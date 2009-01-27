@@ -321,16 +321,19 @@ def RefreshInventoryWindow ():
 	ac += GemRB.GetAbilityBonus(IE_DEX, 2, GemRB.GetPlayerStat(pc, IE_DEX) )
 	Label = GemRB.GetControl (Window, 0x10000038)
 	GemRB.SetText (Window, Label, str (ac))
+	GemRB.SetTooltip (Window, Label, 10339)
 
 	#hp current
 	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
 	Label = GemRB.GetControl (Window, 0x10000039)
 	GemRB.SetText (Window, Label, str (hp))
+	GemRB.SetTooltip (Window, Label, 17184)
 
 	#hp max
 	hpmax = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
 	Label = GemRB.GetControl (Window, 0x1000003a)
 	GemRB.SetText (Window, Label, str (hpmax))
+	GemRB.SetTooltip (Window, Label, 17378)
 
 	#party gold
 	Label = GemRB.GetControl (Window, 0x10000040)
