@@ -30,7 +30,7 @@ class TableMgr;
 class Palette;
 class Item;
 class Spell;
-class Effect;
+struct Effect;
 class ScriptedAnimation;
 class Factory;
 class Actor;
