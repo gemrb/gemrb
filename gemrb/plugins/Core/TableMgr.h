@@ -81,7 +81,7 @@ public:
  *  Utility class to automatically handle loading a table,
  *  and obtain and free a reference to it.
  */
-class AutoTable
+class GEM_EXPORT AutoTable
 {
 public:
 	AutoTable();
