@@ -69,12 +69,37 @@ public:
 	virtual int GetColumnIndex(const char* colname) const = 0;
 	virtual int GetRowIndex(const char* rowname) const = 0;
 	virtual const char* GetColumnName(unsigned int index) const = 0;
+	/** Returns a Row Name, returns NULL on error */
 	virtual const char* GetRowName(unsigned int index) const = 0;
 	virtual unsigned int FindTableValue(unsigned int column, long value, int start = 0) const = 0;
 
 	/** Opens a Table File */
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
-	/** Returns a Row Name, returns NULL on error */
 };
+
+/**
+ *  Utility class to automatically handle loading a table,
+ *  and obtain and free a reference to it.
+ */
+class AutoTable
+{
+public:
+	AutoTable();
+	AutoTable(const char* ResRef);
+	~AutoTable();
+
+	bool load(const char* ResRef);
+	void release();
+	bool ok() const { return table != 0; }
+
+	const TableMgr& operator*() const { return *table; }
+	const TableMgr* operator->() const { return table; }
+	const TableMgr* ptr() const { return table; }
+
+private:
+	TableMgr* table;
+	unsigned int tableref;
+};
+
 
 #endif  // ! TABLEMGR_H

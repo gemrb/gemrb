@@ -20,6 +20,8 @@
  */
 
 #include "TableMgr.h"
+#include "GameData.h"
+#include "Interface.h"
 
 TableMgr::TableMgr()
 {
@@ -27,3 +29,42 @@ TableMgr::TableMgr()
 TableMgr::~TableMgr()
 {
 }
+
+
+AutoTable::AutoTable()
+{
+	table = 0;
+}
+
+AutoTable::AutoTable(const char* ResRef)
+{
+	table = 0;
+	load(ResRef);
+}
+
+bool AutoTable::load(const char* ResRef)
+{
+	release();
+
+	int ref = gamedata->LoadTable(ResRef);
+	if (ref == -1)
+		return false;
+
+	tableref = (unsigned int)ref;
+	table = gamedata->GetTable(tableref);
+	return true;
+}
+
+AutoTable::~AutoTable()
+{
+	release();
+}
+
+void AutoTable::release()
+{
+	if (table) {
+		gamedata->DelTable(tableref);
+		table = 0;
+	}
+}
+
