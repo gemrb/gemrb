@@ -52,14 +52,14 @@ public:
 
 	Factory* GetFactory() const { return factory; }
 
-	// TODO: don't require manually opening a DataStream for this
 	/** Returns actor */
-	Actor *GetCreature(DataStream *stream, unsigned char InParty=0);
+	Actor *GetCreature(const char *ResRef, unsigned int PartySlot=0);
 	/** Returns a PC index, by loading a creature */
-	int LoadCreature(const char *ResRef, int InParty, bool character=false);
+	int LoadCreature(const char *ResRef, unsigned int PartySlot, bool character=false);
 
-	// TODO: make it more convenient to look up a value from a table
-	// There should be no need for a full Load, Get, Del sequence
+
+	// 2DA table functions.
+	// (See also the AutoTable class)
 
 	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
 	int LoadTable(const char * ResRef);

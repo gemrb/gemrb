@@ -620,11 +620,7 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 	}
 
 	int x = core->Roll(1,critter.creaturecount,-1);
-	DataStream *stream = core->GetResourceMgr()->GetResource( critter.CreFile[x], IE_CRE_CLASS_ID );
-	if (!stream) {
-		return;
-	}
-	Actor* cre = gamedata->GetCreature(stream);
+	Actor* cre = gamedata->GetCreature(critter.CreFile[x]);
 	if (!cre) {
 		return;
 	}

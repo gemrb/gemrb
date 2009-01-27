@@ -2286,8 +2286,7 @@ void Map::SpawnCreature(Point &pos, const char *CreName, int radius)
 	Actor *creature;
 	void* lookup;
 	if ( !Spawns.Lookup( CreName, lookup) ) {
-		DataStream *stream = core->GetResourceMgr()->GetResource( CreName, IE_CRE_CLASS_ID );
-		creature = gamedata->GetCreature(stream);
+		creature = gamedata->GetCreature(CreName);
 		if ( creature ) {
 			AddActor(creature);
 			creature->SetPosition( pos, true, radius );
@@ -2300,8 +2299,7 @@ void Map::SpawnCreature(Point &pos, const char *CreName, int radius)
 	unsigned int count = sg->Count;
 	//unsigned int difficulty = sg->Level;
 	while ( count-- ) {
-		DataStream *stream = core->GetResourceMgr()->GetResource( sg->ResRefs[count], IE_CRE_CLASS_ID );
-		creature = gamedata->GetCreature(stream);
+		creature = gamedata->GetCreature(sg->ResRefs[count]);
 		if ( creature ) {
 			AddActor(creature);
 			creature->SetPosition( pos, true, radius );

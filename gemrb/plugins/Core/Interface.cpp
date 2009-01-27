@@ -2398,8 +2398,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 	Actor * ab = NULL;
 
 	while(cnt-- && level>0) {
-		DataStream* ds = key->GetResource( resource, IE_CRE_CLASS_ID );
-		ab = gamedata->GetCreature(ds);
+		ab = gamedata->GetCreature(resource);
 		if (!ab) {
 			return NULL;
 		}

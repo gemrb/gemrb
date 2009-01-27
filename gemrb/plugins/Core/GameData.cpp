@@ -90,22 +90,27 @@ void GameData::ClearCaches()
 	PaletteCache.RemoveAll(ReleasePalette);
 }
 
-Actor *GameData::GetCreature(DataStream *stream, unsigned char InParty)
+Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
 {
+	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef, IE_CRE_CLASS_ID );
+	if (!ds)
+		return 0;
+
 	ActorMgr* actormgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
-	if (!actormgr->Open( stream, true )) {
+	if (!actormgr->Open( ds, true )) {
 		core->FreeInterface( actormgr );
-		return NULL;
+		return 0;
 	}
-	Actor* actor = actormgr->GetActor(InParty);
+	Actor* actor = actormgr->GetActor(PartySlot);
 	core->FreeInterface( actormgr );
 	return actor;
 }
 
-int GameData::LoadCreature(const char* ResRef, int InParty, bool character)
+int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool character)
 {
 	DataStream *stream;
 
+	Actor* actor;
 	if (character) {
 		char nPath[_MAX_PATH], fName[16];
 		snprintf( fName, sizeof(fName), "%s.chr", ResRef);
@@ -114,15 +119,21 @@ int GameData::LoadCreature(const char* ResRef, int InParty, bool character)
 		FileStream *fs = new FileStream();
 		fs -> Open( nPath, true );
 		stream = (DataStream *) fs;
+		ActorMgr* actormgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
+		if (!actormgr->Open( stream, true )) {
+			core->FreeInterface( actormgr );
+			return -1;
+		}
+		actor = actormgr->GetActor(PartySlot);
+		core->FreeInterface( actormgr );
+	} else {
+		actor = GetCreature(ResRef, PartySlot);
 	}
-	else {
-		stream = core->GetResourceMgr()->GetResource( ResRef, IE_CRE_CLASS_ID );
-	}
-	Actor* actor = GetCreature(stream, InParty);
+
 	if ( !actor ) {
 		return -1;
 	}
-	//actor->InParty = (ieByte) InParty;
+
 	//both fields are of length 9, make this sure!
 	memcpy(actor->Area, core->GetGame()->CurrentArea, sizeof(actor->Area) );
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
@@ -132,7 +143,7 @@ int GameData::LoadCreature(const char* ResRef, int InParty, bool character)
 	}
 	actor->SetOrientation( 0, false );
 
-	if ( InParty ) {
+	if ( PartySlot != 0 ) {
 		return core->GetGame()->JoinParty( actor, JP_JOIN|JP_INITPOS );
 	}
 	else {
@@ -201,6 +212,7 @@ TableMgr* GameData::GetTable(unsigned int index) const
 	}
 	return tables[index].tm;
 }
+
 /** Frees a Loaded Table, returns false on error, true on success */
 bool GameData::DelTable(unsigned int index)
 {

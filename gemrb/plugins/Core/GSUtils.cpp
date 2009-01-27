@@ -653,16 +653,15 @@ void PolymorphCopyCore(Actor *src, Actor *tar, bool base)
 
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 {
-	DataStream* ds;
 	Scriptable *tmp = GetActorFromObject( Sender, parameters->objects[1] );
 
+	Actor* ab;
 	if (flags & CC_STRING1) {
-		ds = core->GetResourceMgr()->GetResource( parameters->string1Parameter, IE_CRE_CLASS_ID );
+		ab = gamedata->GetCreature(parameters->string1Parameter);
 	}
 	else {
-		ds = core->GetResourceMgr()->GetResource( parameters->string0Parameter, IE_CRE_CLASS_ID );
+		ab = gamedata->GetCreature(parameters->string0Parameter);
 	}
-	Actor *ab = gamedata->GetCreature(ds);
 
 	//iwd2 allows an optional scriptname to be set
 	//but bg2 doesn't have this feature
@@ -759,8 +758,7 @@ void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *eff
 //this destroys the current actor and replaces it with another
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 {
-	DataStream* ds = core->GetResourceMgr()->GetResource( resref, IE_CRE_CLASS_ID );
-	Actor *tar = gamedata->GetCreature(ds);
+	Actor *tar = gamedata->GetCreature(resref);
 	if (tar) {
 		Map *map = src->GetCurrentArea();
 		map->AddActor( tar );
