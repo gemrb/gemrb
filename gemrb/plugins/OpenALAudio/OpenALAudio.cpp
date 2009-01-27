@@ -591,7 +591,7 @@ int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 	}
 
 	alSourceQueueBuffers(source, 1, &Buffer);
-	if (checkALError("Unable to queueu ambient buffer","ERROR")) {
+	if (checkALError("Unable to queue ambient buffer","ERROR")) {
 		return -1;
 	}
 
