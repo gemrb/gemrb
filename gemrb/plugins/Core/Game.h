@@ -390,7 +390,7 @@ public:
 	/** Dumps information about the object */
 	void DebugDump();
 private:
-	bool DetermineStartPosType(TableMgr *strta);
+	bool DetermineStartPosType(const TableMgr *strta);
 };
 
 #endif  // ! GAME_H

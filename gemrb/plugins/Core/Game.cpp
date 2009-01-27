@@ -62,9 +62,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	LastScriptUpdate = 0;
 
 	//loading master areas
-	int mtab = gamedata->LoadTable("mastarea");
-	TableMgr *table = gamedata->GetTable(mtab);
-	if (table) {
+	AutoTable table;
+	if (table.load("mastarea")) {
 		int i = table->GetRowCount();
 		mastarea.reserve(i);
 		while(i--) {
@@ -72,22 +71,18 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 			strnuprcpy (tmp,table->QueryField(i,0),8);
 			mastarea.push_back( tmp );
 		}
-		gamedata->DelTable(mtab);
 	}
 
 	//loading rest/daylight switching movies (only bg2 has them)
 	memset(restmovies,'*',sizeof(restmovies));
 	memset(daymovies,'*',sizeof(restmovies));
 	memset(nightmovies,'*',sizeof(restmovies));
-	mtab = gamedata->LoadTable("restmov");
-	table = gamedata->GetTable(mtab);
-	if (table) {
+	if (table.load("restmov")) {
 		for(int i=0;i<8;i++) {
 			strnuprcpy(restmovies[i],table->QueryField(i,0),8);
 			strnuprcpy(daymovies[i],table->QueryField(i,1),8);
 			strnuprcpy(nightmovies[i],table->QueryField(i,2),8);
 		}
-		gamedata->DelTable(mtab);
 	}
 
 	interval = 1000/AI_UPDATE_TIME;
@@ -309,7 +304,7 @@ int Game::LeaveParty (Actor* actor)
 }
 
 //determines if startpos.2da has rotation rows (it cannot have tutorial line)
-bool Game::DetermineStartPosType(TableMgr *strta)
+bool Game::DetermineStartPosType(const TableMgr *strta)
 {
 	if ((strta->GetRowCount()>=6) && !stricmp(strta->GetRowName(4),"START_ROT" ) )
 	{
@@ -324,13 +319,12 @@ int Game::JoinParty(Actor* actor, int join)
 	actor->InitButtons(actor->GetStat(IE_CLASS)); //init actor's buttons
 	actor->SetBase(IE_EXPLORE, 1);
 	if (join&JP_INITPOS) {
+		AutoTable strta("startpos");
 		// 0 - single player, 1 - tutorial, 2 - expansion
-		int saindex = gamedata->LoadTable( "startpos" );
-		TableMgr* strta = gamedata->GetTable( saindex );
 		ieDword playmode = 0;
 		core->GetDictionary()->Lookup( "PlayMode", playmode );
 		//hack for iwd2
-		startorient = DetermineStartPosType(strta);
+		startorient = DetermineStartPosType(strta.ptr());
 		if (startorient || strta->GetRowCount()<6) {
 			playmode %= 2;
 			actor->SetOrientation( atoi( strta->QueryField( playmode+4, actor->InParty-1) ), false );
@@ -338,15 +332,12 @@ int Game::JoinParty(Actor* actor, int join)
 		playmode *= 2;
 		actor->Pos.x = actor->Destination.x = (short) atoi( strta->QueryField( playmode, actor->InParty-1 ) );
 		actor->Pos.y = actor->Destination.y = (short) atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
-		gamedata->DelTable( saindex );
 
-		saindex = gamedata->LoadTable( "startare" );
-		strta = gamedata->GetTable( saindex );
+		strta.load("startare");
 		playmode /= 2;
 		playmode *= 3;
 		strnlwrcpy(actor->Area, strta->QueryField( playmode, 0 ), 8 );
 		//TODO: set viewport
-		gamedata->DelTable( saindex );
 
 		SelectActor(actor,true, SELECT_QUIET);
 	}
@@ -802,9 +793,8 @@ char *Game::GetFamiliar(unsigned int Index)
 //reading the challenge rating table for iwd2 (only when needed)
 void Game::LoadCRTable()
 {
-	int mtab = gamedata->LoadTable("moncrate");
-	TableMgr *table = gamedata->GetTable(mtab);
-	if (table) {
+	AutoTable table("moncrate");
+	if (table.ok()) {
 		int maxrow = table->GetRowCount()-1;
 		crtable = new CRRow[MAX_LEVEL];
 		for(int i=0;i<MAX_LEVEL;i++) {
@@ -817,7 +807,6 @@ void Game::LoadCRTable()
 				crtable[i][j]=atoi(table->QueryField(row,col) );
 			}
 		}
-		gamedata->DelTable(mtab);
 	}
 }
 
