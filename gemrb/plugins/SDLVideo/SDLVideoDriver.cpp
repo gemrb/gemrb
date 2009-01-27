@@ -1530,6 +1530,8 @@ inline void ReadPixel(long &val, unsigned char *pixels, int BytesPerPixel) {
 		val = *pixels;
 	} else if (BytesPerPixel == 2) {
 		val = *(Uint16 *)pixels;
+	} else if (BytesPerPixel == 3) {
+		memcpy(&val, pixels, 3); // TODO: big-endian
 	} else if (BytesPerPixel == 4) {
 		val = *(Uint32 *)pixels;
 	}
@@ -1539,6 +1541,8 @@ inline void WritePixel(const long val, unsigned char *pixels, int BytesPerPixel)
 		*pixels = (unsigned char)val;
 	} else if (BytesPerPixel == 2) {
 		*(Uint16 *)pixels = (Uint16)val;
+	} else if (BytesPerPixel == 3) {
+		memcpy(pixels, &val, 3); // TODO: big-endian
 	} else if (BytesPerPixel == 4) {
 		*(Uint32 *)pixels = val;
 	}
