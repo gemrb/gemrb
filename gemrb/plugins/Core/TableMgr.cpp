@@ -42,6 +42,22 @@ AutoTable::AutoTable(const char* ResRef)
 	load(ResRef);
 }
 
+AutoTable::AutoTable(const AutoTable& other)
+{
+	*this = other;
+}
+
+AutoTable& AutoTable::operator=(const AutoTable& other)
+{
+	if (other.table) {
+		tableref = other.tableref;
+		table = gamedata->GetTable(tableref);
+	} else {
+		table = 0;
+	}
+	return *this;
+}
+
 bool AutoTable::load(const char* ResRef)
 {
 	release();

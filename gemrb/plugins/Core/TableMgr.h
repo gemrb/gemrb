@@ -87,6 +87,8 @@ public:
 	AutoTable();
 	AutoTable(const char* ResRef);
 	~AutoTable();
+	AutoTable(const AutoTable &);
+	AutoTable& operator=(const AutoTable&);
 
 	bool load(const char* ResRef);
 	void release();
