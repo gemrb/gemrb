@@ -171,11 +171,10 @@ Game* GAMImp::LoadGame(Game *newGame)
 
 	if (!newGame->CurrentArea[0]) {
 		// 0 - normal, 1 - tutorial, 2 - extension
-		int i = gamedata->LoadTable( "STARTARE" );
-		TableMgr* tm = gamedata->GetTable( i );
+		AutoTable tm("STARTARE");
 		ieDword playmode = 0;
 		//only bg2 has 9 rows (iwd's have 6 rows - normal+extension)
-		if (tm->GetRowCount()==9) {
+		if (tm && tm->GetRowCount()==9) {
 			core->GetDictionary()->Lookup( "PlayMode", playmode );
 			playmode *= 3;
 		}

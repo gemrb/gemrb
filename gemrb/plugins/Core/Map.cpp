@@ -152,20 +152,15 @@ void InitSpawnGroups()
 {
 	ieResRef GroupName;
 	int i;
-	TableMgr * tab;
 
-	int table=gamedata->LoadTable( "spawngrp" );
+	AutoTable tab("spawngrp");
 
 	Spawns.RemoveAll(NULL);
 	Spawns.SetType( GEM_VARIABLES_POINTER );
 
-	if (table<0) {
+	if (!tab)
 		return;
-	}
-	tab = gamedata->GetTable( table );
-	if (!tab) {
-		goto end;
-	}
+
 	i=tab->GetColNamesCount();
 	while (i--) {
 		int j=tab->GetRowCount();
@@ -184,32 +179,26 @@ void InitSpawnGroups()
 			Spawns.SetAt( GroupName, (void*) creatures );
 		}
 	}
-end:
-	gamedata->DelTable( table );
 }
 
 void InitPathFinder()
 {
 	PathFinderInited = true;
-	int passabletable = gamedata->LoadTable( "pathfind" );
-	if (passabletable >= 0) {
-		TableMgr* tm = gamedata->GetTable( passabletable );
-		if (tm) {
-			const char* poi;
+	AutoTable tm("pathfind");
+	if (tm) {
+		const char* poi;
 
-			for (int i = 0; i < 16; i++) {
-				poi = tm->QueryField( 0, i );
-				if (*poi != '*')
-					Passable[i] = atoi( poi );
-			}
-			poi = tm->QueryField( 1, 0 );
+		for (int i = 0; i < 16; i++) {
+			poi = tm->QueryField( 0, i );
 			if (*poi != '*')
-				NormalCost = atoi( poi );
-			poi = tm->QueryField( 1, 1 );
-			if (*poi != '*')
-				AdditionalCost = atoi( poi );
-			gamedata->DelTable( passabletable );
+				Passable[i] = atoi( poi );
 		}
+		poi = tm->QueryField( 1, 0 );
+		if (*poi != '*')
+			NormalCost = atoi( poi );
+		poi = tm->QueryField( 1, 1 );
+		if (*poi != '*')
+			AdditionalCost = atoi( poi );
 	}
 }
 
@@ -1353,15 +1342,10 @@ void Map::PlayAreaSong(int SongType)
 		column = 0;
 		tablename = "music";
 	}
-	int songlist = gamedata->LoadTable( tablename );
-	if (songlist < 0) {
+
+	AutoTable tm(tablename);
+	if (!tm)
 		return;
-	}
-	TableMgr* tm = gamedata->GetTable( songlist );
-	if (!tm) {
-		gamedata->DelTable( songlist );
-		return;
-	}
 	const char* poi = tm->QueryField( SongHeader.SongList[SongType], column );
 	core->GetMusicMgr()->SwitchPlayList( poi, true );
 }

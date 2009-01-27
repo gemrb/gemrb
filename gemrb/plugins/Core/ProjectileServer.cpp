@@ -129,8 +129,7 @@ int ProjectileServer::InitExplosion()
 		return explosioncount;
 	}
 
-	unsigned int resource = gamedata->LoadTable("areapro");
-	TableMgr *explist = gamedata->GetTable(resource);
+	AutoTable explist("areapro");
 	if (explist) {
 		explosioncount = 0;
 
@@ -142,7 +141,6 @@ int ProjectileServer::InitExplosion()
 			strnuprcpy(explosions[ rows].resource1, explist->QueryField(rows, 0), 8);
 			strnuprcpy(explosions[ rows].resource2, explist->QueryField(rows, 1), 8);
 		}
-		core->DelSymbol(resource);
 	}
 	return explosioncount;
 }

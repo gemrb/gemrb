@@ -68,9 +68,8 @@ void InitScriptTables()
 {
 	//initializing the skill->stats conversion table
 	{
-	int table = gamedata->LoadTable( "skillsta" );
-	if (table!=-1) {
-		TableMgr *tab = gamedata->GetTable( table );
+	AutoTable tab("skillsta");
+	if (tab) {
 		int rowcount = tab->GetRowCount();
 		SkillCount = rowcount;
 		if (rowcount) {
@@ -83,39 +82,33 @@ void InitScriptTables()
 	}
 	//initializing the happiness table
 	{
-	int table = gamedata->LoadTable( "happy" );
-	if (table!=-1) {
-		TableMgr *tab = gamedata->GetTable( table );
+	AutoTable tab("happy");
+	if (tab) {
 		for (int alignment=0;alignment<3;alignment++) {
 			for (int reputation=0;reputation<20;reputation++) {
 				happiness[alignment][reputation]=strtol(tab->QueryField(reputation,alignment), NULL, 0);
 			}
 		}
-		gamedata->DelTable( table );
 	}
 	}
 
 	//initializing the reaction mod. reputation table
 	{
-	int table = gamedata->LoadTable( "rmodrep" );
-	if (table!=-1) {
-		TableMgr *tab = gamedata->GetTable( table );
+	AutoTable tab("rmodrep");
+	if (tab) {
 		for (int reputation=0;reputation<20;reputation++) {
 			rmodrep[reputation]=strtol(tab->QueryField(0,reputation), NULL, 0);
 		}
-		gamedata->DelTable( table );
 	}
 	}
 
 	//initializing the reaction mod. charisma table
 	{
-	int table = gamedata->LoadTable( "rmodchr" );
-	if (table!=-1) {
-		TableMgr *tab = gamedata->GetTable( table );
+	AutoTable tab("rmodchr");
+	if (tab) {
 		for (int charisma=0;charisma<25;charisma++) {
 			rmodchr[charisma]=strtol(tab->QueryField(0,charisma), NULL, 0);
 		}
-		gamedata->DelTable( table );
 	}
 	}
 }
@@ -827,11 +820,10 @@ void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 
 int CheckInteract(const char *talker, const char *target)
 {
-	int interact = -1;
-	interact = gamedata->LoadTable( "interact" );
+	AutoTable interact("interact");
 	if(!interact)
 		return 0;
-	const char *value = gamedata->GetTable(interact)->QueryField(talker, target);
+	const char *value = interact->QueryField(talker, target);
 	if(!value)
 		return 0;
 	switch(value[0]) {
@@ -966,7 +958,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 
 	const char* Dialog = NULL;
-	int pdtable = -1;
+	AutoTable pdtable;
 
 	switch (Flags & BD_LOCMASK) {
 		case BD_STRING0:
@@ -994,13 +986,13 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 				speaker->Interact(type);
 				target->Response(type);
 				Sender->ReleaseCurrentAction();
-				goto end_of_quest;
+				return;
 			}
 			/* banter dialogue */
-			pdtable = gamedata->LoadTable( "interdia" );
+			pdtable.load("interdia");
 			//Dialog is a borrowed reference, we cannot free pdtable while it is being used
-			if (pdtable!=-1) {
-				Dialog = gamedata->GetTable( pdtable )->QueryField( scriptingname, "FILE" );
+			if (pdtable) {
+				Dialog = pdtable->QueryField( scriptingname, "FILE" );
 			}
 			break;
 	}
@@ -1009,7 +1001,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	//dialog is not meaningful
 	if (!Dialog || Dialog[0]=='*') {
 		Sender->ReleaseCurrentAction();
-		goto end_of_quest;
+		return;
 	}
 	//maybe we should remove the action queue, but i'm unsure
 	//no, we shouldn't even call this!
@@ -1025,7 +1017,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 				if (tar->GetNextAction()) {
 					core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 					Sender->ReleaseCurrentAction();
-					goto end_of_quest;
+					return;
 				}
 			}
 		}
@@ -1052,11 +1044,6 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 		core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
 		gc->InitDialog( scr, tar, Dialog);
-	}
-//if pdtable was allocated, free it now, it will release Dialog
-end_of_quest:
-	if (pdtable!=-1) {
-		gamedata->DelTable( pdtable );
 	}
 }
 
@@ -2312,16 +2299,14 @@ Point GetEntryPoint(const char *areaname, const char *entryname)
 {
 	Point p;
 
-	int table = gamedata->LoadTable( "entries" );
-	if (table<0) {
+	AutoTable tab("entries");
+	if (!tab) {
 		return p;
 	}
-	TableMgr *tab = gamedata->GetTable( table );
 	const char *tmpstr = tab->QueryField(areaname, entryname);
 	int x=-1;
 	int y=-1;
 	sscanf(tmpstr, "%d.%d", &x, &y);
-	gamedata->DelTable(table);
 	p.x=(short) x;
 	p.y=(short) y;
 	return p;
