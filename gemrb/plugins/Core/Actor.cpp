@@ -487,8 +487,7 @@ void Actor::SetCircleSize()
 
 void ApplyClab(Actor *actor, const char *clab, int level)
 {
-	int tidx = gamedata->LoadTable(clab);
-	TableMgr *table = gamedata->GetTable(tidx);
+	AutoTable table(clab);
 	if (table) {
 		int row = table->GetRowCount();
 		for(int i=0;i<level;i++) {
@@ -514,7 +513,6 @@ void ApplyClab(Actor *actor, const char *clab, int level)
 				}
 			}
 		}
-		gamedata->DelTable(tidx);
 	}
 }
 
@@ -527,8 +525,7 @@ bool Actor::ApplyKit(ieDword Value)
 {
 	//get current unmodified level (i guess)
 	int level = GetXPLevel(false);
-	int tidx = gamedata->LoadTable("kitlist");
-	TableMgr *table = gamedata->GetTable(tidx);
+	AutoTable table("kitlist");
 	if (table) {
 		ieDword row;
 		//find row by unusability
@@ -1008,13 +1005,10 @@ static void InitActorTables()
 	DeathOnZeroStat=(bool) core->HasFeature(GF_DEATH_ON_ZERO_STAT);
 
 	//this table lists various level based xp bonuses
-	int table = gamedata->LoadTable( "xpbonus" );
-	TableMgr *tm = gamedata->GetTable( table );
-
+	AutoTable tm("xpbonus");
 	if (tm) {
 		xpbonustypes = tm->GetRowCount();
 		if (xpbonustypes == 0) {
-			gamedata->DelTable( table );
 			xpbonuslevels = 0;
 		} else {
 			xpbonuslevels = tm->GetColumnCount(0);
@@ -1031,8 +1025,7 @@ static void InitActorTables()
 	}
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
-	table = gamedata->LoadTable( "clskills" );
-	tm = gamedata->GetTable( table );
+	tm.load("clskills");
 	if (tm) {
 		classcount = tm->GetRowCount();
 		memset (isclass,0,sizeof(isclass));
@@ -1086,7 +1079,6 @@ static void InitActorTables()
 			}
 			bitmask <<=1;
 		}
-		gamedata->DelTable( table );
 	} else {
 		classcount = 0; //well
 	}
@@ -1107,8 +1099,7 @@ static void InitActorTables()
 	}
 
 	//initializing the vvc resource references
-	table = gamedata->LoadTable( "damage" );
-	tm = gamedata->GetTable( table );
+	tm.load("damage");
 	if (tm) {
 		for (i=0;i<DAMAGE_LEVELS;i++) {
 			const char *tmp = tm->QueryField( i, COL_MAIN );
@@ -1124,11 +1115,9 @@ static void InitActorTables()
 			tmp = tm->QueryField( i, COL_GRADIENT );
 			d_gradient[i]=atoi(tmp);
 		}
-		gamedata->DelTable( table );
 	}
 
-	table = gamedata->LoadTable( "overlay" );
-	tm = gamedata->GetTable( table );
+	tm.load("overlay");
 	if (tm) {
 		ieDword mask = 1;
 		for (i=0;i<OVERLAY_COUNT;i++) {
@@ -1139,14 +1128,12 @@ static void InitActorTables()
 			}
 			mask<<=1;
 		}
-		gamedata->DelTable( table );
 	}
 
 	//csound for bg1/bg2
 	memset(csound,0,sizeof(csound));
 	if (!core->HasFeature(GF_SOUNDFOLDERS)) {
-		table = gamedata->LoadTable( "csound" );
-		tm = gamedata->GetTable( table );
+		tm.load("csound");
 		if (tm) {
 			for(i=0;i<VCONST_COUNT;i++) {
 				const char *tmp = tm->QueryField( i, 0 );
@@ -1154,12 +1141,10 @@ static void InitActorTables()
 					csound[i]=tmp[0];
 				}
 			}
-			gamedata->DelTable( table );
 		}
 	}
 
-	table = gamedata->LoadTable( "qslots" );
-	tm = gamedata->GetTable( table );
+	tm.load("qslots");
 	GUIBTDefaults = (ActionButtonRow *) calloc( classcount,sizeof(ActionButtonRow) );
 
 	for (i = 0; i < classcount; i++) {
@@ -1170,12 +1155,8 @@ static void InitActorTables()
 			}
 		}
 	}
-	if (tm) {
-		gamedata->DelTable( table );
-	}
 
-	table = gamedata->LoadTable( "itemuse" );
-	tm = gamedata->GetTable( table );
+	tm.load("itemuse");
 	if (tm) {
 		usecount = tm->GetRowCount();
 		itemuse = new ItemUseType[usecount];
@@ -1190,11 +1171,9 @@ static void InitActorTables()
 				itemuse[i].which=0;
 			}
 		}
-		gamedata->DelTable( table );
 	}
 
-	table = gamedata->LoadTable( "itemanim" );
-	tm = gamedata->GetTable( table );
+	tm.load("itemanim");
 	if (tm) {
 		animcount = tm->GetRowCount();
 		itemanim = new ItemAnimType[animcount];
@@ -1202,12 +1181,9 @@ static void InitActorTables()
 			strnlwrcpy(itemanim[i].itemname, tm->QueryField(i,0),8 );
 			itemanim[i].animation = (ieByte) atoi( tm->QueryField(i,1) );
 		}
-		gamedata->DelTable( table );
 	}
 
-
-	table = gamedata->LoadTable( "mxsplwis" );
-	tm = gamedata->GetTable( table );
+	tm.load("mxsplwis");
 	if (tm) {
 		spllevels = tm->GetColumnCount(0);
 		int max = core->GetMaximumAbility();
@@ -1220,11 +1196,9 @@ static void InitActorTables()
 				}
 			}
 		}
-		gamedata->DelTable( table );
 	}
 
-	table = gamedata->LoadTable( "featreq" );
-	tm = gamedata->GetTable( table );
+	tm.load("featreq");
 	if (tm) {
 		unsigned int tmp;
 
@@ -1238,7 +1212,6 @@ static void InitActorTables()
 			}
 			featstats[i] = (ieByte) tmp;
 		}
-		gamedata->DelTable( table );
 	}
 }
 
@@ -1662,8 +1635,7 @@ void Actor::Response(int type)
 
 void Actor::ReactToDeath(const char * deadname)
 {
-	int table = gamedata->LoadTable( "death" );
-	TableMgr *tm = gamedata->GetTable( table );
+	AutoTable tm("death");
 	if (!tm) return;
 	// lookup value based on died's scriptingname and ours
 	// if value is 0 - use reactdeath
@@ -1698,7 +1670,6 @@ void Actor::ReactToDeath(const char * deadname)
 			break;
 		}
 	}
-	gamedata->DelTable(table);
 }
 
 //call this only from gui selects
@@ -3391,15 +3362,9 @@ bool Actor::HandleActorStance()
 
 void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index)
 {
-	int table=gamedata->LoadTable( anims->ResRef );
-
-	if (table<0) {
+	AutoTable tab(anims->ResRef);
+	if (!tab)
 		return;
-	}
-	TableMgr * tab = gamedata->GetTable( table );
-	if (!tab) {
-		goto end;
-	}
 
 	switch (index) {
 		case VB_ATTACK:
@@ -3416,8 +3381,6 @@ void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index)
 			break;
 	}
 	strnlwrcpy(Sound, tab->QueryField (index, 0), 8);
-end:
-	gamedata->DelTable( table );
 }
 
 void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index)
@@ -3872,8 +3835,7 @@ void Actor::SetupFist()
 
 	if (FistRows<0) {
 		FistRows=0;
-		int table = gamedata->LoadTable( "fistweap" );
-		TableMgr *fist = gamedata->GetTable( table );
+		AutoTable fist("fistweap");
 		if (fist) {
 			//default value
 			strnlwrcpy( DefaultFist, fist->QueryField( (unsigned int) -1), 8);
@@ -3887,7 +3849,6 @@ void Actor::SetupFist()
 				*(int *) fistres[i] = atoi(fist->GetRowName( i));
 			}
 		}
-		gamedata->DelTable( table );
 	}
 	if (col>MAX_LEVEL) col=MAX_LEVEL;
 	if (col<1) col=1;

@@ -76,17 +76,15 @@ static ieResRef *ResolveShapeName(ieDword index)
 */
 static ieResRef *GetSpellTable(const ieResRef tableresref, int column)
 {
-	int table = gamedata->LoadTable(tableresref);
-	if (table<0) {
-		return NULL;
-	}
-	TableMgr *tab = gamedata->GetTable((unsigned int) table);
+	AutoTable tab(tableresref);
+	if (!tab)
+		return 0;
+
 	int count = tab->GetRowCount();
 	ieResRef *reslist = (ieResRef *) malloc (sizeof(ieResRef) * count);
 	for(int i = 0; i<count;i++) {
 		strnlwrcpy(reslist[i], tab->QueryField(i, column), 8);
 	}
-	gamedata->DelTable((unsigned int) table);
 	return reslist;
 }
 
