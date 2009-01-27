@@ -65,9 +65,9 @@ static void ReleasePalette(void *poi)
 { \
 	std::vector<type>::iterator i; \
 	for(i = (variable).begin(); i != (variable).end(); ++i) { \
-	if (!(*i).free) { \
+	if ((*i).refcount) { \
 		core->FreeInterface((*i).member); \
-		(*i).free = true; \
+		(*i).refcount = 0; \
 	} \
 	} \
 }
@@ -173,12 +173,12 @@ int GameData::LoadTable(const ieResRef ResRef)
 		return -1;
 	}
 	Table t;
-	t.free = false;
+	t.refcount = 1;
 	strncpy( t.ResRef, ResRef, 8 );
 	t.tm = tm;
 	ind = -1;
 	for (size_t i = 0; i < tables.size(); i++) {
-		if (tables[i].free) {
+		if (tables[i].refcount == 0) {
 			ind = ( int ) i;
 			break;
 		}
@@ -194,7 +194,7 @@ int GameData::LoadTable(const ieResRef ResRef)
 int GameData::GetTableIndex(const char* ResRef) const
 {
 	for (size_t i = 0; i < tables.size(); i++) {
-		if (tables[i].free)
+		if (tables[i].refcount == 0)
 			continue;
 		if (strnicmp( tables[i].ResRef, ResRef, 8 ) == 0)
 			return ( int ) i;
@@ -207,7 +207,7 @@ TableMgr* GameData::GetTable(unsigned int index) const
 	if (index >= tables.size()) {
 		return NULL;
 	}
-	if (tables[index].free) {
+	if (tables[index].refcount == 0) {
 		return NULL;
 	}
 	return tables[index].tm;
@@ -224,11 +224,12 @@ bool GameData::DelTable(unsigned int index)
 	if (index >= tables.size()) {
 		return false;
 	}
-	if (tables[index].free) {
+	if (tables[index].refcount == 0) {
 		return false;
 	}
-	core->FreeInterface( tables[index].tm );
-	tables[index].free = true;
+	tables[index].refcount--;
+	if (tables[index].refcount == 0)
+		core->FreeInterface( tables[index].tm );
 	return true;
 }
 bool GameData::Exists(const char *ResRef, SClass_ID type, bool silent)

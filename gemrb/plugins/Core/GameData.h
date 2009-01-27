@@ -39,7 +39,7 @@ class Sprite2D;
 struct Table {
 	TableMgr * tm;
 	char ResRef[8];
-	bool free;
+	unsigned int refcount;
 };
 
 #ifdef WIN32
