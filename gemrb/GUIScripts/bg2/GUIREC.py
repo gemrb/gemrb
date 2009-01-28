@@ -41,6 +41,7 @@ OldPortraitWindow = None
 OldOptionsWindow = None
 ExportWindow = None
 KitInfoWindow = None
+LevelUpWindow = None
 ExportDoneButton = None
 ExportFileName = ""
 
@@ -90,7 +91,7 @@ def OpenRecordsWindow ():
 	# levelup
 	Button = GemRB.GetControl (Window, 37)
 	GemRB.SetText (Window, Button, 7175)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "LevelupWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "LevelUpWindow")
 
 	# information
 	Button = GemRB.GetControl (Window, 1)
@@ -286,7 +287,7 @@ def GetStatOverview (pc):
 	# Next Level: <NEXTLEVEL>
 
 	#collecting tokens for stat overview
-	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
+	ClassTitle = GetActorClassTitle (pc)
 	GemRB.SetToken("CLASS", ClassTitle)
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassTable = GemRB.LoadTable ("classes")
@@ -763,50 +764,6 @@ def ExportEditChanged():
 		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_ENABLED)
 	return
 
-# returns an array: first field is 0 - not dual classed; 1 - kit/class; 2 - class/class
-# the second and third field hold the kit/class index for each class
-# if invoked with verbose==0 only returns 0 or 1 (is or is not dual classed)
-def IsDualClassed(actor, verbose):
-	Dual = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
-	Dual = Dual & ~(MC_EXPORTABLE|MC_PLOT_CRITICAL|MC_BEENINPARTY|MC_HIDDEN)
-
-	if verbose:
-		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-		ClassTable = GemRB.LoadTable ("classes")
-		ClassIndex = GemRB.FindTableValue (ClassTable, 5, Class)
-		Multi = GemRB.GetTableValue (ClassTable, ClassIndex, 4)
-		DualInfo = []
-		KitIndex = GetKitIndex (actor)
-
-		if (Dual & MC_WAS_ANY_CLASS) > 0: # first (previous) class of the dual class
-			if KitIndex:
-				DualInfo.append (1)
-				DualInfo.append (KitIndex)
-			else:
-				DualInfo.append (2)
-				DualInfo.append (GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS))
-
-			# use the first class of the multiclass bunch that isn't the same as the first class
-			FirstClassIndex = ClassIndex
-			Mask = 1
-			for i in range (16):
-				if Multi & Mask:
-					ClassIndex = GemRB.FindTableValue (ClassTable, 5, i+1)
-					if ClassIndex == FirstClassIndex:
-						Mask += Mask
-						continue
-					DualInfo.append (ClassIndex)
-					break
-				Mask += Mask
-			return DualInfo
-		else:
-			return (0,-1,-1)
-	else:
-		if (Dual & MC_WAS_ANY_CLASS) > 0:
-			return (1,-1,-1)
-		else:
-			return (0,-1,-1)
-
 def CanDualClass(actor):
 	# human
 	if GemRB.GetPlayerStat (actor, IE_RACE) != 1:
@@ -915,6 +872,44 @@ def KitInfoWindow():
 	GemRB.TextAreaAppend (KitInfoWindow, TextArea, text)
 
 	GemRB.ShowModal (KitInfoWindow, MODAL_SHADOW_GRAY)
+	return
+
+def LevelUpWindow():
+	global LevelUpWindow
+
+	LevelUpWindow = GemRB.LoadWindow (3)
+
+	InfoButton = GemRB.GetControl (LevelUpWindow, 125)
+	GemRB.SetText (LevelUpWindow, InfoButton, 13707)
+	GemRB.SetEvent (LevelUpWindow, InfoButton, IE_GUI_BUTTON_ON_PRESS, "LevelUpInfoPress")
+
+	DoneButton = GemRB.GetControl (LevelUpWindow, 0)
+	GemRB.SetText (LevelUpWindow, DoneButton, 11962)
+	GemRB.SetEvent (LevelUpWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "LevelUpDonePress")
+	GemRB.SetButtonFlags (LevelUpWindow, DoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	if False:
+		HLAButton = GemRB.GetControl (LevelUpWindow, 126)
+		GemRB.SetText (LevelUpWindow, HLAButton, "KUKU")
+		GemRB.SetEvent (LevelUpWindow, HLAButton, IE_GUI_BUTTON_ON_PRESS, "LevelUpHLAPress")
+
+	## hide "Character Generation"
+	GemRB.DeleteControl (LevelUpWindow, 126)
+
+	## name
+	Label = GemRB.GetControl (LevelUpWindow, 90)
+	GemRB.SetText (LevelUpWindow, Label, GemRB.GetPlayerName(pc))
+
+	## class
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Label = GemRB.GetControl (LevelUpWindow, 106)
+	GemRB.SetText (LevelUpWindow, Label, GetActorClassTitle (pc))
+
+	GemRB.ShowModal (LevelUpWindow, MODAL_SHADOW_GRAY)
+	return
+
+def LevelUpDonePress():
+	GemRB.UnloadWindow(LevelUpWindow)
 	return
 
 def KitDonePress():

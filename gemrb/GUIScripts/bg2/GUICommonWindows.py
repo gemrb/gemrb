@@ -477,17 +477,33 @@ def GetKitIndex (actor):
 def GetActorClassTitle (actor):
 	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
 
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassTable = GemRB.LoadTable ("classes")
-	Class = GemRB.FindTableValue ( ClassTable, 5, Class )
-	KitTable = GemRB.LoadTable ("kitlist")
-	KitIndex = GetKitIndex (actor)
-
 	if ClassTitle == 0:
-		if KitIndex == 0:
-			ClassTitle=GemRB.GetTableValue (ClassTable, Class, 2)
+		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+		ClassTable = GemRB.LoadTable ("classes")
+		ClassIndex = GemRB.FindTableValue ( ClassTable, 5, Class )
+		KitTable = GemRB.LoadTable ("kitlist")
+		KitIndex = GetKitIndex (actor)
+		Multi = GemRB.GetTableValue (ClassTable, ClassIndex, 4)
+		Dual = IsDualClassed (actor, 1)
+	
+		if Multi and Dual[0] == 0: # true multi class
+			ClassTitle = GemRB.GetTableValue (ClassTable, ClassIndex, 2)
+			ClassTitle = GemRB.GetString (ClassTitle)
 		else:
-			ClassTitle=GemRB.GetTableValue (KitTable, KitIndex, 2)
+			if Dual[0]: # dual class
+				# first (previous) kit or class of the dual class
+				if Dual[0] == 1:
+					ClassTitle = GemRB.GetTableValue (KitTable, Dual[1], 2)
+				elif Dual[0] == 2:
+					ClassTitle = GemRB.GetTableValue (ClassTable, Dual[1], 2)
+				ClassTitle = GemRB.GetString (ClassTitle) + " / "
+				ClassTitle += GemRB.GetString (GemRB.GetTableValue (ClassTable, Dual[2], 2))
+			else: # ordinary class or kit
+				if KitIndex:
+					ClassTitle = GemRB.GetTableValue (KitTable, KitIndex, 2)
+				else:
+					ClassTitle = GemRB.GetTableValue (ClassTable, ClassIndex, 2)
+				ClassTitle = GemRB.GetString (ClassTitle)
 
 	if ClassTitle == "*":
 		return 0
@@ -806,3 +822,46 @@ def OpenWaitForDiscWindow ():
         except:
                 GemRB.SetVisible (DiscWindow, 1)
 
+# returns an array: first field is 0 - not dual classed; 1 - kit/class; 2 - class/class
+# the second and third field hold the kit/class index for each class
+# if invoked with verbose==0 only returns 0 or 1 (is or is not dual classed)
+def IsDualClassed(actor, verbose):
+	Dual = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
+	Dual = Dual & ~(MC_EXPORTABLE|MC_PLOT_CRITICAL|MC_BEENINPARTY|MC_HIDDEN)
+
+	if verbose:
+		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+		ClassTable = GemRB.LoadTable ("classes")
+		ClassIndex = GemRB.FindTableValue (ClassTable, 5, Class)
+		Multi = GemRB.GetTableValue (ClassTable, ClassIndex, 4)
+		DualInfo = []
+		KitIndex = GetKitIndex (actor)
+
+		if (Dual & MC_WAS_ANY_CLASS) > 0: # first (previous) class of the dual class
+			if KitIndex:
+				DualInfo.append (1)
+				DualInfo.append (KitIndex)
+			else:
+				DualInfo.append (2)
+				DualInfo.append (GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS))
+
+			# use the first class of the multiclass bunch that isn't the same as the first class
+			FirstClassIndex = ClassIndex
+			Mask = 1
+			for i in range (16):
+				if Multi & Mask:
+					ClassIndex = GemRB.FindTableValue (ClassTable, 5, i+1)
+					if ClassIndex == FirstClassIndex:
+						Mask += Mask
+						continue
+					DualInfo.append (ClassIndex)
+					break
+				Mask += Mask
+			return DualInfo
+		else:
+			return (0,-1,-1)
+	else:
+		if (Dual & MC_WAS_ANY_CLASS) > 0:
+			return (1,-1,-1)
+		else:
+			return (0,-1,-1)
