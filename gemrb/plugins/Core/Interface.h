@@ -630,6 +630,8 @@ private:
 	void HandleFlags();
 	/** handles the EventFlag bits (conditional events) */
 	void HandleEvents();
+	/** handles hardcoded gui behaviour */
+	void HandleGUIBehaviour();
 	/** Creates a game control, closes all other windows */
 	GameControl* StartGameControl();
 

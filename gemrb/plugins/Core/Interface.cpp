@@ -923,6 +923,7 @@ void Interface::Main()
 		if (EventFlag) {
 			HandleEvents();
 		}
+		HandleGUIBehaviour();
 
 		GameLoop();
 		DrawWindows();
@@ -2868,7 +2869,8 @@ void Interface::GameLoop(void)
 	}
 }
 
-void Interface::DrawWindows(void)
+/** handles hardcoded gui behaviour */
+void Interface::HandleGUIBehaviour(void)
 {
 	GameControl *gc = GetGameControl();
 	if (gc) {
@@ -2876,10 +2878,6 @@ void Interface::DrawWindows(void)
 		int flg = gc->GetDialogueFlags();
 
 		//the following part is a series of hardcoded gui behaviour
-
-		//updating panes according to the saved game
-		//pst requires this before initiating dialogs because it has
-		//no dialog window by default
 
 		//initiating dialog
 		if (flg & DF_IN_DIALOG) {
@@ -2918,7 +2916,10 @@ void Interface::DrawWindows(void)
 		}
 		//end of gui hacks
 	}
+}
 
+void Interface::DrawWindows(void)
+{
 	//here comes the REAL drawing of windows
 	if (ModalWindow) {
 		ModalWindow->DrawWindow();
