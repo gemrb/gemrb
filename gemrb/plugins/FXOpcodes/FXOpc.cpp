@@ -2593,9 +2593,16 @@ seconds:
 		break;
 	}
 
+	ieDword old_hp = target->Modified[IE_HITPOINTS];
 	target->NewBase( IE_HITPOINTS, damage, MOD_ADDITIVE );
-	if (target->BaseStats[IE_HITPOINTS]> target->BaseStats[IE_MAXHITPOINTS]) {
+	if (target->BaseStats[IE_HITPOINTS] > target->BaseStats[IE_MAXHITPOINTS]) {
 		target->SetBase(IE_HITPOINTS, target->BaseStats[IE_MAXHITPOINTS]);
+	}
+	// if an effect only increased the max hp, we need to modify the hp manually,
+	// since SetBase has just reset it to the current base hp (diff is 0)
+	target->SetStat(IE_HITPOINTS, old_hp+damage, 0);
+	if (target->Modified[IE_HITPOINTS] > target->Modified[IE_MAXHITPOINTS]) {
+		target->SetStat(IE_HITPOINTS, target->Modified[IE_MAXHITPOINTS], 0);
 	}
 	return FX_APPLIED;
 }
