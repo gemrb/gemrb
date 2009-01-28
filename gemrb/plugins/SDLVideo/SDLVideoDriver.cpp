@@ -335,7 +335,7 @@ int SDLVideoDriver::SwapBuffers(void)
 			MouseMovement(event.motion.x, event.motion.y);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			if (DisableMouse || !Evnt) //grayed mouse is disabled in this sense
+			if ((DisableMouse & MOUSE_DISABLED) || !Evnt)
 				break;
 			lastevent = true;
 			lastmousetime=Evnt->GetRKDelay();
@@ -353,7 +353,7 @@ int SDLVideoDriver::SwapBuffers(void)
 
 		case SDL_MOUSEBUTTONUP:
 			lastevent = false;
-			if (DisableMouse || !Evnt) //grayed mouse is disabled in this sense
+			if ((DisableMouse & MOUSE_DISABLED) || !Evnt)
 				break;
 			if (CursorIndex != 2)
 				CursorIndex = 0;
