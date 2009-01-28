@@ -874,40 +874,6 @@ def KitInfoWindow():
 	GemRB.ShowModal (KitInfoWindow, MODAL_SHADOW_GRAY)
 	return
 
-def LevelUpWindow():
-	global LevelUpWindow
-
-	LevelUpWindow = GemRB.LoadWindow (3)
-
-	InfoButton = GemRB.GetControl (LevelUpWindow, 125)
-	GemRB.SetText (LevelUpWindow, InfoButton, 13707)
-	GemRB.SetEvent (LevelUpWindow, InfoButton, IE_GUI_BUTTON_ON_PRESS, "LevelUpInfoPress")
-
-	DoneButton = GemRB.GetControl (LevelUpWindow, 0)
-	GemRB.SetText (LevelUpWindow, DoneButton, 11962)
-	GemRB.SetEvent (LevelUpWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "LevelUpDonePress")
-	GemRB.SetButtonFlags (LevelUpWindow, DoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
-
-	if False:
-		HLAButton = GemRB.GetControl (LevelUpWindow, 126)
-		GemRB.SetText (LevelUpWindow, HLAButton, "KUKU")
-		GemRB.SetEvent (LevelUpWindow, HLAButton, IE_GUI_BUTTON_ON_PRESS, "LevelUpHLAPress")
-
-	## hide "Character Generation"
-	GemRB.DeleteControl (LevelUpWindow, 126)
-
-	## name
-	Label = GemRB.GetControl (LevelUpWindow, 90)
-	GemRB.SetText (LevelUpWindow, Label, GemRB.GetPlayerName(pc))
-
-	## class
-	pc = GemRB.GameGetSelectedPCSingle ()
-	Label = GemRB.GetControl (LevelUpWindow, 106)
-	GemRB.SetText (LevelUpWindow, Label, GetActorClassTitle (pc))
-
-	GemRB.ShowModal (LevelUpWindow, MODAL_SHADOW_GRAY)
-	return
-
 def LevelUpDonePress():
 	GemRB.UnloadWindow(LevelUpWindow)
 	return
