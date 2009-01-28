@@ -1302,7 +1302,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 {
 	char Tmp[256];
 
-	if (spellCount) {
+	if ((target_mode&TARGET_MODE_CAST) && spellCount) {
 		//we'll get the container back from the coordinates
 		TryToCast(actor, container->Pos);
 		return;
@@ -1329,7 +1329,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 {
 	char Tmp[256];
 
-	if (spellCount) {
+	if ((target_mode&TARGET_MODE_CAST) && spellCount) {
 		//we'll get the door back from the coordinates
 		TryToCast(actor, door->Pos);
 		return;
@@ -1360,7 +1360,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 
 bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 {
-	if (spellCount) {
+	if ((target_mode&TARGET_MODE_CAST) && spellCount) {
 		//we'll get the active region from the coordinates (if needed)
 		TryToCast(actor, p);
 		//don't bother with this region further
@@ -1509,7 +1509,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		//just a single actor, no formation
 		if (game->selected.size()==1) {
 			//the player is using an item or spell on the ground
-			if (spellCount) {
+			if ((target_mode&TARGET_MODE_CAST) && spellCount) {
 				TryToCast(core->GetFirstSelectedPC(false), p);
 				return;
 			}
@@ -1574,7 +1574,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	//we shouldn't zero this for two reasons in case of spell or item
 	//1. there could be multiple targets
 	//2. the target mode is important
-	if (!spellCount) {
+	if (!(target_mode&TARGET_MODE_CAST) || !spellCount) {
 		target_mode = TARGET_MODE_NONE;
 	}
 
