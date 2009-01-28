@@ -1434,17 +1434,9 @@ void Door::TryDisarm(Actor *actor)
 {
 //first lets do this automatically succeeding
 //TODO: skill check, set off
-	Trapped = 0;
-	TrapDetected = 0;
-	LastDisarmed = actor->GetID();
-	ImmediateEvent();
-}
-
-void Door::TryPickLock(Actor *actor)
-{
 	if (Trapped) {
-		LastPickLockFailed = actor->GetID();
 		LastTrigger = actor->GetID();
+		LastDisarmed = actor->GetID();
 		TrapDetected = 1;
 		//trap fired
 		if (!(Flags & DOOR_RESET) ) {
@@ -1454,11 +1446,16 @@ void Door::TryPickLock(Actor *actor)
 		ImmediateEvent();
 		return;
 	}
+}
+
+void Door::TryPickLock(Actor *actor)
+{
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		if (LockDifficulty==100) {
 			core->DisplayConstantStringName(STR_DOOR_NOPICK, 0xffffff, actor);
 		} else {
 			core->DisplayConstantStringName(STR_DOOR_CANTPICK, 0xffffff, actor);
+			LastPickLockFailed = actor->GetID();
 		}
 		return;
 	}
@@ -1842,17 +1839,9 @@ void Container::TryDisarm(Actor *actor)
 {
 //first lets do this automatically succeeding
 //TODO: skill check, set off
-	Trapped = 0;
-	TrapDetected = 0;
-	LastDisarmed = actor->GetID();
-	ImmediateEvent();
-}
-
-void Container::TryPickLock(Actor *actor)
-{
 	if (Trapped) {
-		LastPickLockFailed = actor->GetID();
 		LastTrigger = actor->GetID();
+		LastDisarmed = actor->GetID();
 		TrapDetected = 1;
 		//trap fired
 		if (!(Flags & CONT_RESET) ) {
@@ -1862,11 +1851,16 @@ void Container::TryPickLock(Actor *actor)
 		ImmediateEvent();
 		return;
 	}
+}
+
+void Container::TryPickLock(Actor *actor)
+{
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		if (LockDifficulty==100) {
 			core->DisplayConstantStringName(STR_CONT_NOPICK, 0xffffff, actor);
 		} else {
 			core->DisplayConstantStringName(STR_CONT_CANTPICK, 0xffffff, actor);
+			LastPickLockFailed = actor->GetID();
 		}
 		return;
 	}
