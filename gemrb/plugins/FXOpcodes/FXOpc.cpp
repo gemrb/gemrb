@@ -1162,8 +1162,7 @@ int SpellAbilityDieRoll(Actor *target, int which)
 
 	ieDword cls = STAT_GET(IE_CLASS);
 	if (!spell_abilities) {
-		int table = gamedata->LoadTable("clssplab");
-		TableMgr *tab = gamedata->GetTable(table);
+		AutoTable tab("clssplab");
 		if (!tab) {
 			spell_abilities = (int *) malloc(sizeof(int)*CSA_CNT);
 			for (int ab=0;ab<CSA_CNT;ab++) {
@@ -1179,7 +1178,6 @@ int SpellAbilityDieRoll(Actor *target, int which)
 				spell_abilities[ab*splabcount+i]=atoi(tab->QueryField(i,ab));
 			}
 		}
-		gamedata->DelTable(table);
 	}
 	if (cls>=splabcount) cls=0;
 	return spell_abilities[which*splabcount+cls];

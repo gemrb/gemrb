@@ -371,12 +371,11 @@ Palette* CharAnimations::GetPartPalette(int part)
 
 void CharAnimations::InitAvatarsTable()
 {
-	int tmp= gamedata->LoadTable( "avatars" );
-	if (tmp<0) {
+	AutoTable Avatars("avatars");
+	if (!Avatars) {
 		printMessage("CharAnimations", "A critical animation file is missing!\n", LIGHT_RED);
 		abort();
 	}
-	TableMgr *Avatars = gamedata->GetTable( tmp );
 	AvatarTable = (AvatarStruct *) calloc ( AvatarsCount = Avatars->GetRowCount(), sizeof(AvatarStruct) );
 	int i=AvatarsCount;
 	while(i--) {
@@ -400,7 +399,6 @@ void CharAnimations::InitAvatarsTable()
 		}
 		AvatarTable[i].Size=Avatars->QueryField(i,AV_SIZE)[0];
 	}
-	gamedata->DelTable( tmp );
 }
 
 CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)

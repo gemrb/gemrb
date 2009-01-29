@@ -630,15 +630,8 @@ bool GenerateAbilityTables()
 
 bool Interface::ReadAbilityTable(const ieResRef tablename, ieWordSigned *mem, int columns, int rows)
 {
-	TableMgr * tab;
-	int table=gamedata->LoadTable( tablename );
-
-	if (table<0) {
-		return false;
-	}
-	tab = gamedata->GetTable( table );
+	AutoTable tab(tablename);
 	if (!tab) {
-		gamedata->DelTable(table);
 		return false;
 	}
 	//this is a hack for rows not starting at 0 in some cases
@@ -657,7 +650,6 @@ bool Interface::ReadAbilityTable(const ieResRef tablename, ieWordSigned *mem, in
 			mem[rows*j+i+fix] = (ieWordSigned) strtol(tab->QueryField(i,j),NULL,0 );
 		}
 	}
-	gamedata->DelTable(table);
 	return true;
 }
 
@@ -852,17 +844,12 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 		AreaAliasTable->SetType(GEM_VARIABLES_INT);
 	}
 
-	int table = gamedata->LoadTable( tablename );
-
-	if (table < 0) {
+	AutoTable aa(tablename);
+	if (!aa) {
 		//don't report error when the file doesn't exist
 		return true;
 	}
-	TableMgr* aa = gamedata->GetTable( table );
-	if (!aa) {
-		gamedata->DelTable( table );
-		return false;
-	}
+
 	int idx = aa->GetRowCount();
 	while (idx--) {
 		ieResRef key;
@@ -871,7 +858,6 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 		ieDword value = atoi(aa->QueryField(idx,0));
 		AreaAliasTable->SetAt(key, value);
 	}
-	gamedata->DelTable( table );
 	return true;
 }
 
@@ -948,21 +934,14 @@ void Interface::Main()
 bool Interface::ReadStrrefs()
 {
 	int i;
-	TableMgr * tab;
-	int table=gamedata->LoadTable("strings");
 	memset(strref_table,-1,sizeof(strref_table) );
-	if (table<0) {
-		return false;
-	}
-	tab = gamedata->GetTable(table);
+	AutoTable tab("strings");
 	if (!tab) {
-		goto end;
+		return false;
 	}
 	for(i=0;i<STRREF_COUNT;i++) {
 		strref_table[i]=atoi(tab->QueryField(i,0));
 	}
-end:
-	gamedata->DelTable(table);
 	return true;
 }
 
@@ -974,24 +953,20 @@ int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
 		free(data);
 		data = NULL;
 	}
-	int table = gamedata->LoadTable( tablename );
-	if (table < 0) {
+	AutoTable tm(tablename);
+	if (!tm) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find %s.2da.\n",tablename );
 		return 0;
 	}
-	TableMgr* tm = gamedata->GetTable( table );
-	if (tm) {
-		count = tm->GetRowCount();
-		data = (ieResRef *) calloc( count, sizeof(ieResRef) );
-		for (int i = 0; i < count; i++) {
-			strnlwrcpy( data[i], tm->QueryField( i, 0 ), 8 );
-			//* marks an empty resource
-			if (data[i][0]=='*') {
-				data[i][0]=0;
-			}
+	count = tm->GetRowCount();
+	data = (ieResRef *) calloc( count, sizeof(ieResRef) );
+	for (int i = 0; i < count; i++) {
+		strnlwrcpy( data[i], tm->QueryField( i, 0 ), 8 );
+		//* marks an empty resource
+		if (data[i][0]=='*') {
+			data[i][0]=0;
 		}
-		gamedata->DelTable( table );
 	}
 	return count;
 }
@@ -1000,7 +975,6 @@ int Interface::LoadSprites()
 {
 	ieDword i;
 	int size;
-	int table = -1;
 	if (!IsAvailable( IE_2DA_CLASS_ID )) {
 		printf( "No 2DA Importer Available.\nTermination in Progress...\n" );
 		return GEM_ERROR;
@@ -1143,8 +1117,8 @@ int Interface::LoadSprites()
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Loading Fonts...\n", WHITE );
-	table = gamedata->LoadTable( "fonts" );
-	if (table < 0) {
+	AutoTable tab("fonts");
+	if (!tab) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find fonts.2da.\nTermination in Progress...\n" );
 		return GEM_ERROR;
@@ -1157,7 +1131,6 @@ int Interface::LoadSprites()
 		}
 		DataStream* str = NULL;
 
-		TableMgr* tab = gamedata->GetTable( table );
 		int count = tab->GetRowCount();
 		for (int i = 0; i < count; i++) {
 			const char* ResRef = tab->QueryField( i, 0 );
@@ -1192,8 +1165,6 @@ int Interface::LoadSprites()
 			fnt->SetFirstChar( (ieByte) first_char );
 			fonts.push_back( fnt );
 		}
-		gamedata->DelTable( table );
-
 		FreeInterface(bamint);
 	}
 	printMessage( "Core", "Fonts Loaded...", WHITE );
@@ -3213,8 +3184,7 @@ int Interface::PlayMovie(const char* ResRef)
 	int cnt = 0;
 	vars->Lookup("Display Movie Subtitles", subtitles);
 	if (subtitles) {
-		int table = gamedata->LoadTable(ResRef);
-		TableMgr *sttable = gamedata->GetTable(table);
+		AutoTable sttable(ResRef);
 		if (sttable) {
 			cnt = sttable->GetRowCount()-3;
 			if (cnt>0) {
@@ -3233,7 +3203,6 @@ int Interface::PlayMovie(const char* ResRef)
 			int g = atoi(sttable->QueryField("green", "frame"));
 			int b = atoi(sttable->QueryField("blue", "frame"));
 			SubtitleFont = GetFont (MovieFont); //will change
-			gamedata->DelTable(table);
 			if (SubtitleFont) {
 				Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};
 				Color back = {0x00, 0x00, 0x00, 0x00};
@@ -3654,9 +3623,7 @@ bool Interface::InitItemTypes()
 	if (slotmatrix) {
 		free(slotmatrix);
 	}
-	int ItemTypeTable = gamedata->LoadTable( "itemtype" );
-	TableMgr *it = gamedata->GetTable(ItemTypeTable);
-
+	AutoTable it("itemtype");
 	ItemTypes = 0;
 	if (it) {
 		ItemTypes = it->GetRowCount(); //number of itemtypes
@@ -3680,13 +3647,11 @@ bool Interface::InitItemTypes()
 			}
 			slotmatrix[i] = (ieDword) value;
 		}
-		gamedata->DelTable(ItemTypeTable);
 	}
 
 	//slottype describes the inventory structure
 	Inventory::Init(HasFeature(GF_MAGICBIT));
-	int SlotTypeTable = gamedata->LoadTable( "slottype" );
-	TableMgr *st = gamedata->GetTable(SlotTypeTable);
+	AutoTable st("slottype");
 	if (slottypes) {
 		free(slottypes);
 		slottypes = NULL;
@@ -3742,7 +3707,6 @@ bool Interface::InitItemTypes()
 			default:;
 			}
 		}
-		gamedata->DelTable( SlotTypeTable );
 	}
 	return (it && st);
 }
@@ -4238,16 +4202,11 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 {
 	ieResRef ItemName;
-	TableMgr * tab;
 	int i,j;
 
-	int table=gamedata->LoadTable(TableName);
-	if (table<0) {
-		return false;
-	}
-	tab = gamedata->GetTable(table);
+	AutoTable tab(TableName);
 	if (!tab) {
-		goto end;
+		return false;
 	}
 	i=tab->GetRowCount();
 	for(j=0;j<i;j++) {
@@ -4269,8 +4228,6 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 		strlwr(ItemName);
 		RtRows->SetAt(ItemName, (void*)itemlist);
 	}
-end:
-	gamedata->DelTable(table);
 	return true;
 }
 
@@ -4278,9 +4235,7 @@ bool Interface::ReadRandomItems()
 {
 	ieResRef RtResRef;
 	int i;
-	TableMgr * tab;
 
-	int table=gamedata->LoadTable( "randitem" );
 	ieDword difflev=0; //rt norm or rt fury
 	vars->Lookup("Nightmare Mode", difflev);
 	if (RtRows) {
@@ -4293,26 +4248,22 @@ bool Interface::ReadRandomItems()
 		}
 		RtRows->SetType( GEM_VARIABLES_POINTER );
 	}
-	if (table<0) {
-		return false;
-	}
-	tab = gamedata->GetTable( table );
+	AutoTable tab("randitem");
 	if (!tab) {
-		goto end;
+		return false;
 	}
 	if (difflev>=tab->GetColumnCount()) {
 		difflev = tab->GetColumnCount()-1;
 	}
 	strncpy( GoldResRef, tab->QueryField((unsigned int) 0,(unsigned int) 0), sizeof(ieResRef) ); //gold
 	if ( GoldResRef[0]=='*' ) {
-		gamedata->DelTable( table );
 		return false;
 	}
 	strncpy( RtResRef, tab->QueryField( 1, difflev ), sizeof(ieResRef) );
 	i=atoi( RtResRef );
 	if (i<1) {
 		ReadItemTable( RtResRef, 0 ); //reading the table itself
-		goto end;
+		return true;
 	}
 	if (i>5) {
 		i=5;
@@ -4321,8 +4272,6 @@ bool Interface::ReadRandomItems()
 		strncpy( RtResRef,tab->QueryField(2+i,difflev), sizeof(ieResRef) );
 		ReadItemTable( RtResRef,tab->GetRowName(2+i) );
 	}
-end:
-	gamedata->DelTable( table );
 	return true;
 }
 
@@ -4990,9 +4939,7 @@ void Interface::GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieRe
 	if (resource3) {
 		resource3[0]=0;
 	}
-	int table = gamedata->LoadTable(resref);
-	TableMgr *tab = gamedata->GetTable(table);
-
+	AutoTable tab(resref);
 	if (tab) {
 		unsigned int cols = tab->GetColumnCount();
 		unsigned int row = (unsigned int) Roll(1,tab->GetRowCount(),-1);
@@ -5008,9 +4955,7 @@ ieDword *Interface::GetListFrom2DA(const ieResRef resref)
 {
 	ieDword *ret;
 
-	int table = gamedata->LoadTable(resref);
-	TableMgr *tab = gamedata->GetTable(table);
-
+	AutoTable tab(resref);
 	if (tab) {
 		ieDword cnt = tab->GetRowCount();
 		ret = (ieDword *) malloc((1+cnt)*sizeof(ieDword));

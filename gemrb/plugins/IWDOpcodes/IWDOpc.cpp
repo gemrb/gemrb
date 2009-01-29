@@ -393,26 +393,18 @@ IWDOpc::~IWDOpc(void)
 
 static void ReadSpellProtTable(const ieResRef tablename)
 {
-	TableMgr * tab;
 	if (spellres) {
 		free(spellres);
 	}
 	spellres = NULL;
 	spellrescnt = 0;
-	int table=gamedata->LoadTable( tablename );
-
-	if (table<0) {
-		return;
-	}
-	tab = gamedata->GetTable( table );
+	AutoTable tab(tablename);
 	if (!tab) {
-		gamedata->DelTable(table);
 		return;
 	}
 	spellrescnt=tab->GetRowCount();
 	spellres = (IWDIDSEntry *) malloc(sizeof(IWDIDSEntry) * spellrescnt);
 	if (!spellres) {
-		gamedata->DelTable(table);
 		return;
 	}
 	for( int i=0;i<spellrescnt;i++) {
@@ -422,8 +414,6 @@ static void ReadSpellProtTable(const ieResRef tablename)
 		spellres[i].value = (ieDword) strtol(tab->QueryField(i,1),NULL,0 );
 		spellres[i].relation = (ieWord) strtol(tab->QueryField(i,2),NULL,0 );
 	}
-	gamedata->DelTable(table);
-	return;
 }
 
 //unusual types which need hacking (fake stats)

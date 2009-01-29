@@ -140,15 +140,12 @@ GameControl::GameControl(void)
 void GameControl::ReadFormations()
 {
 	unsigned int i,j;
-	TableMgr * tab;
-	int table=gamedata->LoadTable("formatio");
-	if (table<0) {
-		goto fallback;
-	}
- 	tab = gamedata->GetTable( table);
+	AutoTable tab("formatio");
 	if (!tab) {
-		gamedata->DelTable(table);
-		goto fallback;
+		// fallback
+		formationcount = 1;
+		formations = (formation_type *) calloc(1,sizeof(formation_type) );
+		return;
 	}
 	formationcount = tab->GetRowCount();
 	formations = (formation_type *) calloc(formationcount, sizeof(formation_type));
@@ -160,14 +157,6 @@ void GameControl::ReadFormations()
 			formations[i][j].y=k;
 		}
 	}
-//
-// read in formation data
-//
-	gamedata->DelTable(table);
-	return;
-fallback:
-	formationcount = 1;
-	formations = (formation_type *) calloc(1,sizeof(formation_type) );
 }
 
 Point GameControl::GetFormationOffset(ieDword formation, ieDword pos)
@@ -224,30 +213,20 @@ GameControl::~GameControl(void)
 void GameControl::AutoSave()
 {
 	const char *folder;
-
-	int SlotTable = gamedata->LoadTable( "savegame" );
-	if (SlotTable >= 0) {
-		TableMgr* tab = gamedata->GetTable( SlotTable );
+	AutoTable tab("savegame");
+	if (tab) {
 		folder = tab->QueryField(0);
 		core->GetSaveGameIterator()->CreateSaveGame(0, folder, 0);
-		if (SlotTable >= 0) {
-			gamedata->DelTable(SlotTable);
-		}
 	}
 }
 
 void GameControl::QuickSave()
 {
 	const char *folder;
-
-	int SlotTable = gamedata->LoadTable( "savegame" );
-	if (SlotTable >= 0) {
-		TableMgr* tab = gamedata->GetTable( SlotTable );
+	AutoTable tab("savegame");
+	if (tab) {
 		folder = tab->QueryField(1);
 		core->GetSaveGameIterator()->CreateSaveGame(1, folder, mqs == 1);
-		if (SlotTable >= 0) {
-			gamedata->DelTable(SlotTable);
-		}
 	}
 }
 

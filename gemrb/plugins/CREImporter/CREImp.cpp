@@ -362,8 +362,7 @@ void CREImp::SetupColor(ieDword &stat)
 	if (RandColor==-1) {
 		RandColor=0;
 		RandRows=0;
-		int table = gamedata->LoadTable( "randcolr" );
-		TableMgr *rndcol = gamedata->GetTable( table );
+		AutoTable rndcol("randcolr");
 		if (rndcol) {
 			RandColor = rndcol->GetColumnCount();
 			RandRows = rndcol->GetRowCount();
@@ -383,7 +382,6 @@ void CREImp::SetupColor(ieDword &stat)
 		else {
 			RandColor=0;
 		}
-		gamedata->DelTable( table );
 	}
 
 	if (stat<200) return;

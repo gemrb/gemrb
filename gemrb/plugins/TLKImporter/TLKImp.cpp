@@ -44,17 +44,10 @@ TLKImp::TLKImp(void)
 	autoFree = false;
 	if (monthnamecount==0) {
 		int i;
-		TableMgr * tab;
-
-		int table=gamedata->LoadTable("months");
-		if (table<0) {
-			monthnamecount=-1;
-			return;
-		}
-		tab = gamedata->GetTable(table);
+		AutoTable tab("months");
 		if (!tab) {
 			monthnamecount=-1;
-			goto end;
+			return;
 		}
 		monthnamecount = tab->GetRowCount();
 		monthnames = (int *) malloc(sizeof(int) * monthnamecount);
@@ -63,8 +56,6 @@ TLKImp::TLKImp(void)
 			days[i]=atoi(tab->QueryField(i,0));
 			monthnames[i]=atoi(tab->QueryField(i,1));
 		}
-end:
-		gamedata->DelTable(table);
 	}
 }
 
@@ -187,15 +178,11 @@ int TLKImp::RaceStrRef(int slot)
 	} else {
 		race=0;
 	}
-	int table = gamedata->LoadTable("races");
-	if (table<0) {
-		return -1;
-	}
-	TableMgr *tab=gamedata->GetTable(table);
+
+	AutoTable tab("races");
 	if (!tab) {
 		return -1;
 	}
-	//don't unload table because we'll load it again soon anyway
 	return atoi(tab->QueryField(race,0) );
 }
 
@@ -354,8 +341,7 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		ieDword row = 0; //default value is 0 (generalist)
 		//this is subject to change, the row number in magesch.2da
 		core->GetDictionary()->Lookup( "MAGESCHOOL", row ); 
-		int ind = gamedata->LoadTable( "magesch" );
-		TableMgr* tm = gamedata->GetTable( ind );
+		AutoTable tm("magesch");
 		if (tm) {
 			const char* value = tm->QueryField( row, 2 );
 			Decoded = GetString( atoi( value ), 0 );

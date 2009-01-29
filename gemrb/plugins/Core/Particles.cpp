@@ -49,17 +49,10 @@ void TranslateColor(const char *value, Color &color)
 void InitSparks()
 {
 	int i,j;
-	TableMgr * tab;
-
-	int table=gamedata->LoadTable( "sprklclr" );
-
-	if (table<0) {
+	AutoTable tab("sprkclr");
+	if (!tab)
 		return;
-	}
-	tab = gamedata->GetTable( table );
-	if (!tab) {
-		goto end;
-	}
+
 	memset(sparkcolors,0,sizeof(sparkcolors));
 	for (i=0;i<MAX_SPARK_COLOR;i++) {
 		for (j=0;j<MAX_SPARK_PHASE;j++) {
@@ -77,8 +70,6 @@ void InitSparks()
 			TranslateColor(value, sparkcolors[i+1][j]);
 		}
 	}
-end:
-	gamedata->DelTable( table );
 }
 
 Particles::Particles(int s)
