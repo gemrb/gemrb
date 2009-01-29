@@ -302,12 +302,19 @@ class GEM_EXPORT Highlightable : public Scriptable {
 public:
 	Highlightable(ScriptableType type);
 	virtual ~Highlightable(void);
+	virtual bool TrapResets() = 0;
+	virtual bool CanDetectTrap() { return true; }
+	virtual bool PossibleToSeeTrap();
 public:
 	Gem_Polygon* outline;
 	Color outlineColor;
 	ieDword Cursor;
 	bool Highlight;
 	Point TrapLaunch;
+	ieWord TrapDetectionDiff;
+	ieWord TrapRemovalDiff;
+	ieWord Trapped;
+	ieWord TrapDetected;	
 	ieResRef KeyResRef;
 public:
 	bool IsOver(Point &Pos);
@@ -318,6 +325,12 @@ public:
 		if (KeyResRef[0]) return KeyResRef;
 		return NULL;
 	}
+	void TryDisarm(Actor *actor);
+	//detect trap, set skill to 256 if you want sure fire
+	void DetectTrap(int skill);
+	//returns true if trap is visible, only_detected must be true
+	//if you want to see discovered traps, false is for cheats
+	bool VisibleTrap(bool only_detected);
 };
 
 class GEM_EXPORT Movable : public Selectable {
@@ -443,10 +456,6 @@ public:
 	ieResRef LockSound;
 	ieResRef UnLockSound;
 	ieDword LockDifficulty; //this is a dword?
-	ieWord TrapDetectionDiff;
-	ieWord TrapRemovalDiff;
-	ieWord Trapped;
-	ieWord TrapDetected;
 	ieStrRef OpenStrRef;
 	ieStrRef NameStrRef;
 	ieResRef Dialog;
@@ -463,9 +472,9 @@ public:
 	void SetDoorOpen(bool Open, bool playsound, ieDword ID);
 	void SetPolygon(bool Open, Gem_Polygon* poly);
 	bool IsOpen() const;
-	void TryDisarm(Actor *actor);
 	void TryPickLock(Actor *actor);
 	void DebugDump();
+	bool TrapResets() { return Flags & DOOR_RESET; }
 };
 
 class GEM_EXPORT Container : public Highlightable {
@@ -484,9 +493,9 @@ public:
 	//returns dithering option
 	int WantDither();
 	bool IsOpen() const;
-	void TryDisarm(Actor *actor);
 	void TryPickLock(Actor *actor);
 	void DebugDump();
+	bool TrapResets() { return Flags & CONT_RESET; }
 private:
 	//updates the ground icons for a pile
 	void RefreshGroundIcons();
@@ -497,10 +506,6 @@ public:
 	ieWord Type;
 	ieDword Flags;
 	ieWord LockDifficulty;
-	ieWord TrapDetectionDiff;
-	ieWord TrapRemovalDiff;
-	ieWord Trapped;
-	ieWord TrapDetected;
 	Inventory inventory;
 	ieStrRef OpenFail;
 	//these are not saved
@@ -513,12 +518,6 @@ class GEM_EXPORT InfoPoint : public Highlightable {
 public:
 	InfoPoint(void);
 	~InfoPoint(void);
-	void TryDisarm(Actor *actor);
-	//detect trap, set skill to 256 if you want sure fire
-	void DetectTrap(int skill);
-	//returns true if trap is visible, only_detected must be true
-	//if you want to see discovered traps, false is for cheats
-	bool VisibleTrap(bool only_detected);
 	//returns true if trap has been triggered, tumble skill???
 	bool TriggerTrap(int skill, ieDword ID);
 	//call this to check if an actor entered the trigger zone
@@ -526,15 +525,14 @@ public:
 	//checks if the actor may use this travel trigger
 	int CheckTravel(Actor *actor);
 	void DebugDump();
+	bool TrapResets() { return Flags & TRAP_RESET; }
+	bool CanDetectTrap();
+	bool PossibleToSeeTrap();
 
 public:
 	ieResRef Destination;
 	ieVariable EntranceName;
 	ieDword Flags;
-	ieWord TrapDetectionDiff;
-	ieWord TrapRemovalDiff;
-	ieWord Trapped;
-	ieWord TrapDetected;
 	//overheadtext contains the string, but we have to save this
 	ieStrRef StrRef;
 	Point UsePoint;

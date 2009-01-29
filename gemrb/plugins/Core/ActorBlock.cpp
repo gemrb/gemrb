@@ -1430,7 +1430,7 @@ void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 	}
 }
 
-void Door::TryDisarm(Actor *actor)
+void Highlightable::TryDisarm(Actor *actor)
 {
 //first lets do this automatically succeeding
 //TODO: skill check, set off
@@ -1439,7 +1439,7 @@ void Door::TryDisarm(Actor *actor)
 		LastDisarmed = actor->GetID();
 		TrapDetected = 1;
 		//trap fired
-		if (!(Flags & DOOR_RESET) ) {
+		if (!TrapResets()) {
 			//trap removed
 			Trapped = 0;
 			actor->AddExperience(XP_DISARM, actor->GetXPLevel(1));
@@ -1531,39 +1531,41 @@ int InfoPoint::CheckTravel(Actor *actor)
 	return CT_ACTIVE;
 }
 
-void InfoPoint::TryDisarm(Actor *actor)
-{
-//first lets do this automatically succeeding
-//TODO: skill check, set off
-	Trapped = 0;
-	TrapDetected = 0;
-	//actor->AddExperience(XP_DISARM, actor->GetXPLevel(1));
-	LastDisarmed = actor->GetID();
-	ImmediateEvent();
-}
-
 //detect this trap, using a skill, skill could be set to 256 for 'sure'
 //skill is the all around modified trap detection skill 
 //a trapdetectiondifficulty of 100 means impossible detection short of a spell
-void InfoPoint::DetectTrap(int skill)
+void Highlightable::DetectTrap(int skill)
 {
-	if (Type!=ST_TRIGGER) return;
+	if (!CanDetectTrap()) return;
 	if (!Scripts[0]) return;
-	if (Flags&(TRAP_DEACTIVATED|TRAP_INVISIBLE) ) return;
 	if ((skill>=100) && (skill!=256) ) skill=100;
 	if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDiff) {
 		TrapDetected=1; //probably could be set to the player #?
 	}
 }
 
+bool Highlightable::PossibleToSeeTrap() {
+	return CanDetectTrap();
+}
+
+bool InfoPoint::PossibleToSeeTrap() {
+	// Only detectable trap-type infopoints.
+	return (CanDetectTrap() && Type == ST_PROXIMITY);
+}
+
+bool InfoPoint::CanDetectTrap() {
+	// Traps can be detected on all types of infopoint, as long
+	// as the trap is detectable and isn't deactivated.
+	return (!(Flags&(TRAP_DETECTABLE|TRAP_DEACTIVATED)));
+}
+
 //trap that is visible on screen (marked by red)
 //if TrapDetected is a bitflag, we could show traps selectively for
 //players, really nice for multiplayer
-bool InfoPoint::VisibleTrap(bool see_all)
+bool Highlightable::VisibleTrap(bool see_all)
 {
-	if (Type!=ST_TRIGGER) return false;
+	if (!PossibleToSeeTrap()) return false;
 	if (!Scripts[0]) return false;
-	if (Flags&(TRAP_DEACTIVATED|TRAP_INVISIBLE) ) return false;
 	if (see_all) return true;
 	if (TrapDetected ) return true;
 	return false;
@@ -1592,7 +1594,7 @@ bool InfoPoint::TriggerTrap(int skill, ieDword ID)
 	}
 	LastTrigger = LastEntered = ID;
 	ImmediateEvent();
-	if (Flags&TRAP_RESET) {
+	if (TrapResets()) {
 		return true;
 	}
 	if (Trapped) {
@@ -1835,25 +1837,6 @@ bool Container::IsOpen() const
 		return false;
 	}
 	return true;
-}
-
-void Container::TryDisarm(Actor *actor)
-{
-//first lets do this automatically succeeding
-//TODO: skill check, set off
-	if (Trapped) {
-		LastTrigger = actor->GetID();
-		LastDisarmed = actor->GetID();
-		TrapDetected = 1;
-		//trap fired
-		if (!(Flags & CONT_RESET) ) {
-			//trap removed
-			Trapped = 0;
-	        actor->AddExperience(XP_DISARM, actor->GetXPLevel(1));
-		}
-		ImmediateEvent();
-		return;
-	}
 }
 
 void Container::TryPickLock(Actor *actor)
