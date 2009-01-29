@@ -683,7 +683,6 @@ bool Interface::ReadAbilityTables()
 bool Interface::ReadAuxItemTables()
 {
 	int idx;
-	TableMgr* aa;
 	int table;
 	bool flag = true;
 
@@ -695,26 +694,19 @@ bool Interface::ReadAuxItemTables()
 	}
 	table = gamedata->LoadTable( "itemexcl" );
 
-	if (table < 0) {
-		//don't report error when the file doesn't exist
-		goto aux_1;
-	}
-	aa = gamedata->GetTable( table );
-	if (!aa) {
-		gamedata->DelTable( table );
-		flag = false;
-		goto aux_1;
-	}
-	idx = aa->GetRowCount();
-	while (idx--) {
-		ieResRef key;
+	AutoTable aa;
 
-		strnlwrcpy(key,aa->GetRowName(idx),8);
-		ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
-		ItemExclTable->SetAt(key, value);
+	//don't report error when the file doesn't exist
+	if (aa.load("itemexcl")) {
+		idx = aa->GetRowCount();
+		while (idx--) {
+			ieResRef key;
+
+			strnlwrcpy(key,aa->GetRowName(idx),8);
+			ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
+			ItemExclTable->SetAt(key, value);
+		}
 	}
-	gamedata->DelTable( table );
-aux_1:
 	if (ItemDialTable) {
 		ItemDialTable->RemoveAll(NULL);
 	} else {
@@ -727,61 +719,42 @@ aux_1:
 		ItemDial2Table = new Variables();
 		ItemDial2Table->SetType(GEM_VARIABLES_STRING);
 	}
-	table = gamedata->LoadTable( "itemdial" );
 
-	if (table < 0) {
-		//don't report error when the file doesn't exist
-		goto aux_2;
-	}
-	aa = gamedata->GetTable( table );
-	if (!aa) {
-		gamedata->DelTable( table );
-		flag = false;
-		goto aux_2;
-	}
-	idx = aa->GetRowCount();
-	while (idx--) {
-		ieResRef key, dlgres;
+	//don't report error when the file doesn't exist
+	if (aa.load("itemdial")) {
+		idx = aa->GetRowCount();
+		while (idx--) {
+			ieResRef key, dlgres;
 
-		strnlwrcpy(key,aa->GetRowName(idx),8);
-		ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
-		ItemDialTable->SetAt(key, value);
-		strnlwrcpy(dlgres,aa->QueryField(idx,1),8);
-		ItemDial2Table->SetAtCopy(key, dlgres);
+			strnlwrcpy(key,aa->GetRowName(idx),8);
+			ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
+			ItemDialTable->SetAt(key, value);
+			strnlwrcpy(dlgres,aa->QueryField(idx,1),8);
+			ItemDial2Table->SetAtCopy(key, dlgres);
+		}
 	}
-	gamedata->DelTable( table );
-aux_2:
+
 	if (ItemTooltipTable) {
 		ItemTooltipTable->RemoveAll(ReleaseItemTooltip);
 	} else {
 		ItemTooltipTable = new Variables();
 		ItemTooltipTable->SetType(GEM_VARIABLES_POINTER);
 	}
-	table = gamedata->LoadTable( "tooltip" );
 
-	if (table < 0) {
-		//don't report error when the file doesn't exist
-		goto aux_3;
-	}
-	aa = gamedata->GetTable( table );
-	if (!aa) {
-		gamedata->DelTable( table );
-		flag = false;
-		goto aux_3;
-	}
-	idx = aa->GetRowCount();
-	while (idx--) {
-		ieResRef key;
-		int *tmppoi = (int *) malloc(sizeof(int)*3);
+	//don't report error when the file doesn't exist
+	if (aa.load("tooltip")) {
+		idx = aa->GetRowCount();
+		while (idx--) {
+			ieResRef key;
+			int *tmppoi = (int *) malloc(sizeof(int)*3);
 
-		strnlwrcpy(key,aa->GetRowName(idx),8);
-		for (int i=0;i<3;i++) {
-			tmppoi[i] = atoi(aa->QueryField(idx,i));
+			strnlwrcpy(key,aa->GetRowName(idx),8);
+			for (int i=0;i<3;i++) {
+				tmppoi[i] = atoi(aa->QueryField(idx,i));
+			}
+			ItemTooltipTable->SetAt(key, (void*)tmppoi);
 		}
-		ItemTooltipTable->SetAt(key, (void*)tmppoi);
 	}
-	gamedata->DelTable( table );
-aux_3:
 	return flag;
 }
 
@@ -3183,31 +3156,29 @@ int Interface::PlayMovie(const char* ResRef)
 	ieDword *strrefs = NULL;
 	int cnt = 0;
 	vars->Lookup("Display Movie Subtitles", subtitles);
-	if (subtitles) {
-		AutoTable sttable(ResRef);
-		if (sttable) {
-			cnt = sttable->GetRowCount()-3;
-			if (cnt>0) {
-				frames = (ieDword *) malloc(cnt * sizeof(ieDword) );
-				strrefs = (ieDword *) malloc(cnt * sizeof(ieDword) );
-			} else {
-				cnt = 0;
+	AutoTable sttable;
+	if (subtitles && sttable.load(ResRef)) {
+		cnt = sttable->GetRowCount()-3;
+		if (cnt>0) {
+			frames = (ieDword *) malloc(cnt * sizeof(ieDword) );
+			strrefs = (ieDword *) malloc(cnt * sizeof(ieDword) );
+		} else {
+			cnt = 0;
+		}
+		if (frames && strrefs) {
+			for (int i=0;i<cnt;i++) {
+				frames[i] = atoi (sttable->QueryField(i+3, 0) );
+				strrefs[i] = atoi (sttable->QueryField(i+3, 1) );
 			}
-			if (frames && strrefs) {
-				for (int i=0;i<cnt;i++) {
-					frames[i] = atoi (sttable->QueryField(i+3, 0) );
-					strrefs[i] = atoi (sttable->QueryField(i+3, 1) );
-				}
-			}
-			int r = atoi(sttable->QueryField("red", "frame"));
-			int g = atoi(sttable->QueryField("green", "frame"));
-			int b = atoi(sttable->QueryField("blue", "frame"));
-			SubtitleFont = GetFont (MovieFont); //will change
-			if (SubtitleFont) {
-				Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};
-				Color back = {0x00, 0x00, 0x00, 0x00};
-				palette = CreatePalette( fore, back );
-			}
+		}
+		int r = atoi(sttable->QueryField("red", "frame"));
+		int g = atoi(sttable->QueryField("green", "frame"));
+		int b = atoi(sttable->QueryField("blue", "frame"));
+		SubtitleFont = GetFont (MovieFont); //will change
+		if (SubtitleFont) {
+			Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};
+			Color back = {0x00, 0x00, 0x00, 0x00};
+			palette = CreatePalette( fore, back );
 		}
 	}
 
