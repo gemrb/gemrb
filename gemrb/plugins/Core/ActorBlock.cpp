@@ -1453,15 +1453,15 @@ void Door::TryPickLock(Actor *actor)
 {
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		if (LockDifficulty==100) {
-			core->DisplayConstantStringName(STR_DOOR_NOPICK, 0xffffff, actor);
+			core->DisplayConstantStringName(STR_DOOR_NOPICK, 0xbcefbc, actor);
 		} else {
-			core->DisplayConstantStringName(STR_DOOR_CANTPICK, 0xffffff, actor);
+			core->DisplayConstantStringName(STR_DOOR_CANTPICK, 0xbcefbc, actor);
 			LastPickLockFailed = actor->GetID();
 		}
 		return;
 	}
 	SetDoorLocked( false, true);
-	core->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xfffff, actor);
+	core->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
 	LastUnlocked = actor->GetID();
 	ImmediateEvent();
 	actor->AddExperience(XP_LOCKPICK, actor->GetXPLevel(1));
@@ -1853,15 +1853,15 @@ void Container::TryPickLock(Actor *actor)
 {
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		if (LockDifficulty==100) {
-			core->DisplayConstantStringName(STR_CONT_NOPICK, 0xffffff, actor);
+			core->DisplayConstantStringName(STR_CONT_NOPICK, 0xbcefbc, actor);
 		} else {
-			core->DisplayConstantStringName(STR_CONT_CANTPICK, 0xffffff, actor);
+			core->DisplayConstantStringName(STR_CONT_CANTPICK, 0xbcefbc, actor);
 			LastPickLockFailed = actor->GetID();
 		}
 		return;
 	}
 	SetContainerLocked(false);
-	core->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xfffff, actor);
+	core->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
 	LastUnlocked = actor->GetID();
 	ImmediateEvent();
 	actor->AddExperience(XP_LOCKPICK, actor->GetXPLevel(1));

@@ -2475,7 +2475,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		return LSR_INVALID;
 	}
 	if (tmp) {
-		core->DisplayConstantStringName(tmp, 0xffffff, this);
+		core->DisplayConstantStringName(tmp, 0xbcefbc, this);
 	}
 	if (flags&LS_ADDXP) {
 		AddExperience(XP_LEARNSPELL, explev);
@@ -2935,7 +2935,7 @@ void Actor::Heal(int days)
 void Actor::AddExperience(int exp)
 {
 	SetBase(IE_XP,BaseStats[IE_XP]+exp);
-	core->DisplayConstantStringValue(STR_GOTXP, 0xc0c000, (ieDword) exp);
+	core->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword) exp);
 }
 
 void Actor::AddExperience(int type, int level)

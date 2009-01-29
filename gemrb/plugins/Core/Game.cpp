@@ -854,9 +854,9 @@ void Game::ShareXP(int xp, int flags)
 		PCs[i]->AddExperience(individual);
 	}
 	if (xp>0) {
-		core->DisplayConstantStringValue( STR_GOTXP, 0xc0c000, (ieDword) xp); //you have gained ... xp
+		core->DisplayConstantStringValue( STR_GOTXP, 0xbcefbc, (ieDword) xp); //you have gained ... xp
 	} else {
-		core->DisplayConstantStringValue( STR_LOSTXP, 0xc0c000, (ieDword) -xp); //you have gained ... xp
+		core->DisplayConstantStringValue( STR_LOSTXP, 0xbcefbc, (ieDword) -xp); //you have lost ... xp
 	}
 }
 
