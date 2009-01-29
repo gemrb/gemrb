@@ -615,6 +615,19 @@ void Map::UpdateScripts()
 		door->ProcessActions(false);
 	}
 
+	//Check if we need to start some container scripts
+	int containerCount = 0;
+	while (true) {
+		Container* container = TMap->GetContainer( containerCount++ );
+		if (!container)
+			break;
+		if (!container->Scripts[0])
+			continue;
+		container->ExecuteScript( 1 );
+		//Execute Pending Actions
+		container->ProcessActions(false);
+	}
+
 	//Check if we need to start some trap scripts
 	int ipCount = 0;
 	while (true) {
