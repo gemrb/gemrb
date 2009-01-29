@@ -4845,7 +4845,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		if (container->Flags & CONT_LOCKED) {
 			//playsound can't open container
 			//display string, etc
-			core->DisplayConstantString(STR_CONTLOCKED,0xff0000);
+			core->DisplayConstantString(STR_CONTLOCKED,0xd7d7be);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
