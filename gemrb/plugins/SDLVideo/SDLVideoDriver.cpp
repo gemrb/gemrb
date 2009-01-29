@@ -2133,7 +2133,12 @@ Color SDLVideoDriver::SpriteGetPixelSum(Sprite2D* sprite, unsigned short xbase, 
 	return sum;
 }
 
-//both parameters must be signed for correct calculation
+// FIXME: The output of this function must be usable in BlitGameSprite
+// Two possible solutions:
+// * Create a BAM sprite for lights, using a palette
+//   consisting entirely of (255,255,255,x) RGBA values
+// * Write a 32bpp bitmap renderer for BlitGameSprite
+//   (based on the non-RLE BAM one)
 Sprite2D* SDLVideoDriver::CreateLight(int radius, int intensity)
 {
 	if(!radius) return NULL;
