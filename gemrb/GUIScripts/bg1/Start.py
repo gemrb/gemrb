@@ -55,6 +55,8 @@ def SinglePlayerPress():
 	GemRB.SetEvent(StartWindow, SinglePlayerButton, 0, "NewSingle")
 	GemRB.SetEvent(StartWindow, MoviesButton, 0, "MissionPack")
 	GemRB.SetEvent(StartWindow, ExitButton, 0, "BackToMain")
+	if GemRB.GetString(24110) == "": # TODO: better way to detect lack of mission pack?
+		GemRB.SetButtonFlags(StartWindow, MoviesButton, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	return
 
 def MultiPlayerPress():
@@ -68,6 +70,7 @@ def MultiPlayerPress():
 	GemRB.SetEvent(StartWindow, MoviesButton, 0, "BackToMain")
 	GemRB.SetEvent(StartWindow, ExitButton, 0, "")
 	GemRB.SetControlStatus(StartWindow, ExitButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonFlags(StartWindow, ExitButton, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	return
 
 def ConnectPress():
@@ -144,6 +147,8 @@ def BackToMain():
 	GemRB.SetEvent(StartWindow, MultiPlayerButton, IE_GUI_BUTTON_ON_PRESS, "MultiPlayerPress")
 	GemRB.SetEvent(StartWindow, MoviesButton, IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
 	GemRB.SetEvent(StartWindow, ExitButton, IE_GUI_BUTTON_ON_PRESS, "ExitPress")
+	GemRB.SetButtonFlags(StartWindow, MoviesButton, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+	GemRB.SetButtonFlags(StartWindow, ExitButton, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 	GemRB.SetVisible(QuitWindow, 0)
 	GemRB.SetVisible(StartWindow, 1)
 	return
