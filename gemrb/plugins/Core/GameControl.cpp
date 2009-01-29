@@ -1159,7 +1159,7 @@ void GameControl::TryToPick(Actor *source, Door *tgt)
 
 	source->ClearPath();
 	source->ClearActions();
-	if (tgt->TrapDetected) {
+	if (tgt->Trapped && tgt->TrapDetected) {
 		snprintf(Tmp, sizeof(Tmp), "RemoveTraps(\"%s\")", tgt->GetScriptName() );
 	} else {
 		snprintf(Tmp, sizeof(Tmp), "PickLock(\"%s\")", tgt->GetScriptName() );
@@ -1173,7 +1173,7 @@ void GameControl::TryToPick(Actor *source, Container *tgt)
 
 	source->ClearPath();
 	source->ClearActions();
-	if (tgt->TrapDetected) {
+	if (tgt->Trapped && tgt->TrapDetected) {
 		snprintf(Tmp, sizeof(Tmp), "RemoveTraps(\"%s\")", tgt->GetScriptName() );
 	} else {
 		snprintf(Tmp, sizeof(Tmp), "PickLock(\"%s\")", tgt->GetScriptName() );
@@ -1313,7 +1313,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 		return;
 	}
 
-	if ((target_mode&TARGET_MODE_PICK) || container->TrapDetected) {
+	if ((target_mode&TARGET_MODE_PICK)) {
 		TryToPick(actor, container);
 		return;
 	}

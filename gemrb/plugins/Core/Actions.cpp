@@ -2175,6 +2175,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 				}
 			}
 		}
+		door->TriggerTrap(0, actor->GetID());
 		door->SetDoorOpen( true, true, actor->GetID() );
 	} else {
 		GoNearAndRetry(Sender, *p, MAX_OPERATING_DISTANCE);
@@ -4848,7 +4849,9 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		core->SetCurrentContainer((Actor *) Sender, container, true);
+		Actor *actor = (Actor *)Sender;
+		container->TriggerTrap(0, actor->GetID());
+		core->SetCurrentContainer(actor, container, true);
 		Sender->ReleaseCurrentAction();
 		return;
 	}

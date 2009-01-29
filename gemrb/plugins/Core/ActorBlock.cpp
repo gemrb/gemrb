@@ -1556,7 +1556,7 @@ bool InfoPoint::PossibleToSeeTrap() {
 bool InfoPoint::CanDetectTrap() {
 	// Traps can be detected on all types of infopoint, as long
 	// as the trap is detectable and isn't deactivated.
-	return (!(Flags&(TRAP_DETECTABLE|TRAP_DEACTIVATED)));
+	return ((Flags&TRAP_DETECTABLE) && !(Flags&TRAP_DEACTIVATED));
 }
 
 //trap that is visible on screen (marked by red)
@@ -1564,6 +1564,7 @@ bool InfoPoint::CanDetectTrap() {
 //players, really nice for multiplayer
 bool Highlightable::VisibleTrap(bool see_all)
 {
+	if (!Trapped) return false;
 	if (!PossibleToSeeTrap()) return false;
 	if (!Scripts[0]) return false;
 	if (see_all) return true;
@@ -1572,19 +1573,16 @@ bool Highlightable::VisibleTrap(bool see_all)
 }
 
 //trap that will fire now
-bool InfoPoint::TriggerTrap(int skill, ieDword ID)
+bool Highlightable::TriggerTrap(int skill, ieDword ID)
 {
-	if (Type!=ST_PROXIMITY) {
-		return true;
+	if (!Trapped) {
+		return false;
 	}
 	//actually this could be script name[0]
 	if (!Scripts[0]) {
 		return false;
 	}
-	if (Flags&TRAP_DEACTIVATED) {
-		return false;
-	}
-	if (Flags&TRAP_DETECTABLE) {
+	if (CanDetectTrap()) {
 		TrapDetected=1; //probably too late :)
 		if ((skill>=100) && (skill!=256) ) skill=100;
 		if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDiff) {
@@ -1594,10 +1592,22 @@ bool InfoPoint::TriggerTrap(int skill, ieDword ID)
 	}
 	LastTrigger = LastEntered = ID;
 	ImmediateEvent();
-	if (TrapResets()) {
+	if (!TrapResets()) {
+		Trapped = false;
+	}
+	return true;
+}
+
+//trap that will fire now
+bool InfoPoint::TriggerTrap(int skill, ieDword ID)
+{
+	if (Type!=ST_PROXIMITY) {
 		return true;
 	}
-	if (Trapped) {
+	if (Flags&TRAP_DEACTIVATED) {
+		return false;
+	}
+	if (Highlightable::TriggerTrap(skill, ID) && !Trapped) {
 		Flags|=TRAP_DEACTIVATED;
 	}
 	return true;

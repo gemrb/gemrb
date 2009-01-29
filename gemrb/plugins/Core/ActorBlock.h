@@ -331,6 +331,8 @@ public:
 	//returns true if trap is visible, only_detected must be true
 	//if you want to see discovered traps, false is for cheats
 	bool VisibleTrap(bool only_detected);
+	//returns true if trap has been triggered, tumble skill???
+	virtual bool TriggerTrap(int skill, ieDword ID);
 };
 
 class GEM_EXPORT Movable : public Selectable {
