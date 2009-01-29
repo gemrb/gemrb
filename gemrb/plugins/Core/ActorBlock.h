@@ -140,6 +140,11 @@ class Gem_Polygon;
 #define BT_PARTYRESTED    0x10000
 #define BT_VACANT         0x20000
 
+//xp bonus types (for xpbonus.2da)
+#define XP_LOCKPICK   0
+#define XP_DISARM     1
+#define XP_LEARNSPELL 2
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL

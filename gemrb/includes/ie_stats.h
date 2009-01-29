@@ -152,6 +152,7 @@
 #define MC_WAS_THIEF		0x0040
 #define MC_WAS_DRUID		0x0080
 #define MC_WAS_RANGER		0x0100
+#define MC_WAS_ANY	        0x01f8 // MC_WAS_FIGHTER | ... | MC_WAS_RANGER
 #define MC_FALLEN_PALADIN	0x0200
 #define MC_FALLEN_RANGER	0x0400
 #define MC_EXPORTABLE           0x0800

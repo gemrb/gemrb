@@ -70,11 +70,6 @@ static int *xpbonus = NULL;
 static int xpbonustypes = -1;
 static int xpbonuslevels = -1;
 
-//xp bonus types (for xpbonus.2da)
-#define XP_LOCKPICK   0
-#define XP_DISARM     1
-#define XP_LEARNSPELL 2
-
 static int FistRows = -1;
 typedef ieResRef FistResType[MAX_LEVEL+1];
 
@@ -1913,7 +1908,7 @@ void Actor::SetPosition(Point &position, int jump, int radius)
 }
 
 /* this is returning the level of the character for xp calculations
-	 later it could calculate with dual/multiclass,
+	 and the average level for dual/multiclass (rounded up),
 	 also with iwd2's 3rd ed rules, this is why it is a separate function */
 ieDword Actor::GetXPLevel(int modified) const
 {
@@ -1926,7 +1921,45 @@ ieDword Actor::GetXPLevel(int modified) const
 		stats = BaseStats;
 	}
 
-	return stats[IE_LEVEL];
+	float classcount = 0;
+	float average = 0;
+	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+		// iwd2
+		for (int i=0; i < 11; i++) {
+			if (stats[levelslots[i]] > 0) classcount++;
+		}
+		average = stats[IE_CLASSLEVELSUM] / classcount + 0.5;
+	}
+	else {
+		int levels[3]={stats[IE_LEVEL], stats[IE_LEVEL2], stats[IE_LEVEL3]};
+		average = levels[0];
+		classcount = 1;
+		if ((stats[IE_MC_FLAGS] & MC_WAS_ANY) > 0) {
+			// dualclassed
+			if (levels[1] > 0) {
+				classcount++;
+				average += levels[1];
+			}
+		}
+		else {
+			// plain level detection fails sometimes, so we improve the correctness by
+			// checking the class
+			long multi2;
+			if (valid_number(multiclass, multi2) && multi2 > 0) {
+				// multiclassed (MULTI is set)
+				if (levels[1] > 0) {
+					classcount++;
+					average += levels[1];
+				}
+				if (levels[2] > 0 && (levels[0]-levels[2]) < 5) { //HACK for jaheira (starts as 6-7-1)
+					classcount++;
+					average += levels[2];
+				}
+			}
+		}
+		average = average / classcount + 0.5;
+	}
+	return ieDword(average);
 }
 
 /** maybe this would be more useful if we calculate with the strength too
@@ -2902,6 +2935,7 @@ void Actor::Heal(int days)
 void Actor::AddExperience(int exp)
 {
 	SetBase(IE_XP,BaseStats[IE_XP]+exp);
+	core->DisplayConstantStringValue(STR_GOTXP, 0xc0c000, (ieDword) exp);
 }
 
 void Actor::AddExperience(int type, int level)
@@ -4112,4 +4146,9 @@ void Actor::CreateDerivedStats()
         } else {
                 CreateDerivedStatsBG();
         }
+	AutoTable tm("classes");
+	if (tm) {
+		// currently we need only the MULTI value
+		strcpy(multiclass, tm->QueryField(tm->FindTableValue(5, BaseStats[IE_CLASS]), 4));
+	}
 }

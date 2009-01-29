@@ -1442,6 +1442,7 @@ void Door::TryDisarm(Actor *actor)
 		if (!(Flags & DOOR_RESET) ) {
 			//trap removed
 			Trapped = 0;
+			actor->AddExperience(XP_DISARM, actor->GetXPLevel(1));
 		}
 		ImmediateEvent();
 		return;
@@ -1463,7 +1464,7 @@ void Door::TryPickLock(Actor *actor)
 	core->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xfffff, actor);
 	LastUnlocked = actor->GetID();
 	ImmediateEvent();
-	//add XP ?
+	actor->AddExperience(XP_LOCKPICK, actor->GetXPLevel(1));
 }
 
 void Door::DebugDump()
@@ -1536,6 +1537,7 @@ void InfoPoint::TryDisarm(Actor *actor)
 //TODO: skill check, set off
 	Trapped = 0;
 	TrapDetected = 0;
+	//actor->AddExperience(XP_DISARM, actor->GetXPLevel(1));
 	LastDisarmed = actor->GetID();
 	ImmediateEvent();
 }
@@ -1847,6 +1849,7 @@ void Container::TryDisarm(Actor *actor)
 		if (!(Flags & CONT_RESET) ) {
 			//trap removed
 			Trapped = 0;
+	        actor->AddExperience(XP_DISARM, actor->GetXPLevel(1));
 		}
 		ImmediateEvent();
 		return;
@@ -1868,7 +1871,7 @@ void Container::TryPickLock(Actor *actor)
 	core->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xfffff, actor);
 	LastUnlocked = actor->GetID();
 	ImmediateEvent();
-	//add XP ?
+	actor->AddExperience(XP_LOCKPICK, actor->GetXPLevel(1));
 }
 
 void Container::DebugDump()
