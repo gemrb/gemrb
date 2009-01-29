@@ -2576,9 +2576,10 @@ int fx_set_regenerating_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		goto seconds;
 	case RPD_TURNS:
 		tmp *= 30;
-	case RPD_SECONDS:
+		//fallthrough
+	case RPD_SECONDS:           //restore param3 hp every param1 seconds
 seconds:
-		fx->Parameter3 = nextHeal+tmp;
+		fx->Parameter1 = nextHeal+tmp;
 		damage = 1;
 		break;
 	case RPD_POINTS:
@@ -3482,6 +3483,12 @@ int fx_find_traps (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_find_traps (%2d)\n", fx->Opcode );
 	//reveal trapped containers, doors, triggers that are in the visible range
 	ieDword range = target->GetStat(IE_VISUALRANGE)*10;
+	ieDword skill;
+
+	if (fx->Parameter2 == 0)
+		skill = 256;                        //always works
+	else
+		skill = target->GetStat(IE_TRAPS);  //based on skill
 
 	TileMap *TMap = target->GetCurrentArea()->TMap;
 
@@ -3490,6 +3497,7 @@ int fx_find_traps (Actor* /*Owner*/, Actor* target, Effect* fx)
 		Door* door = TMap->GetDoor( Count++ );
 		if (!door)
 			break;
+/*
 		//not trapped
 		if (!door->Scripts[0]) {
 			continue;
@@ -3498,9 +3506,34 @@ int fx_find_traps (Actor* /*Owner*/, Actor* target, Effect* fx)
 		if (!(door->Flags&DOOR_DETECTABLE)) {
 			continue;
 		}
+*/
 		if (Distance(door->Pos, target->Pos)<range) {
 			//when was door trap noticed
-			door->TrapDetected = 1;
+			door->DetectTrap(skill);
+//			door->TrapDetected = 1;
+		}
+	}
+
+	Count = 0;
+	while (true) {
+		Container* container = TMap->GetContainer( Count++ );
+		if (!container)
+			break;
+		if (Distance(container->Pos, target->Pos)<range) {
+			//when was door trap noticed
+			container->DetectTrap(skill);
+		}
+	}
+
+
+	Count = 0;
+	while (true) {
+		InfoPoint* trap = TMap->GetInfoPoint( Count++ );
+		if (!trap)
+			break;
+		if (Distance(trap->Pos, target->Pos)<range) {
+			//when was door trap noticed
+			trap->DetectTrap(skill);
 		}
 	}
 
