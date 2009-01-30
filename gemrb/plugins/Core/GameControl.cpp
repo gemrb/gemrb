@@ -344,6 +344,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	video->DrawRect( screen, black, true );
 
 	// setup outlines
+	bool targetting = (target_mode & (TARGET_MODE_CAST |
+		TARGET_MODE_PICK | TARGET_MODE_ATTACK | TARGET_MODE_DEFEND));
 	InfoPoint *i;
 	for (unsigned int idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
 		i->Highlight = false;
@@ -359,9 +361,20 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	Door *d;
 	for (unsigned int idx = 0; (d = area->TMap->GetDoor( idx )); idx++) {
 		d->Highlight = false;
-		if (overDoor == d) {
-			d->outlineColor = cyan; // TODO: right order?
-		} else if (d->VisibleTrap(0)) {
+		if (overDoor == d && targetting) {
+			if (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED)) {
+				// only highlight targettable doors
+				d->outlineColor = green;
+				d->Highlight = true;
+				continue;
+			}
+		} else if (overDoor == d && !(d->Flags & DOOR_SECRET)) {
+			// mouse over, not in target mode, no secret door
+			d->outlineColor = cyan;
+			d->Highlight = true;
+			continue;
+		}
+		if (d->VisibleTrap(0)) {
 			d->outlineColor = red; // traps
 		} else if (d->Flags & DOOR_SECRET) {
 			if (DebugFlags & DEBUG_SHOW_DOORS || d->Flags & DOOR_FOUND) {
@@ -380,12 +393,23 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	Container *c;
 	for (unsigned int idx = 0; (c = area->TMap->GetContainer( idx )); idx++) {
 		c->Highlight = false;
-		if (overContainer == c) {
+		if (overContainer == c && targetting) {
+			if (c->VisibleTrap(0) || (c->Flags & CONT_LOCKED)) {
+				// only highlight targettable containers
+				c->outlineColor = green;
+				c->Highlight = true;
+				continue;
+			}
+		} else if (overContainer == c) {
+			// mouse over, not in target mode
 			c->outlineColor = cyan;
-		} else if (c->VisibleTrap(0)) {
+			c->Highlight = true;
+			continue;
+		}
+		if (c->VisibleTrap(0)) {
 			c->outlineColor = red; // traps
 		} else if (DebugFlags & DEBUG_SHOW_CONTAINERS) {
-			c->outlineColor = cyan;
+			c->outlineColor = cyan; // debug containers
 		} else {
 			continue;
 		}
@@ -859,31 +883,30 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 int GameControl::GetCursorOverDoor(Door *overDoor)
 {
-	overDoor->Highlight = true;
-	if (overDoor->TrapDetected && overDoor->Trapped) {
-		overDoor->outlineColor = red;
-		return IE_CURSOR_TRAP;
-	}
-	overDoor->outlineColor = cyan;
-	if (overDoor->Flags & DOOR_LOCKED) {
-		return IE_CURSOR_LOCK;
+	if (target_mode&TARGET_MODE_PICK) {
+		if (overDoor->VisibleTrap(0)) {
+			return IE_CURSOR_TRAP;
+		}
+		if (overDoor->Flags & DOOR_LOCKED) {
+			return IE_CURSOR_LOCK;
+		}
+
+		return IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
 	}
 	return overDoor->Cursor;
 }
 
 int GameControl::GetCursorOverContainer(Container *overContainer)
 {
-	overContainer->Highlight = true;
-	if (overContainer->TrapDetected && overContainer->Trapped) {
-		overContainer->outlineColor = red;
-		return IE_CURSOR_TRAP;
-	}
-	overContainer->outlineColor = cyan;
-	if (overContainer->Type==IE_CONTAINER_PILE) {
-		return IE_CURSOR_TAKE;
-	}
 	if (target_mode&TARGET_MODE_PICK) {
-		return IE_CURSOR_LOCK2;
+		if (overContainer->VisibleTrap(0)) {
+			return IE_CURSOR_TRAP;
+		}
+		if (overContainer->Flags & CONT_LOCKED) {
+			return IE_CURSOR_LOCK2;
+		}
+
+		return IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
 	}
 	return IE_CURSOR_TAKE;
 }
