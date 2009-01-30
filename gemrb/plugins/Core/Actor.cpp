@@ -292,6 +292,8 @@ Actor::Actor()
 	}
 	//this one is saved only for PC's
 	ModalState = 0;
+	//set it to a neutral value
+	ModalSpell[0] = '*';
 	//this one is saved, but not loaded?
 	localID = globalID = 0;
 }
@@ -2656,6 +2658,16 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 
 void Actor::PerformAttack(ieDword gameTime)
 {
+	//apply the modal effect on the beginning of each round
+	if ((gameTime%ROUND_SIZE==0) && ModalState) {
+		if (!ModalSpell[0]) {
+			printMessage("Actor","Modal Spell Effect was not set!\n", YELLOW);
+			ModalSpell[0]='*';
+		} else if(ModalSpell[0]!='*') {
+			core->ApplySpell(ModalSpell, this, this, 0);
+		}
+	}
+
 	if (!attackcount) {
 		if (initiative) {
 			if (InParty) {
@@ -4152,3 +4164,4 @@ void Actor::CreateDerivedStats()
 		strcpy(multiclass, tm->QueryField(tm->FindTableValue(5, BaseStats[IE_CLASS]), 4));
 	}
 }
+

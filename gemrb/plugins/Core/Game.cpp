@@ -1088,8 +1088,6 @@ bool Game::EveryoneDead() const
 
 //runs all area scripts
 
-#define ROUND_SIZE     10
-
 void Game::UpdateScripts()
 {
 	// This function is called more than once for each value of GameTime.

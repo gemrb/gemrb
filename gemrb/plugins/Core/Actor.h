@@ -146,6 +146,7 @@ public:
 	ieResRef applyWhenHelpless;      //cast spell on condition
 	ieResRef applyWhenAttacked;      //cast spell on condition
 	ieResRef applyWhenBeingHit;      //cast spell on condition
+	ieResRef ModalSpell;             //apply this spell once per round
 
 	PCStatsStruct*  PCStats;
 	ieResRef SmallPortrait;

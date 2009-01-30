@@ -131,6 +131,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		pal = palette;
 	}
 	if (startrow) enablecap=false;
+
 	if (initials==this) {
 		enablecap=false;
 	}

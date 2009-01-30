@@ -50,6 +50,9 @@ class Game;
 #include "Particles.h"
 #include "Variables.h"
 
+//the length of a round in game ticks?
+#define ROUND_SIZE     10
+
 //the size of the bestiary register
 #define BESTIARY_SIZE 260
 
