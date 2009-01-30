@@ -343,8 +343,57 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	}
 	video->DrawRect( screen, black, true );
 
+	// setup outlines
+	InfoPoint *i;
+	for (unsigned int idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
+		i->Highlight = false;
+		if (i->VisibleTrap(DebugFlags & DEBUG_SHOW_INFOPOINTS)) {
+			i->outlineColor = red; // traps
+		} else if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
+			i->outlineColor = blue; // debug infopoints
+		} else {
+			continue;
+		}
+		i->Highlight = true;
+	}
+	Door *d;
+	for (unsigned int idx = 0; (d = area->TMap->GetDoor( idx )); idx++) {
+		d->Highlight = false;
+		if (overDoor == d) {
+			d->outlineColor = cyan; // TODO: right order?
+		} else if (d->VisibleTrap(0)) {
+			d->outlineColor = red; // traps
+		} else if (d->Flags & DOOR_SECRET) {
+			if (DebugFlags & DEBUG_SHOW_DOORS || d->Flags & DOOR_FOUND) {
+				d->outlineColor = magenta; // found hidden door
+			} else {
+				// secret door is invisible
+				continue;
+			}
+		} else if (DebugFlags & DEBUG_SHOW_DOORS) {
+			d->outlineColor = cyan; // debug doors
+		} else {
+			continue;
+		}
+		d->Highlight = true;
+	}
+	Container *c;
+	for (unsigned int idx = 0; (c = area->TMap->GetContainer( idx )); idx++) {
+		c->Highlight = false;
+		if (overContainer == c) {
+			c->outlineColor = cyan;
+		} else if (c->VisibleTrap(0)) {
+			c->outlineColor = red; // traps
+		} else if (DebugFlags & DEBUG_SHOW_CONTAINERS) {
+			c->outlineColor = cyan;
+		} else {
+			continue;
+		}
+		c->Highlight = true;
+	}
+	
 	//drawmap should be here so it updates fog of war
-	area->DrawMap( screen, this );
+	area->DrawMap( screen );
 	game->DrawWeather(screen, update_scripts);
 
 	if (trackerID) {
@@ -383,47 +432,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		video->DrawRect( SelectionRect, green, false, true );
 	}
 
-	// Show doors
-	if (DebugFlags & DEBUG_SHOW_DOORS) {
-		Door* d;
-		//there is a real assignment in the loop!
-		for (unsigned int idx = 0;
-			(d = area->TMap->GetDoor( idx ));
-			idx++) {
-			if (d->TrapDetected) {
-				d->outlineColor = red;
-			} else {
-				if (d->Flags &DOOR_SECRET) {
-					if (d->Flags & DOOR_FOUND) {
-						d->outlineColor = magenta;
-					} else {
-						//secret door is invisible
-						continue;
-					}
-				}
-				d->outlineColor = cyan;
-			}
-			d->DrawOutline();
-		}
-	}
-
-	// Show containers
-	if (DebugFlags & DEBUG_SHOW_CONTAINERS) {
-		Container* c;
-
-		//there is a real assignment in the loop!
-		for (unsigned int idx = 0;
-			(c = area->TMap->GetContainer( idx ));
-			idx++) {
-			if (c->TrapDetected && c->Trapped) {
-				c->outlineColor = red;
-			} else {
-				c->outlineColor = cyan;
-			}
-			c->DrawOutline();
-		}
-	}
-
 	// Show wallpolygons
 	if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
 
@@ -443,30 +451,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			}
 
 			video->DrawPolyline( poly, c, true );
-		}
-	}
-
-	// Show traps
-	if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
-		//draw infopoints with blue overlay
-		InfoPoint* i;
-		//there is a real assignment in the loop!
-		for (unsigned int idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
-			if (i->VisibleTrap( 1 ) ) {
-				i->outlineColor = red; //traps
-				i->DrawOutline();
-			} else {
-				i->outlineColor = blue; //infopoints
-				i->DrawOutline();
-			}
-		}
-	} else {
-		InfoPoint* i;
-		for (unsigned int idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
-			if (i->VisibleTrap( 0 ) ) {
-				i->outlineColor = red; //traps
-				i->DrawOutline();
-			}
 		}
 	}
 

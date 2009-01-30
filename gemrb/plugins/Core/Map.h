@@ -270,8 +270,8 @@ public:
 	void CopyGroundPiles(Map *othermap, Point &Pos);
 	/* draws stationary vvc graphics */
 	//void DrawVideocells(Region screen);
-	void DrawContainers(Region screen, Container *overContainer);
-	void DrawMap(Region screen, GameControl* gc);
+	void DrawHighlightables(Region screen);
+	void DrawMap(Region screen);
 	void PlayAreaSong(int);
 	void AddAnimation(AreaAnimation* anim);
 	aniIterator GetFirstAnimation() { return animations.begin(); }

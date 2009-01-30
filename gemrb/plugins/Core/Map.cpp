@@ -686,7 +686,7 @@ void Map::UpdateScripts()
 	}
 }
 
-void Map::DrawContainers( Region screen, Container *overContainer)
+void Map::DrawHighlightables( Region screen )
 {
 	Region vp = core->GetVideoDriver()->GetViewport();
 	unsigned int i = 0;
@@ -696,21 +696,31 @@ void Map::DrawContainers( Region screen, Container *overContainer)
 		Color tint = LightMap->GetPixel( c->Pos.x / 16, c->Pos.y / 12);
 		tint.a = 255;
 
-		if ((c != overContainer) && (c->Type==IE_CONTAINER_PILE) ) {
+		if (c->Highlight) {
+			if (c->Type==IE_CONTAINER_PILE) {
+				Color tint = LightMap->GetPixel( c->Pos.x / 16, c->Pos.y / 12);
+				tint.a = 255;
+				c->DrawPile(true, screen, tint);
+			} else {
+				c->DrawOutline();
+			}
+		} else if (c->Type==IE_CONTAINER_PILE) {
 			if (c->outline->BBox.InsideRegion( vp )) {
 				c->DrawPile(false, screen, tint);
 			}
 		}
 	}
-	//draw overcontainer with highlight
-	if (overContainer) {
-		if (overContainer->Type==IE_CONTAINER_PILE) {
-			Color tint = LightMap->GetPixel( overContainer->Pos.x / 16, overContainer->Pos.y / 12);
-			tint.a = 255;
-			overContainer->DrawPile(true, screen, tint);
-		} else {
-			overContainer->DrawOutline();
-		}
+
+	Door *d;
+	i = 0;
+	while ( (d = TMap->GetDoor(i++))!=NULL ) {
+		if (d->Highlight) d->DrawOutline();
+	}
+
+	InfoPoint *p;
+	i = 0;
+	while ( (p = TMap->GetInfoPoint(i++))!=NULL ) {
+		if (p->Highlight) p->DrawOutline();
 	}
 }
 
@@ -778,7 +788,7 @@ ScriptedAnimation *Map::GetNextScriptedAnimation(scaIterator &iter)
 
 static ieDword oldgametime = 0;
 
-void Map::DrawMap(Region screen, GameControl* gc)
+void Map::DrawMap(Region screen)
 {
 	if (!TMap) {
 		return;
@@ -802,11 +812,9 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
 
-	//Draw Selected Door Outline
-	if (gc->overDoor) {
-		gc->overDoor->DrawOutline();
-	}
-	DrawContainers( screen, gc->overContainer );
+	//Draw Outlines
+	DrawHighlightables( screen );
+
 	Region vp = video->GetViewport();
 	//if it is only here, then the scripting will fail?
 	GenerateQueues();
