@@ -69,7 +69,7 @@ Scriptable::Scriptable(ScriptableType type)
 	interval = ( 1000 / AI_UPDATE_TIME );
 	WaitCounter = 0;
 	playDeadCounter = 0;
-	if (Type==ST_ACTOR) {
+	if (Type == ST_ACTOR) {
 		InternalFlags = IF_VISIBLE | IF_ONCREATION;
 	} else {
 		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_ONCREATION;
@@ -151,7 +151,7 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 	// NONE is an 'invalid' script name, never used seriously
 	// This hack is to prevent flooding of the console
 	if (aScript[0] && stricmp(aScript, "NONE") ) {
-		if (idx!=AI_SCRIPT_LEVEL) ai=false;
+		if (idx!=AI_SCRIPT_LEVEL) ai = false;
 		Scripts[idx] = new GameScript( aScript, Type, locals, idx, ai );
 		Scripts[idx]->MySelf = this;
 	}
@@ -176,7 +176,7 @@ void Scriptable::DisplayHeadText(const char* text)
 	}
 	overHeadText = (char *) text;
 	if (text) {
-		timeStartDisplaying=core->GetGame()->Ticks;
+		timeStartDisplaying = core->GetGame()->Ticks;
 		textDisplaying = 1;
 	}
 	else {
@@ -210,32 +210,24 @@ void Scriptable::DrawOverheadText(Region &screen)
 	}
 
 	int cs = 100;
-	if (Type==ST_ACTOR) {
+	if (Type == ST_ACTOR) {
 		cs = ((Selectable *) this)->size*50;
 	}
 
 	Region rgn( Pos.x-100+screen.x, Pos.y - cs + screen.y, 200, 400 );
 	font->Print( rgn, ( unsigned char * ) overHeadText,
 		palette?palette:core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
-	//core->GetVideoDriver()->FreePalette(palette);
 	gamedata->FreePalette(palette);
 }
 
 void Scriptable::ImmediateEvent()
 {
-	lastRunTime=0;
-	/*
-	for(int i=0;i<MAX_SCRIPTS;i++) {
-		if (Scripts[i]) {
-			Scripts[i]->RunNow();
-		}
-	}
-	*/
+	lastRunTime = 0;
 }
 
 bool Scriptable::IsPC()
 {
-	if(Type==ST_ACTOR) {
+	if(Type == ST_ACTOR) {
 		if (((Actor *) this)->InParty) {
 			return true;
 		}
@@ -262,9 +254,9 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 	bool alive = false;
 
-	for (int i=0;i<scriptCount;i++) {
+	for (int i = 0;i<scriptCount;i++) {
 		//disable AI script level for actors in party when the player disabled them
-		if ((i==AI_SCRIPT_LEVEL) && IsPC() ) {
+		if ((i == AI_SCRIPT_LEVEL) && IsPC() ) {
 			if (core->GetGame()->ControlStatus&CS_PARTY_AI) {
 				continue;
 			}
@@ -278,7 +270,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	if (alive && UnselectableTimer) {
 			UnselectableTimer--;
 			if (!UnselectableTimer) {
-				if (Type==ST_ACTOR) {
+				if (Type == ST_ACTOR) {
 					((Actor *) this)->SetCircleSize();
 				}
 			}
@@ -455,7 +447,7 @@ void Scriptable::LeaveDialog()
 //this ends cutscene mode for this Sender
 void Scriptable::ClearCutsceneID()
 {
-	CutSceneId=NULL;
+	CutSceneId = NULL;
 	InternalFlags &= ~IF_CUTSCENEID;
 }
 
@@ -463,7 +455,7 @@ void Scriptable::ClearCutsceneID()
 //because the cutscene script executer DOESN'T get hijacked
 void Scriptable::SetCutsceneID(Scriptable *csid)
 {
-	CutSceneId=csid;
+	CutSceneId = csid;
 	InternalFlags |= IF_CUTSCENEID;
 }
 
@@ -551,7 +543,7 @@ void Scriptable::AddTrigger(ieDword *actorref)
 
 void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 {
-	if (Type==ST_ACTOR) {
+	if (Type == ST_ACTOR) {
 		((Actor *) this)->SetStance(IE_ANI_CONJURE);
 	}
 
@@ -567,7 +559,7 @@ void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 
 	Spell* spl = gamedata->GetSpell( SpellResRef );
 	//create projectile from known spellheader
-	Projectile *pro=spl->GetProjectile(SpellHeader);
+	Projectile *pro = spl->GetProjectile(SpellHeader);
 	SpellHeader = -1;
 	if (pro) {
 		pro->SetCaster(GetGlobalID());
@@ -579,12 +571,12 @@ void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 
 void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 {
-	if (Type==ST_ACTOR) {
+	if (Type == ST_ACTOR) {
 		((Actor *) this)->SetStance(IE_ANI_CONJURE);
 	}
 
 	if (SpellHeader == -1) {
-		LastTarget=0;
+		LastTarget = 0;
 		return;
 	}
 	if (!LastTarget) {
@@ -593,7 +585,7 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 	}
 	Spell* spl = gamedata->GetSpell( SpellResRef );
 	//create projectile from known spellheader
-	Projectile *pro=spl->GetProjectile(SpellHeader);
+	Projectile *pro = spl->GetProjectile(SpellHeader);
 	if (pro) {
 		pro->SetCaster(GetGlobalID());
 		GetCurrentArea()->AddProjectile(pro, Pos, LastTarget);
@@ -610,7 +602,7 @@ void Scriptable::CastSpellPoint( const ieResRef SpellResRef, Point &target, bool
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
-	if (Type==ST_ACTOR) {
+	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
 			return;
@@ -627,7 +619,7 @@ void Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
-	if (Type==ST_ACTOR) {
+	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
 			return;
@@ -654,11 +646,11 @@ void Scriptable::SpellCast(const ieResRef SpellResRef)
 	}
 
 	//cfb
-	if (Type==ST_ACTOR) {
+	if (Type == ST_ACTOR) {
 		int level = ((Actor *) this)->GetXPLevel(true);
 		SpellHeader = spl->GetHeaderIndexFromLevel(level);
 		Actor *actor = (Actor *) this;
-		EffectQueue *fxqueue=spl->GetEffectBlock(-1, SpellHeader);
+		EffectQueue *fxqueue = spl->GetEffectBlock(-1, SpellHeader);
 		fxqueue->SetOwner(actor);
 		fxqueue->AddAllEffects(actor, actor->Pos);
 		delete fxqueue;
@@ -731,10 +723,10 @@ void Selectable::DrawCircle(Region &vp)
 		unsigned long step;
 		GetTime( step );
 		step = tp_steps [(step >> 6) & 7];
-		mix.a=overColor.a;
-		mix.r=(overColor.r*step+selectedColor.r*(8-step))/8;
-		mix.g=(overColor.g*step+selectedColor.g*(8-step))/8;
-		mix.b=(overColor.b*step+selectedColor.b*(8-step))/8;
+		mix.a = overColor.a;
+		mix.r = (overColor.r*step+selectedColor.r*(8-step))/8;
+		mix.g = (overColor.g*step+selectedColor.g*(8-step))/8;
+		mix.b = (overColor.b*step+selectedColor.b*(8-step))/8;
 		col = &mix;
 	} else {
 		return;
@@ -774,7 +766,7 @@ bool Selectable::IsOver(Point &P)
 
 bool Selectable::IsSelected()
 {
-	return Selected==1;
+	return Selected == 1;
 }
 
 void Selectable::SetOver(bool over)
@@ -1039,16 +1031,16 @@ void Movable::AddWayPoint(Point &Des)
 	Destination = Des;
 	//it is tempting to use 'step' here, as it could
 	//be about half of the current path already
-	PathNode *endNode=path;
+	PathNode *endNode = path;
 	while(endNode->Next) {
-		endNode=endNode->Next;
+		endNode = endNode->Next;
 	}
 	Point p(endNode->x, endNode->y);
 	area->BlockSearchMap( Pos, size, 0);
 	PathNode *path2 = area->FindPath( p, Des, size );
-	endNode->Next=path2;
+	endNode->Next = path2;
 	//probably it is wise to connect it both ways?
-	path2->Parent=endNode;
+	path2->Parent = endNode;
 }
 
 void Movable::FixPosition()
@@ -1162,10 +1154,10 @@ void Movable::DrawTargetPoint(Region &vp)
 
 TileObject::TileObject()
 {
-	opentiles=NULL;
-	opencount=0;
-	closedtiles=NULL;
-	closedcount=0;
+	opentiles = NULL;
+	opencount = 0;
+	closedtiles = NULL;
+	closedcount = 0;
 	Flags = 0;
 }
 
@@ -1246,7 +1238,7 @@ Door::~Door(void)
 
 void Door::ImpedeBlocks(int count, Point *points, unsigned int value)
 {
-	for(int i=0;i<count;i++) {
+	for(int i = 0;i<count;i++) {
 		unsigned int tmp = area->SearchMap->GetPixelIndex( points[i].x, points[i].y ) & PATH_MAP_NOTDOOR;
 		area->SearchMap->SetPixelIndex( points[i].x, points[i].y, (ieByte) (tmp|value) );
 	}
@@ -1277,7 +1269,7 @@ void Door::UpdateDoor()
 		ImpedeBlocks(cibcount, closed_ib, cval);
 	}
 
-	InfoPoint *ip=area->TMap->GetInfoPoint(LinkedInfo);
+	InfoPoint *ip = area->TMap->GetInfoPoint(LinkedInfo);
 	if (ip) {
 		if (Flags&DOOR_OPEN) ip->Flags&=~INFO_DOOR;
 		else ip->Flags|=INFO_DOOR;
@@ -1303,7 +1295,7 @@ void Door::ToggleTiles(int State, bool playsound)
 	}
 
 	//set door_open as state
-	Flags = (Flags & ~DOOR_OPEN) | (State==!core->HasFeature(GF_REVERSE_DOOR) );
+	Flags = (Flags & ~DOOR_OPEN) | (State == !core->HasFeature(GF_REVERSE_DOOR) );
 }
 
 //this is the short name (not the scripting name)
@@ -1341,7 +1333,7 @@ bool Door::IsOpen() const
 {
 	bool ret = (bool) core->HasFeature(GF_REVERSE_DOOR);
 	if (Flags&DOOR_OPEN) {
-		ret=!ret;
+		ret = !ret;
 	}
 	return ret;
 }
@@ -1355,20 +1347,20 @@ bool Door::BlockedOpen(bool Open, bool ForceOpen)
 
 	blocked = false;
 	if (Open) {
-		count=oibcount;
-		points=open_ib;
+		count = oibcount;
+		points = open_ib;
 	} else {
-		count=cibcount;
-		points=closed_ib;
+		count = cibcount;
+		points = closed_ib;
 	}
 	//getting all impeded actors flagged for jump
 	Region rgn;
-	rgn.w=16;
-	rgn.h=12;
-	for(int i=0;i<count;i++) {
+	rgn.w = 16;
+	rgn.h = 12;
+	for(int i = 0;i<count;i++) {
 		Actor** ab;
-		rgn.x=points[i].x*16;
-		rgn.y=points[i].y*12;
+		rgn.x = points[i].x*16;
+		rgn.y = points[i].y*12;
 		unsigned int tmp = area->SearchMap->GetPixelIndex( points[i].x, points[i].y ) & PATH_MAP_ACTOR;
 		if (tmp) {
 			int ac = area->GetActorInRect(ab, rgn, false);
@@ -1430,6 +1422,16 @@ void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 	}
 }
 
+void Highlightable::SetTrapDetected(int x)
+{
+	if(x == TrapDetected)
+		return;
+	TrapDetected = x;
+	if(TrapDetected) {
+		core->Autopause(AP_TRAP);
+	}
+}
+
 void Highlightable::TryDisarm(Actor *actor)
 {
 //first lets do this automatically succeeding
@@ -1437,7 +1439,7 @@ void Highlightable::TryDisarm(Actor *actor)
 	if (Trapped) {
 		LastTrigger = actor->GetID();
 		LastDisarmed = actor->GetID();
-		TrapDetected = 1;
+		SetTrapDetected(1);
 		//trap fired
 		if (!TrapResets()) {
 			//trap removed
@@ -1455,7 +1457,7 @@ void Highlightable::TryDisarm(Actor *actor)
 void Door::TryPickLock(Actor *actor)
 {
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
-		if (LockDifficulty==100) {
+		if (LockDifficulty == 100) {
 			core->DisplayConstantStringName(STR_DOOR_NOPICK, 0xbcefbc, actor);
 		} else {
 			core->DisplayConstantStringName(STR_DOOR_CANTPICK, 0xbcefbc, actor);
@@ -1541,9 +1543,9 @@ void Highlightable::DetectTrap(int skill)
 {
 	if (!CanDetectTrap()) return;
 	if (!Scripts[0]) return;
-	if ((skill>=100) && (skill!=256) ) skill=100;
+	if ((skill>=100) && (skill!=256) ) skill = 100;
 	if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDiff) {
-		TrapDetected=1; //probably could be set to the player #?
+		SetTrapDetected(1); //probably could be set to the player #?
 	}
 }
 
@@ -1586,8 +1588,8 @@ bool Highlightable::TriggerTrap(int skill, ieDword ID)
 		return false;
 	}
 	if (CanDetectTrap()) {
-		TrapDetected=1; //probably too late :)
-		if ((skill>=100) && (skill!=256) ) skill=100;
+		SetTrapDetected(1); //probably too late :)
+		if ((skill>=100) && (skill!=256) ) skill = 100;
 		if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDiff) {
 			//tumble???
 			return false;
@@ -1694,7 +1696,7 @@ void Container::FreeGroundIcons()
 {
 	Video* video = core->GetVideoDriver();
 
-	for (int i=0;i<MAX_GROUND_ICON_DRAWN;i++) {
+	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		if (groundicons[i]) {
 			video->FreeSprite( groundicons[i] );
 			groundicons[i]=NULL;
@@ -1713,7 +1715,7 @@ void Container::DrawPile(bool highlight, Region screen, Color tint)
 {
 	Video* video = core->GetVideoDriver();
 	CreateGroundIconCover();
-	for (int i=0;i<MAX_GROUND_ICON_DRAWN;i++) {
+	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		if (groundicons[i]) {
 			//draw it with highlight
 			video->BlitGameSprite(groundicons[i],
@@ -1733,7 +1735,7 @@ void Container::CreateGroundIconCover()
 	int height = 0;
 
 	int i; //msvc6.0
-	for (i=0;i<MAX_GROUND_ICON_DRAWN;i++) {
+	for (i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		if (groundicons[i]) {
 			Sprite2D& spr = *groundicons[i];
 			if (xpos < spr.XPos) {
@@ -1765,7 +1767,7 @@ void Container::CreateGroundIconCover()
 	}
 
 	// TODO: remove this checking code eventually
-	for (i=0;i<MAX_GROUND_ICON_DRAWN;i++) {
+	for (i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		if (groundicons[i]) {
 			Sprite2D& spr = *groundicons[i];
 			assert(groundiconcover->Covers(Pos.x, Pos.y, spr.XPos, spr.YPos, spr.Width, spr.Height));
@@ -1787,7 +1789,7 @@ void Container::SetContainerLocked(bool lock)
 void Container::DestroyContainer()
 {
 	//it is already a groundpile?
-	if (Type==IE_CONTAINER_PILE)
+	if (Type == IE_CONTAINER_PILE)
 		return;
 	Type = IE_CONTAINER_PILE;
 	RefreshGroundIcons();
@@ -1799,7 +1801,7 @@ CREItem *Container::RemoveItem(unsigned int idx, unsigned int count)
 {
 	CREItem *ret = inventory.RemoveItem(idx, count);
 	//we just took the 3. or less item, groundpile changed
-	if ((Type==IE_CONTAINER_PILE) && (inventory.GetSlotCount()<3)) {
+	if ((Type == IE_CONTAINER_PILE) && (inventory.GetSlotCount()<3)) {
 		RefreshGroundIcons();
 	}
 	return ret;
@@ -1811,7 +1813,7 @@ int Container::AddItem(CREItem *item)
 {
 	inventory.AddItem(item);
 	//we just added a 3. or less item, groundpile changed
-	if ((Type==IE_CONTAINER_PILE) && (inventory.GetSlotCount()<4)) {
+	if ((Type == IE_CONTAINER_PILE) && (inventory.GetSlotCount()<4)) {
 		RefreshGroundIcons();
 	}
 	return 2;
@@ -1821,7 +1823,7 @@ void Container::RefreshGroundIcons()
 {
 	int i = inventory.GetSlotCount();
 	if (i>MAX_GROUND_ICON_DRAWN)
-		i=MAX_GROUND_ICON_DRAWN;
+		i = MAX_GROUND_ICON_DRAWN;
 	FreeGroundIcons();
 	while (i--) {
 		CREItem *slot = inventory.GetSlotItem(i); //borrowed reference
@@ -1855,7 +1857,7 @@ bool Container::IsOpen() const
 void Container::TryPickLock(Actor *actor)
 {
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
-		if (LockDifficulty==100) {
+		if (LockDifficulty == 100) {
 			core->DisplayConstantStringName(STR_CONT_NOPICK, 0xbcefbc, actor);
 		} else {
 			core->DisplayConstantStringName(STR_CONT_CANTPICK, 0xbcefbc, actor);

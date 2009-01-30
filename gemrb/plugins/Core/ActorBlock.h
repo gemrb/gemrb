@@ -325,6 +325,7 @@ public:
 		if (KeyResRef[0]) return KeyResRef;
 		return NULL;
 	}
+	void SetTrapDetected(int x);
 	void TryDisarm(Actor *actor);
 	//detect trap, set skill to 256 if you want sure fire
 	void DetectTrap(int skill);
