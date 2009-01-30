@@ -131,7 +131,9 @@
 #define STR_PICKPOCKET_ARMOR 96      //armor restriction
 #define STR_USING_FEAT      97
 #define STR_STOPPED_FEAT    98
+#define STR_DISARM_DONE 99       //trap disarmed
+#define STR_DISARM_FAIL 100       //trap not disarmed
 
-#define STRREF_COUNT 99
+#define STRREF_COUNT 101
 
 #endif //! IE_STRINGS_H

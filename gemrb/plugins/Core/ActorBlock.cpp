@@ -1442,7 +1442,10 @@ void Highlightable::TryDisarm(Actor *actor)
 		if (!TrapResets()) {
 			//trap removed
 			Trapped = 0;
+			core->DisplayConstantStringName(STR_DISARM_DONE, 0xd7d7be, actor);
 			actor->AddExperience(XP_DISARM, actor->GetXPLevel(1));
+		} else {
+			core->DisplayConstantStringName(STR_DISARM_FAIL, 0xd7d7be, actor);
 		}
 		ImmediateEvent();
 		return;
