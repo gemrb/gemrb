@@ -37,6 +37,8 @@ class GTable:
   }
   def __del__(self):
     GemRB.UnloadTable(self.ID)
+  def __nonzero__(self):
+    return self.ID != -1
 
 class GSymbol:
   __metaclass__ = metaIDWrapper

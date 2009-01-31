@@ -896,6 +896,38 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( ind );
 }
 
+PyDoc_STRVAR( GemRB_LoadTableObject__doc,
+"LoadTableObject(2DAResRef, [ignore_error=0]) => GTable\n\n"
+"Loads a 2DA Table and returns it as an object." );
+
+static PyObject* GemRB_LoadTableObject(PyObject * self, PyObject* args)
+{
+	const char* tablename;
+	int noerror = 0;
+
+	if (!PyArg_ParseTuple( args, "s|i", &tablename, &noerror )) {
+		return AttributeError( GemRB_LoadTable__doc );
+	}
+
+	PyObject* table = GemRB_LoadTable(self, args);
+	if (!PyObject_TypeCheck( table, &PyInt_Type ))
+		return table; // exception
+
+	PyObject* tabtuple = PyTuple_New(1);
+	PyTuple_SET_ITEM(tabtuple, 0, table);
+
+	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
+	PyObject* ret = gs->ConstructObject("GTable", tabtuple);
+	Py_DECREF(tabtuple);
+	if (!ret) {
+		char buf[256];
+		snprintf( buf, sizeof( buf ), "Couldn't construct Table object for 2DA Table %s!", tablename );
+		return RuntimeError(buf);
+	}
+	return ret;
+}
+
+
 PyDoc_STRVAR( GemRB_UnloadTable__doc,
 "UnloadTable(TableIndex)\n\n"
 "Unloads a 2DA Table." );
@@ -8835,6 +8867,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(LoadMusicPL, METH_VARARGS),
 	METHOD(LoadSymbol, METH_VARARGS),
 	METHOD(LoadTable, METH_VARARGS),
+	METHOD(LoadTableObject, METH_VARARGS),
 	METHOD(LoadWindowPack, METH_VARARGS),
 	METHOD(LoadWindow, METH_VARARGS),
 	METHOD(LoadWindowObject, METH_VARARGS),
