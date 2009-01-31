@@ -788,6 +788,9 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 #define VFLIP_CONDITIONAL data->flip_ver
 #define RLE data->RLE
 #define PAL data->pal
+#define SRCTYPE Uint8
+#define SRCDATA rle
+#define ISTRANSPARENT(p) (p == (Uint8)data->transindex)
 #undef COVER
 #undef TINT
 
@@ -831,6 +834,9 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 #undef VFLIP_CONDITIONAL
 #undef RLE
 #undef PAL
+#undef SRCTYPE
+#undef SRCDATA
+#undef ISTRANSPARENT
 
 		SDL_UnlockSurface(backBuf);
 	}
@@ -915,6 +921,9 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 #define VFLIP_CONDITIONAL data->flip_ver
 #define RLE data->RLE
 #define PAL data->pal
+#define SRCTYPE Uint8
+#define SRCDATA rle
+#define ISTRANSPARENT(p) (p == (Uint8)data->transindex)
 #undef COVER
 #undef TINT
 
@@ -958,6 +967,9 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 #undef PAL
 #undef SPECIALPIXEL
 #undef PALETTE_ALPHA
+#undef SRCTYPE
+#undef SRCDATA
+#undef ISTRANSPARENT
 
 		SDL_UnlockSurface(backBuf);
 	}
@@ -1068,6 +1080,9 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #define PAL palette
 #define COVERX (cover->XPos - spr->XPos)
 #define COVERY (cover->YPos - spr->YPos)
+#define SRCTYPE Uint8
+#define SRCDATA rle
+#define ISTRANSPARENT(p) (p == (Uint8)data->transindex)
 #undef TINT_ALPHA
 #undef PALETTE_ALPHA
 
@@ -1226,10 +1241,10 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #define SPECIALPIXEL   int ia=0; if ((remflags & BLIT_HALFTRANS) || (p == 1 && (remflags & BLIT_TRANSSHADOW))) ia = 1; if (p == 1 && (remflags & BLIT_NOSHADOW)) { } else
 
 #define CUSTOMBLENDING
-#define RVALUE(r,g,b) (r)
-#define GVALUE(r,g,b) (g)
-#define BVALUE(r,g,b) (b)
-#define AVALUE(r,g,b,a) (a)>>ia
+#define RVALUE(p) (col[(p)].r)
+#define GVALUE(p) (col[(p)].g)
+#define BVALUE(p) (col[(p)].b)
+#define AVALUE(p,a) ((a)>>ia)
 #define CUSTOMBLEND(r,g,b) do { if (remflags & BLIT_GREY) { unsigned int t = (r)+(g)+(b); t /= 3; (r)=t; (g)=t; (b)=t; } if (remflags & BLIT_RED) { (g) /= 2; (b) /= 2; } } while(0)
 
 #define TINT_ALPHA
@@ -1346,6 +1361,9 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #undef PAL
 #undef COVERX
 #undef COVERY
+#undef SRCTYPE
+#undef SRCDATA
+#undef ISTRANSPARENT
 
 	SDL_UnlockSurface(backBuf);
 

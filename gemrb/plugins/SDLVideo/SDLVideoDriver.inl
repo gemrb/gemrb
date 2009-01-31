@@ -74,10 +74,10 @@ assert(cover);
 
 
 #ifndef CUSTOMBLENDING
-#define RVALUE(r,g,b) (r)
-#define GVALUE(r,g,b) (g)
-#define BVALUE(r,g,b) (b)
-#define AVALUE(r,g,b,a) (a)
+#define RVALUE(p) (col[(p)].r)
+#define GVALUE(p) (col[(p)].g)
+#define BVALUE(p) (col[(p)].b)
+#define AVALUE(p,a) (a)
 #define CUSTOMBLEND(r,g,b)
 #endif
 
@@ -205,6 +205,7 @@ do {
 	const int gshift = (TARGET)->format->Gshift;
 	const int bshift = (TARGET)->format->Bshift;
 	const Color* const col = (PAL)->col;
+	const SRCTYPE* srcdata = (SRCDATA);
 
 #if (defined(ALPHA) || defined(CUSTOMBLENDING))
 	unsigned int dR;
@@ -280,9 +281,9 @@ do {
 			}
 			while (XNEG((int)(endpix - pix)) > 0)
 			{
-				Uint8 p = *rle++;
-				if (p == (Uint8)data->transindex) {
-					int count = XNEG((*rle++) + 1);
+				Uint8 p = *srcdata++;
+				if (ISTRANSPARENT(p)) {
+					int count = XNEG((*srcdata++) + 1);
 					pix += count;
 #ifdef COVER
 					coverpix += count;
@@ -294,7 +295,7 @@ do {
 #endif
 						{
 							SPECIALPIXEL {
-								BLENDPIXEL(*pix, (RVALUE(col[p].r, col[p].g, col[p].b)), (GVALUE(col[p].r, col[p].g, col[p].b)), (BVALUE(col[p].r, col[p].g, col[p].b)), (AVALUE(col[p].r, col[p].g, col[p].b, (ALPHAVALUE))), *pix);
+								BLENDPIXEL(*pix, (RVALUE(p)), (GVALUE(p)), (BVALUE(p)), (AVALUE(p, (ALPHAVALUE))), *pix);
 							}
 						}
 #if defined(COVER) && defined(HIGHLIGHTCOVER)
@@ -329,7 +330,7 @@ do {
 			if (starty >= endy) break;
 
 			// skip clipped lines at start
-			rle += (starty - ty) * (WIDTH);
+			srcdata += (starty - ty) * (WIDTH);
 #ifdef COVER
 			coverline += (starty - ty) * cover->Width;
 #endif
@@ -342,7 +343,7 @@ do {
 			if (starty <= endy) break;
 
 			// skip clipped lines at start
-			rle += (ty + (HEIGHT) - 1 - starty) * (WIDTH);
+			srcdata += (ty + (HEIGHT) - 1 - starty) * (WIDTH);
 #ifdef COVER
 			coverline -= (ty + (HEIGHT) - 1 - starty) * cover->Width;
 #endif
@@ -386,18 +387,18 @@ do {
 #ifdef COVER
 			Uint8* coverpix = coverline + (COVERX) + XNEG(prelineskip) - xneg*((WIDTH)-1);
 #endif
-			rle += prelineskip;
+			srcdata += prelineskip;
 
 			while (pix != endpix)
 			{
-				Uint8 p = *rle++;
-				if (p != (Uint8)data->transindex) {
+				SRCTYPE p = *srcdata++;
+				if (!(ISTRANSPARENT(p))) {
 #ifdef COVER
 					if (!*coverpix)
 #endif
 					{
 						SPECIALPIXEL {
-							BLENDPIXEL(*pix, (RVALUE(col[p].r, col[p].g, col[p].b)), (GVALUE(col[p].r, col[p].g, col[p].b)), (BVALUE(col[p].r, col[p].g, col[p].b)), (AVALUE(col[p].r, col[p].g, col[p].b, (ALPHAVALUE))), *pix);
+							BLENDPIXEL(*pix, (RVALUE(p)), (GVALUE(p)), (BVALUE(p)), (AVALUE(p, (ALPHAVALUE))), *pix);
 						}
 					}
 #if defined(COVER) && defined(HIGHLIGHTCOVER)
@@ -412,7 +413,7 @@ do {
 #endif
 			}
 
-			rle += postlineskip;
+			srcdata += postlineskip;
 
 			line += YNEG((TARGET)->pitch/(PITCHMULT));
 #ifdef COVER
