@@ -2579,7 +2579,7 @@ int fx_set_regenerating_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		//fallthrough
 	case RPD_SECONDS:           //restore param3 hp every param1 seconds
 seconds:
-		fx->Parameter1 = nextHeal+tmp;
+		fx->Parameter3 = nextHeal+tmp;
 		damage = 1;
 		break;
 	case RPD_POINTS:
