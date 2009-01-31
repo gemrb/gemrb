@@ -1331,13 +1331,13 @@ static PyObject* GemRB_GetControlObject(PyObject * self, PyObject* args)
 	}
 	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
 	ret = gs->ConstructObject(type, ctrltuple);
+	Py_DECREF(ctrltuple);
 
 	if (!ret) {
 		char buf[256];
 		snprintf( buf, sizeof( buf ), "Couldn't construct Control object for control %d in window %d!", ControlID, WindowIndex );
 		return RuntimeError(buf);
 	}
-	Py_DECREF(ctrltuple);
 	return ret;
 }
 
@@ -9248,16 +9248,12 @@ void GUIScript::ExecString(const char* string)
 
 PyObject* GUIScript::ConstructObject(const char* classname, PyObject* pArgs)
 {
-//	PyObject* cname = PyString_InternFromString(classname);
-//	PyObject* cobj = PyObject_GetAttr(pDict, cname);
-//	Py_DECREF(cname);
 	PyObject* cobj = PyDict_GetItemString( pDict, classname );
 	if (!cobj) {
 		fprintf(stderr, "Failed to lookup name '%s'\n", classname);
 		return 0;
 	}
 	PyObject* ret = PyObject_Call(cobj, pArgs, NULL);
-	Py_DECREF(cobj);
 	if (!ret) {
 		fprintf(stderr, "Failed to call constructor\n");
 		return 0;
