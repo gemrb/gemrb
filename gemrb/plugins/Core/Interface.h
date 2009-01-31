@@ -284,6 +284,7 @@ private:
 	int ItemTypes;
 	int tooltip_x;
 	int tooltip_y;
+	int tooltip_currtextw;
 	// the control owning the tooltip
 	Control* tooltip_ctrl;
 	// Currently dragged item or NULL

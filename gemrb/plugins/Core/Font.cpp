@@ -277,6 +277,13 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 	unsigned char Alignment, bool anchor, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor)
 {
+	Print(rgn, rgn, string, hicolor, Alignment, anchor, initials, cursor, curpos, NoColor);
+}
+
+void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
+	Palette* hicolor, unsigned char Alignment, bool anchor, Font* initials,
+	Sprite2D* cursor, unsigned int curpos, bool NoColor)
+{
 	bool enablecap=false;
 	int capital = 0;
 	if (initials)
@@ -406,13 +413,13 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 		}
 		video->BlitSpriteRegion( sprBuffer, size[currChar],
 			x + rgn.x, y + rgn.y - yPos[currChar],
-			anchor, &rgn );
+			anchor, &cliprgn );
 		if (cursor && ( curpos == i ))
-			video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &rgn );
+			video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &cliprgn );
 		x += size[currChar].w;
 	}
 	if (cursor && ( curpos == len )) {
-		video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &rgn );
+		video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &cliprgn );
 	}
 	free( tmp );
 }

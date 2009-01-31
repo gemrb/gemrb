@@ -142,6 +142,7 @@ Interface::Interface(int iargc, char* iargv[])
 	ModalWindow = NULL;
 	tooltip_x = 0;
 	tooltip_y = 0;
+	tooltip_currtextw = 0;
 	tooltip_ctrl = NULL;
 	plugin = NULL;
 
@@ -2657,8 +2658,11 @@ int Interface::SetTooltip(unsigned short WindowIndex,
 
 void Interface::DisplayTooltip(int x, int y, Control *ctrl)
 {
+	if (tooltip_ctrl && tooltip_ctrl == ctrl && tooltip_x == x && tooltip_y == y)
+		return;
 	tooltip_x = x;
 	tooltip_y = y;
+	tooltip_currtextw = 0;
 	tooltip_ctrl = ctrl;
 }
 
@@ -2901,33 +2905,51 @@ void Interface::DrawTooltip ()
 
 	int w1 = 0;
 	int w2 = 0;
-	int w = fnt->CalcStringWidth( tooltip_text ) + 8;
+	int strw = fnt->CalcStringWidth( tooltip_text ) + 8;
+	int w = strw;
 	int h = fnt->maxHeight;
 
 	if (TooltipBack) {
+		// animate BG tooltips
+		// TODO: make tooltip animation an option instead
+		// of following hard-coded check!
+		if (TooltipMargin == 5) {
+			// TODO: make speed an option
+			int tooltip_anim_speed = 15;
+			if (tooltip_currtextw < strw) {
+				tooltip_currtextw += tooltip_anim_speed;
+			}
+			if (tooltip_currtextw > strw) {
+				tooltip_currtextw = strw;
+			}
+			w = tooltip_currtextw;
+		}
+
 		h = TooltipBack[0]->Height;
 		w1 = TooltipBack[1]->Width;
 		w2 = TooltipBack[2]->Width;
 		w += TooltipMargin*2;
+		strw += TooltipMargin*2;
 		//multiline in case of too much text
 		if (w>TooltipBack[0]->Width)
-			w=TooltipBack[0]->Width;
+			strw=w=TooltipBack[0]->Width;
+		else if (strw>TooltipBack[0]->Width)
+			strw=TooltipBack[0]->Width;
 	}
 
-	int x = tooltip_x - w / 2;
+	int strx = tooltip_x - strw / 2;
 	int y = tooltip_y - h / 2;
-
 	// Ensure placement within the screen
-	if (x < 0) x = 0;
-	else if (x + w + w1 + w2 > Width)
-		x = Width - w - w1 - w2;
+	if (strx < 0) strx = 0;
+	else if (strx + strw + w1 + w2 > Width)
+		strx = Width - strw - w1 - w2;
 	if (y < 0) y = 0;
 	else if (y + h > Height)
 		y = Height - h;
 
+	int x = strx + ((strw - w) / 2);
 
-	// FIXME: add tooltip scroll animation for bg. also, take back[0] from
-	// center, not from left end
+	// FIXME: take back[0] from center, not from left end
 	Region r2 = Region( x, y, w, h );
 	if (TooltipBack) {
 		video->BlitSprite( TooltipBack[0], x + TooltipMargin, y, true, &r2 );
@@ -2935,8 +2957,12 @@ void Interface::DrawTooltip ()
 		video->BlitSprite( TooltipBack[2], x + w, y, true );
 	}
 
-	r2.x+=TooltipMargin;
-	fnt->Print( r2, (ieByte *) tooltip_text, NULL,
+	if (TooltipBack) {
+		r2.x+=TooltipMargin;
+		strx+=TooltipMargin;
+	}
+	Region textr = Region( strx, y, strw, h );
+	fnt->Print( r2, textr, (ieByte *) tooltip_text, NULL,
 		IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true );
 }
 

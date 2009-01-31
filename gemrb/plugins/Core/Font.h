@@ -93,6 +93,10 @@ public:
 	/** Call this after adding all characters */
 	void FinalizeSprite(bool cK, int index);
 
+	void Print(Region cliprgn, Region rgn, const unsigned char* string,
+		Palette* color, unsigned char Alignment, bool anchor = false,
+		Font* initials = NULL, Sprite2D* cursor = NULL,
+		unsigned int curpos = 0, bool NoColor = false);
 	void Print(Region rgn, const unsigned char* string, Palette* color,
 		unsigned char Alignment, bool anchor = false,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
