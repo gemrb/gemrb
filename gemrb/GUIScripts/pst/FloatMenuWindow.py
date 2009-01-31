@@ -75,7 +75,7 @@ def OpenFloatMenuWindow ():
 		GemRB.UnhideGUI ()
 
 		if float_menu_selected==None:
-			GemRB.GameControlSetTargetMode (TARGET_MODE_ALL)
+			GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 			return
 
 		if float_menu_mode == MENU_MODE_ITEMS:
@@ -430,7 +430,7 @@ def FloatMenuSelectAnotherPC ():
 
 def FloatMenuSelectDialog ():
 	global float_menu_selected
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_TALK)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK)
 	float_menu_selected = None
 	UpdateFloatMenuWindow ()
 
@@ -440,7 +440,7 @@ def FloatMenuSelectWeapons ():
 	float_menu_index = 0
 	float_menu_selected = None
 	# FIXME: Force attack mode
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectItems ():
@@ -455,7 +455,7 @@ def FloatMenuSelectSpells ():
 	float_menu_mode = MENU_MODE_SPELLS
 	float_menu_index = 0
 	float_menu_selected = None
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectAbilities ():

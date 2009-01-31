@@ -2723,14 +2723,15 @@ static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* 
 
 
 PyDoc_STRVAR( GemRB_GameControlSetTargetMode__doc,
-"GameControlSetTargetMode(Mode)\n\n"
-"Sets the targetting mode of the main game screen control (attack, cast spell,...)." );
+"GameControlSetTargetMode(Mode, Types)\n\n"
+"Sets the targetting mode of the main game screen control (attack, cast spell,...) and type of target (ally, enemy and/or neutral; all by default)" );
 
 static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* args)
 {
 	int Mode;
+	int Types = TARGET_TYPE_ALL; 
 
-	if (!PyArg_ParseTuple( args, "i", &Mode )) {
+	if (!PyArg_ParseTuple( args, "i|i", &Mode, &Types )) {
 		return AttributeError( GemRB_GameControlSetTargetMode__doc );
 	}
 
@@ -2740,6 +2741,7 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* a
 	}
 
 	gc->target_mode = Mode;
+	gc->target_types = Types;
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -7818,7 +7820,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 					SetItemText(wi, ci, item->Usages[actor->PCStats->QuickWeaponHeaders[action-ACT_WEAPON1]], true);
 					if (usedslot == slot) {
 						btn->EnableBorder(0, true);
-						if (core->GetGameControl()->target_mode&TARGET_MODE_ATTACK) {
+						if (core->GetGameControl()->target_mode == TARGET_MODE_ATTACK) {
 							state = IE_GUI_BUTTON_SELECTED;
 						} else {
 							state = IE_GUI_BUTTON_THIRD;
@@ -8119,6 +8121,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	GameControl *gc = core->GetGameControl();
 	switch (spelldata.Target) {
 		case TARGET_SELF:
+			// FIXME: GA_NO_DEAD and such are not actually used by SetupCasting
 			gc->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
 			gc->TryToCast(actor, actor);
 			break;

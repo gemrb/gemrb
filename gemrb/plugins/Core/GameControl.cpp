@@ -883,7 +883,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 int GameControl::GetCursorOverDoor(Door *overDoor)
 {
-	if (target_mode&TARGET_MODE_PICK) {
+	if (target_mode == TARGET_MODE_PICK) {
 		if (overDoor->VisibleTrap(0)) {
 			return IE_CURSOR_TRAP;
 		}
@@ -898,7 +898,7 @@ int GameControl::GetCursorOverDoor(Door *overDoor)
 
 int GameControl::GetCursorOverContainer(Container *overContainer)
 {
-	if (target_mode&TARGET_MODE_PICK) {
+	if (target_mode == TARGET_MODE_PICK) {
 		if (overContainer->VisibleTrap(0)) {
 			return IE_CURSOR_TRAP;
 		}
@@ -983,15 +983,15 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			lastActorID = 0;
 		}
 
-		if (target_mode & TARGET_MODE_TALK) {
+		if (target_mode == TARGET_MODE_TALK) {
 			nextCursor = IE_CURSOR_TALK;
-		} else if (target_mode & TARGET_MODE_ATTACK) {
+		} else if (target_mode == TARGET_MODE_ATTACK) {
 			nextCursor = IE_CURSOR_ATTACK;
-		} else if (target_mode & TARGET_MODE_CAST) {
+		} else if (target_mode == TARGET_MODE_CAST) {
 			nextCursor = IE_CURSOR_CAST;
-		} else if (target_mode & TARGET_MODE_DEFEND) {
+		} else if (target_mode == TARGET_MODE_DEFEND) {
 			nextCursor = IE_CURSOR_DEFEND;
-		} else if (target_mode & TARGET_MODE_PICK) {
+		} else if (target_mode == TARGET_MODE_PICK) {
 			if (lastActor) {
 				nextCursor = IE_CURSOR_PICK;
 				if (lastActor == core->GetFirstSelectedPC(false)) {
@@ -1017,17 +1017,17 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 				case EA_CONTROLLED:
 				case EA_CHARMED:
 				case EA_EVILBUTGREEN:
-					if (target_mode & TARGET_MODE_ALLY)
+					if (target_types & TARGET_TYPE_ALLY)
 						nextCursor^=1;
 					break;
 
 				case EA_ENEMY:
 				case EA_GOODBUTRED:
-					if (target_mode & TARGET_MODE_ENEMY)
+					if (target_types & TARGET_TYPE_ENEMY)
 						nextCursor^=1;
 					break;
 				default:
-					if (target_mode & TARGET_MODE_NEUTRAL)
+					if (target_types & TARGET_TYPE_NEUTRAL)
 						nextCursor^=1;
 					break;
 			}
@@ -1288,18 +1288,18 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 {
 	char Tmp[256];
 
-	if ((target_mode&TARGET_MODE_CAST) && spellCount) {
+	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the container back from the coordinates
 		TryToCast(actor, container->Pos);
 		return;
 	}
 
-	if (target_mode&TARGET_MODE_ATTACK) {
+	if (target_mode == TARGET_MODE_ATTACK) {
 		TryToBash(actor, container);
 		return;
 	}
 
-	if ((target_mode&TARGET_MODE_PICK)) {
+	if ((target_mode == TARGET_MODE_PICK)) {
 		TryToPick(actor, container);
 		return;
 	}
@@ -1315,18 +1315,18 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 {
 	char Tmp[256];
 
-	if ((target_mode&TARGET_MODE_CAST) && spellCount) {
+	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the door back from the coordinates
 		TryToCast(actor, door->Pos);
 		return;
 	}
 
-	if (target_mode&TARGET_MODE_ATTACK) {
+	if (target_mode == TARGET_MODE_ATTACK) {
 		TryToBash(actor, door);
 		return;
 	}
 
-	if ( (target_mode&TARGET_MODE_PICK) || door->TrapDetected) {
+	if ( (target_mode == TARGET_MODE_PICK) || door->TrapDetected) {
 		TryToPick(actor, door);
 		return;
 	}
@@ -1346,7 +1346,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 
 bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 {
-	if ((target_mode&TARGET_MODE_CAST) && spellCount) {
+	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the active region from the coordinates (if needed)
 		TryToCast(actor, p);
 		//don't bother with this region further
@@ -1495,7 +1495,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		//just a single actor, no formation
 		if (game->selected.size()==1) {
 			//the player is using an item or spell on the ground
-			if ((target_mode&TARGET_MODE_CAST) && spellCount) {
+			if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 				TryToCast(core->GetFirstSelectedPC(false), p);
 				return;
 			}
@@ -1545,22 +1545,22 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		type = ACT_NONE; //party
 	}
 
-	if (target_mode&TARGET_MODE_ATTACK) {
+	if (target_mode == TARGET_MODE_ATTACK) {
 		type = ACT_ATTACK;
-	} else if (target_mode&TARGET_MODE_TALK) {
+	} else if (target_mode == TARGET_MODE_TALK) {
 		type = ACT_TALK;
-	} else if (target_mode&TARGET_MODE_CAST) {
+	} else if (target_mode == TARGET_MODE_CAST) {
 		type = ACT_CAST;
-	} else if (target_mode&TARGET_MODE_DEFEND) {
+	} else if (target_mode == TARGET_MODE_DEFEND) {
 		type = ACT_DEFEND;
-	} else if (target_mode&TARGET_MODE_PICK) {
+	} else if (target_mode == TARGET_MODE_PICK) {
 		type = ACT_THIEVING;
 	}
 
 	//we shouldn't zero this for two reasons in case of spell or item
 	//1. there could be multiple targets
 	//2. the target mode is important
-	if (!(target_mode&TARGET_MODE_CAST) || !spellCount) {
+	if (!(target_mode == TARGET_MODE_CAST) || !spellCount) {
 		target_mode = TARGET_MODE_NONE;
 	}
 
@@ -2471,7 +2471,8 @@ void GameControl::SetupItemUse(int slot, int header, Actor *u, int targettype, i
 	spellSlot = slot;
 	spellIndex = header;
 	//item use also uses the casting icon, this might be changed
-	target_mode = targettype|TARGET_MODE_CAST;
+	target_mode = TARGET_MODE_CAST;
+	target_types = targettype;
 	spellCount = cnt;
 }
 
@@ -2481,7 +2482,8 @@ void GameControl::SetupCasting(int type, int level, int idx, Actor *u, int targe
 	spellUser = u;
 	spellSlot = level;
 	spellIndex = idx;
-	target_mode = targettype|TARGET_MODE_CAST;
+	target_mode = TARGET_MODE_CAST;
+	target_types = targettype;
 	spellCount = cnt;
 }
 

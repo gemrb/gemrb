@@ -68,18 +68,19 @@ class Window;
 #define SF_CUTSCENE      32 //don't push new actions onto the action queue
 #define SF_TRACKING      64 //draw blue arrows on the edge for creatures
 
-// target modes
+// target modes and types
 // !!! Keep these synchronized with GUIDefines.py !!!
-#define TARGET_MODE_NONE    0x00
-#define TARGET_MODE_TALK    0x01
-#define TARGET_MODE_ATTACK  0x02
-#define TARGET_MODE_CAST    0x04
-#define TARGET_MODE_DEFEND  0x08
-#define TARGET_MODE_PICK    0x10
-
-#define TARGET_MODE_ALLY    0x100
-#define TARGET_MODE_ENEMY   0x200
-#define TARGET_MODE_NEUTRAL 0x400
+#define TARGET_MODE_NONE    0
+#define TARGET_MODE_TALK    1
+#define TARGET_MODE_ATTACK  2
+#define TARGET_MODE_CAST    3
+#define TARGET_MODE_DEFEND  4
+#define TARGET_MODE_PICK    5
+#define TARGET_TYPE_NONE    0x000
+#define TARGET_TYPE_ALLY    0x100
+#define TARGET_TYPE_ENEMY   0x200
+#define TARGET_TYPE_NEUTRAL 0x400
+#define TARGET_TYPE_ALL (TARGET_TYPE_ALLY | TARGET_TYPE_ENEMY | TARGET_TYPE_NEUTRAL)
 
 /**
  * @class GameControl
@@ -117,7 +118,12 @@ public:
 	Door* overDoor;
 	Container* overContainer;
 	InfoPoint* overInfoPoint;
+
+	// currently selected targetting type, such as talk, attack, cast, ...
 	int target_mode;
+	// allow targetting allies, enemies and/or neutrals (bitmask)
+	int target_types;
+
 private:
 	unsigned char lastCursor;
 	short moveX, moveY;

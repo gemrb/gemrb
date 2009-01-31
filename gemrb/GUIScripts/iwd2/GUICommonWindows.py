@@ -221,29 +221,29 @@ def UpdateActionsWindow ():
 	return
 
 def OpenFloatMenuWindow ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL )
+	GemRB.GameControlSetTargetMode (TARGET_MODE_NONE )
 
 def ActionTalkPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_TALK)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK)
 
 def ActionAttackPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
 
 def ActionDefendPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_DEFEND)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND)
 
 def ActionThievingPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_PICK)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK)
 
 def ActionQWeaponPressed (which):
 	global PortraitWindow
 
 	pc = GemRB.GameGetFirstSelectedPC ()
 
-	if GemRB.GetEquippedQuickSlot (pc,1)==which and not (GemRB.GameControlGetTargetMode() &TARGET_MODE_ATTACK):
-		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
+	if GemRB.GetEquippedQuickSlot (pc,1)==which and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
+		GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
 	else:
-		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL)
+		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 		GemRB.SetEquippedQuickSlot (pc, which)
 
 	GemRB.SetupControls (PortraitWindow, pc, 6)
@@ -373,7 +373,7 @@ def ActionSkillsPressed ():
 def SpellPressed ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	Spell = GemRB.GetVar ("Spell")
 	Type = GemRB.GetVar ("Type")
 	GemRB.SpellCast (pc, Type, Spell)
@@ -384,7 +384,7 @@ def SpellPressed ():
 def EquipmentPressed ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	Item = GemRB.GetVar ("Equipment")
 	#equipment index
 	GemRB.UseItem (pc, -1, Item)
