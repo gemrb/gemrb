@@ -681,7 +681,6 @@ def DisplayItem (itemresref, type):
 		text = item["ItemDescIdentified"]
 	GemRB.SetText (Window, Text, text)
 
-	Button = GemRB.GetControl (Window, 6)
 	#left button
 	Button = GemRB.GetControl(Window, 8)
 
