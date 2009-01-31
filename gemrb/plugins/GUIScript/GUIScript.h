@@ -56,6 +56,7 @@ public:
 	void ExecString(const char* string);
 	/** lets hope this one can be here without screwing up the general interface */
 	PyObject *CallbackFunction(const char* fname, PyObject* pArgs);
+	PyObject* ConstructObject(const char* classname, PyObject* pArgs);
 public:
 	void release(void)
 	{

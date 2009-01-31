@@ -632,6 +632,36 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( ret );
 }
 
+PyDoc_STRVAR( GemRB_LoadWindowObject__doc,
+"LoadWindowObject(WindowID) => GWindow\n\n"
+"Returns a Window as an object." );
+
+static PyObject* GemRB_LoadWindowObject(PyObject * self, PyObject* args)
+{
+	int WindowID;
+	if (!PyArg_ParseTuple( args, "i", &WindowID )) {
+		return AttributeError( GemRB_LoadWindowObject__doc );
+	}
+
+	PyObject* win = GemRB_LoadWindow(self, args);
+	if (!PyObject_TypeCheck( win, &PyInt_Type ))
+		return win; // exception
+
+	PyObject* wintuple = PyTuple_New(1);
+	PyTuple_SET_ITEM(wintuple, 0, win);
+
+	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
+	PyObject* ret = gs->ConstructObject("GWindow", wintuple);
+	Py_DECREF(wintuple);
+	if (!ret) {
+		char buf[256];
+		snprintf( buf, sizeof( buf ), "Couldn't construct Window object for window %d!", WindowID );
+		return RuntimeError(buf);
+	}
+	return ret;
+}
+
+
 PyDoc_STRVAR( GemRB_SetWindowSize__doc,
 "SetWindowSize(WindowIndex, Width, Height)\n\n"
 "Resizes a Window.");
@@ -1209,12 +1239,74 @@ static PyObject* GemRB_GetControl(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetControl__doc );
 	}
 
+
 	int ret = core->GetControl( WindowIndex, ControlID );
 	if (ret == -1) {
 		return RuntimeError( "Control is not found" );
 	}
 
 	return PyInt_FromLong( ret );
+}
+
+PyDoc_STRVAR( GemRB_GetControlObject__doc,
+"GetControlObject(WindowID, ControlID) => GControl, or\n"
+"Window.GetControl(ControlID) => GControl\n\n"
+"Returns a control as on object." );
+
+static PyObject* GemRB_GetControlObject(PyObject * self, PyObject* args)
+{
+	int WindowIndex, ControlID;
+
+	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlID )) {
+		return AttributeError( GemRB_GetControlObject__doc );
+	}
+
+	PyObject* control = GemRB_GetControl( self, args );
+	if (!PyObject_TypeCheck( control, &PyInt_Type ))
+		return control; // exception
+
+	PyObject* ctrltuple = PyTuple_New(2);
+	PyTuple_SET_ITEM(ctrltuple, 0, PyInt_FromLong(WindowIndex));
+	PyTuple_SET_ITEM(ctrltuple, 1, control);
+
+	PyObject* ret = 0;
+	// TODO: get this from 'control' python variable
+	int ctrlindex = core->GetControl(WindowIndex, ControlID);
+	Control *ctrl = GetControl(WindowIndex, ctrlindex, -1);
+	if (!ctrl) {
+		// GetControl will already have raised an exception
+		return 0;
+	}
+	const char* type = "GControl";
+	switch(ctrl->ControlType) {
+	case IE_GUI_LABEL:
+		type = "GLabel";
+		break;
+	case IE_GUI_EDIT:
+		type = "GTextEdit";
+		break;
+	case IE_GUI_TEXTAREA:
+		type = "GTextArea";
+		break;
+	case IE_GUI_BUTTON:
+		type = "GButton";
+		break;
+	case IE_GUI_WORLDMAP:
+		type = "GWorldMap";
+		break;
+	default:
+		break;
+	}
+	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
+	ret = gs->ConstructObject(type, ctrltuple);
+
+	if (!ret) {
+		char buf[256];
+		snprintf( buf, sizeof( buf ), "Couldn't construct Control object for control %d in window %d!", ControlID, WindowIndex );
+		return RuntimeError(buf);
+	}
+	Py_DECREF(ctrltuple);
+	return ret;
 }
 
 PyDoc_STRVAR( GemRB_HasControl__doc,
@@ -8672,6 +8764,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetContainer, METH_VARARGS),
 	METHOD(GetContainerItem, METH_VARARGS),
 	METHOD(GetControl, METH_VARARGS),
+	METHOD(GetControlObject, METH_VARARGS),
 	METHOD(GetCurrentArea, METH_NOARGS),
 	METHOD(GetDestinationArea, METH_VARARGS),
 	METHOD(GetEquippedAmmunition, METH_VARARGS),
@@ -8744,6 +8837,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(LoadTable, METH_VARARGS),
 	METHOD(LoadWindowPack, METH_VARARGS),
 	METHOD(LoadWindow, METH_VARARGS),
+	METHOD(LoadWindowObject, METH_VARARGS),
 	METHOD(LoadWindowFrame, METH_VARARGS),
 	METHOD(MemorizeSpell, METH_VARARGS),
 	METHOD(ModifyEffect, METH_VARARGS),
@@ -8988,6 +9082,13 @@ bool GUIScript::Init(void)
 		printf("Check if %s/GUIDefines.py exists! ", path);
 		return false;
 	}
+
+	if (PyRun_SimpleString( "from GUIClasses import *" ) == -1) {
+		printMessage( "GUIScript", " ", RED );
+		printf("Check if %s/GUIClasses.py exists! ", path);
+		return false;
+	}
+
 	PyObject *pMainMod = PyImport_AddModule( "__main__" );
 	/* pMainMod is a borrowed reference */
 	pMainDic = PyModule_GetDict( pMainMod );
@@ -9110,4 +9211,23 @@ void GUIScript::ExecString(const char* string)
 		}
 		free( newstr );
 	}
+}
+
+PyObject* GUIScript::ConstructObject(const char* classname, PyObject* pArgs)
+{
+//	PyObject* cname = PyString_InternFromString(classname);
+//	PyObject* cobj = PyObject_GetAttr(pDict, cname);
+//	Py_DECREF(cname);
+	PyObject* cobj = PyDict_GetItemString( pDict, classname );
+	if (!cobj) {
+		fprintf(stderr, "Failed to lookup name '%s'\n", classname);
+		return 0;
+	}
+	PyObject* ret = PyObject_Call(cobj, pArgs, NULL);
+	Py_DECREF(cobj);
+	if (!ret) {
+		fprintf(stderr, "Failed to call constructor\n");
+		return 0;
+	}
+	return ret;
 }

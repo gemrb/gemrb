@@ -1,0 +1,70 @@
+#-*-python-*-
+#GemRB - Infinity Engine Emulator
+#Copyright (C) 2009 The GemRB Project
+#
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+# $Id$
+
+# The metaclasses below are used to define objects that call
+# functions in the GemRB module.
+#
+# Example:
+# class GTable:
+#  __metaclass__ = metaIDWrapper
+#  methods = {
+#    'GetValue': GemRB.GetTableValue,
+#  }
+#
+# x = GTable(5)
+#
+# Calling
+# x.GetValue("Row", "Col")
+# will then execute
+# GemRB.GetTableValue(5, "Row", "Col")
+
+def make_caller_lambda_ID(M):
+  return lambda self, *args: M(self.ID, *args)
+class metaIDWrapper(type):
+  def __new__(cls, classname, bases, classdict):
+    def __init__(self, ID):
+      self.ID = ID
+    newdict = { '__slots__':['ID'], '__init__':__init__, }
+    methods = classdict['methods']
+    for key in methods: 
+      newdict[key] = make_caller_lambda_ID(methods[key])
+    for key in classdict:
+      if key != 'methods':
+        newdict[key] = classdict[key]
+    return type.__new__(cls, classname, bases, newdict)
+
+
+# metaControl has two extra arguments: WinID and ID
+def make_caller_lambda_Control(M):
+  return lambda self, *args: M(self.WinID, self.ID, *args)
+class metaControl(type):
+  def __new__(cls, classname, bases, classdict):
+    def __init__(self, WinID, ID):
+      self.WinID = WinID
+      self.ID = ID
+    newdict = { '__slots__':['WinID', 'ID'], '__init__':__init__, }
+    methods = classdict['methods']
+    for key in methods:
+      newdict[key] = make_caller_lambda_Control(methods[key])
+    for key in classdict:
+      if key != 'methods':
+        newdict[key] = classdict[key]
+    return type.__new__(cls, classname, bases, newdict)
+
