@@ -4,14 +4,13 @@ GemRB svn r5587 (2009-01-30):
     - trap detection, removal, triggering, xp, feedback, autopause
     - modal effects
     - proper xp award for dual- and multiclass actors
-    - extended night (alternative lightmap, tileset, minimap, switching movies)
     - double click (used in the map window)
     - click-and-hold incrementing/decrementing
     - accumulate kill statistics
     - characters can move while the map is open
     - sound on item equip
     - arbitrary feat prerequisites in iwd2
-    - hard pause/TAB for all games (originally a ToB feature)
+    - hard pause for all games (originally a ToB feature); triggered with 'h'
     - extended night areas (originally a bg2 feature)
 
   Improved features:

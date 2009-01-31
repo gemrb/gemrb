@@ -859,7 +859,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		return; //return from cheatkeys
 	}
 	switch (Key) {
-		case '\t':
+		case 'h':
 			if (DialogueFlags & DF_FREEZE_SCRIPTS) break;
 			//fallthrough
 		case ' ':
