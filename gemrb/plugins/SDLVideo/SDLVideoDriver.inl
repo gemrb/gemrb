@@ -48,22 +48,46 @@
 #define MASK mask32
 #endif
 
+#ifdef USE_PALETTE
+#define RVALUE(p) (col[(p)].r)
+#define GVALUE(p) (col[(p)].g)
+#define BVALUE(p) (col[(p)].b)
+#define AVALUE(p) (col[(p)].a)
+#define ISTRANSPARENT(p) (p == (Uint8)data->transindex)
+#define SRCTYPE Uint8
+#else
+// TODO: These shifts might need fixing if we ever use this functionality
+// for sprites not created by SDLVideoDriver::CreateLight
+#define RVALUE(p) (p & 0xff)
+#define GVALUE(p) ((p >> 8) & 0xff)
+#define BVALUE(p) ((p >> 16) & 0xff)
+#define AVALUE(p) (p >> 24)
+#define ISTRANSPARENT(p) (AVALUE(p) == 0)
+#define SRCTYPE Uint32
+#endif
+
+#ifndef CUSTOMBLENDING
+#define ALPHAADJUST(a) a
+#define CUSTOMBLEND(r,g,b)
+#endif
+
+
 #ifdef PALETTE_ALPHA
 #define ALPHA
 #ifdef TINT_ALPHA
-#define ALPHAVALUE ((col[p].a * tint.a)>>8)
+#define ALPHAVALUE(p) (ALPHAADJUST(((AVALUE(p)) * tint.a)>>8))
 #else
-#define ALPHAVALUE col[p].a
+#define ALPHAVALUE(p) (ALPHAADJUST(AVALUE(p)))
 #endif
 
 #else
 
 #ifdef TINT_ALPHA
 #define ALPHA
-#define ALPHAVALUE tint.a
+#define ALPHAVALUE(p) (ALPHAADJUST(tint.a))
 #else
 #undef ALPHA
-#define ALPHAVALUE 255
+#define ALPHAVALUE(p) (ALPHAADJUST(255))
 #endif
 
 #endif
@@ -71,16 +95,6 @@
 #ifdef COVER
 assert(cover);
 #endif
-
-
-#ifndef CUSTOMBLENDING
-#define RVALUE(p) (col[(p)].r)
-#define GVALUE(p) (col[(p)].g)
-#define BVALUE(p) (col[(p)].b)
-#define AVALUE(p,a) (a)
-#define CUSTOMBLEND(r,g,b)
-#endif
-
 
 // TODO: preconvert palette to surface-specific color values, where possible
 
@@ -204,7 +218,9 @@ do {
 	const int rshift = (TARGET)->format->Rshift;
 	const int gshift = (TARGET)->format->Gshift;
 	const int bshift = (TARGET)->format->Bshift;
+#ifdef USE_PALETTE
 	const Color* const col = (PAL)->col;
+#endif
 	const SRCTYPE* srcdata = (SRCDATA);
 
 #if (defined(ALPHA) || defined(CUSTOMBLENDING))
@@ -244,7 +260,11 @@ do {
 	}
 #endif
 
+#ifdef USE_PALETTE
 	if (RLE) {
+#else
+	if (false) {
+#endif
 
 		PTYPE* line = (PTYPE*)(TARGET)->pixels +
 			(ty - yneg*((HEIGHT)-1))*(TARGET)->pitch/(PITCHMULT);
@@ -295,7 +315,7 @@ do {
 #endif
 						{
 							SPECIALPIXEL {
-								BLENDPIXEL(*pix, (RVALUE(p)), (GVALUE(p)), (BVALUE(p)), (AVALUE(p, (ALPHAVALUE))), *pix);
+								BLENDPIXEL(*pix, (RVALUE(p)), (GVALUE(p)), (BVALUE(p)), (ALPHAVALUE(p)), *pix);
 							}
 						}
 #if defined(COVER) && defined(HIGHLIGHTCOVER)
@@ -398,7 +418,7 @@ do {
 #endif
 					{
 						SPECIALPIXEL {
-							BLENDPIXEL(*pix, (RVALUE(p)), (GVALUE(p)), (BVALUE(p)), (AVALUE(p, (ALPHAVALUE))), *pix);
+							BLENDPIXEL(*pix, (RVALUE(p)), (GVALUE(p)), (BVALUE(p)), ( (ALPHAVALUE(p))), *pix);
 						}
 					}
 #if defined(COVER) && defined(HIGHLIGHTCOVER)
@@ -438,11 +458,14 @@ do {
 #undef ALPHAVALUE
 #undef HIGHLIGHTCOVER
 #undef MASK
-
-#ifndef CUSTOMBLENDING
 #undef RVALUE
 #undef GVALUE
 #undef BVALUE
 #undef AVALUE
+#undef ISTRANSPARENT
+#undef SRCTYPE
+
+#ifndef CUSTOMBLENDING
+#undef ALPHAADJUST
 #undef CUSTOMBLEND
 #endif

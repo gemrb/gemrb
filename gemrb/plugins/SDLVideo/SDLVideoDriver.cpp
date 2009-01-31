@@ -788,9 +788,8 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 #define VFLIP_CONDITIONAL data->flip_ver
 #define RLE data->RLE
 #define PAL data->pal
-#define SRCTYPE Uint8
 #define SRCDATA rle
-#define ISTRANSPARENT(p) (p == (Uint8)data->transindex)
+#define USE_PALETTE
 #undef COVER
 #undef TINT
 
@@ -834,9 +833,8 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 #undef VFLIP_CONDITIONAL
 #undef RLE
 #undef PAL
-#undef SRCTYPE
 #undef SRCDATA
-#undef ISTRANSPARENT
+#undef USE_PALETTE
 
 		SDL_UnlockSurface(backBuf);
 	}
@@ -921,9 +919,8 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 #define VFLIP_CONDITIONAL data->flip_ver
 #define RLE data->RLE
 #define PAL data->pal
-#define SRCTYPE Uint8
 #define SRCDATA rle
-#define ISTRANSPARENT(p) (p == (Uint8)data->transindex)
+#define USE_PALETTE
 #undef COVER
 #undef TINT
 
@@ -967,9 +964,8 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 #undef PAL
 #undef SPECIALPIXEL
 #undef PALETTE_ALPHA
-#undef SRCTYPE
 #undef SRCDATA
-#undef ISTRANSPARENT
+#undef USE_PALETTE
 
 		SDL_UnlockSurface(backBuf);
 	}
@@ -998,16 +994,23 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 									Region* clip, bool anchor)
 {
 	if (!spr->vptr) return;
+
+	// WARNING: this pointer is only valid with BAM sprites
+	Sprite2D_BAM_Internal* data = 0;
+
 	if (!spr->BAM) {
-		printMessage( "SDLVideo", "BlitGameSprite not supported for this sprite\n", LIGHT_RED );
-		BlitSprite(spr, x, y, false, clip);
-		return;
+		SDL_Surface* surf = ( SDL_Surface * ) spr->vptr;
+		if (surf->format->BytesPerPixel != 4) {
+			// TODO...
+			printMessage( "SDLVideo", "BlitGameSprite not supported for this sprite\n", LIGHT_RED );
+			BlitSprite(spr, x, y, false, clip);
+			return;
+		}
+	} else {
+		data = (Sprite2D_BAM_Internal*)spr->vptr;
+		if (!palette)
+			palette = data->pal;
 	}
-
-	Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
-
-	if (!palette)
-		palette = data->pal;
 
 	// implicit flags:
 	const unsigned int blit_COVERED =      0x20000000U;
@@ -1016,7 +1019,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 
 	if (cover) flags |= blit_COVERED;
 	if ((flags & BLIT_TINTED) && tint.a != 255) flags |= blit_TINTALPHA;
-	if (palette->alpha) flags |= blit_PALETTEALPHA;
+	if (spr->BAM && palette->alpha) flags |= blit_PALETTEALPHA;
 
 	// flag combinations which are often used:
 	// (ignoring MIRRORX/Y since those are handled conditionally)
@@ -1051,8 +1054,8 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 	if (tx+spr->Width <= 0) return;
 	SDL_LockSurface(backBuf);
 
-	bool hflip = data->flip_hor;
-	bool vflip = data->flip_ver;
+	bool hflip = spr->BAM ? data->flip_hor : false;
+	bool vflip = spr->BAM ? data->flip_ver : false;
 	if (flags & BLIT_MIRRORX) hflip = !hflip;
 	if (flags & BLIT_MIRRORY) vflip = !vflip;
 
@@ -1073,6 +1076,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY);
 	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
 
+
 #define FLIP
 #define HFLIP_CONDITIONAL hflip
 #define VFLIP_CONDITIONAL vflip
@@ -1080,13 +1084,12 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #define PAL palette
 #define COVERX (cover->XPos - spr->XPos)
 #define COVERY (cover->YPos - spr->YPos)
-#define SRCTYPE Uint8
+#define USE_PALETTE
 #define SRCDATA rle
-#define ISTRANSPARENT(p) (p == (Uint8)data->transindex)
 #undef TINT_ALPHA
 #undef PALETTE_ALPHA
 
-	if (remflags == (blit_COVERED | BLIT_TINTED)) {
+	if (spr->BAM && remflags == (blit_COVERED | BLIT_TINTED)) {
 
 #define COVER
 #define SPECIALPIXEL
@@ -1104,7 +1107,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #undef TINT
 #undef SPECIALPIXEL
 
-	} else if (remflags == (blit_COVERED | BLIT_TINTED | BLIT_TRANSSHADOW)) {
+	} else if (spr->BAM && remflags == (blit_COVERED | BLIT_TINTED | BLIT_TRANSSHADOW)) {
 
 #define COVER
 #define TINT
@@ -1124,7 +1127,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #undef COVER
 #undef TINT
 
-	} else if (remflags == (blit_COVERED | BLIT_TINTED | BLIT_NOSHADOW)) {
+	} else if (spr->BAM && remflags == (blit_COVERED | BLIT_TINTED | BLIT_NOSHADOW)) {
 
 #define COVER
 #define TINT
@@ -1143,7 +1146,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #undef TINT
 
 
-	} else if (remflags == BLIT_TINTED) {
+	} else if (spr->BAM && remflags == BLIT_TINTED) {
 
 #define SPECIALPIXEL
 #define TINT
@@ -1159,7 +1162,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #undef TINT
 #undef SPECIALPIXEL
 
-	} else if (remflags == BLIT_HALFTRANS) {
+	} else if (spr->BAM && remflags == BLIT_HALFTRANS) {
 
 #define HALFALPHA
 #define SPECIALPIXEL
@@ -1175,7 +1178,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #undef HALFALPHA
 #undef SPECIALPIXEL
 
-	} else if (remflags == (blit_COVERED | BLIT_HALFTRANS)) {
+	} else if (spr->BAM && remflags == (blit_COVERED | BLIT_HALFTRANS)) {
 
 #define HALFALPHA
 #define COVER
@@ -1193,7 +1196,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #undef COVER
 #undef SPECIALPIXEL
 
-	} else if (remflags == blit_COVERED) {
+	} else if (spr->BAM && remflags == blit_COVERED) {
 
 #define COVER
 #define SPECIALPIXEL
@@ -1221,7 +1224,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 		}
 #undef SPECIALPIXEL
 
-}*/ else {
+}*/ else if (spr->BAM) {
 		// handling the following effects with conditionals:
 		// halftrans
 		// noshadow
@@ -1241,10 +1244,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #define SPECIALPIXEL   int ia=0; if ((remflags & BLIT_HALFTRANS) || (p == 1 && (remflags & BLIT_TRANSSHADOW))) ia = 1; if (p == 1 && (remflags & BLIT_NOSHADOW)) { } else
 
 #define CUSTOMBLENDING
-#define RVALUE(p) (col[(p)].r)
-#define GVALUE(p) (col[(p)].g)
-#define BVALUE(p) (col[(p)].b)
-#define AVALUE(p,a) ((a)>>ia)
+#define ALPHAADJUST(a) ((a)>>ia)
 #define CUSTOMBLEND(r,g,b) do { if (remflags & BLIT_GREY) { unsigned int t = (r)+(g)+(b); t /= 3; (r)=t; (g)=t; (b)=t; } if (remflags & BLIT_RED) { (g) /= 2; (b) /= 2; } } while(0)
 
 #define TINT_ALPHA
@@ -1345,12 +1345,96 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 
 #undef SPECIALPIXEL
 #undef CUSTOMBLENDING
-#undef RVALUE
-#undef GVALUE
-#undef BVALUE
-#undef AVALUE
+#undef USE_PALETTE
+#undef ALPHAADJUST
 #undef CUSTOMBLEND
 #undef TINT_ALPHA
+
+	} else {
+		// non-BAM Blitting
+
+		// handling the following effects with conditionals:
+		// halftrans
+		// grey
+		// red
+		// glow (not yet)
+		// blended (not yet)
+
+		// handling the following effects by repeated inclusion:
+		// tinted
+		// covered
+
+		// not handling the following effects at all:
+		// noshadow     (impossible with 32bpp)
+		// transshadow  (impossible with 32bpp)
+		// palettealpha (always set)
+
+//		printf("Unoptimized blit: %04X\n", flags);
+
+#define SPECIALPIXEL   int ia=0; if ((remflags & BLIT_HALFTRANS)) ia = 1; if (p == 1 && (remflags & BLIT_NOSHADOW)) { } else
+
+#define PALETTE_ALPHA
+#define CUSTOMBLENDING
+#define ALPHAADJUST(a) ((a)>>ia)
+#define CUSTOMBLEND(r,g,b) do { if (remflags & BLIT_GREY) { unsigned int t = (r)+(g)+(b); t /= 3; (r)=t; (g)=t; (b)=t; } if (remflags & BLIT_RED) { (g) /= 2; (b) /= 2; } } while(0)
+
+#undef SRCDATA
+#define SRCDATA ((const Uint32*)spr->pixels)
+
+#define TINT_ALPHA
+
+		if (!(remflags & BLIT_TINTED)) tint.a = 255;
+
+		if (remflags & blit_COVERED) {
+#define COVER
+			if (remflags & BLIT_TINTED) {
+#define TINT
+				if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+				} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+				}
+#undef TINT
+			} else {
+				if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+				} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+				}
+			}
+#undef COVER
+		} else {
+			if (remflags & BLIT_TINTED) {
+#define TINT
+				if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+				} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+				}
+#undef TINT
+			} else {
+				if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+				} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+				}
+			}
+		}
+
+#undef SPECIALPIXEL
+#undef CUSTOMBLENDING
+#undef ALPHAADJUST
+#undef CUSTOMBLEND
+#undef TINT_ALPHA
+#undef PALETTE_ALPHA
 
 	}
 
@@ -1361,9 +1445,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #undef PAL
 #undef COVERX
 #undef COVERY
-#undef SRCTYPE
 #undef SRCDATA
-#undef ISTRANSPARENT
 
 	SDL_UnlockSurface(backBuf);
 
@@ -2151,12 +2233,6 @@ Color SDLVideoDriver::SpriteGetPixelSum(Sprite2D* sprite, unsigned short xbase, 
 	return sum;
 }
 
-// FIXME: The output of this function must be usable in BlitGameSprite
-// Two possible solutions:
-// * Create a BAM sprite for lights, using a palette
-//   consisting entirely of (255,255,255,x) RGBA values
-// * Write a 32bpp bitmap renderer for BlitGameSprite
-//   (based on the non-RLE BAM one)
 Sprite2D* SDLVideoDriver::CreateLight(int radius, int intensity)
 {
 	if(!radius) return NULL;
