@@ -1,30 +1,35 @@
-GemRB svn r5497 (2008-12-06):
+GemRB svn r5587 (2009-01-30):
   New features:
-	- 
-	- double click (used in the map window)
-	- click-and-hold incrementing/decrementing
-	- accumulate kill statistics
-	- characters can move while the map is open
-	- sound on item equip
+    - 
+    - trap detection, removal, triggering, xp, feedback, autopause
+    - modal effects
+    - proper xp award for dual- and multiclass actors
+    - extended night (alternative lightmap, tileset, minimap, switching movies)
+    - double click (used in the map window)
+    - click-and-hold incrementing/decrementing
+    - accumulate kill statistics
+    - characters can move while the map is open
+    - sound on item equip
     - arbitrary feat prerequisites in iwd2
-        - hard pause/TAB for all games (originally a ToB feature)
-        - extended night areas (originally a bg2 feature)
+    - hard pause/TAB for all games (originally a ToB feature)
+    - extended night areas (originally a bg2 feature)
 
   Improved features:
-	- 
-	- various guiscripts
-	- cmake build system (now really works on *nix)
-	- magic item exclusion
-	- stores and bags
-	- feat prerequisites in iwd2
-        - fixed attack loop when target dies
+    - 
+    - ppc support (no more crashes)
+    - container/door/infopoint cursor and highlight handling
+    - various guiscripts
+    - cmake build system (now really works on *nix)
+    - magic item exclusion
+    - stores and bags
+    - fixed attack loop when target dies
     - bugfixes
 
   Applied patches:
-	 #2159734 Zefklop (Mouse activity during movies)
-	 #2243323 Zefklop (correct Openal cleanup)
-	 #2263333 Whiteclone (bg1 guiinv)
-	 #2380891 Amikrop (iwd1 guicommonwindows)
+    #2159734 Zefklop (Mouse activity during movies)
+    #2243323 Zefklop (correct Openal cleanup)
+    #2263333 Whiteclone (bg1 guiinv)
+    #2380891 Amikrop (iwd1 guicommonwindows)
 
 GemRB V0.3.1 (2008-09-25):
   New features:
