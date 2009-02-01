@@ -52,149 +52,154 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICONN", 640, 480)
 
 #main window
-	StartWindow = GemRB.LoadWindow(0)
-	GemRB.SetWindowFrame(StartWindow)
-	ProtocolButton = GemRB.GetControl(StartWindow, 0x00)
-	CreateGameButton = GemRB.GetControl(StartWindow, 0x02)
-	LoadGameButton = GemRB.GetControl(StartWindow, 0x07)
-	JoinGameButton = GemRB.GetControl(StartWindow, 0x03)
-	MoviesButton = GemRB.GetControl(StartWindow, 0x08)
-	QuitGameButton = GemRB.GetControl(StartWindow, 0x01)
-	GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,0,800,30, "REALMS2", "", 1)
-	VersionLabel = GemRB.GetControl(StartWindow, 0x0fff0000)
-	GemRB.SetText(StartWindow, VersionLabel, GEMRB_VERSION)
-	GemRB.SetControlStatus(StartWindow, ProtocolButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetControlStatus(StartWindow, CreateGameButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetControlStatus(StartWindow, LoadGameButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetControlStatus(StartWindow, MoviesButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetControlStatus(StartWindow, QuitGameButton, IE_GUI_BUTTON_ENABLED)
+	StartWindow = GemRB.LoadWindowObject(0)
+	StartWindow.SetFrame()
+	ProtocolButton = StartWindow.GetControl(0x00)
+	CreateGameButton = StartWindow.GetControl(0x02)
+	LoadGameButton = StartWindow.GetControl(0x07)
+	JoinGameButton = StartWindow.GetControl(0x03)
+	MoviesButton = StartWindow.GetControl(0x08)
+	QuitGameButton = StartWindow.GetControl(0x01)
+	StartWindow.CreateLabel(0x0fff0000, 0,0,800,30, "REALMS2", "", 1)
+	VersionLabel = StartWindow.GetControl(0x0fff0000)
+	VersionLabel.SetText(GEMRB_VERSION)
+	ProtocolButton.SetStatus(IE_GUI_BUTTON_ENABLED)
+	CreateGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
+	LoadGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
+	MoviesButton.SetStatus(IE_GUI_BUTTON_ENABLED)
+	QuitGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	LastProtocol = GemRB.GetVar("Last Protocol Used")
 	if LastProtocol == 0:
-		GemRB.SetText(StartWindow, ProtocolButton, 15413)
-		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_DISABLED)
+		ProtocolButton.SetText(15413)
+		JoinGameButton.SetStatus(IE_GUI_BUTTON_DISABLED)
 	elif LastProtocol == 1:
-		GemRB.SetText(StartWindow, ProtocolButton, 13967)
-		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_ENABLED)
+		ProtocolButton.SetText(13967)
+		JoinGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	elif LastProtocol == 2:
-		GemRB.SetText(StartWindow, ProtocolButton, 13968)
-		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetText(StartWindow, CreateGameButton, 13963)
-	GemRB.SetText(StartWindow, LoadGameButton, 13729)
-	GemRB.SetText(StartWindow, JoinGameButton, 13964)
-	GemRB.SetText(StartWindow, MoviesButton, 15415)
-	GemRB.SetText(StartWindow, QuitGameButton, 13731)
-	GemRB.SetEvent(StartWindow, QuitGameButton, IE_GUI_BUTTON_ON_PRESS, "QuitPress")
-	GemRB.SetEvent(StartWindow, ProtocolButton, IE_GUI_BUTTON_ON_PRESS, "ProtocolPress")
-	GemRB.SetEvent(StartWindow, MoviesButton, IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
-	GemRB.SetEvent(StartWindow, LoadGameButton, IE_GUI_BUTTON_ON_PRESS, "LoadPress")
-	GemRB.SetEvent(StartWindow, CreateGameButton, IE_GUI_BUTTON_ON_PRESS, "CreatePress")
-	GemRB.SetVisible(StartWindow, 1)
+		ProtocolButton.SetText(13968)
+		JoinGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
+	CreateGameButton.SetText(13963)
+	LoadGameButton.SetText(13729)
+	JoinGameButton.SetText(13964)
+	MoviesButton.SetText(15415)
+	QuitGameButton.SetText(13731)
+	QuitGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "QuitPress")
+	ProtocolButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ProtocolPress")
+	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
+	LoadGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "LoadPress")
+	CreateGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CreatePress")
+	StartWindow.SetVisible(1)
 	GemRB.LoadMusicPL("Theme.mus",1)
 	return
 
 def ProtocolPress():
 	global StartWindow, ProtocolWindow
 	#GemRB.UnloadWindow(StartWindow)
-	GemRB.SetVisible(StartWindow, 0)
-	ProtocolWindow = GemRB.LoadWindow(1)
+	StartWindow.SetVisible(0)
+	ProtocolWindow = GemRB.LoadWindowObject(1)
 	
 	#Disabling Unused Buttons in this Window
-	Button = GemRB.GetControl(ProtocolWindow, 2)
-	GemRB.SetButtonState(ProtocolWindow, Button, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetButtonFlags(ProtocolWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-	Button = GemRB.GetControl(ProtocolWindow, 3)
-	GemRB.SetButtonState(ProtocolWindow, Button, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetButtonFlags(ProtocolWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-	Button = GemRB.GetControl(ProtocolWindow, 9)
-	GemRB.SetButtonState(ProtocolWindow, Button, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetButtonFlags(ProtocolWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+	Button = ProtocolWindow.GetControl(2)
+	Button.SetState(IE_GUI_BUTTON_DISABLED)
+	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+	Button = ProtocolWindow.GetControl(3)
+	Button.SetState(IE_GUI_BUTTON_DISABLED)
+	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+	Button = ProtocolWindow.GetControl(9)
+	Button.SetState(IE_GUI_BUTTON_DISABLED)
+	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	
-	SinglePlayerButton = GemRB.GetControl(ProtocolWindow, 10)
-	GemRB.SetButtonFlags(ProtocolWindow, SinglePlayerButton, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	GemRB.SetText(ProtocolWindow, SinglePlayerButton, 15413)
+	SinglePlayerButton = ProtocolWindow.GetControl(10)
+	SinglePlayerButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	SinglePlayerButton.SetText(15413)
 	
-	IPXButton = GemRB.GetControl(ProtocolWindow, 0)
-	GemRB.SetButtonFlags(ProtocolWindow, IPXButton, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	GemRB.SetText(ProtocolWindow, IPXButton, 13967)
+	IPXButton = ProtocolWindow.GetControl(0)
+	IPXButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	IPXButton.SetText(13967)
 	
-	TCPIPButton = GemRB.GetControl(ProtocolWindow, 1)
-	GemRB.SetButtonFlags(ProtocolWindow, TCPIPButton, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	GemRB.SetText(ProtocolWindow, TCPIPButton, 13968)
+	TCPIPButton = ProtocolWindow.GetControl(1)
+	TCPIPButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	TCPIPButton.SetText(13968)
 	
-	GemRB.SetVarAssoc(ProtocolWindow, SinglePlayerButton, "Last Protocol Used", 0)
-	GemRB.SetVarAssoc(ProtocolWindow, IPXButton, "Last Protocol Used", 1)
-	GemRB.SetVarAssoc(ProtocolWindow, TCPIPButton, "Last Protocol Used", 2)
+	SinglePlayerButton.SetVarAssoc("Last Protocol Used", 0)
+	IPXButton.SetVarAssoc("Last Protocol Used", 1)
+	TCPIPButton.SetVarAssoc("Last Protocol Used", 2)
 	
-	TextArea = GemRB.GetControl(ProtocolWindow, 7)
-	GemRB.SetText(ProtocolWindow, TextArea, 11316)
+	TextArea = ProtocolWindow.GetControl(7)
+	TextArea.SetText(11316)
 	
-	DoneButton = GemRB.GetControl(ProtocolWindow, 6)
-	GemRB.SetText(ProtocolWindow, DoneButton, 11973)
-	GemRB.SetEvent(ProtocolWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "ProtocolDonePress")
+	DoneButton = ProtocolWindow.GetControl(6)
+	DoneButton.SetText(11973)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ProtocolDonePress")
 	
-	GemRB.SetVisible(ProtocolWindow, 1)
+	ProtocolWindow.SetVisible(1)
 	return
 	
 def ProtocolDonePress():
 	global StartWindow, ProtocolWindow, JoinGameButton
-	GemRB.UnloadWindow(ProtocolWindow)
+	if ProtocolWindow:
+		ProtocolWindow.Unload()
 	
-	ProtocolButton = GemRB.GetControl(StartWindow, 0x00)
+	ProtocolButton = StartWindow.GetControl(0x00)
 	
 	LastProtocol = GemRB.GetVar("Last Protocol Used")
 	if LastProtocol == 0:
-		GemRB.SetText(StartWindow, ProtocolButton, 15413)
-		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_DISABLED)
+		ProtocolButton.SetText(15413)
+		JoinGameButton.SetStatus(IE_GUI_BUTTON_DISABLED)
 	elif LastProtocol == 1:
-		GemRB.SetText(StartWindow, ProtocolButton, 13967)
-		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_ENABLED)
+		ProtocolButton.SetText(13967)
+		JoinGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	elif LastProtocol == 2:
-		GemRB.SetText(StartWindow, ProtocolButton, 13968)
-		GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_ENABLED)
+		ProtocolButton.SetText(13968)
+		JoinGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	
-	GemRB.SetVisible(StartWindow, 1)
+	StartWindow.SetVisible(1)
 	return
 	
 def CreatePress():
 	global StartWindow
-	GemRB.UnloadWindow(StartWindow)
+	if StartWindow:
+		StartWindow.Unload()
 	GemRB.LoadGame(-1)
 	GemRB.SetNextScript("PartyFormation")
 	return
 
 def LoadPress():
 	global StartWindow
-	GemRB.UnloadWindow(StartWindow)
+	if StartWindow:
+		StartWindow.Unload()
 	GemRB.SetNextScript("GUILOAD")
 	return
 
 def MoviesPress():
 	global StartWindow
-	GemRB.UnloadWindow(StartWindow)
+	if StartWindow:
+		StartWindow.Unload()
 	GemRB.SetNextScript("GUIMOVIE")
 	return
 	
 def QuitPress():
 	global StartWindow, QuitWindow
-	GemRB.SetVisible(StartWindow, 0)
-	QuitWindow = GemRB.LoadWindow(22)
-	CancelButton = GemRB.GetControl(QuitWindow, 2)
-	GemRB.SetEvent(QuitWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "QuitCancelPress")
+	StartWindow.SetVisible(0)
+	QuitWindow = GemRB.LoadWindowObject(22)
+	CancelButton = QuitWindow.GetControl(2)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "QuitCancelPress")
 	
-	QuitButton = GemRB.GetControl(QuitWindow, 1)
-	GemRB.SetEvent(QuitWindow, QuitButton, IE_GUI_BUTTON_ON_PRESS, "QuitQuitPress")
+	QuitButton = QuitWindow.GetControl(1)
+	QuitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "QuitQuitPress")
 	
-	TextArea = GemRB.GetControl(QuitWindow, 0)
-	GemRB.SetText(QuitWindow, CancelButton, 13727)
-	GemRB.SetText(QuitWindow, QuitButton, 15417)
-	GemRB.SetText(QuitWindow, TextArea, 19532)
-	GemRB.SetVisible(QuitWindow, 1)
+	TextArea = QuitWindow.GetControl(0)
+	CancelButton.SetText(13727)
+	QuitButton.SetText(15417)
+	TextArea.SetText(19532)
+	QuitWindow.SetVisible(1)
 	return
 	
 def QuitCancelPress():
 	global StartWindow, QuitWindow
-	GemRB.UnloadWindow(QuitWindow)
-	GemRB.SetVisible(StartWindow, 1)
+	if QuitWindow:
+		QuitWindow.Unload()
+	StartWindow.SetVisible(1)
 	return
 	
 def QuitQuitPress():

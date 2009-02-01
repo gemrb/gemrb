@@ -42,9 +42,12 @@ def RevealMap ():
 	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (ShowMap):
-		GemRB.UnloadWindow (MapWindow)
-		GemRB.UnloadWindow (OptionsWindow)
-		GemRB.UnloadWindow (PortraitWindow)
+		if MapWindow:
+			MapWindow.Unload ()
+		if OptionsWindow:
+			OptionsWindow.Unload ()
+		if PortraitWindow:
+			PortraitWindow.Unload ()
 
 		MapWindow = None
 		#this window type should block the game
@@ -70,9 +73,12 @@ def ShowMap ():
 	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (ShowMap):
-		GemRB.UnloadWindow (MapWindow)
-		GemRB.UnloadWindow (OptionsWindow)
-		GemRB.UnloadWindow (PortraitWindow)
+		if MapWindow:
+			MapWindow.Unload ()
+		if OptionsWindow:
+			OptionsWindow.Unload ()
+		if PortraitWindow:
+			PortraitWindow.Unload ()
 
 		MapWindow = None
 		#this window type should block the game
@@ -89,36 +95,36 @@ def ShowMap ():
 	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
-	MapWindow = Window = GemRB.LoadWindow (2)
+	MapWindow = Window = GemRB.LoadWindowObject (2)
 	#this window type blocks the game normally, but map window doesn't
-	GemRB.SetVar ("OtherWindow", MapWindow)
+	GemRB.SetVar ("OtherWindow", MapWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
+	OptionsWindow = GemRB.LoadWindowObject (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "ShowMap")
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
-	GemRB.SetWindowFrame (OptionsWindow)
+	OptionsWindow.SetFrame ()
 
 	# World Map
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	Button = Window.GetControl (1)
+	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Hide or Show mapnotes
-	Button = GemRB.GetControl (Window, 3)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	Button = Window.GetControl (3)
+	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-	Label = GemRB.GetControl (Window, 0x10000003)
-	GemRB.SetText (Window, Label, "")
+	Label = Window.GetControl (0x10000003)
+	Label.SetText ("")
 	# Map Control
-	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0)
-	Map = GemRB.GetControl (Window, 2)
+	Window.CreateMapControl (2, 0, 0, 0, 0)
+	Map = Window.GetControl (2)
 	GemRB.SetVar("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
-	GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
-	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "RevealMap")
-	GemRB.SetVisible (OptionsWindow, 2)
-	GemRB.SetVisible (Window, 1)
-	GemRB.SetVisible (PortraitWindow, 2)
+	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
+	Map.SetEvent (IE_GUI_MAP_ON_PRESS, "RevealMap")
+	OptionsWindow.SetVisible (2)
+	Window.SetVisible (1)
+	PortraitWindow.SetVisible (2)
 	GemRB.GamePause (0,0)
 	return
 
@@ -131,7 +137,8 @@ def OpenMapWindow ():
 		if WorldMapWindow: OpenWorldMapWindowInside ()
 
 		GemRB.HideGUI ()
-		GemRB.UnloadWindow (MapWindow)
+		if MapWindow:
+			MapWindow.Unload ()
 		MapWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.UnhideGUI ()
@@ -140,30 +147,30 @@ def OpenMapWindow ():
 	GemRB.HideGUI ()
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
-	MapWindow = Window = GemRB.LoadWindow (2)
+	MapWindow = Window = GemRB.LoadWindowObject (2)
 	#this window type blocks the game normally, but map window doesn't
-	GemRB.SetVar ("OtherWindow", MapWindow)
+	GemRB.SetVar ("OtherWindow", MapWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
+	OptionsWindow = GemRB.LoadWindowObject (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenMapWindow")
-	GemRB.SetWindowFrame (OptionsWindow)
+	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
-	GemRB.SetWindowFrame (OptionsWindow)
+	OptionsWindow.SetFrame ()
 
 	# World Map
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindowInside")
+	Button = Window.GetControl (1)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindowInside")
 
 	# Map Control
-	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0)
-	Map = GemRB.GetControl (Window, 2)
+	Window.CreateMapControl (2, 0, 0, 0, 0)
+	Map = Window.GetControl (2)
 
-	GemRB.SetVisible (OptionsWindow, 1)
-	GemRB.SetVisible (Window, 1)
-	GemRB.SetVisible (PortraitWindow, 1)
-	GemRB.SetControlStatus (Window, Map, IE_GUI_CONTROL_FOCUSED)
+	OptionsWindow.SetVisible (1)
+	Window.SetVisible (1)
+	PortraitWindow.SetVisible (1)
+	Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	GemRB.UnhideGUI ()
 	return
 
@@ -182,7 +189,7 @@ def OpenWorldMapWindow ():
 def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
-	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
+	tmp = WorldMapControl.GetDestinationArea ()
 	CloseWorldMapWindow ()
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"])
 	return
@@ -191,19 +198,20 @@ def ChangeTooltip ():
 	global WorldMapWindow, WorldMapControl
 	global str
 
-	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
+	tmp = WorldMapControl.GetDestinationArea ()
 	if (tmp):
 		str = "%s: %d"%(GemRB.GetString(23084),tmp["Distance"])
 	else:
 		str=""
 
-	GemRB.SetTooltip (WorldMapWindow, WorldMapControl, str)
+	WorldMapControl.SetTooltip (str)
 	return
 
 def CloseWorldMapWindow ():
 	global WorldMapWindow, WorldMapControl
 
-	GemRB.UnloadWindow (WorldMapWindow)
+	if WorldMapWindow:
+		WorldMapWindow.Unload ()
 	WorldMapWindow = None
 	WorldMapControl = None
 	GemRB.SetVisible (0,1)
@@ -221,36 +229,36 @@ def WorldMapWindowCommon (Travel):
 	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
-	WorldMapWindow = Window = GemRB.LoadWindow (0)
+	WorldMapWindow = Window = GemRB.LoadWindowObject (0)
 	MapWindow = None
-	GemRB.SetWindowFrame (Window)
+	Window.SetFrame ()
 
-	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel, "infofont")
-	WorldMapControl = GemRB.GetControl (Window, 4)
-	GemRB.SetAnimation (Window, WorldMapControl, "WMDAG")
-	GemRB.SetEvent (Window, WorldMapControl, IE_GUI_WORLDMAP_ON_PRESS, "MoveToNewArea")
-	GemRB.SetEvent (Window, WorldMapControl, IE_GUI_MOUSE_ENTER_WORLDMAP, "ChangeTooltip")
+	Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "infofont")
+	WorldMapControl = Window.GetControl (4)
+	WorldMapControl.SetAnimation ("WMDAG")
+	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, "MoveToNewArea")
+	WorldMapControl.SetEvent (IE_GUI_MOUSE_ENTER_WORLDMAP, "ChangeTooltip")
 
 	#north
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapN")
+	Button = Window.GetControl (1)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MapN")
 
 	#south
-	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MapS")
+	Button = Window.GetControl (2)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MapS")
 
 	# Done
-	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseWorldMapWindow")
-	GemRB.SetVisible (Window, 1)
+	Button = Window.GetControl (0)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseWorldMapWindow")
+	Window.SetVisible (1)
 	return
 
 def MapN():
-	GemRB.AdjustScrolling (WorldMapWindow, WorldMapControl, 0, -10)
+	WorldMapControl.AdjustScrolling (0, -10)
 	return
 
 def MapS():
-	GemRB.AdjustScrolling (WorldMapWindow, WorldMapControl, 0, 10)
+	WorldMapControl.AdjustScrolling (0, 10)
 	return
 
 

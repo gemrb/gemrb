@@ -46,9 +46,12 @@ def OpenJournalWindow ():
 	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenJournalWindow):
-		GemRB.UnloadWindow (JournalWindow)
-		GemRB.UnloadWindow (OptionsWindow)
-		GemRB.UnloadWindow (PortraitWindow)
+		if JournalWindow:
+			JournalWindow.Unload ()
+		if OptionsWindow:
+			OptionsWindow.Unload ()
+		if PortraitWindow:
+			PortraitWindow.Unload ()
  
 		JournalWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
@@ -64,46 +67,45 @@ def OpenJournalWindow ():
 	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIJRNL", 640, 480)
-	JournalWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar ("OtherWindow", JournalWindow)
+	JournalWindow = Window = GemRB.LoadWindowObject (2)
+	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
+	OptionsWindow = GemRB.LoadWindowObject (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenJournalWindow")
-	GemRB.SetWindowFrame (OptionsWindow)
+	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
 
-	Table = GemRB.LoadTable("YEARS")
+	Table = GemRB.LoadTableObject("YEARS")
 	#StartTime is the time offset for ingame time, beginning from the startyear
-	StartTime = GemRB.GetTableValue(Table, "STARTTIME", "VALUE") / 4500
+	StartTime = Table.GetValue("STARTTIME", "VALUE") / 4500
 	#StartYear is the year of the lowest ingame date to be printed
-	StartYear = GemRB.GetTableValue(Table, "STARTYEAR", "VALUE")
-	GemRB.UnloadTable(Table)
+	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 
-	Button = GemRB.GetControl (Window, 3)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "JournalPrevSectionPress")
+	Button = Window.GetControl (3)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "JournalPrevSectionPress")
 
-	Button = GemRB.GetControl (Window, 4)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "JournalNextSectionPress")
+	Button = Window.GetControl (4)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "JournalNextSectionPress")
 
 	Chapter = GemRB.GetGameVar("chapter")
 	UpdateJournalWindow ()
-	GemRB.SetVisible (OptionsWindow, 1)
-	GemRB.SetVisible (Window, 1)
-	GemRB.SetVisible (PortraitWindow, 1)
+	OptionsWindow.SetVisible (1)
+	Window.SetVisible (1)
+	PortraitWindow.SetVisible (1)
 
 ###################################################
 def UpdateJournalWindow ():
 	Window = JournalWindow
 
 	# Title
-	Title = GemRB.GetControl (Window, 5)
-	GemRB.SetText (Window, Title, 16202 + Chapter)
+	Title = Window.GetControl (5)
+	Title.SetText (16202 + Chapter)
 
 	# text area
-	Text = GemRB.GetControl (Window, 1)
-	GemRB.TextAreaClear (Window, Text)
+	Text = Window.GetControl (1)
+	Text.Clear ()
 	
 	for i in range (GemRB.GetJournalSize (Chapter)):
 		je = GemRB.GetJournalEntry (Chapter, i)
@@ -119,10 +121,10 @@ def UpdateJournalWindow ():
 		GemRB.SetToken("HOUR",str(hours%24 ) )
 		GemRB.SetVar("DAYANDMONTH",dayandmonth)
 		GemRB.SetToken("YEAR",year)
-		GemRB.TextAreaAppend (Window, Text, GemRB.GetString(15980), 3*i)
+		Text.Append (GemRB.GetString(15980), 3*i)
 
-		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i + 1)
-		GemRB.TextAreaAppend (Window, Text, "", 3*i + 2)
+		Text.Append (je['Text'], 3*i + 1)
+		Text.Append ("", 3*i + 2)
 
 
 ###################################################

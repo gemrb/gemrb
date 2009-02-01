@@ -33,85 +33,87 @@ def OnLoad ():
 	global PartyFormationWindow
 
 	GemRB.LoadWindowPack ("GUISP", 640, 480)
-	PartyFormationWindow = GemRB.LoadWindow (0)
-	GemRB.SetWindowFrame (PartyFormationWindow)
+	PartyFormationWindow = GemRB.LoadWindowObject (0)
+	PartyFormationWindow.SetFrame ()
 
-	ModifyCharsButton = GemRB.GetControl (PartyFormationWindow, 43)
-	GemRB.SetEvent (PartyFormationWindow, ModifyCharsButton, IE_GUI_BUTTON_ON_PRESS, "ModifyPress")
-	GemRB.SetControlStatus (PartyFormationWindow, ModifyCharsButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetText (PartyFormationWindow, ModifyCharsButton, 18816)
+	ModifyCharsButton = PartyFormationWindow.GetControl (43)
+	ModifyCharsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ModifyPress")
+	ModifyCharsButton.SetStatus (IE_GUI_BUTTON_DISABLED)
+	ModifyCharsButton.SetText (18816)
 
-	ExitButton = GemRB.GetControl (PartyFormationWindow, 30)
-	GemRB.SetEvent (PartyFormationWindow, ExitButton, IE_GUI_BUTTON_ON_PRESS, "ExitPress")
-	GemRB.SetControlStatus (PartyFormationWindow, ExitButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetText (PartyFormationWindow, ExitButton, 13906)
+	ExitButton = PartyFormationWindow.GetControl (30)
+	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExitPress")
+	ExitButton.SetStatus (IE_GUI_BUTTON_ENABLED)
+	ExitButton.SetText (13906)
 
-	DoneButton = GemRB.GetControl (PartyFormationWindow, 28)
-	GemRB.SetText (PartyFormationWindow, DoneButton, 11973)
+	DoneButton = PartyFormationWindow.GetControl (28)
+	DoneButton.SetText (11973)
 	Portraits = 0
 
 	for i in range(18,24):
-		Label = GemRB.GetControl (PartyFormationWindow, 0x10000012+i)
+		Label = PartyFormationWindow.GetControl (0x10000012+i)
 		#removing this label, it just disturbs us
-		GemRB.SetControlSize (PartyFormationWindow, Label, 0, 0)
-		Button = GemRB.GetControl (PartyFormationWindow, i-12)
+		Label.SetSize (0, 0)
+		Button = PartyFormationWindow.GetControl (i-12)
 		ResRef = GemRB.GetPlayerPortrait (i-17, 1)
 		if ResRef == "":
-			GemRB.SetButtonFlags (PartyFormationWindow, Button, IE_GUI_BUTTON_NORMAL,OP_SET)
+			Button.SetFlags (IE_GUI_BUTTON_NORMAL,OP_SET)
 		else:
-			GemRB.SetButtonPicture (PartyFormationWindow, Button, ResRef)
-			GemRB.SetButtonFlags (PartyFormationWindow, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
+			Button.SetPicture (ResRef)
+			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 			Portraits = Portraits+1
 
-		CreateCharButton = GemRB.GetControl (PartyFormationWindow,i)
-		GemRB.SetVarAssoc (PartyFormationWindow, CreateCharButton, "Slot", i-17)
-		GemRB.SetEvent (PartyFormationWindow, CreateCharButton, IE_GUI_BUTTON_ON_PRESS, "CreateCharPress")
-		GemRB.SetControlStatus (PartyFormationWindow, CreateCharButton, IE_GUI_BUTTON_ENABLED)
+		CreateCharButton = PartyFormationWindow.GetControl (i)
+		CreateCharButton.SetVarAssoc ("Slot", i-17)
+		CreateCharButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CreateCharPress")
+		CreateCharButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 		if ResRef == "":
-			GemRB.SetText (PartyFormationWindow, CreateCharButton, 10264)
+			CreateCharButton.SetText (10264)
 		else:
-			GemRB.SetText (PartyFormationWindow, CreateCharButton, GemRB.GetPlayerName (i-17,0) )
+			CreateCharButton.SetText (GemRB.GetPlayerName (i-17,0) )
 
 	if Portraits == 0:
-		GemRB.SetButtonState (PartyFormationWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
-		GemRB.SetButtonState (PartyFormationWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
-		GemRB.SetButtonFlags (PartyFormationWindow, DoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
-	GemRB.SetEvent (PartyFormationWindow,DoneButton, IE_GUI_BUTTON_ON_PRESS,"EnterGamePress")
+		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+		DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"EnterGamePress")
 
-	GemRB.SetVisible (PartyFormationWindow, 1)
+	PartyFormationWindow.SetVisible (1)
 	return
 
 def CreateCharPress ():
 	global PartyFormationWindow, CreateCharWindow
 
-	GemRB.SetVisible (PartyFormationWindow, 0)
-	CreateCharWindow = GemRB.LoadWindow (3)
+	PartyFormationWindow.SetVisible (0)
+	CreateCharWindow = GemRB.LoadWindowObject (3)
 
-	CreateButton = GemRB.GetControl (CreateCharWindow, 0)
-	GemRB.SetEvent (CreateCharWindow, CreateButton, IE_GUI_BUTTON_ON_PRESS, "CreateCharCreatePress")
-	GemRB.SetControlStatus (CreateCharWindow, CreateButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetText (CreateCharWindow, CreateButton, 13954)
+	CreateButton = CreateCharWindow.GetControl (0)
+	CreateButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CreateCharCreatePress")
+	CreateButton.SetStatus (IE_GUI_BUTTON_ENABLED)
+	CreateButton.SetText (13954)
 
-	DeleteButton = GemRB.GetControl (CreateCharWindow, 3)
-	GemRB.SetEvent (CreateCharWindow, DeleteButton, IE_GUI_BUTTON_ON_PRESS, "CreateCharDeletePress")
-	GemRB.SetControlStatus (CreateCharWindow, DeleteButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetText (CreateCharWindow, DeleteButton, 13957)
+	DeleteButton = CreateCharWindow.GetControl (3)
+	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CreateCharDeletePress")
+	DeleteButton.SetStatus (IE_GUI_BUTTON_DISABLED)
+	DeleteButton.SetText (13957)
 
-	CancelButton = GemRB.GetControl (CreateCharWindow, 4)
-	GemRB.SetEvent (CreateCharWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CreateCharCancelPress")
-	GemRB.SetControlStatus (CreateCharWindow, CancelButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetText (CreateCharWindow, CancelButton, 13727)
-	GemRB.SetButtonFlags (CreateCharWindow, CreateButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CancelButton = CreateCharWindow.GetControl (4)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CreateCharCancelPress")
+	CancelButton.SetStatus (IE_GUI_BUTTON_ENABLED)
+	CancelButton.SetText (13727)
+	CreateButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
-	GemRB.SetVisible (CreateCharWindow, 1)
+	CreateCharWindow.SetVisible (1)
 	return
 
 def CreateCharCreatePress ():
 	global PartyFormationWindow, CreateCharWindow
 
-	GemRB.UnloadWindow (CreateCharWindow)
-	GemRB.UnloadWindow (PartyFormationWindow)
+	if CreateCharWindow:
+		CreateCharWindow.Unload ()
+	if PartyFormationWindow:
+		PartyFormationWindow.Unload ()
 	GemRB.SetNextScript ("CharGen")
 	return
 
@@ -121,8 +123,9 @@ def CreateCharDeletePress ():
 def CreateCharCancelPress ():
 	global PartyFormationWindow, CreateCharWindow
 
-	GemRB.UnloadWindow (CreateCharWindow)
-	GemRB.SetVisible (PartyFormationWindow, 1)
+	if CreateCharWindow:
+		CreateCharWindow.Unload ()
+	PartyFormationWindow.SetVisible (1)
 	return
 
 def ModifyCharsPress ():
@@ -136,34 +139,37 @@ def EnterGamePress ():
 def ExitPress ():
 	global PartyFormationWindow, ExitWindow
 
-	GemRB.SetVisible (PartyFormationWindow, 0)
-	ExitWindow = GemRB.LoadWindow (7)
+	PartyFormationWindow.SetVisible (0)
+	ExitWindow = GemRB.LoadWindowObject (7)
 
-	ExitButton = GemRB.GetControl (ExitWindow, 1)
-	GemRB.SetEvent (ExitWindow, ExitButton, IE_GUI_BUTTON_ON_PRESS, "ExitExitPress")
-	GemRB.SetText (ExitWindow, ExitButton, 13906)
+	ExitButton = ExitWindow.GetControl (1)
+	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExitExitPress")
+	ExitButton.SetText (13906)
 
-	CancelButton = GemRB.GetControl (ExitWindow, 2)
-	GemRB.SetEvent (ExitWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "ExitCancelPress")
-	GemRB.SetText (ExitWindow, CancelButton, 13727)
+	CancelButton = ExitWindow.GetControl (2)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExitCancelPress")
+	CancelButton.SetText (13727)
 
-	TextArea = GemRB.GetControl (ExitWindow, 0)
-	GemRB.SetText (ExitWindow, TextArea, 11329)
+	TextArea = ExitWindow.GetControl (0)
+	TextArea.SetText (11329)
 
-	GemRB.SetVisible (ExitWindow, 1)
+	ExitWindow.SetVisible (1)
 	return
 
 def ExitCancelPress ():
 	global PartyFormationWindow, ExitWindow
 
-	GemRB.UnloadWindow (ExitWindow)
-	GemRB.SetVisible (PartyFormationWindow, 1)
+	if ExitWindow:
+		ExitWindow.Unload ()
+	PartyFormationWindow.SetVisible (1)
 	return
 
 def ExitExitPress ():
 	global PartyFormationWindow, ExitWindow
 
-	GemRB.UnloadWindow (ExitWindow)
-	GemRB.UnloadWindow (PartyFormationWindow)
+	if ExitWindow:
+		ExitWindow.Unload ()
+	if PartyFormationWindow:
+		PartyFormationWindow.Unload ()
 	GemRB.SetNextScript ("Start")
 	return

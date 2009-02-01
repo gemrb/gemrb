@@ -44,9 +44,12 @@ def OpenMageWindow ():
 	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenMageWindow):
-		GemRB.UnloadWindow (MageWindow)
-		GemRB.UnloadWindow (OptionsWindow)
-		GemRB.UnloadWindow (PortraitWindow)
+		if MageWindow:
+			MageWindow.Unload ()
+		if OptionsWindow:
+			OptionsWindow.Unload ()
+		if PortraitWindow:
+			PortraitWindow.Unload ()
 
 		MageWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
@@ -63,59 +66,59 @@ def OpenMageWindow ():
 	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIMG", 640, 480)
-	MageWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar ("OtherWindow", MageWindow)
+	MageWindow = Window = GemRB.LoadWindowObject (2)
+	GemRB.SetVar ("OtherWindow", MageWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
+	OptionsWindow = GemRB.LoadWindowObject (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenMageWindow")
-	GemRB.SetWindowFrame (OptionsWindow)
+	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
 
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MagePrevLevelPress")
+	Button = Window.GetControl (1)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MagePrevLevelPress")
 
-	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MageNextLevelPress")
+	Button = Window.GetControl (2)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MageNextLevelPress")
 
 ## 	#unknown usage
-## 	Button = GemRB.GetControl (Window, 55)
-## 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
-## 	#GemRB.SetText (Window, Button, 123)
-## 	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "xxPress")
+## 	Button = Window.GetControl (55)
+## 	Button.SetState (IE_GUI_BUTTON_LOCKED)
+## 	#Button.SetText (123)
+## 	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "xxPress")
 
 ## 	#setup level buttons
 ## 	for i in range (9):
-## 		Button = GemRB.GetControl (Window, 56 + i)
-## 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RefreshMageLevel")
-## 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+## 		Button = Window.GetControl (56 + i)
+## 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RefreshMageLevel")
+## 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 ## 	for i in range (9):
-## 		Button = GemRB.GetControl (Window, 56 + i)
-## 		GemRB.SetVarAssoc (Window, Button, "MageSpellLevel", i)
+## 		Button = Window.GetControl (56 + i)
+## 		Button.SetVarAssoc ("MageSpellLevel", i)
 
 
 	# Setup memorized spells buttons
 	for i in range (12):
-		Button = GemRB.GetControl (Window, 3 + i)
-		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,0,0,0,64,0,1)
-		GemRB.SetButtonSprites (Window, Button, "SPELFRAM",0,0,0,0,0)
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+		Button = Window.GetControl (3 + i)
+		Button.SetBorder (0,0,0,0,0,0,0,0,64,0,1)
+		Button.SetSprites ("SPELFRAM",0,0,0,0,0)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
 	for i in range (20): #only 20 for iwd
-		Button = GemRB.GetControl (Window, 27 + i)
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+		Button = Window.GetControl (27 + i)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	SetSelectionChangeHandler (UpdateMageWindow)
 	UpdateMageWindow ()
-	GemRB.SetVisible (OptionsWindow, 1)
+	OptionsWindow.SetVisible (1)
 	#bringing the window front
-	GemRB.SetVisible (Window, 3)
-	GemRB.SetVisible (PortraitWindow, 1)
+	Window.SetVisible (3)
+	PortraitWindow.SetVisible (1)
 	return
 
 def UpdateMageWindow ():
@@ -130,67 +133,67 @@ def UpdateMageWindow ():
 	level = MageSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
 
-	Label = GemRB.GetControl (Window, 0x10000032)
+	Label = Window.GetControl (0x10000032)
 	GemRB.SetToken ('LEVEL', str (level + 1))
-	GemRB.SetText (Window, Label, 12137 )
+	Label.SetText (12137 )
 
 	Name = GemRB.GetPlayerName (pc, 0)
-	Label = GemRB.GetControl (Window, 0x10000035)
-	GemRB.SetText (Window, Label, Name)
+	Label = Window.GetControl (0x10000035)
+	Label.SetText (Name)
 	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
 	for i in range (12):
-		Button = GemRB.GetControl (Window, 3 + i)
+		Button = Window.GetControl (3 + i)
 		if i < mem_cnt:
 			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
-			GemRB.SetSpellIcon (Window, Button, ms['SpellResRef'], 0)
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
+			Button.SetSpellIcon (ms['SpellResRef'], 0)
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 			if ms['Flags']:
-				GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellUnmemorizeWindow")
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellUnmemorizeWindow")
 			else:
-				GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnMageUnmemorizeSpell")
-			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenMageSpellInfoWindow")
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnMageUnmemorizeSpell")
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenMageSpellInfoWindow")
 			spell = GemRB.GetSpell (ms['SpellResRef'])
-			GemRB.SetTooltip (Window, Button, spell['SpellName'])
+			Button.SetTooltip (spell['SpellName'])
 			MageMemorizedSpellList.append (ms['SpellResRef'])
-			GemRB.SetVarAssoc (Window, Button, "SpellButton", i)
-			GemRB.EnableButtonBorder (Window, Button, 0, ms['Flags'] == 0)
+			Button.SetVarAssoc ("SpellButton", i)
+			Button.EnableBorder (0, ms['Flags'] == 0)
 		else:
 			if i < max_mem_cnt:
-				GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NORMAL, OP_SET)
+				Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
 			else:
-				GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
-			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-			GemRB.SetTooltip (Window, Button, '')
-			GemRB.EnableButtonBorder (Window, Button, 0, 0)
+				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			Button.SetTooltip ('')
+			Button.EnableBorder (0, 0)
 
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
 	for i in range (20):
-		Button = GemRB.GetControl (Window, 27 + i)
+		Button = Window.GetControl (27 + i)
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
-			GemRB.SetSpellIcon (Window, Button, ks['SpellResRef'], 0)
-			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnMageMemorizeSpell")
-			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenMageSpellInfoWindow")
+			Button.SetSpellIcon (ks['SpellResRef'], 0)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnMageMemorizeSpell")
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenMageSpellInfoWindow")
 			spell = GemRB.GetSpell (ks['SpellResRef'])
-			GemRB.SetTooltip (Window, Button, spell['SpellName'])
+			Button.SetTooltip (spell['SpellName'])
 			MageKnownSpellList.append (ks['SpellResRef'])
-			GemRB.SetVarAssoc (Window, Button, "SpellButton", 100 + i)
+			Button.SetVarAssoc ("SpellButton", 100 + i)
 
 		else:
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
-			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
-			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-			GemRB.SetTooltip (Window, Button, '')
-			GemRB.EnableButtonBorder (Window, Button, 0, 0)
+			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			Button.SetTooltip ('')
+			Button.EnableBorder (0, 0)
 
-	Table = GemRB.LoadTable ("clskills")
-	if (GemRB.GetTableValue (Table, GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 2)=="*"):
-		GemRB.SetVisible (Window, 2)
+	Table = GemRB.LoadTableObject ("clskills")
+	if (Table.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 2)=="*"):
+		Window.SetVisible (2)
 	else:
-		GemRB.SetVisible (Window, 1)
+		Window.SetVisible (1)
 	return
 
 def MagePrevLevelPress ():
@@ -231,41 +234,42 @@ def OpenMageSpellInfoWindow ():
 	global MageSpellInfoWindow
 
 	if MageSpellInfoWindow != None:
-		GemRB.UnloadWindow (MageSpellInfoWindow)
+		if MageSpellInfoWindow:
+			MageSpellInfoWindow.Unload ()
 		MageSpellInfoWindow = None
 		return
 
-	MageSpellInfoWindow = Window = GemRB.LoadWindow (3)
+	MageSpellInfoWindow = Window = GemRB.LoadWindowObject (3)
 
 	#back
-	Button = GemRB.GetControl (Window, 5)
-	GemRB.SetText (Window, Button, 15416)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellInfoWindow")
+	Button = Window.GetControl (5)
+	Button.SetText (15416)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellInfoWindow")
 
 	#erase
-	#Button = GemRB.GetControl (Window, 6)
+	#Button = Window.GetControl (6)
 	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
 		ResRef = MageMemorizedSpellList[index]
-		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
-		#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
+		#Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	else:
 		ResRef = MageKnownSpellList[index - 100]
-		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellRemoveWindow")
-		#GemRB.SetText (Window, Button, 63668)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellRemoveWindow")
+		#Button.SetText (63668)
 
 	spell = GemRB.GetSpell (ResRef)
 
-	Label = GemRB.GetControl (Window, 0x0fffffff)
-	GemRB.SetText (Window, Label, spell['SpellName'])
+	Label = Window.GetControl (0x0fffffff)
+	Label.SetText (spell['SpellName'])
 
-	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetSpellIcon (Window, Button, ResRef, 1)
+	Button = Window.GetControl (2)
+	Button.SetSpellIcon (ResRef, 1)
 
-	Text = GemRB.GetControl (Window, 3)
-	GemRB.SetText (Window, Text, spell['SpellDesc'])
+	Text = Window.GetControl (3)
+	Text.SetText (spell['SpellDesc'])
 
-	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OnMageMemorizeSpell ():
@@ -282,52 +286,53 @@ def OnMageMemorizeSpell ():
 def CloseMageSpellUnmemorizeWindow ():
 	global MageSpellUnmemorizeWindow
 
-	GemRB.UnloadWindow (MageSpellUnmemorizeWindow)
+	if MageSpellUnmemorizeWindow:
+		MageSpellUnmemorizeWindow.Unload ()
 	MageSpellUnmemorizeWindow = None
 	return
 
 def OpenMageSpellRemoveWindow ():
 	global MageSpellUnmemorizeWindow
 
-	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
+	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindowObject (5)
 
 	# "Are you sure you want to ....?"
-	TextArea = GemRB.GetControl (Window, 3)
-	GemRB.SetText (Window, TextArea, 63745)
+	TextArea = Window.GetControl (3)
+	TextArea.SetText (63745)
 
 	# Remove
-	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, Button, 17507)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnMageRemoveSpell")
+	Button = Window.GetControl (0)
+	Button.SetText (17507)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnMageRemoveSpell")
 
 	# Cancel
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetText (Window, Button, 13727)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseMageSpellUnmemorizeWindow")
+	Button = Window.GetControl (1)
+	Button.SetText (13727)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseMageSpellUnmemorizeWindow")
 
-	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OpenMageSpellUnmemorizeWindow ():
 	global MageSpellUnmemorizeWindow
 
-	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
+	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindowObject (5)
 
 	# "Are you sure you want to ....?"
-	TextArea = GemRB.GetControl (Window, 3)
-	GemRB.SetText (Window, TextArea, 11824)
+	TextArea = Window.GetControl (3)
+	TextArea.SetText (11824)
 
 	# Remove
-	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, Button, 17507)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnMageUnmemorizeSpell")
+	Button = Window.GetControl (0)
+	Button.SetText (17507)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnMageUnmemorizeSpell")
 
 	# Cancel
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetText (Window, Button, 13727)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseMageSpellUnmemorizeWindow")
+	Button = Window.GetControl (1)
+	Button.SetText (13727)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseMageSpellUnmemorizeWindow")
 
-	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OnMageUnmemorizeSpell ():
