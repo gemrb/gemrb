@@ -42,6 +42,11 @@ class metaIDWrapper(type):
     def __init__(self, ID):
       self.ID = ID
     newdict = { '__slots__':['ID'], '__init__':__init__, }
+    if len(bases) == 1:
+      def __subinit__(self, ID):
+        bases[0].__init__(self, ID)
+      newdict['__init__'] = __subinit__
+      newdict['__slots__'] = []
     methods = classdict['methods']
     for key in methods: 
       newdict[key] = make_caller_lambda_ID(methods[key])
@@ -60,6 +65,11 @@ class metaControl(type):
       self.WinID = WinID
       self.ID = ID
     newdict = { '__slots__':['WinID', 'ID'], '__init__':__init__, }
+    if len(bases) == 1:
+      def __subinit__(self, WinID, ID):
+        bases[0].__init__(self, WinID, ID)
+      newdict['__init__'] = __subinit__
+      newdict['__slots__'] = []
     methods = classdict['methods']
     for key in methods:
       newdict[key] = make_caller_lambda_Control(methods[key])
