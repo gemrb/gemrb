@@ -568,7 +568,7 @@ def GetReputation (repvalue):
 		repvalue=20
 	txt = GemRB.GetString (GemRB.GetTableValue (table, repvalue, 0) )
 	GemRB.UnloadTable (table)
-	return txt+"("+str(repvalue)+")"
+	return txt+" ("+str(repvalue)+")"
 
 
 def OpenInformationWindow ():
