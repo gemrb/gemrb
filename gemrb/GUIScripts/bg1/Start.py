@@ -9,7 +9,7 @@ MoviesButton = 0
 
 def OnLoad():
 	global StartWindow, QuitWindow
-	global ExitButton, MultiPlayerButton, MoviesButton
+	global ExitButton, MultiPlayerButton, MoviesButton, SinglePlayerButton
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos:
