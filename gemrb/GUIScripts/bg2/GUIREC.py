@@ -796,7 +796,7 @@ def CanLevelUp(actor):
 				Classes[MultiCount] = GemRB.FindTableValue (ClassTable, 5, i)
 				MultiCount += 1
 			Mask = 1 << i
-		print Classes
+
 		if Dual[0] > 0:
 			xp = GemRB.GetPlayerStat (actor, IE_XP)
 			if Classes[0] == Dual[1]:
