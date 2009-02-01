@@ -39,7 +39,7 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 		GemRB.HideGUI ()
 		
 	GemRB.LoadWindowPack ("guils")
-	LoadScreen = Window = GemRB.LoadWindow (0)
+	LoadScreen = Window = GemRB.LoadWindowObject (0)
 
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 
@@ -51,24 +51,24 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 		else:
 			LoadPic = "GUIDS10"
 
-	GemRB.SetWindowPicture (Window, LoadPic)
+	Window.SetPicture (LoadPic)
 	
-	Bar = GemRB.GetControl (Window, 0)
+	Bar = Window.GetControl (0)
 	Progress = 0
 	GemRB.SetVar ("Progress", Progress)
-	GemRB.SetVarAssoc (Window, Bar, "Progress", Progress)
-	GemRB.SetEvent (Window, Bar, IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
-	Skull = GemRB.GetControl (Window, 1)
-	GemRB.SetButtonMOS (Window, Skull, "GSKULOFF")
+	Bar.SetVarAssoc ("Progress", Progress)
+	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
+	Skull = Window.GetControl (1)
+	Skull.SetMOS ("GSKULOFF")
 
 	if screen_type == LS_TYPE_SAVING:
 		GemRB.UnhideGUI ()
 
-	GemRB.SetVisible (Window, 1)
+	Window.SetVisible (1)
 
 
 def EndLoadScreen ():
 	Window = LoadScreen
-	Skull = GemRB.GetControl (Window, 1)
-	GemRB.SetButtonMOS (Window, Skull, "GSKULON")
-	GemRB.SetVisible (Window, 1)
+	Skull = Window.GetControl (1)
+	Skull.SetMOS ("GSKULON")
+	Window.SetVisible (1)

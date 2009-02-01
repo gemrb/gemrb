@@ -50,21 +50,21 @@ def DeathWindowEnd ():
 	GemRB.GamePause (1,1)
 
 	GemRB.LoadWindowPack (GetWindowPack())
-	Window = GemRB.LoadWindow (25)
+	Window = GemRB.LoadWindowObject (25)
 
 	#reason for death
-	Label = GemRB.GetControl (Window, 0x0fffffff)
+	Label = Window.GetControl (0x0fffffff)
 	strref = GemRB.GetVar ("QuitGame3")
-	GemRB.SetText (Window, Label, strref)
+	Label.SetText (strref)
 
 	#done
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetText (Window, Button, 17237)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	Button = Window.GetControl (1)
+	Button.SetText (17237)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePress")
 
 	GemRB.HideGUI ()
 	GemRB.SetVar ("MessageWindow", -1)
-	GemRB.SetVar ("PortraitWindow", Window)
+	GemRB.SetVar ("PortraitWindow", Window.ID)
 	GemRB.UnhideGUI ()
 	#making the playing field gray
 	GemRB.SetVisible (0,2)

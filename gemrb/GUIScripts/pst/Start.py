@@ -42,55 +42,59 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("START")
 #quit subwindow
-	QuitWindow = GemRB.LoadWindow(3)
-	QuitTextArea = GemRB.GetControl(QuitWindow,0)
-	CancelButton = GemRB.GetControl(QuitWindow, 2)
-	ConfirmButton = GemRB.GetControl(QuitWindow, 1)
-	GemRB.SetText(QuitWindow, QuitTextArea, 20582)
-	GemRB.SetText(QuitWindow, CancelButton, 23789)
-	GemRB.SetText(QuitWindow, ConfirmButton, 23787)
-	GemRB.SetEvent(QuitWindow, ConfirmButton, IE_GUI_BUTTON_ON_PRESS, "ExitConfirmed")
-	GemRB.SetEvent(QuitWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "ExitCancelled")
-	GemRB.SetButtonFlags(QuitWindow, CancelButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+	QuitWindow = GemRB.LoadWindowObject(3)
+	QuitTextArea = QuitWindow.GetControl(0)
+	CancelButton = QuitWindow.GetControl(2)
+	ConfirmButton = QuitWindow.GetControl(1)
+	QuitTextArea.SetText(20582)
+	CancelButton.SetText(23789)
+	ConfirmButton.SetText(23787)
+	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitConfirmed")
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitCancelled")
+	CancelButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 #main window
-	StartWindow = GemRB.LoadWindow(0)
-	NewLifeButton = GemRB.GetControl(StartWindow, 0)
-	ResumeLifeButton = GemRB.GetControl(StartWindow, 2)
-	ExitButton = GemRB.GetControl(StartWindow, 3)
-	GemRB.SetEvent(StartWindow, NewLifeButton, IE_GUI_BUTTON_ON_PRESS, "NewLifePress")
-	GemRB.SetEvent(StartWindow, ResumeLifeButton, IE_GUI_BUTTON_ON_PRESS, "ResumeLifePress")
-	GemRB.SetEvent(StartWindow, ExitButton, IE_GUI_BUTTON_ON_PRESS, "ExitPress")
+	StartWindow = GemRB.LoadWindowObject(0)
+	NewLifeButton = StartWindow.GetControl(0)
+	ResumeLifeButton = StartWindow.GetControl(2)
+	ExitButton = StartWindow.GetControl(3)
+	NewLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "NewLifePress")
+	ResumeLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ResumeLifePress")
+	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitPress")
 
-	GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,415,640,30, "EXOFONT", "", 1)
-	Label=GemRB.GetControl(StartWindow, 0x0fff0000)
-	GemRB.SetText(StartWindow, Label,GEMRB_VERSION)
+	StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "EXOFONT", "", 1)
+	Label=StartWindow.GetControl(0x0fff0000)
+	Label.SetText(GEMRB_VERSION)
 	
-	GemRB.SetVisible(QuitWindow, 0)
-	GemRB.SetVisible(StartWindow, 1)
+	QuitWindow.SetVisible(0)
+	StartWindow.SetVisible(1)
 
 	GemRB.LoadMusicPL("Main.mus")
 	return
 	
 def NewLifePress():
-	GemRB.UnloadWindow(QuitWindow)
-	GemRB.UnloadWindow(StartWindow)
+	if QuitWindow:
+		QuitWindow.Unload()
+	if StartWindow:
+		StartWindow.Unload()
 	#to make difference between ingame change and new life
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetNextScript("NewLife")
 	return
 
 def ResumeLifePress():
-	GemRB.UnloadWindow(QuitWindow)
-	GemRB.UnloadWindow(StartWindow)
+	if QuitWindow:
+		QuitWindow.Unload()
+	if StartWindow:
+		StartWindow.Unload()
 	#to make difference between ingame load and initial load
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetNextScript("GUILOAD")
 	return
 
 def ExitPress():
-	GemRB.SetVisible(StartWindow,2)
-	GemRB.SetVisible(QuitWindow,1)
+	StartWindow.SetVisible(2)
+	QuitWindow.SetVisible(1)
 	return
 	
 def ExitConfirmed():
@@ -98,6 +102,6 @@ def ExitConfirmed():
 	return
 
 def ExitCancelled():
-	GemRB.SetVisible(QuitWindow, 0)
-	GemRB.SetVisible(StartWindow, 1)
+	QuitWindow.SetVisible(0)
+	StartWindow.SetVisible(1)
 	return

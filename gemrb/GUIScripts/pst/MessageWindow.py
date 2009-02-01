@@ -27,6 +27,7 @@ import GemRB
 
 from GUICommonWindows import *
 import GUICommonWindows
+from GUIClasses import GTextArea
 
 from FloatMenuWindow import *
 
@@ -53,17 +54,17 @@ def OnLoad():
 	GemRB.GameSetProtagonistMode(0)
 	GemRB.LoadWindowPack (GetWindowPack())
 	GemRB.SetInfoTextColor(0,255,0,255)
-	ActionsWindow = GemRB.LoadWindow(0)
-	OptionsWindow = GemRB.LoadWindow(2)
-	MessageWindow = GemRB.LoadWindow(7)
+	ActionsWindow = GemRB.LoadWindowObject(0)
+	OptionsWindow = GemRB.LoadWindowObject(2)
+	MessageWindow = GemRB.LoadWindowObject(7)
 	PortraitWindow = OpenPortraitWindow (1)
 
-	MessageTA = GemRB.GetControl (MessageWindow, 1)
-	GemRB.SetTextAreaFlags (MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
-	GemRB.SetTAHistory (MessageWindow, MessageTA, 100)
-	GemRB.SetVar ("MessageTextArea", MessageTA)
-	GemRB.SetVar ("ActionsWindow", ActionsWindow)
-	GemRB.SetVar ("OptionsWindow", OptionsWindow)
+	MessageTA = MessageWindow.GetControl (1)
+	MessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
+	MessageTA.SetHistory (100)
+	GemRB.SetVar ("MessageTextArea", MessageTA.ID)
+	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
+	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
 	GemRB.SetVar ("MessageWindow", -1)
 	GemRB.SetVar ("OtherWindow", -1)
 	GemRB.SetVar ("ActionsPosition", 1) #Bottom
@@ -73,23 +74,23 @@ def OnLoad():
 	
 	GemRB.GameSetScreenFlags (0, OP_SET)
 	
-	CloseButton= GemRB.GetControl (MessageWindow, 0)
-	GemRB.SetText(MessageWindow, CloseButton, 28082)
-	GemRB.SetEvent (MessageWindow, CloseButton, IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+	CloseButton= MessageWindow.GetControl (0)
+	CloseButton.SetText(28082)
+	CloseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 	
-	OpenButton = GemRB.GetControl (OptionsWindow, 10)
-	GemRB.SetEvent (OptionsWindow, OpenButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+	OpenButton = OptionsWindow.GetControl (10)
+	OpenButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 
 	# Select all
-	Button = GemRB.GetControl (ActionsWindow, 1)
-	GemRB.SetEvent (ActionsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+	Button = ActionsWindow.GetControl (1)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
 
 	# Select all
-	Button = GemRB.GetControl (ActionsWindow, 3)
-	GemRB.SetEvent (ActionsWindow, Button, IE_GUI_BUTTON_ON_PRESS, "StopAllOnPress")
+	Button = ActionsWindow.GetControl (3)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "StopAllOnPress")
 
-	FormationButton = GemRB.GetControl (ActionsWindow, 4)
-	GemRB.SetEvent (ActionsWindow, FormationButton, IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
+	FormationButton = ActionsWindow.GetControl (4)
+	FormationButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
 
 	SetupActionsWindowControls (ActionsWindow)
 	SetupMenuWindowControls (OptionsWindow)
@@ -112,17 +113,17 @@ def UpdateControlStatus ():
 
 	hideflags = GemRB.HideGUI ()
 	if Expand:
-		GemRB.SetVar ("MessageWindow", MessageWindow)
+		GemRB.SetVar ("MessageWindow", MessageWindow.ID)
 		GemRB.SetVar ("PortraitWindow", -1)
 		GemRB.SetVar ("ActionsWindow", -1)
 		GemRB.SetVar ("OptionsWindow", -1)
-		MessageTA = GemRB.GetVar ("MessageTextArea")
-		GemRB.SetControlStatus (MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED)
+		MessageTA = GTextArea(MessageWindow.ID, GemRB.GetVar ("MessageTextArea"))
+		MessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	else:
 		GemRB.SetVar ("MessageWindow", -1)
-		GemRB.SetVar ("PortraitWindow", PortraitWindow)
-		GemRB.SetVar ("ActionsWindow", ActionsWindow)
-		GemRB.SetVar ("OptionsWindow", OptionsWindow)
+		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
+		GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
+		GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
 		GemRB.SetControlStatus (0,0,IE_GUI_CONTROL_FOCUSED)
 
 	if hideflags:
