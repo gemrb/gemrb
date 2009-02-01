@@ -174,7 +174,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 				if (ctrl == NULL) {
 					ctrl = win->GetControl( x, y, false );
 				}
-				if (ctrl != win->GetOver()) {
+				if (win != last_win_over || ctrl != win->GetOver()) {
 					// Remove tooltip if mouse moved to different control
 					core->DisplayTooltip( 0, 0, NULL );
 					if (last_win_over) {
@@ -186,7 +186,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 				if (ctrl != NULL) {
 					win->OnMouseOver( x, y );
 				}
-		    RefreshCursor(win->Cursor);
+				RefreshCursor(win->Cursor);
 				return;
 			}
 		}
