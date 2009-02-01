@@ -841,22 +841,23 @@ def IsDualClassed(actor, verbose):
 			if KitIndex:
 				DualInfo.append (1)
 				DualInfo.append (KitIndex)
+				FirstClassIndex = ClassIndex
 			else:
 				DualInfo.append (2)
-				DualInfo.append (GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS))
+				FirstClassIndex = GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS)
+				DualInfo.append (FirstClassIndex)
 
 			# use the first class of the multiclass bunch that isn't the same as the first class
-			FirstClassIndex = ClassIndex
 			Mask = 1
-			for i in range (16):
+			for i in range (1,16):
 				if Multi & Mask:
-					ClassIndex = GemRB.FindTableValue (ClassTable, 5, i+1)
+					ClassIndex = GemRB.FindTableValue (ClassTable, 5, i)
 					if ClassIndex == FirstClassIndex:
-						Mask += Mask
+						Mask = 1 << i
 						continue
 					DualInfo.append (ClassIndex)
 					break
-				Mask += Mask
+				Mask = 1 << i
 			return DualInfo
 		else:
 			return (0,-1,-1)
