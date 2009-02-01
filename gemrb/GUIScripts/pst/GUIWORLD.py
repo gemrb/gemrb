@@ -255,7 +255,7 @@ def TakeItemContainer ():
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
 
-	if CloseOtherWindow(ReformPartyWindow):
+	if CloseOtherWindow(OpenReformPartyWindow):
 		GemRB.HideGUI ()
 		if ReformPartyWindow:
 			ReformPartyWindow.Unload ()
