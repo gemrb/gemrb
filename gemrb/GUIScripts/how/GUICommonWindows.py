@@ -103,7 +103,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	if Gears:
 		# Gears (time), how doesn't have this in the right place
 		pos = GemRB.GetSystemVariable (SV_HEIGHT)-71
-		GemRB.CreateButton (Window, 9, 6, pos, 64, 71)
+		Window.CreateButton (9, 6, pos, 64, 71)
 		Button = Window.GetControl (9)
 		Button.SetAnimation ("CGEAR")
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -475,7 +475,7 @@ def OpenPortraitWindow (needcontrols):
 		PortraitWindow = Window = GemRB.LoadWindowObject(26)
 		# Rest
 		pos = GemRB.GetSystemVariable (SV_HEIGHT) - 37
-		GemRB.CreateButton (Window, 8, 6, pos, 55, 37)
+		Window.CreateButton (8, 6, pos, 55, 37)
 		Button = Window.GetControl (8)
 		Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 		Button.SetTooltip (11942)
@@ -483,7 +483,7 @@ def OpenPortraitWindow (needcontrols):
 
 		# AI
 		pos = pos - 37
-		GemRB.CreateButton (Window, 6, 6, pos, 27, 36)
+		Window.CreateButton (6, 6, pos, 27, 36)
 		Button = Window.GetControl (6)
 		#fixing a gui bug, and while we are at it, hacking it to be easier
 		Button.SetSprites ("GUIBTACT", 0, 46, 47, 48, 49)
@@ -499,7 +499,7 @@ def OpenPortraitWindow (needcontrols):
 			Button.SetTooltip (15918)
 
 		#Select All
-		GemRB.CreateButton (Window, 7, 33, pos, 27, 36)
+		Window.CreateButton (7, 33, pos, 27, 36)
 		Button = Window.GetControl (7)
 		Button.SetSprites ("GUIBTACT", 0, 50, 51, 50, 51)
 		Button.SetTooltip (10485)
