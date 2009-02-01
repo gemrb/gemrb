@@ -13,16 +13,16 @@ def DisplayRaces():
 
 	TopIndex=GemRB.GetVar("TopIndex")
 	for i in range(0, 11):
-		Button = GemRB.GetControl(RaceWindow,i+22)
-		Val = GemRB.GetTableValue(RaceTable, i+TopIndex,0)
+		Button = RaceWindow.GetControl(i+22)
+		Val = RaceTable.GetValue(i+TopIndex,0)
 		if Val==0:
-			GemRB.SetText(RaceWindow, Button, "")
-			GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_DISABLED)
+			Button.SetText("")
+			Button.SetState(IE_GUI_BUTTON_DISABLED)
 		else:
-			GemRB.SetText(RaceWindow,Button, Val)
-			GemRB.SetButtonState(RaceWindow,Button,IE_GUI_BUTTON_ENABLED)
-			GemRB.SetEvent(RaceWindow,Button,IE_GUI_BUTTON_ON_PRESS,"RacePress")
-			GemRB.SetVarAssoc(RaceWindow,Button,"HateRace",GemRB.GetTableValue(RaceTable,i+TopIndex,1) )
+			Button.SetText(Val)
+			Button.SetState(IE_GUI_BUTTON_ENABLED)
+			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,"RacePress")
+			Button.SetVarAssoc("HateRace",RaceTable.GetValue(i+TopIndex,1) )
 	return
 
 def OnLoad():
@@ -30,58 +30,60 @@ def OnLoad():
 	global RaceTable, RaceCount, TopIndex
 	
 	GemRB.LoadWindowPack("GUICG", 800 ,600)
-	RaceWindow = GemRB.LoadWindow(15)
+	RaceWindow = GemRB.LoadWindowObject(15)
 
 	Class = GemRB.GetVar("BaseClass")
-	TmpTable = GemRB.LoadTable("clskills")
-	TableName = GemRB.GetTableValue(TmpTable, Class, 0)
+	TmpTable = GemRB.LoadTableObject("clskills")
+	TableName = TmpTable.GetValue(Class, 0)
 	if TableName == "*":
 		GemRB.SetNextScript("Skills")
 		return
-	RaceTable = GemRB.LoadTable(TableName)
-	RaceCount = GemRB.GetTableRowCount(RaceTable)-11
+	RaceTable = GemRB.LoadTableObject(TableName)
+	RaceCount = RaceTable.GetRowCount()-11
 	if RaceCount<0:
 		RaceCount=0
 
 	for i in range(0,11):
-		Button = GemRB.GetControl(RaceWindow,i+22)
-		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+		Button = RaceWindow.GetControl(i+22)
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
-	BackButton = GemRB.GetControl(RaceWindow,10)
-	GemRB.SetText(RaceWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl(RaceWindow,11)
-	GemRB.SetText(RaceWindow,DoneButton,11973)
-	GemRB.SetButtonFlags(RaceWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
-	GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
+	BackButton = RaceWindow.GetControl(10)
+	BackButton.SetText(15416)
+	DoneButton = RaceWindow.GetControl(11)
+	DoneButton.SetText(11973)
+	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
-	TextAreaControl = GemRB.GetControl(RaceWindow, 8)
-	GemRB.SetText(RaceWindow,TextAreaControl,17256)
+	TextAreaControl = RaceWindow.GetControl(8)
+	TextAreaControl.SetText(17256)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
-	ScrollBarControl = GemRB.GetControl(RaceWindow, 1)
-	GemRB.SetVarAssoc(RaceWindow, ScrollBarControl, "TopIndex",RaceCount)
-	GemRB.SetEvent(RaceWindow, ScrollBarControl, IE_GUI_SCROLLBAR_ON_CHANGE, "DisplayRaces")
+	ScrollBarControl = RaceWindow.GetControl(1)
+	ScrollBarControl.SetVarAssoc("TopIndex",RaceCount)
+	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "DisplayRaces")
 
-	GemRB.SetEvent(RaceWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	GemRB.SetEvent(RaceWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	GemRB.SetVisible(RaceWindow,1)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	RaceWindow.SetVisible(1)
 	DisplayRaces()
 	return
 
 def RacePress():
 	Race = GemRB.GetVar("HateRace")
- 	Row = GemRB.FindTableValue(RaceTable,1, Race)
-	GemRB.SetText(RaceWindow,TextAreaControl, GemRB.GetTableValue(RaceTable, Row, 2) )
-	GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_ENABLED)
+ 	Row = RaceTable.FindValue(1, Race)
+	TextAreaControl.SetText(RaceTable.GetValue(Row, 2) )
+	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def BackPress():
-	GemRB.UnloadWindow(RaceWindow)
+	if RaceWindow:
+		RaceWindow.Unload()
 	GemRB.SetVar("HateRace",0)  #scrapping the race value
 	GemRB.SetNextScript("CharGen6")
 	return
 
 def NextPress():
-	GemRB.UnloadWindow(RaceWindow)
+	if RaceWindow:
+		RaceWindow.Unload()
 	GemRB.SetNextScript("Skills")
 	return

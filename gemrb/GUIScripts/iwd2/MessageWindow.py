@@ -30,6 +30,7 @@ from GUIREC import *
 from GUISTORE import *
 from GUIWORLD import *
 from TextScreen import *
+from GUIClasses import GTextArea
 
 MessageWindow = 0
 PortraitWindow = 0
@@ -40,11 +41,11 @@ def OnLoad():
 	GemRB.GameSetProtagonistMode(2)
 	GemRB.SetDefaultActions(1,14,16,17)
 	GemRB.LoadWindowPack(GetWindowPack())
-	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)
+	OptionsWindow = MessageWindow = GemRB.LoadWindowObject(0)
 	ActionsWindow = PortraitWindow = OpenPortraitWindow()
 
-	GemRB.SetVar ("MessageWindow", MessageWindow)
-	GemRB.SetVar ("PortraitWindow", PortraitWindow)
+	GemRB.SetVar ("MessageWindow", MessageWindow.ID)
+	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 	GemRB.SetVar ("TopWindow", -1)
 	GemRB.SetVar ("OtherWindow", -1)
 	GemRB.SetVar ("FloatWindow", -1)
@@ -57,8 +58,8 @@ def OnLoad():
 
 	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 
-	GemRB.SetVisible(MessageWindow, 1)
-	GemRB.SetVisible(PortraitWindow, 1)
+	MessageWindow.SetVisible(1)
+	PortraitWindow.SetVisible(1)
 	return
 
 def OnIncreaseSize():
@@ -87,38 +88,38 @@ def UpdateControlStatus():
 	hideflag = GemRB.HideGUI()
 	if Expand == GS_LARGEDIALOG:
 		GemRB.SetVar ("PortraitWindow", -1)
-		TMessageWindow = GemRB.LoadWindow(7)
-		TMessageTA = GemRB.GetControl (TMessageWindow, 1)
+		TMessageWindow = GemRB.LoadWindowObject(7)
+		TMessageTA = TMessageWindow.GetControl (1)
 	else:
-		GemRB.SetVar ("PortraitWindow", PortraitWindow)
-		TMessageWindow = GemRB.LoadWindow(0)
-		TMessageTA = GemRB.GetControl (TMessageWindow, 1)
+		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
+		TMessageWindow = GemRB.LoadWindowObject(0)
+		TMessageTA = TMessageWindow.GetControl (1)
 
 
-	GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
-	GemRB.SetTAHistory(TMessageWindow, TMessageTA, 100)
+	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL)
+	TMessageTA.SetHistory(100)
 
-	MessageTA = GemRB.GetVar ("MessageTextArea")
-	if MessageWindow>0 and MessageWindow!=TMessageWindow:
-		GemRB.MoveTAText (MessageWindow, MessageTA, TMessageWindow, TMessageTA)
+	MessageTA = GTextArea(MessageWindow, GemRB.GetVar ("MessageTextArea"))
+	if MessageWindow>0 and MessageWindow!=TMessageWindow.ID:
+		MessageTA.MoveText (TMessageTA)
 		GemRB.UnloadWindow(MessageWindow)
-	GemRB.SetVar ("MessageWindow", TMessageWindow)
-	GemRB.SetVar ("MessageTextArea", TMessageTA)
+	GemRB.SetVar ("MessageWindow", TMessageWindow.ID)
+	GemRB.SetVar ("MessageTextArea", TMessageTA.ID)
 
 	if Override:
-		GemRB.SetControlStatus (TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED)
+		TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
 		#gets PC currently talking
 		pc = GemRB.GameGetSelectedPCSingle (1)
 		if pc:
 			Portrait = GemRB.GetPlayerPortrait(pc,1)
 		else:
 			Portrait = None
-		Button = GemRB.GetControl(TMessageWindow, 11)
-		GemRB.SetButtonState (TMessageWindow, Button, IE_GUI_BUTTON_LOCKED)
+		Button = TMessageWindow.GetControl(11)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		if not Portrait:
-			GemRB.SetButtonFlags(TMessageWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
-			GemRB.SetButtonPicture(TMessageWindow, Button, Portrait, "NOPORTSM")
+			Button.SetPicture(Portrait, "NOPORTSM")
 	else:
 		GemRB.SetControlStatus (0,0,IE_GUI_CONTROL_FOCUSED)
 		

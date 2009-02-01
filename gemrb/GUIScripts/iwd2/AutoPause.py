@@ -6,175 +6,177 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUIOPT", 800, 600)
 	
-	AutoPauseWindow = GemRB.LoadWindow(10)
-	GemRB.SetWindowFrame( AutoPauseWindow)
+	AutoPauseWindow = GemRB.LoadWindowObject(10)
+	AutoPauseWindow.SetFrame( )
 
-	TextAreaControl = GemRB.GetControl(AutoPauseWindow, 15)
+	TextAreaControl = AutoPauseWindow.GetControl(15)
 
-	ChHitButton = GemRB.GetControl(AutoPauseWindow, 17)
-	ChHitButtonB = GemRB.GetControl(AutoPauseWindow, 1)
-	GemRB.SetButtonSprites(AutoPauseWindow, ChHitButtonB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	ChHitButton = AutoPauseWindow.GetControl(17)
+	ChHitButtonB = AutoPauseWindow.GetControl(1)
+	ChHitButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	ChInjured = GemRB.GetControl(AutoPauseWindow, 18)
-	ChInjuredB = GemRB.GetControl(AutoPauseWindow, 2)
-	GemRB.SetButtonSprites(AutoPauseWindow, ChInjuredB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	ChInjured = AutoPauseWindow.GetControl(18)
+	ChInjuredB = AutoPauseWindow.GetControl(2)
+	ChInjuredB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	ChDeath = GemRB.GetControl(AutoPauseWindow, 19)
-	ChDeathB = GemRB.GetControl(AutoPauseWindow, 3)
-	GemRB.SetButtonSprites(AutoPauseWindow, ChDeathB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	ChDeath = AutoPauseWindow.GetControl(19)
+	ChDeathB = AutoPauseWindow.GetControl(3)
+	ChDeathB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	ChAttacked = GemRB.GetControl(AutoPauseWindow, 20)
-	ChAttackedB = GemRB.GetControl(AutoPauseWindow, 4)
-	GemRB.SetButtonSprites(AutoPauseWindow, ChAttackedB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	ChAttacked = AutoPauseWindow.GetControl(20)
+	ChAttackedB = AutoPauseWindow.GetControl(4)
+	ChAttackedB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	WeaponUnusable = GemRB.GetControl(AutoPauseWindow, 21)
-	WeaponUnusableB = GemRB.GetControl(AutoPauseWindow, 5)
-	GemRB.SetButtonSprites(AutoPauseWindow, WeaponUnusableB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	WeaponUnusable = AutoPauseWindow.GetControl(21)
+	WeaponUnusableB = AutoPauseWindow.GetControl(5)
+	WeaponUnusableB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	TargetDestroyed = GemRB.GetControl(AutoPauseWindow, 22)
-	TargetDestroyedB = GemRB.GetControl(AutoPauseWindow, 13)
-	GemRB.SetButtonSprites(AutoPauseWindow, TargetDestroyedB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	TargetDestroyed = AutoPauseWindow.GetControl(22)
+	TargetDestroyedB = AutoPauseWindow.GetControl(13)
+	TargetDestroyedB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	EndOfRound = GemRB.GetControl(AutoPauseWindow, 24)
-	EndOfRoundB = GemRB.GetControl(AutoPauseWindow, 25)
-	GemRB.SetButtonSprites(AutoPauseWindow, EndOfRoundB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	EndOfRound = AutoPauseWindow.GetControl(24)
+	EndOfRoundB = AutoPauseWindow.GetControl(25)
+	EndOfRoundB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	EnemySighted = GemRB.GetControl(AutoPauseWindow, 31)
-	EnemySightedB = GemRB.GetControl(AutoPauseWindow, 30)
-	GemRB.SetButtonSprites(AutoPauseWindow, EnemySightedB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	EnemySighted = AutoPauseWindow.GetControl(31)
+	EnemySightedB = AutoPauseWindow.GetControl(30)
+	EnemySightedB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	SpellCast = GemRB.GetControl(AutoPauseWindow, 37)
-	SpellCastB = GemRB.GetControl(AutoPauseWindow, 36)
-	GemRB.SetButtonSprites(AutoPauseWindow, SpellCastB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	SpellCast = AutoPauseWindow.GetControl(37)
+	SpellCastB = AutoPauseWindow.GetControl(36)
+	SpellCastB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	TrapFound = GemRB.GetControl(AutoPauseWindow, 28)
-	TrapFoundB = GemRB.GetControl(AutoPauseWindow, 26)
-	GemRB.SetButtonSprites(AutoPauseWindow, TrapFoundB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	TrapFound = AutoPauseWindow.GetControl(28)
+	TrapFoundB = AutoPauseWindow.GetControl(26)
+	TrapFoundB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	AutopauseCenter = GemRB.GetControl(AutoPauseWindow, 34)
-	AutopauseCenterB = GemRB.GetControl(AutoPauseWindow, 33)
-	GemRB.SetButtonSprites(AutoPauseWindow, AutopauseCenterB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	AutopauseCenter = AutoPauseWindow.GetControl(34)
+	AutopauseCenterB = AutoPauseWindow.GetControl(33)
+	AutopauseCenterB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	OkButton = GemRB.GetControl(AutoPauseWindow, 11)
-	CancelButton = GemRB.GetControl(AutoPauseWindow, 14)
+	OkButton = AutoPauseWindow.GetControl(11)
+	CancelButton = AutoPauseWindow.GetControl(14)
 	
-	GemRB.SetText(AutoPauseWindow, TextAreaControl, 18044)
-	GemRB.SetText(AutoPauseWindow, OkButton, 11973)
-	GemRB.SetText(AutoPauseWindow, CancelButton, 13727)
+	TextAreaControl.SetText(18044)
+	OkButton.SetText(11973)
+	CancelButton.SetText(13727)
 
-	GemRB.SetEvent(AutoPauseWindow, ChHitButton, IE_GUI_BUTTON_ON_PRESS, "ChHitButtonPress")
-	GemRB.SetButtonFlags(AutoPauseWindow, ChHitButtonB,IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetEvent(AutoPauseWindow, ChHitButtonB, IE_GUI_BUTTON_ON_PRESS, "ChHitButtonPress")
+	ChHitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ChHitButtonPress")
+	ChHitButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	ChHitButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ChHitButtonPress")
 
-	GemRB.SetEvent(AutoPauseWindow, ChInjured, IE_GUI_BUTTON_ON_PRESS, "ChInjuredPress")
-	GemRB.SetButtonFlags(AutoPauseWindow, ChInjuredB,IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetEvent(AutoPauseWindow, ChInjuredB, IE_GUI_BUTTON_ON_PRESS, "ChInjuredPress")
+	ChInjured.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ChInjuredPress")
+	ChInjuredB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	ChInjuredB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ChInjuredPress")
 
-	GemRB.SetEvent(AutoPauseWindow, ChDeath, IE_GUI_BUTTON_ON_PRESS, "ChDeathPress")
-	GemRB.SetButtonFlags(AutoPauseWindow, ChDeathB,IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetEvent(AutoPauseWindow, ChDeathB, IE_GUI_BUTTON_ON_PRESS, "ChDeathPress")
+	ChDeath.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ChDeathPress")
+	ChDeathB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	ChDeathB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ChDeathPress")
 
-	GemRB.SetEvent(AutoPauseWindow, ChAttacked, IE_GUI_BUTTON_ON_PRESS, "ChAttackedPress")
-	GemRB.SetButtonFlags(AutoPauseWindow, ChAttackedB,IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetEvent(AutoPauseWindow, ChAttackedB, IE_GUI_BUTTON_ON_PRESS, "ChAttackedPress")
+	ChAttacked.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ChAttackedPress")
+	ChAttackedB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	ChAttackedB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ChAttackedPress")
 
-	GemRB.SetEvent(AutoPauseWindow, WeaponUnusable, IE_GUI_BUTTON_ON_PRESS, "WeaponUnusablePress")
-	GemRB.SetButtonFlags(AutoPauseWindow, WeaponUnusableB,IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetEvent(AutoPauseWindow, WeaponUnusableB, IE_GUI_BUTTON_ON_PRESS, "WeaponUnusablePress")
+	WeaponUnusable.SetEvent(IE_GUI_BUTTON_ON_PRESS, "WeaponUnusablePress")
+	WeaponUnusableB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	WeaponUnusableB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "WeaponUnusablePress")
 
-	GemRB.SetEvent(AutoPauseWindow, TargetDestroyed, IE_GUI_BUTTON_ON_PRESS, "TargetDestroyedPress")
-	GemRB.SetButtonFlags(AutoPauseWindow, TargetDestroyedB,IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetEvent(AutoPauseWindow, TargetDestroyedB, IE_GUI_BUTTON_ON_PRESS, "TargetDestroyedPress")
+	TargetDestroyed.SetEvent(IE_GUI_BUTTON_ON_PRESS, "TargetDestroyedPress")
+	TargetDestroyedB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	TargetDestroyedB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "TargetDestroyedPress")
 
-	GemRB.SetEvent(AutoPauseWindow, EndOfRound, IE_GUI_BUTTON_ON_PRESS, "EndOfRoundPress")
-	GemRB.SetButtonFlags(AutoPauseWindow, EndOfRoundB,IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetEvent(AutoPauseWindow, EndOfRoundB, IE_GUI_BUTTON_ON_PRESS, "EndOfRoundPress")
+	EndOfRound.SetEvent(IE_GUI_BUTTON_ON_PRESS, "EndOfRoundPress")
+	EndOfRoundB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	EndOfRoundB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "EndOfRoundPress")
 
-	GemRB.SetEvent(AutoPauseWindow, EnemySighted, IE_GUI_BUTTON_ON_PRESS, "EnemySightedPress")
-	GemRB.SetButtonFlags(AutoPauseWindow, EnemySightedB,IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetEvent(AutoPauseWindow, EnemySightedB, IE_GUI_BUTTON_ON_PRESS, "EnemySightedPress")
+	EnemySighted.SetEvent(IE_GUI_BUTTON_ON_PRESS, "EnemySightedPress")
+	EnemySightedB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	EnemySightedB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "EnemySightedPress")
 
-	GemRB.SetEvent(AutoPauseWindow, SpellCast, IE_GUI_BUTTON_ON_PRESS, "SpellCastPress")
-	GemRB.SetButtonFlags(AutoPauseWindow, SpellCastB,IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetEvent(AutoPauseWindow, SpellCastB, IE_GUI_BUTTON_ON_PRESS, "SpellCastPress")
+	SpellCast.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellCastPress")
+	SpellCastB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	SpellCastB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellCastPress")
 
-	GemRB.SetEvent(AutoPauseWindow, TrapFound, IE_GUI_BUTTON_ON_PRESS, "TrapFoundPress")
-	GemRB.SetButtonFlags(AutoPauseWindow, TrapFoundB,IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetEvent(AutoPauseWindow, TrapFoundB, IE_GUI_BUTTON_ON_PRESS, "TrapFoundPress")
+	TrapFound.SetEvent(IE_GUI_BUTTON_ON_PRESS, "TrapFoundPress")
+	TrapFoundB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	TrapFoundB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "TrapFoundPress")
 
-	GemRB.SetEvent(AutoPauseWindow, AutopauseCenter, IE_GUI_BUTTON_ON_PRESS, "AutopauseCenterPress")
-	GemRB.SetButtonFlags(AutoPauseWindow, AutopauseCenterB,IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetEvent(AutoPauseWindow, AutopauseCenterB, IE_GUI_BUTTON_ON_PRESS, "AutopauseCenterPress")
+	AutopauseCenter.SetEvent(IE_GUI_BUTTON_ON_PRESS, "AutopauseCenterPress")
+	AutopauseCenterB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	AutopauseCenterB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "AutopauseCenterPress")
 
-	GemRB.SetEvent(AutoPauseWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
-	GemRB.SetEvent(AutoPauseWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OkPress")
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 
-	GemRB.SetVarAssoc(AutoPauseWindow, AutopauseCenterB, "Auto Pause Center",1)
+	AutopauseCenterB.SetVarAssoc("Auto Pause Center",1)
 
-	GemRB.SetVarAssoc(AutoPauseWindow, ChHitButtonB, "Auto Pause State",1)
-	GemRB.SetVarAssoc(AutoPauseWindow, ChInjuredB, "Auto Pause State",2)
-	GemRB.SetVarAssoc(AutoPauseWindow, ChDeathB, "Auto Pause State",4)
-	GemRB.SetVarAssoc(AutoPauseWindow, ChAttackedB, "Auto Pause State",8)
-	GemRB.SetVarAssoc(AutoPauseWindow, WeaponUnusableB, "Auto Pause State",16)
-	GemRB.SetVarAssoc(AutoPauseWindow, TargetDestroyedB, "Auto Pause State",32)
-	GemRB.SetVarAssoc(AutoPauseWindow, EndOfRoundB, "Auto Pause State",64)
-	GemRB.SetVarAssoc(AutoPauseWindow, EnemySightedB, "Auto Pause State",128)
-	GemRB.SetVarAssoc(AutoPauseWindow, SpellCastB, "Auto Pause State",256)
-	GemRB.SetVarAssoc(AutoPauseWindow, TrapFoundB, "Auto Pause State",512)
+	ChHitButtonB.SetVarAssoc("Auto Pause State",1)
+	ChInjuredB.SetVarAssoc("Auto Pause State",2)
+	ChDeathB.SetVarAssoc("Auto Pause State",4)
+	ChAttackedB.SetVarAssoc("Auto Pause State",8)
+	WeaponUnusableB.SetVarAssoc("Auto Pause State",16)
+	TargetDestroyedB.SetVarAssoc("Auto Pause State",32)
+	EndOfRoundB.SetVarAssoc("Auto Pause State",64)
+	EnemySightedB.SetVarAssoc("Auto Pause State",128)
+	SpellCastB.SetVarAssoc("Auto Pause State",256)
+	TrapFoundB.SetVarAssoc("Auto Pause State",512)
 
-	GemRB.SetVisible(AutoPauseWindow,1)
+	AutoPauseWindow.SetVisible(1)
 	return
 
 def ChHitButtonPress():
-	GemRB.SetText(AutoPauseWindow, TextAreaControl, 18032)
+	TextAreaControl.SetText(18032)
 	return
 
 def ChInjuredPress():
-	GemRB.SetText(AutoPauseWindow, TextAreaControl, 18033)
+	TextAreaControl.SetText(18033)
 	return
 
 def ChDeathPress():
-	GemRB.SetText(AutoPauseWindow, TextAreaControl, 18034)
+	TextAreaControl.SetText(18034)
 	return
 
 def ChAttackedPress():
-	GemRB.SetText(AutoPauseWindow, TextAreaControl, 18035)
+	TextAreaControl.SetText(18035)
 	return
 
 def WeaponUnusablePress():
-	GemRB.SetText(AutoPauseWindow, TextAreaControl, 18036)
+	TextAreaControl.SetText(18036)
 	return
 
 def TargetDestroyedPress():
-	GemRB.SetText(AutoPauseWindow, TextAreaControl, 18037)
+	TextAreaControl.SetText(18037)
 	return
 
 def EndOfRoundPress():
-	GemRB.SetText(AutoPauseWindow, TextAreaControl, 10640)
+	TextAreaControl.SetText(10640)
 	return
 
 def EnemySightedPress():
-	GemRB.SetText(AutoPauseWindow, TextAreaControl, 23514)
+	TextAreaControl.SetText(23514)
 	return
 
 def SpellCastPress():
-	GemRB.SetText(AutoPauseWindow, TextAreaControl, 26311)
+	TextAreaControl.SetText(26311)
 	return
 
 def TrapFoundPress():
-	GemRB.SetText(AutoPauseWindow, TextAreaControl, 18560) #iwd2 has it here
+	TextAreaControl.SetText(18560) #iwd2 has it here
 	return
 
 def AutopauseCenterPress():
-	GemRB.SetText(AutoPauseWindow, TextAreaControl, 24888) #iwd2 has it here
+	TextAreaControl.SetText(24888) #iwd2 has it here
 	return
 
 def OkPress():
-	GemRB.UnloadWindow(AutoPauseWindow)
+	if AutoPauseWindow:
+		AutoPauseWindow.Unload()
 	GemRB.SetNextScript("GamePlay")
 	return
 
 def CancelPress():
-	GemRB.UnloadWindow(AutoPauseWindow)
+	if AutoPauseWindow:
+		AutoPauseWindow.Unload()
 	GemRB.SetNextScript("GamePlay")
 	return

@@ -7,76 +7,83 @@ def OnLoad():
 	global OptionsWindow
 	GemRB.LoadWindowPack("GUIOPT", 800, 600)
 	
-	MessageBarWindow = GemRB.LoadWindow(0)
-	GemRB.SetVisible(MessageBarWindow, 1) #This will startup the window as grayed
+	MessageBarWindow = GemRB.LoadWindowObject(0)
+	MessageBarWindow.SetVisible(1) #This will startup the window as grayed
 	
-	CharactersBarWindow = GemRB.LoadWindow(1)
-	GemRB.SetVisible(CharactersBarWindow, 1)
+	CharactersBarWindow = GemRB.LoadWindowObject(1)
+	CharactersBarWindow.SetVisible(1)
 	
 	GemRB.DrawWindows()
 	
-	GemRB.SetVisible(MessageBarWindow, 0)
-	GemRB.SetVisible(CharactersBarWindow, 0)
+	MessageBarWindow.SetVisible(0)
+	CharactersBarWindow.SetVisible(0)
 	
-	GemRB.UnloadWindow(MessageBarWindow)
-	GemRB.UnloadWindow(CharactersBarWindow)
+	if MessageBarWindow:
+		MessageBarWindow.Unload()
+	if CharactersBarWindow:
+		CharactersBarWindow.Unload()
 	
-	OptionsWindow = GemRB.LoadWindow(13)
-	GemRB.SetWindowFrame (OptionsWindow)
+	OptionsWindow = GemRB.LoadWindowObject(13)
+	OptionsWindow.SetFrame ()
 	
-	VersionLabel = GemRB.GetControl(OptionsWindow, 0x1000000B)
-	GemRB.SetText(OptionsWindow, VersionLabel, GEMRB_VERSION)
+	VersionLabel = OptionsWindow.GetControl(0x1000000B)
+	VersionLabel.SetText(GEMRB_VERSION)
 	
-	GraphicsButton = GemRB.GetControl(OptionsWindow, 7)
-	SoundButton = GemRB.GetControl(OptionsWindow, 8)
-	GamePlayButton = GemRB.GetControl(OptionsWindow, 9)
-	MoviesButton = GemRB.GetControl(OptionsWindow, 14)
-	KeyboardButton = GemRB.GetControl(OptionsWindow, 13)
-	ReturnButton = GemRB.GetControl(OptionsWindow, 11)
+	GraphicsButton = OptionsWindow.GetControl(7)
+	SoundButton = OptionsWindow.GetControl(8)
+	GamePlayButton = OptionsWindow.GetControl(9)
+	MoviesButton = OptionsWindow.GetControl(14)
+	KeyboardButton = OptionsWindow.GetControl(13)
+	ReturnButton = OptionsWindow.GetControl(11)
 	
-	GemRB.SetText(OptionsWindow, GraphicsButton, 17162)
-	GemRB.SetEvent(OptionsWindow, GraphicsButton, IE_GUI_BUTTON_ON_PRESS, "GraphicsPress")
-	GemRB.SetText(OptionsWindow, SoundButton, 17164)
-	GemRB.SetEvent(OptionsWindow, SoundButton, IE_GUI_BUTTON_ON_PRESS, "SoundPress")
-	GemRB.SetText(OptionsWindow, GamePlayButton, 17165)
-	GemRB.SetEvent(OptionsWindow, GamePlayButton, IE_GUI_BUTTON_ON_PRESS, "GamePlayPress")
-	GemRB.SetText(OptionsWindow, MoviesButton, 15415)
-	GemRB.SetEvent(OptionsWindow, MoviesButton, IE_GUI_BUTTON_ON_PRESS, "MoviePress")
-	GemRB.SetText(OptionsWindow, KeyboardButton, 33468)
-	GemRB.SetEvent(OptionsWindow, MoviesButton, IE_GUI_BUTTON_ON_PRESS, "KeyboardPress")
-	GemRB.SetText(OptionsWindow, ReturnButton, 10308)
-	GemRB.SetEvent(OptionsWindow, ReturnButton, IE_GUI_BUTTON_ON_PRESS, "ReturnPress")
+	GraphicsButton.SetText(17162)
+	GraphicsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "GraphicsPress")
+	SoundButton.SetText(17164)
+	SoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SoundPress")
+	GamePlayButton.SetText(17165)
+	GamePlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "GamePlayPress")
+	MoviesButton.SetText(15415)
+	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MoviePress")
+	KeyboardButton.SetText(33468)
+	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "KeyboardPress")
+	ReturnButton.SetText(10308)
+	ReturnButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ReturnPress")
 	
-	GemRB.SetVisible(OptionsWindow, 1)
+	OptionsWindow.SetVisible(1)
 	
 	return
 	
 def ReturnPress():
 	global OptionsWindow
-	GemRB.UnloadWindow(OptionsWindow)
+	if OptionsWindow:
+		OptionsWindow.Unload()
 	GemRB.SetNextScript("Start")
 	return
 	
 def GraphicsPress():
 	global OptionsWindow
-	GemRB.UnloadWindow(OptionsWindow)
+	if OptionsWindow:
+		OptionsWindow.Unload()
 	GemRB.SetNextScript("Graphics")
 	return
 	
 def SoundPress():
 	global OptionsWindow
-	GemRB.UnloadWindow(OptionsWindow)
+	if OptionsWindow:
+		OptionsWindow.Unload()
 	GemRB.SetNextScript("Sound")
 	return
 	
 def GamePlayPress():
 	global OptionsWindow
-	GemRB.UnloadWindow(OptionsWindow)
+	if OptionsWindow:
+		OptionsWindow.Unload()
 	GemRB.SetNextScript("GamePlay")
 	return
 
 def MoviePress():
 	global OptionsWindow
-	GemRB.UnloadWindow(OptionsWindow)
+	if OptionsWindow:
+		OptionsWindow.Unload()
 	GemRB.SetNextScript("Movies")
 	return

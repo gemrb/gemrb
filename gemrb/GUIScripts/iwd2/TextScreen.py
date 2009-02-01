@@ -39,35 +39,34 @@ def StartTextScreen ():
 	#set ID according to the Chapter?
 	Chapter = (ID + 1) & 0x7fffffff
 
-	TextScreen = GemRB.LoadWindow (Chapter)
-	GemRB.SetWindowFrame (TextScreen)
+	TextScreen = GemRB.LoadWindowObject (Chapter)
+	TextScreen.SetFrame ()
 
-	TextArea = GemRB.GetControl (TextScreen, 2)
-	GemRB.SetTextAreaFlags (TextScreen, TextArea, IE_GUI_TEXTAREA_SMOOTHSCROLL)
-	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
+	TextArea = TextScreen.GetControl (2)
+	TextArea.SetFlags (IE_GUI_TEXTAREA_SMOOTHSCROLL)
+	TextArea.SetEvent (IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
 
 	#caption
-	Table = GemRB.LoadTable ("chapters")
-	Value = GemRB.GetTableValue (Table, Chapter+1, 0)
-	GemRB.UnloadTable (Table)
-	Label=GemRB.GetControl (TextScreen, 0x10000000)
-	GemRB.SetText (TextScreen, Label, Value)
+	Table = GemRB.LoadTableObject ("chapters")
+	Value = Table.GetValue (Chapter+1, 0)
+	Label=TextScreen.GetControl (0x10000000)
+	Label.SetText (Value)
 
 	#done
-	Button=GemRB.GetControl (TextScreen, 0)
-	GemRB.SetText (TextScreen, Button, 11973)
-	GemRB.SetEvent (TextScreen, Button, IE_GUI_BUTTON_ON_PRESS, "EndTextScreen")
-	GemRB.SetButtonFlags (TextScreen, Button, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	Button=TextScreen.GetControl (0)
+	Button.SetText (11973)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "EndTextScreen")
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	#replay
-	Button=GemRB.GetControl (TextScreen, 3)
-	GemRB.SetText (TextScreen, Button, 16510)
-	GemRB.SetEvent (TextScreen, Button, IE_GUI_BUTTON_ON_PRESS, "ReplayTextScreen")
+	Button=TextScreen.GetControl (3)
+	Button.SetText (16510)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ReplayTextScreen")
 
 	GemRB.HideGUI ()
 	GemRB.SetVisible (0, 0) #removing the gamecontrol screen
-	GemRB.SetVisible (TextScreen, 1)
-	GemRB.RewindTA (TextScreen, TextArea, 200)
+	TextScreen.SetVisible (1)
+	TextArea.Rewind (200)
 	GemRB.DisplayString (17556, 0xff0000)
 	GemRB.GamePause(1, 1)
 	return
@@ -75,24 +74,24 @@ def StartTextScreen ():
 def FeedScroll ():
 	global TextScreen, TextArea
 
-	Table = GemRB.LoadTable ("chapters")
-	Value = GemRB.GetTableValue (Table, Chapter+1, 1)
-	GemRB.UnloadTable (Table)
-	GemRB.TextAreaAppend (TextScreen, TextArea, Value, -1, 6)
+	Table = GemRB.LoadTableObject ("chapters")
+	Value = Table.GetValue (Chapter+1, 1)
+	TextArea.Append (Value, -1, 6)
 	return
 
 def ReplayTextScreen ():
 	global TextScreen, TextArea
 
-	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
-	GemRB.RewindTA (TextScreen, TextArea, 200)
+	TextArea.SetEvent (IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
+	TextArea.Rewind (200)
 	return
 
 def EndTextScreen ():
 	global TextScreen
 
-	GemRB.SetVisible (TextScreen, 0)
-	GemRB.UnloadWindow (TextScreen)
+	TextScreen.SetVisible (0)
+	if TextScreen:
+		TextScreen.Unload ()
 	GemRB.SetVisible (0, 1) #enabling gamecontrol screen
 	GemRB.UnhideGUI ()
 	GemRB.GamePause(0, 1)

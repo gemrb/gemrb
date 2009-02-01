@@ -18,7 +18,7 @@ PointsLeft = 0
 # returns the number of feat levels (for example cleave can be taken twice)
 def MultiLevelFeat(feat):
 	global FeatReqTable
-	return GemRB.GetTableValue(FeatReqTable, feat, "MAX_LEVEL")
+	return FeatReqTable.GetValue(feat, "MAX_LEVEL")
 
 # FIXME: CheckFeatCondition doesn't check for higher level prerequisites
 # (eg. cleave2 needs +4 BAB and weapon specialisation needs 4 fighter levels)
@@ -35,23 +35,23 @@ def MultiLevelFeat(feat):
 def IsFeatUsable(feat):
 	global FeatReqTable
 
-	a_value = GemRB.GetTableValue(FeatReqTable, feat, "A_VALUE")
+	a_value = FeatReqTable.GetValue(feat, "A_VALUE")
 	if a_value<0:
 		#string
-		a_stat = GemRB.GetTableValue(FeatReqTable, feat, "A_STAT", 0)
+		a_stat = FeatReqTable.GetValue(feat, "A_STAT", 0)
 	else:
 		#stat
-		a_stat = GemRB.GetTableValue(FeatReqTable, feat, "A_STAT",2)
-	b_stat = GemRB.GetTableValue(FeatReqTable, feat, "B_STAT",2)
-	c_stat = GemRB.GetTableValue(FeatReqTable, feat, "C_STAT",2)
-	d_stat = GemRB.GetTableValue(FeatReqTable, feat, "D_STAT",2)
-	b_value = GemRB.GetTableValue(FeatReqTable, feat, "B_VALUE")
-	c_value = GemRB.GetTableValue(FeatReqTable, feat, "C_VALUE")
-	d_value = GemRB.GetTableValue(FeatReqTable, feat, "D_VALUE")
-	a_op = GemRB.GetTableValue(FeatReqTable, feat, "A_OP")
-	b_op = GemRB.GetTableValue(FeatReqTable, feat, "B_OP")
-	c_op = GemRB.GetTableValue(FeatReqTable, feat, "C_OP")
-	d_op = GemRB.GetTableValue(FeatReqTable, feat, "D_OP")
+		a_stat = FeatReqTable.GetValue(feat, "A_STAT",2)
+	b_stat = FeatReqTable.GetValue(feat, "B_STAT",2)
+	c_stat = FeatReqTable.GetValue(feat, "C_STAT",2)
+	d_stat = FeatReqTable.GetValue(feat, "D_STAT",2)
+	b_value = FeatReqTable.GetValue(feat, "B_VALUE")
+	c_value = FeatReqTable.GetValue(feat, "C_VALUE")
+	d_value = FeatReqTable.GetValue(feat, "D_VALUE")
+	a_op = FeatReqTable.GetValue(feat, "A_OP")
+	b_op = FeatReqTable.GetValue(feat, "B_OP")
+	c_op = FeatReqTable.GetValue(feat, "C_OP")
+	d_op = FeatReqTable.GetValue(feat, "D_OP")
 	slot = GemRB.GetVar("Slot")
 
 	return GemRB.CheckFeatCondition(slot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value, a_op, b_op, c_op, d_op)
@@ -61,8 +61,8 @@ def IsFeatUsable(feat):
 def GetBaseValue(feat):
 	global FeatsClassColumn, RaceColumn, KitName
 
-	Val1 = GemRB.GetTableValue(FeatTable, feat, FeatsClassColumn)
-	Val2 = GemRB.GetTableValue(FeatTable, feat, RaceColumn)
+	Val1 = FeatTable.GetValue(feat, FeatsClassColumn)
+	Val2 = FeatTable.GetValue(feat, RaceColumn)
 	if Val2 < Val1:
 		Val = Val1
 	else:
@@ -71,9 +71,9 @@ def GetBaseValue(feat):
 	Val3 = 0
 	# only cleric kits have feat bonuses in the original, but the column names are shortened
 	KitName = KitName.replace("CLERIC_","C_")
-	KitColumn = GemRB.GetTableColumnIndex(FeatTable, KitName)
+	KitColumn = FeatTable.GetColumnIndex(KitName)
 	if KitColumn != 0:
-		Val3 = GemRB.GetTableValue(FeatTable, feat, KitColumn)
+		Val3 = FeatTable.GetValue(feat, KitColumn)
 		if Val3 > Val:
 			Val = Val3
 
@@ -82,79 +82,79 @@ def GetBaseValue(feat):
 def RedrawFeats():
 	global TopIndex, PointsLeft, FeatWindow, FeatReqTable
 
-	SumLabel = GemRB.GetControl(FeatWindow, 0x1000000c)
+	SumLabel = FeatWindow.GetControl(0x1000000c)
 	if PointsLeft == 0:
-		GemRB.SetButtonState(FeatWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
-		GemRB.SetLabelTextColor(FeatWindow,SumLabel, 255, 255, 255)
+		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+		SumLabel.SetTextColor(255, 255, 255)
 	else:
-		GemRB.SetButtonState(FeatWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
-		GemRB.SetLabelTextColor(FeatWindow,SumLabel, 255, 255, 0)
+		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+		SumLabel.SetTextColor(255, 255, 0)
 
-	GemRB.SetText(FeatWindow, SumLabel, str(PointsLeft) )
+	SumLabel.SetText(str(PointsLeft) )
 
 	for i in range(0,10):
 		Pos=TopIndex+i
-		FeatName = GemRB.GetTableValue(FeatTable, Pos, 1)
-		Label = GemRB.GetControl(FeatWindow, 0x10000001+i)
-		GemRB.SetText(FeatWindow, Label, FeatName)
+		FeatName = FeatTable.GetValue(Pos, 1)
+		Label = FeatWindow.GetControl(0x10000001+i)
+		Label.SetText(FeatName)
 
-		FeatName=GemRB.GetTableRowName(FeatTable, Pos) #row name
+		FeatName=FeatTable.GetRowName(Pos) #row name
 		FeatValue = GemRB.GetVar("Feat "+str(Pos))
 
-		ButtonPlus = GemRB.GetControl(FeatWindow, i*2+14)
-		ButtonMinus = GemRB.GetControl(FeatWindow, i*2+15)
+		ButtonPlus = FeatWindow.GetControl(i*2+14)
+		ButtonMinus = FeatWindow.GetControl(i*2+15)
 		if FeatValue == 0:
-			GemRB.SetButtonState(FeatWindow, ButtonMinus, IE_GUI_BUTTON_DISABLED)
+			ButtonMinus.SetState(IE_GUI_BUTTON_DISABLED)
 			# check if feat is usable - can be taken
 			if IsFeatUsable(FeatName):
-				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_ENABLED)
-				GemRB.SetLabelTextColor(FeatWindow, Label, 255, 255, 255)
+				ButtonPlus.SetState(IE_GUI_BUTTON_ENABLED)
+				Label.SetTextColor(255, 255, 255)
 			else:
-				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
-				GemRB.SetLabelTextColor(FeatWindow, Label, 150, 150, 150)
+				ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
+				Label.SetTextColor(150, 150, 150)
 		else:
 			# check for maximum if there are more feat levels
 			# FIXME also verify that the next level of the feat is usable
 			if MultiLevelFeat(FeatName) > FeatValue:
-				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_ENABLED)
-				GemRB.SetLabelTextColor(FeatWindow, Label, 255, 255, 255)
+				ButtonPlus.SetState(IE_GUI_BUTTON_ENABLED)
+				Label.SetTextColor(255, 255, 255)
 			else:
-				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
-				GemRB.SetLabelTextColor(FeatWindow, Label, 150, 150, 150)
+				ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
+				Label.SetTextColor(150, 150, 150)
 			BaseValue = GemRB.GetVar("BaseFeatValue " + str(Pos))
 			if FeatValue > BaseValue:
-				GemRB.SetButtonState(FeatWindow, ButtonMinus, IE_GUI_BUTTON_ENABLED)
+				ButtonMinus.SetState(IE_GUI_BUTTON_ENABLED)
 			else:
-				GemRB.SetButtonState(FeatWindow, ButtonMinus, IE_GUI_BUTTON_DISABLED)
+				ButtonMinus.SetState(IE_GUI_BUTTON_DISABLED)
 
 		if PointsLeft == 0:
-			GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
-			GemRB.SetLabelTextColor(FeatWindow, Label, 150, 150, 150)
+			ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
+			Label.SetTextColor(150, 150, 150)
 
-		levels = GemRB.GetTableValue(FeatReqTable, FeatName, "MAX_LEVEL")
+		levels = FeatReqTable.GetValue(FeatName, "MAX_LEVEL")
 		FeatValueCounter = FeatValue
 		# count backwards, since the controls follow each other in rtl order,
 		# while we need to change the bams in ltr order
 		for j in range(4, -1, -1):
-			Star = GemRB.GetControl(FeatWindow, i*5+j+36)
+			Star = FeatWindow.GetControl(i*5+j+36)
 			if 5 - j - 1 < levels:
 				# the star should be there, but which one?
 				if FeatValueCounter > 0:
 					# the full one - the character has already taken a level of this feat
-					GemRB.SetButtonState(FeatWindow, Star, IE_GUI_BUTTON_LOCKED)
-					GemRB.SetButtonBAM(FeatWindow, Star, "GUIPFC", 0, 0, -1)
-					GemRB.SetButtonFlags(FeatWindow, Star, IE_GUI_BUTTON_PICTURE, OP_OR)
+					Star.SetState(IE_GUI_BUTTON_LOCKED)
+					Star.SetBAM("GUIPFC", 0, 0, -1)
+					Star.SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR)
 					FeatValueCounter = FeatValueCounter - 1
 				else:
 					# the empty one - the character hasn't taken any levels of this feat yet
-					GemRB.SetButtonState(FeatWindow, Star, IE_GUI_BUTTON_LOCKED)
-					GemRB.SetButtonBAM(FeatWindow, Star, "GUIPFC", 0, 1, -1)
-					GemRB.SetButtonFlags(FeatWindow, Star, IE_GUI_BUTTON_PICTURE, OP_OR)
+					Star.SetState(IE_GUI_BUTTON_LOCKED)
+					Star.SetBAM("GUIPFC", 0, 1, -1)
+					Star.SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR)
 			else:
 				# no star, no bad bam crap
-				GemRB.SetButtonState(FeatWindow, Star, IE_GUI_BUTTON_DISABLED)
-				GemRB.SetButtonFlags(FeatWindow, Star, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-				GemRB.SetButtonFlags(FeatWindow, Star, IE_GUI_BUTTON_PICTURE, OP_NAND)
+				Star.SetState(IE_GUI_BUTTON_DISABLED)
+				Star.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+				Star.SetFlags(IE_GUI_BUTTON_PICTURE, OP_NAND)
 	return
 
 def ScrollBarPress():
@@ -173,33 +173,33 @@ def OnLoad():
 	GemRB.SetVar("Level",1) #for simplicity
 
 	Race = GemRB.GetVar("Race")
-	RaceTable = GemRB.LoadTable("races")
-	RaceColumn = GemRB.FindTableValue(RaceTable, 3, Race)
-	RaceName = GemRB.GetTableRowName(RaceTable, RaceColumn)
+	RaceTable = GemRB.LoadTableObject("races")
+	RaceColumn = RaceTable.FindValue(3, Race)
+	RaceName = RaceTable.GetRowName(RaceColumn)
 	# could use column ID as well, but they tend to change :)
-	RaceColumn = GemRB.GetTableValue(RaceTable, RaceName, "SKILL_COLUMN")
+	RaceColumn = RaceTable.GetValue(RaceName, "SKILL_COLUMN")
 
 	Class = GemRB.GetVar("Class") - 1
-	ClassTable = GemRB.LoadTable("classes")
-	KitName = GemRB.GetTableRowName(ClassTable, Class)
+	ClassTable = GemRB.LoadTableObject("classes")
+	KitName = ClassTable.GetRowName(Class)
 	# classcolumn is base class or 0 if it is not a kit
-	ClassColumn = GemRB.GetTableValue(ClassTable, Class, 3) - 1
+	ClassColumn = ClassTable.GetValue(Class, 3) - 1
 	if ClassColumn < 0:  #it was already a base class
 		ClassColumn = Class
-		FeatsClassColumn = GemRB.GetTableValue(ClassTable, Class, 2) + 2
+		FeatsClassColumn = ClassTable.GetValue(Class, 2) + 2
 	else:
-		FeatsClassColumn = GemRB.GetTableValue(ClassTable, Class, 3) + 2
+		FeatsClassColumn = ClassTable.GetValue(Class, 3) + 2
 
-	FeatTable = GemRB.LoadTable("feats")
-	RowCount = GemRB.GetTableRowCount(FeatTable)
-	FeatReqTable = GemRB.LoadTable("featreq")
+	FeatTable = GemRB.LoadTableObject("feats")
+	RowCount = FeatTable.GetRowCount()
+	FeatReqTable = GemRB.LoadTableObject("featreq")
 
 	for i in range(RowCount):
 		GemRB.SetVar("Feat "+str(i), GetBaseValue(i))
 		GemRB.SetVar("BaseFeatValue " + str(i), GetBaseValue(i))
 
-	FeatLevelTable = GemRB.LoadTable("featlvl")
-	FeatClassTable = GemRB.LoadTable("featclas")
+	FeatLevelTable = GemRB.LoadTableObject("featlvl")
+	FeatClassTable = GemRB.LoadTableObject("featclas")
 	#calculating the number of new feats for the next level
 	PointsLeft = 0
 	#levels start with 1
@@ -208,71 +208,70 @@ def OnLoad():
 	#this one exists only for clerics
 	# Although it should be made extendable to all kits
 	# A FEAT_COLUMN is needed in classes.2da or better yet, a whole new 2da
-	if GemRB.GetTableValue(ClassTable, Class, 3) == "CLERIC":
+	if ClassTable.GetValue(Class, 3) == "CLERIC":
 		ClassColumn += 3
 		if KitColumn:
 			KitColumn = 3 + KitColumn + 11
 
 	#Always raise one level at once
-	PointsLeft += GemRB.GetTableValue(FeatLevelTable, Level, 0)
-	PointsLeft += GemRB.GetTableValue(FeatClassTable, Level, ClassColumn)
+	PointsLeft += FeatLevelTable.GetValue(Level, 0)
+	PointsLeft += FeatClassTable.GetValue(Level, ClassColumn)
 	
 	#racial abilities which seem to be hardcoded in the IWD2 engine
 	#are implemented in races.2da
 	if Level<1:
-		TmpTable = GemRB.LoadTable('races')
-		PointsLeft += GemRB.GetTableValue(TmpTable,RaceName,'FEATBONUS')
-		GemRB.UnloadTable(TmpTable)
+		TmpTable = GemRB.LoadTableObject('races')
+		PointsLeft += TmpTable.GetValue(RaceName,'FEATBONUS')
 	###
 	
 	GemRB.SetToken("number",str(PointsLeft) )
 
 	GemRB.LoadWindowPack("GUICG", 800, 600)
-	FeatWindow = GemRB.LoadWindow(55)
+	FeatWindow = GemRB.LoadWindowObject(55)
 	for i in range(10):
-		Button = GemRB.GetControl(FeatWindow, i+93)
-		GemRB.SetVarAssoc(FeatWindow, Button, "Feat",i)
-		GemRB.SetEvent(FeatWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
+		Button = FeatWindow.GetControl(i+93)
+		Button.SetVarAssoc("Feat",i)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "JustPress")
 
-		Button = GemRB.GetControl(FeatWindow, i*2+14)
-		GemRB.SetVarAssoc(FeatWindow, Button, "Feat",i)
-		GemRB.SetEvent(FeatWindow, Button, IE_GUI_BUTTON_ON_PRESS, "LeftPress")
+		Button = FeatWindow.GetControl(i*2+14)
+		Button.SetVarAssoc("Feat",i)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
 
-		Button = GemRB.GetControl(FeatWindow, i*2+15)
-		GemRB.SetVarAssoc(FeatWindow, Button, "Feat",i)
-		GemRB.SetEvent(FeatWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RightPress")
+		Button = FeatWindow.GetControl(i*2+15)
+		Button.SetVarAssoc("Feat",i)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "RightPress")
 		for j in range(5):
-			Star=GemRB.GetControl(FeatWindow, i*5+j+36)
-			GemRB.SetButtonState(FeatWindow, Star, IE_GUI_BUTTON_DISABLED)
-			GemRB.SetButtonFlags(FeatWindow, Star, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+			Star=FeatWindow.GetControl(i*5+j+36)
+			Star.SetState(IE_GUI_BUTTON_DISABLED)
+			Star.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 
-	BackButton = GemRB.GetControl(FeatWindow,105)
-	GemRB.SetText(FeatWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl(FeatWindow,0)
-	GemRB.SetText(FeatWindow,DoneButton,36789)
-	GemRB.SetButtonFlags(FeatWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	BackButton = FeatWindow.GetControl(105)
+	BackButton.SetText(15416)
+	DoneButton = FeatWindow.GetControl(0)
+	DoneButton.SetText(36789)
+	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	TextAreaControl = GemRB.GetControl(FeatWindow, 92)
-	GemRB.SetText(FeatWindow,TextAreaControl,36476)
+	TextAreaControl = FeatWindow.GetControl(92)
+	TextAreaControl.SetText(36476)
 
-	ScrollBarControl = GemRB.GetControl(FeatWindow, 104)
-	GemRB.SetEvent(FeatWindow, ScrollBarControl,IE_GUI_SCROLLBAR_ON_CHANGE,"ScrollBarPress")
+	ScrollBarControl = FeatWindow.GetControl(104)
+	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE,"ScrollBarPress")
 	#decrease it with the number of controls on screen (list size)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
-	GemRB.SetVarAssoc(FeatWindow, ScrollBarControl, "TopIndex",RowCount-10)
-	GemRB.SetDefaultScrollBar (FeatWindow, ScrollBarControl)
+	ScrollBarControl.SetVarAssoc("TopIndex",RowCount-10)
+	ScrollBarControl.SetDefaultScrollBar ()
 
-	GemRB.SetEvent(FeatWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	GemRB.SetEvent(FeatWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	RedrawFeats()
-	GemRB.SetVisible(FeatWindow,1)
+	FeatWindow.SetVisible(1)
 	return
 
 
 def JustPress():
 	Pos = GemRB.GetVar("Feat")+TopIndex
-	GemRB.SetText(FeatWindow, TextAreaControl, GemRB.GetTableValue(FeatTable,Pos,2) )
+	TextAreaControl.SetText(FeatTable.GetValue(Pos,2) )
 	return
 
 def RightPress():
@@ -280,7 +279,7 @@ def RightPress():
 
 	Pos = GemRB.GetVar("Feat")+TopIndex
 
-	GemRB.SetText(FeatWindow, TextAreaControl, GemRB.GetTableValue(FeatTable,Pos,2) )
+	TextAreaControl.SetText(FeatTable.GetValue(Pos,2) )
 	ActPoint = GemRB.GetVar("Feat "+str(Pos) )
 	BaseValue = GemRB.GetVar("BaseFeatValue " + str(Pos))
 	if ActPoint <= 0 or ActPoint <= BaseValue:
@@ -295,7 +294,7 @@ def LeftPress():
 
 	Pos = GemRB.GetVar("Feat")+TopIndex
 
-	GemRB.SetText(FeatWindow, TextAreaControl, GemRB.GetTableValue(FeatTable,Pos,2) )
+	TextAreaControl.SetText(FeatTable.GetValue(Pos,2) )
 	if PointsLeft < 1:
 		return
 	ActPoint = GemRB.GetVar("Feat "+str(Pos) )
@@ -307,15 +306,17 @@ def LeftPress():
 	return
 
 def BackPress():
-	GemRB.UnloadWindow(FeatWindow)
-	for i in range(GemRB.GetTableRowCount(FeatTable)):
+	if FeatWindow:
+		FeatWindow.Unload()
+	for i in range(FeatTable.GetRowCount()):
 		GemRB.SetVar("Feat "+str(i),0)
 	GemRB.SetNextScript("Skills")
 	return
 
 def NextPress():
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
-	GemRB.UnloadWindow(FeatWindow)
+	if FeatWindow:
+		FeatWindow.Unload()
 	GemRB.SetNextScript("CharGen7")
 	return
 

@@ -12,38 +12,38 @@ def OnLoad():
 	
 	PartyCount = GemRB.GetINIPartyCount()
 	
-	PartySelectWindow = GemRB.LoadWindow(10)
-	GemRB.SetWindowFrame( PartySelectWindow)
-	TextArea = GemRB.GetControl(PartySelectWindow, 6)
-	ScrollBar = GemRB.GetControl(PartySelectWindow, 8)
-	GemRB.SetEvent(PartySelectWindow, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
-	GemRB.SetVarAssoc(PartySelectWindow, ScrollBar, "TopIndex", PartyCount)
+	PartySelectWindow = GemRB.LoadWindowObject(10)
+	PartySelectWindow.SetFrame( )
+	TextArea = PartySelectWindow.GetControl(6)
+	ScrollBar = PartySelectWindow.GetControl(8)
+	ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
+	ScrollBar.SetVarAssoc("TopIndex", PartyCount)
 	
-	ModifyButton = GemRB.GetControl(PartySelectWindow, 12)
-	GemRB.SetEvent(PartySelectWindow, ModifyButton, IE_GUI_BUTTON_ON_PRESS, "ModifyPress")
-	GemRB.SetText(PartySelectWindow, ModifyButton, 10316)
+	ModifyButton = PartySelectWindow.GetControl(12)
+	ModifyButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ModifyPress")
+	ModifyButton.SetText(10316)
 
-	CancelButton = GemRB.GetControl(PartySelectWindow, 11)
-	GemRB.SetEvent(PartySelectWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.SetText(PartySelectWindow, CancelButton, 13727)
+	CancelButton = PartySelectWindow.GetControl(11)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CancelButton.SetText(13727)
 
-	DoneButton = GemRB.GetControl(PartySelectWindow, 10)
-	GemRB.SetEvent(PartySelectWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
-	GemRB.SetText(PartySelectWindow, DoneButton, 11973)
-	GemRB.SetButtonFlags(PartySelectWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton = PartySelectWindow.GetControl(10)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	DoneButton.SetText(11973)
+	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 	
 	GemRB.SetVar("PartyIdx",0)
 	GemRB.SetVar("TopIndex",0)
 	
 	for i in range(0,PARTY_SIZE):
-		Button = GemRB.GetControl(PartySelectWindow,i)
-		GemRB.SetButtonFlags(PartySelectWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		GemRB.SetEvent(PartySelectWindow, Button, IE_GUI_BUTTON_ON_PRESS, "PartyButtonPress")
+		Button = PartySelectWindow.GetControl(i)
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "PartyButtonPress")
 	
 	ScrollBarPress()
 	PartyButtonPress()
 	
-	GemRB.SetVisible(PartySelectWindow, 1)
+	PartySelectWindow.SetVisible(1)
 	
 	return
 
@@ -52,28 +52,29 @@ def ScrollBarPress():
 	Pos = GemRB.GetVar("TopIndex")
 	for i in range(0,PARTY_SIZE):
 		ActPos = Pos + i
-		Button = GemRB.GetControl(PartySelectWindow, i)
-		GemRB.SetText(PartySelectWindow, Button, "")
-		GemRB.SetVarAssoc(PartySelectWindow, Button, "PartyIdx",-1)
+		Button = PartySelectWindow.GetControl(i)
+		Button.SetText("")
+		Button.SetVarAssoc("PartyIdx",-1)
 		if ActPos<PartyCount:
-			GemRB.SetButtonState(PartySelectWindow, Button, IE_GUI_BUTTON_ENABLED)
+			Button.SetState(IE_GUI_BUTTON_ENABLED)
 		else:
-			GemRB.SetButtonState(PartySelectWindow, Button, IE_GUI_BUTTON_DISABLED)
+			Button.SetState(IE_GUI_BUTTON_DISABLED)
 
 	for i in range(0,PARTY_SIZE):
 		ActPos = Pos + i
-		Button = GemRB.GetControl(PartySelectWindow, i)
+		Button = PartySelectWindow.GetControl(i)
 		if ActPos<PartyCount:
-			GemRB.SetVarAssoc(PartySelectWindow, Button, "PartyIdx",ActPos)
+			Button.SetVarAssoc("PartyIdx",ActPos)
 			Tag = "Party " + str(ActPos)
 			PartyDesc = GemRB.GetINIPartyKey(Tag, "Name", "")					
-			GemRB.SetText(PartySelectWindow, Button, PartyDesc)
+			Button.SetText(PartyDesc)
 	return
 
 def ModifyPress():
 	Pos = GemRB.GetVar("PartyIdx")
 	if Pos == 0: # first entry - behaves same as pressing on done
-		GemRB.UnloadWindow(PartySelectWindow)
+		if PartySelectWindow:
+			PartySelectWindow.Unload()
 		GemRB.LoadGame(-1)
 		GemRB.SetNextScript("SPPartyFormation")
 	#else: # here come the real modifications
@@ -82,11 +83,13 @@ def DonePress():
 	global PartySelectWindow
 	Pos = GemRB.GetVar("PartyIdx")
 	if Pos == 0:
-		GemRB.UnloadWindow(PartySelectWindow)
+		if PartySelectWindow:
+			PartySelectWindow.Unload()
 		GemRB.LoadGame(-1)
 		GemRB.SetNextScript("SPPartyFormation")
 	else:
-		GemRB.UnloadWindow(PartySelectWindow)
+		if PartySelectWindow:
+			PartySelectWindow.Unload()
 		GemRB.LoadGame(-1)
 		#here we should load the party characters
 		#but gemrb engine limitations require us to
@@ -96,7 +99,8 @@ def DonePress():
 	
 def CancelPress():
 	global PartySelectWindow
-	GemRB.UnloadWindow(PartySelectWindow)
+	if PartySelectWindow:
+		PartySelectWindow.Unload()
 	GemRB.SetNextScript("Start")
 	return
 	
@@ -112,7 +116,7 @@ def PartyButtonPress():
 			NewString = NewString + "\n\n"
 			PartyDesc = PartyDesc + NewString
 	
-	GemRB.SetText(PartySelectWindow, TextArea, PartyDesc)
+	TextArea.SetText(PartyDesc)
 	return
 
 #loading characters from party.ini

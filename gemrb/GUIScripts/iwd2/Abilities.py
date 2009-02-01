@@ -14,32 +14,32 @@ KitIndex = 0
 def CalcLimits(Abidx):
 	global Minimum, Maximum, Add
 
-	RaceTable = GemRB.LoadTable("races")
-	Abracead = GemRB.LoadTable("ABRACEAD")
+	RaceTable = GemRB.LoadTableObject("races")
+	Abracead = GemRB.LoadTableObject("ABRACEAD")
 	RaceID = GemRB.GetVar("Race")
-	RowIndex = GemRB.FindTableValue(RaceTable, 3, RaceID)
-	RaceName = GemRB.GetTableRowName(RaceTable, RowIndex)
+	RowIndex = RaceTable.FindValue(3, RaceID)
+	RaceName = RaceTable.GetRowName(RowIndex)
 
 	Minimum = 3
 	Maximum = 18
 
-	Abclasrq = GemRB.LoadTable("ABCLASRQ")
-	tmp = GemRB.GetTableValue(Abclasrq, KitIndex, Abidx)
+	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
+	tmp = Abclasrq.GetValue(KitIndex, Abidx)
 	if tmp!=0 and tmp>Minimum:
 		Minimum = tmp
 
-	Abracerq = GemRB.LoadTable("ABRACERQ")
-	Race = GemRB.GetTableRowIndex(Abracerq, RaceName)
-	tmp = GemRB.GetTableValue(Abracerq, Race, Abidx*2)
+	Abracerq = GemRB.LoadTableObject("ABRACERQ")
+	Race = Abracerq.GetRowIndex(RaceName)
+	tmp = Abracerq.GetValue(Race, Abidx*2)
 	if tmp!=0 and tmp>Minimum:
 		Minimum = tmp
 
-	tmp = GemRB.GetTableValue(Abracerq, Race, Abidx*2+1)
+	tmp = Abracerq.GetValue(Race, Abidx*2+1)
 	if tmp!=0 and tmp>Maximum:
 		Maximum = tmp
 
-	Race = GemRB.GetTableRowIndex(Abracead, RaceName)
-	Add = GemRB.GetTableValue(Abracead, Race, Abidx)
+	Race = Abracead.GetRowIndex(RaceName)
+	Add = Abracead.GetValue(Race, Abidx)
 	Maximum = Maximum + Add
 	Minimum = Minimum + Add
 	if Minimum<1:
@@ -50,31 +50,31 @@ def CalcLimits(Abidx):
 def RollPress():
 	global PointsLeft, Add
 
-	GemRB.InvalidateWindow(AbilityWindow)
+	AbilityWindow.Invalidate()
 	GemRB.SetVar("Ability",0)
-	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
-	GemRB.SetLabelTextColor(AbilityWindow,SumLabel, 255, 255, 0)
+	SumLabel = AbilityWindow.GetControl(0x10000002)
+	SumLabel.SetTextColor(255, 255, 0)
 	PointsLeft=16
-	GemRB.SetLabelUseRGB(AbilityWindow, SumLabel, 1)
-	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft))
+	SumLabel.SetUseRGB(1)
+	SumLabel.SetText(str(PointsLeft))
 
 	for i in range(0,6):
 		CalcLimits(i)
 		v = 10+Add
 		b = v//2-5
 		GemRB.SetVar("Ability "+str(i), v )
-		Label = GemRB.GetControl(AbilityWindow, 0x10000003+i)
-		GemRB.SetText(AbilityWindow, Label, str(v) )
+		Label = AbilityWindow.GetControl(0x10000003+i)
+		Label.SetText(str(v) )
 
-		Label = GemRB.GetControl(AbilityWindow, 0x10000024+i)
-		GemRB.SetLabelUseRGB(AbilityWindow, Label, 1)
+		Label = AbilityWindow.GetControl(0x10000024+i)
+		Label.SetUseRGB(1)
 		if b<0:
-			GemRB.SetLabelTextColor(AbilityWindow,Label,255,0,0)
+			Label.SetTextColor(255,0,0)
 		elif b>0:
-			GemRB.SetLabelTextColor(AbilityWindow,Label,0,255,0)
+			Label.SetTextColor(0,255,0)
 		else:
-			GemRB.SetLabelTextColor(AbilityWindow,Label,255,255,255)
-		GemRB.SetText(AbilityWindow, Label, "%+d"%(b))
+			Label.SetTextColor(255,255,255)
+		Label.SetText("%+d"%(b))
 	return
 
 def OnLoad():
@@ -86,82 +86,82 @@ def OnLoad():
 	#enable repeated clicks
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	Kit = GemRB.GetVar("Class Kit")
-	ClassTable = GemRB.LoadTable("classes")
+	ClassTable = GemRB.LoadTableObject("classes")
 	Class = GemRB.GetVar("Class")-1
 	if Kit == 0:
-		KitName = GemRB.GetTableRowName(ClassTable, Class)
+		KitName = ClassTable.GetRowName(Class)
 	else:
-		KitList = GemRB.LoadTable("kitlist")
+		KitList = GemRB.LoadTableObject("kitlist")
 		#rowname is just a number, first value row what we need here
-		KitName = GemRB.GetTableValue(KitList, Kit, 0) 
+		KitName = KitList.GetValue(Kit, 0) 
 
-	Abclasrq = GemRB.LoadTable("ABCLASRQ")
-	KitIndex = GemRB.GetTableRowIndex(Abclasrq, KitName)
+	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
+	KitIndex = Abclasrq.GetRowIndex(KitName)
 
 	GemRB.LoadWindowPack("GUICG", 800 ,600)
-	AbilityTable = GemRB.LoadTable("ability")
-	AbilityWindow = GemRB.LoadWindow(4)
+	AbilityTable = GemRB.LoadTableObject("ability")
+	AbilityWindow = GemRB.LoadWindowObject(4)
 
 	RollPress()
 	for i in range(0,6):
-		Button = GemRB.GetControl(AbilityWindow, i+30)
-		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
-		GemRB.SetVarAssoc(AbilityWindow, Button, "Ability", i)
+		Button = AbilityWindow.GetControl(i+30)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "JustPress")
+		Button.SetVarAssoc("Ability", i)
 
-		Button = GemRB.GetControl(AbilityWindow, i*2+16)
-		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "LeftPress")
-		GemRB.SetVarAssoc(AbilityWindow, Button, "Ability", i )
+		Button = AbilityWindow.GetControl(i*2+16)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
+		Button.SetVarAssoc("Ability", i )
 
-		Button = GemRB.GetControl(AbilityWindow, i*2+17)
-		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RightPress")
-		GemRB.SetVarAssoc(AbilityWindow, Button, "Ability", i )
+		Button = AbilityWindow.GetControl(i*2+17)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "RightPress")
+		Button.SetVarAssoc("Ability", i )
 
-	BackButton = GemRB.GetControl(AbilityWindow,36)
-	GemRB.SetText(AbilityWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl(AbilityWindow,0)
-	GemRB.SetText(AbilityWindow,DoneButton,36789)
-	GemRB.SetButtonState(AbilityWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetButtonFlags(AbilityWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	BackButton = AbilityWindow.GetControl(36)
+	BackButton.SetText(15416)
+	DoneButton = AbilityWindow.GetControl(0)
+	DoneButton.SetText(36789)
+	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	TextAreaControl = GemRB.GetControl(AbilityWindow, 29)
-	GemRB.SetText(AbilityWindow,TextAreaControl,17247)
+	TextAreaControl = AbilityWindow.GetControl(29)
+	TextAreaControl.SetText(17247)
 
-	GemRB.SetEvent(AbilityWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	GemRB.SetEvent(AbilityWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	GemRB.SetVisible(AbilityWindow,1)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	AbilityWindow.SetVisible(1)
 	return
 
 def RightPress():
 	global PointsLeft
 
-	GemRB.InvalidateWindow(AbilityWindow)
+	AbilityWindow.Invalidate()
 	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	#should be more elaborate
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
-	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, Abidx, 1) )
+	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
 	if Ability<=Minimum:
 		return
 	Ability -= 1
 	GemRB.SetVar("Ability "+str(Abidx), Ability)
 	PointsLeft = PointsLeft + 1
-	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
-	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft) )
-	GemRB.SetLabelTextColor(AbilityWindow,SumLabel, 255, 255, 0)
-	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
-	GemRB.SetText(AbilityWindow, Label, str(Ability) )
-	Label = GemRB.GetControl(AbilityWindow, 0x10000024+Abidx)
+	SumLabel = AbilityWindow.GetControl(0x10000002)
+	SumLabel.SetText(str(PointsLeft) )
+	SumLabel.SetTextColor(255, 255, 0)
+	Label = AbilityWindow.GetControl(0x10000003+Abidx)
+	Label.SetText(str(Ability) )
+	Label = AbilityWindow.GetControl(0x10000024+Abidx)
 	b = Ability // 2 - 5
 	if b<0:
-		GemRB.SetLabelTextColor(AbilityWindow,Label,255,0,0)
+		Label.SetTextColor(255,0,0)
 	elif b>0:
-		GemRB.SetLabelTextColor(AbilityWindow,Label,0,255,0)
+		Label.SetTextColor(0,255,0)
 	else:
-		GemRB.SetLabelTextColor(AbilityWindow,Label,255,255,255)
-	GemRB.SetText(AbilityWindow, Label, "%+d"%(b))
-	GemRB.SetButtonState(AbilityWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+		Label.SetTextColor(255,255,255)
+	Label.SetText("%+d"%(b))
+	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	return
 
 def JustPress():
@@ -171,19 +171,19 @@ def JustPress():
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
-	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, Abidx, 1) )
+	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
 	return
 
 def LeftPress():
 	global PointsLeft
 
 	Abidx = GemRB.GetVar("Ability")
-	GemRB.InvalidateWindow(AbilityWindow)
+	AbilityWindow.Invalidate()
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
-	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, Abidx, 1) )
+	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
 	if PointsLeft == 0:
 		return
 	if Ability>=Maximum:  #should be more elaborate
@@ -191,35 +191,37 @@ def LeftPress():
 	Ability += 1
 	GemRB.SetVar("Ability "+str(Abidx), Ability)
 	PointsLeft = PointsLeft - 1
-	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
+	SumLabel = AbilityWindow.GetControl(0x10000002)
 	if PointsLeft == 0:
-		GemRB.SetLabelTextColor(AbilityWindow,SumLabel, 255, 255, 255)
-	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft) )
-	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
-	GemRB.SetText(AbilityWindow, Label, str(Ability) )
-	Label = GemRB.GetControl(AbilityWindow, 0x10000024+Abidx)
+		SumLabel.SetTextColor(255, 255, 255)
+	SumLabel.SetText(str(PointsLeft) )
+	Label = AbilityWindow.GetControl(0x10000003+Abidx)
+	Label.SetText(str(Ability) )
+	Label = AbilityWindow.GetControl(0x10000024+Abidx)
 	b = Ability // 2 - 5
 	if b<0:
-		GemRB.SetLabelTextColor(AbilityWindow,Label,255,0,0)
+		Label.SetTextColor(255,0,0)
 	elif b>0:
-		GemRB.SetLabelTextColor(AbilityWindow,Label,0,255,0)
+		Label.SetTextColor(0,255,0)
 	else:
-		GemRB.SetLabelTextColor(AbilityWindow,Label,255,255,255)
-	GemRB.SetText(AbilityWindow, Label, "%+d"%(b))
+		Label.SetTextColor(255,255,255)
+	Label.SetText("%+d"%(b))
 	if PointsLeft == 0:
-		GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_ENABLED)
+		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def BackPress():
 	#disable repeated clicks
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
-	GemRB.UnloadWindow(AbilityWindow)
+	if AbilityWindow:
+		AbilityWindow.Unload()
 	GemRB.SetNextScript("CharGen5")
 	for i in range(6):
 		GemRB.SetVar("Ability "+str(i),0)  #scrapping the abilities
 	return
 
 def NextPress():
-	GemRB.UnloadWindow(AbilityWindow)
+	if AbilityWindow:
+		AbilityWindow.Unload()
 	GemRB.SetNextScript("CharGen6") #skills
 	return

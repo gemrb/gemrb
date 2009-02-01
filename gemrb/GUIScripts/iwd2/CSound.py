@@ -11,45 +11,47 @@ def OnLoad():
 	
 	GemRB.LoadWindowPack("GUICG", 800,  600)
 	#this hack will redraw the base CG window
-	SoundWindow = GemRB.LoadWindow(19)
+	SoundWindow = GemRB.LoadWindowObject(19)
 	GemRB.SetVar("Sound",0)  #scrapping the sound value
 
-	BackButton = GemRB.GetControl(SoundWindow,10)
-	GemRB.SetText(SoundWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl(SoundWindow,0)
-	GemRB.SetText(SoundWindow,DoneButton,36789)
-	GemRB.SetButtonFlags(SoundWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	BackButton = SoundWindow.GetControl(10)
+	BackButton.SetText(15416)
+	DoneButton = SoundWindow.GetControl(0)
+	DoneButton.SetText(36789)
+	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	TextAreaControl = GemRB.GetControl(SoundWindow, 50)
-	GemRB.SetText(SoundWindow,TextAreaControl,17236)
+	TextAreaControl = SoundWindow.GetControl(50)
+	TextAreaControl.SetText(17236)
 
-	TextAreaControl = GemRB.GetControl(SoundWindow, 45)
-	GemRB.SetTextAreaFlags(SoundWindow, TextAreaControl,IE_GUI_TEXTAREA_SELECTABLE)
-	GemRB.SetVarAssoc(SoundWindow, TextAreaControl, "Sound", 0)
-	RowCount=GemRB.GetCharSounds(SoundWindow, TextAreaControl)
+	TextAreaControl = SoundWindow.GetControl(45)
+	TextAreaControl.SetFlags(IE_GUI_TEXTAREA_SELECTABLE)
+	TextAreaControl.SetVarAssoc("Sound", 0)
+	RowCount=TextAreaControl.GetCharSounds()
 	
-	DefaultButton = GemRB.GetControl(SoundWindow,47)
-	GemRB.SetText(SoundWindow, DefaultButton, 33479)
+	DefaultButton = SoundWindow.GetControl(47)
+	DefaultButton.SetText(33479)
 
-	GemRB.SetEvent(SoundWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	GemRB.SetEvent(SoundWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	GemRB.SetEvent(SoundWindow,DefaultButton,IE_GUI_BUTTON_ON_PRESS,"DefaultPress")
-	GemRB.SetVisible(SoundWindow,1)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DefaultButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"DefaultPress")
+	SoundWindow.SetVisible(1)
 	return
 
 def DefaultPress():
 	GemRB.SetVar("Sound",0)  #scrapping the sound value
-	GemRB.SetVarAssoc(SoundWindow, TextAreaControl, "Sound", 0)
+	TextAreaControl.SetVarAssoc("Sound", 0)
 	return
 
 def BackPress():
-	GemRB.UnloadWindow(SoundWindow)
+	if SoundWindow:
+		SoundWindow.Unload()
 	GemRB.SetNextScript("Appearance")
 	GemRB.SetVar("Sound",0)  #scrapping the sound value
 	return
 
 def NextPress():
-	GemRB.SetToken("VoiceSet", GemRB.QueryText(SoundWindow, TextAreaControl))
-	GemRB.UnloadWindow(SoundWindow)
+	GemRB.SetToken("VoiceSet", TextAreaControl.QueryText())
+	if SoundWindow:
+		SoundWindow.Unload()
 	GemRB.SetNextScript("CharGen8") #name
 	return

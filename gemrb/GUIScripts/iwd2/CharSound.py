@@ -8,106 +8,108 @@ def OnLoad():
 	global CSoundWindow, TextAreaControl
 
 	GemRB.LoadWindowPack("GUIOPT", 800, 600)
-	CSoundWindow = GemRB.LoadWindow(12)
-	GemRB.SetWindowFrame( CSoundWindow)
-	TextAreaControl = GemRB.GetControl(CSoundWindow, 16)
-	SubtitlesButton = GemRB.GetControl(CSoundWindow, 20)
-	AttackSoundButton = GemRB.GetControl(CSoundWindow, 18)
-	MovementSoundButton = GemRB.GetControl(CSoundWindow, 19)
-	CommandSoundButton = GemRB.GetControl(CSoundWindow, 21)
-	SelectionSoundButton = GemRB.GetControl(CSoundWindow, 57)
-	SubtitlesButtonB = GemRB.GetControl(CSoundWindow, 5)
-	AttackSoundButtonB = GemRB.GetControl(CSoundWindow, 6)
-	MovementSoundButtonB = GemRB.GetControl(CSoundWindow, 7)
-	CSAlwaysButtonB = GemRB.GetControl(CSoundWindow, 8)
-	CSSeldomButtonB = GemRB.GetControl(CSoundWindow, 9)
-	CSNeverButtonB = GemRB.GetControl(CSoundWindow, 10)
-	SSAlwaysButtonB = GemRB.GetControl(CSoundWindow, 58)
-	SSSeldomButtonB = GemRB.GetControl(CSoundWindow, 59)
-	SSNeverButtonB = GemRB.GetControl(CSoundWindow, 60)
-	OkButton = GemRB.GetControl(CSoundWindow, 24)
-	CancelButton = GemRB.GetControl(CSoundWindow, 25)
-	GemRB.SetText(CSoundWindow, TextAreaControl, 18041)
-	GemRB.SetText(CSoundWindow, OkButton, 11973)
-	GemRB.SetText(CSoundWindow, CancelButton, 13727)
+	CSoundWindow = GemRB.LoadWindowObject(12)
+	CSoundWindow.SetFrame( )
+	TextAreaControl = CSoundWindow.GetControl(16)
+	SubtitlesButton = CSoundWindow.GetControl(20)
+	AttackSoundButton = CSoundWindow.GetControl(18)
+	MovementSoundButton = CSoundWindow.GetControl(19)
+	CommandSoundButton = CSoundWindow.GetControl(21)
+	SelectionSoundButton = CSoundWindow.GetControl(57)
+	SubtitlesButtonB = CSoundWindow.GetControl(5)
+	AttackSoundButtonB = CSoundWindow.GetControl(6)
+	MovementSoundButtonB = CSoundWindow.GetControl(7)
+	CSAlwaysButtonB = CSoundWindow.GetControl(8)
+	CSSeldomButtonB = CSoundWindow.GetControl(9)
+	CSNeverButtonB = CSoundWindow.GetControl(10)
+	SSAlwaysButtonB = CSoundWindow.GetControl(58)
+	SSSeldomButtonB = CSoundWindow.GetControl(59)
+	SSNeverButtonB = CSoundWindow.GetControl(60)
+	OkButton = CSoundWindow.GetControl(24)
+	CancelButton = CSoundWindow.GetControl(25)
+	TextAreaControl.SetText(18041)
+	OkButton.SetText(11973)
+	CancelButton.SetText(13727)
 	
-	GemRB.SetEvent(CSoundWindow, SubtitlesButton, IE_GUI_BUTTON_ON_PRESS, "SubtitlesPress")
-	GemRB.SetEvent(CSoundWindow, SubtitlesButtonB, IE_GUI_BUTTON_ON_PRESS, "SubtitlesPress")
-	GemRB.SetButtonFlags(CSoundWindow, SubtitlesButtonB, IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetVarAssoc(CSoundWindow, SubtitlesButtonB, "Subtitles", 1)
-	GemRB.SetButtonSprites(CSoundWindow, SubtitlesButtonB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	SubtitlesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SubtitlesPress")
+	SubtitlesButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SubtitlesPress")
+	SubtitlesButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	SubtitlesButtonB.SetVarAssoc("Subtitles", 1)
+	SubtitlesButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 	
-	GemRB.SetEvent(CSoundWindow, AttackSoundButton, IE_GUI_BUTTON_ON_PRESS, "AttackSoundPress")
-	GemRB.SetEvent(CSoundWindow, AttackSoundButtonB, IE_GUI_BUTTON_ON_PRESS, "AttackSoundPress")
-	GemRB.SetButtonFlags(CSoundWindow, AttackSoundButtonB, IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetVarAssoc(CSoundWindow, AttackSoundButtonB, "Attack Sound", 1) #can't find the right variable name, this is a dummy name
-	GemRB.SetButtonSprites(CSoundWindow, AttackSoundButtonB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	AttackSoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "AttackSoundPress")
+	AttackSoundButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "AttackSoundPress")
+	AttackSoundButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	AttackSoundButtonB.SetVarAssoc("Attack Sound", 1) #can't find the right variable name, this is a dummy name
+	AttackSoundButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 	
-	GemRB.SetEvent(CSoundWindow, MovementSoundButton, IE_GUI_BUTTON_ON_PRESS, "MovementSoundPress")
-	GemRB.SetEvent(CSoundWindow, MovementSoundButtonB, IE_GUI_BUTTON_ON_PRESS, "MovementSoundPress")
-	GemRB.SetButtonFlags(CSoundWindow, MovementSoundButtonB, IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetVarAssoc(CSoundWindow, MovementSoundButtonB, "Movement Sound", 1) #can't find the right variable name, this is a dummy name
-	GemRB.SetButtonSprites(CSoundWindow, MovementSoundButtonB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	MovementSoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MovementSoundPress")
+	MovementSoundButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MovementSoundPress")
+	MovementSoundButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	MovementSoundButtonB.SetVarAssoc("Movement Sound", 1) #can't find the right variable name, this is a dummy name
+	MovementSoundButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 	
-	GemRB.SetEvent(CSoundWindow, CommandSoundButton, IE_GUI_BUTTON_ON_PRESS, "CommandSoundPress")
-	GemRB.SetEvent(CSoundWindow, CSAlwaysButtonB, IE_GUI_BUTTON_ON_PRESS, "CommandSoundPress")
-	GemRB.SetButtonFlags(CSoundWindow, CSAlwaysButtonB, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(CSoundWindow, CSAlwaysButtonB, "Command Sounds Frequency", 3)
-	GemRB.SetButtonSprites(CSoundWindow, CSAlwaysButtonB, "GBTNOPT4", 0, 0, 1, 2, 3)
-	GemRB.SetEvent(CSoundWindow, CSSeldomButtonB, IE_GUI_BUTTON_ON_PRESS, "CommandSoundPress")
-	GemRB.SetButtonFlags(CSoundWindow, CSSeldomButtonB, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(CSoundWindow, CSSeldomButtonB, "Command Sounds Frequency", 2)
-	GemRB.SetButtonSprites(CSoundWindow, CSSeldomButtonB, "GBTNOPT4", 0, 0, 1, 2, 3)
-	GemRB.SetEvent(CSoundWindow, CSNeverButtonB, IE_GUI_BUTTON_ON_PRESS, "CommandSoundPress")
-	GemRB.SetButtonFlags(CSoundWindow, CSNeverButtonB, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(CSoundWindow, CSNeverButtonB, "Command Sounds Frequency", 1)
-	GemRB.SetButtonSprites(CSoundWindow, CSNeverButtonB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	CommandSoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CommandSoundPress")
+	CSAlwaysButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CommandSoundPress")
+	CSAlwaysButtonB.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	CSAlwaysButtonB.SetVarAssoc("Command Sounds Frequency", 3)
+	CSAlwaysButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
+	CSSeldomButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CommandSoundPress")
+	CSSeldomButtonB.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	CSSeldomButtonB.SetVarAssoc("Command Sounds Frequency", 2)
+	CSSeldomButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
+	CSNeverButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CommandSoundPress")
+	CSNeverButtonB.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	CSNeverButtonB.SetVarAssoc("Command Sounds Frequency", 1)
+	CSNeverButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 	
-	GemRB.SetEvent(CSoundWindow, SelectionSoundButton, IE_GUI_BUTTON_ON_PRESS, "SelectionSoundPress")
-	GemRB.SetEvent(CSoundWindow, SSAlwaysButtonB, IE_GUI_BUTTON_ON_PRESS, "SelectionSoundPress")
-	GemRB.SetButtonFlags(CSoundWindow, SSAlwaysButtonB, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(CSoundWindow, SSAlwaysButtonB, "Selection Sounds Frequency", 3)
-	GemRB.SetButtonSprites(CSoundWindow, SSAlwaysButtonB, "GBTNOPT4", 0, 0, 1, 2, 3)
-	GemRB.SetEvent(CSoundWindow, SSSeldomButtonB, IE_GUI_BUTTON_ON_PRESS, "SelectionSoundPress")
-	GemRB.SetButtonFlags(CSoundWindow, SSSeldomButtonB, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(CSoundWindow, SSSeldomButtonB, "Selection Sounds Frequency", 2)
-	GemRB.SetButtonSprites(CSoundWindow, SSSeldomButtonB, "GBTNOPT4", 0, 0, 1, 2, 3)
-	GemRB.SetEvent(CSoundWindow, SSNeverButtonB, IE_GUI_BUTTON_ON_PRESS, "SelectionSoundPress")
-	GemRB.SetButtonFlags(CSoundWindow, SSNeverButtonB, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(CSoundWindow, SSNeverButtonB, "Selection Sounds Frequency", 1)
-	GemRB.SetButtonSprites(CSoundWindow, SSNeverButtonB, "GBTNOPT4", 0, 0, 1, 2, 3)
+	SelectionSoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SelectionSoundPress")
+	SSAlwaysButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SelectionSoundPress")
+	SSAlwaysButtonB.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	SSAlwaysButtonB.SetVarAssoc("Selection Sounds Frequency", 3)
+	SSAlwaysButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
+	SSSeldomButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SelectionSoundPress")
+	SSSeldomButtonB.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	SSSeldomButtonB.SetVarAssoc("Selection Sounds Frequency", 2)
+	SSSeldomButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
+	SSNeverButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SelectionSoundPress")
+	SSNeverButtonB.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	SSNeverButtonB.SetVarAssoc("Selection Sounds Frequency", 1)
+	SSNeverButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 	
-	GemRB.SetEvent(CSoundWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
-	GemRB.SetEvent(CSoundWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.SetVisible(CSoundWindow,1)
+	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OkPress")
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CSoundWindow.SetVisible(1)
 	return
 	
 def SubtitlesPress():
-	GemRB.SetText(CSoundWindow, TextAreaControl, 18015)
+	TextAreaControl.SetText(18015)
 	return
 	
 def AttackSoundPress():
-	GemRB.SetText(CSoundWindow, TextAreaControl, 18013)
+	TextAreaControl.SetText(18013)
 	return
 	
 def MovementSoundPress():
-	GemRB.SetText(CSoundWindow, TextAreaControl, 18014)
+	TextAreaControl.SetText(18014)
 	return
 	
 def CommandSoundPress():
-	GemRB.SetText(CSoundWindow, TextAreaControl, 18016)
+	TextAreaControl.SetText(18016)
 	return
 	
 def SelectionSoundPress():
-	GemRB.SetText(CSoundWindow, TextAreaControl, 11352)
+	TextAreaControl.SetText(11352)
 	return
 	
 def OkPress():
-	GemRB.UnloadWindow(CSoundWindow)
+	if CSoundWindow:
+		CSoundWindow.Unload()
 	GemRB.SetNextScript("Options")
 	return
 	
 def CancelPress():
-	GemRB.UnloadWindow(CSoundWindow)
+	if CSoundWindow:
+		CSoundWindow.Unload()
 	GemRB.SetNextScript("Options")
 	return

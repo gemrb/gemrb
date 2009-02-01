@@ -12,60 +12,63 @@ def OnLoad():
 	global RaceTable, SubRacesTable
 	
 	GemRB.LoadWindowPack("GUICG", 800 ,600)
-	RaceWindow = GemRB.LoadWindow (8)
+	RaceWindow = GemRB.LoadWindowObject (8)
 
-	RaceTable = GemRB.LoadTable ("races")
-	RaceCount = GemRB.GetTableRowCount (RaceTable)
+	RaceTable = GemRB.LoadTableObject ("races")
+	RaceCount = RaceTable.GetRowCount ()
 	
-	SubRacesTable = GemRB.LoadTable ("SUBRACES")
+	SubRacesTable = GemRB.LoadTableObject ("SUBRACES")
 
 	for i in range(2,9):
-		Button = GemRB.GetControl (RaceWindow,i)
-		GemRB.SetButtonFlags (RaceWindow,Button,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+		Button = RaceWindow.GetControl (i)
+		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		
 	for i in range(7):
-		Button = GemRB.GetControl (RaceWindow,i+2)
-		GemRB.SetText (RaceWindow,Button, GemRB.GetTableValue (RaceTable,i,0) )
-		GemRB.SetButtonState (RaceWindow,Button,IE_GUI_BUTTON_ENABLED)
-		GemRB.SetEvent (RaceWindow,Button,IE_GUI_BUTTON_ON_PRESS,"RacePress")
-		GemRB.SetVarAssoc (RaceWindow,Button,"BaseRace",GemRB.GetTableValue (RaceTable, i, 3) )
+		Button = RaceWindow.GetControl (i+2)
+		Button.SetText (RaceTable.GetValue (i,0) )
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS,"RacePress")
+		Button.SetVarAssoc ("BaseRace",RaceTable.GetValue (i, 3) )
 
-	BackButton = GemRB.GetControl (RaceWindow,11) 
-	GemRB.SetText (RaceWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl (RaceWindow,0)
-	GemRB.SetText (RaceWindow,DoneButton,36789)
-	GemRB.SetButtonState (RaceWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
-	GemRB.SetButtonFlags (RaceWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	BackButton = RaceWindow.GetControl (11) 
+	BackButton.SetText (15416)
+	DoneButton = RaceWindow.GetControl (0)
+	DoneButton.SetText (36789)
+	DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	TextAreaControl = GemRB.GetControl (RaceWindow, 9)
-	GemRB.SetText (RaceWindow,TextAreaControl,17237)
+	TextAreaControl = RaceWindow.GetControl (9)
+	TextAreaControl.SetText (17237)
 
-	GemRB.SetEvent (RaceWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	GemRB.SetEvent (RaceWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	GemRB.SetVisible(RaceWindow,1)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	RaceWindow.SetVisible(1)
 	return
 
 def RacePress():
 	global RaceWindow, RaceTable, SubRacesTable
 	Race = GemRB.GetVar ("BaseRace")
 	GemRB.SetVar ("Race", Race)
-	RaceID = GemRB.GetTableRowName (RaceTable, GemRB.FindTableValue (RaceTable, 3, Race) )
-	HasSubRaces = GemRB.GetTableValue (SubRacesTable, RaceID, "PURE_RACE")
+	RaceID = RaceTable.GetRowName (RaceTable.FindValue (3, Race) )
+	HasSubRaces = SubRacesTable.GetValue (RaceID, "PURE_RACE")
 	if HasSubRaces == 0:
-		GemRB.SetText (RaceWindow,TextAreaControl, GemRB.GetTableValue (RaceTable,RaceID,"DESC_REF") )
-		GemRB.SetButtonState (RaceWindow,DoneButton,IE_GUI_BUTTON_ENABLED)
+		TextAreaControl.SetText (RaceTable.GetValue (RaceID,"DESC_REF") )
+		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 		return
-	GemRB.UnloadWindow (RaceWindow)
+	if RaceWindow:
+		RaceWindow.Unload ()
 	GemRB.SetNextScript ("SubRaces")
 	return
 
 def BackPress():
-	GemRB.UnloadWindow (RaceWindow)
+	if RaceWindow:
+		RaceWindow.Unload ()
 	GemRB.SetNextScript ("CharGen2")
 	GemRB.SetVar ("BaseRace",0)  #scrapping the race value
 	return
 
 def NextPress():
-	GemRB.UnloadWindow (RaceWindow)
+	if RaceWindow:
+		RaceWindow.Unload ()
 	GemRB.SetNextScript ("CharGen3") #class
 	return

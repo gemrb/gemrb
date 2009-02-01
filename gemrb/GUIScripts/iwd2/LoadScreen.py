@@ -31,31 +31,31 @@ def StartLoadScreen ():
 	global LoadScreen
 
 	GemRB.LoadWindowPack ("guils", 800, 600)
-	LoadScreen = GemRB.LoadWindow (0)
-	GemRB.SetWindowFrame( LoadScreen)
+	LoadScreen = GemRB.LoadWindowObject (0)
+	LoadScreen.SetFrame( )
 
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	if LoadPic=="":
 		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
-	GemRB.SetWindowPicture(LoadScreen, LoadPic)
+	LoadScreen.SetPicture(LoadPic)
 	Progress = 0
 	GemRB.SetVar ("Progress", Progress)
 
-	Table = GemRB.LoadTable ("loadhint")
-	tmp = GemRB.GetTableRowCount (Table)
+	Table = GemRB.LoadTableObject ("loadhint")
+	tmp = Table.GetRowCount ()
 	tmp = GemRB.Roll (1,tmp,0)
-	HintStr = GemRB.GetTableValue (Table, tmp, 0)
-	TextArea = GemRB.GetControl (LoadScreen, 2)
-	GemRB.SetText (LoadScreen, TextArea, HintStr)
+	HintStr = Table.GetValue (tmp, 0)
+	TextArea = LoadScreen.GetControl (2)
+	TextArea.SetText (HintStr)
 
-	Bar = GemRB.GetControl (LoadScreen, 0)
-	GemRB.SetVarAssoc (LoadScreen, Bar, "Progress", Progress)
-	GemRB.SetEvent (LoadScreen, Bar, IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
-	GemRB.SetVisible (LoadScreen, 1)
+	Bar = LoadScreen.GetControl (0)
+	Bar.SetVarAssoc ("Progress", Progress)
+	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
+	LoadScreen.SetVisible (1)
 	return
 
 def EndLoadScreen ():
-	Skull = GemRB.GetControl (LoadScreen, 3)
-	GemRB.SetButtonMOS (LoadScreen, Skull, "GTRBPSK2")
-	GemRB.SetVisible (LoadScreen, 1)
+	Skull = LoadScreen.GetControl (3)
+	Skull.SetMOS ("GTRBPSK2")
+	LoadScreen.SetVisible (1)
 	return
