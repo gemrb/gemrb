@@ -218,7 +218,7 @@ def OpenContainerWindow ():
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContainerWindow = Window = GemRB.LoadWindowObject (8)
 	OldActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
-	OldMessageWindow = GemRB.GetVar ("MessageWindow")
+	OldMessageWindow = GWindow( GemRB.GetVar ("MessageWindow") )
 	GemRB.SetVar ("ActionsWindow", Window.ID)
 	GemRB.SetVar ("MessageWindow", -1)
 
@@ -452,7 +452,7 @@ def OpenReformPartyWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
 
 	OldActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
-	OldMessageWindow = GemRB.GetVar ("MessageWindow")
+	OldMessageWindow = GWindow( GemRB.GetVar ("MessageWindow") )
 	GemRB.SetVar ("ActionsWindow", -1)
 	GemRB.SetVar ("MessageWindow", -1)
 	UpdateReformWindow ()

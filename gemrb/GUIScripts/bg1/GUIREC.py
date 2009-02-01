@@ -611,7 +611,7 @@ def OpenExportWindow ():
 	TextArea.SetText(10962)
 
 	TextArea = ExportWindow.GetControl(0)
-	GemRB.GetCharacters (ExportWindow, TextArea)
+	TextArea.GetCharacters ()
 
 	ExportDoneButton = ExportWindow.GetControl(4)
 	ExportDoneButton.SetText(11973)
