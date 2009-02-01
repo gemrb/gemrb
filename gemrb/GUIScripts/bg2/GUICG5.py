@@ -9,43 +9,45 @@ def OnLoad():
 	global NameWindow, NameField, DoneButton
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	NameWindow = GemRB.LoadWindow(5)
+	NameWindow = GemRB.LoadWindowObject(5)
 
-	BackButton = GemRB.GetControl(NameWindow,3)
-	GemRB.SetText(NameWindow, BackButton, 15416)
+	BackButton = NameWindow.GetControl(3)
+	BackButton.SetText(15416)
 
-	DoneButton = GemRB.GetControl(NameWindow,0)
-	GemRB.SetText(NameWindow, DoneButton, 11973)
-	GemRB.SetButtonFlags(NameWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
-	GemRB.SetButtonState(NameWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+	DoneButton = NameWindow.GetControl(0)
+	DoneButton.SetText(11973)
+	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
-	NameField = GemRB.GetControl(NameWindow, 2)
+	NameField = NameWindow.GetControl(2)
 
-	GemRB.SetEvent(NameWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	GemRB.SetEvent(NameWindow, BackButton, IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	GemRB.SetEvent(NameWindow, NameField, IE_GUI_EDIT_ON_CHANGE,"EditChange")
-	GemRB.SetVisible(NameWindow,1)
-	GemRB.SetControlStatus(NameWindow, NameField, IE_GUI_CONTROL_FOCUSED)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE,"EditChange")
+	NameWindow.SetVisible(1)
+	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
 	return
 
 def BackPress():
-	GemRB.UnloadWindow(NameWindow)
+	if NameWindow:
+		NameWindow.Unload()
 	GemRB.SetNextScript("CharGen8")
 	return
 
 def NextPress():
-	Name = GemRB.QueryText(NameWindow, NameField)
+	Name = NameField.QueryText()
 	#check length?
 	#seems like a good idea to store it here for the time being
 	GemRB.SetToken("CHARNAME",Name) 
-	GemRB.UnloadWindow(NameWindow)
+	if NameWindow:
+		NameWindow.Unload()
 	GemRB.SetNextScript("CharGen9")
 	return
 
 def EditChange():
-	Name = GemRB.QueryText(NameWindow, NameField)
+	Name = NameField.QueryText()
 	if len(Name)==0:
-		GemRB.SetButtonState(NameWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	else:
-		GemRB.SetButtonState(NameWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return

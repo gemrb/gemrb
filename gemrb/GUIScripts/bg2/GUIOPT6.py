@@ -7,121 +7,123 @@ TextAreaControl = 0
 def OnLoad():
 	global GraphicsWindow, TextAreaControl
 	GemRB.LoadWindowPack("GUIOPT", 640, 480)
-	GraphicsWindow = GemRB.LoadWindow(6)
-	TextAreaControl = GemRB.GetControl(GraphicsWindow, 33)
-	BrightnessButton = GemRB.GetControl(GraphicsWindow, 35)
-	BrightnessSlider = GemRB.GetControl(GraphicsWindow, 3)
-	GemRB.SetVarAssoc(GraphicsWindow, BrightnessSlider, "Brightness Correction",4)
+	GraphicsWindow = GemRB.LoadWindowObject(6)
+	TextAreaControl = GraphicsWindow.GetControl(33)
+	BrightnessButton = GraphicsWindow.GetControl(35)
+	BrightnessSlider = GraphicsWindow.GetControl(3)
+	BrightnessSlider.SetVarAssoc("Brightness Correction",4)
 
-	ContrastButton = GemRB.GetControl(GraphicsWindow, 36)
-	ContrastSlider = GemRB.GetControl(GraphicsWindow, 22)
-	GemRB.SetVarAssoc(GraphicsWindow, ContrastSlider, "Gamma Correction",1)
+	ContrastButton = GraphicsWindow.GetControl(36)
+	ContrastSlider = GraphicsWindow.GetControl(22)
+	ContrastSlider.SetVarAssoc("Gamma Correction",1)
 
-	BppButton = GemRB.GetControl(GraphicsWindow, 37)
-	BppButtonB1 = GemRB.GetControl(GraphicsWindow, 5)
-	BppButtonB2 = GemRB.GetControl(GraphicsWindow, 6)
-	BppButtonB3 = GemRB.GetControl(GraphicsWindow, 7)
-	GemRB.SetButtonFlags(GraphicsWindow, BppButtonB1, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	GemRB.SetButtonFlags(GraphicsWindow, BppButtonB2, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	GemRB.SetButtonFlags(GraphicsWindow, BppButtonB3, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	GemRB.SetVarAssoc(GraphicsWindow, BppButtonB1, "BitsPerPixel",16)
-	GemRB.SetVarAssoc(GraphicsWindow, BppButtonB2, "BitsPerPixel",24)
-	GemRB.SetVarAssoc(GraphicsWindow, BppButtonB3, "BitsPerPixel",32)
+	BppButton = GraphicsWindow.GetControl(37)
+	BppButtonB1 = GraphicsWindow.GetControl(5)
+	BppButtonB2 = GraphicsWindow.GetControl(6)
+	BppButtonB3 = GraphicsWindow.GetControl(7)
+	BppButtonB1.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	BppButtonB2.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	BppButtonB3.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	BppButtonB1.SetVarAssoc("BitsPerPixel",16)
+	BppButtonB2.SetVarAssoc("BitsPerPixel",24)
+	BppButtonB3.SetVarAssoc("BitsPerPixel",32)
 
-	FullScreenButton = GemRB.GetControl(GraphicsWindow, 38)
-	FullScreenButtonB = GemRB.GetControl(GraphicsWindow, 9)
-	GemRB.SetButtonFlags(GraphicsWindow, FullScreenButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
-	GemRB.SetVarAssoc(GraphicsWindow,FullScreenButtonB, "Full Screen",1)
+	FullScreenButton = GraphicsWindow.GetControl(38)
+	FullScreenButtonB = GraphicsWindow.GetControl(9)
+	FullScreenButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	FullScreenButtonB.SetVarAssoc("Full Screen",1)
 
-	SoftMirrBltButton = GemRB.GetControl(GraphicsWindow, 44)
-	SoftMirrBltButtonB = GemRB.GetControl(GraphicsWindow, 40)
-	GemRB.SetButtonFlags(GraphicsWindow, SoftMirrBltButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
-	GemRB.SetVarAssoc(GraphicsWindow,SoftMirrBltButtonB, "SoftMirrorBlt",1)
+	SoftMirrBltButton = GraphicsWindow.GetControl(44)
+	SoftMirrBltButtonB = GraphicsWindow.GetControl(40)
+	SoftMirrBltButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	SoftMirrBltButtonB.SetVarAssoc("SoftMirrorBlt",1)
 
-	SoftTransBltButton = GemRB.GetControl(GraphicsWindow, 46)
-	SoftTransBltButtonB = GemRB.GetControl(GraphicsWindow, 41)
-	GemRB.SetButtonFlags(GraphicsWindow, SoftTransBltButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
-	GemRB.SetVarAssoc(GraphicsWindow,SoftTransBltButtonB, "SoftSrcKeyBlt",1)
+	SoftTransBltButton = GraphicsWindow.GetControl(46)
+	SoftTransBltButtonB = GraphicsWindow.GetControl(41)
+	SoftTransBltButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	SoftTransBltButtonB.SetVarAssoc("SoftSrcKeyBlt",1)
 
-	SoftStandBltButton = GemRB.GetControl(GraphicsWindow, 48)
-	SoftStandBltButtonB = GemRB.GetControl(GraphicsWindow, 42)
-	GemRB.SetButtonFlags(GraphicsWindow, SoftStandBltButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
-	GemRB.SetVarAssoc(GraphicsWindow,SoftStandBltButtonB, "SoftBltFast",1)
+	SoftStandBltButton = GraphicsWindow.GetControl(48)
+	SoftStandBltButtonB = GraphicsWindow.GetControl(42)
+	SoftStandBltButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	SoftStandBltButtonB.SetVarAssoc("SoftBltFast",1)
 
-	TransShadowButton = GemRB.GetControl(GraphicsWindow, 50)
-	TransShadowButtonB = GemRB.GetControl(GraphicsWindow, 51)
-	GemRB.SetButtonFlags(GraphicsWindow, TransShadowButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
-	GemRB.SetVarAssoc(GraphicsWindow,TransShadowButtonB, "Translucent Shadows",1)
+	TransShadowButton = GraphicsWindow.GetControl(50)
+	TransShadowButtonB = GraphicsWindow.GetControl(51)
+	TransShadowButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	TransShadowButtonB.SetVarAssoc("Translucent Shadows",1)
 
-	OkButton = GemRB.GetControl(GraphicsWindow, 21)
-	CancelButton = GemRB.GetControl(GraphicsWindow, 32)
-	GemRB.SetText(GraphicsWindow, TextAreaControl, 18038)
-	GemRB.SetText(GraphicsWindow, OkButton, 11973)
-	GemRB.SetText(GraphicsWindow, CancelButton, 13727)
-	GemRB.SetEvent(GraphicsWindow, BrightnessButton, IE_GUI_BUTTON_ON_PRESS, "BrightnessPress")
-	GemRB.SetEvent(GraphicsWindow, BrightnessSlider, IE_GUI_SLIDER_ON_CHANGE, "BrightnessPress")
-	GemRB.SetEvent(GraphicsWindow, ContrastButton, IE_GUI_BUTTON_ON_PRESS, "ContrastPress")
-	GemRB.SetEvent(GraphicsWindow, ContrastSlider, IE_GUI_SLIDER_ON_CHANGE, "ContrastPress")
-	GemRB.SetEvent(GraphicsWindow, BppButton, IE_GUI_BUTTON_ON_PRESS, "BppPress")
-	GemRB.SetEvent(GraphicsWindow, BppButtonB1, IE_GUI_BUTTON_ON_PRESS, "BppPress")
-	GemRB.SetEvent(GraphicsWindow, BppButtonB2, IE_GUI_BUTTON_ON_PRESS, "BppPress")
-	GemRB.SetEvent(GraphicsWindow, BppButtonB3, IE_GUI_BUTTON_ON_PRESS, "BppPress")
-	GemRB.SetEvent(GraphicsWindow, FullScreenButton, IE_GUI_BUTTON_ON_PRESS, "FullScreenPress")
-	GemRB.SetEvent(GraphicsWindow, FullScreenButtonB, IE_GUI_BUTTON_ON_PRESS, "FullScreenPress")
-	GemRB.SetEvent(GraphicsWindow, TransShadowButton, IE_GUI_BUTTON_ON_PRESS, "TransShadowPress")
-	GemRB.SetEvent(GraphicsWindow, TransShadowButtonB, IE_GUI_BUTTON_ON_PRESS, "TransShadowPress")
-	GemRB.SetEvent(GraphicsWindow, SoftMirrBltButton, IE_GUI_BUTTON_ON_PRESS, "SoftMirrBltPress")
-	GemRB.SetEvent(GraphicsWindow, SoftMirrBltButtonB, IE_GUI_BUTTON_ON_PRESS, "SoftMirrBltPress")
-	GemRB.SetEvent(GraphicsWindow, SoftTransBltButton, IE_GUI_BUTTON_ON_PRESS, "SoftTransBltPress")
-	GemRB.SetEvent(GraphicsWindow, SoftTransBltButtonB, IE_GUI_BUTTON_ON_PRESS, "SoftTransBltPress")
-	GemRB.SetEvent(GraphicsWindow, SoftStandBltButton, IE_GUI_BUTTON_ON_PRESS, "SoftStandBltPress")
-	GemRB.SetEvent(GraphicsWindow, SoftStandBltButtonB, IE_GUI_BUTTON_ON_PRESS, "SoftStandBltPress")
-	GemRB.SetEvent(GraphicsWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
-	GemRB.SetEvent(GraphicsWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.ShowModal(GraphicsWindow)
+	OkButton = GraphicsWindow.GetControl(21)
+	CancelButton = GraphicsWindow.GetControl(32)
+	TextAreaControl.SetText(18038)
+	OkButton.SetText(11973)
+	CancelButton.SetText(13727)
+	BrightnessButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "BrightnessPress")
+	BrightnessSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, "BrightnessPress")
+	ContrastButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ContrastPress")
+	ContrastSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, "ContrastPress")
+	BppButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "BppPress")
+	BppButtonB1.SetEvent(IE_GUI_BUTTON_ON_PRESS, "BppPress")
+	BppButtonB2.SetEvent(IE_GUI_BUTTON_ON_PRESS, "BppPress")
+	BppButtonB3.SetEvent(IE_GUI_BUTTON_ON_PRESS, "BppPress")
+	FullScreenButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "FullScreenPress")
+	FullScreenButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "FullScreenPress")
+	TransShadowButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "TransShadowPress")
+	TransShadowButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "TransShadowPress")
+	SoftMirrBltButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SoftMirrBltPress")
+	SoftMirrBltButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SoftMirrBltPress")
+	SoftTransBltButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SoftTransBltPress")
+	SoftTransBltButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SoftTransBltPress")
+	SoftStandBltButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SoftStandBltPress")
+	SoftStandBltButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SoftStandBltPress")
+	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OkPress")
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	GraphicsWindow.ShowModal()
 	return
 	
 def BrightnessPress():
-	GemRB.SetText(GraphicsWindow, TextAreaControl, 17203)
+	TextAreaControl.SetText(17203)
 	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction"))
 	return
 	
 def ContrastPress():
-	GemRB.SetText(GraphicsWindow, TextAreaControl, 17204)
+	TextAreaControl.SetText(17204)
 	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction"))
 	return
 	
 def BppPress():
-	GemRB.SetText(GraphicsWindow, TextAreaControl, 17205)	
+	TextAreaControl.SetText(17205)	
 	return
 	
 def FullScreenPress():
-	GemRB.SetText(GraphicsWindow, TextAreaControl, 18000)
+	TextAreaControl.SetText(18000)
 	GemRB.SetFullScreen (GemRB.GetVar("Full Screen"))
 	return
 	
 def TransShadowPress():
-	GemRB.SetText(GraphicsWindow, TextAreaControl, 20620)
+	TextAreaControl.SetText(20620)
 	return
 	
 def SoftMirrBltPress():
-	GemRB.SetText(GraphicsWindow, TextAreaControl, 18004)
+	TextAreaControl.SetText(18004)
 	return
 	
 def SoftTransBltPress():
-	GemRB.SetText(GraphicsWindow, TextAreaControl, 18006)
+	TextAreaControl.SetText(18006)
 	return
 	
 def SoftStandBltPress():
-	GemRB.SetText(GraphicsWindow, TextAreaControl, 18007)
+	TextAreaControl.SetText(18007)
 	return
 	
 def OkPress():
-	GemRB.UnloadWindow(GraphicsWindow)
+	if GraphicsWindow:
+		GraphicsWindow.Unload()
 	GemRB.SetNextScript("StartOpt")
 	return
 	
 def CancelPress():
-	GemRB.UnloadWindow(GraphicsWindow)
+	if GraphicsWindow:
+		GraphicsWindow.Unload()
 	GemRB.SetNextScript("StartOpt")
 	return

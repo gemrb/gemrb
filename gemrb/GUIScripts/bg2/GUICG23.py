@@ -8,32 +8,32 @@ def OnLoad ():
 	global BioWindow, EditControl
 
 	GemRB.LoadWindowPack ("GUICG", 640, 480)
-	BioWindow = GemRB.LoadWindow (23)
+	BioWindow = GemRB.LoadWindowObject (23)
 
-	EditControl = GemRB.GetControl (BioWindow, 3)
+	EditControl = BioWindow.GetControl (3)
 	BIO = GemRB.GetToken("BIO")
 	EditControl = GemRB.ConvertEdit (BioWindow, EditControl, 5)
-	GemRB.SetVarAssoc (BioWindow, EditControl, "row", 0)
+	EditControl.SetVarAssoc ("row", 0)
 	if BIO:
-		GemRB.SetText (BioWindow, EditControl, BIO)
+		EditControl.SetText (BIO)
 	else:
-		GemRB.SetText (BioWindow, EditControl, 15882)
+		EditControl.SetText (15882)
 
 	# done
-	OkButton = GemRB.GetControl (BioWindow, 1)
-	GemRB.SetText (BioWindow, OkButton, 11973)
+	OkButton = BioWindow.GetControl (1)
+	OkButton.SetText (11973)
 
-	ClearButton = GemRB.GetControl (BioWindow, 4)
-	GemRB.SetText (BioWindow, ClearButton, 34881)
+	ClearButton = BioWindow.GetControl (4)
+	ClearButton.SetText (34881)
 
 	# back
-	CancelButton = GemRB.GetControl (BioWindow, 2)
-	GemRB.SetText (BioWindow, CancelButton, 12896)
+	CancelButton = BioWindow.GetControl (2)
+	CancelButton.SetText (12896)
 
-	GemRB.SetEvent (BioWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
-	GemRB.SetEvent (BioWindow, ClearButton, IE_GUI_BUTTON_ON_PRESS, "ClearPress")
-	GemRB.SetEvent (BioWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.SetVisible (BioWindow,1)
+	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OkPress")
+	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ClearPress")
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	BioWindow.SetVisible (1)
 	return
 
 def OkPress ():
@@ -48,23 +48,25 @@ def OkPress ():
 	#there is no way to know how much data is in the TextArea
 	while 1:
 		GemRB.SetVar ("row", row)
-		GemRB.SetVarAssoc (BioWindow, EditControl, "row", row)
-		line = GemRB.QueryText (BioWindow, EditControl)
+		EditControl.SetVarAssoc ("row", row)
+		line = EditControl.QueryText ()
 		if len(line)<=0:
 			break
 		BioData += line+"\n"
 		row += 1
 	
-	GemRB.UnloadWindow (BioWindow)
+	if BioWindow:
+		BioWindow.Unload ()
 	GemRB.SetNextScript ("CharGen9")
 	GemRB.SetToken ("BIO", BioData)
 	return
 	
 def CancelPress ():
-	GemRB.UnloadWindow (BioWindow)
+	if BioWindow:
+		BioWindow.Unload ()
 	GemRB.SetNextScript ("CharGen9")
 	return
 
 def ClearPress ():
-	GemRB.SetText (BioWindow, EditControl, "")
+	EditControl.SetText ("")
 	return

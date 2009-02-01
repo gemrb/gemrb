@@ -16,23 +16,23 @@ def OnLoad():
 	RemoveKnownSpells (IE_SPELL_TYPE_PRIEST)
 
 	# learn divine spells if appropriate
-	ClassSkillsTable = GemRB.LoadTable ("clskills")
+	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 	#change this to GetPlayerStat once IE_CLASS is directly stored
-	ClassTable = GemRB.LoadTable ("classes")
+	ClassTable = GemRB.LoadTableObject ("classes")
 	ClassIndex = GemRB.GetVar ("Class")-1
-	Class = GemRB.GetTableValue (ClassTable, ClassIndex, 5)
+	Class = ClassTable.GetValue (ClassIndex, 5)
 	MyChar = GemRB.GetVar ("Slot")
-	TableName = GemRB.GetTableValue (ClassSkillsTable, Class, 1, 0)
+	TableName = ClassSkillsTable.GetValue (Class, 1, 0)
 
 	if TableName == "*":
 		# it isn't a cleric or paladin, so check for druids and rangers
-		TableName = GemRB.GetTableValue (ClassSkillsTable, Class, 0, 0)
+		TableName = ClassSkillsTable.GetValue (Class, 0, 0)
 		ClassFlag = 0x4000
 	else:
 		ClassFlag = 0x8000
 	# check for cleric/rangers, who get access to all the spells
 	# possibly redundant block (see SPL bit 0x0020)
-	if TableName == "MXSPLPRS" and GemRB.GetTableValue (ClassSkillsTable, Class, 0, 0) != "*":
+	if TableName == "MXSPLPRS" and ClassSkillsTable.GetValue (Class, 0, 0) != "*":
 		ClassFlag = 0
 
 	# nulify the memorizable spell counts
@@ -46,7 +46,5 @@ def OnLoad():
 		Learnable = GetLearnablePriestSpells( ClassFlag, GemRB.GetVar ("Alignment"), 1)
 		for i in range(len(Learnable) ):
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
-	GemRB.UnloadTable (ClassSkillsTable)
-	GemRB.UnloadTable (ClassTable)
 
 	return

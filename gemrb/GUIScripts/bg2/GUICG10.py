@@ -11,70 +11,72 @@ def OnLoad():
 	global ClassTable
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ClassTable = GemRB.LoadTable("classes")
-	ClassCount = GemRB.GetTableRowCount(ClassTable)+1
-	ClassWindow = GemRB.LoadWindow(10)
-	TmpTable=GemRB.LoadTable("races")
-	RaceName = GemRB.GetTableRowName(TmpTable, GemRB.GetVar("Race")-1 )
+	ClassTable = GemRB.LoadTableObject("classes")
+	ClassCount = ClassTable.GetRowCount()+1
+	ClassWindow = GemRB.LoadWindowObject(10)
+	TmpTable=GemRB.LoadTableObject("races")
+	RaceName = TmpTable.GetRowName(GemRB.GetVar("Race")-1 )
 
 	j=0
 	for i in range(1,ClassCount):
-		if GemRB.GetTableValue(ClassTable,i-1,4)==0:
+		if ClassTable.GetValue(i-1,4)==0:
 			continue
 		if j>11:
-			Button = GemRB.GetControl(ClassWindow,j+7)
+			Button = ClassWindow.GetControl(j+7)
 		else:
-			Button = GemRB.GetControl(ClassWindow,j+2)
-		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_DISABLED)
-		GemRB.SetButtonFlags(ClassWindow, Button, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+			Button = ClassWindow.GetControl(j+2)
+		Button.SetState(IE_GUI_BUTTON_DISABLED)
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		j = j + 1
 	j=0
 	for i in range(1,ClassCount):
-		ClassName = GemRB.GetTableRowName(ClassTable, i-1)
-		Allowed = GemRB.GetTableValue(ClassTable, ClassName, RaceName)
-		if GemRB.GetTableValue(ClassTable,i-1,4)==0:
+		ClassName = ClassTable.GetRowName(i-1)
+		Allowed = ClassTable.GetValue(ClassName, RaceName)
+		if ClassTable.GetValue(i-1,4)==0:
 			continue
 		if j>11:
-			Button = GemRB.GetControl(ClassWindow,j+7)
+			Button = ClassWindow.GetControl(j+7)
 		else:
-			Button = GemRB.GetControl(ClassWindow,j+2)
+			Button = ClassWindow.GetControl(j+2)
 
-		t = GemRB.GetTableValue(ClassTable, i-1, 0)
-		GemRB.SetText(ClassWindow, Button, t )
+		t = ClassTable.GetValue(i-1, 0)
+		Button.SetText(t )
 		j=j+1
 		if Allowed ==0:
 			continue
-		GemRB.SetButtonState(ClassWindow, Button, IE_GUI_BUTTON_ENABLED)
-		GemRB.SetEvent(ClassWindow, Button, IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
-		GemRB.SetVarAssoc(ClassWindow, Button , "Class", i) #multiclass, actually
+		Button.SetState(IE_GUI_BUTTON_ENABLED)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
+		Button.SetVarAssoc("Class", i) #multiclass, actually
 
-	BackButton = GemRB.GetControl(ClassWindow,14)
-	GemRB.SetText(ClassWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl(ClassWindow,0)
-	GemRB.SetText(ClassWindow,DoneButton,11973)
+	BackButton = ClassWindow.GetControl(14)
+	BackButton.SetText(15416)
+	DoneButton = ClassWindow.GetControl(0)
+	DoneButton.SetText(11973)
 
-	TextAreaControl = GemRB.GetControl(ClassWindow, 12)
-	GemRB.SetText(ClassWindow,TextAreaControl,17244)
+	TextAreaControl = ClassWindow.GetControl(12)
+	TextAreaControl.SetText(17244)
 
-	GemRB.SetEvent(ClassWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	GemRB.SetEvent(ClassWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	GemRB.SetButtonState(ClassWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
-	GemRB.SetVisible(ClassWindow,1)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	ClassWindow.SetVisible(1)
 	return
 
 def ClassPress():
 	Class = GemRB.GetVar("Class")-1
-	GemRB.SetText(ClassWindow,TextAreaControl, GemRB.GetTableValue(ClassTable,Class,1) )
-	GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+	TextAreaControl.SetText(ClassTable.GetValue(Class,1) )
+	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def BackPress():
 	GemRB.SetVar("Class",0)  # scrapping it
-	GemRB.UnloadWindow(ClassWindow)
+	if ClassWindow:
+		ClassWindow.Unload()
 	GemRB.SetNextScript("GUICG2")
 	return
 
 def NextPress():
-	GemRB.UnloadWindow(ClassWindow)
+	if ClassWindow:
+		ClassWindow.Unload()
 	GemRB.SetNextScript("CharGen4") #alignment
 	return

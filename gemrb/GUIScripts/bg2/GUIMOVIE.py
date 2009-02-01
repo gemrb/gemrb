@@ -10,58 +10,60 @@ def OnLoad():
 	global MovieWindow, TextAreaControl, MoviesTable, PlayButton
 
 	GemRB.LoadWindowPack ("GUIMOVIE", 640, 480)
-	MovieWindow = GemRB.LoadWindow (0)
-	GemRB.SetWindowFrame (MovieWindow)
-	TextAreaControl = GemRB.GetControl (MovieWindow, 0)
-	PlayButton = GemRB.GetControl (MovieWindow, 2)
-	CreditsButton = GemRB.GetControl (MovieWindow, 3)
-	DoneButton = GemRB.GetControl (MovieWindow, 4)
-	MoviesTable = GemRB.LoadTable ("MOVIDESC")
-	for i in range( GemRB.GetTableRowCount (MoviesTable) ):
-		t = GemRB.GetTableRowName (MoviesTable, i)
+	MovieWindow = GemRB.LoadWindowObject (0)
+	MovieWindow.SetFrame ()
+	TextAreaControl = MovieWindow.GetControl (0)
+	PlayButton = MovieWindow.GetControl (2)
+	CreditsButton = MovieWindow.GetControl (3)
+	DoneButton = MovieWindow.GetControl (4)
+	MoviesTable = GemRB.LoadTableObject ("MOVIDESC")
+	for i in range( MoviesTable.GetRowCount () ):
+		t = MoviesTable.GetRowName (i)
 		if GemRB.GetVar (t)==1:
-			s = GemRB.GetTableValue (MoviesTable, i, 0)
-			GemRB.TextAreaAppend (MovieWindow, TextAreaControl, s,-1)
-	GemRB.SetVarAssoc (MovieWindow, TextAreaControl, "MovieIndex",0)
-	GemRB.SetTextAreaFlags (MovieWindow, TextAreaControl, IE_GUI_TEXTAREA_SELECTABLE, OP_NAND)
-	GemRB.SetEvent (MovieWindow, TextAreaControl, IE_GUI_TEXTAREA_ON_CHANGE, "MoviePress")
-	GemRB.SetText (MovieWindow, PlayButton, 17318)
-	GemRB.SetText (MovieWindow, CreditsButton, 15591)
-	GemRB.SetText (MovieWindow, DoneButton, 11973)
-	GemRB.SetEvent (MovieWindow, PlayButton, IE_GUI_BUTTON_ON_PRESS, "PlayPress")
-	GemRB.SetControlStatus (MovieWindow, PlayButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetEvent (MovieWindow, CreditsButton, IE_GUI_BUTTON_ON_PRESS, "CreditsPress")
-	GemRB.SetEvent (MovieWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
-	GemRB.SetVisible (MovieWindow,1)
+			s = MoviesTable.GetValue (i, 0)
+			TextAreaControl.Append (s,-1)
+	TextAreaControl.SetVarAssoc ("MovieIndex",0)
+	TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE, OP_NAND)
+	TextAreaControl.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "MoviePress")
+	PlayButton.SetText (17318)
+	CreditsButton.SetText (15591)
+	DoneButton.SetText (11973)
+	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PlayPress")
+	PlayButton.SetStatus (IE_GUI_BUTTON_DISABLED)
+	CreditsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CreditsPress")
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	MovieWindow.SetVisible (1)
 	return
 
 def MoviePress():
-	GemRB.SetControlStatus (MovieWindow, PlayButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetTextAreaFlags (MovieWindow, TextAreaControl, IE_GUI_TEXTAREA_SELECTABLE,OP_SET) # show selection
+	PlayButton.SetStatus (IE_GUI_BUTTON_ENABLED)
+	TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE,OP_SET) # show selection
 	return
 
 def PlayPress():
 	s = GemRB.GetVar ("MovieIndex")
-	for i in range( GemRB.GetTableRowCount (MoviesTable) ):
-		t = GemRB.GetTableRowName (MoviesTable, i)
+	for i in range( MoviesTable.GetRowCount () ):
+		t = MoviesTable.GetRowName (i)
 		if GemRB.GetVar (t)==1:
 			if s==0:
-				GemRB.SetControlStatus (MovieWindow, PlayButton, IE_GUI_BUTTON_DISABLED)
-				GemRB.SetTextAreaFlags (MovieWindow, TextAreaControl, IE_GUI_TEXTAREA_SELECTABLE,OP_NAND) # hide selection
-				s = GemRB.GetTableRowName (MoviesTable, i)
+				PlayButton.SetStatus (IE_GUI_BUTTON_DISABLED)
+				TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE,OP_NAND) # hide selection
+				s = MoviesTable.GetRowName (i)
 				GemRB.PlayMovie (s, 1)
-				GemRB.InvalidateWindow (MovieWindow)
+				MovieWindow.Invalidate ()
 				return
 			s = s - 1
 	return
 
 def CreditsPress():
-	GemRB.UnloadWindow (MovieWindow)
+	if MovieWindow:
+		MovieWindow.Unload ()
 	GemRB.SetNextScript ("GUISONGS")
 	return
 
 def DonePress():
-	GemRB.UnloadWindow (MovieWindow)
+	if MovieWindow:
+		MovieWindow.Unload ()
 	if GameIsTOB():
 		GemRB.SetNextScript ("Start2")
 	else:

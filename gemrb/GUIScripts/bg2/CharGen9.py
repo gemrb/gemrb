@@ -22,10 +22,10 @@ def FinishCharGen():
 	#set my character up
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
-	KitTable = GemRB.LoadTable ("kitlist")
-	RaceTable = GemRB.LoadTable ("races")
+	KitTable = GemRB.LoadTableObject ("kitlist")
+	RaceTable = GemRB.LoadTableObject ("races")
 	Race = GemRB.GetVar ("Race")-1
-	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetTableValue (RaceTable, Race, 3) )
+	GemRB.SetPlayerStat (MyChar, IE_RACE, RaceTable.GetValue (Race, 3) )
 	t = GemRB.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)
 
@@ -40,21 +40,20 @@ def FinishCharGen():
 	#So, for mages, the kit equals to the unusability value
 	#but for others there is an additional mapping by kitlist.2da
 
-	ClassTable = GemRB.LoadTable ("classes")
+	ClassTable = GemRB.LoadTableObject ("classes")
 	ClassIndex = GemRB.GetVar ("Class")-1
-	Class = GemRB.GetTableValue (ClassTable, ClassIndex, 5)
-	ClassName = GemRB.GetTableRowName (ClassTable, ClassIndex)
+	Class = ClassTable.GetValue (ClassIndex, 5)
+	ClassName = ClassTable.GetRowName (ClassIndex)
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 
-	TmpTable = GemRB.LoadTable ("clskills")
+	TmpTable = GemRB.LoadTableObject ("clskills")
 	#mage spells
-	TableName = GemRB.GetTableValue (TmpTable, Class, 2, 0)
-	GemRB.UnloadTable (TmpTable)
+	TableName = TmpTable.GetValue (Class, 2, 0)
 
 	# TODO check if this is really needed
 	KitIndex = GemRB.GetVar ("Class Kit")
 	if TableName != "*":
-		KitValue = GemRB.GetTableValue(KitTable, KitIndex, 6)
+		KitValue = KitTable.GetValue(KitIndex, 6)
 		if KitValue == "*":
 			KitValue = 0x4000
 		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
@@ -64,42 +63,35 @@ def FinishCharGen():
 	print "KitValue**********:",KitValue
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 
-	TmpTable=GemRB.LoadTable ("repstart")
-	AlignmentTable = GemRB.LoadTable ("aligns")
-	t = GemRB.FindTableValue (AlignmentTable, 3, t)
-	t = GemRB.GetTableValue (TmpTable,t,0) * 10
+	TmpTable=GemRB.LoadTableObject ("repstart")
+	AlignmentTable = GemRB.LoadTableObject ("aligns")
+	t = AlignmentTable.FindValue (3, t)
+	t = TmpTable.GetValue (t,0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 
 	#slot 1 is the protagonist
 	if MyChar == 1:
 		GemRB.GameSetReputation( t )
 
-	GemRB.UnloadTable (TmpTable)
-	TmpTable=GemRB.LoadTable ("strtgold")
-	t = GemRB.Roll (GemRB.GetTableValue (TmpTable,Class,1),GemRB.GetTableValue (TmpTable,Class,0), GemRB.GetTableValue (TmpTable,Class,2) )
-	GemRB.SetPlayerStat (MyChar, IE_GOLD, t*GemRB.GetTableValue (TmpTable,Class,3) )
-	GemRB.UnloadTable (AlignmentTable)
-	GemRB.UnloadTable (ClassTable)
-	GemRB.UnloadTable (RaceTable)
-	GemRB.UnloadTable (TmpTable)
+	TmpTable=GemRB.LoadTableObject ("strtgold")
+	t = GemRB.Roll (TmpTable.GetValue (Class,1),TmpTable.GetValue (Class,0), TmpTable.GetValue (Class,2) )
+	GemRB.SetPlayerStat (MyChar, IE_GOLD, t*TmpTable.GetValue (Class,3) )
 
 	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace") )
-	TmpTable=GemRB.LoadTable ("ability")
-	AbilityCount = GemRB.GetTableRowCount (TmpTable)
+	TmpTable=GemRB.LoadTableObject ("ability")
+	AbilityCount = TmpTable.GetRowCount ()
 	for i in range(AbilityCount):
-		StatID=GemRB.GetTableValue (TmpTable, i,4)
+		StatID=TmpTable.GetValue (i,4)
 		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Ability "+str(i) ) )
-	GemRB.UnloadTable (TmpTable)
 
-	TmpTable=GemRB.LoadTable ("weapprof")
-	ProfCount = GemRB.GetTableRowCount (TmpTable)
+	TmpTable=GemRB.LoadTableObject ("weapprof")
+	ProfCount = TmpTable.GetRowCount ()
 	#bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
 	for i in range(ProfCount-8):
-		StatID = GemRB.GetTableValue (TmpTable, i+8, 0)
+		StatID = TmpTable.GetValue (i+8, 0)
 		Value = GemRB.GetVar ("Prof "+str(i) )
 		if Value:
 			GemRB.ApplyEffect (MyChar, "Proficiency", Value, StatID )
-	GemRB.UnloadTable (TmpTable)
 
 	SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
 	SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
@@ -123,19 +115,17 @@ def FinishCharGen():
 	GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability 5"))
 
 	#setting skills (thieving/ranger)
-	TmpTable = GemRB.LoadTable ("skills")
-	RowCount = GemRB.GetTableRowCount (TmpTable)-2
+	TmpTable = GemRB.LoadTableObject ("skills")
+	RowCount = TmpTable.GetRowCount ()-2
 
 	for i in range(RowCount):
-		stat = GemRB.GetTableValue (TmpTable, i+2, 2)
+		stat = TmpTable.GetValue (i+2, 2)
 		value = GemRB.GetVar ("Skill "+str(i) )
 		GemRB.SetPlayerStat (MyChar, stat, value )
- 	GemRB.UnloadTable (TmpTable)
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
-	TmpTable = GemRB.LoadTable ("clskills")
-	GemRB.SetPlayerStat (MyChar, IE_XP, GemRB.GetTableValue (TmpTable, Class, 3) )  #this will also set the level (automatically)
-	GemRB.UnloadTable (TmpTable)
+	TmpTable = GemRB.LoadTableObject ("clskills")
+	GemRB.SetPlayerStat (MyChar, IE_XP, TmpTable.GetValue (Class, 3) )  #this will also set the level (automatically)
 
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
@@ -151,8 +141,8 @@ def FinishCharGen():
 			if EquipmentColName == "SORCERER":
 				EquipmentColName = "MAGE"
 		else:
-			EquipmentColName = GemRB.GetTableValue (KitTable, KitIndex, 0)
-		EquipmentTable = GemRB.LoadTable ("25stweap")
+			EquipmentColName = KitTable.GetValue (KitIndex, 0)
+		EquipmentTable = GemRB.LoadTableObject ("25stweap")
 		# a map of slots in the table to the real slots
 		# SLOT_BAG is invalid, so use the inventory (first occurence)
 		# SLOT_INVENTORY: use -1 instead, that's what CreateItem expects
@@ -161,9 +151,9 @@ def FinishCharGen():
 					SLOT_BELT, SLOT_QUIVER, SLOT_QUIVER, SLOT_QUIVER, \
 					SLOT_ITEM, SLOT_ITEM, SLOT_ITEM, -1, -1, SLOT_WEAPON ]
 		#loop over rows - item slots
-		for slot in range(0, GemRB.GetTableRowCount (EquipmentTable)):
-			slotname = GemRB.GetTableRowName (EquipmentTable, slot)
-			item = GemRB.GetTableValue (EquipmentTable, slotname, EquipmentColName)
+		for slot in range(0, EquipmentTable.GetRowCount ()):
+			slotname = EquipmentTable.GetRowName (slot)
+			item = EquipmentTable.GetValue (slotname, EquipmentColName)
 			if item == "*":
 				continue
 			realslot = GemRB.GetSlots (MyChar, RealSlots[slot], -1)
@@ -190,16 +180,15 @@ def FinishCharGen():
 
 			GemRB.CreateItem(MyChar, item, targetslot, count, 0, 0)
  			GemRB.ChangeItemFlag (MyChar, targetslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-		GemRB.UnloadTable (EquipmentTable)
 
-	GemRB.UnloadTable (KitTable)
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
 		#LETS PLAY!!
 		GemRB.EnterGame()
 	else:
 		#leaving multi player pregen
-		GemRB.UnloadWindow (CharGenWindow)
+		if CharGenWindow:
+			CharGenWindow.Unload ()
 		#when export is done, go to start
 		if GameIsTOB():
 			GemRB.SetToken ("NextScript","Start2")

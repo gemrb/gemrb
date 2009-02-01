@@ -51,9 +51,12 @@ def OpenJournalWindow ():
 
 	if CloseOtherWindow (OpenJournalWindow):
 		
-		GemRB.UnloadWindow (JournalWindow)
-		GemRB.UnloadWindow (OptionsWindow)
-		GemRB.UnloadWindow (PortraitWindow)
+		if JournalWindow:
+			JournalWindow.Unload ()
+		if OptionsWindow:
+			OptionsWindow.Unload ()
+		if PortraitWindow:
+			PortraitWindow.Unload ()
 
 		JournalWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
@@ -66,79 +69,78 @@ def OpenJournalWindow ():
 		SetSelectionChangeHandler (None)
 		return
 		
-	Table = GemRB.LoadTable("YEARS")
-	StartTime = GemRB.GetTableValue(Table, "STARTTIME", "VALUE") / 4500
-	StartYear = GemRB.GetTableValue(Table, "STARTYEAR", "VALUE")
-	GemRB.UnloadTable(Table)
+	Table = GemRB.LoadTableObject("YEARS")
+	StartTime = Table.GetValue("STARTTIME", "VALUE") / 4500
+	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 
 	GemRB.HideGUI ()
 	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIJRNL", 640, 480)
-	JournalWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar ("OtherWindow", JournalWindow)
+	JournalWindow = Window = GemRB.LoadWindowObject (2)
+	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
+	OptionsWindow = GemRB.LoadWindowObject (0)
 	MarkMenuButton (OptionsWindow)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenJournalWindow")
-	GemRB.SetWindowFrame (OptionsWindow)
+	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
 
 	# prev. chapter
-	Button = GemRB.GetControl (JournalWindow, 3)
-	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "PrevChapterPress")
+	Button = JournalWindow.GetControl (3)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PrevChapterPress")
 
 	# next chapter
-	Button = GemRB.GetControl (JournalWindow, 4)
-	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "NextChapterPress")
+	Button = JournalWindow.GetControl (4)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "NextChapterPress")
 
 	GemRB.SetVar ("Section", Section)
 	# Quests
-	Button = GemRB.GetControl (JournalWindow, 6)
-	GemRB.SetButtonFlags (JournalWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc (JournalWindow, Button, "Section", 1)
-	GemRB.SetText (JournalWindow, Button, 45485)
-	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
+	Button = JournalWindow.GetControl (6)
+	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	Button.SetVarAssoc ("Section", 1)
+	Button.SetText (45485)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# Quests completed
-	Button = GemRB.GetControl (JournalWindow, 7)
-	GemRB.SetButtonFlags (JournalWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc (JournalWindow, Button, "Section", 2)
-	GemRB.SetText (JournalWindow, Button, 45486)
-	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
+	Button = JournalWindow.GetControl (7)
+	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	Button.SetVarAssoc ("Section", 2)
+	Button.SetText (45486)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# Journal
-	Button = GemRB.GetControl (JournalWindow, 8)
-	GemRB.SetButtonFlags (JournalWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc (JournalWindow, Button, "Section", 4)
-	GemRB.SetText (JournalWindow, Button, 15333)
-	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
+	Button = JournalWindow.GetControl (8)
+	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	Button.SetVarAssoc ("Section", 4)
+	Button.SetText (15333)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# User
-	Button = GemRB.GetControl (JournalWindow, 9)
-	GemRB.SetButtonFlags (JournalWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc (JournalWindow, Button, "Section", 0)
-	GemRB.SetText (JournalWindow, Button, 45487)
-	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
+	Button = JournalWindow.GetControl (9)
+	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	Button.SetVarAssoc ("Section", 0)
+	Button.SetText (45487)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# Order
-	Button = GemRB.GetControl (JournalWindow, 10)
-	GemRB.SetText (JournalWindow, Button, 4627)
-	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "ToggleOrderWindow")
+	Button = JournalWindow.GetControl (10)
+	Button.SetText (4627)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ToggleOrderWindow")
 
 	# Done
-	#Button = GemRB.GetControl (JournalWindow, 3)
-	#GemRB.SetText (JournalWindow, Button, 20636)
-	#GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	#Button = JournalWindow.GetControl (3)
+	#Button.SetText (20636)
+	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	Chapter = GemRB.GetGameVar("chapter")
 	SetSelectionChangeHandler (UpdateLogWindow)
 	UpdateLogWindow ()
-	GemRB.SetVisible (OptionsWindow, 1)
-	GemRB.SetVisible (Window, 3)
-	GemRB.SetVisible (PortraitWindow, 1)
+	OptionsWindow.SetVisible (1)
+	Window.SetVisible (3)
+	PortraitWindow.SetVisible (1)
 	return
 
 def ToggleOrderWindow ():
@@ -159,13 +161,13 @@ def UpdateLogWindow ():
 	Section = GemRB.GetVar("Section")
 	GemRB.SetToken ("CurrentChapter", str(Chapter) )
 	# CurrentChapter
-	Label = GemRB.GetControl (JournalWindow, 0x1000000a)
-	GemRB.SetText (JournalWindow, Label, 15873)
+	Label = JournalWindow.GetControl (0x1000000a)
+	Label.SetText (15873)
 	print "Chapter ", Chapter, "Section ", Section
 
-	Text = GemRB.GetControl (Window, 1)
+	Text = Window.GetControl (1)
 
-	GemRB.TextAreaClear (Window, Text )
+	Text.Clear ()
 	for i in range (GemRB.GetJournalSize (Chapter, Section)):
 		je = GemRB.GetJournalEntry (Chapter, i, Section)
 
@@ -186,11 +188,11 @@ def UpdateLogWindow ():
 		JournalTitle = "[color=d00000]" + je2[0] + "[/color]" + "\n"
 		JournalText = je2[1]
 
-		GemRB.TextAreaAppend (Window, Text, JournalTitle + GemRB.GetString(15980), 3*i)
-		GemRB.TextAreaAppend (Window, Text, JournalText, 3*i+1)
-		GemRB.TextAreaAppend (Window, Text, "", 3*i + 2)
+		Text.Append (JournalTitle + GemRB.GetString(15980), 3*i)
+		Text.Append (JournalText, 3*i+1)
+		Text.Append ("", 3*i + 2)
 
-	GemRB.SetVisible (Window, 1)
+	Window.SetVisible (1)
 	return
 
 ###################################################

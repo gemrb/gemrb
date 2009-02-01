@@ -14,43 +14,43 @@ def OnLoad():
 	global CharSoundWindow, VoiceList
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	CharSoundWindow=GemRB.LoadWindow(19)
+	CharSoundWindow=GemRB.LoadWindowObject(19)
 
-	VoiceList = GemRB.GetControl (CharSoundWindow, 45)
-	GemRB.SetTextAreaFlags (CharSoundWindow, VoiceList, IE_GUI_TEXTAREA_SELECTABLE)
+	VoiceList = CharSoundWindow.GetControl (45)
+	VoiceList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	if GemRB.GetVar ("Gender")==1:
 		GemRB.SetVar ("Selected", 4)
 	else:
 		GemRB.SetVar ("Selected", 0)
 
-	GemRB.SetVarAssoc (CharSoundWindow, VoiceList, "Selected", 0)
-	RowCount=GemRB.GetCharSounds(CharSoundWindow, VoiceList)
+	VoiceList.SetVarAssoc ("Selected", 0)
+	RowCount=VoiceList.GetCharSounds()
 
-	PlayButton = GemRB.GetControl (CharSoundWindow, 47)
-	GemRB.SetButtonState (CharSoundWindow, PlayButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetEvent (CharSoundWindow, PlayButton, IE_GUI_BUTTON_ON_PRESS, "PlayPress")
-	GemRB.SetText (CharSoundWindow, PlayButton, 17318)
+	PlayButton = CharSoundWindow.GetControl (47)
+	PlayButton.SetState (IE_GUI_BUTTON_ENABLED)
+	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PlayPress")
+	PlayButton.SetText (17318)
 
-	TextArea = GemRB.GetControl (CharSoundWindow, 50)
-	GemRB.SetText (CharSoundWindow, TextArea, 11315)
+	TextArea = CharSoundWindow.GetControl (50)
+	TextArea.SetText (11315)
 
-	BackButton = GemRB.GetControl(CharSoundWindow,10)
-	GemRB.SetText(CharSoundWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl(CharSoundWindow,0)
-	GemRB.SetText(CharSoundWindow,DoneButton,11973)
-	GemRB.SetButtonFlags(CharSoundWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	BackButton = CharSoundWindow.GetControl(10)
+	BackButton.SetText(15416)
+	DoneButton = CharSoundWindow.GetControl(0)
+	DoneButton.SetText(11973)
+	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	GemRB.SetEvent(CharSoundWindow, VoiceList, \
 					IE_GUI_TEXTAREA_ON_CHANGE, "ChangeVoice")
-	GemRB.SetEvent(CharSoundWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	GemRB.SetEvent(CharSoundWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	GemRB.SetVisible(CharSoundWindow,1)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	CharSoundWindow.SetVisible(1)
 	return
 
 def PlayPress():
 	global CharSoundWindow, SoundIndex, SoundSequence
 
-	CharSound = GemRB.QueryText(CharSoundWindow, VoiceList)
+	CharSound = VoiceList.QueryText()
 	# SClassID.h -> IE_WAV_CLASS_ID = 0x00000004
 	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], 0x00000004)):
 		NextSound()
@@ -73,15 +73,17 @@ def ChangeVoice():
 def BackPress():
 	global CharSoundWindow
 
-	GemRB.UnloadWindow(CharSoundWindow)
+	if CharSoundWindow:
+		CharSoundWindow.Unload()
 	GemRB.SetNextScript("GUICG13") 
 	return
 
 def NextPress():
 	global CharSoundWindow
 
-	CharSound = GemRB.QueryText (CharSoundWindow, VoiceList)
+	CharSound = VoiceList.QueryText ()
 	GemRB.SetToken ("CharSound", CharSound)
-	GemRB.UnloadWindow(CharSoundWindow)
+	if CharSoundWindow:
+		CharSoundWindow.Unload()
 	GemRB.SetNextScript("CharGen8") #name
 	return

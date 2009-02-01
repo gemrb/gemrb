@@ -30,31 +30,32 @@ def OnLoad():
 		return
 
 	GemRB.LoadWindowPack("START", 640, 480)
-	StartWindow = GemRB.LoadWindow(7)
-	GemRB.SetWindowFrame (StartWindow)
-	GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,0,640,30, "REALMS", "", 1)
-	Label=GemRB.GetControl(StartWindow, 0x0fff0000)
-	GemRB.SetText(StartWindow, Label,GEMRB_VERSION)
+	StartWindow = GemRB.LoadWindowObject(7)
+	StartWindow.SetFrame ()
+	StartWindow.CreateLabel(0x0fff0000, 0,0,640,30, "REALMS", "", 1)
+	Label=StartWindow.GetControl(0x0fff0000)
+	Label.SetText(GEMRB_VERSION)
 
-	TextArea = GemRB.GetControl(StartWindow, 0)
-	GemRB.SetText(StartWindow, TextArea, 73245)
-	TextArea = GemRB.GetControl(StartWindow, 1)
-	GemRB.SetText(StartWindow, TextArea, 73246)
-	SoAButton = GemRB.GetControl(StartWindow, 2)
-	GemRB.SetText(StartWindow, SoAButton, 73247)
-	ToBButton = GemRB.GetControl(StartWindow, 3)
-	GemRB.SetText(StartWindow, ToBButton, 73248)
-	ExitButton = GemRB.GetControl(StartWindow, 4)
-	GemRB.SetText(StartWindow, ExitButton, 13731)
-	GemRB.SetEvent(StartWindow, SoAButton, IE_GUI_BUTTON_ON_PRESS, "SoAPress")
-	GemRB.SetEvent(StartWindow, ToBButton, IE_GUI_BUTTON_ON_PRESS, "ToBPress")
-	GemRB.SetEvent(StartWindow, ExitButton, IE_GUI_BUTTON_ON_PRESS, "ExitPress")
-	GemRB.SetVisible(StartWindow, 1)
+	TextArea = StartWindow.GetControl(0)
+	TextArea.SetText(73245)
+	TextArea = StartWindow.GetControl(1)
+	TextArea.SetText(73246)
+	SoAButton = StartWindow.GetControl(2)
+	SoAButton.SetText(73247)
+	ToBButton = StartWindow.GetControl(3)
+	ToBButton.SetText(73248)
+	ExitButton = StartWindow.GetControl(4)
+	ExitButton.SetText(13731)
+	SoAButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SoAPress")
+	ToBButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ToBPress")
+	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitPress")
+	StartWindow.SetVisible(1)
 	GemRB.LoadMusicPL("Cred.mus")
 	return
 	
 def SoAPress():
-	GemRB.UnloadWindow(StartWindow)
+	if StartWindow:
+		StartWindow.Unload()
 	GemRB.SetMasterScript("BALDUR","WORLDMAP")
 	GemRB.SetVar("oldgame",1)
 	GemRB.SetNextScript("Start2")
@@ -65,7 +66,8 @@ def SoAPress():
 def ToBPress():
 	GemRB.SetMasterScript("BALDUR25","WORLDM25")
 	GemRB.SetVar("oldgame",0)
-	GemRB.UnloadWindow(StartWindow)
+	if StartWindow:
+		StartWindow.Unload()
 	GemRB.SetNextScript("Start2")
 	if not skip_videos:
 		GemRB.PlayMovie ("INTRO")
