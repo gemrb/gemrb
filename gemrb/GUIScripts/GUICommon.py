@@ -45,9 +45,9 @@ def CloseOtherWindow (NewWindowFn):
 def GetMageSpells (Kit, Alignment, Level):
 	MageSpells = []
 	SpellType = 99
-	Table = GemRB.LoadTable ("aligns")
-	v = GemRB.FindTableValue (Table, 3, Alignment)
-	Usability = Kit | GemRB.GetTableValue(Table, v, 5)
+	Table = GemRB.LoadTableObject ("aligns")
+	v = Table.FindValue (3, Alignment)
+	Usability = Kit | Table.GetValue(v, 5)
 
 	for i in range(100):
 		SpellName = "SPWI%d%02d"%(Level,i)
@@ -82,10 +82,10 @@ def GetLearnableMageSpells (Kit, Alignment, Level):
 def GetLearnablePriestSpells (Class, Alignment, Level):
 	Learnable =[]
 
-	Table=GemRB.LoadTable("aligns")
-	v = GemRB.FindTableValue(Table, 3, Alignment)
+	Table=GemRB.LoadTableObject("aligns")
+	v = Table.FindValue(3, Alignment)
 	#usability is the bitset we look for
-	Usability=GemRB.GetTableValue(Table, v, 5)
+	Usability=Table.GetValue(v, 5)
 
 	for i in range(100):
 		SpellName = "SPPR%d%02d"%(Level,i)
@@ -100,9 +100,9 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 	return Learnable
 
 def SetupSpellLevels (pc, TableName, Type, Level):
-	Table=GemRB.LoadTable (TableName)
-	for i in range(GemRB.GetTableColumnCount (0)):
-		value = GemRB.GetTableValue (Table, Level, i)
+	Table=GemRB.LoadTableObject (TableName)
+	for i in range(Table.GetColumnCount ()):
+		value = Table.GetValue (Level, i)
 		# specialist mages get an extra spell if they already know that level
 		# FIXME: get a general routine to find specialists
 		school = GemRB.GetVar("MAGESCHOOL")
@@ -118,8 +118,8 @@ def UnsetupSpellLevels (pc, TableName, Type, Level):
 	if not GemRB.HasResource (TableName, RES_2DA):
 		return
 
-	Table=GemRB.LoadTable (TableName)
-	for i in range(GemRB.GetTableColumnCount (0)):
+	Table=GemRB.LoadTableObject (TableName)
+	for i in range(Table.GetColumnCount ()):
 		GemRB.SetMemorizableSpellsCount (pc, 0, Type, i)
 	return
 
