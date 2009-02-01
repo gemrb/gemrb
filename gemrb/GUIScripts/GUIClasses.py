@@ -100,6 +100,7 @@ class GControl:
 class GLabel(GControl):
   __metaclass__ = metaControl
   methods = {
+    'SetTextColor': GemRB.SetLabelTextColor,
     'SetUseRGB': GemRB.SetLabelUseRGB
   }
 

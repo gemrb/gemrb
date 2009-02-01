@@ -14,6 +14,7 @@ MoviesButton = 0
 def OnLoad():
 	global StartWindow, TutorialWindow, QuitWindow
 	global ExitButton, OptionsButton, MultiPlayerButton, MoviesButton
+	global SinglePlayerButton
 
 	skip_videos = not GemRB.GetVar ("SkipIntroVideos")
 
