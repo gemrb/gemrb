@@ -156,6 +156,7 @@ int GameData::LoadTable(const ieResRef ResRef)
 {
 	int ind = GetTableIndex( ResRef );
 	if (ind != -1) {
+		tables[ind].refcount++;
 		return ind;
 	}
 	//printf("(%s) Table not found... Loading from file\n", ResRef);
