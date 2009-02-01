@@ -16,7 +16,7 @@ def OnLoad():
 
 	TextAreaControl = ImportWindow.GetControl(2)
 	TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
-	GemRB.GetCharacters(ImportWindow, TextAreaControl)
+	TextAreaControl.GetCharacters()
 
 	DoneButton = ImportWindow.GetControl(0)
 	DoneButton.SetText(13955)
