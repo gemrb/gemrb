@@ -111,7 +111,7 @@ class GTextArea(GControl):
     'Append': GemRB.TextAreaAppend,
     'Clear': GemRB.TextAreaClear,
     'Scroll': GemRB.TextAreaScroll,
-	'SetFlags': GemRB.SetTextAreaFlags
+    'SetFlags': GemRB.SetTextAreaFlags
   }
   def MoveText(self, other):
     GemRB.MoveTAText(self.WinID, self.ID, other.WinID, other.ID)
@@ -143,7 +143,7 @@ class GButton(GControl):
     'SetGamePreview': GemRB.SetGamePreview,
     'SetGamePortraitPreview': GemRB.SetGamePortraitPreview,
     'SetSpellIcon': GemRB.SetSpellIcon,
-    'SetItemIcon': GemRB.SetItemIcon,
+    'SetItemIcon': GemRB.SetItemIcon
   }
   def CreateLabelOnButton(self, control, *args):
     GemRB.CreateLabelOnButton(self.WinID, self.ID, control, *args)

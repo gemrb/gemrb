@@ -273,11 +273,11 @@ def OpenPriestSpellRemoveWindow ():
 	return
 
 def ClosePriestSpellUnmemorizeWindow ():
-        global PriestSpellUnmemorizeWindow
+	global PriestSpellUnmemorizeWindow
 
-        GemRB.UnloadWindow (PriestSpellUnmemorizeWindow)
-        PriestSpellUnmemorizeWindow = None
-        return
+	GemRB.UnloadWindow (PriestSpellUnmemorizeWindow)
+	PriestSpellUnmemorizeWindow = None
+	return
 
 def OpenPriestSpellUnmemorizeWindow ():
 	global PriestSpellUnmemorizeWindow

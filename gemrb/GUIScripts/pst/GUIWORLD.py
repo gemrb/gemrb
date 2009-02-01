@@ -63,7 +63,7 @@ def OpenContainerWindow ():
 	if ContainerWindow:
 		return
 
-       	hideflag = GemRB.HideGUI ()
+	hideflag = GemRB.HideGUI ()
 
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContainerWindow = Window = GemRB.LoadWindow (8)

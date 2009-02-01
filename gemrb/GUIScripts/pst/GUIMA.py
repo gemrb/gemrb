@@ -90,7 +90,7 @@ def OpenMapWindow ():
 	# 2 - map name?
 	# 3 - map bitmap?
 	# 4 - ???
-		       
+
 	# Done
 	Button = GemRB.GetControl (Window, 5)
 	GemRB.SetText (Window, Button, 1403)

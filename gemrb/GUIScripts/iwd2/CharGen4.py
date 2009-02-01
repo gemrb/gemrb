@@ -10,11 +10,11 @@ IE_LEVELSORCEROR, IE_LEVEL2]
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
-        #base class
-        Class=GemRB.GetVar ("BaseClass")
-        GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
-        #kit
-        GemRB.SetPlayerStat (MyChar, IE_KIT, GemRB.GetVar ("Class") )
+	#base class
+	Class=GemRB.GetVar ("BaseClass")
+	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
+	#kit
+	GemRB.SetPlayerStat (MyChar, IE_KIT, GemRB.GetVar ("Class") )
 
 	#works only for the first level character generation
 	#if this code ever needs to be more versatile, consider saving the

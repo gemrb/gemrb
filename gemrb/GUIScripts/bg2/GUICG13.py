@@ -52,7 +52,7 @@ def OnLoad():
 	PortraitName = PortraitName[0:len(PortraitName)-1]
 	PortraitIndex = GemRB.GetTableRowIndex(PortraitTable, PortraitName)
 	if PortraitIndex<0:
-	        HairColor=GemRB.GetTableValue(PortraitTable,0,1)
+		HairColor=GemRB.GetTableValue(PortraitTable,0,1)
 		SkinColor=GemRB.GetTableValue(PortraitTable,0,2)
 		MinorColor=GemRB.GetTableValue(PortraitTable,0,3)
 		MajorColor=GemRB.GetTableValue(PortraitTable,0,4)

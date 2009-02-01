@@ -576,14 +576,14 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
 		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "")
 
 def GearsClicked():
-        GemRB.GamePause(2,0)
+	GemRB.GamePause(2,0)
 
 def OpenWaitForDiscWindow ():
 	global DiscWindow
-        #print "OpenWaitForDiscWindow"
+	#print "OpenWaitForDiscWindow"
 
 	if DiscWindow:
-        	GemRB.HideGUI ()
+		GemRB.HideGUI ()
 		GemRB.UnloadWindow (DiscWindow)
 		GemRB.SetVar ("OtherWindow", -1)
 		# ...LoadWindowPack()
@@ -593,13 +593,13 @@ def OpenWaitForDiscWindow ():
 		return
 
 	try:
-        	GemRB.HideGUI ()
+		GemRB.HideGUI ()
 	except:
 		pass
-        
-        GemRB.LoadWindowPack ("GUIID")
-        DiscWindow = Window = GemRB.LoadWindow (0)
-        GemRB.SetVar ("OtherWindow", Window)
+
+	GemRB.LoadWindowPack ("GUIID")
+	DiscWindow = Window = GemRB.LoadWindow (0)
+	GemRB.SetVar ("OtherWindow", Window)
 	label = GemRB.GetControl (DiscWindow, 0)
 
 	disc_num = GemRB.GetVar ("WaitForDisc")
@@ -608,8 +608,8 @@ def OpenWaitForDiscWindow ():
 
 	text = GemRB.GetString (31483) + " " + str (disc_num) + " " + GemRB.GetString (31569) + " " + disc_path + "\n" + GemRB.GetString (49152)
 	GemRB.SetText (DiscWindow, label, text)
-        DisableAnimatedWindows ()
-        
+	DisableAnimatedWindows ()
+
 	# 31483 - Please place PS:T disc number
 	# 31568 - Please  place the PS:T DVD 
 	# 31569 - in drive
@@ -619,8 +619,8 @@ def OpenWaitForDiscWindow ():
 	# 49152 - To quit the game, press Alt-F4
 
 
-        try:
-                GemRB.UnhideGUI ()
-        except:
-                GemRB.SetVisible (DiscWindow, 1)
+	try:
+		GemRB.UnhideGUI ()
+	except:
+		GemRB.SetVisible (DiscWindow, 1)
 
