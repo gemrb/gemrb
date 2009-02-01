@@ -644,7 +644,7 @@ static PyObject* GemRB_LoadWindowObject(PyObject * self, PyObject* args)
 	}
 
 	PyObject* win = GemRB_LoadWindow(self, args);
-	if (!PyObject_TypeCheck( win, &PyInt_Type ))
+	if (!win || !PyObject_TypeCheck( win, &PyInt_Type ))
 		return win; // exception
 
 	PyObject* wintuple = PyTuple_New(1);
@@ -910,7 +910,7 @@ static PyObject* GemRB_LoadTableObject(PyObject * self, PyObject* args)
 	}
 
 	PyObject* table = GemRB_LoadTable(self, args);
-	if (!PyObject_TypeCheck( table, &PyInt_Type ))
+	if (!table || !PyObject_TypeCheck( table, &PyInt_Type ))
 		return table; // exception
 
 	PyObject* tabtuple = PyTuple_New(1);
@@ -1294,7 +1294,7 @@ static PyObject* GemRB_GetControlObject(PyObject * self, PyObject* args)
 	}
 
 	PyObject* control = GemRB_GetControl( self, args );
-	if (!PyObject_TypeCheck( control, &PyInt_Type ))
+	if (!control || !PyObject_TypeCheck( control, &PyInt_Type ))
 		return control; // exception
 
 	PyObject* ctrltuple = PyTuple_New(2);
@@ -1655,7 +1655,7 @@ static PyObject* GemRB_SetVisible(PyObject * /*self*/, PyObject* args)
 
 	int ret = core->SetVisible( WindowIndex, visible );
 	if (ret == -1) {
-		return NULL;
+		return RuntimeError("Invalid window in SetVisible");
 	}
 	if (!WindowIndex) {
 		core->SetEventFlag(EF_CONTROL);
