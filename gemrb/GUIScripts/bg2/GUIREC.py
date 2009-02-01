@@ -157,6 +157,13 @@ def UpdateRecordsWindow ():
 	else:
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 
+	# levelup
+	Button = GemRB.GetControl (Window, 37)
+	if CanLevelUp (pc):
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+
 	# name
 	Label = GemRB.GetControl (Window, 0x1000000e)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
@@ -770,6 +777,49 @@ def ExportEditChanged():
 	else:
 		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_ENABLED)
 	return
+
+def CanLevelUp(actor):
+	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+	ClassTable = GemRB.LoadTable ("classes")
+	Class = GemRB.FindTableValue (ClassTable, 5, Class)
+	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
+	MultiCount = 0
+	Class = GemRB.GetTableRowName (ClassTable, Class)
+	Dual = IsDualClassed (actor,1)
+
+	if Multi:
+		Levels = [GemRB.GetPlayerStat (actor, IE_LEVEL), GemRB.GetPlayerStat (actor, IE_LEVEL2), GemRB.GetPlayerStat (actor, IE_LEVEL3)]
+		Classes = [0,0,-1]
+		Mask = 1
+		for i in range (1,16):
+			if Multi&Mask:
+				Classes[MultiCount] = GemRB.FindTableValue (ClassTable, 5, i)
+				MultiCount += 1
+			Mask = 1 << i
+		print Classes
+		if Dual[0] > 0:
+			xp = GemRB.GetPlayerStat (actor, IE_XP)
+			if Classes[0] == Dual[1]:
+				Levels = [Levels[1], Levels[0], Levels[2]]
+			Level = Levels[0]
+			Class = GemRB.GetTableRowName (ClassTable, Dual[2])
+		else:
+			xp = GemRB.GetPlayerStat (actor, IE_XP)/MultiCount
+			# check each class of the multiple - can their xp differ?
+			j = 0
+			for i in Classes:
+				if  i == -1:
+					continue
+				if int(GetNextLevelExp (Levels[j], GemRB.GetTableRowName (ClassTable, i))) < xp:
+					return 1
+				j += 1
+			return 0
+	else:
+		xp = GemRB.GetPlayerStat (actor, IE_XP)
+		Level = GemRB.GetPlayerStat (actor, IE_LEVEL)
+	
+	return int(GetNextLevelExp (Level, Class)) < xp
+
 
 def CanDualClass(actor):
 	# human
