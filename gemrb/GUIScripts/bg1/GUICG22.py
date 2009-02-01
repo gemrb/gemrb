@@ -14,97 +14,99 @@ def OnLoad():
 	global KitList, ClassList, SchoolList, ClassID
 	
 	GemRB.LoadWindowPack("GUICG")
-	TmpTable = GemRB.LoadTable("races")
-	RaceName = GemRB.GetTableRowName(TmpTable, GemRB.GetVar("Race")-1 )
-	TmpTable = GemRB.LoadTable("classes")
+	TmpTable = GemRB.LoadTableObject("races")
+	RaceName = TmpTable.GetRowName(GemRB.GetVar("Race")-1 )
+	TmpTable = GemRB.LoadTableObject("classes")
 	Class = GemRB.GetVar("Class")-1
-	ClassName = GemRB.GetTableRowName(TmpTable, Class)
-	ClassID = GemRB.GetTableValue(TmpTable, Class, 5)
-	ClassList = GemRB.LoadTable("classes")
-	KitTable = GemRB.LoadTable("kittable")
-	KitTableName = GemRB.GetTableValue(KitTable, ClassName, RaceName)
-	KitTable = GemRB.LoadTable(KitTableName,1)
+	ClassName = TmpTable.GetRowName(Class)
+	ClassID = TmpTable.GetValue(Class, 5)
+	ClassList = GemRB.LoadTableObject("classes")
+	KitTable = GemRB.LoadTableObject("kittable")
+	KitTableName = KitTable.GetValue(ClassName, RaceName)
+	KitTable = GemRB.LoadTableObject(KitTableName,1)
 
-	KitList = GemRB.LoadTable("kitlist")
-	SchoolList = GemRB.LoadTable("magesch")
+	KitList = GemRB.LoadTableObject("kitlist")
+	SchoolList = GemRB.LoadTableObject("magesch")
 
 	#there is only a specialist mage window for bg1
-	KitWindow = GemRB.LoadWindow(12)
+	KitWindow = GemRB.LoadWindowObject(12)
 
 	for i in range(8):
-		Button = GemRB.GetControl(KitWindow, i+2)
-		GemRB.SetButtonState(KitWindow, Button, IE_GUI_BUTTON_DISABLED)
-		GemRB.SetButtonFlags(KitWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		Button = KitWindow.GetControl(i+2)
+		Button.SetState(IE_GUI_BUTTON_DISABLED)
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 	if KitTable == -1:
 		RowCount = 1
 	else:
-		RowCount = GemRB.GetTableRowCount(KitTable)
+		RowCount = KitTable.GetRowCount()
 
 	for i in range(RowCount):
-		Button = GemRB.GetControl(KitWindow, i+2)
+		Button = KitWindow.GetControl(i+2)
 		if KitTable == -1:
 			if ClassID == 1:
 				Kit=GemRB.GetVar("MAGESCHOOL")
-				KitName = GemRB.GetTableValue(SchoolList, i, 0)
+				KitName = SchoolList.GetValue(i, 0)
 			else:
 				Kit = 0
-				KitName = GemRB.GetTableValue(ClassList, GemRB.GetVar("Class")-1, 0)
+				KitName = ClassList.GetValue(GemRB.GetVar("Class")-1, 0)
 
 		else:
-			Kit = GemRB.GetTableValue(KitTable,i,0)
+			Kit = KitTable.GetValue(i,0)
 			if ClassID == 1:
 				if Kit:
 					Kit = Kit - 21
-				KitName = GemRB.GetTableValue(SchoolList, Kit, 0)
+				KitName = SchoolList.GetValue(Kit, 0)
 			else:
 				if Kit:
-					KitName = GemRB.GetTableValue(KitList, Kit, 1)
+					KitName = KitList.GetValue(Kit, 1)
 				else:
-					KitName = GemRB.GetTableValue(ClassList, GemRB.GetVar("Class")-1, 0)
+					KitName = ClassList.GetValue(GemRB.GetVar("Class")-1, 0)
 
-		GemRB.SetButtonState(KitWindow, Button, IE_GUI_BUTTON_ENABLED)
-		GemRB.SetText(KitWindow, Button, KitName)
-		GemRB.SetVarAssoc(KitWindow, Button, "Class Kit",Kit)
+		Button.SetState(IE_GUI_BUTTON_ENABLED)
+		Button.SetText(KitName)
+		Button.SetVarAssoc("Class Kit",Kit)
 		if i==0:
 			GemRB.SetVar("Class Kit",Kit)
-		GemRB.SetEvent(KitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "KitPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "KitPress")
 
-	BackButton = GemRB.GetControl(KitWindow,12)
-	GemRB.SetText(KitWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl(KitWindow,0)
-	GemRB.SetText(KitWindow,DoneButton,11973)
-	GemRB.SetButtonFlags(KitWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	BackButton = KitWindow.GetControl(12)
+	BackButton.SetText(15416)
+	DoneButton = KitWindow.GetControl(0)
+	DoneButton.SetText(11973)
+	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	TextAreaControl = GemRB.GetControl(KitWindow, 11)
-	GemRB.SetText(KitWindow,TextAreaControl,17247)
+	TextAreaControl = KitWindow.GetControl(11)
+	TextAreaControl.SetText(17247)
 
-	GemRB.SetEvent(KitWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	GemRB.SetEvent(KitWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	KitPress()
-	GemRB.SetVisible(KitWindow,1)
+	KitWindow.SetVisible(1)
 	return
 
 def KitPress():
 	Kit = GemRB.GetVar("Class Kit")
 	if Kit == 0:
-		KitName = GemRB.GetTableValue(ClassList, GemRB.GetVar("Class")-1, 1)
+		KitName = ClassList.GetValue(GemRB.GetVar("Class")-1, 1)
 	else:
 		if ClassID==1:
-			KitName = GemRB.GetTableValue(SchoolList, Kit, 1)
+			KitName = SchoolList.GetValue(Kit, 1)
 		else:
-			KitName = GemRB.GetTableValue(KitList, Kit, 3)
-	GemRB.SetText(KitWindow, TextAreaControl, KitName)
-	GemRB.SetButtonState(KitWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+			KitName = KitList.GetValue(Kit, 3)
+	TextAreaControl.SetText(KitName)
+	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def BackPress():
 	GemRB.SetVar("Class Kit",0) #scrapping
-	GemRB.UnloadWindow(KitWindow)
+	if KitWindow:
+		KitWindow.Unload()
 	GemRB.SetNextScript("GUICG2")
 	return
 
 def NextPress():
-	GemRB.UnloadWindow(KitWindow)
+	if KitWindow:
+		KitWindow.Unload()
 	GemRB.SetNextScript("CharGen4") #abilities
 	return

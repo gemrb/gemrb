@@ -23,22 +23,22 @@ def OnLoad():
 	GemRB.LoadWindowPack("START")
 
 	#quit subwindow
-	QuitWindow = GemRB.LoadWindow(3)
-	QuitTextArea = GemRB.GetControl(QuitWindow,0)
-	CancelButton = GemRB.GetControl(QuitWindow, 2)
-	ConfirmButton = GemRB.GetControl(QuitWindow, 1)
-	GemRB.SetText(QuitWindow, QuitTextArea, 19532)
-	GemRB.SetText(QuitWindow, CancelButton, 13727)
-	GemRB.SetText(QuitWindow, ConfirmButton, 15417)
-	GemRB.SetEvent(QuitWindow, ConfirmButton, 0, "ExitConfirmed")
-	GemRB.SetEvent(QuitWindow, CancelButton, 0, "ExitCancelled")
+	QuitWindow = GemRB.LoadWindowObject(3)
+	QuitTextArea = QuitWindow.GetControl(0)
+	CancelButton = QuitWindow.GetControl(2)
+	ConfirmButton = QuitWindow.GetControl(1)
+	QuitTextArea.SetText(19532)
+	CancelButton.SetText(13727)
+	ConfirmButton.SetText(15417)
+	ConfirmButton.SetEvent(0, "ExitConfirmed")
+	CancelButton.SetEvent(0, "ExitCancelled")
 
 	#main window
-	StartWindow = GemRB.LoadWindow(0)
-	SinglePlayerButton = GemRB.GetControl(StartWindow, 0)
-	MultiPlayerButton = GemRB.GetControl(StartWindow, 1)
-	MoviesButton = GemRB.GetControl(StartWindow, 2)
-	ExitButton = GemRB.GetControl(StartWindow, 3)
+	StartWindow = GemRB.LoadWindowObject(0)
+	SinglePlayerButton = StartWindow.GetControl(0)
+	MultiPlayerButton = StartWindow.GetControl(1)
+	MoviesButton = StartWindow.GetControl(2)
+	ExitButton = StartWindow.GetControl(3)
 
 	BackToMain()
 	
@@ -47,30 +47,30 @@ def OnLoad():
 	
 def SinglePlayerPress():
 	
-	GemRB.SetText(StartWindow, SinglePlayerButton, 13728)
-	GemRB.SetText(StartWindow, MultiPlayerButton, 13729)
-	GemRB.SetText(StartWindow, MoviesButton, 24110)
-	GemRB.SetText(StartWindow, ExitButton, 15416)
-	GemRB.SetEvent(StartWindow, MultiPlayerButton, 0, "LoadSingle")
-	GemRB.SetEvent(StartWindow, SinglePlayerButton, 0, "NewSingle")
-	GemRB.SetEvent(StartWindow, MoviesButton, 0, "MissionPack")
-	GemRB.SetEvent(StartWindow, ExitButton, 0, "BackToMain")
+	SinglePlayerButton.SetText(13728)
+	MultiPlayerButton.SetText(13729)
+	MoviesButton.SetText(24110)
+	ExitButton.SetText(15416)
+	MultiPlayerButton.SetEvent(0, "LoadSingle")
+	SinglePlayerButton.SetEvent(0, "NewSingle")
+	MoviesButton.SetEvent(0, "MissionPack")
+	ExitButton.SetEvent(0, "BackToMain")
 	if GemRB.GetString(24110) == "": # TODO: better way to detect lack of mission pack?
-		GemRB.SetButtonFlags(StartWindow, MoviesButton, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		MoviesButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	return
 
 def MultiPlayerPress():
 	
-	GemRB.SetText(StartWindow, SinglePlayerButton, 11825)
-	GemRB.SetText(StartWindow, MultiPlayerButton, 20642)
-	GemRB.SetText(StartWindow, MoviesButton, 15416)
-	GemRB.SetText(StartWindow, ExitButton, "")
-	GemRB.SetEvent(StartWindow, SinglePlayerButton, 0, "PregenPress")
-	GemRB.SetEvent(StartWindow, MultiPlayerButton, 0, "ConnectPress")
-	GemRB.SetEvent(StartWindow, MoviesButton, 0, "BackToMain")
-	GemRB.SetEvent(StartWindow, ExitButton, 0, "")
-	GemRB.SetControlStatus(StartWindow, ExitButton, IE_GUI_BUTTON_DISABLED)
-	GemRB.SetButtonFlags(StartWindow, ExitButton, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+	SinglePlayerButton.SetText(11825)
+	MultiPlayerButton.SetText(20642)
+	MoviesButton.SetText(15416)
+	ExitButton.SetText("")
+	SinglePlayerButton.SetEvent(0, "PregenPress")
+	MultiPlayerButton.SetEvent(0, "ConnectPress")
+	MoviesButton.SetEvent(0, "BackToMain")
+	ExitButton.SetEvent(0, "")
+	ExitButton.SetStatus(IE_GUI_BUTTON_DISABLED)
+	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	return
 
 def ConnectPress():
@@ -78,8 +78,10 @@ def ConnectPress():
 	return
 
 def PregenPress():
-	GemRB.UnloadWindow(StartWindow)
-	GemRB.UnloadWindow(QuitWindow)
+	if StartWindow:
+		StartWindow.Unload()
+	if QuitWindow:
+		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0) #loadgame needs this hack
 	GemRB.GameSetExpansion(0)
 	GemRB.LoadGame(-1)
@@ -88,24 +90,30 @@ def PregenPress():
 	return
 
 def LoadSingle():
-	GemRB.UnloadWindow(StartWindow)
-	GemRB.UnloadWindow(QuitWindow)
+	if StartWindow:
+		StartWindow.Unload()
+	if QuitWindow:
+		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0)
 	GemRB.GameSetExpansion(0)
 	GemRB.SetNextScript("GUILOAD")
 	return
 
 def MissionPack():
-	GemRB.UnloadWindow(StartWindow)
-	GemRB.UnloadWindow(QuitWindow)
+	if StartWindow:
+		StartWindow.Unload()
+	if QuitWindow:
+		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",3) #use mpsave for saved games
 	GemRB.GameSetExpansion(1)
 	GemRB.SetNextScript("GUILOAD")
 	return
 
 def NewSingle():
-	GemRB.UnloadWindow(StartWindow)
-	GemRB.UnloadWindow(QuitWindow)
+	if StartWindow:
+		StartWindow.Unload()
+	if QuitWindow:
+		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0)
 	GemRB.GameSetExpansion(0)
 	GemRB.SetVar("Slot",1)
@@ -114,8 +122,8 @@ def NewSingle():
 	return
 
 def ExitPress():
-	GemRB.SetVisible(StartWindow,0)
-	GemRB.SetVisible(QuitWindow,1)
+	StartWindow.SetVisible(0)
+	QuitWindow.SetVisible(1)
 	return
 	
 def ExitConfirmed():
@@ -124,31 +132,33 @@ def ExitConfirmed():
 
 def MoviesPress():
 #apparently the order is important
-	GemRB.UnloadWindow(StartWindow)
-	GemRB.UnloadWindow(QuitWindow)
+	if StartWindow:
+		StartWindow.Unload()
+	if QuitWindow:
+		QuitWindow.Unload()
 	GemRB.SetNextScript("GUIMOVIE")
 	return
 
 def ExitCancelled():
-	GemRB.SetVisible(QuitWindow, 0)
-	GemRB.SetVisible(StartWindow, 1)
+	QuitWindow.SetVisible(0)
+	StartWindow.SetVisible(1)
 	return
 	
 def BackToMain():
-	GemRB.SetControlStatus(StartWindow, SinglePlayerButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetControlStatus(StartWindow, MultiPlayerButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetControlStatus(StartWindow, MoviesButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetControlStatus(StartWindow, ExitButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetText(StartWindow, SinglePlayerButton, 15413)
-	GemRB.SetText(StartWindow, MultiPlayerButton, 15414)
-	GemRB.SetText(StartWindow, MoviesButton, 15415)
-	GemRB.SetText(StartWindow, ExitButton, 15417)
-	GemRB.SetEvent(StartWindow, SinglePlayerButton, IE_GUI_BUTTON_ON_PRESS, "SinglePlayerPress")
-	GemRB.SetEvent(StartWindow, MultiPlayerButton, IE_GUI_BUTTON_ON_PRESS, "MultiPlayerPress")
-	GemRB.SetEvent(StartWindow, MoviesButton, IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
-	GemRB.SetEvent(StartWindow, ExitButton, IE_GUI_BUTTON_ON_PRESS, "ExitPress")
-	GemRB.SetButtonFlags(StartWindow, MoviesButton, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-	GemRB.SetButtonFlags(StartWindow, ExitButton, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-	GemRB.SetVisible(QuitWindow, 0)
-	GemRB.SetVisible(StartWindow, 1)
+	SinglePlayerButton.SetStatus(IE_GUI_BUTTON_ENABLED)
+	MultiPlayerButton.SetStatus(IE_GUI_BUTTON_ENABLED)
+	MoviesButton.SetStatus(IE_GUI_BUTTON_ENABLED)
+	ExitButton.SetStatus(IE_GUI_BUTTON_ENABLED)
+	SinglePlayerButton.SetText(15413)
+	MultiPlayerButton.SetText(15414)
+	MoviesButton.SetText(15415)
+	ExitButton.SetText(15417)
+	SinglePlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SinglePlayerPress")
+	MultiPlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MultiPlayerPress")
+	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
+	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitPress")
+	MoviesButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+	QuitWindow.SetVisible(0)
+	StartWindow.SetVisible(1)
 	return

@@ -31,23 +31,23 @@ def StartLoadScreen ():
 	global LoadScreen
 
 	GemRB.LoadWindowPack ("guils")
-	LoadScreen = GemRB.LoadWindow (0)
+	LoadScreen = GemRB.LoadWindowObject (0)
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	if LoadPic=="":
 		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
-	GemRB.SetWindowPicture(LoadScreen, LoadPic)
-	Bar = GemRB.GetControl (LoadScreen, 0)
+	LoadScreen.SetPicture(LoadPic)
+	Bar = LoadScreen.GetControl (0)
 	Progress = 0
 	GemRB.SetVar ("Progress", Progress)
-	GemRB.SetVarAssoc (LoadScreen, Bar, "Progress", Progress)
-	GemRB.SetEvent (LoadScreen, Bar, IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
-	Skull = GemRB.GetControl (LoadScreen, 3)
-	GemRB.SetButtonMOS (LoadScreen, Skull, "GTRBPSK")
-	GemRB.SetVisible (LoadScreen, 1)
+	Bar.SetVarAssoc ("Progress", Progress)
+	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
+	Skull = LoadScreen.GetControl (3)
+	Skull.SetMOS ("GTRBPSK")
+	LoadScreen.SetVisible (1)
 	return
 
 def EndLoadScreen ():
-	Skull = GemRB.GetControl (LoadScreen, 3)
-	GemRB.SetButtonMOS (LoadScreen, Skull, "GTRBPSK2")
-	GemRB.SetVisible (LoadScreen, 1)
+	Skull = LoadScreen.GetControl (3)
+	Skull.SetMOS ("GTRBPSK2")
+	LoadScreen.SetVisible (1)
 	return

@@ -9,42 +9,44 @@ def OnLoad():
 	global ImportWindow, TextAreaControl
 
 	GemRB.LoadWindowPack("GUICG")
-	ImportWindow = GemRB.LoadWindow(20)
+	ImportWindow = GemRB.LoadWindowObject(20)
 
-	TextAreaControl = GemRB.GetControl(ImportWindow, 4)
-	GemRB.SetText(ImportWindow, TextAreaControl, 10963)
+	TextAreaControl = ImportWindow.GetControl(4)
+	TextAreaControl.SetText(10963)
 
-	TextAreaControl = GemRB.GetControl(ImportWindow,2)
-	GemRB.SetTextAreaFlags (ImportWindow, TextAreaControl, IE_GUI_TEXTAREA_SELECTABLE)
+	TextAreaControl = ImportWindow.GetControl(2)
+	TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	GemRB.GetCharacters(ImportWindow, TextAreaControl)
 
-	DoneButton = GemRB.GetControl(ImportWindow, 0)
-	GemRB.SetText(ImportWindow, DoneButton, 13955)
-	GemRB.SetButtonState(ImportWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+	DoneButton = ImportWindow.GetControl(0)
+	DoneButton.SetText(13955)
+	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
-	CancelButton = GemRB.GetControl(ImportWindow,1)
-	GemRB.SetText(ImportWindow, CancelButton, 15416)
+	CancelButton = ImportWindow.GetControl(1)
+	CancelButton.SetText(15416)
 
-	GemRB.SetEvent(ImportWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
-	GemRB.SetEvent(ImportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.SetEvent(ImportWindow, TextAreaControl, IE_GUI_TEXTAREA_ON_CHANGE, "SelectPress")
-	GemRB.SetVisible(ImportWindow,1)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, "SelectPress")
+	ImportWindow.SetVisible(1)
 	return
 
 def SelectPress():
-	DoneButton = GemRB.GetControl(ImportWindow, 0)
-	GemRB.SetButtonState(ImportWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+	DoneButton = ImportWindow.GetControl(0)
+	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def DonePress():
-	FileName = GemRB.QueryText(ImportWindow, TextAreaControl)
+	FileName = TextAreaControl.QueryText()
 	Slot = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
-	GemRB.UnloadWindow(ImportWindow)
+	if ImportWindow:
+		ImportWindow.Unload()
 	GemRB.SetNextScript("CharGen7")
 	return
 	
 def CancelPress():
-	GemRB.UnloadWindow(ImportWindow)
+	if ImportWindow:
+		ImportWindow.Unload()
 	GemRB.SetNextScript(GemRB.GetToken("NextScript"))
 	return
