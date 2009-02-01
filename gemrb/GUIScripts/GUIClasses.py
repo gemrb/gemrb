@@ -75,6 +75,9 @@ class GWindow:
   def CreateLabel(self, control, *args):
     GemRB.CreateLabel(self.ID, control, *args)
     return GemRB.GetControlObject(self.ID, control)
+  def CreateTextEdit(self, control, *args):
+    GemRB.CreateTextEdit(self.ID, control, *args)
+    return GemRB.GetControlObject(self.ID, control)
  
 
 class GControl:
