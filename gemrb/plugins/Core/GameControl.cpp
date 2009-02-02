@@ -177,20 +177,20 @@ void GameControl::MoveToPointFormation(Actor *actor, Point p, int Orient)
 	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
 	switch(Orient) {
 	case 11: case 12: case 13://east
-		p.x-=formations[formation][pos].y*30;
-		p.y+=formations[formation][pos].x*30;
+		p.x-=formations[formation][pos].y;
+		p.y+=formations[formation][pos].x;
 		break;
 	case 6: case 7: case 8: case 9: case 10: //north
-		p.x+=formations[formation][pos].x*30;
-		p.y+=formations[formation][pos].y*30;
+		p.x+=formations[formation][pos].x;
+		p.y+=formations[formation][pos].y;
 		break;
 	case 3: case 4: case 5: //west
-		p.x+=formations[formation][pos].y*30;
-		p.y-=formations[formation][pos].x*30;
+		p.x+=formations[formation][pos].y;
+		p.y-=formations[formation][pos].x;
 		break;
 	case 0: case 1: case 2: case 14: case 15://south
-		p.x-=formations[formation][pos].x*30;
-		p.y-=formations[formation][pos].y*30;
+		p.x-=formations[formation][pos].x;
+		p.y-=formations[formation][pos].y;
 		break;
 	}
 	sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
