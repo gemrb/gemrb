@@ -189,14 +189,15 @@ def generate_2by3():
 	for i in range(num_coords):
 		if left_side: # left
 			print -24,
+			print yloc,
 		else: # right
 			print 24,
+			print yloc,
 			# first step back is 48, then 36
 			if yloc == 0:
 				yloc = 48
 			else:
 				yloc += 36
-		print yloc,
 		left_side = not left_side
 	print
 
