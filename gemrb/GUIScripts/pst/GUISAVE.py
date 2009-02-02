@@ -249,7 +249,7 @@ def OpenSaveDetailWindow ():
 
 	# Areapreview
 	Button = Window.GetControl (0)
-	GemRB.SetGamePreview (Window, Button)
+	Button.SetGamePreview ()
 
 	# PC portraits
 	for j in range (PARTY_SIZE):
