@@ -99,9 +99,21 @@ def generate_gather():
 		print yloc,
 	print
 
-# A wavy-line formation.
+# TODO: not finished/correct
 def generate_4and2():
 	print "4AND2",
+	print "0 0",
+	print "30 0",
+	print "-30 0",
+	print "60 0",
+	print "0 30",
+	print "30 30",
+	print "0 60",
+	print
+
+# A wavy-line formation.
+def generate_s():
+	print "S",
 	for i in range(num_coords):
 		# x coordinate: +/- 15
 		if i % 2 == 0:
@@ -125,8 +137,8 @@ def corrected_position_for_actor(actorno, leadpos):
 
 # A wavy-line formation, with the lead character in the 4th position and
 # the other characters in order (even if this leaves spaces!).
-def generate_s():
-	print "S",
+def generate_wavyline():
+	print "WAVYLINE",
 	for i in range(num_coords):
 		pos = corrected_position_for_actor(i, 3)
 
@@ -214,11 +226,23 @@ def generate_rank():
 		print 0,
 	print
 
+# TODO: not finished/correct
+def generate_v():
+	print "V",
+	print "0 0",
+	print "30 0",
+	print "-30 30",
+	print "60 30",
+	print "-60 60",
+	print "90 60",
+	print "-90 90",
+	print
+
 # A triangle with the lead character at the back. Focal point is at the
 # front. Other characters are placed row-by-row starting at the front row,
 # middle then left then right, with the maximum width being 3.
-def generate_v():
-	print "V",
+def generate_triangle():
+	print "TRIANGLE",
 	for i in range(num_coords):
 		pos = corrected_position_for_actor(i, 3)
 		if pos == 0:
@@ -287,7 +311,7 @@ if argv[1] == "bg1" or argv[1] == "iwd" or argv[1] == "iwd2" or argv[1] == "how"
 	generate_gather()
 	generate_4and2()
 	generate_3by2()
-	generate_protect()
+	generate_protect() # TODO: wrong formation for bg1 or others?
 	generate_2by3()
 	generate_rank()
 	generate_v()
@@ -296,6 +320,18 @@ if argv[1] == "bg1" or argv[1] == "iwd" or argv[1] == "iwd2" or argv[1] == "how"
 	generate_line("LINE")
 
 if argv[1] == "pst":
+	generate_line("FOLLOW") # TODO: should be hard-coded game logic
+	generate_t()
+	generate_gather()
+	generate_4and2()
+	generate_3by2()
+	generate_protect()
+	generate_2by3()
+	generate_rank()
+	generate_v()
+	generate_wedge()
+	generate_s()
+	generate_line("LINE")
 	print "NONE",
 	for i in range(num_coords):
 		print "0 0",
@@ -305,14 +341,14 @@ if argv[1] == "bg2":
 	generate_line("FOLLOW") # TODO: should be hard-coded game logic
 	generate_t()
 	generate_gather()
-	generate_s()
+	generate_wavyline()
 	generate_3by2()
 	generate_protect()
 	generate_2by3()
 	generate_rank()
-	generate_v()
+	generate_triangle()
 	generate_wedge()
-	generate_4and2()
+	generate_s()
 	generate_line("LINE")
 
 if argv[1] == "test1":
