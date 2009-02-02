@@ -70,9 +70,13 @@ bool p2DAImp::Open(DataStream* stream, bool autoFree)
 	while (true) {
 		char* line = ( char* ) malloc( 1024 );
 		int len = str->ReadLine( line, 1023 );
-		if (len <= 0 || line[0] == '#') {
+		if (len <= 0) {
 			free( line );
 			break;
+		}
+		if (line[0] == '#') { // allow comments
+			free( line );
+			continue;
 		}
 		if (len < 1024)
 			line = ( char * ) realloc( line, len + 1 );
