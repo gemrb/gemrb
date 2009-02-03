@@ -85,7 +85,7 @@ def FinishCharGen():
 		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Ability "+str(i) ) )
 
 	# set the base number of attacks; effects will add the proficiency bonus
-	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 1)
+	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 2)
 	TmpTable=GemRB.LoadTableObject ("weapprof")
 	ProfCount = TmpTable.GetRowCount ()
 	#bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
