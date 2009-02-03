@@ -25,6 +25,10 @@
 
 # written (badly, sorry!) by fuzzie, feb 2nd 2009
 
+# TODO: older games have focus points in different positions and different
+# spacing (ie, coordinates have different offsets)
+# eg, pst seems to usually have the focus point always on the lead char
+
 num_coords = 20
 
 def generate_header():
@@ -99,27 +103,37 @@ def generate_gather():
 		print yloc,
 	print
 
-# TODO: not finished/correct
+# A block formation which places 4 on a row - first two in the 
+# middle (left then right), then two on the outside (left then right).
+# With a party size of 6 this results in 4 on the first row and 2 on the
+# second, hence the name.
 def generate_4and2():
 	print "4AND2",
-	print "0 0",
-	print "30 0",
-	print "-30 0",
-	print "60 0",
-	print "0 30",
-	print "30 30",
-	print "0 60",
+	for i in range(num_coords):
+		if i % 4 == 0:
+			xloc = 0
+		elif i % 4 == 1:
+			xloc = 64
+		elif i % 4 == 2:
+			xloc = -64
+		else:
+			xloc = 128
+		yloc = (i / 4) * 48
+		print xloc,
+		print yloc,
 	print
 
 # A wavy-line formation.
-def generate_s():
+def generate_s(bg2style):
 	print "S",
 	for i in range(num_coords):
-		# x coordinate: +/- 15
+		# x coordinate: +/- 15 for bg2, 0/64 otherwise
 		if i % 2 == 0:
-			print 15, # on right
+			if bg2style: print 15, # on right
+			else: print 0, # on left
 		else:
-			print -15, # on left
+			if bg2style: print -15, # on left
+			else: print 64, # on right
 		
 		# y coordinate: 24 each
 		print i * 24,	
@@ -226,16 +240,16 @@ def generate_rank():
 		print 0,
 	print
 
-# TODO: not finished/correct
 def generate_v():
 	print "V",
-	print "0 0",
-	print "30 0",
-	print "-30 30",
-	print "60 30",
-	print "-60 60",
-	print "90 60",
-	print "-90 90",
+	for i in range(num_coords):
+		if i % 2 == 0:
+			xpos = (i / 2) * -15
+		else:
+			xpos = 64 + (i / 2) * -15
+		ypos = (i / 2) * 48
+		print xpos,
+		print ypos,
 	print
 
 # A triangle with the lead character at the back. Focal point is at the
@@ -270,6 +284,7 @@ def generate_triangle():
 # A wide triangle with the lead character at the front. Characters are placed
 # row-by-row. Second row: right then left. Third row: left then right then
 # middle. Other rows: Middle first, left, right.
+# TODO: the older games seem to have the third row ordered the same as the other ones
 def generate_wedge():
 	print "WEDGE",
 	for i in range(num_coords):
@@ -316,7 +331,7 @@ if argv[1] == "bg1" or argv[1] == "iwd" or argv[1] == "iwd2" or argv[1] == "how"
 	generate_rank()
 	generate_v()
 	generate_wedge()
-	generate_s()
+	generate_s(False)
 	generate_line("LINE")
 
 if argv[1] == "pst":
@@ -330,7 +345,7 @@ if argv[1] == "pst":
 	generate_rank()
 	generate_v()
 	generate_wedge()
-	generate_s()
+	generate_s(False)
 	generate_line("LINE")
 	print "NONE",
 	for i in range(num_coords):
@@ -348,7 +363,7 @@ if argv[1] == "bg2":
 	generate_rank()
 	generate_triangle()
 	generate_wedge()
-	generate_s()
+	generate_s(True)
 	generate_line("LINE")
 
 if argv[1] == "test1":
