@@ -131,8 +131,7 @@ def DisplayOverview(step):
 		elif part == 3:
 			TextAreaControl.Append (1048, -1) # new line
 			TextAreaControl.Append (": ")
-			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, \
-				RaceTable.GetValue (GemRB.GetVar ("Race")-1,2))
+			TextAreaControl.Append (RaceTable.GetValue (GemRB.GetVar ("Race")-1,2))
 		elif part == 4:
 			TextAreaControl.Append (12136, -1)
 			TextAreaControl.Append (": ")
@@ -153,8 +152,7 @@ def DisplayOverview(step):
 			for i in range(6):
 				v = AbilityTable.GetValue (i, 2)
 				TextAreaControl.Append (v, -1)
-				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, ": " \
-					+ str(GemRB.GetVar ("Ability "+str(i))) )
+				TextAreaControl.Append (": " + str(GemRB.GetVar ("Ability "+str(i))) )
 		elif part == 7:
 			TextAreaControl.Append ("\n\n")
 			# thieving and other skills

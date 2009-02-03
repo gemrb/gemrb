@@ -40,8 +40,7 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	GemRB.SetEvent(CharSoundWindow, VoiceList, \
-					IE_GUI_TEXTAREA_ON_CHANGE, "ChangeVoice")
+	VoiceList.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, "ChangeVoice")
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	CharSoundWindow.SetVisible(1)

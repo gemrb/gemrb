@@ -33,7 +33,7 @@ def RefreshPDoll():
 	AnimID = AnimID+table.GetValue(GemRB.GetVar("Gender"),0)
 	ResRef = PDollTable.GetValue(hex(AnimID), "LEVEL1")
 
-	PDollButton.SetButtonPLT(ResRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
+	PDollButton.SetPLT(ResRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
 	return
 
 def OnLoad():
