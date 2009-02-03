@@ -35,6 +35,7 @@
 #include "Item.h"
 #include "Game.h"
 #include "SaveGameIterator.h"
+#include <cmath>
 
 #define DEBUG_SHOW_INFOPOINTS   0x01
 #define DEBUG_SHOW_CONTAINERS   0x02
@@ -167,32 +168,35 @@ Point GameControl::GetFormationOffset(ieDword formation, ieDword pos)
 }
 
 //don't pass p as a reference
-void GameControl::MoveToPointFormation(Actor *actor, Point p, int Orient)
+void GameControl::MoveToPointFormation(Actor *actor, unsigned int pos, Point src, Point p)
 {
-	unsigned int pos;
 	char Tmp[256];
 
 	int formation=core->GetGame()->GetFormation();
-	pos=actor->InParty-1; //either this or the actual # of selected actor?
 	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
-	switch(Orient) {
-	case 11: case 12: case 13://east
-		p.x-=formations[formation][pos].y;
-		p.y+=formations[formation][pos].x;
-		break;
-	case 6: case 7: case 8: case 9: case 10: //north
-		p.x+=formations[formation][pos].x;
-		p.y+=formations[formation][pos].y;
-		break;
-	case 3: case 4: case 5: //west
-		p.x+=formations[formation][pos].y;
-		p.y-=formations[formation][pos].x;
-		break;
-	case 0: case 1: case 2: case 14: case 15://south
-		p.x-=formations[formation][pos].x;
-		p.y-=formations[formation][pos].y;
-		break;
+
+	// calculate angle
+	double angle;
+	double xdiff = src.x - p.x;
+	double ydiff = src.y - p.y;
+	if (ydiff == 0) {
+		if (xdiff > 0) {
+			angle = M_PI_2;
+		} else {
+			angle = -M_PI_2;
+		}
+	} else {
+		angle = atan(xdiff/ydiff);
+		if (ydiff < 0) angle += M_PI;
 	}
+	
+	// calculate new coordinates by rotating formation around (0,0)
+	double newx = -formations[formation][pos].x * cos(angle) + formations[formation][pos].y * sin(angle);
+	double newy = formations[formation][pos].x * sin(angle) + formations[formation][pos].y * cos(angle);
+	p.x += (int)newx;
+	p.y += (int)newy;
+
+	// generate an action to do the actual movement
 	sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
 	actor->AddAction( GenerateAction( Tmp) );
 }
@@ -1512,16 +1516,42 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			}
 			return;
 		}
+
+		// construct a sorted party
+		// TODO: this is beyond horrible, help
+		std::vector<Actor *> party;
+		// first, from the actual party
+		for (int i = 0; i < game->GetPartySize(false); i++) {
+			Actor *pc = game->FindPC(i + 1);
+			if (!pc) continue;
+
+			for (unsigned int j = 0; j < game->selected.size(); j++) {
+				if (game->selected[j] == pc) {
+					party.push_back(pc);
+				}
+			}
+		}
+		// then, anything else we selected
+		for (unsigned int i = 0; i < game->selected.size(); i++) {
+			bool found = false;
+			for (unsigned int j = 0; j < party.size(); j++) {
+				if (game->selected[i] == party[j]) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) party.push_back(game->selected[i]);
+		}
+		
 		//party formation movement
-		int orient=GetOrient(p, game->selected[0]->Pos);
-		for(unsigned int i = 0; i < game->selected.size(); i++) {
-			actor=game->selected[i];
+		Point src = party[0]->Pos;
+		for(unsigned int i = 0; i < party.size(); i++) {
+			actor = party[i];
 			actor->ClearPath();
 			actor->ClearActions();
-			//formations should be rotated based on starting point
-			//of the leader? and destination
-			MoveToPointFormation(actor,p,orient);
+			MoveToPointFormation(actor, i, src, p);
 		}
+
 		//p is a searchmap travel region
 		if ( actor->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
 			sprintf( Tmp, "NIDSpecial2()" );

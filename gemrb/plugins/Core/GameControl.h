@@ -214,7 +214,7 @@ public:
 	void HandleDoor(Door *door, Actor *actor);
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
 	Point GetFormationOffset(ieDword formation, ieDword pos);
-	void MoveToPointFormation(Actor *actor, Point p, int Orient);
+	void MoveToPointFormation(Actor *actor, unsigned int pos, Point src, Point p);
 	void InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);
