@@ -326,6 +326,15 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 	}
 	Control *ctrl = NULL;
 
+	// tab shows tooltips
+	if (Key == GEM_TAB) {
+		if (last_win_over != NULL) {
+			Control *ctrl = last_win_over->GetOver();
+			if (ctrl != NULL) {
+				ctrl->DisplayTooltip();
+			}
+		}
+	}
 	//the default control will get only GEM_RETURN
 	if (Key == GEM_RETURN) {
 		ctrl = last_win_focused->GetDefaultControl();

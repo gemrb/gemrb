@@ -316,6 +316,9 @@ int SDLVideoDriver::SwapBuffers(void)
 				case SDLK_RALT:
 					key = GEM_ALT;
 					break;
+				case SDLK_TAB:
+					key = GEM_TAB;
+					break;
 				default:
 					break;
 				}
