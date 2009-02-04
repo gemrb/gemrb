@@ -2159,6 +2159,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 			//TODO: the original engine allowed opening of a door when the
 			//key was on any of the partymembers
 			if (!Key || !actor->inventory.HasItem(Key,0) ) {
+				core->DisplayConstantString(STR_DOORLOCKED,0xd7d7be);
 				//playsound unsuccessful opening of door
 				core->PlaySound(DS_OPEN_FAIL);
 				Sender->ReleaseCurrentAction();
