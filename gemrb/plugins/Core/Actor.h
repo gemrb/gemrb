@@ -522,5 +522,9 @@ public:
 	void AddProjectileImmunity(ieDword projectile);
 	/* Set up all the missing stats on load time, chargen, or after level up */
 	void CreateDerivedStats();
+	/* Checks if the actor is multiclassed (excluding dualclassed actors)) */
+	bool IsMultiClassed() const;
+	/* Checks if the actor is dualclassed */
+	bool IsDualClassed() const;
 };
 #endif

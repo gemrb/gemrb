@@ -1467,7 +1467,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	//calculate hp bonus
 	int bonus;
 
-	//fighter or not (still very primitive model, we need multiclass)
+	// warrior (fighter, barbarian, ranger, or paladin) or not
+	// TODO: for multiclassed characters we look at all classes and use the best
+	// TODO: for dualclassed characters we take the best only if both are active
 	if (Modified[IE_CLASS]==2) {
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
 	} else {
@@ -1936,7 +1938,7 @@ ieDword Actor::GetXPLevel(int modified) const
 		int levels[3]={stats[IE_LEVEL], stats[IE_LEVEL2], stats[IE_LEVEL3]};
 		average = levels[0];
 		classcount = 1;
-		if ((stats[IE_MC_FLAGS] & MC_WAS_ANY) > 0) {
+		if (IsDualClassed()) {
 			// dualclassed
 			if (levels[1] > 0) {
 				classcount++;
@@ -1944,20 +1946,17 @@ ieDword Actor::GetXPLevel(int modified) const
 			}
 		}
 		else {
-			// plain level detection fails sometimes, so we improve the correctness by
-			// checking the class
-			long multi2;
-			if (valid_number(multiclass, multi2) && multi2 > 0) {
-				// multiclassed (MULTI is set)
+			if (IsMultiClassed()) {
 				if (levels[1] > 0) {
 					classcount++;
 					average += levels[1];
 				}
+				// TODO: rather deduce the number of classes from the name
 				if (levels[2] > 0 && (levels[0]-levels[2]) < 5) { //HACK for jaheira (starts as 6-7-1)
 					classcount++;
 					average += levels[2];
 				}
-			}
+			} // else single class
 		}
 		average = average / classcount + 0.5;
 	}
@@ -4165,3 +4164,15 @@ void Actor::CreateDerivedStats()
 	}
 }
 
+/* Checks if the actor is multiclassed (the MULTI column is positive) */
+bool Actor::IsMultiClassed() const
+{
+	long multi2;
+	return (valid_number(multiclass, multi2) && multi2 > 0);
+}
+
+/* Checks if the actor is dualclassed */
+bool Actor::IsDualClassed() const
+{
+	return (Modified[IE_MC_FLAGS] & MC_WAS_ANY) > 0;
+}
