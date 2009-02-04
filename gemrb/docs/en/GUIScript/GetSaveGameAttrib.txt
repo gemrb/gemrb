@@ -11,6 +11,7 @@ Type - the queried attribute's name
  2 - path
  3 - date
  4 - elapsed game time
+ 5 - id
 SlotCount - the index of a saved game
 
 Return value: string
