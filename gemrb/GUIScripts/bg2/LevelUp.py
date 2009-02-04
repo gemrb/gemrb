@@ -42,12 +42,13 @@ NewSkillPoints = 0
 ClickCount = 0
 OldDirection = 0
 OldPos = 0
+LevelDiff = 0
 
 # TODO: multiclass support
 def LevelUpWindow():
 	global LevelUpWindow, TextAreaControl, ProfPointsLeft, NewProfPoints
 	global TopIndex, ScrollBarControl, DoneButton, WeapProfTable, ProfColumn
-	global SkillTable, SkillPointsLeft, NewSkillPoints, KitName
+	global SkillTable, SkillPointsLeft, NewSkillPoints, KitName, LevelDiff
 
 	LevelUpWindow = GemRB.LoadWindowObject (3)
 
@@ -326,13 +327,13 @@ def GetLevelUpNews():
 	return News
 
 def LevelUpInfoPress():
-	global LevelUpWindow, TextAreaControl, InfoCounter
+	global LevelUpWindow, TextAreaControl, InfoCounter, LevelDiff
 
 	if InfoCounter % 2:
 		pc = GemRB.GameGetSelectedPCSingle ()
-		# TODO: call GetStatOverview with the new levels, so the future overview is shown
+		# call GetStatOverview with the new levels, so the future overview is shown
 		# TODO: also take in effect the current prof and skill selection
-		TextAreaControl.SetText(GetStatOverview(pc, 1))
+		TextAreaControl.SetText(GetStatOverview(pc, LevelDiff))
 	else:
 		TextAreaControl.SetText(GetLevelUpNews())
 	InfoCounter += 1

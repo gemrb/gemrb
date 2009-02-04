@@ -303,6 +303,7 @@ def GetStatOverview (pc, LevelDiff=0):
 	Class = ClassTable.GetRowName (Class)
 	Dual = IsDualClassed (pc, 1)
 	if Multi:
+		# TODO: handle LevelDiff for true mc chars
 		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), GemRB.GetPlayerStat (pc, IE_LEVEL2), GemRB.GetPlayerStat (pc, IE_LEVEL3)]
 		Classes = [0,0,0]
 		MultiCount = 0
@@ -321,6 +322,8 @@ def GetStatOverview (pc, LevelDiff=0):
 			# the current active class does not matter!
 			if Classes[0] == Dual[1]:
 				Levels = [Levels[1], Levels[0], Levels[2]]
+
+			Levels[0] += LevelDiff
 
 			ClassTitle = GemRB.GetString(ClassTable.GetValue (Dual[2], 2))
 			GemRB.SetToken("CLASS", ClassTitle)
@@ -381,7 +384,7 @@ def GetStatOverview (pc, LevelDiff=0):
 				stats.append (None)
 
 	else: # single classed
-		Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
+		Level = GemRB.GetPlayerStat (pc, IE_LEVEL) + LevelDiff
 		GemRB.SetToken("LEVEL", str (Level) )
 		GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
 		GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
