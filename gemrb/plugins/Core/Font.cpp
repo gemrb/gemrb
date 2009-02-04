@@ -306,6 +306,12 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	size_t len = strlen( ( char* ) string );
 	char* tmp = ( char* ) malloc( len + 1 );
 	memcpy( tmp, ( char * ) string, len + 1 );
+	while (len > 0 && (tmp[len - 1] == '\n' || tmp[len - 1] == '\r')) {
+		// ignore trailing newlines
+		tmp[len - 1] = 0;
+		len--;
+	}
+
 	SetupString( tmp, rgn.w, NoColor );
 	int ystep = 0;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
