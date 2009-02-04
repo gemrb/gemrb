@@ -280,7 +280,7 @@ def GetStatColor (pc, stat):
 		return (255,255,0)
 	return (0,255,0)
 
-def GetStatOverview (pc):
+def GetStatOverview (pc, LevelDiff=0):
 	StateTable = GemRB.LoadTableObject ("statdesc")
 	str_None = GemRB.GetString (61560)
 
@@ -388,12 +388,13 @@ def GetStatOverview (pc):
 		stats.append ( (16480,1,'c') )
 		stats.append (None)
 
-	effects = GemRB.GetPlayerStates (pc)
-	if len(effects):
-		for c in effects:
-			tmp = StateTable.GetValue (ord(c)-66, 0)
-			stats.append ( (tmp,c,'a') )
-		stats.append (None)
+	if not LevelDiff:
+		effects = GemRB.GetPlayerStates (pc)
+		if len(effects):
+			for c in effects:
+				tmp = StateTable.GetValue (ord(c)-66, 0)
+				stats.append ( (tmp,c,'a') )
+			stats.append (None)
 
 	stats.append ( (8442,1,'c') )
 

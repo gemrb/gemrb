@@ -332,7 +332,7 @@ def LevelUpInfoPress():
 		pc = GemRB.GameGetSelectedPCSingle ()
 		# TODO: call GetStatOverview with the new levels, so the future overview is shown
 		# TODO: also take in effect the current prof and skill selection
-		TextAreaControl.SetText(GetStatOverview(pc))
+		TextAreaControl.SetText(GetStatOverview(pc, 1))
 	else:
 		TextAreaControl.SetText(GetLevelUpNews())
 	InfoCounter += 1
