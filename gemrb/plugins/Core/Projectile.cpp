@@ -416,6 +416,16 @@ void Projectile::CheckTrigger(unsigned int radius)
 	}
 }
 
+void Projectile::SetEffectsCopy(EffectQueue *eq)
+{
+	if(effects) delete effects;
+	if(!eq) {
+		effects=NULL;
+		return;
+	}
+	effects = eq->CopySelf();
+}
+
 //secondary projectiles target all in the explosion radius
 void Projectile::SecondaryTarget()
 {
@@ -424,9 +434,7 @@ void Projectile::SecondaryTarget()
 	Actor **poi=actors;
 	while(*poi) {
 		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(Extension->ExplProjIdx);
-		// this doesn't work because 'effects' needs to be copied
-		// (otherwise it is freed while in-use, for example)
-		// pro->SetEffects(effects);
+		pro->SetEffectsCopy(effects);
 		pro->SetCaster(Caster);
 		area->AddProjectile(pro, Pos, (*poi)->GetGlobalID());
 		poi++;

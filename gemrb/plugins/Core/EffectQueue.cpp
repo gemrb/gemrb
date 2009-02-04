@@ -346,6 +346,21 @@ Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, i
 	return CreateEffect(effect_reference.EffText, param1, param2, timing);
 }
 
+EffectQueue *EffectQueue::CopySelf()
+{
+	EffectQueue *effects;
+
+        effects = new EffectQueue();
+        std::list< Effect* >::iterator fxit = GetFirstEffect();
+	Effect *fx;
+
+        while( (fx = GetNextEffect(fxit))) {
+                effects->AddEffect(fx, false);
+        }
+        effects->SetOwner(GetOwner());
+	return effects;
+}
+
 Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2)
 {
 	if (opcode==0xffffffff) {

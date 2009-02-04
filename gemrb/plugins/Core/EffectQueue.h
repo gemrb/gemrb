@@ -159,6 +159,7 @@ bool IsColorslotEffect(int opcode);
  */
 
 class GEM_EXPORT EffectQueue {
+private:
 	/** List of Effects applied on the Actor */
 	std::list< Effect* > effects;
 	/** Actor which is target of the Effects */
@@ -232,6 +233,7 @@ public:
 	/* this method hacks the offhand weapon color effects */
 	static void HackColorEffects(Actor *Owner, Effect *fx);
 	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieDword timing);
+	EffectQueue *CopySelf();
 	static Effect *CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2);
 	//locating opcodes
 	Effect *HasEffect(EffectRef &effect_reference) const;

@@ -183,6 +183,8 @@ public:
 		return Pos.y;
 	}
 
+	void SetEffectsCopy(EffectQueue *eq);
+
 	//don't forget to set effects to NULL when the projectile discharges
 	//unexploded projectiles are responsible to destruct their payload
 
