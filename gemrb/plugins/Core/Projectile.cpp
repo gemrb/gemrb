@@ -424,10 +424,14 @@ void Projectile::SecondaryTarget()
 	Actor **poi=actors;
 	while(*poi) {
 		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(Extension->ExplProjIdx);
-		pro->SetEffects(effects);
+		// this doesn't work because 'effects' needs to be copied
+		// (otherwise it is freed while in-use, for example)
+		// pro->SetEffects(effects);
 		pro->SetCaster(Caster);
 		area->AddProjectile(pro, Pos, (*poi)->GetGlobalID());
+		poi++;
 	}
+	free(actors);
 }
 
 int Projectile::Update()
