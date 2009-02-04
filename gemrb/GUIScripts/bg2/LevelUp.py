@@ -39,6 +39,9 @@ ProfPointsLeft = 0
 NewProfPoints = 0
 SkillPointsLeft = 0
 NewSkillPoints = 0
+ClickCount = 0
+OldDirection = 0
+OldPos = 0
 
 # TODO: multiclass support
 def LevelUpWindow():
@@ -169,14 +172,15 @@ def LevelUpWindow():
 
 	TopIndex = 0
 	RedrawSkills(1)
-
+	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	LevelUpWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 # TODO: sorcerer spell selection
-def RedrawSkills(First=0):
+def RedrawSkills(First=0, direction=0):
 	global TopIndex, ScrollBarControl, DoneButton, LevelUpWindow, ProfPointsLeft
 	global SkillPointsLeft, SkillTable, NewSkillPoints
+	global ClickCount, OldDirection
 
 	#TODO: and not a sorcerer
 	#TODO: and no more hlas
@@ -274,6 +278,17 @@ def RedrawSkills(First=0):
 		GemRB.SetVar("TopIndex",TopIndex)
 		RedrawSkills()
 
+	if direction:
+		if OldDirection == direction:
+			ClickCount = ClickCount + 1
+			if ClickCount>10:
+				GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_OR)
+			return
+
+	OldDirection = direction
+	ClickCount = 0
+	GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_NAND)
+
 	return
 
 # TODO: constructs a string with the gains that the new levels bring
@@ -347,6 +362,7 @@ def LevelUpDonePress():
 	
 	if LevelUpWindow:
 		LevelUpWindow.Unload()
+	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 	UpdateRecordsWindow()
 	return
 
@@ -375,8 +391,11 @@ def SkillRightPress():
 		return
 	GemRB.SetVar("Skill "+str(Pos),ActPoint-1)
 	SkillPointsLeft = SkillPointsLeft + 1
+	if OldPos != Pos:
+		OldPos = Pos
+		ClickCount = 0
 
-	RedrawSkills()
+	RedrawSkills(0,2)
 	return
 
 def SkillLeftPress():
@@ -391,8 +410,11 @@ def SkillLeftPress():
 		return
 	GemRB.SetVar("Skill "+str(Pos), ActPoint+1)
 	SkillPointsLeft = SkillPointsLeft - 1
+	if OldPos != Pos:
+		OldPos = Pos
+		ClickCount = 0
 
-	RedrawSkills()
+	RedrawSkills(0,1)
 	return
 
 def ScrollBarPress():
