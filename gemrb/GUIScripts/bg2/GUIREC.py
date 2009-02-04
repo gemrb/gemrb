@@ -27,7 +27,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow
+from GUICommon import CloseOtherWindow, GameIsTOB
 from GUICommonWindows import *
 from GUIWORLD import OpenReformPartyWindow
 
@@ -41,7 +41,6 @@ OldPortraitWindow = None
 OldOptionsWindow = None
 ExportWindow = None
 KitInfoWindow = None
-LevelUpWindow = None
 ExportDoneButton = None
 ExportFileName = ""
 
@@ -934,15 +933,11 @@ def KitInfoWindow():
 	KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def LevelUpDonePress():
-	if LevelUpWindow:
-		LevelUpWindow.Unload()
-	return
-
 def KitDonePress():
 	if KitInfoWindow:
 		KitInfoWindow.Unload()
 	return
 
+from LevelUp import *
 ###################################################
 # End of file GUIREC.py

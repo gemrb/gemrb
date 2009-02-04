@@ -10,7 +10,7 @@ TopIndex = 0
 PointsLeft = 0
 ProfColumn = 0
 
-def RedrawSkills(SkillWindow, First=0):
+def RedrawSkills(First=0):
 	global TopIndex, ScrollBarControl
 
 	if PointsLeft == 0:
@@ -62,7 +62,7 @@ def RedrawSkills(SkillWindow, First=0):
 	if len(SkipProfs) > 0 and First == 1:
 		TopIndex += SkipProfs[len(SkipProfs)-1] + 1
 		GemRB.SetVar("TopIndex",TopIndex)
-		RedrawSkills(SkillWindow)
+		RedrawSkills()
 
 	return
 
@@ -139,7 +139,7 @@ def OnLoad():
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	TopIndex = 0
-	RedrawSkills(SkillWindow, 1)
+	RedrawSkills(1)
 	SkillWindow.SetVisible(1)
 	return
 
@@ -147,10 +147,11 @@ def ScrollBarPress():
 	global TopIndex
 
 	TopIndex = GemRB.GetVar("TopIndex")
-	RedrawSkills(SkillWindow)
+	RedrawSkills()
 	return
 
 def JustPress():
+	global TextAreaControl
 	Pos = GemRB.GetVar("Prof")+TopIndex
 	TextAreaControl.SetText(SkillTable.GetValue(Pos+8, 2) )
 	return
@@ -166,7 +167,7 @@ def RightPress():
 	GemRB.SetVar("Prof "+str(Pos),ActPoint-1)
 	PointsLeft = PointsLeft + 1
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	RedrawSkills(SkillWindow)
+	RedrawSkills()
 	return
 
 def LeftPress():
@@ -185,7 +186,7 @@ def LeftPress():
 		return
 	GemRB.SetVar("Prof "+str(Pos),ActPoint+1)
 	PointsLeft = PointsLeft - 1
-	RedrawSkills(SkillWindow)
+	RedrawSkills()
 	return
 
 def BackPress():
