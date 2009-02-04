@@ -223,8 +223,8 @@ public:
 	{
 		return effects.begin();
 	}
-	const Effect *GetNextSavedEffect(std::list< Effect* >::const_iterator f) const;
-	Effect *GetNextEffect(std::list< Effect* >::const_iterator f) const;
+	const Effect *GetNextSavedEffect(std::list< Effect* >::const_iterator &f) const;
+	Effect *GetNextEffect(std::list< Effect* >::const_iterator &f) const;
 	ieDword CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *ResRef) const;
 	void ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y);
 	/* returns the number of saved effects */

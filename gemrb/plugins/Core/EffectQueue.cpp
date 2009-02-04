@@ -351,7 +351,7 @@ EffectQueue *EffectQueue::CopySelf()
 	EffectQueue *effects;
 
         effects = new EffectQueue();
-        std::list< Effect* >::iterator fxit = GetFirstEffect();
+        std::list< Effect* >::const_iterator fxit = GetFirstEffect();
 	Effect *fx;
 
         while( (fx = GetNextEffect(fxit))) {
@@ -1498,7 +1498,7 @@ void EffectQueue::HackColorEffects(Actor *Owner, Effect *fx)
 }
 
 //iterate through saved effects
-const Effect *EffectQueue::GetNextSavedEffect(std::list< Effect* >::const_iterator f) const
+const Effect *EffectQueue::GetNextSavedEffect(std::list< Effect* >::const_iterator &f) const
 {
 	while(f!=effects.end()) {
 		Effect *effect = *f;
@@ -1510,7 +1510,7 @@ const Effect *EffectQueue::GetNextSavedEffect(std::list< Effect* >::const_iterat
 	return NULL;
 }
 
-Effect *EffectQueue::GetNextEffect(std::list< Effect* >::const_iterator f) const
+Effect *EffectQueue::GetNextEffect(std::list< Effect* >::const_iterator &f) const
 {
 	if (f!=effects.end()) return *f++;
 	return NULL;
