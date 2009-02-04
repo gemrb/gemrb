@@ -36,14 +36,14 @@ def OnLoad():
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
-	if KitTable == -1:
+	if not KitTable:
 		RowCount = 1
 	else:
 		RowCount = KitTable.GetRowCount()
 
 	for i in range(RowCount):
 		Button = KitWindow.GetControl(i+2)
-		if KitTable == -1:
+		if not KitTable:
 			if ClassID == 1:
 				Kit=GemRB.GetVar("MAGESCHOOL")
 				KitName = SchoolList.GetValue(i, 0)
