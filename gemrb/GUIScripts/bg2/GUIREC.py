@@ -93,7 +93,7 @@ def OpenRecordsWindow ():
 	# levelup
 	Button = Window.GetControl (37)
 	Button.SetText (7175)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenLevelUpWindow")
 
 	# information
 	Button = Window.GetControl (1)

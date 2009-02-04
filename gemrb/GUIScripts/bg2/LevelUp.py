@@ -45,7 +45,7 @@ OldPos = 0
 LevelDiff = 0
 
 # TODO: multiclass support
-def LevelUpWindow():
+def OpenLevelUpWindow():
 	global LevelUpWindow, TextAreaControl, ProfPointsLeft, NewProfPoints
 	global TopIndex, ScrollBarControl, DoneButton, WeapProfTable, ProfColumn
 	global SkillTable, SkillPointsLeft, NewSkillPoints, KitName, LevelDiff
@@ -128,7 +128,7 @@ def LevelUpWindow():
 
 	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl = LevelUpWindow.GetControl(108)
-	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
+	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "ProfScrollBarPress")
 	ScrollBarControl.SetDefaultScrollBar ()
 	ProfCount = RowCount - 7 # decrease it with the number of controls
 	# decrease it with the number of invalid proficiencies
@@ -418,7 +418,7 @@ def SkillLeftPress():
 	RedrawSkills(0,1)
 	return
 
-def ScrollBarPress():
+def ProfScrollBarPress():
 	global TopIndex
 
 	TopIndex = GemRB.GetVar("TopIndex")
