@@ -121,7 +121,8 @@ class GTextArea(GControl):
     'Scroll': GemRB.TextAreaScroll,
     'SetFlags': GemRB.SetTextAreaFlags,
     'GetCharSounds': GemRB.GetCharSounds,
-    'GetCharacters': GemRB.GetCharacters
+    'GetCharacters': GemRB.GetCharacters,
+    'GetPortraits': GemRB.GetPortraits
   }
   def MoveText(self, other):
     GemRB.MoveTAText(self.WinID, self.ID, other.WinID, other.ID)
