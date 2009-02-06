@@ -3432,7 +3432,11 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index)
 {
 	const char *resource = "";
 	char section[12];
-	snprintf(section,10,"%d", BaseStats[IE_ANIMATION_ID]);
+	unsigned int animid=BaseStats[IE_ANIMATION_ID];
+	if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
+		animid&=0xff;
+	}
+	snprintf(section,10,"%d", animid);
 
 	switch(index) {
 		case VB_ATTACK:
