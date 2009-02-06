@@ -240,7 +240,7 @@ int SDLVideoDriver::SwapBuffers(void)
 	GetTime( time );
 	if (( time - lastTime ) < 17) {
 		SDL_Delay( 17 - (time - lastTime) );
-		return ret;
+		GetTime( time );
 	}
 	lastTime = time;
 
