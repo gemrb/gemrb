@@ -1797,7 +1797,7 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radius)
 			}
 		}
 		if (goal.x + radius < Width) {
-			if (GetBlocked( goal.x - radius, scany ) & PATH_MAP_PASSABLE) {
+			if (GetBlocked( goal.x + radius, scany ) & PATH_MAP_PASSABLE) {
 				goal.x = (ieWord) (goal.x + radius);
 				goal.y = (ieWord) scany;
 				return true;
