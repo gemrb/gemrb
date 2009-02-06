@@ -83,7 +83,11 @@ def OpenLevelUpWindow():
 	WeapProfTable = GemRB.LoadTableObject ("weapprof")
 	if Kit == 0:
 		KitName = ClassName
-		ProfColumn = WeapProfTable.GetColumnIndex (ClassName)
+		# sorcerers are missing from weapprof
+		if ClassName == "SORCERER":
+			ProfColumn = SkillTable.GetColumnIndex ("MAGE")
+		else:
+			ProfColumn = SkillTable.GetColumnIndex (ClassName)
 	else:
 		#rowname is just a number, the kitname is the first data column
 		KitName = KitList.GetValue(Kit, 0)
