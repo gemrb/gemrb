@@ -26,6 +26,7 @@
 import GemRB
 from GUIDefines import *
 from LoadScreen import *
+from GUIClasses import GWindow
 
 SaveWindow = None
 SaveDetailWindow = None
@@ -54,7 +55,7 @@ def OpenSaveWindow ():
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUISAVE", 640, 480)
 	SaveWindow = Window = GemRB.LoadWindowObject (0)
-	OptionsWindow = GemRB.GetVar ("OtherWindow")
+	OptionsWindow = GWindow( GemRB.GetVar ("OtherWindow") )
 	GemRB.SetVar ("OtherWindow", SaveWindow.ID)
 
 
