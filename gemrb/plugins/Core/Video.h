@@ -156,6 +156,9 @@ public:
 	virtual void GetPixel(short x, short y, Color* color) = 0;
 	/** Draws a circle */
 	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true) = 0;
+	/** Draws an Ellipse Segment */
+	virtual void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
+		double anglefrom, double angleto, bool drawlines = true, bool clipped = true) = 0;
 	/** Draws an ellipse */
 	virtual void DrawEllipse(short cx, short cy, unsigned short xr,
 		unsigned short yr, const Color& color, bool clipped = true) = 0;

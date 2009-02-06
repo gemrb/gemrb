@@ -110,6 +110,9 @@ public:
 	void SetPixel(short x, short y, const Color& color, bool clipped = true);
 	void GetPixel(short x, short y, Color* color);
 	void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true);
+	/** This functions Draws an Ellipse Segment */
+	void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
+		double anglefrom, double angleto, bool drawlines = true, bool clipped = true);
 	/** This functions Draws an Ellipse */
 	void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr,
 		const Color& color, bool clipped = true);

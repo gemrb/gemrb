@@ -1932,6 +1932,119 @@ void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r,
 		SDL_UnlockSurface( disp );
 	}
 }
+
+static double ellipseradius(unsigned short xr, unsigned short yr, double angle) {
+	double one = (xr * sin(angle));
+	double two = (yr * cos(angle));
+	return sqrt(xr*xr*yr*yr / (one*one + two*two));	
+}
+
+/** This functions Draws an Ellipse Segment */
+void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
+	unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines, bool clipped)
+{
+	/* beware, dragons and clockwise angles be here! */
+	double radiusfrom = ellipseradius(xr, yr, anglefrom);
+	double radiusto = ellipseradius(xr, yr, angleto);
+	long xfrom = (long)round(radiusfrom * cos(anglefrom));
+	long yfrom = (long)round(radiusfrom * sin(anglefrom));
+	long xto = (long)round(radiusto * cos(angleto));
+	long yto = (long)round(radiusto * sin(angleto));
+
+	if (drawlines) {
+		// TODO: DrawLine's clipping code works differently to the clipping
+		// here so we add Viewport.x/Viewport.y as a hack for now
+		DrawLine(cx + Viewport.x, cy + Viewport.y,
+			cx + xfrom + Viewport.x, cy + yfrom + Viewport.y, color, clipped);
+		DrawLine(cx + Viewport.x, cy + Viewport.y,
+			cx + xto + Viewport.x, cy + yto + Viewport.y, color, clipped);
+	}
+
+	// *Attempt* to calculate the correct x/y boundaries.
+	// TODO: this doesn't work very well - you can't actually bound many
+	// arcs this way (imagine a segment with a small piece cut out).
+	if (xfrom > xto) {
+		long tmp = xfrom; xfrom = xto; xto = tmp;
+	}
+	if (yfrom > yto) {
+		long tmp = yfrom; yfrom = yto; yto = tmp;
+	}
+	if (xfrom >= 0 && yto >= 0) xto = xr;
+	if (xto <= 0 && yto >= 0) xfrom = -xr;
+	if (yfrom >= 0 && xto >= 0) yto = yr;
+	if (yto <= 0 && xto >= 0) yfrom = -yr;
+
+	//Uses Bresenham's Ellipse Algorithm
+	long x, y, xc, yc, ee, tas, tbs, sx, sy;
+
+	if (SDL_MUSTLOCK( disp )) {
+		SDL_LockSurface( disp );
+	}
+	tas = 2 * xr * xr;
+	tbs = 2 * yr * yr;
+	x = xr;
+	y = 0;
+	xc = yr * yr * ( 1 - ( 2 * xr ) );
+	yc = xr * xr;
+	ee = 0;
+	sx = tbs * xr;
+	sy = 0;
+
+	while (sx >= sy) {
+		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
+			SetPixel( cx + ( short ) x, cy + ( short ) y, color, clipped );
+		if (-x >= xfrom && -x <= xto && y >= yfrom && y <= yto)
+			SetPixel( cx - ( short ) x, cy + ( short ) y, color, clipped );
+		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
+			SetPixel( cx - ( short ) x, cy - ( short ) y, color, clipped );
+		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
+			SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );	
+		y++;
+		sy += tas;
+		ee += yc;
+		yc += tas;
+		if (( 2 * ee + xc ) > 0) {
+			x--;
+			sx -= tbs;
+			ee += xc;
+			xc += tbs;
+		}
+	}
+
+	x = 0;
+	y = yr;
+	xc = yr * yr;
+	yc = xr * xr * ( 1 - ( 2 * yr ) );
+	ee = 0;
+	sx = 0;
+	sy = tas * yr;
+
+	while (sx <= sy) {
+		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
+			SetPixel( cx + ( short ) x, cy + ( short ) y, color, clipped );
+		if (-x >= xfrom && -x <= xto && y >= yfrom && y <= yto)
+			SetPixel( cx - ( short ) x, cy + ( short ) y, color, clipped );
+		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
+			SetPixel( cx - ( short ) x, cy - ( short ) y, color, clipped );
+		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
+			SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );		
+		x++;
+		sx += tbs;
+		ee += xc;
+		xc += tbs;
+		if (( 2 * ee + yc ) > 0) {
+			y--;
+			sy -= tas;
+			ee += yc;
+			yc += tas;
+		}
+	}
+	if (SDL_MUSTLOCK( disp )) {
+		SDL_UnlockSurface( disp );
+	}
+}
+
+
 /** This functions Draws an Ellipse */
 void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 	unsigned short yr, const Color& color, bool clipped)

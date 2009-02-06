@@ -33,6 +33,7 @@
 #include "Projectile.h"
 
 #include <cassert>
+#include <cmath>
 
 extern Interface* core;
 
@@ -1141,11 +1142,29 @@ void Movable::DrawTargetPoint(Region &vp)
 	GetTime( step );
 	step = tp_steps [(step >> 6) & 7];
 
-	//Region vp = core->GetVideoDriver()->GetViewport();
-	core->GetVideoDriver()->DrawEllipse( (ieWord) (Destination.x - vp.x),
-		(ieWord) (Destination.y - vp.y), (unsigned short) (size * 10 - step),
-		(unsigned short) ( size * 15 / 2 - step), selectedColor );
+	step = step + 1;
+	int csize = (size - 1) * 4;
+	if (csize < 4) csize = 3;
 
+	/* segments should not go outside selection radius */
+	unsigned short xradius = (csize * 4) - 5;
+	unsigned short yradius = (csize * 3) - 5;
+	ieWord xcentre = (ieWord) (Destination.x - vp.x);
+	ieWord ycentre = (ieWord) (Destination.y - vp.y);
+
+	// TODO: 0.5 and 0.7 are pretty much random values
+	// right segment
+	core->GetVideoDriver()->DrawEllipseSegment( xcentre + step, ycentre, xradius,
+		yradius, selectedColor, -0.5, 0.5 );
+	// top segment
+	core->GetVideoDriver()->DrawEllipseSegment( xcentre, ycentre - step, xradius,
+		yradius, selectedColor, -0.7 - M_PI_2, 0.7 - M_PI_2 );
+	// left segment
+	core->GetVideoDriver()->DrawEllipseSegment( xcentre - step, ycentre, xradius,
+		yradius, selectedColor, -0.5 - M_PI, 0.5 - M_PI );
+	// bottom segment
+	core->GetVideoDriver()->DrawEllipseSegment( xcentre, ycentre + step, xradius,
+		yradius, selectedColor, -0.7 - M_PI - M_PI_2, 0.7 - M_PI - M_PI_2 );
 }
 
 /**********************
