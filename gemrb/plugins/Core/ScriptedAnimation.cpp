@@ -273,35 +273,36 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			unsigned int p_hold = P_HOLD*MAX_ORIENT+i;
 			unsigned int p_onset = P_ONSET*MAX_ORIENT+i;
 			unsigned int p_release = P_RELEASE*MAX_ORIENT+i;
-			//if there are no separate stages, then fill the p_hold fields
-			if(!seq2 && !seq3) {
-				p_onset=p_hold;
-			}
+
+			//if there are no separate phases, then fill the p_hold fields
+			bool phases = (seq2 || seq3);
 
 			int c = seq1;
-			switch (FaceTarget) {
-			case 5:
-				c=SixteenToFive[i];
-				break;
-			case 9:
-				c=SixteenToNine[i];
-				break;
-			case 16:
-				c=i;
-				break;
-			}
-			anims[p_onset] = af->GetCycle( c );
-			if (anims[p_onset]) {
-				PrepareAnimation(anims[p_onset], Transparency);
-				//creature anims may start at random position, vvcs always start on 0
-				anims[p_onset]->pos=0;
-				//vvcs are always paused
-				anims[p_onset]->gameAnimation=true;
-				anims[p_onset]->Flags |= S_ANI_PLAYONCE;
+			if (phases) {
+				switch (FaceTarget) {
+				case 5:
+					c=SixteenToFive[i];
+					break;
+				case 9:
+					c=SixteenToNine[i];
+					break;
+				case 16:
+					c=i;
+					break;
+				}
+				anims[p_onset] = af->GetCycle( c );
+				if (anims[p_onset]) {
+					PrepareAnimation(anims[p_onset], Transparency);
+					//creature anims may start at random position, vvcs always start on 0
+					anims[p_onset]->pos=0;
+					//vvcs are always paused
+					anims[p_onset]->gameAnimation=true;
+					anims[p_onset]->Flags |= S_ANI_PLAYONCE;
+				}
 			}
 
-			c = seq2;
-			if (c) {
+			c = phases ? seq2 : seq1;
+			if (c || !phases) {
 				switch (FaceTarget) {
 				case 5:
 					c=SixteenToFive[i];
