@@ -36,8 +36,9 @@ class GTable:
     'GetColumnCount': GemRB.GetTableColumnCount
   }
   def __del__(self):
-	if self.ID != -1:
-	    GemRB.UnloadTable(self.ID)
+    # don't unload tables if the GemRB module is already unloaded at exit
+    if self.ID != -1 and GemRB:
+      GemRB.UnloadTable(self.ID)
   def __nonzero__(self):
     return self.ID != -1
 
