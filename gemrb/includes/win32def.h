@@ -136,6 +136,18 @@ typedef __POSITION* POSITION;
 #define gotoxy(x,y) printf("\033[%d;%dH", y, x)
 #endif
 
+#ifndef round
+#define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
+#endif
+
+#ifndef M_PI
+#define M_PI    3.14159265358979323846 // pi
+#endif
+#ifndef M_PI_2
+#define M_PI_2  1.57079632679489661923 // pi/2
+#endif
+
+
 #define printBracket(status, color) textcolor(WHITE); printf("["); textcolor(color); printf("%s", status); textcolor(WHITE); printf("]")
 #define printStatus(status, color) printBracket(status, color); printf("\n")
 #define printMessage(owner, message, color) printBracket(owner, LIGHT_WHITE); printf(": "); textcolor(color); printf("%s", message); textcolor(WHITE)
