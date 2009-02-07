@@ -580,6 +580,10 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 			//cannot add directly to inventory (ground piles)
 			c->AddItem( core->ReadItem(str));
 		}
+
+		if (Type==IE_CONTAINER_PILE)
+			Script[0]=0;
+
 		if (Script[0]) {
 			c->Scripts[0] = new GameScript( Script, ST_CONTAINER );
 		} else {
