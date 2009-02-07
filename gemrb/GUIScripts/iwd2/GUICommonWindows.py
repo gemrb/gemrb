@@ -403,42 +403,32 @@ def GetActorRaceTitle (actor):
 	RaceTitle = Table.GetValue (row, 2)
 	return RaceTitle
 
-def GetKitIndex (actor, Class):
-	#Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	KitTable = GemRB.LoadTableObject ("kitlist")
+# NOTE: this function returns the kit index in the class table!
+# NOTE: this function is called with the primary classes
+# TODO: get a multikit character if they are possible and make things work
+def GetKitIndex (actor, ClassIndex):
+	ClassTable = GemRB.LoadTableObject ("classes")
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
-	KitIndex = 0
 
-	if Kit&0xc000ffff == 0x40000000:
-		print "Kit value: 0x%04X"%Kit
-		KitIndex = Kit>>16 & 0xfff
-
-	#looking for kit by the usability flag
-	if KitIndex == 0:
-		KitIndex = KitTable.FindValue (6, Kit)
-		if KitIndex == -1:
-			KitIndex = 0
-		# needed so barbarians don't override other kits
-		elif Class != KitTable.GetValue (KitIndex, 7):
-			print "KitIndex before hack", KitIndex
-			KitIndex = 0
+	# the search offset skips the primary classes
+	KitIndex = ClassTable.FindValue (2, Kit, 10)
+	if KitIndex == -1:
+		return 0
 
 	return KitIndex
 
-def GetActorClassTitle (actor, Class):
+def GetActorClassTitle (actor, ClassIndex):
 	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
+	if ClassTitle:
+		return ClassTitle
 
 	#Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	ClassTable = GemRB.LoadTableObject ("classes")
-	Class = ClassTable.FindValue ( 5, Class )
-	KitTable = GemRB.LoadTableObject ("kitlist")
-	KitIndex = GetKitIndex (actor, Class)
-
-	if ClassTitle == 0:
-		if KitIndex == 0:
-			ClassTitle=ClassTable.GetValue (Class, 2)
-		else:
-			ClassTitle=KitTable.GetValue (KitIndex, 2)
+	KitIndex = GetKitIndex (actor, ClassIndex)
+	if KitIndex == 0:
+		ClassTitle = ClassTable.GetValue (ClassIndex, 0)
+	else:
+		ClassTitle = ClassTable.GetValue (KitIndex, 0)
 
 	if ClassTitle == "*":
 		return 0

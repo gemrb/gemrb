@@ -218,7 +218,7 @@ def DisplayGeneral (pc):
 	#TODO: get special level penalty for subrace
 	adj = 0
 	RecordsTextArea.Append (": "+str(levelsum) )
-	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append ("[/color]")
 	#the class name for highest
 	highest = None
 	tmp = 0
@@ -233,6 +233,7 @@ def DisplayGeneral (pc):
 				highest = i
 				tmp = level
 
+	RecordsTextArea.Append ("\n")
 	#effective character level
 	if adj:
 		RecordsTextArea.Append (40311,-1)
