@@ -189,7 +189,7 @@ void GameControl::MoveToPointFormation(Actor *actor, unsigned int pos, Point src
 		angle = atan(xdiff/ydiff);
 		if (ydiff < 0) angle += M_PI;
 	}
-	
+
 	// calculate new coordinates by rotating formation around (0,0)
 	double newx = -formations[formation][pos].x * cos(angle) + formations[formation][pos].y * sin(angle);
 	double newy = formations[formation][pos].x * sin(angle) + formations[formation][pos].y * cos(angle);
@@ -336,7 +336,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			viewport.y = 0;
 		else if ( (viewport.y + viewport.h ) >= mapsize.y ) //if we are at the right
 			viewport.y = mapsize.y - viewport.h;
-		
+
 		core->timer->SetMoveViewPort( viewport.x, viewport.y, 0, false );
 	}
 	Region screen( x + XPos, y + YPos, Width, Height );
@@ -351,7 +351,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	bool targetting = (target_mode & (TARGET_MODE_CAST |
 		TARGET_MODE_PICK | TARGET_MODE_ATTACK | TARGET_MODE_DEFEND));
 	InfoPoint *i;
-	for (unsigned int idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
+	unsigned int idx;
+	for (idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
 		i->Highlight = false;
 		if (i->VisibleTrap(DebugFlags & DEBUG_SHOW_INFOPOINTS)) {
 			i->outlineColor = red; // traps
@@ -362,8 +363,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		}
 		i->Highlight = true;
 	}
+
 	Door *d;
-	for (unsigned int idx = 0; (d = area->TMap->GetDoor( idx )); idx++) {
+	for (idx = 0; (d = area->TMap->GetDoor( idx )); idx++) {
 		d->Highlight = false;
 		if (overDoor == d && targetting) {
 			if (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED)) {
@@ -395,7 +397,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		d->Highlight = true;
 	}
 	Container *c;
-	for (unsigned int idx = 0; (c = area->TMap->GetContainer( idx )); idx++) {
+	for (idx = 0; (c = area->TMap->GetContainer( idx )); idx++) {
 		c->Highlight = false;
 		if (overContainer == c && targetting) {
 			if (c->VisibleTrap(0) || (c->Flags & CONT_LOCKED)) {
@@ -419,7 +421,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		}
 		c->Highlight = true;
 	}
-	
+
 	//drawmap should be here so it updates fog of war
 	area->DrawMap( screen );
 	game->DrawWeather(screen, update_scripts);
@@ -1052,7 +1054,7 @@ void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
-	
+
 	if (Owner->Visible!=WINDOW_VISIBLE) {
 		return;
 	}
@@ -1088,7 +1090,7 @@ void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 
 void GameControl::UpdateScrolling() {
 	if (!scrolling) return;
-	
+
 	int mousescrollspd = core->GetMouseScrollSpeed(); // TODO: why check against this value and not +/-?
 	Video* video = core->GetVideoDriver();
 
@@ -1521,8 +1523,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		// TODO: this is beyond horrible, help
 		std::vector<Actor *> party;
 		// first, from the actual party
-		for (int i = 0; i < game->GetPartySize(false); i++) {
-			Actor *pc = game->FindPC(i + 1);
+		for (int idx = 0; idx < game->GetPartySize(false); idx++) {
+			Actor *pc = game->FindPC(idx + 1);
 			if (!pc) continue;
 
 			for (unsigned int j = 0; j < game->selected.size(); j++) {
@@ -1531,8 +1533,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 				}
 			}
 		}
+
 		// then, anything else we selected
-		for (unsigned int i = 0; i < game->selected.size(); i++) {
+		for (i = 0; i < game->selected.size(); i++) {
 			bool found = false;
 			for (unsigned int j = 0; j < party.size(); j++) {
 				if (game->selected[i] == party[j]) {
@@ -1542,10 +1545,10 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			}
 			if (!found) party.push_back(game->selected[i]);
 		}
-		
+
 		//party formation movement
 		Point src = party[0]->Pos;
-		for(unsigned int i = 0; i < party.size(); i++) {
+		for(i = 0; i < party.size(); i++) {
 			actor = party[i];
 			actor->ClearPath();
 			actor->ClearActions();
