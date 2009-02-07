@@ -988,10 +988,14 @@ void Movable::DoStep(unsigned int walk_speed)
 		step = path;
 		timeStartStep = time;
 	}
-	if (( time - timeStartStep ) >= walk_speed) {
+	while (step->Next && (( time - timeStartStep ) >= walk_speed)) {
 		//printf("[New Step] : Orientation = %d\n", step->orient);
 		step = step->Next;
-		timeStartStep = time;
+		if (!walk_speed) {
+			timeStartStep = time;
+			break;
+		}
+		timeStartStep = timeStartStep + walk_speed;
 	}
 
 	SetOrientation (step->orient, false);
