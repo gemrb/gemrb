@@ -36,12 +36,18 @@ void AudioStream::ClearProcessedBuffers(bool del)
 {
 	ALint processed = 0;
 	alGetSourcei( Source, AL_BUFFERS_PROCESSED, &processed );
+
+	checkALError("Failed to get processed buffers", "WARNING");
+
 	if (processed > 0) {
 		ALuint * b = new ALuint[processed];
 		alSourceUnqueueBuffers( Source, processed, b );
+		checkALError("Failed to unqueue buffers", "WARNING");
 
-		if (del)
+		if (del) {
 			alDeleteBuffers(processed, b);
+			checkALError("Failed to delete buffers", "WARNING");
+		}
 
 		delete[] b;
 	}
