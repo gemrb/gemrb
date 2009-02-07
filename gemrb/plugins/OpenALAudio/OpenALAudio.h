@@ -51,7 +51,7 @@
 
 
 struct AudioStream {
-    AudioStream() : Buffer(0), Source(0), Duration(0), free(true), ambient(false), locked(false) { }
+    AudioStream() : Buffer(0), Source(0), Duration(0), free(true), ambient(false), locked(false), delete_buffers(false) { }
 
     ALuint Buffer;
     ALuint Source;
@@ -59,9 +59,10 @@ struct AudioStream {
     bool free;
     bool ambient;
     bool locked;
+    bool delete_buffers;
 
     void ClearIfStopped();
-    void ClearProcessedBuffers(bool del=false);
+    void ClearProcessedBuffers();
     void ForceClear();
 };
 

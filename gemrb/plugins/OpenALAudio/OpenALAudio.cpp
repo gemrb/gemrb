@@ -20,6 +20,7 @@
  */
 
 #include "OpenALAudio.h"
+#include <cassert>
 
 bool checkALError(const char* msg, const char* status) {
 	int error = alGetError();
@@ -32,7 +33,7 @@ bool checkALError(const char* msg, const char* status) {
 	return false;
 }
 
-void AudioStream::ClearProcessedBuffers(bool del)
+void AudioStream::ClearProcessedBuffers()
 {
 	ALint processed = 0;
 	alGetSourcei( Source, AL_BUFFERS_PROCESSED, &processed );
@@ -44,7 +45,7 @@ void AudioStream::ClearProcessedBuffers(bool del)
 		alSourceUnqueueBuffers( Source, processed, b );
 		checkALError("Failed to unqueue buffers", "WARNING");
 
-		if (del) {
+		if (delete_buffers) {
 			alDeleteBuffers(processed, b);
 			checkALError("Failed to delete buffers", "WARNING");
 		}
@@ -65,7 +66,7 @@ void AudioStream::ClearIfStopped()
 	if (!checkALError("Failed to check source state", "WARNING") &&
 			state == AL_STOPPED)
 	{
-		ClearProcessedBuffers(false);
+		ClearProcessedBuffers();
 		alDeleteSources( 1, &Source );
 		checkALError("Failed to delete source", "WARNING");
 		Source = 0;
@@ -73,6 +74,7 @@ void AudioStream::ClearIfStopped()
 		free = true;
 		ambient = false;
 		locked = false;
+		delete_buffers = false;
 	}
 }
 
@@ -82,7 +84,7 @@ void AudioStream::ForceClear()
 
 	alSourceStop(Source);
 	checkALError("Failed to stop source", "WARNING");
-	ClearProcessedBuffers(true);
+	ClearProcessedBuffers();
 	ClearIfStopped();
 }
 
@@ -300,12 +302,13 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 		} else {
 			alSourceStop( speech.Source );
 			checkALError("Unable to stop speech", "WARNING");
-			speech.ClearProcessedBuffers(false);
+			speech.ClearProcessedBuffers();
 		}
 		core->GetDictionary()->Lookup( "Volume Voices", volume );
 		alSourcef( speech.Source, AL_GAIN, 0.01f * volume );
 		alSourcei( speech.Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
 		alSourcefv( speech.Source, AL_POSITION, SourcePos );
+		assert(!speech.delete_buffers);
 		alSourcei( speech.Source, AL_BUFFER, Buffer );
 		checkALError("Unable to set speech parameters", "WARNING");
 		speech.Buffer = Buffer;
@@ -345,6 +348,7 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 	alSourcef( Source, AL_GAIN, 0.01f * volume );
 	alSourcei( Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
 	alSourcefv( Source, AL_POSITION, SourcePos );
+	assert(!streams[stream].delete_buffers);
 	alSourcei( Source, AL_BUFFER, Buffer );
 
 	if (checkALError("Unable to set sound parameters", "ERROR")) {
@@ -585,7 +589,7 @@ int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 	ALuint source = streams[stream].Source;
 
 	// first dequeue any processed buffers
-	streams[stream].ClearProcessedBuffers(false);
+	streams[stream].ClearProcessedBuffers();
 
 	if (sound == 0)
 		return 0;
@@ -595,6 +599,8 @@ int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 	if (0 == Buffer) {
 		return -1;
 	}
+
+	assert(!streams[stream].delete_buffers);
 
 	alSourceQueueBuffers(source, 1, &Buffer);
 	if (checkALError("Unable to queue ambient buffer","ERROR")) {
@@ -813,6 +819,8 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 	if (checkALError("Unable to queue buffer", "ERROR")) {
 		return;
 	}
+
+	streams[stream].delete_buffers = true;
 
 	ALenum state;
 	alGetSourcei(streams[stream].Source, AL_SOURCE_STATE, &state);
