@@ -615,6 +615,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		ieStrRef OpenStrRef;
 		ieStrRef NameStrRef;
 		ieResRef Dialog;
+		ieDword Unknown54;
 
 		str->Read( LongName, 32 );
 		LongName[32] = 0;
@@ -644,7 +645,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &OpenImpededCount );
 		str->ReadWord( &ClosedImpededCount );
 		str->ReadDword( &ClosedFirstImpeded );
-		str->Seek( 4, GEM_CURRENT_POS );
+		str->ReadDword( &Unknown54);
 		ieResRef OpenResRef, CloseResRef;
 		str->ReadResRef( OpenResRef );
 		str->ReadResRef( CloseResRef );
@@ -740,6 +741,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		door->cibcount = ClosedImpededCount;
 		door->SetMap(map);
 
+		door->Unknown54 = Unknown54;
 		door->TrapDetectionDiff = TrapDetect;
 		door->TrapRemovalDiff = TrapRemoval;
 		door->Trapped = Trapped;
@@ -1423,8 +1425,7 @@ int AREImp::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &VertIndex);
 		VertIndex += tmpWord;
-		//unknown54
-		stream->WriteDword( &tmpDword);
+		stream->WriteDword( &d->Unknown54);
 		stream->WriteResRef( d->OpenSound);
 		stream->WriteResRef( d->CloseSound);
 		stream->WriteDword( &d->Cursor);

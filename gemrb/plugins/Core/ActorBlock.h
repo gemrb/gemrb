@@ -462,6 +462,7 @@ public:
 	ieStrRef OpenStrRef;
 	ieStrRef NameStrRef;
 	ieResRef Dialog;
+	ieDword  Unknown54;     //not known yet
 private:
 	void SetWallgroups(int count, int value);
 	void ImpedeBlocks(int count, Point *points, unsigned int value);
