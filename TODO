@@ -21,7 +21,7 @@ Effects:
 6. Implement area/non-living affecting effects 
 
 Area:
-2. Don't load scripts for pile items? (research when a script is unused)
+2. (PARTLY) Don't load scripts for pile items? (research when a script is unused)
 3. (DONE) Create real streaming ambients (do not preload them, just use them when needed)
 4. (DONE) in pathfinder, calculate with the actor's feet circle size (npc blocking still needed)
 5. (DONE) fix door wallgroups and tiles (some problems with overlays still exist)
