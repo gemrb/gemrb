@@ -85,9 +85,9 @@ def OpenLevelUpWindow():
 		KitName = ClassName
 		# sorcerers are missing from weapprof
 		if ClassName == "SORCERER":
-			ProfColumn = SkillTable.GetColumnIndex ("MAGE")
+			ProfColumn = WeapProfTable.GetColumnIndex ("MAGE")
 		else:
-			ProfColumn = SkillTable.GetColumnIndex (ClassName)
+			ProfColumn = WeapProfTable.GetColumnIndex (ClassName)
 	else:
 		#rowname is just a number, the kitname is the first data column
 		KitName = KitList.GetValue(Kit, 0)
