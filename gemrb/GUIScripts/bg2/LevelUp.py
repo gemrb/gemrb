@@ -33,6 +33,7 @@ TextAreaControl = 0
 ScrollBarControl = 0
 WeapProfTable = 0
 SkillTable = 0
+ClassTable = 0
 ProfColumn = 0
 InfoCounter = 1
 ProfPointsLeft = 0
@@ -43,12 +44,14 @@ ClickCount = 0
 OldDirection = 0
 OldPos = 0
 LevelDiff = 0
+Level = 0
 
 # TODO: multiclass support
 def OpenLevelUpWindow():
 	global LevelUpWindow, TextAreaControl, ProfPointsLeft, NewProfPoints
 	global TopIndex, ScrollBarControl, DoneButton, WeapProfTable, ProfColumn
 	global SkillTable, SkillPointsLeft, NewSkillPoints, KitName, LevelDiff
+	global ClassTable, Level
 
 	LevelUpWindow = GemRB.LoadWindowObject (3)
 
@@ -302,7 +305,24 @@ def GetLevelUpNews():
 
 	News = GemRB.GetString (5259) + '\n\n'
 	# FIXME: order
+
 	# 5293 - Additional Hit Points Gained
+	hp = 0
+	Class = GemRB.GetPlayerStat (GemRB.GameGetSelectedPCSingle (), IE_CLASS)
+	HPTable = ClassTable.GetValue (ClassTable.FindValue (5, Class), 6)
+	# HACK: fake mc/dc support
+	if HPTable == "*":
+		HPTable = "HPROG"
+	HPTable = GemRB.LoadTableObject (HPTable)
+	for level in range(Level - LevelDiff, Level):
+		rolls = HPTable.GetValue (level, 1)
+		bonus = HPTable.GetValue (level, 2)
+		if rolls:
+			hp += GemRB.Roll (rolls, HPTable.GetValue (level, 0), bonus)
+		else:
+			hp += bonus
+	News += GemRB.GetString (5293) + ": " + str(hp) + '\n\n'
+
 	# saving throws
 		# 5277 death
 		# 5278 wand
