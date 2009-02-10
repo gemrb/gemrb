@@ -403,15 +403,19 @@ def GetActorRaceTitle (actor):
 	RaceTitle = Table.GetValue (row, 2)
 	return RaceTitle
 
-# NOTE: this function returns the kit index in the class table!
 # NOTE: this function is called with the primary classes
-# TODO: get a multikit character if they are possible and make things work
 def GetKitIndex (actor, ClassIndex):
 	ClassTable = GemRB.LoadTableObject ("classes")
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 
-	# the search offset skips the primary classes
-	KitIndex = ClassTable.FindValue (2, Kit, 10)
+	KitIndex = -1
+	ClassID = ClassTable.GetValue (ClassIndex, 2)
+	# skip the primary classes
+	for ci in range(10, ClassTable.GetRowCount()):
+		BaseClass = ClassTable.GetValue (ci, 3)
+		if BaseClass == ClassID and Kit & ClassTable.GetValue (ci, 2):
+			KitIndex = ci
+
 	if KitIndex == -1:
 		return 0
 
@@ -433,27 +437,6 @@ def GetActorClassTitle (actor, ClassIndex):
 	if ClassTitle == "*":
 		return 0
 	return ClassTitle
-
-#find the kit title for a given class (multiple kits are available)
-#def GetActorClassTitle (actor, Class):
-#	#no idea if this still works
-#	#ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
-#	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
-#	ClassTable = GemRB.LoadTableObject ("classes")
-#	ClassTitle = ClassTable.GetValue (Class, 0)
-#	#the real class value
-#	Class += 1
-#	row = 0
-#	while row>=0:
-##		row = ClassTable.FindValue (3, Class, row)
-#		if row<0:
-#			break
-#		if Kit&ClassTable.GetValue (row, 2):
-#			ClassTitle=ClassTable.GetValue (row, 0)
-#			break
-#		row+=1
-#
-#	return ClassTitle
 
 def GetActorPaperDoll (actor):
 	PortraitTable = GemRB.LoadTableObject ("avatars")
