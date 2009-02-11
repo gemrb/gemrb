@@ -358,7 +358,6 @@ def GetStatOverview (pc, LevelDiff=0):
 			# the first class' XP is discarded and set to the minimum level 
 			# requirement, so if you don't dual class right after a levelup, 
 			# the game would eat some of your XP
-			# FIXME: find out how to get this (stored in the chr)
 			XP1 = XPTable.GetValue (XP1, str(Levels[1]))
 			GemRB.SetToken("EXPERIENCE", str (XP1) )
 

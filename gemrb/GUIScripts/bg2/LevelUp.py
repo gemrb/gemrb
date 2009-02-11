@@ -199,8 +199,6 @@ def RedrawSkills(First=0, direction=0):
 	SkillSumLabel = LevelUpWindow.GetControl(0x10000000+37)
 	if NewSkillPoints == 0:
 		SkillSumLabel.SetText("")
-		# FIXME: hide the scrollbar
-		#LevelUpWindow.DeleteControl(109)
 		for i in range(4):
 			Label = LevelUpWindow.GetControl (0x10000000+32+i)
 			Label.SetText ("")
