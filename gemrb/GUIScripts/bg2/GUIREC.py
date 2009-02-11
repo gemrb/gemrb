@@ -843,11 +843,11 @@ def CanDualClass(actor):
 	ClassName = ClassTable.GetRowName (ClassIndex)
 	KitIndex = GetKitIndex (actor)
 	if KitIndex == 0:
-		RowName = ClassName
+		ClassTitle = ClassName
 	else:
 		KitTable = GemRB.LoadTableObject ("kitlist")
-		RowName = KitTable.GetValue (KitIndex, 0)
-	Row = DualClassTable.GetRowIndex (RowName)
+		ClassTitle = KitTable.GetValue (KitIndex, 0)
+	Row = DualClassTable.GetRowIndex (ClassTitle)
 
 	# a lookup table for the DualClassTable columns
 	classes = [ "FIGHTER", "CLERIC", "MAGE", "THIEF", "DRUID", "RANGER" ]
@@ -864,7 +864,6 @@ def CanDualClass(actor):
 		return 1
 
 	# if the only choice for dc is already the same as the actors base class
-	# TODO maybe you can't dc a kit to the base class
 	if Sum == 1 and ClassName in matches and KitIndex == 0:
 		return 1
 
@@ -881,9 +880,32 @@ def CanDualClass(actor):
 	if Sum == 0:
 		return 1
 
+	# check current class' stat limitations
+	StatTable = GemRB.LoadTableObject ("abdcscrq")
+	ClassStatIndex = StatTable.GetRowIndex (ClassTitle)
+	for stat in range(6):
+		minimum = StatTable.GetValue (ClassStatIndex, stat)
+		name = StateTable.GetColumnName (stat)
+		if GemRB.GetPlayerStat (actor, "IE_" + name[4:]) < minimum:
+			return 1
+
+	# check new class' stat limitations - make sure there are any good class choices
+	StatTable = GemRB.LoadTableObject ("abdcdsrq")
+	for match in matches:
+		ClassStatIndex = StatTable.GetRowIndex (match)
+		for stat in range(6):
+			minimum = StatTable.GetValue (ClassStatIndex, stat)
+			name = StateTable.GetColumnName (stat)
+			if GemRB.GetPlayerStat (actor, "IE_" + name[4:]) < minimum:
+				matches.remove(match)
+				break
+	if len(matches) == 0:
+		return 1
+
+	# must be at least level 2
+	if GemRB.GetPlayerStat (pc, IE_LEVEL) == 1:
+		return 1
 	return 0
-	# TODO add limitations for stats (abdc*.2da)
-	# TODO (last) level > 1
 
 def KitInfoWindow():
 	global KitInfoWindow
