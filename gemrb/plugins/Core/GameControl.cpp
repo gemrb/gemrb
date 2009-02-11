@@ -1988,6 +1988,10 @@ void GameControl::ResizeAdd(Window* win, int type)
 
 void GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref)
 {
+	if (dlg) {
+		delete dlg;
+		dlg = NULL;
+	}
 	if (tgt->GetInternalFlag()&IF_NOINT) {
 		core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 		return;
@@ -1995,9 +1999,6 @@ void GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgre
 
 	DialogMgr* dm = ( DialogMgr* ) core->GetInterface( IE_DLG_CLASS_ID );
 	dm->Open( core->GetResourceMgr()->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
-	if (dlg) {
-		delete dlg;
-	}
 	dlg = dm->GetDialog();
 	core->FreeInterface( dm );
 
@@ -2228,8 +2229,20 @@ void GameControl::DialogChoose(unsigned int choose)
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
 			InitDialog( speaker, target, tmpresref );
+			if (!dlg) {
+				// error was displayed by InitDialog
+				ta->SetMinRow( false );
+				EndDialog();
+				return;
+			}
 		}
 		ds = dlg->GetState( si );
+		if (!ds) {
+			printMessage("Dialog","Can't find next dialog\n",YELLOW);
+			ta->SetMinRow( false );
+			EndDialog();
+			return;
+		}
 	}
 	//displaying npc text
 	core->DisplayStringName( ds->StrRef, 0x70FF70, target, IE_STR_SOUND|IE_STR_SPEECH);
