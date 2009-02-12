@@ -44,14 +44,15 @@ def OnLoad():
 #quit subwindow
 	QuitWindow = GemRB.LoadWindowObject(3)
 	QuitTextArea = QuitWindow.GetControl(0)
-	CancelButton = QuitWindow.GetControl(2)
-	ConfirmButton = QuitWindow.GetControl(1)
 	QuitTextArea.SetText(20582)
-	CancelButton.SetText(23789)
+	ConfirmButton = QuitWindow.GetControl(1)
 	ConfirmButton.SetText(23787)
 	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitConfirmed")
+	ConfirmButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CancelButton = QuitWindow.GetControl(2)
+	CancelButton.SetText(23789)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitCancelled")
-	CancelButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
 
 #main window
 	StartWindow = GemRB.LoadWindowObject(0)
@@ -61,6 +62,7 @@ def OnLoad():
 	NewLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "NewLifePress")
 	ResumeLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ResumeLifePress")
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitPress")
+	ExitButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "EXOFONT", "", 1)
 	Label=StartWindow.GetControl(0x0fff0000)

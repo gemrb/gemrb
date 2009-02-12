@@ -29,7 +29,7 @@ IE_GUI_BUTTON_SOUND      = 0x00000004
 IE_GUI_BUTTON_ALT_SOUND  = 0x00000008
 IE_GUI_BUTTON_CHECKBOX   = 0x00000010   #or radio button
 IE_GUI_BUTTON_RADIOBUTTON= 0x00000020   #sticks in a state
-IE_GUI_BUTTON_DEFAULT    = 0x00000040   #enter button triggers it
+IE_GUI_BUTTON_DEFAULT    = 0x00000040   #enter key triggers it
 IE_GUI_BUTTON_ANIMATED   = 0x00000080   # the button is animated
 
 #these bits are hardcoded in the .chu structure, don't move them
@@ -48,7 +48,7 @@ IE_GUI_BUTTON_PLAYONCE   = 0x00040000   # the button animation won't restart
 IE_GUI_BUTTON_CENTER_PICTURES = 0x00080000 # center the button's PictureList
 IE_GUI_BUTTON_BG1_PAPERDOLL   = 0x00100000 # BG1-style paperdoll
 IE_GUI_BUTTON_HORIZONTAL      = 0x00200000 # horizontal clipping of overlay
-
+IE_GUI_BUTTON_CANCEL          = 0x00400000 # escape key triggers it
 
 #scrollbar flags
 IE_GUI_SCROLLBAR_DEFAULT = 0x00000040   # mousewheel triggers it (same value as default button)
