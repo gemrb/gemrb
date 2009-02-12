@@ -60,6 +60,7 @@ def OnLoad():
 	global StrLabel, DexLabel, ConLabel, WisLabel, IntLabel, ChaLabel
 	global TextArea
 
+	GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_SET)
 	GemRB.LoadGame(-1)  #loading the base game
 	StatTable = GemRB.LoadTableObject("abcomm")
 	GemRB.LoadWindowPack("GUICG")
@@ -309,6 +310,8 @@ def AcceptPress():
 	GemRB.SetPlayerStat(1, IE_HITPOINTS, x)
 
 	GemRB.FillPlayerInfo(1) #does all the rest
+	#alter this if needed
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_SET)
 	#LETS PLAY!!
 	GemRB.EnterGame()
 	return
