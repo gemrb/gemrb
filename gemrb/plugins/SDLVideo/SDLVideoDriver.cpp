@@ -277,13 +277,16 @@ int SDLVideoDriver::SwapBuffers(void)
 			break;
 
 		case SDL_KEYDOWN:
-			if (event.key.keysym.sym == SDLK_ESCAPE) {
+			if ((event.key.keysym.sym == SDLK_SPACE) && GetModState(event.key.keysym.mod) & GEM_MOD_CTRL) {
 				core->PopupConsole();
 				break;
 			}
 			key = (unsigned char) event.key.keysym.unicode;
 			if (key < 32 || key == 127) {
 				switch (event.key.keysym.sym) {
+				case SDLK_ESCAPE:
+					key = GEM_ESCAPE;
+					break;
 				case SDLK_END:
 					key = GEM_END;
 					break;

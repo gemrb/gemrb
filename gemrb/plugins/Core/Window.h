@@ -125,7 +125,7 @@ public:
 	/** Deletes the xth. Control */
 	void DelControl(unsigned short i);
 	/** Returns the Default Control which may be a button/gamecontrol atm */
-	Control* GetDefaultControl() const;
+	Control* GetDefaultControl(unsigned int ctrltype) const;
 	/** Returns the Control which should get mouse scroll events */
 	Control* GetScrollControl() const;
 	/** Sets 'ctrl' as currently under mouse */
@@ -166,7 +166,7 @@ public: //Public attributes
 	/** Window flags: Changed, Floating, Framed, Child */
 	int Flags;
 	int Cursor;
-	int DefaultControl;
+	int DefaultControl[2]; //default enter and cancel
 	int ScrollControl;
 private: // Private attributes
 	/** BackGround Image. No BackGround if this variable is NULL. */

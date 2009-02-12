@@ -44,6 +44,8 @@
 #define GEM_ALT			0x89
 #define GEM_HOME		0x8a
 #define GEM_END			0x8b
+#define GEM_ESCAPE		0x8c
+
 
 #define GEM_MOD_SHIFT           1
 #define GEM_MOD_CTRL            2

@@ -336,9 +336,14 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 		}
 	}
 	//the default control will get only GEM_RETURN
-	if (Key == GEM_RETURN) {
-		ctrl = last_win_focused->GetDefaultControl();
+	else if (Key == GEM_RETURN) {
+		ctrl = last_win_focused->GetDefaultControl(0);
 	}
+	//the default cancel control will get only GEM_ESCAPE
+	else if (Key == GEM_ESCAPE) {
+		ctrl = last_win_focused->GetDefaultControl(1);
+	}
+
 	//if there was no default button set, then the current focus will get it
 	if (!ctrl) {
 		ctrl = last_win_focused->GetFocus();
@@ -359,7 +364,7 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 				break;
 			//buttons will receive only GEM_RETURN
 			case IE_GUI_BUTTON:
-				if (Key != GEM_RETURN) {
+				if (Key != GEM_RETURN && Key!=GEM_ESCAPE) {
 					return;
 				}
 				break;

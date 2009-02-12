@@ -334,7 +334,13 @@ void Button::OnSpecialKeyPress(unsigned char Key)
 {
 	if (State != IE_GUI_BUTTON_DISABLED && State != IE_GUI_BUTTON_LOCKED) {
 		if (Key == GEM_RETURN) {
-			if (Flags & IE_GUI_BUTTON_DEFAULT) {
+			if (Flags & IE_GUI_BUTTON_DEFAULT ) {
+				RunEventHandler( ButtonOnPress );
+				return;
+			}
+		}
+		else if (Key == GEM_ESCAPE) {
+			if (Flags & IE_GUI_BUTTON_CANCEL ) {
 				RunEventHandler( ButtonOnPress );
 				return;
 			}

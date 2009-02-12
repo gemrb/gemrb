@@ -44,7 +44,8 @@ Window::Window(unsigned short WindowID, unsigned short XPos,
 	Visible = WINDOW_INVISIBLE;
 	Flags = WF_CHANGED;
 	Cursor = IE_CURSOR_NORMAL;
-	DefaultControl = -1;
+	DefaultControl[0] = -1;
+	DefaultControl[1] = -1;
 	ScrollControl = -1;
 }
 
@@ -230,12 +231,15 @@ void Window::DelControl(unsigned short i)
 	Invalidate();
 }
 
-Control* Window::GetDefaultControl() const
+Control* Window::GetDefaultControl(unsigned int ctrltype) const
 {
 	if (!Controls.size()) {
 		return NULL;
 	}
-	return GetControl( (ieWord) DefaultControl );
+	if (ctrltype>=2) {
+		return NULL;
+	}
+	return GetControl( (ieWord) DefaultControl[ctrltype] );
 }
 
 Control* Window::GetScrollControl() const
@@ -257,7 +261,8 @@ void Window::release(void)
 /** Redraw all the Window */
 void Window::Invalidate()
 {
-	DefaultControl = -1;
+	DefaultControl[0] = -1;
+	DefaultControl[1] = -1;
 	ScrollControl = -1;
 	for (unsigned int i = 0; i < Controls.size(); i++) {
 		if (!Controls[i]) {
@@ -270,11 +275,17 @@ void Window::Invalidate()
 					ScrollControl = i;
 				break;
 			case IE_GUI_BUTTON:
-				if (!( Controls[i]->Flags & IE_GUI_BUTTON_DEFAULT ))
-					break;
+				if (( Controls[i]->Flags & IE_GUI_BUTTON_DEFAULT )) {
+					DefaultControl[0] = i;
+				}
+				if (( Controls[i]->Flags & IE_GUI_BUTTON_CANCEL )) {
+					DefaultControl[1] = i;
+				}
+				break;
 				//falling through
 			case IE_GUI_GAMECONTROL:
-				DefaultControl = i;
+				DefaultControl[0] = i;
+				DefaultControl[1] = i;
 				break;
 			default: ;
 		}

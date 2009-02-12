@@ -54,7 +54,7 @@ class Palette;
 #define IE_GUI_BUTTON_ALT_SOUND    0x00000008
 #define IE_GUI_BUTTON_CHECKBOX     0x00000010   // or radio button
 #define IE_GUI_BUTTON_RADIOBUTTON  0x00000020   // sticks in a state
-#define IE_GUI_BUTTON_DEFAULT      0x00000040   // enter button triggers it
+#define IE_GUI_BUTTON_DEFAULT      0x00000040   // enter key triggers it
 #define IE_GUI_BUTTON_ANIMATED     0x00000080
 
 //these bits are hardcoded in the .chu structure
@@ -73,6 +73,7 @@ class Palette;
 #define IE_GUI_BUTTON_CENTER_PICTURES 0x00080000 // center button's PictureList
 #define IE_GUI_BUTTON_BG1_PAPERDOLL   0x00100000 // BG1-style paperdoll PictureList
 #define IE_GUI_BUTTON_HORIZONTAL      0x00200000 // horizontal clipping of overlay
+#define IE_GUI_BUTTON_CANCEL          0x00400000 // cancel key triggers it
 
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
 
