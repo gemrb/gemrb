@@ -701,12 +701,14 @@ def OptDone (name, window, button_id):
 	button = window.GetControl (button_id)
 	button.SetText (11973) # Done
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "Close%sWindow" %name)
+	button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 def OptCancel (name, window, button_id):
 	"""Standard `Cancel' button for option windows"""
 	button = window.GetControl (button_id)
 	button.SetText (13727) # Cancel
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "Close%sWindow" %name)
+	button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 def OptHelpText (name, window, text_id, text_strref):
 	"""Standard textarea with context help for option windows"""

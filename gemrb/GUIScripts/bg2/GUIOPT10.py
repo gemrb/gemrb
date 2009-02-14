@@ -93,7 +93,9 @@ def OnLoad():
 	AutopauseCenterB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "AutopauseCenterPress")
 
 	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OkPress")
+	OkButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	AutopauseCenterB.SetVarAssoc("Auto Pause Center",1)
 

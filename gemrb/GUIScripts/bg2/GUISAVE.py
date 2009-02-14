@@ -27,6 +27,7 @@ def OpenSaveWindow ():
 	CancelButton=Window.GetControl (34)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSaveWindow")
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	GemRB.SetVar ("LoadIdx",0)
 
 	for i in range(4):

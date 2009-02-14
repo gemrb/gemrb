@@ -77,7 +77,9 @@ def OnLoad():
 	SoftStandBltButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SoftStandBltPress")
 	SoftStandBltButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SoftStandBltPress")
 	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OkPress")
+	OkButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	GraphicsWindow.ShowModal()
 	return
 	
