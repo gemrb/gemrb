@@ -29,6 +29,8 @@ def OnLoad():
 	PlayButton.SetText(33093)
 	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "PlayPress")
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelTut")
+	PlayButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 #quit subwindow
 	QuitWindow = GemRB.LoadWindowObject(3)
 	QuitTextArea = QuitWindow.GetControl(0)
@@ -39,6 +41,8 @@ def OnLoad():
 	ConfirmButton.SetText(15417)
 	ConfirmButton.SetEvent(0, "ExitConfirmed")
 	CancelButton.SetEvent(0, "ExitCancelled")
+	ConfirmButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 #main window
 	StartWindow = GemRB.LoadWindowObject(0)
 	StartWindow.SetFrame ()
@@ -78,6 +82,7 @@ def OnLoad():
 	MultiPlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MultiPlayerPress")
 	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
 	DisabledButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "")
+	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	QuitWindow.SetVisible(0)
 	TutorialWindow.SetVisible(0)
 	StartWindow.SetVisible(1)

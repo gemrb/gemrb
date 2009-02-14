@@ -21,9 +21,11 @@ def OnLoad():
 	DoneButton = ImportWindow.GetControl(0)
 	DoneButton.SetText(2610)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	CancelButton = ImportWindow.GetControl(1)
 	CancelButton.SetText(15416)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")

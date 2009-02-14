@@ -23,6 +23,7 @@ def OnLoad():
 	GameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "GamePress")
 	GraphicButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "GraphicPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "BackPress")
+	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	OptionsWindow.SetVisible(1)
 	return
 	
