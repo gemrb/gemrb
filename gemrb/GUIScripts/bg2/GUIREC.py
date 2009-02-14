@@ -903,7 +903,7 @@ def CanDualClass(actor):
 		return 1
 
 	# must be at least level 2
-	if GemRB.GetPlayerStat (pc, IE_LEVEL) == 1:
+	if GemRB.GetPlayerStat (actor, IE_LEVEL) == 1:
 		return 1
 	return 0
 
