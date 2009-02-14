@@ -40,6 +40,7 @@ def OnLoad():
 
 	BackButton = AppearanceWindow.GetControl (5)
 	BackButton.SetText (15416)
+	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	CustomButton = AppearanceWindow.GetControl (6)
 	CustomButton.SetText (17545)

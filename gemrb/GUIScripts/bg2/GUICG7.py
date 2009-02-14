@@ -113,6 +113,7 @@ def OnLoad():
 	MageSpellsCancelButton.SetState(IE_GUI_BUTTON_ENABLED)
 	MageSpellsCancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MageSpellsCancelPress")
 	MageSpellsCancelButton.SetText(13727)
+	MageSpellsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	MageSpellsPickButton = MageSpellsWindow.GetControl(30)
 	MageSpellsPickButton.SetState(IE_GUI_BUTTON_ENABLED)

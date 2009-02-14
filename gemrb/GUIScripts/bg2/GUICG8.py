@@ -28,6 +28,7 @@ def OnLoad():
 
 	BackButton = RaceWindow.GetControl(i+2)  #i=8 now (when race count is 7)
 	BackButton.SetText(15416)
+	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	DoneButton = RaceWindow.GetControl(0)
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)

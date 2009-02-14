@@ -13,6 +13,7 @@ def OnLoad():
 
 	BackButton = NameWindow.GetControl(3)
 	BackButton.SetText(15416)
+	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	DoneButton = NameWindow.GetControl(0)
 	DoneButton.SetText(11973)

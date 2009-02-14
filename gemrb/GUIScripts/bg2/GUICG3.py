@@ -40,6 +40,7 @@ def OnLoad():
 
 	BackButton = AlignmentWindow.GetControl(13)
 	BackButton.SetText(15416)
+	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	DoneButton = AlignmentWindow.GetControl(0)
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)

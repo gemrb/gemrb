@@ -29,6 +29,7 @@ def OnLoad ():
 	# back
 	CancelButton = BioWindow.GetControl (2)
 	CancelButton.SetText (12896)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OkPress")
 	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ClearPress")

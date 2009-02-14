@@ -20,6 +20,7 @@ def OnLoad():
 
 	CancelButton = ImportWindow.GetControl(3)
 	CancelButton.SetText(13727)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	FileButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "FilePress")
 	SavedGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "GamePress")

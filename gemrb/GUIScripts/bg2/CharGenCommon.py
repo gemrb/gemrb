@@ -63,6 +63,7 @@ def DisplayOverview(step):
 	BackButton.SetText (15416)
 	BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "BackPress")
+	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	AcceptButton = CharGenWindow.GetControl (8)
 	playmode = GemRB.GetVar ("PlayMode")

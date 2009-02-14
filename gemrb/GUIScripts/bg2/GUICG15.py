@@ -62,6 +62,7 @@ def OnLoad():
 
 	BackButton = RaceWindow.GetControl(4)
 	BackButton.SetText(15416)
+	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	DoneButton = RaceWindow.GetControl(5)
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
