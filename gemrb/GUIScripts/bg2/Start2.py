@@ -16,7 +16,7 @@ def OnLoad():
 	global ExitButton, OptionsButton, MultiPlayerButton, MoviesButton, SinglePlayerButton
 	global SinglePlayerButton
 
-	skip_videos = not GemRB.GetVar ("SkipIntroVideos")
+	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 
 	GemRB.LoadWindowPack("START", 640, 480)
 #tutorial subwindow
@@ -50,9 +50,11 @@ def OnLoad():
 	if GemRB.GetVar("oldgame")==1:
 		if GameIsTOB():
 			StartWindow.SetPicture("STARTOLD")
-		GemRB.PlayMovie ("INTRO15F",skip_videos)
+		if not skip_videos:
+			GemRB.PlayMovie ("INTRO15F", 1)
 	else:
-		GemRB.PlayMovie ("INTRO",skip_videos)
+		if not skip_videos:
+			GemRB.PlayMovie ("INTRO", 1)
 
 	#end ToB specific part
 	SinglePlayerButton = StartWindow.GetControl(0)

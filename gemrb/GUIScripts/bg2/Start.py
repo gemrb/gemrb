@@ -10,9 +10,9 @@ def OnLoad():
 	GemRB.EnableCheatKeys(1)
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos:
-		GemRB.PlayMovie ("BISLOGO")
-		GemRB.PlayMovie ("BWDRAGON")
-		GemRB.PlayMovie ("WOTC")
+		GemRB.PlayMovie ("BISLOGO", 1)
+		GemRB.PlayMovie ("BWDRAGON", 1)
+		GemRB.PlayMovie ("WOTC", 1)
 
 	# Find proper window border for higher resolutions
 	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
@@ -60,8 +60,6 @@ def SoAPress():
 	GemRB.SetMasterScript("BALDUR","WORLDMAP")
 	GemRB.SetVar("oldgame",1)
 	GemRB.SetNextScript("Start2")
-	if not skip_videos:
-		GemRB.PlayMovie ("INTRO15F")
 	return
 
 def ToBPress():
@@ -70,8 +68,6 @@ def ToBPress():
 	if StartWindow:
 		StartWindow.Unload()
 	GemRB.SetNextScript("Start2")
-	if not skip_videos:
-		GemRB.PlayMovie ("INTRO")
 	return
 
 def ExitPress():
