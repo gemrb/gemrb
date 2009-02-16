@@ -48,6 +48,7 @@ Level = 0
 
 # TODO: multiclass support
 def OpenLevelUpWindow():
+	return # disabled in this release
 	global LevelUpWindow, TextAreaControl, ProfPointsLeft, NewProfPoints
 	global TopIndex, ScrollBarControl, DoneButton, WeapProfTable, ProfColumn
 	global SkillTable, SkillPointsLeft, NewSkillPoints, KitName, LevelDiff
