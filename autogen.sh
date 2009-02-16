@@ -13,7 +13,11 @@ export WANT_AUTOCONF="2.5"
 if [ "$1" = "" ]; then
   dest=$HOME/GemRB
 else
-  dest=$1
+  if [ "${1:0:1}" == "/" ]; then
+    dest=$1
+  else
+    dest=$PWD/$1
+  fi
   shift
 fi
 
