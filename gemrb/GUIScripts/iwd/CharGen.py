@@ -370,7 +370,6 @@ def AcceptPress():
 
 	TmpTable=GemRB.LoadTableObject ("weapprof")
 	ProfCount = TmpTable.GetRowCount ()
-	#bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
 	for i in range(ProfCount):
 		StatID = TmpTable.GetValue (i, 0)
 		Value = GemRB.GetVar ("Proficiency"+str(i) )

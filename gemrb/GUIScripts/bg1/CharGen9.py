@@ -169,6 +169,8 @@ def NextPress():
 		StatID=TmpTable.GetValue (i,4)
 		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Ability "+str(i) ) )
 
+	# set the base number of attacks; effects will add the proficiency bonus
+	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 2)
 	TmpTable=GemRB.LoadTableObject ("weapprof")
 	ProfCount = TmpTable.GetRowCount ()
 	for i in range(7,ProfCount):
