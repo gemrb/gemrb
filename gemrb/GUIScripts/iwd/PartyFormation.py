@@ -45,6 +45,7 @@ def OnLoad ():
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExitPress")
 	ExitButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	ExitButton.SetText (13906)
+	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	DoneButton = PartyFormationWindow.GetControl (28)
 	DoneButton.SetText (11973)
@@ -145,10 +146,12 @@ def ExitPress ():
 	ExitButton = ExitWindow.GetControl (1)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExitExitPress")
 	ExitButton.SetText (13906)
+	ExitButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	CancelButton = ExitWindow.GetControl (2)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExitCancelPress")
 	CancelButton.SetText (13727)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	TextArea = ExitWindow.GetControl (0)
 	TextArea.SetText (11329)

@@ -203,6 +203,7 @@ def OnLoad():
 	BackButton = CharGenWindow.GetControl (11)
 	BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "BackPress")
+	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	PortraitButton = CharGenWindow.GetControl (12)
 	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -216,10 +217,6 @@ def OnLoad():
 	CancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-
-	BackButton = CharGenWindow.GetControl (11)
-	BackButton.SetState (IE_GUI_BUTTON_ENABLED)
-	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "BackPress")
 
 	AcceptButton = CharGenWindow.GetControl (8)
 	AcceptButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -239,6 +236,10 @@ def BackPress():
 	GemRB.SetToken ("CHARNAME","")
 	if CharGenState > 0:
 		CharGenState = CharGenState - 1
+	else:
+		CancelPress()
+		return
+
 	if CharGenState > 6:
 		CharGenState = 6
 
@@ -557,6 +558,7 @@ def GenderPress():
 	GenderCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	GenderCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "GenderCancelPress")
 	GenderCancelButton.SetText (13727)
+	GenderCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	GenderWindow.SetVisible (1)
 	return
@@ -631,6 +633,7 @@ def PortraitSelect():
 	PortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	PortraitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitCancelPress")
 	PortraitCancelButton.SetText (13727)
+	PortraitCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	while PortraitsTable.GetValue (Portrait, 0) != GemRB.GetVar ("Gender"):
 		Portrait = Portrait + 1
@@ -837,6 +840,7 @@ def RacePress():
 	RaceCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	RaceCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RaceCancelPress")
 	RaceCancelButton.SetText (13727)
+	RaceCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	RaceWindow.SetVisible (1)
 	return
@@ -939,6 +943,7 @@ def ClassPress():
 	ClassCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	ClassCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ClassCancelPress")
 	ClassCancelButton.SetText (13727)
+	ClassCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ClassWindow.SetVisible (1)
 	return
@@ -990,6 +995,7 @@ def ClassMultiPress():
 	ClassMultiCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	ClassMultiCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ClassMultiCancelPress")
 	ClassMultiCancelButton.SetText (13727)
+	ClassMultiCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ClassMultiWindow.SetVisible (1)
 	return
@@ -1050,6 +1056,7 @@ def KitPress():
 	KitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	KitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "KitCancelPress")
 	KitCancelButton.SetText (13727)
+	KitCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	KitWindow.SetVisible (1)
 	return
@@ -1141,6 +1148,7 @@ def AlignmentPress():
 	AlignmentCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	AlignmentCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "AlignmentCancelPress")
 	AlignmentCancelButton.SetText (13727)
+	AlignmentCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	AlignmentWindow.SetVisible (1)
 	return
@@ -1180,6 +1188,7 @@ def AlignmentCancelPress():
 def AbilitiesPress():
 	global CharGenWindow, AbilitiesWindow, AbilitiesTable, AbilitiesRaceAddTable, AbilitiesRaceReqTable, AbilitiesClassReqTable, AbilitiesTextArea, AbilitiesRecallButton, AbilitiesDoneButton
 
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	CharGenWindow.SetVisible (0)
 	AbilitiesWindow = GemRB.LoadWindowObject (4)
 	AbilitiesTable = GemRB.LoadTableObject ("ABILITY")
@@ -1237,6 +1246,7 @@ def AbilitiesPress():
 	AbilitiesCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	AbilitiesCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "AbilitiesCancelPress")
 	AbilitiesCancelButton.SetText (13727)
+	AbilitiesCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	AbilitiesRerollPress()
 
@@ -1376,6 +1386,7 @@ def AbilitiesDonePress():
 	CharGenState = 5
 	SkillsState = 0
 	SetCharacterDescription()
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	CharGenWindow.SetVisible (1)
 	return
 
@@ -1384,6 +1395,7 @@ def AbilitiesCancelPress():
 
 	if AbilitiesWindow:
 		AbilitiesWindow.Unload ()
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	CharGenWindow.SetVisible (1)
 	return
 
@@ -1518,6 +1530,7 @@ def SkillsSelect():
 	SkillsCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	SkillsCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SkillsCancelPress")
 	SkillsCancelButton.SetText (13727)
+	SkillsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	SkillsWindow.SetVisible (1)
 	return
@@ -1622,6 +1635,7 @@ def RacialEnemySelect():
 	RacialEnemyCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	RacialEnemyCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RacialEnemyCancelPress")
 	RacialEnemyCancelButton.SetText (13727)
+	RacialEnemyCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	DisplayRacialEnemies()
 	RacialEnemyWindow.SetVisible (1)
@@ -1765,6 +1779,7 @@ def ProficienciesSelect():
 	ProficienciesCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	ProficienciesCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ProficienciesCancelPress")
 	ProficienciesCancelButton.SetText (13727)
+	ProficienciesCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ProficienciesWindow.SetVisible (1)
 	return
@@ -1897,6 +1912,7 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	MageSpellsCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	MageSpellsCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MageSpellsCancelPress")
 	MageSpellsCancelButton.SetText (13727)
+	MageSpellsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	MageSpellsWindow.SetVisible (1)
 	return
@@ -2013,6 +2029,7 @@ def MageSpellsMemorize(SpellTable, Level, SpellLevel):
 	MageMemorizeCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	MageMemorizeCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MageMemorizeCancelPress")
 	MageMemorizeCancelButton.SetText (13727)
+	MageMemorizeCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	MageMemorizeWindow.SetVisible (1)
 	return
@@ -2133,6 +2150,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 	PriestMemorizeCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	PriestMemorizeCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PriestMemorizeCancelPress")
 	PriestMemorizeCancelButton.SetText (13727)
+	PriestMemorizeCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	PriestMemorizeWindow.SetVisible (1)
 	return
@@ -2258,6 +2276,7 @@ def AppearancePress():
 	AppearanceCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	AppearanceCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "AppearanceCancelPress")
 	AppearanceCancelButton.SetText (13727)
+	AppearanceCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	AppearanceWindow.SetVisible (1)
 	return
@@ -2402,6 +2421,7 @@ def CharSoundSelect():
 	CharSoundCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	CharSoundCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CharSoundCancelPress")
 	CharSoundCancelButton.SetText (13727)
+	CharSoundCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	CharSoundWindow.SetVisible (1)
 	return
@@ -2457,6 +2477,7 @@ def BiographyPress():
 	BiographyCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	BiographyCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "BiographyCancelPress")
 	BiographyCancelButton.SetText (13727)
+	BiographyCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	BiographyDoneButton = BiographyWindow.GetControl (1)
 	BiographyDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -2511,6 +2532,7 @@ def NamePress():
 	NameCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	NameCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "NameCancelPress")
 	NameCancelButton.SetText (13727)
+	NameCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	NameWindow.SetVisible (1)
 	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
@@ -2573,6 +2595,7 @@ def ImportPress():
 	ImportCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	ImportCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ImportCancelPress")
 	ImportCancelButton.SetText (13727)
+	ImportCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ImportWindow.SetVisible (1)
 	return
