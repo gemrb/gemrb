@@ -1,6 +1,8 @@
-GemRB svn r5587 (2009-01-30):
+GemRB V0.3.2 (2009-02-16):
   New features:
-    - 
+    - default cancel button, bound to the escape key
+    - tooltip animations and a shortcut (tab)
+    - wrapper python classes that simplified the GUIScripts
     - trap detection, removal, triggering, xp, feedback, autopause
     - modal effects
     - proper xp award for dual- and multiclass actors
@@ -14,7 +16,8 @@ GemRB svn r5587 (2009-01-30):
     - extended night areas (originally a bg2 feature)
 
   Improved features:
-    - 
+    - walking animation timing
+    - formations (arbitrary sizes, rotation, cursor)
     - ppc support (no more crashes)
     - container/door/infopoint cursor and highlight handling
     - various guiscripts
