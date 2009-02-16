@@ -1414,13 +1414,13 @@ def SkillsPress():
 			SkillRaceTable = GemRB.LoadTableObject ("SKILLRAC")
 			SkillDexterityTable = GemRB.LoadTableObject ("SKILLDEX")
 			Dexterity = str(GemRB.GetVar ("Ability2") )
-			GemRB.SetVar ("Skill0", SkillRaceTable.GetValue (RaceName, "STEALTH") + SkillDexterityTable.GetValue(Dexterity, "STEALTH") + GemRB.LoadTableObject.GetValue(("SKILLRNG"), str(Level), "STEALTH"))
+			GemRB.SetVar ("Skill0", SkillRaceTable.GetValue (RaceName, "STEALTH") + SkillDexterityTable.GetValue(Dexterity, "STEALTH") + GemRB.LoadTableObject("SKILLRNG").GetValue(str(Level), "STEALTH"))
 			RacialEnemySelect()
 		elif IsBard!="*":
 			SkillRaceTable = GemRB.LoadTableObject ("SKILLRAC")
 			SkillDexterityTable = GemRB.LoadTableObject ("SKILLDEX")
 			Dexterity = str(GemRB.GetVar ("Ability2") )
-			GemRB.SetVar ("Skill2", SkillRaceTable.GetValue (RaceName, "PICK_POCKETS") + SkillDexterityTable.GetValue(Dexterity, "PICK_POCKETS") + GemRB.LoadTableObject.GetValue((IsBard), str(Level), "PICK_POCKETS"))
+			GemRB.SetVar ("Skill2", SkillRaceTable.GetValue (RaceName, "PICK_POCKETS") + SkillDexterityTable.GetValue(Dexterity, "PICK_POCKETS") + GemRB.LoadTableObject(IsBard).GetValue(str(Level), "PICK_POCKETS"))
 			SkillsState = 1
 		else:
 			SkillsState = 1
