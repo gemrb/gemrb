@@ -153,7 +153,7 @@ def GameIsHOW ():
 def GetIWDSpellButtonCount ():
 	if GameIsHOW():
 		return 24
-	else
+	else:
 		return 20
 
 def SetGamedaysAndHourToken ():
