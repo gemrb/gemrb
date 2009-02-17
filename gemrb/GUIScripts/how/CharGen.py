@@ -2007,7 +2007,7 @@ def MageSpellsMemorize(SpellTable, Level, SpellLevel):
 		if j < len(Learnable):
 			Spell = GemRB.GetSpell (Learnable[j])
 			SpellButton.SetTooltip(Spell["SpellName"])
-			SpellButton.SetSpellIcon(Learnable[j])
+			SpellButton.SetSpellIcon(Learnable[j], 1)
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
 			SpellButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MageMemorizeSelectPress")
 			SpellButton.SetVarAssoc ("SpellMask", 1 << j)
