@@ -28,7 +28,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_modal import *
 from ie_action import *
-from GUICommon import SetGamedaysAndHourToken
+from GUICommon import SetGamedaysAndHourToken, GameIsHOW
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -102,8 +102,9 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 
 	if Gears:
 		# Gears (time), how doesn't have this in the right place
-		pos = GemRB.GetSystemVariable (SV_HEIGHT)-71
-		Window.CreateButton (9, 6, pos, 64, 71)
+		if GameIsHOW():
+			pos = GemRB.GetSystemVariable (SV_HEIGHT)-71
+			Window.CreateButton (9, 6, pos, 64, 71)
 		Button = Window.GetControl (9)
 		Button.SetAnimation ("CGEAR")
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -471,19 +472,24 @@ def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
 	#take care, this window is different in how/iwd
-	if needcontrols:
-		PortraitWindow = Window = GemRB.LoadWindowObject(26)
-		# Rest
-		pos = GemRB.GetSystemVariable (SV_HEIGHT) - 37
-		Window.CreateButton (8, 6, pos, 55, 37)
-		Button = Window.GetControl (8)
-		Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
-		Button.SetTooltip (11942)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RestPress")
+	if GameIsHOW() and needcontrols:
+		PortraitWindow = Window = GemRB.LoadWindowObject (26)
+	else:
+		PortraitWindow = Window = GemRB.LoadWindowObject (1)
 
+	if needcontrols:
+		if GameIsHOW():
+			# Rest (how)
+			pos = GemRB.GetSystemVariable (SV_HEIGHT) - 37
+			Window.CreateButton (8, 6, pos, 55, 37)
+			Button = Window.GetControl (8)
+			Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
+			Button.SetTooltip (11942)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RestPress")
+
+			pos = pos - 37
+			Window.CreateButton (6, 6, pos, 27, 36)
 		# AI
-		pos = pos - 37
-		Window.CreateButton (6, 6, pos, 27, 36)
 		Button = Window.GetControl (6)
 		#fixing a gui bug, and while we are at it, hacking it to be easier
 		Button.SetSprites ("GUIBTACT", 0, 46, 47, 48, 49)
@@ -499,13 +505,17 @@ def OpenPortraitWindow (needcontrols):
 			Button.SetTooltip (15918)
 
 		#Select All
-		Window.CreateButton (7, 33, pos, 27, 36)
+		if GameIsHOW():
+			Window.CreateButton (7, 33, pos, 27, 36)
 		Button = Window.GetControl (7)
 		Button.SetSprites ("GUIBTACT", 0, 50, 51, 50, 51)
 		Button.SetTooltip (10485)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
-	else:
-		PortraitWindow = Window = GemRB.LoadWindowObject (1)
+		if not GameIsHOW():
+			# Rest (iwd)
+			Button = PortraitWindow.GetControl (8)
+			Button.SetTooltip (11942)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RestPress")
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
@@ -564,10 +574,7 @@ def UpdatePortraitWindow ():
 
 		Button.SetText ("%d/%d" %(hp, hp_max))
 		Button.SetTooltip (GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
-		if sel:
-			Button.EnableBorder (FRAME_PC_SELECTED, 1)
-		else:
-			Button.EnableBorder (FRAME_PC_SELECTED, 0)
+		Button.EnableBorder (FRAME_PC_SELECTED, sel)
 	return
 
 def PortraitButtonOnPress ():

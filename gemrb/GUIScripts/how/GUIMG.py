@@ -27,7 +27,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow
+from GUICommon import CloseOtherWindow, GetIWDSpellButtonCount
 from GUICommonWindows import *
 
 MageWindow = None
@@ -108,7 +108,7 @@ def OpenMageWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
-	for i in range (24):
+	for i in range (GetIWDSpellButtonCount()):
 		Button = Window.GetControl (27 + i)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
@@ -170,7 +170,7 @@ def UpdateMageWindow ():
 
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
-	for i in range (24):
+	for i in range (GetIWDSpellButtonCount()):
 		Button = Window.GetControl (27 + i)
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)

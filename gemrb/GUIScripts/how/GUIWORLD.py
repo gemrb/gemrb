@@ -454,7 +454,7 @@ def OpenReformPartyWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def DeathWindow() :
+def DeathWindow ():
 	#no death movie, but music is changed
 	GemRB.LoadMusicPL ("Theme.mus",1)
 	GemRB.HideGUI ()

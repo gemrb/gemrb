@@ -553,6 +553,39 @@ def OpenItemWindow ():
 	GemRB.EnterStore (ResRef)
 	return
 
+def DrinkItemWindow ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	# the drink item header is always the first
+	GemRB.UseItem (pc, slot, 0)
+	if ItemInfoWindow:
+		ItemInfoWindow.Unload ()
+	return
+
+def ReadItemWindow ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	# the learn scroll header is always the second
+	# 5 is TARGET_SELF, because some scrolls are buggy
+	GemRB.UseItem (pc, slot, 1, 5)
+	if ItemInfoWindow:
+		ItemInfoWindow.Unload ()
+	return
+
+def OpenItemWindow ():
+	#close inventory
+	GemRB.SetVar ("Inventory", 1)
+	if ItemInfoWindow:
+		ItemInfoWindow.Unload ()
+	OpenInventoryWindow ()
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	ResRef = slot_item['ItemResRef']
+	#the store will have to reopen the inventory
+	GemRB.EnterStore (ResRef)
+	return
+
 def DialogItemWindow ():
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()

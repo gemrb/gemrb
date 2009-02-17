@@ -33,6 +33,8 @@ QuitWindow = 0
 def OnLoad ():
 	global StartWindow, JoinGameButton
 
+	GemRB.SetVar("oldgame",1) #don't handle expansion yet
+
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos:
 		GemRB.PlayMovie ('BISLOGO')
