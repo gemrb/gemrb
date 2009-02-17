@@ -186,6 +186,10 @@ def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
 	tmp = WorldMapControl.GetDestinationArea ()
+	if tmp["Distance"]==-1:
+		print "Invalid target", tmp
+		return
+
 	CloseWorldMapWindow ()
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"])
 	return
