@@ -147,6 +147,15 @@ def CheckStat20 (Actor, Stat, Diff):
 def GameIsTOB ():
 	return GemRB.HasResource ("worldm25", RES_WMP)
 
+def GameIsHOW ():
+	return GemRB.HasResource ("expmap", RES_WMP)
+
+def GetIWDSpellButtonCount ():
+	if GameIsHOW():
+		return 24
+	else
+		return 20
+
 def SetGamedaysAndHourToken ():
 	currentTime = GemRB.GetGameTime()
 	days = currentTime / 7200
