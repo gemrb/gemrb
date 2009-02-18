@@ -505,7 +505,7 @@ def LoadPress():
 
 def GetWindowPack():
 	width = GemRB.GetSystemVariable (SV_WIDTH)
-	if GemRB.HasResource("GUIW08", 0x000003EC):
+	if GemRB.HasResource("GUIW08", 0x000003EA):
 		if width == 800:
 			return "GUIW08"
 		if width == 1024:
