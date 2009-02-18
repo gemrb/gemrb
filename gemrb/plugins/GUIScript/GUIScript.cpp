@@ -8476,8 +8476,7 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 	}
 	int i = SpecialItemsCount;
 	while(i--) {
-		if (itemtype&SpecialItems[i].value)
-		{
+		if (itemtype&SpecialItems[i].value) {
 			if (actor->inventory.HasItem(SpecialItems[i].resref,0)) {
 				break;
 			}
@@ -8522,11 +8521,13 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 	}
 	int i = SpecialSpellsCount;
 	while(i--) {
-		if (actor->spellbook.HaveSpell(SpecialSpells[i].resref,useup)) {
-			if (useup) {
-				//actor->SpellCast(SpecialSpells[i].resref, actor);
+		if (itemtype&SpecialSpells[i].value) {
+			if (actor->spellbook.HaveSpell(SpecialSpells[i].resref,useup)) {
+				if (useup) {
+					//actor->SpellCast(SpecialSpells[i].resref, actor);
+				}
+				break;
 			}
-			break;
 		}
 	}
 
