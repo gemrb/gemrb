@@ -9068,7 +9068,12 @@ bool GUIScript::Init(void)
 	PathAppend( path, "GUIScripts" );
 
 	memcpy(path2, path,_MAX_PATH);
-	PathAppend( path2, core->GameType );
+	// use the iwd guiscripts for how, but leave its override
+	if (stricmp( core->GameType, "how" ) == 0) {
+		PathAppend( path2, "iwd" );
+	} else {
+		PathAppend( path2, core->GameType );
+	}
 
 
 #ifdef WIN32
