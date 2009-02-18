@@ -23,11 +23,18 @@
 
 ###################################################
 import GemRB
+import GUICommonWindows
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
+from GUICommonWindows import *
 
 ###################################################
 JournalWindow = None
+PortraitWindow = None
+OptionsWindow = None
+OldPortraitWindow = None
+OldOptionsWindow = None
+
 Chapter = 0
 StartTime = 0
 StartYear = 0
@@ -35,7 +42,40 @@ StartYear = 0
 ###################################################
 def OpenJournalWindow ():
 	global StartTime, StartYear
-	global JournalWindow
+	global JournalWindow, PortraitWindow, OptionsWindow
+	global OldPortraitWindow, OldOptionsWindow
+
+	if CloseOtherWindow (OpenJournalWindow):
+		if JournalWindow:
+			JournalWindow.Unload ()
+		if OptionsWindow:
+			OptionsWindow.Unload ()
+		if PortraitWindow:
+			PortraitWindow.Unload ()
+ 
+		JournalWindow = None
+		GemRB.SetVar ("OtherWindow", -1)
+		GemRB.SetVisible (0,1)
+		GemRB.UnhideGUI ()
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
+		return
+		
+	GemRB.HideGUI ()
+	GemRB.SetVisible (0,0)
+
+	GemRB.LoadWindowPack ("GUIJRNL", 640, 480)
+	JournalWindow = Window = GemRB.LoadWindowObject (2)
+	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
+	#saving the original portrait window
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
+	OptionsWindow = GemRB.LoadWindowObject (0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenJournalWindow")
+	OptionsWindow.SetFrame ()
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
 
 	Table = GemRB.LoadTableObject("YEARS")
 	#StartTime is the time offset for ingame time, beginning from the startyear
@@ -43,22 +83,6 @@ def OpenJournalWindow ():
 	#StartYear is the year of the lowest ingame date to be printed
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 
-	if CloseOtherWindow (OpenJournalWindow):
-		GemRB.HideGUI ()
-		if JournalWindow:
-			JournalWindow.Unload ()
-		JournalWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		
-		GemRB.UnhideGUI ()
-		return
-		
-	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIJRNL")
-	JournalWindow = Window = GemRB.LoadWindowObject (2)
-	GemRB.SetVar("OtherWindow", JournalWindow.ID)
-
-	
 	Button = Window.GetControl (3)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "JournalPrevSectionPress")
 
@@ -67,8 +91,9 @@ def OpenJournalWindow ():
 
 	Chapter = GemRB.GetGameVar("chapter")
 	UpdateJournalWindow ()
-	GemRB.UnhideGUI ()
-
+	OptionsWindow.SetVisible (1)
+	Window.SetVisible (1)
+	PortraitWindow.SetVisible (1)
 
 ###################################################
 def UpdateJournalWindow ():
