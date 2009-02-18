@@ -33,7 +33,7 @@ QuitWindow = 0
 def OnLoad ():
 	global StartWindow, JoinGameButton
 
-	GemRB.SetVar ("oldgame",1) #don't handle expansion yet
+	GemRB.SetVar("oldgame",1) #don't handle expansion yet
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos:
@@ -46,10 +46,11 @@ def OnLoad ():
 	# Find proper window border for higher resolutions
 	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
 	screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
-	if screen_width == 800:
-		GemRB.LoadWindowFrame ("STON08L", "STON08R", "STON08T", "STON08B")
-	elif screen_width == 1024:
-		GemRB.LoadWindowFrame ("STON10L", "STON10R", "STON10T", "STON10B")
+	if GemRB.HasResource ("STON08L", 0x000003EC):
+		if screen_width == 800:
+			GemRB.LoadWindowFrame ("STON08L", "STON08R", "STON08T", "STON08B")
+		elif screen_width == 1024:
+			GemRB.LoadWindowFrame ("STON10L", "STON10R", "STON10T", "STON10B")
 
 	GemRB.LoadWindowPack("GUICONN", 640, 480)
 
