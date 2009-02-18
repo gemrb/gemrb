@@ -8476,8 +8476,11 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 	}
 	int i = SpecialItemsCount;
 	while(i--) {
-		if (actor->inventory.HasItem(SpecialItems[i].resref,0)) {
-			break;
+		if (itemtype&SpecialItems[i].value)
+		{
+			if (actor->inventory.HasItem(SpecialItems[i].resref,0)) {
+				break;
+			}
 		}
 	}
 
