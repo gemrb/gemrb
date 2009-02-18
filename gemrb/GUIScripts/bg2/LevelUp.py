@@ -305,6 +305,10 @@ def GetLevelUpNews():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	# FIXME: order
 
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	ClassIndex = ClassTable.FindValue (5, Class)
+	ClassName = ClassTable.GetRowName (ClassIndex)
+
 	# 5293 - Additional Hit Points Gained
 	hp = 0
 	Class = GemRB.GetPlayerStat (GemRB.GameGetSelectedPCSingle (), IE_CLASS)
@@ -346,14 +350,19 @@ def GetLevelUpNews():
 	# 5261 - Regained abilities from inactive class
 	# 5305 - THAC0 Reduced by
 	# 5375 - Backstab Multiplier Increased by
+
 	# 5376 - Lay On Hands Increased by
+	# TODO: expand clskills with kits, so inquisitors and undead hunters don't get this
+	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
+	if ClassSkillsTable.GetValue (ClassName, "LAYHANDS") != "*":
+		LOHTable = GemRB.LoadTableObject ("layhands")
+		LOHGain = LOHTable.GetValue (0, Level) - LOHTable.GetValue (0, Level-LevelDiff)
+		if LOHGain > 0:
+			News += GemRB.GetString (5376) + ": " + str(LOHGain) + '\n\n'
 
 	# 5377 - Lore Increased by
 	LoreTable = GemRB.LoadTableObject ("lore")
 	# TODO: use the class that actually leveled up (mc/dc support)
-	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassIndex = ClassTable.FindValue (5, Class)
-	ClassName = ClassTable.GetRowName (ClassIndex)
 	LoreClassIndex = LoreTable.GetRowIndex (ClassName)
 	LoreGain = LoreTable.GetValue (LoreClassIndex, 0) * LevelDiff
 	if LoreGain > 0:
