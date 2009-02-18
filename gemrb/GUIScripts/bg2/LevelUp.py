@@ -302,6 +302,7 @@ def GetLevelUpNews():
 	global NewProfPoints, NewSkillPoints
 
 	News = GemRB.GetString (5259) + '\n\n'
+	pc = GemRB.GameGetSelectedPCSingle ()
 	# FIXME: order
 
 	# 5293 - Additional Hit Points Gained
@@ -316,7 +317,11 @@ def GetLevelUpNews():
 		rolls = HPTable.GetValue (level, 1)
 		bonus = HPTable.GetValue (level, 2)
 		if rolls:
-			hp += GemRB.Roll (rolls, HPTable.GetValue (level, 0), bonus)
+			# TODO: difficulty and setting support - max rolls on levelup
+			if True: # core difficulty (or higher) or unchecked max rolls
+				hp += GemRB.Roll (rolls, HPTable.GetValue (level, 0), bonus)
+			else:
+				hp += rolls * HPTable.GetValue (level, 0) + bonus
 		else:
 			hp += bonus
 	News += GemRB.GetString (5293) + ": " + str(hp) + '\n\n'
@@ -342,7 +347,18 @@ def GetLevelUpNews():
 	# 5305 - THAC0 Reduced by
 	# 5375 - Backstab Multiplier Increased by
 	# 5376 - Lay On Hands Increased by
+
 	# 5377 - Lore Increased by
+	LoreTable = GemRB.LoadTableObject ("lore")
+	# TODO: use the class that actually leveled up (mc/dc support)
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	ClassIndex = ClassTable.FindValue (5, Class)
+	ClassName = ClassTable.GetRowName (ClassIndex)
+	LoreClassIndex = LoreTable.GetRowIndex (ClassName)
+	LoreGain = LoreTable.GetValue (LoreClassIndex, 0) * LevelDiff
+	if LoreGain > 0:
+		News += GemRB.GetString (5377) + ": " + str(LoreGain) + '\n\n'
+
 	# 5378 - Additional Skill Points
 	if NewSkillPoints > 0:
 		News += GemRB.GetString (5378) + ": " + str(NewSkillPoints) + '\n'
