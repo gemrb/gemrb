@@ -546,10 +546,10 @@ def IdentifyUseScroll ():
 	slot = GemRB.GetVar ("ItemButton")
 	if ItemIdentifyWindow:
 		ItemIdentifyWindow.Unload ()
-	GemRB.HasSpecialItem (pc, 1, 1)
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
-	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+	if GemRB.HasSpecialItem (pc, 1, 1):
+		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 	OpenItemInfoWindow()
 	return
 
