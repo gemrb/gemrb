@@ -8475,20 +8475,23 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 	int i = SpecialItemsCount;
+	int slot = -1;
 	while(i--) {
 		if (itemtype&SpecialItems[i].value) {
-			if (actor->inventory.HasItem(SpecialItems[i].resref,0)) {
+			slot = actor->inventory.FindItem(SpecialItems[i].resref,0);
+			if (slot>=0) {
 				break;
 			}
 		}
 	}
 
-	if (i<0) {
+	if (slot<0) {
 		return PyInt_FromLong( 0 );
 	}
 
 	if (useup) {
-		//useup = actor->UseItem(SpecialItems[i].resref, actor);
+		//use the found item's first usage
+		useup = actor->UseItem((ieDword) slot, 0, actor, true);
 	} else {
 		useup = 1;
 	}
