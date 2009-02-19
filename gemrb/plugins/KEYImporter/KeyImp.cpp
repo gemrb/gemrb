@@ -135,14 +135,22 @@ bool KeyImp::LoadResFile(const char* resfile)
 				fn[_MAX_PATH] = {0};
 			char* ptr = strrchr( be.name, PathDelimiter );
 			if (ptr) {
-				strncpy( tmpPath, be.name, ( ptr + 1 ) - be.name );
+				strncpy( tmpPath, be.name, ptr - be.name );
+				char* paths[6] = { core->GamePath, core->CD1, core->CD2, core->CD3, core->CD4, core->CD5};
+				char* dirname;
+				for (int i = 0; i < 6; i++) {
+					dirname = FindInDir( paths[i], tmpPath );
+					if (dirname) {
+						strncpy( tmpPath, dirname, sizeof(tmpPath) );
+						FixPath( tmpPath, 1);
+						break;
+					}
+				}
+				if (!dirname) {
+					strncpy( tmpPath, be.name, ( ptr + 1 ) - be.name );
+				}
 			}
 			PathJoin( fullPath, core->GamePath, tmpPath, NULL );
-			if (!dir_exists( fullPath )) {
-				tmpPath[0] = toupper( tmpPath[0] );
-				be.name[0] = toupper( be.name[0] );
-				PathJoin( fullPath, core->GamePath, tmpPath, NULL );
-			}
 			if (ptr) {
 				ExtractFileFromPath( fn, be.name );
 			} else {
