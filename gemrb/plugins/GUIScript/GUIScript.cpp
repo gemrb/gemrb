@@ -8275,6 +8275,33 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_ApplySpell__doc,
+"ApplySpell(actor, spellname)\n\n"
+"Applies a spell on actor.");
+
+static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+	const char *spell;
+
+	if (!PyArg_ParseTuple( args, "is", &PartyID, &spell )) {
+		return AttributeError( GemRB_ApplySpell__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+	core->ApplySpell(spell, actor, actor, 0);
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_UseItem__doc,
 "UseItem(actor, slot, header[,forcetarget])\n\n"
 "Makes the actor try to use an item. "
@@ -8978,6 +9005,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
 	METHOD(UpdateMusicVolume, METH_NOARGS),
 	METHOD(UseItem, METH_VARARGS),
+	METHOD(ApplySpell, METH_VARARGS),
 	// terminating entry
 	{NULL, NULL, 0, NULL}
 };
