@@ -110,8 +110,16 @@ def FinishCharGen():
 	TmpTable=GemRB.LoadTableObject ("ability")
 	AbilityCount = TmpTable.GetRowCount ()
 	for i in range(AbilityCount):
-		StatID=TmpTable.GetValue (i,4)
-		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Ability "+str(i) ) )
+		StatID = TmpTable.GetValue (i,3)
+		if StatID == IE_STR:
+			strength = GemRB.GetVar ("Ability 0")
+			GemRB.SetPlayerStat (MyChar, StatID, strength)
+			if strength == 18:
+				GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
+			else:
+				GemRB.SetPlayerStat (MyChar, IE_STREXTRA, 0)
+		else:
+			GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Ability "+str(i) ) )
 
 	# set the base number of attacks; effects will add the proficiency bonus
 	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 2)
@@ -132,18 +140,6 @@ def FinishCharGen():
 	#SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
 	#SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
-	Str=GemRB.GetVar ("Ability 0")
-	GemRB.SetPlayerStat (MyChar, IE_STR, Str)
-	if Str==18:
-		GemRB.SetPlayerStat (MyChar,IE_STREXTRA,GemRB.GetVar ("StrExtra"))
-	else:
-		GemRB.SetPlayerStat (MyChar, IE_STREXTRA,0)
-
-	GemRB.SetPlayerStat (MyChar, IE_DEX, GemRB.GetVar ("Ability 1"))
-	GemRB.SetPlayerStat (MyChar, IE_CON, GemRB.GetVar ("Ability 2"))
-	GemRB.SetPlayerStat (MyChar, IE_INT, GemRB.GetVar ("Ability 3"))
-	GemRB.SetPlayerStat (MyChar, IE_WIS, GemRB.GetVar ("Ability 4"))
-	GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability 5"))
 
 	#setting skills (thieving/ranger)
 	TmpTable = GemRB.LoadTableObject ("skills")
