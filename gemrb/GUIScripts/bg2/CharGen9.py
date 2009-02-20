@@ -77,8 +77,7 @@ def FinishCharGen():
 	else:
 		AddClassAbilities (MyChar, ABTable)
 
-	# Lay on hands
-	# Turn undead
+	# Lay on hands, turn undead and backstab multiplier get set by the core
 
 	# set the starting reputation
 	TmpTable=GemRB.LoadTableObject ("repstart")
@@ -147,8 +146,7 @@ def FinishCharGen():
 		GemRB.SetPlayerStat (MyChar, stat, value )
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
-	TmpTable = GemRB.LoadTableObject ("clskills")
-	GemRB.SetPlayerStat (MyChar, IE_XP, TmpTable.GetValue (Class, 3) )  #this will also set the level (automatically)
+	GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (Class, 3) )  #this will also set the level (automatically)
 
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
