@@ -4156,7 +4156,7 @@ void Actor::CreateDerivedStatsIWD2()
 
 void Actor::CreateDerivedStats()
 {
-        if (BaseStats[IE_CLASSLEVELSUM]) {
+        if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
                 CreateDerivedStatsIWD2();
         } else {
                 CreateDerivedStatsBG();
