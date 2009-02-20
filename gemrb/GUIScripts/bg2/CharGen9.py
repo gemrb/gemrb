@@ -64,22 +64,18 @@ def FinishCharGen():
 	print "KitValue**********:",KitValue
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 
-	# apply kit abilities
-	TmpTable = KitTable.GetValue (str(KitIndex), "ABILITIES")
-	ABTable = TmpTable
-	if KitValue != 0x4000 and TmpTable != "*":
-		TmpTable = GemRB.LoadTableObject (TmpTable)
-	elif KitValue == 0x4000:
-		# classes get clab**01
-		TmpTable = ClassSkillsTable (ClassName, "ABILITIES")
-	if TmpTable != "*" and TmpTable != ABTable:
-		if KitValue == 0x4000 and "," in TmpTable:
-			# multiclass
-			classes = TmpTable.split(",")
-			for j in classes:
-				AddClassAbilities (MyChar, "CLAB"+j)
-		else:
-			AddClassAbilities (MyChar, TmpTable)
+	# apply class/kit abilities
+	if KitIndex:
+		ABTable = KitTable.GetValue (str(KitIndex), "ABILITIES")
+	else:
+		ABTable = ClassSkillsTable.GetValue (ClassName, "ABILITIES")
+	if not KitIndex and "," in ABTable:
+		# multiclass
+		classes = ABTable.split(",")
+		for j in classes:
+			AddClassAbilities (MyChar, "CLAB"+j)
+	else:
+		AddClassAbilities (MyChar, ABTable)
 
 	# Lay on hands
 	# Turn undead
@@ -225,6 +221,7 @@ def FinishCharGen():
 	return
 
 def AddClassAbilities (MyChar, TmpTable):
+	TmpTable = GemRB.LoadTableObject (TmpTable)
 	for i in range(TmpTable.GetRowCount()):
 		ab = TmpTable.GetValue (i, 0) # only add level 1 abilities
 		if ab != "****":
