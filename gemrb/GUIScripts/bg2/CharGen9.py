@@ -46,9 +46,10 @@ def FinishCharGen():
 	ClassName = ClassTable.GetRowName (ClassIndex)
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 
-	TmpTable = GemRB.LoadTableObject ("clskills")
+	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
+	
 	#mage spells
-	TableName = TmpTable.GetValue (Class, 2, 0)
+	TableName = ClassSkillsTable.GetValue (Class, 2, 0)
 
 	# TODO check if this is really needed
 	KitIndex = GemRB.GetVar ("Class Kit")
@@ -63,15 +64,43 @@ def FinishCharGen():
 	print "KitValue**********:",KitValue
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 
+	# apply kit abilities
+	TmpTable = KitTable.GetValue (str(KitIndex), "ABILITIES")
+	ABTable = TmpTable
+	if KitValue != 0x4000 and TmpTable != "*":
+		TmpTable = GemRB.LoadTableObject (TmpTable)
+	elif KitValue == 0x4000:
+		# classes get clab**01
+		TmpTable = ClassSkillsTable (ClassName, "ABILITIES")
+	if TmpTable != "*" and TmpTable != ABTable:
+		if KitValue == 0x4000 and "," in TmpTable:
+			# multiclass
+			classes = TmpTable.split(",")
+			for j in classes:
+				AddClassAbilities (MyChar, "CLAB"+j)
+		else:
+			AddClassAbilities (MyChar, TmpTable)
+
+	# Lay on hands
+	# Turn undead
+
+	# set the starting reputation
 	TmpTable=GemRB.LoadTableObject ("repstart")
 	AlignmentTable = GemRB.LoadTableObject ("aligns")
 	t = AlignmentTable.FindValue (3, t)
 	t = TmpTable.GetValue (t,0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
-
 	#slot 1 is the protagonist
 	if MyChar == 1:
 		GemRB.GameSetReputation( t )
+
+	# apply starting (alignment dictated) abilities
+	TmpTable = GemRB.LoadTableObject ("abstart")
+	AlignmentAbbrev = AlignmentTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
+	AlignmentAbbrev = AlignmentTable.GetValue (AlignmentAbbrev, 4)
+	for i in range(TmpTable.GetColumnCount()):
+		ab = TmpTable.GetValue (AlignmentAbbrev, str(i))
+		GemRB.LearnSpell (MyChar, ab)
 
 	TmpTable=GemRB.LoadTableObject ("strtgold")
 	t = GemRB.Roll (TmpTable.GetValue (Class,1),TmpTable.GetValue (Class,0), TmpTable.GetValue (Class,2) )
@@ -199,3 +228,14 @@ def FinishCharGen():
 		GemRB.SetNextScript ("ExportFile") #export
 	return
 
+def AddClassAbilities (MyChar, TmpTable):
+	for i in range(TmpTable.GetRowCount()):
+		ab = TmpTable.GetValue (i, 0) # only add level 1 abilities
+		if ab != "****":
+			# apply spell (AP_) or gain spell (GA_)
+			if ab[:2] == "AP":
+				GemRB.ApplySpell (MyChar, ab[3:])
+			elif ab[:2] == "GA":
+				GemRB.LearnSpell (MyChar, ab[3:])
+			else:
+				print "ERROR, unknown class ability (type): ", ab
