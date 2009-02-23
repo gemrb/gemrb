@@ -46,6 +46,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	#Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# Map
 	Button = Window.GetControl (1)

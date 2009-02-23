@@ -46,7 +46,7 @@ OverSlot = None
 def OpenInventoryWindowClick():
 	tmp = GemRB.GetVar("PressedPortrait")+1
 	GemRB.GameSelectPC(tmp, True, SELECT_REPLACE)
-	OpenInventoryWindow()
+	OpenInventoryWindow ()
 
 
 def OpenInventoryWindow ():
@@ -180,7 +180,7 @@ def OpenInventoryWindow ():
 	PortraitWindow.SetVisible (1)
 	return
 
-def ColorDonePress():
+def ColorDonePress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	if ColorPicker:
@@ -195,7 +195,7 @@ def ColorDonePress():
 	UpdateInventoryWindow ()
 	return
 
-def MajorPress():
+def MajorPress ():
 	global ColorIndex, PickedColor
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -204,7 +204,7 @@ def MajorPress():
 	GetColor()
 	return
 
-def MinorPress():
+def MinorPress ():
 	global ColorIndex, PickedColor
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -287,7 +287,7 @@ def RefreshInventoryWindow ():
 	size = PortraitTable.GetValue (row, "SIZE")
 
 	#Weapon
-	slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot(pc) )
+	slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
@@ -314,13 +314,13 @@ def RefreshInventoryWindow ():
 			Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
 
 	#encumbrance
-	SetEncumbranceLabels( Window, 0x10000043, 0x10000044, pc)
+	SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
 
 	#armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
 	#temporary solution, the dexterity bonus should be handled by the core
 	#some ac bonuses are not cummulative with this AC bonus!
-	ac += GemRB.GetAbilityBonus(IE_DEX, 2, GemRB.GetPlayerStat(pc, IE_DEX) )
+	ac += GemRB.GetAbilityBonus (IE_DEX, 2, GemRB.GetPlayerStat (pc, IE_DEX) )
 	Label = Window.GetControl (0x10000038)
 	Label.SetText (str (ac))
 	Label.SetTooltip (10339)
@@ -560,6 +560,70 @@ def OnDropItemToPC ():
 	UpdateInventoryWindow ()
 	return
 
+def DragItemAmount ():
+	Text = Window.GetControl (6)
+	Amount = Text.GetText ()
+	print Amount
+	
+	OpenItemAmountWindow()
+	return
+
+def OpenItemAmountWindow ():
+	global ItemAmountWindow
+
+	GemRB.HideGUI ()
+
+	if ItemAmountWindow != None:
+		if ItemAmountWindow:
+			ItemAmountWindow.Unload ()
+		ItemAmountWindow = None
+		GemRB.SetVar ("FloatWindow", -1)
+
+		GemRB.UnhideGUI ()
+		return
+
+	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
+	GemRB.SetVar ("FloatWindow", ItemAmountWindow.ID)
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	ResRef = slot_item['ItemResRef']
+	item = GemRB.GetItem (ResRef)
+
+	# item icon
+	Icon = Window.GetControl (0)
+	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	Icon.SetItemIcon (ResRef)
+
+	# item amount
+	Text = Window.GetControl (6)
+	Text.SetSize (40, 40)
+	Text.SetText ("1")
+	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
+
+	# Done
+	Button = Window.GetControl (2)
+	Button.SetText (1403)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DragItemAmount")
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	# Cancel
+	Button = Window.GetControl (1)
+	Button.SetText (4196)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenItemAmountWindow")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
+	# 0 bmp
+	# 1,2 done/cancel?
+	# 3 +
+	# 4 -
+	# 6 text
+
+	GemRB.UnhideGUI ()
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
 def DrinkItemWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
@@ -617,7 +681,7 @@ def IdentifyUseSpell ():
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
 	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-	OpenItemInfoWindow()
+	OpenItemInfoWindow ()
 	return
 
 def IdentifyUseScroll ():
@@ -631,7 +695,7 @@ def IdentifyUseScroll ():
 		ItemInfoWindow.Unload ()
 	if GemRB.HasSpecialItem (pc, 1, 1):
 		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-	OpenItemInfoWindow()
+	OpenItemInfoWindow ()
 	return
 
 def CloseIdentifyItemWindow ():
@@ -659,6 +723,7 @@ def IdentifyItemWindow ():
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseIdentifyItemWindow")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	TextArea = Window.GetControl (3)
 	TextArea.SetText (19394)
@@ -668,7 +733,7 @@ def IdentifyItemWindow ():
 def CloseItemInfoWindow ():
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
-	UpdateInventoryWindow()
+	UpdateInventoryWindow ()
 	return
 
 def DisplayItem (itemresref, type):
@@ -679,7 +744,7 @@ def DisplayItem (itemresref, type):
 
 	#fake label
 	Label = Window.GetControl (0x10000000)
-	Label.SetText("")
+	Label.SetText ("")
 
 	#item icon
 	Button = Window.GetControl (2)

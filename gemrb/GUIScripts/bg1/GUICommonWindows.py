@@ -51,6 +51,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetSprites ("GUILSOP", 0,16,17,28,16)
 	Button.SetVarAssoc ("SelectedWindow", 0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# Map
 	Button = Window.GetControl (1)

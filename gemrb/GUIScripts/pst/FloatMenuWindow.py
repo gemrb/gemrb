@@ -207,7 +207,7 @@ def OpenFloatMenuWindow ():
 	UpdateFloatMenuWindow ()
 
 	GemRB.UnhideGUI ()
-
+	return
 
 def UpdateFloatMenuWindow ():
 	Window = FloatMenuWindow
@@ -257,6 +257,7 @@ def UpdateFloatMenuWindow ():
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		for i in range (5):
 			UpdateFloatMenuSpell (pc, i)
+	return
 
 def UpdateFloatMenuSingleAction (i):
 	Window = FloatMenuWindow
@@ -276,7 +277,7 @@ def UpdateFloatMenuSingleAction (i):
 	Button.SetSprites (butts[i][0], 0, 0, 1, 2, 3)
 	Button.SetTooltip (butts[i][1])
 	Button.SetText ('')
-
+	return
 
 def UpdateFloatMenuGroupAction (i):
 	Window = FloatMenuWindow
@@ -294,6 +295,7 @@ def UpdateFloatMenuGroupAction (i):
 	Button.SetSprites (butts[i][0], 0, 0, 1, 2, 3)
 	Button.SetTooltip (butts[i][1])
 	Button.SetText ('')
+	return
 
 def RefreshSpellList(pc, innate):
 	global spell_hash, spell_list, type
@@ -420,6 +422,7 @@ def FloatMenuSelectNextPC ():
 
 	GemRB.GameSelectPC (sel % GemRB.GetPartySize () + 1, 1, SELECT_REPLACE)
 	# NOTE: it invokes FloatMenuSelectAnotherPC() through selection change handler
+	return
 
 def FloatMenuSelectAnotherPC ():
 	global float_menu_mode, float_menu_index, float_menu_selected
@@ -427,13 +430,14 @@ def FloatMenuSelectAnotherPC ():
 	float_menu_index = 0
 	float_menu_selected = None
 	UpdateFloatMenuWindow ()
-
+	return
 
 def FloatMenuSelectDialog ():
 	global float_menu_selected
 	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK)
 	float_menu_selected = None
 	UpdateFloatMenuWindow ()
+	return
 
 def FloatMenuSelectWeapons ():
 	global float_menu_mode, float_menu_index, float_menu_selected
@@ -443,6 +447,7 @@ def FloatMenuSelectWeapons ():
 	# FIXME: Force attack mode
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
 	UpdateFloatMenuWindow ()
+	return
 
 def FloatMenuSelectItems ():
 	global float_menu_mode, float_menu_index, float_menu_selected
@@ -450,6 +455,7 @@ def FloatMenuSelectItems ():
 	float_menu_index = 0
 	float_menu_selected = None
 	UpdateFloatMenuWindow ()
+	return
 
 def FloatMenuSelectSpells ():
 	global float_menu_mode, float_menu_index, float_menu_selected
@@ -458,6 +464,7 @@ def FloatMenuSelectSpells ():
 	float_menu_selected = None
 	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	UpdateFloatMenuWindow ()
+	return
 
 def FloatMenuSelectAbilities ():
 	global float_menu_mode, float_menu_index, float_menu_selected
@@ -465,7 +472,7 @@ def FloatMenuSelectAbilities ():
 	float_menu_index = 0
 	float_menu_selected = None
 	UpdateFloatMenuWindow ()
-
+	return
 
 def FloatMenuPreviousItem ():
 	global float_menu_index, float_menu_selected
@@ -474,6 +481,7 @@ def FloatMenuPreviousItem ():
 		if float_menu_selected!=None:
 			float_menu_selected = float_menu_selected + 1
 		UpdateFloatMenuWindow ()
+	return
 
 def FloatMenuNextItem ():
 	global float_menu_index, float_menu_selected
@@ -481,8 +489,11 @@ def FloatMenuNextItem ():
 	if float_menu_selected!=None:
 		float_menu_selected = float_menu_selected - 1
 	UpdateFloatMenuWindow ()
-
+	return
 
 def FloatMenuDrag ():
 	dx, dy = GemRB.GetVar ("DragX"), GemRB.GetVar ("DragY")
 	FloatMenuWindow.SetPos (dx, dy, WINDOW_RELATIVE | WINDOW_BOUNDED)
+	return
+
+#############################
