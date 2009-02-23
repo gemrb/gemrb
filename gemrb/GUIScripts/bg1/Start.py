@@ -32,6 +32,8 @@ def OnLoad():
 	ConfirmButton.SetText(15417)
 	ConfirmButton.SetEvent(0, "ExitConfirmed")
 	CancelButton.SetEvent(0, "ExitCancelled")
+	ConfirmButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	#main window
 	StartWindow = GemRB.LoadWindowObject(0)
@@ -159,6 +161,8 @@ def BackToMain():
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitPress")
 	MoviesButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	QuitWindow.SetVisible(0)
 	StartWindow.SetVisible(1)
 	return
