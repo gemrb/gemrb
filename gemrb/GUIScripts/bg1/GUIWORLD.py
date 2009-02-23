@@ -368,11 +368,13 @@ def RemovePlayer ():
 	Button = Window.GetControl (1)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RemovePlayerConfirm")
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	#cancel
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RemovePlayerCancel")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 def RemovePlayerConfirm ():
 	global ReformPartyWindow

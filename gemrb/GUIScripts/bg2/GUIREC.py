@@ -750,6 +750,7 @@ def OpenExportWindow ():
 
 	CancelButton = ExportWindow.GetControl(5)
 	CancelButton.SetText(13727)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	NameField = ExportWindow.GetControl(6)
 

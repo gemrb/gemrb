@@ -289,11 +289,13 @@ def CloseMageSpellUnmemorizeWindow ():
 #	Button = Window.GetControl (0)
 #	Button.SetText (17507)
 #	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnMageRemoveSpell")
+#	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 #
 #	# Cancel
 #	Button = Window.GetControl (1)
 #	Button.SetText (13727)
 #	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseMageSpellUnmemorizeWindow")
+#	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 #
 #	Window.ShowModal (MODAL_SHADOW_GRAY)
 #	return
@@ -311,11 +313,13 @@ def OpenMageSpellUnmemorizeWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnMageUnmemorizeSpell")
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseMageSpellUnmemorizeWindow")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

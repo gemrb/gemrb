@@ -1230,10 +1230,14 @@ def RentRoom ():
 	Button = Window.GetControl (0)
 	Button.SetText (17199)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RentConfirm")
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
 	#deny
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RentDeny")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	#textarea
 	TextArea = Window.GetControl (3)
 	TextArea.SetText (15358)
