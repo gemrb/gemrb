@@ -321,8 +321,8 @@ def GetLevelUpNews():
 		rolls = HPTable.GetValue (level, 1)
 		bonus = HPTable.GetValue (level, 2)
 		if rolls:
-			# TODO: difficulty and setting support - max rolls on levelup
-			if True: # core difficulty (or higher) or unchecked max rolls
+			# only core difficulty (or higher) or unchecked max rolls result in a roll for hp
+			if GemRB.GetVar ("Difficulty Level") < 3:
 				hp += GemRB.Roll (rolls, HPTable.GetValue (level, 0), bonus)
 			else:
 				hp += rolls * HPTable.GetValue (level, 0) + bonus
@@ -386,9 +386,10 @@ def LevelUpInfoPress():
 	InfoCounter += 1
 	return
 
+# save the results
 def LevelUpDonePress():
 	global SkillTable
-	# TODO: save the results
+
 	# proficiencies
 	TmpTable=GemRB.LoadTableObject ("weapprof")
 	ProfCount = TmpTable.GetRowCount ()
