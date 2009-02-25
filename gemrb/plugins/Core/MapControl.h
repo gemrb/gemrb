@@ -34,8 +34,8 @@ class MapControl;
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_MAP_ON_PRESS     	0x09000000
-#define IE_GUI_MAP_ON_RIGHT_PRESS	0x09000001
-#define IE_GUI_MAP_ON_DOUBLE_PRESS	0x09000002
+#define IE_GUI_MAP_ON_RIGHT_PRESS	0x09000005
+#define IE_GUI_MAP_ON_DOUBLE_PRESS	0x09000008
 
 #ifdef WIN32
 

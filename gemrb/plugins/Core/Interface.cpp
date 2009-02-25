@@ -2113,7 +2113,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"SpawnIni",           //33GF_SPAWN_INI
 		"IWDDeathVarFormat",  //34GF_IWD_DEATHVARFORMAT
 		"HasResDataIni",      //35GF_RESDATA_INI
-		"OverrideCursorPos",  //46GF_OVERRIDE_CURSORPOS
+		"OverrideCursorPos",  //36GF_OVERRIDE_CURSORPOS
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

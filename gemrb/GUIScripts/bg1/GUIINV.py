@@ -542,7 +542,7 @@ def OnDropItemToPC ():
 	return
 
 def DragItemAmount ():
-	Text = Window.GetControl (6)
+	Text = ItemAmountWindow.GetControl (6)
 	Amount = Text.GetText ()
 	print Amount
 
@@ -585,13 +585,13 @@ def OpenItemAmountWindow ():
 
 	# Done
 	Button = Window.GetControl (2)
-	Button.SetText (1403)
+	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DragItemAmount")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
-	Button.SetText (4196)
+	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenItemAmountWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 

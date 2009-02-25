@@ -455,6 +455,7 @@ def UpdateSlot (pc, slot):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDragItem")
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoWindow")
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, "OpenItemAmountWindow")
 	else:
 		if SlotType["ResRef"]=="*":
 			Button.SetBAM ("",0,0)
@@ -561,7 +562,7 @@ def OnDropItemToPC ():
 	return
 
 def DragItemAmount ():
-	Text = Window.GetControl (6)
+	Text = ItemAmountWindow.GetControl (6)
 	Amount = Text.GetText ()
 	print Amount
 	
@@ -591,6 +592,7 @@ def OpenItemAmountWindow ():
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 
+	print Window.ID
 	# item icon
 	Icon = Window.GetControl (0)
 	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -604,13 +606,13 @@ def OpenItemAmountWindow ():
 
 	# Done
 	Button = Window.GetControl (2)
-	Button.SetText (1403)
+	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DragItemAmount")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
-	Button.SetText (4196)
+	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenItemAmountWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 

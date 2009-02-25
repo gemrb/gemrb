@@ -479,6 +479,71 @@ def OnDropItemToPC ():
 	UpdateInventoryWindow ()
 	return
 
+def DragItemAmount ():
+	Text = ItemAmountWindow.GetControl (6)
+	Amount = Text.GetText ()
+	print Amount
+
+	OpenItemAmountWindow()
+	return
+
+def OpenItemAmountWindow ():
+	global ItemAmountWindow
+
+	GemRB.HideGUI ()
+
+	if ItemAmountWindow != None:
+		if ItemAmountWindow:
+			ItemAmountWindow.Unload ()
+		ItemAmountWindow = None
+		GemRB.SetVar ("FloatWindow", -1)
+
+		GemRB.UnhideGUI ()
+		return
+
+	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
+	GemRB.SetVar ("FloatWindow", ItemAmountWindow.ID)
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	ResRef = slot_item['ItemResRef']
+	item = GemRB.GetItem (ResRef)
+
+	print Window.ID
+	# item icon
+	Icon = Window.GetControl (0)
+	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	Icon.SetItemIcon (ResRef)
+
+	# item amount
+	Text = Window.GetControl (6)
+	Text.SetSize (40, 40)
+	Text.SetText ("1")
+	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
+
+	# Done
+	Button = Window.GetControl (2)
+	Button.SetText (11973)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DragItemAmount")
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	# Cancel
+	Button = Window.GetControl (1)
+	Button.SetText (13727)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenItemAmountWindow")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
+	# 0 bmp
+	# 1,2 done/cancel?
+	# 3 +
+	# 4 -
+	# 6 text
+
+	GemRB.UnhideGUI ()
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
 def DrinkItemWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")

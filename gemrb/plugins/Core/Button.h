@@ -86,7 +86,7 @@ class Palette;
 #define IE_GUI_BUTTON_ON_RIGHT_PRESS 0x00000005
 #define IE_GUI_BUTTON_ON_DRAG_DROP   0x00000006
 #define IE_GUI_BUTTON_ON_DRAG        0x00000007
-
+#define IE_GUI_BUTTON_ON_DOUBLE_PRESS 0x00000008
 
 #ifdef WIN32
 
@@ -172,6 +172,7 @@ public: // Public Events
 	EventHandler ButtonOnPress;
 	EventHandler ButtonOnShiftPress;
 	EventHandler ButtonOnRightPress;
+	EventHandler ButtonOnDoublePress;
 	EventHandler ButtonOnDragDrop;
 	EventHandler ButtonOnDrag;
 	EventHandler MouseEnterButton;

@@ -575,6 +575,9 @@ bool Button::SetEvent(int eventType, const char *handler)
 		case IE_GUI_BUTTON_ON_DRAG:
 			SetEventHandler( ButtonOnDrag, handler );
 			break;
+		case IE_GUI_BUTTON_ON_DOUBLE_PRESS:
+			SetEventHandler( ButtonOnDoublePress, handler );
+			break;
 	default:
 		return false;
 	}

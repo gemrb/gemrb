@@ -540,7 +540,7 @@ def OnDropItemToPC ():
 	return
 
 def DragItemAmount ():
-	Text = Window.GetControl (6)
+	Text = ItemAmountWindow.GetControl (6)
 	Amount = Text.GetText ()
 	print Amount
 
