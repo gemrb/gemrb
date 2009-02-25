@@ -95,6 +95,7 @@ def OpenMapWindow ():
 	Button = Window.GetControl (5)
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
+	Label.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	GemRB.UnhideGUI ()
 

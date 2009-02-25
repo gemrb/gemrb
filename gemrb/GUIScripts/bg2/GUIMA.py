@@ -257,6 +257,7 @@ def AddNoteWindow ():
 	Label = NoteWindow.GetControl (2)
 	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS,"CloseNoteWindow")
 	Label.SetText (13727)
+	Label.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	#remove
 	Label = NoteWindow.GetControl (3)
