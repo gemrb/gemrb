@@ -91,12 +91,12 @@ def OpenInventoryWindow ():
 	InventoryWindow = Window = GemRB.LoadWindowObject (2)
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
 	GemRB.SetVar ("MessageLabel", Window.GetControl (0x1000003f).ID )
-	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindowObject (0)
 	MarkMenuButton (OptionsWindow)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenInventoryWindow")
 	OptionsWindow.SetFrame ()
+	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
 
@@ -595,23 +595,18 @@ def DragItemAmount ():
 def OpenItemAmountWindow ():
 	global ItemAmountWindow, StackAmount
 
-	GemRB.HideGUI ()
-
 	if ItemAmountWindow != None:
 		if ItemAmountWindow:
 			print ItemAmountWindow.ID
 			print GemRB.GetVar ("FloatWindow")
 			ItemAmountWindow.Unload ()
 		ItemAmountWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
 
-		GemRB.UnhideGUI ()
 		GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 		return
 
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
-	GemRB.SetVar ("FloatWindow", ItemAmountWindow.ID)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
@@ -619,7 +614,6 @@ def OpenItemAmountWindow ():
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 
-	print slot_item
 	if slot_item:
 		StackAmount = slot_item["Usages0"]
 	else:
@@ -635,8 +629,7 @@ def OpenItemAmountWindow ():
 
 	# item amount
 	Text = Window.GetControl (6)
-	Text.SetSize (40, 40)
-	Text.SetText ("1")
+	Text.SetText (str (StackAmount) )
 	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
 
 	# Decrease
@@ -665,7 +658,6 @@ def OpenItemAmountWindow ():
 	# 4 -
 	# 6 text
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 

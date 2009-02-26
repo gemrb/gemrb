@@ -33,20 +33,21 @@ from GUICommon import CloseOtherWindow, SetColorStat
 from GUICommonWindows import *
 
 InventoryWindow = None
-PortraitWindow = None
-OldPortraitWindow = None
 ItemInfoWindow = None
 ItemAmountWindow = None
+StackAmount = 0
 ItemIdentifyWindow = None
+PortraitWindow = None
 OptionsWindow = None
+OldPortraitWindow = None
 OldOptionsWindow = None
 OverSlot = None
 
-def OpenInventoryWindowClick():
-	tmp = GemRB.GetVar("PressedPortrait")+1
-	GemRB.GameSelectPC(tmp, True, SELECT_REPLACE)
+def OpenInventoryWindowClick ():
+	tmp = GemRB.GetVar ("PressedPortrait")+1
+	GemRB.GameSelectPC (tmp, True, SELECT_REPLACE)
 	OpenInventoryWindow ()
-
+	return
 
 def OpenInventoryWindow ():
 	global InventoryWindow, OptionsWindow, PortraitWindow
@@ -85,7 +86,7 @@ def OpenInventoryWindow ():
 	GemRB.LoadWindowPack ("GUIINV", 640, 480)
 	InventoryWindow = Window = GemRB.LoadWindowObject (2)
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
-	GemRB.SetVar ("MessageLabel", Window.GetControl(0x1000003f).ID )
+	GemRB.SetVar ("MessageLabel", Window.GetControl (0x1000003f).ID )
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindowObject (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenInventoryWindow")
@@ -192,7 +193,7 @@ def MajorPress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 2
 	PickedColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1) & 0xFF
-	GetColor()
+	GetColor ()
 	return
 
 def MinorPress ():
@@ -201,10 +202,10 @@ def MinorPress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 3
 	PickedColor = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1) & 0xFF
-	GetColor()
+	GetColor ()
 	return
 
-def GetColor():
+def GetColor ():
 	global ColorPicker
 
 	ColorTable = GemRB.LoadTableObject ("clowncol")
@@ -486,8 +487,8 @@ def UpdateSlot (pc, slot):
 
 def OnDragItemGround ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-
 	slot = GemRB.GetVar ("GroundItemButton") + GemRB.GetVar ("TopIndex")
+
 	if not GemRB.IsDraggingItem ():
 		slot_item = GemRB.GetContainerItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
@@ -515,8 +516,8 @@ def OnAutoEquip ():
 
 def OnDragItem ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-
 	slot = GemRB.GetVar ("ItemButton")
+
 	if not GemRB.IsDraggingItem ():
 		slot_item = GemRB.GetSlotItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
@@ -535,39 +536,67 @@ def OnDropItemToPC ():
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
 	if GemRB.IsDraggingItem ():
-		GemRB.DisplayString(17999,0xffffff)
+		GemRB.DisplayString (17999,0xffffff)
 	UpdateInventoryWindow ()
 	return
 
-def DragItemAmount ():
+def DecreaseStackAmount ():
 	Text = ItemAmountWindow.GetControl (6)
-	Amount = Text.GetText ()
-	print Amount
+	Amount = Text.QueryText ()
+	number = int ("0"+Amount)-1
+	if number<1:
+		number=1
+	Text.SetText (str (number))
+	return
 
+def IncreaseStackAmount ():
+	Text = ItemAmountWindow.GetControl (6)
+	Amount = Text.QueryText ()
+	number = int ("0"+Amount)+1
+	if number>=StackAmount:
+		number=StackAmount-1
+	Text.SetText (str (number))
+	return
+
+def DragItemAmount ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	Text = ItemAmountWindow.GetControl (6)
+	Amount = Text.QueryText ()
+	print Amount
+	item = GemRB.GetItem (slot_item["ItemResRef"])
+	GemRB.DragItem (pc, slot, item["ItemIcon"], int ("0"+Amount), 0)
+	OpenItemAmountWindow ()
 	return
 
 def OpenItemAmountWindow ():
-	global ItemAmountWindow
-
-	GemRB.HideGUI ()
+	global ItemAmountWindow, StackAmount
 
 	if ItemAmountWindow != None:
-	        if ItemAmountWindow:
-	                ItemAmountWindow.Unload ()
-	        ItemAmountWindow = None
-	        GemRB.SetVar ("FloatWindow", -1)
+		if ItemAmountWindow:
+			ItemAmountWindow.Unload ()
+		ItemAmountWindow = None
 
-	        GemRB.UnhideGUI ()
-	        return
+		GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
+		return
 
+	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
-	GemRB.SetVar ("FloatWindow", ItemAmountWindow.ID)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
+
+	if slot_item:
+		StackAmount = slot_item["Usages0"]
+	else:
+		StackAmount = 0
+	if StackAmount<=1:
+		OpenItemAmountWindow ()
+		return
 
 	# item icon
 	Icon = Window.GetControl (0)
@@ -576,19 +605,26 @@ def OpenItemAmountWindow ():
 
 	# item amount
 	Text = Window.GetControl (6)
-	Text.SetSize (40, 40)
-	Text.SetText ("1")
-	Text.SetStatus (IE_GUI_EDIT_NUMBER)
+	Text.SetText (str (StackAmount) )
+	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
+
+	# Decrease
+	Button = Window.GetControl (4)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS,"DecreaseStackAmount")
+
+	# Increase
+	Button = Window.GetControl (3)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS,"IncreaseStackAmount")
 
 	# Done
 	Button = Window.GetControl (2)
-	Button.SetText (1403)
+	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DragItemAmount")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
-	Button.SetText (4196)
+	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenItemAmountWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -598,7 +634,6 @@ def OpenItemAmountWindow ():
 	# 4 -
 	# 6 text
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -659,7 +694,7 @@ def DialogItemWindow ():
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 	dialog=item["Dialog"]
-	GemRB.ExecuteString("StartDialog(\""+dialog+"\",Myself)", pc)
+	GemRB.ExecuteString ("StartDialog(\""+dialog+"\",Myself)", pc)
 	return
 
 def IdentifyUseSpell ():
@@ -749,6 +784,7 @@ def DisplayItem (itemresref, type):
 	Button = Window.GetControl (4)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseItemInfoWindow")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	#textarea
 	Text = Window.GetControl (5)
@@ -759,7 +795,7 @@ def DisplayItem (itemresref, type):
 	Text.SetText (text)
 
 	#left button
-	Button = Window.GetControl(8)
+	Button = Window.GetControl (8)
 
 	if type&2:
 		Button.SetText (14133)
@@ -774,7 +810,7 @@ def DisplayItem (itemresref, type):
 	#Button.SetItemIcon (itemresref,2)
 
 	#right button
-	Button = Window.GetControl(9)
+	Button = Window.GetControl (9)
 	drink = (type&1) and (item["Function"]&1)
 	read = (type&1) and (item["Function"]&2)
 	container = (type&1) and (item["Function"]&4)
