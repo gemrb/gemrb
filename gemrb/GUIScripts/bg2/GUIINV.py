@@ -626,7 +626,7 @@ def OpenItemAmountWindow ():
 
 	# item amount
 	Text = Window.GetControl (6)
-	Text.SetText (str (StackAmount) )
+	Text.SetText (str (StackAmount//2) )
 	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
 
 	# Decrease
