@@ -26,7 +26,7 @@ def RedrawSkills(First=0):
 		MaxProf = SkillTable.GetValue(Pos+8, ProfColumn) #we add the bg1 skill count offset
 
 		#invalid entry, adjusting scrollbar
-		if SkillName == 4294967296:
+		if SkillName > 32767 or SkillName < 0:
 			GemRB.SetVar("TopIndex",TopIndex)
 			ScrollBarControl.SetVarAssoc("TopIndex",Pos-7)
 			break
@@ -109,7 +109,7 @@ def OnLoad():
 	# decrease it with the number of invalid proficiencies
 	for i in range(RowCount):
 		SkillName = SkillTable.GetValue (i+8, 1)
-		if SkillName == -1:
+		if SkillName > 32767 or SkillName < 0:
 			ProfCount -= 1
 	ScrollBarControl.SetVarAssoc ("TopIndex", ProfCount)
 
