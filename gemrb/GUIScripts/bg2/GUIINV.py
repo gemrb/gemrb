@@ -564,11 +564,11 @@ def OnDropItemToPC ():
 
 def DecreaseStackAmount ():
 	Text = ItemAmountWindow.GetControl (6)
-	Amount = Text.GetText ()
+	Amount = Text.QueryText ()
 	number = int ("0"+Amount)-1
 	if number<1:
 		number=1
-	Text.SetText (str(number))
+	Text.SetText (str (number))
 	return
 
 def IncreaseStackAmount ():
@@ -577,7 +577,7 @@ def IncreaseStackAmount ():
 	number = int ("0"+Amount)+1
 	if number>=StackAmount:
 		number=StackAmount-1
-	Text.SetText (str(number))
+	Text.SetText (str (number))
 	return
 
 def DragItemAmount ():
