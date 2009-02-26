@@ -36,6 +36,7 @@ from GUICommonWindows import *
 InventoryWindow = None
 ItemInfoWindow = None
 ItemAmountWindow = None
+StackAmount = 0
 ItemIdentifyWindow = None
 PortraitWindow = None
 OptionsWindow = None
@@ -43,11 +44,11 @@ OldPortraitWindow = None
 OldOptionsWindow = None
 OverSlot = None
 
-def OpenInventoryWindowClick():
-	tmp = GemRB.GetVar("PressedPortrait")+1
-	GemRB.GameSelectPC(tmp, True, SELECT_REPLACE)
+def OpenInventoryWindowClick ():
+	tmp = GemRB.GetVar ("PressedPortrait")+1
+	GemRB.GameSelectPC (tmp, True, SELECT_REPLACE)
 	OpenInventoryWindow ()
-
+	return
 
 def OpenInventoryWindow ():
 	global InventoryWindow, OptionsWindow, PortraitWindow
@@ -77,7 +78,7 @@ def OpenInventoryWindow ():
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
 		#don't go back to multi selection mode when going to the store screen
-		if not GemRB.GetVar("Inventory"):
+		if not GemRB.GetVar ("Inventory"):
 			GemRB.SetVisible (0,1)
 			GemRB.UnhideGUI ()
 			SetSelectionChangeHandler (None)
@@ -89,7 +90,7 @@ def OpenInventoryWindow ():
 	GemRB.LoadWindowPack ("GUIINV", 640, 480)
 	InventoryWindow = Window = GemRB.LoadWindowObject (2)
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
-	GemRB.SetVar ("MessageLabel", Window.GetControl(0x1000003f).ID )
+	GemRB.SetVar ("MessageLabel", Window.GetControl (0x1000003f).ID )
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindowObject (0)
@@ -201,7 +202,7 @@ def MajorPress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 2
 	PickedColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1) & 0xFF
-	GetColor()
+	GetColor ()
 	return
 
 def MinorPress ():
@@ -210,10 +211,10 @@ def MinorPress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 3
 	PickedColor = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1) & 0xFF
-	GetColor()
+	GetColor ()
 	return
 
-def GetColor():
+def GetColor ():
 	global ColorPicker
 
 	ColorTable = GemRB.LoadTableObject ("clowncol")
@@ -561,28 +562,54 @@ def OnDropItemToPC ():
 	UpdateInventoryWindow ()
 	return
 
+def DecreaseStackAmount ():
+	Text = ItemAmountWindow.GetControl (6)
+	Amount = Text.GetText ()
+	number = int ("0"+Amount)-1
+	if number<1:
+		number=1
+	Text.SetText (string (number))
+	return
+
+def IncreaseStackAmount ():
+	Text = ItemAmountWindow.GetControl (6)
+	Amount = Text.GetText ()
+	number = int ("0"+Amount)+1
+	if number>=StackAmount:
+		number=StackAmount-1
+	Text.SetText (string (number))
+	return
+
 def DragItemAmount ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
 	Text = ItemAmountWindow.GetControl (6)
 	Amount = Text.GetText ()
 	print Amount
-	
-	OpenItemAmountWindow()
+
+	GemRB.DragItem (pc, slot, item["ItemIcon"], int ("0"+Amount), 0)
+	OpenItemAmountWindow ()
 	return
 
 def OpenItemAmountWindow ():
-	global ItemAmountWindow
+	global ItemAmountWindow, StackAmount
 
 	GemRB.HideGUI ()
 
 	if ItemAmountWindow != None:
 		if ItemAmountWindow:
+			print ItemAmountWindow.ID
+			print GemRB.GetVar ("FloatWindow")
 			ItemAmountWindow.Unload ()
 		ItemAmountWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 
 		GemRB.UnhideGUI ()
+		GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 		return
 
+	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
 	GemRB.SetVar ("FloatWindow", ItemAmountWindow.ID)
 
@@ -592,7 +619,15 @@ def OpenItemAmountWindow ():
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 
-	print Window.ID
+	print slot_item
+	if slot_item:
+		StackAmount = slot_item["Usages0"]
+	else:
+		StackAmount = 0
+	if StackAmount<=1:
+		OpenItemAmountWindow ()
+		return
+
 	# item icon
 	Icon = Window.GetControl (0)
 	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -603,6 +638,14 @@ def OpenItemAmountWindow ():
 	Text.SetSize (40, 40)
 	Text.SetText ("1")
 	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
+
+	# Decrease
+	Button = Window.GetControl (4)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS,"DecreaseStackAmount")
+
+	# Increase
+	Button = Window.GetControl (3)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS,"IncreaseStackAmount")
 
 	# Done
 	Button = Window.GetControl (2)
@@ -758,6 +801,7 @@ def DisplayItem (itemresref, type):
 	Button = Window.GetControl (4)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseItemInfoWindow")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	#textarea
 	Text = Window.GetControl (5)
@@ -768,7 +812,7 @@ def DisplayItem (itemresref, type):
 	Text.SetText (text)
 
 	#left button
-	Button = Window.GetControl(8)
+	Button = Window.GetControl (8)
 
 	if type&2:
 		Button.SetText (14133)
@@ -784,7 +828,7 @@ def DisplayItem (itemresref, type):
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#right button
-	Button = Window.GetControl(9)
+	Button = Window.GetControl (9)
 	drink = (type&1) and (item["Function"]&1)
 	read = (type&1) and (item["Function"]&2)
 	container = (type&1) and (item["Function"]&4)
