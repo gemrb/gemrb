@@ -195,7 +195,7 @@ def MajorPress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 2
 	PickedColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1) & 0xFF
-	GetColor()
+	GetColor ()
 	return
 
 def MinorPress ():
@@ -204,10 +204,10 @@ def MinorPress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 3
 	PickedColor = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1) & 0xFF
-	GetColor()
+	GetColor ()
 	return
 
-def GetColor():
+def GetColor ():
 	global ColorPicker
 
 	ColorTable = GemRB.LoadTableObject ("clowncol")
@@ -555,16 +555,19 @@ def IncreaseStackAmount ():
 	Text = ItemAmountWindow.GetControl (6)
 	Amount = Text.QueryText ()
 	number = int ("0"+Amount)+1
-	if number>=StackAmount:
-		number=StackAmount-1
+	if number>StackAmount:
+		number=StackAmount
 	Text.SetText (str (number))
 	return
 
 def DragItemAmount ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
 	Text = ItemAmountWindow.GetControl (6)
 	Amount = Text.QueryText ()
-	print Amount
-
+	item = GemRB.GetItem (slot_item["ItemResRef"])
+	GemRB.DragItem (pc, slot, item["ItemIcon"], int ("0"+Amount), 0)
 	OpenItemAmountWindow ()
 	return
 

@@ -553,8 +553,8 @@ def IncreaseStackAmount ():
 	Text = ItemAmountWindow.GetControl (6)
 	Amount = Text.QueryText ()
 	number = int ("0"+Amount)+1
-	if number>=StackAmount:
-		number=StackAmount-1
+	if number>StackAmount:
+		number=StackAmount
 	Text.SetText (str (number))
 	return
 
@@ -564,7 +564,6 @@ def DragItemAmount ():
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	Text = ItemAmountWindow.GetControl (6)
 	Amount = Text.QueryText ()
-	print Amount
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 	GemRB.DragItem (pc, slot, item["ItemIcon"], int ("0"+Amount), 0)
 	OpenItemAmountWindow ()
