@@ -141,7 +141,7 @@ def OpenLevelUpWindow():
 	# decrease it with the number of invalid proficiencies
 	for i in range(RowCount):
 		SkillName = WeapProfTable.GetValue (i+8, 1)
-		if SkillName == -1:
+		if SkillName > 0x1000000 or SkillName < 0:
 			ProfCount -= 1
 		GemRB.SetVar("Prof "+str(i), GemRB.GetPlayerStat (pc, WeapProfTable.GetValue (i+8, 0)))
 	ScrollBarControl.SetVarAssoc ("TopIndex", ProfCount)
@@ -246,7 +246,7 @@ def RedrawSkills(First=0, direction=0):
 		MaxProf = WeapProfTable.GetValue(Pos+8, ProfColumn) #we add the bg1 skill count offset
 
 		#invalid entry, adjusting scrollbar
-		if SkillName == -1:
+		if SkillName > 0x1000000 or SkillName < 0:
 			GemRB.SetVar("TopIndex",TopIndex)
 			ScrollBarControl.SetVarAssoc("TopIndex",Pos-7)
 			break
