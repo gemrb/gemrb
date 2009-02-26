@@ -1,3 +1,18 @@
+GemRB svn (r5750):
+  New features:
+    - 
+    - item amount window for stack splitting (shift+click or doubleclick)
+    - depletion of item charges
+    - start of level up support in bg2
+
+  Improved features:
+    - 
+    - iwd and how guiscripts have been merged
+    - various guiscripts
+    - bugfixes
+
+  Applied patches:
+
 GemRB V0.3.2 (2009-02-16):
   New features:
     - default cancel button, bound to the escape key
