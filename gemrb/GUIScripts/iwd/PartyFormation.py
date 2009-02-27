@@ -94,6 +94,7 @@ def CreateCharPress ():
 	CreateButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CreateCharCreatePress")
 	CreateButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	CreateButton.SetText (13954)
+	CreateButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	DeleteButton = CreateCharWindow.GetControl (3)
 	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CreateCharDeletePress")
@@ -104,7 +105,7 @@ def CreateCharPress ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CreateCharCancelPress")
 	CancelButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	CancelButton.SetText (13727)
-	CreateButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	CreateCharWindow.SetVisible (1)
 	return

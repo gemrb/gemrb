@@ -64,7 +64,7 @@ def StartTextScreen ():
 	Button=TextScreen.GetControl (0)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "EndTextScreen")
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT|IE_GUI_BUTTON_CANCEL,OP_OR)
 
 	#replay
 	Button=TextScreen.GetControl (3)

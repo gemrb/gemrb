@@ -88,6 +88,7 @@ def OpenStoreWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseStoreWindow")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# buy / sell
 	Button = Window.GetControl (1)

@@ -888,7 +888,7 @@ def OpenInformationWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
-
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -928,7 +928,8 @@ def OpenBiographyWindow ():
 	Button = Window.GetControl (2)
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
-
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	

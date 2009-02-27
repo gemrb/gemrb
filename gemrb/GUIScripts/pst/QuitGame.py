@@ -61,6 +61,7 @@ def DeathWindowEnd ():
 	Button = Window.GetControl (1)
 	Button.SetText (17237)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	Button.SetEvent (IE_GUI_BUTTON_DEFAULT|IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	GemRB.HideGUI ()
 	GemRB.SetVar ("MessageWindow", -1)

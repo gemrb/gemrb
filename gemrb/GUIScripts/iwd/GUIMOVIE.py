@@ -29,56 +29,57 @@ MovieWindow = 0
 TextAreaControl = 0
 MoviesTable = 0
 
-def OnLoad():
+def OnLoad ():
 	global MovieWindow, TextAreaControl, MoviesTable
 
-	GemRB.LoadWindowPack("GUIMOVIE", 640, 480)
-	MovieWindow = GemRB.LoadWindowObject(0)
-	MovieWindow.SetFrame()
-	TextAreaControl = MovieWindow.GetControl(0)
-	TextAreaControl.SetFlags(IE_GUI_TEXTAREA_SELECTABLE)
-	PlayButton = MovieWindow.GetControl(2)
-	CreditsButton = MovieWindow.GetControl(3)
-	DoneButton = MovieWindow.GetControl(4)
-	MoviesTable = GemRB.LoadTableObject("MOVIDESC")
-	for i in range(0, MoviesTable.GetRowCount() ):
-		t = MoviesTable.GetRowName(i)
+	GemRB.LoadWindowPack ("GUIMOVIE", 640, 480)
+	MovieWindow = GemRB.LoadWindowObject (0)
+	MovieWindow.SetFrame ()
+	TextAreaControl = MovieWindow.GetControl (0)
+	TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
+	PlayButton = MovieWindow.GetControl (2)
+	CreditsButton = MovieWindow.GetControl (3)
+	DoneButton = MovieWindow.GetControl (4)
+	MoviesTable = GemRB.LoadTableObject ("MOVIDESC")
+	for i in range (0, MoviesTable.GetRowCount () ):
+		t = MoviesTable.GetRowName (i)
 		if GemRB.GetVar(t)==1:
-			s = MoviesTable.GetValue(i, 0)
-			TextAreaControl.Append(s,-1)
-	TextAreaControl.SetVarAssoc("MovieIndex",0)
-	PlayButton.SetText(17318)
-	CreditsButton.SetText(15591)
-	DoneButton.SetText(11973)
-	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "PlayPress")
-	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CreditsPress")
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
-	MovieWindow.SetVisible(1)
+			s = MoviesTable.GetValue (i, 0)
+			TextAreaControl.Append (s,-1)
+	TextAreaControl.SetVarAssoc ("MovieIndex",0)
+	PlayButton.SetText (17318)
+	CreditsButton.SetText (15591)
+	DoneButton.SetText (11973)
+	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PlayPress")
+	CreditsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CreditsPress")
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	MovieWindow.SetVisible (1)
+	return
 
-
-def PlayPress():
+def PlayPress ():
 	s = GemRB.GetVar("MovieIndex")
-	for i in range(0, MoviesTable.GetRowCount() ):
-		t = MoviesTable.GetRowName(i)
+	for i in range (0, MoviesTable.GetRowCount () ):
+		t = MoviesTable.GetRowName (i)
 		if GemRB.GetVar(t)==1:
 			if s==0:
-				s = MoviesTable.GetRowName(i)
+				s = MoviesTable.GetRowName (i)
 				MovieWindow.SetVisible (0)
-				GemRB.PlayMovie(s, 1)
+				GemRB.PlayMovie (s, 1)
 				MovieWindow.SetVisible (1)
 				return
 
 			s = s - 1
 
 
-def CreditsPress():
+def CreditsPress ():
 	MovieWindow.SetVisible (0)
-	GemRB.PlayMovie("CREDITS", 1)
+	GemRB.PlayMovie ("CREDITS", 1)
 	MovieWindow.SetVisible (1)
 
 
-def DonePress():
+def DonePress ():
 	if MovieWindow:
-		MovieWindow.Unload()
-	GemRB.SetNextScript("Start")
+		MovieWindow.Unload ()
+	GemRB.SetNextScript ("Start")
 
