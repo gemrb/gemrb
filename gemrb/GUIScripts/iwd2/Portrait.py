@@ -7,86 +7,87 @@ PortraitsTable = 0
 LastPortrait = 0
 Gender = 0
 
-def SetPicture():
+def SetPicture ():
 	global PortraitsTable, LastPortrait
 
-	PortraitName = PortraitsTable.GetRowName(LastPortrait)+"L"
-	PortraitButton.SetPicture(PortraitName)
+	PortraitName = PortraitsTable.GetRowName (LastPortrait)+"L"
+	PortraitButton.SetPicture (PortraitName)
 	return
 
-def OnLoad():
+def OnLoad ():
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
 	global Gender
-	
-	Gender=GemRB.GetVar("Gender")
 
-	GemRB.LoadWindowPack("GUICG", 800, 600)
-	AppearanceWindow = GemRB.LoadWindowObject(11)
-	#AppearanceWindow.SetFrame( )
+	Gender=GemRB.GetVar ("Gender")
+
+	GemRB.LoadWindowPack ("GUICG", 800, 600)
+	AppearanceWindow = GemRB.LoadWindowObject (11)
+	#AppearanceWindow.SetFrame ()
 
 	#Load the Portraits Table
-	PortraitsTable = GemRB.LoadTableObject("PICTURES")
+	PortraitsTable = GemRB.LoadTableObject ("PICTURES")
 	LastPortrait = 0
 
-	PortraitButton = AppearanceWindow.GetControl(1)
-	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	PortraitButton = AppearanceWindow.GetControl (1)
+	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	PortraitButton.SetState (IE_GUI_BUTTON_LOCKED)
 
-	LeftButton = AppearanceWindow.GetControl(2)
-	RightButton = AppearanceWindow.GetControl(3)
+	LeftButton = AppearanceWindow.GetControl (2)
+	RightButton = AppearanceWindow.GetControl (3)
 
-	BackButton = AppearanceWindow.GetControl(5)
-	BackButton.SetText(15416)
+	BackButton = AppearanceWindow.GetControl (5)
+	BackButton.SetText (15416)
+	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL,OP_OR)
 
-	CustomButton = AppearanceWindow.GetControl(6)
-	CustomButton.SetText(17545)
+	CustomButton = AppearanceWindow.GetControl (6)
+	CustomButton.SetText (17545)
 
-	DoneButton = AppearanceWindow.GetControl(0)
-	DoneButton.SetText(36789)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton = AppearanceWindow.GetControl (0)
+	DoneButton.SetText (36789)
+	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	RightButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"RightPress")
-	LeftButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"LeftPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	CustomButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"CustomPress")
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	
+	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"RightPress")
+	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"LeftPress")
+	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	CustomButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"CustomPress")
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"NextPress")
+
 	while True:
-		if PortraitsTable.GetValue(LastPortrait, 0) == Gender:
-			SetPicture()
+		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
+			SetPicture ()
 			break
 		LastPortrait = LastPortrait + 1
-	AppearanceWindow.SetVisible(1)
+	AppearanceWindow.SetVisible (1)
 	return
 
-def RightPress():
+def RightPress ():
 	global LastPortrait
 	while True:
 		LastPortrait = LastPortrait + 1
-		if LastPortrait >= PortraitsTable.GetRowCount():
+		if LastPortrait >= PortraitsTable.GetRowCount ():
 			LastPortrait = 0
-		if PortraitsTable.GetValue(LastPortrait, 0) == Gender:
-			SetPicture()
+		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
+			SetPicture ()
 			return
 
-def LeftPress():
+def LeftPress ():
 	global LastPortrait
 	while True:
 		LastPortrait = LastPortrait - 1
 		if LastPortrait < 0:
-			LastPortrait = PortraitsTable.GetRowCount()-1
-		if PortraitsTable.GetValue(LastPortrait, 0) == Gender:
-			SetPicture()
+			LastPortrait = PortraitsTable.GetRowCount ()-1
+		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
+			SetPicture ()
 			return
 
-def BackPress():
+def BackPress ():
 	if AppearanceWindow:
-		AppearanceWindow.Unload()
-	GemRB.SetNextScript("CharGen")
-	GemRB.SetVar("Gender",0)  #scrapping the gender value
+		AppearanceWindow.Unload ()
+	GemRB.SetNextScript ("CharGen")
+	GemRB.SetVar ("Gender",0) #scrapping the gender value
 	return
 
-def CustomDone():
+def CustomDone ():
 	Window = CustomWindow
 
 	Portrait = PortraitList1.QueryText ()
@@ -100,12 +101,12 @@ def CustomDone():
 	GemRB.SetNextScript ("CharGen2")
 	return
 
-def CustomAbort():
+def CustomAbort ():
 	if CustomWindow:
 		CustomWindow.Unload ()
 	return
 
-def LargeCustomPortrait():
+def LargeCustomPortrait ():
 	Window = CustomWindow
 
 	Portrait = PortraitList1.QueryText ()
@@ -128,7 +129,7 @@ def LargeCustomPortrait():
 	Button.SetPicture (Portrait, "NOPORTMD")
 	return
 
-def SmallCustomPortrait():
+def SmallCustomPortrait ():
 	Window = CustomWindow
 
 	Portrait = PortraitList2.QueryText ()
@@ -151,7 +152,7 @@ def SmallCustomPortrait():
 	Button.SetPicture (Portrait, "NOPORTSM")
 	return
 
-def CustomPress():
+def CustomPress ():
 	global PortraitList1, PortraitList2
 	global RowCount1, RowCount2
 	global CustomWindow
@@ -171,11 +172,13 @@ def CustomPress():
 
 	Button = Window.GetControl (6)
 	Button.SetText (11973)
+	BackButton.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomDone")
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (7)
 	Button.SetText (15416)
+	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL,OP_OR)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomAbort")
 
 	Button = Window.GetControl (0)
@@ -191,13 +194,13 @@ def CustomPress():
 	Window.ShowModal (MODAL_SHADOW_NONE)
 	return
 
-def NextPress():
+def NextPress ():
 	if AppearanceWindow:
-		AppearanceWindow.Unload()
+		AppearanceWindow.Unload ()
 	PortraitTable = GemRB.LoadTableObject ("pictures")
 	PortraitName = PortraitTable.GetRowName (LastPortrait )
 	GemRB.SetToken ("SmallPortrait", PortraitName+"S")
 	GemRB.SetToken ("LargePortrait", PortraitName+"L")
-	#GemRB.SetVar("PortraitIndex",LastPortrait)
-	GemRB.SetNextScript("CharGen2") #Before race
+	#GemRB.SetVar ("PortraitIndex",LastPortrait)
+	GemRB.SetNextScript ("CharGen2") #Before race
 	return

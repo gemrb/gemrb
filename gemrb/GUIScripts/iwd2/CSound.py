@@ -8,7 +8,7 @@ TopIndex = 0
 
 def OnLoad():
 	global SoundWindow, TextAreaControl, DoneButton, TopIndex
-	
+
 	GemRB.LoadWindowPack("GUICG", 800,  600)
 	#this hack will redraw the base CG window
 	SoundWindow = GemRB.LoadWindowObject(19)
@@ -16,6 +16,8 @@ def OnLoad():
 
 	BackButton = SoundWindow.GetControl(10)
 	BackButton.SetText(15416)
+	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+
 	DoneButton = SoundWindow.GetControl(0)
 	DoneButton.SetText(36789)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
@@ -27,7 +29,7 @@ def OnLoad():
 	TextAreaControl.SetFlags(IE_GUI_TEXTAREA_SELECTABLE)
 	TextAreaControl.SetVarAssoc("Sound", 0)
 	RowCount=TextAreaControl.GetCharSounds()
-	
+
 	DefaultButton = SoundWindow.GetControl(47)
 	DefaultButton.SetText(33479)
 

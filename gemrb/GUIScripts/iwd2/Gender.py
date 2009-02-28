@@ -34,6 +34,8 @@ def OnLoad():
 
 	BackButton = GenderWindow.GetControl(6)
 	BackButton.SetText(15416)
+	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+
 	DoneButton = GenderWindow.GetControl(0)
 	DoneButton.SetText(36789)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)

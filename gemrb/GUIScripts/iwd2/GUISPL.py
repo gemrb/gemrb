@@ -238,6 +238,7 @@ def OpenSpellBookSpellInfoWindow ():
 	#back
 	Button = Window.GetControl (5)
 	Button.SetText (15416)
+	Button.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookSpellInfoWindow")
 
 	index = GemRB.GetVar ("SpellButton")

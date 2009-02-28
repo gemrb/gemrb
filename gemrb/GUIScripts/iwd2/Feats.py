@@ -169,7 +169,7 @@ def OnLoad():
 	global FeatTable, FeatReqTable
 	global KitName, Level, PointsLeft
 	global ClassColumn, KitColumn, RaceColumn, FeatsClassColumn
-	
+
 	GemRB.SetVar("Level",1) #for simplicity
 
 	Race = GemRB.GetVar("Race")
@@ -216,14 +216,14 @@ def OnLoad():
 	#Always raise one level at once
 	PointsLeft += FeatLevelTable.GetValue(Level, 0)
 	PointsLeft += FeatClassTable.GetValue(Level, ClassColumn)
-	
+
 	#racial abilities which seem to be hardcoded in the IWD2 engine
 	#are implemented in races.2da
 	if Level<1:
 		TmpTable = GemRB.LoadTableObject('races')
 		PointsLeft += TmpTable.GetValue(RaceName,'FEATBONUS')
 	###
-	
+
 	GemRB.SetToken("number",str(PointsLeft) )
 
 	GemRB.LoadWindowPack("GUICG", 800, 600)
@@ -247,6 +247,8 @@ def OnLoad():
 
 	BackButton = FeatWindow.GetControl(105)
 	BackButton.SetText(15416)
+	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+
 	DoneButton = FeatWindow.GetControl(0)
 	DoneButton.SetText(36789)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
@@ -301,7 +303,7 @@ def LeftPress():
 #	if ActPoint > Level: #Level is 0 for level 1
 #		return
 	GemRB.SetVar("Feat "+str(Pos), ActPoint+1)
-	PointsLeft = PointsLeft - 1 
+	PointsLeft = PointsLeft - 1
 	RedrawFeats()
 	return
 

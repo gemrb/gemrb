@@ -34,6 +34,7 @@ def OnLoad():
 
 	CancelButton = ImportWindow.GetControl(1)
 	CancelButton.SetText(15416)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	
 	# disable the three extraneous buttons in the bottom row
 	for i in [16, 13, 15]:

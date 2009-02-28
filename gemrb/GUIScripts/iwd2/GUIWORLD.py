@@ -74,7 +74,9 @@ def OpenEndMessageWindow ():
 	#end dialog
 	Button = Window.GetControl (0)
 	Button.SetText (9371)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
+
 	if hideflag:
 		GemRB.UnhideGUI ()
 
@@ -266,6 +268,7 @@ def OpenContainerWindow ():
 	# Done
 	Button = Window.GetControl (51)
 	#no caption on this button
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LeaveContainer")
 
 	GemRB.SetVar ("LeftTopIndex", 0)

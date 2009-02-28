@@ -127,7 +127,7 @@ def OnLoad():
 
 	SkillRacTable = GemRB.LoadTableObject("SKILLRAC")
 
-	for i in range(0,RowCount):
+	for i in range(RowCount):
 		GemRB.SetVar("Skill "+str(i),0) # Racial/Class bonuses don't factor in char-gen or leveling
 						# so can be safely ignored
 
@@ -136,7 +136,7 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 800 ,600)
 	SkillWindow = GemRB.LoadWindowObject(6)
 
-	for i in range(0,10):
+	for i in range(10):
 		Button = SkillWindow.GetControl(i+93)
 		Button.SetVarAssoc("Skill",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "JustPress")
@@ -151,6 +151,8 @@ def OnLoad():
 
 	BackButton = SkillWindow.GetControl(105)
 	BackButton.SetText(15416)
+	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(36789)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)

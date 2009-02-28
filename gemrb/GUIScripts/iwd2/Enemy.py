@@ -12,7 +12,7 @@ def DisplayRaces():
 	global TopIndex
 
 	TopIndex=GemRB.GetVar("TopIndex")
-	for i in range(0, 11):
+	for i in range(11):
 		Button = RaceWindow.GetControl(i+22)
 		Val = RaceTable.GetValue(i+TopIndex,0)
 		if Val==0:
@@ -43,12 +43,14 @@ def OnLoad():
 	if RaceCount<0:
 		RaceCount=0
 
-	for i in range(0,11):
+	for i in range(11):
 		Button = RaceWindow.GetControl(i+22)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
 	BackButton = RaceWindow.GetControl(10)
 	BackButton.SetText(15416)
+	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+
 	DoneButton = RaceWindow.GetControl(11)
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)

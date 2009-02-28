@@ -118,10 +118,12 @@ def OnLoad():
 
 	BackButton = AbilityWindow.GetControl(36)
 	BackButton.SetText(15416)
+	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+
 	DoneButton = AbilityWindow.GetControl(0)
 	DoneButton.SetText(36789)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl = AbilityWindow.GetControl(29)
 	TextAreaControl.SetText(17247)

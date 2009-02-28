@@ -37,7 +37,7 @@ def AdjustTextArea():
 def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton, BackButton
 	global ClassTable, ClassCount
-	
+
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	#this replaces help02.2da for class restrictions
 	ClassTable = GemRB.LoadTableObject("classes")
@@ -80,6 +80,8 @@ def OnLoad():
 
 	BackButton = ClassWindow.GetControl(17)
 	BackButton.SetText(15416)
+	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+
 	DoneButton = ClassWindow.GetControl(0)
 	DoneButton.SetText(36789)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
@@ -134,7 +136,7 @@ def ClassPress():
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  "ClassPress2")
 		Button.SetVarAssoc("Class", i)
-		
+
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress2")
 	return
 

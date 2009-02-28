@@ -167,7 +167,7 @@ def GetColor():
 	if ColorIndex==1:
 		m=SkinTable.GetRowCount()
 		t=SkinTable
-	for i in range(0,m):
+	for i in range(m):
 		if ColorIndex<2:
 			MyColor=t.GetValue(i,0)
 		else:
@@ -192,6 +192,7 @@ def GetColor():
 	CancelButton = ColorPicker.GetControl(35)
 	CancelButton.SetText(13727)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ColorPicker.SetVisible(1)
 	return

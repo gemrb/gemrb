@@ -264,8 +264,8 @@ def AddNoteWindow ():
 	#set
 	Label = NoteWindow.GetControl (0)
 	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS,"SetMapNote")
-	Label.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	Label.SetText (11973)
+	Label.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	#cancel
 	Label = NoteWindow.GetControl (2)

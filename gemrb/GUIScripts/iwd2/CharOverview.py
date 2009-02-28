@@ -80,9 +80,12 @@ def UpdateOverview(CurrentStep):
 			State = States[1]
 			Event = 'ImportPress'
 		
-		if Key == 'Back' and CurrentStep == 1:
-			State = States[0]
-			Event = 0
+		if Key == 'Back':
+			if CurrentStep == 1:
+				State = States[0]
+				Event = 0
+			else:
+				PersistButtons[Key].SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 		
 		if Key == 'Next' and CurrentStep == 9:
 			Text = 11962
@@ -92,6 +95,7 @@ def UpdateOverview(CurrentStep):
 		if Key == 'Start' and CurrentStep == 1:
 			Text = 13727
 			Event = 'CancelPress'
+			PersistButtons[Key].SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 		
 		PersistButtons[Key].SetText(Text)
 		PersistButtons[Key].SetState(State)

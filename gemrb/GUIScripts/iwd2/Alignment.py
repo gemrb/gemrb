@@ -19,13 +19,13 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	AlignmentTable = GemRB.LoadTableObject("aligns")
 	AlignmentWindow = GemRB.LoadWindowObject(3)
-	for i in range(0,9):
+	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		Button.SetText(AlignmentTable.GetValue(i,0) )
 
-	for i in range(0,9):
+	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
 		if AlignmentOk.GetValue(KitName, AlignmentTable.GetValue(i, 4) ) != 0:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
@@ -34,6 +34,8 @@ def OnLoad():
 
 	BackButton = AlignmentWindow.GetControl(13)
 	BackButton.SetText(15416)
+	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+
 	DoneButton = AlignmentWindow.GetControl(0)
 	DoneButton.SetText(36789)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)

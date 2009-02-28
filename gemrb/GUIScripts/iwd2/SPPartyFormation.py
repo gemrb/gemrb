@@ -92,10 +92,12 @@ def ExitPress ():
 
 	CancelButton = ExitWindow.GetControl (2)
 	CancelButton.SetText (13727)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExitCancelPress")
 
 	DoneButton = ExitWindow.GetControl (1)
 	DoneButton.SetText (11973)
+	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExitDonePress")
 
 	ExitWindow.SetVisible (1)
