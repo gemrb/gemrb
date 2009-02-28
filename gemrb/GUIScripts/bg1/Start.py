@@ -57,6 +57,7 @@ def SinglePlayerPress():
 	SinglePlayerButton.SetEvent(0, "NewSingle")
 	MoviesButton.SetEvent(0, "MissionPack")
 	ExitButton.SetEvent(0, "BackToMain")
+	ExitButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
 	if GemRB.GetString(24110) == "": # TODO: better way to detect lack of mission pack?
 		MoviesButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	return
@@ -70,9 +71,10 @@ def MultiPlayerPress():
 	SinglePlayerButton.SetEvent(0, "PregenPress")
 	MultiPlayerButton.SetEvent(0, "ConnectPress")
 	MoviesButton.SetEvent(0, "BackToMain")
+	MoviesButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
 	ExitButton.SetEvent(0, "")
 	ExitButton.SetStatus(IE_GUI_BUTTON_DISABLED)
-	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	return
 
 def ConnectPress():

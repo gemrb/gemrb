@@ -13,6 +13,8 @@ def OnLoad():
 	ExitButton = PartyFormationWindow.GetControl(30)
 	ExitButton.SetText(13906)
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitPress")
+	ExitButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	ModifyCharactersButton = PartyFormationWindow.GetControl(43)
 	ModifyCharactersButton.SetText(18816)
 	ModifyCharactersButton.SetState(IE_GUI_BUTTON_DISABLED)
@@ -67,10 +69,12 @@ def ExitPress():
 	CancelButton = ExitWindow.GetControl(2)
 	CancelButton.SetText(13727)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitCancelPress")
+	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
 	
 	DoneButton = ExitWindow.GetControl(1)
 	DoneButton.SetText(11973)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitDonePress")
+	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
 	
 	ExitWindow.SetVisible(1)
 	return
