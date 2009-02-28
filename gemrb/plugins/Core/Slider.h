@@ -31,7 +31,6 @@
 
 #include "Control.h"
 #include "Sprite2D.h"
-#include <math.h>
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_SLIDER_ON_CHANGE    0x02000000
@@ -60,7 +59,7 @@
  */
 
 class GEM_EXPORT Slider : public Control  {
-public: 
+public:
 	Slider(short KnobXPos, short KnobYPos, short KnobStep, unsigned short KnobStepsCount, bool Clear = false);
 	~Slider();
 	/** Draws the Control on the Output Display */

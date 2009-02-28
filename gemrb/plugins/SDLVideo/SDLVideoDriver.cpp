@@ -19,11 +19,11 @@
  *
  */
 
+#include <cmath>
+#include <cassert>
 #include "../../includes/win32def.h"
 #include "SDLVideoDriver.h"
 #include "../Core/Interface.h"
-#include <cmath>
-#include <cassert>
 #include "../Core/SpriteCover.h"
 #include "../Core/Console.h"
 #include "../Core/Audio.h"
@@ -1939,7 +1939,7 @@ void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r,
 static double ellipseradius(unsigned short xr, unsigned short yr, double angle) {
 	double one = (xr * sin(angle));
 	double two = (yr * cos(angle));
-	return sqrt(xr*xr*yr*yr / (one*one + two*two));	
+	return sqrt(xr*xr*yr*yr / (one*one + two*two));
 }
 
 /** This functions Draws an Ellipse Segment */
@@ -2001,7 +2001,7 @@ void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
 		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
 			SetPixel( cx - ( short ) x, cy - ( short ) y, color, clipped );
 		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );	
+			SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );
 		y++;
 		sy += tas;
 		ee += yc;
@@ -2030,7 +2030,7 @@ void SDLVideoDriver::DrawEllipseSegment(short cx, short cy, unsigned short xr,
 		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
 			SetPixel( cx - ( short ) x, cy - ( short ) y, color, clipped );
 		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );		
+			SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );
 		x++;
 		sx += tbs;
 		ee += xc;
@@ -2362,7 +2362,7 @@ Sprite2D* SDLVideoDriver::CreateLight(int radius, int intensity)
 
 	for (p.y = -radius; p.y < radius; p.y++) {
 		for (p.x = -radius; p.x < radius; p.x++) {
-			a = intensity*(radius-(signed) Distance(p,q))/radius;      
+			a = intensity*(radius-(signed) Distance(p,q))/radius;
 
 			if(a<0) a=0;
 			else if(a>255) a = 255;

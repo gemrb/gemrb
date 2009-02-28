@@ -23,7 +23,6 @@
 #include "TileOverlay.h"
 #include "Interface.h"
 #include "Video.h"
-#include <math.h>
 
 extern Interface* core;
 bool RedrawTile = false;

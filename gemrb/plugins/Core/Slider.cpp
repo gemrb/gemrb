@@ -19,6 +19,7 @@
  *
  */
 
+#include <cmath>
 #include "../../includes/win32def.h"
 #include "Slider.h"
 #include "Interface.h"
@@ -107,7 +108,7 @@ void Slider::SetPosition(unsigned int pos)
 		if (!Value)
 			Value = 1;
 		core->GetDictionary()->SetAt( VarName, pos * Value );
-	}	
+	}
 	Changed = true;
 }
 

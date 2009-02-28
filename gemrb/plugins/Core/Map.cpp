@@ -19,6 +19,9 @@
  *
  */
 
+#include <cmath>
+#include <cassert>
+
 #include "../../includes/win32def.h"
 #include "Map.h"
 #include "Interface.h"
@@ -39,9 +42,6 @@
 #include "GameControl.h"
 #include "Palette.h"
 #include "MapMgr.h"
-
-#include <cmath>
-#include <cassert>
 
 #ifndef WIN32
 #include <sys/time.h>
@@ -385,7 +385,7 @@ void Map::ChangeTileMap(ImageMgr* lm, ImageMgr* sm)
 {
 	delete LightMap;
 	delete SmallMap;
- 
+
 	LightMap = lm;
 	SmallMap = sm;
 
@@ -1049,7 +1049,7 @@ void Map::AddActor(Actor* actor)
 	//if a visible aggressive actor was put on the map, it is an autopause reason
 	//guess game is always loaded? if not, then we'll crash
 	ieDword gametime = core->GetGame()->GameTime;
-	
+
 	if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
 		ActorSpottedByPlayer(actor);
 	}
@@ -1390,7 +1390,7 @@ bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
 	// these circles are slightly different for sizes 7 and up.
 
 	if (size > MAX_CIRCLESIZE) size = MAX_CIRCLESIZE;
-	if (size < 2) size = 2;	
+	if (size < 2) size = 2;
 
 	unsigned int ppx = px/16;
 	unsigned int ppy = py/12;
@@ -2816,7 +2816,7 @@ void AreaAnimation::Draw(Region &screen, Map *area)
 {
 	int ac=animcount;
 	Video* video = core->GetVideoDriver();
-	
+
 	//always draw the animation tinted because tint is also used for
 	//transparency
 	Color tint = {255,255,255,255-(ieByte) transparency};
@@ -2852,7 +2852,7 @@ bool Map::ChangeMap(bool day_or_night)
         if (! (AreaType&AT_EXTENDED_NIGHT)) return false;
         //no need of change if the area already has the right tilemap
         if ((DayNight == day_or_night) && GetTileMap()) return false;
-	
+
         MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
 	//no need to open and read the .are file again
 	//using the ARE class for this because ChangeMap is similar to LoadMap

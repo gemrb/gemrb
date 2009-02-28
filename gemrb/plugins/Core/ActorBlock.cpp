@@ -17,6 +17,8 @@
  *
  * $Id$
  */
+#include <cassert>
+
 #include "../../includes/win32def.h"
 #include "../../includes/strrefs.h"
 #include "ActorBlock.h"
@@ -31,9 +33,6 @@
 #include "Game.h"
 #include "GameControl.h"
 #include "Projectile.h"
-
-#include <cassert>
-#include <cmath>
 
 extern Interface* core;
 
@@ -137,7 +136,7 @@ void Scriptable::SetMap(Map *map)
 }
 
 //ai is nonzero if this is an actor currently in the party
-//if the script level is AI_SCRIPT_LEVEL, then we need to 
+//if the script level is AI_SCRIPT_LEVEL, then we need to
 //load an AI script (.bs) instead of (.bcs)
 void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 {
@@ -1276,7 +1275,7 @@ void Door::UpdateDoor()
 	}
 	unsigned int oval, cval;
 
-	oval = PATH_MAP_IMPASSABLE; 
+	oval = PATH_MAP_IMPASSABLE;
 	if (Flags & DOOR_TRANSPARENT) {
 		cval = PATH_MAP_DOOR_TRANSPARENT;
 	}
@@ -1560,7 +1559,7 @@ int InfoPoint::CheckTravel(Actor *actor)
 }
 
 //detect this trap, using a skill, skill could be set to 256 for 'sure'
-//skill is the all around modified trap detection skill 
+//skill is the all around modified trap detection skill
 //a trapdetectiondifficulty of 100 means impossible detection short of a spell
 void Highlightable::DetectTrap(int skill)
 {
@@ -1710,7 +1709,7 @@ Container::Container(void)
 	Trapped = 0;
 	TrapDetected = 0;
 	inventory.SetInventoryType(INVENTORY_HEAP);
-	// NULL should be 0 for this 
+	// NULL should be 0 for this
 	memset (groundicons, 0, sizeof(groundicons) );
 	groundiconcover = 0;
 }

@@ -21,6 +21,7 @@
 #ifndef WIN32
 #include <sys/time.h>
 #endif
+#include <cmath>
 #include "../../includes/win32def.h"
 #include "GameControl.h"
 #include "Interface.h"
@@ -35,7 +36,6 @@
 #include "Item.h"
 #include "Game.h"
 #include "SaveGameIterator.h"
-#include <cmath>
 
 #define DEBUG_SHOW_INFOPOINTS   0x01
 #define DEBUG_SHOW_CONTAINERS   0x02
