@@ -1,3 +1,24 @@
+# -*-python-*-
+# GemRB - Infinity Engine Emulator
+# Copyright (C) 2003 The GemRB Project
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# $Id$
+
+# 
 import GemRB
 from LoadScreen import *
 
@@ -77,7 +98,7 @@ def ProtocolPress():
 	#GemRB.UnloadWindow(StartWindow)
 	StartWindow.SetVisible(0)
 	ProtocolWindow = GemRB.LoadWindowObject(1)
-	
+
 	#Disabling Unused Buttons in this Window
 	Button = ProtocolWindow.GetControl(2)
 	Button.SetState(IE_GUI_BUTTON_DISABLED)
@@ -88,40 +109,41 @@ def ProtocolPress():
 	Button = ProtocolWindow.GetControl(9)
 	Button.SetState(IE_GUI_BUTTON_DISABLED)
 	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-	
+
 	SinglePlayerButton = ProtocolWindow.GetControl(10)
 	SinglePlayerButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 	SinglePlayerButton.SetText(15413)
-	
+
 	IPXButton = ProtocolWindow.GetControl(0)
 	IPXButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 	IPXButton.SetText(13967)
-	
+
 	TCPIPButton = ProtocolWindow.GetControl(1)
 	TCPIPButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 	TCPIPButton.SetText(13968)
-	
+
 	SinglePlayerButton.SetVarAssoc("Last Protocol Used", 0)
 	IPXButton.SetVarAssoc("Last Protocol Used", 1)
 	TCPIPButton.SetVarAssoc("Last Protocol Used", 2)
-	
+
 	TextArea = ProtocolWindow.GetControl(7)
 	TextArea.SetText(11316)
-	
+
 	DoneButton = ProtocolWindow.GetControl(6)
 	DoneButton.SetText(11973)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ProtocolDonePress")
-	
+	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	ProtocolWindow.SetVisible(1)
 	return
-	
+
 def ProtocolDonePress():
 	global StartWindow, ProtocolWindow
 	if ProtocolWindow:
 		ProtocolWindow.Unload()
-	
+
 	ProtocolButton = StartWindow.GetControl(0x00)
-	
+
 	LastProtocol = GemRB.GetVar("Last Protocol Used")
 	if LastProtocol == 0:
 		ProtocolButton.SetText(15413)
@@ -129,10 +151,10 @@ def ProtocolDonePress():
 		ProtocolButton.SetText(13967)
 	elif LastProtocol == 2:
 		ProtocolButton.SetText(13968)
-	
+
 	StartWindow.SetVisible(1)
 	return
-	
+
 def LoadPress():
 	global StartWindow
 
@@ -155,7 +177,7 @@ def OptionsPress():
 		StartWindow.Unload()
 	GemRB.SetNextScript("Options")
 	return
-	
+
 def QuitPress():
 	global StartWindow, QuitWindow
 	StartWindow.SetVisible(0)
@@ -163,24 +185,24 @@ def QuitPress():
 	CancelButton = QuitWindow.GetControl(2)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "QuitCancelPress")
 	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
-	
+
 	QuitButton = QuitWindow.GetControl(1)
 	QuitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "QuitQuitPress")
 	QuitButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
-	
+
 	TextArea = QuitWindow.GetControl(0)
 	CancelButton.SetText(13727)
 	QuitButton.SetText(15417)
 	TextArea.SetText(19532)
 	QuitWindow.SetVisible(1)
 	return
-	
+
 def NewGamePress():
 	global StartWindow
 	if StartWindow:
 		StartWindow.Unload()
 	GemRB.SetNextScript("SPParty")
-	return	
+	return
 
 def QuitCancelPress():
 	global StartWindow, QuitWindow
@@ -188,7 +210,7 @@ def QuitCancelPress():
 		QuitWindow.Unload()
 	StartWindow.SetVisible(1)
 	return
-	
+
 def QuitQuitPress():
 	GemRB.Quit()
 	return

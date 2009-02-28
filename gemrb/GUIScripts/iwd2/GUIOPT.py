@@ -122,6 +122,7 @@ def OpenOptionsWindow ():
 	KeyboardButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenKeyboardWindow")
 	ReturnButton.SetText (10308)
 	ReturnButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
+	ReturnButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	VersionLabel = Window.GetControl (0x1000000B)
 	VersionLabel.SetText (GEMRB_VERSION)
@@ -595,11 +596,13 @@ def OpenLoadMsgWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (15590)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LoadGamePress")
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseLoadMsgWindow")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# Loading a game will destroy ...
 	Text = Window.GetControl (3)

@@ -29,8 +29,13 @@ def OnLoad():
 	CancelButton = SoundWindow.GetControl(25)
 	TextAreaControl.SetText(18040)
 	CharacterSoundButton.SetText(17778)
+
 	OkButton.SetText(11973)
+	OkButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
 	CancelButton.SetText(13727)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	AmbientButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "AmbientPress")
 	AmbientSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, "AmbientPress")
 	AmbientSlider.SetVarAssoc("Volume Ambients",10)
@@ -38,7 +43,7 @@ def OnLoad():
 	SoundEffectsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SoundEffectsPress")
 	SoundEffectsSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, "SoundEffectsPress")
 	SoundEffectsSlider.SetVarAssoc("Volume SFX",10)
-	
+
 	DialogueButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DialoguePress")
 	DialogueSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, "DialoguePress")
 	DialogueSlider.SetVarAssoc("Volume Voices",10)
@@ -62,45 +67,45 @@ def OnLoad():
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	SoundWindow.SetVisible(1)
 	return
-	
+
 def AmbientPress():
 	TextAreaControl.SetText(18008)
 	GemRB.UpdateAmbientsVolume ()
 	return
-	
+
 def SoundEffectsPress():
 	TextAreaControl.SetText(18009)
 	return
-	
+
 def DialoguePress():
 	TextAreaControl.SetText(18010)
 	return
-	
+
 def MusicPress():
 	TextAreaControl.SetText(18011)
 	GemRB.UpdateMusicVolume ()
 	return
-	
+
 def MoviesPress():
 	TextAreaControl.SetText(18012)
 	return
-	
+
 def EnvironmentalPress():
 	TextAreaControl.SetText(18022)
 	return
-	
+
 def CharacterSoundPress():
 	if SoundWindow:
 		SoundWindow.Unload()
 	GemRB.SetNextScript("CharSound")
 	return
-	
+
 def OkPress():
 	if SoundWindow:
 		SoundWindow.Unload()
 	GemRB.SetNextScript("Options")
 	return
-	
+
 def CancelPress():
 	if SoundWindow:
 		SoundWindow.Unload()

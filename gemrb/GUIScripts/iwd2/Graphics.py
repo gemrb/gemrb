@@ -79,6 +79,8 @@ def OnLoad():
 	TextAreaControl.SetText(18038)
 	OkButton.SetText(11973)
 	CancelButton.SetText(13727)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	BrightnessButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "BrightnessPress")
 	BrightnessSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, "BrightnessPress")
 	ContrastButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ContrastPress")

@@ -1,4 +1,25 @@
-#Character Sound Options Menu
+# -*-python-*-
+# GemRB - Infinity Engine Emulator
+# Copyright (C) 2003 The GemRB Project
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# $Id$
+
+#Character Sound Options Menu using GUIOPT
+
 import GemRB
 
 CSoundWindow = 0
@@ -29,26 +50,29 @@ def OnLoad():
 	CancelButton = CSoundWindow.GetControl(25)
 	TextAreaControl.SetText(18041)
 	OkButton.SetText(11973)
+	OkButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
 	CancelButton.SetText(13727)
-	
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	SubtitlesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SubtitlesPress")
 	SubtitlesButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SubtitlesPress")
 	SubtitlesButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	SubtitlesButtonB.SetVarAssoc("Subtitles", 1)
 	SubtitlesButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
-	
+
 	AttackSoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "AttackSoundPress")
 	AttackSoundButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "AttackSoundPress")
 	AttackSoundButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	AttackSoundButtonB.SetVarAssoc("Attack Sound", 1) #can't find the right variable name, this is a dummy name
 	AttackSoundButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
-	
+
 	MovementSoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MovementSoundPress")
 	MovementSoundButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MovementSoundPress")
 	MovementSoundButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	MovementSoundButtonB.SetVarAssoc("Movement Sound", 1) #can't find the right variable name, this is a dummy name
 	MovementSoundButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
-	
+
 	CommandSoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CommandSoundPress")
 	CSAlwaysButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CommandSoundPress")
 	CSAlwaysButtonB.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
@@ -62,7 +86,7 @@ def OnLoad():
 	CSNeverButtonB.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	CSNeverButtonB.SetVarAssoc("Command Sounds Frequency", 1)
 	CSNeverButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
-	
+
 	SelectionSoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SelectionSoundPress")
 	SSAlwaysButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SelectionSoundPress")
 	SSAlwaysButtonB.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
@@ -76,38 +100,38 @@ def OnLoad():
 	SSNeverButtonB.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	SSNeverButtonB.SetVarAssoc("Selection Sounds Frequency", 1)
 	SSNeverButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
-	
+
 	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OkPress")
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	CSoundWindow.SetVisible(1)
 	return
-	
+
 def SubtitlesPress():
 	TextAreaControl.SetText(18015)
 	return
-	
+
 def AttackSoundPress():
 	TextAreaControl.SetText(18013)
 	return
-	
+
 def MovementSoundPress():
 	TextAreaControl.SetText(18014)
 	return
-	
+
 def CommandSoundPress():
 	TextAreaControl.SetText(18016)
 	return
-	
+
 def SelectionSoundPress():
 	TextAreaControl.SetText(11352)
 	return
-	
+
 def OkPress():
 	if CSoundWindow:
 		CSoundWindow.Unload()
 	GemRB.SetNextScript("Options")
 	return
-	
+
 def CancelPress():
 	if CSoundWindow:
 		CSoundWindow.Unload()

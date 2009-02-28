@@ -33,8 +33,13 @@ def OnLoad():
 	OkButton = GamePlayWindow.GetControl(7)
 	CancelButton = GamePlayWindow.GetControl(20)
 	TextAreaControl.SetText(18042)
+
 	OkButton.SetText(11973)
+	OkButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
 	CancelButton.SetText(13727)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	FeedbackButton.SetText(17163)
 	AutoPauseButton.SetText(17166)
 	DelayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DelayPress")

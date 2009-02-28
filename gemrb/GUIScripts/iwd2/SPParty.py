@@ -26,6 +26,7 @@ def OnLoad():
 	CancelButton = PartySelectWindow.GetControl(11)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	CancelButton.SetText(13727)
+	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
 
 	DoneButton = PartySelectWindow.GetControl(10)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")

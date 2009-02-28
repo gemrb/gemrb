@@ -40,15 +40,18 @@ def OnLoad():
 	Miscellaneous = FeedbackWindow.GetControl(37)
 	MiscellaneousB = FeedbackWindow.GetControl(15)
 	MiscellaneousB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
-	
+
 	OkButton = FeedbackWindow.GetControl(26)
 	CancelButton = FeedbackWindow.GetControl(27)
 	TextAreaControl = FeedbackWindow.GetControl(28)
 
 	TextAreaControl.SetText(18043)
 	OkButton.SetText(11973)
+	OkButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
 	CancelButton.SetText(13727)
-	
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	MarkerSlider.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MarkerSliderPress")
 	MarkerSliderS.SetEvent(IE_GUI_SLIDER_ON_CHANGE, "MarkerSliderPress")
 	MarkerSliderS.SetVarAssoc("GUI Feedback Level",1)
