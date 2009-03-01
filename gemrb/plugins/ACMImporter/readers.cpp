@@ -25,6 +25,7 @@
 //   Ogg Vorbis and Interplay's ACM.
 
 #include <stdio.h>
+#include "../Core/Interface.h"
 #include "readers.h"
 #include "general.h"
 
@@ -164,11 +165,11 @@ int CACMReader::init_reader()
 	if (!block) {
 		return 0;
 	}
-	unpacker = new CValueUnpacker( levels, subblocks, stream ); 
+	unpacker = new CValueUnpacker( levels, subblocks, stream );
 	if (!unpacker || !unpacker->init_unpacker()) {
 		return 0;
 	}
-	decoder = new CSubbandDecoder( levels ); 
+	decoder = new CSubbandDecoder( levels );
 	if (!decoder || !decoder->init_decoder()) {
 		return 0;
 	}
