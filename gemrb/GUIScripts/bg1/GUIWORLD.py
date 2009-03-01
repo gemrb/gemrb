@@ -376,6 +376,13 @@ def RemovePlayer ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RemovePlayerCancel")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
+	GemRB.SetVar ("OtherWindow", Window.ID)
+	GemRB.SetVar ("ActionsWindow", -1)
+	if hideflag:
+		GemRB.UnhideGUI ()
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
 def RemovePlayerConfirm ():
 	global ReformPartyWindow
 
