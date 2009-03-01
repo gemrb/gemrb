@@ -476,7 +476,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 		actor->Select( false );
 	}
 
-	if (! (flags & SELECT_QUIET)) { 
+	if (! (flags & SELECT_QUIET)) {
 		core->SetEventFlag(EF_SELECTION);
 		//core->GetGUIScriptEngine()->RunFunction( "SelectionChanged" );
 	}
@@ -868,7 +868,7 @@ bool Game::EveryoneStopped() const
 	return true;
 }
 
-//canmove=true: if some PC can't move (or hostile), then this returns false 
+//canmove=true: if some PC can't move (or hostile), then this returns false
 bool Game::EveryoneNearPoint(Map *area, Point &p, int flags) const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
@@ -981,7 +981,7 @@ void Game::AddGold(ieDword add)
 	old = PartyGold;
 	PartyGold += add;
 	if (old<PartyGold) {
-		core->DisplayConstantStringValue( STR_GOTGOLD, 0xc0c000, PartyGold-old); 
+		core->DisplayConstantStringValue( STR_GOTGOLD, 0xc0c000, PartyGold-old);
 	} else {
 		core->DisplayConstantStringValue( STR_LOSTGOLD, 0xc0c000, old-PartyGold);
 	}

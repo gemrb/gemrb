@@ -2853,7 +2853,7 @@ PyDoc_STRVAR( GemRB_GameControlSetTargetMode__doc,
 static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* args)
 {
 	int Mode;
-	int Types = TARGET_TYPE_ALL; 
+	int Types = TARGET_TYPE_ALL;
 
 	if (!PyArg_ParseTuple( args, "i|i", &Mode, &Types )) {
 		return AttributeError( GemRB_GameControlSetTargetMode__doc );
@@ -3752,7 +3752,7 @@ static PyObject *GetGameDate(DataStream *ds)
 		return NULL;
 	}
 
-	int hours = ((int)GameTime)/4500;
+	int hours = ((int)GameTime)/300;
 	int days = hours/24;
 	hours -= days*24;
 	char tmpstr[10];

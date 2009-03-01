@@ -113,7 +113,7 @@ Game* GAMImp::LoadGame(Game *newGame)
 
 	ieDword GameTime;
 	str->ReadDword( &GameTime );
-	newGame->GameTime = GameTime*15;
+	newGame->GameTime = GameTime;
 
 	str->ReadWord( &newGame->WhichFormation );
 	for (i = 0; i < 5; i++) {
@@ -692,7 +692,7 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 	stream->Write( Signature, 8);
 	//using Signature for padding
 	memset(Signature, 0, sizeof(Signature));
-	tmpDword = game->GameTime/15;
+	tmpDword = game->GameTime;
 	stream->WriteDword( &tmpDword );
 	//pst has a single preset of formations
 	if (game->version==GAM_VER_PST) {
