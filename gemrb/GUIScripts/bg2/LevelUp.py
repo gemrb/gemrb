@@ -133,6 +133,7 @@ def OpenLevelUpWindow():
 
 	RowCount = WeapProfTable.GetRowCount()-7  #we decrease it with the bg1 skills
 
+	# proficiencies scrollbar
 	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl = LevelUpWindow.GetControl(108)
 	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "ProfScrollBarPress")
@@ -145,6 +146,13 @@ def OpenLevelUpWindow():
 			ProfCount -= 1
 		GemRB.SetVar("Prof "+str(i), GemRB.GetPlayerStat (pc, WeapProfTable.GetValue (i+8, 0)))
 	ScrollBarControl.SetVarAssoc ("TopIndex", ProfCount)
+
+	# skills scrollbar
+	GemRB.SetVar ("SkillTopIndex", 0)
+	ScrollBarControl = LevelUpWindow.GetControl (109)
+	ScrollBarControl.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "SkillScrollBarPress")
+	# decrease it with the number of controls on screen (list size) and two unrelated rows
+	ScrollBarControl.SetVarAssoc ("SkillTopIndex", SkillTable.GetRowCount()-3-2)
 
 	for i in range(7):
 		Button=LevelUpWindow.GetControl(i+112)
@@ -213,11 +221,12 @@ def RedrawSkills(First=0, direction=0):
 	else:
 		SkillSumLabel.SetText(str(SkillPointsLeft))
 		for i in range(4):
-			SkillName = SkillTable.GetValue (i+2, 1)
+			Pos = SkillTopIndex + i
+			SkillName = SkillTable.GetValue (Pos+2, 1)
 			Label = LevelUpWindow.GetControl (0x10000000+32+i)
 			Label.SetText (SkillName)
 	
-			SkillName = SkillTable.GetRowName (i+2)
+			SkillName = SkillTable.GetRowName (Pos+2)
 			Ok = SkillTable.GetValue (SkillName, KitName)
 			Button1 = LevelUpWindow.GetControl(i*2+17)
 			Button2 = LevelUpWindow.GetControl(i*2+18)
@@ -233,7 +242,7 @@ def RedrawSkills(First=0, direction=0):
 				Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
 			
 			Label = LevelUpWindow.GetControl(0x10000000+43+i)
-			ActPoint = GemRB.GetVar("Skill "+str(i) )
+			ActPoint = GemRB.GetVar("Skill "+str(Pos) )
 			Label.SetText(str(ActPoint))
 
 	# proficiencies part of the window
@@ -464,6 +473,13 @@ def SkillLeftPress():
 		ClickCount = 0
 
 	RedrawSkills(0,1)
+	return
+
+def SkillScrollBarPress():
+	global SkillTopIndex
+
+	SkillTopIndex = GemRB.GetVar("SkillTopIndex")
+	RedrawSkills()
 	return
 
 def ProfScrollBarPress():
