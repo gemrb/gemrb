@@ -33,6 +33,7 @@ Button::Button()
 	//this->Clear = Clear;
 	State = IE_GUI_BUTTON_UNPRESSED;
 	ResetEventHandler( ButtonOnPress );
+	ResetEventHandler( ButtonOnDoublePress );
 	ResetEventHandler( ButtonOnShiftPress );
 	ResetEventHandler( ButtonOnRightPress );
 	ResetEventHandler( ButtonOnDragDrop );
@@ -372,7 +373,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 	}
 
 	//Button == 1 means Left Mouse Button
-	switch(Button) {
+	switch(Button&GEM_MB_NORMAL) {
 	case GEM_MB_ACTION:
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
@@ -386,6 +387,10 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		Changed = true;
 		if (Flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound( DS_BUTTON_PRESSED );
+		}
+		if ((Button & GEM_MB_DOUBLECLICK) && ButtonOnDoublePress[0]) {
+			RunEventHandler( ButtonOnDoublePress );
+			printMessage("Button","Doubleclick detected\n",GREEN);
 		}
 		break;
 	case GEM_MB_SCRLUP:
@@ -459,7 +464,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	}
 */
 
-	if (Button == GEM_MB_ACTION) {
+	if ((Button&GEM_MB_NORMAL) == GEM_MB_ACTION) {
 		if ((Mod & GEM_MOD_SHIFT) && ButtonOnShiftPress[0])
 			RunEventHandler( ButtonOnShiftPress );
 		else
