@@ -158,17 +158,17 @@ def UpdateRecordsWindow ():
 	# armorclass
 	Label = Window.GetControl (0x10000028)
 	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
-	Label.SetTooltip (4197)
+	Label.SetTooltip (17183)
 
 	# hp now
 	Label = Window.GetControl (0x10000029)
 	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
-	Label.SetTooltip (4198)
+	Label.SetTooltip (17184)
 
 	# hp max
 	Label = Window.GetControl (0x1000002a)
 	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
-	Label.SetTooltip (4199)
+	Label.SetTooltip (17378)
 
 	# stats
 

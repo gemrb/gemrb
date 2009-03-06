@@ -142,15 +142,15 @@ def OpenInventoryWindow ():
 
 	#armor class
 	Label = Window.GetControl (0x10000038)
-	Label.SetTooltip (4197)
+	Label.SetTooltip (17183)
 
 	#hp current
 	Label = Window.GetControl (0x10000039)
-	Label.SetTooltip (4198)
+	Label.SetTooltip (17184)
 
 	#hp max
 	Label = Window.GetControl (0x1000003a)
-	Label.SetTooltip (4199)
+	Label.SetTooltip (17378)
 
 	#info label, game paused, etc
 	Label = Window.GetControl (0x1000003f)
@@ -758,6 +758,7 @@ def IdentifyItemWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "IdentifyUseScroll")
 	if not GemRB.HasSpecialItem (pc, 1, 0):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
+
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseIdentifyItemWindow")

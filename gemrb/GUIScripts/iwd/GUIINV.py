@@ -135,15 +135,15 @@ def OpenInventoryWindow ():
 
 	#armor class
 	Label = Window.GetControl (0x10000038)
-	Label.SetTooltip (4197)
+	Label.SetTooltip (17183)
 
 	#hp current
 	Label = Window.GetControl (0x10000039)
-	Label.SetTooltip (4198)
+	Label.SetTooltip (17184)
 
 	#hp max
 	Label = Window.GetControl (0x1000003a)
-	Label.SetTooltip (4199)
+	Label.SetTooltip (17378)
 
 	#info label, game paused, etc
 	Label = Window.GetControl (0x1000003f)
@@ -312,16 +312,19 @@ def RefreshInventoryWindow ():
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
 	Label = Window.GetControl (0x10000038)
 	Label.SetText (str (ac))
+	Label.SetTooltip (10339)
 
 	#hp current
 	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
 	Label = Window.GetControl (0x10000039)
 	Label.SetText (str (hp))
+	Label.SetTooltip (17184)
 
 	#hp max
 	hpmax = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
 	Label = Window.GetControl (0x1000003a)
 	Label.SetText (str (hpmax))
+	Label.SetTooltip (17378)
 
 	#party gold
 	Label = Window.GetControl (0x10000040)
@@ -446,6 +449,7 @@ def UpdateSlot (pc, slot):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDragItem")
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoWindow")
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, "OpenItemAmountWindow")
 	else:
 		if SlotType["ResRef"]=="*":
 			Button.SetBAM ("",0,0)
@@ -572,6 +576,12 @@ def DragItemAmount ():
 def OpenItemAmountWindow ():
 	global ItemAmountWindow, StackAmount
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+
+	if GemRB.IsDraggingItem ():
+		GemRB.DropDraggedItem(pc, slot)
+
 	if ItemAmountWindow != None:
 		if ItemAmountWindow:
 			ItemAmountWindow.Unload ()
@@ -583,8 +593,6 @@ def OpenItemAmountWindow ():
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
 
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
@@ -604,7 +612,7 @@ def OpenItemAmountWindow ():
 
 	# item amount
 	Text = Window.GetControl (6)
-	Text.SetText (str (StackAmount) )
+	Text.SetText (str (StackAmount//2) )
 	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
 
 	# Decrease
@@ -634,20 +642,6 @@ def OpenItemAmountWindow ():
 	# 6 text
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def OpenItemWindow ():
-	#close inventory
-	GemRB.SetVar ("Inventory", 1)
-	if ItemInfoWindow:
-		ItemInfoWindow.Unload ()
-	OpenInventoryWindow ()
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
-	slot_item = GemRB.GetSlotItem (pc, slot)
-	ResRef = slot_item['ItemResRef']
-	#the store will have to reopen the inventory
-	GemRB.EnterStore (ResRef)
 	return
 
 def DrinkItemWindow ():

@@ -448,6 +448,7 @@ def UpdateSlot (pc, slot):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDragItem")
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoWindow")
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, "OpenItemAmountWindow")
 	else:
 		if SlotType["ResRef"]=="*":
 			Button.SetBAM ("",0,0)
@@ -518,8 +519,8 @@ def OnAutoEquip ():
 
 def OnDragItem ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-
 	slot = GemRB.GetVar ("ItemButton")
+
 	if not GemRB.IsDraggingItem ():
 		slot_item = GemRB.GetSlotItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
@@ -574,6 +575,12 @@ def DragItemAmount ():
 def OpenItemAmountWindow ():
 	global ItemAmountWindow, StackAmount
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+
+	if GemRB.IsDraggingItem ():
+		GemRB.DropDraggedItem(pc, slot)
+
 	if ItemAmountWindow != None:
 		if ItemAmountWindow:
 			ItemAmountWindow.Unload ()
@@ -585,8 +592,6 @@ def OpenItemAmountWindow ():
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
 
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
@@ -606,7 +611,7 @@ def OpenItemAmountWindow ():
 
 	# item amount
 	Text = Window.GetControl (6)
-	Text.SetText (str (StackAmount) )
+	Text.SetText (str (StackAmount//2) )
 	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
 
 	# Decrease
