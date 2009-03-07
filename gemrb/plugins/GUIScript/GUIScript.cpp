@@ -3366,19 +3366,16 @@ PyDoc_STRVAR( GemRB_PlaySound__doc,
 
 static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
-	const char *ResRef;
+	char *ResRef;
 	int xpos = 0;
 	int ypos = 0;
 	unsigned int flags = 1; //GEM_SND_RELATIVE
 
-	if (!PyArg_ParseTuple( args, "s|iii", &ResRef, &xpos, &ypos, &flags )) {
+	if (!PyArg_ParseTuple( args, "z|iii", &ResRef, &xpos, &ypos, &flags )) {
 		return AttributeError( GemRB_PlaySound__doc );
 	}
 
 	int ret = core->GetAudioDrv()->Play( ResRef, xpos, ypos, flags );
-	if (!ret) {
-		return NULL;
-	}
 
 	Py_INCREF( Py_None );
 	return Py_None;
