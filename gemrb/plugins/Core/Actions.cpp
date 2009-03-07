@@ -1412,7 +1412,7 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 		Sender->AddActionInFront( Sender->CurrentAction );
 		return;
 	}
-	DisplayStringCore( Sender, parameters->int0Parameter, DS_CONSOLE|DS_WAIT|DS_SPEECH);
+	DisplayStringCore( Sender, parameters->int0Parameter, DS_CONSOLE|DS_WAIT|DS_SPEECH|DS_HEAD);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -2285,9 +2285,9 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 
 	if(Sender->Type==ST_ACTOR) {
 		Actor *act = (Actor *) Sender;
-		
+
 		unsigned int dist = GetSpellDistance(spellres, act);
-		
+
 		if (PersonalDistance(tar, Sender) > dist) {
 			GoNearAndRetry(Sender, tar, true, dist);
 			Sender->ReleaseCurrentAction();
@@ -2329,9 +2329,9 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 
 	if(Sender->Type==ST_ACTOR) {
 		Actor *act = (Actor *) Sender;
-		
+
 		unsigned int dist = GetSpellDistance(spellres, act);
-		
+
 		if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
 			GoNearAndRetry(Sender, parameters->pointParameter, dist);
 			Sender->ReleaseCurrentAction();
