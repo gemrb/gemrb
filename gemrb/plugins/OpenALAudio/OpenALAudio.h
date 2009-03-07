@@ -29,6 +29,7 @@
 #define REFERENCE_DISTANCE 50
 #define ACM_BUFFERSIZE 8192
 
+#include "SDL.h"
 #include "../Core/Audio.h"
 #include "../Core/LRUCache.h"
 #include "../Core/Interface.h"
@@ -39,7 +40,6 @@
 #include "AmbientMgrAL.h"
 #include "../Core/ResourceMgr.h"
 #include "StackLock.h"
-#include "SDL.h"
 
 #ifndef WIN32
 #include <AL/al.h>

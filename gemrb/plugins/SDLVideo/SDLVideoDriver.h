@@ -22,10 +22,9 @@
 #ifndef SDLVIDEODRIVER_H
 #define SDLVIDEODRIVER_H
 
-#include "../Core/Video.h"
-
 #include <SDL.h>
-
+#include "../../includes/win32def.h"
+#include "../Core/Video.h"
 
 class SDLVideoDriver : public Video {
 private:
@@ -168,7 +167,7 @@ public:
 	Color SpriteGetPixel (Sprite2D* sprite, unsigned short x, unsigned short y);
 	Color SpriteGetPixelSum (Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
 	bool IsSpritePixelTransparent (Sprite2D* sprite, unsigned short x, unsigned short y);
-	Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio );  
+	Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio );
 	Sprite2D* CreateLight(int radius, int intensity); //both parameters must be signed
 	void SetGamma(int brightness, int contrast);
 	void SetMouseScrollSpeed(int speed);

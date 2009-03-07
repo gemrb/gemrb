@@ -21,7 +21,6 @@
 
 #include <cmath>
 #include <cassert>
-#include "../../includes/win32def.h"
 #include "SDLVideoDriver.h"
 #include "../Core/Interface.h"
 #include "../Core/SpriteCover.h"
