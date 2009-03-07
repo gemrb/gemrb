@@ -1857,6 +1857,11 @@ bool Interface::LoadConfig(void)
 
 	return false;
 #else // WIN32
+    // If we were called as $0 -c <filename>, load config from filename
+	if (argc > 2 && ! strcmp("-c", argv[1])) {
+		return LoadConfig( argv[2] ) ;
+    // Explicitly specified cfg file HAS to be present
+	}
 	strcpy( UserDir, ".\\" );
 	return LoadConfig( "GemRB.cfg" );
 #endif// WIN32
@@ -4499,7 +4504,7 @@ void Interface::SetMouseScrollSpeed(int speed) {
 int Interface::GetMouseScrollSpeed() {
 	return mousescrollspd;
 }
-	
+
 ieStrRef Interface::GetRumour(const ieResRef dlgref)
 {
 	DialogMgr* dm = ( DialogMgr* ) GetInterface( IE_DLG_CLASS_ID );
@@ -5001,7 +5006,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
         		GetGUIScriptEngine()->RunFunction( "OpenWaitForDiscWindow" );
 			break;
 		}
-                
+
         } while (video->SwapBuffers() == GEM_OK);
 }
 
