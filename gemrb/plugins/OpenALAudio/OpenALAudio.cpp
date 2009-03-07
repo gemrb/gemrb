@@ -286,37 +286,41 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 	if (flags & GEM_SND_SPEECH) {
 		//speech has a single channel, if a new speech started
 		//we stop the previous one
-		if (speech.free || !alIsSource( speech.Source )) {
-			alGenSources( 1, &speech.Source );
-			if (checkALError("Error creating source for speech", "ERROR")) {
-				return 0;
-			}
-
-			alSourcef( speech.Source, AL_PITCH, 1.0f );
-			alSourcefv( speech.Source, AL_VELOCITY, SourceVel );
-			alSourcei( speech.Source, AL_LOOPING, 0 );
-			alSourcef( speech.Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
-			checkALError("Unable to set speech parameters", "WARNING");
-			speech.free = false;
-			printf("speech.free: %d source:%d\n", speech.free,speech.Source);
-		} else {
-			alSourceStop( speech.Source );
+		if(!speech.free && alIsSource(speech.Source)) {
+		    alSourceStop( speech.Source );
 			checkALError("Unable to stop speech", "WARNING");
 			speech.ClearProcessedBuffers();
 		}
-		core->GetDictionary()->Lookup( "Volume Voices", volume );
-		alSourcef( speech.Source, AL_GAIN, 0.01f * volume );
-		alSourcei( speech.Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
-		alSourcefv( speech.Source, AL_POSITION, SourcePos );
-		assert(!speech.delete_buffers);
-		alSourcei( speech.Source, AL_BUFFER, Buffer );
-		checkALError("Unable to set speech parameters", "WARNING");
-		speech.Buffer = Buffer;
-		alSourcePlay( speech.Source );
-		if (checkALError("Unable to play speech", "ERROR")) {
-			return 0;
-		}
-		return time_length;
+		if (ResRef != NULL) {
+            if(!alIsSource(speech.Source)) {
+                alGenSources( 1, &speech.Source );
+                if (checkALError("Error creating source for speech", "ERROR")) {
+                    return 0;
+                }
+            }
+
+            alSourcef( speech.Source, AL_PITCH, 1.0f );
+            alSourcefv( speech.Source, AL_VELOCITY, SourceVel );
+            alSourcei( speech.Source, AL_LOOPING, 0 );
+            alSourcef( speech.Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
+            checkALError("Unable to set speech parameters", "WARNING");
+            speech.free = false;
+            printf("speech.free: %d source:%d\n", speech.free,speech.Source);
+
+            core->GetDictionary()->Lookup( "Volume Voices", volume );
+            alSourcef( speech.Source, AL_GAIN, 0.01f * volume );
+            alSourcei( speech.Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
+            alSourcefv( speech.Source, AL_POSITION, SourcePos );
+            assert(!speech.delete_buffers);
+            alSourcei( speech.Source, AL_BUFFER, Buffer );
+            checkALError("Unable to set speech parameters", "WARNING");
+            speech.Buffer = Buffer;
+            alSourcePlay( speech.Source );
+            if (checkALError("Unable to play speech", "ERROR")) {
+                return 0;
+            }
+            return time_length;
+		} else return 0; //NULL was specified to stop the speech
 	}
 
 	int stream = -1;
