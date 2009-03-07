@@ -3375,7 +3375,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_PlaySound__doc );
 	}
 
-	int ret = core->GetAudioDrv()->Play( ResRef, xpos, ypos, flags );
+	core->GetAudioDrv()->Play( ResRef, xpos, ypos, flags );
 
 	Py_INCREF( Py_None );
 	return Py_None;
