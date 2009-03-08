@@ -1216,6 +1216,7 @@ int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		STATE_CURE( STATE_SLOWED );
 		STATE_SET( STATE_HASTED );
 	}
+	target->NewStat(IE_MOVEMENTRATE, 200, MOD_PERCENT);
 	switch (fx->Parameter2) {
 	case 0: //normal haste
 		target->AddPortraitIcon(PI_HASTED);
