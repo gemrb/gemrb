@@ -133,7 +133,11 @@
 #define STR_STOPPED_FEAT    98
 #define STR_DISARM_DONE 99       //trap disarmed
 #define STR_DISARM_FAIL 100       //trap not disarmed
+#define STR_DOORBASH_DONE 101
+#define STR_DOORBASH_FAIL 102
+#define STR_CONTBASH_DONE 103
+#define STR_CONTBASH_FAIL 104
 
-#define STRREF_COUNT 101
+#define STRREF_COUNT 105
 
 #endif //! IE_STRINGS_H

@@ -314,7 +314,7 @@ public:
 	ieWord TrapDetectionDiff;
 	ieWord TrapRemovalDiff;
 	ieWord Trapped;
-	ieWord TrapDetected;	
+	ieWord TrapDetected;
 	ieResRef KeyResRef;
 public:
 	bool IsOver(Point &Pos);
@@ -477,6 +477,7 @@ public:
 	void SetPolygon(bool Open, Gem_Polygon* poly);
 	bool IsOpen() const;
 	void TryPickLock(Actor *actor);
+	void TryBashLock(Actor* actor) ;
 	void DebugDump();
 	bool TrapResets() { return Flags & DOOR_RESET; }
 };
@@ -498,6 +499,7 @@ public:
 	int WantDither();
 	bool IsOpen() const;
 	void TryPickLock(Actor *actor);
+	void TryBashLock(Actor* actor) ;
 	void DebugDump();
 	bool TrapResets() { return Flags & CONT_RESET; }
 private:

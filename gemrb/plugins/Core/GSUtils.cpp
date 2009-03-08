@@ -1164,7 +1164,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	ITMExtHeader *header;
 
 	unsigned int wrange = actor->GetWeapon(header, NULL) * 10;
-	if ( wrange == 0) {
+	if ( wrange == 0 ||target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
 		wrange = 10;
 	}
 
@@ -1187,16 +1187,33 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 		}
 	}
 	//action performed
-	actor->SetTarget( target );
+	if(target->Type == ST_ACTOR) {
+        actor->SetTarget( target );
+	}
 
 	if ( PersonalDistance(Sender, target) > wrange ) {
 		//we couldn't perform the action right now
 		//so we add it back to the queue with an additional movement
 		//increases refcount of Sender->CurrentAction, by pumping it back
 		//in the action queue
-		GoNearAndRetry(Sender, target, true, wrange);
+		//Forcing a lock does not launch the trap...
+		GoNearAndRetry(Sender, target, target->Type == ST_ACTOR, wrange);
 		Sender->ReleaseCurrentAction();
 		return;
+	} else if (target->Type == ST_DOOR) {
+	    Door* door = (Door*) target ;
+	    if(door->Flags & DOOR_LOCKED) {
+	        door->TryBashLock(actor) ;
+	    }
+	    Sender->ReleaseCurrentAction() ;
+        return ;
+	} else if (target->Type == ST_CONTAINER) {
+	    Container* cont = (Container*) target;
+	    if(cont->Flags & CONT_LOCKED) {
+	        cont->TryBashLock(actor) ;
+	    }
+	    Sender->ReleaseCurrentAction() ;
+        return ;
 	}
 	//it shouldn't be a problem to call this the second time (in case of attackreevaluate)
 	//because ReleaseCurrentAction() allows NULL

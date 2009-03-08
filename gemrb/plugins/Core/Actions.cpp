@@ -4516,7 +4516,8 @@ void GameScript::Attack( Scriptable* Sender, Action* parameters)
 	}
 
 	//feed Attack back to the queue
-	Sender->AddAction(parameters);
+	if(tar->Type == ST_ACTOR) //bashing doors/containers should be performed only once
+        Sender->AddAction(parameters);
 	AttackCore(Sender, tar, NULL, 0);
 }
 
