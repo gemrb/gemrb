@@ -1297,16 +1297,19 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the container back from the coordinates
 		TryToCast(actor, container->Pos);
+		//Do not reset target_mode, TryToCast does it for us!!
 		return;
 	}
 
 	if (target_mode == TARGET_MODE_ATTACK) {
 		TryToBash(actor, container);
+		target_mode = TARGET_MODE_NONE ;
 		return;
 	}
 
 	if ((target_mode == TARGET_MODE_PICK)) {
 		TryToPick(actor, container);
+		target_mode = TARGET_MODE_NONE;
 		return;
 	}
 
@@ -1329,11 +1332,13 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 
 	if (target_mode == TARGET_MODE_ATTACK) {
 		TryToBash(actor, door);
+		target_mode = TARGET_MODE_NONE ;
 		return;
 	}
 
 	if ( (target_mode == TARGET_MODE_PICK) || door->TrapDetected) {
 		TryToPick(actor, door);
+		target_mode = TARGET_MODE_NONE ;
 		return;
 	}
 
