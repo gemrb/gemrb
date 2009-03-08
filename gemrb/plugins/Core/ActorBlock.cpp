@@ -1505,7 +1505,7 @@ void Door::TryBashLock(Actor *actor)
     if((str == 18) && strEx) {
         int tableEx = gamedata->LoadTable("STREXMOD");
         TableMgr* tmEx = gamedata->GetTable(tableEx) ;
-        bonus += atoi(tmEx->QueryField(tm->GetRowName(str), "BEND_BARS_LIFT_GATES")) ;
+        bonus += atoi(tmEx->QueryField(tmEx->GetRowName(str), "BEND_BARS_LIFT_GATES")) ;
     }
 
     if(bonus < LockDifficulty) {
