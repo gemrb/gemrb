@@ -514,7 +514,7 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
     CharAnimations* anims = act->GetAnims();
     if (anims) {
         Animation* anim = anims->GetAnimation(IE_ANI_WALK, 0)[0];
-        if(anim) ; {
+        if(anim) {
             act->SetBase(IE_MOVEMENTRATE, anim->GetFrameCount()) ;
         }
     }
