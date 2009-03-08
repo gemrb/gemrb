@@ -394,31 +394,33 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		}
 	}
 	anims = new CharAnimations( AnimID&0xffff, BaseStats[IE_ARMOR_TYPE]);
-	if (anims) {
-		anims->SetOffhandRef(ShieldRef);
-		anims->SetHelmetRef(HelmetRef);
-		anims->SetWeaponRef(WeaponRef);
-
-		//if we have a recovery palette, then set it back
-		assert(anims->palette[PAL_MAIN] == 0);
-		anims->palette[PAL_MAIN] = recover;
-		if (recover) {
-			anims->lockPalette = true;
-		}
-		//bird animations are not hindered by searchmap
-		//only animtype==7 (bird) uses this feature
-		//this is a hardcoded hack, but works for all engine type
-		if (anims->GetAnimType()!=IE_ANI_BIRD) {
-			BaseStats[IE_DONOTJUMP]=0;
-		} else {
-			BaseStats[IE_DONOTJUMP]=DNJ_BIRD;
-		}
-		SetCircleSize();
-		anims->SetColors(BaseStats+IE_COLORS);
-	} else {
-		printMessage("Actor", " ",LIGHT_RED);
+	if(anims->ResRef[0] == 0) {
+        delete anims ;
+        anims = NULL ;
+        printMessage("Actor", " ",LIGHT_RED);
 		printf("Missing animation for %s\n",LongName);
-	}
+        return ;
+    }
+    anims->SetOffhandRef(ShieldRef);
+    anims->SetHelmetRef(HelmetRef);
+    anims->SetWeaponRef(WeaponRef);
+
+    //if we have a recovery palette, then set it back
+    assert(anims->palette[PAL_MAIN] == 0);
+    anims->palette[PAL_MAIN] = recover;
+    if (recover) {
+        anims->lockPalette = true;
+    }
+    //bird animations are not hindered by searchmap
+    //only animtype==7 (bird) uses this feature
+    //this is a hardcoded hack, but works for all engine type
+    if (anims->GetAnimType()!=IE_ANI_BIRD) {
+        BaseStats[IE_DONOTJUMP]=0;
+    } else {
+        BaseStats[IE_DONOTJUMP]=DNJ_BIRD;
+    }
+    SetCircleSize();
+    anims->SetColors(BaseStats+IE_COLORS);
 }
 
 CharAnimations* Actor::GetAnims()
@@ -3233,7 +3235,7 @@ void Actor::Draw(Region &screen)
 		// currently we don't have a real direction, but the orientation field
 		// could be used with higher granularity. When we need the face value
 		// it could be divided so it will become a 0-15 number.
-		// 
+		//
 
 		SpriteCover *sc = 0, *newsc = 0;
 		int blurx = cx;

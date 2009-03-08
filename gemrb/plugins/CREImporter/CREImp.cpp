@@ -509,7 +509,9 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 	//this is required so the actor has animation already
 	act->SetAnimationID( ( ieWord ) act->BaseStats[IE_ANIMATION_ID] );
 	//Speed is determined by the number of frames in each cycle of its animation
-    Animation* anim = act->GetAnims()->GetAnimation(IE_ANI_WALK, 0)[0];
+    CharAnimations* anims = act->GetAnims();
+    assert(anims) ;
+    Animation* anim = anims->GetAnimation(IE_ANI_WALK, 0)[0];
     assert(anim) ;
     act->SetBase(IE_MOVEMENTRATE, anim->GetFrameCount()) ;
 	// Setting up derived stats
