@@ -506,14 +506,18 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 	// Reading inventory, spellbook, etc
 	ReadInventory( act, Inventory_Size );
 
+	//default is 9 in Tob
+	act->SetBase(IE_MOVEMENTRATE,9) ;
 	//this is required so the actor has animation already
 	act->SetAnimationID( ( ieWord ) act->BaseStats[IE_ANIMATION_ID] );
 	//Speed is determined by the number of frames in each cycle of its animation
     CharAnimations* anims = act->GetAnims();
-    assert(anims) ;
-    Animation* anim = anims->GetAnimation(IE_ANI_WALK, 0)[0];
-    assert(anim) ;
-    act->SetBase(IE_MOVEMENTRATE, anim->GetFrameCount()) ;
+    if (anims) {
+        Animation* anim = anims->GetAnimation(IE_ANI_WALK, 0)[0];
+        if(anim) ; {
+            act->SetBase(IE_MOVEMENTRATE, anim->GetFrameCount()) ;
+        }
+    }
 	// Setting up derived stats
 	if (act->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		act->SetStance( IE_ANI_TWITCH );
