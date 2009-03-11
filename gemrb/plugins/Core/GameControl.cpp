@@ -118,6 +118,7 @@ GameControl::GameControl(void)
 	ieDword tmp=0;
 
 	target_mode = TARGET_MODE_NONE;
+	target_types = 0;
 
 	core->GetDictionary()->Lookup("Center",tmp);
 	if (tmp) {
