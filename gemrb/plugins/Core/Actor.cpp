@@ -395,11 +395,11 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	}
 	anims = new CharAnimations( AnimID&0xffff, BaseStats[IE_ARMOR_TYPE]);
 	if(anims->ResRef[0] == 0) {
-        delete anims ;
-        anims = NULL ;
-        printMessage("Actor", " ",LIGHT_RED);
+	delete anims ;
+	anims = NULL ;
+	printMessage("Actor", " ",LIGHT_RED);
 		printf("Missing animation for %s\n",LongName);
-        return ;
+	return ;
     }
     anims->SetOffhandRef(ShieldRef);
     anims->SetHelmetRef(HelmetRef);
@@ -409,15 +409,15 @@ void Actor::SetAnimationID(unsigned int AnimID)
     assert(anims->palette[PAL_MAIN] == 0);
     anims->palette[PAL_MAIN] = recover;
     if (recover) {
-        anims->lockPalette = true;
+	anims->lockPalette = true;
     }
     //bird animations are not hindered by searchmap
     //only animtype==7 (bird) uses this feature
     //this is a hardcoded hack, but works for all engine type
     if (anims->GetAnimType()!=IE_ANI_BIRD) {
-        BaseStats[IE_DONOTJUMP]=0;
+	BaseStats[IE_DONOTJUMP]=0;
     } else {
-        BaseStats[IE_DONOTJUMP]=DNJ_BIRD;
+	BaseStats[IE_DONOTJUMP]=DNJ_BIRD;
     }
     SetCircleSize();
     anims->SetColors(BaseStats+IE_COLORS);
@@ -588,7 +588,8 @@ void pcf_level (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		actor->BaseStats[IE_LEVELRANGER]+
 		actor->BaseStats[IE_LEVELSORCEROR];
 	actor->SetBase(IE_CLASSLEVELSUM,sum);
-	actor->SetupFist();
+	//this will be called anyway
+	//actor->SetupFist();
 }
 
 void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
@@ -4099,25 +4100,28 @@ void Actor::CreateDerivedStatsBG()
 	int classid = BaseStats[IE_CLASS];
 	int slot = 0;
 
-	for (i=0;i<11;i++) {
-		//this is not good for multiclassing yet
-		if ((1<<classid)&isclass[i]) {
-			BaseStats[levelslots[i]]=levels[slot];
-			slot++;
+	//this works only for PC classes
+	if (classid<32) {
+		for (i=0;i<11;i++) {
+			//this is not good for multiclassing yet
+			if ((1<<classid)&isclass[i]) {
+				BaseStats[levelslots[i]]=levels[slot];
+				slot++;
+			}
 		}
-	}
-	//recalculate all level based changes
-	pcf_level(this,0,0);
+		//recalculate all level based changes
+		pcf_level(this,0,0);
 
-	if (isclass[ISCLERIC]&(1<<classid)) {
-		turnundeadlevel = BaseStats[IE_LEVELCLERIC]+1-turnlevels[classid];
-		if (turnundeadlevel<0) turnundeadlevel=0;
-	}
-	else if (isclass[ISPALADIN]&(1<<classid)) {
-		turnundeadlevel = BaseStats[IE_LEVELPALADIN]+1-turnlevels[classid];
-		if (turnundeadlevel<0) turnundeadlevel=0;
-	} else {
-		turnundeadlevel = 0;
+		if (isclass[ISCLERIC]&(1<<classid)) {
+			turnundeadlevel = BaseStats[IE_LEVELCLERIC]+1-turnlevels[classid];
+			if (turnundeadlevel<0) turnundeadlevel=0;
+		}
+		else if (isclass[ISPALADIN]&(1<<classid)) {
+			turnundeadlevel = BaseStats[IE_LEVELPALADIN]+1-turnlevels[classid];
+			if (turnundeadlevel<0) turnundeadlevel=0;
+		} else {
+			turnundeadlevel = 0;
+		}
 	}
 
 	ieDword backstabdamagemultiplier=BaseStats[IE_LEVELTHIEF];
@@ -4158,11 +4162,11 @@ void Actor::CreateDerivedStatsIWD2()
 
 void Actor::CreateDerivedStats()
 {
-        if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
-                CreateDerivedStatsIWD2();
-        } else {
-                CreateDerivedStatsBG();
-        }
+	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+		CreateDerivedStatsIWD2();
+	} else {
+		CreateDerivedStatsBG();
+	}
 	AutoTable tm("classes");
 	if (tm) {
 		// currently we need only the MULTI value
