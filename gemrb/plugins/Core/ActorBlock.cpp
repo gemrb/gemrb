@@ -1496,28 +1496,22 @@ void Door::TryPickLock(Actor *actor)
 
 void Door::TryBashLock(Actor *actor)
 {
-     //Get the strength bonus agains lock difficulty
-    int str = actor->GetStat(IE_STR) ;
-    int strEx = actor->GetStat(IE_STREXTRA) ;
-    int table = gamedata->LoadTable("STRMOD");
-    TableMgr* tm = gamedata->GetTable(table) ;
-    unsigned int bonus = atoi(tm->QueryField(tm->GetRowName(str), "BEND_BARS_LIFT_GATES")) ;
-    if((str == 18) && strEx) {
-        int tableEx = gamedata->LoadTable("STREXMOD");
-        TableMgr* tmEx = gamedata->GetTable(tableEx) ;
-        bonus += atoi(tmEx->QueryField(tmEx->GetRowName(str), "BEND_BARS_LIFT_GATES")) ;
-    }
+	//Get the strength bonus agains lock difficulty
+	int str = actor->GetStat(IE_STR);
+	int strEx = actor->GetStat(IE_STREXTRA);
+	unsigned int bonus = core->GetStrengthBonus(2, str, strEx); //BEND_BARS_LIFT_GATES
 
-    if(bonus < LockDifficulty) {
-        core->DisplayConstantStringName(STR_DOORBASH_FAIL, 0xbcefbc, actor);
-        return ;
-    }
+	//bonus will never reach 100
+	if(bonus < LockDifficulty) {
+		core->DisplayConstantStringName(STR_DOORBASH_FAIL, 0xbcefbc, actor);
+		return;
+	}
 
-    core->DisplayConstantStringName(STR_DOORBASH_DONE, 0xd7d7be, actor);
-    SetDoorLocked(false, true) ;
-    //Is this really useful ?
-    LastUnlocked = actor->GetID();
-    ImmediateEvent();
+	core->DisplayConstantStringName(STR_DOORBASH_DONE, 0xd7d7be, actor);
+	SetDoorLocked(false, true);
+	//Is this really useful ?
+	LastUnlocked = actor->GetID();
+	ImmediateEvent();
 }
 
 void Door::DebugDump()
@@ -1922,28 +1916,22 @@ void Container::TryPickLock(Actor *actor)
 
 void Container::TryBashLock(Actor *actor)
 {
-    //Get the strength bonus agains lock difficulty
-    int str = actor->GetStat(IE_STR) ;
-    int strEx = actor->GetStat(IE_STREXTRA) ;
-    int table = gamedata->LoadTable("STRMOD");
-    TableMgr* tm = gamedata->GetTable(table) ;
-    int bonus = atoi(tm->QueryField(tm->GetRowName(str), "BEND_BARS_LIFT_GATES")) ;
-    if((str == 18) && strEx) {
-        int tableEx = gamedata->LoadTable("STREXMOD");
-        TableMgr* tmEx = gamedata->GetTable(tableEx) ;
-        bonus += atoi(tmEx->QueryField(tmEx->GetRowName(str), "BEND_BARS_LIFT_GATES")) ;
-    }
-    //bonus will never reach 100
-    if(bonus < LockDifficulty) {
-        core->DisplayConstantStringName(STR_CONTBASH_FAIL, 0xbcefbc, actor);
-        return ;
-    }
+	//Get the strength bonus agains lock difficulty
+	int str = actor->GetStat(IE_STR);
+	int strEx = actor->GetStat(IE_STREXTRA);
+	unsigned int bonus = core->GetStrengthBonus(2, str, strEx); //BEND_BARS_LIFT_GATES
 
-    core->DisplayConstantStringName(STR_CONTBASH_DONE, 0xd7d7be, actor);
-    SetContainerLocked(false) ;
-    //Is this really useful ?
-    LastUnlocked = actor->GetID();
-    ImmediateEvent();
+	//bonus will never reach 100
+	if(bonus < LockDifficulty) {
+		core->DisplayConstantStringName(STR_CONTBASH_FAIL, 0xbcefbc, actor);
+		return;
+	}
+
+	core->DisplayConstantStringName(STR_CONTBASH_DONE, 0xd7d7be, actor);
+	SetContainerLocked(false);
+	//Is this really useful ?
+	LastUnlocked = actor->GetID();
+	ImmediateEvent();
 }
 
 void Container::DebugDump()
