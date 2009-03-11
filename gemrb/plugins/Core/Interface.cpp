@@ -323,9 +323,6 @@ Interface::~Interface(void)
 	CharAnimations::ReleaseMemory();
 	delete CurrentStore;
 
-	gamedata->ClearCaches();
-	delete gamedata; gamedata = 0;
-
 	FreeResRefTable(DefSound, DSCount);
 
 	free( slottypes );
@@ -394,8 +391,6 @@ Interface::~Interface(void)
 		video->SetDragCursor(NULL);
 	}
 
-	FreeInterface( video );
-
 	delete evntmgr;
 
 	FreeInterface( guiscript );
@@ -439,6 +434,11 @@ Interface::~Interface(void)
 	Map::ReleaseMemory();
 	GameScript::ReleaseMemory();
 	Actor::ReleaseMemory();
+
+	gamedata->ClearCaches();
+	delete gamedata;
+	gamedata = NULL;
+	FreeInterface( video );
 
 	FreeInterface( strings );
 
@@ -4393,6 +4393,7 @@ WorldMapArray *Interface::NewWorldMapArray(int count)
 
 Container *Interface::GetCurrentContainer()
 {
+	printf("GetCurrentContainer\n");
 	return CurrentContainer;
 }
 
@@ -4402,6 +4403,7 @@ int Interface::CloseCurrentContainer()
 	if ( !CurrentContainer) {
 		return -1;
 	}
+	printf("CloseCurrentContainer\n");
 	//remove empty ground piles on closeup
 	CurrentContainer->GetCurrentArea()->TMap->CleanupContainer(CurrentContainer);
 	CurrentContainer = NULL;
@@ -4412,9 +4414,11 @@ void Interface::SetCurrentContainer(Actor *actor, Container *arg, bool flag)
 {
 	//abort action if the first selected PC isn't the original actor
 	if (actor!=GetFirstSelectedPC(false)) {
+	printf("SetCurrentContainer failed\n");
 		CurrentContainer = NULL;
 		return;
 	}
+	printf("SetCurrentContainer done\n");
 	CurrentContainer = arg;
 	UseContainer = flag;
 }

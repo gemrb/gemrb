@@ -80,6 +80,7 @@ GameData::GameData()
 GameData::~GameData()
 {
 	FreeInterfaceVector( Table, tables, tm );
+	delete factory;
 }
 
 void GameData::ClearCaches()
