@@ -143,9 +143,11 @@ bool KeyImp::LoadResFile(const char* resfile)
 					if (dirname) {
 						strncpy( tmpPath, dirname, sizeof(tmpPath) );
 						FixPath( tmpPath, 1);
+						free( dirname );
 						break;
 					}
 				}
+				//dirname cannot be used at this point, it was freed above
 				if (!dirname) {
 					strncpy( tmpPath, be.name, ( ptr + 1 ) - be.name );
 				}
