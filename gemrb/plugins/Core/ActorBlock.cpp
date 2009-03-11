@@ -1946,4 +1946,5 @@ void Container::DebugDump()
 		name = Scripts[0]->GetName();
 	}
 	printf( "Script: %s, Key: %s\n", name, KeyResRef );
+	inventory.dump();
 }
