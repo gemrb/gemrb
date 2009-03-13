@@ -1766,7 +1766,7 @@ void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
 	if (tar->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
+	Actor* actor = ( Actor* ) tar;
 	actor->SetStance( parameters->int0Parameter );
 }
 
