@@ -2459,7 +2459,7 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	}
 
 	//face target
-	if (Sender->type==ST_ACTOR) {
+	if (Sender->Type==ST_ACTOR) {
 		Actor *actor = (Actor *) Sender;
 		if (tar != Sender) {
 			actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
@@ -2493,7 +2493,7 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 	}
 
 	//face target
-	if (Sender->type==ST_ACTOR) {
+	if (Sender->Type==ST_ACTOR) {
 		Actor *actor = (Actor *) Sender;
 		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
 	}
