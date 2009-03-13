@@ -4393,7 +4393,6 @@ WorldMapArray *Interface::NewWorldMapArray(int count)
 
 Container *Interface::GetCurrentContainer()
 {
-	printf("GetCurrentContainer\n");
 	return CurrentContainer;
 }
 
@@ -4403,7 +4402,6 @@ int Interface::CloseCurrentContainer()
 	if ( !CurrentContainer) {
 		return -1;
 	}
-	printf("CloseCurrentContainer\n");
 	//remove empty ground piles on closeup
 	CurrentContainer->GetCurrentArea()->TMap->CleanupContainer(CurrentContainer);
 	CurrentContainer = NULL;
@@ -4414,11 +4412,9 @@ void Interface::SetCurrentContainer(Actor *actor, Container *arg, bool flag)
 {
 	//abort action if the first selected PC isn't the original actor
 	if (actor!=GetFirstSelectedPC(false)) {
-	printf("SetCurrentContainer failed\n");
 		CurrentContainer = NULL;
 		return;
 	}
-	printf("SetCurrentContainer done\n");
 	CurrentContainer = arg;
 	UseContainer = flag;
 }
