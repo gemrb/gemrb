@@ -1419,7 +1419,7 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
+	if (!tar && tar->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1462,7 +1462,7 @@ void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!target) {
+	if (!target && target->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2221,7 +2221,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 			core->PlaySound(DS_CLOSE_FAIL);
 		} else {
 			Actor *actor = (Actor *) Sender;
-	actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
+			actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 			door->SetDoorOpen( false, true, actor->GetID() );
 		}
 	} else {
@@ -2295,10 +2295,12 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	//set target
-	Actor *actor = (Actor *) Sender;
-	if (tar != Sender) {
-		actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+	//face target
+	if (Sender->Type==ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		if (tar != Sender) {
+			actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+		}
 	}
 	Sender->CastSpell( spellres, tar, true );
 
@@ -2339,9 +2341,12 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	//set target
-	Actor *actor = (Actor *) Sender;
-	actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
+	//face target
+	if (Sender->Type==ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
+	}
+
 	Sender->CastSpellPoint( spellres, parameters->pointParameter, true );
 
 	//if target was set, feed action back
@@ -2377,10 +2382,12 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//set target
-	Actor *actor = (Actor *) Sender;
-	if (tar != Sender) {
-		actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+	//face target
+	if (Sender->Type==ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		if (tar != Sender) {
+			actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+		}
 	}
 	Sender->CastSpell( spellres, tar, false );
 
@@ -2410,9 +2417,12 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//set target
-	Actor *actor = (Actor *) Sender;
-	actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
+	//face target
+	if (Sender->Type==ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
+	}
+
 	Sender->CastSpellPoint( spellres, parameters->pointParameter, false );
 
 	//if target was set, feed action back
@@ -2448,10 +2458,12 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//set target
-	Actor *actor = (Actor *) Sender;
-	if (tar != Sender) {
-		actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+	//face target
+	if (Sender->type==ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		if (tar != Sender) {
+			actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+		}
 	}
 	Sender->CastSpell (spellres, tar, false);
 
@@ -2480,9 +2492,12 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//set target
-	Actor *actor = (Actor *) Sender;
-	actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
+	//face target
+	if (Sender->type==ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
+	}
+
 	Sender->CastSpellPoint (spellres, parameters->pointParameter, false);
 
 	//if target was set, feed action back
