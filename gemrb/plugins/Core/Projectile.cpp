@@ -590,8 +590,6 @@ void Projectile::DrawTravel(Region &screen)
 	}
 
 	if (light) {
-		//FIXME: wallgroup cover for light is not rendered correctly
-		//it is not a BAM sprite, we need a conversion?
 		video->BlitGameSprite( light, pos.x, pos.y, 0, tint, NULL, NULL, &screen);
 	}
 
