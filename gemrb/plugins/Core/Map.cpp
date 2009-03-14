@@ -206,10 +206,10 @@ void AddLOS(int destx, int desty, int slot)
 {
 	for (int i=0;i<MaxVisibility;i++) {
 		int x=(destx*i+MaxVisibility/2)/MaxVisibility*16;
-		int y=(desty*i+MaxVisibility/2)/MaxVisibility*16;
+		int y=(desty*i+MaxVisibility/2)/MaxVisibility*12;
 		if (LargeFog) {
 			x += 16;
-			y += 16;
+			y += 12;
 		}
 		VisibilityMasks[i][slot].x=(short) x;
 		VisibilityMasks[i][slot].y=(short) y;
