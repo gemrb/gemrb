@@ -1164,7 +1164,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	ITMExtHeader *header;
 
 	unsigned int wrange = actor->GetWeapon(header, NULL) * 10;
-	if ( wrange == 0 ||target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
+	if ( target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
 		wrange = 10;
 	}
 
@@ -1189,6 +1189,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	//action performed
 	if(target->Type == ST_ACTOR) {
         actor->SetTarget( target );
+        wrange += ((Actor*)target)->size*5 ;
 	}
 
 	if ( PersonalDistance(Sender, target) > wrange ) {
