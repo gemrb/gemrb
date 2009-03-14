@@ -2409,7 +2409,6 @@ void Map::ExploreMapChunk(Point &Pos, int range, int los)
 	while (p--) {
 		int Pass = 2;
 		bool block = false;
-		bool sidewall = false;
 		for (int i=0;i<range;i++) {
 			Tile.x = Pos.x+VisibilityMasks[i][p].x;
 			Tile.y = Pos.y+VisibilityMasks[i][p].y;
@@ -2420,8 +2419,8 @@ void Map::ExploreMapChunk(Point &Pos, int range, int los)
 					if (type & PATH_MAP_NO_SEE) {
 						block=true;
 					} else if (type & PATH_MAP_SIDEWALL) {
-						sidewall=true;
-					} else if (sidewall) block=true;
+						if(Distance(Pos, Tile)>=48) break;
+					}
 				}
 				if (block) {
 					Pass--;
@@ -2443,15 +2442,12 @@ void Map::UpdateFog()
 	SetMapVisibility( 0 );
 	for (unsigned int e = 0; e<actors.size(); e++) {
 		Actor *actor = actors[e];
-		Point head;
-		head.x=actor->Pos.x-100;//So we're above the walls
-		head.y=actor->Pos.y;
 		if (!actor->Modified[ IE_EXPLORE ] ) continue;
 		int state = actor->Modified[IE_STATE_ID];
 		if (state & STATE_CANTSEE) continue;
 		int vis2 = actor->Modified[IE_VISUALRANGE];
 		if ((state&STATE_BLIND) || (vis2<2)) vis2=2; //can see only themselves
-		ExploreMapChunk (head, vis2, 1);
+		ExploreMapChunk (actor->Pos, vis2, 1);
 		Spawn *sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
 		if (sp) {
 			TriggerSpawn(sp);
