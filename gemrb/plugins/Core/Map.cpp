@@ -2443,12 +2443,15 @@ void Map::UpdateFog()
 	SetMapVisibility( 0 );
 	for (unsigned int e = 0; e<actors.size(); e++) {
 		Actor *actor = actors[e];
+		Point head;
+		head.x=actor->Pos.x-100;//So we're above the walls
+		head.y=actor->Pos.y;
 		if (!actor->Modified[ IE_EXPLORE ] ) continue;
 		int state = actor->Modified[IE_STATE_ID];
 		if (state & STATE_CANTSEE) continue;
 		int vis2 = actor->Modified[IE_VISUALRANGE];
 		if ((state&STATE_BLIND) || (vis2<2)) vis2=2; //can see only themselves
-		ExploreMapChunk (actor->Pos, vis2, 1);
+		ExploreMapChunk (head, vis2, 1);
 		Spawn *sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
 		if (sp) {
 			TriggerSpawn(sp);
