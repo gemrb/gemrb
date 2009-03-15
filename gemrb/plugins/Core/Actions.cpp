@@ -5714,7 +5714,7 @@ void GameScript::ChangeAIType(Scriptable* Sender, Action* parameters)
 			continue;
 		}
 		if (!strnicmp(ObjectIDSTableNames[i],"class",8)) {
-			scr->SetBase(IE_RACE, val);
+			scr->SetBase(IE_CLASS, val);
 			continue;
 		}
 		if (!strnicmp(ObjectIDSTableNames[i],"gender",8)) {
