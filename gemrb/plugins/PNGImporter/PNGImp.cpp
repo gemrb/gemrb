@@ -19,7 +19,7 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "../../includes/globals.h"
 #include "PNGImp.h"
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"
