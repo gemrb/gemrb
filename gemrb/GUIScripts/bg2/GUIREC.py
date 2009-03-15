@@ -246,7 +246,7 @@ def UpdateRecordsWindow ():
 
 	# race
 	Table = GemRB.LoadTableObject ("races")
-	text = Table.GetValue (GemRB.GetPlayerStat (pc, IE_RACE) - 1, 0)
+	text = Table.GetValue (Table.FindValue (3, GemRB.GetPlayerStat (pc, IE_RACE)) , 0)
 
 	Label = Window.GetControl (0x1000000f)
 	Label.SetText (text)
