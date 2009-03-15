@@ -75,7 +75,8 @@ def FinishCharGen():
 		for j in classes:
 			AddClassAbilities (MyChar, "CLAB"+j)
 	else:
-		AddClassAbilities (MyChar, ABTable)
+		if ABTable != "*":
+			AddClassAbilities (MyChar, ABTable)
 
 	# Lay on hands, turn undead and backstab multiplier get set by the core
 
