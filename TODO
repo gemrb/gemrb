@@ -6,6 +6,7 @@ Combat:
 1. fix combat round timings
 2. implement customisable combat calculation, it should be general enough to
 simulate all games, without any hardcoded parts
+3. implement wspatck.2da and wspecial.2da handling
 
 Items:
 6. (PARTLY) Break items, count charges
@@ -95,6 +96,9 @@ Documentation:
    copyright notices
 3. Add Doxygen doc comments to more objects
 4. Write GemRB overview, structure and high-level flow docs
+5. (PARTLY) Automate the wikification of guiscript docs
+6. Update guiscript docs with metaclass info
+7. Add missing guiscript function docs
 
 
 Community:
