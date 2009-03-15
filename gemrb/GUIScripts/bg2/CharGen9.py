@@ -75,7 +75,7 @@ def FinishCharGen():
 		for j in classes:
 			AddClassAbilities (MyChar, "CLAB"+j)
 	else:
-		if ABTable != "*":
+		if ABTable != "*" and ABTable[:6] != "CLABMA": # mage kits specify ability tables which don't exist
 			AddClassAbilities (MyChar, ABTable)
 
 	# Lay on hands, turn undead and backstab multiplier get set by the core
