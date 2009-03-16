@@ -19,7 +19,7 @@ Effects:
 3. (PARTLY) Implement IWD2 effects
 4. (DONE-almost) Implement TOB effects
 5. (PARTLY) Implement PST effects
-6. Implement area/non-living affecting effects 
+6. (PARTLY) Implement area/non-living affecting effects 
 
 Area:
 2. (PARTLY) Don't load scripts for pile items? (research when a script is unused)
@@ -65,7 +65,8 @@ General:
    right after loading config files and remain static afterwards. Maybe define 
    some PATH variable describing all the directories searched for files
 4. valgrind reports a big heap of unreleased python objects
-
+5. Implement at least all the options accessible from the GUI options setup,
+   rewrite baldur|torment|icewind.ini
 
 Graphics:
 1. use scaling in Video::SpriteScaleDown() instead of in Video::GetPreview() 
