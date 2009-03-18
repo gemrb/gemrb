@@ -24,6 +24,9 @@
 #include "2DAImp.h"
 #include "../Core/FileStream.h"
 
+#define MAXLENGTH 4096      //if a 2da has longer lines, change this
+#define SIGNLENGTH 256      //if a 2da has longer default value, change this
+
 p2DAImp::p2DAImp(void)
 {
 	str = NULL;
@@ -50,7 +53,7 @@ bool p2DAImp::Open(DataStream* stream, bool autoFree)
 	}
 	str = stream;
 	this->autoFree = autoFree;
-	char Signature[256];
+	char Signature[SIGNLENGTH];
 	str->CheckEncrypted();
 
 	str->ReadLine( Signature, sizeof(Signature) );
@@ -68,8 +71,8 @@ bool p2DAImp::Open(DataStream* stream, bool autoFree)
 	bool colHead = true;
 	int row = 0;
 	while (true) {
-		char* line = ( char* ) malloc( 1024 );
-		int len = str->ReadLine( line, 1023 );
+		char* line = ( char* ) malloc( MAXLENGTH );
+		int len = str->ReadLine( line, MAXLENGTH-1 );
 		if (len <= 0) {
 			free( line );
 			break;
@@ -78,7 +81,7 @@ bool p2DAImp::Open(DataStream* stream, bool autoFree)
 			free( line );
 			continue;
 		}
-		if (len < 1024)
+		if (len < MAXLENGTH)
 			line = ( char * ) realloc( line, len + 1 );
 		ptrs.push_back( line );
 		if (colHead) {
