@@ -712,6 +712,7 @@ void CREImp::GetActorPST(Actor *act)
 	act->BaseStats[IE_GENERAL]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_RACE]=tmpByte;
+	act->Modified[IE_RACE]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_CLASS]=tmpByte;
 	str->Read( &tmpByte, 1 );
@@ -1120,6 +1121,7 @@ void CREImp::GetActorBG(Actor *act)
 	act->BaseStats[IE_GENERAL]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_RACE]=tmpByte;
+	act->Modified[IE_RACE]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_CLASS]=tmpByte;
 	str->Read( &tmpByte, 1);
@@ -1360,6 +1362,7 @@ void CREImp::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_GENERAL]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_RACE]=tmpByte;
+	act->Modified[IE_RACE]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_CLASS]=tmpByte;
 	str->Read( &tmpByte, 1);
@@ -1587,6 +1590,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	act->BaseStats[IE_GENERAL] = tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_RACE] = tmpByte;
+	act->Modified[IE_RACE]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_CLASS] = tmpByte;
 	str->Read( &tmpByte, 1);
