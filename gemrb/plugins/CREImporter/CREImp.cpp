@@ -511,13 +511,13 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 	//this is required so the actor has animation already
 	act->SetAnimationID( ( ieWord ) act->BaseStats[IE_ANIMATION_ID] );
 	//Speed is determined by the number of frames in each cycle of its animation
-    CharAnimations* anims = act->GetAnims();
-    if (anims) {
-        Animation* anim = anims->GetAnimation(IE_ANI_WALK, 0)[0];
-        if(anim) {
-            act->SetBase(IE_MOVEMENTRATE, anim->GetFrameCount()) ;
-        }
-    }
+	CharAnimations* anims = act->GetAnims();
+	if (anims) {
+		Animation* anim = anims->GetAnimation(IE_ANI_WALK, 0)[0];
+		if(anim) {
+			act->SetBase(IE_MOVEMENTRATE, anim->GetFrameCount()) ;
+		}
+	}
 	// Setting up derived stats
 	if (act->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		act->SetStance( IE_ANI_TWITCH );
@@ -535,6 +535,10 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 	}
 	act->inventory.CalculateWeight();
 	act->CreateDerivedStats();
+	//do this after created derived stats
+	act->SetupFist();
+	//initial setup
+	memcpy(act->Modified,act->BaseStats, sizeof(act->Modified));
 	return act;
 }
 
@@ -712,7 +716,6 @@ void CREImp::GetActorPST(Actor *act)
 	act->BaseStats[IE_GENERAL]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_RACE]=tmpByte;
-	act->Modified[IE_RACE]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_CLASS]=tmpByte;
 	str->Read( &tmpByte, 1 );
@@ -741,8 +744,6 @@ void CREImp::GetActorPST(Actor *act)
 	str->ReadDword( &ItemsCount );
 	str->ReadDword( &EffectsOffset );
 	str->ReadDword( &EffectsCount ); //also variables
-
-	//str->ReadResRef( act->Dialog );
 }
 
 void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
@@ -759,7 +760,6 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	act->inventory.SetSlotCount(Inventory_Size+1);
 
 	str->Seek( ItemSlotsOffset+CREOffset, GEM_STREAM_START );
-	act->SetupFist();
 
 	for (i = 1; i <= Inventory_Size; i++) {
 		int Slot = core->QuerySlot( i );
@@ -1121,7 +1121,6 @@ void CREImp::GetActorBG(Actor *act)
 	act->BaseStats[IE_GENERAL]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_RACE]=tmpByte;
-	act->Modified[IE_RACE]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_CLASS]=tmpByte;
 	str->Read( &tmpByte, 1);
@@ -1362,7 +1361,6 @@ void CREImp::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_GENERAL]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_RACE]=tmpByte;
-	act->Modified[IE_RACE]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_CLASS]=tmpByte;
 	str->Read( &tmpByte, 1);
@@ -1590,7 +1588,6 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	act->BaseStats[IE_GENERAL] = tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_RACE] = tmpByte;
-	act->Modified[IE_RACE]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_CLASS] = tmpByte;
 	str->Read( &tmpByte, 1);
