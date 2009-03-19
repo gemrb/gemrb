@@ -24,7 +24,7 @@ def FinishCharGen():
 	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
 	KitTable = GemRB.LoadTableObject ("kitlist")
 	RaceTable = GemRB.LoadTableObject ("races")
-	Race = GemRB.GetVar ("Race")-1
+	Race = GemRB.GetVar ("Race")-1 # the row number in the races table
 	GemRB.SetPlayerStat (MyChar, IE_RACE, RaceTable.GetValue (Race, 3) )
 	t = GemRB.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)

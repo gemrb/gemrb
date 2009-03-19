@@ -887,7 +887,7 @@ def CanDualClass(actor):
 	for stat in range(6):
 		minimum = StatTable.GetValue (ClassStatIndex, stat)
 		name = StatTable.GetColumnName (stat)
-		if GemRB.GetPlayerStat (actor, locals()["IE_" + name[4:]]) < minimum:
+		if GemRB.GetPlayerStat (actor, eval("IE_" + name[4:])) < minimum:
 			return 1
 
 	# check new class' stat limitations - make sure there are any good class choices
@@ -897,7 +897,7 @@ def CanDualClass(actor):
 		for stat in range(6):
 			minimum = StatTable.GetValue (ClassStatIndex, stat)
 			name = StatTable.GetColumnName (stat)
-			if GemRB.GetPlayerStat (actor, locals()["IE_" + name[4:]]) < minimum:
+			if GemRB.GetPlayerStat (actor, eval("IE_" + name[4:])) < minimum:
 				matches.remove(match)
 				break
 	if len(matches) == 0:

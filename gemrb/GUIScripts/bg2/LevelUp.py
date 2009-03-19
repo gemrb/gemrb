@@ -388,7 +388,7 @@ def LevelUpInfoPress():
 	if InfoCounter % 2:
 		pc = GemRB.GameGetSelectedPCSingle ()
 		# call GetStatOverview with the new levels, so the future overview is shown
-		# TODO: also take in effect the current prof and skill selection
+		# TODO: show only xp, levels, thac0, #att, lore, reputation, backstab, saving throws
 		TextAreaControl.SetText(GetStatOverview(pc, LevelDiff))
 	else:
 		TextAreaControl.SetText(GetLevelUpNews())
