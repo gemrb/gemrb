@@ -39,17 +39,16 @@ WorldMapControl::WorldMapControl(const char *font, int direction)
 	Changed = true;
 	Area = NULL;
 	Value = direction;
+	Game* game = core->GetGame();
+	WorldMap* worldmap = core->GetWorldMap();
+	strncpy(currentArea, game->CurrentArea, 8);
+	int entry = core->GetAreaAlias(currentArea);
+	if (entry >= 0) {
+		WMPAreaEntry *m = worldmap->GetEntry(entry);
+		strncpy(currentArea, m->AreaResRef, 8);
+	}
+
 	if (Value!=(ieDword) -1) {
-		Game* game = core->GetGame();
-		WorldMap* worldmap = core->GetWorldMap();
-		strncpy(currentArea, game->CurrentArea, 8);
-		printf("CurrentArea:  %s\n",currentArea);
-		int entry = core->GetAreaAlias(currentArea);
-		if (entry >= 0) {
-			WMPAreaEntry *m = worldmap->GetEntry(entry);
-			strncpy(currentArea, m->AreaResRef, 8);
-		}
-		printf("CurrentArea NEW:  %s\n",currentArea);
 		worldmap->CalculateDistances(currentArea, Value);
 	}
 	
