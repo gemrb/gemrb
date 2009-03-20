@@ -208,8 +208,8 @@ private: // Private attributes
 	double Clipping;
 	Point drag_start;
 	/** HP Bar over portraits */
-	Color SourceRGB, DestRGB;
 	unsigned long starttime;
+	Color SourceRGB, DestRGB;
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];
 	bool IsPixelTransparent (unsigned short x, unsigned short y);
