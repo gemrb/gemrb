@@ -510,14 +510,9 @@ def DeathWindowEnd ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "QuitPress")
 
 	GemRB.HideGUI ()
-	GemRB.SetVar ("OptionsWindow", -1)
-	GemRB.SetVar ("PortraitWindow", -1)
 	GemRB.SetVar ("MessageWindow", -1)
-	GemRB.SetVar ("ActionsWindow", Window.ID)
 	GemRB.UnhideGUI ()
-	#making the playing field gray
-	GemRB.SetVisible (0,2)
-	#destructing the game object
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def QuitPress():
