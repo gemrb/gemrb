@@ -486,14 +486,8 @@ def DeathWindowEnd ():
 
 	GemRB.HideGUI ()
 	GemRB.SetVar ("MessageWindow", -1)
-	GemRB.SetVar ("ActionsWindow", Window.ID)
 	GemRB.UnhideGUI ()
-	#making the playing field gray
-	GemRB.SetVisible (0,2)
-	Window = GWindow( GemRB.GetVar ("PortraitWindow") )
-	Window.SetVisible (2)
-	Window = GWindow( GemRB.GetVar ("OptionsWindow") )
-	Window.SetVisible (2)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def QuitPress():
