@@ -970,7 +970,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		case BD_SOURCE:
 		case BD_TARGET:
 			if (swap) Dialog = scr->GetDialog();
-			else Dialog = target->GetDialog(true);
+			else Dialog = target->GetDialog(GD_FEEDBACK);
 			break;
 		case BD_RESERVED:
 			//what if playerdialog was initiated from Player2?

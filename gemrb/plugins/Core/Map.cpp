@@ -1304,7 +1304,9 @@ Actor* Map::GetActorByDialog(const char *resref)
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
-		if (strnicmp( actor->GetDialog(false), resref, 8 ) == 0) {
+		//if a busy or hostile actor shouldn't be found
+		//set this to GD_CHECK
+		if (strnicmp( actor->GetDialog(GD_NORMAL), resref, 8 ) == 0) {
 			return actor;
 		}
 	}

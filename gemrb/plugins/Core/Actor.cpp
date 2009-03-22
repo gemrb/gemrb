@@ -2487,9 +2487,9 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 	return LSR_OK;
 }
 
-const char *Actor::GetDialog(bool checks) const
+const char *Actor::GetDialog(int flags) const
 {
-	if (!checks) {
+	if (!flags) {
 		return Dialog;
 	}
 	if (Modified[IE_EA]>=EA_EVILCUTOFF) {
@@ -2497,7 +2497,9 @@ const char *Actor::GetDialog(bool checks) const
 	}
 
 	if ( (InternalFlags & IF_NOINT) && CurrentAction) {
-		core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+		if (flags>1) {
+			core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+		}
 		return NULL;
 	}
 	return Dialog;

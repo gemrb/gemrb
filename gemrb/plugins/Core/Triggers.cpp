@@ -233,6 +233,13 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	if (pc->globalID == gc->targetID || pc->globalID==gc->speakerID) {
 		return 0;
 	}
+
+	//don't accept parties with the no interrupt flag
+	//this fixes bug #2573808 on gamescript level
+        //(still someone has to turn the no interrupt flag off)
+	if(!pc->GetDialog(GD_CHECK)) {
+		return 0;
+	}
 	return CanSee( Sender, target, false, GA_NO_DEAD );
 }
 

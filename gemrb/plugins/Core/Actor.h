@@ -83,6 +83,11 @@ class ScriptedAnimation;
 #define AA_PLAYONCE    1
 #define AA_BLEND       2
 
+//GetDialog flags
+#define GD_NORMAL      0
+#define GD_CHECK       1
+#define GD_FEEDBACK    2 //(also check)
+
 /** flags for GetActor */
 //default action
 #define GA_DEFAULT  0
@@ -334,7 +339,7 @@ public:
 	ieDword GetXPLevel(int modified) const;
 
 	/** Gets the Dialog ResRef */
-	const char* GetDialog(bool checks=false) const;
+	const char* GetDialog(int flags=GD_NORMAL) const;
 	/** Gets the Portrait ResRef */
 	const char* GetPortrait(int which) const
 	{
