@@ -384,11 +384,6 @@ def RemovePlayer ():
 	return
 
 def RemovePlayerConfirm ():
-	global ReformPartyWindow
-
-	hideflag = GemRB.HideGUI ()
-	if hideflag:
-		GemRB.UnhideGUI ()
 	slot = GemRB.GetVar("Selected")
 	if GemRB.GetPlayerStat(slot, IE_HITPOINTS) > 0:
                 GemRB.ExecuteString("Dialogue([PC])", slot)
@@ -397,11 +392,9 @@ def RemovePlayerConfirm ():
 	return
 
 def RemovePlayerCancel ():
-	global ReformPartyWindow
-
-	hideflag = GemRB.HideGUI ()
-	if hideflag:
-		GemRB.UnhideGUI ()
+	#Once for getting rid of the confirmation window
+	OpenReformPartyWindow ()
+	#and once for reopening the reform party window
 	OpenReformPartyWindow ()
 	return
 
