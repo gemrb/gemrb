@@ -387,11 +387,6 @@ def RemovePlayerConfirm ():
 	global ReformPartyWindow
 
 	hideflag = GemRB.HideGUI ()
-	if ReformPartyWindow:
-		ReformPartyWindow.Unload ()
-	GemRB.SetVar ("OtherWindow", -1)
-	#removing selected player
-	ReformPartyWindow = None
 	if hideflag:
 		GemRB.UnhideGUI ()
 	GemRB.LeaveParty (GemRB.GetVar("Selected") )
@@ -402,10 +397,6 @@ def RemovePlayerCancel ():
 	global ReformPartyWindow
 
 	hideflag = GemRB.HideGUI ()
-	if ReformPartyWindow:
-		ReformPartyWindow.Unload ()
-	GemRB.SetVar ("OtherWindow", -1)
-	ReformPartyWindow = None
 	if hideflag:
 		GemRB.UnhideGUI ()
 	OpenReformPartyWindow ()
@@ -418,8 +409,7 @@ def OpenReformPartyWindow ():
 	hideflag = GemRB.HideGUI ()
 
 	if ReformPartyWindow:
-		if ReformPartyWindow:
-			ReformPartyWindow.Unload ()
+		ReformPartyWindow.Unload ()
 		GemRB.SetVar ("ActionsWindow", OldActionsWindow.ID)
 		GemRB.SetVar ("MessageWindow", OldMessageWindow.ID)
 		GemRB.SetVar ("OtherWindow", -1)
