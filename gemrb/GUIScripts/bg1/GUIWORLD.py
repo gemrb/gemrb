@@ -409,7 +409,7 @@ def OpenReformPartyWindow ():
 	hideflag = GemRB.HideGUI ()
 
 	if ReformPartyWindow:
-		ReformPartyWindow.Unload ()
+                ReformPartyWindow.Unload ()
 		GemRB.SetVar ("ActionsWindow", OldActionsWindow.ID)
 		GemRB.SetVar ("MessageWindow", OldMessageWindow.ID)
 		GemRB.SetVar ("OtherWindow", -1)
@@ -418,11 +418,12 @@ def OpenReformPartyWindow ():
 		OldMessageWindow = None
 		ReformPartyWindow = None
 
-		#GemRB.LoadWindowPack ("GUIREC")
+		#GemRB.LoadWindowPack (GetWindowPack())
 		if hideflag:
 			GemRB.UnhideGUI ()
 		#re-enabling party size control
 		GemRB.GameSetPartySize (PARTY_SIZE)
+		UpdatePortraitWindow()
 		return
 
 	GemRB.LoadWindowPack (GetWindowPack())

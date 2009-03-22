@@ -57,6 +57,7 @@ def OpenRecordsWindow ():
 		GemRB.UnhideGUI ()
 		OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
+		SetSelectionChangeHandler(None)
 		return
 
 	GemRB.HideGUI ()
@@ -88,7 +89,7 @@ def OpenRecordsWindow ():
 	# reform party
 	Button = Window.GetControl (51)
 	Button.SetText (16559)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenRecReformPartyWindow")
 
 	# customize
 	Button = Window.GetControl (50)
@@ -112,6 +113,12 @@ def OpenRecordsWindow ():
 	Window.SetVisible (1)
 	GUICommonWindows.PortraitWindow.SetVisible (1)
 	return
+
+#original returns to game before continuing...
+def OpenRecReformPartyWindow ():
+        OpenRecordsWindow()
+      	GemRB.SetTimedEvent ("OpenReformPartyWindow", 1)
+        return
 
 def GetNextLevelExp (Level, Class):
 	NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
