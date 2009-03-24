@@ -215,7 +215,6 @@ gemrb/override/test1/Makefile
 gemrb/GUIScripts/Makefile
 gemrb/GUIScripts/bg1/Makefile
 gemrb/GUIScripts/bg2/Makefile
-gemrb/GUIScripts/how/Makefile
 gemrb/GUIScripts/iwd/Makefile
 gemrb/GUIScripts/iwd2/Makefile
 gemrb/GUIScripts/pst/Makefile
