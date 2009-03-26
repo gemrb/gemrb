@@ -49,7 +49,7 @@ void TranslateColor(const char *value, Color &color)
 void InitSparks()
 {
 	int i,j;
-	AutoTable tab("sprkclr");
+	AutoTable tab("sprklclr");
 	if (!tab)
 		return;
 
