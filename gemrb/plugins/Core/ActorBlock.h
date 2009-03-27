@@ -302,7 +302,7 @@ class GEM_EXPORT Highlightable : public Scriptable {
 public:
 	Highlightable(ScriptableType type);
 	virtual ~Highlightable(void);
-	virtual bool TrapResets() = 0;
+	virtual int TrapResets() = 0;
 	virtual bool CanDetectTrap() { return true; }
 	virtual bool PossibleToSeeTrap();
 public:
@@ -467,19 +467,19 @@ private:
 	void SetWallgroups(int count, int value);
 	void ImpedeBlocks(int count, Point *points, unsigned int value);
 	void UpdateDoor();
-	bool BlockedOpen(bool Open, bool ForceOpen);
+	bool BlockedOpen(int Open, int ForceOpen);
 public:
-	void ToggleTiles(int State, bool playsound = false);
+	void ToggleTiles(int State, int playsound = FALSE);
 	void SetName(const char* Name); // sets door ID
 	void SetTiles(unsigned short* Tiles, int count);
-	void SetDoorLocked(bool Locked, bool playsound);
-	void SetDoorOpen(bool Open, bool playsound, ieDword ID);
+	void SetDoorLocked(int Locked, int playsound);
+	void SetDoorOpen(int Open, int playsound, ieDword ID);
 	void SetPolygon(bool Open, Gem_Polygon* poly);
-	bool IsOpen() const;
+	int IsOpen() const;
 	void TryPickLock(Actor *actor);
 	void TryBashLock(Actor* actor) ;
 	void DebugDump();
-	bool TrapResets() { return Flags & DOOR_RESET; }
+	int TrapResets() { return Flags & DOOR_RESET; }
 };
 
 class GEM_EXPORT Container : public Highlightable {
@@ -497,11 +497,11 @@ public:
 	void DrawPile(bool highlight, Region screen, Color tint);
 	//returns dithering option
 	int WantDither();
-	bool IsOpen() const;
+	int IsOpen() const;
 	void TryPickLock(Actor *actor);
 	void TryBashLock(Actor* actor) ;
 	void DebugDump();
-	bool TrapResets() { return Flags & CONT_RESET; }
+	int TrapResets() { return Flags & CONT_RESET; }
 private:
 	//updates the ground icons for a pile
 	void RefreshGroundIcons();
@@ -531,7 +531,7 @@ public:
 	//checks if the actor may use this travel trigger
 	int CheckTravel(Actor *actor);
 	void DebugDump();
-	bool TrapResets() { return Flags & TRAP_RESET; }
+	int TrapResets() { return Flags & TRAP_RESET; }
 	bool CanDetectTrap();
 	bool PossibleToSeeTrap();
 

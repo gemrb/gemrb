@@ -236,7 +236,7 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 
 	//don't accept parties with the no interrupt flag
 	//this fixes bug #2573808 on gamescript level
-        //(still someone has to turn the no interrupt flag off)
+	//(still someone has to turn the no interrupt flag off)
 	if(!pc->GetDialog(GD_CHECK)) {
 		return 0;
 	}

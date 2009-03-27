@@ -433,7 +433,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	int len = strlen(Path);
 	snprintf( Path+len, _MAX_PATH-len, "%s%09d-%s", SPathDelimiter, index, slotname );
 	ResolveFilePath( Path );
-        //this is required in case the old slot wasn't recognised but still there
+	//this is required in case the old slot wasn't recognised but still there
 	core->DelTree(Path, false);
 	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
 	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);

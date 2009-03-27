@@ -3441,7 +3441,7 @@ int fx_cast_spell (Actor* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_cast_spell (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	if (fx->Parameter2) {
 		//apply spell on target
-		core->ApplySpell(fx->Resource, Owner, target, fx->Power);
+		core->ApplySpell(fx->Resource, target, Owner, fx->Power);
 	} else {
 		//cast spell on target
 		Owner->CastSpell(fx->Resource, target, false);
@@ -4917,10 +4917,10 @@ int fx_activate_spell_sequencer(Actor* Owner, Actor* target, Effect* fx)
 	Effect *sequencer = Owner->fxqueue.HasEffect(fx_spell_sequencer_active_ref);
 	if (sequencer) {
 		//cast 1-4 spells stored in the spell sequencer
-		core->ApplySpell(sequencer->Resource, Owner, target, fx->Power);
-		core->ApplySpell(sequencer->Resource2, Owner, target, fx->Power);
-		core->ApplySpell(sequencer->Resource3, Owner, target, fx->Power);
-		core->ApplySpell(sequencer->Resource4, Owner, target, fx->Power);
+		core->ApplySpell(sequencer->Resource, target, Owner, fx->Power);
+		core->ApplySpell(sequencer->Resource2, target, Owner, fx->Power);
+		core->ApplySpell(sequencer->Resource3, target, Owner, fx->Power);
+		core->ApplySpell(sequencer->Resource4, target, Owner, fx->Power);
 		//remove the spell sequencer store effect
 		sequencer->TimingMode=FX_DURATION_JUST_EXPIRED;
 	}

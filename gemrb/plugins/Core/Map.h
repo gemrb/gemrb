@@ -229,7 +229,7 @@ public:
 	bool DayNight;
 private:
 	ieStrRef trackString;
-	bool trackFlag;
+	int trackFlag;
 	ieWord trackDiff;
 	unsigned short* MapSet;
 	std::queue< unsigned int> InternalStack;
@@ -417,7 +417,7 @@ public:
 	bool HasWeather();
 	int GetWeather();
 	void ClearTrap(Actor *actor, ieDword InTrap);
-	void SetTrackString(ieStrRef strref, bool flg, int difficulty);
+	void SetTrackString(ieStrRef strref, int flg, int difficulty);
 	//returns true if tracking failed
 	bool DisplayTrackString(Actor *actor);
 private:

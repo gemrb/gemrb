@@ -5279,7 +5279,9 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 	PyObject* dict = PyDict_New();
+
 	CREItem *ci=container->inventory.GetSlotItem( index );
+	
 	PyDict_SetItemString(dict, "ItemResRef", PyString_FromResRef( ci->ItemResRef ));
 	PyDict_SetItemString(dict, "Usages0", PyInt_FromLong (ci->Usages[0]));
 	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (ci->Usages[1]));

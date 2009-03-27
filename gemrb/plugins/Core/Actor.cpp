@@ -124,8 +124,8 @@ static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
  ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
  ACT_NONE, ACT_INNATE};
-static bool QslotTranslation = false;
-static bool DeathOnZeroStat = true;
+static int QslotTranslation = FALSE;
+static int DeathOnZeroStat = TRUE;
 static ieDword TranslucentShadows = 0;
 static int ProjectileSize = 0;  //the size of the projectile immunity bitfield (dwords)
 
@@ -191,8 +191,8 @@ static int *mxsplwis = NULL;
 static int spllevels;
 
 //for every game except IWD2 we need to reverse TOHIT
-static bool ReverseToHit=true;
-static bool CheckAbilities=false;
+static int ReverseToHit=TRUE;
+static int CheckAbilities=FALSE;
 
 //internal flags for calculating to hit
 #define WEAPON_FIST	0
@@ -333,7 +333,7 @@ void Actor::SetFistStat(ieDword stat)
 	fiststat = stat;
 }
 
-void Actor::SetDefaultActions(bool qslot, ieByte slot1, ieByte slot2, ieByte slot3)
+void Actor::SetDefaultActions(int qslot, ieByte slot1, ieByte slot2, ieByte slot3)
 {
 	QslotTranslation=qslot;
 	DefaultButtons[0]=slot1;
@@ -395,32 +395,32 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	}
 	anims = new CharAnimations( AnimID&0xffff, BaseStats[IE_ARMOR_TYPE]);
 	if(anims->ResRef[0] == 0) {
-	delete anims ;
-	anims = NULL ;
-	printMessage("Actor", " ",LIGHT_RED);
+		delete anims;
+		anims = NULL;
+		printMessage("Actor", " ",LIGHT_RED);
 		printf("Missing animation for %s\n",LongName);
-	return ;
-    }
-    anims->SetOffhandRef(ShieldRef);
-    anims->SetHelmetRef(HelmetRef);
-    anims->SetWeaponRef(WeaponRef);
+		return;
+	}
+	anims->SetOffhandRef(ShieldRef);
+	anims->SetHelmetRef(HelmetRef);
+	anims->SetWeaponRef(WeaponRef);
 
-    //if we have a recovery palette, then set it back
-    assert(anims->palette[PAL_MAIN] == 0);
-    anims->palette[PAL_MAIN] = recover;
-    if (recover) {
-	anims->lockPalette = true;
-    }
-    //bird animations are not hindered by searchmap
-    //only animtype==7 (bird) uses this feature
-    //this is a hardcoded hack, but works for all engine type
-    if (anims->GetAnimType()!=IE_ANI_BIRD) {
-	BaseStats[IE_DONOTJUMP]=0;
-    } else {
-	BaseStats[IE_DONOTJUMP]=DNJ_BIRD;
-    }
-    SetCircleSize();
-    anims->SetColors(BaseStats+IE_COLORS);
+	//if we have a recovery palette, then set it back
+	assert(anims->palette[PAL_MAIN] == 0);
+	anims->palette[PAL_MAIN] = recover;
+	if (recover) {
+		anims->lockPalette = true;
+	}
+	//bird animations are not hindered by searchmap
+	//only animtype==7 (bird) uses this feature
+	//this is a hardcoded hack, but works for all engine type
+	if (anims->GetAnimType()!=IE_ANI_BIRD) {
+		BaseStats[IE_DONOTJUMP]=0;
+	} else {
+		BaseStats[IE_DONOTJUMP]=DNJ_BIRD;
+	}
+	SetCircleSize();
+	anims->SetColors(BaseStats+IE_COLORS);
 }
 
 CharAnimations* Actor::GetAnims()
@@ -1000,9 +1000,9 @@ static void InitActorTables()
 	} else {
 		sharexp=SX_DIVIDE;
 	}
-	ReverseToHit=(bool) core->HasFeature(GF_REVERSE_TOHIT);
-	CheckAbilities=(bool) core->HasFeature(GF_CHECK_ABILITIES);
-	DeathOnZeroStat=(bool) core->HasFeature(GF_DEATH_ON_ZERO_STAT);
+	ReverseToHit = core->HasFeature(GF_REVERSE_TOHIT);
+	CheckAbilities = core->HasFeature(GF_CHECK_ABILITIES);
+	DeathOnZeroStat = core->HasFeature(GF_DEATH_ON_ZERO_STAT);
 
 	//this table lists various level based xp bonuses
 	AutoTable tm("xpbonus");
@@ -1662,7 +1662,7 @@ void Actor::ReactToDeath(const char * deadname)
 				if (*value==',') value++;
 			}
 			strncpy(resref, value, 8);
-			for(count=0;count<8 && resref[count]!=',';count++) ;
+			for(count=0;count<8 && resref[count]!=',';count++);
 			resref[count]=0;
 
 			ieDword len = core->GetAudioDrv()->Play( resref );
@@ -3464,7 +3464,7 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index)
 			if (*resource==',') resource++;
 	}
 	strncpy(Sound, resource, 8);
-	for(count=0;count<8 && Sound[count]!=',';count++) ;
+	for(count=0;count<8 && Sound[count]!=',';count++);
 	Sound[count]=0;
 }
 
@@ -3806,7 +3806,7 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 	}
 }
 
-bool Actor::IsReverseToHit()
+int Actor::IsReverseToHit()
 {
 	return ReverseToHit;
 }

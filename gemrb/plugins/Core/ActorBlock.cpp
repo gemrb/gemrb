@@ -1298,7 +1298,7 @@ void Door::UpdateDoor()
 	}
 }
 
-void Door::ToggleTiles(int State, bool playsound)
+void Door::ToggleTiles(int State, int playsound)
 {
 	int i;
 	int state;
@@ -1335,7 +1335,7 @@ void Door::SetTiles(unsigned short* Tiles, int cnt)
 	tilecount = cnt;
 }
 
-void Door::SetDoorLocked(bool Locked, bool playsound)
+void Door::SetDoorLocked(int Locked, int playsound)
 {
 	if (Locked) {
 		if (Flags & DOOR_LOCKED) return;
@@ -1351,9 +1351,9 @@ void Door::SetDoorLocked(bool Locked, bool playsound)
 	}
 }
 
-bool Door::IsOpen() const
+int Door::IsOpen() const
 {
-	bool ret = (bool) core->HasFeature(GF_REVERSE_DOOR);
+	int ret = core->HasFeature(GF_REVERSE_DOOR);
 	if (Flags&DOOR_OPEN) {
 		ret = !ret;
 	}
@@ -1361,7 +1361,7 @@ bool Door::IsOpen() const
 }
 
 //also mark actors to fix position
-bool Door::BlockedOpen(bool Open, bool ForceOpen)
+bool Door::BlockedOpen(int Open, int ForceOpen)
 {
 	bool blocked;
 	int count;
@@ -1405,7 +1405,7 @@ bool Door::BlockedOpen(bool Open, bool ForceOpen)
 	return blocked;
 }
 
-void Door::SetDoorOpen(bool Open, bool playsound, ieDword ID)
+void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 {
 	if (playsound) {
 		//the door cannot be blocked when opening,
@@ -1420,7 +1420,7 @@ void Door::SetDoorOpen(bool Open, bool playsound, ieDword ID)
 	}
 	if (Open) {
 		LastEntered = ID; //used as lastOpener
-		SetDoorLocked(false,playsound);
+		SetDoorLocked(FALSE,playsound);
 	} else {
 		LastTrigger = ID; //used as lastCloser
 	}
@@ -1487,7 +1487,7 @@ void Door::TryPickLock(Actor *actor)
 		}
 		return;
 	}
-	SetDoorLocked( false, true);
+	SetDoorLocked( FALSE, TRUE);
 	core->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
 	LastUnlocked = actor->GetID();
 	ImmediateEvent();
@@ -1508,7 +1508,7 @@ void Door::TryBashLock(Actor *actor)
 	}
 
 	core->DisplayConstantStringName(STR_DOORBASH_DONE, 0xd7d7be, actor);
-	SetDoorLocked(false, true);
+	SetDoorLocked(FALSE, TRUE);
 	//Is this really useful ?
 	LastUnlocked = actor->GetID();
 	ImmediateEvent();
@@ -1888,12 +1888,12 @@ int Container::WantDither()
 	return 1;
 }
 
-bool Container::IsOpen() const
+int Container::IsOpen() const
 {
 	if (Flags&CONT_LOCKED) {
-		return false;
+		return FALSE;
 	}
-	return true;
+	return TRUE;
 }
 
 void Container::TryPickLock(Actor *actor)

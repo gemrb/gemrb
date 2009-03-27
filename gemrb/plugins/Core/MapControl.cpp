@@ -307,17 +307,16 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 	if (LinkedLabel) {
 		LinkedLabel->SetText( "" );
 	}
-	switch (Value)
-	{
-	case MAP_REVEAL: //for farsee effect
-		Owner->Cursor = IE_CURSOR_CAST;
-		break;
-	case MAP_SET_NOTE:
-		Owner->Cursor = IE_CURSOR_GRAB;
-		break;
-	default:
-		Owner->Cursor = IE_CURSOR_NORMAL;
-		break;
+	switch (Value) {
+		case MAP_REVEAL: //for farsee effect
+			Owner->Cursor = IE_CURSOR_CAST;
+			break;
+		case MAP_SET_NOTE:
+			Owner->Cursor = IE_CURSOR_GRAB;
+			break;
+		default:
+			Owner->Cursor = IE_CURSOR_NORMAL;
+			break;
 	}
 }
 
@@ -331,19 +330,20 @@ void MapControl::ClickHandle(unsigned short Button)
 {
 	core->GetDictionary()->SetAt( "MapControlX", NotePosX );
 	core->GetDictionary()->SetAt( "MapControlY", NotePosY );
-	switch(Button&GEM_MB_NORMAL)
-	{
-        case GEM_MB_ACTION:
-		if (Button&GEM_MB_DOUBLECLICK) {
-			RunEventHandler( MapControlOnDoublePress );
-			printMessage("MapControl","Doubleclick detected\n",GREEN);
-		} else {
-			RunEventHandler( MapControlOnPress );
-		}
-		break;
-        case GEM_MB_MENU:
-		RunEventHandler( MapControlOnRightPress );
-		break;
+	switch(Button&GEM_MB_NORMAL) {
+		case GEM_MB_ACTION:
+			if (Button&GEM_MB_DOUBLECLICK) {
+				RunEventHandler( MapControlOnDoublePress );
+				printMessage("MapControl","Doubleclick detected\n",GREEN);
+			} else {
+				RunEventHandler( MapControlOnPress );
+			}
+			break;
+		case GEM_MB_MENU:
+			RunEventHandler( MapControlOnRightPress );
+			break;
+		default:
+			break;
 	}
 }
 
@@ -365,16 +365,19 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short 
 	unsigned short /*Mod*/)
 {
 	switch((unsigned char) Button) {
-	case GEM_MB_SCRLUP:
-		OnSpecialKeyPress(GEM_UP);
-		return;
-	case GEM_MB_SCRLDOWN:
-		OnSpecialKeyPress(GEM_DOWN);
-		return;
-	case GEM_MB_ACTION:
-		if (Button & GEM_MB_DOUBLECLICK) {
-			ClickHandle(Button);
-		}
+		case GEM_MB_SCRLUP:
+			OnSpecialKeyPress(GEM_UP);
+			return;
+		case GEM_MB_SCRLDOWN:
+			OnSpecialKeyPress(GEM_DOWN);
+			return;
+		case GEM_MB_ACTION:
+			if (Button & GEM_MB_DOUBLECLICK) {
+				ClickHandle(Button);
+			}
+			break;
+		default:
+			break;
 	}
 
 	mouseIsDown = true;
@@ -447,6 +450,8 @@ void MapControl::OnSpecialKeyPress(unsigned char Key)
 		case GEM_TAB:
 			printf( "TAB pressed\n" );
 			break;
+		default:
+			break;
 	}
 
 	if (ScrollX > MapWidth - Width)
@@ -464,17 +469,17 @@ bool MapControl::SetEvent(int eventType, const char *handler)
 	Changed = true;
 
 	switch (eventType) {
-	case IE_GUI_MAP_ON_PRESS:
-		SetEventHandler( MapControlOnPress, handler );
-		break;
-	case IE_GUI_MAP_ON_RIGHT_PRESS:
-		SetEventHandler( MapControlOnRightPress, handler );
-		break;
-	case IE_GUI_MAP_ON_DOUBLE_PRESS:
-		SetEventHandler( MapControlOnDoublePress, handler );
-		break;
-	default:
-		return false;
+		case IE_GUI_MAP_ON_PRESS:
+			SetEventHandler( MapControlOnPress, handler );
+			break;
+		case IE_GUI_MAP_ON_RIGHT_PRESS:
+			SetEventHandler( MapControlOnRightPress, handler );
+			break;
+		case IE_GUI_MAP_ON_DOUBLE_PRESS:
+			SetEventHandler( MapControlOnDoublePress, handler );
+			break;
+		default:
+			return false;
 	}
 
 	return true;

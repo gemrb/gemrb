@@ -2718,7 +2718,7 @@ void Map::ClearTrap(Actor *actor, ieDword InTrap)
 	}
 }
 
-void Map::SetTrackString(ieStrRef strref, bool flg, int difficulty)
+void Map::SetTrackString(ieStrRef strref, int flg, int difficulty)
 {
 	trackString = strref;
 	trackFlag = flg;
@@ -2849,17 +2849,17 @@ void AreaAnimation::Draw(Region &screen, Map *area)
 //change the tileset if needed and possible, return true if changed
 bool Map::ChangeMap(bool day_or_night)
 {
-        //no need of change if the area is not extended night
-        if (! (AreaType&AT_EXTENDED_NIGHT)) return false;
-        //no need of change if the area already has the right tilemap
-        if ((DayNight == day_or_night) && GetTileMap()) return false;
+	//no need of change if the area is not extended night
+	if (! (AreaType&AT_EXTENDED_NIGHT)) return false;
+	//no need of change if the area already has the right tilemap
+	if ((DayNight == day_or_night) && GetTileMap()) return false;
 
-        MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
+	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
 	//no need to open and read the .are file again
 	//using the ARE class for this because ChangeMap is similar to LoadMap
 	//it loads the lightmap and the minimap too, besides swapping the tileset
-        mM->ChangeMap(this, day_or_night);
-        core->FreeInterface( mM );
+	mM->ChangeMap(this, day_or_night);
+	core->FreeInterface( mM );
 	return true;
 }
 

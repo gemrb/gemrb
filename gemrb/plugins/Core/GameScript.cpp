@@ -641,7 +641,7 @@ static const ActionLink actionnames[] = {
 	{"moveglobalsto", GameScript::MoveGlobalsTo, 0}, 
 	{"transferinventory", GameScript::MoveInventory, 0}, 
 	{"movetocenterofscreen", GameScript::MoveToCenterOfScreen,AF_BLOCKING},
-        {"movetoexpansion", GameScript::MoveToExpansion,AF_BLOCKING},
+	{"movetoexpansion", GameScript::MoveToExpansion,AF_BLOCKING},
 	{"movetoobject", GameScript::MoveToObject,AF_BLOCKING|AF_ALIVE},
 	{"movetoobjectfollow", GameScript::MoveToObjectFollow,AF_BLOCKING|AF_ALIVE},
 	{"movetoobjectnointerrupt", GameScript::MoveToObjectNoInterrupt,AF_BLOCKING|AF_ALIVE},

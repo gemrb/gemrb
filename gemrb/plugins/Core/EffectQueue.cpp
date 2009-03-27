@@ -350,14 +350,14 @@ EffectQueue *EffectQueue::CopySelf()
 {
 	EffectQueue *effects;
 
-        effects = new EffectQueue();
-        std::list< Effect* >::const_iterator fxit = GetFirstEffect();
+	effects = new EffectQueue();
+	std::list< Effect* >::const_iterator fxit = GetFirstEffect();
 	Effect *fx;
 
-        while( (fx = GetNextEffect(fxit))) {
-                effects->AddEffect(fx, false);
-        }
-        effects->SetOwner(GetOwner());
+	while( (fx = GetNextEffect(fxit))) {
+		effects->AddEffect(fx, false);
+	}
+	effects->SetOwner(GetOwner());
 	return effects;
 }
 

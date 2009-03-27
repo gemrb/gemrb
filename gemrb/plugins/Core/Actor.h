@@ -253,7 +253,7 @@ public:
 	/** sets game specific parameter (which stat should determine the fist weapon type */
 	static void SetFistStat(ieDword stat);
 	/** sets game specific default data about action buttons */
-	static void SetDefaultActions(bool qslot, ieByte slot1, ieByte slot2, ieByte slot3);
+	static void SetDefaultActions(int qslot, ieByte slot1, ieByte slot2, ieByte slot3);
 	/** prints useful information on console */
 	void DebugDump();
 	/** fixes the feet circle */
@@ -498,7 +498,7 @@ public:
 	/* Deducts a charge from an item */
 	void ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent);
 	/* If it returns true, then default AC=10 and the lesser the better */
-	bool IsReverseToHit();
+	int IsReverseToHit();
 	void InitButtons(ieDword cls);
 	void SetFeat(unsigned int feat, int mode);
 	int GetFeat(unsigned int feat) const;

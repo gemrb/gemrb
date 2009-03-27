@@ -349,7 +349,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	video->DrawRect( screen, black, true );
 
 	// setup outlines
-	bool targetting = (target_mode & (TARGET_MODE_CAST |
+	int targetting = (target_mode & (TARGET_MODE_CAST |
 		TARGET_MODE_PICK | TARGET_MODE_ATTACK | TARGET_MODE_DEFEND));
 	InfoPoint *i;
 	unsigned int idx;
@@ -368,18 +368,20 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	Door *d;
 	for (idx = 0; (d = area->TMap->GetDoor( idx )); idx++) {
 		d->Highlight = false;
-		if (overDoor == d && targetting) {
-			if (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED)) {
-				// only highlight targettable doors
-				d->outlineColor = green;
+		if (overDoor == d) {
+			if (targetting) {
+				if (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED)) {
+  				// only highlight targettable doors
+					d->outlineColor = green;
+					d->Highlight = true;
+					continue;
+				}
+			} else if (!(d->Flags & DOOR_SECRET)) {
+				// mouse over, not in target mode, no secret door
+				d->outlineColor = cyan;
 				d->Highlight = true;
 				continue;
 			}
-		} else if (overDoor == d && !(d->Flags & DOOR_SECRET)) {
-			// mouse over, not in target mode, no secret door
-			d->outlineColor = cyan;
-			d->Highlight = true;
-			continue;
 		}
 		if (d->VisibleTrap(0)) {
 			d->outlineColor = red; // traps

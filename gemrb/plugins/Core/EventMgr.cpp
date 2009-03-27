@@ -413,13 +413,14 @@ unsigned long EventMgr::GetRKDelay()
 unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
 {
 	unsigned long tmp = rk_flags;
-        switch (op) {
-        case BM_SET: tmp = arg; break;
-        case BM_OR: tmp |= arg; break;
-        case BM_NAND: tmp &= ~arg; break;
-        case BM_XOR: tmp ^= arg; break;
-        case BM_AND: tmp &= arg; break;
-        }
+	switch (op) {
+		case BM_SET: tmp = arg; break;
+		case BM_OR: tmp |= arg; break;
+		case BM_NAND: tmp &= ~arg; break;
+		case BM_XOR: tmp ^= arg; break;
+		case BM_AND: tmp &= arg; break;
+		default: tmp = 0; break;
+	}
 	rk_flags=tmp;
 	return rk_flags;
 }

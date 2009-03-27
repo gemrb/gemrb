@@ -1857,10 +1857,10 @@ bool Interface::LoadConfig(void)
 
 	return false;
 #else // WIN32
-    // If we were called as $0 -c <filename>, load config from filename
+	// If we were called as $0 -c <filename>, load config from filename
 	if (argc > 2 && ! strcmp("-c", argv[1])) {
 		return LoadConfig( argv[2] ) ;
-    // Explicitly specified cfg file HAS to be present
+		// Explicitly specified cfg file HAS to be present
 	}
 	strcpy( UserDir, ".\\" );
 	return LoadConfig( "GemRB.cfg" );
@@ -4994,19 +4994,19 @@ ieDword Interface::TranslateStat(const char *stat_name)
 
 void Interface::WaitForDisc(int disc_number, const char* path)
 {
-        Video* video = GetVideoDriver();
+	Video* video = GetVideoDriver();
 
 	GetDictionary()->SetAt( "WaitForDisc", (ieDword) disc_number );
 	//GetDictionary()->SetAt( "WaitForDiscPath", (char*) path );
 
-        GetGUIScriptEngine()->RunFunction( "OpenWaitForDiscWindow" );
-        do {
-                core->DrawWindows ();
+	GetGUIScriptEngine()->RunFunction( "OpenWaitForDiscWindow" );
+	do {
+		core->DrawWindows();
 		if (dir_exists (path)) {
-        		GetGUIScriptEngine()->RunFunction( "OpenWaitForDiscWindow" );
+			GetGUIScriptEngine()->RunFunction( "OpenWaitForDiscWindow" );
 			break;
 		}
 
-        } while (video->SwapBuffers() == GEM_OK);
+	} while (video->SwapBuffers() == GEM_OK);
 }
 

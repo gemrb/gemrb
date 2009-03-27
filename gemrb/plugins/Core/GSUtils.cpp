@@ -1188,8 +1188,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	}
 	//action performed
 	if(target->Type == ST_ACTOR) {
-        actor->SetTarget( target );
-        wrange += ((Actor*)target)->size*5 ;
+		actor->SetTarget( target );
+		wrange += ((Actor*)target)->size*5;
 	}
 
 	if ( PersonalDistance(Sender, target) > wrange ) {
@@ -1202,19 +1202,19 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 		Sender->ReleaseCurrentAction();
 		return;
 	} else if (target->Type == ST_DOOR) {
-	    Door* door = (Door*) target ;
-	    if(door->Flags & DOOR_LOCKED) {
-	        door->TryBashLock(actor) ;
-	    }
-	    Sender->ReleaseCurrentAction() ;
-        return ;
+		Door* door = (Door*) target;
+		if(door->Flags & DOOR_LOCKED) {
+		    door->TryBashLock(actor);
+		}
+		Sender->ReleaseCurrentAction();
+		return;
 	} else if (target->Type == ST_CONTAINER) {
-	    Container* cont = (Container*) target;
-	    if(cont->Flags & CONT_LOCKED) {
-	        cont->TryBashLock(actor) ;
-	    }
-	    Sender->ReleaseCurrentAction() ;
-        return ;
+		Container* cont = (Container*) target;
+		if(cont->Flags & CONT_LOCKED) {
+		    cont->TryBashLock(actor);
+		}
+		Sender->ReleaseCurrentAction();
+		return;
 	}
 	//it shouldn't be a problem to call this the second time (in case of attackreevaluate)
 	//because ReleaseCurrentAction() allows NULL

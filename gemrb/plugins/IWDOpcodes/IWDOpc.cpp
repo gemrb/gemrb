@@ -2096,7 +2096,7 @@ int fx_add_effects_list (Actor* Owner, Actor* target, Effect* fx)
 	if (check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
 		return FX_NOT_APPLIED;
 	}
-	core->ApplySpell(fx->Resource, Owner, target, fx->Power);
+	core->ApplySpell(fx->Resource, target, Owner, fx->Power);
 	return FX_NOT_APPLIED;
 }
 
@@ -2660,7 +2660,7 @@ int fx_persistent_use_effect_list (Actor* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter3) {
 		fx->Parameter3--;
 	} else {
-		core->ApplySpell(fx->Resource, Owner, target, fx->Power);
+		core->ApplySpell(fx->Resource, target, Owner, fx->Power);
 		fx->Parameter3=fx->Parameter1;
 	}
 	return FX_APPLIED;
@@ -2987,7 +2987,7 @@ int fx_power_attack (Actor* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 	unsigned int x;
-        x = target->GetFeat(FEAT_POWER_ATTACK);
+	x = target->GetFeat(FEAT_POWER_ATTACK);
 	if (x>5) x=5;
 	for(unsigned int i = 0;i<5;i++) {
 		if (i<x) {
@@ -3016,7 +3016,7 @@ int fx_expertise (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	unsigned int x;
 
-        x = target->GetFeat(FEAT_EXPERTISE);
+	x = target->GetFeat(FEAT_EXPERTISE);
 	if (x>5) x=5;
 	for(unsigned int i = 0;i<5;i++) {
 		if (i<x) {

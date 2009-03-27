@@ -551,10 +551,10 @@ void GameScript::MoveToExpansion(Scriptable* /*Sender*/, Action* /*parameters*/)
 	Game *game = core->GetGame();
 
 	game->SetExpansion(1);
-        SaveGameIterator *sg = core->GetSaveGameIterator();
-        if (sg) {
-                sg->Invalidate();
-        }
+	SaveGameIterator *sg = core->GetSaveGameIterator();
+	if (sg) {
+		sg->Invalidate();
+	}
 }
 
 //add some animation effects too?
@@ -4532,7 +4532,7 @@ void GameScript::Attack( Scriptable* Sender, Action* parameters)
 
 	//feed Attack back to the queue
 	if(tar->Type == ST_ACTOR) //bashing doors/containers should be performed only once
-        Sender->AddAction(parameters);
+	Sender->AddAction(parameters);
 	AttackCore(Sender, tar, NULL, 0);
 }
 

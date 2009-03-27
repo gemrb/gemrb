@@ -30,46 +30,51 @@
 #define WIN32DEF_H
 
 #ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
 
-#if _MSC_VER >= 1000
+# if _MSC_VER >= 1000
 // 4251 disables the annoying warning about missing dll interface in templates
-#pragma warning( disable: 4251 521 )
+#  pragma warning( disable: 4251 521 )
 //disables annoying warning caused by STL:Map in msvc 6.0
-# if _MSC_VER < 7000
-#   pragma warning(disable:4786)
+#  if _MSC_VER < 7000
+#    pragma warning(disable:4786)
+#  endif
+# endif
+
+# define ADV_TEXT
+# include <conio.h>
+# define textcolor(i) SetConsoleTextAttribute(hConsole, i)
+
+# ifndef __MINGW32__
+#  define printf cprintf //broken in mingw !!
+# elif not defined HAVE_SNPRINTF
+#  define HAVE_SNPRINTF
+# endif
+
+#else //WIN32
+# include <config.h>
+# include <stdio.h>
+# include <stdlib.h>
+
+# define ADV_TEXT
+# define textcolor(i) i
+
+# define stricmp strcasecmp
+# define strnicmp strncasecmp
+#endif //WIN32
+
+#ifndef HAVE_SNPRINTF
+# ifdef WIN32
+#  define snprintf _snprintf
+# else
+#  include "../plugins/Core/snprintf.h"
 # endif
 #endif
 
-#define ADV_TEXT
-#include <conio.h>
-#define textcolor(i) SetConsoleTextAttribute(hConsole, i)
-
-#ifndef __MINGW32__
-#define printf cprintf //broken in mingw !!
-#elif not defined HAVE_SNPRINTF
-#define HAVE_SNPRINTF
-#endif
-
-#else
-#include <config.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#define ADV_TEXT
-#define textcolor(i) i
-
-#define stricmp strcasecmp
-#define strnicmp strncasecmp
-#endif
-
-#ifndef HAVE_SNPRINTF
-#ifdef WIN32
-#define snprintf _snprintf
-#else
-#include "../plugins/Core/snprintf.h"
-#endif
+#ifndef TRUE
+# define TRUE 1
+# define FALSE 0
 #endif
 
 //we need 32+6 bytes at least, because we store 'context' in the variable
@@ -137,9 +142,9 @@ typedef __POSITION* POSITION;
 #endif
 
 #ifdef WIN32
-#ifndef round
-#define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
-#endif
+# ifndef round
+#  define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
+# endif
 #endif
 
 #ifndef M_PI
