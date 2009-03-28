@@ -68,8 +68,7 @@ def OpenMapWindow ():
 	Text = Window.GetControl (4)
 	Text.SetText ("")
 
-	Edit = Window.CreateTextEdit (6, 0, 0, 200, 100, "FONTDLG", "pokus...")
-	#GemRB.SetControlPos (65535, 65535)
+	Edit = Window.CreateTextEdit (6, 0, 0, 200, 100, "FONTDLG", "                      ")
 
 	# Map Control
 	# ronote and usernote are the pins for the notes
@@ -95,7 +94,7 @@ def OpenMapWindow ():
 	Button = Window.GetControl (5)
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
-	Label.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	GemRB.UnhideGUI ()
 
