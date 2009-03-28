@@ -1,4 +1,28 @@
-#load window
+# -*-python-*-
+# GemRB - Infinity Engine Emulator
+# Copyright (C) 2003 The GemRB Project
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+# $Id$
+
+
+# GUISAVE.py - Save window
+
+###################################################
+
 import GemRB
 from LoadScreen import *
 from GUICommon import CloseOtherWindow
@@ -80,17 +104,19 @@ def ScrollBarPress():
 		Button2 = Window.GetControl (30+i)
 		if ActPos<GameCount:
 			Button1.SetState (IE_GUI_BUTTON_ENABLED)
-			Button2.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			Button1.SetState (IE_GUI_BUTTON_DISABLED)
-			Button2.SetState (IE_GUI_BUTTON_DISABLED)
 
 		if ActPos<GameCount-1:
 			Slotname = GemRB.GetSaveGameAttrib (0,ActPos)
+			Button2.SetState (IE_GUI_BUTTON_ENABLED)
 		elif ActPos == GameCount-1:
 			Slotname = 15304
+			Button2.SetState (IE_GUI_BUTTON_DISABLED)
 		else:
 			Slotname = ""
+			Button2.SetState (IE_GUI_BUTTON_DISABLED)
+
 		Label = Window.GetControl (0x10000008+i)
 		Label.SetText (Slotname)
 
@@ -130,7 +156,6 @@ def ConfirmedSaveGame():
 	GemRB.SaveGame(Pos, Slotname) #loads and enters savegame
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
-	#CloseSaveWindow ()
 	SaveWindow.SetVisible (1)
 	return
 
@@ -185,6 +210,8 @@ def SavePress():
 	CancelButton=ConfirmWindow.GetControl (8)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "AbortedSaveGame")
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	ConfirmWindow.SetVisible (1)
 	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
@@ -232,6 +259,8 @@ def DeleteGamePress():
 	CancelButton=ConfirmWindow.GetControl (2)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteGameCancel")
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
 	ConfirmWindow.SetVisible (1)
 	return
 

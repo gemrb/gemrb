@@ -52,8 +52,8 @@ def OpenSaveWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSaveWindow")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-
 	GemRB.SetVar ("LoadIdx",0)
+
 	for i in range(5):
 		Button = Window.GetControl (55+i)
 		Button.SetText (15588)
@@ -104,17 +104,19 @@ def ScrollBarPress():
 		Button2 = Window.GetControl (60+i)
 		if ActPos<GameCount:
 			Button1.SetState (IE_GUI_BUTTON_ENABLED)
-			Button2.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			Button1.SetState (IE_GUI_BUTTON_DISABLED)
-			Button2.SetState (IE_GUI_BUTTON_DISABLED)
 
 		if ActPos<GameCount-1:
 			Slotname = GemRB.GetSaveGameAttrib (0,ActPos)
+			Button2.SetState (IE_GUI_BUTTON_ENABLED)
 		elif ActPos == GameCount-1:
 			Slotname = 15304
+			Button2.SetState (IE_GUI_BUTTON_DISABLED)
 		else:
 			Slotname = ""
+			Button2.SetState (IE_GUI_BUTTON_DISABLED)
+
 		Label = Window.GetControl (0x10000005+i)
 		Label.SetText (Slotname)
 
