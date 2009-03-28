@@ -65,6 +65,7 @@ Scriptable::Scriptable(ScriptableType type)
 	startTime = 0;   //executing scripts
 	lastRunTime = 0; //evaluating scripts
 	lastDelay = 0;
+	Dialog[0] = 0;
 
 	interval = ( 1000 / AI_UPDATE_TIME );
 	WaitCounter = 0;
