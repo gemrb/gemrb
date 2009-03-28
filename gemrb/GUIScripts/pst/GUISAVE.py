@@ -58,11 +58,11 @@ def OpenSaveWindow ():
 	OptionsWindow = GWindow( GemRB.GetVar ("OtherWindow") )
 	GemRB.SetVar ("OtherWindow", SaveWindow.ID)
 
-
 	# Cancel button
 	CancelButton = Window.GetControl (46)
 	CancelButton.SetText (4196)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	GemRB.SetVar ("SaveIdx", 0)
 
 	for i in range (4):
@@ -110,20 +110,21 @@ def ScrollBarPress():
 		Button2 = Window.GetControl (18 + i)
 		if ActPos < GameCount:
 			Button1.SetState(IE_GUI_BUTTON_ENABLED)
-			Button2.SetState(IE_GUI_BUTTON_ENABLED)
 		else:
 			Button1.SetState(IE_GUI_BUTTON_DISABLED)
-			Button2.SetState(IE_GUI_BUTTON_DISABLED)
 
 		if ActPos < GameCount - 1:
 			Slotname = GemRB.GetSaveGameAttrib (0, ActPos)
 			Slottime = GemRB.GetSaveGameAttrib (3, ActPos)
+			Button2.SetState(IE_GUI_BUTTON_ENABLED)
 		elif ActPos == GameCount-1:
 			Slotname = 28647    # "Empty"
 			Slottime = ""
+			Button2.SetState(IE_GUI_BUTTON_DISABLED)
 		else:
 			Slotname = ""
 			Slottime = ""
+			Button2.SetState(IE_GUI_BUTTON_DISABLED)
 			
 		Label = Window.GetControl (0x10000004+i)
 		Label.SetText (Slotname)
@@ -147,7 +148,7 @@ def ScrollBarPress():
 
 def SaveGamePress ():
 	OpenSaveDetailWindow ()
-
+	return
 
 def DeleteGameConfirm():
 	global GameCount
@@ -183,10 +184,12 @@ def DeleteGamePress():
 	DeleteButton=ConfirmWindow.GetControl(1)
 	DeleteButton.SetText(13957)
 	DeleteButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DeleteGameConfirm")
+	DeleteButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	CancelButton=ConfirmWindow.GetControl(2)
 	CancelButton.SetText(4196)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DeleteGameCancel")
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ConfirmWindow.SetVisible(1)
 	return
@@ -223,12 +226,13 @@ def OpenSaveDetailWindow ():
 	else:
 		Button.SetText (28645)   # Save
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ConfirmedSaveGame")
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (5)
 	Button.SetText (4196)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSaveDetailWindow")
-
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# Slot name and time
 	if Pos < GameCount - 1:
