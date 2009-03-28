@@ -112,7 +112,7 @@ Interface::Interface(int iargc, char* iargv[])
 	printf( "GemRB Core Version v%s Loading...\n", VERSION_GEMRB );
 	projserv = NULL;
 	video = NULL;
-	AudioDriver = NULL ;
+	AudioDriver = NULL;
 	key = NULL;
 	strings = NULL;
 	guiscript = NULL;
@@ -1859,7 +1859,7 @@ bool Interface::LoadConfig(void)
 #else // WIN32
 	// If we were called as $0 -c <filename>, load config from filename
 	if (argc > 2 && ! strcmp("-c", argv[1])) {
-		return LoadConfig( argv[2] ) ;
+		return LoadConfig( argv[2] );
 		// Explicitly specified cfg file HAS to be present
 	}
 	strcpy( UserDir, ".\\" );
@@ -3852,15 +3852,22 @@ TextArea *Interface::GetMessageTextArea() const
 	return NULL;
 }
 
-void Interface::DisplayString(const char* Text) const
+void Interface::DisplayString(const char* Text, Scriptable *target) const
 {
 	Label *l = GetMessageLabel();
 	if (l) {
 		l->SetText(Text, 0);
 	}
 	TextArea *ta = GetMessageTextArea();
-	if (ta)
+	if (ta) {
 		ta->AppendText( Text, -1 );
+	} else {
+		if(target) {
+			char *tmp = strdup(Text);
+
+			target->DisplayHeadText(tmp);
+		}
+	}
 }
 
 #define PALSIZE 8
@@ -3901,7 +3908,7 @@ unsigned int Interface::GetSpeakerColor(const char *&name, Scriptable *&speaker)
 
 
 //simply displaying a constant string
-void Interface::DisplayConstantString(int stridx, unsigned int color) const
+void Interface::DisplayConstantString(int stridx, unsigned int color, Scriptable *target) const
 {
 	if (stridx<0) return;
 	char* text = GetString( strref_table[stridx], IE_STR_SOUND );
@@ -3909,7 +3916,7 @@ void Interface::DisplayConstantString(int stridx, unsigned int color) const
 	char* newstr = ( char* ) malloc( newlen );
 	snprintf( newstr, newlen, DisplayFormat, color, text );
 	FreeString( text );
-	DisplayString( newstr );
+	DisplayString( newstr, target);
 	free( newstr );
 }
 

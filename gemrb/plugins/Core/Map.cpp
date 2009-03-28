@@ -388,14 +388,6 @@ void Map::ChangeTileMap(ImageMgr* lm, ImageMgr* sm)
 
 	LightMap = lm;
 	SmallMap = sm;
-
-/*  move this to the tilemap swapper code
-	if (Width!=(unsigned int) (TMap->XCellCount * 4) ||
-	    Height!=(unsigned int) (( TMap->YCellCount * 64 ) / 12) ) {
-		printMessage("Map", " ", RED);
-		printf( "TileSet dimensions for %s and %sN are different \n", WEDResRef, WEDResRef );
-	}
-*/
 }
 
 void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, ImageMgr* hm)
@@ -919,6 +911,25 @@ void Map::DrawMap(Region screen)
 			break;
 		ip->DrawOverheadText(screen);
 	}
+
+	int cnCount = 0;
+	while (true) {
+		//For each Container in the map
+		Container* cn = TMap->GetContainer( cnCount++ );
+		if (!cn)
+			break;
+		cn->DrawOverheadText(screen);
+	}
+
+	int drCount = 0;
+	while (true) {
+		//For each Door in the map
+		Door* dr = TMap->GetDoor( drCount++ );
+		if (!dr)
+			break;
+		dr->DrawOverheadText(screen);
+	}
+
 	oldgametime=gametime;
 }
 

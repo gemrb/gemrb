@@ -2159,7 +2159,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 			//TODO: the original engine allowed opening of a door when the
 			//key was on any of the partymembers
 			if (!Key || !actor->inventory.HasItem(Key,0) ) {
-				core->DisplayConstantString(STR_DOORLOCKED,0xd7d7be);
+				core->DisplayConstantString(STR_DOORLOCKED,0xd7d7be,door);
 				//playsound unsuccessful opening of door
 				core->PlaySound(DS_OPEN_FAIL);
 				Sender->ReleaseCurrentAction();
@@ -4862,7 +4862,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		if (container->Flags & CONT_LOCKED) {
 			//playsound can't open container
 			//display string, etc
-			core->DisplayConstantString(STR_CONTLOCKED,0xd7d7be);
+			core->DisplayConstantString(STR_CONTLOCKED,0xd7d7be,container);
 			Sender->ReleaseCurrentAction();
 			return;
 		}

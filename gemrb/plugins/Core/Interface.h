@@ -389,9 +389,9 @@ public:
 	/** returns the speaker's color and name */
 	unsigned int GetSpeakerColor(const char *&name, Scriptable *&speaker) const;
 	/** displays any string in the textarea */
-	void DisplayString(const char *txt) const;
+	void DisplayString(const char *txt, Scriptable *speaker=NULL) const;
 	/** displays a string constant in the textarea */
-	void DisplayConstantString(int stridx, unsigned int color) const;
+	void DisplayConstantString(int stridx, unsigned int color, Scriptable *speaker=NULL) const;
 	/** displays actor name - action : parameter */
 	void DisplayConstantStringNameString(int stridx, unsigned int color, int stridx2, Scriptable *actor) const;
 	/** displays a string constant followed by a number in the textarea */
