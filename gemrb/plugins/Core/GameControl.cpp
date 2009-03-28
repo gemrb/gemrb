@@ -371,7 +371,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		if (overDoor == d) {
 			if (targetting) {
 				if (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED)) {
-  				// only highlight targettable doors
+					// only highlight targettable doors
 					d->outlineColor = green;
 					d->Highlight = true;
 					continue;
@@ -1496,14 +1496,14 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			HandleDoor(overDoor, core->GetFirstSelectedPC(false));
 			return;
 		}
+		if (overContainer) {
+			HandleContainer(overContainer, core->GetFirstSelectedPC(false));
+			return;
+		}
 		if (overInfoPoint) {
 			if (HandleActiveRegion(overInfoPoint, core->GetFirstSelectedPC(false), p)) {
 				return;
 			}
-		}
-		if (overContainer) {
-			HandleContainer(overContainer, core->GetFirstSelectedPC(false));
-			return;
 		}
 
 		//just a single actor, no formation
