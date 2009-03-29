@@ -207,6 +207,7 @@ Interface::Interface(int iargc, char* iargv[])
 
 	TooltipBack = NULL;
 	DraggedItem = NULL;
+	DraggedPortrait = 0;
 	DefSound = NULL;
 	DSCount = -1;
 	GameFeatures = 0;
@@ -4208,6 +4209,19 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 	}
 }
 
+void Interface::SetDraggedPortrait(int dp, int idx)
+{
+	if (idx<0) idx=14;
+	DraggedPortrait = dp;
+	if (dp) {
+		//hmm this might work?
+		Cursors[idx]->RefCount++;
+		video->SetDragCursor(Cursors[idx]);
+	} else {
+		video->SetDragCursor(NULL);
+	}
+}
+
 bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 {
 	ieResRef ItemName;
@@ -5001,10 +5015,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 
 void Interface::WaitForDisc(int disc_number, const char* path)
 {
-	Video* video = GetVideoDriver();
-
 	GetDictionary()->SetAt( "WaitForDisc", (ieDword) disc_number );
-	//GetDictionary()->SetAt( "WaitForDiscPath", (char*) path );
 
 	GetGUIScriptEngine()->RunFunction( "OpenWaitForDiscWindow" );
 	do {

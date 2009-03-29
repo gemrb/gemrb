@@ -250,7 +250,7 @@ static void GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDw
 	printf("Item animation type: %c%c\n",ID[0], ID[1]);
 	if (ID[1]=='A') {
 		//the last 4 item sounds are used for '1A', '2A', '3A' and '4A'
-                //item animation types
+		//item animation types
 		ItemType = ItemSoundsCount-4+ID[0]-'1';
 	}
 
@@ -1805,11 +1805,11 @@ PyDoc_STRVAR( GemRB_AttachScrollBar__doc,
 
 static PyObject* GemRB_AttachScrollBar(PyObject * /*self*/, PyObject* args)
 {
-        int WindowIndex, ControlIndex, ScbControlIndex;
+	int WindowIndex, ControlIndex, ScbControlIndex;
 
-        if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &ScbControlIndex )) {
-                return AttributeError( GemRB_AttachScrollBar__doc );
-        }
+	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &ScbControlIndex )) {
+		return AttributeError( GemRB_AttachScrollBar__doc );
+	}
 
 	Control *ctrl = GetControl(WindowIndex, ControlIndex, -1);
 	if (!ctrl) {
@@ -1825,13 +1825,13 @@ static PyObject* GemRB_AttachScrollBar(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-        int ret = ctrl->SetScrollBar( scb );
-        if (ret == -1) {
-                return NULL;
-        }
+	int ret = ctrl->SetScrollBar( scb );
+	if (ret == -1) {
+		return NULL;
+	}
 
-        Py_INCREF( Py_None );
-        return Py_None;
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_SetVarAssoc__doc,
@@ -6775,7 +6775,7 @@ CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 
 PyDoc_STRVAR( GemRB_DragItem__doc,
 "DragItem(PartyID, Slot, ResRef, [Count=0, Type])\n\n"
-"Start dragging specified item." );
+"Start dragging specified item, if Slot is negative, drag the PartyID portrait instead." );
 
 static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 {
@@ -6800,8 +6800,17 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "No game loaded!" );
 	}
 	Actor* actor = game->FindPC( PartyID );
-	if (!actor) {
+	//allow -1,-1
+	if (!actor && ( PartyID || ResRef[0]) ) {
+printf("PartyID:%d, Resref[0]:%d\n",PartyID, ResRef[0]);
 		return RuntimeError( "Actor not found" );
+	}
+
+	//dragging a portrait
+	if (!ResRef[0]) {
+		core->SetDraggedPortrait(PartyID, Slot);
+		Py_INCREF( Py_None );
+		return Py_None;
 	}
 
 	if ((unsigned int) Slot>core->GetInventorySize()) {
@@ -6987,10 +6996,14 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_IsDraggingItem__doc,
 "IsDraggingItem()=>int\n\n"
-"Returns 1 if we are dragging some item." );
+"Returns 1 if we are dragging some item.\n"
+"Returns 2 if we are dragging a portrait." );
 
 static PyObject* GemRB_IsDraggingItem(PyObject * /*self*/, PyObject* /*args*/)
 {
+	if (core->GetDraggedPortrait()) {
+		return PyInt_FromLong(2);
+	}
 	return PyInt_FromLong( core->GetDraggedItem() != NULL );
 }
 
@@ -7414,14 +7427,14 @@ static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 
 	if (initDialog) {
 	    if (initDialog == 2)
-            GameScript::SetLeavePartyDialogFile(actor, NULL) ;
-        if(actor->GetStat(IE_HITPOINTS) > 0) {
-            char Tmp[40];
-            actor->ClearPath();
-            actor->ClearActions();
-            strncpy(Tmp,"Dialogue([PC])",sizeof(Tmp) );
-            actor->AddAction( GenerateAction(Tmp) );
-        }
+	    GameScript::SetLeavePartyDialogFile(actor, NULL) ;
+	if(actor->GetStat(IE_HITPOINTS) > 0) {
+	    char Tmp[40];
+	    actor->ClearPath();
+	    actor->ClearActions();
+	    strncpy(Tmp,"Dialogue([PC])",sizeof(Tmp) );
+	    actor->AddAction( GenerateAction(Tmp) );
+	}
 	}
 	game->LeaveParty (actor);
 
@@ -8730,6 +8743,29 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SwapPCs__doc,
+"SwapPCs(idx1, idx2)\n\n"
+"Swaps the party order for two player characters.\n\n");
+
+static PyObject* GemRB_SwapPCs(PyObject * /*self*/, PyObject* args)
+{
+	int idx1, idx2;
+
+	if (!PyArg_ParseTuple( args, "ii", &idx1, &idx2)) {
+		return AttributeError( GemRB_SwapPCs__doc );
+	}
+	
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	game->SwapPCs(idx1, idx2);
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SetRepeatClickFlags__doc,
 "SetRepeatClickFlags(value, op)\n\n"
 "Sets the mode repeat clicks are handled.\n\n");
@@ -9005,6 +9041,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SpellCast, METH_VARARGS),
 	METHOD(StatComment, METH_VARARGS),
 	METHOD(StealFailed, METH_NOARGS),
+	METHOD(SwapPCs, METH_VARARGS),
 	METHOD(TextAreaAppend, METH_VARARGS),
 	METHOD(TextAreaClear, METH_VARARGS),
 	METHOD(TextAreaScroll, METH_VARARGS),

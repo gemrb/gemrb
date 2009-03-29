@@ -289,6 +289,7 @@ private:
 	Control* tooltip_ctrl;
 	// Currently dragged item or NULL
 	CREItem* DraggedItem;
+	int DraggedPortrait;
 	// Current Store
 	Store* CurrentStore;
 	// Index of current container
@@ -526,6 +527,8 @@ public:
 	CREItem* GetDraggedItem() const { return DraggedItem; }
 	/* use this only when the dragged item is dropped */
 	void ReleaseDraggedItem();
+	int GetDraggedPortrait() const { return DraggedPortrait; }
+	void SetDraggedPortrait(int dp, int cursor=-1);
 	CREItem *ReadItem(DataStream *str);
 	bool ResolveRandomItem(CREItem *itm);
 	ieStrRef GetRumour(const ieResRef resname);
