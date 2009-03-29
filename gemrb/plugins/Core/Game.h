@@ -287,6 +287,7 @@ public:
 	int DelMap(unsigned int index, int forced = 0);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index);
+	void SwapPCs(unsigned int Index1, unsigned int Index2);
 	bool IsDay();
 	void InAttack(ieDword globalID);
 	void OutAttack(ieDword globalID);

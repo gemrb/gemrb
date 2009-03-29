@@ -696,6 +696,20 @@ Actor* Game::GetNPC(unsigned int Index)
 	return NPCs[Index];
 }
 
+void Game::SwapPCs(unsigned int Index1, unsigned int Index2)
+{
+	if (Index1 >= PCs.size()) {
+		return;
+	}
+
+	if (Index2 >= PCs.size()) {
+		return;
+	}
+	int tmp = PCs[Index1]->InParty;
+	PCs[Index1]->InParty = PCs[Index2]->InParty;
+	PCs[Index2]->InParty = tmp;
+}
+
 void Game::DeleteJournalEntry(ieStrRef strref)
 {
 	size_t i=Journals.size();
