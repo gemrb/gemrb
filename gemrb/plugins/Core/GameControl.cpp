@@ -172,6 +172,7 @@ Point GameControl::GetFormationOffset(ieDword formation, ieDword pos)
 void GameControl::MoveToPointFormation(Actor *actor, unsigned int pos, Point src, Point p)
 {
 	char Tmp[256];
+	Map* map = actor->GetCurrentArea() ;
 
 	int formation=core->GetGame()->GetFormation();
 	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
@@ -197,8 +198,17 @@ void GameControl::MoveToPointFormation(Actor *actor, unsigned int pos, Point src
 	p.x += (int)newx;
 	p.y += (int)newy;
 
+	p.x/=16;
+	p.y/=12;
+
+	if (p.x < 0) p.x = 0;
+	if (p.y < 0) p.y = 0;
+	if (p.x > map->GetWidth()) p.x = map->GetWidth();
+    if (p.y > map->GetHeight()) p.y = map->GetHeight();
+
+    map->AdjustPosition(p) ;
 	// generate an action to do the actual movement
-	sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
+	sprintf( Tmp, "MoveToPoint([%d.%d])", p.x*16, p.y*12 );
 	actor->AddAction( GenerateAction( Tmp) );
 }
 
