@@ -3464,7 +3464,7 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index)
 			if (*resource==',') resource++;
 	}
 	strncpy(Sound, resource, 8);
-	for(count=0;count<8 && Sound[count]!=',';count++);
+	for(count=0;count<8 && Sound[count]!=',';count++) {};
 	Sound[count]=0;
 }
 
