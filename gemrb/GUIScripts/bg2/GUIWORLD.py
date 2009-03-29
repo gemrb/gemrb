@@ -397,11 +397,9 @@ def RemovePlayer ():
 	return
 
 def RemovePlayerConfirm ():
-	slot = GemRB.GetVar("Selected")
-	if GemRB.GetPlayerStat(slot, IE_HITPOINTS) > 0:
-                GemRB.ExecuteString("Dialogue([PC])", slot)
-	GemRB.LeaveParty (slot )
-	OpenReformPartyWindow ()
+	slot = GemRB.GetVar ("Selected")
+        GemRB.LeaveParty (slot, 2)
+        OpenReformPartyWindow ()
 	return
 
 def RemovePlayerCancel ():

@@ -1519,7 +1519,7 @@ public:
 	static Targets *Player8Fill(Scriptable *Sender, Targets *parameters, int ga_flags);
 };
 
-Action* GenerateAction(char* String);
+GEM_EXPORT Action* GenerateAction(char* String);
 Action* GenerateActionDirect(char* String, Actor *object);
 Trigger* GenerateTrigger(char* String);
 

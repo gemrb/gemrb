@@ -5281,7 +5281,7 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	PyObject* dict = PyDict_New();
 
 	CREItem *ci=container->inventory.GetSlotItem( index );
-	
+
 	PyDict_SetItemString(dict, "ItemResRef", PyString_FromResRef( ci->ItemResRef ));
 	PyDict_SetItemString(dict, "Usages0", PyInt_FromLong (ci->Usages[0]));
 	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (ci->Usages[1]));
@@ -7393,14 +7393,14 @@ static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_LeaveParty__doc,
-"LeaveParty(Slot)\n\n"
-"Makes player in Slot leave party." );
+"LeaveParty(Slot [,dialog])\n\n"
+"Makes player in Slot leave party, and initiate dialog if demanded." );
 
 static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 {
-	int PlayerSlot;
+	int PlayerSlot, initDialog;
 
-	if (!PyArg_ParseTuple( args, "i", &PlayerSlot )) {
+	if (!PyArg_ParseTuple( args, "i|i", &PlayerSlot, &initDialog )) {
 		return AttributeError( GemRB_LeaveParty__doc );
 	}
 	Game *game = core->GetGame();
@@ -7410,6 +7410,18 @@ static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 	Actor *actor = game->FindPC(PlayerSlot);
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
+	}
+
+	if (initDialog) {
+	    if (initDialog == 2)
+            GameScript::SetLeavePartyDialogFile(actor, NULL) ;
+        if(actor->GetStat(IE_HITPOINTS) > 0) {
+            char Tmp[40];
+            actor->ClearPath();
+            actor->ClearActions();
+            strncpy(Tmp,"Dialogue([PC])",sizeof(Tmp) );
+            actor->AddAction( GenerateAction(Tmp) );
+        }
 	}
 	game->LeaveParty (actor);
 
