@@ -150,11 +150,11 @@ def AIPress ():
 	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
 
 	if AI:
-		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_NAND)
-		Button.SetTooltip (15917)
-	else:
-		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_OR)
+		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_NAND)
 		Button.SetTooltip (15918)
+	else:
+		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_OR)
+		Button.SetTooltip (15917)
 	return
 
 def RestPress ():
@@ -181,7 +181,7 @@ def SetupFormation ():
 	global ActionsWindow
 
 	Window = ActionsWindow
-	for i in range(12):
+	for i in range (12):
 		Button = Window.GetControl (i)
 		Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
@@ -528,10 +528,6 @@ def OpenPortraitWindow (needcontrols):
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Inventory = GemRB.GetVar ("Inventory")
-
-	if Inventory:
-		# Ensure that inventory button is highlighted if pressed
-		Button.SetVarAssoc ("SelectedWindow", 3)
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)

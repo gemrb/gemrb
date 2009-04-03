@@ -9,12 +9,12 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # $Id$
 
@@ -36,6 +36,7 @@ FRAME_PC_TARGET   = 1
 PortraitWindow = None
 OptionsWindow = None
 ActionsWindow = None
+DraggedPortrait = None
 
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	# FIXME: add "(key)" to tooltips!
@@ -114,16 +115,31 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		SetGamedaysAndHourToken()
 		Button.SetTooltip(16041)
 
+	MarkMenuButton (Window)
 	return
+
+def MarkMenuButton (WindowIndex):
+	Pressed = WindowIndex.GetControl( GemRB.GetVar ("SelectedWindow") )
+
+	for button in range (9):
+		Button = WindowIndex.GetControl (button)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+
+	if Pressed:
+		Button = Pressed
+	else: # highlight return to game
+		Button = WindowIndex.GetControl (0)
+
+	Button.SetState (IE_GUI_BUTTON_SELECTED)
 
 def AIPress ():
 	Button = PortraitWindow.GetControl (6)
-	AI = GemRB.GetMessageWindowSize() & GS_PARTYAI
+	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
 	if AI:
-		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_NAND)
+		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_NAND)
 		Button.SetTooltip (15918)
 	else:
-		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_OR)
+		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_OR)
 		Button.SetTooltip (15917)
 	return
 
@@ -143,7 +159,7 @@ def EmptyControls ():
 	return
 
 def SelectFormationPreset ():
-	GemRB.GameSetFormation ( GemRB.GetVar ("Value"), GemRB.GetVar ("Formation") )
+	GemRB.GameSetFormation (GemRB.GetVar ("Value"), GemRB.GetVar ("Formation") )
 	GroupControls ()
 	return
 
@@ -452,8 +468,8 @@ def SetSelectionChangeHandler (handler):
 	global SelectionChangeHandler
 
 	# Switching from walking to non-walking environment:
-	#   set the first selected PC in walking env as a selected
-	#   in nonwalking env
+	# set the first selected PC in walking env as a selected
+	# in nonwalking env
 	if (not SelectionChangeHandler) and handler:
 		sel = GemRB.GameGetFirstSelectedPC ()
 		if not sel:
@@ -518,6 +534,9 @@ def OpenPortraitWindow (needcontrols):
 			Button.SetTooltip (11942)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RestPress")
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Inventory = GemRB.GetVar ("Inventory")
+
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
 		if (needcontrols):
@@ -528,8 +547,14 @@ def OpenPortraitWindow (needcontrols):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
+		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, "PortraitButtonOnDrag")
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
+		if Inventory and pc != i+1:
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+			Button.SetText ("")
+			Button.SetTooltip ("")
 
 		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
@@ -541,9 +566,15 @@ def OpenPortraitWindow (needcontrols):
 def UpdatePortraitWindow ():
 	Window = PortraitWindow
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Inventory = GemRB.GetVar ("Inventory")
+
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
 		pic = GemRB.GetPlayerPortrait (i+1, 1)
+		if Inventory and pc != i+1:
+			pic = None
+
 		if not pic:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -552,9 +583,9 @@ def UpdatePortraitWindow ():
 			continue
 
 		sel = GemRB.GameGetSelectedPCSingle () == i + 1
-		Button.SetPicture (pic, "NOPORTSM")
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_HORIZONTAL|IE_GUI_BUTTON_DRAGGABLE, OP_SET)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetPicture (pic, "NOPORTSM")
 		Button.SetFont ("NUMFONT")
 
 		Button.SetVarAssoc ("PressedPortrait", i)
@@ -576,6 +607,14 @@ def UpdatePortraitWindow ():
 		Button.SetText ("%d/%d" %(hp, hp_max))
 		Button.SetTooltip (GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
 		Button.EnableBorder (FRAME_PC_SELECTED, sel)
+	return
+
+def PortraitButtonOnDrag ():
+	global DraggedPortrait
+
+	#they start from 1
+	DraggedPortrait = GemRB.GetVar ("PressedPortrait")+1
+	GemRB.DragItem (DraggedPortrait, -1, "")
 	return
 
 def PortraitButtonOnPress ():
@@ -627,7 +666,18 @@ def SelectionChanged ():
 	return
 
 def PortraitButtonOnMouseEnter ():
+	global DraggedPortrait
+
 	i = GemRB.GetVar ("PressedPortrait")
+
+	if DraggedPortrait != None:
+		print "Swapping ",DraggedPortrait," With ",i+1
+		GemRB.DragItem (0, -1, "")
+		#this might not work
+		GemRB.SwapPCs (DraggedPortrait, i+1)
+		DraggedPortrait = None
+		return
+
 	if GemRB.IsDraggingItem ():
 		Button = PortraitWindow.GetControl (i)
 		Button.EnableBorder (FRAME_PC_TARGET, 1)
@@ -683,7 +733,7 @@ def SetupSavingThrows (pc):
 			if tmp2<tmp1:
 				tmp1=tmp2
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
-	if RaceSaveTableName!="*":
+	if RaceSaveTableName != "*":
 		Con = GemRB.GetPlayerStat (pc, IE_CON)
 		RaceSaveTable = GemRB.LoadTableObject (RaceSaveTableName)
 		for row in range (5):

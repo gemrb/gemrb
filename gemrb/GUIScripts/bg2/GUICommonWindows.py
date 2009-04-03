@@ -134,11 +134,11 @@ def AIPress ():
 	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
 
 	if AI:
-		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_NAND)
+		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_NAND)
 		Button.SetTooltip (15918)
 		GemRB.SetVar ("AI", 0)
 	else:
-		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_OR)
+		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_OR)
 		Button.SetTooltip (15917)
 		GemRB.SetVar ("AI", GS_PARTYAI)
 	return
@@ -167,7 +167,7 @@ def SetupFormation ():
 	global ActionsWindow
 
 	Window = ActionsWindow
-	for i in range(12):
+	for i in range (12):
 		Button = Window.GetControl (i)
 		Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
@@ -691,13 +691,13 @@ def SelectionChanged ():
 def PortraitButtonOnMouseEnter ():
 	global DraggedPortrait
 
-	i = GemRB.GetVar ("PressedPortrait")+1
+	i = GemRB.GetVar ("PressedPortrait")
 
 	if DraggedPortrait != None:
-		print "Swapping ",DraggedPortrait," With ",i
+		print "Swapping ",DraggedPortrait," With ",i+1
 		GemRB.DragItem (0, -1, "")
 		#this might not work
-		GemRB.SwapPCs (DraggedPortrait, i)
+		GemRB.SwapPCs (DraggedPortrait, i+1)
 		DraggedPortrait = None
 		return
 
