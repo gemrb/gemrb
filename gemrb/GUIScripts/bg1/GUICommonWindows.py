@@ -36,6 +36,7 @@ FRAME_PC_TARGET   = 1
 PortraitWindow = None
 OptionsWindow = None
 ActionsWindow = None
+DraggedPortrait = None
 
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	global OptionsWindow
@@ -544,9 +545,10 @@ def OpenPortraitWindow (needcontrols):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
+		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, "PortraitButtonOnDrag")
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
-		if Inventory and pc !=i+1:
+		if Inventory and pc != i+1:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetText ("")
@@ -568,7 +570,7 @@ def UpdatePortraitWindow ():
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
 		pic = GemRB.GetPlayerPortrait (i+1, 1)
-		if Inventory and pc!=i+1:
+		if Inventory and pc != i+1:
 			pic = None
 		if not pic:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -577,7 +579,7 @@ def UpdatePortraitWindow ():
 			Button.SetTooltip ("")
 			continue
 
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_HORIZONTAL|IE_GUI_BUTTON_DRAGGABLE, OP_SET)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetPicture (pic, "NOPORTSM")
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
@@ -594,7 +596,15 @@ def UpdatePortraitWindow ():
 		else:
 			Button.SetOverlay (ratio, 255,0,0,200, 128,0,0,200)
 		Button.SetTooltip (GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
+	return
 
+def PortraitButtonOnDrag ():
+	global DraggedPortrait
+
+	#they start from 1
+	DraggedPortrait = GemRB.GetVar ("PressedPortrait")+1
+	GemRB.DragItem (DraggedPortrait, -1, "")
+	return
 
 def PortraitButtonOnPress ():
 	i = GemRB.GetVar ("PressedPortrait")
@@ -645,7 +655,18 @@ def SelectionChanged ():
 	return
 
 def PortraitButtonOnMouseEnter ():
+	global DraggedPortrait
+
 	i = GemRB.GetVar ("PressedPortrait")
+
+	if DraggedPortrait != None:
+		print "Swapping ",DraggedPortrait," With ",i+1
+		GemRB.DragItem (0, -1, "")
+		#this might not work
+		GemRB.SwapPCs (DraggedPortrait, i+1)
+		DraggedPortrait = None
+		return
+
 	if GemRB.IsDraggingItem ():
 		Button = PortraitWindow.GetControl (i)
 		Button.EnableBorder (FRAME_PC_TARGET, 1)
@@ -701,7 +722,7 @@ def SetupSavingThrows (pc):
 			if tmp2<tmp1:
 				tmp1=tmp2
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
-	if RaceSaveTableName!="*":
+	if RaceSaveTableName != "*":
 		Con = GemRB.GetPlayerStat (pc, IE_CON)
 		RaceSaveTable = GemRB.LoadTableObject (RaceSaveTableName)
 		for row in range (5):
