@@ -804,6 +804,8 @@ void Spellbook::GenerateSpellInfo()
 				if (!slot->Flags)
 					continue;
 				Spell *spl = gamedata->GetSpell(slot->SpellResRef);
+				if (!spl)
+					continue;
 				ieDword level = 0;
 				SpellExtHeader *seh = FindSpellInfo(sm->Level, sm->Type, slot->SpellResRef);
 				if (seh) {
