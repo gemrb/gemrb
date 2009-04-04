@@ -709,7 +709,7 @@ void Game::SwapPCs(unsigned int Index1, unsigned int Index2)
 	PCs[Index1]->InParty = PCs[Index2]->InParty;
 	PCs[Index2]->InParty = tmp;
 	//signal a change of the portrait window
-	core->SetEventFlag(EF_SELECTION);
+	core->SetEventFlag(EF_PORTRAIT);
 }
 
 void Game::DeleteJournalEntry(ieStrRef strref)
@@ -1509,13 +1509,21 @@ void Game::SetExpansion(int exp)
 
 void Game::DebugDump()
 {
+	size_t idx;
+
 	printf("Currently loaded areas:\n");
-	for(size_t idx=0;idx<Maps.size();idx++) {
+	for(idx=0;idx<Maps.size();idx++) {
 		Map *map = Maps[idx];
 
 		printf("%s\n",map->GetScriptName());
 	}
 	printf("CombatCounter: %d\n", (int) CombatCounter);
 	printf("Attackers count: %d\n", (int) Attackers.size());
+	printf("Party size: %d\n", (int) PCs.size());
+	for(idx=0;idx<PCs.size();idx++) {
+		Actor *actor = PCs[idx];
+
+		printf("Name: %s Order %d\n",actor->ShortName, actor->InParty);
+	}
 }
 

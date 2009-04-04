@@ -4465,10 +4465,12 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
+/*
 	PlayerSlot = game->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot, false );
+*/
+	Actor* MyActor = game->FindPC( PlayerSlot );
 	if (!MyActor) {
-		return NULL;
+		return RuntimeError( "Actor not found!" );
 	}
 	MyActor->SetText(Name, Which);
 	MyActor->SetMCFlag(MC_EXPORTABLE,BM_OR);
@@ -4492,10 +4494,12 @@ static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
+/*
 	PlayerSlot = game->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot, false );
+*/
+	Actor* MyActor = game->FindPC( PlayerSlot );
 	if (!MyActor) {
-		return NULL;
+		return RuntimeError( "Actor not found!" );
 	}
 	MyActor->SetSoundFolder(Sound);
 	Py_INCREF( Py_None );
@@ -4693,8 +4697,10 @@ static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
+/*
 	PlayerSlot = game->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot, false );
+*/
+	Actor* MyActor = game->FindPC( PlayerSlot );
 	if (!MyActor) {
 		return PyInt_FromLong( 0 );
 	}
@@ -4781,8 +4787,10 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
+/*
 	PlayerSlot = game->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot, false );
+*/
+	Actor* MyActor = game->FindPC( PlayerSlot );
 	if (!MyActor) {
 		return PyString_FromString( "");
 	}
@@ -4908,10 +4916,12 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
+/*
 	PlayerSlot = game->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot, false );
+*/
+	Actor* MyActor = game->FindPC( PlayerSlot );
 	if (!MyActor) {
-		return NULL;
+		return RuntimeError( "Actor not found!" );
 	}
 	if (Portrait1) {
 		MyActor->SetPortrait( Portrait1, 1);
@@ -4923,8 +4933,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	TableMgr* mtm = gamedata->GetTable( mastertable );
 	int count = mtm->GetRowCount();
 	if (count< 1 || count>8) {
-		printMessage( "GUIScript", "Table is invalid.\n", LIGHT_RED );
-		return NULL;
+		return RuntimeError("Table is invalid." );
 	}
 	const char *poi = mtm->QueryField( 0 );
 	int AnimID = strtoul( poi, NULL, 0 );
@@ -5590,7 +5599,7 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 	}
 	STOItem* si = store->GetItem( Slot );
 	if (!si) {
-		return NULL;
+		return RuntimeError("Store item not found!");
 	}
 
 	if (si->InfiniteSupply != -1) {
@@ -5641,7 +5650,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	{
 		STOItem* si = store->GetItem( Slot );
 		if (!si) {
-			return NULL;
+			return RuntimeError("Store item not found!");
 		}
 		//the amount of items is stored in si->PurchasedAmount
 		//it will adjust AmountInStock/PurchasedAmount
@@ -5674,7 +5683,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	{
 		STOItem* si = store->GetItem( Slot );
 		if (!si) {
-			return NULL;
+			return RuntimeError("Store item not found!");
 		}
 		si->Flags ^= IE_INV_ITEM_SELECTED;
 		if (si->Flags & IE_INV_ITEM_SELECTED) {
@@ -6022,15 +6031,19 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "s|i", &String, &actornum )) {
 		return AttributeError( GemRB_ExecuteString__doc );
 	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
 	if (actornum) {
-		Actor *pc = core->GetGame()->GetPC(actornum-1, false);
+		Actor *pc = game->FindPC(actornum);
 		if (pc) {
 			GameScript::ExecuteString( pc, String );
 		} else {
 			printMessage("GUIScript","Player not found!\n", YELLOW);
 		}
 	} else {
-		GameScript::ExecuteString( core->GetGame()->GetCurrentArea( ), String );
+		GameScript::ExecuteString( game->GetCurrentArea( ), String );
 	}
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -8760,7 +8773,7 @@ static PyObject* GemRB_SwapPCs(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "No game loaded!" );
 	}
 
-	game->SwapPCs(idx1, idx2);
+	game->SwapPCs(game->FindPlayer(idx1), game->FindPlayer(idx2));
 
 	Py_INCREF( Py_None );
 	return Py_None;

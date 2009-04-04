@@ -578,7 +578,7 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		case '7':
 		case '8':
 		case '9':
-			SelectActor(Key-'1');
+			SelectActor(Key-'0');
 			break;
 	default:
 		core->GetGame()->SetHotKey(toupper(Key));
@@ -595,7 +595,7 @@ void GameControl::SelectActor(int whom, int type)
 	}
 
 	/* doesn't fall through here */
-	Actor* actor = game->GetPC( whom,false );
+	Actor* actor = game->FindPC( whom );
 	if (!actor)
 		return;
 
