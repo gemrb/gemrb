@@ -594,10 +594,13 @@ void GameControl::SelectActor(int whom, int type)
 		return;
 	}
 
+printf("Selecting: %d\n", whom);
 	/* doesn't fall through here */
 	Actor* actor = game->FindPC( whom );
 	if (!actor)
 		return;
+
+printf("It is: %s\n", actor->ShortName);
 
 	if (type==0) {
 		game->SelectActor( actor, false, SELECT_NORMAL );
@@ -1621,10 +1624,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 
 	switch (type) {
 		case ACT_NONE: //none
-			//clicked on a new party member
-			// FIXME: call GameControl::SelectActor() instead
-			//game->SelectActor( actor, true, SELECT_REPLACE );
-			SelectActor( game->InParty(actor) );
+			SelectActor( actor->InParty );
 			break;
 		case ACT_TALK:
 			//talk (first selected talks)
