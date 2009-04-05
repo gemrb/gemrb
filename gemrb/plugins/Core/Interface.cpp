@@ -519,10 +519,10 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_ACTION) {
 		ieDword tmp = (ieDword) ~0;
-		vars->Lookup( "ActionWindow", tmp );
+		vars->Lookup( "ActionsWindow", tmp );
 		if (tmp != (ieDword) ~0) {
 			EventFlag&=~EF_ACTION;
-			guiscript->RunFunction( "UpdateActionWindow" );
+			guiscript->RunFunction( "UpdateActionsWindow" );
 		}
 	}
 
