@@ -1874,13 +1874,17 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 {
 	bool effinit=false;
 	if (!GetCurrentArea()) {
+		//we had no area yet
 		effinit = true;
 	}
-	Scriptable::SetMap(map);
+	Scriptable::SetMap(map); //now we have an area
 	localID = LID;
 	globalID = GID;
 
-	//this hack is to delay the equipping effects until the actor has
+	//These functions are called once when the actor is first put in
+	//the area. It already has all the items (including fist) at this
+	//time and it is safe to call effects.
+	//This hack is to delay the equipping effects until the actor has
 	//an area (and the game object is also existing)
 	if (effinit) {
 		int SlotCount = inventory.GetSlotCount();
@@ -1895,8 +1899,13 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 				break;
 			}
 		}
+		//We need to convert this to signed 16 bits, because
+		//it is actually a 16 bit number. The high word could
+		//be anything. It is signed to have the correct math
+		//when adding it to the base slot (SLOT_WEAPON) in 
+		//case of quivers. (weird IE magic)
+		inventory.SetEquippedSlot( (ieWordSigned) Equipped );
 	}
-	inventory.SetEquippedSlot( Equipped );
 }
 
 void Actor::SetPosition(Point &position, int jump, int radius)
