@@ -517,6 +517,15 @@ void Interface::HandleEvents()
 		}
 	}
 
+	if (EventFlag&EF_ACTION) {
+		ieDword tmp = (ieDword) ~0;
+		vars->Lookup( "ActionWindow", tmp );
+		if (tmp != (ieDword) ~0) {
+			EventFlag&=~EF_ACTION;
+			guiscript->RunFunction( "UpdateActionWindow" );
+		}
+	}
+
 	if ((EventFlag&EF_CONTROL) && gc) {
 		EventFlag&=~EF_CONTROL;
 		guiscript->RunFunction( "UpdateControlStatus" );

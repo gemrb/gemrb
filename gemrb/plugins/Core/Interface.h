@@ -153,14 +153,15 @@ public:
 
 //events that are called out of drawwindow
 //they wait until the condition is right
-#define EF_CONTROL       1
+#define EF_CONTROL       1        //updates the game window statuses
 #define EF_SHOWMAP       2        //starts worldmap
 #define EF_PORTRAIT      4        //updates portraits
-#define EF_UPDATEANIM    8        //updates avatar animation
-#define EF_SEQUENCER     16       //starts sequencer/contingency creation
-#define EF_IDENTIFY      32       //starts identify screen
-#define EF_SELECTION     64       //selection changed
-#define EF_OPENSTORE     128      //open store window
+#define EF_ACTION        8        //updates the actions bar
+#define EF_UPDATEANIM    16       //updates avatar animation
+#define EF_SEQUENCER     32       //starts sequencer/contingency creation
+#define EF_IDENTIFY      64       //starts identify screen
+#define EF_SELECTION     128      //selection changed
+#define EF_OPENSTORE     256      //open store window
 
 //autopause
 #define AP_UNUSABLE      0
