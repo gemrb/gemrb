@@ -2177,6 +2177,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header)
 	if (header<0) {
 		if (!PCStats) return; //not a player character
 		PCStats->GetSlotAndIndex(which,idx,headerindex);
+printf("HI: %x\n", headerindex);
 		if (headerindex==0xffff) return; //headerindex is invalid
 	} else {
 		idx=(ieWord) which;
@@ -2251,10 +2252,10 @@ void Actor::ReinitQuickSlots()
 		//(afaik)
 
 		// Note: we're now in the QSLOTn case
-		// If slot is empty, reset quickslot to 0xffff/0
+		// If slot is empty, reset quickslot to 0xffff/0xffff
 
 		if (!inventory.HasItemInSlot("", slot)) {
-			SetupQuickSlot(which, 0xffff, 0);
+			SetupQuickSlot(which, 0xffff, 0xffff);
 		} else {
 			ieWord idx;
 			ieWord headerindex;
@@ -2274,7 +2275,7 @@ void Actor::ReinitQuickSlots()
 		int which = ACT_WEAPON3+i;
 		// Assuming that ACT_WEAPON3 and 4 are always in the first two spots
 		if (PCStats->QSlots[i]!=which) {
-			SetupQuickSlot(which, 0xffff, 0);
+			SetupQuickSlot(which, 0xffff, 0xffff);
 		}
 	}
 }
