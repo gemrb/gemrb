@@ -6,8 +6,11 @@ Description: Tries to learn the specified spell.
 Parameters:
 PartyID     - the PC's position in the party
 SpellResRef - the spell's Resource Reference
-Flags       - give xp, etc.
+Flags       - bitmap with the following bits (default is 0):
  1  - Give XP for learning  (Level * 100)
+ 2  - Display message
+ 4  - Check for insufficient stats
+ 8  - Also memorize it
 
 Return value: integer, 0 on success, different values on failure.
 
