@@ -8387,6 +8387,14 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	if(forcetarget==-1) {
 		forcetarget = itemdata.Target;
 	}
+
+	//is there any better check for a non existent item?
+	if (!itemdata.itemname[0]) {
+		printMessage("GUIScript","Empty slot used?", YELLOW);
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
 	/// remove this after projectile is done
 	printf("Use item: %s\n", itemdata.itemname);
 	printf("Extended header: %d\n", itemdata.headerindex);
