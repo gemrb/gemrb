@@ -2177,7 +2177,6 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header)
 	if (header<0) {
 		if (!PCStats) return; //not a player character
 		PCStats->GetSlotAndIndex(which,idx,headerindex);
-printf("HI: %x\n", headerindex);
 		if (headerindex==0xffff) return; //headerindex is invalid
 	} else {
 		idx=(ieWord) which;

@@ -8390,7 +8390,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 
 	//is there any better check for a non existent item?
 	if (!itemdata.itemname[0]) {
-		printMessage("GUIScript","Empty slot used?", YELLOW);
+		printMessage("GUIScript","Empty slot used?\n", YELLOW);
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
