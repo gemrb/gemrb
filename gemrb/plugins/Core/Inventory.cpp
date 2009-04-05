@@ -53,6 +53,8 @@ static void InvalidSlot(int slot)
 	abort();
 }
 
+//This inline function returns both an item pointer and the slot data.
+//slot is a dynamic slot number (SLOT_*)
 inline Item *Inventory::GetItemPointer(ieDword slot, CREItem *&item) const
 {
 	item = GetSlotItem(slot);
@@ -101,6 +103,7 @@ CREItem *Inventory::GetItem(unsigned int slot)
 {
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
+		return NULL;
 	}
 	CREItem *item = Slots[slot];
 	Slots.erase(Slots.begin()+slot);
@@ -146,7 +149,7 @@ void Inventory::CalculateWeight()
 				if (!(slot->Flags & IE_INV_ITEM_MOVABLE)) {
 					slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
 				}
-				
+
 				if (slot->Flags & IE_INV_ITEM_STOLEN2) {
 					slot->Flags |= IE_INV_ITEM_STOLEN;
 				}
@@ -185,24 +188,21 @@ void Inventory::AddSlotEffects(ieDword index)
 	CREItem* slot;
 
 	const Item *itm = GetItemPointer(index, slot);
-	//Item* itm = gamedata->GetItem( slot->ItemResRef );
 	if (!itm) {
 		printMessage("Inventory","Invalid item equipped...\n",LIGHT_RED);
 		return;
 	}
 	ItemExcl|=itm->ItemExcl;
-	
+
 	ieWord gradient = itm->GetWieldedGradient();
 	if (gradient!=0xffff) {
 		Owner->SetBase(IE_COLORS, gradient);
 	}
-	
+
 	//get the equipping effects
 	EffectQueue *eqfx = itm->GetEffectBlock(-1, index, 0);
 	gamedata->FreeItem( itm, slot->ItemResRef, false );
 
-	//make any adjustments necessary for off-hand weapon colours
-	//eqfx->HackColorEffects();
 	Owner->RefreshEffects(eqfx);
 	core->SetEventFlag(EF_UPDATEANIM);
 }
@@ -337,7 +337,7 @@ void Inventory::KillSlot(unsigned int index)
 				if (Equipped < 0 && FindRangedWeapon() == SLOT_FIST)
 					Equipped = IW_NO_EQUIPPED;
 			}
-				
+
 			UpdateWeaponAnimation();
 			break;
 		case SLOT_EFFECT_HEAD:
@@ -406,7 +406,7 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
-		abort();
+		return NULL;
 	}
 	Changed = true;
 	item = Slots[slot];
@@ -452,6 +452,7 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 {
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
+		return;
 	}
 	Changed = true;
 	if (Slots[slot]) {
@@ -466,6 +467,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 	if (slot >= 0) {
 		if ((unsigned)slot >= Slots.size()) {
 			InvalidSlot(slot);
+			return ASI_FAILED;
 		}
 
 		//check for equipping weapons
@@ -482,7 +484,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 		}
 
 		CREItem *myslot = Slots[slot];
-		if (ItemsAreCompatible( myslot, item )) {			
+		if (ItemsAreCompatible( myslot, item )) {
  			//calculate with the max movable stock
 			int chunk = item->Usages[0];
 			int newamount = myslot->Usages[0]+chunk;
@@ -492,7 +494,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 			}
 			if (!chunk) {
 				return -1;
-			}	
+			}
 			myslot->Flags |= IE_INV_ITEM_ACQUIRED;
 			myslot->Usages[0] = (ieWord) (myslot->Usages[0] + chunk);
 			item->Usages[0] = (ieWord) (item->Usages[0] - chunk);
@@ -620,7 +622,7 @@ int Inventory::DepleteItem(ieDword flags)
 			gamedata->FreeItem( itm, item->ItemResRef, false );
 			if (weapon)
 				continue;
-		}	
+		}
 		//deplete item
 		item->Usages[0]=0;
 		item->Usages[1]=0;
@@ -716,6 +718,7 @@ CREItem *Inventory::GetSlotItem(unsigned int slot) const
 {
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
+		return NULL;
 	}
 	return Slots[slot];
 }
@@ -904,7 +907,7 @@ int Inventory::FindSlotRangedWeapon(unsigned int slot) const
 		type = ext_header->ProjectileQualifier;
 	}
 	gamedata->FreeItem(itm, Slot->ItemResRef, false);
-	return FindTypedRangedWeapon(type);	
+	return FindTypedRangedWeapon(type);
 }
 
 
@@ -1011,14 +1014,9 @@ int Inventory::GetInventorySlot()
 	return SLOT_INV;
 }
 
-int Inventory::GetEquipped() const
-{
-	return Equipped;
-}
-
 //if shield slot is empty, call again for fist slot!
 int Inventory::GetShieldSlot() const
-{	
+{
 	if (IWD2) {
 		if (Equipped>=0 && Equipped<=3) {
 			return Equipped*2+SLOT_MELEE+1;
@@ -1060,7 +1058,7 @@ bool Inventory::SetEquippedSlot(int slotcode)
 		}
 		Equipped = IW_NO_EQUIPPED;
 		//fist slot equipping effects
-		AddSlotEffects(0);
+		AddSlotEffects(SLOT_FIST);
 		UpdateWeaponAnimation();
 		return true;
 	}
@@ -1082,6 +1080,11 @@ bool Inventory::SetEquippedSlot(int slotcode)
 	}
 	UpdateWeaponAnimation();
 	return true;
+}
+
+int Inventory::GetEquipped() const
+{
+	return Equipped;
 }
 
 //returns the fist weapon if there is nothing else
@@ -1110,7 +1113,7 @@ CREItem *Inventory::GetUsedWeapon(bool leftorright) const
 	ret = GetSlotItem(slot);
 	if (!ret) {
 		//return fist weapon
-		ret = GetSlotItem(GetFistSlot());
+		ret = GetSlotItem(SLOT_FIST);
 	}
 	return ret;
 }
@@ -1304,7 +1307,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 			continue;
 		}
 		CREItem *slot;
-		
+
 		const Item *itm = GetItemPointer(idx, slot);
 		if (!itm) {
 			continue;
@@ -1415,7 +1418,6 @@ void Inventory::UpdateWeaponAnimation()
 			if (slot>0) {
 				si = GetSlotItem( (ieDword) slot );
 			}
-			//CREItem* si = GetSlotItem( core->QuerySlot(GetShieldSlot()) );
 			if (si) {
 				Item* it = gamedata->GetItem(si->ItemResRef);
 				if (core->CanUseItemType(SLOT_WEAPON, it))
@@ -1474,7 +1476,7 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 	}
 
 	//magic items have the highest priority
-	if ( HasItemInSlot("", GetMagicSlot())) {
+	if ( HasItemInSlot("", SLOT_MAGIC)) {
 		//magic weapon is in use
 		return STR_MAGICWEAPON;
 	}
