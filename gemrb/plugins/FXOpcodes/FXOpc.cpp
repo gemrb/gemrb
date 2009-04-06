@@ -801,7 +801,7 @@ int fx_ac_vs_damage_type_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 	// FIXME: set to Param1 or Param1-1 ?
 	if (type == 16) {
-	 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 			if (BASE_GET( IE_ARMORCLASS) > fx->Parameter1) {
 				BASE_SET( IE_ARMORCLASS, fx->Parameter1 );
 			}
@@ -2930,38 +2930,39 @@ int fx_immune_to_weapon (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 		level = fx->Parameter1;
 		break;
 	case 1: //all magical weapons
-		mask = IE_INV_ITEM_MAGICAL;
+		value = IE_INV_ITEM_MAGICAL;
 		//fallthrough
 	case 2: //all nonmagical weapons
-		value = IE_INV_ITEM_MAGICAL;
+		mask = IE_INV_ITEM_MAGICAL;
 		break;
 	case 3: //all silver weapons
-		mask = IE_INV_ITEM_SILVER;
+		value = IE_INV_ITEM_SILVER;
 		//fallthrough
 	case 4: //all non silver weapons
-		value = IE_INV_ITEM_SILVER;
+		mask = IE_INV_ITEM_SILVER;
 		break;
 	case 5:
 		value = IE_INV_ITEM_SILVER;
+		mask = IE_INV_ITEM_SILVER;
 		level = 0;
 		break;
 	case 6: //all twohanded
-		mask = IE_INV_ITEM_TWOHANDED;
+		value = IE_INV_ITEM_TWOHANDED;
 		//fallthrough
 	case 7: //all not twohanded
-		value = IE_INV_ITEM_TWOHANDED;
+		mask = IE_INV_ITEM_TWOHANDED;
 		break;
 	case 8: //all twohanded
-		mask = IE_INV_ITEM_CURSED;
+		value = IE_INV_ITEM_CURSED;
 		//fallthrough
 	case 9: //all not twohanded
-		value = IE_INV_ITEM_CURSED;
+		mask = IE_INV_ITEM_CURSED;
 		break;
 	case 10: //all twohanded
-		mask = IE_INV_ITEM_COLDIRON;
+		value = IE_INV_ITEM_COLDIRON;
 		//fallthrough
 	case 11: //all not twohanded
-		value = IE_INV_ITEM_COLDIRON;
+		mask = IE_INV_ITEM_COLDIRON;
 		break;
 	case 12:
 		mask = fx->Parameter1;
