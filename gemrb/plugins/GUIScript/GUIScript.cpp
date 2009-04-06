@@ -6384,7 +6384,10 @@ static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
-	return PyInt_FromLong( actor->LearnSpell(Spell, Flags) );
+
+	int ret = actor->LearnSpell( Spell, Flags ); // returns 0 on success
+	if (!ret) core->SetEventFlag( EF_ACTION );
+	return PyInt_FromLong( ret );
 }
 
 PyDoc_STRVAR( GemRB_RemoveSpell__doc,

@@ -4628,6 +4628,7 @@ void GameScript::AddSpecialAbility( Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	actor->LearnSpell (parameters->string0Parameter, parameters->int0Parameter);
+	core->SetEventFlag(EF_ACTION);
 }
 
 void GameScript::RemoveSpell( Scriptable* Sender, Action* parameters)
