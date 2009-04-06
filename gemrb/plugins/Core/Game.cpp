@@ -1273,6 +1273,7 @@ void Game::RestParty(int checks, int dream, int hp)
 		//removes fatigue, recharges spells
 		tar->Rest(0);
 	}
+	core->SetEventFlag(EF_ACTION);
 }
 
 //timestop effect
