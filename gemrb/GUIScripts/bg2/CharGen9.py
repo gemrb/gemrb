@@ -64,6 +64,10 @@ def FinishCharGen():
 	print "KitValue**********:",KitValue
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 
+	# no table for innates, so we make it a high value
+	# to guarantee innate, class ability and HLA memorization works
+	GemRB.SetMemorizableSpellsCount (MyChar, 50, IE_SPELL_TYPE_INNATE, 0)
+
 	# apply class/kit abilities
 	if KitIndex:
 		ABTable = KitTable.GetValue (str(KitIndex), "ABILITIES")
@@ -94,9 +98,20 @@ def FinishCharGen():
 	TmpTable = GemRB.LoadTableObject ("abstart")
 	AlignmentAbbrev = AlignmentTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
 	AlignmentAbbrev = AlignmentTable.GetValue (AlignmentAbbrev, 4)
-	for i in range(TmpTable.GetColumnCount()):
-		ab = TmpTable.GetValue (AlignmentAbbrev, str(i))
-		GemRB.LearnSpell (MyChar, ab)
+	AbilityCount = TmpTable.GetColumnCount()
+	spells = []
+	for i in range(AbilityCount):
+		spells.append (TmpTable.GetValue (AlignmentAbbrev, str(i)))
+	spells2 = list(set(spells))
+	spells2.sort() # create a sorted list of unique spells
+	spells.sort()
+	ClabOffset = GemRB.GetMemorizedSpellsCount (MyChar, IE_SPELL_TYPE_INNATE, 0)
+	for i in range(len(spells)):
+		ab = spells[i]
+		if GemRB.LearnSpell (MyChar, ab, 8) == 1: # 1 == LSR_KNOWN, 8 == LS_MEMO
+			# the spell is already known, so we have to memorize it manually
+			# the last MemorizeSpell parameter is the index of the known spell to memorize
+			GemRB.MemorizeSpell (MyChar, IE_SPELL_TYPE_INNATE, 0, spells2.index(ab)+ClabOffset)
 
 	TmpTable=GemRB.LoadTableObject ("strtgold")
 	t = GemRB.Roll (TmpTable.GetValue (Class,1),TmpTable.GetValue (Class,0), TmpTable.GetValue (Class,2) )
@@ -228,6 +243,7 @@ def AddClassAbilities (MyChar, TmpTable):
 			if ab[:2] == "AP":
 				GemRB.ApplySpell (MyChar, ab[3:])
 			elif ab[:2] == "GA":
-				GemRB.LearnSpell (MyChar, ab[3:])
+				GemRB.LearnSpell (MyChar, ab[3:], 8)
+				# TODO: fix memorization when the spell is already known
 			else:
 				print "ERROR, unknown class ability (type): ", ab
