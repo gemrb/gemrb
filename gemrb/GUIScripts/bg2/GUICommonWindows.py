@@ -307,8 +307,11 @@ def ActionThievingPressed ():
 
 def ActionQWeaponPressed (which):
 	pc = GemRB.GameGetFirstSelectedPC ()
+	qs = GemRB.GetEquippedQuickSlot (pc,1)
 
-	if GemRB.GetEquippedQuickSlot (pc,1)==which and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
+	#38 is the magic slot
+	print "QS:",qs
+	if ((qs==which) or (qs==38)) and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
 	else:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
@@ -537,11 +540,12 @@ def SetSelectionChangeHandler (handler):
 
 	# redraw selection on change main selection | single selection
 	SelectionChanged ()
+	return
 
 def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
-
+	return
 
 def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
@@ -694,7 +698,6 @@ def PortraitButtonOnMouseEnter ():
 	i = GemRB.GetVar ("PressedPortrait")
 
 	if DraggedPortrait != None:
-		print "Swapping ",DraggedPortrait," With ",i+1
 		GemRB.DragItem (0, -1, "")
 		#this might not work
 		GemRB.SwapPCs (DraggedPortrait, i+1)
