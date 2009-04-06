@@ -6443,7 +6443,10 @@ static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Spell not found!" );
 	}
 
-	return PyInt_FromLong( actor->spellbook.MemorizeSpell( ks, false ) );
+	bool enabled = false;
+	if (SpellType == IE_SPELL_TYPE_INNATE) enabled = true;
+
+	return PyInt_FromLong( actor->spellbook.MemorizeSpell( ks, enabled ) );
 }
 
 
@@ -8308,7 +8311,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 			//bring up inventory in the end???
 			//break;
 		default:
-			printMessage("GUIScript", "Unhandled target type!", LIGHT_RED );
+			printf("Unhandled target type: %d\n", spelldata.Target);
 			break;
 	}
 	Py_INCREF( Py_None );
