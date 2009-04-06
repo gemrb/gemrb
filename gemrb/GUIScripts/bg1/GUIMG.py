@@ -208,17 +208,6 @@ def RefreshMageLevel ():
 	UpdateMageWindow ()
 	return
 
-def OnMageMemorizeSpell ():
-	pc = GemRB.GameGetSelectedPCSingle ()
-	level = MageSpellLevel
-	type = IE_SPELL_TYPE_WIZARD
-
-	index = GemRB.GetVar ("SpellButton") - 100
-
-	if GemRB.MemorizeSpell (pc, type, level, index):
-		UpdateMageWindow ()
-	return
-
 def OpenMageSpellInfoWindow ():
 	global MageSpellInfoWindow
 
