@@ -21,6 +21,7 @@
 
 #include "OpenALAudio.h"
 #include <cassert>
+#include <cstdio>
 
 bool checkALError(const char* msg, const char* status) {
 	int error = alGetError();

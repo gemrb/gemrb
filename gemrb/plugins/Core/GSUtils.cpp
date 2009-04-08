@@ -19,6 +19,7 @@
  *
  */
 
+#include <cstdio>
 #include "GSUtils.h"
 #include "Interface.h"
 #include "TileMap.h"

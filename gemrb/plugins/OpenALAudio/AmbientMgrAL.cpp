@@ -22,6 +22,7 @@
 #include <limits.h>
 #include <cmath>
 #include <cassert>
+#include <cstdio>
 #include "../Core/Ambient.h"
 #include "../Core/Interface.h"
 #include "../Core/Game.h"

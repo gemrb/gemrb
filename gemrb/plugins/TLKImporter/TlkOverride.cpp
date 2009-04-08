@@ -21,7 +21,7 @@
  * (dynamic) part of the talk table (tlk)
  */
 
-
+#include <cstdio>
 #include "TlkOverride.h"
 
 #define SEGMENT_SIZE  512

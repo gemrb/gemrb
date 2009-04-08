@@ -21,6 +21,7 @@
 
 #include "LRUCache.h"
 #include <cassert>
+#include <cstdio>
 
 struct VarEntry {
 	VarEntry* prev;

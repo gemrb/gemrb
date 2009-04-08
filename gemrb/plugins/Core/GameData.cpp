@@ -19,7 +19,7 @@
 *
 */
 
-
+#include <cstdio>
 #include "GameData.h"
 
 #include "Actor.h"

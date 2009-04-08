@@ -19,6 +19,7 @@
  *
  */
 
+#include <cstdio>
 #include "GUIScript.h"
 #include "../Core/Interface.h"
 #include "../Core/Map.h"

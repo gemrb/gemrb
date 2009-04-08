@@ -25,6 +25,7 @@ class Action;
 #ifndef GAMESCRIPT_H
 #define GAMESCRIPT_H
 
+#include <cstdio>
 #include "DataStream.h"
 #include "Variables.h"
 #include "SymbolMgr.h"

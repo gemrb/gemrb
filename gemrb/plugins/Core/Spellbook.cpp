@@ -19,6 +19,7 @@
  *
  */
 
+#include <cstdio>
 #include "Spellbook.h"
 #include "Interface.h"
 #include "Spell.h"

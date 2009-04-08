@@ -22,6 +22,7 @@
 #include <assert.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <cstdio>
 #include "../Core/Interface.h"
 #include "../Core/Video.h"
 #include "../Core/Audio.h"
