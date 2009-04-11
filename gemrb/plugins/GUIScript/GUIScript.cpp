@@ -19,7 +19,6 @@
  *
  */
 
-#include <cstdio>
 #include "GUIScript.h"
 #include "../Core/Interface.h"
 #include "../Core/Map.h"
@@ -45,6 +44,8 @@
 #include "../Core/WorldMap.h"
 #include "../Core/EffectQueue.h"
 #include "../Core/ImageFactory.h"
+
+#include <cstdio>
 
 //this stuff is missing from Python 2.2
 #ifndef PyDoc_VAR
@@ -8782,7 +8783,7 @@ static PyObject* GemRB_SwapPCs(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ii", &idx1, &idx2)) {
 		return AttributeError( GemRB_SwapPCs__doc );
 	}
-	
+
 	Game *game = core->GetGame();
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
