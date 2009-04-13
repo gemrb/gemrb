@@ -108,7 +108,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
-		SetGamedaysAndHourToken()
+		Button.SetEvent(IE_GUI_BUTTON_MOUSE_OVER_BUTTON, "SetGameDaysAndHourToken")
 		Button.SetTooltip(16041)
 		rb = 11
 	else:
@@ -229,7 +229,7 @@ def OpenActionsWindowControls (Window):
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
-	SetGamedaysAndHourToken()
+	Button.SetEvent(IE_GUI_BUTTON_MOUSE_OVER_BUTTON, "SetGameDaysAndHourToken")
 	Button.SetTooltip(16041)
 	UpdateActionsWindow ()
 	return
