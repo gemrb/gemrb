@@ -12,7 +12,7 @@ def OnLoad ():
 
 	EditControl = BioWindow.GetControl (3)
 	BIO = GemRB.GetToken("BIO")
-	EditControl = GemRB.ConvertEdit (BioWindow, EditControl, 5)
+	EditControl = EditControl.ConvertEdit (5)
 	EditControl.SetVarAssoc ("row", 0)
 	if BIO:
 		EditControl.SetText (BIO)

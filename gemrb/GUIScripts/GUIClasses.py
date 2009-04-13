@@ -133,6 +133,9 @@ class GTextEdit(GControl):
   methods = {
     'SetBufferLength': GemRB.SetBufferLength
   }
+  def ConvertEdit(self, ScrollBarID):
+    newID = GemRB.ConvertEdit(self.WinID, self.ID, ScrollBarID)
+    return GemRB.GetControlObject(self.WinID, newID)
  
 class GButton(GControl):
   __metaclass__ = metaControl

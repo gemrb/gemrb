@@ -248,7 +248,7 @@ def AddNoteWindow ():
 	Text = Label.QueryText ()
 	NoteWindow = GemRB.LoadWindowObject (5)
 	NoteLabel = NoteWindow.GetControl (1)
-	NoteLabel = GemRB.ConvertEdit (NoteWindow, NoteLabel, 1)
+	NoteLabel = NoteLabel.ConvertEdit (1)
 	NoteLabel.SetText (Text)
 	NoteLabel.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
