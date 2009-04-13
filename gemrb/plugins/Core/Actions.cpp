@@ -4655,9 +4655,10 @@ void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
 
 //iwd2
 //advance time with a constant
+//This is in seconds according to IESDP
 void GameScript::AdvanceTime(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->AdvanceTime(parameters->int0Parameter);
+	core->GetGame()->AdvanceTime(parameters->int0Parameter*1000/AI_UPDATE_TIME);
 }
 
 //advance at least one day, then stop at next day/dusk/night/morning

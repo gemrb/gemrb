@@ -805,7 +805,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 't'://advances time
 				// 7200 (one day) /24 (hours) == 300
-				game->AdvanceTime(300);
+				game->AdvanceTime(300*ROUND_SIZE);
 				//refresh gui here once we got it
 				break;
 

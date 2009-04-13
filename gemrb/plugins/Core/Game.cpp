@@ -1247,7 +1247,7 @@ void Game::RestParty(int checks, int dream, int hp)
 			return;
 		}
 	}
-	AdvanceTime(2400);
+	AdvanceTime(2400*ROUND_SIZE);
 
 	//movie
 	if (dream>=0) {
