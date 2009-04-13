@@ -531,7 +531,7 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 //the effects are currently NOT in the target's fxqueue, those that stick
 //will get copied (hence the fxqueue.AddEffect call)
 //if this returns FX_NOT_APPLIED, then the whole stack was resisted
-//or expired 
+//or expired
 int EffectQueue::AddAllEffects(Actor* target, Point &destination)
 {
 	int res = FX_NOT_APPLIED;
@@ -946,14 +946,14 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 		fn = effect_refs[fx->Opcode].Function;
 	}
 	int res = FX_ABORT;
-	if (fn) {    
+	if (fn) {
 		if ( target && first_apply ) {
 			if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-				core->DisplayStringName( effect_refs[fx->Opcode].EffText, 0xf0f0f0, 
+				core->DisplayStringName( effect_refs[fx->Opcode].EffText, 0xf0f0f0,
 					target, IE_STR_SOUND);
 			}
 		}
-		
+
 		res=fn( Owner?Owner:target, target, fx );
 
 		//if there is no owner, we assume it is the target
@@ -1143,10 +1143,10 @@ void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) cons
 void EffectQueue::RemoveExpiredEffects(ieDword futuretime) const
 {
 	ieDword GameTime = core->GetGame()->GameTime;
-	if (GameTime+futuretime<GameTime) {
+	if (GameTime+futuretime*ROUND_SIZE<GameTime) {
 		GameTime=0xffffffff;
 	} else {
-		GameTime+=futuretime;
+		GameTime+=futuretime*ROUND_SIZE;
 	}
 
 	std::list< Effect* >::const_iterator f;

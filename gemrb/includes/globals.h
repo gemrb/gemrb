@@ -138,7 +138,7 @@
 #define CHARGE_COUNTERS  3
 
 /////AI global defines
-#define AI_UPDATE_TIME	10
+#define AI_UPDATE_TIME	15
 
 /////maximum animation orientation count (used in many places)
 #define MAX_ORIENT				16

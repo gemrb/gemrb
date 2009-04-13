@@ -145,7 +145,7 @@ void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
 
 	mytime=core->GetGame()->GameTime; //gametime (should increase it)
 	SetVariable( Sender, parameters->string0Parameter,
-		parameters->int0Parameter + mytime);
+		parameters->int0Parameter*ROUND_SIZE + mytime);
 }
 
 void GameScript::SetGlobalTimerRandom(Scriptable* Sender, Action* parameters)
@@ -159,7 +159,7 @@ void GameScript::SetGlobalTimerRandom(Scriptable* Sender, Action* parameters)
 		random = 0;
 	}
 	mytime=core->GetGame()->GameTime; //gametime (should increase it)
-	SetVariable( Sender, parameters->string0Parameter, random + mytime);
+	SetVariable( Sender, parameters->string0Parameter, random*ROUND_SIZE + mytime);
 }
 
 void GameScript::SetGlobalTimerOnce(Scriptable* Sender, Action* parameters)
@@ -170,7 +170,7 @@ void GameScript::SetGlobalTimerOnce(Scriptable* Sender, Action* parameters)
 	}
 	mytime=core->GetGame()->GameTime; //gametime (should increase it)
 	SetVariable( Sender, parameters->string0Parameter,
-		parameters->int0Parameter + mytime);
+		parameters->int0Parameter*ROUND_SIZE + mytime);
 }
 
 void GameScript::RealSetGlobalTimer(Scriptable* Sender, Action* parameters)
@@ -4665,9 +4665,9 @@ void GameScript::AdvanceTime(Scriptable* /*Sender*/, Action* parameters)
 //i'm not sure if we should add a whole day either, needs more research
 void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 {
-	int padding = core->GetGame()->GameTime%7200;
+	int padding = (core->GetGame()->GameTime/ROUND_SIZE)%7200;
 	padding = (padding/300+24-parameters->int0Parameter)%24*300;
-	core->GetGame()->AdvanceTime(7200+padding);
+	core->GetGame()->AdvanceTime(7200+padding*ROUND_SIZE);
 }
 
 //implement pst style parameters:

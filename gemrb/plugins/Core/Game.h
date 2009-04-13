@@ -51,7 +51,7 @@ class Game;
 #include "Variables.h"
 
 //the length of a round in game ticks?
-#define ROUND_SIZE     10
+#define ROUND_SIZE     15
 
 //the size of the bestiary register
 #define BESTIARY_SIZE 260
@@ -371,7 +371,7 @@ public:
 	void AddGold(ieDword add);
 	/** Adds ticks to game time */
 	void AdvanceTime(ieDword add);
-	/** Runs the script engine on the global script and the area scripts 
+	/** Runs the script engine on the global script and the area scripts
 	areas run scripts on door, infopoint, container, actors too */
 	void UpdateScripts();
 	/** runs area functionality, sets partyrested trigger */

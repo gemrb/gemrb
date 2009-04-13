@@ -69,7 +69,7 @@ EffectQueue *Spell::GetEffectBlock(int block_index, int ext_index) const
 {
 	Effect *features;
 	int count;
-	
+
 	//iwd2 has this hack
 	if (block_index>=0) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {

@@ -1902,7 +1902,7 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 		//We need to convert this to signed 16 bits, because
 		//it is actually a 16 bit number. The high word could
 		//be anything. It is signed to have the correct math
-		//when adding it to the base slot (SLOT_WEAPON) in 
+		//when adding it to the base slot (SLOT_WEAPON) in
 		//case of quivers. (weird IE magic)
 		inventory.SetEquippedSlot( (ieWordSigned) Equipped );
 	}
@@ -2633,7 +2633,7 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	if (tmp<0) tmp=0;
 	else if (tmp>0x10) tmp=0x10;
 
-	initiative = (ieDword) (gameTime+tmp);
+	initiative = (ieDword) (gameTime+tmp*ROUND_SIZE);
 }
 
 int Actor::GetToHit(int bonus, ieDword Flags)
@@ -2983,7 +2983,7 @@ bool Actor::Schedule(ieDword gametime)
 	}
 
 	//check for schedule
-	ieDword bit = 1<<(gametime%7200/300);
+	ieDword bit = 1<<((gametime/ROUND_SIZE)%7200/300);
 	if (appearance & bit) {
 		return true;
 	}

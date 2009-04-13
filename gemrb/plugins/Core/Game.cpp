@@ -1006,9 +1006,9 @@ void Game::AddGold(ieDword add)
 //later this could be more complicated
 void Game::AdvanceTime(ieDword add)
 {
-	ieDword h = GameTime/300;
+	ieDword h = GameTime/(300*ROUND_SIZE);
 	GameTime+=add;
-	if (h!=GameTime/300) {
+	if (h!=GameTime/(300*ROUND_SIZE)) {
 		//asking for a new weather when the hour changes
 		WeatherBits&=~WB_HASWEATHER;
 	}
@@ -1243,7 +1243,7 @@ void Game::RestParty(int checks, int dream, int hp)
 			return;
 		}
 		//area encounters
-		if(area->Rest( leader->Pos, 8, GameTime%7200/3600) ) {
+		if(area->Rest( leader->Pos, 8, (GameTime/ROUND_SIZE)%7200/3600) ) {
 			return;
 		}
 	}
@@ -1280,7 +1280,7 @@ void Game::RestParty(int checks, int dream, int hp)
 void Game::TimeStop(Actor* owner, ieDword end)
 {
 	timestop_owner=owner;
-	timestop_end=end;
+	timestop_end=GameTime+end;
 }
 
 //returns the colour which should be applied onto the whole game area viewport
@@ -1313,7 +1313,7 @@ const Color *Game::GetGlobalTint() const
 	}
 	if ((map->AreaType&(AT_OUTDOOR|AT_DAYNIGHT|AT_EXTENDED_NIGHT)) == (AT_OUTDOOR|AT_DAYNIGHT) ) {
 		//get daytime colour
-		ieDword daynight = (GameTime%7200/300);
+		ieDword daynight = ((GameTime/ROUND_SIZE)%7200/300);
 		if (daynight<2 || daynight>22) {
 			return &NightTint;
 		}
@@ -1326,7 +1326,7 @@ const Color *Game::GetGlobalTint() const
 
 bool Game::IsDay()
 {
-	ieDword daynight = (GameTime%7200/300);
+	ieDword daynight = ((GameTime/ROUND_SIZE)%7200/300);
 	if(daynight<4 || daynight>20) {
 		return false;
 	}
@@ -1372,7 +1372,7 @@ void Game::ChangeSong()
 		Song = 3;
 	} else {
 		//night or day
-		Song = GameTime%7200/3600;
+		Song = (GameTime/ROUND_SIZE)%7200/3600;
 	}
 	//area may override the song played (stick in battlemusic)
 	area->PlayAreaSong( Song );
@@ -1426,7 +1426,7 @@ void Game::StartTimer(ieDword ID, ieDword expiration)
 	if (ID>=MAX_TIMER) {
 		return;
 	}
-	script_timers[ID]=GameTime+expiration;
+	script_timers[ID]=GameTime+expiration*ROUND_SIZE;
 }
 
 /* this method redraws weather. If update is false,

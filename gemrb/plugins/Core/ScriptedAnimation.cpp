@@ -490,7 +490,7 @@ bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 		}
 		justCreated = false;
 		if (Duration!=0xffffffff) {
-			Duration += core->GetGame()->Ticks;
+			Duration += core->GetGame()->GameTime;
 		}
 
 		if (!anims[P_ONSET*MAX_ORIENT+Orientation]) {
@@ -513,7 +513,7 @@ retry:
 
 	//explicit duration
 	if (Phase==P_HOLD) {
-		if (core->GetGame()->Ticks>Duration) {
+		if (core->GetGame()->GameTime>Duration) {
 			Phase++;
 			goto retry;
 		}

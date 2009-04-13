@@ -744,7 +744,7 @@ int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid) {
-		if ( value1 == core->GetGame()->GameTime ) return 1;
+		if ( value1 == core->GetGame()->GameTime/ROUND_SIZE ) return 1;
 	}
 	return 0;
 }
@@ -754,8 +754,8 @@ int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
-	if (valid && value1) {    
-		if ( value1 < core->GetGame()->GameTime ) return 1;
+	if (valid && value1) {
+		if ( value1 < core->GetGame()->GameTime/ROUND_SIZE ) return 1;
 	}
 	return 0;
 }
@@ -767,7 +767,7 @@ int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid && value1) {
-	 	if ( value1 > core->GetGame()->GameTime ) return 1;
+	 	if ( value1 > core->GetGame()->GameTime/ROUND_SIZE ) return 1;
 	}
 	return 0;
 }
@@ -780,7 +780,7 @@ int GameScript::GlobalTimerStarted(Scriptable* Sender, Trigger* parameters)
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid && value1) {
-		if ( value1 > core->GetGame()->GameTime ) return 1;
+		if ( value1 > core->GetGame()->GameTime/ROUND_SIZE ) return 1;
 	}
 	return 0;
 }
@@ -3059,19 +3059,19 @@ int GameScript::AnimState(Scriptable* Sender, Trigger* parameters)
 //this trigger uses hours
 int GameScript::Time(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GameTime%7200/300 == (ieDword) parameters->int0Parameter;
+	return (core->GetGame()->GameTime/ROUND_SIZE)%7200/300 == (ieDword) parameters->int0Parameter;
 }
 
 //this trigger uses hours
 int GameScript::TimeGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GameTime%7200/300 > (ieDword) parameters->int0Parameter;
+	return (core->GetGame()->GameTime/ROUND_SIZE)%7200/300 > (ieDword) parameters->int0Parameter;
 }
 
 //this trigger uses hours
 int GameScript::TimeLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GameTime%7200/300 < (ieDword) parameters->int0Parameter;
+	return (core->GetGame()->GameTime/ROUND_SIZE)%7200/300 < (ieDword) parameters->int0Parameter;
 }
 
 int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
@@ -3767,7 +3767,7 @@ int GameScript::Delay( Scriptable* Sender, Trigger* parameters)
 	ieDword delay = (ieDword) parameters->int0Parameter;
 	if (delay<=1) {
 		return 1;
-	}  
+	}
 	ieDword time1=Sender->lastDelay/1000/delay;
 	ieDword time2=Sender->lastRunTime/1000/delay;
 
@@ -3779,7 +3779,7 @@ int GameScript::Delay( Scriptable* Sender, Trigger* parameters)
 
 int GameScript::TimeOfDay(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	ieDword timeofday = core->GetGame()->GameTime%7200/1800;
+	ieDword timeofday = (core->GetGame()->GameTime/ROUND_SIZE)%7200/1800;
 
 	if (timeofday==(ieDword) parameters->int0Parameter) {
 		return 1;

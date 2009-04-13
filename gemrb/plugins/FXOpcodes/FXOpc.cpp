@@ -1735,7 +1735,7 @@ int power_word_stun_iwd2(Actor *target, Effect *fx)
 	else stuntime = core->Roll(4,4,0);
 	fx->Parameter2 = 0;
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
-	fx->Duration = stuntime*6 + core->GetGame()->GameTime;
+	fx->Duration = stuntime*6*ROUND_SIZE + core->GetGame()->GameTime;
 	STATE_SET( STATE_STUNNED );
 	target->AddPortraitIcon(PI_STUN);
 	return FX_APPLIED;
@@ -4277,8 +4277,8 @@ int fx_power_word_stun (Actor* Owner, Actor* target, Effect* fx)
 	stat = (stat * 3 + limit - 1) / limit;
 	//delay will be calculated as 1dx/2dx/3dx
 	//depending on the current hitpoints (or the stat in param2)
-	stat = core->Roll(stat,x?x:4,0) * 15;
-	fx->Duration = core->GetGame()->Ticks+stat;
+	stat = core->Roll(stat,x?x:4,0) * ROUND_SIZE;
+	fx->Duration = core->GetGame()->GameTime+stat;
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	fx->Opcode = EffectQueue::ResolveEffect(fx_set_stun_state_ref);
 	return fx_set_stun_state(Owner,target,fx);
@@ -4352,7 +4352,7 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (fx->TimingMode!=FX_DURATION_INSTANT_PERMANENT) {
-		sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
+		sca->SetDefaultDuration(fx->Duration-core->GetGame()->GameTime);
 	}
 	if (fx->Parameter2) {
 		//play over target (sticky)
@@ -4399,7 +4399,7 @@ int fx_power_word_sleep (Actor* Owner, Actor* target, Effect* fx)
 	}
 	//translate this effect to a normal sleep effect
 	//recalculate delay
-	fx->Duration = core->GetGame()->Ticks+x*15;
+	fx->Duration = core->GetGame()->GameTime+x*ROUND_SIZE;
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	fx->Opcode = EffectQueue::ResolveEffect(fx_sleep_ref);
 	fx->Parameter2=0;
