@@ -120,24 +120,28 @@
 #define STR_LOCKPICK_FAILED 86
 #define STR_STATIC_DISS     87
 #define STR_LIGHTNING_DISS  88
-//
-//
-#define STR_WRONGITEMTYPE   90
-#define STR_ITEMEXCL        91
-#define STR_PICKPOCKET_DONE 92       //done
-#define STR_PICKPOCKET_NONE 93       //no items to steal
-#define STR_PICKPOCKET_FAIL 94       //failed, noticed
-#define STR_PICKPOCKET_EVIL 95       //can't pick hostiles
-#define STR_PICKPOCKET_ARMOR 96      //armor restriction
-#define STR_USING_FEAT      97
-#define STR_STOPPED_FEAT    98
-#define STR_DISARM_DONE 99       //trap disarmed
-#define STR_DISARM_FAIL 100       //trap not disarmed
-#define STR_DOORBASH_DONE 101
-#define STR_DOORBASH_FAIL 102
-#define STR_CONTBASH_DONE 103
-#define STR_CONTBASH_FAIL 104
+//89
+//90
+#define STR_WRONGITEMTYPE   91
+#define STR_ITEMEXCL        92
+#define STR_PICKPOCKET_DONE 93       //done
+#define STR_PICKPOCKET_NONE 94       //no items to steal
+#define STR_PICKPOCKET_FAIL 95       //failed, noticed
+#define STR_PICKPOCKET_EVIL 96       //can't pick hostiles
+#define STR_PICKPOCKET_ARMOR 97      //armor restriction
+#define STR_USING_FEAT      98
+#define STR_STOPPED_FEAT    99
+#define STR_DISARM_DONE 100       //trap disarmed
+#define STR_DISARM_FAIL 101       //trap not disarmed
+#define STR_DOORBASH_DONE 102
+#define STR_DOORBASH_FAIL 103
+#define STR_CONTBASH_DONE 104
+#define STR_CONTBASH_FAIL 105
+#define STR_MAYNOTSETTRAP 106
+#define STR_SNAREFAILED   107
+#define STR_SNARESUCCEED  108
+#define STR_NOMORETRAP    109
 
-#define STRREF_COUNT 105
+#define STRREF_COUNT 110
 
 #endif //! IE_STRINGS_H
