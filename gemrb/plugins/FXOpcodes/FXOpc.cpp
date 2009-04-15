@@ -227,7 +227,7 @@ int fx_disable_button (Actor* Owner, Actor* target, Effect* fx);//90
 int fx_disable_spellcasting (Actor* Owner, Actor* target, Effect* fx);//91
 int fx_cast_spell (Actor* Owner, Actor* target, Effect *fx);//92
 int fx_learn_spell (Actor* Owner, Actor* target, Effect *fx);//93
-int fx_cast_scroll (Actor* Owner, Actor* target, Effect *fx);//94
+int fx_cast_spell_point (Actor* Owner, Actor* target, Effect *fx);//94
 int fx_identify (Actor* Owner, Actor* target, Effect *fx);//95
 int fx_find_traps (Actor* Owner, Actor* target, Effect *fx);//96
 int fx_replace_creature (Actor* Owner, Actor* target, Effect *fx);//97
@@ -679,7 +679,7 @@ static EffectRef effectnames[] = {
 	{ "SpellDurationModifier", fx_spell_duration_modifier, -1 },
 	{ "Spell:Add", fx_add_innate, -1 },
 	{ "Spell:Cast", fx_cast_spell, -1 },
-	{ "Spell:CastAsScroll", fx_cast_scroll, -1 },
+	{ "Spell:CastPoint", fx_cast_spell_point, -1 },
 	{ "Spell:Learn", fx_learn_spell, -1 },
 	{ "Spell:Remove", fx_remove_spell, -1 },
 	{ "Spelltrap",fx_spelltrap , -1 }, //overlay: spmagglo
@@ -783,6 +783,59 @@ static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 	}
 }
 
+//whoseeswho:
+#define ENEMY_SEES_ORIGIN 1
+#define ORIGIN_SEES_ENEMY 2
+
+inline Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
+{
+	//determining the allegiance of the origin
+	int type = 2; //neutral, has no enemies
+	if (origin->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+		type = 1; //PC
+	}
+	if (origin->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+		type = 0;
+	}
+
+	//neutral has no enemies
+	if (type==2) {
+		return NULL;
+	}
+
+	Targets *tgts = new Targets();
+
+	int i = map->GetActorCount(true);
+	Actor *ac;
+	while (i--) {
+		ac=map->GetActor(i,true);
+		int distance = Distance(ac, origin);
+		if (whoseeswho&ENEMY_SEES_ORIGIN) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD)) {
+				continue;
+			}
+		}
+		if (whoseeswho&ORIGIN_SEES_ENEMY) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD)) {
+				continue;
+			}
+		}
+
+		if (type) { //origin is PC
+			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				tgts->AddTarget(ac, distance, GA_NO_DEAD);
+			}
+		}
+		else {
+			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+				tgts->AddTarget(ac, distance, GA_NO_DEAD);
+			}
+		}
+	}
+	ac = (Actor *) tgts->GetTarget(0, ST_ACTOR);
+	delete tgts;
+	return ac;
+}
 // Effect opcodes
 
 // 0x00 ACVsDamageTypeModifier
@@ -1958,14 +2011,15 @@ int fx_dispel_effects (Actor* /*Owner*/, Actor* target, Effect* fx)
 	case 1:
 		//same level: 50% success, each diff modifies it by 5%
 		level = core->Roll(1,20,fx->Power-10);
-		if (level>0x80000000) level = 0;
+		if (level>=0x80000000) level = 0;
 		break;
 	case 2:
 		//same level: 50% success, each diff modifies it by 5%
 		level = core->Roll(1,20,fx->Parameter1-10);
-		if (level>0x80000000) level = 0;
+		if (level>=0x80000000) level = 0;
 		break;
 	}
+	//if signed would it be negative?
 	target->fxqueue.RemoveLevelEffects(level, RL_DISPELLABLE, 0);
 	return FX_NOT_APPLIED;
 }
@@ -3461,9 +3515,9 @@ int fx_learn_spell (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 // 0x94 Spell:CastSpellPoint
-int fx_cast_scroll (Actor* Owner, Actor* target, Effect* fx)
+int fx_cast_spell_point (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_cast_scroll (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
+	if (0) printf( "fx_cast_spell_point (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	Owner->CastSpellPoint(fx->Resource, target->Pos, false);
 	return FX_NOT_APPLIED;
 }
@@ -4568,7 +4622,8 @@ int fx_cast_spell_on_condition (Actor* Owner, Actor* target, Effect* fx)
 	case 1: actor = map->GetActorByGlobalID(target->LastHitter); break;
 		//nearest enemy
 		//fix this!
-	case 2: actor = map->GetActorByGlobalID(target->LastSeen); break;
+	//case 2: actor = map->GetActorByGlobalID(target->LastSeen); break;
+	case 2: actor = GetNearestEnemyOf(map, target, 0); break;
 		//nearest creature
 	case 3: actor = map->GetActorByGlobalID(target->LastSeen); break;
 	}
@@ -4840,10 +4895,44 @@ int fx_damageluck_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xfb bardsong (generic effect)
+
 // 0xfc SetTrap
-int fx_set_area_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_set_area_effect (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_trap (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	ieDword skill, roll;
+	Map *map;
+	
+	map = target->GetCurrentArea();
+	if (!map) return FX_NOT_APPLIED;
+
+	proIterator iter;
+
+	//check if trap count is over an amount (only saved traps count)
+	//actually, only projectiles in trigger phase should count here
+	if (map->GetTrapCount(iter)>6) {
+		core->DisplayConstantStringName(STR_NOMORETRAP, 0xf0f0f0, target);
+		return FX_NOT_APPLIED;
+	}
+
+	//check if we are under attack
+	if (GetNearestEnemyOf(map, target, ORIGIN_SEES_ENEMY|ENEMY_SEES_ORIGIN)) {
+		core->DisplayConstantStringName(STR_MAYNOTSETTRAP, 0xf0f0f0, target);
+		return FX_NOT_APPLIED;
+	}
+
+	skill = Owner->GetStat(IE_SETTRAPS);
+	roll = core->Roll(1,100,0);
+
+	if (roll>skill) {
+		//failure
+		core->DisplayConstantStringName(STR_SNAREFAILED, 0xf0f0f0, target);
+		//TODO check luck and do some damage effect on target
+		return FX_NOT_APPLIED;
+	}
+	//success
+	core->DisplayConstantStringName(STR_SNARESUCCEED, 0xf0f0f0, target);
+	Owner->CastSpellPoint(fx->Resource, target->Pos, false);
 	return FX_NOT_APPLIED;
 }
 

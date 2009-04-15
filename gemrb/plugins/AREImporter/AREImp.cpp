@@ -33,6 +33,7 @@
 #include "../Core/Game.h"
 #include "../Core/Video.h"
 #include "../Core/Palette.h"
+#include "../Core/ProjectileServer.h"
 
 #define DEF_OPEN   0
 #define DEF_CLOSE  1
@@ -214,6 +215,8 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	}
 	str->ReadDword( &NoteOffset );
 	str->ReadDword( &NoteCount );
+	str->ReadDword( &TrapOffset );
+	str->ReadDword( &TrapCount );
 	return true;
 }
 
@@ -1123,6 +1126,31 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		map->AddMapNote( point, color, text );
 	}
 
+	//this is a ToB feature (saves the unexploded projectiles)
+	printf( "Loading traps\n" );
+	str->Seek( NoteOffset, GEM_STREAM_START );
+	for (i = 0; i < TrapCount; i++) {
+		ieResRef TrapResRef;
+		ieDword TrapEffOffset;
+		ieWord TrapSize, ProID;
+		ieWord X,Y;
+		ieDword Unknown1, Unknown2;
+
+		str->ReadResRef( TrapResRef );
+		str->ReadDword( &TrapEffOffset );
+		str->ReadWord( &TrapSize );
+		str->ReadWord( &ProID );
+		str->ReadDword( &Unknown1 );
+		str->ReadWord( &X );
+		str->ReadWord( &Y );
+		str->ReadDword( &Unknown2 );
+		//TODO: the size of the trap effect block?
+		//Read the effects and create a projectile from them?
+		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(ProID);
+		Point pos(X,Y);
+		map->AddProjectile( pro, pos, pos);
+	}
+
 	printf( "Loading tiles\n" );
 	//Loading Tiled objects (if any)
 	str->Seek( TileOffset, GEM_STREAM_START );
@@ -1145,7 +1173,6 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		//are they tileset tiles or impeded block tiles
 		map->TMap->AddTile( ID, Name, Flags, NULL,0, NULL, 0 );
 	}
-
 
 	printf( "Loading explored bitmap\n" );
 	i = map->GetExploredMapSize();
@@ -1277,6 +1304,22 @@ int AREImp::GetStoredFileSize(Map *map)
 
 	ExploredBitmapSize = map->GetExploredMapSize();
 	headersize += ExploredBitmapSize;
+	EffectOffset = headersize;
+
+	TrapCount = (ieDword) map->GetTrapCount(piter);
+	for(i=0;i<TrapCount;i++) {
+		Projectile *pro = map->GetNextTrap(piter);
+		if (pro) {
+			EffectQueue *fxqueue = pro->GetEffects();
+			if (fxqueue) {
+				headersize += fxqueue->GetSavedEffectsCount() * 0x108;
+			}
+		}
+	}
+
+	TrapOffset = headersize;
+	TrapCount = (ieDword) map->GetTrapCount(piter);
+	headersize += TrapCount * 0x1c;
 	NoteOffset = headersize;
 
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
@@ -1293,7 +1336,7 @@ int AREImp::GetStoredFileSize(Map *map)
 
 int AREImp::PutHeader(DataStream *stream, Map *map)
 {
-	char Signature[80];
+	char Signature[72];
 	ieDword tmpDword = 0;
 	ieWord tmpWord = 0;
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
@@ -1370,13 +1413,15 @@ int AREImp::PutHeader(DataStream *stream, Map *map)
 	if (pst) {
 		tmpDword = 0xffffffff;
 		stream->WriteDword( &tmpDword);
-		i=76;
+		i=68;
 	} else {
-		i=80;
+		i=72;
 	}
 	stream->WriteDword( &NoteOffset );
 	stream->WriteDword( &NoteCount );
-	//usually 80 empty bytes (but pst used up 4 elsewhere)
+	stream->WriteDword( &TrapOffset );
+	stream->WriteDword( &TrapCount );
+	//usually 72 empty bytes (but pst used up 4 elsewhere)
 	stream->Write( Signature, i);
 	return 0;
 }
@@ -1920,14 +1965,120 @@ int AREImp::PutMapnotes( DataStream *stream, Map *map)
 			//strref (needs to be fixed?)
 			tmpDword = 0;
 			stream->WriteDword( &tmpDword);
-			stream->WriteWord( &tmpWord);
-			stream->WriteWord( &mn->color);
+			stream->WriteWord( &tmpWord );
+			stream->WriteWord( &mn->color );
 			tmpDword = 1;
-			stream->WriteDword( &tmpDword);
+			stream->WriteDword( &tmpDword );
 			for (x=0;x<9;x++) { //9 empty dwords
 				stream->Write( filling, 4);
 			}
 		}
+	}
+	return 0;
+}
+
+int AREImp::PutEffects( DataStream *stream, EffectQueue *fxqueue)
+{
+	ieDword tmpDword1,tmpDword2;
+	char filling[60];
+
+	memset(filling,0,sizeof(filling) );
+	std::list< Effect* >::const_iterator f=fxqueue->GetFirstEffect();
+	ieDword EffectsCount = fxqueue->GetSavedEffectsCount();
+	for(unsigned int i=0;i<EffectsCount;i++) {
+		const Effect *fx = fxqueue->GetNextSavedEffect(f);
+
+		assert(fx!=NULL);
+
+		stream->Write( filling,8 ); //signature
+		stream->WriteDword( &fx->Opcode);
+		stream->WriteDword( &fx->Target);
+		stream->WriteDword( &fx->Power);
+		stream->WriteDword( &fx->Parameter1);
+		stream->WriteDword( &fx->Parameter2);
+		stream->WriteDword( &fx->TimingMode);
+		stream->WriteDword( &fx->Duration);
+		stream->WriteWord( &fx->Probability1);
+		stream->WriteWord( &fx->Probability2);
+		stream->WriteResRef(fx->Resource);
+		stream->WriteDword( &fx->DiceThrown );
+		stream->WriteDword( &fx->DiceSides );
+		stream->WriteDword( &fx->SavingThrowType );
+		stream->WriteDword( &fx->SavingThrowBonus );
+		//isvariable
+		stream->Write( filling,4 );
+		stream->WriteDword( &fx->PrimaryType );
+		stream->Write( filling,12 );
+		stream->WriteDword( &fx->Resistance );
+		stream->WriteDword( &fx->Parameter3 );
+		stream->WriteDword( &fx->Parameter4 );
+		stream->Write( filling,8 );
+		if (fx->IsVariable) {
+			stream->Write(fx->Resource+8, 8);
+			//resource1-4 are used as a continuous memory
+			stream->Write(((ieByte *) fx->Resource)+16, 8);
+		} else {
+			stream->WriteResRef(fx->Resource2);
+			stream->WriteResRef(fx->Resource3);
+		}
+		tmpDword1 = (ieDword) fx->PosX;
+		tmpDword2 = (ieDword) fx->PosY;
+		stream->WriteDword( &tmpDword1 );
+		stream->WriteDword( &tmpDword2 );
+		//FIXME: these two points are actually different
+		stream->WriteDword( &tmpDword1 );
+		stream->WriteDword( &tmpDword2 );
+		stream->WriteDword( &fx->SourceType );
+		stream->WriteResRef( fx->Source );
+		stream->WriteDword( &fx->SourceFlags );
+		stream->WriteDword( &fx->Projectile );
+		tmpDword1 = (ieDword) fx->InventorySlot;
+		stream->WriteDword( &tmpDword1 );
+		stream->Write( filling,40 ); //12+32+8
+		stream->WriteDword( &fx->SecondaryType );
+		stream->Write( filling,60 );
+	}
+	return 0;
+}
+
+int AREImp::PutTraps( DataStream *stream, Map *map)
+{
+	ieDword Offset;
+	ieDword tmpDword;
+	ieWord tmpWord;
+	ieResRef name;
+	ieWord type = 0;
+	Point dest(0,0);
+
+	Offset = EffectOffset;
+	ieDword i = map->GetTrapCount(piter);
+	while(i--) {
+		tmpWord = 0;
+		Projectile *pro = map->GetNextTrap(piter);
+		if (pro) {
+			type = pro->GetType();
+			dest = pro->GetDestination();
+			strnuprcpy(name, pro->GetName(), 8);
+			EffectQueue *fxqueue = pro->GetEffects();
+			if (fxqueue) {
+				tmpWord = fxqueue->GetSavedEffectsCount();
+			}
+		}
+
+		stream->WriteResRef( name );
+		stream->WriteDword( &Offset );
+		//size of fxqueue;
+		assert(tmpWord<256);
+		tmpWord *= 0x108;
+		Offset += tmpWord;
+		stream->WriteWord( &tmpWord ); //
+		stream->WriteWord( &type ); //
+		stream->WriteDword( &tmpDword );
+		tmpWord = (ieWord) dest.x;
+		stream->WriteWord( &tmpWord );
+		tmpWord = (ieWord) dest.y;
+		stream->WriteWord( &tmpWord );
+		stream->WriteDword( &tmpDword );
 	}
 	return 0;
 }
@@ -2092,6 +2243,30 @@ int AREImp::PutArea(DataStream *stream, Map *map)
 	}
 
 	ret = PutExplored( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ieDword i = map->GetTrapCount(piter);
+	while(i--) {
+		Projectile *trap = map->GetNextTrap(piter);
+		if (!trap) {
+			continue;
+		}
+
+		EffectQueue *fxqueue = trap->GetEffects();
+
+		if (!fxqueue) {
+			continue;
+		}
+
+		ret = PutEffects( stream, fxqueue);
+		if (ret) {
+			return ret;
+		}
+	}
+
+	ret = PutTraps( stream, map);
 	if (ret) {
 		return ret;
 	}

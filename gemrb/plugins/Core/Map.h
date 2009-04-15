@@ -323,8 +323,15 @@ public:
 
 	SongHeaderType SongHeader;
 	RestHeaderType RestHeader;
+
+	//count of unexploded projectiles that are saved
+	ieDword GetTrapCount(proIterator &iter);
+	//get the next saved projectile
+	Projectile* GetNextTrap(proIterator &iter);
+	//add a projectile to the area
 	void AddProjectile(Projectile* pro, Point &source, Point &dest);
 	void AddProjectile(Projectile* pro, Point &source, ieWord actorID);
+
 	void AddVVCell(ScriptedAnimation* vvc);
 	bool CanFree();
 	int GetCursor( Point &p);

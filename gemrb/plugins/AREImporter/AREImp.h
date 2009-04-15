@@ -44,12 +44,14 @@ private:
 	ieWord  ActorCount, VerticesCount, AmbiCount;
 	ieWord  ContainersCount, InfoPointsCount, ItemsCount;
 	ieDword VariablesCount;
-	ieDword NoteCount;
 	ieDword ContainersOffset, InfoPointsOffset, ItemsOffset;
 	ieDword AmbiOffset, VariablesOffset;
-	ieDword NoteOffset;
 	ieDword SpawnOffset, SpawnCount;
 	ieDword TileOffset, TileCount;
+	ieDword NoteOffset, NoteCount;
+	ieDword TrapOffset, TrapCount;  //only in ToB?
+	proIterator piter; //iterator for saving projectiles
+	ieDword EffectOffset;
 	ieResRef Script;
 public:
 	AREImp(void);
@@ -83,6 +85,8 @@ private:
 	int PutVariables(DataStream *stream, Map *map);
 	int PutAmbients(DataStream *stream, Map *map);
 	int PutMapnotes(DataStream *stream, Map *map);
+	int PutEffects( DataStream *stream, EffectQueue *fxqueue);
+	int PutTraps(DataStream *stream, Map *map);
 	int PutExplored(DataStream *stream, Map *map);
 	int PutTiles(DataStream *stream, Map *map);
 	int PutRestHeader(DataStream *stream, Map *map);

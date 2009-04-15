@@ -604,3 +604,9 @@ void Projectile::DrawTravel(Region &screen)
 
 }
 
+void Projectile::SetIdentifiers(const char *resref, ieWord id)
+{
+	strnuprcpy(name, resref, sizeof(name));
+	type=id;
+}
+

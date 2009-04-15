@@ -594,13 +594,10 @@ void GameControl::SelectActor(int whom, int type)
 		return;
 	}
 
-printf("Selecting: %d\n", whom);
 	/* doesn't fall through here */
 	Actor* actor = game->FindPC( whom );
 	if (!actor)
 		return;
-
-printf("It is: %s\n", actor->ShortName);
 
 	if (type==0) {
 		game->SelectActor( actor, false, SELECT_NORMAL );

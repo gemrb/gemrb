@@ -769,6 +769,32 @@ Projectile *Map::GetNextProjectile(proIterator &iter)
 	return *iter;
 }
 
+Projectile *Map::GetNextTrap(proIterator &iter)
+{
+	Projectile *pro;
+
+	do {
+		pro=GetNextProjectile(iter);
+		iter++;
+		//logic to determine dormant traps
+		//if (pro && pro->IsTrap()) break;
+	} while(pro);
+	return pro;
+}
+
+ieDword Map::GetTrapCount(proIterator &iter)
+{
+	ieDword cnt=0;
+	iter=projectiles.begin();
+	while(GetNextTrap(iter)) {
+		cnt++;
+	}
+	//
+	iter = projectiles.begin();
+	return cnt;
+}
+
+
 //doesn't increase iterator, because we might need to erase it from the list
 ScriptedAnimation *Map::GetNextScriptedAnimation(scaIterator &iter)
 {

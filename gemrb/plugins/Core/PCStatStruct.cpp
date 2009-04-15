@@ -69,7 +69,6 @@ void PCStatsStruct::NotifyKill(ieDword xp, ieStrRef name)
 	KillsChapterXP += xp;
 	KillsTotalCount ++;
 	KillsChapterCount ++;
-printf("Killcount increased\n");
 }
 
 //init quick weapon/item slots

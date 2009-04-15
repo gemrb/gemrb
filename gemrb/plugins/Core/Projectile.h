@@ -150,6 +150,9 @@ protected:
 	ieDword Target; //the globalID of target actor
 	ieDword timeStartStep;
 	int phase;
+	//saved in area
+	ieResRef name;
+	ieWord type;
 
 	//special (not using char animations)
 	Animation* travel[MAX_ORIENT];
@@ -172,6 +175,23 @@ public:
 		return step;
 	}
 
+	inline Point GetDestination() const { return Destination; }
+	inline const char * GetName() const { return name; }
+	inline ieWord GetType() const { return type; }
+	//This assumes that the effect queue cannot be bigger than 65535
+	//which is a sane expectation
+	inline EffectQueue *GetEffects() {
+		return effects;
+	}
+
+/*
+	inline ieWord GetSize() const {
+		if (!effects) {
+			return 0;
+		}
+		return (ieWord) (effects->GetEffectsCount()* 0x108);
+	}
+*/
 	inline unsigned char GetOrientation() const {
 		return Orientation;
 	}
@@ -182,6 +202,8 @@ public:
 		}
 		return Pos.y;
 	}
+
+	void SetIdentifiers(const char *name, ieWord type);
 
 	void SetEffectsCopy(EffectQueue *eq);
 

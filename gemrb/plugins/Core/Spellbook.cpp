@@ -317,7 +317,6 @@ void Spellbook::RemoveMemorization(CRESpellMemorization* sm, const ieResRef ResR
 		if (strnicmp(ResRef, (*ms)->SpellResRef, sizeof(ieResRef) ) ) {
 			continue;
 		}
-printf("Removing %s\n", (*ms)->SpellResRef);
 		delete *ms;
 		sm->memorized_spells.erase(ms);
 		ms--;

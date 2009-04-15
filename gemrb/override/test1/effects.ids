@@ -147,7 +147,7 @@ IDS
 0x91	DisableCasting
 0x92	Spell:Cast
 0x93	Spell:Learn
-0x94	Spell:CastAsScroll
+0x94	Spell:CastPoint
 0x95	Identify
 0x96	FindTraps
 0x97	ReplaceCreature

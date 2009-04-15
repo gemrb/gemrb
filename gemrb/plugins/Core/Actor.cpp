@@ -3662,7 +3662,8 @@ int Actor::RestoreSpellLevel(ieDword maxlevel, ieDword type)
 			typemask = ~1;
 			break;
 		default:
-			typemask = 0;
+			//allow any (including innates)
+			typemask = ~0;
 	}
 	for (int i=maxlevel;i>0;i--) {
 		CREMemorizedSpell *cms = spellbook.FindUnchargedSpell(typemask, maxlevel);

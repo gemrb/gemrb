@@ -259,8 +259,6 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 		WMPAreaEntry* ae=area_entries[i];
 		//all directions should be used
 		for(int d=0;d<4;d++) {
-printf("Working on area: %s\n", ae->AreaName);
-
 			int j=ae->AreaLinksIndex[d];
 			int k=j+ae->AreaLinksCount[d];
 			if ((size_t) k>=area_links.size()) {
