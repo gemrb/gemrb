@@ -54,8 +54,20 @@ public:
 	ieResRef resource2;
 };
 
+#ifdef WIN32
+
+#ifdef GEM_BUILD_DLL
+#define GEM_EXPORT __declspec(dllexport)
+#else
+#define GEM_EXPORT __declspec(dllimport)
+#endif
+
+#else
+#define GEM_EXPORT
+#endif
+
 //this singleton object serves the projectile objects
-class ProjectileServer  
+class GEM_EXPORT ProjectileServer
 {
 public:
 	ProjectileServer();
@@ -65,7 +77,7 @@ public:
 	//it is highly unlikely we need this function
 	Projectile *GetProjectileByName(const ieResRef resname);
 	//returns the highest projectile id
-	unsigned int GetHighestProjectileNumber(); 
+	unsigned int GetHighestProjectileNumber();
 	int InitExplosion();
 	ieResRef *GetExplosion(unsigned int idx, int type);
 private:
