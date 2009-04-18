@@ -583,7 +583,7 @@ def LoadGame ():
 def OpenQuitMsgWindow ():
 	global QuitMsgWindow
 
-	GemRB.HideGUI()
+	#GemRB.HideGUI()
 
 	if QuitMsgWindow:		
 		if QuitMsgWindow:
@@ -591,12 +591,12 @@ def OpenQuitMsgWindow ():
 		QuitMsgWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
 		
-		GemRB.UnhideGUI ()
+		#GemRB.UnhideGUI ()
 		return
 		
 	QuitMsgWindow = Window = GemRB.LoadWindowObject (4)
 	GemRB.SetVar ("FloatWindow", QuitMsgWindow.ID)
-	GemRB.SetVisible (GemRB.GetVar ("OtherWindow"), 0)
+	#GemRB.SetVisible (GemRB.GetVar ("OtherWindow"), 0)
 	
 	# Save
 	Button = Window.GetControl (0)
@@ -612,14 +612,15 @@ def OpenQuitMsgWindow ():
 	Button = Window.GetControl (2)
 	Button.SetText (4196)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenQuitMsgWindow")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# The game has not been saved ....
 	Text = Window.GetControl (3)
 	Text.SetText (39430)  # or 39431 - cannot be saved atm
 
-	GemRB.UnhideGUI ()
+	#GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-
+	return
 
 def QuitGame ():
 	OpenOptionsWindow ()
@@ -686,11 +687,13 @@ def OpenKeyboardMappingsWindow ():
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenKeyboardMappingsWindow")	
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (5)
 	Button.SetText (4196)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenKeyboardMappingsWindow")	
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	keys_setup_page (0)
 

@@ -478,11 +478,13 @@ def DisableAnimatedWindows ():
 	GemRB.SetVar ("ActionsWindow", -1)
 	OptionsWindow = GWindow( GemRB.GetVar ("OptionsWindow") )
 	GemRB.SetVar ("OptionsWindow", -1)
+	GemRB.GamePause (1,1)
 
 def EnableAnimatedWindows ():
 	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
 	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
+	GemRB.GamePause (0,1)
 
 
 def GetSavingThrow (SaveName, row, level):
