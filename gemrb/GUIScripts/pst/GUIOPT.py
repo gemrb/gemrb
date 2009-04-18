@@ -590,7 +590,6 @@ def OpenQuitMsgWindow ():
 			QuitMsgWindow.Unload ()
 		QuitMsgWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
-		GemRB.GetVar.SetVisible (("OtherWindow"), 1)
 		
 		GemRB.UnhideGUI ()
 		return
