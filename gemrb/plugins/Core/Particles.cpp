@@ -126,7 +126,7 @@ void Particles::SetBitmap(const ieResRef BAM)
 bool Particles::AddNew(Point &point)
 {
 	int st;
-	
+
 	switch(path)
 	{
 	case SP_PATH_RAIN:
@@ -221,7 +221,7 @@ void Particles::AddParticles(int count)
 {
 	while (count--) {
 		Point p;
-		
+
 		switch (path) {
 		case SP_PATH_FALL:
 		default:
@@ -311,7 +311,7 @@ int Particles::Update()
 				points[i].pos.y--;
 			}
 			break;
-		}    
+		}
 	}
 	if (phase==P_GROW) {
 		AddParticles(grow);

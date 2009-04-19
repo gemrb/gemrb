@@ -55,6 +55,7 @@ Projectile *ProjectileServer::CreateDefaultProjectile(unsigned int idx)
 	int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Type);
 	memset(&pro->Type, 0, strlength );
 	projectiles[idx].projectile = pro;
+	pro->SetIdentifiers(projectiles[idx].resname, idx);
 	return ReturnCopy(idx);
 }
 
@@ -87,7 +88,7 @@ Projectile *ProjectileServer::GetProjectileByIndex(unsigned int idx)
 
 Projectile *ProjectileServer::ReturnCopy(unsigned int idx)
 {
-	Projectile *pro = new Projectile();  
+	Projectile *pro = new Projectile();
 	int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Type);
 	Projectile *old = projectiles[idx].projectile;
 	memcpy(&pro->Type, &old->Type, strlength );
@@ -95,6 +96,7 @@ Projectile *ProjectileServer::ReturnCopy(unsigned int idx)
 	if (old->Extension) {
 		pro->Extension = old->Extension;
 	}
+	pro->SetIdentifiers(projectiles[idx].resname, idx);
 	return pro;
 }
 
@@ -115,7 +117,8 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 	}
 	Projectile *pro = new Projectile();
 	projectiles[idx].projectile = pro;
-	
+	pro->SetIdentifiers(projectiles[idx].resname, idx);
+
 	sm->GetProjectile( pro );
 	core->FreeInterface( sm );
 
@@ -171,7 +174,7 @@ unsigned int ProjectileServer::GetHighestProjectileNumber()
 
 		rows = (unsigned int) projlist->GetSize();
 		while(rows--) {
-			strnuprcpy(projectiles[ projlist->GetValueIndex(rows)].resname, projlist->GetStringIndex(rows), 8);      
+			strnuprcpy(projectiles[ projlist->GetValueIndex(rows)].resname, projlist->GetStringIndex(rows), 8);
 		}
 		core->DelSymbol(resource);
 	} else {

@@ -574,7 +574,7 @@ public:
 	/** applies the spell on the target */
 	void ApplySpell(const ieResRef resname, Actor *target, Actor *caster, int level);
 	/** applies the spell on the area or on a scriptable object */
-	void ApplySpellPoint(const ieResRef resname, Scriptable *target, Point &pos, Actor *caster, int level);
+	void ApplySpellPoint(const ieResRef resname, Map *area, Point &pos, Actor *caster, int level);
 	/** applies a single effect on the target */
 	int ApplyEffect(Effect *fx, Actor *target, Actor *caster);
 	int ApplyEffect(const ieResRef resname, Actor *target, Actor *caster, int level);

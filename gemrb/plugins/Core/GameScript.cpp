@@ -146,8 +146,8 @@ static const TriggerLink triggernames[] = {
 	{"harmlessclosed", GameScript::Closed, 0}, //pst, not sure
 	{"harmlessentered", GameScript::HarmlessEntered, 0}, //???
 	{"harmlessopened", GameScript::Opened, 0}, //pst, not sure
-  {"hasbounceeffects", GameScript::HasBounceEffects, 0},
-  {"hasimmunityeffects", GameScript::HasImmunityEffects, 0},
+	{"hasbounceeffects", GameScript::HasBounceEffects, 0},
+	{"hasimmunityeffects", GameScript::HasImmunityEffects, 0},
 	{"hasinnateability", GameScript::HaveSpell, 0}, //these must be the same
 	{"hasitem", GameScript::HasItem, 0},
 	{"hasitemequiped", GameScript::HasItemEquipped, 0}, //typo in bg2
@@ -1360,7 +1360,7 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 	}
 	strnlwrcpy( Name, ResRef, 8 );
 
-  script = CacheScript( Name, AIScript?IE_BS_CLASS_ID:IE_BCS_CLASS_ID);
+	script = CacheScript( Name, AIScript?IE_BS_CLASS_ID:IE_BCS_CLASS_ID);
 	MySelf = NULL;
 //	scriptRunDelay = 1000;
 	scriptType = ScriptType;
@@ -1413,12 +1413,12 @@ Script* GameScript::CacheScript(ieResRef ResRef, SClass_ID type)
 	char line[10];
 
 	Script *newScript = (Script *) BcsCache.GetResource(ResRef);
-  if ( newScript ) {
-    if (InDebug&ID_REFERENCE) {
-      printf("Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
-    }
-    return newScript;
-  }
+	if ( newScript ) {
+		if (InDebug&ID_REFERENCE) {
+			printf("Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
+		}
+		return newScript;
+	}
 
 	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef, type );
 	if (!stream) {

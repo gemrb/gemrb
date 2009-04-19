@@ -34,6 +34,7 @@
 #include "../Core/Video.h"
 #include "../Core/Palette.h"
 #include "../Core/ProjectileServer.h"
+#include "../Core/EffectMgr.h"
 
 #define DEF_OPEN   0
 #define DEF_CLOSE  1
@@ -1128,13 +1129,14 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 
 	//this is a ToB feature (saves the unexploded projectiles)
 	printf( "Loading traps\n" );
-	str->Seek( NoteOffset, GEM_STREAM_START );
 	for (i = 0; i < TrapCount; i++) {
 		ieResRef TrapResRef;
 		ieDword TrapEffOffset;
 		ieWord TrapSize, ProID;
 		ieWord X,Y;
 		ieDword Unknown1, Unknown2;
+
+ 		str->Seek( TrapOffset + ( i * 0x1c ), GEM_STREAM_START );
 
 		str->ReadResRef( TrapResRef );
 		str->ReadDword( &TrapEffOffset );
@@ -1144,9 +1146,24 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &X );
 		str->ReadWord( &Y );
 		str->ReadDword( &Unknown2 );
-		//TODO: the size of the trap effect block?
-		//Read the effects and create a projectile from them?
-		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(ProID);
+
+		int TrapEffectCount = TrapSize/0x108;
+		if(TrapEffectCount*0x108!=TrapSize) {
+			printMessage("AREImp", " ", LIGHT_RED);
+			printf("TrapEffectSize in game: %d != %d. Clearing it\n", TrapSize, TrapEffectCount*0x108);
+			  continue;
+		}
+		//The projectile is always created, the worst that can happen
+		//is a dummy projectile
+		//The projectile ID is 214 for TRAPSNAR
+		//It is off by one compared to projectl.ids, but the same as missile.ids
+		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(ProID-1);
+
+		//This could be wrong on msvc7 with its separate memory managers
+   		EffectQueue *fxqueue = new EffectQueue();
+		str->Seek( TrapEffOffset, SEEK_SET);
+		ReadEffects(fxqueue, TrapEffectCount);
+		pro->SetEffects(fxqueue);
 		Point pos(X,Y);
 		map->AddProjectile( pro, pos, pos);
 	}
@@ -1200,6 +1217,22 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	}
 	core->FreeInterface( tmm );
 	return map;
+}
+
+void AREImp::ReadEffects(EffectQueue *fxqueue, ieDword EffectsCount)
+{
+	unsigned int i;
+
+	for (i = 0; i < EffectsCount; i++) {
+		Effect fx;
+		EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
+	
+		eM->Open( str, false );
+		eM->GetEffectV20( &fx );
+		core->FreeInterface( eM );
+		// NOTE: AddEffect() allocates a new effect
+		fxqueue->AddEffect( &fx ); // FIXME: don't reroll dice, time, etc!!
+	}
 }
 
 Animation *AREImp::GetAnimationPiece(AnimationFactory *af, int animCycle, AreaAnimation *a)
@@ -1318,7 +1351,6 @@ int AREImp::GetStoredFileSize(Map *map)
 	}
 
 	TrapOffset = headersize;
-	TrapCount = (ieDword) map->GetTrapCount(piter);
 	headersize += TrapCount * 0x1c;
 	NoteOffset = headersize;
 
@@ -2056,7 +2088,9 @@ int AREImp::PutTraps( DataStream *stream, Map *map)
 		tmpWord = 0;
 		Projectile *pro = map->GetNextTrap(piter);
 		if (pro) {
-			type = pro->GetType();
+			//The projectile ID is based on missile.ids which is
+			//off by one compared to projectl.ids
+			type = pro->GetType()+1;
 			dest = pro->GetDestination();
 			strnuprcpy(name, pro->GetName(), 8);
 			EffectQueue *fxqueue = pro->GetEffects();

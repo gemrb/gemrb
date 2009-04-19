@@ -74,6 +74,7 @@ Projectile::~Projectile()
 			delete travel[i];
 			delete shadow[i];
 		}
+		core->GetVideoDriver()->FreeSprite(light);
 	}
 }
 
@@ -180,6 +181,7 @@ void Projectile::Setup()
 	memset(travel,0,sizeof(travel));
 	memset(shadow,0,sizeof(shadow));
 	light = NULL;
+	fragments = NULL;
 
 	CreateAnimations(travel, BAMRes1, Seq1);
 

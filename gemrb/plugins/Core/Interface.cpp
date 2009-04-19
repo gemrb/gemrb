@@ -2825,7 +2825,7 @@ void Interface::GameLoop(void)
 	//in multi player (if we ever get to it), only the server must call this
 	if (update_scripts) {
 		if ( game->selected.size() > 0 ) {
-		      gc->ChangeMap(core->GetFirstSelectedPC(true), false);
+			gc->ChangeMap(core->GetFirstSelectedPC(true), false);
 		}
 		// the game object will run the area scripts as well
 		game->UpdateScripts();
@@ -4656,17 +4656,16 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, 
 	delete fxqueue;
 }
 
-void Interface::ApplySpellPoint(const ieResRef resname, Scriptable* /*area*/, Point &/*pos*/, Actor *caster, int level)
+void Interface::ApplySpellPoint(const ieResRef resname, Map* area, Point &pos, Actor *caster, int level)
 {
 	Spell *spell = gamedata->GetSpell(resname);
 	if (!spell) {
 		return;
 	}
 	level = spell->GetHeaderIndexFromLevel(level);
-	EffectQueue *fxqueue = spell->GetEffectBlock(level);
-	fxqueue->SetOwner( caster );
-	//add effect to area???
-	delete fxqueue;
+	Projectile *pro = spell->GetProjectile(level);
+	pro->SetCaster(caster->GetGlobalID());
+	area->AddProjectile(pro, caster->Pos, pos);
 }
 
 //-1 means the effect was reflected back to the caster

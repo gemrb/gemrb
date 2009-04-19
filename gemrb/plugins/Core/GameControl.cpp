@@ -201,16 +201,16 @@ void GameControl::MoveToPointFormation(Actor *actor, unsigned int pos, Point src
 	if (p.x < 0) p.x = 8;
 	if (p.y < 0) p.y = 8;
 	if (p.x > map->GetWidth()*16) p.x = map->GetWidth()*16 - 8;
-    if (p.y > map->GetHeight()*12) p.y = map->GetHeight()*12 - 8;
+	if (p.y > map->GetHeight()*12) p.y = map->GetHeight()*12 - 8;
 
-    if(map->GetCursor(p) == IE_CURSOR_BLOCKED) {
-        //we can't get there --> adjust position
-        p.x/=16;
-        p.y/=12;
-        map->AdjustPosition(p);
-        p.x*=16;
-        p.y*=12;
-    }
+	if(map->GetCursor(p) == IE_CURSOR_BLOCKED) {
+		//we can't get there --> adjust position
+		p.x/=16;
+		p.y/=12;
+		map->AdjustPosition(p);
+		p.x*=16;
+		p.y*=12;
+	}
 	// generate an action to do the actual movement
 	sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
 	actor->AddAction( GenerateAction( Tmp) );

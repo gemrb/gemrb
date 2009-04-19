@@ -234,7 +234,7 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 				int tw = ftext->CalcStringWidth( ae->GetCaption() ) + 5;
 				int th = ftext->maxHeight;
 				if(h<th)
-					h=th;        
+					h=th;
 				if(w<tw)
 					w=tw;
 			}
