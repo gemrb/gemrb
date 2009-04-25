@@ -221,6 +221,11 @@ void Scriptable::DrawOverheadText(Region &screen)
 	gamedata->FreePalette(palette);
 }
 
+void Scriptable::DelayedEvent()
+{
+	lastRunTime = core->GetGame()->Ticks;
+}
+
 void Scriptable::ImmediateEvent()
 {
 	lastRunTime = 0;
@@ -460,12 +465,6 @@ void Scriptable::SetCutsceneID(Scriptable *csid)
 	InternalFlags |= IF_CUTSCENEID;
 }
 
-//also turning off the idle flag so it won't run continuously
-void Scriptable::Deactivate()
-{
-	InternalFlags &=~(IF_ACTIVE|IF_IDLE);
-}
-
 void Scriptable::Hide()
 {
 	InternalFlags &=~(IF_ACTIVE|IF_VISIBLE);
@@ -486,6 +485,12 @@ void Scriptable::NoInterrupt()
 	InternalFlags |= IF_NOINT;
 }
 
+//also turning off the idle flag so it won't run continuously
+void Scriptable::Deactivate()
+{
+	InternalFlags &=~(IF_ACTIVE|IF_IDLE);
+}
+
 //turning off the not interruptable flag, actions should reenable it themselves
 //also turning off the idle flag
 //heh, no, i wonder why did i touch the interruptable flag here
@@ -493,6 +498,11 @@ void Scriptable::Activate()
 {
 	InternalFlags |= IF_ACTIVE;
 	InternalFlags &= ~IF_IDLE;
+}
+
+void Scriptable::PartyRested()
+{
+	InternalFlags |=IF_PARTYRESTED;
 }
 
 ieDword Scriptable::GetInternalFlag()
@@ -528,6 +538,9 @@ void Scriptable::ClearTriggers()
 	}
 	if (bittriggers & BT_WASINDIALOG) {
 		InternalFlags &= ~IF_WASINDIALOG;
+	}
+	if (bittriggers & BT_PARTYRESTED) {
+		InternalFlags &= ~IF_PARTYRESTED;
 	}
 	InitTriggers();
 }

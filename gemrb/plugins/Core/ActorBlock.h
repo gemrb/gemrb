@@ -118,6 +118,7 @@ class Gem_Polygon;
 #define IF_IDLE          0x10000
 #define IF_INTRAP        0x20000 //actor is currently in a trap (intrap trigger event)
 #define IF_WASINDIALOG   0x40000 //actor just left dialog
+#define IF_PARTYRESTED   0x80000 //party rested trigger event
 
 //the actor should stop attacking
 #define IF_STOPATTACK (IF_JUSTDIED|IF_REALLYDIED|IF_CLEANUP|IF_IDLE)
@@ -135,10 +136,8 @@ class Gem_Polygon;
 #define BT_ONCREATION     2
 #define BT_BECAMEVISIBLE  4
 #define BT_WASINDIALOG    8
-
-//global bittriggers (set in game)
-#define BT_PARTYRESTED    0x10000
-#define BT_VACANT         0x20000
+#define BT_PARTYRESTED    16
+#define BT_VACANT         32
 
 //xp bonus types (for xpbonus.2da)
 #define XP_LOCKPICK   0
@@ -227,6 +226,7 @@ public:
 	void Unhide();
 	void Activate();
 	void Deactivate();
+	void PartyRested();
 	ieDword GetInternalFlag();
 	const char* GetScriptName();
 	Map* GetCurrentArea() const;
@@ -234,6 +234,8 @@ public:
 	void SetScript(int index, GameScript* script);
 	void DisplayHeadText(const char* text);
 	void SetScriptName(const char* text);
+	//call this to deny script running in the next AI cycle
+	void DelayedEvent();
 	//call this to enable script running as soon as possible
 	void ImmediateEvent();
 	bool IsPC();

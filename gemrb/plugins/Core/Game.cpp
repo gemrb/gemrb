@@ -1259,8 +1259,11 @@ void Game::RestParty(int checks, int dream, int hp)
 			core->PlayMovie(restmovies[dream]);
 		}
 	}
-	//play dream (rest movie)
-	InternalFlags |= IF_PARTYRESTED;
+
+	//set partyrested flags
+	PartyRested();
+	area->PartyRested();
+
 	int i = GetPartySize(false);
 
 	while (i--) {
@@ -1272,6 +1275,7 @@ void Game::RestParty(int checks, int dream, int hp)
 		tar->Heal(hp);
 		//removes fatigue, recharges spells
 		tar->Rest(0);
+		tar->PartyRested();
 	}
 	core->SetEventFlag(EF_ACTION);
 }

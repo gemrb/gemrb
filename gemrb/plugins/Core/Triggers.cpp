@@ -3815,11 +3815,10 @@ int GameScript::RandomStatCheck(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-int GameScript::PartyRested(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+int GameScript::PartyRested(Scriptable* Sender, Trigger* /*parameters*/)
 {
-	Game *game = core->GetGame();
-	if (game->GetInternalFlag()&IF_PARTYRESTED) {
-		game->SetBitTrigger(BT_PARTYRESTED);
+	if (Sender->GetInternalFlag()&IF_PARTYRESTED) {
+		Sender->SetBitTrigger(BT_PARTYRESTED);
 		return 1;
 	}
 	return 0;

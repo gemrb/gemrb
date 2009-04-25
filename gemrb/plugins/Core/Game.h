@@ -59,9 +59,6 @@ class Game;
 //timer counts
 #define MAX_TIMER 32
 
-//for global triggers
-#define IF_PARTYRESTED 1
-
 //ShareXP flags
 #define SX_DIVIDE  1   //divide XP among team members
 #define SX_CR      2   //use challenge rating resolution
