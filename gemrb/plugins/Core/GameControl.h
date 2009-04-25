@@ -208,11 +208,17 @@ public:
 	void TryToPick(Actor *source, Door *tgt);
 	void TryToPick(Actor *source, Container *tgt);
 	void TryToDisarm(Actor *source, InfoPoint *tgt);
+
+	//containers
 	int GetCursorOverContainer(Container *overContainer);
 	void HandleContainer(Container *container, Actor *actor);
+	//doors
 	int GetCursorOverDoor(Door *overDoor);
 	void HandleDoor(Door *door, Actor *actor);
+	//infopoints
+	int GetCursorOverInfoPoint(InfoPoint *overInfoPoint);
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
+
 	Point GetFormationOffset(ieDword formation, ieDword pos);
 	void MoveToPointFormation(Actor *actor, unsigned int pos, Point src, Point p);
 	void InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);

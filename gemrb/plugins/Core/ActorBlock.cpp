@@ -589,7 +589,11 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 	Projectile *pro = spl->GetProjectile(SpellHeader);
 	if (pro) {
 		pro->SetCaster(GetGlobalID());
-		GetCurrentArea()->AddProjectile(pro, Pos, LastTarget);
+		if (LastTarget) {
+			GetCurrentArea()->AddProjectile(pro, Pos, LastTarget);
+		} else {
+			GetCurrentArea()->AddProjectile(pro, Pos, LastTargetPos);
+		}
 	}
 	gamedata->FreeSpell(spl, SpellResRef, false);
 	LastTarget = 0;
@@ -1598,7 +1602,7 @@ bool Highlightable::PossibleToSeeTrap() {
 
 bool InfoPoint::PossibleToSeeTrap() {
 	// Only detectable trap-type infopoints.
-	return (CanDetectTrap() && Type == ST_PROXIMITY);
+	return (CanDetectTrap() && (Type == ST_PROXIMITY) );
 }
 
 bool InfoPoint::CanDetectTrap() {
@@ -1610,7 +1614,7 @@ bool InfoPoint::CanDetectTrap() {
 //trap that is visible on screen (marked by red)
 //if TrapDetected is a bitflag, we could show traps selectively for
 //players, really nice for multiplayer
-bool Highlightable::VisibleTrap(bool see_all)
+bool Highlightable::VisibleTrap(int see_all)
 {
 	if (!Trapped) return false;
 	if (!PossibleToSeeTrap()) return false;

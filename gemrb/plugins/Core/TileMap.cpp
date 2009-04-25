@@ -506,7 +506,7 @@ InfoPoint* TileMap::GetInfoPoint(Point &p, bool detectable)
 			continue;
 
 		if (detectable) {
-			if ((ip->Type==ST_PROXIMITY) && !ip->VisibleTrap(false) ) {
+			if ((ip->Type==ST_PROXIMITY) && !ip->VisibleTrap(0) ) {
 				continue;
 			}
 			if (ip->Type==ST_TRAVEL) {

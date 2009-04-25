@@ -74,6 +74,7 @@ typedef Point formation_type[FORMATIONSIZE];
 ieDword formationcount;
 static formation_type *formations=NULL;
 static bool mqs = false;
+static ieResRef TestSpell="SPWI207";
 
 void GameControl::SetTracker(Actor *actor, ieDword dist)
 {
@@ -673,6 +674,12 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 						overContainer->TrapDetected = 1;
 					}
 				}
+				if (overDoor) {
+					if (overDoor->Trapped && 
+						!( overDoor->TrapDetected )) {
+						overDoor->TrapDetected = 1;
+					}
+				}
 				break;
 			case 'l':
 				//the original engine was able to swap through all animations
@@ -682,9 +689,16 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 
 			case 'c':
-				if (game->selected.size() > 0 && lastActor) {
+				if (game->selected.size() > 0) {
 					Actor *src = game->selected[0];
-					src->CastSpell( "SPWI207", lastActor, false );
+					Scriptable *target = lastActor;
+					if (overDoor) {
+						target = overDoor;
+					}
+					if (target) {
+						src->CastSpell( TestSpell, target, false );
+						src->CastSpellEnd( TestSpell );
+					}
 				}
 				break;
 
@@ -904,6 +918,18 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	}
 }
 
+int GameControl::GetCursorOverInfoPoint(InfoPoint *overInfoPoint)
+{
+	if (target_mode == TARGET_MODE_PICK) {
+		if (overInfoPoint->VisibleTrap(0)) {
+			return IE_CURSOR_TRAP;
+		}
+
+		return IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
+	}
+	return overInfoPoint->Cursor;
+}
+
 int GameControl::GetCursorOverDoor(Door *overDoor)
 {
 	if (target_mode == TARGET_MODE_PICK) {
@@ -964,7 +990,8 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	overInfoPoint = area->TMap->GetInfoPoint( p, true );
 	if (overInfoPoint) {
-		nextCursor = overInfoPoint->Cursor;
+		//nextCursor = overInfoPoint->Cursor;
+		nextCursor = GetCursorOverInfoPoint(overInfoPoint);
 	}
 
 	if (overDoor) {
@@ -1021,7 +1048,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 					nextCursor |= IE_CURSOR_GRAY;
 				}
 			} else {
-				if (!overContainer && !overDoor) {
+				if (!overContainer && !overDoor && !overInfoPoint) {
 					nextCursor = IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
 				}
 			}
