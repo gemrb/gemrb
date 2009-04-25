@@ -355,6 +355,11 @@ void Projectile::SetCaster(ieDword caster)
 	Caster=caster;
 }
 
+ieDword Projectile::GetCaster()
+{
+	return Caster;
+}
+
 void Projectile::NextTarget(Point &p)
 {
 	ClearPath();
@@ -413,11 +418,31 @@ void Projectile::ClearPath()
 	step = NULL;
 }
 
+int Projectile::CalculateTargetFlag()
+{
+	//if there are any, then change phase to exploding
+	int flags = GA_NO_DEAD;
+
+	//projectiles don't trigger on dead normally
+	if (Extension->AFlags&PAF_INANIMATE) {
+		flags&=~GA_NO_DEAD;
+	}
+
+	switch (Extension->AFlags&PAF_TARGET) {
+	case PAF_ENEMY:
+		flags|=GA_NO_FRIEND;
+		break;
+	case PAF_PARTY:
+		flags|=GA_NO_ENEMY;
+		break;
+	}
+	return flags;
+}
+
 //get actors covered in area of trigger radius
 void Projectile::CheckTrigger(unsigned int radius)
 {
-	//if there are any, then change phase to exploding
-	if (area->GetActorInRadius(Pos, 0, radius)) {
+	if (area->GetActorInRadius(Pos, CalculateTargetFlag(), radius)) {
 		phase = P_EXPLODING;
 	}
 }
@@ -436,7 +461,7 @@ void Projectile::SetEffectsCopy(EffectQueue *eq)
 void Projectile::SecondaryTarget()
 {
 	int radius = Extension->ExplosionRadius;
-	Actor **actors = area->GetAllActorsInRadius(Pos, 0, radius);
+	Actor **actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	Actor **poi=actors;
 	while(*poi) {
 		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(Extension->ExplProjIdx);

@@ -79,8 +79,9 @@
 #define PAF_SYNC      8     //one explosion at a time
 #define PAF_SECONDARY 16    //secondary projectiles at explosion
 #define PAF_FRAGMENT  32    //fragments (charanimation) at explosion
-#define PAF_TGT       64    //target party or not party
+#define PAF_ENEMY     64    //target party or not party
 #define PAF_PARTY     128   //target party
+#define PAF_TARGET    (64|128)
 
 struct ProjectileExtension
 {
@@ -164,6 +165,7 @@ public:
 	PathNode *GetNextStep(int x);
 	int GetPathLength();
 	void SetCaster(ieDword t);
+	ieDword GetCaster();
 	void SetTarget(ieDword t);
 	void SetTarget(Point &p);
 
@@ -257,6 +259,7 @@ private:
 	int GetShadowPos(int face);
 	void SetPos(int face, int frame1, int frame2);
 	//logic to resolve target when single projectile hit destination
+	int CalculateTargetFlag();
 	Actor *GetTarget();
 	void NextTarget(Point &p);
 	void SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gradients);
