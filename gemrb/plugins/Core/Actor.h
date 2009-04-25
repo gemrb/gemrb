@@ -110,6 +110,10 @@ class ScriptedAnimation;
 #define GA_POINT    64
 //hidden actor may not be selected
 #define GA_NO_HIDDEN 128
+//party members cannot be selected
+#define GA_NO_FRIEND 256
+//only party members could be selected
+#define GA_NO_ENEMY 512
 
 #define GUIBT_COUNT  12
 

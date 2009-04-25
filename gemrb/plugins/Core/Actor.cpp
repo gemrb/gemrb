@@ -2340,6 +2340,14 @@ bool Actor::ValidTarget(int ga_flags) const
 		if (Modified[IE_AVATARREMOVAL]) return false;
 	}
 
+	if (ga_flags&GA_NO_FRIEND) {
+		if(InParty) return false;
+	}
+
+	if (ga_flags&GA_NO_ENEMY) {
+		if(!InParty) return false;
+	}
+
 	switch(ga_flags&GA_ACTION) {
 	case GA_PICK:
 		if (Modified[IE_STATE_ID] & STATE_CANTSTEAL) return false;
