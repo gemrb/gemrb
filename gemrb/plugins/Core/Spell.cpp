@@ -129,7 +129,7 @@ Projectile *Spell::GetProjectile(int header) const
 unsigned int Spell::GetCastingDistance(Actor *actor) const
 {
 	int level = 1;
-	if(!actor) {
+	if(actor) {
 		level = actor->GetStat(IE_LEVEL);
 		if(SpellType==IE_SPL_WIZARD) {
 			level+=actor->GetStat(IE_CASTINGLEVELBONUSMAGE);
