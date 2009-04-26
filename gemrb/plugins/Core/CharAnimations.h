@@ -86,6 +86,7 @@
 #define IE_ANI_TWO_FILES_2		10   //low res bg1 anim
 #define IE_ANI_FOUR_FRAMES		11   //wyvern anims
 #define IE_ANI_NINE_FRAMES		12   //dragon anims
+#define IE_ANI_FRAGMENT                 13   //fragment animation
 
 //PST animation types
 #define IE_ANI_PST_ANIMATION_1		16   //full animation

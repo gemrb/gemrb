@@ -564,6 +564,9 @@ IE_ANI_FOUR_FRAMES:	These animations are large, four bams make a frame.
 IE_ANI_NINE_FRAMES:     These animations are huge, nine bams make a frame.
 
 
+IE_ANI_FRAGMENT:        These animations are used for projectile graphics.
+			A single file contains 5 cycles (code mirror for east animation)
+
 IE_ANI_PST_ANIMATION_1:
 IE_ANI_PST_ANIMATION_2:
 IE_ANI_PST_ANIMATION_3:
@@ -851,6 +854,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			case IE_ANI_PST_ANIMATION_3: //no stc just std
 			case IE_ANI_PST_ANIMATION_2: //no std just stc
 			case IE_ANI_PST_ANIMATION_1:
+			case IE_ANI_FRAGMENT:
 				if (Orient > 8) {
 					a->MirrorAnimation( );
 				}
@@ -867,22 +871,11 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 
 	switch (GetAnimType()) {
 		case IE_ANI_NINE_FRAMES: //dragon animations
-			Anims[StanceID][Orient] = anims;
-			break;
 		case IE_ANI_FOUR_FRAMES: //wyvern animations
-			Anims[StanceID][Orient] = anims;
-			break;
 		case IE_ANI_BIRD:
-			Anims[StanceID][Orient] = anims;
-			break;
 		case IE_ANI_CODE_MIRROR:
-			Anims[StanceID][Orient] = anims;
-			break;
-
 		case IE_ANI_SIX_FILES: //16 anims some are stored elsewhere
 		case IE_ANI_ONE_FILE: //16 orientations
-			Anims[StanceID][Orient] = anims;
-			break;
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
 			Anims[StanceID][Orient] = anims;
 			break;
@@ -892,6 +885,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 		case IE_ANI_TWO_FILES_3:
 		case IE_ANI_FOUR_FILES:
 		case IE_ANI_SIX_FILES_2:
+		case IE_ANI_FRAGMENT:
 			Orient&=~1;
 			Anims[StanceID][Orient] = anims;
 			Anims[StanceID][Orient + 1] = anims;
@@ -958,6 +952,10 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 
 		case IE_ANI_BIRD:
 			Cycle = (ieByte) ((StanceID&1) * 9 + SixteenToNine[Orient]);
+			break;
+
+		case IE_ANI_FRAGMENT:
+			Cycle = SixteenToFive[Orient];
 			break;
 
 		case IE_ANI_ONE_FILE:
