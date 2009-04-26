@@ -274,14 +274,20 @@ Actor::Actor()
 	fxqueue.SetOwner( this );
 	inventory.SetOwner( this );
 	if (classcount<0) {
+		//This block is executed only once, when the first actor is loaded
 		InitActorTables();
 
 		TranslucentShadows = 0;
-		core->GetDictionary()->Lookup("Translucent Shadows",
-			TranslucentShadows);
+		core->GetDictionary()->Lookup("Translucent Shadows", TranslucentShadows);
+		//get the needed size to store projectile immunity bitflags in Dwords
 		ProjectileSize = (core->GetProjectileServer()->GetHighestProjectileNumber()+31)/32;
+		//allowing 1024 bits (1024 projectiles ought to be enough for everybody)
+		//the rest of the projectiles would still work, but couldn't be resisted
+		if (ProjectileSize>32) {
+			ProjectileSize=32;
+		}
 	}
-	projectileImmunity = (ieDword *) malloc(ProjectileSize);
+	projectileImmunity = (ieDword *) calloc(ProjectileSize,sizeof(ieDword));
 	TalkCount = 0;
 	InteractCount = 0; //numtimesinteracted depends on this
 	appearance = 0xffffff; //might be important for created creatures
@@ -1447,7 +1453,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	memset(applyWhenHelpless,0,sizeof(ieResRef));
 	memset(applyWhenAttacked,0,sizeof(ieResRef));
 	memset(applyWhenBeingHit,0,sizeof(ieResRef));
-	memset(projectileImmunity,0,ProjectileSize);
+	memset(projectileImmunity,0,ProjectileSize*sizeof(ieDword));
 
 	//initialize base stats
 	bool first = !(InternalFlags&IF_INITIALIZED);
@@ -4102,7 +4108,13 @@ bool Actor::HasFeat(unsigned int featindex) const
 
 ieDword Actor::ImmuneToProjectile(ieDword projectile) const
 {
-	return projectileImmunity[projectile/32]&(1<<(projectile&31));
+	int idx;
+
+	idx = projectile/32;
+	if (idx>ProjectileSize) {
+		return 0;
+	}
+	return projectileImmunity[idx]&(1<<(projectile&31));
 }
 
 void Actor::AddProjectileImmunity(ieDword projectile)
