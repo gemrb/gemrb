@@ -656,7 +656,6 @@ def PortraitButtonOnMouseEnter ():
 	i = GemRB.GetVar ("PressedPortrait")
 
 	if DraggedPortrait != None:
-		print "Swapping ",DraggedPortrait," With ",i+1
 		GemRB.DragItem (0, -1, "")
 		#this might not work
 		GemRB.SwapPCs (DraggedPortrait, i+1)

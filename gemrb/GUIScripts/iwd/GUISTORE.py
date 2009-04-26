@@ -824,16 +824,17 @@ def RedrawStoreIdentifyWindow ():
 					Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
+				GemRB.SetToken ("ITEMCOST", str(IDPrice) )
 				Button.EnableBorder (0, 1)
 			else:
 				if Index == TopIndex+i:
 					Text = Item['ItemDescIdentified']
 					TextArea.SetText (Text)
-				Button.SetState (IE_GUI_BUTTON_ENABLED)
+				Button.SetState (IE_GUI_BUTTON_DISABLED)
 				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
+				GemRB.SetToken ("ITEMCOST", str(0) )
 				Button.EnableBorder (0, 0)
 
-			GemRB.SetToken ("ITEMCOST", str(IDPrice) )
 			Label.SetText (10162)
 		else:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)

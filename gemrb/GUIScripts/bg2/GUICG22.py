@@ -28,10 +28,15 @@ KitList = 0
 ClassList = 0
 SchoolList = 0
 ClassID = 0
+TopIndex = 0
+RowCount = 10
+KitTable = 0
+Init = 0
 
 def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton
 	global KitList, ClassList, SchoolList, ClassID
+	global RowCount, TopIndex, KitTable, Init
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	TmpTable = GemRB.LoadTableObject("races")
@@ -48,7 +53,7 @@ def OnLoad():
 	KitList = GemRB.LoadTableObject("kitlist")
 	SchoolList = GemRB.LoadTableObject("magesch")
 
-	#there is a specialist mage window, but it is easier to use 
+	#there is a specialist mage window, but it is easier to use
 	#the class kit window for both
 	KitWindow = GemRB.LoadWindowObject(22)
 	if ClassID == 1:
@@ -68,6 +73,17 @@ def OnLoad():
 	else:
 		RowCount = KitTable.GetRowCount()
 
+	TopIndex = 0
+	GemRB.SetVar("TopIndex", 0)
+	if RowCount>10:
+		KitWindow.CreateScrollBar(1000, 290, 47, 16, 200)
+		ScrollBar = KitWindow.GetControl (1000)
+		ScrollBar.SetSprites("GUISCRCW", 0, 0,1,2,3,5,4)
+		ScrollBar.SetVarAssoc("TopIndex",RowCount-10)
+		ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawKits")
+		ScrollBar.SetDefaultScrollBar()
+		RowCount=10
+
 	for i in range(RowCount):
 		if i<4:
 			Button = KitWindow.GetControl(i+1)
@@ -77,14 +93,14 @@ def OnLoad():
 		if not KitTable:
 			if ClassID == 1:
 				Kit = GemRB.GetVar("MAGESCHOOL")
-				KitName = SchoolList.GetValue(i, 0)
+				KitName = SchoolList.GetValue(i+TopIndex, 0)
 				Kit = SchoolList.GetValue (Kit, 3)
 			else:
 				Kit = 0
 				KitName = ClassList.GetValue(GemRB.GetVar("Class")-1, 0)
 
 		else:
-			Kit = KitTable.GetValue(i,0)
+			Kit = KitTable.GetValue(i+TopIndex,0)
 			if Kit:
 				KitName = KitList.GetValue(Kit, 1)
 			else:
@@ -92,7 +108,7 @@ def OnLoad():
 
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetText(KitName)
-		if i==0:
+		if i+TopIndex==0:
 			GemRB.SetVar("Class Kit",Kit)
 		Button.SetVarAssoc("Class Kit",Kit)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "KitPress")
@@ -109,8 +125,45 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	Init = 1
+	RedrawKits()
+	Init = 0
 	KitPress()
 	KitWindow.SetVisible(1)
+	return
+
+def RedrawKits():
+	global TopIndex
+
+	TopIndex=GemRB.GetVar("TopIndex")
+	for i in range(RowCount):
+		if i<4:
+			Button = KitWindow.GetControl(i+1)
+		else:
+			Button = KitWindow.GetControl(i+5)
+
+		if not KitTable:
+			if ClassID == 1:
+				Kit = GemRB.GetVar("MAGESCHOOL")
+				KitName = SchoolList.GetValue(i+TopIndex, 0)
+				Kit = SchoolList.GetValue (Kit, 3)
+			else:
+				Kit = 0
+				KitName = ClassList.GetValue(GemRB.GetVar("Class")-1, 0)
+
+		else:
+			Kit = KitTable.GetValue(i+TopIndex,0)
+			if Kit:
+				KitName = KitList.GetValue(Kit, 1)
+			else:
+				KitName = ClassList.GetValue(GemRB.GetVar("Class")-1, 0)
+
+		Button.SetState(IE_GUI_BUTTON_ENABLED)
+		Button.SetText(KitName)
+		if i+TopIndex==0 and Init:
+			GemRB.SetVar("Class Kit",Kit)
+		Button.SetVarAssoc("Class Kit",Kit)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "KitPress")
 	return
 
 def KitPress():

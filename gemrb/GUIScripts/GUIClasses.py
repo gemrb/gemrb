@@ -80,6 +80,9 @@ class GWindow:
   def CreateButton(self, control, *args):
     GemRB.CreateButton(self.ID, control, *args)
     return GemRB.GetControlObject(self.ID, control)
+  def CreateScrollBar(self, control, *args):
+    GemRB.CreateScrollBar(self.ID, control, *args)
+    return GemRB.GetControlObject(self.ID, control)
   def CreateTextEdit(self, control, *args):
     GemRB.CreateTextEdit(self.ID, control, *args)
     return GemRB.GetControlObject(self.ID, control)
@@ -91,7 +94,6 @@ class GControl:
     'SetVarAssoc': GemRB.SetVarAssoc,
     'SetPos': GemRB.SetControlPos,
     'SetSize': GemRB.SetControlSize,
-    'SetDefaultScrollBar': GemRB.SetDefaultScrollBar,
     'SetAnimationPalette': GemRB.SetAnimationPalette,
     'SetAnimation': GemRB.SetAnimation,
     'QueryText': GemRB.QueryText,
@@ -136,7 +138,14 @@ class GTextEdit(GControl):
   def ConvertEdit(self, ScrollBarID):
     newID = GemRB.ConvertEdit(self.WinID, self.ID, ScrollBarID)
     return GemRB.GetControlObject(self.WinID, newID)
- 
+
+class GScrollBar(GControl):
+  __metaclass__ = metaControl
+  methods = {
+    'SetDefaultScrollBar': GemRB.SetDefaultScrollBar,
+    'SetSprites': GemRB.SetScrollBarSprites
+  }
+
 class GButton(GControl):
   __metaclass__ = metaControl
   methods = {
