@@ -61,7 +61,7 @@ EffectQueue *Item::GetEffectBlock(int usage, ieDwordSigned invslot, ieDword pro)
 		count = EquippingFeatureCount;
 	}
 	EffectQueue *fxqueue = new EffectQueue();
-	
+
 	for (int i=0;i<count;i++) {
 		Effect *fx = features+i;
 		fx->InventorySlot=invslot;
@@ -170,4 +170,15 @@ Effect *Item::BuildGlowEffect(int gradient) const
 	ieDword speed = 128;
 	Effect *fx = EffectQueue::CreateEffect(glow_ref, rgb, location|(speed<<16), FX_DURATION_INSTANT_WHILE_EQUIPPED);
 	return fx;
+}
+
+unsigned int Item::GetCastingDistance(int idx) const
+{
+	ITMExtHeader *seh = GetExtHeader(idx);
+	if (!seh) {
+		printMessage("Item", "Cannot retrieve item header!!! ",RED);
+		printf("required header: %d, maximum: %d\n", idx, (int) ExtHeaderCount);
+		return 0;
+	}
+	return (unsigned int) seh->Range;
 }

@@ -252,7 +252,7 @@ public:
 	int GetDamagePotential(bool ranged, ITMExtHeader *&header) const;
 	//returns the weapon header
 	ITMExtHeader *GetWeaponHeader(bool ranged) const;
-
+	unsigned int GetCastingDistance(int header) const;
 };
 
 #endif // ! ITEM_H
