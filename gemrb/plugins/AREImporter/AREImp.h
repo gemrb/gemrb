@@ -68,7 +68,7 @@ public:
 	}
 	void ReleaseMemory();
 private:
-	void ReadEffects(EffectQueue *fx, ieDword EffectsCount);
+	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount);
 	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle, AreaAnimation *a);
 	CREItem* GetItem();
 	int PutHeader(DataStream *stream, Map *map);

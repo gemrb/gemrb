@@ -806,7 +806,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		ieResRef creatures[MAX_RESCOUNT];
 		ieWord DayChance, NightChance;
 		ieDword Schedule;
-		
+
 		str->Read( Name, 32 );
 		Name[32] = 0;
 		str->ReadWord( &XPos );
@@ -860,7 +860,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
-			//TODO: script order			
+			//TODO: script order
 			memset(Scripts,0,sizeof(Scripts));
 
 			str->ReadResRef( Scripts[SCR_OVERRIDE] );
@@ -907,7 +907,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 			if ((Flags&AF_NAME_OVERRIDE) || (core->HasFeature(GF_IWD2_SCRIPTNAME)) ) {
 				ab->SetScriptName(DefaultName);
 			}
-	
+
 			for (int j=0;j<8;j++) {
 				if (Scripts[j][0]) {
 					ab->SetScript(Scripts[j],j);
@@ -916,11 +916,6 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 			ab->SetOrientation( Orientation,0 );
 			ab->TalkCount = TalkCount;
 			ab->RefreshEffects(NULL);
-			//maybe there is a flag (deactivate), but 
-			//right now we just set this
-			//it is automatically enabled, we should disable it
-			//if required
-			//ab->Active = SCR_VISIBLE;
 		}
 		core->FreeInterface( actmgr );
 	}
@@ -940,7 +935,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 			anim->Pos.x=animX;
 			anim->Pos.y=animY;
 			str->ReadDword( &anim->appearance );
-			str->ReadResRef( anim->BAM );			
+			str->ReadResRef( anim->BAM );
 			str->ReadWord( &anim->sequence );
 			str->ReadWord( &anim->frame );
 			str->ReadDword( &anim->Flags );
@@ -951,7 +946,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 			if (anim->startchance<=0) {
 				anim->startchance=100; //percentage of starting a cycle
 			}
-			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)	
+			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)
 			str->ReadResRef( anim->PaletteRef );
 			str->ReadDword( &anim->unknown48 );
 			AnimationFactory* af = ( AnimationFactory* )
@@ -1013,7 +1008,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		str->Seek( 40, GEM_CURRENT_POS );
 		map->locals->SetAt( Name, Value );
 	}
-	
+
 	printf( "Loading ambients\n" );
 	str->Seek( AmbiOffset, GEM_STREAM_START );
 	for (i = 0; i < AmbiCount; i++) {
@@ -1134,7 +1129,10 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		ieDword TrapEffOffset;
 		ieWord TrapSize, ProID;
 		ieWord X,Y;
-		ieDword Unknown1, Unknown2;
+		ieDword Unknown1;
+		ieWord Unknown2;
+		ieByte Unknown3;
+		ieByte Owner;
 
  		str->Seek( TrapOffset + ( i * 0x1c ), GEM_STREAM_START );
 
@@ -1145,13 +1143,14 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadDword( &Unknown1 );
 		str->ReadWord( &X );
 		str->ReadWord( &Y );
-		str->ReadDword( &Unknown2 );
-
+		str->ReadWord( &Unknown2 );
+		str->Read( &Unknown3,1 );
+		str->Read( &Owner,1 );
 		int TrapEffectCount = TrapSize/0x108;
 		if(TrapEffectCount*0x108!=TrapSize) {
 			printMessage("AREImp", " ", LIGHT_RED);
 			printf("TrapEffectSize in game: %d != %d. Clearing it\n", TrapSize, TrapEffectCount*0x108);
-			  continue;
+				continue;
 		}
 		//The projectile is always created, the worst that can happen
 		//is a dummy projectile
@@ -1160,10 +1159,13 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(ProID-1);
 
 		//This could be wrong on msvc7 with its separate memory managers
-   		EffectQueue *fxqueue = new EffectQueue();
-		str->Seek( TrapEffOffset, SEEK_SET);
-		ReadEffects(fxqueue, TrapEffectCount);
+ 		EffectQueue *fxqueue = new EffectQueue();
+		CachedFileStream *fs = new CachedFileStream( (CachedFileStream *) str, TrapEffOffset, TrapSize, true);
+
+		ReadEffects((DataStream *) fs,fxqueue, TrapEffectCount);
+		Actor * caster = core->GetGame()->FindPC(Owner);
 		pro->SetEffects(fxqueue);
+		if (caster) pro->SetCaster(caster->GetGlobalID());
 		Point pos(X,Y);
 		map->AddProjectile( pro, pos, pos);
 	}
@@ -1219,20 +1221,21 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	return map;
 }
 
-void AREImp::ReadEffects(EffectQueue *fxqueue, ieDword EffectsCount)
+void AREImp::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCount)
 {
 	unsigned int i;
 
+	EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
+	eM->Open( ds, true );
+
 	for (i = 0; i < EffectsCount; i++) {
 		Effect fx;
-		EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
-	
-		eM->Open( str, false );
+
 		eM->GetEffectV20( &fx );
-		core->FreeInterface( eM );
 		// NOTE: AddEffect() allocates a new effect
-		fxqueue->AddEffect( &fx ); // FIXME: don't reroll dice, time, etc!!
+		fxqueue->AddEffect( &fx );
 	}
+	core->FreeInterface(eM);
 }
 
 Animation *AREImp::GetAnimationPiece(AnimationFactory *af, int animCycle, AreaAnimation *a)
@@ -1382,7 +1385,7 @@ int AREImp::PutHeader(DataStream *stream, Map *map)
 	stream->WriteResRef( map->WEDResRef);
 	stream->WriteDword( &core->GetGame()->GameTime ); //lastsaved
 	stream->WriteDword( &map->AreaFlags);
-	
+
 	memset(Signature, 0, sizeof(Signature)); //8 bytes 0
 	stream->Write( Signature, 8); //northref
 	stream->WriteDword( &tmpDword);
@@ -1435,7 +1438,7 @@ int AREImp::PutHeader(DataStream *stream, Map *map)
 	stream->WriteDword( &DoorsCount );
 	stream->WriteDword( &DoorsOffset );
 	stream->WriteDword( &AnimCount );
-	stream->WriteDword( &AnimOffset );	
+	stream->WriteDword( &AnimOffset );
 	stream->WriteDword( &TileCount);
 	stream->WriteDword( &TileOffset);
 	stream->WriteDword( &SongHeader);
@@ -2078,6 +2081,7 @@ int AREImp::PutTraps( DataStream *stream, Map *map)
 	ieDword Offset;
 	ieDword tmpDword;
 	ieWord tmpWord;
+	ieByte tmpByte;
 	ieResRef name;
 	ieWord type = 0;
 	Point dest(0,0);
@@ -2097,6 +2101,12 @@ int AREImp::PutTraps( DataStream *stream, Map *map)
 			if (fxqueue) {
 				tmpWord = fxqueue->GetSavedEffectsCount();
 			}
+			ieDword ID = pro->GetCaster();
+			Actor *actor = map->GetActorByGlobalID(ID);
+			//0xff if not in party
+			//party slot if in party
+			if (actor) tmpByte = (ieByte) (actor->InParty-1);
+			else tmpByte = 0xff;
 		}
 
 		stream->WriteResRef( name );
@@ -2105,14 +2115,18 @@ int AREImp::PutTraps( DataStream *stream, Map *map)
 		assert(tmpWord<256);
 		tmpWord *= 0x108;
 		Offset += tmpWord;
-		stream->WriteWord( &tmpWord ); //
-		stream->WriteWord( &type ); //
-		stream->WriteDword( &tmpDword );
+		stream->WriteWord( &tmpWord );  //size in bytes
+		stream->WriteWord( &type );     //missile.ids
+		tmpDword = 0;
+		stream->WriteDword( &tmpDword );//unknown field
 		tmpWord = (ieWord) dest.x;
 		stream->WriteWord( &tmpWord );
 		tmpWord = (ieWord) dest.y;
 		stream->WriteWord( &tmpWord );
-		stream->WriteDword( &tmpDword );
+		tmpWord = 0;
+		stream->WriteWord( &tmpWord ); //unknown field
+		stream->Write( &tmpByte,1 );   //unknown field
+		stream->Write( &tmpByte,1 );   //InParty flag
 	}
 	return 0;
 }
