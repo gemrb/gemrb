@@ -2683,9 +2683,6 @@ int Map::GetWeather()
 	return WB_NORMAL;
 }
 
-#define SPARKLE_PUFF   1
-#define SPARKLE_SHOWER 3
-
 void Map::FadeSparkle(Point &pos, bool forced)
 {
 	spaIterator iter;
@@ -2703,31 +2700,54 @@ void Map::FadeSparkle(Point &pos, bool forced)
 	}
 }
 
-void Map::Sparkle(ieDword color, ieDword type, Point &pos)
-{
-	Particles *sparkles = new Particles(100);
-	sparkles->SetOwner(this);
-	sparkles->SetRegion(pos.x-20, pos.y-80, 40, 80);
+//void Map::AddParticle(Particles *p, Point &pos)
+//{
+//	spaIterator iter;
+//	for(iter=particles.begin(); (iter!=particles.end()) && ((*iter)->GetHeight()<pos.y); iter++) ;
+//	particles.insert(iter, sparkles);
+//}
 
-	int style, path, grow;
+void Map::Sparkle(ieDword color, ieDword type, Point &pos, unsigned int FragAnimID)
+{
+	int style, path, grow, size, width;
 
 	//the high word is ignored in the original engine (compatibility hack)
 	switch(type&0xffff) {
-	case SPARKLE_SHOWER:
-		style = SP_TYPE_POINT;
+	case SPARKLE_SHOWER:     //simple falling sparks
 		path = SP_PATH_FALL;
 		grow = SP_SPAWN_FULL;
+		size = 100;
+		width = 40;
 		break;
 	case SPARKLE_PUFF:
-		style = SP_TYPE_POINT;
-		path = SP_PATH_FOUNT;
+		path = SP_PATH_FOUNT;  //sparks go up and down
 		grow = SP_SPAWN_FULL;
+		size = 100;
+		width = 40;
+		break;
+	case SPARKLE_EXPLOSION:  //this isn't in the original engine, but it is a nice effect to have
+		path = SP_PATH_EXPL;
+		grow = SP_SPAWN_FULL;
+		size = 10;
+		width = 140;
 		break;
 	default:
-		style = SP_TYPE_POINT;
 		path = SP_PATH_FLIT;
 		grow = SP_SPAWN_SOME;
+		size = 100;
+		width = 40;
 		break;
+	}
+	Particles *sparkles = new Particles(size);
+	sparkles->SetOwner(this);
+	sparkles->SetRegion(pos.x-width/2, pos.y-80, width, 80);
+
+	if (FragAnimID) {
+		style = SP_TYPE_BITMAP;
+		sparkles->SetBitmap(FragAnimID);
+	}
+	else {
+		style = SP_TYPE_POINT;
 	}
 	sparkles->SetType(style, path, grow);
 	sparkles->SetColor(color);
@@ -2735,9 +2755,8 @@ void Map::Sparkle(ieDword color, ieDword type, Point &pos)
 	printf("sparkle: %d %d\n", color, type);
 	printf("Position: %d.%d\n", pos.x,pos.y);
 
+	//AddParticle(sparkles, pos);
 	spaIterator iter;
-	//this is pos.y we just set
-	//int h = sparkles->GetHeight();
 	for(iter=particles.begin(); (iter!=particles.end()) && ((*iter)->GetHeight()<pos.y); iter++) ;
 	particles.insert(iter, sparkles);
 }

@@ -62,6 +62,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 void InitScriptTables();
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode);
 bool ResolveSpellName(ieResRef spellres, Action *parameter);
+bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot);
 void EscapeAreaCore(Actor *src, const char *resref, Point &enter, Point &exit, int flags);
 void GoNear(Scriptable *Sender, Point &p);
 void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool destination, int distance);
@@ -113,6 +114,7 @@ GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, const 
 Action* GenerateActionCore(const char *src, const char *str, int acIndex);
 Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 unsigned int GetSpellDistance(ieResRef spellres, Actor *actor);
+unsigned int GetItemDistance(ieResRef itemres, int header);
 
 inline int Bones(ieDword value)
 {

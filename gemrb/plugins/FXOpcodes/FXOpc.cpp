@@ -1715,7 +1715,7 @@ int fx_sparkle (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 	Point p(fx->PosX, fx->PosY);
-	map->Sparkle( fx->Parameter1, fx->Parameter2, p);
+	map->Sparkle( fx->Parameter1, fx->Parameter2, p, fx->Parameter3);
 	return FX_NOT_APPLIED;
 }
 

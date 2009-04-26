@@ -181,7 +181,6 @@ void Projectile::Setup()
 	memset(travel,0,sizeof(travel));
 	memset(shadow,0,sizeof(shadow));
 	light = NULL;
-	fragments = NULL;
 
 	CreateAnimations(travel, BAMRes1, Seq1);
 
@@ -290,6 +289,9 @@ void Projectile::ChangePhase()
 		effects = NULL;
 		return;
 	}
+
+	extension_delay=Extension->Delay;
+	extension_explosioncount=Extension->ExplosionCount;
 	if (Extension->AFlags&PAF_TRIGGER) {
 		phase = P_TRIGGER;
 	} else {
@@ -443,7 +445,17 @@ int Projectile::CalculateTargetFlag()
 void Projectile::CheckTrigger(unsigned int radius)
 {
 	if (area->GetActorInRadius(Pos, CalculateTargetFlag(), radius)) {
-		phase = P_EXPLODING;
+		if (phase == P_TRIGGER) {
+			phase = P_EXPLODING;
+			extension_delay = Extension->Delay;
+		}
+	} else {
+		if (phase == P_EXPLODING) {
+			//the explosion is revoked
+			if (Extension->AFlags&PAF_SYNC) {
+				phase = P_TRIGGER;
+			}
+		}
 	}
 }
 
@@ -494,19 +506,20 @@ void Projectile::Draw(Region &screen)
 	switch (phase) {
 		case P_UNINITED:
 			return;
-		case P_TRIGGER:
+		case P_TRIGGER: case P_EXPLODING:
+			//This extension flag is to enable the travel projectile at
+			//trigger/explosion time
 			if (Extension->AFlags&PAF_VISIBLE) {
 				DrawTravel(screen);
 			}
 			CheckTrigger(Extension->TriggerRadius);
-		case P_TRAVEL:
-			if (phase != P_EXPLODING) {
-				DrawTravel(screen);
-				return;
+			if (phase == P_EXPLODING) {
+				DrawExplosion(screen);
 			}
-			//falling through in case of explosion
-		case P_EXPLODING:
-			DrawExplosion(screen);
+			break;
+		case P_TRAVEL:
+			//There is no Extension for simple traveling projectiles!
+			DrawTravel(screen);
 			return;
 		default:
 			DrawExploded(screen);
@@ -521,22 +534,37 @@ void Projectile::DrawExploded(Region & /*screen*/)
 
 void Projectile::DrawExplosion(Region & /*screen*/)
 {
+	//This seems to be a needless safeguard
 	if (!Extension) {
 		phase = P_EXPIRED;
 		return;
 	}
-	if (Extension->Delay) {
-		Extension->Delay--;
+
+	//Delay explosion, it could even be revoked with PAF_SYNC (see skull trap)
+	if (extension_delay) {
+		extension_delay--;
 		return;
 	}
-	if (Extension->ExplosionCount) {
-		Extension->ExplosionCount--;
+
+	//0 and 1 have the same effect (1 explosion)
+	if (extension_explosioncount) {
+		extension_explosioncount--;
+	}
+
+	if (extension_explosioncount) {
+		extension_delay=Extension->Delay;
 	} else {
 		phase = P_EXPLODED;
 	}
 
-	//there is a secondary projectile
-	if (Extension->AFlags&PAF_SECONDARY) {
+	//no idea what is PAF_SECONDARY
+	//probably it is to alter some behaviour in the secondary
+	//projectile generation
+	//In trapskul.pro it isn't set, yet it has a secondary (invisible) projectile
+	//All area effects are created by secondary projectiles
+
+	//if (Extension->AFlags&PAF_SECONDARY) {
+	if (Extension->ExplProjIdx) {
 		//the secondary projectile will target everyone in the area of effect
 		SecondaryTarget();
 	}
@@ -546,6 +574,7 @@ void Projectile::DrawExplosion(Region & /*screen*/)
 		//which will go towards the edges (flames, etc)
 		//Extension->ExplColor fake color for single shades (blue,green,red flames)
 		//Extension->FragAnimID the animation id for the character animation
+		area->Sparkle(Extension->ExplColor, SPARKLE_EXPLOSION, Pos, Extension->FragAnimID);
 	}
 
 	//the center of the explosion could be another projectile played over the target

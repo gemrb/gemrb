@@ -97,6 +97,11 @@ class Projectile;
 #define GL_PASS           1
 #define GL_REBOUND        2
 
+//sparkle types
+#define SPARKLE_PUFF      1
+#define SPARKLE_EXPLOSION 2  //not in the original engine
+#define SPARKLE_SHOWER    3
+
 //in areas 10 is a magic number for resref counts
 #define MAX_RESCOUNT 10 
 
@@ -336,7 +341,9 @@ public:
 	bool CanFree();
 	int GetCursor( Point &p);
 	//adds a sparkle puff of colour to a point in the area
-	void Sparkle(ieDword color, ieDword type, Point &pos);
+	//FragAnimID is an optional avatar animation ID (see avatars.2da) for
+	//fragment animation
+	void Sparkle(ieDword color, ieDword type, Point &pos, unsigned int FragAnimID = 0);
 	//removes or fades the sparkle puff at a point
 	void FadeSparkle(Point &pos, bool forced);
 

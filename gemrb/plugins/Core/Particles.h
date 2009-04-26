@@ -55,9 +55,10 @@ struct Element {
 #define SP_PATH_FOUNT  1       //going up and down
 #define SP_PATH_FLIT   2       //flitting
 #define SP_PATH_RAIN   3       //falling and vanishing quickly
+#define SP_PATH_EXPL   4       //explosion (mostly used with fragments)
 
 #define SP_SPAWN_NONE  0       //don't create new sparks
-#define SP_SPAWN_FULL  1       //fill all, then switch to none
+#define SP_SPAWN_FULL  1       //fill all at setup, then switch to none
 #define SP_SPAWN_SOME  2       //add some new elements regularly
 
 #define SPARK_COLOR_NONE 0
@@ -82,7 +83,7 @@ public:
 	Particles(int s);
 	~Particles();
 
-	void SetBitmap(const ieResRef BAM);
+	void SetBitmap(unsigned int FragAnimID);
 	void SetPhase(ieByte ph) { phase = ph; }
 	int GetPhase() { return phase; }
 	bool MatchPos(Point &p) { return pos.x==p.x && pos.y==p.y; }
@@ -120,7 +121,10 @@ private:
 	ieByte path;       //path type
 	ieByte color;      //general spark color
 	ieByte spawn_type;
-	Animation *bitmap[MAX_SPARK_PHASE];
+	//use char animations for the fragment animations
+	//1. the cycles are loaded only when needed
+	//2. the fragments ARE avatar animations in the original IE (for some unknown reason)
+	CharAnimations *fragments;
 };
 
 #endif  // ! PARTICLES_H

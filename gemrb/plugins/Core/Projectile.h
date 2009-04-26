@@ -133,10 +133,9 @@ public:
 	ieResRef TrailBAM[3];
 	ieWord TrailSpeed[3];
 	//
-	ProjectileExtension *Extension;
+	ProjectileExtension* Extension;
 	bool autofree;
-	Palette *palette;
-	//Palette *shadpal;
+	Palette* palette;
 	//internals
 protected:
 	//attributes from moveable object
@@ -154,12 +153,14 @@ protected:
 	//saved in area
 	ieResRef name;
 	ieWord type;
+	//these come from the extension area
+	int extension_delay;
+	int extension_explosioncount;
 
 	//special (not using char animations)
 	Animation* travel[MAX_ORIENT];
 	Animation* shadow[MAX_ORIENT];
 	Sprite2D* light;//this is just a round/halftrans sprite, has no animation
-	Animation** fragments;
 	EffectQueue* effects;
 public:
 	PathNode *GetNextStep(int x);
@@ -186,14 +187,6 @@ public:
 		return effects;
 	}
 
-/*
-	inline ieWord GetSize() const {
-		if (!effects) {
-			return 0;
-		}
-		return (ieWord) (effects->GetEffectsCount()* 0x108);
-	}
-*/
 	inline unsigned char GetOrientation() const {
 		return Orientation;
 	}

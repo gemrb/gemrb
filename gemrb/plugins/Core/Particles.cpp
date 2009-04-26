@@ -76,9 +76,12 @@ Particles::Particles(int s)
 {
 	points = (Element *) malloc(s*sizeof(Element) );
 	memset(points, -1, s*sizeof(Element) );
+	/*
 	for (int i=0;i<MAX_SPARK_PHASE;i++) {
 		bitmap[i]=NULL;
 	}
+	*/
+	fragments = NULL;
 	if (!inited) {
 		InitSparks();
 	}
@@ -96,15 +99,22 @@ Particles::~Particles()
 	if (points) {
 		free(points);
 	}
+	/*
 	for (int i=0;i<MAX_SPARK_PHASE;i++) {
 		delete( bitmap[i]);
 	}
+	*/
+	delete fragments;
 }
 
-void Particles::SetBitmap(const ieResRef BAM)
+void Particles::SetBitmap(unsigned int FragAnimID)
 {
-	int i;
+	//int i;
 
+	delete fragments;
+
+	fragments = new CharAnimations(FragAnimID, 0);
+/*
 	for (i=0;i<MAX_SPARK_PHASE;i++) {
 		delete( bitmap[i] );
 	}
@@ -121,6 +131,7 @@ void Particles::SetBitmap(const ieResRef BAM)
 	}
 
 	core->FreeInterface( af );
+*/
 }
 
 bool Particles::AddNew(Point &point)
@@ -129,6 +140,9 @@ bool Particles::AddNew(Point &point)
 
 	switch(path)
 	{
+	case SP_PATH_EXPL:
+		st = (last_insert%15)<<16;
+		break;
 	case SP_PATH_RAIN:
 	case SP_PATH_FLIT:
 		st = core->Roll(3,5,MAX_SPARK_PHASE)<<4;
@@ -188,6 +202,7 @@ void Particles::Draw(Region &screen)
 		Color clr = sparkcolors[color][state];
 		switch (type) {
 		case SP_TYPE_BITMAP:
+			/*
 			if (bitmap[state]) {
 				Sprite2D *frame = bitmap[state]->GetFrame(points[i].state&255);
 				video->BlitGameSprite(frame,
@@ -195,10 +210,21 @@ void Particles::Draw(Region &screen)
 					points[i].pos.y+screen.y, 0, clr,
 					NULL, NULL, &screen);
 			}
+			*/
+			if (fragments) {
+			  //IE_ANI_CAST stance has a simple looping animation
+			  Animation** anims = fragments->GetAnimation( IE_ANI_CAST, i );
+			  if (anims) {
+			    Animation* anim = anims[0];
+			    Sprite2D* nextFrame = anim->GetFrame(anim->GetCurrentFrame());
+			    video->BlitGameSprite( nextFrame, points[i].pos.x - region.x, points[i].pos.y - region.y,
+			      0, clr, NULL, fragments->GetPartPalette(0), &screen);
+			  }
+			}
 			break;
 		case SP_TYPE_CIRCLE:
-			video->DrawCircle (points[i].pos.x+region.x,
-				points[i].pos.y+region.y, 2, clr, true);
+			video->DrawCircle (points[i].pos.x-region.x,
+				points[i].pos.y-region.y, 2, clr, true);
 			break;
 		case SP_TYPE_POINT:
 		default:
@@ -223,6 +249,10 @@ void Particles::AddParticles(int count)
 		Point p;
 
 		switch (path) {
+		case SP_PATH_EXPL:
+			p.x = pos.w/2;
+			p.y = pos.h/2;
+			break;
 		case SP_PATH_FALL:
 		default:
 			p.x = core->Roll(1,pos.w,0);

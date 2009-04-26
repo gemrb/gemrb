@@ -199,6 +199,16 @@ bool ResolveSpellName(ieResRef spellres, Action *parameters)
 	return true;
 }
 
+bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot)
+{  
+	CREItem *itm = act->inventory.GetSlotItem(Slot);
+	if(itm) {
+		strnlwrcpy(itemres, itm->ItemResRef, 8);
+		return true;
+	}
+	return false;
+}
+
 bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 {
 	bool has_current=false;
@@ -1205,14 +1215,14 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	} else if (target->Type == ST_DOOR) {
 		Door* door = (Door*) target;
 		if(door->Flags & DOOR_LOCKED) {
-		    door->TryBashLock(actor);
+			  door->TryBashLock(actor);
 		}
 		Sender->ReleaseCurrentAction();
 		return;
 	} else if (target->Type == ST_CONTAINER) {
 		Container* cont = (Container*) target;
 		if(cont->Flags & CONT_LOCKED) {
-		    cont->TryBashLock(actor);
+			  cont->TryBashLock(actor);
 		}
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2344,5 +2354,21 @@ unsigned int GetSpellDistance(ieResRef spellres, Actor *actor)
 	}
 	dist=spl->GetCastingDistance(actor);
 	gamedata->FreeSpell(spl, spellres, false);
+	return dist*15;
+}
+
+/* returns a spell's casting distance, it depends on the caster */
+unsigned int GetItemDistance(ieResRef itemres, int header)
+{
+	unsigned int dist;
+
+	Item* itm = gamedata->GetItem( itemres );
+	if (!itm) {
+		printMessage("GameScript"," ",LIGHT_RED);
+		printf("Item couldn't be found:%.8s.\n", itemres);
+		return 0;
+	}
+	dist=itm->GetCastingDistance(header);
+	gamedata->FreeItem(itm, itemres, false);
 	return dist*15;
 }
