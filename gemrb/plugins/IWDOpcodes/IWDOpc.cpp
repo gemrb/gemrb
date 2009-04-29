@@ -1874,6 +1874,9 @@ int fx_set_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x121 Cutscene (this is a very ugly hack in iwd)
+//It doesn't really start a cutscene, just sets a variable
+//The script system itself will detect that variable and activate the cutscene
+//ToB has an effect which actually runs a hardcoded cutscene
 int fx_cutscene (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_cutscene (%2d)\n", fx->Opcode );

@@ -73,6 +73,12 @@ static int shcount = -1;
 static int *spell_abilities = NULL;
 static ieDword splabcount = 0;
 
+//the original engine stores the colors in sprklclr.2da in a different order
+
+#define SPARK_COUNT 13
+
+static int spark_color_indices[SPARK_COUNT]={12,5,0,6,1,8,2,7,9,3,4,10,11};
+
 static ScriptedAnimation default_spell_hit;
 
 int fx_ac_vs_damage_type_modifier (Actor* Owner, Actor* target, Effect* fx);//00
@@ -379,7 +385,7 @@ int fx_existance_delay_modifier (Actor* Owner, Actor* target, Effect* fx);//126
 int fx_disable_chunk_modifier (Actor* Owner, Actor* target, Effect* fx);//127
 int fx_protection_from_animation (Actor* Owner, Actor* target, Effect* fx);//128
 int fx_protection_from_turn (Actor* Owner, Actor* target, Effect* fx);//129
-int fx_area_switch (Actor* Owner, Actor* target, Effect* fx);//12a
+int fx_cutscene2 (Actor* Owner, Actor* target, Effect* fx);//12a
 int fx_chaos_shield_modifier (Actor* Owner, Actor* target, Effect* fx);//12b
 int fx_npc_bump (Actor* Owner, Actor* target, Effect* fx);//12c
 int fx_critical_hit_modifier (Actor* Owner, Actor* target, Effect* fx);//12d
@@ -421,7 +427,7 @@ static EffectRef effectnames[] = {
 	{ "ApplyEffectCurse", fx_apply_effect_curse, -1 },
 	{ "ApplyEffectItemType", fx_generic_effect, -1 }, //apply effect when itemtype is equipped
 	{ "ApplyEffectRepeat", fx_apply_effect_repeat, -1 },
-	{ "AreaSwitch", fx_area_switch, -1 },
+	{ "CutScene2", fx_cutscene2, -1 },
 	{ "AttackSpeedModifier", fx_attackspeed_modifier, -1 },
 	{ "AttacksPerRoundModifier", fx_attacks_per_round_modifier, -1 },
 	{ "AuraCleansingModifier", fx_auracleansing_modifier, -1 },
@@ -940,7 +946,7 @@ int fx_set_berserk_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_berserk_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	//
- 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_STATE_SET( STATE_BERSERK );
 	} else {
 		STATE_SET( STATE_BERSERK );
@@ -1715,7 +1721,17 @@ int fx_sparkle (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 	Point p(fx->PosX, fx->PosY);
-	map->Sparkle( fx->Parameter1, fx->Parameter2, p, fx->Parameter3);
+
+	//the IE programmers did something unexpected, again, a permutation!
+	unsigned int idx;
+
+	if (fx->Parameter1<SPARK_COUNT) {
+		idx = spark_color_indices[fx->Parameter1];
+	}
+	else {
+		idx=fx->Parameter1;
+	}
+	map->Sparkle( idx, fx->Parameter2, p, fx->Parameter3);
 	return FX_NOT_APPLIED;
 }
 
@@ -3915,7 +3931,7 @@ int fx_hold_creature_no_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
- 	if (!EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
+	if (!EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//if the ids don't match, the effect doesn't stick
 		return FX_NOT_APPLIED;
 	}
@@ -3939,7 +3955,7 @@ int fx_hold_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (target->HasSpellState(SS_BLOODRAGE)) return FX_NOT_APPLIED;
 	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
 
- 	if (!EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
+	if (!EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//if the ids don't match, the effect doesn't stick
 		return FX_NOT_APPLIED;
 	}
@@ -3954,7 +3970,7 @@ int fx_hold_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_apply_effect (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_apply_effect (%2d) %s", fx->Opcode, fx->Resource );
- 	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
+	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//apply effect, if the effect is a goner, then kill
 		//this effect too
 		if(core->ApplyEffect(fx->Resource, target, Owner, fx->Power)) {
@@ -4244,7 +4260,7 @@ int fx_protection_secondary_type (Actor* /*Owner*/, Actor* target, Effect *fx)
 int fx_resist_spell (Actor* /*Owner*/, Actor* target, Effect *fx)
 {
 	if (0) printf( "fx_resist_spell (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
- 	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
+	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
 		STAT_BIT_OR( IE_IMMUNITY, IMM_RESOURCE);
 		return FX_APPLIED;
 	}
@@ -4388,7 +4404,7 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//delay action until area is loaded to avoid crash
- 	Map *map = target->GetCurrentArea();
+	Map *map = target->GetCurrentArea();
 	if (!map) return FX_APPLIED;
 
 	//if it is sticky, don't add it if it is already played
@@ -4753,7 +4769,7 @@ int fx_puppet_marker (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_disintegrate (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_disintegrate (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
- 	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
+	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//convert it to a death opcode or apply the new effect?
 		fx->Opcode = EffectQueue::ResolveEffect(fx_death_ref);
 		fx->TimingMode = FX_DURATION_INSTANT_PERMANENT;
@@ -4902,7 +4918,7 @@ int fx_set_area_effect (Actor* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_set_trap (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	ieDword skill, roll;
 	Map *map;
-	
+
 	map = target->GetCurrentArea();
 	if (!map) return FX_NOT_APPLIED;
 
@@ -5446,14 +5462,35 @@ int fx_protection_from_turn (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET( IE_NOTURNABLE, fx->Parameter1 );
 	return FX_APPLIED;
 }
-//0x12a AreaSwitch
-//weird effect (pocket plane)
-int fx_area_switch (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+//0x12a CutScene2
+//runs a predetermined script in cutscene mode
+int fx_cutscene2 (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	//unknown
-	//makes cutscenemode
-	if (0) printf( "fx_area_switch (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	Game *game;
+	ieResRef resref;
+
+	if (0) printf( "fx_cutscene2 (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (core->InCutSceneMode()) return FX_NOT_APPLIED;
+	game = core->GetGame();
+	if (!game) return FX_NOT_APPLIED;
 	core->SetCutSceneMode(true);
+
+	//GemRB enhancement: allow a custom resource
+	if (fx->Resource[0]) {
+		strnlwrcpy(resref,fx->Resource, 8);
+	} else {
+		strnlwrcpy(resref,"cut250a",8);
+	}
+
+        GameScript* gs = new GameScript( resref, ST_GLOBAL );
+        gs->MySelf = game;
+        gs->EvaluateAllBlocks();
+        delete( gs );
+	//for safety reasons, i get this pointer again
+	game = core->GetGame();
+	if (game) {
+	        game->ClearCutsceneID();
+	}
 	return FX_NOT_APPLIED;
 }
 //0x12b ChaosShieldModifier
