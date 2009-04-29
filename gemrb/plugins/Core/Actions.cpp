@@ -1750,12 +1750,13 @@ void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
 		tar = GetActorFromObject( Sender, parameters->objects[1] );
 		if (!tar) {
 			//could be an animation
-			AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->string0Parameter);
+			AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName);
 			if (anim) {
 				//set animation's cycle to parameters->int0Parameter;
 				anim->sequence=parameters->int0Parameter;
 				anim->frame=0;
 				//what else to be done???
+				anim->InitAnimation();
 			}
 			return;
 		}
@@ -3497,7 +3498,7 @@ void GameScript::DestroyAllEquipment(Scriptable* Sender, Action* /*parameters*/)
 {
 	Inventory *inv=NULL;
 
- 	switch (Sender->Type) {
+	switch (Sender->Type) {
 		case ST_ACTOR:
 			inv = &(((Actor *) Sender)->inventory);
 			break;
@@ -3515,7 +3516,7 @@ void GameScript::DestroyItem(Scriptable* Sender, Action* parameters)
 {
 	Inventory *inv=NULL;
 
- 	switch (Sender->Type) {
+	switch (Sender->Type) {
 		case ST_ACTOR:
 			inv = &(((Actor *) Sender)->inventory);
 			break;
@@ -3581,7 +3582,7 @@ void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* /*p
 {
 	Inventory *inv=NULL;
 
- 	switch (Sender->Type) {
+	switch (Sender->Type) {
 		case ST_ACTOR:
 			inv = &(((Actor *) Sender)->inventory);
 			break;
@@ -4129,7 +4130,7 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 	Game *game = core->GetGame();
 	int rows = tab->GetRowCount();
 	for (int i=0;i<rows;i++) {
-	 	int count = parameters->int0Parameter;
+		int count = parameters->int0Parameter;
 		int j = game->GetPartySize(false);
 		while (j--) {
 			Actor *tar = game->GetPC(j, false);
@@ -5576,7 +5577,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	Actor *act = (Actor *) Sender;
 	ieDword Slot, header;
 	ieResRef itemres;
-	
+
 	if (parameters->string0Parameter[0]) {
 		Slot = act->inventory.FindItem(parameters->string0Parameter, 0);
 		//this IS in the original game code (ability)
@@ -5586,7 +5587,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		//this is actually not in the original game code
 		header = parameters->int1Parameter;
 	}
-	
+
 	if (!ResolveItemName( itemres, act, Slot) ) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -5609,11 +5610,11 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	
+
 	Actor *act = (Actor *) Sender;
 	ieDword Slot, header;
 	ieResRef itemres;
-	
+
 	if (parameters->string0Parameter[0]) {
 		Slot = act->inventory.FindItem(parameters->string0Parameter, 0);
 		//this IS in the original game code (ability)
@@ -5623,14 +5624,14 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 		//this is actually not in the original game code
 		header = parameters->int1Parameter;
 	}
-	
+
 	if (!ResolveItemName( itemres, act, Slot) ) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	unsigned int dist = GetItemDistance(itemres, header);
-	
+
 	if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
 		GoNearAndRetry(Sender, parameters->pointParameter, dist);
 		Sender->ReleaseCurrentAction();

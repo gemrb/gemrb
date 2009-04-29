@@ -41,6 +41,7 @@ class Animation;
 class Wall_Polygon;
 class Particles;
 class Projectile;
+class AnimationFactory;
 
 #ifdef WIN32
 
@@ -103,7 +104,7 @@ class Projectile;
 #define SPARKLE_SHOWER    3
 
 //in areas 10 is a magic number for resref counts
-#define MAX_RESCOUNT 10 
+#define MAX_RESCOUNT 10
 
 struct SongHeaderType {
 	ieDword SongList[MAX_RESCOUNT];
@@ -144,7 +145,7 @@ public:
 	ieWord NightChance;
 	ieWord Flags;
 	Spawn() { Creatures=NULL;  }
-	~Spawn() { if(Creatures) free(Creatures); } 
+	~Spawn() { if(Creatures) free(Creatures); }
 	unsigned int GetCreatureCount() { return Count; }
 };
 
@@ -192,10 +193,13 @@ public:
 	SpriteCover** covers;
 	AreaAnimation();
 	~AreaAnimation();
+	void InitAnimation();
 	void SetPalette(ieResRef PaletteRef);
 	void BlendAnimation();
 	bool Schedule(ieDword gametime);
 	void Draw(Region &screen, Map *area);
+private:
+	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle);
 };
 
 enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJECTILE};
@@ -295,7 +299,7 @@ public:
 	void SetWallGroups(unsigned int count, Wall_Polygon **walls)
 	{
 		WallCount = count;
-		Walls = walls;	
+		Walls = walls;
 	}
 	SpriteCover* BuildSpriteCover(int x, int y, int xpos, int ypos,
 		unsigned int width, unsigned int height, int flag);

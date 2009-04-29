@@ -949,29 +949,11 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)
 			str->ReadResRef( anim->PaletteRef );
 			str->ReadDword( &anim->unknown48 );
-			AnimationFactory* af = ( AnimationFactory* )
-				core->GetResourceMgr()->GetFactoryResource( anim->BAM, IE_BAM_CLASS_ID );
-			if (!af) {
-				printf("Cannot load animation: %s\n", anim->BAM);
-				continue;
-			}
-			if (anim->Flags & A_ANI_ALLCYCLES) {
-				anim->animcount = (int) af->GetCycleCount();
-				anim->animation = (Animation **) malloc(anim->animcount * sizeof(Animation *) );
-				for(int j=0;j<anim->animcount;j++) {
-					anim->animation[j]=GetAnimationPiece(af, j, anim);
-				}
-			} else {
-				anim->animcount = 1;
-				anim->animation = (Animation **) malloc( sizeof(Animation *) );
-				anim->animation[0]=GetAnimationPiece(af, anim->sequence, anim);
-			}
-			if (anim->Flags & A_ANI_PALETTE) {
-				anim->SetPalette(anim->PaletteRef);
-			}
-			if (anim->Flags&A_ANI_BLEND) {
-				anim->BlendAnimation();
-			}
+
+			//set up the animation, it cannot be done here
+			//because a StaticSequence action can change
+			//it later
+			anim->InitAnimation();
 
 			map->AddAnimation( anim );
 		}
@@ -1134,7 +1116,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		ieByte Unknown3;
 		ieByte Owner;
 
- 		str->Seek( TrapOffset + ( i * 0x1c ), GEM_STREAM_START );
+		str->Seek( TrapOffset + ( i * 0x1c ), GEM_STREAM_START );
 
 		str->ReadResRef( TrapResRef );
 		str->ReadDword( &TrapEffOffset );
@@ -1159,7 +1141,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(ProID-1);
 
 		//This could be wrong on msvc7 with its separate memory managers
- 		EffectQueue *fxqueue = new EffectQueue();
+		EffectQueue *fxqueue = new EffectQueue();
 		CachedFileStream *fs = new CachedFileStream( (CachedFileStream *) str, TrapEffOffset, TrapSize, true);
 
 		ReadEffects((DataStream *) fs,fxqueue, TrapEffectCount);
@@ -1236,28 +1218,6 @@ void AREImp::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCo
 		fxqueue->AddEffect( &fx );
 	}
 	core->FreeInterface(eM);
-}
-
-Animation *AREImp::GetAnimationPiece(AnimationFactory *af, int animCycle, AreaAnimation *a)
-{
-	Animation *anim = af->GetCycle( ( unsigned char ) animCycle );
-	if (!anim)
-		anim = af->GetCycle( 0 );
-	if (!anim) {
-		printf("Cannot load animation: %s\n", a->BAM);
-		return NULL;
-	}
- 	//this will make the animation stop when the game is stopped
-	//a possible gemrb feature to have this flag settable in .are
-	anim->gameAnimation = true;
-	anim->pos = a->frame;
-	anim->Flags = a->Flags;
-	anim->x = a->Pos.x;
-	anim->y = a->Pos.y;
-	if (anim->Flags&A_ANI_MIRROR) {
-		anim->MirrorAnimation();
-	}
-	return anim;
 }
 
 int AREImp::GetStoredFileSize(Map *map)
@@ -1827,7 +1787,7 @@ int AREImp::PutActors( DataStream *stream, Map *map)
 		PutScript(stream, ac, SCR_GENERAL);
 		PutScript(stream, ac, SCR_DEFAULT);
 		PutScript(stream, ac, SCR_SPECIFICS);
- 		//creature reference is empty because we are embedding it
+		//creature reference is empty because we are embedding it
 		//the original engine used a '*'
 		stream->Write( filling, 8);
 		stream->WriteDword( &CreatureOffset);

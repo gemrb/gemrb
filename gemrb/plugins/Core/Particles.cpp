@@ -130,7 +130,6 @@ void Particles::SetBitmap(unsigned int FragAnimID)
 		bitmap[i] = af->GetCycle( i );
 	}
 
-	core->FreeInterface( af );
 */
 }
 

@@ -2201,7 +2201,7 @@ bool Map::IsVisible(Point &pos, int explored)
 	int h = TMap->YCellCount * 2 + LargeFog;
 	if (sX>=w) return false;
 	if (sY>=h) return false;
- 	int b0 = (sY * w) + sX;
+	int b0 = (sY * w) + sX;
 	int by = b0/8;
 	int bi = 1<<(b0%8);
 
@@ -2581,9 +2581,9 @@ void Map::CopyGroundPiles(Map *othermap, Point &Pos)
 			//creating (or grabbing) the container in the other map at the given position
 			Container *othercontainer;
 			if (Pos.isempty()) {
-				 othercontainer = othermap->GetPile(c->Pos);
+				othercontainer = othermap->GetPile(c->Pos);
 			} else {
-				 othercontainer = othermap->GetPile(Pos);
+				othercontainer = othermap->GetPile(Pos);
 			}
 			//transfer the pile to the other container
 			unsigned int i=c->inventory.GetSlotCount();
@@ -2825,6 +2825,66 @@ AreaAnimation::~AreaAnimation()
 			delete covers[i];
 		}
 		free (covers);
+	}
+}
+
+Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
+{
+	Animation *anim = af->GetCycle( ( unsigned char ) animCycle );
+	if (!anim)
+		anim = af->GetCycle( 0 );
+	if (!anim) {
+		printf("Cannot load animation: %s\n", BAM);
+		return NULL;
+	}
+	//this will make the animation stop when the game is stopped
+	//a possible gemrb feature to have this flag settable in .are
+	anim->gameAnimation = true;
+	anim->pos = frame;
+	anim->Flags = Flags;
+	anim->x = Pos.x;
+	anim->y = Pos.y;
+	if (anim->Flags&A_ANI_MIRROR) {
+		anim->MirrorAnimation();
+	}
+
+	return anim;
+}
+
+void AreaAnimation::InitAnimation()
+{
+	AnimationFactory* af = ( AnimationFactory* )
+		core->GetResourceMgr()->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
+	if (!af) {
+		printf("Cannot load animation: %s\n", BAM);
+		return;
+	}
+
+	//freeing up the previous animation
+	for(int i=0;i<animcount;i++) {
+		if (animation[i]) {
+			delete (animation[i]);
+		}
+	}
+	free(animation);
+
+	if (Flags & A_ANI_ALLCYCLES) {
+		animcount = (int) af->GetCycleCount();
+
+		animation = (Animation **) malloc(animcount * sizeof(Animation *) );
+		for(int j=0;j<animcount;j++) {
+			animation[j]=GetAnimationPiece(af, j);
+		}
+	} else {
+		animcount = 1;
+		animation = (Animation **) malloc( sizeof(Animation *) );
+		animation[0]=GetAnimationPiece(af, sequence);
+	}
+	if (Flags & A_ANI_PALETTE) {
+		SetPalette(PaletteRef);
+	}
+	if (Flags&A_ANI_BLEND) {
+		BlendAnimation();
 	}
 }
 
