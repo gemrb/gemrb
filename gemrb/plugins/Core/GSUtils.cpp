@@ -196,15 +196,15 @@ bool ResolveSpellName(ieResRef spellres, Action *parameters)
 		}
 		sprintf(spellres, "%s%03d", spell_suffices[type], spellid);
 	}
-	return true;
+	return gamedata->Exists(spellres, IE_SPL_CLASS_ID);
 }
 
 bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot)
-{  
+{
 	CREItem *itm = act->inventory.GetSlotItem(Slot);
 	if(itm) {
 		strnlwrcpy(itemres, itm->ItemResRef, 8);
-		return true;
+		return gamedata->Exists(itemres, IE_ITM_CLASS_ID);
 	}
 	return false;
 }
@@ -254,7 +254,7 @@ void ClickCore(Scriptable *Sender, Point point, int type, int speed)
 	}
 	Video *video = core->GetVideoDriver();
 	GlobalTimer *timer = core->timer;
- 	timer->SetMoveViewPort( point.x, point.y, speed, true );
+	timer->SetMoveViewPort( point.x, point.y, speed, true );
 	timer->DoStep(0);
 	if (timer->ViewportIsMoving()) {
 		Sender->AddActionInFront( Sender->CurrentAction );
@@ -917,7 +917,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		//CHECKDIST works only for mobile scriptables
 		if (Flags&BD_CHECKDIST) {
 			if (PersonalDistance(scr, target)>range ) {
-				 //this is unsure, the target's path will be cleared
+				//this is unsure, the target's path will be cleared
 				GoNearAndRetry(Sender, tar, true, MAX_OPERATING_DISTANCE);
 				Sender->ReleaseCurrentAction();
 				return;
@@ -1215,14 +1215,14 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	} else if (target->Type == ST_DOOR) {
 		Door* door = (Door*) target;
 		if(door->Flags & DOOR_LOCKED) {
-			  door->TryBashLock(actor);
+			door->TryBashLock(actor);
 		}
 		Sender->ReleaseCurrentAction();
 		return;
 	} else if (target->Type == ST_CONTAINER) {
 		Container* cont = (Container*) target;
 		if(cont->Flags & CONT_LOCKED) {
-			  cont->TryBashLock(actor);
+			cont->TryBashLock(actor);
 		}
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1475,7 +1475,7 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 
 			case 'a':
 			//Action
-			 {
+			{
 				SKIP_ARGUMENT();
 				char action[257];
 				int i = 0;
