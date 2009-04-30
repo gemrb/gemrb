@@ -227,6 +227,11 @@ void CharAnimations::LockPalette(const ieDword *gradients)
 	}
 }
 
+//                            0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+static const char *StancePrefix[]={"3","2","5","5","4","4","2","2","5","4","1","3","3","3","4","1","4","4","4"};
+static const char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","0","1","1","1","1","1","1","1","1"};
+static const unsigned int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
+
 void CharAnimations::SetColors(const ieDword *arg)
 {
 	Colors = arg;
@@ -303,7 +308,11 @@ void CharAnimations::SetupColors(PaletteType type)
 		PaletteResRef[0]=0;
 		//handling special palettes like MBER_BL (black bear)
 		if (PType!=1) {
-			snprintf(PaletteResRef,8,"%.4s_%-.2s",ResRef, (char *) &PType);
+      if (GetAnimType()==IE_ANI_NINE_FRAMES) {
+        snprintf(PaletteResRef,9,"%.4s_%-.2s%s",ResRef, (char *) &PType, StancePrefix[StanceID]);
+      } else {
+        snprintf(PaletteResRef,9,"%.4s_%-.2s",ResRef, (char *) &PType);
+      }
 			strlwr(PaletteResRef);
 			Palette *tmppal = gamedata->GetPalette(PaletteResRef);
 			if (tmppal) {
@@ -410,6 +419,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		palette[i] = NULL;
 	}
 	nextStanceID = 0;
+  StanceID = 0;
 	autoSwitchOnEnd = false;
 	lockPalette = false;
 	if (!AvatarsCount) {
@@ -501,7 +511,7 @@ This is a simple Idea of how the animation are coded
 
 There are the following animation types:
 
-IE_ANI_CODE_MIRROR: The code automatically mirrors the needed frames 
+IE_ANI_CODE_MIRROR: The code automatically mirrors the needed frames
 			(as in the example above)
 
 			These Animations are stores using the following template:
@@ -539,7 +549,7 @@ IE_ANI_SIX_FILES:	The layout for these files is:
 			G2 contains stand, ready, get hit, die and twitch.
 			g3 contains 3 attacks.
 
-IE_ANI_SIX_FILES_2:     Similar to SIX_FILES, but the orientation numbers are reduced like in FOUR_FILES. Only one animation uses it: MOGR 
+IE_ANI_SIX_FILES_2:     Similar to SIX_FILES, but the orientation numbers are reduced like in FOUR_FILES. Only one animation uses it: MOGR
 
 IE_ANI_TWO_FILES_2:	Animations using this type are stored using the following template:
 			[NAME]g1[/E]
@@ -608,13 +618,15 @@ WSW 003      |      013 ESE
 
 */
 
-Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Orient)
+Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Orient)
 {
 	if (StanceID>=MAX_ANIMS) {
 		printf("Illegal stance ID\n");
 		abort();
 	}
 
+	//for paletted dragon animations, we need the stance id
+	StanceID = Stance;
 	int AnimType = GetAnimType();
 
 	//alter stance here if it is missing and you know a substitute
@@ -798,7 +810,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			if (!palette[PAL_MAIN] && ((GlobalColorMod.type!=RGBModifier::NONE) || (NoPalette()!=1)) ) {
 				// This is the first time we're loading an Animation.
 				// We copy the palette of its first frame into our own palette
-				palette[PAL_MAIN] = 
+				palette[PAL_MAIN] =
 					core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
 
 				// ...and setup the colours properly
@@ -978,7 +990,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			AddMMRSuffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
-		case IE_ANI_TWO_FILES: 
+		case IE_ANI_TWO_FILES:
 			AddTwoFileSuffix(NewResRef, StanceID, Cycle, Orient );
 			break;
 
@@ -1186,10 +1198,6 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 	}
 }
-//                            0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
-static const char *StancePrefix[]={"3","2","5","5","4","4","2","2","5","4","1","3","3","3","4","1","4","4","4"};
-static const char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","0","1","1","1","1","1","1","1","1"};
-static const unsigned int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
 
 // Note: almost like SixSuffix
 void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
@@ -1935,7 +1943,7 @@ void CharAnimations::PulseRGBModifiers()
 	if (time - lastModUpdate <= 40)
 		return;
 
-	if (time - lastModUpdate > 400) lastModUpdate = time - 40; 
+	if (time - lastModUpdate > 400) lastModUpdate = time - 40;
 
 	int inc = (time - lastModUpdate)/40;
 	bool change[4] = { false, false, false, false };

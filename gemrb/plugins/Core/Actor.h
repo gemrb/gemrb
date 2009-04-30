@@ -288,6 +288,7 @@ public:
 	ieDword GetBase(unsigned int StatIndex);
 	/** Sets a Base Stat Value */
 	bool SetBase(unsigned int StatIndex, ieDword Value);
+	bool SetBaseNoPCF(unsigned int StatIndex, ieDword Value);
 	/** set/resets a Base Stat bit */
 	bool SetBaseBit(unsigned int StatIndex, ieDword Value, bool setreset);
 	/** Sets the modified value in different ways, returns difference */

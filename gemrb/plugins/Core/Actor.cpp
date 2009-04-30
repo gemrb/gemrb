@@ -653,6 +653,10 @@ void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 
 void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
+	if ((signed) actor->BaseStats[IE_HITPOINTS]>(signed) actor->Modified[IE_MAXHITPOINTS]) {
+		actor->BaseStats[IE_HITPOINTS]=actor->Modified[IE_MAXHITPOINTS];
+	}
+
 	if ((signed) hp>(signed) actor->Modified[IE_MAXHITPOINTS]) {
 		hp=actor->Modified[IE_MAXHITPOINTS];
 	}
@@ -1349,9 +1353,31 @@ bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 	BaseStats[StatIndex] = Value;
 
 	//if already initialized, then the modified stats
-	//need to run the post change function (stat change can kill actor)
+	//might need to run the post change function (stat change can kill actor)
 	SetStat (StatIndex, Value+diff, InternalFlags&IF_INITIALIZED);
 	return true;
+}
+
+bool Actor::SetBaseNoPCF(unsigned int StatIndex, ieDword Value)
+{
+        if (StatIndex >= MAX_STATS) {
+                return false;
+        }
+        ieDword diff = Modified[StatIndex]-BaseStats[StatIndex];
+
+        //maximize the base stat
+        if ( maximum_values[StatIndex]>0) {
+                if ( (signed) Value>maximum_values[StatIndex]) {
+                        Value = (ieDword) maximum_values[StatIndex];
+                }
+        }
+
+        BaseStats[StatIndex] = Value;
+
+        //if already initialized, then the modified stats
+        //might need to run the post change function (stat change can kill actor)
+        SetStat (StatIndex, Value+diff, 0);
+        return true;
 }
 
 bool Actor::SetBaseBit(unsigned int StatIndex, ieDword Value, bool setreset)
@@ -1469,6 +1495,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		fx->SetOwner(this);
 		fx->AddAllEffects(this, Pos);
 		delete fx;
+		//copy back the original stats, because the effects
+		//will be reapplied in ApplyAllEffects again
+		memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
 	}
 
 	fxqueue.ApplyAllEffects( this );
@@ -1578,15 +1607,15 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 	switch (ModifierType) {
 		case MOD_ADDITIVE:
 			//flat point modifier
-			SetBase(StatIndex, BaseStats[StatIndex]+ModifierValue);
+			SetBaseNoPCF(StatIndex, BaseStats[StatIndex]+ModifierValue);
 			break;
 		case MOD_ABSOLUTE:
 			//straight stat change
-			SetBase(StatIndex, ModifierValue);
+			SetBaseNoPCF(StatIndex, ModifierValue);
 			break;
 		case MOD_PERCENT:
 			//percentile
-			SetBase(StatIndex, BaseStats[StatIndex] * ModifierValue / 100);
+			SetBaseNoPCF(StatIndex, BaseStats[StatIndex] * ModifierValue / 100);
 			break;
 	}
 	return BaseStats[StatIndex] - oldmod;
@@ -1930,8 +1959,8 @@ void Actor::SetPosition(Point &position, int jump, int radius)
 }
 
 /* this is returning the level of the character for xp calculations
-	 and the average level for dual/multiclass (rounded up),
-	 also with iwd2's 3rd ed rules, this is why it is a separate function */
+	and the average level for dual/multiclass (rounded up),
+	also with iwd2's 3rd ed rules, this is why it is a separate function */
 ieDword Actor::GetXPLevel(int modified) const
 {
 	const ieDword *stats;
@@ -2915,8 +2944,8 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 }
 
 void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
-			 unsigned char r, unsigned char g, unsigned char b,
-			 int phase)
+			unsigned char r, unsigned char g, unsigned char b,
+			int phase)
 {
 	CharAnimations* ca = GetAnims();
 	if (!ca) return;
@@ -3103,7 +3132,7 @@ void Actor::DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
 			if (!ca->lockPalette) flags|=BLIT_TINTED;
 
 			video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
-				 flags, tint, newsc, ca->GetPartPalette(partnum), &screen);
+				flags, tint, newsc, ca->GetPartPalette(partnum), &screen);
 		}
 	}
 }
@@ -3252,7 +3281,7 @@ void Actor::Draw(Region &screen)
 		//     Drawn with transparency.
 		//     distance between copies depends on IE_MOVEMENTRATE
 		//     TODO: actually, the direction is the real movement direction,
-		//		 not the (rounded) direction given Face
+		//	not the (rounded) direction given Face
 		//     Uses extraCovers 0-2
 		// * actor itself
 		//     Uses main spritecover
@@ -3435,6 +3464,8 @@ bool Actor::HandleActorStance()
 
 void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index)
 {
+	if (!anims) return;
+
 	AutoTable tab(anims->ResRef);
 	if (!tab)
 		return;

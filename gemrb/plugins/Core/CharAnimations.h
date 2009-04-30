@@ -67,7 +67,7 @@
 #define IE_ANI_ATTACK_JAB		13
 #define IE_ANI_EMERGE			14
 #define IE_ANI_HIDE			15
-#define IE_ANI_RUN			15 //pst has no hide, i hope 
+#define IE_ANI_RUN			15 //pst has no hide, i hope
 #define IE_ANI_SLEEP			16
 #define IE_ANI_GET_UP			17
 #define IE_ANI_PST_START		18
@@ -138,7 +138,7 @@ public:
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
 	ieResRef PaletteResRef;
-	unsigned char nextStanceID;
+	unsigned char nextStanceID, StanceID;
 	bool autoSwitchOnEnd;
 	bool lockPalette;
 public:

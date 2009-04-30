@@ -1008,7 +1008,7 @@ int fx_set_charmed_state (Actor* Owner, Actor* target, Effect* fx)
 	case 1: //charmed (target hostile after charm)
 		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
 	case 1001:
-		target->SetBase(IE_EA, EA_ENEMY);
+		target->SetBaseNoPCF(IE_EA, EA_ENEMY);
 		break;
 	case 2: //dire charmed (target neutral after charm)
 		core->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
@@ -1017,12 +1017,12 @@ int fx_set_charmed_state (Actor* Owner, Actor* target, Effect* fx)
 	case 3: //dire charmed (target hostile after charm)
 		core->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
 	case 1003:
-		target->SetBase(IE_EA, EA_ENEMY);
+		target->SetBaseNoPCF(IE_EA, EA_ENEMY);
 		break;
 	case 4: //controlled by cleric
 		core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
 	case 1004:
-		target->SetBase(IE_EA, EA_ENEMY);
+		target->SetBaseNoPCF(IE_EA, EA_ENEMY);
 		break;
 	case 5: //thrall (typo comes from original engine doc)
 		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
@@ -1940,7 +1940,7 @@ int fx_animation_id_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		//return FX_NOT_APPLIED;
 		//intentionally passing through (perma change removes previous changes)
 	case 2: //permanent animation id change
-		target->SetBase(IE_ANIMATION_ID, fx->Parameter1);
+		target->SetBaseNoPCF(IE_ANIMATION_ID, fx->Parameter1);
 		return FX_NOT_APPLIED;
 	}
 }
@@ -2663,17 +2663,10 @@ seconds:
 		break;
 	}
 
-	ieDword old_hp = target->Modified[IE_HITPOINTS];
-	target->NewBase( IE_HITPOINTS, damage, MOD_ADDITIVE );
-	if (target->BaseStats[IE_HITPOINTS] > target->BaseStats[IE_MAXHITPOINTS]) {
-		target->SetBase(IE_HITPOINTS, target->BaseStats[IE_MAXHITPOINTS]);
-	}
-	// if an effect only increased the max hp, we need to modify the hp manually,
-	// since SetBase has just reset it to the current base hp (diff is 0)
-	target->SetStat(IE_HITPOINTS, old_hp+damage, 0);
-	if (target->Modified[IE_HITPOINTS] > target->Modified[IE_MAXHITPOINTS]) {
-		target->SetStat(IE_HITPOINTS, target->Modified[IE_MAXHITPOINTS], 0);
-	}
+	//This should take care of the change of the modified stat
+	//So there is no need to do anything else here other than increasing
+	//the base current hp
+	target->NewBase(IE_HITPOINTS, damage, MOD_ADDITIVE);
 	return FX_APPLIED;
 }
 // 0x63 SpellDurationModifier
