@@ -1391,7 +1391,7 @@ bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 }
 
 static EffectRef fx_disable_spellcasting_ref={ "DisableCasting", NULL, -1 };
-bool EffectQueue::DisabledSpellcasting(int types) const
+int EffectQueue::DisabledSpellcasting(int types) const
 {
 	ResolveEffectRef(fx_disable_spellcasting_ref);
 	if (fx_disable_spellcasting_ref.EffText < 0) {

@@ -7853,14 +7853,6 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 	// disable all spells if fx_disable_spellcasting was run with the same type
 	// but only if there are any spells of that type to disable
 	int disabled_spellcasting = actor->fxqueue.DisabledSpellcasting(7);
-/*
-	for (int single_type=0; single_type < Type; single_type++) {
-		if ((Type & 1<<single_type) && actor->spellbook.GetKnownSpellsCount(single_type, 0)) {
-			disabled_spellcasting = actor->fxqueue.DisabledSpellcasting(1<<single_type);
-			if (disabled_spellcasting) break;
-		}
-	}
-*/
 
 	for (i=0;i<GUIBT_COUNT-(more?2:0);i++) {
 		int ci = core->GetControl(wi, i+(more?1:0) );
