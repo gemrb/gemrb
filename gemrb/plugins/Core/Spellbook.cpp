@@ -764,7 +764,7 @@ unsigned int Spellbook::GetSpellInfoSize(int type)
 		GenerateSpellInfo();
 		i = spellinfo.size();
 	}
-	if (type) {
+	if (!type) {
 		return (unsigned int) i;
 	}
 	unsigned int count = 0;
