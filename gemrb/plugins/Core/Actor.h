@@ -184,7 +184,6 @@ public:
 	ieWord globalID;
 	ieWord localID;
 	int PathTries; //the # of previous tries to pick up a new walkpath
-	bool DisabledSpellcasting; //used to display the spell disabling (armor) effect message only once
 public:
 	#define LastTarget LastDisarmFailed
 	//ieDword LastTarget; use lastdisarmfailed

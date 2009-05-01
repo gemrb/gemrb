@@ -6386,9 +6386,9 @@ static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* ar
 	}
 
 	if (Level<0) {
-		return PyInt_FromLong( actor->spellbook.GetSpellInfoSize( SpellType ) );
+		return PyInt_FromLong( actor->spellbook.GetSpellInfoSize( 1<<SpellType ) );
 	} else {
-		return PyInt_FromLong( actor->spellbook.GetMemorizedSpellsCount( 1<<SpellType, Level ) );
+		return PyInt_FromLong( actor->spellbook.GetMemorizedSpellsCount( SpellType, Level ) );
 	}
 }
 
@@ -7852,13 +7852,15 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 
 	// disable all spells if fx_disable_spellcasting was run with the same type
 	// but only if there are any spells of that type to disable
-	bool disabled_spellcasting = false;
+	int disabled_spellcasting = actor->fxqueue.DisabledSpellcasting(7);
+/*
 	for (int single_type=0; single_type < Type; single_type++) {
 		if ((Type & 1<<single_type) && actor->spellbook.GetKnownSpellsCount(single_type, 0)) {
 			disabled_spellcasting = actor->fxqueue.DisabledSpellcasting(1<<single_type);
 			if (disabled_spellcasting) break;
 		}
 	}
+*/
 
 	for (i=0;i<GUIBT_COUNT-(more?2:0);i++) {
 		int ci = core->GetControl(wi, i+(more?1:0) );
@@ -7870,7 +7872,7 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 		// disable spells that should be cast from the inventory
 		// Identify is misclassified and has Target 3 (Dead char)
 
-		if (CheckSpecialSpell(spell->spellname, actor) || disabled_spellcasting) {
+		if (CheckSpecialSpell(spell->spellname, actor) || (disabled_spellcasting&spell->type) ) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
 			btn->EnableBorder(1, IE_GUI_BUTTON_DISABLED);
 			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS,"UpdateActionsWindow"); //noop

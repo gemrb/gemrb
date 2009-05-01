@@ -322,10 +322,11 @@ void Inventory::KillSlot(unsigned int index)
 	}
 	ItemExcl &= ~itm->ItemExcl;
 
+/*
 	EffectQueue *eqfx = itm->GetEffectBlock(-1, index, 0);
-	if (eqfx->DisabledSpellcasting(7, false, true)) // FIXME: only allows for one disabling item
+	if (eqfx->DisabledSpellcasting(7))
 		Owner->DisabledSpellcasting = false;
-
+*/
 	switch (effect) {
 		case SLOT_EFFECT_LEFT:
 			UpdateShieldAnimation(0);

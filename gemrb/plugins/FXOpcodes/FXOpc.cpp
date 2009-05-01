@@ -3491,31 +3491,33 @@ int fx_disable_button (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 //0x91 DisableSpellCasting
 //bg2: 0 - mage, 1 - cleric, 2 - innate
 //iwd2: 0 - all, 1 - mage+cleric, 2 - mage, 3 - cleric , 4 - innate
-int fx_disable_spellcasting (Actor* Owner, Actor* /*target*/, Effect* fx)
+int fx_disable_spellcasting (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_disable_spellcasting (%2d): Button: %d\n", fx->Opcode, fx->Parameter2 );
 
+	if (!fx->FirstApply) {
+		return FX_APPLIED;
+	}
 	bool display_warning = false;
-	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+
+	//IWD2 Style spellbook
+	if (target->spellbook.IsIWDSpellBook()) {
 		switch(fx->Parameter2) {
 			case 0: // all
 			case 1: // mage and cleric
 			case 2: // mage
-				if (Owner->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_BARD, 0)) display_warning = true;
-				if (Owner->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_SORCEROR, 0)) display_warning = true;
-				if (Owner->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_WIZARD, 0)) display_warning = true;
+				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_BARD, 0)) display_warning = true;
+				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_SORCEROR, 0)) display_warning = true;
+				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_WIZARD, 0)) display_warning = true;
 				break;
 		}
 	} else { // bg2
 		if (fx->Parameter2 == 0)
-			if (Owner->spellbook.GetKnownSpellsCount(IE_SPELL_TYPE_WIZARD, 0)) display_warning = true;
+			if (target->spellbook.GetKnownSpellsCount(IE_SPELL_TYPE_WIZARD, 0)) display_warning = true;
 	}
-	if (Owner->InParty && !Owner->DisabledSpellcasting) {
-		Owner->DisabledSpellcasting = true;
-		if (display_warning) {
-			core->DisplayConstantStringName(STR_DISABLEDMAGE, 0xff0000, Owner);
-			core->SetEventFlag(EF_ACTION);
-		}
+	if (target->InParty && display_warning) {
+		core->DisplayConstantStringName(STR_DISABLEDMAGE, 0xff0000, target);
+		core->SetEventFlag(EF_ACTION);
 	}
 	return FX_APPLIED;
 }

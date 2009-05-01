@@ -1391,56 +1391,54 @@ bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 }
 
 static EffectRef fx_disable_spellcasting_ref={ "DisableCasting", NULL, -1 };
-bool EffectQueue::DisabledSpellcasting(int types, bool only_live, bool only_mage) const
+bool EffectQueue::DisabledSpellcasting(int types) const
 {
 	ResolveEffectRef(fx_disable_spellcasting_ref);
 	if (fx_disable_spellcasting_ref.EffText < 0) {
 		return 0;
 	}
 
-	unsigned int spelltype_mask;
+	unsigned int spelltype_mask = 0;
 	bool iwd2 = core->HasFeature(GF_IWD2_SCRIPTNAME);
 	ieDword opcode = fx_disable_spellcasting_ref.EffText;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
-		if (only_live) MATCH_LIVE_FX();
+		MATCH_LIVE_FX();
 
-		spelltype_mask = 0; // 2^IE_SPELL_TYPE_*
 		if (iwd2) {
 			switch((*f)->Parameter2) {
 				case 0: // all
-					spelltype_mask = 7;
+					spelltype_mask |= 7;
 					break;
 				case 1: // mage and cleric
-					spelltype_mask = 3;
+					spelltype_mask |= 3;
 					break;
 				case 2: // mage
-					spelltype_mask = 2;
+					spelltype_mask |= 2;
 					break;
 				case 3: // cleric
-					if (!only_mage) spelltype_mask = 1;
+					spelltype_mask |= 1;
 					break;
 				case 4: // innate
-					if (!only_mage) spelltype_mask = 4;
+					spelltype_mask |= 4;
 					break;
 			}
 		} else {
 			switch((*f)->Parameter2) {
 				case 0: // mage
-					spelltype_mask = 2;
+					spelltype_mask |= 2;
 					break;
 				case 1: // cleric
-					if (!only_mage) spelltype_mask = 1;
+					spelltype_mask |= 1;
 					break;
 				case 2: // innate
-					if (!only_mage) spelltype_mask = 4;
+					spelltype_mask |= 4;
 					break;
 			}
 		}
-		return spelltype_mask & types;
 	}
-	return 0;
+	return spelltype_mask & types;
 }
 
 //useful for immunity vs spell, can't use item, etc.

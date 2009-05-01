@@ -249,7 +249,7 @@ public:
 	//getting weapon immunity flag
 	bool WeaponImmunity(int enchantment, ieDword weapontype) const;
 	// checks if spells of type "types" are disabled (usually by armor)
-	bool DisabledSpellcasting(int types, bool only_live=true, bool only_mage=false) const;
+	bool DisabledSpellcasting(int types) const;
 
 	// returns -1 if bounced, 0 if resisted, 1 if accepted spell
 	int CheckImmunity(Actor *target) const;
