@@ -2296,15 +2296,11 @@ Palette* Interface::CreatePalette(const Color &color, const Color &back)
 /** No descriptions */
 Color* Interface::GetPalette(int index, int colors, Color *pal) const
 {
-	//Color* pal = NULL;
 	if (colors == 32) {
-		//pal = ( Color * ) malloc( colors * sizeof( Color ) );
 		pal32->GetPalette( index, colors, pal );
 	} else if (colors <= 32) {
-		//pal = ( Color * ) malloc( colors * sizeof( Color ) );
 		pal16->GetPalette( index, colors, pal );
 	} else if (colors == 256) {
-		//pal = ( Color * ) malloc( colors * sizeof( Color ) );
 		pal256->GetPalette( index, colors, pal );
 	}
 	return pal;

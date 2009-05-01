@@ -87,6 +87,8 @@ private:
 	Sprite2D *MapIcon;
 	char *StrCaption;
 	char *StrTooltip;
+
+	void SetPalette(int gradient, Sprite2D *MapIcon);
 public:
 	ieResRef AreaName;
 	ieResRef AreaResRef;

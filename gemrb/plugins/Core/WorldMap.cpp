@@ -72,7 +72,15 @@ const char* WMPAreaEntry::GetTooltip()
 	return StrTooltip;
 }
 
+static int gradients[5]={18,22,19,3,4};
 
+void WMPAreaEntry::SetPalette(int gradient, Sprite2D* MapIcon)
+{
+	Video *video = core->GetVideoDriver();
+	Palette *palette = new Palette;
+        core->GetPalette( gradient&255, 256, palette->col );
+	video->SetPalette(MapIcon, palette);
+}
 
 Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)
 {
@@ -80,17 +88,23 @@ Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)
 		return NULL;
 	}
 	if (!MapIcon) {
+		int color = -1;
 		int frame = 0;
-		if (bam->GetCycleSize(IconSeq)>5) {
-			switch (AreaStatus&(WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED))
-			{
+		switch (AreaStatus&(WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED))
+		{
 			case WMP_ENTRY_ACCESSIBLE: frame = 0; break;
 			case WMP_ENTRY_VISITED: frame = 4; break;
 			case WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED: frame = 1; break;
 			case 0: frame = 2; break;
-			}
+		}
+		if (bam->GetCycleSize(IconSeq)<5) {
+			color = gradients[frame];
+			frame = 0;
 		}
 		MapIcon = bam->GetFrame((ieWord) frame, (ieByte) IconSeq);
+		if (color>=0) {
+			SetPalette(color, MapIcon);
+		}
 	}
 	return MapIcon;
 }
@@ -345,6 +359,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 	unsigned int i;
 	WMPAreaEntry *ae=GetArea( AreaName, i ); //target area
 	if (!ae) {
+		printMessage("WorldMap","",LIGHT_RED);
 		printf("No such area: %s\n", AreaName);
 		return NULL;
 	}
@@ -420,7 +435,6 @@ void WorldMap::SetAreaStatus(const ieResRef AreaName, int Bits, int Op)
 	WMPAreaEntry* ae=GetArea(AreaName,i);
 	if (!ae)
 		return;
-	printf("Updated Area visibility: %s\n", ae->AreaName);
 	ae->SetAreaStatus(Bits, Op);
 }
 
