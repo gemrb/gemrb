@@ -7984,11 +7984,11 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		switch (action) {
 		case ACT_INNATE:
 			if (actor->spellbook.IsIWDSpellBook()) {
-				type = 1<<IE_IWD2_SPELL_INNATE;
+				type = IE_IWD2_SPELL_INNATE;
 			} else {
-				type = 1<<IE_SPELL_TYPE_INNATE;
+				type = IE_SPELL_TYPE_INNATE;
 			}
-			if (!actor->spellbook.GetSpellInfoSize(type)) {
+			if (!actor->spellbook.GetMemorizedSpellsCount(type)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
