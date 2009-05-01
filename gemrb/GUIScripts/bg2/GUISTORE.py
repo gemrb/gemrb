@@ -294,7 +294,6 @@ def OpenStoreIdentifyWindow ():
 	# 8-11 item slots, 0x1000000c-f labels
 	for i in range (4):
 		Button = Window.GetControl (i+8)
-		Button.SetVarAssoc ("Index", i)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RedrawStoreIdentifyWindow")
@@ -320,12 +319,10 @@ def OpenStoreStealWindow ():
 
 	for i in range (4):
 		Button = Window.GetControl (i+4)
-		Button.SetVarAssoc ("LeftIndex", i)
 		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RedrawStoreStealWindow")
 
 		Button = Window.GetControl (i+11)
-		Button.SetVarAssoc ("RightIndex", i)
 		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoRightWindow")
 
@@ -572,7 +569,7 @@ def BuyPressed ():
 	Window = StoreShoppingWindow
 
 	if (BuySum>GemRB.GameGetPartyGold ()):
-		#not enough money!
+		ErrorWindow (11047)
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -608,8 +605,8 @@ def ToBagPressed ():
 	RightCount = len (inventory_slots)
 	#no need to go reverse
 	for Slot in range (RightCount):
-		Flags = GemRB.IsValidStoreItem (pc, inventory_slots[Slot], ITEM_PC) & SHOP_SELECT
-		if Flags:
+		Flags = GemRB.IsValidStoreItem (pc, inventory_slots[Slot], ITEM_PC)
+		if Flags & SHOP_SELECT:
 			GemRB.ChangeStoreItem (pc, inventory_slots[Slot], SHOP_SELL)
 	UpdateStoreShoppingWindow ()
 	return
@@ -658,18 +655,21 @@ def RedrawStoreShoppingWindow ():
 	RightCount = len(inventory_slots)
 	SellSum = 0
 	for i in range (RightCount):
-		if GemRB.IsValidStoreItem (pc, inventory_slots[i], ITEM_PC) & SHOP_SELECT:
+		Flags = GemRB.IsValidStoreItem (pc, inventory_slots[i], ITEM_PC)
+		if Flags & SHOP_SELECT:
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[i])
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			if Inventory:
 				Price = 1
 			else:
 				Price = Item['Price'] * Store['BuyMarkup'] / 100
+			if Flags & SHOP_ID:
+				Price = 1
 			SellSum = SellSum + Price
 
 	Label = Window.GetControl (0x1000002b)
 	if Inventory:
-		Label.SetText ("" )
+		Label.SetText ("")
 	else:
 		Label.SetText (str(BuySum) )
 	if BuySum:
@@ -679,7 +679,7 @@ def RedrawStoreShoppingWindow ():
 
 	Label = Window.GetControl (0x1000002c)
 	if Inventory:
-		Label.SetText ("" )
+		Label.SetText ("")
 	else:
 		Label.SetText (str(SellSum) )
 	if SellSum:
@@ -758,6 +758,7 @@ def RedrawStoreShoppingWindow ():
 
 			if Flags & SHOP_ID:
 				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
+				Price = 1
 				Button.EnableBorder (0, 1)
 			else:
 				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))

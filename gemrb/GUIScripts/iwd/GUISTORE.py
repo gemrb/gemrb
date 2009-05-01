@@ -161,7 +161,7 @@ def OpenStoreWindow ():
 	#based on shop type, these buttons will change
 	store_type = Store['StoreType']
 	store_buttons = Store['StoreButtons']
-	for i in range(4):
+	for i in range (4):
 		Buttons[i] = Button = Window.GetControl (i+1)
 		Action = store_buttons[i]
 		Button.SetVarAssoc ("Action", i)
@@ -195,7 +195,7 @@ def OpenStoreShoppingWindow ():
 	if Inventory:
 		# Title
 		Label = Window.GetControl (0xfffffff)
-		Label.SetText (51881)
+		Label.SetText (26291)
 		# buy price ...
 		Label = Window.GetControl (0x1000002b)
 		Label.SetText ("")
@@ -217,7 +217,7 @@ def OpenStoreShoppingWindow ():
 		Label = Window.GetControl (0x1000002c)
 		Label.SetText ("0")
 
-	for i in range(4):
+	for i in range (4):
 		Button = Window.GetControl (i+5)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectBuy")
@@ -292,9 +292,8 @@ def OpenStoreIdentifyWindow ():
 	Label.SetText ("0")
 
 	# 8-11 item slots, 0x1000000c-f labels
-	for i in range(4):
+	for i in range (4):
 		Button = Window.GetControl (i+8)
-		Button.SetVarAssoc ("Index", i)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
@@ -319,14 +318,12 @@ def OpenStoreStealWindow ():
 
 	StoreStealWindow = Window = GemRB.LoadWindowObject (6)
 
-	for i in range(4):
+	for i in range (4):
 		Button = Window.GetControl (i+4)
-		Button.SetVarAssoc ("LeftIndex", i)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RedrawStoreStealWindow")
 
 		Button = Window.GetControl (i+11)
-		Button.SetVarAssoc ("RightIndex", i)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoRightWindow")
 
@@ -401,7 +398,7 @@ def OpenStoreHealWindow ():
 	StoreHealWindow = Window = GemRB.LoadWindowObject (5)
 
 	#spell buttons
-	for i in range(4):
+	for i in range (4):
 		Button = Window.GetControl (i+8)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateStoreHealWindow")
@@ -439,7 +436,7 @@ def OpenStoreRumourWindow ():
 	StoreRumourWindow = Window = GemRB.LoadWindowObject (8)
 
 	#removing those pesky labels
-	for i in range(5):
+	for i in range (5):
 		Window.DeleteControl (0x10000005+i)
 
 	TextArea = Window.GetControl (11)
@@ -473,7 +470,7 @@ def OpenStoreRentWindow ():
 
 	# room types
 	RentIndex = -1
-	for i in range(4):
+	for i in range (4):
 		ok = Store['StoreRoomPrices'][i]
 		Button = Window.GetControl (i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateStoreRentWindow")
@@ -534,7 +531,7 @@ def UpdateStoreShoppingWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
-	RightCount = len(inventory_slots)
+	RightCount = len(inventory_slots)-3
 	if RightCount<0:
 		RightCount=0
 	ScrollBar = Window.GetControl (12)
@@ -561,7 +558,7 @@ def ToBackpackPressed ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	LeftCount = Store['StoreItemCount']
 	#going backwards because removed items shift the slots
-	for i in range(LeftCount, 0, -1):
+	for i in range (LeftCount, 0, -1):
 		Flags = GemRB.IsValidStoreItem (pc, i-1, ITEM_STORE)&SHOP_SELECT
 		if Flags:
 			GemRB.ChangeStoreItem (pc, i-1, SHOP_BUY)
@@ -573,13 +570,13 @@ def BuyPressed ():
 	Window = StoreShoppingWindow
 
 	if (BuySum>GemRB.GameGetPartyGold ()):
-		#not enough money!
+		ErrorWindow (11047)
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	LeftCount = Store['StoreItemCount']
 	#going backwards because removed items shift the slots
-	for i in range(LeftCount, 0, -1):
+	for i in range (LeftCount, 0, -1):
 		Flags = GemRB.IsValidStoreItem (pc, i-1, ITEM_STORE)&SHOP_SELECT
 		if Flags:
 			Slot = GemRB.GetStoreItem (i-1)
@@ -608,9 +605,9 @@ def ToBagPressed ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	RightCount = len (inventory_slots)
 	#no need to go reverse
-	for Slot in range(RightCount):
-		Flags = GemRB.IsValidStoreItem (pc, inventory_slots[Slot], ITEM_PC) & SHOP_SELECT
-		if Flags:
+	for Slot in range (RightCount):
+		Flags = GemRB.IsValidStoreItem (pc, inventory_slots[Slot], ITEM_PC)
+		if Flags & SHOP_SELECT:
 			GemRB.ChangeStoreItem (pc, inventory_slots[Slot], SHOP_SELL)
 	UpdateStoreShoppingWindow ()
 	return
@@ -621,7 +618,7 @@ def SellPressed ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	RightCount = len (inventory_slots)
 	#no need to go reverse
-	for Slot in range(RightCount):
+	for Slot in range (RightCount):
 		Flags = GemRB.IsValidStoreItem (pc, inventory_slots[Slot], ITEM_PC) & SHOP_SELECT
 		if Flags:
 			GemRB.ChangeStoreItem (pc, inventory_slots[Slot], SHOP_SELL)
@@ -644,7 +641,7 @@ def RedrawStoreShoppingWindow ():
 	RightIndex = GemRB.GetVar ("RightIndex")
 	LeftCount = Store['StoreItemCount']
 	BuySum = 0
-	for i in range(LeftCount):
+	for i in range (LeftCount):
 		if GemRB.IsValidStoreItem (pc, i, ITEM_STORE) & SHOP_SELECT:
 			Slot = GemRB.GetStoreItem (i)
 			Item = GemRB.GetItem (Slot['ItemResRef'])
@@ -658,19 +655,22 @@ def RedrawStoreShoppingWindow ():
 
 	RightCount = len(inventory_slots)
 	SellSum = 0
-	for i in range(RightCount):
-		if GemRB.IsValidStoreItem (pc, inventory_slots[i], ITEM_PC) & SHOP_SELECT:
+	for i in range (RightCount):
+		Flags = GemRB.IsValidStoreItem (pc, inventory_slots[i], ITEM_PC)
+		if Flags & SHOP_SELECT:
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[i])
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			if Inventory:
 				Price = 1
 			else:
 				Price = Item['Price'] * Store['BuyMarkup'] / 100
+			if Flags & SHOP_ID:
+				Price = 1
 			SellSum = SellSum + Price
 
 	Label = Window.GetControl (0x1000002b)
 	if Inventory:
-		Label.SetText ("" )
+		Label.SetText ("")
 	else:
 		Label.SetText (str(BuySum) )
 	if BuySum:
@@ -680,7 +680,7 @@ def RedrawStoreShoppingWindow ():
 
 	Label = Window.GetControl (0x1000002c)
 	if Inventory:
-		Label.SetText ("" )
+		Label.SetText ("")
 	else:
 		Label.SetText (str(SellSum) )
 	if SellSum:
@@ -688,8 +688,11 @@ def RedrawStoreShoppingWindow ():
 	else:
 		RightButton.SetState (IE_GUI_BUTTON_DISABLED)
 
-	for i in range(4):
-		Slot = GemRB.GetStoreItem (i+LeftTopIndex)
+	for i in range (4):
+		if i+LeftTopIndex<LeftCount:
+			Slot = GemRB.GetStoreItem (i+LeftTopIndex)
+		else:
+			Slot = None
 		Button = Window.GetControl (i+5)
 		Label = Window.GetControl (0x10000012+i)
 		Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
@@ -715,7 +718,7 @@ def RedrawStoreShoppingWindow ():
 				Button.EnableBorder (0, 0)
 
 			if Inventory:
-				Label.SetText (28337)
+				Label.SetText (24890) #different from BG
 			else:
 				Price = Item['Price'] * Store['SellMarkup'] / 100
 				if Price <= 0:
@@ -756,13 +759,14 @@ def RedrawStoreShoppingWindow ():
 
 			if Flags & SHOP_ID:
 				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
+				Price = 1
 				Button.EnableBorder (0, 1)
 			else:
 				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
 				Button.EnableBorder (0, 0)
 
 			if Inventory:
-				Label.SetText (26291) #not sure
+				Label.SetText (24890) #different from BG
 			else:
 				GemRB.SetToken ("ITEMCOST", str(Price) )
 				Label.SetText (10162)
@@ -800,7 +804,7 @@ def RedrawStoreIdentifyWindow ():
 	TextArea = Window.GetControl (23)
 	TextArea.SetText ("")
 	Selected = 0
-	for i in range(4):
+	for i in range (4):
 		if i+TopIndex<Count:
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[i+TopIndex])
 		else:
@@ -982,7 +986,7 @@ def RedrawStoreStealWindow ():
 	LeftCount = Store['StoreItemCount']
 	pc = GemRB.GameGetSelectedPCSingle ()
 	RightCount = len(inventory_slots)
-	for i in range(4):
+	for i in range (4):
 		Slot = GemRB.GetStoreItem (i+LeftTopIndex)
 		Button = Window.GetControl (i+4)
 		Label = Window.GetControl (0x1000000f+i)
@@ -1122,7 +1126,7 @@ def UpdateStoreHealWindow ():
 	UpdateStoreCommon (Window, 0x10000000, 0, 0x10000001)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Index = GemRB.GetVar ("Index")
-	for i in range(4):
+	for i in range (4):
 		Cure = GemRB.GetStoreCure (i+TopIndex)
 
 		Button = Window.GetControl (i+8)
@@ -1199,7 +1203,7 @@ def UpdateStoreRumourWindow ():
 
 	UpdateStoreCommon (Window, 0x10000011, 0, 0x10000012)
 	TopIndex = GemRB.GetVar ("TopIndex")
-	for i in range(5):
+	for i in range (5):
 		Drink = GemRB.GetStoreDrink (i+TopIndex)
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ("Index", i)

@@ -539,7 +539,7 @@ def BuyPressed ():
 	Window = StoreShoppingWindow
 
 	if (BuySum>GemRB.GameGetPartyGold ()):
-		#not enough money!
+		ErrorWindow (11047)
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -612,13 +612,16 @@ def RedrawStoreShoppingWindow ():
 	RightCount = len(inventory_slots)
 	SellSum = 0
 	for i in range (RightCount):
-		if GemRB.IsValidStoreItem (pc, inventory_slots[i], ITEM_PC) & SHOP_SELECT:
+		Flags = GemRB.IsValidStoreItem (pc, inventory_slots[i], ITEM_PC)
+		if Flags & SHOP_SELECT:
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[i])
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			if Inventory:
 				Price = 1
 			else:
 				Price = Item['Price'] * Store['BuyMarkup'] / 100
+			if Flags & SHOP_ID:
+				Price = 1
 			SellSum = SellSum + Price
 
 	Label = Window.GetControl (0x1000002b)
@@ -712,6 +715,7 @@ def RedrawStoreShoppingWindow ():
 
 			if Flags & SHOP_ID:
 				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
+				Price = 1
 				Button.EnableBorder (0, 1)
 			else:
 				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
