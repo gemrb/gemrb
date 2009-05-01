@@ -117,7 +117,9 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 			return ret;
 		}
 	}
-	return 0;
+  
+	//Even if the store doesn't purchase the item, it can still ID it
+	return ret & ~IE_STORE_SELL;
 }
 
 STOCure *Store::GetCure(unsigned int idx) const
