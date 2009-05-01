@@ -1,18 +1,18 @@
-GemRB svn (r5850):
+GemRB svn (r5913):
   New features:
-    - 
     - party reordering
     - bashing of containers and doors
     - item amount window for stack splitting (shift+click or doubleclick)
     - depletion of item charges
     - start of level up support in bg2
+    - disable spellcasting opcode, pocketplane travel in ToB
 
   Improved features:
-    - 
     - fog of war
     - party reformation
     - iwd and how guiscripts have been merged
     - various guiscripts
+    - regeneration, hp bonuses, healing
     - bugfixes
 
   Applied patches:
