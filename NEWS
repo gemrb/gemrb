@@ -6,13 +6,16 @@ GemRB svn (r5913):
     - depletion of item charges
     - start of level up support in bg2
     - disable spellcasting opcode, pocketplane travel in ToB
+    - trap setting
+    - dynamic scrollbar creation (enables the display of more than 10 kits)
 
   Improved features:
     - fog of war
     - party reformation
     - iwd and how guiscripts have been merged
-    - various guiscripts
     - regeneration, hp bonuses, healing
+    - animations and projectiles
+    - various guiscripts
     - bugfixes
 
   Applied patches:
