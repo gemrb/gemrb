@@ -580,7 +580,7 @@ void Map::UpdateScripts()
 			PathNode * step = actor->GetNextStep();
 			if (step && step->Next) {
 				//we should actually wait for a short time and check then
-				if (GetBlocked(step->Next->x*16,step->Next->y*12,actor->size)) {
+				if (GetBlocked(step->Next->x*16+8,step->Next->y*12+6,actor->size)) {//someone is in the way... wait for him to go away
 					actor->NewPath();
 				}
 			}
