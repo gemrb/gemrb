@@ -769,7 +769,7 @@ unsigned int Spellbook::GetSpellInfoSize(int type)
 	}
 	unsigned int count = 0;
 	while(i--) {
-		if (spellinfo[i]->type&type) {
+		if (1<<(spellinfo[i]->type)&type) {
 			count++;
 		}
 	}

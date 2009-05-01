@@ -6388,7 +6388,7 @@ static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* ar
 	if (Level<0) {
 		return PyInt_FromLong( actor->spellbook.GetSpellInfoSize( SpellType ) );
 	} else {
-		return PyInt_FromLong( actor->spellbook.GetMemorizedSpellsCount( SpellType, Level ) );
+		return PyInt_FromLong( actor->spellbook.GetMemorizedSpellsCount( 1<<SpellType, Level ) );
 	}
 }
 
