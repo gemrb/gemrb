@@ -269,6 +269,7 @@ Actor::Actor()
 	initiative = 0;
 	InTrap = 0;
 	PathTries = 0;
+	DisabledSpellcasting = false;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 	fxqueue.SetOwner( this );
