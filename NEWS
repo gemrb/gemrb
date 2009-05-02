@@ -6,6 +6,7 @@ GemRB svn (r5913):
     - depletion of item charges
     - start of level up support in bg2
     - disable spellcasting opcode, pocketplane travel in ToB
+    - knock spell
     - trap setting
     - dynamic scrollbar creation (enables the display of more than 10 kits)
 
