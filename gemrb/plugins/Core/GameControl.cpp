@@ -1347,7 +1347,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 
 	if (target_mode == TARGET_MODE_ATTACK) {
 		TryToBash(actor, container);
-		target_mode = TARGET_MODE_NONE ;
+		target_mode = TARGET_MODE_NONE;
 		return;
 	}
 
@@ -1370,7 +1370,12 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the door back from the coordinates
-		TryToCast(actor, door->Pos);
+		Point *p = door->toOpen;
+		Point *otherp = door->toOpen+1;
+		if (Distance(*p,actor)>Distance(*otherp,actor)) {
+			p=otherp;
+		}
+		TryToCast(actor, *p);
 		return;
 	}
 

@@ -141,6 +141,21 @@ Door* TileMap::GetDoor(Point &p)
 	return NULL;
 }
 
+Door* TileMap::GetDoorByPosition(Point &p)
+{
+	for (size_t i = 0; i < doors.size(); i++) {
+		Door* door = doors[i];
+
+		if (door->toOpen[0].x==p.x && door->toOpen[0].y==p.y) {
+			return door;
+		}
+		if (door->toOpen[1].x==p.x && door->toOpen[1].y==p.y) {
+			return door;
+		}
+	}
+	return NULL;
+}
+
 Door* TileMap::GetDoor(const char* Name)
 {
 	if (!Name) {
@@ -443,6 +458,34 @@ Container* TileMap::GetContainer(Point &position, int type)
 		}
 		if (c->outline->PointIn( position ))
 			return c;
+	}
+	return NULL;
+}
+
+Container* TileMap::GetContainerByPosition(Point &position, int type)
+{
+	for (size_t i = 0; i < containers.size(); i++) {
+		Container* c = containers[i];
+		if (type!=-1) {
+			if (c->Type!=type) {
+				continue;
+			}
+		}
+
+		if (c->Pos.x!=position.x || c->Pos.y!=position.y) {
+			continue;
+		}
+
+		//IE piles don't have polygons, the bounding box is enough for them
+		if (c->Type == IE_CONTAINER_PILE) {
+			//don't find empty piles if we look for any container
+			//if we looked only for piles, then we still return them
+			if ((type==-1) && !c->inventory.GetSlotCount()) {
+				continue;
+			}
+			return c;
+		}
+		return c;
 	}
 	return NULL;
 }

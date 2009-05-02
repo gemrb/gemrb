@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Id$
  *
@@ -57,14 +57,20 @@ public:
 	Door* AddDoor(const char* ID, const char* Name, unsigned int Flags,
 		int ClosedIndex, unsigned short* indices, int count,
 		Gem_Polygon* open, Gem_Polygon* closed);
+	//gets door by active region (click target)
 	Door* GetDoor(Point &position);
+	//gets door by activation position (spell target)
+	Door* GetDoorByPosition(Point &position);
 	Door* GetDoor(unsigned int idx);
 	Door* GetDoor(const char* Name);
 	size_t GetDoorCount() { return doors.size(); }
 
 	/* type is an optional filter for container type*/
 	void AddContainer(Container *c);
+	//gets container by active region (click target)
 	Container* GetContainer(Point &position, int type=-1);
+	//gets container by activation position (spell target)
+	Container* GetContainerByPosition(Point &position, int type=-1);
 	Container* GetContainer(const char* Name);
 	Container* GetContainer(unsigned int idx);
 	/* cleans up empty heaps, returns 1 if container removed*/
@@ -78,7 +84,7 @@ public:
 	InfoPoint* GetInfoPoint(unsigned int idx);
 	size_t GetInfoPointCount() { return infoPoints.size(); }
 
-	TileObject* AddTile(const char* ID, const char* Name, unsigned int Flags, 
+	TileObject* AddTile(const char* ID, const char* Name, unsigned int Flags,
 		unsigned short* openindices, int opencount,unsigned short* closeindices, int closecount);
 	TileObject* GetTile(unsigned int idx);
 	TileObject* GetTile(const char* Name);

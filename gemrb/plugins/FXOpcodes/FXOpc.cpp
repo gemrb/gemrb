@@ -3111,17 +3111,21 @@ int fx_dimension_door (Actor* Owner, Actor* target, Effect* fx)
 // 0x7d Unlock
 int fx_knock (Actor* Owner, Actor* /*target*/, Effect* fx)
 {
-	if (0) printf( "fx_knock (%2d)\n", fx->Opcode );
+	if (0) printf( "fx_knock (%2d) [%d.%d]\n", fx->Opcode, fx->PosX, fx->PosY );
 	Map *map = Owner->GetCurrentArea();
 	Point p(fx->PosX, fx->PosY);
-	Door *door = map->TMap->GetDoor(p);
+	Door *door = map->TMap->GetDoorByPosition(p);
 	if (door) {
-		door->SetDoorLocked(false, true);
+		if (door->LockDifficulty<100) {
+			door->SetDoorLocked(false, true);
+		}
 		return FX_NOT_APPLIED;
 	}
-	Container *container = map->TMap->GetContainer(p);
+	Container *container = map->TMap->GetContainerByPosition(p);
 	if (container) {
-		container->SetContainerLocked(false);
+		if(container->LockDifficulty<100) {
+			container->SetContainerLocked(false);
+		}
 		return FX_NOT_APPLIED;
 	}
 	return FX_NOT_APPLIED;
@@ -5498,14 +5502,14 @@ int fx_cutscene2 (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 		strnlwrcpy(resref,"cut250a",8);
 	}
 
-        GameScript* gs = new GameScript( resref, ST_GLOBAL );
-        gs->MySelf = game;
-        gs->EvaluateAllBlocks();
-        delete( gs );
+	GameScript* gs = new GameScript( resref, ST_GLOBAL );
+	gs->MySelf = game;
+	gs->EvaluateAllBlocks();
+	delete( gs );
 	//for safety reasons, i get this pointer again
 	game = core->GetGame();
 	if (game) {
-	        game->ClearCutsceneID();
+		game->ClearCutsceneID();
 	}
 	return FX_NOT_APPLIED;
 }
