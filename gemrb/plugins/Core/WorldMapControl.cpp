@@ -111,6 +111,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		Sprite2D* icon = m->GetMapIcon(worldmap->bam);
 		if( icon ) {
 			video->BlitSprite( icon, xOffs, yOffs, true, &r );
+			video->FreeSprite( icon );
 		}
 
 		if (AnimPicture && !strnicmp(m->AreaResRef, currentArea, 8) ) {
@@ -133,6 +134,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 			w=icon->Width;
 			xpos=icon->XPos;
 			ypos=icon->YPos;
+			video->FreeSprite( icon );
 		}
 
 		Region r2 = Region( MAP_TO_SCREENX(m->X-xpos), MAP_TO_SCREENY(m->Y-ypos), w, h );
@@ -229,6 +231,7 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 			if (icon) {
 				h=icon->Height;
 				w=icon->Width;
+				core->GetVideoDriver()->FreeSprite( icon );
 			}
 			if (ftext && ae->GetCaption()) {
 				int tw = ftext->CalcStringWidth( ae->GetCaption() ) + 5;

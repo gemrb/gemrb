@@ -79,6 +79,8 @@ public:
 	~WMPAreaEntry();
 	ieDword GetAreaStatus();
 	void SetAreaStatus(ieDword status, int op);
+
+	//! return the map icon of this location. Free the sprite afterwards.
 	Sprite2D *GetMapIcon(AnimationFactory *bam);
 	const char* GetCaption();
 	const char* GetTooltip();

@@ -40,7 +40,7 @@ WMPAreaEntry::~WMPAreaEntry()
 	if (StrTooltip) {
 		core->FreeString(StrTooltip);
 	}
-	//as long as mapicon comes from a factory, no need to free it here
+	core->GetVideoDriver()->FreeSprite(MapIcon);
 }
 
 void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
@@ -52,8 +52,7 @@ void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
 	case BM_XOR: AreaStatus ^= arg; break;
 	case BM_AND: AreaStatus &= arg; break;
 	}
-	//invalidating MapIcon, no need to free it, it is from a factory
-	MapIcon = NULL;
+	core->GetVideoDriver()->FreeSprite(MapIcon);
 }
 
 const char* WMPAreaEntry::GetCaption()
@@ -103,9 +102,13 @@ Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)
 		}
 		MapIcon = bam->GetFrame((ieWord) frame, (ieByte) IconSeq);
 		if (color>=0) {
+			// Note: should a game use the same map icon for two different
+			// map locations, we have to duplicate the MapIcon sprite here.
+			// This doesn't occur in BG1, so no need to do that for the moment.
 			SetPalette(color, MapIcon);
 		}
 	}
+	MapIcon->RefCount++;
 	return MapIcon;
 }
 
