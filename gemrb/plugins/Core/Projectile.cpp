@@ -142,6 +142,7 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 		if (a && c!=Cycle) {
 			a->MirrorAnimation();
 		}
+		a->gameAnimation = true;
 		anims[Cycle] = a;
 	}
 }
@@ -316,7 +317,7 @@ void Projectile::ChangePhase()
 	if (Extension->AFlags&PAF_TRIGGER) {
 		phase = P_TRIGGER;
 	} else {
-		phase = P_EXPLODING;
+		phase = P_EXPLODING1;
 	}
 }
 
@@ -467,11 +468,11 @@ void Projectile::CheckTrigger(unsigned int radius)
 {
 	if (area->GetActorInRadius(Pos, CalculateTargetFlag(), radius)) {
 		if (phase == P_TRIGGER) {
-			phase = P_EXPLODING;
+			phase = P_EXPLODING1;
 			extension_delay = Extension->Delay;
 		}
 	} else {
-		if (phase == P_EXPLODING) {
+		if (phase == P_EXPLODING1) {
 			//the explosion is revoked
 			if (Extension->AFlags&PAF_SYNC) {
 				phase = P_TRIGGER;
@@ -543,14 +544,14 @@ void Projectile::Draw(Region &screen)
 	switch (phase) {
 		case P_UNINITED:
 			return;
-		case P_TRIGGER: case P_EXPLODING:
+		case P_TRIGGER: case P_EXPLODING1:case P_EXPLODING2:
 			//This extension flag is to enable the travel projectile at
 			//trigger/explosion time
 			if (Extension->AFlags&PAF_VISIBLE) {
 				DrawTravel(screen);
 			}
 			CheckTrigger(Extension->TriggerRadius);
-			if (phase == P_EXPLODING) {
+			if (phase == P_EXPLODING1 || phase == P_EXPLODING2) {
 				DrawExplosion(screen);
 			}
 			break;
@@ -598,6 +599,11 @@ void Projectile::DrawExplosion(Region &screen)
 		}
 	}
 
+	int pause = core->IsFreezed();
+	if (pause) {
+		return;
+	}
+
 	//Delay explosion, it could even be revoked with PAF_SYNC (see skull trap)
 	if (extension_delay) {
 		extension_delay--;
@@ -607,12 +613,6 @@ void Projectile::DrawExplosion(Region &screen)
 	//0 and 1 have the same effect (1 explosion)
 	if (extension_explosioncount) {
 		extension_explosioncount--;
-	}
-
-	if (extension_explosioncount) {
-		extension_delay=Extension->Delay;
-	} else {
-		phase = P_EXPLODED;
 	}
 
 	//no idea what is PAF_SECONDARY
@@ -646,32 +646,40 @@ void Projectile::DrawExplosion(Region &screen)
 	}
 
 	//the center of the explosion is based on hardcoded explosion type (this is fireball.cpp in the original engine)
-	//these resources are listed in areapro.2da
+	//these resources are listed in areapro.2da and served by ProjectileServer.cpp
 	if (Extension->ExplType!=0xff) {
-		//the center animation is in the second column
-		ieResRef const *res = server->GetExplosion(Extension->ExplType, 1);
-		//FIXME: * should return a NULL
-		if (res) {
-			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(*res, false);
-			if (vvc) {
-				vvc->XPos+=Pos.x;
-				vvc->YPos+=Pos.y;
-				area->AddVVCell(vvc);
+		ieResRef const *res;
+		int apflags = server->GetExplosionPalette(Extension->ExplType);
+
+		//draw it only once, at the time of explosion
+		if (phase==P_EXPLODING1) {
+			//the center animation is in the second column
+			res = server->GetExplosion(Extension->ExplType, 1);
+			if (res) {
+				ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(*res, false);
+				if (vvc) {
+					if (apflags & APF_VVCPAL) {
+						vvc->SetPalette(Extension->ExplColor);
+					}
+					vvc->XPos+=Pos.x;
+					vvc->YPos+=Pos.y;
+					vvc->PlayOnce();
+					area->AddVVCell(vvc);
+				}
 			}
+			phase=P_EXPLODING2;
 		}
 
 		//the spreading animation is in the first column
 		res = server->GetExplosion(Extension->ExplType, 0);
 		//returns if the explosion animation is fake coloured
 		if (res) {
-			int apflags = server->GetExplosionPalette(Extension->ExplType);
 			if (!children) {
 				child_size=(Extension->ExplosionRadius+15)/16;
 				//more sprites if the whole area needs to be filled
 				if (apflags&APF_FILL) child_size*=2;
 				children = (Projectile **) calloc(sizeof(Projectile *), child_size);
 			}
-
 
 			for(int i=0;i<child_size;i++) {
 
@@ -700,7 +708,11 @@ void Projectile::DrawExplosion(Region &screen)
 				if (i&1) vx=-vx;
 				if (i&2) vy=-vy;
 				Point newdest(Destination.x+vx, Destination.y+vy );
-				pro->MoveTo(area, Pos);
+				if (apflags&APF_SCATTER) {
+					pro->MoveTo(area, newdest);
+				} else {
+					pro->MoveTo(area, Pos);
+				}
 				pro->SetTarget(newdest);
 				pro->autofree=true;
 
@@ -712,12 +724,18 @@ void Projectile::DrawExplosion(Region &screen)
 					pro->StaticTint(tmpColor[PALSIZE/2]);
 
 					//i'm unsure if we need blending for all anims or just the tinted ones
-					pro->TFlags|=PTF_BLEND;
 				}
+				pro->TFlags|=PTF_BLEND;
 				pro->Setup();
 				children[i]=pro;
 			}
 		}
+	}
+
+	if (extension_explosioncount) {
+		extension_delay=Extension->Delay;
+	} else {
+		phase = P_EXPLODED;
 	}
 }
 

@@ -52,16 +52,17 @@
 
 //projectile phases
 #define P_UNINITED  -1
-#define P_TRAVEL    0       //projectile moves to target
-#define P_TRIGGER   1       //projectile hovers over target, waits for trigger
-#define P_EXPLODING 2       //projectile explosion spreads
-#define P_EXPLODED  3       //projectile spread over area
-#define P_EXPIRED   99      //projectile scheduled for removal (existing parts are still drawn)
+#define P_TRAVEL     0   //projectile moves to target
+#define P_TRIGGER    1   //projectile hovers over target, waits for trigger
+#define P_EXPLODING1 2   //projectile explosion spreads
+#define P_EXPLODING2 3   //projectile explosion repeats
+#define P_EXPLODED   4   //projectile spread over area
+#define P_EXPIRED   99   //projectile scheduled for removal (existing parts are still drawn)
 
 //projectile spark flags
 #define PSF_SPARKS  1
 #define PSF_FLYING  2
-#define PSF_LOOPING 4  //looping sound
+#define PSF_LOOPING 4       //looping sound
 #define PSF_IGNORE_CENTER 16
 
 //projectile travel flags
@@ -71,6 +72,11 @@
 #define PTF_SHADOW  32      //has shadow bam
 #define PTF_LIGHT   64      //has light shadow
 #define PTF_BLEND   128     //blend colours
+
+//gemrb specific projectile travel flags
+//these flags are arbitrary, I start assigning them from backwards to avoid
+//collision with existing flags (if possible)
+#define PTF_FREEZE 0x80000000
 
 //projectile area flags
 #define PAF_VISIBLE   1     //the travel projectile is visible until explosion
@@ -83,12 +89,18 @@
 #define PAF_PARTY     128   //target party
 #define PAF_TARGET    (64|128)
 
-//gemrb flag
-#define PTF_FREEZE 0x80000000
 
 //area projectile flags (in areapro.2da)
-#define APF_PALETTE   1     //child projectiles need to be tinted
-#define APF_FILL      2     //child projectiles fill the whole area
+//this functionality was hardcoded in the original engine, so the bit flags are
+//completely arbitrary (i assign them as need arises)
+//child projectiles need to be tinted (example: stinking cloud, counter example: fireball)
+#define APF_PALETTE   1     
+//child projectiles fill the whole area (example: stinking cloud, counter example: fireball)
+#define APF_FILL      2     
+//child projectiles start in their destination (example: icestorm, counter example: fireball)
+#define APF_SCATTER   4     
+//the explosion vvc has gradient (example: icestorm, counter example: fireball)
+#define APF_VVCPAL    8
 
 struct ProjectileExtension
 {
