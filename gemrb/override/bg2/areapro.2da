@@ -1,10 +1,10 @@
 2DA V1.0
 *
-           RESOURCE1  RESOURCE2  RESOURCE3  PALETTE
+           RESOURCE1  RESOURCE2  RESOURCE3  FLAGS
 FIREBALL   SPFLAMES   SPFIREPI   *          0
 STINKCLOUD SPHORPUF   *          *          3
 CLOUDKILL  SPHORPUF   *          *          3
-ICESTORM   SPICESTM   *          *          2
+ICESTORM   SPICESTM   SPBOOM     *          14
 GREASE     GREASED    *          GREASEH    2
 WEB        WEBENTD    *          WEBENTH    2
 METEOR     SPMETSWM   *          *          0
