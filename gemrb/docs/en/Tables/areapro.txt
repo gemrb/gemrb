@@ -1,0 +1,14 @@
+Description: This table lists resource data for area projectiles. The original engine had these hardcoded in the .exe
+
+Columns -
+   RESOURCE1 - A BAM resref which is drawn in the entire area of effect.
+   RESOURCE2 - A VVC (or BAM) resref which is drawn in the center of effect once.
+   RESOURCE3 - (currently unused)
+   FLAGS     - a bitfield which alters the way the resources are drawn
+
+Values for the FLAGS bitfield -
+   1 - RESOURCE1 is recoloured by the gradient set in the projectile
+   2 - fills the entire area of effect randomly, otherwise it is a (spreading) circle
+   4 - no spreading, the filler graphics is already at its destination, otherwise it starts from the center
+   8 - RESOURCE2 is recoloured by the gradient set in the projectile
+
