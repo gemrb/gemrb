@@ -1,0 +1,10 @@
+Description: This table assigns spell resources to modal actions.
+These modal actions were hardcoded in the original engines.
+
+Columns - 
+  SPELL - the spell resource assigned to the modal action.
+
+Rows - the modal actions have a somewhat determined order.
+The first row should be left blank.
+
+See modal.ids of the original engine.
