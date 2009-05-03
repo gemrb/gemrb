@@ -53,7 +53,10 @@ TK1 .. TK6  Talk
 WLK         Walk
 
         SPACE - the personal space of the creature
-      PALETTE - set it to 1 if the animation has its own palette (0 for fake colored avatars). Not needed if OneByteAnimation was set.
+      PALETTE - set it to 1 if the animation has its own palette (0 for fake colored avatars). 
+Not needed if OneByteAnimation was set.
+         SIZE - Used for selecting possible weapon animation BAMs.
+Not needed if OneByteAnimation was set.
 
 Rows: each row begins with a hexadecimal Animation ID. One or two bytes.
 

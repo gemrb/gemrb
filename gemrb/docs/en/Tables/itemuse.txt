@@ -1,0 +1,10 @@
+Description: This table lists the item usability flags.
+
+Columns:
+STAT   - the stat which affects the bits
+FILE   - the file which contains the usability values assigned to the stat values
+MCOL   - the stat values
+VCOL   - the usability values
+WHICH  - which bitfield group is affected (could be only 0 or 1)
+
+Rows: Item resrefs
