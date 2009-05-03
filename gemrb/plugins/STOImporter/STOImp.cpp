@@ -118,7 +118,7 @@ Store* STOImp::GetStore(Store *s)
 
 	//Allocation must be done in the same place as destruction.
 	//Yeah, this is intentionally so ugly, someone who doesn't like this
-	//may fix it. 
+	//may fix it.
 	core->DoTheStoreHack(s);
 
 	str->Seek( s->PurchasedCategoriesOffset, GEM_STREAM_START );
@@ -129,7 +129,7 @@ Store* STOImp::GetStore(Store *s)
 	STOItem *item = s->items[i];
 		GetItem(item);
 		//it is important to handle this field as signed
-		if (item->InfiniteSupply>0) { 
+		if (item->InfiniteSupply>0) {
 			//if there are no triggers, GetRealStockSize is simpler
 			//also it is compatible only with pst/gemrb saved stores
 			s->HasTriggers=true;
@@ -153,7 +153,7 @@ void STOImp::GetItem(STOItem *it)
 {
 	str->ReadResRef( it->ItemResRef );
 	str->ReadWord( &it->PurchasedAmount );
-	for (int i=0;i<3;i++) {
+	for (int i=0;i<CHARGE_COUNTERS;i++) {
 		str->ReadWord( it->Usages+i );
 	}
 	str->ReadDword( &it->Flags );
@@ -328,7 +328,7 @@ int STOImp::PutItems(DataStream *stream, Store *store)
 
 		stream->WriteResRef( it->ItemResRef);
 		stream->WriteWord( &it->PurchasedAmount);
-		for (unsigned int i=0;i<3;i++) {
+		for (unsigned int i=0;i<CHARGE_COUNTERS;i++) {
 			stream->WriteWord( it->Usages+i );
 		}
 		stream->WriteDword( &it->Flags );
