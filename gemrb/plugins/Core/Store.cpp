@@ -117,7 +117,7 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 			return ret;
 		}
 	}
-  
+
 	//Even if the store doesn't purchase the item, it can still ID it
 	return ret & ~IE_STORE_SELL;
 }
@@ -213,7 +213,7 @@ void Store::RechargeItem(CREItem *item)
 	}
 	//gemrb extension, some shops won't recharge items
 	if (!(Flags&IE_STORE_RECHARGE)) {
-		for (int i=0;i<3;i++) {
+		for (int i=0;i<CHARGE_COUNTERS;i++) {
 			ITMExtHeader *h = itm->GetExtHeader(i);
 			if (!h) {
 				item->Usages[i]=0;
