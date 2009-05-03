@@ -333,6 +333,10 @@ public:
 	SongHeaderType SongHeader;
 	RestHeaderType RestHeader;
 
+	//count of all projectiles that are saved
+	size_t GetProjectileCount(proIterator &iter);
+	//get the next projectile
+	Projectile *GetNextProjectile(proIterator &iter);
 	//count of unexploded projectiles that are saved
 	ieDword GetTrapCount(proIterator &iter);
 	//get the next saved projectile
@@ -441,7 +445,6 @@ public:
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);
-	Projectile *GetNextProjectile(proIterator &iter);
 	ScriptedAnimation *GetNextScriptedAnimation(scaIterator &iter);
 	Actor *GetNextActor(int &q, int &index);
 	void DrawSearchMap(Region &screen);

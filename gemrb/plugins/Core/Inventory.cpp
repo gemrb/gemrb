@@ -309,6 +309,10 @@ void Inventory::KillSlot(unsigned int index)
 	if (!item) {
 		return;
 	}
+
+	//the used up item vanishes from the quickslot bar
+	core->SetEventFlag( EF_ACTION );
+
 	Slots[index] = NULL;
  	int effect = core->QuerySlotEffects( index );
 	if (!effect) {
@@ -1518,4 +1522,33 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 		}
 	}
 	return 0;
+}
+
+//recharge items on rest, if rest was partial, recharge only 'hours'
+//if this latter functionality is unwanted, then simply don't recharge if
+//hours != 0
+void Inventory::ChargeAllItems(int hours)
+{
+	//this loop is going from start
+	for (size_t i = 0; i < Slots.size(); i++) {
+		CREItem *item = Slots[i];
+		if (!item) {
+			continue;
+		}
+
+		Item *itm = gamedata->GetItem( item->ItemResRef );
+		if (!itm)
+			continue;
+		for(int h=0;h<CHARGE_COUNTERS;h++) {
+			ITMExtHeader *header = itm->GetExtHeader(h);
+			if (header && (header->RechargeFlags&IE_ITEM_RECHARGE)) {
+				unsigned short add = header->Charges;
+				if (hours && add>hours) add=hours;
+				add+=item->Usages[h];
+				if(add>header->Charges) add=header->Charges;
+				item->Usages[h]=add;
+			}
+		}
+		gamedata->FreeItem( itm, item->ItemResRef, false );
+	}
 }

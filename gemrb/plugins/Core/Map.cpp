@@ -782,6 +782,12 @@ Projectile *Map::GetNextTrap(proIterator &iter)
 	return pro;
 }
 
+size_t Map::GetProjectileCount(proIterator &iter)
+{
+	iter = projectiles.begin();
+	return projectiles.size();
+}
+
 ieDword Map::GetTrapCount(proIterator &iter)
 {
 	ieDword cnt=0;

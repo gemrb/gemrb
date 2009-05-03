@@ -77,7 +77,7 @@ void WMPAreaEntry::SetPalette(int gradient, Sprite2D* MapIcon)
 {
 	Video *video = core->GetVideoDriver();
 	Palette *palette = new Palette;
-        core->GetPalette( gradient&255, 256, palette->col );
+	core->GetPalette( gradient&255, 256, palette->col );
 	video->SetPalette(MapIcon, palette);
 }
 

@@ -52,6 +52,8 @@ public:
 	}
 	ieResRef resource1;
 	ieResRef resource2;
+	ieResRef resource3;
+	int palette;
 };
 
 #ifdef WIN32
@@ -79,7 +81,10 @@ public:
 	//returns the highest projectile id
 	unsigned int GetHighestProjectileNumber();
 	int InitExplosion();
-	ieResRef *GetExplosion(unsigned int idx, int type);
+	int GetExplosionPalette(unsigned int idx);
+	ieResRef const *GetExplosion(unsigned int idx, int type);
+	//creates an empty projectile on the fly
+	Projectile *CreateDefaultProjectile(unsigned int idx);
 private:
 	ProjectileEntry *projectiles; //this is the list of projectiles
 	int projectilecount;
@@ -87,7 +92,6 @@ private:
 	int explosioncount;
 	//this method is used internally
 	Projectile *GetProjectile(unsigned int idx);
-	Projectile *CreateDefaultProjectile(unsigned int idx);
 	//creates a clone from the cached projectiles
 	Projectile *ReturnCopy(unsigned int idx);
 	//returns one of the resource names

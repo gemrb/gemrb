@@ -83,6 +83,13 @@
 #define PAF_PARTY     128   //target party
 #define PAF_TARGET    (64|128)
 
+//gemrb flag
+#define PTF_FREEZE 0x80000000
+
+//area projectile flags (in areapro.2da)
+#define APF_PALETTE   1     //child projectiles need to be tinted
+#define APF_FILL      2     //child projectiles fill the whole area
+
 struct ProjectileExtension
 {
 	ieDword AFlags;
@@ -156,12 +163,15 @@ protected:
 	//these come from the extension area
 	int extension_delay;
 	int extension_explosioncount;
+	Color tint;
 
 	//special (not using char animations)
 	Animation* travel[MAX_ORIENT];
 	Animation* shadow[MAX_ORIENT];
 	Sprite2D* light;//this is just a round/halftrans sprite, has no animation
 	EffectQueue* effects;
+	Projectile **children;
+	int child_size;
 public:
 	PathNode *GetNextStep(int x);
 	int GetPathLength();
@@ -169,6 +179,8 @@ public:
 	ieDword GetCaster();
 	void SetTarget(ieDword t);
 	void SetTarget(Point &p);
+	bool PointInRadius(Point &p);
+	void Cleanup();
 
 //inliners to protect data consistency
 	inline PathNode * GetNextStep() {
@@ -240,10 +252,12 @@ public:
 	int Update();
 	//draw object
 	void Draw(Region &screen);
+	void StaticTint(Color &newtint);
 private:
 	void GetPaletteCopy(Animation *anim[], Palette *&pal);
 	void SetBlend();
 	void SecondaryTarget();
+	//void CleanAreaAffect();
 	void CheckTrigger(unsigned int radius);
 	void DrawTravel(Region &screen);
 	void DrawExplosion(Region &screen);

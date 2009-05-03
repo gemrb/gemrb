@@ -33,6 +33,7 @@
 #include "../Core/damages.h"
 #include "../Core/TileMap.h" //needs for knock!
 #include "../Core/GSUtils.h" //needs for MoveBetweenAreasCore
+#include "../Core/Projectile.h" //needs for clearair
 #include "FXOpc.h"
 
 //FIXME: find a way to handle portrait icons better
@@ -5242,17 +5243,22 @@ int fx_apply_effect_repeat (Actor* Owner, Actor* target, Effect* fx)
 int fx_remove_projectile (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	ieDword *projectilelist;
-
-	//instant effect
+	
+	//instant effect 
 	if (0) printf( "fx_remove_projectile (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	if (!target) return FX_NOT_APPLIED;
+	Map *area = target->GetCurrentArea();
+	if (!area) return FX_NOT_APPLIED;
+
 	switch (fx->Parameter2) {
 	case 0: //standard bg2
 		projectilelist = core->GetListFrom2DA("clearair");
 		break;
-	case 1:
+	case 1: //you can give a 2da for projectile list (gemrb)
 		projectilelist = core->GetListFrom2DA(fx->Resource);
 		break;
-	case 2:
+	case 2: //or you can give one single projectile in param1 (gemrb)
 		projectilelist = (ieDword *) malloc(2*sizeof(ieDword));
 		projectilelist[0]=1;
 		projectilelist[1]=fx->Parameter1;
@@ -5260,13 +5266,26 @@ int fx_remove_projectile (Actor* /*Owner*/, Actor* target, Effect* fx)
 	default:
 		return FX_NOT_APPLIED;
 	}
+	//The first element is the counter, so don't decrease the counter here
+	Point p(fx->PosX, fx->PosY);
+
 	while(projectilelist[0]) {
-		target->fxqueue.RemoveAllEffectsWithProjectile(projectilelist[projectilelist[0]--]);
+		ieDword projectile = projectilelist[projectilelist[0]];
+		proIterator piter;
+
+		size_t cnt = area->GetProjectileCount(piter);
+		while( cnt--) {
+			Projectile *pro = *piter;
+			if ((pro->GetType()==projectile) && pro->PointInRadius(p) ) {
+				pro->Cleanup();
+			}
+		}
+		if (target) {
+			target->fxqueue.RemoveAllEffectsWithProjectile(projectile);
+		}
+		projectilelist[0]--;
 	}
 	free(projectilelist);
-	//TODO:
-	// also remove projectile from area
-	//
 	return FX_NOT_APPLIED;
 }
 

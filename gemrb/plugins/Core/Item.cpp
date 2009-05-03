@@ -118,20 +118,24 @@ ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
 	return NULL;
 }
 
-int Item::UseCharge(ieWord *Charges, int header) const
+int Item::UseCharge(ieWord *Charges, int header, bool expend) const
 {
 	ITMExtHeader *ieh = GetExtHeader(header);
 	if (!ieh) return 0;
 	int type = ieh->ChargeDepletion;
-	int ccount = 0;
+	int ccount = Charges[header];
 	if (header>=CHARGE_COUNTERS) {
 		header = 0;
 	}
+
 	//if the item started from 0 charges, then it isn't depleting
 	if (ieh->Charges==0) {
 		return CHG_NONE;
 	}
-	ccount = --Charges[header];
+	if (expend) {
+		Charges[header] = --ccount;
+	}
+
 	if (ccount>0) {
 		return CHG_NONE;
 	}

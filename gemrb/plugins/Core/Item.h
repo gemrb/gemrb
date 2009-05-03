@@ -56,7 +56,7 @@ class Projectile;
 #define IE_ITEM_CURSED       0x00000010
 #define IE_ITEM_NOT_COPYABLE 0x00000020
 #define IE_ITEM_MAGICAL      0x00000040
-#define IE_ITEM_BOW	  0x00000080
+#define IE_ITEM_BOW          0x00000080
 #define IE_ITEM_SILVER       0x00000100
 #define IE_ITEM_COLD_IRON    0x00000200
 #define IE_ITEM_STOLEN       0x00000400
@@ -70,7 +70,7 @@ class Projectile;
 #define IE_ITEM_HOSTILE      0x400      //equipment
 #define IE_ITEM_RECHARGE     0x800      //equipment
 #define IE_ITEM_IGNORESHIELD 0x10000    //weapon
-#define IE_ITEM_KEEN	     0x20000    //weapon
+#define IE_ITEM_KEEN         0x20000    //weapon
 
 //item use locations (weapons are not listed in equipment list)
 #define ITEM_LOC_WEAPON    1   //this is a weapon slot (uses thac0 etc)
@@ -99,9 +99,10 @@ class Projectile;
 #define PROJ_BULLET 4
 
 //charge depletion flags
+#define CHG_NONE    0
 #define CHG_BREAK   1
 #define CHG_NOSOUND 2
-#define CHG_NONE    3
+#define CHG_DAY     3
 
 /**
  * @class ITMExtHeader
@@ -226,7 +227,8 @@ public:
 		return ItemDescIdentified;
 	}
 
-	int UseCharge(ieWord *Charges, int header) const;
+	//returns if the item is usable, expend will also expend a charge
+	int UseCharge(ieWord *Charges, int header, bool expend) const;
 
 	//returns the requested extended header
 	ITMExtHeader *GetExtHeader(unsigned int which) const

@@ -19,7 +19,7 @@
  *
  */
 
-
+#include <cmath>
 #include "../../includes/win32def.h"
 #include <stdlib.h>
 #include "Projectile.h"
@@ -35,6 +35,9 @@ extern Interface* core;
 extern HANDLE hConsole;
 #endif
 
+//to get gradient color
+#define PALSIZE 32
+
 static const ieByte SixteenToNine[MAX_ORIENT]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
 static const ieByte SixteenToFive[MAX_ORIENT]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
 
@@ -45,7 +48,6 @@ Projectile::Projectile()
 	area = NULL;
 	palette = NULL;
 	PaletteRes[0]=0;
-	//shadpal = NULL;
 	Pos.empty();
 	Destination = Pos;
 	Orientation = 0;
@@ -55,26 +57,35 @@ Projectile::Projectile()
 	timeStartStep = 0;
 	phase = P_UNINITED;
 	effects = NULL;
+	children = NULL;
+	child_size = 0;
 }
 
 Projectile::~Projectile()
 {
+	int i;
+
 	if (autofree) {
 		free(Extension);
 	}
 	delete effects;
 
 	gamedata->FreePalette(palette, PaletteRes);
-	//gamedata->FreePalette(shadpal);
 	ClearPath();
 
 	if (phase != P_UNINITED) {
-		int i;
 		for (i = 0; i < MAX_ORIENT; ++i) {
 			delete travel[i];
 			delete shadow[i];
 		}
 		core->GetVideoDriver()->FreeSprite(light);
+	}
+
+	if(children) {
+		for(i=0;i<child_size;i++) {
+			 delete children[i];
+		}
+		free (children);
 	}
 }
 
@@ -176,6 +187,10 @@ void Projectile::SetBlend()
 // load animations, start sound
 void Projectile::Setup()
 {
+	tint.r=128;
+	tint.g=128;
+	tint.b=128;
+	tint.a=255;
 	phase = P_TRAVEL;
 	core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, GEM_SND_RELATIVE);
 	memset(travel,0,sizeof(travel));
@@ -243,6 +258,12 @@ Actor *Projectile::GetTarget()
 //play explosion sound
 void Projectile::ChangePhase()
 {
+	//freeze on target, this is recommended only for child projectiles
+	//as the projectile won't go away on its own
+	if(TFlags&PTF_FREEZE) {
+		return;
+	}
+
 	//follow target
 	if (Target) {
 		Actor *target = area->GetActorByGlobalID(Target);
@@ -472,11 +493,12 @@ void Projectile::SetEffectsCopy(EffectQueue *eq)
 //secondary projectiles target all in the explosion radius
 void Projectile::SecondaryTarget()
 {
+	ProjectileServer *server = core->GetProjectileServer();
 	int radius = Extension->ExplosionRadius;
 	Actor **actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	Actor **poi=actors;
 	while(*poi) {
-		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(Extension->ExplProjIdx);
+		Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
 		pro->SetEffectsCopy(effects);
 		pro->SetCaster(Caster);
 		area->AddProjectile(pro, Pos, (*poi)->GetGlobalID());
@@ -484,6 +506,21 @@ void Projectile::SecondaryTarget()
 	}
 	free(actors);
 }
+
+/*
+void Projectile::CleanAreaAffect()
+{
+	if (!Extension) return;
+
+	int radius = Extension->ExplosionRadius;
+	Actor **actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
+	Actor **poi=actors;
+	while(*poi) {
+		(*poi)->fxqueue.RemoveAllEffectsWithProjectile(type);
+	}
+	free(actors);
+}
+*/
 
 int Projectile::Update()
 {
@@ -527,17 +564,38 @@ void Projectile::Draw(Region &screen)
 	}
 }
 
-void Projectile::DrawExploded(Region & /*screen*/)
+void Projectile::DrawExploded(Region &screen)
 {
 	phase = P_EXPIRED;
+	if (children) {
+		for(int i=0;i<child_size;i++){
+			if(children[i]) {
+				children[i]->Update();
+				children[i]->DrawTravel(screen);
+			}
+		}
+	}
 }
 
-void Projectile::DrawExplosion(Region & /*screen*/)
+void Projectile::DrawExplosion(Region &screen)
 {
 	//This seems to be a needless safeguard
 	if (!Extension) {
 		phase = P_EXPIRED;
 		return;
+	}
+
+	if (children) {
+		for(int i=0;i<child_size;i++){
+			if(children[i]) {
+				if (children[i]->Update()) {
+					children[i]->Draw(screen);
+				} else {
+					delete children[i];
+					children[i]=NULL;
+				}
+			}
+		}
 	}
 
 	//Delay explosion, it could even be revoked with PAF_SYNC (see skull trap)
@@ -574,12 +632,14 @@ void Projectile::DrawExplosion(Region & /*screen*/)
 		//which will go towards the edges (flames, etc)
 		//Extension->ExplColor fake color for single shades (blue,green,red flames)
 		//Extension->FragAnimID the animation id for the character animation
+		//This color is not used in the original game
 		area->Sparkle(Extension->ExplColor, SPARKLE_EXPLOSION, Pos, Extension->FragAnimID);
 	}
 
+	ProjectileServer *server = core->GetProjectileServer();
 	//the center of the explosion could be another projectile played over the target
 	if (Extension->FragProjIdx) {
-		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(Extension->FragProjIdx);
+		Projectile *pro = server->GetProjectileByIndex(Extension->FragProjIdx);
 		if (pro) {
 			area->AddProjectile(pro, Pos, Pos);
 		}
@@ -588,13 +648,74 @@ void Projectile::DrawExplosion(Region & /*screen*/)
 	//the center of the explosion is based on hardcoded explosion type (this is fireball.cpp in the original engine)
 	//these resources are listed in areapro.2da
 	if (Extension->ExplType!=0xff) {
-		ieResRef *res = core->GetProjectileServer()->GetExplosion(Extension->ExplType, 0);
+		//the center animation is in the second column
+		ieResRef const *res = server->GetExplosion(Extension->ExplType, 1);
+		//FIXME: * should return a NULL
 		if (res) {
 			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(*res, false);
 			if (vvc) {
 				vvc->XPos+=Pos.x;
 				vvc->YPos+=Pos.y;
 				area->AddVVCell(vvc);
+			}
+		}
+
+		//the spreading animation is in the first column
+		res = server->GetExplosion(Extension->ExplType, 0);
+		//returns if the explosion animation is fake coloured
+		if (res) {
+			int apflags = server->GetExplosionPalette(Extension->ExplType);
+			if (!children) {
+				child_size=(Extension->ExplosionRadius+15)/16;
+				//more sprites if the whole area needs to be filled
+				if (apflags&APF_FILL) child_size*=2;
+				children = (Projectile **) calloc(sizeof(Projectile *), child_size);
+			}
+
+
+			for(int i=0;i<child_size;i++) {
+
+				//leave this slot free, it is residue from the previous flare up
+				if (children[i])
+					continue;
+				//create a custom projectile with single traveling effect
+				Projectile *pro = server->CreateDefaultProjectile((unsigned int) ~0);
+				strnlwrcpy(pro->BAMRes1, *res, 8);
+				pro->SetEffects(NULL);
+				pro->Speed=Speed;
+				//calculate the child projectile's target point, it is either
+				//a perimeter or an inside point of the explosion radius
+				int rad = Extension->ExplosionRadius;
+				int vx = core->Roll(1,rad,0);
+				int vy = sqrt(rad*rad-vx*vx);
+				//if the whole area needs to be filled, then
+				if (apflags&APF_FILL) {
+					vy = core->Roll(1,vy,0);
+					//freeze on target (which is somewhere in middle of the parent 
+					//projectile's explosion radius)
+
+					pro->TFlags|=PTF_FREEZE;
+				}
+
+				if (i&1) vx=-vx;
+				if (i&2) vy=-vy;
+				Point newdest(Destination.x+vx, Destination.y+vy );
+				pro->MoveTo(area, Pos);
+				pro->SetTarget(newdest);
+				pro->autofree=true;
+
+				//sets up the gradient color for the explosion animation
+				if (apflags&APF_PALETTE) {
+					Color tmpColor[PALSIZE];
+
+				 	core->GetPalette( Extension->ExplColor, PALSIZE, tmpColor );
+					pro->StaticTint(tmpColor[PALSIZE/2]);
+
+					//i'm unsure if we need blending for all anims or just the tinted ones
+					pro->TFlags|=PTF_BLEND;
+				}
+				pro->Setup();
+				children[i]=pro;
 			}
 		}
 	}
@@ -631,7 +752,10 @@ void Projectile::DrawTravel(Region &screen)
 	Video *video = core->GetVideoDriver();
 	ieDword flag = 0;
 
-	Color tint = {128,128,128,255};
+	if (TFlags&PTF_TINT) {
+		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
+	}
+
 	unsigned int face = GetNextFace();
 	if (face!=Orientation) {
 		SetPos(face, GetTravelPos(face), GetShadowPos(face));
@@ -664,5 +788,40 @@ void Projectile::SetIdentifiers(const char *resref, ieWord id)
 {
 	strnuprcpy(name, resref, sizeof(name));
 	type=id;
+}
+
+bool Projectile::PointInRadius(Point &p)
+{
+	switch(phase) {
+		//better not trigger on projectiles unset/expired
+		case P_EXPIRED:
+		case P_UNINITED: return false;
+		case P_TRAVEL:
+			if(p.x==Pos.x && p.y==Pos.y) return true;
+			return false;
+		default:
+			if(p.x==Pos.x && p.y==Pos.y) return true;
+			if (!Extension) return false;
+			if (Distance(p,Pos)<Extension->ExplosionRadius) return true;
+	}
+	return false;
+}
+
+void Projectile::StaticTint(Color &newtint)
+{
+	tint = newtint;
+	TFlags  &= ~PTF_TINT;
+}
+
+void Projectile::Cleanup()
+{
+	//neutralise the payload
+	delete effects;
+	effects = NULL;
+	//diffuse the projectile
+	phase=P_EXPIRED;
+	//remove effects from affected people in the area
+	//apparently the original game doesn't try this
+	//CleanAreaAffect();
 }
 

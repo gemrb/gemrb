@@ -1360,24 +1360,24 @@ bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 
 bool Actor::SetBaseNoPCF(unsigned int StatIndex, ieDword Value)
 {
-        if (StatIndex >= MAX_STATS) {
-                return false;
-        }
-        ieDword diff = Modified[StatIndex]-BaseStats[StatIndex];
+	if (StatIndex >= MAX_STATS) {
+		return false;
+	}
+	ieDword diff = Modified[StatIndex]-BaseStats[StatIndex];
 
-        //maximize the base stat
-        if ( maximum_values[StatIndex]>0) {
-                if ( (signed) Value>maximum_values[StatIndex]) {
-                        Value = (ieDword) maximum_values[StatIndex];
-                }
-        }
+	//maximize the base stat
+	if ( maximum_values[StatIndex]>0) {
+		if ( (signed) Value>maximum_values[StatIndex]) {
+			Value = (ieDword) maximum_values[StatIndex];
+		}
+	}
 
-        BaseStats[StatIndex] = Value;
+	BaseStats[StatIndex] = Value;
 
-        //if already initialized, then the modified stats
-        //might need to run the post change function (stat change can kill actor)
-        SetStat (StatIndex, Value+diff, 0);
-        return true;
+	//if already initialized, then the modified stats
+	//might need to run the post change function (stat change can kill actor)
+	SetStat (StatIndex, Value+diff, 0);
+	return true;
 }
 
 bool Actor::SetBaseBit(unsigned int StatIndex, ieDword Value, bool setreset)
@@ -2936,11 +2936,6 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 		value |= Modified[IE_COLORS+index] & ~(255<<shift);
 		Modified[IE_COLORS+index] = value;
 	}
-/*
-	if (anims) {
-		anims->SetColors(Modified+IE_COLORS);
-	}
-*/
 }
 
 void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
@@ -3731,6 +3726,7 @@ void Actor::Rest(int hours)
 		NewStat (IE_INTOXICATION, -remaining, MOD_ADDITIVE);
 		//restore hours*10 spell levels
 		//rememorization starts with the lower spell levels?
+		inventory.ChargeAllItems (remaining);
 		for (int level = 1; level<16; level++) {
 			if (level<remaining) {
 				break;
@@ -3742,6 +3738,7 @@ void Actor::Rest(int hours)
 	} else {
 		SetBase (IE_FATIGUE, 0);
 		SetBase (IE_INTOXICATION, 0);
+		inventory.ChargeAllItems (0);
 		spellbook.ChargeAllSpells ();
 	}
 }
@@ -3782,7 +3779,8 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, bool silen
 		return false;
 	Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) return false; //quick item slot contains invalid item resref
-	if ((header<CHARGE_COUNTERS) && !item->Usages[header]) {
+	//item is depleted for today
+	if(itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
 		return false;
 	}
 
@@ -3809,7 +3807,8 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, bool silen
 		return false;
 	Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) return false; //quick item slot contains invalid item resref
-	if ((header<CHARGE_COUNTERS) && !item->Usages[header]) {
+	//item is depleted for today
+	if(itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
 		return false;
 	}
 
@@ -3834,6 +3833,8 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 	}
 	if (!itm) return; //quick item slot contains invalid item resref
 
+	core->SetEventFlag( EF_ACTION );
+
 	if (!silent) {
 		ieByte stance = IE_ANI_ATTACK;
 		for (int i=0;i<animcount;i++) {
@@ -3843,10 +3844,16 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 		}
 		if (stance!=0xff) {
 			SetStance(stance);
+			//play only one cycle of animations
+			
+			anims->nextStanceID=IE_ANI_READY;
+			anims->autoSwitchOnEnd=true;
 		}
 	}
 
-	switch(itm->UseCharge(item->Usages, header)) {
+	switch(itm->UseCharge(item->Usages, header, true)) {
+		case CHG_DAY:
+			break;
 		case CHG_NOSOUND: //remove item
 			inventory.BreakItemSlot(slot);
 			break;

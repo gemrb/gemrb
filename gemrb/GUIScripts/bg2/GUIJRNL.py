@@ -136,6 +136,9 @@ def OpenJournalWindow ():
 	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	Chapter = GemRB.GetGameVar("chapter")
+	if Chapter>65535:
+		Chapter=0
+
 	SetSelectionChangeHandler (UpdateLogWindow)
 	UpdateLogWindow ()
 	OptionsWindow.SetVisible (1)

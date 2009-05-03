@@ -54,6 +54,12 @@ Projectile *ProjectileServer::CreateDefaultProjectile(unsigned int idx)
 	Projectile *pro = new Projectile();
 	int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Type);
 	memset(&pro->Type, 0, strlength );
+
+	//take care, this projectile is not freed up by the server
+	if(idx==(unsigned int) ~0 ) {
+		return pro;
+	}
+
 	projectiles[idx].projectile = pro;
 	pro->SetIdentifiers(projectiles[idx].resname, idx);
 	return ReturnCopy(idx);
@@ -141,8 +147,10 @@ int ProjectileServer::InitExplosion()
 		explosions = new ExplosionEntry[rows];
 
 		while(rows--) {
-			strnuprcpy(explosions[ rows].resource1, explist->QueryField(rows, 0), 8);
-			strnuprcpy(explosions[ rows].resource2, explist->QueryField(rows, 1), 8);
+			strnuprcpy(explosions[rows].resource1, explist->QueryField(rows, 0), 8);
+			strnuprcpy(explosions[rows].resource2, explist->QueryField(rows, 1), 8);
+			strnuprcpy(explosions[rows].resource3, explist->QueryField(rows, 2), 8);
+			explosions[rows].palette = atoi(explist->QueryField(rows,3));
 		}
 	}
 	return explosioncount;
@@ -184,7 +192,7 @@ unsigned int ProjectileServer::GetHighestProjectileNumber()
 	return (unsigned int) projectilecount;
 }
 
-ieResRef *ProjectileServer::GetExplosion(unsigned int idx, int type)
+int ProjectileServer::GetExplosionPalette(unsigned int idx)
 {
 	if (explosioncount==-1) {
 		if (InitExplosion()<0) {
@@ -195,11 +203,36 @@ ieResRef *ProjectileServer::GetExplosion(unsigned int idx, int type)
 	if (idx>=(unsigned int) explosioncount) {
 		return NULL;
 	}
+
+	return explosions[idx].palette;
+}
+
+ieResRef const *ProjectileServer::GetExplosion(unsigned int idx, int type)
+{
+	if (explosioncount==-1) {
+		if (InitExplosion()<0) {
+			printMessage("ProjectileServer","Problem with explosions\n", RED);
+			explosioncount=0;
+		}
+	}
+	if (idx>=(unsigned int) explosioncount) {
+		return NULL;
+	}
+	ieResRef const *ret = NULL;
+
 	switch (type) {
 		case 0:
-			return &explosions[idx].resource1;
+			ret = &explosions[idx].resource1;
+			break;
 		case 1:
-			return &explosions[idx].resource2;
+			ret = &explosions[idx].resource2;
+			break;
+		case 2:
+			//i'm still unsure if we need the third resource column
+			ret = &explosions[idx].resource3;
+			break;
 	}
-	return NULL;
+	if (ret && *ret[0]=='*') ret = NULL;
+
+	return ret;
 }
