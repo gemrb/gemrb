@@ -221,6 +221,7 @@ Interface::Interface(int iargc, char* iargv[])
 	ItemDialTable = NULL;
 	ItemDial2Table = NULL;
 	ItemTooltipTable = NULL;
+	update_scripts = false;
 
 	gamedata = new GameData();
 	::gamedata = gamedata;
@@ -2805,10 +2806,14 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 	return 0;
 }
 
+bool Interface::IsFreezed()
+{
+	return !update_scripts;
+}
+
 void Interface::GameLoop(void)
 {
-	bool update_scripts = false;
-
+	update_scripts = false;
 	GameControl *gc = GetGameControl();
 	if (gc) {
 		update_scripts = !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS);

@@ -234,10 +234,6 @@ private:
 	ResourceMgr * key;
 	ProjectileServer * projserv;
 	GameData * gamedata;
-public:
-	StringMgr *strings;
-	GlobalTimer * timer;
-private:
 	ImageMgr * pal256;
 	ImageMgr * pal32;
 	ImageMgr * pal16;
@@ -298,7 +294,10 @@ private:
 	bool UseContainer;
 	// Scrolling speed
 	int mousescrollspd;
+	bool update_scripts;
 public:
+	StringMgr *strings;
+	GlobalTimer * timer;
 	Palette *InfoTextPalette;
 	int SaveAsOriginal; //if true, saves files in compatible mode
 	int QuitFlag;
@@ -639,7 +638,8 @@ private:
 	void HandleGUIBehaviour();
 	/** Creates a game control, closes all other windows */
 	GameControl* StartGameControl();
-
+	/** Executes everything (non graphical) in the main game loop */
+	void GameLoop(void);
 public:
 	char GameDataPath[_MAX_PATH];
 	char GameOverridePath[_MAX_PATH];
@@ -675,8 +675,8 @@ public:
 	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
 	/** The Main program loop */
 	void Main(void);
-	/** Executes everything (non graphical) in the main game loop */
-	void GameLoop(void);
+	/** returns true if the game is paused */
+	bool IsFreezed();
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);
 	/** Sends a termination signal to the Video Driver */
