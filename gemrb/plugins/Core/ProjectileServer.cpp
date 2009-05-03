@@ -201,7 +201,7 @@ int ProjectileServer::GetExplosionPalette(unsigned int idx)
 		}
 	}
 	if (idx>=(unsigned int) explosioncount) {
-		return NULL;
+		return 0;
 	}
 
 	return explosions[idx].palette;

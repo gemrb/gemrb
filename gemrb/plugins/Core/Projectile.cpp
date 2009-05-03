@@ -687,7 +687,7 @@ void Projectile::DrawExplosion(Region &screen)
 				//a perimeter or an inside point of the explosion radius
 				int rad = Extension->ExplosionRadius;
 				int vx = core->Roll(1,rad,0);
-				int vy = sqrt(rad*rad-vx*vx);
+				int vy = (int) sqrt(rad*rad-vx*vx);
 				//if the whole area needs to be filled, then
 				if (apflags&APF_FILL) {
 					vy = core->Roll(1,vy,0);
