@@ -53,6 +53,7 @@ private:
 	proIterator piter; //iterator for saving projectiles
 	ieDword EffectOffset;
 	ieResRef Script;
+	ieResRef Dream1, Dream2; //only in ToB
 public:
 	AREImp(void);
 	~AREImp(void);

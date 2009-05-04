@@ -236,6 +236,8 @@ public:
 	bool MasterArea;
 	//this is set by the importer (not stored in the file)
 	bool DayNight;
+	//movies for day/night (only in ToB)
+	ieResRef Dream[2];
 private:
 	ieStrRef trackString;
 	int trackFlag;

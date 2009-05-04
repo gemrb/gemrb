@@ -392,6 +392,7 @@ public:
 	void DebugDump();
 private:
 	bool DetermineStartPosType(const TableMgr *strta);
+	ieResRef *GetDream(Map *area);
 };
 
 #endif  // ! GAME_H

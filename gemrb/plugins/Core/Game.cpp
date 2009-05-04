@@ -1189,6 +1189,18 @@ void Game::SetPartySize(int size)
 	partysize = (size_t) size;
 }
 
+//Get the area dependent rest movie
+ieResRef *Game::GetDream(Map *area)
+{
+	//select dream based on area
+	int daynight = IsDay();
+	if (area->Dream[daynight][0]) {
+		return area->Dream+daynight;
+	}
+	int dream = (area->AreaType&(AT_FOREST|AT_CITY|AT_DUNGEON))>>3;
+	return restmovies+dream;
+}
+
 //noareacheck = no random encounters
 //dream = 0 - no dream non-0 - select from list
 //-1 dream based on area
@@ -1252,11 +1264,14 @@ void Game::RestParty(int checks, int dream, int hp)
 	//movie
 	if (dream>=0) {
 		//select dream based on area
+		ieResRef *movie;
 		if (dream==0 || dream>7) {
-			dream = (area->AreaType&(AT_FOREST|AT_CITY|AT_DUNGEON))>>3;
+			movie = GetDream(area);
+		} else {
+			movie = restmovies+dream;
 		}
-		if (restmovies[dream][0]!='*') {
-			core->PlayMovie(restmovies[dream]);
+		if (*movie[0]!='*') {
+			core->PlayMovie(*movie);
 		}
 	}
 
@@ -1434,7 +1449,7 @@ void Game::StartTimer(ieDword ID, ieDword expiration)
 }
 
 /* this method redraws weather. If update is false,
-	 then the weather particles won't change (game paused)
+ then the weather particles won't change (game paused)
 */
 void Game::DrawWeather(Region &screen, bool update)
 {

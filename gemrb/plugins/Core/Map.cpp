@@ -54,6 +54,8 @@ extern Interface* core;
 extern HANDLE hConsole;
 #endif
 
+#define YESNO(x) ( (x)?"Yes":"No")
+
 static unsigned int MAX_CIRCLESIZE = 8;
 static int MaxVisibility = 30;
 static int VisibilityPerimeter; //calculated from MaxVisibility
@@ -1748,6 +1750,12 @@ bool Map::CanFree()
 void Map::DebugDump()
 {
 	printf( "DebugDump of Area %s:\n", scriptName );
+	printf( "OutDoor: %s\n", YESNO(AreaType & AT_OUTDOOR ) );
+	printf( "Day/Night: %s\n", YESNO(AreaType & AT_DAYNIGHT ) );
+	printf( "Extended night: %s\n", YESNO(AreaType & AT_EXTENDED_NIGHT ) );
+	printf( "Weather: %s\n", YESNO(AreaType & AT_WEATHER ) );
+	printf( "Area Type: %d\n", AreaType & (AT_CITY|AT_FOREST|AT_DUNGEON) );
+	printf( "Can rest: %s\n", YESNO(AreaType & AT_CAN_REST) );
 }
 
 /******************************************************************************/

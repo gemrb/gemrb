@@ -218,6 +218,8 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	str->ReadDword( &NoteCount );
 	str->ReadDword( &TrapOffset );
 	str->ReadDword( &TrapCount );
+	str->ReadResRef( Dream1 );
+	str->ReadResRef( Dream2 );
 	return true;
 }
 
@@ -302,7 +304,8 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	map->AreaType = AreaType;
 	map->DayNight = day_or_night;
 	strnlwrcpy( map->WEDResRef, WEDResRef, 8);
-
+	strnlwrcpy( map->Dream[0], Dream1, 8);
+	strnlwrcpy( map->Dream[1], Dream2, 8);
 
 	//we have to set this here because the actors will receive their
 	//current area setting here, areas' 'scriptname' is their name
@@ -1331,7 +1334,7 @@ int AREImp::GetStoredFileSize(Map *map)
 
 int AREImp::PutHeader(DataStream *stream, Map *map)
 {
-	char Signature[72];
+	char Signature[56];
 	ieDword tmpDword = 0;
 	ieWord tmpWord = 0;
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
@@ -1408,15 +1411,17 @@ int AREImp::PutHeader(DataStream *stream, Map *map)
 	if (pst) {
 		tmpDword = 0xffffffff;
 		stream->WriteDword( &tmpDword);
-		i=68;
+		i=52;
 	} else {
-		i=72;
+		i=56;
 	}
 	stream->WriteDword( &NoteOffset );
 	stream->WriteDword( &NoteCount );
 	stream->WriteDword( &TrapOffset );
 	stream->WriteDword( &TrapCount );
-	//usually 72 empty bytes (but pst used up 4 elsewhere)
+	stream->WriteResRef( map->Dream[0] );
+	stream->WriteResRef( map->Dream[1] );
+	//usually 56 empty bytes (but pst used up 4 elsewhere)
 	stream->Write( Signature, i);
 	return 0;
 }
