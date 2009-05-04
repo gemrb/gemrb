@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Id$
  *
@@ -253,6 +253,12 @@ Actor *Projectile::GetTarget()
 	return target;
 }
 
+void Projectile::SetDelay(int delay)
+{
+	extension_delay=delay;
+	TFlags|=PTF_FREEZE;
+}
+
 //control the phase change when the projectile reached its target
 //possible actions: vanish, hover over point, explode
 //depends on the area extension
@@ -262,7 +268,12 @@ void Projectile::ChangePhase()
 	//freeze on target, this is recommended only for child projectiles
 	//as the projectile won't go away on its own
 	if(TFlags&PTF_FREEZE) {
-		return;
+		if(extension_delay) {
+		if (extension_delay>0) {
+			extension_delay--;
+		}
+			return;
+		}
 	}
 
 	//follow target
@@ -533,6 +544,12 @@ int Projectile::Update()
 	if (phase == P_UNINITED) {
 		Setup();
 	}
+
+	int pause = core->IsFreezed();
+	if (pause) {
+		return 1;
+	}
+
 	if (phase == P_TRAVEL) {
 		DoStep(Speed);
 	}
@@ -565,17 +582,34 @@ void Projectile::Draw(Region &screen)
 	}
 }
 
-void Projectile::DrawExploded(Region &screen)
+bool Projectile::DrawChildren(Region &screen)
 {
-	phase = P_EXPIRED;
+	bool drawn = false;
+
 	if (children) {
 		for(int i=0;i<child_size;i++){
 			if(children[i]) {
-				children[i]->Update();
+			if (children[i]->Update()) {
 				children[i]->DrawTravel(screen);
+				drawn = true;
+			} else {
+					delete children[i];
+					children[i]=NULL;
+			}
 			}
 		}
 	}
+
+	return drawn;
+}
+
+//draw until all children expire
+void Projectile::DrawExploded(Region &screen)
+{
+	if (DrawChildren(screen)) {
+		return;
+	}
+	phase = P_EXPIRED;
 }
 
 void Projectile::DrawExplosion(Region &screen)
@@ -586,18 +620,7 @@ void Projectile::DrawExplosion(Region &screen)
 		return;
 	}
 
-	if (children) {
-		for(int i=0;i<child_size;i++){
-			if(children[i]) {
-				if (children[i]->Update()) {
-					children[i]->Draw(screen);
-				} else {
-					delete children[i];
-					children[i]=NULL;
-				}
-			}
-		}
-	}
+	DrawChildren(screen);
 
 	int pause = core->IsFreezed();
 	if (pause) {
@@ -678,11 +701,15 @@ void Projectile::DrawExplosion(Region &screen)
 				child_size=(Extension->ExplosionRadius+15)/16;
 				//more sprites if the whole area needs to be filled
 				if (apflags&APF_FILL) child_size*=2;
+			if (apflags&APF_SPREAD) child_size*=2;
 				children = (Projectile **) calloc(sizeof(Projectile *), child_size);
 			}
 
-			for(int i=0;i<child_size;i++) {
-
+			int initial = child_size;
+			if (apflags&APF_SPREAD) {
+				initial/=2;
+			}
+			for(int i=0;i<initial;i++) {
 				//leave this slot free, it is residue from the previous flare up
 				if (children[i])
 					continue;
@@ -702,7 +729,8 @@ void Projectile::DrawExplosion(Region &screen)
 					//freeze on target (which is somewhere in middle of the parent 
 					//projectile's explosion radius)
 
-					pro->TFlags|=PTF_FREEZE;
+				pro->SetDelay(Extension->Delay);
+					//pro->TFlags|=PTF_FREEZE;
 				}
 
 				if (i&1) vx=-vx;
@@ -717,13 +745,17 @@ void Projectile::DrawExplosion(Region &screen)
 				pro->autofree=true;
 
 				//sets up the gradient color for the explosion animation
+				if (apflags&(APF_PALETTE|APF_TINT) ) {
 				if (apflags&APF_PALETTE) {
+					pro->SetGradient(Extension->ExplColor);
+				} else {
 					Color tmpColor[PALSIZE];
 
 				 	core->GetPalette( Extension->ExplColor, PALSIZE, tmpColor );
 					pro->StaticTint(tmpColor[PALSIZE/2]);
+				}
 
-					//i'm unsure if we need blending for all anims or just the tinted ones
+				//i'm unsure if we need blending for all anims or just the tinted ones
 				}
 				pro->TFlags|=PTF_BLEND;
 				pro->Setup();
@@ -825,10 +857,17 @@ bool Projectile::PointInRadius(Point &p)
 	return false;
 }
 
+void Projectile::SetGradient(int gradient)
+{
+	//gradients are unsigned chars, so this works
+	memset(Gradients, gradient, 7);
+	TFlags |= PTF_COLOUR;
+}
+
 void Projectile::StaticTint(Color &newtint)
 {
 	tint = newtint;
-	TFlags  &= ~PTF_TINT;
+	TFlags &= ~PTF_TINT;
 }
 
 void Projectile::Cleanup()

@@ -6,7 +6,7 @@ STINKCLOUD SPHORPUF   *          *          3
 CLOUDKILL  SPHORPUF   *          *          3
 ICESTORM   SPICESTM   SPBOOM     *          14
 GREASE     GREASED    *          GREASEH    2
-WEB        WEBENTD    *          WEBENTH    2
+WEB        WEBENTD    *          WEBENTH    34
 METEOR     SPMETSWM   *          *          0
 WILTING    SPHORPUF   SPHORWIL   *          1
 WEIRD      SPWRDFLD   *          *          2
@@ -16,5 +16,5 @@ CONECOLD   SPCCOLDE   SPCCOLDL   *          0
 HOLYSMITE  SPHLYSM2   SPHLYSM3   *          0
 UNHOLY     SPUNHBL2   SPUNHBL3   *          0
 PRISMATIC  SPPRISM2   SPPRISM3   *          0
-DRAGON     SPRDRASI   *          *          0
+DRAGON     SPRDRASI   *          *          16
 VENGEANCE  SPSTRMVA   SPSRMVB    *          2

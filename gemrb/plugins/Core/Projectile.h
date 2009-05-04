@@ -94,13 +94,17 @@
 //this functionality was hardcoded in the original engine, so the bit flags are
 //completely arbitrary (i assign them as need arises)
 //child projectiles need to be tinted (example: stinking cloud, counter example: fireball)
-#define APF_PALETTE   1     
+#define APF_TINT      1
 //child projectiles fill the whole area (example: stinking cloud, counter example: fireball)
 #define APF_FILL      2     
 //child projectiles start in their destination (example: icestorm, counter example: fireball)
 #define APF_SCATTER   4     
 //the explosion vvc has gradient (example: icestorm, counter example: fireball)
 #define APF_VVCPAL    8
+//there is an additional added scatter after the initial spreading ring
+#define APF_SPREAD    16
+//the spread projectile needs gradient colouring,not tint (example:web, counter example: stinking cloud)
+#define APF_PALETTE   32
 
 struct ProjectileExtension
 {
@@ -256,6 +260,9 @@ public:
 	}
 
 	void Setup();
+	//sets how long a created travel projectile will hover over a spot
+	//before vanishing (without the need of area extension)
+	void SetDelay(int delay);
 	void ChangePhase();
 	void DoStep(unsigned int walk_speed);
 	void MoveTo(Map *map, Point &Des);
@@ -264,6 +271,7 @@ public:
 	int Update();
 	//draw object
 	void Draw(Region &screen);
+	void SetGradient(int gradient);
 	void StaticTint(Color &newtint);
 private:
 	void GetPaletteCopy(Animation *anim[], Palette *&pal);
@@ -272,6 +280,7 @@ private:
 	//void CleanAreaAffect();
 	void CheckTrigger(unsigned int radius);
 	void DrawTravel(Region &screen);
+	bool DrawChildren(Region &screen);
 	void DrawExplosion(Region &screen);
 	void DrawExploded(Region &screen);
 	int GetTravelPos(int face);
