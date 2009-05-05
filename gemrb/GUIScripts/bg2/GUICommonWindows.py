@@ -464,18 +464,17 @@ def GetKitIndex (actor):
 	KitIndex = 0
 
 	if Kit&0xc000ffff == 0x40000000:
-		print "Kit value: 0x%04X"%Kit
 		KitIndex = Kit>>16 & 0xfff
 
-	#looking for kit by the usability flag
-	if KitIndex == 0:
+	# carefully looking for kit by the usability flag
+	# since the barbarian kit id clashes with the no-kit value
+	if KitIndex == 0 and Kit != 0x40000000:
 		KitIndex = KitTable.FindValue (6, Kit)
 		if KitIndex == -1:
 			KitIndex = 0
-		# needed so barbarians don't override other kits
-		elif Class != KitTable.GetValue (KitIndex, 7):
-			print "KitIndex before hack", KitIndex
-			KitIndex = 0
+#		# needed so barbarians don't override other kits
+#		elif Class != KitTable.GetValue (KitIndex, 7):
+#			KitIndex = 0
 
 	return KitIndex
 
