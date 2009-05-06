@@ -989,6 +989,7 @@ void CREImp::GetActorBG(Actor *act)
 	int i;
 	ieByte tmpByte;
 	ieWord tmpWord;
+	ieDword tmpDword;
 
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_REPUTATION]=tmpByte;
@@ -1108,7 +1109,10 @@ void CREImp::GetActorBG(Actor *act)
 	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
 	str->Read( &tmpByte, 1);
 	//skipping a byte
-	str->ReadDword( &act->BaseStats[IE_KIT] );
+	str->ReadWord( ((ieWord *) (&tmpDword))+1);
+	str->ReadWord( (ieWord *) (&tmpDword));
+	act->BaseStats[IE_KIT]=tmpDword;
+	//str->ReadDword( &act->BaseStats[IE_KIT] );
 	ReadScript(act, SCR_OVERRIDE);
 	ReadScript(act, SCR_CLASS);
 	ReadScript(act, SCR_RACE);
@@ -1324,6 +1328,7 @@ void CREImp::GetActorIWD2(Actor *act)
 	//act->BaseStats[IE_HATEDRACE]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
+	//No KIT word order magic for IWD2
 	str->ReadDword( &act->BaseStats[IE_KIT] );
 	ReadScript(act, SCR_OVERRIDE);
 	ReadScript(act, SCR_CLASS);
@@ -1433,6 +1438,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	int i;
 	ieByte tmpByte;
 	ieWord tmpWord;
+	ieDword tmpDword;
 
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_REPUTATION]=tmpByte;
@@ -1551,7 +1557,10 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	//skipping a byte
-	str->ReadDword( &act->BaseStats[IE_KIT] );
+	str->ReadWord( ((ieWord *) (&tmpDword))+1);
+	str->ReadWord( (ieWord *) (&tmpDword));
+	act->BaseStats[IE_KIT]=tmpDword;
+	//str->ReadDword( &act->BaseStats[IE_KIT] );
 	ReadScript(act, SCR_OVERRIDE);
 	ReadScript(act, SCR_CLASS);
 	ReadScript(act, SCR_RACE);
@@ -1778,6 +1787,7 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	char Signature[8];
 	ieByte tmpByte;
 	ieWord tmpWord;
+	ieDword tmpDword;
 	int i;
 	char filling[51];
 
@@ -2043,6 +2053,7 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 		stream->Write( &tmpByte, 1);
 		// unknown byte
 		stream->Write( &filling,1);
+		// no kit word order magic for iwd2
 		stream->WriteDword( &actor->BaseStats[IE_KIT] );
 		stream->WriteResRef( actor->Scripts[SCR_OVERRIDE]->GetName() );
 		stream->WriteResRef( actor->Scripts[SCR_CLASS]->GetName() );
@@ -2092,7 +2103,10 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 		stream->Write( &tmpByte, 1);
 		// unknown byte
 		stream->Write( &Signature,1);
-		stream->WriteDword( &actor->BaseStats[IE_KIT] );
+		//stream->WriteDword( &actor->BaseStats[IE_KIT] );
+		tmpDword = actor->BaseStats[IE_KIT];
+		stream->WriteWord( ((ieWord *) (&tmpDword)+1) );
+		stream->WriteWord( (ieWord *) (&tmpDword) );
 		stream->WriteResRef( actor->Scripts[SCR_OVERRIDE]->GetName() );
 		stream->WriteResRef( actor->Scripts[SCR_CLASS]->GetName() );
 		stream->WriteResRef( actor->Scripts[SCR_RACE]->GetName() );
