@@ -472,9 +472,6 @@ def GetKitIndex (actor):
 		KitIndex = KitTable.FindValue (6, Kit)
 		if KitIndex == -1:
 			KitIndex = 0
-#		# needed so barbarians don't override other kits
-#		elif Class != KitTable.GetValue (KitIndex, 7):
-#			KitIndex = 0
 
 	return KitIndex
 
