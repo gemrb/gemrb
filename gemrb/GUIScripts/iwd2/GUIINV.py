@@ -549,8 +549,7 @@ def DrinkItemWindow ():
 	slot = GemRB.GetVar ("ItemButton")
 	# the drink item header is always the first
 	GemRB.UseItem (pc, slot, 0)
-	if ItemInfoWindow:
-		ItemInfoWindow.Unload ()
+	CloseItemInfoWindow ()
 	return
 
 def ReadItemWindow ():
@@ -559,8 +558,7 @@ def ReadItemWindow ():
 	# the learn scroll header is always the second
 	# 5 is TARGET_SELF, because some scrolls are buggy
 	GemRB.UseItem (pc, slot, 1, 5)
-	if ItemInfoWindow:
-		ItemInfoWindow.Unload ()
+	CloseItemInfoWindow ()
 	return
 
 def OpenItemWindow ():
