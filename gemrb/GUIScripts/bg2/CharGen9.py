@@ -22,6 +22,7 @@ import GemRB
 from CharGenCommon import *
 from ie_stats import *
 from ie_slots import *
+from ie_spells import *
 from GUICommon import *
 
 CharGenWindow = 0
@@ -73,7 +74,7 @@ def FinishCharGen():
 
 	for i in range(len(spells)):
 		ab = spells[i]
-		if GemRB.LearnSpell (MyChar, ab, 8) == 1: # 1 == LSR_KNOWN, 8 == LS_MEMO
+		if GemRB.LearnSpell (MyChar, ab, LS_MEMO) == LSR_KNOWN:
 			# the spell is already known, so we have to memorize it manually
 			# the last MemorizeSpell parameter is the index of the known spell to memorize
 			GemRB.MemorizeSpell (MyChar, IE_SPELL_TYPE_INNATE, 0, spells2.index(ab) + ClabOffset)
