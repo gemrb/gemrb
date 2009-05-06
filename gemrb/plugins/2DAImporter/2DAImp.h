@@ -145,19 +145,19 @@ public:
 		return "";
 	};
 
-	inline unsigned int FindTableValue(unsigned int col, long val, int start) const
-  {
-    ieDword row, max;
-    
-    max = GetRowCount();
-    for (row = start; row < max; row++) {
-      const char* ret = QueryField( row, col );
-      long Value;
-      if (valid_number( ret, Value ) && (Value == val) )
-        return row;
-    }
-    return 0xffffffff;
-  }
+	inline int FindTableValue(unsigned int col, long val, int start) const
+	{
+		ieDword row, max;
+		
+		max = GetRowCount();
+		for (row = start; row < max; row++) {
+			const char* ret = QueryField( row, col );
+			long Value;
+			if (valid_number( ret, Value ) && (Value == val) )
+				return (int) row;
+		}
+		return -1;
+	}
 
 public:
 	void release(void)
