@@ -737,7 +737,8 @@ def IdentifyUseScroll ():
 def CloseIdentifyItemWindow ():
 	if ItemIdentifyWindow:
 		ItemIdentifyWindow.Unload ()
-	RefreshInventoryWindow()
+	#RefreshInventoryWindow()
+	#UpdateInventoryWindow ()
 	return
 
 def IdentifyItemWindow ():
