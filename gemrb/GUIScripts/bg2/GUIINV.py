@@ -669,6 +669,7 @@ def DrinkItemWindow ():
 	GemRB.UseItem (pc, slot, 0)
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
+	UpdateInventoryWindow ()
 	return
 
 def ReadItemWindow ():
@@ -679,6 +680,7 @@ def ReadItemWindow ():
 	GemRB.UseItem (pc, slot, 1, 5)
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
+	UpdateInventoryWindow ()
 	return
 
 def OpenItemWindow ():
@@ -739,6 +741,7 @@ def IdentifyUseScroll ():
 def CloseIdentifyItemWindow ():
 	if ItemIdentifyWindow:
 		ItemIdentifyWindow.Unload ()
+	RefreshInventoryWindow()
 	return
 
 def IdentifyItemWindow ():
