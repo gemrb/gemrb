@@ -83,7 +83,7 @@ Projectile::~Projectile()
 
 	if(children) {
 		for(i=0;i<child_size;i++) {
-			 delete children[i];
+			delete children[i];
 		}
 		free (children);
 	}
@@ -465,7 +465,7 @@ int Projectile::CalculateTargetFlag()
 
 	switch (Extension->AFlags&PAF_TARGET) {
 	case PAF_ENEMY:
-		flags|=GA_NO_FRIEND;
+		flags|=GA_NO_ALLY;
 		break;
 	case PAF_PARTY:
 		flags|=GA_NO_ENEMY;
@@ -638,6 +638,16 @@ void Projectile::DrawExplosion(Region &screen)
 		extension_explosioncount--;
 	}
 
+	//VVC in center
+	if (Extension->AFlags&PAF_VVC) {
+		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
+		if (vvc) {
+			vvc->XPos+=Pos.x;
+			vvc->YPos+=Pos.y;
+			area->AddVVCell(vvc);
+		}
+	}
+
 	//no idea what is PAF_SECONDARY
 	//probably it is to alter some behaviour in the secondary
 	//projectile generation
@@ -701,7 +711,7 @@ void Projectile::DrawExplosion(Region &screen)
 				child_size=(Extension->ExplosionRadius+15)/16;
 				//more sprites if the whole area needs to be filled
 				if (apflags&APF_FILL) child_size*=2;
-			if (apflags&APF_SPREAD) child_size*=2;
+				if (apflags&APF_SPREAD) child_size*=2;
 				children = (Projectile **) calloc(sizeof(Projectile *), child_size);
 			}
 
@@ -721,21 +731,27 @@ void Projectile::DrawExplosion(Region &screen)
 				//calculate the child projectile's target point, it is either
 				//a perimeter or an inside point of the explosion radius
 				int rad = Extension->ExplosionRadius;
-				int vx = core->Roll(1,rad,0);
-				int vy = (int) sqrt(rad*rad-vx*vx);
-				//if the whole area needs to be filled, then
-				if (apflags&APF_FILL) {
-					vy = core->Roll(1,vy,0);
-					//freeze on target (which is somewhere in middle of the parent 
-					//projectile's explosion radius)
+				Point newdest;
 
-				pro->SetDelay(Extension->Delay);
-					//pro->TFlags|=PTF_FREEZE;
+				if (apflags&APF_FILL) rad=core->Roll(1,rad,0);
+				int max = 256;
+				int add = 0;
+				if (Extension->AFlags&PAF_CONE) {
+					max=Extension->ConeWidth;
+					add=Orientation*16;
+				}
+				max=core->Roll(1,max,add);
+				double degree=max*M_PI/128;
+				newdest.x = (int) (rad * cos(degree) );
+				newdest.y = (int) (rad * sin(degree) );
+
+				if (apflags&APF_FILL) {
+					pro->SetDelay(Extension->Delay);
 				}
 
-				if (i&1) vx=-vx;
-				if (i&2) vy=-vy;
-				Point newdest(Destination.x+vx, Destination.y+vy );
+				newdest.x+=Destination.x;
+				newdest.y+=Destination.y;
+
 				if (apflags&APF_SCATTER) {
 					pro->MoveTo(area, newdest);
 				} else {
@@ -746,17 +762,17 @@ void Projectile::DrawExplosion(Region &screen)
 
 				//sets up the gradient color for the explosion animation
 				if (apflags&(APF_PALETTE|APF_TINT) ) {
-				if (apflags&APF_PALETTE) {
-					pro->SetGradient(Extension->ExplColor);
-				} else {
-					Color tmpColor[PALSIZE];
+					if (apflags&APF_PALETTE) {
+						pro->SetGradient(Extension->ExplColor);
+					} else {
+						Color tmpColor[PALSIZE];
 
-				 	core->GetPalette( Extension->ExplColor, PALSIZE, tmpColor );
-					pro->StaticTint(tmpColor[PALSIZE/2]);
+						core->GetPalette( Extension->ExplColor, PALSIZE, tmpColor );
+						pro->StaticTint(tmpColor[PALSIZE/2]);
+					}
+
 				}
-
 				//i'm unsure if we need blending for all anims or just the tinted ones
-				}
 				pro->TFlags|=PTF_BLEND;
 				pro->Setup();
 				children[i]=pro;
@@ -832,6 +848,9 @@ void Projectile::DrawTravel(Region &screen)
 		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
 	}
 
+	if (SFlags&PSF_SPARKS) {
+		area->Sparkle(SparkColor,SPARKLE_PUFF,pos);
+	}
 }
 
 void Projectile::SetIdentifiers(const char *resref, ieWord id)

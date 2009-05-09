@@ -97,9 +97,10 @@ class ScriptedAnimation;
 #define GA_ATTACK   2
 //actor selected for spell target
 #define GA_SPELL    3
+//actor selected for defend
+#define GA_DEFEND   4
 //actor selected for pick pockets
-#define GA_PICK     4
-
+#define GA_PICK     5
 //action mask
 #define GA_ACTION   15
 //unselectable actor may not be selected (can still block)
@@ -111,9 +112,13 @@ class ScriptedAnimation;
 //hidden actor may not be selected
 #define GA_NO_HIDDEN 128
 //party members cannot be selected
-#define GA_NO_FRIEND 256
+#define GA_NO_ALLY  256
 //only party members could be selected
 #define GA_NO_ENEMY 512
+//
+#define GA_NO_NEUTRAL 1024
+//cannot target self
+#define GA_NO_SELF    2048
 
 #define GUIBT_COUNT  12
 

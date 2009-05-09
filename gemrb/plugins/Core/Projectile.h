@@ -88,6 +88,9 @@
 #define PAF_ENEMY     64    //target party or not party
 #define PAF_PARTY     128   //target party
 #define PAF_TARGET    (64|128)
+#define PAF_VVC       1024
+#define PAF_CONE      2048
+
 
 
 //area projectile flags (in areapro.2da)

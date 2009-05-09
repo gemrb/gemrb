@@ -2375,12 +2375,17 @@ bool Actor::ValidTarget(int ga_flags) const
 		if (Modified[IE_AVATARREMOVAL]) return false;
 	}
 
-	if (ga_flags&GA_NO_FRIEND) {
+	if (ga_flags&GA_NO_ALLY) {
 		if(InParty) return false;
+		if(Modified[IE_EA]<=EA_GOODCUTOFF) return false;
 	}
 
 	if (ga_flags&GA_NO_ENEMY) {
-		if(!InParty) return false;
+		if(!InParty && (Modified[IE_EA]>=EA_EVILCUTOFF) ) return false;
+	}
+
+	if (ga_flags&GA_NO_NEUTRAL) {
+		if(!InParty && (Modified[IE_EA]<EA_EVILCUTOFF) ) return false;
 	}
 
 	switch(ga_flags&GA_ACTION) {

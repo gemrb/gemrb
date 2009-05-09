@@ -294,25 +294,25 @@ def OpenFloatMenuWindow ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 
 def ActionTalkPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK,GA_NO_DEAD|GA_NO_ENEMY|GA_NO_HIDDEN)
 
 def ActionAttackPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK,GA_NO_DEAD|GA_NO_SELF|GA_NO_HIDDEN)
 
 def ActionDefendPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND,GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
 def ActionThievingPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
 def ActionQWeaponPressed (which):
 	pc = GemRB.GameGetFirstSelectedPC ()
 	qs = GemRB.GetEquippedQuickSlot (pc,1)
 
 	#38 is the magic slot
-	print "QS:",qs
+	print "Quick Slot:",qs
 	if ((qs==which) or (qs==38)) and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
-		GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
+		GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK, GA_NO_DEAD|GA_NO_SELF|GA_NO_HIDDEN)
 	else:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 		GemRB.SetEquippedQuickSlot (pc, which)

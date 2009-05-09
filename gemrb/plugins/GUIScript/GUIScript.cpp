@@ -2952,7 +2952,7 @@ PyDoc_STRVAR( GemRB_GameControlSetTargetMode__doc,
 static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* args)
 {
 	int Mode;
-	int Types = TARGET_TYPE_ALL;
+	int Types = GA_SELECT | GA_NO_DEAD | GA_NO_HIDDEN;
 
 	if (!PyArg_ParseTuple( args, "i|i", &Mode, &Types )) {
 		return AttributeError( GemRB_GameControlSetTargetMode__doc );
@@ -2963,8 +2963,10 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* a
 		return RuntimeError("Can't find GameControl!");
 	}
 
-	gc->target_mode = Mode;
-	gc->target_types = Types;
+	//target mode is only the low bits (which is a number)
+	gc->target_mode = Mode&GA_ACTION;
+	//target type is all the bits
+	gc->target_types = (Mode&GA_ACTION)|Types;
 
 	Py_INCREF( Py_None );
 	return Py_None;
