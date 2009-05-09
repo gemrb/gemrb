@@ -1498,6 +1498,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		//copy back the original stats, because the effects
 		//will be reapplied in ApplyAllEffects again
 		memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
+		//also clear the spell bonuses just given, they will be
+		//recalculated below again
+		spellbook.ClearBonus();
 	}
 
 	fxqueue.ApplyAllEffects( this );
