@@ -4282,7 +4282,13 @@ Actor *Actor::CopySelf() const
 	//copy the running effects
 	EffectQueue *newFXQueue = fxqueue.CopySelf();
 
+	area->AddActor(newActor);
+	newActor->Pos.x = Pos.x;
+	newActor->Pos.y = Pos.y;
+	newActor->Destination.x = Destination.x;
+	newActor->Destination.y = Destination.y;
+	newActor->SetOrientation(GetOrientation(),0);
 	//and apply them
-	newActor->RefreshEffects(newFXQueue);
+	newActor->RefreshEffects(newFXQueue);	
 	return newActor;
 }
