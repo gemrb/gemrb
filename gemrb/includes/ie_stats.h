@@ -414,7 +414,7 @@
 #define IE_NPCBUMP              190 // not entirely sure what is this
 #define IE_CANUSEANYITEM        191
 #define IE_ALWAYSBACKSTAB       192
-//193
+#define IE_SEX_CHANGED          193 // modified by opcode 0x47
 #define IE_SPELLFAILUREINNATE   194
 #define IE_NOTRACKING           195 // tracking doesn't detect this
 #define IE_DEADMAGIC            196
