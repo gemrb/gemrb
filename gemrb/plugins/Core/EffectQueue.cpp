@@ -346,7 +346,7 @@ Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, i
 	return CreateEffect(effect_reference.EffText, param1, param2, timing);
 }
 
-EffectQueue *EffectQueue::CopySelf()
+EffectQueue *EffectQueue::CopySelf() const
 {
 	EffectQueue *effects;
 

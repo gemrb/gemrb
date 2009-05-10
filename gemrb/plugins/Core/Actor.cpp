@@ -4264,3 +4264,25 @@ bool Actor::IsDualClassed() const
 {
 	return (Modified[IE_MC_FLAGS] & MC_WAS_ANY) > 0;
 }
+
+Actor *Actor::CopySelf() const
+{
+	Actor *newActor = new Actor();
+
+	newActor->SetText(GetName(0),0);
+	newActor->SetText(GetName(1),1);
+	memcpy(newActor->BaseStats, BaseStats, sizeof(BaseStats) );
+
+	//IF_INITIALIZED shouldn't be set here, yet
+	newActor->SetMCFlag(MC_EXPORTABLE, BM_NAND);
+
+	//the creature importer does this too
+	memcpy(newActor->Modified,newActor->BaseStats, sizeof(Modified) );
+
+	//copy the running effects
+	EffectQueue *newFXQueue = fxqueue.CopySelf();
+
+	//and apply them
+	newActor->RefreshEffects(newFXQueue);
+	return newActor;
+}

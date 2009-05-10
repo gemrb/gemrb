@@ -541,5 +541,7 @@ public:
 	bool IsMultiClassed() const;
 	/* Checks if the actor is dualclassed */
 	bool IsDualClassed() const;
+	/* Returns an exact copy of this actor */
+	Actor *CopySelf() const;
 };
 #endif

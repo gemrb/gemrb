@@ -172,7 +172,7 @@ public:
 	/** Sets Actor which is affected by these effects */
 	void SetOwner(Actor* act) { Owner = act; }
 	/** Returns Actor affected by these effects */
-	Actor* GetOwner() { return Owner; }
+	Actor* GetOwner() const { return Owner; }
 
 	/** adds an effect to the queue, it could also insert it if flagged so
 	 *  fx should be freed by the caller
@@ -219,7 +219,7 @@ public:
 	/* returns true if the effect should be saved */
 	static bool Persistent(Effect* fx);
 	/* returns next saved effect, increases index */
-	std::list< Effect* >::iterator GetFirstEffect()
+	std::list< Effect* >::const_iterator GetFirstEffect() const
 	{
 		return effects.begin();
 	}
@@ -233,7 +233,7 @@ public:
 	/* this method hacks the offhand weapon color effects */
 	static void HackColorEffects(Actor *Owner, Effect *fx);
 	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieDword timing);
-	EffectQueue *CopySelf();
+	EffectQueue *CopySelf() const;
 	static Effect *CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2);
 	//locating opcodes
 	Effect *HasEffect(EffectRef &effect_reference) const;

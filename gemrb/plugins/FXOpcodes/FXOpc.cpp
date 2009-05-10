@@ -73,6 +73,8 @@ static bool enhanced_effects = false;
 static int shcount = -1;
 static int *spell_abilities = NULL;
 static ieDword splabcount = 0;
+static int *polymorph_stats = NULL;
+static int polystatcount = 0;
 
 //the original engine stores the colors in sprklclr.2da in a different order
 
@@ -762,6 +764,10 @@ FXOpc::~FXOpc(void)
 {
 	core->FreeResRefTable(casting_glows, cgcount);
 	core->FreeResRefTable(spell_hits, shcount);
+	if(spell_abilities) free(spell_abilities);
+	spell_abilities=NULL;
+	if(polymorph_stats) free(polymorph_stats);
+	polymorph_stats=NULL;
 }
 
 static inline void SetGradient(Actor *target, ieDword gradient)
@@ -2259,6 +2265,10 @@ int fx_sex_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter2) {
 		value = fx->Parameter1;
 	} else {
+		if (STAT_GET(IE_SEX_CHANGED)) {
+			return FX_NOT_APPLIED;
+		}
+		STAT_SET( IE_SEX_CHANGED, 1);
 		value = STAT_GET(IE_SEX);
 		if (value==SEX_MALE) {
 			value = SEX_FEMALE;
@@ -3332,11 +3342,66 @@ int fx_set_petrified_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x87 Polymorph
+static EffectRef fx_polymorph_ref={"Polymorph",NULL,-1};
+
+void CopyPolyMorphStats(Actor *source, Actor *target)
+{
+	int i;
+
+	if(!polymorph_stats) {
+		AutoTable tab("polystat");
+		if (!tab) {
+			spell_abilities = (int *) malloc(0);			
+			polystatcount=0;
+			return;
+		}
+		polystatcount = tab->GetRowCount();
+		spell_abilities=(int *) malloc(sizeof(int)*polystatcount);
+		for (i=0;i<polystatcount;i++) {
+			polymorph_stats[i]=core->TranslateStat(tab->QueryField(i,0));
+		}
+	}
+
+	//copy polymorphed stats
+	for(i=0;i<polystatcount;i++) {
+		target->Modified[polymorph_stats[i]]=source->Modified[polymorph_stats[i]];
+	}
+}
+
 int fx_polymorph (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_polymorph_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_SET( IE_POLYMORPHED, 1 );
+	if (!gamedata->Exists(fx->Resource,IE_CRE_CLASS_ID)) {
+		//kill all polymorph effects
+		target->fxqueue.RemoveAllEffectsWithParam(fx_polymorph_ref, fx->Parameter2);
+		//destroy the magic item slot
+		target->inventory.RemoveItem(target->inventory.GetMagicSlot() );
+		return FX_NOT_APPLIED;
+	}
+	
+	//FIXME:
+	//This pointer should be cached, or we are in deep trouble
+	Actor *newCreature = gamedata->GetCreature(fx->Resource,0);
+
+	//I don't know how could this happen, existance of the resource was already checked
+	if (!newCreature) {
+		return FX_NOT_APPLIED;
+	}
+
+	//TODO:
+	//copy the animation ID
+	
+	//copy all polymorphed stats
+	if(fx->Parameter2) {
+		STAT_SET( IE_POLYMORPHED, 1 );
+		//FIXME: of course, the first parameter should be the creature we copy
+		CopyPolyMorphStats(newCreature, target);
+	}
+
+	//FIXME:
+	//Be careful when this became a cached pointer
+	delete newCreature;
 	return FX_APPLIED;
 }
 
@@ -4771,11 +4836,38 @@ int fx_wing_buffet (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0xec ProjectImage
+
+static EffectRef fx_unsummon_creature_ref={"UnsummonCreature",NULL,-1};
+
 int fx_puppet_master (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
+	const char * resref = NULL;
+
 	if (0) printf( "fx_puppet_master (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET (IE_PUPPETMASTERTYPE, fx->Parameter1);
-	return FX_APPLIED;
+	Actor *copy = target->CopySelf();
+	switch(fx->Parameter2)
+	{
+	case 1:
+		resref = "MISLEAD";
+		break;
+	case 2:
+		resref = "PROJIMG";
+		break;
+	case 3:
+		resref = "SIMULACR";
+		break;
+	default:
+		resref = fx->Resource;
+		break;
+	}
+	//resref is always something, but we play safe
+	if (resref && resref[0]) {
+		core->ApplySpell(resref,copy,target,0);
+	}
+	Effect *newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
+	core->ApplyEffect(newfx, copy, target);
+	return FX_NOT_APPLIED;
 }
 
 // 0xed PuppetMarker
