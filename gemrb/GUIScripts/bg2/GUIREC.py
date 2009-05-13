@@ -421,6 +421,14 @@ def GetStatOverview (pc, LevelDiff=0):
 	stats.append ( (9462, GS (IE_TRAPS), '') )
 	stats.append ( (9463, GS (IE_PICKPOCKET), '') )
 	stats.append ( (9461, GS (IE_STEALTH), '') )
+	HatedRace = GS (IE_HATEDRACE)
+	if HatedRace:
+		HateTable = GemRB.LoadTableObject ("haterace")
+		Racist = HateTable.FindValue (1, HatedRace)
+		if Racist != -1:
+			HatedRace = HateTable.GetValue (Racist, 0)
+			stats.append ( (15982, GemRB.GetString (HatedRace), '') )
+
 	stats.append ( (34120, GS (IE_HIDEINSHADOWS), '') )
 	stats.append ( (34121, GS (IE_DETECTILLUSIONS), '') )
 	stats.append ( (34122, GS (IE_SETTRAPS), '') )
