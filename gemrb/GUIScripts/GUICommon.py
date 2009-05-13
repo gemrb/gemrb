@@ -102,7 +102,8 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 def SetupSpellLevels (pc, TableName, Type, Level):
 	Table=GemRB.LoadTableObject (TableName)
 	for i in range(Table.GetColumnCount ()):
-		value = Table.GetValue (Level, i)
+		# do a string lookup since some tables don't have entries for all levels
+		value = Table.GetValue (str(Level), str(i+1), 1)
 		# specialist mages get an extra spell if they already know that level
 		# FIXME: get a general routine to find specialists
 		school = GemRB.GetVar("MAGESCHOOL")
