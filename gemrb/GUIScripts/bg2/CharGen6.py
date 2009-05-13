@@ -75,23 +75,16 @@ def OnLoad():
 
 	# learn divine spells if appropriate
 	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
-	#change this to GetPlayerStat once IE_CLASS is directly stored
-	ClassTable = GemRB.LoadTableObject ("classes")
-	ClassIndex = GemRB.GetVar ("Class")-1
-	Class = ClassTable.GetValue (ClassIndex, 5)
-	MyChar = GemRB.GetVar ("Slot")
-	TableName = ClassSkillsTable.GetValue (Class, 1, 0)
+	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
+	TableName = ClassSkillsTable.GetValue (Class, 1, 0) # cleric spells
 
-	if TableName == "*":
-		# it isn't a cleric or paladin, so check for druids and rangers
+	if TableName == "*": # only druid spells or no spells at all
 		TableName = ClassSkillsTable.GetValue (Class, 0, 0)
 		ClassFlag = 0x4000
-	else:
-		ClassFlag = 0x8000
-	# check for cleric/rangers, who get access to all the spells
-	# possibly redundant block (see SPL bit 0x0020)
-	if TableName == "MXSPLPRS" and ClassSkillsTable.GetValue (Class, 0, 0) != "*":
+	elif ClassSkillsTable.GetValue (Class, 0, 0) != "*": # cleric and druid spells
 		ClassFlag = 0
+	else: # only cleric spells
+		ClassFlag = 0x8000
 
 	# nulify the memorizable spell counts
 	for type in [ "MXSPLPRS", "MXSPLPAL", "MXSPLRAN", "MXSPLDRU" ]:
@@ -100,9 +93,9 @@ def OnLoad():
 		UnsetupSpellLevels (MyChar, type, IE_SPELL_TYPE_WIZARD, 1)
 
 	if TableName != "*":
-		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
-		Learnable = GetLearnablePriestSpells( ClassFlag, GemRB.GetVar ("Alignment"), 1)
+		SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
+		Learnable = GetLearnablePriestSpells (ClassFlag, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT), 1)
 		for i in range(len(Learnable) ):
-			GemRB.LearnSpell (MyChar, Learnable[i], 0)
+			GemRB.LearnSpell (MyChar, Learnable[i], IE_SPELL_TYPE_PRIEST)
 
 	return
