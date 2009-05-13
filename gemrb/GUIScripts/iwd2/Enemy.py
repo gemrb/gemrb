@@ -22,7 +22,7 @@ def DisplayRaces():
 			Button.SetText(Val)
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
 			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,"RacePress")
-			Button.SetVarAssoc("HateRace",RaceTable.GetValue(i+TopIndex,1) )
+			Button.SetVarAssoc("HatedRace",RaceTable.GetValue(i+TopIndex,1) )
 	return
 
 def OnLoad():
@@ -71,7 +71,7 @@ def OnLoad():
 	return
 
 def RacePress():
-	Race = GemRB.GetVar("HateRace")
+	Race = GemRB.GetVar("HatedRace")
  	Row = RaceTable.FindValue(1, Race)
 	TextAreaControl.SetText(RaceTable.GetValue(Row, 2) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
@@ -80,7 +80,7 @@ def RacePress():
 def BackPress():
 	if RaceWindow:
 		RaceWindow.Unload()
-	GemRB.SetVar("HateRace",0)  #scrapping the race value
+	GemRB.SetVar("HatedRace",0)  #scrapping the race value
 	GemRB.SetNextScript("CharGen6")
 	return
 

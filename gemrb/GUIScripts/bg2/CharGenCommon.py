@@ -210,7 +210,7 @@ def DisplayOverview(step):
 
 			# racial enemy
 			info = ""
-			Race = GemRB.GetVar ("HateRace")
+			Race = GemRB.GetVar ("HatedRace")
 			if Race:
 				RaceTable = GemRB.LoadTableObject ("HATERACE")
 				Row = RaceTable.FindValue (1, Race)

@@ -42,7 +42,7 @@ def OnLoad():
 		GemRB.SetPlayerStat (MyChar, StatID, 0)
 
 	# nully other variables
-	GemRB.SetVar ("HateRace", 0)
+	GemRB.SetVar ("HatedRace", 0)
 
 	# save our previous stats:
 	# 	abilities
