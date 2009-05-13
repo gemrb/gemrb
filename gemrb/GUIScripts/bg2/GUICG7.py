@@ -247,6 +247,7 @@ def RandomPick (Range):
 			j=Range-1
 	return j
 
+# TODO: suggested spells are listed in splautop.2da
 def AutoPick (Range):
 	return j
 
