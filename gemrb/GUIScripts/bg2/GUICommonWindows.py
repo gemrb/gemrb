@@ -355,6 +355,8 @@ def ActionRightPressed ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Type = GemRB.GetVar ("Type")
+	#Type is a bitfield if there is no level given
+	#This is to make sure cleric/mages get all spells listed
 	Max = GemRB.GetMemorizedSpellsCount(pc, Type)
 	TopIndex += 10
 	if TopIndex > Max - 10:
@@ -362,7 +364,6 @@ def ActionRightPressed ():
 			TopIndex = Max-10
 		else:
 			TopIndex = 0
-
 	GemRB.SetVar ("TopIndex", TopIndex)
 	UpdateActionsWindow ()
 	return

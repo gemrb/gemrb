@@ -139,7 +139,8 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 			break;
 		}
 		Animation* a = af->GetCycle( c );
-		if (a && c!=Cycle) {
+		//if (a && c!=Cycle) {
+		if (a && Cycle>=Aim) {
 			a->MirrorAnimation();
 		}
 		a->gameAnimation = true;
