@@ -6520,6 +6520,41 @@ static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( actor->spellbook.RemoveSpell( ks ) );
 }
 
+PyDoc_STRVAR( GemRB_RemoveItem__doc,
+"RemoveItem(PartyID, Slot[, Count])=>bool\n\n"
+"Removes (or decreases the charges) of a specified item. Returns 1 on success." );
+
+static PyObject* GemRB_RemoveItem(PyObject * /*self*/, PyObject* args)
+{
+        int PartyID, Slot;
+	int Count = 0;
+
+        if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &Slot, &Count )) {
+                return AttributeError( GemRB_RemoveItem__doc );
+        }
+        Game *game = core->GetGame();
+        if (!game) {
+                return RuntimeError( "No game loaded!" );
+        }
+        Actor* actor = game->FindPC( PartyID );
+        if (!actor) {
+                return RuntimeError( "Actor not found!" );
+        }
+
+	int ok;
+
+	Slot = core->QuerySlot(Slot);
+	actor->inventory.UnEquipItem( Slot, false );
+	CREItem *si = actor->inventory.RemoveItem( Slot, Count );
+	if (si) {
+		ok = true;
+		delete si;
+	} else {
+		ok = false;
+	}
+        return PyInt_FromLong( ok );
+}
+
 PyDoc_STRVAR( GemRB_MemorizeSpell__doc,
 "MemorizeSpell(PartyID, SpellType, Level, Index)=>bool\n\n"
 "Memorizes specified known spell. Returns 1 on success." );
@@ -7173,7 +7208,11 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (SlotID==-1) {
+		//This is already a slot ID we need later
 		SlotID=actor->inventory.FindCandidateSlot(SLOT_INVENTORY,0);
+	} else {
+		//I believe we need this only here
+		SlotID = core->QuerySlot(SlotID);
 	}
 
 	if (SlotID==-1) {
@@ -7188,7 +7227,6 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	} else {
 		// Note: this forcefully gets rid of any item currently
 		// in the slot without properly unequipping it
-		SlotID = core->QuerySlot(SlotID);
 		actor->inventory.SetSlotItemRes( ItemResRef, SlotID, Charge0, Charge1, Charge2 );
 		actor->inventory.EquipItem(SlotID);
 		//EquipItem already called RefreshEffects
@@ -9098,6 +9136,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(QuitGame, METH_NOARGS),
 	METHOD(PlaySound, METH_VARARGS),
 	METHOD(PlayMovie, METH_VARARGS),
+	METHOD(RemoveItem, METH_VARARGS),
 	METHOD(RemoveSpell, METH_VARARGS),
 	METHOD(RestParty, METH_VARARGS),
 	METHOD(RevealArea, METH_VARARGS),
