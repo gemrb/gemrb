@@ -2518,6 +2518,14 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 	if (!spell) {
 		return LSR_INVALID; //not existent spell
 	}
+
+	if (flags & LS_STATS) {
+		// chance to learn roll
+		if (core->Roll(1,100,0) > core->GetIntelligenceBonus(0, GetStat(IE_INT))) {
+			return LSR_FAILED;
+		}
+	}
+
 	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO);
 	int tmp = spell->SpellNameIdentified;
 	if (flags&LS_LEARN) {
