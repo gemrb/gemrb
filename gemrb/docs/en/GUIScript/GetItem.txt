@@ -18,7 +18,7 @@ The fields of the dictionary are the following:
   0 - no special function
   1 - item is a copyable scroll (2. header's 1. feature is 'Learn spell')
   2 - item is a drinkable potion 
-"SpellLevel"          - the spell's level if the item is a copyable scroll
+"Spell"              - the spell's strref if the item is a copyable scroll
 
 See also: GetSpell, SetItemIcon
 
