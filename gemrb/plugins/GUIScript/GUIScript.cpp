@@ -6459,6 +6459,7 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "SpellDivine", PyInt_FromLong (spell->PriestType)); //this will tell apart a priest spell from a druid spell
 	PyDict_SetItemString(dict, "SpellSchool", PyInt_FromLong (spell->PrimaryType));
 	PyDict_SetItemString(dict, "SpellType", PyInt_FromLong (spell->SecondaryType));
+	PyDict_SetItemString(dict, "SpellLevel", PyInt_FromLong (spell->SpellLevel));
 	gamedata->FreeSpell( spell, ResRef, false );
 	return dict;
 }

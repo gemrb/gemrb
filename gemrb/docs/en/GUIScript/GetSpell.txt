@@ -14,6 +14,7 @@ The fields of the dictionary are the following:
 "SpellDivine"         - this field tells divine magics apart
 "SpellSchool"         - the spell's school (primary type)
 "SpellType"           - the type of text that appears on spell dispelling
+"SpellLevel"          - the spell's level
 
 See also: GetItem, SetSpellIcon, spell structure
 
