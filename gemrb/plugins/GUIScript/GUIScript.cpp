@@ -6818,6 +6818,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		//maybe further checks for school exclusion?
 		//no, those were done by CanUseItemType
 		function|=CAN_READ;
+		PyDict_SetItemString(dict, "Spell", PyString_FromResRef (f->Resource));
 	}
 not_a_scroll:
 	if (core->CanUseItemType(SLOT_BAG, item, NULL, false) ) {
