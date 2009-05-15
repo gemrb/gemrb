@@ -2023,8 +2023,12 @@ void GameScript::RemoveTraps(Scriptable* Sender, Action* parameters)
 		break;
 	case ST_PROXIMITY:
 		trigger = (InfoPoint *) tar;
+		// this point is incorrect! will cause actor to enter trap
+		// need to find a point using trigger->outline
+		p = &trigger->Pos;
+		otherp = p;	
 		distance = Distance(tar, Sender);
-		flags = trigger->Trapped && trigger->TrapDetected;
+		flags = trigger->Trapped && trigger->TrapDetected && trigger->CanDetectTrap();
 		break;
 	default:
 		Sender->ReleaseCurrentAction();
