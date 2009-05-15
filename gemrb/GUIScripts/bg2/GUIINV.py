@@ -30,7 +30,8 @@ from GUISTORE import *
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
-from GUICommon import CloseOtherWindow, SetColorStat, GameIsTOB
+from ie_spells import *
+from GUICommon import CloseOtherWindow, SetColorStat, GameIsTOB, HasSpell
 from GUICommonWindows import *
 
 InventoryWindow = None
@@ -40,6 +41,7 @@ StackAmount = 0
 ItemIdentifyWindow = None
 PortraitWindow = None
 OptionsWindow = None
+ErrorWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
 OverSlot = None
@@ -670,14 +672,57 @@ def DrinkItemWindow ():
 	CloseItemInfoWindow ()
 	return
 
+def OpenErrorWindow (strref):
+	global ErrorWindow
+	pc = GemRB.GameGetSelectedPCSingle ()
+
+	ErrorWindow = Window = GemRB.LoadWindowObject (7)
+	Button = Window.GetControl (0)
+	Button.SetText (11973)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseErrorWindow")
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	TextArea = Window.GetControl (3)
+	TextArea.SetText (strref)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def CloseErrorWindow ():
+	if ErrorWindow:
+		ErrorWindow.Unload ()
+	UpdateInventoryWindow ()
+	return
+
 def ReadItemWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
-	# the learn scroll header is always the second
-	# 5 is TARGET_SELF, because some scrolls are buggy
-	GemRB.UseItem (pc, slot, 1, 5)
+	ret = 0
+
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
+	spell = GemRB.GetSpell (spell_ref)
+	if spell:
+		# can we learn more spells of this level?
+		spell_count = GemRB.GetKnownSpellsCount (pc, IE_SPELL_TYPE_WIZARD, spell['SpellLevel']-1)
+		if spell_count > GemRB.GetAbilityBonus (IE_INT, 2, GemRB.GetPlayerStat (pc, IE_INT)):
+			ret = LSR_FULL
+			strref = 32097
+		else:
+			if GemRB.LearnSpell (pc, spell_ref, LS_STATS|LS_ADDXP):
+				ret = LSR_FAILED
+				strref = 10831 # failure
+			else:
+				strref = 10830 # success
+			GemRB.RemoveItem (pc, slot)
+	else:
+		print "WARNING: invalid spell header in item", slot_item['ItemResRef']
+		CloseItemInfoWindow ()
+		return -1
+	
 	CloseItemInfoWindow ()
-	return
+	OpenErrorWindow (strref)
+	
+	return ret
 
 def OpenItemWindow ():
 	#close inventory
@@ -828,7 +873,7 @@ def DisplayItem (itemresref, type):
 	if drink:
 		Button.SetText (19392)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DrinkItemWindow")
-	elif read:
+	elif read and not CannotLearnSlotSpell ():
 		Button.SetText (17104)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ReadItemWindow")
 	elif container:
@@ -850,6 +895,28 @@ def DisplayItem (itemresref, type):
 
 	ItemInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
+
+def CannotLearnSlotSpell ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	
+	# disqualify sorcerors immediately
+	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
+		return LSR_STAT
+	
+	slot_item = GemRB.GetSlotItem (pc, GemRB.GetVar ("ItemButton"))
+	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
+	spell = GemRB.GetSpell (spell_ref)
+
+	# maybe she already knows this spell
+	if HasSpell (pc, IE_SPELL_TYPE_WIZARD, spell['SpellLevel']-1, spell_ref) != -1:
+		return LSR_KNOWN
+
+	# level check (needs enough intelligence for this level of spell)
+	dumbness = GemRB.GetPlayerStat (pc, IE_INT)
+	if spell['SpellLevel'] > GemRB.GetAbilityBonus (IE_INT, 1, dumbness):
+		return LSR_LEVEL
+	
+	return 0
 
 def OpenItemInfoWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
