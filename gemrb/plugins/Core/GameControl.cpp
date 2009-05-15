@@ -1440,6 +1440,12 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 		//don't bother with this region further
 		return true;
 	}
+	if ((target_mode == TARGET_MODE_PICK)) {
+		TryToDisarm(actor, trap);
+		target_mode = TARGET_MODE_NONE;
+		return true;
+	}
+
 	switch(trap->Type) {
 		case ST_TRAVEL:
 			trap->Flags|=TRAP_RESET;
