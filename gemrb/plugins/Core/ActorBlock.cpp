@@ -1684,6 +1684,9 @@ bool InfoPoint::TriggerTrap(int skill, ieDword ID)
 		if (!Trapped) {
 			Flags|=TRAP_DEACTIVATED;
 		}
+		// ok, so this is a pain. Entered() trigger checks Trapped,
+		// so it needs to be kept set. how to do this right?
+		Trapped = true;
 		return true;
 	}
 	return false;
