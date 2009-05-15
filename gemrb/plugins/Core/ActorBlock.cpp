@@ -1676,10 +1676,17 @@ bool InfoPoint::TriggerTrap(int skill, ieDword ID)
 	if (Flags&TRAP_DEACTIVATED) {
 		return false;
 	}
-	if (Highlightable::TriggerTrap(skill, ID) && !Trapped) {
-		Flags|=TRAP_DEACTIVATED;
+	if (!Trapped) {
+		// we have to set Entered somewhere, here seems best..
+		LastEntered = ID;
+		return true;
+	} else if (Highlightable::TriggerTrap(skill, ID)) {
+		if (!Trapped) {
+			Flags|=TRAP_DEACTIVATED;
+		}
+		return true;
 	}
-	return true;
+	return false;
 }
 
 bool InfoPoint::Entered(Actor *actor)
