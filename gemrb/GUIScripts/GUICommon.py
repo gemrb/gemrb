@@ -163,3 +163,14 @@ def SetGamedaysAndHourToken ():
 	hours = (currentTime % 7200) / 300
 	GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
+
+# Returns -1 if not found; otherwise, the index of the spell
+def HasSpell (Actor, SpellType, Level, Ref):
+	# loop through each spell in the spell level and check for a matching ref
+	for i in range (GemRB.GetKnownSpellsCount (Actor, SpellType, Level)):
+		Spell = GemRB.GetKnownSpell(Actor, SpellType, Level, i)
+		if Spell["SpellResRef"].upper() == Ref.upper(): # ensure case is the same
+			return i
+
+	# not found
+	return -1
