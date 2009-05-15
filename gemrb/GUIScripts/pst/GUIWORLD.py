@@ -28,6 +28,7 @@ import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
 from GUICommonWindows import EnableAnimatedWindows, DisableAnimatedWindows, SetEncumbranceButton, SetItemButton, OpenWaitForDiscWindow
+from GUIClasses import GWindow
 
 ContainerWindow = None
 FormationWindow = None
@@ -37,21 +38,21 @@ Container = None
 
 def CloseContinueWindow ():
 	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
-	Window = GemRB.GetVar ("MessageWindow")
+	Window = GWindow(GemRB.GetVar ("MessageWindow"))
 	Button = Window.GetControl (0)
 	Button.SetText(28082)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 
 
 def OpenEndMessageWindow ():
-	Window = GemRB.GetVar ("MessageWindow")
+	Window = GWindow(GemRB.GetVar ("MessageWindow"))
 	Button = Window.GetControl (0)
 	Button.SetText (34602)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 
 
 def OpenContinueMessageWindow ():
-	Window = GemRB.GetVar ("MessageWindow")
+	Window = GWindow(GemRB.GetVar ("MessageWindow"))
 	Button = Window.GetControl (0)
 	Button.SetText (34603)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
