@@ -286,7 +286,10 @@ def GetStatColor (pc, stat):
 		return (255,255,0)
 	return (0,255,0)
 
-def GetStatOverview (pc, LevelDiff=0):
+# LevelDiff is used only from the level up code and holds the level
+# difference for each class
+def GetStatOverview (pc, LevelDiff=[0,0,0]):
+	print "Function GUIREC.GetStatOverview:"
 	StateTable = GemRB.LoadTableObject ("statdesc")
 	str_None = GemRB.GetString (61560)
 
@@ -299,104 +302,105 @@ def GetStatOverview (pc, LevelDiff=0):
 	# Experience: <EXPERIENCE>
 	# Next Level: <NEXTLEVEL>
 
-	#collecting tokens for stat overview
+	# collecting tokens for stat overview
 	ClassTitle = GetActorClassTitle (pc)
+	KitTable = GemRB.LoadTableObject ("kitlist")
 	GemRB.SetToken("CLASS", ClassTitle)
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassTable = GemRB.LoadTableObject ("classes")
 	Class = ClassTable.FindValue (5, Class)
-	Multi = ClassTable.GetValue (Class, 4)
 	Class = ClassTable.GetRowName (Class)
 	Dual = IsDualClassed (pc, 1)
-	if Multi:
-		# TODO: handle LevelDiff for true mc chars
+	Multi = IsMultiClassed (pc, 1)
+	XP = GemRB.GetPlayerStat (pc, IE_XP)
+
+	if Multi[0] > 1: # we're multiclassed
+		print "\tMulticlassed"
 		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), GemRB.GetPlayerStat (pc, IE_LEVEL2), GemRB.GetPlayerStat (pc, IE_LEVEL3)]
-		Classes = [0,0,0]
-		MultiCount = 0
-		Mask = 1
-		for i in range (1,16):
-			if Multi&Mask:
-				Classes[MultiCount] = ClassTable.FindValue (5, i)
-				MultiCount += 1
-			Mask = 1 << i
 
-		if Dual[0] > 0: # dual classed; first show the new class
-			stats.append ( (19722,1,'c') )
-			stats.append (None)
-			
-			# the levels are stored in the class order (eg. FIGHTER_MAGE)
-			# the current active class does not matter!
-			if Classes[0] == Dual[1]:
-				Levels = [Levels[1], Levels[0], Levels[2]]
-
-			Levels[0] += LevelDiff
-
-			ClassTitle = GemRB.GetString(ClassTable.GetValue (Dual[2], 2))
+		stats.append ( (19721,1,'c') )
+		stats.append (None)
+		for i in range (Multi[0]):
+			ClassIndex = ClassTable.FindValue (5, Multi[i+1])
+			ClassTitle = GemRB.GetString(ClassTable.GetValue (ClassIndex, 2))
 			GemRB.SetToken("CLASS", ClassTitle)
-			GemRB.SetToken("LEVEL", str (Levels[0]))
-			Class = ClassTable.GetRowName (Dual[2])
-			GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Levels[0], Class) )
-
-			XP2 = GemRB.GetPlayerStat (pc, IE_XP)
-			GemRB.SetToken("EXPERIENCE", str (XP2) )
-
+			Class = ClassTable.GetRowName (ClassIndex)
+			GemRB.SetToken("LEVEL", str (Levels[i]+LevelDiff[i]) )
+			GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Levels[i]+LevelDiff[i], Class) )
+			GemRB.SetToken("EXPERIENCE", str (XP/Multi[0]) )
+			#resolve string immediately
 			stats.append ( (GemRB.GetString(16480),"",'d') )
 			stats.append (None)
+			print "\t\tClass (Level):",Class,"(",Levels[i],")"
 
-			# the first class (shown second)
-			if Dual[0] == 1:
-				ClassTitle = GemRB.GetString(KitTable.GetValue (Dual[1], 2))
-			elif Dual[0] == 2:
-				ClassTitle = GemRB.GetString(ClassTable.GetValue (Dual[1], 2))
-			GemRB.SetToken("CLASS", ClassTitle)
-			GemRB.SetToken("LEVEL", str (Levels[1]) )
-
-			# the xp table contains only classes
-			XPTable = GemRB.LoadTableObject ("xplevel")
-			if Dual[0] == 2:
-				XP1 = XPTable.GetRowName (Dual[1])
-			else:
-				KitTable = GemRB.LoadTableObject ("kitlist")
-				BaseClass = GetKitIndex (pc)
-				BaseClass = KitTable.GetValue (BaseClass, 7)
-				BaseClass = ClassTable.GetRowName (BaseClass)
-				XP1 = XPTable.GetRowName (BaseClass)
-			# the first class' XP is discarded and set to the minimum level 
-			# requirement, so if you don't dual class right after a levelup, 
-			# the game would eat some of your XP
-			XP1 = XPTable.GetValue (XP1, str(Levels[1]))
-			GemRB.SetToken("EXPERIENCE", str (XP1) )
-
-			if Levels[0] < Levels[1]:
-				# inactive
-				stats.append ( (19719,1,'c') )
-			else:
-				stats.append ( (19720,1,'c') )
-			stats.append (None)
-		else: # multi classed
-			stats.append ( (19721,1,'c') )
-			stats.append (None)
-			for i in range (MultiCount):
-				Class = Classes[i]
-				ClassTitle = GemRB.GetString(ClassTable.GetValue (Class, 2))
-				GemRB.SetToken("CLASS", ClassTitle)
-				Class = ClassTable.GetRowName (i)
-				GemRB.SetToken("LEVEL", str (Levels[i]) )
-				GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Levels[i], Class) )
-				GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP)/MultiCount ) )
-				#resolve string immediately
-				stats.append ( (GemRB.GetString(16480),"",'d') )
-				stats.append (None)
-
-	else: # single classed
-		Level = GemRB.GetPlayerStat (pc, IE_LEVEL) + LevelDiff
-		GemRB.SetToken("LEVEL", str (Level) )
-		GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
-		GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
-		stats.append ( (16480,1,'c') )
+	elif Dual[0] > 0: # dual classed; first show the new class
+		print "\tDual classed"
+		stats.append ( (19722,1,'c') )
 		stats.append (None)
 
-	if not LevelDiff:
+		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), GemRB.GetPlayerStat (pc, IE_LEVEL2), GemRB.GetPlayerStat (pc, IE_LEVEL3)]
+
+		# the levels are stored in the class order (eg. FIGHTER_MAGE)
+		# the current active class does not matter!
+		if IsDualSwap (pc):
+			Levels = [Levels[1], Levels[0], Levels[2]]
+
+		Levels[0] += LevelDiff[0]
+
+		ClassTitle = GemRB.GetString(ClassTable.GetValue (Dual[2], 2))
+		GemRB.SetToken("CLASS", ClassTitle)
+		GemRB.SetToken("LEVEL", str (Levels[0]))
+		Class = ClassTable.GetRowName (Dual[2])
+		GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Levels[0], Class) )
+
+		XP2 = GemRB.GetPlayerStat (pc, IE_XP)
+		GemRB.SetToken("EXPERIENCE", str (XP2) )
+
+		stats.append ( (GemRB.GetString(16480),"",'d') )
+		stats.append (None)
+
+		# the first class (shown second)
+		if Dual[0] == 1:
+			ClassTitle = GemRB.GetString(KitTable.GetValue (Dual[1], 2))
+		elif Dual[0] == 2:
+			ClassTitle = GemRB.GetString(ClassTable.GetValue (Dual[1], 2))
+		GemRB.SetToken("CLASS", ClassTitle)
+		GemRB.SetToken("LEVEL", str (Levels[1]) )
+
+		# the xp table contains only classes
+		XPTable = GemRB.LoadTableObject ("xplevel")
+		if Dual[0] == 2:
+			BaseClass = ClassTable.GetRowName (Dual[1])
+		else:
+			BaseClass = GetKitIndex (pc)
+			BaseClass = KitTable.GetValue (BaseClass, 7)
+			BaseClass = ClassTable.FindValue (5, BaseClass)
+			BaseClass = ClassTable.GetRowName (BaseClass)
+		# the first class' XP is discarded and set to the minimum level 
+		# requirement, so if you don't dual class right after a levelup, 
+		# the game would eat some of your XP
+		XP1 = XPTable.GetValue (BaseClass, str(Levels[1]))
+		GemRB.SetToken("EXPERIENCE", str (XP1) )
+
+		# inactive until the new class SURPASSES the former
+		if Levels[0] <= Levels[1]:
+			# inactive
+			stats.append ( (19719,1,'c') )
+		else:
+			stats.append ( (19720,1,'c') )
+		stats.append (None)
+	else: # single classed
+		print "\tSingle classed"
+		Level = GemRB.GetPlayerStat (pc, IE_LEVEL) + LevelDiff[0]
+		GemRB.SetToken("LEVEL", str (Level))
+		GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
+		GemRB.SetToken("EXPERIENCE", str (XP) )
+		stats.append ( (16480,1,'c') )
+		stats.append (None)
+		print "\t\tClass (Level):",Class,"(",Level,")"
+
+	# check to see if we have a level diff anywhere
+	if sum(LevelDiff) > 0:
 		effects = GemRB.GetPlayerStates (pc)
 		if len(effects):
 			for c in effects:
@@ -597,7 +601,8 @@ def OpenInformationWindow ():
 	global InformationWindow
 
 	if InformationWindow != None:
-		if BiographyWindow: OpenBiographyWindow ()
+		if BiographyWindow:
+			OpenBiographyWindow ()
 
 		if InformationWindow:
 			InformationWindow.Unload ()
@@ -798,48 +803,38 @@ def ExportEditChanged():
 		ExportDoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
+# returns boolean - true if can level
 def CanLevelUp(actor):
+	# get our class and placements for Multi'd and Dual'd characters
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassTable = GemRB.LoadTable ("classes")
-	Class = GemRB.FindTableValue (ClassTable, 5, Class)
-	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
-	MultiCount = 0
-	Class = GemRB.GetTableRowName (ClassTable, Class)
-	Dual = IsDualClassed (actor,1)
+	ClassTable = GemRB.LoadTableObject ("classes")
+	Class = ClassTable.FindValue (5, Class)
+	Class = ClassTable.GetRowName (Class)
+	Multi = IsMultiClassed (actor, 1)
+	Dual = IsDualClassed (actor, 1)
 
-	if Multi:
-		Levels = [GemRB.GetPlayerStat (actor, IE_LEVEL), GemRB.GetPlayerStat (actor, IE_LEVEL2), GemRB.GetPlayerStat (actor, IE_LEVEL3)]
-		Classes = [0,0,-1]
-		Mask = 1
-		for i in range (1,16):
-			if Multi&Mask:
-				Classes[MultiCount] = GemRB.FindTableValue (ClassTable, 5, i)
-				MultiCount += 1
-			Mask = 1 << i
+	# get all the levels and overall xp here
+	Levels = [GemRB.GetPlayerStat (actor, IE_LEVEL), GemRB.GetPlayerStat (actor, IE_LEVEL2), GemRB.GetPlayerStat (actor, IE_LEVEL3)]
+	xp = GemRB.GetPlayerStat (actor, IE_XP)
 
-		if Dual[0] > 0:
-			xp = GemRB.GetPlayerStat (actor, IE_XP)
-			if Classes[0] == Dual[1]:
-				Levels = [Levels[1], Levels[0], Levels[2]]
-			Level = Levels[0]
-			Class = GemRB.GetTableRowName (ClassTable, Dual[2])
-		else:
-			xp = GemRB.GetPlayerStat (actor, IE_XP)/MultiCount
-			# check each class of the multiple - can their xp differ?
-			j = 0
-			for i in Classes:
-				if  i == -1:
-					continue
-				if int(GetNextLevelExp (Levels[j], GemRB.GetTableRowName (ClassTable, i))) < xp:
-					return 1
-				j += 1
-			return 0
-	else:
-		xp = GemRB.GetPlayerStat (actor, IE_XP)
-		Level = GemRB.GetPlayerStat (actor, IE_LEVEL)
+	if Multi[0] > 1: # multiclassed
+		xp = xp/Multi[0] # divide the xp evenly between the classes
+		for i in range (Multi[0]):
+			# if any class can level, return 1
+			ClassIndex = ClassTable.FindValue (5, Multi[i+1])
+			if int(GetNextLevelExp (Levels[i], ClassTable.GetRowName (ClassIndex))) <= xp:
+				return 1
+
+		# didn't find a class that could level
+		return 0
+	elif Dual[0] > 0: # dual classed
+		if IsDualSwap (actor): # swap the levels if we have to
+			Levels = [Levels[1], Levels[0], Levels[2]]
+		# get the class we can level
+		Class = ClassTable.GetRowName (Dual[2])
 	
-	return int(GetNextLevelExp (Level, Class)) < xp
-
+	# check the class that can be level (single or dual)
+	return int(GetNextLevelExp (Levels[0], Class)) <= xp
 
 def CanDualClass(actor):
 	# human
