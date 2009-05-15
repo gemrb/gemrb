@@ -888,3 +888,80 @@ def IsDualClassed(actor, verbose):
 			return (1,-1,-1)
 		else:
 			return (0,-1,-1)
+
+# Determines if the dualclassed actor has the two base classes in reverse order.
+# This happens since dualclassed actors are treated as multiclassed and there
+# are only so many valid multiclasses. 
+# Example: diviner/fighter maps to FIGHTER_MAGE instead of MAGE_FIGHTER
+def IsDualSwap (actor):
+	Dual = IsDualClassed (actor, 1)
+
+	# not dual classed
+	if Dual[0] == 0:
+		return 0
+
+	# split the full class name into its individual parts
+	# i.e FIGHTER_MAGE becomes [FIGHTER, MAGE]
+	ClassTable = GemRB.LoadTableObject ("classes")
+	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+	Class = ClassTable.FindValue (5, Class)
+	Class = ClassTable.GetRowName (Class)
+	Class = Class.split("_")
+
+	# get our old class name
+	if Dual[0] == 2:
+		BaseClass = ClassTable.GetRowName (Dual[1])
+	else:
+		KitList = GemRB.LoadTableObject ("kitlist")
+		BaseClass = GetKitIndex (actor)
+		BaseClass = KitList.GetValue (BaseClass, 7)
+		BaseClass = ClassTable.FindValue (5, BaseClass)
+		BaseClass = ClassTable.GetRowName (BaseClass)
+
+	# if our old class is the first class, we need to swap
+	if Class[0] == BaseClass:
+		return 1
+
+	return 0
+
+##
+#
+# Determines if an actor is multiclassed and returns the individual classes.
+# @param actor The character reference.
+# @param verbose If 0 simply returns 0 if not multi.
+# @return A tuple - (IsMultiClassed, Class1, Class2, Class3).
+def IsMultiClassed (actor, verbose):
+	# get our base class
+	ClassTable = GemRB.LoadTableObject ("classes")
+	ClassIndex = ClassTable.FindValue (5, GemRB.GetPlayerStat (actor, IE_CLASS))
+	IsMulti = ClassTable.GetValue (ClassIndex, 4) # 0 if not multi'd
+	IsDual = IsDualClassed (actor, 0)
+
+	# dual-class char's look like multi-class chars
+	if (IsMulti == 0) or (IsDual[0] > 0):
+		return (0,-1,-1,-1)
+	elif verbose == 0:
+		return (IsMulti,-1,-1,-1)
+
+	# get all our classes (leave space for our number of classes in the return array)
+	Classes = [0]*4
+	NumClasses = 0
+	Mask = 1 # we're looking at multiples of 2
+
+	# loop through each class and test it as a mask
+	# TODO: make 16 dynamic? -- allows for custom classes (not just kits)
+	for i in range (1, 16):
+		if IsMulti&Mask: # it's part of this class
+			NumClasses = NumClasses+1
+			Classes[NumClasses] = i # mask is (i-1)^2 where i is class id
+		Mask = 1 << i # shift to the next multiple of 2 for testing
+
+	# in case we couldn't figure out to which classes the multi belonged
+	if NumClasses < 2:
+		return (0,-1,-1,-1)
+	
+	# save our number of classes (2 or 3) and make sure we return a tuple
+	Classes[0] = NumClasses
+	Classes = (Classes[0], Classes[1], Classes[2], Classes[3])
+
+	return Classes
