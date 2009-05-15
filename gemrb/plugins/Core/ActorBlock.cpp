@@ -1438,7 +1438,11 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 	}
 	if (Open) {
 		LastEntered = ID; //used as lastOpener
-		SetDoorLocked(FALSE,playsound);
+
+		// in PS:T, opening a door does not unlock it
+		if (!core->HasFeature(GF_REVERSE_DOOR)) {
+			SetDoorLocked(FALSE,playsound);
+		}
 	} else {
 		LastTrigger = ID; //used as lastCloser
 	}

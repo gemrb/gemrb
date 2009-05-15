@@ -2167,8 +2167,8 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 				return; //don't open door
 			}
 
-			//remove the key
-			if (door->Flags&DOOR_KEY) {
+			// remove the key (but not in PS:T!)
+			if (!core->HasFeature(GF_REVERSE_DOOR) && door->Flags&DOOR_KEY) {
 				CREItem *item = NULL;
 				actor->inventory.RemoveItem(Key,0,&item);
 				//the item should always be existing!!!
