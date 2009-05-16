@@ -374,6 +374,13 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	unsigned int idx;
 	for (idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
 		i->Highlight = false;
+		if (overInfoPoint == i && target_mode) {
+			if (i->VisibleTrap(0)) {
+				i->outlineColor = green;
+				i->Highlight = true;
+				continue;
+			}
+		}
 		if (i->VisibleTrap(DebugFlags & DEBUG_SHOW_INFOPOINTS)) {
 			i->outlineColor = red; // traps
 		} else if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
@@ -920,6 +927,10 @@ int GameControl::GetCursorOverInfoPoint(InfoPoint *overInfoPoint)
 		}
 
 		return IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
+	}
+	// traps always display a walk cursor?
+	if (overInfoPoint->Type == ST_PROXIMITY) {
+		return IE_CURSOR_WALK;
 	}
 	return overInfoPoint->Cursor;
 }
