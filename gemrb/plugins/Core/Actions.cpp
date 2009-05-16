@@ -4524,7 +4524,7 @@ void GameScript::Attack( Scriptable* Sender, Action* parameters)
 	Scriptable* tar;
 	tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 
-	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
+	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) || tar == Sender) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
