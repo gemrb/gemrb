@@ -2294,7 +2294,7 @@ void GameControl::DialogChoose(unsigned int choose)
 			for (unsigned int i = 0; i < tr->action->count; i++) {
 				Action* action = GenerateAction( tr->action->strings[i]);
 				if (action) {
-					target->AddAction( action );
+					GameScript::ExecuteAction( target, action );
 				} else {
 					snprintf(Tmp, sizeof(Tmp),
 						"Can't compile action: %s\n",
@@ -2311,11 +2311,11 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 
 		// moved immediate execution of dialog actions here
-		if (DialogueFlags & DF_FREEZE_SCRIPTS) {
+		/*if (DialogueFlags & DF_FREEZE_SCRIPTS) {
 			target->ProcessActions(true);
 			//clear queued actions that remained stacked?
 			target->ClearActions();
-		}
+		}*/
 
 		//displaying dialog for selected option
 		int si = tr->stateIndex;
