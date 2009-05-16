@@ -2294,7 +2294,14 @@ void GameControl::DialogChoose(unsigned int choose)
 			for (unsigned int i = 0; i < tr->action->count; i++) {
 				Action* action = GenerateAction( tr->action->strings[i]);
 				if (action) {
-					GameScript::ExecuteAction( target, action );
+					// execute actions immediately if we're
+					// in the middle of a dialog (at the
+					// end there are complications, might
+					// try to initiate a new dialog)
+					if (tr->Flags & IE_DLG_TR_FINAL)
+						target->AddAction( action );
+					else
+						GameScript::ExecuteAction( target, action );
 				} else {
 					snprintf(Tmp, sizeof(Tmp),
 						"Can't compile action: %s\n",
