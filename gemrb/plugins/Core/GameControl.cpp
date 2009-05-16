@@ -2146,7 +2146,6 @@ void GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgre
 	if (tgt->Type==ST_ACTOR) {
 		Actor *tar = (Actor *) tgt;
 		tar->DialogInterrupt();
-		tar->ClearActions();
 	}
 
 	//allow mouse selection from dialog (even though screen is locked)
