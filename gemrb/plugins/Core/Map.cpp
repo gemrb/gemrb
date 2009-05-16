@@ -633,47 +633,51 @@ void Map::UpdateScripts()
 		if (!ip->Scripts[0] && ( ip->Type != ST_TRAVEL )) {
 			continue;
 		}
-		//it was turned off
-		if (ip->Flags&TRAP_DEACTIVATED) {
-			continue;
-		}
+		bool wasActive = !(ip->Flags&TRAP_DEACTIVATED);
+		
 		//If this InfoPoint is a Switch Trigger
 		if (ip->Type == ST_TRIGGER) {
 			//Check if this InfoPoint was activated
 			if (ip->LastTrigger) {
-				//Run the InfoPoint script
-				ip->ExecuteScript( 1 );
+				if (wasActive) {
+					//Run the InfoPoint script
+					ip->ExecuteScript( 1 );
+				}
 				//Execute Pending Actions
 				ip->ProcessActions(false);
 			}
 			continue;
 		}
 
-		q=Qcount[PR_SCRIPT];
-		while (q--) {
-			Actor* actor = queue[PR_SCRIPT][q];
-			if (ip->Type == ST_PROXIMITY) {
-				if(ip->Entered(actor)) {
-					//if trap triggered, then mark actor
-					actor->SetInTrap(ipCount);
-				}
-			} else {
-				//ST_TRAVEL
-				//don't move if doing something else
-				if (actor->GetNextAction())
-					continue;
-				//this is needed, otherwise the travel
-				//trigger would be activated anytime
-				if (!(ip->Flags&TRAP_RESET))
-					continue;
-				if (ip->Entered(actor)) {
-					UseExit(actor, ip);
+		if (wasActive) {
+			q=Qcount[PR_SCRIPT];
+			while (q--) {
+				Actor* actor = queue[PR_SCRIPT][q];
+				if (ip->Type == ST_PROXIMITY) {
+					if(ip->Entered(actor)) {
+						//if trap triggered, then mark actor
+						actor->SetInTrap(ipCount);
+					}
+				} else {
+					//ST_TRAVEL
+					//don't move if doing something else
+					if (actor->GetNextAction())
+						continue;
+					//this is needed, otherwise the travel
+					//trigger would be activated anytime
+					if (!(ip->Flags&TRAP_RESET))
+						continue;
+					if (ip->Entered(actor)) {
+						UseExit(actor, ip);
+					}
 				}
 			}
 		}
 
 		if (ip->Type==ST_PROXIMITY) {
-			ip->ExecuteScript( 1 );
+			if (wasActive) {
+				ip->ExecuteScript( 1 );
+			}
 			//Execute Pending Actions
 			ip->ProcessActions(false);
 		}
