@@ -53,7 +53,7 @@ def OnLoad():
 	# save the kit
 	KitList = GemRB.LoadTableObject ("kitlist")
 	KitIndex = GemRB.GetVar ("Class Kit")
-	KitValue = (0x4000 + KitIndex)<<16
+	KitValue = (0x4000 + KitIndex)
 	KitName = KitList.GetValue (KitIndex, 0)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 
