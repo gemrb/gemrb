@@ -944,7 +944,7 @@ def IsMultiClassed (actor, verbose):
 		return (IsMulti,-1,-1,-1)
 
 	# get all our classes (leave space for our number of classes in the return array)
-	Classes = [0]*4
+	Classes = [0]*3
 	NumClasses = 0
 	Mask = 1 # we're looking at multiples of 2
 
@@ -952,16 +952,13 @@ def IsMultiClassed (actor, verbose):
 	# TODO: make 16 dynamic? -- allows for custom classes (not just kits)
 	for i in range (1, 16):
 		if IsMulti&Mask: # it's part of this class
-			NumClasses = NumClasses+1
 			Classes[NumClasses] = i # mask is (i-1)^2 where i is class id
+			NumClasses = NumClasses+1
 		Mask = 1 << i # shift to the next multiple of 2 for testing
 
 	# in case we couldn't figure out to which classes the multi belonged
 	if NumClasses < 2:
 		return (0,-1,-1,-1)
-	
-	# save our number of classes (2 or 3) and make sure we return a tuple
-	Classes[0] = NumClasses
-	Classes = (Classes[0], Classes[1], Classes[2], Classes[3])
 
-	return Classes
+	# return the tuple
+	return (NumClasses, Classes[0], Classes[1], Classes[2]) 
