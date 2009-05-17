@@ -1405,7 +1405,7 @@ void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 	if (Sender->Type==ST_ACTOR) {
 		DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE);
 	} else {
-		DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD);
+		DisplayStringCore( target, parameters->int0Parameter, DS_AREA);
 	}
 }
 

@@ -355,6 +355,15 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 			Sender->DisplayHeadText( sb.text );
 			//don't free sb.text, it is residing in Sender
 		} else {
+			if (flags&DS_AREA) {
+				GameControl *gc = core->GetGameControl();
+				if (gc) {
+					Point p;
+
+					GetPositionFromScriptable(Sender,p,0);
+					gc->DisplayString(p, sb.text);
+				}
+			}
 			core->FreeString( sb.text );
 		}
 	}
