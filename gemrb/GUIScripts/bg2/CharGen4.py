@@ -20,6 +20,7 @@
 # character generation - classes+kits; next alignment/reputation(CharGen4.py)
 import GemRB
 from CharGenCommon import *
+from GUICommon import AddClassAbilities
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
@@ -90,18 +91,3 @@ def OnLoad():
 	DisplayOverview (4)
 
 	return
-
-def AddClassAbilities (MyChar, TmpTable):
-	TmpTable = GemRB.LoadTableObject (TmpTable)
-
-	for i in range(TmpTable.GetRowCount()):
-		ab = TmpTable.GetValue (i, 0) # only add level 1 abilities
-		if ab != "****":
-			# apply spell (AP_) or gain spell (GA_)
-			if ab[:2] == "AP":
-				GemRB.ApplySpell (MyChar, ab[3:])
-			elif ab[:2] == "GA":
-				GemRB.LearnSpell (MyChar, ab[3:], 8)
-				# TODO: fix memorization when the spell is already known
-			else:
-				print "ERROR, unknown class ability (type): ", ab

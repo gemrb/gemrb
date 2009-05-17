@@ -58,6 +58,7 @@ def FinishCharGen():
 	AlignmentTable = GemRB.LoadTableObject ("aligns")
 
 	# apply starting (alignment dictated) abilities
+	# TODO: simplify this by using AddClassAbilities from GUICommon (spurious name)
 	TmpTable = GemRB.LoadTableObject ("abstart")
 	AlignmentAbbrev = AlignmentTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
 	AlignmentAbbrev = AlignmentTable.GetValue (AlignmentAbbrev, 4)

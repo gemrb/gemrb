@@ -22,6 +22,7 @@
 
 import GemRB
 from ie_restype import *
+from ie_spells import LS_MEMO
 from GUIDefines import *
 
 OtherWindowFn = None
@@ -174,3 +175,24 @@ def HasSpell (Actor, SpellType, Level, Ref):
 
 	# not found
 	return -1
+
+# Adds class/kit abilities
+def AddClassAbilities (pc, TmpTable, Level=1, LevelDiff=1):
+	TmpTable = GemRB.LoadTableObject (TmpTable)
+
+	for i in range(TmpTable.GetRowCount()):
+		# apply each spell from each new class
+		for j in range (Level-LevelDiff, Level):
+			ab = TmpTable.GetValue (i, j)
+			if ab != "****":
+				# apply spell (AP_) or gain spell (GA_)
+				if ab[:2] == "AP":
+					GemRB.ApplySpell (pc, ab[3:])
+				elif ab[:2] == "GA":
+					SpellIndex = HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
+					if SpellIndex < 0: # don't know it yet
+						GemRB.LearnSpell (pc, ab[3:], LS_MEMO)
+					else: # memorize another one
+						GemRB.MemorizeSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
+				else:
+					print "ERROR, unknown class ability (type): ", ab

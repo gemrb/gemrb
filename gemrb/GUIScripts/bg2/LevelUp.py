@@ -22,8 +22,9 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import GameIsTOB
+from GUICommon import GameIsTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities
 from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GetKitIndex
+from GUICommonWindows import IsDualClassed, IsMultiClassed, IsDualSwap
 
 LevelUpWindow = None
 TopIndex = 0
