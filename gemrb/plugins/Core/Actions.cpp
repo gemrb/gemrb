@@ -1395,14 +1395,18 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 	FreeSrc(rndstr, parameters->string0Parameter);
 }
 
-//apparently this should not display over head
+//apparently this should not display over head (for actors)
 void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1]);
 	if (!target) {
 		target=Sender;
 	}
-	DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE);
+	if (Sender->Type==ST_ACTOR) {
+		DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE);
+	} else {
+		DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD);
+	}
 }
 
 //DisplayStringHead, but wait for previous talk to succeed
