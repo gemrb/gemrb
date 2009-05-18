@@ -290,6 +290,8 @@ IE_DIALOGRANGE                  = 178 # distance for dialogue
 IE_STONESKINSGOLEM		= 199
 IE_LEVELDRAIN			= 200
 IE_AVATARREMOVAL                = 201
+
+IE_DISABLEDBUTTON		= 204
 # GemRB Specific Defines
 IE_ANIMATION_ID			= 205
 IE_STATE_ID			= 206

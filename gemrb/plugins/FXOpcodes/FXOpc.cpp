@@ -3551,10 +3551,23 @@ int fx_create_item_in_slot (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x90 DisableButton
-int fx_disable_button (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+// different in iwd2 and the rest (maybe also in how: 0-7?)
+int fx_disable_button (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_disable_button (%2d): Button: %d\n", fx->Opcode, fx->Parameter2 );
-	//
+
+	// iwd2 has a flexible action bar, so there are more possible parameter values
+	// only values 0-5 match the bg2 constants (which map to ACT_*)
+	// FIXME: support disabling all iwd2 buttons
+	if (target->spellbook.IsIWDSpellBook()) {
+		if (fx->Parameter2 < 6) STAT_BIT_OR( IE_DISABLEDBUTTON, 1<<fx->Parameter2 );
+	} else {
+		STAT_BIT_OR( IE_DISABLEDBUTTON, 1<<fx->Parameter2 );
+	}
+
+	if (target->InParty && fx->FirstApply) {
+		core->SetEventFlag(EF_ACTION);
+	}
 	return FX_APPLIED;
 }
 
