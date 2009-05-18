@@ -1,12 +1,14 @@
-GemRB svn (r5913):
+GemRB svn (r5999):
   New features:
-    - party reordering
+    -
+    - level up support in bg2
+    - basic party reordering
     - bashing of containers and doors
+    - persistent area effects (cloudkill, stinking cloud, web, etc.)
     - item amount window for stack splitting (shift+click or doubleclick)
     - depletion of item charges
-    - start of level up support in bg2
-    - disable spellcasting opcode, pocketplane travel in ToB
-    - knock spell
+    - opcodes: disable spellcasting, cutscene2 (pocketplane travel), knock,
+      clear air, polymorph, disable button
     - trap setting
     - dynamic scrollbar creation (enables the display of more than 10 kits)
 
@@ -14,12 +16,16 @@ GemRB svn (r5913):
     - fog of war
     - party reformation
     - iwd and how guiscripts have been merged
+    - traps
+    - pst dialogs
     - regeneration, hp bonuses, healing
     - animations and projectiles
     - various guiscripts
     - bugfixes
 
   Applied patches:
+    #2770564 Whiteclone (pst options window bug)
+    numerous patches from mattinm extending the level up support
 
 GemRB V0.3.2 (2009-02-16):
   New features:
