@@ -11,6 +11,7 @@ RowCount = 0
 ClickCount = 0
 OldDirection = 0
 OldPos = 0
+AvailableSkillIndices = []
 
 def RedrawSkills(direction):
 	global TopIndex, OldDirection, ClickCount
@@ -22,7 +23,21 @@ def RedrawSkills(direction):
 	SumLabel.SetText(str(PointsLeft) )
 
 	for i in range(4):
-		Pos=TopIndex+i
+		if len(AvailableSkillIndices) <= i:
+			Label = SkillWindow.GetControl (0x10000001+i)
+			Label.SetText ("")
+			Button1 = SkillWindow.GetControl(i*2+11)
+			Button1.SetState(IE_GUI_BUTTON_DISABLED)
+			Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+			Button2 = SkillWindow.GetControl(i*2+12)
+			Button2.SetState(IE_GUI_BUTTON_DISABLED)
+			Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+			Label = SkillWindow.GetControl(0x10000006+i)
+			Label.SetText("")
+			continue
+
+		Pos = AvailableSkillIndices[TopIndex+i]
+
 		SkillName = SkillTable.GetValue(Pos+2,1)
 		Label = SkillWindow.GetControl(0x10000006+i)
 		Label.SetText(SkillName)
@@ -31,7 +46,7 @@ def RedrawSkills(direction):
 		Ok=SkillTable.GetValue(SkillName, KitName)
 		Button1 = SkillWindow.GetControl(i*2+11)
 		Button2 = SkillWindow.GetControl(i*2+12)
-		if Ok == 0:
+		if Ok == -1:
 			Button1.SetState(IE_GUI_BUTTON_DISABLED)
 			Button2.SetState(IE_GUI_BUTTON_DISABLED)
 			Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
@@ -67,7 +82,7 @@ def ScrollBarPress():
 
 def OnLoad():
 	global SkillWindow, TextAreaControl, DoneButton, TopIndex
-	global SkillTable, PointsLeft, KitName, RowCount
+	global SkillTable, PointsLeft, KitName, RowCount, AvailableSkillIndices
 	
 	SkillTable = GemRB.LoadTableObject("skills")
 	RowCount = SkillTable.GetRowCount()-2
@@ -88,10 +103,18 @@ def OnLoad():
 		KitList = GemRB.LoadTableObject("kitlist")
 		KitName = KitList.GetValue(Kit, 0) #rowname is just a number
 
+	# setup the indices/count of usable skills
+	AvailableSkillIndices = []
+	for i in range(SkillTable.GetRowCount()-2):
+		SkillName = SkillTable.GetRowName (i+2)
+		if SkillTable.GetValue (SkillName, KitName) != -1:
+			AvailableSkillIndices.append(i)
+	print "TZTZUTU", AvailableSkillIndices, KitName
 	SkillRacTable = GemRB.LoadTableObject("SKILLRAC")
 	RaceTable = GemRB.LoadTableObject("RACES")
 	RaceName = RaceTable.GetRowName(GemRB.GetVar("Race")-1)
 
+	# TODO: also save the values in another set of vars, so we can prevent skill redistribution
 	Ok=0
 	for i in range(RowCount):
 		SkillName = SkillTable.GetRowName(i+2)
@@ -117,24 +140,31 @@ def OnLoad():
 	SkillTable = GemRB.LoadTableObject("skills")
 	SkillWindow = GemRB.LoadWindowObject(6)
 
-	GemRB.SetVar("TopIndex", 0)
-	ScrollBarControl = SkillWindow.GetControl(26)
-	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
-	#decrease it with the number of controls on screen (list size)
-	ScrollBarControl.SetVarAssoc("TopIndex", RowCount-3)
-	ScrollBarControl.SetDefaultScrollBar ()
+	if len(AvailableSkillIndices) > 4:
+		GemRB.SetVar("TopIndex", 0)
+		ScrollBarControl = SkillWindow.GetControl(26)
+		ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
+		#decrease it with the number of controls on screen (list size)
+		ScrollBarControl.SetVarAssoc("TopIndex", RowCount-3)
+		ScrollBarControl.SetDefaultScrollBar ()
+	else:
+		if len(AvailableSkillIndices):
+			# autoscroll to the first valid skill; luckily all three monk ones are adjacent
+			GemRB.SetVar("TopIndex", AvailableSkillIndices[0])
 
-	for i in range(4):
+	for i in range(len(AvailableSkillIndices)):
+		if i == 4:
+				break
 		Button = SkillWindow.GetControl(i+21)
-		Button.SetVarAssoc("Skill",i)
+		Button.SetVarAssoc("Skill",AvailableSkillIndices[i])
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "JustPress")
 
 		Button = SkillWindow.GetControl(i*2+11)
-		Button.SetVarAssoc("Skill",i)
+		Button.SetVarAssoc("Skill",AvailableSkillIndices[i])
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
 
 		Button = SkillWindow.GetControl(i*2+12)
-		Button.SetVarAssoc("Skill",i)
+		Button.SetVarAssoc("Skill",AvailableSkillIndices[i])
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "RightPress")
 
 	BackButton = SkillWindow.GetControl(25)

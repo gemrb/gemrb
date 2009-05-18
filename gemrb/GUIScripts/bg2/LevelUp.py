@@ -57,6 +57,7 @@ pc = 0
 ClassSkillsTable = 0
 ClassName = 0
 RaceTable = 0
+AvailableSkillIndices = []
 
 # old values (so we don't add too much)
 OldHP = 0		# << old current hitpoints
@@ -71,9 +72,6 @@ NewWSpells = [0]*9	# << new wizard spells per level
 DeltaDSpells = 0	# << total new divine spells
 DeltaWSpells = 0	# << total new wizard spells
 
-# TODO: multiclass support
-# EDIT: added multiclass and dualclass support
-#	needs extensive testing
 def OpenLevelUpWindow():
 	global LevelUpWindow, TextAreaControl, ProfPointsLeft, NewProfPoints
 	global TopIndex, ScrollBarControl, DoneButton, WeapProfTable, ProfColumn
@@ -81,6 +79,7 @@ def OpenLevelUpWindow():
 	global ClassTable, Level, Classes, NumClasses, DualSwap, ClassSkillsTable, IsMulti
 	global OldHP, OldHPMax, OldSaves, OldLore, OldThaco, DeltaDSpells, DeltaWSpells
 	global NewDSpells, NewWSpells, OldDSpells, OldWSpells, pc, HLACount, ClassName, IsDual
+	global AvailableSkillIndices
 
 	LevelUpWindow = GemRB.LoadWindowObject (3)
 
@@ -218,7 +217,6 @@ def OpenLevelUpWindow():
 	for i in range(NumClasses):
 		print "Class:",Classes[i]
 		# we don't care about the current level, but about the to-be-achieved one
-		# FIXME: get the correct xp/level for MC and DC chars
 		# TODO: check MC (should be working) and DC (iffy) functionality
 		# get the next level
 		Level[i] = GetNextLevelFromExp (GemRB.GetPlayerStat (pc, IE_XP)/NumClasses, Classes[i])
@@ -335,21 +333,28 @@ def OpenLevelUpWindow():
 	ProfPointsLeft = LevelDiff[FastestProf]/FastestRate
 	NewProfPoints = ProfPointsLeft
 
+	# setup the indices/count of usable skills
+	AvailableSkillIndices = []
+	for i in range(SkillTable.GetRowCount()-2):
+		SkillName = SkillTable.GetRowName (i+2)
+		if SkillTable.GetValue (SkillName, KitName) != -1:
+			AvailableSkillIndices.append(i)
+
 	# see if we got a thief (or monk)
 	if SkillIndex > -1:
 		# KitName should be fine as all multis are in classes.2da
 		# also allows for thief kits
-		# TODO: add monks to clskills.2da
 		SkillPointsLeft = LevelDiff[SkillIndex] * SkillTable.GetValue("RATE", KitName)
 		if SkillPointsLeft < 0:
 			# really don't have an entry
 			SkillPointsLeft = 0
 		else:
 			# get the skill values
-			# TODO: show skillbrd, skillrng, skilldex? monks (same as rangers?)?!
+			# TODO: get upgrades from clskills -> skill{brd,rng} (add rangers to clskills)
+			# TODO: also save the values in another set of vars, so we can prevent skill redistribution
 			for i in range(SkillTable.GetRowCount()-2):
-				SkillName = SkillTable.GetValue (i+2, 2)
-				SkillValue = GemRB.GetPlayerStat (pc, SkillName, 1)
+				SkillID = SkillTable.GetValue (i+2, 2)
+				SkillValue = GemRB.GetPlayerStat (pc, SkillID, 1)
 				GemRB.SetVar("Skill "+str(i), SkillValue)
 
 	NewSkillPoints = SkillPointsLeft
@@ -411,11 +416,16 @@ def OpenLevelUpWindow():
 	ScrollBarControl.SetVarAssoc ("TopIndex", ProfCount)
 
 	# skills scrollbar
-	GemRB.SetVar ("SkillTopIndex", 0)
-	ScrollBarControl = LevelUpWindow.GetControl (109)
-	ScrollBarControl.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "SkillScrollBarPress")
-	# decrease it with the number of controls on screen (list size) and two unrelated rows
-	ScrollBarControl.SetVarAssoc ("SkillTopIndex", SkillTable.GetRowCount()-3-2)
+	if len(AvailableSkillIndices) > 4:
+		GemRB.SetVar ("SkillTopIndex", 0)
+		ScrollBarControl = LevelUpWindow.GetControl (109)
+		ScrollBarControl.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "SkillScrollBarPress")
+		# decrease it with the number of controls on screen (list size) and two unrelated rows
+		ScrollBarControl.SetVarAssoc ("SkillTopIndex", SkillTable.GetRowCount()-3-2)
+	else:
+		if len(AvailableSkillIndices):
+			# autoscroll to the first valid skill; luckily all three monk ones are adjacent
+			GemRB.SetVar ("SkillTopIndex", AvailableSkillIndices[0])
 
 	for i in range(7):
 		Button=LevelUpWindow.GetControl(i+112)
@@ -433,17 +443,19 @@ def OpenLevelUpWindow():
 		for j in range(5):
 			Star=LevelUpWindow.GetControl(i*5+j+48)
 
-	for i in range(4):
+	for i in range(len(AvailableSkillIndices)):
+		if i == 4:
+			break
 		Button = LevelUpWindow.GetControl(i+120)
-		Button.SetVarAssoc("Skill",i)
+		Button.SetVarAssoc("Skill",AvailableSkillIndices[i])
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SkillJustPress")
 
 		Button = LevelUpWindow.GetControl(i*2+17)
-		Button.SetVarAssoc("Skill",i)
+		Button.SetVarAssoc("Skill",AvailableSkillIndices[i])
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SkillLeftPress")
 
 		Button = LevelUpWindow.GetControl(i*2+18)
-		Button.SetVarAssoc("Skill",i)
+		Button.SetVarAssoc("Skill",AvailableSkillIndices[i])
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SkillRightPress")
 
 	TextAreaControl = LevelUpWindow.GetControl(110)
@@ -458,9 +470,23 @@ def OpenLevelUpWindow():
 	if (Classes[0] == 19) and (DeltaWSpells > 0): # open our sorc spell selection window
 		OpenSpellsWindow (pc, "SPLSRCKN", Level[0], LevelDiff[0])
 
+def HideSkills(i):
+	global LevelUpWindow
+
+	Label = LevelUpWindow.GetControl (0x10000000+32+i)
+	Label.SetText ("")
+	Button1 = LevelUpWindow.GetControl(i*2+17)
+	Button1.SetState(IE_GUI_BUTTON_DISABLED)
+	Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+	Button2 = LevelUpWindow.GetControl(i*2+18)
+	Button2.SetState(IE_GUI_BUTTON_DISABLED)
+	Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+	Label = LevelUpWindow.GetControl(0x10000000+43+i)
+	Label.SetText("")
+
 def RedrawSkills(First=0, direction=0):
 	global TopIndex, ScrollBarControl, DoneButton, LevelUpWindow, ProfPointsLeft
-	global SkillPointsLeft, SkillTable, NewSkillPoints
+	global SkillPointsLeft, SkillTable, NewSkillPoints, AvailableSkillIndices
 	global ClickCount, OldDirection, HLACount
 
 	# we need to disable the HLA button if we don't have any HLAs left
@@ -480,29 +506,23 @@ def RedrawSkills(First=0, direction=0):
 	if NewSkillPoints == 0:
 		SkillSumLabel.SetText("")
 		for i in range(4):
-			Label = LevelUpWindow.GetControl (0x10000000+32+i)
-			Label.SetText ("")
-			Button1 = LevelUpWindow.GetControl(i*2+17)
-			Button1.SetState(IE_GUI_BUTTON_DISABLED)
-			Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			Button2 = LevelUpWindow.GetControl(i*2+18)
-			Button2.SetState(IE_GUI_BUTTON_DISABLED)
-			Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			Label = LevelUpWindow.GetControl(0x10000000+43+i)
-			Label.SetText("")
+			HideSkills(i)
 	else:
 		SkillSumLabel.SetText(str(SkillPointsLeft))
 		for i in range(4):
-			Pos = SkillTopIndex + i
+			if len(AvailableSkillIndices) <= i:
+				HideSkills(i)
+				continue
+			Pos = AvailableSkillIndices[SkillTopIndex+i]
 			SkillName = SkillTable.GetValue (Pos+2, 1)
 			Label = LevelUpWindow.GetControl (0x10000000+32+i)
 			Label.SetText (SkillName)
-	
+
 			SkillName = SkillTable.GetRowName (Pos+2)
 			Ok = SkillTable.GetValue (SkillName, KitName)
 			Button1 = LevelUpWindow.GetControl(i*2+17)
 			Button2 = LevelUpWindow.GetControl(i*2+18)
-			if Ok == 0:
+			if Ok == -1:
 				Button1.SetState(IE_GUI_BUTTON_DISABLED)
 				Button2.SetState(IE_GUI_BUTTON_DISABLED)
 				Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)

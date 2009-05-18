@@ -1,12 +1,12 @@
-2DA V1.0
+2DA	V1.0
 -1
-                DESC_REF   CAP_REF  ID   THIEF	MAGE_THIEF	FIGHTER_THIEF	CLERIC_THIEF	FIGHTER_MAGE_THIEF	ASSASIN		BOUNTY_HUNTER	SWASHBUCKLER
-FIRST_LEVEL	*	   *	    *    40     40              40              40              40			15		20		40
-RATE		*	   *	    *    40	40		40		40		40			15		20		40
-PICK_POCKETS    9597       9463     29   1	1		1		1		1			1		1		1
-OPEN_LOCKS      9598       9460     26   1	1		1		1		1			1		1		1
-FIND_TRAPS      9599       9462     28   1	1		1		1		1			1		1		1
-MOVE_SILENTLY   9600       9461     27   1	1		1		1		1			1		1		1
-HIDE_IN_SHADOWS 9601       34120    135  1	1		1		1		1			1		1		1
-DETECT_ILLUSION 34123      34121    136  1	1		1		1		1			1		1		1
-SET_TRAPS       34124      34122    137  1	1		1		1		1			1		1		1
+				DESC_REF	CAP_REF	ID	THIEF	MAGE_THIEF	FIGHTER_THIEF	CLERIC_THIEF	FIGHTER_MAGE_THIEF	ASSASIN		BOUNTY_HUNTER	SWASHBUCKLER	MONK
+FIRST_LEVEL		*			*		*	40		40			40				40				40					15			20				40				10
+RATE			*			*		*	40		40			40				40				40					15			20				40				10
+PICK_POCKETS	9597		9463	29	1		1			1				1				1					1			1				1				-1
+OPEN_LOCKS		9598		9460	26	1		1			1				1				1					1			1				1				-1
+FIND_TRAPS		9599		9462	28	1		1			1				1				1					1			1				1				1
+MOVE_SILENTLY	9600		9461	27	1		1			1				1				1					1			1				1				1
+HIDE_IN_SHADOWS	9601		34120	135	1		1			1				1				1					1			1				1				1
+DETECT_ILLUSION	34123		34121	136	1		1			1				1				1					1			1				1				-1
+SET_TRAPS		34124		34122	137	1		1			1				1				1					1			1				1				-1

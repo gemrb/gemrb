@@ -164,7 +164,6 @@ def DisplayOverview(step):
 			Class = GemRB.GetVar ("Class") - 1
 			ClassID = ClassTable.GetValue (Class, 5)
 			Class = ClassTable.FindValue (5, ClassID)
-			# TODO: what about monks and any others not in skills.2da?
 			# TODO also before: skill{rng,brd}.2da <-- add rangers to clskills.2da
 			KitName = GetKitIndex (MyChar)
 			if KitName == 0:
@@ -174,10 +173,10 @@ def DisplayOverview(step):
 
 			if SkillTable.GetValue ("RATE", KitName) != -1:
 				for skill in range(SkillTable.GetRowCount () - 2):
-					name = SkillTable.GetValue (skill+2, 1)
-					name = GemRB.GetString (name)
+					name = GemRB.GetString (SkillTable.GetValue (skill+2, 1))
+					available = SkillTable.GetValue (SkillTable.GetRowName (skill+2), KitName)
 					value = GemRB.GetVar ("Skill " + str(skill))
-					if value >= 0:
+					if value >= 0 and available != -1:
 						info += name + ": " + str(value) + "\n"
 			if info != "":
 				info = "\n" + info + "\n"
