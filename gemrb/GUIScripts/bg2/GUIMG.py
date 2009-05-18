@@ -27,7 +27,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow
+from GUICommon import CloseOtherWindow, GameIsTOB
 from GUICommonWindows import *
 
 MageWindow = None
@@ -235,16 +235,19 @@ def OpenMageSpellInfoWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellInfoWindow")
 
 	#erase
-	Button = Window.GetControl (6)
 	index = GemRB.GetVar ("SpellButton")
+	if GameIsTOB():
+		Button = Window.GetControl (6)
+		if index < 100:
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		else:
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellRemoveWindow")
+			Button.SetText (63668)
 	if index < 100:
 		ResRef = MageMemorizedSpellList[index]
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	else:
 		ResRef = MageKnownSpellList[index - 100]
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellRemoveWindow")
-		Button.SetText (63668)
 
 	spell = GemRB.GetSpell (ResRef)
 
