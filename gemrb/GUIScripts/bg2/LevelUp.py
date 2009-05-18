@@ -351,11 +351,11 @@ def OpenLevelUpWindow():
 		else:
 			# get the skill values
 			# TODO: get upgrades from clskills -> skill{brd,rng} (add rangers to clskills)
-			# TODO: also save the values in another set of vars, so we can prevent skill redistribution
 			for i in range(SkillTable.GetRowCount()-2):
 				SkillID = SkillTable.GetValue (i+2, 2)
 				SkillValue = GemRB.GetPlayerStat (pc, SkillID, 1)
 				GemRB.SetVar("Skill "+str(i), SkillValue)
+				GemRB.SetVar("SkillBase "+str(i), SkillValue)
 
 	NewSkillPoints = SkillPointsLeft
 
@@ -863,7 +863,8 @@ def SkillRightPress():
 	Pos = GemRB.GetVar("Skill")+SkillTopIndex
 	TextAreaControl.SetText(SkillTable.GetValue(Pos+2,0) )
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
-	if ActPoint <= 0:
+	BasePoint = GemRB.GetVar("SkillBase "+str(Pos) )
+	if ActPoint <= 0 or ActPoint == BasePoint:
 		return
 	GemRB.SetVar("Skill "+str(Pos),ActPoint-1)
 	SkillPointsLeft = SkillPointsLeft + 1

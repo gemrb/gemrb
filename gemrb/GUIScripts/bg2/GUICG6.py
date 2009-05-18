@@ -109,18 +109,18 @@ def OnLoad():
 		SkillName = SkillTable.GetRowName (i+2)
 		if SkillTable.GetValue (SkillName, KitName) != -1:
 			AvailableSkillIndices.append(i)
-	print "TZTZUTU", AvailableSkillIndices, KitName
+
 	SkillRacTable = GemRB.LoadTableObject("SKILLRAC")
 	RaceTable = GemRB.LoadTableObject("RACES")
 	RaceName = RaceTable.GetRowName(GemRB.GetVar("Race")-1)
 
-	# TODO: also save the values in another set of vars, so we can prevent skill redistribution
 	Ok=0
 	for i in range(RowCount):
 		SkillName = SkillTable.GetRowName(i+2)
 		if SkillTable.GetValue(SkillName, KitName)==1:
 			b=SkillRacTable.GetValue(RaceName, SkillName)
 			GemRB.SetVar("Skill "+str(i),b)
+			GemRB.SetVar("SkillBase "+str(i), b)
 			Ok=1
 		else:
 			GemRB.SetVar("Skill "+str(i),0)
@@ -198,7 +198,8 @@ def RightPress():
 	Pos = GemRB.GetVar("Skill")+TopIndex
 	TextAreaControl.SetText(SkillTable.GetValue(Pos+2,0) )
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
-	if ActPoint <= 0:
+	BasePoint = GemRB.GetVar("SkillBase "+str(Pos) )
+	if ActPoint <= 0 or ActPoint == BasePoint:
 		return
 	GemRB.SetVar("Skill "+str(Pos),ActPoint-1)
 	PointsLeft = PointsLeft + 1
