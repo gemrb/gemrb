@@ -170,7 +170,7 @@ def FinishCharGen():
 		if CharGenWindow:
 			CharGenWindow.Unload ()
 		#when export is done, go to start
-		if GameIsTOB():
+		if HasTOB():
 			GemRB.SetToken ("NextScript","Start2")
 		else:
 			GemRB.SetToken ("NextScript","Start")

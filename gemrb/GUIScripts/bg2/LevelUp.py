@@ -22,6 +22,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+from ie_restype import RES_2DA
 from GUICommon import GameIsTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities
 from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GetKitIndex
 from GUICommonWindows import IsDualClassed, IsMultiClassed, IsDualSwap
@@ -289,7 +290,7 @@ def OpenLevelUpWindow():
 				NewDSpells[j] = ClericTable.GetValue (str(Level[i]), str(j+1), 1)
 				OldDSpells[j] = ClericTable.GetValue (str(StartLevel), str(j+1), 1)
 			DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
-		elif DruidTable != "*" and GameIsTOB (): # FIXME: how are druids going to update their spells in SoA then?
+		elif DruidTable != "*" and GemRB.HasResource (DruidTable, RES_2DA):
 			# clerics have precedence in multis (ranger/cleric)
 			if HaveCleric == 0:
 				# check druid spells

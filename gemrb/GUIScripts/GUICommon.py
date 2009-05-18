@@ -147,6 +147,9 @@ def CheckStat20 (Actor, Stat, Diff):
 	return False
 
 def GameIsTOB ():
+	return GemRB.HasResource ("worldm25", RES_WMP) and GemRB.GetVar("oldgame") == 0
+
+def HasTOB ():
 	return GemRB.HasResource ("worldm25", RES_WMP)
 
 def GameIsHOW ():

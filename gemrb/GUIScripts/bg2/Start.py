@@ -1,6 +1,6 @@
 #ToB start window, precedes the SoA window
 import GemRB
-from GUICommon import GameIsTOB
+from GUICommon import HasTOB
 
 StartWindow = 0
 
@@ -23,7 +23,7 @@ def OnLoad():
 		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
 
 	#if not detected tob, we go right to the main menu
-	if not GameIsTOB():
+	if not HasTOB():
 		GemRB.SetMasterScript("BALDUR","WORLDMAP")
 		GemRB.SetVar("oldgame",1)
 		GemRB.SetNextScript("Start2")

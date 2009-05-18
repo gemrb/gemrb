@@ -27,7 +27,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow, GameIsTOB
+from GUICommon import CloseOtherWindow, HasTOB
 from GUICommonWindows import *
 
 MageWindow = None
@@ -236,7 +236,7 @@ def OpenMageSpellInfoWindow ():
 
 	#erase
 	index = GemRB.GetVar ("SpellButton")
-	if GameIsTOB():
+	if HasTOB():
 		Button = Window.GetControl (6)
 		if index < 100:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")

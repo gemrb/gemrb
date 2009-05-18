@@ -27,7 +27,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow, GameIsTOB
+from GUICommon import CloseOtherWindow
 from GUICommonWindows import *
 from GUIWORLD import OpenReformPartyWindow
 
