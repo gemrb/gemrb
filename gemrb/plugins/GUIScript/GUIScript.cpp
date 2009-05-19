@@ -1708,6 +1708,7 @@ static PyObject* GemRB_ShowModal(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
+	core->PlaySound(DS_WINDOW_OPEN);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -1893,6 +1894,7 @@ static PyObject* GemRB_UnloadWindow(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Can't unload window!" );
 	}
 
+	core->PlaySound(DS_WINDOW_CLOSE);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
