@@ -2406,7 +2406,7 @@ def CharSoundSelect():
 	CharSoundPlayButton = CharSoundWindow.GetControl (47)
 	CharSoundPlayButton.SetState (IE_GUI_BUTTON_ENABLED)
 	CharSoundPlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CharSoundPlayPress")
-	CharSoundPlayButton.SetText ("play")
+	CharSoundPlayButton.SetText (17318)
 
 	CharSoundTextArea = CharSoundWindow.GetControl (50)
 	CharSoundTextArea.SetText (11315)
