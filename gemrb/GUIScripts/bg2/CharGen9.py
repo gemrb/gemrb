@@ -97,7 +97,11 @@ def FinishCharGen():
 
 	# save the name and starting xp (can level right away in game)
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
-	GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (Class, 3)) # character can level in game
+	if GameIsTOB():
+		GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (ClassName, "STARTXP2"))
+	else:
+		GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (ClassName, "STARTXP"))
+	
 
 	# does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
