@@ -36,6 +36,7 @@ InformationWindow = None
 BiographyWindow = None
 PortraitWindow = None
 OptionsWindow = None
+CustomizeWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
 
@@ -101,7 +102,7 @@ def OpenRecordsWindow ():
 	# customize
 	Button = Window.GetControl (50)
 	Button.SetText (10645)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomizeWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenCustomizeWindow")
 
 	# export
 	Button = Window.GetControl (36)
@@ -704,6 +705,57 @@ def ExportEditChanged():
 		ExportDoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
+def OpenCustomizeWindow ():
+	global CustomizeWindow
+
+	CustomizeWindow = GemRB.LoadWindowObject (17)
+
+	AppearanceButton = CustomizeWindow.GetControl (0)
+	AppearanceButton.SetText (11961)
+
+	SoundButton = CustomizeWindow.GetControl (1)
+	SoundButton.SetText (10647)
+
+	ColorButton = CustomizeWindow.GetControl (2)
+	ColorButton.SetText (10646)
+
+	ScriptButton = CustomizeWindow.GetControl (3)
+	ScriptButton.SetText (17111)
+
+	BiographyButton = CustomizeWindow.GetControl (9)
+	BiographyButton.SetText (18003)
+
+	TextArea = CustomizeWindow.GetControl (5)
+	TextArea.SetText (11327)
+
+	CustomizeDoneButton = CustomizeWindow.GetControl (7)
+	CustomizeDoneButton.SetText (11973)
+	CustomizeDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+
+	CancelButton = CustomizeWindow.GetControl (8);
+	CancelButton.SetText (13727)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
+	AppearanceButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenAppearanceWindow")
+	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSoundWindow")
+	ColorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenColorWindow")
+	ScriptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenScriptWindow")
+	BiographyButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyEditWindow")
+	CustomizeDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomizeDonePress")
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomizeCancelPress")
+
+	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def CustomizeDonePress ():
+	if CustomizeWindow:
+		CustomizeWindow.Unload ()
+	return
+
+def CustomizeCancelPress ():
+	if CustomizeWindow:
+		CustomizeWindow.Unload ()
+	return
 
 ###################################################
 # End of file GUIREC.py
