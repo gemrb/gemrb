@@ -40,6 +40,26 @@ def OnLoad():
 		GemRB.SetPlayerStat (MyChar, StatID, Value)
 		print "\tSkill ",str(i),": ",Value
 
+	# grant ranger and bard skills
+	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
+	ClassTable = GemRB.LoadTableObject ("classes")
+	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
+	ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class))
+	RangerSkills = ClassSkillsTable.GetValue (ClassName, "RANGERSKILL")
+	BardSkills = ClassSkillsTable.GetValue (ClassName, "BARDSKILL")
+
+	Level = 1
+	for skills in RangerSkills, BardSkills:
+		if skills == "*":
+			continue
+		SpecialSkillsTable = GemRB.LoadTableObject (skills)
+		for skill in range(SpecialSkillsTable.GetColumnCount ()):
+			skillname = SpecialSkillsTable.GetColumnName(skill)
+			value = SpecialSkillsTable.GetValue (str(Level), skillname)
+			StatID = SkillTable.GetValue (skillname, "ID")
+			# setting it to value is enough, but this is more modder friendly
+			GemRB.SetPlayerStat (MyChar, StatID, value + GemRB.GetPlayerStat (MyChar, StatID, 1))
+
 	# weapon proficiencies
 	# set the base number of attacks; effects will add the proficiency bonus
 	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 2)

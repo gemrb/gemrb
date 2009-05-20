@@ -159,17 +159,19 @@ def DisplayOverview(step):
 			# thieving and other skills
 			info = ""
 			SkillTable = GemRB.LoadTableObject ("skills")
-			KitList = GemRB.LoadTableObject ("kitlist")
-			ClassTable = GemRB.LoadTableObject ("classes")
+			ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 			Class = GemRB.GetVar ("Class") - 1
 			ClassID = ClassTable.GetValue (Class, 5)
 			Class = ClassTable.FindValue (5, ClassID)
+			ClassName = ClassTable.GetRowName (Class)
+			RangerSkills = ClassSkillsTable.GetValue (ClassName, "RANGERSKILL")
+			BardSkills = ClassSkillsTable.GetValue (ClassName, "BARDSKILL")
 			# TODO also before: skill{rng,brd}.2da <-- add rangers to clskills.2da
 			KitName = GetKitIndex (MyChar)
 			if KitName == 0:
-				KitName = ClassTable.GetRowName (Class)
+				KitName = ClassName
 			else:
-				KitName = KitList.GetValue (KitName, 0)
+				KitName = KitTable.GetValue (KitName, 0)
 
 			if SkillTable.GetValue ("RATE", KitName) != -1:
 				for skill in range(SkillTable.GetRowCount () - 2):
@@ -177,6 +179,13 @@ def DisplayOverview(step):
 					available = SkillTable.GetValue (SkillTable.GetRowName (skill+2), KitName)
 					value = GemRB.GetVar ("Skill " + str(skill))
 					if value >= 0 and available != -1:
+						info += name + ": " + str(value) + "\n"
+			elif BardSkills != "*" or RangerSkills != "*":
+				for skill in range(SkillTable.GetRowCount () - 2):
+					name = GemRB.GetString (SkillTable.GetValue (skill+2, 1))
+					StatID = SkillTable.GetValue (skill+2, 2)
+					value = GemRB.GetPlayerStat (MyChar, StatID, 1)
+					if value > 0:
 						info += name + ": " + str(value) + "\n"
 			if info != "":
 				info = "\n" + info + "\n"

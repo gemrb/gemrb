@@ -351,7 +351,7 @@ def OpenLevelUpWindow():
 			SkillPointsLeft = 0
 		else:
 			# get the skill values
-			# TODO: get upgrades from clskills -> skill{brd,rng} (add rangers to clskills)
+			# TODO: get upgrades from clskills -> skill{brd,rng}
 			for i in range(SkillTable.GetRowCount()-2):
 				SkillID = SkillTable.GetValue (i+2, 2)
 				SkillValue = GemRB.GetPlayerStat (pc, SkillID, 1)
