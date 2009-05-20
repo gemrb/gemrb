@@ -3849,7 +3849,9 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 	}
 	if (!itm) return; //quick item slot contains invalid item resref
 
-	core->SetEventFlag( EF_ACTION );
+	if (InParty) {
+		core->SetEventFlag( EF_ACTION );
+	}
 
 	if (!silent) {
 		ieByte stance = IE_ANI_ATTACK;
@@ -3932,6 +3934,10 @@ void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int
 	anims->SetWeaponRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
 	SetAttackMoveChances(MeleeAnimation);
+	if (InParty) {
+	        //update the paperdoll weapon animation
+        	core->SetEventFlag(EF_UPDATEANIM);
+	}
 }
 
 void Actor::SetUsedShield(const char* AnimationType, int wt)
@@ -3946,6 +3952,10 @@ void Actor::SetUsedShield(const char* AnimationType, int wt)
 		return;
 	anims->SetOffhandRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
+	if (InParty) {
+	        //update the paperdoll weapon animation
+        	core->SetEventFlag(EF_UPDATEANIM);
+	}
 }
 
 void Actor::SetUsedHelmet(const char* AnimationType)
@@ -3954,6 +3964,10 @@ void Actor::SetUsedHelmet(const char* AnimationType)
 	if (!anims)
 		return;
 	anims->SetHelmetRef(AnimationType);
+	if (InParty) {
+	        //update the paperdoll weapon animation
+        	core->SetEventFlag(EF_UPDATEANIM);
+	}
 }
 
 //set up stuff here, like attack number, turn undead level

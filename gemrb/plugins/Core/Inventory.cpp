@@ -204,7 +204,10 @@ void Inventory::AddSlotEffects(ieDword index)
 	gamedata->FreeItem( itm, slot->ItemResRef, false );
 
 	Owner->RefreshEffects(eqfx);
-	core->SetEventFlag(EF_UPDATEANIM);
+	//call gui for possible paperdoll animation changes
+	if (Owner->InParty) {
+		core->SetEventFlag(EF_UPDATEANIM);
+	}
 }
 
 //no need to know the item effects 'personally', the equipping slot
@@ -214,7 +217,9 @@ void Inventory::RemoveSlotEffects(ieDword index)
 	Owner->fxqueue.RemoveEquippingEffects(index);
 	Owner->RefreshEffects(NULL);
 	//call gui for possible paperdoll animation changes
-	core->SetEventFlag(EF_UPDATEANIM);
+	if (Owner->InParty) {
+		core->SetEventFlag(EF_UPDATEANIM);
+	}
 }
 
 void Inventory::SetInventoryType(int arg)
@@ -311,7 +316,9 @@ void Inventory::KillSlot(unsigned int index)
 	}
 
 	//the used up item vanishes from the quickslot bar
-	core->SetEventFlag( EF_ACTION );
+	if (Owner->InParty) {
+		core->SetEventFlag( EF_ACTION );
+	}
 
 	Slots[index] = NULL;
  	int effect = core->QuerySlotEffects( index );
@@ -463,6 +470,11 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 		delete Slots[slot];
 	}
 	Slots[slot] = item;
+
+	//update the action bar next time
+	if (Owner->InParty) {
+		core->SetEventFlag( EF_ACTION );
+	}
 }
 
 int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
@@ -1442,8 +1454,6 @@ void Inventory::UpdateWeaponAnimation()
 	if (itm)
 		gamedata->FreeItem( itm, Slot->ItemResRef, false );
 	Owner->SetUsedWeapon(AnimationType, MeleeAnimation, WeaponType);
-	//update the weapon animation
-	core->SetEventFlag(EF_SELECTION);
 }
 
 //this function will also check disabled slots (if that feature will be imped)

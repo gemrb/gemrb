@@ -1541,12 +1541,18 @@ int fx_remove_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 				inv->ChangeItemFlag(i, IE_INV_ITEM_CURSED, BM_NAND);
 				if (inv->UnEquipItem(i,true)) {
 					CREItem *tmp = inv->RemoveItem(i);
-					inv->AddSlotItem(tmp,-3);
+					if(inv->AddSlotItem(tmp,-3)!=ASI_SUCCESS) {
+						//if the item couldn't be placed in the inventory, then put it back to the original slot
+						inv->SetSlotItem(tmp,i);
+						//and drop it in the area. (If there is no area, then the item will stay in the inventory)
+						target->DropItem(i,0);
+					}
 				}
 			}
 		}
 		target->fxqueue.RemoveAllEffects(fx_apply_effect_curse_ref);
 	}
+
 	//this is an instant effect
 	return FX_NOT_APPLIED;
 }
@@ -3641,8 +3647,10 @@ int fx_cast_spell_point (Actor* Owner, Actor* target, Effect* fx)
 int fx_identify (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_identify (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
-	BASE_SET (IE_IDENTIFYMODE, 1);
-	core->SetEventFlag(EF_IDENTIFY);
+	if (target->InParty) {
+		BASE_SET (IE_IDENTIFYMODE, 1);
+		core->SetEventFlag(EF_IDENTIFY);
+	}
 	return FX_NOT_APPLIED;
 }
 // 0x96 FindTraps
@@ -4806,8 +4814,10 @@ int fx_proficiency (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_create_contingency (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_contingency (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	BASE_SET(IE_IDENTIFYMODE,2);
-	core->SetEventFlag(EF_SEQUENCER);
+	if (target->InParty) {
+		BASE_SET(IE_IDENTIFYMODE,2);
+		core->SetEventFlag(EF_SEQUENCER);
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -5135,8 +5145,10 @@ int fx_create_spell_sequencer(Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_spell_sequencer (%2d)\n", fx->Opcode );
 	//just a call to activate the spell sequencer creation gui
-	BASE_SET(IE_IDENTIFYMODE,3);
-	core->SetEventFlag(EF_SEQUENCER);
+	if (target->InParty) {
+		BASE_SET(IE_IDENTIFYMODE,3);
+		core->SetEventFlag(EF_SEQUENCER);
+	}
 	return FX_NOT_APPLIED;
 }
 
