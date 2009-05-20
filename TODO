@@ -1,5 +1,5 @@
 Scripts:
-1. ToB specific actions/triggers, like pocketplane (so ToB will work)
+1. (PARTLY) ToB specific actions/triggers, like pocketplane (so ToB will work)
 2. (PARTLY) Properly detect the play mode (sp/mp, normal/extended)
 
 Combat:
@@ -19,7 +19,7 @@ Effects:
 3. (PARTLY) Implement IWD2 effects
 4. (DONE-almost) Implement TOB effects
 5. (PARTLY) Implement PST effects
-6. (PARTLY) Implement area/non-living affecting effects 
+6. (DONE-almost) Implement area/non-living affecting effects 
 
 Area:
 2. (PARTLY) Don't load scripts for pile items? (research when a script is unused)
@@ -35,7 +35,7 @@ Animation:
 1. (PARTLY) fix char animation sequences
 5. (DONE) Handle equipment animations (armourlevel, weapons) - this seems to be done by wjp/avenger
 7. stanceID is still fuzzy. Fix it. (FIXED?)
-8. Implement projectile animations (area, cone, fragments)
+8. (PARTLY) Implement projectile animations (area, cone, fragments)
 
 Actor:
 2. Use the character sheet (Actor.cpp) itself to store attributes of the character 
@@ -55,8 +55,9 @@ Game GUI:
 5. (PARTLY) Fix drop capitals (initials) Calculate text height/width correctly, display
    it correctly too.
 6. (PARTLY) Fix unwanted screen shake (especially when on bottom of area)
-7. Level up code, this should be written mostly in GuiScript!!!
+7. (PARTLY) Level up code, this should be written mostly in GuiScript!!!
 8. Contingency, spell trigger setup windows
+9. Customize windows (part of character record window)
 
 General:
 1. The Cache and Variables classes could be rewritten to incorporate the release 
