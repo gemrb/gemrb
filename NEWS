@@ -21,6 +21,7 @@ GemRB svn (r5999):
     - regeneration, hp bonuses, healing
     - animations and projectiles
     - various guiscripts
+    - rewritten MVE player
     - bugfixes
 
   Applied patches:

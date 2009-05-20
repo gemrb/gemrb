@@ -28,7 +28,7 @@
 #include "../Core/Audio.h"
 #include "../Core/Variables.h"
 #include "MVEPlay.h"
-#include "libmve.h"
+#include "mve_player.h"
 #include "../../includes/ie_types.h"
 
 static const char MVESignature[] = "Interplay MVE File\x1A";
@@ -134,55 +134,44 @@ int MVEPlay::Play()
 	}
 	//Start Movie Playback
 	frameCount = 0;
-	doPlay( str );
-	return 0;
+	return doPlay( );
 }
 
-int MVEPlay::doPlay(const DataStream* mve)
+int MVEPlay::doPlay()
 {
-	int result;
 	int done = 0;
-	int bpp = 0;
-	MVE_videoSpec vSpec;
+	MVEPlayer player(this);
 
 	memset( g_palette, 0, 768 );
 
-	ieDword volume;
-	core->GetDictionary()->Lookup( "Volume Movie", volume );
-	MVE_sndInit( core->GetAudioDrv()->CanPlay()?1:-1, volume );
-	MVE_memCallbacks( malloc, free );
-	MVE_ioCallbacks( fileRead );
-	MVE_sfCallbacks( showFrame );
-	MVE_palCallbacks( setPalette );
-	MVE_audioCallbacks( setAudioStream, freeAudioStream, queueBuffer ) ;
+	//ieDword volume;
+	//core->GetDictionary()->Lookup( "Volume Movie", volume );
+	player.sound_init( core->GetAudioDrv()->CanPlay() );
 
 	int w,h;
 
 	video->InitMovieScreen(w,h);
-	MVE_rmPrepMovie( ( void * ) mve, -1, -1, 1 );
+	player.video_init(w, h);
 
-	vSpec.screenWidth = w;
-	vSpec.screenHeight = h;
-
-	MVE_getVideoSpec( &vSpec );
-	bpp = vSpec.truecolor ? 16 : 8;
-
-	g_truecolor = vSpec.truecolor;
-
-	while (!done && ( result = MVE_rmStepMovie() ) == 0) {
-		done = video->PollMovieEvents();
+	if (!player.start_playback()) {
+		printf("Failed to decode movie!\n");
+		return 1;
 	}
 
-	MVE_rmEndMovie();
+	g_truecolor = player.is_truecolour();
+
+	while (!done && player.next_frame()) {
+		done = video->PollMovieEvents();
+	}
 
 	return 0;
 }
 
-unsigned int MVEPlay::fileRead(void* handle, void* buf, unsigned int count)
+unsigned int MVEPlay::fileRead(void* buf, unsigned int count)
 {
 	unsigned numread;
 
-	numread = ( ( DataStream * ) handle )->Read( buf, count );//fread(buf, 1, count, (FILE *)handle);
+	numread = str->Read( buf, count );
 	return ( numread == count );
 }
 

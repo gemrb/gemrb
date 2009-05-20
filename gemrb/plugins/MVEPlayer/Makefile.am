@@ -6,10 +6,9 @@ libMVEPlayer_la_SOURCES = \
 	MVEPlay.cpp \
 	MVEPlayer.cpp \
 	MVEPlayerDesc.cpp \
-	decoder16.cpp \
-	decoder8.cpp \
-	mve_audio.cpp \
-	mve_play.cpp \
-	mvelib.cpp
+	mvevideodec8.cpp \
+	mvevideodec16.cpp \
+	mveaudiodec.cpp \
+	mve_player.cpp
 
-noinst_HEADERS = MVEPlayerDesc.h MVEPlay.h decoders.h libmve.h mve_audio.h mvelib.h
+noinst_HEADERS = MVEPlayerDesc.h MVEPlay.h gstmvedemux.h mve.h mve_player.h

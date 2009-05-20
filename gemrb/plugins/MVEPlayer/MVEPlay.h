@@ -28,21 +28,23 @@
 #include "../Core/Interface.h"
 
 class MVEPlay : public MoviePlayer {
+	friend class MVEPlayer;
+
 private:
 	DataStream* str;
 	bool autoFree;
 	bool validVideo;
-	static int doPlay(const DataStream* mve);
-	static unsigned int fileRead(void* handle, void* buf, unsigned int count);
-	static void showFrame(unsigned char* buf, unsigned int bufw,
+	int doPlay();
+	unsigned int fileRead(void* buf, unsigned int count);
+	void showFrame(unsigned char* buf, unsigned int bufw,
 		unsigned int bufh, unsigned int sx, unsigned int sy,
 		unsigned int w, unsigned int h, unsigned int dstx,
 		unsigned int dsty);
-	static void setPalette(unsigned char* p, unsigned start, unsigned count);
-	static int pollEvents();
-	static int setAudioStream();
-	static void freeAudioStream(int stream);
-	static void queueBuffer(int stream, unsigned short bits,
+	void setPalette(unsigned char* p, unsigned start, unsigned count);
+	int pollEvents();
+	int setAudioStream();
+	void freeAudioStream(int stream);
+	void queueBuffer(int stream, unsigned short bits,
                 int channels, short* memory,
                 int size, int samplerate);
 public:
