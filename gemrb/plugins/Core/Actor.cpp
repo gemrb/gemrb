@@ -1610,15 +1610,15 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 	switch (ModifierType) {
 		case MOD_ADDITIVE:
 			//flat point modifier
-			SetBaseNoPCF(StatIndex, BaseStats[StatIndex]+ModifierValue);
+			SetBase(StatIndex, BaseStats[StatIndex]+ModifierValue);
 			break;
 		case MOD_ABSOLUTE:
 			//straight stat change
-			SetBaseNoPCF(StatIndex, ModifierValue);
+			SetBase(StatIndex, ModifierValue);
 			break;
 		case MOD_PERCENT:
 			//percentile
-			SetBaseNoPCF(StatIndex, BaseStats[StatIndex] * ModifierValue / 100);
+			SetBase(StatIndex, BaseStats[StatIndex] * ModifierValue / 100);
 			break;
 	}
 	return BaseStats[StatIndex] - oldmod;
