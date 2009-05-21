@@ -24,8 +24,8 @@ from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
 from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities
-from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GetKitIndex
-from GUICommonWindows import IsDualClassed, IsMultiClassed, IsDualSwap
+from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle
+from GUICommonWindows import IsDualClassed, IsMultiClassed, IsDualSwap, GetKitIndex
 from LUSpellSelection import *
 
 LevelUpWindow = None
@@ -83,7 +83,6 @@ def OpenLevelUpWindow():
 	global AvailableSkillIndices
 
 	LevelUpWindow = GemRB.LoadWindowObject (3)
-
 
 	InfoButton = LevelUpWindow.GetControl (125)
 	InfoButton.SetText (13707)
@@ -182,8 +181,6 @@ def OpenLevelUpWindow():
 
 		# store a boolean for IsDual
 		IsDual = IsDual[0] > 0
-
-	print "NumClasses in LevelUp:",NumClasses
 
 	Level = [0]*3
 	LevelDiff = [0]*3
