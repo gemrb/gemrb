@@ -1298,6 +1298,5 @@ def CloseSubSubCustomizeWindow():
 		SubSubCustomizeWindow.Unload ()
 	return
 
-from LevelUp import *
 ###################################################
 # End of file GUIREC.py
