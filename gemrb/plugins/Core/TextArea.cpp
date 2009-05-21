@@ -256,7 +256,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	int rc = 0;
 	int sr = startrow;
 	unsigned int i;
-	int yl = 0;
+	int yl;
 	for (i = 0; i < linesize; i++) {
 		if (rc + lrows[i] <= sr) {
 			rc += lrows[i];
@@ -273,7 +273,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		ftext->PrintFromLine( sr, clip,
 			( unsigned char * ) lines[i], pal,
 			IE_FONT_ALIGN_LEFT, finit, NULL );
-		yl = lrows[i] - sr;
+		yl = ftext->size[1].h*(lrows[i]-sr);
+		clip.y+=yl;
+		clip.h-=yl;
 		break;
 	}
 	for (i++; i < linesize; i++) {
@@ -284,12 +286,12 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			pal = lineselpal;
 		else
 			pal = palette;
-		clip.y+=ftext->size[1].h;
-		clip.h-=ftext->size[1].h;
 		ftext->Print( clip, ( unsigned char * ) lines[i], pal,
 			IE_FONT_ALIGN_LEFT, true );
+		yl = ftext->size[1].h*lrows[i];
+		clip.y+=yl;
+		clip.h-=yl;
 
-		yl += lrows[i];
 	}
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
@@ -674,6 +676,7 @@ void TextArea::SetRow(int row)
 
 void TextArea::CalcRowCount()
 {
+	int tr;
 	int w = Width;
 
 	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
@@ -697,8 +700,8 @@ void TextArea::CalcRowCount()
 	rows = 0;
 	if (lines.size() != 0) {
 		for (size_t i = 0; i < lines.size(); i++) {
-			rows++;
-			int tr = 0;
+//			rows++;
+			tr = 0;
 			int len = ( int ) strlen( lines[i] );
 			char* tmp = (char *) malloc( len + 1 );
 			memcpy( tmp, lines[i], len + 1 );
@@ -720,12 +723,13 @@ void TextArea::CalcRowCount()
 					continue;
 				}
 				if (tmp[p] == 0) {
-					if (p != len)
-						rows++;
+//					if (p != len)
+//						rows++;
 					tr++;
 				}
 			}
 			lrows[i] = tr;
+			rows += tr;
 			free( tmp );
 		}
 	}
@@ -748,7 +752,11 @@ void TextArea::CalcRowCount()
 		return;
 	}
 	ScrollBar* bar = ( ScrollBar* ) sb;
-	bar->SetMax( (ieWord) rows );
+	tr = rows - Height/ftext->size[1].h;
+	if (tr<0) {
+		tr = 0;
+	}
+	bar->SetMax( (ieWord) tr );
 }
 /** Mouse Over Event */
 void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
