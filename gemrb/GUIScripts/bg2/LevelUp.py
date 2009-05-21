@@ -27,6 +27,7 @@ from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell,
 from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle
 from GUICommonWindows import IsDualClassed, IsMultiClassed, IsDualSwap, GetKitIndex
 from LUSpellSelection import *
+from LUHLASelection import *
 
 LevelUpWindow = None
 TopIndex = 0
@@ -318,10 +319,6 @@ def OpenLevelUpWindow():
 		if ABTable != "*" and ABTable[:6] != "CLABMA":
 			AddClassAbilities (pc, ABTable, Level[i], LevelDiff[i])
 
-		# set up the class in gemrb for use in the hla code
-		GemRB.SetVar ("Class "+str(i), Classes[i])
-		GemRB.SetVar ("Level "+str(i), Level[i])
-
 	# save our new hp if it changed
 	if (OldHPMax == GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)):
 		GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, OldHPMax + hp)
@@ -387,8 +384,6 @@ def OpenLevelUpWindow():
 
 		# set values required by the hla level up code
 		GemRB.SetVar ("HLACount", HLACount)
-		GemRB.SetVar ("NumClasses", NumClasses)
-		GemRB.SetVar ("PC", pc)
 	HLAButton = LevelUpWindow.GetControl (126)
 	if HLACount:
 		HLAButton.SetText (4954)
@@ -1025,5 +1020,14 @@ def ReactivateBaseClass ():
 	if ABTable != "*" and ABTable[:6] != "CLABMA":
 		AddClassAbilities (pc, ABTable, Level[1], Level[1]) # relearn class abilites
 
-# this has to be down here because it calls RedrawSkills ()		
-from LUHLASelection import *
+def LevelUpHLAPress ():
+	# we can turn the button off and temporarily set HLACount to 0
+	# because there is no cancel button on the HLA window; therefore,
+	# it's guaranteed to come back as 0
+	TmpCount = GemRB.GetVar ("HLACount")
+	GemRB.SetVar ("HLACount", 0)
+	RedrawSkills ()
+	GemRB.SetVar ("HLACount", TmpCount)
+
+	OpenHLAWindow (pc, NumClasses, Classes, Level)
+	return

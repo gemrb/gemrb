@@ -24,7 +24,6 @@ from ie_stats import *
 from GUICommon import HasSpell
 from GUIREC import GetKitIndex
 from GUICommonWindows import IsDualClassed
-from LevelUp import RedrawSkills
 
 # HLA selection
 HLAWindow = 0		# << HLA selection window
@@ -40,16 +39,15 @@ Classes = []		# << classes (ids)
 Level = []		# << levels for each class
 
 # open our HLA window
-def LevelUpHLAPress ():
+def OpenHLAWindow (actor, numclasses, classes, levels):
 	global HLAWindow, HLADoneButton, HLATextArea, HLACount, NumClasses, pc, Classes, Level
 
 	# save our variables 
-	pc = GemRB.GetVar ("PC")
+	pc = actor
+	NumClasses = numclasses
+	Classes = classes
+	Level = levels
 	HLACount = GemRB.GetVar ("HLACount")
-	NumClasses = GemRB.GetVar ("NumClasses")
-	for i in range (NumClasses):
-		Classes.append (GemRB.GetVar ("Class "+str(i)))
-		Level.append (GemRB.GetVar ("Level "+str(i)))
 
 	# setup our scroll index
 	GemRB.SetVar ("HLATopIndex", 0)
@@ -123,9 +121,8 @@ def HLADonePress ():
 	if HLAWindow:
 		HLAWindow.Unload ()
 
-	# and redraw the skills (to allow the Done button to be enabled)
+	# so redraw skills knows we're done
 	GemRB.SetVar ("HLACount", 0)
-	RedrawSkills()
 
 	return
 
