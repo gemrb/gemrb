@@ -1,6 +1,6 @@
 # -*-python-*-
 # GemRB - Infinity Engine Emulator
-# Copyright (C) 2003-2004 The GemRB Project
+# Copyright (C) 2003-2009 The GemRB Project
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -47,6 +47,14 @@ KitInfoWindow = None
 ExportDoneButton = None
 ExportFileName = ""
 PortraitsTable = None
+ScriptsTable = None
+ScriptTextArea = None
+
+# the available sounds
+SoundSequence = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', \
+				'm', 's', 't', 'u', 'v', '_', 'x', 'y', 'z', '0', '1', '2', \
+				'3', '4', '5', '6', '7', '8', '9']
+SoundIndex = 0
 
 ###################################################
 def OpenRecordsWindow ():
@@ -141,7 +149,7 @@ def GetNextLevelExp (Level, Class):
 	NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
 	Row = NextLevelTable.GetRowIndex (Class)
 	if Level < NextLevelTable.GetColumnCount (Row):
-		return str(NextLevelTable.GetValue (Row, Level) )
+		return str (NextLevelTable.GetValue (Row, Level) )
 
 	return 0
 
@@ -213,17 +221,17 @@ def UpdateRecordsWindow ():
 	if sstrx > 0 and sstr==18:
 		sstr = "%d/%02d" %(sstr, sstrx % 100)
 	else:
-		sstr = str(sstr)
-	sint = str(GemRB.GetPlayerStat (pc, IE_INT))
-	cint = GetStatColor(pc, IE_INT)
-	swis = str(GemRB.GetPlayerStat (pc, IE_WIS))
-	cwis = GetStatColor(pc, IE_WIS)
-	sdex = str(GemRB.GetPlayerStat (pc, IE_DEX))
-	cdex = GetStatColor(pc, IE_DEX)
-	scon = str(GemRB.GetPlayerStat (pc, IE_CON))
-	ccon = GetStatColor(pc, IE_CON)
-	schr = str(GemRB.GetPlayerStat (pc, IE_CHR))
-	cchr = GetStatColor(pc, IE_CHR)
+		sstr = str (sstr)
+	sint = str (GemRB.GetPlayerStat (pc, IE_INT))
+	cint = GetStatColor (pc, IE_INT)
+	swis = str (GemRB.GetPlayerStat (pc, IE_WIS))
+	cwis = GetStatColor (pc, IE_WIS)
+	sdex = str (GemRB.GetPlayerStat (pc, IE_DEX))
+	cdex = GetStatColor (pc, IE_DEX)
+	scon = str (GemRB.GetPlayerStat (pc, IE_CON))
+	ccon = GetStatColor (pc, IE_CON)
+	schr = str (GemRB.GetPlayerStat (pc, IE_CHR))
+	cchr = GetStatColor (pc, IE_CHR)
 
 	Label = Window.GetControl (0x1000002f)
 	Label.SetText (sstr)
@@ -360,14 +368,14 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		XP2 = GemRB.GetPlayerStat (pc, IE_XP)
 		GemRB.SetToken ("EXPERIENCE", str (XP2) )
 
-		stats.append ( (GemRB.GetString(16480),"",'d') )
+		stats.append ( (GemRB.GetString (16480),"",'d') )
 		stats.append (None)
 
 		# the first class (shown second)
 		if Dual[0] == 1:
-			ClassTitle = GemRB.GetString(KitTable.GetValue (Dual[1], 2))
+			ClassTitle = GemRB.GetString (KitTable.GetValue (Dual[1], 2))
 		elif Dual[0] == 2:
-			ClassTitle = GemRB.GetString(ClassTable.GetValue (Dual[1], 2))
+			ClassTitle = GemRB.GetString (ClassTable.GetValue (Dual[1], 2))
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[1]) )
 
@@ -383,7 +391,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		# the first class' XP is discarded and set to the minimum level
 		# requirement, so if you don't dual class right after a levelup,
 		# the game would eat some of your XP
-		XP1 = XPTable.GetValue (BaseClass, str(Levels[1]))
+		XP1 = XPTable.GetValue (BaseClass, str (Levels[1]))
 		GemRB.SetToken ("EXPERIENCE", str (XP1) )
 
 		# inactive until the new class SURPASSES the former
@@ -404,9 +412,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		print "\t\tClass (Level):",Class,"(",Level,")"
 
 	# check to see if we have a level diff anywhere
-	if sum(LevelDiff) > 0:
+	if sum (LevelDiff) > 0:
 		effects = GemRB.GetPlayerStates (pc)
-		if len(effects):
+		if len (effects):
 			for c in effects:
 				tmp = StateTable.GetValue (ord(c)-66, 0)
 				stats.append ( (tmp,c,'a') )
@@ -423,7 +431,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		tmp2 = str(tmp/2)
 	stats.append ( (9458, tmp2, '') )
 	stats.append ( (9459, GS (IE_LORE), '') )
-	reptxt = GetReputation (GemRB.GameGetReputation()/10)
+	reptxt = GetReputation (GemRB.GameGetReputation ()/10)
 	stats.append ( (9465, reptxt, '') )
 	stats.append ( (9460, GS (IE_LOCKPICKING), '') )
 	stats.append ( (9462, GS (IE_TRAPS), '') )
@@ -465,7 +473,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	# 9466 Weapon profs
 	stats.append (9466)
-	table = GemRB.LoadTableObject("weapprof")
+	table = GemRB.LoadTableObject ("weapprof")
 	RowCount = table.GetRowCount ()
 	# the first 7 profs are foobared
 	for i in range(8,RowCount):
@@ -491,13 +499,13 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	value = GemRB.GetPlayerStat (pc, IE_STR)
 	ex = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 	# 10332 to hit
-	stats.append ( (10332, GemRB.GetAbilityBonus(IE_STR,0,value,ex), '0') )
+	stats.append ( (10332, GemRB.GetAbilityBonus (IE_STR,0,value,ex), '0') )
 	# 10336 damage
-	stats.append ( (10336, GemRB.GetAbilityBonus(IE_STR,1,value,ex), '0') )
+	stats.append ( (10336, GemRB.GetAbilityBonus (IE_STR,1,value,ex), '0') )
 	# 10337 open doors (bend bars lift gates)
-	stats.append ( (10337, GemRB.GetAbilityBonus(IE_STR,2,value,ex), '0') )
+	stats.append ( (10337, GemRB.GetAbilityBonus (IE_STR,2,value,ex), '0') )
 	# 10338 weight allowance
-	stats.append ( (10338, GemRB.GetAbilityBonus(IE_STR,3,value,ex), '0') )
+	stats.append ( (10338, GemRB.GetAbilityBonus (IE_STR,3,value,ex), '0') )
 	# 10339 AC
 	stats.append ( (10339, GA(IE_DEX,2), '0') )
 	# 10340 Missile
@@ -633,7 +641,7 @@ def OpenInformationWindow ():
 	ChapterPartyExp = 0
 	TotalCount = 0
 	ChapterCount = 0
-	for i in range (1, GemRB.GetPartySize() + 1):
+	for i in range (1, GemRB.GetPartySize () + 1):
 		stat = GemRB.GetPCStats(i)
 		TotalPartyExp = TotalPartyExp + stat['KillsChapterXP']
 		ChapterPartyExp = ChapterPartyExp + stat['KillsTotalXP']
@@ -647,7 +655,7 @@ def OpenInformationWindow ():
 	Label = Window.GetControl (0x10000000)
 	Label.SetText (GemRB.GetPlayerName (pc, 1))
 	# class
-	ClassTitle = GetActorClassTitle(pc)
+	ClassTitle = GetActorClassTitle (pc)
 	Label = Window.GetControl (0x10000018)
 	Label.SetText (ClassTitle)
 
@@ -661,7 +669,7 @@ def OpenInformationWindow ():
 	# in a minute, 24 hours in a day, but ONLY 5 minutes in an hour!!
 	# Hence currentTime (and joinTime after div by 15) has
 	# 7200 secs a day (60 * 5 * 24)
-	currentTime = GemRB.GetGameTime()
+	currentTime = GemRB.GetGameTime ()
 	joinTime = stat['JoinDate'] - stat['AwayTime']
 
 	party_time = currentTime - (joinTime / 15)
@@ -746,7 +754,7 @@ def OpenBiographyWindow ():
 
 	TextArea = Window.GetControl (0)
 	pc = GemRB.GameGetSelectedPCSingle ()
-	TextArea.SetText (GemRB.GetPlayerString(pc, 74) )
+	TextArea.SetText (GemRB.GetPlayerString (pc, 74) )
 
 	# Done
 	Button = Window.GetControl (2)
@@ -759,27 +767,27 @@ def OpenBiographyWindow ():
 def OpenExportWindow ():
 	global ExportWindow, NameField, ExportDoneButton
 
-	ExportWindow = GemRB.LoadWindowObject(13)
+	ExportWindow = GemRB.LoadWindowObject (13)
 
-	TextArea = ExportWindow.GetControl(2)
-	TextArea.SetText(10962)
+	TextArea = ExportWindow.GetControl (2)
+	TextArea.SetText (10962)
 
-	TextArea = ExportWindow.GetControl(0)
+	TextArea = ExportWindow.GetControl (0)
 	TextArea.GetCharacters ()
 
-	ExportDoneButton = ExportWindow.GetControl(4)
-	ExportDoneButton.SetText(11973)
-	ExportDoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	ExportDoneButton = ExportWindow.GetControl (4)
+	ExportDoneButton.SetText (11973)
+	ExportDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 
-	CancelButton = ExportWindow.GetControl(5)
-	CancelButton.SetText(13727)
+	CancelButton = ExportWindow.GetControl (5)
+	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	NameField = ExportWindow.GetControl(6)
+	NameField = ExportWindow.GetControl (6)
 
-	ExportDoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
-	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
+	ExportDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
+	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
 	ExportWindow.ShowModal (MODAL_SHADOW_GRAY)
 	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
@@ -789,7 +797,7 @@ def ExportDonePress():
 		ExportWindow.Unload()
 	#save file under name from EditControl
 	pc = GemRB.GameGetSelectedPCSingle ()
-	GemRB.SaveCharacter(pc, ExportFileName)
+	GemRB.SaveCharacter (pc, ExportFileName)
 	return
 
 def ExportCancelPress():
@@ -978,7 +986,7 @@ def KitDonePress():
 	return
 
 def OpenCustomizeWindow ():
-	global CustomizeWindow, PortraitsTable
+	global CustomizeWindow, PortraitsTable, ScriptsTable
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	if GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE:
@@ -987,6 +995,7 @@ def OpenCustomizeWindow ():
 		Exportable = 0
 
 	PortraitsTable = GemRB.LoadTableObject ("PICTURES")
+	ScriptsTable = GemRB.LoadTableObject ("SCRPDESC")
 	CustomizeWindow = GemRB.LoadWindowObject (17)
 
 	AppearanceButton = CustomizeWindow.GetControl (0)
@@ -1142,6 +1151,7 @@ def OpenOwnPortraitWindow():
 
 def OpenSoundWindow():
 	global SubCustomizeWindow
+	global VoiceList
 	global Gender
 
 	SubCustomizeWindow = GemRB.LoadWindowObject (20)
@@ -1221,8 +1231,17 @@ def UpdatePaperDoll():
 
 def OpenScriptWindow():
 	global SubCustomizeWindow
+	global ScriptTextArea, SelectedTextArea
 
 	SubCustomizeWindow = GemRB.LoadWindowObject (11)
+
+	ScriptTextArea = SubCustomizeWindow.GetControl (2)
+	ScriptTextArea.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
+	ScriptTextArea.SetVarAssoc ("Selected", 0)
+
+	SelectedTextArea = SubCustomizeWindow.GetControl (4)
+	FillScriptList ()
+	UpdateScriptSelection ()
 
 	DoneButton = SubCustomizeWindow.GetControl (5)
 	DoneButton.SetText (11973)
@@ -1234,7 +1253,34 @@ def OpenScriptWindow():
 
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneSubCustomizeWindow")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
+	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "UpdateScriptSelection")
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_NONE)
+	return
+
+def FillScriptList():
+	ScriptTextArea.Clear ()
+	row = ScriptsTable.GetRowCount ()
+	for i in range (row):
+		GemRB.SetToken ("script", ScriptsTable.GetRowName (i) )
+		title = ScriptsTable.GetValue (i,0)
+		if title!=-1:
+			desc = ScriptsTable.GetValue (i,1)
+			txt = GemRB.GetString (title)
+
+			if (desc!=-1):
+				txt += GemRB.GetString (desc)
+
+			ScriptTextArea.Append (txt+"\n", -1)
+
+		else:
+			ScriptTextArea.Append (ScriptsTable.GetRowName (i)+"\n" ,-1)
+
+	return
+
+def UpdateScriptSelection():
+	text = ScriptTextArea.QueryText ()
+	SelectedTextArea.SetText (text)
+	print "Selected script: ", ScriptsTable.GetRowName(GemRB.GetVar("Selected"))
 	return
 
 def OpenBiographyEditWindow():
