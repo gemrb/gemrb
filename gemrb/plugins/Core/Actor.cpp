@@ -2784,7 +2784,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	WeaponInfo wi;
 	ITMExtHeader *header;
 	//can't reach target, zero range shouldn't be allowed
-	if (GetWeapon(header, &wi, leftorright)*10<PersonalDistance(this, target)+1) {
+	//Don't forget to take size of the opponents into account
+	if ((GetWeapon(header, &wi, leftorright)*10+(size + target->size)*5)<PersonalDistance(this, target)) {
 		return;
 	}
 	ieDword Flags;

@@ -1191,10 +1191,11 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	//if distance is too much, insert a move action and requeue the action
 	ITMExtHeader *header;
 
-	unsigned int wrange = actor->GetWeapon(header, NULL)*10;
+	unsigned int wrange = actor->GetWeapon(header, NULL) * 10;
 	if ( target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
 		wrange = 10;
 	}
+	wrange += actor->size * 5 ;
 
 	Actor *tar = NULL;
 	ieDword targetID = 0;
@@ -1217,10 +1218,10 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	//action performed
 	if(target->Type == ST_ACTOR) {
 		actor->SetTarget( target );
-		wrange += ((Actor*)target)->size*5;
+		wrange += ((Actor*)target)->size * 5 ;
 	}
 
-	if ( PersonalDistance(Sender, target) > wrange ) {
+	if ( PersonalDistance(Sender, target) > wrange) {
 		//we couldn't perform the action right now
 		//so we add it back to the queue with an additional movement
 		//increases refcount of Sender->CurrentAction, by pumping it back
