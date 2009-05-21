@@ -180,14 +180,37 @@ def HasSpell (Actor, SpellType, Level, Ref):
 	return -1
 
 # Adds class/kit abilities
-def AddClassAbilities (pc, TmpTable, Level=1, LevelDiff=1):
+def AddClassAbilities (pc, TmpTable, Level=1, LevelDiff=1, align=-1):
 	TmpTable = GemRB.LoadTableObject (TmpTable)
 
-	for i in range(TmpTable.GetRowCount()):
+	# gotta stay positive
+	if Level-LevelDiff < 0:
+		return
+
+	# we're doing alignment additions
+	if align == -1:
+		iMin = 0
+		iMax = TmpTable.GetRowCount ()
+	else:
+		# alignment is expected to be the row required
+		iMin = align
+		iMax = align+1
+
+	# make sure we don't go out too far
+	jMin = Level-LevelDiff
+	jMax = Level
+	if jMax > TmpTable.GetColumnCount ():
+		jMax = TmpTable.GetColumnCount ()
+
+	for i in range(iMin, iMax):
 		# apply each spell from each new class
-		for j in range (Level-LevelDiff, Level):
-			ab = TmpTable.GetValue (i, j)
-			if ab != "****":
+		for j in range (jMin, jMax):
+			ab = TmpTable.GetValue (i, j, 0)
+			if ab and ab != "****":
+				# seems all SPINs act like GA_*
+				if ab[:4] == "SPIN":
+					ab = "GA_" + ab
+
 				# apply spell (AP_) or gain spell (GA_)
 				if ab[:2] == "AP":
 					GemRB.ApplySpell (pc, ab[3:])
