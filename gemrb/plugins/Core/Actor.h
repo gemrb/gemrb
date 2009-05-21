@@ -207,7 +207,7 @@ public:
 	ieDword LastSeen;
 	ieDword LastMarked; // no idea if non-actors could mark objects
 	ieDword LastHeard;
-	ieDword HotKey; 
+	ieDword HotKey;
 	char ShieldRef[2];
 	char HelmetRef[2];
 	char WeaponRef[2];
@@ -339,7 +339,7 @@ public:
 		return ShortName;
 	}
 	/** Gets the DeathVariable */
-	const char* GetScriptName(void) const 
+	const char* GetScriptName(void) const
 	{
 		return scriptName;
 	}
@@ -423,7 +423,7 @@ public:
 	int GetRangedWeapon(ITMExtHeader *&which, WeaponInfo *wi) const;
 	/* Returns current weapon range and extended header
 	 if range is nonzero, then which is valid */
-	unsigned int GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorright=false) const;
+	unsigned int GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorright=false);
 	/* Creates player statistics */
 	void CreateStats();
 	/* Heals actor by days */
@@ -449,7 +449,7 @@ public:
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
 	/* sets an RGB colour modification effect; location 0xff for global */
-	void SetColorMod( ieDword location, RGBModifier::Type type, int speed, 
+	void SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 		unsigned char r, unsigned char g, unsigned char b,
 		int phase=-1 );
 	bool Schedule(ieDword gametime);
@@ -483,7 +483,7 @@ public:
 	ScriptedAnimation *FindOverlay(int index);
 	/* draw videocells */
 	void DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint);
-	
+
 	void SetLockedPalette(const ieDword *gradients);
 	void UnlockPalette();
 	void AddAnimation(const ieResRef resource, int gradient, int height, int flags);

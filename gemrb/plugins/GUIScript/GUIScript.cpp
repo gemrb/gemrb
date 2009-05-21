@@ -8308,10 +8308,10 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 	}
 
 	int ret = actor->inventory.GetEquippedSlot();
-	int effect = core->QuerySlotEffects(ret);
+	/*int effect = core->QuerySlotEffects(ret);
 	if (effect == SLOT_EFFECT_MISSILE) {
 		ret = actor->inventory.FindRangedWeapon();
-	}
+	}*/
 	if (actor->PCStats) {
 		for(int i=0;i<4;i++) {
 			if (ret == actor->PCStats->QuickWeaponSlots[i]) {

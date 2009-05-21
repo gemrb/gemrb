@@ -1191,7 +1191,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	//if distance is too much, insert a move action and requeue the action
 	ITMExtHeader *header;
 
-	unsigned int wrange = actor->GetWeapon(header, NULL) * 10;
+	unsigned int wrange = actor->GetWeapon(header, NULL)*10;
 	if ( target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
 		wrange = 10;
 	}

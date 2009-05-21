@@ -2449,9 +2449,11 @@ void Actor::GetPrevAnimation()
 }
 
 //slot is the projectile slot
+//This will return the projectile item.
 int Actor::GetRangedWeapon(ITMExtHeader *&which, WeaponInfo *wi) const
 {
-	unsigned int slot = inventory.FindRangedWeapon();
+//EquippedSlot is the projectile. To get the weapon, use inventory.GetUsedWeapon()
+	unsigned int slot = inventory.GetEquippedSlot();
 	const CREItem *wield = inventory.GetSlotItem(slot);
 	if (!wield) {
 		return 0;
@@ -2466,12 +2468,12 @@ int Actor::GetRangedWeapon(ITMExtHeader *&which, WeaponInfo *wi) const
 	}
 	which = item->GetWeaponHeader(true);
 	gamedata->FreeItem(item, wield->ItemResRef, false);
-	return 0;
+	return 1;
 }
 
-//returns weapon header currently used
+//returns weapon header currently used (bow in case of bow+arrow)
 //if range is nonzero, then the returned header is valid
-unsigned int Actor::GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorright) const
+unsigned int Actor::GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorright)
 {
 	const CREItem *wield = inventory.GetUsedWeapon(leftorright);
 	if (!wield) {
@@ -2487,7 +2489,7 @@ unsigned int Actor::GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorr
 		wi->itemflags = wield->Flags;
 	}
 	//select first weapon header
-	which = item->GetWeaponHeader(false);
+	which = item->GetWeaponHeader(GetAttackStyle() == WEAPON_RANGED);
 	//make sure we use 'false' in this freeitem
 	//so 'which' won't point into invalid memory
 	gamedata->FreeItem(item, wield->ItemResRef, false);
@@ -2609,7 +2611,9 @@ void Actor::SetModal(ieDword newstate)
 //even spells got this attack style
 int Actor::GetAttackStyle()
 {
-	return WEAPON_MELEE;
+	int effect = core->QuerySlotEffects(inventory.GetEquippedSlot()) ;
+	if (effect == SLOT_EFFECT_MISSILE) return WEAPON_RANGED ;
+	return WEAPON_MELEE ;
 }
 
 void Actor::SetTarget( Scriptable *target)
@@ -2785,6 +2789,9 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	ieDword Flags;
 	ITMExtHeader *rangedheader = NULL;
+	ITMExtHeader *hittingheader = header;
+	int THACOBonus = header->THAC0Bonus ;
+	int DamageBonus = header->DamageBonus ;
 	switch(header->AttackType) {
 	case ITEM_AT_MELEE:
 		Flags = WEAPON_MELEE;
@@ -2793,24 +2800,29 @@ void Actor::PerformAttack(ieDword gameTime)
 		Flags = WEAPON_RANGED;
 		break;
 	case ITEM_AT_BOW:
-		if (!GetRangedWeapon(rangedheader, &wi)) {
+		if (!GetRangedWeapon(rangedheader, NULL)) {
 			//out of ammo event
 			//try to refill
 			SetStance(IE_ANI_READY);
 			return;
 		}
-		SetStance(IE_ANI_READY);
-		return;
+		Flags = WEAPON_RANGED ;
+		//The bow can give some bonuses, but the core attack is made by the arrow.
+		hittingheader = rangedheader ;
+		THACOBonus += rangedheader->THAC0Bonus ;
+		DamageBonus+= rangedheader->DamageBonus ;
+		break;
 	default:
 		//item is unsuitable for fight
 		SetStance(IE_ANI_READY);
 		return;
 	}//melee or ranged
 	if (leftorright) Flags|=WEAPON_LEFTHAND;
+	//this flag is set by the bow in case of projectile launcher.
 	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) Flags|=WEAPON_USESTRENGTH;
 
 	//second parameter is left or right hand flag
-	int tohit = GetToHit(header->THAC0Bonus, Flags);
+	int tohit = GetToHit(THACOBonus, Flags);
 
 	int roll = core->Roll(1,ATTACKROLL,0);
 	if (roll==1) {
@@ -2820,10 +2832,10 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	//damage type is?
 	//modify defense with damage type
-	ieDword damagetype = header->DamageType;
+	ieDword damagetype = hittingheader->DamageType;
 	printMessage("Attack"," ",GREEN);
-	int damage = core->Roll(header->DiceThrown, header->DiceSides, header->DamageBonus);
-	printf("Damage %dd%d%+d = %d\n",header->DiceThrown, header->DiceSides, header->DamageBonus, damage);
+	int damage = core->Roll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus);
+	printf("Damage %dd%d%+d = %d\n",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
 	int damageluck = (int) GetStat(IE_DAMAGELUCK);
 	if (damage<damageluck) {
 		damage = damageluck;
@@ -3863,7 +3875,7 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 		if (stance!=0xff) {
 			SetStance(stance);
 			//play only one cycle of animations
-			
+
 			anims->nextStanceID=IE_ANI_READY;
 			anims->autoSwitchOnEnd=true;
 		}
@@ -4311,6 +4323,6 @@ Actor *Actor::CopySelf() const
 	newActor->Destination.y = Destination.y;
 	newActor->SetOrientation(GetOrientation(),0);
 	//and apply them
-	newActor->RefreshEffects(newFXQueue);	
+	newActor->RefreshEffects(newFXQueue);
 	return newActor;
 }
