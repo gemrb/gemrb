@@ -23,7 +23,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
-from GUICommon import GameIsTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities
+from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities
 from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GetKitIndex
 from GUICommonWindows import IsDualClassed, IsMultiClassed, IsDualSwap
 from LUSpellSelection import *
@@ -269,7 +269,7 @@ def OpenLevelUpWindow():
 		if MageTable != "*":
 			# we get 1 extra spell per level if we're a specialist
 			Specialist = 0
-			if KitName != ClassName or ClassTable.GetValue (TmpName, RaceName, 1) == 2: # gnomes are always illusionists
+			if KitList.GetValue (Kit, 7) == 1: # see if we're a kitted mage (TODO: make gnomes ALWAYS be kitted, even multis)
 				Specialist = 1
 			MageTable = GemRB.LoadTableObject (MageTable)
 			# loop through each spell level and save the amount possible to cast (current)
@@ -362,7 +362,7 @@ def OpenLevelUpWindow():
 
 	# use total levels for HLAs
 	HLACount = 0
-	if GameIsTOB(): # make sure SoA doesn't try to get it
+	if HasTOB(): # make sure SoA doesn't try to get it
 		HLATable = GemRB.LoadTableObject("lunumab")
 		if IsMulti:
 			# we need to check each level against a multi value (this is kinda screwy)
@@ -413,7 +413,12 @@ def OpenLevelUpWindow():
 		SkillName = WeapProfTable.GetValue (i+8, 1)
 		if SkillName > 0x1000000 or SkillName < 0:
 			ProfCount -= 1
-		GemRB.SetVar("Prof "+str(i), GemRB.GetPlayerStat (pc, WeapProfTable.GetValue (i+8, 0), 1))
+
+		# we only need the low 3 bits for profeciencies
+		# TODO: use the 6 bits the actual system uses for dual classes
+		#	this code will remain compatible in the meantime
+		currentprof = GemRB.GetPlayerStat (pc, WeapProfTable.GetValue (i+8, 0))&0x07
+		GemRB.SetVar("Prof "+str(i), currentprof)
 	ScrollBarControl.SetVarAssoc ("TopIndex", ProfCount)
 
 	# skills scrollbar
@@ -810,14 +815,14 @@ def LevelUpDonePress():
 			# learn all the spells we're given, but don't have, up to our given casting level
 			if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 1) > 0: # we can memorize spells of this level
 				for j in range(NumClasses): # loop through each class
-					IsDruid = ClassSkillsTable.GetValue (Classes[j], 1, 0)
-					IsCleric = ClassSkillsTable.GetValue (Classes[j], 0, 0)
+					IsDruid = ClassSkillsTable.GetValue (Classes[j], 0, 0)
+					IsCleric = ClassSkillsTable.GetValue (Classes[j], 1, 0)
 					if IsCleric == "*" and IsDruid == "*": # no divine spells (so mage/cleric multis don't screw up)
 						continue
 					elif IsCleric == "*": # druid spells
-						ClassFlag = 0x4000
-					else: # cleric spells
 						ClassFlag = 0x8000
+					else: # cleric spells
+						ClassFlag = 0x4000
 
 					Learnable = GetLearnablePriestSpells(ClassFlag, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
 					for k in range(len(Learnable)): # loop through all the learnable spells
