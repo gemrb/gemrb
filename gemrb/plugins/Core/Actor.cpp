@@ -3028,7 +3028,6 @@ void Actor::Heal(int days)
 void Actor::AddExperience(int exp)
 {
 	SetBase(IE_XP,BaseStats[IE_XP]+exp);
-	core->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword) exp);
 }
 
 void Actor::AddExperience(int type, int level)
@@ -3041,7 +3040,9 @@ void Actor::AddExperience(int type, int level)
 	if (l>=(unsigned int) xpbonuslevels) {
 		l=xpbonuslevels-1;
 	}
-	AddExperience(xpbonus[type*xpbonuslevels+l]);
+	int xp = xpbonus[type*xpbonuslevels+l];
+	AddExperience(xp);
+	core->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword) xp);
 }
 
 bool Actor::Schedule(ieDword gametime)
