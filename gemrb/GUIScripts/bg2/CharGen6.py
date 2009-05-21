@@ -20,7 +20,7 @@
 # character generation - ability; next skills/profs/spells (CharGen6)
 import GemRB
 from CharGenCommon import *
-from GUICG7 import RemoveKnownSpells
+from LUSpellSelection import RemoveKnownSpells
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
@@ -70,8 +70,8 @@ def OnLoad():
 	
 	DisplayOverview (6)
 
-	RemoveKnownSpells (IE_SPELL_TYPE_WIZARD)
-	RemoveKnownSpells (IE_SPELL_TYPE_PRIEST)
+	RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1,9, 1)
+	RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)
 
 	# learn divine spells if appropriate
 	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
