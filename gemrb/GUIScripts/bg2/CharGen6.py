@@ -39,7 +39,6 @@ def OnLoad():
 	for i in range (ProfsCount):
 		StatID = ProfsTable.GetValue (i+8, 0)
 		GemRB.SetVar ("Prof "+str(i), 0)
-		GemRB.SetPlayerStat (MyChar, StatID, 0)
 
 	# nully other variables
 	GemRB.SetVar ("HatedRace", 0)

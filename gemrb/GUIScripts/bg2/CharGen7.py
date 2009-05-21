@@ -60,18 +60,6 @@ def OnLoad():
 			# setting it to value is enough, but this is more modder friendly
 			GemRB.SetPlayerStat (MyChar, StatID, value + GemRB.GetPlayerStat (MyChar, StatID, 1))
 
-	# weapon proficiencies
-	# set the base number of attacks; effects will add the proficiency bonus
-	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 2)
-	ProfsTable = GemRB.LoadTableObject ("weapprof")
-	ProfsCount = ProfsTable.GetRowCount () - 8 # bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
-	for i in range(ProfsCount):
-		StatID = ProfsTable.GetValue (i+8, 0)
-		Value = GemRB.GetVar ("Prof "+str(i))
-		if Value:
-			GemRB.ApplyEffect (MyChar, "Proficiency", Value, StatID)
-			print "\tProf ",str(i),": ",Value
-
 	DisplayOverview (7)
 
 	return

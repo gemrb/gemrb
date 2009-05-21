@@ -47,7 +47,19 @@ def FinishCharGen():
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 	ClassIndex = ClassTable.FindValue (5, Class)
 	ClassName = ClassTable.GetRowName (ClassIndex)
-	
+
+	# weapon proficiencies
+	# set the base number of attacks; effects will add the proficiency bonus
+	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 2)
+	ProfsTable = GemRB.LoadTableObject ("weapprof")
+	ProfsCount = ProfsTable.GetRowCount () - 8 # bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
+	for i in range(ProfsCount):
+		StatID = ProfsTable.GetValue (i+8, 0)
+		Value = GemRB.GetVar ("Prof "+str(i))
+		if Value:
+			GemRB.ApplyEffect (MyChar, "Proficiency", Value, StatID)
+			print "\tProf ",str(i),": ",Value	
+
 	# mage spells
 	TableName = ClassSkillsTable.GetValue (Class, 2, 0)
 	if TableName != "*":
@@ -58,27 +70,9 @@ def FinishCharGen():
 	AlignmentTable = GemRB.LoadTableObject ("aligns")
 
 	# apply starting (alignment dictated) abilities
-	# TODO: simplify this by using AddClassAbilities from GUICommon (spurious name)
-	TmpTable = GemRB.LoadTableObject ("abstart")
+	# pc, table, new level, level diff, alignment
 	AlignmentAbbrev = AlignmentTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
-	AlignmentAbbrev = AlignmentTable.GetValue (AlignmentAbbrev, 4)
-	AbilityCount = TmpTable.GetColumnCount ()
-	spells = []
-
-	for i in range(AbilityCount):
-		spells.append (TmpTable.GetValue (AlignmentAbbrev, str(i)))
-
-	spells2 = list(set(spells))
-	spells2.sort() # create a sorted list of unique spells
-	spells.sort()
-	ClabOffset = GemRB.GetMemorizedSpellsCount (MyChar, IE_SPELL_TYPE_INNATE, 0)
-
-	for i in range(len(spells)):
-		ab = spells[i]
-		if GemRB.LearnSpell (MyChar, ab, LS_MEMO) == LSR_KNOWN:
-			# the spell is already known, so we have to memorize it manually
-			# the last MemorizeSpell parameter is the index of the known spell to memorize
-			GemRB.MemorizeSpell (MyChar, IE_SPELL_TYPE_INNATE, 0, spells2.index(ab) + ClabOffset)
+	AddClassAbilities (MyChar, "abstart", 7,7, AlignmentAbbrev)
 
 	# setup starting gold (uses a roll dictated by class
 	TmpTable = GemRB.LoadTableObject ("strtgold")
