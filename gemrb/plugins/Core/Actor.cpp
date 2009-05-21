@@ -1878,6 +1878,7 @@ void Actor::DebugDump()
 	printf( "Morale:     %d   current morale:%d\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
 	printf( "Moralebreak:%d   Morale recovery:%d\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
 	printf( "Visualrange:%d (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
+	printf( "HP:         %d   current HP:%d\n", BaseStats[IE_HITPOINTS], Modified[IE_HITPOINTS] );
 	printf( "Mod[IE_ANIMATION_ID]: 0x%04X\n", Modified[IE_ANIMATION_ID] );
 	printf( "Colors:    ");
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
