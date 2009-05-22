@@ -421,7 +421,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		print "\t\tClass (Level):",Class,"(",Level,")"
 
 	# check to see if we have a level diff anywhere
-	if sum (LevelDiff) > 0:
+	if sum (LevelDiff) == 0:
 		effects = GemRB.GetPlayerStates (pc)
 		if len (effects):
 			for c in effects:
