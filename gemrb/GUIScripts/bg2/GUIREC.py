@@ -146,14 +146,6 @@ def OpenRecReformPartyWindow ():
 	GemRB.SetTimedEvent ("OpenReformPartyWindow", 1)
 	return
 
-def GetNextLevelExp (Level, Class):
-	NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
-	Row = NextLevelTable.GetRowIndex (Class)
-	if Level < NextLevelTable.GetColumnCount (Row):
-		return str (NextLevelTable.GetValue (Row, Level) )
-
-	return 0
-
 def UpdateRecordsWindow ():
 	global stats_overview, alignment_help
 
@@ -823,39 +815,6 @@ def ExportEditChanged():
 	else:
 		ExportDoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
-
-# returns boolean - true if can level
-def CanLevelUp(actor):
-	# get our class and placements for Multi'd and Dual'd characters
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassTable = GemRB.LoadTableObject ("classes")
-	Class = ClassTable.FindValue (5, Class)
-	Class = ClassTable.GetRowName (Class)
-	Multi = IsMultiClassed (actor, 1)
-	Dual = IsDualClassed (actor, 1)
-
-	# get all the levels and overall xp here
-	Levels = [GemRB.GetPlayerStat (actor, IE_LEVEL), GemRB.GetPlayerStat (actor, IE_LEVEL2), GemRB.GetPlayerStat (actor, IE_LEVEL3)]
-	xp = GemRB.GetPlayerStat (actor, IE_XP)
-
-	if Multi[0] > 1: # multiclassed
-		xp = xp/Multi[0] # divide the xp evenly between the classes
-		for i in range (Multi[0]):
-			# if any class can level, return 1
-			ClassIndex = ClassTable.FindValue (5, Multi[i+1])
-			if int(GetNextLevelExp (Levels[i], ClassTable.GetRowName (ClassIndex))) <= xp:
-				return 1
-
-		# didn't find a class that could level
-		return 0
-	elif Dual[0] > 0: # dual classed
-		if IsDualSwap (actor): # swap the levels if we have to
-			Levels = [Levels[1], Levels[0], Levels[2]]
-		# get the class we can level
-		Class = ClassTable.GetRowName (Dual[2])
-
-	# check the class that can be level (single or dual)
-	return int(GetNextLevelExp (Levels[0], Class)) <= xp
 
 def CanDualClass(actor):
 	# human
