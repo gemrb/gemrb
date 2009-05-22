@@ -3602,6 +3602,32 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar)
 	memcpy(ar,DefaultButtons,3*sizeof(ieByte) );
 }
 
+void Actor::SetPortrait(const char* ResRef, int Which)
+{
+	int i;
+
+	if (ResRef == NULL) {
+		return;
+	}
+	if (InParty) {
+		core->SetEventFlag(EF_PORTRAIT);
+	}
+
+	if(Which!=1) {
+		memset( SmallPortrait, 0, 8 );
+		strncpy( SmallPortrait, ResRef, 8 );
+	}
+	if(Which!=2) {
+		memset( LargePortrait, 0, 8 );
+		strncpy( LargePortrait, ResRef, 8 );
+	}
+	if(!Which) {
+		for (i = 0; i < 8 && ResRef[i]; i++) {};
+		SmallPortrait[i] = 'S';
+		LargePortrait[i] = 'M';
+	}
+}
+
 void Actor::SetSoundFolder(const char *soundset)
 {
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
@@ -3952,8 +3978,8 @@ void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int
 	anims->SetWeaponType(WeaponType);
 	SetAttackMoveChances(MeleeAnimation);
 	if (InParty) {
-	        //update the paperdoll weapon animation
-        	core->SetEventFlag(EF_UPDATEANIM);
+		//update the paperdoll weapon animation
+		core->SetEventFlag(EF_UPDATEANIM);
 	}
 	ITMExtHeader *header ;
 	GetWeapon(header, NULL) ;
@@ -3977,8 +4003,8 @@ void Actor::SetUsedShield(const char* AnimationType, int wt)
 	anims->SetOffhandRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
 	if (InParty) {
-	        //update the paperdoll weapon animation
-        	core->SetEventFlag(EF_UPDATEANIM);
+		//update the paperdoll weapon animation
+		core->SetEventFlag(EF_UPDATEANIM);
 	}
 }
 
@@ -3989,8 +4015,8 @@ void Actor::SetUsedHelmet(const char* AnimationType)
 		return;
 	anims->SetHelmetRef(AnimationType);
 	if (InParty) {
-	        //update the paperdoll weapon animation
-        	core->SetEventFlag(EF_UPDATEANIM);
+		//update the paperdoll weapon animation
+		core->SetEventFlag(EF_UPDATEANIM);
 	}
 }
 

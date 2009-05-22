@@ -307,27 +307,7 @@ public:
 	}
 	/** Sets the Icon ResRef */
 	//Which - 0 both, 1 Large, 2 Small
-	void SetPortrait(const char* ResRef, int Which=0)
-	{
-		int i;
-
-		if (ResRef == NULL) {
-			return;
-		}
-		if(Which!=1) {
-			memset( SmallPortrait, 0, 8 );
-			strncpy( SmallPortrait, ResRef, 8 );
-		}
-		if(Which!=2) {
-			memset( LargePortrait, 0, 8 );
-			strncpy( LargePortrait, ResRef, 8 );
-		}
-		if(!Which) {
-			for (i = 0; i < 8 && ResRef[i]; i++) {};
-			SmallPortrait[i] = 'S';
-			LargePortrait[i] = 'M';
-		}
-	}
+	void SetPortrait(const char* ResRef, int Which=0);
 	void SetSoundFolder(const char *soundset);
 	/** Gets the Character Long Name/Short Name */
 	char* GetName(int which) const
