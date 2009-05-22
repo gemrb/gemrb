@@ -157,9 +157,13 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				str->ReadWord( &DisabledIndex );
 				btn->Owner = win;
 				/** Justification comes from the .chu, other bits are set by script */
-				if(!Width) {
+				if (!Width) {
 					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_OR);
 				}
+				if (core->HasFeature(GF_UPPER_BUTTON_TEXT)) {
+					btn->SetFlags(IE_GUI_BUTTON_CAPS, BM_OR);
+				}
+
 				btn->SetFlags( Cycle&0xff00, BM_OR );
 				if (strnicmp( BAMFile, "guictrl\0", 8 ) == 0) {
 					if (UnpressedIndex == 0) {

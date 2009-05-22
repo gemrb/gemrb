@@ -542,7 +542,7 @@ int Button::SetText(const char* string, int /*pos*/)
 	} else if (string[0] == 0) {
 		hasText = false;
 	} else {
-		if (core->HasFeature( GF_UPPER_BUTTON_TEXT ))
+		if (Flags&IE_GUI_BUTTON_CAPS)
 			strnuprcpy( Text, string, 63 );
 		else
 			strncpy( Text, string, 63 );

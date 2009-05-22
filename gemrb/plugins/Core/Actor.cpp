@@ -1486,6 +1486,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	if (first) {
 		InternalFlags|=IF_INITIALIZED;
+		memcpy( previous, BaseStats, MAX_STATS * sizeof( ieDword ) );
 	} else {
 		memcpy( previous, Modified, MAX_STATS * sizeof( ieDword ) );
 	}
@@ -1533,16 +1534,10 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	Modified[IE_HITPOINTS]+=bonus;
 
 	for (unsigned int i=0;i<MAX_STATS;i++) {
-		if (first ) {
+		if (first || Modified[i]!=previous[i]) {
 			PostChangeFunctionType f = post_change_functions[i];
 			if (f) {
-				(*f)(this, first?0:previous[i], Modified[i]);
-			}
-		} else
-		if (Modified[i]!=previous[i]) {
-			PostChangeFunctionType f = post_change_functions[i];
-			if (f) {
-				(*f)(this, first?0:previous[i], Modified[i]);
+				(*f)(this, previous[i], Modified[i]);
 			}
 		}
 	}

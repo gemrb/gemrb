@@ -310,7 +310,6 @@ def ActionQWeaponPressed (which):
 	qs = GemRB.GetEquippedQuickSlot (pc,1)
 
 	#38 is the magic slot
-	print "Quick Slot:",qs
 	if ((qs==which) or (qs==38)) and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK, GA_NO_DEAD|GA_NO_SELF|GA_NO_HIDDEN)
 	else:
@@ -575,6 +574,7 @@ def OpenPortraitWindow (needcontrols):
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
+		Button.SetFont ("STATES2")
 		Button.SetVarAssoc ("PressedPortrait", i)
 		if (needcontrols):
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenInventoryWindowClick")
@@ -614,7 +614,7 @@ def UpdatePortraitWindow ():
 			Button.SetTooltip ("")
 			continue
 
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_HORIZONTAL|IE_GUI_BUTTON_DRAGGABLE, OP_SET)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_TOP|IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_HORIZONTAL|IE_GUI_BUTTON_DRAGGABLE, OP_SET)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetPicture (pic, "NOPORTSM")
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
@@ -631,6 +631,18 @@ def UpdatePortraitWindow ():
 		else:
 			Button.SetOverlay (ratio, 255,0,0,200, 128,0,0,200)
 		Button.SetTooltip (GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
+
+		#add effects on the portrait
+		effects = GemRB.GetPlayerStates (i+1)
+		states = ""
+		for i in range((len(effects)+2)/3):
+			states=states+effects[len(effects)-i*3-3:len(effects)-i*3]+"\n"
+
+		if CanLevelUp (pc):
+			states = chr(255)+"\n"+states
+		else:
+			states = "\n"+states
+		Button.SetText(states)
 	return
 
 def PortraitButtonOnDrag ():
@@ -800,7 +812,6 @@ def GearsClicked():
 
 def OpenWaitForDiscWindow ():
 	global DiscWindow
-	#print "OpenWaitForDiscWindow"
 
 	if DiscWindow:
 		GemRB.HideGUI ()

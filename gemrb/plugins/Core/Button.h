@@ -74,6 +74,7 @@ class Palette;
 #define IE_GUI_BUTTON_BG1_PAPERDOLL   0x00100000 // BG1-style paperdoll PictureList
 #define IE_GUI_BUTTON_HORIZONTAL      0x00200000 // horizontal clipping of overlay
 #define IE_GUI_BUTTON_CANCEL          0x00400000 // cancel key triggers it
+#define IE_GUI_BUTTON_CAPS            0x00800000 // convert text to uppercase
 
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
 
