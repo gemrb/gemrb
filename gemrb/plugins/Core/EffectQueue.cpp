@@ -1484,7 +1484,7 @@ void EffectQueue::dump()
 			if (fx->Opcode < MAX_EFFECTS)
 				Name = (char*) effect_refs[fx->Opcode].Name;
 
-			printf( " %2d: 0x%02x: %s (%d, %d)\n", i++, fx->Opcode, Name, fx->Parameter1, fx->Parameter2 );
+			printf( " %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Name, fx->Parameter1, fx->Parameter2, fx->Source );
 		}
 	}
 }
