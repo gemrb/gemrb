@@ -323,18 +323,18 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 	printf( "Displaying string on: %s\n", Sender->GetScriptName() );
 	if (flags & DS_CONST) {
 		if (Sender->Type!=ST_ACTOR) {
-			printf("[GameScript] Verbal constant not supported for non actors!\n");
+			printMessage("GameScript","Verbal constant not supported for non actors!\n", LIGHT_RED);
 			return;
 		}
 		Actor* actor = ( Actor* ) Sender;
 		if ((ieDword) Strref>=VCONST_COUNT) {
-			printf("[GameScript] Invalid verbal constant!\n");
+			printMessage("GameScript","Invalid verbal constant!\n", LIGHT_RED);
 			return;
 		}
 
 		int tmp=(int) actor->StrRefs[Strref];
-		// 0 is also illegal as string constant (in pst at least)
-		if (tmp <= 0) {
+		if (tmp <= 0 || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
+			//get soundset based string constant
 			actor->ResolveStringConstant( sb.Sound, (unsigned int) Strref);
 		}
 		Strref = tmp;

@@ -4979,12 +4979,12 @@ static PyObject* GemRB_GetPlayerScript(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_SetPlayerScript__doc,
 "SetPlayerScript(Slot, Resource[, Index])\n\n"
 "Sets the script resource for a player. If index is omitted, it will default to "
-"the default script slot." );
+"the class script slot (customisable by players)." );
 
 static PyObject* GemRB_SetPlayerScript(PyObject * /*self*/, PyObject* args)
 {
 	const char *ScriptName;
-	int PlayerSlot, Index = SCR_DEFAULT;
+	int PlayerSlot, Index = SCR_CLASS;
 
 	if (!PyArg_ParseTuple( args, "is|i", &PlayerSlot, &ScriptName, &Index )) {
 		return AttributeError( GemRB_SetPlayerScript__doc );
