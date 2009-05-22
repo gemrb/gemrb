@@ -860,13 +860,12 @@ def IsDualClassed(actor, verbose):
 		KitIndex = GetKitIndex (actor)
 
 		if (Dual & MC_WAS_ANY_CLASS) > 0: # first (previous) class of the dual class
+			FirstClassIndex = ClassTable.FindValue (15, Dual & MC_WAS_ANY_CLASS)
 			if KitIndex:
 				DualInfo.append (1)
 				DualInfo.append (KitIndex)
-				FirstClassIndex = ClassIndex
 			else:
 				DualInfo.append (2)
-				FirstClassIndex = ClassTable.FindValue (15, Dual & MC_WAS_ANY_CLASS)
 				DualInfo.append (FirstClassIndex)
 
 			# use the first class of the multiclass bunch that isn't the same as the first class
