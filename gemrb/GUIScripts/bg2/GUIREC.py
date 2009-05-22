@@ -480,7 +480,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	for i in range(8,RowCount):
 		text = table.GetValue (i, 1)
 		stat = table.GetValue (i, 0)
-		stats.append ( (text, GS(stat), '+') )
+		stats.append ( (text, GS(stat)&0x07, '+') )
 	stats.append (None)
 
 	# 11766 AC Bonuses

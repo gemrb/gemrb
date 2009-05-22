@@ -222,3 +222,42 @@ def AddClassAbilities (pc, TmpTable, Level=1, LevelDiff=1, align=-1):
 						GemRB.MemorizeSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
 				else:
 					print "ERROR, unknown class ability (type): ", ab
+
+# remove all class abilities up to a give level
+# for dual-classing mainly
+def RemoveClassAbilities (pc, TmpTable, Level):
+	TmpTable = GemRB.LoadTableObject (TmpTable)
+
+	# gotta stay positive
+	if Level < 0:
+		return
+
+	# make sure we don't go out too far
+	jMax = Level
+	if jMax > TmpTable.GetColumnCount ():
+		jMax = TmpTable.GetColumnCount ()
+
+	for i in range(TmpTable.GetRowCount ()):
+		for j in range (jMax):
+			ab = TmpTable.GetValue (i, j, 0)
+			if ab and ab != "****":
+				# get the index
+				SpellIndex = HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
+
+				# seems all SPINs act like GA_*
+				if ab[:4] == "SPIN":
+					ab = "GA_" + ab
+
+				# apply spell (AP_) or gain spell (GA_)?
+				if ab[:2] == "AP":
+					# TODO: implement
+					print "Spell index for",ab,":",SpellIndex
+				elif ab[:2] == "GA":
+					if SpellIndex >= 0:
+						# TODO: get the correct counts to avoid removing an innate ability
+						# given by more than one thing?
+						GemRB.UnmemorizeSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
+						GemRB.RemoveSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
+				else:
+					print "ERROR, unknown class ability (type): ", ab
+

@@ -770,6 +770,8 @@ def LevelUpDonePress():
 	for i in range(ProfCount-8): # skip bg1 weapprof.2da proficiencies
 		StatID = TmpTable.GetValue (i+8, 0)
 		Value = GemRB.GetVar ("Prof "+str(i))
+		OldProf = GemRB.GetPlayerStat (pc, StatID) & 0x38
+		Value = OldProf | Value
 		if Value:
 			GemRB.ApplyEffect (pc, "Proficiency", Value, StatID )
 
@@ -948,6 +950,7 @@ def LeftPress():
 # regains all the benifits of the former class
 def ReactivateBaseClass ():
 	# things that change:
+	#	proficiencies
 	#	thac0
 	#	saves
 	#	class abilities (need to relearn)
@@ -957,6 +960,19 @@ def ReactivateBaseClass ():
 	ClassName = ClassTable.GetRowName (ClassIndex)
 	KitIndex = GetKitIndex (pc)
 	KitList = GemRB.LoadTableObject ("kitlist")
+
+	# reactivate all our proficiencies
+	TmpTable = GemRB.LoadTableObject ("weapprof")
+	ProfCount = TmpTable.GetRowCount ()
+	for i in range(ProfCount-8): # skip bg1 weapprof.2da proficiencies
+		StatID = TmpTable.GetValue (i+8, 0)
+		Value = GemRB.GetPlayerStat (pc, StatID)
+		OldProf = (Value & 0x38) >> 3
+		NewProf = Value & 0x07
+		if OldProf > NewProf:
+			Value = (OldProf << 3) | OldProf
+			print "Value:",Value
+			GemRB.ApplyEffect (pc, "Proficiency", Value, StatID )
 
 	# see if this thac0 is lower than our current thac0
 	ThacoTable = GemRB.LoadTableObject ("THAC0")
