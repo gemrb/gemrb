@@ -234,7 +234,7 @@ private:
 	//when the next attack is scheduled (gametime+initiative)
 	ieDword initiative;
 	ieDword InTrap;
-
+	char AttackStance ;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
 				 SpriteCover*& sc, Animation** anims,

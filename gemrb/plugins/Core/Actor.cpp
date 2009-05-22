@@ -2680,7 +2680,8 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 		return;
 	}
 
-	SetStance(IE_ANI_ATTACK);
+	SetStance(AttackStance) ;
+
 	//last chance to disable attacking
 	//
 	attackcount = GetStat(IE_NUMBEROFATTACKS);
@@ -3480,9 +3481,10 @@ bool Actor::HandleActorStance()
 		return true;
 	}
 	if (StanceID == IE_ANI_ATTACK || StanceID == IE_ANI_ATTACK_JAB ||
-		StanceID == IE_ANI_ATTACK_SLASH || StanceID == IE_ANI_ATTACK_BACKSLASH)
+		StanceID == IE_ANI_ATTACK_SLASH || StanceID == IE_ANI_ATTACK_BACKSLASH ||
+		StanceID == IE_ANI_SHOOT)
 	{
-		SetStance( IE_ANI_ATTACK );
+		SetStance( AttackStance );
 		return true;
 	}
 	return false;
@@ -3869,7 +3871,7 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 	}
 
 	if (!silent) {
-		ieByte stance = IE_ANI_ATTACK;
+		ieByte stance = AttackStance;
 		for (int i=0;i<animcount;i++) {
 			if ( strnicmp(item->ItemResRef, itemanim[i].itemname, 8) == 0) {
 				stance = itemanim[i].animation;
@@ -3953,6 +3955,13 @@ void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int
 	        //update the paperdoll weapon animation
         	core->SetEventFlag(EF_UPDATEANIM);
 	}
+	ITMExtHeader *header ;
+	GetWeapon(header, NULL) ;
+	if(header && header->AttackType == ITEM_AT_BOW) {
+		AttackStance = IE_ANI_SHOOT ;
+		return ;
+	}
+	AttackStance =  IE_ANI_ATTACK;
 }
 
 void Actor::SetUsedShield(const char* AnimationType, int wt)
