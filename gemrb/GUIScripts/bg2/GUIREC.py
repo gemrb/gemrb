@@ -299,6 +299,14 @@ def GetStatColor (pc, stat):
 		return (255,255,0)
 	return (0,255,0)
 
+# GemRB.GetPlayerStat wrapper that only returns nonnegative values
+def GSNN (pc, stat):
+	val = GemRB.GetPlayerStat (pc, stat)
+	if val >= 0:
+		return val
+	else:
+		return 0
+
 # LevelDiff is used only from the level up code and holds the level
 # difference for each class
 def GetStatOverview (pc, LevelDiff=[0,0,0]):
@@ -434,10 +442,10 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ( (9459, GS (IE_LORE), '') )
 	reptxt = GetReputation (GemRB.GameGetReputation ()/10)
 	stats.append ( (9465, reptxt, '') )
-	stats.append ( (9460, GS (IE_LOCKPICKING), '') )
-	stats.append ( (9462, GS (IE_TRAPS), '') )
-	stats.append ( (9463, GS (IE_PICKPOCKET), '') )
-	stats.append ( (9461, GS (IE_STEALTH), '') )
+	stats.append ( (9460, GSNN (pc, IE_LOCKPICKING), '') )
+	stats.append ( (9462, GSNN (pc, IE_TRAPS), '') )
+	stats.append ( (9463, GSNN (pc, IE_PICKPOCKET), '') )
+	stats.append ( (9461, GSNN (pc, IE_STEALTH), '') )
 	HatedRace = GS (IE_HATEDRACE)
 	if HatedRace:
 		HateTable = GemRB.LoadTableObject ("haterace")
@@ -446,9 +454,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			HatedRace = HateTable.GetValue (Racist, 0)
 			stats.append ( (15982, GemRB.GetString (HatedRace), '') )
 
-	stats.append ( (34120, GS (IE_HIDEINSHADOWS), '') )
-	stats.append ( (34121, GS (IE_DETECTILLUSIONS), '') )
-	stats.append ( (34122, GS (IE_SETTRAPS), '') )
+	stats.append ( (34120, GSNN (pc, IE_HIDEINSHADOWS), '') )
+	stats.append ( (34121, GSNN (pc, IE_DETECTILLUSIONS), '') )
+	stats.append ( (34122, GSNN (pc, IE_SETTRAPS), '') )
 	stats.append ( (12128, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
 	stats.append ( (12126, GS (IE_TURNUNDEADLEVEL), '') )
 	stats.append ( (12127, GS (IE_LAYONHANDSAMOUNT), '') )

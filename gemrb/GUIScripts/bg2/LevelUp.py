@@ -24,7 +24,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
 from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities
-from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle
+from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GSNN
 from GUICommonWindows import IsDualClassed, IsMultiClassed, IsDualSwap, GetKitIndex
 from LUSpellSelection import *
 from LUHLASelection import *
@@ -368,7 +368,6 @@ def OpenLevelUpWindow():
 		for skill in range(SpecialSkillsTable.GetColumnCount ()):
 			skillname = SpecialSkillsTable.GetColumnName (skill)
 			value = SpecialSkillsTable.GetValue (str(Level[skills[1]]), skillname)
-			StatID = SkillTable.GetValue (skillname, "ID")
 			skillindex = SkillTable.GetRowIndex (skillname) - 2
 			GemRB.SetVar ("Skill " + str(skillindex), value)
 			AvailableSkillIndices.append(skillindex)
