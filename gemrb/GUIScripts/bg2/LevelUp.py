@@ -1021,17 +1021,19 @@ def ReactivateBaseClass ():
 				GemRB.SetMemorizableSpellsCount (pc, NumSpells, IE_SPELL_TYPE_WIZARD, i)
 	elif SpellTables[1] != "*" or SpellTables[0] != "*": # casts priest spells
 		# get the correct table and mask
-		if SpellsTables[1] != "*": # clerical spells
+		if SpellTables[1] != "*": # clerical spells
 			SpellTable = GemRB.LoadTableObject (SpellTables[1])
-			ClassMask = 0x8000
+			ClassMask = 0x4000
 		else: # druidic spells
 			SpellTable = GemRB.LoadTableObject (SpellTables[0])
-			ClassMask = 0x4000
+			ClassMask = 0x8000
 
 		# loop through each spell level
 		for i in range (7):
 			# update if we can cast more spells at this level
-			NumSpells = SpellTable.GetValue (Level[1]-1, i)
+			NumSpells = SpellTable.GetValue (str(Level[1]), str(i+1), 1)
+			if not NumSpells:
+				continue
 			if NumSpells > GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 1):
 				GemRB.SetMemorizableSpellsCount (pc, NumSpells, IE_SPELL_TYPE_PRIEST, i)
 
