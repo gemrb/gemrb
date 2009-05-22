@@ -84,6 +84,9 @@ def NextPress():
 
 	CharSound = VoiceList.QueryText ()
 	GemRB.SetToken ("CharSound", CharSound)
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerSound (MyChar, CharSound)
+
 	if CharSoundWindow:
 		CharSoundWindow.Unload()
 	GemRB.SetNextScript("CharGen8") #name
