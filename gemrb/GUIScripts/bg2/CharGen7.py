@@ -57,8 +57,7 @@ def OnLoad():
 			skillname = SpecialSkillsTable.GetColumnName(skill)
 			value = SpecialSkillsTable.GetValue (str(Level), skillname)
 			StatID = SkillTable.GetValue (skillname, "ID")
-			# setting it to value is enough, but this is more modder friendly
-			GemRB.SetPlayerStat (MyChar, StatID, value + GemRB.GetPlayerStat (MyChar, StatID, 1))
+			GemRB.SetPlayerStat (MyChar, StatID, value)
 
 	DisplayOverview (7)
 

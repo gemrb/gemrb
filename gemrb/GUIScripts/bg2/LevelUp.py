@@ -60,6 +60,7 @@ ClassSkillsTable = 0
 ClassName = 0
 RaceTable = 0
 AvailableSkillIndices = []
+SpecialSkillsMap = []
 
 # old values (so we don't add too much)
 OldHP = 0		# << old current hitpoints
@@ -81,7 +82,7 @@ def OpenLevelUpWindow():
 	global ClassTable, Level, Classes, NumClasses, DualSwap, ClassSkillsTable, IsMulti
 	global OldHP, OldHPMax, OldSaves, OldLore, OldThaco, DeltaDSpells, DeltaWSpells
 	global NewDSpells, NewWSpells, OldDSpells, OldWSpells, pc, HLACount, ClassName, IsDual
-	global AvailableSkillIndices
+	global AvailableSkillIndices, SpecialSkillsMap
 
 	LevelUpWindow = GemRB.LoadWindowObject (3)
 
@@ -345,7 +346,6 @@ def OpenLevelUpWindow():
 			SkillPointsLeft = 0
 		else:
 			# get the skill values
-			# TODO: get upgrades from clskills -> skill{brd,rng}
 			for i in range(SkillTable.GetRowCount()-2):
 				SkillID = SkillTable.GetValue (i+2, 2)
 				SkillValue = GemRB.GetPlayerStat (pc, SkillID, 1)
@@ -353,6 +353,25 @@ def OpenLevelUpWindow():
 				GemRB.SetVar("SkillBase "+str(i), SkillValue)
 
 	NewSkillPoints = SkillPointsLeft
+	
+	# get ranger and bard skill upgrades (automatic)
+	SpecialSkillsMap = []
+	for i in range(len(Classes)):
+		classname = ClassTable.GetRowName (ClassTable.FindValue (5, Classes[i]))
+		for table in "RANGERSKILL", "BARDSKILL":
+			SpecialSkillsTable = ClassSkillsTable.GetValue (classname, table)
+			if SpecialSkillsTable != "*":
+				SpecialSkillsMap.append((SpecialSkillsTable, i))
+				break
+	for skills in SpecialSkillsMap:
+		SpecialSkillsTable = GemRB.LoadTableObject (skills[0])
+		for skill in range(SpecialSkillsTable.GetColumnCount ()):
+			skillname = SpecialSkillsTable.GetColumnName (skill)
+			value = SpecialSkillsTable.GetValue (str(Level[skills[1]]), skillname)
+			StatID = SkillTable.GetValue (skillname, "ID")
+			skillindex = SkillTable.GetRowIndex (skillname) - 2
+			GemRB.SetVar ("Skill " + str(skillindex), value)
+			AvailableSkillIndices.append(skillindex)
 
 	# use total levels for HLAs
 	HLACount = 0
@@ -501,7 +520,7 @@ def RedrawSkills(First=0, direction=0):
 
 	# skill part of the window
 	SkillSumLabel = LevelUpWindow.GetControl(0x10000000+37)
-	if NewSkillPoints == 0:
+	if NewSkillPoints == 0 and not SpecialSkillsMap:
 		SkillSumLabel.SetText("")
 		for i in range(4):
 			HideSkills(i)
@@ -517,7 +536,10 @@ def RedrawSkills(First=0, direction=0):
 			Label.SetText (SkillName)
 
 			SkillName = SkillTable.GetRowName (Pos+2)
-			Ok = SkillTable.GetValue (SkillName, KitName)
+			if SpecialSkillsMap:
+				Ok = -1
+			else:
+				Ok = SkillTable.GetValue (SkillName, KitName)
 			Button1 = LevelUpWindow.GetControl(i*2+17)
 			Button2 = LevelUpWindow.GetControl(i*2+18)
 			if Ok == -1:
@@ -699,10 +721,7 @@ def GetLevelUpNews():
 	# new spell slots
 		# 5373 - Additional Priest Spells
 		# 5374 - Additional Mage Spells
-		#? 10345 - Level <SPELLLEVEL> (used in stats_overview for bonus priest spells)
-		#? 11293 - <CLASS>: Level <LEVEL>
-		#? 61269 - Level <LEVEL> Spells <- the one we use
-
+		# 61269 - Level <LEVEL> Spells
 	if DeltaDSpells > 0: # new divine spells
 		News += GemRB.GetString (5373) + '\n'
 		for i in range (len (NewDSpells)):
@@ -743,6 +762,7 @@ def GetLevelUpNews():
 		News += GemRB.GetString (5377) + ": " + str(LoreGain) + '\n\n'
 
 	# 5378 - Additional Skill Points
+	# ranger and bard skill(point) gain is not mentioned here in the original
 	if NewSkillPoints > 0:
 		News += GemRB.GetString (5378) + ": " + str(NewSkillPoints) + '\n'
 
