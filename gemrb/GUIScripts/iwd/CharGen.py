@@ -764,7 +764,7 @@ def PortraitCustomPress():
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (7)
-	Button.SetText (15416)
+	Button.SetText (13727) 
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomAbort")
 
 	Button = Window.GetControl (0)
