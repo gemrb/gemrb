@@ -4127,7 +4127,7 @@ int Actor::Unusable(Item *item) const
 	}
 
 	if (item->MinStrength==18) {
-		if (GetStat(IE_STR==18)) {
+		if (GetStat(IE_STR)==18) {
 			if (item->MinStrengthBonus>GetStat(IE_STREXTRA)) {
 				return 1;
 			}
