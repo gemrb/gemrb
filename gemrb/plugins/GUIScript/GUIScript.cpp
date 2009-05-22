@@ -4993,11 +4993,9 @@ static PyObject* GemRB_SetPlayerScript(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError("Cannot find actor!\n");
 	}
-	const char *scr = actor->GetScript(Index);
-	if (scr[0]==0) {
-		scr="None";
-	}
-	return PyString_FromString( scr );
+	actor->SetScript(ScriptName, Index, true);
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_FillPlayerInfo__doc,
