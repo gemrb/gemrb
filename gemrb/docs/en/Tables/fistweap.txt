@@ -1,5 +1,7 @@
-Description: This table contains what resref will be created in the fist slot of a creature. This is usually the MFIST object, but for the monk class it varies with level. It is possible to add other classes which have level based fist weapon.
+Description: This table contains what resref will be created in the fist slot of a creature.
+This is usually the FIST object, but for the monk class it varies with level.
+It is possible to add other classes which have level based fist weapon.
 
 Columns: The levels
 
-Rows: The classes (use class name as label)
+Rows: The classes (use class id as label)
