@@ -5474,7 +5474,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
  		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
  			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
-	 			memcpy(Sound,item->ReplacementItem,8);
+				memcpy(Sound,item->ReplacementItem,8);
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
@@ -5506,7 +5506,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
  		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
  			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
-	 			memcpy(Sound,item->DescriptionIcon,8);
+				memcpy(Sound,item->DescriptionIcon,8);
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 			}
@@ -6492,6 +6492,34 @@ static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( ret );
 }
 
+
+PyDoc_STRVAR( GemRB_RemoveEffects__doc,
+"RemoveEffects(PartyID, SpellResRef)\n\n"
+"Removes all effects from target whose source is SpellResRef." );
+
+static PyObject* GemRB_RemoveEffects(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+	const char * SpellResRef;
+
+	if (!PyArg_ParseTuple( args, "is", &PartyID, &SpellResRef )) {
+		return AttributeError( GemRB_RemoveEffects__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found!" );
+	}
+
+	actor->fxqueue.RemoveAllEffects(SpellResRef);
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_RemoveSpell__doc,
 "RemoveSpell(PartyID, SpellType, Level, Index)=>bool\n\n"
 "Removes specified known spell. Returns 1 on success." );
@@ -6526,20 +6554,20 @@ PyDoc_STRVAR( GemRB_RemoveItem__doc,
 
 static PyObject* GemRB_RemoveItem(PyObject * /*self*/, PyObject* args)
 {
-        int PartyID, Slot;
+	int PartyID, Slot;
 	int Count = 0;
 
-        if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &Slot, &Count )) {
-                return AttributeError( GemRB_RemoveItem__doc );
-        }
-        Game *game = core->GetGame();
-        if (!game) {
-                return RuntimeError( "No game loaded!" );
-        }
-        Actor* actor = game->FindPC( PartyID );
-        if (!actor) {
-                return RuntimeError( "Actor not found!" );
-        }
+	if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &Slot, &Count )) {
+		return AttributeError( GemRB_RemoveItem__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found!" );
+	}
 
 	int ok;
 
@@ -6552,7 +6580,7 @@ static PyObject* GemRB_RemoveItem(PyObject * /*self*/, PyObject* args)
 	} else {
 		ok = false;
 	}
-        return PyInt_FromLong( ok );
+	return PyInt_FromLong( ok );
 }
 
 PyDoc_STRVAR( GemRB_MemorizeSpell__doc,
@@ -7053,7 +7081,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
  		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
  			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
-	 			memcpy(Sound,item->ReplacementItem,8);
+				memcpy(Sound,item->ReplacementItem,8);
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
@@ -8987,6 +9015,7 @@ static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 static PyMethodDef GemRBMethods[] = {
 	METHOD(AdjustScrolling, METH_VARARGS),
 	METHOD(ApplyEffect, METH_VARARGS),
+	METHOD(ApplySpell, METH_VARARGS),
 	METHOD(AttachScrollBar, METH_VARARGS),
 	METHOD(CanUseItemType, METH_VARARGS),
 	METHOD(ChangeContainerItem, METH_VARARGS),
@@ -9138,6 +9167,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(PlayMovie, METH_VARARGS),
 	METHOD(RemoveItem, METH_VARARGS),
 	METHOD(RemoveSpell, METH_VARARGS),
+	METHOD(RemoveEffects, METH_VARARGS),
 	METHOD(RestParty, METH_VARARGS),
 	METHOD(RevealArea, METH_VARARGS),
 	METHOD(RewindTA, METH_VARARGS),
@@ -9228,7 +9258,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
 	METHOD(UpdateMusicVolume, METH_NOARGS),
 	METHOD(UseItem, METH_VARARGS),
-	METHOD(ApplySpell, METH_VARARGS),
 	// terminating entry
 	{NULL, NULL, 0, NULL}
 };
