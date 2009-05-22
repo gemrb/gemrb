@@ -1285,7 +1285,10 @@ def OpenSoundWindow():
 	return
 
 def DoneSoundWindow():
-	#TODO set new soundset
+	pc = GemRB.GameGetSelectedPCSingle ()
+	CharSound = VoiceList.QueryText()
+	GemRB.SetPlayerSound (pc, CharSound)
+
 	CloseSubCustomizeWindow()
 	return
 
@@ -1347,10 +1350,14 @@ def OpenScriptWindow():
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
 	ScriptTextArea.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
-	ScriptTextArea.SetVarAssoc ("Selected", 0)
+	FillScriptList ()
+	pc = GemRB.GameGetSelectedPCSingle ()
+	script = GemRB.GetPlayerScript (pc)
+	scriptindex = ScriptsTable.GetRowIndex (script)
+	GemRB.SetVar ("Selected", scriptindex)
+	ScriptTextArea.SetVarAssoc ("Selected", scriptindex)
 
 	SelectedTextArea = SubCustomizeWindow.GetControl (4)
-	FillScriptList ()
 	UpdateScriptSelection ()
 
 	DoneButton = SubCustomizeWindow.GetControl (5)
@@ -1388,15 +1395,15 @@ def FillScriptList():
 	return
 
 def DoneScriptWindow():
-	#todo: set script
-	print "Selected script: ", ScriptsTable.GetRowName(GemRB.GetVar("Selected"))
+	pc = GemRB.GameGetSelectedPCSingle ()
+	script = ScriptsTable.GetRowName(GemRB.GetVar("Selected") )
+	GemRB.SetPlayerScript (pc, script)
 	CloseSubCustomizeWindow()
         return
 
 def UpdateScriptSelection():
 	text = ScriptTextArea.QueryText ()
 	SelectedTextArea.SetText (text)
-	print "Selected script: ", ScriptsTable.GetRowName(GemRB.GetVar("Selected"))
 	return
 
 def OpenBiographyEditWindow():
