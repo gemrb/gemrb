@@ -38,6 +38,7 @@ from GUISTORE import *
 from GUIWORLD import *
 from TextScreen import *
 from LevelUp import *
+from DualClass import *
 
 MessageWindow = 0
 PortraitWindow = 0

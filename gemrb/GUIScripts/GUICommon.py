@@ -251,7 +251,7 @@ def RemoveClassAbilities (pc, TmpTable, Level):
 				# apply spell (AP_) or gain spell (GA_)?
 				if ab[:2] == "AP":
 					# TODO: implement
-					print "Spell index for",ab,":",SpellIndex
+					GemRB.RemoveEffects (pc, ab[3:])
 				elif ab[:2] == "GA":
 					if SpellIndex >= 0:
 						# TODO: get the correct counts to avoid removing an innate ability
