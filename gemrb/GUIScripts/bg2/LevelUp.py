@@ -159,6 +159,7 @@ def OpenLevelUpWindow():
 	NumClasses = IsMulti[0] # 2 or 3 if IsMulti; 0 otherwise
 	IsMulti = NumClasses > 1
 	IsDual = 0
+	DualSwap = 0
 	
 	# not multi, check dual
 	if not IsMulti:
