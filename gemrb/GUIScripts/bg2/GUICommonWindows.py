@@ -645,7 +645,7 @@ def UpdatePortraitWindow ():
 			if col % 3 == 2: states = states + "\n"
 
 		if CanLevelUp (i+1):
-			states = chr(255)+"\n"+states
+			states = chr(255)+"\n\n"+states
 		else:
 			states = "\n"+states
 		Button.SetText(states)
