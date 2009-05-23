@@ -638,7 +638,7 @@ def UpdatePortraitWindow ():
 		for i in range((len(effects)+2)/3):
 			states=states+effects[len(effects)-i*3-3:len(effects)-i*3]+"\n"
 
-		if CanLevelUp (pc):
+		if CanLevelUp (i+1):
 			states = chr(255)+"\n"+states
 		else:
 			states = "\n"+states
