@@ -1800,7 +1800,7 @@ void GameScript::ChangeDialogue(Scriptable* Sender, Action* parameters)
 //string0, no interrupt, talkcount increased
 void GameScript::StartDialogue(Scriptable* Sender, Action* parameters)
 {
-	BeginDialog( Sender, parameters, BD_STRING0 | BD_TALKCOUNT | BD_SETDIALOG | BD_CHECKDIST );
+	BeginDialog( Sender, parameters, BD_STRING0 | BD_TALKCOUNT | BD_SETDIALOG );
 }
 
 //string0, no interrupt, talkcount increased, don't set default
