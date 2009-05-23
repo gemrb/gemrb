@@ -4904,10 +4904,11 @@ static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 	if (Index>=VCONST_COUNT) {
 		return RuntimeError("String reference too high!\n");
 	}
-	//returning the modified stat if BaseStat was 0 (default)
 	StatValue = GetCreatureStrRef( MyActor, Index );
 	return PyInt_FromLong( StatValue );
 }
+
+//TODO: maybe we also need setplayerstring
 
 PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
 "GetPlayerStat(Slot, ID[, BaseStat]) => int\n\n"
@@ -7150,13 +7151,29 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (!item) {
 		return PyInt_FromLong( -1 );
 	}
+
 	// can't equip item because of similar already equipped
-	if (Effect && item->ItemExcl & actor->inventory.GetEquipExclusion()) {
-		core->DisplayConstantString(STR_ITEMEXCL, 0xf0f0f0);
-		//freeing the item before returning
-		gamedata->FreeItem( item, slotitem->ItemResRef, false );
-		return PyInt_FromLong( 0 );
+	if (Effect) {
+		if (item->ItemExcl & actor->inventory.GetEquipExclusion()) {
+			core->DisplayConstantString(STR_ITEMEXCL, 0xf0f0f0);
+			//freeing the item before returning
+			gamedata->FreeItem( item, slotitem->ItemResRef, false );
+			return PyInt_FromLong( 0 );
+		}
 	}
+
+	printf("Slottype; %d\n", Slottype);
+	printf("SLOT_ITEM: %d\n", SLOT_ITEM);
+	// can't equip item because it is not identified
+        if ( Effect && (Slottype & SLOT_ITEM) && !(slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
+                ITMExtHeader *eh = item->GetExtHeader(0);
+       	        if (!eh || !eh->IDReq) {
+			core->DisplayConstantString(STR_ITEMID, 0xf0f0f0);
+			gamedata->FreeItem( item, slotitem->ItemResRef, false );
+			return PyInt_FromLong( 0 );
+                }
+        }
+
 	//CanUseItemType will check actor's class bits too
 	Slottype = core->CanUseItemType (Slottype, item, actor, true);
 	//resolve the equipping sound, it needs to be resolved before
@@ -7166,15 +7183,6 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	} else {
 		GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 	}
-
-        if (! (slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
-                ITMExtHeader *eh = item->GetExtHeader(0);
-                if (!eh || !eh->IDReq) {
-			core->DisplayConstantString(STR_ITEMID, 0xf0f0f0);
-			gamedata->FreeItem( item, slotitem->ItemResRef, false );
-			return PyInt_FromLong( 0 );
-                }
-        }
 
 	//freeing the item before returning
 	gamedata->FreeItem( item, slotitem->ItemResRef, false );

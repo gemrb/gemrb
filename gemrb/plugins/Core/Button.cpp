@@ -275,9 +275,12 @@ void Button::Draw(unsigned short x, unsigned short y)
 		else
 			align |= IE_FONT_ALIGN_MIDDLE;
 
+		if (! (Flags & IE_GUI_BUTTON_MULTILINE)) {
+			align |= IE_FONT_SINGLE_LINE;
+		}
 		font->Print( Region( x + XPos, y + YPos, Width - 2, Height - 2 ),
 			( unsigned char * ) Text, ppoi,
-			(ieByte) (align | IE_FONT_SINGLE_LINE), true );
+			(ieByte) align, true );
 	}
 
 	if (! (Flags&IE_GUI_BUTTON_NO_IMAGE)) {
