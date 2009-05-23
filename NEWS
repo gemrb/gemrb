@@ -11,6 +11,9 @@ GemRB svn (r5999):
       clear air, polymorph, disable button
     - trap setting
     - dynamic scrollbar creation (enables the display of more than 10 kits)
+    - portrait effect icons
+    - item ability selection
+    - character customization
 
   Improved features:
     - fog of war
