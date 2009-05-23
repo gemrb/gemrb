@@ -1,4 +1,4 @@
-#-*-python-*-
+
 #GemRB - Infinity Engine Emulator
 #Copyright (C) 2003-2004 The GemRB Project
 #
@@ -58,12 +58,12 @@ def OpenInventoryWindow ():
 	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenInventoryWindow):
-		if GemRB.IsDraggingItem ():
+		if GemRB.IsDraggingItem ()==1:
 			pc = GemRB.GameGetSelectedPCSingle ()
 			#store the item in the inventory before window is closed
 			GemRB.DropDraggedItem (pc, -3)
 			#dropping on ground if cannot store in inventory
-			if GemRB.IsDraggingItem ():
+			if GemRB.IsDraggingItem ()==1:
 				GemRB.DropDraggedItem (pc, -2)
 
 		if InventoryWindow:
@@ -363,7 +363,7 @@ def RefreshInventoryWindow ():
 	TopIndex = GemRB.GetVar ("TopIndex")
 	for i in range (5):
 		Button = Window.GetControl (i+68)
-		if GemRB.IsDraggingItem ():
+		if GemRB.IsDraggingItem ()==1:
 			Button.SetState (IE_GUI_BUTTON_SECOND)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -415,7 +415,7 @@ def UpdateSlot (pc, slot):
 	if not ControlID:
 		return
 
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		#get dragged item
 		drag_item = GemRB.GetSlotItem (0,0)
 		itemname = drag_item["ItemResRef"]
@@ -503,7 +503,7 @@ def OnDragItemGround ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	slot = GemRB.GetVar ("GroundItemButton") + GemRB.GetVar ("TopIndex")
-	if not GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==0:
 		slot_item = GemRB.GetContainerItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 1) #container
@@ -514,7 +514,7 @@ def OnDragItemGround ():
 	return
 
 def OnAutoEquip ():
-	if not GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()!=1:
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -522,13 +522,16 @@ def OnAutoEquip ():
 	#-1 : drop stuff in equipable slots (but not inventory)
 	GemRB.DropDraggedItem (pc, -1)
 
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		GemRB.PlaySound ("GAM_47") #failed equip
 
 	UpdateInventoryWindow ()
 	return
 
 def OnDragItem ():
+	if GemRB.IsDraggingItem()==2:
+		return
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 
@@ -556,7 +559,7 @@ def OnDropItemToPC ():
 
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		if HasTOB ():
 			GemRB.DisplayString (61794,0xfffffff)
 		else:
@@ -600,7 +603,7 @@ def OpenItemAmountWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		GemRB.DropDraggedItem (pc, slot)
 
 	if ItemAmountWindow != None:
@@ -816,7 +819,7 @@ def IdentifyItemWindow ():
 def DoneAbilitiesItemWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
-	GemRB.SetupQuickSlot (pc, slot, -1, GemRB.GetVar ("Ability") )
+	GemRB.SetupQuickSlot (pc, -1, slot, GemRB.GetVar ("Ability") )
 	CloseAbilitiesItemWindow ()
 	return
 
@@ -839,6 +842,7 @@ def AbilitiesItemWindow ():
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 	Tips = item["Tooltips"]
 
+	print slot_item
 	GemRB.SetVar ("Ability", 0)
 	for i in range(3):
 		Button = Window.GetControl (i+1)
@@ -1020,7 +1024,7 @@ def MouseEnterSlot ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	OverSlot = GemRB.GetVar ("ItemButton")
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		UpdateSlot (pc, OverSlot-1)
 	return
 
@@ -1038,7 +1042,7 @@ def MouseEnterGround ():
 	Window = InventoryWindow
 	i = GemRB.GetVar ("GroundItemButton")
 	Button = Window.GetControl (i+68)
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		Button.SetState (IE_GUI_BUTTON_SELECTED)
 	return
 
@@ -1046,7 +1050,7 @@ def MouseLeaveGround ():
 	Window = InventoryWindow
 	i = GemRB.GetVar ("GroundItemButton")
 	Button = Window.GetControl (i+68)
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		Button.SetState (IE_GUI_BUTTON_SECOND)
 	return
 
