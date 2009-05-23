@@ -652,6 +652,9 @@ def UpdatePortraitWindow ():
 		if pc==portid+1:
 			if GemRB.GetStore()!=None:
 				flag = chr(155)
+		else:
+			if GemRB.GameGetSelectedPCSingle(1)==portid+1:
+				flag = chr(154)
 
 		if CanLevelUp (portid+1):
 			states = flag+chr(238)+chr(255) + states

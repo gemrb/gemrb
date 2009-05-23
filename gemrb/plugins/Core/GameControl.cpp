@@ -2158,6 +2158,7 @@ void GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgre
 	//opening control size to maximum, enabling dialog window
 	core->GetGame()->SetControlStatus(CS_HIDEGUI, BM_NAND);
 	core->GetGame()->SetControlStatus(CS_DIALOG, BM_OR);
+	core->SetEventFlag(EF_PORTRAIT);
 }
 
 /*try to break will only try to break it, false means unconditional stop*/
