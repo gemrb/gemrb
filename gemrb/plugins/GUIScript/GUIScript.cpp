@@ -5572,7 +5572,8 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 
 	Store *store = core->GetCurrentStore();
 	if (!store) {
-		return RuntimeError("No current store!");
+		Py_INCREF( Py_None );
+		return Py_None;
 	}
 	if (store->Type>STORETYPE_COUNT-1) {
 		store->Type=STORETYPE_COUNT-1;

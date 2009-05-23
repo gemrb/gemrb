@@ -101,7 +101,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetTooltip (13902)
 
 	if Gears:
-		# Pendulum, gears, sun/moon dial  (time)
+		# Pendulum, gears, sun/moon dial (time)
 		# FIXME: display all animations: CPEN, CGEAR, CDIAL
 		Button = Window.GetControl (9)
 		Label = Button.CreateLabelOnButton (0x10000009, "NORMAL", 0)
@@ -487,7 +487,7 @@ def GetActorClassTitle (actor):
 		KitIndex = GetKitIndex (actor)
 		Multi = ClassTable.GetValue (ClassIndex, 4)
 		Dual = IsDualClassed (actor, 1)
-	
+
 		if Multi and Dual[0] == 0: # true multi class
 			ClassTitle = ClassTable.GetValue (ClassIndex, 2)
 			ClassTitle = GemRB.GetString (ClassTitle)
@@ -647,10 +647,16 @@ def UpdatePortraitWindow ():
 		states = "\n" + states
 
 		# chr(154) is the talk icon chr(155) is the shopping icon
-		blank = chr(238)
-		if CanLevelUp (portid+1):
-			states = blank + blank + chr(255) + states
+		flag = chr(238)
 
+		if pc==portid+1:
+			if GemRB.GetStore()!=None:
+				flag = chr(155)
+
+		if CanLevelUp (portid+1):
+			states = flag+chr(238)+chr(255) + states
+		else:
+			states = flag+chr(238)+chr(238) + states
 		Button.SetText(states)
 	return
 
@@ -850,7 +856,7 @@ def OpenWaitForDiscWindow ():
 	label.SetText (text)
 	DisableAnimatedWindows ()
 	# 31483 - Please place PS:T disc number
-	# 31568 - Please  place the PS:T DVD
+	# 31568 - Please place the PS:T DVD
 	# 31569 - in drive
 	# 31570 - Wrong disc in drive
 	# 31571 - There is no disc in drive
@@ -908,7 +914,7 @@ def IsDualClassed(actor, verbose):
 
 # Determines if the dualclassed actor has the two base classes in reverse order.
 # This happens since dualclassed actors are treated as multiclassed and there
-# are only so many valid multiclasses. 
+# are only so many valid multiclasses.
 # Example: diviner/fighter maps to FIGHTER_MAGE instead of MAGE_FIGHTER
 def IsDualSwap (actor):
 	Dual = IsDualClassed (actor, 1)
@@ -975,7 +981,7 @@ def IsMultiClassed (actor, verbose):
 		return (0,-1,-1,-1)
 
 	# return the tuple
-	return (NumClasses, Classes[0], Classes[1], Classes[2]) 
+	return (NumClasses, Classes[0], Classes[1], Classes[2])
 
 def GetNextLevelExp (Level, Class):
 	Row = NextLevelTable.GetRowIndex (Class)
