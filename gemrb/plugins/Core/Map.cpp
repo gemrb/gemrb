@@ -968,6 +968,15 @@ void Map::DrawMap(Region screen)
 		dr->DrawOverheadText(screen);
 	}
 
+	size_t i = actors.size();
+	while (i--) {
+		//For each Actor present
+		//This must go AFTER the fog!
+		//(maybe we should be using the queue?)
+		Actor* actor = actors[i];
+		actor->DrawOverheadText(screen);
+	}
+
 	oldgametime=gametime;
 }
 

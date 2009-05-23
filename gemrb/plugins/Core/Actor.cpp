@@ -3444,9 +3444,6 @@ void Actor::Draw(Region &screen)
 
 	//draw videocells over the actor
 	DrawVideocells(screen, vvcOverlays, tint);
-
-	//text feedback
-	DrawOverheadText(screen);
 }
 
 /* Handling automatic stance changes */
