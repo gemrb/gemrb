@@ -8,6 +8,6 @@ QWeaponSlot - the quickslot to equip
 
 Return value: N/A
 
-See also: GetEquippedQuickSlot
+See also: GetEquippedQuickSlot, SetupQuickSlot
 
-MD5: d5987a066d03c89c5832d96143fa34e7
+MD5: dde8a3aad7a34d817501e1d8877f5173
