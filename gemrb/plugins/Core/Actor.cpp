@@ -2362,7 +2362,9 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
 {
 	if (!PCStats) return;
-	PCStats->InitQuickSlot(which, (ieWord) slot, (ieWord) headerindex);
+	PCStats->InitQuickSlot(which, slot, headerindex);
+        //something changed about the quick items
+        core->SetEventFlag(EF_ACTION);
 }
 
 bool Actor::ValidTarget(int ga_flags) const

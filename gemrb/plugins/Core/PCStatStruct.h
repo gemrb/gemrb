@@ -110,12 +110,15 @@ public:
 	ieByte    QuickSpellClass[MAX_QSLOTS];
 	ieWord    PortraitIcons[MAX_PORTRAIT_ICONS];
 	ieByte    PortraitIconString[MAX_PORTRAIT_ICONS+2];
+private:
+	void SetQuickItemSlot(int x, int slot, int headerindex);
 public:
 	PCStatsStruct();
 	void IncrementChapter();
 	void NotifyKill(ieDword xp, ieStrRef name);
-	void InitQuickSlot(unsigned int which, ieWord slot, ieWord headerindex);
+	void InitQuickSlot(unsigned int which, int slot, int headerindex);
 	void SetSlotIndex(unsigned int which, ieWord headerindex);
 	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex);
+	int GetHeaderForSlot(int slot);
 };
 #endif

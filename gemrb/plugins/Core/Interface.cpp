@@ -780,7 +780,7 @@ int Interface::GetItemExcl(const ieResRef itemname) const
 	return 0;
 }
 
-int Interface::GetItemTooltip(const ieResRef itemname, int header)
+int Interface::GetItemTooltip(const ieResRef itemname, int header, int identified)
 {
 	int *value = NULL;
 
@@ -796,7 +796,7 @@ int Interface::GetItemTooltip(const ieResRef itemname, int header)
 	if (!item) {
 		return -1;
 	}
-	int ret = item->ItemName;
+	int ret = identified?item->ItemNameIdentified:item->ItemName;
 	gamedata->FreeItem(item, itemname, 0);
 	return ret;
 }

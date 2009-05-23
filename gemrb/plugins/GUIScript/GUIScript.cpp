@@ -5166,7 +5166,8 @@ static void SetItemText(int wi, int ci, int charges, bool oneisnone)
 
 PyDoc_STRVAR( GemRB_SetItemIcon__doc,
 "SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, type, tooltip, Function, ITM2ResRef])\n\n"
-"Sets Item icon image on a button. 0/1 - Inventory Icons, 2 - Description Icon, 3 - No icon." );
+"Sets Item icon image on a button. 0/1 - Inventory Icons, 2 - Description Icon, 3 - No icon,\n"
+" 4/5 - Weapon icons, 6 and above - Extended header icons." );
 
 PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int tooltip, int Function, const char *Item2ResRef)
 {
@@ -5202,6 +5203,8 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 			if (Picture)
 				btn->StackPicture(Picture);
 		}
+		//fallthrough
+	case 3:
 		setpicture = false;
 		Picture = NULL;
 		break;
@@ -5221,7 +5224,13 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		}
 		break;
 	default:
-		Picture = NULL;
+		ITMExtHeader *eh = item->GetExtHeader(Which-6);
+		if (eh) {
+			Picture = gamedata->GetBAMSprite(eh->UseIcon, -1, 0);
+		}
+		else {
+			Picture = NULL;
+		}
 	}
 
 	if (setpicture)
@@ -5250,7 +5259,6 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iis|iiis", &wi, &ci, &ItemResRef, &Which, &tooltip, &Function, &Item2ResRef )) {
 		return AttributeError( GemRB_SetItemIcon__doc );
 	}
-
 
 	PyObject *ret = SetItemIcon(wi, ci, ItemResRef, Which, tooltip, Function, Item2ResRef);
 	if (ret) {
@@ -5366,6 +5374,7 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetContainerItem__doc );
 	}
 	Container *container;
+
 	if (PartyID) {
 		Game *game = core->GetGame();
 		if (!game) {
@@ -6513,6 +6522,7 @@ static PyObject* GemRB_RemoveEffects(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found!" );
 	}
 
+	printf("Removing: %s\n",SpellResRef);
 	actor->fxqueue.RemoveAllEffects(SpellResRef);
 
 	Py_INCREF( Py_None );
@@ -6644,7 +6654,7 @@ static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GetSlotItem__doc,
 "GetSlotItem(PartyID, slot)=>dict\n\n"
-"Returns dict with specified slot item from PC's inventory." );
+"Returns dict with specified slot item from PC's inventory or the dragged item if PartyID is 0." );
 
 static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 {
@@ -6654,6 +6664,7 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetSlotItem__doc );
 	}
 	CREItem *si;
+	int header = -1;
 
 	if (PartyID==0) {
 		si = core->GetDraggedItem();
@@ -6667,7 +6678,10 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 			return RuntimeError( "Actor not found" );
 		}
 
-		si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
+		Slot = core->QuerySlot(Slot);
+		header = actor->PCStats->GetHeaderForSlot(Slot);
+
+		si = actor->inventory.GetSlotItem( Slot );
 	}
 	if (! si) {
 		Py_INCREF( Py_None );
@@ -6679,6 +6693,7 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (si->Usages[1]));
 	PyDict_SetItemString(dict, "Usages2", PyInt_FromLong (si->Usages[2]));
 	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (si->Flags));
+	PyDict_SetItemString(dict, "Header", PyInt_FromLong (header));
 
 	return dict;
 }
@@ -6811,9 +6826,10 @@ PyDoc_STRVAR( GemRB_GetItem__doc,
 "GetItem(ResRef)=>dict\n\n"
 "Returns dict with specified item." );
 
-#define CAN_DRINK 1 //potions
-#define CAN_READ  2 //scrolls
-#define CAN_STUFF 4 //containers
+#define CAN_DRINK 1  //potions
+#define CAN_READ  2  //scrolls
+#define CAN_STUFF 4  //containers
+#define CAN_SELECT 8 //items with more abilities
 
 static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 {
@@ -6856,7 +6872,18 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Exclusion", PyInt_FromLong(item->ItemExcl));
 	PyDict_SetItemString(dict, "LoreToID", PyInt_FromLong(item->LoreToID));
 
+	int ehc = item->ExtHeaderCount;
+
+	PyObject* tooltiptuple = PyTuple_New(ehc);
+	for(int i=0;i<ehc;i++) {
+		int tip = core->GetItemTooltip(ResRef, i, 1);
+		PyTuple_SetItem(tooltiptuple, i, PyInt_FromLong(tip));
+	}
+
+	PyDict_SetItemString(dict, "Tooltips", tooltiptuple);
+
 	int function=0;
+
 	if (core->CanUseItemType(SLOT_POTION, item, actor, false) ) {
 			function|=CAN_DRINK;
 	}
@@ -6864,7 +6891,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		ITMExtHeader *eh;
 		Effect *f;
 		//determining if this is a copyable scroll
-		if (item->ExtHeaderCount<2) {
+		if (ehc<2) {
 			goto not_a_scroll;
 		}
 		eh = item->ext_headers+1;
@@ -6888,10 +6915,15 @@ not_a_scroll:
 		//allow the open container flag only if there is
 		//a store file (this fixes pst eye items, which
 		//got the same item type as bags)
-		//this isn't required anymore, as bag itemtypes are customisable
+		//while this isn't required anymore, as bag itemtypes are customisable
+		//we still better check for the existence of the store, or we
+		//get a crash somewhere.
 		if (gamedata->Exists( ResRef, IE_STO_CLASS_ID) ) {
 			function|=CAN_STUFF;
 		}
+	}
+	if (ehc>1) {
+		function|=CAN_SELECT;
 	}
 	PyDict_SetItemString(dict, "Function", PyInt_FromLong(function));
 	gamedata->FreeItem( item, ResRef, false );
@@ -7134,6 +7166,16 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	} else {
 		GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 	}
+
+        if (! (slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
+                ITMExtHeader *eh = item->GetExtHeader(0);
+                if (!eh || !eh->IDReq) {
+			core->DisplayConstantString(STR_ITEMID, 0xf0f0f0);
+			gamedata->FreeItem( item, slotitem->ItemResRef, false );
+			return PyInt_FromLong( 0 );
+                }
+        }
+
 	//freeing the item before returning
 	gamedata->FreeItem( item, slotitem->ItemResRef, false );
 	if ( !Slottype) {
@@ -7834,7 +7876,9 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 			btn->SetPicture( Picture );
 			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
-			int tip = core->GetItemTooltip(item->itemname, item->headerindex);
+
+			const CREItem *item_slot = actor->inventory.GetItem(item->slot);
+			int tip = core->GetItemTooltip(item->itemname, item->headerindex, item_slot->Flags&IE_INV_ITEM_IDENTIFIED);
 			if (tip>0) {
 				//cannot make this const, because it will be freed
 				char *tmp = core->GetString((ieStrRef) tip,0);
@@ -8205,8 +8249,17 @@ jump_label:
 				//no slot translation required
 				CREItem *item = actor->inventory.GetSlotItem(slot);
 				if (item) {
-					SetItemIcon(wi, ci, item->ItemResRef,0,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, 0);
-					SetItemText(wi, ci, item->Usages[actor->PCStats->QuickItemHeaders[tmp]], false);
+					//MISC3H (horn of blasting) is not displayed when it is out of usages
+					int header = actor->PCStats->QuickItemHeaders[tmp];
+					int usages = item->Usages[header];
+					//I don't like this feature, if the goal is full IE compatibility
+					//uncomment the next line.
+					//if (usages)
+					{
+						//SetItemIcon parameter needs header+6 to display extended header icons
+						SetItemIcon(wi, ci, item->ItemResRef,header+6,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, NULL);
+						SetItemText(wi, ci, usages, false);
+					}
 				}
 			}
 		}
@@ -8283,8 +8336,36 @@ static PyObject* GemRB_SetDefaultActions(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetupQuickSlot__doc,
+"SetupQuickSlot(PartyID, quickslot, inventoryslot, headerindex)\n\n"
+"Set up a quick slot or weapon slot of a PC to use a weapon ability.\n\n"
+"If the inventoryslot number is -1, only the header index will be changed. "
+"If the quick slot is 0, then the inventory slot will be used to find which "
+"headerindex should be set. The default value for headerindex is 0.");
+
+static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, which, slot, headerindex = 0;
+
+	if (!PyArg_ParseTuple( args, "iii|i", &PartyID, &which, &slot, &headerindex )) {
+		return AttributeError( GemRB_SetupQuickSlot__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+	actor->SetupQuickSlot(which, slot, headerindex);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SetEquippedQuickSlot__doc,
-"SetEquippedQuickSlot(PartyID, QWeaponSlot)->\n\n"
+"SetEquippedQuickSlot(PartyID, QWeaponSlot)->int\n\n"
 "Sets the named weapon slot as equipped weapon slot."
 "Returns strref number of failure (0 success, -1 silent failure)." );
 
@@ -8554,6 +8635,11 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 		case -2:
 			//quickslot
 			actor->GetItemSlotInfo(&itemdata, header, -1);
+			if (!itemdata.Charges) {
+				printMessage("GUIScript","QuickItem has no charges.\n", WHITE);
+				Py_INCREF( Py_None );
+				return Py_None;
+			}
 			break;
 		default:
 			//any normal slot
@@ -8795,7 +8881,7 @@ PyDoc_STRVAR( GemRB_ApplyEffect__doc,
 "ApplyEffect(pc, effect, param1, param2[,resref,resref2, resref3]])\n\n"
 "Creates a basic effect and applies it on the player character. "
 "This function could be used to add stats that are stored in effect blocks. "
-"The resource fields are optional.\n\n");
+"The resource fields are optional.");
 
 static EffectRef work_ref;
 
@@ -8849,7 +8935,7 @@ PyDoc_STRVAR( GemRB_CountEffects__doc,
 "CountEffects(pc, effect, param1, param2[,resref])\n\n"
 "Counts how many matching effects are applied on the player character. "
 "This function could be used to get HLA information in ToB. "
-"The resource field is optional.\n\n");
+"The resource field is optional.");
 
 static PyObject* GemRB_CountEffects(PyObject * /*self*/, PyObject* args)
 {
@@ -8878,7 +8964,7 @@ static PyObject* GemRB_CountEffects(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_ModifyEffect__doc,
 "ModifyEffect(pc, effect, p1, p2)\n\n"
 "Changes/sets the target coordinates of the specified effect. "
-"This command is used for the farsight spell.\n\n");
+"This command is used for the farsight spell.");
 
 static PyObject* GemRB_ModifyEffect(PyObject * /*self*/, PyObject* args)
 {
@@ -8907,7 +8993,7 @@ static PyObject* GemRB_ModifyEffect(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_StealFailed__doc,
 "StealFailed()\n\n"
 "Sends the steal failed trigger (attacked) to the owner of the current store. "
-"The owner of the current store was set to the Sender of StartStore action.\n\n");
+"The owner of the current store was set to the Sender of StartStore action.");
 
 static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -8944,7 +9030,7 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 
 PyDoc_STRVAR( GemRB_SwapPCs__doc,
 "SwapPCs(idx1, idx2)\n\n"
-"Swaps the party order for two player characters.\n\n");
+"Swaps the party order for two player characters.");
 
 static PyObject* GemRB_SwapPCs(PyObject * /*self*/, PyObject* args)
 {
@@ -8967,7 +9053,7 @@ static PyObject* GemRB_SwapPCs(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_SetRepeatClickFlags__doc,
 "SetRepeatClickFlags(value, op)\n\n"
-"Sets the mode repeat clicks are handled.\n\n");
+"Sets the mode repeat clicks are handled.");
 
 static PyObject* GemRB_SetRepeatClickFlags(PyObject * /*self*/, PyObject* args)
 {
@@ -8984,7 +9070,7 @@ static PyObject* GemRB_SetRepeatClickFlags(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_DisplayString__doc,
 "DisplayString(strref, color[,actor])\n\n"
 "Displays string on the MessageWindow using methods supplied by the engine core. "
-"The optional actor is the party ID of the character whose name will be displayed.\n\n");
+"The optional actor is the party ID of the character whose name will be displayed.");
 
 static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 {
@@ -9232,6 +9318,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetupControls, METH_VARARGS),
 	METHOD(SetupEquipmentIcons, METH_VARARGS),
 	METHOD(SetupSpellIcons, METH_VARARGS),
+	METHOD(SetupQuickSlot, METH_VARARGS),
 	METHOD(SetVar, METH_VARARGS),
 	METHOD(SetVarAssoc, METH_VARARGS),
 	METHOD(SetVisible, METH_VARARGS),

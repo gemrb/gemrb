@@ -39,6 +39,7 @@ ItemInfoWindow = None
 ItemAmountWindow = None
 StackAmount = 0
 ItemIdentifyWindow = None
+ItemAbilitiesWindow = None
 PortraitWindow = None
 OptionsWindow = None
 ErrorWindow = None
@@ -294,7 +295,7 @@ def RefreshInventoryWindow ():
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
-			Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 1)
+			Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 1)
 
 	#Shield
 	slot_item = GemRB.GetSlotItem (pc, 3)
@@ -304,17 +305,17 @@ def RefreshInventoryWindow ():
 		if (item['AnimationType'] != ''):
 			if (GemRB.CanUseItemType (SLOT_WEAPON, itemname)):
 				#off-hand weapon
-				Button.SetPLT("WP" + size + item['AnimationType'] + "OIN", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
+				Button.SetPLT ("WP" + size + item['AnimationType'] + "OIN", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
 			else:
 				#shield
-				Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
+				Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
 
 	#Helmet
 	slot_item = GemRB.GetSlotItem (pc, 1)
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
-			Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
+			Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
 
 	#encumbrance
 	SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
@@ -556,7 +557,7 @@ def OnDropItemToPC ():
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
 	if GemRB.IsDraggingItem ():
-		if HasTOB():
+		if HasTOB ():
 			GemRB.DisplayString (61794,0xfffffff)
 		else:
 			GemRB.DisplayString (17999,0xfffffff)
@@ -600,7 +601,7 @@ def OpenItemAmountWindow ():
 	slot = GemRB.GetVar ("ItemButton")
 
 	if GemRB.IsDraggingItem ():
-		GemRB.DropDraggedItem(pc, slot)
+		GemRB.DropDraggedItem (pc, slot)
 
 	if ItemAmountWindow != None:
 		if ItemAmountWindow:
@@ -718,10 +719,10 @@ def ReadItemWindow ():
 		print "WARNING: invalid spell header in item", slot_item['ItemResRef']
 		CloseItemInfoWindow ()
 		return -1
-	
+
 	CloseItemInfoWindow ()
 	OpenErrorWindow (strref)
-	
+
 	return ret
 
 def OpenItemWindow ():
@@ -812,6 +813,63 @@ def IdentifyItemWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
+def DoneAbilitiesItemWindow ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	GemRB.SetupQuickSlot (pc, slot, -1, GemRB.GetVar ("Ability") )
+	CloseAbilitiesItemWindow ()
+	return
+
+def CloseAbilitiesItemWindow ():
+	global ItemAbilitiesWindow
+
+	if ItemAbilitiesWindow:
+		ItemAbilitiesWindow.Unload ()
+		ItemAbilitiesWindow = None
+	return
+
+def AbilitiesItemWindow ():
+	global ItemAbilitiesWindow
+
+	ItemAbilitiesWindow = Window = GemRB.LoadWindowObject (6)
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	item = GemRB.GetItem (slot_item["ItemResRef"])
+	Tips = item["Tooltips"]
+
+	GemRB.SetVar ("Ability", 0)
+	for i in range(3):
+		Button = Window.GetControl (i+1)
+		Button.SetSprites ("GUIBTBUT",i,0,1,2,0)
+		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		Button.SetVarAssoc ("Ability",i)
+		Text = Window.GetControl (i+0x10000003)
+		if i<len(Tips):
+			Button.SetItemIcon (slot_item['ItemResRef'],i+6)
+			Text.SetText (Tips[i])
+		else:
+			#disable button
+			Button.SetItemIcon ("",3)
+			Text.SetText ("")
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+
+	TextArea = Window.GetControl (8)
+	TextArea.SetText (11322)
+
+	Button = Window.GetControl (7)
+	Button.SetText (11973)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneAbilitiesItemWindow")
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	Button = Window.GetControl (10)
+	Button.SetText (13727)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseAbilitiesItemWindow")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
 def CloseItemInfoWindow ():
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
@@ -823,10 +881,6 @@ def DisplayItem (itemresref, type):
 
 	item = GemRB.GetItem (itemresref)
 	ItemInfoWindow = Window = GemRB.LoadWindowObject (5)
-
-	#fake label
-	Label = Window.GetControl (0x10000000)
-	Label.SetText ("")
 
 	#item icon
 	Button = Window.GetControl (2)
@@ -850,10 +904,14 @@ def DisplayItem (itemresref, type):
 
 	#left button
 	Button = Window.GetControl (8)
+	select = (type&1) and (item["Function"]&8)
 
 	if type&2:
 		Button.SetText (14133)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "IdentifyItemWindow")
+	elif select:
+		Button.SetText (11960)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "AbilitiesItemWindow")
 	else:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -886,23 +944,28 @@ def DisplayItem (itemresref, type):
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
-	Text = Window.GetControl (0x1000000b)
+	Text = Window.GetControl (0x10000000)
+	Label = Window.GetControl (0x1000000b)
 	if (type&2):
 		text = item["ItemName"]
+		label = 17108
 	else:
 		text = item["ItemNameIdentified"]
+		label = ""
+
 	Text.SetText (text)
+	Label.SetText (label)
 
 	ItemInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def CannotLearnSlotSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-	
+
 	# disqualify sorcerors immediately
 	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
 		return LSR_STAT
-	
+
 	slot_item = GemRB.GetSlotItem (pc, GemRB.GetVar ("ItemButton"))
 	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
 	spell = GemRB.GetSpell (spell_ref)
@@ -915,7 +978,7 @@ def CannotLearnSlotSpell ():
 	dumbness = GemRB.GetPlayerStat (pc, IE_INT)
 	if spell['SpellLevel'] > GemRB.GetAbilityBonus (IE_INT, 1, dumbness):
 		return LSR_LEVEL
-	
+
 	return 0
 
 def OpenItemInfoWindow ():

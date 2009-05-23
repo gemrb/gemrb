@@ -72,29 +72,41 @@ void PCStatsStruct::NotifyKill(ieDword xp, ieStrRef name)
 }
 
 //init quick weapon/item slots
-void PCStatsStruct::InitQuickSlot(unsigned int which, ieWord slot, ieWord headerindex)
+void PCStatsStruct::SetQuickItemSlot(int idx, int slot, int headerindex)
 {
+	if (slot>=0) {
+		QuickItemSlots[idx]=(ieWord) slot;
+	}
+	QuickItemHeaders[idx]=(ieWord) headerindex;
+}
+
+void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
+{
+	if (!which) {
+		int i;
+
+		for(i=0;i<MAX_QUICKITEMSLOT;i++) {
+			if (slot==QuickItemSlots[i]) {
+				QuickItemHeaders[i]=headerindex;
+				return;
+			}
+		}
+
+		for(i=0;i<MAX_QUICKWEAPONSLOT;i++) {
+			if (slot==QuickWeaponSlots[i]) {
+				QuickWeaponHeaders[i]=headerindex;
+				return;
+			}
+		}
+		return;
+	}
+
 	switch(which) {
-	case ACT_QSLOT1:
-		QuickItemSlots[0]=slot;
-		QuickItemHeaders[0]=headerindex;
-		break;
-	case ACT_QSLOT2:
-		QuickItemSlots[1]=slot;
-		QuickItemHeaders[1]=headerindex;
-		break;
-	case ACT_QSLOT3:
-		QuickItemSlots[2]=slot;
-		QuickItemHeaders[2]=headerindex;
-		break;
-	case ACT_QSLOT4:
-		QuickItemSlots[3]=slot;
-		QuickItemHeaders[3]=headerindex;
-		break;
-	case ACT_QSLOT5:
-		QuickItemSlots[4]=slot;
-		QuickItemHeaders[4]=headerindex;
-		break;
+	case ACT_QSLOT1: SetQuickItemSlot(0,slot,headerindex); break;
+	case ACT_QSLOT2: SetQuickItemSlot(1,slot,headerindex); break;
+	case ACT_QSLOT3: SetQuickItemSlot(2,slot,headerindex); break;
+	case ACT_QSLOT4: SetQuickItemSlot(3,slot,headerindex); break;
+	case ACT_QSLOT5: SetQuickItemSlot(4,slot,headerindex); break;
 	case ACT_WEAPON1:
 		QuickWeaponSlots[0]=slot;
 		QuickWeaponHeaders[0]=0;
@@ -122,6 +134,7 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, ieWord slot, ieWord header
 	}
 }
 
+/* this function is obsolete, use initquickslot with slot=-1
 void PCStatsStruct::SetSlotIndex(unsigned int which, ieWord headerindex)
 {
 	//this is not correct, not the slot, but a separate headerindex should be here
@@ -135,7 +148,9 @@ void PCStatsStruct::SetSlotIndex(unsigned int which, ieWord headerindex)
 	///it shouldn't reach this point
 	abort();
 }
+*/
 
+//returns both the inventory slot and the header index associated to a quickslot
 void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex)
 {
 	int idx;
@@ -151,4 +166,19 @@ void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &he
 	slot=QuickItemSlots[idx];
 	headerindex=QuickItemHeaders[idx];
 }
-//
+
+//return the item extended header assigned to an inventory slot (the ability to use)
+//only quickslots have this assignment, equipment items got all abilities available
+int PCStatsStruct::GetHeaderForSlot(int slot)
+{
+	int i;
+
+	for(i=0;i<MAX_QUICKITEMSLOT;i++) {
+		if(QuickItemSlots[i]==slot) return (ieWordSigned) QuickItemHeaders[i];
+	}
+
+	for(i=0;i<MAX_QUICKWEAPONSLOT;i++) {
+		if(QuickWeaponSlots[i]==slot) return (ieWordSigned) QuickWeaponHeaders[i];
+	}
+	return -1;
+}

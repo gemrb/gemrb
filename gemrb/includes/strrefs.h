@@ -121,7 +121,7 @@
 #define STR_STATIC_DISS     87
 #define STR_LIGHTNING_DISS  88
 //89
-//90
+#define STR_ITEMID          90       //item needs identify
 #define STR_WRONGITEMTYPE   91
 #define STR_ITEMEXCL        92
 #define STR_PICKPOCKET_DONE 93       //done

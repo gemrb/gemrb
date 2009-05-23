@@ -596,7 +596,7 @@ public:
 	/** frees the data */
 	void FreeResRefTable(ieResRef *&table, int &count);
 	/** Returns the item tooltip value for the xth extension header */
-	int GetItemTooltip(const ieResRef itemname, int idx);
+	int GetItemTooltip(const ieResRef itemname, int idx, int identified);
 	/** Returns the item exclusion value */
 	int GetItemExcl(const ieResRef itemname) const;
 	/** Returns the strref for the item dialog */
@@ -707,7 +707,7 @@ public:
 	Console * console;
 
 	Audio* GetAudioDrv(void) {
-	    return AudioDriver ;
+		return AudioDriver;
 	}
 
 #ifdef _DEBUG
