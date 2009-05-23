@@ -40,6 +40,7 @@ IE_GUI_BUTTON_ALIGN_TOP  = 0x00000400
 IE_GUI_BUTTON_ALIGN_BOTTOM = 0x00000800
 
 IE_GUI_BUTTON_DRAGGABLE    = 0x00001000
+IE_GUI_BUTTON_MULTILINE    = 0x00002000 # don't set the SINGLE_LINE font rendering flag
 
 IE_GUI_BUTTON_NO_TEXT    = 0x00010000   # don't draw button label
 IE_GUI_BUTTON_PLAYRANDOM = 0x00020000   # the button animation is random
@@ -49,6 +50,7 @@ IE_GUI_BUTTON_CENTER_PICTURES = 0x00080000 # center the button's PictureList
 IE_GUI_BUTTON_BG1_PAPERDOLL   = 0x00100000 # BG1-style paperdoll
 IE_GUI_BUTTON_HORIZONTAL      = 0x00200000 # horizontal clipping of overlay
 IE_GUI_BUTTON_CANCEL          = 0x00400000 # escape key triggers it
+IE_GUI_BUTTON_CAPS            = 0x00800000 # capitalize all the text (default for bg2)
 
 #scrollbar flags
 IE_GUI_SCROLLBAR_DEFAULT = 0x00000040   # mousewheel triggers it (same value as default button)
