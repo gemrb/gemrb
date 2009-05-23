@@ -132,7 +132,7 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
 	palette = new Palette();
-	//no idea if we have to switch this
+	// no need to switch this
 	for (i = 0; i < 256; i++) {
 		RevColor rc;
 		str->Read( &rc, 4 );
