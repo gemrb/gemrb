@@ -351,28 +351,14 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 				core->DisplayStringName( Strref, 0xf0f0f0, Sender, 0);
 			}
 		}
-		if (flags & DS_HEAD) {
+		if (flags & (DS_HEAD | DS_AREA)) {
 			Sender->DisplayHeadText( sb.text );
 			//don't free sb.text, it is residing in Sender
+			if (flags & DS_AREA) {
+				Sender->FixHeadTextPos();
+			}
 		} else {
-			GameControl *gc = NULL;
-
-			if (flags&DS_AREA) {
-				gc = core->GetGameControl();
-			}
-
-			//if gc was not needed, or didn't resolve, free the string
-			//otherwise display it in the area
-			if (gc) {
-				Point p;
-
-				GetPositionFromScriptable(Sender,p,0);
-				gc->DisplayString(p, sb.text);
-				//don't free sb.text, it is residing in Sender
-			} else {
-				//we free the text since it isn't used anymore
-				core->FreeString( sb.text );
-			}
+			core->FreeString( sb.text );
 		}
 	}
 	if (sb.Sound[0] && !(flags&DS_SILENT) ) {

@@ -176,6 +176,7 @@ void Scriptable::DisplayHeadText(const char* text)
 		core->FreeString( overHeadText );
 	}
 	overHeadText = (char *) text;
+	overHeadTextPos.empty();
 	if (text) {
 		timeStartDisplaying = core->GetGame()->Ticks;
 		textDisplaying = 1;
@@ -184,6 +185,12 @@ void Scriptable::DisplayHeadText(const char* text)
 		timeStartDisplaying = 0;
 		textDisplaying = 0;
 	}
+}
+
+/* 'fix' the current overhead text in the current position */
+void Scriptable::FixHeadTextPos()
+{
+	overHeadTextPos = Pos;
 }
 
 #define MAX_DELAY  6000
@@ -215,7 +222,16 @@ void Scriptable::DrawOverheadText(Region &screen)
 		cs = ((Selectable *) this)->size*50;
 	}
 
-	Region rgn( Pos.x-100+screen.x, Pos.y - cs + screen.y, 200, 400 );
+	short x, y;
+	if (overHeadTextPos.isempty()) {
+		x = Pos.x;
+		y = Pos.y;
+	} else {
+		x = overHeadTextPos.x;
+		y = overHeadTextPos.y;
+	}
+
+	Region rgn( x-100+screen.x, y - cs + screen.y, 200, 400 );
 	font->Print( rgn, ( unsigned char * ) overHeadText,
 		palette?palette:core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
 	gamedata->FreePalette(palette);

@@ -189,6 +189,7 @@ public:
 	ieStrRef DialogName;
 	GameScript* Scripts[MAX_SCRIPTS];
 	char* overHeadText;
+	Point overHeadTextPos;
 	unsigned char textDisplaying;
 	unsigned long timeStartDisplaying;
 	ieDword UnselectableTimer;
@@ -233,6 +234,7 @@ public:
 	void SetMap(Map *map);
 	void SetScript(int index, GameScript* script);
 	void DisplayHeadText(const char* text);
+	void FixHeadTextPos();
 	void SetScriptName(const char* text);
 	//call this to deny script running in the next AI cycle
 	void DelayedEvent();
