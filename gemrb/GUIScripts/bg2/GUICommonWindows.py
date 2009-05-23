@@ -615,7 +615,10 @@ def UpdatePortraitWindow ():
 			Button.SetTooltip ("")
 			continue
 
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_TOP|IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_HORIZONTAL|IE_GUI_BUTTON_DRAGGABLE, OP_SET)
+		#			IE_GUI_BUTTON_ALIGN_LEFT| IE_GUI_BUTTON_ALIGN_TOP| \
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE| \
+				IE_GUI_BUTTON_HORIZONTAL| \
+				IE_GUI_BUTTON_DRAGGABLE|IE_GUI_BUTTON_MULTILINE, OP_SET)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetPicture (pic, "NOPORTSM")
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
@@ -636,8 +639,8 @@ def UpdatePortraitWindow ():
 		#add effects on the portrait
 		effects = GemRB.GetPlayerStates (i+1)
 		states = ""
-		for i in range((len(effects)+2)/3):
-			states=states+effects[len(effects)-i*3-3:len(effects)-i*3]+"\n"
+		for col in range((len(effects)+2)/3):
+			states=states+effects[len(effects)-col*3-3:len(effects)-col*3]+"\n"
 
 		if CanLevelUp (i+1):
 			states = chr(255)+"\n"+states
