@@ -39,6 +39,10 @@ OptionsWindow = None
 ActionsWindow = None
 DraggedPortrait = None
 
+ClassTable = GemRB.LoadTableObject ("classes")
+NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
+KitListTable = GemRB.LoadTableObject ("kitlist")
+
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	global OptionsWindow
 
@@ -459,7 +463,6 @@ def EquipmentPressed ():
 
 def GetKitIndex (actor):
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	KitTable = GemRB.LoadTableObject ("kitlist")
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 	KitIndex = 0
 
@@ -469,7 +472,7 @@ def GetKitIndex (actor):
 	# carefully looking for kit by the usability flag
 	# since the barbarian kit id clashes with the no-kit value
 	if KitIndex == 0 and Kit != 0x4000:
-		KitIndex = KitTable.FindValue (6, Kit)
+		KitIndex = KitListTable.FindValue (6, Kit)
 		if KitIndex == -1:
 			KitIndex = 0
 
@@ -480,9 +483,7 @@ def GetActorClassTitle (actor):
 
 	if ClassTitle == 0:
 		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-		ClassTable = GemRB.LoadTableObject ("classes")
 		ClassIndex = ClassTable.FindValue ( 5, Class )
-		KitTable = GemRB.LoadTableObject ("kitlist")
 		KitIndex = GetKitIndex (actor)
 		Multi = ClassTable.GetValue (ClassIndex, 4)
 		Dual = IsDualClassed (actor, 1)
@@ -494,14 +495,14 @@ def GetActorClassTitle (actor):
 			if Dual[0]: # dual class
 				# first (previous) kit or class of the dual class
 				if Dual[0] == 1:
-					ClassTitle = KitTable.GetValue (Dual[1], 2)
+					ClassTitle = KitListTable.GetValue (Dual[1], 2)
 				elif Dual[0] == 2:
 					ClassTitle = ClassTable.GetValue (Dual[1], 2)
 				ClassTitle = GemRB.GetString (ClassTitle) + " / "
 				ClassTitle += GemRB.GetString (ClassTable.GetValue (Dual[2], 2))
 			else: # ordinary class or kit
 				if KitIndex:
-					ClassTitle = KitTable.GetValue (KitIndex, 2)
+					ClassTitle = KitListTable.GetValue (KitIndex, 2)
 				else:
 					ClassTitle = ClassTable.GetValue (ClassIndex, 2)
 				ClassTitle = GemRB.GetString (ClassTitle)
@@ -738,7 +739,6 @@ def SetupSavingThrows (pc):
 	if level2 > 20:
 		level2 = 20
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassTable = GemRB.LoadTableObject ("classes")
 
 	Race = GemRB.GetPlayerStat (pc, IE_RACE)
 	RaceTable = GemRB.LoadTableObject ("races")
@@ -864,7 +864,6 @@ def IsDualClassed(actor, verbose):
 
 	if verbose:
 		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-		ClassTable = GemRB.LoadTableObject ("classes")
 		ClassIndex = ClassTable.FindValue (5, Class)
 		Multi = ClassTable.GetValue (ClassIndex, 4)
 		DualInfo = []
@@ -912,7 +911,6 @@ def IsDualSwap (actor):
 
 	# split the full class name into its individual parts
 	# i.e FIGHTER_MAGE becomes [FIGHTER, MAGE]
-	ClassTable = GemRB.LoadTableObject ("classes")
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	Class = ClassTable.FindValue (5, Class)
 	Class = ClassTable.GetRowName (Class)
@@ -922,9 +920,8 @@ def IsDualSwap (actor):
 	if Dual[0] == 2:
 		BaseClass = ClassTable.GetRowName (Dual[1])
 	else:
-		KitList = GemRB.LoadTableObject ("kitlist")
 		BaseClass = GetKitIndex (actor)
-		BaseClass = KitList.GetValue (BaseClass, 7)
+		BaseClass = KitListTable.GetValue (BaseClass, 7)
 		BaseClass = ClassTable.FindValue (5, BaseClass)
 		BaseClass = ClassTable.GetRowName (BaseClass)
 
@@ -942,7 +939,6 @@ def IsDualSwap (actor):
 # @return A tuple - (IsMultiClassed, Class1, Class2, Class3).
 def IsMultiClassed (actor, verbose):
 	# get our base class
-	ClassTable = GemRB.LoadTableObject ("classes")
 	ClassIndex = ClassTable.FindValue (5, GemRB.GetPlayerStat (actor, IE_CLASS))
 	IsMulti = ClassTable.GetValue (ClassIndex, 4) # 0 if not multi'd
 	IsDual = IsDualClassed (actor, 0)
@@ -974,7 +970,6 @@ def IsMultiClassed (actor, verbose):
 	return (NumClasses, Classes[0], Classes[1], Classes[2]) 
 
 def GetNextLevelExp (Level, Class):
-	NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
 	Row = NextLevelTable.GetRowIndex (Class)
 	if Level < NextLevelTable.GetColumnCount (Row):
 		return str (NextLevelTable.GetValue (Row, Level) )
@@ -985,7 +980,6 @@ def GetNextLevelExp (Level, Class):
 def CanLevelUp(actor):
 	# get our class and placements for Multi'd and Dual'd characters
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassTable = GemRB.LoadTableObject ("classes")
 	Class = ClassTable.FindValue (5, Class)
 	Class = ClassTable.GetRowName (Class)
 	Multi = IsMultiClassed (actor, 1)
