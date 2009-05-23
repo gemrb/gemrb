@@ -430,6 +430,7 @@ def OpenLevelUpWindow():
 		#	this code will remain compatible in the meantime
 		currentprof = GemRB.GetPlayerStat (pc, WeapProfTable.GetValue (i+8, 0))&0x07
 		GemRB.SetVar("Prof "+str(i), currentprof)
+		GemRB.SetVar("ProfBase "+str(i), currentprof)
 	ScrollBarControl.SetVarAssoc ("TopIndex", ProfCount)
 
 	# skills scrollbar
@@ -940,7 +941,8 @@ def RightPress():
 	Pos = GemRB.GetVar("Prof")+TopIndex
 	TextAreaControl.SetText(WeapProfTable.GetValue(Pos+8, 2) )
 	ActPoint = GemRB.GetVar("Prof "+str(Pos) )
-	if ActPoint <= 0:
+	MinPoint = GemRB.GetVar ("ProfBase "+str(Pos) )
+	if ActPoint <= 0 or ActPoint <= MinPoint:
 		return
 	GemRB.SetVar("Prof "+str(Pos),ActPoint-1)
 	ProfPointsLeft = ProfPointsLeft + 1
