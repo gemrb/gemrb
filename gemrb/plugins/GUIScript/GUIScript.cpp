@@ -7162,12 +7162,10 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-	printf("Slottype; %d\n", Slottype);
-	printf("SLOT_ITEM: %d\n", SLOT_ITEM);
 	// can't equip item because it is not identified
-        if ( Effect && (Slottype & SLOT_ITEM) && !(slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
+        if ( (Slottype == SLOT_ITEM) && !(slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
                 ITMExtHeader *eh = item->GetExtHeader(0);
-       	        if (!eh || !eh->IDReq) {
+       	        if (eh && eh->IDReq) {
 			core->DisplayConstantString(STR_ITEMID, 0xf0f0f0);
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
 			return PyInt_FromLong( 0 );
