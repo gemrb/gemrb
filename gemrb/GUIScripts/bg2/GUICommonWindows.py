@@ -602,10 +602,10 @@ def UpdatePortraitWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Inventory = GemRB.GetVar ("Inventory")
 
-	for i in range (PARTY_SIZE):
-		Button = Window.GetControl (i)
-		pic = GemRB.GetPlayerPortrait (i+1, 1)
-		if Inventory and pc != i+1:
+	for portid in range (PARTY_SIZE):
+		Button = Window.GetControl (portid)
+		pic = GemRB.GetPlayerPortrait (portid+1, 1)
+		if Inventory and pc != portid+1:
 			pic = None
 
 		if not pic:
@@ -621,9 +621,9 @@ def UpdatePortraitWindow ():
 				IE_GUI_BUTTON_DRAGGABLE|IE_GUI_BUTTON_MULTILINE, OP_SET)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetPicture (pic, "NOPORTSM")
-		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
-		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
-		state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
+		hp = GemRB.GetPlayerStat (portid+1, IE_HITPOINTS)
+		hp_max = GemRB.GetPlayerStat (portid+1, IE_MAXHITPOINTS)
+		state = GemRB.GetPlayerStat (portid+1, IE_STATE_ID)
 
 		if (hp_max<1):
 			ratio = 0.0
@@ -634,20 +634,22 @@ def UpdatePortraitWindow ():
 			Button.SetOverlay (ratio, 64,64,64,200, 64,64,64,200)
 		else:
 			Button.SetOverlay (ratio, 255,0,0,200, 128,0,0,200)
-		Button.SetTooltip (GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
+		Button.SetTooltip (GemRB.GetPlayerName (portid+1, 1) + "\n%d/%d" %(hp, hp_max))
 
 		#add effects on the portrait
-		effects = GemRB.GetPlayerStates (i+1)
+		effects = GemRB.GetPlayerStates (portid+1)
 		states = ""
 		for col in range(len(effects)):
-			states = states + effects[col:col+1]
-			if col % 3 == 2: states = states + "\n"
-		for x in range(3 - ((len(effects) + 2)/3)):
+			states = effects[col:col+1] + states
+			if col % 3 == 2: states = "\n" + states
+		for x in range(3 - (len(effects)/3)):
 			states = "\n" + states
-		states = "\n\n" + states
+		states = "\n" + states
 
-		if CanLevelUp (i+1):
-			states = "  " + chr(255) + states
+		# chr(154) is the talk icon chr(155) is the shopping icon
+		blank = chr(238)
+		if CanLevelUp (portid+1):
+			states = blank + blank + chr(255) + states
 
 		Button.SetText(states)
 	return
