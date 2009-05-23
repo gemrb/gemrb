@@ -642,7 +642,7 @@ def UpdatePortraitWindow ():
 		for col in range(len(effects)):
 			states = states + effects[col:col+1]
 			if col % 3 == 2: states = states + "\n"
-		for i in range(3 - ((len(effects) + 2)/3)):
+		for x in range(3 - ((len(effects) + 2)/3)):
 			states = "\n" + states
 		states = "\n\n" + states
 
