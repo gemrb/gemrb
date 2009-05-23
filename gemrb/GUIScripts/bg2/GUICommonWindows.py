@@ -615,10 +615,9 @@ def UpdatePortraitWindow ():
 			Button.SetTooltip ("")
 			continue
 
-		#			IE_GUI_BUTTON_ALIGN_LEFT| IE_GUI_BUTTON_ALIGN_TOP| \
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE| \
 				IE_GUI_BUTTON_HORIZONTAL| \
-				IE_GUI_BUTTON_ALIGN_LEFT| \
+				IE_GUI_BUTTON_ALIGN_LEFT| IE_GUI_BUTTON_ALIGN_TOP| \
 				IE_GUI_BUTTON_DRAGGABLE|IE_GUI_BUTTON_MULTILINE, OP_SET)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetPicture (pic, "NOPORTSM")
@@ -643,11 +642,13 @@ def UpdatePortraitWindow ():
 		for col in range(len(effects)):
 			states = states + effects[col:col+1]
 			if col % 3 == 2: states = states + "\n"
+		for i in range(3 - ((len(effects) + 2)/3)):
+			states = "\n" + states
+		states = "\n\n" + states
 
 		if CanLevelUp (i+1):
-			states = chr(255)+"\n\n"+states
-		else:
-			states = "\n"+states
+			states = "  " + chr(255) + states
+
 		Button.SetText(states)
 	return
 
