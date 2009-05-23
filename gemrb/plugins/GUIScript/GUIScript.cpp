@@ -263,13 +263,8 @@ static void GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDw
 	printf("Sound resource retrieved: %s\n", Sound);
 }
 
-static int GetCreatureStrRef(unsigned int Slot, unsigned int Str)
+static int GetCreatureStrRef(Actor *actor, unsigned int Str)
 {
-	Actor * actor = core->GetGame()->FindPC(Slot);
-	if (!actor || Str>=VCONST_COUNT) {
-		return 0xdadadada;
-	}
-
 	return actor->StrRefs[Str];
 }
 
@@ -284,25 +279,16 @@ static inline bool CheckStat(Actor * actor, ieDword stat, ieDword value, int op)
 	return dc;
 }
 
-static int GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
+static int GetCreatureStat(Actor *actor, unsigned int StatID, int Mod)
 {
-	Actor * actor = core->GetGame()->FindPC(Slot);
-	if (!actor) {
-		return 0xdadadada;
-	}
-
 	if (Mod) {
 		return actor->GetStat( StatID );
 	}
 	return actor->GetBase( StatID );
 }
 
-static int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue)
+static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue)
 {
-	Actor * actor = core->GetGame()->FindPC(Slot);
-	if (!actor) {
-		return 0;
-	}
 	actor->SetBase( StatID, StatValue );
 	actor->CreateDerivedStats();
 	return 1;
@@ -4911,8 +4897,15 @@ static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ii", &PlayerSlot, &Index)) {
 		return AttributeError( GemRB_GetPlayerString__doc );
 	}
+	Actor* MyActor = core->GetGame()->FindPC( PlayerSlot );
+	if (!MyActor) {
+		return RuntimeError("Cannot find actor!\n");
+	}
+	if (Index>=VCONST_COUNT) {
+		return RuntimeError("String reference too high!\n");
+	}
 	//returning the modified stat if BaseStat was 0 (default)
-	StatValue = GetCreatureStrRef( PlayerSlot, Index );
+	StatValue = GetCreatureStrRef( MyActor, Index );
 	return PyInt_FromLong( StatValue );
 }
 
@@ -4928,8 +4921,12 @@ static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ii|i", &PlayerSlot, &StatID, &BaseStat )) {
 		return AttributeError( GemRB_GetPlayerStat__doc );
 	}
+	Actor* MyActor = core->GetGame()->FindPC( PlayerSlot );
+	if (!MyActor) {
+		return RuntimeError("Cannot find actor!\n");
+	}
 	//returning the modified stat if BaseStat was 0 (default)
-	StatValue = GetCreatureStat( PlayerSlot, StatID, !BaseStat );
+	StatValue = GetCreatureStat( MyActor, StatID, !BaseStat );
 	return PyInt_FromLong( StatValue );
 }
 
@@ -4944,10 +4941,12 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iii", &PlayerSlot, &StatID, &StatValue )) {
 		return AttributeError( GemRB_SetPlayerStat__doc );
 	}
-	//Setting the creature's base stat
-	if (!SetCreatureStat( PlayerSlot, StatID, StatValue)) {
+	Actor* MyActor = core->GetGame()->FindPC( PlayerSlot );
+	if (!MyActor) {
 		return RuntimeError("Cannot find actor!\n");
 	}
+	//Setting the creature's base stat
+	SetCreatureStat( MyActor, StatID, StatValue);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
