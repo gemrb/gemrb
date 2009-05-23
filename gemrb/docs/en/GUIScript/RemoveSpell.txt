@@ -11,6 +11,5 @@ Index     - the known spell's index
 
 Return value: boolean, 1 on success
 
-See also: UnmemorizeSpell, GetKnownSpellsCount, GetKnownSpell, LearnSpell
+See also: UnmemorizeSpell, GetKnownSpellsCount, GetKnownSpell, LearnSpell, RemoveEffects
 
-MD5: 455fe10422ca29c4933f95052b792ab2
