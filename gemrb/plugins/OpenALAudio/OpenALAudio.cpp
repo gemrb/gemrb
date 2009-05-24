@@ -583,6 +583,7 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 	alSourcef( source, AL_GAIN, 0.01f * gain );
 	alSourcei( source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
 	alSourcei( source, AL_ROLLOFF_FACTOR, point ? 1 : 0 );
+	alSourcei( source, AL_LOOPING, 0 );
 	checkALError("Unable to set stream parameters", "WARNING");
 
 	streams[stream].Buffer = 0;
@@ -828,12 +829,13 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 		return;
 	}
 
+	streams[stream].delete_buffers = true;
+	streams[stream].ClearProcessedBuffers();
+
 	alSourceQueueBuffers(streams[stream].Source, 1, &Buffer );
 	if (checkALError("Unable to queue buffer", "ERROR")) {
 		return;
 	}
-
-	streams[stream].delete_buffers = true;
 
 	ALenum state;
 	alGetSourcei(streams[stream].Source, AL_SOURCE_STATE, &state);
