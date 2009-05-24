@@ -264,6 +264,7 @@ public:
 	/** sets game specific default data about action buttons */
 	static void SetDefaultActions(int qslot, ieByte slot1, ieByte slot2, ieByte slot3);
 	/** prints useful information on console */
+	void DumpMaxValues();
 	void DebugDump();
 	/** fixes the feet circle */
 	void SetCircleSize();

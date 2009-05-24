@@ -775,8 +775,10 @@ void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
 	}
 }
 
-//de/activates the sanctuary overlay
-//the sanctuary vvc draws the globe half transparent
+//de/activates the sanctuary and other overlays
+//unlike IE, gemrb uses this stat for other overlay fields
+//see the complete list in overlay.2da
+//it loosely follows the internal representation of overlays in IWD2
 void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	ieDword changed = newValue^oldValue;
@@ -883,28 +885,28 @@ void pcf_armorlevel(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 	}
 }
 
-static int maximum_values[256]={
-32767,32767,20,100,100,100,100,25,5,25,25,25,25,25,100,100,//0f
+static int maximum_values[MAX_STATS]={
+32767,32767,20,100,100,100,100,25,10,25,25,25,25,25,100,100,//0f
 100,100,100,100,100,100,100,100,100,200,200,200,200,200,100,100,//1f
 200,200,MAX_LEVEL,255,25,100,25,25,25,25,25,999999999,999999999,999999999,25,25,//2f
-200,255,200,100,100,200,200,25,5,100,1,1,100,1,1,1,//3f
-1,1,1,1,MAX_LEVEL,MAX_LEVEL,1,9999,25,100,100,255,1,20,20,25,//4f
+200,255,200,100,100,200,200,25,5,100,1,1,100,1,1,0,//3f
+511,1,1,1,MAX_LEVEL,MAX_LEVEL,1,9999,25,100,100,255,1,20,20,25,//4f
 25,1,1,255,25,25,255,255,25,255,255,255,255,255,255,255,//5f
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//6f
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//7f
 255,255,255,255,255,255,255,100,100,100,255,5,5,255,1,1,//8f
-1,25,25,30,1,1,1,25,-1,100,100,1,255,255,255,255,//9f
+1,25,25,30,1,1,1,25,0,100,100,1,255,255,255,255,//9f
 255,255,255,255,255,255,20,255,255,1,20,255,999999999,999999999,1,1,//af
 999999999,999999999,0,0,10,0,0,0,0,0,0,0,0,0,0,0,//bf
-0,0,0,0,0,0,0,25,25,255,255,255,255,65535,-1,-1,//cf - 207
--1,-1,-1,-1,-1,-1,-1,-1,MAX_LEVEL,255,65535,3,255,255,255,255,//df - 223
-255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//ef - 239
+0,0,0,0,0,0,0,25,25,255,255,255,255,65535,0,0,//cf - 207
+0,0,0,0,0,0,0,0,MAX_LEVEL,255,65535,3,255,255,255,255,//df - 223
+255,255,255,255,255,255,255,255,255,255,255,255,65535,65535,15,0,//ef - 239
 MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL, MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL, //0xf7 - 247
-MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL, 255,65535,65535,15//ff
+MAX_LEVEL,MAX_LEVEL,0,0,0,0,0,0//ff
 };
 
 typedef void (*PostChangeFunctionType)(Actor *actor, ieDword oldValue, ieDword newValue);
-static PostChangeFunctionType post_change_functions[256]={
+static PostChangeFunctionType post_change_functions[MAX_STATS]={
 pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
@@ -1344,7 +1346,7 @@ bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 	ieDword diff = Modified[StatIndex]-BaseStats[StatIndex];
 
 	//maximize the base stat
-	if ( maximum_values[StatIndex]>0) {
+	if ( maximum_values[StatIndex]) {
 		if ( (signed) Value>maximum_values[StatIndex]) {
 			Value = (ieDword) maximum_values[StatIndex];
 		}
@@ -1366,7 +1368,7 @@ bool Actor::SetBaseNoPCF(unsigned int StatIndex, ieDword Value)
 	ieDword diff = Modified[StatIndex]-BaseStats[StatIndex];
 
 	//maximize the base stat
-	if ( maximum_values[StatIndex]>0) {
+	if ( maximum_values[StatIndex]) {
 		if ( (signed) Value>maximum_values[StatIndex]) {
 			Value = (ieDword) maximum_values[StatIndex];
 		}
@@ -1845,6 +1847,19 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	return damage;
 }
 
+//Just to quickly inspect debug maximum values
+#if 0
+void Actor::DumpMaxValues()
+{
+        int symbol = core->LoadSymbol( "stats" );
+        SymbolMgr *sym = core->GetSymbol( symbol );
+
+	for(int i=0;i<MAX_STATS;i++) {
+		printf("%d (%s) %d\n", i, sym->GetValue(i), maximum_values[i]);
+	}
+}
+#endif
+
 void Actor::DebugDump()
 {
 	unsigned int i;
@@ -1893,6 +1908,9 @@ void Actor::DebugDump()
 	inventory.dump();
 	spellbook.dump();
 	fxqueue.dump();
+#if 0
+	DumpMaxValues();
+#endif
 }
 
 const char* Actor::GetActorNameByID(ieDword ID) const
