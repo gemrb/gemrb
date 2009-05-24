@@ -128,7 +128,7 @@ int Item::UseCharge(ieWord *Charges, int header, bool expend) const
 	if ((header>=CHARGE_COUNTERS) || (header<0/*weapon header*/)) {
 		header = 0;
 	}
-	ccount=Charges[header] ;
+	ccount=Charges[header];
 
 	//if the item started from 0 charges, then it isn't depleting
 	if (ieh->Charges==0) {
@@ -138,7 +138,6 @@ int Item::UseCharge(ieWord *Charges, int header, bool expend) const
 		Charges[header] = --ccount;
 	}
 
-	printf("ccount is %d", ccount) ;
 	if (ccount>0) {
 		return CHG_NONE;
 	}
@@ -149,16 +148,18 @@ int Item::UseCharge(ieWord *Charges, int header, bool expend) const
 }
 
 //returns a projectile loaded with the effect queue
-Projectile *Item::GetProjectile(ieDwordSigned invslot, int header) const
+Projectile *Item::GetProjectile(ieDwordSigned invslot, int header, int miss) const
 {
 	ITMExtHeader *eh = GetExtHeader(header);
 	if (!eh) {
 		return NULL;
 	}
 	ieDword idx = eh->ProjectileAnimation;
-	EffectQueue *fx = GetEffectBlock(header, invslot, idx);
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(idx);
-	pro->SetEffects(fx);
+	if (!miss) {
+		EffectQueue *fx = GetEffectBlock(header, invslot, idx);
+		pro->SetEffects(fx);
+	}
 	return pro;
 }
 

@@ -249,7 +249,8 @@ public:
 	//-1 will return the equipping feature block
 	EffectQueue *GetEffectBlock(int header, ieDwordSigned invslot, ieDword pro) const;
 	//returns a projectile created from an extended header
-	Projectile *GetProjectile(ieDwordSigned invslot, int header) const;
+	//if miss is non-zero, then no effects will be loaded
+	Projectile *GetProjectile(ieDwordSigned invslot, int header, int miss) const;
 	//Builds an equipping glow effect from gradient colour
 	//this stuff is not item specific, could be moved elsewhere
 	Effect *BuildGlowEffect(int gradient) const;

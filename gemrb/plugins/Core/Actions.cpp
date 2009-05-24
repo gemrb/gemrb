@@ -5584,16 +5584,19 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	}
 	Actor *act = (Actor *) Sender;
 	ieDword Slot, header;
+	ieDword flags;
 	ieResRef itemres;
 
 	if (parameters->string0Parameter[0]) {
 		Slot = act->inventory.FindItem(parameters->string0Parameter, 0);
 		//this IS in the original game code (ability)
 		header = parameters->int0Parameter;
+		flags = parameters->int1Parameter;
 	} else {
 		Slot = parameters->int0Parameter;
 		//this is actually not in the original game code
 		header = parameters->int1Parameter;
+		flags = parameters->int2Parameter;
 	}
 
 	if (!ResolveItemName( itemres, act, Slot) ) {
@@ -5609,7 +5612,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	act->UseItem(Slot, header, tar, false);
+	act->UseItem(Slot, header, tar, flags);
 }
 
 void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
@@ -5622,15 +5625,18 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 	Actor *act = (Actor *) Sender;
 	ieDword Slot, header;
 	ieResRef itemres;
+	ieDword flags;
 
 	if (parameters->string0Parameter[0]) {
 		Slot = act->inventory.FindItem(parameters->string0Parameter, 0);
 		//this IS in the original game code (ability)
 		header = parameters->int0Parameter;
+		flags = parameters->int1Parameter;
 	} else {
 		Slot = parameters->int0Parameter;
 		//this is actually not in the original game code
 		header = parameters->int1Parameter;
+		flags = parameters->int2Parameter;
 	}
 
 	if (!ResolveItemName( itemres, act, Slot) ) {
@@ -5646,7 +5652,7 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	act->UseItemPoint(Slot, header, parameters->pointParameter, false);
+	act->UseItemPoint(Slot, header, parameters->pointParameter, flags);
 }
 
 //addfeat will be able to remove feats too

@@ -1175,14 +1175,15 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	}
 
 	//if distance is too much, insert a move action and requeue the action
-	ITMExtHeader *header;
+	WeaponInfo wi;
+	ITMExtHeader *header = actor->GetWeapon(wi, false);
 
-	unsigned int wrange = actor->GetWeapon(header, NULL) * 10;
+	if (header) wi.range *= 10;
+	else wi.range = 0;
+
 	if ( target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
-		wrange = 10;
+		wi.range += 10;
 	}
-	wrange += actor->size * 5 ;
-
 	Actor *tar = NULL;
 	ieDword targetID = 0;
 	if (target->Type==ST_ACTOR) {
@@ -1204,16 +1205,15 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	//action performed
 	if(target->Type == ST_ACTOR) {
 		actor->SetTarget( target );
-		wrange += ((Actor*)target)->size * 5 ;
 	}
 
-	if ( PersonalDistance(Sender, target) > wrange) {
+	if ( PersonalDistance(Sender, target) > wi.range) {
 		//we couldn't perform the action right now
 		//so we add it back to the queue with an additional movement
 		//increases refcount of Sender->CurrentAction, by pumping it back
 		//in the action queue
 		//Forcing a lock does not launch the trap...
-		GoNearAndRetry(Sender, target, target->Type == ST_ACTOR, wrange);
+		GoNearAndRetry(Sender, target, target->Type == ST_ACTOR, wi.range);
 		Sender->ReleaseCurrentAction();
 		return;
 	} else if (target->Type == ST_DOOR) {

@@ -1105,13 +1105,13 @@ int Inventory::GetEquipped() const
 
 //returns the fist weapon if there is nothing else
 //This will return the actual weapon, I mean the bow in the case of bow+arrow combination
-CREItem *Inventory::GetUsedWeapon(bool leftorright) const
+CREItem *Inventory::GetUsedWeapon(bool leftorright, int &slot) const
 {
 	CREItem *ret;
-	int slot;
 
 	if (SLOT_MAGIC!=-1) {
-		ret = GetSlotItem(SLOT_MAGIC);
+		slot = SLOT_MAGIC;
+		ret = GetSlotItem(slot);
 		if (ret && ret->ItemResRef[0]) {
 			return ret;
 		}
@@ -1127,13 +1127,14 @@ CREItem *Inventory::GetUsedWeapon(bool leftorright) const
 		}
 	}
 	slot = GetEquippedSlot();
-	if(core->QuerySlotEffects(slot))
-		ret = GetSlotItem(FindRangedWeapon());
-	else
-		ret = GetSlotItem(slot) ;
+	if(core->QuerySlotEffects(slot)) {
+		slot = FindRangedWeapon();
+	}
+	ret = GetSlotItem(slot);
 	if (!ret) {
 		//return fist weapon
-		ret = GetSlotItem(SLOT_FIST);
+		slot = SLOT_FIST;
+		ret = GetSlotItem(slot);
 	}
 	return ret;
 }

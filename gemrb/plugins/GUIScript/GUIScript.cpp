@@ -8632,7 +8632,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 	ItemExtHeader itemdata;
-	bool silent = false;
+	int flags = 0;
 
 	switch (slot) {
 		case -1:
@@ -8651,7 +8651,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 		default:
 			//any normal slot
 			actor->GetItemSlotInfo(&itemdata, core->QuerySlot(slot), header);
-			silent = true;
+			flags = UI_SILENT;
 			break;
 	}
 
@@ -8676,10 +8676,10 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	//
 	switch (forcetarget) {
 		case TARGET_SELF:
-			actor->UseItem(itemdata.slot, itemdata.headerindex, actor, silent);
+			actor->UseItem(itemdata.slot, itemdata.headerindex, actor, flags);
 			break;
 		case TARGET_NONE:
-			actor->UseItem(itemdata.slot, itemdata.headerindex, NULL, silent);
+			actor->UseItem(itemdata.slot, itemdata.headerindex, NULL, flags);
 			break;
 		case TARGET_AREA:
 			core->GetGameControl()->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_POINT, itemdata.TargetNumber);
@@ -8834,7 +8834,7 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 
 	if (useup) {
 		//use the found item's first usage
-		useup = actor->UseItem((ieDword) slot, 0, actor, true);
+		useup = actor->UseItem((ieDword) slot, 0, actor, UI_SILENT);
 	} else {
 		CREItem *si = actor->inventory.GetSlotItem( slot );
 		if (si->Usages[0]) useup = 1;

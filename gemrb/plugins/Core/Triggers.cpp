@@ -3464,13 +3464,17 @@ int GameScript::InWeaponRange(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) Sender;
-	ITMExtHeader *header;
-	unsigned int wrange = actor->GetWeapon(header, NULL, false) * 10;
-	unsigned int wrange2 = actor->GetWeapon(header, NULL, true) * 10;
-	if (wrange2>wrange) {
-		wrange=wrange2;
+	WeaponInfo wi;
+	unsigned int wrange = 0;
+	ITMExtHeader *header = actor->GetWeapon(wi, false);
+	if (header) {
+		wrange = wi.range;
 	}
-	if ( PersonalDistance( Sender, tar ) <= wrange ) {
+	header = actor->GetWeapon(wi, true);
+	if (header && (wi.range>wrange)) {
+		wrange = wi.range;
+	}
+	if ( PersonalDistance( Sender, tar ) <= wrange * 10 ) {
 		return 1;
 	}
 	return 0;
@@ -3491,14 +3495,9 @@ int GameScript::OutOfAmmo(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) scr;
-	ITMExtHeader *header;
-	unsigned int weapon = actor->GetWeapon(header, NULL);
-	//no weapon wielded?
-	if (weapon==0) {
-		return 0;
-	}
-	//if not bow is wielded, then we either have projectile
-	//or wielding something else (which has no ammo)
+	WeaponInfo wi;
+	ITMExtHeader *header = actor->GetWeapon(wi, false);
+	//no bow wielded?
 	if (!header || header->AttackType!=ITEM_AT_BOW) {
 		return 0;
 	}
@@ -3520,12 +3519,9 @@ int GameScript::HaveUsableWeaponEquipped(Scriptable* Sender, Trigger* /*paramete
 		return 0;
 	}
 	Actor *actor = (Actor *) Sender;
-	ITMExtHeader *header;
-	unsigned int weapon = actor->GetWeapon(header, NULL);
-	//no weapon range
-	if (weapon==0) {
-		return 0;
-	}
+	WeaponInfo wi;
+	ITMExtHeader *header = actor->GetWeapon(wi, false);
+
 	//bows are not usable (because if they are loaded, the equipped
 	//weapon is the projectile)
 	if (!header || header->AttackType==ITEM_AT_BOW) {

@@ -132,13 +132,19 @@ class ScriptedAnimation;
 // 3 for blur, 8 for mirror images
 #define EXTRA_ACTORCOVERS 11
 
+//flags for UseItem
+#define UI_SILENT    1       //no sound when used up
+#define UI_MISS      2       //ranged miss (projectile has no effects)
+
 typedef ieByte ActionButtonRow[GUIBT_COUNT];
 
 typedef std::vector< ScriptedAnimation*> vvcVector;
 typedef std::list<ieResRef*> resourceList;
 
 struct WeaponInfo {
+	int slot;
 	int enchantment;
+	unsigned int range;
 	ieDword itemflags;
 };
 
@@ -401,10 +407,10 @@ public:
 	/* learns the given spell, possibly receive XP */
 	int LearnSpell(const ieResRef resref, ieDword flags);
 	/* returns the ranged weapon header associated with the currently equipped projectile */
-	int GetRangedWeapon(ITMExtHeader *&which, WeaponInfo *wi) const;
+	ITMExtHeader *GetRangedWeapon(WeaponInfo &wi) const;
 	/* Returns current weapon range and extended header
 	 if range is nonzero, then which is valid */
-	unsigned int GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorright=false);
+	ITMExtHeader* GetWeapon(WeaponInfo &wi, bool leftorright=false);
 	/* Creates player statistics */
 	void CreateStats();
 	/* Heals actor by days */
@@ -484,8 +490,8 @@ public:
 	/* Sets equipped Quick slot */
 	int SetEquippedQuickSlot(int slot);
 	/* Uses an item on the target or point */
-	bool UseItemPoint(ieDword slot, ieDword header, Point &point, bool silent);
-	bool UseItem(ieDword slot, ieDword header, Scriptable *target, bool silent);
+	bool UseItemPoint(ieDword slot, ieDword header, Point &point, ieDword flags);
+	bool UseItem(ieDword slot, ieDword header, Scriptable *target, ieDword flags);
 	/* Deducts a charge from an item */
 	void ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent);
 	/* If it returns true, then default AC=10 and the lesser the better */

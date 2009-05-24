@@ -142,7 +142,7 @@ unsigned int PersonalDistance(Point p, Scriptable *b)
 	long y = ( p.y - b->Pos.y );
 	int ret = (int) sqrt( ( double ) ( x* x + y* y ) );
 	if (b->Type==ST_ACTOR) {
-		ret-=((Actor *)b)->size*5;
+		ret-=((Actor *)b)->size*10;
 	}
 	if (ret<0) return (unsigned int) 0;
 	return (unsigned int) ret;
@@ -163,11 +163,10 @@ unsigned int PersonalDistance(Scriptable *a, Scriptable *b)
 	long y = ( a->Pos.y - b->Pos.y );
 	int ret = (int) sqrt( ( double ) ( x* x + y* y ) );
 	if (a->Type==ST_ACTOR) {
-		// *10 / 2
-		ret-=((Actor *)a)->size*5;
+		ret-=((Actor *)a)->size*10;
 	}
 	if (b->Type==ST_ACTOR) {
-		ret-=((Actor *)b)->size*5;
+		ret-=((Actor *)b)->size*10;
 	}
 	if (ret<0) return (unsigned int) 0;
 	return (unsigned int) ret;

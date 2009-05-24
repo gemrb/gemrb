@@ -295,7 +295,7 @@ void Projectile::ChangePhase()
 	//reached target
 	if (!Extension) {
 		phase = P_EXPIRED;
-		//there could be no-effect projectiles
+		//there are no-effect projectiles, like missed arrows
 		if (!effects) return;
 
 		Actor *target;

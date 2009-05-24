@@ -2466,32 +2466,33 @@ void Actor::GetPrevAnimation()
 
 //slot is the projectile slot
 //This will return the projectile item.
-int Actor::GetRangedWeapon(ITMExtHeader *&which, WeaponInfo *wi) const
+ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 {
 //EquippedSlot is the projectile. To get the weapon, use inventory.GetUsedWeapon()
-	unsigned int slot = inventory.GetEquippedSlot();
-	const CREItem *wield = inventory.GetSlotItem(slot);
+	wi.slot = inventory.GetEquippedSlot();
+	const CREItem *wield = inventory.GetSlotItem(wi.slot);
 	if (!wield) {
-		return 0;
+		return NULL;
 	}
 	Item *item = gamedata->GetItem(wield->ItemResRef);
 	if (!item) {
-		return 0;
+		return NULL;
 	}
-	if (wi) {
-		wi->enchantment = item->Enchantment;
-		wi->itemflags = wield->Flags;
-	}
-	which = item->GetWeaponHeader(true);
+	//The magic of the bow and the arrow add up?
+	wi.enchantment += item->Enchantment;
+	wi.itemflags = wield->Flags;
+	//wi.range is not set, the projectile has no effect on range?
+
+	ITMExtHeader *which = item->GetWeaponHeader(true);
 	gamedata->FreeItem(item, wield->ItemResRef, false);
-	return 1;
+	return which;
 }
 
 //returns weapon header currently used (bow in case of bow+arrow)
 //if range is nonzero, then the returned header is valid
-unsigned int Actor::GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorright)
+ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright)
 {
-	const CREItem *wield = inventory.GetUsedWeapon(leftorright);
+	const CREItem *wield = inventory.GetUsedWeapon(leftorright, wi.slot);
 	if (!wield) {
 		return 0;
 	}
@@ -2500,12 +2501,11 @@ unsigned int Actor::GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorr
 		return 0;
 	}
 
-	if (wi) {
-		wi->enchantment = item->Enchantment;
-		wi->itemflags = wield->Flags;
-	}
+	wi.enchantment = item->Enchantment;
+	wi.itemflags = wield->Flags;
+
 	//select first weapon header
-	which = item->GetWeaponHeader(GetAttackStyle() == WEAPON_RANGED);
+	ITMExtHeader *which = item->GetWeaponHeader(GetAttackStyle() == WEAPON_RANGED);
 	//make sure we use 'false' in this freeitem
 	//so 'which' won't point into invalid memory
 	gamedata->FreeItem(item, wield->ItemResRef, false);
@@ -2515,7 +2515,9 @@ unsigned int Actor::GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorr
 	if (which->Location!=ITEM_LOC_WEAPON) {
 		return 0;
 	}
-	return which->Range+1;
+	wi.range = which->Range+1;
+	return which;
+	//return which->Range+1;
 }
 
 void Actor::GetNextStance()
@@ -2627,9 +2629,9 @@ void Actor::SetModal(ieDword newstate)
 //even spells got this attack style
 int Actor::GetAttackStyle()
 {
-	int effect = core->QuerySlotEffects(inventory.GetEquippedSlot()) ;
-	if (effect == SLOT_EFFECT_MISSILE) return WEAPON_RANGED ;
-	return WEAPON_MELEE ;
+	int effect = core->QuerySlotEffects(inventory.GetEquippedSlot());
+	if (effect == SLOT_EFFECT_MISSILE) return WEAPON_RANGED;
+	return WEAPON_MELEE;
 }
 
 void Actor::SetTarget( Scriptable *target)
@@ -2695,7 +2697,7 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 		return;
 	}
 
-	SetStance(AttackStance) ;
+	SetStance(AttackStance);
 
 	//last chance to disable attacking
 	//
@@ -2799,18 +2801,23 @@ void Actor::PerformAttack(ieDword gameTime)
 	bool leftorright = (bool) (attackcount&1);
 
 	WeaponInfo wi;
-	ITMExtHeader *header;
+	ITMExtHeader *header = GetWeapon(wi,leftorright);
+	if (!header) {
+		return;
+	}
+
 	//can't reach target, zero range shouldn't be allowed
 	//Don't forget to take size of the opponents into account
-	if ((GetWeapon(header, &wi, leftorright)*10+(size + target->size)*5)<PersonalDistance(this, target)) {
+	//Actually, this version of PersonalDistance already calculates with the size!!!
+	if (wi.range*10<PersonalDistance(this, target)) {
 		return;
 	}
 	ieDword Flags;
-	ITMExtHeader *rangedheader = NULL;
 	ITMExtHeader *hittingheader = header;
-	int THACOBonus = header->THAC0Bonus ;
-	int DamageBonus = header->DamageBonus ;
-	switch(header->AttackType) {
+	ITMExtHeader *rangedheader = NULL;
+	int THACOBonus = hittingheader->THAC0Bonus;
+	int DamageBonus = hittingheader->DamageBonus;
+	switch(hittingheader->AttackType) {
 	case ITEM_AT_MELEE:
 		Flags = WEAPON_MELEE;
 		break;
@@ -2818,17 +2825,18 @@ void Actor::PerformAttack(ieDword gameTime)
 		Flags = WEAPON_RANGED;
 		break;
 	case ITEM_AT_BOW:
-		if (!GetRangedWeapon(rangedheader, NULL)) {
+		rangedheader = GetRangedWeapon(wi);
+		if (!rangedheader) {
 			//out of ammo event
 			//try to refill
 			SetStance(IE_ANI_READY);
 			return;
 		}
-		Flags = WEAPON_RANGED ;
+		Flags = WEAPON_RANGED;
 		//The bow can give some bonuses, but the core attack is made by the arrow.
-		hittingheader = rangedheader ;
-		THACOBonus += rangedheader->THAC0Bonus ;
-		DamageBonus+= rangedheader->DamageBonus ;
+		hittingheader = rangedheader;
+		THACOBonus += rangedheader->THAC0Bonus;
+		DamageBonus+= rangedheader->DamageBonus;
 		break;
 	default:
 		//item is unsuitable for fight
@@ -2844,8 +2852,16 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	int roll = core->Roll(1,ATTACKROLL,0);
 	if (roll==1) {
-		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
 		//critical failure
+		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
+		if (Flags&WEAPON_RANGED) {
+			UseItem(wi.slot, -2, target, UI_MISS);
+		} else {
+			//break sword
+			if (header->RechargeFlags&IE_ITEM_BREAKABLE) {
+				inventory.BreakItemSlot(wi.slot);
+			}
+		}
 		return;
 	}
 	//damage type is?
@@ -2863,7 +2879,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical success
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
 		DealDamage (target, damage, damagetype, &wi, true);
-		UseItem(inventory.GetEquippedSlot(), Flags&WEAPON_RANGED?-2:-1, target, false) ;
+		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0);
 		return;
 	}
 	tohit += roll;
@@ -2877,10 +2893,13 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (tohit<defense) {
 		//hit failed
+		if (Flags&WEAPON_RANGED) {
+			UseItem(wi.slot, -2, target, UI_MISS);
+		}
 		return;
 	}
 	DealDamage (target, damage, damagetype, &wi, false);
-	UseItem(inventory.GetEquippedSlot(), Flags&WEAPON_RANGED?-2:-1, target, false) ;
+	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0);
 }
 
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
@@ -3845,7 +3864,7 @@ int Actor::SetEquippedQuickSlot(int slot)
 //if target is a non living scriptable, then we simply shoot for its position
 //the fx should get a NULL target, and handle itself by using the position
 //(shouldn't crash when target is NULL)
-bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, bool silent)
+bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, ieDword flags)
 {
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
@@ -3857,8 +3876,8 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, bool silen
 		return false;
 	}
 
-	Projectile *pro = itm->GetProjectile(slot, header);
-	ChargeItem(slot, header, item, itm, silent);
+	Projectile *pro = itm->GetProjectile(slot, header, flags&UI_MISS);
+	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
 	gamedata->FreeItem(itm,item->ItemResRef, false);
 	if (pro) {
 		pro->SetCaster(globalID);
@@ -3868,10 +3887,10 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, bool silen
 	return false;
 }
 
-bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, bool silent)
+bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword flags)
 {
 	if (target->Type!=ST_ACTOR) {
-		return UseItemPoint(slot, header, target->Pos, silent);
+		return UseItemPoint(slot, header, target->Pos, flags);
 	}
 
 	Actor *tar = (Actor *) target;
@@ -3881,12 +3900,12 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, bool silen
 	Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) return false; //quick item slot contains invalid item resref
 	//item is depleted for today
-	if(itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
+	if (itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
 		return false;
 	}
 
-	Projectile *pro = itm->GetProjectile(slot, header);
-	ChargeItem(slot, header, item, itm, silent);
+	Projectile *pro = itm->GetProjectile(slot, header, flags&UI_MISS);
+	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
 	gamedata->FreeItem(itm,item->ItemResRef, false);
 	if (pro) {
 		pro->SetCaster(globalID);
@@ -3995,14 +4014,14 @@ void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int
 		//update the paperdoll weapon animation
 		core->SetEventFlag(EF_UPDATEANIM);
 	}
-	ITMExtHeader *header ;
-	GetWeapon(header, NULL) ;
+	WeaponInfo wi;
+	ITMExtHeader *header = GetWeapon(wi);
+
 	if(header && header->AttackType == ITEM_AT_BOW) {
-		AttackStance = IE_ANI_SHOOT ;
-		ITMExtHeader* projHeader ;
-		GetRangedWeapon(projHeader, NULL) ;
-		anims->RangedType = projHeader->ProjectileType - 1 ;
-		return ;
+		AttackStance = IE_ANI_SHOOT;
+		ITMExtHeader* projHeader = GetRangedWeapon(wi);
+		anims->RangedType = projHeader->ProjectileType - 1;
+		return;
 	}
 	AttackStance =  IE_ANI_ATTACK;
 }
