@@ -49,6 +49,7 @@ Scriptable::Scriptable(ScriptableType type)
 		Scripts[i] = NULL;
 	}
 	overHeadText = NULL;
+	overHeadTextPos.empty();
 	textDisplaying = 0;
 	timeStartDisplaying = 0;
 	scriptName[0] = 0;
