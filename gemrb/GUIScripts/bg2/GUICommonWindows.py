@@ -646,15 +646,16 @@ def UpdatePortraitWindow ():
 			states = "\n" + states
 		states = "\n" + states
 
-		# chr(154) is the talk icon chr(155) is the shopping icon
+		# blank space
 		flag = chr(238)
 
+		# shopping icon
 		if pc==portid+1:
 			if GemRB.GetStore()!=None:
 				flag = chr(155)
-		else:
-			if GemRB.GameGetSelectedPCSingle(1)==portid+1:
-				flag = chr(154)
+		# talk icon
+		if GemRB.GameGetSelectedPCSingle(1)==portid+1:
+			flag = chr(154)
 
 		if CanLevelUp (portid+1):
 			states = flag+chr(238)+chr(255) + states

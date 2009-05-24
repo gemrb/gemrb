@@ -2192,6 +2192,7 @@ void GameControl::EndDialog(bool try_to_break)
 	core->GetGame()->SetControlStatus(CS_DIALOG, BM_NAND);
 	ScreenFlags &=~(SF_DISABLEMOUSE|SF_LOCKSCROLL);
 	DialogueFlags = 0;
+	core->SetEventFlag(EF_PORTRAIT);
 }
 
 //translate section values (journal, solved, unsolved, user)
