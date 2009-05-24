@@ -231,8 +231,11 @@ public:
 	int UseCharge(ieWord *Charges, int header, bool expend) const;
 
 	//returns the requested extended header
-	ITMExtHeader *GetExtHeader(unsigned int which) const
+	//-1 will return melee weapon header, -2 the ranged one
+	ITMExtHeader *GetExtHeader(int which) const
 	{
+		if(which < 0)
+			return GetWeaponHeader(which == -2) ;
 		if(ExtHeaderCount<=which) {
 			return NULL;
 		}

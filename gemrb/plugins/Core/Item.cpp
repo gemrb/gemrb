@@ -123,10 +123,12 @@ int Item::UseCharge(ieWord *Charges, int header, bool expend) const
 	ITMExtHeader *ieh = GetExtHeader(header);
 	if (!ieh) return 0;
 	int type = ieh->ChargeDepletion;
-	int ccount = Charges[header];
-	if (header>=CHARGE_COUNTERS) {
+
+	int ccount = 0;
+	if ((header>=CHARGE_COUNTERS) || (header<0/*weapon header*/)) {
 		header = 0;
 	}
+	ccount=Charges[header] ;
 
 	//if the item started from 0 charges, then it isn't depleting
 	if (ieh->Charges==0) {
@@ -136,6 +138,7 @@ int Item::UseCharge(ieWord *Charges, int header, bool expend) const
 		Charges[header] = --ccount;
 	}
 
+	printf("ccount is %d", ccount) ;
 	if (ccount>0) {
 		return CHG_NONE;
 	}

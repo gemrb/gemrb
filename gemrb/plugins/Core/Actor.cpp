@@ -2863,6 +2863,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical success
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
 		DealDamage (target, damage, damagetype, &wi, true);
+		UseItem(inventory.GetEquippedSlot(), Flags&WEAPON_RANGED?-2:-1, target, false) ;
 		return;
 	}
 	tohit += roll;
@@ -2879,6 +2880,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		return;
 	}
 	DealDamage (target, damage, damagetype, &wi, false);
+	UseItem(inventory.GetEquippedSlot(), Flags&WEAPON_RANGED?-2:-1, target, false) ;
 }
 
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,

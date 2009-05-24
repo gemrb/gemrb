@@ -431,7 +431,7 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 	}
 
 	CREItem *returned = new CREItem(*item);
-	item->Usages[0]=(ieWord) (item->Usages[0]-count);
+	item->Usages[0]-=count;
 	returned->Usages[0]=(ieWord) count;
 	return returned;
 }
@@ -1219,9 +1219,14 @@ void Inventory::BreakItemSlot(ieDword slot)
 	const Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) return;
 	memcpy(newItem, itm->ReplacementItem,sizeof(newItem) );
-	gamedata->FreeItem( itm, Slot->ItemResRef, true );
-	//this depends on setslotitemres using setslotitem
-	SetSlotItemRes(newItem, slot, 0,0,0);
+	//remove one item
+	RemoveItem(slot, 1) ;
+	//and if there are no more of them, break it!
+	if(!Slots[slot]) {
+		gamedata->FreeItem( itm, Slot->ItemResRef, true );
+		//this depends on setslotitemres using setslotitem
+		SetSlotItemRes(newItem, slot, 0,0,0);
+	}
 }
 
 void Inventory::dump()
