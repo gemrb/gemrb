@@ -287,7 +287,9 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 					c=SixteenToNine[i];
 					break;
 				case 16:
-					c=i;
+					//this is an uglybugly hack, i still have to
+					//figure out what 'FaceTarget' really is
+					if ( (int) af->GetCycleCount()>i) c=i;
 					break;
 				}
 				anims[p_onset] = af->GetCycle( c );
@@ -311,7 +313,9 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 					c=SixteenToNine[i];
 					break;
 				case 16:
-					c=i;
+					//this is an uglybugly hack, i still have to
+					//figure out what 'FaceTarget' really is
+					if ((int) af->GetCycleCount()>i) c=i;
 					break;
 				}
 				anims[p_hold] = af->GetCycle( c );
@@ -336,7 +340,9 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 					c=SixteenToNine[i];
 					break;
 				case 16:
-					c=i;
+					//this is an uglybugly hack, i still have to
+					//figure out what 'FaceTarget' really is
+					if ( (int) af->GetCycleCount()>i) c=i;
 					break;
 				}
 				anims[p_release] = af->GetCycle( ( unsigned char ) c );
