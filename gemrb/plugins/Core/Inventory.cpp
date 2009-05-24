@@ -1219,14 +1219,9 @@ void Inventory::BreakItemSlot(ieDword slot)
 	const Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) return;
 	memcpy(newItem, itm->ReplacementItem,sizeof(newItem) );
-	//remove one item
-	RemoveItem(slot, 1) ;
-	//and if there are no more of them, break it!
-	if(!Slots[slot]) {
-		gamedata->FreeItem( itm, Slot->ItemResRef, true );
-		//this depends on setslotitemres using setslotitem
-		SetSlotItemRes(newItem, slot, 0,0,0);
-	}
+	gamedata->FreeItem( itm, Slot->ItemResRef, true );
+	//this depends on setslotitemres using setslotitem
+	SetSlotItemRes(newItem, slot, 0,0,0);
 }
 
 void Inventory::dump()
