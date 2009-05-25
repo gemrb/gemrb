@@ -75,6 +75,8 @@ def OpenEndMessageWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (9371)	
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
+	if PortraitWindow:
+		UpdatePortraitWindow ()
 	if hideflag:
 		GemRB.UnhideGUI ()
 
