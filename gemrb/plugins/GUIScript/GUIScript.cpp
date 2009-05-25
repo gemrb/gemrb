@@ -6911,6 +6911,8 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		//no, those were done by CanUseItemType
 		function|=CAN_READ;
 		PyDict_SetItemString(dict, "Spell", PyString_FromResRef (f->Resource));
+	} else if (ehc>1) {
+		function|=CAN_SELECT;
 	}
 not_a_scroll:
 	if (core->CanUseItemType(SLOT_BAG, item, NULL, false) ) {
@@ -6923,9 +6925,6 @@ not_a_scroll:
 		if (gamedata->Exists( ResRef, IE_STO_CLASS_ID) ) {
 			function|=CAN_STUFF;
 		}
-	}
-	if (ehc>1) {
-		function|=CAN_SELECT;
 	}
 	PyDict_SetItemString(dict, "Function", PyInt_FromLong(function));
 	gamedata->FreeItem( item, ResRef, false );
