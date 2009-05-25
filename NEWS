@@ -1,6 +1,5 @@
-GemRB svn (r5999):
+GemRB V0.4.0 (2009-05-25):
   New features:
-    -
     - level up support in bg2
     - basic party reordering
     - bashing of containers and doors
@@ -9,8 +8,7 @@ GemRB svn (r5999):
     - depletion of item charges
     - opcodes: disable spellcasting, cutscene2 (pocketplane travel), knock,
       clear air, polymorph, disable button
-    - trap setting
-    - dynamic scrollbar creation (enables the display of more than 10 kits)
+    - dynamic scrollbar creation (display of more than 10 kits, 24 spells)
     - portrait effect icons
     - item ability selection
     - character customization
@@ -23,13 +21,16 @@ GemRB svn (r5999):
     - pst dialogs
     - regeneration, hp bonuses, healing
     - animations and projectiles
-    - various guiscripts
     - rewritten MVE player
+    - ranged combat
+    - various guiscripts
     - bugfixes
 
   Applied patches:
     #2770564 Whiteclone (pst options window bug)
-    numerous patches from mattinm extending the level up support
+    numerous patches from mattinm finishing the level up support
+    a few patches from ape fixing and extending iwd
+    #2579743 jbmetz added RPM spec files
 
 GemRB V0.3.2 (2009-02-16):
   New features:
