@@ -18,6 +18,7 @@
  * $Id$
  */
 #include <cassert>
+#include <cmath>
 
 #include "../../includes/win32def.h"
 #include "../../includes/strrefs.h"
@@ -1133,8 +1134,18 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	if (run) {
 		InternalFlags|=IF_RUNNING;
 	}
-	//area->BlockSearchMap( Pos, size, 0);
+	//the comment of the next line was removed in 0.4.0
+	//if you want to put it back for some reason, check
+	//if the searchmap is not eaten up
+	area->BlockSearchMap( Pos, size, 0);
 	Point p = Pos;
+
+	//selecting points around a circle's edge around actor (didn't work better)
+	//int x = core->Roll(1,100,-50);
+	//p.x+=x;
+	//p.y+=(int) sqrt(100-x*x);
+
+	//selecting points in a square around actor
 	p.x+=core->Roll(1,50,-25);
 	p.y+=core->Roll(1,50,-25);
 	path = area->RunAway( Pos, p, size, 50, 0 );
