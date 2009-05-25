@@ -25,7 +25,7 @@ from ie_stats import *
 from ie_restype import RES_2DA
 from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities
 from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GSNN
-from GUICommonWindows import IsDualClassed, IsMultiClassed, IsDualSwap, GetKitIndex
+from GUICommonWindows import IsDualClassed, IsMultiClassed, IsDualSwap, GetKitIndex, UpdatePortraitWindow
 from LUSpellSelection import *
 from LUHLASelection import *
 
@@ -856,6 +856,7 @@ def LevelUpDonePress():
 	
 	if LevelUpWindow:
 		LevelUpWindow.Unload()
+	UpdatePortraitWindow ()
 	UpdateRecordsWindow()
 
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)

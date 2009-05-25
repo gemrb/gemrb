@@ -123,6 +123,9 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RestPress")
 	Button.SetTooltip (11942)
 
+	if PortraitWindow:
+		UpdatePortraitWindow ()
+
 def MarkMenuButton (WindowIndex):
 	Pressed = WindowIndex.GetControl( GemRB.GetVar ("SelectedWindow") )
 
