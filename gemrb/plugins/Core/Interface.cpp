@@ -3197,7 +3197,10 @@ int Interface::PlayMovie(const char* ResRef)
 	ieDword *frames = NULL;
 	ieDword *strrefs = NULL;
 	int cnt = 0;
+
+	//one of these two should exist (they both mean the same thing)
 	vars->Lookup("Display Movie Subtitles", subtitles);
+	vars->Lookup("Display Subtitles", subtitles);
 	AutoTable sttable;
 	if (subtitles && sttable.load(ResRef)) {
 		cnt = sttable->GetRowCount()-3;
