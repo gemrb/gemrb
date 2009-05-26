@@ -30,7 +30,6 @@
 Button::Button()
 {
 	Unpressed = Pressed = Selected = Disabled = NULL;
-	//this->Clear = Clear;
 	State = IE_GUI_BUTTON_UNPRESSED;
 	ResetEventHandler( ButtonOnPress );
 	ResetEventHandler( ButtonOnDoublePress );
@@ -86,6 +85,7 @@ void Button::SetImage(unsigned char type, Sprite2D* img)
 	switch (type) {
 		case IE_GUI_BUTTON_UNPRESSED:
 		case IE_GUI_BUTTON_LOCKED:
+		case IE_GUI_BUTTON_LOCKED_PRESSED:
 			core->GetVideoDriver()->FreeSprite( Unpressed );
 			Unpressed = img;
 			break;
@@ -157,6 +157,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 		switch (State) {
 			case IE_GUI_BUTTON_UNPRESSED:
 			case IE_GUI_BUTTON_LOCKED:
+			case IE_GUI_BUTTON_LOCKED_PRESSED:
 				Image = Unpressed;
 				break;
 
@@ -257,7 +258,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 
 		if (State == IE_GUI_BUTTON_DISABLED)
 			ppoi = disabled_palette;
-		// FIXME: hopefully there's no button which sunks when selected
+		// FIXME: hopefully there's no button which sinks when selected
 		//   AND has text label
 		//else if (State == IE_GUI_BUTTON_PRESSED || State == IE_GUI_BUTTON_SELECTED) {
 
@@ -296,13 +297,13 @@ void Button::Draw(unsigned short x, unsigned short y)
 /** Sets the Button State */
 void Button::SetState(unsigned char state)
 {
-	if (state > IE_GUI_BUTTON_SECOND) {// If wrong value inserted
+	if (state > IE_GUI_BUTTON_LOCKED_PRESSED) {// If wrong value inserted
 		return;
 	}
 	if (State != state) {
 		Changed = true;
+		State = state;
 	}
-	State = state;
 }
 void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, const Color &color, bool enabled, bool filled)
 {
@@ -386,10 +387,10 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		drag_start.y = Owner->YPos + YPos + y;
 
  		if (State == IE_GUI_BUTTON_LOCKED) {
+			SetState( IE_GUI_BUTTON_LOCKED_PRESSED );
 			return;
 		}
-		State = IE_GUI_BUTTON_PRESSED;
-		Changed = true;
+		SetState( IE_GUI_BUTTON_PRESSED );
 		if (Flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound( DS_BUTTON_PRESSED );
 		}
@@ -422,12 +423,17 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	if (core->GetDraggedItem () && !ButtonOnDragDrop[0])
 		return;
 
-	if (State == IE_GUI_BUTTON_PRESSED) {
+	switch (State) {
+	case IE_GUI_BUTTON_PRESSED:
 		if (ToggleState) {
 			SetState( IE_GUI_BUTTON_SELECTED );
 		} else {
 			SetState( IE_GUI_BUTTON_UNPRESSED );
 		}
+		break;
+	case IE_GUI_BUTTON_LOCKED_PRESSED:
+		SetState( IE_GUI_BUTTON_LOCKED );
+		break;
 	}
 	if (( x >= Width ) || ( y >= Height )) {
 		return;
@@ -497,7 +503,9 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 
 	Owner->Cursor = IE_CURSOR_NORMAL;
 
-	if ((Flags & IE_GUI_BUTTON_DRAGGABLE) && (State == IE_GUI_BUTTON_PRESSED)) {
+	//portrait buttons are draggable and locked
+	if ((Flags & IE_GUI_BUTTON_DRAGGABLE) && 
+            (State == IE_GUI_BUTTON_PRESSED || State ==IE_GUI_BUTTON_LOCKED_PRESSED)) {
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
 		int dx = Owner->XPos + XPos + x - drag_start.x;
@@ -614,11 +622,10 @@ void Button::RedrawButton(const char* VariableName, unsigned int Sum)
 		return;
 	} //other buttons, nothing to redraw
 	if (ToggleState) {
-		State = IE_GUI_BUTTON_SELECTED;
+		SetState(IE_GUI_BUTTON_SELECTED);
 	} else {
-		State = IE_GUI_BUTTON_UNPRESSED;
+		SetState(IE_GUI_BUTTON_UNPRESSED);
 	}
-	Changed = true;
 }
 /** Sets the Picture */
 void Button::SetPicture(Sprite2D* newpic)

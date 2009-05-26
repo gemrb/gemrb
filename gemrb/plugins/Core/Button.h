@@ -47,6 +47,7 @@ class Palette;
 // Draws the disabled bitmap, but otherwise works like unpressed
 #define IE_GUI_BUTTON_THIRD     5
 #define IE_GUI_BUTTON_SECOND    6
+#define IE_GUI_BUTTON_LOCKED_PRESSED    7  //all the same as LOCKED
 
 #define IE_GUI_BUTTON_NO_IMAGE     0x00000001   // don't draw image (BAM)
 #define IE_GUI_BUTTON_PICTURE      0x00000002   // draw picture (BMP, MOS, ...)
