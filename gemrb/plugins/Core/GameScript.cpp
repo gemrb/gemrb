@@ -35,7 +35,6 @@
 //16 - trigger evaluation
 
 static bool charnameisgabber = false;
-static bool charactersubtitles = false;
 static ieVariable IWDDeathVarFormat = "KILL_%s_CNT";
 static ieVariable BGDeathVarFormat = "SPRITE_IS_DEAD%s";
 static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
@@ -1217,7 +1216,8 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		initialized = 1;
 		ieDword tmp = 0;
 
-		core->GetDictionary()->Lookup("Character Subtitles", tmp);
+		//display the verbal constants in the console
+		core->GetDictionary()->Lookup("Subtitles", tmp);
 		if (tmp) {
 			charactersubtitles = true;
 		} else {

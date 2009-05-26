@@ -37,6 +37,7 @@
 #include "../../includes/defsounds.h"
 
 int initialized = 0;
+bool charactersubtitles = true;
 //these tables will get freed by Core
 SymbolMgr* triggersTable;
 SymbolMgr* actionsTable;
@@ -338,6 +339,9 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 			actor->ResolveStringConstant( sb.Sound, (unsigned int) Strref);
 		}
 		Strref = tmp;
+		if (charactersubtitles) {
+			flags |= DS_CONSOLE;
+		}
 	}
 
 	if ((Strref != -1) && !sb.Sound[0]) {

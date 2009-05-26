@@ -555,7 +555,6 @@ def OnDragItem ():
 	return
 
 def OnDropItemToPC ():
-	print "DROPITEMTOPC"
 	pc = GemRB.GetVar ("PressedPortrait")
 
 	#-3 : drop stuff in inventory (but not equippable slots)
@@ -843,7 +842,6 @@ def AbilitiesItemWindow ():
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 	Tips = item["Tooltips"]
 
-	print slot_item
 	GemRB.SetVar ("Ability", 0)
 	for i in range(3):
 		Button = Window.GetControl (i+1)
