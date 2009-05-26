@@ -559,10 +559,27 @@ void Map::UpdateScripts()
 
 		actor->inventory.CalculateWeight();
 		actor->SetBase( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
+
 		//TODO:calculate actor speed!
 		int speed = (int) actor->GetStat(IE_MOVEMENTRATE);
 		if (speed) {
 			speed = 1500/speed;
+		}
+		if (core->GetResDataINI()) {
+			ieDword animid = actor->BaseStats[IE_ANIMATION_ID];
+			if (core->HasFeature(GF_ONE_BYTE_ANIMID)) {
+				animid = animid & 0xff;
+			}
+			if (animid < (ieDword)CharAnimations::GetAvatarsCount()) {
+				AvatarStruct *avatar = CharAnimations::GetAvatarStruct(animid);
+				if (avatar->RunScale && (actor->GetInternalFlag() & IF_RUNNING)) {
+					speed = avatar->RunScale;
+				} else if (avatar->WalkScale) {
+					speed = avatar->WalkScale;
+				} else {
+					//printf("no walkscale for anim %d!\n", actor->BaseStats[IE_ANIMATION_ID]);
+				}
+			}
 		}
 
 		if (actor->Modified[IE_DONOTJUMP]<2) {
@@ -1077,16 +1094,16 @@ bool Map::AnyEnemyNearPoint(Point &p)
 void Map::ActorSpottedByPlayer(Actor *actor)
 {
 	unsigned int animid;
-	char section[10];
 
-	if(core->HasFeature(GF_HAS_BEASTS_INI)) {
+	if(core->HasFeature(GF_HAS_BEASTS_INI)) {			
 		animid=actor->BaseStats[IE_ANIMATION_ID];
 		if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
 			animid&=0xff;
 		}
-		sprintf(section,"%d",animid);
-		animid=(unsigned int) core->GetResDataINI()->GetKeyAsInt(section,"bestiary",-1);
-		core->GetGame()->SetBeastKnown(animid);
+		if (animid < (ieDword)CharAnimations::GetAvatarsCount()) {
+			AvatarStruct *avatar = CharAnimations::GetAvatarStruct(animid);
+			core->GetGame()->SetBeastKnown(avatar->Bestiary);
+		}
 	}
 
 	if (!(actor->GetInternalFlag()&IF_STOPATTACK)) {
