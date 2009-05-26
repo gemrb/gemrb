@@ -14,12 +14,8 @@ Preparing and testing SVN
 
 * Update NEWS with highlights since the last release 
 
-* Update ChangeLog with entry about release
-
 * Make sure that GemRB SVN is in compilable and runnable state
-
   - download a clean SVN tree and test it.
-
   - Make distribution .tar.gz  (make dist) and test it as well -
     especially make sure all needed files are included.
 
@@ -76,6 +72,6 @@ Release and Announcements
 
 * Test the downloads from sourceforge.net
 
-* Announce on homepage, SF, #GemRB in channel and title, Gibberlings3
+* Announce on homepage, SF, #GemRB in channel and title, Gibberlings3, Happypenguin
 
-* Possibly announce on Freshmeat/Happypenguin
+* Possibly announce on Freshmeat (only balrog has the account?)
