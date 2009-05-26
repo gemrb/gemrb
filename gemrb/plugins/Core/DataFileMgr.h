@@ -62,6 +62,8 @@ public:
 		const char* Default) = 0;
 	virtual int GetKeyAsInt(const char* Tag, const char* Key,
 		const int Default) = 0;
+	virtual float GetKeyAsFloat(const char* Tag, const char* Key,
+		const float Default) = 0;
 	virtual bool GetKeyAsBool(const char* Tag, const char* Key,
 		const bool Default) = 0;
 };
