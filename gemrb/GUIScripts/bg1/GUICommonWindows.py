@@ -332,7 +332,7 @@ def ActionQWeapon4Pressed ():
 def ActionStopPressed ():
 	for i in range (PARTY_SIZE):
 		if GemRB.GameIsPCSelected(i + 1):
-			GemRB.ClearAction(i + 1)
+			GemRB.ClearActions(i + 1)
 	return
 
 #no check needed because the button wouldn't be drawn if illegal

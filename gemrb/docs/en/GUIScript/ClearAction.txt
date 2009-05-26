@@ -1,9 +1,0 @@
-
-Prototype: GemRB.ClearActions(Slot)
-
-Description: Stops a player character's movement and any pending action.
-
-Parameters: Slot  - actor index in game structure
-
-Return value: N/A
-

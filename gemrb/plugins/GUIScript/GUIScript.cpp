@@ -8275,16 +8275,16 @@ jump_label:
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_ClearAction__doc,
-"ClearAction(slot)\n\n"
+PyDoc_STRVAR( GemRB_ClearActions__doc,
+"ClearActions(slot)\n\n"
 "Stops an action for a PC indexed by slot." );
 
-static PyObject* GemRB_ClearAction(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 {
 	int slot;
 
 	if (!PyArg_ParseTuple( args, "i", &slot )) {
-		return AttributeError( GemRB_ClearAction__doc );
+		return AttributeError( GemRB_ClearActions__doc );
 	}
 	Game *game = core->GetGame();
 	if (!game) {
@@ -9106,7 +9106,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(ChangeStoreItem, METH_VARARGS),
 	METHOD(CheckFeatCondition, METH_VARARGS),
 	METHOD(CheckVar, METH_VARARGS),
-	METHOD(ClearAction, METH_VARARGS),
+	METHOD(ClearActions, METH_VARARGS),
 	METHOD(ConvertEdit, METH_VARARGS),
 	METHOD(CountEffects, METH_VARARGS),
 	METHOD(CreateButton, METH_VARARGS),

@@ -427,7 +427,7 @@ def PortraitButtonHPOnPress ():
 def StopAllOnPress ():
 	for i in range (PARTY_SIZE):
 		if GemRB.GameIsPCSelected(i + 1):
-			GemRB.ClearAction(i + 1)
+			GemRB.ClearActions(i + 1)
 	return
 
 def SelectAllOnPress ():
