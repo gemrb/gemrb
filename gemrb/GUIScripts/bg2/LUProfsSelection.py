@@ -75,6 +75,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsOffsetPress = 69
 		ProfsNumButtons = 8
 		ProfsTextArea = ProfsWindow.GetControl (68)
+		ProfsTextArea.SetText (9588)
 		ProfsScrollBar = ProfsWindow.GetControl (78)
 	elif type == LUPROFS_TYPE_LEVELUP: #levelup
 		ProfsOffsetSum = 36
@@ -93,6 +94,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsOffsetPress = 66
 		ProfsNumButtons = 8
 		ProfsTextArea = ProfsWindow.GetControl (74)
+		ProfsTextArea.SetText (9588)
 		ProfsScrollBar = ProfsWindow.GetControl (78)
 	else: #unknown
 		return
