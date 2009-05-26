@@ -3197,13 +3197,21 @@ int Interface::PlayMovie(const char* ResRef)
 	ieDword *frames = NULL;
 	ieDword *strrefs = NULL;
 	int cnt = 0;
+	int offset = 0;
 
 	//one of these two should exist (they both mean the same thing)
 	vars->Lookup("Display Movie Subtitles", subtitles);
-	vars->Lookup("Display Subtitles", subtitles);
+	if (subtitles) {
+		//HoW flag
+		cnt=-3;
+		offset = 3;
+	} else {
+		//ToB flag
+		vars->Lookup("Display Subtitles", subtitles);
+	}
 	AutoTable sttable;
 	if (subtitles && sttable.load(ResRef)) {
-		cnt = sttable->GetRowCount()-3;
+		cnt += sttable->GetRowCount();
 		if (cnt>0) {
 			frames = (ieDword *) malloc(cnt * sizeof(ieDword) );
 			strrefs = (ieDword *) malloc(cnt * sizeof(ieDword) );
@@ -3212,14 +3220,19 @@ int Interface::PlayMovie(const char* ResRef)
 		}
 		if (frames && strrefs) {
 			for (int i=0;i<cnt;i++) {
-				frames[i] = atoi (sttable->QueryField(i+3, 0) );
-				strrefs[i] = atoi (sttable->QueryField(i+3, 1) );
+				frames[i] = atoi (sttable->QueryField(i+offset, 0) );
+				strrefs[i] = atoi (sttable->QueryField(i+offset, 1) );
 			}
 		}
 		int r = atoi(sttable->QueryField("red", "frame"));
 		int g = atoi(sttable->QueryField("green", "frame"));
 		int b = atoi(sttable->QueryField("blue", "frame"));
 		SubtitleFont = GetFont (MovieFont); //will change
+		if (!r && !g && !b) {
+			r=255;
+			g=255;
+			b=255;
+		}
 		if (SubtitleFont) {
 			Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};
 			Color back = {0x00, 0x00, 0x00, 0x00};
