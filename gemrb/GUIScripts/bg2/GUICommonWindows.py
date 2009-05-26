@@ -579,7 +579,7 @@ def OpenPortraitWindow (needcontrols):
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
 		Button.SetFont ("STATES2")
-		Button.SetVarAssoc ("PressedPortrait", i)
+		Button.SetVarAssoc ("PressedPortrait", i+1)
 		if (needcontrols):
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenInventoryWindowClick")
 		else:
@@ -622,7 +622,7 @@ def UpdatePortraitWindow ():
 				IE_GUI_BUTTON_HORIZONTAL| \
 				IE_GUI_BUTTON_ALIGN_LEFT| IE_GUI_BUTTON_ALIGN_TOP| \
 				IE_GUI_BUTTON_DRAGGABLE|IE_GUI_BUTTON_MULTILINE, OP_SET)
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetPicture (pic, "NOPORTSM")
 		hp = GemRB.GetPlayerStat (portid+1, IE_HITPOINTS)
 		hp_max = GemRB.GetPlayerStat (portid+1, IE_MAXHITPOINTS)
@@ -671,19 +671,22 @@ def PortraitButtonOnDrag ():
 	global DraggedPortrait
 
 	#they start from 1
-	DraggedPortrait = GemRB.GetVar ("PressedPortrait")+1
+	DraggedPortrait = GemRB.GetVar ("PressedPortrait")
 	GemRB.DragItem (DraggedPortrait, -1, "")
 	return
 
 def PortraitButtonOnPress ():
 	i = GemRB.GetVar ("PressedPortrait")
 
+	if not i:
+		return
+
 	if (not SelectionChangeHandler):
-		if GemRB.GameIsPCSelected (i+1):
+		if GemRB.GameIsPCSelected (i):
 			GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_OR)
-		GemRB.GameSelectPC (i + 1, True, SELECT_REPLACE)
+		GemRB.GameSelectPC (i, True, SELECT_REPLACE)
 	else:
-		GemRB.GameSelectPCSingle (i + 1)
+		GemRB.GameSelectPCSingle (i)
 		SelectionChanged ()
 		RunSelectionChangeHandler ()
 	return
@@ -691,12 +694,15 @@ def PortraitButtonOnPress ():
 def PortraitButtonOnShiftPress ():
 	i = GemRB.GetVar ("PressedPortrait")
 
+	if not i:
+		return
+
 	if (not SelectionChangeHandler):
-		sel = GemRB.GameIsPCSelected (i + 1)
+		sel = GemRB.GameIsPCSelected (i)
 		sel = not sel
-		GemRB.GameSelectPC (i + 1, sel)
+		GemRB.GameSelectPC (i, sel)
 	else:
-		GemRB.GameSelectPCSingle (i + 1)
+		GemRB.GameSelectPCSingle (i)
 		SelectionChanged ()
 		RunSelectionChangeHandler ()
 	return
@@ -726,13 +732,16 @@ def SelectionChanged ():
 def PortraitButtonOnMouseEnter ():
 	global DraggedPortrait
 
-	i = GemRB.GetVar ("PressedPortrait")
+	if GemRB.IsDraggingItem()==2:
+		i = GemRB.GetVar ("PressedPortrait")
 
-	if DraggedPortrait != None:
-		GemRB.DragItem (0, -1, "")
-		#this might not work
-		GemRB.SwapPCs (DraggedPortrait, i+1)
-		DraggedPortrait = None
+		if DraggedPortrait != None:
+			GemRB.SwapPCs (DraggedPortrait, i)
+			GemRB.SetVar ("PressedPortrait", DraggedPortrait)
+			DraggedPortrait = i
+			GemRB.SetTimedEvent ("CheckDragging",1)
+		else:
+			OnDropItemToPC2()
 		return
 
 	if GemRB.IsDraggingItem ():
@@ -740,11 +749,33 @@ def PortraitButtonOnMouseEnter ():
 		Button.EnableBorder (FRAME_PC_TARGET, 1)
 	return
 
+def OnDropItemToPC2 ():
+	GemRB.SetVar ("PressedPortrait",0)
+	GemRB.DragItem (0, -1, "")
+	DraggedPortrait = None
+        return
+
+#stop the portrait dragging if the mouse went on a trip
+def CheckDragging():
+	global DraggedPortrait
+
+	i = GemRB.GetVar ("PressedPortrait")
+	if not i:
+		GemRB.DragItem (0, -1, "")
+	
+	if GemRB.IsDraggingItem()!=2:
+		DraggedPortrait = None
+	return
+
 def PortraitButtonOnMouseLeave ():
 	i = GemRB.GetVar ("PressedPortrait")
+	if not i:
+		return
 
-	Button = PortraitWindow.GetControl (i)
+	Button = PortraitWindow.GetControl (i-1)
 	Button.EnableBorder (FRAME_PC_TARGET, 0)
+	GemRB.SetVar ("PressedPortrait", 0)
+	GemRB.SetTimedEvent ("CheckDragging",1)
 	return
 
 def GetSavingThrow (SaveName, row, level):

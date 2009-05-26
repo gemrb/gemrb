@@ -48,7 +48,7 @@ OldOptionsWindow = None
 OverSlot = None
 
 def OpenInventoryWindowClick ():
-	tmp = GemRB.GetVar ("PressedPortrait")+1
+	tmp = GemRB.GetVar ("PressedPortrait")
 	GemRB.GameSelectPC (tmp, True, SELECT_REPLACE)
 	OpenInventoryWindow ()
 	return
@@ -555,7 +555,8 @@ def OnDragItem ():
 	return
 
 def OnDropItemToPC ():
-	pc = GemRB.GetVar ("PressedPortrait") + 1
+	print "DROPITEMTOPC"
+	pc = GemRB.GetVar ("PressedPortrait")
 
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)

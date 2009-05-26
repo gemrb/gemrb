@@ -48,6 +48,7 @@ class Action;
 #define VB_PANIC     1
 #define VB_HAPPY     2
 #define VB_UNHAPPY   3
+#define VB_LEADER    6
 #define VB_TIRED     7
 #define VB_BORED     8
 #define VB_ATTACK    9

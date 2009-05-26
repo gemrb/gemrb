@@ -4554,9 +4554,6 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-/*
-	PlayerSlot = game->FindPlayer( PlayerSlot );
-*/
 	Actor* MyActor = game->FindPC( PlayerSlot );
 	if (!MyActor) {
 		return RuntimeError( "Actor not found!" );
@@ -4583,9 +4580,6 @@ static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-/*
-	PlayerSlot = game->FindPlayer( PlayerSlot );
-*/
 	Actor* MyActor = game->FindPC( PlayerSlot );
 	if (!MyActor) {
 		return RuntimeError( "Actor not found!" );
@@ -4786,9 +4780,6 @@ static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-/*
-	PlayerSlot = game->FindPlayer( PlayerSlot );
-*/
 	Actor* MyActor = game->FindPC( PlayerSlot );
 	if (!MyActor) {
 		return PyInt_FromLong( 0 );
@@ -4876,9 +4867,6 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-/*
-	PlayerSlot = game->FindPlayer( PlayerSlot );
-*/
 	Actor* MyActor = game->FindPC( PlayerSlot );
 	if (!MyActor) {
 		return PyString_FromString( "");
@@ -9052,6 +9040,10 @@ static PyObject* GemRB_SwapPCs(PyObject * /*self*/, PyObject* args)
 	}
 
 	game->SwapPCs(game->FindPlayer(idx1), game->FindPlayer(idx2));
+        //leader changed
+        if (idx1==1 || idx2==1) {
+                DisplayStringCore( game->FindPC(1), VB_LEADER, DS_CONST);
+        }
 
 	Py_INCREF( Py_None );
 	return Py_None;

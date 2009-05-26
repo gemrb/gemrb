@@ -420,7 +420,14 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
-	if (core->GetDraggedItem () && !ButtonOnDragDrop[0])
+
+	//what was just dropped?
+	int dragtype = 0;
+	if (core->GetDraggedItem ()) dragtype=1;
+	if (core->GetDraggedPortrait ()) dragtype=2;
+
+	//if something was dropped, but it isn't handled here: it didn't happen
+	if (dragtype && !ButtonOnDragDrop[0])
 		return;
 
 	switch (State) {
@@ -435,8 +442,13 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 		SetState( IE_GUI_BUTTON_LOCKED );
 		break;
 	}
-	if (( x >= Width ) || ( y >= Height )) {
-		return;
+
+	//in case of dragged/dropped portraits, allow the event to happen even
+	//when we are out of bound
+	if (dragtype!=2) {
+		if (( x >= Width ) || ( y >= Height )) {
+			return;
+		}
 	}
 	if (Flags & IE_GUI_BUTTON_CHECKBOX) {
 		//checkbox
@@ -464,16 +476,25 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 		}
 	}
 
-	if (core->GetDraggedItem()) {
-		RunEventHandler( ButtonOnDragDrop );
-		return;
-	}
+	//FIXME: you may want to clean this mess up
+	//normally there is only one handler allowed, but the portraits need
+	//another, i didn't want to have another 64 bytes allocated for every
+	//button control, so this hack calls a different function in case
+	//a portrait was dropped
+	//If the original was: DropItemToPC, then it calls DropItemToPC2
+	switch (dragtype) {
+		case 1:
+			RunEventHandler( ButtonOnDragDrop );
+			break;
+		case 2:
+			//very ugly hack
+			EventHandler tmp;
 
-/* spellbooks need the LOCKED state processing these events
-	if (State == IE_GUI_BUTTON_LOCKED) {
-		return;
+			memcpy(tmp, ButtonOnDragDrop, sizeof(tmp));
+			strncat(tmp,"2", sizeof(EventHandler) );
+			RunEventHandler( tmp );
+			break;
 	}
-*/
 
 	if ((Button&GEM_MB_NORMAL) == GEM_MB_ACTION) {
 		if ((Mod & GEM_MOD_SHIFT) && ButtonOnShiftPress[0])

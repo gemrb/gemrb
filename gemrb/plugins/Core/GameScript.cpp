@@ -35,6 +35,7 @@
 //16 - trigger evaluation
 
 static bool charnameisgabber = false;
+static bool charactersubtitles = false;
 static ieVariable IWDDeathVarFormat = "KILL_%s_CNT";
 static ieVariable BGDeathVarFormat = "SPRITE_IS_DEAD%s";
 static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
@@ -1214,6 +1215,14 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 
 	if (!initialized) {
 		initialized = 1;
+		ieDword tmp = 0;
+
+		core->GetDictionary()->Lookup("Character Subtitles", tmp);
+		if (tmp) {
+			charactersubtitles = true;
+		} else {
+			charactersubtitles = false;
+		}
 
 		if (core->HasFeature(GF_CHARNAMEISGABBER)) {
 			charnameisgabber=true;
@@ -1362,9 +1371,7 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 
 	script = CacheScript( Name, AIScript?IE_BS_CLASS_ID:IE_BCS_CLASS_ID);
 	MySelf = NULL;
-//	scriptRunDelay = 1000;
 	scriptType = ScriptType;
-	//lastRunTime = 0;
 }
 
 GameScript::~GameScript(void)

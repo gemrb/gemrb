@@ -183,8 +183,8 @@ def UpdateRecordsWindow ():
 
 	# portrait
 	Button = Window.GetControl (2)
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
+	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTMD")
 
 	# armorclass
@@ -1008,7 +1008,7 @@ def OpenCustomizeWindow ():
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomizeDonePress")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomizeCancelPress")
 
-	CustomizeWindow.ShowModal (MODAL_SHADOW_NONE)
+	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def CustomizeDonePress ():
@@ -1044,6 +1044,7 @@ def OpenAppearanceWindow():
 
 	PortraitButton = SubCustomizeWindow.GetControl (0)
 	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	PortraitButton.SetState (IE_GUI_BUTTON_LOCKED)
 
 	LeftButton = SubCustomizeWindow.GetControl (1)
 	RightButton = SubCustomizeWindow.GetControl (2)
@@ -1064,7 +1065,7 @@ def OpenAppearanceWindow():
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePortraitWindow")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
 	OwnPortraitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenCustomPortraitWindow")
-	SubCustomizeWindow.ShowModal (MODAL_SHADOW_NONE)
+	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	while True:
 		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
@@ -1151,7 +1152,7 @@ def OpenCustomPortraitWindow():
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePortraitCustomizeWindow")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubSubCustomizeWindow")
 
-	SubSubCustomizeWindow.ShowModal (MODAL_SHADOW_NONE)
+	SubSubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def DonePortraitCustomizeWindow ():
@@ -1240,7 +1241,7 @@ def OpenSoundWindow():
 	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PlaySoundPressed")
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneSoundWindow")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
-	SubCustomizeWindow.ShowModal (MODAL_SHADOW_NONE)
+	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def DoneSoundWindow():
@@ -1263,11 +1264,19 @@ def PlaySoundPressed():
 def OpenColorWindow():
 	global SubCustomizeWindow
 	global PortraitWindow
+	global PortraitButton
+	global HairButton, SkinButton, MajorButton, MinorButton
 
 	SubCustomizeWindow = GemRB.LoadWindowObject (21)
 
 	PortraitButton = SubCustomizeWindow.GetControl (0)
 	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	PortraitButton.SetState (IE_GUI_BUTTON_LOCKED)
+
+	HairButton = SubCustomizeWindow.GetControl (3)
+	SkinButton = SubCustomizeWindow.GetControl (4)
+	MajorButton = SubCustomizeWindow.GetControl (5)
+	MinorButton = SubCustomizeWindow.GetControl (6)
 
 	DoneButton = SubCustomizeWindow.GetControl (12)
 	DoneButton.SetText (11973)
@@ -1279,7 +1288,8 @@ def OpenColorWindow():
 
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneColorWindow")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
-	SubCustomizeWindow.ShowModal (MODAL_SHADOW_NONE)
+	UpdatePaperDoll()
+	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def DoneColorWindow():
@@ -1288,15 +1298,18 @@ def DoneColorWindow():
 	return
 
 def UpdatePaperDoll():
-
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Color1 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
 	Color2 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
+	MinorButton.SetBAM ("COLGRAD", 0, 0, Color2&0xff)
 	Color3 = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
+	MajorButton.SetBAM ("COLGRAD", 0, 0, Color3&0xff)
 	Color4 = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
+	SkinButton.SetBAM ("COLGRAD", 0, 0, Color4&0xff)
 	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
 	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
 	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
+	HairButton.SetBAM ("COLGRAD", 0, 0, Color7&0xff)
 	PortraitButton.SetPLT (GetActorPaperDoll (pc),
 		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
 	return
@@ -1330,7 +1343,7 @@ def OpenScriptWindow():
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneScriptWindow")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
 	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "UpdateScriptSelection")
-	SubCustomizeWindow.ShowModal (MODAL_SHADOW_NONE)
+	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def FillScriptList():
@@ -1358,7 +1371,7 @@ def DoneScriptWindow():
 	script = ScriptsTable.GetRowName(GemRB.GetVar("Selected") )
 	GemRB.SetPlayerScript (pc, script)
 	CloseSubCustomizeWindow()
-        return
+	return
 
 def UpdateScriptSelection():
 	text = ScriptTextArea.QueryText ()
@@ -1370,6 +1383,7 @@ def OpenBiographyEditWindow():
 	global BioStrRef
 
 	Changed = 0
+	pc = GemRB.GameGetSelectedPCSingle ()
 	BioStrRef = GemRB.GetPlayerString(pc, 74)
 	if BioStrRef != 33347:
 		Changed = 1
@@ -1396,7 +1410,7 @@ def OpenBiographyEditWindow():
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneBiographyWindow")
 	RevertButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RevertBiography")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
-	SubCustomizeWindow.ShowModal (MODAL_SHADOW_NONE)
+	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def ClearBiography():
