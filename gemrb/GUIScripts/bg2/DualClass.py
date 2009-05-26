@@ -25,6 +25,7 @@ from GUICommon import HasTOB, GetLearnablePriestSpells, HasSpell, AddClassAbilit
 from GUIREC import UpdateRecordsWindow
 from GUICommonWindows import IsDualSwap, GetActorClassTitle, GetKitIndex
 from LUSpellSelection import *
+from LUProfsSelection import *
 
 #######################
 pc = 0
@@ -48,8 +49,6 @@ DCClasses = []
 #######################
 DCProfsWindow = 0
 DCProfsDoneButton = 0
-DCProfsLeft = 0
-DCProfsColumn = 0
 #######################
 DCSkillsWindow = 0
 DCSkillsDoneButton = 0
@@ -147,17 +146,7 @@ def DualClassWindow ():
 # we're done!
 def DCMainDonePress ():
 	# save our proficiencies
-	RowCount = DCProfsTable.GetRowCount ()-7 # don't want bg1 profs
-	for i in range (RowCount):
-		# save the new proficiency with the old one in the back 3 bits
-		# to access profs, one should always use prof&0x07 to get the
-		# current profs available
-		ProfID = DCProfsTable.GetValue (i+8, 0)
-		OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x07
-		NewProf = GemRB.GetVar ("Prof "+str(i)) & 0x07
-		SaveProf = (OldProf << 3) | NewProf
-		if SaveProf > 0:
-			GemRB.ApplyEffect (pc, "Proficiency", SaveProf, ProfID)
+	ProfsSave (pc, LUPROFS_TYPE_DUALCLASS)
 
 	# remove old class abilities
 	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
@@ -432,46 +421,12 @@ def DCMainSkillsPress ():
 
 # opens the proficiencies window
 def DCOpenProfsWindow ():
-	global DCProfsWindow, DCProfsLeft, DCProfsDoneButton, DCProfsColumn, DCProfsTable
+	global DCProfsWindow, DCProfsDoneButton
 
 	# load up our window and set some basic variables
 	DCProfsWindow = GemRB.LoadWindowObject (15)
-	GemRB.SetVar ("ProfsTopIndex", 0)
-
-	# figure out how many proficiencies this class gets at level 1
-	ProfsCountTable = GemRB.LoadTableObject ("profs")
-	DCProfsTable = GemRB.LoadTableObject ("weapprof")
-	DCProfsLeft = ProfsCountTable.GetValue (ClassName, "FIRST_LEVEL", 1)
-	DCProfsColumn = DCProfsTable.GetColumnIndex (ClassName)
-
-	# setup our prof counts
-	RowCount = DCProfsTable.GetRowCount ()-7 # don't want bg1 profs
-	ProfCount = RowCount-8 # decrease with number of controls
-	for i in range (RowCount):
-		SkillName = DCProfsTable.GetValue (i+8, 1)
-		if SkillName > 0x1000000 or SkillName < 0:
-			ProfCount -= 1
-		GemRB.SetVar("Prof "+str(i), 0)
-
-	# setup the scrollbar
-	ScrollBar = DCProfsWindow.GetControl (78)
-	ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "DCProfsRedraw")
-	ScrollBar.SetVarAssoc ("ProfsTopIndex", ProfCount)
-	ScrollBar.SetDefaultScrollBar ()
-
-	# setup the +/- and info controls
-	for i in range (8):
-		Button=DCProfsWindow.GetControl(i+66)
-		Button.SetVarAssoc("Prof", i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DCProfsJustPress")
-
-		Button=DCProfsWindow.GetControl(i*2+50)
-		Button.SetVarAssoc("Prof", i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DCProfsLeftPress")
-
-		Button=DCProfsWindow.GetControl(i*2+51)
-		Button.SetVarAssoc("Prof", i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DCProfsRightPress")
+	NewClassId = ClassTable.GetValue (ClassName, "ID", 1)
+	SetupProfsWindow (pc, LUPROFS_TYPE_DUALCLASS, DCProfsWindow, DCProfsRedraw, classid=NewClassId)
 
 	# setup the done and cancel
 	DCProfsDoneButton = DCProfsWindow.GetControl (76)
@@ -493,47 +448,12 @@ def DCOpenProfsWindow ():
 
 # redraw the profs -- called whenever anything changes
 def DCProfsRedraw ():
-	ProfsTopIndex = GemRB.GetVar ("ProfsTopIndex")
+	ProfsPointsLeft = GemRB.GetVar ("ProfsPointsLeft")
 
-	# show how many points are left
-	PointsLeftLabel = DCProfsWindow.GetControl (0x10000028)
-	PointsLeftLabel.SetText (str(DCProfsLeft))
-
-	for i in range (8):
-		# add the bg1 offset to the lookups
-		ProfPos = ProfsTopIndex+i
-		ProfName = DCProfsTable.GetValue (ProfPos+8, 1)
-		ProfMax = DCProfsTable.GetValue (ProfPos+8, DCProfsColumn)
-
-		# get the left/right buttons
-		ButtonLeft = DCProfsWindow.GetControl (i*2+50)
-		ButtonRight = DCProfsWindow.GetControl (i*2+51)
-	
-		# disable the left/right if we can't assign to this prof
-		if not ProfMax:
-			ButtonLeft.SetState(IE_GUI_BUTTON_DISABLED)
-			ButtonRight.SetState(IE_GUI_BUTTON_DISABLED)
-			ButtonLeft.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			ButtonRight.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-		else:
-			ButtonLeft.SetState(IE_GUI_BUTTON_ENABLED)
-			ButtonRight.SetState(IE_GUI_BUTTON_ENABLED)
-			ButtonLeft.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-			ButtonRight.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-
-		# show the name of the skill
-		Label = DCProfsWindow.GetControl (0x10000029+i)
-		Label.SetText (ProfName)
-
-		# show the stars
-		ProfPoints = GemRB.GetVar ("Prof "+str(ProfPos))
-		for j in range (5):
-			# only show if it's greater than j
-			Star = DCProfsWindow.GetControl (5*i+j)
-			if ProfPoints > j:
-				Star.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-			else:
-				Star.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+	if ProfsPointsLeft == 0:
+		DCProfsDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+	else:
+		DCProfsDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	return
 
 # goes to the next scripts (mage or thief)
@@ -587,68 +507,6 @@ def DCProfsCancelPress ():
 		DCProfsWindow.Unload ()
 
 	DCMainBackPress ()
-	return
-
-# update the text area with info about the prof
-def DCProfsJustPress ():
-	ProfsTopIndex = GemRB.GetVar ("ProfsTopIndex")
-	ProfPos = GemRB.GetVar ("Prof")+ProfsTopIndex
-	ProfTextArea = DCProfsWindow.GetControl (74)
-	ProfTextArea.SetText (DCProfsTable.GetValue (ProfPos+8, 2))
-	return
-
-# takes a point away from a given prof
-def DCProfsRightPress ():
-	global DCProfsLeft
-
-	# get our current position
-	ProfsTopIndex = GemRB.GetVar ("ProfsTopIndex")
-	ProfPos = GemRB.GetVar ("Prof")+ProfsTopIndex
-
-	# make sure we can remove a point
-	ProfPoints = GemRB.GetVar ("Prof "+str(ProfPos))
-	if ProfPoints <= 0:
-		return
-
-	# decrease the prof, increase global profs, and unset the done button
-	GemRB.SetVar("Prof "+str(ProfPos),ProfPoints-1)
-	DCProfsLeft += 1
-	DCProfsDoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	DCProfsJustPress ()
-	DCProfsRedraw ()
-	return
-
-# gives a point to a given prof
-def DCProfsLeftPress():
-	global DCProfsLeft
-
-	# gotta have points to give em
-	if DCProfsLeft == 0:
-		return
-
-	# get our index and max proficiencies (5 cap)
-	ProfsTopIndex = GemRB.GetVar ("ProfsTopIndex")
-	ProfPos = GemRB.GetVar ("Prof")+ProfsTopIndex
-	ProfMax = DCProfsTable.GetValue (ProfPos+8, DCProfsColumn) # we add the bg1 skill count offset
-	if ProfMax > 5:
-		ProfMax = 5
-
-	# make sure we can add to the prof
-	ProfPoints = GemRB.GetVar("Prof "+str(ProfPos) )
-	if ProfPoints >= ProfMax:
-		return
-
-	# increase the prof, decrease global profs
-	GemRB.SetVar("Prof "+str(ProfPos),ProfPoints+1)
-	DCProfsLeft -= 1
-
-	# see if we can now be done
-	if not DCProfsLeft:
-		DCProfsDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-
-	# update
-	DCProfsJustPress ()
-	DCProfsRedraw ()
 	return
 
 # open the window to select thief skills

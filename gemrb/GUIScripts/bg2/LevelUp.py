@@ -28,6 +28,7 @@ from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GSN
 from GUICommonWindows import IsDualClassed, IsMultiClassed, IsDualSwap, GetKitIndex, UpdatePortraitWindow
 from LUSpellSelection import *
 from LUHLASelection import *
+from LUProfsSelection import *
 
 LevelUpWindow = None
 TopIndex = 0
@@ -35,12 +36,9 @@ SkillTopIndex = 0
 DoneButton = 0
 TextAreaControl = 0
 ScrollBarControl = 0
-WeapProfTable = 0
 SkillTable = 0
 ClassTable = 0
-ProfColumn = 0
 InfoCounter = 1
-ProfPointsLeft = 0
 NewProfPoints = 0
 SkillPointsLeft = 0
 NewSkillPoints = 0
@@ -76,8 +74,8 @@ DeltaDSpells = 0	# << total new divine spells
 DeltaWSpells = 0	# << total new wizard spells
 
 def OpenLevelUpWindow():
-	global LevelUpWindow, TextAreaControl, ProfPointsLeft, NewProfPoints
-	global TopIndex, ScrollBarControl, DoneButton, WeapProfTable, ProfColumn
+	global LevelUpWindow, TextAreaControl, NewProfPoints
+	global TopIndex, ScrollBarControl, DoneButton
 	global SkillTable, SkillPointsLeft, NewSkillPoints, KitName, LevelDiff, RaceTable
 	global ClassTable, Level, Classes, NumClasses, DualSwap, ClassSkillsTable, IsMulti
 	global OldHP, OldHPMax, OldSaves, OldLore, OldThaco, DeltaDSpells, DeltaWSpells
@@ -127,7 +125,6 @@ def OpenLevelUpWindow():
 	KitList = GemRB.LoadTableObject("kitlist")
 	ClassName = ClassTable.GetRowName(ClassIndex)
 	Kit = GetKitIndex (pc)
-	WeapProfTable = GemRB.LoadTableObject ("weapprof")
 	
 	# need this for checking gnomes
 	RaceTable = GemRB.LoadTableObject ("races")
@@ -140,18 +137,9 @@ def OpenLevelUpWindow():
 	# figure our our proficiency table and index
 	if Kit == 0:
 		KitName = ClassName
-		# sorcerers are missing from weapprof
-		if ClassName == "SORCERER":
-			ProfColumn = WeapProfTable.GetColumnIndex ("MAGE")
-		else:
-			ProfColumn = WeapProfTable.GetColumnIndex (ClassName)
 	else:
 		#rowname is just a number, the kitname is the first data column
 		KitName = KitList.GetValue(Kit, 0)
-		#this is the proficiency column number in kitlist
-		ProfColumn = KitList.GetValue(Kit, 5)
-
-	ProfCountTable = GemRB.LoadTableObject("profs")
 
 	# our multiclass variables
 	IsMulti = IsMultiClassed (pc, 1)
@@ -197,8 +185,6 @@ def OpenLevelUpWindow():
 		KitName = ClassName # for simplicity throughout the code
 		Classes[0] = ClassTable.GetValue (Classes[0], 5)
 		# Class[1] is taken care of above
-		ProfColumn = WeapProfTable.GetColumnIndex (ClassName) # or we'll get the multi progression
-
 
 		# we need the old level as well
 		if DualSwap:
@@ -207,8 +193,6 @@ def OpenLevelUpWindow():
 			Level[1] = GemRB.GetPlayerStat (pc, IE_LEVEL2)
 
 	hp = 0
-	FastestProf = 0
-	FastestRate = 100
 	SkillIndex = -1
 	HaveCleric = 0
 	DeltaWSpells = 0
@@ -301,12 +285,6 @@ def OpenLevelUpWindow():
 					OldDSpells[j] = DruidTable.GetValue (str(StartLevel), str(j+1), 1)
 				DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
 
-		# check for a better proficiency rate
-		TmpRate = ProfCountTable.GetValue(Classes[i]-1, 1)
-		if (TmpRate < FastestRate): # rate is how often you get it; therefore less is more
-			FastestProf = i
-			FastestRate = TmpRate
-
 		# see if we have a thief (or monk)
 		if (ClassSkillsTable.GetValue (Classes[i], 5, 0) != "*"):
 			SkillIndex = i
@@ -326,10 +304,6 @@ def OpenLevelUpWindow():
 		GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, OldHPMax + hp)
 		GemRB.SetPlayerStat (pc, IE_HITPOINTS, OldHP + hp)
 	
-	# save our proficiencies
-	ProfPointsLeft = LevelDiff[FastestProf]/FastestRate
-	NewProfPoints = ProfPointsLeft
-
 	# setup the indices/count of usable skills
 	AvailableSkillIndices = []
 	for i in range(SkillTable.GetRowCount()-2):
@@ -410,29 +384,6 @@ def OpenLevelUpWindow():
 	else:
 		HLAButton.SetFlags (IE_GUI_BUTTON_DISABLED, OP_OR)
 
-	RowCount = WeapProfTable.GetRowCount()-7  #we decrease it with the bg1 skills
-
-	# proficiencies scrollbar
-	GemRB.SetVar ("TopIndex", 0)
-	ScrollBarControl = LevelUpWindow.GetControl(108)
-	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "ProfScrollBarPress")
-	ScrollBarControl.SetDefaultScrollBar ()
-	ProfCount = RowCount - 7 # decrease it with the number of controls
-
-	# decrease it with the number of invalid proficiencies
-	for i in range(RowCount):
-		SkillName = WeapProfTable.GetValue (i+8, 1)
-		if SkillName > 0x1000000 or SkillName < 0:
-			ProfCount -= 1
-
-		# we only need the low 3 bits for profeciencies
-		# TODO: use the 6 bits the actual system uses for dual classes
-		#	this code will remain compatible in the meantime
-		currentprof = GemRB.GetPlayerStat (pc, WeapProfTable.GetValue (i+8, 0))&0x07
-		GemRB.SetVar("Prof "+str(i), currentprof)
-		GemRB.SetVar("ProfBase "+str(i), currentprof)
-	ScrollBarControl.SetVarAssoc ("TopIndex", ProfCount)
-
 	# skills scrollbar
 	if len(AvailableSkillIndices) > 4:
 		GemRB.SetVar ("SkillTopIndex", 0)
@@ -444,22 +395,6 @@ def OpenLevelUpWindow():
 		if len(AvailableSkillIndices):
 			# autoscroll to the first valid skill; luckily all three monk ones are adjacent
 			GemRB.SetVar ("SkillTopIndex", AvailableSkillIndices[0])
-
-	for i in range(7):
-		Button=LevelUpWindow.GetControl(i+112)
-		Button.SetVarAssoc("Prof", i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "JustPress")
-
-		Button=LevelUpWindow.GetControl(i*2+1)
-		Button.SetVarAssoc("Prof", i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
-
-		Button=LevelUpWindow.GetControl(i*2+2)
-		Button.SetVarAssoc("Prof", i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "RightPress")
-
-		for j in range(5):
-			Star=LevelUpWindow.GetControl(i*5+j+48)
 
 	for i in range(len(AvailableSkillIndices)):
 		if i == 4:
@@ -476,11 +411,18 @@ def OpenLevelUpWindow():
 		Button.SetVarAssoc("Skill",AvailableSkillIndices[i])
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SkillRightPress")
 
+	# setup our profs
+	Level1 = []
+	for i in range (len (Level)):
+		Level1.append (Level[i]-LevelDiff[i])
+	SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
+	NewProfPoints = GemRB.GetVar ("ProfsPointsLeft")
+
 	TextAreaControl = LevelUpWindow.GetControl(110)
 	TextAreaControl.SetText(GetLevelUpNews())
 
 	TopIndex = 0
-	RedrawSkills(1)
+	RedrawSkills()
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	LevelUpWindow.ShowModal (MODAL_SHADOW_GRAY)
 	
@@ -502,8 +444,8 @@ def HideSkills(i):
 	Label = LevelUpWindow.GetControl(0x10000000+43+i)
 	Label.SetText("")
 
-def RedrawSkills(First=0, direction=0):
-	global TopIndex, ScrollBarControl, DoneButton, LevelUpWindow, ProfPointsLeft
+def RedrawSkills(direction=0):
+	global TopIndex, ScrollBarControl, DoneButton, LevelUpWindow
 	global SkillPointsLeft, SkillTable, NewSkillPoints, AvailableSkillIndices
 	global ClickCount, OldDirection, HLACount
 
@@ -516,8 +458,11 @@ def RedrawSkills(First=0, direction=0):
 
 	# enable the done button if they've allocated all points
 	# sorcerer spell selection (if applicable) comes after hitting the done button
+	ProfPointsLeft = GemRB.GetVar ("ProfsPointsLeft")
 	if ProfPointsLeft == 0 and SkillPointsLeft == 0 and HLACount == 0:
-		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+	else:
+		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	# skill part of the window
 	SkillSumLabel = LevelUpWindow.GetControl(0x10000000+37)
@@ -558,54 +503,6 @@ def RedrawSkills(First=0, direction=0):
 			ActPoint = GemRB.GetVar("Skill "+str(Pos) )
 			Label.SetText(str(ActPoint))
 
-	# proficiencies part of the window
-	ProfSumLabel = LevelUpWindow.GetControl(0x10000000+36)
-	ProfSumLabel.SetText(str(ProfPointsLeft))
-	SkipProfs = []
-	for i in range(7):
-		Pos=TopIndex+i
-		SkillName = WeapProfTable.GetValue(Pos+8, 1) #we add the bg1 skill count offset
-		MaxProf = WeapProfTable.GetValue(Pos+8, ProfColumn) #we add the bg1 skill count offset
-
-		#invalid entry, adjusting scrollbar
-		if SkillName > 0x1000000 or SkillName < 0:
-			GemRB.SetVar("TopIndex",TopIndex)
-			ScrollBarControl.SetVarAssoc("TopIndex",Pos-7)
-			break
-
-		Button1=LevelUpWindow.GetControl(i*2+1)
-		Button2=LevelUpWindow.GetControl(i*2+2)
-		if MaxProf == 0:
-			Button1.SetState(IE_GUI_BUTTON_DISABLED)
-			Button2.SetState(IE_GUI_BUTTON_DISABLED)
-			Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			# skip proficiencies only if all the previous ones were skipped too
-			if i == 0 or ((i-1) in SkipProfs):
-				SkipProfs.append(i)
-		else:
-			Button1.SetState(IE_GUI_BUTTON_ENABLED)
-			Button2.SetState(IE_GUI_BUTTON_ENABLED)
-			Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-			Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-		
-		Label=LevelUpWindow.GetControl(0x10000000+24+i)
-		Label.SetText(SkillName)
-
-		ActPoint = GemRB.GetVar("Prof "+str(Pos) )
-		for j in range(5):  #5 is maximum distributable
-			Star=LevelUpWindow.GetControl(i*5+j+48)
-			if ActPoint > j:
-				Star.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-			else:
-				Star.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-
-	# skip unavaliable proficiencies on the first run
-	if len(SkipProfs) > 0 and First == 1:
-		TopIndex += SkipProfs[len(SkipProfs)-1] + 1
-		GemRB.SetVar("TopIndex",TopIndex)
-		RedrawSkills()
-
 	if direction:
 		if OldDirection == direction:
 			ClickCount = ClickCount + 1
@@ -621,8 +518,6 @@ def RedrawSkills(First=0, direction=0):
 
 # TODO: constructs a string with the gains that the new levels bring
 def GetLevelUpNews():
-	global NewProfPoints, NewSkillPoints
-
 	News = GemRB.GetString (5259) + '\n\n'
 
 	# display if our class has been reactivated
@@ -786,15 +681,7 @@ def LevelUpDonePress():
 	global SkillTable
 
 	# proficiencies
-	TmpTable=GemRB.LoadTableObject ("weapprof")
-	ProfCount = TmpTable.GetRowCount ()
-	for i in range(ProfCount-8): # skip bg1 weapprof.2da proficiencies
-		StatID = TmpTable.GetValue (i+8, 0)
-		Value = GemRB.GetVar ("Prof "+str(i))
-		OldProf = GemRB.GetPlayerStat (pc, StatID) & 0x38
-		Value = OldProf | Value
-		if Value:
-			GemRB.ApplyEffect (pc, "Proficiency", Value, StatID )
+	ProfsSave (pc)
 
 	# skills
 	for i in range(SkillTable.GetRowCount()-2):
@@ -894,7 +781,7 @@ def SkillRightPress():
 		OldPos = Pos
 		ClickCount = 0
 
-	RedrawSkills(0,2)
+	RedrawSkills(2)
 	return
 
 def SkillLeftPress():
@@ -913,60 +800,13 @@ def SkillLeftPress():
 		OldPos = Pos
 		ClickCount = 0
 
-	RedrawSkills(0,1)
+	RedrawSkills(1)
 	return
 
 def SkillScrollBarPress():
 	global SkillTopIndex
 
 	SkillTopIndex = GemRB.GetVar("SkillTopIndex")
-	RedrawSkills()
-	return
-
-def ProfScrollBarPress():
-	global TopIndex
-
-	TopIndex = GemRB.GetVar("TopIndex")
-	RedrawSkills()
-	return
-
-def JustPress():
-	global TextAreaControl
-	Pos = GemRB.GetVar("Prof")+TopIndex
-	TextAreaControl.SetText(WeapProfTable.GetValue(Pos+8, 2) )
-	return
-	
-def RightPress():
-	global ProfPointsLeft
-
-	Pos = GemRB.GetVar("Prof")+TopIndex
-	TextAreaControl.SetText(WeapProfTable.GetValue(Pos+8, 2) )
-	ActPoint = GemRB.GetVar("Prof "+str(Pos) )
-	MinPoint = GemRB.GetVar ("ProfBase "+str(Pos) )
-	if ActPoint <= 0 or ActPoint <= MinPoint:
-		return
-	GemRB.SetVar("Prof "+str(Pos),ActPoint-1)
-	ProfPointsLeft = ProfPointsLeft + 1
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	RedrawSkills()
-	return
-
-def LeftPress():
-	global ProfPointsLeft
-
-	Pos = GemRB.GetVar("Prof")+TopIndex
-	TextAreaControl.SetText(WeapProfTable.GetValue(Pos+8, 2) )
-	if ProfPointsLeft == 0:
-		return
-	MaxProf = WeapProfTable.GetValue(Pos+8, ProfColumn) #we add the bg1 skill count offset
-	if MaxProf>5:
-		MaxProf = 5
-
-	ActPoint = GemRB.GetVar("Prof "+str(Pos) )
-	if ActPoint >= MaxProf:
-		return
-	GemRB.SetVar("Prof "+str(Pos),ActPoint+1)
-	ProfPointsLeft = ProfPointsLeft - 1
 	RedrawSkills()
 	return
 
