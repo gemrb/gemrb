@@ -308,11 +308,11 @@ void CharAnimations::SetupColors(PaletteType type)
 		PaletteResRef[0]=0;
 		//handling special palettes like MBER_BL (black bear)
 		if (PType!=1) {
-      if (GetAnimType()==IE_ANI_NINE_FRAMES) {
-        snprintf(PaletteResRef,9,"%.4s_%-.2s%s",ResRef, (char *) &PType, StancePrefix[StanceID]);
-      } else {
-        snprintf(PaletteResRef,9,"%.4s_%-.2s",ResRef, (char *) &PType);
-      }
+			if (GetAnimType()==IE_ANI_NINE_FRAMES) {
+				snprintf(PaletteResRef,9,"%.4s_%-.2s%s",ResRef, (char *) &PType, StancePrefix[StanceID]);
+			} else {
+				snprintf(PaletteResRef,9,"%.4s_%-.2s",ResRef, (char *) &PType);
+			}
 			strlwr(PaletteResRef);
 			Palette *tmppal = gamedata->GetPalette(PaletteResRef);
 			if (tmppal) {
@@ -387,6 +387,7 @@ void CharAnimations::InitAvatarsTable()
 	}
 	AvatarTable = (AvatarStruct *) calloc ( AvatarsCount = Avatars->GetRowCount(), sizeof(AvatarStruct) );
 	int i=AvatarsCount;
+	DataFileMgr *resdata = core->GetResDataINI();
 	while(i--) {
 		AvatarTable[i].AnimID=(unsigned int) strtol(Avatars->GetRowName(i),NULL,0 );
 		strnlwrcpy(AvatarTable[i].Prefixes[0],Avatars->QueryField(i,AV_PREFIX1),8);
@@ -407,6 +408,23 @@ void CharAnimations::InitAvatarsTable()
 			AvatarTable[i].PaletteType=atoi(Avatars->QueryField(i,AV_USE_PALETTE) );
 		}
 		AvatarTable[i].Size=Avatars->QueryField(i,AV_SIZE)[0];
+
+		AvatarTable[i].WalkScale = 0;
+		AvatarTable[i].RunScale = 0;
+		AvatarTable[i].Bestiary = -1;
+
+		if (resdata) {
+			char section[12];
+			snprintf(section,10,"%d", i);
+
+			if (!resdata->GetKeysCount(section)) continue;
+
+			float walkscale = resdata->GetKeyAsFloat(section, "walkscale", 0.0f);
+			if (walkscale != 0.0f) AvatarTable[i].WalkScale = (int)(1000.0f / walkscale);
+			float runscale = resdata->GetKeyAsFloat(section, "runscale", 0.0f);
+			if (runscale != 0.0f) AvatarTable[i].RunScale = (int)(1000.0f / runscale);
+			AvatarTable[i].Bestiary = resdata->GetKeyAsInt(section, "bestiary", -1);
+		}
 	}
 }
 
@@ -419,7 +437,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		palette[i] = NULL;
 	}
 	nextStanceID = 0;
-  StanceID = 0;
+	StanceID = 0;
 	autoSwitchOnEnd = false;
 	lockPalette = false;
 	if (!AvatarsCount) {

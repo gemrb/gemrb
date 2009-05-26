@@ -116,6 +116,11 @@ struct AvatarStruct {
 	unsigned char AnimationType;
 	unsigned char CircleSize;
 	char Size;
+	
+	/* resdata entries */
+	unsigned int WalkScale; /* 1000 / walkscale */
+	unsigned int RunScale; /* 1000 / runscale */
+	int Bestiary;
 };
 
 struct EquipResRefData;
