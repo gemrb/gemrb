@@ -1035,6 +1035,9 @@ void Movable::DoStep(unsigned int walk_speed)
 
 	SetOrientation (step->orient, false);
 	StanceID = IE_ANI_WALK;
+	if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
+		StanceID = IE_ANI_RUN;
+	}
 	Pos.x = ( step->x * 16 ) + 8;
 	Pos.y = ( step->y * 12 ) + 6;
 	if (!step->Next) {
