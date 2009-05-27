@@ -23,7 +23,7 @@ from GUIDefines import *
 from ie_stats import *
 from GUICommon import HasTOB, GetLearnablePriestSpells, HasSpell, AddClassAbilities, RemoveClassAbilities
 from GUIREC import UpdateRecordsWindow
-from GUICommonWindows import IsDualSwap, GetActorClassTitle, GetKitIndex, KitListTable, ClassTable
+from GUICommonWindows import *
 from LUSpellSelection import *
 from LUProfsSelection import *
 
@@ -147,7 +147,6 @@ def DCMainDonePress ():
 	ProfsSave (pc, LUPROFS_TYPE_DUALCLASS)
 
 	# remove old class abilities
-	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 	KitIndex = GetKitIndex (pc)
 	if KitIndex:
 		ABTable = KitListTable.GetValue (str(KitIndex), "ABILITIES")
@@ -458,7 +457,6 @@ def DCProfsDonePress ():
 	global NewMageSpells, NewThiefSkills, NewPriestMask
 
 	# check for mage spells and thief skills
-	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 	SpellTable = ClassSkillsTable.GetValue (ClassName, "MAGESPELL")
 	ThiefTable = ClassSkillsTable.GetValue (ClassName, "THIEFSKILL")
 	ClericTable = ClassSkillsTable.GetValue (ClassName, "CLERICSPELL")

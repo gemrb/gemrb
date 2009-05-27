@@ -42,6 +42,7 @@ DraggedPortrait = None
 ClassTable = GemRB.LoadTableObject ("classes")
 NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
 KitListTable = GemRB.LoadTableObject ("kitlist")
+ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	global OptionsWindow

@@ -22,7 +22,7 @@ import GemRB
 from ie_stats import *
 from GUIDefines import *
 from GUICommon import *
-from GUICommonWindows import GetKitIndex, KitListTable, ClassTable
+from GUICommonWindows import GetKitIndex, KitListTable, ClassTable, ClassSkillsTable
 
 CharGenWindow = 0
 TextAreaControl = 0
@@ -176,7 +176,6 @@ def DisplayOverview(step):
 			# thieving and other skills
 			info = ""
 			SkillTable = GemRB.LoadTableObject ("skills")
-			ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 			Class = GemRB.GetVar ("Class") - 1
 			ClassID = ClassTable.GetValue (Class, 5)
 			Class = ClassTable.FindValue (5, ClassID)

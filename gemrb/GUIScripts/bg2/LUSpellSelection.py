@@ -22,7 +22,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import GetMageSpells, HasSpell
-from GUICommonWindows import GetKitIndex, KitListTable
+from GUICommonWindows import GetKitIndex, KitListTable, ClassSkillsTable
 
 # storage variables
 pc = 0
@@ -401,8 +401,6 @@ def HasSpecialistSpell ():
 # kit is only used to distinguish priest spells for ranger/cleric duals
 # TODO: move this to a better location (GUICommon/GUICommonWindows?)
 def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
-	# a couple tables we'll need
-	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 	
 	# choose the correct limit based upon class type
 	if type == IE_SPELL_TYPE_WIZARD:

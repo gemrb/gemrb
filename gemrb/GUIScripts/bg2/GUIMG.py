@@ -188,8 +188,7 @@ def UpdateMageWindow ():
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
-	Table = GemRB.LoadTableObject ("clskills")
-	if (Table.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 2)=="*"):
+	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 2)=="*"):
 		Window.SetVisible (2)
 	else:
 		Window.SetVisible (1)

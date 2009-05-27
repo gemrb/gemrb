@@ -53,7 +53,6 @@ KitName = 0
 IsDual = 0
 IsMulti = 0
 pc = 0
-ClassSkillsTable = 0
 ClassName = 0
 RaceTable = 0
 AvailableSkillIndices = []
@@ -116,7 +115,6 @@ def OpenLevelUpWindow():
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	print "Class:",Class
 	ClassIndex = ClassTable.FindValue (5, Class)
-	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 	SkillTable = GemRB.LoadTableObject("skills")
 
 	# kit
