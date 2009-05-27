@@ -119,6 +119,7 @@ private:
 	std::vector< Actor*> highlighted;
 	bool DrawSelectionRect;
 	bool MouseIsDown;
+	bool DoubleClick;
 	Region SelectionRect;
 	short StartX, StartY;
 	//int action;

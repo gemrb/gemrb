@@ -226,7 +226,11 @@ void GameControl::MoveToPointFormation(Actor *actor, unsigned int pos, Point src
 		p.y*=12;
 	}
 	// generate an action to do the actual movement
-	sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
+	if (DoubleClick) {
+		sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
+	} else {
+		sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
+	}
 	actor->AddAction( GenerateAction( Tmp) );
 }
 
@@ -1509,6 +1513,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 
 	short px=x;
 	short py=y;
+	DoubleClick = false;
 	switch(Button)
 	{
 	case GEM_MB_SCRLUP:
@@ -1517,6 +1522,8 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 	case GEM_MB_SCRLDOWN:
 		OnSpecialKeyPress(GEM_DOWN);
 		break;
+	case GEM_MB_ACTION|GEM_MB_DOUBLECLICK:
+		DoubleClick = true;
 	case GEM_MB_ACTION:
 		core->GetVideoDriver()->ConvertToGame( px, py );
 		MouseIsDown = true;
@@ -1578,6 +1585,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		core->GetGUIScriptEngine()->RunFunction( "OpenFloatMenuWindow" );
 		return;
 	}
+
 	if (Button != GEM_MB_ACTION) {
 		return;
 	}
@@ -1608,7 +1616,12 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			actor=game->selected[0];
 			actor->ClearPath();
 			actor->ClearActions();
-			sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
+			if (DoubleClick) {
+				sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
+			} else {
+				sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
+			}
+
 			actor->AddAction( GenerateAction( Tmp) );
 			//p is a searchmap travel region
 			if ( actor->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
