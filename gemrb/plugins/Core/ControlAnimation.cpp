@@ -59,7 +59,7 @@ bool ControlAnimation::SameResource(const ieResRef ResRef, int Cycle)
 {
 	if (!control ) return false;
 	if (!bam) return false;
-	if (memcmp(ResRef, bam->ResRef, sizeof(ieResRef) )) return false;
+	if (strnicmp(ResRef, bam->ResRef, sizeof(ieResRef) )) return false;
 	int c = cycle;
 	if (control->Flags&IE_GUI_BUTTON_PLAYRANDOM) {
 		c&=~1;
