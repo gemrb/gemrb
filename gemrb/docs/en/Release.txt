@@ -75,3 +75,5 @@ Release and Announcements
 * Announce on homepage, SF, #GemRB in channel and title, Gibberlings3, Happypenguin
 
 * Possibly announce on Freshmeat (only balrog has the account?)
+
+* Run admin/restart_news.sh to restart the NEWS cycle
