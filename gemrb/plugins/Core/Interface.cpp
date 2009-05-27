@@ -3228,15 +3228,12 @@ int Interface::PlayMovie(const char* ResRef)
 		int g = atoi(sttable->QueryField("green", "frame"));
 		int b = atoi(sttable->QueryField("blue", "frame"));
 		SubtitleFont = GetFont (MovieFont); //will change
-		if (!r && !g && !b) {
-			r=255;
-			g=255;
-			b=255;
-		}
-		if (SubtitleFont) {
-			Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};
-			Color back = {0x00, 0x00, 0x00, 0x00};
-			palette = CreatePalette( fore, back );
+		if (r || g || b) {
+			if (SubtitleFont) {
+				Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};
+				Color back = {0x00, 0x00, 0x00, 0x00};
+				palette = CreatePalette( fore, back );
+			}
 		}
 	}
 
