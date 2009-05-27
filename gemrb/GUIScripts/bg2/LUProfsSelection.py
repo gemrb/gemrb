@@ -47,6 +47,7 @@ ProfsTopIndex = 0
 ProfsTextArea = 0
 ProfsColumn = 0
 ProfsTable = 0
+ProfCount = 0
 
 # type: listed above
 # window: the window we're getting the controls from
@@ -55,8 +56,8 @@ ProfsTable = 0
 # level2: new level
 def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1], classid=0):
 	global ProfsOffsetSum, ProfsOffsetButton1, ProfsOffsetLabel, ProfsOffsetStar
-	global ProfsOffsetPress, ProfsPointsLeft, ProfsNumButtons, ProfsTopIndex
-	global ProfsWindow, ProfsCallback, ProfsTextArea, ProfsColumn, ProfsTable
+	global ProfsOffsetPress, ProfsPointsLeft, ProfsNumButtons, ProfsTopIndex, ProfsScrollBar
+	global ProfsWindow, ProfsCallback, ProfsTextArea, ProfsColumn, ProfsTable, ProfCount
 
 	# make sure we're within ranges
 	GemRB.SetVar ("ProfsPointsLeft", 0)
@@ -232,6 +233,7 @@ def ProfsRedraw (first=0):
 	if first and len (SkipProfs):
 		ProfsTopIndex += SkipProfs[-1]+1
 		GemRB.SetVar ("ProfsTopIndex", ProfsTopIndex)
+		ProfsScrollBar.SetVarAssoc ("ProfsTopIndex", ProfCount)
 		ProfsRedraw ()
 	return
 
