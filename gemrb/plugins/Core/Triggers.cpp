@@ -371,8 +371,8 @@ int GameScript::Kit(Scriptable* Sender, Trigger* parameters)
 	if (kit == (ieDword) (parameters->int0Parameter)) {
 		return 1;
 	}
-	//BG2 style kit matching
-	kit = (kit>>16)|(kit<<16);
+	//BG2 style kit matching (not needed anymore?), we do it on load
+	//kit = (kit>>16)|(kit<<16);
 	if ( kit == (ieDword) (parameters->int0Parameter)) {
 		return 1;
 	}
