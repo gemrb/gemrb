@@ -1470,19 +1470,21 @@ static int ParseInt(const char*& src)
 		src++;
 	}
 	*tmp = 0;
-	src++;
+	if (*src)
+		src++;
 	return atoi( number );
 }
 
 static void ParseString(const char*& src, char* tmp)
 {
-	while (*src != '"') {
+	while (*src != '"' && *src) {
 		*tmp = *src;
 		tmp++;
 		src++;
 	}
 	*tmp = 0;
-	src++;
+	if (*src)
+		src++;
 }
 
 static Object* DecodeObject(const char* line)
@@ -1502,13 +1504,16 @@ static Object* DecodeObject(const char* line)
 		for (i = 0; i < 4; i++) {
 			oB->objectRect[i] = ParseInt( line );
 		}
-		line++; //Skip ] (not really... it skips a ' ' since the ] was skipped by the ParseInt function
+		if (*line)
+			line++; //Skip ] (not really... it skips a ' ' since the ] was skipped by the ParseInt function
 	}
-	line++; //Skip "
+	if (*line)
+		line++; //Skip "
 	ParseString( line, oB->objectName );
-	line++; //Skip " (the same as above)
+	if (*line)
+		line++; //Skip " (the same as above)
 	//this seems to be needed too
-	if (ExtraParametersCount) {
+	if (ExtraParametersCount && *line) {
 		line++;
 	}
 	for (i = 0; i < ExtraParametersCount; i++) {
