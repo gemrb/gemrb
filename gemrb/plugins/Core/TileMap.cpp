@@ -553,8 +553,14 @@ InfoPoint* TileMap::GetInfoPoint(Point &p, bool detectable)
 				continue;
 			}
 			if (ip->Type==ST_TRAVEL) {
-				if ( (ip->Trapped & (PORTAL_CURSOR|PORTAL_TRAVEL)) == PORTAL_TRAVEL) {
-					continue;
+				// PS:T portals (abusing a GF flag somewhat here..)
+				if (core->HasFeature(GF_REVERSE_DOOR)) {
+					if (ip->Cursor == IE_CURSOR_PORTAL) {
+						// skip portals without PORTAL_CURSOR set
+						if (!(ip->Trapped & PORTAL_CURSOR)) {
+							continue;
+						}
+					}
 				}
 			}
 		}
