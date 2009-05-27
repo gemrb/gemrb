@@ -49,6 +49,8 @@ ExportDoneButton = None
 ExportFileName = ""
 PortraitsTable = None
 ScriptsTable = None
+ColorTable = None
+ColorIndex = None
 ScriptTextArea = None
 
 # the available sounds
@@ -424,9 +426,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ( (9457, GS (IE_THAC0), '') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
-		tmp2 = str(tmp/2) + chr(188)
+		tmp2 = str (tmp/2) + chr(188)
 	else:
-		tmp2 = str(tmp/2)
+		tmp2 = str (tmp/2)
 	stats.append ( (9458, tmp2, '') )
 	stats.append ( (9459, GS (IE_LORE), '') )
 	reptxt = GetReputation (GemRB.GameGetReputation ()/10)
@@ -474,7 +476,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	table = GemRB.LoadTableObject ("weapprof")
 	RowCount = table.GetRowCount ()
 	# the first 7 profs are foobared
-	for i in range(8,RowCount):
+	for i in range (8,RowCount):
 		text = table.GetValue (i, 1)
 		stat = table.GetValue (i, 0)
 		stats.append ( (text, GS(stat)&0x07, '+') )
@@ -522,13 +524,13 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	#Bonus spells
 	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, 0, 0)>0:
 		stats.append (10344)
-		for level in range(7):
-			GemRB.SetToken ("SPELLLEVEL", str(level+1) )
+		for level in range (7):
+			GemRB.SetToken ("SPELLLEVEL", str (level+1) )
 			#get the bonus spell count
 			base = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level, 0)
 			if base:
 				count = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level)
-				stats.append ( (GemRB.GetString(10345), count-base, 'b') )
+				stats.append ( (GemRB.GetString (10345), count-base, 'b') )
 		stats.append (None)
 
 	# 32204 Resistances
@@ -576,7 +578,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			elif type == 'a': #value (portrait icon) + string
 				res.append ("[capital=2]"+val+" "+GemRB.GetString (strref))
 			elif type == 'b': #strref is an already resolved string
-				res.append ("[capital=0]"+strref+": "+str(val) )
+				res.append ("[capital=0]"+strref+": "+str (val) )
 			elif type == 'c': #normal string
 				res.append ("[capital=0]"+GemRB.GetString (strref) )
 			elif type == 'd': #strref is an already resolved string
@@ -604,7 +606,7 @@ def GetReputation (repvalue):
 	if repvalue>20:
 		repvalue=20
 	txt = GemRB.GetString (table.GetValue (repvalue, 0) )
-	return txt+" ("+str(repvalue)+")"
+	return txt+" ("+str (repvalue)+")"
 
 
 def OpenInformationWindow ():
@@ -806,11 +808,11 @@ def ExportCancelPress():
 def ExportEditChanged():
 	global ExportFileName
 
-	ExportFileName = NameField.QueryText()
+	ExportFileName = NameField.QueryText ()
 	if ExportFileName == "":
-		ExportDoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+		ExportDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
-		ExportDoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+		ExportDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
 def CanDualClass(actor):
@@ -838,7 +840,7 @@ def CanDualClass(actor):
 	classes = [ "FIGHTER", "CLERIC", "MAGE", "THIEF", "DRUID", "RANGER" ]
 	matches = []
 	Sum = 0
-	for col in range(0, DualClassTable.GetColumnCount ()):
+	for col in range (0, DualClassTable.GetColumnCount ()):
 		value = DualClassTable.GetValue (Row, col)
 		Sum += value
 		if value == 1:
@@ -868,21 +870,21 @@ def CanDualClass(actor):
 	# check current class' stat limitations
 	StatTable = GemRB.LoadTableObject ("abdcscrq")
 	ClassStatIndex = StatTable.GetRowIndex (ClassTitle)
-	for stat in range(6):
+	for stat in range (6):
 		minimum = StatTable.GetValue (ClassStatIndex, stat)
 		name = StatTable.GetColumnName (stat)
-		if GemRB.GetPlayerStat (actor, eval("IE_" + name[4:])) < minimum:
+		if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:])) < minimum:
 			return 1
 
 	# check new class' stat limitations - make sure there are any good class choices
 	StatTable = GemRB.LoadTableObject ("abdcdsrq")
 	for match in matches:
 		ClassStatIndex = StatTable.GetRowIndex (match)
-		for stat in range(6):
+		for stat in range (6):
 			minimum = StatTable.GetValue (ClassStatIndex, stat)
 			name = StatTable.GetColumnName (stat)
-			if GemRB.GetPlayerStat (actor, eval("IE_" + name[4:])) < minimum:
-				matches.remove(match)
+			if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:])) < minimum:
+				matches.remove (match)
 				break
 	if len(matches) == 0:
 		return 1
@@ -892,7 +894,7 @@ def CanDualClass(actor):
 		return 1
 	return 0
 
-def KitInfoWindow():
+def KitInfoWindow ():
 	global KitInfoWindow
 
 	KitInfoWindow = GemRB.LoadWindowObject (24)
@@ -947,7 +949,8 @@ def KitDonePress():
 	return
 
 def OpenCustomizeWindow ():
-	global CustomizeWindow, PortraitsTable, ScriptsTable
+	global CustomizeWindow
+	global PortraitsTable, ScriptsTable, ColorTable
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	if GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE:
@@ -957,6 +960,7 @@ def OpenCustomizeWindow ():
 
 	PortraitsTable = GemRB.LoadTableObject ("PICTURES")
 	ScriptsTable = GemRB.LoadTableObject ("SCRPDESC")
+	ColorTable = GemRB.LoadTableObject ("CLOWNCOL")
 	CustomizeWindow = GemRB.LoadWindowObject (17)
 
 	AppearanceButton = CustomizeWindow.GetControl (0)
@@ -1011,7 +1015,7 @@ def CustomizeDonePress ():
 		CustomizeWindow.Unload ()
 		CustomizeWindow = None
 
-	UpdateRecordsWindow()
+	UpdateRecordsWindow ()
 	return
 
 def CustomizeCancelPress ():
@@ -1021,10 +1025,10 @@ def CustomizeCancelPress ():
 		CustomizeWindow.Unload ()
 		CustomizeWindow = None
 
-	UpdateRecordsWindow()
+	UpdateRecordsWindow ()
 	return
 
-def OpenAppearanceWindow():
+def OpenAppearanceWindow ():
 	global SubCustomizeWindow
 	global PortraitButton
 	global Gender, LastPortrait
@@ -1062,17 +1066,17 @@ def OpenAppearanceWindow():
 
 	while True:
 		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
-			UpdatePortrait()
+			UpdatePortrait ()
 			break
 		LastPortrait = LastPortrait + 1
 
 	return
 
-def DonePortraitWindow():
+def DonePortraitWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Name = PortraitsTable.GetRowName (LastPortrait)
 	GemRB.FillPlayerInfo (pc, Name + "M", Name + "S")
-	CloseSubCustomizeWindow()
+	CloseSubCustomizeWindow ()
 	return
 
 def PortraitRightPress():
@@ -1101,12 +1105,12 @@ def PortraitLeftPress():
 
 	return
 
-def UpdatePortrait():
+def UpdatePortrait ():
 	PortraitName = PortraitsTable.GetRowName (LastPortrait)+"L"
 	PortraitButton.SetPicture (PortraitName, "NOPORTLG")
 	return
 
-def OpenCustomPortraitWindow():
+def OpenCustomPortraitWindow ():
 	global SubSubCustomizeWindow
 	global PortraitList1, PortraitList2
 	global RowCount1, RowCount2
@@ -1156,7 +1160,7 @@ def DonePortraitCustomizeWindow ():
 	CloseSubCustomizeWindow ()
 	return
 
-def LargeCustomPortrait():
+def LargeCustomPortrait ():
 	Window = SubSubCustomizeWindow
 
 	Portrait = PortraitList1.QueryText ()
@@ -1179,7 +1183,7 @@ def LargeCustomPortrait():
 	Button.SetPicture (Portrait, "NOPORTMD")
 	return
 
-def SmallCustomPortrait():
+def SmallCustomPortrait ():
 	Window = SubSubCustomizeWindow
 
 	Portrait = PortraitList2.QueryText ()
@@ -1202,7 +1206,7 @@ def SmallCustomPortrait():
 	Button.SetPicture (Portrait, "NOPORTSM")
 	return
 
-def OpenSoundWindow():
+def OpenSoundWindow ():
 	global SubCustomizeWindow
 	global VoiceList
 	global Gender
@@ -1237,29 +1241,35 @@ def OpenSoundWindow():
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def DoneSoundWindow():
+def DoneSoundWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-	CharSound = VoiceList.QueryText()
+	CharSound = VoiceList.QueryText ()
 	GemRB.SetPlayerSound (pc, CharSound)
 
-	CloseSubCustomizeWindow()
+	CloseSubCustomizeWindow ()
 	return
 
 def PlaySoundPressed():
 	global CharSoundWindow, SoundIndex, SoundSequence
 
-	CharSound = VoiceList.QueryText()
+	CharSound = VoiceList.QueryText ()
 	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], RES_WAV)):
 		NextSound()
 	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], 0, 0, 4)
 	return
 
-def OpenColorWindow():
+def OpenColorWindow ():
 	global SubCustomizeWindow
 	global PortraitWindow
 	global PortraitButton
 	global HairButton, SkinButton, MajorButton, MinorButton
+	global HairColor, SkinColor, MajorColor, MinorColor
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+	MinorColor = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
+	MajorColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
+	SkinColor = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
+	HairColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
 	SubCustomizeWindow = GemRB.LoadWindowObject (21)
 
 	PortraitButton = SubCustomizeWindow.GetControl (0)
@@ -1279,35 +1289,123 @@ def OpenColorWindow():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
+	HairButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SetHairColor")
+	SkinButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SetSkinColor")
+	MajorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SetMajorColor")
+	MinorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SetMinorColor")
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneColorWindow")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
-	UpdatePaperDoll()
+	UpdatePaperDoll ()
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def DoneColorWindow():
-	#TODO set colors
-	CloseSubCustomizeWindow()
+def DoneColorWindow ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.SetPlayerStat (pc, IE_MINOR_COLOR, MinorColor)
+	GemRB.SetPlayerStat (pc, IE_MAJOR_COLOR, MajorColor)
+	GemRB.SetPlayerStat (pc, IE_SKIN_COLOR, SkinColor)
+	GemRB.SetPlayerStat (pc, IE_HAIR_COLOR, HairColor)
+	CloseSubCustomizeWindow ()
 	return
 
-def UpdatePaperDoll():
+def UpdatePaperDoll ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Color1 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
-	Color2 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
-	MinorButton.SetBAM ("COLGRAD", 0, 0, Color2&0xff)
-	Color3 = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
-	MajorButton.SetBAM ("COLGRAD", 0, 0, Color3&0xff)
-	Color4 = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
-	SkinButton.SetBAM ("COLGRAD", 0, 0, Color4&0xff)
+	MinorButton.SetBAM ("COLGRAD", 0, 0, MinorColor&0xff)
+	MajorButton.SetBAM ("COLGRAD", 0, 0, MajorColor&0xff)
+	SkinButton.SetBAM ("COLGRAD", 0, 0, SkinColor&0xff)
 	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
 	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
-	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-	HairButton.SetBAM ("COLGRAD", 0, 0, Color7&0xff)
+	HairButton.SetBAM ("COLGRAD", 0, 0, HairColor&0xff)
 	PortraitButton.SetPLT (GetActorPaperDoll (pc),
-		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
+		Color1, MinorColor, MajorColor, SkinColor, Color5, Color6, HairColor, 0, 0)
 	return
 
-def OpenScriptWindow():
+def SetHairColor ():
+	global ColorIndex, PickedColor
+
+	ColorIndex = 0
+	PickedColor = HairColor
+	OpenColorPicker ()
+	return
+
+def SetSkinColor ():
+	global ColorIndex, PickedColor
+
+	ColorIndex = 1
+	PickedColor = SkinColor
+	OpenColorPicker ()
+	return
+
+def SetMinorColor ():
+	global ColorIndex, PickedColor
+
+	ColorIndex = 2
+	PickedColor = MinorColor
+	OpenColorPicker ()
+	return
+
+def SetMajorColor ():
+	global ColorIndex, PickedColor
+
+	ColorIndex = 3
+	PickedColor = MajorColor
+	OpenColorPicker ()
+	return
+
+def OpenColorPicker ():
+	global SubSubCustomizeWindow
+	#global Selected
+
+	SubSubCustomizeWindow = GemRB.LoadWindowObject (22)
+
+	GemRB.SetVar ("Selected",-1)
+	for i in range (1,35):
+		Button = SubSubCustomizeWindow.GetControl (i)
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+
+	#Selected = -1
+	for i in range (34):
+		MyColor = ColorTable.GetValue (ColorIndex, i)
+		if MyColor == "*":
+			break
+		Button = SubSubCustomizeWindow.GetControl (i+1)
+		Button.SetBAM("COLGRAD", 2, 0, MyColor)
+		if PickedColor == MyColor:
+			GemRB.SetVar ("Selected",i)
+			#Selected = i
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetVarAssoc("Selected",i)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePress")
+
+	SubSubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def DonePress():
+	global HairColor, SkinColor, MajorColor, MinorColor
+	global PickedColor
+
+	CloseSubSubCustomizeWindow ()
+	PickedColor=ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
+	if ColorIndex==0:
+		HairColor=PickedColor
+		UpdatePaperDoll ()
+		return
+	if ColorIndex==1:
+		SkinColor=PickedColor
+		UpdatePaperDoll ()
+		return
+	if ColorIndex==2:
+		MinorColor=PickedColor
+		UpdatePaperDoll ()
+		return
+
+	MajorColor=PickedColor
+	UpdatePaperDoll ()
+	return
+
+def OpenScriptWindow ():
 	global SubCustomizeWindow
 	global ScriptTextArea, SelectedTextArea
 
@@ -1339,7 +1437,7 @@ def OpenScriptWindow():
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def FillScriptList():
+def FillScriptList ():
 	ScriptTextArea.Clear ()
 	row = ScriptsTable.GetRowCount ()
 	for i in range (row):
@@ -1359,11 +1457,11 @@ def FillScriptList():
 
 	return
 
-def DoneScriptWindow():
+def DoneScriptWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-	script = ScriptsTable.GetRowName(GemRB.GetVar("Selected") )
+	script = ScriptsTable.GetRowName (GemRB.GetVar ("Selected") )
 	GemRB.SetPlayerScript (pc, script)
-	CloseSubCustomizeWindow()
+	CloseSubCustomizeWindow ()
 	return
 
 def UpdateScriptSelection():
@@ -1371,13 +1469,13 @@ def UpdateScriptSelection():
 	SelectedTextArea.SetText (text)
 	return
 
-def OpenBiographyEditWindow():
+def OpenBiographyEditWindow ():
 	global SubCustomizeWindow
 	global BioStrRef
 
 	Changed = 0
 	pc = GemRB.GameGetSelectedPCSingle ()
-	BioStrRef = GemRB.GetPlayerString(pc, 74)
+	BioStrRef = GemRB.GetPlayerString (pc, 74)
 	if BioStrRef != 33347:
 		Changed = 1
 
@@ -1411,9 +1509,10 @@ def ClearBiography():
 	TextArea.SetText ("")
 	return
 
-def DoneBiographyWindow():
+def DoneBiographyWindow ():
 	#TODO set bio
-	CloseSubCustomizeWindow()
+	GemRB.SetPlayerString (BioStrRef)
+	CloseSubCustomizeWindow ()
 	return
 
 def RevertBiography():
@@ -1423,7 +1522,7 @@ def RevertBiography():
 	TextArea.SetText (33347)
 	return
 
-def CloseSubCustomizeWindow():
+def CloseSubCustomizeWindow ():
 	global SubCustomizeWindow
 
 	if SubCustomizeWindow:
@@ -1431,7 +1530,7 @@ def CloseSubCustomizeWindow():
 		SubCustomizeWindow = None
 	return
 
-def CloseSubSubCustomizeWindow():
+def CloseSubSubCustomizeWindow ():
 	global SubSubCustomizeWindow
 
 	if SubSubCustomizeWindow:
