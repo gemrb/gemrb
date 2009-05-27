@@ -23,7 +23,7 @@ from GUIDefines import *
 from ie_stats import *
 from GUICommon import HasSpell
 from GUIREC import GetKitIndex
-from GUICommonWindows import IsDualClassed
+from GUICommonWindows import IsDualClassed, KitListTable, ClassTable
 
 # HLA selection
 HLAWindow = 0		# << HLA selection window
@@ -272,7 +272,6 @@ def GetHLAs ():
 
 	# the HLA table lookup table
 	HLAAbbrTable = GemRB.LoadTableObject ("luabbr")
-	ClassTable = GemRB.LoadTableObject ("classes")
 
 	# get all the HLAs for each class
 	for i in range (NumClasses):
@@ -281,8 +280,7 @@ def GetHLAs ():
 		CurrentLevel = Level[i]
 
 		if Kit != 0 and NumClasses == 1 and not IsDual: # kitted single-class
-			KitList = GemRB.LoadTableObject ("kitlist")
-			KitName = KitList.GetValue (Kit, 0)
+			KitName = KitListTable.GetValue (Kit, 0)
 			HLAClassTable = "lu" + HLAAbbrTable.GetValue (KitName, "ABBREV")
 			ClassName = KitName
 		else: # everyone else

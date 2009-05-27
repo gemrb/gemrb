@@ -22,7 +22,7 @@ import GemRB
 from ie_stats import *
 from GUIDefines import *
 from GUICommon import *
-from GUICommonWindows import GetKitIndex
+from GUICommonWindows import GetKitIndex, KitListTable, ClassTable
 
 CharGenWindow = 0
 TextAreaControl = 0
@@ -122,8 +122,6 @@ def DisplayOverview(step):
 	# Stat overview
 	###
 	RaceTable = GemRB.LoadTableObject ("races")
-	ClassTable = GemRB.LoadTableObject ("classes")
-	KitTable = GemRB.LoadTableObject ("kitlist")
 	AlignmentTable = GemRB.LoadTableObject ("aligns")
 	AbilityTable = GemRB.LoadTableObject ("ability")
 
@@ -160,7 +158,7 @@ def DisplayOverview(step):
 				Class = GemRB.GetVar ("Class")-1
 				ClassTitle=ClassTable.GetValue (Class, 2)
 			else:
-				ClassTitle=KitTable.GetValue (KitIndex, 2)
+				ClassTitle=KitListTable.GetValue (KitIndex, 2)
 			TextAreaControl.Append (ClassTitle)
 		elif part == 5:
 			TextAreaControl.Append (1049, -1)
@@ -185,12 +183,11 @@ def DisplayOverview(step):
 			ClassName = ClassTable.GetRowName (Class)
 			RangerSkills = ClassSkillsTable.GetValue (ClassName, "RANGERSKILL")
 			BardSkills = ClassSkillsTable.GetValue (ClassName, "BARDSKILL")
-			# TODO also before: skill{rng,brd}.2da <-- add rangers to clskills.2da
 			KitName = GetKitIndex (MyChar)
 			if KitName == 0:
 				KitName = ClassName
 			else:
-				KitName = KitTable.GetValue (KitName, 0)
+				KitName = KitListTable.GetValue (KitName, 0)
 
 			if SkillTable.GetValue ("RATE", KitName) != -1:
 				for skill in range(SkillTable.GetRowCount () - 2):

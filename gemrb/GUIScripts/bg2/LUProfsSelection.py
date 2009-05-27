@@ -22,7 +22,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from GUICommonWindows import GetKitIndex, IsDualClassed, IsMultiClassed
+from GUICommonWindows import *
 
 #the different types possible
 LUPROFS_TYPE_LEVELUP = 0
@@ -105,7 +105,6 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	ProfsTable = GemRB.LoadTableObject ("profs")
 
 	#get the class name
-	ClassTable = GemRB.LoadTableObject ("classes")
 	if classid: #for dual classes when we can't get the class dualing to
 		Class = classid
 	else:
@@ -148,8 +147,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	Kit = GetKitIndex (pc)
 	if Kit and type != LUPROFS_TYPE_DUALCLASS:
 		#if we do kit with dualclass, we'll get the old kit
-		KitList = GemRB.LoadTableObject ("kitlist")
-		ProfsColumn = KitList.GetValue (Kit, 5)
+		ProfsColumn = KitListTable.GetValue (Kit, 5)
 	else:
 		#sorcerers don't have a column, so ref mages
 		if ClassName == "SORCERER":

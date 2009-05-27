@@ -23,7 +23,7 @@ from GUIDefines import *
 from ie_stats import *
 from GUICommon import HasTOB, GetLearnablePriestSpells, HasSpell, AddClassAbilities, RemoveClassAbilities
 from GUIREC import UpdateRecordsWindow
-from GUICommonWindows import IsDualSwap, GetActorClassTitle, GetKitIndex
+from GUICommonWindows import IsDualSwap, GetActorClassTitle, GetKitIndex, KitListTable, ClassTable
 from LUSpellSelection import *
 from LUProfsSelection import *
 
@@ -31,7 +31,6 @@ from LUProfsSelection import *
 pc = 0
 OldClassName = 0
 ClassName = 0
-ClassTable = 0
 NewMageSpells = 0
 NewThiefSkills = 0
 NewPriestMask = 0
@@ -68,7 +67,6 @@ def DualClassWindow ():
 
 	# get our basic globals
 	pc = GemRB.GameGetSelectedPCSingle ()
-	ClassTable = GemRB.LoadTableObject ("classes")
 	DCMainStep = 1
 
 	# make sure to nullify old values
@@ -152,8 +150,7 @@ def DCMainDonePress ():
 	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 	KitIndex = GetKitIndex (pc)
 	if KitIndex:
-		KitList = GemRB.LoadTableObject ("kitlist")
-		ABTable = KitList.GetValue (str(KitIndex), "ABILITIES")
+		ABTable = KitListTable.GetValue (str(KitIndex), "ABILITIES")
 	else:
 		ABTable = ClassSkillsTable.GetValue (OldClassName, "ABILITIES")
 	if ABTable != "*" and ABTable[:6] != "CLABMA": # mage kits specify ability tables which don't exist

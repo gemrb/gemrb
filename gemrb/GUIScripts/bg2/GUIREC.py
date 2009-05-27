@@ -317,10 +317,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	# collecting tokens for stat overview
 	ClassTitle = GetActorClassTitle (pc)
-	KitTable = GemRB.LoadTableObject ("kitlist")
 	GemRB.SetToken ("CLASS", ClassTitle)
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassTable = GemRB.LoadTableObject ("classes")
 	Class = ClassTable.FindValue (5, Class)
 	Class = ClassTable.GetRowName (Class)
 	Dual = IsDualClassed (pc, 1)
@@ -374,25 +372,24 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 		# the first class (shown second)
 		if Dual[0] == 1:
-			ClassTitle = GemRB.GetString (KitTable.GetValue (Dual[1], 2))
+			ClassTitle = GemRB.GetString (KitListTable.GetValue (Dual[1], 2))
 		elif Dual[0] == 2:
 			ClassTitle = GemRB.GetString (ClassTable.GetValue (Dual[1], 2))
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[1]) )
 
-		# the xp table contains only classes
-		XPTable = GemRB.LoadTableObject ("xplevel")
+		# the xp table contains only classes, so we have to determine the base class for kits
 		if Dual[0] == 2:
 			BaseClass = ClassTable.GetRowName (Dual[1])
 		else:
 			BaseClass = GetKitIndex (pc)
-			BaseClass = KitTable.GetValue (BaseClass, 7)
+			BaseClass = KitListTable.GetValue (BaseClass, 7)
 			BaseClass = ClassTable.FindValue (5, BaseClass)
 			BaseClass = ClassTable.GetRowName (BaseClass)
 		# the first class' XP is discarded and set to the minimum level
 		# requirement, so if you don't dual class right after a levelup,
 		# the game would eat some of your XP
-		XP1 = XPTable.GetValue (BaseClass, str (Levels[1]))
+		XP1 = NextLevelTable.GetValue (BaseClass, str (Levels[1]))
 		GemRB.SetToken ("EXPERIENCE", str (XP1) )
 
 		# inactive until the new class SURPASSES the former
@@ -828,15 +825,13 @@ def CanDualClass(actor):
 
 	DualClassTable = GemRB.LoadTableObject ("dualclas")
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassTable = GemRB.LoadTableObject ("classes")
 	ClassIndex = ClassTable.FindValue (5, Class)
 	ClassName = ClassTable.GetRowName (ClassIndex)
 	KitIndex = GetKitIndex (actor)
 	if KitIndex == 0:
 		ClassTitle = ClassName
 	else:
-		KitTable = GemRB.LoadTableObject ("kitlist")
-		ClassTitle = KitTable.GetValue (KitIndex, 0)
+		ClassTitle = KitListTable.GetValue (KitIndex, 0)
 	Row = DualClassTable.GetRowIndex (ClassTitle)
 
 	# a lookup table for the DualClassTable columns
@@ -912,7 +907,6 @@ def KitInfoWindow():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassTable = GemRB.LoadTableObject ("classes")
 	ClassIndex = ClassTable.FindValue (5, Class)
 	Multi = ClassTable.GetValue (ClassIndex, 4)
 	Dual = IsDualClassed (pc, 1)
@@ -923,13 +917,12 @@ def KitInfoWindow():
 		KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
-	KitTable = GemRB.LoadTableObject ("kitlist")
 	KitIndex = GetKitIndex (pc)
 
 	if Dual[0]: # dual class
 		# first (previous) kit or class of the dual class
 		if Dual[0] == 1:
-			text = KitTable.GetValue (Dual[1], 3)
+			text = KitListTable.GetValue (Dual[1], 3)
 		elif Dual[0] == 2:
 			text = ClassTable.GetValue (Dual[1], 1)
 
@@ -939,7 +932,7 @@ def KitInfoWindow():
 
 	else: # ordinary class or kit
 		if KitIndex:
-			text = KitTable.GetValue (KitIndex, 3)
+			text = KitListTable.GetValue (KitIndex, 3)
 		else:
 			text = ClassTable.GetValue (ClassIndex, 1)
 

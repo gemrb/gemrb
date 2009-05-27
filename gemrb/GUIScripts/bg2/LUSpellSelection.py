@@ -22,7 +22,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import GetMageSpells, HasSpell
-from GUICommonWindows import GetKitIndex 
+from GUICommonWindows import GetKitIndex, KitListTable
 
 # storage variables
 pc = 0
@@ -402,7 +402,6 @@ def HasSpecialistSpell ():
 # TODO: move this to a better location (GUICommon/GUICommonWindows?)
 def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 	# a couple tables we'll need
-	KitList = GemRB.LoadTableObject ("kitlist")
 	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 	
 	# choose the correct limit based upon class type
@@ -416,7 +415,7 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 			originalkit = GetKitIndex (pc)
 
 			if originalkit: # kitted; find the class value
-				originalkit = KitList.GetValue (originalkit, 7)
+				originalkit = KitListTable.GetValue (originalkit, 7)
 			else: # just get the class value
 				originalkit = GemRB.GetPlayerStat (pc, IE_CLASS)
 

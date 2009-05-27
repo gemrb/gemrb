@@ -25,7 +25,7 @@ from ie_stats import *
 from ie_restype import RES_2DA
 from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities
 from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GSNN
-from GUICommonWindows import IsDualClassed, IsMultiClassed, IsDualSwap, GetKitIndex, UpdatePortraitWindow
+from GUICommonWindows import *
 from LUSpellSelection import *
 from LUHLASelection import *
 from LUProfsSelection import *
@@ -37,7 +37,6 @@ DoneButton = 0
 TextAreaControl = 0
 ScrollBarControl = 0
 SkillTable = 0
-ClassTable = 0
 InfoCounter = 1
 NewProfPoints = 0
 SkillPointsLeft = 0
@@ -114,7 +113,6 @@ def OpenLevelUpWindow():
 	Label = LevelUpWindow.GetControl (0x10000000+106)
 	Label.SetText (GetActorClassTitle (pc))
 
-	ClassTable = GemRB.LoadTableObject("classes")
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	print "Class:",Class
 	ClassIndex = ClassTable.FindValue (5, Class)
@@ -122,7 +120,6 @@ def OpenLevelUpWindow():
 	SkillTable = GemRB.LoadTableObject("skills")
 
 	# kit
-	KitList = GemRB.LoadTableObject("kitlist")
 	ClassName = ClassTable.GetRowName(ClassIndex)
 	Kit = GetKitIndex (pc)
 	
@@ -139,7 +136,7 @@ def OpenLevelUpWindow():
 		KitName = ClassName
 	else:
 		#rowname is just a number, the kitname is the first data column
-		KitName = KitList.GetValue(Kit, 0)
+		KitName = KitListTable.GetValue(Kit, 0)
 
 	# our multiclass variables
 	IsMulti = IsMultiClassed (pc, 1)
@@ -166,7 +163,7 @@ def OpenLevelUpWindow():
 			Classes = [Class]
 		else: # make sure Classes[1] is a class, not a kit
 			if IsDual[0] == 1: # kit
-				Classes[1] = KitList.GetValue (IsDual[1], 7)
+				Classes[1] = KitListTable.GetValue (IsDual[1], 7)
 			else: # class
 				Classes[1] = ClassTable.GetValue (Classes[1], 5)
 
@@ -253,7 +250,7 @@ def OpenLevelUpWindow():
 		if MageTable != "*":
 			# we get 1 extra spell per level if we're a specialist
 			Specialist = 0
-			if KitList.GetValue (Kit, 7) == 1: # see if we're a kitted mage (TODO: make gnomes ALWAYS be kitted, even multis)
+			if KitListTable.GetValue (Kit, 7) == 1: # see if we're a kitted mage (TODO: make gnomes ALWAYS be kitted, even multis)
 				Specialist = 1
 			MageTable = GemRB.LoadTableObject (MageTable)
 			# loop through each spell level and save the amount possible to cast (current)
@@ -293,7 +290,7 @@ def OpenLevelUpWindow():
 		if IsMulti or IsDual or Kit == 0:
 			ABTable = ClassSkillsTable.GetValue (TmpName, "ABILITIES")
 		else: # single-classed with a kit
-			ABTable = KitList.GetValue (str(Kit), "ABILITIES")
+			ABTable = KitListTable.GetValue (str(Kit), "ABILITIES")
 
 		# add the abilites if we aren't a mage and have a table to ref
 		if ABTable != "*" and ABTable[:6] != "CLABMA":
@@ -750,8 +747,6 @@ def LevelUpDonePress():
 	return
 
 def GetNextLevelFromExp (XP, Class):
-	NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
-	ClassTable = GemRB.LoadTableObject ("classes")
 	ClassIndex = ClassTable.FindValue (5, Class)
 	ClassName = ClassTable.GetRowName (ClassIndex)
 	Row = NextLevelTable.GetRowIndex (ClassName)
@@ -822,7 +817,6 @@ def ReactivateBaseClass ():
 	ClassIndex = ClassTable.FindValue (5, Classes[1])
 	ClassName = ClassTable.GetRowName (ClassIndex)
 	KitIndex = GetKitIndex (pc)
-	KitList = GemRB.LoadTableObject ("kitlist")
 
 	# reactivate all our proficiencies
 	TmpTable = GemRB.LoadTableObject ("weapprof")
@@ -894,7 +888,7 @@ def ReactivateBaseClass ():
 	if KitIndex == 0: # no kit
 		ABTable = ClassSkillsTable.GetValue (ClassName, "ABILITIES")
 	else: # kit
-		ABTable = KitList.GetValue (KitIndex, 4, 0)
+		ABTable = KitListTable.GetValue (KitIndex, 4, 0)
 	print "ABTable:",ABTable
 
 	# add the abilites if we aren't a mage and have a table to ref
