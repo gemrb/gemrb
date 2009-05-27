@@ -59,7 +59,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	global ProfsWindow, ProfsCallback, ProfsTextArea, ProfsColumn, ProfsTable
 
 	# make sure we're within ranges
-	GemRB.SetVar ("ProfsPointsLeft", ProfsPointsLeft)
+	GemRB.SetVar ("ProfsPointsLeft", 0)
 	if not window or not callback or len(level1)!=len(level2):
 		return
 
@@ -100,13 +100,17 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		return
 
 	#nullify internal variables
+	GemRB.SetVar ("ProfsTopIndex", 0)
 	ProfsPointsLeft = 0
 	ProfsTopIndex = 0
 	ProfsTable = GemRB.LoadTableObject ("profs")
 
 	#get the class name
+	IsDual = IsDualClassed (pc, 1)
 	if classid: #for dual classes when we can't get the class dualing to
 		Class = classid
+	elif IsDual[0]:
+		Class = ClassTable.GetValue (IsDual[2], 5)
 	else:
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassName = ClassTable.FindValue (5, Class)
@@ -123,14 +127,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 				ProfsRate = TmpRate
 				FastestProf = i-1
 	else:
-		IsDual = IsDualClassed (pc, 1)
-		if IsDual[0]:
-			#dual'd character only care about the new clas
-			TmpClass = ClassTable.GetValue (IsDual[2], 5)
-			ClassName = ClassTable.GetRowName (IsDual[2])
-			ProfsRate = ProfsTable.GetValue (TmpClass-1, 1)
-		else:
-			ProfsRate = ProfsTable.GetValue (Class-1, 1)
+		ProfsRate = ProfsTable.GetValue (Class-1, 1)
 
 	#figure out how many prof points we have
 	diff = []
@@ -156,7 +153,6 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 			ProfsColumn = ProfsTable.GetColumnIndex (ClassName)
 
 	#setup some basic counts
-	GemRB.SetVar ("ProfsTopIndex", 0)
 	RowCount = ProfsTable.GetRowCount ()-7
 	ProfCount = RowCount-ProfsNumButtons #decrease it with the number of controls
 
@@ -193,11 +189,15 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	ProfsScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "ProfsScrollBarPress")
 	ProfsScrollBar.SetDefaultScrollBar ()
 	ProfsScrollBar.SetVarAssoc ("ProfsTopIndex", ProfCount)
+	ProfsRedraw (1)
 	return
 
-def ProfsRedraw ():
+def ProfsRedraw (first=0):
+	global ProfsTopIndex
+
 	ProfSumLabel = ProfsWindow.GetControl(0x10000000+ProfsOffsetSum)
 	ProfSumLabel.SetText(str(ProfsPointsLeft))
+	SkipProfs = []
 	for i in range(ProfsNumButtons):
 		Pos=ProfsTopIndex+i
 		ProfName = ProfsTable.GetValue(Pos+8, 1) #we add the bg1 skill count offset
@@ -210,6 +210,8 @@ def ProfsRedraw ():
 			Button2.SetState(IE_GUI_BUTTON_DISABLED)
 			Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 			Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+			if i==0 or ((i-1) in SkipProfs):
+				SkipProfs.append (i)
 		else:
 			Button1.SetState(IE_GUI_BUTTON_ENABLED)
 			Button2.SetState(IE_GUI_BUTTON_ENABLED)
@@ -226,6 +228,11 @@ def ProfsRedraw ():
 				Star.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
 			else:
 				Star.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+
+	if first and len (SkipProfs):
+		ProfsTopIndex += SkipProfs[-1]+1
+		GemRB.SetVar ("ProfsTopIndex", ProfsTopIndex)
+		ProfsRedraw ()
 	return
 
 def ProfsScrollBarPress():
