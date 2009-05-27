@@ -230,6 +230,8 @@ public:
 
 	Point GetFormationOffset(ieDword formation, ieDword pos);
 	void MoveToPointFormation(Actor *actor, unsigned int pos, Point src, Point p);
+	/** calls MoveToPoint or RunToPoint */
+	void CreateMovement(Actor *actor, Point &p);
 	void InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);

@@ -185,7 +185,6 @@ Point GameControl::GetFormationOffset(ieDword formation, ieDword pos)
 //WARNING: don't pass p as a reference because it gets modified
 void GameControl::MoveToPointFormation(Actor *actor, unsigned int pos, Point src, Point p)
 {
-	char Tmp[256];
 	Map* map = actor->GetCurrentArea() ;
 
 	int formation=core->GetGame()->GetFormation();
@@ -225,13 +224,27 @@ void GameControl::MoveToPointFormation(Actor *actor, unsigned int pos, Point src
 		p.x*=16;
 		p.y*=12;
 	}
-	// generate an action to do the actual movement
+	CreateMovement(actor, p);
+}
+
+// generate an action to do the actual movement
+// only PST supports RunToPoint
+void GameControl::CreateMovement(Actor *actor, Point &p)
+{
+	char Tmp[256];
+
+	Action *action = NULL;
 	if (DoubleClick) {
 		sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
-	} else {
-		sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
+ 		action = GenerateAction( Tmp );
 	}
-	actor->AddAction( GenerateAction( Tmp) );
+	if (!action)
+	{
+		sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
+ 		action = GenerateAction( Tmp );
+	}
+
+	actor->AddAction( action );
 }
 
 GameControl::~GameControl(void)
@@ -1616,6 +1629,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			actor=game->selected[0];
 			actor->ClearPath();
 			actor->ClearActions();
+			CreateMovement(actor, p);
+/*
 			if (DoubleClick) {
 				sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
 			} else {
@@ -1623,6 +1638,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			}
 
 			actor->AddAction( GenerateAction( Tmp) );
+*/
 			//p is a searchmap travel region
 			if ( actor->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
 				sprintf( Tmp, "NIDSpecial2()" );
