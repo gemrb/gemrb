@@ -75,7 +75,10 @@ bool MVEPlay::PlayBik(DataStream *stream)
 	while(size) {
 		int chunk = size>256?256:size;
 		stream->Read(Tmp, chunk);
-		write(fhandle,Tmp, chunk);
+		if (write(fhandle,Tmp, chunk) <= 0) {
+			close(fhandle);
+			return false;
+		}
 		size -= chunk;
 	}
 	close(fhandle);

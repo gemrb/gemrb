@@ -141,7 +141,10 @@ int BIFImp::OpenArchive(const char* filename)
 		return GEM_ERROR;
 	}
 	char Signature[8];
-	fread( &Signature, 1, 8, in_cache );
+	if (fread( &Signature, 1, 8, in_cache ) != 8) {
+		fclose ( in_cache );
+		return GEM_ERROR;
+	}
 	fclose( in_cache );
 	//normal bif, not in cache
 	if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
