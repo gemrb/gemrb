@@ -169,12 +169,12 @@ def DCMainDonePress ():
 
 	# save our new class and say was multi
 	OldClassId = GemRB.GetPlayerStat (pc, IE_CLASS)
-	OldClassIndex = ClassTable.FindValue (5, OldClassId)
+	OldClassName = ClassTable.GetRowName (ClassTable.FindValue (5, OldClassId) )
 	MultClassId = (1 << (NewClassId-1)) | (1 << (OldClassId-1))
 	MultClassId = ClassTable.FindValue (4, MultClassId)
 	MultClassId = ClassTable.GetValue (MultClassId, 5)
 	GemRB.SetPlayerStat (pc, IE_CLASS, MultClassId)
-	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, ClassTable.GetValue (OldClassIndex, 15))
+	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, ClassTable.GetValue (OldClassName, "MC_WAS_ID", 1))
 
 	# update our levels and xp
 	if IsDualSwap (pc):
