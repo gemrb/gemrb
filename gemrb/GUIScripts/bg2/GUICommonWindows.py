@@ -806,10 +806,9 @@ def SetupSavingThrows (pc, Level=None):
 		Class = [Multi[1], Multi[2], Multi[3]]
 	elif Dual[0]: #only worry about the newer class
 		Class = [ClassTable.GetValue (Dual[2], 5)]
-		if IsDualSwap(pc) and len(Levels)>1:
-			TmpLevel = Levels[0]
-			Levels[0] = Levels[1]
-			Levels[1] = TmpLevel
+		#assume Level is correct if passed
+		if IsDualSwap(pc) and not Level:
+			Levels = [Levels[1], Levels[0], Levels[2]]
 	if NumClasses>len(Levels):
 		return
 
@@ -853,6 +852,109 @@ def SetupSavingThrows (pc, Level=None):
 		if RaceSaveTable:
 			CurrentSave += RaceSaveTable.GetValue (row, Con)
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, CurrentSave)
+	return
+
+def SetupThaco (pc, Level=None):
+	#storing levels as an array makes them easier to deal with
+	if not Level:
+		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL)-1, \
+			GemRB.GetPlayerStat (pc, IE_LEVEL2)-1, \
+			GemRB.GetPlayerStat (pc, IE_LEVEL3)-1]
+	else:
+		Levels = []
+		for level in Level:
+			Levels.append (level-1)
+
+	#get some basic values
+	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
+	ThacoTable = GemRB.LoadTableObject ("THAC0")
+
+	#adjust the class for multi/dual chars
+	Multi = IsMultiClassed (pc, 1)
+	Dual = IsDualClassed (pc, 1)
+	NumClasses = 1
+	if Multi[0]>1: #get each of the multi-classes
+		NumClasses = Multi[0]
+		Class = [Multi[1], Multi[2], Multi[3]]
+	elif Dual[0]: #only worry about the newer class
+		Class = [ClassTable.GetValue (Dual[2], 5)]
+		#assume Level is correct if passed
+		if IsDualSwap(pc) and not Level:
+			Levels = [Levels[1], Levels[0], Levels[2]]
+	if NumClasses>len(Levels):
+		return
+
+	#make sure to limit the levels to the table allowable
+	MaxLevel = ThacoTable.GetColumnCount ()-1
+	for i in range (len(Levels)):
+		if Levels[i] > MaxLevel:
+			Levels[i] = MaxLevel
+
+	CurrentThaco = GemRB.GetPlayerStat (pc, IE_THAC0, 1)
+	NewThaco = 0
+	for i in range (NumClasses):
+		#loop through each class and update the save value if we have
+		#a better thac0
+		TmpThaco = ThacoTable.GetValue (Class[i]-1, Levels[i])
+		if TmpThaco < CurrentThaco:
+			NewThaco = 1
+			CurrentThaco = TmpThaco
+
+	#only update if we have a better thac0
+	if NewThaco:
+		GemRB.SetPlayerStat (pc, IE_THAC0, CurrentThaco)
+	return
+
+#LevelDiff should be an array containing the difference in levels of
+#  each class. If left None, we assume that the character is starting
+#  from level 0, and therefore LevelDiff = Level
+def SetupLore (pc, LevelDiff=None):
+	#storing levels as an array makes them easier to deal with
+	if not LevelDiff:
+		LevelDiffs = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL2), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
+	else:
+		LevelDiffs = []
+		for diff in LevelDiff:
+			LevelDiffs.append (diff)
+
+	#get some basic values
+	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
+	LoreTable = GemRB.LoadTableObject ("lore")
+
+	#adjust the class for multi/dual chars
+	Multi = IsMultiClassed (pc, 1)
+	Dual = IsDualClassed (pc, 1)
+	NumClasses = 1
+	if Multi[0]>1: #get each of the multi-classes
+		NumClasses = Multi[0]
+		Class = [Multi[1], Multi[2], Multi[3]]
+	elif Dual[0]: #only worry about the newer class
+		Class = [ClassTable.GetValue (Dual[2], 5)]
+		#if LevelDiff is passed, we assume it is correct
+		if IsDualSwap(pc) and not LevelDiff:
+			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]
+	if NumClasses>len(LevelDiffs):
+		return
+
+	#loop through each class and update the lore value if we have
+	CurrentLore = GemRB.GetPlayerStat (pc, IE_LORE, 1)
+	for i in range (NumClasses):
+		#correct unlisted progressions
+		ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class[i]) )
+		if ClassName == "SORCERER":
+			ClassName = "MAGE"
+		elif ClassName == "MONK": #monks have a rate of 1, so this is arbitrary
+			ClassName = "CLERIC"
+
+		#add the lore from this class to the total lore
+		TmpLore = LevelDiff[i] * LoreTable.GetValue (ClassName, "RATE", 1)
+		if TmpLore:
+			CurrentLore += TmpLore
+
+	#update our lore value
+	GemRB.SetPlayerStat (pc, IE_LORE, CurrentLore)
 	return
 
 def SetEncumbranceLabels (Window, Label, Label2, pc):

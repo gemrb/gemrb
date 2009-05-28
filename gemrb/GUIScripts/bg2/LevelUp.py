@@ -282,8 +282,10 @@ def OpenLevelUpWindow():
 		GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, OldHPMax + hp)
 		GemRB.SetPlayerStat (pc, IE_HITPOINTS, OldHP + hp)
 
-	#update our saves
+	#update our saves, thaco and lore
 	SetupSavingThrows (pc, Level)
+	SetupThaco (pc, Level)
+	SetupLore (pc, LevelDiff)
 	
 	# use total levels for HLAs
 	HLACount = 0
@@ -394,10 +396,6 @@ def GetLevelUpNews():
 		News += GemRB.GetString (5271) + ": " + str(NewProfPoints) + '\n\n'
 
 	# temps to compare all our new saves against (we get the best of our saving throws)
-	ThacoTable = GemRB.LoadTableObject ("THAC0")
-	LoreTable = GemRB.LoadTableObject ("lore")
-	NewThaco = OldThaco
-	LoreGain = 0
 	LOHGain = 0
 	BackstabMult = 0
 
@@ -405,12 +403,6 @@ def GetLevelUpNews():
 		# get the class name
 		TmpClassName = ClassTable.FindValue (5, Classes[i])
 		TmpClassName = ClassTable.GetRowName (TmpClassName)
-
-		# see if this classes has a lower thaco
-		TmpIndex = Level[i]-1
-		TmpThaco = ThacoTable.GetValue (Classes[i]-1, TmpIndex, 1)
-		if (TmpThaco < NewThaco):
-			NewThaco = TmpThaco
 
 		# backstab
 		# NOTE: Stalkers and assassins should get the correct mods at the correct levels based
@@ -435,13 +427,6 @@ def GetLevelUpNews():
 				LOHValue = LOHTable.GetValue (0, Level[i])
 				LOHGain = LOHValue - LOHTable.GetValue (0, Level[i]-LevelDiff[i])
 
-		# find the lore from each class
-		# sorcerers are not defined in lore.2da, but get mage progression instead
-		if TmpClassName == "SORCERER":
-			TmpClassName = "MAGE"
-		LoreClassIndex = LoreTable.GetRowIndex (TmpClassName)
-		LoreGain = LoreGain + LoreTable.GetValue (LoreClassIndex, 0) * LevelDiff[i]
-
 	# saving throws
 		# 5277 death
 		# 5278 wand
@@ -462,8 +447,8 @@ def GetLevelUpNews():
 
 	# 5305 - THAC0 Reduced by
 	# only output if there is a change in thaco
+	NewThaco = GemRB.GetPlayerStat (pc, IE_THAC0, 1)
 	if (NewThaco < OldThaco):
-		GemRB.SetPlayerStat (pc, IE_THAC0, NewThaco)
 		News += GemRB.GetString (5305) + ": " + str(OldThaco-NewThaco) + '\n\n'
 
 	# new spell slots
@@ -505,9 +490,9 @@ def GetLevelUpNews():
 
 	# 5377 - Lore Increased by
 	# add the lore gain if we haven't done so already
-	if (LoreGain > 0) and (OldLore == GemRB.GetPlayerStat (pc, IE_LORE, 1)):
-		GemRB.SetPlayerStat (pc, IE_LORE, OldLore + LoreGain)
-		News += GemRB.GetString (5377) + ": " + str(LoreGain) + '\n\n'
+	NewLore = GemRB.GetPlayerStat (pc, IE_LORE, 1)
+	if NewLore > OldLore:
+		News += GemRB.GetString (5377) + ": " + str(NewLore-OldLore) + '\n\n'
 
 	# 5378 - Additional Skill Points
 	# ranger and bard skill(point) gain is not mentioned here in the original
