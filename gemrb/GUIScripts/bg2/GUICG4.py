@@ -19,7 +19,7 @@
 #
 #character generation, ability (GUICG4)
 import GemRB
-from GUICommonWindows import ClassTable, KitListTable
+from GUICommonWindows import ClassTable, KitListTable, RaceTable
 
 AbilityWindow = 0
 TextAreaControl = 0
@@ -35,7 +35,6 @@ HasStrExtra = 0
 def CalcLimits(Abidx):
 	global Minimum, Maximum, Add
 
-	RaceTable = GemRB.LoadTableObject("races")
 	Abracead = GemRB.LoadTableObject("ABRACEAD")
 	Abclsmod = GemRB.LoadTableObject("ABCLSMOD")
 	Race = GemRB.GetVar("Race")-1

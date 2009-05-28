@@ -22,7 +22,7 @@ import GemRB
 from ie_stats import *
 from GUIDefines import *
 from GUICommon import *
-from GUICommonWindows import GetKitIndex, KitListTable, ClassTable, ClassSkillsTable
+from GUICommonWindows import GetKitIndex, KitListTable, ClassTable, ClassSkillsTable, RaceTable
 
 CharGenWindow = 0
 TextAreaControl = 0
@@ -121,7 +121,6 @@ def DisplayOverview(step):
 	###
 	# Stat overview
 	###
-	RaceTable = GemRB.LoadTableObject ("races")
 	AlignmentTable = GemRB.LoadTableObject ("aligns")
 	AbilityTable = GemRB.LoadTableObject ("ability")
 
@@ -235,9 +234,9 @@ def DisplayOverview(step):
 			info = ""
 			Race = GemRB.GetVar ("HatedRace")
 			if Race:
-				RaceTable = GemRB.LoadTableObject ("HATERACE")
-				Row = RaceTable.FindValue (1, Race)
-				info = GemRB.GetString (RaceTable.GetValue(Row, 0))
+				HateRaceTable = GemRB.LoadTableObject ("HATERACE")
+				Row = HateRaceTable.FindValue (1, Race)
+				info = GemRB.GetString (HateRaceTable.GetValue(Row, 0))
 				if info != "":
 					info = "\n" + info + "\n\n"
 					TextAreaControl.Append (15982)

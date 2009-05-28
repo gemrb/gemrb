@@ -35,7 +35,6 @@ def OnLoad():
 
 	# set new stats:
 	#	race
-	RaceTable = GemRB.LoadTableObject ("races")
 	Race = GemRB.GetVar ("Race") - 1
 	GemRB.SetPlayerStat (MyChar, IE_RACE, RaceTable.GetValue (Race, 3))
 

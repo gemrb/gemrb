@@ -20,7 +20,7 @@
 #character generation, class kit (GUICG22)
 
 import GemRB
-from GUICommonWindows import ClassTable, KitListTable
+from GUICommonWindows import ClassTable, KitListTable, RaceTable
 
 KitWindow = 0
 TextAreaControl = 0
@@ -38,8 +38,7 @@ def OnLoad():
 	global RowCount, TopIndex, KitTable, Init
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	TmpTable = GemRB.LoadTableObject("races")
-	RaceName = TmpTable.GetRowName(GemRB.GetVar("Race")-1 )
+	RaceName = RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
 	Class = GemRB.GetVar("Class")-1
 	ClassName = ClassTable.GetRowName(Class)
 	ClassID = ClassTable.GetValue(Class, 5)

@@ -19,20 +19,18 @@
 #
 #character generation, race (GUICG2)
 import GemRB
+from GUICommonWindows import RaceTable
 
 RaceWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-RaceTable = 0
 
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
-	global RaceTable
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	RaceWindow = GemRB.LoadWindowObject(8)
 
-	RaceTable = GemRB.LoadTableObject("races")
 	RaceCount = RaceTable.GetRowCount()
 
 	for i in range(2,RaceCount+2):

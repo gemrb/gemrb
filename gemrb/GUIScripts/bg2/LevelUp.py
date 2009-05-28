@@ -47,7 +47,6 @@ IsDual = 0
 IsMulti = 0
 pc = 0
 ClassName = 0
-RaceTable = 0
 
 # old values (so we don't add too much)
 OldHPMax = 0		# << old maximum hitpoints
@@ -110,7 +109,6 @@ def OpenLevelUpWindow():
 	Kit = GetKitIndex (pc)
 	
 	# need this for checking gnomes
-	RaceTable = GemRB.LoadTableObject ("races")
 	RaceName = GemRB.GetPlayerStat (pc, IE_RACE, 1)
 	RaceName = RaceTable.FindValue (3, RaceName)
 	RaceName = RaceTable.GetRowName (RaceName)

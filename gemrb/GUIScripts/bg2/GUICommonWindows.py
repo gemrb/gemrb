@@ -44,6 +44,7 @@ ClassTable = GemRB.LoadTableObject ("classes")
 NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
 KitListTable = GemRB.LoadTableObject ("kitlist")
 ClassSkillsTable = GemRB.LoadTableObject ("clskills")
+RaceTable = GemRB.LoadTableObject ("races")
 
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	global OptionsWindow
@@ -796,7 +797,6 @@ def SetupSavingThrows (pc, Level=None):
 	#get some basic values
 	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
 	Race = GemRB.GetPlayerStat (pc, IE_RACE)
-	RaceTable = GemRB.LoadTableObject ("races")
 
 	#adjust the class for multi/dual chars
 	Multi = IsMultiClassed (pc, 1)
