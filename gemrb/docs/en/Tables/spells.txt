@@ -1,0 +1,6 @@
+Description: This table lists the highest .spl learnable at the given level.
+
+Columns - 
+1-9 - the level to limit
+
+Rows - the types of spells to limit (MAGE, PRIEST, INNATE)
