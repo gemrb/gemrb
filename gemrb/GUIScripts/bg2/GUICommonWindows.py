@@ -781,23 +781,21 @@ def PortraitButtonOnMouseLeave ():
 
 #Levels needs to be an array containing the level desired for each class
 #this is potentially useful for leveling up 
-def SetupSavingThrows (pc, Levels=None):
+def SetupSavingThrows (pc, Level=None):
 	#storing levels as an array makes them easier to deal with
-	if not Levels:
-		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
-			GemRB.GetPlayerStat (pc, IE_LEVEL2), \
-			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
+	if not Level:
+		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL)-1, \
+			GemRB.GetPlayerStat (pc, IE_LEVEL2)-1, \
+			GemRB.GetPlayerStat (pc, IE_LEVEL3)-1]
+	else:
+		Levels = []
+		for level in Level:
+			Levels.append (level-1)
 
 	#get some basic values
 	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
 	Race = GemRB.GetPlayerStat (pc, IE_RACE)
 	RaceTable = GemRB.LoadTableObject ("races")
-
-	#make sure to limit the levels to the table allowable
-	MaxLevel = RaceTable.GetRowCount ()-1
-	for i in range (len(Levels)):
-		if Levels[i] > MaxLevel:
-			Levels[i] = MaxLevel
 
 	#adjust the class for multi/dual chars
 	Multi = IsMultiClassed (pc, 1)
@@ -812,6 +810,8 @@ def SetupSavingThrows (pc, Levels=None):
 			TmpLevel = Levels[0]
 			Levels[0] = Levels[1]
 			Levels[1] = TmpLevel
+	if NumClasses>len(Levels):
+		return
 
 	#see if we can add racial bonuses to saves
 	#default return is -1 NOT "*", so we convert always convert to str
@@ -830,6 +830,14 @@ def SetupSavingThrows (pc, Levels=None):
 	for i in range (NumClasses):
 		SaveName = ClassTable.GetValue (ClassTable.FindValue (5, Class[i]), 3, 0)
 		SaveTables.append (GemRB.LoadTableObject (SaveName) )
+	if not len (SaveTables):
+		return
+
+	#make sure to limit the levels to the table allowable
+	MaxLevel = SaveTables[0].GetColumnCount ()-1
+	for i in range (len(Levels)):
+		if Levels[i] > MaxLevel:
+			Levels[i] = MaxLevel
 
 	#save the saves
 	for row in range (5):
@@ -837,8 +845,7 @@ def SetupSavingThrows (pc, Levels=None):
 		for i in range (NumClasses):
 			#loop through each class and update the save value if we have
 			#a better save
-			TmpTable = SaveTables[i]
-			TmpSave = TmpTable.GetValue (row, Levels[i]-1)
+			TmpSave = SaveTables[i].GetValue (row, Levels[i])
 			if TmpSave and (TmpSave < CurrentSave or i == 0):
 				CurrentSave = TmpSave
 
