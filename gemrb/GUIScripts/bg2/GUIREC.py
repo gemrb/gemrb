@@ -825,6 +825,7 @@ def CanDualClass(actor):
 		return 1
 
 	DualClassTable = GemRB.LoadTableObject ("dualclas")
+	CurrentStatTable = GemRB.LoadTableObject ("abdcscrq")
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	ClassIndex = ClassTable.FindValue (5, Class)
 	ClassName = ClassTable.GetRowName (ClassIndex)
@@ -833,6 +834,9 @@ def CanDualClass(actor):
 		ClassTitle = ClassName
 	else:
 		ClassTitle = KitListTable.GetValue (KitIndex, 0)
+		# archers are not in the two abxafjsdof tables, so fallback to base class
+		if CurrentStatTable.GetRowIndex (ClassTitle) == -1:
+			ClassTitle = ClassName
 	Row = DualClassTable.GetRowIndex (ClassTitle)
 
 	# a lookup table for the DualClassTable columns
@@ -847,10 +851,12 @@ def CanDualClass(actor):
 
 	# cannot dc if all the columns of the DualClassTable are 0
 	if Sum == 0:
+		print "CannotDualClass: all the columns of the DualClassTable are 0"
 		return 1
 
 	# if the only choice for dc is already the same as the actors base class
 	if Sum == 1 and ClassName in matches and KitIndex == 0:
+		print "CannotDualClass: the only choice for dc is already the same as the actors base class"
 		return 1
 
 	AlignmentTable = GemRB.LoadTableObject ("alignmnt")
@@ -864,32 +870,35 @@ def CanDualClass(actor):
 
 	# cannot dc if all the available classes forbid the chars alignment
 	if Sum == 0:
+		print "CannotDualClass: all the available classes forbid the chars alignment"
 		return 1
 
 	# check current class' stat limitations
-	StatTable = GemRB.LoadTableObject ("abdcscrq")
-	ClassStatIndex = StatTable.GetRowIndex (ClassTitle)
+	ClassStatIndex = CurrentStatTable.GetRowIndex (ClassTitle)
 	for stat in range (6):
-		minimum = StatTable.GetValue (ClassStatIndex, stat)
-		name = StatTable.GetColumnName (stat)
+		minimum = CurrentStatTable.GetValue (ClassStatIndex, stat)
+		name = CurrentStatTable.GetColumnName (stat)
 		if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:])) < minimum:
+			print "CannotDualClass: current class' stat limitations are too big"
 			return 1
 
 	# check new class' stat limitations - make sure there are any good class choices
-	StatTable = GemRB.LoadTableObject ("abdcdsrq")
+	TargetStatTable = GemRB.LoadTableObject ("abdcdsrq")
 	for match in matches:
-		ClassStatIndex = StatTable.GetRowIndex (match)
+		ClassStatIndex = TargetStatTable.GetRowIndex (match)
 		for stat in range (6):
-			minimum = StatTable.GetValue (ClassStatIndex, stat)
-			name = StatTable.GetColumnName (stat)
+			minimum = TargetStatTable.GetValue (ClassStatIndex, stat)
+			name = TargetStatTable.GetColumnName (stat)
 			if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:])) < minimum:
 				matches.remove (match)
 				break
 	if len(matches) == 0:
+		print "CannotDualClass: no good new class choices"
 		return 1
 
 	# must be at least level 2
 	if GemRB.GetPlayerStat (actor, IE_LEVEL) == 1:
+		print "CannotDualClass: level 1"
 		return 1
 	return 0
 
