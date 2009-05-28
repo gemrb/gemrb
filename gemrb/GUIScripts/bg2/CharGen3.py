@@ -28,6 +28,11 @@ def OnLoad():
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, 0)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, 0)
 
+	#reset all the levels (assigned in CharGen4)
+	GemRB.SetPlayerStat (MyChar, IE_LEVEL, 0)
+	GemRB.SetPlayerStat (MyChar, IE_LEVEL2, 0)
+	GemRB.SetPlayerStat (MyChar, IE_LEVEL3, 0)
+
 	# set new stats:
 	#	race
 	RaceTable = GemRB.LoadTableObject ("races")

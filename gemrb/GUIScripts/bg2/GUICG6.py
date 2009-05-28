@@ -39,7 +39,11 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	SkillWindow = GemRB.LoadWindowObject(6)
 	MyChar = GemRB.GetVar ("Slot")
-	SetupSkillsWindow (MyChar, LUSKILLS_TYPE_CHARGEN, SkillWindow, RedrawSkills)
+
+	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), \
+			GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
+			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
+	SetupSkillsWindow (MyChar, LUSKILLS_TYPE_CHARGEN, SkillWindow, RedrawSkills, [0,0,0], Levels)
 
 	if not GemRB.GetVar ("SkillPointsLeft"): #skipping
 		GemRB.SetNextScript("GUICG9")
@@ -55,6 +59,7 @@ def OnLoad():
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 
 	RedrawSkills ()
 	SkillWindow.SetVisible(1)

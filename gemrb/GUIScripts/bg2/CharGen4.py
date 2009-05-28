@@ -20,7 +20,8 @@
 # character generation - classes+kits; next alignment/reputation(CharGen4.py)
 import GemRB
 from CharGenCommon import *
-from GUICommon import AddClassAbilities
+from GUICommonWindows import *
+from LevelUp import GetNextLevelFromExp
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
@@ -45,40 +46,45 @@ def OnLoad():
 	# but for others there is an additional mapping by kitlist.2da
 
 	# find the class from the class table
-	ClassTable = GemRB.LoadTableObject ("classes")
 	ClassIndex = GemRB.GetVar ("Class") - 1
 	Class = ClassTable.GetValue (ClassIndex, 5)
-	ClassName = ClassTable.GetRowName (ClassIndex)
+	#protect against barbarians
+	ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class) )
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	
 	# save the kit
-	KitList = GemRB.LoadTableObject ("kitlist")
 	KitIndex = GemRB.GetVar ("Class Kit")
 	KitValue = (0x4000 + KitIndex)
-	KitName = KitList.GetValue (KitIndex, 0)
+	KitName = KitListTable.GetValue (KitIndex, 0)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
-
-	# save the class/kit abilites
-	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 
 	# no table for innates, so we make it a high value
 	# to guarantee innate, class ability and HLA memorization works
 	GemRB.SetMemorizableSpellsCount (MyChar, 50, IE_SPELL_TYPE_INNATE, 0)
 
-	# apply class/kit abilities
-	if KitIndex:
-		ABTable = KitList.GetValue (str(KitIndex), "ABILITIES")
+	#assign the correct XP
+	if GameIsTOB():
+		GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (ClassName, "STARTXP2"))
 	else:
-		ABTable = ClassSkillsTable.GetValue (ClassName, "ABILITIES")
-	if not KitIndex and "," in ABTable:
-		# multiclass
-		classes = ABTable.split(",")
-		for j in classes:
-			AddClassAbilities (MyChar, "CLAB"+j)
+		GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (ClassName, "STARTXP"))
+
+	#create an array to get all the classes from
+	NumClasses = 1
+	IsMulti = IsMultiClassed (MyChar, 1)
+	if IsMulti[0] > 1:
+		NumClasses = IsMulti[0]
+		Classes = [IsMulti[1], IsMulti[2], IsMulti[3]]
 	else:
-		if ABTable != "*" and ABTable[:6] != "CLABMA": # mage kits specify ability tables which don't exist
-			AddClassAbilities (MyChar, ABTable)
-	
+		Classes = [GemRB.GetPlayerStat (MyChar, IE_CLASS)]
+
+	#loop through each class and update it's level
+	xp = GemRB.GetPlayerStat (MyChar, IE_XP)/NumClasses
+	for i in range (NumClasses):
+		CurrentLevel = GetNextLevelFromExp (xp, Classes[i])
+		if i == 0:
+			GemRB.SetPlayerStat (MyChar, IE_LEVEL, CurrentLevel)
+		elif i <= 2:
+			GemRB.SetPlayerStat (MyChar, IE_LEVEL2+i-1, CurrentLevel)
 
 	# diagnostic output
 	print "CharGen4 output:"
@@ -86,7 +92,6 @@ def OnLoad():
 	print "\tClass Name: ",ClassName
 	print "\tKitValue: ",KitValue
 	print "\tKitName: ",KitName
-	print "\tABTable: ",ABTable
 
 	DisplayOverview (4)
 

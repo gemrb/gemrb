@@ -24,6 +24,7 @@ from ie_stats import *
 from ie_slots import *
 from ie_spells import *
 from GUICommon import *
+from GUICommonWindows import *
 from LUProfsSelection import *
 
 CharGenWindow = 0
@@ -40,31 +41,58 @@ def NextPress():
 	return
 
 def FinishCharGen():
+	# Lay on hands, turn undead and backstab multiplier get set by the core
 	# set my character up
 	MyChar = GemRB.GetVar ("Slot")
-	ClassTable = GemRB.LoadTableObject ("classes")
-	KitTable = GemRB.LoadTableObject ("kitlist")
-	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 	ClassIndex = ClassTable.FindValue (5, Class)
 	ClassName = ClassTable.GetRowName (ClassIndex)
+	IsMulti = IsMultiClassed (MyChar, 1)
+	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
+			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
 
 	# weapon proficiencies
 	# set the base number of attacks; effects will add the proficiency bonus
 	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 2)
 	ProfsSave (MyChar, LUPROFS_TYPE_CHARGEN)
 
+	#lore, thac0, and saves
+	SetupSavingThrows (MyChar)
+	SetupThaco (MyChar)
+	SetupLore (MyChar)
+
 	# mage spells
 	TableName = ClassSkillsTable.GetValue (Class, 2, 0)
 	if TableName != "*":
-		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
+		index = 0
+		if IsMulti[0]>1:
+			#find out which class gets mage spells
+			for i in range (IsMulti[0]):
+				if ClassSkillsTable.GetValue (IsMulti[i+1], 2, 0) != "*":
+					index = i
+					break
+		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, Levels[index])
 
-	# Lay on hands, turn undead and backstab multiplier get set by the core
-
-	AlignmentTable = GemRB.LoadTableObject ("aligns")
+	# apply class/kit abilities
+	KitIndex = GetKitIndex (MyChar)
+	if IsMulti[0]>1:
+		#get the class abilites for each class
+		for i in range (IsMulti[0]):
+			TmpClassName = ClassTable.GetRowName (ClassTable.FindValue (5, IsMulti[i+1]) )
+			ABTable = ClassSkillsTable.GetValue (TmpClassName, "ABILITIES")
+			if ABTable != "*" and ABTable[:6] != "CLABMA":
+				AddClassAbilities (MyChar, ABTable, Levels[i], Levels[i])
+	else:
+		if KitIndex:
+			ABTable = KitListTable.GetValue (str(KitIndex), "ABILITIES")
+		else:
+			ABTable = ClassSkillsTable.GetValue (ClassName, "ABILITIES")
+		if ABTable != "*" and ABTable[:6] != "CLABMA": # mage kits specify ability tables which don't exist
+			AddClassAbilities (MyChar, ABTable, Levels[0], Levels[0])
 
 	# apply starting (alignment dictated) abilities
 	# pc, table, new level, level diff, alignment
+	AlignmentTable = GemRB.LoadTableObject ("aligns")
 	AlignmentAbbrev = AlignmentTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
 	AddClassAbilities (MyChar, "abstart", 7,7, AlignmentAbbrev)
 
@@ -85,11 +113,6 @@ def FinishCharGen():
 
 	# save the name and starting xp (can level right away in game)
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
-	if GameIsTOB():
-		GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (ClassName, "STARTXP2"))
-	else:
-		GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (ClassName, "STARTXP"))
-	
 
 	# does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
@@ -99,14 +122,13 @@ def FinishCharGen():
 	# add the starting inventory for tob
 	if GameIsTOB():
 		# get the kit (or use class if no kit) to load the start table
-		KitIndex = GetKitIndex (MyChar)
 		if KitIndex == 0:
 			EquipmentColName = ClassName
 			# sorcerers are missing from the table, use the mage equipment instead
 			if EquipmentColName == "SORCERER":
 				EquipmentColName = "MAGE"
 		else:
-			EquipmentColName = KitTable.GetValue (KitIndex, 0)
+			EquipmentColName = KitListTable.GetValue (KitIndex, 0)
 
 		EquipmentTable = GemRB.LoadTableObject ("25stweap")
 

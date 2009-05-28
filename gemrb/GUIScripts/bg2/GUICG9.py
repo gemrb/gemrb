@@ -38,7 +38,9 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	SkillWindow = GemRB.LoadWindowObject(9)
 	MyChar = GemRB.GetVar ("Slot")
-	SetupProfsWindow (MyChar, LUPROFS_TYPE_CHARGEN, SkillWindow, RedrawSkills)
+	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
+			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
+	SetupProfsWindow (MyChar, LUPROFS_TYPE_CHARGEN, SkillWindow, RedrawSkills, [0,0,0], Levels)
 
 	BackButton = SkillWindow.GetControl(77)
 	BackButton.SetText(15416)

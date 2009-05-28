@@ -21,6 +21,7 @@
 
 import GemRB
 from GUIDefines import *
+from GUICommonWindows import IsMultiClassed
 from LUSpellSelection import *
 
 def OnLoad():
@@ -55,6 +56,13 @@ def OnLoad():
 	# NOTE: bards correctly get no spells from level 0 to 1 as they don't
 	#	get any spells until level 2
 	# TODO: implement correct ranges
-	OpenSpellsWindow (Slot, TableName, 1, 1, KitValue, 1)
+	IsMulti = IsMultiClassed (Slot, 1)
+	Level = GemRB.GetPlayerStat (Slot, IE_LEVEL)
+	if IsMulti[0]>1:
+		for i in range (2, IsMulti[0]+1):
+			if TmpTable.GetValue (IsMulti[i], 2, 0) != "*":
+				Level = GemRB.GetPlayerStat (Slot, IE_LEVEL2+i-1)
+			break
+	OpenSpellsWindow (Slot, TableName, Level, Level, KitValue, 1)
 
 	return
