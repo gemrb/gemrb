@@ -116,6 +116,7 @@ public:
 	void SetSpriteCover(SpriteCover* c) { delete cover; cover = c; }
 	/* get stored SpriteCover */
 	SpriteCover* GetSpriteCover() const { return cover; }
+	int GetCurrentFrame();
 	ieDword GetSequenceDuration(ieDword multiplier);
 	/* sets default duration if it wasn't set yet */
 	void SetDefaultDuration(unsigned int duration);

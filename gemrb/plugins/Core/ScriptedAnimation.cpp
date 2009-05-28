@@ -456,6 +456,15 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 	}
 }
 
+int ScriptedAnimation::GetCurrentFrame()
+{
+	Animation *anim = anims[P_HOLD*MAX_ORIENT];
+	if (anim) {
+		return anim->GetCurrentFrame();
+	}
+	return 0;
+}
+
 ieDword ScriptedAnimation::GetSequenceDuration(ieDword multiplier)
 {
 	//P_HOLD * MAX_ORIENT == MAX_ORIENT

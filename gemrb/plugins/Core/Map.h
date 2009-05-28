@@ -347,6 +347,8 @@ public:
 	void AddProjectile(Projectile* pro, Point &source, Point &dest);
 	void AddProjectile(Projectile* pro, Point &source, ieWord actorID);
 
+	//returns the duration of a VVC cell set in the area (point may be set to empty)
+	ieDword HasVVCCell(const ieResRef resource, Point &p);
 	void AddVVCell(ScriptedAnimation* vvc);
 	bool CanFree();
 	int GetCursor( Point &p);
@@ -462,6 +464,7 @@ private:
 	//separated position adjustment, so their order could be randomised */
 	bool AdjustPositionX(Point &goal, unsigned int radius);
 	bool AdjustPositionY(Point &goal, unsigned int radius);
+	void DrawPortal(InfoPoint *ip, int enable);
 };
 
 #endif

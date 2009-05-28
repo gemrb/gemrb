@@ -1668,7 +1668,7 @@ bool InfoPoint::IsPortal()
 {
 	if (Type!=ST_TRAVEL) return false;
 	if (Cursor != IE_CURSOR_PORTAL) return false;
-	return !core->HasFeature(GF_REVERSE_DOOR);
+	return core->HasFeature(GF_REVERSE_DOOR);
 }
 
 //trap that is visible on screen (marked by red)

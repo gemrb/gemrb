@@ -56,6 +56,8 @@ extern HANDLE hConsole;
 
 #define YESNO(x) ( (x)?"Yes":"No")
 
+static ieResRef PortalResRef={"EF03TPR3"};
+static unsigned int PortalTime = 15;
 static unsigned int MAX_CIRCLESIZE = 8;
 static int MaxVisibility = 30;
 static int VisibilityPerimeter; //calculated from MaxVisibility
@@ -517,6 +519,27 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	}
 }
 
+//Draw two overlapped animations to achieve the original effect
+//PlayOnce makes sure that if we stop drawing them, they will go away
+void Map::DrawPortal(InfoPoint *ip, int enable)
+{
+	ieDword gotportal = HasVVCCell(PortalResRef, ip->Pos);
+
+	if (enable) {
+		if (gotportal>PortalTime) return;
+		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(PortalResRef, false);
+		if (sca) {
+			sca->SetBlend();
+			sca->PlayOnce();
+			sca->XPos=ip->Pos.x;
+			sca->YPos=ip->Pos.y;
+			sca->ZPos=gotportal;
+			AddVVCell(sca);
+		}
+		return;
+	}
+}
+
 void Map::UpdateScripts()
 {
 	// if masterarea, then we allow 'any' actors
@@ -664,6 +687,10 @@ void Map::UpdateScripts()
 				ip->ProcessActions(false);
 			}
 			continue;
+		}
+
+		if (ip->IsPortal()) {
+			DrawPortal(ip, ip->Trapped&PORTAL_TRAVEL);
 		}
 
 		if (wasActive) {
@@ -1673,6 +1700,27 @@ void Map::AddProjectile(Projectile* pro, Point &source, Point &dest)
 	int height = pro->GetHeight();
 	for(iter=projectiles.begin();iter!=projectiles.end() && (*iter)->GetHeight()<height; iter++) ;
 	projectiles.insert(iter, pro);
+}
+
+//returns the longest duration of the VVC cell named 'resource' (if it exists)
+//if P is empty, the position won't be checked
+ieDword Map::HasVVCCell(const ieResRef resource, Point &p)
+{
+	scaIterator iter;
+	ieDword ret = 0;
+
+	for(iter=vvcCells.begin();iter!=vvcCells.end(); iter++) {
+		if (!p.isempty()) {
+			if ((*iter)->XPos!=p.x) continue;
+			if ((*iter)->YPos!=p.y) continue;
+		}
+		if (strnicmp(resource, (*iter)->ResName, sizeof(ieResRef) )) continue;
+		ieDword tmp = (*iter)->GetSequenceDuration(15)-(*iter)->GetCurrentFrame();
+		if (tmp>ret) {
+			ret = tmp;
+		}
+	}
+	return ret;
 }
 
 //adding videocell in order, based on its height parameter
