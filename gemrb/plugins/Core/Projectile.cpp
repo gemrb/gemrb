@@ -122,6 +122,7 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 	//reporting bigger face count than possible by the animation
 	int Max = af->GetCycleCount();
 	if (Aim>Max) Aim=Max;
+	bool mirror = false;
 	for (int Cycle = 0; Cycle<MAX_ORIENT; Cycle++) {
 		int c;
 		switch(Aim) {
@@ -130,17 +131,18 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 			break;
 		case 5:
 			c = SixteenToFive[Cycle];
+			if (Cycle>9) mirror=true;
 			break;
 		case 9:
 			c = SixteenToNine[Cycle];
+			if (Cycle>8) mirror=true;
 			break;
 		case 16:
 			c=Cycle;
 			break;
 		}
 		Animation* a = af->GetCycle( c );
-		//if (a && c!=Cycle) {
-		if (a && Cycle>=Aim) {
+		if (a && mirror) {
 			a->MirrorAnimation();
 		}
 		a->gameAnimation = true;
@@ -408,7 +410,7 @@ void Projectile::NextTarget(Point &p)
 		Pos = Destination;
 		return;
 	}
-	Orientation = GetOrient(Pos, Destination);
+	Orientation = GetOrient(Destination, Pos);
 	path = area->GetLine( Pos, Destination, Speed, Orientation, GL_PASS );
 }
 
