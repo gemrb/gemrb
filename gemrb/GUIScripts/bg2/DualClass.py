@@ -31,10 +31,12 @@ from LUSkillsSelection import *
 #######################
 pc = 0
 OldClassName = 0
+OldKitName = 0
 ClassName = 0
 NewMageSpells = 0
 NewPriestMask = 0
 NewClassId = 0
+DualClassTable = 0
 #######################
 DCMainWindow = 0
 DCMainClassButton = 0
@@ -56,7 +58,7 @@ DCSkillsDoneButton = 0
 
 # open the dual class window
 def DualClassWindow ():
-	global pc, OldClassName, NewMageSpells, NewPriestMask, NewClassId
+	global pc, OldClassName, NewMageSpells, NewPriestMask, NewClassId, OldKitName, DualClassTable
 	global DCMainWindow, DCMainClassButton, DCMainDoneButton, DCMainSkillsButton, DCMainStep
 
 	# get our basic globals
@@ -121,9 +123,14 @@ def DualClassWindow ():
 	DCLabel.SetText (GemRB.GetPlayerName (pc, 0))
 
 	# class name
-	OldClassName = GetActorClassTitle (pc)
+	Kit = GetKitIndex (pc)
+	OldClassName = ClassTable.GetRowName (ClassTable.FindValue (5, GemRB.GetPlayerStat (pc, IE_CLASS) ) )
+	if Kit:
+		OldKitName = KitListTable.GetValue (Kit, 0, 0)
+	else:
+		OldKitName = OldClassName
 	DCLabel = DCMainWindow.GetControl (0x10000009)
-	DCLabel.SetText (OldClassName)
+	DCLabel.SetText (GetActorClassTitle (pc))
 
 	# get the names of the classes we can dual to
 	DualClassTable = GemRB.LoadTableObject ("dualclas")
@@ -136,8 +143,6 @@ def DualClassWindow ():
 
 # we're done!
 def DCMainDonePress ():
-	global OldClassName
-
 	# save our proficiencies
 	ProfsSave (pc, LUPROFS_TYPE_DUALCLASS)
 
@@ -171,7 +176,6 @@ def DCMainDonePress ():
 
 	# save our new class and say was multi
 	OldClassId = GemRB.GetPlayerStat (pc, IE_CLASS)
-	OldClassName = ClassTable.GetRowName (ClassTable.FindValue (5, OldClassId) )
 	MultClassId = (1 << (NewClassId-1)) | (1 << (OldClassId-1))
 	MultClassId = ClassTable.FindValue (4, MultClassId)
 	MultClassId = ClassTable.GetValue (MultClassId, 5)
@@ -355,22 +359,12 @@ def DCClassDonePress ():
 
 # returns boolean
 def CanDualInto (index):
-	global OldClassName
-
 	# make sure index isn't out of range
 	if index < 0 or index >= len (DCClasses):
 		return 0
 
-	# find our row
-	DCTable = GemRB.LoadTableObject ("dualclas")
-
-	# FIXME: hack for archers: they're not in any relevant table
-	# this changes the global value!
-	if OldClassName == "Archer":
-		OldClassName = "RANGER"
-
 	# return 0 if we can't dual into the class
-	if not DCTable.GetValue (OldClassName, DCClasses[index], 1):
+	if not DualClassTable.GetValue (OldKitName, DCClasses[index], 1):
 		return 0
 
 	# make sure we aren't restricted by alignment
