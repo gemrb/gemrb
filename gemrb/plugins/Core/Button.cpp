@@ -485,7 +485,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	switch (dragtype) {
 		case 1:
 			RunEventHandler( ButtonOnDragDrop );
-			break;
+			return;
 		case 2:
 			//very ugly hack
 			EventHandler tmp;
@@ -493,7 +493,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 			memcpy(tmp, ButtonOnDragDrop, sizeof(tmp));
 			strncat(tmp,"2", sizeof(EventHandler) );
 			RunEventHandler( tmp );
-			break;
+			return;
 	}
 
 	if ((Button&GEM_MB_NORMAL) == GEM_MB_ACTION) {
