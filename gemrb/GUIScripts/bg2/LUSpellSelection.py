@@ -381,16 +381,25 @@ def SpellsPickPress ():
 				
 	return
 
-# ensures we have at least 1 specialist spell per level
+# ensures we have at least 1 specialist spell per level (if there are any)
 def HasSpecialistSpell ():
 	# always return true for non-kitted classed
 	if KitMask == 0x4000:
 		return 1
 
-	# return true if we've memorized and school spell this level
+	# return true if we've memorized a school spell of this level
 	for i in range (len (Spells[SpellLevel])):
 		if Spells[SpellLevel][i][1] == 2 and SpellBook[i]:
 			return 1
+
+	# return true if there are no specialist spells of this level
+	SpecialistSpellCount = 0
+	for i in range (len (Spells[SpellLevel])):
+		if Spells[SpellLevel][i][1] == 2:
+			SpecialistSpellCount = 1
+			break
+	if SpecialistSpellCount == 0:
+		return 1
 
 	# no luck
 	return 0
