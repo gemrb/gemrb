@@ -25,6 +25,10 @@ AbilityWindow = 0
 TextAreaControl = 0
 DoneButton = 0
 AbilityTable = 0
+Abclasrq = 0
+Abclsmod = 0
+Abclasrq = 0
+Abracerq = 0
 PointsLeft = 0
 Minimum = 0
 Maximum = 0
@@ -35,20 +39,16 @@ HasStrExtra = 0
 def CalcLimits(Abidx):
 	global Minimum, Maximum, Add
 
-	Abracead = GemRB.LoadTableObject("ABRACEAD")
-	Abclsmod = GemRB.LoadTableObject("ABCLSMOD")
 	Race = GemRB.GetVar("Race")-1
 	RaceName = RaceTable.GetRowName(Race)
 
 	Minimum = 3
 	Maximum = 18
 
-	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
 	tmp = Abclasrq.GetValue(KitIndex, Abidx)
 	if tmp!=0 and tmp>Minimum:
 		Minimum = tmp
 
-	Abracerq = GemRB.LoadTableObject("ABRACERQ")
 	Race = Abracerq.GetRowIndex(RaceName)
 	tmp = Abracerq.GetValue(Race, Abidx*2)
 	if tmp!=0 and tmp>Minimum:
@@ -107,9 +107,14 @@ def RollPress():
 def OnLoad():
 	global AbilityWindow, TextAreaControl, DoneButton
 	global PointsLeft, HasStrExtra
-	global AbilityTable
+	global AbilityTable, Abclasrq, Abclsmod, Abracerq, Abracead
 	global KitIndex, Minimum, Maximum
 	
+	Abracead = GemRB.LoadTableObject("ABRACEAD")
+	Abclsmod = GemRB.LoadTableObject("ABCLSMOD")
+	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
+	Abracerq = GemRB.LoadTableObject("ABRACERQ")
+
 	Kit = GemRB.GetVar("Class Kit")
 	Class = GemRB.GetVar("Class")-1
 	if Kit == 0:
@@ -123,7 +128,6 @@ def OnLoad():
 	else:
 		HasStrExtra=0
 
-	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
 	KitIndex = Abclasrq.GetRowIndex(KitName)
 
 	GemRB.LoadWindowPack("GUICG", 640, 480)
