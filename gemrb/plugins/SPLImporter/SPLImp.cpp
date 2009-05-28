@@ -61,10 +61,9 @@ bool SPLImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Spell* SPLImp::GetSpell(Spell *s, bool silent)
+Spell* SPLImp::GetSpell(Spell *s, bool /*silent*/)
 {
 	unsigned int i;
-	if (0) silent = true;
 
 	str->ReadDword( &s->SpellName );
 	str->ReadDword( &s->SpellNameIdentified );
