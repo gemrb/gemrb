@@ -407,6 +407,10 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 	if ( fobjindex != -1)
 		return gamedata->GetFactory()->GetFactoryObject( fobjindex );
 
+	// empty resref
+	if (!strcmp(resname, "")) 
+		return NULL;
+
 	switch (type) {
 	case IE_BAM_CLASS_ID:
 	{
