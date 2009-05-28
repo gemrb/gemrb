@@ -1644,19 +1644,31 @@ void Highlightable::DetectTrap(int skill)
 	}
 }
 
-bool Highlightable::PossibleToSeeTrap() {
+bool Highlightable::PossibleToSeeTrap()
+{
 	return CanDetectTrap();
 }
 
-bool InfoPoint::PossibleToSeeTrap() {
+bool InfoPoint::PossibleToSeeTrap()
+{
 	// Only detectable trap-type infopoints.
 	return (CanDetectTrap() && (Type == ST_PROXIMITY) );
 }
 
-bool InfoPoint::CanDetectTrap() {
+bool InfoPoint::CanDetectTrap()
+{
 	// Traps can be detected on all types of infopoint, as long
 	// as the trap is detectable and isn't deactivated.
 	return ((Flags&TRAP_DETECTABLE) && !(Flags&TRAP_DEACTIVATED));
+}
+
+// returns true if the infopoint is a PS:T portal
+// GF_REVERSE_DOOR is the closest game feature (exists only in PST, and about area objects)
+bool InfoPoint::IsPortal()
+{
+	if (Type!=ST_TRAVEL) return false;
+	if (Cursor != IE_CURSOR_PORTAL) return false;
+	return !core->HasFeature(GF_REVERSE_DOOR);
 }
 
 //trap that is visible on screen (marked by red)

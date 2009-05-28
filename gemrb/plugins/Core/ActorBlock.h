@@ -538,6 +538,7 @@ public:
 	int TrapResets() { return Flags & TRAP_RESET; }
 	bool CanDetectTrap();
 	bool PossibleToSeeTrap();
+	bool IsPortal();
 
 public:
 	ieResRef Destination;
