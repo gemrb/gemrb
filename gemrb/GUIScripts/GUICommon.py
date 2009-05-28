@@ -101,6 +101,10 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 	return Learnable
 
 def SetupSpellLevels (pc, TableName, Type, Level):
+	#BG2 has no mxspldru table? (don't die on missing spell tables)
+	if not GemRB.HasResource (TableName, RES_2DA):
+		return
+
 	Table=GemRB.LoadTableObject (TableName)
 	for i in range(Table.GetColumnCount ()):
 		# do a string lookup since some tables don't have entries for all levels
@@ -115,7 +119,6 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 	return
 
 def UnsetupSpellLevels (pc, TableName, Type, Level):
-
 	#BG2 has no mxspldru table? (don't die on missing spell tables)
 	if not GemRB.HasResource (TableName, RES_2DA):
 		return
