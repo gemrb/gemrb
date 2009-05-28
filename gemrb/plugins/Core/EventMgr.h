@@ -64,6 +64,7 @@
 
 #define GEM_RK_DOUBLESPEED      1
 #define GEM_RK_DISABLE          2
+#define GEM_RK_QUADRUPLESPEED   4
 
 #ifdef WIN32
 

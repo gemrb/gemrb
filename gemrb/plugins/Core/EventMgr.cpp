@@ -407,6 +407,7 @@ unsigned long EventMgr::GetRKDelay()
 {
 	if (rk_flags&GEM_RK_DISABLE) return (unsigned long) ~0;
 	if (rk_flags&GEM_RK_DOUBLESPEED) return rk_delay/2;
+	if (rk_flags&GEM_RK_QUADRUPLESPEED) return rk_delay/4;
 	return rk_delay;
 }
 
