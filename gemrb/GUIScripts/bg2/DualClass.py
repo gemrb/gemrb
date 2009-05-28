@@ -353,12 +353,19 @@ def DCClassDonePress ():
 
 # returns boolean
 def CanDualInto (index):
+	global OldClassName
+
 	# make sure index isn't out of range
 	if index < 0 or index >= len (DCClasses):
 		return 0
 
 	# find our row
 	DCTable = GemRB.LoadTableObject ("dualclas")
+
+	# FIXME: hack for archers: they're not in any relevant table
+	# this changes the global value!
+	if OldClassName == "Archer":
+		OldClassName = "RANGER"
 
 	# return 0 if we can't dual into the class
 	if not DCTable.GetValue (OldClassName, DCClasses[index], 1):
