@@ -221,6 +221,7 @@ def ShowSpells ():
 		SpellButton = SpellsWindow.GetControl (i+SpellStart)
 		if i >= len (Spells[SpellLevel]):
 			SpellButton.SetState (IE_GUI_BUTTON_DISABLED)
+			SpellButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			continue
 
 		# fill in the button with the spell data
@@ -244,6 +245,7 @@ def ShowSpells ():
 			SpellButton.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
 		else: # specialist (shouldn't get here)
 			# use the green border state for matching specialist spells
+			SpellButton.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
 			SpellButton.SetState (IE_GUI_BUTTON_THIRD)
 
 	# show which spells are selected
