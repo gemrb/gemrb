@@ -97,7 +97,7 @@ def FinishCharGen():
 	# pc, table, new level, level diff, alignment
 	AlignmentTable = GemRB.LoadTableObject ("aligns")
 	AlignmentAbbrev = AlignmentTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
-	AddClassAbilities (MyChar, "abstart", 7,7, AlignmentAbbrev)
+	AddClassAbilities (MyChar, "abstart", 6,6, AlignmentAbbrev)
 
 	# setup starting gold (uses a roll dictated by class
 	TmpTable = GemRB.LoadTableObject ("strtgold")

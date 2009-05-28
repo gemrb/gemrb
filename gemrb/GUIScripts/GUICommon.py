@@ -185,8 +185,8 @@ def HasSpell (Actor, SpellType, Level, Ref):
 	return -1
 
 # Adds class/kit abilities
-def AddClassAbilities (pc, TmpTable, Level=1, LevelDiff=1, align=-1):
-	TmpTable = GemRB.LoadTableObject (TmpTable)
+def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
+	TmpTable = GemRB.LoadTableObject (table)
 
 	# gotta stay positive
 	if Level-LevelDiff < 0:
@@ -230,8 +230,8 @@ def AddClassAbilities (pc, TmpTable, Level=1, LevelDiff=1, align=-1):
 
 # remove all class abilities up to a give level
 # for dual-classing mainly
-def RemoveClassAbilities (pc, TmpTable, Level):
-	TmpTable = GemRB.LoadTableObject (TmpTable)
+def RemoveClassAbilities (pc, table, Level):
+	TmpTable = GemRB.LoadTableObject (table)
 
 	# gotta stay positive
 	if Level < 0:

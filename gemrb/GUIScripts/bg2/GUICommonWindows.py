@@ -985,7 +985,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 
 	#get some basic values
 	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
-
+		
 	#adjust the class for multi/dual chars
 	Multi = IsMultiClassed (pc, 1)
 	Dual = IsDualClassed (pc, 1)
@@ -1001,13 +1001,22 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	if NumClasses>len(Levels):
 		return
 
+	#get the correct hp for barbarians
+	Kit = GetKitIndex (pc)
+	ClassName = None
+	if Kit and not Dual[0] and Multi[0]<2:
+		KitName = KitListTable.GetValue (Kit, 0, 0)
+		if ClassTable.GetRowIndex (KitName) >= 0:
+			ClassName = KitName
+
 	#loop through each class and update the hp
 	OldHP = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
 	CurrentHP = 0
 	Divisor = float (NumClasses)
 	for i in range (NumClasses):
 		#check this classes hp table for any gain
-		ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class[i]) )
+		if not ClassName or NumClasses > 1:
+			ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class[i]) )
 		HPTable = ClassTable.GetValue (ClassName, "HP")
 		HPTable = GemRB.LoadTableObject (HPTable)
 
