@@ -24,6 +24,7 @@
 ###################################################
 
 import GemRB
+from math import ceil
 from GUIDefines import *
 from ie_stats import *
 from ie_modal import *
@@ -955,6 +956,96 @@ def SetupLore (pc, LevelDiff=None):
 
 	#update our lore value
 	GemRB.SetPlayerStat (pc, IE_LORE, CurrentLore)
+	return
+
+#Level should be an array containing the current level of the class.
+#LevelDiff should be an array containing the difference in levels of
+#  each class. If left None, we assume that the character is starting
+#  from level 0, and therefore LevelDiff = Level.
+def SetupHP (pc, Level=None, LevelDiff=None):
+	#storing levels as an array makes them easier to deal with
+	if not Level:
+		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL2), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
+	else:
+		Levels = []
+		for level in Level:
+			Levels.append (level)
+	if not LevelDiff:
+		LevelDiffs = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL2), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
+	else:
+		LevelDiffs = []
+		for diff in LevelDiff:
+			LevelDiffs.append (diff)
+	if len (Levels) != len (LevelDiffs):
+		return
+
+	#get some basic values
+	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
+
+	#adjust the class for multi/dual chars
+	Multi = IsMultiClassed (pc, 1)
+	Dual = IsDualClassed (pc, 1)
+	NumClasses = 1
+	if Multi[0]>1: #get each of the multi-classes
+		NumClasses = Multi[0]
+		Class = [Multi[1], Multi[2], Multi[3]]
+	elif Dual[0]: #only worry about the newer class
+		Class = [ClassTable.GetValue (Dual[2], 5)]
+		#if Level and LevelDiff are passed, we assume it is correct
+		if IsDualSwap(pc) and not Level and not LevelDiff:
+			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]
+	if NumClasses>len(Levels):
+		return
+
+	#loop through each class and update the hp
+	OldHP = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
+	CurrentHP = 0
+	Divisor = float (NumClasses)
+	for i in range (NumClasses):
+		#check this classes hp table for any gain
+		ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class[i]) )
+		HPTable = ClassTable.GetValue (ClassName, "HP")
+		HPTable = GemRB.LoadTableObject (HPTable)
+
+		#make sure we are within table ranges
+		MaxLevel = HPTable.GetRowCount()-1
+		LowLevel = Levels[i]-LevelDiffs[i]
+		HiLevel = Levels[i]
+		if LowLevel >= HiLevel:
+			continue
+		if LowLevel < 0:
+			LowLevel = 0
+		elif LowLevel > MaxLevel:
+			LowLevel = MaxLevel
+		if HiLevel < 0:
+			HiLevel = 0
+		elif HiLevel > MaxLevel:
+			HiLevel = MaxLevel
+
+		#add all the hp for the given level
+		#we use ceil to ensure each class gets hp
+		for level in range(LowLevel, HiLevel):
+			#TODO: do dual-class characters get the roll?
+			rolls = HPTable.GetValue (level, 1)
+			bonus = HPTable.GetValue (level, 2)
+
+			# we only do a roll if core diff or higher, or uncheck max
+			if rolls:
+				if GemRB.GetVar ("Difficulty Level") < 3:
+					CurrentHP += ceil (GemRB.Roll (rolls, HPTable.GetValue (level, 0), bonus) / Divisor)
+				else:
+					CurrentHP += ceil ((rolls * HPTable.GetValue (level, 0) + bonus) / Divisor)
+			else:
+				CurrentHP += ceil (bonus / Divisor)
+			CurrentHP = int (CurrentHP)
+
+	#update our hp values
+	GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, CurrentHP+OldHP)
+	GemRB.SetPlayerStat (pc, IE_HITPOINTS, GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1)+CurrentHP)
 	return
 
 def SetEncumbranceLabels (Window, Label, Label2, pc):

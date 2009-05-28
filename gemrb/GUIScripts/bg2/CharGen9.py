@@ -56,10 +56,13 @@ def FinishCharGen():
 	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 2)
 	ProfsSave (MyChar, LUPROFS_TYPE_CHARGEN)
 
-	#lore, thac0, and saves
+	#lore, thac0, hp, and saves
+	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
+	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0)
 	SetupSavingThrows (MyChar)
 	SetupThaco (MyChar)
 	SetupLore (MyChar)
+	SetupHP (MyChar)
 
 	# mage spells
 	TableName = ClassSkillsTable.GetValue (Class, 2, 0)

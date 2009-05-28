@@ -50,7 +50,6 @@ ClassName = 0
 RaceTable = 0
 
 # old values (so we don't add too much)
-OldHP = 0		# << old current hitpoints
 OldHPMax = 0		# << old maximum hitpoints
 OldSaves = [0]*5	# << old saves
 OldThaco = 0		# << old thac0 value
@@ -67,7 +66,7 @@ def OpenLevelUpWindow():
 	global DoneButton
 	global NewSkillPoints, KitName, LevelDiff, RaceTable
 	global ClassTable, Level, Classes, NumClasses, DualSwap, ClassSkillsTable, IsMulti
-	global OldHP, OldHPMax, OldSaves, OldLore, OldThaco, DeltaDSpells, DeltaWSpells
+	global OldHPMax, OldSaves, OldLore, OldThaco, DeltaDSpells, DeltaWSpells
 	global NewDSpells, NewWSpells, OldDSpells, OldWSpells, pc, HLACount, ClassName, IsDual
 
 	LevelUpWindow = GemRB.LoadWindowObject (3)
@@ -91,7 +90,6 @@ def OpenLevelUpWindow():
 	Label.SetText (GemRB.GetPlayerName (pc))
 
 	# some current values
-	OldHP = GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1)
 	OldHPMax = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
 	OldThaco = GemRB.GetPlayerStat (pc, IE_THAC0, 1)
 	OldLore = GemRB.GetPlayerStat (pc, IE_LORE, 1)
@@ -206,25 +204,6 @@ def OpenLevelUpWindow():
 		print "Level (",i,"):",Level[i]
 		print "Level Diff (",i,"):",LevelDiff[i]
 
-		# check this classes hp table for any gain
-		HPTable = ClassTable.GetValue (TmpIndex, 6, 0)
-		HPTable = GemRB.LoadTableObject (HPTable)
-
-		# loop through each level gained
-		for level in range(Level[i] - LevelDiff[i], Level[i]):
-			# TODO: figure out how multiclass and dualclass rolls are done
-			rolls = HPTable.GetValue (level, 1)
-			bonus = HPTable.GetValue (level, 2)
-
-			# we only do a roll if core diff or higher, or uncheck max
-			if rolls:
-				if GemRB.GetVar ("Difficulty Level") < 3:
-					hp += GemRB.Roll (rolls, HPTable.GetValue (level, 0), bonus) / NumClasses
-				else:
-					hp += (rolls * HPTable.GetValue (level, 0) + bonus) / NumClasses
-			else:
-				hp += bonus / NumClasses
-
 		# save our current and next spell amounts
 		StartLevel = Level[i] - LevelDiff[i]
 		DruidTable = ClassSkillsTable.GetValue (Classes[i], 0, 0)
@@ -277,15 +256,11 @@ def OpenLevelUpWindow():
 		if ABTable != "*" and ABTable[:6] != "CLABMA":
 			AddClassAbilities (pc, ABTable, Level[i], LevelDiff[i])
 
-	# save our new hp if it changed
-	if (OldHPMax == GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)):
-		GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, OldHPMax + hp)
-		GemRB.SetPlayerStat (pc, IE_HITPOINTS, OldHP + hp)
-
-	#update our saves, thaco and lore
+	#update our saves, thaco, hp and lore
 	SetupSavingThrows (pc, Level)
 	SetupThaco (pc, Level)
 	SetupLore (pc, LevelDiff)
+	SetupHP (pc, Level, LevelDiff)
 	
 	# use total levels for HLAs
 	HLACount = 0
