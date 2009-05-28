@@ -57,7 +57,7 @@ public:
 	int AddToSaveGame(DataStream *str, DataStream *uncompressed);
 	int OpenArchive(const char* filename);
 	int CreateArchive(DataStream *compressed);
-	DataStream* GetStream(unsigned long Resource, unsigned long Type);
+	DataStream* GetStream(unsigned long Resource, unsigned long Type, bool silent=false);
 private:
 	void ReadBIF(void);
 public:

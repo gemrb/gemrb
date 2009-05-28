@@ -449,7 +449,7 @@ bool Spellbook::AddKnownSpell(CREKnownSpell *spl, int flg)
 			return false;
 		}
 	}
-printf("type: %d  level:%d   spellname:%s\n", type, level, spl->SpellResRef);
+
 	spells[type][level]->known_spells.push_back(spl);
 	if (type==IE_SPELL_TYPE_INNATE) {
 		spells[type][level]->Number++;

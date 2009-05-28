@@ -259,7 +259,7 @@ int BIFImp::OpenArchive(const char* filename)
 	return GEM_ERROR;
 }
 
-DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
+DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type, bool silent)
 {
 	DataStream* s = NULL;
 	if (Type == IE_TIS_CLASS_ID) {
@@ -281,10 +281,12 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 			}
 		}
 	}
-	if (s) {
-		printStatus( "FOUND", LIGHT_GREEN );
-	} else {
-		printStatus( "ERROR", LIGHT_RED );
+	if (!silent) {
+		if (s) {
+			printStatus( "FOUND", LIGHT_GREEN );
+		} else {
+			printStatus( "ERROR", LIGHT_RED );
+		}
 	}
 	return s;
 }

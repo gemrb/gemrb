@@ -48,10 +48,10 @@ public:
 	/* predicts the availability of a resource */
 	bool HasResource(const char* resname, SClass_ID type, bool silent=false);
 	/* returns resource */
-	DataStream* GetResource(const char* resname, SClass_ID type);
+	DataStream* GetResource(const char* resname, SClass_ID type, bool silent=false);
 	/* returns factory resource, currently works only with animations */
 	void* GetFactoryResource(const char* resname, SClass_ID type,
-		unsigned char mode = IE_NORMAL);
+		unsigned char mode = IE_NORMAL, bool silent=false);
 public:
 	void release(void)
 	{

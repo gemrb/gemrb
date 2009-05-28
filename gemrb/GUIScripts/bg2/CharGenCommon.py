@@ -211,7 +211,7 @@ def DisplayOverview(step):
 			for level in range(0, 9):
 				for j in range(0, GemRB.GetKnownSpellsCount (MyChar, IE_SPELL_TYPE_WIZARD, level) ):
 					Spell = GemRB.GetKnownSpell (MyChar, IE_SPELL_TYPE_WIZARD, level, j)
-					Spell = GemRB.GetSpell (Spell['SpellResRef'])['SpellName']
+					Spell = GemRB.GetSpell (Spell['SpellResRef'], 1)['SpellName']
 					info += GemRB.GetString (Spell) + "\n"
 			if info != "":
 				info = "\n" + info + "\n"
@@ -223,7 +223,7 @@ def DisplayOverview(step):
 			for level in range(0, 7):
 				for j in range(0, GemRB.GetKnownSpellsCount (MyChar, IE_SPELL_TYPE_PRIEST, level) ):
 					Spell = GemRB.GetKnownSpell (MyChar, IE_SPELL_TYPE_PRIEST, level, j)
-					Spell = GemRB.GetSpell (Spell['SpellResRef'])['SpellName']
+					Spell = GemRB.GetSpell (Spell['SpellResRef'], 1)['SpellName']
 					info += GemRB.GetString (Spell) + "\n"
 			if info != "":
 				info = "\n" + info + "\n"

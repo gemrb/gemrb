@@ -41,7 +41,7 @@ public:
 	SPLImp(void);
 	~SPLImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	Spell* GetSpell(Spell *spl);
+	Spell* GetSpell(Spell *spl, bool silent=false);
 	void release(void)
 	{
 		delete this;

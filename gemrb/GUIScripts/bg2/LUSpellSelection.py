@@ -225,7 +225,7 @@ def ShowSpells ():
 			continue
 
 		# fill in the button with the spell data
-		Spell = GemRB.GetSpell (Spells[SpellLevel][i+SpellTopIndex][0])
+		Spell = GemRB.GetSpell (Spells[SpellLevel][i+SpellTopIndex][0], 1)
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetSpellIcon(Spells[SpellLevel][i+SpellTopIndex][0], 1)
 		SpellButton.SetVarAssoc("ButtonPressed", i)
@@ -264,7 +264,7 @@ def SpellsSelectPress ():
 	i = GemRB.GetVar ("ButtonPressed") + SpellTopIndex
 
 	# get the spell that's been pushed
-	Spell = GemRB.GetSpell (Spells[SpellLevel][i][0])
+	Spell = GemRB.GetSpell (Spells[SpellLevel][i][0], 1)
 	SpellsTextArea.SetText (Spell["SpellDesc"])
 
 	# make sure we can learn the spell

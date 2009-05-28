@@ -90,7 +90,7 @@ public:
 	
 	Item* GetItem(const ieResRef resname);
 	void FreeItem(Item const *itm, const ieResRef name, bool free=false);
-	Spell* GetSpell(const ieResRef resname);
+	Spell* GetSpell(const ieResRef resname, bool silent=false);
 	void FreeSpell(Spell *spl, const ieResRef name, bool free=false);
 	Effect* GetEffect(const ieResRef resname);
 	void FreeEffect(Effect *eff, const ieResRef name, bool free=false);

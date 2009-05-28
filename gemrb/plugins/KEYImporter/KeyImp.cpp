@@ -199,7 +199,7 @@ static bool FindIn(const char *BasePath, const char *Path, const char *ResRef, S
 	return false;
 }
 
-static FileStream *SearchIn(const char * BasePath,const char * Path,const char * ResRef, SClass_ID Type, const char *foundMessage)
+static FileStream *SearchIn(const char * BasePath,const char * Path,const char * ResRef, SClass_ID Type, const char *foundMessage, bool silent=false)
 {
 	char p[_MAX_PATH], f[_MAX_PATH] = {0};
 	strncpy(f, ResRef, 8);
@@ -214,7 +214,10 @@ static FileStream *SearchIn(const char * BasePath,const char * Path,const char *
 		FileStream * fs = new FileStream();
 		if(!fs) return NULL;
 		fs->Open(p, true);
-		printBracket(foundMessage, LIGHT_GREEN); printf("\n");
+		if (!silent) {
+			printBracket(foundMessage, LIGHT_GREEN);
+			printf("\n");
+		}
 		return fs;
 	}
 	return NULL;
@@ -246,45 +249,47 @@ bool KeyImp::HasResource(const char* resname, SClass_ID type, bool silent)
 	return false;
 }
 
-DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
+DataStream* KeyImp::GetResource(const char* resname, SClass_ID type, bool silent)
 {
 	char path[_MAX_PATH];
 	char BasePath[_MAX_PATH] = {
 		0
 	};
-	printMessage( "KEYImporter", "Searching for ", WHITE );
-	printf( "%.8s%s...", resname, core->TypeExt( type ) );
+	if (!silent) {
+		printMessage( "KEYImporter", "Searching for ", WHITE );
+		printf( "%.8s%s...", resname, core->TypeExt( type ) );
+	}
 	//Search it in the GemRB override Directory
 	PathJoin( path, "override", core->GameType, NULL ); //this shouldn't change
 
 	FileStream *fs;
 
 	fs=SearchIn( core->CachePath, "", resname, type,
-		"Found in Cache" );
+		"Found in Cache", silent );
 	if (fs) return fs;
 
 	fs=SearchIn( core->GemRBOverridePath, path, resname, type,
-		"Found in GemRB Override" );
+		"Found in GemRB Override", silent );
 	if (fs) return fs;
 
 	fs=SearchIn( core->GamePath, core->GameOverridePath, resname, type,
-		"Found in Override" );
+		"Found in Override", silent );
 	if (fs) return fs;
 
 	fs=SearchIn( core->GamePath, core->GameSoundsPath, resname, type,
-		"Found in Sounds" );
+		"Found in Sounds", silent );
 	if (fs) return fs;
 
 	fs=SearchIn( core->GamePath, core->GameScriptsPath, resname, type,
-		"Found in Scripts" );
+		"Found in Scripts", silent );
 	if (fs) return fs;
 
 	fs=SearchIn( core->GamePath, core->GamePortraitsPath, resname, type,
-		"Found in Portraits" );
+		"Found in Portraits", silent );
 	if (fs) return fs;
 
 	fs=SearchIn( core->GamePath, core->GameDataPath, resname, type,
-		"Found in Data" );
+		"Found in Data", silent );
 	if (fs) return fs;
 
 	unsigned int ResLocator;
@@ -380,7 +385,7 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 			core->FreeInterface( ai );
 			return NULL;
 		}
-		DataStream* ret = ai->GetStream( ResLocator, type );
+		DataStream* ret = ai->GetStream( ResLocator, type, silent );
 		core->FreeInterface( ai );
 		if (ret) {
 			strnlwrcpy( ret->filename, resname, 8 );
@@ -388,12 +393,14 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 		}
 		return ret;
 	}
-	printStatus( "ERROR", LIGHT_RED );
+	if (!silent) {
+		printStatus( "ERROR", LIGHT_RED );
+	}
 	return NULL;
 }
 
 void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
-	unsigned char mode)
+	unsigned char mode, bool silent)
 {
 	int fobjindex = gamedata->GetFactory()->IsLoaded(resname,type);
 	// already cached
@@ -403,7 +410,7 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 	switch (type) {
 	case IE_BAM_CLASS_ID:
 	{
-		DataStream* ret = GetResource( resname, type );
+		DataStream* ret = GetResource( resname, type, silent );
 		if (ret) {
 			AnimationMgr* ani = ( AnimationMgr* )
 				core->GetInterface( IE_BAM_CLASS_ID );
@@ -420,7 +427,7 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 	case IE_BMP_CLASS_ID:
 	{
 		// check PNG first
-		DataStream* ret = GetResource( resname, IE_PNG_CLASS_ID );
+		DataStream* ret = GetResource( resname, IE_PNG_CLASS_ID, silent );
 		if (ret) {
 			ImageMgr* img = (ImageMgr*) core->GetInterface( IE_PNG_CLASS_ID );
 			if (img) {
@@ -432,7 +439,7 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 			}
 		}
 
-		ret = GetResource( resname, IE_BMP_CLASS_ID );
+		ret = GetResource( resname, IE_BMP_CLASS_ID, silent );
 		if (ret) {
 			ImageMgr* img = (ImageMgr*) core->GetInterface( IE_BMP_CLASS_ID );
 			if (img) {

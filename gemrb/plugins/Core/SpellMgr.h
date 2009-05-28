@@ -54,7 +54,7 @@ public:
 	SpellMgr(void);
 	virtual ~SpellMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
-	virtual Spell* GetSpell(Spell *spl) = 0;
+	virtual Spell* GetSpell(Spell *spl, bool silent=false) = 0;
 };
 
 #endif

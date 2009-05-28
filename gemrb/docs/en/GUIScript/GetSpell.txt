@@ -1,7 +1,8 @@
 
-Prototype: GemRB.GetSpell(ResRef)
+Prototype: GemRB.GetSpell(ResRef[, silent])
 
-Description: Returns dictionary with the specified spell's data.
+Description: Returns dictionary with the specified spell's data. If silent
+is set, nothing will be printed to the console.
 
 Parameters: ResRef - the resource reference of the spell.
 

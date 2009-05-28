@@ -349,13 +349,13 @@ void GameData::FreeItem(Item const *itm, const ieResRef name, bool free)
 	if (free) delete itm;
 }
 
-Spell* GameData::GetSpell(const ieResRef resname)
+Spell* GameData::GetSpell(const ieResRef resname, bool silent)
 {
 	Spell *spell = (Spell *) SpellCache.GetResource(resname);
 	if (spell) {
 		return spell;
 	}
-	DataStream* str = core->GetResourceMgr()->GetResource( resname, IE_SPL_CLASS_ID );
+	DataStream* str = core->GetResourceMgr()->GetResource( resname, IE_SPL_CLASS_ID, silent );
 	SpellMgr* sm = ( SpellMgr* ) core->GetInterface( IE_SPL_CLASS_ID );
 	if (sm == NULL) {
 		delete ( str );
@@ -369,7 +369,7 @@ Spell* GameData::GetSpell(const ieResRef resname)
 	spell = new Spell();
 	//this is required for storing the 'source'
 	strnlwrcpy(spell->Name, resname, 8);
-	sm->GetSpell( spell );
+	sm->GetSpell( spell, silent );
 	if (spell == NULL) {
 		core->FreeInterface( sm );
 		return NULL;

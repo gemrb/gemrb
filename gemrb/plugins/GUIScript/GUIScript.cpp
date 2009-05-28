@@ -5065,7 +5065,7 @@ PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int
 		return Py_None;
 	}
 
-	Spell* spell = gamedata->GetSpell( SpellResRef );
+	Spell* spell = gamedata->GetSpell( SpellResRef, 1 );
 	if (spell == NULL) {
 		btn->SetPicture( NULL );
 		printMessage( "GUIScript", " ", LIGHT_RED);
@@ -5083,8 +5083,9 @@ PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int
 	}
 	AnimationFactory* af = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( IconResRef,
-		IE_BAM_CLASS_ID, IE_NORMAL );
+		IE_BAM_CLASS_ID, IE_NORMAL, 1 );
 	if (!af) {
+		printf("Searched for: %s\n", IconResRef);
 		return RuntimeError( "BAM not found" );
 	}
 	//small difference between pst and others
@@ -6426,8 +6427,8 @@ static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GetSpell__doc,
-"GetSpell(ResRef)=>dict\n\n"
-"Returns dict with specified spell." );
+"GetSpell(ResRef[, silent])=>dict\n\n"
+"Returns dict with specified spell. Verbose by default." );
 
 static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -6443,7 +6444,7 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	Spell* spell = gamedata->GetSpell(ResRef);
+	Spell* spell = gamedata->GetSpell(ResRef, silent);
 	if (spell == NULL) {
 		Py_INCREF( Py_None );
 		return Py_None;

@@ -1347,7 +1347,7 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 			if type == IE_SPELL_TYPE_PRIEST and kit:
 				# get the spells ref data
 				ref = GemRB.GetKnownSpell (pc, type, level, mod-spell)
-				ref = GemRB.GetSpell (ref['SpellResRef'])
+				ref = GemRB.GetSpell (ref['SpellResRef'], 1)
 
 				# we have to look at the originalkit as well specifically for ranger/cleric dual-classes
 				# we wouldn't want to remove all cleric spells and druid spells if we lost our cleric class
