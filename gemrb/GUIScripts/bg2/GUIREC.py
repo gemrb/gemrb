@@ -834,9 +834,6 @@ def CanDualClass(actor):
 		ClassTitle = ClassName
 	else:
 		ClassTitle = KitListTable.GetValue (KitIndex, 0)
-		# archers are not in the two abxafjsdof tables, so fallback to base class
-		if CurrentStatTable.GetRowIndex (ClassTitle) == -1:
-			ClassTitle = ClassName
 	Row = DualClassTable.GetRowIndex (ClassTitle)
 
 	# a lookup table for the DualClassTable columns
