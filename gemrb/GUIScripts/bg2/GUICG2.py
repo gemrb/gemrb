@@ -19,18 +19,16 @@
 #
 #character generation, class (GUICG2)
 import GemRB
+from GUICommonWindows import ClassTable
 
 ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-ClassTable = 0
 
 def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton
-	global ClassTable
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ClassTable = GemRB.LoadTableObject("classes")
 	ClassCount = ClassTable.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindowObject(2)
 	TmpTable=GemRB.LoadTableObject("races")

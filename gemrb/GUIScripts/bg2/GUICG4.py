@@ -19,6 +19,7 @@
 #
 #character generation, ability (GUICG4)
 import GemRB
+from GUICommonWindows import ClassTable, KitListTable
 
 AbilityWindow = 0
 TextAreaControl = 0
@@ -111,14 +112,12 @@ def OnLoad():
 	global KitIndex, Minimum, Maximum
 	
 	Kit = GemRB.GetVar("Class Kit")
-	ClassTable = GemRB.LoadTableObject("classes")
 	Class = GemRB.GetVar("Class")-1
 	if Kit == 0:
 		KitName = ClassTable.GetRowName(Class)
 	else:
-		KitList = GemRB.LoadTableObject("kitlist")
 		#rowname is just a number, first value row what we need here
-		KitName = KitList.GetValue(Kit, 0) 
+		KitName = KitListTable.GetValue(Kit, 0)
 
 	if ClassTable.GetValue(Class, 3)=="SAVEWAR":
 		HasStrExtra=1

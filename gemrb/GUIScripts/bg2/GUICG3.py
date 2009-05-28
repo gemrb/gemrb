@@ -19,6 +19,7 @@
 #
 #character generation, alignment (GUICG3)
 import GemRB
+from GUICommonWindows import ClassTable, KitListTable
 
 AlignmentWindow = 0
 TextAreaControl = 0
@@ -31,12 +32,10 @@ def OnLoad():
 	
 	Kit = GemRB.GetVar("Class Kit")
 	if Kit == 0:
-		ClassTable = GemRB.LoadTableObject("classes")
 		Class = GemRB.GetVar("Class")-1
 		KitName = ClassTable.GetRowName(Class)
 	else:
-		KitList = GemRB.LoadTableObject("kitlist")
-		KitName = KitList.GetValue(Kit, 0) #rowname is just a number
+		KitName = KitListTable.GetValue(Kit, 0) #rowname is just a number
 
 	AlignmentOk = GemRB.LoadTableObject("ALIGNMNT")
 

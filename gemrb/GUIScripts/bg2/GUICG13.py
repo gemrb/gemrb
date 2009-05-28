@@ -19,6 +19,7 @@
 #
 #character generation, color (GUICG13)
 import GemRB
+from GUICommonWindows import ClassTable
 
 global IE_ANIM_ID
 ColorTable = 0
@@ -44,7 +45,6 @@ def RefreshPDoll():
 	table = GemRB.LoadTableObject("avprefr")
 	AnimID = AnimID+table.GetValue(GemRB.GetVar("Race"),0)
 	table = GemRB.LoadTableObject("avprefc")
-	ClassTable = GemRB.LoadTableObject("classes")
 	ClassIndex = GemRB.GetVar ("Class")-1
 	Class = ClassTable.GetValue(ClassIndex, 5)
 	AnimID = AnimID+table.GetValue(Class, 0)
