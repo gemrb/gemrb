@@ -136,6 +136,8 @@ def DualClassWindow ():
 
 # we're done!
 def DCMainDonePress ():
+	global OldClassName
+
 	# save our proficiencies
 	ProfsSave (pc, LUPROFS_TYPE_DUALCLASS)
 
