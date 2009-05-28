@@ -281,6 +281,9 @@ def OpenLevelUpWindow():
 	if (OldHPMax == GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)):
 		GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, OldHPMax + hp)
 		GemRB.SetPlayerStat (pc, IE_HITPOINTS, OldHP + hp)
+
+	#update our saves
+	SetupSavingThrows (pc, Level)
 	
 	# use total levels for HLAs
 	HLACount = 0
@@ -393,7 +396,6 @@ def GetLevelUpNews():
 	# temps to compare all our new saves against (we get the best of our saving throws)
 	ThacoTable = GemRB.LoadTableObject ("THAC0")
 	LoreTable = GemRB.LoadTableObject ("lore")
-	Saves = OldSaves
 	NewThaco = OldThaco
 	LoreGain = 0
 	LOHGain = 0
@@ -404,19 +406,8 @@ def GetLevelUpNews():
 		TmpClassName = ClassTable.FindValue (5, Classes[i])
 		TmpClassName = ClassTable.GetRowName (TmpClassName)
 
-		# get each save from the table
-		SaveTable = ClassTable.GetValue (TmpClassName, "SAVE", 0)
-		SaveTable = GemRB.LoadTableObject (SaveTable)
-		
-		# loop through each save
-		TmpIndex = Level[i]-1
-		for j in range (5):
-			# if the save is better, update the saves array
-			TmpSave = SaveTable.GetValue (j, TmpIndex)
-			if TmpSave < Saves[j]:
-				Saves[j] = TmpSave
-
 		# see if this classes has a lower thaco
+		TmpIndex = Level[i]-1
 		TmpThaco = ThacoTable.GetValue (Classes[i]-1, TmpIndex, 1)
 		if (TmpThaco < NewThaco):
 			NewThaco = TmpThaco
@@ -459,15 +450,15 @@ def GetLevelUpNews():
 		# 5292 spell
 	# include in news if the save is updated
 	for i in range (5):
-		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+i, Saves[i]) # save the saves :D
+		CurrentSave = GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH+i)
 		SaveString = 5277+i
 		if i == 3:
 			SaveString = 5282
 		elif i == 4:
 			SaveString = 5292
 
-		if Saves[i] < OldSaves[i]:
-			News += GemRB.GetString (SaveString) + ": " + str(OldSaves[i]-Saves[i]) + '\n'
+		if CurrentSave < OldSaves[i]:
+			News += GemRB.GetString (SaveString) + ": " + str(OldSaves[i]-CurrentSave) + '\n'
 
 	# 5305 - THAC0 Reduced by
 	# only output if there is a change in thaco

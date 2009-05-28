@@ -779,56 +779,73 @@ def PortraitButtonOnMouseLeave ():
 	GemRB.SetTimedEvent ("CheckDragging",1)
 	return
 
-def GetSavingThrow (SaveName, row, level):
-	SaveTable = GemRB.LoadTableObject (SaveName)
-	tmp = SaveTable.GetValue (level)
-	return tmp
+#Levels needs to be an array containing the level desired for each class
+#this is potentially useful for leveling up 
+def SetupSavingThrows (pc, Levels=None):
+	#storing levels as an array makes them easier to deal with
+	if not Levels:
+		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL2), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
 
-def SetupSavingThrows (pc):
-	level1 = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
-	if level1 > 20:
-		level1 = 20
-	level2 = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
-	if level2 > 20:
-		level2 = 20
-	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-
+	#get some basic values
+	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
 	Race = GemRB.GetPlayerStat (pc, IE_RACE)
 	RaceTable = GemRB.LoadTableObject ("races")
 
-	Class = ClassTable.FindValue (5, Class)
-	Multi = ClassTable.GetValue (Class, 4)
+	#make sure to limit the levels to the table allowable
+	MaxLevel = RaceTable.GetRowCount ()-1
+	for i in range (len(Levels)):
+		if Levels[i] > MaxLevel:
+			Levels[i] = MaxLevel
 
-	Race = RaceTable.FindValue (3, Race)
-	RaceSaveTableName = RaceTable.GetValue (Race, 4)
+	#adjust the class for multi/dual chars
+	Multi = IsMultiClassed (pc, 1)
+	Dual = IsDualClassed (pc, 1)
+	NumClasses = 1
+	if Multi[0]>1: #get each of the multi-classes
+		NumClasses = Multi[0]
+		Class = [Multi[1], Multi[2], Multi[3]]
+	elif Dual[0]: #only worry about the newer class
+		Class = [ClassTable.GetValue (Dual[2], 5)]
+		if IsDualSwap(pc) and len(Levels)>1:
+			TmpLevel = Levels[0]
+			Levels[0] = Levels[1]
+			Levels[1] = TmpLevel
 
-	#todo fix multi class
-	if Multi:
-		if Class == 7:
-			#fighter/mage
-			Class = ClassTable.FindValue (5, 1)
-		else:
-			#fighter/thief
-			Class = ClassTable.FindValue (5, 4)
-		SaveName2 = ClassTable.GetValue (Class, 3)
-		Class = 0 #fighter
-
-	SaveName1 = ClassTable.GetValue (Class, 3)
-
-	for row in range (5):
-		tmp1 = GetSavingThrow (SaveName1, row, level1)
-		if Multi:
-			tmp2 = GetSavingThrow (SaveName2, row, level2)
-			if tmp2<tmp1:
-				tmp1=tmp2
-		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
-	if RaceSaveTableName != "*":
-		Con = GemRB.GetPlayerStat (pc, IE_CON)
+	#see if we can add racial bonuses to saves
+	#default return is -1 NOT "*", so we convert always convert to str
+	#I'm leaving the "*" just in case
+	Race = RaceTable.GetRowName (RaceTable.FindValue (3, Race) )
+	RaceSaveTableName = str(RaceTable.GetValue (Race, "SAVE") )
+	RaceSaveTable = None
+	if RaceSaveTableName != "-1" and RaceSaveTableName != "*":
+		Con = GemRB.GetPlayerStat (pc, IE_CON, 1)-1
 		RaceSaveTable = GemRB.LoadTableObject (RaceSaveTableName)
-		for row in range (5):
-			tmp1 = GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH+row)
-			tmp1 += RaceSaveTable.GetValue (row, Con)
-			GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
+		if Con >= RaceSaveTable.GetRowCount ():
+			Con = RaceSaveTable.GetRowCount ()-1
+
+	#preload our tables to limit multi-classed lookups
+	SaveTables = []
+	for i in range (NumClasses):
+		SaveName = ClassTable.GetValue (ClassTable.FindValue (5, Class[i]), 3, 0)
+		SaveTables.append (GemRB.LoadTableObject (SaveName) )
+
+	#save the saves
+	for row in range (5):
+		CurrentSave = 20
+		for i in range (NumClasses):
+			#loop through each class and update the save value if we have
+			#a better save
+			TmpTable = SaveTables[i]
+			TmpSave = TmpTable.GetValue (row, Levels[i]-1)
+			if TmpSave and (TmpSave < CurrentSave or i == 0):
+				CurrentSave = TmpSave
+
+		#add racial bonuses if applicable (small pc's)
+		if RaceSaveTable:
+			CurrentSave += RaceSaveTable.GetValue (row, Con)
+		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, CurrentSave)
 	return
 
 def SetEncumbranceLabels (Window, Label, Label2, pc):
