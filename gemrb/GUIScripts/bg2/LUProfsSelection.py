@@ -300,3 +300,12 @@ def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 		if SaveProf: # only save if we have a prof to save
 			GemRB.ApplyEffect (pc, "Proficiency", SaveProf, ProfID)
 	return
+
+def ProfsNullify ():
+	global ProfsTable
+	if not ProfsTable:
+		ProfsTable = GemRB.LoadTableObject ("weapprof")
+	for i in range (ProfsTable.GetRowCount ()-7): #skip bg1 profs
+		GemRB.SetVar ("Prof "+str(i), 0)
+		GemRB.SetVar ("ProfBase "+str(i), 0)
+	return
