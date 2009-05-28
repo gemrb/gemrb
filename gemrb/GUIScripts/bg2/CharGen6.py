@@ -20,8 +20,7 @@
 # character generation - ability; next skills/profs/spells (CharGen6)
 import GemRB
 from CharGenCommon import *
-from GUICommonWindows import ClassSkillsTable
-from LUSpellSelection import RemoveKnownSpells
+from GUICommonWindows import *
 from LUSkillsSelection import *
 from LUProfsSelection import *
 
@@ -61,9 +60,8 @@ def OnLoad():
 	# apply our extra str
 	GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
 	print "\tSTREXTRA:\t",GemRB.GetVar ("StrExtra")
-	
-	DisplayOverview (6)
 
+	#remove all known spells and nullify the memorizable counts
 	RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1,9, 1)
 	RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)
 
@@ -73,22 +71,42 @@ def OnLoad():
 
 	if TableName == "*": # only druid spells or no spells at all
 		TableName = ClassSkillsTable.GetValue (Class, 0, 0)
-		ClassFlag = 0x4000
+		ClassFlag = 0x8000
 	elif ClassSkillsTable.GetValue (Class, 0, 0) != "*": # cleric and druid spells
 		ClassFlag = 0
 	else: # only cleric spells
-		ClassFlag = 0x8000
-
-	# nulify the memorizable spell counts
-	for type in [ "MXSPLPRS", "MXSPLPAL", "MXSPLRAN", "MXSPLDRU" ]:
-		UnsetupSpellLevels (MyChar, type, IE_SPELL_TYPE_PRIEST, 1)
-	for type in [ "MXSPLWIZ", "MXSPLSRC", "MXSPLBRD" ]:
-		UnsetupSpellLevels (MyChar, type, IE_SPELL_TYPE_WIZARD, 1)
+		ClassFlag = 0x4000
 
 	if TableName != "*":
-		SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
-		Learnable = GetLearnablePriestSpells (ClassFlag, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT), 1)
-		for i in range(len(Learnable) ):
-			GemRB.LearnSpell (MyChar, Learnable[i], IE_SPELL_TYPE_PRIEST)
+		#figure out which class casts spells and use the level of the class
+		#to setup the priest spells
+		Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), \
+				GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
+				GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
+		index = 0
+		IsMulti = IsMultiClassed (MyChar, 1)
+		if IsMulti[0]>1:
+			#loop through each multiclass until we come across the class that gives
+			#divine spells; because clerics have a lower id than rangers, they should
+			#be looked at first in Cleric/Ranger multi's, which is correct
+			foundindex = 0
+			for i in range (IsMulti[0]):
+				ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, IsMulti[i+1]) )
+				for table in "CLERICSPELL", "DRUIDSPELL":
+					if ClassSkillsTable.GetValue (ClassName, table) != "*":
+						index = i
+						foundindex = 1
+						break
+				if foundindex:
+					break
 
+		#set our memorizable counts
+		SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, Levels[index])
+
+		#learn all our priest spells up to the level we can learn
+		for level in range (7):
+			if GemRB.GetMemorizableSpellsCount (MyChar, IE_SPELL_TYPE_PRIEST, level, 1) <= 0:
+				LearnPriestSpells (MyChar, level, ClassFlag)
+				break
+	DisplayOverview (6)
 	return

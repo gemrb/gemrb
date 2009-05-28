@@ -22,7 +22,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import GetMageSpells, HasSpell
-from GUICommonWindows import GetKitIndex, KitListTable, ClassSkillsTable
+from GUICommonWindows import *
 
 # storage variables
 pc = 0
@@ -394,75 +394,3 @@ def HasSpecialistSpell ():
 
 	# no luck
 	return 0
-
-# removes all known spells of a type between two inclusive levels
-# type should be IE_SPELL_TYPE_*
-# if noslots is true, then we also set memorizable counts to 0
-# kit is only used to distinguish priest spells for ranger/cleric duals
-# TODO: move this to a better location (GUICommon/GUICommonWindows?)
-def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
-	
-	# choose the correct limit based upon class type
-	if type == IE_SPELL_TYPE_WIZARD:
-		limit = 9
-	elif type == IE_SPELL_TYPE_PRIEST:
-		limit = 7
-
-		# make sure that we get the original kit, if we have one
-		if kit:
-			originalkit = GetKitIndex (pc)
-
-			if originalkit: # kitted; find the class value
-				originalkit = KitListTable.GetValue (originalkit, 7)
-			else: # just get the class value
-				originalkit = GemRB.GetPlayerStat (pc, IE_CLASS)
-
-			# this is is specifically for dual-classes and will not work to remove only one
-			# spell type from a ranger/cleric multi-class
-			if ClassSkillsTable.GetValue (originalkit, 0, 0) != "*": # knows druid spells
-				originalkit = 0x8000
-			elif ClassSkillsTable.GetValue (originalkit, 1, 0) != "*": # knows cleric spells
-				originalkit = 0x4000
-			else: # don't know any other spells
-				originalkit = 0
-
-			# don't know how this would happen, but better to be safe
-			if originalkit == kit:
-				originalkit = 0
-	elif type == IE_SPELL_TYPE_INNATE:
-		limit = 1
-	else: # can't do anything if an improper spell type is sent
-		return -1
-
-	# make sure we're within parameters
-	if level1 < 1 or level2 > limit or level1 > level2:
-		return -1
-
-	# remove all spells for each level
-	for level in range (level1-1, level2):
-		# we need the count because we remove each spell in reverse order
-		count = GemRB.GetKnownSpellsCount (pc, type, level)
-		mod = count-1
-
-		for spell in range (count):
-			# see if we need to check for kit
-			if type == IE_SPELL_TYPE_PRIEST and kit:
-				# get the spells ref data
-				ref = GemRB.GetKnownSpell (pc, type, level, mod-spell)
-				ref = GemRB.GetSpell (ref['SpellResRef'])
-
-				# we have to look at the originalkit as well specifically for ranger/cleric dual-classes
-				# we wouldn't want to remove all cleric spells and druid spells if we lost our cleric class
-				# only the cleric ones
-				if kit&ref['SpellDivine'] or (originalkit and not originalkit&ref['SpellDivine']):
-					continue
-
-			# remove the spell
-			GemRB.RemoveSpell (pc, type, level, mod-spell)
-
-		# remove memorization counts if disired
-		if noslots:
-			GemRB.SetMemorizableSpellsCount (pc, 0, type, level)
-
-	# return success
-	return 1

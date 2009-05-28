@@ -544,19 +544,3 @@ def DCSkillsDonePress ():
 		DCSkillsWindow.Unload ()
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 	return
-
-# learn all the priest spells up to a given spell level
-# mask is 0x4000 = cleric and 0x8000 = druid
-# level 1 is 1st level spells
-def LearnPriestSpells (pc, level, mask):
-	if level > 7: # make sure we don't have too high a level
-		level = 7
-
-	# go through each level
-	for i in range (level):
-		learnable = GetLearnablePriestSpells (mask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
-
-		for spell in learnable:
-			# if the spell isn't learned, learn it
-			if HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, spell) < 0:
-				GemRB.LearnSpell (pc, spell)
