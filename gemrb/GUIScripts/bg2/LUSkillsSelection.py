@@ -213,6 +213,8 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	#we didn't find anything, so don't continue (will show as a return of 0)
 	#or don't display if we aren't leveling and have a bard/ranger
 	if not len (SkillsIndices) or (not SkillPointsLeft and type != LUSKILLS_TYPE_LEVELUP):
+		SkillSumLabel = SkillsWindow.GetControl(0x10000000+SkillsOffsetSum)
+		SkillSumLabel.SetText("")
 		return
 	
 	#skills scrollbar
