@@ -735,9 +735,8 @@ def SelectionChanged ():
 def PortraitButtonOnMouseEnter ():
 	global DraggedPortrait
 
+	i = GemRB.GetVar ("PressedPortrait")
 	if GemRB.IsDraggingItem()==2:
-		i = GemRB.GetVar ("PressedPortrait")
-
 		if DraggedPortrait != None:
 			GemRB.SwapPCs (DraggedPortrait, i)
 			GemRB.SetVar ("PressedPortrait", DraggedPortrait)
