@@ -29,21 +29,14 @@ from GUICommonWindows import *
 from LUSpellSelection import *
 from LUHLASelection import *
 from LUProfsSelection import *
+from LUSkillsSelection import *
 
 LevelUpWindow = None
-TopIndex = 0
-SkillTopIndex = 0
 DoneButton = 0
 TextAreaControl = 0
-ScrollBarControl = 0
-SkillTable = 0
 InfoCounter = 1
 NewProfPoints = 0
-SkillPointsLeft = 0
 NewSkillPoints = 0
-ClickCount = 0
-OldDirection = 0
-OldPos = 0
 LevelDiff = 0
 Level = 0
 Classes = 0
@@ -55,8 +48,6 @@ IsMulti = 0
 pc = 0
 ClassName = 0
 RaceTable = 0
-AvailableSkillIndices = []
-SpecialSkillsMap = []
 
 # old values (so we don't add too much)
 OldHP = 0		# << old current hitpoints
@@ -73,12 +64,11 @@ DeltaWSpells = 0	# << total new wizard spells
 
 def OpenLevelUpWindow():
 	global LevelUpWindow, TextAreaControl, NewProfPoints
-	global TopIndex, ScrollBarControl, DoneButton
-	global SkillTable, SkillPointsLeft, NewSkillPoints, KitName, LevelDiff, RaceTable
+	global DoneButton
+	global NewSkillPoints, KitName, LevelDiff, RaceTable
 	global ClassTable, Level, Classes, NumClasses, DualSwap, ClassSkillsTable, IsMulti
 	global OldHP, OldHPMax, OldSaves, OldLore, OldThaco, DeltaDSpells, DeltaWSpells
 	global NewDSpells, NewWSpells, OldDSpells, OldWSpells, pc, HLACount, ClassName, IsDual
-	global AvailableSkillIndices, SpecialSkillsMap
 
 	LevelUpWindow = GemRB.LoadWindowObject (3)
 
@@ -124,10 +114,8 @@ def OpenLevelUpWindow():
 	# need this for checking gnomes
 	RaceTable = GemRB.LoadTableObject ("races")
 	RaceName = GemRB.GetPlayerStat (pc, IE_RACE, 1)
-	print "IE_RACE:",RaceName
 	RaceName = RaceTable.FindValue (3, RaceName)
 	RaceName = RaceTable.GetRowName (RaceName)
-	print "Race:",RaceName
 
 	# figure our our proficiency table and index
 	if Kit == 0:
@@ -188,7 +176,6 @@ def OpenLevelUpWindow():
 			Level[1] = GemRB.GetPlayerStat (pc, IE_LEVEL2)
 
 	hp = 0
-	SkillIndex = -1
 	HaveCleric = 0
 	DeltaWSpells = 0
 	DeltaDSpells = 0
@@ -280,10 +267,6 @@ def OpenLevelUpWindow():
 					OldDSpells[j] = DruidTable.GetValue (str(StartLevel), str(j+1), 1)
 				DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
 
-		# see if we have a thief (or monk)
-		if (ClassSkillsTable.GetValue (Classes[i], 5, 0) != "*"):
-			SkillIndex = i
-
 		# setup class bonuses for this class
 		if IsMulti or IsDual or Kit == 0:
 			ABTable = ClassSkillsTable.GetValue (TmpName, "ABILITIES")
@@ -299,49 +282,6 @@ def OpenLevelUpWindow():
 		GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, OldHPMax + hp)
 		GemRB.SetPlayerStat (pc, IE_HITPOINTS, OldHP + hp)
 	
-	# setup the indices/count of usable skills
-	AvailableSkillIndices = []
-	for i in range(SkillTable.GetRowCount()-2):
-		SkillName = SkillTable.GetRowName (i+2)
-		if SkillTable.GetValue (SkillName, KitName) != -1:
-			AvailableSkillIndices.append(i)
-
-	# see if we got a thief (or monk)
-	if SkillIndex > -1:
-		# KitName should be fine as all multis are in classes.2da
-		# also allows for thief kits
-		SkillPointsLeft = LevelDiff[SkillIndex] * SkillTable.GetValue("RATE", KitName)
-		if SkillPointsLeft < 0:
-			# really don't have an entry
-			SkillPointsLeft = 0
-		else:
-			# get the skill values
-			for i in range(SkillTable.GetRowCount()-2):
-				SkillID = SkillTable.GetValue (i+2, 2)
-				SkillValue = GemRB.GetPlayerStat (pc, SkillID, 1)
-				GemRB.SetVar("Skill "+str(i), SkillValue)
-				GemRB.SetVar("SkillBase "+str(i), SkillValue)
-
-	NewSkillPoints = SkillPointsLeft
-	
-	# get ranger and bard skill upgrades (automatic)
-	SpecialSkillsMap = []
-	for i in range(len(Classes)):
-		classname = ClassTable.GetRowName (ClassTable.FindValue (5, Classes[i]))
-		for table in "RANGERSKILL", "BARDSKILL":
-			SpecialSkillsTable = ClassSkillsTable.GetValue (classname, table)
-			if SpecialSkillsTable != "*":
-				SpecialSkillsMap.append((SpecialSkillsTable, i))
-				break
-	for skills in SpecialSkillsMap:
-		SpecialSkillsTable = GemRB.LoadTableObject (skills[0])
-		for skill in range(SpecialSkillsTable.GetColumnCount ()):
-			skillname = SpecialSkillsTable.GetColumnName (skill)
-			value = SpecialSkillsTable.GetValue (str(Level[skills[1]]), skillname)
-			skillindex = SkillTable.GetRowIndex (skillname) - 2
-			GemRB.SetVar ("Skill " + str(skillindex), value)
-			AvailableSkillIndices.append(skillindex)
-
 	# use total levels for HLAs
 	HLACount = 0
 	if HasTOB(): # make sure SoA doesn't try to get it
@@ -379,33 +319,6 @@ def OpenLevelUpWindow():
 	else:
 		HLAButton.SetFlags (IE_GUI_BUTTON_DISABLED, OP_OR)
 
-	# skills scrollbar
-	if len(AvailableSkillIndices) > 4:
-		GemRB.SetVar ("SkillTopIndex", 0)
-		ScrollBarControl = LevelUpWindow.GetControl (109)
-		ScrollBarControl.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "SkillScrollBarPress")
-		# decrease it with the number of controls on screen (list size) and two unrelated rows
-		ScrollBarControl.SetVarAssoc ("SkillTopIndex", SkillTable.GetRowCount()-3-2)
-	else:
-		if len(AvailableSkillIndices):
-			# autoscroll to the first valid skill; luckily all three monk ones are adjacent
-			GemRB.SetVar ("SkillTopIndex", AvailableSkillIndices[0])
-
-	for i in range(len(AvailableSkillIndices)):
-		if i == 4:
-			break
-		Button = LevelUpWindow.GetControl(i+120)
-		Button.SetVarAssoc("Skill",AvailableSkillIndices[i])
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SkillJustPress")
-
-		Button = LevelUpWindow.GetControl(i*2+17)
-		Button.SetVarAssoc("Skill",AvailableSkillIndices[i])
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SkillLeftPress")
-
-		Button = LevelUpWindow.GetControl(i*2+18)
-		Button.SetVarAssoc("Skill",AvailableSkillIndices[i])
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SkillRightPress")
-
 	# setup our profs
 	Level1 = []
 	for i in range (len (Level)):
@@ -413,10 +326,15 @@ def OpenLevelUpWindow():
 	SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
 	NewProfPoints = GemRB.GetVar ("ProfsPointsLeft")
 
+	#we autohide the skills and let SetupSkillsWindow show them if needbe
+	for i in range (4):
+		HideSkills (i)
+	SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
+	NewSkillPoints = GemRB.GetVar ("SkillPointsLeft")
+
 	TextAreaControl = LevelUpWindow.GetControl(110)
 	TextAreaControl.SetText(GetLevelUpNews())
 
-	TopIndex = 0
 	RedrawSkills()
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	LevelUpWindow.ShowModal (MODAL_SHADOW_GRAY)
@@ -440,9 +358,7 @@ def HideSkills(i):
 	Label.SetText("")
 
 def RedrawSkills(direction=0):
-	global TopIndex, ScrollBarControl, DoneButton, LevelUpWindow
-	global SkillPointsLeft, SkillTable, NewSkillPoints, AvailableSkillIndices
-	global ClickCount, OldDirection, HLACount
+	global DoneButton, LevelUpWindow, HLACount
 
 	# we need to disable the HLA button if we don't have any HLAs left
 	HLACount = GemRB.GetVar ("HLACount")
@@ -454,61 +370,11 @@ def RedrawSkills(direction=0):
 	# enable the done button if they've allocated all points
 	# sorcerer spell selection (if applicable) comes after hitting the done button
 	ProfPointsLeft = GemRB.GetVar ("ProfsPointsLeft")
+	SkillPointsLeft = GemRB.GetVar ("SkillPointsLeft")
 	if ProfPointsLeft == 0 and SkillPointsLeft == 0 and HLACount == 0:
 		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-
-	# skill part of the window
-	SkillSumLabel = LevelUpWindow.GetControl(0x10000000+37)
-	if NewSkillPoints == 0 and not SpecialSkillsMap:
-		SkillSumLabel.SetText("")
-		for i in range(4):
-			HideSkills(i)
-	else:
-		SkillSumLabel.SetText(str(SkillPointsLeft))
-		for i in range(4):
-			if len(AvailableSkillIndices) <= i:
-				HideSkills(i)
-				continue
-			Pos = AvailableSkillIndices[SkillTopIndex+i]
-			SkillName = SkillTable.GetValue (Pos+2, 1)
-			Label = LevelUpWindow.GetControl (0x10000000+32+i)
-			Label.SetText (SkillName)
-
-			SkillName = SkillTable.GetRowName (Pos+2)
-			if SpecialSkillsMap:
-				Ok = -1
-			else:
-				Ok = SkillTable.GetValue (SkillName, KitName)
-			Button1 = LevelUpWindow.GetControl(i*2+17)
-			Button2 = LevelUpWindow.GetControl(i*2+18)
-			if Ok == -1:
-				Button1.SetState(IE_GUI_BUTTON_DISABLED)
-				Button2.SetState(IE_GUI_BUTTON_DISABLED)
-				Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-				Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			else:
-				Button1.SetState(IE_GUI_BUTTON_ENABLED)
-				Button2.SetState(IE_GUI_BUTTON_ENABLED)
-				Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-				Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-			
-			Label = LevelUpWindow.GetControl(0x10000000+43+i)
-			ActPoint = GemRB.GetVar("Skill "+str(Pos) )
-			Label.SetText(str(ActPoint))
-
-	if direction:
-		if OldDirection == direction:
-			ClickCount = ClickCount + 1
-			if ClickCount>10:
-				GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_OR)
-			return
-
-	OldDirection = direction
-	ClickCount = 0
-	GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_NAND)
-
 	return
 
 # TODO: constructs a string with the gains that the new levels bring
@@ -679,11 +545,8 @@ def LevelUpDonePress():
 	ProfsSave (pc)
 
 	# skills
-	for i in range(SkillTable.GetRowCount()-2):
-		SkillName = SkillTable.GetValue (i+2, 2)
-		SkillValue = GemRB.GetVar ("Skill "+str(i))
-		GemRB.SetPlayerStat (pc, SkillName, SkillValue )
-	
+	SkillsSave (pc)
+
 	# level
 	if DualSwap: # swap the IE_LEVELs around if a backward dual
 		GemRB.SetPlayerStat (pc, IE_LEVEL2, Level[0])
@@ -753,55 +616,6 @@ def GetNextLevelFromExp (XP, Class):
 			return i
 	# fix hacked characters that have more xp than the xp cap
 	return 40
-
-def SkillJustPress():
-	Pos = GemRB.GetVar("Skill")+SkillTopIndex
-	TextAreaControl.SetText(SkillTable.GetValue(Pos+2,0) )
-	return
-
-def SkillRightPress():
-	global SkillPointsLeft, ClickCount, OldPos
-
-	Pos = GemRB.GetVar("Skill")+SkillTopIndex
-	TextAreaControl.SetText(SkillTable.GetValue(Pos+2,0) )
-	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
-	BasePoint = GemRB.GetVar("SkillBase "+str(Pos) )
-	if ActPoint <= 0 or ActPoint == BasePoint:
-		return
-	GemRB.SetVar("Skill "+str(Pos),ActPoint-1)
-	SkillPointsLeft = SkillPointsLeft + 1
-	if OldPos != Pos:
-		OldPos = Pos
-		ClickCount = 0
-
-	RedrawSkills(2)
-	return
-
-def SkillLeftPress():
-	global SkillPointsLeft, ClickCount, OldPos
-
-	Pos = GemRB.GetVar("Skill")+SkillTopIndex
-	TextAreaControl.SetText(SkillTable.GetValue(Pos+2,0) )
-	if SkillPointsLeft == 0:
-		return
-	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
-	if ActPoint >= 200:
-		return
-	GemRB.SetVar("Skill "+str(Pos), ActPoint+1)
-	SkillPointsLeft = SkillPointsLeft - 1
-	if OldPos != Pos:
-		OldPos = Pos
-		ClickCount = 0
-
-	RedrawSkills(1)
-	return
-
-def SkillScrollBarPress():
-	global SkillTopIndex
-
-	SkillTopIndex = GemRB.GetVar("SkillTopIndex")
-	RedrawSkills()
-	return
 
 # regains all the benifits of the former class
 def ReactivateBaseClass ():

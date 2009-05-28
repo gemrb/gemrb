@@ -26,14 +26,15 @@ from GUIREC import UpdateRecordsWindow
 from GUICommonWindows import *
 from LUSpellSelection import *
 from LUProfsSelection import *
+from LUSkillsSelection import *
 
 #######################
 pc = 0
 OldClassName = 0
 ClassName = 0
 NewMageSpells = 0
-NewThiefSkills = 0
 NewPriestMask = 0
+NewClassId = 0
 #######################
 DCMainWindow = 0
 DCMainClassButton = 0
@@ -51,18 +52,11 @@ DCProfsDoneButton = 0
 #######################
 DCSkillsWindow = 0
 DCSkillsDoneButton = 0
-DCSkillsLeft = 0
-DCSkillsRowCount = 0
-DCSkillsTable = 0
-DCSkillsIndices = []
-OldPos = 0
-OldDirection = 0
-ClickCount = 0
 #######################
 
 # open the dual class window
 def DualClassWindow ():
-	global pc, OldClassName, ClassTable, NewMageSpells, NewThiefSkills, NewPriestMask, DCSkillsIndices
+	global pc, OldClassName, NewMageSpells, NewPriestMask, NewClassId
 	global DCMainWindow, DCMainClassButton, DCMainDoneButton, DCMainSkillsButton, DCMainStep
 
 	# get our basic globals
@@ -72,8 +66,7 @@ def DualClassWindow ():
 	# make sure to nullify old values
 	NewPriestMask = 0
 	NewMageSpells = 0
-	NewThiefSkills = 0
-	DCSkillsIndices = []
+	NewClassId = 0
 	
 	# set up our main window
 	DCMainWindow = GemRB.LoadWindowObject (5)
@@ -172,12 +165,9 @@ def DCMainDonePress ():
 		GemRB.SetMemorizableSpellsCount (pc, 1, IE_SPELL_TYPE_PRIEST, 0)
 
 	# save our thief skills if we have them
-	for skill in DCSkillsIndices:
-		SkillID = DCSkillsTable.GetValue (skill+2, 2)
-		GemRB.SetPlayerStat (pc, SkillID, GemRB.GetVar ("Skill "+str(skill)))
+	SkillsSave (pc)
 
 	# save our new class and say was multi
-	NewClassId = ClassTable.GetValue (ClassName, "ID", 1)
 	OldClassId = GemRB.GetPlayerStat (pc, IE_CLASS)
 	OldClassIndex = ClassTable.FindValue (5, OldClassId)
 	MultClassId = (1 << (NewClassId-1)) | (1 << (OldClassId-1))
@@ -225,7 +215,7 @@ def DCMainCancelPress ():
 
 # goes to the previous step
 def DCMainBackPress ():
-	global DCMainStep, DCClass, NewMageSpells, DCSkillsIndices, NewThiefSkills
+	global DCMainStep, DCClass, NewMageSpells
 	global NewPriestMask
 
 	if DCMainStep == 2: # class selected, wait to choose skills
@@ -243,14 +233,10 @@ def DCMainBackPress ():
 		# un-learn our spells and skills
 		if NewMageSpells:
 			RemoveKnownSpells (pc, IE_SPELL_TYPE_WIZARD, 1,1, 1)
-			NewMageSpells = 0
-		if NewThiefSkills:
-			for skill in DCSkillsIndices:
-				GemRB.SetVar ("Skill "+str(skill), 0)
-			DCSkillsIndices = []
-			NewThiefSkills = 0
 
+		SkillsNullify ()
 		NewPriestMask = 0
+		NewMageSpells = 0
 
 		# go back a step
 		DCMainStep = 2
@@ -346,7 +332,7 @@ def DCClassSelect ():
 
 # used when a class is selected by pressing the done button
 def DCClassDonePress ():
-	global DCMainStep, ClassName
+	global DCMainStep, ClassName, NewClassId
 
 	# unload our class selection window
 	if DCClassWindow:
@@ -358,6 +344,7 @@ def DCClassDonePress ():
 
 	# save the class
 	ClassName = DCClasses[DCClass]
+	NewClassId = ClassTable.GetValue (ClassName, "ID", 1)
 
 	# set our step to 2 so that the back button knows where we are
 	DCMainStep = 2
@@ -454,11 +441,10 @@ def DCProfsRedraw ():
 
 # goes to the next scripts (mage or thief)
 def DCProfsDonePress ():
-	global NewMageSpells, NewThiefSkills, NewPriestMask
+	global NewMageSpells, NewPriestMask
 
 	# check for mage spells and thief skills
 	SpellTable = ClassSkillsTable.GetValue (ClassName, "MAGESPELL")
-	ThiefTable = ClassSkillsTable.GetValue (ClassName, "THIEFSKILL")
 	ClericTable = ClassSkillsTable.GetValue (ClassName, "CLERICSPELL")
 	DruidTable = ClassSkillsTable.GetValue (ClassName, "DRUIDSPELL")
 	if SpellTable != "*":
@@ -468,10 +454,6 @@ def DCProfsDonePress ():
 		SpellTable = GemRB.LoadTableObject (SpellTable)
 		GemRB.SetMemorizableSpellsCount (pc, SpellTable.GetValue (0, 0), IE_SPELL_TYPE_WIZARD, 0)
 		NewMageSpells = 1
-	if ThiefTable != "*":
-		# open the thieves selection window
-		OpenSkillsWindow ()
-		NewThiefSkills = 1
 	if ClericTable != "*":
 		print "Setting PriestMask"
 		# make sure we can cast spells at this level (paladins)
@@ -486,6 +468,9 @@ def DCProfsDonePress ():
 				NewPriestMask = 0x8000
 		else:
 			NewPriestMask = 0x8000
+
+	# open the thieves selection window
+	OpenSkillsWindow ()
 
 	# we can be done now
 	DCMainDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -506,65 +491,14 @@ def DCProfsCancelPress ():
 
 # open the window to select thief skills
 def OpenSkillsWindow ():
-	global DCSkillsWindow, DCSkillsLeft, DCSkillsDoneButton, DCSkillsTable
-	global DCSkillsIndices, DCSkillRowCount
-
-	# get some required values
-	DCSkillsTable = GemRB.LoadTableObject ("skills")
-	SkillRacTable = GemRB.LoadTableObject ("SKILLRAC")
-	RaceTable = GemRB.LoadTableObject ("RACES")
-	Race = RaceTable.FindValue (3, GemRB.GetPlayerStat (pc, IE_RACE))
-	Race = RaceTable.GetRowName (Race)
-	DCSkillsRowCount = DCSkillsTable.GetRowCount ()-2
-
-	# setup our starting points
-	for i in range (DCSkillsRowCount):
-		SkillName = DCSkillsTable.GetRowName (i+2)
-		SkillID = DCSkillsTable.GetValue (i+2, 2)
-		
-		# we need to add the racial bonuses to the starting value
-		if DCSkillsTable.GetValue (SkillName, ClassName) == 1:
-			value = SkillRacTable.GetValue (Race, SkillName)
-			DCSkillsIndices.append(i)
-			GemRB.SetVar ("Skill "+str(i), value)
-			GemRB.SetVar ("SkillBase "+str(i), value)
-
-	# figure out how many points we have left
-	DCSkillsLeft = DCSkillsTable.GetValue ("FIRST_LEVEL", ClassName)
+	global DCSkillsWindow, DCSkillsDoneButton
 
 	DCSkillsWindow = GemRB.LoadWindowObject (7)
+	SetupSkillsWindow (pc, LUSKILLS_TYPE_DUALCLASS, DCSkillsWindow, DCSkillsRedraw, classid=NewClassId)
 
-	# setup our scrollbar if needed
-	if len(DCSkillsIndices) > 4:
-		GemRB.SetVar("SkillsTopIndex", 0)
-		ScrollBar = DCSkillsWindow.GetControl(26)
-		ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "DCSkillsRedraw")
-		#decrease it with the number of controls on screen (list size)
-		ScrollBar.SetVarAssoc("SkillsTopIndex", DCSkillsRowCount-3)
-		ScrollBar.SetDefaultScrollBar ()
-	else:
-		if len(DCSkillsIndices):
-			# autoscroll to the first valid skill; luckily all three monk ones are adjacent
-			# NOTE: leaving this here in case dualing to monks is enabled for some reason
-			GemRB.SetVar("SkillTopIndex", DCSkillsIndices[0])
-
-	# setup the skills buttons
-	for i in range(len(DCSkillsIndices)):
-		# we have only 4 controls
-		if i == 4:
-			break
-
-		Button = DCSkillsWindow.GetControl(i+5)
-		Button.SetVarAssoc("Skill",DCSkillsIndices[i])
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DCSkillsJustPress")
-
-		Button = DCSkillsWindow.GetControl(i*2+14)
-		Button.SetVarAssoc("Skill",DCSkillsIndices[i])
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DCSkillsLeftPress")
-
-		Button = DCSkillsWindow.GetControl(i*2+15)
-		Button.SetVarAssoc("Skill",DCSkillsIndices[i])
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DCSkillsRightPress")
+	#just go back if we can't assign skills
+	if GemRB.GetVar ("SkillPointsLeft") <= 0:
+		return
 
 	# setup the back and done buttons
 	BackButton = DCSkillsWindow.GetControl(24)
@@ -575,7 +509,7 @@ def OpenSkillsWindow ():
 	DCSkillsDoneButton = DCSkillsWindow.GetControl(25)
 	DCSkillsDoneButton.SetText(11973)
 	DCSkillsDoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
-	DCSkillsDoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"DCSkillsDonePress")
+	DCSkillsDoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DCSkillsDonePress")
 	DCSkillsDoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	# setup the default text area
@@ -588,143 +522,20 @@ def OpenSkillsWindow ():
 	return
 
 # updates the window
-def DCSkillsRedraw (direction=0):
-	global OldDirection, ClickCount
-
-	SkillsTopIndex = GemRB.GetVar ("SkillsTopIndex")
-
+def DCSkillsRedraw ():
 	# no points left? we can be done! :)
-	if DCSkillsLeft == 0:
+	DCSkillsLeft = GemRB.GetVar ("SkillPointsLeft")
+	if DCSkillsLeft <= 0:
 		DCSkillsDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-
-	# update the points left label
-	SumLabel = DCSkillsWindow.GetControl (0x10000008)
-	SumLabel.SetText (str(DCSkillsLeft))
-
-	# update each of the skills
-	for i in range (4):
-		# show nothing if we can only get less than 4 skills
-		if len (DCSkillsIndices) <= i:
-			Label = DCSkillsWindow.GetControl (0x1000000+i)
-			Label.SetText ("")
-			Button1 = DCSkillsWindow.GetControl (i*2+14)
-			Button1.SetState (IE_GUI_BUTTON_DISABLED)
-			Button1.SetFlags (IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			Button2 = DCSkillsWindow.GetControl (i*2+15)
-			Button2.SetState (IE_GUI_BUTTON_DISABLED)
-			Button2.SetFlags (IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			Label = DCSkillsWindow.GetControl (0x10000009+i)
-			Label.SetText ("")
-			continue
-
-		# show the skill name
-		Pos = DCSkillsIndices[SkillsTopIndex+i]
-		SkillName = DCSkillsTable.GetValue (Pos+2,1)
-		Label = DCSkillsWindow.GetControl (0x10000000+i)
-		Label.SetText (SkillName)
-
-		# enable or disable our buttons as appropriate
-		SkillName = DCSkillsTable.GetRowName (Pos+2)
-		Button1 = DCSkillsWindow.GetControl (i*2+14)
-		Button2 = DCSkillsWindow.GetControl (i*2+15)
-		if DCSkillsTable.GetValue (SkillName, ClassName) == -1:
-			Button1.SetState (IE_GUI_BUTTON_DISABLED)
-			Button2.SetState (IE_GUI_BUTTON_DISABLED)
-			Button1.SetFlags (IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			Button2.SetFlags (IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-		else: # can learn
-			Button1.SetState (IE_GUI_BUTTON_ENABLED)
-			Button2.SetState (IE_GUI_BUTTON_ENABLED)
-			Button1.SetFlags (IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-			Button2.SetFlags (IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-
-		# update the points label
-		Label = DCSkillsWindow.GetControl (0x10000009+i)
-		ActPoint = GemRB.GetVar ("Skill "+str(Pos))
-		Label.SetText (str(ActPoint))
-
-	# go double-speed if we have enough clicks
-	if direction:
-		if OldDirection == direction:
-			ClickCount += 1
-			if ClickCount>10:
-				GemRB.SetRepeatClickFlags (GEM_RK_DOUBLESPEED, OP_OR)
-				return
-
-	OldDirection = direction
-	ClickCount = 0
-	GemRB.SetRepeatClickFlags (GEM_RK_DOUBLESPEED, OP_NAND)
-	return
-
-# gives info about the skill
-def DCSkillsJustPress():
-	SkillsTopIndex = GemRB.GetVar ("SkillsTopIndex")
-	Pos = GemRB.GetVar ("Skill")+SkillsTopIndex
-	TextArea = DCSkillsWindow.GetControl (22)
-	TextArea.SetText (DCSkillsTable.GetValue (Pos+2,0))
-	return
-
-# decreases the skill
-def DCSkillsRightPress():
-	global DCSkillsLeft, ClickCount, OldPos
-
-	# get the points
-	SkillsTopIndex = GemRB.GetVar ("SkillsTopIndex")
-	Pos = GemRB.GetVar ("Skill")+SkillsTopIndex
-	ActPoint = GemRB.GetVar ("Skill "+str(Pos))
-	BasePoint = GemRB.GetVar ("SkillBase "+str(Pos))
-
-	# make sure we can take the point away
-	if ActPoint <= 0 or ActPoint == BasePoint:
-		return
-	
-	# decrease the skill and increase the overall points left
-	GemRB.SetVar("Skill "+str(Pos),ActPoint-1)
-	DCSkillsLeft += 1
-
-	# update the pos for double-speed
-	if OldPos != Pos:
-		OldPos = Pos
-		ClickCount = 0
-
-	DCSkillsJustPress ()
-	DCSkillsRedraw (1)
-	return
-
-def DCSkillsLeftPress():
-	global DCSkillsLeft, ClickCount, OldPos
-
-	# make sure we can allocate points to the skill
-	SkillsTopIndex = GemRB.GetVar ("SkillsTopIndex")
-	Pos = GemRB.GetVar ("Skill")+SkillsTopIndex
-	if DCSkillsLeft == 0:
-		return
-	ActPoint = GemRB.GetVar ("Skill "+str(Pos))
-	if ActPoint >= 200:
-		return
-
-	# increase the skill and decrease the overall points left
-	GemRB.SetVar ("Skill "+str(Pos), ActPoint+1)
-	DCSkillsLeft -= 1
-
-	# update double-speed
-	if OldPos != Pos:
-		OldPos = Pos
-		ClickCount = 0
-
-	DCSkillsJustPress ()
-	DCSkillsRedraw (2)
-	return
+	else:
+		DCSkillsDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 # undoes all changes so far
 def DCSkillsBackPress ():
 	if DCSkillsWindow:
 		DCSkillsWindow.Unload ()
-	for i in range(DCSkillsRowCount):
-		GemRB.SetVar ("Skill "+str(i), 0)
-		GemRB.SetVar ("SkillBase "+str(i), 0)
+	NullifyPoints ()
 	DCMainBackPress ()
-	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 	return
 
 # closes the skills window

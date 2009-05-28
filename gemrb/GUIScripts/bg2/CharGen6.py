@@ -20,25 +20,20 @@
 # character generation - ability; next skills/profs/spells (CharGen6)
 import GemRB
 from CharGenCommon import *
+from GUICommonWindows import ClassSkillsTable
 from LUSpellSelection import RemoveKnownSpells
+from LUSkillsSelection import *
+from LUProfsSelection import *
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
 
 	# nullify our thieving skills
-	SkillsTable = GemRB.LoadTableObject ("skills")
-	SkillsCount = SkillsTable.GetRowCount () - 2 # first 2 are starting values
-	for i in range (SkillsCount):
-		StatID = SkillsTable.GetValue (i+2, 2)
-		GemRB.SetVar ("Skill "+str(i), 0)
-		GemRB.SetPlayerStat (MyChar, StatID, 0)
+	SkillsNullify ()
+	SkillsSave (MyChar)
 
 	# nullify our proficiencies
-	ProfsTable = GemRB.LoadTableObject ("weapprof")
-	ProfsCount = ProfsTable.GetRowCount () - 8 # we don't want bg1 profs
-	for i in range (ProfsCount):
-		StatID = ProfsTable.GetValue (i+8, 0)
-		GemRB.SetVar ("Prof "+str(i), 0)
+	ProfsNullify ()
 
 	# nully other variables
 	GemRB.SetVar ("HatedRace", 0)
@@ -73,7 +68,6 @@ def OnLoad():
 	RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)
 
 	# learn divine spells if appropriate
-	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 	TableName = ClassSkillsTable.GetValue (Class, 1, 0) # cleric spells
 

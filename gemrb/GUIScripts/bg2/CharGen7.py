@@ -20,6 +20,7 @@
 #character generation - skills/profs/spells; next apearance/sound (CharGen7)
 import GemRB
 from CharGenCommon import *
+from LUSkillsSelection import *
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
@@ -32,32 +33,7 @@ def OnLoad():
 	print "\tHated Race: ",GemRB.GetVar ("HatedRace")
 
 	# save all skills
-	SkillTable = GemRB.LoadTableObject ("skills")
-	SkillCount = SkillTable.GetRowCount () - 2
-	for i in range(SkillCount):
-		StatID = SkillTable.GetValue (i+2, 2)
-		Value = GemRB.GetVar ("Skill "+str(i))
-		GemRB.SetPlayerStat (MyChar, StatID, Value)
-		print "\tSkill ",str(i),": ",Value
-
-	# grant ranger and bard skills
-	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
-	ClassTable = GemRB.LoadTableObject ("classes")
-	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class))
-	RangerSkills = ClassSkillsTable.GetValue (ClassName, "RANGERSKILL")
-	BardSkills = ClassSkillsTable.GetValue (ClassName, "BARDSKILL")
-
-	Level = 1
-	for skills in RangerSkills, BardSkills:
-		if skills == "*":
-			continue
-		SpecialSkillsTable = GemRB.LoadTableObject (skills)
-		for skill in range(SpecialSkillsTable.GetColumnCount ()):
-			skillname = SpecialSkillsTable.GetColumnName(skill)
-			value = SpecialSkillsTable.GetValue (str(Level), skillname)
-			StatID = SkillTable.GetValue (skillname, "ID")
-			GemRB.SetPlayerStat (MyChar, StatID, value)
+	SkillsSave (MyChar)
 
 	DisplayOverview (7)
 
