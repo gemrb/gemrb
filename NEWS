@@ -1,9 +1,12 @@
-GemRB svn (6100):
+GemRB svn (6182):
   New features:
     - 
+    - bg2 chargen now levels to the correct level
+    - running and portal animations in pst
 
   Improved features:
     - 
+    - levelup, dual classing
     - various guiscripts
     - bugfixes
 
