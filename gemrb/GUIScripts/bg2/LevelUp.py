@@ -291,9 +291,9 @@ def OpenLevelUpWindow():
 			print "HLA Class:",ClassName
 			FirstLevel = HLATable.GetValue (ClassName, "FIRST_LEVEL", 1)
 			if FirstLevel <= Level[0]:
-				if (Level[0] - LevelDiff[0]) < FirstLevel:
+				if (Level[0] - LevelDiff[0] + 1) < FirstLevel:
 					# count only from FirstLevel up
-					HLACount = (LevelDiff[0] - FirstLevel) / HLATable.GetValue (ClassName, "RATE", 1)
+					HLACount = (Level[0] - FirstLevel) / HLATable.GetValue (ClassName, "RATE", 1)
 				else:
 					HLACount = LevelDiff[0] / HLATable.GetValue (ClassName, "RATE", 1)
 
