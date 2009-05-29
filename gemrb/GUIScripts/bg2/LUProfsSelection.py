@@ -158,18 +158,22 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	ProfCount = RowCount-ProfsNumButtons #decrease it with the number of controls
 
 	ProfsAssignable = 0
+	TwoWeapIndex = ProfsTable.GetRowIndex ("2WEAPON")
 	for i in range(RowCount):
 		ProfName = ProfsTable.GetValue (i+8, 1)
 		#decrease it with the number of invalid proficiencies
 		if ProfName > 0x1000000 or ProfName < 0:
 			ProfCount -= 1
 
-		#we only need the low 3 bits for profeciencies unless we're dualing, then
-		#we just want to set them all to 0
+		#we only need the low 3 bits for profeciencies on levelup; otherwise
+		#we just set them all to 0
 		currentprof = 0
-		if type != LUPROFS_TYPE_DUALCLASS:
+		if type == LUPROFS_TYPE_LEVELUP:
 			currentprof = GemRB.GetPlayerStat (pc, ProfsTable.GetValue (i+8, 0))&0x07
 		else:
+			#rangers always get 2 points in 2 weapons style
+			if (i+8) == TwoWeapIndex and "RANGER" in ClassName.split("_"):
+				currentprof = 2
 			GemRB.SetVar ("Prof "+str(i), currentprof)
 			GemRB.SetVar ("ProfBase "+str(i), currentprof)
 
