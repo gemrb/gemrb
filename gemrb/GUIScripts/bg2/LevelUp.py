@@ -287,7 +287,7 @@ def OpenLevelUpWindow():
 				# count only from FirstLevel up
 				HLACount += (Level[i] - FirstLevel + 1)
 			else:
-				HLACount += LevelDiff[0]
+				HLACount += LevelDiff[i]
 			
 		# set values required by the hla level up code
 		HLACount = HLACount / HLATable.GetValue (ClassName, "RATE", 1)
