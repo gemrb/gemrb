@@ -180,7 +180,6 @@ def OpenLevelUpWindow():
 	for i in range(NumClasses):
 		print "Class:",Classes[i]
 		# we don't care about the current level, but about the to-be-achieved one
-		# TODO: check MC (should be working) and DC (iffy) functionality
 		# get the next level
 		Level[i] = GetNextLevelFromExp (GemRB.GetPlayerStat (pc, IE_XP)/NumClasses, Classes[i])
 		TmpIndex = ClassTable.FindValue (5, Classes[i])
@@ -212,7 +211,7 @@ def OpenLevelUpWindow():
 		if MageTable != "*":
 			# we get 1 extra spell per level if we're a specialist
 			Specialist = 0
-			if KitListTable.GetValue (Kit, 7) == 1: # see if we're a kitted mage (TODO: make gnomes ALWAYS be kitted, even multis)
+			if KitListTable.GetValue (Kit, 7) == 1: # see if we're a kitted mage
 				Specialist = 1
 			MageTable = GemRB.LoadTableObject (MageTable)
 			# loop through each spell level and save the amount possible to cast (current)
@@ -268,36 +267,30 @@ def OpenLevelUpWindow():
 	HLACount = 0
 	if HasTOB(): # make sure SoA doesn't try to get it
 		HLATable = GemRB.LoadTableObject("lunumab")
-		if IsMulti:
-			# we need to check each level against a multi value (this is kinda screwy)
-			CanLearnHLAs = 1
-			for i in range (NumClasses):
+		# we need to check each level against a multi value (this is kinda screwy)
+		for i in range (NumClasses):
+			if IsMulti:
 				# get the row name for lookup ex. MULTI2FIGHTER, MULTI3THIEF
 				MultiName = ClassTable.FindValue (5, Classes[i])
 				MultiName = ClassTable.GetRowName (MultiName)
 				MultiName = "MULTI" + str(NumClasses) + MultiName
+			else:
+				MultiName = ClassName
 
-				print "HLA Multiclass:",MultiName
+			# if we can't learn for this class, we can't learn at all
+			FirstLevel = HLATable.GetValue (MultiName, "FIRST_LEVEL", 1)
+			if Level[i] < FirstLevel:
+				HLACount = 0
+				break
 
-				# if we can't learn for this class, we can't learn at all
-				if Level[i] < HLATable.GetValue (MultiName, "FIRST_LEVEL", 1):
-					CanLearnHLAs = 0
-					break
+			if (Level[i] - LevelDiff[i]) < FirstLevel:
+				# count only from FirstLevel up
+				HLACount += (Level[i] - FirstLevel + 1)
+			else:
+				HLACount += LevelDiff[0]
 			
-			# update the HLA count if we can learn them
-			if CanLearnHLAs:
-				HLACount = sum (LevelDiff) / HLATable.GetValue (ClassName, "RATE", 1)
-		else: # dual or single classed
-			print "HLA Class:",ClassName
-			FirstLevel = HLATable.GetValue (ClassName, "FIRST_LEVEL", 1)
-			if FirstLevel <= Level[0]:
-				if (Level[0] - LevelDiff[0] + 1) < FirstLevel:
-					# count only from FirstLevel up
-					HLACount = (Level[0] - FirstLevel) / HLATable.GetValue (ClassName, "RATE", 1)
-				else:
-					HLACount = LevelDiff[0] / HLATable.GetValue (ClassName, "RATE", 1)
-
 		# set values required by the hla level up code
+		HLACount = HLACount / HLATable.GetValue (ClassName, "RATE", 1)
 		GemRB.SetVar ("HLACount", HLACount)
 	HLAButton = LevelUpWindow.GetControl (126)
 	if HLACount:
@@ -364,7 +357,6 @@ def RedrawSkills(direction=0):
 		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	return
 
-# TODO: constructs a string with the gains that the new levels bring
 def GetLevelUpNews():
 	News = GemRB.GetString (5259) + '\n\n'
 
