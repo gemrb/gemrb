@@ -5,7 +5,8 @@ GemRB svn (6182):
     - running and portal animations in pst
 
   Improved features:
-    - 
+    - fixed projectile orientations
+    - disarm trap checks skills
     - levelup, dual classing
     - various guiscripts
     - bugfixes
