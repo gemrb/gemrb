@@ -251,6 +251,8 @@ bool KeyImp::HasResource(const char* resname, SClass_ID type, bool silent)
 
 DataStream* KeyImp::GetResource(const char* resname, SClass_ID type, bool silent)
 {
+	if (!strcmp(resname, "")) return NULL;
+
 	char path[_MAX_PATH];
 	char BasePath[_MAX_PATH] = {
 		0
