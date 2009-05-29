@@ -233,9 +233,13 @@ def OpenLevelUpWindow():
 				NewDSpells[j] = ClericTable.GetValue (str(Level[i]), str(j+1), 1)
 				OldDSpells[j] = ClericTable.GetValue (str(StartLevel), str(j+1), 1)
 			DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
-		elif DruidTable != "*" and GemRB.HasResource (DruidTable, RES_2DA):
+		elif DruidTable != "*":
 			# clerics have precedence in multis (ranger/cleric)
 			if HaveCleric == 0:
+				#use MXSPLPRS if we can't find the resource (SoA fix)
+				if not GemRB.HasResource (DruidTable, RES_2DA):
+					DruidTable = "MXSPLPRS"
+
 				# check druid spells
 				DruidTable = GemRB.LoadTableObject (DruidTable)
 				# same as above
