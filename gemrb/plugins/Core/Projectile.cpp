@@ -39,7 +39,7 @@ extern HANDLE hConsole;
 #define PALSIZE 32
 
 static const ieByte SixteenToNine[MAX_ORIENT]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
-static const ieByte SixteenToFive[MAX_ORIENT]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
+static const ieByte SixteenToFive[MAX_ORIENT]={0,1,2,3,4,3,2,1,0,1,2,3,4,3,2,1};
 
 Projectile::Projectile()
 {
@@ -122,8 +122,8 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 	//reporting bigger face count than possible by the animation
 	int Max = af->GetCycleCount();
 	if (Aim>Max) Aim=Max;
-	bool mirror = false;
 	for (int Cycle = 0; Cycle<MAX_ORIENT; Cycle++) {
+		bool mirror = false, mirrorvert = false;
 		int c;
 		switch(Aim) {
 		default:
@@ -131,7 +131,20 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 			break;
 		case 5:
 			c = SixteenToFive[Cycle];
-			if (Cycle>9) mirror=true;
+			// orientations go counter-clockwise, starting south
+			if (Cycle <= 4) {
+				// bottom-right quadrant
+				mirror = false; mirrorvert = false;
+			} else if (Cycle <= 8) {
+				// top-right quadrant
+				mirror = false; mirrorvert = true;
+			} else if (Cycle < 12) {
+				// top-left quadrant
+				mirror = true; mirrorvert = true;
+			} else {
+				// bottom-left quadrant
+				mirror = true; mirrorvert = false;
+			}
 			break;
 		case 9:
 			c = SixteenToNine[Cycle];
@@ -142,11 +155,16 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 			break;
 		}
 		Animation* a = af->GetCycle( c );
-		if (a && mirror) {
+		anims[Cycle] = a;
+		if (!a) continue;
+
+		if (mirror) {
 			a->MirrorAnimation();
 		}
+		if (mirrorvert) {
+			a->MirrorAnimationVert();
+		}
 		a->gameAnimation = true;
-		anims[Cycle] = a;
 	}
 }
 
