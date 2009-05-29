@@ -289,8 +289,13 @@ def OpenLevelUpWindow():
 				HLACount = sum (LevelDiff) / HLATable.GetValue (ClassName, "RATE", 1)
 		else: # dual or single classed
 			print "HLA Class:",ClassName
-			if HLATable.GetValue (ClassName, "FIRST_LEVEL", 1) <= Level[0]:
-				HLACount = LevelDiff[0] / HLATable.GetValue (ClassName, "RATE", 1)
+			FirstLevel = HLATable.GetValue (ClassName, "FIRST_LEVEL", 1)
+			if FirstLevel <= Level[0]:
+				if (Level[0] - LevelDiff[0]) < FirstLevel:
+					# count only from FirstLevel up
+					HLACount = (LevelDiff[0] - FirstLevel) / HLATable.GetValue (ClassName, "RATE", 1)
+				else:
+					HLACount = LevelDiff[0] / HLATable.GetValue (ClassName, "RATE", 1)
 
 		# set values required by the hla level up code
 		GemRB.SetVar ("HLACount", HLACount)
