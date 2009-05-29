@@ -52,11 +52,19 @@ def OnLoad():
 	ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class) )
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	
-	# save the kit
+	#make gnomes always kitted
 	KitIndex = GemRB.GetVar ("Class Kit")
+	MageSchool = GemRB.GetVar ("MAGESCHOOL")
+	if MageSchool and not KitIndex:
+		SchoolTable = GemRB.LoadTableObject ("magesch")
+		KitIndex = KitListTable.FindValue (6, SchoolTable.GetValue (MageSchool, 3) )
+
+	#save the kit
 	KitValue = (0x4000 + KitIndex)
 	KitName = KitListTable.GetValue (KitIndex, 0)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
+	print "Kit:",KitIndex
+	print "School:",MageSchool
 
 	# no table for innates, so we make it a high value
 	# to guarantee innate, class ability and HLA memorization works
