@@ -1509,24 +1509,22 @@ void Highlightable::SetTrapDetected(int x)
 
 void Highlightable::TryDisarm(Actor *actor)
 {
-//first lets do this automatically succeeding
-//TODO: skill check, set off
-	if (Trapped) {
-		LastTrigger = actor->GetID();
+	if (!Trapped || !TrapDetected) return;
+
+	LastTrigger = actor->GetID();
+	int skill = actor->GetStat(IE_TRAPS);
+
+	if (skill/2+core->Roll(1,skill/2,0)>TrapRemovalDiff) {
 		LastDisarmed = actor->GetID();
-		SetTrapDetected(1);
-		//trap fired
-		if (!TrapResets()) {
-			//trap removed
-			Trapped = 0;
-			core->DisplayConstantStringName(STR_DISARM_DONE, 0xd7d7be, actor);
-			actor->AddExperience(XP_DISARM, actor->GetXPLevel(1));
-		} else {
-			core->DisplayConstantStringName(STR_DISARM_FAIL, 0xd7d7be, actor);
-		}
-		ImmediateEvent();
-		return;
+		//trap removed
+		Trapped = 0;
+		core->DisplayConstantStringName(STR_DISARM_DONE, 0xd7d7be, actor);
+		actor->AddExperience(XP_DISARM, actor->GetXPLevel(1));
+	} else {
+		core->DisplayConstantStringName(STR_DISARM_FAIL, 0xd7d7be, actor);
+		TriggerTrap(skill, LastTrigger);
 	}
+	ImmediateEvent();
 }
 
 void Door::TryPickLock(Actor *actor)
@@ -1620,10 +1618,8 @@ int InfoPoint::CheckTravel(Actor *actor)
 		}
 		return CT_GO_CLOSER;
 	}
-	if(actor->IsSelected() )
-	{
-		if(core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE|ENP_ONLYSELECT) )
-		{
+	if(actor->IsSelected() ) {
+		if(core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE|ENP_ONLYSELECT) ) {
 			return CT_MOVE_SELECTED;
 		}
 		return CT_SELECTED;
