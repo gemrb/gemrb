@@ -727,6 +727,13 @@ def SelectionChanged ():
 	else:
 		sel = GemRB.GameGetSelectedPCSingle ()
 
+		#update mage school
+		GemRB.SetVar ("MAGESCHOOL", 0)
+		Kit = GetKitIndex (sel)
+		if Kit and KitListTable.GetValue (Kit, 7) == 1:
+			MageTable = GemRB.LoadTableObject ("magesch")
+			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, KitListTable.GetValue (Kit, 6) ) )
+
 		for i in range (PARTY_SIZE):
 			Button = PortraitWindow.GetControl (i)
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)

@@ -158,6 +158,13 @@ def UpdateRecordsWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
+	#update mage school
+	GemRB.SetVar ("MAGESCHOOL", 0)
+	Kit = GetKitIndex (pc)
+	if Kit and KitListTable.GetValue (Kit, 7) == 1:
+		MageTable = GemRB.LoadTableObject ("magesch")
+		GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, KitListTable.GetValue (Kit, 6) ) )
+
 	# exportable
 	Button = Window.GetControl (36)
 	if GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE:
