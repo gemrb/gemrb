@@ -3072,7 +3072,7 @@ static EffectRef fx_remove_inventory_item_ref={"Item:RemoveInventory",NULL,-1};
 int fx_create_inventory_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_inventory_item (%2d)\n", fx->Opcode );
-	target->inventory.AddSlotItemRes( fx->Resource, -3, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
+	target->inventory.AddSlotItemRes( fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
 	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
 //if this effect has expiration, then it will remain as a remove_item
 //on the effect queue, inheriting all the parameters
@@ -3547,7 +3547,7 @@ int fx_create_item_in_slot (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_item_in_slot (%2d): Button: %d\n", fx->Opcode, fx->Parameter2 );
 	//create item and set it in target's slot
-	target->inventory.AddSlotItemRes( fx->Resource, core->QuerySlot(fx->Parameter2), fx->Parameter1, fx->Parameter3, fx->Parameter4 );
+	target->inventory.SetSlotItemRes( fx->Resource, core->QuerySlot(fx->Parameter2), fx->Parameter1, fx->Parameter3, fx->Parameter4 );
 	if (fx->TimingMode!=FX_DURATION_INSTANT_LIMITED) {
 		//convert it to a destroy item
 		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_item_ref);
@@ -5118,7 +5118,7 @@ int fx_remove_map_note (Actor* Owner, Actor* target, Effect* fx)
 int fx_create_item_days (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_item_days (%2d)\n", fx->Opcode );
-	target->inventory.SetSlotItemRes( fx->Resource, -1, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
+	target->inventory.AddSlotItemRes( fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
 	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
 //if this effect has expiration, then it will remain as a remove_item
 //on the effect queue, inheriting all the parameters
