@@ -28,6 +28,7 @@ from GUICommonWindows import *
 LUSKILLS_TYPE_CHARGEN = 0
 LUSKILLS_TYPE_LEVELUP = 1
 LUSKILLS_TYPE_DUALCLASS = 2
+LUSKILLS_MAX = 200
 
 #refs to the script calling this
 SkillsWindow = 0
@@ -132,8 +133,9 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		return
 
 	#figure out the kitname if we need it
+	#protect against kitted multiclasses
 	Kit = GetKitIndex (pc)
-	if not Kit or type == LUSKILLS_TYPE_DUALCLASS or IsDual[0]:
+	if not Kit or type == LUSKILLS_TYPE_DUALCLASS or IsDual[0] or IsMulti[0]>1:
 		SkillsKitName = ClassName
 	else:
 		SkillsKitName = KitListTable.GetValue (Kit, 0, 0)
@@ -166,6 +168,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 			SkillPointsLeft = SkillsTable.GetValue ("FIRST_LEVEL", SkillsKitName, 1)
 			LevelDiff[SkillIndex] -= 1
 		SkillPointsLeft += LevelDiff[SkillIndex] * SkillsTable.GetValue("RATE", SkillsKitName, 1)
+		TotalSkillsAssignable = 0
 		if SkillPointsLeft < 0:
 			#really don't have an entry
 			SkillPointsLeft = 0
@@ -186,6 +189,11 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 					SkillValue = GemRB.GetPlayerStat (pc, SkillID, 1)
 				GemRB.SetVar("Skill "+str(i), SkillValue)
 				GemRB.SetVar("SkillBase "+str(i), SkillValue)
+				TotalSkillsAssignable += LUSKILLS_MAX-SkillValue
+
+		#protect against having more skills than we can assign
+		if SkillPointsLeft > TotalSkillsAssignable:
+			SkillPointsLeft = TotalSkillsAssignable
 		GemRB.SetVar ("SkillPointsLeft", SkillPointsLeft)
 	else: 
 		#get ranger and bard skills
@@ -331,7 +339,7 @@ def SkillLeftPress():
 	if SkillPointsLeft == 0:
 		return
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
-	if ActPoint >= 200:
+	if ActPoint >= LUSKILLS_MAX:
 		return
 	GemRB.SetVar("Skill "+str(Pos), ActPoint+1)
 	SkillPointsLeft = SkillPointsLeft - 1

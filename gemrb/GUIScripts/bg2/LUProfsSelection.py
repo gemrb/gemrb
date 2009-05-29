@@ -138,13 +138,13 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsPointsLeft = ProfsTable.GetValue (ClassName, "FIRST_LEVEL")
 		diff[FastestProf] -= 1
 	ProfsPointsLeft += diff[FastestProf]/ProfsRate
-	GemRB.SetVar ("ProfsPointsLeft", ProfsPointsLeft)
 
 	#setup prof vars for passing between functions
 	ProfsTable = GemRB.LoadTableObject ("weapprof")
 	Kit = GetKitIndex (pc)
-	if Kit and type != LUPROFS_TYPE_DUALCLASS:
+	if Kit and type != LUPROFS_TYPE_DUALCLASS and IsMulti[0]<2:
 		#if we do kit with dualclass, we'll get the old kit
+		#also don't want to worry about kitted multis
 		ProfsColumn = KitListTable.GetValue (Kit, 5)
 	else:
 		#sorcerers don't have a column, so ref mages
@@ -157,20 +157,31 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	RowCount = ProfsTable.GetRowCount ()-7
 	ProfCount = RowCount-ProfsNumButtons #decrease it with the number of controls
 
+	ProfsAssignable = 0
 	for i in range(RowCount):
 		ProfName = ProfsTable.GetValue (i+8, 1)
 		#decrease it with the number of invalid proficiencies
 		if ProfName > 0x1000000 or ProfName < 0:
 			ProfCount -= 1
 
-		#we only need the low 3 bits for profeciencies
+		#we only need the low 3 bits for profeciencies unless we're dualing, then
+		#we just want to set them all to 0
+		currentprof = 0
 		if type != LUPROFS_TYPE_DUALCLASS:
 			currentprof = GemRB.GetPlayerStat (pc, ProfsTable.GetValue (i+8, 0))&0x07
-			GemRB.SetVar("Prof "+str(i), currentprof)
-			GemRB.SetVar("ProfBase "+str(i), currentprof)
 		else:
-			GemRB.SetVar ("Prof "+str(i), 0)
-			GemRB.SetVar ("ProfBase "+str(i), 0)
+			GemRB.SetVar ("Prof "+str(i), currentprof)
+			GemRB.SetVar ("ProfBase "+str(i), currentprof)
+
+		#see if we can assign to this prof
+		maxprof = ProfsTable.GetValue(i+8, ProfsColumn)
+		if maxprof > currentprof:
+			ProfsAssignable += maxprof-currentprof
+	
+	#correct the profs left if we can't assign that much
+	if ProfsPointsLeft > ProfsAssignable:
+		ProfsPointsLeft = ProfsAssignable
+	GemRB.SetVar ("ProfsPointsLeft", ProfsPointsLeft)
 
 	# setup the +/- and info controls
 	for i in range (ProfsNumButtons):
