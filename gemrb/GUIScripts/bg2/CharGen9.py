@@ -153,6 +153,10 @@ def FinishCharGen():
 			if item_resref == "*":
 				continue
 
+			# the table has typos for kitted bard's armor
+			if item_resref == "LEATH14":
+				item_resref = "LEAT14"
+
 			# get empty slots of the requested type
 			realslot = GemRB.GetSlots (MyChar, RealSlots[slot], -1)
 
