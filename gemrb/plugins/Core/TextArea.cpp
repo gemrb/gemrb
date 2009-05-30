@@ -752,7 +752,7 @@ void TextArea::CalcRowCount()
 		return;
 	}
 	ScrollBar* bar = ( ScrollBar* ) sb;
-	tr = rows - Height/ftext->size[1].h;
+	tr = rows - Height/ftext->size[1].h + 1;
 	if (tr<0) {
 		tr = 0;
 	}
