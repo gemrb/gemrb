@@ -142,41 +142,52 @@ def FinishCharGen():
 					SLOT_RING, SLOT_CLOAK, SLOT_BOOT, SLOT_AMULET, SLOT_GLOVE, \
 					SLOT_BELT, SLOT_QUIVER, SLOT_QUIVER, SLOT_QUIVER, \
 					SLOT_ITEM, SLOT_ITEM, SLOT_ITEM, -1, -1, SLOT_WEAPON ]
+		inventory_exclusion = 0
 
 		#loop over rows - item slots
 		for slot in range(0, EquipmentTable.GetRowCount ()):
 			slotname = EquipmentTable.GetRowName (slot)
-			item = EquipmentTable.GetValue (slotname, EquipmentColName)
+			item_resref = EquipmentTable.GetValue (slotname, EquipmentColName)
 
 			# no item - go to next
-			if item == "*":
+			if item_resref == "*":
 				continue
-			
+
+			# get empty slots of the requested type
 			realslot = GemRB.GetSlots (MyChar, RealSlots[slot], -1)
 
 			if realslot == (): # this shouldn't happen!
+				print "Eeek! No free slots for", item_resref
 				continue
 
 			# if an item contains a comma, the rest of the value is the stack
-			if "," in item:
-				item = item.split(",")
-				count = int(item[1])
-				item = item[0]
+			if "," in item_resref:
+				item_resref = item_resref.split(",")
+				count = int(item_resref[1])
+				item_resref = item_resref[0]
 			else:
 				count = 0
 
 			targetslot = realslot[0]
 			SlotType = GemRB.GetSlotType (targetslot, MyChar)
 			i = 1
+			item = GemRB.GetItem (item_resref)
 
-			# if there are no free slots, CreateItem will create the item on the ground
-			while not GemRB.CanUseItemType (SlotType["Type"], item, MyChar) and i < len(realslot):
-				targetslot = realslot[i]
-				SlotType = GemRB.GetSlotType (targetslot, MyChar)
-				i = i + 1
+			if inventory_exclusion & item['Exclusion']:
+				# oops, too many magic items to equip, so just dump it to the inventory
+				targetslot = GemRB.GetSlots (MyChar, -1, -1)[0]
+				SlotType = -1
+			else:
+				# if there are no free slots, CreateItem will create the item on the ground
+				while not GemRB.CanUseItemType (SlotType["Type"], item_resref, MyChar) \
+				and i < len(realslot):
+					targetslot = realslot[i]
+					SlotType = GemRB.GetSlotType (targetslot, MyChar)
+					i = i + 1
 
-			GemRB.CreateItem(MyChar, item, targetslot, count, 0, 0)
+			GemRB.CreateItem(MyChar, item_resref, targetslot, count, 0, 0)
  			GemRB.ChangeItemFlag (MyChar, targetslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+			inventory_exclusion |= item['Exclusion']
 
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
