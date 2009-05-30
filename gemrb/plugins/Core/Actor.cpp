@@ -202,6 +202,17 @@ static int CheckAbilities=FALSE;
 #define WEAPON_LEFTHAND    16
 #define WEAPON_USESTRENGTH 32
 
+/* counts the on bits in a number */
+ieDword bitcount (ieDword n)
+{
+	ieDword count=0;
+	while (n) {
+		count += n & 0x1u;
+		n >>= 1;
+	}
+    	return count;
+}
+
 void ReleaseMemoryActor()
 {
 	if (mxsplwis) {
@@ -2011,15 +2022,10 @@ ieDword Actor::GetXPLevel(int modified) const
 		}
 		else {
 			if (IsMultiClassed()) {
-				if (levels[1] > 0) {
-					classcount++;
-					average += levels[1];
-				}
-				// TODO: rather deduce the number of classes from the name
-				if (levels[2] > 0 && (levels[0]-levels[2]) < 5) { //HACK for jaheira (starts as 6-7-1)
-					classcount++;
-					average += levels[2];
-				}
+				//classcount is the number of on bits in the MULTI field
+				classcount = bitcount (multiclass);
+				for (int i=1; i<classcount; i++)
+					average += levels[i];
 			} // else single class
 		}
 		average = average / classcount + 0.5;
@@ -4353,23 +4359,29 @@ void Actor::CreateDerivedStatsIWD2()
 
 void Actor::CreateDerivedStats()
 {
+	//we have to calculate multiclass for further code
+	AutoTable tm("classes");
+	if (tm) {
+		// currently we need only the MULTI value
+		char tmpmulti[8];
+		long tmp;
+		strcpy(tmpmulti, tm->QueryField(tm->FindTableValue(5, BaseStats[IE_CLASS]), 4));
+		if (!valid_number(tmpmulti, tmp))
+			multiclass = 0;
+		else
+			multiclass = (ieDword)tmp;
+	}
+
 	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
 		CreateDerivedStatsIWD2();
 	} else {
 		CreateDerivedStatsBG();
 	}
-	AutoTable tm("classes");
-	if (tm) {
-		// currently we need only the MULTI value
-		strcpy(multiclass, tm->QueryField(tm->FindTableValue(5, BaseStats[IE_CLASS]), 4));
-	}
 }
-
 /* Checks if the actor is multiclassed (the MULTI column is positive) */
 bool Actor::IsMultiClassed() const
 {
-	long multi2;
-	return (valid_number(multiclass, multi2) && multi2 > 0);
+	return (multiclass > 0);
 }
 
 /* Checks if the actor is dualclassed */

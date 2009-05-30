@@ -218,7 +218,7 @@ public:
 	char HelmetRef[2];
 	char WeaponRef[2];
 	int WeaponType;
-	char multiclass[8];
+	ieDword multiclass;
 
 	int LastCommand;   //lastcommander
 	int LastShout;     //lastheard
