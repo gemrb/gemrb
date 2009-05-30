@@ -46,6 +46,8 @@ ErrorWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
 OverSlot = None
+print # keeps the keyimporter output in two lines
+PortraitTable = GemRB.LoadTableObject ("PDOLLS")
 
 def OpenInventoryWindowClick ():
 	tmp = GemRB.GetVar ("PressedPortrait")
@@ -285,7 +287,6 @@ def RefreshInventoryWindow ():
 	Button.SetPLT (GetActorPaperDoll (pc),
 		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
 
-	PortraitTable = GemRB.LoadTableObject ("PDOLLS")
 	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
 	row = "0x%04X" %anim_id
 	size = PortraitTable.GetValue (row, "SIZE")

@@ -46,6 +46,10 @@ KitListTable = GemRB.LoadTableObject ("kitlist")
 ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 RaceTable = GemRB.LoadTableObject ("races")
 
+# only used in SetEncumbranceLabels, but that is called very often
+StrModTable = GemRB.LoadTableObject ("strmod")
+StrModExTable = GemRB.LoadTableObject ("strmodex")
+
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	global OptionsWindow
 
@@ -1064,15 +1068,12 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	return
 
 def SetEncumbranceLabels (Window, Label, Label2, pc):
-	# encumbrance
-	# Loading tables of modifications
-	Table = GemRB.LoadTableObject ("strmod")
-	TableEx = GemRB.LoadTableObject ("strmodex")
 	# Getting the character's strength
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 
-	max_encumb = Table.GetValue (sstr, 3) + TableEx.GetValue (ext_str, 3)
+	# encumbrance
+	max_encumb = StrModTable.GetValue (sstr, 3) + StrModExTable.GetValue (ext_str, 3)
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
 
 	Label = Window.GetControl (0x10000043)
