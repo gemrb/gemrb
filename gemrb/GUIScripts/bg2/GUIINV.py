@@ -659,12 +659,6 @@ def OpenItemAmountWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenItemAmountWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	# 0 bmp
-	# 1,2 done/cancel?
-	# 3 +
-	# 4 -
-	# 6 text
-
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
