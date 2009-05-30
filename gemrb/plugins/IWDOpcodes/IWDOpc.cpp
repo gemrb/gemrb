@@ -50,6 +50,7 @@ static ieDword *EntropyProjectileList = NULL;
 #define PI_PANIC        36
 #define PI_NAUSEA       43
 #define PI_HOPELESSNESS 44
+#define PI_STONESKIN    46
 #define PI_RIGHTEOUS    67
 #define PI_ELEMENTS     76
 #define PI_FAITHARMOR   84
@@ -57,6 +58,7 @@ static ieDword *EntropyProjectileList = NULL;
 #define PI_HOLYPOWER    86
 #define PI_DEATHWARD    87
 #define PI_UNCONSCIOUS  88
+#define PI_IRONSKIN     89
 #define PI_ENFEEBLEMENT 90
 #define PI_ELEMPROT     93
 #define PI_MINORGLOBE   96
@@ -601,6 +603,7 @@ int fx_ironskins (Actor* /*Owner*/, Actor* target, Effect* fx)
 			STAT_SET(IE_STONESKINS, fx->Parameter1);
 		}
 		target->SetSpellState( SS_IRONSKIN);
+		target->AddPortraitIcon(PI_IRONSKIN);
 		return FX_APPLIED;
 	}
 
@@ -616,6 +619,7 @@ int fx_ironskins (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 	if (target->SetSpellState( SS_STONESKIN)) return FX_NOT_APPLIED;
 	target->SetGradient(14);
+	target->AddPortraitIcon(PI_STONESKIN);
 	return FX_APPLIED;
 }
 

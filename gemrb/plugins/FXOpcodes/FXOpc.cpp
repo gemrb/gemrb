@@ -37,30 +37,31 @@
 #include "FXOpc.h"
 
 //FIXME: find a way to handle portrait icons better
-#define PI_CONFUSED 3
-#define PI_BERSERK  4
-#define PI_POISONED 6
-#define PI_HELD    13
-#define PI_SLEEP   14
-#define PI_BLESS   17
+#define PI_CONFUSED  3
+#define PI_BERSERK   4
+#define PI_POISONED  6
+#define PI_HELD     13
+#define PI_SLEEP    14
+#define PI_BLESS    17
 #define PI_PANIC        36
-#define PI_HASTED  38
-#define PI_FATIGUE 39
-#define PI_SLOWED  41
+#define PI_HASTED   38
+#define PI_FATIGUE  39
+#define PI_SLOWED   41
 #define PI_HOPELESS 44
 #define PI_FEEBLEMIND 54
-#define PI_STUN    55
-#define PI_AID     57
-#define PI_HOLY    59
-#define PI_BOUNCE  65
-#define PI_BOUNCE2 67
+#define PI_STUN     55
+#define PI_AID      57
+#define PI_HOLY     59
+#define PI_BOUNCE   65
+#define PI_BOUNCE2  67
 
 #define PI_BLOODRAGE 76 //iwd2
-#define PI_MAZE    78
-#define PI_PRISON  79
-#define PI_DEAFNESS 83 //iwd2
+#define PI_MAZE     78
+#define PI_PRISON   79
+#define PI_STONESKIN 80
+#define PI_DEAFNESS  83 //iwd2
 #define PI_SEQUENCER 92
-#define PI_BLUR 109
+#define PI_BLUR      109
 #define PI_IMPROVEDHASTE 110
 #define PI_SPELLTRAP 117
 #define PI_CSHIELD  162
@@ -4601,6 +4602,7 @@ int fx_stoneskin_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		SetGradient(target, 14);
 	}
 	STAT_SET(IE_STONESKINS, fx->Parameter1);
+	target->AddPortraitIcon(PI_STONESKIN);
 	return FX_APPLIED;
 }
 
