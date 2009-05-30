@@ -14,11 +14,20 @@ The fields of the dictionary are the following:
 "ItemIcon"           - the item's icon (.bam resref)
 "StackAmount"        - maximum stackable amount
 "Dialog"             - item dialog (.dlg resref)
+"DialogName"         - the item dialog name
 "Function"           - returns special function
   0 - no special function
   1 - item is a copyable scroll (2. header's 1. feature is 'Learn spell')
   2 - item is a drinkable potion 
 "Spell"              - the spell's strref if the item is a copyable scroll
+"DescIcon"           - the description icon
+"BrokenItem"         - the replacement item (used for items with broken sounds)
+"Price"              - the base item price
+"Type"               - the item type (see itemtype.2da)
+"AnimationType"      - the item animation ID
+"Exclusion"          - the exclusion bit (used by eg. magic armor and rings of protection).
+"LoreToID"           - the required lore to identify the item
+"Tooltips"           - the item tooltips
 
-See also: GetSpell, SetItemIcon
+See also: GetSlotItem, GetSpell, SetItemIcon
 
