@@ -456,7 +456,11 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ( (34122, GSNN (pc, IE_SETTRAPS), '') )
 	stats.append ( (12128, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
 	stats.append ( (12126, GS (IE_TURNUNDEADLEVEL), '') )
-	stats.append ( (12127, GS (IE_LAYONHANDSAMOUNT), '') )
+
+	#this hack only displays LOH if we know the spell
+	#TODO: the core should just not set LOH if the paladin can't learn it
+	if (HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
+		stats.append ( (12127, GS (IE_LAYONHANDSAMOUNT), '') )
 	#script
 	aiscript = GemRB.GetPlayerScript (pc )
 	stats.append ( (2078, aiscript, '') )

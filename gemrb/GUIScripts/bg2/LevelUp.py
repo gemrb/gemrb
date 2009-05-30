@@ -394,12 +394,9 @@ def GetLevelUpNews():
 			# and unkitted paladins do; therefore, we check for the existence of lay on hands to ensure
 			# the character should get the new value; LoH is defined in GA_SPCL211 if anyone wants to
 			# make a pally kit with LoH
-			print "LoH Amount:",GemRB.GetPlayerStat (pc, IE_LAYONHANDSAMOUNT, 1) 
-			if (HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") != -1):
-				print "Doing a LoH lookup."
+			if (HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
 				LOHTable = GemRB.LoadTableObject ("layhands")
-				LOHValue = LOHTable.GetValue (0, Level[i])
-				LOHGain = LOHValue - LOHTable.GetValue (0, Level[i]-LevelDiff[i])
+				LOHGain = LOHTable.GetValue (0, Level[i]) - LOHTable.GetValue (0, Level[i]-LevelDiff[i])
 
 	# saving throws
 		# 5277 death
@@ -455,7 +452,6 @@ def GetLevelUpNews():
 
 	# 5376 - Lay on Hands increased
 	if LOHGain > 0:
-		GemRB.SetPlayerStat (pc, IE_LAYONHANDSAMOUNT, LOHValue)
 		News += GemRB.GetString (5376) + ": " + str(LOHGain) + '\n\n'
 
 	# 5293 - HP increased by
