@@ -405,6 +405,7 @@ def GetLevelUpNews():
 		# 5282 breath
 		# 5292 spell
 	# include in news if the save is updated
+	Changed = 0
 	for i in range (5):
 		CurrentSave = GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH+i)
 		SaveString = 5277+i
@@ -415,6 +416,9 @@ def GetLevelUpNews():
 
 		if CurrentSave < OldSaves[i]:
 			News += GemRB.GetString (SaveString) + ": " + str(OldSaves[i]-CurrentSave) + '\n'
+			Changed = 1
+	if Changed:
+		News += '\n'
 
 	# 5305 - THAC0 Reduced by
 	# only output if there is a change in thaco
