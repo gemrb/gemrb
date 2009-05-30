@@ -2855,7 +2855,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical failure
 		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
 		if (Flags&WEAPON_RANGED) {
-			UseItem(wi.slot, -2, target, UI_MISS);
+			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		} else {
 			//break sword
 			if (header->RechargeFlags&IE_ITEM_BREAKABLE) {
@@ -2894,7 +2894,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (tohit<defense) {
 		//hit failed
 		if (Flags&WEAPON_RANGED) {
-			UseItem(wi.slot, -2, target, UI_MISS);
+			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		}
 		return;
 	}
