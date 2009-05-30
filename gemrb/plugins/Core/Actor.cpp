@@ -521,9 +521,9 @@ void ApplyClab(Actor *actor, const char *clab, int level)
 	}
 }
 
-#define BG2_KITMASK  0xc000ffff
-#define KIT_BARBARIAN 0x40000000
-#define KIT_BASECLASS 0x4000
+#define BG2_KITMASK  0xffffc000
+#define KIT_BARBARIAN 0x4000
+#define KIT_BASECLASS 0x40000000
 
 //applies a kit on the character (only bg2)
 bool Actor::ApplyKit(ieDword Value)
@@ -544,7 +544,7 @@ bool Actor::ApplyKit(ieDword Value)
 		}
 		//if it wasn't found, try the bg2 kit format
 		if ((Value&BG2_KITMASK)==KIT_BARBARIAN) {
-			row = (Value>>16)&0xfff;
+			row = (Value<<16);
 		}
 		//cannot find kit
 		if (table->GetRowCount()>=row) {
@@ -4129,7 +4129,7 @@ int Actor::CheckUsability(Item *item) const
 		//feel free to solve this logic without a goto
 		if (itemuse[i].stat==IE_KIT) {
 			if ((stat&BG2_KITMASK)==KIT_BARBARIAN) {
-				stat = (stat>>16)&0xfff;
+				stat = (stat<<16); // correct? kit values are confusing
 				if (stat) {
 					goto resolve_stat;
 				} else {
@@ -4141,6 +4141,7 @@ resolve_stat:
 			stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
 		}
 		if (stat&itemvalue) {
+			//printf("failed usability: itemvalue %d, stat %d, stat value %d\n", itemvalue, itemuse[i].stat, stat);
 			return STR_CANNOT_USE_ITEM;
 		}
 	}
@@ -4152,43 +4153,47 @@ resolve_stat:
 int Actor::Unusable(Item *item) const
 {
 	if (!GetStat(IE_CANUSEANYITEM)) {
-		return CheckUsability(item);
+		int unusable = CheckUsability(item);
+		if (unusable) {
+			return unusable;
+		}
+	}
+
+	// iesdp says this is always checked?
+	if (item->MinLevel>GetXPLevel(true)) {
+		return STR_CANNOT_USE_ITEM;
 	}
 
 	if (!CheckAbilities) {
 		return 0;
 	}
 
-	if (item->MinLevel>GetXPLevel(true)) {
-		return 1;
-	}
-
 	if (item->MinStrength>GetStat(IE_STR)) {
-		return 1;
+		return STR_CANNOT_USE_ITEM;
 	}
 
 	if (item->MinStrength==18) {
 		if (GetStat(IE_STR)==18) {
 			if (item->MinStrengthBonus>GetStat(IE_STREXTRA)) {
-				return 1;
+				return STR_CANNOT_USE_ITEM;
 			}
 		}
 	}
 
 	if (item->MinIntelligence>GetStat(IE_INT)) {
-		return 1;
+		return STR_CANNOT_USE_ITEM;
 	}
 	if (item->MinDexterity>GetStat(IE_DEX)) {
-		return 1;
+		return STR_CANNOT_USE_ITEM;
 	}
 	if (item->MinWisdom>GetStat(IE_WIS)) {
-		return 1;
+		return STR_CANNOT_USE_ITEM;
 	}
 	if (item->MinConstitution>GetStat(IE_CON)) {
-		return 1;
+		return STR_CANNOT_USE_ITEM;
 	}
 	if (item->MinCharisma>GetStat(IE_CHR)) {
-		return 1;
+		return STR_CANNOT_USE_ITEM;
 	}
 	//note, weapon proficiencies shouldn't be checked here
 	//missing proficiency causes only attack penalty
