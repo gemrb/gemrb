@@ -2165,9 +2165,28 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 		if (door->Flags&DOOR_LOCKED) {
 			const char *Key = door->GetKey();
-			//TODO: the original engine allowed opening of a door when the
-			//key was on any of the partymembers
-			if (!Key || !actor->inventory.HasItem(Key,0) ) {
+			Actor *haskey = NULL;
+
+			if (Key && actor->InParty) {
+				Game *game = core->GetGame();
+				//allow opening of a door when the key is on any partymember
+				for (int idx = 0; idx < game->GetPartySize(false); idx++) {
+					Actor *pc = game->FindPC(idx + 1);
+					if (!pc) continue;
+
+					if (pc->inventory.HasItem(Key,0) ) {
+						haskey = pc;
+						break;
+					}
+				}
+			} else if (Key) {
+				//actor is not in party, check only actor
+				if (actor->inventory.HasItem(Key,0) ) {
+					haskey = actor;
+				}
+			}
+
+			if (!haskey) {
 				core->DisplayConstantString(STR_DOORLOCKED,0xd7d7be,door);
 				//playsound unsuccessful opening of door
 				core->PlaySound(DS_OPEN_FAIL);
@@ -2178,7 +2197,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 			// remove the key (but not in PS:T!)
 			if (!core->HasFeature(GF_REVERSE_DOOR) && door->Flags&DOOR_KEY) {
 				CREItem *item = NULL;
-				actor->inventory.RemoveItem(Key,0,&item);
+				haskey->inventory.RemoveItem(Key,0,&item);
 				//the item should always be existing!!!
 				if (item) {
 					delete item;
