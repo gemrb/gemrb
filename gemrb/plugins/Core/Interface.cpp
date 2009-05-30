@@ -3837,6 +3837,9 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 
 	//if any bit is true, the answer counts as true
 	int ret = (slotmatrix[item->ItemType]&slottype);
+	if (slottype == SLOT_INVENTORY || slottype == SLOT_ANY) {
+		ret = 1;
+	}
 	if (!ret) {
 		if (feedback) DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
 	}
