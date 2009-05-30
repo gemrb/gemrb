@@ -168,6 +168,7 @@ Interface::Interface(int iargc, char* iargv[])
 	GameOnCD = false;
 	SkipIntroVideos = false;
 	DrawFPS = false;
+	KeepCache = false;
 	TooltipDelay = 100;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
@@ -447,7 +448,7 @@ Interface::~Interface(void)
 	delete plugin;
 
 	// Removing all stuff from Cache, except bifs
-	DelTree((const char *) CachePath, true);
+	if (!KeepCache) DelTree((const char *) CachePath, true);
 }
 
 void Interface::SetWindowFrame(int i, Sprite2D *Picture)
@@ -1941,6 +1942,8 @@ bool Interface::LoadConfig(const char* filename)
 			DrawFPS = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "EnableCheatKeys" ) == 0) {
 			EnableCheatKeys ( atoi( value ) );
+		} else if (stricmp( name, "KeepCache" ) == 0) {
+			KeepCache = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "FogOfWar" ) == 0) {
 			FogOfWar = atoi( value );
 		} else if (stricmp( name, "EndianSwitch" ) == 0) {
@@ -2080,7 +2083,7 @@ bool Interface::LoadConfig(const char* filename)
 		printf( "Cache path %s doesn't exist, not a folder or contains alien files!\n", CachePath );
 		return false;
 	}
-	DelTree((const char *) CachePath, false);
+	if (!KeepCache) DelTree((const char *) CachePath, false);
 	FixPath( CachePath, true );
 
 	return true;
@@ -3535,7 +3538,7 @@ void Interface::LoadGame(int index)
 	WorldMapArray* new_worldmap = NULL;
 
 	LoadProgress(15);
-	DelTree((const char *) CachePath, true);
+	if (!KeepCache) DelTree((const char *) CachePath, true);
 	LoadProgress(20);
 
 	if (index == -1) {

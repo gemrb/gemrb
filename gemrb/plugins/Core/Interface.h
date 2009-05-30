@@ -673,6 +673,7 @@ public:
 	unsigned int TooltipDelay;
 	unsigned int FogOfWar;
 	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
+	bool KeepCache;
 	/** The Main program loop */
 	void Main(void);
 	/** returns true if the game is paused */
