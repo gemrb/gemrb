@@ -136,6 +136,20 @@ class ScriptedAnimation;
 #define UI_SILENT    1       //no sound when used up
 #define UI_MISS      2       //ranged miss (projectile has no effects)
 
+//locations of classes in the isclass/levelslots arrays
+#define ISFIGHTER   0
+#define ISMAGE      1
+#define ISTHIEF     2
+#define ISBARBARIAN 3
+#define ISBARD      4
+#define ISCLERIC    5
+#define ISDRUID     6
+#define ISMONK      7
+#define ISPALADIN   8
+#define ISRANGER    9
+#define ISSORCERER  10
+#define ISCLASSES   11
+
 typedef ieByte ActionButtonRow[GUIBT_COUNT];
 
 typedef std::vector< ScriptedAnimation*> vvcVector;
@@ -260,6 +274,8 @@ private:
 	void CreateDerivedStatsBG();
 	/* Set up all the missing stats on load time, or after level up */
 	void CreateDerivedStatsIWD2();
+	/* Gets the given ISCLASS level */
+	ieDword GetClassLevel (const ieDword id) const;
 public:
 	Actor(void);
 	~Actor(void);
@@ -530,5 +546,17 @@ public:
 	bool IsDualClassed() const;
 	/* Returns an exact copy of this actor */
 	Actor *CopySelf() const;
+	/* Returns the actor's level of the given class */
+	ieDword GetFighterLevel () const { return GetClassLevel(ISFIGHTER); }
+	ieDword GetMageLevel () const { return GetClassLevel(ISMAGE); }
+	ieDword GetThiefLevel () const { return GetClassLevel(ISTHIEF); }
+	ieDword GetBarbarianLevel () const { return GetClassLevel(ISBARBARIAN); }
+	ieDword GetBardLevel () const { return GetClassLevel(ISBARD); }
+	ieDword GetClericLevel () const { return GetClassLevel(ISCLERIC); }
+	ieDword GetDruidLevel () const { return GetClassLevel(ISDRUID); }
+	ieDword GetMonkLevel () const { return GetClassLevel(ISMONK); }
+	ieDword GetPaladinLevel () const { return GetClassLevel(ISPALADIN); }
+	ieDword GetRangerLevel () const { return GetClassLevel(ISRANGER); }
+	ieDword GetSorcererLevel () const { return GetClassLevel(ISSORCERER); }
 };
 #endif

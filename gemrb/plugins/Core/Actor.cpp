@@ -69,6 +69,8 @@ static int *turnlevels = NULL;
 static int *xpbonus = NULL;
 static int xpbonustypes = -1;
 static int xpbonuslevels = -1;
+static int **levelslots = NULL;
+static int *dualswap = NULL;
 
 static int FistRows = -1;
 typedef ieResRef FistResType[MAX_LEVEL+1];
@@ -101,18 +103,11 @@ static int fiststat = IE_CLASS;
 
 //conversion for 3rd ed
 static int isclass[11]={0,0,0,0,0,0,0,0,0,0,0};
-#define ISBARBARIAN 0
-#define ISBARD      1
-#define ISCLERIC    2
-#define ISDRUID     3
-#define ISFIGHTER   4
-#define ISMONK      5
-#define ISPALADIN   6
-#define ISRANGER    7
-#define ISROGUE     8
-#define ISSORCERER  9
-#define ISWIZARD    10
-static const int levelslots[11]={IE_LEVELFIGHTER,IE_LEVELMAGE,IE_LEVELTHIEF,
+
+static const char *isclassnames[11] = {
+	"FIGHTER", "MAGE", "THIEF", "BARBARIAN", "BARD", "CLERIC",
+	"DRUID", "MONK", "PALADIN", "RANGER", "SORCERER" };
+static const int levelslotsiwd2[11]={IE_LEVELFIGHTER,IE_LEVELMAGE,IE_LEVELTHIEF,
 	IE_LEVELBARBARIAN,IE_LEVELBARD,IE_LEVELCLERIC,IE_LEVELDRUID,IE_LEVELMONK,
 	IE_LEVELPALADIN,IE_LEVELRANGER,IE_LEVELSORCEROR};
 
@@ -593,17 +588,17 @@ void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 void pcf_level (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	ieDword sum =
-		actor->BaseStats[IE_LEVELFIGHTER]+
-		actor->BaseStats[IE_LEVELMAGE]+
-		actor->BaseStats[IE_LEVELTHIEF]+
-		actor->BaseStats[IE_LEVELBARBARIAN]+
-		actor->BaseStats[IE_LEVELBARD]+
-		actor->BaseStats[IE_LEVELCLERIC]+
-		actor->BaseStats[IE_LEVELDRUID]+
-		actor->BaseStats[IE_LEVELMONK]+
-		actor->BaseStats[IE_LEVELPALADIN]+
-		actor->BaseStats[IE_LEVELRANGER]+
-		actor->BaseStats[IE_LEVELSORCEROR];
+		actor->GetFighterLevel()+
+		actor->GetMageLevel()+
+		actor->GetThiefLevel()+
+		actor->GetBarbarianLevel()+
+		actor->GetBardLevel()+
+		actor->GetClericLevel()+
+		actor->GetDruidLevel()+
+		actor->GetMonkLevel()+
+		actor->GetPaladinLevel()+
+		actor->GetRangerLevel()+
+		actor->GetSorcererLevel();
 	actor->SetBase(IE_CLASSLEVELSUM,sum);
 	//this will be called anyway
 	//actor->SetupFist();
@@ -995,6 +990,19 @@ void Actor::ReleaseMemory()
 			xpbonuslevels = -1;
 			xpbonustypes = -1;
 		}
+		if (levelslots) {
+			for (i=0; i<classcount; i++) {
+				if (levelslots[i]) {
+					free(levelslots[i]);
+				}
+			}
+			free(levelslots);
+			levelslots=NULL;
+		}
+		if (dualswap) {
+			free(dualswap);
+			dualswap=NULL;
+		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1013,6 +1021,17 @@ void Actor::ReleaseMemory()
 #define COL_MAIN       0
 #define COL_SPARKS     1
 #define COL_GRADIENT   2
+
+/* returns the ISCLASS for the class based on name */
+int IsClassFromName (const char* name)
+{
+	//TODO: is there a better way of doing this?
+	for (int i=0; i<ISCLASSES; i++) {
+		if (strcmp(name, isclassnames[i]) == 0)
+			return i;
+	}
+	return -1;
+}
 
 static void InitActorTables()
 {
@@ -1082,7 +1101,7 @@ static void InitActorTables()
 
 			field = tm->QueryField( i, 2 );
 			if (field[0]!='*') {
-				isclass[ISWIZARD] |= bitmask;
+				isclass[ISMAGE] |= bitmask;
 				wizardspelltables[i]=strdup(field);
 			}
 
@@ -1236,6 +1255,98 @@ static void InitActorTables()
 			featstats[i] = (ieByte) tmp;
 		}
 	}
+
+	tm.load("classes");
+	if (tm && !core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+		//iwd2 just uses levelslotsiwd2 instead
+		printf("Examining classes.2da\n");
+
+		//when searching the levelslots, you must search for
+		//levelslots[BaseStats[IE_CLASS]-1] as there is no class id of 0
+		levelslots = (int **) calloc(classcount, sizeof(int*));
+		dualswap = (int *) calloc(classcount, sizeof(int*));
+		//default all dualswaps to 0
+		memset(dualswap, 0, sizeof(dualswap));
+		ieDword tmpindex;
+		for (i=0; i<classcount; i++) {
+			//make sure we have a valid classid, then decrement
+			//it to get the correct array index
+			tmpindex = atoi(tm->QueryField(i, 5));
+			if (!tmpindex)
+				continue;
+			tmpindex--;
+
+			printf("\tID: %d ", tmpindex);
+			//only create the array if it isn't yet made
+			//i.e. barbarians would overwrite fighters in bg2
+			if (levelslots[tmpindex]) {
+				printf ("Already Found!\n");
+				continue;
+			}
+
+			const char* classname = tm->GetRowName(i);
+			printf("Name: %s ", classname);
+			int classis = 0;
+			//default all levelslots to 0
+			levelslots[tmpindex] = (int *) calloc(ISCLASSES, sizeof(int*));
+			memset(levelslots[tmpindex], 0, sizeof(levelslots[tmpindex]));
+
+			//single classes only worry about IE_LEVEL
+			ieDword tmpclass = atoi(tm->QueryField(i, 4));
+			if (!tmpclass) {
+				classis = IsClassFromName(classname);
+				if (classis>=0) {
+					printf("Classis: %d ", classis);
+					levelslots[tmpindex][classis] = IE_LEVEL;
+				}
+				printf("DS: %d\n", dualswap[tmpindex]);
+				continue;
+			}
+
+			//we have to account for dual-swap in the multiclass field
+			ieDword numfound = 0;
+			ieDword tmpbits = bitcount (tmpclass);
+			for (int j=0; j<classcount; j++) {
+				//no sense continuing if we've found all to be found
+				if (numfound==tmpbits)
+					break;
+				if ((1<<j)&tmpclass) {
+					//save the IE_LEVEL information
+					const char* currentname = tm->GetRowName((ieDword)(tm->FindTableValue(5, j+1)));
+					classis = IsClassFromName(currentname);
+					if (classis>=0) {
+						printf("Classis: %d ", classis);
+						if (numfound==0) {
+							levelslots[tmpindex][classis] = IE_LEVEL;
+						} else if (numfound==1) {
+							levelslots[tmpindex][classis] = IE_LEVEL2;
+						} else if (numfound==2) {
+							levelslots[tmpindex][classis] = IE_LEVEL3;
+						}
+					}
+
+					//figure out if this is a dualswap situation
+					if (numfound==0 && tmpbits==2) {
+						char* firstclass = (char*)strtok((char*)classname, "_");
+						if (strcmp(firstclass, currentname) != 0) {
+							dualswap[tmpindex] = 1;
+						}
+					}
+					numfound++;
+				}
+			}
+			printf("DS: %d\n", dualswap[tmpindex]);
+		}
+		/*this could be enabled to ensure all levelslots are filled with at least 0's;
+		 *however, the access code should ensure this never happens
+		for (i=0; i<classcount; i++) {
+			if (!levelslots[i]) {
+				levelslots[i] = (int *) calloc(ISCLASSES, sizeof(int *));
+				memset(levelslots[i], 0, sizeof(levelslots[i]));
+			}
+		}*/
+	}
+	printf("Finished examining classes.2da\n");
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -2005,7 +2116,7 @@ ieDword Actor::GetXPLevel(int modified) const
 	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
 		// iwd2
 		for (int i=0; i < 11; i++) {
-			if (stats[levelslots[i]] > 0) classcount++;
+			if (stats[levelslotsiwd2[i]] > 0) classcount++;
 		}
 		average = stats[IE_CLASSLEVELSUM] / classcount + 0.5;
 	}
@@ -2020,14 +2131,12 @@ ieDword Actor::GetXPLevel(int modified) const
 				average += levels[1];
 			}
 		}
-		else {
-			if (IsMultiClassed()) {
+		else if (IsMultiClassed()) {
 				//classcount is the number of on bits in the MULTI field
 				classcount = bitcount (multiclass);
 				for (int i=1; i<classcount; i++)
 					average += levels[i];
-			} // else single class
-		}
+		} //else single classed
 		average = average / classcount + 0.5;
 	}
 	return ieDword(average);
@@ -4294,45 +4403,47 @@ void Actor::AddProjectileImmunity(ieDword projectile)
 //2nd edition rules
 void Actor::CreateDerivedStatsBG()
 {
-	int i;
 	int turnundeadlevel = 0;
-	int levels[3]={BaseStats[IE_LEVEL],BaseStats[IE_LEVEL2],BaseStats[IE_LEVEL3]};
-
 	int classid = BaseStats[IE_CLASS];
-	int slot = 0;
 
 	//this works only for PC classes
 	if (classid<32) {
-		for (i=0;i<11;i++) {
-			//this is not good for multiclassing yet
-			if ((1<<classid)&isclass[i]) {
-				BaseStats[levelslots[i]]=levels[slot];
-				slot++;
-			}
-		}
 		//recalculate all level based changes
 		pcf_level(this,0,0);
 
+		//even though the original didn't allow a cleric/paladin dual or multiclass
+		//we shouldn't restrict the possibility by using "else if" here
 		if (isclass[ISCLERIC]&(1<<classid)) {
-			turnundeadlevel = BaseStats[IE_LEVELCLERIC]+1-turnlevels[classid];
+			turnundeadlevel += GetClericLevel()+1-turnlevels[classid];
 			if (turnundeadlevel<0) turnundeadlevel=0;
 		}
-		else if (isclass[ISPALADIN]&(1<<classid)) {
-			turnundeadlevel = BaseStats[IE_LEVELPALADIN]+1-turnlevels[classid];
+		if (isclass[ISPALADIN]&(1<<classid)) {
+			turnundeadlevel += GetPaladinLevel()+1-turnlevels[classid];
 			if (turnundeadlevel<0) turnundeadlevel=0;
-		} else {
-			turnundeadlevel = 0;
 		}
 	}
 
-	ieDword backstabdamagemultiplier=BaseStats[IE_LEVELTHIEF];
+	ieDword backstabdamagemultiplier=GetThiefLevel();
 	if (backstabdamagemultiplier) {
-		backstabdamagemultiplier=backstabdamagemultiplier+3/4;
+		AutoTable tm("backstab");
+		//fallback to a general algorithm (bg2 backstab.2da version) if we can't find backstab.2da
+		//TODO: AP_SPCL332 (increase backstab by one) seems to not be effecting this at all
+		//for assassins perhaps the effect is being called prior to this, and this overwrites it;
+		//stalkers work correctly, which is even more odd, considering as they use the same
+		//effect and backstabmultiplier would be 0 for them
+		if (tm)	{
+			ieDword cols = tm->GetColumnCount();
+			if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols;
+			backstabdamagemultiplier = atoi(tm->QueryField(0, backstabdamagemultiplier));
+		} else {
+			backstabdamagemultiplier = (backstabdamagemultiplier+7)/4;
+		}
+		printf("\n");
 		if (backstabdamagemultiplier>7) backstabdamagemultiplier=7;
 	}
 	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;
 	BaseStats[IE_BACKSTABDAMAGEMULTIPLIER]=backstabdamagemultiplier;
-	BaseStats[IE_LAYONHANDSAMOUNT]=BaseStats[IE_LEVELPALADIN]*2;
+	BaseStats[IE_LAYONHANDSAMOUNT]=GetPaladinLevel()*2;
 }
 
 //3rd edition rules
@@ -4420,4 +4531,36 @@ Actor *Actor::CopySelf() const
 	//and apply them
 	newActor->RefreshEffects(newFXQueue);
 	return newActor;
+}
+
+ieDword Actor::GetClassLevel(const ieDword id) const {
+	if (id>=ISCLASSES)
+		return 0;
+
+	//return iwd2 value if appropriate
+	if (version==22)
+		return BaseStats[levelslotsiwd2[id]];
+
+	//houston, we gots a problem!
+	if (!levelslots || !dualswap)
+		return 0;
+
+	//only works with PC's
+	ieDword classid = BaseStats[IE_CLASS]-1;
+	if (classid>=(ieDword)classcount || !levelslots[classid])
+		return 0;
+
+	//get the levelid (IE_LEVEL,*2,*3)
+	ieDword levelid = levelslots[classid][id];
+	if (!levelid)
+		return 0;
+
+	//do dual-swap
+	if (IsDualClassed() && dualswap[classid]) {
+		if (levelid==IE_LEVEL)
+			levelid = IE_LEVEL2;
+		else
+			levelid = IE_LEVEL;
+	}
+	return BaseStats[levelid];
 }
