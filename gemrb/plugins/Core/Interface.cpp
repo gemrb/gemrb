@@ -3594,9 +3594,11 @@ void Interface::LoadGame(int index)
 	if (sav_str) {
 		ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);
 		if (ai) {
-			ai->DecompressSaveGame(sav_str);
+			if (ai->DecompressSaveGame(sav_str) != GEM_OK) {
+				FreeInterface( ai );
+				goto cleanup;
+			}
 			FreeInterface( ai );
-			ai = NULL;
 		}
 		delete sav_str;
 		sav_str = NULL;

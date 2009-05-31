@@ -72,7 +72,9 @@ int BIFImp::DecompressSaveGame(DataStream *compressed)
 		FILE *in_cache = fopen( path, "wb" );
 		Compressor* comp = ( Compressor* )
 			core->GetInterface( IE_COMPRESSION_CLASS_ID );
-		comp->Decompress( in_cache, compressed );
+		if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
+			return GEM_ERROR;
+		}
 		core->FreeInterface( comp );
 		fclose( in_cache );
 		Current = compressed->Remains();
@@ -188,7 +190,9 @@ int BIFImp::OpenArchive(const char* filename)
 		in_cache = fopen( path, "wb" );
 		Compressor* comp = ( Compressor* )
 			core->GetInterface( IE_COMPRESSION_CLASS_ID );
-		comp->Decompress( in_cache, compressed );
+		if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
+			return GEM_ERROR;
+		}
 		core->FreeInterface( comp );
 		fclose( in_cache );
 		delete( compressed );
@@ -231,7 +235,9 @@ int BIFImp::OpenArchive(const char* filename)
 		int laststep = 0;
 		while (finalsize < unCompBifSize) {
 			compressed->Seek( 8, GEM_CURRENT_POS );
-			comp->Decompress( in_cache, compressed );
+			if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
+				return GEM_ERROR;
+			}
 			finalsize = ftell( in_cache );
 			if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
 				laststep++;
