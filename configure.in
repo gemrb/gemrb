@@ -34,6 +34,7 @@ AC_CONFIG_SRCDIR([gemrb/])
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME,AC_PACKAGE_VERSION)
 AM_CONFIG_HEADER(config.h)
+AC_USE_SYSTEM_EXTENSIONS
 
 for top_builddir in . .. ../.. $ac_auxdir $ac_auxdir/..; do
   test -f $top_builddir/configure && break

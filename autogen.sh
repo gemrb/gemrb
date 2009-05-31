@@ -152,10 +152,10 @@ then
 fi
 
 echo Running libtoolize
-$my_libtoolize --force || exit 1
+$my_libtoolize --force --no-warn || exit 1
 
 echo Running aclocal
-$my_aclocal || exit 1
+$my_aclocal -W no-syntax || exit 1
 
 echo Running autoconf
 $my_autoconf || exit 1
