@@ -66,8 +66,8 @@ fi
 
 AC_ARG_ENABLE(debug, AS_HELP_STRING(--enable-debug,Build in debug mode), gemrb_use_debug=$enableval, gemrb_use_debug=no)
 if test "x$gemrb_use_debug" = "xyes" ; then
-  CFLAGS="-O0 -g $CFLAGS"
-  CXXFLAGS="-O0 -g $CXXFLAGS"
+  CFLAGS="$CFLAGS -O0 -g"
+  CXXFLAGS="$CXXFLAGS -O0 -g"
 fi
 
 AC_SUBST(plugindir)
