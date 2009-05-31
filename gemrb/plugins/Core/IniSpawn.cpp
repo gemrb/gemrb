@@ -431,7 +431,9 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 	const char *s;
 	
 	entry.interval = (unsigned int) inifile->GetKeyAsInt(entryname,"interval",0);
-	s = inifile->GetKeyAsString(entryname,"critters",NULL);
+	//don't default to NULL here, some entries may be missing in original game
+	//an empty default string here will create an empty but consistent entry
+	s = inifile->GetKeyAsString(entryname,"critters","");
 	int crittercount = CountElements(s,',');
 	entry.crittercount=crittercount;
 	entry.critters=new CritterEntry[crittercount];
