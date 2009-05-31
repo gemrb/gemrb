@@ -744,7 +744,7 @@ int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid) {
-		if ( value1 == core->GetGame()->GameTime/ROUND_SIZE ) return 1;
+		if ( value1 == core->GetGame()->GameTime ) return 1;
 	}
 	return 0;
 }
@@ -755,7 +755,7 @@ int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid && value1) {
-		if ( value1 < core->GetGame()->GameTime/ROUND_SIZE ) return 1;
+		if ( value1 < core->GetGame()->GameTime ) return 1;
 	}
 	return 0;
 }
@@ -767,7 +767,7 @@ int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid && value1) {
-	 	if ( value1 > core->GetGame()->GameTime/ROUND_SIZE ) return 1;
+	 	if ( value1 > core->GetGame()->GameTime ) return 1;
 	}
 	return 0;
 }
@@ -780,7 +780,7 @@ int GameScript::GlobalTimerStarted(Scriptable* Sender, Trigger* parameters)
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid && value1) {
-		if ( value1 > core->GetGame()->GameTime/ROUND_SIZE ) return 1;
+		if ( value1 > core->GetGame()->GameTime ) return 1;
 	}
 	return 0;
 }
