@@ -4137,11 +4137,15 @@ void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int
 	WeaponInfo wi;
 	ITMExtHeader *header = GetWeapon(wi);
 
-	if(header && header->AttackType == ITEM_AT_BOW) {
+	if(header && (header->AttackType == ITEM_AT_BOW)) {
 		AttackStance = IE_ANI_SHOOT;
 		ITMExtHeader* projHeader = GetRangedWeapon(wi);
 		anims->RangedType = projHeader->ProjectileType - 1;
 		return;
+	}
+	if(header && (header->AttackType == ITEM_AT_PROJECTILE)) {
+		AttackStance = IE_ANI_ATTACK_SLASH ; //That's it!!
+		return ;
 	}
 	AttackStance =  IE_ANI_ATTACK;
 }
