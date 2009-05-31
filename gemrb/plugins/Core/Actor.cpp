@@ -71,6 +71,7 @@ static int xpbonustypes = -1;
 static int xpbonuslevels = -1;
 static int **levelslots = NULL;
 static int *dualswap = NULL;
+static int *maxhpconbon = NULL;
 
 static int FistRows = -1;
 typedef ieResRef FistResType[MAX_LEVEL+1];
@@ -1003,6 +1004,10 @@ void Actor::ReleaseMemory()
 			free(dualswap);
 			dualswap=NULL;
 		}
+		if (maxhpconbon) {
+			free(maxhpconbon);
+			maxhpconbon=NULL;
+		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1256,15 +1261,20 @@ static void InitActorTables()
 		}
 	}
 
+	//default all hp con bonuses to 9; this should be updated below
+	//TODO: check iwd2
+	maxhpconbon = (int *) calloc(classcount, sizeof(int));
+	memset(maxhpconbon, 9, sizeof(maxhpconbon));
 	tm.load("classes");
 	if (tm && !core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+		AutoTable hptm;
 		//iwd2 just uses levelslotsiwd2 instead
 		printf("Examining classes.2da\n");
 
 		//when searching the levelslots, you must search for
 		//levelslots[BaseStats[IE_CLASS]-1] as there is no class id of 0
 		levelslots = (int **) calloc(classcount, sizeof(int*));
-		dualswap = (int *) calloc(classcount, sizeof(int*));
+		dualswap = (int *) calloc(classcount, sizeof(int));
 		//default all dualswaps to 0
 		memset(dualswap, 0, sizeof(dualswap));
 		ieDword tmpindex;
@@ -1298,6 +1308,16 @@ static void InitActorTables()
 				if (classis>=0) {
 					printf("Classis: %d ", classis);
 					levelslots[tmpindex][classis] = IE_LEVEL;
+					//get the max hp con bonus
+					hptm.load(tm->QueryField(i, 6));
+					if (hptm) {
+						int tmphp = 0;
+						int rollscolumn = hptm->GetColumnIndex("ROLLS");
+						while (atoi(hptm->QueryField(tmphp, rollscolumn)))
+							tmphp++;
+						printf("TmpHP: %d ", tmphp);
+						if (tmphp) maxhpconbon[tmpindex] = tmphp;
+					}
 				}
 				printf("DS: %d\n", dualswap[tmpindex]);
 				continue;
@@ -1306,6 +1326,7 @@ static void InitActorTables()
 			//we have to account for dual-swap in the multiclass field
 			ieDword numfound = 0;
 			ieDword tmpbits = bitcount (tmpclass);
+			bool foundwarrior = false;
 			for (int j=0; j<classcount; j++) {
 				//no sense continuing if we've found all to be found
 				if (numfound==tmpbits)
@@ -1323,6 +1344,22 @@ static void InitActorTables()
 						} else if (numfound==2) {
 							levelslots[tmpindex][classis] = IE_LEVEL3;
 						}
+
+						//warrior take presedence
+						if (!foundwarrior) {
+							foundwarrior = (classis==ISFIGHTER||classis==ISRANGER||classis==ISPALADIN||
+								classis==ISBARBARIAN);
+							hptm.load(tm->QueryField(currentname, "HP"));
+							if (hptm) {
+								int tmphp = 0;
+								int rollscolumn = hptm->GetColumnIndex("ROLLS");
+								while (atoi(hptm->QueryField(tmphp, rollscolumn)))
+									tmphp++;
+								//make sure we at least set the first class
+								if ((tmphp>maxhpconbon[tmpindex])||foundwarrior||numfound==0)
+									maxhpconbon[tmpindex]=tmphp;
+							}
+						}
 					}
 
 					//figure out if this is a dualswap situation
@@ -1335,6 +1372,7 @@ static void InitActorTables()
 					numfound++;
 				}
 			}
+			printf("HPCON: %d ", maxhpconbon[tmpindex]);
 			printf("DS: %d\n", dualswap[tmpindex]);
 		}
 		/*this could be enabled to ensure all levelslots are filled with at least 0's;
@@ -1632,15 +1670,20 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	//calculate hp bonus
 	int bonus;
+	int bonlevel = GetXPLevel(true);
+	//we must limit the levels to the max allowable
+	if (bonlevel>maxhpconbon[BaseStats[IE_CLASS]])
+		bonlevel = maxhpconbon[BaseStats[IE_CLASS]];
 
 	// warrior (fighter, barbarian, ranger, or paladin) or not
 	// TODO: for dualclassed characters we take the best only if both are active
 	if (IsWarrior()) {
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
 	} else {
+		
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);
 	}
-	bonus *= GetXPLevel( true );
+	bonus *= bonlevel;
 
 	//morale recovery every xth AI cycle
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
