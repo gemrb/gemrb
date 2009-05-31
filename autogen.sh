@@ -83,8 +83,8 @@ then
   my_libtoolize=$LIBTOOLIZE
 else
   for file in libtoolize; do
-    version=`$file --version | sed -n '1 { s/^[^ ]* (.*) //; s/ .*$//; s,\.,,g; p; }'`
-    if [ "$version" -gt 15 ];
+    libtool_version=`$file --version | sed -n '1 { s/^[^ ]* (.*) //; s/ .*$//; s,\.,,g; p; }'`
+    if [ "$libtool_version" -gt 15 ];
     then
       my_libtoolize=$file
       break
@@ -157,7 +157,11 @@ then
 fi
 
 echo Running libtoolize
-$my_libtoolize --force --no-warn || exit 1
+if [ "${libtool_version:0:1}" = 2 ]; then
+  $my_libtoolize --force --no-warn
+else
+  $my_libtoolize --force
+fi || exit 1
 
 echo Running aclocal
 $my_aclocal -W no-syntax || exit 1
