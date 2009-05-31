@@ -1973,8 +1973,8 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 #if 0
 void Actor::DumpMaxValues()
 {
-        int symbol = core->LoadSymbol( "stats" );
-        SymbolMgr *sym = core->GetSymbol( symbol );
+	int symbol = core->LoadSymbol( "stats" );
+	SymbolMgr *sym = core->GetSymbol( symbol );
 
 	for(int i=0;i<MAX_STATS;i++) {
 		printf("%d (%s) %d\n", i, sym->GetValue(i), maximum_values[i]);
@@ -2082,7 +2082,7 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 	}
 }
 
-void Actor::SetPosition(Point &position, int jump, int radius)
+void Actor::SetPosition(const Point &position, int jump, int radius)
 {
 	PathTries = 0;
 	ClearPath();
@@ -2500,8 +2500,8 @@ void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
 {
 	if (!PCStats) return;
 	PCStats->InitQuickSlot(which, slot, headerindex);
-        //something changed about the quick items
-        core->SetEventFlag(EF_ACTION);
+	//something changed about the quick items
+	core->SetEventFlag(EF_ACTION);
 }
 
 bool Actor::ValidTarget(int ga_flags) const
@@ -4528,11 +4528,9 @@ Actor *Actor::CopySelf() const
 	EffectQueue *newFXQueue = fxqueue.CopySelf();
 
 	area->AddActor(newActor);
-	newActor->Pos.x = Pos.x;
-	newActor->Pos.y = Pos.y;
-	newActor->Destination.x = Destination.x;
-	newActor->Destination.y = Destination.y;
+	newActor->SetPosition( Pos, CC_CHECK_IMPASSABLE, 0 );
 	newActor->SetOrientation(GetOrientation(),0);
+
 	//and apply them
 	newActor->RefreshEffects(newFXQueue);
 	return newActor;
