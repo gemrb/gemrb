@@ -1708,7 +1708,6 @@ int CREImp::GetStoredFileSize(Actor *actor)
 	//counting items (calculating item storage)
 	ItemsCount = 0;
 	for (i=0;i<Inventory_Size;i++) {
-	//for (i=0;i<core->GetInventorySize();i++) {
 		unsigned int j = core->QuerySlot(i+1);
 		CREItem *it = actor->inventory.GetSlotItem(j);
 		if (it) {
