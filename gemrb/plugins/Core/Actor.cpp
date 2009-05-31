@@ -4520,7 +4520,8 @@ Actor *Actor::CopySelf() const
 	//the creature importer does this too
 	memcpy(newActor->Modified,newActor->BaseStats, sizeof(Modified) );
 
-	//this is called too
+	//these need to be called too to have a valid inventory
+	newActor->inventory.SetSlotCount(inventory.GetSlotCount());
 	newActor->SetupFist();
 
 	//copy the running effects
