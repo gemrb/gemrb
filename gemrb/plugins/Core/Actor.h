@@ -558,5 +558,8 @@ public:
 	ieDword GetPaladinLevel () const { return GetClassLevel(ISPALADIN); }
 	ieDword GetRangerLevel () const { return GetClassLevel(ISRANGER); }
 	ieDword GetSorcererLevel () const { return GetClassLevel(ISSORCERER); }
+
+	/* Returns true if the character is a warrior */
+	bool IsWarrior() const { return (GetFighterLevel()||GetBarbarianLevel()||GetRangerLevel()||GetPaladinLevel()); }
 };
 #endif

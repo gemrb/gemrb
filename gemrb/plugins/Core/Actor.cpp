@@ -1634,9 +1634,8 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	int bonus;
 
 	// warrior (fighter, barbarian, ranger, or paladin) or not
-	// TODO: for multiclassed characters we look at all classes and use the best
 	// TODO: for dualclassed characters we take the best only if both are active
-	if (Modified[IE_CLASS]==2) {
+	if (IsWarrior()) {
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
 	} else {
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);

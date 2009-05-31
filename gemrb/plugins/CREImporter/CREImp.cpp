@@ -1770,7 +1770,7 @@ int CREImp::GetHpAdjustment(Actor *actor)
 {
 	int val;
 
-	if (actor->Modified[IE_CLASS]==2) {
+	if (actor->IsWarrior()) {
 		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,actor->BaseStats[IE_CON]);
 	} else {
 		val = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,actor->BaseStats[IE_CON]);
