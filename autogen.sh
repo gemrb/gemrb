@@ -171,10 +171,12 @@ $my_autoheader || exit 1
 echo Running automake
 $my_automake --add-missing || exit 1
 
-echo Running configure
+if test -z "$NOCONFIGURE"; then
+  echo Running configure
 
-cmd="./configure --prefix=$dest/ --bindir=$dest/ --sysconfdir=$dest/ --datadir=$dest/ --libdir=$dest --disable-subdirs"
-$cmd "$extra_args"
+  cmd="./configure --prefix=$dest/ --bindir=$dest/ --sysconfdir=$dest/ --datadir=$dest/ --libdir=$dest --disable-subdirs"
+  $cmd "$extra_args"
 
-echo
-echo "Configure was invoked as: $cmd $extra_args"
+  echo
+  echo "Configure was invoked as: $cmd $extra_args"
+fi
