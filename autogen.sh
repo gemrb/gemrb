@@ -19,6 +19,11 @@ else
     dest=$PWD/$1
   fi
   shift
+
+  # treat any other parameters as additional configure flags
+  if [ "$1" != "" ]; then
+    extra_args="$@"
+  fi
 fi
 
 if [ -n "$ACLOCAL" ];
@@ -169,7 +174,7 @@ $my_automake --add-missing || exit 1
 echo Running configure
 
 cmd="./configure --prefix=$dest/ --bindir=$dest/ --sysconfdir=$dest/ --datadir=$dest/ --libdir=$dest --disable-subdirs"
-$cmd
+$cmd "$extra_args"
 
 echo
-echo "Configure was invoked as: $cmd"
+echo "Configure was invoked as: $cmd $extra_args"
