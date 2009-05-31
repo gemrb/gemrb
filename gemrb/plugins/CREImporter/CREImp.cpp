@@ -529,12 +529,13 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 		ReadChrHeader(act);
 	}
 
+	act->inventory.CalculateWeight();
+	act->CreateDerivedStats();
 	if (CREVersion==IE_CRE_V1_2) {
+		//do this after created derived stats
 		ieDword hp = act->BaseStats[IE_HITPOINTS] - GetHpAdjustment(act);
 		act->BaseStats[IE_HITPOINTS]=hp;
 	}
-	act->inventory.CalculateWeight();
-	act->CreateDerivedStats();
 	//do this after created derived stats
 	act->SetupFist();
 	//initial setup
