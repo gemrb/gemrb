@@ -4520,6 +4520,9 @@ Actor *Actor::CopySelf() const
 	//the creature importer does this too
 	memcpy(newActor->Modified,newActor->BaseStats, sizeof(Modified) );
 
+	//this is called too
+	newActor->SetupFist();
+
 	//copy the running effects
 	EffectQueue *newFXQueue = fxqueue.CopySelf();
 
