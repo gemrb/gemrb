@@ -2314,10 +2314,10 @@ bool Actor::CheckOnDeath()
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
-	
+
 	// party actors are never removed
 	if (InParty) return false;
-	
+
 	if (Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) return true;
 	if (Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
 	//if chunked death, then return true
@@ -2748,8 +2748,10 @@ void Actor::SetModal(ieDword newstate)
 //even spells got this attack style
 int Actor::GetAttackStyle()
 {
-	int effect = core->QuerySlotEffects(inventory.GetEquippedSlot());
-	if (effect == SLOT_EFFECT_MISSILE) return WEAPON_RANGED;
+	WeaponInfo wi ;
+	//Non NULL if the equipped slot is a projectile or a throwing weapon
+	//TODO some weapons have both melee and ranged capability
+	if (GetRangedWeapon(wi) != NULL) return WEAPON_RANGED ;
 	return WEAPON_MELEE;
 }
 
@@ -2924,7 +2926,6 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (!header) {
 		return;
 	}
-
 	//can't reach target, zero range shouldn't be allowed
 	//Don't forget to take size of the opponents into account
 	//Actually, this version of PersonalDistance already calculates with the size!!!

@@ -1127,7 +1127,7 @@ CREItem *Inventory::GetUsedWeapon(bool leftorright, int &slot) const
 		}
 	}
 	slot = GetEquippedSlot();
-	if(core->QuerySlotEffects(slot)) {
+	if((core->QuerySlotEffects(slot) & SLOT_EFFECT_MISSILE) == SLOT_EFFECT_MISSILE) {
 		slot = FindRangedWeapon();
 	}
 	ret = GetSlotItem(slot);
