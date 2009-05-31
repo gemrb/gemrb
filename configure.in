@@ -63,6 +63,12 @@ else
   moddir=$datadir/gemrb
 fi
 
+AC_ARG_ENABLE(debug, AS_HELP_STRING(--enable-debug,Build in debug mode), gemrb_use_debug=$enableval, gemrb_use_debug=no)
+if test "x$gemrb_use_debug" = "xyes" ; then
+  CFLAGS="-O0 -g $CFLAGS"
+  CXXFLAGS="-O0 -g $CXXFLAGS"
+fi
+
 AC_SUBST(plugindir)
 AC_SUBST(moddir)
 AC_SUBST(docdir)
