@@ -1720,7 +1720,6 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if (IsWarrior()) {
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
 	} else {
-		
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);
 	}
 	bonus *= bonlevel;

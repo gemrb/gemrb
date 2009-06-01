@@ -1004,6 +1004,9 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		NumClasses = Multi[0]
 		Class = [Multi[1], Multi[2], Multi[3]]
 	elif Dual[0]: #only worry about the newer class
+		#we only get the hp bonus if the old class is reactivated
+		if (Levels[0]<=Levels[1]):
+			return
 		Class = [ClassTable.GetValue (Dual[2], 5)]
 		#if Level and LevelDiff are passed, we assume it is correct
 		if IsDualSwap(pc) and not Level and not LevelDiff:
