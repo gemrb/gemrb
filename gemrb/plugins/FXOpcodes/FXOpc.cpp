@@ -1154,7 +1154,9 @@ int fx_damage (Actor* Owner, Actor* target, Effect* fx)
 	if ((damagetype&3)==3) {
 		damagetype&=~3;
 	}
-	target->Damage(fx->Parameter1, damagetype, Owner);
+	//Roll dice.
+	int damage = core->Roll(fx->DiceThrown, fx->DiceSides, fx->Parameter1);
+	target->Damage(damage, damagetype, Owner);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }
@@ -3358,7 +3360,7 @@ void CopyPolymorphStats(Actor *source, Actor *target)
 	if(!polymorph_stats) {
 		AutoTable tab("polystat");
 		if (!tab) {
-			spell_abilities = (int *) malloc(0);			
+			spell_abilities = (int *) malloc(0);
 			polystatcount=0;
 			return;
 		}
@@ -3387,7 +3389,7 @@ int fx_polymorph (Actor* /*Owner*/, Actor* target, Effect* fx)
 		target->inventory.RemoveItem(target->inventory.GetMagicSlot() );
 		return FX_NOT_APPLIED;
 	}
-	
+
 	//FIXME:
 	//This pointer should be cached, or we are in deep trouble
 	Actor *newCreature = gamedata->GetCreature(fx->Resource,0);
@@ -3399,7 +3401,7 @@ int fx_polymorph (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 	//TODO:
 	//copy the animation ID
-	
+
 	//copy all polymorphed stats
 	if(fx->Parameter2) {
 		STAT_SET( IE_POLYMORPHED, 1 );
@@ -5363,8 +5365,8 @@ int fx_apply_effect_repeat (Actor* Owner, Actor* target, Effect* fx)
 int fx_remove_projectile (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	ieDword *projectilelist;
-	
-	//instant effect 
+
+	//instant effect
 	if (0) printf( "fx_remove_projectile (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	if (!target) return FX_NOT_APPLIED;

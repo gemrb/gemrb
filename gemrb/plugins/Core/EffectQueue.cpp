@@ -841,7 +841,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	bool saved = false;
 	ieDword j=1;
 	for (int i=0;i<5;i++) {
-		if (fx->SavingThrowType&j) {
+		if (fx->SavingThrowType&(j<<i)) {
 			saved = actor->GetSavingThrow(i, fx->SavingThrowBonus);
 			if (saved) {
 				break;
@@ -850,7 +850,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	}
 	if (saved) {
 		if (fx->IsSaveForHalfDamage) {
-			fx->Parameter1/=2;
+			fx->Parameter1/=2; fx->DiceSides/=2 ; /*Hope this will work*/
 		} else {
 			return true;
 		}
