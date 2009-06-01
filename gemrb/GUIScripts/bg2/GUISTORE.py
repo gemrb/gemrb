@@ -936,6 +936,9 @@ def InfoWindow (Slot, Item):
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ErrorDone")
 
+	# hide the empty button
+	Window.DeleteControl (9)
+
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
