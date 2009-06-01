@@ -319,6 +319,8 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 	return fx;
 }
 
+//return the count of effects with matching parameters
+//useful for effects where there is no separate stat to see
 ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *resource) const
 {
 	ResolveEffectRef(effect_reference);
@@ -328,6 +330,9 @@ ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, i
 	return CountEffects(effect_reference.EffText, param1, param2, resource);
 }
 
+//Change the location of an existing effect
+//this is used when some external code needs to adjust the effect's location
+//used when the gui sets the effect's final target
 void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y)
 {
 	ResolveEffectRef(effect_reference);
@@ -346,6 +351,7 @@ Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, i
 	return CreateEffect(effect_reference.EffText, param1, param2, timing);
 }
 
+//copies the whole effectqueue (area projectiles use it)
 EffectQueue *EffectQueue::CopySelf() const
 {
 	EffectQueue *effects;
@@ -361,6 +367,10 @@ EffectQueue *EffectQueue::CopySelf() const
 	return effects;
 }
 
+//create a new effect with most of the characteristics of the old effect
+//only opcode and parameters are changed
+//This is used mostly inside effects, when an effect needs to spawn
+//other effects with the same coordinates, source, duration, etc.
 Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2)
 {
 	if (opcode==0xffffffff) {
@@ -397,6 +407,8 @@ void EffectQueue::AddEffect(Effect* fx, bool insert)
 	}
 }
 
+//This method can remove an effect described by a pointer to it, or
+//an exact matching effect
 bool EffectQueue::RemoveEffect(Effect* fx)
 {
 	int invariant_size = offsetof( Effect, random_value );
@@ -404,8 +416,6 @@ bool EffectQueue::RemoveEffect(Effect* fx)
 	for (std::list< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
 		Effect* fx2 = *f;
 
-		//TODO:
-		//equipped effects do not have point at removal
 		if ( (fx==fx2) || !memcmp( fx, fx2, invariant_size)) {
 			delete fx2;
 			effects.erase( f );
@@ -436,6 +446,7 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 	}
 }
 
+//Handle the target flag when the effect is applied first
 int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &dest)
 {
 	int i;
@@ -556,6 +567,8 @@ int EffectQueue::AddAllEffects(Actor* target, Point &destination)
 	return res;
 }
 
+//check if an effect has no level based resistance, but instead the dice sizes/count
+//adjusts Parameter1 (like a damage causing effect)
 inline static bool IsDicedEffect(int opcode)
 {
 	int i;
@@ -568,6 +581,8 @@ inline static bool IsDicedEffect(int opcode)
 	return false;
 }
 
+//there is no level based resistance, but Parameter1 cannot be precalculated
+//these effects use the Dice fields in a special way
 inline static bool IsDicedEffect2(int opcode)
 {
 	int i;
@@ -608,6 +623,8 @@ inline bool check_level(Actor *target, Effect *fx)
 	return false;
 }
 
+//roll for the effect probability, there is a high and a low treshold, the d100 
+//roll should hit in the middle
 inline bool check_probability(Effect* fx)
 {
 	//watch for this, probability1 is the high number
@@ -660,6 +677,7 @@ inline static void DecreaseEffect(Effect *efx)
 	}
 }
 
+//lower decreasing immunities/bounces
 static int check_type(Actor* actor, Effect* fx)
 {
 	//the protective effect (if any)
@@ -815,6 +833,7 @@ static int check_type(Actor* actor, Effect* fx)
 	return 1;
 }
 
+//check resistances, saving throws
 static bool check_resistance(Actor* actor, Effect* fx)
 {
 	//magic immunity
@@ -863,7 +882,9 @@ static bool check_resistance(Actor* actor, Effect* fx)
 // if the effect returns FX_DURATION_JUST_EXPIRED then it won't stick
 // when first_apply is unset, the effect is already on the target
 // this happens on load time too!
-// returns true if the process should stop calling applyeffect anymore
+// returns FX_NOT_APPLIED if the process shouldn't be calling applyeffect anymore
+// returns FX_ABORT if the whole spell this effect is in should be aborted
+// it will disable all future effects of same source (only on first apply)
 
 int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 {
@@ -1084,6 +1105,7 @@ void EffectQueue::RemoveAllEffects(EffectRef &effect_reference) const
 	RemoveAllEffects(effect_reference.EffText);
 }
 
+//Removes all effects with a matching resource field
 void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource) const
 {
 	std::list< Effect* >::const_iterator f;
@@ -1102,6 +1124,8 @@ void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, cons
 	RemoveAllEffectsWithResource(effect_reference.EffText, resource);
 }
 
+//This method could be used to remove stat modifiers that would lower a stat
+//(works only if a higher stat means good for the target)
 void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) const
 {
 	std::list< Effect* >::const_iterator f;
@@ -1125,6 +1149,10 @@ void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) c
 	}
 }
 
+//Removes all effects with a matching param2
+//param2 is usually an effect's subclass (quality) while param1 is more like quantity.
+//So opcode+param2 usually pinpoints an effect better when not all effects of a given
+//opcode need to be removed (see removal of portrait icon)
 void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) const
 {
 	std::list< Effect* >::const_iterator f;
@@ -1186,6 +1214,9 @@ void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword
 	RemoveAllEffectsWithParam(effect_reference.EffText, param2);
 }
 
+//remove certain levels of effects, possibly matching school/secondary type
+//this method removes whole spells (tied together by their source)
+//FIXME: probably this isn't perfect
 void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match) const
 {
 	ieResRef Removed;
