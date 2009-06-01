@@ -1302,7 +1302,15 @@ void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
 
 void GameScript::DisplayStringNoName(Scriptable* Sender, Action* parameters)
 {
-	DisplayStringCore( Sender, parameters->int0Parameter, DS_CONSOLE|DS_NONAME);
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1]);
+	if (!target) {
+		target=Sender;
+	}
+	if (Sender->Type==ST_ACTOR) {
+		DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_NONAME);
+	} else {
+		DisplayStringCore( target, parameters->int0Parameter, DS_AREA|DS_NONAME);
+	}
 }
 
 void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
@@ -1423,7 +1431,7 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar && tar->Type!=ST_ACTOR) {
+	if (!tar || tar->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
