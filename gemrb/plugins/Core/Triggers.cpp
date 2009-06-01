@@ -2761,7 +2761,7 @@ int GameScript::TargetUnreachable(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::PartyCountEQ(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GetPartySize(0)<parameters->int0Parameter;
+	return core->GetGame()->GetPartySize(0)==parameters->int0Parameter;
 }
 
 int GameScript::PartyCountLT(Scriptable* /*Sender*/, Trigger* parameters)
@@ -2776,7 +2776,7 @@ int GameScript::PartyCountGT(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::PartyCountAliveEQ(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GetPartySize(1)<parameters->int0Parameter;
+	return core->GetGame()->GetPartySize(1)==parameters->int0Parameter;
 }
 
 int GameScript::PartyCountAliveLT(Scriptable* /*Sender*/, Trigger* parameters)
@@ -2791,7 +2791,7 @@ int GameScript::PartyCountAliveGT(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::LevelParty(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GetPartyLevel(1)<parameters->int0Parameter;
+	return core->GetGame()->GetPartyLevel(1)==parameters->int0Parameter;
 }
 
 int GameScript::LevelPartyLT(Scriptable* /*Sender*/, Trigger* parameters)
