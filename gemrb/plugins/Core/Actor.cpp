@@ -1363,12 +1363,14 @@ static void InitActorTables()
 						}
 					}
 
-					//figure out if this is a dualswap situation
+					//save the MC_WAS_ID of the first class in the dual-class
 					if (numfound==0 && tmpbits==2) {
 						char* firstclass = (char*)strtok((char*)classname, "_");
-						if (strcmp(firstclass, currentname) != 0) {
-							dualswap[tmpindex] = 1;
+						if (strcmp(firstclass, currentname) == 0) {
+							dualswap[tmpindex] = strtol(tm->QueryField(classname, "MC_WAS_ID"), NULL, 0);
 						}
+					} else if (numfound==1 && tmpbits==2 && !dualswap[tmpindex]) {
+						dualswap[tmpindex] = strtol(tm->QueryField(classname, "MC_WAS_ID"), NULL, 0);
 					}
 					numfound++;
 				}
@@ -4611,7 +4613,7 @@ ieDword Actor::GetClassLevel(const ieDword id) const
 	if (IsDualClassed()) {
 		//if the old class is inactive, and it is the class
 		//being searched for, return 0
-		if (IsDualInactive() && (Modified[IE_MC_FLAGS]&mcwasflags[id]))
+		if (IsDualInactive() && ((Modified[IE_MC_FLAGS]&MC_WAS_ANY)==(ieDword)mcwasflags[id]))
 			return 0;
 
 		//flip the IE_LEVEL if we need to
@@ -4638,6 +4640,5 @@ bool Actor::IsDualSwap() const
 {
 	//the dualswap[class-1] holds the info
 	if (!IsDualClassed()) return false;
-	if ((BaseStats[IE_CLASS]-1)>=ISCLASSES) return false;
-	return dualswap[BaseStats[IE_CLASS]-1];
+	return (ieDword)dualswap[BaseStats[IE_CLASS]-1]==(Modified[IE_MC_FLAGS]&MC_WAS_ANY);
 }
