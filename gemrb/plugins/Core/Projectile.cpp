@@ -277,7 +277,7 @@ Actor *Projectile::GetTarget()
 void Projectile::SetDelay(int delay)
 {
 	extension_delay=delay;
-	TFlags|=PTF_FREEZE;
+	ExtFlags|=PEF_FREEZE;
 }
 
 //control the phase change when the projectile reached its target
@@ -288,7 +288,7 @@ void Projectile::ChangePhase()
 {
 	//freeze on target, this is recommended only for child projectiles
 	//as the projectile won't go away on its own
-	if(TFlags&PTF_FREEZE) {
+	if(ExtFlags&PEF_FREEZE) {
 		if(extension_delay) {
 		if (extension_delay>0) {
 			extension_delay--;

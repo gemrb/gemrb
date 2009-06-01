@@ -72,7 +72,8 @@ Projectile* PROImp::GetProjectile(Projectile *s)
 	str->ReadResRef( s->SoundRes2 );
 	str->ReadResRef( s->SoundRes3 );
 	str->ReadDword( &s->SparkColor ); //enabled by PSF_SPARK
-	str->Seek(212, GEM_CURRENT_POS); //skipping unused features
+	str->ReadDword( &s->ExtFlags ); //gemrb extension flags
+	str->Seek(208, GEM_CURRENT_POS); //skipping unused (unknown) bytes
 	//we should stand at offset 0x100 now
 	str->ReadDword( &s->TFlags ); //other projectile flags
 	str->ReadResRef( s->BAMRes1 );

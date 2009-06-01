@@ -73,10 +73,10 @@
 #define PTF_LIGHT   64      //has light shadow
 #define PTF_BLEND   128     //blend colours
 
-//gemrb specific projectile travel flags
-//these flags are arbitrary, I start assigning them from backwards to avoid
-//collision with existing flags (if possible)
-#define PTF_FREEZE 0x80000000
+//projectile extended travel flags (gemrb specific)
+#define PEF_BOUNCE   1      //bounce from walls (lightning bolt)
+#define PEF_CONTINUE 2      //continue as a travel projectile after trigger (lightning bolt)
+#define PEF_FREEZE   4      //stay around and slowly fade out after trigger (ice dagger in pst)
 
 //projectile area flags
 #define PAF_VISIBLE   1     //the travel projectile is visible until explosion
@@ -142,6 +142,7 @@ public:
 	ieResRef SoundRes2;
 	ieResRef SoundRes3;
 	ieDword SparkColor;
+	ieDword ExtFlags;
 	////// gap
 	ieDword TFlags;
 	ieResRef BAMRes1;
