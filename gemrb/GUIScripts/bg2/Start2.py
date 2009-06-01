@@ -169,7 +169,7 @@ def LoadSingle():
 		QuitWindow.Unload()
 	if TutorialWindow:
 		TutorialWindow.Unload()
-	GemRB.SetVar("PlayMode",0)
+	GemRB.SetVar("PlayMode",2)
 	GemRB.SetNextScript ("GUILOAD")
 	return
 
