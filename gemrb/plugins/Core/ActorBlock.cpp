@@ -403,6 +403,9 @@ void Scriptable::ProcessActions(bool force)
 	if (InMove()) {
 		return;
 	}
+	
+	// try to release NoInterrupt at end of MoveToPoint etc
+	Interrupt();
 
 	if (CurrentAction) {
 		ReleaseCurrentAction();
@@ -1046,8 +1049,6 @@ void Movable::DoStep(unsigned int walk_speed)
 		//since clearpath no longer sets currentaction to NULL
 		//we set it here
 		ReleaseCurrentAction();
-		// try to release NoInterrupt at end of MoveToPoint etc
-		Interrupt();
 		return;
 	}
 	if (!walk_speed) {
