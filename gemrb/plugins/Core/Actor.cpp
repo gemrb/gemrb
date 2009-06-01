@@ -1695,9 +1695,25 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	//calculate hp bonus
 	int bonus;
 	int bonlevel = GetXPLevel(true);
+	int oldlevel, oldbonus;
+	oldlevel = oldbonus = 0;
+	ieDword bonindex = BaseStats[IE_CLASS]-1;
 	//we must limit the levels to the max allowable
-	if (bonlevel>maxhpconbon[BaseStats[IE_CLASS]-1])
-		bonlevel = maxhpconbon[BaseStats[IE_CLASS]-1];
+	if (bonlevel>maxhpconbon[bonindex])
+		bonlevel = maxhpconbon[bonindex];
+
+	if (IsDualInactive()) {
+		//we apply the inactive hp bonus if it's better than the new hp bonus, so that we
+		//never lose hp, only gain, on leveling
+		oldlevel = IsDualSwap() ? BaseStats[IE_LEVEL] : BaseStats[IE_LEVEL2];
+		bonlevel = IsDualSwap() ? BaseStats[IE_LEVEL2] : BaseStats[IE_LEVEL];
+		oldlevel = (oldlevel > maxhpconbon[bonindex]) ? maxhpconbon[bonindex] : oldlevel;
+		if (Modified[IE_MC_FLAGS] & (MC_WAS_FIGHTER|MC_WAS_RANGER)) {
+			oldbonus = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR, Modified[IE_CON]);
+		} else {
+			oldbonus = core->GetConstitutionBonus(STAT_CON_HP_NORMAL, Modified[IE_CON]);
+		}
+	}
 
 	// warrior (fighter, barbarian, ranger, or paladin) or not
 	// GetClassLevel now takes into consideration inactive dual-classes
@@ -1708,6 +1724,8 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);
 	}
 	bonus *= bonlevel;
+	oldbonus *= oldlevel;
+	bonus = (oldbonus > bonus) ? oldbonus : bonus;
 
 	//morale recovery every xth AI cycle
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
