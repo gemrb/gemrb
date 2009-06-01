@@ -283,6 +283,7 @@ char** DLGImp::GetStrings(char* string, unsigned int& count)
 						ignore=true;
 					}
 				}
+				break;
 			case '"':
 				quotes = !quotes;
 				break;
@@ -315,12 +316,13 @@ char** DLGImp::GetStrings(char* string, unsigned int& count)
 		return strings;
 	}
 	poi = string;
-	for (unsigned int i = 0; i < count; i++) {
+	for (int i = 0; i < (int)count; i++) {
 		while (MyIsSpace( *poi ))
 			poi++;
 		int len = GetActionLength( poi );
 		if((*poi=='/') && (*(poi+1)=='/') ) {
 			poi+=len;
+			i--;
 			continue;
 		}
 		strings[i] = ( char * ) malloc( len + 1 );
