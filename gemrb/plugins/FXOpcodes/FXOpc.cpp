@@ -1154,9 +1154,7 @@ int fx_damage (Actor* Owner, Actor* target, Effect* fx)
 	if ((damagetype&3)==3) {
 		damagetype&=~3;
 	}
-	//Roll dice.
-	int damage = core->Roll(fx->DiceThrown, fx->DiceSides, fx->Parameter1);
-	target->Damage(damage, damagetype, Owner);
+	target->Damage(fx->Parameter1, damagetype, Owner);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }
