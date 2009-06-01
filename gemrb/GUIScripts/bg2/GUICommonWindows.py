@@ -1051,7 +1051,6 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		#add all the hp for the given level
 		#we use ceil to ensure each class gets hp
 		for level in range(LowLevel, HiLevel):
-			#TODO: do dual-class characters get the roll?
 			rolls = HPTable.GetValue (level, 1)
 			bonus = HPTable.GetValue (level, 2)
 
