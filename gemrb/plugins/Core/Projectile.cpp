@@ -707,6 +707,10 @@ void Projectile::DrawExplosion(Region &screen)
 
 		//draw it only once, at the time of explosion
 		if (phase==P_EXPLODING1) {
+			res = server->GetExplosion(Extension->ExplType, 3);
+			if (res) {
+				core->GetAudioDrv()->Play(*res, Pos.x, Pos.y, GEM_SND_RELATIVE);
+			}
 			//the center animation is in the second column
 			res = server->GetExplosion(Extension->ExplType, 1);
 			if (res) {
@@ -722,6 +726,11 @@ void Projectile::DrawExplosion(Region &screen)
 				}
 			}
 			phase=P_EXPLODING2;
+		} else {
+			res = server->GetExplosion(Extension->ExplType, 4);
+			if (res) {
+				core->GetAudioDrv()->Play(*res, Pos.x, Pos.y, GEM_SND_RELATIVE);
+			}
 		}
 
 		//the spreading animation is in the first column
