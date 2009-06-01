@@ -395,7 +395,7 @@ void Scriptable::ProcessActions(bool force)
 	}
 	if (WaitCounter) {
 		WaitCounter--;
-		return;
+		if (WaitCounter) return;
 	}
 
 	//don't do anything while moving?
