@@ -276,6 +276,8 @@ private:
 	void CreateDerivedStatsIWD2();
 	/* Gets the given ISCLASS level */
 	ieDword GetClassLevel (const ieDword id) const;
+	/* Returns true if the dual class is backwards */
+	bool IsDualSwap() const;
 public:
 	Actor(void);
 	~Actor(void);
@@ -547,19 +549,20 @@ public:
 	/* Returns an exact copy of this actor */
 	Actor *CopySelf() const;
 	/* Returns the actor's level of the given class */
-	ieDword GetFighterLevel () const { return GetClassLevel(ISFIGHTER); }
-	ieDword GetMageLevel () const { return GetClassLevel(ISMAGE); }
-	ieDword GetThiefLevel () const { return GetClassLevel(ISTHIEF); }
-	ieDword GetBarbarianLevel () const { return GetClassLevel(ISBARBARIAN); }
-	ieDword GetBardLevel () const { return GetClassLevel(ISBARD); }
-	ieDword GetClericLevel () const { return GetClassLevel(ISCLERIC); }
-	ieDword GetDruidLevel () const { return GetClassLevel(ISDRUID); }
-	ieDword GetMonkLevel () const { return GetClassLevel(ISMONK); }
-	ieDword GetPaladinLevel () const { return GetClassLevel(ISPALADIN); }
-	ieDword GetRangerLevel () const { return GetClassLevel(ISRANGER); }
-	ieDword GetSorcererLevel () const { return GetClassLevel(ISSORCERER); }
-
+	ieDword GetFighterLevel() const { return GetClassLevel(ISFIGHTER); }
+	ieDword GetMageLevel() const { return GetClassLevel(ISMAGE); }
+	ieDword GetThiefLevel() const { return GetClassLevel(ISTHIEF); }
+	ieDword GetBarbarianLevel() const { return GetClassLevel(ISBARBARIAN); }
+	ieDword GetBardLevel() const { return GetClassLevel(ISBARD); }
+	ieDword GetClericLevel() const { return GetClassLevel(ISCLERIC); }
+	ieDword GetDruidLevel() const { return GetClassLevel(ISDRUID); }
+	ieDword GetMonkLevel() const { return GetClassLevel(ISMONK); }
+	ieDword GetPaladinLevel() const { return GetClassLevel(ISPALADIN); }
+	ieDword GetRangerLevel() const { return GetClassLevel(ISRANGER); }
+	ieDword GetSorcererLevel() const { return GetClassLevel(ISSORCERER); }
 	/* Returns true if the character is a warrior */
 	bool IsWarrior() const { return (GetFighterLevel()||GetBarbarianLevel()||GetRangerLevel()||GetPaladinLevel()); }
+	/* Returns true if the old class is inactive */
+	bool IsDualInactive() const;
 };
 #endif

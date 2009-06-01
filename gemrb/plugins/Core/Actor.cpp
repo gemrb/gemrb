@@ -105,6 +105,9 @@ static int fiststat = IE_CLASS;
 //conversion for 3rd ed
 static int isclass[11]={0,0,0,0,0,0,0,0,0,0,0};
 
+static const int mcwasflags[11] = {
+	MC_WAS_FIGHTER, MC_WAS_MAGE, MC_WAS_THIEF, 0, 0, MC_WAS_CLERIC,
+	MC_WAS_DRUID, 0, 0, MC_WAS_RANGER, 0};
 static const char *isclassnames[11] = {
 	"FIGHTER", "MAGE", "THIEF", "BARBARIAN", "BARD", "CLERIC",
 	"DRUID", "MONK", "PALADIN", "RANGER", "SORCERER" };
@@ -1275,7 +1278,6 @@ static void InitActorTables()
 		//levelslots[BaseStats[IE_CLASS]-1] as there is no class id of 0
 		levelslots = (int **) calloc(classcount, sizeof(int*));
 		dualswap = (int *) calloc(classcount, sizeof(int));
-		//default all dualswaps to 0
 		memset(dualswap, 0, sizeof(dualswap));
 		ieDword tmpindex;
 		for (i=0; i<classcount; i++) {
@@ -1298,7 +1300,7 @@ static void InitActorTables()
 			printf("Name: %s ", classname);
 			int classis = 0;
 			//default all levelslots to 0
-			levelslots[tmpindex] = (int *) calloc(ISCLASSES, sizeof(int*));
+			levelslots[tmpindex] = (int *) calloc(ISCLASSES, sizeof(int));
 			memset(levelslots[tmpindex], 0, sizeof(levelslots[tmpindex]));
 
 			//single classes only worry about IE_LEVEL
@@ -1319,7 +1321,6 @@ static void InitActorTables()
 						if (tmphp) maxhpconbon[tmpindex] = tmphp;
 					}
 				}
-				printf("DS: %d\n", dualswap[tmpindex]);
 				continue;
 			}
 
@@ -1672,11 +1673,11 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	int bonus;
 	int bonlevel = GetXPLevel(true);
 	//we must limit the levels to the max allowable
-	if (bonlevel>maxhpconbon[BaseStats[IE_CLASS]])
-		bonlevel = maxhpconbon[BaseStats[IE_CLASS]];
+	if (bonlevel>maxhpconbon[BaseStats[IE_CLASS]-1])
+		bonlevel = maxhpconbon[BaseStats[IE_CLASS]-1];
 
 	// warrior (fighter, barbarian, ranger, or paladin) or not
-	// TODO: for dualclassed characters we take the best only if both are active
+	// GetClassLevel now takes into consideration inactive dual-classes
 	if (IsWarrior()) {
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
 	} else {
@@ -4583,7 +4584,8 @@ Actor *Actor::CopySelf() const
 	return newActor;
 }
 
-ieDword Actor::GetClassLevel(const ieDword id) const {
+ieDword Actor::GetClassLevel(const ieDword id) const
+{
 	if (id>=ISCLASSES)
 		return 0;
 
@@ -4596,7 +4598,7 @@ ieDword Actor::GetClassLevel(const ieDword id) const {
 		return 0;
 
 	//only works with PC's
-	ieDword classid = BaseStats[IE_CLASS]-1;
+	ieDword	classid = BaseStats[IE_CLASS]-1;
 	if (classid>=(ieDword)classcount || !levelslots[classid])
 		return 0;
 
@@ -4606,11 +4608,36 @@ ieDword Actor::GetClassLevel(const ieDword id) const {
 		return 0;
 
 	//do dual-swap
-	if (IsDualClassed() && dualswap[classid]) {
-		if (levelid==IE_LEVEL)
-			levelid = IE_LEVEL2;
-		else
-			levelid = IE_LEVEL;
+	if (IsDualClassed()) {
+		//if the old class is inactive, and it is the class
+		//being searched for, return 0
+		if (IsDualInactive() && (Modified[IE_MC_FLAGS]&mcwasflags[id]))
+			return 0;
+
+		//flip the IE_LEVEL if we need to
+		if (IsDualSwap()) {
+			levelid = (levelid == IE_LEVEL) ? IE_LEVEL2 : IE_LEVEL;
+		}
 	}
 	return BaseStats[levelid];
+}
+
+bool Actor::IsDualInactive() const
+{
+	if (!IsDualClassed()) return 0;
+
+	//we assume the old class is in IE_LEVEL2, unless swapped
+	ieDword oldlevel = IsDualSwap() ? BaseStats[IE_LEVEL] : BaseStats[IE_LEVEL2];
+
+	//since GetXPLevel returns the average of the 2 levels, oldclasslevel will
+	//only be less than GetXPLevel when the new class surpasses it
+	return oldlevel>=GetXPLevel(false);
+}
+
+bool Actor::IsDualSwap() const
+{
+	//the dualswap[class-1] holds the info
+	if (!IsDualClassed()) return false;
+	if ((BaseStats[IE_CLASS]-1)>=ISCLASSES) return false;
+	return dualswap[BaseStats[IE_CLASS]-1];
 }
