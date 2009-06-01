@@ -1325,8 +1325,17 @@ static void InitActorTables()
 			}
 
 			//we have to account for dual-swap in the multiclass field
-			ieDword numfound = 0;
+			ieDword numfound = 1;
 			ieDword tmpbits = bitcount (tmpclass);
+
+			//we need all the classnames of the multi to compare with the order we load them in
+			//because the original game set the levels based on name order, not bit order
+			char **classnames = (char **) calloc(tmpbits, sizeof(char *));
+			classnames[0] = strdup((char*)strtok((char*)classname, "_"));
+			while (numfound<tmpbits && (classnames[numfound] = strdup(strtok(NULL, "_")))) {
+				numfound++;
+			}
+			numfound = 0;
 			bool foundwarrior = false;
 			for (int j=0; j<classcount; j++) {
 				//no sense continuing if we've found all to be found
@@ -1337,14 +1346,18 @@ static void InitActorTables()
 					const char* currentname = tm->GetRowName((ieDword)(tm->FindTableValue(5, j+1)));
 					classis = IsClassFromName(currentname);
 					if (classis>=0) {
-						printf("Classis: %d ", classis);
-						if (numfound==0) {
-							levelslots[tmpindex][classis] = IE_LEVEL;
-						} else if (numfound==1) {
-							levelslots[tmpindex][classis] = IE_LEVEL2;
-						} else if (numfound==2) {
-							levelslots[tmpindex][classis] = IE_LEVEL3;
+						//search for the current class in the split of the names to get it's
+						//correct order
+						for (ieDword k=0; k<tmpbits; k++) {
+							if (strcmp(classnames[k], currentname) == 0) {
+								int tmplevel = 0;
+								if (k==0) tmplevel = IE_LEVEL;
+								else if (k==1) tmplevel = IE_LEVEL2;
+								else tmplevel = IE_LEVEL3;
+								levelslots[tmpindex][classis] = tmplevel; 
+							}
 						}
+						printf("Classis: %d ", classis);
 
 						//warrior take presedence
 						if (!foundwarrior) {
@@ -1365,8 +1378,7 @@ static void InitActorTables()
 
 					//save the MC_WAS_ID of the first class in the dual-class
 					if (numfound==0 && tmpbits==2) {
-						char* firstclass = (char*)strtok((char*)classname, "_");
-						if (strcmp(firstclass, currentname) == 0) {
+						if (strcmp(classnames[0], currentname) == 0) {
 							dualswap[tmpindex] = strtol(tm->QueryField(classname, "MC_WAS_ID"), NULL, 0);
 						}
 					} else if (numfound==1 && tmpbits==2 && !dualswap[tmpindex]) {
@@ -1374,6 +1386,15 @@ static void InitActorTables()
 					}
 					numfound++;
 				}
+			}
+			if (classnames) {
+				for (ieDword j=0; j<tmpbits; j++) {
+					if (classnames[j]) {
+						free(classnames[j]);
+					}
+				}
+				free(classnames);
+				classnames = NULL;
 			}
 			printf("HPCON: %d ", maxhpconbon[tmpindex]);
 			printf("DS: %d\n", dualswap[tmpindex]);
@@ -4615,11 +4636,6 @@ ieDword Actor::GetClassLevel(const ieDword id) const
 		//being searched for, return 0
 		if (IsDualInactive() && ((Modified[IE_MC_FLAGS]&MC_WAS_ANY)==(ieDword)mcwasflags[id]))
 			return 0;
-
-		//flip the IE_LEVEL if we need to
-		if (IsDualSwap()) {
-			levelid = (levelid == IE_LEVEL) ? IE_LEVEL2 : IE_LEVEL;
-		}
 	}
 	return BaseStats[levelid];
 }

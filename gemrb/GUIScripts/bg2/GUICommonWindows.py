@@ -1240,12 +1240,18 @@ def IsMultiClassed (actor, verbose):
 	Classes = [0]*3
 	NumClasses = 0
 	Mask = 1 # we're looking at multiples of 2
+	ClassNames = ClassTable.GetRowName(ClassIndex).split("_")
 
 	# loop through each class and test it as a mask
 	# TODO: make 16 dynamic? -- allows for custom classes (not just kits)
 	for i in range (1, 16):
 		if IsMulti&Mask: # it's part of this class
-			Classes[NumClasses] = i # mask is (i-1)^2 where i is class id
+			#we need to place the classes in the array based on their order in the name,
+			#NOT the order they are detected in
+			CurrentName = ClassTable.GetRowName (ClassTable.FindValue (5, i));
+			for j in range(len(ClassNames)):
+				if ClassNames[j] == CurrentName:
+					Classes[j] = i # mask is (i-1)^2 where i is class id
 			NumClasses = NumClasses+1
 		Mask = 1 << i # shift to the next multiple of 2 for testing
 
