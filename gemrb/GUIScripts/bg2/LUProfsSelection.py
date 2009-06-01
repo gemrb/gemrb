@@ -131,18 +131,15 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsRate = ProfsTable.GetValue (Class-1, 1)
 
 	#figure out how many prof points we have
-	diff = []
-	for i in range (len (level1)):
-		diff.append (level2[i]-level1[i])
 	if sum (level1) == 0: #character is being generated (either chargen or dual)
 		ProfsPointsLeft = ProfsTable.GetValue (ClassName, "FIRST_LEVEL")
-		diff[FastestProf] -= 1
-	ProfsPointsLeft += diff[FastestProf]/ProfsRate
+	#we need these 2 number to floor before subtracting
+	ProfsPointsLeft += level2[FastestProf]/ProfsRate - level1[FastestProf]/ProfsRate
 
 	#setup prof vars for passing between functions
 	ProfsTable = GemRB.LoadTableObject ("weapprof")
 	Kit = GetKitIndex (pc)
-	if Kit and type != LUPROFS_TYPE_DUALCLASS and IsMulti[0]<2:
+	if Kit and type != LUPROFS_TYPE_DUALCLASS and IsMulti[0]<2 and not IsDual[0]:
 		#if we do kit with dualclass, we'll get the old kit
 		#also don't want to worry about kitted multis
 		ProfsColumn = KitListTable.GetValue (Kit, 5)
@@ -174,8 +171,8 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 			#rangers always get 2 points in 2 weapons style
 			if (i+8) == TwoWeapIndex and "RANGER" in ClassName.split("_"):
 				currentprof = 2
-			GemRB.SetVar ("Prof "+str(i), currentprof)
-			GemRB.SetVar ("ProfBase "+str(i), currentprof)
+		GemRB.SetVar ("Prof "+str(i), currentprof)
+		GemRB.SetVar ("ProfBase "+str(i), currentprof)
 
 		#see if we can assign to this prof
 		maxprof = ProfsTable.GetValue(i+8, ProfsColumn)
