@@ -25,6 +25,9 @@
 #include "PluginMgr.h"
 #include "Projectile.h"
 
+//the number of resrefs in areapro.2da (before the flags field)
+#define AP_RESCNT 5
+
 //this represents a line of projectl.ids
 class ProjectileEntry
 {
@@ -50,10 +53,8 @@ public:
 	{
 		memset(this,0,sizeof(ExplosionEntry));
 	}
-	ieResRef resource1;
-	ieResRef resource2;
-	ieResRef resource3;
-	int palette;
+	ieResRef resources[AP_RESCNT];
+	int flags;
 };
 
 #ifdef WIN32
@@ -81,7 +82,7 @@ public:
 	//returns the highest projectile id
 	unsigned int GetHighestProjectileNumber();
 	int InitExplosion();
-	int GetExplosionPalette(unsigned int idx);
+	int GetExplosionFlags(unsigned int idx);
 	ieResRef const *GetExplosion(unsigned int idx, int type);
 	//creates an empty projectile on the fly
 	Projectile *CreateDefaultProjectile(unsigned int idx);

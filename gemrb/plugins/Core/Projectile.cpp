@@ -703,7 +703,7 @@ void Projectile::DrawExplosion(Region &screen)
 	//these resources are listed in areapro.2da and served by ProjectileServer.cpp
 	if (Extension->ExplType!=0xff) {
 		ieResRef const *res;
-		int apflags = server->GetExplosionPalette(Extension->ExplType);
+		int apflags = server->GetExplosionFlags(Extension->ExplType);
 
 		//draw it only once, at the time of explosion
 		if (phase==P_EXPLODING1) {

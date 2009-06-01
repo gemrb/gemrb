@@ -147,10 +147,13 @@ int ProjectileServer::InitExplosion()
 		explosions = new ExplosionEntry[rows];
 
 		while(rows--) {
-			strnuprcpy(explosions[rows].resource1, explist->QueryField(rows, 0), 8);
-			strnuprcpy(explosions[rows].resource2, explist->QueryField(rows, 1), 8);
-			strnuprcpy(explosions[rows].resource3, explist->QueryField(rows, 2), 8);
-			explosions[rows].palette = atoi(explist->QueryField(rows,3));
+			int i;
+
+			for(i=0;i<AP_RESCNT;i++) {
+				strnuprcpy(explosions[rows].resources[i], explist->QueryField(rows, i), 8);
+			}
+			//using i so the flags field will always be after the resources
+			explosions[rows].flags = atoi(explist->QueryField(rows,i));
 		}
 	}
 	return explosioncount;
@@ -192,7 +195,8 @@ unsigned int ProjectileServer::GetHighestProjectileNumber()
 	return (unsigned int) projectilecount;
 }
 
-int ProjectileServer::GetExplosionPalette(unsigned int idx)
+//return various flags for the explosion type
+int ProjectileServer::GetExplosionFlags(unsigned int idx)
 {
 	if (explosioncount==-1) {
 		if (InitExplosion()<0) {
@@ -204,7 +208,7 @@ int ProjectileServer::GetExplosionPalette(unsigned int idx)
 		return 0;
 	}
 
-	return explosions[idx].palette;
+	return explosions[idx].flags;
 }
 
 ieResRef const *ProjectileServer::GetExplosion(unsigned int idx, int type)
@@ -220,18 +224,7 @@ ieResRef const *ProjectileServer::GetExplosion(unsigned int idx, int type)
 	}
 	ieResRef const *ret = NULL;
 
-	switch (type) {
-		case 0:
-			ret = &explosions[idx].resource1;
-			break;
-		case 1:
-			ret = &explosions[idx].resource2;
-			break;
-		case 2:
-			//i'm still unsure if we need the third resource column
-			ret = &explosions[idx].resource3;
-			break;
-	}
+	ret = &explosions[idx].resources[type];
 	if (ret && *ret[0]=='*') ret = NULL;
 
 	return ret;
