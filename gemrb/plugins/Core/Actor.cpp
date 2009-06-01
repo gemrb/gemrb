@@ -1354,7 +1354,7 @@ static void InitActorTables()
 								if (k==0) tmplevel = IE_LEVEL;
 								else if (k==1) tmplevel = IE_LEVEL2;
 								else tmplevel = IE_LEVEL3;
-								levelslots[tmpindex][classis] = tmplevel; 
+								levelslots[tmpindex][classis] = tmplevel;
 							}
 						}
 						printf("Classis: %d ", classis);
@@ -1720,6 +1720,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if (IsWarrior()) {
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
 	} else {
+
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);
 	}
 	bonus *= bonlevel;
@@ -3019,7 +3020,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	ITMExtHeader *hittingheader = header;
 	ITMExtHeader *rangedheader = NULL;
 	int THACOBonus = hittingheader->THAC0Bonus;
-	int DamageBonus = hittingheader->DamageBonus;
+	int DamageBonus = hittingheader->DamageBonus ;
 	switch(hittingheader->AttackType) {
 	case ITEM_AT_MELEE:
 		Flags = WEAPON_MELEE;
@@ -3039,7 +3040,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//The bow can give some bonuses, but the core attack is made by the arrow.
 		hittingheader = rangedheader;
 		THACOBonus += rangedheader->THAC0Bonus;
-		DamageBonus+= rangedheader->DamageBonus;
+		DamageBonus+= rangedheader->DamageBonus ;
 		break;
 	default:
 		//item is unsuitable for fight
@@ -3057,7 +3058,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (roll==1) {
 		//critical failure
 		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
-		if (Flags&WEAPON_RANGED) {
+		if (Flags&WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		} else {
 			//break sword
@@ -3082,7 +3083,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical success
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
 		DealDamage (target, damage, damagetype, &wi, true);
-		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0);
+		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 		return;
 	}
 	tohit += roll;
@@ -3096,13 +3097,13 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (tohit<defense) {
 		//hit failed
-		if (Flags&WEAPON_RANGED) {
+		if (Flags&WEAPON_RANGED) {//Launch the projectile anyway
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		}
 		return;
 	}
 	DealDamage (target, damage, damagetype, &wi, false);
-	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0);
+	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 }
 
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
@@ -3113,7 +3114,7 @@ static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
 static EffectRef fx_mirrorimage_ref={"MirrorImageModifier",NULL,-1};
 static EffectRef fx_aegis_ref={"Aegis",NULL,-1};
 
-void Actor::DealDamage(Actor *target, int damage, int damagetype, WeaponInfo *wi, bool critical)
+void Actor::DealDamage(Actor *target, int &damage, int damagetype, WeaponInfo *wi, bool critical)
 {
 	int stoneskins = target->Modified[IE_STONESKINS];
 	if (stoneskins) {
@@ -3170,7 +3171,8 @@ void Actor::DealDamage(Actor *target, int damage, int damagetype, WeaponInfo *wi
 		target->Modified[IE_MINHITPOINTS]=1;
 		damagetype = 0;
 	}
-	target->Damage(damage, weapon_damagetype[damagetype], this);
+	//This will be done by useitem
+	/*target->Damage(damage, weapon_damagetype[damagetype], this);*/
 	target->Modified[IE_MINHITPOINTS]=tmp;
 }
 
@@ -4090,7 +4092,9 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, ieDword fl
 	return false;
 }
 
-bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword flags)
+static EffectRef fx_damage_ref={"Damage",NULL,-1};
+
+bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword flags, int damage)
 {
 	if (target->Type!=ST_ACTOR) {
 		return UseItemPoint(slot, header, target->Pos, flags);
@@ -4111,7 +4115,17 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
 	gamedata->FreeItem(itm,item->ItemResRef, false);
 	if (pro) {
-		pro->SetCaster(globalID);
+		//ieDword is unsigned!!
+		if(((int)header < 0) && !(flags&UI_MISS)) { //using a weapon
+			ITMExtHeader *which = itm->GetWeaponHeader(header == (ieDword)-2);
+			Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, weapon_damagetype[which->DamageType], FX_DURATION_INSTANT_LIMITED);
+			AttackEffect->Projectile = which->ProjectileAnimation ;
+			AttackEffect->Target = FX_TARGET_PRESET ;
+			pro->GetEffects()->AddEffect(AttackEffect, true) ;
+			//TODO: When do we want to launch it???
+			//pro->timeStartStep+=3*AI_UPDATE_TIME ; //hardcoded?
+		}
+		pro->SetCaster(globalID) ;
 		GetCurrentArea()->AddProjectile(pro, Pos, tar->globalID);
 		return true;
 	}

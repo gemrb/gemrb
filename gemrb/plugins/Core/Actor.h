@@ -450,7 +450,7 @@ public:
 	/* performs attack against target */
 	void PerformAttack(ieDword initiative);
 	/* deal damage to target */
-	void DealDamage(Actor *target, int damage, int damagetype, WeaponInfo *wi, bool critical);
+	void DealDamage(Actor *target, int &damage, int damagetype, WeaponInfo *wi, bool critical);
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
 	/* sets an RGB colour modification effect; location 0xff for global */
@@ -509,7 +509,7 @@ public:
 	int SetEquippedQuickSlot(int slot);
 	/* Uses an item on the target or point */
 	bool UseItemPoint(ieDword slot, ieDword header, Point &point, ieDword flags);
-	bool UseItem(ieDword slot, ieDword header, Scriptable *target, ieDword flags);
+	bool UseItem(ieDword slot, ieDword header, Scriptable *target, ieDword flags, int damage = 0);
 	/* Deducts a charge from an item */
 	void ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent);
 	/* If it returns true, then default AC=10 and the lesser the better */

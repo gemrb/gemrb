@@ -99,9 +99,9 @@
 //child projectiles need to be tinted (example: stinking cloud, counter example: fireball)
 #define APF_TINT      1
 //child projectiles fill the whole area (example: stinking cloud, counter example: fireball)
-#define APF_FILL      2     
+#define APF_FILL      2
 //child projectiles start in their destination (example: icestorm, counter example: fireball)
-#define APF_SCATTER   4     
+#define APF_SCATTER   4
 //the explosion vvc has gradient (example: icestorm, counter example: fireball)
 #define APF_VVCPAL    8
 //there is an additional added scatter after the initial spreading ring
@@ -162,6 +162,8 @@ public:
 	ProjectileExtension* Extension;
 	bool autofree;
 	Palette* palette;
+	//let's make this one public
+	ieDword timeStartStep;
 	//internals
 protected:
 	//attributes from moveable object
@@ -174,7 +176,6 @@ protected:
 	Point Destination;
 	ieDword Caster; //the globalID of the caster actor
 	ieDword Target; //the globalID of target actor
-	ieDword timeStartStep;
 	int phase;
 	//saved in area
 	ieResRef name;

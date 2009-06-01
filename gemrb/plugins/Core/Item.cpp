@@ -95,9 +95,8 @@ int Item::GetDamagePotential(bool ranged, ITMExtHeader *&header) const
 	return 0;
 }
 
-ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
+int Item::GetWeaponHeaderNumber(bool ranged) const
 {
-	//start from the beginning
 	for(int ehc=0; ehc<ExtHeaderCount; ehc++) {
 		ITMExtHeader *ext_header = GetExtHeader(ehc);
 		if (ext_header->Location!=ITEM_LOC_WEAPON) {
@@ -113,9 +112,15 @@ ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
 				continue;
 			}
 		}
-		return ext_header;
+		return ehc;
 	}
-	return NULL;
+	return 0xffff; //invalid extheader number
+}
+
+ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
+{
+	//start from the beginning
+	return GetExtHeader(GetWeaponHeaderNumber(ranged)) ;
 }
 
 int Item::UseCharge(ieWord *Charges, int header, bool expend) const
@@ -156,8 +161,13 @@ Projectile *Item::GetProjectile(ieDwordSigned invslot, int header, int miss) con
 	}
 	ieDword idx = eh->ProjectileAnimation;
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(idx);
+	int usage ;
+	if (header>= 0)
+		usage = header ;
+	else
+		usage = GetWeaponHeaderNumber(header==-2) ;
 	if (!miss) {
-		EffectQueue *fx = GetEffectBlock(header, invslot, idx);
+		EffectQueue *fx = GetEffectBlock(usage, invslot, idx);
 		pro->SetEffects(fx);
 	}
 	return pro;
