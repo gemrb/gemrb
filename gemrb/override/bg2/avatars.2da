@@ -17,7 +17,7 @@
 0x1208     MDR1       MDR1       MDR1       MDR1       12         7          PU         *
 0x2000     MSIR       MSIR       MSIR       MSIR       2          2          0          *
 0x2100     UVOL       UVOL       UVOL       UVOL       2          2          1          *
-0x2200     MOGM       MOGM       MOGM       MOGM       2          2          0          S
+0x2200     MOGM       MOGM       MOGM       MOGM       3          2          0          S
 0x2300     MDKN       MDKN       MDKN       MDKN       2          2          1          *
 0x3000     MAKH       MAKH       MAKH       MAKH       2          3          1          *
 0x4000     SNOMC      SNOMC      SNOMC      SNOMC      1          2          0          *
@@ -127,8 +127,8 @@
 0x6406     MDGU1      MDGU1      MDGU1      MDGU1      6          2          0          *
 0x6500     CHMM1      CHMB2      CHMB3      CHMC4      0          2          0          L
 0x6510     CHFM1      CHFB2      CHFB3      CHFC4      0          2          0          N
-0x7000     MOGH       MOGH       MOGH       MOGH       2          2          0          *
-0x7001     MOGN       MOGN       MOGN       MOGN       2          2          0          *
+0x7000     MOGH       MOGH       MOGH       MOGH       3          2          0          *
+0x7001     MOGN       MOGN       MOGN       MOGN       3          2          0          *
 0x7100     MBAS       MBAS       MBAS       MBAS       2          2          1          *
 0x7101     MBAS       MBAS       MBAS       MBAS       2          2          GR         *
 0x7200     MBER       MBER       MBER       MBER       2          2          BL         *
@@ -142,9 +142,9 @@
 0x7311     MFIS       MFIS       MFIS       MFIS       4          2          1          *
 0x7320     MAIR       MAIR       MAIR       MAIR       4          2          1          *
 0x7321     MAIS       MAIS       MAIS       MAIS       4          2          1          *
-0x7400     MDOG       MDOG       MDOG       MDOG       2          2          WI         *
-0x7401     MDOG       MDOG       MDOG       MDOG       2          2          WA         *
-0x7402     MDOG       MDOG       MDOG       MDOG       2          2          MO         *
+0x7400     MDOG       MDOG       MDOG       MDOG       3          2          WI         *
+0x7401     MDOG       MDOG       MDOG       MDOG       3          2          WA         *
+0x7402     MDOG       MDOG       MDOG       MDOG       3          2          MO         *
 0x7500     MDOP       MDOP       MDOP       MDOP       2          2          1          *
 0x7501     MDOP       MDOP       MDOP       MDOP       2          2          GR         *
 0x7600     METT       METT       METT       METT       2          2          1          *
