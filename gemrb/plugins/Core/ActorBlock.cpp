@@ -398,9 +398,9 @@ void Scriptable::ProcessActions(bool force)
 		if (WaitCounter) return;
 	}
 
-	//don't do anything while moving without interruptions allowed
+	//don't do anything while moving?
 	//maybe this should be fixed
-	if (InMove() && (InternalFlags & IF_NOINT)) {
+	if (InMove()) {
 		return;
 	}
 	
@@ -430,7 +430,7 @@ void Scriptable::ProcessActions(bool force)
 			break;
 		}
 		//break execution in case of movement
-		if (InMove() && (InternalFlags & IF_NOINT)) {
+		if (InMove()) {
 			break;
 		}
 	}
