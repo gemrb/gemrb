@@ -3942,11 +3942,13 @@ static PyObject* GemRB_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
 	if (im == NULL) {
 		delete ( str );
-		return NULL;
+		Py_INCREF( Py_None );
+		return Py_None;
 	}
 	if (!im->Open( str, true )) {
 		core->FreeInterface( im );
-		return NULL;
+		Py_INCREF( Py_None );
+		return Py_None;
 	}
 
 	Sprite2D* Picture = im->GetImage();
