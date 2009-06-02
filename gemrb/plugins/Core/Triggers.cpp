@@ -965,7 +965,7 @@ int GameScript::StoreHasItem(Scriptable* /*Sender*/, Trigger* parameters)
 int GameScript::HasItem(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if ( !scr || scr->Type!=ST_ACTOR) {
+	if ( !scr ) {
 		return 0;
 	}
 	Inventory *inventory;
@@ -980,7 +980,7 @@ int GameScript::HasItem(Scriptable* Sender, Trigger* parameters)
 			inventory = NULL;
 			break;
 	}
-	if (HasItemCore(inventory, parameters->string0Parameter, parameters->int0Parameter) ) {
+	if (inventory && HasItemCore(inventory, parameters->string0Parameter, parameters->int0Parameter) ) {
 		return 1;
 	}
 	return 0;
