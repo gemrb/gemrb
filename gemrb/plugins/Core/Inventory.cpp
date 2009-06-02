@@ -1383,9 +1383,21 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 	return false;
 }
 
-ieDword Inventory::GetEquipExclusion() const
+//The slot index value is optional, if you supply it,
+// then ItemExcl will be returned as if the item was already unequipped
+ieDword Inventory::GetEquipExclusion(int index) const
 {
-	return ItemExcl;
+	if (index<0) {
+		return ItemExcl;
+	}
+	CREItem *slot;
+	const Item *itm = GetItemPointer(index, slot);
+	if (!itm) {
+		return ItemExcl;
+	}
+	ieDword ret = ItemExcl&~itm->ItemExcl;
+	gamedata->FreeItem(itm, slot->ItemResRef, false);
+	return ret;
 }
 
 void Inventory::UpdateShieldAnimation(Item *it)

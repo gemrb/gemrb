@@ -311,7 +311,7 @@ public:
 	/** returns the struct of the usable items, returns true if there are more */
 	bool GetEquipmentInfo(ItemExtHeader *array, int startindex, int count);
 	/** returns the exclusion bits */
-	ieDword GetEquipExclusion() const;
+	ieDword GetEquipExclusion(int index) const;
 	/** returns if a slot is temporarily blocked */
 	bool IsSlotBlocked(int slot) const;
 	/** returns true if a two handed weapon is in slot */

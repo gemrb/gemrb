@@ -7145,7 +7145,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 
 	// can't equip item because of similar already equipped
 	if (Effect) {
-		if (item->ItemExcl & actor->inventory.GetEquipExclusion()) {
+		if (item->ItemExcl & actor->inventory.GetEquipExclusion(Slot)) {
 			core->DisplayConstantString(STR_ITEMEXCL, 0xf0f0f0);
 			//freeing the item before returning
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
