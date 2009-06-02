@@ -153,7 +153,7 @@ def ConfirmedSaveGame():
 	Label = ConfirmWindow.GetControl (3)
 	Slotname = Label.QueryText ()
 	StartLoadScreen()
-	GemRB.SaveGame(Pos, Slotname) #loads and enters savegame
+	GemRB.SaveGame(Pos, Slotname)
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
 	SaveWindow.SetVisible (1)
