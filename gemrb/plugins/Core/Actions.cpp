@@ -1474,7 +1474,7 @@ void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!target && target->Type!=ST_ACTOR) {
+	if (!target || target->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -3241,12 +3241,10 @@ void GameScript::GlobalShR(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalMaxGlobal(Scriptable* Sender, Action* parameters)
 {
-	ieDword value1 = CheckVariable( Sender,
-		parameters->string0Parameter );
-	ieDword value2 = CheckVariable( Sender,
-		parameters->string1Parameter );
+	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value2 = CheckVariable( Sender, parameters->string1Parameter );
 	if (value1 < value2) {
-		SetVariable( Sender, parameters->string0Parameter, value1 );
+		SetVariable( Sender, parameters->string0Parameter, value2 );
 	}
 }
 
@@ -3254,8 +3252,8 @@ void GameScript::GlobalMinGlobal(Scriptable* Sender, Action* parameters)
 {
 	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter );
 	ieDword value2 = CheckVariable( Sender, parameters->string1Parameter );
-	if (value1 < value2) {
-		SetVariable( Sender, parameters->string0Parameter, value1 );
+	if (value1 > value2) {
+		SetVariable( Sender, parameters->string0Parameter, value2 );
 	}
 }
 
