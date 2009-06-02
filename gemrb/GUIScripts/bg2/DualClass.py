@@ -56,8 +56,9 @@ DCSkillsWindow = 0
 DCSkillsDoneButton = 0
 #######################
 
-# open the dual class window
 def DualClassWindow ():
+	"""Opens the dual class selection window."""
+
 	global pc, OldClassName, NewMageSpells, NewPriestMask, NewClassId, OldKitName, DualClassTable
 	global DCMainWindow, DCMainClassButton, DCMainDoneButton, DCMainSkillsButton, DCMainStep
 
@@ -141,8 +142,12 @@ def DualClassWindow ():
 	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-# we're done!
 def DCMainDonePress ():
+	"""Saves our dualclass changes and closes the window.
+
+	This de-activates our old class and readjusts the basic actor stats, such as
+	THAC0, spell casting, proficiencies, and so forth, to the new class."""
+
 	# save our proficiencies
 	ProfsSave (pc, LUPROFS_TYPE_DUALCLASS)
 
@@ -206,8 +211,9 @@ def DCMainDonePress ():
 	UpdateRecordsWindow()
 	return
 
-# undo everything
 def DCMainCancelPress ():
+	"""Revert all changes and close the dual class window."""
+
 	# simulate pressing the back button until we get back to DCMainStep = 1
 	# to unset all things from the new class
 	while DCMainStep > 1:
@@ -219,8 +225,8 @@ def DCMainCancelPress ():
 
 	return
 
-# goes to the previous step
 def DCMainBackPress ():
+	"""Reverts all current changes and reverts back to the previous step."""
 	global DCMainStep, DCClass, NewMageSpells
 	global NewPriestMask
 
@@ -248,8 +254,9 @@ def DCMainBackPress ():
 		DCMainStep = 2
 	return
 
-# opens the class selection window
 def DCMainClassPress ():
+	"""Opens the class selection window."""
+
 	global DCClassWindow, DCClassDoneButton, DCClass
 
 	# we default the class back down to -1
@@ -302,8 +309,9 @@ def DCMainClassPress ():
 
 	return
 
-# used whenever a class is clicked
 def DCClassSelect ():
+	"""Updates the current class based on the button pressed."""
+
 	global DCClass
 
 	# un-select the old button and save and select the new one
@@ -336,8 +344,9 @@ def DCClassSelect ():
 
 	return
 
-# used when a class is selected by pressing the done button
 def DCClassDonePress ():
+	"""Stores the selected class and moves to the next step."""
+
 	global DCMainStep, ClassName, NewClassId
 
 	# unload our class selection window
@@ -357,8 +366,11 @@ def DCClassDonePress ():
 
 	return
 
-# returns boolean
 def CanDualInto (index):
+	"""Determines if a given class can be dualed into.
+
+	Index defines the position within the DCClasses list."""
+
 	# make sure index isn't out of range
 	if index < 0 or index >= len (DCClasses):
 		return 0
@@ -389,24 +401,29 @@ def CanDualInto (index):
 	return 1
 
 def DCClassBackPress ():
+	"""Unloads the class selection window without making any changes."""
 	# close the class window
 	if DCClassWindow:
 		DCClassWindow.Unload ()
 	return
 
 def DCMainSkillsPress ():
+	"""Opens the proficiency selection window.
+
+	Then follows the skills proficiency and spells windows, if required."""
+
 	global DCSkillsWindow, DCMainStep, DCHasProfs
 
 	# we're onto the next step
 	DCMainSkillsButton.SetState (IE_GUI_BUTTON_DISABLED)
 	DCMainStep = 3
 
-	# TODO: go to proficiencies first
 	DCOpenProfsWindow ()
 	return
 
-# opens the proficiencies window
 def DCOpenProfsWindow ():
+	"""Opens the proficiency selection window."""
+
 	global DCProfsWindow, DCProfsDoneButton
 
 	# load up our window and set some basic variables
@@ -432,8 +449,11 @@ def DCOpenProfsWindow ():
 	DCProfsRedraw ()
 	return
 
-# redraw the profs -- called whenever anything changes
 def DCProfsRedraw ():
+	"""Redraws the proficiency selection window.
+
+	Called whenever a proficiency is assigned or removed."""
+
 	ProfsPointsLeft = GemRB.GetVar ("ProfsPointsLeft")
 
 	if ProfsPointsLeft == 0:
@@ -442,8 +462,11 @@ def DCProfsRedraw ():
 		DCProfsDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	return
 
-# goes to the next scripts (mage or thief)
 def DCProfsDonePress ():
+	"""Goes to the next applicable step.
+
+	This is either skill selection, spell selection, or nothing."""
+
 	global NewMageSpells, NewPriestMask
 
 	# check for mage spells and thief skills
@@ -483,8 +506,9 @@ def DCProfsDonePress ():
 		DCProfsWindow.Unload ()
 	return
 
-# undoes our changes
 def DCProfsCancelPress ():
+	"""Closes the profeciency selection window."""
+
 	# close out the profs window and go back a step
 	if DCProfsWindow:
 		DCProfsWindow.Unload ()
@@ -492,8 +516,12 @@ def DCProfsCancelPress ():
 	DCMainBackPress ()
 	return
 
-# open the window to select thief skills
 def OpenSkillsWindow ():
+	"""Opens the skills selection window.
+
+	This will allow the selection of thief skills for appropriate classes, or
+	auto-assign them for classes that recieve skills based on level."""
+
 	global DCSkillsWindow, DCSkillsDoneButton
 
 	DCSkillsWindow = GemRB.LoadWindowObject (7)
@@ -524,8 +552,11 @@ def OpenSkillsWindow ():
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	return
 
-# updates the window
 def DCSkillsRedraw ():
+	"""Redraws the skills selection window.
+
+	Called whenever a skill is assigned or removed."""
+
 	# no points left? we can be done! :)
 	DCSkillsLeft = GemRB.GetVar ("SkillPointsLeft")
 	if DCSkillsLeft <= 0:
@@ -533,16 +564,18 @@ def DCSkillsRedraw ():
 	else:
 		DCSkillsDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 
-# undoes all changes so far
 def DCSkillsBackPress ():
+	"""Reverts all changes to this points."""
+
 	if DCSkillsWindow:
 		DCSkillsWindow.Unload ()
 	NullifyPoints ()
 	DCMainBackPress ()
 	return
 
-# closes the skills window
 def DCSkillsDonePress ():
+	"""Closes the skills selection window."""
+
 	if DCSkillsWindow:
 		DCSkillsWindow.Unload ()
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)

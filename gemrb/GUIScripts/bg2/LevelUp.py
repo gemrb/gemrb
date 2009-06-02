@@ -61,6 +61,8 @@ DeltaDSpells = 0	# << total new divine spells
 DeltaWSpells = 0	# << total new wizard spells
 
 def OpenLevelUpWindow():
+	"""Sets up the level up window."""
+
 	global LevelUpWindow, TextAreaControl, NewProfPoints
 	global DoneButton
 	global NewSkillPoints, KitName, LevelDiff, RaceTable
@@ -324,6 +326,7 @@ def OpenLevelUpWindow():
 		OpenSpellsWindow (pc, "SPLSRCKN", Level[0], LevelDiff[0])
 
 def HideSkills(i):
+	"""Hides the given skill label from view."""
 	global LevelUpWindow
 
 	Label = LevelUpWindow.GetControl (0x10000000+32+i)
@@ -337,7 +340,12 @@ def HideSkills(i):
 	Label = LevelUpWindow.GetControl(0x10000000+43+i)
 	Label.SetText("")
 
-def RedrawSkills(direction=0):
+def RedrawSkills():
+	"""Redraws the entire window.
+
+	Called whenever a state changes, such as a proficiency or skill being
+	added or taken away."""
+
 	global DoneButton, LevelUpWindow, HLACount
 
 	# we need to disable the HLA button if we don't have any HLAs left
@@ -358,6 +366,10 @@ def RedrawSkills(direction=0):
 	return
 
 def GetLevelUpNews():
+	"""Returns a string containing improvements gain on level up.
+
+	These include: HP, spells per level, and lore, among others."""
+
 	News = GemRB.GetString (5259) + '\n\n'
 
 	# display if our class has been reactivated
@@ -476,6 +488,10 @@ def GetLevelUpNews():
 	return News
 
 def LevelUpInfoPress():
+	"""Displays new abilites gained on level up.
+
+	Alternates between overall and modified stats."""
+
 	global LevelUpWindow, TextAreaControl, InfoCounter, LevelDiff
 
 	if InfoCounter % 2:
@@ -489,6 +505,10 @@ def LevelUpInfoPress():
 
 # save the results
 def LevelUpDonePress():
+	"""Updates the PC with the new choices.
+
+	Closes the window when finished."""
+
 	global SkillTable
 
 	# proficiencies
@@ -558,6 +578,8 @@ def LevelUpDonePress():
 	return
 
 def GetNextLevelFromExp (XP, Class):
+	"""Gets the next level based on current experience."""
+
 	ClassIndex = ClassTable.FindValue (5, Class)
 	ClassName = ClassTable.GetRowName (ClassIndex)
 	Row = NextLevelTable.GetRowIndex (ClassName)
@@ -567,14 +589,11 @@ def GetNextLevelFromExp (XP, Class):
 	# fix hacked characters that have more xp than the xp cap
 	return 40
 
-# regains all the benifits of the former class
 def ReactivateBaseClass ():
-	# things that change:
-	#	proficiencies
-	#	thac0
-	#	saves
-	#	class abilities (need to relearn)
-	#	spell casting
+	"""Regains all abilities of the base dual-class.
+
+	Proficiencies, THACO, saves, spells, and innate abilites,
+	most noteably."""
 
 	ClassIndex = ClassTable.FindValue (5, Classes[1])
 	ClassName = ClassTable.GetRowName (ClassIndex)
@@ -660,6 +679,8 @@ def ReactivateBaseClass ():
 		AddClassAbilities (pc, ABTable, Level[1], Level[1]) # relearn class abilites
 
 def LevelUpHLAPress ():
+	"""Opens the HLA selection window."""
+
 	# we can turn the button off and temporarily set HLACount to 0
 	# because there is no cancel button on the HLA window; therefore,
 	# it's guaranteed to come back as 0

@@ -38,8 +38,9 @@ NumClasses = 0		# << number of classes
 Classes = []		# << classes (ids)
 Level = []		# << levels for each class
 
-# open our HLA window
 def OpenHLAWindow (actor, numclasses, classes, levels):
+	"""Opens the HLA selection window."""
+
 	global HLAWindow, HLADoneButton, HLATextArea, HLACount, NumClasses, pc, Classes, Level
 
 	# save our variables 
@@ -85,8 +86,9 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 
 	return
 
-# close our HLA window
 def HLADonePress ():
+	"""Saves the new HLAs and closes the HLA selection window."""
+
 	# save all of our HLAs
 	for i in range (len (HLANewAbilities)):
 		# see if we're going to learn this ability
@@ -126,8 +128,11 @@ def HLADonePress ():
 
 	return
 
-# updates the HLA selection window
 def HLAShowAbilities ():
+	"""Updates the HLA selections window.
+
+	Called whenever an HLA is pressed."""
+
 	HLATopIndex = GemRB.GetVar ("HLATopIndex")
 
 	# we have a grid of 24 abilites
@@ -173,8 +178,9 @@ def HLAShowAbilities ():
 
 	return
 
-# updates the abilites when one is selected
 def HLASelectPress ():
+	"""Toggles the HLA and displays a description string."""
+
 	global HLACount, HLAAbilities, HLANewAbilities
 
 	# get our variables
@@ -224,8 +230,9 @@ def HLASelectPress ():
 	PointsLeftLabel.SetText (str (HLACount))
 	return
 
-# marks all of the selected abilities
 def HLAShowSelectedAbilities ():
+	"""Marks all of the selected abilities."""
+
 	HLATopIndex = GemRB.GetVar ("HLATopIndex")
 
 	# mark all of the abilities picked thus far
@@ -239,8 +246,11 @@ def HLAShowSelectedAbilities ():
 
 	return
 
-# show ability as selected, enabled, or disabled
 def HLAMarkButton (i, select):
+	"""Enables, disables, or highlights the given button.
+
+	If select is true, the button is highlighted."""
+
 	HLATopIndex = GemRB.GetVar ("HLATopIndex")
 
 	if select:
@@ -256,9 +266,12 @@ def HLAMarkButton (i, select):
 	SpellButton.SetState(type)
 	return
 
-# return a 2d array with all the HLAs and whether or not prereqs have been met
-# aka [0] = ("ref",0) and [1] = ("ref",1)
 def GetHLAs ():
+	"""Updates HLAAbilites with all the choosable class HLAs.
+
+	HLAAbilities[x][0] is the given HLAs spell reference.
+	HLAAbilities[x][1] is true if the HLAs prerequisites have been met."""
+
 	global HLAAbilities, HLANewAbilities
 
 	# get some needed values
@@ -359,9 +372,9 @@ def GetHLAs ():
 
 	return
 
-# rechecks pre-reqs for HLAs on the fly
-# num memorized should be updated before calling this
 def HLARecheckPrereqs (index):
+	"""Rechecks the HLA prequisites on the index on the fly."""
+
 	# the numer of times memorized
 	Ref = HLAAbilities[index][0]
 	Memorized = HLAAbilities[index][2]

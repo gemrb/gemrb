@@ -51,6 +51,8 @@ StrModTable = GemRB.LoadTableObject ("strmod")
 StrModExTable = GemRB.LoadTableObject ("strmodex")
 
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
+	"""Sets up all of the basic control windows."""
+
 	global OptionsWindow
 
 	OptionsWindow = Window
@@ -144,6 +146,8 @@ def MarkMenuButton (WindowIndex):
 		Pressed.SetState (IE_GUI_BUTTON_SELECTED)
 
 def AIPress ():
+	"""Toggles the party AI."""
+
 	Button = PortraitWindow.GetControl (6)
 	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
 
@@ -173,11 +177,13 @@ def EmptyControls ():
 	return
 
 def SelectFormationPreset ():
+	"""Choose the default formation."""
 	GemRB.GameSetFormation (GemRB.GetVar ("Value"), GemRB.GetVar ("Formation") )
 	GroupControls ()
 	return
 
 def SetupFormation ():
+	"""Opens the formation selection section."""
 	global ActionsWindow
 
 	Window = ActionsWindow
@@ -195,6 +201,8 @@ def SelectFormation ():
 	return
 
 def GroupControls ():
+	"""Sections that control group actions."""
+
 	global ActionsWindow
 
 	GemRB.SetVar ("ActionLevel", 0)
@@ -249,6 +257,8 @@ def OpenActionsWindowControls (Window):
 	return
 
 def UpdateActionsWindow ():
+	"""Redraws the actions section of the window."""
+
 	global ActionsWindow, PortraitWindow, OptionsWindow
 	global level, TopIndex
 
@@ -320,6 +330,8 @@ def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
 def ActionQWeaponPressed (which):
+	"""Selects the given quickslot weapon if possible."""
+
 	pc = GemRB.GameGetFirstSelectedPC ()
 	qs = GemRB.GetEquippedQuickSlot (pc,1)
 
@@ -347,6 +359,8 @@ def ActionQWeapon4Pressed ():
 	ActionQWeaponPressed(3)
 
 def ActionStopPressed ():
+	"""Clears all party actions."""
+
 	for i in range (PARTY_SIZE):
 		if GemRB.GameIsPCSelected(i + 1):
 			GemRB.ClearActions(i + 1)
@@ -354,6 +368,10 @@ def ActionStopPressed ():
 
 #no check needed because the button wouldn't be drawn if illegal
 def ActionLeftPressed ():
+	"""Scrolls the actions window left.
+
+	Used primarily for spell selection."""
+
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if TopIndex>10:
 		TopIndex -= 10
@@ -365,6 +383,10 @@ def ActionLeftPressed ():
 
 #no check needed because the button wouldn't be drawn if illegal
 def ActionRightPressed ():
+	"""Scrolls the action window right.
+
+	Used primarily for spell selection."""
+
 	pc = GemRB.GameGetFirstSelectedPC ()
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Type = GemRB.GetVar ("Type")
@@ -382,24 +404,28 @@ def ActionRightPressed ():
 	return
 
 def ActionBardSongPressed ():
+	"""Toggles the battle song."""
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
 	UpdateActionsWindow ()
 	return
 
 def ActionSearchPressed ():
+	"""Toggles detect traps."""
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_DETECTTRAPS)
 	UpdateActionsWindow ()
 	return
 
 def ActionStealthPressed ():
+	"""Toggles stealth."""
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_STEALTH)
 	UpdateActionsWindow ()
 	return
 
 def ActionTurnPressed ():
+	"""Toggles turn undead."""
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_TURNUNDEAD)
 	UpdateActionsWindow ()
@@ -412,12 +438,14 @@ def ActionUseItemPressed ():
 	return
 
 def ActionCastPressed ():
+	"""Opens the spell choice scrollbar."""
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 2)
 	UpdateActionsWindow ()
 	return
 
 def ActionQItemPressed (action):
+	"""Uses the given quick item."""
 	pc = GemRB.GameGetFirstSelectedPC ()
 	#quick slot
 	GemRB.UseItem (pc, -2, action)
@@ -444,12 +472,15 @@ def ActionQItem5Pressed ():
 	return
 
 def ActionInnatePressed ():
+	"""Opens the innate spell scrollbar."""
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 3)
 	UpdateActionsWindow ()
 	return
 
 def SpellPressed ():
+	"""Prepares a spell to be cast."""
+
 	pc = GemRB.GameGetFirstSelectedPC ()
 
 	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
@@ -472,6 +503,10 @@ def EquipmentPressed ():
 	return
 
 def GetKitIndex (actor):
+	"""Return the index of the actors kit from KITLIST.2da.
+
+	Returns 0 if the class is not kitted."""
+
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 	KitIndex = 0
@@ -489,6 +524,8 @@ def GetKitIndex (actor):
 	return KitIndex
 
 def GetActorClassTitle (actor):
+	"""Returns the string representation of the actors class."""
+
 	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
 
 	if ClassTitle == 0:
@@ -532,6 +569,8 @@ def GetActorPaperDoll (actor):
 SelectionChangeHandler = None
 
 def SetSelectionChangeHandler (handler):
+	"""Updates the selection handler."""
+
 	global SelectionChangeHandler
 
 	# Switching from walking to non-walking environment:
@@ -607,6 +646,8 @@ def OpenPortraitWindow (needcontrols):
 	return Window
 
 def UpdatePortraitWindow ():
+	"""Updates all of the portraits."""
+
 	Window = PortraitWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -683,6 +724,8 @@ def PortraitButtonOnDrag ():
 	return
 
 def PortraitButtonOnPress ():
+	"""Selects the portrait individually."""
+
 	i = GemRB.GetVar ("PressedPortrait")
 
 	if not i:
@@ -699,6 +742,8 @@ def PortraitButtonOnPress ():
 	return
 
 def PortraitButtonOnShiftPress ():
+	"""Handles selecting multiple portaits with shift."""
+
 	i = GemRB.GetVar ("PressedPortrait")
 
 	if not i:
@@ -718,8 +763,9 @@ def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
 	return
 
-# Run by Game class when selection was changed
 def SelectionChanged ():
+	"""Ran by the Game class when a PC selection is changed."""
+
 	global PortraitWindow
 
 	GemRB.SetVar ("ActionLevel", 0)
@@ -768,8 +814,9 @@ def OnDropItemToPC2 ():
 	DraggedPortrait = None
         return
 
-#stop the portrait dragging if the mouse went on a trip
 def CheckDragging():
+	"""Contains portrait dragging in case of mouse out-of-range."""
+
 	global DraggedPortrait
 
 	i = GemRB.GetVar ("PressedPortrait")
@@ -791,9 +838,12 @@ def PortraitButtonOnMouseLeave ():
 	GemRB.SetTimedEvent ("CheckDragging",1)
 	return
 
-#Levels needs to be an array containing the level desired for each class
-#this is potentially useful for leveling up 
 def SetupSavingThrows (pc, Level=None):
+	"""Updates an actors saving throws based upon level.
+
+	Level should contain the actors current level.
+	If Level is None, it is filled with the actors current level."""
+
 	#storing levels as an array makes them easier to deal with
 	if not Level:
 		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL)-1, \
@@ -866,6 +916,11 @@ def SetupSavingThrows (pc, Level=None):
 	return
 
 def SetupThaco (pc, Level=None):
+	"""Updates an actors THAC0 based upon level.
+
+	Level should contain the actors current level.
+	If Level is None it is filled with the actors current level."""
+
 	#storing levels as an array makes them easier to deal with
 	if not Level:
 		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL)-1, \
@@ -916,10 +971,14 @@ def SetupThaco (pc, Level=None):
 		GemRB.SetPlayerStat (pc, IE_THAC0, CurrentThaco)
 	return
 
-#LevelDiff should be an array containing the difference in levels of
-#  each class. If left None, we assume that the character is starting
-#  from level 0, and therefore LevelDiff = Level
 def SetupLore (pc, LevelDiff=None):
+	"""Updates an actors lore based upon level.
+
+	Level should contain the actors current level.
+	LevelDiff should contain the change in levels.
+	Level and LevelDiff must be of the same length.
+	If either are None, they are filled with the actors current level."""
+
 	#storing levels as an array makes them easier to deal with
 	if not LevelDiff:
 		LevelDiffs = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
@@ -968,11 +1027,14 @@ def SetupLore (pc, LevelDiff=None):
 	GemRB.SetPlayerStat (pc, IE_LORE, CurrentLore)
 	return
 
-#Level should be an array containing the current level of the class.
-#LevelDiff should be an array containing the difference in levels of
-#  each class. If left None, we assume that the character is starting
-#  from level 0, and therefore LevelDiff = Level.
 def SetupHP (pc, Level=None, LevelDiff=None):
+	"""Updates an actors hp based upon level.
+
+	Level should contain the actors current level.
+	LevelDiff should contain the change in levels.
+	Level and LevelDiff must be of the same length.
+	If either are None, they are filled with the actors current level."""
+
 	#storing levels as an array makes them easier to deal with
 	if not Level:
 		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
@@ -1070,6 +1132,8 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	return
 
 def SetEncumbranceLabels (Window, Label, Label2, pc):
+	"""Displays the encumarance as a ratio of current to maximum."""
+
 	# Getting the character's strength
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
@@ -1143,10 +1207,14 @@ def OpenWaitForDiscWindow ():
 	except:
 		DiscWindow.SetVisible (1)
 
-# returns an array: first field is 0 - not dual classed; 1 - kit/class; 2 - class/class
-# the second and third field hold the kit/class index for each class
-# if invoked with verbose==0 only returns 0 or 1 (is or is not dual classed)
 def IsDualClassed(actor, verbose):
+	"""Returns an array containing the dual class information.
+
+	Return[0] is 0 if not dualclassed, 1 if the old class is a kit, 2 otherwise.
+	Return[1] contains either the kit or class index of the old class.
+	Return[2] contains the class index of the new class.
+	If verbose is false, only Return[0] contains useable data."""
+
 	Dual = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
 	Dual = Dual & ~(MC_EXPORTABLE|MC_PLOT_CRITICAL|MC_BEENINPARTY|MC_HIDDEN)
 
@@ -1187,11 +1255,15 @@ def IsDualClassed(actor, verbose):
 		else:
 			return (0,-1,-1)
 
-# Determines if the dualclassed actor has the two base classes in reverse order.
-# This happens since dualclassed actors are treated as multiclassed and there
-# are only so many valid multiclasses.
-# Example: diviner/fighter maps to FIGHTER_MAGE instead of MAGE_FIGHTER
 def IsDualSwap (actor):
+	"""Returns true if the dualed classes are reverse of expection.
+
+	This can happen, because the engine gives dualclass characters the same ID as
+	their multiclass counterpart (eg. FIGHTER_MAGE = 3). Logic would dictate that
+	the new and old class levels would be stored in IE_LEVEL and IE_LEVEL2,
+	respectively; however, if one duals from a fighter to a mage in the above
+	example, the levels would actually be in reverse of expectation."""
+
 	Dual = IsDualClassed (actor, 1)
 
 	# not dual classed
@@ -1220,13 +1292,13 @@ def IsDualSwap (actor):
 
 	return 0
 
-##
-#
-# Determines if an actor is multiclassed and returns the individual classes.
-# @param actor The character reference.
-# @param verbose If 0 simply returns 0 if not multi.
-# @return A tuple - (IsMultiClassed, Class1, Class2, Class3).
 def IsMultiClassed (actor, verbose):
+	"""Returns a tuple containing the multiclass information.
+
+	Return[0] contains the total number of classes.
+	Return[1-3] contain the ID of their respective classes.
+	If verbose is false, only Return[0] has useable data."""
+
 	# get our base class
 	ClassIndex = ClassTable.FindValue (5, GemRB.GetPlayerStat (actor, IE_CLASS))
 	IsMulti = ClassTable.GetValue (ClassIndex, 4) # 0 if not multi'd
@@ -1265,14 +1337,16 @@ def IsMultiClassed (actor, verbose):
 	return (NumClasses, Classes[0], Classes[1], Classes[2])
 
 def GetNextLevelExp (Level, Class):
+	"""Returns the amount of XP required to gain the next level."""
 	Row = NextLevelTable.GetRowIndex (Class)
 	if Level < NextLevelTable.GetColumnCount (Row):
 		return str (NextLevelTable.GetValue (Row, Level) )
 
 	return 0
 
-# returns boolean - true if can level
 def CanLevelUp(actor):
+	"""Returns true if the actor can level up."""
+
 	# get our class and placements for Multi'd and Dual'd characters
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	Class = ClassTable.FindValue (5, Class)
@@ -1303,10 +1377,10 @@ def CanLevelUp(actor):
 	# check the class that can be level (single or dual)
 	return int(GetNextLevelExp (Levels[0], Class)) <= xp
 
-# learn all the priest spells up to a given spell level
-# mask is 0x4000 = cleric and 0x8000 = druid
-# level 1 is 1st level spells
 def LearnPriestSpells (pc, level, mask):
+	"""Learns all the priest spells through the given spell level.
+
+	Mask distinguishes clerical and druidic spells."""
 	if level > 7: # make sure we don't have too high a level
 		level = 7
 
@@ -1320,11 +1394,13 @@ def LearnPriestSpells (pc, level, mask):
 			if HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, spell) < 0:
 				GemRB.LearnSpell (pc, spell)
 
-# removes all known spells of a type between two inclusive levels
-# type should be IE_SPELL_TYPE_*
-# if noslots is true, then we also set memorizable counts to 0
-# kit is only used to distinguish priest spells for ranger/cleric duals
 def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
+	"""Removes all known spells of a given type between two spell levels.
+
+	If noslots is true, all memorization counts are set to 0.
+	Kit is used to identify the priest spell mask of the spells to be removed;
+	this is only used when removing spells in a dualclass."""
+
 	# choose the correct limit based upon class type
 	if type == IE_SPELL_TYPE_WIZARD:
 		limit = 9

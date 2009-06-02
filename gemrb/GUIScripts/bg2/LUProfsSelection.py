@@ -49,12 +49,14 @@ ProfsColumn = 0
 ProfsTable = 0
 ProfCount = 0
 
-# type: listed above
-# window: the window we're getting the controls from
-# callback: function to call on each change
-# level1: old level
-# level2: new level
 def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1], classid=0):
+	"""Opens the proficiency selection window.
+
+	type specifies the type of selection we are doing; choices are above.
+	window specifies the window to be updated.
+	callback specifies the function to call on changes.
+	classid is sent only during dualclassing to specify the new class."""
+
 	global ProfsOffsetSum, ProfsOffsetButton1, ProfsOffsetLabel, ProfsOffsetStar
 	global ProfsOffsetPress, ProfsPointsLeft, ProfsNumButtons, ProfsTopIndex, ProfsScrollBar
 	global ProfsWindow, ProfsCallback, ProfsTextArea, ProfsColumn, ProfsTable, ProfCount
@@ -206,6 +208,10 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	return
 
 def ProfsRedraw (first=0):
+	"""Redraws the proficiencies part of the window.
+
+	If first is true, it skips ahead to the first assignable proficiency."""
+
 	global ProfsTopIndex
 
 	ProfSumLabel = ProfsWindow.GetControl(0x10000000+ProfsOffsetSum)
@@ -250,6 +256,8 @@ def ProfsRedraw (first=0):
 	return
 
 def ProfsScrollBarPress():
+	"""Scrolls the window by reassigning ProfsTopIndex."""
+
 	global ProfsTopIndex
 
 	ProfsTopIndex = GemRB.GetVar ("ProfsTopIndex")
@@ -257,11 +265,14 @@ def ProfsScrollBarPress():
 	return
 
 def ProfsJustPress():
+	"""Updates the text area with a description of the proficiency."""
 	Pos = GemRB.GetVar ("Prof")+ProfsTopIndex
 	ProfsTextArea.SetText (ProfsTable.GetValue(Pos+8, 2) )
 	return
 	
 def ProfsRightPress():
+	"""Decrease the current proficiency by one."""
+
 	global ProfsPointsLeft
 
 	Pos = GemRB.GetVar("Prof")+ProfsTopIndex
@@ -278,6 +289,8 @@ def ProfsRightPress():
 	return
 
 def ProfsLeftPress():
+	"""Increases the current proficiency by one."""
+
 	global ProfsPointsLeft
 
 	Pos = GemRB.GetVar("Prof")+ProfsTopIndex
@@ -299,6 +312,8 @@ def ProfsLeftPress():
 	return
 
 def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
+	"""Updates the actor with the new proficiencies."""
+
 	ProfCount = ProfsTable.GetRowCount ()-7
 	for i in range(ProfCount): # skip bg1 weapprof.2da proficiencies
 		ProfID = ProfsTable.GetValue (i+8, 0)
@@ -314,6 +329,8 @@ def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 	return
 
 def ProfsNullify ():
+	"""Resets all of the internal variables to 0."""
+
 	global ProfsTable
 	if not ProfsTable:
 		ProfsTable = GemRB.LoadTableObject ("weapprof")

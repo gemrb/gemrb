@@ -46,10 +46,15 @@ SpellPointsLeftLabel = 0	# << label indicating the number of points left
 SpellsPickButton = 0		# << button to select random spells
 SpellsCancelButton = 0		# << cancel chargen
 
-# a kit must be passed instead of GetKitIndex which allows for this to be used during
-# dual-classing where GetKitIndex would be the kit index of the old class, not the new one
-# base gen on character generation (uses a different window)
 def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0):
+	"""Opens the spells selection window.
+
+	table should refer to the name of the classes MXSPLxxx.2da.
+	level contains the current level of the actor.
+	diff contains the difference from the old level.
+	kit should always be GetKitIndex except when dualclassing.
+	gen is true if this is for character generation."""
+
 	global SpellsWindow, DoneButton, SpellsSelectPointsLeft, Spells, chargen, SpellPointsLeftLabel
 	global SpellsTextArea, SpellsKnownTable, SpellTopIndex, SpellBook, SpellLevel, pc, SpellStart
 	global KitMask
@@ -171,9 +176,12 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0):
 
 	return
 
-# save all the current spells and move to the next level if required;
-# otherwise, close the window and update our records
 def SpellsDonePress ():
+	"""Move to the next assignable level.
+
+	If there is not another assignable level, then save all the new spells and
+	close the window."""
+
 	global SpellBook, SpellLevel
 
 	# save all the spells
@@ -211,8 +219,9 @@ def SpellsDonePress ():
 
 	return
 
-# shows 24 spells on the grid and scrolls with a scrollbar to allow more spells
 def ShowSpells ():
+	"""Shows the viewable 24 spells."""
+
 	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
 
 	# we have a grid of 24 spells
@@ -257,6 +266,8 @@ def ShowSpells ():
 	return
 
 def SpellsSelectPress ():
+	"""Toggles the selection of the given spell."""
+
 	global SpellsSelectPointsLeft, Spells, SpellBook
 
 	# get our variables
@@ -298,8 +309,12 @@ def SpellsSelectPress ():
 
 	return
 
-# make sure i is sent with +SpellTopIndex
 def MarkButton (i, select):
+	"""Shows enabled, disabled, or highlighted button.
+
+	If selected is true, the button is highlighted.
+	Be sure i is sent with +SpellTopIndex!"""
+
 	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
 
 	if select:
@@ -318,8 +333,9 @@ def MarkButton (i, select):
 	SpellButton.SetState(type)
 	return
 
-# marks all selected spells
 def ShowSelectedSpells ():
+	"""Highlights all selected spells."""
+
 	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
 
 	# mark all of the spells picked thus far
@@ -335,8 +351,11 @@ def ShowSelectedSpells ():
 	SpellPointsLeftLabel.SetText (str (SpellsSelectPointsLeft[SpellLevel]))
 	return
 
-# only used with chargen
 def SpellsCancelPress ():
+	"""Removes all known spells and close the window.
+
+	This is only callable within character generation."""
+
 	# remove all learned spells
 	RemoveKnownSpells (pc, IE_SPELL_TYPE_WIZARD, 1, 9, 1)
 
@@ -346,9 +365,12 @@ def SpellsCancelPress ():
 	GemRB.SetNextScript("CharGen6") #haterace
 	return
 
-# only used with chargen
-# TODO: use with sorc?
 def SpellsPickPress ():
+	"""Auto-picks spells for the current level based on splautop.2da.
+
+	Only used in character generation.
+	Perhaps implement for sorcerers, if possible."""
+
 	global SpellBook, SpellsSelectPointsLeft
 
 	# load up our table
@@ -383,8 +405,13 @@ def SpellsPickPress ():
 				
 	return
 
-# ensures we have at least 1 specialist spell per level (if there are any)
 def HasSpecialistSpell ():
+	"""Determines if specialist requirements have been met.
+
+	Always returns true if the mage is not a specialist.
+	Returns true only if the specialists knows at least one spell from thier
+	school."""
+
 	# always return true for non-kitted classed
 	if KitMask == 0x4000:
 		return 1
