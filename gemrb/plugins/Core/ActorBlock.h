@@ -483,6 +483,7 @@ public:
 	int IsOpen() const;
 	void TryPickLock(Actor *actor);
 	void TryBashLock(Actor* actor) ;
+	bool TryUnlockDoor(Actor *actor);
 	void DebugDump();
 	int TrapResets() { return Flags & DOOR_RESET; }
 };

@@ -1488,6 +1488,51 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 	area->ActivateWallgroups(closed_wg_index, closed_wg_count, !(Flags&DOOR_OPEN));
 }
 
+bool Door::TryUnlockDoor(Actor *actor) {
+	if (!(Flags&DOOR_LOCKED)) return true;
+
+	// not sure what we should do without an actor (see OpenDoor/CloseDoor actions)
+	if (!actor) return false;
+
+	const char *Key = GetKey();
+	Actor *haskey = NULL;
+
+	if (Key && actor->InParty) {
+		Game *game = core->GetGame();
+		//allow opening/closing of a door when the key is on any partymember
+		for (int idx = 0; idx < game->GetPartySize(false); idx++) {
+			Actor *pc = game->FindPC(idx + 1);
+			if (!pc) continue;
+
+			if (pc->inventory.HasItem(Key,0) ) {
+				haskey = pc;
+				break;
+			}
+		}
+	} else if (Key) {
+		//actor is not in party, check only actor
+		if (actor->inventory.HasItem(Key,0) ) {
+			haskey = actor;
+		}
+	}
+
+	if (!haskey) {
+		return false;
+	}
+
+	// remove the key (but not in PS:T!)
+	if (!core->HasFeature(GF_REVERSE_DOOR) && Flags&DOOR_KEY) {
+		CREItem *item = NULL;
+		haskey->inventory.RemoveItem(Key,0,&item);
+		//the item should always be existing!!!
+		if (item) {
+			delete item;
+		}
+	}
+
+	return true;
+}
+
 void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 {
 	if (Open) {
