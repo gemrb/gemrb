@@ -4363,6 +4363,15 @@ void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE, BM_NAND);
 }
 
+void GameScript::SendTrigger(Scriptable* Sender, Action* parameters)
+{
+	Scriptable *tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
+	if (!tar) {
+		return;
+	}
+	tar->TriggerID=parameters->int0Parameter;
+}
+
 void GameScript::Shout( Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {

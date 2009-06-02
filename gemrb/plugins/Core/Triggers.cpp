@@ -1422,6 +1422,15 @@ int GameScript::Or(Scriptable* /*Sender*/, Trigger* parameters)
 	return parameters->int0Parameter;
 }
 
+int GameScript::TriggerTrigger(Scriptable* Sender, Trigger* parameters)
+{
+	if(Sender->TriggerID==(ieDword) parameters->int0Parameter) {
+		Sender->AddTrigger (&Sender->TriggerID);
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::WalkedToTrigger(Scriptable* Sender, Trigger* parameters)
 {
 	Actor *target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastTrigger);

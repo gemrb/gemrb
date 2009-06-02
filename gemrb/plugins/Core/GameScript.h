@@ -946,6 +946,7 @@ public: //Script Functions
 	static int TotalItemCntGT(Scriptable* Sender, Trigger* parameters);
 	static int TotalItemCntLT(Scriptable* Sender, Trigger* parameters);
 	static int TrapTriggered(Scriptable* Sender, Trigger* parameters);
+	static int TriggerTrigger(Scriptable* Sender, Trigger* parameters);
 	static int TriggerSetGlobal(Scriptable* Sender, Trigger* parameters);
 	static int True(Scriptable* Sender, Trigger* parameters);
 	static int Unlocked(Scriptable* Sender, Trigger* parameters);
@@ -1286,6 +1287,7 @@ public:
 	static void SaveObjectLocation(Scriptable* Sender, Action* parameters);
 	static void ScreenShake(Scriptable* Sender, Action* parameters);
 	static void SelectWeaponAbility(Scriptable* Sender, Action* parameters);
+	static void SendTrigger(Scriptable* Sender, Action* parameters);
 	static void SetAnimState(Scriptable* Sender, Action* parameters);
 	static void SetApparentName(Scriptable* Sender, Action* parameters);
 	static void SetAreaFlags(Scriptable* Sender, Action* parameters);

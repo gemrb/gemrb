@@ -351,6 +351,7 @@ static const TriggerLink triggernames[] = {
 	{"totalitemcntgt", GameScript::TotalItemCntGT, 0}, //iwd2
 	{"totalitemcntlt", GameScript::TotalItemCntLT, 0}, //iwd2
 	{"traptriggered", GameScript::TrapTriggered, 0},
+	{"trigger", GameScript::TriggerTrigger, 0},
 	{"triggerclick", GameScript::Clicked, 0}, //not sure
 	{"triggersetglobal", GameScript::TriggerSetGlobal,0}, //iwd2, but never used
 	{"true", GameScript::True, 0},
@@ -739,6 +740,7 @@ static const ActionLink actionnames[] = {
 	{"saveobjectlocation", GameScript::SaveObjectLocation, 0},
 	{"screenshake", GameScript::ScreenShake,AF_BLOCKING},
 	{"selectweaponability", GameScript::SelectWeaponAbility, 0},
+	{"sendtrigger", GameScript::SendTrigger, 0},
 	{"setanimstate", GameScript::PlaySequence, AF_ALIVE},//pst
 	{"setapparentnamestrref", GameScript::SetApparentName, 0},
 	{"setareaflags", GameScript::SetAreaFlags, 0},

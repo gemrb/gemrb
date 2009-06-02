@@ -54,6 +54,7 @@ Scriptable::Scriptable(ScriptableType type)
 	textDisplaying = 0;
 	timeStartDisplaying = 0;
 	scriptName[0] = 0;
+	TriggerID = 0; //used by SendTrigger
 	LastTrigger = 0;
 	LastEntered = 0;
 	LastDisarmed = 0;

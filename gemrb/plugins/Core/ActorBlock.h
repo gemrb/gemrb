@@ -193,6 +193,7 @@ public:
 	unsigned char textDisplaying;
 	unsigned long timeStartDisplaying;
 	ieDword UnselectableTimer;
+	ieDword TriggerID; //for sendtrigger
 	ieDword LastTrigger;  // also LastClosed
 	ieDword LastEntered;  // also LastOpened
 	ieDword LastDisarmed; // also LastAttacker
