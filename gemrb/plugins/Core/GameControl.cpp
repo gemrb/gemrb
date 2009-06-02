@@ -1446,17 +1446,13 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 		return;
 	}
 
-	if (door->IsOpen()) {
-		actor->ClearPath();
-		actor->ClearActions();
-		sprintf( Tmp, "CloseDoor(\"%s\")", door->GetScriptName() );
-		actor->AddAction( GenerateAction( Tmp) );
-	} else {
-		actor->ClearPath();
-		actor->ClearActions();
-		sprintf( Tmp, "OpenDoor(\"%s\")", door->GetScriptName() );
-		actor->AddAction( GenerateAction( Tmp) );
-	}
+	actor->ClearPath();
+	actor->ClearActions();
+	// it really isn't very nice to store a pointer in the actor like this
+	actor->TargetDoor = door;
+	// internal gemrb toggle door action hack - should we use UseDoor instead?
+	sprintf( Tmp, "NIDSpecial9()" );
+	actor->AddAction( GenerateAction( Tmp) );
 }
 
 //generate action code for actor appropriate for the target mode when the target is an active region (infopoint, trap or travel)

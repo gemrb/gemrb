@@ -240,6 +240,8 @@ public:
 	int LastDamageType;//lasthitter
 	Point FollowOffset;//follow lastfollowed at this offset
 
+	class Door *TargetDoor;
+
 	EffectQueue fxqueue;
 	vvcVector vvcOverlays;
 	vvcVector vvcShields;

@@ -1391,6 +1391,7 @@ public:
 	static void TakePartyItemRange(Scriptable* Sender, Action* parameters);
 	static void TeleportParty(Scriptable* Sender, Action* parameters);
 	static void TextScreen(Scriptable* Sender, Action* parameters);
+	static void ToggleDoor(Scriptable* Sender, Action* parameters);
 	static void TimedMoveToPoint(Scriptable* Sender, Action* parameters);
 	static void TransformItem(Scriptable* Sender, Action* parameters);
 	static void TransformItemAll(Scriptable* Sender, Action* parameters);

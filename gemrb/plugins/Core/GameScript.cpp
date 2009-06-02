@@ -446,7 +446,7 @@ static const ActionLink actionnames[] = {
 	{"clicklbuttonpoint", GameScript::ClickLButtonPoint, AF_BLOCKING},
 	{"clickrbuttonobject", GameScript::ClickLButtonObject, AF_BLOCKING},
 	{"clickrbuttonpoint", GameScript::ClickLButtonPoint, AF_BLOCKING},
-	{"closedoor", GameScript::CloseDoor,AF_BLOCKING},
+	{"closedoor", GameScript::CloseDoor,0},
 	{"containerenable", GameScript::ContainerEnable, 0},
 	{"continue", GameScript::Continue,AF_INSTANT | AF_CONTINUE},
 	{"copygroundpilesto", GameScript::CopyGroundPilesTo, 0},
@@ -665,9 +665,9 @@ static const ActionLink actionnames[] = {
 	{"nidspecial6", GameScript::Spell, AF_BLOCKING|AF_DIRECT|AF_ALIVE},
 	{"nidspecial7", GameScript::UseItemPoint, AF_BLOCKING|AF_ALIVE},
 	{"nidspecial8", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE},
-	{"nidspecial9", GameScript::Attack, AF_BLOCKING|AF_ALIVE},
+	{"nidspecial9", GameScript::ToggleDoor, AF_BLOCKING},//another internal hack, maybe we should use UseDoor instead
 	{"noaction", GameScript::NoAction, 0},
-	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
+	{"opendoor", GameScript::OpenDoor,0},
 	{"panic", GameScript::Panic, AF_ALIVE},
 	{"permanentstatchange", GameScript::PermanentStatChange, 0}, //pst
 	{"pausegame", GameScript::PauseGame, AF_BLOCKING}, //this is almost surely blocking
@@ -3030,6 +3030,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	}
 	if (InDebug&ID_ACTIONS) {
 		printMessage("GameScript"," ",YELLOW);
+		PrintAction(actionID);
 		printf("Sender: %s\n",Sender->GetScriptName() );
 	}
 	ActionFunction func = actions[actionID];

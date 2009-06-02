@@ -279,6 +279,7 @@ Actor::Actor()
 	initiative = 0;
 	InTrap = 0;
 	PathTries = 0;
+	TargetDoor = NULL;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 	fxqueue.SetOwner( this );

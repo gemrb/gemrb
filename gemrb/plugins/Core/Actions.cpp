@@ -2141,89 +2141,57 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 	Sender->ReleaseCurrentAction();
 }
 
-void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
-{
+void GameScript::OpenDoor(Scriptable* Sender, Action* parameters) {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
-		Sender->ReleaseCurrentAction();
 		return;
 	}
 	if (tar->Type != ST_DOOR) {
-		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	if (door->IsOpen()) {
-		//door is already open
-		Sender->ReleaseCurrentAction();
+	Actor* actor = NULL;
+	if (Sender->Type == ST_ACTOR) actor = (Actor *)Sender;
+	if (!door->TryUnlockDoor(actor)) {
 		return;
 	}
-	if (Sender->Type != ST_ACTOR) {
-		//if not an actor opens, it don't play sound
-		door->SetDoorOpen( true, false, 0 );
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	unsigned int distance;
-	Point *p = door->toOpen;
-	Point *otherp = door->toOpen+1;
-	distance = FindNearPoint( Sender, p, otherp);
-	if (distance <= MAX_OPERATING_DISTANCE) {
-		Actor *actor = (Actor *) Sender;
-		actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
-		if (door->Flags&DOOR_LOCKED) {
-			const char *Key = door->GetKey();
-			Actor *haskey = NULL;
-
-			if (Key && actor->InParty) {
-				Game *game = core->GetGame();
-				//allow opening of a door when the key is on any partymember
-				for (int idx = 0; idx < game->GetPartySize(false); idx++) {
-					Actor *pc = game->FindPC(idx + 1);
-					if (!pc) continue;
-
-					if (pc->inventory.HasItem(Key,0) ) {
-						haskey = pc;
-						break;
-					}
-				}
-			} else if (Key) {
-				//actor is not in party, check only actor
-				if (actor->inventory.HasItem(Key,0) ) {
-					haskey = actor;
-				}
-			}
-
-			if (!haskey) {
-				core->DisplayConstantString(STR_DOORLOCKED,0xd7d7be,door);
-				//playsound unsuccessful opening of door
-				core->PlaySound(DS_OPEN_FAIL);
-				Sender->ReleaseCurrentAction();
-				return; //don't open door
-			}
-
-			// remove the key (but not in PS:T!)
-			if (!core->HasFeature(GF_REVERSE_DOOR) && door->Flags&DOOR_KEY) {
-				CREItem *item = NULL;
-				haskey->inventory.RemoveItem(Key,0,&item);
-				//the item should always be existing!!!
-				if (item) {
-					delete item;
-				}
-			}
-		}
-		door->TriggerTrap(0, actor->GetID());
-		door->SetDoorOpen( true, true, actor->GetID() );
-	} else {
-		GoNearAndRetry(Sender, *p, MAX_OPERATING_DISTANCE);
-	}
-	Sender->SetWait(1);
+	//if not an actor opens, it don't play sound
+	door->SetDoorOpen( true, (Sender->Type == ST_ACTOR), 0 );
 	Sender->ReleaseCurrentAction();
 }
 
-void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
-{
+void GameScript::CloseDoor(Scriptable* Sender, Action* parameters) {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_DOOR) {
+		return;
+	}
+	Door* door = ( Door* ) tar;
+	Actor* actor = NULL;
+	if (Sender->Type == ST_ACTOR) actor = (Actor *)Sender;
+	if (!door->TryUnlockDoor(actor)) {
+		return;
+	}
+	//if not an actor closes, it don't play sound
+	door->SetDoorOpen( false, (Sender->Type == ST_ACTOR), 0 );
+	Sender->ReleaseCurrentAction();
+}
+
+void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+
+	// TargetDoor is set when GameControl makes the action, so should be fine
+	// unless this action is quietly called by a script (and UseDoor in the
+	// original engine crashes, so this is surely no worse..), but we should
+	// maybe have a better solution
+	Scriptable* tar = actor->TargetDoor;
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2233,33 +2201,26 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	if (!door->IsOpen() ) {
-		//door is already closed
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	if (Sender->Type != ST_ACTOR) {
-		//if not an actor opens, it don't play sound
-		door->SetDoorOpen( false, false, 0 );
-		Sender->ReleaseCurrentAction();
-		return;
-	}
 	unsigned int distance;
 	Point *p = door->toOpen;
 	Point *otherp = door->toOpen+1;
 	distance = FindNearPoint( Sender, p, otherp);
 	if (distance <= MAX_OPERATING_DISTANCE) {
-		//actually if we got the key, we could still open it
-		//we need a more sophisticated check here
-		//doors could be locked but open, and unable to close
-		if (door->Flags&DOOR_LOCKED) {
-			//playsound unsuccessful closing of door
-			core->PlaySound(DS_CLOSE_FAIL);
-		} else {
-			Actor *actor = (Actor *) Sender;
-			actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
-			door->SetDoorOpen( false, true, actor->GetID() );
+		actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
+		if (!door->TryUnlockDoor(actor)) {
+			core->DisplayConstantString(STR_DOORLOCKED,0xd7d7be,door);
+			//playsound unsuccessful opening of door
+			if(door->IsOpen())
+				core->PlaySound(DS_CLOSE_FAIL);
+			else
+				core->PlaySound(DS_OPEN_FAIL);
+			Sender->ReleaseCurrentAction();
+			return; //don't open door
 		}
+
+		// should we be triggering the trap on close?
+		door->TriggerTrap(0, actor->GetID());
+		door->SetDoorOpen( !door->IsOpen(), true, actor->GetID() );
 	} else {
 		GoNearAndRetry(Sender, *p, MAX_OPERATING_DISTANCE);
 	}
