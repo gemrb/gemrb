@@ -93,11 +93,25 @@ Sprite2D* TISImp::GetTile(int index)
 	Color Palette[256];
 	void* pixels = malloc( 4096 );
 	unsigned long pos = index *(1024+4096) + headerShift;
-	if(str->Size()<pos) {
-		printf("Invalid tile index: %d\n",index);
-		printf("FileSize: %ld\n", str->Size() );
-		printf("Position: %ld\n", pos);
-		printf("Shift: %d\n", headerShift);
+	if(str->Size()<pos+1024+4096) {
+		// try to only report error once per file
+		static TISImp *last_corrupt = NULL;
+		if (last_corrupt != this) {
+			/*printf("Invalid tile index: %d\n",index);
+			printf("FileSize: %ld\n", str->Size() );
+			printf("Position: %ld\n", pos);
+			printf("Shift: %d\n", headerShift);*/
+			printf("Corrupt WED file encountered; couldn't find any more tiles at tile %d\n", index);
+			last_corrupt = this;
+		}
+	
+		// original PS:T AR0609 and AR0612 report far more tiles than are actually present :(
+		memset(pixels, 0, 4096);
+		memset(Palette, 0, 256 * sizeof(Color));
+		Palette[0].g = 200;
+		Sprite2D* spr = core->GetVideoDriver()->CreateSprite8( 64, 64, 8, pixels, Palette, false, 0 );
+		spr->XPos = spr->YPos = 0;
+		return spr;
 	}
 	str->Seek( ( index * ( 1024 + 4096 ) + headerShift ), GEM_STREAM_START );
 	str->Read( &RevCol, 1024 );
