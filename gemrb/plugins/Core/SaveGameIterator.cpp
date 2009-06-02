@@ -386,8 +386,9 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	char FName[12];
 
 	//some of these restrictions might not be needed
-	if (core->GetCurrentStore()) {
-		return 1; //can't save while store is open
+	Store * store = core->GetCurrentStore();
+	if (store && (store->Type < STT_BG2CONT)) {
+		return 1; //can't save while store is open unless it is a container
 	}
 	GameControl *gc = core->GetGameControl();
 	if (!gc) {
