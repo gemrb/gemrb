@@ -29,6 +29,8 @@ TextAreaControl = 0
 PortraitName = ""
 
 def DisplayOverview(step):
+	"""Sets up the primary character generation window."""
+
 	global CharGenWindow, TextAreaControl, PortraitName
 
 	GemRB.LoadWindowPack ("GUICG", 640, 480)
@@ -268,6 +270,8 @@ def DisplayOverview(step):
 	return
 
 def SetButtonStateFromStep (buttonName, button, step):
+	"""Updates selectable buttons based upon current step."""
+
 	global CharGenWindow
 
 	state = IE_GUI_BUTTON_DISABLED
@@ -306,6 +310,8 @@ def SetButtonStateFromStep (buttonName, button, step):
 	return
 
 def CancelPress():
+	"""Revert back to the first step; if there, free the actor."""
+
 	global CharGenWindow
 	if CharGenWindow:
 		CharGenWindow.Unload ()
@@ -321,6 +327,8 @@ def CancelPress():
 	return
 
 def ImportPress():
+	"""Opens the character import window."""
+
 	global CharGenWindow
 	if CharGenWindow:
 		CharGenWindow.Unload ()
@@ -335,6 +343,8 @@ def ImportPress():
 	return
 
 def BackPress():
+	"""Moves to the previous step."""
+
 	global CharGenWindow
 	if CharGenWindow:
 		CharGenWindow.Unload ()
@@ -349,6 +359,8 @@ def BackPress():
 	return
 
 def NextPress():
+	"""Moves to the next step."""
+
 	global CharGenWindow
 	if CharGenWindow:
 		CharGenWindow.Unload ()
@@ -371,6 +383,7 @@ def NextPress():
 	return
 
 def BiographyPress():
+	"""Opens the biography window."""
 	if CharGenWindow:
 		CharGenWindow.Unload()
 	GemRB.SetNextScript("GUICG23") #biography

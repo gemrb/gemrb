@@ -56,6 +56,8 @@ def OpenInventoryWindowClick ():
 	return
 
 def OpenInventoryWindow ():
+	"""Opens the inventory window."""
+
 	global InventoryWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
@@ -187,6 +189,8 @@ def OpenInventoryWindow ():
 	return
 
 def ColorDonePress ():
+	"""Saves the selected colors."""
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	if ColorPicker:
@@ -202,6 +206,7 @@ def ColorDonePress ():
 	return
 
 def MajorPress ():
+	"""Selects the major color."""
 	global ColorIndex, PickedColor
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -211,6 +216,7 @@ def MajorPress ():
 	return
 
 def MinorPress ():
+	"""Selects the minor color."""
 	global ColorIndex, PickedColor
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -220,6 +226,8 @@ def MinorPress ():
 	return
 
 def GetColor ():
+	"""Opens the color selection window."""
+
 	global ColorPicker
 
 	ColorTable = GemRB.LoadTableObject ("clowncol")
@@ -247,8 +255,9 @@ def GetColor ():
 	ColorPicker.SetVisible (1)
 	return
 
-#complete update
 def UpdateInventoryWindow ():
+	"""Redraws the inventory window and resets TopIndex."""
+
 	Window = InventoryWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -265,8 +274,9 @@ def UpdateInventoryWindow ():
 		UpdateSlot (pc, i)
 	return
 
-#partial update without altering TopIndex
 def RefreshInventoryWindow ():
+	"""Partial redraw without resetting TopIndex."""
+
 	Window = InventoryWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -408,6 +418,7 @@ def RefreshInventoryWindow ():
 	return
 
 def UpdateSlot (pc, slot):
+	"""Updates a specific slot."""
 
 	Window = InventoryWindow
 	SlotType = GemRB.GetSlotType (slot+1, pc)
@@ -501,6 +512,8 @@ def UpdateSlot (pc, slot):
 	return
 
 def OnDragItemGround ():
+	"""Drops and item to the ground."""
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	slot = GemRB.GetVar ("GroundItemButton") + GemRB.GetVar ("TopIndex")
@@ -515,6 +528,8 @@ def OnDragItemGround ():
 	return
 
 def OnAutoEquip ():
+	"""Auto-equips equipment if possible."""
+
 	if GemRB.IsDraggingItem ()!=1:
 		return
 
@@ -530,6 +545,8 @@ def OnAutoEquip ():
 	return
 
 def OnDragItem ():
+	"""Updates dragging."""
+
 	if GemRB.IsDraggingItem()==2:
 		return
 
@@ -556,6 +573,8 @@ def OnDragItem ():
 	return
 
 def OnDropItemToPC ():
+	"""Gives an item to another character."""
+
 	pc = GemRB.GetVar ("PressedPortrait")
 
 	#-3 : drop stuff in inventory (but not equippable slots)
@@ -570,6 +589,8 @@ def OnDropItemToPC ():
 	return
 
 def DecreaseStackAmount ():
+	"""Decreases the split size."""
+
 	Text = ItemAmountWindow.GetControl (6)
 	Amount = Text.QueryText ()
 	number = int ("0"+Amount)-1
@@ -579,6 +600,8 @@ def DecreaseStackAmount ():
 	return
 
 def IncreaseStackAmount ():
+	"""Increases the split size."""
+
 	Text = ItemAmountWindow.GetControl (6)
 	Amount = Text.QueryText ()
 	number = int ("0"+Amount)+1
@@ -588,6 +611,8 @@ def IncreaseStackAmount ():
 	return
 
 def DragItemAmount ():
+	"""Drag a split item."""
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
@@ -599,6 +624,8 @@ def DragItemAmount ():
 	return
 
 def OpenItemAmountWindow ():
+	"""Open the split window."""
+
 	global ItemAmountWindow, StackAmount
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -664,6 +691,8 @@ def OpenItemAmountWindow ():
 	return
 
 def DrinkItemWindow ():
+	"""Drink?"""
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 	# the drink item header is always the first
@@ -672,6 +701,8 @@ def DrinkItemWindow ():
 	return
 
 def OpenErrorWindow (strref):
+	"""Opens the error window and displays the string."""
+
 	global ErrorWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -693,6 +724,8 @@ def CloseErrorWindow ():
 	return
 
 def ReadItemWindow ():
+	"""Displays the contents of a scroll."""
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 	ret = 0
@@ -724,6 +757,8 @@ def ReadItemWindow ():
 	return ret
 
 def OpenItemWindow ():
+	"""Displays information about an item."""
+
 	#close inventory
 	GemRB.SetVar ("Inventory", 1)
 	if ItemInfoWindow:
@@ -738,6 +773,8 @@ def OpenItemWindow ():
 	return
 
 def DialogItemWindow ():
+	"""Converse with an item. (Lilacor?)"""
+
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
 	OpenInventoryWindow ()
@@ -751,6 +788,8 @@ def DialogItemWindow ():
 	return
 
 def IdentifyUseSpell ():
+	"""Identifies an item with a memorized spell."""
+
 	global ItemIdentifyWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -765,6 +804,8 @@ def IdentifyUseSpell ():
 	return
 
 def IdentifyUseScroll ():
+	"""Identifies an item with a scroll."""
+
 	global ItemIdentifyWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
