@@ -387,8 +387,8 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 
 	//some of these restrictions might not be needed
 	Store * store = core->GetCurrentStore();
-	if (store && (store->Type < STT_BG2CONT)) {
-		return 1; //can't save while store is open unless it is a container
+	if (store) {
+		return 1; //can't save while store is open
 	}
 	GameControl *gc = core->GetGameControl();
 	if (!gc) {
@@ -400,6 +400,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	//TODO: can't save while in combat
 	//TODO: can't save while (party) actors are in helpless states
 	//TODO: can't save while AOE spells are in effect
+	//TODO: can't save while IF_NOINT is set on an actor
 
 	GetSaveGameCount(); //forcing reload
 	if (mqs) {

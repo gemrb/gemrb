@@ -212,6 +212,7 @@ bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot)
 
 bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 {
+	bool had_nostore=false;
 	bool has_current=false;
 	ieResRef current;
 	ieVariable owner;
@@ -219,6 +220,7 @@ bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 
 	Store *store = core->GetCurrentStore();
 	if (!store) {
+		had_nostore = true;
 		store = core->SetCurrentStore(storename, NULL);
 	} else {
 		if (strnicmp(store->Name, storename, 8) ) {
@@ -236,6 +238,8 @@ bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 	if (has_current) {
 		//setting back old store (this will save our current store)
 		core->SetCurrentStore(current, owner);
+	} else if (had_nostore) {
+		core->CloseCurrentStore();
 	}
 	return ret;
 }
