@@ -2597,12 +2597,6 @@ int GameScript::UnselectableVariable(Scriptable* Sender, Trigger* parameters)
 	if (!tar) {
 		return 0;
 	}
-	/*
-	if (tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor = ( Actor* ) tar;
-	*/
 	return tar->UnselectableTimer == (unsigned) parameters->int0Parameter;
 }
 
@@ -2618,6 +2612,9 @@ int GameScript::UnselectableVariableGT(Scriptable* Sender, Trigger* parameters)
 int GameScript::UnselectableVariableLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
 	return tar->UnselectableTimer < (unsigned) parameters->int0Parameter;
 }
 
