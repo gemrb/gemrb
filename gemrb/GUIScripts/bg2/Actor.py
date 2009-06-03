@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: GUICommon.py 6171 2009-05-29 01:07:15Z mattinm $
+# $Id:$
 
 # Actor.py: Contains the actor class.
 
