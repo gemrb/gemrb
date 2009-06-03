@@ -397,6 +397,9 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
 		return 2; //can't save while in dialog?
 	}
+	//TODO: can't save while in combat
+	//TODO: can't save while (party) actors are in helpless states
+	//TODO: can't save while AOE spells are in effect
 
 	GetSaveGameCount(); //forcing reload
 	if (mqs) {
@@ -416,13 +419,15 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 		while (ExistingSlotName(index) !=-1 ) {
 			index++;
 		}
+		snprintf( Path, _MAX_PATH, "%09d-%s", index, slotname );
 	} else {
-		int oldindex = ExistingSlotName(index);
-		if (oldindex>=0) {
-			DeleteSaveGame(oldindex);
-		}
+		// the existing filename has the original index of the previous save
+		// this is usually bad since the gui sends the current one
+		SaveGame *save = GetSaveGame(index);
+		if (!save) return -1;
+		DeleteSaveGame(index);
+		snprintf( Path, _MAX_PATH, "%09d-%s", save->GetSaveID(), slotname );
 	}
-	snprintf( Path, _MAX_PATH, "%09d-%s", index, slotname );
 	save_slots.insert( save_slots.end(), strdup( Path ) );
 	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, PlayMode() );
 
