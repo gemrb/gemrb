@@ -2692,33 +2692,22 @@ int GameScript::InActiveArea(Scriptable* Sender, Trigger* parameters)
 	if (!tar) {
 		return 0;
 	}
-	switch (tar->Type) {
-		case ST_ACTOR:
-			return strnicmp(core->GetGame()->CurrentArea, (( Actor* ) tar)->Area, 8) ==0;
-		case ST_AREA:
-			return core->GetGame()->GetCurrentArea() == tar;
-		default:
-			// should this work for more than just actors and areas? probably!
-			return 0;
+	if (core->GetGame()->GetCurrentArea() == tar->GetCurrentArea()) {
+		return 1;
 	}
+	return 0;
 }
 
 int GameScript::InMyArea(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		return 0;
-	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar) {
 		return 0;
 	}
-	if (tar->Type != ST_ACTOR) {
-		return 0;
+	if (Sender->GetCurrentArea() == tar->GetCurrentArea()) {
+		return 1;
 	}
-	Actor* actor1 = ( Actor* ) Sender;
-	Actor* actor2 = ( Actor* ) tar;
-
-	return strnicmp(actor1->Area, actor2->Area, 8)==0;
+	return 0;
 }
 
 int GameScript::AreaType(Scriptable* Sender, Trigger* parameters)
