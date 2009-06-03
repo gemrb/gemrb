@@ -1,13 +1,17 @@
-GemRB svn (6182):
+GemRB svn (6282):
   New features:
     - 
+    - projectile sounds
+    - The Nameless One properly dies / resurrects
     - bg2 chargen now levels to the correct level
     - running and portal animations in pst
 
   Improved features:
+    - dialog, actions and triggers (especially the ones in the start of ToB)
+    - combat
     - fixed projectile orientations
     - disarm trap checks skills
-    - levelup, dual classing
+    - levelup, dual classing, multiclass handling
     - various guiscripts
     - bugfixes
 
