@@ -975,6 +975,9 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 	}
 
+	// starting a dialog ends cutscenes!
+	core->SetCutSceneMode(false);
+
 	const char* Dialog = NULL;
 	AutoTable pdtable;
 
