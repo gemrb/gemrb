@@ -30,6 +30,7 @@ from LUSpellSelection import *
 from LUHLASelection import *
 from LUProfsSelection import *
 from LUSkillsSelection import *
+from Actor import *
 
 LevelUpWindow = None
 DoneButton = 0
@@ -47,6 +48,7 @@ IsDual = 0
 IsMulti = 0
 pc = 0
 ClassName = 0
+actor = 0
 
 # old values (so we don't add too much)
 OldHPMax = 0		# << old maximum hitpoints
@@ -63,7 +65,7 @@ DeltaWSpells = 0	# << total new wizard spells
 def OpenLevelUpWindow():
 	"""Sets up the level up window."""
 
-	global LevelUpWindow, TextAreaControl, NewProfPoints
+	global LevelUpWindow, TextAreaControl, NewProfPoints, actor
 	global DoneButton
 	global NewSkillPoints, KitName, LevelDiff, RaceTable
 	global ClassTable, Level, Classes, NumClasses, DualSwap, ClassSkillsTable, IsMulti
@@ -87,6 +89,7 @@ def OpenLevelUpWindow():
 
 	# name
 	pc = GemRB.GameGetSelectedPCSingle ()
+	actor = Actor(pc)
 	Label = LevelUpWindow.GetControl (0x10000000+90)
 	Label.SetText (GemRB.GetPlayerName (pc))
 
@@ -100,15 +103,18 @@ def OpenLevelUpWindow():
 	# class
 	Label = LevelUpWindow.GetControl (0x10000000+106)
 	Label.SetText (GetActorClassTitle (pc))
+	print "Title:",GetActorClassTitle (pc),"\tActor Title:",actor.ClassTitle()
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	print "Class:",Class
+	print "Class:",Class,"\tActor Class:",actor.classid
 	ClassIndex = ClassTable.FindValue (5, Class)
 	SkillTable = GemRB.LoadTableObject("skills")
 
 	# kit
 	ClassName = ClassTable.GetRowName(ClassIndex)
 	Kit = GetKitIndex (pc)
+	print "Kit:", Kit, "\tActor Kit:",actor.KitIndex()
+	print "ClassName:",ClassName,"\tActor ClassNames:",actor.ClassNames()
 	
 	# need this for checking gnomes
 	RaceName = GemRB.GetPlayerStat (pc, IE_RACE, 1)
@@ -132,8 +138,6 @@ def OpenLevelUpWindow():
 	
 	# not multi, check dual
 	if not IsMulti:
-		print "Not Multi"
-
 		# check if we're dual classed
 		IsDual = IsDualClassed (pc, 1)
 		Classes = [IsDual[2], IsDual[1]] # make sure the new class is first
@@ -143,7 +147,6 @@ def OpenLevelUpWindow():
 		
 		# not dual, must be single
 		if IsDual[0] == 0:
-			print "Not Dual"
 			Classes = [Class]
 		else: # make sure Classes[1] is a class, not a kit
 			if IsDual[0] == 1: # kit
@@ -153,6 +156,8 @@ def OpenLevelUpWindow():
 
 		# store a boolean for IsDual
 		IsDual = IsDual[0] > 0
+
+	print "NumClasses:",NumClasses,"\tActor NumClasses:",actor.NumClasses()
 
 	Level = [0]*3
 	LevelDiff = [0]*3
@@ -173,6 +178,9 @@ def OpenLevelUpWindow():
 		else:
 			Level[1] = GemRB.GetPlayerStat (pc, IE_LEVEL2)
 
+	print "Classes:",Classes,"\tActor Classes:",actor.Classes()
+	print "IsDual:",IsDual>0,"\tActor IsDual",actor.isdual
+
 	hp = 0
 	HaveCleric = 0
 	DeltaWSpells = 0
@@ -180,14 +188,14 @@ def OpenLevelUpWindow():
 
 	# get a bunch of different things each level
 	for i in range(NumClasses):
-		print "Class:",Classes[i]
+#		print "Class:",Classes[i]
 		# we don't care about the current level, but about the to-be-achieved one
 		# get the next level
 		Level[i] = GetNextLevelFromExp (GemRB.GetPlayerStat (pc, IE_XP)/NumClasses, Classes[i])
 		TmpIndex = ClassTable.FindValue (5, Classes[i])
 		TmpName = ClassTable.GetRowName (TmpIndex) 
 
-		print "Name:",TmpName
+#		print "Name:",TmpName
 
 		# find the level diff for each classes (3 max, obviously)
 		if i == 0:
@@ -200,8 +208,8 @@ def OpenLevelUpWindow():
 		elif i == 2:
 			LevelDiff[i] = Level[i] - GemRB.GetPlayerStat (pc, IE_LEVEL3)
 
-		print "Level (",i,"):",Level[i]
-		print "Level Diff (",i,"):",LevelDiff[i]
+#		print "Level (",i,"):",Level[i]
+#		print "Level Diff (",i,"):",LevelDiff[i]
 
 		# save our current and next spell amounts
 		StartLevel = Level[i] - LevelDiff[i]
@@ -259,6 +267,10 @@ def OpenLevelUpWindow():
 		if ABTable != "*" and ABTable[:6] != "CLABMA":
 			AddClassAbilities (pc, ABTable, Level[i], LevelDiff[i])
 
+	print "Actor CurrentLevels:",actor.Levels()
+	print "Levels:",Level,"Actor NextLevels:",actor.NextLevels()
+	print "LevelDiffs:",LevelDiff,"Actor LevelDiffs:",actor.LevelDiffs()
+
 	#update our saves, thaco, hp and lore
 	SetupSavingThrows (pc, Level)
 	SetupThaco (pc, Level)
@@ -270,6 +282,12 @@ def OpenLevelUpWindow():
 	if HasTOB(): # make sure SoA doesn't try to get it
 		HLATable = GemRB.LoadTableObject("lunumab")
 		# we need to check each level against a multi value (this is kinda screwy)
+		if actor.multiclass:
+			print "Actor HLA Names:",["MULTI"+str(actor.NumClasses())+name \
+				for name in actor.ClassNames()]
+		else:
+			print "Actor HLA Names:",actor.ClassNames()
+			
 		for i in range (NumClasses):
 			if IsMulti:
 				# get the row name for lookup ex. MULTI2FIGHTER, MULTI3THIEF
