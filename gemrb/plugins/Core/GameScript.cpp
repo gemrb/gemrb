@@ -1180,6 +1180,8 @@ void Targets::AddTarget(Scriptable* target, unsigned int distance, int ga_flags)
 		break;
 	case ST_DOOR:
 		break;
+	case ST_AREA:
+		break;
 	default:
 		return;
 	}
