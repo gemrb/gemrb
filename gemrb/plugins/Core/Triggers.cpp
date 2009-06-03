@@ -2689,11 +2689,18 @@ int GameScript::AnyPCOnMap(Scriptable* Sender, Trigger* /*parameters*/)
 int GameScript::InActiveArea(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar || tar->Type != ST_ACTOR) {
+	if (!tar) {
 		return 0;
 	}
-	Actor* actor2 = ( Actor* ) tar;
-	return strnicmp(core->GetGame()->CurrentArea, actor2->Area, 8) ==0;
+	switch (tar->Type) {
+		case ST_ACTOR:
+			return strnicmp(core->GetGame()->CurrentArea, (( Actor* ) tar)->Area, 8) ==0;
+		case ST_AREA:
+			return core->GetGame()->GetCurrentArea() == tar;
+		default:
+			// should this work for more than just actors and areas? probably!
+			return 0;
+	}
 }
 
 int GameScript::InMyArea(Scriptable* Sender, Trigger* parameters)
