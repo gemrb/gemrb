@@ -1789,7 +1789,7 @@ bool InfoPoint::Entered(Actor *actor)
 		goto check;
 	}
 	if (Flags&TRAP_USEPOINT) {
-		if (Distance(UsePoint, actor->Pos)<MAX_OPERATING_DISTANCE) {
+		if (Distance(TalkPos, actor->Pos)<MAX_OPERATING_DISTANCE) {
 			goto check;
 		}
 	}
