@@ -548,6 +548,7 @@ public:
 	ieDword Flags;
 	//overheadtext contains the string, but we have to save this
 	ieStrRef StrRef;
+	Point UsePoint;
 	Point TalkPos;
 };
 

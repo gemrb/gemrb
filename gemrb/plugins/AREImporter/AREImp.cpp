@@ -476,15 +476,16 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		ip->textDisplaying = 0;
 		ip->timeStartDisplaying = 0;
 		ip->SetMap(map);
+		ip->Flags = Flags;
+		ip->UsePoint.x = PosX;
+		ip->UsePoint.y = PosY;
 		//FIXME: PST doesn't use this field
 		if (ip->Flags&TRAP_USEPOINT) {
-			ip->Pos.x=PosX;
-			ip->Pos.y=PosY;
+			ip->Pos = ip->UsePoint;
 		} else {
 			ip->Pos.x = bbox.x + ( bbox.w / 2 );
 			ip->Pos.y = bbox.y + ( bbox.h / 2 );
 		}
-		ip->Flags = Flags;
 		memcpy( ip->Destination, Destination, sizeof(Destination) );
 		memcpy( ip->EntranceName, Entrance, sizeof(Entrance) );
 		memcpy( ip->KeyResRef, KeyResRef, sizeof(KeyResRef) );
@@ -1688,9 +1689,9 @@ int AREImp::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 		} else {
 			stream->Write( filling, 8);
 		}
-		tmpWord = (ieWord) ip->Pos.x;
+		tmpWord = (ieWord) ip->UsePoint.x;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) ip->Pos.y;
+		tmpWord = (ieWord) ip->UsePoint.y;
 		stream->WriteWord( &tmpWord);
 		stream->Write( filling, 44); //unknown
 		//these are probably only in PST

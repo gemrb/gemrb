@@ -1505,7 +1505,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			}
 			if (trap->Flags&TRAP_USEPOINT) {
 				//overriding the target point
-				p = trap->Pos;
+				p = trap->UsePoint;
 				return false;
 			}
 			return true;

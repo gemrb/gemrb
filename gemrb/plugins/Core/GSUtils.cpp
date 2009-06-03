@@ -808,6 +808,10 @@ void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 			position = ((Movable *) scr)->GetMostLikelyPosition();
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
+			if (((InfoPoint *) scr)->Flags & TRAP_USEPOINT) {
+				position=((InfoPoint *) scr)->UsePoint;
+				break;
+			}
 			position=((InfoPoint *) scr)->TrapLaunch;
 			break;
 		case ST_DOOR: case ST_CONTAINER:
@@ -831,6 +835,10 @@ void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 			position = ((Movable *) scr)->GetMostLikelyPosition();
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
+                       if (((InfoPoint *) scr)->Flags & TRAP_USEPOINT) {
+                               position=((InfoPoint *) scr)->UsePoint;
+                               break;
+                       }
 		case ST_DOOR: case ST_CONTAINER:
 			position=((Highlightable *) scr)->TrapLaunch;
 	}
