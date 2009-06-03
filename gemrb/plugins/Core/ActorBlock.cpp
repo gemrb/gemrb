@@ -1491,9 +1491,6 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 bool Door::TryUnlockDoor(Actor *actor) {
 	if (!(Flags&DOOR_LOCKED)) return true;
 
-	// not sure what we should do without an actor (see OpenDoor/CloseDoor actions)
-	if (!actor) return false;
-
 	const char *Key = GetKey();
 	Actor *haskey = NULL;
 

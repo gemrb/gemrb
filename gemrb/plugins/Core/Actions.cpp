@@ -2150,10 +2150,13 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters) {
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	Actor* actor = NULL;
-	if (Sender->Type == ST_ACTOR) actor = (Actor *)Sender;
-	if (!door->TryUnlockDoor(actor)) {
-		return;
+	// no idea if this is right, or whether OpenDoor/CloseDoor should allow opening
+	// of all doors, or some doors, or whether it should still check for non-actors
+	if (Sender->Type == ST_ACTOR) {
+		Actor *actor = (Actor *)Sender;
+		if (!door->TryUnlockDoor(actor)) {
+			return;
+		}
 	}
 	//if not an actor opens, it don't play sound
 	door->SetDoorOpen( true, (Sender->Type == ST_ACTOR), 0 );
@@ -2169,10 +2172,12 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters) {
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	Actor* actor = NULL;
-	if (Sender->Type == ST_ACTOR) actor = (Actor *)Sender;
-	if (!door->TryUnlockDoor(actor)) {
-		return;
+	// see comments in OpenDoor above
+	if (Sender->Type == ST_ACTOR) {
+		Actor *actor = (Actor *)Sender;
+		if (!door->TryUnlockDoor(actor)) {
+			return;
+		}
 	}
 	//if not an actor closes, it don't play sound
 	door->SetDoorOpen( false, (Sender->Type == ST_ACTOR), 0 );
