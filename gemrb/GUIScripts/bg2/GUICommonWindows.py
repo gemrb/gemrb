@@ -40,6 +40,7 @@ OptionsWindow = None
 ActionsWindow = None
 DraggedPortrait = None
 
+print
 ClassTable = GemRB.LoadTableObject ("classes")
 NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
 KitListTable = GemRB.LoadTableObject ("kitlist")
