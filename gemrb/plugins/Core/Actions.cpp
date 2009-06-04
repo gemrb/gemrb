@@ -5178,6 +5178,7 @@ void GameScript::PickUpItem(Scriptable* Sender, Action* parameters)
 	//the following part is coming from GUISCript.cpp with trivial changes
 	int Slot = c->inventory.FindItem(parameters->string0Parameter, 0);
 	if (Slot<0) {
+		return;
 	}
 	int res = core->CanMoveItem(c->inventory.GetSlotItem(Slot) );
 	if (!res) { //cannot move
@@ -5583,8 +5584,8 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	ieDword Slot, header;
-	ieDword flags;
+	int Slot;
+	ieDword header, flags;
 	ieResRef itemres;
 
 	if (parameters->string0Parameter[0]) {
@@ -5597,6 +5598,11 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		//this is actually not in the original game code
 		header = parameters->int1Parameter;
 		flags = parameters->int2Parameter;
+	}
+
+	if (Slot == -1) {
+		Sender->ReleaseCurrentAction();
+		return;
 	}
 
 	if (!ResolveItemName( itemres, act, Slot) ) {
@@ -5623,7 +5629,8 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 	}
 
 	Actor *act = (Actor *) Sender;
-	ieDword Slot, header;
+	int Slot;
+	ieDword header;
 	ieResRef itemres;
 	ieDword flags;
 
@@ -5637,6 +5644,11 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 		//this is actually not in the original game code
 		header = parameters->int1Parameter;
 		flags = parameters->int2Parameter;
+	}
+
+	if (Slot == -1) {
+		Sender->ReleaseCurrentAction();
+		return;
 	}
 
 	if (!ResolveItemName( itemres, act, Slot) ) {
