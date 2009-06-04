@@ -2395,6 +2395,28 @@ bool Actor::CheckOnDeath()
 		}
 	}
 
+	if (Modified[IE_SEX] == SEX_EXTRA || (Modified[IE_SEX] >= SEX_EXTRA2 && Modified[IE_SEX] <= SEX_MAXEXTRA)) {
+		// if gender is set to one of the EXTRA values, then at death, we have to decrease
+		// the relevant EXTRACOUNT area variable. scripts use this to check how many actors
+		// of this extra id are still alive (for example, see the ToB challenge scripts)
+		ieVariable varname;
+		if (Modified[IE_SEX] == SEX_EXTRA) {
+			snprintf(varname, 32, "EXTRACOUNT");
+		} else {
+			snprintf(varname, 32, "EXTRACOUNT%d", 2 + (Modified[IE_SEX] - SEX_EXTRA2));
+		}
+
+		Map *area = GetCurrentArea();
+		if (area) {
+			ieDword value = 0;
+			area->locals->Lookup(varname, value);
+			// i am guessing that we shouldn't decrease below 0
+			if (value > 0) {
+				area->locals->SetAt(varname, value-1);
+			}
+		}
+	}
+
 	DropItem("",0);
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9

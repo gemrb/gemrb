@@ -62,7 +62,14 @@
 //GENDER values
 #define SEX_MALE      1
 #define SEX_FEMALE    2
+#define SEX_OTHER     3
+#define SEX_NEITHER   4
+#define SEX_BOTH      5
 #define SEX_SUMMON    6
+#define SEX_ILLUSION  7 // bg2
+#define SEX_EXTRA     8 // bg2
+#define SEX_EXTRA2    0xa // ToB
+#define SEX_MAXEXTRA  0x12 // ToB (extra10)
 
 //alignment values
 #define AL_GE_MASK     3  //good / evil
