@@ -4367,6 +4367,29 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 	return 0;
 }
 
+static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist")
+{
+	int kitindex = 0;
+
+	if ((kit&BG2_KITMASK) == KIT_BARBARIAN) {
+		kitindex = kit&0xfff;
+	}
+
+	// carefully looking for kit by the usability flag
+	// since the barbarian kit id clashes with the no-kit value
+	if (kitindex == 0 && kit != KIT_BARBARIAN) {
+		TableMgr *tm = gamedata->GetTable(gamedata->LoadTable(resref) );
+		if (tm) {
+			kitindex = tm->FindTableValue(6, kit);
+			if (kitindex < 0) {
+				kitindex = 0;
+			}
+		}
+	}
+
+	return (ieDword)kitindex;
+}
+
 int Actor::CheckUsability(Item *item) const
 {
 	ieDword itembits[2]={item->UsabilityBitmask, item->KitUsability};
@@ -4375,26 +4398,17 @@ int Actor::CheckUsability(Item *item) const
 		ieDword itemvalue = itembits[itemuse[i].which];
 		ieDword stat = GetStat(itemuse[i].stat);
 		ieDword mcol = itemuse[i].mcol;
-		//here comes an unavoidable hackety hack because of bg2
-		//feel free to solve this logic without a goto
+		//if we have a kit, we just we use it's index for the lookup
 		if (itemuse[i].stat==IE_KIT) {
-			if ((stat&BG2_KITMASK)==KIT_BARBARIAN) {
-				stat = (stat<<16); // correct? kit values are confusing
-				if (stat) {
-					goto resolve_stat;
-				} else {
-					stat = KIT_BASECLASS;
-				}
-			}
-		} else {
-resolve_stat:
-			stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
+			stat = GetKitIndex(stat, itemuse[i].table);
+			mcol = 0xff;
 		}
+		stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
 		if (stat&itemvalue) {
 			//printf("failed usability: itemvalue %d, stat %d, stat value %d\n", itemvalue, itemuse[i].stat, stat);
 			return STR_CANNOT_USE_ITEM;
 		}
-	}
+	}	
 
 	return 0;
 }
