@@ -228,7 +228,7 @@ def ShowSpells ():
 	for i in range (24):
 		# ensure we can learn this many spells
 		SpellButton = SpellsWindow.GetControl (i+SpellStart)
-		if i >= len (Spells[SpellLevel]):
+		if i+SpellTopIndex >= len (Spells[SpellLevel]):
 			SpellButton.SetState (IE_GUI_BUTTON_DISABLED)
 			SpellButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			continue
@@ -340,7 +340,7 @@ def ShowSelectedSpells ():
 
 	# mark all of the spells picked thus far
 	for j in range (24):
-		if j >= len (SpellBook): # make sure we don't call unavailable indexes
+		if j+SpellTopIndex >= len (SpellBook): # make sure we don't call unavailable indexes
 			break
 		if SpellBook[j+SpellTopIndex]: # selected
 			MarkButton (j+SpellTopIndex, 1)
