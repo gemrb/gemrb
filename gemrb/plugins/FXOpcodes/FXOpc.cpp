@@ -3531,6 +3531,8 @@ int fx_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 		sca->SetBlend();
 		sca->PlayOnce();
 		map->AddVVCell(sca);
+	} else {
+		printf("fx_visual_spell_hit: Unhandled Type: %d\n", fx->Parameter2);
 	}
 	return FX_NOT_APPLIED;
 }
