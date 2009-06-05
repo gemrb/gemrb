@@ -429,7 +429,7 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 	ieWord tmp;
 	ieWordSigned tmps;
 	str->ReadWordSigned( &tmps );
-	act->BaseStats[IE_HITPOINTS]=(tmps >= 0 ? tmps : 0);
+	act->BaseStats[IE_HITPOINTS]=(ieDwordSigned)tmps;
 	str->ReadWord( &tmp );
 	act->BaseStats[IE_MAXHITPOINTS]=tmp;
 	str->ReadDword( &act->BaseStats[IE_ANIMATION_ID] );//animID is a dword
