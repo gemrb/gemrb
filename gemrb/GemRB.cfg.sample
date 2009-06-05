@@ -55,7 +55,7 @@ Width=640
 #Screen height
 Height=480
 
-#Bits per pixel [Integer:16,24,32]
+#Bits per pixel [Integer:16,32]
 Bpp=32
 
 #Fullscreen [Boolean]
