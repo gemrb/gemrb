@@ -1739,7 +1739,12 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if (bonus<0 && (Modified[IE_MAXHITPOINTS]+bonus)<=0) {
 		bonus=1-Modified[IE_MAXHITPOINTS];
 	}
+
+	//we still apply the maximum bonus to dead characters, but don't apply
+	//to current HP, or we'd have dead characters showing as having hp
 	Modified[IE_MAXHITPOINTS]+=bonus;
+	if(BaseStats[IE_STATE_ID]&STATE_DEAD)
+		bonus = 0;
 	Modified[IE_HITPOINTS]+=bonus;
 
 	for (unsigned int i=0;i<MAX_STATS;i++) {
@@ -4710,5 +4715,7 @@ bool Actor::IsDualSwap() const
 {
 	//the dualswap[class-1] holds the info
 	if (!IsDualClassed()) return false;
-	return (ieDword)dualswap[BaseStats[IE_CLASS]-1]==(Modified[IE_MC_FLAGS]&MC_WAS_ANY);
+	ieDword tmpclass = BaseStats[IE_CLASS]-1;
+	if (tmpclass>=(ieDword)classcount) return false;
+	return (ieDword)dualswap[tmpclass]==(Modified[IE_MC_FLAGS]&MC_WAS_ANY);
 }

@@ -64,6 +64,7 @@ public:
 	virtual ~DataStream(void);
 	virtual int Read(void* dest, unsigned int len) = 0;
 	int ReadWord(ieWord* dest);
+	int ReadWordSigned (ieWordSigned* dest);
 	int ReadDword(ieDword* dest);
 	int ReadResRef(ieResRef dest);
 	virtual int Write(const void* src, unsigned int len) = 0;
