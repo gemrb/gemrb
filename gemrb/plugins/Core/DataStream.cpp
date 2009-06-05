@@ -105,11 +105,10 @@ int DataStream::ReadWordSigned(ieWordSigned *dest)
 {
 	int len = Read(dest, 2);
 	if (EndianSwitch) {
-		//TODO: is this correct?
-		char tmp;
-		tmp=((char *) dest)[0];
-		((char *) dest)[0]=((char *) dest)[1];
-		((char *) dest)[1]=tmp;
+		unsigned char tmp;
+		tmp=((unsigned char *) dest)[0];
+		((unsigned char *) dest)[0]=((unsigned char *) dest)[1];
+		((unsigned char *) dest)[1]=tmp;
 	}
 	return len;
 }
