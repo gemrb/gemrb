@@ -5817,7 +5817,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	case IE_STORE_SELL:
 	{
 		//store/bag is at full capacity
-		if (store->Capacity && (store->Capacity >= store->GetRealStockSize()) ) {
+		if (store->Capacity && (store->Capacity <= store->GetRealStockSize()) ) {
 			printMessage("GUIScript", "Store is full.\n", GREEN);
 			res = ASI_FAILED;
 			break;
