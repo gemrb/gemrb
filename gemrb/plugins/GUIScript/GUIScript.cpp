@@ -5673,10 +5673,16 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 		printf("Invalid resource reference: %s\n", ItemResRef);
 		return PyInt_FromLong(0);
 	}
+
 	ret = store->AcceptableItemType( item->ItemType, Flags, !type );
+
+	//don't allow putting a bag into itself
+	if (!strnicmp(ItemResRef, store->Name, sizeof(ieResRef)) ) {
+		ret &= ~IE_STORE_SELL;
+	}
 	//this is a hack to report on selected items
 	if (Flags & IE_INV_ITEM_SELECTED) {
-		ret |= IE_INV_ITEM_SELECTED;
+		ret |= IE_STORE_SELECT;
 	}
 	gamedata->FreeItem( item, ItemResRef, false );
 	return PyInt_FromLong(ret);
