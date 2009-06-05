@@ -1356,8 +1356,22 @@ def CanLevelUp(actor):
 	Dual = IsDualClassed (actor, 1)
 
 	# get all the levels and overall xp here
-	Levels = [GemRB.GetPlayerStat (actor, IE_LEVEL), GemRB.GetPlayerStat (actor, IE_LEVEL2), GemRB.GetPlayerStat (actor, IE_LEVEL3)]
 	xp = GemRB.GetPlayerStat (actor, IE_XP)
+	Levels = [GemRB.GetPlayerStat (actor, IE_LEVEL), GemRB.GetPlayerStat (actor, IE_LEVEL2),\
+		GemRB.GetPlayerStat (actor, IE_LEVEL3)]
+
+	if Multi[0]<2:
+		if IsDualSwap (actor):
+			Levels = [Levels[1], Levels[0]]
+		else:
+			Levels = [Levels[0], Levels[1]]
+		#we only want the active classes for IE_CLASSLEVELSUM
+		if Dual[0]>0 and Levels[0] <= Levels[1]:
+			Levels = [Levels[0]]
+
+	#TODO: better way to check for level drain?
+	if sum(Levels) != GemRB.GetPlayerStat(actor, IE_CLASSLEVELSUM):
+		return 0
 
 	if Multi[0] > 1: # multiclassed
 		xp = xp/Multi[0] # divide the xp evenly between the classes
@@ -1370,8 +1384,6 @@ def CanLevelUp(actor):
 		# didn't find a class that could level
 		return 0
 	elif Dual[0] > 0: # dual classed
-		if IsDualSwap (actor): # swap the levels if we have to
-			Levels = [Levels[1], Levels[0], Levels[2]]
 		# get the class we can level
 		Class = ClassTable.GetRowName (Dual[2])
 
