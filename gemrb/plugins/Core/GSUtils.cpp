@@ -282,6 +282,9 @@ void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 	int i = actor->inventory.GetSlotCount();
 	while(i--) {
 		CREItem *item = actor->inventory.GetSlotItem(i);
+		if (!item) {
+			continue;
+		}
 		if (strnicmp(item->ItemResRef, parameters->string0Parameter, 8) ) {
 			continue;
 		}
