@@ -86,10 +86,14 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 {
 	int ret;
 
-	if (invflags&IE_INV_ITEM_UNDROPPABLE) {
+	if (invflags&IE_INV_ITEM_CRITICAL) {
 		ret = 0;
 	} else {
-		ret = IE_STORE_BUY|IE_STORE_SELL|IE_STORE_STEAL;
+		if (invflags&IE_INV_ITEM_UNDROPPABLE) {
+			ret = 0;
+		} else {
+			ret = IE_STORE_BUY|IE_STORE_SELL|IE_STORE_STEAL;
+		}
 	}
 	if (invflags&IE_INV_ITEM_UNSTEALABLE) {
 		ret &= ~IE_STORE_STEAL;
