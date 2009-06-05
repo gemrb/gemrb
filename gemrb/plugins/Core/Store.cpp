@@ -86,14 +86,11 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 {
 	int ret;
 
-	if (invflags&IE_INV_ITEM_CRITICAL) {
+	//don't allow any movement of undroppable items 
+	if (invflags&IE_INV_ITEM_UNDROPPABLE ) {
 		ret = 0;
 	} else {
-		if (invflags&IE_INV_ITEM_UNDROPPABLE) {
-			ret = 0;
-		} else {
-			ret = IE_STORE_BUY|IE_STORE_SELL|IE_STORE_STEAL;
-		}
+		ret = IE_STORE_BUY|IE_STORE_SELL|IE_STORE_STEAL;
 	}
 	if (invflags&IE_INV_ITEM_UNSTEALABLE) {
 		ret &= ~IE_STORE_STEAL;
@@ -103,9 +100,15 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 	}
 	if (pc && (Type<STT_BG2CONT) ) {
 		//can't sell critical items
-		if (!(invflags&IE_INV_ITEM_DESTRUCTIBLE)) {
+		if (!(invflags&IE_INV_ITEM_DESTRUCTIBLE )) {
 			ret &= ~IE_STORE_SELL;
 		}
+		//don't allow selling of non destructible items
+		//don't allow selling of critical items (they could still be put in bags)
+		if ((invflags&(IE_INV_ITEM_DESTRUCTIBLE|IE_INV_ITEM_CRITICAL))!=IE_INV_ITEM_DESTRUCTIBLE) {
+			ret &= ~IE_STORE_SELL;
+		}
+	
 		//check if store buys stolen items
 		if ((invflags&IE_INV_ITEM_STOLEN) && !(Type&IE_STORE_FENCE) ) {
 			ret &= ~IE_STORE_SELL;
