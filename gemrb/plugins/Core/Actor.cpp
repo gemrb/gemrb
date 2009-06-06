@@ -2975,6 +2975,7 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 		case WEAPON_RANGED:
 			tohit += GetStat(IE_MISSILEHITBONUS);
 			//add dexterity bonus
+			tohit += core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
 			break;
 	}
 	//add strength bonus if we need
