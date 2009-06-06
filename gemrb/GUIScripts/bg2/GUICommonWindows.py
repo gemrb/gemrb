@@ -902,7 +902,7 @@ def SetupSavingThrows (pc, Level=None):
 
 	#save the saves
 	for row in range (5):
-		CurrentSave = 20
+		CurrentSave = GemRB.GetPlayerStat(pc, IE_SAVEVSDEATH+i, 1)
 		for i in range (NumClasses):
 			#loop through each class and update the save value if we have
 			#a better save

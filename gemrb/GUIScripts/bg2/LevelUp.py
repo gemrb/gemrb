@@ -437,7 +437,7 @@ def GetLevelUpNews():
 	# include in news if the save is updated
 	Changed = 0
 	for i in range (5):
-		CurrentSave = GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH+i)
+		CurrentSave = GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH+i, 1)
 		SaveString = 5277+i
 		if i == 3:
 			SaveString = 5282

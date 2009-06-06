@@ -470,15 +470,15 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# 17379 Saving Throws
 	stats.append (17379)
 	# 17380 Death
-	stats.append ( (17380, GS (IE_SAVEVSDEATH), '') )
+	stats.append ( (17380, GS (IE_SAVEVSDEATH), '0') )
 	# 17381
-	stats.append ( (17381, GS (IE_SAVEVSWANDS), '') )
+	stats.append ( (17381, GS (IE_SAVEVSWANDS), '0') )
 	# 17382 AC vs. Crushing
-	stats.append ( (17382, GS (IE_SAVEVSPOLY), '') )
+	stats.append ( (17382, GS (IE_SAVEVSPOLY), '0') )
 	# 17383 Rod
-	stats.append ( (17383, GS (IE_SAVEVSBREATH), '') )
+	stats.append ( (17383, GS (IE_SAVEVSBREATH), '0') )
 	# 17384 Spells
-	stats.append ( (17384, GS (IE_SAVEVSSPELL), '') )
+	stats.append ( (17384, GS (IE_SAVEVSSPELL), '0') )
 	stats.append (None)
 
 	# 9466 Weapon profs

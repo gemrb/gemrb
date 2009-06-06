@@ -866,14 +866,14 @@ int fx_ac_vs_damage_type_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_PERMANENT;
 	}
 
-	// FIXME: set to Param1 or Param1-1 ?
+	//convert to signed so -1 doesn't turn to an astronomical number
 	if (type == 16) {
 		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			if (BASE_GET( IE_ARMORCLASS) > fx->Parameter1) {
+			if ((signed)BASE_GET( IE_ARMORCLASS) > (signed)fx->Parameter1) {
 				BASE_SET( IE_ARMORCLASS, fx->Parameter1 );
 			}
 		} else {
-			if (STAT_GET( IE_ARMORCLASS) > fx->Parameter1) {
+			if ((signed)STAT_GET( IE_ARMORCLASS) > (signed)fx->Parameter1) {
 				STAT_SET( IE_ARMORCLASS, fx->Parameter1 );
 			}
 		}
@@ -1617,7 +1617,7 @@ int fx_save_vs_death_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_death_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_MOD( IE_SAVEVSDEATH );
+	STAT_SUB( IE_SAVEVSDEATH, fx->Parameter1 );
 	return FX_APPLIED;
 }
 
@@ -1626,7 +1626,7 @@ int fx_save_vs_wands_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_wands_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_MOD( IE_SAVEVSWANDS );
+	STAT_SUB( IE_SAVEVSWANDS, fx->Parameter1 );
 	return FX_APPLIED;
 }
 
@@ -1635,7 +1635,7 @@ int fx_save_vs_poly_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_poly_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_MOD( IE_SAVEVSPOLY );
+	STAT_SUB( IE_SAVEVSPOLY, fx->Parameter1 );
 	return FX_APPLIED;
 }
 
@@ -1644,7 +1644,7 @@ int fx_save_vs_breath_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_breath_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_MOD( IE_SAVEVSBREATH );
+	STAT_SUB( IE_SAVEVSBREATH, fx->Parameter1 );
 	return FX_APPLIED;
 }
 
@@ -1653,7 +1653,7 @@ int fx_save_vs_spell_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_spell_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_MOD( IE_SAVEVSSPELL );
+	STAT_SUB( IE_SAVEVSSPELL, fx->Parameter1 );
 	return FX_APPLIED;
 }
 
