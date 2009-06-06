@@ -783,7 +783,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 						if (bFinished) {
 							printMessage("OpenAL", "Playing Next Music\n", WHITE );
 							core->GetMusicMgr()->PlayNext();
-							if (driver->MusicReader) {
+							if (driver->MusicPlaying) {
 								printMessage( "OpenAL", "Queuing New Music\n", WHITE );
 								driver->MusicReader->read_samples( ( short* ) ( driver->music_memory + ( cnt*2 ) ), size >> 1 );
 								bFinished = AL_FALSE;
@@ -791,6 +791,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 								printMessage( "OpenAL", "No Other Music to play\n", WHITE );
 								memset( driver->music_memory + ( cnt * 2 ), 0, size );
 								driver->MusicPlaying = false;
+								return 0;
 							}
 						}
 						alBufferData( BufferID, AL_FORMAT_STEREO16, driver->music_memory, ACM_BUFFERSIZE, driver->MusicReader->get_samplerate() );
