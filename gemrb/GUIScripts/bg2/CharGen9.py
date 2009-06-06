@@ -141,7 +141,7 @@ def FinishCharGen():
 		RealSlots = [ SLOT_ARMOUR, SLOT_SHIELD, SLOT_HELM, -1, SLOT_RING, \
 					SLOT_RING, SLOT_CLOAK, SLOT_BOOT, SLOT_AMULET, SLOT_GLOVE, \
 					SLOT_BELT, SLOT_QUIVER, SLOT_QUIVER, SLOT_QUIVER, \
-					SLOT_ITEM, SLOT_ITEM, SLOT_ITEM, -1, -1, SLOT_WEAPON ]
+					SLOT_ITEM, SLOT_ITEM, SLOT_ITEM, SLOT_WEAPON, SLOT_WEAPON, SLOT_WEAPON ]
 		inventory_exclusion = 0
 
 		#loop over rows - item slots
@@ -159,6 +159,12 @@ def FinishCharGen():
 
 			# get empty slots of the requested type
 			realslot = GemRB.GetSlots (MyChar, RealSlots[slot], -1)
+			if RealSlots[slot] == SLOT_WEAPON:
+				# exclude the shield slot, so the offhand stays empty
+				realslot = realslot[1:]
+
+			if realslot == (): # fallback to the inventory
+				realslot = GemRB.GetSlots (MyChar, -1, -1)
 
 			if realslot == (): # this shouldn't happen!
 				print "Eeek! No free slots for", item_resref
@@ -197,6 +203,7 @@ def FinishCharGen():
 	if playmode >=0:
 		#LETS PLAY!!
 		GemRB.EnterGame()
+		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
 	else:
 		#leaving multi player pregen
 		if CharGenWindow:
