@@ -2943,7 +2943,7 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	if (secondround) {
 		attackcount++;
 	}
-	attackcount/=2;
+	//attackcount/=2; why?
 
 	//d10
 	int tmp = core->Roll(1, 10, 0);// GetStat(IE_WEAPONSPEED)-GetStat(IE_PHYSICALSPEED) );
