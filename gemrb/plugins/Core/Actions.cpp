@@ -2873,15 +2873,15 @@ void GameScript::ForceHide(Scriptable* Sender, Action* parameters)
 	actor->BaseStats[IE_AVATARREMOVAL]=1;
 }
 
-//this isn't sure
 void GameScript::Activate(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	tar->Activate();
-	//tar->Active |= SCR_VISIBLE;
+	// Deactivate hides, so this should unhide..
+	//tar->Activate();
+	tar->Unhide();
 }
 
 void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
