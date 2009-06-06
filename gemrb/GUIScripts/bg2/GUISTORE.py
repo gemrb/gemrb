@@ -750,6 +750,7 @@ def RedrawStoreShoppingWindow ():
 
 			if (Price>0) and (Flags & SHOP_SELL):
 				if Flags & SHOP_SELECT:
+					print "SELECTING", GemRB.GetString(Item['ItemNameIdentified'])
 					Button.SetState (IE_GUI_BUTTON_SELECTED)
 				else:
 					Button.SetState (IE_GUI_BUTTON_ENABLED)

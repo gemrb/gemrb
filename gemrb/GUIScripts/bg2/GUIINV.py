@@ -724,7 +724,7 @@ def CloseErrorWindow ():
 	return
 
 def ReadItemWindow ():
-	"""Displays the contents of a scroll."""
+	"""Tries to learn the mage scroll."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
