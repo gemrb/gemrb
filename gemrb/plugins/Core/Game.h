@@ -51,7 +51,8 @@ class Game;
 #include "Variables.h"
 
 //the length of a round in game ticks?
-#define ROUND_SIZE     15
+//default is 6 seconds 15*6=90
+#define ROUND_SIZE     90
 
 //the size of the bestiary register
 #define BESTIARY_SIZE 260
