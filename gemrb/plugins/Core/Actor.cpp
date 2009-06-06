@@ -1052,7 +1052,6 @@ static void InitActorTables()
 		sharexp=SX_DIVIDE;
 	}
 	ReverseToHit = core->HasFeature(GF_REVERSE_TOHIT);
-ReverseToHit = 1
 	CheckAbilities = core->HasFeature(GF_CHECK_ABILITIES);
 	DeathOnZeroStat = core->HasFeature(GF_DEATH_ON_ZERO_STAT);
 
