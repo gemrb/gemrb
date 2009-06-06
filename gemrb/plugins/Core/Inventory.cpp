@@ -1309,7 +1309,7 @@ void Inventory::EquipBestWeapon(int flags)
 		}
 	}
 
-	SetEquippedSlot(best_slot);
+	EquipItem(best_slot);
 	UpdateWeaponAnimation();
 }
 
