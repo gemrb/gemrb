@@ -1052,6 +1052,7 @@ static void InitActorTables()
 		sharexp=SX_DIVIDE;
 	}
 	ReverseToHit = core->HasFeature(GF_REVERSE_TOHIT);
+ReverseToHit = 1
 	CheckAbilities = core->HasFeature(GF_CHECK_ABILITIES);
 	DeathOnZeroStat = core->HasFeature(GF_DEATH_ON_ZERO_STAT);
 
@@ -3002,33 +3003,36 @@ int Actor::GetToHitBonus(bool leftorright)
 int Actor::GetToHit(int bonus, ieDword Flags)
 {
 	int tohit = GetStat(IE_TOHIT);
-	if (ReverseToHit) {
-		tohit = ATTACKROLL-tohit;
-	}
-	tohit -= bonus;
+	tohit += bonus;
 
 	if (Flags&WEAPON_LEFTHAND) {
-		tohit -= GetStat(IE_HITBONUSLEFT);
+		tohit += GetStat(IE_HITBONUSLEFT);
 	} else {
-		tohit -= GetStat(IE_HITBONUSRIGHT);
+		tohit += GetStat(IE_HITBONUSRIGHT);
 	}
 	//get attack style (melee or ranged)
 	switch(Flags&WEAPON_STYLEMASK) {
 		case WEAPON_MELEE:
-			tohit -= GetStat(IE_MELEEHIT);
+			tohit += GetStat(IE_MELEEHIT);
 			break;
 		case WEAPON_FIST:
-			tohit -= GetStat(IE_FISTHIT);
+			tohit += GetStat(IE_FISTHIT);
 			break;
 		case WEAPON_RANGED:
-			tohit -= GetStat(IE_MISSILEHITBONUS);
+			tohit += GetStat(IE_MISSILEHITBONUS);
 			//add dexterity bonus
-			tohit -= core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
+			tohit += core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
 			break;
 	}
 	//add strength bonus if we need
 	if (Flags&WEAPON_USESTRENGTH) {
-		tohit -= core->GetStrengthBonus(0,GetStat(IE_STR), GetStat(IE_STREXTRA) );
+		tohit += core->GetStrengthBonus(0,GetStat(IE_STR), GetStat(IE_STREXTRA) );
+	}
+
+	if (ReverseToHit) {
+		tohit = GetStat(IE_TOHIT)-tohit;
+	} else {
+		tohit += GetStat(IE_TOHIT);
 	}
 	return tohit;
 }
