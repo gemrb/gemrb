@@ -61,7 +61,7 @@ class Map;
 #define CF_CHECKCROWD 64
 #define CF_SAFESTPOINT 128
 #define CF_NO_DIFF_MASK 28
-#define CF_CHECK_NAME 246
+#define CF_CHECK_NAME 256
 //spec ids flags
 #define AI_EA		0
 #define AI_FACTION	1
