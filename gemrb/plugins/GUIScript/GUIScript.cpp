@@ -9124,9 +9124,18 @@ static PyObject* GemRB_GetToHit(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
+
 	leftorright = leftorright&1;
-	int ret = actor->GetToHitBonus(leftorright);
-	return PyInt_FromLong( ret );
+	WeaponInfo wi;
+	ITMExtHeader *header = NULL;
+	ITMExtHeader *hittingheader = NULL;
+	int tohit;
+	ieDword Flags;
+
+	if (!actor->GetToHitBonus(tohit, leftorright, wi, header, hittingheader, Flags)) {
+		//TODO: handle error, thout tohit will still be set correctly
+	}
+	return PyInt_FromLong( tohit );
 }
 
 static PyMethodDef GemRBMethods[] = {

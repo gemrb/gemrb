@@ -2957,18 +2957,14 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	initiative = (ieDword) (gameTime+tmp*ROUND_SIZE);
 }
 
-//TODO: this is just a copy of the attack code
-// this should probably be consolidated where possible
-int Actor::GetToHitBonus(bool leftorright)
+bool Actor::GetToHitBonus(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, ieDword &Flags)
 {
-	int tohit = GetStat(IE_TOHIT);
-	WeaponInfo wi;
-	ITMExtHeader *header = GetWeapon(wi,leftorright);
+	tohit = GetStat(IE_TOHIT);
+	header = GetWeapon(wi,leftorright);
 	if (!header) {
-		return tohit;
+		return false;
 	}
-	ieDword Flags;
-	ITMExtHeader *hittingheader = header;
+	hittingheader = header;
 	ITMExtHeader *rangedheader = NULL;
 	int THACOBonus = hittingheader->THAC0Bonus;
 	int DamageBonus = hittingheader->DamageBonus ;
@@ -2985,7 +2981,7 @@ int Actor::GetToHitBonus(bool leftorright)
 			//out of ammo event
 			//try to refill
 			SetStance(IE_ANI_READY);
-			return tohit;
+			return false;
 		}
 		Flags = WEAPON_RANGED;
 		//The bow can give some bonuses, but the core attack is made by the arrow.
@@ -2996,7 +2992,7 @@ int Actor::GetToHitBonus(bool leftorright)
 	default:
 		//item is unsuitable for fight
 		SetStance(IE_ANI_READY);
-		return tohit;
+		return false;
 	}//melee or ranged
 	if (leftorright) Flags|=WEAPON_LEFTHAND;
 	//this flag is set by the bow in case of projectile launcher.
@@ -3004,7 +3000,7 @@ int Actor::GetToHitBonus(bool leftorright)
 
 	//second parameter is left or right hand flag
 	tohit = GetToHit(THACOBonus, Flags);
-	return tohit;
+	return true;
 }
 
 int Actor::GetToHit(int bonus, ieDword Flags)
@@ -3129,53 +3125,15 @@ void Actor::PerformAttack(ieDword gameTime)
 	bool leftorright = (bool) (attackcount&1);
 
 	WeaponInfo wi;
-	ITMExtHeader *header = GetWeapon(wi,leftorright);
-	if (!header) {
-		return;
-	}
-	//can't reach target, zero range shouldn't be allowed
-	//Don't forget to take size of the opponents into account
-	//Actually, this version of PersonalDistance already calculates with the size!!!
-	if (wi.range*10<PersonalDistance(this, target)) {
-		return;
-	}
+	ITMExtHeader *header = NULL;
+	ITMExtHeader *hittingheader = NULL;
+	int tohit;
 	ieDword Flags;
-	ITMExtHeader *hittingheader = header;
-	ITMExtHeader *rangedheader = NULL;
-	int THACOBonus = hittingheader->THAC0Bonus;
-	int DamageBonus = hittingheader->DamageBonus ;
-	switch(hittingheader->AttackType) {
-	case ITEM_AT_MELEE:
-		Flags = WEAPON_MELEE;
-		break;
-	case ITEM_AT_PROJECTILE: //throwing weapon
-		Flags = WEAPON_RANGED;
-		break;
-	case ITEM_AT_BOW:
-		rangedheader = GetRangedWeapon(wi);
-		if (!rangedheader) {
-			//out of ammo event
-			//try to refill
-			SetStance(IE_ANI_READY);
-			return;
-		}
-		Flags = WEAPON_RANGED;
-		//The bow can give some bonuses, but the core attack is made by the arrow.
-		hittingheader = rangedheader;
-		THACOBonus += rangedheader->THAC0Bonus;
-		DamageBonus+= rangedheader->DamageBonus ;
-		break;
-	default:
-		//item is unsuitable for fight
-		SetStance(IE_ANI_READY);
-		return;
-	}//melee or ranged
-	if (leftorright) Flags|=WEAPON_LEFTHAND;
-	//this flag is set by the bow in case of projectile launcher.
-	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) Flags|=WEAPON_USESTRENGTH;
 
-	//second parameter is left or right hand flag
-	int tohit = GetToHit(THACOBonus, Flags);
+	//will return false on any errors	
+	if (!GetToHitBonus(tohit, leftorright, wi, header, hittingheader, Flags)) {
+		return;
+	}
 
 	int roll = core->Roll(1,ATTACKROLL,0);
 	if (roll==1) {
@@ -3195,8 +3153,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	//modify defense with damage type
 	ieDword damagetype = hittingheader->DamageType;
 	printMessage("Attack"," ",GREEN);
-	int damage = core->Roll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus);
-	printf("Damage %dd%d%+d = %d\n",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
+	int damage = core->Roll(hittingheader->DiceThrown, hittingheader->DiceSides, hittingheader->DamageBonus);
+	printf("Damage %dd%d%+d = %d\n",hittingheader->DiceThrown, hittingheader->DiceSides, hittingheader->DamageBonus, damage);
 	int damageluck = (int) GetStat(IE_DAMAGELUCK);
 	if (damage<damageluck) {
 		damage = damageluck;
