@@ -3471,6 +3471,12 @@ void Actor::Draw(Region &screen)
 		area->ClearTrap(this, InTrap-1);
 	}
 
+	// if an actor isn't visible, should we still handle animations, draw
+	// video cells, etc? let us assume not, for now..
+	if (!(InternalFlags & IF_VISIBLE)) {
+		return;
+	}
+
 	//visual feedback
 	CharAnimations* ca = GetAnims();
 	if (!ca)
