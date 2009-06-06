@@ -59,6 +59,9 @@ Projectile::Projectile()
 	effects = NULL;
 	children = NULL;
 	child_size = 0;
+	memset(travel, 0, sizeof(travel)) ;
+	memset(shadow, 0, sizeof(shadow)) ;
+	light = NULL ;
 }
 
 Projectile::~Projectile()
@@ -75,8 +78,10 @@ Projectile::~Projectile()
 
 	if (phase != P_UNINITED) {
 		for (i = 0; i < MAX_ORIENT; ++i) {
-			delete travel[i];
-			delete shadow[i];
+			if(travel[i])
+				delete travel[i];
+			if(shadow[i])
+				delete shadow[i];
 		}
 		core->GetVideoDriver()->FreeSprite(light);
 	}
