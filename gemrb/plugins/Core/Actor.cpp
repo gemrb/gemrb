@@ -2957,7 +2957,8 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	initiative = (ieDword) (gameTime+tmp*ROUND_SIZE);
 }
 
-bool Actor::GetToHitBonus(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, ieDword &Flags)
+bool Actor::GetToHitBonus(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
+		ieDword &Flags, int &DamageBonus)
 {
 	tohit = GetStat(IE_TOHIT);
 	header = GetWeapon(wi,leftorright);
@@ -2967,7 +2968,7 @@ bool Actor::GetToHitBonus(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHe
 	hittingheader = header;
 	ITMExtHeader *rangedheader = NULL;
 	int THACOBonus = hittingheader->THAC0Bonus;
-	int DamageBonus = hittingheader->DamageBonus ;
+	DamageBonus = hittingheader->DamageBonus ;
 	switch(hittingheader->AttackType) {
 	case ITEM_AT_MELEE:
 		Flags = WEAPON_MELEE;
@@ -3129,9 +3130,10 @@ void Actor::PerformAttack(ieDword gameTime)
 	ITMExtHeader *hittingheader = NULL;
 	int tohit;
 	ieDword Flags;
+	int DamageBonus;
 
 	//will return false on any errors	
-	if (!GetToHitBonus(tohit, leftorright, wi, header, hittingheader, Flags)) {
+	if (!GetToHitBonus(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus)) {
 		return;
 	}
 
@@ -3153,8 +3155,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	//modify defense with damage type
 	ieDword damagetype = hittingheader->DamageType;
 	printMessage("Attack"," ",GREEN);
-	int damage = core->Roll(hittingheader->DiceThrown, hittingheader->DiceSides, hittingheader->DamageBonus);
-	printf("Damage %dd%d%+d = %d\n",hittingheader->DiceThrown, hittingheader->DiceSides, hittingheader->DamageBonus, damage);
+	int damage = core->Roll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus);
+	printf("Damage %dd%d%+d = %d\n",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
 	int damageluck = (int) GetStat(IE_DAMAGELUCK);
 	if (damage<damageluck) {
 		damage = damageluck;

@@ -454,7 +454,8 @@ public:
 	/* gets the defense against an attack */
 	int GetDefense(int DamageType) ;
 	/* get the current hit bonus */
-	bool GetToHitBonus(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, ieDword &Flags);
+	bool GetToHitBonus(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
+		ieDword &Flags, int &DamageBonus);
 	/* performs attack against target */
 	void PerformAttack(ieDword initiative);
 	/* deal damage to target */

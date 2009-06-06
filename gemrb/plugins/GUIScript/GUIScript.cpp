@@ -9131,8 +9131,9 @@ static PyObject* GemRB_GetToHit(PyObject * /*self*/, PyObject* args)
 	ITMExtHeader *hittingheader = NULL;
 	int tohit;
 	ieDword Flags;
+	int DamageBonus;
 
-	if (!actor->GetToHitBonus(tohit, leftorright, wi, header, hittingheader, Flags)) {
+	if (!actor->GetToHitBonus(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus)) {
 		//TODO: handle error, thout tohit will still be set correctly
 	}
 	return PyInt_FromLong( tohit );
