@@ -3007,8 +3007,7 @@ int Actor::GetToHitBonus(bool leftorright)
 
 int Actor::GetToHit(int bonus, ieDword Flags)
 {
-	int tohit = GetStat(IE_TOHIT);
-	tohit += bonus;
+	int tohit = bonus;
 
 	if (Flags&WEAPON_LEFTHAND) {
 		tohit += GetStat(IE_HITBONUSLEFT);
@@ -3035,7 +3034,7 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 	}
 
 	if (ReverseToHit) {
-		tohit = GetStat(IE_TOHIT)-tohit;
+		tohit = (signed)GetStat(IE_TOHIT)-tohit;
 	} else {
 		tohit += GetStat(IE_TOHIT);
 	}
