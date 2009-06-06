@@ -1360,17 +1360,8 @@ def CanLevelUp(actor):
 	Levels = [GemRB.GetPlayerStat (actor, IE_LEVEL), GemRB.GetPlayerStat (actor, IE_LEVEL2),\
 		GemRB.GetPlayerStat (actor, IE_LEVEL3)]
 
-	if Multi[0]<2:
-		if IsDualSwap (actor):
-			Levels = [Levels[1], Levels[0]]
-		else:
-			Levels = [Levels[0], Levels[1]]
-		#we only want the active classes for IE_CLASSLEVELSUM
-		if Dual[0]>0 and Levels[0] <= Levels[1]:
-			Levels = [Levels[0]]
-
-	#TODO: better way to check for level drain?
-	if sum(Levels) != GemRB.GetPlayerStat(actor, IE_CLASSLEVELSUM):
+	#TODO: double-check this
+	if GemRB.GetPlayerStat(actor, IE_LEVELDRAIN)>0:
 		return 0
 
 	if Multi[0] > 1: # multiclassed
