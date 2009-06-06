@@ -2318,17 +2318,18 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 
 		if (tr->action) {
+			// does this belong here? we must clear actions somewhere before
+			// we start executing them (otherwise queued actions interfere)
+			// executing actions directly does not work, because dialog
+			// needs to end before final actions are executed due to
+			// actions making new dialogs!
+			target->ClearActions();
+
 			for (unsigned int i = 0; i < tr->action->count; i++) {
 				Action* action = GenerateAction( tr->action->strings[i]);
 				if (action) {
-					// execute actions immediately if we're
-					// in the middle of a dialog (at the
-					// end there are complications, might
-					// try to initiate a new dialog)
-					if (tr->Flags & IE_DLG_TR_FINAL)
-						target->AddAction( action );
-					else
-						GameScript::ExecuteAction( target, action );
+					target->AddAction(action);
+					//GameScript::ExecuteAction( target, action );
 				} else {
 					snprintf(Tmp, sizeof(Tmp),
 						"Can't compile action: %s\n",
@@ -2338,9 +2339,18 @@ void GameControl::DialogChoose(unsigned int choose)
 			}
 		}
 
-		if (tr->Flags & IE_DLG_TR_FINAL) {
+		bool final_dialog = tr->Flags & IE_DLG_TR_FINAL;
+
+		if (final_dialog) {
 			ta->SetMinRow( false );
 			EndDialog();
+		}
+
+		// all dialog actions must be executed immediately
+		target->ProcessActions(true);
+		// (do not clear actions - final actions can involve waiting/moving)
+
+		if (final_dialog) {
 			return;
 		}
 

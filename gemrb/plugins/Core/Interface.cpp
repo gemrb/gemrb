@@ -2858,7 +2858,12 @@ void Interface::HandleGUIBehaviour(void)
 				gc->EndDialog();
 			} else if ( (int)var !=-3) {
 				gc->DialogChoose(var);
-				vars->SetAt("DialogChoose", (ieDword) -3);
+				
+				// the last node of a dialog can have a new-dialog action! don't interfere in that case
+				ieDword newvar = 0; vars->Lookup("DialogChoose", newvar);
+				if (var == (ieDword) -1 || newvar != (ieDword) -1) {
+					vars->SetAt("DialogChoose", (ieDword) -3);
+				}
 			}
 			if (flg & DF_OPENCONTINUEWINDOW) {
 				guiscript->RunFunction( "OpenContinueMessageWindow" );
