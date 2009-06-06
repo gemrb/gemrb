@@ -5654,14 +5654,19 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 
 	if (type) {
 		STOItem* si = store->GetItem( Slot );
+		if (!si) {
+			return PyInt_FromLong(0);
+		}
+		ItemResRef = si->ItemResRef;
+		Flags = si->Flags;
 	} else {
 		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
+		if (!si) {
+			return PyInt_FromLong(0);
+		}
+		ItemResRef = si->ItemResRef;
+		Flags = si->Flags;
 	}
-	if (!si) {
-		return PyInt_FromLong(0);
-	}
-	Flags = si->Flags;
-	ItemResRef = si->ItemResRef;
 	Item *item = gamedata->GetItem( ItemResRef );
 	if (!item) {
 		printMessage("GUIScript", " ", LIGHT_RED);
