@@ -449,6 +449,8 @@ public:
 	void InitRound(ieDword gameTime, bool secondround);
 	/* gets the to hit value */
 	int GetToHit(int bonus, ieDword Flags);
+	/* get the current hit bonus */
+	int GetToHitBonus(bool leftorright);
 	/* performs attack against target */
 	void PerformAttack(ieDword initiative);
 	/* deal damage to target */

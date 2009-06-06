@@ -1964,7 +1964,7 @@ int fx_to_hit_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_MOD( IE_TOHIT );
+	STAT_SUB( IE_TOHIT, fx->Parameter1 );
 	return FX_APPLIED;
 }
 

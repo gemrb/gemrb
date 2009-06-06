@@ -2951,36 +2951,84 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	initiative = (ieDword) (gameTime+tmp*ROUND_SIZE);
 }
 
+//TODO: this is just a copy of the attack code
+// this should probably be consolidated where possible
+int Actor::GetToHitBonus(bool leftorright)
+{
+	WeaponInfo wi;
+	ITMExtHeader *header = GetWeapon(wi,leftorright);
+	if (!header) {
+		return 1000;
+	}
+	ieDword Flags;
+	ITMExtHeader *hittingheader = header;
+	ITMExtHeader *rangedheader = NULL;
+	int THACOBonus = hittingheader->THAC0Bonus;
+	int DamageBonus = hittingheader->DamageBonus ;
+	switch(hittingheader->AttackType) {
+	case ITEM_AT_MELEE:
+		Flags = WEAPON_MELEE;
+		break;
+	case ITEM_AT_PROJECTILE: //throwing weapon
+		Flags = WEAPON_RANGED;
+		break;
+	case ITEM_AT_BOW:
+		rangedheader = GetRangedWeapon(wi);
+		if (!rangedheader) {
+			//out of ammo event
+			//try to refill
+			SetStance(IE_ANI_READY);
+			return 1000;
+		}
+		Flags = WEAPON_RANGED;
+		//The bow can give some bonuses, but the core attack is made by the arrow.
+		hittingheader = rangedheader;
+		THACOBonus += rangedheader->THAC0Bonus;
+		DamageBonus+= rangedheader->DamageBonus ;
+		break;
+	default:
+		//item is unsuitable for fight
+		SetStance(IE_ANI_READY);
+		return 1000;
+	}//melee or ranged
+	if (leftorright) Flags|=WEAPON_LEFTHAND;
+	//this flag is set by the bow in case of projectile launcher.
+	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) Flags|=WEAPON_USESTRENGTH;
+
+	//second parameter is left or right hand flag
+	return GetToHit(THACOBonus, Flags);
+}
+
 int Actor::GetToHit(int bonus, ieDword Flags)
 {
 	int tohit = GetStat(IE_TOHIT);
 	if (ReverseToHit) {
 		tohit = ATTACKROLL-tohit;
 	}
-	tohit += bonus;
+	tohit -= bonus;
 
 	if (Flags&WEAPON_LEFTHAND) {
-		tohit += GetStat(IE_HITBONUSLEFT);
+		tohit -= GetStat(IE_HITBONUSLEFT);
 	} else {
-		tohit += GetStat(IE_HITBONUSRIGHT);
+		tohit -= GetStat(IE_HITBONUSRIGHT);
 	}
 	//get attack style (melee or ranged)
 	switch(Flags&WEAPON_STYLEMASK) {
 		case WEAPON_MELEE:
-			tohit += GetStat(IE_MELEEHIT);
+			tohit -= GetStat(IE_MELEEHIT);
 			break;
 		case WEAPON_FIST:
-			tohit += GetStat(IE_FISTHIT);
+			tohit -= GetStat(IE_FISTHIT);
 			break;
 		case WEAPON_RANGED:
-			tohit += GetStat(IE_MISSILEHITBONUS);
+			tohit -= GetStat(IE_MISSILEHITBONUS);
 			//add dexterity bonus
-			tohit += core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
+			tohit -= core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
 			break;
 	}
 	//add strength bonus if we need
 	if (Flags&WEAPON_USESTRENGTH) {
-		tohit += core->GetStrengthBonus(0,GetStat(IE_STR), GetStat(IE_STREXTRA) );
+		tohit -= core->GetStrengthBonus(0,GetStat(IE_STR), GetStat(IE_STREXTRA) );
 	}
 	return tohit;
 }

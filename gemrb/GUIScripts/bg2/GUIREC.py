@@ -428,15 +428,15 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	stats.append ( (8442,1,'c') )
 
-	stats.append ( (61932, GS (IE_THAC0), '') )
-	stats.append ( (9457, GS (IE_THAC0), '') )
+	stats.append ( (61932, GS (IE_THAC0), '0') )
+	stats.append ( (9457, GemRB.GetToHit(pc, 0), '0') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
 		tmp2 = str (tmp/2) + chr(188)
 	else:
 		tmp2 = str (tmp/2)
 	stats.append ( (9458, tmp2, '') )
-	stats.append ( (9459, GS (IE_LORE), '') )
+	stats.append ( (9459, GS (IE_LORE), '0') )
 	reptxt = GetReputation (GemRB.GameGetReputation ()/10)
 	stats.append ( (9465, reptxt, '') )
 	stats.append ( (9460, GSNN (pc, IE_LOCKPICKING), '') )

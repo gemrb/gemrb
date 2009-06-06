@@ -9104,6 +9104,34 @@ static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GetToHit__doc,
+"GetToHit(pc, leftorright)\n\n"
+"Returns the current THAC0 in relation to the equipped weapon.");
+
+static PyObject* GemRB_GetToHit(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+	int leftorright;
+
+	if (!PyArg_ParseTuple( args, "ii", &PartyID, &leftorright)) {
+		return AttributeError( GemRB_GetToHit__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+	leftorright = leftorright&1;
+	int ret = actor->GetToHitBonus(leftorright);
+	if (ret == 1000) {
+		ret = actor->GetStat(IE_TOHIT);
+	}
+	return PyInt_FromLong( ret );
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(AdjustScrolling, METH_VARARGS),
 	METHOD(ApplyEffect, METH_VARARGS),
@@ -9213,6 +9241,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetTableColumnName, METH_VARARGS),
 	METHOD(GetTableRowCount, METH_VARARGS),
 	METHOD(GetTableColumnCount, METH_VARARGS),
+	METHOD(GetToHit, METH_VARARGS),
 	METHOD(GetToken, METH_VARARGS),
 	METHOD(GetVar, METH_VARARGS),
 	METHOD(GetSlotType, METH_VARARGS),
