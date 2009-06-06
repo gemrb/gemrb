@@ -3036,6 +3036,41 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 	return tohit;
 }
 
+static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
+	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
+
+int Actor::GetDefense(int DamageType)
+{
+	//dexterity bonus.
+	int defense = core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) );
+	if(DamageType > 5)
+		DamageType = 0 ;
+	switch (weapon_damagetype[DamageType]) {
+	case DAMAGE_CRUSHING:
+		defense += GetStat(IE_ACCRUSHINGMOD) ;
+		break ;
+	case DAMAGE_PIERCING:
+		defense += GetStat(IE_ACPIERCINGMOD) ;
+		break ;
+	case DAMAGE_SLASHING:
+		defense += GetStat(IE_ACSLASHINGMOD) ;
+		break ;
+	case DAMAGE_MISSILE:
+		defense += GetStat(IE_ACMISSILEMOD) ;
+		break ;
+	//What about stunning ?
+	default :
+		break ;
+	}
+	if (ReverseToHit) {
+		defense = GetStat(IE_ARMORCLASS)-defense;
+	} else {
+		defense += GetStat(IE_ARMORCLASS);
+	}
+
+	return defense ;
+}
+
 void Actor::PerformAttack(ieDword gameTime)
 {
 	//apply the modal effect on the beginning of each round
@@ -3166,16 +3201,17 @@ void Actor::PerformAttack(ieDword gameTime)
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 		return;
 	}
-	tohit += roll;
 
 	//get target's defense against attack
-	int defense = target->GetStat(IE_ARMORCLASS);
-	defense += core->GetDexterityBonus(STAT_DEX_AC, target->GetStat(IE_DEX) );
-	if (ReverseToHit) {
-		defense = DEFAULTAC - defense;
-	}
+	int defense = target->GetDefense(damagetype) ;
 
-	if (tohit<defense) {
+	bool success ;
+	if(ReverseToHit)
+		success = roll > tohit - defense ;
+	else
+		success = tohit + roll > defense ;
+
+	if (!success) {
 		//hit failed
 		if (Flags&WEAPON_RANGED) {//Launch the projectile anyway
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
@@ -3185,9 +3221,6 @@ void Actor::PerformAttack(ieDword gameTime)
 	DealDamage (target, damage, damagetype, &wi, false);
 	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 }
-
-static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
-	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
 
 static EffectRef fx_stoneskin_ref={"StoneSkinModifier",NULL,-1};
 static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
@@ -4466,7 +4499,7 @@ int Actor::CheckUsability(Item *item) const
 			//printf("failed usability: itemvalue %d, stat %d, stat value %d\n", itemvalue, itemuse[i].stat, stat);
 			return STR_CANNOT_USE_ITEM;
 		}
-	}	
+	}
 
 	return 0;
 }

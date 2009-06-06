@@ -449,6 +449,8 @@ public:
 	void InitRound(ieDword gameTime, bool secondround);
 	/* gets the to hit value */
 	int GetToHit(int bonus, ieDword Flags);
+	/* gets the defense against an attack */
+	int GetDefense(int DamageType) ;
 	/* get the current hit bonus */
 	int GetToHitBonus(bool leftorright);
 	/* performs attack against target */
