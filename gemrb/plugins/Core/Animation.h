@@ -74,7 +74,7 @@ public:
 	/** returns the frame count */
 	unsigned int GetFrameCount() const { return indicesCount; }
 	/** returns the current frame's index */
-	int GetCurrentFrame() const;
+	unsigned int GetCurrentFrame() const;
 	/** add other animation's animarea to self */
 	void AddAnimArea(Animation* slave);
 };

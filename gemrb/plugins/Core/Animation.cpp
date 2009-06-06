@@ -58,7 +58,7 @@ Animation::Animation(int count)
 Animation::~Animation(void)
 {
 	Video *video = core->GetVideoDriver();
-	
+
 	for (unsigned int i = 0; i < indicesCount; i++) {
 		video->FreeSprite( frames[i] );
 	}
@@ -104,7 +104,7 @@ void Animation::AddFrame(Sprite2D* frame, unsigned int index)
 	}
 }
 
-int Animation::GetCurrentFrame() const
+unsigned int Animation::GetCurrentFrame() const
 {
 	if (playReversed)
 		return indicesCount-pos-1;

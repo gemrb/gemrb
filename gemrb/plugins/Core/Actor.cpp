@@ -281,6 +281,7 @@ Actor::Actor()
 	InTrap = 0;
 	PathTries = 0;
 	TargetDoor = NULL;
+	attackProjectile = NULL ;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 	fxqueue.SetOwner( this );
@@ -3646,6 +3647,12 @@ void Actor::Draw(Region &screen)
 			}
 		}
 		if (nextFrame && lastFrame != nextFrame) {
+			//Projectile is launched in the middle of the animation
+			//If you find a better place for it, I'll really be glad to put it there
+			if(attackProjectile && (anims[0]->GetCurrentFrame() == (anims[0]->GetFrameCount()/2))) {
+				GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget) ;
+				attackProjectile = NULL ;
+			}
 			Region newBBox;
 			if (PartCount == 1) {
 				newBBox.x = cx - nextFrame->XPos;
@@ -3807,7 +3814,6 @@ void Actor::Draw(Region &screen)
 				anims[0]->endReached = false;
 				anims[0]->SetPos(0);
 			}
-
 		}
 
 		ca->PulseRGBModifiers();
@@ -4243,17 +4249,16 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	gamedata->FreeItem(itm,item->ItemResRef, false);
 	if (pro) {
 		//ieDword is unsigned!!
+		pro->SetCaster(globalID) ;
 		if(((int)header < 0) && !(flags&UI_MISS)) { //using a weapon
 			ITMExtHeader *which = itm->GetWeaponHeader(header == (ieDword)-2);
 			Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, weapon_damagetype[which->DamageType], FX_DURATION_INSTANT_LIMITED);
 			AttackEffect->Projectile = which->ProjectileAnimation ;
 			AttackEffect->Target = FX_TARGET_PRESET ;
 			pro->GetEffects()->AddEffect(AttackEffect, true) ;
-			//TODO: When do we want to launch it???
-			//pro->timeStartStep+=3*AI_UPDATE_TIME ; //hardcoded?
-		}
-		pro->SetCaster(globalID) ;
-		GetCurrentArea()->AddProjectile(pro, Pos, tar->globalID);
+			attackProjectile = pro ;
+		} else //launch it now as we are not attacking
+			GetCurrentArea()->AddProjectile(pro, Pos, tar->globalID);
 		return true;
 	}
 	return false;

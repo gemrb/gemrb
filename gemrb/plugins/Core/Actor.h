@@ -257,6 +257,8 @@ private:
 	ieDword initiative;
 	ieDword InTrap;
 	char AttackStance ;
+	/*The projectile bringing the current attack*/
+	Projectile* attackProjectile ;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
 				 SpriteCover*& sc, Animation** anims,
