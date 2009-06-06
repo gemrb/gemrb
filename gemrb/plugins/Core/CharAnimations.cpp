@@ -644,7 +644,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 	}
 
 	//for paletted dragon animations, we need the stance id
-	StanceID = Stance;
+	StanceID  = nextStanceID = Stance;
 	int AnimType = GetAnimType();
 
 	//alter stance here if it is missing and you know a substitute
@@ -859,20 +859,12 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		a->SetPos( 0 );
 
 		//setting up the sequencing of animation cycles
+		if (nextStanceID != StanceID)
+			a->Flags |= A_ANI_PLAYONCE ;
 		switch (StanceID) {
-			case IE_ANI_DAMAGE:
-			case IE_ANI_SLEEP:
-			case IE_ANI_TWITCH:
-			case IE_ANI_DIE:
-			case IE_ANI_PST_START:
-			case IE_ANI_HEAD_TURN:
-			case IE_ANI_CONJURE:
-				a->Flags |= A_ANI_PLAYONCE;
-				break;
 			case IE_ANI_EMERGE:
 			case IE_ANI_GET_UP:
 				a->playReversed = true;
-				a->Flags |= A_ANI_PLAYONCE;
 				break;
 		}
 		switch (GetAnimType()) {

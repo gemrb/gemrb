@@ -2937,8 +2937,6 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 		return;
 	}
 
-	SetStance(AttackStance);
-
 	//last chance to disable attacking
 	//
 	attackcount = GetStat(IE_NUMBEROFATTACKS);
@@ -3113,6 +3111,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		StopAttack();
 		return;
 	}
+	SetStance(AttackStance) ;
 	//get target
 	Actor *target = area->GetActorByGlobalID(LastTarget);
 
@@ -3806,7 +3805,9 @@ void Actor::Draw(Region &screen)
 		if (anims[0]->endReached) {
 			if (HandleActorStance() ) {
 				anims[0]->endReached = false;
+				anims[0]->SetPos(0);
 			}
+
 		}
 
 		ca->PulseRGBModifiers();
