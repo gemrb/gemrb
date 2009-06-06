@@ -9126,9 +9126,6 @@ static PyObject* GemRB_GetToHit(PyObject * /*self*/, PyObject* args)
 	}
 	leftorright = leftorright&1;
 	int ret = actor->GetToHitBonus(leftorright);
-	if (ret == 1000) {
-		ret = actor->GetStat(IE_TOHIT);
-	}
 	return PyInt_FromLong( ret );
 }
 

@@ -2961,10 +2961,11 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 // this should probably be consolidated where possible
 int Actor::GetToHitBonus(bool leftorright)
 {
+	int tohit = GetStat(IE_TOHIT);
 	WeaponInfo wi;
 	ITMExtHeader *header = GetWeapon(wi,leftorright);
 	if (!header) {
-		return 1000;
+		return tohit;
 	}
 	ieDword Flags;
 	ITMExtHeader *hittingheader = header;
@@ -2984,7 +2985,7 @@ int Actor::GetToHitBonus(bool leftorright)
 			//out of ammo event
 			//try to refill
 			SetStance(IE_ANI_READY);
-			return 1000;
+			return tohit;
 		}
 		Flags = WEAPON_RANGED;
 		//The bow can give some bonuses, but the core attack is made by the arrow.
@@ -2995,14 +2996,15 @@ int Actor::GetToHitBonus(bool leftorright)
 	default:
 		//item is unsuitable for fight
 		SetStance(IE_ANI_READY);
-		return 1000;
+		return tohit;
 	}//melee or ranged
 	if (leftorright) Flags|=WEAPON_LEFTHAND;
 	//this flag is set by the bow in case of projectile launcher.
 	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) Flags|=WEAPON_USESTRENGTH;
 
 	//second parameter is left or right hand flag
-	return GetToHit(THACOBonus, Flags);
+	tohit = GetToHit(THACOBonus, Flags);
+	return tohit;
 }
 
 int Actor::GetToHit(int bonus, ieDword Flags)
