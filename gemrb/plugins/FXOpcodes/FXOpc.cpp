@@ -784,16 +784,16 @@ static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 {
 	if (mode==FX_DURATION_INSTANT_PERMANENT) {
 		if (target->IsReverseToHit()) {
-			BASE_ADD( stat, mod );
-		} else {
 			BASE_SUB( stat, mod );
+		} else {
+			BASE_ADD( stat, mod );
 		}
 		return;
 	}
 	if (target->IsReverseToHit()) {
-		STAT_ADD( stat, mod );
-	} else {
 		STAT_SUB( stat, mod );
+	} else {
+		STAT_ADD( stat, mod );
 	}
 }
 
@@ -1617,7 +1617,7 @@ int fx_save_vs_death_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_death_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_SUB( IE_SAVEVSDEATH, fx->Parameter1 );
+	HandleBonus( target, IE_SAVEVSDEATH, fx->Parameter1, fx->TimingMode );
 	return FX_APPLIED;
 }
 
@@ -1626,7 +1626,7 @@ int fx_save_vs_wands_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_wands_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_SUB( IE_SAVEVSWANDS, fx->Parameter1 );
+	HandleBonus( target, IE_SAVEVSWANDS, fx->Parameter1, fx->TimingMode );
 	return FX_APPLIED;
 }
 
@@ -1635,7 +1635,7 @@ int fx_save_vs_poly_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_poly_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_SUB( IE_SAVEVSPOLY, fx->Parameter1 );
+	HandleBonus( target, IE_SAVEVSPOLY, fx->Parameter1, fx->TimingMode );
 	return FX_APPLIED;
 }
 
@@ -1644,7 +1644,7 @@ int fx_save_vs_breath_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_breath_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_SUB( IE_SAVEVSBREATH, fx->Parameter1 );
+	HandleBonus( target, IE_SAVEVSBREATH, fx->Parameter1, fx->TimingMode );
 	return FX_APPLIED;
 }
 
@@ -1653,7 +1653,7 @@ int fx_save_vs_spell_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_spell_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_SUB( IE_SAVEVSSPELL, fx->Parameter1 );
+	HandleBonus( target, IE_SAVEVSSPELL, fx->Parameter1, fx->TimingMode );
 	return FX_APPLIED;
 }
 
@@ -1964,7 +1964,7 @@ int fx_to_hit_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_SUB( IE_TOHIT, fx->Parameter1 );
+	HandleBonus( target, IE_TOHIT, fx->Parameter1, fx->TimingMode );
 	return FX_APPLIED;
 }
 
@@ -5449,7 +5449,7 @@ int fx_set_traps_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_to_hit_bonus_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_MOD( IE_HITBONUS );
+	HandleBonus( target, IE_HITBONUS, fx->Parameter1, fx->TimingMode );
 	return FX_APPLIED;
 }
 
