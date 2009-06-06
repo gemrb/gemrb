@@ -197,7 +197,7 @@ def DCMainDonePress ():
 
 	# new thac0
 	ThacoTable = GemRB.LoadTableObject ("THAC0")
-	GemRB.SetPlayerStat (pc, IE_THAC0, ThacoTable.GetValue (NewClassId-1, 0, 1))
+	GemRB.SetPlayerStat (pc, IE_TOHIT, ThacoTable.GetValue (NewClassId-1, 0, 1))
 
 	# new saves
 	SavesTable = ClassTable.GetValue (ClassTable.FindValue (5, NewClassId), 3, 0)

@@ -95,7 +95,7 @@ def OpenLevelUpWindow():
 
 	# some current values
 	OldHPMax = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
-	OldThaco = GemRB.GetPlayerStat (pc, IE_THAC0, 1)
+	OldThaco = GemRB.GetPlayerStat (pc, IE_TOHIT, 1)
 	OldLore = GemRB.GetPlayerStat (pc, IE_LORE, 1)
 	for i in range (5):
 		OldSaves[i] = GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH+i, 1)
@@ -452,7 +452,7 @@ def GetLevelUpNews():
 
 	# 5305 - THAC0 Reduced by
 	# only output if there is a change in thaco
-	NewThaco = GemRB.GetPlayerStat (pc, IE_THAC0, 1)
+	NewThaco = GemRB.GetPlayerStat (pc, IE_TOHIT, 1)
 	if (NewThaco < OldThaco):
 		News += GemRB.GetString (5305) + ": " + str(OldThaco-NewThaco) + '\n\n'
 
@@ -633,8 +633,8 @@ def ReactivateBaseClass ():
 	# see if this thac0 is lower than our current thac0
 	ThacoTable = GemRB.LoadTableObject ("THAC0")
 	TmpThaco = ThacoTable.GetValue(Classes[1]-1, Level[1]-1, 1)
-	if TmpThaco < GemRB.GetPlayerStat (pc, IE_THAC0, 1):
-		GemRB.SetPlayerStat (pc, IE_THAC0, TmpThaco)
+	if TmpThaco < GemRB.GetPlayerStat (pc, IE_TOHIT, 1):
+		GemRB.SetPlayerStat (pc, IE_TOHIT, TmpThaco)
 
 	# see if all our saves are lower than our current saves
 	SavesTable = ClassTable.GetValue (ClassIndex, 3, 0)

@@ -334,8 +334,8 @@ def GetStatOverview (pc):
 
 	stats.append ( (8442,1,'c') )
 
-	stats.append ( (61932, GS (IE_THAC0), '') )
-	stats.append ( (9457, GS (IE_THAC0), '') )
+	stats.append ( (61932, GS (IE_TOHIT), '') )
+	stats.append ( (9457, GS (IE_TOHIT), '') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
 		tmp2 = str(tmp/2) + chr(188)

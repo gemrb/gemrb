@@ -957,7 +957,7 @@ def SetupThaco (pc, Level=None):
 		if Levels[i] > MaxLevel:
 			Levels[i] = MaxLevel
 
-	CurrentThaco = GemRB.GetPlayerStat (pc, IE_THAC0, 1)
+	CurrentThaco = GemRB.GetPlayerStat (pc, IE_TOHIT, 1)
 	NewThaco = 0
 	for i in range (NumClasses):
 		#loop through each class and update the save value if we have
@@ -969,7 +969,7 @@ def SetupThaco (pc, Level=None):
 
 	#only update if we have a better thac0
 	if NewThaco:
-		GemRB.SetPlayerStat (pc, IE_THAC0, CurrentThaco)
+		GemRB.SetPlayerStat (pc, IE_TOHIT, CurrentThaco)
 	return
 
 def SetupLore (pc, LevelDiff=None):

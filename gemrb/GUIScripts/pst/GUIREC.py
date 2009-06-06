@@ -641,7 +641,7 @@ def GetStatOverview (pc):
 	# 4220 Proficiencies
 	stats.append (4220)
 	#   4208 THAC0
-	stats.append ((4208, GS (IE_THAC0), ''))
+	stats.append ((4208, GS (IE_TOHIT), ''))
 	#   4209 Number of Attacks
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
@@ -1161,7 +1161,7 @@ def OpenLevelUpWindow ():
 			# Thac0
 			Thac0 = GetThac0 (Class, NextLevel)
 			# Is the new thac0 better than old? (The smaller, the better)
-			if Thac0 < GemRB.GetPlayerStat (pc, IE_THAC0):
+			if Thac0 < GemRB.GetPlayerStat (pc, IE_TOHIT):
 				Thac0Updated = True
 
 	else:
@@ -1226,7 +1226,7 @@ def OpenLevelUpWindow ():
 		# Multi class use the primary class level to determine Thac0
 		Thac0 = GetThac0 (Class, PrimNextLevel)
 		# Is the new thac0 better than old? (The smaller the better)
-		if Thac0 < GemRB.GetPlayerStat (pc, IE_THAC0):
+		if Thac0 < GemRB.GetPlayerStat (pc, IE_TOHIT):
 			Thac0Updated = True
 
 

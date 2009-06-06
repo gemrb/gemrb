@@ -330,7 +330,7 @@ def GetStatOverview (pc):
 
 	#proficiencies
 	stats.append ( (8442,1,'c') )
-	stats.append ( (9457, GS (IE_THAC0), '') )
+	stats.append ( (9457, GS (IE_TOHIT), '') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
 		tmp2 = str(tmp/2) + chr(188)
