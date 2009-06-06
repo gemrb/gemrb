@@ -33,6 +33,7 @@
 #include "Projectile.h"
 #include "Game.h"
 #include "GameScript.h"
+#include "GameControl.h" //checking for dialog
 #include "ScriptEngine.h"
 #include "GSUtils.h" //needed for DisplayStringCore
 #include "Video.h"
@@ -2362,6 +2363,12 @@ bool Actor::CheckOnDeath()
 	if (BaseStats[IE_STATE_ID]&STATE_DEAD) {
 		return false;
 	}
+	// don't destroy actors currently in a dialog
+	GameControl *gc = core->GetGameControl();
+	if (gc && (globalID == gc->targetID || globalID == gc->speakerID)) {
+		return false;
+	}
+
 	//we need to check animID here, if it has not played the death
 	//sequence yet, then we could return now
 	ClearActions();
