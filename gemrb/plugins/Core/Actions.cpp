@@ -1315,7 +1315,12 @@ void GameScript::DisplayStringNoName(Scriptable* Sender, Action* parameters)
 
 void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
 {
-	DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD|DS_CONSOLE|DS_NONAME);
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!target) {
+		target=Sender;
+	}
+
+	DisplayStringCore( target, parameters->int0Parameter, DS_HEAD|DS_CONSOLE|DS_NONAME);
 }
 
 //display message over current script owner
