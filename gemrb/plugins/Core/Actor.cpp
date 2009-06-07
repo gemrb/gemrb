@@ -3210,7 +3210,6 @@ void Actor::PerformAttack(ieDword gameTime)
 		StopAttack();
 		return;
 	}
-	SetStance(AttackStance) ;
 	//get target
 	Actor *target = area->GetActorByGlobalID(LastTarget);
 
@@ -3259,6 +3258,15 @@ void Actor::PerformAttack(ieDword gameTime)
 			printf("Initiative: 0!\n");
 		}
 	}
+
+	if((PersonalDistance(this, target) > wi.range*10) /*|| (!GetCurrentArea()->IsVisible(Pos, target->Pos))*/) {
+		//too far or cannot be seen. Stop the attack and retry.
+		//StopAttack() ;
+		core->GetGameControl()->TryToAttack(this, target) ;
+		return ;
+	}
+
+	SetStance(AttackStance) ;
 
 	//figure out the time for our next attack since the old time has the initiative
 	//in it, we only have to add the basic delta

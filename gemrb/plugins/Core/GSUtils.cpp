@@ -1228,8 +1228,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	if(target->Type == ST_ACTOR) {
 		actor->SetTarget( target );
 	}
-
-	if ( PersonalDistance(Sender, target) > wi.range) {
+	//TODO use gonearandretry when sender can't see target!!
+	if ( (PersonalDistance(Sender, target) > wi.range) /*|| (!Sender->GetCurrentArea()->IsVisible(Sender->Pos, target->Pos))*/) {
 		//we couldn't perform the action right now
 		//so we add it back to the queue with an additional movement
 		//increases refcount of Sender->CurrentAction, by pumping it back
