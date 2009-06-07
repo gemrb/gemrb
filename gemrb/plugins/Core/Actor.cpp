@@ -123,7 +123,10 @@ static ieByte featstats[MAX_FEATS]={0
 //holds the wspecial table for weapon prof bonuses
 #define WSPECIAL_COLS 3
 static int wspecial_max = 0;
+static int wspattack_rows = 0;
+static int wspattack_cols = 0;
 static int **wspecial;
+static int **wspattack;
 
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
@@ -1030,6 +1033,15 @@ void Actor::ReleaseMemory()
 			free(wspecial);
 			wspecial=NULL;
 		}
+		if (wspattack) {
+			for (i=0; i<=wspattack_rows; i++) {
+				if (wspattack[i]) {
+					free(wspattack[i]);
+				}
+			}
+			free(wspattack);
+			wspattack=NULL;
+		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1441,6 +1453,27 @@ static void InitActorTables()
 			}
 		}
 	}
+
+	//pre-cache attack per round bonuses
+	tm.load("wspatck");
+	if (tm) {
+		wspattack_rows = tm->GetRowCount();
+		wspattack_cols = tm->GetColumnCount();
+		wspattack = (int **) calloc(wspattack_rows, sizeof(int *));
+
+		int tmp = 0;
+		for (i=0; i<wspattack_rows; i++) {
+			wspattack[i] = (int *) calloc(wspattack_cols, sizeof(int));
+			for (int j=0; j<wspattack_cols; j++) {
+				tmp = atoi(tm->QueryField(i, j));
+				//negative values relate to x/2, so we adjust them
+				//positive values relate to x, so we must times by 2
+				if (tmp<0) tmp  = -2*tmp-1;
+				else       tmp *=  2;
+				wspattack[i][j] = tmp;
+			}
+		}
+	}
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -1769,6 +1802,21 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	if (bonus<0 && (Modified[IE_MAXHITPOINTS]+bonus)<=0) {
 		bonus=1-Modified[IE_MAXHITPOINTS];
+	}
+
+	//get the wspattack bonuses for proficiencies
+	WeaponInfo wi;
+	ITMExtHeader *header = GetWeapon(wi, false);
+	if (header && (wi.prof <= MAX_STATS)) {
+		ieDword stars = GetStat(wi.prof)&PROFS_MASK;
+		if ((signed)stars >= wspattack_rows) {
+			stars = wspattack_rows-1;
+		}
+		int tmplevel = GetXPLevel(true)-1;
+		if (tmplevel >= wspattack_cols) {
+			tmplevel = wspattack_cols-1;
+		}
+		SetBase(IE_NUMBEROFATTACKS, 2+wspattack[stars][tmplevel]);
 	}
 
 	//we still apply the maximum bonus to dead characters, but don't apply
@@ -3036,7 +3084,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	//add in proficiency bonuses
 	if (wi.prof && (wi.prof <= MAX_STATS)) {
 		ieDword stars = GetStat(wi.prof)&PROFS_MASK;
-		printf("Stars: %d\n", stars);
+
+		//hit/damage/speed bonuses from wspecial
 		if ((signed)stars > wspecial_max) {
 			stars = wspecial_max;
 		}
@@ -4745,17 +4794,6 @@ void Actor::CreateDerivedStatsBG()
 	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;
 	BaseStats[IE_BACKSTABDAMAGEMULTIPLIER]=backstabdamagemultiplier;
 	BaseStats[IE_LAYONHANDSAMOUNT]=GetPaladinLevel()*2;
-
-	//TODO: THIS IS ONLY TEMPORARY!
-	// Find a way to not hardcode this... perhaps in 2da?
-	ieDword warriorlevel = GetWarriorLevel();
-	if (warriorlevel >= 13) {
-		BaseStats[IE_NUMBEROFATTACKS] = 4;
-	} else if (warriorlevel >= 7) {
-		BaseStats[IE_NUMBEROFATTACKS] = 3;
-	} else {
-		BaseStats[IE_NUMBEROFATTACKS] = 2;
-	}
 }
 
 //3rd edition rules
