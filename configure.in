@@ -269,4 +269,5 @@ gemrb/docs/en/GUIScript/Makefile
 gemrb/docs/en/Tables/Makefile 
 gemrb/docs/en/Engine/Makefile 
 ])
+AC_CONFIG_FILES([gemrb.spec])
 AC_OUTPUT

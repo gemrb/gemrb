@@ -16,6 +16,7 @@ GemRB svn (6282):
     - bugfixes
 
   Applied patches:
+    #2802190 jbmetz (improve the rpm spec handling)
 
 GemRB V0.4.0 (2009-05-25):
   New features:

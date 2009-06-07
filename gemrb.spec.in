@@ -1,5 +1,5 @@
 Name: gemrb
-Version: 0.4.0
+Version: @VERSION@
 Release: 1
 Summary: Port of the original Infinity (Game) Engine
 Group: Applications/Games
@@ -51,6 +51,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %attr(755,root,root) %{_libdir}/gemrb/plugins/*.la
 
 %changelog
+* Sat Jun  6 2009 Joachim Metz <jbmetz@users.sourceforge.net> 0.4.0-1
+- Added support for configure integration
+
 * Tue May 25 2009 Jaka Kranjc <lynxlupodian@users.sourceforge.net> 0.4.0-1
 - Update for gemrb 0.4.0
 

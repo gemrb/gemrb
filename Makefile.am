@@ -1,5 +1,12 @@
 SUBDIRS = gemrb
-EXTRA_DIST = admin/setup.sh 
+
+SPEC_FILES = \
+        gemrb.spec \
+        gemrb.spec.in
+
+EXTRA_DIST = admin/setup.sh \
+	$(SPEC_FILES)
+
 MAINTAINERCLEANFILES = \
 	aclocal.m4 \
 	config.h.in \
