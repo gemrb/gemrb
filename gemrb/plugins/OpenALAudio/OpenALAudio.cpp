@@ -747,6 +747,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 							alSourcePlay( driver->MusicSource );
 							checkALError("Error playing music source", "ERROR");
 						}
+						bFinished = AL_FALSE;
 					}
 					break;
 				case AL_STOPPED:
@@ -791,7 +792,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 								printMessage( "OpenAL", "No Other Music to play\n", WHITE );
 								memset( driver->music_memory + ( cnt * 2 ), 0, size );
 								driver->MusicPlaying = false;
-								return 0;
+								break;
 							}
 						}
 						alBufferData( BufferID, AL_FORMAT_STEREO16, driver->music_memory, ACM_BUFFERSIZE, driver->MusicReader->get_samplerate() );
