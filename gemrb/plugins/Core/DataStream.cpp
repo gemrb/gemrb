@@ -164,10 +164,15 @@ int DataStream::ReadResRef(ieResRef dest)
 {
 	int len = Read(dest, 8);
 	int i;
-	//zero filling from the first space or in the end
-	//we got a 9 bytes long buffer
-	for(i=0;(i<8) && (dest[i]!=' ');i++) dest[i]=(char) tolower(dest[i]);
-	while(i<9) dest[i++]=0;
+	// lowercase the resref
+	for(i = 0; i < 8; i++) {
+		dest[i] = (char) tolower(dest[i]);
+	}
+	// remove trailing spaces
+	for (i = 7; i >= 0; i--) {
+		if (dest[i] == ' ') dest[i] = 0;
+		else break;
+	}
 	return len;
 }
 
