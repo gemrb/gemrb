@@ -1132,7 +1132,7 @@ int fx_constitution_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x0B Cure:Poison
-static EffectRef fx_poisoned_state_ref={"State:Poison",NULL,-1};
+static EffectRef fx_poisoned_state_ref={"State:Poisoned",NULL,-1};
 
 int fx_cure_poisoned_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
