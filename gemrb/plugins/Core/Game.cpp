@@ -1123,7 +1123,7 @@ void Game::UpdateScripts()
 			while(acnt--) {
 				Actor *actor = Maps[idx]->GetActorByGlobalID(Attackers[acnt]);
 				if (actor) {
-					actor->InitRound(Ticks, !(CombatCounter&1) );
+					actor->InitRound(GameTime, !(CombatCounter&1) );
 				}
 			}
 		}

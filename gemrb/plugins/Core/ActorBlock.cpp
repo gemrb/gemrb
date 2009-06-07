@@ -380,7 +380,7 @@ void Scriptable::ProcessActions(bool force)
 
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
-		actor->PerformAttack(thisTime);
+		actor->PerformAttack(core->GetGame()->GameTime);
 	}
 
 	if (!force && (( thisTime - startTime ) < interval)) {

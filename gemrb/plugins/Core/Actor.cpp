@@ -277,7 +277,10 @@ Actor::Actor()
 	LastDamageType = 0;
 	HotKey = 0;
 	attackcount = 0;
-	initiative = 0;
+	attacksperround = 0;
+	initiative = 0.0;
+	nextattack = 0;
+	lasttime = 0;
 	InTrap = 0;
 	PathTries = 0;
 	TargetDoor = NULL;
@@ -2917,7 +2920,14 @@ int Actor::Immobile() const
 //so it is safe to do cleanup here (it will be called only once)
 void Actor::InitRound(ieDword gameTime, bool secondround)
 {
+	//reset variables used in PerformAttack
 	attackcount = 0;
+	attacksperround = 0;
+	nextattack = 0;
+	lasttime = 0;
+	initiative = 0.0;
+
+	printf("InitRound Begin: gameTime: %d\n", gameTime);
 
 	if (InternalFlags&IF_STOPATTACK) {
 		core->GetGame()->OutAttack(GetID());
@@ -2938,23 +2948,20 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 		return;
 	}
 
-	//last chance to disable attacking
-	//
+	//add one for second round to get an extra attack only if we
+	//are x/2 attacks per round
 	attackcount = GetStat(IE_NUMBEROFATTACKS);
 	if (secondround) {
 		attackcount++;
 	}
-	//attackcount/=2; why?
+	//all numbers of attacks are stored at twice their value
+	attackcount >>= 1;
 
-	//d10
-	int tmp = core->Roll(1, 10, 0);// GetStat(IE_WEAPONSPEED)-GetStat(IE_PHYSICALSPEED) );
-	if (state & STATE_SLOWED) tmp <<= 1;
-	if (state & STATE_HASTED) tmp >>= 1;
-
-	if (tmp<0) tmp=0;
-	else if (tmp>0x10) tmp=0x10;
-
-	initiative = (ieDword) (gameTime+tmp*ROUND_SIZE);
+	//adjust for slow and haste
+	if (state & STATE_SLOWED) attackcount >>= 1;
+	if (state & STATE_HASTED) attackcount <<= 1;
+	attacksperround = attackcount;
+	printf("InitRound End: Attack Count: %d | Number of Attacks: %d\n", attackcount, GetStat(IE_NUMBEROFATTACKS));
 }
 
 bool Actor::GetToHitBonus(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
@@ -3087,19 +3094,24 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	if (!attackcount) {
-		if (initiative) {
+	//only return if we don't have any attacks left this round
+	//FIXME: this could get REALLY annoying because characters will end their
+	// attack rounds at different times... perhaps move to the beginning of
+	// InitRounds() or elsewhere
+	if (attackcount<=0) {
+		if (attacksperround) {
 			if (InParty) {
 				core->Autopause(AP_ENDROUND);
 			}
-			initiative = 0;
 		}
 		return;
 	}
-	if (initiative>gameTime) {
+
+	//don't continue if we can't make the attack yet
+	//we check lasttime because we will get the same gameTime a few times
+	if ((nextattack > gameTime) || (lasttime == gameTime)) {
 		return;
 	}
-	attackcount--;
 
 	if (InternalFlags&IF_STOPATTACK) {
 		core->GetGame()->OutAttack(GetID());
@@ -3122,6 +3134,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		LastTarget = 0;
 		return;
 	}
+
 	//which hand is used
 	bool leftorright = (bool) (attackcount&1);
 
@@ -3137,6 +3150,39 @@ void Actor::PerformAttack(ieDword gameTime)
 		return;
 	}
 
+	//if this is the first call of the round, we need to update next attack
+	if (nextattack == 0) {
+		//FIXME: figure out exactly how initiative is calculated; I know that it's random,
+		// but is it based on moral? or what? currently just using speed factor
+		initiative = (float)hittingheader->Speed/10 /*+(float)core->Roll(-100, 100, 0)/100*/;
+		if (initiative < 0.0) initiative = 0.0;
+		if (initiative > 10.0) initiative = 10.0;
+
+		//(round_size/attacks_per_round)*(initiative) is the first delta
+		nextattack = (ROUND_SIZE/attacksperround)*initiative + gameTime;
+
+		//we can still attack this round if we have a speed factor of 0
+		if (nextattack > gameTime) {
+			printf("APR: %d | Attacks Left: %d\n", attacksperround, attackcount);
+			printf("Next Attack: %d | CurrentTime: %d\n", nextattack, gameTime);
+			return;
+		} else {
+			printf("Initiative: 0!\n");
+		}
+	}
+
+	//figure out the time for our next attack since the old time has the initiative
+	//in it, we only have to add the basic delta
+	attackcount--;
+	nextattack += (ROUND_SIZE/attacksperround);
+	lasttime = gameTime;
+
+	//debug messages
+	if (attacksperround) {
+		printf("APR: %d | Attacks Left: %d\n", attacksperround, attackcount);
+		printf("Next Attack: %d | CurrentTime: %d\n", nextattack, gameTime);
+	}
+
 	int roll = core->Roll(1,ATTACKROLL,0);
 	if (roll==1) {
 		//critical failure
@@ -3145,6 +3191,8 @@ void Actor::PerformAttack(ieDword gameTime)
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		} else {
 			//break sword
+			//TODO: this appears to be a random roll on-hit (perhaps critical failure
+			// too), but definitely doesn't happen each critical hit
 			if (header->RechargeFlags&IE_ITEM_BREAKABLE) {
 				inventory.BreakItemSlot(wi.slot);
 			}
@@ -3174,10 +3222,11 @@ void Actor::PerformAttack(ieDword gameTime)
 	int defense = target->GetDefense(damagetype) ;
 
 	bool success ;
-	if(ReverseToHit)
+	if(ReverseToHit) {
 		success = roll > tohit - defense ;
-	else
+	} else {
 		success = tohit + roll > defense ;
+	}
 
 	if (!success) {
 		//hit failed
@@ -4656,6 +4705,17 @@ void Actor::CreateDerivedStatsBG()
 	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;
 	BaseStats[IE_BACKSTABDAMAGEMULTIPLIER]=backstabdamagemultiplier;
 	BaseStats[IE_LAYONHANDSAMOUNT]=GetPaladinLevel()*2;
+
+	//TODO: THIS IS ONLY TEMPORARY!
+	// Find a way to not hardcode this... perhaps in 2da?
+	ieDword warriorlevel = GetWarriorLevel();
+	if (warriorlevel >= 13) {
+		BaseStats[IE_NUMBEROFATTACKS] = 4;
+	} else if (warriorlevel >= 7) {
+		BaseStats[IE_NUMBEROFATTACKS] = 3;
+	} else {
+		BaseStats[IE_NUMBEROFATTACKS] = 2;
+	}
 }
 
 //3rd edition rules
@@ -4800,4 +4860,25 @@ bool Actor::IsDualSwap() const
 	ieDword tmpclass = BaseStats[IE_CLASS]-1;
 	if (tmpclass>=(ieDword)classcount) return false;
 	return (ieDword)dualswap[tmpclass]==(Modified[IE_MC_FLAGS]&MC_WAS_ANY);
+}
+
+ieDword Actor::GetWarriorLevel() const
+{
+	if (!IsWarrior()) return 0;
+
+	ieDword warriorlevels[4] = {
+		GetBarbarianLevel(),
+		GetFighterLevel(),
+		GetPaladinLevel(),
+		GetRangerLevel()
+	};
+
+	ieDword highest = 0;
+	for (int i=0; i<4; i++) {
+		if (warriorlevels[i] > highest) {
+			highest = warriorlevels[i];
+		}
+	}
+
+	return highest;
 }

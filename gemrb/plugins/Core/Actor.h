@@ -253,8 +253,12 @@ private:
 	ieByte SavingThrow[5];
 	//how many attacks in this round
 	int attackcount;
-	//when the next attack is scheduled (gametime+initiative)
-	ieDword initiative;
+	int attacksperround;
+	//time of our next attack
+	ieDword nextattack;
+	ieDword lasttime;
+	//random speed variable
+	float initiative;
 	ieDword InTrap;
 	char AttackStance ;
 	/*The projectile bringing the current attack*/
@@ -570,6 +574,7 @@ public:
 	ieDword GetRangerLevel() const { return GetClassLevel(ISRANGER); }
 	ieDword GetSorcererLevel() const { return GetClassLevel(ISSORCERER); }
 	/* Returns true if the character is a warrior */
+	ieDword GetWarriorLevel() const;
 	bool IsWarrior() const { return (GetFighterLevel()||GetBarbarianLevel()||GetRangerLevel()||GetPaladinLevel()); }
 	/* Returns true if the old class is inactive */
 	bool IsDualInactive() const;
