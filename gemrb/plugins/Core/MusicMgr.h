@@ -55,6 +55,8 @@ public:
 	virtual void PlayNext() = 0;
 	/** Returns whether music is currently playing */
 	virtual bool IsPlaying() = 0;
+	/** Returns whether given playlist is currently loaded */
+	virtual bool CurrentPlayList(const char* name) = 0;
 };
 
 #endif

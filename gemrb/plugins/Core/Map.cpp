@@ -1450,7 +1450,7 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 	return count;
 }
 
-void Map::PlayAreaSong(int SongType)
+void Map::PlayAreaSong(int SongType, bool restart)
 {
 	//you can speed this up by loading the songlist once at startup
 	int column;
@@ -1472,6 +1472,7 @@ void Map::PlayAreaSong(int SongType)
 	if (!tm)
 		return;
 	const char* poi = tm->QueryField( SongHeader.SongList[SongType], column );
+	if (!restart && core->GetMusicMgr()->CurrentPlayList(poi)) return;
 	core->GetMusicMgr()->SwitchPlayList( poi, true );
 }
 

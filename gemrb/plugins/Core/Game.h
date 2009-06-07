@@ -386,7 +386,7 @@ public:
 	/** draw weather */
 	void DrawWeather(Region &screen, bool update);
 	/** updates current area music */
-	void ChangeSong();
+	void ChangeSong(bool force = true);
 	/** sets expansion mode */
 	void SetExpansion(int exp);
 	/** Dumps information about the object */

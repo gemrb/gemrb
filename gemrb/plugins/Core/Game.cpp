@@ -1140,7 +1140,7 @@ void Game::UpdateScripts()
 
 	// perhaps a StartMusic action stopped the area music?
 	if (!core->GetMusicMgr()->IsPlaying()) {
-		 ChangeSong();
+		 ChangeSong(false);
 	}
 
 	//this is used only for the death delay so far
@@ -1381,7 +1381,7 @@ void Game::OutAttack(ieDword globalID)
 	}
 }
 
-void Game::ChangeSong()
+void Game::ChangeSong(bool force)
 {
 	int Song;
 
@@ -1393,7 +1393,7 @@ void Game::ChangeSong()
 		Song = (GameTime/ROUND_SIZE)%7200/3600;
 	}
 	//area may override the song played (stick in battlemusic)
-	area->PlayAreaSong( Song );
+	area->PlayAreaSong( Song, force );
 }
 
 int Game::AttackersOf(ieDword globalID, Map *area) const

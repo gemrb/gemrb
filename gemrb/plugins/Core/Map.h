@@ -283,7 +283,7 @@ public:
 	//void DrawVideocells(Region screen);
 	void DrawHighlightables(Region screen);
 	void DrawMap(Region screen);
-	void PlayAreaSong(int);
+	void PlayAreaSong(int SongType, bool restart = true);
 	void AddAnimation(AreaAnimation* anim);
 	aniIterator GetFirstAnimation() { return animations.begin(); }
 	AreaAnimation* GetNextAnimation(aniIterator &iter)

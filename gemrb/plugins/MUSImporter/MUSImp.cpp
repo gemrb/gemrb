@@ -304,3 +304,10 @@ void MUSImp::PlayMusic(char* name)
 	}
 	printf( "Playing: %s\n", FName );
 }
+
+bool MUSImp::CurrentPlayList(const char* name) {
+	int len = ( int ) strlen( PLName );
+	if (strnicmp( name, PLName, len ) == 0) return true;
+	return false;
+}
+
