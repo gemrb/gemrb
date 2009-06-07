@@ -1297,7 +1297,6 @@ static void InitActorTables()
 		//levelslots[BaseStats[IE_CLASS]-1] as there is no class id of 0
 		levelslots = (int **) calloc(classcount, sizeof(int*));
 		dualswap = (int *) calloc(classcount, sizeof(int));
-		memset(dualswap, 0, sizeof(dualswap));
 		ieDword tmpindex;
 		for (i=0; i<classcount; i++) {
 			//make sure we have a valid classid, then decrement
@@ -1320,7 +1319,6 @@ static void InitActorTables()
 			int classis = 0;
 			//default all levelslots to 0
 			levelslots[tmpindex] = (int *) calloc(ISCLASSES, sizeof(int));
-			memset(levelslots[tmpindex], 0, sizeof(levelslots[tmpindex]));
 
 			//single classes only worry about IE_LEVEL
 			ieDword tmpclass = atoi(tm->QueryField(i, 4));
@@ -1423,7 +1421,6 @@ static void InitActorTables()
 		for (i=0; i<classcount; i++) {
 			if (!levelslots[i]) {
 				levelslots[i] = (int *) calloc(ISCLASSES, sizeof(int *));
-				memset(levelslots[i], 0, sizeof(levelslots[i]));
 			}
 		}*/
 	}
@@ -1439,7 +1436,6 @@ static void InitActorTables()
 
 		for (i=0; i<=wspecial_max; i++) {
 			wspecial[i] = (int *) calloc(WSPECIAL_COLS, sizeof(int));
-			memset (wspecial[i], 0, sizeof(wspecial[i]));
 			for (int j=0; j<cols; j++) {
 				wspecial[i][j] = atoi(tm->QueryField(i, j));
 			}
@@ -2994,7 +2990,7 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	printf("InitRound End: Attack Count: %d | Number of Attacks: %d\n", attackcount, GetStat(IE_NUMBEROFATTACKS));
 }
 
-bool Actor::GetToHitBonus(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
+bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
 		ieDword &Flags, int &DamageBonus, int &speed)
 {
 	tohit = GetStat(IE_TOHIT);
@@ -3189,7 +3185,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	int speed;
 
 	//will return false on any errors
-	if (!GetToHitBonus(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed)) {
+	if (!GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed)) {
 		return;
 	}
 
