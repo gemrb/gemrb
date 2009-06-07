@@ -524,6 +524,7 @@ void IniSpawn::RespawnNameless()
 	if (NamelessSpawnPoint.isnull()) {
 		core->GetGame()->JoinParty(nameless,JP_INITPOS);
 		NamelessSpawnPoint=nameless->Pos;
+		strnuprcpy(NamelessSpawnArea, nameless->Area, 8);
 	}
 
 	nameless->Resurrect();
