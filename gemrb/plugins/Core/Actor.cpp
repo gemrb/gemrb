@@ -1809,14 +1809,23 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	ITMExtHeader *header = GetWeapon(wi, false);
 	if (header && (wi.prof <= MAX_STATS)) {
 		ieDword stars = GetStat(wi.prof)&PROFS_MASK;
-		if ((signed)stars >= wspattack_rows) {
+		if (stars >= (unsigned)wspattack_rows) {
 			stars = wspattack_rows-1;
 		}
-		int tmplevel = GetXPLevel(true)-1;
+
+		int tmplevel = GetWarriorLevel();
 		if (tmplevel >= wspattack_cols) {
 			tmplevel = wspattack_cols-1;
+		} else if (tmplevel < 0) {
+			tmplevel = 0;
 		}
-		SetBase(IE_NUMBEROFATTACKS, 2+wspattack[stars][tmplevel]);
+
+		//wspattack appears to only effect warriors
+		if (tmplevel) {
+			SetBase(IE_NUMBEROFATTACKS, 2+wspattack[stars][tmplevel]);
+		} else {
+			SetBase(IE_NUMBEROFATTACKS, 2);
+		}
 	}
 
 	//we still apply the maximum bonus to dead characters, but don't apply

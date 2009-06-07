@@ -1377,6 +1377,8 @@ def CanLevelUp(actor):
 	elif Dual[0] > 0: # dual classed
 		# get the class we can level
 		Class = ClassTable.GetRowName (Dual[2])
+		if IsDualSwap(actor):
+			Levels = [Levels[1], Levels[0], Levels[2]]
 
 	# check the class that can be level (single or dual)
 	return int(GetNextLevelExp (Levels[0], Class)) <= xp
