@@ -3053,7 +3053,7 @@ static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 int Actor::GetDefense(int DamageType)
 {
 	//dexterity bonus.
-	int defense = core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) );
+	int defense = 0;
 	if(DamageType > 5)
 		DamageType = 0 ;
 	switch (weapon_damagetype[DamageType]) {
@@ -3078,8 +3078,8 @@ int Actor::GetDefense(int DamageType)
 	} else {
 		defense += GetStat(IE_ARMORCLASS);
 	}
-
-	return defense ;
+//Defense bonus are stocked < 0 in 2da files.
+	return defense + core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) ) ;
 }
 
 void Actor::PerformAttack(ieDword gameTime)
@@ -3145,7 +3145,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	ieDword Flags;
 	int DamageBonus;
 
-	//will return false on any errors	
+	//will return false on any errors
 	if (!GetToHitBonus(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus)) {
 		return;
 	}
@@ -3154,12 +3154,11 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (nextattack == 0) {
 		//FIXME: figure out exactly how initiative is calculated; I know that it's random,
 		// but is it based on moral? or what? currently just using speed factor
-		initiative = (float)hittingheader->Speed/10 /*+(float)core->Roll(-100, 100, 0)/100*/;
-		if (initiative < 0.0) initiative = 0.0;
-		if (initiative > 10.0) initiative = 10.0;
+		ieDword spdfactor = hittingheader->Speed /*+(float)core->Roll(-100, 100, 0)/100*/;
+		if (spdfactor>10) spdfactor = 10;
 
 		//(round_size/attacks_per_round)*(initiative) is the first delta
-		nextattack = (ROUND_SIZE/attacksperround)*initiative + gameTime;
+		nextattack = ROUND_SIZE*spdfactor/(attacksperround*10) + gameTime;
 
 		//we can still attack this round if we have a speed factor of 0
 		if (nextattack > gameTime) {
