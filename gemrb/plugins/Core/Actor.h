@@ -257,8 +257,6 @@ private:
 	//time of our next attack
 	ieDword nextattack;
 	ieDword lasttime;
-	//random speed variable
-	float initiative;
 	ieDword InTrap;
 	char AttackStance ;
 	/*The projectile bringing the current attack*/
@@ -461,7 +459,7 @@ public:
 	bool GetToHitBonus(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
 		ieDword &Flags, int &DamageBonus);
 	/* performs attack against target */
-	void PerformAttack(ieDword initiative);
+	void PerformAttack(ieDword gameTime);
 	/* deal damage to target */
 	void DealDamage(Actor *target, int &damage, int damagetype, WeaponInfo *wi, bool critical);
 	/* sets a colour gradient stat, handles location */

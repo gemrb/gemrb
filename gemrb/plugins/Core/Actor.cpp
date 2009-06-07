@@ -278,7 +278,6 @@ Actor::Actor()
 	HotKey = 0;
 	attackcount = 0;
 	attacksperround = 0;
-	initiative = 0.0;
 	nextattack = 0;
 	lasttime = 0;
 	InTrap = 0;
@@ -2925,7 +2924,6 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	attacksperround = 0;
 	nextattack = 0;
 	lasttime = 0;
-	initiative = 0.0;
 
 	printf("InitRound Begin: gameTime: %d\n", gameTime);
 
