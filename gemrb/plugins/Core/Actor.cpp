@@ -120,6 +120,11 @@ static const int levelslotsiwd2[11]={IE_LEVELFIGHTER,IE_LEVELMAGE,IE_LEVELTHIEF,
 static ieByte featstats[MAX_FEATS]={0
 };
 
+//holds the wspecial table for weapon prof bonuses
+#define WSPECIAL_COLS 3
+static int wspecial_max = 0;
+static int **wspecial;
+
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
  ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
@@ -1016,6 +1021,15 @@ void Actor::ReleaseMemory()
 			free(maxhpconbon);
 			maxhpconbon=NULL;
 		}
+		if (wspecial) {
+			for (i=0; i<=wspecial_max; i++) {
+				if (wspecial[i]) {
+					free(wspecial[i]);
+				}
+			}
+			free(wspecial);
+			wspecial=NULL;
+		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1414,6 +1428,23 @@ static void InitActorTables()
 		}*/
 	}
 	printf("Finished examining classes.2da\n");
+
+	//pre-cache hit/damage/speed bonuses for weapons
+	tm.load("wspecial");
+	if (tm) {
+		//load in the identifiers
+		wspecial_max = tm->GetRowCount()-1;
+		int cols = tm->GetColumnCount();
+		wspecial = (int **) calloc(wspecial_max+1, sizeof(int *));
+
+		for (i=0; i<=wspecial_max; i++) {
+			wspecial[i] = (int *) calloc(WSPECIAL_COLS, sizeof(int));
+			memset (wspecial[i], 0, sizeof(wspecial[i]));
+			for (int j=0; j<cols; j++) {
+				wspecial[i][j] = atoi(tm->QueryField(i, j));
+			}
+		}
+	}
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -2744,6 +2775,7 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright)
 
 	wi.enchantment = item->Enchantment;
 	wi.itemflags = wield->Flags;
+	wi.prof = item->WeaProf;
 
 	//select first weapon header
 	ITMExtHeader *which = item->GetWeaponHeader(GetAttackStyle() == WEAPON_RANGED);
@@ -2963,9 +2995,10 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 }
 
 bool Actor::GetToHitBonus(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
-		ieDword &Flags, int &DamageBonus)
+		ieDword &Flags, int &DamageBonus, int &speed)
 {
 	tohit = GetStat(IE_TOHIT);
+	speed = 0;
 	header = GetWeapon(wi,leftorright);
 	if (!header) {
 		return false;
@@ -3003,6 +3036,17 @@ bool Actor::GetToHitBonus(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHe
 	if (leftorright) Flags|=WEAPON_LEFTHAND;
 	//this flag is set by the bow in case of projectile launcher.
 	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) Flags|=WEAPON_USESTRENGTH;
+
+	//add in proficiency bonuses
+	if (wi.prof <= MAX_STATS) {
+		ieDword stars = GetStat(wi.prof);
+		if ((signed)stars > wspecial_max) {
+			stars = wspecial_max;
+		}
+		tohit += wspecial[stars][0];
+		DamageBonus += wspecial[stars][1];
+		speed = wspecial[stars][2];
+	}
 
 	//second parameter is left or right hand flag
 	tohit = GetToHit(THACOBonus, Flags);
@@ -3142,9 +3186,10 @@ void Actor::PerformAttack(ieDword gameTime)
 	int tohit;
 	ieDword Flags;
 	int DamageBonus;
+	int speed;
 
 	//will return false on any errors
-	if (!GetToHitBonus(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus)) {
+	if (!GetToHitBonus(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed)) {
 		return;
 	}
 
@@ -3152,7 +3197,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (nextattack == 0) {
 		//FIXME: figure out exactly how initiative is calculated; I know that it's random,
 		// but is it based on moral? or what? currently just using speed factor
-		ieDword spdfactor = hittingheader->Speed /*+(float)core->Roll(-100, 100, 0)/100*/;
+		int spdfactor = hittingheader->Speed + speed /*+ random intiative*/;
+		if (spdfactor<0) spdfactor = 0;
 		if (spdfactor>10) spdfactor = 10;
 
 		//(round_size/attacks_per_round)*(initiative) is the first delta

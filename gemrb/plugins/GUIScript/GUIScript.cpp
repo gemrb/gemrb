@@ -9132,8 +9132,9 @@ static PyObject* GemRB_GetToHit(PyObject * /*self*/, PyObject* args)
 	int tohit;
 	ieDword Flags;
 	int DamageBonus;
+	int speed;
 
-	if (!actor->GetToHitBonus(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus)) {
+	if (!actor->GetToHitBonus(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed)) {
 		//TODO: handle error, thout tohit will still be set correctly
 	}
 	return PyInt_FromLong( tohit );
