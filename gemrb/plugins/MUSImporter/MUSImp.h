@@ -66,6 +66,8 @@ public:
 	void Start();
 	/** Plays the Next Entry */
 	void PlayNext();
+	/** Returns whether music is currently playing */
+	bool IsPlaying() { return Playing; }
 public:
 	void release(void)
 	{

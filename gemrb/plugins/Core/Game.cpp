@@ -27,6 +27,7 @@
 #include "ResourceMgr.h"
 #include "ScriptEngine.h"
 #include "GameControl.h"
+#include "MusicMgr.h"
 #include "../../includes/strrefs.h"
 #include "../../includes/defsounds.h"
 
@@ -1135,6 +1136,11 @@ void Game::UpdateScripts()
 		for(unsigned int i=0;i<idx;i++) {
 			DelMap( (unsigned int) i, false );
 		}
+	}
+
+	// perhaps a StartMusic action stopped the area music?
+	if (!core->GetMusicMgr()->IsPlaying()) {
+		 ChangeSong();
 	}
 
 	//this is used only for the death delay so far

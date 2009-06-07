@@ -53,6 +53,8 @@ public:
 	virtual void SwitchPlayList(const char* name, bool Hard) = 0;
 	/** Plays the Next Entry */
 	virtual void PlayNext() = 0;
+	/** Returns whether music is currently playing */
+	virtual bool IsPlaying() = 0;
 };
 
 #endif
