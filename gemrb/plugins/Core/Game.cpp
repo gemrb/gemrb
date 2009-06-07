@@ -557,17 +557,12 @@ void Game::SetMasterArea(const char *area)
 
 int Game::AddMap(Map* map)
 {
-	unsigned int i = (unsigned int) Maps.size();
 	if (MasterArea(map->GetScriptName()) ) {
-		//no push_front, we do this ugly hack
-		Maps.push_back(NULL);
-		for (;i;i--) {
-			Maps[i]=Maps[i-1];
-		}
-		Maps[0] = map;
+		Maps.insert(Maps.begin(), 1, map);
 		MapIndex++;
 		return 0;
 	}
+	unsigned int i = (unsigned int) Maps.size();
 	Maps.push_back( map );
 	return i;
 }
