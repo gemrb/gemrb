@@ -136,6 +136,9 @@ class ScriptedAnimation;
 #define UI_SILENT    1       //no sound when used up
 #define UI_MISS      2       //ranged miss (projectile has no effects)
 
+//used to mask off current profs
+#define PROFS_MASK  0x07
+
 //locations of classes in the isclass/levelslots arrays
 #define ISFIGHTER   0
 #define ISMAGE      1

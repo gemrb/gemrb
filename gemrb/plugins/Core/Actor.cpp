@@ -3034,8 +3034,9 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) Flags|=WEAPON_USESTRENGTH;
 
 	//add in proficiency bonuses
-	if (wi.prof <= MAX_STATS) {
-		ieDword stars = GetStat(wi.prof);
+	if (wi.prof && (wi.prof <= MAX_STATS)) {
+		ieDword stars = GetStat(wi.prof)&PROFS_MASK;
+		printf("Stars: %d\n", stars);
 		if ((signed)stars > wspecial_max) {
 			stars = wspecial_max;
 		}
