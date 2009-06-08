@@ -1100,32 +1100,20 @@ bool Game::EveryoneDead() const
 
 void Game::UpdateScripts()
 {
-	// This function is called more than once for each value of GameTime.
-	// We keep track of the last GameTime we were called in to prevent
-	// InitRound() being called more than once per round.
-
-	bool StartTurn = (GameTime%ROUND_SIZE==0) && (GameTime != LastScriptUpdate);
-	LastScriptUpdate = GameTime;
-
-	if (StartTurn) {
-		size_t acnt=Attackers.size();
-		if (acnt) {
-			CombatCounter++;
-		}
-	}
 	ExecuteScript( 1 );
 	ProcessActions(false);
 	size_t idx;
 
 	for (idx=0;idx<Maps.size();idx++) {
 		Maps[idx]->UpdateScripts();
-		if (StartTurn) {
-			size_t acnt=Attackers.size();
-			while(acnt--) {
-				Actor *actor = Maps[idx]->GetActorByGlobalID(Attackers[acnt]);
-				if (actor) {
-					actor->InitRound(GameTime, !(CombatCounter&1) );
-				}
+		size_t acnt=Attackers.size();
+		while(acnt--) {
+			Actor *actor = Maps[idx]->GetActorByGlobalID(Attackers[acnt]);
+			if (actor) {
+				//each attacker handles their own round initiation
+				//FIXME: individual combat counter
+				CombatCounter++;
+				actor->InitRound(GameTime, !(CombatCounter&1) );
 			}
 		}
 	}
@@ -1152,19 +1140,17 @@ void Game::UpdateScripts()
 		event_timer--;
 	}
 
-	if (StartTurn) {
-		if (EveryoneDead()) {
-			//don't check it any more
-			protagonist = PM_NO;
-			core->GetGUIScriptEngine()->RunFunction("DeathWindow");
-			return;
-		}
+	if (EveryoneDead()) {
+		//don't check it any more
+		protagonist = PM_NO;
+		core->GetGUIScriptEngine()->RunFunction("DeathWindow");
+		return;
+	}
 
-		if (PartyOverflow()) {
-			partysize = 0;
-			core->GetGUIScriptEngine()->RunFunction("OpenReformPartyWindow");
-			return;
-		}
+	if (PartyOverflow()) {
+		partysize = 0;
+		core->GetGUIScriptEngine()->RunFunction("OpenReformPartyWindow");
+		return;
 	}
 }
 

@@ -250,6 +250,8 @@ public:
 	vvcVector vvcOverlays;
 	vvcVector vvcShields;
 	ieDword *projectileImmunity; //classic bitfield
+	ieDword roundTime;           //these are timers for attack rounds
+	ieDword lastInit;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
@@ -260,7 +262,7 @@ private:
 	int attacksperround;
 	//time of our next attack
 	ieDword nextattack;
-	ieDword lasttime;
+	ieDword lastattack;
 	ieDword InTrap;
 	char AttackStance ;
 	/*The projectile bringing the current attack*/

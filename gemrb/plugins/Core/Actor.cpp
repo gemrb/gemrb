@@ -287,11 +287,13 @@ Actor::Actor()
 	attackcount = 0;
 	attacksperround = 0;
 	nextattack = 0;
-	lasttime = 0;
 	InTrap = 0;
 	PathTries = 0;
 	TargetDoor = NULL;
 	attackProjectile = NULL ;
+	lastInit = 0;
+	roundTime = 0;
+	lastattack = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 	fxqueue.SetOwner( this );
@@ -3004,30 +3006,48 @@ int Actor::Immobile() const
 //so it is safe to do cleanup here (it will be called only once)
 void Actor::InitRound(ieDword gameTime, bool secondround)
 {
+	lastInit = gameTime;
+
+	//roundTime will equal 0 if we aren't attacking something
+	if (roundTime) {
+		//only perform calculations at the beginning of the round!
+		if (((gameTime-roundTime)%ROUND_SIZE != 0) || \
+		(roundTime == lastInit)) {
+			return;
+		}
+	}
+
 	//reset variables used in PerformAttack
 	attackcount = 0;
 	attacksperround = 0;
 	nextattack = 0;
-	lasttime = 0;
+	lastattack = 0;
 
 	printf("InitRound Begin: gameTime: %d\n", gameTime);
 
+	//we set roundTime to zero on any of the following returns, because this
+	//is guaranteed to be the start of a round, and we only want roundTime
+	//if we are attacking this round
 	if (InternalFlags&IF_STOPATTACK) {
 		core->GetGame()->OutAttack(GetID());
+		roundTime = 0;
 		return;
 	}
 
 	if (!LastTarget) {
 		StopAttack();
+		roundTime = 0;
 		return;
 	}
 
 	//if held or disabled, etc, then cannot continue attacking
 	ieDword state = GetStat(IE_STATE_ID);
 	if (state&STATE_CANTMOVE) {
+		roundTime = 0;
 		return;
 	}
 	if (Immobile()) {
+		roundTime = 0;
 		return;
 	}
 
@@ -3043,7 +3063,10 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	//adjust for slow and haste
 	if (state & STATE_SLOWED) attackcount >>= 1;
 	if (state & STATE_HASTED) attackcount <<= 1;
+
+	//set our apr and starting round time
 	attacksperround = attackcount;
+	roundTime = gameTime;
 	printf("InitRound End: Attack Count: %d | Number of Attacks: %d\n", attackcount, GetStat(IE_NUMBEROFATTACKS));
 }
 
@@ -3182,7 +3205,7 @@ int Actor::GetDefense(int DamageType)
 void Actor::PerformAttack(ieDword gameTime)
 {
 	//apply the modal effect on the beginning of each round
-	if ((gameTime%ROUND_SIZE==0) && ModalState) {
+	if (((gameTime-roundTime)%ROUND_SIZE==0) && ModalState) {
 		if (!ModalSpell[0]) {
 			printMessage("Actor","Modal Spell Effect was not set!\n", YELLOW);
 			ModalSpell[0]='*';
@@ -3205,8 +3228,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	//don't continue if we can't make the attack yet
-	//we check lasttime because we will get the same gameTime a few times
-	if ((nextattack > gameTime) || (lasttime == gameTime)) {
+	//we check lastattack because we will get the same gameTime a few times
+	if ((nextattack > gameTime) || (gameTime == lastattack)) {
 		return;
 	}
 
@@ -3281,7 +3304,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	//in it, we only have to add the basic delta
 	attackcount--;
 	nextattack += (ROUND_SIZE/attacksperround);
-	lasttime = gameTime;
+	lastattack = gameTime;
 
 	//debug messages
 	if (attacksperround) {
