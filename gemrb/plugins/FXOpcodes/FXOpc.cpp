@@ -2649,34 +2649,37 @@ int fx_set_regenerating_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	ieDword nextHeal;
 
 	if (!fx->Parameter3) {
-		nextHeal = gameTime;
+		//hack to ensure our first call gets through
+		nextHeal = gameTime-1;
 	} else {
 		nextHeal = fx->Parameter3;
 	}
 
-	if (nextHeal>gameTime) return FX_APPLIED;
+	//we can have multiple calls at the same gameTime, so we 
+	//just go to gameTime+1 to ensure one call
+	if (nextHeal>=gameTime) return FX_APPLIED;
 
 	switch(fx->Parameter2) {
 	case RPD_PERCENT:
 		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
 		break;
-	case RPD_ROUNDS:
-		tmp *= 6;
-		goto seconds;
-	case RPD_TURNS:
-		tmp *= 30;
-		//fallthrough
-	case RPD_SECONDS:           //restore param3 hp every param1 seconds
-seconds:
-		fx->Parameter3 = nextHeal+tmp;
+	case RPD_TURNS:		//restore param3 hp every param1 turns
+		//assuming 1 turn = 10 rounds
+		tmp *= ROUND_PER_TURN;
+		//fall
+	case RPD_ROUNDS:	//restore param3 hp every param1 rounds
+		tmp *= ROUND_SECONDS;
+		//fall
+	case RPD_SECONDS:	//restore param3 hp every param1 seconds
+		fx->Parameter3 = nextHeal + tmp*(ROUND_TICKS);
 		damage = 1;
 		break;
-	case RPD_POINTS:
+	case RPD_POINTS:	//restore param1 hp every second? that's crazy!
 		damage = fx->Parameter1;
-		fx->Parameter3++;
+		fx->Parameter3 = nextHeal + (ROUND_TICKS);
 		break;
 	default:
-		fx->Parameter3++;
+		fx->Parameter3 = nextHeal + (ROUND_TICKS);
 		damage = 1;
 		break;
 	}

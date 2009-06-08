@@ -53,6 +53,9 @@ class Game;
 //the length of a round in game ticks?
 //default is 6 seconds 15*6=90
 #define ROUND_SIZE     90
+#define ROUND_SECONDS  6
+#define ROUND_TICKS    (ROUND_SIZE/ROUND_SECONDS)
+#define ROUND_PER_TURN 10
 
 //the size of the bestiary register
 #define BESTIARY_SIZE 260
