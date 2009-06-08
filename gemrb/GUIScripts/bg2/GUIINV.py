@@ -628,12 +628,6 @@ def OpenItemAmountWindow ():
 
 	global ItemAmountWindow, StackAmount
 
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
-
-	if GemRB.IsDraggingItem ()==1:
-		GemRB.DropDraggedItem (pc, slot)
-
 	if ItemAmountWindow != None:
 		if ItemAmountWindow:
 			ItemAmountWindow.Unload ()
@@ -641,6 +635,12 @@ def OpenItemAmountWindow ():
 
 		GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 		return
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+
+	if GemRB.IsDraggingItem ()==1:
+		GemRB.DropDraggedItem (pc, slot)
 
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
