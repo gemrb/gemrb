@@ -20,6 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
+#include "../../includes/strrefs.h"
 #include "SaveGameIterator.h"
 #include "Interface.h"
 #include "ResourceMgr.h"
@@ -495,6 +496,12 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 
 	core->FreeInterface(im);
 	loaded = false;
+	// Save succesful / Quick-save succesful
+	if (index == 1) {
+		core->DisplayConstantString(STR_QSAVESUCCEED, 0xbcefbc);
+	} else {
+		core->DisplayConstantString(STR_SAVESUCCEED, 0xbcefbc);
+	}
 	return 0;
 }
 
