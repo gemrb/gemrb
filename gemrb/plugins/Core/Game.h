@@ -51,10 +51,9 @@ class Game;
 #include "Variables.h"
 
 //the length of a round in game ticks?
-//default is 6 seconds 15*6=90
+//default (ROUND_SIZE) is 6 seconds: 15 (AI_UPDATE_TIME)*6 (ROUND_SECODS)=90
 #define ROUND_SIZE     90
 #define ROUND_SECONDS  6
-#define ROUND_TICKS    (ROUND_SIZE/ROUND_SECONDS)
 #define ROUND_PER_TURN 10
 
 //the size of the bestiary register

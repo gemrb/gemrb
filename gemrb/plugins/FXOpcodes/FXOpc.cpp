@@ -2671,15 +2671,15 @@ int fx_set_regenerating_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		tmp *= ROUND_SECONDS;
 		//fall
 	case RPD_SECONDS:	//restore param3 hp every param1 seconds
-		fx->Parameter3 = nextHeal + tmp*(ROUND_TICKS);
+		fx->Parameter3 = nextHeal + tmp*AI_UPDATE_TIME;
 		damage = 1;
 		break;
 	case RPD_POINTS:	//restore param1 hp every second? that's crazy!
 		damage = fx->Parameter1;
-		fx->Parameter3 = nextHeal + (ROUND_TICKS);
+		fx->Parameter3 = nextHeal + AI_UPDATE_TIME;
 		break;
 	default:
-		fx->Parameter3 = nextHeal + (ROUND_TICKS);
+		fx->Parameter3 = nextHeal + AI_UPDATE_TIME;
 		damage = 1;
 		break;
 	}

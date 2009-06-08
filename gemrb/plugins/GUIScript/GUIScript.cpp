@@ -4144,7 +4144,7 @@ PyDoc_STRVAR( GemRB_GetGameTime__doc,
 
 static PyObject* GemRB_GetGameTime(PyObject * /*self*/, PyObject* /*args*/)
 {
-	unsigned long GameTime = core->GetGame()->GameTime/ROUND_SIZE;
+	unsigned long GameTime = core->GetGame()->GameTime/AI_UPDATE_TIME;
 	return PyInt_FromLong( GameTime );
 }
 

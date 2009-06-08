@@ -1170,10 +1170,10 @@ void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) cons
 void EffectQueue::RemoveExpiredEffects(ieDword futuretime) const
 {
 	ieDword GameTime = core->GetGame()->GameTime;
-	if (GameTime+futuretime*ROUND_SIZE<GameTime) {
+	if (GameTime+futuretime*AI_UPDATE_TIME<GameTime) {
 		GameTime=0xffffffff;
 	} else {
-		GameTime+=futuretime*ROUND_SIZE;
+		GameTime+=futuretime*AI_UPDATE_TIME;
 	}
 
 	std::list< Effect* >::const_iterator f;

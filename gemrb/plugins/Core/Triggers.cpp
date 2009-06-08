@@ -3061,19 +3061,19 @@ int GameScript::AnimState(Scriptable* Sender, Trigger* parameters)
 //this trigger uses hours
 int GameScript::Time(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return (core->GetGame()->GameTime/ROUND_SIZE)%7200/300 == (ieDword) parameters->int0Parameter;
+	return (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/300 == (ieDword) parameters->int0Parameter;
 }
 
 //this trigger uses hours
 int GameScript::TimeGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return (core->GetGame()->GameTime/ROUND_SIZE)%7200/300 > (ieDword) parameters->int0Parameter;
+	return (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/300 > (ieDword) parameters->int0Parameter;
 }
 
 //this trigger uses hours
 int GameScript::TimeLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return (core->GetGame()->GameTime/ROUND_SIZE)%7200/300 < (ieDword) parameters->int0Parameter;
+	return (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/300 < (ieDword) parameters->int0Parameter;
 }
 
 int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
@@ -3777,7 +3777,7 @@ int GameScript::Delay( Scriptable* Sender, Trigger* parameters)
 
 int GameScript::TimeOfDay(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	ieDword timeofday = (core->GetGame()->GameTime/ROUND_SIZE)%7200/1800;
+	ieDword timeofday = (core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/1800;
 
 	if (timeofday==(ieDword) parameters->int0Parameter) {
 		return 1;

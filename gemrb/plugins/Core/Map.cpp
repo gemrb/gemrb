@@ -2452,7 +2452,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 		return;
 	}
 	//check schedule
-	ieDword bit = 1<<((core->GetGame()->GameTime/ROUND_SIZE)%7200/300);
+	ieDword bit = 1<<((core->GetGame()->GameTime/AI_UPDATE_TIME)%7200/300);
 	if (!(spawn->appearance & bit)) {
 		return;
 	}
@@ -3015,7 +3015,7 @@ bool AreaAnimation::Schedule(ieDword gametime)
 	}
 
 	//check for schedule
-	ieDword bit = 1<<((gametime/ROUND_SIZE)%7200/300);
+	ieDword bit = 1<<((gametime/AI_UPDATE_TIME)%7200/300);
 	if (appearance & bit) {
 		return true;
 	}
