@@ -49,11 +49,10 @@ bool TISImp::Open(DataStream* stream, bool autoFree)
 	str = stream;
 	this->autoFree = autoFree;
 	char Signature[8];
-	str->Read( Signature, 1 );
-	str->Seek( -1, GEM_CURRENT_POS );
+	str->Read( Signature, 8 );
+	str->Seek( -8, GEM_CURRENT_POS );
 	headerShift = 0;
-	if (Signature[0] == 'T') {
-		str->Read( Signature, 8 );	
+	if (Signature[0] == 'T' && Signature[1] == 'I' && Signature[2] == 'S') {
 		if (strncmp( Signature, "TIS V1  ", 8 ) != 0) {
 			printf( "[TISImporter]: Not a Valid TIS File.\n" );
 			return false;
