@@ -408,10 +408,14 @@ def OnDropItemToPC ():
 	return
 
 def DragItemAmount ():
-	Text = Window.GetControl (6)
-	Amount = Text.GetText ()
-	print Amount
+	"""Drag a split item."""
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
+	Text = ItemAmountWindow.GetControl (6)
+	Amount = Text.QueryText ()
+	item = GemRB.GetItem (slot_item["ItemResRef"])
+	GemRB.DragItem (pc, slot, item["ItemIcon"], int ("0"+Amount), 0)
 	OpenItemAmountWindow ()
 	return
 
@@ -433,8 +437,7 @@ def OpenItemAmountWindow ():
 	GemRB.SetVar ("FloatWindow", ItemAmountWindow.ID)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
-	slot_item = GemRB.GetSlotItem (pc, slot)
+	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 
