@@ -3235,11 +3235,13 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (InternalFlags&IF_STOPATTACK) {
 		core->GetGame()->OutAttack(GetID());
+		roundTime = 0;
 		return;
 	}
 
 	if (!LastTarget) {
 		StopAttack();
+		roundTime = 0;
 		return;
 	}
 	//get target
@@ -3272,9 +3274,9 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	//if this is the first call of the round, we need to update next attack
 	if (nextattack == 0) {
-		//FIXME: figure out exactly how initiative is calculated; I know that it's random,
-		// but is it based on moral? or what? currently just using speed factor
-		int spdfactor = hittingheader->Speed + speed /*+ random intiative*/;
+		//FIXME: figure out exactly how initiative is calculated
+		int initiative = core->Roll(1, 10, GetXPLevel(true)/(-8));
+		int spdfactor = hittingheader->Speed + speed + initiative;
 		if (spdfactor<0) spdfactor = 0;
 		if (spdfactor>10) spdfactor = 10;
 
