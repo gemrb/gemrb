@@ -536,10 +536,15 @@ void Projectile::SecondaryTarget()
 	Actor **actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	Actor **poi=actors;
 	while(*poi) {
-		Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
-		pro->SetEffectsCopy(effects);
-		pro->SetCaster(Caster);
-		area->AddProjectile(pro, Pos, (*poi)->GetGlobalID());
+		ieDword Target = (*poi)->GetGlobalID();
+
+		//this flag is actually about ignoring the caster
+		if (!(SFlags & PSF_IGNORE_CENTER) || Caster!=Target) {
+			Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
+			pro->SetEffectsCopy(effects);
+			pro->SetCaster(Caster);
+			area->AddProjectile(pro, Pos, Target);
+		}
 		poi++;
 	}
 	free(actors);
