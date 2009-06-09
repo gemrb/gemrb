@@ -582,5 +582,7 @@ public:
 	bool IsWarrior() const { return (GetFighterLevel()||GetBarbarianLevel()||GetRangerLevel()||GetPaladinLevel()); }
 	/* Returns true if the old class is inactive */
 	bool IsDualInactive() const;
+	/* true if we are dual-wielding */
+	int IsDualWielding() const;
 };
 #endif

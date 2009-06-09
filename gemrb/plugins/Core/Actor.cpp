@@ -1823,10 +1823,11 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		}
 
 		//wspattack appears to only effect warriors
+		int defaultattacks = 2 + 2*IsDualWielding();
 		if (tmplevel) {
-			SetBase(IE_NUMBEROFATTACKS, 2+wspattack[stars][tmplevel]);
+			SetBase(IE_NUMBEROFATTACKS, defaultattacks+wspattack[stars][tmplevel]);
 		} else {
-			SetBase(IE_NUMBEROFATTACKS, 2);
+			SetBase(IE_NUMBEROFATTACKS, defaultattacks);
 		}
 	}
 
@@ -2815,10 +2816,34 @@ ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 	return which;
 }
 
+int Actor::IsDualWielding() const
+{
+	int slot;
+	//if the shield slot is a weapon, we're dual wielding
+	const CREItem *wield = inventory.GetUsedWeapon(true, slot);
+	if (!wield) {
+		return 0;
+	}
+
+	Item *itm = gamedata->GetItem( wield->ItemResRef );
+	if (!itm) {
+		return 0;
+	}
+
+	//if the item is usable in weapon slot, then it is weapon
+	int weapon = core->CanUseItemType( SLOT_WEAPON, itm );
+	gamedata->FreeItem( itm, wield->ItemResRef, false );
+	//is just weapon>0 ok?
+	return (weapon>0)?1:0;
+}
+
 //returns weapon header currently used (bow in case of bow+arrow)
 //if range is nonzero, then the returned header is valid
 ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright)
 {
+	//only use the shield slot if we are dual wielding
+	leftorright = leftorright && IsDualWielding();
+
 	const CREItem *wield = inventory.GetUsedWeapon(leftorright, wi.slot);
 	if (!wield) {
 		return 0;
@@ -3218,7 +3243,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	//FIXME: this could get REALLY annoying because characters will end their
 	// attack rounds at different times... perhaps move to the beginning of
 	// InitRounds() or elsewhere
-	if (attackcount<=0) {
+	if (attackcount==0) {
+		attackcount--; //so we don't get spammed with pauses
 		if (attacksperround) {
 			if (InParty) {
 				core->Autopause(AP_ENDROUND);
@@ -3257,7 +3283,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	//which hand is used
-	bool leftorright = (bool) (attackcount&1);
+	//we do apr - attacksleft so we always use the main hand first
+	bool leftorright = (bool) ((attacksperround-attackcount)&1);
 
 	WeaponInfo wi;
 	ITMExtHeader *header = NULL;

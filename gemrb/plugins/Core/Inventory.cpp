@@ -1123,6 +1123,9 @@ CREItem *Inventory::GetUsedWeapon(bool leftorright, int &slot) const
 			ret = GetSlotItem(slot);
 			if (ret) {
 				return ret;
+			} else {
+				//we don't want to return fist for shield slot
+				return NULL;
 			}
 		}
 	}
