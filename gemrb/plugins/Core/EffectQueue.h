@@ -96,7 +96,7 @@ class Map;
 #define DICE_ROLL(adjustment) (core->Roll( fx->DiceThrown, fx->DiceSides, adjustment) )
 
 // You will need to get GameTime somehow to use this macro
-#define	PrepareDuration(fx) fx->Duration = fx->Duration*6 + GameTime
+#define	PrepareDuration(fx) fx->Duration = (fx->Duration*AI_UPDATE_TIME + GameTime)
 
 // often used stat modifications, usually Parameter2 types 0, 1 and 2
 //these macros should work differently in permanent mode (modify base too)
