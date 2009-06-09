@@ -4641,7 +4641,7 @@ void GameScript::AddSpecialAbility( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->LearnSpell (parameters->string0Parameter, parameters->int0Parameter);
+	actor->LearnSpell (parameters->string0Parameter, parameters->int0Parameter|LS_MEMO);
 	core->SetEventFlag(EF_ACTION);
 }
 
