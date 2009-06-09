@@ -3352,7 +3352,7 @@ void Actor::PerformAttack(ieDword gameTime)
 			//break sword
 			//TODO: this appears to be a random roll on-hit (perhaps critical failure
 			// too), but definitely doesn't happen each critical hit
-			if (header->RechargeFlags&IE_ITEM_BREAKABLE) {
+			if ((header->RechargeFlags&IE_ITEM_BREAKABLE) && core->Roll(1,ATTACKROLL,0) == 1) {
 				inventory.BreakItemSlot(wi.slot);
 			}
 		}
