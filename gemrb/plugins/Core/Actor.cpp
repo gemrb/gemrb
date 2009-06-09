@@ -3093,6 +3093,11 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	attacksperround = attackcount;
 	roundTime = gameTime;
 	printf("InitRound End: Attack Count: %d | Number of Attacks: %d\n", attackcount, GetStat(IE_NUMBEROFATTACKS));
+
+	// this might not be the right place, but let's give it a go
+	if (attacksperround && InParty) {
+		core->Autopause(AP_ENDROUND);
+	}
 }
 
 bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
@@ -3240,16 +3245,12 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	//only return if we don't have any attacks left this round
-	//FIXME: this could get REALLY annoying because characters will end their
-	// attack rounds at different times... perhaps move to the beginning of
-	// InitRounds() or elsewhere
-	if (attackcount==0) {
-		attackcount--; //so we don't get spammed with pauses
-		if (attacksperround) {
-			if (InParty) {
-				core->Autopause(AP_ENDROUND);
-			}
-		}
+	if (attackcount==0) return;
+
+	// this check shouldn't be necessary, but it causes a divide-by-zero below,
+	// so i would like it to be clear if it ever happens
+	if (attacksperround==0) {
+		printMessage("Actor", "APR was 0 in PerformAttack!\n", RED);
 		return;
 	}
 
