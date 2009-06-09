@@ -3088,6 +3088,8 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	//adjust for slow and haste
 	if (state & STATE_SLOWED) attackcount >>= 1;
 	if (state & STATE_HASTED) attackcount <<= 1;
+	//make sure we always get at least 1apr (in case of slow)
+	if (attackcount < 1)      attackcount = 1;
 
 	//set our apr and starting round time
 	attacksperround = attackcount;
