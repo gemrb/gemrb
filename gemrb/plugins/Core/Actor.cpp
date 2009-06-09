@@ -3134,7 +3134,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		//The bow can give some bonuses, but the core attack is made by the arrow.
 		hittingheader = rangedheader;
 		THACOBonus += rangedheader->THAC0Bonus;
-		DamageBonus+= rangedheader->DamageBonus ;
+		DamageBonus += rangedheader->DamageBonus ;
 		break;
 	default:
 		//item is unsuitable for fight
@@ -3153,7 +3153,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		if ((signed)stars > wspecial_max) {
 			stars = wspecial_max;
 		}
-		tohit += wspecial[stars][0];
+		THACOBonus += wspecial[stars][0];
 		DamageBonus += wspecial[stars][1];
 		speed = wspecial[stars][2];
 	}
