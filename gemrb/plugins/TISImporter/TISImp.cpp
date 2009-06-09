@@ -50,7 +50,6 @@ bool TISImp::Open(DataStream* stream, bool autoFree)
 	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
-	str->Seek( -8, GEM_CURRENT_POS );
 	headerShift = 0;
 	if (Signature[0] == 'T' && Signature[1] == 'I' && Signature[2] == 'S') {
 		if (strncmp( Signature, "TIS V1  ", 8 ) != 0) {
@@ -61,6 +60,8 @@ bool TISImp::Open(DataStream* stream, bool autoFree)
 		str->ReadDword( &TilesSectionLen );
 		str->ReadDword( &headerShift );
 		str->ReadDword( &TileSize );
+	} else {
+		str->Seek( -8, GEM_CURRENT_POS );
 	}
 	return true;
 }
