@@ -9140,6 +9140,30 @@ static PyObject* GemRB_GetToHit(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( tohit );
 }
 
+PyDoc_STRVAR( GemRB_IsDualWielding__doc,
+"IsDualWielding(pc)\n\n"
+"1 if the pc is dual wielding; 0 otherwise.");
+
+static PyObject* GemRB_IsDualWielding(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+
+	if (!PyArg_ParseTuple( args, "i", &PartyID)) {
+		return AttributeError( GemRB_IsDualWielding__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+
+	int dualwield = actor->IsDualWielding();
+	return PyInt_FromLong( dualwield );
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(AdjustScrolling, METH_VARARGS),
 	METHOD(ApplyEffect, METH_VARARGS),
@@ -9271,6 +9295,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(IncreaseReputation, METH_VARARGS),
 	METHOD(InvalidateWindow, METH_VARARGS),
 	METHOD(IsDraggingItem, METH_NOARGS),
+	METHOD(IsDualWielding, METH_VARARGS),
 	METHOD(IsValidStoreItem, METH_VARARGS),
 	METHOD(LearnSpell, METH_VARARGS),
 	METHOD(LeaveContainer, METH_VARARGS),
