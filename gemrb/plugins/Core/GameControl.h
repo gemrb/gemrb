@@ -162,6 +162,7 @@ public: //Events
 		unsigned short Mod);
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
+	void DisplayTooltip();
 	void UpdateScrolling();
 	void SetScreenFlags(int value, int mode);
 	void SetDialogueFlags(int value, int mode);

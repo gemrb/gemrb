@@ -144,7 +144,12 @@
 #define STR_DISABLEDMAGE  110
 #define STR_SAVESUCCEED   111
 #define STR_QSAVESUCCEED  112
+#define STR_UNINJURED     113       //uninjured
+#define STR_INJURED1      114
+#define STR_INJURED2      115
+#define STR_INJURED3      116
+#define STR_INJURED4      117       //near death
 
-#define STRREF_COUNT 113
+#define STRREF_COUNT 118
 
 #endif //! IE_STRINGS_H

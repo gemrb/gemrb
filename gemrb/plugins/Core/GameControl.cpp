@@ -939,6 +939,89 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	}
 }
 
+void GameControl::DisplayTooltip() {
+	Game* game = core->GetGame();
+	if (game) {
+		Map* area = game->GetCurrentArea( );
+		if (area) {
+			Actor *actor = area->GetActorByGlobalID(lastActorID);
+			if (actor) {
+				char *name = actor->GetName(1);
+				int hp = actor->GetStat(IE_HITPOINTS);
+				int maxhp = actor->GetStat(IE_MAXHITPOINTS);
+				
+				char buffer[100];
+				if (!core->TooltipBack) {
+					// single-line tooltips without background (PS:T)
+					if (actor->InParty) {
+						snprintf(buffer, 100, "%s: %d/%d", name, hp, maxhp);
+					} else {
+						snprintf(buffer, 100, "%s", name);
+					}
+				} else {
+					// a guess at a neutral check
+					bool neutral = actor->GetStat(IE_EA) == EA_NEUTRAL;
+					// test for an injured string being present for this game
+					int strindex = core->GetStringReference(STR_UNINJURED);
+					// normal tooltips
+					if (actor->InParty) {
+						// in party: display hp
+						snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
+					} else if (neutral) {
+						// neutral: display name only
+						snprintf(buffer, 100, "%s", name);
+					} else if (strindex == -1) {
+						// non-neutral, not in party, no injured strings: display hp
+						snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
+					} else {
+						// non-neutral, not in party: display injured string
+						int strindex;
+						char *injuredstring = NULL;
+						// these boundaries are just a guess
+						if (hp == maxhp) {
+							strindex = STR_UNINJURED;
+						} else if (hp > (maxhp*3)/4) {
+							strindex = STR_INJURED1;
+						} else if (hp > maxhp/2) {
+							strindex = STR_INJURED2;
+						} else if (hp > maxhp/3) {
+							strindex = STR_INJURED3;
+						} else  {
+							strindex = STR_INJURED4;
+						}
+						strindex = core->GetStringReference(strindex);
+						if (strindex != -1) {
+							injuredstring = core->GetString(strindex, 0);
+						}
+
+						if (!injuredstring) {
+							// eek, where did the string go?
+							snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
+						} else {
+							snprintf(buffer, 100, "%s\n%s", name, injuredstring);
+						}
+					}
+				}
+
+				Point p = actor->Pos;
+				core->GetVideoDriver()->ConvertToScreen( p.x, p.y );
+				p.x += Owner->XPos + XPos; 
+				// try positioning above (see also ActorBlock::DrawOverheadText)
+				p.y += Owner->YPos + YPos - actor->size*50;
+				
+				// we should probably cope better with moving actors
+				SetTooltip(buffer);
+				core->DisplayTooltip(p.x, p.y, this);
+				return;
+			}
+		}
+	}
+
+	SetTooltip(NULL);
+	core->DisplayTooltip(0, 0, NULL);
+	return;
+}
+
 //returns the appropriate cursor over an active region (trap, infopoint, travel region)
 int GameControl::GetCursorOverInfoPoint(InfoPoint *overInfoPoint)
 {
@@ -1045,7 +1128,14 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			nextCursor = GetCursorOverContainer(overContainer);
 		}
 
+		Actor *prevActor = lastActor;
 		lastActor = area->GetActor( p, target_types);
+		if (lastActor != prevActor) {
+			// we store prevActor so we can remove the tooltip on actor change
+			// (maybe we should be checking this and actor movements every frame?)
+			SetTooltip(NULL);
+			core->DisplayTooltip(0, 0, this);
+		}
 
 		if ((target_types & GA_NO_SELF) && lastActor ) {
 			if (lastActor == core->GetFirstSelectedPC(false)) {
