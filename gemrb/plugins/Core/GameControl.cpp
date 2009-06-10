@@ -1006,8 +1006,7 @@ void GameControl::DisplayTooltip() {
 				Point p = actor->Pos;
 				core->GetVideoDriver()->ConvertToScreen( p.x, p.y );
 				p.x += Owner->XPos + XPos; 
-				// try positioning above (see also ActorBlock::DrawOverheadText)
-				p.y += Owner->YPos + YPos - actor->size*50;
+				p.y += Owner->YPos + YPos;
 				
 				// we should probably cope better with moving actors
 				SetTooltip(buffer);
