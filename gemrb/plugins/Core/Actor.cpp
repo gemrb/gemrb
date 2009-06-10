@@ -125,8 +125,12 @@ static ieByte featstats[MAX_FEATS]={0
 static int wspecial_max = 0;
 static int wspattack_rows = 0;
 static int wspattack_cols = 0;
-static int **wspecial;
-static int **wspattack;
+static int **wspecial = NULL;
+static int **wspattack = NULL;
+
+//holds the weapon style bonuses
+#define STYLE_MAX 3
+static int **wsdualwield = NULL;
 
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
@@ -1044,6 +1048,15 @@ void Actor::ReleaseMemory()
 			free(wspattack);
 			wspattack=NULL;
 		}
+		if (wsdualwield) {
+			for (i=0; i<=STYLE_MAX; i++) {
+				if (wsdualwield[i]) {
+					free(wsdualwield[i]);
+				}
+			}
+			free(wsdualwield);
+			wsdualwield=NULL;
+		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1476,6 +1489,19 @@ static void InitActorTables()
 			}
 		}
 	}
+
+	//dual-wielding table
+	tm.load("wstwowpn");
+	if (tm) {
+		wsdualwield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
+		int cols = tm->GetColumnCount();
+		for (i=0; i<=STYLE_MAX; i++) {
+			wsdualwield[i] = (int *) calloc(cols, sizeof(int));
+			for (int j=0; j<cols; j++) {
+				wsdualwield[i][j] = atoi(tm->QueryField(i, j));
+			}
+		}
+	}
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -1809,8 +1835,10 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	//get the wspattack bonuses for proficiencies
 	WeaponInfo wi;
 	ITMExtHeader *header = GetWeapon(wi, false);
+	ieDword stars;
+	int dualwielding = IsDualWielding();
 	if (header && (wi.prof <= MAX_STATS)) {
-		ieDword stars = GetStat(wi.prof)&PROFS_MASK;
+		stars = GetStat(wi.prof)&PROFS_MASK;
 		if (stars >= (unsigned)wspattack_rows) {
 			stars = wspattack_rows-1;
 		}
@@ -1823,12 +1851,29 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		}
 
 		//wspattack appears to only effect warriors
-		int defaultattacks = 2 + 2*IsDualWielding();
+		int defaultattacks = 2 + 2*dualwielding;
 		if (tmplevel) {
 			SetBase(IE_NUMBEROFATTACKS, defaultattacks+wspattack[stars][tmplevel]);
 		} else {
 			SetBase(IE_NUMBEROFATTACKS, defaultattacks);
 		}
+	}
+
+	//setup dual wielding bonuses
+	//TODO: IWD2 compatibility
+	if (wsdualwield && dualwielding) {
+		stars = GetStat(IE_PROFICIENCY2WEAPON);
+		if (stars > STYLE_MAX) stars = STYLE_MAX;
+
+		//these values aren't set on any of the CRE loaded, so i am assuming
+		//the engine assigns them as it goes
+		//TODO: see if LEFT/RIGHT are only used in dual-wielding circumstances and
+		//if MELEE is used with or instead of them
+		SetBase(IE_HITBONUSRIGHT, wsdualwield[stars][0]);
+		SetBase(IE_HITBONUSLEFT, wsdualwield[stars][1]);
+	} else {
+		SetBase(IE_HITBONUSRIGHT, 0);
+		SetBase(IE_HITBONUSLEFT, 0);
 	}
 
 	//we still apply the maximum bonus to dead characters, but don't apply
@@ -3107,6 +3152,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 {
 	tohit = GetStat(IE_TOHIT);
 	speed = 0;
+	leftorright = leftorright && IsDualWielding();
 	header = GetWeapon(wi,leftorright);
 	if (!header) {
 		return false;
@@ -3167,11 +3213,15 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 {
 	int tohit = bonus;
 
-	if (Flags&WEAPON_LEFTHAND) {
-		tohit += GetStat(IE_HITBONUSLEFT);
-	} else {
-		tohit += GetStat(IE_HITBONUSRIGHT);
+	//get our dual wielding modifier
+	if (IsDualWielding()) {
+		if (Flags&WEAPON_LEFTHAND) {
+				tohit += GetStat(IE_HITBONUSLEFT);
+		} else {
+				tohit += GetStat(IE_HITBONUSRIGHT);
+		}
 	}
+
 	//get attack style (melee or ranged)
 	switch(Flags&WEAPON_STYLEMASK) {
 		case WEAPON_MELEE:
