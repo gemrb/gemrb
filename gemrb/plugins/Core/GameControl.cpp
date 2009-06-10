@@ -1008,6 +1008,9 @@ void GameControl::DisplayTooltip() {
 				p.x += Owner->XPos + XPos; 
 				p.y += Owner->YPos + YPos;
 				
+				// hack to position text above PS:T actors
+				if (!core->TooltipBack) p.y -= actor->size*50;
+
 				// we should probably cope better with moving actors
 				SetTooltip(buffer);
 				core->DisplayTooltip(p.x, p.y, this);
