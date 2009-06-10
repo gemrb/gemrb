@@ -191,6 +191,7 @@ private:
 public:
 	ieWord speakerID;
 	ieWord targetID;
+	ieWord originalTargetID;
 	//no idea if this is viable
 	Scriptable *targetOB;
 	//using spell or item

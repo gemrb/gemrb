@@ -141,6 +141,7 @@ GameControl::GameControl(void)
 	DialogueFlags = 0;
 	dlg = NULL;
 	targetID = 0;
+	originalTargetID = 0;
 	speakerID = 0;
 	targetOB = NULL;
 }
@@ -2159,6 +2160,7 @@ void GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgre
 		Actor *tar = (Actor *) tgt;
 		speakerID = spe->globalID;
 		targetID = tar->globalID;
+		if (!originalTargetID) originalTargetID = tar->globalID;
 		spe->LastTalkedTo=targetID;
 		tar->LastTalkedTo=speakerID;
 	}
@@ -2214,6 +2216,7 @@ void GameControl::EndDialog(bool try_to_break)
 	}
 	targetOB = NULL;
 	targetID = 0;
+	originalTargetID = 0;
 	ds = NULL;
 	if (dlg) {
 		delete dlg;
@@ -2372,7 +2375,20 @@ void GameControl::DialogChoose(unsigned int choose)
 		//follow external linkage, if required
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
 			//target should be recalculated!
-			tgt = target->GetCurrentArea()->GetActorByDialog(tr->Dialog);
+			tgt = NULL;
+			if (originalTargetID) {
+				// always try original target first (sometimes there are multiple
+				// actors with the same dialog in an area, we want to pick the one
+				// we were talking to)
+				tgt = GetActorByGlobalID(originalTargetID);
+				if (tgt && strnicmp( tgt->GetDialog(GD_NORMAL), tr->Dialog, 8 ) != 0) {
+					tgt = NULL;
+				}
+			}
+			if (!tgt) {
+				// then just search the current area for an actor with the dialog
+				tgt = target->GetCurrentArea()->GetActorByDialog(tr->Dialog);
+			}
 			target = tgt;
 			if (!target) {
 				printMessage("Dialog","Can't redirect dialog\n",YELLOW);
