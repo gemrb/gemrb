@@ -1043,7 +1043,7 @@ void Actor::ReleaseMemory()
 			wspecial=NULL;
 		}
 		if (wspattack) {
-			for (i=0; i<=wspattack_rows; i++) {
+			for (i=0; i<wspattack_rows; i++) {
 				if (wspattack[i]) {
 					free(wspattack[i]);
 				}
@@ -1343,7 +1343,9 @@ static void InitActorTables()
 	//default all hp con bonuses to 9; this should be updated below
 	//TODO: check iwd2
 	maxhpconbon = (int *) calloc(classcount, sizeof(int));
-	memset(maxhpconbon, 9, sizeof(maxhpconbon));
+	for (i = 0; i < classcount; i++) {
+		maxhpconbon[i] = 9;
+	}
 	tm.load("classes");
 	if (tm && !core->HasFeature(GF_IWD2_SCRIPTNAME)) {
 		AutoTable hptm;
@@ -1854,12 +1856,38 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	fxqueue.ApplyAllEffects( this );
 
+	// IE_CLASS is >classcount for non-PCs/NPCs
+	if (BaseStats[IE_CLASS] <= (ieDword)classcount)
+		RefreshPCStats();
+	
+	for (unsigned int i=0;i<MAX_STATS;i++) {
+		if (first || Modified[i]!=previous[i]) {
+			PostChangeFunctionType f = post_change_functions[i];
+			if (f) {
+				(*f)(this, previous[i], Modified[i]);
+			}
+		}
+	}
+	//add wisdom bonus spells
+	if (!spellbook.IsIWDSpellBook() && mxsplwis) {
+		int level = Modified[IE_WIS];
+		if (level--) {
+			spellbook.BonusSpells(IE_SPELL_TYPE_PRIEST, spllevels, mxsplwis+spllevels*level);
+		}
+	}
+
+}
+
+// refresh stats on creatures (PC or NPC) with a valid class (not animals etc)
+// internal use only, and this is maybe a stupid name :)
+void Actor::RefreshPCStats() {
 	//calculate hp bonus
 	int bonus;
 	int bonlevel = GetXPLevel(true);
 	int oldlevel, oldbonus;
 	oldlevel = oldbonus = 0;
 	ieDword bonindex = BaseStats[IE_CLASS]-1;
+
 	//we must limit the levels to the max allowable
 	if (bonlevel>maxhpconbon[bonindex])
 		bonlevel = maxhpconbon[bonindex];
@@ -1934,22 +1962,6 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if(BaseStats[IE_STATE_ID]&STATE_DEAD)
 		bonus = 0;
 	Modified[IE_HITPOINTS]+=bonus;
-
-	for (unsigned int i=0;i<MAX_STATS;i++) {
-		if (first || Modified[i]!=previous[i]) {
-			PostChangeFunctionType f = post_change_functions[i];
-			if (f) {
-				(*f)(this, previous[i], Modified[i]);
-			}
-		}
-	}
-	//add wisdom bonus spells
-	if (!spellbook.IsIWDSpellBook() && mxsplwis) {
-		int level = Modified[IE_WIS];
-		if (level--) {
-			spellbook.BonusSpells(IE_SPELL_TYPE_PRIEST, spllevels, mxsplwis+spllevels*level);
-		}
-	}
 }
 
 void Actor::RollSaves()
@@ -4978,20 +4990,20 @@ void Actor::CreateDerivedStatsBG()
 	int classid = BaseStats[IE_CLASS];
 
 	//this works only for PC classes
-	if (classid<32) {
-		//recalculate all level based changes
-		pcf_level(this,0,0);
+	if (classid>=32) return;
 
-		//even though the original didn't allow a cleric/paladin dual or multiclass
-		//we shouldn't restrict the possibility by using "else if" here
-		if (isclass[ISCLERIC]&(1<<classid)) {
-			turnundeadlevel += GetClericLevel()+1-turnlevels[classid];
-			if (turnundeadlevel<0) turnundeadlevel=0;
-		}
-		if (isclass[ISPALADIN]&(1<<classid)) {
-			turnundeadlevel += GetPaladinLevel()+1-turnlevels[classid];
-			if (turnundeadlevel<0) turnundeadlevel=0;
-		}
+	//recalculate all level based changes
+	pcf_level(this,0,0);
+
+	//even though the original didn't allow a cleric/paladin dual or multiclass
+	//we shouldn't restrict the possibility by using "else if" here
+	if (isclass[ISCLERIC]&(1<<classid)) {
+		turnundeadlevel += GetClericLevel()+1-turnlevels[classid];
+		if (turnundeadlevel<0) turnundeadlevel=0;
+	}
+	if (isclass[ISPALADIN]&(1<<classid)) {
+		turnundeadlevel += GetPaladinLevel()+1-turnlevels[classid];
+		if (turnundeadlevel<0) turnundeadlevel=0;
 	}
 
 	ieDword backstabdamagemultiplier=GetThiefLevel();

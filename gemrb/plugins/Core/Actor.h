@@ -290,6 +290,8 @@ private:
 	ieDword GetClassLevel (const ieDword id) const;
 	/* Returns true if the dual class is backwards */
 	bool IsDualSwap() const;
+	/** Re/Inits the Modified vector for PCs/NPCs */
+	void RefreshPCStats();
 public:
 	Actor(void);
 	~Actor(void);
