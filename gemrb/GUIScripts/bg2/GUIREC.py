@@ -430,10 +430,10 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	stats.append ( (61932, GS (IE_TOHIT), '0') )
 	if (GemRB.IsDualWielding(pc)):
-		tmp = str(GemRB.GetToHit(pc, 0)) + '/' + str(GemRB.GetToHit(pc, 1))
+		stats.append ( (56911, GemRB.GetToHit(pc, 0), '0') )
+		stats.append ( (56910, GemRB.GetToHit(pc, 1), '0') )
 	else:
-		tmp = GemRB.GetToHit(pc, 0)
-	stats.append ( (9457, tmp, '0') )
+		stats.append ( (9457, GemRB.GetToHit(pc, 0), '0') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
 		tmp2 = str (tmp/2) + chr(188)
