@@ -134,8 +134,12 @@ public:
 	Control* GetOver() const;
 	/** Sets 'ctrl' as Focused */
 	void SetFocused(Control* ctrl);
+	/** Sets 'ctrl' as mouse event Focused */
+	void SetMouseFocused(Control* ctrl);
 	/** Returns last focused control */
 	Control* GetFocus() const;
+	/** Returns last mouse event focused control */
+	Control* GetMouseFocus() const;
 	/** Redraw all the Window */
 	void Invalidate();
 	/** Redraw controls of the same group */
@@ -177,6 +181,8 @@ private: // Private attributes
 	Control* lastC;
 	/** Last Focused Control */
 	Control* lastFocus;
+	/** Last mouse event Focused Control */
+	Control* lastMouseFocus;
 	/** Last Control under mouse */
 	Control* lastOver;
 

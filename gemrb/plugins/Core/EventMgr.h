@@ -122,6 +122,8 @@ public:
 	void OnSpecialKeyPress(unsigned char Key);
 	/** Sets focus to the control of the window */
 	void SetFocused(Window *win, Control *ctrl);
+	/** Sets mouse event focus to the control of the window */
+	void SetMouseFocused(Window *win, Control *ctrl);
 	/** Sets the maximum accepted doubleclick delay */
 	void SetDCDelay(unsigned long t);
 	void SetRKDelay(unsigned long t);
@@ -133,6 +135,8 @@ public:
 private:
 	/** Last Window focused */
 	Window* last_win_focused;
+	/** Last Window mouse event focused */
+	Window* last_win_mousefocused;
 	/** Last Window under Mouse Pointer*/
 	Window* last_win_over;
 	/** Sets a Window on the Top of the Window Queue */

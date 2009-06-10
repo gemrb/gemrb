@@ -28,6 +28,8 @@
 EventMgr::EventMgr(void)
 {
 	last_win_focused = NULL;
+	// Last window focused for mouse events (eg, with a click). Used to determine MouseUp events
+	last_win_mousefocused = NULL;
 	// Last window we were over. Used to determine MouseEnter and MouseLeave events
 	last_win_over = NULL;
 	MButtons = 0;
@@ -104,6 +106,7 @@ void EventMgr::Clear()
 	topwin.clear();
 	windows.clear();
 	last_win_focused = NULL;
+	last_win_mousefocused = NULL;
 	last_win_over = NULL;
 }
 
@@ -113,6 +116,9 @@ void EventMgr::DelWindow(Window *win)
 {
 	if (last_win_focused == win) {
 		last_win_focused = NULL;
+	}
+	if (last_win_mousefocused == win) {
+		last_win_mousefocused = NULL;
 	}
 	if (last_win_over == win) {
 		last_win_over = NULL;
@@ -257,9 +263,9 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 				if (!ctrl) {
 					ctrl = ( *m )->GetControl( x, y, false);
 				}
-				last_win_focused = *m;
+				last_win_mousefocused = *m;
 				if (ctrl != NULL) {
-					last_win_focused->SetFocused( ctrl );
+					last_win_mousefocused->SetMouseFocused( ctrl );
 					ctrl->OnMouseDown( x - last_win_focused->XPos - ctrl->XPos, y - last_win_focused->YPos - ctrl->YPos, Button, Mod );
 					return;
 				}
@@ -269,15 +275,15 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 			break;
 	}
 
-	if (Button == GEM_MB_SCRLUP || Button == GEM_MB_SCRLDOWN) {
-		ctrl = last_win_focused->GetScrollControl();
+	if ((Button == GEM_MB_SCRLUP || Button == GEM_MB_SCRLDOWN) && last_win_mousefocused) {
+		ctrl = last_win_mousefocused->GetScrollControl();
 		if (ctrl) {
-			ctrl->OnMouseDown( x - last_win_focused->XPos - ctrl->XPos, y - last_win_focused->YPos - ctrl->YPos, Button, Mod );
+			ctrl->OnMouseDown( x - last_win_mousefocused->XPos - ctrl->XPos, y - last_win_mousefocused->YPos - ctrl->YPos, Button, Mod );
 		}
 	}
 
-	if (last_win_focused) {
-		last_win_focused->SetFocused(NULL);
+	if (last_win_mousefocused) {
+		last_win_mousefocused->SetMouseFocused(NULL);
 	}
 }
 /** BroadCast Mouse Up Event */
@@ -285,11 +291,11 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button
 	unsigned short Mod)
 {
 	MButtons &= ~Button;
-	if (last_win_focused == NULL) return;
-	Control *last_ctrl_focused = last_win_focused->GetFocus();
-	if (last_ctrl_focused == NULL) return;
-	last_ctrl_focused->OnMouseUp( x - last_win_focused->XPos - last_ctrl_focused->XPos,
-		y - last_win_focused->YPos - last_ctrl_focused->YPos, Button, Mod );
+	if (last_win_mousefocused == NULL) return;
+	Control *last_ctrl_mousefocused = last_win_mousefocused->GetMouseFocus();
+	if (last_ctrl_mousefocused == NULL) return;
+	last_ctrl_mousefocused->OnMouseUp( x - last_win_mousefocused->XPos - last_ctrl_mousefocused->XPos,
+		y - last_win_mousefocused->YPos - last_ctrl_mousefocused->YPos, Button, Mod );
 }
 
 /** BroadCast Mouse Idle Event */

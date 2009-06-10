@@ -40,6 +40,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos,
 	this->BackGround = NULL;
 	lastC = NULL;
 	lastFocus = NULL;
+	lastMouseFocus = NULL;
 	lastOver = NULL;
 	Visible = WINDOW_INVISIBLE;
 	Flags = WF_CHANGED;
@@ -179,6 +180,11 @@ Control* Window::GetFocus() const
 	return lastFocus;
 }
 
+Control* Window::GetMouseFocus() const
+{
+	return lastMouseFocus;
+}
+
 /** Sets 'ctrl' as Focused */
 void Window::SetFocused(Control* ctrl)
 {
@@ -190,6 +196,18 @@ void Window::SetFocused(Control* ctrl)
 	if (ctrl != NULL) {
 		lastFocus->hasFocus = true;
 		lastFocus->Changed = true;
+	}
+}
+
+/** Sets 'ctrl' as Mouse Focused */
+void Window::SetMouseFocused(Control* ctrl)
+{
+	if (lastMouseFocus != NULL) {
+		lastMouseFocus->Changed = true;
+	}
+	lastMouseFocus = ctrl;
+	if (ctrl != NULL) {
+		lastMouseFocus->Changed = true;
 	}
 }
 
@@ -225,6 +243,9 @@ void Window::DelControl(unsigned short i)
 		if (ctrl==lastFocus) {
 			lastFocus=NULL;
 		}
+		if (ctrl==lastMouseFocus) {
+			lastMouseFocus=NULL;
+		}
 		delete ctrl;
 		Controls.erase(Controls.begin()+i);
 	}
@@ -255,6 +276,7 @@ void Window::release(void)
 	Visible = WINDOW_INVALID;
 	lastC = NULL;
 	lastFocus = NULL;
+	lastMouseFocus = NULL;
 	lastOver = NULL;
 }
 
