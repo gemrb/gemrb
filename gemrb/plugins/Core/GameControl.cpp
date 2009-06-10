@@ -376,7 +376,10 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		else if ( (viewport.y + viewport.h ) >= mapsize.y ) //if we are at the right
 			viewport.y = mapsize.y - viewport.h;
 
+		// override any existing viewport moves which may be in progress
 		core->timer->SetMoveViewPort( viewport.x, viewport.y, 0, false );
+		// move it directly ourselves, since we might be paused
+		video->MoveViewportTo( viewport.x, viewport.y );
 	}
 	Region screen( x + XPos, y + YPos, Width, Height );
 	Map* area = game->GetCurrentArea( );
@@ -1826,7 +1829,10 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 		moveY = 0;
 	}
 	else {
+		// override any existing viewport moves which may be in progress
 		core->timer->SetMoveViewPort( Viewport.x, Viewport.y, 0, false );
+		// move it directly ourselves, since we might be paused
+		core->GetVideoDriver()->MoveViewportTo( Viewport.x, Viewport.y );
 	}
 }
 

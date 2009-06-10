@@ -69,6 +69,11 @@ void GlobalTimer::Freeze()
 		return;
 	}
 	game->RealTime+=advance;
+
+	// show scrolling cursor while paused
+	GameControl* gc = core->GetGameControl();
+	if (gc)
+		gc->UpdateScrolling();
 }
 
 bool GlobalTimer::ViewportIsMoving()
