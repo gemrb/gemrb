@@ -993,7 +993,7 @@ int GameScript::ItemIsIdentified(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) scr;
-	if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_IDENTIFIED) ) {
+	if (HasItemCore(&actor->inventory, parameters->string0Parameter, IE_INV_ITEM_IDENTIFIED) ) {
 		return 1;
 	}
 	return 0;
@@ -1076,7 +1076,7 @@ int GameScript::PartyHasItem(Scriptable * /*Sender*/, Trigger* parameters)
 	int i = game->GetPartySize(true);
 	while(i--) {
 		Actor *actor = game->GetPC(i, true);
-		if (actor->inventory.HasItem(parameters->string0Parameter,parameters->int0Parameter) ) {
+		if (HasItemCore(&actor->inventory, parameters->string0Parameter, parameters->int0Parameter) ) {
 			return 1;
 		}
 	}
@@ -1090,7 +1090,7 @@ int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* paramet
 	int i = game->GetPartySize(true);
 	while(i--) {
 		Actor *actor = game->GetPC(i, true);
-		if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_IDENTIFIED) ) {
+		if (HasItemCore(&actor->inventory, parameters->string0Parameter, IE_INV_ITEM_IDENTIFIED) ) {
 			return 1;
 		}
 	}
