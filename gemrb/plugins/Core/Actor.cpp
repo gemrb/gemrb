@@ -3365,7 +3365,7 @@ int Actor::GetDefense(int DamageType)
 				stars = GetStat(IE_PROFICIENCYSINGLEWEAPON)&PROFS_MASK;
 				if (stars>STYLE_MAX) stars = STYLE_MAX;
 				defense += wssingle[stars][0];
-			} else if (DamageType == DAMAGE_MISSILE) {
+			} else if (weapon_damagetype[DamageType] == DAMAGE_MISSILE) {
 				//sword-shield style applies only to missile ac
 				stars = GetStat(IE_PROFICIENCYSWORDANDSHIELD)&PROFS_MASK;
 				if (stars>STYLE_MAX) stars = STYLE_MAX;
