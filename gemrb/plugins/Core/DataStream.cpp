@@ -173,6 +173,8 @@ int DataStream::ReadResRef(ieResRef dest)
 		if (dest[i] == ' ') dest[i] = 0;
 		else break;
 	}
+	// null-terminate
+	dest[8] = 0;
 	return len;
 }
 
