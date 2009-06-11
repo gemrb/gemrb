@@ -3157,8 +3157,6 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	nextattack = 0;
 	lastattack = 0;
 
-	printf("InitRound Begin: gameTime: %d\n", gameTime);
-
 	//we set roundTime to zero on any of the following returns, because this
 	//is guaranteed to be the start of a round, and we only want roundTime
 	//if we are attacking this round
@@ -3203,7 +3201,10 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	//set our apr and starting round time
 	attacksperround = attackcount;
 	roundTime = gameTime;
-	printf("InitRound End: Attack Count: %d | Number of Attacks: %d\n", attackcount, GetStat(IE_NUMBEROFATTACKS));
+
+	//print a little message :)
+	printMessage("InitRound", " ", WHITE);
+	printf("Name: %s | Attacks: %d | Start: %d\n", ShortName, attacksperround, gameTime);
 
 	// this might not be the right place, but let's give it a go
 	if (attacksperround && InParty) {
@@ -3476,11 +3477,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 		//we can still attack this round if we have a speed factor of 0
 		if (nextattack > gameTime) {
-			printf("APR: %d | Attacks Left: %d\n", attacksperround, attackcount);
-			printf("Next Attack: %d | CurrentTime: %d\n", nextattack, gameTime);
 			return;
-		} else {
-			printf("Initiative: 0!\n");
 		}
 	}
 
@@ -3500,9 +3497,10 @@ void Actor::PerformAttack(ieDword gameTime)
 	lastattack = gameTime;
 
 	//debug messages
+	printMessage("Attack"," ",GREEN);
 	if (attacksperround) {
-		printf("APR: %d | Attacks Left: %d\n", attacksperround, attackcount);
-		printf("Next Attack: %d | CurrentTime: %d\n", nextattack, gameTime);
+		printf("Left: %d | ", attackcount);
+		printf("Next: %d ", nextattack);
 	}
 
 	int roll = core->Roll(1,ATTACKROLL,0);
@@ -3519,14 +3517,15 @@ void Actor::PerformAttack(ieDword gameTime)
 				inventory.BreakItemSlot(wi.slot);
 			}
 		}
+		printBracket("Critical Miss", RED);
+		printf("\n");
 		return;
 	}
 	//damage type is?
 	//modify defense with damage type
 	ieDword damagetype = hittingheader->DamageType;
-	printMessage("Attack"," ",GREEN);
 	int damage = core->Roll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus);
-	printf("Damage %dd%d%+d = %d\n",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
+	printf("| Damage %dd%d%+d = %d ",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
 	int damageluck = (int) GetStat(IE_DAMAGELUCK);
 	if (damage<damageluck) {
 		damage = damageluck;
@@ -3534,6 +3533,8 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (roll>=ATTACKROLL-(int) GetStat(IE_CRITICALHITBONUS) ) {
 		//critical success
+		printBracket("Critical Hit", GREEN);
+		printf("\n");
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
 		DealDamage (target, damage, damagetype, &wi, true);
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
@@ -3555,8 +3556,12 @@ void Actor::PerformAttack(ieDword gameTime)
 		if (Flags&WEAPON_RANGED) {//Launch the projectile anyway
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		}
+		printBracket("Missed", LIGHT_RED);
+		printf("\n");
 		return;
 	}
+	printBracket("Hit", GREEN);
+	printf("\n");
 	DealDamage (target, damage, damagetype, &wi, false);
 	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 }
