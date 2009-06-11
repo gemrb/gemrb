@@ -3497,7 +3497,11 @@ void Actor::PerformAttack(ieDword gameTime)
 	lastattack = gameTime;
 
 	//debug messages
-	printMessage("Attack"," ",GREEN);
+	if (leftorright && IsDualWielding()) {
+		printMessage("Attack","(Off) ", YELLOW);
+	} else {
+		printMessage("Attack","(Main) ", GREEN);
+	}
 	if (attacksperround) {
 		printf("Left: %d | ", attackcount);
 		printf("Next: %d ", nextattack);
