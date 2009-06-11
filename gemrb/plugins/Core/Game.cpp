@@ -1127,6 +1127,8 @@ void Game::UpdateScripts()
 	}
 
 	// perhaps a StartMusic action stopped the area music?
+	// (we should probably find a less silly way to handle this,
+	// because nothing can ever stop area music now..)
 	if (!core->GetMusicMgr()->IsPlaying()) {
 		 ChangeSong(false);
 	}

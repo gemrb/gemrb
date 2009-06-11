@@ -317,6 +317,7 @@ public:
 	Sprite2D **TooltipBack;
 	Sprite2D *WindowFrames[4];
 	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6];
+	std::vector<const char *> musiclist;
 public:
 	Interface(int iargc, char *iargv[]);
 	~Interface(void);
@@ -614,6 +615,8 @@ public:
 	ieDword TranslateStat(const char *stat_name);
 	/** Opens CD prompt window and waits for the specified disc */
 	void WaitForDisc(int disc_number, const char* path);
+	/** Returns the music playlist corresponding to the provided type */
+	const char *GetMusicPlaylist(int SongType) const;
 private:
 	int LoadSprites();
 	bool LoadConfig(void);
@@ -626,6 +629,7 @@ private:
 	bool ReadItemTable(const ieResRef item, const char *Prefix);
 	bool ReadAbilityTables();
 	bool ReadAbilityTable(const ieResRef name, ieWordSigned *mem, int cols, int rows);
+	bool ReadMusicTable(const ieResRef name, int col);
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);
 	/** Reads itemexcl, itemdial, tooltip */

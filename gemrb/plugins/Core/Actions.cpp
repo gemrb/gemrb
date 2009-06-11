@@ -1501,14 +1501,11 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 /*switchplaylist could implement fade */
 void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 {
-	AutoTable music("music");
-	if (music) {
-		const char* string = music->QueryField( parameters->int0Parameter, 0 );
-		if (string[0] == '*') {
-			core->GetMusicMgr()->HardEnd();
-		} else {
-			core->GetMusicMgr()->SwitchPlayList( string, true );
-		}
+	const char* string = core->GetMusicPlaylist( parameters->int0Parameter );
+	if (!string || string[0] == '*') {
+		core->GetMusicMgr()->HardEnd();
+	} else {
+		core->GetMusicMgr()->SwitchPlayList( string, true );
 	}
 }
 

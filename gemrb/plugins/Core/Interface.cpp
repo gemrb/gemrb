@@ -346,6 +346,8 @@ Interface::~Interface(void)
 	FreeResourceVector( Font, fonts );
 	FreeResourceVector( Window, windows );
 
+	FreeResourceVector( const char *, musiclist );
+
 	delete projserv;
 
 	delete console;
@@ -856,6 +858,25 @@ int Interface::GetAreaAlias(const ieResRef areaname) const
 		return (int) value;
 	}
 	return -1;
+}
+
+bool Interface::ReadMusicTable(const ieResRef tablename, int col) {
+	AutoTable tm(tablename);
+	if (!tm)
+		return false;
+
+	for (unsigned int i = 0; i < tm->GetRowCount(); i++) {
+		musiclist.push_back(strdup(tm->QueryField(i, col)));
+	}
+
+	return true;
+}
+
+const char *Interface::GetMusicPlaylist(int SongType) const {
+	if (SongType < 0 || (unsigned int)SongType >= musiclist.size())
+		return NULL;
+	
+	return musiclist[SongType];
 }
 
 static const Color white = {0xff,0xff,0xff,0xff};
@@ -1431,6 +1452,21 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
+	
+	printMessage("Core", "Loading music list...\n", WHITE );
+	if (HasFeature( GF_HAS_SONGLIST )) {
+		ret = ReadMusicTable("songlist", 1);
+	} else {
+		/*since bg1 and pst has no .2da for songlist,
+		we must supply one in the gemrb/override folder.
+		It should be: music.2da, first column is a .mus filename*/
+		ret = ReadMusicTable("music", 0);
+	}
+	if (ret) {
+		printStatus( "OK", LIGHT_GREEN );
+	} else {
+		printStatus( "NOT FOUND", YELLOW );
+	}
 
 	if (HasFeature( GF_RESDATA_INI )) {
 		printMessage( "Core", "Loading resource data File...", WHITE );

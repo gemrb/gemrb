@@ -1452,26 +1452,8 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 
 void Map::PlayAreaSong(int SongType, bool restart)
 {
-	//you can speed this up by loading the songlist once at startup
-	int column;
-	const char* tablename;
-
-	if (core->HasFeature( GF_HAS_SONGLIST )) {
-		column = 1;
-		tablename = "songlist";
-	} else {
-		/*since bg1 and pst has no .2da for songlist,
-		we must supply one in the gemrb/override folder.
-		It should be: music.2da, first column is a .mus filename
-		*/
-		column = 0;
-		tablename = "music";
-	}
-
-	AutoTable tm(tablename);
-	if (!tm)
-		return;
-	const char* poi = tm->QueryField( SongHeader.SongList[SongType], column );
+	const char* poi = core->GetMusicPlaylist( SongHeader.SongList[SongType] );
+	if (!poi) return;
 	if (!restart && core->GetMusicMgr()->CurrentPlayList(poi)) return;
 	core->GetMusicMgr()->SwitchPlayList( poi, true );
 }
