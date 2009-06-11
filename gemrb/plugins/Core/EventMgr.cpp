@@ -266,7 +266,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 				last_win_mousefocused = *m;
 				if (ctrl != NULL) {
 					last_win_mousefocused->SetMouseFocused( ctrl );
-					ctrl->OnMouseDown( x - last_win_focused->XPos - ctrl->XPos, y - last_win_focused->YPos - ctrl->YPos, Button, Mod );
+					ctrl->OnMouseDown( x - last_win_mousefocused->XPos - ctrl->XPos, y - last_win_mousefocused->YPos - ctrl->YPos, Button, Mod );
 					return;
 				}
 			}
