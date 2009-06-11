@@ -1227,6 +1227,8 @@ void Game::RestParty(int checks, int dream, int hp)
 
 	//rest check, if PartyRested should be set, area should return true
 	//area should advance gametime too (so partial rest is possible)
+	char buffer[8];
+	int hours = 8;
 	if (!(checks&REST_NOAREA) ) {
 		//you cannot rest here
 		if (area->AreaFlags&1) {
@@ -1278,6 +1280,30 @@ void Game::RestParty(int checks, int dream, int hp)
 		tar->PartyRested();
 	}
 	core->SetEventFlag(EF_ACTION);
+
+	//restindex will be -1 in the case of PST
+	int restindex = core->GetStringReference(STR_REST);
+	int strindex;
+	char* tmpstr = NULL;
+	snprintf(buffer, 8, "%d", hours);
+
+	core->GetTokenDictionary()->SetAtCopy("HOUR", buffer);
+	if (restindex != -1) {
+		strindex = core->GetStringReference(STR_HOURS);
+	} else {
+		strindex = core->GetStringReference(STR_PST_HOURS);
+		restindex = core->GetStringReference(STR_PST_REST);
+	}
+
+	//this would be bad
+	if (strindex == -1 || restindex == -1) return;
+	tmpstr = core->GetString(strindex, 0);
+	//as would this
+	if (!tmpstr) return;
+
+	core->GetTokenDictionary()->SetAtCopy("DURATION", tmpstr);
+	core->FreeString(tmpstr);
+	core->DisplayString(restindex, 0xffffff, 0);
 }
 
 //timestop effect

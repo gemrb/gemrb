@@ -149,7 +149,16 @@
 #define STR_INJURED2      115
 #define STR_INJURED3      116
 #define STR_INJURED4      117       //near death
+#define STR_HOURS         118       //<HOUR> hours
+#define STR_HOUR          119
+#define STR_DAYS          120       //<GAMEDAYS> days
+#define STR_DAY           121
+#define STR_REST          122       //You have rested for <DURATION>
+#define STR_JOURNEY       123       //The journey took <DURATION>
+#define STR_PST_REST      124       //You have rested for <HOUR> <DURATION>
+#define STR_PST_HOUR      125
+#define STR_PST_HOURS     126
 
-#define STRREF_COUNT 118
+#define STRREF_COUNT 127
 
 #endif //! IE_STRINGS_H
