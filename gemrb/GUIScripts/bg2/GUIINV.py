@@ -641,9 +641,14 @@ def OpenItemAmountWindow ():
 
 	if GemRB.IsDraggingItem ()==1:
 		GemRB.DropDraggedItem (pc, slot)
+		# disallow splitting while holding split items (double splitting)
+		if GemRB.IsDraggingItem () == 1:
+			UpdateSlot (pc, slot-1)
+			return
+	else:
+		return
 
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
-	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
 
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	ResRef = slot_item['ItemResRef']
@@ -654,9 +659,10 @@ def OpenItemAmountWindow ():
 	else:
 		StackAmount = 0
 	if StackAmount<=1:
-		OpenItemAmountWindow ()
+		UpdateSlot (pc, slot-1)
 		return
 
+	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
 	# item icon
 	Icon = Window.GetControl (0)
 	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
