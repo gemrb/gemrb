@@ -468,8 +468,8 @@ public:
 		ieDword &Flags, int &DamageBonus, int &speed);
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
-	/* deal damage to target */
-	void DealDamage(Actor *target, int &damage, int damagetype, WeaponInfo *wi, bool critical);
+	/* ensures we can deal damage to a target */
+	bool CanDamage(Actor *target, int &damage, WeaponInfo *wi, bool critical);
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
 	/* sets an RGB colour modification effect; location 0xff for global */

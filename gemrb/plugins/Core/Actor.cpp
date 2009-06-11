@@ -3283,7 +3283,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 
 		DamageBonus += wstwohanded[stars][0];
 		//TODO: critical bonus
-		speed -= wstwohanded[stars][2];
+		speed += wstwohanded[stars][2];
 	} else if ((Flags&WEAPON_MELEE) && wssingle) {
 		int slot;
 		//NULL return means no shield slot
@@ -3510,6 +3510,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	int roll = core->Roll(1,ATTACKROLL,0);
 	if (roll==1) {
 		//critical failure
+		printBracket("Critical Miss", RED);
+		printf("\n");
 		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
 		if (Flags&WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
@@ -3521,8 +3523,6 @@ void Actor::PerformAttack(ieDword gameTime)
 				inventory.BreakItemSlot(wi.slot);
 			}
 		}
-		printBracket("Critical Miss", RED);
-		printf("\n");
 		return;
 	}
 	//damage type is?
@@ -3540,7 +3540,9 @@ void Actor::PerformAttack(ieDword gameTime)
 		printBracket("Critical Hit", GREEN);
 		printf("\n");
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
-		DealDamage (target, damage, damagetype, &wi, true);
+		if (!CanDamage (target, damage, &wi, true)) {
+			damage = 0;
+		}
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 		return;
 	}
@@ -3566,7 +3568,9 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	printBracket("Hit", GREEN);
 	printf("\n");
-	DealDamage (target, damage, damagetype, &wi, false);
+	if (!CanDamage (target, damage, &wi, false)) {
+		damage = 0;
+	}
 	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 }
 
@@ -3575,21 +3579,21 @@ static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
 static EffectRef fx_mirrorimage_ref={"MirrorImageModifier",NULL,-1};
 static EffectRef fx_aegis_ref={"Aegis",NULL,-1};
 
-void Actor::DealDamage(Actor *target, int &damage, int damagetype, WeaponInfo *wi, bool critical)
+bool Actor::CanDamage(Actor *target, int &damage, WeaponInfo *wi, bool critical)
 {
 	int stoneskins = target->Modified[IE_STONESKINS];
 	if (stoneskins) {
 		target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin_ref, 1);
 		target->fxqueue.DecreaseParam1OfEffect(fx_aegis_ref, 1);
 		target->Modified[IE_STONESKINS]--;
-		return;
+		return false;
 	}
 
 	stoneskins = target->Modified[IE_STONESKINSGOLEM];
 	if (stoneskins) {
 		target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin2_ref, 1);
 		target->Modified[IE_STONESKINSGOLEM]--;
-		return;
+		return false;
 	}
 
 	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
@@ -3597,7 +3601,7 @@ void Actor::DealDamage(Actor *target, int &damage, int damagetype, WeaponInfo *w
 		if (core->Roll(1,mirrorimages+1,0)!=1) {
 			target->fxqueue.DecreaseParam1OfEffect(fx_mirrorimage_ref, 1);
 			target->Modified[IE_MIRRORIMAGES]--;
-			return;
+			return false;
 		}
 	}
 
@@ -3611,7 +3615,7 @@ void Actor::DealDamage(Actor *target, int &damage, int damagetype, WeaponInfo *w
 
 	if (!damage) {
 		DisplayStringCore(this, VB_TIMMUNE, DS_CONSOLE|DS_CONST );
-		return;
+		return false;
 	}
 
 	if (critical) {
@@ -3626,15 +3630,7 @@ void Actor::DealDamage(Actor *target, int &damage, int damagetype, WeaponInfo *w
 			core->timer->SetScreenShake(2,2,2);
 		}
 	}
-	ieDword tmp = target->Modified[IE_MINHITPOINTS];
-	if (damagetype>5) {
-		//hack for nonlethal damage (this round only)
-		target->Modified[IE_MINHITPOINTS]=1;
-		damagetype = 0;
-	}
-	//This will be done by useitem
-	/*target->Damage(damage, weapon_damagetype[damagetype], this);*/
-	target->Modified[IE_MINHITPOINTS]=tmp;
+	return true;
 }
 
 //idx could be: 0-6, 16-22, 32-38, 48-54
