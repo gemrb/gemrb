@@ -2192,14 +2192,14 @@ bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete)
 }
 
 //returns actual damage
-int Actor::Damage(int damage, int damagetype, Actor *hitter)
+int Actor::Damage(int damage, int damagetype, Actor *hitter, int modtype)
 {
 	//add lastdamagetype up
 	LastDamageType|=damagetype;
 	LastHitter=hitter->GetID();
-	//recalculate damage based on resistances and difficulty level
-	//the lower 2 bits are actually modifier types
-	switch(damagetype&3)
+	//note: the lower 2 bits are actually modifier types
+	// this is processed elsewhere and sent as modtype
+	switch(modtype)
 	{
 	case MOD_ADDITIVE:
 		damage = -NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);

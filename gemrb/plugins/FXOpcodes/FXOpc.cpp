@@ -1150,11 +1150,12 @@ int fx_damage (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_damage (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	//save for half damage type
-	ieDword damagetype = fx->Parameter2;
-	if ((damagetype&3)==3) {
-		damagetype&=~3;
+	ieDword damagetype = fx->Parameter2>>16;
+	ieDword modtype = fx->Parameter2&3;
+	if (modtype==3) {
+		modtype&=~3;
 	}
-	target->Damage(fx->Parameter1, damagetype, Owner);
+	target->Damage(fx->Parameter1, damagetype, Owner, modtype);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }
