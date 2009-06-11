@@ -469,7 +469,7 @@ public:
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
 	/* ensures we can deal damage to a target */
-	bool CanDamage(Actor *target, int &damage, WeaponInfo *wi, bool critical);
+	void ModifyDamage(Actor *target, int &damage, WeaponInfo *wi, bool critical);
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
 	/* sets an RGB colour modification effect; location 0xff for global */

@@ -3540,9 +3540,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		printBracket("Critical Hit", GREEN);
 		printf("\n");
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
-		if (!CanDamage (target, damage, &wi, true)) {
-			damage = 0;
-		}
+		ModifyDamage (target, damage, &wi, true);
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 		return;
 	}
@@ -3568,9 +3566,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	printBracket("Hit", GREEN);
 	printf("\n");
-	if (!CanDamage (target, damage, &wi, false)) {
-		damage = 0;
-	}
+	ModifyDamage (target, damage, &wi, false);
 	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 }
 
@@ -3579,21 +3575,23 @@ static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
 static EffectRef fx_mirrorimage_ref={"MirrorImageModifier",NULL,-1};
 static EffectRef fx_aegis_ref={"Aegis",NULL,-1};
 
-bool Actor::CanDamage(Actor *target, int &damage, WeaponInfo *wi, bool critical)
+void Actor::ModifyDamage(Actor *target, int &damage, WeaponInfo *wi, bool critical)
 {
 	int stoneskins = target->Modified[IE_STONESKINS];
 	if (stoneskins) {
 		target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin_ref, 1);
 		target->fxqueue.DecreaseParam1OfEffect(fx_aegis_ref, 1);
 		target->Modified[IE_STONESKINS]--;
-		return false;
+		damage = 0;
+		return;
 	}
 
 	stoneskins = target->Modified[IE_STONESKINSGOLEM];
 	if (stoneskins) {
 		target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin2_ref, 1);
 		target->Modified[IE_STONESKINSGOLEM]--;
-		return false;
+		damage = 0;
+		return;
 	}
 
 	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
@@ -3601,7 +3599,8 @@ bool Actor::CanDamage(Actor *target, int &damage, WeaponInfo *wi, bool critical)
 		if (core->Roll(1,mirrorimages+1,0)!=1) {
 			target->fxqueue.DecreaseParam1OfEffect(fx_mirrorimage_ref, 1);
 			target->Modified[IE_MIRRORIMAGES]--;
-			return false;
+			damage = 0;
+			return;
 		}
 	}
 
@@ -3609,13 +3608,11 @@ bool Actor::CanDamage(Actor *target, int &damage, WeaponInfo *wi, bool critical)
 		damage = 0;
 	}
 
-	if (damage<0) damage = 0;
-
 	//check casting failure
-
+	if (damage<0) damage = 0;
 	if (!damage) {
 		DisplayStringCore(this, VB_TIMMUNE, DS_CONSOLE|DS_CONST );
-		return false;
+		return;
 	}
 
 	if (critical) {
@@ -3630,7 +3627,7 @@ bool Actor::CanDamage(Actor *target, int &damage, WeaponInfo *wi, bool critical)
 			core->timer->SetScreenShake(2,2,2);
 		}
 	}
-	return true;
+	return;
 }
 
 //idx could be: 0-6, 16-22, 32-38, 48-54
