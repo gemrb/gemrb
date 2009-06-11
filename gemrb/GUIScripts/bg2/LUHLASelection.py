@@ -59,6 +59,10 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	# get all our HLAs (stored in HLAAbilities)
 	GetHLAs ()
 
+	# change the title to ABILITIES
+	TitleLabel = HLAWindow.GetControl (0x10000017)
+	TitleLabel.SetText (63818)
+
 	# create the done button
 	HLADoneButton = HLAWindow.GetControl (28)
 	HLADoneButton.SetState(IE_GUI_BUTTON_DISABLED)
@@ -170,7 +174,7 @@ def HLAShowAbilities ():
 	HLAShowSelectedAbilities ()
 
 	GemRB.SetToken("number", str(HLACount))
-	HLATextArea.SetText(17250)
+	HLATextArea.SetText(63817)
 
 	# show the points left
 	PointsLeftLabel = HLAWindow.GetControl (0x10000018)
