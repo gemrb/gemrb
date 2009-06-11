@@ -79,7 +79,9 @@ struct Effect {
 	ieDword Power;
 	ieDword Parameter1;
 	ieDword Parameter2;
-	ieDword TimingMode;
+	ieByte TimingMode;
+	ieByte unknown1;
+	ieWord unknown2;
 	ieDword Resistance;
 	ieDword Duration;
 	ieWord Probability1;

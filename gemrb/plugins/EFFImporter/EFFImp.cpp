@@ -117,7 +117,9 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->ReadDword( &fx->Power );
 	str->ReadDword( &fx->Parameter1 );
 	str->ReadDword( &fx->Parameter2 );
-	str->ReadDword( &fx->TimingMode );
+	str->Read( &fx->TimingMode, 1 );
+	str->Read( &fx->unknown1, 1 );
+	str->ReadWord( &fx->unknown2 );
 	str->ReadDword( &fx->Duration );
 	str->ReadWord( &fx->Probability1 );
 	str->ReadWord( &fx->Probability2 );

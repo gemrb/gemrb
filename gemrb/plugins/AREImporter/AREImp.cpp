@@ -1997,7 +1997,9 @@ int AREImp::PutEffects( DataStream *stream, EffectQueue *fxqueue)
 		stream->WriteDword( &fx->Power);
 		stream->WriteDword( &fx->Parameter1);
 		stream->WriteDword( &fx->Parameter2);
-		stream->WriteDword( &fx->TimingMode);
+		stream->Write( &fx->TimingMode, 1);
+		stream->Write( &fx->unknown1, 1);
+		stream->WriteWord( &fx->unknown2);
 		stream->WriteDword( &fx->Duration);
 		stream->WriteWord( &fx->Probability1);
 		stream->WriteWord( &fx->Probability2);

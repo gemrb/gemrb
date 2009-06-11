@@ -297,7 +297,7 @@ EffectQueue::~EffectQueue()
 	}
 }
 
-Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieDword timing)
+Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieByte timing)
 {
 	if (opcode==0xffffffff) {
 		return NULL;
@@ -342,7 +342,7 @@ void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDw
 	ModifyEffectPoint(effect_reference.EffText, x, y);
 }
 
-Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieDword timing)
+Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieByte timing)
 {
 	ResolveEffectRef(effect_reference);
 	if (effect_reference.EffText<0) {
@@ -926,26 +926,26 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 				return FX_NOT_APPLIED;
 			}
 		}
-		if (NeedPrepare((ieByte) fx->TimingMode) ) {
+		if (NeedPrepare(fx->TimingMode) ) {
 			//save delay for later
 			fx->SecondaryDelay=fx->Duration;
 			PrepareDuration(fx);
 		}
 	}
 	//check if the effect has triggered or expired
-	switch (IsPrepared((ieByte) fx->TimingMode) ) {
+	switch (IsPrepared(fx->TimingMode) ) {
 	case DELAYED:
 		if (fx->Duration>GameTime) {
 			return FX_NOT_APPLIED;
 		}
 		//effect triggered
 		//delayed duration (3)
-		if (NeedPrepare((ieByte) fx->TimingMode) ) {
+		if (NeedPrepare(fx->TimingMode) ) {
 			//prepare for delayed duration effects
 			fx->Duration=fx->SecondaryDelay;
 			PrepareDuration(fx);
 		}
-		fx->TimingMode=TriggeredEffect((ieByte) fx->TimingMode);
+		fx->TimingMode=TriggeredEffect(fx->TimingMode);
 		break;
 	case DURATION:
 		if (fx->Duration<=GameTime) {
@@ -1021,7 +1021,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 // useful for: remove projectile type
 #define MATCH_PROJECTILE() if((*f)->Projectile!=projectile) { continue; }
 
-#define MATCH_LIVE_FX() {ieDword tmp=(*f)->TimingMode; \
+#define MATCH_LIVE_FX() {ieByte tmp=(*f)->TimingMode; \
 		if (tmp!=FX_DURATION_INSTANT_LIMITED && \
 			tmp!=FX_DURATION_INSTANT_PERMANENT && \
 			tmp!=FX_DURATION_INSTANT_WHILE_EQUIPPED && \
@@ -1084,7 +1084,7 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 }
 
 //remove effects belonging to a given spell, but only if they match timing method x
-void EffectQueue::RemoveAllEffects(const ieResRef Removed, ieDword timing) const
+void EffectQueue::RemoveAllEffects(const ieResRef Removed, ieByte timing) const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
@@ -1180,7 +1180,7 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime) const
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//FIXME: how this method handles delayed effects???
 		//it should remove them as well, i think
-		if ( IsPrepared( (ieByte) ((*f)->TimingMode) )!=PERMANENT ) {
+		if ( IsPrepared( ((*f)->TimingMode) )!=PERMANENT ) {
 			if ( (*f)->Duration<=GameTime) {
 				(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
 			}
@@ -1645,7 +1645,7 @@ ieDword EffectQueue::GetSavedEffectsCount() const
 	return cnt;
 }
 
-void EffectQueue::TransformToDelay(ieDword &TimingMode)
+void EffectQueue::TransformToDelay(ieByte &TimingMode)
 {
 	if (TimingMode<MAX_TIMING_MODE) {;
 		TimingMode = fx_to_delayed[TimingMode];
