@@ -1328,7 +1328,8 @@ int fx_current_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter2&0x20000) {
 		target->fxqueue.RemoveAllNonPermanentEffects();
 	}
-	return FX_PERMANENT;
+	//never stay permanent
+	return FX_NOT_APPLIED;
 }
 
 // 0x12 MaximumHPModifier
