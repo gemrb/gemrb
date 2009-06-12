@@ -1290,6 +1290,8 @@ int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		target->AddPortraitIcon(PI_HASTED);
 		STAT_SET(IE_IMPROVEDHASTE,0);
 		STAT_SET(IE_ATTACKNUMBERDOUBLE,0);
+		STAT_ADD(IE_NUMBEROFATTACKS, 2);
+		// TODO: -2 initiative bonus
 		break;
 	case 1://improved haste
 		target->AddPortraitIcon(PI_IMPROVEDHASTE);
@@ -1302,6 +1304,7 @@ int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		STAT_SET(IE_ATTACKNUMBERDOUBLE,1);
 		break;
 	}
+	if (target->InParty) core->SetEventFlag(EF_PORTRAIT);
 
 	return FX_PERMANENT;
 }
