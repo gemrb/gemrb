@@ -346,7 +346,10 @@ Interface::~Interface(void)
 	FreeResourceVector( Font, fonts );
 	FreeResourceVector( Window, windows );
 
-	FreeResourceVector( const char *, musiclist );
+	unsigned int i;
+	for (i = 0; i < musiclist.size(); i++) {
+		free((void *)musiclist[i]);
+	}
 
 	delete projserv;
 
@@ -362,8 +365,6 @@ Interface::~Interface(void)
 	FreeInterface( windowmgr );
 
 	if (video) {
-		unsigned int i;
-
 		//for(i=0;i<sizeof(ArrowSprites)/sizeof(Sprite2D *);i++ ) {
 		//	video->FreeSprite(ArrowSprites[i]);
 		//}
