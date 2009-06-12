@@ -398,7 +398,7 @@ public:
 
 	void SetStance(unsigned int arg);
 	void SetAttackMoveChances(ieWord *amc);
-	void DoStep(unsigned int walk_speed);
+	bool DoStep(unsigned int walk_speed, ieDword time = 0);
 	void AddWayPoint(Point &Des);
 	void RunAwayFrom(Point &Des, int PathLength, int flags);
 	void RandomWalk(bool can_stop, bool run);

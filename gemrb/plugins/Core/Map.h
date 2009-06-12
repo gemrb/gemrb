@@ -274,6 +274,7 @@ public:
 	/* sets all the auxiliary maps and the tileset */
 	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, ImageMgr* hm);
 	void UpdateScripts();
+	bool DoStepForActor(Actor *actor, int speed, ieDword time);
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
 	int ConsolidateContainers();

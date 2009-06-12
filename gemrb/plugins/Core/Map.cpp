@@ -568,13 +568,20 @@ void Map::UpdateScripts()
 	Actor *timestop_owner = game->timestop_owner;
 	bool timestop = game->timestop_end>game->GameTime;
 
+	// this is silly, the speed should be pre-calculated somewhere
+	int *actor_speeds = (int *)calloc(Qcount[PR_SCRIPT], sizeof(int));
+	
+	bool *no_more_steps_for_actor = (bool *)calloc(Qcount[PR_SCRIPT], sizeof(bool));
+
 	while (q--) {
 		Actor* actor = queue[PR_SCRIPT][q];
 		//actor just moved away, don't run its script from this side
 		if (actor->GetCurrentArea()!=this) {
+			no_more_steps_for_actor[q] = true;
 			continue;
 		}
 		if (timestop && actor!=timestop_owner && actor->Modified[IE_DISABLETIMESTOP] ) {
+			no_more_steps_for_actor[q] = true;
 			continue;
 		}
 		actor->ExecuteScript( MAX_SCRIPTS );
@@ -604,37 +611,29 @@ void Map::UpdateScripts()
 				}
 			}
 		}
+		actor_speeds[q] = speed;
+	}
 
-		if (actor->Modified[IE_DONOTJUMP]<2) {
-			Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*16);
-			BlockSearchMap( actor->Pos, actor->size, 0);
+	// We need to step through the list of actors until all of them are done
+	// taking steps.
+	bool more_steps = true;
+	ieDword time = core->GetGame()->Ticks; // make sure everything moves at the same time
+	while (more_steps) {
+		more_steps = false;
 
-			// Restore the searchmap areas of any nearby actors that could
-			// have been cleared by this BlockSearchMap(..., 0).
-			// (Necessary since blocked areas of actors may overlap.)
-			int i=0;
-			while(nearActors[i]!=NULL) {
-				if(nearActors[i]!=actor)
-					BlockSearchMap( nearActors[i]->Pos, nearActors[i]->size, nearActors[i]->InParty?PATH_MAP_PC:PATH_MAP_NPC);
-				++i;
-			}
+		q=Qcount[PR_SCRIPT];
+		while (q--) {
+			if (no_more_steps_for_actor[q]) continue;
 
-			PathNode * step = actor->GetNextStep();
-			if (step && step->Next) {
-				//we should actually wait for a short time and check then
-				if (GetBlocked(step->Next->x*16+8,step->Next->y*12+6,actor->size)) {
-					actor->NewPath();
-				}
-			}
-			free(nearActors);
-		}
-		if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
-			if (!actor->Immobile()) {
-				actor->DoStep( speed );
-				BlockSearchMap( actor->Pos, actor->size, actor->InParty?PATH_MAP_PC:PATH_MAP_NPC);
-			}
+			Actor* actor = queue[PR_SCRIPT][q];
+		
+			no_more_steps_for_actor[q] = DoStepForActor(actor, actor_speeds[q], time);
+			if (!no_more_steps_for_actor[q]) more_steps = true;
 		}
 	}
+
+	free(no_more_steps_for_actor);
+	free(actor_speeds);
 
 	//Check if we need to start some door scripts
 	int doorCount = 0;
@@ -726,6 +725,45 @@ void Map::UpdateScripts()
 			ip->ProcessActions(false);
 		}
 	}
+}
+
+bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
+	bool no_more_steps = true;
+
+	if (actor->Modified[IE_DONOTJUMP]<2) {
+		Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*16);
+		BlockSearchMap( actor->Pos, actor->size, 0);
+
+		// Restore the searchmap areas of any nearby actors that could
+		// have been cleared by this BlockSearchMap(..., 0).
+		// (Necessary since blocked areas of actors may overlap.)
+		int i=0;
+		while(nearActors[i]!=NULL) {
+			if(nearActors[i]!=actor)
+				BlockSearchMap( nearActors[i]->Pos, nearActors[i]->size, nearActors[i]->InParty?PATH_MAP_PC:PATH_MAP_NPC);
+			++i;
+		}
+		free(nearActors);
+
+		PathNode * step = actor->GetNextStep();
+		if (step && step->Next) {
+			//we should actually wait for a short time and check then
+			if (GetBlocked(step->Next->x*16+8,step->Next->y*12+6,actor->size)) {
+				actor->NewPath();
+			}
+		}
+	}
+	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
+		if (!actor->Immobile()) {
+			no_more_steps = actor->DoStep( speed, time );
+			// if IE_DONOTJUMP means don't touch the searchmap, we shouldn't be blocking it here?
+			if (actor->Modified[IE_DONOTJUMP]<2) {
+				BlockSearchMap( actor->Pos, actor->size, actor->InParty?PATH_MAP_PC:PATH_MAP_NPC);
+			}
+		}
+	}
+
+	return no_more_steps;
 }
 
 void Map::DrawHighlightables( Region screen )

@@ -1017,26 +1017,42 @@ void Movable::MoveLine(int steps, int Pass, ieDword orient)
 	path = area->GetLine( p, steps, orient, Pass );
 }
 
-void Movable::DoStep(unsigned int walk_speed)
+void AdjustPositionTowards(Point &Pos, ieDword time_diff, unsigned int walk_speed, short srcx, short srcy, short destx, short desty) {
+	if (destx > srcx)
+		Pos.x += ( unsigned short )
+			( ( ( ( ( destx * 16 ) + 8 ) - Pos.x ) * ( time_diff ) ) / walk_speed );
+	else
+		Pos.x -= ( unsigned short )
+			( ( ( Pos.x - ( ( destx * 16 ) + 8 ) ) * ( time_diff ) ) / walk_speed );
+	if (desty > srcy)
+		Pos.y += ( unsigned short )
+			( ( ( ( ( desty * 12 ) + 6 ) - Pos.y ) * ( time_diff ) ) / walk_speed );
+	else
+		Pos.y -= ( unsigned short )
+			( ( ( Pos.y - ( ( desty * 12 ) + 6 ) ) * ( time_diff ) ) / walk_speed );
+	
+}
+
+// returns whether we made all pending steps (so, false if we must be called again this tick)
+// we can't just do them all here because the caller might have to update searchmap etc
+bool Movable::DoStep(unsigned int walk_speed, ieDword time)
 {
 	if (!path) {
-		return;
+		return true;
 	}
-	ieDword time = core->GetGame()->Ticks;
+	if (!time) time = core->GetGame()->Ticks;
 	if (!step) {
 		step = path;
 		timeStartStep = time;
-	}
-	while (step->Next && (( time - timeStartStep ) >= walk_speed)) {
+	} else if (step->Next && (( time - timeStartStep ) >= walk_speed)) {
 		//printf("[New Step] : Orientation = %d\n", step->orient);
 		step = step->Next;
 		if (!walk_speed) {
 			timeStartStep = time;
-			break;
+		} else {
+			timeStartStep = timeStartStep + walk_speed;
 		}
-		timeStartStep = timeStartStep + walk_speed;
 	}
-
 	SetOrientation (step->orient, false);
 	StanceID = IE_ANI_WALK;
 	if ((Type == ST_ACTOR) && (InternalFlags & IF_RUNNING)) {
@@ -1045,28 +1061,24 @@ void Movable::DoStep(unsigned int walk_speed)
 	Pos.x = ( step->x * 16 ) + 8;
 	Pos.y = ( step->y * 12 ) + 6;
 	if (!step->Next) {
+		// we reached our destination, we are done
 		ClearPath();
 		NewOrientation = Orientation;
 		//since clearpath no longer sets currentaction to NULL
 		//we set it here
 		ReleaseCurrentAction();
-		return;
+		return true;
 	}
 	if (!walk_speed) {
-		return;
+		// with zero speed, all we can do is one step per frame
+		return true;
 	}
-	if (step->Next->x > step->x)
-		Pos.x += ( unsigned short )
-			( ( ( ( ( step->Next->x * 16 ) + 8 ) - Pos.x ) * ( time - timeStartStep ) ) / walk_speed );
-	else
-		Pos.x -= ( unsigned short )
-			( ( ( Pos.x - ( ( step->Next->x * 16 ) + 8 ) ) * ( time - timeStartStep ) ) / walk_speed );
-	if (step->Next->y > step->y)
-		Pos.y += ( unsigned short )
-			( ( ( ( ( step->Next->y * 12 ) + 6 ) - Pos.y ) * ( time - timeStartStep ) ) / walk_speed );
-	else
-		Pos.y -= ( unsigned short )
-			( ( ( Pos.y - ( ( step->Next->y * 12 ) + 6 ) ) * ( time - timeStartStep ) ) / walk_speed );
+	if (( time - timeStartStep ) >= walk_speed) {
+		// we didn't finish all pending steps, yet
+		return false;
+	}
+	AdjustPositionTowards(Pos, time - timeStartStep, walk_speed, step->x, step->y, step->Next->x, step->Next->y);
+	return true;
 }
 
 void Movable::AddWayPoint(Point &Des)
