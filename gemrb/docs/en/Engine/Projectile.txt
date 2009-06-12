@@ -1,0 +1,9 @@
+Projectile extension flags for GemRB
+
+These flags reside in the .pro format on offset 0x2c
+
+1       Bounce from walls
+2       Continue on original path as travel projectile after explosion
+4       Freeze as travel projectile after explosion (and slowly fade out)
+8       No travel path (move to destination immediately, thus skipping the travel phase)
+16      Trail bams got the same orientation behaviour as the travel bam
