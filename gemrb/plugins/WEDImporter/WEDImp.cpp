@@ -112,7 +112,7 @@ int WEDImp::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 	for (int y = 0; y < overlays->Height; y++) {
 		for (int x = 0; x < overlays->Width; x++) {
 			str->Seek( overlays->TilemapOffset +
-				( y * overlays->Width * 10 ) + ( x * 10 ),
+				( y * overlays->Width + x) * 10,
 				GEM_STREAM_START );
 			ieWord startindex, count, secondary;
 			ieByte overlaymask;
