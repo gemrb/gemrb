@@ -109,6 +109,15 @@ inline int IsPrepared(ieByte timingmode)
 	return fx_prepared[timingmode];
 }
 
+//which effects are removable
+static const bool fx_removable[MAX_TIMING_MODE]={true,true,false,true,false,true,true,true,true,false,true};
+
+inline int IsRemovable(ieByte timingmode)
+{
+	if (timingmode>=MAX_TIMING_MODE) return INVALID;
+	return fx_removable[timingmode];
+}
+
 //change the timing method after the effect triggered
 static const ieByte fx_triggered[MAX_TIMING_MODE]={FX_DURATION_JUST_EXPIRED,FX_DURATION_INSTANT_PERMANENT,//0,1
 FX_DURATION_INSTANT_WHILE_EQUIPPED,FX_DURATION_DELAY_LIMITED_PENDING,//2,3
@@ -1194,7 +1203,7 @@ void EffectQueue::RemoveAllNonPermanentEffects() const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		if( (*f)->TimingMode != FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES) {
+		if( IsRemovable((*f)->TimingMode) ) {
 			(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
 		}
 	}
