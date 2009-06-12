@@ -7880,7 +7880,7 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
 
-			const CREItem *item_slot = actor->inventory.GetItem(item->slot);
+			const CREItem *item_slot = actor->inventory.GetSlotItem(item->slot);
 			int tip = core->GetItemTooltip(item->itemname, item->headerindex, item_slot->Flags&IE_INV_ITEM_IDENTIFIED);
 			if (tip>0) {
 				//cannot make this const, because it will be freed
