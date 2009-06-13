@@ -859,9 +859,21 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		a->SetPos( 0 );
 
 		//setting up the sequencing of animation cycles
-		if (nextStanceID != StanceID)
-			a->Flags |= A_ANI_PLAYONCE ;
 		switch (StanceID) {
+			case IE_ANI_DAMAGE:
+			case IE_ANI_SLEEP:
+			case IE_ANI_TWITCH:
+			case IE_ANI_DIE:
+			case IE_ANI_PST_START:
+			case IE_ANI_HEAD_TURN:
+			case IE_ANI_CONJURE:
+			case IE_ANI_SHOOT:
+			case IE_ANI_ATTACK:
+			case IE_ANI_ATTACK_JAB:
+			case IE_ANI_ATTACK_SLASH:
+			case IE_ANI_ATTACK_BACKSLASH:
+				a->Flags |= A_ANI_PLAYONCE;
+				break;
 			case IE_ANI_EMERGE:
 			case IE_ANI_GET_UP:
 				a->playReversed = true;
