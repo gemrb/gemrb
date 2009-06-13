@@ -158,7 +158,11 @@
 #define STR_PST_REST      124       //You have rested for <HOUR> <DURATION>
 #define STR_PST_HOUR      125
 #define STR_PST_HOURS     126
+#define STR_DAMAGE_IMMUNITY 127
+#define STR_DAMAGE1 128
+#define STR_DAMAGE2 129
+#define STR_DAMAGE3 130
 
-#define STRREF_COUNT 127
+#define STRREF_COUNT 131
 
 #endif //! IE_STRINGS_H

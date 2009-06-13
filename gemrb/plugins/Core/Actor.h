@@ -403,6 +403,8 @@ public:
 	bool HandleCastingStance(const ieResRef SpellResRef, bool deplete);
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Actor *hitter, int modtype=MOD_ADDITIVE);
+	/* displays the damage taken and other details (depends on the game type) */
+	void DisplayCombatFeedback (unsigned int damage, unsigned int damagetype_strref, Actor *hitter);
 	/* drops items from inventory to current spot */
 	void DropItem(const ieResRef resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);
