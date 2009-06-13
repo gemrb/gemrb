@@ -1725,7 +1725,11 @@ int fx_set_slowed_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	} else {
 		STATE_SET( STATE_SLOWED );
 		target->AddPortraitIcon(PI_SLOWED);
+		// halve apr and speed
+		STAT_MUL(IE_NUMBEROFATTACKS, 50);
+		STAT_MUL(IE_MOVEMENTRATE, 50);
 	}
+	if (target->InParty) core->SetEventFlag(EF_PORTRAIT);
 	return FX_PERMANENT;
 }
 
