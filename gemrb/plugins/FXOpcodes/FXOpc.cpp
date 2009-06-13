@@ -1297,6 +1297,8 @@ int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		target->AddPortraitIcon(PI_IMPROVEDHASTE);
 		STAT_SET(IE_IMPROVEDHASTE,1);
 		STAT_SET(IE_ATTACKNUMBERDOUBLE,0);
+		target->NewStat(IE_NUMBEROFATTACKS, 200, MOD_PERCENT);
+		// TODO: -2 initiative bonus
 		break;
 	case 2://speed haste only
 		target->AddPortraitIcon(PI_HASTED);
