@@ -304,8 +304,6 @@ unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level) const
 {
 	if (type >= NUM_BOOK_TYPES || level >= GetSpellLevelCount(type))
 		return 0;
-	if (level >= spells[type].size())
-		return 0;
 	return (unsigned int) spells[type][level]->known_spells.size();
 }
 
