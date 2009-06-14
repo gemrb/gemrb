@@ -81,6 +81,7 @@
 #define PEF_TRAIL     16    //trail bams facing value uses the same field as the travel projectile (otherwise it defaults to 9) (shout in iwd)
 #define PEF_CURVE     32    //curved path (magic missile)
 #define PEF_RANDOM    64    //random starting frame for animation (?)
+#define PEF_PILLAR    128   //draw all cycles simultaneously on top of each other (call lightning, flamestrike)
 
 //projectile area flags
 #define PAF_VISIBLE   1     //the travel projectile is visible until explosion
@@ -137,7 +138,6 @@ public:
 	Projectile();
 	~Projectile();
 	void InitExtension();
-	void CreateAnimations(Animation **anims, const ieResRef bam, int Seq);
 
 	ieWord Type;
 	ieWord Speed;
@@ -283,6 +283,11 @@ public:
 	void SetGradient(int gradient);
 	void StaticTint(Color &newtint);
 private:
+	void CreateAnimations(Animation **anims, const ieResRef bam, int Seq);
+	//pillar type animations
+	void CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq);
+	//oriented animations (also simple ones)
+	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq);
 	void GetPaletteCopy(Animation *anim[], Palette *&pal);
 	void SetBlend();
 	void SecondaryTarget();

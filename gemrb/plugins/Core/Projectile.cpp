@@ -127,6 +127,37 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 	//reporting bigger face count than possible by the animation
 	int Max = af->GetCycleCount();
 	if (Aim>Max) Aim=Max;
+
+	if(ExtFlags&PEF_PILLAR) {
+		CreateCompositeAnimation(anims, af, Seq);
+	} else {
+		CreateOrientedAnimations(anims, af, Seq);
+	}
+}
+
+//Seq is the first cycle to use in the composite
+//Aim is the number of cycles
+void Projectile::CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq)
+{
+	for (int Cycle = 0; Cycle<Aim; Cycle++) {
+		int c = Cycle+Seq;
+		Animation* a = af->GetCycle( c );
+		anims[Cycle] = a;
+		if (!a) continue;
+		//animations are started at a random frame position
+		//Always start from 0, unless set otherwise
+		if (!(ExtFlags&PEF_RANDOM)) {
+			a->SetPos(0);
+		}
+
+		a->gameAnimation = true;
+	}
+}
+
+//Seq is the cycle to use in case of single orientations
+//Aim is the number of Orientations
+void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq)
+{
 	for (int Cycle = 0; Cycle<MAX_ORIENT; Cycle++) {
 		bool mirror = false, mirrorvert = false;
 		int c;
@@ -160,13 +191,13 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 			break;
 		}
 		Animation* a = af->GetCycle( c );
+		anims[Cycle] = a;
+		if (!a) continue;
 		//animations are started at a random frame position
 		//Always start from 0, unless set otherwise
 		if (!(ExtFlags&PEF_RANDOM)) {
 			a->SetPos(0);
 		}
-		anims[Cycle] = a;
-		if (!a) continue;
 
 		if (mirror) {
 			a->MirrorAnimation();
@@ -898,9 +929,20 @@ void Projectile::DrawTravel(Region &screen)
 		pos.y-=FLY_HEIGHT;
 	}
 
-	if (travel[face]) {
-		Sprite2D *frame = travel[face]->NextFrame();
-		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
+	if(ExtFlags&PEF_PILLAR) {
+		//draw all frames simultaneously on top of each other
+		for(int i=0;i<Aim;i++) {
+			if (travel[i]) {
+				Sprite2D *frame = travel[i]->NextFrame();
+				video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
+				pos.y-=frame->YPos;
+			}
+		}
+	} else {
+		if (travel[face]) {
+			Sprite2D *frame = travel[face]->NextFrame();
+			video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
+		}
 	}
 
 	if (SFlags&PSF_SPARKS) {

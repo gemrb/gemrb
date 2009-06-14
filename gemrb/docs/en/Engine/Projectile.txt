@@ -7,5 +7,6 @@ These flags reside in the .pro format on offset 0x2c
 4       Freeze as travel projectile after explosion (and slowly fade out)
 8       No travel path (move to destination immediately, thus skipping the travel phase)
 16      Trail bams got the same orientation behaviour as the travel bam
-32      Curved path
+32      Curved path 
 64      Random starting frame for travel projectile
+128     Pillar type projectiles (instead of orientations, the cycles are drawn vertically on top of each other)
