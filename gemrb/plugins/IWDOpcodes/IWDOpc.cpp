@@ -2837,13 +2837,8 @@ int fx_alicorn_lance (Actor* /*Owner*/, Actor* target, Effect* fx)
 //449 CallLightning
 Actor *GetRandomEnemySeen(Map *map, Actor *origin)
 {
-	int type = 2; //neutral, has no enemies
-	if (origin->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-		type = 1; //PC
-	}
-	if (origin->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-		type = 0;
-	}
+	int type = GetGroup(origin);
+
 	if (type==2) {
 		return NULL; //no enemies
 	}

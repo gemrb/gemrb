@@ -804,13 +804,7 @@ static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 inline Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
 {
 	//determining the allegiance of the origin
-	int type = 2; //neutral, has no enemies
-	if (origin->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-		type = 1; //PC
-	}
-	if (origin->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-		type = 0;
-	}
+	int type = GetGroup(origin);
 
 	//neutral has no enemies
 	if (type==2) {

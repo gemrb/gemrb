@@ -104,6 +104,7 @@ void GoNearAndRetry(Scriptable *Sender, Point &p, int distance);
 #define BINARY_MORE 10          //left has more bits than right
 #define BINARY_LESS 11          //left has less bits than right
 
+GEM_EXPORT int GetGroup(Actor *actor);
 Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters, int ga_flags);
 Targets *XthNearestOf(Targets *parameters, int count, int ga_flags);
 Targets *XthNearestDoor(Targets *parameters, unsigned int count);

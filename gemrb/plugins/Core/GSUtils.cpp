@@ -2121,6 +2121,18 @@ int DiffCore(ieDword a, ieDword b, int diffmode)
 	return 0;
 }
 
+int GetGroup(Actor *actor)
+{
+	int type = 2; //neutral, has no enemies
+	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+		type = 1; //PC
+	}
+	if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+		type = 0;
+	}
+	return type;
+}
+
 Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters, int ga_flags)
 {
 	if (!actor) {
@@ -2232,13 +2244,8 @@ Targets *ClosestEnemySummoned(Scriptable *origin, Targets *parameters, int ga_fl
 	}
 	Actor *actor = (Actor *) origin;
 	//determining the allegiance of the origin
-	int type = 2; //neutral, has no enemies
-	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-		type = 1; //PC
-	}
-	if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-		type = 0;
-	}
+	int type = GetGroup(actor);
+
 	if (type==2) {
 		parameters->Clear();
 		return parameters;
@@ -2281,13 +2288,8 @@ Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned
 	}
 	Actor *actor = (Actor *) origin;
 	//determining the allegiance of the origin
-	int type = 2; //neutral, has no enemies
-	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-		type = 1; //PC
-	}
-	if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-		type = 0;
-	}
+	int type = GetGroup(actor);
+
 	if (type==2) {
 		parameters->Clear();
 		return parameters;
@@ -2323,13 +2325,8 @@ Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags)
 		return parameters;
 	}
 	//determining the allegiance of the origin
-	int type = 2; //neutral, has no enemies
-	if (origin->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-		type = 1; //PC
-	}
-	if (origin->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-		type = 0;
-	}
+	int type = GetGroup(origin);
+
 	if (type==2) {
 		return parameters;
 	}

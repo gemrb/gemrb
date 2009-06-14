@@ -795,6 +795,7 @@ public: //Script Functions
 	static int InActiveArea(Scriptable* Sender, Trigger* parameter);
 	static int InCutSceneMode(Scriptable *Sender, Trigger* parameter);
 	static int InMyArea(Scriptable* Sender, Trigger* parameter);
+	static int InMyGroup(Scriptable* Sender, Trigger* parameter);
 	static int InParty(Scriptable* Sender, Trigger* parameters);
 	static int InPartyAllowDead(Scriptable* Sender, Trigger* parameters);
 	static int InPartySlot(Scriptable* Sender, Trigger* parameters);

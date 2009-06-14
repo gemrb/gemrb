@@ -3882,6 +3882,22 @@ int GameScript::ActuallyInCombat(Scriptable* /*Sender*/, Trigger* /*parameters*/
 	return 0;
 }
 
+int GameScript::InMyGroup(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	if (GetGroup( (Actor *) tar)==GetGroup( (Actor *) Sender) ) {
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::AnyPCSeesEnemy(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
 	Game *game = core->GetGame();
