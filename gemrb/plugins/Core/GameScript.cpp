@@ -82,7 +82,7 @@ static const TriggerLink triggernames[] = {
 	{"classlevelgt", GameScript::ClassLevelGT, 0},
 	{"classlevellt", GameScript::ClassLevelLT, 0},
 	{"clicked", GameScript::Clicked, 0},
-	{"closed", GameScript::Closed, 0}, 
+	{"closed", GameScript::Closed, 0},
 	{"combatcounter", GameScript::CombatCounter, 0},
 	{"combatcountergt", GameScript::CombatCounterGT, 0},
 	{"combatcounterlt", GameScript::CombatCounterLT, 0},
@@ -111,7 +111,7 @@ static const TriggerLink triggernames[] = {
 	{"extraproficiencygt", GameScript::ExtraProficiencyGT, 0},
 	{"extraproficiencylt", GameScript::ExtraProficiencyLT, 0},
 	{"faction", GameScript::Faction, 0},
-	{"failedtoopen", GameScript::OpenFailed, 0}, 
+	{"failedtoopen", GameScript::OpenFailed, 0},
 	{"fallenpaladin", GameScript::FallenPaladin, 0},
 	{"fallenranger", GameScript::FallenRanger, 0},
 	{"false", GameScript::False, 0},
@@ -161,7 +161,7 @@ static const TriggerLink triggernames[] = {
 	{"hasweaponequipped", GameScript::HasWeaponEquipped, 0},
 	{"haveanyspells", GameScript::HaveAnySpells, 0},
 	{"havespell", GameScript::HaveSpell, 0}, //these must be the same
-	{"havespellparty", GameScript::HaveSpellParty, 0}, 
+	{"havespellparty", GameScript::HaveSpellParty, 0},
 	{"havespellres", GameScript::HaveSpell, 0}, //they share the same ID
 	{"haveusableweaponequipped", GameScript::HaveUsableWeaponEquipped, 0},
 	{"heard", GameScript::Heard, 0},
@@ -202,7 +202,7 @@ static const TriggerLink triggernames[] = {
 	{"isheartoffurymodeon", GameScript::NightmareModeOn, 0},
 	{"islocked", GameScript::IsLocked, 0},
 	{"isextendednight", GameScript::IsExtendedNight, 0},
-	{"isoverme", GameScript::IsOverMe, 0}, 
+	{"isoverme", GameScript::IsOverMe, 0},
 	{"isplayernumber", GameScript::IsPlayerNumber, 0},
 	{"isrotation", GameScript::IsRotation, 0},
 	{"isscriptname", GameScript::CalledByName, 0}, //seems the same
@@ -282,8 +282,8 @@ static const TriggerLink triggernames[] = {
 	{"objitemcountlt", GameScript::NumItemsLT, 0},
 	{"oncreation", GameScript::OnCreation, 0},
 	{"onscreen", GameScript::OnScreen, 0},
-	{"opened", GameScript::Opened, 0}, 
-	{"openfailed", GameScript::OpenFailed, 0}, 
+	{"opened", GameScript::Opened, 0},
+	{"openfailed", GameScript::OpenFailed, 0},
 	{"openstate", GameScript::OpenState, 0},
 	{"or", GameScript::Or, 0},
 	{"outofammo", GameScript::OutOfAmmo, 0},
@@ -304,8 +304,8 @@ static const TriggerLink triggernames[] = {
 	{"pccanseepoint", GameScript::PCCanSeePoint, 0},
 	{"pcinstore", GameScript::PCInStore, 0},
 	{"personalspacedistance", GameScript::PersonalSpaceDistance, 0},
-	{"picklockfailed", GameScript::PickLockFailed, 0}, 
-	{"pickpocketfailed", GameScript::PickpocketFailed, 0}, 
+	{"picklockfailed", GameScript::PickLockFailed, 0},
+	{"pickpocketfailed", GameScript::PickpocketFailed, 0},
 	{"proficiency", GameScript::Proficiency, 0},
 	{"proficiencygt", GameScript::ProficiencyGT, 0},
 	{"proficiencylt", GameScript::ProficiencyLT, 0},
@@ -409,12 +409,12 @@ static const ActionLink actionnames[] = {
 	{"backstab", GameScript::Attack,AF_BLOCKING|AF_ALIVE},//actually hide+attack
 	{"bashdoor", GameScript::BashDoor,AF_BLOCKING|AF_ALIVE}, //the same until we know better
 	{"battlesong", GameScript::BattleSong, AF_ALIVE},
-	{"berserk", GameScript::Berserk, AF_ALIVE}, 
+	{"berserk", GameScript::Berserk, AF_ALIVE},
 	{"bitclear", GameScript::BitClear,AF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal,AF_MERGESTRINGS},
 	{"bitset", GameScript::GlobalBOr,AF_MERGESTRINGS}, //probably the same
 	{"breakinstants", GameScript::BreakInstants, AF_BLOCKING},//delay execution of instants to the next AI cycle???
-	{"calm", GameScript::Calm, 0}, 
+	{"calm", GameScript::Calm, 0},
 	{"changeaiscript", GameScript::ChangeAIScript, 0},
 	{"changeaitype", GameScript::ChangeAIType, 0},
 	{"changealignment", GameScript::ChangeAlignment, 0},
@@ -453,7 +453,7 @@ static const ActionLink actionnames[] = {
 	{"createcreature", GameScript::CreateCreature, 0}, //point is relative to Sender
 	{"createcreaturecopypoint", GameScript::CreateCreatureCopyPoint, 0}, //point is relative to Sender
 	{"createcreaturedoor", GameScript::CreateCreatureDoor, 0},
-	{"createcreatureatfeet", GameScript::CreateCreatureAtFeet, 0}, 
+	{"createcreatureatfeet", GameScript::CreateCreatureAtFeet, 0},
 	{"createcreatureatlocation", GameScript::CreateCreatureAtLocation, 0},
 	{"createcreatureimpassable", GameScript::CreateCreatureImpassable, 0},
 	{"createcreatureimpassableallowoverlap", GameScript::CreateCreatureImpassableAllowOverlap, 0},
@@ -527,7 +527,7 @@ static const ActionLink actionnames[] = {
 	{"escapeareadestroy", GameScript::EscapeAreaDestroy, 0},
 	{"escapeareaobject", GameScript::EscapeAreaObject, 0},
 	{"escapeareaobjectnosee", GameScript::EscapeAreaObjectNoSee, 0},
-	{"exitpocketplane", GameScript::ExitPocketPlane, 0}, 
+	{"exitpocketplane", GameScript::ExitPocketPlane, 0},
 	{"expansionendcredits", GameScript::QuitGame, 0},//ends game too
 	{"explore", GameScript::Explore, 0},
 	{"exploremapchunk", GameScript::ExploreMapChunk, 0},
@@ -636,11 +636,11 @@ static const ActionLink actionnames[] = {
 	{"movebetweenareas", GameScript::MoveBetweenAreas, 0},
 	{"movebetweenareaseffect", GameScript::MoveBetweenAreas, 0},
 	{"movecursorpoint", GameScript::MoveCursorPoint, 0},//immediate move
-	{"moveglobal", GameScript::MoveGlobal, 0}, 
-	{"moveglobalobject", GameScript::MoveGlobalObject, 0}, 
+	{"moveglobal", GameScript::MoveGlobal, 0},
+	{"moveglobalobject", GameScript::MoveGlobalObject, 0},
 	{"moveglobalobjectoffscreen", GameScript::MoveGlobalObjectOffScreen, 0},
-	{"moveglobalsto", GameScript::MoveGlobalsTo, 0}, 
-	{"transferinventory", GameScript::MoveInventory, 0}, 
+	{"moveglobalsto", GameScript::MoveGlobalsTo, 0},
+	{"transferinventory", GameScript::MoveInventory, 0},
 	{"movetocenterofscreen", GameScript::MoveToCenterOfScreen,AF_BLOCKING},
 	{"movetoexpansion", GameScript::MoveToExpansion,AF_BLOCKING},
 	{"movetoobject", GameScript::MoveToObject,AF_BLOCKING|AF_ALIVE},
@@ -673,7 +673,7 @@ static const ActionLink actionnames[] = {
 	{"pausegame", GameScript::PauseGame, AF_BLOCKING}, //this is almost surely blocking
 	{"picklock", GameScript::PickLock,AF_BLOCKING},
 	{"pickpockets", GameScript::PickPockets, AF_BLOCKING},
-	{"pickupitem", GameScript::PickUpItem, 0}, 
+	{"pickupitem", GameScript::PickUpItem, 0},
 	{"playdead", GameScript::PlayDead,AF_BLOCKING|AF_ALIVE},
 	{"playdeadinterruptable", GameScript::PlayDeadInterruptable,AF_BLOCKING|AF_ALIVE},
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
@@ -858,7 +858,7 @@ static const ActionLink actionnames[] = {
 	{"takepartyitemall", GameScript::TakePartyItemAll, 0},
 	{"takepartyitemnum", GameScript::TakePartyItemNum, 0},
 	{"takepartyitemrange", GameScript::TakePartyItemRange, 0},
-	{"teleportparty", GameScript::TeleportParty, 0}, 
+	{"teleportparty", GameScript::TeleportParty, 0},
 	{"textscreen", GameScript::TextScreen, AF_BLOCKING},
 	{"timedmovetopoint", GameScript::TimedMoveToPoint,AF_BLOCKING|AF_ALIVE},
 	{"tomsstringdisplayer", GameScript::DisplayMessage, 0},
@@ -1097,7 +1097,7 @@ int Targets::Count() const
 {
 	return (int)objects.size();
 }
- 
+
 targettype *Targets::RemoveTargetAt(targetlist::iterator &m)
 {
 	m=objects.erase(m);
@@ -2403,9 +2403,10 @@ Targets *GameScript::WorstAC(Scriptable* /*Sender*/, Targets *parameters, int ga
 	return parameters;
 }
 
-Targets *GameScript::MostDamagedOf(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
+Targets *GameScript::MostDamagedOf(Scriptable* Sender, Targets *parameters, int ga_flags)
 {
-	targetlist::iterator m;
+	//Original engines restrict this to the PCs...
+	/*targetlist::iterator m;
 	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
 	if (!t) {
 		return parameters;
@@ -2420,6 +2421,24 @@ Targets *GameScript::MostDamagedOf(Scriptable* /*Sender*/, Targets *parameters, 
 		if (worsthp>hp) {
 			worsthp=hp;
 			scr=t->actor;
+		}
+	}
+	parameters->Clear();
+	parameters->AddTarget(scr, 0, ga_flags);
+	return parameters;*/
+	Map* area = Sender->GetCurrentArea() ;
+	Game *game = core->GetGame();
+	Scriptable* scr = NULL ;
+	int worsthp = 0xffff ;
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *actor = game->GetPC(i, false);
+		if(actor->GetCurrentArea() == area) {
+			int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+			if (worsthp>hp) {
+				worsthp=hp;
+				scr=actor;
+			}
 		}
 	}
 	parameters->Clear();
