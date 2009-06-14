@@ -74,9 +74,11 @@
 #define PTF_BLEND   128     //blend colours
 
 //projectile extended travel flags (gemrb specific)
-#define PEF_BOUNCE   1      //bounce from walls (lightning bolt)
-#define PEF_CONTINUE 2      //continue as a travel projectile after trigger (lightning bolt)
-#define PEF_FREEZE   4      //stay around and slowly fade out after trigger (ice dagger in pst)
+#define PEF_BOUNCE    1     //bounce from walls (lightning bolt)
+#define PEF_CONTINUE  2     //continue as a travel projectile after trigger (lightning bolt)
+#define PEF_FREEZE    4     //stay around and slowly fade out after trigger (ice dagger)
+#define PEF_NO_TRAVEL 8     //all instant projectiles (draw upon holy might, finger of death)
+#define PEF_TRAIL     16    //trail bams facing value uses the same field as the travel projectile (otherwise it defaults to 9)
 
 //projectile area flags
 #define PAF_VISIBLE   1     //the travel projectile is visible until explosion

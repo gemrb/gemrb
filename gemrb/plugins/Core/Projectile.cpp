@@ -218,6 +218,10 @@ void Projectile::Setup()
 	tint.g=128;
 	tint.b=128;
 	tint.a=255;
+
+	if (ExtFlags&PEF_NO_TRAVEL) {
+		Pos = Destination;
+	}
 	phase = P_TRAVEL;
 	core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, GEM_SND_RELATIVE);
 	memset(travel,0,sizeof(travel));
