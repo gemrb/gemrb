@@ -3892,7 +3892,12 @@ int GameScript::InMyGroup(Scriptable* Sender, Trigger* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return 0;
 	}
+/* IESDP SUCKS
 	if (GetGroup( (Actor *) tar)==GetGroup( (Actor *) Sender) ) {
+		return 1;
+	}
+*/
+	if ( ((Actor *) tar)->GetStat(IE_SPECIFIC)==((Actor *) tar)->GetStat(IE_SPECIFIC) ) {
 		return 1;
 	}
 	return 0;
