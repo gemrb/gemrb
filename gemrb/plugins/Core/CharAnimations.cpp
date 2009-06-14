@@ -873,9 +873,11 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			case IE_ANI_ATTACK_SLASH:
 			case IE_ANI_ATTACK_BACKSLASH:
 				a->Flags |= A_ANI_PLAYONCE;
+				break;
 			case IE_ANI_EMERGE:
 			case IE_ANI_GET_UP:
 				a->playReversed = true;
+				a->Flags |= A_ANI_PLAYONCE;
 				break;
 		}
 		switch (GetAnimType()) {
