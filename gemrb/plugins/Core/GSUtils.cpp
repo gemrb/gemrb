@@ -1260,8 +1260,11 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 
 bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 {
-	if (!Sender || !oC) {
+	if (!Sender) {
 		return false;
+	}
+	if (!oC) {
+		return true;
 	}
 	Targets *tgts = GetAllObjects(Sender, oC, 0);
 	bool ret = false;
