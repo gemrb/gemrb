@@ -160,6 +160,11 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 			break;
 		}
 		Animation* a = af->GetCycle( c );
+		//animations are started at a random frame position
+		//Always start from 0, unless set otherwise
+		if (!(ExtFlags&PEF_RANDOM)) {
+			a->SetPos(0);
+		}
 		anims[Cycle] = a;
 		if (!a) continue;
 
@@ -219,9 +224,6 @@ void Projectile::Setup()
 	tint.b=128;
 	tint.a=255;
 
-	if (ExtFlags&PEF_NO_TRAVEL) {
-		Pos = Destination;
-	}
 	phase = P_TRAVEL;
 	core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, GEM_SND_RELATIVE);
 	memset(travel,0,sizeof(travel));
@@ -229,6 +231,15 @@ void Projectile::Setup()
 	light = NULL;
 
 	CreateAnimations(travel, BAMRes1, Seq1);
+
+	if (ExtFlags&PEF_NO_TRAVEL) {
+		Pos = Destination;
+
+		//the travel projectile should linger after explosion
+		if(travel[0]) {
+			SetDelay(travel[0]->GetFrameCount() );
+		}
+	}
 
 	if (TFlags&PTF_COLOUR) {
 		SetupPalette(travel, palette, Gradients);

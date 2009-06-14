@@ -78,7 +78,9 @@
 #define PEF_CONTINUE  2     //continue as a travel projectile after trigger (lightning bolt)
 #define PEF_FREEZE    4     //stay around and slowly fade out after trigger (ice dagger)
 #define PEF_NO_TRAVEL 8     //all instant projectiles (draw upon holy might, finger of death)
-#define PEF_TRAIL     16    //trail bams facing value uses the same field as the travel projectile (otherwise it defaults to 9)
+#define PEF_TRAIL     16    //trail bams facing value uses the same field as the travel projectile (otherwise it defaults to 9) (shout in iwd)
+#define PEF_CURVE     32    //curved path (magic missile)
+#define PEF_RANDOM    64    //random starting frame for animation (?)
 
 //projectile area flags
 #define PAF_VISIBLE   1     //the travel projectile is visible until explosion
