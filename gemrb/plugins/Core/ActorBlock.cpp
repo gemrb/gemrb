@@ -747,6 +747,11 @@ void Selectable::DrawCircle(Region &vp)
 	flashing cyan/white for neutrals the mouse is over
 	*/
 
+	// ground circles are not drawn in cutscenes
+	// they SHOULD be drawn for at least white speaker circles (eg, via VerbalConstant), please fix :)
+	if ((core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE))
+		return;
+
 	if (size<=0) {
 		return;
 	}
@@ -1202,6 +1207,10 @@ void Movable::ClearPath()
 void Movable::DrawTargetPoint(Region &vp)
 {
 	if (!path || !Selected || (InternalFlags&IF_NORECTICLE) )
+		return;
+
+	// recticles are never drawn in cutscenes
+	if ((core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE))
 		return;
 
 	// generates "step" from sequence 3 2 1 0 1 2 3 4
