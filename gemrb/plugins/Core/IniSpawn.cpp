@@ -469,7 +469,7 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 	NamelessSpawnPoint.y=y;
 	//35 - already standing
 	//36 - getting up
-	NamelessState = inifile->GetKeyAsInt("nameless","state",35);
+	NamelessState = inifile->GetKeyAsInt("nameless","state",36);
 
 	namelessvarcount = inifile->GetKeysCount("namelessvar");
 	if (namelessvarcount) {
