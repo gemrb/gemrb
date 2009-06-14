@@ -932,7 +932,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		ieDword range = MAX_TRAVELING_DISTANCE;
+		ieDword range = MAX_OPERATING_DISTANCE;
 		//making sure speaker is the protagonist, player, actor
 		if ( target->InParty == 1) swap = true;
 		else if ( speaker->InParty !=1 && target->InParty) swap = true;
@@ -959,7 +959,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 				return;
 			}
 			GetTalkPositionFromScriptable(scr, TalkPos);
-			if (Distance(TalkPos, target)>MAX_TRAVELING_DISTANCE ) {
+			if (Distance(TalkPos, target)>MAX_OPERATING_DISTANCE ) {
 				//try to force the target to come closer???
 				GoNear(target, TalkPos);
 				Sender->AddActionInFront( Sender->CurrentAction );
