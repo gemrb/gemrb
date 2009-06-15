@@ -157,9 +157,8 @@ def CheckStat20 (Actor, Stat, Diff):
 		return True
 	return False
 
-# only differentiates between bg1 and bg2 (maybe others too; by chance)
 def GameIsBG1 ():
-	return not GemRB.HasResource ("AR3900", RES_ARE)
+	return GemRB.GameType == "bg1"
 
 def GameIsTOB ():
 	return GemRB.HasResource ("worldm25", RES_WMP) and GemRB.GetVar("oldgame") == 0
