@@ -58,7 +58,7 @@ class ScriptedAnimation;
 #include "Spellbook.h"
 
 #define MAX_STATS 256
-#define MAX_LEVEL 30
+#define MAX_LEVEL 128
 #define MAX_FEATS 96   //3*sizeof(ieDword)
 
 //modal states
