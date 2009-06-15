@@ -945,6 +945,14 @@ void GameControl::DisplayTooltip() {
 		Map* area = game->GetCurrentArea( );
 		if (area) {
 			Actor *actor = area->GetActorByGlobalID(lastActorID);
+			if (actor && (actor->GetStat(IE_STATE_ID)&STATE_DEAD || actor->GetInternalFlag()&IF_JUSTDIED)) {
+				// checking IF_JUSTDIED is kind of horrid, but seems necessary
+				// no tooltips for dead actors!
+				actor->SetOver( false );
+				lastActorID = 0;
+				actor = NULL;
+			}
+
 			if (actor) {
 				char *name = actor->GetName(1);
 				int hp = actor->GetStat(IE_HITPOINTS);
