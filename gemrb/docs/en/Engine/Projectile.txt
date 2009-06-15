@@ -11,3 +11,4 @@ These flags reside in the .pro format on offset 0x2c
 64      Random starting frame for travel projectile
 128     Pillar type projectiles (instead of orientations, the cycles are drawn vertically on top of each other)
 256     Half transparent travel projectile (not blend, but could be combined with it)
+512     Static tinted travel projectile
