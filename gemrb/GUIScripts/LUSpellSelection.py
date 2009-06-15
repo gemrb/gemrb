@@ -21,7 +21,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import GetMageSpells, HasSpell
+from GUICommon import GetMageSpells, HasSpell, GameIsBG1
 from BGCommon import *
 from CharGenCommon import *
 
@@ -228,19 +228,19 @@ def SpellsDonePress ():
 			DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 			return
 
-	if not recommend:
+	if GameIsBG1():
 		# close our window and update our records
 		if SpellsWindow:
 			SpellsWindow.Unload ()
 
 	# move to the next script if this is chargen
 	if chargen:
-		if recommend:
+		if not GameIsBG1():
 			GemRB.SetNextScript("GUICG6")
 		else:
 			next()
 	 # close our window and update our records
-	elif SpellsWindow and not recommend:
+	elif SpellsWindow and GameIsBG1():
 		SpellsWindow.Unload ()
 
 	return
@@ -264,7 +264,7 @@ def ShowSpells ():
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetVarAssoc("ButtonPressed", i)
 		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsSelectPress")
-		if recommend:
+		if not GameIsBG1():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
 		else:
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
