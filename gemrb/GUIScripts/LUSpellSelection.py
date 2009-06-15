@@ -22,7 +22,8 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import GetMageSpells, HasSpell
-from GUICommonWindows import *
+from BGCommon import *
+from CharGenCommon import *
 
 # storage variables
 pc = 0
@@ -41,27 +42,32 @@ SpellBook = []			# << array containing all the spell indexes to learn
 SpellLevel = 0			# << current level of spells
 SpellStart = 0			# << starting id of the spell list
 SpellPointsLeftLabel = 0	# << label indicating the number of points left
+Scroll = 0                  # scrollbar toggle
 
 # chargen only
 SpellsPickButton = 0		# << button to select random spells
 SpellsCancelButton = 0		# << cancel chargen
 
-def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0):
+
+def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, scroll=True):
 	"""Opens the spells selection window.
 
 	table should refer to the name of the classes MXSPLxxx.2da.
 	level contains the current level of the actor.
 	diff contains the difference from the old level.
 	kit should always be GetKitIndex except when dualclassing.
-	gen is true if this is for character generation."""
+	gen is true if this is for character generation.
+	recommend is used in bg2 for spell recommendation / autopick.
+	scroll is used for adding a scrollbar, so more than 24 spells can be shown."""
 
 	global SpellsWindow, DoneButton, SpellsSelectPointsLeft, Spells, chargen, SpellPointsLeftLabel
 	global SpellsTextArea, SpellsKnownTable, SpellTopIndex, SpellBook, SpellLevel, pc, SpellStart
-	global KitMask
+	global KitMask, Scroll
 
 	# save our pc
 	pc = actor
 	chargen = gen
+	Scroll = scroll
 
 	# this ensures compatibility with chargen, sorc, and dual-classing
 	if kit == 0:
@@ -80,30 +86,38 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0):
 	if chargen:
 		GemRB.LoadWindowPack("GUICG", 640, 480)
 		SpellsWindow = GemRB.LoadWindowObject (7)
+		if not recommend:
+			CloseOtherWindow (SpellsWindow.Unload)
 		DoneButton = SpellsWindow.GetControl (0)
 		SpellsTextArea = SpellsWindow.GetControl (27)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x1000001b)
-		SpellsWindow.CreateScrollBar (1000, 325,42, 16,252)
+		if (scroll):
+			SpellsWindow.CreateScrollBar (1000, 325,42, 16,252)
 		SpellStart = 2
 
 		# cancel button only applicable for chargen
 		SpellsCancelButton = SpellsWindow.GetControl(29)
 		SpellsCancelButton.SetState(IE_GUI_BUTTON_ENABLED)
-		SpellsCancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsCancelPress")
+		if recommend:
+			SpellsCancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsCancelPress")
+		else:
+			SpellsCancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "BackPress")
 		SpellsCancelButton.SetText(13727)
 		SpellsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-		# recommended spell picks
-		SpellsPickButton = SpellsWindow.GetControl(30)
-		SpellsPickButton.SetState(IE_GUI_BUTTON_ENABLED)
-		SpellsPickButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsPickPress")
-		SpellsPickButton.SetText(34210)
+		if (recommend):
+			# recommended spell picks
+			SpellsPickButton = SpellsWindow.GetControl(30)
+			SpellsPickButton.SetState(IE_GUI_BUTTON_ENABLED)
+			SpellsPickButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsPickPress")
+			SpellsPickButton.SetText(34210)
 	else:
 		SpellsWindow = GemRB.LoadWindowObject (8)
 		DoneButton = SpellsWindow.GetControl (28)
 		SpellsTextArea = SpellsWindow.GetControl(26)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)
-		SpellsWindow.CreateScrollBar (1000, 290,142, 16,252)
+		if(scroll):
+			SpellsWindow.CreateScrollBar (1000, 290,142, 16,252)
 		SpellStart = 0
 
 	# setup our variables
@@ -152,17 +166,18 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0):
 			SpellLevel = i
 			SpellBook = [0]*len(Spells[i])
 
-			# setup the scrollbar
-			ScrollBar = SpellsWindow.GetControl (1000)
-			ScrollBar.SetSprites ("GUISCRCW", 0, 0,1,2,3,5,4)
-			ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "ShowSpells")
-			ScrollBar.SetDefaultScrollBar ()
+			if(scroll):
+				# setup the scrollbar
+				ScrollBar = SpellsWindow.GetControl (1000)
+				ScrollBar.SetSprites ("GUISCRCW", 0, 0,1,2,3,5,4)
+				ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "ShowSpells")
+				ScrollBar.SetDefaultScrollBar ()
 
-			# only scroll if we have more than 24 spells
-			if len (Spells[i]) > 24:
-				ScrollBar.SetVarAssoc ("SpellTopIndex", len (Spells[i])-23)
-			else:
-				ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
+				# only scroll if we have more than 24 spells
+				if len (Spells[i]) > 24:
+					ScrollBar.SetVarAssoc ("SpellTopIndex", len (Spells[i])-23)
+				else:
+					ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
 
 			# show our spells
 			ShowSpells ()
@@ -170,7 +185,10 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0):
 
 	# show the selection window
 	if chargen:
-		SpellsWindow.SetVisible (1)
+		if recommend:
+			SpellsWindow.SetVisible (1)
+		else:
+			SpellsWindow.ShowModal (MODAL_SHADOW_NONE)
 	else:
 		SpellsWindow.ShowModal (MODAL_SHADOW_GRAY)
 
@@ -197,25 +215,33 @@ def SpellsDonePress ():
 			SpellLevel = i
 			SpellBook = [0]*len(Spells[i])
 
-			# setup the scrollbar
-			ScrollBar = SpellsWindow.GetControl (1000)
-			if len (Spells[i]) > 24:
-				ScrollBar.SetVarAssoc ("SpellTopIndex", len (Spells[i])-23)
-			else:
-				ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
+			if (Scroll):
+				# setup the scrollbar
+				ScrollBar = SpellsWindow.GetControl (1000)
+				if len (Spells[i]) > 24:
+					ScrollBar.SetVarAssoc ("SpellTopIndex", len (Spells[i])-23)
+				else:
+					ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
 
 			# show the spells and set the done button to off
 			ShowSpells ()
 			DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 			return
 
-	# close our window and update our records
-	if SpellsWindow:
-		SpellsWindow.Unload ()
+	if not recommend:
+		# close our window and update our records
+		if SpellsWindow:
+			SpellsWindow.Unload ()
 
 	# move to the next script if this is chargen
 	if chargen:
-		GemRB.SetNextScript("GUICG6")
+		if recommend:
+			GemRB.SetNextScript("GUICG6")
+		else:
+			next()
+	 # close our window and update our records
+	elif SpellsWindow and not recommend:
+		SpellsWindow.Unload ()
 
 	return
 
@@ -236,13 +262,17 @@ def ShowSpells ():
 		# fill in the button with the spell data
 		Spell = GemRB.GetSpell (Spells[SpellLevel][i+SpellTopIndex][0], 1)
 		SpellButton.SetTooltip(Spell['SpellName'])
-		SpellButton.SetSpellIcon(Spells[SpellLevel][i+SpellTopIndex][0], 1)
 		SpellButton.SetVarAssoc("ButtonPressed", i)
 		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsSelectPress")
-		SpellButton.SetSprites("GUIBTBUT", 0,0,1,2,3)
+		if recommend:
+			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
+		else:
+			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
+		SpellButton.SetSpellIcon(Spells[SpellLevel][i+SpellTopIndex][0], 1)
 		SpellButton.SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR)
 
 		# don't allow the selection of an un-learnable spell
+		#TODO: check if the SetBorder calls work in bg1
 		if Spells[SpellLevel][i+SpellTopIndex][1] == 0:
 			SpellButton.SetState(IE_GUI_BUTTON_LOCKED)
 			# shade red
