@@ -22,7 +22,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from GUICommonWindows import *
+from BGCommon import *
 
 #constants
 LUSKILLS_TYPE_CHARGEN = 0
@@ -56,7 +56,7 @@ SkillsAssignable = 0
 
 #WARNING: This WILL NOT show the window, only access it. To see the return, call GemRB.GetVar ("SkillPointsLeft").
 # If nothing can be assigned, it will return 0 prior to accessing any of the window methods.
-def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1], classid=0):
+def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1], classid=0, scroll=True):
 	global SkillsWindow, SkillsCallback, SkillsOffsetPress, SkillsOffsetButton1, SkillsOffsetName
 	global SkillsOffsetPoints, SkillsOffsetSum, SkillsIndices, SkillPointsLeft, SkillsTopIndex
 	global SkillsTable, SkillsOldPos, SkillsClickCount, SkillsOldDirection, SkillsNumButtons
@@ -108,8 +108,9 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillsNumButtons = 4
 		SkillsTextArea = SkillsWindow.GetControl (19)
 		SkillsTextArea.SetText(17248)
-		ScrollBar = SkillsWindow.GetControl (26)
-		ScrollBar.SetDefaultScrollBar ()
+		if (scroll):
+			ScrollBar = SkillsWindow.GetControl (26)
+			ScrollBar.SetDefaultScrollBar ()
 	else:
 		return
 
