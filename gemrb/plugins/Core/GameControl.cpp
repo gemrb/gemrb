@@ -1776,9 +1776,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		}
 
 		//p is a searchmap travel region
-		if ( actor->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
+		if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
 			sprintf( Tmp, "NIDSpecial2()" );
-			actor->AddAction( GenerateAction( Tmp) );
+			party[0]->AddAction( GenerateAction( Tmp) );
 		}
 		return;
 	}
