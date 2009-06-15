@@ -123,6 +123,10 @@ def HLADonePress ():
 			else: # memorize it again
 				GemRB.MemorizeSpell (pc, HLAType, HLALevel, SpellIndex)
 
+		#save the number of this HLA memorized
+		#TODO: check param2 (0 seems to work ok)
+		GemRB.ApplyEffect(pc, "HLA", HLAAbilities[i][2], 0, HLARef[3:])
+
 	# close the window
 	if HLAWindow:
 		HLAWindow.Unload ()
@@ -276,12 +280,13 @@ def GetHLAs ():
 	HLAAbilities[x][0] is the given HLAs spell reference.
 	HLAAbilities[x][1] is true if the HLAs prerequisites have been met."""
 
-	global HLAAbilities, HLANewAbilities
+	global HLAAbilities, HLANewAbilities, HLACount
 
 	# get some needed values
 	Kit = GetKitIndex (pc)
 	IsDual = IsDualClassed (pc, 0)
 	IsDual = IsDual[0] > 0
+	MaxHLACount = 0
 
 	# reset the abilities
 	HLAAbilities = []
@@ -363,6 +368,7 @@ def GetHLAs ():
 			print "\t\tHLAPre count:",HLAMemorized
 			if (SaveArray[3] == "*") or (HLAMemorized > 0):
 				print "\t\tWe can learn it!"
+				MaxHLACount += 1
 				SaveArray[1] = 1
 				HLAAbilities.append (SaveArray)
 				continue
@@ -373,6 +379,11 @@ def GetHLAs ():
 
 	# create an array to store our abilities as they are selected
 	HLANewAbilities = [0]*len (HLAAbilities)
+
+	#make sure we don't get stuck with HLAs we can't apply
+	if MaxHLACount < HLACount:
+		HLACount = MaxHLACount
+		GemRB.SetVar ("HLACount", HLACount)
 
 	return
 
