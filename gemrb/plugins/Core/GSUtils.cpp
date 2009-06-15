@@ -351,7 +351,7 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 		}
 	}
 
-	if ((Strref != -1) && !sb.Sound[0]) {
+	if ((Strref != -1) && strcmp(core->GetString(Strref, 0),"") && !sb.Sound[0]) {
 		sb = core->strings->GetStringBlock( Strref );
 		if (flags & DS_CONSOLE) {
 			//can't play the sound here, we have to delay action
