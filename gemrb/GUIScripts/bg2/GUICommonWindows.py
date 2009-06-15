@@ -31,6 +31,7 @@ from ie_modal import *
 from ie_action import *
 from ie_slots import *
 from GUICommon import *
+from BGCommon import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -39,13 +40,6 @@ PortraitWindow = None
 OptionsWindow = None
 ActionsWindow = None
 DraggedPortrait = None
-
-print
-ClassTable = GemRB.LoadTableObject ("classes")
-NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
-KitListTable = GemRB.LoadTableObject ("kitlist")
-ClassSkillsTable = GemRB.LoadTableObject ("clskills")
-RaceTable = GemRB.LoadTableObject ("races")
 
 # only used in SetEncumbranceLabels, but that is called very often
 StrModTable = GemRB.LoadTableObject ("strmod")
@@ -502,27 +496,6 @@ def EquipmentPressed ():
 	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
-
-def GetKitIndex (actor):
-	"""Return the index of the actors kit from KITLIST.2da.
-
-	Returns 0 if the class is not kitted."""
-
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
-	KitIndex = 0
-
-	if Kit & 0xc000 == 0x4000:
-		KitIndex = Kit & 0xfff
-
-	# carefully looking for kit by the usability flag
-	# since the barbarian kit id clashes with the no-kit value
-	if KitIndex == 0 and Kit != 0x4000:
-		KitIndex = KitListTable.FindValue (6, Kit)
-		if KitIndex == -1:
-			KitIndex = 0
-
-	return KitIndex
 
 def GetActorClassTitle (actor):
 	"""Returns the string representation of the actors class."""
@@ -1208,54 +1181,6 @@ def OpenWaitForDiscWindow ():
 	except:
 		DiscWindow.SetVisible (1)
 
-def IsDualClassed(actor, verbose):
-	"""Returns an array containing the dual class information.
-
-	Return[0] is 0 if not dualclassed, 1 if the old class is a kit, 2 otherwise.
-	Return[1] contains either the kit or class index of the old class.
-	Return[2] contains the class index of the new class.
-	If verbose is false, only Return[0] contains useable data."""
-
-	Dual = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
-	Dual = Dual & ~(MC_EXPORTABLE|MC_PLOT_CRITICAL|MC_BEENINPARTY|MC_HIDDEN)
-
-	if verbose:
-		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-		ClassIndex = ClassTable.FindValue (5, Class)
-		Multi = ClassTable.GetValue (ClassIndex, 4)
-		DualInfo = []
-		KitIndex = GetKitIndex (actor)
-
-		if (Dual & MC_WAS_ANY_CLASS) > 0: # first (previous) class of the dual class
-			MCColumn = ClassTable.GetColumnIndex ("MC_WAS_ID")
-			FirstClassIndex = ClassTable.FindValue (MCColumn, Dual & MC_WAS_ANY_CLASS)
-			if KitIndex:
-				DualInfo.append (1)
-				DualInfo.append (KitIndex)
-			else:
-				DualInfo.append (2)
-				DualInfo.append (FirstClassIndex)
-
-			# use the first class of the multiclass bunch that isn't the same as the first class
-			Mask = 1
-			for i in range (1,16):
-				if Multi & Mask:
-					ClassIndex = ClassTable.FindValue (5, i)
-					if ClassIndex == FirstClassIndex:
-						Mask = 1 << i
-						continue
-					DualInfo.append (ClassIndex)
-					break
-				Mask = 1 << i
-			return DualInfo
-		else:
-			return (0,-1,-1)
-	else:
-		if (Dual & MC_WAS_ANY_CLASS) > 0:
-			return (1,-1,-1)
-		else:
-			return (0,-1,-1)
-
 def IsDualSwap (actor):
 	"""Returns true if the dualed classes are reverse of expection.
 
@@ -1401,75 +1326,3 @@ def LearnPriestSpells (pc, level, mask):
 			# if the spell isn't learned, learn it
 			if HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, spell) < 0:
 				GemRB.LearnSpell (pc, spell)
-
-def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
-	"""Removes all known spells of a given type between two spell levels.
-
-	If noslots is true, all memorization counts are set to 0.
-	Kit is used to identify the priest spell mask of the spells to be removed;
-	this is only used when removing spells in a dualclass."""
-
-	# choose the correct limit based upon class type
-	if type == IE_SPELL_TYPE_WIZARD:
-		limit = 9
-	elif type == IE_SPELL_TYPE_PRIEST:
-		limit = 7
-
-		# make sure that we get the original kit, if we have one
-		if kit:
-			originalkit = GetKitIndex (pc)
-
-			if originalkit: # kitted; find the class value
-				originalkit = KitListTable.GetValue (originalkit, 7)
-			else: # just get the class value
-				originalkit = GemRB.GetPlayerStat (pc, IE_CLASS)
-
-			# this is is specifically for dual-classes and will not work to remove only one
-			# spell type from a ranger/cleric multi-class
-			if ClassSkillsTable.GetValue (originalkit, 0, 0) != "*": # knows druid spells
-				originalkit = 0x8000
-			elif ClassSkillsTable.GetValue (originalkit, 1, 0) != "*": # knows cleric spells
-				originalkit = 0x4000
-			else: # don't know any other spells
-				originalkit = 0
-
-			# don't know how this would happen, but better to be safe
-			if originalkit == kit:
-				originalkit = 0
-	elif type == IE_SPELL_TYPE_INNATE:
-		limit = 1
-	else: # can't do anything if an improper spell type is sent
-		return 0
-
-	# make sure we're within parameters
-	if level1 < 1 or level2 > limit or level1 > level2:
-		return 0
-
-	# remove all spells for each level
-	for level in range (level1-1, level2):
-		# we need the count because we remove each spell in reverse order
-		count = GemRB.GetKnownSpellsCount (pc, type, level)
-		mod = count-1
-
-		for spell in range (count):
-			# see if we need to check for kit
-			if type == IE_SPELL_TYPE_PRIEST and kit:
-				# get the spells ref data
-				ref = GemRB.GetKnownSpell (pc, type, level, mod-spell)
-				ref = GemRB.GetSpell (ref['SpellResRef'], 1)
-
-				# we have to look at the originalkit as well specifically for ranger/cleric dual-classes
-				# we wouldn't want to remove all cleric spells and druid spells if we lost our cleric class
-				# only the cleric ones
-				if kit&ref['SpellDivine'] or (originalkit and not originalkit&ref['SpellDivine']):
-					continue
-
-			# remove the spell
-			GemRB.RemoveSpell (pc, type, level, mod-spell)
-
-		# remove memorization counts if disired
-		if noslots:
-			GemRB.SetMemorizableSpellsCount (pc, 0, type, level)
-
-	# return success
-	return 1
