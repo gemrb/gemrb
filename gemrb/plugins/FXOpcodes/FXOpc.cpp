@@ -2432,7 +2432,7 @@ int fx_set_diseased_state (Actor* Owner, Actor* target, Effect* fx)
 
 
 // 0x4f Cure:Disease
-static EffectRef fx_diseased_state_ref={"State:Disease",NULL,-1};
+static EffectRef fx_diseased_state_ref={"State:Diseased",NULL,-1};
 
 int fx_cure_diseased_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
