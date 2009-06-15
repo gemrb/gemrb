@@ -36,7 +36,7 @@ extern HANDLE hConsole;
 #endif
 
 //to get gradient color
-#define PALSIZE 32
+#define PALSIZE 12
 
 static const ieByte SixteenToNine[MAX_ORIENT]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
 static const ieByte SixteenToFive[MAX_ORIENT]={0,1,2,3,4,3,2,1,0,1,2,3,4,3,2,1};
@@ -254,6 +254,14 @@ void Projectile::Setup()
 	tint.g=128;
 	tint.b=128;
 	tint.a=255;
+
+	//set any static tint
+	if(ExtFlags&PEF_TINT) {
+		Color tmpColor[PALSIZE];
+
+		core->GetPalette( Gradients[0], PALSIZE, tmpColor );
+		StaticTint(tmpColor[PALSIZE/2]);
+	}
 
 	phase = P_TRAVEL;
 	core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, GEM_SND_RELATIVE);
@@ -849,12 +857,9 @@ void Projectile::DrawExplosion(Region &screen)
 				//sets up the gradient color for the explosion animation
 				if (apflags&(APF_PALETTE|APF_TINT) ) {
 					if (apflags&APF_PALETTE) {
-						pro->SetGradient(Extension->ExplColor);
+						pro->SetGradient(Extension->ExplColor, false);
 					} else {
-						Color tmpColor[PALSIZE];
-
-						core->GetPalette( Extension->ExplColor, PALSIZE, tmpColor );
-						pro->StaticTint(tmpColor[PALSIZE/2]);
+						pro->SetGradient(Extension->ExplColor, true);
 					}
 
 				}
@@ -904,11 +909,21 @@ void Projectile::DrawTravel(Region &screen)
 	Video *video = core->GetVideoDriver();
 	ieDword flag;
 	
-	if(ExtFlags&PEF_HALFTRANS) flag=BLIT_HALFTRANS;
-	else flag = 0;
+	if(ExtFlags&PEF_HALFTRANS) {
+		flag=BLIT_HALFTRANS;
+	} else {
+		flag = 0;
+	}
 
+	//static tint (use the tint field)
+	if(ExtFlags&PEF_TINT) {
+		flag|=BLIT_TINTED;
+	}
+
+	//Area tint
 	if (TFlags&PTF_TINT) {
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
+		flag |= BLIT_TINTED;
 	}
 
 	unsigned int face = GetNextFace();
@@ -976,17 +991,22 @@ bool Projectile::PointInRadius(Point &p)
 	return false;
 }
 
-void Projectile::SetGradient(int gradient)
+//Set gradient color, if type is true then it is static tint, otherwise it is paletted color
+void Projectile::SetGradient(int gradient, bool type)
 {
 	//gradients are unsigned chars, so this works
 	memset(Gradients, gradient, 7);
-	TFlags |= PTF_COLOUR;
+	if (type) {
+		ExtFlags|=PEF_TINT;
+	} else {
+		TFlags |= PTF_COLOUR;
+	}
 }
 
 void Projectile::StaticTint(Color &newtint)
 {
 	tint = newtint;
-	TFlags &= ~PTF_TINT;
+	TFlags &= ~PTF_TINT;        //turn off area tint
 }
 
 void Projectile::Cleanup()

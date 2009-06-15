@@ -83,6 +83,7 @@
 #define PEF_RANDOM    64    //random starting frame for animation (?)
 #define PEF_PILLAR    128   //draw all cycles simultaneously on top of each other (call lightning, flamestrike)
 #define PEF_HALFTRANS 256   //half-transparency (holy might)
+#define PEF_TINT      512   //use palette gradient as tint
 
 //projectile area flags
 #define PAF_VISIBLE   1     //the travel projectile is visible until explosion
@@ -281,7 +282,7 @@ public:
 	int Update();
 	//draw object
 	void Draw(Region &screen);
-	void SetGradient(int gradient);
+	void SetGradient(int gradient, bool tint);
 	void StaticTint(Color &newtint);
 private:
 	void CreateAnimations(Animation **anims, const ieResRef bam, int Seq);
