@@ -731,19 +731,7 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 	bool no_more_steps = true;
 
 	if (actor->Modified[IE_DONOTJUMP]<2) {
-		Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*16);
-		BlockSearchMap( actor->Pos, actor->size, 0);
-
-		// Restore the searchmap areas of any nearby actors that could
-		// have been cleared by this BlockSearchMap(..., 0).
-		// (Necessary since blocked areas of actors may overlap.)
-		int i=0;
-		while(nearActors[i]!=NULL) {
-			if(nearActors[i]!=actor)
-				BlockSearchMap( nearActors[i]->Pos, nearActors[i]->size, nearActors[i]->InParty?PATH_MAP_PC:PATH_MAP_NPC);
-			++i;
-		}
-		free(nearActors);
+		ClearSearchMapFor(actor);
 
 		PathNode * step = actor->GetNextStep();
 		if (step && step->Next) {
@@ -764,6 +752,22 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 	}
 
 	return no_more_steps;
+}
+
+void Map::ClearSearchMapFor( Movable *actor ) {
+	Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*16);
+	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_FREE);
+
+	// Restore the searchmap areas of any nearby actors that could
+	// have been cleared by this BlockSearchMap(..., 0).
+	// (Necessary since blocked areas of actors may overlap.)
+	int i=0;
+	while(nearActors[i]!=NULL) {
+		if(nearActors[i]!=actor)
+			BlockSearchMap( nearActors[i]->Pos, nearActors[i]->size, nearActors[i]->InParty?PATH_MAP_PC:PATH_MAP_NPC);
+		++i;
+	}
+	free(nearActors);
 }
 
 void Map::DrawHighlightables( Region screen )
@@ -1214,26 +1218,14 @@ void Map::DeleteActor(int i)
 {
 	Actor *actor = actors[i];
 
-	Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*16);
-
 	Game *game = core->GetGame();
 	game->LeaveParty( actor );
 	game->DelNPC( game->InStore(actor) );
 
-	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_FREE);
-	// Restore the searchmap areas of any nearby actors that could
-	// have been cleared by this BlockSearchMap(..., 0).
-	// (Necessary since blocked areas of actors may overlap.)
-	int j=0;
-	while(nearActors[j]!=NULL) {
-		if(nearActors[j]!=actor)
-			BlockSearchMap( nearActors[j]->Pos, nearActors[j]->size, nearActors[j]->InParty?PATH_MAP_PC:PATH_MAP_NPC);
-		++j;
-	}
+	ClearSearchMapFor(actor);
 
 	actors.erase( actors.begin()+i );
 	delete actor;
-	free(nearActors);
 }
 
 Actor* Map::GetActorByGlobalID(ieDword objectID)
@@ -1824,7 +1816,8 @@ void Map::RemoveActor(Actor* actor)
 	size_t i=actors.size();
 	while (i--) {
 		if (actors[i] == actor) {
-			BlockSearchMap(actor->Pos, actor->size, PATH_MAP_FREE);
+			//BlockSearchMap(actor->Pos, actor->size, PATH_MAP_FREE);
+			ClearSearchMapFor(actor);
 			actors.erase( actors.begin()+i );
 			return;
 		}

@@ -386,6 +386,7 @@ public:
 	void ExploreMapChunk(Point &Pos, int range, int los);
 	/* block or unblock searchmap with value */
 	void BlockSearchMap(Point &Pos, unsigned int size, unsigned int value);
+	void ClearSearchMapFor(Movable *actor);
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
 	//PathFinder

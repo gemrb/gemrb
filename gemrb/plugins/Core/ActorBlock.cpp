@@ -1100,7 +1100,7 @@ void Movable::AddWayPoint(Point &Des)
 		endNode = endNode->Next;
 	}
 	Point p(endNode->x, endNode->y);
-	area->BlockSearchMap( Pos, size, 0);
+	area->ClearSearchMapFor(this);
 	PathNode *path2 = area->FindPath( p, Des, size );
 	endNode->Next = path2;
 	//probably it is wise to connect it both ways?
@@ -1117,7 +1117,7 @@ void Movable::FixPosition()
 		return;
 	}
 	//before fixposition, you should remove own shadow
-	area->BlockSearchMap( Pos, size, 0);
+	area->ClearSearchMapFor(this);
 	Pos.x/=16;
 	Pos.y/=12;
 	GetCurrentArea()->AdjustPosition(Pos);
@@ -1129,7 +1129,7 @@ void Movable::WalkTo(Point &Des, int distance)
 {
 	ClearPath();
 	FixPosition();
-	area->BlockSearchMap( Pos, size, 0);
+	area->ClearSearchMapFor(this);
 	path = area->FindPath( Pos, Des, size, distance );
 	//ClearPath sets destination, so Destination must be set after it
 	//also we should set Destination only if there is a walkable path
@@ -1141,7 +1141,7 @@ void Movable::WalkTo(Point &Des, int distance)
 void Movable::RunAwayFrom(Point &Des, int PathLength, int flags)
 {
 	ClearPath();
-	area->BlockSearchMap( Pos, size, 0);
+	area->ClearSearchMapFor(this);
 	path = area->RunAway( Pos, Des, size, PathLength, flags );
 }
 
@@ -1158,10 +1158,10 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	if (run) {
 		InternalFlags|=IF_RUNNING;
 	}
-	//the comment of the next line was removed in 0.4.0
+	//the commenting-out of the clear search map call was removed in 0.4.0
 	//if you want to put it back for some reason, check
 	//if the searchmap is not eaten up
-	area->BlockSearchMap( Pos, size, 0);
+	area->ClearSearchMapFor(this);
 	Point p = Pos;
 
 	//selecting points around a circle's edge around actor (didn't work better)
@@ -1177,7 +1177,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 
 void Movable::MoveTo(Point &Des)
 {
-	area->BlockSearchMap( Pos, size, 0);
+	area->ClearSearchMapFor(this);
 	Pos = Des;
 	Destination = Des;
 	area->BlockSearchMap( Pos, size, IsPC()?PATH_MAP_PC:PATH_MAP_NPC);
