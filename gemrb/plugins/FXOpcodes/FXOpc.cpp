@@ -1882,7 +1882,7 @@ int fx_cure_invisible_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x30 Cure:Silence
-static EffectRef fx_set_silenced_state_ref={"State:Silence",NULL,-1};
+static EffectRef fx_set_silenced_state_ref={"State:Silenced",NULL,-1};
 
 int fx_cure_silenced_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
