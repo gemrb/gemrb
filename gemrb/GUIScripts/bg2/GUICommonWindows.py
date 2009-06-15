@@ -1369,7 +1369,8 @@ def CanLevelUp(actor):
 		for i in range (Multi[0]):
 			# if any class can level, return 1
 			ClassIndex = ClassTable.FindValue (5, Multi[i+1])
-			if int(GetNextLevelExp (Levels[i], ClassTable.GetRowName (ClassIndex))) <= xp:
+			tmpNext = int(GetNextLevelExp (Levels[i], ClassTable.GetRowName (ClassIndex) ) )
+			if tmpNext != 0 and tmpNext <= xp:
 				return 1
 
 		# didn't find a class that could level
@@ -1381,7 +1382,8 @@ def CanLevelUp(actor):
 			Levels = [Levels[1], Levels[0], Levels[2]]
 
 	# check the class that can be level (single or dual)
-	return int(GetNextLevelExp (Levels[0], Class)) <= xp
+	tmpNext = int(GetNextLevelExp (Levels[0], Class) )
+	return (tmpNext != 0 and tmpNext <= xp)
 
 def LearnPriestSpells (pc, level, mask):
 	"""Learns all the priest spells through the given spell level.
