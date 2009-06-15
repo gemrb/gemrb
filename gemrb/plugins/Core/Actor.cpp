@@ -3709,7 +3709,7 @@ void Actor::ModifyDamage(Actor *target, int &damage, WeaponInfo *wi, bool critic
 		int head = inventory.GetHeadSlot();
 		if ((head!=-1) && target->inventory.HasItemInSlot("",(ieDword) head)) {
 			//critical hit is averted by helmet
-			core->DisplayConstantString(STR_NO_CRITICAL,0xffffff);
+			core->DisplayConstantStringName(STR_NO_CRITICAL, 0xffffff, target);
 		} else {
 			damage <<=1; //critical damage is always double?
 			core->timer->SetScreenShake(2,2,2);
