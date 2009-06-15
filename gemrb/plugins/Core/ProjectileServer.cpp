@@ -159,39 +159,82 @@ int ProjectileServer::InitExplosion()
 	return explosioncount;
 }
 
+unsigned int ProjectileServer::PrepareSymbols(SymbolMgr *projlist) {
+	unsigned int count = 0;
+
+	unsigned int rows = (unsigned int) projlist->GetSize();
+	while(rows--) {
+		unsigned int value = projlist->GetValueIndex(rows);
+		if (value>MAX_PROJ_IDX) {
+			//value = MAX_PROJ_IDX;
+			printMessage("ProjectileServer","Too high projectilenumber\n", YELLOW);
+			continue; // ignore
+		}
+		if (value>(unsigned int) count) {
+			count = (unsigned int) value;
+		}
+	}
+
+	return count;
+}
+
+void ProjectileServer::AddSymbols(SymbolMgr *projlist) {
+	unsigned int rows = (unsigned int) projlist->GetSize();
+	while(rows--) {
+		unsigned int value = projlist->GetValueIndex(rows);
+		if (value>MAX_PROJ_IDX) {
+			continue;
+		}
+		if (value >= (unsigned int)projectilecount) {
+			// this should never happen!
+			printMessage("ProjectileServer","Too high projectilenumber while adding projectiles\n", RED);
+			abort();
+		}
+		strnuprcpy(projectiles[value].resname, projlist->GetStringIndex(rows), 8);
+	}
+}
+
 unsigned int ProjectileServer::GetHighestProjectileNumber()
 {
 	if (projectilecount>=0) {
+		// already read the projectiles
 		return (unsigned int) projectilecount;
 	}
 
+	// built-in gemrb projectiles and game/mod-provided projectiles
+	unsigned int gemresource = core->LoadSymbol("gemprjtl");
+	SymbolMgr *gemprojlist = core->GetSymbol(gemresource);
 	unsigned int resource = core->LoadSymbol("projectl");
 	SymbolMgr *projlist = core->GetSymbol(resource);
-	if (projlist) {
-		projectilecount = 0;
 
-		unsigned int rows = (unsigned int) projlist->GetSize();
-		while(rows--) {
-			unsigned int value = projlist->GetValueIndex(rows);
-			if (value>MAX_PROJ_IDX) {
-				value = MAX_PROJ_IDX;
-				printMessage("ProjectileServer","Too high projectilenumber\n", YELLOW);
-			}
-			if (value>(unsigned int) projectilecount) {
-				projectilecount = (unsigned int) value+1;
-			}
-		}
-		projectiles = new ProjectileEntry[projectilecount];
-
-		rows = (unsigned int) projlist->GetSize();
-		while(rows--) {
-			strnuprcpy(projectiles[ projlist->GetValueIndex(rows)].resname, projlist->GetStringIndex(rows), 8);
-		}
-		core->DelSymbol(resource);
-	} else {
-		projectilecount=1;
-		projectiles = new ProjectileEntry[projectilecount];
+	// first, we must calculate how many projectiles we have
+	if (gemprojlist) {
+		projectilecount = PrepareSymbols(gemprojlist) + 1;
 	}
+	if (projlist) {
+		unsigned int temp = PrepareSymbols(projlist) + 1;
+		if (projectilecount == -1 || temp > (unsigned int)projectilecount)
+			projectilecount = temp;
+	}
+
+	// then, allocate space for them all
+	if (projectilecount == -1) {
+		// no valid projectiles files..
+		projectilecount = 1;
+	}	
+	projectiles = new ProjectileEntry[projectilecount];
+	
+	// finally, we must read the projectile resrefs
+	if (projlist) {
+		AddSymbols(projlist);
+		core->DelSymbol(resource);
+	}
+	// gemprojlist is second because it always overrides game/mod-supplied projectiles
+	if (gemprojlist) {
+		AddSymbols(gemprojlist);
+		core->DelSymbol(gemresource);
+	}
+
 	return (unsigned int) projectilecount;
 }
 
