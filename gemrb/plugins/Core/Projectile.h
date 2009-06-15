@@ -82,6 +82,7 @@
 #define PEF_CURVE     32    //curved path (magic missile)
 #define PEF_RANDOM    64    //random starting frame for animation (?)
 #define PEF_PILLAR    128   //draw all cycles simultaneously on top of each other (call lightning, flamestrike)
+#define PEF_HALFTRANS 256   //half-transparency (holy might)
 
 //projectile area flags
 #define PAF_VISIBLE   1     //the travel projectile is visible until explosion

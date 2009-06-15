@@ -902,7 +902,10 @@ void Projectile::SetPos(int face, int frame1, int frame2)
 void Projectile::DrawTravel(Region &screen)
 {
 	Video *video = core->GetVideoDriver();
-	ieDword flag = 0;
+	ieDword flag;
+	
+	if(ExtFlags&PEF_HALFTRANS) flag=BLIT_HALFTRANS;
+	else flag = 0;
 
 	if (TFlags&PTF_TINT) {
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
