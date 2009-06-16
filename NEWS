@@ -1,17 +1,20 @@
-GemRB svn (6382):
+GemRB svn (6487):
   New features:
     - 
+    - actor tooltips (name and injury status)
     - combat: dual-wielding, APR, proficiency and style boni, dexterity
       bonus, initiatitive and speed factor, individual combat rounds
     - ToB and PST are roughly playable beyond their first levels
-    - projectile sounds
+    - many hardcoded projectiles and support for projectile sounds
     - bg2 chargen now levels to the correct level
     - running and portal animations in PST
 
   Improved features:
+    - 
+    - focus: scrolling while paused is now possible
     - matters of time and matter
     - dialog, actions and triggers
-    - combat mechanics, animation, ranged combat
+    - combat mechanics, animation, feedback, ranged combat
     - area music restarts when there's no music playing
     - The Nameless One properly dies / resurrects
     - projectile orientation, animation
@@ -22,6 +25,7 @@ GemRB svn (6382):
 
   Applied patches:
     #2802190 jbmetz (improve the rpm spec handling)
+    #2802437 danamin (patch bomb sanitizing bg1 chargen + bg2 code share)
 
 GemRB V0.4.0 (2009-05-25):
   New features:
