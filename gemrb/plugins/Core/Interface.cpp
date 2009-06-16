@@ -4092,6 +4092,7 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 	unsigned int speaker_color;
 	const char *name;
 
+	if (stridx<0) return;
 	speaker_color = GetSpeakerColor(name, speaker);
 
 	char* text = GetString( stridx, flags);
