@@ -253,6 +253,7 @@ def ProfsRedraw (first=0):
 		ActPoint = GemRB.GetVar("Prof "+str(Pos) )
 		for j in range(5):  #5 is maximum distributable
 			Star=ProfsWindow.GetControl(i*5+j+ProfsOffsetStar)
+			Star.SetSprites("GUIPFC", 0, 0, 0, 0, 0)
 			if ActPoint > j:
 				Star.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
 			else:
