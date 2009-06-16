@@ -65,7 +65,9 @@ Projectile* PROImp::GetProjectile(Projectile *s)
 	if( !s) {
 		return NULL;
 	}
-	str->ReadWord( &s->Type );
+	ieWord AreaExtension;
+
+	str->ReadWord( &AreaExtension );
 	str->ReadWord( &s->Speed );
 	str->ReadDword( &s->SFlags ); //spark, ignore center, looping sound etc
 	str->ReadResRef( s->SoundRes1 );
@@ -96,7 +98,7 @@ Projectile* PROImp::GetProjectile(Projectile *s)
 	str->ReadWord( &s->TrailSpeed[1] );
 	str->ReadWord( &s->TrailSpeed[2] );
 	str->Seek(172, GEM_CURRENT_POS);
-	if (s->Type!=3) {
+	if (AreaExtension!=3) {
 		return s;
 	}
 	s->InitExtension();
