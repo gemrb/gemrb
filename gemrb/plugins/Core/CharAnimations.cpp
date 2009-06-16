@@ -1178,6 +1178,11 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			Cycle+=54;
 			break;
 
+		case IE_ANI_SHOOT:
+			strcat( ResRef, "g24" );
+			Cycle+=27;
+			break;
+
 		case IE_ANI_HEAD_TURN:
 		case IE_ANI_AWAKE:
 			strcat( ResRef, "g12" );
