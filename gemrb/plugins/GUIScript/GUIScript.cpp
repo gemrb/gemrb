@@ -9517,11 +9517,6 @@ bool GUIScript::Init(void)
 	} else {
 		PathAppend( path2, core->GameType );
 	}
-	sprintf( string, "GameType = \"%s\"", core->GameType);
-	if (PyRun_SimpleString( string ) == -1) {
-		printMessage( "GUIScript", string, RED );
-		return false;
-	}
 
 #ifdef WIN32
 	char *p;
@@ -9551,6 +9546,12 @@ bool GUIScript::Init(void)
 	}
 	sprintf( string, "import GemRB\n");
 	if (PyRun_SimpleString( "import GemRB" ) == -1) {
+		printMessage( "GUIScript", string, RED );
+		return false;
+	}
+
+	sprintf( string, "GemRB.GameType = \"%s\"", core->GameType);
+	if (PyRun_SimpleString( string ) == -1) {
 		printMessage( "GUIScript", string, RED );
 		return false;
 	}
