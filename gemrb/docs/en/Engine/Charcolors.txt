@@ -3,7 +3,7 @@ There are 4 distinct palettes.
 Known values of palette (p) are:
 0 Body
 1 Weapon
-2 Shield
+2 Shield (or Off-hand weapon)
 3 Helmet
 
 Each has 7 colour slots at most.
@@ -26,4 +26,11 @@ Weapon:
 etc.
 
 The combined palette location is given in <p><s> format, where both numbers are 4 bits.
+
+
+
+In GemRB we store these values in the 7 stats starting at IE_COLORS.
+Each stat stores four colour gradients (each as a byte).
+The n-th stat contains the n-th colour for body, weapon, shield, helmet, from
+least significant to most significant byte.
 
