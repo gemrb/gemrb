@@ -383,6 +383,7 @@ def WorldMapWindowCommon (Travel):
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseWorldMapWindow")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Window.SetVisible (1)
 	return
 
