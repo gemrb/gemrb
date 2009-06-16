@@ -2367,10 +2367,7 @@ Sprite2D* SDLVideoDriver::CreateLight(int radius, int intensity)
 			if(a<0) a=0;
 			else if(a>255) a = 255;
 
-			*((unsigned char*)pixels + i++) = 255;
-			*((unsigned char*)pixels + i++) = 255;
-			*((unsigned char*)pixels + i++) = 255;
-			*((unsigned char*)pixels + i++) = (unsigned char) a/2;
+			*((unsigned int*)pixels + i++) = 0xffffff + ((a/2) << 24);
 		}
 	}
 
@@ -2394,6 +2391,7 @@ Sprite2D* SDLVideoDriver::SpriteScaleDown( Sprite2D* sprite, unsigned int ratio 
 		for (unsigned int x = 0; x < Width; x++) {
 			Color c = SpriteGetPixelSum( sprite, x, y, ratio );
 
+			// this seems unlikely to work on big-endian
 			*((char*)pixels + i++) = c.r;
 			*((char*)pixels + i++) = c.g;
 			*((char*)pixels + i++) = c.b;
