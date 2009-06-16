@@ -84,6 +84,7 @@
 #define PEF_PILLAR    128   //draw all cycles simultaneously on top of each other (call lightning, flamestrike)
 #define PEF_HALFTRANS 256   //half-transparency (holy might)
 #define PEF_TINT      512   //use palette gradient as tint
+#define PEF_ITERATION 1024  //create another projectile of type-1 (magic missiles)
 
 //projectile area flags
 #define PAF_VISIBLE   1     //the travel projectile is visible until explosion
@@ -141,7 +142,6 @@ public:
 	~Projectile();
 	void InitExtension();
 
-	ieWord Type;
 	ieWord Speed;
 	ieDword SFlags;
 	ieResRef SoundRes1;
@@ -170,9 +170,9 @@ public:
 	bool autofree;
 	Palette* palette;
 	//let's make this one public
-	ieDword timeStartStep;
 	//internals
 protected:
+	ieDword timeStartStep;
 	//attributes from moveable object
 	unsigned char Orientation, NewOrientation;
 	PathNode* path; //whole path
@@ -285,6 +285,8 @@ public:
 	void SetGradient(int gradient, bool tint);
 	void StaticTint(Color &newtint);
 private:
+	//creates a child projectile with current_projectile_id - 1
+	void CreateIteration();
 	void CreateAnimations(Animation **anims, const ieResRef bam, int Seq);
 	//pillar type animations
 	void CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq);
@@ -293,7 +295,6 @@ private:
 	void GetPaletteCopy(Animation *anim[], Palette *&pal);
 	void SetBlend();
 	void SecondaryTarget();
-	//void CleanAreaAffect();
 	void CheckTrigger(unsigned int radius);
 	void DrawTravel(Region &screen);
 	bool DrawChildren(Region &screen);

@@ -247,6 +247,16 @@ void Projectile::SetBlend()
 	}
 }
 
+//create another projectile with type-1 (iterate magic missiles and call lightning)
+void Projectile::CreateIteration()
+{
+	ProjectileServer *server = core->GetProjectileServer();
+	Projectile *pro = server->GetProjectileByIndex(type-1);
+	pro->SetEffectsCopy(effects);
+	pro->SetCaster(Caster);
+	area->AddProjectile(pro, Pos, Target);
+}
+
 // load animations, start sound
 void Projectile::Setup()
 {
@@ -254,6 +264,10 @@ void Projectile::Setup()
 	tint.g=128;
 	tint.b=128;
 	tint.a=255;
+
+	if(ExtFlags&PEF_ITERATION) {
+		CreateIteration();
+	}
 
 	//set any static tint
 	if(ExtFlags&PEF_TINT) {

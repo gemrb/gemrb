@@ -52,8 +52,10 @@ ProjectileServer::~ProjectileServer()
 Projectile *ProjectileServer::CreateDefaultProjectile(unsigned int idx)
 {
 	Projectile *pro = new Projectile();
-	int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Type);
-	memset(&pro->Type, 0, strlength );
+	//int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Type);
+	//memset(&pro->Type, 0, strlength );
+	int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Speed);
+	memset(&pro->Speed, 0, strlength );
 
 	//take care, this projectile is not freed up by the server
 	if(idx==(unsigned int) ~0 ) {
@@ -95,9 +97,11 @@ Projectile *ProjectileServer::GetProjectileByIndex(unsigned int idx)
 Projectile *ProjectileServer::ReturnCopy(unsigned int idx)
 {
 	Projectile *pro = new Projectile();
-	int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Type);
 	Projectile *old = projectiles[idx].projectile;
-	memcpy(&pro->Type, &old->Type, strlength );
+	//int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Type);
+	//memcpy(&pro->Type, &old->Type, strlength );
+	int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Speed);
+	memcpy(&pro->Speed, &old->Speed, strlength );
 	//FIXME: copy extension data too, or don't alter the extension
 	if (old->Extension) {
 		pro->Extension = old->Extension;
