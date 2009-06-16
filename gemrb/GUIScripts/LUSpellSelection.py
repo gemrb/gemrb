@@ -228,7 +228,7 @@ def SpellsDonePress ():
 			DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 			return
 
-	if GameIsBG1():
+	if not GameIsBG1():
 		# close our window and update our records
 		if SpellsWindow:
 			SpellsWindow.Unload ()
@@ -240,7 +240,7 @@ def SpellsDonePress ():
 		else:
 			next()
 	 # close our window and update our records
-	elif SpellsWindow and GameIsBG1():
+	elif SpellsWindow and not GameIsBG1():
 		SpellsWindow.Unload ()
 
 	return
@@ -264,7 +264,7 @@ def ShowSpells ():
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetVarAssoc("ButtonPressed", i)
 		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsSelectPress")
-		if not GameIsBG1():
+		if GameIsBG1():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
 		else:
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
