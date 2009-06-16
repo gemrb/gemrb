@@ -1922,6 +1922,10 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			moveX = 0;
 			moveY = 0;
 			return;
+		case GEM_ESCAPE:
+			core->GetGUIScriptEngine()->RunFunction("EmptyControls");
+			core->SetEventFlag(EF_ACTION);
+			return;
 		default:
 			return;
 	}
