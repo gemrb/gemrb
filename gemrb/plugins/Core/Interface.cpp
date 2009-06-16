@@ -3966,7 +3966,7 @@ unsigned int Interface::GetSpeakerColor(const char *&name, Scriptable *&speaker)
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = ((Actor *) speaker)->GetName(-1);
-			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR), PALSIZE, ActorColor );
+			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR) & 0xFF, PALSIZE, ActorColor );
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
@@ -4116,7 +4116,7 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = ((Actor *) speaker)->GetName(-1);
-			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR), PALSIZE, ActorColor );
+			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR) & 0xFF, PALSIZE, ActorColor );
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
