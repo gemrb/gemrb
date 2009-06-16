@@ -1,63 +1,59 @@
 Scripts:
-1. (PARTLY) ToB specific actions/triggers, like pocketplane (so ToB will work)
+1. (DONE?) ToB specific actions/triggers, like pocketplane (so ToB will work)
 2. (PARTLY) Properly detect the play mode (sp/mp, normal/extended)
 
 Combat:
-1. fix combat round timings
+1. (DONE?) fix combat round timings
 2. implement customisable combat calculation, it should be general enough to
 simulate all games, without any hardcoded parts
-3. implement wspatck.2da and wspecial.2da handling
+3. (PARTLY) implement wspatck.2da and wspecial.2da handling
 
 Items:
-6. (PARTLY) Break items, count charges
-7. Implement switching weapon abilities
-8. (PARTLY) Implement item usage (similar to spells)
+1. (DONE-almost) Break items, count charges
+2. (PARTLY) Implement switching weapon abilities
+3. (DONE-almost) Implement item usage (similar to spells)
 
 Effects:
-1. (DONE) Create base system for effect blocks
-2. (DONE-almost) Implement common effects
-3. (PARTLY) Implement IWD2 effects
-4. (DONE-almost) Implement TOB effects
-5. (PARTLY) Implement PST effects
-6. (DONE-almost) Implement area/non-living affecting effects 
+1. (DONE-almost) Implement common effects
+2. (PARTLY) Implement IWD2 effects
+3. (DONE-almost) Implement TOB effects
+4. (PARTLY) Implement PST effects
+5. (DONE-almost) Implement area/non-living affecting effects 
 
 Area:
-2. (PARTLY) Don't load scripts for pile items? (research when a script is unused)
-3. (DONE) Create real streaming ambients (do not preload them, just use them when needed)
-4. (DONE) in pathfinder, calculate with the actor's feet circle size (npc blocking still needed)
-5. (DONE) fix door wallgroups and tiles (some problems with overlays still exist)
-6. (DONE) Handle extended night flag (alternate lightmap, tileset, minimap)
+1. (PARTLY) Don't load scripts for pile items? (research when a script is unused)
+2. (DONE) Create real streaming ambients (do not preload them, just use them when needed)
+3. (DONE) in pathfinder, calculate with the actor's feet circle size (npc blocking still needed)
+4. (DONE-almost) fix overlaid tiles - bug #1623839
 
 Store:
-no tasks
+1.  Store caching (especially bags)
 
 Animation:
 1. (PARTLY) fix char animation sequences
-5. (DONE) Handle equipment animations (armourlevel, weapons) - this seems to be done by wjp/avenger
-7. stanceID is still fuzzy. Fix it. (FIXED?)
-8. (PARTLY) Implement projectile animations (area, cone, fragments)
+2. stanceID is still fuzzy. Fix it. (FIXED?)
+3. (PARTLY) Implement projectile animations (area, cone, fragments, hardcoded features)
 
 Actor:
-2. Use the character sheet (Actor.cpp) itself to store attributes of the character 
+1. (PARTLY) Use the character sheet (Actor.cpp) itself to store attributes of the character 
    during character generation. 
    Benefits: data is already stored in the destination, data constraints and relations 
    are easily implemented.
    How to: replace GemRB.SetVar with GemRB.SetPlayerStat. Don't forget to create
    the character first. - see iwd2 chargen for a partially implemented solution
-3. Move position of actor (and ground circle) to the center of a searchmap cell
+2. Move position of actor (and ground circle) to the center of a searchmap cell
 
 
 Game GUI:
-2. (PARTLY) implement class based (but customisable) action button bar. Generally port
+1. (PARTLY) implement class based (but customisable) action button bar. Generally port
    the IWD2 system to all engines
-3. implement grabbing mouse pointer by a control to fix dragging of PST Float menu window
-4. (DONE) Fix multi line editboxes. Allow attaching of scrollbar. - Avenger, i think it is done
-5. (PARTLY) Fix drop capitals (initials) Calculate text height/width correctly, display
+2. implement grabbing mouse pointer by a control to fix dragging of PST Float menu window
+3. (PARTLY) Fix drop capitals (initials) Calculate text height/width correctly, display
    it correctly too.
-6. (PARTLY) Fix unwanted screen shake (especially when on bottom of area)
-7. (PARTLY) Level up code, this should be written mostly in GuiScript!!!
-8. Contingency, spell trigger setup windows
-9. Customize windows (part of character record window)
+4. (PARTLY) Fix unwanted screen shake (especially when on bottom of area)
+5. (PARTLY) Level up code, this should be written mostly in GuiScript!!!
+6. Contingency, spell trigger setup windows
+7. (PARTLY) Customize windows (part of character record window)
 
 General:
 1. The Cache and Variables classes could be rewritten to incorporate the release 
@@ -65,8 +61,8 @@ General:
 2. various directories (GemRB override, game override ...) should be resolved 
    right after loading config files and remain static afterwards. Maybe define 
    some PATH variable describing all the directories searched for files
-4. valgrind reports a big heap of unreleased python objects
-5. Implement at least all the options accessible from the GUI options setup,
+3. valgrind reports a big heap of unreleased python objects
+4. Implement at least all the options accessible from the GUI options setup,
    rewrite baldur|torment|icewind.ini
 
 Graphics:
@@ -94,15 +90,15 @@ Release:
 
 
 Documentation:
-2. (PARTLY) make tool to scan source files for those with non-standard
+1. (PARTLY) make tool to scan source files for those with non-standard
    copyright notices
-3. Add Doxygen doc comments to more objects
-4. Write GemRB overview, structure and high-level flow docs
-5. (PARTLY) Automate the wikification of guiscript docs
-6. Update guiscript docs with metaclass info
-7. Add missing guiscript function docs
+2. Add Doxygen doc comments to more objects
+3. Write GemRB overview, structure and high-level flow docs
+4. (PARTLY) Automate the wikification of guiscript docs
+5. Update guiscript docs with metaclass info
+6. Add missing guiscript function docs
 
 
 Community:
-2. (DONE-needs more work) Update the web page, get rid of postnuke
-3. Move this todo to bug/task tracker at Sourceforge :-)
+1. (DONE-needs more work) Update the web page, get rid of postnuke
+2. Move this todo to bug/task tracker at Sourceforge :-)
