@@ -4075,27 +4075,7 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 
 	GetSpeakerColor(name2, target);
 	attacker_color = GetSpeakerColor(name1, attacker);
-/*
-	switch (attacker->Type) {
-		case ST_ACTOR:
-			name1 = ((Actor *) attacker)->GetName(-1);
-			GetPalette( ((Actor *) attacker)->GetStat(IE_MAJOR_COLOR),PALSIZE, ActorColor );
-			attacker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
-			break;
-		default:
-			name1 = "";
-			attacker_color = 0x800000;
-			break;
-	}
-	switch (target->Type) {
-		case ST_ACTOR:
-			name2 = ((Actor *) target)->GetName(-1);
-			break;
-		default:
-			name2 = "";
-			break;
-	}
-*/
+
 	char* text = GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	int newlen = (int)(strlen( DisplayFormatAction ) + strlen( name1 ) +
 		+ strlen( name2 ) + strlen( text ) + 18);
@@ -4112,22 +4092,7 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 	unsigned int speaker_color;
 	const char *name;
 
-	if (stridx<0) return;
-	switch (speaker->Type) {
-		case ST_ACTOR:
-			name = ((Actor *) speaker)->GetName(-1);
-			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR) & 0xFF, PALSIZE, ActorColor );
-			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
-			break;
-		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-			name = GetString( ((InfoPoint *) speaker)->DialogName );
-			speaker_color = 0xc0c0c0;
-			break;
-		default:
-			name = "";
-			speaker_color = 0x800000;
-			break;
-	}
+	speaker_color = GetSpeakerColor(name, speaker);
 
 	char* text = GetString( stridx, flags);
 	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
