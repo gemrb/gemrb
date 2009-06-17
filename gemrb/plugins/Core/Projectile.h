@@ -116,6 +116,8 @@
 #define APF_SPREAD    16
 //the spread projectile needs gradient colouring,not tint (example:web, counter example: stinking cloud)
 #define APF_PALETTE   32
+//use both animations in the spread
+#define APF_BOTH      64
 
 struct ProjectileExtension
 {

@@ -265,6 +265,13 @@ void Projectile::Setup()
 	tint.b=128;
 	tint.a=255;
 
+	//cone area of effect always disables the travel flag
+	//but also makes the caster immune to the effect
+	if (Extension && (Extension->AFlags&PAF_CONE)) {
+		Destination=Pos;
+		ExtFlags|=PEF_NO_TRAVEL;
+	}
+
 	if(ExtFlags&PEF_ITERATION) {
 		CreateIteration();
 	}
@@ -438,6 +445,8 @@ void Projectile::DoStep(unsigned int walk_speed)
 		return;
 	}
 
+	//path won't be calculated if speed==0
+	walk_speed=1500/walk_speed;
 	ieDword time = core->GetGame()->Ticks;
 	if (!step) {
 		step = path;
@@ -501,7 +510,12 @@ void Projectile::NextTarget(Point &p)
 		Pos = Destination;
 		return;
 	}
-	Orientation = GetOrient(Destination, Pos);
+	NewOrientation = Orientation = GetOrient(Destination, Pos);
+	if(ExtFlags&PEF_NO_TRAVEL) {
+		Target = NULL;
+		Destination = Pos;
+		return;
+	}
 	path = area->GetLine( Pos, Destination, Speed, Orientation, GL_PASS );
 }
 
@@ -599,39 +613,59 @@ void Projectile::SetEffectsCopy(EffectQueue *eq)
 //secondary projectiles target all in the explosion radius
 void Projectile::SecondaryTarget()
 {
+	int mindeg = 0;
+	int maxdeg = 0;
+	if (Extension->AFlags&PAF_CONE) {		
+		mindeg=Orientation*22-Extension->ConeWidth/2;
+		maxdeg=mindeg+Extension->ConeWidth;
+	}
+
 	ProjectileServer *server = core->GetProjectileServer();
 	int radius = Extension->ExplosionRadius;
 	Actor **actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	Actor **poi=actors;
 	while(*poi) {
 		ieDword Target = (*poi)->GetGlobalID();
-
+		
 		//this flag is actually about ignoring the caster
-		if (!(SFlags & PSF_IGNORE_CENTER) || Caster!=Target) {
-			Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
-			pro->SetEffectsCopy(effects);
-			pro->SetCaster(Caster);
-			area->AddProjectile(pro, Pos, Target);
+		if ((SFlags & PSF_IGNORE_CENTER) && (Caster==Target)) {
+			poi++;
+			continue;
 		}
+
+		if (Extension->AFlags&PAF_CONE) {
+
+			//cone never affects the caster
+			if(Caster==Target) {
+				poi++;
+				continue;
+			}
+			double xdiff = Pos.x-(*poi)->Pos.x;
+			double ydiff = Pos.y-(*poi)->Pos.y;
+			int deg;
+			
+			if (ydiff) {
+				deg = (int) (atan(xdiff/ydiff)*180/M_PI);
+				if(ydiff<0) deg+=180;
+			} else {
+				if (xdiff<0) deg=0;
+				else deg = 180;
+			}
+			
+			//not in the right sector of circle
+			if (mindeg>deg || maxdeg<deg) {
+				poi++;
+				continue;
+			}
+		}
+		Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
+		pro->SetEffectsCopy(effects);
+		pro->SetCaster(Caster);
+		area->AddProjectile(pro, Pos, Target);
 		poi++;
 	}
 	free(actors);
 }
-
-/*
-void Projectile::CleanAreaAffect()
-{
-	if (!Extension) return;
-
-	int radius = Extension->ExplosionRadius;
-	Actor **actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
-	Actor **poi=actors;
-	while(*poi) {
-		(*poi)->fxqueue.RemoveAllEffectsWithProjectile(type);
-	}
-	free(actors);
-}
-*/
 
 int Projectile::Update()
 {
@@ -684,21 +718,21 @@ void Projectile::Draw(Region &screen)
 bool Projectile::DrawChildren(Region &screen)
 {
 	bool drawn = false;
-
+	
 	if (children) {
 		for(int i=0;i<child_size;i++){
 			if(children[i]) {
-			if (children[i]->Update()) {
-				children[i]->DrawTravel(screen);
-				drawn = true;
-			} else {
+				if (children[i]->Update()) {
+					children[i]->DrawTravel(screen);
+					drawn = true;
+				} else {
 					delete children[i];
 					children[i]=NULL;
-			}
+				}
 			}
 		}
 	}
-
+	
 	return drawn;
 }
 
@@ -824,9 +858,7 @@ void Projectile::DrawExplosion(Region &screen)
 			}
 
 			int initial = child_size;
-			if (apflags&APF_SPREAD) {
-				initial/=2;
-			}
+
 			for(int i=0;i<initial;i++) {
 				//leave this slot free, it is residue from the previous flare up
 				if (children[i])
@@ -841,17 +873,19 @@ void Projectile::DrawExplosion(Region &screen)
 				int rad = Extension->ExplosionRadius;
 				Point newdest;
 
-				if (apflags&APF_FILL) rad=core->Roll(1,rad,0);
-				int max = 256;
+				if (apflags&APF_FILL) {
+					rad=core->Roll(1,rad,0);
+				}
+				int max = 360;
 				int add = 0;
 				if (Extension->AFlags&PAF_CONE) {
 					max=Extension->ConeWidth;
-					add=Orientation*16;
+					add=(Orientation*45-max)/2;
 				}
 				max=core->Roll(1,max,add);
-				double degree=max*M_PI/128;
-				newdest.x = (int) (rad * cos(degree) );
-				newdest.y = (int) (rad * sin(degree) );
+				double degree=max*M_PI/180;
+				newdest.x = (int) -(rad * sin(degree) );
+				newdest.y = (int) (rad * cos(degree) );
 
 				if (apflags&APF_FILL) {
 					pro->SetDelay(Extension->Delay);
@@ -870,15 +904,12 @@ void Projectile::DrawExplosion(Region &screen)
 
 				//sets up the gradient color for the explosion animation
 				if (apflags&(APF_PALETTE|APF_TINT) ) {
-					if (apflags&APF_PALETTE) {
-						pro->SetGradient(Extension->ExplColor, false);
-					} else {
-						pro->SetGradient(Extension->ExplColor, true);
-					}
-
+					pro->SetGradient(Extension->ExplColor, !(apflags&APF_PALETTE));
 				}
 				//i'm unsure if we need blending for all anims or just the tinted ones
 				pro->TFlags|=PTF_BLEND;
+				//random frame is needed only for some of these, make it an areapro flag?
+				pro->ExtFlags|=PEF_RANDOM;
 				pro->Setup();
 				children[i]=pro;
 			}
@@ -1020,7 +1051,7 @@ void Projectile::SetGradient(int gradient, bool type)
 void Projectile::StaticTint(Color &newtint)
 {
 	tint = newtint;
-	TFlags &= ~PTF_TINT;        //turn off area tint
+	TFlags &= ~PTF_TINT; //turn off area tint
 }
 
 void Projectile::Cleanup()
@@ -1030,8 +1061,5 @@ void Projectile::Cleanup()
 	effects = NULL;
 	//diffuse the projectile
 	phase=P_EXPIRED;
-	//remove effects from affected people in the area
-	//apparently the original game doesn't try this
-	//CleanAreaAffect();
 }
 
