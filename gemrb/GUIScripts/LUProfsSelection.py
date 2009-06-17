@@ -55,6 +55,8 @@ ProfCount = 0
 ProfsTableOffset = 0
 ProfsScrollBar = None
 
+ProfsType = None
+
 def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1], classid=0, scroll=True, profTableOffset=8):
 	"""Opens the proficiency selection window.
 	
@@ -65,7 +67,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 
 	global ProfsOffsetSum, ProfsOffsetButton1, ProfsOffsetLabel, ProfsOffsetStar
 	global ProfsOffsetPress, ProfsPointsLeft, ProfsNumButtons, ProfsTopIndex
-	global ProfsScrollBar, ProfsTableOffset
+	global ProfsScrollBar, ProfsTableOffset, ProfsType
 	global ProfsWindow, ProfsCallback, ProfsTextArea, ProfsColumn, ProfsTable, ProfCount
 
 	# make sure we're within ranges
@@ -77,6 +79,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	ProfsWindow = window
 	ProfsCallback = callback
 	ProfsTableOffset = profTableOffset
+	ProfsType = type
 
 	if type == LUPROFS_TYPE_CHARGEN: #chargen
 		ProfsOffsetSum = 9
@@ -104,7 +107,10 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsOffsetStar = 0
 		ProfsOffsetLabel = 41
 		ProfsOffsetPress = 66
-		ProfsNumButtons = 8
+		if GameIsBG1():
+			ProfsNumButtons = 7
+		else:
+			ProfsNumButtons = 8
 		ProfsTextArea = ProfsWindow.GetControl (74)
 		ProfsTextArea.SetText (9588)
 		ProfsScrollBar = ProfsWindow.GetControl (78)
@@ -313,6 +319,8 @@ def ProfsLeftPress():
 	MaxProf = ProfsTable.GetValue(Pos+ProfsTableOffset, ProfsColumn) #we add the bg1 skill count offset
 	if MaxProf>5:
 		MaxProf = 5
+	if GameIsBG1() and (MaxProf>2) and (ProfsType == LUPROFS_TYPE_CHARGEN):
+		MaxProf = 2
 
 	ActPoint = GemRB.GetVar("Prof "+str(Pos) )
 	if ActPoint >= MaxProf:
