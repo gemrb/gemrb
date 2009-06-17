@@ -246,6 +246,8 @@ void GameControl::CreateMovement(Actor *actor, Point &p)
 	}
 
 	actor->AddAction( action );
+	// force action so that we get target recticles immediately
+	actor->ProcessActions(true);
 }
 
 GameControl::~GameControl(void)
