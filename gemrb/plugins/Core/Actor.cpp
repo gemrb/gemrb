@@ -3677,8 +3677,9 @@ void Actor::ModifyDamage(Actor *target, int &damage, ieDword damagetype, WeaponI
 	}
 
 	// only check stone skins if damage type is physical or magical
-	// FIXME: DAMAGE_CRUSHING is 0 :(
-	if ((damagetype & (DAMAGE_PIERCING|DAMAGE_SLASHING|DAMAGE_MISSILE|DAMAGE_MAGIC)) || damagetype == DAMAGE_CRUSHING) {
+	// DAMAGE_CRUSHING is 0, so we can't AND with it to check for its presence
+	printf("DAMAGETYPE:%d\n", damagetype);
+	if (!(damagetype & ~(DAMAGE_PIERCING|DAMAGE_SLASHING|DAMAGE_MISSILE|DAMAGE_MAGIC))) {
 		int stoneskins = target->Modified[IE_STONESKINS];
 		if (stoneskins) {
 			target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin_ref, 1);
