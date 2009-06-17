@@ -239,9 +239,6 @@ def SpellsDonePress ():
 			GemRB.SetNextScript("GUICG6")
 		else:
 			next()
-	 # close our window and update our records
-	elif SpellsWindow and not GameIsBG1():
-		SpellsWindow.Unload ()
 
 	return
 
