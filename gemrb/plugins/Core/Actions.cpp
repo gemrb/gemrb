@@ -1429,7 +1429,11 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 		Sender->AddActionInFront( Sender->CurrentAction );
 		return;
 	}
-	DisplayStringCore( Sender, parameters->int0Parameter, DS_CONSOLE|DS_WAIT|DS_SPEECH|DS_HEAD);
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1]);
+	if (!target) {
+		target=Sender;
+	}
+	DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_WAIT|DS_SPEECH|DS_HEAD);
 	Sender->ReleaseCurrentAction();
 }
 
