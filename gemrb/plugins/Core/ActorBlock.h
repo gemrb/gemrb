@@ -44,6 +44,7 @@ class Gem_Polygon;
 
 #define MAX_SCRIPTS		8
 #define MAX_GROUND_ICON_DRAWN   3
+#define MAX_TIMER		256
 
 /** The distance of operating a trigger, container, etc. */
 #define MAX_OPERATING_DISTANCE      40 //a search square is 16x12
@@ -174,6 +175,9 @@ private:
 	unsigned long startTime;
 	unsigned long interval;
 	unsigned long WaitCounter;
+	// script_timers should probably be a std::map to
+	// conserve memory (usually at most 2 ids are used)
+	ieDword script_timers[MAX_TIMER];
 protected: //let Actor access this
 	Map *area;
 	ieVariable scriptName;
@@ -266,6 +270,10 @@ public:
 	void CastSpellPointEnd( const ieResRef SpellResRef);
 	void CastSpellEnd( const ieResRef SpellResRef);
 	ieWord GetGlobalID();
+	/** timer functions (numeric ID, not saved) */
+	bool TimerActive(ieDword ID);
+	bool TimerExpired(ieDword ID);
+	void StartTimer(ieDword ID, ieDword expiration);
 private:
 	/* used internally to handle start of spellcasting */
 	void SpellCast(const ieResRef SpellResRef);

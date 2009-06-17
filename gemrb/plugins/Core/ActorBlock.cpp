@@ -88,6 +88,8 @@ Scriptable::Scriptable(ScriptableType type)
 	locals->SetType( GEM_VARIABLES_INT );
 	locals->ParseKey( 1 );
 	InitTriggers();
+
+	memset( script_timers,0, sizeof(script_timers));
 }
 
 Scriptable::~Scriptable(void)
@@ -701,6 +703,40 @@ void Scriptable::SpellCast(const ieResRef SpellResRef)
 	SPLExtHeader *header = spl->GetExtHeader(SpellHeader);
 	SetWait(header->CastingTime*AI_UPDATE_TIME);
 	gamedata->FreeSpell(spl, SpellResRef, false);
+}
+
+bool Scriptable::TimerActive(ieDword ID)
+{
+	if (ID>=MAX_TIMER) {
+		return false;
+	}
+	if (script_timers[ID]) {
+		return true;
+	}
+	return false;
+}
+
+bool Scriptable::TimerExpired(ieDword ID)
+{
+	if (ID>=MAX_TIMER) {
+		return false;
+	}
+	if (script_timers[ID] && script_timers[ID] < core->GetGame()->GameTime) {
+		// expired timers become inactive after being checked
+		script_timers[ID] = 0;
+		return true;
+	}
+	return false;
+}
+
+void Scriptable::StartTimer(ieDword ID, ieDword expiration)
+{
+	if (ID>=MAX_TIMER) {
+		printMessage("Scriptable", " ", RED);
+		printf("Timer id %d exceeded MAX_TIMER %d\n", ID, MAX_TIMER);
+		return;
+	}
+	script_timers[ID]= core->GetGame()->GameTime + expiration*AI_UPDATE_TIME;
 }
 
 /********************

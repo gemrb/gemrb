@@ -59,9 +59,6 @@ class Game;
 //the size of the bestiary register
 #define BESTIARY_SIZE 260
 
-//timer counts
-#define MAX_TIMER 32
-
 //ShareXP flags
 #define SX_DIVIDE  1   //divide XP among team members
 #define SX_CR      2   //use challenge rating resolution
@@ -224,7 +221,6 @@ public:
 	Particles *weather;
 	int event_timer;
 	char event_handler[64]; //like in Control
-	ieDword script_timers[MAX_TIMER];
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();
@@ -381,10 +377,6 @@ public:
 	/** gets the colour which should be applied over the game area,
 	may return NULL */
 	const Color *GetGlobalTint() const;
-	/** timer functions (numeric ID, not saved) */
-	bool TimerActive(ieDword ID);
-	bool TimerExpired(ieDword ID);
-	void StartTimer(ieDword ID, ieDword expiration);
 	/** draw weather */
 	void DrawWeather(Region &screen, bool update);
 	/** updates current area music */

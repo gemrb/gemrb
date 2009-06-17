@@ -57,7 +57,6 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	timestop_end = 0;
 	event_timer = 0;
 	event_handler[0] = 0;
-	memset( script_timers,0, sizeof(script_timers));
 	weather = new Particles(200);
 	weather->SetRegion(0, 0, core->Width, core->Height);
 	LastScriptUpdate = 0;
@@ -1427,38 +1426,6 @@ int Game::AttackersOf(ieDword globalID, Map *area) const
 		}
 	}
 	return cnt;
-}
-
-bool Game::TimerActive(ieDword ID)
-{
-	if (ID>=MAX_TIMER) {
-		return false;
-	}
-	if (script_timers[ID]) {
-		return true;
-	}
-	return false;
-}
-
-bool Game::TimerExpired(ieDword ID)
-{
-	if (ID>=MAX_TIMER) {
-		return false;
-	}
-	if (script_timers[ID] && script_timers[ID]<GameTime) {
-	//would an expired timer become inactive?
-	//if yes, make it zero now
-		return true;
-	}
-	return false;
-}
-
-void Game::StartTimer(ieDword ID, ieDword expiration)
-{
-	if (ID>=MAX_TIMER) {
-		return;
-	}
-	script_timers[ID]=GameTime+expiration*AI_UPDATE_TIME; // correct?
 }
 
 /* this method redraws weather. If update is false,

@@ -3859,17 +3859,17 @@ int GameScript::Sequence(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-int GameScript::TimerExpired(Scriptable* /*Sender*/, Trigger* parameters)
+int GameScript::TimerExpired(Scriptable* Sender, Trigger* parameters)
 {
-	if (core->GetGame()->TimerExpired(parameters->int0Parameter) ) {
+	if (Sender->TimerExpired(parameters->int0Parameter) ) {
 		return 1;
 	}
 	return 0;
 }
 
-int GameScript::TimerActive(Scriptable* /*Sender*/, Trigger* parameters)
+int GameScript::TimerActive(Scriptable* Sender, Trigger* parameters)
 {
-	if (core->GetGame()->TimerActive(parameters->int0Parameter) ) {
+	if (Sender->TimerActive(parameters->int0Parameter) ) {
 		return 1;
 	}
 	return 0;

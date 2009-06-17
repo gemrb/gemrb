@@ -128,15 +128,15 @@ void GameScript::SetGlobalRandom(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::StartTimer(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::StartTimer(Scriptable* Sender, Action* parameters)
 {
-	core->GetGame()->StartTimer(parameters->int0Parameter, parameters->int1Parameter);
+	Sender->StartTimer(parameters->int0Parameter, parameters->int1Parameter);
 }
 
-void GameScript::StartRandomTimer(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::StartRandomTimer(Scriptable* Sender, Action* parameters)
 {
 	ieDword value = core->Roll(1, parameters->int2Parameter-parameters->int1Parameter, parameters->int2Parameter-1);
-	core->GetGame()->StartTimer(parameters->int0Parameter, value);
+	Sender->StartTimer(parameters->int0Parameter, value);
 }
 
 void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
