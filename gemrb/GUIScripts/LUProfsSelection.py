@@ -23,6 +23,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from BGCommon import *
+from GUICommon import GameIsBG1
 
 #the different types possible
 LUPROFS_TYPE_LEVELUP = 0
@@ -239,7 +240,7 @@ def ProfsRedraw (first=0):
 			Button2.SetState(IE_GUI_BUTTON_DISABLED)
 			Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 			Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			if i==0 or ((i-1) in SkipProfs):
+			if (not GameIsBG1()) and (i==0 or ((i-1) in SkipProfs)):
 				SkipProfs.append (i)
 		else:
 			Button1.SetState(IE_GUI_BUTTON_ENABLED)
