@@ -682,9 +682,9 @@ void Map::UpdateScripts()
 					//Run the InfoPoint script
 					ip->ExecuteScript( 1 );
 				}
-				//Execute Pending Actions
-				ip->ProcessActions(false);
 			}
+			//Execute Pending Actions
+			ip->ProcessActions(false);
 			continue;
 		}
 
@@ -717,13 +717,11 @@ void Map::UpdateScripts()
 			}
 		}
 
-		if (ip->Type==ST_PROXIMITY) {
-			if (wasActive) {
-				ip->ExecuteScript( 1 );
-			}
-			//Execute Pending Actions
-			ip->ProcessActions(false);
+		if (wasActive) {
+			ip->ExecuteScript( 1 );
 		}
+		//Execute Pending Actions
+		ip->ProcessActions(false);
 	}
 }
 
