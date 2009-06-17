@@ -728,7 +728,7 @@ void Map::UpdateScripts()
 bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 	bool no_more_steps = true;
 
-	if (actor->Modified[IE_DONOTJUMP]<2) {
+	if (actor->BlocksSearchMap()) {
 		ClearSearchMapFor(actor);
 
 		PathNode * step = actor->GetNextStep();
@@ -742,8 +742,7 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
 		if (!actor->Immobile()) {
 			no_more_steps = actor->DoStep( speed, time );
-			// if IE_DONOTJUMP means don't touch the searchmap, we shouldn't be blocking it here?
-			if (actor->Modified[IE_DONOTJUMP]<2) {
+			if (actor->BlocksSearchMap()) {
 				BlockSearchMap( actor->Pos, actor->size, actor->InParty?PATH_MAP_PC:PATH_MAP_NPC);
 			}
 		}
@@ -761,7 +760,7 @@ void Map::ClearSearchMapFor( Movable *actor ) {
 	// (Necessary since blocked areas of actors may overlap.)
 	int i=0;
 	while(nearActors[i]!=NULL) {
-		if(nearActors[i]!=actor)
+		if(nearActors[i]!=actor && nearActors[i]->BlocksSearchMap())
 			BlockSearchMap( nearActors[i]->Pos, nearActors[i]->size, nearActors[i]->InParty?PATH_MAP_PC:PATH_MAP_NPC);
 		++i;
 	}

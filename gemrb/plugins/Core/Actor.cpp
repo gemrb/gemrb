@@ -5288,3 +5288,8 @@ ieDword Actor::GetWarriorLevel() const
 
 	return highest;
 }
+
+bool Actor::BlocksSearchMap() const
+{
+	return Modified[IE_DONOTJUMP] < 2;
+}

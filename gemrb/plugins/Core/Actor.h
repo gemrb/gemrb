@@ -588,5 +588,6 @@ public:
 	bool IsDualInactive() const;
 	/* true if we are dual-wielding */
 	int IsDualWielding() const;
+	bool BlocksSearchMap() const;
 };
 #endif

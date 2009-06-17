@@ -1216,7 +1216,9 @@ void Movable::MoveTo(Point &Des)
 	area->ClearSearchMapFor(this);
 	Pos = Des;
 	Destination = Des;
-	area->BlockSearchMap( Pos, size, IsPC()?PATH_MAP_PC:PATH_MAP_NPC);
+	if (BlocksSearchMap()) {
+		area->BlockSearchMap( Pos, size, IsPC()?PATH_MAP_PC:PATH_MAP_NPC);
+	}
 }
 
 void Movable::ClearPath()

@@ -418,6 +418,7 @@ public:
 	void DrawTargetPoint(Region &vp);
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition();
+	virtual bool BlocksSearchMap() const = 0;
 
 };
 
