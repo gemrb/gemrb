@@ -3665,6 +3665,17 @@ static EffectRef fx_aegis_ref={"Aegis",NULL,-1};
 
 void Actor::ModifyDamage(Actor *target, int &damage, WeaponInfo *wi, bool critical)
 {
+
+	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
+	if (mirrorimages) {
+		if (core->Roll(1,mirrorimages+1,0)!=1) {
+			target->fxqueue.DecreaseParam1OfEffect(fx_mirrorimage_ref, 1);
+			target->Modified[IE_MIRRORIMAGES]--;
+			damage = 0;
+			return;
+		}
+	}
+
 	int stoneskins = target->Modified[IE_STONESKINS];
 	if (stoneskins) {
 		target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin_ref, 1);
@@ -3680,16 +3691,6 @@ void Actor::ModifyDamage(Actor *target, int &damage, WeaponInfo *wi, bool critic
 		target->Modified[IE_STONESKINSGOLEM]--;
 		damage = 0;
 		return;
-	}
-
-	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
-	if (mirrorimages) {
-		if (core->Roll(1,mirrorimages+1,0)!=1) {
-			target->fxqueue.DecreaseParam1OfEffect(fx_mirrorimage_ref, 1);
-			target->Modified[IE_MIRRORIMAGES]--;
-			damage = 0;
-			return;
-		}
 	}
 
 	if (target->fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags)) {
