@@ -623,6 +623,20 @@ Targets* GetAllObjects(Scriptable* Sender, Object* oC, int ga_flags)
 	return tgts;
 }
 
+Targets *GetAllActors(Scriptable *Sender, int ga_flags)
+{
+	Map *map=Sender->GetCurrentArea();
+	
+	int i = map->GetActorCount(true);
+	Targets *tgts = new Targets();
+	while (i--) {
+		Actor *ac=map->GetActor(i,true);
+		int dist = Distance(Sender->Pos, ac->Pos);
+		tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
+	}
+	return tgts;
+}
+
 Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 {
 	if (!oC) {
@@ -1265,10 +1279,14 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 	if (!Sender) {
 		return false;
 	}
-	if (!oC) {
-		return true;
+	Targets *tgts;
+	if (oC) {
+		tgts = GetAllObjects(Sender, oC, 0);
+	} else {
+		// [0]/[ANYONE] can match all actors
+		tgts = GetAllActors(Sender, 0);
 	}
-	Targets *tgts = GetAllObjects(Sender, oC, 0);
+
 	bool ret = false;
 
 	if (tgts) {
