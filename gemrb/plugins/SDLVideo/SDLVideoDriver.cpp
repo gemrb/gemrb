@@ -322,6 +322,12 @@ int SDLVideoDriver::SwapBuffers(void)
 				case SDLK_TAB:
 					key = GEM_TAB;
 					break;
+				case SDLK_PAGEUP:
+					key = GEM_PGUP;
+					break;
+				case SDLK_PAGEDOWN:
+					key = GEM_PGDOWN;
+					break;
 				default:
 					break;
 				}

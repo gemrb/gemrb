@@ -1926,6 +1926,12 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			core->GetGUIScriptEngine()->RunFunction("EmptyControls");
 			core->SetEventFlag(EF_ACTION);
 			return;
+		case GEM_PGUP:
+			core->GetGUIScriptEngine()->RunFunction("OnIncreaseSize");
+			return;
+		case GEM_PGDOWN:
+			core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
+			return;
 		default:
 			return;
 	}

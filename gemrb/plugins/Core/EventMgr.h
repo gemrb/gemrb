@@ -45,6 +45,8 @@
 #define GEM_HOME		0x8a
 #define GEM_END			0x8b
 #define GEM_ESCAPE		0x8c
+#define GEM_PGUP		0x8d
+#define GEM_PGDOWN		0x8e
 
 
 #define GEM_MOD_SHIFT           1
