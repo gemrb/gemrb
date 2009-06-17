@@ -87,10 +87,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsOffsetStar = 27
 		ProfsOffsetLabel = 1
 		ProfsOffsetPress = 69
-		if GameIsBG1():
-			ProfsNumButtons = 7
-		else:
-			ProfsNumButtons = 8
+		ProfsNumButtons = 8
 		ProfsTextArea = ProfsWindow.GetControl (68)
 		ProfsTextArea.SetText (9588)
 		if (scroll):
