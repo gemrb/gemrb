@@ -3628,7 +3628,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		printBracket("Critical Hit", GREEN);
 		printf("\n");
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
-		ModifyDamage (target, damage, &wi, true);
+		ModifyDamage (target, damage, damagetype, &wi, true);
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 		return;
 	}
@@ -3654,7 +3654,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	printBracket("Hit", GREEN);
 	printf("\n");
-	ModifyDamage (target, damage, &wi, false);
+	ModifyDamage (target, damage, damagetype, &wi, false);
 	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 }
 
@@ -3663,7 +3663,7 @@ static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
 static EffectRef fx_mirrorimage_ref={"MirrorImageModifier",NULL,-1};
 static EffectRef fx_aegis_ref={"Aegis",NULL,-1};
 
-void Actor::ModifyDamage(Actor *target, int &damage, WeaponInfo *wi, bool critical)
+void Actor::ModifyDamage(Actor *target, int &damage, ieDword damagetype, WeaponInfo *wi, bool critical)
 {
 
 	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
@@ -3676,21 +3676,25 @@ void Actor::ModifyDamage(Actor *target, int &damage, WeaponInfo *wi, bool critic
 		}
 	}
 
-	int stoneskins = target->Modified[IE_STONESKINS];
-	if (stoneskins) {
-		target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin_ref, 1);
-		target->fxqueue.DecreaseParam1OfEffect(fx_aegis_ref, 1);
-		target->Modified[IE_STONESKINS]--;
-		damage = 0;
-		return;
-	}
-
-	stoneskins = target->Modified[IE_STONESKINSGOLEM];
-	if (stoneskins) {
-		target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin2_ref, 1);
-		target->Modified[IE_STONESKINSGOLEM]--;
-		damage = 0;
-		return;
+	// only check stone skins if damage type is physical or magical
+	// FIXME: DAMAGE_CRUSHING is 0 :(
+	if ((damagetype & (DAMAGE_PIERCING|DAMAGE_SLASHING|DAMAGE_MISSILE|DAMAGE_MAGIC)) || damagetype == DAMAGE_CRUSHING) {
+		int stoneskins = target->Modified[IE_STONESKINS];
+		if (stoneskins) {
+			target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin_ref, 1);
+			target->fxqueue.DecreaseParam1OfEffect(fx_aegis_ref, 1);
+			target->Modified[IE_STONESKINS]--;
+			damage = 0;
+			return;
+		}
+	
+		stoneskins = target->Modified[IE_STONESKINSGOLEM];
+		if (stoneskins) {
+			target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin2_ref, 1);
+			target->Modified[IE_STONESKINSGOLEM]--;
+			damage = 0;
+			return;
+		}
 	}
 
 	if (target->fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags)) {
