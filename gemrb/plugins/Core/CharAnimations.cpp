@@ -1854,11 +1854,6 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
 		case IE_ANI_PST_START:
-			strcat( ResRef, "g1" );
-			strcpy( EquipData->Suffix, "g1" );
-			Cycle = 32 + Orient / 2;
-			break;
-			break;
 		case IE_ANI_DIE:
 			strcat( ResRef, "g1" );
 			strcpy( EquipData->Suffix, "g1" );
