@@ -2339,12 +2339,12 @@ void Actor::DisplayCombatFeedback (unsigned int damage, unsigned int damagetype_
 			//<DAMAGEE> was immune to my <TYPE> damage
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(0) );
 			core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name );
-			core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, this);
+			core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
 		} else if (core->GetStringReference(STR_DAMAGE_IMMUNITY) != (ieStrRef) -1 && core->GetStringReference(STR_DAMAGE1) != (ieStrRef) -1) {
 			// bg2
 			//<DAMAGEE> was immune to my damage.
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(0) );
-			core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, this);
+			core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
 		} // else: other games don't display anything
 	}
 
