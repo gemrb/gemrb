@@ -281,6 +281,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 	bool alive = false;
 
+	bool continuing = false, done = false;
 	for (int i = 0;i<scriptCount;i++) {
 		//disable AI script level for actors in party when the player disabled them
 		if ((i == AI_SCRIPT_LEVEL) && IsPC() ) {
@@ -291,8 +292,11 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 		GameScript *Script = Scripts[i];
 		if (Script) {
-			alive |= Script->Update();
+			alive |= Script->Update(&continuing, &done);
 		}
+		
+		/* scripts are not concurrent, see WAITPC override script for example */
+		if (done) break;
 	}
 	if (alive && UnselectableTimer) {
 			UnselectableTimer--;

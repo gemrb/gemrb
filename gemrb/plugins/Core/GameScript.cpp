@@ -1595,7 +1595,13 @@ void GameScript::RunNow()
 	lastRunTime = 0;
 }
 */
-bool GameScript::Update()
+
+/*
+ * if you pass non-NULL parameters, continuing is set to whether we Continue()ed
+ * (should start false and be passed to next script's Update),
+ * and done is set to whether we processed a block without Continue()
+ */
+bool GameScript::Update(bool *continuing, bool *done)
 {
 	if (!MySelf)
 		return false;
@@ -1615,6 +1621,7 @@ bool GameScript::Update()
 	}
 
 	bool continueExecution = false;
+	if (continuing) continueExecution = *continuing;
 
 	RandomNumValue=rand();
 	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
@@ -1642,10 +1649,13 @@ bool GameScript::Update()
 			}
 			continueExecution = ( ExecuteResponseSet( MySelf,
 				rB->responseSet ) != 0 );
+			if (continuing) *continuing = continueExecution;
 			//clear triggers after response executed
 			//MySelf->ClearTriggers();
-			if (!continueExecution)
+			if (!continueExecution) {
+				if (done) *done = true;
 				break;
+			}
 			//continueExecution = false;
 		}
 	}

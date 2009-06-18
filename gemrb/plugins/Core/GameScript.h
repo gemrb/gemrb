@@ -623,7 +623,7 @@ public:
 //	unsigned long scriptRunDelay;
 	int scriptlevel;
 //	void RunNow();
-	bool Update();
+	bool Update(bool *continuing = NULL, bool *done = NULL);
 	void EvaluateAllBlocks();
 private: //Internal Functions
 	Script* CacheScript(ieResRef ResRef, SClass_ID type);
