@@ -170,6 +170,9 @@ bool Spellbook::HaveSpell(int spellid, ieDword flags)
 		return false;
 	}
 	type = sections[type];
+	if (type >= NUM_BOOK_TYPES) {
+		return false;
+	}
 	spellid = spellid % 1000;
 
 	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
@@ -196,6 +199,9 @@ bool Spellbook::KnowSpell(int spellid)
 		return false;
 	}
 	type = sections[type];
+	if (type >= NUM_BOOK_TYPES) {
+		return false;
+	}
 	spellid = spellid % 1000;
 
 	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
@@ -356,6 +362,9 @@ void Spellbook::RemoveSpell(int spellid)
 		return;
 	}
 	type = sections[type];
+	if (type >= NUM_BOOK_TYPES) {
+		return;
+	}
 	spellid = spellid % 1000;
 	std::vector< CRESpellMemorization* >::iterator sm;
 	for (sm = spells[type].begin(); sm != spells[type].end(); sm++) {
