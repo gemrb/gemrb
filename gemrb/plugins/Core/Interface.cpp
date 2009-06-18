@@ -4387,19 +4387,24 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 			k=1;
 		}
 		j=strtol(NewItem,&endptr,10);
+		if (j<1) {
+			j=1;
+		}
 		if (*endptr) {
 			strnlwrcpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
 		} else {
 			strnlwrcpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
-			itm->Usages[0]=(ieWord) Roll(j,k,0);
 		}
 		if ( !memcmp( itm->ItemResRef,"NO_DROP",8 ) ) {
 			itm->ItemResRef[0]=0;
 		}
-		if (!itm->ItemResRef[0]) return false;
+		if (!itm->ItemResRef[0]) {
+			return false;
+		}
+		itm->Usages[0]=(ieWord) Roll(j,k,0);
 	}
-	printf("Loop detected while generating random item:%s",itm->ItemResRef);
-	printStatus("ERROR", LIGHT_RED);
+	printMessage("Interface"," ",LIGHT_RED);
+	printf("Loop detected while generating random item:%s\n",itm->ItemResRef);
 	return false;
 }
 
