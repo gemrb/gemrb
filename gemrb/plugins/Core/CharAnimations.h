@@ -87,6 +87,7 @@
 #define IE_ANI_FOUR_FRAMES		11   //wyvern anims
 #define IE_ANI_NINE_FRAMES		12   //dragon anims
 #define IE_ANI_FRAGMENT                 13   //fragment animation
+#define IE_ANI_FOUR_FILES_2		14 //METT
 
 //PST animation types
 #define IE_ANI_PST_ANIMATION_1		16   //full animation
@@ -206,6 +207,8 @@ private:
 		unsigned char& Cycle, unsigned char Orient);
 	void AddLRSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
+	void AddLRSuffix2( char* ResRef, unsigned char StanceID,
+		unsigned char& Cycle, unsigned char Orient, EquipResRefData *&EquipData);
 	void GetLREquipmentRef(char* ResRef, unsigned char& Cycle,
 		const char* equipRef, bool offhand, EquipResRefData* equip);
 	void AddLR2Suffix(char* ResRef, unsigned char AnimID,

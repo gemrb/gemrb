@@ -146,6 +146,7 @@ int CharAnimations::GetTotalPartCount() const
 	if (AvatarsRowNum==~0u) return -1;
 	switch (AvatarTable[AvatarsRowNum].AnimationType) {
 	case IE_ANI_FOUR_FILES:
+	case IE_ANI_FOUR_FILES_2:
 		return GetActorPartCount() + 1; // only weapon
 	case IE_ANI_CODE_MIRROR:
 		return GetActorPartCount() + 3; // equipment
@@ -553,6 +554,8 @@ IE_ANI_TWO_FILES:	The whole animation is in 2 files. The East and West part are 
 IE_ANI_FOUR_FILES:	The Animation is coded in Four Files. Probably it is an old Two File animation with
 			additional frames added in a second time.
 
+IE_ANI_FOUR_FILES_2:	Like IE_ANI_FOUR_FILES but with only 16 cycles per frame.
+
 IE_ANI_TWENTYTWO:	This Animation Type stores the Animation in the following format
 			[NAME][ACTIONCODE][/E]
 			ACTIONCODE=A1-6, CA, SX, SA (sling is A1)
@@ -919,6 +922,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		case IE_ANI_TWO_FILES_2:
 		case IE_ANI_TWO_FILES_3:
 		case IE_ANI_FOUR_FILES:
+		case IE_ANI_FOUR_FILES_2:
 		case IE_ANI_SIX_FILES_2:
 		case IE_ANI_FRAGMENT:
 			Orient&=~1;
@@ -1021,6 +1025,10 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			AddLRSuffix( NewResRef, StanceID, Cycle, Orient, EquipData );
 			break;
 
+		case IE_ANI_FOUR_FILES_2:
+			AddLRSuffix2( NewResRef, StanceID, Cycle, Orient, EquipData );
+			break;
+
 		case IE_ANI_SIX_FILES_2: //MOGR (variant of FOUR_FILES)
 			AddLR3Suffix( NewResRef, StanceID, Cycle, Orient );
 			break;
@@ -1056,6 +1064,7 @@ void CharAnimations::GetEquipmentResRef(const char* equipRef, bool offhand,
 {
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FILES:
+		case IE_ANI_FOUR_FILES_2:
 			GetLREquipmentRef( ResRef, Cycle, equipRef, offhand, equip );
 			break;
 		case IE_ANI_CODE_MIRROR:
@@ -1722,6 +1731,73 @@ void CharAnimations::AddTwoFileSuffix( char* ResRef, unsigned char StanceID,
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
 	}
+}
+
+void CharAnimations::AddLRSuffix2( char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient, EquipResRefData *&EquipData)
+{
+	EquipData = new EquipResRefData;
+	EquipData->Suffix[0] = 0;
+	switch (StanceID) {
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_BACKSLASH:
+		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_ATTACK_JAB:
+			strcat( ResRef, "g2" );
+			strcpy( EquipData->Suffix, "g2" );
+			Cycle = Orient / 2;
+			break;
+		case IE_ANI_CAST:
+		case IE_ANI_CONJURE:
+		case IE_ANI_SHOOT:
+			strcat( ResRef, "g2" );
+			strcpy( EquipData->Suffix, "g2" );
+			Cycle = 8 + Orient / 2;
+			break;
+		case IE_ANI_WALK:
+			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
+			Cycle = Orient / 2;
+			break;
+		case IE_ANI_READY:
+			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
+			Cycle = 8 + Orient / 2;
+			break;
+		case IE_ANI_HEAD_TURN: //could be wrong
+		case IE_ANI_AWAKE:
+			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
+			Cycle = 16 + Orient / 2;
+			break;
+		case IE_ANI_DAMAGE:
+			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
+			Cycle = 24 + Orient / 2;
+			break;
+		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
+		case IE_ANI_PST_START:
+		case IE_ANI_DIE:
+			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
+			Cycle = 32 + Orient / 2;
+			break;
+		case IE_ANI_TWITCH:
+			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
+			Cycle = 40 + Orient / 2;
+			break;
+		default:
+			printf("LRSuffix2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			abort();
+			break;
+	}
+	if (Orient > 9) {
+		strcat( ResRef, "e" );
+		strcat( EquipData->Suffix, "e");
+	}
+	EquipData->Cycle = Cycle;
 }
 
 void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,

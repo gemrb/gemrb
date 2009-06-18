@@ -147,7 +147,7 @@
 0x7402     MDOG       MDOG       MDOG       MDOG       3          2          MO         *
 0x7500     MDOP       MDOP       MDOP       MDOP       2          2          1          *
 0x7501     MDOP       MDOP       MDOP       MDOP       2          2          GR         *
-0x7600     METT       METT       METT       METT       2          2          1          *
+0x7600     METT       METT       METT       METT       14         2          1          *
 0x7701     MGHL       MGHL       MGHL       MGHL       2          2          1          *
 0x7702     MGHL       MGHL       MGHL       MGHL       2          2          RE         *
 0x7703     MGHL       MGHL       MGHL       MGHL       2          2          GA         *
