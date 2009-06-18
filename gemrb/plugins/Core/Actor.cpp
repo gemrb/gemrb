@@ -3718,7 +3718,7 @@ void Actor::ModifyDamage(Actor *target, int &damage, int damagetype, WeaponInfo 
 			core->DisplayConstantStringName(STR_NO_CRITICAL, 0xffffff, target);
 		} else {
 			damage <<=1; //critical damage is always double?
-			core->timer->SetScreenShake(2,2,2);
+			core->timer->SetScreenShake(16,16,8);
 		}
 	}
 	return;
