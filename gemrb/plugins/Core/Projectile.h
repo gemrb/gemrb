@@ -85,6 +85,9 @@
 #define PEF_HALFTRANS 256   //half-transparency (holy might)
 #define PEF_TINT      512   //use palette gradient as tint
 #define PEF_ITERATION 1024  //create another projectile of type-1 (magic missiles)
+#define PEF_TILED     2048  //tiled AOE (bg1 cone of cold/fire)
+#define PEF_FALLING   4096  //projectile falls down vertically (cow)
+#define PEF_INCOMING  8192  //projectile falls in on trajectory (comet)
 
 //projectile area flags
 #define PAF_VISIBLE   1     //the travel projectile is visible until explosion

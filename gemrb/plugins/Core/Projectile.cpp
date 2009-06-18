@@ -265,6 +265,16 @@ void Projectile::Setup()
 	tint.b=128;
 	tint.a=255;
 
+	if(ExtFlags&(PEF_FALLING|PEF_INCOMING) ) {
+		if (ExtFlags&PEF_FALLING) {
+			Pos.x=Destination.x;
+		} else {
+			Pos.x=Destination.x-200;
+		}
+		Pos.y=Destination.y-200;
+		NextTarget(Destination);
+	}
+
 	//cone area of effect always disables the travel flag
 	//but also makes the caster immune to the effect
 	if (Extension && (Extension->AFlags&PAF_CONE)) {
