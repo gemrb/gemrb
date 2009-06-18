@@ -3628,7 +3628,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		printBracket("Critical Hit", GREEN);
 		printf("\n");
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
-		ModifyDamage (target, damage, damagetype, &wi, true);
+		ModifyDamage (target, damage, weapon_damagetype[damagetype], &wi, true);
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 		return;
 	}
@@ -3654,7 +3654,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	printBracket("Hit", GREEN);
 	printf("\n");
-	ModifyDamage (target, damage, damagetype, &wi, false);
+	ModifyDamage (target, damage, weapon_damagetype[damagetype], &wi, false);
 	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 }
 
@@ -3663,7 +3663,7 @@ static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
 static EffectRef fx_mirrorimage_ref={"MirrorImageModifier",NULL,-1};
 static EffectRef fx_aegis_ref={"Aegis",NULL,-1};
 
-void Actor::ModifyDamage(Actor *target, int &damage, ieDword damagetype, WeaponInfo *wi, bool critical)
+void Actor::ModifyDamage(Actor *target, int &damage, int damagetype, WeaponInfo *wi, bool critical)
 {
 
 	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
