@@ -522,7 +522,7 @@ void Projectile::NextTarget(Point &p)
 	}
 	NewOrientation = Orientation = GetOrient(Destination, Pos);
 	if(ExtFlags&PEF_NO_TRAVEL) {
-		Target = NULL;
+		Target = 0;
 		Destination = Pos;
 		return;
 	}
@@ -625,7 +625,7 @@ void Projectile::SecondaryTarget()
 {
 	int mindeg = 0;
 	int maxdeg = 0;
-	if (Extension->AFlags&PAF_CONE) {		
+	if (Extension->AFlags&PAF_CONE) {
 		mindeg=Orientation*22-Extension->ConeWidth/2;
 		maxdeg=mindeg+Extension->ConeWidth;
 	}
@@ -636,7 +636,7 @@ void Projectile::SecondaryTarget()
 	Actor **poi=actors;
 	while(*poi) {
 		ieDword Target = (*poi)->GetGlobalID();
-		
+
 		//this flag is actually about ignoring the caster
 		if ((SFlags & PSF_IGNORE_CENTER) && (Caster==Target)) {
 			poi++;
@@ -653,7 +653,7 @@ void Projectile::SecondaryTarget()
 			double xdiff = Pos.x-(*poi)->Pos.x;
 			double ydiff = Pos.y-(*poi)->Pos.y;
 			int deg;
-			
+
 			if (ydiff) {
 				deg = (int) (atan(xdiff/ydiff)*180/M_PI);
 				if(ydiff<0) deg+=180;
@@ -661,7 +661,7 @@ void Projectile::SecondaryTarget()
 				if (xdiff<0) deg=0;
 				else deg = 180;
 			}
-			
+
 			//not in the right sector of circle
 			if (mindeg>deg || maxdeg<deg) {
 				poi++;
@@ -728,7 +728,7 @@ void Projectile::Draw(Region &screen)
 bool Projectile::DrawChildren(Region &screen)
 {
 	bool drawn = false;
-	
+
 	if (children) {
 		for(int i=0;i<child_size;i++){
 			if(children[i]) {
@@ -742,7 +742,7 @@ bool Projectile::DrawChildren(Region &screen)
 			}
 		}
 	}
-	
+
 	return drawn;
 }
 
@@ -963,7 +963,7 @@ void Projectile::DrawTravel(Region &screen)
 {
 	Video *video = core->GetVideoDriver();
 	ieDword flag;
-	
+
 	if(ExtFlags&PEF_HALFTRANS) {
 		flag=BLIT_HALFTRANS;
 	} else {
