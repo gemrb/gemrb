@@ -302,12 +302,25 @@ void Projectile::Setup()
 
 	CreateAnimations(travel, BAMRes1, Seq1);
 
+	if (TFlags&PTF_SHADOW) {
+		CreateAnimations(shadow, BAMRes2, Seq2);
+	}
+
 	if (ExtFlags&PEF_NO_TRAVEL) {
 		Pos = Destination;
 
 		//the travel projectile should linger after explosion
-		if(travel[0]) {
-			SetDelay(travel[0]->GetFrameCount() );
+		if(ExtFlags&PEF_POP) {
+			//the explosion consists of a pop in/hold/pop out of the travel projectile (dimension door)
+			if(travel[0] && shadow[0]) {
+				SetDelay(travel[0]->GetFrameCount()*2+shadow[0]->GetFrameCount() );
+				travel[0]->Flags|=A_ANI_PLAYONCE;
+				shadow[0]->Flags|=A_ANI_PLAYONCE;
+			}
+		} else {
+			if(travel[0]) {
+				SetDelay(travel[0]->GetFrameCount() );
+			}
 		}
 	}
 
@@ -318,12 +331,6 @@ void Projectile::Setup()
 		palette=gamedata->GetPalette(PaletteRes);
 	}
 
-	if (TFlags&PTF_SHADOW) {
-		CreateAnimations(shadow, BAMRes2, Seq2);
-		//if (TFlags&PTF_SHADOWCOLOR) {
-		//	SetupPalette(shadow, shadpal, Gradients);
-		//}
-	}
 	if (TFlags&PTF_LIGHT) {
 		light = core->GetVideoDriver()->CreateLight(LightX, LightZ);
 	}
@@ -715,6 +722,12 @@ void Projectile::Draw(Region &screen)
 				DrawExplosion(screen);
 			}
 			break;
+//    case P_POP_IN:
+//    case P_HOLD:
+//    case P_POP_OUT:
+//    DrawPop(screen);
+//      break;
+
 		case P_TRAVEL:
 			//There is no Extension for simple traveling projectiles!
 			DrawTravel(screen);
@@ -989,13 +1002,36 @@ void Projectile::DrawTravel(Region &screen)
 	pos.x+=screen.x;
 	pos.y+=screen.y;
 
-	if (shadow[face]) {
-		Sprite2D *frame = shadow[face]->NextFrame();
-		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, NULL, &screen);
-	}
-
 	if (light) {
 		video->BlitGameSprite( light, pos.x, pos.y, 0, tint, NULL, NULL, &screen);
+	}
+
+	if (ExtFlags&PEF_POP) {
+			//draw pop in/hold/pop out animation sequences
+			Sprite2D *frame;
+			
+			if(ExtFlags&PEF_UNPOP) {
+				frame = shadow[0]->NextFrame();
+				if(shadow[0]->endReached) {
+				  ExtFlags&=~PEF_UNPOP;
+				}
+			} else {
+				frame = travel[0]->NextFrame();
+				if(travel[0]->endReached) {
+				  travel[0]->playReversed=true;
+				  travel[0]->SetPos(0);
+				  ExtFlags|=PEF_UNPOP;
+				  frame = shadow[0]->NextFrame();
+				}
+			}
+			
+			video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
+			return;
+	} else {
+		if (shadow[face]) {
+			Sprite2D *frame = shadow[face]->NextFrame();
+			video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
+		}
 	}
 
 	if (SFlags&PSF_FLYING) {

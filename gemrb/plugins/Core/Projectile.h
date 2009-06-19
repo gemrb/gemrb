@@ -49,6 +49,8 @@
 
 //this is the height of the projectile when Spark Flag Fly = 1
 #define FLY_HEIGHT 50
+//this is supposed to move the projectile to the background
+#define BACK_DEPTH 50
 
 //projectile phases
 #define P_UNINITED  -1
@@ -74,20 +76,25 @@
 #define PTF_BLEND   128     //blend colours
 
 //projectile extended travel flags (gemrb specific)
-#define PEF_BOUNCE    1     //bounce from walls (lightning bolt)
-#define PEF_CONTINUE  2     //continue as a travel projectile after trigger (lightning bolt)
-#define PEF_FREEZE    4     //stay around and slowly fade out after trigger (ice dagger)
-#define PEF_NO_TRAVEL 8     //all instant projectiles (draw upon holy might, finger of death)
-#define PEF_TRAIL     16    //trail bams facing value uses the same field as the travel projectile (otherwise it defaults to 9) (shout in iwd)
-#define PEF_CURVE     32    //curved path (magic missile)
-#define PEF_RANDOM    64    //random starting frame for animation (?)
-#define PEF_PILLAR    128   //draw all cycles simultaneously on top of each other (call lightning, flamestrike)
-#define PEF_HALFTRANS 256   //half-transparency (holy might)
-#define PEF_TINT      512   //use palette gradient as tint
-#define PEF_ITERATION 1024  //create another projectile of type-1 (magic missiles)
-#define PEF_TILED     2048  //tiled AOE (bg1 cone of cold/fire)
-#define PEF_FALLING   4096  //projectile falls down vertically (cow)
-#define PEF_INCOMING  8192  //projectile falls in on trajectory (comet)
+#define PEF_BOUNCE     1       //bounce from walls (lightning bolt)
+#define PEF_CONTINUE   2       //continue as a travel projectile after trigger (lightning bolt)
+#define PEF_FREEZE     4       //stay around and slowly fade out after trigger (ice dagger)
+#define PEF_NO_TRAVEL  8       //all instant projectiles (draw upon holy might, finger of death)
+#define PEF_TRAIL      16      //trail bams facing value uses the same field as the travel projectile (otherwise it defaults to 9) (shout in iwd)
+#define PEF_CURVE      32      //curved path (magic missile)
+#define PEF_RANDOM     64      //random starting frame for animation (?)
+#define PEF_PILLAR     128     //draw all cycles simultaneously on top of each other (call lightning, flamestrike)
+#define PEF_HALFTRANS  256     //half-transparency (holy might)
+#define PEF_TINT       512     //use palette gradient as tint
+#define PEF_ITERATION  1024    //create another projectile of type-1 (magic missiles)
+#define PEF_TILED      2048    //tiled AOE (bg1 cone of cold/fire)
+#define PEF_FALLING    4096    //projectile falls down vertically (cow)
+#define PEF_INCOMING   8192    //projectile falls in on trajectory (comet)
+#define PEF_LINE       16384   //solid line between source and target (agannazar's scorcher)
+#define PEF_WALL       32768   //solid line in front of source, crossing target (wall of fire)
+#define PEF_BACKGROUND 0x10000 //draw under target,overrides flying (dimension door)
+#define PEF_POP        0x20000 //draw travel bam, then shadow, then travel bam backwards
+#define PEF_UNPOP      0x40000 //draw shadow, then travel bam (this is an internal flag)
 
 //projectile area flags
 #define PAF_VISIBLE   1     //the travel projectile is visible until explosion
@@ -236,6 +243,12 @@ public:
 	}
 	//no idea if projectiles got height, using y
 	inline int GetHeight() const {
+		//if projectile is drawn behind target
+		if (ExtFlags&PEF_BACKGROUND) {
+			return Pos.y-BACK_DEPTH;
+		}
+
+		//if projectile is flying
 		if (SFlags&PSF_FLYING) {
 			return Pos.y+FLY_HEIGHT;
 		}
