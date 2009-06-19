@@ -1637,7 +1637,7 @@ void Door::TryPickLock(Actor *actor)
 		if (LockDifficulty == 100) {
 			core->DisplayConstantStringName(STR_DOOR_NOPICK, 0xbcefbc, actor);
 		} else {
-			core->DisplayConstantStringName(STR_DOOR_CANTPICK, 0xbcefbc, actor);
+			core->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
 			LastPickLockFailed = actor->GetID();
 		}
 		return;
@@ -2077,7 +2077,7 @@ void Container::TryPickLock(Actor *actor)
 		if (LockDifficulty == 100) {
 			core->DisplayConstantStringName(STR_CONT_NOPICK, 0xbcefbc, actor);
 		} else {
-			core->DisplayConstantStringName(STR_CONT_CANTPICK, 0xbcefbc, actor);
+			core->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
 			LastPickLockFailed = actor->GetID();
 		}
 		return;
