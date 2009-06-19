@@ -3496,6 +3496,9 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
+	// don't attack if there's no round started
+	if (!roundTime) return;
+
 	//only return if we don't have any attacks left this round
 	if (attackcount==0) return;
 
@@ -3531,7 +3534,9 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	if (!target) {
+		StopAttack();
 		LastTarget = 0;
+		roundTime = 0;
 		return;
 	}
 
