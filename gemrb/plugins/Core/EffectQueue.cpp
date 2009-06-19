@@ -928,8 +928,8 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 		}
 
 		//the effect didn't pass the resistance check
-		if(fx->Resistance == FX_CAN_RESIST_CAN_DISPEL ||
-			fx->Resistance == FX_CAN_RESIST_NO_DISPEL) {
+    if(fx->Resistance == FX_CAN_RESIST_CAN_DISPEL) {
+		//	fx->Resistance == FX_CAN_RESIST_NO_DISPEL) {
 			if (check_resistance(target, fx) ) {
 				fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 				return FX_NOT_APPLIED;
