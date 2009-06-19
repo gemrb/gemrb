@@ -1010,7 +1010,9 @@ int fx_set_charmed_state (Actor* Owner, Actor* target, Effect* fx)
 	case 1: //charmed (target hostile after charm)
 		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
 	case 1001:
-		target->SetBaseNoPCF(IE_EA, EA_ENEMY);
+		if (!target->InParty) {
+			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
+		}
 		break;
 	case 2: //dire charmed (target neutral after charm)
 		core->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
@@ -1019,12 +1021,16 @@ int fx_set_charmed_state (Actor* Owner, Actor* target, Effect* fx)
 	case 3: //dire charmed (target hostile after charm)
 		core->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
 	case 1003:
-		target->SetBaseNoPCF(IE_EA, EA_ENEMY);
+		if (!target->InParty) {
+			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
+		}
 		break;
 	case 4: //controlled by cleric
 		core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
 	case 1004:
-		target->SetBaseNoPCF(IE_EA, EA_ENEMY);
+		if (!target->InParty) {
+			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
+		}
 		break;
 	case 5: //thrall (typo comes from original engine doc)
 		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
