@@ -561,16 +561,18 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
 	# 32221 Acid
 	stats.append ((32221, GS (IE_RESISTACID), '%'))
-	# 32233 Magic Damage
-	stats.append ((32233, GS (IE_RESISTMAGIC), '%'))
-	# 67216 Slashing Attacks
-	stats.append ((67216, GS (IE_RESISTSLASHING), '%'))
-	# 67217 Piercing Attacks
-	stats.append ((67217, GS (IE_RESISTPIERCING), '%'))
-	# 67218 Crushing Attacks
-	stats.append ((67218, GS (IE_RESISTCRUSHING), '%'))
-	# 67219 Missile Attacks
-	stats.append ((67219, GS (IE_RESISTMISSILE), '%'))
+	# Magic
+	stats.append ((62146, GS (IE_RESISTMAGIC), '%'))
+	# Magic Damage
+	stats.append ((32233, GS (IE_MAGICDAMAGERESISTANCE), '%'))
+	# Missile
+	stats.append ((11767, GS (IE_RESISTMISSILE), '%'))
+	# Slashing
+	stats.append ((11768, GS (IE_RESISTSLASHING), '%'))
+	# Piercing
+	stats.append ((11769, GS (IE_RESISTPIERCING), '%'))
+	# Crushing
+	stats.append ((11770, GS (IE_RESISTCRUSHING), '%'))
 	stats.append (None)
 
 	#Weapon Style bonuses
