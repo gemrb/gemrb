@@ -384,11 +384,6 @@ void Scriptable::ProcessActions(bool force)
 {
 	unsigned long thisTime = core->GetGame()->Ticks;
 
-	if (Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
-		actor->PerformAttack(core->GetGame()->GameTime);
-	}
-
 	if (!force && (( thisTime - startTime ) < interval)) {
 		return;
 	}
