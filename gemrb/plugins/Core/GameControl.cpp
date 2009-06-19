@@ -305,7 +305,7 @@ static const int arrow_orientations[16]={
 	-1, 4, 2, 3, 0,-1, 1,-1, 6, 5,-1,-1, 7,-1,-1,-1
 };
 
-//Draws arrow markers along the edge of the game window 
+//Draws arrow markers along the edge of the game window
 //WARNING:don't use reference for point, because it is altered
 void GameControl::DrawArrowMarker(Region &screen, Point p, Region &viewport)
 {
@@ -708,7 +708,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					}
 				}
 				if (overDoor) {
-					if (overDoor->Trapped && 
+					if (overDoor->Trapped &&
 						!( overDoor->TrapDetected )) {
 						overDoor->TrapDetected = 1;
 					}
@@ -959,7 +959,7 @@ void GameControl::DisplayTooltip() {
 				char *name = actor->GetName(1);
 				int hp = actor->GetStat(IE_HITPOINTS);
 				int maxhp = actor->GetStat(IE_MAXHITPOINTS);
-				
+
 				char buffer[100];
 				if (!core->TooltipBack) {
 					// single-line tooltips without background (PS:T)
@@ -1015,9 +1015,9 @@ void GameControl::DisplayTooltip() {
 
 				Point p = actor->Pos;
 				core->GetVideoDriver()->ConvertToScreen( p.x, p.y );
-				p.x += Owner->XPos + XPos; 
+				p.x += Owner->XPos + XPos;
 				p.y += Owner->YPos + YPos;
-				
+
 				// hack to position text above PS:T actors
 				if (!core->TooltipBack) p.y -= actor->size*50;
 
@@ -1476,7 +1476,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		target_mode = TARGET_MODE_NONE;
 	}
 }
- 
+
 //generate action code for source actor to use talk to target actor
 void GameControl::TryToTalk(Actor *source, Actor *tgt)
 {
@@ -1524,7 +1524,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	actor->AddAction( GenerateAction( Tmp) );
 }
 
-//generate action code for actor appropriate for the target mode when the target is a door 
+//generate action code for actor appropriate for the target mode when the target is a door
 void GameControl::HandleDoor(Door *door, Actor *actor)
 {
 	char Tmp[256];
@@ -1829,7 +1829,13 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 
 	switch (type) {
 		case ACT_NONE: //none
-			SelectActor( actor->InParty );
+			if (actor->InParty)
+				SelectActor( actor->InParty );
+			else if (actor->GetStat(IE_EA) <= EA_CHARMED) {
+				/*let's select charmed/summoned creatures
+				EA_CHARMED is the maximum value known atm*/
+				core->GetGame()->SelectActor(actor, true, SELECT_REPLACE) ;
+			}
 			break;
 		case ACT_TALK:
 			//talk (first selected talks)

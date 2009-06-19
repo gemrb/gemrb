@@ -570,7 +570,7 @@ void Map::UpdateScripts()
 
 	// this is silly, the speed should be pre-calculated somewhere
 	int *actor_speeds = (int *)calloc(Qcount[PR_SCRIPT], sizeof(int));
-	
+
 	bool *no_more_steps_for_actor = (bool *)calloc(Qcount[PR_SCRIPT], sizeof(bool));
 
 	while (q--) {
@@ -628,7 +628,7 @@ void Map::UpdateScripts()
 			if (no_more_steps_for_actor[q]) continue;
 
 			Actor* actor = queue[PR_SCRIPT][q];
-		
+
 			no_more_steps_for_actor[q] = DoStepForActor(actor, actor_speeds[q], time);
 			if (!no_more_steps_for_actor[q]) more_steps = true;
 		}
@@ -675,7 +675,7 @@ void Map::UpdateScripts()
 			continue;
 		}
 		bool wasActive = !(ip->Flags&TRAP_DEACTIVATED);
-		
+
 		//If this InfoPoint is a Switch Trigger
 		if (ip->Type == ST_TRIGGER) {
 			//Check if this InfoPoint was activated
@@ -1163,7 +1163,7 @@ void Map::ActorSpottedByPlayer(Actor *actor)
 {
 	unsigned int animid;
 
-	if(core->HasFeature(GF_HAS_BEASTS_INI)) {			
+	if(core->HasFeature(GF_HAS_BEASTS_INI)) {
 		animid=actor->BaseStats[IE_ANIMATION_ID];
 		if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
 			animid&=0xff;
@@ -1465,8 +1465,9 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 	while (i--) {
 		Actor* actor = actors[i];
 //use this function only for party?
-		if (onlyparty && !actor->InParty)
+		if (onlyparty && actor->GetStat(IE_EA)>EA_CHARMED) {
 			continue;
+		}
 		if (!actor->ValidTarget(GA_SELECT|GA_NO_DEAD) )
 			continue;
 		if ((actor->Pos.x<rgn.x) || (actor->Pos.y<rgn.y))
