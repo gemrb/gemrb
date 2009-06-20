@@ -654,6 +654,7 @@ void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
 		actor->SetLockedPalette(fullwhite);
 		return;
 	}
+	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
 	actor->UnlockPalette();
 }
 
@@ -696,6 +697,7 @@ void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 		actor->Die(NULL);
 	}
 	actor->Modified[IE_HITPOINTS]=hp;
+	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
 }
 
 void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
