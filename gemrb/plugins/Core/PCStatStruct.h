@@ -109,6 +109,7 @@ public:
 	ieByte    QSlots[MAX_QSLOTS];          //iwd2 specific
 	ieByte    QuickSpellClass[MAX_QSLOTS];
 	ieWord    PortraitIcons[MAX_PORTRAIT_ICONS];
+	ieWord    PreviousPortraitIcons[MAX_PORTRAIT_ICONS];
 	ieByte    PortraitIconString[MAX_PORTRAIT_ICONS+2];
 private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);

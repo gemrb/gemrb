@@ -49,6 +49,7 @@ PCStatsStruct::PCStatsStruct()
 	memset( QuickWeaponSlots, -1, sizeof(QuickWeaponSlots) );
 	memset( QuickWeaponHeaders, -1, sizeof(QuickWeaponHeaders) );
 	memset( PortraitIcons, -1, sizeof(PortraitIcons) );
+	memset( PreviousPortraitIcons, -1, sizeof(PreviousPortraitIcons) );
 	memset( PortraitIconString, 0, sizeof(PortraitIconString) );
 }
 

@@ -1792,13 +1792,8 @@ void Actor::DisablePortraitIcon(ieByte icon)
 void Actor::RefreshEffects(EffectQueue *fx)
 {
 	ieDword previous[MAX_STATS];
-	ieWord PreviousPortraitIcons[MAX_PORTRAIT_ICONS];
 
 	//put all special cleanup calls here
-	if (PCStats) {
-		memcpy( PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PreviousPortraitIcons) );
-		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
-	}
 	CharAnimations* anims = GetAnims();
 	if (anims) {
 		unsigned int location;
@@ -1830,6 +1825,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		memcpy( previous, Modified, MAX_STATS * sizeof( ieDword ) );
 	}
 	memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
+	if (PCStats) memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
 
 	if (fx) {
 		fx->SetOwner(this);
@@ -1866,8 +1862,11 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 
 	// check if any new portrait icon was removed or added
-	if (PCStats && memcmp(PreviousPortraitIcons, PCStats->PortraitIcons, MAX_PORTRAIT_ICONS)) {
+	if (PCStats && memcmp(PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons))) {
 		core->SetEventFlag(EF_PORTRAIT);
+	}
+	if (PCStats) {
+		memcpy( PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons) );
 	}
 }
 
