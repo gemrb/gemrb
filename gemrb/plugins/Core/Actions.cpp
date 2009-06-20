@@ -2538,11 +2538,12 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 		}
 		actor->SetStance (IE_ANI_CONJURE);
 	}
+	Sender->CastSpell (spellres, tar, false);
 	if (tar->Type==ST_ACTOR) {
-		Sender->LastTarget=tar->GetGlobalID();
+		//Sender->LastTarget=tar->GetGlobalID();
 		Sender->CastSpellEnd(spellres);
 	} else {
-		GetPositionFromScriptable(tar, Sender->LastTargetPos, false);
+		//GetPositionFromScriptable(tar, Sender->LastTargetPos, false);
 		Sender->CastSpellPointEnd(spellres);
 	}
 	Sender->ReleaseCurrentAction();
@@ -2561,7 +2562,7 @@ void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Sender->LastTargetPos=parameters->pointParameter;
+	//Sender->LastTargetPos=parameters->pointParameter;
 	if (Sender->Type == ST_ACTOR) {
 		if (Sender->GetInternalFlag()&IF_STOPATTACK) {
 			Sender->ReleaseCurrentAction();
@@ -2571,6 +2572,7 @@ void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
 		actor->SetStance (IE_ANI_CONJURE);
 	}
+	Sender->CastSpellPoint (spellres, parameters->pointParameter, false);
 	Sender->CastSpellPointEnd(spellres);
 	Sender->ReleaseCurrentAction();
 }
@@ -2596,11 +2598,12 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 		Actor *actor = (Actor *) Sender;
 		actor->SetStance (IE_ANI_CONJURE);
 	}
+	Sender->CastSpell (spellres, tar, false);
 	if (tar->Type==ST_ACTOR) {
-		Sender->LastTarget=tar->GetGlobalID();
+		//Sender->LastTarget=tar->GetGlobalID();
 		Sender->CastSpellEnd(spellres);
 	} else {
-		GetPositionFromScriptable(tar, Sender->LastTargetPos, false);
+		//GetPositionFromScriptable(tar, Sender->LastTargetPos, false);
 		Sender->CastSpellPointEnd(spellres);
 	}
 	Sender->ReleaseCurrentAction();
