@@ -119,7 +119,7 @@ inline int IsPrepared(ieByte timingmode)
 }
 
 //which effects are removable
-static const bool fx_removable[MAX_TIMING_MODE]={true,true,false,true,false,true,true,true,true,false,true};
+static const bool fx_removable[MAX_TIMING_MODE]={true,true,false,true,true,false,true,true,false,false,true};
 
 inline int IsRemovable(ieByte timingmode)
 {
