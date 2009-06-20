@@ -1306,7 +1306,6 @@ int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		STAT_SET(IE_ATTACKNUMBERDOUBLE,1);
 		break;
 	}
-	if (target->InParty) core->SetEventFlag(EF_PORTRAIT);
 
 	return FX_PERMANENT;
 }
@@ -1729,7 +1728,6 @@ int fx_set_slowed_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		STAT_MUL(IE_NUMBEROFATTACKS, 50);
 		STAT_MUL(IE_MOVEMENTRATE, 50);
 	}
-	if (target->InParty) core->SetEventFlag(EF_PORTRAIT);
 	return FX_PERMANENT;
 }
 

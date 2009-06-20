@@ -646,9 +646,6 @@ static const ieDword fullstone[7]={STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,
 
 void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
 {
-	if (actor->InParty) {
-		core->SetEventFlag(EF_PORTRAIT);
-	}
 	if (State & STATE_PETRIFIED) {
 		actor->SetLockedPalette(fullstone);
 		return;
@@ -699,10 +696,6 @@ void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 		actor->Die(NULL);
 	}
 	actor->Modified[IE_HITPOINTS]=hp;
-
-	if (actor->InParty) {
-		core->SetEventFlag(EF_PORTRAIT);
-	}
 }
 
 void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
@@ -711,9 +704,6 @@ void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 		actor->Modified[IE_HITPOINTS]=hp;
 		//passing 0 because it is ignored anyway
 		pcf_hitpoint(actor, 0, hp);
-	}
-	if (actor->InParty) {
-		core->SetEventFlag(EF_PORTRAIT);
 	}
 }
 
@@ -734,9 +724,6 @@ void pcf_stat(Actor *actor, ieDword newValue, ieDword stat)
 		} else {
 			actor->Modified[stat]=1;
 		}
-	}
-	if (actor->InParty) {
-		core->SetEventFlag(EF_PORTRAIT);
 	}
 }
 
@@ -1805,9 +1792,11 @@ void Actor::DisablePortraitIcon(ieByte icon)
 void Actor::RefreshEffects(EffectQueue *fx)
 {
 	ieDword previous[MAX_STATS];
+	ieWord PreviousPortraitIcons[MAX_PORTRAIT_ICONS];
 
 	//put all special cleanup calls here
 	if (PCStats) {
+		memcpy( PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PreviousPortraitIcons) );
 		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
 	}
 	CharAnimations* anims = GetAnims();
@@ -1876,6 +1865,10 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		}
 	}
 
+	// check if any new portrait icon was removed or added
+	if (PCStats && memcmp(PreviousPortraitIcons, PCStats->PortraitIcons, MAX_PORTRAIT_ICONS)) {
+		core->SetEventFlag(EF_PORTRAIT);
+	}
 }
 
 // refresh stats on creatures (PC or NPC) with a valid class (not animals etc)
@@ -2273,6 +2266,7 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter, int modtype)
 		}
 		if (damage>0) {
 			core->Autopause(AP_HIT);
+			core->SetEventFlag(EF_PORTRAIT);
 		}
 	}
 	return damage;
