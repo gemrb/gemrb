@@ -57,6 +57,14 @@ bool Point::operator==(const Point& pnt)
 	//return !memcmp( this, &pnt, sizeof(*this));
 }
 
+bool Point::operator!=(const Point& pnt)
+{
+	if (( x == pnt.x ) && ( y == pnt.y )) {
+		return false;
+	}
+	return true;
+}
+
 Point::Point(short x, short y)
 {
 	this->x = x;
