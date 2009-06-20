@@ -94,6 +94,7 @@ def UpdateControlStatus():
 		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 		TMessageWindow = GemRB.LoadWindowObject(0)
 		TMessageTA = TMessageWindow.GetControl (1)
+		SetupMenuWindowControls (TMessageWindow, 1, "ReturnToGame")
 
 
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL)
