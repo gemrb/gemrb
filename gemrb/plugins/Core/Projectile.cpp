@@ -269,7 +269,7 @@ void Projectile::Setup()
 		if (ExtFlags&PEF_FALLING) {
 			Pos.x=Destination.x;
 		} else {
-			Pos.x=Destination.x-200;
+			Pos.x=Destination.x+200;
 		}
 		Pos.y=Destination.y-200;
 		NextTarget(Destination);
@@ -282,6 +282,7 @@ void Projectile::Setup()
 		ExtFlags|=PEF_NO_TRAVEL;
 	}
 
+	//create more projectiles
 	if(ExtFlags&PEF_ITERATION) {
 		CreateIteration();
 	}
@@ -306,6 +307,7 @@ void Projectile::Setup()
 		CreateAnimations(shadow, BAMRes2, Seq2);
 	}
 
+	//there is no travel phase, create the projectile right at the target
 	if (ExtFlags&PEF_NO_TRAVEL) {
 		Pos = Destination;
 
@@ -441,8 +443,15 @@ void Projectile::ChangePhase()
 		return;
 	}
 
-	extension_delay=Extension->Delay;
+	//this flag says the first explosion is delayed (works for delaying triggers too)
+	if(Extension->AFlags&PAF_DELAY) {
+		extension_delay=Extension->Delay;
+	} else {
+		extension_delay=0;
+	}
 	extension_explosioncount=Extension->ExplosionCount;
+
+	//this flag says that the explosion should occur only when triggered
 	if (Extension->AFlags&PAF_TRIGGER) {
 		phase = P_TRIGGER;
 	} else {
@@ -528,6 +537,10 @@ void Projectile::NextTarget(Point &p)
 		return;
 	}
 	NewOrientation = Orientation = GetOrient(Destination, Pos);
+
+	//this hack ensures that the projectile will go away after its time
+	//by the time it reaches this part, it was already expired, so Target
+	//needs to be cleared.
 	if(ExtFlags&PEF_NO_TRAVEL) {
 		Target = 0;
 		Destination = Pos;
@@ -583,11 +596,12 @@ int Projectile::CalculateTargetFlag()
 	//if there are any, then change phase to exploding
 	int flags = GA_NO_DEAD;
 
-	//projectiles don't trigger on dead normally
+	//projectiles don't affect dead/inanimate normally
 	if (Extension->AFlags&PAF_INANIMATE) {
 		flags&=~GA_NO_DEAD;
 	}
 
+	//affect only enemies or allies
 	switch (Extension->AFlags&PAF_TARGET) {
 	case PAF_ENEMY:
 		flags|=GA_NO_ALLY;
@@ -632,8 +646,10 @@ void Projectile::SecondaryTarget()
 {
 	int mindeg = 0;
 	int maxdeg = 0;
+
+	//the AOE (area of effect) is cone shaped
 	if (Extension->AFlags&PAF_CONE) {
-		mindeg=Orientation*22-Extension->ConeWidth/2;
+		mindeg=(Orientation*45-Extension->ConeWidth)/2;
 		maxdeg=mindeg+Extension->ConeWidth;
 	}
 
@@ -644,14 +660,13 @@ void Projectile::SecondaryTarget()
 	while(*poi) {
 		ieDword Target = (*poi)->GetGlobalID();
 
-		//this flag is actually about ignoring the caster
+		//this flag is actually about ignoring the caster (who is at the center)
 		if ((SFlags & PSF_IGNORE_CENTER) && (Caster==Target)) {
 			poi++;
 			continue;
 		}
 
 		if (Extension->AFlags&PAF_CONE) {
-
 			//cone never affects the caster
 			if(Caster==Target) {
 				poi++;
@@ -680,6 +695,12 @@ void Projectile::SecondaryTarget()
 		pro->SetCaster(Caster);
 		area->AddProjectile(pro, Pos, Target);
 		poi++;
+
+		//we already got one target affected in the AOE, this flag says
+		//that was enough
+		if(Extension->AFlags&PAF_AFFECT_ONE) {
+			break;
+		}
 	}
 	free(actors);
 }
@@ -794,7 +815,7 @@ void Projectile::DrawExplosion(Region &screen)
 		extension_explosioncount--;
 	}
 
-	//VVC in center
+	//play VVC in center
 	if (Extension->AFlags&PAF_VVC) {
 		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
 		if (vvc) {
@@ -816,6 +837,7 @@ void Projectile::DrawExplosion(Region &screen)
 		SecondaryTarget();
 	}
 
+	//draw fragment graphics animation at the explosion center
 	if (Extension->AFlags&PAF_FRAGMENT) {
 		//there is a character animation in the center of the explosion
 		//which will go towards the edges (flames, etc)
@@ -1013,15 +1035,15 @@ void Projectile::DrawTravel(Region &screen)
 			if(ExtFlags&PEF_UNPOP) {
 				frame = shadow[0]->NextFrame();
 				if(shadow[0]->endReached) {
-				  ExtFlags&=~PEF_UNPOP;
+					ExtFlags&=~PEF_UNPOP;
 				}
 			} else {
 				frame = travel[0]->NextFrame();
 				if(travel[0]->endReached) {
-				  travel[0]->playReversed=true;
-				  travel[0]->SetPos(0);
-				  ExtFlags|=PEF_UNPOP;
-				  frame = shadow[0]->NextFrame();
+					travel[0]->playReversed=true;
+					travel[0]->SetPos(0);
+					ExtFlags|=PEF_UNPOP;
+					frame = shadow[0]->NextFrame();
 				}
 			}
 			
