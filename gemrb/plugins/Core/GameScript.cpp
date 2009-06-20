@@ -1633,10 +1633,17 @@ bool GameScript::Update(bool *continuing, bool *done)
 			if (!continueExecution) {
 				if (MySelf->GetNextAction()) {
 					if (MySelf->GetInternalFlag()&IF_NOINT) {
+						// we presumably don't want any further execution?
+						if (done) *done = true;
 						return true;
 					}
 
 					if (lastAction==a) {
+						// we presumably don't want any further execution?
+						// this one is a bit more complicated, due to possible
+						// interactions with Continue() (lastAction here is always
+						// the first block encountered), needs more testing
+						//if (done) *done = true;
 						return true;
 					}
 
@@ -1644,6 +1651,10 @@ bool GameScript::Update(bool *continuing, bool *done)
 					//(what is broken if it is here?)
 					MySelf->ClearActions();
 					//IE even clears the path, shall we?
+					//yes we must :)
+					if (MySelf->Type == ST_ACTOR) {
+						((Movable *)MySelf)->ClearPath();
+					}
 				}
 				lastAction=a;
 			}
