@@ -16,3 +16,8 @@ These flags reside in the .pro format on offset 0x2c
 2048    Tile the whole area of effect with the travel bam
 4096    Freefalling trajectory (appears horizontally over the target)
 8192    Incoming trajectory (appears diagonally over the target)
+16384   The area of effect is a line from source to target
+32768   The area of effect is a line (wall) crossing target, ahead of source
+65536   Draw behind (under) the target
+0x20000 Draw pop in/hold/pop out animation sequence
+0x40000 Internal flag for 0x20000 (after pop in phase was done) - could be used to play 2 phases, first shadow, then travel bam
