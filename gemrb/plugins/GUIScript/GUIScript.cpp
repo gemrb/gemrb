@@ -9164,6 +9164,15 @@ static PyObject* GemRB_IsDualWielding(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( dualwield );
 }
 
+PyDoc_STRVAR( GemRB_GetSelectedSize__doc,
+"GetSelectedSize()\n\n"
+"Returns the number of actors selected in the party.");
+
+static PyObject* GemRB_GetSelectedSize(PyObject* /*self*/, PyObject* /*args*/)
+{
+	return PyInt_FromLong(core->GetGame()->selected.size()) ;
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(AdjustScrolling, METH_VARARGS),
 	METHOD(ApplyEffect, METH_VARARGS),
@@ -9264,6 +9273,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetPortraits, METH_VARARGS),
 	METHOD(GetSymbolValue, METH_VARARGS),
 	METHOD(GetSaveGameCount, METH_VARARGS),
+	METHOD(GetSelectedSize, METH_NOARGS),
 	METHOD(GetString, METH_VARARGS),
 	METHOD(GetSaveGameAttrib, METH_VARARGS),
 	METHOD(GetTableValue, METH_VARARGS),

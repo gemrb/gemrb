@@ -271,14 +271,7 @@ def UpdateActionsWindow ():
 		if OptionsWindow:
 			OptionsWindow.Invalidate ()
 
-	pc = 0
-	for i in range (PARTY_SIZE):
-		if GemRB.GameIsPCSelected (i+1):
-			if pc == 0:
-				pc = i+1
-			else:
-				pc = -1
-				break
+	Selected = GemRB.GetSelectedSize()
 
 	#setting up the disabled button overlay (using the second border slot)
 	for i in range (12):
@@ -287,14 +280,26 @@ def UpdateActionsWindow ():
 		Button.SetFont ("NUMBER")
 		Button.SetText ("")
 
-	if pc == 0:
+	if Selected == 0:
 		EmptyControls ()
 		return
-	if pc == -1:
+	if Selected > 1:
 		GroupControls ()
 		return
 	#this is based on class
-
+	#we are sure there is only one actor selected
+	pc = 0
+	for i in range (PARTY_SIZE):
+		if GemRB.GameIsPCSelected (i+1):
+			pc = i+1
+			break
+		
+	if pc == 0:
+		#summoned/charmed creature.
+		#TODO: some creatures have real actions window!!
+		GroupControls()
+		return
+		
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == 0:
