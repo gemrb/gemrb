@@ -1795,9 +1795,10 @@ bool Highlightable::TriggerTrap(int skill, ieDword ID)
 		return false;
 	}
 	if (CanDetectTrap()) {
-		SetTrapDetected(1); //probably too late :)
+		// this should probably be party members only
 		if ((skill>=100) && (skill!=256) ) skill = 100;
 		if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDiff) {
+			SetTrapDetected(1); //probably too late :)
 			//tumble???
 			return false;
 		}
