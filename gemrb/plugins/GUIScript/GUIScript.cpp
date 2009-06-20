@@ -7160,14 +7160,14 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	// can't equip item because it is not identified
-        if ( (Slottype == SLOT_ITEM) && !(slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
-                ITMExtHeader *eh = item->GetExtHeader(0);
-       	        if (eh && eh->IDReq) {
+	if ( (Slottype == SLOT_ITEM) && !(slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
+		ITMExtHeader *eh = item->GetExtHeader(0);
+    		if (eh && eh->IDReq) {
 			core->DisplayConstantString(STR_ITEMID, 0xf0f0f0);
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
 			return PyInt_FromLong( 0 );
-                }
-        }
+		}
+	}
 
 	//CanUseItemType will check actor's class bits too
 	Slottype = core->CanUseItemType (Slottype, item, actor, true);
@@ -7971,12 +7971,13 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 	int disabled_spellcasting = actor->fxqueue.DisabledSpellcasting(7);
 
 	for (i=0;i<GUIBT_COUNT-(more?2:0);i++) {
+		SpellExtHeader *spell = SpellArray+i;
+
 		int ci = core->GetControl(wi, i+(more?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 		strcpy(btn->VarName,"Spell");
-		btn->Value = Start+i;
+		btn->Value = spell->slot;
 
-		SpellExtHeader *spell = SpellArray+i;
 		// disable spells that should be cast from the inventory
 		// Identify is misclassified and has Target 3 (Dead char)
 
@@ -9049,10 +9050,10 @@ static PyObject* GemRB_SwapPCs(PyObject * /*self*/, PyObject* args)
 	}
 
 	game->SwapPCs(game->FindPlayer(idx1), game->FindPlayer(idx2));
-        //leader changed
-        if (idx1==1 || idx2==1) {
-                DisplayStringCore( game->FindPC(1), VB_LEADER, DS_CONST);
-        }
+	//leader changed
+	if (idx1==1 || idx2==1) {
+		DisplayStringCore( game->FindPC(1), VB_LEADER, DS_CONST);
+	}
 
 	Py_INCREF( Py_None );
 	return Py_None;

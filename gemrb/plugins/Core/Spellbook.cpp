@@ -751,8 +751,12 @@ bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, in
 	}
 	int actual = 0;
 	bool ret = false;
-	for (unsigned int i = startindex; i<spellinfo.size(); i++) {
+	for (unsigned int i = 0; i<spellinfo.size(); i++) {
 		if ( !(type & (1<<spellinfo[i]->type)) ) {
+			continue;
+		}
+		if(startindex>0) {
+			startindex-=spellinfo[i]->count;
 			continue;
 		}
 		if (actual>=count) {
