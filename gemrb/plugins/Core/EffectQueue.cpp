@@ -86,6 +86,15 @@ inline bool IsInstant(ieByte timingmode)
 	if (timingmode>=MAX_TIMING_MODE) return false;
 	return fx_instant[timingmode];
 }
+
+static const bool fx_equipped[MAX_TIMING_MODE]={false,false,true,false,false,true,false,false,true,false,false};
+
+inline bool IsEquipped(ieByte timingmode)
+{
+	if (timingmode>=MAX_TIMING_MODE) return false;
+	return fx_equipped[timingmode];
+}
+
 //                                               0    1     2     3    4    5    6     7       8   9     10
 static const bool fx_relative[MAX_TIMING_MODE]={true,false,false,true,true,true,false,false,false,false,false};
 
@@ -1030,14 +1039,14 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 // useful for: remove projectile type
 #define MATCH_PROJECTILE() if((*f)->Projectile!=projectile) { continue; }
 
-#define MATCH_LIVE_FX() {ieByte tmp=(*f)->TimingMode; \
-		if (tmp!=FX_DURATION_INSTANT_LIMITED && \
-			tmp!=FX_DURATION_INSTANT_PERMANENT && \
-			tmp!=FX_DURATION_INSTANT_WHILE_EQUIPPED && \
-			tmp!=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES) { \
-			continue; \
-		}}
+static const bool fx_live[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,false};
+inline bool IsLive(ieByte timingmode)
+{
+	if (timingmode>=MAX_TIMING_MODE) return false;
+	return fx_live[timingmode];
+}
 
+#define MATCH_LIVE_FX() if(!IsLive((*f)->TimingMode)) { continue; }
 #define MATCH_PARAM1() if((*f)->Parameter1!=param1) { continue; }
 #define MATCH_PARAM2() if((*f)->Parameter2!=param2) { continue; }
 #define MATCH_RESOURCE() if( strnicmp( (*f)->Resource, resource, 8) ) { continue; }
@@ -1062,7 +1071,7 @@ void EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode) const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		if ((*f)->TimingMode!=FX_DURATION_INSTANT_WHILE_EQUIPPED) continue;
+		if (!IsEquipped((*f)->TimingMode)) continue;
 		MATCH_SLOTCODE();
 
 		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
