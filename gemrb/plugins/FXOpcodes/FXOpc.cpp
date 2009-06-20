@@ -1502,6 +1502,7 @@ int fx_set_poisoned_state (Actor* Owner, Actor* target, Effect* fx)
 	case RPD_SECONDS:
 seconds:
 		damage = 1;
+		tmp *= AI_UPDATE_TIME;
 		if (tmp && (core->GetGame()->GameTime%tmp)) {
 			return FX_APPLIED;
 		}
@@ -2396,7 +2397,7 @@ int fx_set_diseased_state (Actor* Owner, Actor* target, Effect* fx)
 		break;
 	case RPD_SECONDS:
 		damage = 1;
-		if (fx->Parameter1 && (core->GetGame()->GameTime%fx->Parameter1)) {
+		if (fx->Parameter1 && (core->GetGame()->GameTime%(fx->Parameter1*AI_UPDATE_TIME))) {
 			return FX_APPLIED;
 		}
 		break;
