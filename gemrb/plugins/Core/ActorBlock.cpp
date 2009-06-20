@@ -1844,7 +1844,10 @@ bool InfoPoint::Entered(Actor *actor)
 			goto check;
 		}
 	}
-	if (Distance(Pos, actor->Pos)<MAX_OPERATING_DISTANCE) {
+	// why is this here? actors which aren't *in* a trap get IF_INTRAP
+	// repeatedly unset, so this triggers again and again and again.
+	// i disabled it for ST_PROXIMITY for now..
+	if (Type != ST_PROXIMITY && Distance(Pos, actor->Pos)<MAX_OPERATING_DISTANCE) {
 		goto check;
 	}
 	if (Flags&TRAP_USEPOINT) {
