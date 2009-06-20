@@ -1671,7 +1671,8 @@ void GoNearAndRetry(Scriptable *Sender, Point &p, int distance)
 	//MoveToPoint shall pop the next action too if movement fails
 	//and the actor is farther than distance
 	//this will prevent deadlocks
-	action->int0Parameter = distance;
+	//(we have to add 1 because otherwise distance==0 fails, we subtract it in MoveToPoint)
+	action->int0Parameter = distance+1;
 	Sender->AddActionInFront( action );
 }
 

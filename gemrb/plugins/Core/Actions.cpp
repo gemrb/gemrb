@@ -1036,7 +1036,9 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 		Point dest = actor->Destination;
 		if (!actor->InMove()) {
 			//can't reach target, movement failed
-			if (Distance(dest,actor)>tmp) {
+			//we have to use tmp-1 because the distance required might be 0,
+			//so in GoNearAndRetry we add 1 to distance
+			if (Distance(dest,actor)>tmp-1) {
 				//to prevent deadlocks, we free the action
 				//which caused MoveToPoint in the first place
 				Sender->PopNextAction();
