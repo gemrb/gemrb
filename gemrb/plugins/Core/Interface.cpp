@@ -2395,7 +2395,11 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 	int cnt=10;
 	Actor * ab = NULL;
 
-	while(cnt-- && level>0) {
+	//TODO:
+	//decrease the number of summoned creatures with the number of already summoned creatures here
+	//the summoned creatures have a special IE_SPECIFIC
+
+	while(cnt--) {
 		ab = gamedata->GetCreature(resource);
 		if (!ab) {
 			return NULL;
@@ -2403,7 +2407,6 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 
 		ab->LastSummoner = Owner->GetID();
 		//Always use Base stats for the recently summoned creature
-		level -= ab->GetBase(IE_XP);
 
 		int enemyally;
 
@@ -2452,6 +2455,12 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 				vvc->YPos=position.y;
 				map->AddVVCell( vvc );
 			}
+		}
+
+		//this check should happen after the fact
+		level -= ab->GetBase(IE_XP);
+		if(level<0) {
+			break;
 		}
 	}
 	return ab;
