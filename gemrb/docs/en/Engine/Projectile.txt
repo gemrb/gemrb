@@ -4,7 +4,7 @@ These flags reside in the .pro format on offset 0x2c
 
 1       Bounce from walls
 2       Continue on original path as travel projectile after explosion
-4       Freeze as travel projectile after explosion (and slowly fade out)
+4       Freeze as travel projectile after explosion
 8       No travel path (move to destination immediately, thus skipping the travel phase)
 16      Trail bams got the same orientation behaviour as the travel bam
 32      Curved path 
@@ -21,3 +21,4 @@ These flags reside in the .pro format on offset 0x2c
 65536   Draw behind (under) the target
 0x20000 Draw pop in/hold/pop out animation sequence
 0x40000 Internal flag for 0x20000 (after pop in phase was done) - could be used to play 2 phases, first shadow, then travel bam
+0x80000 Slowly fade out a freezed projectile (used with 0x4)
