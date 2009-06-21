@@ -3488,7 +3488,7 @@ int fx_display_string (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x8c CastingGlow
 static const int ypos_by_direction[16]={10,10,10,0,-10,-10,-10,-10,-10,-10,-10,-10,0,10,10,10};
-static const int xpos_by_direction[16]={0,-2,-4,-6,-8,-6,-4,-2,0,2,4,6,8,6,4,2};
+static const int xpos_by_direction[16]={0,-10,-12,-14,-16,-14,-12,-10,0,10,12,14,16,14,12,10};
 
 int fx_casting_glow (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
