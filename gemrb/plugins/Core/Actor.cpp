@@ -598,7 +598,7 @@ found_row:
 //cannot use old or new value, because it is called two ways
 void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
-	if (actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK] ) {
+	if ((actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK]) && (actor->Modified[IE_MORALEBREAK] != 0) ) {
 		actor->Panic();
 	}
 	//for new colour
@@ -1846,7 +1846,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	// IE_CLASS is >classcount for non-PCs/NPCs
 	if (BaseStats[IE_CLASS] <= (ieDword)classcount)
 		RefreshPCStats();
-	
+
 	for (unsigned int i=0;i<MAX_STATS;i++) {
 		if (first || Modified[i]!=previous[i]) {
 			PostChangeFunctionType f = post_change_functions[i];
@@ -3688,7 +3688,7 @@ void Actor::ModifyDamage(Actor *target, int &damage, int damagetype, WeaponInfo 
 			damage = 0;
 			return;
 		}
-	
+
 		stoneskins = target->Modified[IE_STONESKINSGOLEM];
 		if (stoneskins) {
 			target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin2_ref, 1);
