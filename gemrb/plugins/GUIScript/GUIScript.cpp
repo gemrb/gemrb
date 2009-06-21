@@ -7976,7 +7976,7 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 		int ci = core->GetControl(wi, i+(more?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 		strcpy(btn->VarName,"Spell");
-		btn->Value = spell->slot;
+		btn->Value = i;
 
 		// disable spells that should be cast from the inventory
 		// Identify is misclassified and has Target 3 (Dead char)
@@ -8514,9 +8514,9 @@ PyDoc_STRVAR( GemRB_SpellCast__doc,
 
 static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 {
-	int slot;
-	int type;
-	int spell;
+	unsigned int slot;
+	unsigned int type;
+	unsigned int spell;
 
 	if (!PyArg_ParseTuple( args, "iii", &slot, &type, &spell )) {
 		return AttributeError( GemRB_SpellCast__doc );
@@ -8529,9 +8529,13 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
-	SpellExtHeader spelldata;
+	if(!SpellArray)
+		RuntimeError( "Spells should have been initialized before calling SpellCast") ;
 
- 	actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
+	SpellExtHeader spelldata = SpellArray[spell];
+
+	if(spelldata.type != type)
+		RuntimeError( "Wrong type of spell!") ;
 
 	printf("Cast spell: %s\n", spelldata.spellname);
 	printf("Slot: %d\n", spelldata.slot);
