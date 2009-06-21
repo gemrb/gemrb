@@ -1931,6 +1931,7 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
 		case IE_ANI_PST_START:
+		case IE_ANI_SLEEP:
 			strcat( ResRef, "g3" );
 			Cycle = 16 + Orient / 2;
 			break;
