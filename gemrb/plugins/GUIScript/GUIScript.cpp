@@ -363,7 +363,7 @@ static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_GetGameString__doc,
-"GetGameString(Index)\n\n"
+"GetGameString(Index) => string\n\n"
 "Returns various string attributes of the Game object, see the docs.");
 
 static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
@@ -2518,7 +2518,7 @@ static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetDestinationArea__doc,
-"GetDestinationArea(WindowIndex, ControlID)\n\n"
+"GetDestinationArea(WindowIndex, ControlID) => WorldMap entry\n\n"
 "Returns the last area pointed on the worldmap." );
 
 static PyObject* GemRB_GetDestinationArea(PyObject * /*self*/, PyObject* args)
@@ -2961,7 +2961,7 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* a
 }
 
 PyDoc_STRVAR( GemRB_GameControlGetTargetMode__doc,
-"GameControlGetTargetMode()=>Mode\n\n"
+"GameControlGetTargetMode() => Mode\n\n"
 "Returns the targetting mode of the main game screen control (attack, cast spell,...)." );
 
 static PyObject* GemRB_GameControlGetTargetMode(PyObject * /*self*/, PyObject* /*args*/)
@@ -3579,7 +3579,7 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetMessageWindowSize__doc,
-"GetMessageWindowSize(Value)\n\n"
+"GetMessageWindowSize(Value) => int\n\n"
 "Returns current MessageWindowSize, it works only when a game is loaded." );
 
 static PyObject* GemRB_GetMessageWindowSize(PyObject * /*self*/, PyObject* /*args*/)
@@ -3870,7 +3870,7 @@ static PyObject *GetGameDate(DataStream *ds)
 }
 
 PyDoc_STRVAR( GemRB_GetSaveGameAttrib__doc,
-"GetSaveGameAttrib(Type, SaveSlotCount) => string\n\n"
+"GetSaveGameAttrib(Type, SaveSlotCount) => string/int\n\n"
 "Returns the name, path, prefix, date or ingame date of the saved game." );
 
 static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
@@ -7162,7 +7162,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	// can't equip item because it is not identified
 	if ( (Slottype == SLOT_ITEM) && !(slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
 		ITMExtHeader *eh = item->GetExtHeader(0);
-    		if (eh && eh->IDReq) {
+		if (eh && eh->IDReq) {
 			core->DisplayConstantString(STR_ITEMID, 0xf0f0f0);
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
 			return PyInt_FromLong( 0 );
@@ -7488,7 +7488,7 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CheckFeatCondition__doc,
-"CheckFeatCondition(partyslot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value[,a_op, b_op, c_op, d_op])==> bool\n\n"
+"CheckFeatCondition(partyslot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value[,a_op, b_op, c_op, d_op]) => bool\n\n"
 "Checks if actor in partyslot is eligible for a feat, the formula is: (stat[a]~a or stat[b]~b) and (stat[c]~c or stat[d]~d). Where ~ is a relational operator. If the operators are omitted, the default operator is <=.");
 
 static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
@@ -7976,7 +7976,7 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 		int ci = core->GetControl(wi, i+(more?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 		strcpy(btn->VarName,"Spell");
-		btn->Value = i;
+		btn->Value = i+Start;
 
 		// disable spells that should be cast from the inventory
 		// Identify is misclassified and has Target 3 (Dead char)
@@ -8529,13 +8529,9 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
-	if(!SpellArray)
-		RuntimeError( "Spells should have been initialized before calling SpellCast") ;
 
-	SpellExtHeader spelldata = SpellArray[spell];
-
-	if(spelldata.type != type)
-		RuntimeError( "Wrong type of spell!") ;
+	SpellExtHeader spelldata; // = SpellArray[spell];
+	actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
 
 	printf("Cast spell: %s\n", spelldata.spellname);
 	printf("Slot: %d\n", spelldata.slot);
@@ -8546,6 +8542,10 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	core->FreeString(tmp);
 	printf("Target: %d\n", spelldata.Target);
 	printf("Range: %d\n", spelldata.Range);
+	if(! (1<<spelldata.type) & type) {
+		return RuntimeError( "Wrong type of spell!");
+	}
+
 	GameControl *gc = core->GetGameControl();
 	switch (spelldata.Target) {
 		case TARGET_SELF:
@@ -9110,7 +9110,7 @@ static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetToHit__doc,
-"GetToHit(pc, leftorright)\n\n"
+"GetToHit(pc, leftorright) => int\n\n"
 "Returns the current THAC0 in relation to the equipped weapon.");
 
 static PyObject* GemRB_GetToHit(PyObject * /*self*/, PyObject* args)
@@ -9170,12 +9170,12 @@ static PyObject* GemRB_IsDualWielding(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSelectedSize__doc,
-"GetSelectedSize()\n\n"
+"GetSelectedSize() => int\n\n"
 "Returns the number of actors selected in the party.");
 
 static PyObject* GemRB_GetSelectedSize(PyObject* /*self*/, PyObject* /*args*/)
 {
-	return PyInt_FromLong(core->GetGame()->selected.size()) ;
+	return PyInt_FromLong(core->GetGame()->selected.size());
 }
 
 static PyMethodDef GemRBMethods[] = {
