@@ -1492,28 +1492,37 @@ int fx_set_poisoned_state (Actor* Owner, Actor* target, Effect* fx)
 
 	switch(fx->Parameter2) {
 	case RPD_PERCENT:
+		// this is all wrong
+		tmp = 1;
 		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
 		break;
 	case RPD_ROUNDS:
 		tmp *= 6;
-		goto seconds;
+		damage = 1;
+		break;
 	case RPD_TURNS:
 		tmp *= 30;
-	case RPD_SECONDS:
-seconds:
 		damage = 1;
-		tmp *= AI_UPDATE_TIME;
-		if (tmp && (core->GetGame()->GameTime%tmp)) {
-			return FX_APPLIED;
-		}
+		break;
+	case RPD_SECONDS:
+		damage = 1;
 		break;
 	case RPD_POINTS:
+		tmp = 1; // hit points per second
 		damage = fx->Parameter1;
 		break;
 	default:
+		tmp = 1;
 		damage = 1;
 		break;
 	}
+
+	// all damage is at most per-second
+	tmp *= AI_UPDATE_TIME;
+	if (tmp && (core->GetGame()->GameTime%tmp)) {
+		return FX_APPLIED;
+	}
+
 	//percent
 	target->Damage(damage, DAMAGE_POISON, Owner);
 	return FX_APPLIED;
@@ -2393,6 +2402,7 @@ int fx_set_diseased_state (Actor* Owner, Actor* target, Effect* fx)
 
 	switch(fx->Parameter2) {
 	case RPD_PERCENT:
+		// this is all wrong
 		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
 		break;
 	case RPD_SECONDS:
@@ -2403,6 +2413,10 @@ int fx_set_diseased_state (Actor* Owner, Actor* target, Effect* fx)
 		break;
 	case RPD_POINTS:
 		damage = fx->Parameter1;
+		// per second
+		if (core->GetGame()->GameTime%AI_UPDATE_TIME) {
+			return FX_APPLIED;
+		}
 		break;
 	case RPD_STR: //strength
 		STAT_ADD(IE_STR, fx->Parameter1);
@@ -2671,6 +2685,7 @@ int fx_set_regenerating_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 	switch(fx->Parameter2) {
 	case RPD_PERCENT:
+		// this is all wrong
 		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
 		break;
 	case RPD_TURNS:		//restore param3 hp every param1 turns
