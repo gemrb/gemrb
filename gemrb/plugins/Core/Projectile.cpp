@@ -102,18 +102,6 @@ void Projectile::InitExtension()
 	}
 }
 
-PathNode *Projectile::GetNextStep(int x)
-{
-	if (!step) {
-		DoStep((unsigned int) ~0);
-	}
-	PathNode *node = step;
-	while(node && x--) {
-		node = node->Next;
-	}
-	return node;
-}
-
 void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int Seq)
 {
 	AnimationFactory* af = ( AnimationFactory* )
@@ -265,6 +253,9 @@ void Projectile::Setup()
 	tint.b=128;
 	tint.a=255;
 
+	ieDword time = core->GetGame()->Ticks;
+	timeStartStep = time;
+
 	if(ExtFlags&(PEF_FALLING|PEF_INCOMING) ) {
 		if (ExtFlags&PEF_FALLING) {
 			Pos.x=Destination.x;
@@ -275,16 +266,15 @@ void Projectile::Setup()
 		NextTarget(Destination);
 	}
 
+	if(ExtFlags&PEF_WALL) {
+		SetupWall();
+	}
+
 	//cone area of effect always disables the travel flag
 	//but also makes the caster immune to the effect
 	if (Extension && (Extension->AFlags&PAF_CONE)) {
 		Destination=Pos;
 		ExtFlags|=PEF_NO_TRAVEL;
-	}
-
-	//create more projectiles
-	if(ExtFlags&PEF_ITERATION) {
-		CreateIteration();
 	}
 
 	//set any static tint
@@ -295,7 +285,6 @@ void Projectile::Setup()
 		StaticTint(tmpColor[PALSIZE/2]);
 	}
 
-	phase = P_TRAVEL;
 	core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, GEM_SND_RELATIVE);
 	memset(travel,0,sizeof(travel));
 	memset(shadow,0,sizeof(shadow));
@@ -339,6 +328,12 @@ void Projectile::Setup()
 	if (TFlags&PTF_BLEND) {
 		SetBlend();
 	}
+	phase = P_TRAVEL;
+
+	//create more projectiles
+	if(ExtFlags&PEF_ITERATION) {
+		CreateIteration();
+	}
 }
 
 Actor *Projectile::GetTarget()
@@ -379,67 +374,86 @@ void Projectile::SetDelay(int delay)
 	ExtFlags|=PEF_FREEZE;
 }
 
+void Projectile::Payload()
+{
+	Actor *target;
+
+	if(!effects) {
+		return;
+	}
+
+	if (Target) {
+		target = GetTarget();
+		if (target) {
+			//projectile rebounced
+			if (phase!=P_EXPIRED) {
+				return;
+			}
+		}
+	} else {
+		//the target will be the original caster
+		//in case of single point area target (dimension door)
+		target = area->GetActorByGlobalID(Caster);
+		if (target) {
+			effects->SetOwner(target);
+		}
+	}
+	if (target) {
+		effects->AddAllEffects(target, Destination);
+	}
+	delete effects;
+	effects = NULL;
+}
+
 //control the phase change when the projectile reached its target
 //possible actions: vanish, hover over point, explode
 //depends on the area extension
 //play explosion sound
 void Projectile::ChangePhase()
 {
-	//freeze on target, this is recommended only for child projectiles
-	//as the projectile won't go away on its own
-	if(ExtFlags&PEF_FREEZE) {
-		if(extension_delay) {
-		if (extension_delay>0) {
-			extension_delay--;
-		}
-			return;
-		}
-	}
-
-	//follow target
 	if (Target) {
 		Actor *target = area->GetActorByGlobalID(Target);
 		if (!target) {
 			phase = P_EXPIRED;
 			return;
 		}
-		int steps = Distance(Pos, target);
-		//48 = 6*8
-		if (steps>=48) {
-			NextTarget(target->Pos);
-			return;
+	}
+	//reached target, and explodes now
+	if (!Extension) {
+		//there are no-effect projectiles, like missed arrows
+		//Payload can redirect the projectile in case of projectile reflection
+		if (effects) {
+			Payload();
 		}
+		//freeze on target, this is recommended only for child projectiles
+		//as the projectile won't go away on its own
+		if(ExtFlags&PEF_FREEZE) {
+			if(extension_delay) {
+				if (extension_delay>0) {
+					extension_delay--;
+				}
+				return;
+			}
+		}
+		if(ExtFlags&PEF_FADE) {
+			TFlags &= ~PTF_TINT; //turn off area tint
+			tint.a--;
+			if(tint.a>0) {
+				return;
+			}
+		}
+
+		phase = P_EXPIRED;
+		return;
 	}
 
-	//reached target
-	if (!Extension) {
+	EndTravel();
+}
+
+void Projectile::EndTravel()
+{
+	if(!Extension) {
 		phase = P_EXPIRED;
-		//there are no-effect projectiles, like missed arrows
-		if (!effects) return;
-
-		Actor *target;
-
-		if (Target) {
-			target = GetTarget();
-			if (target) {
-				//projectile rebounced
-				if (phase!=P_EXPIRED) {
-					return;
-				}
-			}
-		} else {
-			//the target will be the original caster
-			//in case of single point area target (dimension door)
-			target = area->GetActorByGlobalID(Caster);
-			if (target) {
-				effects->SetOwner(target);
-			}
-		}
-		if (target) {
-			effects->AddAllEffects(target, Destination);
-		}
-		delete effects;
-		effects = NULL;
 		return;
 	}
 
@@ -465,9 +479,26 @@ void Projectile::DoStep(unsigned int walk_speed)
 		ChangePhase();
 		return;
 	}
+
 	if (Pos==Destination) {
 		ClearPath();
 		ChangePhase();
+		return;
+	}
+
+	if (ExtFlags&PEF_LINE) {
+		if(Extension) {
+			//transform into an explosive line
+			EndTravel();
+		} else {
+			if(!(ExtFlags&PEF_FREEZE) && travel[0]) {
+				//switch to 'fading' phase
+				//SetDelay(travel[0]->GetFrameCount());
+				SetDelay(100);
+			}
+			ChangePhase();
+		}
+		//don't change position
 		return;
 	}
 
@@ -476,7 +507,7 @@ void Projectile::DoStep(unsigned int walk_speed)
 	ieDword time = core->GetGame()->Ticks;
 	if (!step) {
 		step = path;
-		timeStartStep = time;
+		//timeStartStep = time;
 	}
 	while (step->Next && (( time - timeStartStep ) >= walk_speed)) {
 		step = step->Next;
@@ -563,7 +594,20 @@ void Projectile::SetTarget(ieDword tar)
 		phase = P_EXPIRED;
 		return;
 	}
-	NextTarget(target->Pos);
+	//replan the path in case the target moved
+	if(target->Pos!=Destination) {
+		NextTarget(target->Pos);
+		return;
+	}
+
+	//replan the path in case the source moved (only for line projectiles)
+	if(ExtFlags&PEF_LINE) {
+		Actor *c = area->GetActorByGlobalID(Caster);
+		if(c && c->Pos!=Pos) {
+			Pos=c->Pos;
+			NextTarget(target->Pos);
+		}
+	}
 }
 
 void Projectile::MoveTo(Map *map, Point &Des)
@@ -575,17 +619,11 @@ void Projectile::MoveTo(Map *map, Point &Des)
 
 void Projectile::ClearPath()
 {
-	if (!path) {
-		return;
-	}
-	PathNode* nextNode = path->Next;
 	PathNode* thisNode = path;
-	while (true) {
+	while (thisNode) {
+		PathNode* nextNode = thisNode->Next;
 		delete( thisNode );
-		if (!nextNode)
-			break;
 		thisNode = nextNode;
-		nextNode = thisNode->Next;
 	}
 	path = NULL;
 	step = NULL;
@@ -639,6 +677,34 @@ void Projectile::SetEffectsCopy(EffectQueue *eq)
 		return;
 	}
 	effects = eq->CopySelf();
+}
+
+void Projectile::UpdateLine()
+{
+	if (Target) {
+		SetTarget(Target);
+	}
+}
+
+void Projectile::LineTarget()
+{
+	Actor *original = area->GetActorByGlobalID(Caster);
+	Actor *prev = NULL;
+	PathNode *iter = path;
+	while(iter) {
+		Point pos(iter->x,iter->y);
+		Actor *target = area->GetActorInRadius(pos, CalculateTargetFlag(), 1);
+		if (target && target->GetGlobalID()!=Caster && prev!=target) {
+			prev = target;
+	 		int res = effects->CheckImmunity ( target );
+			if (res>0) {
+				EffectQueue *eff = effects->CopySelf();
+				eff->SetOwner(original);
+				effects->AddAllEffects(target, target->Pos);
+			}
+		}
+		iter = iter->Next;
+	}
 }
 
 //secondary projectiles target all in the explosion radius
@@ -720,6 +786,8 @@ int Projectile::Update()
 	if (pause) {
 		return 1;
 	}
+	//recreate path if target has moved
+	SetTarget(Target);
 
 	if (phase == P_TRAVEL) {
 		DoStep(Speed);
@@ -743,12 +811,6 @@ void Projectile::Draw(Region &screen)
 				DrawExplosion(screen);
 			}
 			break;
-//    case P_POP_IN:
-//    case P_HOLD:
-//    case P_POP_OUT:
-//    DrawPop(screen);
-//      break;
-
 		case P_TRAVEL:
 			//There is no Extension for simple traveling projectiles!
 			DrawTravel(screen);
@@ -823,6 +885,12 @@ void Projectile::DrawExplosion(Region &screen)
 			vvc->YPos+=Pos.y;
 			area->AddVVCell(vvc);
 		}
+	}
+
+	//Line targets are actors between source and destination point
+	if(ExtFlags&PEF_LINE) {
+		UpdateLine();
+		LineTarget();
 	}
 
 	//no idea what is PAF_SECONDARY
@@ -994,6 +1062,39 @@ void Projectile::SetPos(int face, int frame1, int frame2)
 	}
 }
 
+//recalculate target and source points (perpendicular bisector)
+void Projectile::SetupWall()
+{
+	Point p1, p2;
+
+	p1.x=(Pos.x+Destination.x)/2;
+	p1.y=(Pos.y+Destination.y)/2;
+
+	p2.x=p1.x+(Pos.y-Destination.y);
+	p2.y=p1.y+(Pos.x-Destination.x);
+	Pos=p1;
+	SetTarget(p2);
+}
+
+void Projectile::DrawLine(Region &screen, int face, ieDword flag)
+{
+ 	Video *video = core->GetVideoDriver();
+	PathNode *iter = path;
+	Sprite2D *frame = travel[face]->NextFrame();
+	while(iter) {
+		Point pos(iter->x, iter->y);
+
+		if (SFlags&PSF_FLYING) {
+			pos.y-=FLY_HEIGHT;
+		}
+		pos.x+=screen.x;
+		pos.y+=screen.y;
+
+		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
+		iter = iter->Next;
+	}
+}
+
 void Projectile::DrawTravel(Region &screen)
 {
 	Video *video = core->GetVideoDriver();
@@ -1049,18 +1150,23 @@ void Projectile::DrawTravel(Region &screen)
 			
 			video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
 			return;
-	} else {
-		if (shadow[face]) {
-			Sprite2D *frame = shadow[face]->NextFrame();
-			video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
-		}
+	}
+	
+	if (ExtFlags&PEF_LINE) {
+		DrawLine(screen, face, flag);
+		return;
+	}
+	
+	if (shadow[face]) {
+		Sprite2D *frame = shadow[face]->NextFrame();
+		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
 	}
 
 	if (SFlags&PSF_FLYING) {
 		pos.y-=FLY_HEIGHT;
 	}
 
-	if(ExtFlags&PEF_PILLAR) {
+	if (ExtFlags&PEF_PILLAR) {
 		//draw all frames simultaneously on top of each other
 		for(int i=0;i<Aim;i++) {
 			if (travel[i]) {

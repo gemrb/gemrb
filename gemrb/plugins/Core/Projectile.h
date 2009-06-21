@@ -78,7 +78,7 @@
 //projectile extended travel flags (gemrb specific)
 #define PEF_BOUNCE     1       //bounce from walls (lightning bolt)
 #define PEF_CONTINUE   2       //continue as a travel projectile after trigger (lightning bolt)
-#define PEF_FREEZE     4       //stay around and slowly fade out after trigger (ice dagger)
+#define PEF_FREEZE     4       //stay around (ice dagger)
 #define PEF_NO_TRAVEL  8       //all instant projectiles (draw upon holy might, finger of death)
 #define PEF_TRAIL      16      //trail bams facing value uses the same field as the travel projectile (otherwise it defaults to 9) (shout in iwd)
 #define PEF_CURVE      32      //curved path (magic missile)
@@ -95,6 +95,7 @@
 #define PEF_BACKGROUND 0x10000 //draw under target,overrides flying (dimension door)
 #define PEF_POP        0x20000 //draw travel bam, then shadow, then travel bam backwards
 #define PEF_UNPOP      0x40000 //draw shadow, then travel bam (this is an internal flag)
+#define PEF_FADE       0x80000 //gradually fade on spot if used with PEF_FREEZE (ice dagger)
 
 //projectile area flags
 #define PAF_VISIBLE    1     //the travel projectile is visible until explosion
@@ -213,8 +214,6 @@ protected:
 	Projectile **children;
 	int child_size;
 public:
-	PathNode *GetNextStep(int x);
-	int GetPathLength();
 	void SetCaster(ieDword t);
 	ieDword GetCaster();
 	void SetTarget(ieDword t);
@@ -293,8 +292,6 @@ public:
 	//sets how long a created travel projectile will hover over a spot
 	//before vanishing (without the need of area extension)
 	void SetDelay(int delay);
-	void ChangePhase();
-	void DoStep(unsigned int walk_speed);
 	void MoveTo(Map *map, Point &Des);
 	void ClearPath();
 	//handle phases, return 0 when expired
@@ -313,8 +310,16 @@ private:
 	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq);
 	void GetPaletteCopy(Animation *anim[], Palette *&pal);
 	void SetBlend();
-	void SecondaryTarget();
+	void Payload();
+	void EndTravel();
+	void ChangePhase();
+	void DoStep(unsigned int walk_speed);
+	void UpdateLine();
+	void LineTarget();      //line projectiles (walls, scorchers)
+	void SecondaryTarget(); //area projectiles (circles, cones)
 	void CheckTrigger(unsigned int radius);
+	void SetupWall();
+	void DrawLine(Region &screen, int face, ieDword flag);
 	void DrawTravel(Region &screen);
 	bool DrawChildren(Region &screen);
 	void DrawExplosion(Region &screen);
