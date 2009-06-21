@@ -354,7 +354,6 @@ Actor *Projectile::GetTarget()
 			return NULL;
 		}
 		if (res==-1) {
-			phase = P_TRAVEL;
 			Target = original->GetID();
 			return NULL;
 		}
@@ -384,11 +383,9 @@ void Projectile::Payload()
 
 	if (Target) {
 		target = GetTarget();
-		if (target) {
+		if (!target && (Target==Caster)) {
 			//projectile rebounced
-			if (phase!=P_EXPIRED) {
-				return;
-			}
+			return;
 		}
 	} else {
 		//the target will be the original caster
@@ -787,7 +784,9 @@ int Projectile::Update()
 		return 1;
 	}
 	//recreate path if target has moved
-	SetTarget(Target);
+	if(Target) {
+		SetTarget(Target);
+	}
 
 	if (phase == P_TRAVEL) {
 		DoStep(Speed);
@@ -1001,7 +1000,7 @@ void Projectile::DrawExplosion(Region &screen)
 				newdest.y = (int) (rad * cos(degree) );
 
 				if (apflags&APF_FILL) {
-					pro->SetDelay(Extension->Delay);
+					pro->SetDelay(Extension->Delay*extension_explosioncount);
 				}
 
 				newdest.x+=Destination.x;
