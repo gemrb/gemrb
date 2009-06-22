@@ -3304,7 +3304,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		ieDword &Flags, int &DamageBonus, int &speed)
 {
 	tohit = GetStat(IE_TOHIT);
-	speed = GetStat(IE_PHYSICALSPEED);
+	speed = -GetStat(IE_PHYSICALSPEED);
 	leftorright = leftorright && IsDualWielding();
 	header = GetWeapon(wi,leftorright);
 	if (!header) {
@@ -3560,7 +3560,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	//if this is the first call of the round, we need to update next attack
 	if (nextattack == 0) {
 		//FIXME: figure out exactly how initiative is calculated
-		int initiative = core->Roll(1, 10, GetXPLevel(true)/(-8));
+		int initiative = core->Roll(1, 5, GetXPLevel(true)/(-8));
 		int spdfactor = hittingheader->Speed + speed + initiative;
 		if (spdfactor<0) spdfactor = 0;
 		if (spdfactor>10) spdfactor = 10;
