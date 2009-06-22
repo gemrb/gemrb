@@ -1847,7 +1847,10 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 				} else {
 					source = core->GetFirstSelectedPC(false);
 				}
-				TryToTalk(source, actor);
+				// only party members can start conversations
+				if (source) {
+					TryToTalk(source, actor);
+				}
 			}
 			break;
 		case ACT_ATTACK:
