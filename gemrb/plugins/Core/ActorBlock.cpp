@@ -1081,17 +1081,19 @@ bool Movable::DoStep(unsigned int walk_speed, ieDword time)
 		return true;
 	}
 	if (!time) time = core->GetGame()->Ticks;
+	if (!walk_speed) {
+		// zero speed: no movement
+		timeStartStep = time;
+		StanceID = IE_ANI_READY;
+		return true;
+	}
 	if (!step) {
 		step = path;
 		timeStartStep = time;
 	} else if (step->Next && (( time - timeStartStep ) >= walk_speed)) {
 		//printf("[New Step] : Orientation = %d\n", step->orient);
 		step = step->Next;
-		if (!walk_speed) {
-			timeStartStep = time;
-		} else {
-			timeStartStep = timeStartStep + walk_speed;
-		}
+		timeStartStep = timeStartStep + walk_speed;
 	}
 	SetOrientation (step->orient, false);
 	StanceID = IE_ANI_WALK;
@@ -1107,10 +1109,6 @@ bool Movable::DoStep(unsigned int walk_speed, ieDword time)
 		//since clearpath no longer sets currentaction to NULL
 		//we set it here
 		ReleaseCurrentAction();
-		return true;
-	}
-	if (!walk_speed) {
-		// with zero speed, all we can do is one step per frame
 		return true;
 	}
 	if (( time - timeStartStep ) >= walk_speed) {
