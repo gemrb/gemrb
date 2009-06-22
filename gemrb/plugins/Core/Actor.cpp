@@ -2577,6 +2577,7 @@ void Actor::Die(Scriptable *killer)
 	game->SelectActor(this, false, SELECT_NORMAL);
 	game->OutAttack(GetID());
 
+	ClearActions();
 	ClearPath();
 	SetModal( 0 );
 	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
@@ -2637,7 +2638,7 @@ bool Actor::CheckOnDeath()
 		return true;
 	}
 	if (InternalFlags&IF_JUSTDIED) {
-		if (GetNextAction()) {
+		if (lastRunTime == 0 || GetNextAction()) {
 			return false; //actor is currently dying, let him die first
 		}
 	}
