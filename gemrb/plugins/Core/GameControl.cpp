@@ -1159,7 +1159,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			lastActorID = lastActor->globalID;
 			lastActor->SetOver( true );
 			ieDword type = lastActor->GetStat(IE_EA);
-			if (type >= EA_EVILCUTOFF) {
+			if (type >= EA_EVILCUTOFF || type == EA_GOODBUTRED) {
 				nextCursor = IE_CURSOR_ATTACK;
 			} else if ( type > EA_CHARMED ) {
 				nextCursor = IE_CURSOR_TALK;
@@ -1800,7 +1800,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	ieDword type;
 
 	type = actor->GetStat(IE_EA);
-	if ( type >= EA_EVILCUTOFF ) {
+	if ( type >= EA_EVILCUTOFF || type == EA_GOODBUTRED ) {
 		type = ACT_ATTACK; //hostile
 	} else if ( type > EA_CHARMED ) {
 		type = ACT_TALK; //neutral
