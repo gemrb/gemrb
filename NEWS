@@ -1,25 +1,27 @@
-GemRB svn (6487):
+GemRB svn (6587):
   New features:
     - 
-    - actor tooltips (name and injury status)
+    - SoA, ToB and PST are roughly playable beyond their first levels
     - combat: dual-wielding, APR, proficiency and style boni, dexterity
       bonus, initiatitive and speed factor, individual combat rounds
-    - ToB and PST are roughly playable beyond their first levels
-    - many hardcoded projectiles and support for projectile sounds
+    - many IE's hardcoded projectiles and support for projectile sounds
+    - IWD2 GUI now works after chargen too
     - bg2 chargen now levels to the correct level
+    - summoned and charmed creatures can be ordered around
+    - actor tooltips (name and injury status)
     - running and portal animations in PST
 
   Improved features:
     - 
-    - focus: scrolling while paused is now possible
-    - matters of time and matter
     - dialog, actions and triggers
     - combat mechanics, animation, feedback, ranged combat
-    - area music restarts when there's no music playing
-    - The Nameless One properly dies / resurrects
-    - projectile orientation, animation
-    - disarm trap checks skills
+    - matters of time and matter
     - levelup, dual classing, multiclass handling
+    - focus: scrolling while paused is now possible
+    - animations (projectile, creature)
+    - pathfinding
+    - area music restarts when there's no music playing
+    - disarm trap checks skills
     - various guiscripts
     - bugfixes
 
