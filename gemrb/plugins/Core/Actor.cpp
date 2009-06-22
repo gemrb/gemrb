@@ -626,8 +626,7 @@ void pcf_level (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		actor->GetRangerLevel()+
 		actor->GetSorcererLevel();
 	actor->SetBase(IE_CLASSLEVELSUM,sum);
-	//this will be called anyway
-	//actor->SetupFist();
+	actor->SetupFist();
 }
 
 void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
