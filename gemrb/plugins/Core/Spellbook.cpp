@@ -516,15 +516,22 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 		return false;
 	}
 
-	while (s->size() <= level ) {
-		s->push_back( NULL );
+	while (s->size() < level ) {
+		// this code previously added NULLs, leading to crashes,
+		// so this is an attempt to make it not broken
+		CRESpellMemorization *newsm = new CRESpellMemorization();
+		newsm->Type = sm->Type;
+		newsm->Level = (ieWord) s->size();
+		newsm->Number = newsm->Number2 = 0;
+		s->push_back( newsm );
 	}
 
-	if ((*s)[level]) {
-		return false;
+	// only add this one if necessary
+	if (s->size() == level) {
+		s->push_back(sm);
+		return true;
 	}
-	(*s)[level] = sm;
-	return true;
+	return false;
 }
 
 //apply the wisdom bonus on all spell levels for type
