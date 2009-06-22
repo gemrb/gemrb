@@ -1290,7 +1290,7 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		default:
-			printf("Six Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			printf("Four frames Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 
