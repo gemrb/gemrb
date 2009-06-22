@@ -1257,6 +1257,8 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_ATTACK_JAB:
+		case IE_ANI_CAST:
+		case IE_ANI_CONJURE:
 			strcat( ResRef, "g3" );
 			Cycle += 32;
 			break;
