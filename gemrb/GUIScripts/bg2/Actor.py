@@ -191,7 +191,10 @@ class Actor:
 	def NumClasses (self):
 		"""Returns the number of *active* classes."""
 		if self.__numclasses == None:
-			self.__numclasses = 1 if self.isdual else len(self.ClassNames() )
+			if self.isdual:
+				self.__numclasses = 1
+			else:
+				self.__numclasses = len(self.ClassNames() )
 		return self.__numclasses
 
 
