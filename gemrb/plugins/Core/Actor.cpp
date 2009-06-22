@@ -3304,7 +3304,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		ieDword &Flags, int &DamageBonus, int &speed)
 {
 	tohit = GetStat(IE_TOHIT);
-	speed = 0;
+	speed = GetStat(IE_PHYSICALSPEED);
 	leftorright = leftorright && IsDualWielding();
 	header = GetWeapon(wi,leftorright);
 	if (!header) {
@@ -3355,7 +3355,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		}
 		THACOBonus += wspecial[stars][0];
 		DamageBonus += wspecial[stars][1];
-		speed = wspecial[stars][2];
+		speed += wspecial[stars][2];
 	}
 
 	if (IsDualWielding() && wsdualwield) {
