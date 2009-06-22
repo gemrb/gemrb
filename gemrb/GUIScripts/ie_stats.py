@@ -286,7 +286,8 @@ IE_DISABLEBACKSTAB		= 175
 IE_XP_MAGE	 		= 176 # In PST this stores secondary level exp
 IE_XP_THIEF	 		= 177 # In PST this stores tertiary level exp
 IE_DIALOGRANGE                  = 178 # distance for dialogue
-#179-198 unused
+IE_MOVEMENTRATE     = 179
+#180-198 unused
 IE_STONESKINSGOLEM		= 199
 IE_LEVELDRAIN			= 200
 IE_AVATARREMOVAL                = 201
