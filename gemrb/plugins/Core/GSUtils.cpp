@@ -263,6 +263,7 @@ void ClickCore(Scriptable *Sender, Point point, int type, int speed)
 	timer->DoStep(0);
 	if (timer->ViewportIsMoving()) {
 		Sender->AddActionInFront( Sender->CurrentAction );
+		Sender->SetWait(1);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1066,7 +1067,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			scr = tmp;
 		} else {
 			if (!(Flags & BD_INTERRUPT)) {
-				if (tar->GetNextAction()) {
+				// added CurrentAction as part of blocking action fixes
+				if (tar->CurrentAction || tar->GetNextAction()) {
 					core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 					Sender->ReleaseCurrentAction();
 					return;
@@ -1097,6 +1099,11 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
 		gc->InitDialog( scr, tar, Dialog);
 	}
+
+	// we should block until dialog is over! here is a hack instead,
+	// we will just hope that the dialog starts in the next frame
+	Sender->SetWait(1);
+	Sender->ReleaseCurrentAction();
 }
 
 void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust)
@@ -1148,8 +1155,9 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 			return;
 		}
 	}
-	actor->WalkTo( target->Pos, flags, 0 );
-	Point dest = actor->Destination;
+	if (!actor->InMove() || actor->Destination != target->Pos) {
+		actor->WalkTo( target->Pos, flags, 0 );
+	}
 	//hopefully this hack will prevent lockups
 	if (!actor->InMove()) {
 		Sender->ReleaseCurrentAction();
@@ -1163,6 +1171,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 			newaction->int0Parameter--;
 		}
 		actor->AddActionInFront(newaction);
+		actor->SetWait(1);
 	}
 
 	Sender->ReleaseCurrentAction();
@@ -1200,6 +1209,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 			//if ParamCopy will ever create it with 1 refcount, we could
 			//change this to a Release()
 			delete parameters;
+			// this was added as part of the blocking actions fix
+			Sender->ReleaseCurrentAction();
 			return;
 		}
 		parameters->int0Parameter--;
@@ -1269,9 +1280,6 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	//it shouldn't be a problem to call this the second time (in case of attackreevaluate)
-	//because ReleaseCurrentAction() allows NULL
-	Sender->ReleaseCurrentAction();
 }
 
 bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)

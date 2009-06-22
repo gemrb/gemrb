@@ -267,6 +267,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	if (core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE) {
 		return;
 	}
+	// Wait() is non-interruptible!
 	if (WaitCounter) {
 		return;
 	}
@@ -350,6 +351,7 @@ Action* Scriptable::PopNextAction()
 
 void Scriptable::ClearActions()
 {
+	ReleaseCurrentAction();
 	for (unsigned int i = 0; i < actionQueue.size(); i++) {
 		Action* aC = actionQueue.front();
 		actionQueue.pop_front();
@@ -400,22 +402,14 @@ void Scriptable::ProcessActions(bool force)
 		if (WaitCounter) return;
 	}
 
-	//don't do anything while moving?
-	//maybe this should be fixed
-	if (InMove()) {
-		return;
-	}
-	
-	// try to release NoInterrupt at end of MoveToPoint etc
-	Interrupt();
-
-	if (CurrentAction) {
-		ReleaseCurrentAction();
-	}
-
-	while (!CurrentAction) {
-		CurrentAction = PopNextAction();
+	while (true) {
 		if (!CurrentAction) {
+			CurrentAction = PopNextAction();
+		}
+		if (!CurrentAction) {
+			// try to release NoInterrupt at end of MoveToPoint etc
+			// (this should really be handled by the blocking actions themselves)
+			Interrupt();
 			if (CutSceneId) {
 				CutSceneId = NULL;
 			}
@@ -431,14 +425,24 @@ void Scriptable::ProcessActions(bool force)
 			//ClearTriggers();
 			break;
 		}
+		//break execution in case of blocking action
+		if (CurrentAction) {
+			break;
+		}
 		//break execution in case of movement
+		//we should not actually break here, or else fix waypoints
 		if (InMove()) {
 			break;
 		}
 	}
 	//most likely the best place to clear triggers is here
 	//queue is empty, or there is a looong action subject to break
-	ClearTriggers();
+	//- ok, fuzzie changed this because things like LastSeenBy must
+	//be preserved while actions are being executed, triggers
+	//need to be looked at some more please
+	if (!CurrentAction && !WaitCounter) {
+		ClearTriggers();
+	}
 	if (InternalFlags&IF_IDLE) {
 		Deactivate();
 	}
@@ -1122,7 +1126,8 @@ bool Movable::DoStep(unsigned int walk_speed, ieDword time)
 		NewOrientation = Orientation;
 		//since clearpath no longer sets currentaction to NULL
 		//we set it here
-		ReleaseCurrentAction();
+		//no we don't, action is responsible for releasing itself
+		//ReleaseCurrentAction();
 		return true;
 	}
 	if (( time - timeStartStep ) >= walk_speed) {

@@ -458,12 +458,14 @@ void GameScript::FadeToColor(Scriptable* Sender, Action* parameters)
 {
 	core->timer->SetFadeToColor( parameters->pointParameter.x );
 	Sender->SetWait( parameters->pointParameter.x );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::FadeFromColor(Scriptable* Sender, Action* parameters)
 {
 	core->timer->SetFadeFromColor( parameters->pointParameter.x );
 	Sender->SetWait( parameters->pointParameter.x );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::FadeToAndFromColor(Scriptable* Sender, Action* parameters)
@@ -471,6 +473,7 @@ void GameScript::FadeToAndFromColor(Scriptable* Sender, Action* parameters)
 	core->timer->SetFadeToColor( parameters->pointParameter.x );
 	core->timer->SetFadeFromColor( parameters->pointParameter.x );
 	Sender->SetWait( parameters->pointParameter.x<<1 ); //multiply by 2
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::JumpToPoint(Scriptable* Sender, Action* parameters)
@@ -546,7 +549,7 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 
 //this is unfinished, maybe the original moves actors too?
 //creates savegame?
-void GameScript::MoveToExpansion(Scriptable* /*Sender*/, Action* /*parameters*/)
+void GameScript::MoveToExpansion(Scriptable* Sender, Action* /*parameters*/)
 {
 	Game *game = core->GetGame();
 
@@ -555,6 +558,7 @@ void GameScript::MoveToExpansion(Scriptable* /*Sender*/, Action* /*parameters*/)
 	if (sg) {
 		sg->Invalidate();
 	}
+	Sender->ReleaseCurrentAction();
 }
 
 //add some animation effects too?
@@ -900,16 +904,19 @@ void GameScript::WaitRandom(Scriptable* Sender, Action* parameters)
 		width = rand() % width + parameters->int0Parameter;
 	}
 	Sender->SetWait( width * AI_UPDATE_TIME );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::Wait(Scriptable* Sender, Action* parameters)
 {
 	Sender->SetWait( parameters->int0Parameter * AI_UPDATE_TIME );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::SmallWait(Scriptable* Sender, Action* parameters)
 {
 	Sender->SetWait( parameters->int0Parameter );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::SmallWaitRandom(Scriptable* Sender, Action* parameters)
@@ -919,11 +926,13 @@ void GameScript::SmallWaitRandom(Scriptable* Sender, Action* parameters)
 		random = 1;
 	}
 	Sender->SetWait( rand()%random + parameters->int0Parameter );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
-void GameScript::MoveViewPoint(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
 {
 	core->timer->SetMoveViewPort( parameters->pointParameter.x, parameters->pointParameter.y, parameters->int0Parameter<<1, true );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
@@ -933,6 +942,7 @@ void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	core->timer->SetMoveViewPort( scr->Pos.x, scr->Pos.y, parameters->int0Parameter<<1, true );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::AddWayPoint(Scriptable* Sender, Action* parameters)
@@ -942,6 +952,9 @@ void GameScript::AddWayPoint(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->AddWayPoint( parameters->pointParameter );
+	// this is marked as AF_BLOCKING (and indeed AddWayPoint causes moves),
+	// but this probably needs more thought
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::MoveToPointNoRecticle(Scriptable* Sender, Action* parameters)
@@ -951,8 +964,13 @@ void GameScript::MoveToPointNoRecticle(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = ( Actor* ) Sender;
-	actor->WalkTo( parameters->pointParameter, IF_NORECTICLE, 0 );
-	Sender->ReleaseCurrentAction();
+	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
+		actor->WalkTo( parameters->pointParameter, IF_NORECTICLE, 0 );
+	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 void GameScript::MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters)
@@ -962,8 +980,15 @@ void GameScript::MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->WalkTo( parameters->pointParameter, IF_NOINT, 0 );
-	Sender->ReleaseCurrentAction();
+	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
+		actor->WalkTo( parameters->pointParameter, IF_NOINT, 0 );
+	}
+	// should we always force IF_NOINT here?
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		actor->Interrupt();
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 void GameScript::RunToPointNoRecticle(Scriptable* Sender, Action* parameters)
@@ -973,8 +998,13 @@ void GameScript::RunToPointNoRecticle(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->WalkTo( parameters->pointParameter, IF_NORECTICLE|IF_RUNNING, 0 );
-	Sender->ReleaseCurrentAction();
+	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
+		actor->WalkTo( parameters->pointParameter, IF_NORECTICLE|IF_RUNNING, 0 );
+	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 void GameScript::RunToPoint(Scriptable* Sender, Action* parameters)
@@ -984,8 +1014,13 @@ void GameScript::RunToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->WalkTo( parameters->pointParameter, IF_RUNNING, 0 );
-	Sender->ReleaseCurrentAction();
+	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
+		actor->WalkTo( parameters->pointParameter, IF_RUNNING, 0 );
+	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 //movetopoint until timer is down or target reached
@@ -1001,21 +1036,23 @@ void GameScript::TimedMoveToPoint(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 
-	actor->WalkTo( parameters->pointParameter, parameters->int1Parameter,0 );
-	Point dest = actor->Destination;
+	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
+		actor->WalkTo( parameters->pointParameter, parameters->int1Parameter,0 );
+	}
+
 	//hopefully this hack will prevent lockups
 	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	//repeat movement...
-	Action *newaction = ParamCopyNoOverride(parameters);
-	if (newaction->int0Parameter!=1) {
-		if (newaction->int0Parameter) {
-			newaction->int0Parameter--;
-		}
+	if (parameters->int0Parameter>0) {
+		Action *newaction = ParamCopyNoOverride(parameters);
+		newaction->int0Parameter--;
 		actor->AddActionInFront(newaction);
+		Sender->SetWait(1);
 	}
 
 	Sender->ReleaseCurrentAction();
@@ -1028,12 +1065,24 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	//InMove could release the current action, so we need this
+	//WalkTo could release the current action, so we need this
 	ieDword tmp = (ieDword) parameters->int0Parameter;
-	actor->WalkTo( parameters->pointParameter, 0, tmp );
+	//InMove can clear destination, so we need to save it
+	Point dest = actor->Destination;
+	
+	// try the actual move, if we are not already moving there
+	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
+		actor->WalkTo( parameters->pointParameter, 0, tmp );
+		dest = actor->Destination;
+	}
+
+	// give up if we can't move there (no path was found)
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		Sender->ReleaseCurrentAction();
+	}
+	
 	if (tmp) {
-		//InMove will clear destination too, so we need to save it
-		Point dest = actor->Destination;
 		if (!actor->InMove()) {
 			//can't reach target, movement failed
 			//we have to use tmp-1 because the distance required might be 0,
@@ -1045,7 +1094,6 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 			}
 		}
 	}
-	Sender->ReleaseCurrentAction();
 }
 
 //bg2, jumps to saved location in variable
@@ -1056,6 +1104,7 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 		tar = Sender;
 	}
 	if (tar->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
@@ -1064,6 +1113,7 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
 	p.fromDword(value);
 	actor->SetPosition(p, true );
+	Sender->ReleaseCurrentAction();
 }
 /** iwd2 returntosavedlocation (with stats) */
 /** pst returntosavedplace */
@@ -1085,7 +1135,13 @@ void GameScript::ReturnToSavedLocation(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	actor->WalkTo( p, 0, 0 );
+	if (!actor->InMove() || actor->Destination != p) {
+		actor->WalkTo( p, 0, 0 );
+	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 //PST
@@ -1106,7 +1162,13 @@ void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	actor->WalkTo( p, IF_RUNNING, 0 );
+	if (!actor->InMove() || actor->Destination != p) {
+		actor->WalkTo( p, IF_RUNNING, 0 );
+	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 //iwd2
@@ -1129,8 +1191,14 @@ void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* paramet
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	actor->WalkTo( p, 0, 0 );
+	if (!actor->InMove() || actor->Destination != p) {
+		actor->WalkTo( p, 0, 0 );
+	}
 	//what else?
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 void GameScript::MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters)
@@ -1171,9 +1239,6 @@ void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
 		actor->SetLeader( (Actor *) target, 5);
 	}
 	actor->WalkTo( target->Pos, 0, MAX_OPERATING_DISTANCE );
-	Sender->AddActionInFront(parameters);
-	Sender->SetWait(1);
-	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -1213,7 +1278,13 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 	Region vp = core->GetVideoDriver()->GetViewport();
 	Actor* actor = ( Actor* ) Sender;
 	Point p((short) (vp.x+vp.w/2), (short) (vp.y+vp.h/2) );
-	actor->WalkTo( p, IF_NOINT, 0 );
+	if (!actor->InMove() || actor->Destination != p) {
+		actor->WalkTo( p, IF_NOINT, 0 );
+	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
@@ -1224,7 +1295,13 @@ void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	Point p(Sender->Pos.x+parameters->pointParameter.x, Sender->Pos.y+parameters->pointParameter.y);
-	actor->WalkTo( p, 0, 0 );
+	if (!actor->InMove() || actor->Destination != p) {
+		actor->WalkTo( p, 0, 0 );
+	}
+	if (!actor->InMove()) {
+		// we should probably instead keep retrying until we reach dest
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
@@ -1244,7 +1321,21 @@ void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	//TODO: actor could use travel areas
-	actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
+	// we should be using int0Parameter for the timing here, not distance
+	if (!actor->InMove()) {
+		// we should make sure our existing walk is a 'run away', or fix moving/path code
+		actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
+	}
+
+	//repeat movement...
+	if (parameters->int0Parameter>0) {
+		Action *newaction = ParamCopyNoOverride(parameters);
+		newaction->int0Parameter--;
+		actor->AddActionInFront(newaction);
+		Sender->SetWait(1);
+	}
+
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::RunAwayFromNoLeaveArea(Scriptable* Sender, Action* parameters)
@@ -1263,7 +1354,21 @@ void GameScript::RunAwayFromNoLeaveArea(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
+	// we should be using int0Parameter for the timing here, not distance
+	if (!actor->InMove()) {
+		// we should make sure our existing walk is a 'run away', or fix moving/path code
+		actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
+	}
+
+	//repeat movement...
+	if (parameters->int0Parameter>0) {
+		Action *newaction = ParamCopyNoOverride(parameters);
+		newaction->int0Parameter--;
+		actor->AddActionInFront(newaction);
+		Sender->SetWait(1);
+	}
+
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
@@ -1285,7 +1390,23 @@ void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
 	}
 	//actor->InternalFlags|=IF_NOINT;
 	actor->NoInterrupt();
-	actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
+	// we should be using int0Parameter for the timing here, not distance
+	if (!actor->InMove()) {
+		// we should make sure our existing walk is a 'run away', or fix moving/path code
+		actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
+	}
+
+	//repeat movement...
+	if (parameters->int0Parameter>0) {
+		Action *newaction = ParamCopyNoOverride(parameters);
+		newaction->int0Parameter--;
+		actor->AddActionInFront(newaction);
+		Sender->SetWait(1);
+	} else {
+		actor->Interrupt();
+	}
+
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
@@ -1299,7 +1420,21 @@ void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->RunAwayFrom( parameters->pointParameter, parameters->int0Parameter, false);
+	// we should be using int0Parameter for the timing here, not distance?
+	if (!actor->InMove()) {
+		// we should make sure our existing walk is a 'run away', or fix moving/path code
+		actor->RunAwayFrom( parameters->pointParameter, parameters->int0Parameter, false);
+	}
+
+	//repeat movement...
+	if (parameters->int0Parameter>0) {
+		Action *newaction = ParamCopyNoOverride(parameters);
+		newaction->int0Parameter--;
+		actor->AddActionInFront(newaction);
+		Sender->SetWait(1);
+	}
+	
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::DisplayStringNoName(Scriptable* Sender, Action* parameters)
@@ -1428,7 +1563,7 @@ void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 {
 	if (core->GetAudioDrv()->IsSpeaking()) {
-		Sender->AddActionInFront( Sender->CurrentAction );
+		//Sender->AddActionInFront( Sender->CurrentAction );
 		return;
 	}
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1]);
@@ -1464,6 +1599,7 @@ void GameScript::Face(Scriptable* Sender, Action* parameters)
 		actor->SetOrientation(parameters->int0Parameter, false);
 	}
 	actor->SetWait( 1 );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
@@ -1480,6 +1616,7 @@ void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetOrientation( GetOrient( target->Pos, actor->Pos ), false);
 	actor->SetWait( 1 );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
@@ -1500,6 +1637,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 
 	actor->SetOrientation ( GetOrient( p, actor->Pos ), false);
 	actor->SetWait( 1 );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 /*pst and bg2 can play a song designated by index*/
@@ -1605,6 +1743,7 @@ void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 			parameters->pointParameter.y, parameters->int0Parameter );
 	}
 	Sender->SetWait( parameters->int0Parameter );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::UnhideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -1758,8 +1897,6 @@ void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Sender->AddActionInFront( Sender->CurrentAction );
-	Sender->ReleaseCurrentAction();
 }
 
 // PlaySequence without object parameter defaults to Sender
@@ -1852,7 +1989,6 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Game *game=core->GetGame();
 	if (!game->EveryoneStopped() ) {
-		Sender->AddActionInFront( Sender->CurrentAction );
 		//wait for a while
 		Sender->SetWait( 1 * AI_UPDATE_TIME );
 		return;
@@ -2315,8 +2451,8 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 	Sender->CastSpell( spellres, tar, true );
 
 	//if target was set, feed action back
-	if (Sender->LastTarget) {
-		Sender->AddActionInFront( Sender->CurrentAction );
+	if (!Sender->LastTarget) {
+		Sender->ReleaseCurrentAction();
 	}
 }
 
@@ -2360,8 +2496,8 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 	Sender->CastSpellPoint( spellres, parameters->pointParameter, true );
 
 	//if target was set, feed action back
-	if (!Sender->LastTargetPos.isempty()) {
-		Sender->AddActionInFront( Sender->CurrentAction );
+	if (Sender->LastTargetPos.isempty()) {
+		Sender->ReleaseCurrentAction();
 	}
 }
 
@@ -2402,8 +2538,8 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 	Sender->CastSpell( spellres, tar, false );
 
 	//if target was set, feed action back
-	if (Sender->LastTarget) {
-		Sender->AddActionInFront( Sender->CurrentAction );
+	if (!Sender->LastTarget) {
+		Sender->ReleaseCurrentAction();
 	}
 }
 
@@ -2436,8 +2572,8 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 	Sender->CastSpellPoint( spellres, parameters->pointParameter, false );
 
 	//if target was set, feed action back
-	if (!Sender->LastTargetPos.isempty()) {
-		Sender->AddActionInFront( Sender->CurrentAction );
+	if (Sender->LastTargetPos.isempty()) {
+		Sender->ReleaseCurrentAction();
 	}
 }
 
@@ -2478,8 +2614,8 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	Sender->CastSpell (spellres, tar, false);
 
 	//if target was set, feed action back
-	if (Sender->LastTarget) {
-		Sender->AddActionInFront( Sender->CurrentAction );
+	if (!Sender->LastTarget) {
+		Sender->ReleaseCurrentAction();
 	}
 }
 
@@ -2511,8 +2647,8 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 	Sender->CastSpellPoint (spellres, parameters->pointParameter, false);
 
 	//if target was set, feed action back
-	if (!Sender->LastTargetPos.isempty()) {
-		Sender->AddActionInFront( Sender->CurrentAction );
+	if (Sender->LastTargetPos.isempty()) {
+		Sender->ReleaseCurrentAction();
 	}
 }
 
@@ -2992,9 +3128,10 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStance( IE_ANI_DIE );
-	actor->NoInterrupt();
+	actor->NoInterrupt(); // surely this should have a SetWait of an appropriate time instead?
 	actor->playDeadCounter = parameters->int0Parameter;
 	actor->SetWait( 1 );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 /** no difference at this moment, but this action should be interruptable */
@@ -3010,6 +3147,7 @@ void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
 	//also set time for playdead!
 	actor->playDeadCounter = parameters->int0Parameter;
 	actor->SetWait( 1 );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 /* this may not be correct, just a placeholder you can fix */
@@ -3302,9 +3440,10 @@ void GameScript::SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters)
 	actor->TalkCount = parameters->int0Parameter;
 }
 
-void GameScript::StartMovie(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::StartMovie(Scriptable* Sender, Action* parameters)
 {
 	core->PlayMovie( parameters->string0Parameter );
+	Sender->ReleaseCurrentAction(); // should this be blocking?
 }
 
 void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameters*/)
@@ -3318,16 +3457,17 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 	act->SetDialog( pdtable->QueryField( scriptingname, "POST_DIALOG_FILE" ) );
 }
 
-void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::TextScreen(Scriptable* Sender, Action* parameters)
 {
 	strnlwrcpy(core->GetGame()->LoadMos, parameters->string0Parameter,8);
 	core->GetGUIScriptEngine()->RunFunction( "StartTextScreen" );
 	core->GetVideoDriver()->SetMouseEnabled(true);
+	Sender->ReleaseCurrentAction(); // should this be blocking?
 }
 
 void GameScript::IncrementChapter(Scriptable* Sender, Action* parameters)
 {
-	TextScreen(Sender, parameters);
+	TextScreen(Sender, parameters); // textscreen will release blocking for us
 	core->GetGame()->IncrementChapter();
 }
 
@@ -3892,11 +4032,13 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction(); //why blocking???
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
 	int slot = actor->inventory.FindItem(parameters->string0Parameter, 0);
 	if (slot<0) {
+		Sender->ReleaseCurrentAction(); //why blocking???
 		return;
 	}
 	if (parameters->int0Parameter==0) { //unequip
@@ -3911,6 +4053,7 @@ void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 		actor->inventory.EquipItem(slot);
 	}
 	actor->ReinitQuickSlots();
+	Sender->ReleaseCurrentAction(); //why blocking???
 }
 
 void GameScript::DropItem(Scriptable *Sender, Action* parameters)
@@ -4019,6 +4162,7 @@ void GameScript::Plunder(Scriptable *Sender, Action* parameters)
 	//move all movable item from the target to the Sender
 	//the rest will be dropped at the feet of Sender
 	while(MoveItemCore(tar, Sender, "",0,0)!=MIC_NOITEM) ;
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::MoveInventory(Scriptable *Sender, Action* parameters)
@@ -4426,12 +4570,13 @@ void GameScript::AttackOneRound( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Action *newAction = ParamCopyNoOverride( parameters );
-	if (!newAction->int0Parameter) {
+	if (!parameters->int0Parameter) {
+		Action *newAction = ParamCopyNoOverride( parameters );
 		newAction->int0Parameter=2;
 		Sender->AddActionInFront(newAction);
 		Sender->SetWait(AI_UPDATE_TIME);
 		AttackCore(Sender, tar, newAction, AC_REEVALUATE);
+		Sender->ReleaseCurrentAction(); // the newAction will take over
 	} else {
 		Sender->ReleaseCurrentAction();
 		//this is the LastDisarmFailed field, but this is an actor
@@ -4464,8 +4609,6 @@ void GameScript::RunningAttackNoSound( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//feed Attack back to the queue
-	Sender->AddAction(parameters);
 	AttackCore(Sender, tar, NULL, AC_NO_SOUND|AC_RUNNING);
 }
 
@@ -4494,8 +4637,6 @@ void GameScript::AttackNoSound( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//feed Attack back to the queue
-	Sender->AddAction(parameters);
 	AttackCore(Sender, tar, NULL, AC_NO_SOUND);
 }
 
@@ -4524,8 +4665,6 @@ void GameScript::RunningAttack( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//feed Attack back to the queue
-	Sender->AddAction(parameters);
 	AttackCore(Sender, tar, NULL, AC_RUNNING);
 }
 
@@ -4550,9 +4689,6 @@ void GameScript::Attack( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//feed Attack back to the queue
-	if(tar->Type == ST_ACTOR) //bashing doors/containers should be performed only once
-	Sender->AddAction(parameters);
 	AttackCore(Sender, tar, NULL, 0);
 }
 
@@ -4603,6 +4739,7 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 	//pumping parameters back for AttackReevaluate
 	Action *newAction = ParamCopyNoOverride( parameters );
 	AttackCore(Sender, tar, newAction, AC_REEVALUATE);
+	// no need to release, AttackCore replaces Sender->CurrentAction with newAction
 }
 
 void GameScript::Explore( Scriptable* Sender, Action* /*parameters*/)
@@ -4830,7 +4967,7 @@ void GameScript::RandomRun(Scriptable* Sender, Action* /*parameters*/)
 	Sender->ReleaseCurrentAction();
 }
 
-void GameScript::RandomWalkContinuous(Scriptable* Sender, Action* parameters)
+void GameScript::RandomWalkContinuous(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
@@ -4838,8 +4975,6 @@ void GameScript::RandomWalkContinuous(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->RandomWalk( false, false );
-	Sender->AddAction( parameters );
-	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::RandomFly(Scriptable* Sender, Action* parameters)
@@ -4906,12 +5041,14 @@ void GameScript::ForceUseContainer(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction(); //why blocking???
 		return;
 	}
 	char Tmp[256];
 	sprintf( Tmp, "UseContainer()");
 	Action *newaction = GenerateAction(Tmp);
 	tar->AddActionInFront(newaction);
+	Sender->ReleaseCurrentAction(); //why blocking???
 }
 
 //these actions directly manipulate a game variable (as the original engine)
@@ -5024,6 +5161,7 @@ void GameScript::TurnAMT(Scriptable* Sender, Action* parameters)
 	Actor *actor = (Actor *) Sender;
 	actor->SetOrientation(actor->GetOrientation()+parameters->int0Parameter, true);
 	actor->SetWait( 1 );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::RandomTurn(Scriptable* Sender, Action* /*parameters*/)
@@ -5035,6 +5173,7 @@ void GameScript::RandomTurn(Scriptable* Sender, Action* /*parameters*/)
 	Actor *actor = (Actor *) Sender;
 	actor->SetOrientation(rand() % MAX_ORIENT, true);
 	actor->SetWait( 1 );
+	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::AttachTransitionToDoor(Scriptable* Sender, Action* parameters)
@@ -5365,18 +5504,22 @@ void GameScript::BreakInstants(Scriptable* Sender, Action* /*parameters*/)
 {
 	//don't do anything, apparently the point of this action is to
 	//delay the execution of further actions to the next AI cycle
-	//we should set CurrentAction to zero eventually!
-	Sender->ReleaseCurrentAction();
+	Sender->SetWait(1);
+	Sender->ReleaseCurrentAction(); // this doesn't really need to block
 }
 
 //an interesting improvement would be to pause game for a given duration
-void GameScript::PauseGame(Scriptable* /*Sender*/, Action* /*parameters*/)
+void GameScript::PauseGame(Scriptable* Sender, Action* /*parameters*/)
 {
 	GameControl *gc = core->GetGameControl();
 	if (gc) {
 		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
 		core->DisplayConstantString(STR_SCRIPTPAUSED,0xff0000);
 	}
+	// releasing this action allows actions to continue executing,
+	// so we force a wait
+	Sender->SetWait(1);
+	Sender->ReleaseCurrentAction(); // does this need to block?
 }
 
 void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
@@ -5400,11 +5543,14 @@ void GameScript::UseDoor(Scriptable* Sender, Action* parameters)
 {
 	GameControl *gc = core->GetGameControl();
 	if (!gc) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	gc->target_mode = TARGET_MODE_NONE;
 	OpenDoor(Sender, parameters);
+
+	Sender->ReleaseCurrentAction(); // this is blocking, OpenDoor is not
 }
 
 //this will force bashing the door
@@ -5412,11 +5558,14 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 {
 	GameControl *gc = core->GetGameControl();
 	if (!gc) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	gc->target_mode = TARGET_MODE_ATTACK; //for bashing doors too
 	OpenDoor(Sender, parameters);
+
+	Sender->ReleaseCurrentAction(); // this is blocking, OpenDoor is not
 }
 
 //pst action
@@ -5633,6 +5782,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	}
 
 	act->UseItem(Slot, header, tar, flags);
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
@@ -5678,7 +5828,7 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	act->UseItemPoint(Slot, header, parameters->pointParameter, flags);
+	Sender->ReleaseCurrentAction();
 }
 
 //addfeat will be able to remove feats too
@@ -5820,55 +5970,69 @@ void GameScript::Follow(Scriptable* Sender, Action* parameters)
 void GameScript::FollowCreature(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Actor *scr = (Actor *)Sender;
 	Actor *actor = (Actor *)tar;
 	scr->LastFollowed = actor->GetID();
 	scr->FollowOffset.empty();
+	if (!scr->InMove() || scr->Destination != actor->Pos) {
+		scr->WalkTo(actor->Pos, 0, 1);
+	}
 }
 
 void GameScript::RunFollow(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Actor *scr = (Actor *)Sender;
 	Actor *actor = (Actor *)tar;
 	scr->LastFollowed = actor->GetID();
 	scr->FollowOffset.empty();
-	scr->WalkTo(actor->Pos, IF_RUNNING, 1);
-	Sender->ReleaseCurrentAction();
+	if (!scr->InMove() || scr->Destination != actor->Pos) {
+		scr->WalkTo(actor->Pos, IF_RUNNING, 1);
+	}
 }
 
 void GameScript::ProtectPoint(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Actor *scr = (Actor *)Sender;
-	scr->WalkTo( parameters->pointParameter, 0, 1 );
+	if (!scr->InMove() || scr->Destination != parameters->pointParameter) {
+		scr->WalkTo( parameters->pointParameter, 0, 1 );
+	}
+	// we should handle 'Protect' here rather than just unblocking
 	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::ProtectObject(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Actor *scr = (Actor *)Sender;
@@ -5878,7 +6042,11 @@ void GameScript::ProtectObject(Scriptable* Sender, Action* parameters)
 	//not exactly range
 	scr->FollowOffset.x = parameters->int0Parameter;
 	scr->FollowOffset.y = parameters->int0Parameter;
-	scr->WalkTo( tar->Pos, 0, MAX_OPERATING_DISTANCE );
+	if (!scr->InMove() || scr->Destination != tar->Pos) {
+		scr->WalkTo( tar->Pos, 0, MAX_OPERATING_DISTANCE );
+	}
+	// we should handle 'Protect' here rather than just unblocking
+	Sender->ReleaseCurrentAction();
 }
 
 //keeps following the object in formation
@@ -5886,14 +6054,17 @@ void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 {
 	GameControl *gc = core->GetGameControl();
 	if (!gc) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Actor *scr = (Actor *)Sender;
@@ -5902,7 +6073,9 @@ void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 	ieDword formation = parameters->int0Parameter;
 	ieDword pos = parameters->int1Parameter;
 	scr->FollowOffset = gc->GetFormationOffset(formation, pos);
-	scr->WalkTo( tar->Pos, 0, 1 );
+	if (!scr->InMove() || scr->Destination != tar->Pos) {
+		scr->WalkTo( tar->Pos, 0, 1 );
+	}
 	Sender->ReleaseCurrentAction();
 }
 
@@ -5911,13 +6084,16 @@ void GameScript::Formation(Scriptable* Sender, Action* parameters)
 {
 	GameControl *gc = core->GetGameControl();
 	if (!gc) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Actor *scr = (Actor *)Sender;
@@ -5926,8 +6102,9 @@ void GameScript::Formation(Scriptable* Sender, Action* parameters)
 	Point FollowOffset = gc->GetFormationOffset(formation, pos);
 	FollowOffset.x+=tar->Pos.x;
 	FollowOffset.y+=tar->Pos.y;
-	scr->WalkTo( FollowOffset, 0, 1 );
-	Sender->ReleaseCurrentAction();
+	if (!scr->InMove() || scr->Destination != FollowOffset) {
+		scr->WalkTo( FollowOffset, 0, 1 );
+	}
 }
 
 void GameScript::TransformItem(Scriptable* Sender, Action* parameters)
@@ -6093,6 +6270,7 @@ void GameScript::ClickLButtonObject(Scriptable* Sender, Action* parameters)
 {
 	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1] );
 	if (!tar) {
+		Sender->ReleaseCurrentAction(); // this is blocking for some reason?
 		return;
 	}
 	ClickCore(Sender, tar->Pos, GEM_MB_ACTION, parameters->int0Parameter);
@@ -6107,6 +6285,7 @@ void GameScript::ClickRButtonObject(Scriptable* Sender, Action* parameters)
 {
 	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1] );
 	if (!tar) {
+		Sender->ReleaseCurrentAction(); // this is blocking for some reason?
 		return;
 	}
 	ClickCore(Sender, tar->Pos, GEM_MB_MENU, parameters->int0Parameter);
@@ -6121,6 +6300,7 @@ void GameScript::DoubleClickLButtonObject(Scriptable* Sender, Action* parameters
 {
 	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1] );
 	if (!tar) {
+		Sender->ReleaseCurrentAction(); // this is blocking for some reason?
 		return;
 	}
 	ClickCore(Sender, tar->Pos, GEM_MB_ACTION|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
@@ -6135,6 +6315,7 @@ void GameScript::DoubleClickRButtonObject(Scriptable* Sender, Action* parameters
 {
 	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1] );
 	if (!tar) {
+		Sender->ReleaseCurrentAction(); // this is blocking for some reason?
 		return;
 	}
 	ClickCore(Sender, tar->Pos, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);

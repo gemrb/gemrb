@@ -2697,7 +2697,7 @@ bool Actor::CheckOnDeath()
 		return true;
 	}
 	if (InternalFlags&IF_JUSTDIED) {
-		if (lastRunTime == 0 || GetNextAction()) {
+		if (lastRunTime == 0 || CurrentAction || GetNextAction()) {
 			return false; //actor is currently dying, let him die first
 		}
 	}
@@ -4280,7 +4280,8 @@ bool Actor::HandleActorStance()
 		SetStance( IE_ANI_HEAD_TURN );
 		return true;
 	}
-	if ((StanceID==IE_ANI_READY) && !GetNextAction()) {
+	// added CurrentAction as part of blocking action fixes
+	if ((StanceID==IE_ANI_READY) && !CurrentAction && !GetNextAction()) {
 		SetStance( IE_ANI_AWAKE );
 		return true;
 	}

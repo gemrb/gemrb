@@ -1316,7 +1316,8 @@ int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 */
-	if (scr->GetNextAction()) {
+	// added CurrentAction as part of blocking action fixes
+	if (scr->CurrentAction || scr->GetNextAction()) {
 		return 0;
 	}
 	return 1;
@@ -1329,7 +1330,8 @@ int GameScript::ActionListEmpty(Scriptable* Sender, Trigger* /*parameters*/)
 		return 0;
 	}
 */
-	if (Sender->GetNextAction()) {
+	// added CurrentAction as part of blocking action fixes
+	if (Sender->CurrentAction || Sender->GetNextAction()) {
 		return 0;
 	}
 	return 1;

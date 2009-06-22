@@ -1631,7 +1631,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 			//we cannot clear the queue and cannot execute the new block
 			//if we already have stuff on the queue!
 			if (!continueExecution) {
-				if (MySelf->GetNextAction()) {
+				if (MySelf->CurrentAction || MySelf->GetNextAction()) {
 					if (MySelf->GetInternalFlag()&IF_NOINT) {
 						// we presumably don't want any further execution?
 						if (done) *done = true;

@@ -706,7 +706,8 @@ void Map::UpdateScripts()
 				} else {
 					//ST_TRAVEL
 					//don't move if doing something else
-					if (actor->GetNextAction())
+					// added CurrentAction as part of blocking action fixes
+					if (actor->CurrentAction || actor->GetNextAction())
 						continue;
 					//this is needed, otherwise the travel
 					//trigger would be activated anytime
