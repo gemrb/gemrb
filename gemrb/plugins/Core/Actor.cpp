@@ -2611,6 +2611,66 @@ void Actor::Die(Scriptable *killer)
 			InternalFlags|=IF_GIVEXP;
 		}
 	}
+
+	// XP seems to be handed at out at the moment of death
+	if (InternalFlags&IF_GIVEXP) {
+		//give experience to party
+		game->ShareXP(Modified[IE_XPVALUE], sharexp );
+		//handle reputation here
+	}
+
+	// death variables are updated at the moment of death
+	if (KillVar[0]) {
+		ieDword value = 0;
+		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
+			game->kaputz->Lookup(KillVar, value);
+			game->kaputz->SetAt(KillVar, value+1);
+		} else {
+			game->locals->Lookup(KillVar, value);
+			game->locals->SetAt(KillVar, value+1);
+		}
+	}
+	if (scriptName[0]) {
+		ieVariable varname;
+		ieDword value = 0;
+
+		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
+			snprintf(varname, 32, "%s_DEAD", scriptName);
+			game->kaputz->Lookup(varname, value);
+			game->kaputz->SetAt(varname, value+1);
+		} else {
+			snprintf(varname, 32, "SPRITE_IS_DEAD%s", scriptName);
+			game->locals->Lookup(varname, value);
+			game->locals->SetAt(varname, value+1);
+		}
+	}
+
+	// EXTRACOUNT is updated at the moment of death
+	if (Modified[IE_SEX] == SEX_EXTRA || (Modified[IE_SEX] >= SEX_EXTRA2 && Modified[IE_SEX] <= SEX_MAXEXTRA)) {
+		// if gender is set to one of the EXTRA values, then at death, we have to decrease
+		// the relevant EXTRACOUNT area variable. scripts use this to check how many actors
+		// of this extra id are still alive (for example, see the ToB challenge scripts)
+		ieVariable varname;
+		if (Modified[IE_SEX] == SEX_EXTRA) {
+			snprintf(varname, 32, "EXTRACOUNT");
+		} else {
+			snprintf(varname, 32, "EXTRACOUNT%d", 2 + (Modified[IE_SEX] - SEX_EXTRA2));
+		}
+
+		Map *area = GetCurrentArea();
+		if (area) {
+			ieDword value = 0;
+			area->locals->Lookup(varname, value);
+			// i am guessing that we shouldn't decrease below 0
+			if (value > 0) {
+				area->locals->SetAt(varname, value-1);
+			}
+		}
+	}
+
+	// items seem to be dropped at the moment of death
+	DropItem("",0);
+
 	//a plot critical creature has died (iwd2)
 	if (BaseStats[IE_MC_FLAGS]&MC_PLOT_CRITICAL) {
 		core->GetGUIScriptEngine()->RunFunction("DeathWindowPlot", false);
@@ -2661,61 +2721,6 @@ bool Actor::CheckOnDeath()
 	//missed the opportunity of Died()
 	InternalFlags&=~IF_JUSTDIED;
 
-	Game *game = core->GetGame();
-	if (InternalFlags&IF_GIVEXP) {
-		//give experience to party
-		game->ShareXP(Modified[IE_XPVALUE], sharexp );
-		//handle reputation here
-	}
-
-	if (KillVar[0]) {
-		ieDword value = 0;
-		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
-			game->kaputz->Lookup(KillVar, value);
-			game->kaputz->SetAt(KillVar, value+1);
-		} else {
-			game->locals->Lookup(KillVar, value);
-			game->locals->SetAt(KillVar, value+1);
-		}
-	}
-	if (scriptName[0]) {
-		ieVariable varname;
-		ieDword value = 0;
-
-		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
-			snprintf(varname, 32, "%s_DEAD", scriptName);
-			game->kaputz->Lookup(varname, value);
-			game->kaputz->SetAt(varname, value+1);
-		} else {
-			snprintf(varname, 32, "SPRITE_IS_DEAD%s", scriptName);
-			game->locals->Lookup(varname, value);
-			game->locals->SetAt(varname, value+1);
-		}
-	}
-
-	if (Modified[IE_SEX] == SEX_EXTRA || (Modified[IE_SEX] >= SEX_EXTRA2 && Modified[IE_SEX] <= SEX_MAXEXTRA)) {
-		// if gender is set to one of the EXTRA values, then at death, we have to decrease
-		// the relevant EXTRACOUNT area variable. scripts use this to check how many actors
-		// of this extra id are still alive (for example, see the ToB challenge scripts)
-		ieVariable varname;
-		if (Modified[IE_SEX] == SEX_EXTRA) {
-			snprintf(varname, 32, "EXTRACOUNT");
-		} else {
-			snprintf(varname, 32, "EXTRACOUNT%d", 2 + (Modified[IE_SEX] - SEX_EXTRA2));
-		}
-
-		Map *area = GetCurrentArea();
-		if (area) {
-			ieDword value = 0;
-			area->locals->Lookup(varname, value);
-			// i am guessing that we shouldn't decrease below 0
-			if (value > 0) {
-				area->locals->SetAt(varname, value-1);
-			}
-		}
-	}
-
-	DropItem("",0);
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
