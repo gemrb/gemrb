@@ -878,7 +878,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor->ClearActions();
 					lastActor->ClearPath();
 					char Tmp[40];
-					strncpy(Tmp,"Kill(Myself)",sizeof(Tmp) );
+					strncpy(Tmp,"ApplyDamage(Myself,1000,4)",sizeof(Tmp) ); // electrocution
 					lastActor->AddAction( GenerateAction(Tmp) );
 				}
 				break;
