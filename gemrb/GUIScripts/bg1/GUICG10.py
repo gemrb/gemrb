@@ -19,6 +19,9 @@
 #
 #character generation, multi-class (GUICG10)
 import GemRB
+from GUICommon import CloseOtherWindow
+
+from CharGenCommon import * 
 
 ClassWindow = 0
 TextAreaControl = 0
@@ -28,11 +31,14 @@ ClassTable = 0
 def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton
 	global ClassTable
-	
+
 	GemRB.LoadWindowPack("GUICG")
+	ClassWindow = GemRB.LoadWindowObject(10)
+
+	CloseOtherWindow (ClassWindow.Unload)
+
 	ClassTable = GemRB.LoadTableObject("classes")
 	ClassCount = ClassTable.GetRowCount()+1
-	ClassWindow = GemRB.LoadWindowObject(10)
 	TmpTable=GemRB.LoadTableObject("races")
 	RaceName = TmpTable.GetRowName(GemRB.GetVar("Race")-1 )
 
@@ -78,7 +84,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	ClassWindow.SetVisible(1)
+	ClassWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def ClassPress():
@@ -87,15 +93,10 @@ def ClassPress():
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
-def BackPress():
-	GemRB.SetVar("Class",0)  # scrapping it
-	if ClassWindow:
-		ClassWindow.Unload()
-	GemRB.SetNextScript("GUICG2")
-	return
-
 def NextPress():
-	if ClassWindow:
-		ClassWindow.Unload()
-	GemRB.SetNextScript("CharGen4") #alignment
-	return
+	#class	
+	ClassIndex = GemRB.GetVar ("Class")-1
+	Class = ClassTable.GetValue (ClassIndex, 5)
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
+	next()

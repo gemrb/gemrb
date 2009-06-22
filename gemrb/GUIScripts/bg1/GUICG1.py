@@ -20,29 +20,24 @@
 #character generation, gender (GUICG1)
 import GemRB
 
+from CharGenCommon import * 
+from GUICommon import CloseOtherWindow
+
 GenderWindow = 0
 TextAreaControl = 0
 DoneButton = 0
 
 def OnLoad():
 	global GenderWindow, TextAreaControl, DoneButton
+
+	if CloseOtherWindow (OnLoad):
+		if(GenderWindow):
+			GenderWindow.Unload()
+			GenderWindow = None
+		return
 	
 	GemRB.LoadWindowPack("GUICG")
-	#this hack will redraw the base CG window
-	#GenderWindow = GemRB.LoadWindowObject(0)
-	#PortraitButton = GenderWindow.GetControl(12)
-	#PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	#ImportButton = GenderWindow.GetControl(13)
-	#ImportButton.SetText(13955)
-	#ImportButton.SetState(IE_GUI_BUTTON_DISABLED)
-
-	#CancelButton = GenderWindow.GetControl(15)
-	#CancelButton.SetText(13727)
-	#CancelButton.SetState(IE_GUI_BUTTON_DISABLED)
-
-	#GenderWindow.SetVisible(1)
-	#GemRB.DrawWindows()
-	#GemRB.UnloadWindow(GenderWindow)
+	
 	GenderWindow = GemRB.LoadWindowObject(1)
 
 	BackButton = GenderWindow.GetControl(6)
@@ -59,7 +54,8 @@ def OnLoad():
 
 	FemaleButton = GenderWindow.GetControl(3)
 	FemaleButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-
+	
+	GemRB.SetVar("Gender",0)
 	MaleButton.SetVarAssoc("Gender",1)
 	FemaleButton.SetVarAssoc("Gender",2)
 	MaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"ClickedMale")
@@ -67,7 +63,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	GenderWindow.SetVisible(1)
+	GenderWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def ClickedMale():
@@ -80,15 +76,10 @@ def ClickedFemale():
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
-def BackPress():
-	if GenderWindow:
-		GenderWindow.Unload()
-	GemRB.SetNextScript("CharGen")
-	GemRB.SetVar("Gender",0)  #scrapping the gender value
-	return
-
 def NextPress():
-	if GenderWindow:
-		GenderWindow.Unload()
-	GemRB.SetNextScript("GUICG12") 
+	MyChar = GemRB.GetVar ("Slot")
+	#GemRB.CreatePlayer ("charbase", MyChar | 0x8000 )
+	Gender = GemRB.GetVar ("Gender")
+	GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
+	next()
 	return

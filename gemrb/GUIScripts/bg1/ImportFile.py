@@ -19,6 +19,7 @@
 #
 #character generation, import (GUICG20)
 import GemRB
+from CharGenCommon import * 
 
 #import from a character sheet
 ImportWindow = 0
@@ -29,6 +30,8 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG")
 	ImportWindow = GemRB.LoadWindowObject(20)
+
+	CloseOtherWindow(ImportWindow.Unload)
 
 	TextAreaControl = ImportWindow.GetControl(4)
 	TextAreaControl.SetText(10963)
@@ -47,7 +50,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, "SelectPress")
-	ImportWindow.SetVisible(1)
+	ImportWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def SelectPress():
@@ -59,13 +62,5 @@ def DonePress():
 	FileName = TextAreaControl.QueryText()
 	Slot = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
-	if ImportWindow:
-		ImportWindow.Unload()
-	GemRB.SetNextScript("CharGen7")
-	return
-	
-def CancelPress():
-	if ImportWindow:
-		ImportWindow.Unload()
-	GemRB.SetNextScript(GemRB.GetToken("NextScript"))
+	jumpTo("name")
 	return

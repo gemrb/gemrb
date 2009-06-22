@@ -20,6 +20,10 @@
 #character generation, racial enemy (GUICG15)
 import GemRB
 
+from CharGenCommon import * 
+from GUICommon import CloseOtherWindow
+
+
 RaceWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -50,15 +54,21 @@ def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
 	global RaceTable, RaceCount, TopIndex
 
+	if CloseOtherWindow (OnLoad):
+		if(RaceWindow):
+			RaceWindow.Unload()
+			RaceWindow = None
+		return
+	
+	GemRB.SetVar ("HatedRace",0)
+	
 	ClassTable = GemRB.LoadTableObject("classes")
 	ClassRow = GemRB.GetVar("Class")-1
 	Class = ClassTable.GetValue(ClassRow, 5)
 	TmpTable = GemRB.LoadTableObject("clskills")
 	ClassName = TmpTable.GetRowName(Class)
 	TableName = TmpTable.GetValue(ClassName, "HATERACE")
-	if TableName == "*":
-		GemRB.SetNextScript("GUICG7")
-		return
+	
 	GemRB.LoadWindowPack("GUICG")
 	RaceWindow = GemRB.LoadWindowObject(15)
 	RaceTable = GemRB.LoadTableObject(TableName)
@@ -88,7 +98,7 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	RaceWindow.SetVisible(1)
+	RaceWindow.ShowModal(MODAL_SHADOW_NONE)
 	DisplayRaces()
 	return
 
@@ -99,15 +109,7 @@ def RacePress():
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
-def BackPress():
-	if RaceWindow:
-		RaceWindow.Unload()
-	GemRB.SetVar("HatedRace",0) #scrapping the race value
-	GemRB.SetNextScript("CharGen6")
-	return
-
 def NextPress():
-	if RaceWindow:
-		RaceWindow.Unload()
-	GemRB.SetNextScript("GUICG7") #mage spells
-	return
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace") )
+	next()

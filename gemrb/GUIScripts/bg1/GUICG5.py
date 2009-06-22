@@ -20,12 +20,22 @@
 #character generation, name (GUICG5)
 import GemRB
 
+from CharGenCommon import * 
+from GUICommon import CloseOtherWindow
+
+
 NameWindow = 0
 NameField = 0
 DoneButton = 0
 
 def OnLoad():
 	global NameWindow, NameField, DoneButton
+
+	if CloseOtherWindow (OnLoad):
+		if(NameWindow):
+			NameWindow.Unload()
+			NameWindow = None
+		return
 	
 	GemRB.LoadWindowPack("GUICG")
 	NameWindow = GemRB.LoadWindowObject(5)
@@ -43,24 +53,17 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE,"EditChange")
-	NameWindow.SetVisible(1)
+	NameWindow.ShowModal(MODAL_SHADOW_NONE)
 	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
-	return
-
-def BackPress():
-	if NameWindow:
-		NameWindow.Unload()
-	GemRB.SetNextScript("CharGen8")
 	return
 
 def NextPress():
 	Name = NameField.QueryText()
 	#check length?
 	#seems like a good idea to store it here for the time being
-	GemRB.SetToken("CHARNAME",Name) 
-	if NameWindow:
-		NameWindow.Unload()
-	GemRB.SetNextScript("CharGen9")
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerName (MyChar, Name, 0)
+	next()
 	return
 
 def EditChange():

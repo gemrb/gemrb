@@ -20,6 +20,10 @@
 #character generation, color (GUICG13)
 import GemRB
 
+from CharGenCommon import *
+from GUICommon import CloseOtherWindow
+
+
 global IE_ANIM_ID
 ColorTable = 0
 ColorWindow = 0
@@ -59,6 +63,7 @@ def OnLoad():
 	
 	GemRB.LoadWindowPack("GUICG")
 	ColorWindow=GemRB.LoadWindowObject(13)
+	CloseOtherWindow (ColorWindow.Unload)
 
 	ColorTable = GemRB.LoadTableObject("clowncol")
 	#set these colors to some default
@@ -109,7 +114,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	RefreshPDoll()
-	ColorWindow.SetVisible(1)
+	ColorWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def DonePress():
@@ -117,7 +122,8 @@ def DonePress():
 
 	if ColorPicker:
 		ColorPicker.Unload()
-	ColorWindow.SetVisible(1)
+	
+	ColorWindow.ShowModal(MODAL_SHADOW_NONE)
 	PickedColor=ColorTable.GetValue(ColorIndex, GemRB.GetVar("Selected"))
 	if ColorIndex==0:
 		HairColor=PickedColor
@@ -165,7 +171,7 @@ def GetColor():
 		Button.SetVarAssoc("Selected",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	
-	ColorPicker.SetVisible(1)
+	ColorPicker.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def HairPress():
@@ -204,18 +210,12 @@ def MinorPress():
 	GetColor()
 	return
 
-def BackPress():
-	if ColorWindow:
-		ColorWindow.Unload()
-	GemRB.SetNextScript("CharGen7")
-	return
 
 def NextPress():
-	if ColorWindow:
-		ColorWindow.Unload()
-	GemRB.SetVar("HairColor",HairColor)
-	GemRB.SetVar("SkinColor",SkinColor)
-	GemRB.SetVar("MinorColor",MinorColor)
-	GemRB.SetVar("MajorColor",MajorColor)
-	GemRB.SetNextScript("GUICG19") #sounds
+	MyChar = GemRB.GetVar ("Slot")
+	SetColorStat (MyChar, IE_HAIR_COLOR, HairColor )
+	SetColorStat (MyChar, IE_SKIN_COLOR, SkinColor )
+	SetColorStat (MyChar, IE_MAJOR_COLOR, MajorColor)
+	SetColorStat (MyChar, IE_MINOR_COLOR, MinorColor )
+	next()
 	return

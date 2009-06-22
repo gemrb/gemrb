@@ -20,11 +20,21 @@
 #character generation, sounds (GUICG19)
 import GemRB
 
+from CharGenCommon import * 
+from GUICommon import CloseOtherWindow
+
+
 VoiceList = 0
 CharSoundWindow = 0
 
 def OnLoad():
 	global CharSoundWindow, VoiceList
+
+	if CloseOtherWindow (OnLoad):
+		if(CharSoundWindow):
+			CharSoundWindow.Unload()
+			CharSoundWindow = None
+		return
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	CharSoundWindow=GemRB.LoadWindowObject(19)
@@ -55,7 +65,7 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	CharSoundWindow.SetVisible(1)
+	CharSoundWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def PlayPress():
@@ -65,20 +75,11 @@ def PlayPress():
 	GemRB.PlaySound (CharSound+"a")
 	return
 
-def BackPress():
-	global CharSoundWindow
-
-	if CharSoundWindow:
-		CharSoundWindow.Unload()
-	GemRB.SetNextScript("GUICG13") 
-	return
 
 def NextPress():
 	global CharSoundWindow
-
 	CharSound = VoiceList.QueryText ()
-	GemRB.SetToken ("CharSound", CharSound)
-	if CharSoundWindow:
-		CharSoundWindow.Unload()
-	GemRB.SetNextScript("CharGen8") #name
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerSound(MyChar,CharSound)
+	next()
 	return

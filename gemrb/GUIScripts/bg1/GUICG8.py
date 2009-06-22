@@ -20,6 +20,10 @@
 #character generation, race (GUICG2)
 import GemRB
 
+from CharGenCommon import *
+from GUICommon import CloseOtherWindow
+
+
 RaceWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -28,7 +32,15 @@ RaceTable = 0
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
 	global RaceTable
+
+	if CloseOtherWindow (OnLoad):
+		if(RaceWindow):
+			RaceWindow.Unload()
+			RaceWindow = None
+		return
 	
+	GemRB.SetVar("Race",0) 
+
 	GemRB.LoadWindowPack("GUICG")
 	RaceWindow = GemRB.LoadWindowObject(8)
 
@@ -57,7 +69,7 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	RaceWindow.SetVisible(1)
+	RaceWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def RacePress():
@@ -66,15 +78,8 @@ def RacePress():
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
-def BackPress():
-	if RaceWindow:
-		RaceWindow.Unload()
-	GemRB.SetNextScript("CharGen2")
-	GemRB.SetVar("Race",0)  #scrapping the race value
-	return
-
 def NextPress():
-	if RaceWindow:
-		RaceWindow.Unload()
-	GemRB.SetNextScript("CharGen3") #class
-	return
+	Race = GemRB.GetVar ("Race") - 1
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerStat (MyChar, IE_RACE, RaceTable.GetValue (Race, 3))
+	next()

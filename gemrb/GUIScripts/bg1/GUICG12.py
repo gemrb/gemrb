@@ -20,6 +20,10 @@
 #character generation, appearance (GUICG12)
 import GemRB
 
+from CharGenCommon import * 
+from GUICommon import CloseOtherWindow
+
+
 AppearanceWindow = 0
 CustomWindow = 0
 PortraitButton = 0
@@ -37,11 +41,17 @@ def SetPicture ():
 def OnLoad():
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
 	global Gender
-	
-	Gender=GemRB.GetVar ("Gender")
+
+	if CloseOtherWindow (OnLoad):
+		if(AppearanceWindow):AppearanceWindow.Unload()
+		AppearanceWindow = None
+		return
 
 	GemRB.LoadWindowPack("GUICG")
 	AppearanceWindow = GemRB.LoadWindowObject (11)
+	
+	#Load the Gender
+	Gender=GemRB.GetVar ("Gender")
 
 	#Load the Portraits Table
 	PortraitsTable = GemRB.LoadTableObject ("PICTURES")
@@ -74,7 +84,7 @@ def OnLoad():
 			SetPicture ()
 			break
 		LastPortrait = LastPortrait + 1
-	AppearanceWindow.SetVisible (1)
+	AppearanceWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def RightPress():
@@ -97,13 +107,6 @@ def LeftPress():
 			SetPicture ()
 			return
 
-def BackPress():
-	if AppearanceWindow:
-		AppearanceWindow.Unload ()
-	GemRB.SetNextScript ("GUICG1")
-	GemRB.SetVar ("Gender",0) #scrapping the gender value
-	return
-
 def CustomDone():
 	Window = CustomWindow
 
@@ -115,7 +118,7 @@ def CustomDone():
 		Window.Unload ()
 	if AppearanceWindow:
 		AppearanceWindow.Unload ()
-	GemRB.SetNextScript ("CharGen2")
+	next()
 	return
 
 def CustomAbort():
@@ -210,11 +213,19 @@ def CustomPress():
 	return
 
 def NextPress():
-	if AppearanceWindow:
-		AppearanceWindow.Unload ()
 	PortraitTable = GemRB.LoadTableObject ("pictures")
 	PortraitName = PortraitTable.GetRowName (LastPortrait )
 	GemRB.SetToken ("SmallPortrait", PortraitName+"S")
 	GemRB.SetToken ("LargePortrait", PortraitName+"L")
-	GemRB.SetNextScript ("CharGen2") #Before race
-	return
+	next()
+	#GemRB.SetVar("Step",1)
+	#GemRB.SetNextScript("CharGen")
+	#GemRB.SetNextScript ("CharGen2") #Before race
+	#return
+
+#def BackPress():
+#	if AppearanceWindow:
+#		AppearanceWindow.Unload ()
+#	GemRB.SetNextScript ("GUICG1")
+	#GemRB.SetVar ("Gender",0) #scrapping the gender value
+#	return

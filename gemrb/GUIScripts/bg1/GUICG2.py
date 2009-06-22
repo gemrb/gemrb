@@ -20,6 +20,11 @@
 #character generation, class (GUICG2)
 import GemRB
 
+from CharGenCommon import * 
+
+from GUICommon import CloseOtherWindow
+
+
 ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -28,6 +33,17 @@ ClassTable = 0
 def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton
 	global ClassTable
+
+	if CloseOtherWindow (OnLoad):
+		if(ClassWindow):
+			ClassWindow.Unload()
+			ClassWindow = None
+		return
+	
+	GemRB.SetVar("Class",0)
+	GemRB.SetVar("Multi Class",0)
+	GemRB.SetVar("Specialist",0)
+	GemRB.SetVar("Class Kit",0)
 	
 	GemRB.LoadWindowPack("GUICG")
 	ClassTable = GemRB.LoadTableObject("classes")
@@ -96,23 +112,19 @@ def OnLoad():
 	SpecialistButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpecialistPress")
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	ClassWindow.SetVisible(1)
+	ClassWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def MultiClassPress():
-	if ClassWindow:
-		ClassWindow.Unload()
-	GemRB.SetVar("Class Kit",0)
-	GemRB.SetNextScript("GUICG10")
-	return
+	GemRB.SetVar("Multi Class",1)
+	next()
 
 def SpecialistPress():
-	if ClassWindow:
-		ClassWindow.Unload()
+	GemRB.SetVar("Specialist",1)
+
 	GemRB.SetVar("Class Kit", 0)
 	GemRB.SetVar("Class", 6)
-	GemRB.SetNextScript("GUICG22")
-	return
+	next()
 	
 def ClassPress():
 	Class = GemRB.GetVar("Class")-1
@@ -120,15 +132,14 @@ def ClassPress():
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
-def BackPress():
-	if ClassWindow:
-		ClassWindow.Unload()
-	GemRB.SetNextScript("CharGen3")
-	GemRB.SetVar("Class",0)  #scrapping the class value
-	return
-
 def NextPress():
-	if ClassWindow:
-		ClassWindow.Unload()
-	GemRB.SetNextScript("CharGen4") #alignment
-	return
+	# find the class from the class table
+	ClassIndex = GemRB.GetVar ("Class") - 1
+	Class = ClassTable.GetValue (ClassIndex, 5)
+	#protect against barbarians
+	ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class) )
+	
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
+	next()
+	

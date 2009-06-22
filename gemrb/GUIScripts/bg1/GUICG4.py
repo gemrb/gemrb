@@ -20,6 +20,10 @@
 #character generation, ability (GUICG4)
 import GemRB
 
+from CharGenCommon import * 
+from GUICommon import CloseOtherWindow
+
+
 AbilityWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -101,17 +105,21 @@ def OnLoad():
 	global AbilityTable
 	global KitIndex, Minimum, Maximum
 
-	#Kit = GemRB.GetVar("Class Kit")
-	#if Kit == 0:
+	if CloseOtherWindow (OnLoad):
+		if(AbilityWindow):
+			AbilityWindow.Unload()
+			AbilityWindow = None
+		return
+
+	AbilityTable = GemRB.LoadTableObject ("ability")
+	AbilityCount = AbilityTable.GetRowCount ()
+	
+	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
+
+	
 	ClassTable = GemRB.LoadTableObject("classes")
 	Class = GemRB.GetVar("Class")-1
 	KitName = ClassTable.GetRowName(Class)
-	#else:
-	#	KitList = GemRB.LoadTableObject("kitlist")
-		#rowname is just a number, first value row what we need here
-	#	KitName = KitList.GetValue(Kit, 0) 
-
-	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
 	KitIndex = Abclasrq.GetRowIndex(KitName)
 
 	GemRB.LoadWindowPack("GUICG", 640, 480)
@@ -154,7 +162,8 @@ def OnLoad():
 	RerollButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"RollPress")
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	AbilityWindow.SetVisible(1)
+	AbilityWindow.ShowModal(MODAL_SHADOW_NONE)
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	return
 
 def RightPress():
@@ -246,15 +255,20 @@ def RecallPress():
 	return
 
 def BackPress():
-	if AbilityWindow:
-		AbilityWindow.Unload()
-	GemRB.SetNextScript("CharGen5")
-	for i in range(6):
-		GemRB.SetVar("Ability "+str(i),0)  #scrapping the abilities
-	return
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
+	back()
 
 def NextPress():
-	if AbilityWindow:
-		AbilityWindow.Unload()
-	GemRB.SetNextScript("CharGen6") #
-	return
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
+	
+	MyChar = GemRB.GetVar ("Slot")
+	
+	AbilityTable = GemRB.LoadTableObject ("ability")
+	AbilityCount = AbilityTable.GetRowCount ()
+	
+	for i in range (AbilityCount):
+		StatID = AbilityTable.GetValue (i, 3)
+		StatValue = GemRB.GetVar ("Ability "+str(i))
+		GemRB.SetPlayerStat (MyChar, StatID, StatValue)
+	next()
+

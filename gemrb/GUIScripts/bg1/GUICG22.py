@@ -20,6 +20,10 @@
 #character generation, class kit (GUICG22)
 import GemRB
 
+from CharGenCommon import * 
+from GUICommon import CloseOtherWindow
+
+
 KitWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -31,7 +35,13 @@ ClassID = 0
 def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton
 	global KitList, ClassList, SchoolList, ClassID
-	
+
+	if CloseOtherWindow(OnLoad):
+		if(KitWindow):
+			KitWindow.Unload()
+			KitWindow = None
+		return
+
 	GemRB.LoadWindowPack("GUICG")
 	TmpTable = GemRB.LoadTableObject("races")
 	RaceName = TmpTable.GetRowName(GemRB.GetVar("Race")-1 )
@@ -100,8 +110,8 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	KitPress()
-	KitWindow.SetVisible(1)
+	#KitPress()
+	KitWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def KitPress():
@@ -117,15 +127,13 @@ def KitPress():
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
-def BackPress():
-	GemRB.SetVar("Class Kit",0) #scrapping
-	if KitWindow:
-		KitWindow.Unload()
-	GemRB.SetNextScript("GUICG2")
-	return
-
 def NextPress():
-	if KitWindow:
-		KitWindow.Unload()
-	GemRB.SetNextScript("CharGen4") #abilities
-	return
+	#class	
+	ClassIndex = GemRB.GetVar ("Class")-1
+	ClassTable = GemRB.LoadTableObject("classes")
+	Class = ClassTable.GetValue (ClassIndex, 5)
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
+	KitIndex = GemRB.GetVar ("Class Kit")
+	GemRB.SetPlayerStat (MyChar, IE_KIT, KitIndex)
+	next()

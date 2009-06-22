@@ -20,116 +20,42 @@
 # character generation, mage spells (GUICG7)
 
 import GemRB
-from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells
-
-MageSpellsWindow = 0
-MageSpellsTextArea = 0
-DoneButton = 0
-Learnable = []
+from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells,CloseOtherWindow
+from CharGenCommon import * 
+from LUSpellSelection import *
 
 def OnLoad():
-	global MageSpellsWindow, MageSpellsTextArea, DoneButton
-	global MageSpellsSelectPointsLeft, Learnable
-	
-	AlignmentTable = GemRB.LoadTableObject("aligns")
-	ClassTable = GemRB.LoadTableObject("classes")
-	ClassRow = GemRB.GetVar("Class")-1
-	Class = ClassTable.GetValue(ClassRow, 5)
-	TmpTable = GemRB.LoadTableObject("clskills")
-	TableName = TmpTable.GetValue(Class, 2)
-	if TableName == "*":
-		GemRB.SetNextScript("GUICG6")
-		return
+	KitTable = GemRB.LoadTableObject("magesch")
+	Slot = GemRB.GetVar ("Slot")
+	Class = GemRB.GetPlayerStat (Slot, IE_CLASS)
+	TableName = ClassSkillsTable.GetValue(Class, 2)
 
-	GemRB.LoadWindowPack("GUICG")
-	MageSpellsWindow = GemRB.LoadWindowObject(7)
-	v = GemRB.GetVar("Alignment")
-	Learnable = GetLearnableMageSpells( GemRB.GetVar("Class Kit"), v, 1)
-	GemRB.SetVar("MageSpellBook", 0)
-	GemRB.SetVar("SpellMask", 0)
+	# make sure we have a correct table
+	if Class == 19:
+		# sorcerer's need their known not max table
+		TableName = "SPLSRCKN"
 
-	MageSpellsSelectPointsLeft = 2
-	PointsLeftLabel = MageSpellsWindow.GetControl(0x1000001b)
-	PointsLeftLabel.SetUseRGB(1)
-	PointsLeftLabel.SetText(str(MageSpellsSelectPointsLeft))
+	# get our kit index
+	KitIndex = GetKitIndex (Slot)
+	if KitIndex:
+		KitValue = KitTable.GetValue(KitIndex - 21, 3)
 
-	for i in range (24):
-		SpellButton = MageSpellsWindow.GetControl(i + 2)
-		SpellButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
-		SpellButton.SetSprites("GUIBTBUT", 0, (i % 12) * 2, (i % 12) * 2 + 1, (i % 12) * 2 + 24, (i % 12) * 2 + 25)
-		if i < len(Learnable):
-			Spell = GemRB.GetSpell(Learnable[i])
-			SpellButton.SetSpellIcon(Learnable[i], 1)
-			SpellButton.SetState(IE_GUI_BUTTON_ENABLED)
-			SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MageSpellsSelectPress")
-			SpellButton.SetVarAssoc("SpellMask", 1 << i)
-			SpellButton.SetTooltip(Spell['SpellName'])
-		else:
-			SpellButton.SetState(IE_GUI_BUTTON_DISABLED)
-
-	GemRB.SetToken("number", str(MageSpellsSelectPointsLeft))
-	MageSpellsTextArea = MageSpellsWindow.GetControl(27)
-	MageSpellsTextArea.SetText(17250)
-
-	DoneButton = MageSpellsWindow.GetControl(0)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MageSpellsDonePress")
-	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
-
-	MageSpellsCancelButton = MageSpellsWindow.GetControl(29)
-	MageSpellsCancelButton.SetState(IE_GUI_BUTTON_ENABLED)
-	MageSpellsCancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MageSpellsCancelPress")
-	MageSpellsCancelButton.SetText(13727)
-
-	MageSpellsWindow.SetVisible(1)
-	return
-
-def MageSpellsSelectPress():
-	global MageSpellsWindow, MageSpellsTextArea, DoneButton
-	global MageSpellsSelectPointsLeft, Learnable
-
-	MageSpellBook = GemRB.GetVar("MageSpellBook")
-	SpellMask = GemRB.GetVar("SpellMask")
-	Spell = abs(MageSpellBook - SpellMask)
-
-	i = -1
-	while (Spell > 0):
-		i = i + 1
-		Spell = Spell >> 1
-
-	Spell = GemRB.GetSpell(Learnable[i])
-	MageSpellsTextArea.SetText(Spell["SpellDesc"])
-	if SpellMask < MageSpellBook:
-		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft + 1
-		for i in range (len(Learnable)):
-			SpellButton = MageSpellsWindow.GetControl(i + 2)
-			if (((1 << i) & SpellMask) == 0):
-				SpellButton.SetState(IE_GUI_BUTTON_ENABLED)
-		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+		# bards have kits too
+		if KitValue == -1:
+			KitValue = 0x4000 # we only need it for the spells, so this is ok
 	else:
-		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft - 1
-		if MageSpellsSelectPointsLeft == 0:
-			for i in range (len(Learnable)):
-				SpellButton = MageSpellsWindow.GetControl(i + 2)
-				if ((1 << i) & SpellMask) == 0:
-					SpellButton.SetState(IE_GUI_BUTTON_DISABLED)
-			DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+		KitValue = 0x4000
 
-	PointsLeftLabel = MageSpellsWindow.GetControl(0x1000001b)
-	PointsLeftLabel.SetText(str(MageSpellsSelectPointsLeft))
-	GemRB.SetVar("MageSpellBook", SpellMask)
+	# open up the spell selection window
+	# remember, it is pc, table, level, diff, kit, chargen
+	IsMulti = IsMultiClassed (Slot, 1)
+	Level = GemRB.GetPlayerStat (Slot, IE_LEVEL)
+	if IsMulti[0]>1:
+		for i in range (2, IsMulti[0]+1):
+			if ClassSkillsTable.GetValue (IsMulti[i], 2, 0) != "*":
+				Level = GemRB.GetPlayerStat (Slot, IE_LEVEL2+i-1)
+			break
+	SetupSpellLevels(Slot, TableName, IE_SPELL_TYPE_WIZARD, 1)
+	OpenSpellsWindow (Slot, TableName, Level, Level, KitValue, 1,False,False)
+
 	return
-
-def MageSpellsCancelPress():
-	if MageSpellsWindow:
-		MageSpellsWindow.Unload()
-	GemRB.SetNextScript("CharGen6") #haterace
-	return
-
-def MageSpellsDonePress():
-	if MageSpellsWindow:
-		MageSpellsWindow.Unload()
-	GemRB.SetNextScript("GUICG6") #abilities
-	return
-

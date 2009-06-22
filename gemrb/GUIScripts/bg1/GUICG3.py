@@ -20,6 +20,10 @@
 #character generation, alignment (GUICG3)
 import GemRB
 
+from CharGenCommon import * 
+from GUICommon import CloseOtherWindow
+
+
 AlignmentWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -28,6 +32,14 @@ AlignmentTable = 0
 def OnLoad():
 	global AlignmentWindow, TextAreaControl, DoneButton
 	global AlignmentTable
+
+	if CloseOtherWindow (OnLoad):
+		if(AlignmentWindow):
+			AlignmentWindow.Unload()
+			AlignmentWindow = None
+		return
+
+	GemRB.SetVar("Alignment",-1)
 	
 	ClassTable = GemRB.LoadTableObject("classes")
 	Class = GemRB.GetVar("Class")-1
@@ -71,7 +83,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	AlignmentWindow.SetVisible(1)
+	AlignmentWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def AlignmentPress():
@@ -81,15 +93,8 @@ def AlignmentPress():
 	GemRB.SetVar("Alignment",AlignmentTable.GetValue(Alignment,3) )
 	return
 
-def BackPress():
-	if AlignmentWindow:
-		AlignmentWindow.Unload()
-	GemRB.SetNextScript("CharGen4")
-	GemRB.SetVar("Alignment",-1)  #scrapping the alignment value
-	return
-
 def NextPress():
-	if AlignmentWindow:
-		AlignmentWindow.Unload()
-	GemRB.SetNextScript("CharGen5") #appearance
-	return
+	MyChar = GemRB.GetVar ("Slot")
+	Alignment = GemRB.GetVar ("Alignment")
+	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment)
+	next()
