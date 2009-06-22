@@ -600,7 +600,14 @@ void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 	SpellHeader = -1;
 	if (pro) {
 		pro->SetCaster(GetGlobalID());
-		GetCurrentArea()->AddProjectile(pro, Pos, LastTargetPos);
+		Point origin = Pos;
+		if (Type == ST_TRIGGER || Type == ST_PROXIMITY) {
+			// try and make projectiles start from the right trap position
+			// see the traps in the dreugar/assassin battle in bg2 dungeon
+			// see also function below - maybe we should fix Pos instead
+			origin = ((InfoPoint *)this)->TrapLaunch;
+		}
+		GetCurrentArea()->AddProjectile(pro, origin, LastTargetPos);
 	}
 	LastTarget = 0;
 	LastTargetPos.empty();
@@ -625,10 +632,17 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 	Projectile *pro = spl->GetProjectile(SpellHeader);
 	if (pro) {
 		pro->SetCaster(GetGlobalID());
+		Point origin = Pos;
+		if (Type == ST_TRIGGER || Type == ST_PROXIMITY) {
+			// try and make projectiles start from the right trap position
+			// see the traps in the dreugar/assassin battle in bg2 dungeon
+			// see also function above - maybe we should fix Pos instead
+			origin = ((InfoPoint *)this)->TrapLaunch;
+		}
 		if (LastTarget) {
-			GetCurrentArea()->AddProjectile(pro, Pos, LastTarget);
+			GetCurrentArea()->AddProjectile(pro, origin, LastTarget);
 		} else {
-			GetCurrentArea()->AddProjectile(pro, Pos, LastTargetPos);
+			GetCurrentArea()->AddProjectile(pro, origin, LastTargetPos);
 		}
 	}
 	gamedata->FreeSpell(spl, SpellResRef, false);
