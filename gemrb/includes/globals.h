@@ -131,8 +131,9 @@
 #define  GF_IWD_DEATHVARFORMAT  	34 //iwd branch (maybe pst)
 #define  GF_RESDATA_INI         	35 //pst
 #define  GF_OVERRIDE_CURSORPOS  	36 //pst, iwd2
+#define  GF_BREAKABLE_WEAPONS     	37 //bg1, not bg2 and iwd2, maybe others
 //update this
-#define GF_COUNT 37
+#define GF_COUNT 38
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

@@ -2170,6 +2170,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"IWDDeathVarFormat",  //34GF_IWD_DEATHVARFORMAT
 		"HasResDataIni",      //35GF_RESDATA_INI
 		"OverrideCursorPos",  //36GF_OVERRIDE_CURSORPOS
+		"BreakableWeapons",   //37GF_BREAKABLE_WEAPONS
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

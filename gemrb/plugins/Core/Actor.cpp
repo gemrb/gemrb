@@ -3603,11 +3603,11 @@ void Actor::PerformAttack(ieDword gameTime)
 		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
 		if (Flags&WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
-		} else {
+		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS)) {
 			//break sword
 			//TODO: this appears to be a random roll on-hit (perhaps critical failure
-			// too), but definitely doesn't happen each critical hit
-			if ((header->RechargeFlags&IE_ITEM_BREAKABLE) && core->Roll(1,ATTACKROLL,0) == 1) {
+			// too); we use 1% (1d20*1d5==1)
+			if ((header->RechargeFlags&IE_ITEM_BREAKABLE) && core->Roll(1,5,0) == 1) {
 				inventory.BreakItemSlot(wi.slot);
 			}
 		}
