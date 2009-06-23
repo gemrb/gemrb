@@ -1179,8 +1179,8 @@ void Movable::FixPosition()
 
 void Movable::WalkTo(Point &Des, int distance)
 {
-	Point from = Pos;
-	
+	Point from;
+
 	// the prev_step stuff is a naive attempt to allow re-pathing while moving
 	PathNode *prev_step = NULL;
 	unsigned char old_stance = StanceID;
@@ -1188,12 +1188,13 @@ void Movable::WalkTo(Point &Des, int distance)
 		// don't interrupt in the middle of a step; path from the next one
 		prev_step = new PathNode(*step);
 		from.x = ( step->Next->x * 16 ) + 8;
-		from.y = ( step->Next->y * 12 ) + 6;	
+		from.y = ( step->Next->y * 12 ) + 6;
 	}
 
 	ClearPath();
 	if (!prev_step) {
 		FixPosition();
+		from = Pos;
 	}
 	area->ClearSearchMapFor(this);
 	path = area->FindPath( from, Des, size, distance );
@@ -1201,12 +1202,12 @@ void Movable::WalkTo(Point &Des, int distance)
 	//also we should set Destination only if there is a walkable path
 	if (path) {
 		Destination = Des;
-		
+
 		if (prev_step) {
 			// we want to smoothly continue, please
 			// this all needs more thought! but it seems to work okay
 			StanceID = old_stance;
-			
+
 			if (path->Next) {
 				// this is a terrible hack to make up for the
 				// pathfinder orienting the first node wrong
@@ -1222,8 +1223,14 @@ void Movable::WalkTo(Point &Des, int distance)
 			prev_step->Next = path;
 			path->Parent = prev_step;
 			path = prev_step;
-			
+
 			step = path;
+		}
+	} else {
+		// pathing failed
+		if (prev_step) {
+			delete( prev_step );
+			FixPosition();
 		}
 	}
 }
