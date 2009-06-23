@@ -562,7 +562,8 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 			//ar0203 in PST seems to want the check this way.
 			//if other areas conflict and you want to use (!specvar),
 			//please research further
-			if (specvar) {
+			//researched further - ar0203 respawns only if specvar is 1
+			if (!specvar) {
 				return;
 			}
 		}
