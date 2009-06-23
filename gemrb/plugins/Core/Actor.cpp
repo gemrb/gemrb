@@ -2681,9 +2681,6 @@ void Actor::Die(Scriptable *killer)
 		}
 	}
 
-	// items seem to be dropped at the moment of death
-	DropItem("",0);
-
 	//a plot critical creature has died (iwd2)
 	if (BaseStats[IE_MC_FLAGS]&MC_PLOT_CRITICAL) {
 		core->GetGUIScriptEngine()->RunFunction("DeathWindowPlot", false);
@@ -2733,6 +2730,11 @@ bool Actor::CheckOnDeath()
 	ClearActions();
 	//missed the opportunity of Died()
 	InternalFlags&=~IF_JUSTDIED;
+
+	// items seem to be dropped at the moment of death
+	// .. but this can't go in Die() because that is called
+	// from effects and dropping items might change effects!
+	DropItem("",0);
 
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9
