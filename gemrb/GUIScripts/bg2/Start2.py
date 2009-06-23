@@ -112,7 +112,8 @@ def OnLoad():
 	TutorialWindow.SetVisible (0)
 	StartWindow.SetVisible (1)
 	MusicTable = GemRB.LoadTableObject ("songlist")
-	theme = MusicTable.GetValue ("BG2Theme", "RESOURCE")
+	# the table has useless rownames, so we can't search for BG2Theme
+	theme = MusicTable.GetValue ("33", "RESOURCE")
 	GemRB.LoadMusicPL (theme, 1)
 	return
 
