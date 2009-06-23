@@ -4979,7 +4979,7 @@ void GameScript::RandomWalkContinuous(Scriptable* Sender, Action* /*parameters*/
 	actor->RandomWalk( false, false );
 }
 
-void GameScript::RandomFly(Scriptable* Sender, Action* parameters)
+void GameScript::RandomFly(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
@@ -4995,8 +4995,8 @@ void GameScript::RandomFly(Scriptable* Sender, Action* parameters)
 	//fly in this direction for 5 steps
 	actor->MoveLine(5, GL_PASS, actor->GetOrientation() );
 	//readding the action to the end of the queue
-	Sender->AddAction( parameters );
-	Sender->ReleaseCurrentAction();
+	//Sender->AddAction( parameters );
+	//Sender->ReleaseCurrentAction();
 }
 
 //UseContainer uses the predefined target (like Nidspecial1 dialog hack)
