@@ -1954,12 +1954,22 @@ void Actor::RefreshPCStats() {
 			tmplevel = 0;
 		}
 
-		//wspattack appears to only effect warriors
-		int defaultattacks = 2 + 2*dualwielding;
-		if (tmplevel) {
-			SetBase(IE_NUMBEROFATTACKS, defaultattacks+wspattack[stars][tmplevel]);
+		//HACK: attacks per round bonus for monks should only apply to fists
+		if (isclass[ISMONK]&(1<<BaseStats[IE_CLASS])) {
+			if (BaseStats[IE_NUMBEROFATTACKS] == 2) {
+				AutoTable tm("monkbon");
+				if (tm) {
+					SetBase(IE_NUMBEROFATTACKS, 2 + atoi(tm->QueryField(0, GetMonkLevel()-1)));
+				}
+			}
 		} else {
-			SetBase(IE_NUMBEROFATTACKS, defaultattacks);
+			//wspattack appears to only effect warriors
+			int defaultattacks = 2 + 2*dualwielding;
+			if (tmplevel) {
+				SetBase(IE_NUMBEROFATTACKS, defaultattacks+wspattack[stars][tmplevel]);
+			} else {
+				SetBase(IE_NUMBEROFATTACKS, defaultattacks);
+			}
 		}
 	}
 
