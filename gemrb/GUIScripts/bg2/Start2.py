@@ -111,7 +111,9 @@ def OnLoad():
 	QuitWindow.SetVisible (0)
 	TutorialWindow.SetVisible (0)
 	StartWindow.SetVisible (1)
-	GemRB.LoadMusicPL("Theme.mus",1)
+	MusicTable = GemRB.LoadTableObject ("songlist")
+	theme = MusicTable.GetValue ("BG2Theme", "RESOURCE")
+	GemRB.LoadMusicPL (theme, 1)
 	return
 
 def SinglePlayerPress():
