@@ -1200,6 +1200,11 @@ static void InitActorTables()
 			if (field[0]!='*') {
 				isclass[ISRANGER] |= bitmask;
 			}
+
+			field = tm->QueryField( i, 10 );
+			if (!strncasecmp(field, "CLABMO", 6)) {
+				isclass[ISMONK] |= bitmask;
+			}
 			bitmask <<=1;
 		}
 	} else {
