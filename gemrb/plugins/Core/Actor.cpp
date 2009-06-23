@@ -1155,11 +1155,6 @@ static void InitActorTables()
 			int turnlevel = atoi(tm->QueryField( i, 7));
 			turnlevels[i]=turnlevel;
 
-			field = tm->QueryField( i, 9 );
-			if (field[0]!='*') {
-				isclass[ISRANGER] |= bitmask;
-			}
-
 			field = tm->QueryField( i, 0 );
 			if (field[0]!='*') {
 				isclass[ISDRUID] |= bitmask;
@@ -1177,9 +1172,16 @@ static void InitActorTables()
 				wizardspelltables[i]=strdup(field);
 			}
 
+			// field 3 holds the starting xp
+
 			field = tm->QueryField( i, 4 );
 			if (field[0]!='*') {
 				isclass[ISBARD] |= bitmask;
+			}
+
+			field = tm->QueryField( i, 5 );
+			if (field[0]!='*') {
+				isclass[ISTHIEF] |= bitmask;
 			}
 
 			field = tm->QueryField( i, 6 );
@@ -1187,9 +1189,16 @@ static void InitActorTables()
 				isclass[ISPALADIN] |= bitmask;
 			}
 
-			field = tm->QueryField( i, 7 );
+			// field 7 holds the turn undead level
+
+			field = tm->QueryField( i, 8 );
 			if (atoi(field)==2) {
 				isclass[ISSORCERER] |= bitmask;
+			}
+
+			field = tm->QueryField( i, 9 );
+			if (field[0]!='*') {
+				isclass[ISRANGER] |= bitmask;
 			}
 			bitmask <<=1;
 		}
