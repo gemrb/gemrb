@@ -1202,7 +1202,7 @@ static void InitActorTables()
 			}
 
 			field = tm->QueryField( i, 10 );
-			if (!strncasecmp(field, "CLABMO", 6)) {
+			if (!strnicmp(field, "CLABMO", 6)) {
 				isclass[ISMONK] |= bitmask;
 			}
 			bitmask <<=1;
