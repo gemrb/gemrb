@@ -4860,8 +4860,6 @@ void Actor::SetUsedHelmet(const char* AnimationType)
 	}
 }
 
-//set up stuff here, like attack number, turn undead level
-//and similar derived stats that change with level
 void Actor::SetupFist()
 {
 	int slot = core->QuerySlot( 0 );
@@ -5140,6 +5138,18 @@ void Actor::CreateDerivedStatsBG()
 		printf("\n");
 		if (backstabdamagemultiplier>7) backstabdamagemultiplier=7;
 	}
+
+	// monk's level dictated ac and ac vs missiles bonus
+	// attacks per round bonus will be handled elsewhere, since it only applies to fist apr
+	if (isclass[ISMONK]&(1<<classid)) {
+		AutoTable tm("monkbon");
+		if (tm) {
+			int level = GetMonkLevel();
+			BaseStats[IE_ARMORCLASS] = DEFAULTAC - atoi(tm->QueryField(1, level-1));
+			BaseStats[IE_ACMISSILEMOD] = - atoi(tm->QueryField(2, level-1));
+		}
+	}
+
 	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;
 	BaseStats[IE_BACKSTABDAMAGEMULTIPLIER]=backstabdamagemultiplier;
 	BaseStats[IE_LAYONHANDSAMOUNT]=GetPaladinLevel()*2;
@@ -5171,6 +5181,8 @@ void Actor::CreateDerivedStatsIWD2()
 	BaseStats[IE_LAYONHANDSAMOUNT]=(ieDword) layonhandsamount;
 }
 
+//set up stuff here, like attack number, turn undead level
+//and similar derived stats that change with level
 void Actor::CreateDerivedStats()
 {
 	//we have to calculate multiclass for further code
