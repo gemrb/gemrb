@@ -87,6 +87,8 @@ bool ResolveSpellName(ieResRef spellres, Action *parameter);
 bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot);
 void EscapeAreaCore(Actor *src, const char *resref, Point &enter, Point &exit, int flags);
 void GoNear(Scriptable *Sender, Point &p);
+void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance);
+void MoveNearerTo(Scriptable *Sender, Point &p, int distance);
 void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool destination, int distance);
 void GoNearAndRetry(Scriptable *Sender, Point &p, int distance);
 

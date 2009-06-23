@@ -956,9 +956,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		//CHECKDIST works only for mobile scriptables
 		if (Flags&BD_CHECKDIST) {
 			if (PersonalDistance(scr, target)>range ) {
-				//this is unsure, the target's path will be cleared
-				GoNearAndRetry(Sender, tar, true, MAX_OPERATING_DISTANCE);
-				Sender->ReleaseCurrentAction();
+				MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE);
 				return;
 			}
 		}
@@ -1656,6 +1654,33 @@ void GoNear(Scriptable *Sender, Point &p)
 	sprintf( Tmp, "MoveToPoint([%hd.%hd])", p.x, p.y );
 	Action * action = GenerateAction( Tmp);
 	Sender->AddActionInFront( action );
+}
+
+void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
+{
+	Point p;
+	GetPositionFromScriptable(target, p, 0);
+	MoveNearerTo(Sender, p, distance);	
+}
+
+void MoveNearerTo(Scriptable *Sender, Point &p, int distance)
+{
+	if (Sender->Type != ST_ACTOR) {
+		printMessage("GameScript","MoveNearerTo only works with actors\n",LIGHT_RED);
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Actor *actor = (Actor *)Sender;
+
+	if (!actor->InMove() || actor->Destination != p) {
+		actor->WalkTo(p, 0, distance);
+	}
+
+	if (!actor->InMove()) {
+		// we can't walk any nearer to destination, give up
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool flag, int distance)
