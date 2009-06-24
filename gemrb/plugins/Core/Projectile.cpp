@@ -898,11 +898,8 @@ void Projectile::DrawExplosion(Region &screen)
 	//In trapskul.pro it isn't set, yet it has a secondary (invisible) projectile
 	//All area effects are created by secondary projectiles
 
-	//if (Extension->AFlags&PAF_SECONDARY) {
-	if (Extension->ExplProjIdx) {
-		//the secondary projectile will target everyone in the area of effect
-		SecondaryTarget();
-	}
+	//the secondary projectile will target everyone in the area of effect
+	SecondaryTarget();
 
 	//draw fragment graphics animation at the explosion center
 	if (Extension->AFlags&PAF_FRAGMENT) {
