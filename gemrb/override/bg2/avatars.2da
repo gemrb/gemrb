@@ -148,9 +148,9 @@
 0x7500     MDOP       MDOP       MDOP       MDOP       2          2          1          *
 0x7501     MDOP       MDOP       MDOP       MDOP       2          2          GR         *
 0x7600     METT       METT       METT       METT       14         2          1          *
-0x7701     MGHL       MGHL       MGHL       MGHL       2          2          1          *
-0x7702     MGHL       MGHL       MGHL       MGHL       2          2          RE         *
-0x7703     MGHL       MGHL       MGHL       MGHL       2          2          GA         *
+0x7701     MGHL       MGHL       MGHL       MGHL       14         2          1          *
+0x7702     MGHL       MGHL       MGHL       MGHL       14         2          RE         *
+0x7703     MGHL       MGHL       MGHL       MGHL       14         2          GA         *
 0x7704     MSHD       MSHD       MSHD       MSHD       4          2          1          *
 0x7800     MGIB       MGIB       MGIB       MGIB       2          2          1          *
 0x7900     MSLI       MSLI       MSLI       MSLI       3          3          GR         *
