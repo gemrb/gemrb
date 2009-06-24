@@ -940,7 +940,8 @@ def SetupThaco (pc, Level=None):
 	for i in range (NumClasses):
 		#loop through each class and update the save value if we have
 		#a better thac0
-		TmpThaco = ThacoTable.GetValue (Class[i]-1, Levels[i])
+		ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class[i]))
+		TmpThaco = ThacoTable.GetValue (ClassName, str(Levels[i]+1))
 		if TmpThaco < CurrentThaco:
 			NewThaco = 1
 			CurrentThaco = TmpThaco
