@@ -1181,6 +1181,12 @@ void Movable::WalkTo(Point &Des, int distance)
 {
 	Point from;
 
+	// maybe caller should be responsible for this
+	if ((Des.x/16 == Pos.x/16) && (Des.y/12 == Pos.y/12)) {
+		ClearPath();
+		return;
+	}
+
 	// the prev_step stuff is a naive attempt to allow re-pathing while moving
 	PathNode *prev_step = NULL;
 	unsigned char old_stance = StanceID;
