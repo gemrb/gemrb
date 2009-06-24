@@ -205,6 +205,9 @@ Game* GAMImp::LoadGame(Game *newGame)
 	//apparently BG1/IWD2 relies on this, if chapter is unset, it is
 	//set to -1, hopefully it won't break anything
 	newGame->locals->SetAt("CHAPTER", (ieDword) -1);
+	
+	// load initial values from var.var
+	newGame->locals->LoadInitialValues("GLOBAL");
 
 	//Loading Global Variables
 	ieVariable Name;
@@ -221,6 +224,8 @@ Game* GAMImp::LoadGame(Game *newGame)
 	if(core->HasFeature(GF_HAS_KAPUTZ) ) {
 		newGame->kaputz = new Variables();
 		newGame->kaputz->SetType( GEM_VARIABLES_INT );
+		// load initial values from var.var
+		newGame->kaputz->LoadInitialValues("KAPUTZ");
 		str->Seek( KillVarsOffset, GEM_STREAM_START );
 		for (i = 0; i < KillVarsCount; i++) {
 			ieDword Value;

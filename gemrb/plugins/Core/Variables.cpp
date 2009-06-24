@@ -20,6 +20,8 @@
  */
 
 #include "Variables.h"
+#include "Interface.h" // for LoadInitialValues
+#include "FileStream.h" // for LoadInitialValues
 #ifndef HAVE_STRNLEN
 
 static int strnlen(const char* string, int maxlen)
@@ -443,3 +445,34 @@ void Variables::Remove(const char* key)
 	pAssoc->pNext = 0;
 	FreeAssoc(pAssoc);
 }
+
+void Variables::LoadInitialValues(const char* name)
+{
+	char nPath[_MAX_PATH];
+	// we only support PST's var.var for now
+	PathJoin( nPath, core->GamePath, "var.var", NULL );
+	ResolveFilePath(nPath);
+	FileStream fs;
+	if (!fs.Open( nPath, true )) {
+		return;
+	}
+
+	char buffer[41];
+	ieDword value;
+	buffer[40] = 0;
+	
+	// first value is useless
+	if (!fs.Read(buffer, 40)) return;
+	if (fs.ReadDword(&value) != 4) return;
+	
+	while (fs.Remains()) {
+		// read data
+		if (!fs.Read(buffer, 40)) return;
+		if (fs.ReadDword(&value) != 4) return;
+		// is it the type we want? if not, skip
+		if (strncmp(buffer, name, 6)) continue;
+		// set variable (types have two extra spaces)
+		SetAt(buffer + 8, value);
+	}
+}
+

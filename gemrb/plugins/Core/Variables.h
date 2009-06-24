@@ -70,6 +70,7 @@ protected:
 public:
 	// Construction
 	Variables(int nBlockSize = 10, int nHashTableSize = 2049);
+	void LoadInitialValues(const char* name);
 
 	// Attributes
 	//sets the way we handle keys, no parsing for .ini file entries, parsing for game variables

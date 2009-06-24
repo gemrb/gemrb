@@ -979,10 +979,8 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	printf( "Loading variables\n" );
+	map->locals->LoadInitialValues(ResRef);
 	//Loading Variables
-	//map->vars=new Variables();
-	//map->vars->SetType( GEM_VARIABLES_INT );
-
 	str->Seek( VariablesOffset, GEM_STREAM_START );
 	for (i = 0; i < VariablesCount; i++) {
 		ieVariable Name;
