@@ -3,7 +3,7 @@
 # $Id$
 
 # Gentoo and Mandrake specific flags
-export WANT_AUTOMAKE="1.7"
+export WANT_AUTOMAKE="1.10"
 export WANT_AUTOCONF="2.5"
 
 # FreeBSD favourite paths
