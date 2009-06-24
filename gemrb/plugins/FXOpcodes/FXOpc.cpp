@@ -3780,7 +3780,7 @@ int fx_replace_creature (Actor* Owner, Actor* target, Effect *fx)
 		break;
 	default:;
 	}
-	//create replacement
+	//create replacement; should we be passing the target instead of NULL?
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, -1,0);
 	return FX_NOT_APPLIED;
 }
