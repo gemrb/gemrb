@@ -461,6 +461,9 @@ void Projectile::EndTravel()
 		extension_delay=0;
 	}
 	extension_explosioncount=Extension->ExplosionCount;
+	if (!extension_explosioncount) {
+		extension_explosioncount=1;
+	}
 
 	//this flag says that the explosion should occur only when triggered
 	if (Extension->AFlags&PAF_TRIGGER) {
