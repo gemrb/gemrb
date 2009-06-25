@@ -16,7 +16,7 @@ Preparing and testing SVN
 
 * Make sure that GemRB SVN is in compilable and runnable state
   - download a clean SVN tree and test it.
-  - Make distribution .tar.gz  (make dist) and test it as well -
+  - Make distribution .tar.gz (see Source release below) and test it as well -
     especially make sure all needed files are included.
 
 * Tag current SVN to version number e.g. GEMRB_0_3_0
@@ -63,7 +63,7 @@ Release and Announcements
   Source pkg details:
     Release name: GemRB 0.2.5 Sources
     File name: gemrb-0.2.5.tar.gz
-    Processor: platform-independent ; Type: Source .gz
+    Processor: Any ; Type: Source .gz
 
   Binary pkg details: 
     Release name: GemRB 0.2.5 Linux/i386

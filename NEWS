@@ -1,3 +1,14 @@
+GemRB svn (6624):
+  New features:
+    - 
+
+  Improved features:
+    - 
+    - various guiscripts
+    - bugfixes
+
+  Applied patches:
+
 GemRB V0.5.0 (2009-06-25):
   New features:
     - SoA, ToB and PST are roughly playable beyond their first levels
