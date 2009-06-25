@@ -158,6 +158,12 @@ struct GAMJournalEntry {
 	ieByte   Group;   // this is a GemRB extension
 };
 
+// Saved location of party member.
+struct GAMPartyLocation {
+	ieResRef area;
+	Point pos;
+};
+
 #define MAX_CRLEVEL 32
 
 typedef int CRRow[MAX_CRLEVEL];
@@ -221,6 +227,7 @@ public:
 	Particles *weather;
 	int event_timer;
 	char event_handler[64]; //like in Control
+	std::vector<GAMPartyLocation> savedpositions;
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();

@@ -1246,11 +1246,16 @@ void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
 void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game *game = core->GetGame();
+	game->savedpositions.resize(game->GetPartySize(false));
 	for (int i = 0; i < game->GetPartySize(false); i++) {
 		Actor* act = game->GetPC( i, false );
 		if (act) {
-			ieDword value = act->Pos.asDword();
-			SetVariable( act, "LOCALSsavedlocation", value);
+			//ieDword value = act->Pos.asDword();
+			//SetVariable( act, "LOCALSsavedlocation", value);
+			game->savedpositions[i].pos = act->Pos;
+			memcpy(game->savedpositions[i].area, act->Area, 9);
+		} else {
+			game->savedpositions[i].area[0] = 0;
 		}
 	}
 }
@@ -1261,14 +1266,22 @@ void GameScript::RestorePartyLocation(Scriptable* /*Sender*/, Action* /*paramete
 	for (int i = 0; i < game->GetPartySize(false); i++) {
 		Actor* act = game->GetPC( i, false );
 		if (act) {
-			ieDword value=CheckVariable( act, "LOCALSsavedlocation");
+			//ieDword value=CheckVariable( act, "LOCALSsavedlocation");
 			//setting position, don't put actor on another actor
-			Point p;
-			p.fromDword(value);
-			act->SetPosition(p, -1);
+			//Point p;
+			//p.fromDword(value);
+			//act->SetPosition(loc.pos, -1);
+			if (game->savedpositions.size() <= (unsigned int)i || !game->savedpositions[i].area[0]) {
+				// what are we meant to do here?
+				printf("argh, couldn't restore party member %d!", i + 1);
+				continue;
+			}
+			MoveBetweenAreasCore(act, game->savedpositions[i].area, game->savedpositions[i].pos, -1, true);
 		}
 	}
 
+	// presumably this is correct
+	game->savedpositions.clear();
 }
 
 void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/)
