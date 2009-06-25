@@ -28,7 +28,7 @@
 dnl Initialize autoconf and automake
 
 AC_PREREQ([2.57])
-AC_INIT(gemrb, 0.4.0)
+AC_INIT(gemrb, 0.5.0)
 AC_CONFIG_AUX_DIR([admin])
 AC_CONFIG_SRCDIR([gemrb/])
 AC_CANONICAL_SYSTEM
