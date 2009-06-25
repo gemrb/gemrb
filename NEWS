@@ -1,6 +1,5 @@
-GemRB svn (6587):
+GemRB V0.5.0 (2009-06-25):
   New features:
-    - 
     - SoA, ToB and PST are roughly playable beyond their first levels
     - combat: dual-wielding, APR, proficiency and style boni, dexterity
       bonus, initiatitive and speed factor, individual combat rounds
@@ -9,10 +8,10 @@ GemRB svn (6587):
     - bg2 chargen now levels to the correct level
     - summoned and charmed creatures can be ordered around
     - actor tooltips (name and injury status)
-    - running and portal animations in PST
+    - running, initial variable values and portal animations in PST
+    - hardcoded monk bonuses
 
   Improved features:
-    - 
     - dialog, actions and triggers
     - combat mechanics, animation, feedback, ranged combat
     - matters of time and matter
