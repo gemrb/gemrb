@@ -3223,8 +3223,10 @@ int GameScript::AttackedBy(Scriptable* Sender, Trigger* parameters)
 		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
 			Actor *actor = (Actor *) tt->actor;
-			if (actor->LastTarget == scr->GetID()) {
+			//if (actor->LastTarget == scr->GetID()) {
+			if (scr->LastAttacker == actor->GetID()) {
 				if (!AStyle || (AStyle==actor->GetAttackStyle()) ) {
+					scr->AddTrigger(&scr->LastAttacker);
 					ret = 1;
 					break;
 				}
