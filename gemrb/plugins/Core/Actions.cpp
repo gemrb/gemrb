@@ -2980,7 +2980,10 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	Actor* act = ( Actor* ) Sender;
 	act->SetBase( IE_EA, EA_PC );
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
-		act->SetScript( "", AI_SCRIPT_LEVEL, true );
+		/* we must reset various existing scripts */
+		act->SetScript( "DEFAULT", AI_SCRIPT_LEVEL, true );
+		act->SetScript( "", SCR_RACE, true );
+		act->SetScript( "", SCR_GENERAL, true );
 		act->SetScript( "DPLAYER2", SCR_DEFAULT, false );
 	}
 	AutoTable pdtable("pdialog");
