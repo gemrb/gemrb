@@ -19,6 +19,7 @@
 # $Id:$
 
 import GemRB
+from math import ceil
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import GetMageSpells, HasSpell, GameIsBG1
@@ -42,7 +43,8 @@ SpellBook = []			# << array containing all the spell indexes to learn
 SpellLevel = 0			# << current level of spells
 SpellStart = 0			# << starting id of the spell list
 SpellPointsLeftLabel = 0	# << label indicating the number of points left
-Scroll = 0                  # scrollbar toggle
+Scroll = 0			# << scrollbar toggle
+Sorc25thSpellButton = 1		# << toogle for new button for 25th spell icon in sorcerers' level up spells selection window
 
 # chargen only
 SpellsPickButton = 0		# << button to select random spells
@@ -118,6 +120,9 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, s
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)
 		if(scroll):
 			SpellsWindow.CreateScrollBar (1000, 290,142, 16,252)
+		#draw the 25th spell button for sorcerers?
+		if(Sorc25thSpellButton):
+			SpellsWindow.CreateButton (24, 231, 345, 42, 42)
 		SpellStart = 0
 
 	# setup our variables
@@ -175,7 +180,12 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, s
 
 				# only scroll if we have more than 24 spells
 				if len (Spells[i]) > 24:
-					ScrollBar.SetVarAssoc ("SpellTopIndex", len (Spells[i])-23)
+					if chargen:
+						ScrollBar.SetVarAssoc ("SpellTopIndex", int ( ceil ( ( len (Spells[i])-24 ) / 6.0 ) ) + 1 )
+					elif Sorc25thSpellButton: #there are five rows of 5 spells in level up of sorcs
+						ScrollBar.SetVarAssoc ("SpellTopIndex", int ( ceil ( ( len (Spells[i])-25 ) / 5.0 ) ) + 1 )
+					else: #scrolling by rows if no 25th spell slot is available in sorcs level up looks weird so fallback to drawing 1 by 1
+						ScrollBar.SetVarAssoc ("SpellTopIndex", len (Spells[i])-23 )
 				else:
 					ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
 
@@ -219,7 +229,12 @@ def SpellsDonePress ():
 				# setup the scrollbar
 				ScrollBar = SpellsWindow.GetControl (1000)
 				if len (Spells[i]) > 24:
-					ScrollBar.SetVarAssoc ("SpellTopIndex", len (Spells[i])-23)
+					if chargen:
+						ScrollBar.SetVarAssoc ("SpellTopIndex", int ( ceil ( ( len (Spells[i])-24 ) / 6.0 ) ) + 1 )
+					elif Sorc25thSpellButton:
+						ScrollBar.SetVarAssoc ("SpellTopIndex", int ( ceil ( ( len (Spells[i])-25 ) / 5.0 ) ) + 1 )
+					else:
+						ScrollBar.SetVarAssoc ("SpellTopIndex", len (Spells[i])-23 )
 				else:
 					ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
 
@@ -245,13 +260,16 @@ def SpellsDonePress ():
 def ShowSpells ():
 	"""Shows the viewable 24 spells."""
 
-	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
+	j = RowIndex()
+	extrabuttons = 0
+	if Sorc25thSpellButton and (not chargen):
+		extrabuttons = 1
 
 	# we have a grid of 24 spells
-	for i in range (24):
+	for i in range (24 + extrabuttons):
 		# ensure we can learn this many spells
 		SpellButton = SpellsWindow.GetControl (i+SpellStart)
-		if i+SpellTopIndex >= len (Spells[SpellLevel]):
+		if i + j >= len (Spells[SpellLevel]):
 			SpellButton.SetState (IE_GUI_BUTTON_DISABLED)
 			SpellButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			continue
@@ -260,7 +278,7 @@ def ShowSpells ():
 			SpellButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 
 		# fill in the button with the spell data
-		Spell = GemRB.GetSpell (Spells[SpellLevel][i+SpellTopIndex][0], 1)
+		Spell = GemRB.GetSpell (Spells[SpellLevel][i+j][0], 1)
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetVarAssoc("ButtonPressed", i)
 		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsSelectPress")
@@ -268,16 +286,17 @@ def ShowSpells ():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
 		else:
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
-		SpellButton.SetSpellIcon(Spells[SpellLevel][i+SpellTopIndex][0], 1)
+
+		SpellButton.SetSpellIcon(Spells[SpellLevel][i+j][0], 1)
 		SpellButton.SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR)
 
 		# don't allow the selection of an un-learnable spell
 		#TODO: check if the SetBorder calls work in bg1
-		if Spells[SpellLevel][i+SpellTopIndex][1] == 0:
+		if Spells[SpellLevel][i+j][1] == 0:
 			SpellButton.SetState(IE_GUI_BUTTON_LOCKED)
 			# shade red
 			SpellButton.SetBorder (0, 0,0, 0,0, 200,0,0,100, 1,1)
-		elif Spells[SpellLevel][i+SpellTopIndex][1] == 1: # learnable
+		elif Spells[SpellLevel][i+j][1] == 1: # learnable
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
 			# unset any borders on this button or an un-learnable from last level
 			# will still shade red even though it is clickable
@@ -301,8 +320,8 @@ def SpellsSelectPress ():
 	global SpellsSelectPointsLeft, Spells, SpellBook
 
 	# get our variables
-	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
-	i = GemRB.GetVar ("ButtonPressed") + SpellTopIndex
+	j = RowIndex()
+	i = GemRB.GetVar ("ButtonPressed") + j
 
 	# get the spell that's been pushed
 	Spell = GemRB.GetSpell (Spells[SpellLevel][i][0], 1)
@@ -345,7 +364,7 @@ def MarkButton (i, select):
 	If selected is true, the button is highlighted.
 	Be sure i is sent with +SpellTopIndex!"""
 
-	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
+	j = RowIndex()
 
 	if select:
 		type = IE_GUI_BUTTON_SELECTED
@@ -359,23 +378,26 @@ def MarkButton (i, select):
 			type = IE_GUI_BUTTON_LOCKED
 
 	# we have to use the index on the actual grid
-	SpellButton = SpellsWindow.GetControl(i+SpellStart-SpellTopIndex)
+	SpellButton = SpellsWindow.GetControl(i+SpellStart-j)
 	SpellButton.SetState(type)
 	return
 
 def ShowSelectedSpells ():
 	"""Highlights all selected spells."""
 
-	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
+	k = RowIndex()
+	extrabuttons = 0
+	if Sorc25thSpellButton and (not chargen):
+		extrabuttons = 1
 
 	# mark all of the spells picked thus far
-	for j in range (24):
-		if j+SpellTopIndex >= len (SpellBook): # make sure we don't call unavailable indexes
+	for j in range (24 + extrabuttons):
+		if j + k >= len (SpellBook): # make sure we don't call unavailable indexes
 			break
-		if SpellBook[j+SpellTopIndex]: # selected
-			MarkButton (j+SpellTopIndex, 1)
+		if SpellBook[j+k]: # selected
+			MarkButton (j+k, 1)
 		else: # not selected
-			MarkButton (j+SpellTopIndex, 0)
+			MarkButton (j+k, 0)
 	
 	# show how many spell picks are left
 	SpellPointsLeftLabel.SetText (str (SpellsSelectPointsLeft[SpellLevel]))
@@ -462,3 +484,19 @@ def HasSpecialistSpell ():
 
 	# no luck
 	return 0
+
+def RowIndex ():
+	"""Determines which factor to use in scrolling of spells
+
+	It depends on if it is character generation where you have
+	4 rows of 6 spells (24), or it is sorcs level up window where there
+	is 4 rows of 5 spells and 5th row of 4 spell, but you may also use 25th slot there
+	and it is 5 rows of 5 with 25 spells seen at once. """
+
+	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
+	if chargen:
+		return ( SpellTopIndex + 1 ) * 6 - 6
+	elif Sorc25thSpellButton:
+		return ( SpellTopIndex + 1 ) * 5 - 5
+	else:
+		return SpellTopIndex
