@@ -3534,14 +3534,13 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	if (InternalFlags&IF_STOPATTACK) {
-		core->GetGame()->OutAttack(GetID());
-		roundTime = 0;
+		// this should be avoided by the AF_ALIVE check by all the calling actions
+		printMessage("Actor", "Attack by dead actor!", LIGHT_RED);
 		return;
 	}
 
 	if (!LastTarget) {
-		StopAttack();
-		roundTime = 0;
+		printMessage("Actor", "Attack without valid target ID!", LIGHT_RED);
 		return;
 	}
 	//get target
@@ -3552,9 +3551,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	if (!target) {
-		StopAttack();
-		LastTarget = 0;
-		roundTime = 0;
+		printMessage("Actor", "Attack without valid target!", LIGHT_RED);
 		return;
 	}
 
@@ -3570,7 +3567,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	int DamageBonus;
 	int speed;
 
-	//will return false on any errors
+	//will return false on any errors (eg, unusable weapon)
 	if (!GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed)) {
 		return;
 	}
@@ -3594,7 +3591,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if((PersonalDistance(this, target) > wi.range*10) /*|| (!GetCurrentArea()->IsVisible(Pos, target->Pos))*/) {
 		// this is a temporary double-check, remove when bugfixed
-		printMessage("Actor", "Action didn't bring us close enough!", LIGHT_RED);
+		printMessage("Actor", "Attack action didn't bring us close enough!", LIGHT_RED);
 		return;
 	}
 
