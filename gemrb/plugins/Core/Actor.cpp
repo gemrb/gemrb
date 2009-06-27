@@ -3512,18 +3512,10 @@ int Actor::GetDefense(int DamageType)
 
 void Actor::PerformAttack(ieDword gameTime)
 {
-	//apply the modal effect on the beginning of each round
-	if (((gameTime-roundTime)%ROUND_SIZE==0) && ModalState) {
-		if (!ModalSpell[0]) {
-			printMessage("Actor","Modal Spell Effect was not set!\n", YELLOW);
-			ModalSpell[0]='*';
-		} else if(ModalSpell[0]!='*') {
-			core->ApplySpell(ModalSpell, this, this, 0);
-		}
+	// start a new round if we really don't have one yet
+	if (!roundTime) {
+		InitRound(gameTime, false);
 	}
-
-	// don't attack if there's no round started
-	if (!roundTime) return;
 
 	//only return if we don't have any attacks left this round
 	if (attackcount==0) return;
@@ -3601,10 +3593,9 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	if((PersonalDistance(this, target) > wi.range*10) /*|| (!GetCurrentArea()->IsVisible(Pos, target->Pos))*/) {
-		//too far or cannot be seen. Stop the attack and retry.
-		//StopAttack() ;
-		core->GetGameControl()->TryToAttack(this, target) ;
-		return ;
+		// this is a temporary double-check, remove when bugfixed
+		printMessage("Actor", "Action didn't bring us close enough!", LIGHT_RED);
+		return;
 	}
 
 	SetStance(AttackStance) ;
@@ -3753,6 +3744,18 @@ void Actor::ModifyDamage(Actor *target, int &damage, int damagetype, WeaponInfo 
 		}
 	}
 	return;
+}
+
+void Actor::ApplyModalSpell(ieDword gameTime) {
+	//apply the modal effect on the beginning of each round
+	if (((gameTime-roundTime)%ROUND_SIZE==0) && ModalState) {
+		if (!ModalSpell[0]) {
+			printMessage("Actor","Modal Spell Effect was not set!\n", YELLOW);
+			ModalSpell[0]='*';
+		} else if(ModalSpell[0]!='*') {
+			core->ApplySpell(ModalSpell, this, this, 0);
+		}
+	}
 }
 
 //idx could be: 0-6, 16-22, 32-38, 48-54

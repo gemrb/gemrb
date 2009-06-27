@@ -1223,6 +1223,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 
 	//if distance is too much, insert a move action and requeue the action
 	WeaponInfo wi;
+	//TODO: must we pass leftorright as the second param?
 	ITMExtHeader *header = actor->GetWeapon(wi, false);
 
 	if (header) wi.range *= 10;
@@ -1255,15 +1256,10 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	}
 	//TODO use gonearandretry when sender can't see target!!
 	if ( (PersonalDistance(Sender, target) > wi.range) /*|| (!Sender->GetCurrentArea()->IsVisible(Sender->Pos, target->Pos))*/) {
-		//we couldn't perform the action right now
-		//so we add it back to the queue with an additional movement
-		//increases refcount of Sender->CurrentAction, by pumping it back
-		//in the action queue
-		//Forcing a lock does not launch the trap...
-		GoNearAndRetry(Sender, target, target->Type == ST_ACTOR, wi.range);
-		Sender->ReleaseCurrentAction();
+		MoveNearerTo(Sender, target, wi.range);
 		return;
 	} else if (target->Type == ST_DOOR) {
+		//Forcing a lock does not launch the trap...
 		Door* door = (Door*) target;
 		if(door->Flags & DOOR_LOCKED) {
 			door->TryBashLock(actor);
@@ -1278,6 +1274,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	actor->PerformAttack(core->GetGame()->GameTime);
 }
 
 bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
@@ -1659,6 +1657,9 @@ void GoNear(Scriptable *Sender, Point &p)
 void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 {
 	Point p;
+	// we deliberately don't try GetLikelyPosition here for now,
+	// maybe a future idea if we have a better implementation
+	// (the old code used it - by passing true not 0 below - when target was a movable)
 	GetPositionFromScriptable(target, p, 0);
 	MoveNearerTo(Sender, p, distance);	
 }
