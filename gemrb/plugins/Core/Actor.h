@@ -472,8 +472,8 @@ public:
 	void PerformAttack(ieDword gameTime);
 	/* ensures we can deal damage to a target */
 	void ModifyDamage(Actor *target, int &damage, int damagetype, WeaponInfo *wi, bool critical);
-	/* applies modal spell, if needed */
-	void ApplyModalSpell(ieDword gameTime);
+	/* applies modal spell etc, if needed */
+	void UpdateActorState(ieDword gameTime);
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
 	/* sets an RGB colour modification effect; location 0xff for global */

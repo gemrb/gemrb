@@ -587,7 +587,7 @@ void Map::UpdateScripts()
 		actor->ExecuteScript( MAX_SCRIPTS );
 		actor->ProcessActions(false);
 
-		actor->ApplyModalSpell(core->GetGame()->GameTime);
+		actor->UpdateActorState(core->GetGame()->GameTime);
 
 		actor->inventory.CalculateWeight();
 		actor->SetBase( IE_ENCUMBRANCE, actor->inventory.GetWeight() );

@@ -3530,6 +3530,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	//don't continue if we can't make the attack yet
 	//we check lastattack because we will get the same gameTime a few times
 	if ((nextattack > gameTime) || (gameTime == lastattack)) {
+		// fuzzie added the following line as part of the UpdateActorState hack below
+		lastattack = gameTime;
 		return;
 	}
 
@@ -3743,7 +3745,7 @@ void Actor::ModifyDamage(Actor *target, int &damage, int damagetype, WeaponInfo 
 	return;
 }
 
-void Actor::ApplyModalSpell(ieDword gameTime) {
+void Actor::UpdateActorState(ieDword gameTime) {
 	//apply the modal effect on the beginning of each round
 	if (((gameTime-roundTime)%ROUND_SIZE==0) && ModalState) {
 		if (!ModalSpell[0]) {
@@ -3752,6 +3754,23 @@ void Actor::ApplyModalSpell(ieDword gameTime) {
 		} else if(ModalSpell[0]!='*') {
 			core->ApplySpell(ModalSpell, this, this, 0);
 		}
+	}
+
+	// this is a HACK, fuzzie can't work out where else to do this for now
+	// but we shouldn't be resetting rounds/attacks just because the actor
+	// wandered away, the action code should probably be responsible somehow
+	// see also line above (search for comment containing UpdateActorState)!
+	if (LastTarget && lastattack && lastattack != gameTime) {
+		Actor *target = area->GetActorByGlobalID(LastTarget);
+		if (!target || target->GetStat(IE_STATE_ID)&STATE_DEAD) {
+			StopAttack();
+		} else {
+			printMessage("Attack","(Leaving attack)", GREEN);
+			core->GetGame()->OutAttack(GetID());
+		}
+
+		roundTime = 0;
+		LastTarget = 0;
 	}
 }
 
