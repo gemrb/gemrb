@@ -66,7 +66,10 @@ def OnLoad():
 	if not KitTable:
 		RowCount = 1
 	else:
-		RowCount = KitTable.GetRowCount()
+		if ClassID == 1:
+			RowCount = SchoolList.GetRowCount()
+		else:
+			RowCount = KitTable.GetRowCount()
 
 	TopIndex = 0
 	GemRB.SetVar("TopIndex", 0)
@@ -87,6 +90,7 @@ def OnLoad():
 
 		if not KitTable:
 			if ClassID == 1:
+				# TODO: this seems to be never reached
 				Kit = GemRB.GetVar("MAGESCHOOL")
 				KitName = SchoolList.GetValue(i+TopIndex, 0)
 				Kit = SchoolList.GetValue (Kit, 3)
@@ -95,17 +99,29 @@ def OnLoad():
 				KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
 
 		else:
-			Kit = KitTable.GetValue(i+TopIndex,0)
-			if Kit:
-				KitName = KitListTable.GetValue(Kit, 1)
+			Kit = KitTable.GetValue (i+TopIndex, 0)
+			if ClassID == 1:
+				KitName = SchoolList.GetValue (i+TopIndex, 0)
+				if Kit == 0:
+					KitName = SchoolList.GetValue (0, 0)
+				elif Kit == "*":
+					Kit = 0
 			else:
-				KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
-
+				if Kit:
+					KitName = KitListTable.GetValue(Kit, 1)
+				else:
+					KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetText(KitName)
 		if i+TopIndex==0:
-			GemRB.SetVar("Class Kit",Kit)
-		Button.SetVarAssoc("Class Kit",Kit)
+			GemRB.SetVar("Class Kit", Kit)
+		if ClassID == 1:
+			if i+TopIndex == 0:
+				Button.SetVarAssoc("Class Kit", 0)
+			else:
+				Button.SetVarAssoc("Class Kit", i+TopIndex+21)
+		else:
+			Button.SetVarAssoc("Class Kit", Kit)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "KitPress")
 
 	BackButton = KitWindow.GetControl(8)
@@ -131,12 +147,14 @@ def RedrawKits():
 	global TopIndex
 
 	TopIndex=GemRB.GetVar("TopIndex")
+	EnabledButtons = []
 	for i in range(RowCount):
 		if i<4:
 			Button = KitWindow.GetControl(i+1)
 		else:
 			Button = KitWindow.GetControl(i+5)
 
+		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		if not KitTable:
 			if ClassID == 1:
 				Kit = GemRB.GetVar("MAGESCHOOL")
@@ -147,18 +165,27 @@ def RedrawKits():
 				KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
 
 		else:
-			Kit = KitTable.GetValue(i+TopIndex,0)
-			if Kit:
-				KitName = KitListTable.GetValue(Kit, 1)
+			Kit = KitTable.GetValue (i+TopIndex,0)
+			if ClassID == 1:
+				KitName = SchoolList.GetValue (i+TopIndex, 0)
+				if Kit != "*":
+					EnabledButtons.append(Kit-21)
+				if Kit == 0:
+					KitName = SchoolList.GetValue (0, 0)
+					Button.SetState(IE_GUI_BUTTON_ENABLED)
 			else:
-				KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
+				if Kit:
+					KitName = KitListTable.GetValue(Kit, 1)
+				else:
+					KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
 
-		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetText(KitName)
+		if not EnabledButtons or i+TopIndex in EnabledButtons:
+			Button.SetState(IE_GUI_BUTTON_ENABLED)
+		if Kit == "*":
+			continue
 		if i+TopIndex==0 and Init:
 			GemRB.SetVar("Class Kit",Kit)
-		Button.SetVarAssoc("Class Kit",Kit)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "KitPress")
 	return
 
 def KitPress():
