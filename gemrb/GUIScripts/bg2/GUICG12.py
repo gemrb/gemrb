@@ -45,7 +45,12 @@ def OnLoad():
 
 	#Load the Portraits Table
 	PortraitsTable = GemRB.LoadTableObject ("PICTURES")
-	LastPortrait = 0
+	PortraitsStart = PortraitsTable.FindValue (0, 2)
+	FemaleCount = PortraitsTable.GetRowCount () - PortraitsStart + 1
+	if Gender == 2:
+		LastPortrait = GemRB.Roll (1, FemaleCount, PortraitsStart-1)
+	else:
+		LastPortrait = GemRB.Roll (1, PortraitsTable.GetRowCount()-FemaleCount, 0)
 
 	TextAreaControl = AppearanceWindow.GetControl (7)
 	TextAreaControl.SetText ("") # why is this here?
