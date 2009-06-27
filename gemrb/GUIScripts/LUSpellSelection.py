@@ -255,6 +255,9 @@ def ShowSpells ():
 			SpellButton.SetState (IE_GUI_BUTTON_DISABLED)
 			SpellButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			continue
+		else:
+			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
+			SpellButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 
 		# fill in the button with the spell data
 		Spell = GemRB.GetSpell (Spells[SpellLevel][i+SpellTopIndex][0], 1)
