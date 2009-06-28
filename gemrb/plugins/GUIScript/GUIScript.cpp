@@ -2518,14 +2518,16 @@ static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetDestinationArea__doc,
-"GetDestinationArea(WindowIndex, ControlID) => WorldMap entry\n\n"
-"Returns the last area pointed on the worldmap." );
+"GetDestinationArea(WindowIndex, ControlID[, RndEncounter]) => WorldMap entry\n\n"
+"Returns the last area pointed on the worldmap.\n"
+"If the random encounter flag is set, the random encounters will be evaluated too." );
 
 static PyObject* GemRB_GetDestinationArea(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
+	int eval = 0;
 
-	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex)) {
+	if (!PyArg_ParseTuple( args, "ii|i", &WindowIndex, &ControlIndex, &eval)) {
 		return AttributeError( GemRB_GetDestinationArea__doc );
 	}
 
@@ -2551,9 +2553,12 @@ static PyObject* GemRB_GetDestinationArea(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Destination", PyString_FromString (wmc->Area->AreaName) );
 	PyDict_SetItemString(dict, "Entrance", PyString_FromString (wal->DestEntryPoint) );
 	//the area the user will fall on
-	if (encounter) {
+	if (encounter && eval) {
 		int i=rand()%5;
 
+		if(wal->EncounterChance>=100) {
+			wal->EncounterChance-=100;
+		}
 		for(int j=0;j<5;j++) {
 			if (wal->EncounterAreaResRef[(i+j)%5][0]) {
 				PyDict_SetItemString(dict, "Destination", PyString_FromString (wal->EncounterAreaResRef[(i+j)%5]) );
