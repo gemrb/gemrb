@@ -885,6 +885,7 @@ void Projectile::DrawExplosion(Region &screen)
 		if (vvc) {
 			vvc->XPos+=Pos.x;
 			vvc->YPos+=Pos.y;
+			vvc->PlayOnce();
 			area->AddVVCell(vvc);
 		}
 	}
