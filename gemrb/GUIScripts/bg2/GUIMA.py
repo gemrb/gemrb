@@ -284,7 +284,7 @@ def OpenWorldMapWindow ():
 def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
-	tmp = WorldMapControl.GetDestinationArea ()
+	tmp = WorldMapControl.GetDestinationArea (1)
 	CloseWorldMapWindow ()
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"])
 	return

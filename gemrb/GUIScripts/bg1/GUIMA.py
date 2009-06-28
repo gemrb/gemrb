@@ -185,7 +185,7 @@ def OpenWorldMapWindow ():
 def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
-	tmp = WorldMapControl.GetDestinationArea ()
+	tmp = WorldMapControl.GetDestinationArea (1)
 	if tmp["Distance"]==-1:
 		print "Invalid target", tmp
 		return
