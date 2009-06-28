@@ -4489,7 +4489,8 @@ void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 		printf("Can't find worldmap!\n");
 		abort();
 	}
-	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE, BM_OR);
+	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
+	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BM_OR);
 }
 
 void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
@@ -4499,7 +4500,8 @@ void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 		printf("Can't find worldmap!\n");
 		abort();
 	}
-	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE, BM_NAND);
+	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
+	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BM_NAND);
 }
 
 void GameScript::SendTrigger(Scriptable* Sender, Action* parameters)
