@@ -157,7 +157,8 @@ then
 fi
 
 echo Running libtoolize
-if [ "${libtool_version:0:1}" = 2 ]; then
+libtool_version_major=`echo "libtool_version" | cut -c1`
+if [ "$libtool_version_major" = "2" ]; then
   $my_libtoolize --force --no-warn
 else
   $my_libtoolize --force
