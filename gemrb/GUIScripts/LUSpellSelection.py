@@ -60,7 +60,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, s
 	kit should always be GetKitIndex except when dualclassing.
 	gen is true if this is for character generation.
 	recommend is used in bg2 for spell recommendation / autopick.
-	scroll is used for adding a scrollbar, so more than 24 spells can be shown."""
+	scroll is used for adding a scrollbar, so more than 24 (or 25 in other case) spells can be shown."""
 
 	global SpellsWindow, DoneButton, SpellsSelectPointsLeft, Spells, chargen, SpellPointsLeftLabel
 	global SpellsTextArea, SpellsKnownTable, SpellTopIndex, SpellBook, SpellLevel, pc, SpellStart
@@ -178,8 +178,8 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, s
 				ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "ShowSpells")
 				ScrollBar.SetDefaultScrollBar ()
 
-				# only scroll if we have more than 24 spells
-				if len (Spells[i]) > 24:
+				# only scroll if we have more than 24 spells or 25 if extra 25th spell slot is available in sorcs LevelUp
+				if len (Spells[i]) > ( 24 + ExtraSpellButtons() ):
 					if chargen:
 						ScrollBar.SetVarAssoc ("SpellTopIndex", int ( ceil ( ( len (Spells[i])-24 ) / 6.0 ) ) + 1 )
 					elif Sorc25thSpellButton: #there are five rows of 5 spells in level up of sorcs
@@ -228,7 +228,7 @@ def SpellsDonePress ():
 			if (Scroll):
 				# setup the scrollbar
 				ScrollBar = SpellsWindow.GetControl (1000)
-				if len (Spells[i]) > 24:
+				if len (Spells[i]) > ( 24 + ExtraSpellButtons() ):
 					if chargen:
 						ScrollBar.SetVarAssoc ("SpellTopIndex", int ( ceil ( ( len (Spells[i])-24 ) / 6.0 ) ) + 1 )
 					elif Sorc25thSpellButton:
@@ -261,12 +261,9 @@ def ShowSpells ():
 	"""Shows the viewable 24 spells."""
 
 	j = RowIndex()
-	extrabuttons = 0
-	if Sorc25thSpellButton and (not chargen):
-		extrabuttons = 1
 
 	# we have a grid of 24 spells
-	for i in range (24 + extrabuttons):
+	for i in range (24 + ExtraSpellButtons()):
 		# ensure we can learn this many spells
 		SpellButton = SpellsWindow.GetControl (i+SpellStart)
 		if i + j >= len (Spells[SpellLevel]):
@@ -386,12 +383,9 @@ def ShowSelectedSpells ():
 	"""Highlights all selected spells."""
 
 	k = RowIndex()
-	extrabuttons = 0
-	if Sorc25thSpellButton and (not chargen):
-		extrabuttons = 1
 
 	# mark all of the spells picked thus far
-	for j in range (24 + extrabuttons):
+	for j in range (24 + ExtraSpellButtons()):
 		if j + k >= len (SpellBook): # make sure we don't call unavailable indexes
 			break
 		if SpellBook[j+k]: # selected
@@ -500,3 +494,11 @@ def RowIndex ():
 		return ( SpellTopIndex + 1 ) * 5 - 5
 	else:
 		return SpellTopIndex
+
+def ExtraSpellButtons ():
+	"""Determines if extra spell slots are available. """
+
+	if Sorc25thSpellButton and (not chargen):
+		return 1
+	else:
+		return 0
