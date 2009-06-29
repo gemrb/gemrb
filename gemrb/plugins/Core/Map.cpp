@@ -2296,7 +2296,7 @@ PathNode* Map::FindPath(const Point &s, const Point &d, unsigned int size, int M
 
 //single point visible or not (visible/exploredbitmap)
 //if explored = true then explored otherwise currently visible
-bool Map::IsVisible(Point &pos, int explored)
+bool Map::IsVisible(const Point &pos, int explored)
 {
 	if (!VisibleBitmap)
 		return false;
@@ -2317,7 +2317,7 @@ bool Map::IsVisible(Point &pos, int explored)
 }
 
 //point a is visible from point b (searchmap)
-bool Map::IsVisible(Point &s, Point &d)
+bool Map::IsVisible(const Point &s, const Point &d)
 {
 	int sX=s.x/16;
 	int sY=s.y/12;

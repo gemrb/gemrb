@@ -405,9 +405,9 @@ public:
 	/* Finds the path which leads to d */
 	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, int MinDistance = 0);
 	/* returns false if point isn't visible on visibility/explored map */
-	bool IsVisible(Point &s, int explored);
+	bool IsVisible(const Point &s, int explored);
 	/* returns false if point d cannot be seen from point d due to searchmap */
-	bool IsVisible(Point &s, Point &d);
+	bool IsVisible(const Point &s, const Point &d);
 	/* returns edge direction of map boundary, only worldmap regions */
 	int WhichEdge(Point &s);
 
