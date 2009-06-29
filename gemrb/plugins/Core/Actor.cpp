@@ -3760,7 +3760,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 	// but we shouldn't be resetting rounds/attacks just because the actor
 	// wandered away, the action code should probably be responsible somehow
 	// see also line above (search for comment containing UpdateActorState)!
-	if (LastTarget && lastattack && lastattack != gameTime) {
+	if (LastTarget && lastattack && lastattack < (gameTime - 1)) {
 		Actor *target = area->GetActorByGlobalID(LastTarget);
 		if (!target || target->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			StopAttack();
@@ -3770,7 +3770,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		}
 
 		roundTime = 0;
-		LastTarget = 0;
+		lastattack = 0;
 	}
 }
 
