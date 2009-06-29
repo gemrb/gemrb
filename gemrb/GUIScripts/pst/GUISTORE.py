@@ -23,7 +23,6 @@
 
 ###################################################
 
-import string
 import GemRB
 from GUIDefines import *
 #from GUICommonWindows import OpenCommonWindows, CloseCommonWindows

@@ -22,7 +22,6 @@
 
 ###################################################
 
-import string
 import GemRB
 import GUICommonWindows
 from GUIDefines import *

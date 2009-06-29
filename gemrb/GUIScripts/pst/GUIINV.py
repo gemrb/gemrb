@@ -23,8 +23,6 @@
 
 ###################################################
 
-import string
-
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -171,7 +169,7 @@ def UpdateInventoryWindow ():
 
 	# get a list which maps slot number to slot type/icon/tooltip
 	row = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	slot_list = map (int, string.split (AvSlotsTable.GetValue (row, 1, 0), ','))
+	slot_list = map (int, AvSlotsTable.GetValue (row, 1, 0).split( ','))
 
 	# populate inventory slot controls
 	for i in range (46):
@@ -671,9 +669,9 @@ def DisplayItem (itemresref, type):
 
 	Label = Window.GetControl (0x10000000)
 	if type&2:
-		Label.SetText (string.upper (GemRB.GetString (item['ItemName'])))
+		Label.SetText (GemRB.GetString (item['ItemName']).upper())
 	else:
-		Label.SetText (string.upper (GemRB.GetString (item['ItemNameIdentified'])))
+		Label.SetText (GemRB.GetString (item['ItemNameIdentified']).upper())
 
 	Icon = Window.GetControl (2)
 	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)

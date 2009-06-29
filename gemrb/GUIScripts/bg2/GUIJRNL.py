@@ -23,7 +23,6 @@
 
 import GemRB
 import GUICommonWindows
-import string
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
 from GUICommon import GameIsTOB

@@ -65,7 +65,6 @@
 #38 hp but?
 
 ###################################################
-import string
 import GemRB
 from GUIDefines import *
 from ie_stats import *
@@ -753,7 +752,7 @@ def GetStatOverview (pc):
 				res.append ("")
 				lines = 0
 
-	return Main + CurrentState + string.join (res, "\n")
+	return Main + CurrentState + "\n".join (res)
 	pass
 
 

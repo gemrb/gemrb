@@ -22,7 +22,6 @@
 # GUIREC.py - scripts to control stats/records windows from the GUIREC winpack
 
 ###################################################
-import string
 import GemRB
 import GUICommonWindows
 from GUIDefines import *
@@ -614,7 +613,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				res.append ("")
 				lines = 0
 
-	return string.join (res, "\n")
+	return "\n".join (res)
 
 
 def GetReputation (repvalue):
