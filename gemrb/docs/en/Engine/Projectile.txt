@@ -21,4 +21,6 @@ These flags reside in the .pro format on offset 0x2c
 65536   Draw behind (under) the target
 0x20000 Draw pop in/hold/pop out animation sequence
 0x40000 Internal flag for 0x20000 (after pop in phase was done) - could be used to play 2 phases, first shadow, then travel bam
-0x80000 Slowly fade out a freezed projectile (used with 0x4)
+0x80000 Slowly fade out a freezed projectile (used with flag 0x4)
+0x100000 Display string in setup (string reference is stored on offset 0x30)
+0x200000 Random movement instead of path
