@@ -256,6 +256,13 @@ void Projectile::Setup()
 	ieDword time = core->GetGame()->Ticks;
 	timeStartStep = time;
 
+	if(ExtFlags&PEF_TEXT) {
+		Actor *act = area->GetActorByGlobalID(Caster);
+		if(act) {
+			core->DisplayStringName(StrRef,0xd7d7be,act,0);
+		}
+	}
+
 	if(ExtFlags&(PEF_FALLING|PEF_INCOMING) ) {
 		if (ExtFlags&PEF_FALLING) {
 			Pos.x=Destination.x;

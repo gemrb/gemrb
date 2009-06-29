@@ -96,6 +96,8 @@
 #define PEF_POP        0x20000 //draw travel bam, then shadow, then travel bam backwards
 #define PEF_UNPOP      0x40000 //draw shadow, then travel bam (this is an internal flag)
 #define PEF_FADE       0x80000 //gradually fade on spot if used with PEF_FREEZE (ice dagger)
+#define PEF_TEXT       0x100000//display text during setup
+#define PEF_WANDERING  0x200000//random movement (no real path)
 
 //projectile area flags
 #define PAF_VISIBLE    1     //the travel projectile is visible until explosion
@@ -163,6 +165,7 @@ public:
 	ieResRef SoundRes3;
 	ieDword SparkColor;
 	ieDword ExtFlags;
+	ieDword StrRef;
 	////// gap
 	ieDword TFlags;
 	ieResRef BAMRes1;
