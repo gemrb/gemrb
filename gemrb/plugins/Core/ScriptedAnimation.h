@@ -90,7 +90,7 @@ public:
 	int XPos, YPos, ZPos;
 	ieDword FrameRate;
 	ieDword FaceTarget;
-	ieByte Orientation, NewOrientation;
+	ieByte Orientation;
 	ieDword Duration;
 	bool justCreated;
 	ieResRef ResName;
