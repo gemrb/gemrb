@@ -182,13 +182,13 @@ public:
 	ieWord SmokeAnimID;
 	ieResRef TrailBAM[3];
 	ieWord TrailSpeed[3];
-	//
+	//these are public but not in the .pro file
 	ProjectileExtension* Extension;
 	bool autofree;
 	Palette* palette;
-	//let's make this one public
 	//internals
 protected:
+	ieResRef smokebam;
 	ieDword timeStartStep;
 	//attributes from moveable object
 	unsigned char Orientation, NewOrientation;
@@ -216,6 +216,7 @@ protected:
 	EffectQueue* effects;
 	Projectile **children;
 	int child_size;
+	int pathcounter;
 public:
 	void SetCaster(ieDword t);
 	ieDword GetCaster();
@@ -224,7 +225,7 @@ public:
 	bool PointInRadius(Point &p);
 	void Cleanup();
 
-//inliners to protect data consistency
+	//inliners to protect data consistency
 	inline PathNode * GetNextStep() {
 		if (!step) {
 			DoStep((unsigned int) ~0);
@@ -312,10 +313,12 @@ private:
 	//oriented animations (also simple ones)
 	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq);
 	void GetPaletteCopy(Animation *anim[], Palette *&pal);
+	void GetSmokeAnim();
 	void SetBlend();
 	void Payload();
 	void EndTravel();
 	void ChangePhase();
+	void AddTrail(ieResRef BAM, const ieByte *pal);
 	void DoStep(unsigned int walk_speed);
 	void UpdateLine();
 	void LineTarget();      //line projectiles (walls, scorchers)
