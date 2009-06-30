@@ -2605,6 +2605,11 @@ void Actor::Die(Scriptable *killer)
 	SetModal( 0 );
 	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
 
+	// clearing the search map here means it's not blocked during death animations
+	// this is perhaps not ideal, but matches other searchmap code which uses
+	// GA_NO_DEAD to exclude IF_JUSTDIED actors as well as dead ones
+	area->ClearSearchMapFor(this);
+
 	//JUSTDIED will be removed when the Die() trigger executed
 	//otherwise it is the same as REALLYDIED
 	InternalFlags|=IF_REALLYDIED|IF_JUSTDIED;
