@@ -490,7 +490,11 @@ void ScriptedAnimation::SetOrientation(int orientation)
 	if (orientation==-1) {
 		return;
 	}
-	Orientation=(ieByte) orientation;
+	if(FaceTarget) {
+		Orientation=(ieByte) orientation;
+	} else {
+		Orientation = 0;
+	}
 	if (twin) {
 		twin->Orientation=Orientation;
 	}
