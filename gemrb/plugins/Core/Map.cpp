@@ -629,6 +629,12 @@ void Map::UpdateScripts()
 
 			Actor* actor = queue[PR_SCRIPT][q];
 
+			// try to exclude actors which only just died
+			// (shouldn't we not be stepping actors which don't have a path anyway?)
+			// following fails on Immobile creatures, don't think it's a problem, but replace with next line if it is
+			if (!actor->ValidTarget(GA_NO_DEAD)) continue;
+			//if (actor->GetStat(IE_STATE_ID)&STATE_DEAD || actor->GetInternalFlag() & IF_JUSTDIED) continue;
+
 			no_more_steps_for_actor[q] = DoStepForActor(actor, actor_speeds[q], time);
 			if (!no_more_steps_for_actor[q]) more_steps = true;
 		}
