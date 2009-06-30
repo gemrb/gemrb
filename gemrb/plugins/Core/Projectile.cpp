@@ -47,7 +47,7 @@ Projectile::Projectile()
 	Extension = NULL;
 	area = NULL;
 	palette = NULL;
-	PaletteRes[0]=0;
+	//smokepal = NULL;
 	Pos.empty();
 	Destination = Pos;
 	Orientation = 0;
@@ -61,7 +61,12 @@ Projectile::Projectile()
 	child_size = 0;
 	memset(travel, 0, sizeof(travel)) ;
 	memset(shadow, 0, sizeof(shadow)) ;
-	light = NULL ;
+	memset(PaletteRes,0,sizeof(PaletteRes));
+	memset(smokebam, 0, sizeof(smokebam));
+	//memset(trail,0,sizeof(trail));
+	//memset(smoke,0,sizeof(smoke));
+	light = NULL;
+	pathcounter = 0x7fff;
 }
 
 Projectile::~Projectile()
@@ -245,6 +250,23 @@ void Projectile::CreateIteration()
 	area->AddProjectile(pro, Pos, Target);
 }
 
+void Projectile::GetSmokeAnim()
+{
+	int AvatarsRowNum=CharAnimations::GetAvatarsCount();
+
+	SmokeAnimID&=0xfff0; //this is a hack, i'm too lazy to figure out the subtypes
+
+	for(int i=0;i<AvatarsRowNum;i++) {
+		AvatarStruct *as = CharAnimations::GetAvatarStruct(i);
+		if (as->AnimID==SmokeAnimID) {
+			memcpy(smokebam, as->Prefixes, sizeof(ieResRef) );
+			return;
+		}
+	}
+	//turn off smoke animation if its animation was not found
+	//you might want to issue some warning here
+	TFlags&=PTF_SMOKE;
+}
 // load animations, start sound
 void Projectile::Setup()
 {
@@ -293,14 +315,15 @@ void Projectile::Setup()
 	}
 
 	core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, GEM_SND_RELATIVE);
-	memset(travel,0,sizeof(travel));
-	memset(shadow,0,sizeof(shadow));
-	light = NULL;
 
 	CreateAnimations(travel, BAMRes1, Seq1);
 
 	if (TFlags&PTF_SHADOW) {
 		CreateAnimations(shadow, BAMRes2, Seq2);
+	}
+
+	if (TFlags&PTF_SMOKE) {
+		GetSmokeAnim();
 	}
 
 	//there is no travel phase, create the projectile right at the target
@@ -480,8 +503,30 @@ void Projectile::EndTravel()
 	}
 }
 
+void Projectile::AddTrail(ieResRef BAM, const ieByte *pal)
+{
+	ScriptedAnimation *sca=gamedata->GetScriptedAnimation(BAM,0);
+	if(pal) {
+		for(int i=0;i<7;i++) {
+			sca->SetPalette(pal[i], 4+i*PALSIZE);
+		}
+	}
+	sca->SetOrientation(Orientation);
+	sca->PlayOnce();
+	sca->SetBlend();
+	sca->XPos += Pos.x;
+	sca->YPos += Pos.y;
+	area->AddVVCell(sca);
+}
+
 void Projectile::DoStep(unsigned int walk_speed)
 {
+	if(pathcounter) {
+		pathcounter--;
+	} else {
+		ClearPath();
+	}
+
 	if (!path) {
 		ChangePhase();
 		return;
@@ -491,6 +536,19 @@ void Projectile::DoStep(unsigned int walk_speed)
 		ClearPath();
 		ChangePhase();
 		return;
+	}
+
+	//don't bug out on 0 smoke frequency like the original IE
+	if ((TFlags&PTF_SMOKE) && SmokeSpeed) {
+		if(!(pathcounter%SmokeSpeed)) {
+			AddTrail(smokebam, SmokeGrad);
+		}
+	}
+
+	for(int i=0;i<3;i++) {
+		if(TrailSpeed[i] && !(pathcounter%TrailSpeed[i])) {
+			AddTrail(TrailBAM[i], 0);
+		}
 	}
 
 	if (ExtFlags&PEF_LINE) {
@@ -514,7 +572,6 @@ void Projectile::DoStep(unsigned int walk_speed)
 	ieDword time = core->GetGame()->Ticks;
 	if (!step) {
 		step = path;
-		//timeStartStep = time;
 	}
 	while (step->Next && (( time - timeStartStep ) >= walk_speed)) {
 		step = step->Next;
@@ -970,7 +1027,7 @@ void Projectile::DrawExplosion(Region &screen)
 		//returns if the explosion animation is fake coloured
 		if (res) {
 			if (!children) {
-				child_size=(Extension->ExplosionRadius+15)/16;
+				child_size = (Extension->ExplosionRadius+15)/16;
 				//more sprites if the whole area needs to be filled
 				if (apflags&APF_FILL) child_size*=2;
 				if (apflags&APF_SPREAD) child_size*=2;
