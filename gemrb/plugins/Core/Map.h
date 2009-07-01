@@ -402,6 +402,8 @@ public:
 	PathNode* GetLine(Point &start, Point &dest, int flags);
 	PathNode* GetLine(Point &start, int Steps, int Orientation, int flags);
 	PathNode* GetLine(Point &start, Point &dest, int speed, int Orientation, int flags);
+	/* Finds the path which leads to near d */
+	PathNode* FindPathNear(const Point &s, const Point &d, unsigned int size, unsigned int MinDistance = 0, bool sight = true);
 	/* Finds the path which leads to d */
 	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, int MinDistance = 0);
 	/* returns false if point isn't visible on visibility/explored map */

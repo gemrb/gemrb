@@ -2201,6 +2201,149 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Speed, int Orientation, in
 	return Return;
 }
 
+/*
+ * find a path from start to goal, ending at the specified distance from the
+ * target (the goal must be in sight of the end, if 'sight' is specified)
+ *
+ * if you don't need to find an optimal path near the goal then use FindPath
+ * instead, but don't change this one without testing with combat and dialog,
+ * you can't predict the goal point for those, you *must* path!
+ */
+PathNode* Map::FindPathNear(const Point &s, const Point &d, unsigned int size, unsigned int MinDistance, bool sight)
+{
+	// adjust the start/goal points to be searchmap locations
+	Point start( s.x/16, s.y/12 );
+	Point goal ( d.x/16, d.y/12 );
+	Point orig_goal = goal;
+
+	// re-initialise the path finding structures
+	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
+	while (InternalStack.size())
+		InternalStack.pop();
+
+	// set the start point in the path finding structures
+	unsigned int pos2 = ( goal.x << 16 ) | goal.y;
+	unsigned int pos = ( start.x << 16 ) | start.y;
+	InternalStack.push( pos );
+	MapSet[start.y * Width + start.x] = 1;
+
+	unsigned int squaredmindistance = MinDistance * MinDistance;
+	bool found_path = false;
+	while (InternalStack.size()) {
+		pos = InternalStack.front();
+		InternalStack.pop();
+		unsigned int x = pos >> 16;
+		unsigned int y = pos & 0xffff;
+
+		if (pos == pos2) {
+			// we got all the way to the target!
+			found_path = true;
+			break;
+		} else if (MinDistance) {
+			/* check minimum distance:
+			 * as an obvious optimisation we only check squared distance: this is a
+			 * possible overestimate since the sqrt Distance() rounds down
+			 * (some other optimisations could be made here, but you'd be better off
+			 * fixing the pathfinder to do A* properly)
+			 * caller should have already done PersonalDistance adjustments, this is
+			 * simply between the specified points
+			 */
+
+			int distx = (x*16 + 8) - d.x;
+			int disty = (y*12 + 6) - d.y;
+			if ((unsigned int)(distx*distx + disty*disty) <= squaredmindistance) {
+				// we are within the minimum distance of the goal
+				Point ourpos(x*16 + 8, y*12 + 6);
+				// sight check is *slow* :(
+				if (!sight || IsVisible(ourpos, d)) {
+					// we got all the way to a suitable goal!
+					goal = Point(x, y);
+					found_path = true;
+					break;
+				}
+			}
+		}
+
+		unsigned int Cost = MapSet[y * Width + x] + NormalCost;
+		if (Cost > 65500) {
+			// cost is far too high, no path found
+			break;
+		}
+
+		// diagonal movements
+		SetupNode( x - 1, y - 1, size, Cost );
+		SetupNode( x + 1, y - 1, size, Cost );
+		SetupNode( x + 1, y + 1, size, Cost );
+		SetupNode( x - 1, y + 1, size, Cost );
+
+		// direct movements
+		Cost += AdditionalCost;
+		SetupNode( x, y - 1, size, Cost );
+		SetupNode( x + 1, y, size, Cost );
+		SetupNode( x, y + 1, size, Cost );
+		SetupNode( x - 1, y, size, Cost );
+	}
+
+	// find path from goal to start
+	PathNode* StartNode = new PathNode;
+	PathNode* Return = StartNode;
+	StartNode->Next = NULL;
+	StartNode->Parent = NULL;
+	if (!found_path) {
+		// this is not really great, we should be finding the path that
+		// went nearest to where we wanted
+		StartNode->x = start.x;
+		StartNode->y = start.y;
+		StartNode->orient = GetOrient( goal, start );
+		return Return;
+	}
+	StartNode->x = goal.x;
+	StartNode->y = goal.y;
+	bool fixup_orient = false;
+	if (orig_goal != goal) {
+		StartNode->orient = GetOrient( orig_goal, goal );
+	} else {
+		// we pathed all the way to original goal!
+		// we don't know correct orientation until we find previous step
+		fixup_orient = true;
+		StartNode->orient = GetOrient( goal, start );
+	}
+	Point p = goal;
+	pos2 = start.y * Width + start.x;
+	while (( pos = p.y * Width + p.x ) != pos2) {
+		unsigned int level = MapSet[pos];
+		unsigned int diff = 0;
+		Point n;
+		Leveldown( p.x, p.y + 1, level, n, diff );
+		Leveldown( p.x + 1, p.y, level, n, diff );
+		Leveldown( p.x - 1, p.y, level, n, diff );
+		Leveldown( p.x, p.y - 1, level, n, diff );
+		Leveldown( p.x - 1, p.y + 1, level, n, diff );
+		Leveldown( p.x + 1, p.y + 1, level, n, diff );
+		Leveldown( p.x + 1, p.y - 1, level, n, diff );
+		Leveldown( p.x - 1, p.y - 1, level, n, diff );
+		if (!diff)
+			return Return;
+
+		if (fixup_orient) {
+			// don't change orientation at end of path? this seems best
+			StartNode->orient = GetOrient( p, n );
+		}
+
+		Return = new PathNode;
+		Return->Next = StartNode;
+		Return->Next->Parent = Return;
+		StartNode = Return;
+		
+		StartNode->x = n.x;
+		StartNode->y = n.y;
+		StartNode->orient = GetOrient( p, n );
+		p = n;
+	}
+
+	return Return;
+}
+
 PathNode* Map::FindPath(const Point &s, const Point &d, unsigned int size, int MinDistance)
 {
 	Point start( s.x/16, s.y/12 );
