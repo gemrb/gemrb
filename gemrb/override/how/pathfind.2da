@@ -3,3 +3,4 @@
          0 1 2 3 4 5 6 7 8 9 a b c d e f
 PASSABLE 8 1 1 1 1 1 1 1 0 1 8 1 0 8 3 1
 COST  10 4
+SOUND * FS_Dirt FS_WdSn FS_WOOD FS_Tomb * * FS_Ston * FS_WOOD * FS_Snow * * * FS_Gras
