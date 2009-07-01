@@ -1203,7 +1203,11 @@ void Movable::WalkTo(Point &Des, int distance)
 		from = Pos;
 	}
 	area->ClearSearchMapFor(this);
-	path = area->FindPath( from, Des, size, distance );
+	if (distance) {
+		path = area->FindPathNear( from, Des, size, distance );
+	} else {
+		path = area->FindPath( from, Des, size, distance );
+	}
 	//ClearPath sets destination, so Destination must be set after it
 	//also we should set Destination only if there is a walkable path
 	if (path) {
