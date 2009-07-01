@@ -114,12 +114,11 @@ Projectile *Spell::GetProjectile(int header) const
 		printf("required header: %d, maximum: %d\n", header, (int) ExtHeaderCount);
 		return NULL;
 	}
+	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 	if (seh->FeatureCount) {
-		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 		pro->SetEffects(GetEffectBlock(header));
-		return pro;
 	}
-	return NULL;
+	return pro;
 }
 
 //get the casting distance of the spell
