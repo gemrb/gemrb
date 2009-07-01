@@ -1661,7 +1661,16 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 	// maybe a future idea if we have a better implementation
 	// (the old code used it - by passing true not 0 below - when target was a movable)
 	GetPositionFromScriptable(target, p, 0);
-	MoveNearerTo(Sender, p, distance);	
+	
+	// account for PersonalDistance (which caller uses, but pathfinder doesn't)
+	if (distance && Sender->Type == ST_ACTOR) {
+		distance += ((Actor *)Sender)->size*10;
+	}
+	if (distance && target->Type == ST_ACTOR) {
+		distance += ((Actor *)target)->size*10;
+	}
+
+	MoveNearerTo(Sender, p, distance);
 }
 
 void MoveNearerTo(Scriptable *Sender, Point &p, int distance)
