@@ -2064,6 +2064,7 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int size, unsigned int PathL
 		Return = new PathNode;
 		StartNode->Parent = Return;
 		Return->Next = StartNode;
+		StartNode = Return;
 		unsigned int level = MapSet[pos];
 		unsigned int diff = 0;
 		Point n;
