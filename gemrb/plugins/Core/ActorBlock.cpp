@@ -64,6 +64,7 @@ Scriptable::Scriptable(ScriptableType type)
 	LastPickLockFailed = 0;
 	DialogName = 0;
 	CurrentAction = NULL;
+	CurrentActionState = 0;
 	UnselectableTimer = 0;
 	startTime = 0;   //executing scripts
 	lastRunTime = 0; //evaluating scripts
@@ -371,6 +372,8 @@ void Scriptable::ReleaseCurrentAction()
 		CurrentAction->Release();
 		CurrentAction = NULL;
 	}
+
+	CurrentActionState = 0;
 }
 
 ieWord Scriptable::GetGlobalID()

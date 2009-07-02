@@ -207,6 +207,7 @@ public:
 	ieDword LastPickLockFailed;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
+	int CurrentActionState;
 	unsigned long playDeadCounter;
 	Point LastTargetPos;
 	int SpellHeader;
