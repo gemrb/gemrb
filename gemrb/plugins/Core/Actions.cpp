@@ -4590,17 +4590,18 @@ void GameScript::AttackOneRound( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	if (!parameters->int0Parameter) {
-		Action *newAction = ParamCopyNoOverride( parameters );
-		newAction->int0Parameter=2;
-		Sender->AddActionInFront(newAction);
-		Sender->SetWait(AI_UPDATE_TIME);
-		AttackCore(Sender, tar, newAction, AC_REEVALUATE);
-		Sender->ReleaseCurrentAction(); // the newAction will take over
-	} else {
-		Sender->ReleaseCurrentAction();
+	if (!Sender->CurrentActionState) {
+		Sender->CurrentActionState = ROUND_SIZE;
+	}
+	
+	AttackCore(Sender, tar, 0);
+
+	if (Sender->CurrentActionState == 1) {
 		//this is the LastDisarmFailed field, but this is an actor
-		Sender->LastTarget = 0;
+		//Sender->LastTarget = 0;
+		Sender->ReleaseCurrentAction();
+	} else {
+		Sender->CurrentActionState--;
 	}
 }
 
@@ -4629,7 +4630,7 @@ void GameScript::RunningAttackNoSound( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	AttackCore(Sender, tar, NULL, AC_NO_SOUND|AC_RUNNING);
+	AttackCore(Sender, tar, AC_NO_SOUND|AC_RUNNING);
 }
 
 void GameScript::AttackNoSound( Scriptable* Sender, Action* parameters)
@@ -4657,7 +4658,7 @@ void GameScript::AttackNoSound( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	AttackCore(Sender, tar, NULL, AC_NO_SOUND);
+	AttackCore(Sender, tar, AC_NO_SOUND);
 }
 
 void GameScript::RunningAttack( Scriptable* Sender, Action* parameters)
@@ -4685,7 +4686,7 @@ void GameScript::RunningAttack( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	AttackCore(Sender, tar, NULL, AC_RUNNING);
+	AttackCore(Sender, tar, AC_RUNNING);
 }
 
 void GameScript::Attack( Scriptable* Sender, Action* parameters)
@@ -4709,7 +4710,7 @@ void GameScript::Attack( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	AttackCore(Sender, tar, NULL, 0);
+	AttackCore(Sender, tar, 0);
 }
 
 void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
@@ -4756,10 +4757,15 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//pumping parameters back for AttackReevaluate
-	Action *newAction = ParamCopyNoOverride( parameters );
-	AttackCore(Sender, tar, newAction, AC_REEVALUATE);
-	// no need to release, AttackCore replaces Sender->CurrentAction with newAction
+	if (!Sender->CurrentActionState) {
+		Sender->CurrentActionState = parameters->int0Parameter;
+		// TODO: reevaluate target if we are not actively in combat
+	}
+
+	// AC_REEVALUATE is not actually used presently; remove it?
+	AttackCore(Sender, tar, AC_REEVALUATE);
+
+	Sender->CurrentActionState--;
 }
 
 void GameScript::Explore( Scriptable* Sender, Action* /*parameters*/)

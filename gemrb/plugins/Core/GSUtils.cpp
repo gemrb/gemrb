@@ -1199,8 +1199,9 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	//this is a dangerous cast, make sure actor is Actor * !!!
 	Actor *actor = (Actor *) Sender;
 
+	//this code is bad, and this is now handled in the reevaluate action
 	//replace the action for the xth time
-	if (flags&AC_REEVALUATE) {
+	/*if (flags&AC_REEVALUATE) {
 		if (!parameters->int0Parameter) {
 			//dropping the action, since it has 0 refcount, we should
 			//delete it instead of release otherwise we trigger a tripwire
@@ -1219,7 +1220,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 		Sender->CurrentAction=parameters;
 		//we call GoNearAndRetry
 		//Sender->AddAction(parameters);
-	}
+	}*/
 
 	//if distance is too much, insert a move action and requeue the action
 	WeaponInfo wi;

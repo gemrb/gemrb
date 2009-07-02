@@ -80,7 +80,7 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0)
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag);
 void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee);
 void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c);
-void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int flags);
+void AttackCore(Scriptable *Sender, Scriptable *target, int flags);
 void InitScriptTables();
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode);
 bool ResolveSpellName(ieResRef spellres, Action *parameter);
