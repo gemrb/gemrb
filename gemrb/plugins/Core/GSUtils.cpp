@@ -1129,8 +1129,11 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int f
 	if (face !=-1) {
 		actor->SetOrientation( face, false );
 	}
-	GameControl *gc=core->GetGameControl();
-	gc->SetScreenFlags(SF_CENTERONACTOR,BM_OR);
+	// should this perhaps be a 'selected' check or similar instead?
+	if (actor->InParty) {
+		GameControl *gc=core->GetGameControl();
+		gc->SetScreenFlags(SF_CENTERONACTOR,BM_OR);
+	}
 }
 
 //repeat movement, until goal isn't reached
