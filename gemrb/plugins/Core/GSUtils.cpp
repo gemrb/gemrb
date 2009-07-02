@@ -1194,7 +1194,7 @@ void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 }
 
 //It is possible to attack CONTAINERS/DOORS as well!!!
-void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int flags)
+void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 {
 	//this is a dangerous cast, make sure actor is Actor * !!!
 	Actor *actor = (Actor *) Sender;
