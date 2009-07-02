@@ -392,6 +392,8 @@ void Map::ChangeTileMap(ImageMgr* lm, ImageMgr* sm)
 
 	LightMap = lm;
 	SmallMap = sm;
+
+	TMap->UpdateDoors();
 }
 
 void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, ImageMgr* hm)

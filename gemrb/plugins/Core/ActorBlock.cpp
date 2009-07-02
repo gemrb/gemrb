@@ -1676,6 +1676,11 @@ void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 	}
 }
 
+void Door::SetNewOverlay(TileOverlay *Overlay) {
+	overlay = Overlay;
+	ToggleTiles(IsOpen(), false);
+}
+
 void Highlightable::SetTrapDetected(int x)
 {
 	if(x == TrapDetected)

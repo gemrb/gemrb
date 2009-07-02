@@ -496,6 +496,7 @@ public:
 	bool TryUnlockDoor(Actor *actor);
 	void DebugDump();
 	int TrapResets() { return Flags & DOOR_RESET; }
+	void SetNewOverlay(TileOverlay *Overlay);
 };
 
 class GEM_EXPORT Container : public Highlightable {

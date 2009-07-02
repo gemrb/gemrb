@@ -64,6 +64,8 @@ public:
 	Door* GetDoor(unsigned int idx);
 	Door* GetDoor(const char* Name);
 	size_t GetDoorCount() { return doors.size(); }
+	//update doors for a new overlay
+	void UpdateDoors();
 
 	/* type is an optional filter for container type*/
 	void AddContainer(Container *c);

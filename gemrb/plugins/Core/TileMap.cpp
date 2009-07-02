@@ -169,6 +169,14 @@ Door* TileMap::GetDoor(const char* Name)
 	return NULL;
 }
 
+void TileMap::UpdateDoors()
+{
+	for (size_t i = 0; i < doors.size(); i++) {
+		Door* door = doors[i];
+		door->SetNewOverlay(overlays[0]);
+	}
+}
+
 //overlays, allow pushing of NULL
 void TileMap::AddOverlay(TileOverlay* overlay)
 {
