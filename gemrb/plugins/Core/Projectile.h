@@ -138,7 +138,7 @@ struct ProjectileExtension
 	ieDword AFlags;
 	ieWord TriggerRadius;
 	ieWord ExplosionRadius;
-	ieResRef SoundRes;
+	ieResRef SoundRes; //used for areapro.2da explosion sound
 	ieWord Delay;
 	ieWord FragAnimID;
 	ieWord FragProjIdx;
@@ -146,9 +146,13 @@ struct ProjectileExtension
 	ieByte ExplType;
 	ieWord ExplColor;
 	ieWord ExplProjIdx;
-	ieResRef VVCRes;
+	ieResRef VVCRes;  //used for areapro.2da second resref (center animation)
 	ieWord ConeWidth;
-	//there could be some more unused bytes we don't load
+	//these are GemRB specific (from areapro.2da)
+	ieDword APFlags;    //areapro.2da flags
+	ieResRef Spread;    //areapro.2da first resref
+	ieResRef Secondary; //areapro.2da third resref
+	ieResRef AreaSound; //areapro.2da second sound resource
 };
 
 class GEM_EXPORT Projectile

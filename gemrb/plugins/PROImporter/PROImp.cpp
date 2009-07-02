@@ -109,6 +109,8 @@ Projectile* PROImp::GetProjectile(Projectile *s)
 
 void PROImp::GetAreaExtension(ProjectileExtension *e)
 {
+	ieWord tmp;
+
 	str->ReadDword( &e->AFlags );
 	str->ReadWord( &e->TriggerRadius );
 	str->ReadWord( &e->ExplosionRadius );
@@ -119,7 +121,8 @@ void PROImp::GetAreaExtension(ProjectileExtension *e)
 	str->ReadWord( &e->FragProjIdx );
 	str->Read( &e->ExplosionCount,1 );
 	//the area puff type (flames, puffs, clouds) fireball.ids
-	//gemrb will need a fireball.2da for this
+	//gemrb uses areapro.2da for this
+	//It overrides Spread, VVCRes, Secondary, SoundRes, AreaSound, APFlags
 	str->Read( &e->ExplType,1);
 	str->ReadWord( &e->ExplColor);
 	str->ReadWord( &e->ExplProjIdx);
@@ -130,6 +133,11 @@ void PROImp::GetAreaExtension(ProjectileExtension *e)
 
 	str->ReadResRef( e->VVCRes );
 	str->ReadWord( &e->ConeWidth);
+	str->ReadWord( &tmp);
+	str->ReadResRef( e->Spread);
+	str->ReadResRef( e->Secondary);
+	str->ReadResRef( e->AreaSound);
+	str->ReadDword( &e->APFlags);
 	//we skip the rest
-	str->Seek(218, GEM_CURRENT_POS);
+	str->Seek(188, GEM_CURRENT_POS);
 }

@@ -943,17 +943,6 @@ void Projectile::DrawExplosion(Region &screen)
 		extension_explosioncount--;
 	}
 
-	//play VVC in center
-	if (Extension->AFlags&PAF_VVC) {
-		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
-		if (vvc) {
-			vvc->XPos+=Pos.x;
-			vvc->YPos+=Pos.y;
-			vvc->PlayOnce();
-			area->AddVVCell(vvc);
-		}
-	}
-
 	//Line targets are actors between source and destination point
 	if(ExtFlags&PEF_LINE) {
 		UpdateLine();
@@ -990,106 +979,107 @@ void Projectile::DrawExplosion(Region &screen)
 
 	//the center of the explosion is based on hardcoded explosion type (this is fireball.cpp in the original engine)
 	//these resources are listed in areapro.2da and served by ProjectileServer.cpp
-	if (Extension->ExplType!=0xff) {
-		ieResRef const *res;
-		int apflags = server->GetExplosionFlags(Extension->ExplType);
-
-		//draw it only once, at the time of explosion
-		if (phase==P_EXPLODING1) {
-			res = server->GetExplosion(Extension->ExplType, 3);
-			if (res) {
-				core->GetAudioDrv()->Play(*res, Pos.x, Pos.y, GEM_SND_RELATIVE);
-			}
-			//the center animation is in the second column
-			res = server->GetExplosion(Extension->ExplType, 1);
-			if (res) {
-				ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(*res, false);
-				if (vvc) {
-					if (apflags & APF_VVCPAL) {
-						vvc->SetPalette(Extension->ExplColor);
-					}
-					vvc->XPos+=Pos.x;
-					vvc->YPos+=Pos.y;
-					vvc->PlayOnce();
-					area->AddVVCell(vvc);
+	int apflags = Extension->APFlags;
+	
+	//draw it only once, at the time of explosion
+	if (phase==P_EXPLODING1) {
+		core->GetAudioDrv()->Play(Extension->SoundRes, Pos.x, Pos.y, GEM_SND_RELATIVE);
+		//play VVC in center
+		if (Extension->AFlags&PAF_VVC) {
+			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
+			if (vvc) {
+				if (apflags & APF_VVCPAL) {
+					vvc->SetPalette(Extension->ExplColor);
 				}
-			}
-			phase=P_EXPLODING2;
-		} else {
-			res = server->GetExplosion(Extension->ExplType, 4);
-			if (res) {
-				core->GetAudioDrv()->Play(*res, Pos.x, Pos.y, GEM_SND_RELATIVE);
+				vvc->XPos+=Pos.x;
+				vvc->YPos+=Pos.y;
+				vvc->PlayOnce();
+				area->AddVVCell(vvc);
 			}
 		}
-
-		//the spreading animation is in the first column
-		res = server->GetExplosion(Extension->ExplType, 0);
+		
+		phase=P_EXPLODING2;
+	} else {
+		core->GetAudioDrv()->Play(Extension->AreaSound, Pos.x, Pos.y, GEM_SND_RELATIVE);
+	}
+	
+	//the spreading animation is in the first column
+	const char *tmp = Extension->Spread;
+	if(tmp[0]) {
+		//i'm unsure about the need of this
+		if(apflags&APF_BOTH) {
+			if(rand()&1) {
+				tmp = Extension->Secondary;
+			}
+		}
 		//returns if the explosion animation is fake coloured
-		if (res) {
-			if (!children) {
-				child_size = (Extension->ExplosionRadius+15)/16;
-				//more sprites if the whole area needs to be filled
-				if (apflags&APF_FILL) child_size*=2;
-				if (apflags&APF_SPREAD) child_size*=2;
-				children = (Projectile **) calloc(sizeof(Projectile *), child_size);
+		if (!children) {
+			child_size = (Extension->ExplosionRadius+15)/16;
+			//more sprites if the whole area needs to be filled
+			if (apflags&APF_FILL) child_size*=2;
+			if (apflags&APF_SPREAD) child_size*=2;
+			children = (Projectile **) calloc(sizeof(Projectile *), child_size);
+		}
+		
+		int initial = child_size;
+		
+		for(int i=0;i<initial;i++) {
+			//leave this slot free, it is residue from the previous flare up
+			if (children[i])
+				continue;
+			//create a custom projectile with single traveling effect
+			Projectile *pro = server->CreateDefaultProjectile((unsigned int) ~0);
+			strnlwrcpy(pro->BAMRes1, tmp, sizeof(ieResRef) );
+			pro->SetEffects(NULL);
+			pro->Speed=Speed;
+			//calculate the child projectile's target point, it is either
+			//a perimeter or an inside point of the explosion radius
+			int rad = Extension->ExplosionRadius;
+			Point newdest;
+			
+			if (apflags&APF_FILL) {
+				rad=core->Roll(1,rad,0);
 			}
-
-			int initial = child_size;
-
-			for(int i=0;i<initial;i++) {
-				//leave this slot free, it is residue from the previous flare up
-				if (children[i])
-					continue;
-				//create a custom projectile with single traveling effect
-				Projectile *pro = server->CreateDefaultProjectile((unsigned int) ~0);
-				strnlwrcpy(pro->BAMRes1, *res, 8);
-				pro->SetEffects(NULL);
-				pro->Speed=Speed;
-				//calculate the child projectile's target point, it is either
-				//a perimeter or an inside point of the explosion radius
-				int rad = Extension->ExplosionRadius;
-				Point newdest;
-
-				if (apflags&APF_FILL) {
-					rad=core->Roll(1,rad,0);
-				}
-				int max = 360;
-				int add = 0;
-				if (Extension->AFlags&PAF_CONE) {
-					max=Extension->ConeWidth;
-					add=(Orientation*45-max)/2;
-				}
-				max=core->Roll(1,max,add);
-				double degree=max*M_PI/180;
-				newdest.x = (int) -(rad * sin(degree) );
-				newdest.y = (int) (rad * cos(degree) );
-
-				if (apflags&APF_FILL) {
-					pro->SetDelay(Extension->Delay*extension_explosioncount);
-				}
-
-				newdest.x+=Destination.x;
-				newdest.y+=Destination.y;
-
-				if (apflags&APF_SCATTER) {
-					pro->MoveTo(area, newdest);
-				} else {
-					pro->MoveTo(area, Pos);
-				}
-				pro->SetTarget(newdest);
-				pro->autofree=true;
-
-				//sets up the gradient color for the explosion animation
-				if (apflags&(APF_PALETTE|APF_TINT) ) {
-					pro->SetGradient(Extension->ExplColor, !(apflags&APF_PALETTE));
-				}
-				//i'm unsure if we need blending for all anims or just the tinted ones
-				pro->TFlags|=PTF_BLEND;
-				//random frame is needed only for some of these, make it an areapro flag?
-				pro->ExtFlags|=PEF_RANDOM;
-				pro->Setup();
-				children[i]=pro;
+			int max = 360;
+			int add = 0;
+			if (Extension->AFlags&PAF_CONE) {
+				max=Extension->ConeWidth;
+				add=(Orientation*45-max)/2;
 			}
+			max=core->Roll(1,max,add);
+			double degree=max*M_PI/180;
+			newdest.x = (int) -(rad * sin(degree) );
+			newdest.y = (int) (rad * cos(degree) );
+			
+			if (apflags&APF_FILL) {
+				int delay = Extension->Delay*extension_explosioncount;
+				if(ExtFlags&PEF_FREEZE) {
+					delay+=Extension->Delay;
+				}
+				pro->SetDelay(delay);
+			}
+			
+			newdest.x+=Destination.x;
+			newdest.y+=Destination.y;
+			
+			if (apflags&APF_SCATTER) {
+				pro->MoveTo(area, newdest);
+			} else {
+				pro->MoveTo(area, Pos);
+			}
+			pro->SetTarget(newdest);
+			pro->autofree=true;
+			
+			//sets up the gradient color for the explosion animation
+			if (apflags&(APF_PALETTE|APF_TINT) ) {
+				pro->SetGradient(Extension->ExplColor, !(apflags&APF_PALETTE));
+			}
+			//i'm unsure if we need blending for all anims or just the tinted ones
+			pro->TFlags|=PTF_BLEND;
+			//random frame is needed only for some of these, make it an areapro flag?
+			pro->ExtFlags|=PEF_RANDOM;
+			pro->Setup();
+			children[i]=pro;
 		}
 	}
 

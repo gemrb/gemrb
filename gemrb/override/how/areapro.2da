@@ -18,10 +18,5 @@ UNHOLY     SPUNHBL2   SPUNHBL3   *          EFF_M34	*	0
 PRISMATIC  SPPRISM2   SPPRISM3   *          EFF_M34	*	0
 DRAGON     DBREATHA   DBREATHX   *          ARE_M21	*	16
 VENGEANCE  SPSTRMVA   SPSRMVB    *          *		*	2
-FIREBALL2  SPFLAMES   SPFIREPI   *          EFF_M21	*	0
-FIREBALL3  SPFLAMES   SPFIREPI   *          EFF_M21	*	0
-FIRESTORM  FSTORMA    FSTORMX    *          EFF_P45	ARE_P03 14
-ACIDSTORM  ASTORMA    ASTORMX    *          *		ARE_M04 14
-VAPOR      CLOUDKR    *          *          *       	*      	0
-SSTONE     SSTONEA    *          *          EFF_P48	ARE_P04 14
-DFOG       DFOGA      DFOGX      *          RNG_M01 ARE_M02 2
+FIREBALL2  SPRING   SPFIREPI   *          EFF_M21	* 32
+FIREBALL3  SPRING   SPFIREPI   *          EFF_M21	* 32

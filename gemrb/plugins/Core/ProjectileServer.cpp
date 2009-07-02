@@ -130,6 +130,37 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 	pro->SetIdentifiers(projectiles[idx].resname, idx);
 
 	sm->GetProjectile( pro );
+	int Type = 0xff;
+
+	if(pro->Extension) {
+		Type = pro->Extension->ExplType;
+	}
+	if(Type<0xff) {
+		ieResRef const *res;
+
+		res = GetExplosion(Type,0);
+		if(res) {
+			strnuprcpy(pro->Extension->Spread,*res,sizeof(ieResRef));
+		}
+		res = GetExplosion(Type,1);
+		if(res) {
+			strnuprcpy(pro->Extension->VVCRes,*res,sizeof(ieResRef));
+		}
+		res = GetExplosion(Type,2);
+		if(res) {
+			strnuprcpy(pro->Extension->Secondary,*res,sizeof(ieResRef));
+		}
+		res = GetExplosion(Type,3);
+		if(res) {
+			strnuprcpy(pro->Extension->SoundRes,*res,sizeof(ieResRef));
+		}
+		res = GetExplosion(Type,4);
+		if(res) {
+			strnuprcpy(pro->Extension->AreaSound,*res,sizeof(ieResRef));
+		}
+		pro->Extension->APFlags = GetExplosionFlags(Type);
+
+	}
 	core->FreeInterface( sm );
 
 	pro->autofree = true;
@@ -147,6 +178,11 @@ int ProjectileServer::InitExplosion()
 		explosioncount = 0;
 
 		unsigned int rows = (unsigned int) explist->GetRowCount();
+		//cannot handle 0xff and it is easier to set up the fields
+		//without areapro.2da anyway. So this isn't a restriction
+		if(rows>254) {
+			rows=254;
+		}
 		explosioncount = rows;
 		explosions = new ExplosionEntry[rows];
 
