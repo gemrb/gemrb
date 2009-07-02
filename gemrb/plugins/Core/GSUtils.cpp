@@ -812,11 +812,14 @@ void EscapeAreaCore(Actor* src, const char* resref, Point &enter, Point &exit, i
 		//this must be put into a non-const variable
 		sprintf( Tmp, "DestroySelf()" );
 	} else {
-		sprintf( Tmp, "JumpToPoint(\"%s\",[%hd.%hd])", resref, enter.x, enter.y );
+		// last parameter is 'face', which should be passed from relevant action parameter..
+		sprintf( Tmp, "MoveBetweenAreas(\"%s\",[%hd.%hd],%d)", resref, enter.x, enter.y, 0 );
 	}
 	src->AddActionInFront( GenerateAction( Tmp) );
-	sprintf( Tmp, "MoveToPoint([%hd.%hd])", exit.x, exit.y );
-	src->AddActionInFront( GenerateAction( Tmp) );
+	// all of the callers are completely broken, so i disabled this for now
+	(void)exit;
+	/*sprintf( Tmp, "MoveToPoint([%hd.%hd])", exit.x, exit.y );
+	src->AddActionInFront( GenerateAction( Tmp) );*/
 }
 
 void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)

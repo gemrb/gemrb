@@ -5317,13 +5317,14 @@ void GameScript::EscapeAreaDestroy(Scriptable* Sender, Action* parameters)
 /*EscapeAreaObjectMove(S:Area*,I:X*,I:Y*,I:Face*)*/
 void GameScript::EscapeAreaObject(Scriptable* Sender, Action* parameters)
 {
+	// this is completely wrong, we're meant to escape USING the provided object!
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (tar && tar->Type == ST_ACTOR) {
 		//find nearest exit
 		Point p(0,0);
 		if (parameters->string0Parameter[0]) {
 			Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
-			EscapeAreaCore((Actor *) tar, parameters->string0Parameter, p, q, 0 );
+			EscapeAreaCore((Actor *) tar, parameters->string0Parameter, q, p, 0 );
 		} else {
 			EscapeAreaCore((Actor *) tar, 0, p, p, EA_DESTROY );
 		}
@@ -5332,12 +5333,13 @@ void GameScript::EscapeAreaObject(Scriptable* Sender, Action* parameters)
 
 void GameScript::EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters)
 {
+	// this is completely wrong, we're meant to escape USING the provided object!
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (tar && tar->Type == ST_ACTOR) {
 		//find nearest exit
 		Point p(0,0);
 		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
-		EscapeAreaCore((Actor *) tar, parameters->string0Parameter, p, q, EA_DESTROY );
+		EscapeAreaCore((Actor *) tar, parameters->string0Parameter, q, p, EA_DESTROY );
 	}
 }
 
