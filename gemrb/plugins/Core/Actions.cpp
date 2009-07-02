@@ -2090,11 +2090,16 @@ void GameScript::Lock(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	if (tar->Type != ST_DOOR) {
-		return;
+	switch (tar->Type) {
+		case ST_DOOR:
+			((Door *)tar)->SetDoorLocked(true, true);
+			break;
+		case ST_CONTAINER:
+			((Container *)tar)->SetContainerLocked(true);
+			break;
+		default:
+			return;
 	}
-	Door* door = ( Door* ) tar;
-	door->SetDoorLocked( true, true);
 }
 
 void GameScript::Unlock(Scriptable* Sender, Action* parameters)
@@ -2103,11 +2108,16 @@ void GameScript::Unlock(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	if (tar->Type != ST_DOOR) {
-		return;
+	switch (tar->Type) {
+		case ST_DOOR:
+			((Door *)tar)->SetDoorLocked(false, true);
+			break;
+		case ST_CONTAINER:
+			((Container *)tar)->SetContainerLocked(false);
+			break;
+		default:
+			return;
 	}
-	Door* door = ( Door* ) tar;
-	door->SetDoorLocked( false, true);
 }
 
 void GameScript::SetDoorLocked(Scriptable* Sender, Action* parameters)
