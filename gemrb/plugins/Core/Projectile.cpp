@@ -47,7 +47,6 @@ Projectile::Projectile()
 	Extension = NULL;
 	area = NULL;
 	palette = NULL;
-	//smokepal = NULL;
 	Pos.empty();
 	Destination = Pos;
 	Orientation = 0;
@@ -63,8 +62,6 @@ Projectile::Projectile()
 	memset(shadow, 0, sizeof(shadow)) ;
 	memset(PaletteRes,0,sizeof(PaletteRes));
 	memset(smokebam, 0, sizeof(smokebam));
-	//memset(trail,0,sizeof(trail));
-	//memset(smoke,0,sizeof(smoke));
 	light = NULL;
 	pathcounter = 0x7fff;
 }
@@ -449,9 +446,7 @@ void Projectile::ChangePhase()
 	if (!Extension) {
 		//there are no-effect projectiles, like missed arrows
 		//Payload can redirect the projectile in case of projectile reflection
-		if (effects) {
-			Payload();
-		}
+		Payload();
 		//freeze on target, this is recommended only for child projectiles
 		//as the projectile won't go away on its own
 		if(ExtFlags&PEF_FREEZE) {
@@ -743,15 +738,12 @@ void Projectile::SetEffectsCopy(EffectQueue *eq)
 	effects = eq->CopySelf();
 }
 
-void Projectile::UpdateLine()
-{
-	if (Target) {
-		SetTarget(Target);
-	}
-}
-
 void Projectile::LineTarget()
 {
+	if(!effects) {
+		return;
+	}
+
 	Actor *original = area->GetActorByGlobalID(Caster);
 	Actor *prev = NULL;
 	PathNode *iter = path;
@@ -945,7 +937,9 @@ void Projectile::DrawExplosion(Region &screen)
 
 	//Line targets are actors between source and destination point
 	if(ExtFlags&PEF_LINE) {
-		UpdateLine();
+		if (Target) {
+			SetTarget(Target);
+		}
 		LineTarget();
 	}
 

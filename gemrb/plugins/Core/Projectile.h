@@ -324,7 +324,6 @@ private:
 	void ChangePhase();
 	void AddTrail(ieResRef BAM, const ieByte *pal);
 	void DoStep(unsigned int walk_speed);
-	void UpdateLine();
 	void LineTarget();      //line projectiles (walls, scorchers)
 	void SecondaryTarget(); //area projectiles (circles, cones)
 	void CheckTrigger(unsigned int radius);
