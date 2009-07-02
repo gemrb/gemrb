@@ -25,6 +25,8 @@
 #include "PluginMgr.h"
 #include "Plugin.h"
 #include "Interface.h"
+// FIXME: this should be in Interface.h instead
+#include "Variables.h"
 
 #ifdef WIN32
 #include <io.h>
@@ -54,75 +56,40 @@ inline voidvoid my_dlsym(void *handle, const char *symbol)
 #define my_dlsym dlsym
 #endif
 
+#ifdef WIN32
+#define FREE_PLUGIN( handle )  FreeLibrary( handle )
+#define GET_PLUGIN_SYMBOL( handle, name )  GetProcAddress( handle, name )
+#define PRINT_DLERROR
+#else
+#define FREE_PLUGIN( handle )  dlclose( handle )
+#define GET_PLUGIN_SYMBOL( handle, name )  my_dlsym( handle, name )
+#define PRINT_DLERROR printf( "%s\n", dlerror() )
+#endif
+
 PluginMgr::PluginMgr(char* pluginpath)
 {
-	printMessage( "PluginMgr", "Loading Plugins...\n", WHITE );
+	printMessage( "PluginMgr", "Loading Plugins from ", WHITE );
+	printf( "%s\n", pluginpath );
+	
 	char path[_MAX_PATH];
 	strcpy( path, pluginpath );
-	/*
-	 Since Win32 and Linux uses two different methods for loading external Dynamic Link Libraries,
-	 we have to take this in consideration using some #ifdef statements.
-	 Win32 uses the _findfirst/_findnext functions for iterating through all the files in the
-	 plugin directory.
-	 Linux simply uses a readdir function to walk through the directory and a fnmatch function to
-	 search files with ".so" extension.
-	*/
-#ifdef WIN32
-	//The windows _findfirst/_findnext functions allow the use of wildcards so we'll use them :)
-	struct _finddata_t c_file;
-	long hFile;
-	strcat( path, "*.dll" );
-	printMessage( "PluginMgr", "Searching for plugins in: ", WHITE );
-	printf( "%s\n", path );
-	if (( hFile = ( long ) _findfirst( path, &c_file ) ) == -1L) //If there is no file matching our search
-#else
-	{
-		printMessage( "PluginMgr", "Searching for plugins in: ", WHITE );
-	}
-	printf( "%s\n", path );
-	DIR* dir = opendir( path );
-	if (dir == NULL) //If we cannot open the Directory
-#endif
-	{
+
+	std::list< char * > files;
+	if (! FindFiles( path, files ))
 		return;
-	} //Simply return
-#ifndef WIN32  //Linux Statement
-	struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
-	if (de == NULL) //If no entry exists just return
-	{
-		return;
-	}
-#endif
+	
 	charvoid LibVersion;
 	charvoid LibDescription;
 	cdvoid LibClassDesc;
-	do {
-		//Iterate through all the available modules to load
-#ifdef WIN32
-		strcpy( path, pluginpath );
-		//strcat(path, "plugins\\");
-		strcat( path, c_file.name );
-		printBracket( "PluginMgr", LIGHT_WHITE );
-		printf( ": Loading: " );
-		textcolor( LIGHT_WHITE );
-		printf( "%s", c_file.name );
-		textcolor( WHITE );
-		printf( "..." );
-		HMODULE hMod = LoadLibrary( path ); //Try to load the Module
-		if (hMod == NULL) {
-			printBracket( "ERROR", LIGHT_RED );
-			printf( "\nCannot Load Module, Skipping...\n" );
-			continue;
-		}
-		printStatus( "OK", LIGHT_GREEN );
-		LibVersion = ( charvoid ) GetProcAddress( hMod, "LibVersion" );
-		LibDescription = ( charvoid )
-			GetProcAddress( hMod, "LibDescription" );
-		LibClassDesc = ( cdvoid ) GetProcAddress( hMod, "LibClassDesc" );
-#else
-		if (fnmatch( "*.so", de->d_name, 0 ) != 0) //If the current file has no ".so" extension, skip it
-			continue;
-		PathJoin( path, pluginpath, de->d_name, NULL );
+
+	//Iterate through all the available modules to load
+	int file_count = files.size (); // keeps track of first-pass files
+	while (! files.empty()) {
+		char* file = files.front();
+		files.pop_front();
+		file_count--;
+
+		PathJoin( path, pluginpath, file, NULL );		
 		printBracket( "PluginMgr", LIGHT_WHITE );
 		printf( ": Loading: " );
 		textcolor( LIGHT_WHITE );
@@ -130,41 +97,61 @@ PluginMgr::PluginMgr(char* pluginpath)
 		textcolor( WHITE );
 		printf( "..." );
 
+		
+		ieDword flags = 0;
+		core->plugin_flags->Lookup (file, flags);
+		 
+		// module is sent to the back
+		if ((flags == PLF_DELAY) && (file_count >= 0)) {
+			printStatus( "DELAYING", YELLOW );
+			files.push_back( file );
+			continue;
+		} 
+
+		// We do not need the basename anymore now
+		free( file );
+		
+		// module is skipped
+		if (flags == PLF_SKIP) {
+			printStatus( "SKIPPING", YELLOW );
+			continue;
+		}
+ 
+
+		
 		// Try to load the Module
+#ifdef WIN32
+		HMODULE hMod = LoadLibrary( path );
+#else
 		// Note: the RTLD_GLOBAL is necessary to export symbols to modules
 		//       which python may have to dlopen (-wjp, 20060716)
 		void* hMod = dlopen( path, RTLD_NOW | RTLD_GLOBAL ); 
+#endif
 		if (hMod == NULL) {
 			printBracket( "ERROR", LIGHT_RED );
-			printf( "\nCannot Load Module, Skipping...\n%s\n", dlerror() );
+			printf( "\nCannot Load Module, Skipping...\n" );
+			PRINT_DLERROR;
 			continue;
 		}
+
 		printStatus( "OK", LIGHT_GREEN );
 		//using C bindings, so we don't need to jump through extra hoops
 		//with the symbol name
-		LibVersion = ( charvoid ) my_dlsym( hMod, "LibVersion" );
-		LibDescription = ( charvoid ) my_dlsym( hMod, "LibDescription" );
-		LibClassDesc = ( cdvoid ) my_dlsym( hMod, "LibClassDesc" );
-#endif
+		LibVersion = ( charvoid ) GET_PLUGIN_SYMBOL( hMod, "LibVersion" );
+		LibDescription = ( charvoid ) GET_PLUGIN_SYMBOL( hMod, "LibDescription" );
+		LibClassDesc = ( cdvoid ) GET_PLUGIN_SYMBOL( hMod, "LibClassDesc" );
+		
 		printMessage( "PluginMgr", "Checking Plugin Version...", WHITE );
 		if (LibVersion==NULL) {
 			printStatus( "ERROR", LIGHT_RED );
 			printf( "Invalid Plug-in, Skipping...\n" );
-#ifdef WIN32
-			FreeLibrary(hMod);
-#else
-			dlclose(hMod);
-#endif
+			FREE_PLUGIN( hMod );
 			continue;
 		}
 		if (strcmp(LibVersion(), VERSION_GEMRB) ) {
 			printStatus( "ERROR", LIGHT_RED );
 			printf( "Plug-in Version not valid, Skipping...\n" );
-#ifdef WIN32
-			FreeLibrary(hMod);
-#else
-			dlclose(hMod);
-#endif
+			FREE_PLUGIN( hMod );
 			continue;
 		}
 		printStatus( "OK", LIGHT_GREEN );
@@ -179,40 +166,30 @@ PluginMgr::PluginMgr(char* pluginpath)
 		if (plug == NULL) {
 			printMessage( "PluginMgr", "Plug-in Exports Error! ", WHITE );
 			printStatus( "ERROR", LIGHT_RED );
-		} else {
-			for (unsigned int x = 0; x < plugins.size(); x++) {
-				if (plugins[x]->ClassID() == plug->ClassID()) {
-					printMessage( "PluginMgr", "Plug-in Already Loaded! ", WHITE );
-					printStatus( "SKIPPING", YELLOW );
-					error = true;
-					break;
-				}
+			continue;
+		} 
+		for (unsigned int x = 0; x < plugins.size(); x++) {
+			if (plugins[x]->ClassID() == plug->ClassID()) {
+				printMessage( "PluginMgr", "Plug-in Already Loaded! ", WHITE );
+				printStatus( "SKIPPING", YELLOW );
+				error = true;
+				break;
+			}
 
-				if (plugins[x]->SuperClassID() == plug->SubClassID()) {
-					printMessage( "PluginMgr", "Duplicate Plug-in! ", WHITE );
-					printStatus( "SKIPPING", YELLOW );
-					error = true;
-					break;
-				}
+			if (plugins[x]->SuperClassID() == plug->SubClassID()) {
+				printMessage( "PluginMgr", "Duplicate Plug-in! ", WHITE );
+				printStatus( "SKIPPING", YELLOW );
+				error = true;
+				break;
 			}
-			if (error) {
-#ifdef WIN32
-				FreeLibrary(hMod);
-#else
-				dlclose(hMod);
-#endif
-				continue;
-			}
-			plugins.push_back( plug );
-			libs.push_back( hMod );
 		}
-#ifdef WIN32 //Win32 while condition uses the _findnext function
-	} while (_findnext( hFile, &c_file ) == 0);
-	_findclose( hFile );
-#else //Linux uses the readdir function
-} while (( de = readdir( dir ) ) != NULL);
-closedir(dir); //No other files in the directory, close it
-#endif
+		if (error) {
+			FREE_PLUGIN( hMod );
+			continue;
+		}
+		plugins.push_back( plug );
+		libs.push_back( hMod );
+	}
 }
 
 PluginMgr::~PluginMgr(void)
@@ -228,6 +205,52 @@ PluginMgr::~PluginMgr(void)
 	}
 #endif
 }
+
+#ifdef WIN32
+bool
+PluginMgr::FindFiles( char* path, std::list<char*> &files )
+{
+	//The windows _findfirst/_findnext functions allow the use of wildcards so we'll use them :)
+	struct _finddata_t c_file;
+	long hFile;
+	strcat( path, "*.dll" );
+	if (( hFile = ( long ) _findfirst( path, &c_file ) ) == -1L) //If there is no file matching our search
+		return false;
+		
+	do {
+		files.push_back( strdup( c_file.name )); 
+	} while (_findnext( hFile, &c_file ) == 0);
+	
+	_findclose( hFile );
+	return true;
+}
+
+#else // ! WIN32
+
+bool
+PluginMgr::FindFiles( char* path, std::list<char*> &files )
+{
+	DIR* dir = opendir( path );
+	if (dir == NULL) //If we cannot open the Directory
+		return false;
+
+	struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
+	if (de == NULL) {
+		//If no entry exists just return
+		closedir( dir );
+		return false;
+	}
+	
+	do {
+		if (fnmatch( "*.so", de->d_name, 0 ) != 0) //If the current file has no ".so" extension, skip it
+			continue;
+		files.push_back( strdup( de->d_name ));		
+	} while (( de = readdir( dir ) ) != NULL);
+	
+	closedir( dir ); //No other files in the directory, close it
+	return true;
+}
+#endif  // ! WIN32
 
 bool PluginMgr::IsAvailable(SClass_ID plugintype) const
 {

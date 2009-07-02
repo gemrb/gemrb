@@ -220,6 +220,12 @@ public:
 #define FOG_DRAWSEARCHMAP 2
 #define FOG_DITHERSPRITES 4
 
+enum PluginFlagsType {
+	PLF_NORMAL,
+	PLF_SKIP,
+	PLF_DELAY
+};
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -678,6 +684,7 @@ public:
 	unsigned int FogOfWar;
 	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
 	bool KeepCache;
+	Variables *plugin_flags;
 	/** The Main program loop */
 	void Main(void);
 	/** returns true if the game is paused */

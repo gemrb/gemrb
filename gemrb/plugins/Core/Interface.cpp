@@ -145,6 +145,7 @@ Interface::Interface(int iargc, char* iargv[])
 	tooltip_currtextw = 0;
 	tooltip_ctrl = NULL;
 	plugin = NULL;
+	plugin_flags = NULL;
 
 	pal16 = NULL;
 	pal32 = NULL;
@@ -350,6 +351,8 @@ Interface::~Interface(void)
 	for (i = 0; i < musiclist.size(); i++) {
 		free((void *)musiclist[i]);
 	}
+	
+	delete plugin_flags;
 
 	delete projserv;
 
@@ -1199,6 +1202,9 @@ int Interface::LoadSprites()
 
 int Interface::Init()
 {
+	plugin_flags = new Variables();
+	plugin_flags->SetType( GEM_VARIABLES_INT );
+
 	printMessage( "Core", "Initializing the Event Manager...", WHITE );
 	evntmgr = new EventMgr();
 
@@ -1981,6 +1987,10 @@ bool Interface::LoadConfig(const char* filename)
 			EnableCheatKeys ( atoi( value ) );
 		} else if (stricmp( name, "KeepCache" ) == 0) {
 			KeepCache = ( atoi( value ) == 0 ) ? false : true;
+		} else if (stricmp( name, "SkipPlugin" ) == 0) {
+			plugin_flags->SetAt( value, PLF_SKIP );
+		} else if (stricmp( name, "DelayPlugin" ) == 0) {
+			plugin_flags->SetAt( value, PLF_DELAY );
 		} else if (stricmp( name, "FogOfWar" ) == 0) {
 			FogOfWar = atoi( value );
 		} else if (stricmp( name, "EndianSwitch" ) == 0) {

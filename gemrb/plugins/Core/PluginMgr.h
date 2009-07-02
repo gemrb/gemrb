@@ -31,6 +31,7 @@
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include <vector>
+#include <list>
 #include <cstring>
 
 #ifdef WIN32
@@ -71,6 +72,8 @@ private:
 	std::vector< ClassDesc*> plugins;
 	std::vector< LibHandle> libs;
 public:
+	/** Return names of all *.so or *.dll files in the given directory */
+	bool FindFiles( char* path, std::list< char* > &files);
 	bool IsAvailable(SClass_ID plugintype) const;
 	void* GetPlugin(SClass_ID plugintype) const;
 	std::vector<InterfaceElement> *GetAllPlugin(SClass_ID plugintype) const;	

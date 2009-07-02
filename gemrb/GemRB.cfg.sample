@@ -73,6 +73,10 @@ TooltipDelay=500
 #                                                   #
 #####################################################
 
+# Load NullSound driver only if OpenALAudio driver failed
+DelayPlugin=libNullSound.so
+DelayPlugin=libNullSound.dll
+
 # Volume of ambient sounds
 VolumeAmbients = 100
 
