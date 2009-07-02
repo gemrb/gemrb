@@ -568,6 +568,15 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( &tmp );
 			points[x].y = tmp;
 		}
+		if (vertCount == 0 && bbox.w == 0 && bbox.h == 0) {
+			/* piles have no polygons and no bounding box in some areas,
+			 * but bg2 gives them this bounding box at first load,
+			 * should we specifically check for Type==IE_CONTAINER_PILE? */
+			bbox.x = XPos - 7;
+			bbox.y = YPos - 5;
+			bbox.w = 16;
+			bbox.h = 12;
+		}
 		Gem_Polygon* poly = new Gem_Polygon( points, vertCount, &bbox );
 		free( points );
 		Container* c = map->AddContainer( Name, Type, poly );
