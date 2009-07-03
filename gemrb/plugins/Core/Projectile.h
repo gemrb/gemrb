@@ -98,6 +98,7 @@
 #define PEF_FADE       0x80000 //gradually fade on spot if used with PEF_FREEZE (ice dagger)
 #define PEF_TEXT       0x100000//display text during setup
 #define PEF_WANDERING  0x200000//random movement (no real path)
+#define PEF_CYCLE      0x400000//random cycle
 
 //projectile area flags
 #define PAF_VISIBLE    1     //the travel projectile is visible until explosion
@@ -132,6 +133,8 @@
 #define APF_PALETTE   32
 //use both animations in the spread
 #define APF_BOTH      64
+//more child projectiles
+#define APF_MORE      128
 
 struct ProjectileExtension
 {

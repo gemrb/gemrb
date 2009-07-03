@@ -113,9 +113,18 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 	if (!af) {
 		return;
 	}
+
+	int Max = af->GetCycleCount();
+	if (!Max) {
+		return;
+	}
+
+	if(PEF_CYCLE && !Seq) {
+		Seq=rand()%Max;
+	}
+
 	//this hack is needed because bioware .pro files are sometimes
 	//reporting bigger face count than possible by the animation
-	int Max = af->GetCycleCount();
 	if (Aim>Max) Aim=Max;
 
 	if(ExtFlags&PEF_PILLAR) {
@@ -706,6 +715,9 @@ int Projectile::CalculateTargetFlag()
 	case PAF_PARTY:
 		flags|=GA_NO_ENEMY;
 		break;
+	case PAF_TARGET:
+		flags|=GA_NO_NEUTRAL|GA_NO_ENEMY;
+		break;
 	}
 	return flags;
 }
@@ -988,6 +1000,7 @@ void Projectile::DrawExplosion(Region &screen)
 				vvc->XPos+=Pos.x;
 				vvc->YPos+=Pos.y;
 				vvc->PlayOnce();
+				vvc->SetBlend();
 				area->AddVVCell(vvc);
 			}
 		}
@@ -1001,17 +1014,14 @@ void Projectile::DrawExplosion(Region &screen)
 	const char *tmp = Extension->Spread;
 	if(tmp[0]) {
 		//i'm unsure about the need of this
-		if(apflags&APF_BOTH) {
-			if(rand()&1) {
-				tmp = Extension->Secondary;
-			}
-		}
 		//returns if the explosion animation is fake coloured
 		if (!children) {
 			child_size = (Extension->ExplosionRadius+15)/16;
 			//more sprites if the whole area needs to be filled
 			if (apflags&APF_FILL) child_size*=2;
 			if (apflags&APF_SPREAD) child_size*=2;
+			if (apflags&APF_BOTH) child_size/=2;  //intentionally decreases
+			if (apflags&APF_MORE) child_size*=2;  
 			children = (Projectile **) calloc(sizeof(Projectile *), child_size);
 		}
 		
@@ -1021,6 +1031,13 @@ void Projectile::DrawExplosion(Region &screen)
 			//leave this slot free, it is residue from the previous flare up
 			if (children[i])
 				continue;
+			if(apflags&APF_BOTH) {
+				if(rand()&1) {
+					tmp = Extension->Secondary;
+				} else {
+					tmp = Extension->Spread;
+				}
+			}
 			//create a custom projectile with single traveling effect
 			Projectile *pro = server->CreateDefaultProjectile((unsigned int) ~0);
 			strnlwrcpy(pro->BAMRes1, tmp, sizeof(ieResRef) );
@@ -1046,9 +1063,16 @@ void Projectile::DrawExplosion(Region &screen)
 			newdest.y = (int) (rad * cos(degree) );
 			
 			if (apflags&APF_FILL) {
-				int delay = Extension->Delay*extension_explosioncount;
+				int delay;
+				delay = Extension->Delay*extension_explosioncount;
+
+				if(apflags&APF_BOTH) {
+					if (delay) {
+					  delay = rand()%delay;
+					}
+				}
 				if(ExtFlags&PEF_FREEZE) {
-					delay+=Extension->Delay;
+					delay += Extension->Delay;
 				}
 				pro->SetDelay(delay);
 			}
@@ -1071,7 +1095,11 @@ void Projectile::DrawExplosion(Region &screen)
 			//i'm unsure if we need blending for all anims or just the tinted ones
 			pro->TFlags|=PTF_BLEND;
 			//random frame is needed only for some of these, make it an areapro flag?
-			pro->ExtFlags|=PEF_RANDOM;
+			if(ExtFlags&PEF_CYCLE) {
+				pro->ExtFlags|=PEF_CYCLE;  //random cycle
+			} else {
+				pro->ExtFlags|=PEF_RANDOM; //random frame
+			}
 			pro->Setup();
 			children[i]=pro;
 		}
