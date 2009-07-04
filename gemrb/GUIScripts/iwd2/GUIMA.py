@@ -295,7 +295,7 @@ def MoveToNewArea ():
 
 	tmp = WorldMapControl.GetDestinationArea (1)
 	CloseWorldMapWindow ()
-	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"])
+	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"], tmp["Direction"])
 	return
 
 def ChangeTooltip ():

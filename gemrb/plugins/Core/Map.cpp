@@ -418,7 +418,7 @@ void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, Imag
 	}
 }
 
-void Map::MoveToNewArea(const char *area, const char *entrance, int EveryOne, Actor *actor)
+void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor)
 {
 	char command[256];
 
@@ -440,11 +440,31 @@ void Map::MoveToNewArea(const char *area, const char *entrance, int EveryOne, Ac
 	Entrance* ent = map->GetEntrance( entrance );
 	int X,Y, face;
 	if (!ent) {
-		printMessage("Map", " ", YELLOW);
-		printf( "WARNING!!! %s EntryPoint does not exist\n", entrance );
-		X = map->TMap->XCellCount * 64;
-		Y = map->TMap->YCellCount * 64;
-		face = -1;
+		// no entrance found, try using direction flags
+
+		face = -1; // should this be handled per-case?
+
+		// ok, so the original engine tries these in a different order
+		// (north first, then south) but it doesn't seem to matter
+		if (direction & 0x1) { // north
+			X = map->TMap->XCellCount * 32;
+			Y = 0;
+		} else if (direction & 0x2) { // east
+			X = map->TMap->XCellCount * 64;
+			Y = map->TMap->YCellCount * 32;
+		} else if (direction & 0x4) { // south
+			X = map->TMap->XCellCount * 32;
+			Y = map->TMap->YCellCount * 64;
+		} else if (direction & 0x8) { // west
+			X = 0;
+			Y = map->TMap->YCellCount * 32;
+		} else {
+			// crashes in original engine
+			printMessage("Map", " ", YELLOW);
+			printf( "WARNING!!! EntryPoint '%s' does not exist and direction %d is invalid\n", entrance, direction );
+			X = map->TMap->XCellCount * 64;
+			Y = map->TMap->YCellCount * 64;
+		}
 	} else {
 		X = ent->Pos.x;
 		Y = ent->Pos.y;
@@ -511,7 +531,8 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 
 	ip->Flags&=~TRAP_RESET; //exit triggered
 	if (ip->Destination[0] != 0) {
-		MoveToNewArea(ip->Destination, ip->EntranceName, EveryOne, actor);
+		// 0 here is direction, can infopoints specify that or is an entrance always provided?
+		MoveToNewArea(ip->Destination, ip->EntranceName, 0, EveryOne, actor);
 		return;
 	}
 	if (ip->Scripts[0]) {

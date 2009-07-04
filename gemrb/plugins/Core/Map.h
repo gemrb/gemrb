@@ -443,7 +443,7 @@ public:
 	unsigned int GetSpawnCount() { return (unsigned int) spawns.size(); }
 	void TriggerSpawn(Spawn *spawn);
 	//move some or all players to a new area
-	void MoveToNewArea(const char *area, const char *entrance, int EveryOne, Actor *actor);
+	void MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor);
 	bool HasWeather();
 	int GetWeather();
 	void ClearTrap(Actor *actor, ieDword InTrap);

@@ -2491,7 +2491,7 @@ static PyObject* GemRB_AdjustScrolling(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreateMovement__doc,
-"CreateMovement(Area, Entrance)\n\n"
+"CreateMovement(Area, Entrance, Direction)\n\n"
 "Moves actors to a new area." );
 
 static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
@@ -2499,8 +2499,9 @@ static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
 	int everyone;
 	char *area;
 	char *entrance;
+	int direction = 0;
 
-	if (!PyArg_ParseTuple( args, "ss", &area, &entrance)) {
+	if (!PyArg_ParseTuple( args, "ss|i", &area, &entrance, &direction)) {
 		return AttributeError( GemRB_CreateMovement__doc );
 	}
 	if (core->HasFeature(GF_TEAM_MOVEMENT) ) {
@@ -2512,7 +2513,7 @@ static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	game->GetCurrentArea()->MoveToNewArea(area, entrance, everyone, NULL);
+	game->GetCurrentArea()->MoveToNewArea(area, entrance, (unsigned int)direction, everyone, NULL);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -2552,6 +2553,7 @@ static PyObject* GemRB_GetDestinationArea(PyObject * /*self*/, PyObject* args)
 	}
 	PyDict_SetItemString(dict, "Destination", PyString_FromString (wmc->Area->AreaName) );
 	PyDict_SetItemString(dict, "Entrance", PyString_FromString (wal->DestEntryPoint) );
+	PyDict_SetItemString(dict, "Direction", PyInt_FromLong (wal->DirectionFlags) );
 	//the area the user will fall on
 	if (encounter && eval) {
 		int i=rand()%5;
@@ -2563,6 +2565,7 @@ static PyObject* GemRB_GetDestinationArea(PyObject * /*self*/, PyObject* args)
 			if (wal->EncounterAreaResRef[(i+j)%5][0]) {
 				PyDict_SetItemString(dict, "Destination", PyString_FromString (wal->EncounterAreaResRef[(i+j)%5]) );
 				PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
+				// do we need to change Direction here?
 				break;
 			}
 		}
