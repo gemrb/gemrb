@@ -793,7 +793,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			if (part < actorPartCount) {
 				char warnbuf[200];
 				snprintf(warnbuf, 200,
-						 "Couldn't create animationfactory: %s\n", NewResRef);
+					 "Couldn't create animationfactory: %s\n", NewResRef);
 				printMessage("CharAnimations",warnbuf,LIGHT_RED);
 				for (int i = 0; i < part; ++i)
 					delete anims[i];
@@ -828,7 +828,11 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		}
 
 		if (part < actorPartCount) {
-			if (!palette[PAL_MAIN] && ((GlobalColorMod.type!=RGBModifier::NONE) || (NoPalette()!=1)) ) {
+			//if you need to revert this change, consider true paletted
+			//animations which need a GlobalColorMod (mgir for example)
+
+			//if (!palette[PAL_MAIN] && ((GlobalColorMod.type!=RGBModifier::NONE) || (NoPalette()!=1)) ) {
+			if(!palette[PAL_MAIN]) {
 				// This is the first time we're loading an Animation.
 				// We copy the palette of its first frame into our own palette
 				palette[PAL_MAIN] =
