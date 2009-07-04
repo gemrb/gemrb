@@ -515,7 +515,8 @@ public:
 	void SetLockedPalette(const ieDword *gradients);
 	void UnlockPalette();
 	void AddAnimation(const ieResRef resource, int gradient, int height, int flags);
-	void PlayDamageAnimation(int x);
+	/* plays damage animation, if hit is not set, then plays only the splash part */
+	void PlayDamageAnimation(int x, bool hit=true);
 	/* restores a spell of maximum maxlevel level, type is a mask of disabled spells */
 	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);
 	/* rememorizes spells, cures fatigue, etc */

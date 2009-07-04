@@ -181,6 +181,8 @@ static ieResRef d_splash[DAMAGE_LEVELS] = {
 	"SPBURN","SPBURN","SPBURN", //flames
 	"SPSPARKS","SPSPARKS","SPSPARKS", //sparks
 	"","","",
+	"","","",
+	"","",""
 };
 
 #define BLOOD_GRADIENT 19
@@ -225,7 +227,7 @@ ieDword bitcount (ieDword n)
 		count += n & 0x1u;
 		n >>= 1;
 	}
-    	return count;
+			return count;
 }
 
 void ReleaseMemoryActor()
@@ -1609,7 +1611,7 @@ void Actor::AddAnimation(const ieResRef resource, int gradient, int height, int 
 	AddVVCell(sca);
 }
 
-void Actor::PlayDamageAnimation(int type)
+void Actor::PlayDamageAnimation(int type, bool hit)
 {
 	int i;
 
@@ -1617,28 +1619,40 @@ void Actor::PlayDamageAnimation(int type)
 		case 0: case 1: case 2: case 3: //blood
 			i = (int) GetStat(IE_ANIMATION_ID)>>16;
 			if (!i) i = d_gradient[type];
-			AddAnimation(d_main[type], i, 0, AA_PLAYONCE);
+			if(hit) {
+				AddAnimation(d_main[type], i, 0, AA_PLAYONCE);
+			}
 			break;
-		case 4: case 5: case 6: case 7: //fire
-			AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+		case 4: case 5: case 6: //fire
+			if(hit) {
+				AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+			}
 			for(i=DL_FIRE;i<=type;i++) {
 				AddAnimation(d_splash[i], d_gradient[i], 0, AA_PLAYONCE);
 			}
 			break;
-		case 8: case 9: case 10: //electricity
-			AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+		case 7: case 8: case 9: //electricity
+			if (hit) {
+				AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+			}
 			for(i=DL_ELECTRICITY;i<=type;i++) {
 				AddAnimation(d_splash[i], d_gradient[i], 0, AA_PLAYONCE);
 			}
 			break;
-		case 11: case 12: case 13://cold
-			AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+		case 10: case 11: case 12://cold
+			if (hit) {
+				AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+			}
 			break;
-		case 14: case 15: case 16://acid
-			AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+		case 13: case 14: case 15://acid
+			if (hit) {
+				AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+			}
 			break;
-		case 17: case 18: case 19://disintegrate
-			AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+		case 16: case 17: case 18://disintegrate
+			if (hit) {
+				AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+			}
 			break;
 	}
 }
@@ -2963,7 +2977,7 @@ bool Actor::ValidTarget(int ga_flags) const
 	}
 
 	if (ga_flags&GA_NO_NEUTRAL) {
-		if(!InParty && (Modified[IE_EA]<EA_EVILCUTOFF) ) return false;
+		if((Modified[IE_EA]>EA_GOODCUTOFF) && (Modified[IE_EA]<EA_EVILCUTOFF) ) return false;
 	}
 
 	switch(ga_flags&GA_ACTION) {

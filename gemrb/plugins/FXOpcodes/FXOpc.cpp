@@ -4008,7 +4008,8 @@ int fx_damage_animation (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_damage_animation (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->PlayDamageAnimation(fx->Parameter2);
+	//Parameter1 is a gemrb extension
+	target->PlayDamageAnimation(fx->Parameter2, !fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 // 0xab Spell:Add
