@@ -384,8 +384,10 @@ int Game::GetPartySize(bool onlyalive) const
 /* sends the hotkey trigger to all selected actors */
 void Game::SetHotKey(unsigned long Key)
 {
-	for(unsigned int i = 0; i < PCs.size(); i++) {
-		Actor *actor = PCs[i];
+	std::vector< Actor*>::const_iterator m;
+
+	for ( m = selected.begin(); m != selected.end(); ++m) {
+		Actor *actor = *m;
 
 		if (actor->IsSelected()) {
 			actor->HotKey = (ieDword) Key;
