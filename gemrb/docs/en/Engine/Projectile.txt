@@ -24,3 +24,15 @@ These flags reside in the .pro format on offset 0x2c
 0x80000 Slowly fade out a freezed projectile (used with flag 0x4)
 0x100000 Display string in setup (string reference is stored on offset 0x30)
 0x200000 Random movement instead of path
+
+These fields are in the .pro format in the Extension structure:
+0x228 - ResRef - spread animation (RESOURCE2 in areapro.2da)
+0x230 - ResRef - secondary animation (RESOURCE3 in areapro.2da)
+0x238 - ResRef - area sound (SOUND2 in areapro.2da)
+0x240 - Dword  - flags in areapro.2da
+
+Other areapro.2da fields
+0x21c - ResRef - RESOURCE1
+0x208 - ResRef - SOUND1
+
+See areapro.2da for more information.

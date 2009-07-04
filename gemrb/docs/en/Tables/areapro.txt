@@ -3,12 +3,23 @@ Description: This table lists resource data for area projectiles. The original e
 Columns -
    RESOURCE1 - A BAM resref which is drawn in the entire area of effect.
    RESOURCE2 - A VVC (or BAM) resref which is drawn in the center of effect once.
-   RESOURCE3 - (currently unused)
+   RESOURCE3 - An alternate animation (named recoil without better name)
+   SOUND1    - Explosion sound (played on first explosion)
+   SOUND2    - Area sound (played on subsequent explosions)
    FLAGS     - a bitfield which alters the way the resources are drawn
 
 Values for the FLAGS bitfield -
-   1 - RESOURCE1 is recoloured by the gradient set in the projectile
-   2 - fills the entire area of effect randomly, otherwise it is a (spreading) circle
-   4 - no spreading, the filler graphics is already at its destination, otherwise it starts from the center
-   8 - RESOURCE2 is recoloured by the gradient set in the projectile
+   1     - RESOURCE1 is recoloured by the gradient set in the projectile
+   2     - fills the entire area of effect randomly, otherwise it is a (spreading) circle
+   4     - no spreading, the filler graphic is already at its destination, otherwise it starts from the center
+   8     - RESOURCE2 is recoloured by the gradient set in the projectile
+   0x10  - repopulate children that vanished
+   0x20  - the child projectiles need gradient colouring
+   0x40  - draw RESOURCE3 projectiles too (halves the number of children as well)
+   0x80  - double the number of child projectiles
+   0x100 - if none was affected by this projectile, apply a spell of same name on the caster
 
+areapro.2da data could be completely incorporated into the projectile file, it is supplied
+only for some BG2 spells that don't use the extended projectile format.
+
+See projectile.txt for more information.
