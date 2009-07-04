@@ -268,12 +268,15 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 	Distances[i] = 0; //setting our own distance
 	GotHereFrom[i] = -1; //we didn't move
 
+	int *seen_entry = (int *) malloc( memsize );
+
 	std::list<int> pending;
 	pending.push_back(i);
 	while(pending.size()) {
 		i=pending.front();
 		pending.pop_front();
 		WMPAreaEntry* ae=area_entries[i];
+		memset( seen_entry, -1, memsize );
 		//all directions should be used
 		for(int d=0;d<4;d++) {
 			int j=ae->AreaLinksIndex[d];
@@ -288,6 +291,9 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 				WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
 				unsigned int mydistance = (unsigned int) Distances[i];
 
+				// we must only process the FIRST seen link to each area from this one
+				if (seen_entry[al->AreaIndex] != -1) continue;
+				seen_entry[al->AreaIndex] = 0;
 /*
 				if ( ( (ae->GetAreaStatus() & WMP_ENTRY_PASSABLE) == WMP_ENTRY_PASSABLE) &&
 				( (ae2->GetAreaStatus() & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE)
@@ -305,6 +311,8 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 			}
 		}
 	}
+
+	free(seen_entry);
 	return 0;
 }
 
