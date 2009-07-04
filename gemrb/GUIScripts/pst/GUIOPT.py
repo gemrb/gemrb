@@ -167,8 +167,8 @@ def OpenVideoOptionsWindow ():
 	OptDone ('VideoOptions', Window, 7)
 	OptCancel ('VideoOptions', Window, 8)
 
-	OptSlider ('VideoOptions', 'Brightness', Window, 1, 10, 31234, "Brightness Correction", 5)
-	OptSlider ('VideoOptions', 'Contrast', Window, 2, 11, 31429, "Gamma Correction", 5)
+	OptSlider ('VideoOptions', 'Brightness', Window, 1, 10, 31234, "Brightness Correction", "GammaFeedback", 1)
+	OptSlider ('VideoOptions', 'Contrast', Window, 2, 11, 31429, "Gamma Correction", "GammaFeedback", 1)
 
 	OptCheckbox ('VideoOptions', 'SoftwareBlitting', Window, 6, 15, 30898, "SoftBlt")
 	OptCheckbox ('VideoOptions', 'SoftwareMirroring', Window, 4, 13, 30896, "SoftMirrorBlt")
@@ -176,8 +176,11 @@ def OpenVideoOptionsWindow ():
 
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
 	
-	
+def GammaFeedback ():
+	GemRB.SetGamma (GemRB.GetVar("Brightness Correction")/5,GemRB.GetVar("Gamma Correction")/5)
+	return
 
 def DisplayHelpVideoOptions ():
 	VideoHelpText.SetText (31052)
