@@ -510,6 +510,7 @@ void Projectile::EndTravel()
 void Projectile::AddTrail(ieResRef BAM, const ieByte *pal)
 {
 	ScriptedAnimation *sca=gamedata->GetScriptedAnimation(BAM,0);
+	if (!sca) return;
 	if(pal) {
 		for(int i=0;i<7;i++) {
 			sca->SetPalette(pal[i], 4+i*PALSIZE);
@@ -710,9 +711,9 @@ int Projectile::CalculateTargetFlag()
 	//affect only enemies or allies
 	switch (Extension->AFlags&PAF_TARGET) {
 	case PAF_ENEMY:
-		flags|=GA_NO_ALLY;
+		flags|=GA_NO_NEUTRAL|GA_NO_ALLY;
 		break;
-	case PAF_PARTY:
+	case PAF_PARTY:        //this doesn't exist in IE
 		flags|=GA_NO_ENEMY;
 		break;
 	case PAF_TARGET:
@@ -791,6 +792,17 @@ void Projectile::SecondaryTarget()
 	int radius = Extension->ExplosionRadius;
 	Actor **actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	Actor **poi=actors;
+	if (!*poi) {
+		if(Extension->APFlags&APF_SPELLFAIL) {
+			Actor *actor = area->GetActorByGlobalID(Caster);
+			if (actor) {
+				//name is the projectile's name
+				//for simplicity, we apply a spell of the same name
+				core->ApplySpell(name, actor, actor, 0);
+			}
+		}
+	}
+
 	while(*poi) {
 		ieDword Target = (*poi)->GetGlobalID();
 
@@ -1068,7 +1080,7 @@ void Projectile::DrawExplosion(Region &screen)
 
 				if(apflags&APF_BOTH) {
 					if (delay) {
-					  delay = rand()%delay;
+						delay = rand()%delay;
 					}
 				}
 				if(ExtFlags&PEF_FREEZE) {

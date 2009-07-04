@@ -135,6 +135,8 @@
 #define APF_BOTH      64
 //more child projectiles
 #define APF_MORE      128
+//apply spell on caster if failed to find target
+#define APF_SPELLFAIL 256
 
 struct ProjectileExtension
 {
