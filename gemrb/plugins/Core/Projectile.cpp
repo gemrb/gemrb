@@ -320,8 +320,6 @@ void Projectile::Setup()
 		StaticTint(tmpColor[PALSIZE/2]);
 	}
 
-	core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, GEM_SND_RELATIVE);
-
 	CreateAnimations(travel, BAMRes1, Seq1);
 
 	if (TFlags&PTF_SHADOW) {
@@ -365,6 +363,7 @@ void Projectile::Setup()
 		SetBlend();
 	}
 	phase = P_TRAVEL;
+	core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, 0);
 
 	//create more projectiles
 	if(ExtFlags&PEF_ITERATION) {
@@ -505,6 +504,10 @@ void Projectile::EndTravel()
 	} else {
 		phase = P_EXPLODING1;
 	}
+
+	//this sound is played for projectiles waiting for trigger
+	//it is probably also played when a travel projectile ends its mission
+	core->GetAudioDrv()->Play(SoundRes2, Pos.x, Pos.y, 0);
 }
 
 void Projectile::AddTrail(ieResRef BAM, const ieByte *pal)
@@ -1001,13 +1004,17 @@ void Projectile::DrawExplosion(Region &screen)
 	
 	//draw it only once, at the time of explosion
 	if (phase==P_EXPLODING1) {
-		core->GetAudioDrv()->Play(Extension->SoundRes, Pos.x, Pos.y, GEM_SND_RELATIVE);
+		core->GetAudioDrv()->Play(Extension->SoundRes, Pos.x, Pos.y, 0);
 		//play VVC in center
 		if (Extension->AFlags&PAF_VVC) {
 			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
 			if (vvc) {
 				if (apflags & APF_VVCPAL) {
 					vvc->SetPalette(Extension->ExplColor);
+				}
+				//if the trail oriented, then the center is oriented too
+				if (ExtFlags&PEF_TRAIL) {
+					vvc->SetOrientation(Orientation);
 				}
 				vvc->XPos+=Pos.x;
 				vvc->YPos+=Pos.y;
@@ -1019,7 +1026,7 @@ void Projectile::DrawExplosion(Region &screen)
 		
 		phase=P_EXPLODING2;
 	} else {
-		core->GetAudioDrv()->Play(Extension->AreaSound, Pos.x, Pos.y, GEM_SND_RELATIVE);
+		core->GetAudioDrv()->Play(Extension->AreaSound, Pos.x, Pos.y, 0);
 	}
 	
 	//the spreading animation is in the first column
@@ -1054,7 +1061,6 @@ void Projectile::DrawExplosion(Region &screen)
 			Projectile *pro = server->CreateDefaultProjectile((unsigned int) ~0);
 			strnlwrcpy(pro->BAMRes1, tmp, sizeof(ieResRef) );
 			pro->SetEffects(NULL);
-			pro->Speed=Speed;
 			//calculate the child projectile's target point, it is either
 			//a perimeter or an inside point of the explosion radius
 			int rad = Extension->ExplosionRadius;
@@ -1074,10 +1080,16 @@ void Projectile::DrawExplosion(Region &screen)
 			newdest.x = (int) -(rad * sin(degree) );
 			newdest.y = (int) (rad * cos(degree) );
 			
+			pro->Speed=Speed;
 			if (apflags&APF_FILL) {
 				int delay;
-				delay = Extension->Delay*extension_explosioncount;
 
+				//a bit of difference in case crowding is needed
+				//make this a separate flag if speed difference
+				//is not always wanted 
+				pro->Speed-=rand()&7;
+
+				delay = Extension->Delay*extension_explosioncount;
 				if(apflags&APF_BOTH) {
 					if (delay) {
 						delay = rand()%delay;
@@ -1109,6 +1121,9 @@ void Projectile::DrawExplosion(Region &screen)
 			//random frame is needed only for some of these, make it an areapro flag?
 			if(ExtFlags&PEF_CYCLE) {
 				pro->ExtFlags|=PEF_CYCLE;  //random cycle
+				if(ExtFlags&PEF_RANDOM) {
+					pro->ExtFlags|=PEF_RANDOM;
+				}
 			} else {
 				pro->ExtFlags|=PEF_RANDOM; //random frame
 			}
