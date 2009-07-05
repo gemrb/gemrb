@@ -34,6 +34,15 @@ bool checkALError(const char* msg, const char* status) {
 	return false;
 }
 
+void showALCError(const char* msg, const char* status, ALCdevice *device) {
+	int error = alcGetError(device);
+	printMessage("OpenAL", msg, WHITE );
+	if (error != AL_NO_ERROR) {
+		printf (": %d ", error);
+	}
+	printStatus(status, YELLOW);
+}
+
 void AudioStream::ClearProcessedBuffers()
 {
 	ALint processed = 0;
@@ -98,6 +107,7 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 	memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
 	musicMutex = SDL_CreateMutex();
 	MusicReader = 0;
+	ambim = NULL;
 }
 
 bool OpenALAudioDriver::Init(void)
@@ -107,16 +117,19 @@ bool OpenALAudioDriver::Init(void)
 
 	device = alcOpenDevice (NULL);
 	if (device == NULL) {
+		showALCError("Failed to open device", "ERROR", device);
 		return false;
 	}
 
 	context = alcCreateContext (device, NULL);
 	if (context == NULL) {
+		showALCError("Failed to create context", "ERROR", device);
 		alcCloseDevice (device);
 		return false;
 	}
 
 	if (!alcMakeContextCurrent (context)) {
+		showALCError("Failed to select context", "ERROR", device);
 		alcDestroyContext (context);
 		alcCloseDevice (device);
 		return false;
@@ -167,6 +180,11 @@ int OpenALAudioDriver::CountAvailableSources(int limit)
 
 OpenALAudioDriver::~OpenALAudioDriver(void)
 {
+	if (!ambim) {
+		// initialisation must have failed
+		return;
+	}
+
 	for(int i =0; i<num_streams; i++) {
 		streams[i].ForceClear();
 	}
