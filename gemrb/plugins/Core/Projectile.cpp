@@ -119,7 +119,7 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 		return;
 	}
 
-	if(PEF_CYCLE && !Seq) {
+	if((ExtFlags&PEF_CYCLE) && !Seq) {
 		Seq=rand()%Max;
 	}
 
@@ -1075,6 +1075,9 @@ void Projectile::DrawExplosion(Region &screen)
 			//create a custom projectile with single traveling effect
 			Projectile *pro = server->CreateDefaultProjectile((unsigned int) ~0);
 			strnlwrcpy(pro->BAMRes1, tmp, sizeof(ieResRef) );
+			if (ExtFlags&PEF_TRAIL) {
+				pro->Aim = Aim;
+			}
 			pro->SetEffects(NULL);
 			//calculate the child projectile's target point, it is either
 			//a perimeter or an inside point of the explosion radius
