@@ -813,16 +813,22 @@ void Projectile::SecondaryTarget()
 				poi++;
 				continue;
 			}
-			double xdiff = Pos.x-(*poi)->Pos.x;
+			double xdiff = (*poi)->Pos.x-Pos.x;
 			double ydiff = Pos.y-(*poi)->Pos.y;
 			int deg;
 
+			//fixme: a dragon will definitely be easier to hit than a mouse
+			//nothing checks on the personal space of the possible target
+
+			//unsigned int dist = (unsigned int) sqrt(xdiff*xdiff+ydiff*ydiff);
+			//int width = (*poi)->GetAnims()->GetCircleSize();
+
 			if (ydiff) {
 				deg = (int) (atan(xdiff/ydiff)*180/M_PI);
-				if(ydiff<0) deg+=180;
+				if(ydiff>0) deg+=180;
 			} else {
-				if (xdiff<0) deg=0;
-				else deg = 180;
+				if (xdiff<0) deg=90;
+				else deg = 270;
 			}
 
 			//not in the right sector of circle
@@ -853,7 +859,6 @@ void Projectile::SecondaryTarget()
 		if (actor) {
 			//name is the projectile's name
 			//for simplicity, we apply a spell of the same name
-printf("applyspell: %s\n", name);
 			core->ApplySpell(name, actor, actor, 0);
 		}
 	}
@@ -1049,6 +1054,11 @@ void Projectile::DrawExplosion(Region &screen)
 			children = (Projectile **) calloc(sizeof(Projectile *), child_size);
 		}
 		
+		//zero cone width means single line area of effect
+		if(!Extension->ConeWidth) {
+			child_size=1;
+		}
+
 		int initial = child_size;
 		
 		for(int i=0;i<initial;i++) {
