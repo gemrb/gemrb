@@ -853,6 +853,7 @@ void Projectile::SecondaryTarget()
 		if (actor) {
 			//name is the projectile's name
 			//for simplicity, we apply a spell of the same name
+printf("applyspell: %s\n", name);
 			core->ApplySpell(name, actor, actor, 0);
 		}
 	}
