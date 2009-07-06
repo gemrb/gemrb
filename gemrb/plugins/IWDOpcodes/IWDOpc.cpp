@@ -30,6 +30,7 @@
 #include "../Core/Spell.h"
 #include "../Core/damages.h"
 #include "../Core/GSUtils.h"  //needs for displaystringcore
+#include "../Core/ProjectileServer.h" //needs for alter_animation
 #include "IWDOpc.h"
 
 static ieResRef *iwd_spell_hits = NULL;
@@ -159,6 +160,9 @@ static int fx_jackalwere_gaze (Actor* Owner, Actor* target, Effect* fx); //127
 //0x129 HideInShadows (same as bg2)
 static int fx_use_magic_device_modifier (Actor* Owner, Actor* target, Effect* fx);//12a
 
+//iwd related, gemrb specific effects (IE. unhardcoded hacks)
+static int fx_alter_animation (Actor *Owner, Actor *target, Effect* fx); //399
+
 //iwd2 specific effects
 static int fx_hopelessness (Actor* Owner, Actor* target, Effect* fx);//400
 static int fx_protection_from_evil (Actor* Owner, Actor* target, Effect* fx);//401
@@ -283,6 +287,8 @@ static EffectRef effectnames[] = {
 	{ "HarpyWail", fx_harpy_wail, -1}, //126
 	{ "JackalWereGaze", fx_jackalwere_gaze, -1}, //127
 	{ "UseMagicDeviceModifier", fx_use_magic_device_modifier, -1}, //12a
+	//unhardcoded hacks for IWD
+	{ "AlterAnimation", fx_alter_animation, -1}, //399
 	//iwd2 effects
 	{ "Hopelessness", fx_hopelessness, -1}, //400
 	{ "ProtectionFromEvil", fx_protection_from_evil, -1}, //401
@@ -2059,6 +2065,63 @@ int fx_use_magic_device_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_use_magic_device_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_MOD( IE_MAGICDEVICE );
 	return FX_APPLIED;
+}
+
+//GemRB specific IWD related effects
+
+//This code is needed for the ending cutscene in IWD (found in a projectile)
+//The effect will alter the target animation's cycle by a xor value
+//Parameter1: the value to binary xor on the initial cycle numbers of the animation(s)
+//Parameter2: an optional projectile (IWD spell hit projectiles start at 0x1001)
+//Resource: the animation's name
+
+//Useful applications other than the HoW cutscene:
+//A fireball could affect environment by applying the effect on certain animations
+//all you need to do:
+//Name the area animation as 'burnable'.
+//Create alternate cycles for the altered area object
+//Create a spell hit animation (optionally)
+//Create the effect which will contain the spell hit projectile and the cycle change command
+int fx_alter_animation (Actor* Owner, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_alter_animation (%2d)\n", fx->Opcode);
+	Map *map = Owner->GetCurrentArea();
+	if (!map) {
+		return FX_NOT_APPLIED;
+	}
+
+	aniIterator iter = map->GetFirstAnimation();
+	while(AreaAnimation *an = map->GetNextAnimation(iter) ) {
+		//Only animations with 8 letters could be used, no problem, iwd uses 8 letters
+		if (!strnicmp (an->Name, fx->Resource, 8) ) {
+			//play spell hit animation
+			Projectile *pro=core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
+			pro->SetCaster(Owner->GetGlobalID());
+			map->AddProjectile(pro, an->Pos, an->Pos);
+			//alter animation, we need only this for the original, but in the
+			//spirit of unhardcoding, i provided the standard modifier codeset
+			//0->4, 1->5, 2->6, 3->7
+			//4->0, 5->1, 6->2, 7->3
+			ieWord value = fx->Parameter1>>16;
+			switch(fx->Parameter1&0xffff) {
+				case BM_SET:
+					an->sequence=value;
+					break;
+				case BM_OR:
+					an->sequence|=value;
+					break;
+				case BM_NAND:
+					an->sequence&=~value;
+					break;
+				case BM_XOR:
+					an->sequence^=value;
+					break;
+			}
+			an->frame=0;
+			an->InitAnimation();
+		}
+	}
+	return FX_NOT_APPLIED;
 }
 
 //IWD2 effects
