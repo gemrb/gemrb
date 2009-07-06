@@ -782,6 +782,8 @@ void Projectile::LineTarget()
 //secondary projectiles target all in the explosion radius
 void Projectile::SecondaryTarget()
 {
+	//fail will become true if the projectile utterly failed to find a target
+	bool fail= !!(Extension->APFlags&APF_SPELLFAIL);
 	int mindeg = 0;
 	int maxdeg = 0;
 
@@ -795,16 +797,6 @@ void Projectile::SecondaryTarget()
 	int radius = Extension->ExplosionRadius;
 	Actor **actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	Actor **poi=actors;
-	if (!*poi) {
-		if(Extension->APFlags&APF_SPELLFAIL) {
-			Actor *actor = area->GetActorByGlobalID(Caster);
-			if (actor) {
-				//name is the projectile's name
-				//for simplicity, we apply a spell of the same name
-				core->ApplySpell(name, actor, actor, 0);
-			}
-		}
-	}
 
 	while(*poi) {
 		ieDword Target = (*poi)->GetGlobalID();
@@ -844,6 +836,7 @@ void Projectile::SecondaryTarget()
 		pro->SetCaster(Caster);
 		area->AddProjectile(pro, Pos, Target);
 		poi++;
+		fail=false;
 
 		//we already got one target affected in the AOE, this flag says
 		//that was enough
@@ -852,6 +845,17 @@ void Projectile::SecondaryTarget()
 		}
 	}
 	free(actors);
+
+	//In case of utter failure, apply a spell of the same name on the caster
+	//this feature is used by SCHARGE, PRTL_OP and PRTL_CL in the HoW pack
+	if(fail) {
+		Actor *actor = area->GetActorByGlobalID(Caster);
+		if (actor) {
+			//name is the projectile's name
+			//for simplicity, we apply a spell of the same name
+			core->ApplySpell(name, actor, actor, 0);
+		}
+	}
 }
 
 int Projectile::Update()
