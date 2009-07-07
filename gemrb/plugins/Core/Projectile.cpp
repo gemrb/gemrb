@@ -1055,8 +1055,8 @@ void Projectile::DrawExplosion(Region &screen)
 		}
 		
 		//zero cone width means single line area of effect
-		if(!Extension->ConeWidth) {
-			child_size=1;
+		if((Extension->AFlags&PAF_CONE) && !Extension->ConeWidth) {
+			child_size = 1;
 		}
 
 		int initial = child_size;
