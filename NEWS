@@ -1,9 +1,17 @@
-GemRB svn (6624):
+GemRB svn (6724):
   New features:
     - 
+    - the null sound plugin is now always loaded last by default; for old
+      installs see the provided configuration example (DelayPlugin)
+    - many IE's hardcoded projectiles for BG1 and HoW, spell hit projectiles,
+      projectile trails, projectile failure (spell)
 
   Improved features:
     - 
+    - projectiles
+    - pathfinding and worldmap travel
+    - combat
+    - actions and triggers
     - various guiscripts
     - bugfixes
 
