@@ -119,7 +119,7 @@ ENDMACRO(ADD_GEMRB_PLUGIN)
 
 #gemrb overrides macro
 MACRO(ADD_GEMRB_OVERRIDE game_name)
-FILE( GLOB FILES_TO_INSTALL *.2da *.bmp *.ini *.chu *.ids *.bcs *.vvc *.mos *.spl *.wav )
+FILE( GLOB FILES_TO_INSTALL *.2da *.bmp *.ini *.chu *.ids *.bcs *.vvc *.mos *.spl *.wav *.pro)
 INSTALL( FILES ${FILES_TO_INSTALL} DESTINATION ${OVERRIDE_INSTALL_DIR}/${game_name} )
 ENDMACRO(ADD_GEMRB_OVERRIDE )
 
