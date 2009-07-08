@@ -2,7 +2,13 @@ cmake_minimum_required(VERSION 2.4.4)
 if(COMMAND cmake_policy)
       cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
+
 PROJECT(GemRB)
+
+IF(PREFIX)
+  SET(PREFIX CACHE PATH "Abbreviation for CMAKE_INSTALL_PREFIX.")
+  SET(CMAKE_INSTALL_PREFIX ${PREFIX})
+ENDIF(PREFIX)
 
 IF( NOT PLUGIN_INSTALL_DIR )
  SET( PLUGIN_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/plugins )
@@ -109,7 +115,7 @@ ENDIF(VORBIS_LIBRARY)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
-#Plugin addtion macro
+#Plugin addition macro
 MACRO(ADD_GEMRB_PLUGIN plugin_name)
 ADD_LIBRARY(${plugin_name} MODULE ${ARGN})
 IF(WIN32)
