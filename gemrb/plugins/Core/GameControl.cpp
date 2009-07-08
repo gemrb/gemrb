@@ -722,8 +722,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 
 			case 'c': //force cast a hardcoded spell
-				  //caster is the last selected actor
-				  //target is the door/actor currently under the pointer
+				//caster is the last selected actor
+				//target is the door/actor currently under the pointer
 				if (game->selected.size() > 0) {
 					Actor *src = game->selected[0];
 					Scriptable *target = lastActor;
@@ -1863,7 +1863,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			if (game->selected.size()==1) {
 				Actor *source;
 				source = core->GetFirstSelectedPC(false);
-				TryToCast(source, actor);
+				if(source) {
+					TryToCast(source, actor);
+				}
 			}
 			break;
 		case ACT_DEFEND:
@@ -1875,7 +1877,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			if (game->selected.size()==1) {
 				Actor *source;
 				source = core->GetFirstSelectedPC(false);
-				TryToPick(source, actor);
+				if(source) {
+					TryToPick(source, actor);
+				}
 			}
 			break;
 	}

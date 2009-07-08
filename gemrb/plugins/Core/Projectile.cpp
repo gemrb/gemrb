@@ -1099,6 +1099,8 @@ void Projectile::DrawExplosion(Region &screen)
 			newdest.y = (int) (rad * cos(degree) );
 			
 			pro->Speed=Speed;
+			//these flags are always inherited
+			pro->ExtFlags=ExtFlags&(PEF_HALFTRANS|PEF_CYCLE);
 			if (apflags&APF_FILL) {
 				int delay;
 
@@ -1137,13 +1139,8 @@ void Projectile::DrawExplosion(Region &screen)
 			//i'm unsure if we need blending for all anims or just the tinted ones
 			pro->TFlags|=PTF_BLEND;
 			//random frame is needed only for some of these, make it an areapro flag?
-			if(ExtFlags&PEF_CYCLE) {
-				pro->ExtFlags|=PEF_CYCLE;  //random cycle
-				if(ExtFlags&PEF_RANDOM) {
-					pro->ExtFlags|=PEF_RANDOM;
-				}
-			} else {
-				pro->ExtFlags|=PEF_RANDOM; //random frame
+			if( !(ExtFlags&PEF_CYCLE) || (ExtFlags&PEF_RANDOM) ) {
+				pro->ExtFlags|=PEF_RANDOM;
 			}
 			pro->Setup();
 			children[i]=pro;
