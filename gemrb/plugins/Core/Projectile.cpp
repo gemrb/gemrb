@@ -291,6 +291,10 @@ void Projectile::Setup()
 		}
 	}
 
+	if(Shake) {
+		core->timer->SetScreenShake( Shake, Shake, Shake);
+	}
+
 	if(ExtFlags&(PEF_FALLING|PEF_INCOMING) ) {
 		if (ExtFlags&PEF_FALLING) {
 			Pos.x=Destination.x;
@@ -431,6 +435,11 @@ void Projectile::Payload()
 		}
 	}
 	if (target) {
+		if(ExtFlags&PEF_RGB) {
+			target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
+			  RGB >> 8, RGB >> 16, RGB >> 24);
+		}
+
 		effects->AddAllEffects(target, Destination);
 	}
 	delete effects;
@@ -772,6 +781,11 @@ void Projectile::LineTarget()
 			if (res>0) {
 				EffectQueue *eff = effects->CopySelf();
 				eff->SetOwner(original);
+			  if(ExtFlags&PEF_RGB) {
+			    target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
+			      RGB >> 8, RGB >> 16, RGB >> 24);
+			  }
+
 				effects->AddAllEffects(target, target->Pos);
 			}
 		}
@@ -1098,9 +1112,12 @@ void Projectile::DrawExplosion(Region &screen)
 			newdest.x = (int) -(rad * sin(degree) );
 			newdest.y = (int) (rad * cos(degree) );
 			
-			pro->Speed=Speed;
-			//these flags are always inherited
-			pro->ExtFlags=ExtFlags&(PEF_HALFTRANS|PEF_CYCLE);
+			//these fields and flags are always inherited by all children
+			pro->Speed = Speed;
+			pro->ExtFlags = ExtFlags&(PEF_HALFTRANS|PEF_CYCLE|PEF_RGB);
+			pro->RGB = RGB;
+			pro->ColorSpeed = ColorSpeed;
+
 			if (apflags&APF_FILL) {
 				int delay;
 

@@ -99,6 +99,7 @@
 #define PEF_TEXT       0x100000//display text during setup
 #define PEF_WANDERING  0x200000//random movement (no real path)
 #define PEF_CYCLE      0x400000//random cycle
+#define PEF_RGB        0x800000//rgb pulse on hit
 
 //projectile area flags
 #define PAF_VISIBLE    1     //the travel projectile is visible until explosion
@@ -175,6 +176,9 @@ public:
 	ieDword SparkColor;
 	ieDword ExtFlags;
 	ieDword StrRef;
+	ieDword RGB;
+	ieWord ColorSpeed;
+	ieWord Shake;
 	////// gap
 	ieDword TFlags;
 	ieResRef BAMRes1;
