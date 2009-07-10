@@ -33,12 +33,9 @@
 #include "../Core/ProjectileServer.h" //needs for alter_animation
 #include "IWDOpc.h"
 
-static ieResRef *iwd_spell_hits = NULL;
-
 static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
 
 static bool enhanced_effects = false;
-static int shcount = -1;
 //a scripting object for enemy (used for enemy in line of sight check)
 static Trigger *Enemy = NULL;
 //a list of projectiles Entropy Shield protects against
@@ -643,40 +640,23 @@ int fx_fade_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xe9 IWDVisualSpellHit
-int fx_iwd_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_iwd_visual_spell_hit (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_iwd_visual_spell_hit (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	if (shcount<0) {
-		shcount = core->ReadResRefTable("iwdshtab",iwd_spell_hits);
-	}
-	
 	//remove effect if there is no current area
 	Map *map = target->GetCurrentArea();
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
-	if (fx->Parameter2<(ieDword) shcount) {
-		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(iwd_spell_hits[fx->Parameter2], false);
-		//remove effect if there is no animation
-		if (!sca) {
-			return FX_NOT_APPLIED;
-		}
-		if (fx->Parameter1) {
-			sca->XPos+=target->Pos.x;
-			sca->YPos+=target->Pos.y;
+	Point pos(fx->PosX,fx->PosY);
+	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(0x1001+fx->Parameter2);
+	if (Owner) {
+		pro->SetCaster(Owner->GetGlobalID());
+		if (target) {
+			map->AddProjectile( pro, pos, target->GetGlobalID());  
 		} else {
-			sca->XPos+=fx->PosX;
-			sca->YPos+=fx->PosY;
+			map->AddProjectile( pro, pos, pos);  
 		}
-		if (fx->Parameter2<32) {
-			int tmp = fx->Parameter2>>2;
-			if (tmp) {
-				sca->SetFullPalette(tmp);
-			}
-		}
-		sca->SetBlend();
-		sca->PlayOnce();
-		map->AddVVCell(sca);
 	}
 	return FX_NOT_APPLIED;
 }

@@ -29,7 +29,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define MAX_PROJ_IDX  1023
+#define MAX_PROJ_IDX  0x1fff
 
 ProjectileServer::ProjectileServer()
 {
