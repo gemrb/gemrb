@@ -2447,6 +2447,13 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	//the target was converted to a point
+	if(!Sender->LastTargetPos.isempty()) {
+		Sender->CastSpellPointEnd( spellres );
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	//parse target
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
@@ -2476,7 +2483,7 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 	Sender->CastSpell( spellres, tar, true );
 
 	//if target was set, feed action back
-	if (!Sender->LastTarget) {
+	if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -2521,7 +2528,7 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 	Sender->CastSpellPoint( spellres, parameters->pointParameter, true );
 
 	//if target was set, feed action back
-	if (Sender->LastTargetPos.isempty()) {
+	if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -2546,6 +2553,13 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	//the target was converted to a point
+	if(!Sender->LastTargetPos.isempty()) {
+		Sender->CastSpellPointEnd( spellres );
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	//parse target
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
@@ -2563,7 +2577,7 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 	Sender->CastSpell( spellres, tar, false );
 
 	//if target was set, feed action back
-	if (!Sender->LastTarget) {
+	if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
 		Sender->ReleaseCurrentAction();
 	}
 }
@@ -2622,6 +2636,13 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	//the target was converted to a point
+	if(!Sender->LastTargetPos.isempty()) {
+		Sender->CastSpellPointEnd( spellres );
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	//parse target
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
@@ -2639,7 +2660,7 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	Sender->CastSpell (spellres, tar, false);
 
 	//if target was set, feed action back
-	if (!Sender->LastTarget) {
+	if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
 		Sender->ReleaseCurrentAction();
 	}
 }
