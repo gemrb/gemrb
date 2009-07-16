@@ -3145,7 +3145,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 	}
 
 	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO);
-	int tmp = spell->SpellNameIdentified;
+	int tmp = spell->SpellName;
 	if (flags&LS_LEARN) {
 		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(tmp));
 		switch (spell->SpellType) {
