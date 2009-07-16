@@ -173,7 +173,8 @@
 #define STR_DMG_COLD 139
 #define STR_DMG_ACID 140
 #define STR_DMG_OTHER 141
+#define STR_GOTQUESTXP 142
 
-#define STRREF_COUNT 142
+#define STRREF_COUNT 143
 
 #endif //! IE_STRINGS_H
