@@ -328,7 +328,7 @@ IDS
 427	ExecutionerEyes
 428	Death3
 429	EffectsOnStruck
-430	EffectsOnProjectile
+430	ProjectileUseEffectList
 431	EnergyDrain
 432	TortoiseShell
 433	Blink

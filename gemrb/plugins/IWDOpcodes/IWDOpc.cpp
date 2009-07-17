@@ -8,7 +8,7 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
@@ -29,7 +29,7 @@
 #include "../Core/Game.h"
 #include "../Core/Spell.h"
 #include "../Core/damages.h"
-#include "../Core/GSUtils.h"  //needs for displaystringcore
+#include "../Core/GSUtils.h" //needs for displaystringcore
 #include "../Core/ProjectileServer.h" //needs for alter_animation
 #include "IWDOpc.h"
 
@@ -178,7 +178,7 @@ static int fx_visual_effect_iwd2 (Actor* Owner, Actor* target, Effect* fx); //41
 static int fx_resilient_sphere (Actor* Owner, Actor* target, Effect* fx); //414
 static int fx_barkskin (Actor* Owner, Actor* target, Effect* fx); //415
 static int fx_bleeding_wounds (Actor* Owner, Actor* target, Effect* fx); //416
-static int fx_area_effect  (Actor* Owner, Actor* target, Effect* fx); //417
+static int fx_area_effect (Actor* Owner, Actor* target, Effect* fx); //417
 static int fx_free_action_iwd2 (Actor* Owner, Actor* target, Effect* fx); //418
 static int fx_unconsciousness (Actor* Owner, Actor* target, Effect* fx); //419
 //420 Death2 (same as 0xd)
@@ -191,7 +191,7 @@ static int fx_aegis (Actor* Owner, Actor* target, Effect* fx); //426
 static int fx_executioner_eyes (Actor* Owner, Actor* target, Effect* fx); //427
 //428 DeathMagic (same as 0xd)
 //429
-//430
+static int fx_projectile_use_effect_list (Actor* Owner, Actor* target, Effect* fx); //430
 static int fx_energy_drain (Actor* Owner, Actor* target, Effect* fx); //431
 static int fx_tortoise_shell (Actor* Owner, Actor* target, Effect* fx); //432
 static int fx_blink (Actor* Owner, Actor* target, Effect* fx); //433
@@ -254,7 +254,7 @@ static EffectRef effectnames[] = {
 	{ "SummonPomab", fx_summon_pomab, -1}, //106
 	{ "ControlUndead", fx_control_undead, -1}, //107
 	{ "StaticCharge", fx_static_charge, -1}, //108
-	{ "CloakOfFear", fx_cloak_of_fear, -1}, //109 how/iwd2  
+	{ "CloakOfFear", fx_cloak_of_fear, -1}, //109 how/iwd2
 	{ "RemoveConfusion", fx_remove_confusion, -1},//10b
 	{ "EyeOfTheMind", fx_eye_of_the_mind, -1}, //10c
 	{ "EyeOfTheSword", fx_eye_of_the_sword, -1}, //10d
@@ -313,6 +313,7 @@ static EffectRef effectnames[] = {
 	{ "ControlUndead2", fx_control_undead, -1}, //425
 	{ "Aegis", fx_aegis, -1}, //426
 	{ "ExecutionerEyes", fx_executioner_eyes, -1}, //427
+	{ "ProjectileUseEffectList", fx_projectile_use_effect_list, -1}, //430
 	{ "EnergyDrain", fx_energy_drain, -1}, //431
 	{ "TortoiseShell", fx_tortoise_shell, -1}, //432
 	{ "Blink", fx_blink, -1},//433
@@ -593,7 +594,7 @@ int fx_draw_upon_holy_might (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-//0xda IronSkins (iwd2) 
+//0xda IronSkins (iwd2)
 //This is about damage reduction, not full stoneskin like in bg2
 int fx_ironskins (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -643,20 +644,21 @@ int fx_fade_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_iwd_visual_spell_hit (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_iwd_visual_spell_hit (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (!Owner) {
+		return FX_NOT_APPLIED;
+	}
 	//remove effect if there is no current area
-	Map *map = target->GetCurrentArea();
+	Map *map = Owner->GetCurrentArea();
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
 	Point pos(fx->PosX,fx->PosY);
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(0x1001+fx->Parameter2);
-	if (Owner) {
-		pro->SetCaster(Owner->GetGlobalID());
-		if (target) {
-			map->AddProjectile( pro, pos, target->GetGlobalID());  
-		} else {
-			map->AddProjectile( pro, pos, pos);  
-		}
+	pro->SetCaster(Owner->GetGlobalID());
+	if (target) {
+		map->AddProjectile( pro, pos, target->GetGlobalID());
+	} else {
+		map->AddProjectile( pro, pos, pos);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -768,7 +770,7 @@ int fx_slow_poison (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-#define IWD_MSC  13
+#define IWD_MSC 13
 ieResRef iwd_monster_2da[IWD_MSC]={"MSUMMO1","MSUMMO2","MSUMMO3","MSUMMO4",
  "MSUMMO5","MSUMMO6","MSUMMO7","ASUMMO1","ASUMMO2","ASUMMO3","CDOOM","GINSECT",
  "MSUMMOM"};
@@ -824,7 +826,7 @@ int fx_vampiric_touch (Actor* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-#define IWD_AD  2
+#define IWD_AD 2
 ieResRef animate_dead_2da[IWD_AD]={"ADEAD","ADEADL"};
 
 //0xf3 AnimateDead
@@ -859,7 +861,7 @@ int fx_prayer (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_prayer (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	ieDword value;
-	
+
 	if (fx->Parameter2)
 	{
 		if (target->SetSpellState(SS_BADPRAYER)) return FX_NOT_APPLIED;
@@ -882,7 +884,7 @@ int fx_prayer (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_SAVEVSSPELL, value);
 	return FX_APPLIED;
 }
-//0xf5 
+//0xf5
 int fx_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_curse (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -966,7 +968,7 @@ int fx_burning_blood2 (Actor* Owner, Actor* target, Effect* fx)
 	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
 	}
-	
+
 	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
@@ -1020,7 +1022,7 @@ int fx_recitation (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_recitation (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	ieDword value;
-	
+
 	if (fx->Parameter2)
 	{
 		if (target->SetSpellState(SS_BADRECIT)) return FX_NOT_APPLIED;
@@ -1166,7 +1168,7 @@ int fx_umberhulk_gaze (Actor* Owner, Actor* target, Effect* fx)
 
 	//build effects to apply
 	Effect * newfx1, *newfx2;
-		
+
 	newfx1 = EffectQueue::CreateEffectCopy(fx, fx_confusion_ref, 0, 0);
 	newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	newfx1->Duration = fx->Parameter1;
@@ -1183,7 +1185,7 @@ int fx_umberhulk_gaze (Actor* Owner, Actor* target, Effect* fx)
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
 		if (PersonalDistance(target, victim)>20) continue;
-		
+
 		//check if target is golem/umber hulk/minotaur, the effect is not working
 		if (check_iwd_targeting(Owner, victim, 0, 17)) { //umber hulk
 			continue;
@@ -1241,7 +1243,7 @@ int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx)
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
 		if (PersonalDistance(target, victim)>20) continue;
-		
+
 		//check if target is golem/umber hulk/minotaur, the effect is not working
 		if (check_iwd_targeting(Owner, victim, 0, 27)) { //golem
 			continue;
@@ -1252,7 +1254,7 @@ int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx)
 
 		//apply a panic opcode on target (0x18)
 		core->ApplyEffect(newfx1, Owner, victim);
-		
+
 		//apply a resource resistance against this spell to block flood
 		core->ApplyEffect(newfx2, Owner, victim);
 	}
@@ -1318,7 +1320,7 @@ int fx_summon_pomab (Actor* Owner, Actor* target, Effect* fx)
 
 	int real = core->Roll(1,6,-1);
 
-	for (int i=0;i<6;i++) {    
+	for (int i=0;i<6;i++) {
 		core->SummonCreature(real==i?pomab_resref[0]:pomab_resref[1], fx->Resource2, Owner,
 			target, pomab_positions[i], -1, 100);
 	}
@@ -1359,7 +1361,7 @@ int fx_control_undead (Actor* Owner, Actor* target, Effect* fx)
 			break;
 		}
 	}
-	
+
 	STATE_SET( STATE_CHARMED );
 	STAT_SET( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
 	//don't stick if permanent
@@ -1416,7 +1418,7 @@ int fx_cloak_of_fear(Actor* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	//timing (set up next fire)  
+	//timing (set up next fire)
 	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
 	fx->Duration=core->GetGame()->GameTime+3*15;
 	fx->Parameter1--;
@@ -1464,7 +1466,7 @@ int fx_eye_of_the_mind (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_eye_of_the_mind (%2d)\n", fx->Opcode );
 	if (target->SetSpellState( SS_EYEMIND)) return FX_APPLIED;
 	EXTSTATE_SET(EXTSTATE_EYE_MIND);
-	
+
 	if (fx->FirstApply) {
 		target->LearnSpell(SevenEyes[EYE_MIND], LS_MEMO);
 	}
@@ -1716,7 +1718,7 @@ int fx_turn_undead (Actor* Owner, Actor* target, Effect* fx)
 //0x118 TurnUndead2 iwd2
 int fx_turn_undead2 (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_turn_undead2 (%2d): Level: %d  Type %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_turn_undead2 (%2d): Level: %d Type %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	switch (fx->Parameter2)
 	{
 	case 0: //command
@@ -1806,7 +1808,7 @@ int fx_mace_of_disruption (Actor* Owner, Actor* target, Effect* fx)
 		case 156: // outsider
 			chance = 5;
 			break;
-		case 108: case 115: case 167:  //ghoul, skeleton, undead
+		case 108: case 115: case 167: //ghoul, skeleton, undead
 			switch (STAT_GET(IE_LEVEL)) {
 			case 1: case 2: case 3: case 4:
 				chance = 100;
@@ -2578,7 +2580,7 @@ int fx_aegis (Actor* /*Owner*/, Actor* target, Effect* fx)
 	//0x9d web
 	//0x6d hold
 	//0x28 slow
-	
+
 	if (target->SetSpellState( SS_AEGIS)) return FX_APPLIED;
 	//deflection AC bonus
 	//
@@ -2608,7 +2610,7 @@ int fx_aegis (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter1>tmp) {
 		STAT_SET(IE_STONESKINS, fx->Parameter1);
 	}
-	
+
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_AEGIS);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x80, 0x60, 0x60);
@@ -2639,6 +2641,34 @@ int fx_executioner_eyes (Actor* /*Owner*/, Actor* target, Effect* fx)
 //429 WhenStruckUseEffectList
 
 //430 ProjectileUseEffectList
+int fx_projectile_use_effect_list (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_projectile_use_effect_list (%2d) Type: %d Spell:%s\n", fx->Opcode, fx->Parameter2, fx->Resource);
+
+	if (!Owner) {
+		return FX_NOT_APPLIED;
+	}
+	Map *map = Owner->GetCurrentArea();
+	if (!map) {
+		return FX_NOT_APPLIED;
+	}
+	Spell* spl = gamedata->GetSpell( fx->Resource );
+	//create projectile from known spellheader
+	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
+	
+	if (pro) {
+		pro->SetEffects(spl->GetEffectBlock(0));
+		pro->SetCaster(Owner->GetGlobalID());
+		Point origin(fx->PosX, fx->PosY);
+		pro->SetCaster(Owner->GetGlobalID());
+		if (target) {
+			map->AddProjectile( pro, origin, target->GetGlobalID());
+		} else {
+			map->AddProjectile( pro, origin, origin);
+		}
+	}
+	return FX_NOT_APPLIED;
+}
 
 //431 EnergyDrain
 
