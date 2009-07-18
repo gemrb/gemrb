@@ -138,28 +138,41 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 	if(Type<0xff) {
 		ieResRef const *res;
 
+		//fill the spread field according to the hardcoded explosion type
 		res = GetExplosion(Type,0);
 		if(res) {
 			strnuprcpy(pro->Extension->Spread,*res,sizeof(ieResRef));
 		}
+	
+		//if the hardcoded explosion type has a center animation
+		//override the VVC animation field with it
 		res = GetExplosion(Type,1);
 		if(res) {
+			pro->Extension->AFlags|=PAF_VVC;
 			strnuprcpy(pro->Extension->VVCRes,*res,sizeof(ieResRef));
 		}
+
+		//fill the secondary spread field out
 		res = GetExplosion(Type,2);
 		if(res) {
 			strnuprcpy(pro->Extension->Secondary,*res,sizeof(ieResRef));
 		}
+
+		//the explosion sound, used for the first explosion
+		//(overrides an original field)
 		res = GetExplosion(Type,3);
 		if(res) {
 			strnuprcpy(pro->Extension->SoundRes,*res,sizeof(ieResRef));
 		}
+
+		//the area sound (used for subsequent explosions)
 		res = GetExplosion(Type,4);
 		if(res) {
 			strnuprcpy(pro->Extension->AreaSound,*res,sizeof(ieResRef));
 		}
-		pro->Extension->APFlags = GetExplosionFlags(Type);
 
+		//fill the explosion/spread animation flags
+		pro->Extension->APFlags = GetExplosionFlags(Type);
 	}
 	core->FreeInterface( sm );
 

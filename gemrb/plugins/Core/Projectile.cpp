@@ -1132,9 +1132,10 @@ void Projectile::DrawExplosion(Region &screen)
 						delay = rand()%delay;
 					}
 				}
-				if(ExtFlags&PEF_FREEZE) {
+				//this needs to be commented out for ToB horrid wilting
+				//if(ExtFlags&PEF_FREEZE) {
 					delay += Extension->Delay;
-				}
+				//}
 				pro->SetDelay(delay);
 			}
 			
