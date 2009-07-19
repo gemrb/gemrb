@@ -1958,7 +1958,7 @@ bool Interface::LoadConfig(const char* filename)
 		fseek( config, -1, SEEK_CUR );
 		memset(value,'\0',_MAX_PATH + 3);
 		//the * element is not counted
-		if (fscanf( config, "%64[^=]=%[^\r\n]%*[\r\n]", name, value )!=2)
+		if (fscanf( config, "%64[^= ] = %[^\r\n]%*[\r\n]", name, value )!=2)
 			continue;
 		for (int i=_MAX_PATH + 2; i > 0; i--) {
 			if (value[i] == '\0') continue;
