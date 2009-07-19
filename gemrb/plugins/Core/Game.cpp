@@ -316,7 +316,7 @@ int Game::JoinParty(Actor* actor, int join)
 {
 	bool startorient = 0;
 	actor->CreateStats(); //create stats if they didn't exist yet
-	actor->InitButtons(actor->GetStat(IE_CLASS)); //init actor's buttons
+	actor->InitButtons(actor->GetStat(IE_CLASS), false); //init actor's buttons
 	actor->SetBase(IE_EXPLORE, 1);
 	if (join&JP_INITPOS) {
 		AutoTable strta("startpos");

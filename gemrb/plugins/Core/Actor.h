@@ -538,7 +538,9 @@ public:
 	void ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent);
 	/* If it returns true, then default AC=10 and the lesser the better */
 	int IsReverseToHit();
-	void InitButtons(ieDword cls);
+	/* initialize the action buttons based on class. If forced, it will override 
+           previously customized or set buttons. */
+	void InitButtons(ieDword cls, bool forced);
 	void SetFeat(unsigned int feat, int mode);
 	int GetFeat(unsigned int feat) const;
 	void SetUsedWeapon(const char *AnimationType, ieWord *MeleeAnimation,

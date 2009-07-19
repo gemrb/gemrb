@@ -633,7 +633,7 @@ void pcf_level (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 
 void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
-	actor->InitButtons(actor->Modified[IE_CLASS]);
+	actor->InitButtons(actor->Modified[IE_CLASS], false);
 }
 
 void pcf_animid(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
@@ -4458,9 +4458,7 @@ void Actor::SetActionButtonRow(ActionButtonRow &ar)
 //the first 3 buttons are untouched by this function
 void Actor::GetActionButtonRow(ActionButtonRow &ar)
 {
-	if (PCStats->QSlots[0]==0xff) {
-		InitButtons(GetStat(IE_CLASS));
-	}
+	InitButtons(GetStat(IE_CLASS), false);
 	for(int i=0;i<GUIBT_COUNT-3;i++) {
 		ieByte tmp=PCStats->QSlots[i];
 		if (QslotTranslation) {
@@ -4822,11 +4820,15 @@ int Actor::IsReverseToHit()
 	return ReverseToHit;
 }
 
-void Actor::InitButtons(ieDword cls)
+void Actor::InitButtons(ieDword cls, bool forced)
 {
 	if (!PCStats) {
 		return;
 	}
+	if ( (PCStats->QSlots[0]!=0xff) && !forced) {
+		return;
+	}
+
 	ActionButtonRow myrow;
 	if ((int) cls >= classcount) {
 		memcpy(&myrow, &DefaultButtons, sizeof(ActionButtonRow));
