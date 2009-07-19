@@ -73,11 +73,13 @@ bool MUSImp::OpenPlaylist(const char* name)
 #ifndef WIN32
 	ResolveFilePath( path );
 #endif
+	printMessage("MUSImporter", "", WHITE);
+	printf( "Loading %s...", path );
 	if (!str->Open( path, true )) {
-		printf( "%s [NOT FOUND]\n", path );
+		printStatus("NOT FOUND", LIGHT_RED );
 		return false;
 	}
-	printf( "Loading %s\n", name );
+	printStatus("FOUND", LIGHT_GREEN );
 	int c = str->ReadLine( PLName, 32 );
 	while (c > 0) {
 		if (( PLName[c - 1] == ' ' ) || ( PLName[c - 1] == '\t' ))
