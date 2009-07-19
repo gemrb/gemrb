@@ -27,11 +27,6 @@
 #include "Actor.h"
 #include "Projectile.h"
 
-static ieResRef *spelllist = NULL;
-static ieResRef *innatelist = NULL;
-static ieResRef *songlist = NULL;
-static ieResRef *shapelist = NULL;
-
 static bool SBInitialized = false;
 static int NUM_BOOK_TYPES = 3;
 static bool IWD2Style = false;
@@ -41,53 +36,6 @@ static const int spelltypes[NUM_SPELL_TYPES]={
 	IE_SPELL_TYPE_INNATE, IE_SPELL_TYPE_WIZARD, IE_SPELL_TYPE_PRIEST,
 	IE_SPELL_TYPE_WIZARD, IE_SPELL_TYPE_INNATE, IE_SPELL_TYPE_SONG
 };
-
-/* temporarily out
-static ieResRef *ResolveSpellName(ieDword index)
-{
-	if (spelllist) {
-		return spelllist+index;
-	}
-	return NULL;
-}
-
-static ieResRef *ResolveInnateName(ieDword index)
-{
-	if (innatelist) {
-		return innatelist+index;
-	}
-	return NULL;
-}
-
-static ieResRef *ResolveSongName(ieDword index)
-{
-	if (songlist) {
-		return songlist+index;
-	}
-	return NULL;
-}
-
-static ieResRef *ResolveShapeName(ieDword index)
-{
-	if (shapelist) {
-		return shapelist+index;
-	}
-	return NULL;
-}
-*/
-static ieResRef *GetSpellTable(const ieResRef tableresref, int column)
-{
-	AutoTable tab(tableresref);
-	if (!tab)
-		return 0;
-
-	int count = tab->GetRowCount();
-	ieResRef *reslist = (ieResRef *) malloc (sizeof(ieResRef) * count);
-	for(int i = 0; i<count;i++) {
-		strnlwrcpy(reslist[i], tab->QueryField(i, column), 8);
-	}
-	return reslist;
-}
 
 Spellbook::Spellbook()
 {
@@ -102,10 +50,6 @@ void Spellbook::InitializeSpellbook()
 	if (!SBInitialized) {
 		SBInitialized=true;
 		if (core->HasFeature(GF_HAS_SPELLLIST)) {
-			spelllist = GetSpellTable("listspll",7); //this is fucked up
-			innatelist = GetSpellTable("listinnt",0);
-			songlist = GetSpellTable("listsong",0);
-			shapelist = GetSpellTable("listshap",0);
 			NUM_BOOK_TYPES=NUM_IWD2_SPELLTYPES; //iwd2 spell types
 		} else {
 			NUM_BOOK_TYPES=NUM_SPELLTYPES; //bg/pst/iwd1 spell types
@@ -116,18 +60,6 @@ void Spellbook::InitializeSpellbook()
 
 void Spellbook::ReleaseMemory()
 {
-	if(spelllist) {
-		free(spelllist);
-		spelllist=NULL;
-	}
-	if(innatelist) {
-		free(innatelist);
-		innatelist=NULL;
-	}
-	if(songlist) {
-		free(songlist);
-		songlist=NULL;
-	}
 	SBInitialized=false;
 }
 
