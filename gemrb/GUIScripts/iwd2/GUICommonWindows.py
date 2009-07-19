@@ -212,13 +212,13 @@ def UpdateActionsWindow ():
 	if level == 0:
 		PortraitWindow.SetupControls (pc, 6)
 	elif level == 1:
-		PortraitWindow.SetupEquipmentIcons (pc, TopIndex)
+		PortraitWindow.SetupEquipmentIcons (pc, TopIndex, 6)
 	elif level == 2: #spells
 		GemRB.SetVar ("Type", 3)
-		PortraitWindow.SetupSpellIcons (pc, 3, TopIndex)
+		PortraitWindow.SetupSpellIcons (pc, 3, TopIndex, 6)
 	elif level == 3: #innates
 		GemRB.SetVar ("Type", 4)
-		PortraitWindow.SetupSpellIcons (pc, 4, TopIndex)
+		PortraitWindow.SetupSpellIcons (pc, 4, TopIndex, 6)
 	return
 
 def OpenFloatMenuWindow ():
