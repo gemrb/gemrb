@@ -158,6 +158,10 @@ public:
 	//returns the requested extended header
 	inline SPLExtHeader *GetExtHeader(unsigned int which) const
 	{
+		if (Flags & SF_SIMPLIFIED_DURATION) {
+			which = 0;
+		}
+
 		if(ExtHeaderCount<=which) {
 			return NULL;
 		}

@@ -27,6 +27,7 @@
 
 ITMExtHeader::ITMExtHeader(void)
 {
+	features = NULL;
 }
 
 ITMExtHeader::~ITMExtHeader(void)
@@ -36,11 +37,15 @@ ITMExtHeader::~ITMExtHeader(void)
 
 Item::Item(void)
 {
+	ext_headers = NULL;
+	equipping_features = NULL;
 }
 
 Item::~Item(void)
 {
-	core->FreeITMExt( ext_headers, equipping_features );
+	//core->FreeITMExt( ext_headers, equipping_features );
+	delete [] ext_headers;
+	delete [] equipping_features;
 }
 
 //-1 will return equipping feature block

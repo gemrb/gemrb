@@ -28,6 +28,7 @@
 
 SPLExtHeader::SPLExtHeader(void)
 {
+	features = NULL;
 }
 
 SPLExtHeader::~SPLExtHeader(void)
@@ -37,12 +38,16 @@ SPLExtHeader::~SPLExtHeader(void)
 
 Spell::Spell(void)
 {
-//	SpellIconBAM = NULL;
+	ext_headers = NULL;
+	casting_features = NULL;
 }
 
 Spell::~Spell(void)
 {
-	core->FreeSPLExt(ext_headers, casting_features);
+	//Spell is in the core, so this is not needed, i guess (Avenger)
+	//core->FreeSPLExt(ext_headers, casting_features);
+	delete [] ext_headers;
+	delete [] casting_features;
 }
 
 int Spell::GetHeaderIndexFromLevel(int level) const
