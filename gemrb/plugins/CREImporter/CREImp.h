@@ -88,10 +88,12 @@ private:
 	void GetActorBG(Actor *actor);
 	void GetActorIWD1(Actor *actor);
 	void GetActorIWD2(Actor *actor);
+	void GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, int count);
 	void ReadInventory(Actor*, unsigned int);
 	void ReadEffects(Actor* actor);
 	void GetEffect(Effect *fx);
 	void ReadScript(Actor *actor, int ScriptLevel);
+	void ReadDialog(Actor *actor);
 	CREKnownSpell* GetKnownSpell();
 	CRESpellMemorization* GetSpellMemorization();
 	CREMemorizedSpell* GetMemorizedSpell();

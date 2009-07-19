@@ -35,6 +35,194 @@ static int RandRows=-1;
 static ColorSet* randcolors=NULL;
 static int MagicBit = core->HasFeature(GF_MAGICBIT);
 
+//one column, these don't have a level
+static ieResRef* innlist;   //IE_IWD2_SPELL_INNATE
+static int inncount=-1;     
+static ieResRef* snglist;   //IE_IWD2_SPELL_SONG
+static int sngcount=-1;
+static ieResRef* shplist;   //IE_IWD2_SPELL_SHAPE
+static int shpcount=-1;
+
+struct LevelAndKit
+{
+	int level;
+	int kit;
+};
+
+class SpellEntry
+{
+public:
+	~SpellEntry();
+	SpellEntry();
+	const ieResRef *FindSpell(int level, int kit) const;
+	bool Equals(const char *spl) const;
+	void SetSpell(const char *spl);
+	void AddLevel(int level, int kit);
+private:
+	ieResRef spell;
+	LevelAndKit *levels;
+	int count;
+};
+
+SpellEntry::SpellEntry()
+{
+	levels = NULL;
+	spell[0]=0;
+	count = 0;
+}
+
+SpellEntry::~SpellEntry()
+{
+	free(levels);
+	levels = NULL;
+}
+
+const ieResRef *SpellEntry::FindSpell(int level, int kit) const
+{
+	int i = count;
+	while(i--) {
+		if (levels[i].level==level && levels[i].kit==kit) {
+			return &spell;
+		}
+	}
+	return NULL;
+}
+
+bool SpellEntry::Equals(const char *spl) const
+{
+	return !strnicmp(spell, spl, sizeof(ieResRef));
+}
+
+void SpellEntry::SetSpell(const char *spl)
+{
+	strnlwrcpy(spell, spl, 8);
+}
+
+void SpellEntry::AddLevel(int level, int kit)
+{
+	if(!level) {
+		return;
+	}
+
+	level--;
+	for(int i=0;i<count;i++) {
+		if(levels[i].kit==kit && levels[i].level==level) {
+			return;
+		}
+	}
+	levels = (LevelAndKit *) realloc(levels, sizeof(LevelAndKit) * (count+1) );
+	levels[count].kit=kit;
+	levels[count].level=level;
+	count++;
+}
+
+static SpellEntry* spllist;
+static int splcount=-1;
+static SpellEntry* domlist;
+static int domcount=-1;
+static SpellEntry* maglist;
+static int magcount=-1;
+
+int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
+{
+	int i;
+
+	if (level>=MAX_SPELL_LEVEL) {
+		return -1;
+	}
+	switch(type)
+	{
+	case IE_IWD2_SPELL_INNATE:
+		for(i=0;i<inncount;i++) {
+			if(!strnicmp(name, innlist[i], 8) ) {
+				return i;
+			}
+		}
+		break;
+	case IE_IWD2_SPELL_SONG:
+		for(i=0;i<sngcount;i++) {
+			if(!strnicmp(name, snglist[i], 8) ) {
+				return i;
+			}
+		}
+		break;
+	case IE_IWD2_SPELL_SHAPE:
+		for(i=0;i<shpcount;i++) {
+			if(!strnicmp(name, shplist[i], 8) ) {
+				return i;
+			}
+		}
+		break;
+	case IE_IWD2_SPELL_DOMAIN:
+		return -1;
+	default:
+		return -1;
+	}
+	return -1;
+}
+
+//input: index, level, type, kit
+const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType type, int kit)
+{
+	const ieResRef *ret;
+
+	if (level>=MAX_SPELL_LEVEL) {
+		return NULL;
+	}
+
+	switch(type)
+	{
+	case IE_IWD2_SPELL_INNATE:
+		if (index>=inncount) {
+			return NULL;
+		}
+		return &innlist[index];
+	case IE_IWD2_SPELL_SONG:
+		if (index>=sngcount) {
+			return NULL;
+		}
+		return &snglist[index];
+	case IE_IWD2_SPELL_SHAPE:
+		if (index>=shpcount) {
+			return NULL;
+		}
+		return &shplist[index];
+	case IE_IWD2_SPELL_DOMAIN:
+		if (index>=domcount) {
+			return NULL;
+		}
+		return domlist[index].FindSpell(level, kit);
+	case IE_IWD2_SPELL_WIZARD:
+		if (index>=magcount) {
+			break;
+		}
+		//if it is a specialist spell, return it now
+		ret = maglist[index].FindSpell(level, kit);
+		if ( ret) {
+			return ret;
+		}
+		//fall through
+	default:
+		kit = -1;
+		//comes later
+		break;
+	}
+
+	ret = spllist[index].FindSpell(level, type);
+	if ( !ret || (kit==-1) ) {
+		return ret;
+	}
+
+	int i;
+
+	for(i=0;i<magcount;i++) {
+		if (maglist[i].Equals(*ret)) {
+			return maglist[i].FindSpell(level, kit);    
+		}
+	}
+	return NULL;
+}
+
 void ReleaseMemoryCRE()
 {
 	if (randcolors) {
@@ -42,6 +230,101 @@ void ReleaseMemoryCRE()
 		randcolors = NULL;
 	}
 	RandColor = -1;
+
+	if (spllist) {
+		delete [] spllist;
+		spllist = NULL;
+	}
+	splcount = -1;
+
+	if (domlist) {
+		delete [] domlist;
+		domlist = NULL;
+	}
+	domcount = -1;
+
+	if (maglist) {
+		delete [] maglist;
+		maglist = NULL;
+	}
+	magcount = -1;
+
+	if (innlist) {
+		free(innlist);
+		innlist = NULL;
+	}
+	inncount = -1;
+
+	if(snglist) {
+		free(snglist);
+		snglist = NULL;
+	}
+	sngcount = -1;
+
+	if(shplist) {
+		free(shplist);
+		shplist = NULL;
+	}
+	shpcount = -1;
+}
+
+static ieResRef *GetSpellTable(const ieResRef tableresref, int &count)
+{
+	count = 0;
+	AutoTable tab(tableresref);
+	if (!tab)
+		return 0;
+
+	int column = tab->GetColumnCount()-1;
+	if (column<0) {
+		return 0;
+	}
+
+	count = tab->GetRowCount();
+	ieResRef *reslist = (ieResRef *) malloc (sizeof(ieResRef) * count);
+	for(int i = 0; i<count;i++) {
+		strnlwrcpy(reslist[i], tab->QueryField(i, column), 8);
+	}
+	return reslist;
+}
+
+static SpellEntry *GetKitSpell(const ieResRef tableresref, int &count)
+{
+	count = 0;
+	AutoTable tab(tableresref);
+	if (!tab)
+		return 0;
+
+	int column = tab->GetColumnCount()-1;
+	if (column<1) {
+		return 0;
+	}
+
+	count = tab->GetRowCount();
+	SpellEntry *reslist = new SpellEntry[count];
+	for(int i = 0;i<count;i++) {
+		reslist[i].SetSpell(tab->QueryField(i,column));
+		for(int col=0;col<column;col++) {
+			reslist[i].AddLevel(atoi(tab->QueryField(i,col)), col);
+		}
+	}
+	return reslist;
+}
+
+static void InitSpellbook()
+{
+	if (splcount!=-1) {
+		return;
+	}
+
+	if (core->HasFeature(GF_HAS_SPELLLIST)) {
+		innlist = GetSpellTable("listinnt", inncount);
+		snglist = GetSpellTable("listsong", sngcount);
+		shplist = GetSpellTable("listshap", shpcount);
+		spllist = GetKitSpell("listspll", splcount);
+		maglist = GetKitSpell("listmage", magcount);
+		domlist = GetKitSpell("listdomn", domcount);
+	}
 }
 
 CREImp::CREImp(void)
@@ -50,6 +333,7 @@ CREImp::CREImp(void)
 	autoFree = false;
 	TotSCEFF = 0xff;
 	CREVersion = 0xff;
+	InitSpellbook();
 }
 
 CREImp::~CREImp(void)
@@ -402,6 +686,18 @@ void CREImp::SetupColor(ieDword &stat)
 	}
 }
 
+void CREImp::ReadDialog(Actor *act)
+{
+	ieResRef Dialog;
+
+	str->ReadResRef(Dialog);
+	//Hacking NONE to no error
+	if (strnicmp(Dialog,"NONE",8) == 0) {
+		Dialog[0]=0;
+	}
+	act->SetDialog(Dialog);
+}
+
 Actor* CREImp::GetActor(unsigned char is_in_party)
 {
 	if (!str)
@@ -489,14 +785,6 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 			Inventory_Size=0;
 			printMessage("CREImp","Unknown creature signature.\n", YELLOW);
 	}
-
-	ieResRef Dialog;
-	str->ReadResRef(Dialog);
-	//Hacking NONE to no error
-	if (strnicmp(Dialog,"NONE",8) == 0) {
-		Dialog[0]=0;
-	}
-	act->SetDialog(Dialog);
 
 	// Read saved effects
 	if (core->IsAvailable(IE_EFF_CLASS_ID) ) {
@@ -746,6 +1034,8 @@ void CREImp::GetActorPST(Actor *act)
 	str->ReadDword( &ItemsCount );
 	str->ReadDword( &EffectsOffset );
 	str->ReadDword( &EffectsCount ); //also variables
+
+	ReadDialog(act);
 }
 
 void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
@@ -902,7 +1192,6 @@ void CREImp::GetEffect(Effect *fx)
 		eM->GetEffectV1( fx );
 	}
 	core->FreeInterface( eM );
-
 }
 
 ieDword CREImp::GetActorGemRB(Actor *act)
@@ -1154,7 +1443,63 @@ void CREImp::GetActorBG(Actor *act)
 	str->ReadDword( &EffectsOffset );
 	str->ReadDword( &EffectsCount );
 
-	//str->ReadResRef( act->Dialog );
+	ReadDialog(act);
+}
+
+void CREImp::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, int count)
+{
+	ieDword spellindex;
+	ieDword totalcount;
+	ieDword memocount;
+	ieDword tmpDword;
+
+	int check = 0;
+	CRESpellMemorization *sm = new CRESpellMemorization;
+	sm->Level = level;
+	sm->Type = type;
+	while(count--) {
+		str->ReadDword(&spellindex);
+		str->ReadDword(&totalcount);
+		str->ReadDword(&memocount);
+		str->ReadDword(&tmpDword);
+		check+=totalcount;
+		const ieResRef *tmp = ResolveSpellIndex(spellindex, level, type, act->BaseStats[IE_KIT]);
+		if(tmp) {
+			CREKnownSpell *known = new CREKnownSpell;
+			known->Level=level;
+			known->Type=type;
+			strnlwrcpy(known->SpellResRef,*tmp,8);
+			sm->known_spells.push_back(known);
+			while(memocount--) {
+				if(totalcount) {
+					totalcount--;
+				} else {
+					printMessage("CREImporter", "More spells still known than memorised.\n", LIGHT_RED);
+					break;
+				}
+				CREMemorizedSpell *memory = new CREMemorizedSpell;
+				memory->Flags=1;
+				strnlwrcpy(memory->SpellResRef,*tmp,8);
+				sm->memorized_spells.push_back(memory);
+			}
+			
+			while(totalcount--) {
+				CREMemorizedSpell *memory = new CREMemorizedSpell;
+				memory->Flags=0;
+				strnlwrcpy(memory->SpellResRef,*tmp,8);
+				sm->memorized_spells.push_back(memory);
+			}
+		} else {
+			printMessage("CREImporter","Unresolved spell index: ", LIGHT_RED);
+			printf("%d level:%d, type: %d", spellindex, level+1, type);
+		}
+	}
+	str->ReadDword(&tmpDword);
+	sm->Number = (ieWord) tmpDword;
+	str->ReadDword(&tmpDword);
+	sm->Number2 = (ieWord) tmpDword;
+	
+	act->spellbook.AddSpellMemorization(sm);
 }
 
 void CREImp::GetActorIWD2(Actor *act)
@@ -1430,7 +1775,23 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->ReadDword( &EffectsOffset );
 	str->ReadDword( &EffectsCount );
 
-	//str->ReadResRef( act->Dialog );
+	ReadDialog(act);
+
+	for(i=0;i<8;i++) {
+		for(int lev=0;lev<9;lev++) {
+			//if everything is alright, then this seek is not needed
+			str->Seek(ClassSpellOffsets[i*9+lev], GEM_STREAM_START);
+			GetIWD2Spellpage(act, (ieIWD2SpellType) i, lev, ClassSpellCounts[i*9+lev]);
+		}
+	}
+	str->Seek(InnateOffset, GEM_STREAM_START);
+	GetIWD2Spellpage(act, IE_IWD2_SPELL_INNATE, 0, InnateCount);
+
+	str->Seek(SongOffset, GEM_STREAM_START);
+	GetIWD2Spellpage(act, IE_IWD2_SPELL_SONG, 0, SongCount);
+
+	str->Seek(ShapeOffset, GEM_STREAM_START);
+	GetIWD2Spellpage(act, IE_IWD2_SPELL_SHAPE, 0, ShapeCount);
 }
 
 void CREImp::GetActorIWD1(Actor *act) //9.0
@@ -1624,7 +1985,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->ReadDword( &EffectsOffset );
 	str->ReadDword( &EffectsCount );
 
-	//str->ReadResRef( act->Dialog );
+	ReadDialog(act);
 }
 
 int CREImp::GetStoredFileSize(Actor *actor)
