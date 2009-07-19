@@ -876,7 +876,8 @@ bool Interface::ReadMusicTable(const ieResRef tablename, int col) {
 	return true;
 }
 
-const char *Interface::GetMusicPlaylist(int SongType) const {
+//Not a constant anymore, we let the caller set the entry to zero
+char *Interface::GetMusicPlaylist(int SongType) const {
 	if (SongType < 0 || (unsigned int)SongType >= musiclist.size())
 		return NULL;
 	

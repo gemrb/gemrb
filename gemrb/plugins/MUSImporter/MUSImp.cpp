@@ -219,15 +219,15 @@ void MUSImp::HardEnd()
 	PLpos = 0;
 }
 
-/** Switches the current PlayList while playing the current one */
-void MUSImp::SwitchPlayList(const char* name, bool Hard)
+/** Switches the current PlayList while playing the current one, return nonzero on error */
+int MUSImp::SwitchPlayList(const char* name, bool Hard)
 {
 	//don't do anything if the requested song is already playing
 	//this fixed PST's infinite song start
 	if (Playing) {
 		int len = ( int ) strlen( PLName );
 		if (strnicmp( name, PLName, len ) == 0)
-			return;
+			return 0;
 		if (Hard) {
 			HardEnd();
 		} else {
@@ -236,7 +236,9 @@ void MUSImp::SwitchPlayList(const char* name, bool Hard)
 	}
 	if (OpenPlaylist( name )) {
 		Start();
+		return 0;
 	}
+	return -1;
 }
 /** Plays the Next Entry */
 void MUSImp::PlayNext()

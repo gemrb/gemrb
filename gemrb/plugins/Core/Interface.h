@@ -323,7 +323,7 @@ public:
 	Sprite2D **TooltipBack;
 	Sprite2D *WindowFrames[4];
 	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6];
-	std::vector<const char *> musiclist;
+	std::vector<char *> musiclist;
 public:
 	Interface(int iargc, char *iargv[]);
 	~Interface(void);
@@ -622,7 +622,8 @@ public:
 	/** Opens CD prompt window and waits for the specified disc */
 	void WaitForDisc(int disc_number, const char* path);
 	/** Returns the music playlist corresponding to the provided type */
-	const char *GetMusicPlaylist(int SongType) const;
+	/** it allows scrapping the entry, hence it isn't const */
+	char *GetMusicPlaylist(int SongType) const;
 private:
 	int LoadSprites();
 	bool LoadConfig(void);

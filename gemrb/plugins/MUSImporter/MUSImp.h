@@ -27,7 +27,7 @@
 #include <stdio.h>
 
 /**MUS PlayList Importer
-  *@author GemRB Developement Team
+  *@author GemRB Development Team
   */
 
 struct PLString {
@@ -50,7 +50,7 @@ private:
 private:
 	void PlayMusic(int pos);
 	void PlayMusic(char* name);
-public: 
+public:
 	MUSImp();
 	~MUSImp();
 	/** Loads a PlayList for playing */
@@ -58,7 +58,7 @@ public:
 	/** Initializes the PlayList Manager */
 	bool Init();
 	/** Switches the current PlayList while playing the current one */
-	void SwitchPlayList(const char* name, bool Hard);
+	int SwitchPlayList(const char* name, bool Hard);
 	/** Ends the Current PlayList Execution */
 	void End();
 	void HardEnd();

@@ -49,8 +49,8 @@ public:
 	virtual bool Init();
 	/** Loads a PlayList for playing */
 	virtual bool OpenPlaylist(const char* name) = 0;
-	/** Switches the current PlayList while playing the current one */
-	virtual void SwitchPlayList(const char* name, bool Hard) = 0;
+	/** Switches the current PlayList while playing the current one, return nonzero on error */
+	virtual int SwitchPlayList(const char* name, bool Hard) = 0;
 	/** Plays the Next Entry */
 	virtual void PlayNext() = 0;
 	/** Returns whether music is currently playing */
