@@ -684,6 +684,7 @@ public:
 	unsigned int TooltipDelay;
 	unsigned int FogOfWar;
 	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
+	bool GUIEnhancements;
 	bool KeepCache;
 	Variables *plugin_flags;
 	/** The Main program loop */

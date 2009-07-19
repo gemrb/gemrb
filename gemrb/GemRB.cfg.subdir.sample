@@ -233,5 +233,22 @@ GUIScriptsPath=/usr/share/gemrb
 GemRBOverridePath=/usr/share/gemrb
 
 #####################################################
+#  GUI Parameters                                   #
+#####################################################
+#                                                   #
+# GemRB may enhance the GUI of the Infinity Engine  #
+# games (so far only in bg2) creating functionally  #
+# new buttons or scrollbars where they weren't      #
+# present in original games. It may improve its     #
+# usability, but is not quite compatible with       #
+# mods changing graphics and alignment in the *.chu #
+# files (e.g. the buttons will appear in old        #
+# coordinates and may stop being clickable).        #
+#####################################################
+
+# Enable all gui enhancements ? [Boolean]
+GUIEnhancements = 1
+
+#####################################################
 #  END                                              #
 #####################################################

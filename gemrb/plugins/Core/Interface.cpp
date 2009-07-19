@@ -151,6 +151,8 @@ Interface::Interface(int iargc, char* iargv[])
 	pal32 = NULL;
 	pal256 = NULL;
 
+	GUIEnhancements = 0;
+
 	CursorCount = 0;
 	Cursors = NULL;
 
@@ -1443,6 +1445,7 @@ int Interface::Init()
 
 	//no need of strdup, variables do copy the key!
 	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
+	vars->SetAt( "GUIEnhancements", (unsigned long)GUIEnhancements );
 
 	printMessage( "Core", "Initializing Token Dictionary...", WHITE );
 	tokens = new Variables();
@@ -1974,6 +1977,8 @@ bool Interface::LoadConfig(const char* filename)
 			Bpp = atoi( value );
 		} else if (stricmp( name, "FullScreen" ) == 0) {
 			FullScreen = ( atoi( value ) == 0 ) ? false : true;
+		} else if (stricmp( name, "GUIEnhancements" ) == 0) {
+			GUIEnhancements = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "TooltipDelay" ) == 0) {
 			TooltipDelay = atoi( value );
 		} else if (stricmp( name, "DoubleClickDelay" ) == 0) {

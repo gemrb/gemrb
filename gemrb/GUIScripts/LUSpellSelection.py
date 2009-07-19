@@ -43,15 +43,14 @@ SpellBook = []			# << array containing all the spell indexes to learn
 SpellLevel = 0			# << current level of spells
 SpellStart = 0			# << starting id of the spell list
 SpellPointsLeftLabel = 0	# << label indicating the number of points left
-Scroll = 0			# << scrollbar toggle
-Sorc25thSpellButton = 1		# << toogle for new button for 25th spell icon in sorcerers' level up spells selection window
+EnhanceGUI = 0			# << scrollbars and extra spell slot for sorcs on LU
 
 # chargen only
 SpellsPickButton = 0		# << button to select random spells
 SpellsCancelButton = 0		# << cancel chargen
 
 
-def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, scroll=True):
+def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 	"""Opens the spells selection window.
 
 	table should refer to the name of the classes MXSPLxxx.2da.
@@ -59,17 +58,19 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, s
 	diff contains the difference from the old level.
 	kit should always be GetKitIndex except when dualclassing.
 	gen is true if this is for character generation.
-	recommend is used in bg2 for spell recommendation / autopick.
-	scroll is used for adding a scrollbar, so more than 24 (or 25 in other case) spells can be shown."""
+	recommend is used in bg2 for spell recommendation / autopick."""
 
 	global SpellsWindow, DoneButton, SpellsSelectPointsLeft, Spells, chargen, SpellPointsLeftLabel
 	global SpellsTextArea, SpellsKnownTable, SpellTopIndex, SpellBook, SpellLevel, pc, SpellStart
-	global KitMask, Scroll
+	global KitMask, EnhanceGUI
+
+	#enhance GUI?
+	if (GemRB.GetVar("GUIEnhancements")):
+		EnhanceGUI = 1
 
 	# save our pc
 	pc = actor
 	chargen = gen
-	Scroll = scroll
 
 	# this ensures compatibility with chargen, sorc, and dual-classing
 	if kit == 0:
@@ -93,7 +94,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, s
 		DoneButton = SpellsWindow.GetControl (0)
 		SpellsTextArea = SpellsWindow.GetControl (27)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x1000001b)
-		if (scroll):
+		if (EnhanceGUI):
 			SpellsWindow.CreateScrollBar (1000, 325,42, 16,252)
 			HideUnhideScrollBar(1)
 		SpellStart = 2
@@ -119,11 +120,10 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, s
 		DoneButton = SpellsWindow.GetControl (28)
 		SpellsTextArea = SpellsWindow.GetControl(26)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)
-		if(scroll):
+		if(EnhanceGUI):
 			SpellsWindow.CreateScrollBar (1000, 290,142, 16,252)
 			HideUnhideScrollBar(1)
-		#draw the 25th spell button for sorcerers?
-		if(Sorc25thSpellButton):
+			#25th spell button for sorcerers
 			SpellsWindow.CreateButton (24, 231, 345, 42, 42)
 		SpellStart = 0
 
@@ -173,7 +173,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, s
 			SpellLevel = i
 			SpellBook = [0]*len(Spells[i])
 
-			if(scroll):
+			if(EnhanceGUI):
 				# setup the scrollbar
 				ScrollBar = SpellsWindow.GetControl (1000)
 				ScrollBar.SetSprites ("GUISCRCW", 0, 0,1,2,3,5,4)
@@ -185,10 +185,8 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, s
 					HideUnhideScrollBar(0)
 					if chargen:
 						ScrollBar.SetVarAssoc ("SpellTopIndex", int ( ceil ( ( len (Spells[i])-24 ) / 6.0 ) ) + 1 )
-					elif Sorc25thSpellButton: #there are five rows of 5 spells in level up of sorcs
+					else: #there are five rows of 5 spells in level up of sorcs
 						ScrollBar.SetVarAssoc ("SpellTopIndex", int ( ceil ( ( len (Spells[i])-25 ) / 5.0 ) ) + 1 )
-					else: #scrolling by rows if no 25th spell slot is available in sorcs level up looks weird so fallback to drawing 1 by 1
-						ScrollBar.SetVarAssoc ("SpellTopIndex", len (Spells[i])-23 )
 				else:
 					ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
 					HideUnhideScrollBar(1)
@@ -229,17 +227,15 @@ def SpellsDonePress ():
 			SpellLevel = i
 			SpellBook = [0]*len(Spells[i])
 
-			if (Scroll):
+			if (EnhanceGUI):
 				# setup the scrollbar
 				ScrollBar = SpellsWindow.GetControl (1000)
 				if len (Spells[i]) > ( 24 + ExtraSpellButtons() ):
 					HideUnhideScrollBar(0)
 					if chargen:
 						ScrollBar.SetVarAssoc ("SpellTopIndex", int ( ceil ( ( len (Spells[i])-24 ) / 6.0 ) ) + 1 )
-					elif Sorc25thSpellButton:
-						ScrollBar.SetVarAssoc ("SpellTopIndex", int ( ceil ( ( len (Spells[i])-25 ) / 5.0 ) ) + 1 )
 					else:
-						ScrollBar.SetVarAssoc ("SpellTopIndex", len (Spells[i])-23 )
+						ScrollBar.SetVarAssoc ("SpellTopIndex", int ( ceil ( ( len (Spells[i])-25 ) / 5.0 ) ) + 1 )
 				else:
 					ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
 					HideUnhideScrollBar(1)
@@ -496,7 +492,7 @@ def RowIndex ():
 	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
 	if chargen:
 		return ( SpellTopIndex + 1 ) * 6 - 6
-	elif Sorc25thSpellButton:
+	elif EnhanceGUI:
 		return ( SpellTopIndex + 1 ) * 5 - 5
 	else:
 		return SpellTopIndex
@@ -504,7 +500,7 @@ def RowIndex ():
 def ExtraSpellButtons ():
 	"""Determines if extra spell slots are available. """
 
-	if Sorc25thSpellButton and (not chargen):
+	if EnhanceGUI and (not chargen):
 		return 1
 	else:
 		return 0
