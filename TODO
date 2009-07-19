@@ -40,9 +40,10 @@ Actor:
    Benefits: data is already stored in the destination, data constraints and relations 
    are easily implemented.
    How to: replace GemRB.SetVar with GemRB.SetPlayerStat. Don't forget to create
-   the character first. - see iwd2 chargen for a partially implemented solution
+   the character first. - see bg1 chargen for a complete solution
 2. Move position of actor (and ground circle) to the center of a searchmap cell
-
+3. Actually handle the iwd2 spelllists. Convert the actor data on the fly in the importer!
+   See the list* 2da files. Handle the level info in them correctly. <-- big task
 
 Game GUI:
 1. (PARTLY) implement class based (but customisable) action button bar. Generally port
