@@ -79,6 +79,8 @@ Sound:
 2. (PARTLY) sounds get sometimes distorted, might be connected to problem #1
 3. (PARTLY) Separate OpenAL interface from ACM loader and MVE player
 4. implement sound handles so looping, moving sound, stopping sound is possible
+5. fix sound settings (currently the volumes get reset on area change, for example)
+6. implement and use as much from EAX (echo, damping, etc) as possible
 
 Building:
 1. fix include paths during compilation, so the files do not 
