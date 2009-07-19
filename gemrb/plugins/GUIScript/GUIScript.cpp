@@ -7820,15 +7820,18 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetupEquipmentIcons__doc,
-"SetupEquipmentIcons(WindowIndex, slot[, Start])\n\n"
-"Automagically sets up the controls of the equipment list window for a PC indexed by slot.");
+"SetupEquipmentIcons(WindowIndex, slot[, Start, Offset])\n\n"
+"Automagically sets up the controls of the equipment list window for a PC indexed by slot.\n"
+"Start is the beginning of the visible part of the item list.\n"
+"Offset is the ID of the first usable button.");
 
 static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 {
 	int wi, slot;
 	int Start = 0;
+	int Offset = 0; //control offset (iwd2 has the action buttons starting at 6)
 
-	if (!PyArg_ParseTuple( args, "ii|i", &wi, &slot, &Start )) {
+	if (!PyArg_ParseTuple( args, "ii|ii", &wi, &slot, &Start, &Offset )) {
 		return AttributeError( GemRB_SetupEquipmentIcons__doc );
 	}
 
@@ -7848,7 +7851,7 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT-(Start?1:0));
 	int i;
 	if (Start) {
-		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, 0),ACT_LEFT,0);
+		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, Offset),ACT_LEFT,0);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -7862,7 +7865,7 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 	}
 
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
-		int ci = core->GetControl(wi, i+(Start?1:0) );
+		int ci = core->GetControl(wi, i+Offset+(Start?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, "EquipmentPressed");
 		strcpy(btn->VarName,"Equipment");
@@ -7911,7 +7914,7 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (more) {
-		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+1),ACT_RIGHT,i+1);
+		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+Offset+1),ACT_RIGHT,i+1);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -7922,15 +7925,18 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetupSpellIcons__doc,
-"SetupSpellIcons(WindowIndex, slot, type[, Start])\n\n"
-"Automagically sets up the controls of the spell or innate list window for a PC indexed by slot.");
+"SetupSpellIcons(WindowIndex, slot, type[, Start, Offset])\n\n"
+"Automagically sets up the controls of the spell or innate list window for a PC indexed by slot.\n"
+"Start is the beginning of the visible part of the spell list.\n"
+"Offset is the ID of the first usable button.");
 
 static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 {
 	int wi, slot, Type;
 	int Start = 0;
+	int Offset = 0;
 
-	if (!PyArg_ParseTuple( args, "iii|i", &wi, &slot, &Type, &Start )) {
+	if (!PyArg_ParseTuple( args, "iii|ii", &wi, &slot, &Type, &Start, &Offset )) {
 		return AttributeError( GemRB_SetupSpellIcons__doc );
 	}
 
@@ -7953,7 +7959,7 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 		more |= 2;
 	}
 	if (more) {
-		int ci = core->GetControl(wi, 0);
+		int ci = core->GetControl(wi, Offset);
 		PyObject *ret = SetActionIcon(wi, ci, ACT_LEFT, 0);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
@@ -7981,7 +7987,7 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 	for (i=0;i<GUIBT_COUNT-(more?2:0);i++) {
 		SpellExtHeader *spell = SpellArray+i;
 
-		int ci = core->GetControl(wi, i+(more?1:0) );
+		int ci = core->GetControl(wi, i+Offset+(more?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 		strcpy(btn->VarName,"Spell");
 		btn->Value = i+Start;
@@ -8031,7 +8037,7 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (more) {
-		int ci = core->GetControl(wi, i+1);
+		int ci = core->GetControl(wi, i+Offset+1);
 		PyObject *ret = SetActionIcon(wi, ci, ACT_RIGHT, i+1);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
