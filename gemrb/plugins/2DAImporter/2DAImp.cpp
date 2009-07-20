@@ -67,7 +67,12 @@ bool p2DAImp::Open(DataStream* stream, bool autoFree)
 	}
 	Signature[0] = 0;
 	str->ReadLine( Signature, sizeof(Signature) );
-	strncpy(defVal, Signature, sizeof(defVal) );
+	char* token = strtok( Signature, " " );
+	if (token) {
+		strncpy(defVal, token, sizeof(defVal) );
+	} else { // no whitespace
+		strncpy(defVal, Signature, sizeof(defVal) );
+	}
 	bool colHead = true;
 	int row = 0;
 	while (true) {
