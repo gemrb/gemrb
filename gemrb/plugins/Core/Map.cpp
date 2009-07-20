@@ -2213,6 +2213,17 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Speed, int Orientation, in
 		Point p;
 		p.x = (ieWord) start.x + ((dest.x - start.x) * Steps / Max);
 		p.y = (ieWord) start.y + ((dest.y - start.y) * Steps / Max);
+
+		//the path ends here as it would go off the screen, causing problems
+		//maybe there is a better way, but i needed a quick hack to fix 
+		//the crash in projectiles
+		if ((signed) p.x<0 || (signed) p.y<0) {
+			return Return;
+		}
+		if ((ieWord) p.x>Width*16 || (ieWord) p.y>Height*12) {
+			return Return;
+		}
+
 		StartNode->x = p.x;
 		StartNode->y = p.y;
 		StartNode->orient = Orientation;
@@ -2221,7 +2232,6 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Speed, int Orientation, in
 			case GL_REBOUND:
 				Orientation = (Orientation + 8) &15;
 				//recalculate dest (mirror it)
-				//
 				break;
 			case GL_PASS:
 				break;
