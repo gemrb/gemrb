@@ -185,9 +185,9 @@
 #define IE_SAVEVSPOLY		11
 #define IE_SAVEVSBREATH		12
 #define IE_SAVEVSSPELL		13
-#define IE_SAVEFORTITUDE 9
-#define IE_SAVEREFLEX 10
-#define IE_SAVEWILL 11
+#define IE_SAVEFORTITUDE    	9
+#define IE_SAVEREFLEX     	10
+#define IE_SAVEWILL         	11
 #define IE_RESISTFIRE		14
 #define IE_RESISTCOLD		15
 #define IE_RESISTELECTRICITY	16
@@ -199,34 +199,34 @@
 #define IE_RESISTCRUSHING	22
 #define IE_RESISTPIERCING	23
 #define IE_RESISTMISSILE	24
-#define IE_LORE		25
-#define IE_LOCKPICKING	26
+#define IE_LORE	        	25
+#define IE_LOCKPICKING  	26
 #define IE_STEALTH		27
 #define IE_TRAPS		28
-#define IE_PICKPOCKET	29
+#define IE_PICKPOCKET   	29
 #define IE_FATIGUE		30
-#define IE_INTOXICATION	31
-#define IE_LUCK		32
-#define IE_TRACKING	33
+#define IE_INTOXICATION 	31
+#define IE_LUCK	        	32
+#define IE_TRACKING     	33
 #define IE_LEVEL		34
-#define IE_LEVELFIGHTER  34 //for pst, iwd2
-#define IE_SEX		35
-#define IE_STR		36
-#define IE_STREXTRA	37
-#define IE_INT		38
-#define IE_WIS		39
-#define IE_DEX		40
-#define IE_CON		41
-#define IE_CHR		42
-#define IE_XPVALUE	43
-#define IE_CR           43      //for iwd2, not sure if this is a good idea yet
-#define IE_XP		44
-#define IE_GOLD		45
-#define IE_MORALEBREAK	46
+#define IE_LEVELFIGHTER      	34 //for pst, iwd2
+#define IE_SEX	        	35
+#define IE_STR          	36
+#define IE_STREXTRA     	37
+#define IE_INT               	38
+#define IE_WIS          	39
+#define IE_DEX   		40
+#define IE_CON  		41
+#define IE_CHR  		42
+#define IE_XPVALUE      	43
+#define IE_CR                 	43      //for iwd2, not sure if this is a good idea yet
+#define IE_XP   		44
+#define IE_GOLD	        	45
+#define IE_MORALEBREAK   	46
 #define IE_MORALERECOVERYTIME	47
-#define IE_REPUTATION	48
-#define IE_HATEDRACE	49
-#define IE_DAMAGEBONUS	50
+#define IE_REPUTATION        	48
+#define IE_HATEDRACE         	49
+#define IE_DAMAGEBONUS       	50
 #define IE_SPELLFAILUREMAGE	51 
 #define IE_SPELLFAILUREPRIEST	52 
 #define IE_SPELLDURATIONMODMAGE	53
@@ -234,46 +234,46 @@
 #define IE_TURNUNDEADLEVEL	55
 #define IE_BACKSTABDAMAGEMULTIPLIER	56
 #define IE_LAYONHANDSAMOUNT	57
-#define IE_HELD 		   58
-#define IE_POLYMORPHED     59
-#define IE_TRANSLUCENT     60
-#define IE_IDENTIFYMODE    61
-#define IE_ENTANGLE	62
-#define IE_SANCTUARY	63
-#define IE_MINORGLOBE	64
-#define IE_SHIELDGLOBE	65
+#define IE_HELD 		58
+#define IE_POLYMORPHED          59
+#define IE_TRANSLUCENT          60
+#define IE_IDENTIFYMODE         61
+#define IE_ENTANGLE          	62
+#define IE_SANCTUARY     	63
+#define IE_MINORGLOBE    	64
+#define IE_SHIELDGLOBE   	65
 #define IE_GREASE		66
-#define IE_WEB		67
-#define IE_LEVEL2   	   68
-#define IE_LEVELMAGE     68 //pst, iwd2
-#define IE_LEVEL3   	   69
-#define IE_LEVELTHIEF    69 //pst, iwd2
-#define IE_CASTERHOLD	70
-#define IE_ENCUMBRANCE    71
-#define IE_MISSILEHITBONUS	  72  
+#define IE_WEB   		67
+#define IE_LEVEL2               68
+#define IE_LEVELMAGE            68 //pst, iwd2
+#define IE_LEVEL3        	69
+#define IE_LEVELTHIEF           69 //pst, iwd2
+#define IE_CASTERHOLD       	70
+#define IE_ENCUMBRANCE          71
+#define IE_MISSILEHITBONUS	72  
 #define IE_MAGICDAMAGERESISTANCE  73
 #define IE_RESISTPOISON 	 74
-#define IE_DONOTJUMP		  75
-#define IE_AURACLEANSING	  76
-#define IE_MENTALSPEED  	  77
-#define IE_PHYSICALSPEED	  78
+#define IE_DONOTJUMP           	 75
+#define IE_AURACLEANSING	 76
+#define IE_MENTALSPEED  	 77
+#define IE_PHYSICALSPEED	 78
 #define IE_CASTINGLEVELBONUSMAGE	79
 #define IE_CASTINGLEVELBONUSCLERIC  80
-#define IE_SEEINVISIBLE 			81
+#define IE_SEEINVISIBLE 		81
 #define IE_IGNOREDIALOGPAUSE		82
-#define IE_MINHITPOINTS		 83
+#define IE_MINHITPOINTS 		83
 #define IE_HITBONUSRIGHT  		84
 #define IE_HITBONUSLEFT   		85
 #define IE_DAMAGEBONUSRIGHT 		86
 #define IE_DAMAGEBONUSLEFT  		87
 #define IE_STONESKINS  			88
-#define IE_FEAT_BOW  89
-#define IE_FEAT_CROSSBOW 90
-#define IE_FEAT_SLING 91
-#define IE_FEAT_AXE 92
-#define IE_FEAT_MACE 93
-#define IE_FEAT_FLAIL 94
-#define IE_FEAT_POLEARM 95
+#define IE_FEAT_BOW                  	89
+#define IE_FEAT_CROSSBOW              	90
+#define IE_FEAT_SLING                 	91
+#define IE_FEAT_AXE                   	92
+#define IE_FEAT_MACE                   	93
+#define IE_FEAT_FLAIL                  	94
+#define IE_FEAT_POLEARM                 95
 #define IE_FEAT_HAMMER 96
 #define IE_FEAT_STAFF 97
 #define IE_FEAT_GREAT_SWORD 98
@@ -299,12 +299,12 @@
 #define IE_PROFICIENCYAXE			92
 #define IE_PROFICIENCYTWOHANDEDSWORD	93
 #define IE_PROFICIENCYKATANA		94
-#define IE_PROFICIENCYSCIMITARWAKISASHININJATO	95
+#define IE_PROFICIENCYSCIMITAR   	95        //wakisashininjato
 #define IE_PROFICIENCYDAGGER		96
 #define IE_PROFICIENCYWARHAMMER	97
 #define IE_PROFICIENCYSPEAR	98
 #define IE_PROFICIENCYHALBERD		99
-#define IE_PROFICIENCYFLAILMORNINGSTAR	100
+#define IE_PROFICIENCYFLAIL	100       //morningstar
 #define IE_PROFICIENCYMACE			101
 #define IE_PROFICIENCYQUARTERSTAFF		102
 #define IE_PROFICIENCYCROSSBOW			103
@@ -320,23 +320,23 @@
 #define IE_PROFICIENCYSINGLEWEAPON		113
 #define IE_PROFICIENCY2WEAPON		 114  
 #define IE_EXTRAPROFICIENCY1 		 115
-#define IE_ALCHEMY               115
+#define IE_ALCHEMY                       115
 #define IE_EXTRAPROFICIENCY2 		 116
-#define IE_ANIMALS               116
+#define IE_ANIMALS                       116
 #define IE_EXTRAPROFICIENCY3 		 117
-#define IE_BLUFF                 117
+#define IE_BLUFF                         117
 #define IE_EXTRAPROFICIENCY4 		 118
-#define IE_CONCENTRATION         118
+#define IE_CONCENTRATION                 118
 #define IE_EXTRAPROFICIENCY5 		 119
-#define IE_DIPLOMACY             119
+#define IE_DIPLOMACY                     119
 #define IE_EXTRAPROFICIENCY6 		 120
-#define IE_INTIMIDATE            120
+#define IE_INTIMIDATE                    120
 #define IE_EXTRAPROFICIENCY7 		 121
-#define IE_SEARCH                121
+#define IE_SEARCH                        121
 #define IE_EXTRAPROFICIENCY8 		 122
-#define IE_SPELLCRAFT            122
+#define IE_SPELLCRAFT                    122
 #define IE_EXTRAPROFICIENCY9 		 123
-#define IE_MAGICDEVICE           123
+#define IE_MAGICDEVICE                   123
 #define IE_EXTRAPROFICIENCY10 		 124
 #define IE_EXTRAPROFICIENCY11 		 125
 #define IE_EXTRAPROFICIENCY12 		 126
@@ -345,11 +345,11 @@
 #define IE_EXTRAPROFICIENCY15 		 129
 #define IE_EXTRAPROFICIENCY16 		 130
 #define IE_EXTRAPROFICIENCY17 		 131
-#define IE_FEATS1                  131
+#define IE_FEATS1                        131
 #define IE_EXTRAPROFICIENCY18 		 132
-#define IE_FEATS2                  132
+#define IE_FEATS2                        132
 #define IE_EXTRAPROFICIENCY19 		 133
-#define IE_FEATS3                  133
+#define IE_FEATS3                        133
 #define IE_EXTRAPROFICIENCY20 		 134
 #define IE_FREESLOTS	 		 134 //same as above
 #define IE_HIDEINSHADOWS			  135
@@ -383,12 +383,12 @@
 #define IE_INTERNAL_7            163
 #define IE_INTERNAL_8            164
 #define IE_INTERNAL_9            165
-#define IE_SCRIPTINGSTATE1  		  156
-#define IE_SCRIPTINGSTATE2  		  157
-#define IE_SCRIPTINGSTATE3  		  158
-#define IE_SCRIPTINGSTATE4  		  159
-#define IE_SCRIPTINGSTATE5  		  160
-#define IE_SCRIPTINGSTATE6  		  161
+#define IE_SCRIPTINGSTATE1	 156
+#define IE_SCRIPTINGSTATE2	 157
+#define IE_SCRIPTINGSTATE3	 158
+#define IE_SCRIPTINGSTATE4  	 159
+#define IE_SCRIPTINGSTATE5  	 160
+#define IE_SCRIPTINGSTATE6  	 161
 #define IE_SCRIPTINGSTATE7  	162   
 #define IE_SCRIPTINGSTATE8  	163
 #define IE_SCRIPTINGSTATE9  	164
@@ -404,19 +404,20 @@
 #define IE_TITLE2		173
 #define IE_DISABLEOVERLAY	174
 #define IE_DISABLEBACKSTAB	175
-//these are unknown, but already used in GemRB
-//176
-//177
-//178
-//179
-//180
-//181
-//182
+//these are clashing with GemRB now
+//176 IE_OPEN_LOCK_BONUS
+//177 IE_MOVE_SILENTLY_BONUS
+//178 IE_FIND_TRAPS_BONUS
+//179 IE_PICK_POCKETS_BONUS
+//180 IE_HIDE_IN_SHADOWS_BONUS
+//181 DETECT_ILLUSIONS_BONUS
+//182 SET_TRAPS_BONUS
 #define IE_ENABLEOFFSCREENAI    183 // bg2 has this on this spot
-#define IE_EXISTANCEDELAY       184 // (sound2mn)
+#define IE_EXISTANCEDELAY       184 // affects the displaying of EXISTANCE strings
 #define IE_ATTACKNUMBERDOUBLE   185 // used by haste option 2
 #define IE_DISABLECHUNKING      186 //
 #define IE_NOTURNABLE           187 // immune to turn
+//188 IE_NOTINTERRUPTABLE
 #define IE_CHAOSSHIELD          189 // defense against wild surge
 #define IE_NPCBUMP              190 // not entirely sure what is this
 #define IE_CANUSEANYITEM        191
