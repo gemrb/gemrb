@@ -721,7 +721,15 @@ void Scriptable::SpellCast(const ieResRef SpellResRef)
 	}
 
 	SPLExtHeader *header = spl->GetExtHeader(SpellHeader);
-	SetWait(header->CastingTime*AI_UPDATE_TIME);
+	int casting_time = (int)header->CastingTime;
+	// how does this work for non-actors exactly?
+	if (Type == ST_ACTOR) {
+		// The mental speed effect can shorten or lengthen the casting time.
+		casting_time -= (int)((Actor *) this)->GetStat(IE_MENTALSPEED);
+		if (casting_time < 0) casting_time = 0;
+	}
+	// this is a guess which seems approximately right so far
+	SetWait((casting_time*ROUND_SIZE)/10);
 	gamedata->FreeSpell(spl, SpellResRef, false);
 }
 
