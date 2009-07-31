@@ -576,6 +576,7 @@ public:
 	int GetDexterityBonus(int column, int value) const;
 	int GetConstitutionBonus(int column, int value) const;
 	int GetCharismaBonus(int column, int value) const;
+	int GetLoreBonus(int column, int value) const;
 
 	/** applies the spell on the target */
 	void ApplySpell(const ieResRef resname, Actor *target, Actor *caster, int level);

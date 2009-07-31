@@ -1993,6 +1993,9 @@ void Actor::RefreshPCStats() {
 	if(BaseStats[IE_STATE_ID]&STATE_DEAD)
 		bonus = 0;
 	Modified[IE_HITPOINTS]+=bonus;
+
+	// apply the intelligence and wisdom bonus to lore
+	Modified[IE_LORE] += core->GetLoreBonus(0, Modified[IE_INT]) + core->GetLoreBonus(0, Modified[IE_WIS]);
 }
 
 void Actor::RollSaves()

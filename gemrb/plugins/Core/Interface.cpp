@@ -100,6 +100,7 @@ static ieWordSigned *intmod = NULL;
 static ieWordSigned *dexmod = NULL;
 static ieWordSigned *conmod = NULL;
 static ieWordSigned *chrmod = NULL;
+static ieWordSigned *lorebon = NULL;
 
 Interface::Interface(int iargc, char* iargv[])
 {
@@ -284,6 +285,10 @@ void FreeAbilityTables()
 		free(chrmod);
 	}
 	chrmod = NULL;
+	if (lorebon) {
+		free(lorebon);
+	}
+	lorebon = NULL;
 }
 
 void Interface::FreeResRefTable(ieResRef *&table, int &count)
@@ -646,6 +651,9 @@ bool GenerateAbilityTables()
 	chrmod = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
 	if (!chrmod)
 		return false;
+	lorebon = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
+	if (!lorebon)
+		return false;
 	return true;
 }
 
@@ -692,6 +700,9 @@ bool Interface::ReadAbilityTables()
 	ret = ReadAbilityTable("dexmod", dexmod, 3, MaximumAbility + 1);
 	//no dexmod in iwd2???
 	ret = ReadAbilityTable("hpconbon", conmod, 5, MaximumAbility + 1);
+	if (!ret)
+		return ret;
+	ret = ReadAbilityTable("lorebon", lorebon, 1, MaximumAbility + 1);
 	if (!ret)
 		return ret;
 	//this table is a single row (not a single column)
@@ -4985,11 +4996,18 @@ int Interface::GetCharismaBonus(int column, int value) const
 	return chrmod[column*(MaximumAbility+1)+value];
 }
 
+int Interface::GetLoreBonus(int column, int value) const
+{
+	if (column<0 || column>0)
+		return -9999;
+
+	return lorebon[value];
+}
+
 // -3, -2 if request is illegal or in cutscene
 // -1 if pause is already active
 // 0 if pause was not allowed
 // 1 if autopause happened
-
 int Interface::Autopause(ieDword flag)
 {
 	GameControl *gc = GetGameControl();

@@ -7639,6 +7639,9 @@ static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 		case IE_CHR:
 			ret=core->GetCharismaBonus(column, value);
 			break;
+		case IE_LORE:
+			ret=core->GetLoreBonus(column, value);
+			break;
 		default:
 			return RuntimeError( "Invalid ability!");
 	}
