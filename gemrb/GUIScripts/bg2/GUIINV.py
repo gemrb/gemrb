@@ -972,6 +972,7 @@ def DisplayItem (itemresref, type):
 	read = (type&1) and (item["Function"]&2)
 	container = (type&1) and (item["Function"]&4)
 	dialog = (type&1) and (item["Dialog"]!="")
+	familiar = (type&1) and (item["Type"] == 38)
 	if drink:
 		Button.SetText (19392)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DrinkItemWindow")
@@ -984,6 +985,9 @@ def DisplayItem (itemresref, type):
 	elif dialog:
 		Button.SetText (item["DialogName"])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DialogItemWindow")
+	elif familiar:
+		Button.SetText (4373)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ReleaseFamiliar")
 	else:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
