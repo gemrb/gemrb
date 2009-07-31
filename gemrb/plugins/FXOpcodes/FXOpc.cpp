@@ -3781,7 +3781,7 @@ int fx_replace_creature (Actor* Owner, Actor* target, Effect *fx)
 	default:;
 	}
 	//create replacement; should we be passing the target instead of NULL?
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, -1,0);
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, -1,-1);
 	return FX_NOT_APPLIED;
 }
 
