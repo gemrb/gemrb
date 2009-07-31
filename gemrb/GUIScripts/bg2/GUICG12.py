@@ -84,6 +84,8 @@ def OnLoad():
 			SetPicture ()
 			break
 		LastPortrait = LastPortrait + 1
+		if LastPortrait > 100:
+			LastPortrait = 0
 	AppearanceWindow.SetVisible (1)
 	return
 
