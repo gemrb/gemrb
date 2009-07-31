@@ -273,6 +273,12 @@ void Scriptable::ExecuteScript(int scriptCount)
 		return;
 	}
 
+	// only allow death scripts to run once, hopefully?
+	// this is probably terrible logic which needs moving elsewhere
+	if ((lastRunTime != 0) && (InternalFlags & IF_JUSTDIED)) {
+		return;
+	}
+
 	ieDword thisTime = core->GetGame()->Ticks;
 	if (( thisTime - lastRunTime ) < 1000) {
 		return;
