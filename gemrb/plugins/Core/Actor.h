@@ -153,6 +153,20 @@ class ScriptedAnimation;
 #define ISSORCERER  10
 #define ISCLASSES   11
 
+//appearance flags
+
+#define APP_HALFTRANS    2           //half transparent
+#define APP_DEATHVAR     16          //set death variable
+#define APP_DEATHTYPE    32          //count creature type deaths
+#define APP_INVULNERABLE 0x200       //invulnerable
+#define APP_GOOD         0x400       //good count
+#define APP_LAW          0x800       //law count
+#define APP_LADY         0x1000      //lady count
+#define APP_MURDER       0x2000      //murder count
+#define APP_NOTURN       0x4000      //doesn't face gabber in dialogue
+#define APP_BUDDY        0x8000      //npcs will turn hostile if this one dies
+#define APP_DEAD         0x40000000  //used by the engine to prevent dying twice
+
 typedef ieByte ActionButtonRow[GUIBT_COUNT];
 
 typedef std::vector< ScriptedAnimation*> vvcVector;
@@ -173,7 +187,8 @@ public:
 	//CRE DATA FIELDS
 	ieDword BaseStats[MAX_STATS];
 	ieDword Modified[MAX_STATS];
-
+	ieByteSigned DeathCounters[4];   //PST specific (good, law, lady, murder)
+	
 	ieResRef applyWhenHittingMelee;  //set melee effect
 	ieResRef applyWhenHittingRanged; //set ranged effect
 	ieResRef applyWhenNearLiving;    //cast spell on condition
@@ -195,8 +210,9 @@ public:
 	ieStrRef ShortStrRef, LongStrRef;
 	ieStrRef StrRefs[VCONST_COUNT];
 
-	ieWord AppearanceFlags1;
-	ieWord AppearanceFlags2;
+	//ieWord AppearanceFlags1;
+	//ieWord AppearanceFlags2;
+	ieDword AppearanceFlags;
 
 	ieVariable KillVar; //this second field is present in pst and iwd1
 

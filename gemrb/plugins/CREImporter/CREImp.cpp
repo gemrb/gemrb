@@ -974,24 +974,27 @@ void CREImp::GetActorPST(Actor *act)
 		str->ReadWord( &tmpWord );
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
-	str->Seek( 4, GEM_CURRENT_POS );
+	//good, law, lady, murder
+	for (i=0;i<4;i++) {
+		str->Read( &tmpByte, 1);
+		act->DeathCounters[i]=(ieByteSigned) tmpByte;
+	}
 	ieVariable KillVar; //use this as needed
 	str->Read(KillVar,32);
 	KillVar[32]=0;
 	str->Seek( 3, GEM_CURRENT_POS ); // dialog radius, feet circle size???
 
-	ieByte ColorsCount;
+	str->Read( &tmpByte, 1 );
 
-	str->Read( &ColorsCount, 1 );
-
-	str->ReadWord( &act->AppearanceFlags1 );
-	str->ReadWord( &act->AppearanceFlags2 );
+	//str->ReadWord( &act->AppearanceFlags1 );
+	//str->ReadWord( &act->AppearanceFlags2 );
+	str->ReadDword( &act->AppearanceFlags );
 
 	for (i = 0; i < 7; i++) {
 		str->ReadWord( &tmpWord );
 		act->BaseStats[IE_COLORS+i] = tmpWord;
 	}
-	act->BaseStats[IE_COLORCOUNT] = ColorsCount; //hack
+	act->BaseStats[IE_COLORCOUNT] = tmpByte; //hack
 
 	str->Seek(31, GEM_CURRENT_POS);
 	str->Read( &tmpByte, 1 );
@@ -2543,13 +2546,18 @@ int CREImp::PutActorPST(DataStream *stream, Actor *actor)
 		tmpWord = actor->BaseStats[IE_INTERNAL_0];
 		stream->WriteWord( &tmpWord );
 	}
-	stream->Write(filling,4); //unknown
-	stream->Write(actor->KillVar, 32);
-	stream->Write(filling,3); //unknown
+	for (i = 0; i<4; i++) {
+		tmpByte = (ieByte) (actor->DeathCounters[i]);
+		stream->Write( &tmpByte, 1);
+	}
+	stream->Write( actor->KillVar, 32);
+	stream->Write( filling,3); //unknown
 	tmpByte=actor->BaseStats[IE_COLORCOUNT];
 	stream->Write( &tmpByte, 1);
-	stream->WriteWord( &actor->AppearanceFlags1);
-	stream->WriteWord( &actor->AppearanceFlags2);
+	//stream->WriteWord( &actor->AppearanceFlags1);
+	//stream->WriteWord( &actor->AppearanceFlags2);
+	stream->WriteDword( &actor->AppearanceFlags);
+
 	for (i=0;i<7;i++) {
 		tmpWord = actor->BaseStats[IE_COLORS+i];
 		stream->WriteWord( &tmpWord);
