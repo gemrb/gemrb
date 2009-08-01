@@ -8,6 +8,7 @@ my $TGTDIR = "../gemrb/docs/en/GUIScript";
 
 my %fn_hash = ();
 my %file_hash = ();
+my %desc_hash = ();
 
 my %file_ignore = (
 		   'CVS' => 1,
@@ -36,6 +37,7 @@ sub parse_guiscript_cpp {
 	    my $desc .= $1;
 	    my $md5 = md5_hex ($desc);
 	    $fn_hash{$fname} = $md5;
+	    $desc_hash{$fname} = $desc;
 	    $fname = '';
 	    $desc = '';
 	}
@@ -87,7 +89,7 @@ foreach my $fn (sort keys %fn_hash) {
 	}
     }
     else {
-	print "+ $fn : $md5_1\n";
+	print "+ $fn : $md5_1 : $desc_hash{$fn}\n";
     }
 }
 
