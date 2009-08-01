@@ -1,0 +1,11 @@
+
+Prototype: GemRB.IsDualWielding(pc)
+
+Description:  1 if the pc is dual wielding; 0 otherwise.
+
+Parameters: 
+
+Return value:
+
+See also:
+

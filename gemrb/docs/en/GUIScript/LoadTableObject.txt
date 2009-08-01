@@ -1,0 +1,13 @@
+
+Prototype: GemRB.LoadTableObject(2DAResRef, [ignore_error=0])
+
+Description:  Loads a 2DA Table and returns it as an object.
+
+Parameters: 
+2DAResRef - 
+[ignore_error=0 - (optional) 
+
+Return value: GTable
+
+See also:
+

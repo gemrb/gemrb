@@ -1,0 +1,13 @@
+
+Prototype: GemRB.GetToHit(pc, leftorright)
+
+Description:  Returns the current THAC0 in relation to the equipped weapon.
+
+Parameters: 
+pc - 
+leftorright - 
+
+Return value: int
+
+See also:
+

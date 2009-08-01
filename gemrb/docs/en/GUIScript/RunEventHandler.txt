@@ -1,0 +1,12 @@
+
+Prototype: GemRB.RunEventHandler(String[,error])nnExecutes a GUIScript event handler function named String.
+
+Description:  If error set to nonzero, then a missing handler will cause error.
+
+Parameters: 
+String[error - (optional) 
+
+Return value:
+
+See also:
+

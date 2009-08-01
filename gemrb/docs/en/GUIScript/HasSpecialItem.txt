@@ -1,0 +1,14 @@
+
+Prototype: GemRB.HasSpecialItem(pc, itemtype, useup)
+
+Description:  Checks if a team member has an item, optionally uses it.
+
+Parameters: 
+pc - 
+itemtype - 
+useup - 
+
+Return value: bool
+
+See also:
+

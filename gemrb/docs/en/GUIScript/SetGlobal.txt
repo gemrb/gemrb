@@ -1,0 +1,14 @@
+
+Prototype: GemRB.SetGlobal(VariableName, Context, Value)
+
+Description:  Sets a gamescript variable to the specificed numeric value.
+
+Parameters: 
+VariableName - 
+Context - 
+Value - 
+
+Return value:
+
+See also:
+

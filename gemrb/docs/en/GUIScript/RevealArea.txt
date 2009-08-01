@@ -1,0 +1,15 @@
+
+Prototype: GemRB.RevealArea(x, y, radius, type)
+
+Description:  Reveals part of the area.
+
+Parameters: 
+x - 
+y - 
+radius - 
+type - 
+
+Return value:
+
+See also:
+

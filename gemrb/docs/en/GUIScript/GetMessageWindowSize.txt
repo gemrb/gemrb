@@ -1,0 +1,11 @@
+
+Prototype: GemRB.GetMessageWindowSize(Value)
+
+Description:  Returns current MessageWindowSize, it works only when a game is loaded.
+
+Parameters: 
+
+Return value: int
+
+See also:
+

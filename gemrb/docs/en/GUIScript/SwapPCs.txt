@@ -1,0 +1,13 @@
+
+Prototype: GemRB.SwapPCs(idx1, idx2)
+
+Description:  Swaps the party order for two player characters.
+
+Parameters: 
+idx1 - 
+idx2 - 
+
+Return value:
+
+See also:
+

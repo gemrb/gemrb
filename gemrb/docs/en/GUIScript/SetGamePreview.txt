@@ -1,0 +1,13 @@
+
+Prototype: GemRB.SetGamePreview(WindowIndex, ControlIndex)
+
+Description:  Sets current game area preview bmp onto a button as picture.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+
+Return value:
+
+See also:
+

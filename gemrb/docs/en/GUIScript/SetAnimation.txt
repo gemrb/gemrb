@@ -1,0 +1,15 @@
+
+Prototype: GemRB.SetAnimation(WindowIndex, ControlIndex, BAMResRef[, Cycle])
+
+Description:  Sets the animation of a Control (usually a Button) from a BAM file. Optionally an animation cycle could be set too.
+
+Parameters: 
+WindowIndex - 
+ControlIndex - 
+BAMResRef - 
+Cycle - (optional) 
+
+Return value:
+
+See also:
+

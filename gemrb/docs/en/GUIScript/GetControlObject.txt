@@ -1,0 +1,13 @@
+
+Prototype: GemRB.GetControlObject(WindowID, ControlID)
+
+Description:  Returns a control as on object.
+
+Parameters: 
+WindowID - 
+ControlID - 
+
+Return value: GControl, ornWindow.GetControl(ControlID) 
+
+See also:
+

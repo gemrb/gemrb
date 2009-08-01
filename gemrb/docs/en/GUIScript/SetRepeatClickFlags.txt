@@ -1,0 +1,13 @@
+
+Prototype: GemRB.SetRepeatClickFlags(value, op)
+
+Description:  Sets the mode repeat clicks are handled.
+
+Parameters: 
+value - 
+op - 
+
+Return value:
+
+See also:
+
