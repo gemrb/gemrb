@@ -1333,7 +1333,7 @@ static PyObject* GemRB_GetControlObject(PyObject * self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_HasControl__doc,
-"HasControl(WindowIndex, ControlID[,ControlType]) => bool\n\n"
+"HasControl(WindowIndex, ControlID[, ControlType]) => bool\n\n"
 "Returns true if the control exists." );
 
 static PyObject* GemRB_HasControl(PyObject * /*self*/, PyObject* args)
@@ -6166,9 +6166,9 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_RunEventHandler__doc,
-"RunEventHandler(String[,error])\n\n"
+"RunEventHandler(String[, error])\n\n"
 "Executes a GUIScript event handler function named String. "
-"If error set to nonzero, then a missing handler will cause error." );
+"If error is set to nonzero, then a missing handler will cause an error." );
 
 static PyObject* GemRB_RunEventHandler(PyObject * /*self*/, PyObject* args)
 {
