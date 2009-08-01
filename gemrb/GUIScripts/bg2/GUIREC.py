@@ -1532,7 +1532,8 @@ def ClearBiography():
 
 def DoneBiographyWindow ():
 	#TODO set bio
-	GemRB.SetPlayerString (BioStrRef)
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.SetPlayerString (pc, 74, BioStrRef)
 	CloseSubCustomizeWindow ()
 	return
 
