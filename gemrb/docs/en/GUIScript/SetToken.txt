@@ -1,7 +1,7 @@
 
 Prototype: GemRB.SetToken(VariableName, Value)
 
-Description: Set/Create a token to be replaced in StrRefs. GetText() will use the actual value of the token when it encounters "<token>" substrings in a retrieved dialog.tlk entry. Some tokens are hardcoded and you can't affect GetText() by setting them. Usage of those tokens should be avoided. The hardcoded token list:
+Description: Set/Create a token to be replaced in StrRefs. QueryText() will use the actual value of the token when it encounters "<token>" substrings in a retrieved dialog.tlk entry. Some tokens are hardcoded and you can't affect QueryText() by setting them. Usage of those tokens should be avoided. The hardcoded token list:
 FIGHTERTYPE  - always resolves to strref #10086
 RACE         - always resolves to the race of the last speaker
 GABBER       - always resolves to the longname of the last speaker
@@ -22,6 +22,6 @@ Parameters:
 
 Return value: N/A
 
-See also: GetToken, GetText
+See also: GetToken, QueryText
 
 MD5: fd99519e2b63105ddb7d772476886701

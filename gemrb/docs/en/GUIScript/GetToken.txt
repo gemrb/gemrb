@@ -10,7 +10,7 @@ Return value: string, the value of the token
 Example: GemRB.TextAreaAppend(CharGenWindow, TextArea, GemRB.GetToken("CHARNAME"))
 The above example will add the protagonist's name to the TextArea (if the token was set correctly).
 
-See also: SetToken, GetText
+See also: SetToken, QueryText
 
 
 MD5: fea89d3ea3aa58100ad165ea6b9cb605
