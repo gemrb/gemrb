@@ -11,7 +11,7 @@ MosResRef - the background image (.mos resref)
 
 Return value: a window index
 
-See also: CreateControl
+See also:
 
 
 MD5: f28c0c3fb8a9e7d0a279d735c5b94d6f

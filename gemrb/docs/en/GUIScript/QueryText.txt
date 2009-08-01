@@ -15,7 +15,7 @@ The above example retrieves the character's name typed into the TextEdit control
  GemRB.SetToken("VoiceSet", GemRB.QueryText(SoundWindow, TextAreaControl))
 The above example sets the VoiceSet token to the value of the selected string in a TextArea control. Later this voiceset could be stored in the character sheet.
 
-See also: SetText, SetToken, accessing_controls
+See also: SetText, SetToken, accessing_gui_controls
 
 
 MD5: 7bcc3ff81f595b8d73c784ca32b06d5e

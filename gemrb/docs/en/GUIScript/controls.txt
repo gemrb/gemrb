@@ -15,7 +15,7 @@ Slider:
 A slider is used for limited numeric input.
 
 
-Edit:
+TextEdit:
 
 This is a text input field. It has a configurable maximum input length.
 

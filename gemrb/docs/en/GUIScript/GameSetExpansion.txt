@@ -10,5 +10,5 @@ Parameters: Mode - 0 or 1
 
 Return value: N/A
 
-See also: LoadGame, GameType (variable)
+See also: LoadGame, GameType(variable)
 

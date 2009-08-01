@@ -10,4 +10,4 @@ movie  -  a number 0-7, see restmov.2da
 
 Return value: N/A
 
-See also: StartStore
+See also: StartStore(gamescript)

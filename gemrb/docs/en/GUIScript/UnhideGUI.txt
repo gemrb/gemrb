@@ -7,7 +7,7 @@ Parameters: N/A
 
 Return value: N/A
 
-See also: HideGUI, Invalidate, SetVisible
+See also: HideGUI, InvalidateWindow, SetVisible
 
 
 MD5: da75d42bc5444aff63580ee249c5b858

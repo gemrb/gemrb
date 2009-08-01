@@ -7,5 +7,5 @@ Parameters: N/A
 
 Return value: N/A
 
-See also: Invalidate, UnhideGUI
+See also: InvalidateWindow, UnhideGUI
 

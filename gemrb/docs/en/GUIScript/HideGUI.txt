@@ -22,7 +22,7 @@ Parameters: N/A
 
 Return value: 1 on success?
 
-See also: UnhideGUI, Invalidate, SetVisible
+See also: UnhideGUI, InvalidateWindow, SetVisible
 
 
 MD5: b95f905bba48f95a878868c7c453d52f

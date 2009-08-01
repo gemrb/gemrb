@@ -9,5 +9,5 @@ Parameters: Slot  - actor index in game structure
 
 Return value: N/A
 
-See also: GameGetPartySize
+See also: GetPartySize
 

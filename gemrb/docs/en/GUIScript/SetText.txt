@@ -11,6 +11,6 @@ Strref - a string index from the dialog.tlk table.
 Return value:
 0 on success, -1 otherwise
 
-See also: QueryText, DisplayString, GetControl, accessing_controls
+See also: QueryText, DisplayString, GetControl, accessing_gui_controls
 
 MD5: 583a8146b015a25b137c43a036043991

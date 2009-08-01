@@ -7,7 +7,7 @@ Parameters: N/A
 
 Return value: N/A
 
-See also: QuitGame()
+See also: QuitGame
 
 
 MD5: 821540a9b347bc2490ac7935df46f481

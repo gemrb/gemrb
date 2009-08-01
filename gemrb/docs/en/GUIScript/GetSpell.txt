@@ -17,5 +17,5 @@ The fields of the dictionary are the following:
 "SpellType"           - the type of text that appears on spell dispelling
 "SpellLevel"          - the spell's level
 
-See also: GetItem, SetSpellIcon, spell structure
+See also: GetItem, SetSpellIcon, spell_structure(IESDP)
 

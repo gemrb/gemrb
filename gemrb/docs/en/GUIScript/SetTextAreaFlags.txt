@@ -27,8 +27,6 @@ Example:
         RowCount=GemRB.GetCharSounds(SoundWindow, TextAreaControl)
 The above code will set up the TextArea as a ListBox control, by reading the names of available character soundsets into the TextArea and setting it up as selectable. When the user clicks on row, the "Sound" variable will be assigned a row number.
 
-See also: RewindTA, SetTAHistory, GetCharSounds, GetCharList, QueryText,
-          accessing_gui_controls
-
+See also: RewindTA, SetTAHistory, GetCharSounds, GetCharacters, QueryText, accessing_gui_controls
 
 MD5: 30fd7c88972e5fc7e4f41158a28ceaff

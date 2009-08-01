@@ -7,5 +7,5 @@ Parameters: N/A
 
 Return value: numeric
 
-See also: DeleteSaveGame, GetSaveGameAttrib, SetSaveGameAreaPortrait, SaveGame
+See also: DeleteSaveGame, GetSaveGameAttrib, SetSaveGamePortrait, SetSaveGamePreview, SaveGame
 
