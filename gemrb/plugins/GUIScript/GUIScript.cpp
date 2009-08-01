@@ -4574,6 +4574,36 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetPlayerString__doc,
+"SetPlayerSound(PlayerSlot, StringSlot, StrRef)\n\n"
+"Sets one of the player character's verbal constants. Mostly useful for setting biography." );
+
+static PyObject* GemRB_SetPlayerString(PyObject * /*self*/, PyObject* args)
+{
+	int PlayerSlot, StringSlot, StrRef;
+
+	if (!PyArg_ParseTuple( args, "iii", &PlayerSlot, &StringSlot, &StrRef )) {
+		return AttributeError( GemRB_SetPlayerString__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* MyActor = game->FindPC( PlayerSlot );
+	if (!MyActor) {
+		return RuntimeError( "Actor not found!" );
+	}
+
+	if (StringSlot>=VCONST_COUNT) {
+		return AttributeError( "StringSlot is out of range!" );
+	}
+
+	MyActor->StrRefs[StringSlot]=StrRef;
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SetPlayerSound__doc,
 "SetPlayerSound(Slot, SoundFolder)\n\n"
 "Sets the player character's sound set." );
@@ -9402,6 +9432,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetPlayerName, METH_VARARGS),
 	METHOD(SetPlayerScript, METH_VARARGS),
 	METHOD(SetPlayerStat, METH_VARARGS),
+	METHOD(SetPlayerString, METH_VARARGS),
 	METHOD(SetPlayerSound, METH_VARARGS),
 	METHOD(SetPurchasedAmount, METH_VARARGS),
 	METHOD(SetRepeatClickFlags, METH_VARARGS),
