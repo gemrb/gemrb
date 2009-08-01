@@ -5408,9 +5408,9 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 
 	Item *item = gamedata->GetItem( ci->ItemResRef );
 
-	int identified = ci->Flags & IE_INV_ITEM_IDENTIFIED;
-	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( (signed) item->GetItemName( (bool) identified )) );
-	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( (signed) item->GetItemDesc( (bool) identified )) );
+	bool identified = ci->Flags & IE_INV_ITEM_IDENTIFIED;
+	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( (signed) item->GetItemName( identified )) );
+	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( (signed) item->GetItemDesc( identified )) );
 	gamedata->FreeItem( item, ci->ItemResRef, false );
 	return dict;
 }
