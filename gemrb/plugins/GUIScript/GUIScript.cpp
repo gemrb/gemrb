@@ -3587,14 +3587,14 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetMessageWindowSize__doc,
-"GetMessageWindowSize(Value) => int\n\n"
+"GetMessageWindowSize() => int\n\n"
 "Returns current MessageWindowSize, it works only when a game is loaded." );
 
 static PyObject* GemRB_GetMessageWindowSize(PyObject * /*self*/, PyObject* /*args*/)
 {
 	Game *game = core->GetGame();
 	if (!game) {
-		return NULL;
+		return RuntimeError( "No game loaded!" );
 	}
 	return PyInt_FromLong( game->ControlStatus );
 }
@@ -4398,7 +4398,7 @@ static PyObject* GemRB_GetINIPartyCount(PyObject * /*self*/,
 	PyObject * /*args*/)
 {
 	if (!core->GetPartyINI()) {
-		return NULL;
+		return RuntimeError( "INI resource not found!" );
 	}
 	return PyInt_FromLong( core->GetPartyINI()->GetTagsCount() );
 }
@@ -4415,7 +4415,7 @@ static PyObject* GemRB_GetINIQuestsKey(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetINIQuestsKey__doc );
 	}
 	if (!core->GetQuestsINI()) {
-		return NULL;
+		return RuntimeError( "INI resource not found!" );
 	}
 	return PyString_FromString(
 			core->GetQuestsINI()->GetKeyAsString( Tag, Key, Default ) );
@@ -4451,7 +4451,7 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetINIPartyKey__doc );
 	}
 	if (!core->GetPartyINI()) {
-		return NULL;
+		return RuntimeError( "INI resource not found!" );
 	}
 	return PyString_FromString(
 			core->GetPartyINI()->GetKeyAsString( Tag, Key, Default ) );
@@ -4754,7 +4754,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 
 		Item* item = gamedata->GetItem(ps->FavouriteWeapons[largest]);
 		if (item == NULL) {
-			return NULL;
+			return RuntimeError( "Item not found!" );
 		}
 
 		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong ((signed) item->GetItemName(false)));
@@ -5819,7 +5819,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	{
 		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
 		if (!si) {
-			return NULL;
+			return RuntimeError( "Item not found!" );
 		}
 		si->Flags |= IE_INV_ITEM_IDENTIFIED;
 		res = ASI_SUCCESS;
@@ -5846,15 +5846,9 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		//this is  not removeitem, because the item is just marked
 		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
 		if (!si) {
-			return NULL;
+			return RuntimeError( "Item not found!" );
 		}
 		si->Flags ^= IE_INV_ITEM_SELECTED;
-		//this field is used for something else, and we don't need it
-		//if (si->Flags & IE_INV_ITEM_SELECTED) {
-		//	si->PurchasedAmount=1;
-		//} else {
-		//	si->PurchasedAmount=0;
-		//}
 		res = ASI_SUCCESS;
 		break;
 	}
@@ -5869,7 +5863,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		//this is removeitem, because the item leaves our inventory
 		CREItem* si = actor->inventory.RemoveItem( core->QuerySlot(Slot) );
 		if (!si) {
-			return NULL;
+			return RuntimeError( "Item not found!" );
 		}
 		//well, it shouldn't be sold at all, but if it is here
 		//it will vanish!!!
@@ -6283,7 +6277,7 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 	}
 	Map* map2 = game->GetMap(String, true);
 	if (!map2) {
-		return NULL;
+		return RuntimeError( "Map not found!" );
 	}
 	int i = game->GetPartySize(true);
 	while (i--) {
@@ -6393,15 +6387,13 @@ static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 	}
 	Actor* actor = game->FindPC( PartyID );
 	if (!actor) {
-		return RuntimeError( "Actor not found" );
+		return RuntimeError( "Actor not found!" );
 	}
 
 	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
 	if (! ks) {
-		return NULL;
+		return RuntimeError( "Spell not found!" );
 	}
-
-
 
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "SpellResRef", PyString_FromResRef (ks->SpellResRef));
@@ -6429,7 +6421,7 @@ static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* ar
 	}
 	Actor* actor = game->FindPC( PartyID );
 	if (!actor) {
-		return RuntimeError( "Actor not found" );
+		return RuntimeError( "Actor not found!" );
 	}
 
 	if (Level<0) {
@@ -6456,12 +6448,12 @@ static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 	}
 	Actor* actor = game->FindPC( PartyID );
 	if (!actor) {
-		return RuntimeError( "Actor not found" );
+		return RuntimeError( "Actor not found!" );
 	}
 
 	CREMemorizedSpell* ms = actor->spellbook.GetMemorizedSpell( SpellType, Level, Index );
 	if (! ms) {
-		return RuntimeError( "Page not found" );
+		return RuntimeError( "Spell not found!" );
 	}
 
 	PyObject* dict = PyDict_New();
@@ -6678,12 +6670,12 @@ static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 	}
 	Actor* actor = game->FindPC( PartyID );
 	if (!actor) {
-		return RuntimeError( "Actor not found" );
+		return RuntimeError( "Actor not found!" );
 	}
 
 	CREMemorizedSpell* ms = actor->spellbook.GetMemorizedSpell( SpellType, Level, Index );
 	if (! ms) {
-		return NULL;
+		return RuntimeError( "Spell not found!" );
 	}
 
 	return PyInt_FromLong( actor->spellbook.UnmemorizeSpell( ms ) );
