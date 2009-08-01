@@ -5160,10 +5160,14 @@ void GameScript::Weather(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::CopyGroundPilesTo(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type!=ST_AREA) {
+	Map *map;
+	if (Sender->Type == ST_AREA) {
+		map = (Map *) Sender;
+	} else if (Sender->Type == ST_ACTOR) {
+		map = Sender->GetCurrentArea();
+	} else {
 		return;
 	}
-	Map *map = (Map *) Sender;
 	Map *othermap = core->GetGame()->GetMap( parameters->string0Parameter, false );
 	if (!othermap) {
 		return;
