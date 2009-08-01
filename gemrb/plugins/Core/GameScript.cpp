@@ -1902,7 +1902,7 @@ Targets *GameScript::Protagonist(Scriptable* Sender, Targets *parameters, int ga
 		}
 		return parameters;
 	}
-	parameters->AddTarget(core->GetGame()->FindPC(1), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->GetPC(0, false), 0, ga_flags);
 	return parameters;
 }
 
@@ -2191,112 +2191,112 @@ Targets *GameScript::LastSummonerOf(Scriptable* Sender, Targets *parameters, int
 Targets *GameScript::Player1(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(1), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->GetPC(0,false), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player1Fill(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(0,false), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->FindPC(1), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player2(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(2), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->GetPC(1,false), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player2Fill(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(1,false), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->FindPC(2), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player3(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(3), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->GetPC(2,false), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player3Fill(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(2,false), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->FindPC(3), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player4(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(4), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->GetPC(3,false), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player4Fill(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(3,false), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->FindPC(4), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player5(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(5), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->GetPC(4,false), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player5Fill(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(4,false), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->FindPC(5), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player6(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(6), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->GetPC(5,false), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player6Fill(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(5,false), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->FindPC(6), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player7(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(7), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->GetPC(6,false), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player7Fill(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(6,false), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->FindPC(7), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player8(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(8), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->GetPC(7,false), 0, ga_flags);
 	return parameters;
 }
 
 Targets *GameScript::Player8Fill(Scriptable* /*Sender*/, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(7,false), 0, ga_flags);
+	parameters->AddTarget(core->GetGame()->FindPC(8), 0, ga_flags);
 	return parameters;
 }
 

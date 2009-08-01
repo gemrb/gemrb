@@ -1872,7 +1872,7 @@ int GameScript::PartyMemberDied(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 
 int GameScript::NamelessBitTheDust(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
-	Actor* actor = core->GetGame()->FindPC(1);
+	Actor* actor = core->GetGame()->GetPC(0, false);
 	if (actor->GetInternalFlag()&IF_JUSTDIED) {
 		//set trigger to clear
 		actor->SetBitTrigger(BT_DIE);

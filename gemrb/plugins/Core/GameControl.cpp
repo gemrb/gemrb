@@ -1843,7 +1843,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 				//if we are in PST modify this to NO!
 				Actor *source;
 				if (core->HasFeature(GF_PROTAGONIST_TALKS) ) {
-					source = game->FindPC(1); //protagonist
+					source = game->GetPC(0, false); //protagonist
 				} else {
 					source = core->GetFirstSelectedPC(false);
 				}

@@ -519,7 +519,7 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 void IniSpawn::RespawnNameless()
 {
 	Game *game = core->GetGame();
-	Actor *nameless = game->FindPC(1);
+	Actor *nameless = game->GetPC(0, false);
 
 	if (NamelessSpawnPoint.isnull()) {
 		core->GetGame()->JoinParty(nameless,JP_INITPOS);

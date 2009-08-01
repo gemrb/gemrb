@@ -236,7 +236,7 @@ void GameScript::ChangeClass(Scriptable* Sender, Action* parameters)
 void GameScript::SetNamelessClass(Scriptable* /*Sender*/, Action* parameters)
 {
 	//same as Protagonist
-	Actor* actor = core->GetGame()->FindPC(1);
+	Actor* actor = core->GetGame()->GetPC(0, false);
 	actor->SetBase( IE_CLASS, parameters->int0Parameter );
 }
 
