@@ -43,7 +43,7 @@ INCLUDE(FindOpenAL)
 IF(OPENAL_FOUND)
  MESSAGE(STATUS "openal found")
 ELSE(OPENAL_FOUND)
- MESSAGE(FATAL_ERROR "unable to find openal. please set OPENALDIR environment variable or get it from www.openal.org")
+ MESSAGE(ERROR "unable to find openal. please set OPENALDIR environment variable or get it from www.openal.org")
 ENDIF(OPENAL_FOUND)
 
 MESSAGE(STATUS "Looking for SDL")
