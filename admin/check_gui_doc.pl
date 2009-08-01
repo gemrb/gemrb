@@ -26,16 +26,15 @@ sub parse_guiscript_cpp {
     open (SRC, "< $SRCFILE") || die "Can't open $SRCFILE: $!\n";
 
     while (defined (my $line = <SRC>)) {
-	#if ($line =~ /^PyDoc_STRVAR\s*\(\s*GemRB_(.*)__doc\s*\)/g) {
 	if ($line =~ /^PyDoc_STRVAR\s*\(\s*GemRB_(.*)__doc/g) {
 	    $fname = $1;
 	}
 	elsif ($fname && $line =~ /^\"(.*)\"\s*$/g) {
-	    my $desc .= $1;
+	    $desc .= $1;
 	}
 	elsif ($fname && $line =~ /^\"(.*)\"\s*\);\s*$/g) {
-	    my $desc .= $1;
-	    my $md5 = md5_hex ($desc);
+	    $desc .= " : $1";
+	    my $md5 = md5_hex ($1);
 	    $fn_hash{$fname} = $md5;
 	    $desc_hash{$fname} = $desc;
 	    $fname = '';
