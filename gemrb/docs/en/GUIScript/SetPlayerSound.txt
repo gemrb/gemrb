@@ -8,4 +8,4 @@ Parameters: Slot        - numeric, the character's slot
 
 Return value: N/A
 
-See also: SetPlayerPortrait, SetPlayerString
+See also: FillPlayerInfo, SetPlayerString
