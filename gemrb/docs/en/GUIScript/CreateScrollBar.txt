@@ -4,14 +4,14 @@ Prototype: GemRB.CreateScrollBar(WindowIndex, ControlID, x, y, w, h)
 Description:  Creates and adds a new ScrollBar to a Window.
 
 Parameters: 
-WindowIndex - 
-ControlID - 
-x - 
-y - 
-w - 
-h - 
+WindowIndex - the window control
+ControlID - the id of the new control
+x - position
+y - position
+w - width
+h - height
 
 Return value: ControlIndex
 
-See also:
+See also: SetScrollBarSprites, SetDefaultScrollBar, AttachScrollBar
 

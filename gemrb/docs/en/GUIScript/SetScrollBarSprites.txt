@@ -4,16 +4,16 @@ Prototype: GemRB.SetScrollBarSprites(WindowIndex, ControlIndex, ResRef, Cycle, U
 Description:  Sets a ScrollBar Sprites Images.
 
 Parameters: 
-WindowIndex - 
-ControlIndex - 
-ResRef - 
-Cycle - 
-UpUnpressedFrame - 
-UpPressedFrame - 
-DownUnpressedFrame - 
-DownPressedFrame - 
-TroughFrame - 
-SliderFrame - 
+WindowIndex - the window control id
+ControlID - the id of the target control
+ResRef - bam resref
+Cycle - cycle number
+UpUnpressedFrame - frame number
+UpPressedFrame - frame number
+DownUnpressedFrame - frame number
+DownPressedFrame - frame number
+TroughFrame - frame number
+SliderFrame - frame number
 
 Return value:
 

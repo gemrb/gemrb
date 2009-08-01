@@ -1,11 +1,12 @@
 
-Prototype: GemRB.HasControl(WindowIndex, ControlID[,ControlType])
+Prototype: GemRB.HasControl(WindowIndex, ControlID[, ControlType])
 
 Description:  Returns true if the control exists.
 
-Parameters: 
-WindowIndex - 
-ControlID[ControlType - (optional) 
+Parameters:
+WindowIndex - the window control id
+ControlID - the id of the target control
+ControlType - (optional) limit to controls of this type (export them from control.h when needed)
 
 Return value: bool
 

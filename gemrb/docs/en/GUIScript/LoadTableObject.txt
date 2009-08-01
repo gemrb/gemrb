@@ -5,9 +5,9 @@ Description:  Loads a 2DA Table and returns it as an object.
 
 Parameters: 
 2DAResRef - 
-[ignore_error=0 - (optional) 
+ignore_error - (optional) ignore errors, off by default
 
 Return value: GTable
 
-See also:
+See also: LoadTable
 

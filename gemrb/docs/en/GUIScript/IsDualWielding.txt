@@ -4,8 +4,9 @@ Prototype: GemRB.IsDualWielding(pc)
 Description:  1 if the pc is dual wielding; 0 otherwise.
 
 Parameters: 
+pc - position in the party
 
-Return value:
+Return value: bool
 
 See also:
 

@@ -4,9 +4,9 @@ Prototype: GemRB.HasSpecialSpell(pc, itemtype, useup)
 Description:  Checks if a team member has a spell, optionally uses it.
 
 Parameters: 
-pc - 
-itemtype - 
-useup - 
+pc - position in the party
+itemtype - see splspec.2da
+useup - destroy/remove a charge after use
 
 Return value: bool
 

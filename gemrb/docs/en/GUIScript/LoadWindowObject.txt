@@ -4,8 +4,9 @@ Prototype: GemRB.LoadWindowObject(WindowID)
 Description:  Returns a Window as an object.
 
 Parameters: 
+WindowID - the window control id
 
 Return value: GWindow
 
-See also:
+See also: LoadWindow, LoadWindowPack
 
