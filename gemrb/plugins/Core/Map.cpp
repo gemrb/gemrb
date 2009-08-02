@@ -2215,7 +2215,7 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Speed, int Orientation, in
 		p.y = (ieWord) start.y + ((dest.y - start.y) * Steps / Max);
 
 		//the path ends here as it would go off the screen, causing problems
-		//maybe there is a better way, but i needed a quick hack to fix 
+		//maybe there is a better way, but i needed a quick hack to fix
 		//the crash in projectiles
 		if ((signed) p.x<0 || (signed) p.y<0) {
 			return Return;
@@ -2376,7 +2376,7 @@ PathNode* Map::FindPathNear(const Point &s, const Point &d, unsigned int size, u
 		Return->Next = StartNode;
 		Return->Next->Parent = Return;
 		StartNode = Return;
-		
+
 		StartNode->x = n.x;
 		StartNode->y = n.y;
 		StartNode->orient = GetOrient( p, n );
@@ -2746,6 +2746,7 @@ void Map::ExploreMapChunk(Point &Pos, int range, int los)
 	while (p--) {
 		int Pass = 2;
 		bool block = false;
+		bool sidewall = false ;
 		for (int i=0;i<range;i++) {
 			Tile.x = Pos.x+VisibilityMasks[i][p].x;
 			Tile.y = Pos.y+VisibilityMasks[i][p].y;
@@ -2756,7 +2757,11 @@ void Map::ExploreMapChunk(Point &Pos, int range, int los)
 					if (type & PATH_MAP_NO_SEE) {
 						block=true;
 					} else if (type & PATH_MAP_SIDEWALL) {
-						if(Distance(Pos, Tile)>=48) break;
+						sidewall = true;
+					} else if (sidewall && Distance(Pos,Tile)>=48)
+					{ /*48 is an experimental value and is made to avoid blocking
+					   *sight when being hidden by the wall. This might be game specific*/
+						block=true ;
 					}
 				}
 				if (block) {

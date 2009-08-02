@@ -1,5 +1,3 @@
-INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} )
-
 FILE( GLOB ACMImporter_files *.cpp )
 
 ADD_GEMRB_PLUGIN (ACMImporter ${ACMImporter_files})
