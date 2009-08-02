@@ -1533,7 +1533,7 @@ int Map::GetBlocked(unsigned int x, unsigned int y)
 		ret&=~PATH_MAP_PASSABLE;
 	}
 	if (ret&PATH_MAP_DOOR_OPAQUE) {
-		ret=PATH_MAP_NO_SEE;
+		ret=PATH_MAP_SIDEWALL;
 	}
 	return ret;
 }
@@ -2758,9 +2758,8 @@ void Map::ExploreMapChunk(Point &Pos, int range, int los)
 						block=true;
 					} else if (type & PATH_MAP_SIDEWALL) {
 						sidewall = true;
-					} else if (sidewall && Distance(Pos,Tile)>=48)
-					{ /*48 is an experimental value and is made to avoid blocking
-					   *sight when being hidden by the wall. This might be game specific*/
+					} else if (sidewall)
+					{
 						block=true ;
 					}
 				}
