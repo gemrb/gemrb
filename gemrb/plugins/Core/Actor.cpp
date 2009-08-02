@@ -4154,13 +4154,13 @@ void Actor::Draw(Region &screen)
 				core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 			}
 		}
+		//If you find a better place for it, I'll really be glad to put it there
+		//IN BG1 and BG2, this is at the ninth frame...
+		if(attackProjectile && (anims[0]->GetCurrentFrame() == 8/*anims[0]->GetFramesCount()/2*/)) {
+			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget) ;
+			attackProjectile = NULL ;
+		}
 		if (nextFrame && lastFrame != nextFrame) {
-			//Projectile is launched in the middle of the animation
-			//If you find a better place for it, I'll really be glad to put it there
-			if(attackProjectile && (anims[0]->GetCurrentFrame() == (anims[0]->GetFrameCount()/2))) {
-				GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget) ;
-				attackProjectile = NULL ;
-			}
 			Region newBBox;
 			if (PartCount == 1) {
 				newBBox.x = cx - nextFrame->XPos;
