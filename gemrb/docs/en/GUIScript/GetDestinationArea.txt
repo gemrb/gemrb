@@ -1,12 +1,14 @@
 
-Prototype: GemRB.GetDestinationArea(WindowIndex, ControlIndex)
+Prototype: GemRB.GetDestinationArea(WindowIndex, ControlIndex[, RndEncounter])
 
-Metaclass Prototype: GetDestinationArea(ControlIndex)
+Metaclass Prototype: GetDestinationArea([RndEncounter])
 
 Description: Returns a dictionary of the selected area by the worldmap control.
-If the route is blocked, then Distance will return a negative value and Destination/Entrance won't be set.
+If the route is blocked, then Distance will return a negative value and Destination/Entrance won't be set. Random encounters could be optionally evaluated.
 
-Parameters: WindowIndex, ControlIndex - designate a worldmap control
+Parameters:
+   WindowIndex, ControlIndex - designate a worldmap control
+   RndEncounter              - 0/1
 
 Return value: Dictionary
 Target      - The target area selected by the player
