@@ -28,10 +28,12 @@ def OnLoad():
 
 	GemRB.EnableCheatKeys(1)
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
-	if not skip_videos:
+	if not skip_videos and not GemRB.GetVar ("SeenIntroVideos"):
 		GemRB.PlayMovie ("BISLOGO", 1)
 		GemRB.PlayMovie ("BWDRAGON", 1)
 		GemRB.PlayMovie ("WOTC", 1)
+		# don't replay the intros on subsequent reentries
+		GemRB.SetVar ("SeenIntroVideos", 1)
 
 	# Find proper window border for higher resolutions
 	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
