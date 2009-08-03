@@ -1271,7 +1271,7 @@ static PyObject* GemRB_GetControl(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_GetControlObject__doc,
 "GetControlObject(WindowID, ControlID) => GControl, or\n"
 "Window.GetControl(ControlID) => GControl\n\n"
-"Returns a control as on object." );
+"Returns a control as an object." );
 
 static PyObject* GemRB_GetControlObject(PyObject * self, PyObject* args)
 {
