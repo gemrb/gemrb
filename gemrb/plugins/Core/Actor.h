@@ -483,7 +483,7 @@ public:
 	int GetDefense(int DamageType) ;
 	/* get the current hit bonus */
 	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
-		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus);
+		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus, int &style);
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
 	/* ensures we can deal damage to a target */

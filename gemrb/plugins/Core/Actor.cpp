@@ -3349,7 +3349,7 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 }
 
 bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
-		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus)
+		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus, int &style)
 {
 	tohit = GetStat(IE_TOHIT);
 	speed = -GetStat(IE_PHYSICALSPEED);
@@ -3411,12 +3411,14 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		stars = GetStat(IE_PROFICIENCY2WEAPON)&PROFS_MASK;
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
 
+		style = 1000*stars + IE_PROFICIENCY2WEAPON;
 		THACOBonus += wsdualwield[stars][leftorright?1:0];
 	} else if (wi.itemflags&(IE_ITEM_TWO_HANDED) && (Flags&WEAPON_MELEE) && wstwohanded) {
 		//add two handed profs bonus
 		stars = GetStat(IE_PROFICIENCY2HANDED)&PROFS_MASK;
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
 
+		style = 1000*stars + IE_PROFICIENCY2HANDED;
 		DamageBonus += wstwohanded[stars][0];
 		CriticalBonus = wstwohanded[stars][1];
 		speed += wstwohanded[stars][2];
@@ -3424,7 +3426,19 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		int slot;
 		//NULL return means no shield slot
 		if ((inventory.GetUsedWeapon(true, slot)==NULL)) {
+			stars = GetStat(IE_PROFICIENCYSINGLEWEAPON)&PROFS_MASK;
+			if (stars > STYLE_MAX) stars = STYLE_MAX;
+
+			style = 1000*stars + IE_PROFICIENCYSINGLEWEAPON;
 			CriticalBonus = wssingle[stars][1];
+		}
+	} else if ((Flags&WEAPON_MELEE) && wsswordshield) {
+		int slot;
+		if (inventory.GetUsedWeapon(true, slot)) {
+			stars = GetStat(IE_PROFICIENCYSWORDANDSHIELD)&PROFS_MASK;
+			if (stars > STYLE_MAX) stars = STYLE_MAX;
+
+			style = 1000*stars + IE_PROFICIENCYSWORDANDSHIELD;
 		}
 	}
 
@@ -3589,10 +3603,10 @@ void Actor::PerformAttack(ieDword gameTime)
 	int tohit;
 	ieDword Flags;
 	int DamageBonus, CriticalBonus;
-	int speed;
+	int speed, style;
 
 	//will return false on any errors (eg, unusable weapon)
-	if (!GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus)) {
+	if (!GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus, style)) {
 		return;
 	}
 
