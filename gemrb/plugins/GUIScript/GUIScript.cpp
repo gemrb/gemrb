@@ -5082,6 +5082,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	}
 	gamedata->DelTable( mastertable );
 	MyActor->SetOver( false );
+	MyActor->InitButtons(MyActor->GetStat(IE_CLASS), true); //force re-init of actor's buttons
 	Py_INCREF( Py_None );
 	return Py_None;
 }
