@@ -2,6 +2,6 @@ Description: This table lists the benefits for points in single-weapon proficien
 
 Columns - 
 AC   - bonus to ac
-CRIT - bonus to critical range
+CRITICALHITBONUS - bonus to critical range
 
 Rows - number of stars
