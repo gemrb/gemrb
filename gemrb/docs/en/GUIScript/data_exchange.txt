@@ -23,25 +23,26 @@ WorldMapControl: whether travel allowed or not (change the cursor)
 MapControl: the mapcontrol will use the first bit of the associated value to display mapnotes.
 
 Examples:
- Progress = 0
- GemRB.SetVar ("Progress", Progress)
- Bar = GemRB.GetControl (LoadScreen, 0)
- GemRB.SetVarAssoc (LoadScreen, Bar, "Progress", Progress)
+   Progress = 0
+   GemRB.SetVar ("Progress", Progress)
+   Bar = GemRB.GetControl (LoadScreen, 0)
+   GemRB.SetVarAssoc (LoadScreen, Bar, "Progress", Progress)
 Bar is a ProgressBar control, the engine will refresh the "Progress" Global Dictionary Variable as it progresses with the EnterGame command.
 
- GemRB.SetButtonFlags(FeedbackWindow,THac0RollsB, IE_GUI_BUTTON_CHECKBOX, OP_OR)
- GemRB.SetVarAssoc(FeedbackWindow,THac0RollsB, "Rolls",1)
+   GemRB.SetButtonFlags(FeedbackWindow,THac0RollsB, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+   GemRB.SetVarAssoc(FeedbackWindow,THac0RollsB, "Rolls",1)
 The above commands (from the options screen) will change the "Rolls" variable according to the CheckBox' state.
 
- BppButtonB1 = GemRB.GetControl(GraphicsWindow, 5)
- BppButtonB2 = GemRB.GetControl(GraphicsWindow, 6)
- BppButtonB3 = GemRB.GetControl(GraphicsWindow, 7)
- GemRB.SetButtonFlags(GraphicsWindow, BppButtonB1, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
- GemRB.SetButtonFlags(GraphicsWindow, BppButtonB2, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
- GemRB.SetButtonFlags(GraphicsWindow, BppButtonB3, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
- GemRB.SetVarAssoc(GraphicsWindow, BppButtonB1, "BitsPerPixel",16)
- GemRB.SetVarAssoc(GraphicsWindow, BppButtonB2, "BitsPerPixel",24)
- GemRB.SetVarAssoc(GraphicsWindow, BppButtonB3, "BitsPerPixel",32)
+   BppButtonB1 = GemRB.GetControl(GraphicsWindow, 5)
+   BppButtonB2 = GemRB.GetControl(GraphicsWindow, 6)
+   BppButtonB3 = GemRB.GetControl(GraphicsWindow, 7)
+   GemRB.SetButtonFlags(GraphicsWindow, BppButtonB1, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+   GemRB.SetButtonFlags(GraphicsWindow, BppButtonB2, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+   GemRB.SetButtonFlags(GraphicsWindow, BppButtonB3, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+   GemRB.SetVarAssoc(GraphicsWindow, BppButtonB1, "BitsPerPixel",16)
+   GemRB.SetVarAssoc(GraphicsWindow, BppButtonB2, "BitsPerPixel",24)
+   GemRB.SetVarAssoc(GraphicsWindow, BppButtonB3, "BitsPerPixel",32)
 The above commands will set up the BPP selection RadioButton group.
 
 See also: SetVarAssoc, SetVar, GetVar, QueryText, SetButtonFlags, accessing_gui_controls
+
