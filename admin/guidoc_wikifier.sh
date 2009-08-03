@@ -67,7 +67,7 @@ for txt_file in *; do
   # format the title
   if grep -qR --include="*.py" "GemRB\.${txt_file%.*}" "$scriptdir"; then
     # actual script command
-    sed -i "1 s,^,===== ${txt_file%.*} =====," $txt_file
+    sed -i "1 s,^,===== ${txt_file%.*} =====\n," $txt_file
   if [[ ${txt_file%.*} == controls ]]; then echo juhu0; fi
 else
     # miscellaneous doc
@@ -82,12 +82,12 @@ else
   fi
 
   # bold the headlines, itemize the parameters and add some links
-#  sed -i "s,Description:\|Return value:\|Prototype:\|Parameters:\|$see_also_str\|MD5:\|Examples*:,\n**&**," $txt_file
-  sed -i "s@^[^:]\{,15\}:@\n**&**@" $txt_file
-  sed -i "$ s,$,\n\n[[guiscript:index|Function index]]," $txt_file
+  sed -i "/\[\[guiscript:/! s@^[^:]\{,20\}:@\n**&**@" $txt_file
+  sed -i "/^$see_also_str/ s@^[^:]\{,10\}:@\n**&**@" $txt_file
+  echo -e "\n\n[[guiscript:index|Function index]]" >> $txt_file
   sed -i "/Parameters:/,/^[^:]*:\*\*/ { /^[^:]*:\*\*/!s,^\(\s*\S\S*\),  * \1,}" $txt_file
   sed -i '/^\s*$/ {N; /\n\s*$/D }' $txt_file # squeeze repeats of more than 2 newlines
-  sed -i "1 s,$,\n  * [[guiscript:${txt_file%.*}]]," indexX
+  echo "  * [[guiscript:${txt_file%.*}]]" >> indexX
 
   [[ ${txt_file%.*} == indexX ]] && continue
   lo_file=$(tr '[[:upper:]]' '[[:lower:]]' <<< $txt_file)
