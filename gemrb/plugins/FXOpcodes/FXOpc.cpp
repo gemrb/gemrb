@@ -5540,7 +5540,7 @@ int fx_apply_effect_curse (Actor* Owner, Actor* target, Effect* fx)
 int fx_melee_to_hit_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_melee_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_MOD( IE_MELEEHIT );
+	STAT_MOD( IE_MELEETOHIT );
 	return FX_APPLIED;
 }
 

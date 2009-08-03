@@ -3449,7 +3449,7 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 	//get attack style (melee or ranged)
 	switch(Flags&WEAPON_STYLEMASK) {
 		case WEAPON_MELEE:
-			tohit += GetStat(IE_MELEEHIT);
+			tohit += GetStat(IE_MELEETOHIT);
 			break;
 		case WEAPON_FIST:
 			tohit += GetStat(IE_FISTHIT);

@@ -394,7 +394,7 @@
 #define IE_SCRIPTINGSTATE9  	164
 #define IE_SCRIPTINGSTATE10 	165
 //these are genuine bg2 stats found by research
-#define IE_MELEEHIT		166
+#define IE_MELEETOHIT		166
 #define IE_MELEEDAMAGE		167
 #define IE_MISSILEDAMAGE	168
 #define IE_NOCIRCLE		169
