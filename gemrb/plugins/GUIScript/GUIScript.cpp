@@ -4936,8 +4936,6 @@ static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( StatValue );
 }
 
-//TODO: maybe we also need setplayerstring
-
 PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
 "GetPlayerStat(Slot, ID[, BaseStat]) => int\n\n"
 "Queries a stat." );
