@@ -2462,11 +2462,8 @@ const char* Actor::GetActorNameByID(ieDword ID) const
 
 void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 {
-	bool effinit=false;
-	if (!GetCurrentArea()) {
-		//we had no area yet
-		effinit = true;
-	}
+	//Did we have an area?
+	bool effinit=!GetCurrentArea() ;
 	Scriptable::SetMap(map); //now we have an area
 	localID = LID;
 	globalID = GID;
@@ -4713,6 +4710,9 @@ int Actor::SetEquippedQuickSlot(int slot)
 	//creatures and such
 	if (PCStats) {
 		slot = PCStats->QuickWeaponSlots[slot]-inventory.GetWeaponSlot();
+	}
+	if(!GetCurrentArea()) {//no area yet
+		Equipped = slot ;
 	}
 	if (inventory.SetEquippedSlot(slot)) {
 		return 0;
