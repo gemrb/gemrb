@@ -3781,7 +3781,7 @@ int fx_replace_creature (Actor* Owner, Actor* target, Effect *fx)
 	default:;
 	}
 	//create replacement; should we be passing the target instead of NULL?
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, -1,-1);
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, EAM_DEFAULT,-1);
 	return FX_NOT_APPLIED;
 }
 
@@ -4247,7 +4247,7 @@ int fx_find_familiar (Actor* Owner, Actor* target, Effect* fx)
 	}
 	//summon familiar with fx->Resource
 	Point p(fx->PosX, fx->PosY);
-	Actor *fam = core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, -1,0);
+	Actor *fam = core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_DEFAULT, 0);
 	if (fam) {
 		Effect *newfx;
 

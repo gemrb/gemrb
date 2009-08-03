@@ -800,7 +800,7 @@ int fx_iwd_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
 
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
-	core->SummonCreature(monster, areahit, Owner, target, p, -1, fx->Parameter1);
+	core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 
@@ -853,7 +853,7 @@ int fx_animate_dead (Actor* Owner, Actor* target, Effect* fx)
 
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
-	core->SummonCreature(monster, areahit, Owner, target, p, -1, fx->Parameter1);
+	core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 //f4 Prayer
@@ -928,7 +928,7 @@ int fx_summon_monster2 (Actor* Owner, Actor* target, Effect* fx)
 
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
-	core->SummonCreature(monster, areahit, Owner, target, p, -1, fx->Parameter1);
+	core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 
@@ -1014,7 +1014,7 @@ int fx_summon_shadow_monster (Actor* Owner, Actor* target, Effect* fx)
 
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
-	core->SummonCreature(monster, areahit, Owner, target, p, -1, fx->Parameter1);
+	core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 //f9 Recitation
@@ -1322,7 +1322,7 @@ int fx_summon_pomab (Actor* Owner, Actor* target, Effect* fx)
 
 	for (int i=0;i<6;i++) {
 		core->SummonCreature(real==i?pomab_resref[0]:pomab_resref[1], fx->Resource2, Owner,
-			target, pomab_positions[i], -1, 100);
+			target, pomab_positions[i], EAM_DEFAULT, 100);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -1594,7 +1594,7 @@ int fx_soul_eater (Actor* Owner, Actor* target, Effect* fx)
 		core->GetResRefFrom2DA("souleatr", monster, hit, areahit);
 		//the monster should appear near the effect position
 		Point p(fx->PosX, fx->PosY);
-		core->SummonCreature(monster, areahit, Owner, target, p, -1, fx->Parameter1);
+		core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1);
 	}
 	return FX_NOT_APPLIED;
 }

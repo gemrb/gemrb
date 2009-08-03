@@ -184,12 +184,12 @@ public:
 #define MAX_CIRCLE_SIZE  3
 
 /** Summoning */
-#define EAM_DEFAULT -1
-#define EAM_ALLY    0
+#define EAM_DEFAULT 0
 #define EAM_ENEMY   1
-#define EAM_SOURCEALLY 2
+#define EAM_ALLY    2
 #define EAM_SOURCEENEMY 3
-#define EAM_NEUTRAL 4
+#define EAM_SOURCEALLY 4
+#define EAM_NEUTRAL 5
 //
 #define STAT_CON_HP_NORMAL   0
 #define STAT_CON_HP_WARRIOR  1
