@@ -4575,7 +4575,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerString__doc,
-"SetPlayerSound(PlayerSlot, StringSlot, StrRef)\n\n"
+"SetPlayerString(PlayerSlot, StringSlot, StrRef)\n\n"
 "Sets one of the player character's verbal constants. Mostly useful for setting biography." );
 
 static PyObject* GemRB_SetPlayerString(PyObject * /*self*/, PyObject* args)
