@@ -3349,7 +3349,7 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 }
 
 bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
-		ieDword &Flags, int &DamageBonus, int &speed)
+		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus)
 {
 	tohit = GetStat(IE_TOHIT);
 	speed = -GetStat(IE_PHYSICALSPEED);
@@ -3418,13 +3418,13 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 		DamageBonus += wstwohanded[stars][0];
-		//TODO: critical bonus
+		CriticalBonus = wstwohanded[stars][1];
 		speed += wstwohanded[stars][2];
 	} else if ((Flags&WEAPON_MELEE) && wssingle) {
 		int slot;
 		//NULL return means no shield slot
 		if ((inventory.GetUsedWeapon(true, slot)==NULL)) {
-			//TODO: critical bonus
+			CriticalBonus = wssingle[stars][1];
 		}
 	}
 
@@ -3588,11 +3588,11 @@ void Actor::PerformAttack(ieDword gameTime)
 	ITMExtHeader *hittingheader = NULL;
 	int tohit;
 	ieDword Flags;
-	int DamageBonus;
+	int DamageBonus, CriticalBonus;
 	int speed;
 
 	//will return false on any errors (eg, unusable weapon)
-	if (!GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed)) {
+	if (!GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus)) {
 		return;
 	}
 
@@ -3666,7 +3666,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		damage = damageluck;
 	}
 
-	if (roll>=ATTACKROLL-(int) GetStat(IE_CRITICALHITBONUS) ) {
+	if (roll >= (ATTACKROLL - (int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus)) {
 		//critical success
 		printBracket("Critical Hit", GREEN);
 		printf("\n");
