@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetWindowSize(WindowIndex, Width, Height)
 
+Metaclass Prototype: SetSize(Width, Height)
+
 Description: Resizes a Window.
 
 Parameters:

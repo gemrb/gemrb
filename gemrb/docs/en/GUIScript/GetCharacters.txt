@@ -1,6 +1,8 @@
 
 Prototype: GemRB.GetCharacters(WindowIndex, ControlIndex)
 
+Metaclass Prototype: GetCharacters(ControlIndex)
+
 Description: Reads the contents of the characters subfolder into a TextArea control.
 
 Parameters:

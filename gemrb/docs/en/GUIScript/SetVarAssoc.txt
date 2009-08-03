@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetVarAssoc(WindowIndex, ControlIndex, VariableName, LongValue)
 
+Metaclass Prototype: SetVarAssoc(VariableName, LongValue)
+
 Description: It associates a variable name and value with a control. The control uses this associated value differently, depending on the control. See more about this in "data_exchange".
 
 Parameters:

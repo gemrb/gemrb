@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetButtonFlags(WindowIndex, ControlIndex, Flags, Operation)
 
+Metaclass Prototype: SetFlags(Flags, Operation)
+
 Description: Sets the Display Flags of a Button. 
 
 Parameters:

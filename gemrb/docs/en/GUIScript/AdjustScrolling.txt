@@ -1,6 +1,8 @@
 
 Prototype: AdjustScrolling(WindowIndex, ControlIndex, x, y)
 
+Metaclass Prototype: AdjustScrolling(x, y)
+
 Description: Sets the scrolling offset of a WorldMapControl.
 
 Parameters: WindowIndex, ControlIndex  - the control's reference

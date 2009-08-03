@@ -1,5 +1,7 @@
-
+v
 Prototype: GemRB.CreateScrollBar(WindowIndex, ControlID, x, y, w, h)
+
+Metaclass Prototype: CreateScrollBar(ControlID, x, y, w, h)
 
 Description:  Creates and adds a new ScrollBar to a Window.
 

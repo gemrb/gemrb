@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetupControls(WindowIndex, Slot)
 
+Metaclass Prototype: SetupControls(Slot)
+
 Description: Sets up all 12 action buttons for a player character, based on preset preferences and the character's class.
 
 Parameters:

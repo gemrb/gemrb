@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetTooltip(WindowIndex, ControlIndex, String|Strref)
 
+Metaclass Prototype: SetTooltip(String|Strref)
+
 Description: Sets control's tooltip. Any control may have a tooltip.
 
 Parameters: WindowIndex, ControlIndex  - the control's reference

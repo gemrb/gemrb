@@ -1,6 +1,7 @@
 
-Prototype:
-GemRB.GetSymbolValue(SymbolIndex, StringVal|IntVal)
+Prototype: GemRB.GetSymbolValue(SymbolIndex, StringVal|IntVal)
+
+Metaclass Prototype: GetValue(StringVal|IntVal)
 
 Description: Returns a field of a IDS Symbol Table.
 

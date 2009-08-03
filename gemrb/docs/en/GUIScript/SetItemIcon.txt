@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, Type, Tooltip, ITM2ResRef])
 
+Metaclass Prototype: SetItemIcon(ITMResRef[, Type, Tooltip, ITM2ResRef])
+
 Description: Sets Item icon image on a Button control.
 
 Parameters:

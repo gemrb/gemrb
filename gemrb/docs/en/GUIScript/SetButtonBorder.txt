@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetButtonBorder(WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, R, G, B, A, [enabled, filled])
 
+Metaclass Prototype: SetBorder(BorderIndex, dx1, dy1, dx2, dy2, R, G, B, A, [enabled, filled])
+
 Description: Sets border/frame/overlay parameters for a button. This command can be used for drawing a border around a button, or to overlay it with a tint (like with unusable or unidentified item's icons).
 
 Parameters: 

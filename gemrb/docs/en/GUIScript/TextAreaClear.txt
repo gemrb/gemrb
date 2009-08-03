@@ -1,6 +1,8 @@
 
 Prototype: GemRB.TextAreaClear(WindowIndex, ControlIndex)
 
+Metaclass Prototype: Clear()
+
 Description: Clears the Text from the TextArea Control in the Window.
 
 Parameters: WindowIndex, ControlIndex  - the control's reference

@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetButtonBAM(WindowIndex, ControlIndex, BAMResRef, CycleIndex, FrameIndex, col1)
 
+Metaclass Prototype: SetBAM(BAMResRef, CycleIndex, FrameIndex, col1)
+
 Description: Sets the Picture of a Button Control from a BAM file. If the supplied color gradient value is -1, then no palette change, if it is >=0, then it changes the 4-16 palette entries of the bam.
 
 Parameters:

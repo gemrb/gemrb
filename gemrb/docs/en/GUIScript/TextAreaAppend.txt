@@ -1,6 +1,8 @@
 
 Prototype: GemRB.TextAreaAppend(WindowIndex, ControlIndex, String|Strref [, Row[, Flag]])
 
+Metaclass Prototype: TextAreaAppend(String|Strref [, Row[, Flag]])
+
 Description: Appends the Text to the TextArea Control in the Window. If row is specificed, it can also append text to existing rows.
 
 Parameters:

@@ -1,6 +1,8 @@
 
 Prototype: GemRB.GetTableColumnName(TableIndex, ColumnIndex)
 
+Metaclass Prototype: GetColumnName(ColumnIndex)
+
 Description: Returns the Name of a Column in a 2DA Table.
 
 Parameters: TableIndex - returned by a previous LoadTable command.

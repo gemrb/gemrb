@@ -1,6 +1,8 @@
 
 Prototype: GemRB.CreateMapControl(WindowIndex, ControlID, x, y, w, h, [LabelID, FlagResRef [, Flag2ResRef]]
 
+Metaclass Prototype: CreateMapControl(ControlID, x, y, w, h, [LabelID, FlagResRef [, Flag2ResRef]]
+
 Description:  Creates and adds a new Area Map Control to a Window. If WindowIndex and ControlID (not ControlIndex!) point to a valid control, it will replace that control with the MapControl using the original control's dimensions (x,y,w,h are ignored). It is possible to associate a variable with the MapControl, in this case, the associated variable will enable or disable mapnotes (you must supply a LabelID and the resources for the pins). 
 
 Parameters:

@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetButtonSprites(WindowIndex, ControlIndex, ResRef, Cycle, UnpressedFrame, PressedFrame, SelectedFrame, DisabledFrame)
 
+Metaclass Prototype: SetSprites(ResRef, Cycle, UnpressedFrame, PressedFrame, SelectedFrame, DisabledFrame)
+
 Description: Sets the Button's Images. You can disable the images by setting the IE_GUI_BUTTON_NO_IMAGE flag on the control.
 
 Parameters:

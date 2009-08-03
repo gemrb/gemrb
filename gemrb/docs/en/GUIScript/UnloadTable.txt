@@ -1,6 +1,8 @@
 
 Prototype: GemRB.UnloadTable(TableIndex)
 
+Metaclass Prototype: Unload()
+
 Description: Unloads a 2DA Table.
 
 Parameters: TableIndex - returned by a previous LoadTable command.

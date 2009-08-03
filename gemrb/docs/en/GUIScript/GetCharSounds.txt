@@ -1,6 +1,8 @@
 
 Prototype: GemRB.GetCharSounds(WindowIndex, ControlIndex)
 
+Metaclass Prototype: GetCharSounds(ControlIndex)
+
 Description: Reads the contents of the sounds subfolder into a TextArea control.
 
 Parameters:

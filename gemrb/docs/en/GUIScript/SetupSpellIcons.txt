@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetupSpellIcons(WindowIndex, Slot, Type[, Start])
 
+Metaclass Prototype: SetupSpellIcons(Slot, Type[, Start])
+
 Description: Sets up all 12 action buttons for a player character with spell or innate icons.
 It also sets up the scroll buttons left and right if needed.
 If Start is supplied, it will skip the first few items.

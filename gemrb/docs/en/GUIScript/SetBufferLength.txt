@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetBufferLength(WindowIndex, ControlIndex, Length)
 
+Metaclass Prototype: SetBufferLength(Length)
+
 Description:  Sets the maximum text length of a TextEdit Control. It cannot be more than 65535.
 
 Parameters: 

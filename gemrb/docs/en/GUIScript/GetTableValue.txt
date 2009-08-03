@@ -1,6 +1,8 @@
 
 Prototype: GemRB.GetTableValue(TableIndex, RowIndex/RowString, ColIndex/ColString[, Type])
 
+Metaclass Prototype: GetValue(RowIndex/RowString, ColIndex/ColString[, Type])
+
 Description: Returns a field of a 2DA Table. The row and column indices must be of same type (either string or numeric), the return value will be of the same type.
 Type can also be specified.
 

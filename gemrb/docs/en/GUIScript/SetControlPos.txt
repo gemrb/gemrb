@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetControlPos(WindowIndex, ControlIndex, X, Y)
 
+Metaclass Prototype: SetPos(X, Y)
+
 Description: Moves a Control.
 
 Parameters: WindowIndex, ControlIndex  - the control's reference

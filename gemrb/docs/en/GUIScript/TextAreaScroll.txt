@@ -1,6 +1,8 @@
 
 Prototype: GemRB.TextAreaScroll(WindowIndex, ControlIndex, offset)
 
+Metaclass Prototype: Scroll(offset)
+
 Description:  Scrolls the textarea up or down by offset.
 
 Parameters: 

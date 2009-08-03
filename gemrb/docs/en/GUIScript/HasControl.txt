@@ -1,6 +1,8 @@
 
 Prototype: GemRB.HasControl(WindowIndex, ControlID[, ControlType])
 
+Metaclass Prototype: HasControl(ControlID[, ControlType])
+
 Description:  Returns true if the control exists.
 
 Parameters:

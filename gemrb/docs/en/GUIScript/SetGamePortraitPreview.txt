@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetGamePortraitPreview(WindowIndex, ControlIndex, PCSlotCount)
 
+Metaclass Prototype: SetGamePortraitPreview(PCSlotCount)
+
 Description:  Sets a current game PC portrait preview bmp onto a button as picture.
 
 Parameters: 

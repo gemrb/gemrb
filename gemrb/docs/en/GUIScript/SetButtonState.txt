@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetButtonState(WindowIndex, ControlIndex, State)
 
+Metaclass Prototype: SetState(State)
+
 Description: Sets the state of a Button Control. Doesn't work if the button
 is a checkbox or a radio button though, their states are handled internally.
 

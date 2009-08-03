@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetSaveGamePortrait(WindowIndex, ControlIndex, SaveSlotCount, PCSlotCount)
 
+Metaclass Prototype: SetSaveGamePortrait(SaveSlotCount, PCSlotCount)
+
 Description: Sets a savegame PC portrait bmp onto a button as picture.
 
 Parameters: WindowIndex, ControlIndex  - the control's reference

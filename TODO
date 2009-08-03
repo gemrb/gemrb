@@ -98,7 +98,6 @@ Documentation:
    copyright notices
 2. Add Doxygen doc comments to more objects
 3. Write GemRB overview, structure and high-level flow docs
-5. Update guiscript docs with metaclass info
 
 
 Community:

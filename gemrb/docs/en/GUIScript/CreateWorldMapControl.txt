@@ -1,6 +1,8 @@
 
 Prototype: GemRB.CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, direction[, font])
 
+Metaclass Prototype: CreateWorldMapControl(ControlID, x, y, w, h, direction[, font])
+
 Description: This command will create a special WorldMapControl, which is currently unavailable via .chu files. If WindowIndex and ControlID (not ControlIndex!) point to a valid control, it will replace that control with the WorldMapControl using the original control's dimensions (x,y,w,h are ignored). 
 
 Parameters:

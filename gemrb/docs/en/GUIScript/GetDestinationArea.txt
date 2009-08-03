@@ -1,6 +1,8 @@
 
 Prototype: GemRB.GetDestinationArea(WindowIndex, ControlIndex)
 
+Metaclass Prototype: GetDestinationArea(ControlIndex)
+
 Description: Returns a dictionary of the selected area by the worldmap control.
 If the route is blocked, then Distance will return a negative value and Destination/Entrance won't be set.
 

@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetButtonMOS(WindowIndex, ControlIndex, MOSResRef)
 
+Metaclass Prototype: SetMOS(MOSResRef)
+
 Description: Sets the Picture of a Button Control from a MOS file.
 
 Parameters:

@@ -1,6 +1,8 @@
 
 Prototype: GemRB.FindTableValue(TableIndex, ColumnIndex, Value[, Start])
 
+Metaclass Prototype: FindValue(ColumnIndex, Value[, Start])
+
 Description: Returns the first rowcount of a field value in a 2DA Table. If Start
 is omitted, the search starts from the beginning. This command doesn't work with
 a string value.

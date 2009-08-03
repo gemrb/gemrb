@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetControlStatus(WindowIndex, ControlIndex, State)
 
+Metaclass Prototype: SetStatus(State)
+
 Description: Sets the state of a Control. For buttons, this is the same as SetButtonState. You can additionally use 0x80 for a focused control.
 For other controls, this command will set the common Value of the control, which has various uses.
 

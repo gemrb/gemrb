@@ -1,6 +1,8 @@
 
 Prototype: MoveTAText(srcWin, srcCtrl, dstWin, dstCtrl)
 
+Metaclass Prototype: MoveText(dstCtrl)
+
 Description: Copies a TextArea content to another TextArea. Both parameter pairs must point to a valid TextArea.
 
 Parameters: srcWin, srcCtrl - a window index/control index pair of the source control

@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetTextAreaFlags(WindowIndex, ControlIndex, Flags, Operation)
 
+Metaclass Prototype: SetFlags(Flags, Operation)
+
 Description: Sets the Flags of a TextArea.
 
 Parameters: WindowIndex, ControlIndex  - the control's reference

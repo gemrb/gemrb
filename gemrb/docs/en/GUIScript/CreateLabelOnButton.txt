@@ -1,6 +1,8 @@
 
 Prototype: GemRB.CreateLabelOnButton(WindowIndex, ButtonControlID, NewID, font, text, align)
 
+Metaclass Prototype: CreateLabelOnButton(NewID, font, text, align)
+
 Description: Creates and adds a new Label to a Window, based on the dimensions of an existing button. If the NewID is the same as the old button ID, the old button will be converted to this Label (the old button will be removed). 
 
 Parameters:

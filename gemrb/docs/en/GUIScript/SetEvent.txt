@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetEvent(WindowIndex, ControlIndex, EventMask, FunctionName)
 
+Metaclass Prototype: SetEvent(EventMask, FunctionName)
+
 Description: Sets an event of a control on a window to a script defined function. 
 
 Parameters: 

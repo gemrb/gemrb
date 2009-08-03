@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetGamePreview(WindowIndex, ControlIndex)
 
+Metaclass Prototype: SetGamePreview()
+
 Description:  Sets current game area preview bmp onto a button as picture.
 
 Parameters: 

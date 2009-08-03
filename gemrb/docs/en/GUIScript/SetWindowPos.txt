@@ -1,6 +1,8 @@
 
 Prototype: GemRB.SetWindowPos(WindowIndex, X, Y, [Flags=WINDOW_TOPLEFT])
 
+Metaclass Prototype: SetPos(X, Y, [Flags=WINDOW_TOPLEFT])
+
 Description: Moves a Window.
 
 Parameters: 
