@@ -56,6 +56,6 @@ def OnLoad():
 				Level = GemRB.GetPlayerStat (Slot, IE_LEVEL2+i-1)
 			break
 	SetupSpellLevels(Slot, TableName, IE_SPELL_TYPE_WIZARD, 1)
-	OpenSpellsWindow (Slot, TableName, Level, Level, KitValue, 1,False,False)
+	OpenSpellsWindow (Slot, TableName, Level, Level, KitValue, 1,False)
 
 	return
