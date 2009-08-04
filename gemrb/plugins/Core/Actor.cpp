@@ -73,6 +73,10 @@ static int xpbonuslevels = -1;
 static int **levelslots = NULL;
 static int *dualswap = NULL;
 static int *maxhpconbon = NULL;
+static ieVariable IWDDeathVarFormat = "KILL_%s_CNT";
+static ieVariable BGDeathVarFormat = "SPRITE_IS_DEAD%s";
+static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
+static ieVariable CounterNames[4]={"GOOD","LAW","LADY","MURDER"};
 
 static int FistRows = -1;
 typedef ieResRef FistResType[MAX_LEVEL+1];
@@ -1110,6 +1114,12 @@ int IsClassFromName (const char* name)
 static void InitActorTables()
 {
 	int i, j;
+
+	if (core->HasFeature(GF_IWD_DEATHVARFORMAT)) {
+		memcpy(DeathVarFormat, IWDDeathVarFormat, sizeof(ieVariable));
+	} else {
+		memcpy(DeathVarFormat, BGDeathVarFormat, sizeof(ieVariable));
+	}
 
 	if (core->HasFeature(GF_CHALLENGERATING)) {
 		sharexp=SX_DIVIDE|SX_CR;
@@ -2595,11 +2605,26 @@ void Actor::Resurrect()
 	ClearActions();
 	ClearPath();
 	SetStance(IE_ANI_EMERGE);
+	//readjust death variable on resurrection
+	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_DEATHVAR)) {
+		ieVariable DeathVar;
+
+		snprintf(DeathVar,sizeof(ieVariable),"%s_DEAD",scriptName);
+		Game *game=core->GetGame();
+		ieDword value=0;
+
+		game->kaputz->Lookup(DeathVar, value);
+		if (value) {
+			game->kaputz->SetAt(DeathVar, value-1);
+		}
+	}
 	//clear effects?
 }
 
 void Actor::Die(Scriptable *killer)
 {
+	int i,j;
+
 	if (InternalFlags&IF_REALLYDIED) {
 		return; //can die only once
 	}
@@ -2677,14 +2702,32 @@ void Actor::Die(Scriptable *killer)
 		ieDword value = 0;
 
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
-			snprintf(varname, 32, "%s_DEAD", scriptName);
-			game->kaputz->Lookup(varname, value);
-			game->kaputz->SetAt(varname, value+1);
+			if (AppearanceFlags&APP_DEATHVAR) {
+			  snprintf(varname, 32, "%s_DEAD", scriptName);
+			  game->kaputz->Lookup(varname, value);
+			  game->kaputz->SetAt(varname, value+1);
+			}
+			if (AppearanceFlags&APP_DEATHTYPE) {
+			  snprintf(varname, 32, "KILL_%s", KillVar);
+			  game->kaputz->Lookup(varname, value);
+			  game->kaputz->SetAt(varname, value+1);
+			}
 		} else {
-			snprintf(varname, 32, "SPRITE_IS_DEAD%s", scriptName);
+			snprintf(varname, 32, DeathVarFormat, scriptName);
 			game->locals->Lookup(varname, value);
 			game->locals->SetAt(varname, value+1);
 		}
+	}
+
+	//death counters for PST
+	j=APP_GOOD;
+	for(i=0;i<4;i++) {
+		if (AppearanceFlags&j) {
+			ieDword value = 0;
+			game->locals->Lookup(CounterNames[i], value);
+			game->locals->SetAt(CounterNames[i], value+DeathCounters[i]);
+		}
+		j+=j;
 	}
 
 	// EXTRACOUNT is updated at the moment of death

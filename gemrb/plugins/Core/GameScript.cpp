@@ -35,9 +35,6 @@
 //16 - trigger evaluation
 
 static bool charnameisgabber = false;
-static ieVariable IWDDeathVarFormat = "KILL_%s_CNT";
-static ieVariable BGDeathVarFormat = "SPRITE_IS_DEAD%s";
-static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
 
 //Make this an ordered list, so we could use bsearch!
 static const TriggerLink triggernames[] = {
@@ -1233,11 +1230,6 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 			charnameisgabber=true;
 		} else {
 			charnameisgabber=false;
-		}
-		if (core->HasFeature(GF_IWD_DEATHVARFORMAT)) {
-			memcpy(DeathVarFormat, IWDDeathVarFormat, sizeof(ieVariable));
-		} else {
-			memcpy(DeathVarFormat, BGDeathVarFormat, sizeof(ieVariable));
 		}
 
 		InitScriptTables();

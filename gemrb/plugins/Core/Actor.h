@@ -158,6 +158,9 @@ class ScriptedAnimation;
 #define APP_HALFTRANS    2           //half transparent
 #define APP_DEATHVAR     16          //set death variable
 #define APP_DEATHTYPE    32          //count creature type deaths
+//64
+#define APP_FACTION      128         //count killed faction
+#define APP_TEAM         0x100       //count killed team
 #define APP_INVULNERABLE 0x200       //invulnerable
 #define APP_GOOD         0x400       //good count
 #define APP_LAW          0x800       //law count
@@ -166,6 +169,11 @@ class ScriptedAnimation;
 #define APP_NOTURN       0x4000      //doesn't face gabber in dialogue
 #define APP_BUDDY        0x8000      //npcs will turn hostile if this one dies
 #define APP_DEAD         0x40000000  //used by the engine to prevent dying twice
+
+#define DC_GOOD   0
+#define DC_LAW    1
+#define DC_LADY   2
+#define DC_MURDER 3
 
 typedef ieByte ActionButtonRow[GUIBT_COUNT];
 
@@ -210,8 +218,6 @@ public:
 	ieStrRef ShortStrRef, LongStrRef;
 	ieStrRef StrRefs[VCONST_COUNT];
 
-	//ieWord AppearanceFlags1;
-	//ieWord AppearanceFlags2;
 	ieDword AppearanceFlags;
 
 	ieVariable KillVar; //this second field is present in pst and iwd1
@@ -555,7 +561,7 @@ public:
 	/* If it returns true, then default AC=10 and the lesser the better */
 	int IsReverseToHit();
 	/* initialize the action buttons based on class. If forced, it will override 
-           previously customized or set buttons. */
+		previously customized or set buttons. */
 	void InitButtons(ieDword cls, bool forced);
 	void SetFeat(unsigned int feat, int mode);
 	int GetFeat(unsigned int feat) const;
