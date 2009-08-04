@@ -576,7 +576,15 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	#Weapon Style bonuses
 	stats.append (32131)
-	#
+	wstyle = GemRB.GetCombatDetails (pc, 0)["Style"] # equipped weapon style + 1000 * proficiency level
+	profcount = wstyle / 1000
+	if profcount:
+		wstyletables = { IE_PROFICIENCY2WEAPON:"wstwowpn", IE_PROFICIENCY2HANDED:"wstwohnd", IE_PROFICIENCYSINGLEWEAPON:"wssingle", IE_PROFICIENCYSWORDANDSHIELD:"wsshield" }
+		bonusrefs = { "THAC0BONUSRIGHT":56911, "THAC0BONUSLEFT":56910, "DAMAGEBONUS":10336, "CRITICALHITBONUS":32140, "PHYSICALSPEED":32141, "AC":10339, "ACVSMISSLE":10340 }
+		WStyleTable = GemRB.LoadTableObject (wstyletables[wstyle%1000])
+		for col in range(WStyleTable.GetColumnCount()):
+			value = WStyleTable.GetValue (profcount, col)
+			stats.append ((bonusrefs[WStyleTable.GetColumnName(col)], value, ''))
 	stats.append (None)
 
 	res = []
