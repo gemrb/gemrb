@@ -33,6 +33,7 @@ def OnLoad ():
 	BIO = GemRB.GetToken("BIO")
 	EditControl = EditControl.ConvertEdit (5)
 	EditControl.SetVarAssoc ("row", 0)
+	EditControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	if BIO:
 		EditControl.SetText (BIO)
 	else:
