@@ -3410,7 +3410,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 
 		style = 1000*stars + IE_PROFICIENCY2WEAPON;
 		THACOBonus += wsdualwield[stars][leftorright?1:0];
-	} else if (wi.itemflags&(IE_ITEM_TWO_HANDED) && (Flags&WEAPON_MELEE) && wstwohanded) {
+	} else if (wi.itemflags&(IE_INV_ITEM_TWOHANDED) && (Flags&WEAPON_MELEE) && wstwohanded) {
 		//add two handed profs bonus
 		stars = GetStat(IE_PROFICIENCY2HANDED)&PROFS_MASK;
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
