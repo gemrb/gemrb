@@ -74,7 +74,6 @@ static int **levelslots = NULL;
 static int *dualswap = NULL;
 static int *maxhpconbon = NULL;
 static ieVariable IWDDeathVarFormat = "KILL_%s_CNT";
-static ieVariable BGDeathVarFormat = "SPRITE_IS_DEAD%s";
 static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
 static ieVariable CounterNames[4]={"GOOD","LAW","LADY","MURDER"};
 
@@ -1117,8 +1116,6 @@ static void InitActorTables()
 
 	if (core->HasFeature(GF_IWD_DEATHVARFORMAT)) {
 		memcpy(DeathVarFormat, IWDDeathVarFormat, sizeof(ieVariable));
-	} else {
-		memcpy(DeathVarFormat, BGDeathVarFormat, sizeof(ieVariable));
 	}
 
 	if (core->HasFeature(GF_CHALLENGERATING)) {
