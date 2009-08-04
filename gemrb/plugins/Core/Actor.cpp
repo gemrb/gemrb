@@ -3419,24 +3419,26 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		DamageBonus += wstwohanded[stars][0];
 		CriticalBonus = wstwohanded[stars][1];
 		speed += wstwohanded[stars][2];
-	} else if ((Flags&WEAPON_MELEE) && wssingle) {
+	} else if (Flags&WEAPON_MELEE) {
 		int slot;
-		//NULL return means no shield slot
-		if ((inventory.GetUsedWeapon(true, slot)==NULL)) {
+		CREItem *weapon = inventory.GetUsedWeapon(true, slot);
+		if(wssingle && weapon == NULL) {
+			//NULL return from GetUsedWeapon means no shield slot
 			stars = GetStat(IE_PROFICIENCYSINGLEWEAPON)&PROFS_MASK;
 			if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 			style = 1000*stars + IE_PROFICIENCYSINGLEWEAPON;
 			CriticalBonus = wssingle[stars][1];
-		}
-	} else if ((Flags&WEAPON_MELEE) && wsswordshield) {
-		int slot;
-		if (inventory.GetUsedWeapon(true, slot)) {
+		} else if (wsswordshield && weapon) {
 			stars = GetStat(IE_PROFICIENCYSWORDANDSHIELD)&PROFS_MASK;
 			if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 			style = 1000*stars + IE_PROFICIENCYSWORDANDSHIELD;
+		} else {
+			// no bonus
 		}
+	} else {
+		// ranged - no bonus
 	}
 
 	//second parameter is left or right hand flag
