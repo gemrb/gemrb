@@ -9147,17 +9147,17 @@ static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_GetToHit__doc,
-"GetToHit(pc, leftorright) => int\n\n"
-"Returns the current THAC0 in relation to the equipped weapon.");
+PyDoc_STRVAR( GemRB_GetCombatDetails__doc,
+"GetCombatDetails(pc, leftorright) => dict\n\n"
+"Returns the current THAC0 and other data in relation to the equipped weapon.");
 
-static PyObject* GemRB_GetToHit(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID;
 	int leftorright;
 
 	if (!PyArg_ParseTuple( args, "ii", &PartyID, &leftorright)) {
-		return AttributeError( GemRB_GetToHit__doc );
+		return AttributeError( GemRB_GetCombatDetails__doc );
 	}
 	Game *game = core->GetGame();
 	if (!game) {
@@ -9172,15 +9172,22 @@ static PyObject* GemRB_GetToHit(PyObject * /*self*/, PyObject* args)
 	WeaponInfo wi;
 	ITMExtHeader *header = NULL;
 	ITMExtHeader *hittingheader = NULL;
-	int tohit;
-	ieDword Flags;
-	int DamageBonus, CriticalBonus;
-	int speed, style;
+	int tohit=20;
+	ieDword Flags=0;
+	int DamageBonus=0, CriticalBonus=0;
+	int speed, style=0;
 
+	PyObject* dict = PyDict_New();
 	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus, style)) {
-		//TODO: handle error, thout tohit will still be set correctly
+		//TODO: handle error, so tohit will still be set correctly?
 	}
-	return PyInt_FromLong( tohit );
+	PyDict_SetItemString(dict, "ToHit", PyInt_FromLong (tohit));
+	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (Flags));
+	PyDict_SetItemString(dict, "DamageBonus", PyInt_FromLong (DamageBonus));
+	PyDict_SetItemString(dict, "Speed", PyInt_FromLong (speed));
+	PyDict_SetItemString(dict, "CriticalBonus", PyInt_FromLong (CriticalBonus));
+	PyDict_SetItemString(dict, "Style", PyInt_FromLong (style));
+	return dict;
 }
 
 PyDoc_STRVAR( GemRB_IsDualWielding__doc,
@@ -9281,6 +9288,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetAbilityBonus, METH_VARARGS),
 	METHOD(GetCharacters, METH_VARARGS),
 	METHOD(GetCharSounds, METH_VARARGS),
+	METHOD(GetCombatDetails, METH_VARARGS),
 	METHOD(GetContainer, METH_VARARGS),
 	METHOD(GetContainerItem, METH_VARARGS),
 	METHOD(GetControl, METH_VARARGS),
@@ -9326,7 +9334,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetTableColumnName, METH_VARARGS),
 	METHOD(GetTableRowCount, METH_VARARGS),
 	METHOD(GetTableColumnCount, METH_VARARGS),
-	METHOD(GetToHit, METH_VARARGS),
 	METHOD(GetToken, METH_VARARGS),
 	METHOD(GetVar, METH_VARARGS),
 	METHOD(GetSlotType, METH_VARARGS),
