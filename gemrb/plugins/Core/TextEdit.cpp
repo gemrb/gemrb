@@ -180,6 +180,7 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 int TextEdit::SetText(const char* string, int /*pos*/)
 {
 	strncpy( ( char * ) Buffer, string, max );
+	Buffer[max]=0;
 	CurPos = (ieWord) strlen((char *) Buffer);
 	if (Owner) {
 		Owner->Invalidate();
@@ -191,9 +192,9 @@ void TextEdit::SetBufferLength(ieWord buflen)
 {
 	if(buflen<1) return;
 	if(buflen!=max) {
-		Buffer = (unsigned char *) realloc(Buffer, buflen);
+		Buffer = (unsigned char *) realloc(Buffer, buflen+1);
 		max=(ieWord) buflen;
-		Buffer[max-1]=0;
+		Buffer[max]=0;
 	}
 }
 
