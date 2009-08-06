@@ -1524,6 +1524,7 @@ def OpenBiographyEditWindow ():
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	TextArea = SubCustomizeWindow.GetControl (4)
+	TextArea.SetBufferLength (65535)
 	TextArea.SetText (BioStrRef)
 
 	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ClearBiography")
