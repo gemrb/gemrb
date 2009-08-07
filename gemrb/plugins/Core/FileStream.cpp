@@ -73,6 +73,35 @@ bool FileStream::Open(const char* fname, bool aF)
 	return true;
 }
 
+bool FileStream::Modify(const char* fname, bool aF)
+{
+	if (str && autoFree) {
+#ifdef _DEBUG
+		core->FileStreamPtrCount--;
+#endif
+		_fclose( str );
+	}
+	autoFree = aF;
+	str = _fopen( fname, "ab" );
+	if (str == NULL) {
+		return false;
+	}
+#ifdef _DEBUG
+	core->FileStreamPtrCount++;
+#endif
+	startpos = 0;
+	opened = true;
+	created = true;
+	//FIXME: this is a very lame way to tell the file length
+	_fseek( str, 0, SEEK_END );
+	size = _ftell( str );
+	_fseek( str, 0, SEEK_SET );
+	ExtractFileFromPath( filename, fname );
+	strncpy( originalfile, fname, _MAX_PATH);
+	Pos = 0;
+	return true;
+}
+
 bool FileStream::Open(_FILE* stream, int spos, int maxsize, bool aF)
 {
 	if (str && autoFree) {
@@ -126,7 +155,7 @@ bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID
 	if (str == NULL) {
 		return false;
 	}
-	opened = false;
+	opened = true;
 	created = true;
 	Pos = 0;
 	size = 0;
@@ -179,6 +208,10 @@ int FileStream::Seek(int newpos, int type)
 		return GEM_ERROR;
 	}
 	switch (type) {
+		case GEM_STREAM_END:
+			_fseek( str, startpos + size - newpos, SEEK_SET);
+			Pos = size - newpos;
+			break;
 		case GEM_CURRENT_POS:
 			_fseek( str, newpos, SEEK_CUR );
 			Pos += newpos;

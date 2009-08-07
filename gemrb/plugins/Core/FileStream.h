@@ -60,6 +60,7 @@ public:
 
 	bool Open(const char* filename, bool autoFree = true);
 	bool Open(_FILE* stream, int startpos, int size, bool autoFree = false);
+	bool Modify(const char* filename, bool autoFree = true);
 	bool Create(const char* folder, const char* filename, SClass_ID ClassID);
 	bool Create(const char* filename, SClass_ID ClassID);
 	int Read(void* dest, unsigned int length);
