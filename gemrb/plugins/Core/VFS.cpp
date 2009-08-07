@@ -77,22 +77,28 @@ _FILE* _fopen(const char* filename, const char* mode)
 {
 	DWORD OpenFlags = 0;
 	DWORD AccessFlags = 0;
+	DWORD ShareFlags = 0;
+
 	while (*mode) {
 		if (( *mode == 'w' ) || ( *mode == 'W' )) {
 			OpenFlags |= OPEN_ALWAYS;
 			AccessFlags |= GENERIC_WRITE;
+			ShareFlags |= FILE_SHARE_READ;
 		} else if (( *mode == 'r' ) || ( *mode == 'R' )) {
 			OpenFlags |= OPEN_EXISTING;
 			AccessFlags |= GENERIC_READ;
+			ShareFlags |= FILE_SHARE_READ|FILE_SHARE_WRITE;
 		} else if (( *mode == 'a' ) || ( *mode == 'A' )) {
 			OpenFlags |= OPEN_ALWAYS;
-			AccessFlags |= GENERIC_READ | GENERIC_WRITE;
+			AccessFlags |= GENERIC_READ|GENERIC_WRITE;
+			ShareFlags |= FILE_SHARE_READ|FILE_SHARE_WRITE;
 		} else if (*mode == '+') {
-			AccessFlags |= GENERIC_READ | GENERIC_WRITE;
+			AccessFlags |= GENERIC_READ|GENERIC_WRITE;
+			ShareFlags |= FILE_SHARE_READ|FILE_SHARE_WRITE;
 		}
 		mode++;
 	}
-	HANDLE hFile = CreateFile( filename, AccessFlags, FILE_SHARE_READ, NULL,
+	HANDLE hFile = CreateFile( filename, AccessFlags, ShareFlags, NULL,
 					OpenFlags, FILE_ATTRIBUTE_NORMAL, NULL );
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return NULL;
