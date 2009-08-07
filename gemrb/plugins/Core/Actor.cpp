@@ -3441,6 +3441,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		THACOBonus += wspecial[stars][0];
 		DamageBonus += wspecial[stars][1];
 		speed += wspecial[stars][2];
+		 // add non-proficiency penalty, which is missing from the table
+		if (stars == 0) THACOBonus -= 4;
 	}
 
 	if (IsDualWielding() && wsdualwield) {
