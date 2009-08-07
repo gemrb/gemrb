@@ -1076,12 +1076,14 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 				sprintf(key, "yPos%d",count);
 				value = INInote->GetKeyAsInt( map->GetScriptName(), key, 0);
 				point.y = value;
-				map->AddMapNote( point, color, text );
+				map->AddMapNote( point, color, text, 0);
 				count--;
 			}
 		}
 	}
 	for (i = 0; i < NoteCount; i++) {
+		ieStrRef strref = 0;
+
 		if (pst) {
 			ieDword px,py;
 
@@ -1099,7 +1101,6 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		}
 		else {
 			ieWord px,py;
-			ieDword strref;
 
 			str->ReadWord( &px );
 			str->ReadWord( &py );
@@ -1112,7 +1113,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 			str->Seek( 40, GEM_CURRENT_POS );
 			text = core->GetString( strref,0 );
 		}
-		map->AddMapNote( point, color, text );
+		map->AddMapNote( point, color, text, strref );
 	}
 
 	//this is a ToB feature (saves the unexploded projectiles)
@@ -1970,8 +1971,9 @@ int AREImp::PutMapnotes( DataStream *stream, Map *map)
 			stream->WriteWord( &tmpWord );
 			tmpWord = (ieWord) mn->Pos.y;
 			stream->WriteWord( &tmpWord );
-			//strref (needs to be fixed?)
-			tmpDword = 0;
+			//update custom strref
+			core->UpdateString( mn->strref, mn->text);
+			tmpDword = mn->strref;
 			stream->WriteDword( &tmpDword);
 			stream->WriteWord( &tmpWord );
 			stream->WriteWord( &mn->color );

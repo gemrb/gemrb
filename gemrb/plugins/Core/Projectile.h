@@ -211,6 +211,7 @@ protected:
 	Map *area;
 	Point Pos;
 	Point Destination;
+	Point Origin;
 	ieDword Caster; //the globalID of the caster actor
 	ieDword Target; //the globalID of target actor
 	int phase;

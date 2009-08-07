@@ -126,6 +126,7 @@ struct Entrance {
 
 class MapNote {
 public:
+	ieStrRef strref;
 	Point Pos;
 	ieWord color;
 	char *text;
@@ -420,7 +421,7 @@ public:
 	unsigned int GetAmbientCount() { return (unsigned int) ambients.size(); }
 
 	//mapnotes
-	void AddMapNote(Point &point, int color, char *text);
+	void AddMapNote(Point &point, int color, char *text, ieStrRef strref);
 	void RemoveMapNote(Point &point);
 	MapNote *GetMapNote(int i) { return mapnotes[i]; }
 	MapNote *GetMapNote(Point &point);

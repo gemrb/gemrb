@@ -784,7 +784,6 @@ def OpenBiographyWindow ():
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
-	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OpenExportWindow ():
@@ -1501,6 +1500,7 @@ def UpdateScriptSelection():
 def OpenBiographyEditWindow ():
 	global SubCustomizeWindow
 	global BioStrRef
+	global TextArea
 
 	Changed = 0
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -1511,11 +1511,14 @@ def OpenBiographyEditWindow ():
 	SubCustomizeWindow = GemRB.LoadWindowObject (23)
 
 	ClearButton = SubCustomizeWindow.GetControl (5)
+	ClearButton.SetText (34881)
+	
 	DoneButton = SubCustomizeWindow.GetControl (1)
 	DoneButton.SetText (11973)
 	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	RevertButton = SubCustomizeWindow.GetControl (3)
+	RevertButton.SetText (2240)
 	if not Changed:
 		RevertButton.SetState (IE_GUI_BUTTON_DISABLED)
 
@@ -1535,13 +1538,20 @@ def OpenBiographyEditWindow ():
 	return
 
 def ClearBiography():
-	BioStrRef = None
+	pc = GemRB.GameGetSelectedPCSingle ()
+	BioStrRef = 62015+pc
+	#GemRB.CreateString (BioStrRef, "")
 	TextArea.SetText ("")
 	return
 
 def DoneBiographyWindow ():
+	global BioStrRef
+	
 	#TODO set bio
 	pc = GemRB.GameGetSelectedPCSingle ()
+	#pc is 1 based
+	BioStrRef = 62015+pc
+	GemRB.CreateString (BioStrRef, TextArea.QueryText())
 	GemRB.SetPlayerString (pc, 74, BioStrRef)
 	CloseSubCustomizeWindow ()
 	return

@@ -22,9 +22,8 @@
  */
 
 #include <cstdio>
+#include <cassert>
 #include "TlkOverride.h"
-
-#define SEGMENT_SIZE  512
 
 CTlkOverride::CTlkOverride()
 {
@@ -49,8 +48,9 @@ char *CTlkOverride::CS(const char *src)
 bool CTlkOverride::Init()
 {
 	CloseResources();
-	toh_str = GetAuxHdr();
-	tot_str = GetAuxTlk();
+	//Creation of the headers should be game specific, some games don't have these
+	toh_str = GetAuxHdr(true);
+	tot_str = GetAuxTlk(true);
 	if (toh_str == NULL) {
 		return false;
 	}
@@ -67,13 +67,25 @@ bool CTlkOverride::Init()
 	toh_str->Seek( 8, GEM_CURRENT_POS );
 	toh_str->ReadDword( &AuxCount );
 
-	tot_str->Read( Signature, 8 );
-	if (strncmp( Signature, "\xff\xff\xff\xff\xff\xff\xff\xff",8) !=0) {
+	tot_str->ReadDword( &FreeOffset );
+	tot_str->Read(Signature,4);
+	if (strncmp( Signature, "\xff\xff\xff\xff",4) !=0) {
 		printf( "[TLKImporter]: Not a valid TOT File.\n" );
 		return false;
 	}
 
 	return true;
+}
+
+void CTlkOverride::UpdateFreeOffset(ieDword NewFree)
+{
+	if (NewFree!=0xffffffff) {
+		tot_str->Seek(NewFree,GEM_STREAM_START);
+		tot_str->WriteDword( &FreeOffset);
+	}
+	FreeOffset=NewFree;
+	tot_str->Seek(0, GEM_STREAM_START);
+	tot_str->WriteDword( &FreeOffset );
 }
 
 void CTlkOverride::CloseResources()
@@ -140,24 +152,113 @@ char* CTlkOverride::LocateString2(ieDword offset)
 	return ret;
 }
 
-//this function handles the .tot and .toh files
-//finds and returns a string referenced by an strref
-char* CTlkOverride::LocateString(ieStrRef strref)
+ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
+{
+	ieDword memoffset = 0;
+	bool tookfree = false;
+	ieDword offset = LocateString(strref);
+
+	if (offset==0xffffffff) {
+		strref=GetNewStrRef();
+		offset=LocateString(strref);
+		assert(strref!=0xffffffff);
+	}
+	
+	ieDword length = strlen(newvalue);
+	if(length>65535) length=65535;
+	length++;
+
+	//set the backpointer of the first string segment
+	ieDword backp = 0xffffffff;
+
+	do
+	{
+		//fill the backpointer
+		tot_str->Seek(offset+4, GEM_STREAM_START);
+		tot_str->WriteDword(&backp);
+		backp = offset;
+		ieDword tmp = length>SEGMENT_SIZE?SEGMENT_SIZE:length;
+		tot_str->Write(newvalue+memoffset, tmp);
+		length-=tmp;
+		memoffset+=tmp;
+		tot_str->Seek(backp+SEGMENT_SIZE+8, GEM_STREAM_START);
+		tot_str->ReadDword(&offset);
+		
+		//end of string
+		if(!length) {
+		  if(offset!=0xffffffff) {
+		    tookfree = true;
+		  }
+		  tot_str->Seek(-4,GEM_CURRENT_POS);
+		  backp = offset+4;
+		  offset = 0xffffffff;
+		  tot_str->WriteDword(&offset);
+		  break;
+		}
+
+		if (offset==0xffffffff) {
+		  //no more space, but we need some
+		  offset = FreeOffset;
+		  tookfree = true;
+		  if (offset == 0xffffffff) {
+		    //to the end of file
+		    offset = tot_str->Size();
+		  }
+		}
+		tot_str->Seek(-4,GEM_CURRENT_POS);
+		tot_str->WriteDword(&offset);
+	}
+	while(length);
+
+	//adjust the free list
+	if (tookfree) {
+		UpdateFreeOffset(backp);
+	}
+	return strref;
+}
+
+ieStrRef CTlkOverride::GetNewStrRef()
+{
+	EntryType entry;
+
+	memset(&entry,0,sizeof(entry));
+
+	if (!AuxCount) {
+		entry.strref = STRREF_START;
+		entry.offset = 8;
+	} else {
+		toh_str->Seek(sizeof(entry), GEM_STREAM_END );
+		toh_str->ReadDword(&entry.strref);
+		toh_str->Read(entry.dummy, 20);
+		entry.strref++;
+		entry.offset = tot_str->Size();
+	}
+	toh_str->Seek(0,GEM_STREAM_END);
+	toh_str->WriteDword(&entry.strref);
+	toh_str->Write(entry.dummy, 20);
+	toh_str->WriteDword(&entry.offset);
+	AuxCount++;
+	toh_str->Seek(8,GEM_STREAM_START);
+	toh_str->WriteDword(&AuxCount);
+	return entry.strref;
+}
+
+ieDword CTlkOverride::LocateString(ieStrRef strref)
 {
 	ieDword strref2;
 	ieDword offset;
 
 	if (!toh_str) return NULL;
-	toh_str->Seek(20,GEM_STREAM_START);
+	toh_str->Seek(TOH_HEADER_SIZE,GEM_STREAM_START);
 	for(ieDword i=0;i<AuxCount;i++) {
 		toh_str->ReadDword(&strref2);
 		toh_str->Seek(20,GEM_CURRENT_POS);
 		toh_str->ReadDword(&offset);
 		if (strref2==strref) {
-			return LocateString2(offset);
-		}    
+		  return offset;
+		}
 	}
-	return NULL;
+	return 0xffffffff;
 }
 
 //this function handles all of the .tlk override mechanism with caching
@@ -165,10 +266,12 @@ char* CTlkOverride::LocateString(ieStrRef strref)
 //it is possible to turn off caching
 char* CTlkOverride::ResolveAuxString(ieStrRef strref, int &Length)
 {
+	char *string;
+
 	if (!this) {
 		Length = 0;
-		char *string = ( char* ) malloc( Length+1 );
-		string[Length] = 0;
+		string = ( char* ) malloc( 1 );
+		string[0] = 0;
 		return string;
 	}
 
@@ -179,13 +282,14 @@ char* CTlkOverride::ResolveAuxString(ieStrRef strref, int &Length)
 	}
 #endif
 
-	char *string = LocateString(strref);
-	if (!string) {
-		Length = 0;
-		string = ( char* ) malloc( Length+1 );
-		string[Length] = 0;
-	} else {
+	ieDword offset = LocateString(strref);
+	if (offset!=0xffffffff) {
+		string = LocateString2(offset);
 		Length = strlen(string);
+	} else {	
+		Length = 0;
+		string = ( char* ) malloc( 1 );
+		string[0] = 0;
 	}
 #ifdef CACHE_TLK_OVERRIDE
 	stringmap[strref]=CS(string);
@@ -193,22 +297,33 @@ char* CTlkOverride::ResolveAuxString(ieStrRef strref, int &Length)
 	return string;
 }
 
-DataStream* CTlkOverride::GetAuxHdr()
+DataStream* CTlkOverride::GetAuxHdr(bool create)
 {
 	char nPath[_MAX_PATH];
+	char Signature[TOH_HEADER_SIZE];
+
 	sprintf( nPath, "%s%sdefault.toh", core->CachePath, SPathDelimiter );
 #ifndef WIN32
 	ResolveFilePath( nPath );
 #endif
 	FileStream* fs = new FileStream();
-	if (fs->Open( nPath, true )) {
+retry:
+	if (fs->Modify( nPath, true )) {
 		return fs;
+	}
+	if (create) {
+		fs->Create( "default", IE_TOH_CLASS_ID);
+		memset(Signature,0,sizeof(Signature));
+		memcpy(Signature,"TLK ",4);
+		fs->Write(Signature, sizeof(Signature));
+		create = false;
+		goto retry;
 	}
 	delete fs;
 	return NULL;
 }
 
-DataStream* CTlkOverride::GetAuxTlk()
+DataStream* CTlkOverride::GetAuxTlk(bool create)
 {
 	char nPath[_MAX_PATH];
 	sprintf( nPath, "%s%sdefault.tot", core->CachePath, SPathDelimiter );
@@ -216,8 +331,14 @@ DataStream* CTlkOverride::GetAuxTlk()
 	ResolveFilePath( nPath );
 #endif
 	FileStream* fs = new FileStream();
-	if (fs->Open( nPath, true )) {
+retry:
+	if (fs->Modify( nPath, true )) {
 		return fs;
+	}
+	if (create) {
+		fs->Create( "default", IE_TOT_CLASS_ID);
+		create = false;
+		goto retry;
 	}
 	delete fs;
 	return NULL;

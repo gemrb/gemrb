@@ -437,7 +437,7 @@ void Projectile::Payload()
 	if (target) {
 		if(ExtFlags&PEF_RGB) {
 			target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
-			  RGB >> 8, RGB >> 16, RGB >> 24);
+				RGB >> 8, RGB >> 16, RGB >> 24);
 		}
 
 		effects->AddAllEffects(target, Destination);
@@ -694,6 +694,7 @@ void Projectile::SetTarget(ieDword tar)
 void Projectile::MoveTo(Map *map, Point &Des)
 {
 	area = map;
+	Origin = Des;
 	Pos = Des;
 	Destination = Des;
 }
@@ -781,10 +782,10 @@ void Projectile::LineTarget()
 			if (res>0) {
 				EffectQueue *eff = effects->CopySelf();
 				eff->SetOwner(original);
-			  if(ExtFlags&PEF_RGB) {
-			    target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
-			      RGB >> 8, RGB >> 16, RGB >> 24);
-			  }
+				if(ExtFlags&PEF_RGB) {
+				  target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
+				    RGB >> 8, RGB >> 16, RGB >> 24);
+				}
 
 				effects->AddAllEffects(target, target->Pos);
 			}
@@ -1257,9 +1258,15 @@ void Projectile::DrawTravel(Region &screen)
 	if (face!=Orientation) {
 		SetPos(face, GetTravelPos(face), GetShadowPos(face));
 	}
+	int amp = 0;
 	Point pos = Pos;
 	pos.x+=screen.x;
 	pos.y+=screen.y;
+
+	if(ExtFlags&PEF_CURVE) {
+		amp = sqrt(Distance(Origin, pos)*Distance(pos,Destination));
+		printf("%d  ", amp);
+	}
 
 	if (light) {
 		video->BlitGameSprite( light, pos.x, pos.y, 0, tint, NULL, NULL, &screen);

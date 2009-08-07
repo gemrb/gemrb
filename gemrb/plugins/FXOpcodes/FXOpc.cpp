@@ -5133,7 +5133,7 @@ int fx_set_map_note (Actor* Owner, Actor* target, Effect* fx)
 	if (!map) return FX_APPLIED; //delay effect
 	Point p(fx->PosX, fx->PosY);
 	char *text = core->GetString(fx->Parameter1, 0);
-	map->AddMapNote(p, fx->Parameter2, text);
+	map->AddMapNote(p, fx->Parameter2, text, fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 

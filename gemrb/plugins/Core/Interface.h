@@ -339,6 +339,8 @@ public:
 	ProjectileServer* GetProjectileServer() const;
 	Video * GetVideoDriver() const;
 	ResourceMgr * GetResourceMgr() const;
+	/* create or change a custom string */
+	ieStrRef UpdateString(ieStrRef strref, const char *text) const;
 	/* returns a newly created string */
 	char * GetString(ieStrRef strref, ieDword options = 0) const;
 	/* makes sure the string is freed in TLKImp */
@@ -519,8 +521,8 @@ public:
 	void RemoveFromCache(const ieResRef resref, SClass_ID SClassID);
 	/*removes all files from directory*/
 	void DelTree(const char *path, bool onlysaved);
-	/*returns true if the file should be saved */
-	bool SavedExtension(const char *filename);
+	/*returns 0,1,2 based on how the file should be saved */
+	int SavedExtension(const char *filename);
 	/*returns true if the file should never be deleted accidentally */
 	bool ProtectedExtension(const char *filename);
 	/*returns true if the directory path isn't good as a Cache */

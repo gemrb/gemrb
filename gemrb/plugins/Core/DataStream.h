@@ -33,6 +33,7 @@
 
 #define GEM_CURRENT_POS 0
 #define GEM_STREAM_START 1
+#define GEM_STREAM_END 2
 
 #ifdef WIN32
 

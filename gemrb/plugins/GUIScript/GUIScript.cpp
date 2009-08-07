@@ -1450,9 +1450,9 @@ static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 		if (StrRef == -1) {
 			ret = core->SetText( (ieWord) WindowIndex, (ieWord) ControlIndex, GEMRB_STRING );
 		} else {
-			char *str = core->GetString( StrRef );
-			ret = core->SetText( (ieWord) WindowIndex, (ieWord) ControlIndex, str );
-			core->FreeString( str );
+			char *tmpstr = core->GetString( StrRef );
+			ret = core->SetText( (ieWord) WindowIndex, (ieWord) ControlIndex, tmpstr );
+			core->FreeString( tmpstr );
 		}
 		if (ret == -1) {
 			return RuntimeError("Cannot set text");
@@ -4574,6 +4574,27 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_CreateString__doc,
+"CreateString( Text )->StrRef\n\n"
+"Creates a custom string." );
+
+static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
+{
+	const char *Text;
+	ieStrRef strref;
+
+	if (!PyArg_ParseTuple( args, "is", &strref, &Text )) {
+		return AttributeError( GemRB_CreateString__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	strref = core->UpdateString(strref, Text);
+	return PyInt_FromLong( strref );
+}
+
 PyDoc_STRVAR( GemRB_SetPlayerString__doc,
 "SetPlayerString(PlayerSlot, StringSlot, StrRef)\n\n"
 "Sets one of the player character's verbal constants. Mostly useful for setting biography." );
@@ -7359,13 +7380,17 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	if (!map) {
 		return RuntimeError( "No current area" );
 	}
+	ieStrRef strref;
 	Point point;
 	point.x=x;
 	point.y=y;
 	if (txt && txt[0]) {
 		char* newvalue = ( char* ) malloc( strlen( txt ) + 1 ); //duplicating the string
 		strcpy( newvalue, txt );
-		map->AddMapNote(point, color, newvalue);
+		MapNote *old = map->GetMapNote(point);
+		if (old) strref = old->strref;
+		else strref = 0xffffffff;
+		map->AddMapNote(point, color, newvalue, strref);
 	} else {
 		map->RemoveMapNote(point);
 	}
@@ -9246,6 +9271,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CreateMovement, METH_VARARGS),
 	METHOD(CreatePlayer, METH_VARARGS),
 	METHOD(CreateScrollBar, METH_VARARGS),
+	METHOD(CreateString, METH_VARARGS),
 	METHOD(CreateTextEdit, METH_VARARGS),
 	METHOD(CreateWindow, METH_VARARGS),
 	METHOD(CreateWorldMapControl, METH_VARARGS),

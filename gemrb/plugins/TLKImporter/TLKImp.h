@@ -42,16 +42,13 @@ public:
 	/** purge string defs coming from saved game */
 	void CloseAux();
 	bool Open(DataStream* stream, bool autoFree = true);
+	/** construct a new custom string */
+	ieStrRef UpdateString(ieStrRef strref, const char *newvalue);
+	/** resolve a string reference */
 	char* GetString(ieStrRef strref, ieDword flags = 0);
 	StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0);
 	void FreeString(char *str);
 private:
-	/** loads a string from the auxiliary resource, knowing the strref */
-	char* LocateString(ieStrRef strref);
-	/** loads a string from the auxiliary resource, knowing absolute offset in file*/
-	char* LocateString2(ieDword offset);
-	/** gets a cached string */
-	char* ResolveAuxString(ieStrRef strref, ieDword flags, int &Length);
 	/** resolves day and monthname tokens */
 	void GetMonthName(int dayandmonth);
 	/** replaces tags in dest, don't exceed Length */

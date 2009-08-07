@@ -437,6 +437,21 @@ bool TLKImp::GetNewStringLength(char* string, int& Length)
 	return lChange;
 }
 
+ieStrRef TLKImp::UpdateString(ieStrRef strref, const char *newvalue)
+{
+	if (!override) {
+		printMessage("TLKImp", "Custom string is not supported by this game format.\n", LIGHT_RED);
+		return 0xffffffff;
+	}
+
+	if(strref>STRREF_START || (strref>=BIO_START && strref<=BIO_END) ) {
+		return override->UpdateString(strref, newvalue);
+	}
+
+	printMessage("TLKImp", "Cannot set custom string.\n", LIGHT_RED);
+	return 0xffffffff;
+}
+
 char* TLKImp::GetString(ieStrRef strref, ieDword flags)
 {
 	char* string;
@@ -448,7 +463,7 @@ char* TLKImp::GetString(ieStrRef strref, ieDword flags)
 	int Length;
 	ieResRef SoundResRef;
 
-	if (strref >= StrRefCount) {
+	if((strref>=STRREF_START) || (strref>=BIO_START && strref<=BIO_END) ) {
 empty:
 		string = override->ResolveAuxString(strref, Length);
 		type = 0;

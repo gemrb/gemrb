@@ -4596,7 +4596,7 @@ void GameScript::AddMapnote( Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
 	char *str = core->GetString( parameters->int0Parameter, 0);
-	map->AddMapNote(parameters->pointParameter, parameters->int1Parameter, str);
+	map->AddMapNote(parameters->pointParameter, parameters->int1Parameter, str, parameters->int0Parameter);
 }
 
 void GameScript::RemoveMapnote( Scriptable* Sender, Action* parameters)

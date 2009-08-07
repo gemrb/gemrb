@@ -1800,6 +1800,11 @@ void Interface::FreeString(char *&str) const
 	str = NULL;
 }
 
+ieStrRef Interface::UpdateString(ieStrRef strref, const char *text) const
+{
+	return strings->UpdateString( strref, text );
+}
+
 char* Interface::GetString(ieStrRef strref, ieDword options) const
 {
 	ieDword flags = 0;
@@ -4147,19 +4152,28 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 	free( newstr );
 }
 
-static const char *saved_extensions[]={".are",".sto",".tot",".toh",0};
+static const char *saved_extensions[]={".are",".sto",0};
+static const char *saved_extensions_last[]={".tot",".toh",0};
 
-//returns true if file should be saved
-bool Interface::SavedExtension(const char *filename)
+//returns the priority of the file to be saved
+//2 - save
+//1 - save last
+//0 - don't save
+int Interface::SavedExtension(const char *filename)
 {
 	const char *str=strchr(filename,'.');
-	if (!str) return false;
+	if (!str) return 0;
 	int i=0;
 	while(saved_extensions[i]) {
-		if (!stricmp(saved_extensions[i], str) ) return true;
+		if (!stricmp(saved_extensions[i], str) ) return 2;
 		i++;
 	}
-	return false;
+	i=0;
+	while(saved_extensions_last[i]) {
+		if (!stricmp(saved_extensions_last[i], str) ) return 1;
+		i++;
+	}
+	return 0;
 }
 
 static const char *protected_extensions[]={".exe",".dll",".so",0};
@@ -4918,22 +4932,32 @@ int Interface::CompressSave(const char *folder)
 	ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);
 	ai->CreateArchive( &str);
 
-	do {
-		char dtmp[_MAX_PATH];
-		struct stat fst;
-		snprintf( dtmp, _MAX_PATH, "%s%s", CachePath, de->d_name );
-		stat( dtmp, &fst );
-		if (S_ISDIR( fst.st_mode ))
-			continue;
-		if (de->d_name[0] == '.')
-			continue;
-		if (SavedExtension(de->d_name) ) {
-			FileStream fs;
-			fs.Open(dtmp, true);
-			ai->AddToSaveGame(&str, &fs);
+	//.tot and .toh should be saved last, because they are updated when an .are is saved
+	int priority=2;
+	while(priority) {    
+		do {
+			char dtmp[_MAX_PATH];
+			struct stat fst;
+			snprintf( dtmp, _MAX_PATH, "%s%s", CachePath, de->d_name );
+			stat( dtmp, &fst );
+			if (S_ISDIR( fst.st_mode ))
+			  continue;
+			if (de->d_name[0] == '.')
+			  continue;
+			if (SavedExtension(de->d_name)==priority) {
+			  FileStream fs;
+			  fs.Open(dtmp, true);
+			  ai->AddToSaveGame(&str, &fs);
+			}
+		} while (( de = readdir( dir ) ) != NULL);
+		closedir( dir );
+		//reopen list for the second round
+		priority--;
+		if (priority>0) {
+			dir = opendir( CachePath );
+			de = readdir( dir );
 		}
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir );
+	}
 	FreeInterface( ai );
 	return 0;
 }

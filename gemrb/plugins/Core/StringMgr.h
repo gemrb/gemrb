@@ -69,6 +69,7 @@ public:
 	virtual char* GetString(ieStrRef strref, unsigned int flags = 0) = 0;
 	virtual StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0) = 0;
 	virtual void FreeString(char *str) = 0;
+	virtual ieStrRef UpdateString(ieStrRef strref, const char *text) = 0;
 };
 
 #endif  // ! STRINGMGR_H

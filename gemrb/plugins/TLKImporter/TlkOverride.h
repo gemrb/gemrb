@@ -34,6 +34,21 @@
 typedef std::map<ieStrRef, char *> StringMapType;
 #endif
 
+#define STRREF_START  300000
+#define SEGMENT_SIZE  512
+#define TOH_HEADER_SIZE 20
+
+//the original games used these strings for custom biography (another quirk of the IE)
+#define BIO_START 62016                 //first BIO string
+#define BIO_END   (BIO_START+5)         //last BIO string
+
+typedef struct
+{
+	ieDword strref;
+	ieByte dummy[20];
+	ieDword offset;
+} EntryType;
+
 class CTlkOverride  
 {
 private:
@@ -43,20 +58,24 @@ private:
 	DataStream *tot_str;
 	DataStream *toh_str;
 	ieDword AuxCount;
+	ieDword FreeOffset;
 
+	void UpdateFreeOffset(ieDword NewFree);
 	void CloseResources();
-	DataStream *GetAuxHdr();
-	DataStream *GetAuxTlk();
+	DataStream *GetAuxHdr(bool create);
+	DataStream *GetAuxTlk(bool create);
+	ieStrRef GetNewStrRef();
+	ieDword LocateString(ieStrRef strref);
 	char* LocateString2(ieDword offset);
-	char* LocateString(ieStrRef strref);
 	ieDword GetLength();
 public:
 	CTlkOverride();
 	virtual ~CTlkOverride();
 
-	char *CS(const char *src);
 	bool Init();
 	char *ResolveAuxString(ieStrRef strref, int &Length);
+	ieStrRef UpdateString(ieStrRef strref, const char *newvalue);
+	char *CS(const char *src);
 };
 
 #endif //TLKOVERRIDE_H
