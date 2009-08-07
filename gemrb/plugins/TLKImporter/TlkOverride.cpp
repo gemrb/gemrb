@@ -186,24 +186,24 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 		
 		//end of string
 		if(!length) {
-		  if(offset!=0xffffffff) {
-		    tookfree = true;
-		  }
-		  tot_str->Seek(-4,GEM_CURRENT_POS);
-		  backp = offset+4;
-		  offset = 0xffffffff;
-		  tot_str->WriteDword(&offset);
-		  break;
+			if(offset!=0xffffffff) {
+				tookfree = true;
+			}
+			tot_str->Seek(-4,GEM_CURRENT_POS);
+			backp = offset+4;
+			offset = 0xffffffff;
+			tot_str->WriteDword(&offset);
+			break;
 		}
 
 		if (offset==0xffffffff) {
-		  //no more space, but we need some
-		  offset = FreeOffset;
-		  tookfree = true;
-		  if (offset == 0xffffffff) {
-		    //to the end of file
-		    offset = tot_str->Size();
-		  }
+			//no more space, but we need some
+			offset = FreeOffset;
+			tookfree = true;
+			if (offset == 0xffffffff) {
+				//to the end of file
+				offset = tot_str->Size();
+			}
 		}
 		tot_str->Seek(-4,GEM_CURRENT_POS);
 		tot_str->WriteDword(&offset);
@@ -255,7 +255,7 @@ ieDword CTlkOverride::LocateString(ieStrRef strref)
 		toh_str->Seek(20,GEM_CURRENT_POS);
 		toh_str->ReadDword(&offset);
 		if (strref2==strref) {
-		  return offset;
+			return offset;
 		}
 	}
 	return 0xffffffff;
