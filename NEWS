@@ -1,21 +1,28 @@
-GemRB svn (6724):
+GemRB svn (6826):
   New features:
     - 
+    - PST death counters (don't anger the Lady)
+    - intelligence and wisdom dictated lore bonus
+    - a GUIEnhancements config option (on by default) that enables a few
+      extra controls (for convenience and larger mods)
+    - reading of iwd2 spellbooks
     - the null sound plugin is now always loaded last by default; for old
       installs see the provided configuration example (DelayPlugin)
-    - many IE's hardcoded projectiles for BG1 and HoW, spell hit projectiles,
-      projectile trails, projectile failure (spell)
+    - almost all missing IE's hardcoded projectiles, spell hit projectiles,
+      projectile trails, projectile failure (spell), projectile effectlists
 
   Improved features:
     - 
+    - config and default table value parsing is smarter about spaces
     - projectiles
-    - pathfinding and worldmap travel
-    - combat
+    - pathfinding, fog of war and worldmap travel
+    - combat and spellcasting
     - actions and triggers
     - various guiscripts
     - bugfixes
 
   Applied patches:
+    various patches from nugrud for bg2 gui enhancements
 
 GemRB V0.5.0 (2009-06-25):
   New features:
