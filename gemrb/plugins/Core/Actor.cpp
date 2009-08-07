@@ -3397,7 +3397,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	}
 	hittingheader = header;
 	ITMExtHeader *rangedheader = NULL;
-	int THACOBonus = hittingheader->THAC0Bonus;
+	int THAC0Bonus = hittingheader->THAC0Bonus;
 	DamageBonus = hittingheader->DamageBonus ;
 	switch(hittingheader->AttackType) {
 	case ITEM_AT_MELEE:
@@ -3417,7 +3417,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		Flags = WEAPON_RANGED;
 		//The bow can give some bonuses, but the core attack is made by the arrow.
 		hittingheader = rangedheader;
-		THACOBonus += rangedheader->THAC0Bonus;
+		THAC0Bonus += rangedheader->THAC0Bonus;
 		DamageBonus += rangedheader->DamageBonus ;
 		break;
 	default:
@@ -3438,11 +3438,11 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		if ((signed)stars > wspecial_max) {
 			stars = wspecial_max;
 		}
-		THACOBonus += wspecial[stars][0];
+		THAC0Bonus += wspecial[stars][0];
 		DamageBonus += wspecial[stars][1];
 		speed += wspecial[stars][2];
 		 // add non-proficiency penalty, which is missing from the table
-		if (stars == 0) THACOBonus -= 4;
+		if (stars == 0) THAC0Bonus -= 4;
 	}
 
 	if (IsDualWielding() && wsdualwield) {
@@ -3451,7 +3451,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 		style = 1000*stars + IE_PROFICIENCY2WEAPON;
-		THACOBonus += wsdualwield[stars][leftorright?1:0];
+		THAC0Bonus += wsdualwield[stars][leftorright?1:0];
 	} else if (wi.itemflags&(IE_INV_ITEM_TWOHANDED) && (Flags&WEAPON_MELEE) && wstwohanded) {
 		//add two handed profs bonus
 		stars = GetStat(IE_PROFICIENCY2HANDED)&PROFS_MASK;
@@ -3484,7 +3484,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	}
 
 	//second parameter is left or right hand flag
-	tohit = GetToHit(THACOBonus, Flags);
+	tohit = GetToHit(THAC0Bonus, Flags);
 	return true;
 }
 
