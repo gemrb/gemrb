@@ -2838,12 +2838,35 @@ int fx_reputation_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0x6d --> see later
 
 // 0x6e
-//retreat_from (unknown)
-int fx_retreat_from (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+//retreat_from (works in PST) - forces target to run away/walk away from Owner
+int fx_retreat_from (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_retreat_from (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	return FX_NOT_APPLIED;
+	if (!Owner) {
+		return FX_NOT_APPLIED;
+	}
+
+	//distance to run
+	if (!fx->Parameter3) {
+		fx->Parameter3=100;
+	}
+
+	if (fx->Parameter2==8) {
+		//backs away from owner
+		target->RunAwayFrom(Owner->Pos, fx->Parameter3, false);
+		//one shot
+		return FX_NOT_APPLIED;
+	}
+
+	//walks (7) or runs away (all others) from owner
+	target->RunAwayFrom(Owner->Pos, fx->Parameter3, true);
+	if (fx->Parameter2!=7) {
+		target->SetRunFlags(IF_RUNNING);
+	}
+
+	//has a duration
+	return FX_APPLIED;
 }
 
 // 0x6f Item:CreateMagic
