@@ -607,7 +607,26 @@ void Map::UpdateScripts()
 			no_more_steps_for_actor[q] = true;
 			continue;
 		}
+
+		/*
+		 * we run scripts all at once because one of the actions in ProcessActions
+		 * might remove us from a cutscene and then bad things can happen when
+		 * scripts are queued unexpectedly (such as an ogre in a cutscene -> dialog
+		 * -> cutscene transition in the first bg1 cutscene exploiting the race
+		 * condition to murder player1) - it is entirely possible that we should be
+		 * doing this differently (for example by storing the cutscene state at the
+		 * start of this function, or by changing the cutscene state at a later
+		 * point, etc), but i did it this way for now because it seems least painful
+		 * and we should probably be staggering the script executions anyway
+		 */
 		actor->ExecuteScript( MAX_SCRIPTS );
+	}
+
+	q=Qcount[PR_SCRIPT];
+	while (q--) {
+		if (no_more_steps_for_actor[q]) continue;
+		Actor* actor = queue[PR_SCRIPT][q];
+
 		actor->ProcessActions(false);
 
 		actor->UpdateActorState(core->GetGame()->GameTime);
