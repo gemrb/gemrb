@@ -605,6 +605,10 @@ def PortraitButtonOnDrag ():
 
 def PortraitButtonOnPress ():
 	i = GemRB.GetVar ("PressedPortrait")
+	
+	if GemRB.GameControlGetTargetMode() != TARGET_MODE_NONE:
+		GemRB.ActOnPC(i+1)
+		return
 
 	if (not SelectionChangeHandler):
 		if GemRB.GameIsPCSelected (i+1):

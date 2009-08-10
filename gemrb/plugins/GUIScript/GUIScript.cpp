@@ -4912,6 +4912,35 @@ static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*a
 	return PyInt_FromLong( 0 );
 }
 
+PyDoc_STRVAR( GemRB_ActOnPC__doc,
+"ActOnPC(player)\n\n"
+"Makes the selected PC acting on player (cast spell, attack..." );
+
+static PyObject* GemRB_ActOnPC(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+
+	if (!PyArg_ParseTuple( args, "i", &PartyID )) {
+		return AttributeError( GemRB_GetPCStats__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* MyActor = game->FindPC( PartyID );
+	/*Simulate a click where the actor is...*/
+	if (MyActor) {
+		GameControl* gc = core->GetGameControl();
+		if(gc) {
+			Point p = MyActor->Pos ;
+			core->GetVideoDriver()->ConvertToScreen(p.x, p.y);
+			gc->OnMouseUp(p.x, p.y, GEM_MB_ACTION, 0) ;
+		}
+	}
+	Py_INCREF(Py_None) ;
+	return Py_None ;
+}
+
 PyDoc_STRVAR( GemRB_GetPlayerPortrait__doc,
 "GetPlayerPortrait(Slot[, SmallOrLarge]) => string\n\n"
 "Queries the player portrait." );
@@ -9249,6 +9278,7 @@ static PyObject* GemRB_GetSelectedSize(PyObject* /*self*/, PyObject* /*args*/)
 }
 
 static PyMethodDef GemRBMethods[] = {
+	METHOD(ActOnPC, METH_VARARGS),
 	METHOD(AdjustScrolling, METH_VARARGS),
 	METHOD(ApplyEffect, METH_VARARGS),
 	METHOD(ApplySpell, METH_VARARGS),
