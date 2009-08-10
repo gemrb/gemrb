@@ -163,7 +163,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 		offset=LocateString(strref);
 		assert(strref!=0xffffffff);
 	}
-	
+
 	ieDword length = strlen(newvalue);
 	if(length>65535) length=65535;
 	length++;
@@ -183,7 +183,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 		memoffset+=tmp;
 		tot_str->Seek(backp+SEGMENT_SIZE+8, GEM_STREAM_START);
 		tot_str->ReadDword(&offset);
-		
+
 		//end of string
 		if(!length) {
 			if(offset!=0xffffffff) {
@@ -248,7 +248,7 @@ ieDword CTlkOverride::LocateString(ieStrRef strref)
 	ieDword strref2;
 	ieDword offset;
 
-	if (!toh_str) return NULL;
+	if (!toh_str) return 0xffffffff;
 	toh_str->Seek(TOH_HEADER_SIZE,GEM_STREAM_START);
 	for(ieDword i=0;i<AuxCount;i++) {
 		toh_str->ReadDword(&strref2);
@@ -286,7 +286,7 @@ char* CTlkOverride::ResolveAuxString(ieStrRef strref, int &Length)
 	if (offset!=0xffffffff) {
 		string = LocateString2(offset);
 		Length = strlen(string);
-	} else {	
+	} else {
 		Length = 0;
 		string = ( char* ) malloc( 1 );
 		string[0] = 0;
