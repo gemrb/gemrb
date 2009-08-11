@@ -4914,14 +4914,14 @@ static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*a
 
 PyDoc_STRVAR( GemRB_ActOnPC__doc,
 "ActOnPC(player)\n\n"
-"Makes the selected PC acting on player (cast spell, attack..." );
+"Targets the selected PC for an action (cast spell, attack, ...)" );
 
 static PyObject* GemRB_ActOnPC(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID;
 
 	if (!PyArg_ParseTuple( args, "i", &PartyID )) {
-		return AttributeError( GemRB_GetPCStats__doc );
+		return AttributeError( GemRB_ActOnPC__doc );
 	}
 	Game *game = core->GetGame();
 	if (!game) {
