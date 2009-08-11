@@ -710,6 +710,10 @@ def PortraitButtonOnPress ():
 	if not i:
 		return
 
+	if GemRB.GameControlGetTargetMode() != TARGET_MODE_NONE:
+		GemRB.ActOnPC (i)
+		return
+
 	if (not SelectionChangeHandler):
 		if GemRB.GameIsPCSelected (i):
 			GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_OR)
