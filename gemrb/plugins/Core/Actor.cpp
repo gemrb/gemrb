@@ -3285,7 +3285,6 @@ void Actor::SetTarget( Scriptable *target)
 		core->GetGame()->InAttack(tar->LastAttacker);
 	}
 	SetOrientation( GetOrient( target->Pos, Pos ), false );
-	SetWait( 1 );
 }
 
 //in case of LastTarget = 0
