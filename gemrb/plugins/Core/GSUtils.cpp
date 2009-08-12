@@ -578,7 +578,10 @@ abort();
 				Actor *ac=map->GetActor(i,true);
 				int dist = Distance(Sender->Pos, ac->Pos);
 				if (ac && func(ac, oC->objectFields[j]) ) {
-					tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
+					// don't return Sender in IDS targeting!
+					if (ac != Sender) {
+						tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
+					}
 				}
 			}
 		}
