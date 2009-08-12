@@ -446,12 +446,7 @@ void Scriptable::ProcessActions(bool force)
 	}
 	//most likely the best place to clear triggers is here
 	//queue is empty, or there is a looong action subject to break
-	//- ok, fuzzie changed this because things like LastSeenBy must
-	//be preserved while actions are being executed, triggers
-	//need to be looked at some more please
-	if (!CurrentAction && !WaitCounter) {
-		ClearTriggers();
-	}
+	ClearTriggers();
 	if (InternalFlags&IF_IDLE) {
 		Deactivate();
 	}
