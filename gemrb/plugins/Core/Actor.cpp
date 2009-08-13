@@ -4193,9 +4193,12 @@ void Actor::Draw(Region &screen)
 		// (eg, via VerbalConstant), please fix :)
 		drawcircle = false;
 	}
+	if (BaseStats[IE_STATE_ID]&STATE_DEAD || InternalFlags&IF_JUSTDIED) { 
+		drawcircle = false;
+	}
 	bool drawtarget = drawcircle;
 	// we always show circle/target on pause
-	if (!(core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
+	if (drawcircle && !(core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 		// check marker feedback level
 		ieDword markerfeedback = 4;
 		core->GetDictionary()->Lookup("GUI Feedback Level", markerfeedback);
