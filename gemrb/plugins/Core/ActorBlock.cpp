@@ -812,20 +812,14 @@ void Selectable::DrawCircle(Region &vp)
 	flashing cyan/white for neutrals the mouse is over
 	*/
 
-	// ground circles are not drawn in cutscenes
-	// they SHOULD be drawn for at least white speaker circles (eg, via VerbalConstant), please fix :)
-	if ((core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE))
-		return;
-
 	if (size<=0) {
 		return;
 	}
 	Color mix;
-	Color* col = NULL;
+	Color* col = &selectedColor;
 	Sprite2D* sprite = circleBitmap[0];
 
 	if (Selected) {
-		col = &selectedColor;
 		sprite = circleBitmap[1];
 	} else if (Over) {
 		//doing a time dependent flashing of colors
@@ -838,14 +832,13 @@ void Selectable::DrawCircle(Region &vp)
 		mix.g = (overColor.g*step+selectedColor.g*(8-step))/8;
 		mix.b = (overColor.b*step+selectedColor.b*(8-step))/8;
 		col = &mix;
-	} else {
-		return;
+	} else if (IsPC()) {
+		col = &overColor;
 	}
 
 	if (sprite) {
 		core->GetVideoDriver()->BlitSprite( sprite, Pos.x - vp.x, Pos.y - vp.y, true );
-	}
-	else {
+	} else {
 		// for size >= 2, radii are (size-1)*16, (size-1)*12
 		// for size == 1, radii are 12, 9
 		int csize = (size - 1) * 4;

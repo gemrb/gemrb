@@ -4186,8 +4186,41 @@ void Actor::Draw(Region &screen)
 	Video* video = core->GetVideoDriver();
 	Region vp = video->GetViewport();
 
-	if (NoCircle==0) {
+	bool drawcircle = (NoCircle == 0);
+	if ((core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE)) {
+		// ground circles are not drawn in cutscenes
+		// they SHOULD be drawn for at least white speaker circles
+		// (eg, via VerbalConstant), please fix :)
+		drawcircle = false;
+	}
+	bool drawtarget = drawcircle;
+	// we always show circle/target on pause
+	if (!(core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
+		// check marker feedback level
+		ieDword markerfeedback = 4;
+		core->GetDictionary()->Lookup("GUI Feedback Level", markerfeedback);
+		if (Over) {
+			// picked creature
+			drawcircle = markerfeedback >= 1;
+		} else if (Selected) {
+			// selected creature
+			drawcircle = markerfeedback >= 2;
+		} else if (IsPC()) {
+			// selectable
+			drawcircle = markerfeedback >= 3;
+		} else if (Modified[IE_EA] >= EA_EVILCUTOFF) {
+			// hostile
+			drawcircle = markerfeedback >= 5;
+		} else {
+			// all
+			drawcircle = markerfeedback >= 6;
+		}
+		drawtarget = Selected && markerfeedback >= 4;
+	}
+	if (drawcircle) {
 		DrawCircle(vp);
+	}
+	if (drawtarget) {
 		DrawTargetPoint(vp);
 	}
 
