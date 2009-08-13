@@ -3520,6 +3520,7 @@ void GameScript::TextScreen(Scriptable* Sender, Action* parameters)
 	strnlwrcpy(core->GetGame()->LoadMos, parameters->string0Parameter,8);
 	core->GetGUIScriptEngine()->RunFunction( "StartTextScreen" );
 	core->GetVideoDriver()->SetMouseEnabled(true);
+	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction(); // should this be blocking?
 }
 
