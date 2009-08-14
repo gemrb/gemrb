@@ -21,12 +21,12 @@ might be needed to 'click' the GameControl (i.e. map) first.
 Ctrl-A - Alters the animation ID of the actor. You have to hover your
          mouse over it.
 
-Ctrl-B - Inserts/Removes spell effect S056ICBL on selected actor. 
-         Exactly one actor must be selected.
+Ctrl-B - Draws path from start point marked by Ctrl-O to current mouse 
+         position.
 
 Ctrl-C - Force casts a hardcoded spell. The last selected actor is the
          caster and the target is the door/actor currently under the
-         pointer. This currently casts knock.
+         pointer. This currently casts knock (SPWI207).
 
 Ctrl-D - Trap or trapped container pointed w/ mouse is disarmed.
 
@@ -37,6 +37,9 @@ Ctrl-G - Dumps the global (game) object. Currently shows only loaded areas.
 Ctrl-I - Triggers an interaction between the last pointed npc and a random
          party member.
 
+Ctrl-L - Plays the S056ICBL animation over the actor. (This exists in PST only)
+	 TODO: iterate through animations, like the IE does.
+
 Ctrl-J - Teleports (jumps) selected actors to current mouse position.
 
 Ctrl-K - Kicks the actor out of the party.
@@ -45,10 +48,9 @@ Ctrl-M - Prints (on terminal or DOS window) useful info on pointed actor, door
          container or infopoint and current map
 
 Ctrl-O - Marks current mouse position as start point (origin) for path drawn
-         with Ctrl-P
+         with Ctrl-B
 
-Ctrl-P - Draws path from start point marked by Ctrl-O to current mouse 
-         position.
+Ctrl-P - Centers the viewport on the selected actor.
 
 Ctrl-Q - The pointed actor will join the party.
 
