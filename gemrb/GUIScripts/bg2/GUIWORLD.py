@@ -25,8 +25,7 @@
 
 import GemRB
 from GUIDefines import *
-from GUICommon import CloseOtherWindow
-from GUICommon import SetGamedaysAndHourToken
+from GUICommon import CloseOtherWindow, SetGamedaysAndHourToken, UpdateInventorySlot
 from GUICommonWindows import *
 from GUIClasses import GWindow
 
@@ -175,18 +174,11 @@ def RedrawContainerWindow ():
 		#this is an autoselected container, but we could use PC too
 		Slot = GemRB.GetContainerItem (0, i+LeftTopIndex)
 		Button = Window.GetControl (i)
-
 		if Slot != None:
-			Item = GemRB.GetItem (Slot['ItemResRef'])
 			Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
-			Button.SetItemIcon (Slot['ItemResRef'],0)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-			Button.SetTooltip (Slot['ItemName'])
 		else:
 			Button.SetVarAssoc ("LeftIndex", -1)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetTooltip ("")
-
+		UpdateInventorySlot (Button, Slot)
 
 	for i in range (4):
 		if i+RightTopIndex<RightCount:
@@ -195,17 +187,10 @@ def RedrawContainerWindow ():
 			Slot = None
 		Button = Window.GetControl (i+10)
 		if Slot!=None:
-			Item = GemRB.GetItem (Slot['ItemResRef'])
 			Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
-			Button.SetItemIcon (Slot['ItemResRef'],0)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-			#is this needed?
-			#Slot = GemRB.GetItem(Slot['ItemResRef'])
-			#Button.SetTooltip (Slot['ItemName'])
 		else:
 			Button.SetVarAssoc ("RightIndex", -1)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetTooltip ("")
+		UpdateInventorySlot (Button, Slot)
 
 
 def OpenContainerWindow ():

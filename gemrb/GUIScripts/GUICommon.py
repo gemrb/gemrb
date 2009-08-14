@@ -275,3 +275,38 @@ def RemoveClassAbilities (pc, table, Level):
 				else:
 					print "ERROR, unknown class ability (type): ", ab
 
+def UpdateInventorySlot (Button, Slot):
+#	Button.SetSprites ("STONSLOT",0,0,2,4,3)
+	Button.SetFont ("NUMBER")
+	Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
+	Button.SetBorder (1,2,2,5,5,32,32,255,0,0,0)
+	Button.SetBorder (2,0,0,0,0,255,128,128,64,0,1)
+	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
+	Button.SetText ("")
+
+	if Slot == None:
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+		Button.SetTooltip ("")
+	else:
+		item = GemRB.GetItem (Slot['ItemResRef'])
+		identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
+		magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL
+#		print 111, identified, magical, Slot
+		if item["StackAmount"] > 1:
+			Button.SetText (str (Slot["Usages0"])) # this has the correct value
+
+		if not identified or item["ItemNameIdentified"] == -1:
+			Button.SetTooltip (item["ItemName"])
+			Button.EnableBorder (0, 1)
+			Button.EnableBorder (1, 0)
+		else:
+			Button.SetTooltip (item["ItemNameIdentified"])
+			Button.EnableBorder (0, 0)
+			if magical:
+				Button.EnableBorder (1, 1)
+			else:
+				Button.EnableBorder (1, 0)
+
+		Button.SetItemIcon (Slot['ItemResRef'], 0)
+
+	return
