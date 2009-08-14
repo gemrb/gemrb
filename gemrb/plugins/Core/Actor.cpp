@@ -3394,6 +3394,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	if (!header) {
 		return false;
 	}
+	style = 0;
+	CriticalBonus = 0;
 	hittingheader = header;
 	ITMExtHeader *rangedheader = NULL;
 	int THAC0Bonus = hittingheader->THAC0Bonus;
