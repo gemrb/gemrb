@@ -338,16 +338,21 @@ void Inventory::KillSlot(unsigned int index)
 			UpdateShieldAnimation(0);
 			break;
 		case SLOT_EFFECT_MISSILE:
+			//getting a new projectile of the same type
+			if (Equipped != SLOT_MAGIC-SLOT_MELEE) {
+				if (Equipped < 0) {
+					ITMExtHeader *header = itm->GetExtHeader(0);
+					Equipped = FindRangedProjectile(header->ProjectileQualifier);
+				}
+			}
+			UpdateWeaponAnimation();
+			break;
 		case SLOT_EFFECT_MELEE:
 			// reset Equipped if it was the removed item
 			if (Equipped+SLOT_MELEE == (int)index)
 				Equipped = IW_NO_EQUIPPED;
 			// reset Equipped if it is a ranged weapon slot
 			// but not magic weapon slot!
-			if (Equipped != SLOT_MAGIC-SLOT_MELEE) {
-				if (Equipped < 0 && FindRangedWeapon() == SLOT_FIST)
-					Equipped = IW_NO_EQUIPPED;
-			}
 
 			UpdateWeaponAnimation();
 			break;

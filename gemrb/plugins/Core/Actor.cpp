@@ -302,7 +302,7 @@ Actor::Actor()
 	InTrap = 0;
 	PathTries = 0;
 	TargetDoor = NULL;
-	attackProjectile = NULL ;
+	attackProjectile = NULL;
 	lastInit = 0;
 	roundTime = 0;
 	lastattack = 0;
@@ -2470,7 +2470,7 @@ const char* Actor::GetActorNameByID(ieDword ID) const
 void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 {
 	//Did we have an area?
-	bool effinit=!GetCurrentArea() ;
+	bool effinit=!GetCurrentArea();
 	Scriptable::SetMap(map); //now we have an area
 	localID = LID;
 	globalID = GID;
@@ -3267,10 +3267,10 @@ void Actor::SetModal(ieDword newstate)
 //even spells got this attack style
 int Actor::GetAttackStyle()
 {
-	WeaponInfo wi ;
+	WeaponInfo wi;
 	//Non NULL if the equipped slot is a projectile or a throwing weapon
 	//TODO some weapons have both melee and ranged capability
-	if (GetRangedWeapon(wi) != NULL) return WEAPON_RANGED ;
+	if (GetRangedWeapon(wi) != NULL) return WEAPON_RANGED;
 	return WEAPON_MELEE;
 }
 
@@ -3392,14 +3392,16 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	leftorright = leftorright && IsDualWielding();
 	header = GetWeapon(wi,leftorright);
 	if (!header) {
+		printf("No header got\n");
 		return false;
 	}
+	printf("getcombatdetails\n");
 	style = 0;
 	CriticalBonus = 0;
 	hittingheader = header;
 	ITMExtHeader *rangedheader = NULL;
 	int THAC0Bonus = hittingheader->THAC0Bonus;
-	DamageBonus = hittingheader->DamageBonus ;
+	DamageBonus = hittingheader->DamageBonus;
 	switch(hittingheader->AttackType) {
 	case ITEM_AT_MELEE:
 		Flags = WEAPON_MELEE;
@@ -3410,16 +3412,17 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	case ITEM_AT_BOW:
 		rangedheader = GetRangedWeapon(wi);
 		if (!rangedheader) {
-			//out of ammo event
-			//try to refill
+			//display out of ammo verbal constant if there is any???
+			//DisplayStringCore(this, VB_OUTOFAMMO, DS_CONSOLE|DS_CONST );
 			SetStance(IE_ANI_READY);
+			//set some trigger?
 			return false;
 		}
 		Flags = WEAPON_RANGED;
 		//The bow can give some bonuses, but the core attack is made by the arrow.
 		hittingheader = rangedheader;
 		THAC0Bonus += rangedheader->THAC0Bonus;
-		DamageBonus += rangedheader->DamageBonus ;
+		DamageBonus += rangedheader->DamageBonus;
 		break;
 	default:
 		//item is unsuitable for fight
@@ -3537,23 +3540,23 @@ int Actor::GetDefense(int DamageType)
 	//dexterity bonus.
 	int defense = 0;
 	if(DamageType > 5)
-		DamageType = 0 ;
+		DamageType = 0;
 	switch (weapon_damagetype[DamageType]) {
 	case DAMAGE_CRUSHING:
-		defense += GetStat(IE_ACCRUSHINGMOD) ;
-		break ;
+		defense += GetStat(IE_ACCRUSHINGMOD);
+		break;
 	case DAMAGE_PIERCING:
-		defense += GetStat(IE_ACPIERCINGMOD) ;
-		break ;
+		defense += GetStat(IE_ACPIERCINGMOD);
+		break;
 	case DAMAGE_SLASHING:
-		defense += GetStat(IE_ACSLASHINGMOD) ;
-		break ;
+		defense += GetStat(IE_ACSLASHINGMOD);
+		break;
 	case DAMAGE_MISSILE:
-		defense += GetStat(IE_ACMISSILEMOD) ;
-		break ;
+		defense += GetStat(IE_ACMISSILEMOD);
+		break;
 	//What about stunning ?
 	default :
-		break ;
+		break;
 	}
 
 	//check for s/s and single weapon ac bonuses
@@ -3585,7 +3588,7 @@ int Actor::GetDefense(int DamageType)
 		defense += GetStat(IE_ARMORCLASS);
 	}
 //Defense bonus are stocked < 0 in 2da files.
-	return defense + core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) ) ;
+	return defense + core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) );
 }
 
 void Actor::PerformAttack(ieDword gameTime)
@@ -3635,6 +3638,8 @@ void Actor::PerformAttack(ieDword gameTime)
 		return;
 	}
 
+	printf("Performattack for %s, target is: %s\n", ShortName, target->ShortName);
+
 	//which hand is used
 	//we do apr - attacksleft so we always use the main hand first
 	bool leftorright = (bool) ((attacksperround-attackcount)&1);
@@ -3675,7 +3680,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		return;
 	}
 
-	SetStance(AttackStance) ;
+	SetStance(AttackStance);
 
 	//figure out the time for our next attack since the old time has the initiative
 	//in it, we only have to add the basic delta
@@ -3733,13 +3738,13 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	//get target's defense against attack
-	int defense = target->GetDefense(damagetype) ;
+	int defense = target->GetDefense(damagetype);
 
-	bool success ;
+	bool success;
 	if(ReverseToHit) {
-		success = roll > tohit - defense ;
+		success = roll > tohit - defense;
 	} else {
-		success = tohit + roll > defense ;
+		success = tohit + roll > defense;
 	}
 
 	if (!success) {
@@ -4249,8 +4254,8 @@ void Actor::Draw(Region &screen)
 		//If you find a better place for it, I'll really be glad to put it there
 		//IN BG1 and BG2, this is at the ninth frame...
 		if(attackProjectile && (anims[0]->GetCurrentFrame() == 8/*anims[0]->GetFramesCount()/2*/)) {
-			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget) ;
-			attackProjectile = NULL ;
+			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget);
+			attackProjectile = NULL;
 		}
 		if (nextFrame && lastFrame != nextFrame) {
 			Region newBBox;
@@ -4793,7 +4798,7 @@ int Actor::SetEquippedQuickSlot(int slot)
 		slot = PCStats->QuickWeaponSlots[slot]-inventory.GetWeaponSlot();
 	}
 	if(!GetCurrentArea()) {//no area yet
-		Equipped = slot ;
+		Equipped = slot;
 	}
 	if (inventory.SetEquippedSlot(slot)) {
 		return 0;
@@ -4851,14 +4856,14 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	gamedata->FreeItem(itm,item->ItemResRef, false);
 	if (pro) {
 		//ieDword is unsigned!!
-		pro->SetCaster(globalID) ;
+		pro->SetCaster(globalID);
 		if(((int)header < 0) && !(flags&UI_MISS)) { //using a weapon
 			ITMExtHeader *which = itm->GetWeaponHeader(header == (ieDword)-2);
 			Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, weapon_damagetype[which->DamageType], FX_DURATION_INSTANT_LIMITED);
-			AttackEffect->Projectile = which->ProjectileAnimation ;
-			AttackEffect->Target = FX_TARGET_PRESET ;
-			pro->GetEffects()->AddEffect(AttackEffect, true) ;
-			attackProjectile = pro ;
+			AttackEffect->Projectile = which->ProjectileAnimation;
+			AttackEffect->Target = FX_TARGET_PRESET;
+			pro->GetEffects()->AddEffect(AttackEffect, true);
+			attackProjectile = pro;
 		} else //launch it now as we are not attacking
 			GetCurrentArea()->AddProjectile(pro, Pos, tar->globalID);
 		return true;
@@ -4978,12 +4983,12 @@ void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int
 		AttackStance = IE_ANI_SHOOT;
 		anims->RangedType = projHeader->ProjectileType - 1;
 		//bows ARE one handed, from an anim POV at least
-		anims->SetWeaponType(IE_ANI_WEAPON_1H) ;
+		anims->SetWeaponType(IE_ANI_WEAPON_1H);
 		return;
 	}
 	if(header && (header->AttackType == ITEM_AT_PROJECTILE)) {
-		AttackStance = IE_ANI_ATTACK_SLASH ; //That's it!!
-		return ;
+		AttackStance = IE_ANI_ATTACK_SLASH; //That's it!!
+		return;
 	}
 	AttackStance =  IE_ANI_ATTACK;
 }
