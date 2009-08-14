@@ -3394,10 +3394,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	leftorright = leftorright && IsDualWielding();
 	header = GetWeapon(wi,leftorright);
 	if (!header) {
-		printf("No header got\n");
 		return false;
 	}
-	printf("getcombatdetails\n");
 	style = 0;
 	CriticalBonus = 0;
 	hittingheader = header;
