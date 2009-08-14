@@ -2499,6 +2499,8 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 		//when adding it to the base slot (SLOT_WEAPON) in
 		//case of quivers. (weird IE magic)
 		inventory.SetEquippedSlot( (ieWordSigned) Equipped );
+		//find a quiver for the bow, etc
+		ReinitQuickSlots();
 	}
 }
 
