@@ -1231,10 +1231,22 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		//Sender->AddAction(parameters);
 	}*/
 
-	//if distance is too much, insert a move action and requeue the action
 	WeaponInfo wi;
-	//TODO: must we pass leftorright as the second param?
-	ITMExtHeader *header = actor->GetWeapon(wi, false);
+	ITMExtHeader *header = NULL;
+	ITMExtHeader *hittingheader = NULL;
+	int tohit;
+	ieDword Flags;
+	int DamageBonus, CriticalBonus;
+	int speed, style;
+
+	//bool leftorright = (bool) ((attacksperround-attackcount)&1);
+	bool leftorright = false;
+
+	//will return false on any errors (eg, unusable weapon)
+	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus, style)) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 
 	if (header) wi.range *= 10;
 	else wi.range = 0;
