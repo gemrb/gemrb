@@ -220,7 +220,6 @@ Interface::Interface(int iargc, char* iargv[])
 	memset( WindowFrames, 0, sizeof( WindowFrames ));
 	memset( GroundCircles, 0, sizeof( GroundCircles ));
 	memset(FogSprites, 0, sizeof( FogSprites ));
-	//memset(ArrowSprites, 0, sizeof( ArrowSprites ));
 	AreaAliasTable = NULL;
 	ItemExclTable = NULL;
 	ItemDialTable = NULL;
@@ -375,9 +374,6 @@ Interface::~Interface(void)
 	FreeInterface( windowmgr );
 
 	if (video) {
-		//for(i=0;i<sizeof(ArrowSprites)/sizeof(Sprite2D *);i++ ) {
-		//	video->FreeSprite(ArrowSprites[i]);
-		//}
 
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
 			video->FreeSprite(FogSprites[i]);
@@ -1025,19 +1021,6 @@ int Interface::LoadSprites()
 	}
 	video->SetCursor( Cursors[0], Cursors[1] );
 	printStatus( "OK", LIGHT_GREEN );
-
-	// Load arrow cursors
-	//str = key->GetResource( "cursarw", IE_BAM_CLASS_ID );
-	//printMessage( "Core", "Loading arrow cursor bitmaps...\n", WHITE );
-	//anim->Open( str, true );
-	//if (anim->GetCycleCount( ) != MAX_ORIENT/2) {
-	//	printStatus( "ERROR", LIGHT_RED );
-	//	goto end_of_init;
-	//}
-
-	//for(i=0;i<MAX_ORIENT/2;i++) {
-	//	ArrowSprites[i] = anim->GetFrameFromCycle( i, 0);
-	//}
 
 	// Load fog-of-war bitmaps
 	anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);

@@ -1409,6 +1409,9 @@ void GameControl::TryToCast(Actor *source, Point &tgt)
 		target_mode = TARGET_MODE_NONE;
 		return; //not casting or using an own item
 	}
+	source->ClearPath();
+	source->ClearActions();
+
 	spellCount--;
 	if (spellOrItem>=0) {
 		sprintf(Tmp, "NIDSpecial8()");
@@ -1450,6 +1453,9 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		target_mode = TARGET_MODE_NONE;
 		return; //not casting or using an own item
 	}
+	source->ClearPath();
+	source->ClearActions();
+
 	spellCount--;
 	if (spellOrItem>=0) {
 		sprintf(Tmp, "NIDSpecial6()");
