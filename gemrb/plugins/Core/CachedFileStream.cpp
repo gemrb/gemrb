@@ -44,7 +44,11 @@ CachedFileStream::CachedFileStream(const char* stream, bool autoFree)
 			void* buff = malloc( 1024 * 1000 );
 			do {
 				size_t len = _fread( buff, 1, 1024 * 1000, src );
-				_fwrite( buff, 1, len, dest );
+				size_t c = _fwrite( buff, 1, len, dest );
+				if (c != len) {
+					printf("CachedFileStream failed to write to cached file '%s' (from '%s')\n", originalfile, stream);
+					abort();
+				}
 			} while (!_feof( src ));
 			free( buff );
 			_fclose( src );
