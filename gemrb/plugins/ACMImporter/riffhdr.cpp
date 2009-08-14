@@ -54,5 +54,8 @@ void write_wavc_header(FILE* fpoi, int samples, int channels, int compressed,
 	wavc.channels = ( short ) channels;
 	wavc.samplespersec = ( short ) samplerate;
 	rewind( fpoi );
-	fwrite( &wavc, 1, sizeof( WAVC_HEADER ), fpoi );
+	size_t c = fwrite( &wavc, 1, sizeof( WAVC_HEADER ), fpoi );
+	if (c) {
+		return;
+	}
 }
