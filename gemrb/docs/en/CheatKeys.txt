@@ -37,12 +37,12 @@ Ctrl-G - Dumps the global (game) object. Currently shows only loaded areas.
 Ctrl-I - Triggers an interaction between the last pointed npc and a random
          party member.
 
-Ctrl-L - Plays the S056ICBL animation over the actor. (This exists in PST only)
-	 TODO: iterate through animations, like the IE does.
-
 Ctrl-J - Teleports (jumps) selected actors to current mouse position.
 
 Ctrl-K - Kicks the actor out of the party.
+
+Ctrl-L - Plays the S056ICBL animation over the actor. (This exists in PST only)
+	 TODO: iterate through animations, like the IE does.
 
 Ctrl-M - Prints (on terminal or DOS window) useful info on pointed actor, door
          container or infopoint and current map
