@@ -857,13 +857,16 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
 	if (fx->random_value < val) {
+		printf ("effect resisted: %s\n", (char*) effect_refs[fx->Opcode].Name);
 		return true;
 	}
 	//opcode immunity
 	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
+		printf ("immune to effect: %s\n", (char*) effect_refs[fx->Opcode].Name);
 		return true;
 	}
 	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
+		printf ("immune2 to effect: %s\n", (char*) effect_refs[fx->Opcode].Name);
 		return true;
 	}
 
@@ -888,6 +891,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		if (fx->IsSaveForHalfDamage) {
 			fx->Parameter1/=2;
 		} else {
+			printf ("effect saved: %s\n", (char*) effect_refs[fx->Opcode].Name);
 			return true;
 		}
 	}
