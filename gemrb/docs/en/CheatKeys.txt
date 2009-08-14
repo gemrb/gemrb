@@ -11,8 +11,8 @@ gemrb/plugins/Core/GameControl.cpp, functions GameControl::OnKeyRelease()
 and GameControl::Draw().
 
 Cheat keys are disabled by default. To activate them, either type command
-GemRB.EnableCheatKeys(1) on console (pop-up with ESC key), or put it into
-some GUIScript - e.g. for PS:T in Start.py.
+GemRB.EnableCheatKeys(1) on console (pops-up with CTRL+SPACE key combination)
+or put it into some GUIScript - e.g. for PS:T in Start.py.
 
 GameControl control must be focused for the keys to be recognized, so it
 might be needed to 'click' the GameControl (i.e. map) first.
@@ -24,13 +24,22 @@ Ctrl-A - Alters the animation ID of the actor. You have to hover your
 Ctrl-B - Inserts/Removes spell effect S056ICBL on selected actor. 
          Exactly one actor must be selected.
 
+Ctrl-C - Force casts a hardcoded spell. The last selected actor is the
+         caster and the target is the door/actor currently under the
+         pointer. This currently casts knock.
+
 Ctrl-D - Trap or trapped container pointed w/ mouse is disarmed.
 
 Ctrl-F - Toggles fullscreen mode
 
 Ctrl-G - Dumps the global (game) object. Currently shows only loaded areas.
 
+Ctrl-I - Triggers an interaction between the last pointed npc and a random
+         party member.
+
 Ctrl-J - Teleports (jumps) selected actors to current mouse position.
+
+Ctrl-K - Kicks the actor out of the party.
 
 Ctrl-M - Prints (on terminal or DOS window) useful info on pointed actor, door
          container or infopoint and current map
@@ -43,7 +52,7 @@ Ctrl-P - Draws path from start point marked by Ctrl-O to current mouse
 
 Ctrl-Q - The pointed actor will join the party.
 
-Ctrl-R - Resurrects pointed actor.
+Ctrl-R - Resurrects pointed actor. If she's already alive, just heals.
 
 Ctrl-S - Alters the stance (animation state) of the actor. You have to
          hover your mouse over it.
@@ -57,7 +66,8 @@ Ctrl-W - The pointed actor will leave the party.
 Ctrl-X - Prints (on terminal or DOS window) name of current area script
          and current mouse position converted to game coordinates.
 
-Ctrl-Y - Kills pointed actor
+Ctrl-Y - Kills pointed actor or unlocks the pointed door/container, even
+         if it requires a key.
 
 Ctrl-Z - Same as Ctrl-A but backward
 
