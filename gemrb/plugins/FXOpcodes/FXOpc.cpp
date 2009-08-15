@@ -23,6 +23,7 @@
 #include "../../includes/strrefs.h"
 #include "../../includes/opcode_params.h"
 #include "../../includes/overlays.h"
+#include "../../includes/ie_feats.h" //cannot avoid declaring these
 #include "../Core/Actor.h"
 #include "../Core/EffectQueue.h"
 #include "../Core/Interface.h"
@@ -2355,8 +2356,15 @@ int fx_damage_bonus_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_blind_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_blind_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_SET( STATE_BLIND );
-	STAT_SUB (IE_TOHIT, 10); // all other tohit stats are treated as bonuses
+
+	//don't do this effect twice (bug exists in BG2, but fixed in IWD2)
+	if (!STATE_GET(STATE_BLIND)) {
+		STATE_SET( STATE_BLIND );
+		//the feat normally exists only in IWD2, but won't hurt
+		if (!target->GetFeat(FEAT_BLIND_FIGHT)) {
+			STAT_SUB (IE_TOHIT, 10); // all other tohit stats are treated as bonuses
+		}
+	}
 	return FX_APPLIED;
 }
 
