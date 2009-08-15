@@ -2356,6 +2356,7 @@ int fx_set_blind_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_blind_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_SET( STATE_BLIND );
+	STAT_SUB (IE_TOHIT, 10); // all other tohit stats are treated as bonuses
 	return FX_APPLIED;
 }
 
@@ -3412,12 +3413,12 @@ void CopyPolymorphStats(Actor *source, Actor *target)
 	if(!polymorph_stats) {
 		AutoTable tab("polystat");
 		if (!tab) {
-			spell_abilities = (int *) malloc(0);
+			polymorph_stats = (int *) malloc(0);
 			polystatcount=0;
 			return;
 		}
 		polystatcount = tab->GetRowCount();
-		spell_abilities=(int *) malloc(sizeof(int)*polystatcount);
+		polymorph_stats=(int *) malloc(sizeof(int)*polystatcount);
 		for (i=0;i<polystatcount;i++) {
 			polymorph_stats[i]=core->TranslateStat(tab->QueryField(i,0));
 		}
