@@ -86,6 +86,7 @@ Inventory::Inventory()
 	Changed = false;
 	Weight = 0;
 	Equipped = IW_NO_EQUIPPED;
+	EquippedHeader = 0;
 	ItemExcl = 0;
 }
 
