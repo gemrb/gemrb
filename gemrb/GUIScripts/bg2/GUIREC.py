@@ -439,7 +439,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	else:
 		tmp2 = str (tmp/2)
 	stats.append ( (9458, tmp2, '') )
-	stats.append ( (9459, GS (IE_LORE), '0') )
+	stats.append ( (9459, GSNN (pc, IE_LORE), '0') )
 	reptxt = GetReputation (GemRB.GameGetReputation ()/10)
 	stats.append ( (9465, reptxt, '') )
 	stats.append ( (9460, GSNN (pc, IE_LOCKPICKING), '') )
