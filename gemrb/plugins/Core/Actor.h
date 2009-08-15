@@ -223,7 +223,8 @@ public:
 	ieVariable KillVar; //this second field is present in pst and iwd1
 
 	Inventory inventory;
-	ieDword Equipped;   //i found no better place for this :(
+	ieWordSigned Equipped;         //the equipped weapon slot
+	ieWord EquippedHeader;         //the used extended header
 	Spellbook spellbook;
 	//savefile version (creatures embedded in area)
 	int version;

@@ -2879,7 +2879,7 @@ int fx_create_magic_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 	//charge count is incorrect
 	target->inventory.SetSlotItemRes(fx->Resource, target->inventory.GetMagicSlot(),fx->Parameter1,fx->Parameter3,fx->Parameter4);
 	//equip the weapon
-	target->inventory.SetEquippedSlot(target->inventory.GetMagicSlot()-target->inventory.GetWeaponSlot());
+	target->inventory.SetEquippedSlot(target->inventory.GetMagicSlot()-target->inventory.GetWeaponSlot(), 0);
 	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
 //if this effect has expiration, then it will remain as a remove_item
 //on the effect queue, inheriting all the parameters
@@ -2907,7 +2907,7 @@ int fx_equip_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 	switch(eff) {
 	case SLOT_EFFECT_NONE:
 	case SLOT_EFFECT_MELEE:
-		target->inventory.SetEquippedSlot( fx->Parameter2 );
+		target->inventory.SetEquippedSlot( fx->Parameter2, fx->Parameter1 );
 		break;
 	default:
 		target->inventory.EquipItem( fx->Parameter2 );

@@ -308,6 +308,9 @@ Actor::Actor()
 	lastattack = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
+	Equipped = 0;
+	EquippedHeader = 0;
+
 	fxqueue.SetOwner( this );
 	inventory.SetOwner( this );
 	if (classcount<0) {
@@ -2494,13 +2497,13 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 			}
 		}
 		//We need to convert this to signed 16 bits, because
-		//it is actually a 16 bit number. The high word could
-		//be anything. It is signed to have the correct math
+		//it is actually a 16 bit number.
+		//It is signed to have the correct math
 		//when adding it to the base slot (SLOT_WEAPON) in
 		//case of quivers. (weird IE magic)
-		inventory.SetEquippedSlot( (ieWordSigned) Equipped );
-		//find a quiver for the bow, etc
-		ReinitQuickSlots();
+                //The other word is the equipped header. 
+		//find a quiver for the bow, etc		
+		inventory.SetEquippedSlot( Equipped, EquippedHeader );
 	}
 }
 
@@ -2910,7 +2913,7 @@ void Actor::ReinitQuickSlots()
 			case ACT_WEAPON2:
 			case ACT_WEAPON3:
 			case ACT_WEAPON4:
-				CheckWeaponQuickSlot(which-ACT_WEAPON1);
+				CheckWeaponQuickSlot(which);
 				slot = 0;
 				break;
 				//WARNING:this cannot be condensed, because the symbols don't come in order!!!
@@ -2964,6 +2967,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 	int slot = PCStats->QuickWeaponSlots[which];
 	int header = PCStats->QuickWeaponHeaders[which];
 	if (!inventory.HasItemInSlot("", slot) || header == 0xffff) {
+		//a quiver just went dry, falling back to fist
 		empty = true;
 	} else {
 		// If current quickweaponslot contains ammo, and bow not found, reset
@@ -4793,14 +4797,17 @@ int Actor::GetQuickSlot(int slot)
 //marks the quickslot as equipped
 int Actor::SetEquippedQuickSlot(int slot)
 {
+	ieWord header = EquippedHeader;
+
 	//creatures and such
 	if (PCStats) {
+		header = PCStats->QuickWeaponHeaders[slot];
 		slot = PCStats->QuickWeaponSlots[slot]-inventory.GetWeaponSlot();
 	}
 	if(!GetCurrentArea()) {//no area yet
-		Equipped = slot;
+		Equipped = (ieWordSigned) slot;
 	}
-	if (inventory.SetEquippedSlot(slot)) {
+	if (inventory.SetEquippedSlot(slot, header)) {
 		return 0;
 	}
 	return STR_MAGICWEAPON;

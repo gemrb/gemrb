@@ -1103,9 +1103,8 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	// 1000 - fist
 	// -24,-23,-22,-21 - quiver
 	//the equipping effects are delayed until the actor gets an area
-	//ieDword Equipped;
-	str->ReadDword( &act->Equipped );
-	//act->inventory.SetEquippedSlot( (short)Equipped, true);
+	str->ReadWordSigned( &act->Equipped );
+	str->ReadWord( &act->EquippedHeader );
 
 	// Reading spellbook
 	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );
@@ -2090,6 +2089,7 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 {
 	unsigned int i;
 	ieDword tmpDword;
+	ieWord tmpWord;
 	ieWord ItemCount = 0;
 	ieWord *indices =(ieWord *) malloc(size*sizeof(ieWord) );
 
@@ -2124,8 +2124,10 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 	for (i=0;i<size;i++) {
 		stream->WriteWord( indices+i);
 	}
-	tmpDword = actor->inventory.GetEquipped();
-	stream->WriteDword( &tmpDword);
+	tmpWord = (ieWord) actor->inventory.GetEquipped();
+	stream->WriteWord( &tmpWord);
+	tmpWord = (ieWord) actor->inventory.GetEquippedHeader();
+	stream->WriteWord( &tmpWord);
 	free(indices);
 	return 0;
 }

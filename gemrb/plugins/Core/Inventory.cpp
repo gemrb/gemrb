@@ -339,10 +339,16 @@ void Inventory::KillSlot(unsigned int index)
 			break;
 		case SLOT_EFFECT_MISSILE:
 			//getting a new projectile of the same type
-			if (Equipped != SLOT_MAGIC-SLOT_MELEE) {
+			if (Equipped + SLOT_MELEE == (int) index) {
 				if (Equipped < 0) {
-					ITMExtHeader *header = itm->GetExtHeader(0);
+				  //always get the projectile weapon header (this quiver was equipped)
+					ITMExtHeader *header = itm->GetWeaponHeader(true);
 					Equipped = FindRangedProjectile(header->ProjectileQualifier);
+				  if (Equipped!=IW_NO_EQUIPPED) {
+				    EquipItem(Equipped+SLOT_MELEE);
+				  } else {
+				    EquipItem(SLOT_FIST);
+				  }
 				}
 			}
 			UpdateWeaponAnimation();
@@ -351,10 +357,34 @@ void Inventory::KillSlot(unsigned int index)
 			// reset Equipped if it was the removed item
 			if (Equipped+SLOT_MELEE == (int)index)
 				Equipped = IW_NO_EQUIPPED;
+			else if (Equipped < 0) {
+				//always get the projectile weapon header (this is a bow, because Equipped is negative)
+				ITMExtHeader *header = itm->GetWeaponHeader(true);
+				if (header) {
+				  //find the equipped type
+				  int type = header->ProjectileQualifier;
+				  int weaponslot = FindTypedRangedWeapon(type);
+				  CREItem *item2 = Slots[weaponslot];
+				  if (item2) {
+				    Item *itm2 = gamedata->GetItem(item2->ItemResRef);
+				    if (itm2) {
+				      if (type == header->ProjectileQualifier) {
+				        Equipped = FindRangedProjectile(header->ProjectileQualifier);
+				        if (Equipped!=IW_NO_EQUIPPED) {
+				          EquipItem(Equipped+SLOT_MELEE);
+				        } else {
+				          EquipItem(SLOT_FIST);
+				        }
+				      }
+				      gamedata->FreeItem(itm2, item2->ItemResRef, false);
+				    }
+				  }
+				}
+			}
 			// reset Equipped if it is a ranged weapon slot
 			// but not magic weapon slot!
 
-			UpdateWeaponAnimation();
+			UpdateWeaponAnimation();      
 			break;
 		case SLOT_EFFECT_HEAD:
 			Owner->SetUsedHelmet("");
@@ -803,34 +833,41 @@ bool Inventory::EquipItem(unsigned int slot)
 		//if weapon is ranged, then find quarrel for it and equip that
 		slot -= SLOT_MELEE;
 		weaponslot = slot;
-		header = itm->GetExtHeader(0);
+		EquippedHeader = 0;
+		header = itm->GetExtHeader(EquippedHeader);
 		if (header && header->AttackType == ITEM_AT_BOW) {
 			//find the ranged projectile associated with it.
 			slot = FindRangedProjectile(header->ProjectileQualifier);
-			header = itm->GetWeaponHeader(true);
+			EquippedHeader = itm->GetWeaponHeaderNumber(true);
 		} else if (header && header->AttackType == ITEM_AT_PROJECTILE) {
-			header = itm->GetWeaponHeader(true);
+			EquippedHeader = itm->GetWeaponHeaderNumber(true);
 		} else {
-			header = itm->GetWeaponHeader(false);
+			EquippedHeader = itm->GetWeaponHeaderNumber(false);
 		}
+		header = itm->GetExtHeader(EquippedHeader);
 		if (header) {
+			SetEquippedSlot(slot, EquippedHeader);
 			if (slot != IW_NO_EQUIPPED) {
-				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot+SLOT_MELEE, 0);
+				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot+SLOT_MELEE, EquippedHeader);
 			}
-			SetEquippedSlot(slot);
 			effect = 0; // SetEquippedSlot will already call AddSlotEffects
 			UpdateWeaponAnimation();
 		}
 		break;
-	case SLOT_EFFECT_MISSILE:
-		header = itm->GetExtHeader(0);
+	case SLOT_EFFECT_MISSILE:		
+		//Get the ranged header of the projectile (so we theoretically allow shooting of daggers)
+		EquippedHeader = itm->GetWeaponHeaderNumber(true);
+		header = itm->GetExtHeader(EquippedHeader);
 		if (header) {
 			weaponslot = FindTypedRangedWeapon(header->ProjectileQualifier);
 			if (weaponslot != SLOT_FIST) {
 				weaponslot -= SLOT_MELEE;
-				SetEquippedSlot(slot-SLOT_MELEE);
+				SetEquippedSlot((ieWordSigned) (slot-SLOT_MELEE), EquippedHeader);
+				//It is unsure if we can have multiple equipping headers for bows/arrow
+				//It is unclear which item's header index should go there
 				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot, 0);
 			}
+			UpdateWeaponAnimation();
 		}
 		break;
 	case SLOT_EFFECT_HEAD:
@@ -850,7 +887,6 @@ bool Inventory::EquipItem(unsigned int slot)
 	}
 	gamedata->FreeItem(itm, item->ItemResRef, false);
 	if (effect) {
-		//item->Flags|=IE_INV_ITEM_EQUIPPED; //no need to set this, only for weapons
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
@@ -922,7 +958,8 @@ int Inventory::FindSlotRangedWeapon(unsigned int slot) const
 	Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) return SLOT_FIST;
 
-	ITMExtHeader *ext_header = itm->GetExtHeader(0);
+	//always look for a ranged header when looking for a projectile/projector
+	ITMExtHeader *ext_header = itm->GetWeaponHeader(true);
 	unsigned int type = 0;
 	if (ext_header) {
 		type = ext_header->ProjectileQualifier;
@@ -943,7 +980,8 @@ int Inventory::FindTypedRangedWeapon(unsigned int type) const
 
 		const Item *itm = GetItemPointer(i, Slot);
 		if (!itm) continue;
-		ITMExtHeader *ext_header = itm->GetExtHeader(0);
+		//always look for a ranged header when looking for a projectile/projector
+		ITMExtHeader *ext_header = itm->GetWeaponHeader(true);
 		int weapontype = 0;
 		if (ext_header) {
 			weapontype = ext_header->ProjectileQualifier;
@@ -1063,8 +1101,10 @@ int Inventory::GetEquippedSlot() const
 	return Equipped+SLOT_MELEE;
 }
 
-bool Inventory::SetEquippedSlot(int slotcode)
+bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 {
+	EquippedHeader = header;
+
 	//doesn't work if magic slot is used, refresh the magic slot just in case
 	if (HasItemInSlot("",SLOT_MAGIC) && (slotcode!=SLOT_MAGIC-SLOT_MELEE)) {
 		Equipped = SLOT_MAGIC-SLOT_MELEE;
@@ -1106,6 +1146,11 @@ bool Inventory::SetEquippedSlot(int slotcode)
 int Inventory::GetEquipped() const
 {
 	return Equipped;
+}
+
+int Inventory::GetEquippedHeader() const
+{
+	return EquippedHeader;
 }
 
 //returns the fist weapon if there is nothing else

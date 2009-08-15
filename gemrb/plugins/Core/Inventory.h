@@ -206,7 +206,8 @@ private:
 	/** Total weight of all items in Inventory */
 	int Weight;
 
-	int Equipped;
+	ieWordSigned Equipped;
+	ieWord EquippedHeader;
 	/** this isn't saved */
 	ieDword ItemExcl;
 public: 
@@ -271,8 +272,9 @@ public:
 	int FindItem(const char *resref, unsigned int flags) const;
 	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc);
 	bool DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
-	bool SetEquippedSlot(int slotcode);
+	bool SetEquippedSlot(ieWordSigned slotcode, ieWord header);
 	int GetEquipped() const;
+	int GetEquippedHeader() const;
 	//right hand
 	int GetEquippedSlot() const;
 	//left hand
