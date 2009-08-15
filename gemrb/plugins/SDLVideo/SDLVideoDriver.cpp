@@ -2424,8 +2424,10 @@ Sprite2D* SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
 		for (int x = 0; x < sprite->Width; x++) {
 			int sum = 0;
 			int cnt = 0;
-			for (int xx=x-2;xx<x+2;xx++) {
-				for(int yy=y-2;yy<y+2;yy++) {
+			for (int xx=x-3;xx<=x+3;xx++) {
+				for(int yy=y-3;yy<=y+3;yy++) {
+					if (((xx==x-3) || (xx==x+3)) &&
+                                            ((yy==y-3) || (yy==y+3))) continue;
 					if (xx < 0 || xx >= sprite->Width) continue;
 					if (yy < 0 || yy >= sprite->Height) continue;
 					cnt++;
