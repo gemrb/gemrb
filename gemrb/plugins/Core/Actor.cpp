@@ -2375,7 +2375,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, unsigned int damagetype_
 	} else {
 		// this will also display for hits on stoneskins and mirrorimages
 		printMessage("Actor", " ", GREEN);
-		printf("is immune to damage type %d.\n", damagetype_str_id);
+		printf("is immune to damage type %d (strrefs.h reference): %s.\n", damagetype_str_id, type_name);
 
 		if (detailed) {
 			//<DAMAGEE> was immune to my <TYPE> damage
