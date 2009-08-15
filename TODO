@@ -72,6 +72,7 @@ Graphics:
 2. move SDLVideoDriver sprite functions to their own file, rename them to 
    SpriteIsPixelTransparent etc.
 3. (PARTLY) Add PNG support? (still image done)
+4. Fog of war: fully visible squares with one corner neighbour invisible need alpha of the adjacent corner to the invisible square tuned down (uh, i hope it is clear what to do, look for artifacts in the fog of war edge)
 
 Sound:
 1. valgrind reports invalid memory access due to Unqueueing buffers and using 
