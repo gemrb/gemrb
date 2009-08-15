@@ -117,11 +117,6 @@ def OpenInventoryWindow ():
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveGround")
 		Button.SetVarAssoc ("GroundItemButton", i)
 		Button.SetSprites ("STONSLOT",0,0,2,4,3)
-		Button.SetFont ("NUMBER")
-		Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
-		Button.SetBorder (1,2,2,5,5,32,32,255,0,0,0)
-		Button.SetBorder (2,0,0,0,0,255,128,128,64,0,1)
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	#major & minor clothing color
 	Button = Window.GetControl (62)
@@ -379,38 +374,17 @@ def RefreshInventoryWindow ():
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItemGround")
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
-		if Slot != None:
-			item = GemRB.GetItem (Slot['ItemResRef'])
-			identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
-			magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL
 
-			Button.SetItemIcon (Slot['ItemResRef'],0)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-			if not identified or item["ItemNameIdentified"] == -1:
-				Button.SetTooltip (item["ItemName"])
-				Button.EnableBorder (0, 1)
-				Button.EnableBorder (1, 0)
-
-			else:
-				Button.SetTooltip (item["ItemNameIdentified"])
-				Button.EnableBorder (0, 0)
-				if magical:
-					Button.EnableBorder (1, 1)
-				else:
-					Button.EnableBorder (1, 0)
-
+		if Slot == None:
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+		else:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDragItemGround")
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenGroundItemInfoWindow")
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenGroundItemAmountWindow")
 
-		else:
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetTooltip (12011)
-			Button.EnableBorder (0, 0)
-			Button.EnableBorder (1, 0)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+		UpdateInventorySlot (Button, Slot)
 
 	#making window visible/shaded depending on the pc's state
 	Window.SetVisible (1)
