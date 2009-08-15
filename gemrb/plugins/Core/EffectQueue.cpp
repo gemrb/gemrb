@@ -98,7 +98,7 @@ inline bool IsEquipped(ieByte timingmode)
 //                                               0    1     2     3    4    5    6     7       8   9     10
 static const bool fx_relative[MAX_TIMING_MODE]={true,false,false,true,true,true,false,false,false,false,false};
 
-inline bool NeedPrepare(ieByte timingmode)
+inline bool NeedPrepare(ieWord timingmode)
 {
 	if (timingmode>=MAX_TIMING_MODE) return false;
 	return fx_relative[timingmode];
@@ -112,7 +112,7 @@ inline bool NeedPrepare(ieByte timingmode)
 static const int fx_prepared[MAX_TIMING_MODE]={DURATION,PERMANENT,PERMANENT,DELAYED, //0-3
 DELAYED,DELAYED,DELAYED,DELAYED,PERMANENT,PERMANENT,PERMANENT};		//4-7
 
-inline int IsPrepared(ieByte timingmode)
+inline int DelayType(ieByte timingmode)
 {
 	if (timingmode>=MAX_TIMING_MODE) return INVALID;
 	return fx_prepared[timingmode];
@@ -135,7 +135,7 @@ FX_DURATION_INSTANT_LIMITED,FX_DURATION_JUST_EXPIRED,FX_DURATION_PERMANENT_UNSAV
 FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES,FX_DURATION_JUST_EXPIRED};//9,10
 
 //change the timing method for effect that should trigger after this effect expired
-static const ieDword fx_to_delayed[]={FX_DURATION_AFTER_EXPIRES,FX_DURATION_JUST_EXPIRED,
+static const ieDword fx_to_delayed[]={FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED,
 FX_DURATION_PERMANENT_UNSAVED,FX_DURATION_DELAY_LIMITED_PENDING,
 FX_DURATION_AFTER_EXPIRES,FX_DURATION_PERMANENT_UNSAVED, //4,5
 FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED,//6,8
@@ -315,7 +315,7 @@ EffectQueue::~EffectQueue()
 	}
 }
 
-Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieByte timing)
+Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing)
 {
 	if (opcode==0xffffffff) {
 		return NULL;
@@ -360,7 +360,7 @@ void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDw
 	ModifyEffectPoint(effect_reference.EffText, x, y);
 }
 
-Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieByte timing)
+Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieWord timing)
 {
 	ResolveEffectRef(effect_reference);
 	if (effect_reference.EffText<0) {
@@ -955,7 +955,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 		}
 	}
 	//check if the effect has triggered or expired
-	switch (IsPrepared(fx->TimingMode) ) {
+	switch (DelayType(fx->TimingMode&0xff) ) {
 	case DELAYED:
 		if (fx->Duration>GameTime) {
 			return FX_NOT_APPLIED;
@@ -1202,7 +1202,7 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime) const
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//FIXME: how this method handles delayed effects???
 		//it should remove them as well, i think
-		if ( IsPrepared( ((*f)->TimingMode) )!=PERMANENT ) {
+		if ( DelayType( ((*f)->TimingMode) )!=PERMANENT ) {
 			if ( (*f)->Duration<=GameTime) {
 				(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
 			}
@@ -1451,7 +1451,7 @@ int EffectQueue::DisabledSpellcasting(int types) const
 	}
 
 	unsigned int spelltype_mask = 0;
-	bool iwd2 = core->HasFeature(GF_IWD2_SCRIPTNAME);
+	int iwd2 = core->HasFeature(GF_IWD2_SCRIPTNAME);
 	ieDword opcode = fx_disable_spellcasting_ref.EffText;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {

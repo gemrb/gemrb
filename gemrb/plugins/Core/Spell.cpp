@@ -25,6 +25,7 @@
 #include "Projectile.h"
 #include "ProjectileServer.h"
 #include "Interface.h"
+#include "Game.h"
 
 SPLExtHeader::SPLExtHeader(void)
 {
@@ -93,8 +94,8 @@ EffectQueue *Spell::GetEffectBlock(int block_index, int ext_index) const
 	//add casting glow
 	if (block_index==-1) {
 		assert(ext_index>=0);
-		Effect *fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_INSTANT_LIMITED);
-		fx->Duration=ext_headers[ext_index].CastingTime;
+		Effect *fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
+		fx->Duration=ext_headers[ext_index].CastingTime+core->GetGame()->GameTime;
 		fxqueue->AddEffect(fx);
 	}
 	for (int i=0;i<count;i++) {

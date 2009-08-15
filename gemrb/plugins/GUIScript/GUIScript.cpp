@@ -8461,16 +8461,17 @@ static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetEquippedQuickSlot__doc,
-"SetEquippedQuickSlot(PartyID, QWeaponSlot)->int\n\n"
-"Sets the named weapon slot as equipped weapon slot."
+"SetEquippedQuickSlot(PartyID, QWeaponSlot[, ability])->int\n\n"
+"Sets the named weapon/item slot as equipped weapon slot, optionally sets the used ability."
 "Returns strref number of failure (0 success, -1 silent failure)." );
 
 static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
 	int slot;
 	int PartyID;
+	int ability = -1;
 
-	if (!PyArg_ParseTuple( args, "ii", &PartyID, &slot)) {
+	if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &slot, &ability)) {
 		return AttributeError( GemRB_SetEquippedQuickSlot__doc );
 	}
 
@@ -8483,7 +8484,7 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 
-	int ret = actor->SetEquippedQuickSlot(slot);
+	int ret = actor->SetEquippedQuickSlot(slot, ability);
 	return PyInt_FromLong( ret );
 }
 

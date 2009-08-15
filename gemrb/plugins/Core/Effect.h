@@ -58,6 +58,7 @@ class Actor;
 #define FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES   9//this is a special permanent
 #define FX_DURATION_JUST_EXPIRED             10
 #define MAX_TIMING_MODE 11
+#define FX_DURATION_ABSOLUTE                 0x1000
 
 // Effect resistance types
 #define FX_NO_RESIST_NO_DISPEL      0
@@ -79,8 +80,7 @@ struct Effect {
 	ieDword Power;
 	ieDword Parameter1;
 	ieDword Parameter2;
-	ieByte TimingMode;
-	ieByte unknown1;
+	ieWord TimingMode;   //0x1000 -- no need of conversion
 	ieWord unknown2;
 	ieDword Resistance;
 	ieDword Duration;

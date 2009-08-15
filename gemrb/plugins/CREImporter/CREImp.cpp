@@ -2772,8 +2772,7 @@ int CREImp::PutEffects( DataStream *stream, Actor *actor)
 			stream->WriteDword( &fx->Power);
 			stream->WriteDword( &fx->Parameter1);
 			stream->WriteDword( &fx->Parameter2);
-			stream->Write( &fx->TimingMode, 1);
-			stream->Write( &fx->unknown1, 1);
+			stream->WriteWord( &fx->TimingMode);
 			stream->WriteWord( &fx->unknown2);
 			stream->WriteDword( &fx->Duration);
 			stream->WriteWord( &fx->Probability1);

@@ -232,7 +232,7 @@ public:
 	size_t GetEffectsCount() const { return effects.size(); }
 	/* this method hacks the offhand weapon color effects */
 	static void HackColorEffects(Actor *Owner, Effect *fx);
-	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieByte timing);
+	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieWord timing);
 	EffectQueue *CopySelf() const;
 	static Effect *CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2);
 	//locating opcodes
@@ -269,7 +269,7 @@ private:
 	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const char *ResRef) const;
 	void ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y) const;
 	//use the effect reference style calls from outside
-	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieByte timing);
+	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing);
 	static Effect *CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2);
 	void RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) const;
 	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) const;

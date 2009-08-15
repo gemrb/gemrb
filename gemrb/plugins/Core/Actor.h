@@ -552,8 +552,8 @@ public:
 	void DisablePortraitIcon(ieByte icon);
 	/* returns which slot belongs to the quickweapon slot */
 	int GetQuickSlot(int slot);
-	/* Sets equipped Quick slot */
-	int SetEquippedQuickSlot(int slot);
+	/* Sets equipped Quick slot, if header is -1, then use the current one */
+	int SetEquippedQuickSlot(int slot, int header);
 	/* Uses an item on the target or point */
 	bool UseItemPoint(ieDword slot, ieDword header, Point &point, ieDword flags);
 	bool UseItem(ieDword slot, ieDword header, Scriptable *target, ieDword flags, int damage = 0);

@@ -2502,8 +2502,11 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 		//when adding it to the base slot (SLOT_WEAPON) in
 		//case of quivers. (weird IE magic)
                 //The other word is the equipped header. 
-		//find a quiver for the bow, etc		
-		inventory.SetEquippedSlot( Equipped, EquippedHeader );
+		//find a quiver for the bow, etc
+		if (Equipped!=IW_NO_EQUIPPED) {
+			inventory.EquipItem( Equipped+inventory.GetWeaponSlot());
+		}
+		SetEquippedQuickSlot( inventory.GetEquipped(), EquippedHeader );
 	}
 }
 
@@ -4795,18 +4798,19 @@ int Actor::GetQuickSlot(int slot)
 }
 
 //marks the quickslot as equipped
-int Actor::SetEquippedQuickSlot(int slot)
+int Actor::SetEquippedQuickSlot(int slot, int header)
 {
-	ieWord header = EquippedHeader;
-
 	//creatures and such
 	if (PCStats) {
-		header = PCStats->QuickWeaponHeaders[slot];
+		if (header==-1) {
+			header = PCStats->QuickWeaponHeaders[slot];
+		} else {
+			PCStats->QuickWeaponHeaders[slot]=header;
+		}
 		slot = PCStats->QuickWeaponSlots[slot]-inventory.GetWeaponSlot();
 	}
-	if(!GetCurrentArea()) {//no area yet
-		Equipped = (ieWordSigned) slot;
-	}
+	Equipped = (ieWordSigned) slot;
+	EquippedHeader = (ieWord) header;
 	if (inventory.SetEquippedSlot(slot, header)) {
 		return 0;
 	}

@@ -2483,7 +2483,7 @@ void GameControl::DialogChoose(unsigned int choose)
 			}
 		}
 
-		bool final_dialog = tr->Flags & IE_DLG_TR_FINAL;
+		int final_dialog = tr->Flags & IE_DLG_TR_FINAL;
 
 		if (final_dialog) {
 			ta->SetMinRow( false );

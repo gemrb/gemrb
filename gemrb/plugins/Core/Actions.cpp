@@ -5782,10 +5782,7 @@ void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
 		if (slot<0 || slot>=MAX_QUICKWEAPONSLOT) {
 			return;
 		}
-		scr->SetEquippedQuickSlot(slot);
-		if (scr->PCStats) {
-			scr->PCStats->QuickWeaponHeaders[slot]=(ieWord) parameters->int1Parameter;
-		}
+		scr->SetEquippedQuickSlot(slot, parameters->int1Parameter);
 		return;
 	}
 	//quick item

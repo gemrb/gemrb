@@ -2672,18 +2672,27 @@ int fx_projectile_use_effect_list (Actor* Owner, Actor* target, Effect* fx)
 
 //431 EnergyDrain
 
-static EffectRef fx_energy_drain_ref={"EnergyDrain",NULL,-1};
-
 int fx_energy_drain (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_energy_drain (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
-	Effect *oldfx = target->fxqueue.HasEffect(fx_energy_drain_ref);
-	if (oldfx) {
-		oldfx->Parameter2+=fx->Parameter2;
+	if (0) printf( "fx_energy_drain (%2d) Type: %d\n", fx->Opcode, fx->Parameter1);
+	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
-	//if there is another energy drain effect, add it up
-	STAT_SET(IE_LEVELDRAIN, fx->Parameter2);
+	if (fx->FirstApply) {
+		//display string?
+
+		//hitpoints don't have base/modified, only current
+		BASE_SUB(IE_HITPOINTS, fx->Parameter1*5);
+	}
+	//if there is another energy drain effect (level drain), add them up
+	STAT_ADD(IE_LEVELDRAIN, fx->Parameter1);
+	STAT_SUB(IE_SAVEFORTITUDE, fx->Parameter1);
+	STAT_SUB(IE_SAVEREFLEX, fx->Parameter1);
+	STAT_SUB(IE_SAVEWILL, fx->Parameter1);
+	//these saving throws don't exist in 2nd edition, but to make it portable, we should affect ALL saving throws
+	STAT_SUB(IE_SAVEVSBREATH, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSSPELL, fx->Parameter1);
+	STAT_SUB(IE_MAXHITPOINTS, fx->Parameter1*5);
 	return FX_APPLIED;
 }
 

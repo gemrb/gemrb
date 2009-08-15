@@ -4605,14 +4605,31 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //d8 LevelDrainModifier
+
+static EffectRef fx_leveldrain_ref={"LevelDrainModifier",NULL,-1};
+
 int fx_leveldrain_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_leveldrain_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
 
+	//never subtract more than the maximum hitpoints
+	ieDword x = STAT_GET(IE_MAXHITPOINTS)-1;
+	if (fx->Parameter1*4<x) {
+		x=fx->Parameter1*4;
+	}
 	STAT_ADD(IE_LEVELDRAIN, fx->Parameter1);
-	STAT_ADD(IE_MAXHITPOINTS, -fx->Parameter1*4);
-	STAT_ADD(IE_HITPOINTS, -fx->Parameter1*4);
+	STAT_SUB(IE_MAXHITPOINTS, x);
+	STAT_SUB(IE_SAVEVSDEATH, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSWANDS, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSPOLY, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSBREATH, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSSPELL, fx->Parameter1);
 	target->AddPortraitIcon(PI_LEVELDRAIN);
+	//decrease current hitpoints on first apply
+	if (fx->FirstApply) {
+		//current hitpoints don't have base/modified, only current
+		BASE_SUB(IE_HITPOINTS, x);
+	}
 	return FX_APPLIED;
 }
 
@@ -4710,12 +4727,12 @@ int fx_protection_school_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xe0 Cure:LevelDrain
-static EffectRef fx_leveldrain_ref={"LevelDrainModifier",NULL,-1};
 
 int fx_cure_leveldrain (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_leveldrain (%2d)\n", fx->Opcode );
 	//all level drain removed at once???
+	//if not, then find old effect, remove a number
 	target->fxqueue.RemoveAllEffects( fx_leveldrain_ref );
 	return FX_NOT_APPLIED;
 }
