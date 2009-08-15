@@ -48,6 +48,7 @@
 #define PI_FATIGUE  39
 #define PI_SLOWED   41
 #define PI_HOPELESS 44
+#define PI_LEVELDRAIN 53
 #define PI_FEEBLEMIND 54
 #define PI_STUN     55
 #define PI_AID      57
@@ -4610,6 +4611,7 @@ int fx_leveldrain_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_LEVELDRAIN, fx->Parameter1);
 	STAT_ADD(IE_MAXHITPOINTS, -fx->Parameter1*4);
 	STAT_ADD(IE_HITPOINTS, -fx->Parameter1*4);
+	target->AddPortraitIcon(PI_LEVELDRAIN);
 	return FX_APPLIED;
 }
 
