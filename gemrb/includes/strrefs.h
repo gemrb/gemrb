@@ -174,7 +174,8 @@
 #define STR_DMG_ACID 140
 #define STR_DMG_OTHER 141
 #define STR_GOTQUESTXP 142
+#define STR_LEVELUP 143
 
-#define STRREF_COUNT 143
+#define STRREF_COUNT 144
 
 #endif //! IE_STRINGS_H
