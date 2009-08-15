@@ -24,6 +24,7 @@ import GemRB
 from ie_restype import *
 from ie_spells import LS_MEMO
 from GUIDefines import *
+from ie_slots import SLOT_ANY
 
 OtherWindowFn = None
 #global OtherWindowFn
@@ -275,7 +276,7 @@ def RemoveClassAbilities (pc, table, Level):
 				else:
 					print "ERROR, unknown class ability (type): ", ab
 
-def UpdateInventorySlot (Button, Slot):
+def UpdateInventorySlot (pc, Button, Slot, Type):
 	Button.SetFont ("NUMBER")
 	Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
 	Button.SetBorder (1,2,2,5,5,32,32,255,0,0,0)
@@ -285,17 +286,27 @@ def UpdateInventorySlot (Button, Slot):
 
 	if Slot == None:
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-		Button.SetTooltip (12011)
+		if Type == "inventory":
+			Button.SetTooltip (12013) # Personal Item
+		elif Type == "ground":
+			Button.SetTooltip (12011) # Ground Item
+		else:
+			Button.SetTooltip ("")
 		Button.EnableBorder (0, 0)
 		Button.EnableBorder (1, 0)
+		Button.EnableBorder (2, 0)
 	else:
 		item = GemRB.GetItem (Slot['ItemResRef'])
 		identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
 		magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL
-#		print 111, identified, magical, Slot
+
+		# TODO: figure out this mess
 #		if item["StackAmount"] > 1:
-		if Slot["Usages0"] > 1:
-			Button.SetText (str (Slot["Usages0"])) # this has the correct value for potions, but not for gems (0)
+#			Button.SetText (str (item["StackAmount"])) # wrong for potions, correct for arrows
+#		if Slot["Usages0"] > 1:
+#			Button.SetText (str (Slot["Usages0"])) # this has the correct value for potions, but not for gems (0)
+		if item["StackAmount"] > 1:
+			Button.SetText (str (Slot["Usages0"]))
 
 		if not identified or item["ItemNameIdentified"] == -1:
 			Button.SetTooltip (item["ItemName"])
@@ -308,6 +319,11 @@ def UpdateInventorySlot (Button, Slot):
 				Button.EnableBorder (1, 1)
 			else:
 				Button.EnableBorder (1, 0)
+
+		if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc):
+			Button.EnableBorder (2, 0)
+		else:
+			Button.EnableBorder (2, 1)
 
 		Button.SetItemIcon (Slot['ItemResRef'], 0)
 

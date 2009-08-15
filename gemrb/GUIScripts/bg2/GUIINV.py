@@ -168,11 +168,6 @@ def OpenInventoryWindow ():
 			#keeping 2 in the original place, because it is how
 			#the gui resource has it, but setting the other cycles
 			Button.SetSprites ("STONSLOT",0,0,2,4,3)
-			Button.SetFont ("NUMBER")
-			Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
-			Button.SetBorder (1,2,2,5,5,32,32,255,0,0,0)
-			Button.SetBorder (2,0,0,0,0,255,128,128,64,0,1)
-			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	GemRB.SetVar ("TopIndex", 0)
 	SetSelectionChangeHandler (UpdateInventoryWindow)
@@ -384,7 +379,7 @@ def RefreshInventoryWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenGroundItemInfoWindow")
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenGroundItemAmountWindow")
 
-		UpdateInventorySlot (Button, Slot)
+		UpdateInventorySlot (pc, Button, Slot, "ground")
 
 	#making window visible/shaded depending on the pc's state
 	Window.SetVisible (1)
@@ -413,34 +408,9 @@ def UpdateSlot (pc, slot):
 
 	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+	UpdateInventorySlot (pc, Button, slot_item, "inventory")
+	
 	if slot_item:
-		item = GemRB.GetItem (slot_item["ItemResRef"])
-		identified = slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED
-		magical = slot_item["Flags"] & IE_INV_ITEM_MAGICAL
-
-		Button.SetItemIcon (slot_item["ItemResRef"])
-		if item["StackAmount"] > 1:
-			Button.SetText (str (slot_item["Usages0"]))
-		else:
-			Button.SetText ("")
-
-		if not identified or item["ItemNameIdentified"] == -1:
-			Button.SetTooltip (item["ItemName"])
-			Button.EnableBorder (0, 1)
-			Button.EnableBorder (1, 0)
-		else:
-			Button.SetTooltip (item["ItemNameIdentified"])
-			Button.EnableBorder (0, 0)
-			if magical:
-				Button.EnableBorder (1, 1)
-			else:
-				Button.EnableBorder (1, 0)
-
-		if GemRB.CanUseItemType (SLOT_ANY, slot_item['ItemResRef'], pc):
-			Button.EnableBorder (2, 0)
-		else:
-			Button.EnableBorder (2, 1)
-
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDragItem")
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoWindow")
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountWindow")
@@ -459,14 +429,10 @@ def UpdateSlot (pc, slot):
 			Button.SetBAM (SlotType["ResRef"],0,0)
 			Button.SetTooltip (SlotType["Tip"])
 
-		Button.SetText ("")
-		Button.EnableBorder (0, 0)
-		Button.EnableBorder (1, 0)
-		Button.EnableBorder (2, 0)
-
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, "")
 
 	if OverSlot == slot+1:
 		if GemRB.CanUseItemType (SlotType["Type"], itemname):

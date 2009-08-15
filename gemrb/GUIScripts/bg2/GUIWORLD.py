@@ -178,7 +178,7 @@ def RedrawContainerWindow ():
 			Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
 		else:
 			Button.SetVarAssoc ("LeftIndex", -1)
-		UpdateInventorySlot (Button, Slot)
+		UpdateInventorySlot (pc, Button, Slot, "container")
 
 	for i in range (4):
 		if i+RightTopIndex<RightCount:
@@ -190,7 +190,7 @@ def RedrawContainerWindow ():
 			Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 		else:
 			Button.SetVarAssoc ("RightIndex", -1)
-		UpdateInventorySlot (Button, Slot)
+		UpdateInventorySlot (pc, Button, Slot, "inventory")
 
 
 def OpenContainerWindow ():
