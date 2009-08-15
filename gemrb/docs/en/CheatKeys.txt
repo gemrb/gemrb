@@ -63,8 +63,6 @@ Ctrl-T - Advances time by one hour.
 
 Ctrl-V - Explores a small, random part of the pointed area.
 
-Ctrl-W - The pointed actor will leave the party.
-
 Ctrl-X - Prints (on terminal or DOS window) name of current area script
          and current mouse position converted to game coordinates.
 
