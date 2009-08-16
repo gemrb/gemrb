@@ -465,37 +465,45 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 }
 
 //Handle the target flag when the effect is applied first
-int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &dest)
+int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point &dest)
 {
 	int i;
 	Game *game;
 	Map *map;
 	int flg;
+	Actor *st = (self && (self->Type==ST_ACTOR)) ?(Actor *) self:NULL;
 
 	switch (fx->Target) {
 	case FX_TARGET_ORIGINAL:
 		fx->PosX=self->Pos.x;
 		fx->PosY=self->Pos.y;
-		flg = self->fxqueue.ApplyEffect( self, fx, 1 );
+		
+		flg = ApplyEffect( st, fx, 1 );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
-			self->fxqueue.AddEffect( fx, flg==FX_INSERT );
+			if (st) {
+				st->fxqueue.AddEffect( fx, flg==FX_INSERT );
+			}
 		}
 		break;
 	case FX_TARGET_SELF:
 		fx->PosX=dest.x;
 		fx->PosY=dest.y;
-		flg = self->fxqueue.ApplyEffect( self, fx, 1 );
+		flg = ApplyEffect( st, fx, 1 );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
-			self->fxqueue.AddEffect( fx, flg==FX_INSERT );
+			if (st) {
+				st->fxqueue.AddEffect( fx, flg==FX_INSERT );
+			}
 		}
 		break;
 
 	case FX_TARGET_PRESET:
 		fx->PosX=pretarget->Pos.x;
 		fx->PosY=pretarget->Pos.y;
-		flg = self->fxqueue.ApplyEffect( pretarget, fx, 1 );
+		flg = ApplyEffect( pretarget, fx, 1 );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
-			pretarget->fxqueue.AddEffect( fx, flg==FX_INSERT );
+			if (pretarget) {
+				pretarget->fxqueue.AddEffect( fx, flg==FX_INSERT );
+			}
 		}
 		break;
 
@@ -505,8 +513,8 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 		while(i--) {
 			Actor* actor = game->GetPC( i, true );
 			fx->PosX=actor->Pos.x;
-			fx->PosY=actor->Pos.y;
-			flg = self->fxqueue.ApplyEffect( actor, fx, 1 );
+			fx->PosY=actor->Pos.y;			
+			flg = ApplyEffect( actor, fx, 1 );
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( fx, flg==FX_INSERT );
 			}
@@ -521,7 +529,7 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 			Actor* actor = map->GetActor( i, true );
 			fx->PosX=actor->Pos.x;
 			fx->PosY=actor->Pos.y;
-			flg = self->fxqueue.ApplyEffect( actor, fx, 1 );
+			flg = ApplyEffect( actor, fx, 1 );
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( fx, flg==FX_INSERT );
 			}
@@ -536,9 +544,8 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 			Actor* actor = map->GetActor( i, false );
 			fx->PosX=actor->Pos.x;
 			fx->PosY=actor->Pos.y;
-			flg = self->fxqueue.ApplyEffect( actor, fx, 1 );
+			flg = ApplyEffect( actor, fx, 1 );
 			//GetActorCount can now return all nonparty critters
-			//if (actor->InParty) continue;
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( fx, flg==FX_INSERT );
 			}
@@ -573,7 +580,13 @@ int EffectQueue::AddAllEffects(Actor* target, Point &destination)
 		(*f)->random_value = random_value;
 		//if applyeffect returns true, we stop adding the future effects
 		//this is to simulate iwd2's on the fly spell resistance
-		int tmp = AddEffect(*f, Owner?Owner:target, target, destination);
+
+		int tmp = AddEffect(*f, Owner, target, destination);
+		//lets try without Owner, any crash?
+		//If yes, then try to fix the individual effect
+		//If you use target for Owner here, the wand in chateau irenicus will work
+		//the same way as Imoen's monster summoning, which is a BAD THING (TM)
+		//int tmp = AddEffect(*f, Owner?Owner:target, target, destination);
 		if (tmp==FX_ABORT) {
 			res = FX_NOT_APPLIED;
 			break;
@@ -634,6 +647,11 @@ inline bool check_level(Actor *target, Effect *fx)
 	if (IsDicedEffect2((int) fx->Opcode)) {
 		return false;
 	}
+
+	if (!target) {
+		return false;
+	}
+
 	ieDword level = (ieDword) target->GetXPLevel( true );
 	if ((fx->DiceSides != 0 && fx->DiceThrown != 0) && (level > fx->DiceSides || level < fx->DiceThrown)) {
 		return true;
@@ -854,6 +872,10 @@ static int check_type(Actor* actor, Effect* fx)
 //check resistances, saving throws
 static bool check_resistance(Actor* actor, Effect* fx)
 {
+	if(!actor) {
+		return false;
+	}
+
 	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
 	if (fx->random_value < val) {
@@ -910,10 +932,12 @@ static bool check_resistance(Actor* actor, Effect* fx)
 
 int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 {
+	/*
 	if (!target) {
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 		return FX_ABORT;
 	}
+	*/
 	//printf( "FX 0x%02x: %s(%d, %d)\n", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
 	if (fx->Opcode >= MAX_EFFECTS) {
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
@@ -996,7 +1020,8 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 			}
 		}
 
-		res=fn( Owner?Owner:target, target, fx );
+		//res=fn( Owner?Owner:target, target, fx );
+		res=fn( Owner, target, fx );
 
 		//if there is no owner, we assume it is the target
 		switch( res ) {

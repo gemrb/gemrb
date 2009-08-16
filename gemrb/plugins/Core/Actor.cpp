@@ -348,14 +348,13 @@ Actor::~Actor(void)
 {
 	unsigned int i;
 
-	if (anims) {
-		delete( anims );
-	}
+	delete anims;
+
 	core->FreeString( LongName );
 	core->FreeString( ShortName );
-	if (PCStats) {
-		delete PCStats;
-	}
+
+	delete PCStats;
+
 	for (i = 0; i < vvcOverlays.size(); i++) {
 		if (vvcOverlays[i]) {
 			delete vvcOverlays[i];
@@ -370,6 +369,8 @@ Actor::~Actor(void)
 	}
 	for (i = 0; i < EXTRA_ACTORCOVERS; i++)
 		delete extraCovers[i];
+
+	delete attackProjectile;
 
 	free(projectileImmunity);
 }
@@ -2236,11 +2237,16 @@ bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete)
 }
 
 //returns actual damage
-int Actor::Damage(int damage, int damagetype, Actor *hitter, int modtype)
+int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 {
 	//add lastdamagetype up
 	LastDamageType|=damagetype;
-	LastHitter=hitter->GetID();
+	if(hitter && hitter->Type==ST_ACTOR) {
+		LastHitter=((Actor *) hitter)->GetID();
+	} else {
+		//Maybe it should be something impossible like 0xffff, and use 'Someone'
+		LastHitter=GetID();
+	}
 	//note: the lower 2 bits are actually modifier types
 	// this is processed elsewhere and sent as modtype
 	switch(modtype)
@@ -2309,7 +2315,7 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter, int modtype)
 		}
 		PlayDamageAnimation(damagelevel);
 	}
-	DisplayCombatFeedback(damage, damagetype_str_id, hitter);
+	DisplayCombatFeedback(damage, damagetype_str_id, (Actor *)hitter);
 
 	if (InParty) {
 		if (chp<(signed) Modified[IE_MAXHITPOINTS]/10) {
@@ -2501,12 +2507,13 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 		//It is signed to have the correct math
 		//when adding it to the base slot (SLOT_WEAPON) in
 		//case of quivers. (weird IE magic)
-                //The other word is the equipped header. 
+		//The other word is the equipped header. 
 		//find a quiver for the bow, etc
 		if (Equipped!=IW_NO_EQUIPPED) {
 			inventory.EquipItem( Equipped+inventory.GetWeaponSlot());
+printf("Equipping: %d\n", inventory.GetEquipped() );
+			SetEquippedQuickSlot( inventory.GetEquipped(), EquippedHeader );
 		}
-		SetEquippedQuickSlot( inventory.GetEquipped(), EquippedHeader );
 	}
 }
 
@@ -2708,14 +2715,14 @@ void Actor::Die(Scriptable *killer)
 
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 			if (AppearanceFlags&APP_DEATHVAR) {
-			  snprintf(varname, 32, "%s_DEAD", scriptName);
-			  game->kaputz->Lookup(varname, value);
-			  game->kaputz->SetAt(varname, value+1);
+				snprintf(varname, 32, "%s_DEAD", scriptName);
+				game->kaputz->Lookup(varname, value);
+				game->kaputz->SetAt(varname, value+1);
 			}
 			if (AppearanceFlags&APP_DEATHTYPE) {
-			  snprintf(varname, 32, "KILL_%s", KillVar);
-			  game->kaputz->Lookup(varname, value);
-			  game->kaputz->SetAt(varname, value+1);
+				snprintf(varname, 32, "KILL_%s", KillVar);
+				game->kaputz->Lookup(varname, value);
+				game->kaputz->SetAt(varname, value+1);
 			}
 		} else {
 			snprintf(varname, 32, DeathVarFormat, scriptName);
@@ -4825,7 +4832,11 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, ieDword fl
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
 		return false;
-	Item *itm = gamedata->GetItem(item->ItemResRef);
+
+	ieResRef tmpresref;
+	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef));
+
+	Item *itm = gamedata->GetItem(tmpresref);
 	if (!itm) return false; //quick item slot contains invalid item resref
 	//item is depleted for today
 	if(itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
@@ -4834,7 +4845,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, ieDword fl
 
 	Projectile *pro = itm->GetProjectile(slot, header, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
-	gamedata->FreeItem(itm,item->ItemResRef, false);
+	gamedata->FreeItem(itm,tmpresref, false);
 	if (pro) {
 		pro->SetCaster(globalID);
 		GetCurrentArea()->AddProjectile(pro, Pos, target);
@@ -4855,7 +4866,11 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
 		return false;
-	Item *itm = gamedata->GetItem(item->ItemResRef);
+
+	ieResRef tmpresref;
+	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef));
+
+	Item *itm = gamedata->GetItem(tmpresref);
 	if (!itm) return false; //quick item slot contains invalid item resref
 	//item is depleted for today
 	if (itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
@@ -4864,7 +4879,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 
 	Projectile *pro = itm->GetProjectile(slot, header, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
-	gamedata->FreeItem(itm,item->ItemResRef, false);
+	gamedata->FreeItem(itm,tmpresref, false);
 	if (pro) {
 		//ieDword is unsigned!!
 		pro->SetCaster(globalID);
@@ -4874,6 +4889,8 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 			AttackEffect->Projectile = which->ProjectileAnimation;
 			AttackEffect->Target = FX_TARGET_PRESET;
 			pro->GetEffects()->AddEffect(AttackEffect, true);
+			//AddEffect created a copy, the original needs to be scrapped
+			delete AttackEffect;
 			attackProjectile = pro;
 		} else //launch it now as we are not attacking
 			GetCurrentArea()->AddProjectile(pro, Pos, tar->globalID);

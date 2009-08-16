@@ -2405,7 +2405,7 @@ ScriptEngine* Interface::GetGUIScriptEngine() const
 }
 
 //NOTE: if there were more summoned creatures, it will return only the last
-Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level)
+Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, Point &position, int eamod, int level)
 {
 	//maximum number of monsters summoned
 	int cnt=10;
@@ -2421,13 +2421,19 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			return NULL;
 		}
 
-		ab->LastSummoner = Owner->GetID();
+		if (Owner && Owner->Type==ST_ACTOR) {
+			ab->LastSummoner = ((Actor *) Owner)->GetID();
+		}
 		//Always use Base stats for the recently summoned creature
 
 		int enemyally;
 
 		if (eamod==EAM_SOURCEALLY || eamod==EAM_SOURCEENEMY) {
-			enemyally = Owner->GetStat(IE_EA)>EA_GOODCUTOFF;
+			if (Owner && Owner->Type==ST_ACTOR) {
+				enemyally = ((Actor *) Owner)->GetStat(IE_EA)>EA_GOODCUTOFF;
+			} else {
+				enemyally = true;
+			}
 		} else {
 			if (target) {
 				enemyally = target->GetBase(IE_EA)>EA_GOODCUTOFF;
@@ -3993,6 +3999,7 @@ unsigned int Interface::GetSpeakerColor(const char *&name, Scriptable *&speaker)
 {
 	unsigned int speaker_color;
 
+	if(!speaker) return 0;
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = ((Actor *) speaker)->GetName(-1);
@@ -4083,6 +4090,7 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 	const char *name;
 
 	if (stridx<0) return;
+	if(!speaker) return;
 	speaker_color = GetSpeakerColor(name, speaker);
 	char* text = GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
@@ -4709,7 +4717,7 @@ int Interface::CanMoveItem(const CREItem *item) const
 }
 
 // dealing with applying effects
-void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, int level)
+void Interface::ApplySpell(const ieResRef resname, Actor *actor, Scriptable *caster, int level)
 {
 	Spell *spell = gamedata->GetSpell(resname);
 	if (!spell) {
@@ -4724,8 +4732,13 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, 
 	//check effect immunities
 	int res = fxqueue->CheckImmunity ( actor );
 	if (res) {
-		if (res == -1 ) {
-			actor = caster;
+		if (res == -1) {
+			//bounced back at a nonliving caster
+			if (caster->Type!=ST_ACTOR) {
+				delete fxqueue;
+				return;
+			}
+			actor = (Actor *) caster;
 		}
 		fxqueue->SetOwner( caster );
 		fxqueue->AddAllEffects(actor, actor->Pos);
@@ -4733,7 +4746,7 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, 
 	delete fxqueue;
 }
 
-void Interface::ApplySpellPoint(const ieResRef resname, Map* area, Point &pos, Actor *caster, int level)
+void Interface::ApplySpellPoint(const ieResRef resname, Map* area, Point &pos, Scriptable *caster, int level)
 {
 	Spell *spell = gamedata->GetSpell(resname);
 	if (!spell) {
@@ -4748,7 +4761,7 @@ void Interface::ApplySpellPoint(const ieResRef resname, Map* area, Point &pos, A
 //-1 means the effect was reflected back to the caster
 //0 means the effect was resisted and should be removed
 //1 means the effect was applied
-int Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
+int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
 {
 	EffectQueue *fxqueue = new EffectQueue();
 	//AddEffect now copies the fx data, please delete your effect reference
@@ -4758,7 +4771,12 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
 	int res = fxqueue->CheckImmunity ( actor );
 	if (res) {
 		if (res == -1 ) {
-			actor = caster;
+			//bounced back at a nonliving caster
+			if (caster->Type!=ST_ACTOR) {
+				delete fxqueue;
+				return 0;
+			}
+			actor = (Actor *) caster;
 		}
 		fxqueue->SetOwner( caster );
 		if (fxqueue->AddAllEffects( actor,actor->Pos )==FX_NOT_APPLIED) {
@@ -4769,7 +4787,7 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
 	return res;
 }
 
-int Interface::ApplyEffect(const ieResRef resname, Actor *actor, Actor *caster, int level)
+int Interface::ApplyEffect(const ieResRef resname, Actor *actor, Scriptable *caster, int level)
 {
 	//Don't free this reference, it is cached!
 	Effect *effect = gamedata->GetEffect(resname);
@@ -4924,13 +4942,13 @@ int Interface::CompressSave(const char *folder)
 			snprintf( dtmp, _MAX_PATH, "%s%s", CachePath, de->d_name );
 			stat( dtmp, &fst );
 			if (S_ISDIR( fst.st_mode ))
-			  continue;
+				continue;
 			if (de->d_name[0] == '.')
-			  continue;
+				continue;
 			if (SavedExtension(de->d_name)==priority) {
-			  FileStream fs;
-			  fs.Open(dtmp, true);
-			  ai->AddToSaveGame(&str, &fs);
+				FileStream fs;
+				fs.Open(dtmp, true);
+				ai->AddToSaveGame(&str, &fs);
 			}
 		} while (( de = readdir( dir ) ) != NULL);
 		closedir( dir );

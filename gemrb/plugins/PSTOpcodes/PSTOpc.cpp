@@ -30,28 +30,28 @@
 #include "PSTOpc.h"
 
 
-int fx_set_status (Actor* Owner, Actor* target, Effect* fx);//ba
-int fx_play_bam_blended (Actor* Owner, Actor* target, Effect* fx);//bb
-int fx_play_bam_not_blended (Actor* Owner, Actor* target, Effect* fx);//bc
-int fx_transfer_hp (Actor* Owner, Actor* target, Effect* fx);//c0
-//int fx_shake_screen (Actor* Owner, Actor* target, Effect* fx);//c1 already implemented
-int fx_flash_screen (Actor* Owner, Actor* target, Effect* fx);//c2
-int fx_tint_screen (Actor* Owner, Actor* target, Effect* fx);//c3
-int fx_special_effect (Actor* Owner, Actor* target, Effect* fx);//c4
+int fx_set_status (Scriptable* Owner, Actor* target, Effect* fx);//ba
+int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx);//bb
+int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx);//bc
+int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx);//c0
+//int fx_shake_screen (Scriptable* Owner, Actor* target, Effect* fx);//c1 already implemented
+int fx_flash_screen (Scriptable* Owner, Actor* target, Effect* fx);//c2
+int fx_tint_screen (Scriptable* Owner, Actor* target, Effect* fx);//c3
+int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx);//c4
 //unknown 0xc5-c8
-int fx_overlay (Actor* Owner, Actor* target, Effect* fx);//c9
+int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx);//c9
 //unknown 0xca
-int fx_bless (Actor* Owner, Actor* target, Effect* fx);//82 (this is a modified effect)
-int fx_curse (Actor* Owner, Actor* target, Effect* fx);//cb
-int fx_prayer (Actor* Owner, Actor* target, Effect* fx);//cc
-int fx_move_view (Actor* Owner, Actor* target, Effect* fx);//cd
-int fx_embalm (Actor* Owner, Actor* target, Effect* fx);//ce
-int fx_stop_all_action (Actor* Owner, Actor* target, Effect* fx);//cf
-int fx_iron_fist (Actor* Owner, Actor* target, Effect* fx);//d0
-int fx_hostile_image(Actor* Owner, Actor* target, Effect* fx);//d1
-int fx_detect_evil (Actor* Owner, Actor* target, Effect* fx);//d2
-int fx_jumble_curse (Actor* Owner, Actor* target, Effect* fx);//d3
-//int fx_unknown (Actor* Owner, Actor* target, Effect* fx);//d4
+int fx_bless (Scriptable* Owner, Actor* target, Effect* fx);//82 (this is a modified effect)
+int fx_curse (Scriptable* Owner, Actor* target, Effect* fx);//cb
+int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx);//cc
+int fx_move_view (Scriptable* Owner, Actor* target, Effect* fx);//cd
+int fx_embalm (Scriptable* Owner, Actor* target, Effect* fx);//ce
+int fx_stop_all_action (Scriptable* Owner, Actor* target, Effect* fx);//cf
+int fx_iron_fist (Scriptable* Owner, Actor* target, Effect* fx);//d0
+int fx_hostile_image(Scriptable* Owner, Actor* target, Effect* fx);//d1
+int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx);//d2
+int fx_jumble_curse (Scriptable* Owner, Actor* target, Effect* fx);//d3
+//int fx_unknown (Scriptable* Owner, Actor* target, Effect* fx);//d4
 
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectRef effectnames[] = {
@@ -89,7 +89,7 @@ PSTOpc::~PSTOpc(void)
 }
 
 //0xba fx_set_status
-int fx_set_status (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_set_status (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_status (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	if (fx->Parameter1) {
@@ -111,7 +111,7 @@ int fx_set_status (Actor* /*Owner*/, Actor* target, Effect* fx)
 //bb fx_play_bam_bb (play multi-part blended sticky animation)
 // 1 repeats
 // 2 not sticky (override default)
-int fx_play_bam_blended (Actor* Owner, Actor* target, Effect* fx)
+int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	bool playonce;
 
@@ -173,7 +173,7 @@ int fx_play_bam_blended (Actor* Owner, Actor* target, Effect* fx)
 //twin animation:                   0x30000
 //background animation:             0x10000
 //foreground animation:             0x20000
-int fx_play_bam_not_blended (Actor* Owner, Actor* target, Effect* fx)
+int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	bool playonce;
 	bool doublehint;
@@ -268,10 +268,16 @@ int fx_play_bam_not_blended (Actor* Owner, Actor* target, Effect* fx)
 }
 
 //0xc0 fx_transfer_hp
-int fx_transfer_hp (Actor* Owner, Actor* target, Effect* fx)
+int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_transfer_hp (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
-	if (Owner==target) {
+	if (Owner->Type!=ST_ACTOR) {
+		return FX_NOT_APPLIED;
+	}
+
+	Actor *owner = (Actor *) Owner;
+
+	if (owner==target) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -281,19 +287,19 @@ int fx_transfer_hp (Actor* Owner, Actor* target, Effect* fx)
 
 	switch(fx->Parameter2) {
 		case 3:
-		case 0: receiver = target; donor = Owner; break;
+		case 0: receiver = target; donor = owner; break;
 		case 4:
-		case 1: receiver = Owner; donor = target; break;
+		case 1: receiver = owner; donor = target; break;
 		case 2:
-			a = Owner->GetBase(IE_HITPOINTS);
+			a = owner->GetBase(IE_HITPOINTS);
 			b = target->GetBase(IE_HITPOINTS);
-			Owner->SetBase(IE_HITPOINTS, a);
+			owner->SetBase(IE_HITPOINTS, a);
 			target->SetBase(IE_HITPOINTS, b);
 			//fallthrough
 		default:
 			return FX_NOT_APPLIED;
 	}
-	int damage = donor->Damage(fx->Parameter1, fx->Parameter2, Owner);
+	int damage = donor->Damage(fx->Parameter1, fx->Parameter2, owner);
 	if (fx->Parameter2>2) {
 		receiver->SetBase( IE_HITPOINTS, BASE_GET( IE_HITPOINTS ) + ( damage ) );
 	} else {
@@ -305,7 +311,7 @@ int fx_transfer_hp (Actor* Owner, Actor* target, Effect* fx)
 //0xc1 fx_shake_screen this is already implemented in BG2
 
 //0xc2 fx_flash_screen
-int fx_flash_screen (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_flash_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_flash_screen (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	core->GetVideoDriver()->SetFadeColor(((char *) &fx->Parameter1)[0],((char *) &fx->Parameter1)[1],((char *) &fx->Parameter1)[2]);
@@ -315,7 +321,7 @@ int fx_flash_screen (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0xc3 fx_tint_screen
-int fx_tint_screen (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_tint_screen (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	core->timer->SetFadeFromColor(10);
@@ -324,7 +330,7 @@ int fx_tint_screen (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0xc4 fx_special_effect
-int fx_special_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_special_effect (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_special_effect (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 
@@ -332,7 +338,7 @@ int fx_special_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 //0xc5-c8 fx_unknown
 //0xc9 fx_overlay
-int fx_overlay (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_overlay (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_overlay (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	target->AddAnimation(fx->Resource,-1,0,true);
@@ -345,7 +351,7 @@ int fx_overlay (Actor* /*Owner*/, Actor* target, Effect* fx)
 //static EffectRef fx_glow_ref ={"Color:PulseRGBGlobal",NULL,-1};
 //pst bless effect spawns a color glow automatically
 //but i would rather use the IWD2 method
-int fx_bless (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_bless (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_curse (%2d): Par1: %d\n", fx->Opcode, fx->Parameter1 );
 	//this bit is the same as the invisibility bit in other games
@@ -368,7 +374,7 @@ int fx_bless (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xcb fx_curse
-int fx_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_curse (%2d): Par1: %d\n", fx->Opcode, fx->Parameter1 );
 	//this bit is the same as the invisibility bit in other games
@@ -391,7 +397,7 @@ int fx_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 static EffectRef fx_curse_ref={"Curse",NULL,-1};
 static EffectRef fx_bless_ref={"Bless",NULL,-1};
 
-int fx_prayer (Actor* Owner, Actor* target, Effect* fx)
+int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_prayer (%2d): Par1: %d\n", fx->Opcode, fx->Parameter1 );
 	int ea = target->GetStat(IE_EA);
@@ -422,7 +428,7 @@ int fx_prayer (Actor* Owner, Actor* target, Effect* fx)
 }
 
 //0xcd fx_move_view
-int fx_move_view (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_move_view (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_move_view (%2d): Speed: %d\n", fx->Opcode, fx->Parameter1 );
 	Map *map = core->GetGame()->GetCurrentArea();
@@ -433,7 +439,7 @@ int fx_move_view (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0xce fx_embalm
-int fx_embalm (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_embalm (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_embalm (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	if (STATE_GET (STATE_EMBALM) ) //embalm is non cumulative
@@ -456,7 +462,7 @@ int fx_embalm (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 //0xcf fx_stop_all_action
-int fx_stop_all_action (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_stop_all_action (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_stop_all_action (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	if (fx->Parameter2) {
@@ -469,7 +475,7 @@ int fx_stop_all_action (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 //0xd0 fx_iron_fist
 //GemRB extension: lets you specify not hardcoded values
-int fx_iron_fist (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_iron_fist (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	ieDword p1,p2;
 
@@ -487,7 +493,7 @@ int fx_iron_fist (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xd1 fx_hostile_image
-int fx_hostile_image (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_hostile_image (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_hostile_image (%2d): Par1: %d Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	return FX_NOT_APPLIED;
@@ -496,7 +502,7 @@ int fx_hostile_image (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 //0xd2 fx_detect_evil
 static EffectRef fx_single_color_pulse_ref={"Color:BriefRGB",NULL,-1};
 
-int fx_detect_evil (Actor* Owner, Actor* target, Effect* fx)
+int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_detect_evil (%2d): Par1: %d Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	ieDword type = fx->Parameter2;
@@ -523,7 +529,7 @@ int fx_detect_evil (Actor* Owner, Actor* target, Effect* fx)
 }
 
 //0xd3 fx_jumble_curse
-int fx_jumble_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_jumble_curse (%2d)\n", fx->Opcode );
 

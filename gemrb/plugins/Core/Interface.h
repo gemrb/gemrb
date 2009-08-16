@@ -184,12 +184,12 @@ public:
 #define MAX_CIRCLE_SIZE  3
 
 /** Summoning */
-#define EAM_DEFAULT 0
-#define EAM_ENEMY   1
-#define EAM_ALLY    2
-#define EAM_SOURCEENEMY 3
-#define EAM_SOURCEALLY 4
-#define EAM_NEUTRAL 5
+#define EAM_SOURCEALLY 0
+#define EAM_SOURCEENEMY 1
+#define EAM_ENEMY   2
+#define EAM_ALLY    3
+#define EAM_NEUTRAL 4
+#define EAM_DEFAULT 5
 //
 #define STAT_CON_HP_NORMAL   0
 #define STAT_CON_HP_WARRIOR  1
@@ -362,7 +362,7 @@ public:
 	/** Get GUI Script Manager */
 	ScriptEngine * GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor */
-	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level);
+	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, Point &position, int eamod, int level);
 	/** Loads a WindowPack (CHUI file) in the Window Manager */
 	bool LoadWindowPack(const char *name);
 	/** Loads a Window in the Window Manager */
@@ -581,12 +581,12 @@ public:
 	int GetLoreBonus(int column, int value) const;
 
 	/** applies the spell on the target */
-	void ApplySpell(const ieResRef resname, Actor *target, Actor *caster, int level);
+	void ApplySpell(const ieResRef resname, Actor *target, Scriptable *caster, int level);
 	/** applies the spell on the area or on a scriptable object */
-	void ApplySpellPoint(const ieResRef resname, Map *area, Point &pos, Actor *caster, int level);
+	void ApplySpellPoint(const ieResRef resname, Map *area, Point &pos, Scriptable *caster, int level);
 	/** applies a single effect on the target */
-	int ApplyEffect(Effect *fx, Actor *target, Actor *caster);
-	int ApplyEffect(const ieResRef resname, Actor *target, Actor *caster, int level);
+	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster);
+	int ApplyEffect(const ieResRef resname, Actor *target, Scriptable *caster, int level);
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map);
 	/** saves (exports a character to the characters folder */

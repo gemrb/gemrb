@@ -34,6 +34,7 @@
 #include "Effect.h"
 #include "Region.h"
 
+class Scriptable;
 class Actor;
 class Map;
 
@@ -130,7 +131,7 @@ class Map;
 #define BASE_STATE_CURE( mod ) target->SetBaseBit( IE_STATE_ID, ( mod ), false )
 
 /** Prototype of a function implementing a particular Effect opcode */
-typedef int (* EffectFunction)(Actor*, Actor*, Effect*);
+typedef int (* EffectFunction)(Scriptable*, Actor*, Effect*);
 
 
 /** Links Effect name to a function implementing the effect */
@@ -163,16 +164,16 @@ private:
 	/** List of Effects applied on the Actor */
 	std::list< Effect* > effects;
 	/** Actor which is target of the Effects */
-	Actor* Owner;
+	Scriptable* Owner;
 
 public:
 	EffectQueue();
 	virtual ~EffectQueue();
 
 	/** Sets Actor which is affected by these effects */
-	void SetOwner(Actor* act) { Owner = act; }
+	void SetOwner(Scriptable* act) { Owner = act; }
 	/** Returns Actor affected by these effects */
-	Actor* GetOwner() const { return Owner; }
+	Scriptable* GetOwner() const { return Owner; }
 
 	/** adds an effect to the queue, it could also insert it if flagged so
 	 *  fx should be freed by the caller
@@ -181,7 +182,7 @@ public:
 	/** Adds an Effect to the queue, subject to level and other checks.
 	 * Returns FX_ABORT is unsuccessful. fx is just a reference, AddEffect()
 	 * will malloc its own copy */
-	int AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &dest);
+	int AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point &dest);
 	/** Removes first Effect matching fx from the queue.
 	 * Effects are matched based on their contents */
 	bool RemoveEffect(Effect* fx);
