@@ -2436,6 +2436,7 @@ Sprite2D* SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
 				}
 			}
 			int tmp=255 - (sum * 255 / cnt);
+			tmp = tmp * tmp / 255;
 			pixels[i++]=tmp;
 		}
 	}
