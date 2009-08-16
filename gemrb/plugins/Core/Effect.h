@@ -43,6 +43,7 @@ class Actor;
 #define FX_TARGET_PARTY      3
 #define FX_TARGET_GLOBAL_INCL_PARTY   4
 #define FX_TARGET_GLOBAL_EXCL_PARTY   5
+#define FX_TARGET_NOT_EVIL   6
 #define FX_TARGET_ORIGINAL   9
 
 // Effect duration/timing types

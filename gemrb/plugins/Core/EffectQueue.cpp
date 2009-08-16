@@ -496,6 +496,11 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point
 		}
 		break;
 
+	case FX_TARGET_NOT_EVIL:
+		if (EARelation(self, pretarget)==EAR_HOSTILE) {
+			return FX_NOT_APPLIED;
+		}
+		//falling through
 	case FX_TARGET_PRESET:
 		fx->PosX=pretarget->Pos.x;
 		fx->PosY=pretarget->Pos.y;
