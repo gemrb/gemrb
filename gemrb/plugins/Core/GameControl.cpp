@@ -1025,6 +1025,7 @@ void GameControl::DisplayTooltip() {
 							snprintf(buffer, 100, "%s\n%d/%d", name, hp, maxhp);
 						} else {
 							snprintf(buffer, 100, "%s\n%s", name, injuredstring);
+							free(injuredstring);
 						}
 					}
 				}
