@@ -934,6 +934,18 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				core->DisplayConstantString(STR_UNPAUSED,0xff0000);
 			}
 			break;
+		case 'm':
+			core->GetGUIScriptEngine()->RunFunction("OpenMapWindow");
+			break;
+		case 'j':
+			core->GetGUIScriptEngine()->RunFunction("OpenJournalWindow");
+			break;
+		case 'i':
+			core->GetGUIScriptEngine()->RunFunction("OpenInventoryWindow");
+			break;
+		case 'r':
+			core->GetGUIScriptEngine()->RunFunction("OpenRecordsWindow");
+			break;
 		case 'q': //quicksave
 			QuickSave();
 			break;
