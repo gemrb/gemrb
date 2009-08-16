@@ -331,6 +331,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	Dual = IsDualClassed (pc, 1)
 	Multi = IsMultiClassed (pc, 1)
 	XP = GemRB.GetPlayerStat (pc, IE_XP)
+	LevelDrain = GS(IE_LEVELDRAIN)
 
 	if Multi[0] > 1: # we're multiclassed
 		print "\tMulticlassed"
@@ -343,11 +344,14 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			ClassTitle = GemRB.GetString (ClassTable.GetValue (ClassIndex, 2))
 			GemRB.SetToken ("CLASS", ClassTitle)
 			Class = ClassTable.GetRowName (ClassIndex)
-			GemRB.SetToken ("LEVEL", str (Levels[i]+LevelDiff[i]) )
-			GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Levels[i]+LevelDiff[i], Class) )
+			GemRB.SetToken ("LEVEL", str (Levels[i]+LevelDiff[i]-int(LevelDrain/Multi[0])) )
 			GemRB.SetToken ("EXPERIENCE", str (XP/Multi[0]) )
-			#resolve string immediately
-			stats.append ( (GemRB.GetString (16480),"",'d') )
+			if LevelDrain:
+				stats.append ( (19720,1,'c') )
+				stats.append ( (57435,1,'c') ) # LEVEL DRAINED
+			else:
+				GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Levels[i]+LevelDiff[i], Class) )
+				stats.append ( (16480,1,'c') )
 			stats.append (None)
 			print "\t\tClass (Level):",Class,"(",Levels[i],")"
 
@@ -367,14 +371,17 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 		ClassTitle = GemRB.GetString (ClassTable.GetValue (Dual[2], 2))
 		GemRB.SetToken ("CLASS", ClassTitle)
-		GemRB.SetToken ("LEVEL", str (Levels[0]))
+		GemRB.SetToken ("LEVEL", str (Levels[0]-LevelDrain))
 		Class = ClassTable.GetRowName (Dual[2])
-		GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Levels[0], Class) )
-
 		XP2 = GemRB.GetPlayerStat (pc, IE_XP)
 		GemRB.SetToken ("EXPERIENCE", str (XP2) )
+		if LevelDrain:
+			stats.append ( (19720,1,'c') )
+			stats.append ( (57435,1,'c') ) # LEVEL DRAINED
+		else:
+			GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Levels[0], Class) )
+			stats.append ( (16480,1,'c') )
 
-		stats.append ( (GemRB.GetString (16480),"",'d') )
 		stats.append (None)
 
 		# the first class (shown second)
@@ -409,10 +416,14 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	else: # single classed
 		print "\tSingle classed"
 		Level = GemRB.GetPlayerStat (pc, IE_LEVEL) + LevelDiff[0]
-		GemRB.SetToken ("LEVEL", str (Level))
-		GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Level, Class) )
+		GemRB.SetToken ("LEVEL", str (Level-LevelDrain))
 		GemRB.SetToken ("EXPERIENCE", str (XP) )
-		stats.append ( (16480,1,'c') )
+		if LevelDrain:
+			stats.append ( (19720,1,'c') )
+			stats.append ( (57435,1,'c') ) # LEVEL DRAINED
+		else:
+			GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Level, Class) )
+			stats.append ( (16480,1,'c') )
 		stats.append (None)
 		print "\t\tClass (Level):",Class,"(",Level,")"
 
