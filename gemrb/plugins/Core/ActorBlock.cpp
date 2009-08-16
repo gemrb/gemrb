@@ -75,7 +75,7 @@ Scriptable::Scriptable(ScriptableType type)
 	WaitCounter = 0;
 	playDeadCounter = 0;
 	if (Type == ST_ACTOR) {
-		InternalFlags = IF_VISIBLE | IF_ONCREATION;
+		InternalFlags = IF_VISIBLE | IF_ONCREATION | IF_USEDSAVE;
 	} else {
 		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_ONCREATION;
 	}
