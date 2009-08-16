@@ -97,6 +97,8 @@ EffectQueue *Spell::GetEffectBlock(int block_index, int ext_index) const
 		Effect *fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
 		fx->Duration=ext_headers[ext_index].CastingTime+core->GetGame()->GameTime;
 		fxqueue->AddEffect(fx);
+		//AddEffect creates a copy, we need to destroy the original
+		delete fx;
 	}
 	for (int i=0;i<count;i++) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {
