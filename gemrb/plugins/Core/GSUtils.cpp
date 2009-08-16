@@ -630,7 +630,7 @@ Targets* GetAllObjects(Scriptable* Sender, Object* oC, int ga_flags)
 Targets *GetAllActors(Scriptable *Sender, int ga_flags)
 {
 	Map *map=Sender->GetCurrentArea();
-	
+
 	int i = map->GetActorCount(true);
 	Targets *tgts = new Targets();
 	while (i--) {
@@ -690,6 +690,12 @@ void PolymorphCopyCore(Actor *src, Actor *tar, bool base)
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 {
 	Scriptable *tmp = GetActorFromObject( Sender, parameters->objects[1] );
+	//if there is nothing to copy, don't spawn anything
+	if (flags & CC_COPY) {
+		if (!tmp || tmp->Type != ST_ACTOR) {
+			return;
+		}
+	}
 
 	Actor* ab;
 	if (flags & CC_STRING1) {
@@ -751,9 +757,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 
 	if (flags & CC_COPY) {
-		if (tmp && tmp->Type == ST_ACTOR) {
-			PolymorphCopyCore ( (Actor *) tmp, ab, false);
-		}
+		PolymorphCopyCore ( (Actor *) tmp, ab, false);
 	}
 }
 
@@ -863,10 +867,10 @@ void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 			position = ((Movable *) scr)->GetMostLikelyPosition();
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-                       if (((InfoPoint *) scr)->Flags & TRAP_USEPOINT) {
-                               position=((InfoPoint *) scr)->UsePoint;
-                               break;
-                       }
+			if (((InfoPoint *) scr)->Flags & TRAP_USEPOINT) {
+				position=((InfoPoint *) scr)->UsePoint;
+				break;
+			}
 		case ST_DOOR: case ST_CONTAINER:
 			position=((Highlightable *) scr)->TrapLaunch;
 	}
@@ -1683,7 +1687,7 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 	// maybe a future idea if we have a better implementation
 	// (the old code used it - by passing true not 0 below - when target was a movable)
 	GetPositionFromScriptable(target, p, 0);
-	
+
 	// account for PersonalDistance (which caller uses, but pathfinder doesn't)
 	if (distance && Sender->Type == ST_ACTOR) {
 		distance += ((Actor *)Sender)->size*10;
