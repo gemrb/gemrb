@@ -583,6 +583,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ((11769, GS (IE_RESISTPIERCING), '%'))
 	# Crushing
 	stats.append ((11770, GS (IE_RESISTCRUSHING), '%'))
+	# Poison
+	stats.append ((14017, GS (IE_RESISTPOISON), '%'))
 	stats.append (None)
 
 	#Weapon Style bonuses
