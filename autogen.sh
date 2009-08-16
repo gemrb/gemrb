@@ -165,7 +165,7 @@ else
 fi || exit 1
 
 echo Running aclocal
-$my_aclocal -W no-syntax || exit 1
+$my_aclocal -W no-syntax || $my_aclocal || exit 1
 
 echo Running autoconf
 $my_autoconf || exit 1
