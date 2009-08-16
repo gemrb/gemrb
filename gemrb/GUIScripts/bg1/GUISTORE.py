@@ -1086,11 +1086,11 @@ def UpdateStoreHealWindow ():
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Index = GemRB.GetVar ("Index")
 	for i in range (4):
-		Cure = GemRB.GetStoreCure (i+TopIndex)
+		Cure = GemRB.GetStoreCure (TopIndex+i)
 
 		Button = Window.GetControl (i+8)
 		Label = Window.GetControl (0x1000000c+i)
-		Button.SetVarAssoc ("Index", TopIndex+i)
+		Button.SetVarAssoc ("Index", i)
 		if Cure != None:
 			Spell = GemRB.GetSpell (Cure['CureResRef'])
 			Button.SetSpellIcon (Cure['CureResRef'], 1)
@@ -1106,7 +1106,7 @@ def UpdateStoreHealWindow ():
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 			Label.SetText ("")
-		if i==Index:
+		if TopIndex+i==Index:
 			TextArea = Window.GetControl (23)
 			TextArea.SetText (Cure['Description'])
 			Label = Window.GetControl (0x10000003)
@@ -1152,8 +1152,7 @@ def BuyHeal ():
 
 	GemRB.GameSetPartyGold (gold-Cure['Price'])
 	pc = GemRB.GameGetSelectedPCSingle ()
-	#chances are we don't need a new function for this
-	GemRB.ExecuteString ("ApplySpell("+Cure['CureResRef']+", Myself)", pc)
+	GemRB.ApplySpell (pc, Cure['CureResRef'])
 	UpdateStoreHealWindow ()
 	return
 
@@ -1163,7 +1162,7 @@ def UpdateStoreRumourWindow ():
 	UpdateStoreCommon (Window, 0x10000011, 0, 0x10000012)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	for i in range (5):
-		Drink = GemRB.GetStoreDrink (i+TopIndex)
+		Drink = GemRB.GetStoreDrink (TopIndex+i)
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ("Index", i)
 		if Drink != None:

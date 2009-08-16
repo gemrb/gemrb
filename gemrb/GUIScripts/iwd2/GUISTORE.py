@@ -805,15 +805,15 @@ def RedrawStoreIdentifyWindow ():
 	TextArea.SetText ("")
 	Selected = 0
 	for i in range (4):
-		if i+TopIndex<Count:
-			Slot = GemRB.GetSlotItem (pc, inventory_slots[i+TopIndex])
+		if TopIndex+i<Count:
+			Slot = GemRB.GetSlotItem (pc, inventory_slots[TopIndex+i])
 		else:
 			Slot = None
 		Button = Window.GetControl (i+8)
 		Label = Window.GetControl (0x1000000c+i)
 		Button.SetVarAssoc ("Index", TopIndex+i)
 		if Slot != None:
-			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[i+TopIndex], ITEM_PC)
+			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[TopIndex+i], ITEM_PC)
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			Button.SetItemIcon (Slot['ItemResRef'], 0)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
@@ -1127,7 +1127,7 @@ def UpdateStoreHealWindow ():
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Index = GemRB.GetVar ("Index")
 	for i in range (4):
-		Cure = GemRB.GetStoreCure (i+TopIndex)
+		Cure = GemRB.GetStoreCure (TopIndex+i)
 
 		Button = Window.GetControl (i+8)
 		Label = Window.GetControl (0x1000000c+i)
@@ -1147,7 +1147,7 @@ def UpdateStoreHealWindow ():
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 			Label.SetText ("")
-		if i==Index:
+		if TopIndex+i==Index:
 			TextArea = Window.GetControl (23)
 			TextArea.SetText (Cure['Description'])
 			Label = Window.GetControl (0x10000003)
@@ -1193,8 +1193,7 @@ def BuyHeal ():
 
 	GemRB.GameSetPartyGold (gold-Cure['Price'])
 	pc = GemRB.GameGetSelectedPCSingle ()
-	#chances are we don't need a new function for this
-	GemRB.ExecuteString ("ApplySpell("+Cure['CureResRef']+", Myself)", pc)
+	GemRB.ApplySpell (pc, Cure['CureResRef'])
 	UpdateStoreHealWindow ()
 	return
 
@@ -1204,7 +1203,7 @@ def UpdateStoreRumourWindow ():
 	UpdateStoreCommon (Window, 0x10000011, 0, 0x10000012)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	for i in range (5):
-		Drink = GemRB.GetStoreDrink (i+TopIndex)
+		Drink = GemRB.GetStoreDrink (TopIndex+i)
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ("Index", i)
 		if Drink != None:
