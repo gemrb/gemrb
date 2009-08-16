@@ -2511,7 +2511,6 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 		//find a quiver for the bow, etc
 		if (Equipped!=IW_NO_EQUIPPED) {
 			inventory.EquipItem( Equipped+inventory.GetWeaponSlot());
-printf("Equipping: %d\n", inventory.GetEquipped() );
 			SetEquippedQuickSlot( inventory.GetEquipped(), EquippedHeader );
 		}
 	}

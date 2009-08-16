@@ -174,7 +174,7 @@ GEM_EXPORT unsigned int Distance(Point pos, Scriptable *b);
 GEM_EXPORT unsigned int PersonalDistance(Point pos, Scriptable *b);
 GEM_EXPORT unsigned int Distance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int PersonalDistance(Scriptable *a, Scriptable *b);
-GEM_EXPORT int EARelation(Actor *a, Actor *b);
+GEM_EXPORT int EARelation(Scriptable *a, Actor *b);
 GEM_EXPORT bool dir_exists(const char* path);
 GEM_EXPORT int strlench(const char* string, char ch);
 #ifndef HAVE_STRNDUP

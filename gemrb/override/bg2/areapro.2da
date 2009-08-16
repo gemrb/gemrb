@@ -2,14 +2,14 @@
 *
            RESOURCE1  RESOURCE2  RESOURCE3  SOUND1	SOUND2	FLAGS
 FIREBALL   SPFLAMES   SPFIREPI   *          EFF_M21	*	0
-STINKCLOUD SPHORPUF   *          *          EFF_M18A	ARE_M02	3
-CLOUDKILL  SPHORPUF   *          *          EFF_M18A	ARE_M02	3
+STINKCLOUD SPHORPUF   *          *          EFF_M18A	ARE_M02	7
+CLOUDKILL  SPHORPUF   *          *          EFF_M18A	ARE_M02	7
 ICESTORM   SPICESTM   SPBOOM     *          EFF_M34	ARE_M04	14
 GREASE     GREASED    *          GREASEH    EFF_M31B	ARE_M01	2
 WEB        WEBENTD    *          WEBENTH    EFF_M19	ARE_M03	34
-METEOR     SPMETSWM   *          *          EFF_M34	ARE_P14	2
+METEOR     SPMETSWM   *          *          EFF_M34	ARE_P14	6
 WILTING    SPHORPUF   SPHORWIL   *          *       	*	2
-WEIRD      SPWRDFLD   *          *          EFF_M34	ARE_M11	2
+WEIRD      SPWRDFLD   *          *          EFF_M34	ARE_M11	6
 ENTANGLE   SPENTAAI   *          *          EFF_M19	ARE_P01	2
 COLORSPRAY SPCSPRA3   *          SPCSPRA2   EFF_M19	*	2
 CONECOLD   SPCCOLDE   SPCCOLDL   *          EFF_M19	*	0
