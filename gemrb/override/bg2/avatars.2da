@@ -159,7 +159,7 @@
 0x7902     MSLI       MSLI       MSLI       MSLI       3          3          MU         *
 0x7903     MSLI       MSLI       MSLI       MSLI       3          3          OC         *
 0x7904     MSLI       MSLI       MSLI       MSLI       3          3          1          *
-0x7A00     MSPI       MSPI       MSPI       MSPI       2          2          GI         *
+0x7A00     MSPI       MSPI       MSPI       MSPI       14         2          GI         *
 0x7A01     MSPI       MSPI       MSPI       MSPI       3          2          HU         *
 0x7A02     MSPI       MSPI       MSPI       MSPI       3          2          PH         *
 0x7A03     MSPI       MSPI       MSPI       MSPI       3          2          SW         *
