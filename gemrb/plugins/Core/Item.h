@@ -259,6 +259,7 @@ public:
 	//returns the weapon header
 	ITMExtHeader *GetWeaponHeader(bool ranged) const;
 	int GetWeaponHeaderNumber(bool ranged) const;
+	int GetEquipmentHeaderNumber(int cnt) const;
 	unsigned int GetCastingDistance(int header) const;
 private:
 };

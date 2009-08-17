@@ -342,14 +342,14 @@ void Inventory::KillSlot(unsigned int index)
 			//getting a new projectile of the same type
 			if (Equipped + SLOT_MELEE == (int) index) {
 				if (Equipped < 0) {
-				  //always get the projectile weapon header (this quiver was equipped)
+					//always get the projectile weapon header (this quiver was equipped)
 					ITMExtHeader *header = itm->GetWeaponHeader(true);
 					Equipped = FindRangedProjectile(header->ProjectileQualifier);
-				  if (Equipped!=IW_NO_EQUIPPED) {
-				    EquipItem(Equipped+SLOT_MELEE);
-				  } else {
-				    EquipItem(SLOT_FIST);
-				  }
+					if (Equipped!=IW_NO_EQUIPPED) {
+						EquipItem(Equipped+SLOT_MELEE);
+					} else {
+						EquipItem(SLOT_FIST);
+					}
 				}
 			}
 			UpdateWeaponAnimation();
@@ -362,24 +362,24 @@ void Inventory::KillSlot(unsigned int index)
 				//always get the projectile weapon header (this is a bow, because Equipped is negative)
 				ITMExtHeader *header = itm->GetWeaponHeader(true);
 				if (header) {
-				  //find the equipped type
-				  int type = header->ProjectileQualifier;
-				  int weaponslot = FindTypedRangedWeapon(type);
-				  CREItem *item2 = Slots[weaponslot];
-				  if (item2) {
-				    Item *itm2 = gamedata->GetItem(item2->ItemResRef);
-				    if (itm2) {
-				      if (type == header->ProjectileQualifier) {
-				        Equipped = FindRangedProjectile(header->ProjectileQualifier);
-				        if (Equipped!=IW_NO_EQUIPPED) {
-				          EquipItem(Equipped+SLOT_MELEE);
-				        } else {
-				          EquipItem(SLOT_FIST);
-				        }
-				      }
-				      gamedata->FreeItem(itm2, item2->ItemResRef, false);
-				    }
-				  }
+					//find the equipped type
+					int type = header->ProjectileQualifier;
+					int weaponslot = FindTypedRangedWeapon(type);
+					CREItem *item2 = Slots[weaponslot];
+					if (item2) {
+						Item *itm2 = gamedata->GetItem(item2->ItemResRef);
+						if (itm2) {
+							if (type == header->ProjectileQualifier) {
+								Equipped = FindRangedProjectile(header->ProjectileQualifier);
+								if (Equipped!=IW_NO_EQUIPPED) {
+									EquipItem(Equipped+SLOT_MELEE);
+								} else {
+									EquipItem(SLOT_FIST);
+								}
+							}
+							gamedata->FreeItem(itm2, item2->ItemResRef, false);
+						}
+					}
 				}
 			}
 			// reset Equipped if it is a ranged weapon slot
@@ -522,7 +522,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 			return ASI_FAILED;
 		}
 
-		//check for equipping weapons
+		//check for equipping weapons 
 		if (WhyCantEquip(slot,twohanded)) {
 			return ASI_FAILED;
 		}
@@ -583,8 +583,9 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 				continue;
 			}
 		}
-		if (WhyCantEquip(i,twohanded))
-			continue;
+		//this is called by AddSlotItem as well
+		//if (WhyCantEquip(i,twohanded))
+		//	continue;
 		int part_res = AddSlotItem (item, i);
 		if (part_res == ASI_SUCCESS) return ASI_SUCCESS;
 		else if (part_res == ASI_PARTIAL) res = ASI_PARTIAL;

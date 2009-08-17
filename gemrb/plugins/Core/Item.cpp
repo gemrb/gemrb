@@ -122,6 +122,26 @@ int Item::GetWeaponHeaderNumber(bool ranged) const
 	return 0xffff; //invalid extheader number
 }
 
+int Item::GetEquipmentHeaderNumber(int cnt) const
+{
+	for(int ehc=0; ehc<ExtHeaderCount; ehc++) {
+		ITMExtHeader *ext_header = GetExtHeader(ehc);
+		if (ext_header->Location!=ITEM_LOC_EQUIPMENT) {
+			continue;
+		}
+		if (ext_header->AttackType!=ITEM_AT_MAGIC) {
+			continue;
+		}
+
+		if (cnt) {
+			cnt--;
+			continue;
+		}
+		return ehc;
+	}
+	return 0xffff; //invalid extheader number
+}
+
 ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
 {
 	//start from the beginning

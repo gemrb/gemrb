@@ -2478,7 +2478,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		if (vvcres[0]) {
 			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(vvcres, false);
 			if (vvc) {
-	      //This is the final position of the actor, not the original target point
+				//This is the final position of the actor, not the original target point
 				vvc->XPos=ab->Pos.x;
 				vvc->YPos=ab->Pos.y;
 				map->AddVVCell( vvc );
@@ -3924,7 +3924,29 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 	}
 	if (!ret) {
 		if (feedback) DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
+		return 0;
 	}
+
+	if (slottype&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
+		ret = 0;
+		if (slottype&SLOT_QUIVER) {
+			if (item->GetWeaponHeader(true)) ret = 1;
+		}
+
+		if (slottype&SLOT_WEAPON) {
+			if (item->GetWeaponHeader(false)) ret = 1;
+		}
+
+		if (slottype&SLOT_ITEM) {
+			if (item->GetEquipmentHeaderNumber(0)!=0xffff) ret = 1;
+		}
+
+		if (!ret) {
+			if (feedback) DisplayConstantString(STR_UNUSABLEITEM, 0xf0f0f0);
+			return 0;
+		}
+	}
+
 	return ret;
 }
 
