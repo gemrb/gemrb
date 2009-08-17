@@ -1324,7 +1324,7 @@ void CharAnimations::AddVHR3Suffix(char* ResRef, unsigned char StanceID,
 			strcat( ResRef, "g11" );
 			break;
 		default:
-			printf("VHR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			printf("VHR3 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}
