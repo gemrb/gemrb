@@ -1972,16 +1972,28 @@ void GameScript::StartDialogue(Scriptable* Sender, Action* parameters)
 }
 
 //string0, no interrupt, talkcount increased, don't set default
+//optionally item name is used
 void GameScript::StartDialogueOverride(Scriptable* Sender, Action* parameters)
 {
-	BeginDialog( Sender, parameters, BD_STRING0 | BD_TALKCOUNT );
+	int flags = BD_STRING0 | BD_TALKCOUNT;
+
+	if (parameters->int2Parameter) {
+		flags|=BD_ITEM;
+	}
+	BeginDialog( Sender, parameters, flags );
 }
 
 //string0, no interrupt, talkcount increased, don't set default
+//optionally item name is used
 void GameScript::StartDialogueOverrideInterrupt(Scriptable* Sender,
 	Action* parameters)
 {
-	BeginDialog( Sender, parameters, BD_STRING0 | BD_TALKCOUNT | BD_INTERRUPT );
+	int flags = BD_STRING0 | BD_TALKCOUNT | BD_INTERRUPT;
+
+	if (parameters->int2Parameter) {
+		flags|=BD_ITEM;
+	}
+	BeginDialog( Sender, parameters, flags );
 }
 
 //start talking to oneself

@@ -572,9 +572,10 @@ struct TriggerLink {
 #define BD_TALKCOUNT 8  //increases talkcount
 #define BD_SETDIALOG 16 //also sets dialog (for string0)
 #define BD_CHECKDIST 32 //checks distance, if needs, walks up
-#define BD_OWN  	 64 //source == target, works for player only
-#define BD_INTERRUPT 128  //interrupts action
-#define BD_NUMERIC   256  //target is numeric
+#define BD_OWN       64 //source == target, works for player only
+#define BD_INTERRUPT 128 //interrupts action
+#define BD_NUMERIC   256 //target is numeric
+#define BD_ITEM      512 //talk to an item
 
 #define AF_NONE 	 0
 #define AF_INSTANT       1
