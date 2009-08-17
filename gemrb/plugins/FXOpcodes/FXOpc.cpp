@@ -2785,7 +2785,7 @@ int fx_protection_spelllevel (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_change_name (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_change_name_modifier (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
-	target->SetText(fx->Parameter1, 0);
+	target->SetName(fx->Parameter1, 0);
 	return FX_NOT_APPLIED;
 }
 
