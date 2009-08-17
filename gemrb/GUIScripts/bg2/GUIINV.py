@@ -729,7 +729,7 @@ def DialogItemWindow ():
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 	dialog=item["Dialog"]
-	GemRB.ExecuteString ("StartDialog(\""+dialog+"\",Myself)", pc)
+	GemRB.ExecuteString ("StartDialogOverride(\""+dialog+"\",Myself,0,0,1)", pc)
 	return
 
 def IdentifyUseSpell ():
