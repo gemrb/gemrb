@@ -230,6 +230,11 @@ bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 			strnuprcpy(owner, store->GetOwner(), 32);
 		}
 	}
+	if (!store) {
+		printMessage("GameScript","Store cannot be opened!\n", LIGHT_RED);
+		return false;
+	}
+
 	bool ret = false;
 	//don't use triggers (pst style), it would be possible to create infinite loops
 	if (store->FindItem(itemname, false) != (unsigned int)-1) {
