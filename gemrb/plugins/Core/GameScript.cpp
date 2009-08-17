@@ -1174,14 +1174,11 @@ void Targets::AddTarget(Scriptable* target, unsigned int distance, int ga_flags)
 			}
 		}
 		break;
-	case ST_CONTAINER:
-		break;
-	case ST_DOOR:
-		break;
-	case ST_AREA:
-		break;
-	default:
+	case ST_GLOBAL:
+		// this doesn't seem a good idea to allow
 		return;
+	default:
+		break;
 	}
 	targettype Target = {target, distance};
 	targetlist::iterator m;
