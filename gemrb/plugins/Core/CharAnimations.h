@@ -88,6 +88,7 @@
 #define IE_ANI_NINE_FRAMES		12   //dragon anims
 #define IE_ANI_FRAGMENT                 13   //fragment animation
 #define IE_ANI_FOUR_FILES_2		14 //METT
+#define IE_ANI_CODE_MIRROR_3	15 //MSPS
 
 //PST animation types
 #define IE_ANI_PST_ANIMATION_1		16   //full animation
@@ -193,6 +194,8 @@ private:
 		unsigned char& Cycle, unsigned char Orient);
 	void AddVHRSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
+	void AddVHR3Suffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
 	void GetVHREquipmentRef(char* ResRef, unsigned char& Cycle,
 		const char* equipRef, bool offhand, EquipResRefData* equip);
 	void AddSixSuffix(char* ResRef, unsigned char AnimID,

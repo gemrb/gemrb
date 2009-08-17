@@ -215,7 +215,7 @@
 0x7F2C     NSOL       NSOL       NSOL       NSOL       4          2          1          *
 0x7F2D     MWFM       MWFM       MWFM       MWFM       4          2          1          *
 0x7F2E     MRAV       MRAV       MRAV       MRAV       4          3          1          *
-0x7F2F     MSPS       MSPS       MSPS       MSPS       4          2          1          *
+0x7F2F     MSPS       MSPS       MSPS       MSPS       15         2          1          *
 0x7F30     NBOH       NBOH       NBOH       NBOH       4          2          1          *
 0x7F31     NELL       NELL       NELL       NELL       4          2          1          *
 0x7F32     MSLY       MSLY       MSLY       MSLY       4          2          1          *

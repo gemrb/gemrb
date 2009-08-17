@@ -539,6 +539,11 @@ IE_ANI_CODE_MIRROR: The code automatically mirrors the needed frames
 			Each BAM File contains only 9 Orientations, the missing 7 Animations
 			are created by Horizontally Mirroring the 1-7 Orientations.
 
+IE_ANI_CODE_MIRROR_2: another mirroring type with more animations
+			[NAME]g[1,11-15,2,21-26]
+
+IE_ANI_CODE_MIRROR_3: Almost identical to IE_ANI_CODE_MIRROR_2, but with fewer cycles in g26
+
 IE_ANI_ONE_FILE:	The whole animation is in one file, no mirroring needed.
 			Each animation group is 16 Cycles.
 
@@ -893,6 +898,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			case IE_ANI_BIRD:
 			case IE_ANI_CODE_MIRROR:
 			case IE_ANI_CODE_MIRROR_2: //9 orientations
+			case IE_ANI_CODE_MIRROR_3:
 			case IE_ANI_PST_ANIMATION_3: //no stc just std
 			case IE_ANI_PST_ANIMATION_2: //no std just stc
 			case IE_ANI_PST_ANIMATION_1:
@@ -919,6 +925,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		case IE_ANI_SIX_FILES: //16 anims some are stored elsewhere
 		case IE_ANI_ONE_FILE: //16 orientations
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
+		case IE_ANI_CODE_MIRROR_3:
 			Anims[StanceID][Orient] = anims;
 			break;
 		case IE_ANI_TWO_FILES:
@@ -1039,6 +1046,10 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
 			AddVHR2Suffix( NewResRef, StanceID, Cycle, Orient );
+			break;
+
+		case IE_ANI_CODE_MIRROR_3: // like IE_ANI_CODE_MIRROR_2 but with fewer cycles in g26
+			AddVHR3Suffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_PST_ANIMATION_1:
@@ -1189,6 +1200,85 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_CONJURE://ending
 			strcat( ResRef, "g26" );
 			Cycle+=54;
+			break;
+
+		case IE_ANI_SHOOT:
+			strcat( ResRef, "g24" );
+			Cycle+=27;
+			break;
+
+		case IE_ANI_HEAD_TURN:
+		case IE_ANI_AWAKE:
+			strcat( ResRef, "g12" );
+			Cycle+=18;
+			break;
+
+		case IE_ANI_SLEEP:
+			strcat( ResRef, "g15" );
+			Cycle+=45;
+			break;
+
+		case IE_ANI_TWITCH:
+			strcat( ResRef, "g14" );
+			Cycle+=45;
+			break;
+
+		case IE_ANI_DIE:
+		case IE_ANI_EMERGE:
+		case IE_ANI_GET_UP:
+		case IE_ANI_PST_START:
+			strcat( ResRef, "g14" );
+			Cycle+=36;
+			break;
+
+		case IE_ANI_DAMAGE:
+			strcat( ResRef, "g13" );
+			Cycle+=27;
+			break;
+
+		case IE_ANI_READY:
+			strcat( ResRef, "g1" );
+			Cycle+=9;
+			break;
+
+		case IE_ANI_WALK:
+			strcat( ResRef, "g11" );
+			break;
+		default:
+			printf("VHR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			abort();
+			break;
+	}
+}
+
+void CharAnimations::AddVHR3Suffix(char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	Cycle=SixteenToNine[Orient];
+
+	switch (StanceID) {
+		case IE_ANI_ATTACK: //temporarily
+		case IE_ANI_ATTACK_BACKSLASH:
+			strcat( ResRef, "g21" );
+			break;
+
+		case IE_ANI_ATTACK_SLASH:
+			strcat( ResRef, "g2" );
+			break;
+
+		case IE_ANI_ATTACK_JAB:
+			strcat( ResRef, "g26" );
+			Cycle+=18;
+			break;
+
+		case IE_ANI_CAST: //looping
+			strcat( ResRef, "g25" );
+			Cycle+=45;
+			break;
+
+		case IE_ANI_CONJURE://ending
+			strcat( ResRef, "g26" );
+			Cycle+=36;
 			break;
 
 		case IE_ANI_SHOOT:
