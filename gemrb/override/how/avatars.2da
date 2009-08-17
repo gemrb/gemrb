@@ -115,10 +115,10 @@
 0x6400    UDRZ1     UDRZ1      UDRZ1      UDRZ1      6          2          0          *
 0x6401    UELM1     UELM1      UELM1      UELM1      6          2          1          *
 0x6402    CMNK1     CMNK1      CMNK1      CMNK1      6          2          0          *
-0x6403    MSKL1     MSKL2      MSKL3      MSKL4      6          2          0          *
+0x6403    MSKL1     MSKL1      MSKL1      MSKL1      6          2          0          M
 0x6404    USAR1     USAR1      USAR1      USAR1      6          2          1          *
-0x6405    MDGU1     MDGU1      MDGU1      MDGU1      6          2          0          *
-0x6406    MDGU1     MDGU1      MDGU1      MDGU1      6          2          0          *
+0x6405    MDGU1     MDGU1      MDGU1      MDGU1      6          2          0          M
+0x6406    MDGU1     MDGU1      MDGU1      MDGU1      6          2          0          L
 0x6500    CHMM1     CHMB2      CHMB3      CHMC4      0          2          0          M
 0x6510    CHFM1     CHFB2      CHFB3      CHFC4      0          2          0          M
 0x7000    MOGH      MOGH       MOGH       MOGH       2          2          0          *
