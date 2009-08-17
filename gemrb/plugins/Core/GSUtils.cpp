@@ -689,8 +689,8 @@ void PolymorphCopyCore(Actor *src, Actor *tar, bool base)
 			tar->SetBase(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
 		}
 	}
-	tar->ShortName = src->ShortName;
-	tar->LongName = src->LongName;
+        tar->SetText(src->GetName(0),0);
+        tar->SetText(src->GetName(1),1);
 	//add more attribute copying
 }
 
