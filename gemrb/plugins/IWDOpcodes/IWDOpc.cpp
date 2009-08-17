@@ -1293,7 +1293,7 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 	//summon creature (resource), play vvc (resource2)
 	//creature's lastsummoner is Owner
 	//creature's target is target
-	//position of appearance is target's pos
+	//position of appearance is target's pos (not sure!!!)
 	int eamod = EAM_DEFAULT;
 	if (fx->Parameter2<4){
 		eamod = eamods[fx->Parameter2];
@@ -1306,6 +1306,8 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 //0x105 immunity to effect (same as bg2?)
 //0x106 SummonPomab
 
+//This is ugly, hardcoded, crap, but this is what we got from BlackIsle
+//Use a 2da for the positions and the resrefs.
 static Point pomab_positions[6]={
 	Point(0x1e8, 0x20a),
 	Point(0x1c6, 0x1f6),

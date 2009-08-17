@@ -586,7 +586,7 @@ public:
 	void ApplySpellPoint(const ieResRef resname, Map *area, Point &pos, Scriptable *caster, int level);
 	/** applies a single effect on the target */
 	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster);
-	int ApplyEffect(const ieResRef resname, Actor *target, Scriptable *caster, int level);
+	int ApplyEffect(const ieResRef resname, Actor *target, Scriptable *caster, int level, Point &p);
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map);
 	/** saves (exports a character to the characters folder */

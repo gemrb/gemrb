@@ -2254,7 +2254,11 @@ int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter2<6){
 		eamod = eamods[fx->Parameter2];
 	}
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, target->Pos, eamod, 0);
+
+	//the monster should appear near the effect position
+	Point p(fx->PosX, fx->PosY);
+
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, eamod, 0);
 	return FX_NOT_APPLIED;
 }
 
@@ -3812,8 +3816,7 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 		return FX_NOT_APPLIED;
 	}
 
-	//FIXME: the monster should appear near the effect position?
-	//or the target position, this needs experiment
+	//the monster should appear near the effect position? (unsure)
 	Point p(fx->PosX, fx->PosY);
 
 	//remove old creature
@@ -4165,7 +4168,9 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//apply effect, if the effect is a goner, then kill
 		//this effect too
-		if(core->ApplyEffect(fx->Resource, target, Owner, fx->Power)) {
+		Point p(fx->PosX, fx->PosY);
+
+		if(core->ApplyEffect(fx->Resource, target, Owner, fx->Power, p)) {
 			return FX_APPLIED;
 		}
 		return FX_NOT_APPLIED;
@@ -5443,25 +5448,27 @@ int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx)
 	ieDword i; //moved here because msvc6 cannot handle it otherwise
 
 	if (0) printf( "fx_apply_effect_repeat (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	Point p(fx->PosX, fx->PosY);
 	switch (fx->Parameter2) {
 		case 0: //once per second
 		case 1: //crash???
-			core->ApplyEffect(fx->Resource, target, Owner, fx->Power);
+			core->ApplyEffect(fx->Resource, target, Owner, fx->Power, p);
 			break;
 		case 2://param1 times every second
 			for (i=0;i<fx->Parameter1;i++) {
-				core->ApplyEffect(fx->Resource, target, Owner, fx->Power);
+				core->ApplyEffect(fx->Resource, target, Owner, fx->Power, p);
 			}
 			break;
 		case 3: //once every Param1 second
 			if (fx->Parameter1 && (core->GetGame()->GameTime%fx->Parameter1)) {
-				core->ApplyEffect(fx->Resource, target, Owner, fx->Power);
+				core->ApplyEffect(fx->Resource, target, Owner, fx->Power, p);
 			}
 			break;
 		case 4: //param3 times every Param1 second
 			if (fx->Parameter1 && (core->GetGame()->GameTime%fx->Parameter1)) {
 				for (i=0;i<fx->Parameter3;i++) {
-					core->ApplyEffect(fx->Resource, target, Owner, fx->Power);
+					core->ApplyEffect(fx->Resource, target, Owner, fx->Power, p);
 				}
 			}
 			break;
@@ -5608,7 +5615,9 @@ int fx_apply_effect_curse (Scriptable* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_apply_effect_curse (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//load effect and add it to the end of the effect queue?
-		core->ApplyEffect(fx->Resource, target, Owner, fx->Power);
+		Point p(fx->PosX, fx->PosY);
+
+		core->ApplyEffect(fx->Resource, target, Owner, fx->Power, p);
 	}
 	return FX_APPLIED;
 }

@@ -28,8 +28,8 @@
 #ifndef EFFECT_H
 #define EFFECT_H
 
-//#include <vector>
 #include "../../includes/ie_types.h"
+#include "Region.h"
 class Actor;
 
 //local variables in creatures are stored in fake opcodes
@@ -41,9 +41,10 @@ class Actor;
 #define FX_TARGET_SELF       1
 #define FX_TARGET_PRESET     2
 #define FX_TARGET_PARTY      3
-#define FX_TARGET_GLOBAL_INCL_PARTY   4
-#define FX_TARGET_GLOBAL_EXCL_PARTY   5
-#define FX_TARGET_NOT_EVIL   6
+#define FX_TARGET_ALL        4
+#define FX_TARGET_ALL_BUT_PARTY   5
+#define FX_TARGET_OWN_SIDE   6
+#define FX_TARGET_ALL_BUT_SELF 8
 #define FX_TARGET_ORIGINAL   9
 
 // Effect duration/timing types
@@ -117,6 +118,14 @@ struct Effect {
 	ieDword SecondaryDelay; //still not sure about this
 	// These are not in the IE files, but are our precomputed values
 	ieDword random_value;
+public:
+	//don't modify position in case it was already set
+	void SetPosition(Point &p) {
+		if(PosX==0xffffffff && PosY==0xffffffff) {
+			PosX=p.x;
+			PosY=p.y;
+		}
+	}
 };
 
 // FIXME: what about area spells? They can have map & coordinates as target

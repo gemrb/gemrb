@@ -475,8 +475,9 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point
 
 	switch (fx->Target) {
 	case FX_TARGET_ORIGINAL:
-		fx->PosX=self->Pos.x;
-		fx->PosY=self->Pos.y;
+		fx->SetPosition(self->Pos);
+		//fx->PosX=self->Pos.x;
+		//fx->PosY=self->Pos.y;
 		
 		flg = ApplyEffect( st, fx, 1 );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
@@ -486,8 +487,9 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point
 		}
 		break;
 	case FX_TARGET_SELF:
-		fx->PosX=dest.x;
-		fx->PosY=dest.y;
+		fx->SetPosition(dest);
+		//fx->PosX=dest.x;
+		//fx->PosY=dest.y;
 		flg = ApplyEffect( st, fx, 1 );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 			if (st) {
@@ -496,14 +498,50 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point
 		}
 		break;
 
-	case FX_TARGET_NOT_EVIL:
-		if (EARelation(self, pretarget)==EAR_HOSTILE) {
-			return FX_NOT_APPLIED;
+	case FX_TARGET_ALL_BUT_SELF:
+		map=self->GetCurrentArea();
+		i= map->GetActorCount(true);
+		while(i--) {
+			Actor* actor = map->GetActor( i, true );
+			//don't pick ourselves
+			if (Owner->Type==ST_ACTOR && (Actor *)Owner==actor) {
+			  continue;
+			}
+			fx->SetPosition(actor->Pos);
+			//fx->PosX=actor->Pos.x;
+			//fx->PosY=actor->Pos.y;
+			flg = ApplyEffect( actor, fx, 1 );
+			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
+				actor->fxqueue.AddEffect( fx, flg==FX_INSERT );
+			}
 		}
+		flg = FX_APPLIED;
+		break;
+
+	case FX_TARGET_OWN_SIDE:
+		map=self->GetCurrentArea();
+		i = map->GetActorCount(false);
+		while(i--) {
+			Actor* actor = map->GetActor( i, true );
+			if (EARelation(self, pretarget)==EAR_HOSTILE) {
+				continue;
+			}
+			fx->SetPosition(actor->Pos);
+			//fx->PosX=actor->Pos.x;
+			//fx->PosY=actor->Pos.y;
+			flg = ApplyEffect( actor, fx, 1 );
+			//GetActorCount can now return all nonparty critters
+			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
+				actor->fxqueue.AddEffect( fx, flg==FX_INSERT );
+			}
+		}
+		flg = FX_APPLIED;
+		break;
 		//falling through
 	case FX_TARGET_PRESET:
-		fx->PosX=pretarget->Pos.x;
-		fx->PosY=pretarget->Pos.y;
+		fx->SetPosition(pretarget->Pos);
+		//fx->PosX=pretarget->Pos.x;
+		//fx->PosY=pretarget->Pos.y;
 		flg = ApplyEffect( pretarget, fx, 1 );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 			if (pretarget) {
@@ -517,8 +555,9 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point
 		i = game->GetPartySize(true);
 		while(i--) {
 			Actor* actor = game->GetPC( i, true );
-			fx->PosX=actor->Pos.x;
-			fx->PosY=actor->Pos.y;			
+			fx->SetPosition(actor->Pos);
+			//fx->PosX=actor->Pos.x;
+			//fx->PosY=actor->Pos.y;			
 			flg = ApplyEffect( actor, fx, 1 );
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( fx, flg==FX_INSERT );
@@ -527,13 +566,14 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point
 		flg = FX_APPLIED;
 		break;
 
-	case FX_TARGET_GLOBAL_INCL_PARTY:
+	case FX_TARGET_ALL:
 		map=self->GetCurrentArea();
 		i= map->GetActorCount(true);
 		while(i--) {
 			Actor* actor = map->GetActor( i, true );
-			fx->PosX=actor->Pos.x;
-			fx->PosY=actor->Pos.y;
+			fx->SetPosition(actor->Pos);
+			//fx->PosX=actor->Pos.x;
+			//fx->PosY=actor->Pos.y;
 			flg = ApplyEffect( actor, fx, 1 );
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( fx, flg==FX_INSERT );
@@ -542,13 +582,14 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point
 		flg = FX_APPLIED;
 		break;
 
-	case FX_TARGET_GLOBAL_EXCL_PARTY:
+	case FX_TARGET_ALL_BUT_PARTY:
 		map=self->GetCurrentArea();
 		i = map->GetActorCount(false);
 		while(i--) {
 			Actor* actor = map->GetActor( i, false );
-			fx->PosX=actor->Pos.x;
-			fx->PosY=actor->Pos.y;
+			fx->SetPosition(actor->Pos);
+			//fx->PosX=actor->Pos.x;
+			//fx->PosY=actor->Pos.y;
 			flg = ApplyEffect( actor, fx, 1 );
 			//GetActorCount can now return all nonparty critters
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
@@ -1025,7 +1066,6 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 			}
 		}
 
-		//res=fn( Owner?Owner:target, target, fx );
 		res=fn( Owner, target, fx );
 
 		//if there is no owner, we assume it is the target

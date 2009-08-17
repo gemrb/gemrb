@@ -2478,8 +2478,9 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		if (vvcres[0]) {
 			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(vvcres, false);
 			if (vvc) {
-				vvc->XPos=position.x;
-				vvc->YPos=position.y;
+	      //This is the final position of the actor, not the original target point
+				vvc->XPos=ab->Pos.x;
+				vvc->YPos=ab->Pos.y;
 				map->AddVVCell( vvc );
 			}
 		}
@@ -4787,7 +4788,7 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
 	return res;
 }
 
-int Interface::ApplyEffect(const ieResRef resname, Actor *actor, Scriptable *caster, int level)
+int Interface::ApplyEffect(const ieResRef resname, Actor *actor, Scriptable *caster, int level, Point &p)
 {
 	//Don't free this reference, it is cached!
 	Effect *effect = gamedata->GetEffect(resname);
@@ -4797,7 +4798,10 @@ int Interface::ApplyEffect(const ieResRef resname, Actor *actor, Scriptable *cas
 	if (!level) {
 		level = 1;
 	}
-	effect->Power=level;
+	effect->Power = level;
+	//don't use effect->SetPosition here, effect is cached, and has a dirty position
+	effect->PosX = p.x;
+	effect->PosY = p.y;
 	return ApplyEffect(effect, actor, caster);
 }
 
