@@ -432,7 +432,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 
  		//torment has them as 0 or -1
 		if (pcInfo.Name[0]!=0 && pcInfo.Name[0]!=UNINITIALIZED_CHAR) {
-			actor->SetText(pcInfo.Name,0); //setting both names
+			actor->SetName(pcInfo.Name,0); //setting both names
 		}
 		actor->TalkCount = pcInfo.TalkCount;
 	} else {
