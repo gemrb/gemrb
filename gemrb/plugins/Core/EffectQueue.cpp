@@ -699,7 +699,12 @@ inline bool check_level(Actor *target, Effect *fx)
 	}
 
 	ieDword level = (ieDword) target->GetXPLevel( true );
-	if ((fx->DiceSides != 0 && fx->DiceThrown != 0) && (level > fx->DiceSides || level < fx->DiceThrown)) {
+	//return true if resisted
+	//level resistance is checked when DiceSides or DiceThrown
+	//are greater than 0 (sometimes they used -1 for our amusement)
+	//if level>than maximum affected or level<than minimum affected, then the
+	//effect is resisted
+	if ((fx->DiceSides > 0 || fx->DiceThrown > 0) && (level > fx->DiceSides || level < fx->DiceThrown)) {
 		return true;
 	}
 	return false;
