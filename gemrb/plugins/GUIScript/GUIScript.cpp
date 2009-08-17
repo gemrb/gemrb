@@ -4568,7 +4568,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	if (!MyActor) {
 		return RuntimeError( "Actor not found!" );
 	}
-	MyActor->SetText(Name, Which);
+	MyActor->SetName(Name, Which);
 	MyActor->SetMCFlag(MC_EXPORTABLE,BM_OR);
 	Py_INCREF( Py_None );
 	return Py_None;

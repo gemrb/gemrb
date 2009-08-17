@@ -388,7 +388,7 @@ void Actor::SetDefaultActions(int qslot, ieByte slot1, ieByte slot2, ieByte slot
 	DefaultButtons[2]=slot3;
 }
 
-void Actor::SetText(const char* ptr, unsigned char type)
+void Actor::SetName(const char* ptr, unsigned char type)
 {
 	size_t len = strlen( ptr ) + 1;
 	//32 is the maximum possible length of the actor name in the original games
@@ -403,7 +403,7 @@ void Actor::SetText(const char* ptr, unsigned char type)
 	}
 }
 
-void Actor::SetText(int strref, unsigned char type)
+void Actor::SetName(int strref, unsigned char type)
 {
 	if (type!=2) {
 		if (LongName) free(LongName);
@@ -5410,8 +5410,8 @@ Actor *Actor::CopySelf() const
 {
 	Actor *newActor = new Actor();
 
-	newActor->SetText(GetName(0),0);
-	newActor->SetText(GetName(1),1);
+	newActor->SetName(GetName(0),0);
+	newActor->SetName(GetName(1),1);
 	memcpy(newActor->BaseStats, BaseStats, sizeof(BaseStats) );
 
 	//IF_INITIALIZED shouldn't be set here, yet

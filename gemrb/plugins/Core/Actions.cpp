@@ -3822,7 +3822,7 @@ void GameScript::SetApparentName(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* target = ( Actor* ) tar;
-	target->SetText(parameters->int0Parameter,1);
+	target->SetName(parameters->int0Parameter,1);
 }
 
 void GameScript::SetRegularName(Scriptable* Sender, Action* parameters)
@@ -3832,7 +3832,7 @@ void GameScript::SetRegularName(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* target = ( Actor* ) tar;
-	target->SetText(parameters->int0Parameter,2);
+	target->SetName(parameters->int0Parameter,2);
 }
 
 /** this is a gemrb extension */

@@ -398,8 +398,8 @@ public:
 		return which ? SmallPortrait : LargePortrait;
 	}
 
-	void SetText(const char* ptr, unsigned char type);
-	void SetText(int strref, unsigned char type);
+	void SetName(const char* ptr, unsigned char type);
+	void SetName(int strref, unsigned char type);
 	/* returns carried weight atm, could calculate with strength*/
 	int GetEncumbrance();
 	/* checks on death of actor, returns true if it should be removed*/

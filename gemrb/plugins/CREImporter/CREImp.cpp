@@ -556,7 +556,7 @@ void CREImp::ReadChrHeader(Actor *act)
 	name[32]=0;
 	tmpDword = *(ieDword *) name;
 	if (tmpDword != 0 && tmpDword !=1) {
-		act->SetText( name, 0 ); //setting longname
+		act->SetName( name, 0 ); //setting longname
 	}
 	str->ReadDword( &offset);
 	str->ReadDword( &size);
@@ -709,11 +709,11 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 	str->ReadDword( &act->LongStrRef );
 	//Beetle name in IWD needs the allow zero flag
 	char* poi = core->GetString( act->LongStrRef, IE_STR_ALLOW_ZERO );
-	act->SetText( poi, 1 ); //setting longname
+	act->SetName( poi, 1 ); //setting longname
 	free( poi );
 	str->ReadDword( &act->ShortStrRef );
 	poi = core->GetString( act->ShortStrRef );
-	act->SetText( poi, 2 ); //setting shortname (for tooltips)
+	act->SetName( poi, 2 ); //setting shortname (for tooltips)
 	free( poi );
 	act->BaseStats[IE_VISUALRANGE] = 30; //this is just a hack
 	act->BaseStats[IE_DIALOGRANGE] = 15; //this is just a hack
