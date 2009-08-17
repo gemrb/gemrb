@@ -180,7 +180,7 @@
 0x7F01     MMIN       MMIN       MMIN       MMIN       4          2          1          *
 0x7F02     MBEH       MBEH       MBEH       MBEH       4          3          1          *
 0x7F03     MIMP       MIMP       MIMP       MIMP       4          2          1          *
-0x7F04     MIGO       MIGO       MIGO       MIGO       4          4          1          *
+0x7F04     MIGO       MIGO       MIGO       MIGO       15         4          1          *
 0x7F05     MDJI       MDJI       MDJI       MDJI       4          2          1          *
 0x7F06     MDJL       MDJL       MDJL       MDJL       4          2          1          *
 0x7F07     MGLC       MGLC       MGLC       MGLC       4          2          1          *
@@ -208,7 +208,7 @@
 0x7F23     MSAT       MSAT       MSAT       MSAT       4          2          1          *
 0x7F24     NPIR       NPIR       NPIR       NPIR       4          2          1          *
 0x7F27     MDRO       MDRO       MDRO       MDRO       4          2          1          *
-0x7F28     MKUL       MKUL       MKUL       MKUL       4          2          1          *
+0x7F28     MKUL       MKUL       MKUL       MKUL       15         2          1          *
 0x7F29     MFDR       MFDR       MFDR       MFDR       4          2          1          *
 0x7F2A     NSAI       NSAI       NSAI       NSAI       4          2          1          *
 0x7F2B     MMAX       MMAX       MMAX       MMAX       4          2          1          *
