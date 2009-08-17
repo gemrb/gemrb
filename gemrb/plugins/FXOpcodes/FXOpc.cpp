@@ -3481,8 +3481,9 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	//TODO:
-	//copy the animation ID
+	//copy the animation ID; never resets back! shapeshift to natural doesn't work either
+	//target->SetAnimationID( newCreature->GetStat(IE_ANIMATION_ID) );
+	//TODO: also change the inventory paper doll
 
 	//copy all polymorphed stats
 	if(fx->Parameter2) {
