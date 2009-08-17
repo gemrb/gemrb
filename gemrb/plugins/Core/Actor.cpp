@@ -2650,7 +2650,7 @@ void Actor::Die(Scriptable *killer)
 	game->SelectActor(this, false, SELECT_NORMAL);
 	game->OutAttack(GetID());
 
-	ClearActions();
+	// actions are NOT cleared on death
 	ClearPath();
 	SetModal( 0 );
 	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
