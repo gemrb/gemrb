@@ -2736,10 +2736,8 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 	}
 	Sender->CastSpell (spellres, tar, false);
 	if (tar->Type==ST_ACTOR) {
-		//Sender->LastTarget=tar->GetGlobalID();
 		Sender->CastSpellEnd(spellres);
 	} else {
-		//GetPositionFromScriptable(tar, Sender->LastTargetPos, false);
 		Sender->CastSpellPointEnd(spellres);
 	}
 	Sender->ReleaseCurrentAction();
@@ -5521,6 +5519,7 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 	}
 	if (tar->Type==ST_ACTOR) {
 		//apply spell on target
+/*
 		Actor *owner;
 
 		if (Sender->Type==ST_ACTOR) {
@@ -5528,9 +5527,12 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 		} else {
 			owner = (Actor *) tar;
 		}
-		core->ApplySpell(spellres, (Actor *) tar, owner, parameters->int1Parameter);
+*/
+		//core->ApplySpell(spellres, (Actor *) tar, owner, parameters->int1Parameter);
+		core->ApplySpell(spellres, (Actor *) tar, Sender, parameters->int1Parameter);
 	} else {
 		//no idea about this one
+/*
 		Actor *owner;
 
 		if (Sender->Type==ST_ACTOR) {
@@ -5538,10 +5540,12 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 		} else {
 			owner = NULL;
 		}
+*/
 		//apply spell on point
 		Point d;
 		GetPositionFromScriptable(tar, d, false);
-		core->ApplySpellPoint(spellres, tar->GetCurrentArea(), d, owner, parameters->int1Parameter);
+		//core->ApplySpellPoint(spellres, tar->GetCurrentArea(), d, owner, parameters->int1Parameter);
+		core->ApplySpellPoint(spellres, tar->GetCurrentArea(), d, Sender, parameters->int1Parameter);
 	}
 }
 
