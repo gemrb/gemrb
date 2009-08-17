@@ -120,7 +120,7 @@
 #define STR_LOCKPICK_FAILED 86
 #define STR_STATIC_DISS     87
 #define STR_LIGHTNING_DISS  88
-//89
+#define STR_UNUSABLEITEM    89       //item has no usable ability
 #define STR_ITEMID          90       //item needs identify
 #define STR_WRONGITEMTYPE   91
 #define STR_ITEMEXCL        92
