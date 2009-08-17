@@ -815,10 +815,12 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		str->Seek( SpawnOffset + (i*0xc8), GEM_STREAM_START );
 		ieVariable Name;
 		ieWord XPos, YPos;
-		ieWord Count, Difficulty, Flags;
+		ieWord Count, Difficulty, Frequency, Method;
+		ieWord Maximum, Enabled;
 		ieResRef creatures[MAX_RESCOUNT];
 		ieWord DayChance, NightChance;
 		ieDword Schedule;
+		ieByte Unknown7c[8];
 
 		str->Read( Name, 32 );
 		Name[32] = 0;
@@ -828,17 +830,30 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadResRef( creatures[j] );
 		}
 		str->ReadWord( &Count);
-		str->Seek( 14, GEM_CURRENT_POS); //skipping unknowns
 		str->ReadWord( &Difficulty);
-		str->ReadWord( &Flags);
+		str->ReadWord( &Frequency );
+		str->ReadWord( &Method);
+		str->Read( Unknown7c, 8); //skipping unknowns
+		str->ReadWord( &Maximum);
+		str->ReadWord( &Enabled);
 		str->ReadDword( &Schedule);
 		str->ReadWord( &DayChance);
 		str->ReadWord( &NightChance);
 
 		Spawn *sp = map->AddSpawn(Name, XPos, YPos, creatures, Count);
-		sp->appearance = Schedule;
 		sp->Difficulty = Difficulty;
-		sp->Flags = Flags;
+		//this value is used in a division, better make it nonzero now
+		//this will fix any old gemrb saves vs. the original engine
+		if (!Frequency) {
+			Frequency = 1;
+		}
+		sp->Frequency = Frequency;
+		sp->Method = Method;
+		//these seem to be one dword, and two words
+		memcpy(sp->unknown7c, Unknown7c, sizeof(Unknown7c));
+		sp->Maximum = Maximum;
+		sp->Enabled = Enabled;
+		sp->appearance = Schedule;
 		sp->DayChance = DayChance;
 		sp->NightChance = NightChance;
 		//the rest is not read, we seek for every record
@@ -1736,9 +1751,12 @@ int AREImp::PutSpawns( DataStream *stream, Map *map)
 			stream->Write( filling, 8);
 		}
 		stream->WriteWord( &tmpWord );
-		stream->Write( filling, 14); //these values may actually mean something, but we don't care now
 		stream->WriteWord( &sp->Difficulty);
-		stream->WriteWord( &sp->Flags);
+		stream->WriteWord( &sp->Frequency);
+		stream->WriteWord( &sp->Method);
+		stream->Write( sp->unknown7c, 8); //these values may actually mean something, but we don't care now
+		stream->WriteWord( &sp->Maximum);
+		stream->WriteWord( &sp->Enabled);
 		stream->WriteDword( &sp->appearance);
 		stream->WriteWord( &sp->DayChance);
 		stream->WriteWord( &sp->NightChance);

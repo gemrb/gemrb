@@ -5477,7 +5477,7 @@ void GameScript::SpawnPtActivate(Scriptable* Sender, Action* parameters)
 		Map *map = Sender->GetCurrentArea();
 		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
 		if (spawn) {
-			spawn->Flags = 1;
+			spawn->Enabled = 1;
 		}
 	}
 }
@@ -5488,7 +5488,7 @@ void GameScript::SpawnPtDeactivate(Scriptable* Sender, Action* parameters)
 		Map *map = Sender->GetCurrentArea();
 		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
 		if (spawn) {
-			spawn->Flags = 0;
+			spawn->Enabled = 0;
 		}
 	}
 }
@@ -5499,7 +5499,7 @@ void GameScript::SpawnPtSpawn(Scriptable* Sender, Action* parameters)
 		Map *map = Sender->GetCurrentArea();
 		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
 		if (spawn) {
-			spawn->Flags = 1; //??? maybe use an unconditionality flag
+			spawn->Enabled = 1; //??? maybe use an unconditionality flag
 			map->TriggerSpawn(spawn);
 		}
 	}

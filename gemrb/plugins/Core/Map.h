@@ -140,11 +140,15 @@ public:
 	Point Pos;
 	ieResRef *Creatures;
 	unsigned int Count;
-	ieDword appearance;
 	ieWord Difficulty;
+	ieWord Frequency;
+	ieWord Method;
+	ieByte unknown7c[8];
+	ieWord Maximum;
+	ieWord Enabled;
+	ieDword appearance;
 	ieWord DayChance;
 	ieWord NightChance;
-	ieWord Flags;
 	Spawn() { Creatures=NULL;  }
 	~Spawn() { if(Creatures) free(Creatures); }
 	unsigned int GetCreatureCount() { return Count; }

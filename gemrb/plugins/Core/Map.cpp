@@ -2673,7 +2673,7 @@ void Map::SpawnCreature(Point &pos, const char *CreName, int radius)
 void Map::TriggerSpawn(Spawn *spawn)
 {
 	//is it still active
-	if (!spawn->Flags) {
+	if (!spawn->Enabled) {
 		return;
 	}
 	//check schedule
@@ -2692,7 +2692,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 		SpawnCreature(spawn->Pos, spawn->Creatures[i], 0);
 	}
 	//disable spawnpoint
-	spawn->Flags = 0;
+	spawn->Enabled = 0;
 }
 
 //--------restheader----------------
