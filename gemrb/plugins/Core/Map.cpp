@@ -1694,7 +1694,8 @@ void Map::GenerateQueues()
 				//just became visible
 				if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
 					priority = PR_SCRIPT; //run scripts and display, activated now
-					actor->Unhide();
+					//more like activate!
+					actor->Activate();
 					ActorSpottedByPlayer(actor);
 				} else {
 					priority = PR_IGNORE;
