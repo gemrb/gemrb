@@ -1251,19 +1251,22 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 
 void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
 {
-	CREItem *TmpItem = new CREItem();
-	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
-	TmpItem->Expired=0;
-	TmpItem->Usages[0]=(ieWord) Charge0;
-	TmpItem->Usages[1]=(ieWord) Charge1;
-	TmpItem->Usages[2]=(ieWord) Charge2;
-	TmpItem->Flags=0;
-	if (core->ResolveRandomItem(TmpItem) && gamedata->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
-		SetSlotItem( TmpItem, SlotID );
+	if(ItemResRef[0]) {
+		CREItem *TmpItem = new CREItem();
+		strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
+		TmpItem->Expired=0;
+		TmpItem->Usages[0]=(ieWord) Charge0;
+		TmpItem->Usages[1]=(ieWord) Charge1;
+		TmpItem->Usages[2]=(ieWord) Charge2;
+		TmpItem->Flags=0;
+		if (core->ResolveRandomItem(TmpItem) && gamedata->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
+			SetSlotItem( TmpItem, SlotID );
+		} else {
+			delete TmpItem;
+		}
 	} else {
 		//if the item isn't creatable, we still destroy the old item
 		KillSlot( SlotID );
-		delete TmpItem;
 	}
 	CalculateWeight();
 }
@@ -1275,7 +1278,12 @@ void Inventory::BreakItemSlot(ieDword slot)
 
 	const Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) return;
-	memcpy(newItem, itm->ReplacementItem,sizeof(newItem) );
+	//if it is the magic weapon slot, don't break it, just remove it, because it couldn't be removed
+	if(slot ==(unsigned int) SLOT_MAGIC) {
+		newItem[0]=0;
+	} else {
+		memcpy(newItem, itm->ReplacementItem,sizeof(newItem) );
+	}
 	gamedata->FreeItem( itm, Slot->ItemResRef, true );
 	//this depends on setslotitemres using setslotitem
 	SetSlotItemRes(newItem, slot, 0,0,0);

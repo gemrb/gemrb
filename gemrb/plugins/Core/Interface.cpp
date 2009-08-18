@@ -357,7 +357,7 @@ Interface::~Interface(void)
 	for (i = 0; i < musiclist.size(); i++) {
 		free((void *)musiclist[i]);
 	}
-	
+
 	delete plugin_flags;
 
 	delete projserv;
@@ -889,7 +889,7 @@ bool Interface::ReadMusicTable(const ieResRef tablename, int col) {
 char *Interface::GetMusicPlaylist(int SongType) const {
 	if (SongType < 0 || (unsigned int)SongType >= musiclist.size())
 		return NULL;
-	
+
 	return musiclist[SongType];
 }
 
@@ -1457,7 +1457,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
-	
+
 	printMessage("Core", "Loading music list...\n", WHITE );
 	if (HasFeature( GF_HAS_SONGLIST )) {
 		ret = ReadMusicTable("songlist", 1);
@@ -2405,7 +2405,7 @@ ScriptEngine* Interface::GetGUIScriptEngine() const
 }
 
 //NOTE: if there were more summoned creatures, it will return only the last
-Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, Point &position, int eamod, int level)
+Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, Point &position, int eamod, int level, Effect *fx)
 {
 	//maximum number of monsters summoned
 	int cnt=10;
@@ -2496,7 +2496,10 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		if (ab->BaseStats[IE_EA]<EA_GOODCUTOFF) {
 			ab->SetBase(IE_XPVALUE, 0);
 		}
-
+		if (fx) {
+printf("Applied %x\n", fx->Opcode);
+			ApplyEffect(fx, ab, Owner);
+		}
 	}
 	return ab;
 }
@@ -2939,7 +2942,7 @@ void Interface::HandleGUIBehaviour(void)
 				gc->EndDialog();
 			} else if ( (int)var !=-3) {
 				gc->DialogChoose(var);
-				
+
 				// the last node of a dialog can have a new-dialog action! don't interfere in that case
 				ieDword newvar = 0; vars->Lookup("DialogChoose", newvar);
 				if (var == (ieDword) -1 || newvar != (ieDword) -1) {
@@ -3724,7 +3727,7 @@ cleanup:
 
 GameControl *Interface::GetGameControl() const
 {
- 	Window *window = GetWindow( 0 );
+	Window *window = GetWindow( 0 );
 	// in the beginning, there's no window at all
 	if (! window)
 		return NULL;
@@ -3953,7 +3956,7 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 			if (!ret) {
 				DisplayConstantString(STR_UNUSABLEITEM, 0xf0f0f0);
 				return 0;
-			}	
+			}
 		}
 	}
 
@@ -4794,6 +4797,10 @@ void Interface::ApplySpellPoint(const ieResRef resname, Map* area, Point &pos, S
 //1 means the effect was applied
 int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
 {
+	if (!effect) {
+		return 0;
+	}
+
 	EffectQueue *fxqueue = new EffectQueue();
 	//AddEffect now copies the fx data, please delete your effect reference
 	//if you created it. (Don't delete cached references)
@@ -4821,12 +4828,12 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
 	return res;
 }
 
-int Interface::ApplyEffect(const ieResRef resname, Actor *actor, Scriptable *caster, int level, Point &p)
+Effect *Interface::GetEffect(const ieResRef resname, int level, Point &p)
 {
 	//Don't free this reference, it is cached!
 	Effect *effect = gamedata->GetEffect(resname);
 	if (!effect) {
-		return 0;
+		return NULL;
 	}
 	if (!level) {
 		level = 1;
@@ -4834,8 +4841,7 @@ int Interface::ApplyEffect(const ieResRef resname, Actor *actor, Scriptable *cas
 	effect->Power = level;
 	effect->PosX=p.x;
 	effect->PosY=p.y;
-	//don't use effect->SetPosition here, effect is cached, and has a dirty position
-	return ApplyEffect(effect, actor, caster);
+	return effect;
 }
 
 // dealing with saved games
@@ -4972,7 +4978,7 @@ int Interface::CompressSave(const char *folder)
 
 	//.tot and .toh should be saved last, because they are updated when an .are is saved
 	int priority=2;
-	while(priority) {    
+	while(priority) {
 		do {
 			char dtmp[_MAX_PATH];
 			struct stat fst;

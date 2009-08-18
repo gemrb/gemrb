@@ -1844,7 +1844,7 @@ int power_word_stun_iwd2(Actor *target, Effect *fx)
 	else if (hp>50) stuntime = core->Roll(2,4,0);
 	else stuntime = core->Roll(4,4,0);
 	fx->Parameter2 = 0;
-	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+	fx->TimingMode = FX_DURATION_ABSOLUTE;
 	fx->Duration = stuntime*6*ROUND_SIZE + core->GetGame()->GameTime;
 	STATE_SET( STATE_STUNNED );
 	target->AddPortraitIcon(PI_STUN);
@@ -2233,8 +2233,11 @@ int fx_transparency_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-static int eamods[]={EAM_ALLY,EAM_ALLY,EAM_DEFAULT,EAM_ALLY,EAM_DEFAULT,EAM_ENEMY,EAM_ALLY};
 // 0x43 SummonCreature
+
+static EffectRef fx_unsummon_creature_ref={"UnsummonCreature",NULL,-1};
+static int eamods[]={EAM_ALLY,EAM_ALLY,EAM_DEFAULT,EAM_ALLY,EAM_DEFAULT,EAM_ENEMY,EAM_ALLY};
+
 int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_summon_creature (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
@@ -2258,7 +2261,12 @@ int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
 
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, eamod, 0);
+	Effect *newfx = NULL;
+	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
+		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
+	}
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, eamod, 0, newfx);
+	delete newfx;
 	return FX_NOT_APPLIED;
 }
 
@@ -2897,7 +2905,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->inventory.SetSlotItemRes(fx->Resource, target->inventory.GetMagicSlot(),fx->Parameter1,fx->Parameter3,fx->Parameter4);
 	//equip the weapon
 	target->inventory.SetEquippedSlot(target->inventory.GetMagicSlot()-target->inventory.GetWeaponSlot(), 0);
-	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
+	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
 //if this effect has expiration, then it will remain as a remove_item
 //on the effect queue, inheriting all the parameters
 		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_item_ref);
@@ -3145,7 +3153,7 @@ int fx_create_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_inventory_item (%2d)\n", fx->Opcode );
 	target->inventory.AddSlotItemRes( fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
-	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
+	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
 //if this effect has expiration, then it will remain as a remove_item
 //on the effect queue, inheriting all the parameters
 		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_inventory_item_ref);
@@ -3283,7 +3291,12 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
 
-	core->SummonCreature(monster, hit, Owner, target, p, fx->Parameter2/5, level);
+	Effect *newfx = NULL;
+	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
+		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
+	}
+	core->SummonCreature(monster, hit, Owner, target, p, fx->Parameter2/5, level, newfx);
+	delete newfx;
 	return FX_NOT_APPLIED;
 }
 
@@ -3296,7 +3309,7 @@ int fx_set_confused_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
+	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
 		BASE_STATE_SET( STATE_CONFUSED );
 	} else {
 		STATE_SET( STATE_CONFUSED );
@@ -3630,7 +3643,7 @@ int fx_create_item_in_slot (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_create_item_in_slot (%2d): Button: %d\n", fx->Opcode, fx->Parameter2 );
 	//create item and set it in target's slot
 	target->inventory.SetSlotItemRes( fx->Resource, core->QuerySlot(fx->Parameter2), fx->Parameter1, fx->Parameter3, fx->Parameter4 );
-	if (fx->TimingMode!=FX_DURATION_INSTANT_LIMITED) {
+	if (fx->TimingMode!=FX_DURATION_ABSOLUTE) {
 		//convert it to a destroy item
 		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_item_ref);
 		fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
@@ -3833,7 +3846,12 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 	default:;
 	}
 	//create replacement; should we be passing the target instead of NULL?
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, EAM_DEFAULT,-1);
+	Effect *newfx = NULL;
+	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
+		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
+	}
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, EAM_DEFAULT,-1, newfx);
+	delete newfx;
 	return FX_NOT_APPLIED;
 }
 
@@ -4161,23 +4179,38 @@ int fx_hold_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xb0 see: fx_movement_modifier
 
 //0xb1 ApplyEffect
-int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_apply_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_apply_effect (%2d) %s", fx->Opcode, fx->Resource );
+
+	//this effect executes a file effect in place of this effect
+	//the file effect inherits the target and the timingmode, but gets
+	//a new chance to roll percents
+	int ret = FX_NOT_APPLIED;
+	if (!target) {
+		return ret;
+	}
 	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
-		//apply effect, if the effect is a goner, then kill
-		//this effect too
 		Point p(fx->PosX, fx->PosY);
 
-		if(core->ApplyEffect(fx->Resource, target, Owner, fx->Power, p)) {
-			return FX_APPLIED;
+		//apply effect, if the effect is a goner, then kill
+		//this effect too
+		Effect *newfx = core->GetEffect(fx->Resource, fx->Power, p);
+		if (newfx) {
+			Effect *myfx = new Effect;
+			memcpy(myfx, newfx, sizeof(Effect));
+			myfx->random_value = core->Roll(1,100,0);
+			myfx->Target = FX_TARGET_PRESET;
+			myfx->TimingMode = fx->TimingMode;
+			myfx->Duration = fx->Duration;
+			ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply);
+			delete myfx;
 		}
-		return FX_NOT_APPLIED;
+		//newfx is a borrowed reference don't delete it
 	}
-	//FIXME:
-	//if the ids don't match, the effect will still stick?
-	return FX_APPLIED;
+	return ret;
 }
+
 //0xb2 hitbonus generic effect ToHitVsCreature
 //0xb3 damagebonus generic effect DamageVsCreature
 // b4 can't use item (resource) generic effect CantUseItem
@@ -4301,10 +4334,13 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	//summon familiar with fx->Resource
 	Point p(fx->PosX, fx->PosY);
-	Actor *fam = core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_DEFAULT, 0);
+	Effect *newfx = NULL;
+	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
+		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
+	}
+	Actor *fam = core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_DEFAULT, 0, newfx);
+	delete newfx;
 	if (fam) {
-		Effect *newfx;
-
 		newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, (ieDword) -10, 0, FX_DURATION_INSTANT_PERMANENT);
 		core->ApplyEffect(newfx, fam, fam);
 		delete newfx;
@@ -4545,7 +4581,7 @@ int fx_power_word_stun (Scriptable* Owner, Actor* target, Effect* fx)
 	//depending on the current hitpoints (or the stat in param2)
 	stat = core->Roll(stat,x?x:4,0) * ROUND_SIZE;
 	fx->Duration = core->GetGame()->GameTime+stat;
-	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+	fx->TimingMode = FX_DURATION_ABSOLUTE;
 	fx->Opcode = EffectQueue::ResolveEffect(fx_set_stun_state_ref);
 	return fx_set_stun_state(Owner,target,fx);
 }
@@ -4684,7 +4720,7 @@ int fx_power_word_sleep (Scriptable* Owner, Actor* target, Effect* fx)
 	//translate this effect to a normal sleep effect
 	//recalculate delay
 	fx->Duration = core->GetGame()->GameTime+x*ROUND_SIZE;
-	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+	fx->TimingMode = FX_DURATION_ABSOLUTE;
 	fx->Opcode = EffectQueue::ResolveEffect(fx_sleep_ref);
 	fx->Parameter2=0;
 	return fx_set_unconscious_state(Owner,target,fx);
@@ -4968,8 +5004,6 @@ int fx_wing_buffet (Scriptable* Owner, Actor* target, Effect* fx)
 
 // 0xec ProjectImage
 
-static EffectRef fx_unsummon_creature_ref={"UnsummonCreature",NULL,-1};
-
 int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	const char * resref = NULL;
@@ -4998,6 +5032,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	Effect *newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
 	core->ApplyEffect(newfx, copy, target);
+	delete newfx;
 	return FX_NOT_APPLIED;
 }
 
@@ -5231,7 +5266,7 @@ int fx_create_item_days (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_item_days (%2d)\n", fx->Opcode );
 	target->inventory.AddSlotItemRes( fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
-	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
+	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
 //if this effect has expiration, then it will remain as a remove_item
 //on the effect queue, inheriting all the parameters
 		//duration needs a hack (recalculate it for days)
@@ -5449,29 +5484,36 @@ int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_apply_effect_repeat (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	Point p(fx->PosX, fx->PosY);
+	Effect *newfx = core->GetEffect(fx->Resource, fx->Power, p);
+	if (!newfx) {
+		return FX_NOT_APPLIED;
+	}
+
 	switch (fx->Parameter2) {
 		case 0: //once per second
 		case 1: //crash???
-			core->ApplyEffect(fx->Resource, target, Owner, fx->Power, p);
+			core->ApplyEffect(newfx, target, Owner);
 			break;
 		case 2://param1 times every second
 			for (i=0;i<fx->Parameter1;i++) {
-				core->ApplyEffect(fx->Resource, target, Owner, fx->Power, p);
+				core->ApplyEffect(newfx, target, Owner);
 			}
 			break;
 		case 3: //once every Param1 second
 			if (fx->Parameter1 && (core->GetGame()->GameTime%fx->Parameter1)) {
-				core->ApplyEffect(fx->Resource, target, Owner, fx->Power, p);
+				core->ApplyEffect(newfx, target, Owner);
 			}
 			break;
 		case 4: //param3 times every Param1 second
 			if (fx->Parameter1 && (core->GetGame()->GameTime%fx->Parameter1)) {
 				for (i=0;i<fx->Parameter3;i++) {
-					core->ApplyEffect(fx->Resource, target, Owner, fx->Power, p);
+					core->ApplyEffect(newfx, target, Owner);
 				}
 			}
 			break;
 	}
+	//core->GetEffect is a borrowed reference, don't delete it
+	//delete newfx;
 	return FX_APPLIED;
 }
 
@@ -5609,16 +5651,36 @@ int fx_scripting_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x11b ApplyEffectCurse
-int fx_apply_effect_curse (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_apply_effect_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_apply_effect_curse (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//this effect executes a file effect in place of this effect
+	//the file effect inherits the target and the timingmode, but gets
+	//a new chance to roll percents
+	int ret = FX_NOT_APPLIED;
+	if (!target) {
+		return ret;
+	}
+
 	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
-		//load effect and add it to the end of the effect queue?
 		Point p(fx->PosX, fx->PosY);
 
-		core->ApplyEffect(fx->Resource, target, Owner, fx->Power, p);
+		//apply effect, if the effect is a goner, then kill
+		//this effect too
+		Effect *newfx = core->GetEffect(fx->Resource, fx->Power, p);
+		if (newfx) {
+			Effect *myfx = new Effect;
+			myfx->random_value = core->Roll(1,100,0);
+			myfx->TimingMode=fx->TimingMode;
+			myfx->Duration=fx->Duration;
+			memcpy(myfx, newfx, sizeof(Effect));
+			ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply);
+			delete myfx;
+		}
+		//newfx is a borrowed reference don't delete it
 	}
-	return FX_APPLIED;
+	return ret;
 }
 
 // 0x11c MeleeHitModifier

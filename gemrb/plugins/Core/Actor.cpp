@@ -3733,11 +3733,18 @@ void Actor::PerformAttack(ieDword gameTime)
 	//damage type is?
 	//modify defense with damage type
 	ieDword damagetype = hittingheader->DamageType;
-	int damage = core->Roll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus);
-	printf("| Damage %dd%d%+d = %d ",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
-	int damageluck = (int) GetStat(IE_DAMAGELUCK);
-	if (damage<damageluck) {
-		damage = damageluck;
+	int damage;
+	
+	if (hittingheader->DiceThrown<256) {
+		damage = core->Roll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus);
+		printf("| Damage %dd%d%+d = %d ",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
+		int damageluck = (int) GetStat(IE_DAMAGELUCK);
+		if (damage<damageluck) {
+			damage = damageluck;
+		}
+	} else {
+		printf("| No Damage");
+		damage = 0;
 	}
 
 	if (roll >= (ATTACKROLL - (int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus)) {
@@ -4933,13 +4940,12 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 	switch(itm->UseCharge(item->Usages, header, true)) {
 		case CHG_DAY:
 			break;
-		case CHG_NOSOUND: //remove item
-			inventory.BreakItemSlot(slot);
-			break;
 		case CHG_BREAK: //both
 			if (!silent) {
 				core->PlaySound(DS_ITEM_GONE);
 			}
+			//fall through
+		case CHG_NOSOUND: //remove item
 			inventory.BreakItemSlot(slot);
 			break;
 		default: //don't do anything
