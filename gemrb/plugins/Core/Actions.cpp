@@ -4024,9 +4024,9 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 		myinv->AddItem(item);
 	} else {
 		if ( ASI_SUCCESS != myinv->AddSlotItem(item, SLOT_ONLYINVENTORY)) {
-			Map *map=Sender->GetCurrentArea();
+			Map *map=tar->GetCurrentArea();
 			// drop it at my feet
-			map->AddItemToLocation(Sender->Pos, item);
+			map->AddItemToLocation(tar->Pos, item);
 			if (((Actor *)tar)->InParty) core->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
 		} else {
 			if (((Actor *)tar)->InParty) core->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
