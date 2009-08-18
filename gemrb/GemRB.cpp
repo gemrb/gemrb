@@ -43,7 +43,7 @@
 
 //this supposed to convince SDL to work on OS/X
 #ifdef __APPLE_CC__ // we need startup SDL here
-#include "SDL.h"
+#include "SDL/SDL.h"
 #endif
 
 int main(int argc, char* argv[])

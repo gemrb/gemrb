@@ -42,8 +42,13 @@
 #include "StackLock.h"
 
 #ifndef WIN32
+#ifdef __APPLE_CC__
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
+#else
 #include <AL/al.h>
 #include <AL/alc.h>
+#endif 
 #else
 #include <al.h>
 #include <alc.h>
