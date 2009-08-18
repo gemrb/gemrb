@@ -498,12 +498,12 @@ void Scriptable::SetCutsceneID(Scriptable *csid)
 
 void Scriptable::Hide()
 {
-	InternalFlags &=~(IF_ACTIVE|IF_VISIBLE);
+	InternalFlags &=~(IF_VISIBLE);
 }
 
 void Scriptable::Unhide()
 {
-	InternalFlags |= IF_ACTIVE|IF_VISIBLE;
+	InternalFlags |= IF_VISIBLE;
 }
 
 void Scriptable::Interrupt()
@@ -710,10 +710,11 @@ void Scriptable::SpellCast(const ieResRef SpellResRef)
 
 	//cfb
 	if (Type == ST_ACTOR) {
+		//The ext. index is here to calculate the casting time
 		int level = ((Actor *) this)->GetXPLevel(true);
 		SpellHeader = spl->GetHeaderIndexFromLevel(level);
 		Actor *actor = (Actor *) this;
-		EffectQueue *fxqueue = spl->GetEffectBlock(-1, SpellHeader);
+		EffectQueue *fxqueue = spl->GetEffectBlock(-1, SpellHeader, 0);
 		fxqueue->SetOwner(actor);
 		fxqueue->AddAllEffects(actor, actor->Pos);
 		delete fxqueue;

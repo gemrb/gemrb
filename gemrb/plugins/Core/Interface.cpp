@@ -4747,10 +4747,8 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Scriptable *cas
 		return;
 	}
 
-	actor->RollSaves();
-
 	level = spell->GetHeaderIndexFromLevel(level);
-	EffectQueue *fxqueue = spell->GetEffectBlock(level);
+	EffectQueue *fxqueue = spell->GetEffectBlock(level, -1, 0);
 
 	//check effect immunities
 	int res = fxqueue->CheckImmunity ( actor );

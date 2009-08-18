@@ -170,7 +170,7 @@ public:
 	//converts a wanted level to block index count
 	int GetHeaderIndexFromLevel(int level) const;
 	//-1 will return the cfb
-	EffectQueue *GetEffectBlock(int block_index, int ext_index=-1) const;
+	EffectQueue *GetEffectBlock(int block_index, int ext_index=-1, ieDword pro=0) const;
 	//returns a projectile created from an extended header
 	Projectile *GetProjectile(int headerindex) const;
 	unsigned int GetCastingDistance(Actor *actor) const;

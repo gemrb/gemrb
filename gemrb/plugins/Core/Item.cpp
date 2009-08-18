@@ -69,8 +69,8 @@ EffectQueue *Item::GetEffectBlock(int usage, ieDwordSigned invslot, ieDword pro)
 
 	for (int i=0;i<count;i++) {
 		Effect *fx = features+i;
-		fx->InventorySlot=invslot;
-		fx->Projectile=pro;
+		fx->InventorySlot = invslot;
+		fx->Projectile = pro;
 		fxqueue->AddEffect( fx );
 	}
 

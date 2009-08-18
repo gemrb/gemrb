@@ -71,7 +71,7 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 //otherwise set to caster level
 static EffectRef fx_casting_glow_ref={"CastingGlow",NULL,-1};
 
-EffectQueue *Spell::GetEffectBlock(int block_index, int ext_index) const
+EffectQueue *Spell::GetEffectBlock(int block_index, int ext_index, ieDword pro) const
 {
 	Effect *features;
 	int count;
@@ -95,7 +95,9 @@ EffectQueue *Spell::GetEffectBlock(int block_index, int ext_index) const
 	if (block_index==-1) {
 		assert(ext_index>=0);
 		Effect *fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
-		fx->Duration=ext_headers[ext_index].CastingTime+core->GetGame()->GameTime;
+		fx->Duration = ext_headers[ext_index].CastingTime+core->GetGame()->GameTime;
+		fx->InventorySlot = 0xffff;
+		fx->Projectile = 0;
 		fxqueue->AddEffect(fx);
 		//AddEffect creates a copy, we need to destroy the original
 		delete fx;
@@ -106,9 +108,13 @@ EffectQueue *Spell::GetEffectBlock(int block_index, int ext_index) const
 			//fxqueue->AddEffect will copy the effect,
 			//so we don't risk any overwriting
 			if (EffectQueue::HasDuration(features+i)) {
-				features[i].Duration=(TimePerLevel*block_index+TimeConstant)*7;
+				features[i].Duration = (TimePerLevel*block_index+TimeConstant)*7;
 			}
 		}
+		//fill these for completeness, inventoryslot is a good way
+		//to discern a spell from an item effect
+		features[i].InventorySlot = 0xffff;
+		features[i].Projectile = pro;
 		fxqueue->AddEffect( features+i );
 	}
 	return fxqueue;
@@ -124,7 +130,7 @@ Projectile *Spell::GetProjectile(int header) const
 	}
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 	if (seh->FeatureCount) {
-		pro->SetEffects(GetEffectBlock(header));
+		pro->SetEffects(GetEffectBlock(header,-1,seh->ProjectileAnimation));
 	}
 	return pro;
 }

@@ -505,7 +505,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point
 			Actor* actor = map->GetActor( i, true );
 			//don't pick ourselves
 			if (Owner->Type==ST_ACTOR && (Actor *)Owner==actor) {
-			  continue;
+				continue;
 			}
 			fx->SetPosition(actor->Pos);
 			//fx->PosX=actor->Pos.x;
@@ -620,6 +620,9 @@ int EffectQueue::AddAllEffects(Actor* target, Point &destination)
 	// pre-roll dice for fx needing them and stow them in the effect
 	ieDword random_value = core->Roll( 1, 100, 0 );
 
+	if (target) {
+		target->RollSaves();
+	}
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//handle resistances and saving throws here
@@ -1770,6 +1773,12 @@ int EffectQueue::CheckImmunity(Actor *target) const
 
 		//projectile immunity
 		if (target->ImmuneToProjectile(fx->Projectile)) return 0;
+
+		//don't resist item projectile payloads based on spell school, bounce, etc.
+		if(fx->InventorySlot) {
+			return 1;
+		}
+
 		//check level resistances
 		//check specific spell immunity
 		//check school/sectype immunity
