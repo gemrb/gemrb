@@ -256,7 +256,7 @@ void Scriptable::ImmediateEvent()
 bool Scriptable::IsPC()
 {
 	if(Type == ST_ACTOR) {
-		if (((Actor *) this)->InParty) {
+		if (((Actor *) this)->GetStat(IE_EA) <= EA_CHARMED) {
 			return true;
 		}
 	}
@@ -292,7 +292,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	bool continuing = false, done = false;
 	for (int i = 0;i<scriptCount;i++) {
 		//disable AI script level for actors in party when the player disabled them
-		if ((i == AI_SCRIPT_LEVEL) && IsPC() ) {
+		if ((i == AI_SCRIPT_LEVEL) && Type == ST_ACTOR && ((Actor *) this)->InParty) {
 			if (core->GetGame()->ControlStatus&CS_PARTY_AI) {
 				continue;
 			}
