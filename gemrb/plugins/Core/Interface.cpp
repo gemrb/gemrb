@@ -2497,7 +2497,6 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			ab->SetBase(IE_XPVALUE, 0);
 		}
 		if (fx) {
-printf("Applied %x\n", fx->Opcode);
 			ApplyEffect(fx, ab, Owner);
 		}
 	}

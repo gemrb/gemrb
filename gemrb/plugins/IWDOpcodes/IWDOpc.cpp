@@ -777,7 +777,6 @@ int fx_slow_poison (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #define IWD_MSC 13
 
 //this requires the FXOpcode package
-static EffectRef fx_unsummon_creature_ref={"UnsummonCreature",NULL,-1};
 ieResRef iwd_monster_2da[IWD_MSC]={"MSUMMO1","MSUMMO2","MSUMMO3","MSUMMO4",
  "MSUMMO5","MSUMMO6","MSUMMO7","ASUMMO1","ASUMMO2","ASUMMO3","CDOOM","GINSECT",
  "MSUMMOM"};
@@ -807,10 +806,7 @@ int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
-	Effect *newfx = NULL;
-	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-	}
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
@@ -871,10 +867,7 @@ int fx_animate_dead (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
-	Effect *newfx = NULL;
-	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-	}
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
@@ -951,10 +944,7 @@ int fx_summon_monster2 (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
-	Effect *newfx = NULL;
-	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-	}
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
@@ -1042,10 +1032,7 @@ int fx_summon_shadow_monster (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
-	Effect *newfx = NULL;
-	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-	}
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
@@ -1321,10 +1308,7 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter2<4){
 		eamod = eamods[fx->Parameter2];
 	}
-	Effect *newfx = NULL;
-	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-	}
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, target->Pos, eamod, 0, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
@@ -1637,10 +1621,7 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 		core->GetResRefFrom2DA("souleatr", monster, hit, areahit);
 		//the monster should appear near the effect position
 		Point p(fx->PosX, fx->PosY);
-		Effect *newfx = NULL;
-		if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
-		        newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-		}
+		Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 		core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1, newfx);
 		delete newfx;
 	}
@@ -2335,10 +2316,7 @@ int fx_summon_ally (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 	Point p(fx->PosX, fx->PosY);
-	Effect *newfx = NULL;
-       	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-       	}
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_ALLY, 0, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
@@ -2355,10 +2333,7 @@ int fx_summon_enemy (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 	Point p(fx->PosX, fx->PosY);
-	Effect *newfx = NULL;
-       	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-       	}
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_ENEMY, 0, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;

@@ -236,6 +236,7 @@ public:
 	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieWord timing);
 	EffectQueue *CopySelf() const;
 	static Effect *CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2);
+	static Effect *CreateUnsummonEffect(Effect *fx);
 	//locating opcodes
 	Effect *HasEffect(EffectRef &effect_reference) const;
 	Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const;

@@ -2235,7 +2235,6 @@ int fx_transparency_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x43 SummonCreature
 
-static EffectRef fx_unsummon_creature_ref={"UnsummonCreature",NULL,-1};
 static int eamods[]={EAM_ALLY,EAM_ALLY,EAM_DEFAULT,EAM_ALLY,EAM_DEFAULT,EAM_ENEMY,EAM_ALLY};
 
 int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
@@ -2261,10 +2260,7 @@ int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
 
-	Effect *newfx = NULL;
-	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-	}
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, eamod, 0, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
@@ -2905,7 +2901,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->inventory.SetSlotItemRes(fx->Resource, target->inventory.GetMagicSlot(),fx->Parameter1,fx->Parameter3,fx->Parameter4);
 	//equip the weapon
 	target->inventory.SetEquippedSlot(target->inventory.GetMagicSlot()-target->inventory.GetWeaponSlot(), 0);
-	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
+	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
 //if this effect has expiration, then it will remain as a remove_item
 //on the effect queue, inheriting all the parameters
 		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_item_ref);
@@ -3153,7 +3149,7 @@ int fx_create_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_inventory_item (%2d)\n", fx->Opcode );
 	target->inventory.AddSlotItemRes( fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
-	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
+	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
 //if this effect has expiration, then it will remain as a remove_item
 //on the effect queue, inheriting all the parameters
 		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_inventory_item_ref);
@@ -3291,10 +3287,7 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
 
-	Effect *newfx = NULL;
-	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-	}
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(monster, hit, Owner, target, p, fx->Parameter2/5, level, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
@@ -3309,7 +3302,7 @@ int fx_set_confused_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
+	if (fx->TimingMode==FX_DURATION_DELAY_PERMANENT) {
 		BASE_STATE_SET( STATE_CONFUSED );
 	} else {
 		STATE_SET( STATE_CONFUSED );
@@ -3643,7 +3636,7 @@ int fx_create_item_in_slot (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_create_item_in_slot (%2d): Button: %d\n", fx->Opcode, fx->Parameter2 );
 	//create item and set it in target's slot
 	target->inventory.SetSlotItemRes( fx->Resource, core->QuerySlot(fx->Parameter2), fx->Parameter1, fx->Parameter3, fx->Parameter4 );
-	if (fx->TimingMode!=FX_DURATION_ABSOLUTE) {
+	if (fx->TimingMode!=FX_DURATION_INSTANT_LIMITED) {
 		//convert it to a destroy item
 		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_item_ref);
 		fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
@@ -3846,10 +3839,7 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 	default:;
 	}
 	//create replacement; should we be passing the target instead of NULL?
-	Effect *newfx = NULL;
-	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-	}
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, EAM_DEFAULT,-1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
@@ -4334,10 +4324,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	//summon familiar with fx->Resource
 	Point p(fx->PosX, fx->PosY);
-	Effect *newfx = NULL;
-	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-	}
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	Actor *fam = core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_DEFAULT, 0, newfx);
 	delete newfx;
 	if (fam) {
@@ -5030,9 +5017,11 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (resref && resref[0]) {
 		core->ApplySpell(resref,copy,target,0);
 	}
-	Effect *newfx = EffectQueue::CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-	core->ApplyEffect(newfx, copy, target);
-	delete newfx;
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
+	if (newfx) {
+		core->ApplyEffect(newfx, copy, target);
+		delete newfx;
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -5266,7 +5255,7 @@ int fx_create_item_days (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_item_days (%2d)\n", fx->Opcode );
 	target->inventory.AddSlotItemRes( fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
-	if (fx->TimingMode==FX_DURATION_ABSOLUTE) {
+	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
 //if this effect has expiration, then it will remain as a remove_item
 //on the effect queue, inheriting all the parameters
 		//duration needs a hack (recalculate it for days)
@@ -5485,6 +5474,7 @@ int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx)
 
 	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = core->GetEffect(fx->Resource, fx->Power, p);
+	//core->GetEffect is a borrowed reference, don't delete it
 	if (!newfx) {
 		return FX_NOT_APPLIED;
 	}
@@ -5512,8 +5502,6 @@ int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx)
 			}
 			break;
 	}
-	//core->GetEffect is a borrowed reference, don't delete it
-	//delete newfx;
 	return FX_APPLIED;
 }
 

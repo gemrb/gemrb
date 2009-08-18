@@ -414,6 +414,19 @@ Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference
 	return CreateEffectCopy(oldfx, effect_reference.EffText, param1, param2);
 }
 
+static EffectRef fx_unsummon_creature_ref={"UnsummonCreature",NULL,-1};
+
+Effect *EffectQueue::CreateUnsummonEffect(Effect *fx)
+{
+        Effect *newfx = NULL;
+        if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
+                newfx = CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
+                newfx->TimingMode=FX_DURATION_DELAY_PERMANENT;
+        }
+
+        return newfx;
+}
+
 void EffectQueue::AddEffect(Effect* fx, bool insert)
 {
 	Effect* new_fx = new Effect;
