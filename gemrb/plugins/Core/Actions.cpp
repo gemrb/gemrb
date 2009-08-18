@@ -4027,6 +4027,9 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
 			map->AddItemToLocation(Sender->Pos, item);
+			if (((Actor *)tar)->InParty) core->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
+		} else {
+			if (((Actor *)tar)->InParty) core->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
 		}
 	}
 }
@@ -4055,6 +4058,9 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
 			map->AddItemToLocation(Sender->Pos, item);
+			if (((Actor *)Sender)->InParty) core->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
+		} else {
+			if (((Actor *)Sender)->InParty) core->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
 		}
 	}
 }

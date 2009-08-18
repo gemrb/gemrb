@@ -443,6 +443,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 		if (count && (destructed>=count) )
 			break;
 	}
+	if (Changed && Owner->InParty) core->DisplayConstantString(STR_LOSTITEM, 0xbcefbc);
 
 	return destructed;
 }

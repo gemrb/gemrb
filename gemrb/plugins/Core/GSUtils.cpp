@@ -461,6 +461,9 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 {
 	Inventory *myinv;
 	Map *map;
+	// track whether we are dealing with our party and need to display feedback
+	bool lostitem = false;
+	bool gotitem = false;
 
 	if (!target) {
 		return MIC_INVALID;
@@ -469,6 +472,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	switch(Sender->Type) {
 		case ST_ACTOR:
 			myinv=&((Actor *) Sender)->inventory;
+			if (((Actor *)Sender)->InParty) lostitem = true;
 			break;
 		case ST_CONTAINER:
 			myinv=&((Container *) Sender)->inventory;
@@ -479,6 +483,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	CREItem *item;
 	myinv->RemoveItem(resref, flags, &item);
 	if (!item) {
+		// nothing was removed
 		return MIC_NOITEM;
 	}
 
@@ -487,6 +492,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	switch(target->Type) {
 		case ST_ACTOR:
 			myinv=&((Actor *) target)->inventory;
+			if (((Actor *) target)->InParty) gotitem = true;
 			break;
 		case ST_CONTAINER:
 			myinv=&((Container *) target)->inventory;
@@ -497,13 +503,16 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	}
 	if (!myinv) {
 		delete item;
-		return MIC_GOTITEM;
+		if (lostitem) core->DisplayConstantString(STR_LOSTITEM, 0xbcefbc);
+		return MIC_GOTITEM; // actually it was lost, not gained
 	}
 	if ( myinv->AddSlotItem(item, SLOT_ONLYINVENTORY) !=ASI_SUCCESS) {
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
+		if (gotitem) core->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
 		return MIC_FULL;
 	}
+	if (gotitem) core->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
 	return MIC_GOTITEM;
 }
 
