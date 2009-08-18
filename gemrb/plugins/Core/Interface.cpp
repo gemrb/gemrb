@@ -2475,6 +2475,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		map->AddActor(ab);
 		ab->SetPosition(position, true, 0);
 		ab->RefreshEffects(NULL);
+
 		if (vvcres[0]) {
 			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(vvcres, false);
 			if (vvc) {
@@ -2490,6 +2491,12 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		if(level<0) {
 			break;
 		}
+
+		//remove the xp value of friendly summons
+		if (ab->BaseStats[IE_EA]<EA_GOODCUTOFF) {
+			ab->SetBase(IE_XPVALUE, 0);
+		}
+
 	}
 	return ab;
 }
