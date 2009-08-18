@@ -3927,23 +3927,26 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 		return 0;
 	}
 
-	if (slottype&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
-		ret = 0;
-		if (slottype&SLOT_QUIVER) {
-			if (item->GetWeaponHeader(true)) ret = 1;
-		}
+	//this warning comes only when feedback is enabled
+	if (feedback) {
+		if (slottype&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
+			ret = 0;
+			if (slottype&SLOT_QUIVER) {
+				if (item->GetWeaponHeader(true)) ret = 1;
+			}
 
-		if (slottype&SLOT_WEAPON) {
-			if (item->GetWeaponHeader(false)) ret = 1;
-		}
+			if (slottype&SLOT_WEAPON) {
+				if (item->GetWeaponHeader(false)) ret = 1;
+			}
 
-		if (slottype&SLOT_ITEM) {
-			if (item->GetEquipmentHeaderNumber(0)!=0xffff) ret = 1;
-		}
+			if (slottype&SLOT_ITEM) {
+				if (item->GetEquipmentHeaderNumber(0)!=0xffff) ret = 1;
+			}
 
-		if (!ret) {
-			if (feedback) DisplayConstantString(STR_UNUSABLEITEM, 0xf0f0f0);
-			return 0;
+			if (!ret) {
+				DisplayConstantString(STR_UNUSABLEITEM, 0xf0f0f0);
+				return 0;
+			}	
 		}
 	}
 
