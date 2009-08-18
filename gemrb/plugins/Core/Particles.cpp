@@ -211,14 +211,14 @@ void Particles::Draw(Region &screen)
 			}
 			*/
 			if (fragments) {
-			  //IE_ANI_CAST stance has a simple looping animation
-			  Animation** anims = fragments->GetAnimation( IE_ANI_CAST, i );
-			  if (anims) {
-			    Animation* anim = anims[0];
-			    Sprite2D* nextFrame = anim->GetFrame(anim->GetCurrentFrame());
-			    video->BlitGameSprite( nextFrame, points[i].pos.x - region.x, points[i].pos.y - region.y,
-			      0, clr, NULL, fragments->GetPartPalette(0), &screen);
-			  }
+				//IE_ANI_CAST stance has a simple looping animation
+				Animation** anims = fragments->GetAnimation( IE_ANI_CAST, i );
+				if (anims) {
+					Animation* anim = anims[0];
+					Sprite2D* nextFrame = anim->GetFrame(anim->GetCurrentFrame());
+					video->BlitGameSprite( nextFrame, points[i].pos.x - region.x, points[i].pos.y - region.y,
+						0, clr, NULL, fragments->GetPartPalette(0), &screen);
+				}
 			}
 			break;
 		case SP_TYPE_CIRCLE:

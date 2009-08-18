@@ -1205,7 +1205,7 @@ public:
 	static void MoveGlobalsTo(Scriptable* Sender, Action* parameters);
 	static void MoveInventory(Scriptable *Sender, Action* parameters);
 	static void MoveToCenterOfScreen(Scriptable* Sender, Action* parameters);
-        static void MoveToExpansion(Scriptable* Sender, Action* parameters);
+	      static void MoveToExpansion(Scriptable* Sender, Action* parameters);
 	static void MoveToObject(Scriptable* Sender, Action* parameters);
 	static void MoveToObjectFollow(Scriptable* Sender, Action* parameters);
 	static void MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters);
@@ -1354,6 +1354,7 @@ public:
 	static void SpawnPtDeactivate(Scriptable* Sender, Action* parameters);
 	static void SpawnPtSpawn(Scriptable* Sender, Action* parameters);
 	static void Spell(Scriptable* Sender, Action* parameters);
+	static void SpellHitEffectPoint(Scriptable* Sender, Action* parameters);
 	static void SpellHitEffectSprite(Scriptable* Sender, Action* parameters);
 	static void SpellNoDec(Scriptable* Sender, Action* parameters);
 	static void SpellPoint(Scriptable* Sender, Action* parameters);

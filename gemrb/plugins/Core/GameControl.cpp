@@ -732,7 +732,11 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					}
 					if (target) {
 						src->CastSpell( TestSpell, target, false );
-						src->CastSpellEnd( TestSpell );
+						if (src->LastTarget) {
+							src->CastSpellEnd( TestSpell );
+						} else {
+							src->CastSpellPointEnd( TestSpell );
+						}
 					}
 				}
 				break;

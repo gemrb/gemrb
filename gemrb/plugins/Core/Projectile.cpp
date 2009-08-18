@@ -784,8 +784,8 @@ void Projectile::LineTarget()
 				EffectQueue *eff = effects->CopySelf();
 				eff->SetOwner(original);
 				if(ExtFlags&PEF_RGB) {
-				  target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
-				    RGB >> 8, RGB >> 16, RGB >> 24);
+					target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
+						RGB >> 8, RGB >> 16, RGB >> 24);
 				}
 
 				effects->AddAllEffects(target, target->Pos);

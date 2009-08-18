@@ -8,7 +8,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -78,7 +78,7 @@ inline unsigned int Variables::MyHashKey(const char* key) const
 POSITION Variables::GetNextAssoc(POSITION rNextPosition, const char*& rKey,
 	ieDword& rValue) const
 {
-	MYASSERT( m_pHashTable != NULL );  // never call on empty map
+	MYASSERT( m_pHashTable != NULL ); // never call on empty map
 
 	Variables::MyAssoc* pAssocRet = ( Variables::MyAssoc* ) rNextPosition;
 
@@ -87,7 +87,7 @@ POSITION Variables::GetNextAssoc(POSITION rNextPosition, const char*& rKey,
 		for (unsigned int nBucket = 0; nBucket < m_nHashTableSize; nBucket++)
 			if (( pAssocRet = m_pHashTable[nBucket] ) != NULL)
 				break;
-		MYASSERT( pAssocRet != NULL );  // must find something
+		MYASSERT( pAssocRet != NULL ); // must find something
 	}
 	Variables::MyAssoc* pAssocNext;
 	if (( pAssocNext = pAssocRet->pNext ) == NULL) {
@@ -111,7 +111,7 @@ Variables::Variables(int nBlockSize, int nHashTableSize)
 	MYASSERT( nHashTableSize > 16 );
 
 	m_pHashTable = NULL;
-	m_nHashTableSize = nHashTableSize;  // default size
+	m_nHashTableSize = nHashTableSize; // default size
 	m_nCount = 0;
 	m_lParseKey = false;
 	m_pFreeList = NULL;
@@ -192,7 +192,7 @@ Variables::MyAssoc* Variables::NewAssoc(const char* key)
 	if (m_pFreeList == NULL) {
 		// add another block
 		Variables::MemBlock* newBlock = ( Variables::MemBlock* ) malloc( m_nBlockSize*sizeof( Variables::MyAssoc ) + sizeof( Variables::MemBlock ));
-		MYASSERT( newBlock != NULL );  // we must have something
+		MYASSERT( newBlock != NULL ); // we must have something
 		newBlock->pNext = m_pBlocks;
 		m_pBlocks = newBlock;
 
@@ -207,7 +207,7 @@ Variables::MyAssoc* Variables::NewAssoc(const char* key)
 	Variables::MyAssoc* pAssoc = m_pFreeList;
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
-	MYASSERT( m_nCount > 0 );  // make sure we don't overflow
+	MYASSERT( m_nCount > 0 ); // make sure we don't overflow
 	if (m_lParseKey) {
 		MyCopyKey( pAssoc->key, key );
 	} else {
@@ -270,7 +270,7 @@ int Variables::GetValueLength(const char* key) const
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
 	if (pAssoc == NULL) {
-		return 0;  // not in map
+		return 0; // not in map
 	}
 
 	return ( int ) strlen( pAssoc->Value.sValue );
@@ -283,7 +283,7 @@ bool Variables::Lookup(const char* key, char* dest, int MaxLength) const
 	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
 	if (pAssoc == NULL) {
 		dest[0] = 0;
-		return false;  // not in map
+		return false; // not in map
 	}
 
 	strncpy( dest, pAssoc->Value.sValue, MaxLength );
@@ -297,7 +297,7 @@ bool Variables::Lookup(const char* key, char *&dest) const
 	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
 	if (pAssoc == NULL) {
 		return false;
-	}  // not in map
+	} // not in map
 
 	dest = pAssoc->Value.sValue;
 	return true;
@@ -310,7 +310,7 @@ bool Variables::Lookup(const char* key, void *&dest) const
 	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
 	if (pAssoc == NULL) {
 		return false;
-	}  // not in map
+	} // not in map
 
 	dest = pAssoc->Value.pValue;
 	return true;
@@ -323,7 +323,7 @@ bool Variables::Lookup(const char* key, ieDword& rValue) const
 	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
 	if (pAssoc == NULL) {
 		return false;
-	}  // not in map
+	} // not in map
 
 	rValue = pAssoc->Value.nValue;
 	return true;
@@ -435,7 +435,7 @@ void Variables::Remove(const char* key)
 		// Room for optimization: make each bucket a doubly linked
 		// list to make removes from a bucket O(1).
 		// (This will have limited use in gemrb's case, because we
-		//  use relatively large tables and small buckets.)
+		// use relatively large tables and small buckets.)
 		while (prev->pNext != pAssoc) {
 			prev = prev->pNext;
 			MYASSERT( prev != NULL );

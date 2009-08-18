@@ -810,6 +810,7 @@ static const ActionLink actionnames[] = {
 	{"spawnptdeactivate", GameScript::SpawnPtDeactivate, 0},
 	{"spawnptspawn", GameScript::SpawnPtSpawn, 0},
 	{"spell", GameScript::Spell, AF_BLOCKING|AF_ALIVE},
+	{"spellhiteffectpoint", GameScript::SpellHitEffectPoint, 0},
 	{"spellhiteffectsprite", GameScript::SpellHitEffectSprite, 0},
 	{"spellnodec", GameScript::SpellNoDec, AF_BLOCKING|AF_ALIVE},
 	{"spellpoint", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE},

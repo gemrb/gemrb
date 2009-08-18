@@ -71,7 +71,7 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 //otherwise set to caster level
 static EffectRef fx_casting_glow_ref={"CastingGlow",NULL,-1};
 
-EffectQueue *Spell::GetEffectBlock(int block_index, int ext_index, ieDword pro) const
+EffectQueue *Spell::GetEffectBlock(Scriptable *self, Point &pos, int block_index, int ext_index, ieDword pro) const
 {
 	Effect *features;
 	int count;
@@ -114,13 +114,21 @@ EffectQueue *Spell::GetEffectBlock(int block_index, int ext_index, ieDword pro) 
 		//fill these for completeness, inventoryslot is a good way
 		//to discern a spell from an item effect
 		features[i].InventorySlot = 0xffff;
-		features[i].Projectile = pro;
-		fxqueue->AddEffect( features+i );
+		if (features[i].Target != FX_TARGET_SELF) {
+			features[i].Projectile = pro;
+			fxqueue->AddEffect( features+i );
+		} else {
+			Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
+			features[i].Projectile = 0;
+			features[i].PosX=pos.x;
+			features[i].PosY=pos.y;
+			core->ApplyEffect(features+i, target, self);
+		}
 	}
 	return fxqueue;
 }
 
-Projectile *Spell::GetProjectile(int header) const
+Projectile *Spell::GetProjectile(Scriptable *self, int header, Point &target) const
 {
 	SPLExtHeader *seh = GetExtHeader(header);
 	if (!seh) {
@@ -130,7 +138,7 @@ Projectile *Spell::GetProjectile(int header) const
 	}
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 	if (seh->FeatureCount) {
-		pro->SetEffects(GetEffectBlock(header,-1,seh->ProjectileAnimation));
+		pro->SetEffects(GetEffectBlock(self, target, header, -1, seh->ProjectileAnimation));
 	}
 	return pro;
 }

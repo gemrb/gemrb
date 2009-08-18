@@ -604,7 +604,7 @@ void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 
 	Spell* spl = gamedata->GetSpell( SpellResRef );
 	//create projectile from known spellheader
-	Projectile *pro = spl->GetProjectile(SpellHeader);
+	Projectile *pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
 	SpellHeader = -1;
 	if (pro) {
 		pro->SetCaster(GetGlobalID());
@@ -637,7 +637,7 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 	}
 	Spell* spl = gamedata->GetSpell( SpellResRef );
 	//create projectile from known spellheader
-	Projectile *pro = spl->GetProjectile(SpellHeader);
+	Projectile *pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
 	if (pro) {
 		pro->SetCaster(GetGlobalID());
 		Point origin = Pos;
@@ -691,9 +691,8 @@ void Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool
 
 	if (!target) target = this;
 
-	if (target->Type!=ST_ACTOR) {
-		LastTargetPos = target->Pos;
-	} else {
+	LastTargetPos = target->Pos;
+	if (target->Type==ST_ACTOR) {
 		LastTarget = target->GetGlobalID();
 	}
 	SpellCast(SpellResRef);
@@ -714,7 +713,7 @@ void Scriptable::SpellCast(const ieResRef SpellResRef)
 		int level = ((Actor *) this)->GetXPLevel(true);
 		SpellHeader = spl->GetHeaderIndexFromLevel(level);
 		Actor *actor = (Actor *) this;
-		EffectQueue *fxqueue = spl->GetEffectBlock(-1, SpellHeader, 0);
+		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1, SpellHeader, 0);
 		fxqueue->SetOwner(actor);
 		fxqueue->AddAllEffects(actor, actor->Pos);
 		delete fxqueue;

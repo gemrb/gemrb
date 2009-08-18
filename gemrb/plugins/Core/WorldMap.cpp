@@ -283,7 +283,7 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 			int k=j+ae->AreaLinksCount[d];
 			if ((size_t) k>=area_links.size()) {
 				printMessage("WorldMap","The worldmap file is corrupted... and it would crash right now!\n",RED);
-				printf("Entry #: %d  Direction: %d\n",i,d);
+				printf("Entry #: %d Direction: %d\n",i,d);
 				break;
 			}
 			for(;j<k;j++) {

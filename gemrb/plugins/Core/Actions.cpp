@@ -2794,10 +2794,8 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 	}
 	Sender->CastSpell (spellres, tar, false);
 	if (tar->Type==ST_ACTOR) {
-		//Sender->LastTarget=tar->GetGlobalID();
 		Sender->CastSpellEnd(spellres);
 	} else {
-		//GetPositionFromScriptable(tar, Sender->LastTargetPos, false);
 		Sender->CastSpellPointEnd(spellres);
 	}
 	Sender->ReleaseCurrentAction();
@@ -3478,7 +3476,8 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 			if (!act->ValidTarget(GA_NO_DEAD) ) {
 				continue;
 			}
-			if (!act->Schedule(gametime) ) {
+			//Do we need this???
+			if (!act->Schedule(gametime, false) ) {
 				continue;
 			}
 			act->ClearActions();
@@ -6323,10 +6322,10 @@ EffectRef fx_iwd_visual_spell_hit_ref={"IWDVisualSpellHit",NULL,-1};
 void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* src = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!src || src->Type!=ST_ACTOR) {
+	if (!src) {
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[2] );
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
@@ -6343,8 +6342,34 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	fx->Parameter1 = parameters->int1Parameter;
 	fx->Probability1=100;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
-	core->ApplyEffect(fx, (Actor *) src, (Actor *) tar);
+	core->ApplyEffect(fx, (Actor *) tar, src);
 }
+
+void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* src = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!src) {
+		return;
+	}
+
+	int opcode = EffectQueue::ResolveEffect(fx_iwd_visual_spell_hit_ref);
+	Effect *fx = core->GetEffect(opcode);
+	if (!fx) {
+		//invalid effect name didn't resolve to opcode
+		return;
+	}
+
+	//vvc type
+	fx->Parameter2 = parameters->int0Parameter;
+	//height (not sure if this is in the opcode, but seems acceptable)
+	fx->Parameter1 = parameters->int1Parameter;
+	fx->Probability1=100;
+	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
+	fx->PosX=parameters->pointParameter.x;
+	fx->PosY=parameters->pointParameter.y;
+	core->ApplyEffect(fx, NULL, src);
+}
+
 
 void GameScript::ClickLButtonObject(Scriptable* Sender, Action* parameters)
 {

@@ -1768,6 +1768,11 @@ int EffectQueue::ResolveEffect(EffectRef &effect_reference)
 //returns -1 if effect block bounced
 int EffectQueue::CheckImmunity(Actor *target) const
 {
+	//don't resist if target is non living
+	if (!target) {
+		return 1;
+	}
+
 	if (effects.size() ) {
 		Effect* fx = *effects.begin();
 

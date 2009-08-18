@@ -1194,7 +1194,7 @@ bool Map::AnyEnemyNearPoint(Point &p)
 	while (i--) {
 		Actor *actor = actors[i];
 
-		if (actor->Schedule(gametime) ) {
+		if (actor->Schedule(gametime, true) ) {
 			continue;
 		}
 		if (Distance(actor->Pos, p) > 400) {
@@ -1242,7 +1242,7 @@ void Map::AddActor(Actor* actor)
 	//guess game is always loaded? if not, then we'll crash
 	ieDword gametime = core->GetGame()->GameTime;
 
-	if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
+	if (IsVisible(actor->Pos, false) && actor->Schedule(gametime, true) ) {
 		ActorSpottedByPlayer(actor);
 	}
 }
@@ -1254,7 +1254,7 @@ bool Map::AnyPCSeesEnemy()
 	while (i--) {
 		Actor* actor = actors[i];
 		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
-			if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
+			if (IsVisible(actor->Pos, false) && actor->Schedule(gametime, true) ) {
 				return true;
 			}
 		}
@@ -1312,7 +1312,7 @@ Actor* Map::GetActor(Point &p, int flags)
 		if (!actor->ValidTarget(flags) ) {
 			continue;
 		}
-		if (!actor->Schedule(gametime) ) {
+		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
 		return actor;
@@ -1332,7 +1332,7 @@ Actor* Map::GetActorInRadius(Point &p, int flags, unsigned int radius)
 		if (!actor->ValidTarget(flags) ) {
 			continue;
 		}
-		if (!actor->Schedule(gametime) ) {
+		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
 		return actor;
@@ -1355,7 +1355,7 @@ Actor **Map::GetAllActorsInRadius(Point &p, int flags, unsigned int radius)
 		if (!actor->ValidTarget(flags) ) {
 			continue;
 		}
-		if (!actor->Schedule(gametime) ) {
+		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
 		count++;
@@ -1372,7 +1372,7 @@ Actor **Map::GetAllActorsInRadius(Point &p, int flags, unsigned int radius)
 		if (!actor->ValidTarget(flags) ) {
 			continue;
 		}
-		if (!actor->Schedule(gametime) ) {
+		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
 		ret[j++]=actor;
@@ -1588,9 +1588,9 @@ int Map::GetBlocked(Point &c)
 	return GetBlocked(c.x/16, c.y/12);
 }
 
-// flags: 0 - never dither (full cover)
-//        1 - dither if polygon wants it
-//        2 - always dither
+//flags:0 - never dither (full cover)
+//	1 - dither if polygon wants it
+//	2 - always dither
 
 SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 	unsigned int width, unsigned int height, int flags)
@@ -1692,7 +1692,7 @@ void Map::GenerateQueues()
 				//isvisible flag is false (visibilitymap) here,
 				//coz we want to reactivate creatures that
 				//just became visible
-				if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
+				if (IsVisible(actor->Pos, false) && actor->Schedule(gametime, false) ) {
 					priority = PR_SCRIPT; //run scripts and display, activated now
 					//more like activate!
 					actor->Activate();
@@ -3036,19 +3036,19 @@ void Map::Sparkle(ieDword color, ieDword type, Point &pos, unsigned int FragAnim
 
 	//the high word is ignored in the original engine (compatibility hack)
 	switch(type&0xffff) {
-	case SPARKLE_SHOWER:     //simple falling sparks
+	case SPARKLE_SHOWER: //simple falling sparks
 		path = SP_PATH_FALL;
 		grow = SP_SPAWN_FULL;
 		size = 100;
 		width = 40;
 		break;
 	case SPARKLE_PUFF:
-		path = SP_PATH_FOUNT;  //sparks go up and down
+		path = SP_PATH_FOUNT; //sparks go up and down
 		grow = SP_SPAWN_FULL;
 		size = 100;
 		width = 40;
 		break;
-	case SPARKLE_EXPLOSION:  //this isn't in the original engine, but it is a nice effect to have
+	case SPARKLE_EXPLOSION: //this isn't in the original engine, but it is a nice effect to have
 		path = SP_PATH_EXPL;
 		grow = SP_SPAWN_FULL;
 		size = 10;

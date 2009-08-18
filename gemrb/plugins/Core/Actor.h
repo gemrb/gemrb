@@ -503,7 +503,7 @@ public:
 	void SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 		unsigned char r, unsigned char g, unsigned char b,
 		int phase=-1 );
-	bool Schedule(ieDword gametime);
+	bool Schedule(ieDword gametime, bool checkhide);
 	/* call this when path needs to be changed */
 	void NewPath();
 	/* overridden method, won't walk if dead */

@@ -4751,7 +4751,7 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Scriptable *cas
 	}
 
 	level = spell->GetHeaderIndexFromLevel(level);
-	EffectQueue *fxqueue = spell->GetEffectBlock(level, -1, 0);
+	EffectQueue *fxqueue = spell->GetEffectBlock(caster, actor->Pos, level, -1, 0);
 
 	//check effect immunities
 	int res = fxqueue->CheckImmunity ( actor );
@@ -4777,7 +4777,7 @@ void Interface::ApplySpellPoint(const ieResRef resname, Map* area, Point &pos, S
 		return;
 	}
 	level = spell->GetHeaderIndexFromLevel(level);
-	Projectile *pro = spell->GetProjectile(level);
+	Projectile *pro = spell->GetProjectile(caster, level, pos);
 	pro->SetCaster(caster->GetGlobalID());
 	area->AddProjectile(pro, caster->Pos, pos);
 }
@@ -4803,7 +4803,10 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
 			actor = (Actor *) caster;
 		}
 		fxqueue->SetOwner( caster );
-		if (fxqueue->AddAllEffects( actor,actor->Pos )==FX_NOT_APPLIED) {
+		Point p;
+
+		p.empty(); //the effect should have all its coordinates already set
+		if (fxqueue->AddAllEffects( actor, p )==FX_NOT_APPLIED) {
 			res=0;
 		}
 	}
@@ -4822,9 +4825,9 @@ int Interface::ApplyEffect(const ieResRef resname, Actor *actor, Scriptable *cas
 		level = 1;
 	}
 	effect->Power = level;
+	effect->PosX=p.x;
+	effect->PosY=p.y;
 	//don't use effect->SetPosition here, effect is cached, and has a dirty position
-	effect->PosX = p.x;
-	effect->PosY = p.y;
 	return ApplyEffect(effect, actor, caster);
 }
 

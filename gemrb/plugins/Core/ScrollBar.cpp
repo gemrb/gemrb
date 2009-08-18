@@ -48,7 +48,7 @@ ScrollBar::~ScrollBar(void)
 }
 
 /** Sets a new position, relays the change to an associated textarea and calls
-    any existing GUI OnChange callback */
+	any existing GUI OnChange callback */
 void ScrollBar::SetPos(int NewPos)
 {
 	if (Pos && ( Pos == NewPos )) {

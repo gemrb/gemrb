@@ -3981,10 +3981,12 @@ void Actor::AddExperience(int type, int level)
 	core->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword) xp);
 }
 
-bool Actor::Schedule(ieDword gametime)
+bool Actor::Schedule(ieDword gametime, bool checkhide)
 {
-	if (!(InternalFlags&IF_VISIBLE) ) {
-		return false;
+	if (checkhide) {
+		if (!(InternalFlags&IF_VISIBLE) ) {
+			return false;
+		}
 	}
 
 	//check for schedule

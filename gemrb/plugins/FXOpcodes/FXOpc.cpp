@@ -3251,11 +3251,11 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_monster_summoning (%2d): Number: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	//check the summoning limit?
-	if (!target) {
+	if (!Owner) {
 		return FX_NOT_APPLIED;
 	}
 
-	if (!target->GetCurrentArea()) {
+	if (!Owner->GetCurrentArea()) {
 		return FX_APPLIED;
 	}
 
@@ -3283,13 +3283,7 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
 
-	Actor *tar;
-	if (target->Type==ST_ACTOR) {
-		tar = (Actor *) target;
-	} else {
-		tar = NULL;
-	}
-	core->SummonCreature(monster, hit, Owner, tar, p, fx->Parameter2/5, level);
+	core->SummonCreature(monster, hit, Owner, target, p, fx->Parameter2/5, level);
 	return FX_NOT_APPLIED;
 }
 

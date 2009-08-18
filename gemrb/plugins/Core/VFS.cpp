@@ -8,7 +8,7 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
@@ -20,7 +20,7 @@
  */
 
 // VFS.cpp : functions to access filesystem in os-independent way
-//  		 and POSIX-like compatibility layer for win
+// and POSIX-like compatibility layer for win
 
 #include <stdarg.h>
 #include <sys/stat.h>
@@ -214,7 +214,7 @@ int _fclose(_FILE* stream)
 	return 0;
 }
 
-#endif  // WIN32
+#endif // WIN32
 
 
 /** Returns true if path is an existing directory */
@@ -325,7 +325,7 @@ char* FindInDir(const char* Dir, const char* Filename, bool wildcards)
 	}
 
 	// First test if there's a Filename with exactly same name
-	//   and if yes, return it and do not search in the Dir
+	// and if yes, return it and do not search in the Dir
 	char TempFilePath[_MAX_PATH];
 	PathJoin( TempFilePath, Dir, Filename, NULL );
 
@@ -335,7 +335,7 @@ char* FindInDir(const char* Dir, const char* Filename, bool wildcards)
 	}
 
 	// Exact match not found, so try to search for Filename
-	//    with different case
+	// with different case
 	struct dirent* de = readdir( dir );
 	if (de == NULL) {
 		closedir( dir );
@@ -354,7 +354,7 @@ char* FindInDir(const char* Dir, const char* Filename, bool wildcards)
 			break;
 		}
 	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir );  //No other files in the directory, close it
+	closedir( dir ); //No other files in the directory, close it
 	return fn;
 }
 
