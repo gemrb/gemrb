@@ -185,9 +185,16 @@ int BIFImp::OpenArchive(const char* filename)
 			return GEM_OK;
 		}
 		printf( "Decompressing\n" );
-		if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID ))
+		if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID )) {
+			printMessage("BIFImporter", "No Compression Manager Available.", RED);
 			return GEM_ERROR;
+		}
 		in_cache = fopen( path, "wb" );
+		if (!in_cache) {
+			printMessage("BIFImporter", " ", RED);
+			printf( "Cannot write %s.\n", path );
+			return GEM_ERROR;
+		}
 		Compressor* comp = ( Compressor* )
 			core->GetInterface( IE_COMPRESSION_CLASS_ID );
 		if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
