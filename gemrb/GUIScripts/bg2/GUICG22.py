@@ -113,15 +113,7 @@ def OnLoad():
 					KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetText(KitName)
-		if i+TopIndex==0:
-			GemRB.SetVar("Class Kit", Kit)
-		if ClassID == 1:
-			if i+TopIndex == 0:
-				Button.SetVarAssoc("Class Kit", 0)
-			else:
-				Button.SetVarAssoc("Class Kit", i+TopIndex+21)
-		else:
-			Button.SetVarAssoc("Class Kit", Kit)
+		Button.SetVarAssoc("ButtonPressed", i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "KitPress")
 
 	BackButton = KitWindow.GetControl(8)
@@ -185,28 +177,57 @@ def RedrawKits():
 		if Kit == "*":
 			continue
 		if i+TopIndex==0 and Init:
-			GemRB.SetVar("Class Kit",Kit)
+			GemRB.SetVar("ButtonPressed", i)
 	return
 
 def KitPress():
 	global ClassID
 
-	Kit = GemRB.GetVar("Class Kit")
+	ButtonPressed=GemRB.GetVar("ButtonPressed")
+
+	if not KitTable:
+		if ClassID == 1: 
+			# TODO: this seems to be never reached
+			Kit = GemRB.GetVar("MAGESCHOOL")
+			KitName = SchoolList.GetValue(ButtonPressed+TopIndex, 0)
+			Kit = SchoolList.GetValue (Kit, 3)
+		else:
+			Kit = 0
+			KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
+	else:
+		Kit = KitTable.GetValue (ButtonPressed+TopIndex, 0)
+		if ClassID == 1:
+			KitName = SchoolList.GetValue (ButtonPressed+TopIndex, 0)
+			if Kit == 0:
+				KitName = SchoolList.GetValue (0, 0)
+			elif Kit == "*":
+				Kit = 0
+		else:
+			if Kit:
+				KitName = KitListTable.GetValue(Kit, 1)
+			else:
+				KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
+
 	if ClassID == 1 and Kit != 0:
 		GemRB.SetVar("MAGESCHOOL", Kit-21) # hack: -21 to make the generalist 0
 	else:
 		GemRB.SetVar("MAGESCHOOL", 0) # so bards don't get schools
-		
+
 	if Kit == 0:
 		KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 1)
 	else:
 		KitName = KitListTable.GetValue(Kit, 3)
+
 	TextAreaControl.SetText(KitName)
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+
+	GemRB.SetVar("Class Kit", Kit)
+
 	return
 
 def BackPress():
 	GemRB.SetVar("Class Kit",0) #scrapping
+	GemRB.SetVar("MAGESCHOOL", 0)
 	if KitWindow:
 		KitWindow.Unload()
 	GemRB.SetNextScript("GUICG2")
