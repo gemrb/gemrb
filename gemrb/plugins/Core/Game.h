@@ -392,6 +392,8 @@ public:
 	void SetExpansion(int exp);
 	/** Dumps information about the object */
 	void DebugDump();
+	/** Finds an actor by global ID */
+	Actor *GetActorByGlobalID(ieWord objectID);
 private:
 	bool DetermineStartPosType(const TableMgr *strta);
 	ieResRef *GetDream(Map *area);

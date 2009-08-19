@@ -1529,3 +1529,13 @@ void Game::DebugDump()
 	}
 }
 
+Actor *Game::GetActorByGlobalID(ieWord objectID) {
+	size_t mc = GetLoadedMapCount();
+	while(mc--) {
+		Map *map = GetMap(mc);
+		Actor *actor = map->GetActorByGlobalID(objectID);
+		if (actor) return actor;
+	}
+	return NULL;
+}
+
