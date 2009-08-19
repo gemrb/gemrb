@@ -138,6 +138,11 @@ static int **wstwohanded = NULL;
 static int **wsswordshield = NULL;
 static int **wssingle = NULL;
 
+//unhardcoded monk bonuses
+static int **monkbon = NULL;
+static int monkbon_cols = 0;
+static int monkbon_rows = 0;
+
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
  ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
@@ -1084,6 +1089,15 @@ void Actor::ReleaseMemory()
 			free(wssingle);
 			wssingle=NULL;
 		}
+		if (monkbon) {
+			for (i=0; i<monkbon_rows; i++) {
+				if (monkbon[i]) {
+					free(monkbon[i]);
+				}
+			}
+			free(monkbon);
+			monkbon=NULL;
+		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1588,6 +1602,20 @@ static void InitActorTables()
 			}
 		}
 	}
+
+	//unhardcoded monk bonus table
+	tm.load("monkbon");
+	if (tm) {
+		monkbon_rows = tm->GetRowCount();
+		monkbon_cols = tm->GetColumnCount();
+		monkbon = (int **) calloc(monkbon_rows, sizeof(int *));
+		for (i=0; i<monkbon_rows; i++) {
+			monkbon[i] = (int *) calloc(monkbon_cols, sizeof(int));
+			for (int j=0; j<monkbon_cols; j++) {
+				monkbon[i][j] = atoi(tm->QueryField(i, j));
+			}
+		}
+	}
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -1981,12 +2009,8 @@ void Actor::RefreshPCStats() {
 
 		//HACK: attacks per round bonus for monks should only apply to fists
 		if (isclass[ISMONK]&(1<<BaseStats[IE_CLASS])) {
-			if (BaseStats[IE_NUMBEROFATTACKS] == 2) {
-				AutoTable tm("monkbon");
-				if (tm) {
-					SetBase(IE_NUMBEROFATTACKS, 2 + atoi(tm->QueryField(0, GetMonkLevel()-1)));
-				}
-			}
+			unsigned int level = GetMonkLevel()-1;
+			SetBase(IE_NUMBEROFATTACKS, 2 + monkbon[0][level]);
 		} else {
 			//wspattack appears to only effect warriors
 			int defaultattacks = 2 + 2*dualwielding;
@@ -5340,12 +5364,9 @@ void Actor::CreateDerivedStatsBG()
 	// monk's level dictated ac and ac vs missiles bonus
 	// attacks per round bonus will be handled elsewhere, since it only applies to fist apr
 	if (isclass[ISMONK]&(1<<classid)) {
-		AutoTable tm("monkbon");
-		if (tm) {
-			int level = GetMonkLevel();
-			BaseStats[IE_ARMORCLASS] = DEFAULTAC - atoi(tm->QueryField(1, level-1));
-			BaseStats[IE_ACMISSILEMOD] = - atoi(tm->QueryField(2, level-1));
-		}
+		unsigned int level = GetMonkLevel()-1;
+		BaseStats[IE_ARMORCLASS] = DEFAULTAC - monkbon[1][level];
+		BaseStats[IE_ACMISSILEMOD] = - monkbon[2][level];
 	}
 
 	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;
