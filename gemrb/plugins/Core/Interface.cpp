@@ -2486,12 +2486,6 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			}
 		}
 
-		//this check should happen after the fact
-		level -= ab->GetBase(IE_XP);
-		if(level<0) {
-			break;
-		}
-
 		//remove the xp value of friendly summons
 		if (ab->BaseStats[IE_EA]<EA_GOODCUTOFF) {
 			ab->SetBase(IE_XPVALUE, 0);
@@ -2499,6 +2493,13 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		if (fx) {
 			ApplyEffect(fx, ab, Owner);
 		}
+
+		//this check should happen after the fact
+		level -= ab->GetBase(IE_XP);
+		if(level<0) {
+			break;
+		}
+
 	}
 	return ab;
 }
