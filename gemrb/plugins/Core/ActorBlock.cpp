@@ -338,7 +338,7 @@ void Scriptable::AddActionInFront(Action* aC)
 	aC->IncRef();
 }
 
-Action* Scriptable::GetNextAction()
+Action* Scriptable::GetNextAction() const
 {
 	if (actionQueue.size() == 0) {
 		return NULL;
@@ -1797,10 +1797,11 @@ InfoPoint::~InfoPoint(void)
 //bit 2 : whole team
 int InfoPoint::CheckTravel(Actor *actor)
 {
-	if (!(Flags&TRAP_RESET)) return CT_CANTMOVE; //experimental hack
 	if (Flags&TRAP_DEACTIVATED) return CT_CANTMOVE;
+	//
 	if (!actor->InParty && (Flags&TRAVEL_NONPC) ) return CT_CANTMOVE;
-	if (Flags&TRAVEL_PARTY) {
+	if (actor->InParty && !(Flags&TRAP_RESET)) return CT_CANTMOVE;
+	if (actor->InParty && (Flags&TRAVEL_PARTY) ) {
 		if (core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE) ) {
 			return CT_WHOLE;
 		}
@@ -1931,17 +1932,23 @@ bool InfoPoint::Entered(Actor *actor)
 	// why is this here? actors which aren't *in* a trap get IF_INTRAP
 	// repeatedly unset, so this triggers again and again and again.
 	// i disabled it for ST_PROXIMITY for now..
-	if (Type != ST_PROXIMITY && Distance(Pos, actor->Pos)<MAX_OPERATING_DISTANCE) {
+	if (Type != ST_PROXIMITY && (PersonalDistance(Pos, actor)<MAX_OPERATING_DISTANCE) ) {
 		goto check;
 	}
 	if (Flags&TRAP_USEPOINT) {
-		if (Distance(UsePoint, actor->Pos)<MAX_OPERATING_DISTANCE) {
+		if (PersonalDistance(UsePoint, actor)<MAX_OPERATING_DISTANCE) {
 			goto check;
 		}
 	}
 	return false;
 check:
+	if (Type==ST_TRAVEL) {
+		return true;
+	}
+
 	if (actor->InParty || (Flags&TRAP_NPC) ) {
+		//no need to avoid a travel trigger
+
 		//skill?
 		if (TriggerTrap(0, actor->GetID()) ) {
 			return true;

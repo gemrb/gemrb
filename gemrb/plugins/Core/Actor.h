@@ -119,6 +119,8 @@ class ScriptedAnimation;
 #define GA_NO_NEUTRAL 1024
 //cannot target self
 #define GA_NO_SELF    2048
+//try other areas too
+#define GA_GLOBAL     4096
 
 #define GUIBT_COUNT  12
 
@@ -617,5 +619,7 @@ public:
 	/* true if we are dual-wielding */
 	int IsDualWielding() const;
 	bool BlocksSearchMap() const;
+	bool CannotPassEntrance() const;
+	void UseExit(int flag);
 };
 #endif

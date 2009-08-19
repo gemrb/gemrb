@@ -602,6 +602,22 @@ InfoPoint* TileMap::GetInfoPoint(unsigned int idx)
 	return infoPoints[idx];
 }
 
+InfoPoint* TileMap::GetTravelTo(const char* Destination)
+{
+        size_t i=infoPoints.size();
+        while (i--) {
+                InfoPoint *ip = infoPoints[i];
+
+		if (ip->Type!=ST_TRAVEL)
+			continue;
+
+                if (strnicmp( ip->Destination, Destination, 8 ) == 0) {
+                        return ip;
+                }
+        }
+        return NULL;
+}
+
 Point TileMap::GetMapSize()
 {
 	return Point((short) (XCellCount*64), (short) (YCellCount*64));

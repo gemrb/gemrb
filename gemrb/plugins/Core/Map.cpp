@@ -620,6 +620,7 @@ void Map::UpdateScripts()
 		 * and we should probably be staggering the script executions anyway
 		 */
 		actor->ExecuteScript( MAX_SCRIPTS );
+
 	}
 
 	q=Qcount[PR_SCRIPT];
@@ -755,12 +756,16 @@ void Map::UpdateScripts()
 					//ST_TRAVEL
 					//don't move if doing something else
 					// added CurrentAction as part of blocking action fixes
-					if (actor->CurrentAction || actor->GetNextAction())
+					if (actor->CannotPassEntrance() ) {
 						continue;
+					}
 					//this is needed, otherwise the travel
 					//trigger would be activated anytime
+					//Well, i don't know why is it here, but lets try this
+/*
 					if (!(ip->Flags&TRAP_RESET))
 						continue;
+*/
 					if (ip->Entered(actor)) {
 						UseExit(actor, ip);
 					}
@@ -1851,7 +1856,7 @@ Entrance* Map::GetEntrance(const char* Name)
 	while (i--) {
 		Entrance *e = entrances[i];
 
-		if (stricmp( e->Name, Name ) == 0) {
+		if (strnicmp( e->Name, Name, 32 ) == 0) {
 			return e;
 		}
 	}
@@ -1889,6 +1894,11 @@ bool Map::CanFree()
 	size_t i=actors.size();
 	while (i--) {
 		if (actors[i]->InParty) {
+			return false;
+		}
+
+		//actor is busy (or actors[i]->GetInternalFlag()&IF_ACTIVE)
+		if (actors[i]->GetCurrentAction()) {
 			return false;
 		}
 	}

@@ -612,6 +612,7 @@ void GameScript::MoveGlobal(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
+
 	MoveBetweenAreasCore( (Actor *) tar, parameters->string0Parameter,
 		parameters->pointParameter, -1, true);
 }
@@ -1240,7 +1241,25 @@ void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
 	if (target->Type==ST_ACTOR) {
 		actor->SetLeader( (Actor *) target, 5);
 	}
+	MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE);
+/*
+	if (target->GetCurrentArea()!=Sender->GetCurrentArea()) {
+printf("Move failed, to follow target, i need to go to: %s\n", target->GetCurrentArea()->GetScriptName());
+		InfoPoint *p = Sender->GetCurrentArea()->GetTileMap()->GetTravelTo(target->GetCurrentArea()->GetScriptName());
+		if (actor->Destination == p->Pos) {
+			printf("Already walking to %s\n", p->GetScriptName());
+			return;
+		}
+		if (p) {
+			printf("Using %s\n", p->GetScriptName());
+			actor->WalkTo(p->Pos, 0, MAX_OPERATING_DISTANCE);
+			return;
+		}
+	}
+
+printf("Walkto\n");
 	actor->WalkTo( target->Pos, 0, MAX_OPERATING_DISTANCE );
+*/
 }
 
 void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)

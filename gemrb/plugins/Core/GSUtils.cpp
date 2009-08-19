@@ -267,7 +267,7 @@ void ClickCore(Scriptable *Sender, Point point, int type, int speed)
 	timer->SetMoveViewPort( point.x, point.y, speed, true );
 	timer->DoStep(0);
 	if (timer->ViewportIsMoving()) {
-		Sender->AddActionInFront( Sender->CurrentAction );
+		Sender->AddActionInFront( Sender->GetCurrentAction() );
 		Sender->SetWait(1);
 		Sender->ReleaseCurrentAction();
 		return;
@@ -388,20 +388,23 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 	}
 }
 
-int CanSee(Scriptable* Sender, Scriptable* target, bool range, int nodead)
+int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 {
 	Map *map;
 
 	if (target->Type==ST_ACTOR) {
 		Actor *tar = (Actor *) target;
 
-		if (!tar->ValidTarget(nodead)) {
+		if (!tar->ValidTarget(seeflag)) {
 			return 0;
 		}
 	}
+
 	map = target->GetCurrentArea();
-	if ( map!=Sender->GetCurrentArea() ) {
-		return 0;
+	if (!(seeflag&GA_GLOBAL)) {
+		if ( map!=Sender->GetCurrentArea() ) {
+			return 0;
+		}
 	}
 
 	if (range) {
@@ -528,14 +531,32 @@ static Targets* ReturnActorAsTarget(Actor *aC)
 		return tgts;
 }
 
-/* returns actors that match the [x.y.z] expression */
-static Targets* EvaluateObject(Scriptable* Sender, Object* oC, int ga_flags)
+Actor *FindActorNearby(const char *name, Map *except, int ga_flags)
 {
-	Map *map=Sender->GetCurrentArea();
+	Game *game = core->GetGame();
+	size_t mc = game->GetLoadedMapCount();
+	while(mc--) {
+		Map *map = game->GetMap(mc);
+		if (map==except) continue;
+		Actor * aC = map->GetActor(name, ga_flags);
+		if (aC) {
+			return aC;
+		}
+	}
+	return NULL;
+}
 
+/* returns actors that match the [x.y.z] expression */
+static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_flags)
+{
 	if (oC->objectName[0]) {
 		//We want the object by its name... (doors/triggers don't play here!)
 		Actor* aC = map->GetActor( oC->objectName, ga_flags );
+
+		if (!aC && (ga_flags&GA_GLOBAL) ) {
+			aC = FindActorNearby(oC->objectName, map, ga_flags );
+		}
+
 		return ReturnActorAsTarget(aC);
 	}
 
@@ -603,12 +624,12 @@ abort();
 	return tgts;
 }
 
-Targets* GetAllObjects(Scriptable* Sender, Object* oC, int ga_flags)
+Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags)
 {
 	if (!oC) {
 		return NULL;
 	}
-	Targets* tgts = EvaluateObject(Sender, oC, ga_flags);
+	Targets* tgts = EvaluateObject(map, Sender, oC, ga_flags);
 	//if we couldn't find an endpoint by name or object qualifiers
 	//it is not an Actor, but could still be a Door or Container (scriptable)
 	if (!tgts && oC->objectName[0]) {
@@ -641,6 +662,21 @@ Targets* GetAllObjects(Scriptable* Sender, Object* oC, int ga_flags)
 	return tgts;
 }
 
+Targets *GetAllObjectsNearby(Scriptable* Sender, Object* oC, int ga_flags)
+{
+	Game *game = core->GetGame();
+	size_t mc = game->GetLoadedMapCount();
+	while(mc--) {
+		Map *map = game->GetMap(mc);
+		if (map==Sender->GetCurrentArea()) continue;
+		Targets *tgts = GetAllObjects(map, Sender, oC, ga_flags);
+		if (tgts) {
+			return tgts;
+		}
+	}
+	return NULL;
+}
+
 Targets *GetAllActors(Scriptable *Sender, int ga_flags)
 {
 	Map *map=Sender->GetCurrentArea();
@@ -655,34 +691,68 @@ Targets *GetAllActors(Scriptable *Sender, int ga_flags)
 	return tgts;
 }
 
+Scriptable *GetActorObject(TileMap *TMap, const char *name)
+{
+
+	Scriptable * aC = TMap->GetDoor( name );
+	if (aC) {
+		return aC;
+	}
+
+	//No... it was not a door... maybe an InfoPoint?
+	aC = TMap->GetInfoPoint( name );
+	if (aC) {
+		return aC;
+	}
+	//No... it was not an infopoint... maybe a Container?
+	aC = TMap->GetContainer( name );
+	if (aC) {
+		return aC;
+	}
+	return aC;
+}
+
 Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 {
+	Scriptable *aC = NULL;
+
 	if (!oC) {
 		return NULL;
 	}
-	Targets *tgts = GetAllObjects(Sender, oC, ga_flags);
+	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, ga_flags);
 	if (tgts) {
 		//now this could return other than actor objects
-		Scriptable *object = tgts->GetTarget(0,-1);
+		aC = tgts->GetTarget(0,-1);
 		delete tgts;
-		return object;
+		if (!aC && (ga_flags&GA_GLOBAL) )
+		{
+			tgts = GetAllObjectsNearby(Sender, oC, ga_flags);
+			if (tgts) {
+				//now this could return other than actor objects
+				aC = tgts->GetTarget(0,-1);
+				delete tgts;
+			}
+		}
+		return aC;
 	}
 
 	if (oC->objectName[0]) {
-		Scriptable * aC = Sender->GetCurrentArea()->TMap->GetDoor( oC->objectName );
+		aC = GetActorObject(Sender->GetCurrentArea()->GetTileMap(), oC->objectName );
 		if (aC) {
 			return aC;
 		}
 
-		//No... it was not a door... maybe an InfoPoint?
-		aC = Sender->GetCurrentArea()->TMap->GetInfoPoint( oC->objectName );
-		if (aC) {
-			return aC;
-		}
-		//No... it was not an infopoint... maybe a Container?
-		aC = Sender->GetCurrentArea()->TMap->GetContainer( oC->objectName );
-		if (aC) {
-			return aC;
+		if (ga_flags&GA_GLOBAL) {
+			Game *game = core->GetGame();
+			size_t mc = game->GetLoadedMapCount();
+			while(mc--) {
+				Map *map = game->GetMap(mc);
+				if (map==Sender->GetCurrentArea()) continue;
+				aC = GetActorObject(map->GetTileMap(), oC->objectName);
+				if (aC) {
+					return aC;
+				}
+			}
 		}
 	}
 	return NULL;
@@ -698,8 +768,8 @@ void PolymorphCopyCore(Actor *src, Actor *tar, bool base)
 			tar->SetBase(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
 		}
 	}
-        tar->SetName(src->GetName(0),0);
-        tar->SetName(src->GetName(1),1);
+	tar->SetName(src->GetName(0),0);
+	tar->SetName(src->GetName(1),1);
 	//add more attribute copying
 }
 
@@ -916,18 +986,20 @@ static ieResRef PlayerDialogRes = "PLAYERx\0";
 void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
 	Scriptable* tar, *scr;
+	int seeflag = GA_NO_DEAD;
 
 	if (InDebug&ID_VARIABLES) {
 		printf("BeginDialog core\n");
 	}
 	if (Flags & BD_OWN) {
-		scr = tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
+		tar = GetActorFromObject( Sender, parameters->objects[1], seeflag);
+		scr = tar;
 	} else {
-		tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
+		seeflag |= GA_GLOBAL;
+		tar = GetActorFromObject( Sender, parameters->objects[1], seeflag);
 		scr = Sender;
 	}
 	if (!scr) {
-	//if (!scr || scr->Type != ST_ACTOR) {
 		printMessage("GameScript"," ",LIGHT_RED);
 		printf("Speaker for dialog couldn't be found (Sender: %s, Type: %d) Flags:%d.\n", Sender->GetScriptName(), Sender->Type, Flags);
 		Sender->ReleaseCurrentAction();
@@ -954,7 +1026,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	speaker = NULL;
 	target = (Actor *) tar;
-	if (!CanSee(scr, target, false, GA_NO_DEAD) ) {
+	if (!CanSee(scr, target, false, seeflag) ) {
 		printMessage("GameScript"," ",LIGHT_RED);
 		printf("CanSee returned false! Speaker (%s, type %d) and target are:\n", scr->GetScriptName(), scr->Type);
 		if (scr->Type == ST_ACTOR) {
@@ -981,7 +1053,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		else if ( speaker->InParty !=1 && target->InParty) swap = true;
 		//CHECKDIST works only for mobile scriptables
 		if (Flags&BD_CHECKDIST) {
-			if (PersonalDistance(scr, target)>range ) {
+			if ( scr->GetCurrentArea()!=target->GetCurrentArea() ||
+				PersonalDistance(scr, target)>range) {
 				MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE);
 				return;
 			}
@@ -994,16 +1067,16 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 			if (target->InMove()) {
 				//waiting for target
-				Sender->AddActionInFront( Sender->CurrentAction );
+				Sender->AddActionInFront( Sender->GetCurrentAction() );
 				Sender->ReleaseCurrentAction();
 				Sender->SetWait(1);
 				return;
 			}
 			GetTalkPositionFromScriptable(scr, TalkPos);
-			if (Distance(TalkPos, target)>MAX_OPERATING_DISTANCE ) {
+			if (PersonalDistance(TalkPos, target)>MAX_OPERATING_DISTANCE ) {
 				//try to force the target to come closer???
 				GoNear(target, TalkPos);
-				Sender->AddActionInFront( Sender->CurrentAction );
+				Sender->AddActionInFront( Sender->GetCurrentAction() );
 				Sender->ReleaseCurrentAction();
 				Sender->SetWait(1);
 				return;
@@ -1092,7 +1165,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		} else {
 			if (!(Flags & BD_INTERRUPT)) {
 				// added CurrentAction as part of blocking action fixes
-				if (tar->CurrentAction || tar->GetNextAction()) {
+				if (tar->GetCurrentAction() || tar->GetNextAction()) {
 					core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 					Sender->ReleaseCurrentAction();
 					return;
@@ -1228,29 +1301,6 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	//this is a dangerous cast, make sure actor is Actor * !!!
 	Actor *actor = (Actor *) Sender;
 
-	//this code is bad, and this is now handled in the reevaluate action
-	//replace the action for the xth time
-	/*if (flags&AC_REEVALUATE) {
-		if (!parameters->int0Parameter) {
-			//dropping the action, since it has 0 refcount, we should
-			//delete it instead of release otherwise we trigger a tripwire
-			//if ParamCopy will ever create it with 1 refcount, we could
-			//change this to a Release()
-			delete parameters;
-			// this was added as part of the blocking actions fix
-			Sender->ReleaseCurrentAction();
-			return;
-		}
-		parameters->int0Parameter--;
-		Sender->ReleaseCurrentAction();
-		//parameters action was created from the scratch, by adding it, it will
-		//have one RefCount
-		parameters->IncRef();
-		Sender->CurrentAction=parameters;
-		//we call GoNearAndRetry
-		//Sender->AddAction(parameters);
-	}*/
-
 	WeaponInfo wi;
 	ITMExtHeader *header = NULL;
 	ITMExtHeader *hittingheader = NULL;
@@ -1296,8 +1346,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	if(target->Type == ST_ACTOR) {
 		actor->SetTarget( target );
 	}
-	//TODO use gonearandretry when sender can't see target!!
-	if ( (PersonalDistance(Sender, target) > wi.range) /*|| (!Sender->GetCurrentArea()->IsVisible(Sender->Pos, target->Pos))*/) {
+	if ( ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
+	       PersonalDistance(Sender, target) > wi.range) ) {
 		MoveNearerTo(Sender, target, wi.range);
 		return;
 	} else if (target->Type == ST_DOOR) {
@@ -1327,7 +1377,7 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 	}
 	Targets *tgts;
 	if (oC) {
-		tgts = GetAllObjects(Sender, oC, 0);
+		tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, 0);
 	} else {
 		// [0]/[ANYONE] can match all actors
 		tgts = GetAllActors(Sender, 0);
@@ -1359,7 +1409,7 @@ int GetObjectCount(Scriptable* Sender, Object* oC)
 	// EvaluateObject will return [PC]
 	// GetAllObjects will also return Myself (evaluates object filters)
 	// i believe we need the latter here
-	Targets* tgts = GetAllObjects(Sender, oC, 0);
+	Targets* tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, 0);
 	int count = tgts->Count();
 	delete tgts;
 	return count;
@@ -1380,7 +1430,7 @@ int GetObjectLevelCount(Scriptable* Sender, Object* oC)
 	// EvaluateObject will return [PC]
 	// GetAllObjects will also return Myself (evaluates object filters)
 	// i believe we need the latter here
-	Targets* tgts = GetAllObjects(Sender, oC, 0);
+	Targets* tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, 0);
 	int count = 0;
 	if (tgts) {
 		targetlist::iterator m;
@@ -1686,7 +1736,7 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 
 void GoNear(Scriptable *Sender, Point &p)
 {
-	if (Sender->CurrentAction) {
+	if (Sender->GetCurrentAction()) {
 		printMessage("GameScript","Target busy???\n",LIGHT_RED);
 		return;
 	}
@@ -1699,6 +1749,34 @@ void GoNear(Scriptable *Sender, Point &p)
 void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 {
 	Point p;
+	Map *myarea, *hisarea;
+
+	if (Sender->Type != ST_ACTOR) {
+		printMessage("GameScript","MoveNearerTo only works with actors\n",LIGHT_RED);
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	myarea = Sender->GetCurrentArea();
+	hisarea = target->GetCurrentArea();
+	if (hisarea!=myarea) {
+		((Actor *) Sender)->UseExit(true);
+		target = myarea->GetTileMap()->GetTravelTo(hisarea->GetScriptName());
+
+		if (!target) {
+			printMessage("GameScript", "MoveNearerTo failed to find an exit\n", YELLOW);
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+		//no idea if this will use the travel trigger or not
+		if ((int) PersonalDistance(Sender, target)<=distance) {
+			printMessage("GameScript", "MoveNearerTo failed to use an exit\n", YELLOW);
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+	}
+
+	((Actor *) Sender)->UseExit(false);
 	// we deliberately don't try GetLikelyPosition here for now,
 	// maybe a future idea if we have a better implementation
 	// (the old code used it - by passing true not 0 below - when target was a movable)
@@ -1744,11 +1822,11 @@ void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool flag, int dista
 
 void GoNearAndRetry(Scriptable *Sender, Point &p, int distance)
 {
-	if (!Sender->CurrentAction) {
+	if (!Sender->GetCurrentAction() ) {
 		printMessage("GameScript","NULL action retried???\n",LIGHT_RED);
 		return;
 	}
-	Sender->AddActionInFront( Sender->CurrentAction );
+	Sender->AddActionInFront( Sender->GetCurrentAction() );
 	char Tmp[256];
 	sprintf( Tmp, "MoveToPoint([%hd.%hd])", p.x, p.y );
 	Action * action = GenerateAction( Tmp);

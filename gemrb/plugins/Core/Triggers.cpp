@@ -1311,13 +1311,9 @@ int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters)
 	if (!scr) {
 		return 0;
 	}
-/* hmm, other objects might have an action list as well
-	if (scr->Type != ST_ACTOR) {
-		return 0;
-	}
-*/
+
 	// added CurrentAction as part of blocking action fixes
-	if (scr->CurrentAction || scr->GetNextAction()) {
+	if (scr->GetCurrentAction() || scr->GetNextAction()) {
 		return 0;
 	}
 	return 1;
@@ -1325,13 +1321,8 @@ int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::ActionListEmpty(Scriptable* Sender, Trigger* /*parameters*/)
 {
-/*yeah, other objects might have an action list as well
-	if (Sender->Type != ST_ACTOR) {
-		return 0;
-	}
-*/
 	// added CurrentAction as part of blocking action fixes
-	if (Sender->CurrentAction || Sender->GetNextAction()) {
+	if (Sender->GetCurrentAction() || Sender->GetNextAction()) {
 		return 0;
 	}
 	return 1;
@@ -3214,7 +3205,7 @@ int GameScript::AttackedBy(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *scr = (Actor *) Sender;
-	Targets *tgts = GetAllObjects(Sender, parameters->objectParameter, GA_NO_DEAD);
+	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, parameters->objectParameter, GA_NO_DEAD);
 	int ret = 0;
 	int AStyle = parameters->int0Parameter;
 	//iterate through targets to get the actor

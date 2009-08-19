@@ -108,18 +108,20 @@ class Gem_Polygon;
 //these bits could be set by a WalkTo
 #define IF_RUNFLAGS   (IF_RUNNING|IF_NORECTICLE|IF_NOINT)
 #define IF_BECAMEVISIBLE 0x100//actor just became visible (trigger event)
-#define IF_INITIALIZED  0x200
-#define IF_USEDSAVE     0x400 //actor needed saving throws
-#define IF_TARGETGONE   0x800 //actor's target is gone (trigger event)
+#define IF_INITIALIZED   0x200
+#define IF_USEDSAVE      0x400  //actor needed saving throws
+#define IF_TARGETGONE    0x800  //actor's target is gone (trigger event)
+#define IF_USEEXIT       0x1000 //
+#define IF_INTRAP        0x2000 //actor is currently in a trap (intrap trigger event)
+#define IF_WASINDIALOG   0x4000 //actor just left dialog
+
 //scriptable flags
-#define IF_ACTIVE        0x1000
-#define IF_CUTSCENEID    0x2000
-#define IF_VISIBLE       0x4000
-#define IF_ONCREATION    0x8000
-#define IF_IDLE          0x10000
-#define IF_INTRAP        0x20000 //actor is currently in a trap (intrap trigger event)
-#define IF_WASINDIALOG   0x40000 //actor just left dialog
-#define IF_PARTYRESTED   0x80000 //party rested trigger event
+#define IF_ACTIVE        0x10000
+#define IF_CUTSCENEID    0x20000
+#define IF_VISIBLE       0x40000
+#define IF_ONCREATION    0x80000
+#define IF_IDLE          0x100000
+#define IF_PARTYRESTED   0x200000 //party rested trigger event
 
 //the actor should stop attacking
 #define IF_STOPATTACK (IF_JUSTDIED|IF_REALLYDIED|IF_CLEANUP|IF_IDLE)
@@ -184,7 +186,10 @@ protected: //let Actor access this
 	ieDword InternalFlags; //for triggers
 	Scriptable* CutSceneId;
 	ieResRef Dialog;
+	std::list< Action*> actionQueue;
+	Action* CurrentAction;
 public:
+	int CurrentActionState;
 	ieDword lastDelay;
 	ieDword lastRunTime;
 	Variables* locals;
@@ -205,9 +210,6 @@ public:
 	ieDword LastUnlocked;
 	ieDword LastOpenFailed; // also LastPickpocketFailed
 	ieDword LastPickLockFailed;
-	std::list< Action*> actionQueue;
-	Action* CurrentAction;
-	int CurrentActionState;
 	unsigned long playDeadCounter;
 	Point LastTargetPos;
 	int SpellHeader;
@@ -250,7 +252,8 @@ public:
 	void ExecuteScript(int scriptCount);
 	void AddAction(Action* aC);
 	void AddActionInFront(Action* aC);
-	Action* GetNextAction();
+	Action* GetCurrentAction() const { return CurrentAction; }
+	Action* GetNextAction() const;
 	Action* PopNextAction();
 	void ClearActions();
 	void ReleaseCurrentAction();

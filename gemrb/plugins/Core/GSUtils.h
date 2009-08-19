@@ -74,7 +74,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect);
 void PolymorphCopyCore(Actor *src, Actor *tar, bool base);
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
-Targets* GetAllObjects(Scriptable* Sender, Object* oC, int ga_flags);
+Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags);
 Targets* GetAllActors(Scriptable* Sender, int ga_flags);
 Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0);
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag);

@@ -5545,3 +5545,22 @@ bool Actor::BlocksSearchMap() const
 {
 	return Modified[IE_DONOTJUMP] < 2;
 }
+
+//return true if the actor doesn't want to use an entrance
+bool Actor::CannotPassEntrance() const
+{
+	if (!CurrentAction && !GetNextAction() ) return false;
+
+	if (InternalFlags&IF_USEEXIT) {
+		return false;
+	}
+	return true;
+}
+
+void Actor::UseExit(int flag) {
+	if (flag) {
+		InternalFlags|=IF_USEEXIT;
+	} else {
+		InternalFlags&=~IF_USEEXIT;
+	}
+}
