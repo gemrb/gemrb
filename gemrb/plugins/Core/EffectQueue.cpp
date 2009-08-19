@@ -973,12 +973,6 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		return false;
 	}
 
-	//magic immunity
-	ieDword val = actor->GetStat(IE_RESISTMAGIC);
-	if( fx->random_value < val) {
-		printf ("effect resisted: %s\n", (char*) effect_refs[fx->Opcode].Name);
-		return true;
-	}
 	//opcode immunity
 	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
 		printf ("immune to effect: %s\n", (char*) effect_refs[fx->Opcode].Name);
@@ -995,6 +989,18 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		return false;
 	}
 */
+
+	//not resistable (no saves either?)
+	if( fx->Resistance != FX_CAN_RESIST_CAN_DISPEL) {
+		return false;
+	}
+
+	//magic immunity
+	ieDword val = actor->GetStat(IE_RESISTMAGIC);
+	if( fx->random_value < val) {
+		printf ("effect resisted: %s\n", (char*) effect_refs[fx->Opcode].Name);
+		return true;
+	}
 
 	//saving throws
 	bool saved = false;
@@ -1056,13 +1062,11 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 		}
 
 		//the effect didn't pass the resistance check
-		if( fx->Resistance == FX_CAN_RESIST_CAN_DISPEL) {
-		//	fx->Resistance == FX_CAN_RESIST_NO_DISPEL) {
-			if( check_resistance(target, fx) ) {
-				fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-				return FX_NOT_APPLIED;
-			}
+		if( check_resistance(target, fx) ) {
+			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+			return FX_NOT_APPLIED;
 		}
+
 		if( NeedPrepare(fx->TimingMode) ) {
 			//save delay for later
 			fx->SecondaryDelay = fx->Duration;
