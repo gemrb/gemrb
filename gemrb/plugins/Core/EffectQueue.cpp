@@ -423,9 +423,9 @@ Effect *EffectQueue::CreateUnsummonEffect(Effect *fx)
 				        newfx = CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
 				        newfx->TimingMode = FX_DURATION_DELAY_PERMANENT;
 				        if( newfx->Resource3[0]) {
-				          strnuprcpy(newfx->Resource,newfx->Resource3, sizeof(ieResRef) );
+				          strnuprcpy(newfx->Resource,newfx->Resource3, sizeof(ieResRef)-1 );
 				        } else {
-				          strnuprcpy(newfx->Resource,"SPGFLSH1", sizeof(ieResRef) );
+				          strnuprcpy(newfx->Resource,"SPGFLSH1", sizeof(ieResRef)-1 );
 				        }
 				        if( fx->TimingMode == FX_DURATION_ABSOLUTE) {
 				          //unprepare duration

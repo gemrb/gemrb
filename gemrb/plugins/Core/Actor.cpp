@@ -4866,7 +4866,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, ieDword fl
 		return false;
 
 	ieResRef tmpresref;
-	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef));
+	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef)-1);
 
 	Item *itm = gamedata->GetItem(tmpresref);
 	if (!itm) return false; //quick item slot contains invalid item resref
@@ -4900,7 +4900,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 		return false;
 
 	ieResRef tmpresref;
-	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef));
+	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef)-1);
 
 	Item *itm = gamedata->GetItem(tmpresref);
 	if (!itm) return false; //quick item slot contains invalid item resref

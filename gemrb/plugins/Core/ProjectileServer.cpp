@@ -141,7 +141,7 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		//fill the spread field according to the hardcoded explosion type
 		res = GetExplosion(Type,0);
 		if(res) {
-			strnuprcpy(pro->Extension->Spread,*res,sizeof(ieResRef));
+			strnuprcpy(pro->Extension->Spread,*res,sizeof(ieResRef)-1);
 		}
 	
 		//if the hardcoded explosion type has a center animation
@@ -149,26 +149,26 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		res = GetExplosion(Type,1);
 		if(res) {
 			pro->Extension->AFlags|=PAF_VVC;
-			strnuprcpy(pro->Extension->VVCRes,*res,sizeof(ieResRef));
+			strnuprcpy(pro->Extension->VVCRes,*res,sizeof(ieResRef)-1);
 		}
 
 		//fill the secondary spread field out
 		res = GetExplosion(Type,2);
 		if(res) {
-			strnuprcpy(pro->Extension->Secondary,*res,sizeof(ieResRef));
+			strnuprcpy(pro->Extension->Secondary,*res,sizeof(ieResRef)-1);
 		}
 
 		//the explosion sound, used for the first explosion
 		//(overrides an original field)
 		res = GetExplosion(Type,3);
 		if(res) {
-			strnuprcpy(pro->Extension->SoundRes,*res,sizeof(ieResRef));
+			strnuprcpy(pro->Extension->SoundRes,*res,sizeof(ieResRef)-1);
 		}
 
 		//the area sound (used for subsequent explosions)
 		res = GetExplosion(Type,4);
 		if(res) {
-			strnuprcpy(pro->Extension->AreaSound,*res,sizeof(ieResRef));
+			strnuprcpy(pro->Extension->AreaSound,*res,sizeof(ieResRef)-1);
 		}
 
 		//fill the explosion/spread animation flags
