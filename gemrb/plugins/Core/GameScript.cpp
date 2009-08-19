@@ -436,7 +436,7 @@ static const ActionLink actionnames[] = {
 	{"changeteam", GameScript::SetTeam, 0}, //pst
 	{"changetilestate", GameScript::ChangeTileState, 0}, //bg2
 	{"chunkcreature", GameScript::Kill, 0}, //should be more graphical
-	{"clearactions", GameScript::ClearActions, 0},
+	{"clearactions", GameScript::ClearActions, AF_INSTANT},
 	{"clearallactions", GameScript::ClearAllActions, 0},
 	{"clearpartyeffects", GameScript::ClearPartyEffects, 0},
 	{"clearspriteeffects", GameScript::ClearSpriteEffects, 0},
