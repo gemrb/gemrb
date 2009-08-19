@@ -65,6 +65,7 @@ Scriptable::Scriptable(ScriptableType type)
 	DialogName = 0;
 	CurrentAction = NULL;
 	CurrentActionState = 0;
+	CurrentActionTarget = 0;
 	UnselectableTimer = 0;
 	startTime = 0;   //executing scripts
 	lastRunTime = 0; //evaluating scripts
@@ -380,6 +381,7 @@ void Scriptable::ReleaseCurrentAction()
 	}
 
 	CurrentActionState = 0;
+	CurrentActionTarget = 0;
 }
 
 ieWord Scriptable::GetGlobalID()

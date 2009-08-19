@@ -4820,10 +4820,26 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
+	Scriptable* tar = NULL;
+	if (Sender->CurrentActionTarget) {
+		tar = core->GetGame()->GetActorByGlobalID(Sender->CurrentActionTarget);
+	}
+	if (!tar) {
+		tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
+	}
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;
+	}
+
+	if (tar->Type == ST_ACTOR) {
+		Object *oC = parameters->objects[1];
+		// stupid hack for now: we wish to ignore named objects,
+		// and objects which use the globalid hack, and we only
+		// want objects created via objectFilters
+		if (!oC->objectName[0] && !(oC->objectFields[0] == -1) && oC->objectFilters[0]) {
+			Sender->CurrentActionTarget = ((Actor *)tar)->globalID;
+		}
 	}
 
 	//actor is already incapable of attack
