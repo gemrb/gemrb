@@ -3711,7 +3711,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	if((PersonalDistance(this, target) > wi.range*10) /*|| (!GetCurrentArea()->IsVisible(Pos, target->Pos))*/) {
+	if((PersonalDistance(this, target) > wi.range*10) || (GetCurrentArea()!=target->GetCurrentArea() ) ) {
 		// this is a temporary double-check, remove when bugfixed
 		printMessage("Actor", "Attack action didn't bring us close enough!", LIGHT_RED);
 		return;

@@ -81,9 +81,8 @@ class Action;
 #define DM_SET     3
 
 //attack core flags
-#define AC_REEVALUATE 1
-#define AC_NO_SOUND   2
-#define AC_RUNNING    4
+#define AC_NO_SOUND   1
+#define AC_RUNNING    2
 
 //trigger flags stored in triggers in .bcs files
 #define NEGATE_TRIGGER 1

@@ -4853,8 +4853,7 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 		// TODO: reevaluate target if we are not actively in combat
 	}
 
-	// AC_REEVALUATE is not actually used presently; remove it?
-	AttackCore(Sender, tar, AC_REEVALUATE);
+	AttackCore(Sender, tar, 0);
 
 	Sender->CurrentActionState--;
 }

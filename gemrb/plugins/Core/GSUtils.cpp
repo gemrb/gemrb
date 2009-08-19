@@ -1352,8 +1352,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	if(target->Type == ST_ACTOR) {
 		actor->SetTarget( target );
 	}
-	if ( ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
-	       PersonalDistance(Sender, target) > wi.range) ) {
+	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
+	       (PersonalDistance(Sender, target) > wi.range) ) {
 		MoveNearerTo(Sender, target, wi.range);
 		return;
 	} else if (target->Type == ST_DOOR) {

@@ -3033,13 +3033,6 @@ void Map::FadeSparkle(Point &pos, bool forced)
 	}
 }
 
-//void Map::AddParticle(Particles *p, Point &pos)
-//{
-//	spaIterator iter;
-//	for(iter=particles.begin(); (iter!=particles.end()) && ((*iter)->GetHeight()<pos.y); iter++) ;
-//	particles.insert(iter, sparkles);
-//}
-
 void Map::Sparkle(ieDword color, ieDword type, Point &pos, unsigned int FragAnimID)
 {
 	int style, path, grow, size, width;
