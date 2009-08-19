@@ -1,6 +1,8 @@
-GemRB svn (6826):
+GemRB svn (6934):
   New features:
     - 
+    - auto-reloading of projectile weapons in case the ammo stack runs out
+    - initial support for targetting by portrait
     - PST death counters (don't anger the Lady)
     - intelligence and wisdom dictated lore bonus
     - a GUIEnhancements config option (on by default) that enables a few
@@ -15,14 +17,15 @@ GemRB svn (6826):
     - 
     - config and default table value parsing is smarter about spaces
     - projectiles
-    - pathfinding, fog of war and worldmap travel
-    - combat and spellcasting
-    - actions and triggers
+    - pathfinding, feet circles, fog of war and worldmap travel
+    - combat and spellcasting (especially summoning)
+    - actions, effects and triggers
     - various guiscripts
     - bugfixes
 
   Applied patches:
     various patches from nugrud for bg2 gui enhancements
+    fix compilation (with cmake) on OS X, by hanicka
 
 GemRB V0.5.0 (2009-06-25):
   New features:
