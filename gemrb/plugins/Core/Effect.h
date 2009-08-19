@@ -44,6 +44,7 @@ class Actor;
 #define FX_TARGET_ALL        4
 #define FX_TARGET_ALL_BUT_PARTY   5
 #define FX_TARGET_OWN_SIDE   6
+#define FX_TARGET_OTHER_SIDE 7
 #define FX_TARGET_ALL_BUT_SELF 8
 #define FX_TARGET_ORIGINAL   9
 

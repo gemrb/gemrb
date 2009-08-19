@@ -2274,7 +2274,14 @@ int fx_unsummon_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//to be compatible with the original engine, unsummon doesn't work with PC's
 	//but it works on anything else
 	if (!target->InParty) {
-		//TODO:animation
+		//play the vanish animation
+		ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, false);
+		if (sca) {
+			sca->XPos+=target->Pos.x;
+			sca->YPos+=target->Pos.y;
+			target->GetCurrentArea()->AddVVCell(sca);
+		}
+		//remove the creature
 		target->DestroySelf();
 	}
 	return FX_NOT_APPLIED;
