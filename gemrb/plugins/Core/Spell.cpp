@@ -95,7 +95,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, Point &pos, int block_index
 	if (block_index==-1) {
 		assert(ext_index>=0);
 		Effect *fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
-		fx->Duration = ext_headers[ext_index].CastingTime+core->GetGame()->GameTime;
+		fx->Duration = (ext_headers[ext_index].CastingTime*ROUND_SIZE)/10+core->GetGame()->GameTime;
 		fx->InventorySlot = 0xffff;
 		fx->Projectile = 0;
 		fxqueue->AddEffect(fx);
