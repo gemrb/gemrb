@@ -1152,7 +1152,7 @@ int Interface::LoadSprites()
 			if (!fnt) {
 				continue;
 			}
-			strncpy( fnt->ResRef, ResRef, 8 );
+			strnlwrcpy( fnt->ResRef, ResRef, 8 );
 			if (needpalette) {
 
 				Color fore = {0xff, 0xff, 0xff, 0};
@@ -4359,7 +4359,7 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 		if (Prefix) {
 			snprintf(ItemName,sizeof(ItemName),"%s%02d",Prefix, j+1);
 		} else {
-			strncpy(ItemName,tab->GetRowName(j),sizeof(ieResRef) );
+			strnlwrcpy(ItemName,tab->GetRowName(j), 8);
 		}
 		//Variable elements are free'd, so we have to use malloc
 		//well, not anymore, we can use ReleaseFunction
@@ -4368,10 +4368,8 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 		int cl = atoi(tab->GetColumnName(0));
 		ItemList *itemlist = new ItemList(l, cl);
 		for(int k=0;k<l;k++) {
-			strncpy(itemlist->ResRefs[k],tab->QueryField(j,k),sizeof(ieResRef) );
+			strnlwrcpy(itemlist->ResRefs[k],tab->QueryField(j,k), 8);
 		}
-		ItemName[8]=0;
-		strlwr(ItemName);
 		RtRows->SetAt(ItemName, (void*)itemlist);
 	}
 	return true;
@@ -4401,11 +4399,13 @@ bool Interface::ReadRandomItems()
 	if (difflev>=tab->GetColumnCount()) {
 		difflev = tab->GetColumnCount()-1;
 	}
-	strncpy( GoldResRef, tab->QueryField((unsigned int) 0,(unsigned int) 0), sizeof(ieResRef) ); //gold
+
+	//the gold item
+	strnlwrcpy( GoldResRef, tab->QueryField((unsigned int) 0,(unsigned int) 0), 8);
 	if ( GoldResRef[0]=='*' ) {
 		return false;
 	}
-	strncpy( RtResRef, tab->QueryField( 1, difflev ), sizeof(ieResRef) );
+	strnlwrcpy( RtResRef, tab->QueryField( 1, difflev ), 8);
 	i=atoi( RtResRef );
 	if (i<1) {
 		ReadItemTable( RtResRef, 0 ); //reading the table itself
@@ -4415,7 +4415,7 @@ bool Interface::ReadRandomItems()
 		i=5;
 	}
 	while(i--) {
-		strncpy( RtResRef,tab->QueryField(2+i,difflev), sizeof(ieResRef) );
+		strnlwrcpy( RtResRef, tab->QueryField(2+i,difflev), 8);
 		ReadItemTable( RtResRef,tab->GetRowName(2+i) );
 	}
 	return true;
@@ -4461,7 +4461,7 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		} else {
 			i=Roll(1,itemlist->Count,-1);
 		}
-		strncpy( NewItem, itemlist->ResRefs[i], sizeof(ieResRef) );
+		strnlwrcpy( NewItem, itemlist->ResRefs[i], 8);
 		char *p=(char *) strchr(NewItem,'*');
 		if (p) {
 			*p=0; //doing this so endptr is ok
@@ -4474,11 +4474,11 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 			j=1;
 		}
 		if (*endptr) {
-			strnlwrcpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
+			strnlwrcpy(itm->ItemResRef, NewItem, 8);
 		} else {
-			strnlwrcpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
+			strnlwrcpy(itm->ItemResRef, GoldResRef, 8);
 		}
-		if ( !memcmp( itm->ItemResRef,"NO_DROP",8 ) ) {
+		if ( !memcmp( itm->ItemResRef,"no_drop",8 ) ) {
 			itm->ItemResRef[0]=0;
 		}
 		if (!itm->ItemResRef[0]) {
