@@ -4666,11 +4666,11 @@ void Actor::SetSoundFolder(const char *soundset)
 			}
 		}
 		if (fp) {
-			strnlwrcpy(PCStats->SoundSet, fp, sizeof(PCStats->SoundSet));
+			strnlwrcpy(PCStats->SoundSet, fp, 8);
 			free(fp);
 		}
 	} else {
-		strnlwrcpy(PCStats->SoundSet, soundset, sizeof(PCStats->SoundSet));
+		strnlwrcpy(PCStats->SoundSet, soundset, 8);
 		PCStats->SoundFolder[0]=0;
 	}
 }

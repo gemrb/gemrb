@@ -75,8 +75,9 @@ int Label::SetText(const char* string, int /*pos*/)
 		free( Buffer );
 	if (Alignment == IE_FONT_ALIGN_CENTER) {
 		if (core->HasFeature( GF_LOWER_LABEL_TEXT )) {
-			Buffer = (char *) malloc( 64 );
-			strnlwrcpy( Buffer, string, 63 );
+			int len = strlen(string);
+			Buffer = (char *) malloc( len+1 );
+			strnlwrcpy( Buffer, string, len );
 		}
 		else {
 			Buffer = strdup( string );
