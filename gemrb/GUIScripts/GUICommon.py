@@ -355,7 +355,7 @@ def LearnPriestSpells (pc, level, mask):
 				GemRB.LearnSpell (pc, spell)
 	return
 
-def SetEncumbranceLabels (Window, Label, Label2, pc):
+def SetEncumbranceLabels (Window, LabelID, Label2ID, pc):
 	"""Displays the encumarance as a ratio of current to maximum."""
 
 	# Getting the character's strength
@@ -366,10 +366,10 @@ def SetEncumbranceLabels (Window, Label, Label2, pc):
 	max_encumb = StrModTable.GetValue (sstr, 3) + StrModExTable.GetValue (ext_str, 3)
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
 
-	Label = Window.GetControl (0x10000043)
+	Label = Window.GetControl (LabelID)
 	Label.SetText (str (encumbrance) + ":")
 
-	Label2 = Window.GetControl (0x10000044)
+	Label2 = Window.GetControl (Label2ID)
 	Label2.SetText (str (max_encumb) + ":")
 	ratio = (0.0 + encumbrance) / max_encumb
 	if ratio > 1.0:

@@ -42,10 +42,6 @@ OptionsWindow = None
 ActionsWindow = None
 DraggedPortrait = None
 
-# only used in SetEncumbranceLabels, but that is called very often
-StrModTable = GemRB.LoadTableObject ("strmod")
-StrModExTable = GemRB.LoadTableObject ("strmodex")
-
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	"""Sets up all of the basic control windows."""
 
