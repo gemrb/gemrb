@@ -429,13 +429,13 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 		// the existing filename has the original index of the previous save
 		// this is usually bad since the gui sends the current one
 		SaveGame *save = GetSaveGame(index);
+		if (!save) return -1;
 		if (save->GetSaveID() != index) {
 			// stop gemrb from deleting all our save games
 			printf("gemrb's buggy save code is trying to delete slot %d\n", save->GetSaveID());
 			printf("that is not the slot %d we were trying to save to, erroring out!\n", index);
 			return -1;
 		}
-		if (!save) return -1;
 		DeleteSaveGame(index);
 		snprintf( Path, _MAX_PATH, "%09d-%s", save->GetSaveID(), slotname );
 	}
