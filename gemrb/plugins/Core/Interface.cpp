@@ -2216,27 +2216,27 @@ bool Interface::LoadGemRBINI()
 	// Resrefs are already initialized in Interface::Interface()
 	s = ini->GetKeyAsString( "resources", "CursorBAM", NULL );
 	if (s)
-		strcpy( CursorBam, s );
+		strnlwrcpy( CursorBam, s, 8 );
 
 	s = ini->GetKeyAsString( "resources", "ScrollCursorBAM", NULL );
 	if (s)
-		strcpy( ScrollCursorBam, s );
+		strnlwrcpy( ScrollCursorBam, s, 8 );
 
 	s = ini->GetKeyAsString( "resources", "ButtonFont", NULL );
 	if (s)
-		strcpy( ButtonFont, s );
+		strnlwrcpy( ButtonFont, s, 8 );
 
 	s = ini->GetKeyAsString( "resources", "TooltipFont", NULL );
 	if (s)
-		strcpy( TooltipFont, s );
+		strnlwrcpy( TooltipFont, s, 8 );
 
 	s = ini->GetKeyAsString( "resources", "MovieFont", NULL );
 	if (s)
-		strcpy( MovieFont, s );
+		strnlwrcpy( MovieFont, s, 8 );
 
 	s = ini->GetKeyAsString( "resources", "TooltipBack", NULL );
 	if (s)
-		strcpy( TooltipBackResRef, s );
+		strnlwrcpy( TooltipBackResRef, s, 8 );
 
 	s = ini->GetKeyAsString( "resources", "TooltipColor", NULL );
 	if (s) {
