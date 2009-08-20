@@ -3638,7 +3638,8 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (parameters->int0Parameter) {
-		actor->Select(0);
+		// flags may be wrong
+		core->GetGame()->SelectActor(actor, false, SELECT_QUIET);
 	}
 
 	actor->SetCircleSize();
