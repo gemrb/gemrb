@@ -3212,11 +3212,15 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetStance( IE_ANI_DIE );
-	actor->NoInterrupt(); // surely this should have a SetWait of an appropriate time instead?
-	actor->playDeadCounter = parameters->int0Parameter;
-	actor->SetWait( 1 );
-	Sender->ReleaseCurrentAction(); // todo, blocking?
+	if (Sender->CurrentActionState == 0) {
+		Sender->CurrentActionState = 1;
+		actor->SetStance( IE_ANI_DIE );
+		actor->playDeadCounter = parameters->int0Parameter;
+		actor->NoInterrupt();
+	}
+	if (actor->playDeadCounter == 0) {
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 /** no difference at this moment, but this action should be interruptable */
@@ -5305,7 +5309,7 @@ void GameScript::ChangeAnimation(Scriptable* Sender, Action* parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
-	ChangeAnimationCore((Actor *) Sender, parameters->string0Parameter,0);
+	ChangeAnimationCore((Actor *) Sender, parameters->string0Parameter,1);
 }
 
 void GameScript::ChangeAnimationNoEffect(Scriptable* Sender, Action* parameters)
@@ -5313,7 +5317,7 @@ void GameScript::ChangeAnimationNoEffect(Scriptable* Sender, Action* parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
-	ChangeAnimationCore((Actor *) Sender, parameters->string0Parameter,1);
+	ChangeAnimationCore((Actor *) Sender, parameters->string0Parameter,0);
 }
 
 void GameScript::Polymorph(Scriptable* Sender, Action* parameters)
