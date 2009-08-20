@@ -91,6 +91,11 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 				return false;
 			}
 			FILE* newfile = fopen( cpath, "wb" );
+			if (!newfile) {
+				printMessage("BAMImporter", " ", RED);
+				printf( "Cannot write %s.\n", cpath );
+				return false;
+			}
 			Compressor* comp = ( Compressor* )
 				core->GetInterface( IE_COMPRESSION_CLASS_ID );
 			comp->Decompress( newfile, str );
