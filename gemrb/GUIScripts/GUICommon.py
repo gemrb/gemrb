@@ -25,13 +25,13 @@ from ie_restype import *
 from ie_spells import LS_MEMO
 from GUIDefines import *
 from ie_slots import SLOT_ANY
+from ie_stats import *
 
 OtherWindowFn = None
 #global OtherWindowFn
 
 # only used in SetEncumbranceLabels, but that is called very often
-StrModTable = GemRB.LoadTableObject ("strmod")
-StrModExTable = GemRB.LoadTableObject ("strmodex")
+StrModTable = StrModExTable = None
 
 def CloseOtherWindow (NewWindowFn):
 	global OtherWindowFn
@@ -357,6 +357,11 @@ def LearnPriestSpells (pc, level, mask):
 
 def SetEncumbranceLabels (Window, LabelID, Label2ID, pc):
 	"""Displays the encumarance as a ratio of current to maximum."""
+	global StrModTable, StrModExTable
+
+	if not StrModTable:
+		StrModTable = GemRB.LoadTableObject ("strmod")
+		StrModExTable = GemRB.LoadTableObject ("strmodex")
 
 	# Getting the character's strength
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)

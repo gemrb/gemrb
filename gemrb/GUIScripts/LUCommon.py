@@ -20,6 +20,10 @@
 #
 # LUCommon.py - common functions related to leveling up
 
+import GemRB
+from BGCommon import ClassTable, NextLevelTable, IsMultiClassed, IsDualClassed, IsDualSwap
+from ie_stats import *
+
 def GetNextLevelExp (Level, Class):
 	"""Returns the amount of XP required to gain the next level."""
 	Row = NextLevelTable.GetRowIndex (Class)
