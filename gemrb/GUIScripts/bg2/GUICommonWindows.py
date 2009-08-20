@@ -1116,34 +1116,6 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	GemRB.SetPlayerStat (pc, IE_HITPOINTS, GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1)+CurrentHP)
 	return
 
-def SetEncumbranceLabels (Window, Label, Label2, pc):
-	"""Displays the encumarance as a ratio of current to maximum."""
-
-	# Getting the character's strength
-	sstr = GemRB.GetPlayerStat (pc, IE_STR)
-	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-
-	# encumbrance
-	max_encumb = StrModTable.GetValue (sstr, 3) + StrModExTable.GetValue (ext_str, 3)
-	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
-
-	Label = Window.GetControl (0x10000043)
-	Label.SetText (str (encumbrance) + ":")
-
-	Label2 = Window.GetControl (0x10000044)
-	Label2.SetText (str (max_encumb) + ":")
-	ratio = (0.0 + encumbrance) / max_encumb
-	if ratio > 1.0:
-		Label.SetTextColor (255, 0, 0)
-		Label2.SetTextColor (255, 0, 0)
-	elif ratio > 0.8:
-		Label.SetTextColor (255, 255, 0)
-		Label2.SetTextColor (255, 0, 0)
-	else:
-		Label.SetTextColor (255, 255, 255)
-		Label2.SetTextColor (255, 0, 0)
-	return
-
 def GearsClicked():
 	GemRB.GamePause(2,0)
 

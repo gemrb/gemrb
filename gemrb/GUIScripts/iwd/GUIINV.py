@@ -28,7 +28,7 @@ import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
-from GUICommon import CloseOtherWindow, SetColorStat
+from GUICommon import CloseOtherWindow, SetColorStat, SetEncumbranceLabels
 from GUICommonWindows import *
 
 InventoryWindow = None

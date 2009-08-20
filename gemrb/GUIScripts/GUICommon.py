@@ -29,6 +29,10 @@ from ie_slots import SLOT_ANY
 OtherWindowFn = None
 #global OtherWindowFn
 
+# only used in SetEncumbranceLabels, but that is called very often
+StrModTable = GemRB.LoadTableObject ("strmod")
+StrModExTable = GemRB.LoadTableObject ("strmodex")
+
 def CloseOtherWindow (NewWindowFn):
 	global OtherWindowFn
 
@@ -350,4 +354,33 @@ def LearnPriestSpells (pc, level, mask):
 			if HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, spell) < 0:
 				GemRB.LearnSpell (pc, spell)
 	return
+
+def SetEncumbranceLabels (Window, Label, Label2, pc):
+	"""Displays the encumarance as a ratio of current to maximum."""
+
+	# Getting the character's strength
+	sstr = GemRB.GetPlayerStat (pc, IE_STR)
+	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
+
+	# encumbrance
+	max_encumb = StrModTable.GetValue (sstr, 3) + StrModExTable.GetValue (ext_str, 3)
+	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
+
+	Label = Window.GetControl (0x10000043)
+	Label.SetText (str (encumbrance) + ":")
+
+	Label2 = Window.GetControl (0x10000044)
+	Label2.SetText (str (max_encumb) + ":")
+	ratio = (0.0 + encumbrance) / max_encumb
+	if ratio > 1.0:
+		Label.SetTextColor (255, 0, 0)
+		Label2.SetTextColor (255, 0, 0)
+	elif ratio > 0.8:
+		Label.SetTextColor (255, 255, 0)
+		Label2.SetTextColor (255, 0, 0)
+	else:
+		Label.SetTextColor (255, 255, 255)
+		Label2.SetTextColor (255, 0, 0)
+	return
+
 

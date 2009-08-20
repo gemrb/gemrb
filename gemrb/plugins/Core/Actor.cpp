@@ -2007,18 +2007,12 @@ void Actor::RefreshPCStats() {
 			tmplevel = 0;
 		}
 
-		//HACK: attacks per round bonus for monks should only apply to fists
-		if (isclass[ISMONK]&(1<<BaseStats[IE_CLASS])) {
-			unsigned int level = GetMonkLevel()-1;
-			SetBase(IE_NUMBEROFATTACKS, 2 + monkbon[0][level]);
+		//wspattack appears to only effect warriors
+		int defaultattacks = 2 + 2*dualwielding;
+		if (tmplevel) {
+			SetBase(IE_NUMBEROFATTACKS, defaultattacks+wspattack[stars][tmplevel]);
 		} else {
-			//wspattack appears to only effect warriors
-			int defaultattacks = 2 + 2*dualwielding;
-			if (tmplevel) {
-				SetBase(IE_NUMBEROFATTACKS, defaultattacks+wspattack[stars][tmplevel]);
-			} else {
-				SetBase(IE_NUMBEROFATTACKS, defaultattacks);
-			}
+			SetBase(IE_NUMBEROFATTACKS, defaultattacks);
 		}
 	}
 
