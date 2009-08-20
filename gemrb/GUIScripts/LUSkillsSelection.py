@@ -28,7 +28,7 @@ from BGCommon import *
 LUSKILLS_TYPE_CHARGEN = 0
 LUSKILLS_TYPE_LEVELUP = 1
 LUSKILLS_TYPE_DUALCLASS = 2
-LUSKILLS_MAX = 200
+LUSKILLS_MAX = 250
 
 #refs to the script calling this
 SkillsWindow = 0
