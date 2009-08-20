@@ -884,6 +884,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					char Tmp[40];
 					strncpy(Tmp,"ApplyDamage(Myself,1000,4)",sizeof(Tmp) ); // electrocution
 					lastActor->AddAction( GenerateAction(Tmp) );
+					strncpy(Tmp,"ApplyDamage(Myself,1000,1)",sizeof(Tmp) ); // corrosion
+					lastActor->AddAction( GenerateAction(Tmp) );
 				} else if (overContainer) {
 					overContainer->SetContainerLocked(0);
 				} else if (overDoor) {
