@@ -333,6 +333,11 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 {
 	StringBlock sb;
 
+	//no one hears you when you are in the Limbo!
+	if (!Sender->GetCurrentArea()) {
+		return;
+	}
+
 	memset(&sb,0,sizeof(sb));
 	printf( "Displaying string on: %s\n", Sender->GetScriptName() );
 	if (flags & DS_CONST) {

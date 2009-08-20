@@ -2649,9 +2649,12 @@ void GameControl::DisplayString(Point &p, const char *Text)
 void GameControl::DisplayString(Scriptable* target)
 {
 	Scriptable* scr = new Scriptable( ST_TRIGGER );
+	scr->overHeadText = strdup( target->overHeadText );
+/* strdup should work here, we use it elsewhere
 	size_t len = strlen( target->overHeadText ) + 1;
 	scr->overHeadText = ( char * ) malloc( len );
 	strcpy( scr->overHeadText, target->overHeadText );
+*/
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = target->timeStartDisplaying;
 	scr->Pos = target->Pos;

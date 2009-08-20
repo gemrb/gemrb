@@ -2682,7 +2682,8 @@ void Actor::Die(Scriptable *killer)
 	// clearing the search map here means it's not blocked during death animations
 	// this is perhaps not ideal, but matches other searchmap code which uses
 	// GA_NO_DEAD to exclude IF_JUSTDIED actors as well as dead ones
-	area->ClearSearchMapFor(this);
+	if (area)
+		area->ClearSearchMapFor(this);
 
 	//JUSTDIED will be removed when the Die() trigger executed
 	//otherwise it is the same as REALLYDIED
@@ -2809,7 +2810,8 @@ void Actor::DestroySelf()
 	InternalFlags|=IF_CLEANUP;
 	// clear search map so that a new actor can immediately go there
 	// (via ChangeAnimationCore)
-	area->ClearSearchMapFor(this);
+	if (area)
+		area->ClearSearchMapFor(this);
 }
 
 bool Actor::CheckOnDeath()
