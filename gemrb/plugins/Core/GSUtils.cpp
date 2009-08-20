@@ -699,13 +699,18 @@ Scriptable *GetActorObject(TileMap *TMap, const char *name)
 		return aC;
 	}
 
-	//No... it was not a door... maybe an InfoPoint?
-	aC = TMap->GetInfoPoint( name );
+	//containers should have a precedence over infopoints because otherwise
+	//AR1512 sanity test quest would fail
+	//If this order couldn't be maintained, then 'Contains' should have a
+	//unique call to get containers only
+	//No... it was not an door... maybe a Container?
+	aC = TMap->GetContainer( name );
 	if (aC) {
 		return aC;
 	}
-	//No... it was not an infopoint... maybe a Container?
-	aC = TMap->GetContainer( name );
+
+	//No... it was not a container ... maybe an InfoPoint?
+	aC = TMap->GetInfoPoint( name );
 	if (aC) {
 		return aC;
 	}
