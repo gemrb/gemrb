@@ -347,11 +347,11 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			GemRB.SetToken ("LEVEL", str (Levels[i]+LevelDiff[i]-int(LevelDrain/Multi[0])) )
 			GemRB.SetToken ("EXPERIENCE", str (XP/Multi[0]) )
 			if LevelDrain:
-				stats.append ( (19720,1,'c') )
-				stats.append ( (57435,1,'c') ) # LEVEL DRAINED
+				stats.append ( (GemRB.GetString (19720),1,'d') )
+				stats.append ( (GemRB.GetString (57435),1,'d') ) # LEVEL DRAINED
 			else:
 				GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Levels[i]+LevelDiff[i], Class) )
-				stats.append ( (16480,1,'c') )
+				stats.append ( (GemRB.GetString (16480),"",'d') )
 			stats.append (None)
 			print "\t\tClass (Level):",Class,"(",Levels[i],")"
 
@@ -376,12 +376,11 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		XP2 = GemRB.GetPlayerStat (pc, IE_XP)
 		GemRB.SetToken ("EXPERIENCE", str (XP2) )
 		if LevelDrain:
-			stats.append ( (19720,1,'c') )
-			stats.append ( (57435,1,'c') ) # LEVEL DRAINED
+			stats.append ( (GemRB.GetString (19720),1,'d') )
+			stats.append ( (GemRB.GetString (57435),1,'d') ) # LEVEL DRAINED
 		else:
 			GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Levels[0], Class) )
-			stats.append ( (16480,1,'c') )
-
+			stats.append ( (GemRB.GetString (16480),"",'d') )
 		stats.append (None)
 
 		# the first class (shown second)
