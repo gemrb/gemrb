@@ -1090,7 +1090,7 @@ void Projectile::DrawExplosion(Region &screen)
 			}
 			//create a custom projectile with single traveling effect
 			Projectile *pro = server->CreateDefaultProjectile((unsigned int) ~0);
-			strnlwrcpy(pro->BAMRes1, tmp, sizeof(ieResRef) );
+			strnlwrcpy(pro->BAMRes1, tmp, 8);
 			if (ExtFlags&PEF_TRAIL) {
 				pro->Aim = Aim;
 			}
@@ -1333,7 +1333,7 @@ void Projectile::DrawTravel(Region &screen)
 
 void Projectile::SetIdentifiers(const char *resref, ieWord id)
 {
-	strnuprcpy(name, resref, sizeof(name));
+	strnuprcpy(name, resref, 8);
 	type=id;
 }
 
