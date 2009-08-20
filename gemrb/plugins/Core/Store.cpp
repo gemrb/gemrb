@@ -274,5 +274,5 @@ const char *Store::GetOwner() const
 
 void Store::SetOwner(const char *name)
 {
-	strnuprcpy(StoreOwner, name, sizeof(StoreOwner));
+	strnuprcpy(StoreOwner, name, 32);
 }
