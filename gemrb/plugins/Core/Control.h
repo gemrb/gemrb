@@ -94,7 +94,7 @@ public:
 	int SetTooltip(const char* string);
 	/** Displays the tooltip text, Worldmap handles this differently */
 	virtual void DisplayTooltip();
-	/** Variables */
+	/** Variable length is 40-1 (zero terminator) */
 	char VarName[MAX_VARIABLE_LENGTH];
 	/** the value of the control to add to the variable */
 	ieDword Value;

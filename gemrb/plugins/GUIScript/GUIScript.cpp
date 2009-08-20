@@ -1846,7 +1846,8 @@ static PyObject* GemRB_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	strnlwrcpy( ctrl->VarName, VarName, MAX_VARIABLE_LENGTH );
+	//max variable length is not 32, but 40 (in guiscripts), but that includes zero terminator!
+	strnlwrcpy( ctrl->VarName, VarName, MAX_VARIABLE_LENGTH-1 );
 	ctrl->Value = Value;
 	/** setting the correct state for this control */
 	/** it is possible to set up a default value, if Lookup returns false, use it */

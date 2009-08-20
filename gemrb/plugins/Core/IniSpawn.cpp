@@ -476,7 +476,7 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 		NamelessVar = new VariableSpec[namelessvarcount];
 		for (y=0;y<namelessvarcount;y++) {
 			const char* Key = inifile->GetKeyNameByIndex("namelessvar",y);
-			strnlwrcpy(NamelessVar[y].Name, Key, sizeof(ieVariable));
+			strnlwrcpy(NamelessVar[y].Name, Key, 32);
 			NamelessVar[y].Value = inifile->GetKeyAsInt("namelessvar",Key,0);
 		}
 	}
@@ -486,7 +486,7 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 		Locals = new VariableSpec[localscount];
 		for (y=0;y<localscount;y++) {
 			const char* Key = inifile->GetKeyNameByIndex("locals",y);
-			strnlwrcpy(Locals[y].Name, Key, sizeof(ieVariable));
+			strnlwrcpy(Locals[y].Name, Key, 32);
 			Locals[y].Value = inifile->GetKeyAsInt("locals",Key,0);
 		}
 	}
