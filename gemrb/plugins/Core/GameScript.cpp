@@ -3052,6 +3052,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 				printMessage("GameScript"," ",YELLOW);
 				printf("Sender: %s-->override: %s\n",Sender->GetScriptName(), scr->GetScriptName() );
 			}
+			scr->ReleaseCurrentAction();
 			//Sender->CurrentAction
 			scr->AddAction(ParamCopyNoOverride(aC));
 		} else {
