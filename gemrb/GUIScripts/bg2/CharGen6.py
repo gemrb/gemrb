@@ -23,6 +23,7 @@ from CharGenCommon import *
 from GUICommonWindows import *
 from LUSkillsSelection import *
 from LUProfsSelection import *
+from GUICommon import LearnPriestSpells
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")

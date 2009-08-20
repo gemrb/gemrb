@@ -28,6 +28,7 @@ from ie_stats import *
 from GUICommon import CloseOtherWindow
 from GUICommonWindows import *
 from GUIWORLD import OpenReformPartyWindow
+from LUCommon import GetNextLevelExp
 
 import Portrait
 
@@ -41,6 +42,8 @@ OptionsWindow = None
 CustomizeWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
+
+NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
 
 ###################################################
 def OpenRecordsWindow ():
@@ -124,14 +127,6 @@ def OpenRecordsWindow ():
 	Window.SetVisible (3)
 	PortraitWindow.SetVisible (1)
 	return
-
-def GetNextLevelExp (Level, Class):
-	NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
-	Row = NextLevelTable.GetRowIndex (Class)
-	if Level < NextLevelTable.GetColumnCount (Row):
-		return str(NextLevelTable.GetValue (Row, Level) )
-
-	return 0;
 
 def UpdateRecordsWindow ():
 	global stats_overview, alignment_help

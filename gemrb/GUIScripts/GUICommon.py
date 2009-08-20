@@ -161,6 +161,10 @@ def CheckStat20 (Actor, Stat, Diff):
 def GameIsBG1 ():
 	return GemRB.GameType == "bg1"
 
+
+def GameIsBG2 ():
+	return GemRB.GameType == "bg2"
+
 def GameIsTOB ():
 	return GemRB.HasResource ("worldm25", RES_WMP) and GemRB.GetVar("oldgame") == 0
 
@@ -328,3 +332,22 @@ def UpdateInventorySlot (pc, Button, Slot, Type):
 		Button.SetItemIcon (Slot['ItemResRef'], 0)
 
 	return
+
+def LearnPriestSpells (pc, level, mask):
+	"""Learns all the priest spells through the given spell level.
+
+	Mask distinguishes clerical and druidic spells."""
+	if level > 7: # make sure we don't have too high a level
+		level = 7
+
+	# go through each level
+	alignment = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
+	for i in range (level):
+		learnable = GetLearnablePriestSpells (mask, alignment, i+1)
+
+		for spell in learnable:
+			# if the spell isn't learned, learn it
+			if HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, spell) < 0:
+				GemRB.LearnSpell (pc, spell)
+	return
+
