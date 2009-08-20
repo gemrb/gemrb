@@ -5765,6 +5765,7 @@ int fx_offscreenai_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_offscreenai_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_ENABLEOFFSCREENAI, fx->Parameter1 );
+	target->Activate();
 	return FX_APPLIED;
 }
 //0x126 ExistanceDelayModifier
