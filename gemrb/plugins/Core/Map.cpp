@@ -692,9 +692,8 @@ void Map::UpdateScripts()
 		Door* door = TMap->GetDoor( doorCount++ );
 		if (!door)
 			break;
-		if (!door->Scripts[0])
-			continue;
-		door->ExecuteScript( 1 );
+		if (door->Scripts[0])
+			door->ExecuteScript( 1 );
 		//Execute Pending Actions
 		door->ProcessActions(false);
 	}
@@ -705,9 +704,8 @@ void Map::UpdateScripts()
 		Container* container = TMap->GetContainer( containerCount++ );
 		if (!container)
 			break;
-		if (!container->Scripts[0])
-			continue;
-		container->ExecuteScript( 1 );
+		if (container->Scripts[0])
+			container->ExecuteScript( 1 );
 		//Execute Pending Actions
 		container->ProcessActions(false);
 	}
@@ -720,10 +718,8 @@ void Map::UpdateScripts()
 		if (!ip)
 			break;
 		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
-		if (!ip->Scripts[0] && ( ip->Type != ST_TRAVEL )) {
-			continue;
-		}
-		bool wasActive = !(ip->Flags&TRAP_DEACTIVATED);
+		bool wasActive = (ip->Scripts[0] || ( ip->Type == ST_TRAVEL ));
+ 		// bool wasActive = !(ip->Flags&TRAP_DEACTIVATED);
 
 		//If this InfoPoint is a Switch Trigger
 		if (ip->Type == ST_TRIGGER) {
