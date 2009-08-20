@@ -104,7 +104,7 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 
 			//draw overlay tiles, they should be half transparent
 			int mask = 2;
-			for (int z = 1;z<5;z++) {
+			for (size_t z = 1;z<overlays.size();z++) {
 				TileOverlay * ov = overlays[z];
 				if (ov && ov->count > 0) {
 					Tile *ovtile = ov->tiles[0]; //allow only 1x1 tiles now
