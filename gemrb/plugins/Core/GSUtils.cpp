@@ -1213,12 +1213,6 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	// we will just hope that the dialog starts in the next frame
 	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction();
-	// ok, let's clear all actions and paths too, for now (may be
-	// incorrect, but it fixes some obvious problems)
-	Sender->ClearActions();
-	if (Sender->Type == ST_ACTOR) {
-		((Actor *)Sender)->ClearPath();
-	}
 }
 
 void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust)
