@@ -31,6 +31,7 @@ from GUICommon import CloseOtherWindow
 from LUCommon import CanLevelUp, GetNextLevelExp
 from GUICommonWindows import *
 from GUIWORLD import OpenReformPartyWindow
+from BGCommon import CanDualClass
 
 ###################################################
 RecordsWindow = None
@@ -781,91 +782,6 @@ def ExportEditChanged():
 	else:
 		ExportDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
-
-def CanDualClass(actor):
-	# human
-	if GemRB.GetPlayerStat (actor, IE_RACE) != 1:
-		return 1
-
-	# already dualclassed
-	Dual = IsDualClassed (actor,0)
-	if Dual[0] > 0:
-		return 1
-
-	DualClassTable = GemRB.LoadTableObject ("dualclas")
-	CurrentStatTable = GemRB.LoadTableObject ("abdcscrq")
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassIndex = ClassTable.FindValue (5, Class)
-	ClassName = ClassTable.GetRowName (ClassIndex)
-	KitIndex = GetKitIndex (actor)
-	if KitIndex == 0:
-		ClassTitle = ClassName
-	else:
-		ClassTitle = KitListTable.GetValue (KitIndex, 0)
-	Row = DualClassTable.GetRowIndex (ClassTitle)
-
-	# a lookup table for the DualClassTable columns
-	classes = [ "FIGHTER", "CLERIC", "MAGE", "THIEF", "DRUID", "RANGER" ]
-	matches = []
-	Sum = 0
-	for col in range (0, DualClassTable.GetColumnCount ()):
-		value = DualClassTable.GetValue (Row, col)
-		Sum += value
-		if value == 1:
-			matches.append (classes[col])
-
-	# cannot dc if all the columns of the DualClassTable are 0
-	if Sum == 0:
-		print "CannotDualClass: all the columns of the DualClassTable are 0"
-		return 1
-
-	# if the only choice for dc is already the same as the actors base class
-	if Sum == 1 and ClassName in matches and KitIndex == 0:
-		print "CannotDualClass: the only choice for dc is already the same as the actors base class"
-		return 1
-
-	AlignmentTable = GemRB.LoadTableObject ("alignmnt")
-	AlignsTable = GemRB.LoadTableObject ("aligns")
-	Alignment = GemRB.GetPlayerStat (actor, IE_ALIGNMENT)
-	AlignmentColName = AlignsTable.FindValue (3, Alignment)
-	AlignmentColName = AlignsTable.GetValue (AlignmentColName, 4)
-	Sum = 0
-	for classy in matches:
-		Sum += AlignmentTable.GetValue (classy, AlignmentColName)
-
-	# cannot dc if all the available classes forbid the chars alignment
-	if Sum == 0:
-		print "CannotDualClass: all the available classes forbid the chars alignment"
-		return 1
-
-	# check current class' stat limitations
-	ClassStatIndex = CurrentStatTable.GetRowIndex (ClassTitle)
-	for stat in range (6):
-		minimum = CurrentStatTable.GetValue (ClassStatIndex, stat)
-		name = CurrentStatTable.GetColumnName (stat)
-		if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:])) < minimum:
-			print "CannotDualClass: current class' stat limitations are too big"
-			return 1
-
-	# check new class' stat limitations - make sure there are any good class choices
-	TargetStatTable = GemRB.LoadTableObject ("abdcdsrq")
-	for match in matches:
-		ClassStatIndex = TargetStatTable.GetRowIndex (match)
-		for stat in range (6):
-			minimum = TargetStatTable.GetValue (ClassStatIndex, stat)
-			name = TargetStatTable.GetColumnName (stat)
-			if GemRB.GetPlayerStat (actor, eval ("IE_" + name[4:])) < minimum:
-				matches.remove (match)
-				break
-	if len(matches) == 0:
-		print "CannotDualClass: no good new class choices"
-		return 1
-
-	# must be at least level 2
-	if GemRB.GetPlayerStat (actor, IE_LEVEL) == 1:
-		print "CannotDualClass: level 1"
-		return 1
-	return 0
 
 def OpenCustomizeWindow ():
 	global CustomizeWindow
