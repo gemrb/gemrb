@@ -2807,6 +2807,9 @@ void Actor::SetPersistent(int partyslot)
 void Actor::DestroySelf()
 {
 	InternalFlags|=IF_CLEANUP;
+	// clear search map so that a new actor can immediately go there
+	// (via ChangeAnimationCore)
+	area->ClearSearchMapFor(this);
 }
 
 bool Actor::CheckOnDeath()

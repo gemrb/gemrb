@@ -893,9 +893,11 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 	if (tar) {
 		Map *map = src->GetCurrentArea();
 		map->AddActor( tar );
-		tar->SetPosition(src->Pos, 1);
+		Point pos = src->Pos;
 		tar->SetOrientation(src->GetOrientation(), false );
 		src->DestroySelf();
+		// can't SetPosition while the old actor is taking the spot
+		tar->SetPosition(pos, 1);
 		if (effect) {
 			CreateVisualEffectCore(tar, tar->Pos,"smokepuffeffect",1);
 		}
