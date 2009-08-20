@@ -3006,6 +3006,12 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 				if (Sender->GetInternalFlag()&IF_CUTSCENEID) {
 					Scriptable *cs = Sender->GetCutsceneID();
 					if (cs) {
+						// maybe this belongs somewhere else, but it certainly
+						// happens at the start of the cutscene (note that the
+						// queue is NOT cleared, so you can still have a pending
+						// action block your cutscene!)
+						cs->ReleaseCurrentAction();
+
 						cs->AddAction( aC );
 					} else {
 						//this can happen if a script refers to a wrong cutsceneid
