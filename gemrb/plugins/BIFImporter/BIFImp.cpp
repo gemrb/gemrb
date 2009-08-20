@@ -70,6 +70,11 @@ int BIFImp::DecompressSaveGame(DataStream *compressed)
 		if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID ))
 			return GEM_ERROR;
 		FILE *in_cache = fopen( path, "wb" );
+		if (!in_cache) {
+			printMessage("BIFImporter", " ", RED);
+			printf( "Cannot write %s.\n", path );	
+			return GEM_ERROR;
+		}
 		Compressor* comp = ( Compressor* )
 			core->GetInterface( IE_COMPRESSION_CLASS_ID );
 		if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
@@ -238,6 +243,11 @@ int BIFImp::OpenArchive(const char* filename)
 		printf( "\nDecompressing file: [..........]" );
 		fflush(stdout);
 		in_cache = fopen( path, "wb" );
+		if (!in_cache) {
+			printMessage("BIFImporter", " ", RED);
+			printf( "Cannot write %s.\n", path );	
+			return GEM_ERROR;
+		}
 		ieDword finalsize = 0;
 		int laststep = 0;
 		while (finalsize < unCompBifSize) {
