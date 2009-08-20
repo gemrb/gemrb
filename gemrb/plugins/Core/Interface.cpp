@@ -111,6 +111,13 @@ Interface::Interface(int iargc, char* iargv[])
 #endif
 	textcolor( LIGHT_WHITE );
 	printf( "GemRB Core Version v%s Loading...\n", VERSION_GEMRB );
+
+	unsigned int i;
+	for(i=0;i<256;i++) {
+		pl_uppercase[i]=(ieByte) toupper(i);
+		pl_lowercase[i]=(ieByte) tolower(i);
+	}
+
 	projserv = NULL;
 	video = NULL;
 	AudioDriver = NULL;
@@ -2290,13 +2297,7 @@ bool Interface::LoadGemRBINI()
 	if (s)
 		strcpy( Palette256, s );
 
-	unsigned int i;
-	for(i=0;i<256;i++) {
-		pl_uppercase[i]=(ieByte) toupper(i);
-		pl_lowercase[i]=(ieByte) tolower(i);
-	}
-
-	i = (unsigned int) ini->GetKeyAsInt ("charset", "CharCount", 0);
+	unsigned int i = (unsigned int) ini->GetKeyAsInt ("charset", "CharCount", 0);
 	if (i>99) i=99;
 	while(i--) {
 		char key[10];
