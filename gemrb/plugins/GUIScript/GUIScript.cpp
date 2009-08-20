@@ -9820,6 +9820,11 @@ void GUIScript::ExecString(const char* string)
 
 PyObject* GUIScript::ConstructObject(const char* classname, PyObject* pArgs)
 {
+	if (!pDict) {
+		fprintf(stderr, "Tried to use an object (%s) before script compiled!\n", classname);
+		return 0;
+	}
+
 	PyObject* cobj = PyDict_GetItemString( pDict, classname );
 	if (!cobj) {
 		fprintf(stderr, "Failed to lookup name '%s'\n", classname);
