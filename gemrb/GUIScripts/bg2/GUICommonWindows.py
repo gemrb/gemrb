@@ -1255,3 +1255,5 @@ def LearnPriestSpells (pc, level, mask):
 			# if the spell isn't learned, learn it
 			if HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, spell) < 0:
 				GemRB.LearnSpell (pc, spell)
+	return
+

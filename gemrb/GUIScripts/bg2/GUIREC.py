@@ -309,7 +309,6 @@ def GSNN (pc, stat):
 # LevelDiff is used only from the level up code and holds the level
 # difference for each class
 def GetStatOverview (pc, LevelDiff=[0,0,0]):
-	print "Function GUIREC.GetStatOverview:"
 	StateTable = GemRB.LoadTableObject ("statdesc")
 	str_None = GemRB.GetString (61560)
 
@@ -331,7 +330,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	Dual = IsDualClassed (pc, 1)
 	Multi = IsMultiClassed (pc, 1)
 	XP = GemRB.GetPlayerStat (pc, IE_XP)
-	LevelDrain = GS(IE_LEVELDRAIN)
+	LevelDrain = GS (IE_LEVELDRAIN)
 
 	if Multi[0] > 1: # we're multiclassed
 		print "\tMulticlassed"
@@ -435,6 +434,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				stats.append ( (tmp,c,'a') )
 			stats.append (None)
 
+	#proficiencies
 	stats.append ( (8442,1,'c') )
 
 	stats.append ( (61932, GS (IE_TOHIT), '0') )
@@ -445,11 +445,13 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append ( (9457, GemRB.GetCombatDetails(pc, 0)["ToHit"], '0') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
-		tmp2 = str (tmp/2) + chr(188)
+		tmp2 = str (tmp/2) + chr (188)
 	else:
 		tmp2 = str (tmp/2)
 	stats.append ( (9458, tmp2, '') )
 	stats.append ( (9459, GSNN (pc, IE_LORE), '0') )
+
+	#reputation
 	reptxt = GetReputation (GemRB.GameGetReputation ()/10)
 	stats.append ( (9465, reptxt, '') )
 	stats.append ( (9460, GSNN (pc, IE_LOCKPICKING), '') )
@@ -479,22 +481,21 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ( (2078, aiscript, '') )
 	stats.append (None)
 
-
-	# 17379 Saving Throws
+	# 17379 Saving throws
 	stats.append (17379)
-	# 17380 Death
+	# 17380 Paralyze/Poison/Death
 	stats.append ( (17380, GS (IE_SAVEVSDEATH), '0') )
-	# 17381
+	# 17381 Rod/Staff/Wand
 	stats.append ( (17381, GS (IE_SAVEVSWANDS), '0') )
-	# 17382 AC vs. Crushing
+	# 17382 Petrify/Polymorph
 	stats.append ( (17382, GS (IE_SAVEVSPOLY), '0') )
-	# 17383 Rod
+	# 17383 Breath weapon
 	stats.append ( (17383, GS (IE_SAVEVSBREATH), '0') )
 	# 17384 Spells
 	stats.append ( (17384, GS (IE_SAVEVSSPELL), '0') )
 	stats.append (None)
 
-	# 9466 Weapon profs
+	# 9466 Weapon proficiencies
 	stats.append (9466)
 	table = GemRB.LoadTableObject ("weapprof")
 	RowCount = table.GetRowCount ()
@@ -502,10 +503,10 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	for i in range (8,RowCount):
 		text = table.GetValue (i, 1)
 		stat = table.GetValue (i, 0)
-		stats.append ( (text, GS(stat)&0x07, '+') )
+		stats.append ( (text, GS (stat)&0x07, '+') )
 	stats.append (None)
 
-	# 11766 AC Bonuses
+	# 11766 AC bonuses
 	stats.append (11766)
 	# 11770 AC vs. Crushing
 	stats.append ((11770, GS (IE_ACCRUSHINGMOD), ''))
@@ -530,18 +531,18 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# 10338 weight allowance
 	stats.append ( (10338, GemRB.GetAbilityBonus (IE_STR,3,value,ex), '0') )
 	# 10339 AC
-	stats.append ( (10339, GA(IE_DEX,2), '0') )
-	# 10340 Missile
-	stats.append ( (10340, GA(IE_DEX,1), '0') )
-	# 10341 Reaction
-	stats.append ( (10341, GA(IE_DEX,0), '0') )
-	# 10342 Hp/Level
-	stats.append ( (10342, GA(IE_CON,0), '0') )
+	stats.append ( (10339, GA (IE_DEX,2), '0') )
+	# 10340 Missile adjustment
+	stats.append ( (10340, GA (IE_DEX,1), '0') )
+	# 10341 Reaction adjustment
+	stats.append ( (10341, GA (IE_DEX,0), '0') )
+	# 10342 CON HP Bonus/Level
+	stats.append ( (10342, GA (IE_CON,0), '0') )
 	# 10343 Chance To Learn spell
 	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, 0, 0)>0:
-		stats.append ((10343, GA (IE_INT,0), '%' ))
+		stats.append ( (10343, GA (IE_INT,0), '%' ) )
 	# 10347 Reaction
-	stats.append ( (10347, GA(IE_CHR,0), '0') )
+	stats.append ( (10347, GA (IE_CHR,0), '0') )
 	stats.append (None)
 
 	#Bonus spells
@@ -611,7 +612,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			elif type == 'x': #x character before value
 				res.append ("[capital=0]"+GemRB.GetString (strref)+': x' + str (val) )
 			elif type == 'a': #value (portrait icon) + string
-				res.append ("[capital=2]"+val+" "+GemRB.GetString (strref))
+				res.append ("[capital=2]"+val+" "+GemRB.GetString (strref) )
 			elif type == 'b': #strref is an already resolved string
 				res.append ("[capital=0]"+strref+": "+str (val) )
 			elif type == 'c': #normal string
@@ -1094,14 +1095,14 @@ def OpenAppearanceWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	OwnPortraitButton = SubCustomizeWindow.GetControl (5)
-	OwnPortraitButton.SetText (17545)
+	CustomPortraitButton = SubCustomizeWindow.GetControl (5)
+	CustomPortraitButton.SetText (17545)
 
 	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitLeftPress")
 	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitRightPress")
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePortraitWindow")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
-	OwnPortraitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenCustomPortraitWindow")
+	CustomPortraitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenCustomPortraitWindow")
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	while True:
@@ -1278,6 +1279,7 @@ def OpenSoundWindow ():
 	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PlaySoundPressed")
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneSoundWindow")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
+
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -1336,6 +1338,7 @@ def OpenColorWindow ():
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneColorWindow")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
 	UpdatePaperDoll ()
+
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -1474,6 +1477,7 @@ def OpenScriptWindow ():
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneScriptWindow")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
 	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "UpdateScriptSelection")
+
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -1524,7 +1528,7 @@ def OpenBiographyEditWindow ():
 
 	ClearButton = SubCustomizeWindow.GetControl (5)
 	ClearButton.SetText (34881)
-	
+
 	DoneButton = SubCustomizeWindow.GetControl (1)
 	DoneButton.SetText (11973)
 	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
@@ -1546,6 +1550,7 @@ def OpenBiographyEditWindow ():
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneBiographyWindow")
 	RevertButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RevertBiography")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
+
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -1558,7 +1563,7 @@ def ClearBiography():
 
 def DoneBiographyWindow ():
 	global BioStrRef
-	
+
 	#TODO set bio
 	pc = GemRB.GameGetSelectedPCSingle ()
 	#pc is 1 based
