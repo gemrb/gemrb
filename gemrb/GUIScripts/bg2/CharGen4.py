@@ -21,7 +21,7 @@
 import GemRB
 from CharGenCommon import *
 from GUICommonWindows import *
-from LevelUp import GetNextLevelFromExp
+from LUCommon import GetNextLevelFromExp
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")

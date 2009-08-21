@@ -595,18 +595,6 @@ def LevelUpDonePress():
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 	return
 
-def GetNextLevelFromExp (XP, Class):
-	"""Gets the next level based on current experience."""
-
-	ClassIndex = ClassTable.FindValue (5, Class)
-	ClassName = ClassTable.GetRowName (ClassIndex)
-	Row = NextLevelTable.GetRowIndex (ClassName)
-	for i in range(1, NextLevelTable.GetColumnCount()-1):
-		if XP < NextLevelTable.GetValue (Row, i):
-			return i
-	# fix hacked characters that have more xp than the xp cap
-	return 40
-
 def LevelUpHLAPress ():
 	"""Opens the HLA selection window."""
 

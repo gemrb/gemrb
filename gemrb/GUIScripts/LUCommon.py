@@ -239,3 +239,16 @@ def ReactivateBaseClass ():
 	# add the abilites if we aren't a mage and have a table to ref
 	if ABTable != "*" and ABTable[:6] != "CLABMA":
 		AddClassAbilities (pc, ABTable, Level[1], Level[1]) # relearn class abilites
+
+def GetNextLevelFromExp (XP, Class):
+	"""Gets the next level based on current experience."""
+
+	ClassIndex = ClassTable.FindValue (5, Class)
+	ClassName = ClassTable.GetRowName (ClassIndex)
+	Row = NextLevelTable.GetRowIndex (ClassName)
+	for i in range(1, NextLevelTable.GetColumnCount()-1):
+		if XP < NextLevelTable.GetValue (Row, i):
+			return i
+	# fix hacked characters that have more xp than the xp cap
+	return 40
+
