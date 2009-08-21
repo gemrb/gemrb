@@ -1732,25 +1732,29 @@ int GameScript::HarmlessEntered(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-/* Same as entered, except that 'Trapped' isn't checked */
 int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type != ST_PROXIMITY) {
 		return 0;
 	}
+	Highlightable *trap = (Highlightable *)Sender;
 
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastEntered) {
-			Sender->AddTrigger (&Sender->LastEntered);
-			return 1;
+	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, parameters->objectParameter, GA_NO_DEAD);
+	int ret = 0;
+	if (tgts) {
+		targetlist::iterator m;
+		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
+		while (tt) {
+			Actor *actor = (Actor *) tt->actor;
+			if (trap->IsOver(actor->Pos)) {
+				ret = 1;
+				break;
+			}
+			tt = tgts->GetNextTarget(m, ST_ACTOR);
 		}
-		return 0;
 	}
-	if (MatchActor(Sender, Sender->LastEntered, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastEntered);
-		return 1;
-	}
-	return 0;
+	delete tgts;
+	return ret;
 }
 
 //this function is different in every engines, if you use a string0parameter
