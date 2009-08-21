@@ -2039,16 +2039,34 @@ void Actor::RollSaves()
 	}
 }
 
+//saving throws:
+//type      bits in file    order in stats
+//0  spells            1    4
+//1  breath            2    3
+//2  death             4    0
+//3  wands             8    1
+//4  polymorph        16    2
+
+//iwd2 (luckily they use the same bits as it would be with bg2):
+//0 not used
+//1 not used
+//2 fortitude          4   0
+//3 reflex             8   1
+//4 will              16   2
+
+#define SAVECOUNT 5
+static int savingthrows[SAVECOUNT]={IE_SAVEVSSPELL, IE_SAVEVSBREATH, IE_SAVEVSDEATH, IE_SAVEVSWANDS, IE_SAVEVSPOLY};
+
 /** returns true if actor made the save against saving throw type */
 bool Actor::GetSavingThrow(ieDword type, int modifier)
 {
-	assert(type<5);
+	assert(type<SAVECOUNT);
 	InternalFlags|=IF_USEDSAVE;
 	int ret = SavingThrow[type];
 	if (ret == 1) return false;
 	if (ret == SAVEROLL) return true;
 	ret += modifier;
-	return ret > (int) GetStat(IE_SAVEVSDEATH+type);
+	return ret > (int) GetStat(savingthrows[type]);
 }
 
 /** implements a generic opcode function, modify modified stats
