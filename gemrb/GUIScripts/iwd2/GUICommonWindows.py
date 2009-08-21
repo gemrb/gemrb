@@ -604,8 +604,3 @@ def PortraitButtonOnMouseLeave ():
 	Button.EnableBorder (FRAME_PC_TARGET, 0)
 	return
 
-def GetSavingThrow (SaveName, row, level):
-	SaveTable = GemRB.LoadTableObject (SaveName)
-	tmp = SaveTable.GetValue (level)
-	return tmp
-

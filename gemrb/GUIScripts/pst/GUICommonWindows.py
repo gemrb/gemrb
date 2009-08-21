@@ -487,11 +487,6 @@ def EnableAnimatedWindows ():
 	GemRB.GamePause (0,1)
 
 
-def GetSavingThrow (SaveName, row, level):
-	SaveTable = GemRB.LoadTableObject (SaveName)
-	tmp = SaveTable.GetValue (level)
-	return tmp
-
 def SetEncumbranceButton (Window, ButtonID, pc):
 	"""Set current/maximum encumbrance button for a given pc,
 	using numeric font"""
