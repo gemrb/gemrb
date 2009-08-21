@@ -27,11 +27,10 @@ import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import *
-from GUICommon import CloseOtherWindow
+from GUICommon import *
 from LUCommon import CanLevelUp, GetNextLevelExp
 from GUICommonWindows import *
 from GUIWORLD import OpenReformPartyWindow
-from BGCommon import CanDualClass
 
 ###################################################
 RecordsWindow = None

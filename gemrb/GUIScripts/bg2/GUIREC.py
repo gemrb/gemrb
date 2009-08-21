@@ -27,11 +27,10 @@ import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import *
-from GUICommon import CloseOtherWindow
+from GUICommon import *
 from LUCommon import CanLevelUp, GetNextLevelExp
 from GUICommonWindows import *
 from GUIWORLD import OpenReformPartyWindow
-from BGCommon import CanDualClass
 
 ###################################################
 RecordsWindow = None
@@ -342,6 +341,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append (None)
 		for i in range (Multi[0]):
 			ClassIndex = ClassTable.FindValue (5, Multi[i+1])
+			print "AAAAA", ClassIndex, Multi
 			ClassTitle = GemRB.GetString (ClassTable.GetValue (ClassIndex, 2))
 			GemRB.SetToken ("CLASS", ClassTitle)
 			Class = ClassTable.GetRowName (ClassIndex)

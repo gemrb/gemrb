@@ -22,8 +22,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from BGCommon import *
-from GUICommon import GameIsBG1
+from GUICommon import *
 
 #the different types possible
 LUPROFS_TYPE_LEVELUP = 0

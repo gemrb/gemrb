@@ -19,7 +19,7 @@
 #
 #ToB start window, precedes the SoA window
 import GemRB
-from GUICommon import HasTOB
+from GUICommon import HasTOB, LoadCommonTables
 
 StartWindow = 0
 
@@ -42,6 +42,8 @@ def OnLoad():
 		GemRB.LoadWindowFrame("STON08L", "STON08R", "STON08T", "STON08B")
 	elif screen_width == 1024:
 		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
+
+	LoadCommonTables ()
 
 	#if not detected tob, we go right to the main menu
 	if not HasTOB():

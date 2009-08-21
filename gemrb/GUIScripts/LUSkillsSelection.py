@@ -22,7 +22,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from BGCommon import *
+from GUICommon import *
 
 #constants
 LUSKILLS_TYPE_CHARGEN = 0

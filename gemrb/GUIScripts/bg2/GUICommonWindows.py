@@ -31,7 +31,6 @@ from ie_modal import *
 from ie_action import *
 from ie_slots import *
 from GUICommon import *
-from BGCommon import *
 from LUCommon import *
 
 FRAME_PC_SELECTED = 0

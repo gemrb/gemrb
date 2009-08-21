@@ -21,7 +21,7 @@
 # LUCommon.py - common functions related to leveling up
 
 import GemRB
-from BGCommon import ClassTable, NextLevelTable, IsMultiClassed, IsDualClassed, IsDualSwap
+from GUICommon import *
 from ie_stats import *
 
 def GetNextLevelExp (Level, Class):
