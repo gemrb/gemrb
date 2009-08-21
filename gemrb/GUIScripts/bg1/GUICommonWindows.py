@@ -455,41 +455,6 @@ def EquipmentPressed ():
 	UpdateActionsWindow ()
 	return
 
-def GetActorClassTitle (actor):
-	"""Returns the string representation of the actors class."""
-
-	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
-
-	if ClassTitle == 0:
-		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-		ClassIndex = ClassTable.FindValue ( 5, Class )
-		KitIndex = GetKitIndex (actor)
-		Multi = ClassTable.GetValue (ClassIndex, 4)
-		Dual = IsDualClassed (actor, 1)
-
-		if Multi and Dual[0] == 0: # true multi class
-			ClassTitle = ClassTable.GetValue (ClassIndex, 2)
-			ClassTitle = GemRB.GetString (ClassTitle)
-		else:
-			if Dual[0]: # dual class
-				# first (previous) kit or class of the dual class
-				if Dual[0] == 1:
-					ClassTitle = KitListTable.GetValue (Dual[1], 2)
-				elif Dual[0] == 2:
-					ClassTitle = ClassTable.GetValue (Dual[1], 2)
-				ClassTitle = GemRB.GetString (ClassTitle) + " / "
-				ClassTitle += GemRB.GetString (ClassTable.GetValue (Dual[2], 2))
-			else: # ordinary class or kit
-				if KitIndex:
-					ClassTitle = KitListTable.GetValue (KitIndex, 2)
-				else:
-					ClassTitle = ClassTable.GetValue (ClassIndex, 2)
-				ClassTitle = GemRB.GetString (ClassTitle)
-
-	if ClassTitle == "*":
-		return 0
-	return ClassTitle
-
 def GetActorPaperDoll (actor):
 	PortraitTable = GemRB.LoadTableObject ("PDOLLS")
 	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)

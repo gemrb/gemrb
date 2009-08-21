@@ -439,21 +439,6 @@ def EquipmentPressed ():
 	UpdateActionsWindow ()
 	return
 
-def GetActorClassTitle (actor):
-	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
-	KitIndex = 0
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassTable = GemRB.LoadTableObject ("classes")
-	Class = ClassTable.FindValue ( 5, Class )
-
-	if ClassTitle == 0:
-		if KitIndex == 0:
-			ClassTitle=ClassTable.GetValue (Class, 2)
-		#else:
-		#	ClassTitle=KitTable.GetValue (KitIndex, 2)
-
-	return ClassTitle
-
 def GetActorPaperDoll (actor):
 	PortraitTable = GemRB.LoadTableObject ("PDOLLS")
 	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)
