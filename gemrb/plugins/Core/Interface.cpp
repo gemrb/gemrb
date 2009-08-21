@@ -3940,7 +3940,7 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 
 	//this warning comes only when feedback is enabled
 	if (feedback) {
-		if (slottype&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
+		if (slotmatrix[item->ItemType]&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
 			ret = 0;
 			if (slottype&SLOT_QUIVER) {
 				if (item->GetWeaponHeader(true)) ret = 1;
