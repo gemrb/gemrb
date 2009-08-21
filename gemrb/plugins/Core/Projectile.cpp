@@ -733,8 +733,16 @@ int Projectile::CalculateTargetFlag()
 	case PAF_TARGET:
 		flags|=GA_NO_NEUTRAL|GA_NO_ENEMY;
 		break;
+	default:
+		return flags;
 	}
-	return flags;
+
+	Actor *caster = area->GetActorByGlobalID(Caster);
+	if (caster && ((Actor *) caster)->GetStat(IE_EA)<EA_GOODCUTOFF) {
+		return flags;
+	}
+
+	return flags^(GA_NO_ALLY|GA_NO_ENEMY);
 }
 
 //get actors covered in area of trigger radius
