@@ -1273,7 +1273,7 @@ void Projectile::DrawTravel(Region &screen)
 	pos.y+=screen.y;
 
 	if(ExtFlags&PEF_CURVE) {
-		amp = sqrt(Distance(Origin, pos)*Distance(pos,Destination));
+		amp = (int)sqrt(Distance(Origin, pos)*Distance(pos,Destination));
 		printf("%d  ", amp);
 	}
 
