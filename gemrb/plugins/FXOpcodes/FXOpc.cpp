@@ -5053,35 +5053,56 @@ int fx_wing_buffet (Scriptable* Owner, Actor* target, Effect* fx)
 
 // 0xec ProjectImage
 
+static EffectRef fx_puppetmarker_ref={"PuppetMarker",NULL,-1};
+
 int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	const char * resref = NULL;
 
 	if (0) printf( "fx_puppet_master (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET (IE_PUPPETMASTERTYPE, fx->Parameter1);
+
+	//copyself doesn't copy scripts, so the script clearing code is not needed
 	Actor *copy = target->CopySelf();
+
+	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
+	if (newfx) {
+		core->ApplyEffect(newfx, copy, copy);
+		delete newfx;
+	}
+
+	ieResRef script;
+	
+	//intentionally 7, to leave room for the last letter
+	strnlwrcpy(script,target->GetScript(SCR_CLASS),7); 
+	//no need of buffer defense as long as you don't mess with the 7 above
+	strcat(script,"m"); 
+	//if the caster is inparty, the script is turned off by the AI disable flag
+	copy->SetScript(script, SCR_CLASS, target->InParty!=0); 
+
 	switch(fx->Parameter2)
 	{
 	case 1:
-		resref = "MISLEAD";
+		resref = "mislead";
 		break;
 	case 2:
-		resref = "PROJIMG";
+		resref = "projimg";
 		break;
 	case 3:
-		resref = "SIMULACR";
+		resref = "simulacr";
 		break;
 	default:
 		resref = fx->Resource;
 		break;
 	}
-	//resref is always something, but we play safe
-	if (resref && resref[0]) {
-		core->ApplySpell(resref,copy,target,0);
+	if (resref[0]) {
+		core->ApplySpell(resref,copy,copy,0);
 	}
-	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
+
+	//FIXME: parameter1 is unsure, but something similar to what the original engine has there
+	newfx = EffectQueue::CreateEffectCopy(fx, fx_puppetmarker_ref, target->InParty-1, fx->Parameter2);
 	if (newfx) {
-		core->ApplyEffect(newfx, copy, target);
+		core->ApplyEffect(newfx, copy, copy);
 		delete newfx;
 	}
 	return FX_NOT_APPLIED;
@@ -5091,7 +5112,10 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_puppet_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_puppet_marker (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_SET (IE_PUPPETTYPE, fx->Parameter1);
+	//actually the Type is in parameter2 and the ID is in parameter1
+	//but for some reason the defines are in the opposite order
+	STAT_SET (IE_PUPPETTYPE, fx->Parameter1);  //cb4 - the ID of the controller
+	STAT_SET (IE_PUPPETID, fx->Parameter2);    //cb8 - the control type
 	return FX_APPLIED;
 }
 
