@@ -26,6 +26,7 @@ from ie_restype import RES_2DA
 from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities
 from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GSNN
 from GUICommonWindows import *
+from LUCommon import *
 from LUSpellSelection import *
 from LUHLASelection import *
 from LUProfsSelection import *

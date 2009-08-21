@@ -609,35 +609,3 @@ def GetSavingThrow (SaveName, row, level):
 	tmp = SaveTable.GetValue (level)
 	return tmp
 
-def SetupSavingThrows (pc):
-	level1 = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
-	if level1 > 20:
-		level1 = 20
-	level2 = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
-	if level2 > 20:
-		level2 = 20
-	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassTable = GemRB.LoadTableObject ("classes")
-	Class = ClassTable.FindValue (5, Class)
-	Multi = ClassTable.GetValue (4, Class)
-	if Multi:
-		if Class == 7:
-			#fighter/mage
-			Class = ClassTable.FindValue (5, 1)
-		else:
-			#fighter/thief
-			Class = ClassTable.FindValue (5, 4)
-		SaveName2 = ClassTable.GetValue (Class, 3)
-		Class = 0 #fighter
-
-	SaveName1 = ClassTable.GetValue (Class, 3)
-
-	for row in range (5):
-		tmp1 = GetSavingThrow (SaveName1, row, level1)
-		if Multi:
-			tmp2 = GetSavingThrow (SaveName2, row, level2)
-			if tmp2<tmp1:
-				tmp1=tmp2
-		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
-	return
-

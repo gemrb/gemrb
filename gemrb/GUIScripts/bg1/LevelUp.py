@@ -27,7 +27,7 @@ from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell,
 from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GSNN
 from GUICommonWindows import *
 from LUSpellSelection import *
-#from LUHLASelection import *
+from LUCommon import *
 from LUProfsSelection import *
 from LUSkillsSelection import *
 from Actor import *

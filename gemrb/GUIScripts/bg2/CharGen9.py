@@ -25,6 +25,7 @@ from ie_slots import *
 from ie_spells import *
 from GUICommon import *
 from GUICommonWindows import *
+from LUCommon import *
 from LUProfsSelection import *
 
 CharGenWindow = 0
