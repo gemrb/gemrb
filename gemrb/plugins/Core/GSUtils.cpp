@@ -1007,7 +1007,6 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		tar = GetActorFromObject( Sender, parameters->objects[1], seeflag);
 		scr = tar;
 	} else {
-		seeflag |= GA_GLOBAL;
 		tar = GetActorFromObject( Sender, parameters->objects[1], seeflag);
 		scr = Sender;
 	}
