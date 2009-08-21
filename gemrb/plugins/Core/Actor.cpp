@@ -3672,12 +3672,12 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (InternalFlags&IF_STOPATTACK) {
 		// this should be avoided by the AF_ALIVE check by all the calling actions
-		printMessage("Actor", "Attack by dead actor!", LIGHT_RED);
+		printMessage("Actor", "Attack by dead actor!\n", LIGHT_RED);
 		return;
 	}
 
 	if (!LastTarget) {
-		printMessage("Actor", "Attack without valid target ID!", LIGHT_RED);
+		printMessage("Actor", "Attack without valid target ID!\n", LIGHT_RED);
 		return;
 	}
 	//get target
@@ -3688,7 +3688,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	if (!target) {
-		printMessage("Actor", "Attack without valid target!", LIGHT_RED);
+		printMessage("Actor", "Attack without valid target!\n", LIGHT_RED);
 		return;
 	}
 
