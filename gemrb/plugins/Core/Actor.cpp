@@ -5014,8 +5014,11 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 			SetStance(stance);
 			//play only one cycle of animations
 
-			anims->nextStanceID=IE_ANI_READY;
-			anims->autoSwitchOnEnd=true;
+			// this was crashing for fuzzie due to NULL anims
+			if (anims) {
+				anims->nextStanceID=IE_ANI_READY;
+				anims->autoSwitchOnEnd=true;
+			}
 		}
 	}
 
