@@ -802,7 +802,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					overInfoPoint->DebugDump();
 					break;
 				}
-				core->GetGame()->GetCurrentArea()->DebugDump();
+				core->GetGame()->GetCurrentArea()->DebugDump(Mod & GEM_MOD_SHIFT);
 				break;
 			case 'v': //marks some of the map visited (random vision distance)
 				area->ExploreMapChunk( p, rand()%30, 1 );

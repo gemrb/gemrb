@@ -1923,7 +1923,7 @@ bool Map::CanFree()
 	return true;
 }
 
-void Map::DebugDump()
+void Map::DebugDump(bool show_actors)
 {
 	printf( "DebugDump of Area %s:\n", scriptName );
 	printf( "OutDoor: %s\n", YESNO(AreaType & AT_OUTDOOR ) );
@@ -1932,6 +1932,16 @@ void Map::DebugDump()
 	printf( "Weather: %s\n", YESNO(AreaType & AT_WEATHER ) );
 	printf( "Area Type: %d\n", AreaType & (AT_CITY|AT_FOREST|AT_DUNGEON) );
 	printf( "Can rest: %s\n", YESNO(AreaType & AT_CAN_REST) );
+
+	if (show_actors) {
+		printf("\n");
+		size_t i = actors.size();
+		while (i--) {
+			if (!(actors[i]->GetInternalFlag()&(IF_JUSTDIED|IF_REALLYDIED))) {
+				printf("Actor: %s at %d.%d\n", actors[i]->GetName(0), actors[i]->Pos.x, actors[i]->Pos.y);
+			}
+		}
+	}
 }
 
 /******************************************************************************/
