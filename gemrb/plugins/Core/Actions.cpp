@@ -554,6 +554,13 @@ void GameScript::MoveToExpansion(Scriptable* Sender, Action* /*parameters*/)
 	Game *game = core->GetGame();
 
 	game->SetExpansion(1);
+
+	int i = game->GetPartySize(false);
+	while(i--) {
+		Actor *actor = game->GetPC(i, false);
+		game->InitActorPos(actor);
+	}
+
 	SaveGameIterator *sg = core->GetSaveGameIterator();
 	if (sg) {
 		sg->Invalidate();

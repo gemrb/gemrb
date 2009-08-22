@@ -247,6 +247,8 @@ public:
 	Actor* FindPC(const char *deathvar);
 	/** Finds an actor in store by scripting name*/
 	Actor* FindNPC(const char *deathvar);
+	/** Sets the area and position of the actor to the starting position */
+	void InitActorPos(Actor *actor);
 	/** Joins party */
 	int JoinParty(Actor* pc, int join=JP_JOIN);
 	/** Return current party size */

@@ -312,34 +312,41 @@ bool Game::DetermineStartPosType(const TableMgr *strta)
 	}
 	return false;
 }
-int Game::JoinParty(Actor* actor, int join)
+
+void Game::InitActorPos(Actor *actor)
 {
 	bool startorient = 0;
+
+	AutoTable strta("startpos");
+	// 0 - single player, 1 - tutorial, 2 - expansion
+	ieDword playmode = 0;
+	core->GetDictionary()->Lookup( "PlayMode", playmode );
+	//hack for iwd2
+	startorient = DetermineStartPosType(strta.ptr());
+	if (startorient || strta->GetRowCount()<6) {
+		playmode %= 2;
+		actor->SetOrientation( atoi( strta->QueryField( playmode+4, actor->InParty-1) ), false );
+	}
+	playmode *= 2;
+	actor->Pos.x = actor->Destination.x = (short) atoi( strta->QueryField( playmode, actor->InParty-1 ) );
+	actor->Pos.y = actor->Destination.y = (short) atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
+
+	strta.load("startare");
+	playmode /= 2;
+	playmode *= 3;
+	strnlwrcpy(actor->Area, strta->QueryField( playmode, 0 ), 8 );
+	//TODO: set viewport
+
+	SelectActor(actor,true, SELECT_QUIET);
+}
+
+int Game::JoinParty(Actor* actor, int join)
+{
 	actor->CreateStats(); //create stats if they didn't exist yet
 	actor->InitButtons(actor->GetStat(IE_CLASS), false); //init actor's buttons
 	actor->SetBase(IE_EXPLORE, 1);
 	if (join&JP_INITPOS) {
-		AutoTable strta("startpos");
-		// 0 - single player, 1 - tutorial, 2 - expansion
-		ieDword playmode = 0;
-		core->GetDictionary()->Lookup( "PlayMode", playmode );
-		//hack for iwd2
-		startorient = DetermineStartPosType(strta.ptr());
-		if (startorient || strta->GetRowCount()<6) {
-			playmode %= 2;
-			actor->SetOrientation( atoi( strta->QueryField( playmode+4, actor->InParty-1) ), false );
-		}
-		playmode *= 2;
-		actor->Pos.x = actor->Destination.x = (short) atoi( strta->QueryField( playmode, actor->InParty-1 ) );
-		actor->Pos.y = actor->Destination.y = (short) atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
-
-		strta.load("startare");
-		playmode /= 2;
-		playmode *= 3;
-		strnlwrcpy(actor->Area, strta->QueryField( playmode, 0 ), 8 );
-		//TODO: set viewport
-
-		SelectActor(actor,true, SELECT_QUIET);
+		InitActorPos(actor);
 	}
 	int slot = InParty( actor );
 	if (slot != -1) {
