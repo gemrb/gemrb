@@ -565,15 +565,40 @@ void Map::DrawPortal(InfoPoint *ip, int enable)
 
 void Map::UpdateScripts()
 {
+	bool has_pcs = false;
+	size_t i=actors.size();
+	while (i--) {
+		if (actors[i]->InParty) {
+			has_pcs = true;
+			break;
+		}
+	}
+
 	// if masterarea, then we allow 'any' actors
 	// if not masterarea, we allow only players
-	if (!GetActorCount(MasterArea) ) {
+	// if (!GetActorCount(MasterArea) ) {
+	// fuzzie changed this because the previous code was wrong
+	// (GetActorCount(false) returns only non-PCs) - it is not
+	// well-tested so feel free to change if there are problems
+	// (for example, the CanFree seems like it would be needed to
+	// check for any running scripts, such as following, but it seems
+	// to work ok anyway in my testing - if you change it you probably
+	// also want to change the actor updating code below so it doesn't
+	// add new actions while we are trying to get rid of the area!)
+	if (!has_pcs && !(MasterArea && actors.size()) /*&& !CanFree()*/) {
 		return;
 	}
 
-	//Run the Map Script
-	ExecuteScript( 1 );
-
+	// fuzzie added this check because some area scripts (eg, AR1600 when
+	// escaping Brynnlaw) were executing after they were meant to be done, 
+	// and this seems the nicest way of handling that for now - it's quite
+	// possibly wrong (so if you have problems, revert this and find
+	// another way)
+	if (has_pcs) {
+		//Run the Map Script
+		ExecuteScript( 1 );
+	}
+	
 	//Execute Pending Actions
 	//if it is only here, then the drawing will fail
 	ProcessActions(false);
