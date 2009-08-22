@@ -4196,6 +4196,8 @@ void Actor::Draw(Region &screen)
 			return;
 		if (LastTarget) //currently attacking someone
 			return;
+		if (!lastRunTime) // haven't had a chance to run a script
+			return;
 		if (CurrentAction)
 			return;
 		if (GetNextStep())
