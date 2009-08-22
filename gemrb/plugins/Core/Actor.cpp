@@ -3612,7 +3612,7 @@ static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 
 int Actor::GetDefense(int DamageType)
 {
-	//dexterity bonus.
+	//specific damage type bonus.
 	int defense = 0;
 	if(DamageType > 5)
 		DamageType = 0;
@@ -3662,7 +3662,7 @@ int Actor::GetDefense(int DamageType)
 	} else {
 		defense += GetStat(IE_ARMORCLASS);
 	}
-//Defense bonus are stocked < 0 in 2da files.
+	//Dexterity bonus is stored negative in 2da files.
 	return defense + core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) );
 }
 
@@ -3795,15 +3795,19 @@ void Actor::PerformAttack(ieDword gameTime)
 	//damage type is?
 	//modify defense with damage type
 	ieDword damagetype = hittingheader->DamageType;
-	int damage;
+	int damage = 0;
 	
 	if (hittingheader->DiceThrown<256) {
-		damage = core->Roll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus);
-		printf("| Damage %dd%d%+d = %d ",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
 		int damageluck = (int) GetStat(IE_DAMAGELUCK);
-		if (damage<damageluck) {
-			damage = damageluck;
+		int roll;
+		// luck increases the minimum damage rolled per dice, but only up to DiceSides
+		for (int dice=0; dice < hittingheader->DiceThrown; dice++) {
+			roll = core->Roll(1, hittingheader->DiceSides, damageluck);
+			if (roll > hittingheader->DiceSides) roll = hittingheader->DiceSides;
+			damage += roll;
 		}
+		damage += DamageBonus;
+		printf("| Damage %dd%d%+d = %d ",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
 	} else {
 		printf("| No Damage");
 		damage = 0;
