@@ -38,6 +38,7 @@ PortraitWindow = None
 OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
+BookType = None
 
 def OpenMageWindow ():
 	global MageWindow, OptionsWindow, PortraitWindow
@@ -66,8 +67,7 @@ def OpenMageWindow ():
 	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIMG", 640, 480)
-	MageWindow = Window = GemRB.LoadWindowObject (2)
-	GemRB.SetVar ("OtherWindow", MageWindow.ID)
+
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindowObject (0)
@@ -75,7 +75,34 @@ def OpenMageWindow ():
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenMageWindow")
 	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
+
 	PortraitWindow = OpenPortraitWindow (0)
+	SetupMageWindow()
+	SetSelectionChangeHandler (SetupMageWindow)
+	return
+
+def SetupMageWindow ():
+	global MageWindow
+	global BookType
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	BookType = 0
+	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 8)==2):
+		BookType = 1
+		
+	if MageWindow:
+		MageWindow.Unload()
+		MageWindow = None
+
+	if BookType:
+		MageWindow = Window = GemRB.LoadWindowObject (8)
+	else:
+		MageWindow = Window = GemRB.LoadWindowObject (2)
+	GemRB.SetVar ("OtherWindow", MageWindow.ID)
+	
+	if BookType:
+		label = Window.GetControl (0x10000040)
+		label.SetText (61256) #spells can cast
 
 	Button = Window.GetControl (1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MagePrevLevelPress")
@@ -98,12 +125,13 @@ def OpenMageWindow ():
 		Button.SetVarAssoc ("MageSpellLevel", i)
 
 	# Setup memorized spells buttons
-	for i in range (12):
-		Button = Window.GetControl (3 + i)
-		Button.SetBorder (0,0,0,0,0,0,0,0,64,0,1)
-		Button.SetSprites ("SPELFRAM",0,0,0,0,0)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
+	if not BookType:
+		for i in range (12):
+			Button = Window.GetControl (3 + i)
+			Button.SetBorder (0,0,0,0,0,0,0,0,64,0,1)
+			Button.SetSprites ("SPELFRAM",0,0,0,0,0)
+			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+			Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
 	for i in range (24):
@@ -111,7 +139,6 @@ def OpenMageWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-	SetSelectionChangeHandler (UpdateMageWindow)
 	UpdateMageWindow ()
 	OptionsWindow.SetVisible (1)
 	#bringing the window front
@@ -139,34 +166,34 @@ def UpdateMageWindow ():
 	Label = Window.GetControl (0x10000035)
 	Label.SetText (Name)
 
-	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
-	for i in range (12):
-		Button = Window.GetControl (3 + i)
-		if i < mem_cnt:
-			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
-			Button.SetSpellIcon (ms['SpellResRef'], 0)
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-			if ms['Flags']:
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellUnmemorizeWindow")
+	if not BookType:
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+		for i in range (12):
+			Button = Window.GetControl (3 + i)
+			if i < mem_cnt:
+				ms = GemRB.GetMemorizedSpell (pc, type, level, i)
+				Button.SetSpellIcon (ms['SpellResRef'], 0)
+				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+				Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+				if ms['Flags']:
+					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellUnmemorizeWindow")
+				else:
+					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnMageUnmemorizeSpell")
+				Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenMageSpellInfoWindow")
+				spell = GemRB.GetSpell (ms['SpellResRef'])
+				Button.SetTooltip (spell['SpellName'])
+				MageMemorizedSpellList.append (ms['SpellResRef'])
+				Button.SetVarAssoc ("SpellButton", i)
+				Button.EnableBorder (0, ms['Flags'] == 0)
 			else:
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnMageUnmemorizeSpell")
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenMageSpellInfoWindow")
-			spell = GemRB.GetSpell (ms['SpellResRef'])
-			Button.SetTooltip (spell['SpellName'])
-			MageMemorizedSpellList.append (ms['SpellResRef'])
-			Button.SetVarAssoc ("SpellButton", i)
-			Button.EnableBorder (0, ms['Flags'] == 0)
-		else:
-			if i < max_mem_cnt:
-				Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
-			else:
-				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-			Button.SetTooltip ('')
-			Button.EnableBorder (0, 0)
-
+				if i < max_mem_cnt:
+					Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
+				else:
+					Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
+				Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+				Button.SetTooltip ('')
+				Button.EnableBorder (0, 0)
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
 	for i in range (24):
