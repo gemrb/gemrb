@@ -77,6 +77,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
 Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags);
 Targets* GetAllActors(Scriptable* Sender, int ga_flags);
 Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0);
+Scriptable* GetStoredActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0);
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag);
 void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee);
 void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c);

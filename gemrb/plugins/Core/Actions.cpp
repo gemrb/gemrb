@@ -1237,7 +1237,7 @@ void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* target = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!target) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1356,7 +1356,7 @@ void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1390,7 +1390,7 @@ void GameScript::RunAwayFromNoLeaveArea(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1424,7 +1424,7 @@ void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2493,7 +2493,7 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 	}
 
 	//parse target
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2599,7 +2599,7 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 	}
 
 	//parse target
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2682,7 +2682,7 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	}
 
 	//parse target
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -4248,7 +4248,7 @@ void GameScript::Plunder(Scriptable *Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -4291,7 +4291,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -4664,7 +4664,7 @@ void GameScript::AttackOneRound( Scriptable* Sender, Action* parameters)
 		GameControl *gc = core->GetGameControl();
 		tar = gc->GetTarget();
 	} else {
-		tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
+		tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	}
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
@@ -4704,7 +4704,7 @@ void GameScript::RunningAttackNoSound( Scriptable* Sender, Action* parameters)
 		GameControl *gc = core->GetGameControl();
 		tar = gc->GetTarget();
 	} else {
-		tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
+		tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	}
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
@@ -4732,7 +4732,7 @@ void GameScript::AttackNoSound( Scriptable* Sender, Action* parameters)
 		GameControl *gc = core->GetGameControl();
 		tar = gc->GetTarget();
 	} else {
-		tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
+		tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	}
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
@@ -4760,7 +4760,7 @@ void GameScript::RunningAttack( Scriptable* Sender, Action* parameters)
 		GameControl *gc = core->GetGameControl();
 		tar = gc->GetTarget();
 	} else {
-		tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
+		tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	}
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
@@ -4784,7 +4784,7 @@ void GameScript::Attack( Scriptable* Sender, Action* parameters)
 	}
 	//using auto target!
 	Scriptable* tar;
-	tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
+	tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) || tar == Sender) {
 		Sender->ReleaseCurrentAction();
@@ -4832,37 +4832,23 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = NULL;
-	if (Sender->CurrentActionTarget) {
-		tar = core->GetGame()->GetActorByGlobalID(Sender->CurrentActionTarget);
+
+	if (!Sender->CurrentActionState) {
+		Sender->CurrentActionState = parameters->int0Parameter;
+		// TODO: reevaluate target (set CurrentActionTarget to 0) if we are not actively in combat
 	}
-	if (!tar) {
-		tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
-	}
+
+	Scriptable* tar;
+	tar = GetStoredActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;
-	}
-
-	if (tar->Type == ST_ACTOR) {
-		Object *oC = parameters->objects[1];
-		// stupid hack for now: we wish to ignore named objects,
-		// and objects which use the globalid hack, and we only
-		// want objects created via objectFilters
-		if (!oC->objectName[0] && !(oC->objectFields[0] == -1) && oC->objectFilters[0]) {
-			Sender->CurrentActionTarget = ((Actor *)tar)->globalID;
-		}
 	}
 
 	//actor is already incapable of attack
 	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
 		Sender->ReleaseCurrentAction();
 		return;
-	}
-
-	if (!Sender->CurrentActionState) {
-		Sender->CurrentActionState = parameters->int0Parameter;
-		// TODO: reevaluate target if we are not actively in combat
 	}
 
 	AttackCore(Sender, tar, 0);
@@ -5871,7 +5857,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -6105,7 +6091,7 @@ void GameScript::FollowCreature(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -6126,7 +6112,7 @@ void GameScript::RunFollow(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -6161,7 +6147,7 @@ void GameScript::ProtectObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -6193,7 +6179,7 @@ void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -6222,7 +6208,7 @@ void GameScript::Formation(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;

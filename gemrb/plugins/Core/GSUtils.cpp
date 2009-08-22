@@ -722,6 +722,32 @@ Scriptable *GetActorObject(TileMap *TMap, const char *name)
 	return aC;
 }
 
+// blocking actions need to store some kinds of objects between ticks
+Scriptable* GetStoredActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
+{
+	Scriptable *tar = NULL;
+	// retrieve an existing target if it still exists and is valid
+	if (Sender->CurrentActionTarget) {
+		tar = core->GetGame()->GetActorByGlobalID(Sender->CurrentActionTarget);
+		if (tar) {
+			// always an actor, check if it satisfies flags
+			if (((Actor *)tar)->ValidTarget(ga_flags)) {
+				return tar;
+			}
+		}
+		return NULL; // target invalid/gone
+	}
+	tar = GetActorFromObject(Sender, oC, ga_flags);
+	// maybe store the target if it's an actor..
+	if (tar && tar->Type == ST_ACTOR) {
+		// .. but we only want objects created via objectFilters
+		if (oC->objectFilters[0]) {
+			Sender->CurrentActionTarget = ((Actor *)tar)->globalID;
+		}
+	}
+	return tar;
+}
+
 Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 {
 	Scriptable *aC = NULL;
