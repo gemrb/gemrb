@@ -1312,9 +1312,6 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	//this is a dangerous cast, make sure actor is Actor * !!!
 	Actor *actor = (Actor *) Sender;
 
-if(!actor->InParty)
-printf("AttackCore for %s\n", Sender->GetScriptName());
-
 	WeaponInfo wi;
 	ITMExtHeader *header = NULL;
 	ITMExtHeader *hittingheader = NULL;
