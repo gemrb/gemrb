@@ -269,7 +269,6 @@ int fx_playsound (Scriptable* Owner, Actor* target, Effect* fx);//ae
 int fx_hold_creature (Scriptable* Owner, Actor* target, Effect* fx);//af
 // this function is exactly the same as 0x7e fx_movement_modifier (in bg2 at least)//b0
 int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx);//b1
-int fx_apply_effect_item_type (Scriptable* Owner, Actor* target, Effect* fx);
 //b2 //hitbonus against creature (generic_effect)
 //b3 //damagebonus against creature (generic effect)
 //b4 //unknown
@@ -432,7 +431,7 @@ static EffectRef effectnames[] = {
 	{ "AnimationStateChange", fx_animation_stance, -1 },
 	{ "ApplyEffect", fx_apply_effect, -1 },
 	{ "ApplyEffectCurse", fx_apply_effect_curse, -1 },
-	{ "ApplyEffectItemType", fx_apply_effect_item_type, -1 }, //apply effect when itemtype is equipped
+	{ "ApplyEffectItemType", fx_generic_effect, -1 }, //apply effect when itemtype is equipped
 	{ "ApplyEffectRepeat", fx_apply_effect_repeat, -1 },
 	{ "CutScene2", fx_cutscene2, -1 },
 	{ "AttackSpeedModifier", fx_attackspeed_modifier, -1 },
@@ -4214,61 +4213,7 @@ int fx_apply_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // b4 can't use item (resource) generic effect CantUseItem
 // b5 can't use itemtype (resource) generic effect CantUseItemType
 // b6 generic effect ApplyEffectItem
-
 // b7 generic effect ApplyEffectItemType
-// Applies the effect specified by the resource key to the targeted creature(s)
-// when an item of the item type specified by the 'Type' field is equipped.
-int fx_apply_effect_item_type (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
-{
-	if (0) printf( "fx_apply_effect_item_type( (%2d): Type: %d, Effect: %s\n", fx->Opcode, fx->Parameter2, fx->Resource );
-
-	//this effect executes a file effect in place of this effect
-	//the file effect inherits the target and the timingmode, but gets
-	//a new chance to roll percents
-/*	int ret = FX_NOT_APPLIED;
-	if (!target) {
-		return ret;
-	}
-l	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
-		Point p(fx->PosX, fx->PosY);
-
-		//apply effect, if the effect is a goner, then kill
-		//this effect too
-		Effect *newfx = core->GetEffect(fx->Resource, fx->Power, p);
-		if (newfx) {
-			Effect *myfx = new Effect;
-			memcpy(myfx, newfx, sizeof(Effect));
-			myfx->random_value = core->Roll(1,100,0);
-			myfx->Target = FX_TARGET_PRESET;
-			myfx->TimingMode = fx->TimingMode;
-			myfx->Duration = fx->Duration;
-			ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply);
-			delete myfx;
-		}
-		//newfx is a borrowed reference don't delete it
-	}
-	return ret;
-
-
-
-
-
-
-
-
-	//attacks per round bonus for monks only applies to fists
-	unsigned int level = target->GetMonkLevel();
-	if (fx->Parameter2 == 28 && level) // hand-to-hand
-		ieDword fistweapon = target->inventory.GetFistSlot();
-		if (fistweapon != DefaultFist) {
-// base or not base!? base, so it sticks, but then we don't lose it on unequip?
-// vs effect fx_attacks_per_round_modifier
-			target->SetBase(IE_NUMBEROFATTACKS, 2 + monkbon[0][level-1]);
-		}
-*/
-	return FX_APPLIED;
-}
-
 // b8 DontJumpModifier
 int fx_dontjump_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {

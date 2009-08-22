@@ -184,10 +184,6 @@ void Inventory::CalculateWeight()
 	Changed = false;
 }
 
-
-//static EffectRef fx_apply_effect_item_type_ref={"fx_apply_effect_item_type",NULL,-1};
-//static EffectRef fx_attacks_per_round_modifier_ref={"fx_attacks_per_round_modifier",NULL,-1};
-
 void Inventory::AddSlotEffects(ieDword index)
 {
 	CREItem* slot;
@@ -206,8 +202,6 @@ void Inventory::AddSlotEffects(ieDword index)
 
 	//get the equipping effects
 	EffectQueue *eqfx = itm->GetEffectBlock(-1, index, 0);
-//	Effect *equip_type_fx = EffectQueue::CreateEffect(fx_apply_effect_item_type_ref, 0, 0, FX_DURATION_INSTANT_WHILE_EQUIPPED);
-//	eqfx->AddEffect(equip_type_fx);
 	gamedata->FreeItem( itm, slot->ItemResRef, false );
 
 	Owner->RefreshEffects(eqfx);
