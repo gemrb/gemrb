@@ -687,7 +687,7 @@ void Spellbook::DepleteLevel(CRESpellMemorization* sm)
 {
 	size_t cnt = sm->memorized_spells.size();
 	ieResRef last={""};
-	for (size_t i = 0; i < cnt; i++) {
+	for (size_t i = 0; i < cnt && cnt>0; i++) {
 		CREMemorizedSpell *cms = sm->memorized_spells[i];
 		//sorcerer spells are created in orderly manner
 		if (strncmp(last,cms->SpellResRef,8) ) {
@@ -695,6 +695,7 @@ void Spellbook::DepleteLevel(CRESpellMemorization* sm)
 			delete cms;
 			sm->memorized_spells.erase(sm->memorized_spells.begin()+i);
 			i--;
+			cnt--;
 		}
 	}
 }
