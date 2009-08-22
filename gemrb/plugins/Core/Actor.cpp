@@ -67,6 +67,7 @@ static char **clericspelltables = NULL;
 static char **druidspelltables = NULL;
 static char **wizardspelltables = NULL;
 static int *turnlevels = NULL;
+static int *booktypes = NULL;
 static int *xpbonus = NULL;
 static int xpbonustypes = -1;
 static int xpbonuslevels = -1;
@@ -643,9 +644,19 @@ void pcf_level (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	actor->SetupFist();
 }
 
-void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
-	actor->InitButtons(actor->Modified[IE_CLASS], false);
+	actor->InitButtons(newValue, false);
+
+	int sorcerer=0;
+	if (newValue<(ieDword) classcount) {
+		switch(booktypes[newValue]) {
+		case 2: sorcerer = 1<<IE_SPELL_TYPE_WIZARD; break;
+		case 3: sorcerer = 1<<IE_SPELL_TYPE_PRIEST; break;
+		default: break;
+		}
+	}
+	actor->spellbook.SetBookType(sorcerer);
 }
 
 void pcf_animid(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
@@ -1012,6 +1023,12 @@ void Actor::ReleaseMemory()
 			free(turnlevels);
 			turnlevels=NULL;
 		}
+
+		if (booktypes) {
+			free(booktypes);
+			booktypes=NULL;
+		}
+
 		if (xpbonus) {
 			free(xpbonus);
 			xpbonus=NULL;
@@ -1174,6 +1191,7 @@ static void InitActorTables()
 		druidspelltables = (char **) calloc(classcount, sizeof(char*));
 		wizardspelltables = (char **) calloc(classcount, sizeof(char*));
 		turnlevels = (int *) calloc(classcount, sizeof(int));
+		booktypes = (int *) calloc(classcount, sizeof(int));
 
 		ieDword bitmask = 1;
 
@@ -1219,7 +1237,10 @@ static void InitActorTables()
 			// field 7 holds the turn undead level
 
 			field = tm->QueryField( i, 8 );
-			if (atoi(field)==2) {
+			booktypes[i]=atoi(field);
+			//if booktype == 3 then it is a 'divine sorceror' class
+			//we shouldn't hardcode iwd2 classes this heavily
+			if (booktypes[i]==2) {
 				isclass[ISSORCERER] |= bitmask;
 			}
 

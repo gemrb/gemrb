@@ -143,9 +143,12 @@ class GEM_EXPORT Spellbook {
 private:
 	std::vector<CRESpellMemorization*> *spells;
 	std::vector<SpellExtHeader*> spellinfo;
+	int sorcerer;
 
 	/** Sets spell from memorized as 'already-cast' */
 	bool DepleteSpell(CREMemorizedSpell* spl);
+	/** Depletes a sorcerer type spellpage by one */
+	void DepleteLevel(CRESpellMemorization* sm);
 	/** regenerates the spellinfo list */
 	void GenerateSpellInfo();
 	/** invalidates the spellinfo list */
@@ -168,7 +171,7 @@ public:
 	/** Check if the spell is memorised, optionally deplete it (casting) */
 	bool HaveSpell(const char *resref, ieDword flags);
 	bool HaveSpell(int spellid, ieDword flags);
-        /** Check if the spell is in the book */
+	      /** Check if the spell is in the book */
 	bool KnowSpell(const char *resref);
 	bool KnowSpell(int spellid);
 
@@ -191,6 +194,8 @@ public:
 	/** this removes ALL spells matching spellid */
 	void RemoveSpell(int spellid);
 
+	/** sets the book type */
+	void SetBookType(int clss);
 	/** returns the page number for the spelltype */
 	static int GetSpellType(int spelltype);
 	/** adds a spell to the book, returns experience if learned */
@@ -223,6 +228,10 @@ public:
 
 	/** recharges all spells */
 	void ChargeAllSpells();
+
+	/** creates sorcerer's selection of spells to memorise:
+	selects all spells as many times as the spell page allows */
+	void CreateSorcererMemory(int type);
 
 	/** returns the number of distinct spells (generates spellinfo) */
 	unsigned int GetSpellInfoSize(int type);
