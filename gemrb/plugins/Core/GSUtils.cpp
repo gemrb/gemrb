@@ -1312,6 +1312,9 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	//this is a dangerous cast, make sure actor is Actor * !!!
 	Actor *actor = (Actor *) Sender;
 
+if(!actor->InParty)
+printf("AttackCore for %s\n", Sender->GetScriptName());
+
 	WeaponInfo wi;
 	ITMExtHeader *header = NULL;
 	ITMExtHeader *hittingheader = NULL;
@@ -1771,7 +1774,6 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 	myarea = Sender->GetCurrentArea();
 	hisarea = target->GetCurrentArea();
 	if (hisarea!=myarea) {
-		((Actor *) Sender)->UseExit(true);
 		target = myarea->GetTileMap()->GetTravelTo(hisarea->GetScriptName());
 
 		if (!target) {
@@ -1779,15 +1781,10 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		//no idea if this will use the travel trigger or not
-		if ((int) PersonalDistance(Sender, target)<=distance) {
-			printMessage("GameScript", "MoveNearerTo failed to use an exit\n", YELLOW);
-			Sender->ReleaseCurrentAction();
-			return;
-		}
+		((Actor *) Sender)->UseExit(true);
+	} else {
+		((Actor *) Sender)->UseExit(false);
 	}
-
-	((Actor *) Sender)->UseExit(false);
 	// we deliberately don't try GetLikelyPosition here for now,
 	// maybe a future idea if we have a better implementation
 	// (the old code used it - by passing true not 0 below - when target was a movable)

@@ -1800,9 +1800,7 @@ InfoPoint::~InfoPoint(void)
 int InfoPoint::CheckTravel(Actor *actor)
 {
 	if (Flags&TRAP_DEACTIVATED) return CT_CANTMOVE;
-	//
 	if (!actor->InParty && (Flags&TRAVEL_NONPC) ) return CT_CANTMOVE;
-	if (actor->InParty && !(Flags&TRAP_RESET)) return CT_CANTMOVE;
 	if (actor->InParty && (Flags&TRAVEL_PARTY) ) {
 		if (core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE) ) {
 			return CT_WHOLE;

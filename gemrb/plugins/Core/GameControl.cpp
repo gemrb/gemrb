@@ -1607,7 +1607,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 
 	switch(trap->Type) {
 		case ST_TRAVEL:
-			trap->Flags|=TRAP_RESET;
+			actor->UseExit(true);
 			return false;
 		case ST_TRIGGER:
 			//the importer shouldn't load the script

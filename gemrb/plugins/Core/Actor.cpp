@@ -5593,8 +5593,6 @@ bool Actor::BlocksSearchMap() const
 //return true if the actor doesn't want to use an entrance
 bool Actor::CannotPassEntrance() const
 {
-	if (!CurrentAction && !GetNextAction() ) return false;
-
 	if (InternalFlags&IF_USEEXIT) {
 		return false;
 	}

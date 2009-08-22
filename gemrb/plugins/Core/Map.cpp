@@ -529,7 +529,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		break;
 	}
 
-	ip->Flags&=~TRAP_RESET; //exit triggered
+	actor->UseExit(false);
 	if (ip->Destination[0] != 0) {
 		// 0 here is direction, can infopoints specify that or is an entrance always provided?
 		MoveToNewArea(ip->Destination, ip->EntranceName, 0, EveryOne, actor);
@@ -783,10 +783,6 @@ void Map::UpdateScripts()
 					//this is needed, otherwise the travel
 					//trigger would be activated anytime
 					//Well, i don't know why is it here, but lets try this
-/*
-					if (!(ip->Flags&TRAP_RESET))
-						continue;
-*/
 					if (ip->Entered(actor)) {
 						UseExit(actor, ip);
 					}
@@ -1918,8 +1914,7 @@ bool Map::CanFree()
 			return false;
 		}
 
-		//actor is busy (or actors[i]->GetInternalFlag()&IF_ACTIVE)
-		if (actors[i]->GetCurrentAction()) {
+		if (actors[i]->GetInternalFlag()&(IF_ACTIVE|IF_USEEXIT) ) {
 			return false;
 		}
 	}
