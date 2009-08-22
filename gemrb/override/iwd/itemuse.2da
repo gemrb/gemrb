@@ -1,6 +1,6 @@
 2DA V1.0
 0
-		STAT	FILE		MCOL	VCOL	WHICH
-ALIGNMENT	217	aligns		3	5	0
-RACE	        231	races	 	3       4       0
-CLASS		232	classes		5	7	0
+	STAT    	FILE		MCOL	VCOL	WHICH
+0	ALIGNMENT	aligns		3	5	0
+1	RACE	        races	 	3       4       0
+2	CLASS		classes		5	7	0

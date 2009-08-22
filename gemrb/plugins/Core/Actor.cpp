@@ -1337,7 +1337,7 @@ static void InitActorTables()
 		usecount = tm->GetRowCount();
 		itemuse = new ItemUseType[usecount];
 		for (i = 0; i < usecount; i++) {
-			itemuse[i].stat = (ieByte) atoi( tm->QueryField(i,0) );
+			itemuse[i].stat = (ieByte) core->TranslateStat( tm->QueryField(i,0) );
 			strnlwrcpy(itemuse[i].table, tm->QueryField(i,1),8 );
 			itemuse[i].mcol = (ieByte) atoi( tm->QueryField(i,2) );
 			itemuse[i].vcol = (ieByte) atoi( tm->QueryField(i,3) );

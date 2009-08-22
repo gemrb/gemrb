@@ -19,6 +19,6 @@ FIGHTER_DRUID       7212       9579       1066       *          1026       16   
 CLERIC_RANGER       7208       9580       1073       *          2052       18         *          1024       -1         0          1          1          0          0          0          0
 FIGHTER_MAGE_THIEF  7215       9576       1074       *          11         10         *          0x10000    -1         0          1          1          0          0          0          0
 FIGHTER_MAGE_CLERIC 7214       9581       1075       *          7          17         *          0x8000     -1         0          1          1          0          0          0          0
-SORCERER            45849      45866      45856      SAVEWIZ    0          19         HPWIZ      0          -1         1          1          1          0          0          0          0
+SORCERER            45849      45866      45856      SAVEWIZ    0          19         HPWIZ      0x40000    -1         1          1          1          0          0          0          0
 MONK                45851      45867      45858      SAVEMONK   0          20         HPMONK     0x20000000 -1         1          0          0          0          0          0          0
 BARBARIAN           45855      45869      45859      SAVEWAR    0          2          HPBARB     0          -1         1          1          1          1          1          1          1
