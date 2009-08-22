@@ -70,7 +70,7 @@ def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 
 	ProfCount = ProfsTable.GetRowCount()
 	for i in range(ProfCount): 
-		ProfID = ProfsTable.GetValue (i, 0) + IE_PROFICIENCYBASTARDSWORD
+		ProfID = ProfsTable.GetValue (i, 0)
 		SaveProf = GemRB.GetVar ("Prof "+str(i))
 		#print "prof" , ProfID, SaveProf
 		OldProf = GemRB.SetPlayerStat (pc, ProfID,SaveProf)
