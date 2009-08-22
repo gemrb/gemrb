@@ -685,7 +685,6 @@ bool Spellbook::DepleteSpell(int type)
 
 void Spellbook::DepleteLevel(CRESpellMemorization* sm)
 {
-	//TODO: remove (completely) one of each spells on this level
 	size_t cnt = sm->memorized_spells.size();
 	ieResRef last={""};
 	for (size_t i = 0; i < cnt; i++) {
