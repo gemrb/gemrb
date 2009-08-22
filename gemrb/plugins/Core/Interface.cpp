@@ -365,6 +365,8 @@ Interface::~Interface(void)
 		free((void *)musiclist[i]);
 	}
 
+	DamageInfoMap.clear();
+
 	delete plugin_flags;
 
 	delete projserv;
@@ -887,6 +889,22 @@ bool Interface::ReadMusicTable(const ieResRef tablename, int col) {
 
 	for (unsigned int i = 0; i < tm->GetRowCount(); i++) {
 		musiclist.push_back(strdup(tm->QueryField(i, col)));
+	}
+
+	return true;
+}
+
+bool Interface::ReadDamageTypeTable() {
+	AutoTable tm("dmgtypes");
+	if (!tm)
+		return false;
+
+	DamageInfoStruct di;
+	for (ieDword i = 0; i < tm->GetRowCount(); i++) {
+		di.strref = core->GetStringReference(atoi(tm->QueryField(i, 0)));
+		di.resist_stat = atoi(tm->QueryField(i, 1));
+		di.value = strtol(tm->QueryField(i, 2), (char **) NULL, 16);
+		DamageInfoMap.insert(std::make_pair <ieDword, DamageInfoStruct> ((ieDword)di.value, di));
 	}
 
 	return true;
@@ -1610,6 +1628,13 @@ int Interface::Init()
 
 	ret = ReadAuxItemTables();
 	printMessage( "Core", "Reading item tables...", WHITE);
+	if (!ret) {
+		printStatus( "ERROR", LIGHT_RED );
+	}
+	printStatus( "OK", LIGHT_GREEN );
+
+	ret = ReadDamageTypeTable();
+	printMessage( "Core", "Reading damage type table...", WHITE);
 	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
 	}

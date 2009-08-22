@@ -27,6 +27,7 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
+#include <map>
 #include "InterfaceDesc.h"
 #include "../../includes/SClassID.h"
 #include "Cache.h"
@@ -92,6 +93,13 @@ struct SlotType {
 	ieDword slotid;
 	ieDword sloteffects;
 	ieResRef slotresref;
+};
+
+struct DamageInfoStruct {
+	unsigned int strref;
+	unsigned int resist_stat;
+	unsigned int value;
+	// maybe also add the ac bonus and/or the DL_ constants
 };
 
 class ItemList {
@@ -324,6 +332,7 @@ public:
 	Sprite2D *WindowFrames[4];
 	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6];
 	std::vector<char *> musiclist;
+	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
 public:
 	Interface(int iargc, char *iargv[]);
 	~Interface(void);
@@ -643,6 +652,7 @@ private:
 	bool ReadAbilityTables();
 	bool ReadAbilityTable(const ieResRef name, ieWordSigned *mem, int cols, int rows);
 	bool ReadMusicTable(const ieResRef name, int col);
+	bool ReadDamageTypeTable();
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);
 	/** Reads itemexcl, itemdial, tooltip */

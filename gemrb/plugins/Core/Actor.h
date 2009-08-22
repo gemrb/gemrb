@@ -177,6 +177,9 @@ class ScriptedAnimation;
 #define DC_LADY   2
 #define DC_MURDER 3
 
+// used for distinguishing damage immunity from high damage resistance
+#define DR_IMMUNE 999999
+
 typedef ieByte ActionButtonRow[GUIBT_COUNT];
 
 typedef std::vector< ScriptedAnimation*> vvcVector;
@@ -429,7 +432,7 @@ public:
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Scriptable *hitter, int modtype=MOD_ADDITIVE);
 	/* displays the damage taken and other details (depends on the game type) */
-	void DisplayCombatFeedback (unsigned int damage, unsigned int damagetype_strref, Actor *hitter);
+	void DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Actor *hitter);
 	/* drops items from inventory to current spot */
 	void DropItem(const ieResRef resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);
@@ -496,7 +499,7 @@ public:
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
 	/* ensures we can deal damage to a target */
-	void ModifyDamage(Actor *target, int &damage, int damagetype, WeaponInfo *wi, bool critical);
+	void ModifyDamage(Actor *target, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical);
 	/* applies modal spell etc, if needed */
 	void UpdateActorState(ieDword gameTime);
 	/* sets a colour gradient stat, handles location */

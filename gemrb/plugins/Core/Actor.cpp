@@ -2339,40 +2339,26 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 			damagelevel = 3;
 		}
 	}
-	GetHit();
-	unsigned int damagetype_str_id = 0;
+
+	int resisted = 0;
+	ModifyDamage (this, damage, resisted, damagetype, NULL, false);
+	if (damage) GetHit();
+
 	if (damagetype & (DAMAGE_FIRE|DAMAGE_MAGICFIRE) ) {
 		PlayDamageAnimation(DL_FIRE+damagelevel);
-		damagetype_str_id = STR_DMG_FIRE;
 	} else if (damagetype & (DAMAGE_COLD|DAMAGE_MAGICCOLD) ) {
 		PlayDamageAnimation(DL_COLD+damagelevel);
-		damagetype_str_id = STR_DMG_COLD;
 	} else if (damagetype & (DAMAGE_ELECTRICITY) ) {
 		PlayDamageAnimation(DL_ELECTRICITY+damagelevel);
-		damagetype_str_id = STR_DMG_ELECTRIC;
 	} else if (damagetype & (DAMAGE_ACID) ) {
 		PlayDamageAnimation(DL_ACID+damagelevel);
-		damagetype_str_id = STR_DMG_ACID;
 	} else if (damagetype & (DAMAGE_MAGIC) ) {
 		PlayDamageAnimation(DL_DISINTEGRATE+damagelevel);
-		damagetype_str_id = STR_DMG_MAGIC;
 	} else {
-		if (damagetype & (DAMAGE_POISON) ) {
-			damagetype_str_id = STR_DMG_POISON;
-		} else if (damagetype & (DAMAGE_MISSILE|DAMAGE_PIERCINGMISSILE|DAMAGE_CRUSHINGMISSILE) ) {
-			damagetype_str_id = STR_DMG_MISSILE;
-		} else if (damagetype & (DAMAGE_SLASHING) ) {
-			damagetype_str_id = STR_DMG_SLASHING;
-		} else if (damagetype & (DAMAGE_PIERCING) ) {
-			damagetype_str_id = STR_DMG_PIERCING;
-		} else if (damagetype & (DAMAGE_STUNNING|DAMAGE_SOULEATER|DAMAGE_DISEASE|DAMAGE_CHUNKING) ) {
-			damagetype_str_id = STR_DMG_OTHER;
-		} else if (damagetype == DAMAGE_CRUSHING) { // DAMAGE_CRUSHING is 0, so we can't compare it as the rest
-			damagetype_str_id = STR_DMG_CRUSHING;
-		}
 		PlayDamageAnimation(damagelevel);
 	}
-	DisplayCombatFeedback(damage, damagetype_str_id, (Actor *)hitter);
+
+	DisplayCombatFeedback(damage, resisted, damagetype, (Actor *)hitter);
 
 	if (InParty) {
 		if (chp<(signed) Modified[IE_MAXHITPOINTS]/10) {
@@ -2387,20 +2373,21 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 }
 
 //TODO: handle pst
-//TODO: handle resisted damage
 //TODO: handle bonus damage
-void Actor::DisplayCombatFeedback (unsigned int damage, unsigned int damagetype_str_id, Actor *hitter)
+void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Actor *hitter)
 {
 	bool detailed = false;
 	const char *type_name = "unknown";
 	if (core->GetStringReference(STR_DMG_SLASHING) != (ieStrRef) -1) { // how and iwd2
-		if (damagetype_str_id) {
-			type_name = core->GetString(core->GetStringReference(damagetype_str_id), 0);
+		std::multimap<ieDword, DamageInfoStruct>::iterator it;
+		it = core->DamageInfoMap.find(damagetype);
+		if (it != core->DamageInfoMap.end()) {
+			type_name = core->GetString(it->second.strref, 0);
 		}
 		detailed = true;
 	}
 
-	if (damage > 0) {
+	if (damage > 0 && resisted != DR_IMMUNE) {
 		printMessage("Actor", " ", GREEN);
 		printf("%d damage taken.\n", damage);
 		char dmg_str[8];
@@ -2412,18 +2399,21 @@ void Actor::DisplayCombatFeedback (unsigned int damage, unsigned int damagetype_
 			core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name);
 			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", dmg_str);
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter->GetName(0) );
-			/*if (bonus-resistance > 0) {
+			int bonus = 0; //TODO: change this once damage bonus is supported
+			char resist_str[8];
+			snprintf(resist_str, 8, "%d", abs(resisted-bonus));
+			if (bonus-resisted > 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
-				core->GetTokenDictionary()->SetAtCopy( "RESISTED", bonus);
+				core->GetTokenDictionary()->SetAtCopy( "RESISTED", resist_str);
 				core->DisplayConstantStringName(STR_DAMAGE3, 0xffffff, this);
-			} else if (bonus-resistance < 0) {
+			} else if (bonus-resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage resisted)
-				core->GetTokenDictionary()->SetAtCopy( "RESISTED", resistance);
+				core->GetTokenDictionary()->SetAtCopy( "RESISTED", resist_str);
 				core->DisplayConstantStringName(STR_DAMAGE2, 0xffffff, this);
-			} else {*/
+			} else {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
 				core->DisplayConstantStringName(STR_DAMAGE1, 0xffffff, this);
-			//}
+			}
 		} else if (stricmp( core->GameType, "pst" ) == 0) {
 			if(0) printf("TODO: pst floating text\n");
 		} else if (core->GetStringReference(STR_DAMAGE_IMMUNITY) == (ieStrRef) -1 && core->GetStringReference(STR_DAMAGE1) != (ieStrRef) -1) {
@@ -2439,21 +2429,25 @@ void Actor::DisplayCombatFeedback (unsigned int damage, unsigned int damagetype_
 			core->DisplayConstantStringName(STR_DAMAGE1, 0xffffff, hitter);
 		}
 	} else {
-		// this will also display for hits on stoneskins and mirrorimages
-		printMessage("Actor", " ", GREEN);
-		printf("is immune to damage type %d (strrefs.h reference): %s.\n", damagetype_str_id, type_name);
-
-		if (detailed) {
-			//<DAMAGEE> was immune to my <TYPE> damage
-			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(0) );
-			core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name );
-			core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
-		} else if (core->GetStringReference(STR_DAMAGE_IMMUNITY) != (ieStrRef) -1 && core->GetStringReference(STR_DAMAGE1) != (ieStrRef) -1) {
-			// bg2
-			//<DAMAGEE> was immune to my damage.
-			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(0) );
-			core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
-		} // else: other games don't display anything
+		if (resisted == DR_IMMUNE) {
+			// this will also display for hits on stoneskins and mirrorimages
+			printMessage("Actor", " ", GREEN);
+			printf("is immune to damage type: %s.\n", type_name);
+	
+			if (detailed) {
+				//<DAMAGEE> was immune to my <TYPE> damage
+				core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(0) );
+				core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name );
+				core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
+			} else if (core->GetStringReference(STR_DAMAGE_IMMUNITY) != (ieStrRef) -1 && core->GetStringReference(STR_DAMAGE1) != (ieStrRef) -1) {
+				// bg2
+				//<DAMAGEE> was immune to my damage.
+				core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(0) );
+				core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
+			} // else: other games don't display anything
+		} else {
+			// mirror image or stoneskin: no message
+		}
 	}
 
 }
@@ -3796,6 +3790,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	//modify defense with damage type
 	ieDword damagetype = hittingheader->DamageType;
 	int damage = 0;
+	int resisted = 0;
 	
 	if (hittingheader->DiceThrown<256) {
 		int damageluck = (int) GetStat(IE_DAMAGELUCK);
@@ -3818,7 +3813,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		printBracket("Critical Hit", GREEN);
 		printf("\n");
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
-		ModifyDamage (target, damage, weapon_damagetype[damagetype], &wi, true);
+		ModifyDamage (target, damage, resisted, weapon_damagetype[damagetype], &wi, true);
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 		return;
 	}
@@ -3844,7 +3839,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	printBracket("Hit", GREEN);
 	printf("\n");
-	ModifyDamage (target, damage, weapon_damagetype[damagetype], &wi, false);
+	ModifyDamage (target, damage, resisted, weapon_damagetype[damagetype], &wi, false);
 	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 }
 
@@ -3853,7 +3848,7 @@ static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
 static EffectRef fx_mirrorimage_ref={"MirrorImageModifier",NULL,-1};
 static EffectRef fx_aegis_ref={"Aegis",NULL,-1};
 
-void Actor::ModifyDamage(Actor *target, int &damage, int damagetype, WeaponInfo *wi, bool critical)
+void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
 {
 
 	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
@@ -3868,7 +3863,6 @@ void Actor::ModifyDamage(Actor *target, int &damage, int damagetype, WeaponInfo 
 
 	// only check stone skins if damage type is physical or magical
 	// DAMAGE_CRUSHING is 0, so we can't AND with it to check for its presence
-	printf("DAMAGETYPE:%d\n", damagetype);
 	if (!(damagetype & ~(DAMAGE_PIERCING|DAMAGE_SLASHING|DAMAGE_MISSILE|DAMAGE_MAGIC))) {
 		int stoneskins = target->Modified[IE_STONESKINS];
 		if (stoneskins) {
@@ -3888,8 +3882,22 @@ void Actor::ModifyDamage(Actor *target, int &damage, int damagetype, WeaponInfo 
 		}
 	}
 
-	if (target->fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags)) {
+	if (wi && target->fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags)) {
 		damage = 0;
+		resisted = DR_IMMUNE; // mark immunity for GetCombatDetails
+	} else {
+		// check damage type immunity / resistance / susceptibility
+		std::multimap<ieDword, DamageInfoStruct>::iterator it;
+		it = core->DamageInfoMap.find(damagetype);
+		if (it == core->DamageInfoMap.end()) {
+			printf("Unhandled damagetype:%d\n", damagetype);
+		} else {
+			resisted = int ((damage * target->GetStat(it->second.resist_stat)/100) + 0.5);
+			damage -= resisted;
+			printf("Resisted %d of %d at %d%% resistance to %d\n", resisted, damage+resisted, target->GetStat(it->second.resist_stat), damagetype);
+			if (damage <= 0) resisted = DR_IMMUNE;
+			//TODO: figure out how how/iwd2 do damage bonus
+		}
 	}
 
 	//check casting failure
