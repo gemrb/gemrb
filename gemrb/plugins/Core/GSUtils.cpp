@@ -1037,7 +1037,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	speaker = NULL;
 	target = (Actor *) tar;
-	if (!CanSee(scr, target, false, seeflag) ) {
+	if ((Flags & BD_CHECKDIST) && !CanSee(scr, target, false, seeflag) ) {
 		printMessage("GameScript"," ",LIGHT_RED);
 		printf("CanSee returned false! Speaker (%s, type %d) and target are:\n", scr->GetScriptName(), scr->Type);
 		if (scr->Type == ST_ACTOR) {
