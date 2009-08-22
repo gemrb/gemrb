@@ -99,10 +99,6 @@ def SetupMageWindow ():
 	else:
 		MageWindow = Window = GemRB.LoadWindowObject (2)
 	GemRB.SetVar ("OtherWindow", MageWindow.ID)
-	
-	if BookType:
-		label = Window.GetControl (0x10000040)
-		label.SetText (61256) #spells can cast
 
 	Button = Window.GetControl (1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MagePrevLevelPress")
@@ -194,6 +190,9 @@ def UpdateMageWindow ():
 				Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 				Button.SetTooltip ('')
 				Button.EnableBorder (0, 0)
+	else:
+		label = Window.GetControl (0x10000040)
+		label.SetText (GemRB.GetString(61256) + " " + str(max_mem_cnt)) #spells can cast
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
 	for i in range (24):
