@@ -571,6 +571,7 @@ void Button::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 int Button::SetText(const char* string, int /*pos*/)
 {
 	free(Text);
+	Text = NULL;
 	if (string == NULL) {
 		hasText = false;
 	} else if (string[0] == 0) {
