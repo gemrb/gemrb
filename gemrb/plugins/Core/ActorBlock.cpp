@@ -216,8 +216,9 @@ void Scriptable::DrawOverheadText(Region &screen)
 	Font* font = core->GetFont( 1 );
 	if (time >= MAX_DELAY) {
 		textDisplaying = 0;
+		return;
 	} else {
-		time = MAX_DELAY-time;
+		time = (MAX_DELAY-time)/10;
 		if (time<256) {
 			const Color overHeadColor = {time,time,time,time};
 			palette = core->CreatePalette(overHeadColor, black);
