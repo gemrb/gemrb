@@ -19,6 +19,7 @@
 # $Id:$
 
 import GemRB
+from math import ceil
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import HasSpell
@@ -27,7 +28,6 @@ from GUICommonWindows import IsDualClassed, KitListTable, ClassTable
 
 # HLA selection
 HLAWindow = 0		# << HLA selection window
-HLATopIndex = 0		# << HLA scrollbar index
 HLAAbilities = []	# << all learnable HLA abilities
 HLANewAbilities = []	# << selected HLA abilites
 HLADoneButton = 0	# << done button
@@ -37,11 +37,17 @@ pc = 0			# << the pc
 NumClasses = 0		# << number of classes
 Classes = []		# << classes (ids)
 Level = []		# << levels for each class
+EnhanceGUI = 0		# << toggle for scrollbar and 25th hla slot
 
 def OpenHLAWindow (actor, numclasses, classes, levels):
 	"""Opens the HLA selection window."""
 
 	global HLAWindow, HLADoneButton, HLATextArea, HLACount, NumClasses, pc, Classes, Level
+	global EnhanceGUI
+
+	#enhance GUI?
+	if (GemRB.GetVar("GUIEnhancements")):
+		EnhanceGUI = 1
 
 	# save our variables 
 	pc = actor
@@ -49,9 +55,6 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	Classes = classes
 	Level = levels
 	HLACount = GemRB.GetVar ("HLACount")
-
-	# setup our scroll index
-	GemRB.SetVar ("HLATopIndex", 0)
 
 	# we use the same window as sorcerer spell selection
 	HLAWindow = GemRB.LoadWindowObject (8)
@@ -76,13 +79,20 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	print "Number of HLAs:",len (HLAAbilities)
 
 	# create a scrollbar if need-be
-	if len (HLAAbilities) > 24:
-		HLAWindow.CreateScrollBar (1000, 290,142, 16,252)
-		ScrollBar = HLAWindow.GetControl (1000)
-		ScrollBar.SetSprites ("GUISCRCW", 0, 0,1,2,3,5,4)
-		ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "HLAShowAbilities")
-		ScrollBar.SetVarAssoc ("HLATopIndex", len (HLAAbilities)-24)
-		ScrollBar.SetDefaultScrollBar ()
+	if ( len (HLAAbilities) >= 25 ) and EnhanceGUI:
+		# setup extra 25th HLA slot:
+		HLAWindow.CreateButton (24, 231, 345, 42, 42)
+		if ( len (HLAAbilities) > 25):
+			# setup our scroll index
+			GemRB.SetVar("HLATopIndex", 0)
+			# setup scrollbar
+			HLAWindow.CreateScrollBar (1000, 290,142, 16,252)
+			ScrollBar = HLAWindow.GetControl (1000)
+			ScrollBar.SetSprites ("GUISCRCW", 0, 0,1,2,3,5,4)
+			ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "HLAShowAbilities")
+			#with enhanced GUI we have 5 rows of 5 abilities (the last one is 'the extra slot')
+			ScrollBar.SetVarAssoc ("HLATopIndex", int ( ceil ( ( len (HLAAbilities)-25 ) / 5.0 ) ) + 1 )
+			ScrollBar.SetDefaultScrollBar ()
 
 	# draw our HLAs and show the window
 	HLAShowAbilities ()
@@ -141,18 +151,22 @@ def HLAShowAbilities ():
 
 	Called whenever an HLA is pressed."""
 
-	HLATopIndex = GemRB.GetVar ("HLATopIndex")
+	j = ( GemRB.GetVar("HLATopIndex") + 1 ) * 5 - 5
 
 	# we have a grid of 24 abilites
-	for i in range (24):
+	for i in range (24+EnhanceGUI):
 		# ensure we can learn this many abilites
 		SpellButton = HLAWindow.GetControl (i)
-		if i >= len (HLAAbilities):
+		if i + j >= len (HLAAbilities):
 			SpellButton.SetState (IE_GUI_BUTTON_DISABLED)
+			SpellButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			continue
+		else:
+			SpellButton.SetState(IE_GUI_BUTTON_ENABLED)
+			SpellButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 
 		# fill in the button with the spell data
-		HLARef = HLAAbilities[i+HLATopIndex][0][3:]
+		HLARef = HLAAbilities[i+j][0][3:]
 		if not HLARef:
 			continue
 		Spell = GemRB.GetSpell (HLARef)
@@ -164,7 +178,7 @@ def HLAShowAbilities ():
 		SpellButton.SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR)
 
 		# don't allow the selection of an un-learnable ability
-		if HLAAbilities[i+HLATopIndex][1] == 0:
+		if HLAAbilities[i+j][1] == 0:
 			SpellButton.SetState(IE_GUI_BUTTON_LOCKED)
 			# shade red
 			SpellButton.SetBorder (0, 0,0, 0,0, 200,0,0,100, 1,1)
@@ -192,8 +206,8 @@ def HLASelectPress ():
 	global HLACount, HLAAbilities, HLANewAbilities
 
 	# get our variables
-	HLATopIndex = GemRB.GetVar ("HLATopIndex")
-	i = GemRB.GetVar ("ButtonPressed") + HLATopIndex
+	j = ( GemRB.GetVar("HLATopIndex") + 1 ) * 5 - 5
+	i = GemRB.GetVar ("ButtonPressed") + j
 
 	# get the spell that's been pushed
 	Spell = GemRB.GetSpell (HLAAbilities[i][0][3:])
@@ -241,16 +255,16 @@ def HLASelectPress ():
 def HLAShowSelectedAbilities ():
 	"""Marks all of the selected abilities."""
 
-	HLATopIndex = GemRB.GetVar ("HLATopIndex")
+	j = ( GemRB.GetVar("HLATopIndex") + 1 ) * 5 - 5
 
 	# mark all of the abilities picked thus far
-	for i in range (24):
-		if i >= len (HLANewAbilities): # make sure we don't call unavailable indexes
+	for i in range (24+EnhanceGUI):
+		if i + j >= len (HLANewAbilities): # make sure we don't call unavailable indexes
 			break
-		if HLANewAbilities[i+HLATopIndex]:
-			HLAMarkButton (i+HLATopIndex, 1)
+		if HLANewAbilities[i+j]:
+			HLAMarkButton (i+j, 1)
 		else:
-			HLAMarkButton (i+HLATopIndex, 0)
+			HLAMarkButton (i+j, 0)
 
 	return
 
@@ -259,7 +273,7 @@ def HLAMarkButton (i, select):
 
 	If select is true, the button is highlighted."""
 
-	HLATopIndex = GemRB.GetVar ("HLATopIndex")
+	j = ( GemRB.GetVar("HLATopIndex") + 1 ) * 5 - 5
 
 	if select:
 		type = IE_GUI_BUTTON_SELECTED
@@ -270,7 +284,7 @@ def HLAMarkButton (i, select):
 			type = IE_GUI_BUTTON_LOCKED
 
 	# we have to use the index on the actual grid
-	SpellButton = HLAWindow.GetControl(i-HLATopIndex)
+	SpellButton = HLAWindow.GetControl(i-j)
 	SpellButton.SetState(type)
 	return
 
