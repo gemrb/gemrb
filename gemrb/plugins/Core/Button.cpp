@@ -280,7 +280,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 		if (! (Flags & IE_GUI_BUTTON_MULTILINE)) {
 			align |= IE_FONT_SINGLE_LINE;
 		}
-		font->Print( Region( x + XPos, y + YPos, Width - 2, Height - 2 ),
+		font->Print( Region( x + XPos+5, y + YPos+5, Width - 10, Height - 10 ),
 			( unsigned char * ) Text, ppoi,
 			(ieByte) align, true );
 	}
