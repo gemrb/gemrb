@@ -2337,6 +2337,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters) {
 	// of all doors, or some doors, or whether it should still check for non-actors
 	if (Sender->Type == ST_ACTOR) {
 		Actor *actor = (Actor *)Sender;
+		actor->SetModal(MS_NONE);
 		if (!door->TryUnlockDoor(actor)) {
 			return;
 		}
@@ -2374,6 +2375,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
+	actor->SetModal(MS_NONE);
 
 	// TargetDoor is set when GameControl makes the action, so should be fine
 	// unless this action is quietly called by a script (and UseDoor in the
@@ -2478,6 +2480,7 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 	if(Sender->Type==ST_ACTOR) {
 		Actor *act = (Actor *) Sender;
 
+		act->SetModal(MS_NONE);
 		unsigned int dist = GetSpellDistance(spellres, act);
 
 		if (PersonalDistance(tar, Sender) > dist) {
@@ -2485,13 +2488,15 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
+/* we don't need this, do we?
 	}
 
 	//face target
 	if (Sender->Type==ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
+		Actor *act = (Actor *) Sender;
+*/
 		if (tar != Sender) {
-			actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+			act->SetOrientation( GetOrient( tar->Pos, act->Pos ), false );
 		}
 	}
 	Sender->CastSpell( spellres, tar, true );
@@ -5117,6 +5122,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 			return;
 		}
 		Actor *actor = (Actor *)Sender;
+		actor->SetModal(MS_NONE);
 		container->TriggerTrap(0, actor->GetID());
 		core->SetCurrentContainer(actor, container, true);
 		Sender->ReleaseCurrentAction();

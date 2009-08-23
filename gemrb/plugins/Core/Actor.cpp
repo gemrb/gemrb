@@ -2717,7 +2717,7 @@ void Actor::Die(Scriptable *killer)
 
 	ClearActions();
 	ClearPath();
-	SetModal( 0 );
+	SetModal( MS_NONE );
 	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
 
 	// clearing the search map here means it's not blocked during death animations
@@ -3346,6 +3346,10 @@ void Actor::SetModal(ieDword newstate)
 	}
 	//come here only if success
 	ModalState = newstate;
+
+	//update the action bar
+	if (InParty)
+		core->SetEventFlag(EF_ACTION);
 }
 
 //this is just a stub function for now, attackstyle could be melee/ranged
