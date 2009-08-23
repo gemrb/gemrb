@@ -297,7 +297,7 @@ IDS
 0x127	DisableChunk
 0x128	Protection:Animation
 0x129	Protection:Turn
-0x12a	CutScene
+0x12a	CutScene2
 0x12b	ChaosShieldModifier
 0x12c	NPCBump
 0x12d	CriticalHitModifier
