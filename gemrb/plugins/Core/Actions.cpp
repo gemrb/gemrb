@@ -572,19 +572,21 @@ void GameScript::MoveToExpansion(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game *game = core->GetGame();
-	int i = game->GetPartySize(false);
-	if (!i) return;
-	Actor *actor = game->GetPC(0, false);
-	ieResRef area;
-	Point p((short) actor->GetStat(IE_SAVEDXPOS), (short) actor->GetStat(IE_SAVEDYPOS) );
-	//FIXME: calculate area
-	//This action is not working now!!!
-	memcpy(area,actor->GetCurrentArea(),sizeof(ieResRef) );
-	//end of hack
-	while (i--) {
-		Actor *tar = game->GetPC(i, false);
-		MoveBetweenAreasCore( tar, area, p, -1, true);
+	for (int i = 0; i < game->GetPartySize(false); i++) {
+		Actor* act = game->GetPC( i, false );
+		if (act) {
+			if (game->GetPlaneLocationCount() <= (unsigned int)i) {
+				// what are we meant to do here?
+				printf("argh, couldn't restore party member %d!", i + 1);
+				continue;
+			}
+			GAMLocationEntry *gle = game->GetPlaneLocationEntry(i);
+			MoveBetweenAreasCore(act, gle->AreaResRef, gle->Pos, -1, true);
+		}
 	}
+
+	// presumably this is correct
+	game->ClearPlaneLocations();
 }
 
 //moves pcs and npcs from an area to another area
@@ -1249,39 +1251,17 @@ void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
 		actor->SetLeader( (Actor *) target, 5);
 	}
 	MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE);
-/*
-	if (target->GetCurrentArea()!=Sender->GetCurrentArea()) {
-printf("Move failed, to follow target, i need to go to: %s\n", target->GetCurrentArea()->GetScriptName());
-		InfoPoint *p = Sender->GetCurrentArea()->GetTileMap()->GetTravelTo(target->GetCurrentArea()->GetScriptName());
-		if (actor->Destination == p->Pos) {
-			printf("Already walking to %s\n", p->GetScriptName());
-			return;
-		}
-		if (p) {
-			printf("Using %s\n", p->GetScriptName());
-			actor->WalkTo(p->Pos, 0, MAX_OPERATING_DISTANCE);
-			return;
-		}
-	}
-
-printf("Walkto\n");
-	actor->WalkTo( target->Pos, 0, MAX_OPERATING_DISTANCE );
-*/
 }
 
 void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game *game = core->GetGame();
-	game->savedpositions.resize(game->GetPartySize(false));
 	for (int i = 0; i < game->GetPartySize(false); i++) {
 		Actor* act = game->GetPC( i, false );
-		if (act) {
-			//ieDword value = act->Pos.asDword();
-			//SetVariable( act, "LOCALSsavedlocation", value);
-			game->savedpositions[i].pos = act->Pos;
-			memcpy(game->savedpositions[i].area, act->Area, 9);
-		} else {
-			game->savedpositions[i].area[0] = 0;
+		GAMLocationEntry *gle = game->GetSavedLocationEntry(i);
+		if (act && gle) {
+			gle->Pos = act->Pos;
+			memcpy(gle->AreaResRef, act->Area, 9);
 		}
 	}
 }
@@ -1292,22 +1272,18 @@ void GameScript::RestorePartyLocation(Scriptable* /*Sender*/, Action* /*paramete
 	for (int i = 0; i < game->GetPartySize(false); i++) {
 		Actor* act = game->GetPC( i, false );
 		if (act) {
-			//ieDword value=CheckVariable( act, "LOCALSsavedlocation");
-			//setting position, don't put actor on another actor
-			//Point p;
-			//p.fromDword(value);
-			//act->SetPosition(loc.pos, -1);
-			if (game->savedpositions.size() <= (unsigned int)i || !game->savedpositions[i].area[0]) {
+			if (game->GetSavedLocationCount() <= (unsigned int)i) {
 				// what are we meant to do here?
 				printf("argh, couldn't restore party member %d!", i + 1);
 				continue;
 			}
-			MoveBetweenAreasCore(act, game->savedpositions[i].area, game->savedpositions[i].pos, -1, true);
+			GAMLocationEntry *gle = game->GetSavedLocationEntry(i);
+			MoveBetweenAreasCore(act, gle->AreaResRef, gle->Pos, -1, true);
 		}
 	}
 
 	// presumably this is correct
-	game->savedpositions.clear();
+	game->ClearSavedLocations();
 }
 
 void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/)
@@ -4491,7 +4467,7 @@ void GameScript::ApplyDamagePercent(Scriptable* Sender, Action* parameters)
 	} else {
 		damager=damagee;
 	}
-	damagee->Damage(damagee->GetStat(IE_HITPOINTS)*parameters->int0Parameter/100, parameters->int1Parameter, damager);
+	damagee->Damage(damagee->GetBase(IE_HITPOINTS)*parameters->int0Parameter/100, parameters->int1Parameter, damager);
 }
 
 void GameScript::Damage(Scriptable* Sender, Action* parameters)

@@ -999,8 +999,8 @@ int GameScript::ItemIsIdentified(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-/** if the string is zero, then it will return true if there is any item in the slot */
-/** if the string is non-zero, it will return true, if the given item was in the slot */
+/** if the string is zero, then it will return true if there is any item in the slot (BG2)*/
+/** if the string is non-zero, it will return true, if the given item was in the slot (IWD2)*/
 int GameScript::HasItemSlot(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
@@ -1016,7 +1016,7 @@ int GameScript::HasItemSlot(Scriptable* Sender, Trigger* parameters)
 }
 
 //this is a GemRB extension
-//HasItemTypeSlot(SLOT, ItemType)
+//HasItemTypeSlot(Object, SLOT, ItemType)
 //returns true if the item in SLOT is of ItemType
 int GameScript::HasItemTypeSlot(Scriptable* Sender, Trigger* parameters)
 {
@@ -1912,7 +1912,7 @@ int GameScript::HP(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if ((signed) actor->GetStat( IE_HITPOINTS ) == parameters->int0Parameter) {
+	if ((signed) actor->GetBase( IE_HITPOINTS ) == parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -1928,7 +1928,7 @@ int GameScript::HPGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if ( (signed) actor->GetStat( IE_HITPOINTS ) > parameters->int0Parameter) {
+	if ( (signed) actor->GetBase( IE_HITPOINTS ) > parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -1944,11 +1944,53 @@ int GameScript::HPLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if ( (signed) actor->GetStat( IE_HITPOINTS ) < parameters->int0Parameter) {
+	if ( (signed) actor->GetBase( IE_HITPOINTS ) < parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
 }
+
+//these triggers work on the current damage (not the last damage)
+/* they are identical to HPLost
+int GameScript::DamageTaken(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	int damage = actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
+	if (damage==(int) parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::DamageTakenGT(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	int damage = actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
+	if (damage>(int) parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::DamageTakenLT(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	int damage = actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
+	if (damage<(int) parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+*/
 
 int GameScript::HPLost(Scriptable* Sender, Trigger* parameters)
 {
@@ -1960,8 +2002,8 @@ int GameScript::HPLost(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	//Mod == actual-original
-	if (-actor->GetMod( IE_HITPOINTS ) == parameters->int0Parameter) {
+	//max-current
+	if ( (signed) actor->GetStat(IE_MAXHITPOINTS)-(signed) actor->GetBase( IE_HITPOINTS ) == (signed) parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -1977,8 +2019,8 @@ int GameScript::HPLostGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	//Mod == actual-original
-	if (-actor->GetMod( IE_HITPOINTS ) > parameters->int0Parameter) {
+	//max-current
+	if ( (signed) actor->GetStat(IE_MAXHITPOINTS)-(signed) actor->GetBase( IE_HITPOINTS ) > (signed) parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -1994,8 +2036,8 @@ int GameScript::HPLostLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	//Mod == actual-original
-	if (-actor->GetMod( IE_HITPOINTS ) < parameters->int0Parameter) {
+	//max-current
+	if ( (signed) actor->GetStat(IE_MAXHITPOINTS)-(signed) actor->GetBase( IE_HITPOINTS ) < (signed) parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3247,46 +3289,6 @@ int GameScript::TookDamage(Scriptable* Sender, Trigger* /*parameters*/)
 	return 0;
 }
 
-//these triggers work on the current damage (not the last damage)
-int GameScript::DamageTaken(Scriptable* Sender, Trigger* parameters)
-{
-	if (Sender->Type!=ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	int damage = actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
-	if (damage==(int) parameters->int0Parameter) {
-		return 1;
-	}
-	return 0;
-}
-
-int GameScript::DamageTakenGT(Scriptable* Sender, Trigger* parameters)
-{
-	if (Sender->Type!=ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	int damage = actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
-	if (damage>(int) parameters->int0Parameter) {
-		return 1;
-	}
-	return 0;
-}
-
-int GameScript::DamageTakenLT(Scriptable* Sender, Trigger* parameters)
-{
-	if (Sender->Type!=ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	int damage = actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
-	if (damage<(int) parameters->int0Parameter) {
-		return 1;
-	}
-	return 0;
-}
-
 int GameScript::HitBy(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -3707,9 +3709,14 @@ int GameScript::CheckDoorFlags( Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-/* works only on animations?*/
+// works only on animations?
+// Be careful when converting to GetActorFromObject, it won't return animations (those are not scriptable)
 int GameScript::Frame( Scriptable* Sender, Trigger* parameters)
 {
+	//to avoid a crash
+	if (!parameters->objectParameter) {
+		return 0;
+	}
 	AreaAnimation* anim = Sender->GetCurrentArea()->GetAnimation(parameters->objectParameter->objectName);
 	if (!anim) {
 		return 0;
@@ -3722,12 +3729,20 @@ int GameScript::Frame( Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+//Modalstate in IWD2 allows specifying an object
 int GameScript::ModalState( Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
+	Scriptable *scr;
+
+	if (parameters->objectParameter) {
+		scr = GetActorFromObject( Sender, parameters->objectParameter );
+	} else {
+		scr = Sender;
+	}
+	if (scr->Type!=ST_ACTOR) {
 		return 0;
 	}
-	Actor *actor = (Actor *) Sender;
+	Actor *actor = (Actor *) scr;
 
 	if (actor->ModalState==(ieDword) parameters->int0Parameter) {
 		return 1;
@@ -3837,14 +3852,17 @@ int GameScript::IsWeaponRanged(Scriptable* Sender, Trigger* parameters)
 //HoW applies sequence on area animations
 int GameScript::Sequence(Scriptable* Sender, Trigger* parameters)
 {
-	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objectParameter->objectName);
-	if (anim) {
-		//this is the cycle count for the area animation
-		//very much like stance for avatar anims
-		if (anim->sequence==parameters->int0Parameter) {
-			return 1;
+	//to avoid a crash, check if object is NULL
+	if (parameters->objectParameter) {
+		AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objectParameter->objectName);
+		if (anim) {
+			//this is the cycle count for the area animation
+			//very much like stance for avatar anims
+			if (anim->sequence==parameters->int0Parameter) {
+				return 1;
+			}
+			return 0;
 		}
-		return 0;
 	}
 
 	Scriptable *tar = GetActorFromObject( Sender, parameters->objectParameter );

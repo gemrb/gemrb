@@ -8,7 +8,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -61,7 +61,7 @@ class Palette;
 
 class GEM_EXPORT TextEdit : public Control {
 public:
-	TextEdit(unsigned short maxLength);
+	TextEdit(unsigned short maxLength, unsigned short x, unsigned short y);
 	~TextEdit(void);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
@@ -87,6 +87,8 @@ private:
 	Sprite2D* Back;
 	/** Max Edit Text Length */
 	unsigned short max;
+	/** Client area position */
+	unsigned short FontPosX, FontPosY;
 	/** Text Buffer */
 	unsigned char* Buffer;
 	/** Cursor Position */

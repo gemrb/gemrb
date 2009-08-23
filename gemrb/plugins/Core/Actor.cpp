@@ -711,23 +711,27 @@ void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 		actor->BaseStats[IE_HITPOINTS]=actor->Modified[IE_MAXHITPOINTS];
 	}
 
-	if ((signed) hp>(signed) actor->Modified[IE_MAXHITPOINTS]) {
-		hp=actor->Modified[IE_MAXHITPOINTS];
+	int hptmp = (signed) actor->Modified[IE_MAXHITPOINTS];
+	if ((signed) hp>hptmp) {
+		hp=hptmp;
 	}
-	if ((signed) hp<(signed) actor->Modified[IE_MINHITPOINTS]) {
-		hp=actor->Modified[IE_MINHITPOINTS];
+
+	hptmp = (signed) actor->Modified[IE_MINHITPOINTS];
+	if (hptmp && (signed) hp<hptmp) {
+		hp=hptmp;
 	}
 	if ((signed) hp<=0) {
 		actor->Die(NULL);
 	}
+	actor->BaseStats[IE_HITPOINTS]=hp;
 	actor->Modified[IE_HITPOINTS]=hp;
 	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
 }
 
 void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
-	if ((signed) hp<(signed) actor->Modified[IE_HITPOINTS]) {
-		actor->Modified[IE_HITPOINTS]=hp;
+	if ((signed) hp<(signed) actor->BaseStats[IE_HITPOINTS]) {
+		actor->BaseStats[IE_HITPOINTS]=hp;
 		//passing 0 because it is ignored anyway
 		pcf_hitpoint(actor, 0, hp);
 	}
@@ -735,8 +739,8 @@ void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 
 void pcf_minhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
-	if ((signed) hp>(signed) actor->Modified[IE_HITPOINTS]) {
-		actor->Modified[IE_HITPOINTS]=hp;
+	if ((signed) hp>(signed) actor->BaseStats[IE_HITPOINTS]) {
+		actor->BaseStats[IE_HITPOINTS]=hp;
 		//passing 0 because it is ignored anyway
 		pcf_hitpoint(actor, 0, hp);
 	}
@@ -776,7 +780,7 @@ void pcf_stat_dex(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 void pcf_stat_con(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_CON);
-	pcf_hitpoint(actor, 0, actor->Modified[IE_HITPOINTS]);
+	pcf_hitpoint(actor, 0, actor->BaseStats[IE_HITPOINTS]);
 }
 
 void pcf_stat_cha(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
@@ -2045,10 +2049,10 @@ void Actor::RefreshPCStats() {
 
 	//we still apply the maximum bonus to dead characters, but don't apply
 	//to current HP, or we'd have dead characters showing as having hp
-	Modified[IE_MAXHITPOINTS]+=bonus;
-	if(BaseStats[IE_STATE_ID]&STATE_DEAD)
-		bonus = 0;
-	Modified[IE_HITPOINTS]+=bonus;
+	//Modified[IE_MAXHITPOINTS]+=bonus;
+	//if(BaseStats[IE_STATE_ID]&STATE_DEAD)
+	//	bonus = 0;
+//	BaseStats[IE_HITPOINTS]+=bonus;
 
 	// apply the intelligence and wisdom bonus to lore
 	Modified[IE_LORE] += core->GetLoreBonus(0, Modified[IE_INT]) + core->GetLoreBonus(0, Modified[IE_WIS]);
@@ -2302,7 +2306,7 @@ bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete)
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 {
-	//add lastdamagetype up
+	//add lastdamagetype up ? maybe
 	LastDamageType|=damagetype;
 	if(hitter && hitter->Type==ST_ACTOR) {
 		LastHitter=((Actor *) hitter)->GetID();
@@ -2310,27 +2314,35 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 		//Maybe it should be something impossible like 0xffff, and use 'Someone'
 		LastHitter=GetID();
 	}
-	//note: the lower 2 bits are actually modifier types
-	// this is processed elsewhere and sent as modtype
+
 	switch(modtype)
 	{
 	case MOD_ADDITIVE:
-		damage = -NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+		//damage = -NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
 		break;
 	case MOD_ABSOLUTE:
-		damage = -NewBase(IE_HITPOINTS, (ieDword) damage, MOD_ABSOLUTE);
+		//damage = -NewBase(IE_HITPOINTS, (ieDword) damage, MOD_ABSOLUTE);
+		damage = GetBase(IE_HITPOINTS) - damage;
 		break;
 	case MOD_PERCENT:
-		damage = -NewBase(IE_HITPOINTS, (ieDword) damage, MOD_PERCENT);
+		//damage = -NewBase(IE_HITPOINTS, (ieDword) damage, MOD_PERCENT);
+		damage = GetStat(IE_MAXHITPOINTS) * 100 / damage;
 		break;
 	default:
 		//this shouldn't happen
 		printMessage("Actor","Invalid damagetype!\n",RED);
 		return 0;
 	}
+
+	int resisted = 0;
+	ModifyDamage (this, damage, resisted, damagetype, NULL, false);
+	if (damage) GetHit();
+
+	NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+
 	LastDamage=damage;
 	InternalFlags|=IF_ACTIVE;
-	int chp = (signed) Modified[IE_HITPOINTS];
+	int chp = (signed) BaseStats[IE_HITPOINTS];
 	int damagelevel = 3;
 	if (damage<5) {
 		damagelevel = 1;
@@ -2345,10 +2357,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 			damagelevel = 3;
 		}
 	}
-
-	int resisted = 0;
-	ModifyDamage (this, damage, resisted, damagetype, NULL, false);
-	if (damage) GetHit();
 
 	if (damagetype & (DAMAGE_FIRE|DAMAGE_MAGICFIRE) ) {
 		PlayDamageAnimation(DL_FIRE+damagelevel);
@@ -2499,7 +2507,7 @@ void Actor::DebugDump()
 	printf( "Morale:     %d   current morale:%d\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
 	printf( "Moralebreak:%d   Morale recovery:%d\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
 	printf( "Visualrange:%d (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
-	printf( "HP:         %d   current HP:%d\n", BaseStats[IE_HITPOINTS], Modified[IE_HITPOINTS] );
+	printf( "current HP:%d\n", BaseStats[IE_HITPOINTS] );
 	printf( "Mod[IE_ANIMATION_ID]: 0x%04X\n", Modified[IE_ANIMATION_ID] );
 	printf( "Colors:    ");
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {

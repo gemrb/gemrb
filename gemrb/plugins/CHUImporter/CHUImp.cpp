@@ -318,22 +318,30 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				ieResRef BGMos;
 				ieResRef FontResRef, CursorResRef;
 				ieWord maxInput;
+	      ieWord CurCycle, CurFrame;
+	      ieWord PosX, PosY;
+
 				str->ReadResRef( BGMos );
 				str->Seek( 16, GEM_CURRENT_POS );
 				str->ReadResRef( CursorResRef );
-				str->Seek( 12, GEM_CURRENT_POS );
+	      str->ReadWord( &CurCycle );
+	      str->ReadWord( &CurFrame );
+	      str->ReadWord( &PosX );
+	      str->ReadWord( &PosY );
+				str->Seek( 4, GEM_CURRENT_POS );
 				str->ReadResRef( FontResRef );
 				str->Seek( 34, GEM_CURRENT_POS );
 				str->ReadWord( &maxInput );
 				Font* fnt = core->GetFont( FontResRef );
-
+	      
 				AnimationFactory* bam = ( AnimationFactory* )
 					core->GetResourceMgr()->GetFactoryResource( CursorResRef,
 															IE_BAM_CLASS_ID,
 															IE_NORMAL );
 				Sprite2D *cursor = NULL;
-				if (bam)
-					cursor = bam->GetFrame( 0,0 );
+	      if (bam) {
+					cursor = bam->GetFrame( CurCycle, CurFrame );
+	      }
 
 				ImageMgr* mos = ( ImageMgr* )
 					core->GetInterface( IE_MOS_CLASS_ID );
@@ -344,7 +352,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				}
 				core->FreeInterface( mos );
 
-				TextEdit* te = new TextEdit( maxInput );
+				TextEdit* te = new TextEdit( maxInput, PosX, PosY );
 				te->ControlID = ControlID;
 				te->XPos = XPos;
 				te->YPos = YPos;

@@ -300,11 +300,7 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 	}
 	int damage = donor->Damage(fx->Parameter1, fx->Parameter2, owner);
-	if (fx->Parameter2>2) {
-		receiver->SetBase( IE_HITPOINTS, BASE_GET( IE_HITPOINTS ) + ( damage ) );
-	} else {
-		receiver->SetStat( IE_HITPOINTS, STAT_GET( IE_HITPOINTS ) + ( damage ), 0 );
-	}
+	receiver->SetBase( IE_HITPOINTS, BASE_GET( IE_HITPOINTS ) + ( damage ) );
 	return FX_NOT_APPLIED;
 }
 

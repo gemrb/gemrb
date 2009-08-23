@@ -103,7 +103,6 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 Game* GAMImp::LoadGame(Game *newGame)
 {
 	unsigned int i;
-	//Game* newGame = new Game();
 
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time
@@ -125,7 +124,8 @@ Game* GAMImp::LoadGame(Game *newGame)
 		newGame->WhichFormation = 0;
 	}
 	str->ReadDword( &newGame->PartyGold );
-	str->ReadDword( &newGame->WeatherBits );
+	str->ReadWord( &newGame->NpcInParty);                 //npc count in party???
+	str->ReadWord( &newGame->WeatherBits );
 	str->ReadDword( &PCOffset );
 	str->ReadDword( &PCCount );
 	//these fields are not really used by any engine, and never saved
@@ -152,7 +152,9 @@ Game* GAMImp::LoadGame(Game *newGame)
 			str->ReadDword( &SavedLocOffset );
 			str->ReadDword( &SavedLocCount );
 			str->ReadDword( &newGame->RealTime);
-			str->Seek( 60, GEM_CURRENT_POS);
+			str->ReadDword( &PPLocOffset );
+			str->ReadDword( &PPLocCount );
+			str->Seek( 52, GEM_CURRENT_POS);
 			break;
 
 		case GAM_VER_PST:
@@ -165,6 +167,8 @@ Game* GAMImp::LoadGame(Game *newGame)
 			str->ReadResRef( newGame->AnotherArea ); //yet another area
 			SavedLocOffset = 0;
 			SavedLocCount = 0;
+			PPLocOffset = 0;
+			PPLocCount = 0;
 			str->Seek( 64, GEM_CURRENT_POS);
 			break;
 	}
@@ -269,9 +273,33 @@ Game* GAMImp::LoadGame(Game *newGame)
 		}
 	}
 
+	//TODO: these need to be corrected!
 	if (SavedLocCount && SavedLocOffset) {
+		ieWord PosX, PosY;
+
 		str->Seek( SavedLocOffset, GEM_STREAM_START );
-		//reading saved locations
+		for (i=0; i<SavedLocCount; i++) {
+			GAMLocationEntry *gle = newGame->GetSavedLocationEntry(i);
+			str->ReadResRef( gle->AreaResRef );
+			str->ReadWord( &PosX );
+			str->ReadWord( &PosY );
+			gle->Pos.x=PosX;
+			gle->Pos.y=PosY;
+		}
+	}
+
+	if (PPLocCount && PPLocOffset) {
+		ieWord PosX, PosY;
+
+		str->Seek( PPLocOffset, GEM_STREAM_START );
+		for (i=0; i<PPLocCount; i++) {
+			GAMLocationEntry *gle = newGame->GetPlaneLocationEntry(i);
+			str->ReadResRef( gle->AreaResRef );
+			str->ReadWord( &PosX );
+			str->ReadWord( &PosY );
+			gle->Pos.x=PosX;
+			gle->Pos.y=PosY;
+		}
 	}
 	return newGame;
 }
@@ -612,10 +640,15 @@ int GAMImp::GetStoredFileSize(Game *game)
 			headersize += 9 * 8 + 82 * 4;
 		}
 	}
+
+	//TODO: Fix this for ToB and BG2 (saved locations and pocket plane locations)
 	SavedLocOffset = headersize;
-	//i don't use this yet, it should be used only for bg2
 	SavedLocCount = 0;
-	return headersize + SavedLocCount * 20;
+
+	PPLocOffset = headersize;
+	PPLocCount = 0;
+
+	return headersize + (PPLocCount+SavedLocCount) * 20;
 }
 
 int GAMImp::PutJournals(DataStream *stream, Game *game)
@@ -632,6 +665,39 @@ int GAMImp::PutJournals(DataStream *stream, Game *game)
 		stream->Write( &j->Group, 1 ); // this is a GemRB extension
 	}
 
+	return 0;
+}
+
+//only in ToB
+int GAMImp::PutSavedLocations(DataStream *stream, Game *game)
+{
+	ieWord tmpWord;
+
+	for (unsigned int i=0;i<SavedLocCount;i++) {
+			GAMLocationEntry *j = game->GetSavedLocationEntry(i);
+
+			stream->WriteResRef(j->AreaResRef);
+			tmpWord = j->Pos.x;
+			stream->WriteWord(&tmpWord);
+			tmpWord = j->Pos.y;
+			stream->WriteWord(&tmpWord);
+	}
+	return 0;
+}
+
+int GAMImp::PutPlaneLocations(DataStream *stream, Game *game)
+{
+	ieWord tmpWord;
+
+	for (unsigned int i=0;i<PPLocCount;i++) {
+			GAMLocationEntry *j = game->GetPlaneLocationEntry(i);
+
+			stream->WriteResRef(j->AreaResRef);
+			tmpWord = j->Pos.x;
+			stream->WriteWord(&tmpWord);
+			tmpWord = j->Pos.y;
+			stream->WriteWord(&tmpWord);
+	}
 	return 0;
 }
 
@@ -710,7 +776,10 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 		}
 	}
 	stream->WriteDword( &game->PartyGold );
-	stream->WriteDword( &game->WeatherBits );
+	//hack because we don't need this
+	game->NpcInParty=PCCount-1;
+	stream->WriteWord( &game->NpcInParty );
+	stream->WriteWord( &game->WeatherBits );
 	stream->WriteDword( &PCOffset );
 	stream->WriteDword( &PCCount );
 	//these fields are zeroed in any original savegame
@@ -722,7 +791,8 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 	stream->WriteDword( &GlobalOffset );
 	stream->WriteDword( &GlobalCount );
 	stream->WriteResRef( game->CurrentArea );
-	stream->WriteDword( &game->Unknown48 );
+	//this is always 0xffffffff
+	stream->WriteDword( &game->Unknown48 );        
 	stream->WriteDword( &JournalCount );
 	stream->WriteDword( &JournalOffset );
 
@@ -780,7 +850,9 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	stream->WriteDword( &CREOffset);
 	stream->WriteDword( &CRESize);
 	//creature resref is always unused in saved games
+	filling[0]='*';                       //make it the same as in the original
 	stream->Write( filling, 8);
+	filling[0]=0;
 	tmpDword = ac->GetOrientation();
 	stream->WriteDword( &tmpDword);
 	stream->WriteResRef(ac->Area);
@@ -789,9 +861,9 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	tmpWord = ac->Pos.y;
 	stream->WriteWord( &tmpWord);
 	//no viewport, we cheat
-	tmpWord = ac->Pos.x;
+	tmpWord = ac->Pos.x-core->Width/2;
 	stream->WriteWord( &tmpWord);
-	tmpWord = ac->Pos.y;
+	tmpWord = ac->Pos.y-core->Height/2;
 	stream->WriteWord( &tmpWord);
 	tmpWord = (ieWord) ac->ModalState;
 	stream->WriteWord( &tmpWord);

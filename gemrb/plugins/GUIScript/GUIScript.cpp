@@ -2055,7 +2055,8 @@ static PyObject* GemRB_CreateTextEdit(PyObject * /*self*/, PyObject* args)
 	if (win == NULL) {
 		return RuntimeError("Cannot find window!");
 	}
-	TextEdit* edit = new TextEdit( 500 );
+	//there is no need to set these differently, currently
+	TextEdit* edit = new TextEdit( 500, 0, 0);
 	edit->SetFont( core->GetFont( font ) );
 	edit->XPos = x;
 	edit->YPos = y;
@@ -7747,7 +7748,7 @@ static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 	if (initDialog) {
 		if (initDialog == 2)
 		GameScript::SetLeavePartyDialogFile(actor, NULL);
-		if(actor->GetStat(IE_HITPOINTS) > 0) {
+		if(actor->GetBase(IE_HITPOINTS) > 0) {
 			char Tmp[40];
 			actor->ClearPath();
 			actor->ClearActions();

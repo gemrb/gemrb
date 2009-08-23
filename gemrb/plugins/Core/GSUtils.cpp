@@ -149,7 +149,7 @@ int GetHPPercent(Scriptable* Sender)
 	if (hp1<1) {
 		return 0;
 	}
-	int hp2 = ab->GetStat(IE_HITPOINTS);
+	int hp2 = ab->GetBase(IE_HITPOINTS);
 	if (hp2<1) {
 		return 0;
 	}

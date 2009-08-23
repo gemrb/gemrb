@@ -46,7 +46,7 @@ private:
 	ieDword KillVarsOffset, KillVarsCount;
 	ieDword FamiliarsOffset;
 	ieDword SavedLocOffset, SavedLocCount;
-
+	ieDword PPLocOffset, PPLocCount;
 public:
 	GAMImp(void);
 	~GAMImp(void);
@@ -75,6 +75,8 @@ private:
 	int PutKillVars(DataStream *stream, Game *game);
 	int PutMaze(DataStream *stream, Game *game);
 	int PutFamiliars(DataStream *stream, Game *game);
+	int PutSavedLocations(DataStream *stream, Game *game);
+	int PutPlaneLocations(DataStream *stream, Game *game);
 };
 
 #endif

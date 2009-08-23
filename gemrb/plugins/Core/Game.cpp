@@ -125,6 +125,16 @@ Game::~Game(void)
 	while(i--) {
 		delete Journals[i];
 	}
+
+	i=savedpositions.size();
+	while(i--) {
+		delete savedpositions[i];
+	}
+
+	i=planepositions.size();
+	while(i--) {
+		delete planepositions[i];
+	}
 }
 
 bool IsAlive(Actor *pc)
@@ -801,6 +811,64 @@ GAMJournalEntry* Game::GetJournalEntry(unsigned int Index)
 		return NULL;
 	}
 	return Journals[Index];
+}
+
+unsigned int Game::GetSavedLocationCount() const
+{
+	return (unsigned int) savedpositions.size();
+}
+
+void Game::ClearSavedLocations()
+{
+	size_t i=savedpositions.size();
+	while(i--) {
+		delete savedpositions[i];
+	}
+	savedpositions.clear();
+}
+
+GAMLocationEntry* Game::GetSavedLocationEntry(unsigned int i)
+{
+	size_t current = savedpositions.size();
+	if (i>=current) {
+		if (i>PCs.size()) {
+			return NULL;
+		}
+		savedpositions.resize(i);
+		while(current<=i) {
+			savedpositions[current++]=(GAMLocationEntry *) calloc(1, sizeof(GAMLocationEntry) );
+		}
+	}
+	return savedpositions[i];
+}
+
+unsigned int Game::GetPlaneLocationCount() const
+{
+	return (unsigned int) planepositions.size();
+}
+
+void Game::ClearPlaneLocations()
+{
+	size_t i=planepositions.size();
+	while(i--) {
+		delete planepositions[i];
+	}
+	planepositions.clear();
+}
+
+GAMLocationEntry* Game::GetPlaneLocationEntry(unsigned int i)
+{
+	size_t current = planepositions.size();
+	if (i>=current) {
+		if (i>PCs.size()) {
+			return NULL;
+		}
+		planepositions.resize(i+1);
+		while(current<=i) {
+			planepositions[current++]=(GAMLocationEntry *) calloc(1, sizeof(GAMLocationEntry) );
+		}
+	}
+	return planepositions[i];
 }
 
 char *Game::GetFamiliar(unsigned int Index)

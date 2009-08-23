@@ -715,9 +715,9 @@ public: //Script Functions
 	static int Contains(Scriptable* Sender, Trigger* parameters);
 	static int CreatureHidden( Scriptable* Sender, Trigger* parameters);
 	static int CurrentAreaIs(Scriptable* Sender, Trigger* parameters);
-	static int DamageTaken(Scriptable* Sender, Trigger* parameters);
-	static int DamageTakenGT(Scriptable* Sender, Trigger* parameters);
-	static int DamageTakenLT(Scriptable* Sender, Trigger* parameters);
+	//static int DamageTaken(Scriptable* Sender, Trigger* parameters);
+	//static int DamageTakenGT(Scriptable* Sender, Trigger* parameters);
+	//static int DamageTakenLT(Scriptable* Sender, Trigger* parameters);
 	static int Dead(Scriptable* Sender, Trigger* parameters);
 	static int Delay(Scriptable* Sender, Trigger* parameters);
 	static int Detect(Scriptable* Sender, Trigger* parameters);

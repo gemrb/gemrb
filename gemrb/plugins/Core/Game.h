@@ -159,9 +159,9 @@ struct GAMJournalEntry {
 };
 
 // Saved location of party member.
-struct GAMPartyLocation {
-	ieResRef area;
-	Point pos;
+struct GAMLocationEntry {
+	ieResRef AreaResRef;
+	Point Pos;
 };
 
 #define MAX_CRLEVEL 32
@@ -182,6 +182,8 @@ private:
 	std::vector< Actor*> NPCs;
 	std::vector< Map*> Maps;
 	std::vector< GAMJournalEntry*> Journals;
+	std::vector< GAMLocationEntry*> savedpositions;
+	std::vector< GAMLocationEntry*> planepositions;
 	std::vector< char*> mastarea;
 	std::vector< ieDword> Attackers;
 	CRRow *crtable;
@@ -215,7 +217,8 @@ public:
 	ieWord  WhichFormation;
 	ieWord  Formations[5];
 	ieDword PartyGold;
-	ieDword WeatherBits;
+	ieWord NpcInParty;
+	ieWord WeatherBits;
 	ieDword Unknown48;
 	ieDword Reputation;
 	ieDword ControlStatus;// used in bg2, iwd (where you can switch panes off)
@@ -227,7 +230,6 @@ public:
 	Particles *weather;
 	int event_timer;
 	char event_handler[64]; //like in Control
-	std::vector<GAMPartyLocation> savedpositions;
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();
@@ -310,6 +312,14 @@ public:
 	unsigned int GetJournalCount() const;
 	GAMJournalEntry* FindJournalEntry(ieStrRef strref);
 	GAMJournalEntry* GetJournalEntry(unsigned int Index);
+
+	unsigned int GetSavedLocationCount() const;
+	void ClearSavedLocations();
+	GAMLocationEntry* GetSavedLocationEntry(unsigned int Index);
+
+	unsigned int GetPlaneLocationCount() const;
+	void ClearPlaneLocations();
+	GAMLocationEntry* GetPlaneLocationEntry(unsigned int Index);
 
 	char *GetFamiliar(unsigned int Index);
 

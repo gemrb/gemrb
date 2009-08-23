@@ -1322,23 +1322,18 @@ int fx_current_hp_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_current_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	if (target->HasSpellState(SS_BLOODRAGE)) {
-		return FX_NOT_APPLIED;
-	}
-
-	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		//BASE_MOD( IE_HITPOINTS );
-		target->NewBase( IE_HITPOINTS, fx->Parameter1, fx->Parameter2&0xffff);
-	} else {
-		//STAT_MOD( IE_HITPOINTS );
-		target->NewStat( IE_HITPOINTS, fx->Parameter1, fx->Parameter2&0xffff);
-	}
 	if (fx->Parameter2&0x10000) {
 		target->Resurrect();
 	}
 	if (fx->Parameter2&0x20000) {
 		target->fxqueue.RemoveAllNonPermanentEffects();
 	}
+	//Cannot heal bloodrage
+	if (target->HasSpellState(SS_BLOODRAGE)) {
+		return FX_NOT_APPLIED;
+	}
+
+	target->NewBase( IE_HITPOINTS, fx->Parameter1, fx->Parameter2&0xffff);
 	//never stay permanent
 	return FX_NOT_APPLIED;
 }
@@ -1837,7 +1832,7 @@ int fx_strength_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x2D State:Stun
 int power_word_stun_iwd2(Actor *target, Effect *fx)
 {
-	int hp = STAT_GET(IE_HITPOINTS);
+	int hp = BASE_GET(IE_HITPOINTS);
 	if (hp>150) return FX_NOT_APPLIED;
 	int stuntime;
 	if (hp>100) stuntime = core->Roll(1,4,0);
@@ -3334,7 +3329,10 @@ int fx_set_aid_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STATE_SET( STATE_AID );
 	target->SetSpellState(SS_AID);
 	STAT_ADD( IE_MAXHITPOINTS, fx->Parameter2);
-	STAT_ADD( IE_HITPOINTS, fx->Parameter1);
+	//This better happens after increasing maxhitpoints
+	if (fx->FirstApply) {
+		BASE_ADD( IE_HITPOINTS, fx->Parameter1);
+	}
 	STAT_ADD( IE_SAVEVSDEATH, fx->Parameter1);
 	STAT_ADD( IE_SAVEVSWANDS, fx->Parameter1);
 	STAT_ADD( IE_SAVEVSPOLY, fx->Parameter1);
@@ -4901,13 +4899,13 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		condition = PersonalDistance(actor, target)<30;
 		break;
 	case COND_HP_HALF:
-		condition = actor->GetStat(IE_HITPOINTS)<actor->GetStat(IE_MAXHITPOINTS)/2;
+		condition = actor->GetBase(IE_HITPOINTS)<actor->GetStat(IE_MAXHITPOINTS)/2;
 		break;
 	case COND_HP_QUART:
-		condition = actor->GetStat(IE_HITPOINTS)<actor->GetStat(IE_MAXHITPOINTS)/4;
+		condition = actor->GetBase(IE_HITPOINTS)<actor->GetStat(IE_MAXHITPOINTS)/4;
 		break;
 	case COND_HP_LOW:
-		condition = actor->GetStat(IE_HITPOINTS)<actor->GetStat(IE_MAXHITPOINTS)/10;
+		condition = actor->GetBase(IE_HITPOINTS)<actor->GetStat(IE_MAXHITPOINTS)/10;
 		break;
 	case COND_HELPLESS:
 		condition = actor->GetStat(IE_STATE_ID) & STATE_CANTMOVE;
@@ -5828,14 +5826,24 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	Game *game;
 	ieResRef resref;
 
-	if (0) printf( "fx_cutscene2 (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_cutscene2 (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	if (core->InCutSceneMode()) return FX_NOT_APPLIED;
 	game = core->GetGame();
 	if (!game) return FX_NOT_APPLIED;
+
+	for (int i = 0; i < game->GetPartySize(false); i++) {
+		Actor* act = game->GetPC( i, false );
+		GAMLocationEntry *gle = game->GetPlaneLocationEntry(i);
+		if (act && gle) {
+			gle->Pos = act->Pos;
+			memcpy(gle->AreaResRef, act->Area, 9);
+		}
+	}
+
 	core->SetCutSceneMode(true);
 
 	//GemRB enhancement: allow a custom resource
-	if (fx->Resource[0]) {
+	if (fx->Parameter2) {
 		strnlwrcpy(resref,fx->Resource, 8);
 	} else {
 		strnlwrcpy(resref,"cut250a",8);

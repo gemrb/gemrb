@@ -87,9 +87,9 @@ static const TriggerLink triggernames[] = {
 	{"currentareais", GameScript::CurrentAreaIs, 0},//checks object
 	{"creaturehidden", GameScript::CreatureHidden, 0},//this is the engine level hiding feature, not the skill
 	{"creatureinarea", GameScript::AreaCheck, 0}, //pst, checks this object
-	{"damagetaken", GameScript::DamageTaken, 0},
-	{"damagetakengt", GameScript::DamageTakenGT, 0},
-	{"damagetakenlt", GameScript::DamageTakenLT, 0},
+	{"damagetaken", GameScript::HPLost, 0},
+	{"damagetakengt", GameScript::HPLostGT, 0},
+	{"damagetakenlt", GameScript::HPLostLT, 0},
 	{"dead", GameScript::Dead, 0},
 	{"delay", GameScript::Delay, 0},
 	{"detect", GameScript::Detect, 0}, //so far i see no difference
@@ -2425,11 +2425,11 @@ Targets *GameScript::MostDamagedOf(Scriptable* Sender, Targets *parameters, int 
 	}
 	Scriptable *scr = t->actor;
 	Actor *actor=(Actor *) scr;
-	int worsthp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+	int worsthp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
 	// assignment in while
 	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
 		actor = (Actor *) t->actor;
-		int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+		int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
 		if (worsthp>hp) {
 			worsthp=hp;
 			scr=t->actor;
@@ -2446,7 +2446,7 @@ Targets *GameScript::MostDamagedOf(Scriptable* Sender, Targets *parameters, int 
 	while (i--) {
 		Actor *actor = game->GetPC(i, false);
 		if(actor->GetCurrentArea() == area) {
-			int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+			int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
 			if (worsthp>hp) {
 				worsthp=hp;
 				scr=actor;
@@ -2466,11 +2466,11 @@ Targets *GameScript::LeastDamagedOf(Scriptable* /*Sender*/, Targets *parameters,
 	}
 	Scriptable *scr = t->actor;
 	Actor *actor = (Actor *) scr;
-	int besthp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+	int besthp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
 	// assignment in while
 	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
 		actor = (Actor *) t->actor;
-		int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+		int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetBase(IE_HITPOINTS);
 		if (besthp<hp) {
 			besthp=hp;
 			scr=t->actor;

@@ -199,7 +199,7 @@ Interface::Interface(int iargc, char* iargv[])
 	strncpy( ButtonFont, "STONESML", sizeof(ButtonFont) );
 	strncpy( TooltipFont, "STONESML", sizeof(TooltipFont) );
 	strncpy( MovieFont, "STONESML", sizeof(MovieFont) );
-	strncpy( CursorBam, "CAROT", sizeof(CursorBam) );
+	//strncpy( CursorBam, "CAROT", sizeof(CursorBam) );
 	strncpy( ScrollCursorBam, "CURSARW", sizeof(ScrollCursorBam) );
 	strncpy( GlobalScript, "BALDUR", sizeof(GlobalScript) );
 	strncpy( WorldMapName, "WORLDMAP", sizeof(WorldMapName) );
@@ -2248,7 +2248,7 @@ bool Interface::LoadGemRBINI()
 	// Resrefs are already initialized in Interface::Interface()
 	s = ini->GetKeyAsString( "resources", "CursorBAM", NULL );
 	if (s)
-		strnlwrcpy( CursorBam, s, 8 );
+		strnlwrcpy( CursorBam, s, 8 ); //console cursor
 
 	s = ini->GetKeyAsString( "resources", "ScrollCursorBAM", NULL );
 	if (s)
@@ -4745,6 +4745,7 @@ Actor *Interface::GetFirstSelectedPC(bool forced)
 	return NULL;
 }
 
+//this is used only for the console
 Sprite2D *Interface::GetCursorSprite()
 {
 	Sprite2D *spr = gamedata->GetBAMSprite(CursorBam, 0, 0);
