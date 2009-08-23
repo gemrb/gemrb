@@ -2,7 +2,7 @@
 -1
 				DESC_REF	CAP_REF	ID	THIEF	MAGE_THIEF	FIGHTER_THIEF	CLERIC_THIEF	FIGHTER_MAGE_THIEF	ASSASIN		BOUNTY_HUNTER	SWASHBUCKLER	MONK
 FIRST_LEVEL		*			*		*	40		40			40				40				40					15			20				40				10
-RATE			*			*		*	40		40			40				40				40					15			20				40				10
+RATE			*			*		*	25		25			25				25				25					15			20				25				10
 PICK_POCKETS	9597		9463	29	1		1			1				1				1					1			1				1				-1
 OPEN_LOCKS		9598		9460	26	1		1			1				1				1					1			1				1				-1
 FIND_TRAPS		9599		9462	28	1		1			1				1				1					1			1				1				1
