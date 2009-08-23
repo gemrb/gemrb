@@ -40,7 +40,8 @@ Button::Button()
 	ResetEventHandler( MouseEnterButton );
 	ResetEventHandler( MouseLeaveButton );
 	ResetEventHandler( MouseOverButton );
-	Text = ( char * ) calloc( 64, sizeof(char) );
+	//Text = ( char * ) calloc( 64, sizeof(char) );
+	Text = NULL;
 	hasText = false;
 	font = core->GetButtonFont();
 	normal_palette = NULL;
@@ -526,7 +527,7 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 
 	//portrait buttons are draggable and locked
 	if ((Flags & IE_GUI_BUTTON_DRAGGABLE) && 
-            (State == IE_GUI_BUTTON_PRESSED || State ==IE_GUI_BUTTON_LOCKED_PRESSED)) {
+			      (State == IE_GUI_BUTTON_PRESSED || State ==IE_GUI_BUTTON_LOCKED_PRESSED)) {
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
 		int dx = Owner->XPos + XPos + x - drag_start.x;
@@ -569,15 +570,17 @@ void Button::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 /** Sets the Text of the current control */
 int Button::SetText(const char* string, int /*pos*/)
 {
+	free(Text);
 	if (string == NULL) {
 		hasText = false;
 	} else if (string[0] == 0) {
 		hasText = false;
 	} else {
-		if (Flags&IE_GUI_BUTTON_CAPS)
-			strnuprcpy( Text, string, 63 );
-		else
-			strncpy( Text, string, 63 );
+		Text = strndup( string, 255 );
+		if (Flags&IE_GUI_BUTTON_LOWERCASE)
+			strlwr( Text );
+		else if (Flags&IE_GUI_BUTTON_CAPS)
+			strupr( Text );
 		hasText = true;
 	}
 	Changed = true;
