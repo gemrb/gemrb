@@ -799,6 +799,7 @@ static const ActionLink actionnames[] = {
 	{"settrackstring", GameScript::SetTrackString, 0},
 	{"settoken", GameScript::SetToken, 0},
 	{"settokenglobal", GameScript::SetTokenGlobal,AF_MERGESTRINGS},
+	{"setupwish", GameScript::SetupWish, 0},
 	{"setvisualrange", GameScript::SetVisualRange, 0},
 	{"sg", GameScript::SG, 0},
 	{"shout", GameScript::Shout, 0},

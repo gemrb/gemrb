@@ -1081,7 +1081,7 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 	ieDword tmp = (ieDword) parameters->int0Parameter;
 	//InMove can clear destination, so we need to save it
 	Point dest = actor->Destination;
-	
+
 	// try the actual move, if we are not already moving there
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
 		actor->WalkTo( parameters->pointParameter, 0, tmp );
@@ -1093,7 +1093,7 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 		// we should probably instead keep retrying until we reach dest
 		Sender->ReleaseCurrentAction();
 	}
-	
+
 	if (tmp) {
 		if (!actor->InMove()) {
 			//can't reach target, movement failed
@@ -1450,7 +1450,7 @@ void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
 		actor->AddActionInFront(newaction);
 		Sender->SetWait(1);
 	}
-	
+
 	Sender->ReleaseCurrentAction();
 }
 
@@ -2221,7 +2221,7 @@ void GameScript::RemoveTraps(Scriptable* Sender, Action* parameters)
 		// this point is incorrect! will cause actor to enter trap
 		// need to find a point using trigger->outline
 		p = &trigger->Pos;
-		otherp = p;	
+		otherp = p;
 		distance = Distance(tar, Sender);
 		flags = trigger->Trapped && trigger->TrapDetected && trigger->CanDetectTrap();
 		break;
@@ -4661,7 +4661,7 @@ void GameScript::AttackOneRound( Scriptable* Sender, Action* parameters)
 	if (!Sender->CurrentActionState) {
 		Sender->CurrentActionState = ROUND_SIZE;
 	}
-	
+
 	AttackCore(Sender, tar, 0);
 
 	if (Sender->CurrentActionState == 1) {
@@ -6449,6 +6449,62 @@ void GameScript::DoubleClickRButtonObject(Scriptable* Sender, Action* parameters
 void GameScript::DoubleClickRButtonPoint(Scriptable* Sender, Action* parameters)
 {
 	ClickCore(Sender, parameters->pointParameter, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+}
+
+//Picks 5 lines from wish.2da
+//Gets the 5 values (column is int0parameter) from the table.
+//Sets the five wishpowerNN to 1, while resets the rest to 0.
+//TODO: investigate what happens with * values
+void GameScript::SetupWish(Scriptable* Sender, Action* parameters)
+{
+	int count = 0;
+	char varname[33];
+
+	AutoTable tm("wish");
+	if (!tm) {
+		printStatus( "ERROR", LIGHT_RED );
+		printf( "Cannot find wish.2da.\n");
+		return;
+	}
+
+	int picks[5];
+	int i,j;
+	count = tm->GetRowCount();
+
+	for(i=0;i<99;i++) {
+		snprintf(varname,32, "wishpower%02d", i);
+		if(CheckVariable(Sender, varname, "GLOBAL") ) {
+			SetVariable(Sender, varname, "GLOBAL", 0);
+		}
+	}
+
+	if (count<5) {
+		for(i=0;i<count;i++) {
+			picks[i]=i;
+		}
+		while(i++<5) {
+			picks[i]=-1;
+		}
+	} else {
+		for(i=0;i<5;i++) {
+			picks[i]=rand()%count;
+retry:
+			for(j=0;j<i;j++) {
+				if(picks[i]==picks[j]) {
+					picks[i]++;
+					goto retry;
+				}
+			}
+		}
+	}
+
+	for (i = 0; i < 5; i++) {
+		if (picks[i]<0)
+			continue;
+		int spnum = atoi( tm->QueryField( picks[i], parameters->int0Parameter ) );
+		snprintf(varname,32,"wishpower%02d", spnum);
+		SetVariable(Sender, varname, "GLOBAL",1);
+	}
 }
 
 //this is a gemrb extension for scriptable tracks
