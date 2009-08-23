@@ -176,7 +176,10 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		}
 		h = h * ystep;
 		y += ( rgn.h - h );
+	} else if (Alignment & IE_FONT_ALIGN_TOP) {
+		y += 5;
 	}
+
 	int row = 0;
 	for (size_t i = 0; i < len; i++) {
 		if (( ( unsigned char ) tmp[i] ) == '[' && !NoColor) {
@@ -351,6 +354,8 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		}
 		h = h * ystep;
 		y += ( rgn.h - h );
+	} else if (Alignment & IE_FONT_ALIGN_TOP) {
+		y += 5;
 	}
 	for (size_t i = 0; i < len; i++) {
 		if (( ( unsigned char ) tmp[i] ) == '[' && !NoColor) {
