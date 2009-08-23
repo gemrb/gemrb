@@ -834,7 +834,7 @@ GAMLocationEntry* Game::GetSavedLocationEntry(unsigned int i)
 		if (i>PCs.size()) {
 			return NULL;
 		}
-		savedpositions.resize(i);
+		savedpositions.resize(i+1);
 		while(current<=i) {
 			savedpositions[current++]=(GAMLocationEntry *) calloc(1, sizeof(GAMLocationEntry) );
 		}
