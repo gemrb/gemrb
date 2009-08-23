@@ -42,7 +42,7 @@ def OnLoad():
 			Button = ClassWindow.GetControl(j+7)
 		else:
 			Button = ClassWindow.GetControl(j+2)
-		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		j = j+1
 
