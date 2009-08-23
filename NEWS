@@ -1,6 +1,9 @@
-GemRB svn (6934):
+GemRB svn (7026):
   New features:
     - 
+    - damage resistance
+    - sorcerer style spellbooks
+    - target following in other areas
     - auto-reloading of projectile weapons in case the ammo stack runs out
     - initial support for targetting by portrait
     - PST death counters (don't anger the Lady)
