@@ -1030,10 +1030,10 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		printf("BeginDialog core\n");
 	}
 	if (Flags & BD_OWN) {
-		tar = GetActorFromObject( Sender, parameters->objects[1], seeflag);
+		tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag);
 		scr = tar;
 	} else {
-		tar = GetActorFromObject( Sender, parameters->objects[1], seeflag);
+		tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag);
 		scr = Sender;
 	}
 	if (!scr) {
@@ -1277,7 +1277,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* target = GetStoredActorFromObject( Sender, parameters->objects[1] );
 	if (!target) {
 		Sender->ReleaseCurrentAction();
 		return;
