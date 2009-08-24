@@ -3910,7 +3910,7 @@ void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagety
 		if (it == core->DamageInfoMap.end()) {
 			printf("Unhandled damagetype:%d\n", damagetype);
 		} else {
-			resisted = int ((damage * target->GetStat(it->second.resist_stat)/100) + 0.5);
+			resisted = (int) (damage * (signed)target->GetStat(it->second.resist_stat)/100.0);
 			damage -= resisted;
 			printf("Resisted %d of %d at %d%% resistance to %d\n", resisted, damage+resisted, target->GetStat(it->second.resist_stat), damagetype);
 			if (damage <= 0) resisted = DR_IMMUNE;
