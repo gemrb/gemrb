@@ -156,6 +156,8 @@ def HLAShowAbilities ():
 	# we have a grid of 24 abilites
 	for i in range (24+EnhanceGUI):
 		# ensure we can learn this many abilites
+		if len (HLAAbilities) < 25 and i == 24: #break if we don't need extra 25th button
+			break
 		SpellButton = HLAWindow.GetControl (i)
 		if i + j >= len (HLAAbilities):
 			SpellButton.SetState (IE_GUI_BUTTON_DISABLED)
