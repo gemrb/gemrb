@@ -5640,6 +5640,7 @@ void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 	}
 	ip->LastEntered = 0;
 	ip->LastTrigger = 0;
+	ip->LastTriggerObject = 0;
 }
 
 void GameScript::UseDoor(Scriptable* Sender, Action* parameters)

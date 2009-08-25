@@ -1618,7 +1618,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			//reset trap and deactivated flags
 			if (trap->Scripts[0]) {
 				if (!(trap->Flags&TRAP_DEACTIVATED) ) {
-					trap->LastTrigger = actor->GetID();
+					trap->LastTriggerObject = trap->LastTrigger = actor->GetID();
 					trap->ImmediateEvent();
 					//directly feeding the event, even if there are actions in the queue
 					trap->Scripts[0]->Update();

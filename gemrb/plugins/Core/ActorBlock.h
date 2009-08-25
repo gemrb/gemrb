@@ -205,6 +205,7 @@ public:
 	ieDword UnselectableTimer;
 	ieDword TriggerID; //for sendtrigger
 	ieDword LastTrigger;  // also LastClosed
+	ieDword LastTriggerObject; // hack until someone fixes triggers
 	ieDword LastEntered;  // also LastOpened
 	ieDword LastDisarmed; // also LastAttacker
 	ieDword LastDisarmFailed; //also LastTarget

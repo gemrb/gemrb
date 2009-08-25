@@ -55,7 +55,7 @@ Scriptable::Scriptable(ScriptableType type)
 	timeStartDisplaying = 0;
 	scriptName[0] = 0;
 	TriggerID = 0; //used by SendTrigger
-	LastTrigger = 0;
+	LastTriggerObject = LastTrigger = 0;
 	LastEntered = 0;
 	LastDisarmed = 0;
 	LastDisarmFailed = 0;
@@ -1619,7 +1619,7 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 			SetDoorLocked(FALSE,playsound);
 		}
 	} else {
-		LastTrigger = ID; //used as lastCloser
+		LastTriggerObject = LastTrigger = ID; //used as lastCloser
 	}
 	ToggleTiles(Open, playsound);
 	//synchronising other data with the door state
@@ -1702,7 +1702,7 @@ void Highlightable::TryDisarm(Actor *actor)
 {
 	if (!Trapped || !TrapDetected) return;
 
-	LastTrigger = actor->GetID();
+	LastTriggerObject = LastTrigger = actor->GetID();
 	int skill = actor->GetStat(IE_TRAPS);
 
 	if (skill/2+core->Roll(1,skill/2,0)>TrapRemovalDiff) {
@@ -1889,7 +1889,7 @@ bool Highlightable::TriggerTrap(int skill, ieDword ID)
 			return false;
 		}
 	}
-	LastTrigger = LastEntered = ID;
+	LastTriggerObject = LastTrigger = LastEntered = ID;
 	ImmediateEvent();
 	if (!TrapResets()) {
 		Trapped = false;

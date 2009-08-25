@@ -536,7 +536,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		return;
 	}
 	if (ip->Scripts[0]) {
-		ip->LastTrigger = ip->LastEntered = actor->GetID();
+		ip->LastTriggerObject = ip->LastTrigger = ip->LastEntered = actor->GetID();
 		ip->ExecuteScript( 1 );
 		ip->ProcessActions(true);
 	}
