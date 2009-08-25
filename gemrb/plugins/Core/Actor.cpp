@@ -5524,7 +5524,7 @@ Actor *Actor::CopySelf() const
 
 	//these need to be called too to have a valid inventory
 	newActor->inventory.SetSlotCount(inventory.GetSlotCount());
-	newActor->SetupFist();
+	newActor->CreateDerivedStats();
 
 	//copy the running effects
 	EffectQueue *newFXQueue = fxqueue.CopySelf();
