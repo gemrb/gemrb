@@ -183,7 +183,8 @@ int TLKImp::RaceStrRef(int slot)
 	if (!tab) {
 		return -1;
 	}
-	return atoi(tab->QueryField(race,0) );
+	int row = tab->FindTableValue(3, race, 0);
+	return atoi(tab->QueryField(row,0) );
 }
 
 int TLKImp::GenderStrRef(int slot, int malestrref, int femalestrref)
