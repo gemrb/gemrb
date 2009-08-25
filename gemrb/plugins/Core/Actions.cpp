@@ -554,6 +554,8 @@ void GameScript::MoveToExpansion(Scriptable* Sender, Action* /*parameters*/)
 	Game *game = core->GetGame();
 
 	game->SetExpansion(1);
+	core->GetDictionary()->SetAt( "PlayMode", 2 );
+	//TODO: set the new world map
 
 	int i = game->GetPartySize(false);
 	while(i--) {
