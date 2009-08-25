@@ -101,7 +101,6 @@ def RollPress():
 		else:
 			Label.SetText(str(v) )
 		Label.SetUseRGB(1)
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def OnLoad():
@@ -147,6 +146,7 @@ def OnLoad():
 	DoneButton = AbilityWindow.GetControl(0)
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
 	RollPress()
 	StorePress()
@@ -202,7 +202,6 @@ def RightPress():
 		Label.SetText("18/"+str(StrExtra) )
 	else:
 		Label.SetText(str(Ability-1) )
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	return
 
 def JustPress():
@@ -241,8 +240,6 @@ def LeftPress():
 		Label.SetText("18/%02d"%(StrExtra) )
 	else:
 		Label.SetText(str(Ability+1) )
-	if PointsLeft == 0:
-		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def EmptyPress():
@@ -272,10 +269,6 @@ def RecallPress():
 			Label.SetText(str(v) )
 
 	PointsLeft = GemRB.GetVar("Ability -1")
-	if PointsLeft == 0:
-		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-	else:
-		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	return
 
 def BackPress():
