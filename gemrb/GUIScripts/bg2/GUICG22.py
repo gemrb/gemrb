@@ -63,10 +63,10 @@ def OnLoad():
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
-	if not KitTable:
+	if not KitTable: # sorcerer or monk
 		RowCount = 1
 	else:
-		if ClassID == 1:
+		if ClassID == 1: # mages
 			RowCount = SchoolList.GetRowCount()
 		else:
 			RowCount = KitTable.GetRowCount()
@@ -87,32 +87,6 @@ def OnLoad():
 			Button = KitWindow.GetControl(i+1)
 		else:
 			Button = KitWindow.GetControl(i+5)
-
-		if not KitTable:
-			if ClassID == 1:
-				# TODO: this seems to be never reached
-				Kit = GemRB.GetVar("MAGESCHOOL")
-				KitName = SchoolList.GetValue(i+TopIndex, 0)
-				Kit = SchoolList.GetValue (Kit, 3)
-			else:
-				Kit = 0
-				KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
-
-		else:
-			Kit = KitTable.GetValue (i+TopIndex, 0)
-			if ClassID == 1:
-				KitName = SchoolList.GetValue (i+TopIndex, 0)
-				if Kit == 0:
-					KitName = SchoolList.GetValue (0, 0)
-				elif Kit == "*":
-					Kit = 0
-			else:
-				if Kit:
-					KitName = KitListTable.GetValue(Kit, 1)
-				else:
-					KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
-		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetText(KitName)
 		Button.SetVarAssoc("ButtonPressed", i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "KitPress")
 
@@ -149,64 +123,56 @@ def RedrawKits():
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		if not KitTable:
 			if ClassID == 1:
+				# TODO: check if this is ever reached
 				Kit = GemRB.GetVar("MAGESCHOOL")
 				KitName = SchoolList.GetValue(i+TopIndex, 0)
 				Kit = SchoolList.GetValue (Kit, 3)
 			else:
 				Kit = 0
 				KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
-
 		else:
 			Kit = KitTable.GetValue (i+TopIndex,0)
 			if ClassID == 1:
 				KitName = SchoolList.GetValue (i+TopIndex, 0)
-				if Kit != "*":
-					EnabledButtons.append(Kit-21)
 				if Kit == 0:
 					KitName = SchoolList.GetValue (0, 0)
 					Button.SetState(IE_GUI_BUTTON_ENABLED)
+				if Kit != "*":
+					EnabledButtons.append(Kit-21)
 			else:
 				if Kit:
 					KitName = KitListTable.GetValue(Kit, 1)
 				else:
 					KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
-
 		Button.SetText(KitName)
 		if not EnabledButtons or i+TopIndex in EnabledButtons:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
 		if Kit == "*":
 			continue
 		if i+TopIndex==0 and Init:
-			GemRB.SetVar("ButtonPressed", i)
+			if EnabledButtons:
+				GemRB.SetVar("ButtonPressed", EnabledButtons[0])
+			else:
+				GemRB.SetVar("ButtonPressed", 0)
 	return
 
 def KitPress():
-	global ClassID
-
 	ButtonPressed=GemRB.GetVar("ButtonPressed")
 
 	if not KitTable:
 		if ClassID == 1: 
 			# TODO: this seems to be never reached
 			Kit = GemRB.GetVar("MAGESCHOOL")
-			KitName = SchoolList.GetValue(ButtonPressed+TopIndex, 0)
 			Kit = SchoolList.GetValue (Kit, 3)
 		else:
 			Kit = 0
-			KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
 	else:
 		Kit = KitTable.GetValue (ButtonPressed+TopIndex, 0)
 		if ClassID == 1:
-			KitName = SchoolList.GetValue (ButtonPressed+TopIndex, 0)
-			if Kit == 0:
-				KitName = SchoolList.GetValue (0, 0)
-			elif Kit == "*":
+			if ButtonPressed + TopIndex == 0:
 				Kit = 0
-		else:
-			if Kit:
-				KitName = KitListTable.GetValue(Kit, 1)
 			else:
-				KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
+				Kit = ButtonPressed + TopIndex + 21
 
 	if ClassID == 1 and Kit != 0:
 		GemRB.SetVar("MAGESCHOOL", Kit-21) # hack: -21 to make the generalist 0
@@ -214,11 +180,11 @@ def KitPress():
 		GemRB.SetVar("MAGESCHOOL", 0) # so bards don't get schools
 
 	if Kit == 0:
-		KitName = ClassTable.GetValue(GemRB.GetVar("Class")-1, 1)
+		KitDescription = ClassTable.GetValue(GemRB.GetVar("Class")-1, 1)
 	else:
-		KitName = KitListTable.GetValue(Kit, 3)
+		KitDescription = KitListTable.GetValue(Kit, 3)
 
-	TextAreaControl.SetText(KitName)
+	TextAreaControl.SetText(KitDescription)
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
 	GemRB.SetVar("Class Kit", Kit)
@@ -226,7 +192,7 @@ def KitPress():
 	return
 
 def BackPress():
-	GemRB.SetVar("Class Kit",0) #scrapping
+	GemRB.SetVar("Class Kit", 0) # reverting the value so we are idempotent
 	GemRB.SetVar("MAGESCHOOL", 0)
 	if KitWindow:
 		KitWindow.Unload()
