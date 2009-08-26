@@ -2903,9 +2903,9 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->inventory.SetSlotItemRes(fx->Resource, target->inventory.GetMagicSlot(),fx->Parameter1,fx->Parameter3,fx->Parameter4);
 	//equip the weapon
 	target->inventory.SetEquippedSlot(target->inventory.GetMagicSlot()-target->inventory.GetWeaponSlot(), 0);
-	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
-//if this effect has expiration, then it will remain as a remove_item
-//on the effect queue, inheriting all the parameters
+	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
+		//if this effect has expiration, then it will remain as a remove_item
+		//on the effect queue, inheriting all the parameters
 		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_item_ref);
 		fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
 		return FX_APPLIED;
