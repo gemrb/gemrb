@@ -1388,7 +1388,7 @@ void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match
 		//if dispellable was not set, or the effect is dispellable
 		//then remove it
 		if( Flags&RL_DISPELLABLE) {
-			if( !(*f)->Resistance&FX_CAN_DISPEL) {
+			if( !((*f)->Resistance&FX_CAN_DISPEL)) {
 				continue;
 			}
 		}
