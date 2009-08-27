@@ -1,3 +1,14 @@
+GemRB svn (7059):
+  New features:
+    - 
+
+  Improved features:
+    - 
+    - various guiscripts
+    - bugfixes
+
+  Applied patches:
+
 GemRB V0.5.1 (2009-08-27):
   New features:
     - BG2:SoA is roughly completable!
