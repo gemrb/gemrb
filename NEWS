@@ -1,28 +1,26 @@
-GemRB svn (7026):
+GemRB V0.5.1 (2009-08-27):
   New features:
-    - 
-    - damage resistance
-    - sorcerer style spellbooks
-    - target following in other areas
+    - BG2:SoA is roughly completable!
+    - almost all missing IE's hardcoded projectiles, spell hit projectiles,
+      projectile trails, projectile failure (spell), projectile effectlists
     - auto-reloading of projectile weapons in case the ammo stack runs out
-    - initial support for targetting by portrait
-    - PST death counters (don't anger the Lady)
+    - damage resistance
+    - sorcerer style spellbooks, reading of iwd2 spellbooks
+    - target following to other areas
+    - the null sound plugin is now always loaded last by default; for old
+      installs see the provided configuration example (DelayPlugin)
     - intelligence and wisdom dictated lore bonus
     - a GUIEnhancements config option (on by default) that enables a few
       extra controls (for convenience and larger mods)
-    - reading of iwd2 spellbooks
-    - the null sound plugin is now always loaded last by default; for old
-      installs see the provided configuration example (DelayPlugin)
-    - almost all missing IE's hardcoded projectiles, spell hit projectiles,
-      projectile trails, projectile failure (spell), projectile effectlists
+    - PST death counters (don't anger the Lady)
+    - initial support for targetting by portrait
 
   Improved features:
-    - 
-    - config and default table value parsing is smarter about spaces
-    - projectiles
+    - actions, effects and triggers
     - pathfinding, feet circles, fog of war and worldmap travel
     - combat and spellcasting (especially summoning)
-    - actions, effects and triggers
+    - projectiles
+    - config and default table value parsing is smarter about spaces
     - various guiscripts
     - bugfixes
 
