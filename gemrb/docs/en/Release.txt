@@ -60,20 +60,15 @@ Release and Announcements
 =========================
 
 * Put the tarballs/binaries into Releases on SF
-  Source pkg details:
-    Release name: GemRB 0.2.5 Sources
-    File name: gemrb-0.2.5.tar.gz
-    Processor: Any ; Type: Source .gz
-
-  Binary pkg details: 
-    Release name: GemRB 0.2.5 Linux/i386
-    File name: gemrb-0.2.5-linux_i386.tar.gz
-    Processor: i386 ; Type:
+  - create a new directory in the appropriate section by rightclicking
+  - mark it for upload
+  - upload the release notes
+  - upload the file
+  - mark the release notes as release notes (popup on leftclick)
+  - mark the file to have the release notes and default platforms (popup on leftclick)
 
 * Test the downloads from sourceforge.net
 
 * Announce on homepage, SF, #GemRB in channel and title, Gibberlings3, Happypenguin
-
-* Possibly announce on Freshmeat (only balrog has the account?)
 
 * Run admin/restart_news.sh to restart the NEWS cycle
