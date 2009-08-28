@@ -62,6 +62,8 @@ private:
 	Point goal;
 	int speed;
 	Region currentVP;
+
+	void DoFadeStep(ieDword count);
 public:
 	GlobalTimer(void);
 	~GlobalTimer(void);

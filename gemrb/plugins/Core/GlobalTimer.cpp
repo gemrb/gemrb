@@ -63,12 +63,19 @@ void GlobalTimer::Freeze()
 
 	GetTime( thisTime );
 	advance = thisTime - startTime;
+	if ( advance < interval) {
+		return;
+	}
 	startTime = thisTime;
 	Game* game = core->GetGame();
 	if (!game) {
 		return;
 	}
 	game->RealTime+=advance;
+
+	ieDword count = advance/interval;
+	// pst/bg2 do this, if you fix it for another game, wrap it in a check
+	DoFadeStep(count);
 
 	// show scrolling cursor while paused
 	GameControl* gc = core->GetGameControl();
@@ -144,8 +151,6 @@ void GlobalTimer::Update()
 	unsigned long thisTime;
 	unsigned long advance;
 
-	Video *video = core->GetVideoDriver();
-
 	gc = core->GetGameControl();
 	if (gc)
 		gc->UpdateScrolling();
@@ -165,37 +170,7 @@ void GlobalTimer::Update()
 	}
 	ieDword count = advance/interval;
 	DoStep(count);
-
-	if (fadeToCounter) {
-		fadeToCounter-=count;
-		if (fadeToCounter<0) {
-			fadeToCounter=0;
-		}
-		video->SetFadePercent( ( ( fadeToMax - fadeToCounter ) * 100 ) / fadeToMax );
-		//bug/patch #1837747 made this unneeded
-		//goto end; //hmm, freeze gametime?
-	}
-	//i think this 'else' is needed now because of the 'goto' cut above
-	else if (fadeFromCounter!=fadeFromMax) {
-		if (fadeFromCounter>fadeFromMax) {
-			fadeFromCounter-=advance/interval;
-			if (fadeFromCounter<fadeFromMax) {
-				fadeFromCounter=fadeFromMax;
-			}
-			//don't freeze gametime when already dark
-		} else {
-			fadeFromCounter+=advance/interval;
-			if (fadeToCounter>fadeFromMax) {
-				fadeToCounter=fadeFromMax;
-			}
-			video->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax );
-			//bug/patch #1837747 made this unneeded
-			//goto end; //freeze gametime?
-		}
-	}
-	if (fadeFromCounter==fadeFromMax) {
-		video->SetFadePercent( 0 );
-	}
+	DoFadeStep(count);
 	if (!gc) {
 		goto end;
 	}
@@ -223,6 +198,41 @@ void GlobalTimer::Update()
 	}
 end:
 	startTime = thisTime;
+}
+
+
+void GlobalTimer::DoFadeStep(ieDword count) {
+	Video *video = core->GetVideoDriver();
+	if (fadeToCounter) {
+		fadeToCounter-=count;
+		if (fadeToCounter<0) {
+			fadeToCounter=0;
+		}
+		video->SetFadePercent( ( ( fadeToMax - fadeToCounter ) * 100 ) / fadeToMax );
+		//bug/patch #1837747 made this unneeded
+		//goto end; //hmm, freeze gametime?
+	}
+	//i think this 'else' is needed now because of the 'goto' cut above
+	else if (fadeFromCounter!=fadeFromMax) {
+		if (fadeFromCounter>fadeFromMax) {
+			fadeFromCounter-=count;
+			if (fadeFromCounter<fadeFromMax) {
+				fadeFromCounter=fadeFromMax;
+			}
+			//don't freeze gametime when already dark
+		} else {
+			fadeFromCounter+=count;
+			if (fadeToCounter>fadeFromMax) {
+				fadeToCounter=fadeFromMax;
+			}
+			video->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax );
+			//bug/patch #1837747 made this unneeded
+			//goto end; //freeze gametime?
+		}
+	}
+	if (fadeFromCounter==fadeFromMax) {
+		video->SetFadePercent( 0 );
+	}
 }
 
 void GlobalTimer::SetFadeToColor(unsigned long Count)
