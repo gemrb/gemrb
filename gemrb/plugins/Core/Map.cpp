@@ -744,7 +744,8 @@ void Map::UpdateScripts()
 			break;
 		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
 		bool wasActive = (ip->Scripts[0] || ( ip->Type == ST_TRAVEL ));
- 		// bool wasActive = !(ip->Flags&TRAP_DEACTIVATED);
+ 		if (wasActive)
+			wasActive = !(ip->Flags&TRAP_DEACTIVATED);
 
 		//If this InfoPoint is a Switch Trigger
 		if (ip->Type == ST_TRIGGER) {
