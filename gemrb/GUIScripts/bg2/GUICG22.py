@@ -104,13 +104,12 @@ def OnLoad():
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	Init = 1
 	RedrawKits()
-	Init = 0
 	KitPress()
 	KitWindow.SetVisible(1)
 	return
 
 def RedrawKits():
-	global TopIndex
+	global TopIndex, Init
 
 	TopIndex=GemRB.GetVar("TopIndex")
 	EnabledButtons = []
@@ -119,7 +118,6 @@ def RedrawKits():
 			Button = KitWindow.GetControl(i+1)
 		else:
 			Button = KitWindow.GetControl(i+5)
-
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		if not KitTable:
 			if ClassID == 1:
@@ -137,6 +135,9 @@ def RedrawKits():
 				if Kit == 0:
 					KitName = SchoolList.GetValue (0, 0)
 					Button.SetState(IE_GUI_BUTTON_ENABLED)
+					if Init: #preselection of mage plain kit
+						Button.SetState(IE_GUI_BUTTON_SELECTED)
+						Init=0
 				if Kit != "*":
 					EnabledButtons.append(Kit-21)
 			else:
@@ -147,13 +148,18 @@ def RedrawKits():
 		Button.SetText(KitName)
 		if not EnabledButtons or i+TopIndex in EnabledButtons:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
+			if Init and i+TopIndex>0:
+				Button.SetState(IE_GUI_BUTTON_SELECTED)
+				Init=0
 		if Kit == "*":
 			continue
-		if i+TopIndex==0 and Init:
+		if Init and i+TopIndex==0:
 			if EnabledButtons:
-				GemRB.SetVar("ButtonPressed", EnabledButtons[0])
+				GemRB.SetVar("ButtonPressed", EnabledButtons[0]) #but leave Init==1
 			else:
 				GemRB.SetVar("ButtonPressed", 0)
+				Button.SetState(IE_GUI_BUTTON_SELECTED) 
+				Init=0
 	return
 
 def KitPress():
