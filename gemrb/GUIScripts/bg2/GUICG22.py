@@ -31,6 +31,7 @@ TopIndex = 0
 RowCount = 10
 KitTable = 0
 Init = 0
+KitSelected = 0 #store clicked kit on redraw as number withing RowCount
 
 def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton
@@ -109,7 +110,7 @@ def OnLoad():
 	return
 
 def RedrawKits():
-	global TopIndex, Init
+	global TopIndex, Init, KitSelected
 
 	TopIndex=GemRB.GetVar("TopIndex")
 	EnabledButtons = []
@@ -137,6 +138,7 @@ def RedrawKits():
 					Button.SetState(IE_GUI_BUTTON_ENABLED)
 					if Init: #preselection of mage plain kit
 						Button.SetState(IE_GUI_BUTTON_SELECTED)
+						KitSelected = i+TopIndex
 						Init=0
 				if Kit != "*":
 					EnabledButtons.append(Kit-21)
@@ -150,6 +152,7 @@ def RedrawKits():
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
 			if Init and i+TopIndex>0:
 				Button.SetState(IE_GUI_BUTTON_SELECTED)
+				KitSelected = i+TopIndex
 				Init=0
 		if Kit == "*":
 			continue
@@ -159,12 +162,17 @@ def RedrawKits():
 			else:
 				GemRB.SetVar("ButtonPressed", 0)
 				Button.SetState(IE_GUI_BUTTON_SELECTED) 
+				KitSelected = i+TopIndex
 				Init=0
+		if not Init and i+TopIndex == KitSelected: #remark selection state on redraw
+			Button.SetState(IE_GUI_BUTTON_SELECTED)
 	return
 
 def KitPress():
-	ButtonPressed=GemRB.GetVar("ButtonPressed")
+	global KitSelected
 
+	ButtonPressed=GemRB.GetVar("ButtonPressed")
+	KitSelected = ButtonPressed + TopIndex
 	if not KitTable:
 		if ClassID == 1: 
 			# TODO: this seems to be never reached
