@@ -582,6 +582,13 @@ void Interface::HandleEvents()
 		guiscript->RunFunction( "OpenStoreWindow" );
 		return;
 	}
+
+	if (EventFlag&EF_MASTERSCRIPT) {
+		EventFlag&=~EF_MASTERSCRIPT;
+		guiscript->RunFunction( "UpdateMasterScript" );
+		return;
+	}
+
 }
 
 /* handle main loop events that might destroy or create windows
@@ -3749,6 +3756,34 @@ cleanup:
 	delete gam_str;
 	delete wmp_str;
 	delete sav_str;
+}
+
+/* swapping out old resources */
+void Interface::UpdateMasterScript()
+{
+	if (game) {
+		game->SetScript( GlobalScript, 0 );
+	}
+
+	WorldMapMgr* wmp_mgr = ( WorldMapMgr* ) GetInterface( IE_WMP_CLASS_ID );
+	if (! wmp_mgr)
+		return;
+
+	if (worldmap) {
+		DataStream *wmp_str = key->GetResource( WorldMapName, IE_WMP_CLASS_ID );
+
+		if (!wmp_mgr->Open( wmp_str, true )) {
+			delete wmp_str;
+			goto cleanup;
+		}
+
+		delete worldmap;
+		worldmap = wmp_mgr->GetWorldMapArray();
+	}
+
+cleanup:
+	// Something went wrong, so try to clean after itself
+	FreeInterface( wmp_mgr );
 }
 
 GameControl *Interface::GetGameControl() const

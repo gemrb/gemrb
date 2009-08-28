@@ -1671,6 +1671,7 @@ PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 	}
 	strnlwrcpy( core->GlobalScript, script, 8 );
 	strnlwrcpy( core->WorldMapName, worldmap, 8 );
+	core->UpdateMasterScript();
 	Py_INCREF( Py_None );
 	return Py_None;
 }

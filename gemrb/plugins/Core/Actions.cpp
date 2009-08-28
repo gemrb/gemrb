@@ -567,6 +567,7 @@ void GameScript::MoveToExpansion(Scriptable* Sender, Action* /*parameters*/)
 	if (sg) {
 		sg->Invalidate();
 	}
+	core->SetEventFlag(EF_MASTERSCRIPT);
 	Sender->ReleaseCurrentAction();
 }
 

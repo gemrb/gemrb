@@ -170,6 +170,7 @@ public:
 #define EF_IDENTIFY      64       //starts identify screen
 #define EF_SELECTION     128      //selection changed
 #define EF_OPENSTORE     256      //open store window
+#define EF_MASTERSCRIPT  512      //change masterscript request
 
 //autopause
 #define AP_UNUSABLE      0
@@ -511,6 +512,8 @@ public:
 	/** if backtomain is not null then goes back to main screen */
 	void QuitGame(int backtomain);
 	void LoadGame(int index);
+	/** fix changes in global script/worldmap*/
+	void UpdateMasterScript();
 	/*reads the filenames of the portraits folder into a list */
 	int GetPortraits(TextArea* ta, bool smallorlarge);
 	/*reads the filenames of the sounds folder into a list */
