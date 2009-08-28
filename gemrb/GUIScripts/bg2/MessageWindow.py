@@ -185,3 +185,7 @@ def UpdateControlStatus():
 
 	if hideflag:
 		GemRB.UnhideGUI()
+
+def UpdateMasterScript():
+	GemRB.SetMasterScript("BALDUR25","WORLDM25")
+	return
