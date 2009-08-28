@@ -2233,15 +2233,11 @@ PathNode* Map::GetLine(Point &start, Point &dest, int flags)
 PathNode* Map::GetLine(Point &start, int Steps, int Orientation, int flags)
 {
 	Point dest=start;
-	int count = Steps;
 
-	while(count) {
-		unsigned int st = Steps>MaxVisibility?MaxVisibility:Steps;
-		int p = VisibilityPerimeter*Orientation/MAX_ORIENT;
-		dest.x += VisibilityMasks[Steps][p].x;
-		dest.y += VisibilityMasks[Steps][p].y;
-		count-=st;
-	}
+	unsigned int st = Steps>=MaxVisibility?MaxVisibility-1:Steps;
+	int p = VisibilityPerimeter*Orientation/MAX_ORIENT;
+	dest.x += VisibilityMasks[st][p].x;
+	dest.y += VisibilityMasks[st][p].y;
 	//FIXME: calculate dest based on distance and orientation
 	return GetLine(start, dest, Steps, Orientation, flags);
 }
