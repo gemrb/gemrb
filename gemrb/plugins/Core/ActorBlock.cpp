@@ -78,7 +78,7 @@ Scriptable::Scriptable(ScriptableType type)
 	if (Type == ST_ACTOR) {
 		InternalFlags = IF_VISIBLE | IF_ONCREATION | IF_USEDSAVE;
 	} else {
-		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_ONCREATION;
+		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_ONCREATION | IF_NOINT;
 	}
 	area = 0;
 	Pos.x = 0;
@@ -271,6 +271,10 @@ void Scriptable::ExecuteScript(int scriptCount)
 		return;
 	}
 
+	if ((InternalFlags & IF_NOINT) && (CurrentAction || GetNextAction())) {
+		return;
+	}
+
 	// only allow death scripts to run once, hopefully?
 	// this is probably terrible logic which needs moving elsewhere
 	if ((lastRunTime != 0) && (InternalFlags & IF_JUSTDIED)) {
@@ -368,6 +372,12 @@ void Scriptable::ClearActions()
 	LastTarget = 0;
 	//clear the triggers as fast as possible when queue ended?
 	ClearTriggers();
+
+	if (Type == ST_ACTOR) {
+		Interrupt();
+	} else {
+		NoInterrupt();
+	}
 }
 
 void Scriptable::ReleaseCurrentAction()
@@ -415,9 +425,7 @@ void Scriptable::ProcessActions(bool force)
 			CurrentAction = PopNextAction();
 		}
 		if (!CurrentAction) {
-			// try to release NoInterrupt at end of MoveToPoint etc
-			// (this should really be handled by the blocking actions themselves)
-			Interrupt();
+			ClearActions();
 			if (CutSceneId) {
 				CutSceneId = NULL;
 			}
