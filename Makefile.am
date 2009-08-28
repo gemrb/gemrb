@@ -5,6 +5,9 @@ SPEC_FILES = \
         gemrb.spec.in
 
 EXTRA_DIST = admin/setup.sh \
+	CMakeLists.txt \
+	cmake_config.h.in \
+	cmake_uninstall.cmake.in \
 	$(SPEC_FILES)
 
 MAINTAINERCLEANFILES = \

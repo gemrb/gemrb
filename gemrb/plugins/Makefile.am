@@ -37,3 +37,4 @@ SUBDIRS = \
 	WMPImporter
 
 DISTCLEANFILES = *.so
+EXTRA_DIST = CMakeLists.txt */CMakeLists.txt
