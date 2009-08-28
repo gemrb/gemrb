@@ -270,10 +270,6 @@ void Scriptable::ExecuteScript(int scriptCount)
 	if (core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE) {
 		return;
 	}
-	// Wait() is non-interruptible!
-	if (WaitCounter) {
-		return;
-	}
 
 	// only allow death scripts to run once, hopefully?
 	// this is probably terrible logic which needs moving elsewhere

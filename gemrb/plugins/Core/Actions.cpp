@@ -909,36 +909,72 @@ void GameScript::CreateCreatureAtLocation(Scriptable* Sender, Action* parameters
 
 void GameScript::WaitRandom(Scriptable* Sender, Action* parameters)
 {
-	int width = parameters->int1Parameter-parameters->int0Parameter;
-	if (width<2) {
-		width = parameters->int0Parameter;
+	if (!Sender->CurrentActionState) {
+		int width = parameters->int1Parameter-parameters->int0Parameter;
+		if (width<2) {
+			width = parameters->int0Parameter;
+		} else {
+			width = rand() % width + parameters->int0Parameter;
+		}
+		Sender->CurrentActionState = width * AI_UPDATE_TIME;
 	} else {
-		width = rand() % width + parameters->int0Parameter;
+		Sender->CurrentActionState--;
 	}
-	Sender->SetWait( width * AI_UPDATE_TIME );
-	Sender->ReleaseCurrentAction(); // todo, blocking?
+
+	if (!Sender->CurrentActionState) {
+		Sender->ReleaseCurrentAction();
+	}
+
+	assert(Sender->CurrentActionState >= 0);
 }
 
 void GameScript::Wait(Scriptable* Sender, Action* parameters)
 {
-	Sender->SetWait( parameters->int0Parameter * AI_UPDATE_TIME );
-	Sender->ReleaseCurrentAction(); // todo, blocking?
+	if (!Sender->CurrentActionState) {
+		Sender->CurrentActionState = parameters->int0Parameter * AI_UPDATE_TIME;
+	} else {
+		Sender->CurrentActionState--;
+	}
+	
+	if (!Sender->CurrentActionState) {
+		Sender->ReleaseCurrentAction();
+	}
+
+	assert(Sender->CurrentActionState >= 0);
 }
 
 void GameScript::SmallWait(Scriptable* Sender, Action* parameters)
 {
-	Sender->SetWait( parameters->int0Parameter );
-	Sender->ReleaseCurrentAction(); // todo, blocking?
+	if (!Sender->CurrentActionState) {
+		Sender->CurrentActionState = parameters->int0Parameter;
+	} else {
+		Sender->CurrentActionState--;
+	}
+	
+	if (!Sender->CurrentActionState) {
+		Sender->ReleaseCurrentAction();
+	}
+
+	assert(Sender->CurrentActionState >= 0);
 }
 
 void GameScript::SmallWaitRandom(Scriptable* Sender, Action* parameters)
 {
-	int random = parameters->int1Parameter - parameters->int0Parameter;
-	if (random<1) {
-		random = 1;
+	if (!Sender->CurrentActionState) {
+		int random = parameters->int1Parameter - parameters->int0Parameter;
+		if (random<1) {
+			random = 1;
+		}
+		Sender->CurrentActionState = rand() % random + parameters->int0Parameter;
+	} else {
+		Sender->CurrentActionState--;
 	}
-	Sender->SetWait( rand()%random + parameters->int0Parameter );
-	Sender->ReleaseCurrentAction(); // todo, blocking?
+
+	if (!Sender->CurrentActionState) {
+		Sender->ReleaseCurrentAction();
+	}
+
+	assert(Sender->CurrentActionState >= 0);
 }
 
 void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
