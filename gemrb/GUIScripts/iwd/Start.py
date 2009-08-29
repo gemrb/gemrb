@@ -25,6 +25,7 @@
 
 import GemRB
 from ie_restype import *
+from GUICommon import LoadCommonTables
 
 StartWindow = 0
 JoinGameButton = 0
@@ -52,6 +53,8 @@ def OnLoad ():
 			GemRB.LoadWindowFrame ("STON08L", "STON08R", "STON08T", "STON08B")
 		elif screen_width == 1024:
 			GemRB.LoadWindowFrame ("STON10L", "STON10R", "STON10T", "STON10B")
+
+	LoadCommonTables ()
 
 	GemRB.LoadWindowPack("GUICONN", 640, 480)
 

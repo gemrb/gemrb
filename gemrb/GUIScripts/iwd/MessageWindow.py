@@ -38,6 +38,7 @@ from GUIREC import *
 from GUISTORE import *
 from GUIWORLD import *
 from TextScreen import *
+from LevelUp import *
 
 MessageWindow = 0
 PortraitWindow = 0

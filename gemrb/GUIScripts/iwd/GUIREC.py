@@ -220,39 +220,32 @@ def UpdateRecordsWindow ():
 	Label.SetText (ClassTitle)
 
 	# race
-	Table = GemRB.LoadTableObject ("races")
-	text = Table.GetValue (GemRB.GetPlayerStat (pc, IE_RACE) - 1, 0)
+	text = RaceTable.GetValue (RaceTable.FindValue (3, GemRB.GetPlayerStat (pc, IE_RACE)) ,
+ 0)
 
 	Label = Window.GetControl (0x1000000f)
 	Label.SetText (text)
 
 	Table = GemRB.LoadTableObject ("aligns")
 
-	text = Table.GetValue (Table.FindValue( 3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT) ), 0)
+	text = Table.GetValue (Table.FindValue ( 3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT) ), 0)
 	Label = Window.GetControl (0x10000010)
 	Label.SetText (text)
 
 	Label = Window.GetControl (0x10000011)
-	if GemRB.GetPlayerStat (pc, IE_SEX) ==  1:
+	if GemRB.GetPlayerStat (pc, IE_SEX) == 1:
 		Label.SetText (7198)
 	else:
 		Label.SetText (7199)
-
-	#collecting tokens for stat overview
-	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
-
-	GemRB.SetToken("CLASS", ClassTitle)
-	GemRB.SetToken("LEVEL", str (GemRB.GetPlayerStat (pc, IE_LEVEL) ) )
-	GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
 
 	# help, info textarea
 	stats_overview = GetStatOverview (pc)
 	Text = Window.GetControl (45)
 	Text.SetText (stats_overview)
-	#if player is inaccessible make this grey
+	#making window visible/shaded depending on the pc's state
 	Window.SetVisible (1)
-
-
+	return
+	
 def GetStatColor (pc, stat):
 	a = GemRB.GetPlayerStat(pc, stat)
 	b = GemRB.GetPlayerStat(pc, stat, 1)
@@ -261,6 +254,14 @@ def GetStatColor (pc, stat):
 	if a<b:
 		return (255,255,0)
 	return (0,255,0)
+
+# GemRB.GetPlayerStat wrapper that only returns nonnegative values
+def GSNN (pc, stat):
+	val = GemRB.GetPlayerStat (pc, stat)
+	if val >= 0:
+		return val
+	else:
+		return 0
 
 def GetStatOverview (pc):
 	StateTable = GemRB.LoadTableObject ("statdesc")
@@ -275,7 +276,7 @@ def GetStatOverview (pc):
 	# Next Level: <NEXTLEVEL>
 
 	#collecting tokens for stat overview
-	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
+	ClassTitle = GetActorClassTitle (pc)
 	GemRB.SetToken("CLASS", ClassTitle)
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassTable = GemRB.LoadTableObject ("classes")

@@ -420,9 +420,13 @@ def GetActorClassTitle (actor):
 				else:
 					ClassTitle = ClassTable.GetValue (ClassIndex, 2)
 				ClassTitle = GemRB.GetString (ClassTitle)
+	else:
+		ClassTitle = GemRB.GetString (ClassTitle)
 
-	if ClassTitle == "*":
-		return 0
+	#GetActorClassTitle returns string now...
+	#if ClassTitle == "*":
+	#	return 0
+
 	return ClassTitle
 
 
@@ -736,7 +740,7 @@ def CanDualClass(actor):
 def LoadCommonTables():
 	global ClassTable, KitListTable, ClassSkillsTable, RaceTable, NextLevelTable
 
-	print # so the following output isn't appended to an exsisting line
+	print # so the following output isn't appended to an existing line
 	if not ClassTable:
 		ClassTable = GemRB.LoadTableObject ("classes")
 	if not KitListTable:
