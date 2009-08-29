@@ -9,7 +9,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -39,6 +39,12 @@ OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
 BookType = None
+OtherWindow = None
+Exclusions = None
+ContCond = None
+ContTarg = None
+SpellType = None
+Level = 1
 
 def OpenMageWindow ():
 	global MageWindow, OptionsWindow, PortraitWindow
@@ -89,7 +95,7 @@ def SetupMageWindow ():
 	BookType = 0
 	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 8)==2):
 		BookType = 1
-		
+
 	if MageWindow:
 		MageWindow.Unload()
 		MageWindow = None
@@ -382,6 +388,344 @@ def OnMageRemoveSpell ():
 	#remove spell from book
 	GemRB.RemoveSpell (pc, type, level, index)
 	UpdateMageWindow ()
+	return
+
+def LoadCondition ():
+	global ContCond, ContTarg
+
+	Table = GemRB.LoadTableObject ("contcond")
+	CondCount = Table.GetRowCount ()
+	ContCond = [0] * CondCount
+
+	for i in range (CondCount):
+		#get the condition's name and description
+		tuple = (Table.GetValue (i, 0),Table.GetValue (i, 1) )
+		ContCond[i] = tuple
+
+	Table = GemRB.LoadTableObject ("conttarg")
+	TargCount = Table.GetRowCount ()
+	ContTarg = [0] * TargCount
+
+	for i in range (TargCount):
+		#get the condition's name and description
+		tuple = (Table.GetValue (i, 0),Table.GetValue (i, 1) )
+		ContTarg[i] = tuple
+	return
+
+def OpenSequencerWindow ():
+	global OtherWindow
+	global ContingencyTextArea, TypeButton, OkButton
+	global Level, MaxLevel, Target, Count
+	global pc
+	global ContCond, ContTarg
+	global Spell1, Spell2, Spell3, Source
+
+	if ContCond == None:
+		LoadCondition()
+
+	Level = 1
+	Spell1 = ""
+	Spell2 = ""
+	Spell3 = ""
+	#the target player (who receives the contingency or sequencer)
+	pc = GemRB.GetVar("P0")
+	#maximum spell level
+	MaxLevel = GemRB.GetVar("P1")
+	#target 0 - any, 1 - caster only, 2 - sequencer
+	#spell count 1-3
+	p2 = GemRB.GetVar("P2")
+	Source = GemRB.GetSpellCastOn(pc)
+
+	print "Source: ", Source
+	Target = p2>>16
+	Count = p2&255
+	if Count > 3:
+		Count = 3
+
+	GemRB.LoadWindowPack ("GUIMG", 640, 480)
+
+	#saving the original portrait window
+	OtherWindow = Window = GemRB.LoadWindowObject (6)
+
+	Title = Window.GetControl (0x0fffffff)
+
+	ContingencyTextArea = Window.GetControl (25)
+
+	if Target == 2:
+		if Count < 3:
+			Title.SetText (55374)
+			ContingencyTextArea.SetText (60420)
+		else:
+			Title.SetText (55375)
+			ContingencyTextArea.SetText (55372)
+	else:
+		if Count < 3:
+			Title.SetText (11941)
+		else:
+			Title.SetText (55376)
+		ContingencyTextArea.SetText (55373)
+
+	CondSelect = Window.GetControl (4)
+	CondLabel = Window.GetControl (0x10000000)
+	TargSelect = Window.GetControl (6)
+	TargLabel = Window.GetControl (0x10000001)
+	TypeButton = Window.GetControl (8)
+
+	#no cleric spells available
+	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 0)=="*" and
+			ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 1)=="*"):
+		TypeButton.SetState (IE_GUI_BUTTON_DISABLED)
+
+	if Target == 2:
+		CondSelect.SetPos (-1,-1)
+		CondLabel.SetPos (-1,-1)
+		TargSelect.SetPos (-1,-1)
+		TargLabel.SetPos (-1,-1)
+		sb = Window.GetControl (5)
+		sb.SetPos (-1,-1)
+		sb = Window.GetControl (7)
+		sb.SetPos (-1,-1)
+	else:
+		CondSelect.SetFlags (IE_GUI_TEXTAREA_SELECTABLE, OP_SET)
+		CondSelect.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "ContingencyHelpCondition")
+		CondSelect.SetVarAssoc ("ContCond", 0)
+		for elem in ContCond:
+			CondSelect.Append (elem[0], -1)
+
+		TargSelect.SetFlags (IE_GUI_TEXTAREA_SELECTABLE, OP_SET)
+		TargSelect.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "ContingencyHelpTarget")
+		TargSelect.SetVarAssoc ("ContTarg", 0)
+		for elem in ContTarg:
+			TargSelect.Append (elem[0], -1)
+			#check if target is only self
+			if Target:
+				TargSelect.SetVarAssoc ("ContTarg", 1)
+				break
+
+	GemRB.SetVar ("SpellType", 0)
+	TypeButton.SetVarAssoc ("SpellType", 1)
+	TypeButton.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
+	TypeButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ContTypePressed")
+
+	Button = Window.GetControl (9)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "LevelIncrease")
+	Button = Window.GetControl (10)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "LevelDecrease")
+
+	OkButton = Window.GetControl (27)
+	OkButton.SetText (11973)
+	OkButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	OkButton.SetState (IE_GUI_BUTTON_DISABLED)
+
+	CancelButton = Window.GetControl (29)
+	CancelButton.SetText (13727)
+	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
+	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ContingencyOk")
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ContingencyCancel")
+	ContTypePressed ()
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def UpdateSpellList ():
+	Window = OtherWindow
+
+	if SpellType:
+		Type = IE_SPELL_TYPE_PRIEST
+	else:
+		Type = IE_SPELL_TYPE_WIZARD
+
+	Label = Window.GetControl (0x1000001d)
+	Label.SetText (GemRB.GetString(12137)+str(Level) )
+
+	BuildSpellList(pc, Type, Level-1)
+
+	names = SpellList.keys()
+	names.sort()
+
+	cnt = len(names)
+	j = 0
+	for i in range(11,20):
+		Button = Window.GetControl (i)
+		Button.SetFont ("NUMBER")
+		Button.SetFlags (IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM,OP_OR)
+		if j<cnt:
+			Button.SetSpellIcon (names[j], 1)
+			Button.SetText( str(SpellList[names[j]]) )
+			Button.SetVarAssoc("Index", j)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ContingencyHelpSpell")
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+		else:
+			Button.SetSpellIcon("")
+			Button.SetText("")
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+		j = j+1
+
+	Button = Window.GetControl (22)
+	Button.SetSpellIcon(Spell1, 1)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteSpell1")
+	Button = Window.GetControl (23)
+	Button.SetSpellIcon(Spell2, 1)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteSpell2")
+	Button = Window.GetControl (24)
+	Button.SetSpellIcon(Spell3, 1)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteSpell3")
+
+	if not Spell1:
+		OkButton.SetState (IE_GUI_BUTTON_DISABLED)
+	else:
+		OkButton.SetState (IE_GUI_BUTTON_ENABLED)
+	return
+
+def ContTypePressed ():
+	global SpellType
+
+	Label = OtherWindow.GetControl (0x10000002)
+	SpellType = GemRB.GetVar ("SpellType")
+
+	if SpellType:
+		Label.SetText (54352)
+		TypeButton.SetText (18039)
+	else:
+		Label.SetText (21836)
+		TypeButton.SetText (7204)
+	UpdateSpellList()
+	return
+
+def ContingencyOk ():
+	global OtherWindow
+
+	#set the storage
+	if Target == 2:
+		GemRB.ApplyEffect (pc, "Sequencer:Store", 0, 0, Spell1, Spell2, Spell3, Source)
+	else:
+		GemRB.ApplyEffect (pc, "CastSpellOnCondition", Target, Condition, Spell1, Spell2, Spell3, Source)
+	#set the innate
+	GemRB.LearnSpell (pc, Source+"d", LS_MEMO)
+	OtherWindow.Unload()
+	return
+
+def ContingencyCancel ():
+	global OtherWindow
+
+	GemRB.SetPlayerStat (pc, IE_IDENTIFYMODE, 0)
+	OtherWindow.Unload()
+	return
+
+def ContingencyHelpSpell ():
+	global Spell1, Spell2, Spell3
+
+	names = SpellList.keys()
+	names.sort()
+	i = GemRB.GetVar("Index")
+	spell = names[i]
+
+	if Spell1=="" and Count>0:
+		Spell1 = spell
+	elif Spell2=="" and Count>1:
+		Spell2 = spell
+	elif Spell3=="" and Count>2:
+		Spell3 = spell
+
+	spl = GemRB.GetSpell(spell)
+	ContingencyTextArea.SetText (spl["SpellDesc"])
+	UpdateSpellList ()
+	return
+
+def DeleteSpell1 ():
+	global Spell1, Spell2, Spell3
+
+	Spell1 = Spell2
+	Spell2 = Spell3
+	Spell3 = ""
+	ContingencyTextArea.SetText("")
+	UpdateSpellList ()
+	return
+
+def DeleteSpell2 ():
+	global Spell2, Spell3
+
+	Spell2 = Spell3
+	Spell3 = ""
+	ContingencyTextArea.SetText("")
+	UpdateSpellList ()
+	return
+
+def DeleteSpell3 ():
+	global Spell3
+
+	Spell3 = ""
+	ContingencyTextArea.SetText("")
+	UpdateSpellList ()
+	return
+
+def ContingencyHelpCondition ():
+	i = GemRB.GetVar ("ContCond")
+	ContingencyTextArea.SetText (ContCond[i][1])
+	return
+
+def ContingencyHelpTarget ():
+	i = GemRB.GetVar ("ContTarg")
+	ContingencyTextArea.SetText (ContTarg[i][1])
+	return
+
+def LoadExclusions():
+	global Exclusions
+
+	ExclusionTable = GemRB.LoadTableObject ("contingx")
+	Columns = ExclusionTable.GetColumnCount ()
+	Rows = ExclusionTable.GetRowCount ()
+	Exclusions = []
+	for i in range (Columns):
+		Exclusions.append ([])
+		for j in range (Rows):
+			spell = ExclusionTable.GetValue (j,i,0)
+			if spell[0]=="*":
+				break
+			Exclusions[i].append (spell.lower())
+
+	return
+
+#TODO: build a correct list for sorcerers too!
+def BuildSpellList (pc, type, level):
+	global SpellList
+
+	if not Exclusions:
+		LoadExclusions()
+
+	SpellList = {}
+	dummy = [Spell1,Spell2,Spell3]
+	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+
+	for i in range(mem_cnt):
+		ms = GemRB.GetMemorizedSpell (pc, type, level, i)
+		if ms["Flags"]:
+			spell = ms["SpellResRef"]
+			if spell in Exclusions[level]:
+				continue
+			if spell in dummy:
+				dummy.remove(spell)
+				continue
+			if not (spell in SpellList):
+				SpellList[spell] = 1
+			else:
+				SpellList[spell] = SpellList[spell]+1
+	return
+
+def LevelIncrease():
+	global Level
+
+	if Level<MaxLevel:
+		Level = Level+1
+	UpdateSpellList()
+	return
+
+def LevelDecrease():
+	global Level
+
+	if Level>1:
+		Level = Level-1
+	UpdateSpellList()
 	return
 
 ###################################################

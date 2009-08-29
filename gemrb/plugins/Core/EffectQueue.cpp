@@ -164,7 +164,8 @@ static EffectRef* FindEffect(const char* effectname)
 	}
 	void *tmp = bsearch(effectname, effectnames, opcodes_count, sizeof(EffectRef), find_effect);
 	if( !tmp) {
-		printf( "Warning: Couldn't assign effect: %s\n", effectname );
+		printMessage( "EffectQueue", "", YELLOW);
+		printf("Couldn't assign effect: %s\n", effectname );
 	}
 	return (EffectRef *) tmp;
 }
@@ -418,22 +419,22 @@ static EffectRef fx_unsummon_creature_ref={"UnsummonCreature",NULL,-1};
 
 Effect *EffectQueue::CreateUnsummonEffect(Effect *fx)
 {
-				Effect *newfx = NULL;
-				if( (fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
-				        newfx = CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-				        newfx->TimingMode = FX_DURATION_DELAY_PERMANENT;
-				        if( newfx->Resource3[0]) {
-				          strnuprcpy(newfx->Resource,newfx->Resource3, sizeof(ieResRef)-1 );
-				        } else {
-				          strnuprcpy(newfx->Resource,"SPGFLSH1", sizeof(ieResRef)-1 );
-				        }
-				        if( fx->TimingMode == FX_DURATION_ABSOLUTE) {
-				          //unprepare duration
-				          newfx->Duration = (newfx->Duration-core->GetGame()->GameTime)/AI_UPDATE_TIME;
-				        }
-				}
+	Effect *newfx = NULL;
+	if( (fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
+		newfx = CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
+		newfx->TimingMode = FX_DURATION_DELAY_PERMANENT;
+		if( newfx->Resource3[0]) {
+			strnuprcpy(newfx->Resource,newfx->Resource3, sizeof(ieResRef)-1 );
+		} else {
+			strnuprcpy(newfx->Resource,"SPGFLSH1", sizeof(ieResRef)-1 );
+		}
+		if( fx->TimingMode == FX_DURATION_ABSOLUTE) {
+			//unprepare duration
+			newfx->Duration = (newfx->Duration-core->GetGame()->GameTime)/AI_UPDATE_TIME;
+		}
+	}
 
-				return newfx;
+	return newfx;
 }
 
 void EffectQueue::AddEffect(Effect* fx, bool insert)
@@ -1635,6 +1636,26 @@ Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, const ie
 	return HasOpcodeWithResource(effect_reference.EffText, resource);
 }
 
+//used in contingency/sequencer code (cannot have the same contingency twice)
+Effect *EffectQueue::HasOpcodeWithSource(ieDword opcode, const ieResRef Removed) const
+{
+	std::list< Effect* >::const_iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+		MATCH_SOURCE();
+
+		return (*f);
+	}
+	return NULL;
+}
+
+Effect *EffectQueue::HasEffectWithSource(EffectRef &effect_reference, const ieResRef resource) const
+{
+	ResolveEffectRef(effect_reference);
+	return HasOpcodeWithSource(effect_reference.EffText, resource);
+}
+
 bool EffectQueue::HasAnyDispellableEffect() const
 {
 	std::list< Effect* >::const_iterator f;
@@ -1858,6 +1879,11 @@ void EffectQueue::AffectAllInRange(Map *map, Point &pos, int idstype, int idsval
 			continue;
 		}
 		AddAllEffects(actor, actor->Pos);
+		std::list< Effect* >::const_iterator fxit = GetFirstEffect();
+		Effect *fx = GetNextEffect(fxit);
+		if (fx) {
+			strnlwrcpy (actor->LastSpell, fx->Source, 8);
+		}
 	}
 }
 

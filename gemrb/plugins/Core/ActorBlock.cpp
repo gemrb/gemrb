@@ -84,6 +84,7 @@ Scriptable::Scriptable(ScriptableType type)
 	Pos.x = 0;
 	Pos.y = 0;
 
+	LastSpell[0]=0;
 	SpellHeader = -1;
 	LastTargetPos.empty();
 	locals = new Variables();
@@ -618,7 +619,7 @@ void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 		Point origin = Pos;
 		if (Type == ST_TRIGGER || Type == ST_PROXIMITY) {
 			// try and make projectiles start from the right trap position
-			// see the traps in the dreugar/assassin battle in bg2 dungeon
+			// see the traps in the duergar/assassin battle in bg2 dungeon
 			// see also function below - maybe we should fix Pos instead
 			origin = ((InfoPoint *)this)->TrapLaunch;
 		}
@@ -650,7 +651,7 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 		Point origin = Pos;
 		if (Type == ST_TRIGGER || Type == ST_PROXIMITY) {
 			// try and make projectiles start from the right trap position
-			// see the traps in the dreugar/assassin battle in bg2 dungeon
+			// see the traps in the duergar/assassin battle in bg2 dungeon
 			// see also function above - maybe we should fix Pos instead
 			origin = ((InfoPoint *)this)->TrapLaunch;
 		}

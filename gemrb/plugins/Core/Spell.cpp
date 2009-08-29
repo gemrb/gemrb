@@ -123,6 +123,10 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, Point &pos, int block_index
 			features[i].PosX=pos.x;
 			features[i].PosY=pos.y;
 			core->ApplyEffect(features+i, target, self);
+			//self affecting part???
+			if (target) {
+				strnlwrcpy(target->LastSpell, Name, 8);
+			}
 		}
 	}
 	return fxqueue;

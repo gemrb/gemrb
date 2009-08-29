@@ -4871,6 +4871,13 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cast_spell_on_condition (%2d): Target: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
+	if (fx->FirstApply && fx->Parameter3) {
+		target->spellbook.HaveSpell( fx->Resource, HS_DEPLETE );
+		target->spellbook.HaveSpell( fx->Resource2, HS_DEPLETE );
+		target->spellbook.HaveSpell( fx->Resource3, HS_DEPLETE );
+		target->spellbook.HaveSpell( fx->Resource4, HS_DEPLETE );
+	}
+
 	//get subject of check
 	Actor *actor = NULL;
 	Map *map = target->GetCurrentArea();
@@ -4928,6 +4935,12 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (condition) {
 		core->ApplySpell(fx->Resource, actor, Owner, fx->Power);
+		core->ApplySpell(fx->Resource2, actor, Owner, fx->Power);
+		core->ApplySpell(fx->Resource3, actor, Owner, fx->Power);
+		core->ApplySpell(fx->Resource4, actor, Owner, fx->Power);
+		if (fx->Parameter3) {
+			return FX_NOT_APPLIED;
+		}
 	}
 	return FX_APPLIED;
 }
@@ -4947,11 +4960,24 @@ int fx_proficiency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xea CreateContingency
+static EffectRef fx_contingency_ref={"CastSpellOnCondition",NULL,-1};
+
 int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_create_contingency (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_create_contingency (%2d): Level: %d, Count: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+printf("Check source:%s\n", fx->Source);
+	if (target->fxqueue.HasEffectWithSource(fx_contingency_ref, fx->Source)) {
+		core->DisplayConstantStringName(STR_CONTDUP, 0xf0f0f0, target);
+		return FX_NOT_APPLIED;
+	}
+
 	if (target->InParty) {
-		BASE_SET(IE_IDENTIFYMODE,2);
+		Variables *dict = core->GetDictionary();
+
+		dict->SetAt( "P0", target->InParty );
+		dict->SetAt( "P1", fx->Parameter1 );
+		dict->SetAt( "P2", fx->Parameter2 );
 		core->SetEventFlag(EF_SEQUENCER);
 	}
 	return FX_NOT_APPLIED;
@@ -5303,23 +5329,39 @@ int fx_store_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_store_spell_sequencer (%2d)\n", fx->Opcode );
 	//just display the spell sequencer portrait icon
 	target->AddPortraitIcon(PI_SEQUENCER);
+	if (fx->FirstApply && fx->Parameter3) {
+		target->spellbook.HaveSpell( fx->Resource, HS_DEPLETE );
+		target->spellbook.HaveSpell( fx->Resource2, HS_DEPLETE );
+		target->spellbook.HaveSpell( fx->Resource3, HS_DEPLETE );
+		target->spellbook.HaveSpell( fx->Resource4, HS_DEPLETE );
+	}
 	return FX_APPLIED;
 }
 
 // 0x101 Sequencer:Create
+static EffectRef fx_spell_sequencer_active_ref={"Sequencer:Store",NULL,-1};
+
 int fx_create_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_create_spell_sequencer (%2d)\n", fx->Opcode );
+	if (0) printf( "fx_create_spell_sequencer (%2d): Level: %d, Count: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+printf("Check source:%s\n", fx->Source);
+	if (target->fxqueue.HasEffectWithSource(fx_spell_sequencer_active_ref, fx->Source)) {
+		core->DisplayConstantStringName(STR_SEQDUP, 0xf0f0f0, target);
+		return FX_NOT_APPLIED;
+	}
 	//just a call to activate the spell sequencer creation gui
 	if (target->InParty) {
-		BASE_SET(IE_IDENTIFYMODE,3);
+		Variables *dict = core->GetDictionary();
+
+		dict->SetAt( "P0", target->InParty );
+		dict->SetAt( "P1", fx->Parameter1 );           //maximum level
+		dict->SetAt( "P2", fx->Parameter2 | (2<<16) ); //count and target type
 		core->SetEventFlag(EF_SEQUENCER);
 	}
 	return FX_NOT_APPLIED;
 }
 
 // 0x102 Sequencer:Activate
-static EffectRef fx_spell_sequencer_active_ref={"Sequencer:Store",NULL,-1};
 
 int fx_activate_spell_sequencer(Scriptable* Owner, Actor* target, Effect* fx)
 {

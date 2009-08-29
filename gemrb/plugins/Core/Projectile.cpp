@@ -442,6 +442,11 @@ void Projectile::Payload()
 		}
 
 		effects->AddAllEffects(target, Destination);
+		std::list< Effect* >::const_iterator fxit = effects->GetFirstEffect();
+		Effect *fx = effects->GetNextEffect(fxit);
+		if (fx) {
+			strnlwrcpy (target->LastSpell, fx->Source, 8);
+		}
 	}
 	delete effects;
 	effects = NULL;
@@ -797,6 +802,11 @@ void Projectile::LineTarget()
 				}
 
 				effects->AddAllEffects(target, target->Pos);
+				std::list< Effect* >::const_iterator fxit = effects->GetFirstEffect();
+				Effect *fx = effects->GetNextEffect(fxit);
+				if (fx) {
+					strnlwrcpy (target->LastSpell, fx->Source, 8);
+				}
 			}
 		}
 		iter = iter->Next;

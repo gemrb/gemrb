@@ -212,6 +212,7 @@ public:
 	ieDword LastUnlocked;
 	ieDword LastOpenFailed; // also LastPickpocketFailed
 	ieDword LastPickLockFailed;
+	ieResRef LastSpell; //Last spell cast on this scriptable
 	unsigned long playDeadCounter;
 	Point LastTargetPos;
 	int SpellHeader;

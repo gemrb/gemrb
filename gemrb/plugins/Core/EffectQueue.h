@@ -242,6 +242,7 @@ public:
 	Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const;
 	Effect *HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2) const;
 	Effect *HasEffectWithResource(EffectRef &effect_reference, const ieResRef resource) const;
+	Effect *HasEffectWithSource(EffectRef &effect_reference, const ieResRef source) const;
 	void DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount) const;
 	bool HasAnyDispellableEffect() const;
 	//transforming timing modes
@@ -279,6 +280,7 @@ private:
 	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2) const;
 	Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const;
 	Effect *HasOpcodeWithResource(ieDword opcode, const ieResRef resource) const;
+	Effect *HasOpcodeWithSource(ieDword opcode, const ieResRef source) const;
 	void DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const;
 	int BonusAgainstCreature(ieDword opcode, Actor *actor) const;
 	bool WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const;

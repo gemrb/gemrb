@@ -179,7 +179,8 @@
 #define STR_CONTDUP 145
 #define STR_CONTTRIG 146
 #define STR_CONTFAIL 147
+#define STR_SEQDUP 148
 
-#define STRREF_COUNT 148
+#define STRREF_COUNT 149
 
 #endif //! IE_STRINGS_H

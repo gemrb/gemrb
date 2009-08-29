@@ -5096,9 +5096,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-/*
-	PlayerSlot = game->FindPlayer( PlayerSlot );
-*/
+
 	Actor* MyActor = game->FindPC( PlayerSlot );
 	if (!MyActor) {
 		return RuntimeError( "Actor not found!" );
@@ -7098,7 +7096,6 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	Actor* actor = game->FindPC( PartyID );
 	//allow -1,-1
 	if (!actor && ( PartyID || ResRef[0]) ) {
-printf("PartyID:%d, Resref[0]:%d\n",PartyID, ResRef[0]);
 		return RuntimeError( "Actor not found" );
 	}
 
@@ -8997,8 +8994,9 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	const char *resref1 = NULL;
 	const char *resref2 = NULL;
 	const char *resref3 = NULL;
+	const char *source = NULL;
 
-	if (!PyArg_ParseTuple( args, "isii|sss", &PartyID, &opcodename, &param1, &param2, &resref1, &resref2, &resref3)) {
+	if (!PyArg_ParseTuple( args, "isii|ssss", &PartyID, &opcodename, &param1, &param2, &resref1, &resref2, &resref3, &source)) {
 		return AttributeError( GemRB_ApplyEffect__doc );
 	}
 	Game *game = core->GetGame();
@@ -9025,10 +9023,16 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	if (resref3) {
 		strnlwrcpy(fx->Resource3, resref3, 8);
 	}
-	//fx is freed by this function (not freed anymore)
+	if (source) {
+		strnlwrcpy(fx->Source, source, 8);
+	}
+	//This is a hack...
+	fx->Parameter3=1;
+
+	//fx is not freed by this function
 	core->ApplyEffect(fx, actor, actor);
 
-	//not freed, it seems, lets kill it
+	//lets kill it
 	delete fx;
 
 	Py_INCREF( Py_None );
@@ -9281,6 +9285,29 @@ static PyObject* GemRB_GetSelectedSize(PyObject* /*self*/, PyObject* /*args*/)
 	return PyInt_FromLong(core->GetGame()->selected.size());
 }
 
+PyDoc_STRVAR( GemRB_GetSpellCastOn__doc,
+"GetSpellCastOn(pc) => resref\n\n"
+"Returns the last spell cast on a partymember.");
+
+static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
+{
+	int PartyID;
+
+	if (!PyArg_ParseTuple( args, "i", &PartyID )) {
+		return AttributeError( GemRB_GetSpellCastOn__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+	
+	return PyString_FromString(actor->LastSpell);
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(ActOnPC, METH_VARARGS),
 	METHOD(AdjustScrolling, METH_VARARGS),
@@ -9387,6 +9414,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetSelectedSize, METH_NOARGS),
 	METHOD(GetString, METH_VARARGS),
 	METHOD(GetSaveGameAttrib, METH_VARARGS),
+	METHOD(GetSpellCastOn, METH_VARARGS),
 	METHOD(GetTableValue, METH_VARARGS),
 	METHOD(GetTableRowIndex, METH_VARARGS),
 	METHOD(GetTableRowName, METH_VARARGS),
