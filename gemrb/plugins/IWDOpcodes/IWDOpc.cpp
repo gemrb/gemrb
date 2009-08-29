@@ -2500,7 +2500,7 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	EffectQueue *fxqueue = spell->GetEffectBlock(Owner, pos, 0, -1, 0);
+	EffectQueue *fxqueue = spell->GetEffectBlock(Owner, pos, 0);
 	fxqueue->SetOwner(Owner);
 	//bit 2 original target is excluded or not excluded
 	fxqueue->AffectAllInRange(target->GetCurrentArea(), pos, 0, 0,fx->Parameter1, fx->Parameter2&AE_TARGETEXCL?target:NULL);
@@ -2705,7 +2705,7 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 	if (pro) {
 		Point p(fx->PosX, fx->PosY);
 
-		pro->SetEffects(spl->GetEffectBlock(Owner, p, 0,-1, fx->Parameter2));
+		pro->SetEffects(spl->GetEffectBlock(Owner, p, 0, fx->Parameter2));
 		Point origin(fx->PosX, fx->PosY);
 		pro->SetCaster(Owner->GetGlobalID());
 		if (target) {

@@ -2538,7 +2538,8 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 			act->SetOrientation( GetOrient( tar->Pos, act->Pos ), false );
 		}
 	}
-	Sender->CastSpell( spellres, tar, true );
+	int duration = Sender->CastSpell( spellres, tar, true );
+	if (duration != -1) Sender->SetWait(duration);
 
 	//if target was set, feed action back
 	if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
@@ -2583,7 +2584,8 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
 	}
 
-	Sender->CastSpellPoint( spellres, parameters->pointParameter, true );
+	int duration = Sender->CastSpellPoint( spellres, parameters->pointParameter, true );
+	if (duration != -1) Sender->SetWait(duration);
 
 	//if target was set, feed action back
 	if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
@@ -2632,7 +2634,8 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 			actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
 		}
 	}
-	Sender->CastSpell( spellres, tar, false );
+	int duration = Sender->CastSpell( spellres, tar, false );
+	if (duration != -1) Sender->SetWait(duration);
 
 	//if target was set, feed action back
 	if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
@@ -2666,7 +2669,8 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
 	}
 
-	Sender->CastSpellPoint( spellres, parameters->pointParameter, false );
+	int duration = Sender->CastSpellPoint( spellres, parameters->pointParameter, false );
+	if (duration != -1) Sender->SetWait(duration);
 
 	//if target was set, feed action back
 	if (Sender->LastTargetPos.isempty()) {
@@ -2715,7 +2719,8 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 			actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
 		}
 	}
-	Sender->CastSpell (spellres, tar, false);
+	int duration = Sender->CastSpell (spellres, tar, false);
+	if (duration != -1) Sender->SetWait(duration);
 
 	//if target was set, feed action back
 	if (!Sender->LastTarget && Sender->LastTargetPos.isempty()) {
@@ -2748,7 +2753,8 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
 	}
 
-	Sender->CastSpellPoint (spellres, parameters->pointParameter, false);
+	int duration = Sender->CastSpellPoint (spellres, parameters->pointParameter, false);
+	if (duration != -1) Sender->SetWait(duration);
 
 	//if target was set, feed action back
 	if (Sender->LastTargetPos.isempty()) {
@@ -2780,7 +2786,7 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 		}
 		actor->SetStance (IE_ANI_CONJURE);
 	}
-	Sender->CastSpell (spellres, tar, false);
+	Sender->CastSpell (spellres, tar, false, true);
 	if (tar->Type==ST_ACTOR) {
 		Sender->CastSpellEnd(spellres);
 	} else {
@@ -2812,7 +2818,7 @@ void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
 		actor->SetStance (IE_ANI_CONJURE);
 	}
-	Sender->CastSpellPoint (spellres, parameters->pointParameter, false);
+	Sender->CastSpellPoint (spellres, parameters->pointParameter, false, true);
 	Sender->CastSpellPointEnd(spellres);
 	Sender->ReleaseCurrentAction();
 }
@@ -2838,7 +2844,7 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 		Actor *actor = (Actor *) Sender;
 		actor->SetStance (IE_ANI_CONJURE);
 	}
-	Sender->CastSpell (spellres, tar, false);
+	Sender->CastSpell (spellres, tar, false, true);
 	if (tar->Type==ST_ACTOR) {
 		Sender->CastSpellEnd(spellres);
 	} else {

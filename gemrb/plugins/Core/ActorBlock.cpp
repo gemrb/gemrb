@@ -668,31 +668,31 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 //set target as point
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-void Scriptable::CastSpellPoint( const ieResRef SpellResRef, Point &target, bool deplete )
+int Scriptable::CastSpellPoint( const ieResRef SpellResRef, Point &target, bool deplete, bool instant )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
-			return;
+			return -1;
 		}
 	}
 	LastTargetPos = target;
-	SpellCast(SpellResRef);
+	return SpellCast(SpellResRef, instant);
 }
 
 //set target as actor (if target isn't actor, use its position)
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-void Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool deplete )
+int Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool deplete, bool instant )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
-			return;
+			return -1;
 		}
 	}
 
@@ -702,28 +702,23 @@ void Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool
 	if (target->Type==ST_ACTOR) {
 		LastTarget = target->GetGlobalID();
 	}
-	SpellCast(SpellResRef);
+	return SpellCast(SpellResRef, instant);
 }
 
 //start spellcasting (common part)
-void Scriptable::SpellCast(const ieResRef SpellResRef)
+int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 {
 	Spell* spl = gamedata->GetSpell( SpellResRef );
 	if (!spl) {
 		SpellHeader = -1;
-		return;
+		return -1;
 	}
 
-	//cfb
 	if (Type == ST_ACTOR) {
-		//The ext. index is here to calculate the casting time
-		int level = ((Actor *) this)->GetXPLevel(true);
-		SpellHeader = spl->GetHeaderIndexFromLevel(level);
 		Actor *actor = (Actor *) this;
-		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1, SpellHeader, 0);
-		fxqueue->SetOwner(actor);
-		fxqueue->AddAllEffects(actor, actor->Pos);
-		delete fxqueue;
+		//The ext. index is here to calculate the casting time
+		int level = actor->GetXPLevel(true);
+		SpellHeader = spl->GetHeaderIndexFromLevel(level);
 	} else {
 		SpellHeader = 0;
 	}
@@ -737,8 +732,22 @@ void Scriptable::SpellCast(const ieResRef SpellResRef)
 		if (casting_time < 0) casting_time = 0;
 	}
 	// this is a guess which seems approximately right so far
-	SetWait((casting_time*ROUND_SIZE)/10);
+	int duration = (casting_time*ROUND_SIZE) / 10;
+	if (instant)
+		duration = 0;
+
+	//cfb
+	if (Type == ST_ACTOR) {
+		Actor *actor = (Actor *) this;
+		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1);
+		spl->AddCastingGlow(fxqueue, duration);
+		fxqueue->SetOwner(actor);
+		fxqueue->AddAllEffects(actor, actor->Pos);
+		delete fxqueue;
+	}
+
 	gamedata->FreeSpell(spl, SpellResRef, false);
+	return duration;
 }
 
 bool Scriptable::TimerActive(ieDword ID)

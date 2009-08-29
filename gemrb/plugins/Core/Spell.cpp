@@ -71,7 +71,18 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 //otherwise set to caster level
 static EffectRef fx_casting_glow_ref={"CastingGlow",NULL,-1};
 
-EffectQueue *Spell::GetEffectBlock(Scriptable *self, Point &pos, int block_index, int ext_index, ieDword pro) const
+void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration)
+{
+	Effect *fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
+	fx->Duration = core->GetGame()->GameTime + duration;
+	fx->InventorySlot = 0xffff;
+	fx->Projectile = 0;
+	fxqueue->AddEffect(fx);
+	//AddEffect creates a copy, we need to destroy the original
+	delete fx;
+}
+
+EffectQueue *Spell::GetEffectBlock(Scriptable *self, Point &pos, int block_index, ieDword pro) const
 {
 	Effect *features;
 	int count;
@@ -91,17 +102,6 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, Point &pos, int block_index
 	}
 	EffectQueue *fxqueue = new EffectQueue();
 
-	//add casting glow
-	if (block_index==-1) {
-		assert(ext_index>=0);
-		Effect *fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
-		fx->Duration = (ext_headers[ext_index].CastingTime*ROUND_SIZE)/10+core->GetGame()->GameTime;
-		fx->InventorySlot = 0xffff;
-		fx->Projectile = 0;
-		fxqueue->AddEffect(fx);
-		//AddEffect creates a copy, we need to destroy the original
-		delete fx;
-	}
 	for (int i=0;i<count;i++) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {
 			//hack the effect according to Level
@@ -138,7 +138,7 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, Point &target) co
 	}
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 	if (seh->FeatureCount) {
-		pro->SetEffects(GetEffectBlock(self, target, header, -1, seh->ProjectileAnimation));
+		pro->SetEffects(GetEffectBlock(self, target, header, seh->ProjectileAnimation));
 	}
 	return pro;
 }

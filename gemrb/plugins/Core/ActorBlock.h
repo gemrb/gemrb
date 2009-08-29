@@ -270,8 +270,8 @@ public:
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText(Region &screen);
 	/* actor/scriptable casts spell */
-	void CastSpellPoint( const ieResRef SpellResRef, Point &Target, bool deplete );
-	void CastSpell( const ieResRef SpellResRef, Scriptable* Target, bool deplete );
+	int CastSpellPoint( const ieResRef SpellResRef, Point &Target, bool deplete, bool instant = false );
+	int CastSpell( const ieResRef SpellResRef, Scriptable* Target, bool deplete, bool instant = false );
 	/* spellcasting finished */
 	void CastSpellPointEnd( const ieResRef SpellResRef);
 	void CastSpellEnd( const ieResRef SpellResRef);
@@ -282,7 +282,7 @@ public:
 	void StartTimer(ieDword ID, ieDword expiration);
 private:
 	/* used internally to handle start of spellcasting */
-	void SpellCast(const ieResRef SpellResRef);
+	int SpellCast(const ieResRef SpellResRef, bool instant);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {
