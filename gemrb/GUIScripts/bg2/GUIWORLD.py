@@ -500,12 +500,21 @@ def LoadPress():
 
 def GetWindowPack():
 	width = GemRB.GetSystemVariable (SV_WIDTH)
+	if width == 640:
+		return "GUIW"
 	if width == 800:
 		return "GUIW08"
 	if width == 1024:
 		return "GUIW10"
 	if width == 1280:
 		return "GUIW12"
-	#default
-	return "GUIW"
+
+	# use a custom gui if there is one
+	height = GemRB.GetSystemVariable (SV_HEIGHT)
+	gui = "CGUI" + str(width)[:2] + str(height)[:2]
+	if GemRB.HasResource (gui, RES_CHU):
+		return gui
+	else:
+		# fallback to the smallest resolution
+		return "GUIW"
 
