@@ -936,7 +936,7 @@ void GameScript::Wait(Scriptable* Sender, Action* parameters)
 	} else {
 		Sender->CurrentActionState--;
 	}
-	
+
 	if (!Sender->CurrentActionState) {
 		Sender->ReleaseCurrentAction();
 	}
@@ -951,7 +951,7 @@ void GameScript::SmallWait(Scriptable* Sender, Action* parameters)
 	} else {
 		Sender->CurrentActionState--;
 	}
-	
+
 	if (!Sender->CurrentActionState) {
 		Sender->ReleaseCurrentAction();
 	}
@@ -4264,6 +4264,9 @@ void GameScript::GivePartyAllEquipment(Scriptable *Sender, Action* /*parameters*
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i,false);
+		//don't try to give self, it would be an infinite loop
+		if (tar==(Actor *) Sender)
+			continue;
 		while(MoveItemCore(Sender, tar, "",0,0)!=MIC_NOITEM) { }
 	}
 }
@@ -4279,6 +4282,13 @@ void GameScript::Plunder(Scriptable *Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	//you must be joking
+	if (tar==Sender) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	Actor *scr = (Actor *) tar;
 	//can plunder only dead actors
 	if (! (scr->BaseStats[IE_STATE_ID]&STATE_DEAD) ) {
@@ -4306,6 +4316,9 @@ void GameScript::MoveInventory(Scriptable *Sender, Action* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
+	//don't try to move to self, it would create infinite loop
+	if (src==tar)
+		return;
 	//move all movable item from the target to the Sender
 	//the rest will be dropped at the feet of Sender
 	while(MoveItemCore(src, tar, "",0,0)!=MIC_NOITEM) { }
@@ -4338,8 +4351,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		return;
 	}
 
-	//not sure about the real formula
-	int skill = snd->GetStat(IE_PICKPOCKET) - scr->GetXPLevel(0)*10;
+	int skill = snd->GetStat(IE_PICKPOCKET) - scr->GetStat(IE_PICKPOCKET);
 	skill+=core->Roll(1,100,1);
 	if (skill<100) {
 		//noticed
@@ -4363,8 +4375,18 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		scr->SetBase(IE_GOLD,scr->GetBase(IE_GOLD)-money);
-		snd->SetBase(IE_GOLD,snd->GetBase(IE_GOLD)+money);
+		CREItem *item = new CREItem();
+		CreateItemCore(item, core->GoldResRef, money, 0, 0);
+		if ( ASI_SUCCESS == snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY)) {
+			scr->SetBase(IE_GOLD,scr->GetBase(IE_GOLD)-money);
+		} else {
+			Map *map=Sender->GetCurrentArea();
+			// drop it at my feet
+			map->AddItemToLocation(Sender->Pos, item);
+			if (((Actor *)Sender)->InParty) core->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
+			Sender->ReleaseCurrentAction();
+			return;
+		}
 	}
 
 	core->DisplayConstantString(STR_PICKPOCKET_DONE,0xffffff);
@@ -5491,7 +5513,13 @@ void GameScript::PickUpItem(Scriptable* Sender, Action* parameters)
 	}
 	return;
 item_is_gold: //we take gold!
-	core->GetGame()->PartyGold += res;
+	if (scr->InParty) {
+		core->GetGame()->PartyGold += res;
+		//if you want message here then use
+		//core->GetGame()->AddGold(res);
+	} else {
+		scr->SetBase( IE_GOLD, scr->GetBase(IE_GOLD) + res );
+	}
 	delete item;
 }
 
