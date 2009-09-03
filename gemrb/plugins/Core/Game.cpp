@@ -48,6 +48,10 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	Reputation = 0;
 	ControlStatus = 0;
 	CombatCounter = 0; //stored here until we know better
+	StateOverrideTime = 0;
+	StateOverrideFlag = 0;
+	BanterBlockTime = 0;
+	BanterBlockFlag = 0;
 	WeatherBits = 0;
 	crtable = NULL;
 	kaputz = NULL;
@@ -1193,6 +1197,12 @@ void Game::UpdateScripts()
 			}
 		}
 	}
+
+	if (StateOverrideTime)
+		StateOverrideTime--;
+	if (BanterBlockTime)
+		BanterBlockTime--;
+
 	if (Maps.size()>MAX_MAPS_LOADED) {
 		idx = Maps.size();
 

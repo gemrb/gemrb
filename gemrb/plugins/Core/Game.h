@@ -200,6 +200,8 @@ public:
 	ieByte* mazedata; //only in PST
 	ieResRef Familiars[9];
 	ieDword CombatCounter;
+	ieDword StateOverrideFlag, StateOverrideTime;
+	ieDword BanterBlockFlag, BanterBlockTime;
 
 	/** Index of PC selected in non-walking environment (shops, inventory...) */
 	int SelectedSingle;
@@ -328,7 +330,7 @@ public:
 			return false;
 		}
 		if (Index>=BESTIARY_SIZE) {
-		  return false;
+			return false;
 		}
 		return beasts[Index] != 0;
 	}
@@ -337,7 +339,7 @@ public:
 			return;
 		}
 		if (Index>=BESTIARY_SIZE) {
-		  return;
+			return;
 		}
 		beasts[Index] = 1;
 	}

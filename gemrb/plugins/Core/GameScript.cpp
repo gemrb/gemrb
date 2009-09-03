@@ -413,6 +413,7 @@ static const ActionLink actionnames[] = {
 	{"bitglobal", GameScript::BitGlobal,AF_MERGESTRINGS},
 	{"bitset", GameScript::GlobalBOr,AF_MERGESTRINGS}, //probably the same
 	{"breakinstants", GameScript::BreakInstants, AF_BLOCKING},//delay execution of instants to the next AI cycle???
+	{"calllightning", GameScript::Kill, 0}, //TODO: call lightning projectile
 	{"calm", GameScript::Calm, 0},
 	{"changeaiscript", GameScript::ChangeAIScript, 0},
 	{"changeaitype", GameScript::ChangeAIType, 0},
@@ -841,6 +842,8 @@ static const ActionLink actionnames[] = {
 	{"startsong", GameScript::StartSong, 0},
 	{"startstore", GameScript::StartStore, 0},
 	{"starttimer", GameScript::StartTimer, 0},
+	{"stateoverrideflag", GameScript::StateOverrideFlag, 0},
+	{"stateoverridetime", GameScript::StateOverrideTime, 0},
 	{"staticpalette", GameScript::StaticPalette, 0},
 	{"staticsequence", GameScript::PlaySequence, 0},//bg2 animation sequence
 	{"staticstart", GameScript::StaticStart, 0},
@@ -891,7 +894,7 @@ static const ActionLink actionnames[] = {
 	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING},
 	{"weather", GameScript::Weather, 0},
 	{"xequipitem", GameScript::XEquipItem, 0},
- 	{ NULL,NULL, 0}
+	{ NULL,NULL, 0}
 };
 
 //Make this an ordered list, so we could use bsearch!
@@ -1914,7 +1917,7 @@ Targets *GameScript::LastTrigger(Scriptable *Sender, Targets *parameters, int ga
 	parameters->Clear();
 	if (Sender->LastTriggerObject) {
 		Actor *target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastTriggerObject);
- 		parameters->AddTarget(target, 0, ga_flags);
+		parameters->AddTarget(target, 0, ga_flags);
 	}
 	return parameters;
 }

@@ -6590,4 +6590,22 @@ void GameScript::SetTrackString(Scriptable* Sender, Action* parameters)
 	map->SetTrackString(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
 }
 
+void GameScript::StateOverrideFlag(Scriptable* /*Sender*/, Action* parameters)
+{
+	core->GetGame()->StateOverrideFlag = parameters->int0Parameter;
+}
 
+void GameScript::StateOverrideTime(Scriptable* /*Sender*/, Action* parameters)
+{
+	core->GetGame()->StateOverrideTime = parameters->int0Parameter;
+}
+
+void GameScript::BanterBlockFlag(Scriptable* /*Sender*/, Action* parameters)
+{
+	core->GetGame()->BanterBlockFlag = parameters->int0Parameter;
+}
+
+void GameScript::BanterBlockTime(Scriptable* /*Sender*/, Action* parameters)
+{
+	core->GetGame()->BanterBlockTime = parameters->int0Parameter;
+}

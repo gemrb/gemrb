@@ -617,21 +617,30 @@ void Map::UpdateScripts()
 	bool timestop = game->timestop_end>game->GameTime;
 
 	// this is silly, the speed should be pre-calculated somewhere
-	int *actor_speeds = (int *)calloc(Qcount[PR_SCRIPT], sizeof(int));
+	//int *actor_speeds = (int *)calloc(Qcount[PR_SCRIPT], sizeof(int));
 
-	bool *no_more_steps_for_actor = (bool *)calloc(Qcount[PR_SCRIPT], sizeof(bool));
+	//bool *no_more_steps_for_actor = (bool *)calloc(Qcount[PR_SCRIPT], sizeof(bool));
 
 	while (q--) {
 		Actor* actor = queue[PR_SCRIPT][q];
 		//actor just moved away, don't run its script from this side
 		if (actor->GetCurrentArea()!=this) {
-			no_more_steps_for_actor[q] = true;
+			actor->no_more_steps = true;
 			continue;
 		}
 		if (timestop && actor!=timestop_owner && actor->Modified[IE_DISABLETIMESTOP] ) {
-			no_more_steps_for_actor[q] = true;
+			actor->no_more_steps = true;
 			continue;
 		}
+
+    //if the actor is immobile, don't run the scripts
+    if (!game->StateOverrideFlag && !game->StateOverrideTime) {
+      if (actor->Immobile()) {
+        actor->no_more_steps = true;
+        continue;
+      }
+    }
+    actor->no_more_steps = false;
 
 		/*
 		 * we run scripts all at once because one of the actions in ProcessActions
@@ -650,12 +659,12 @@ void Map::UpdateScripts()
 
 	q=Qcount[PR_SCRIPT];
 	while (q--) {
-		if (no_more_steps_for_actor[q]) continue;
 		Actor* actor = queue[PR_SCRIPT][q];
+		if (actor->no_more_steps) continue;
 
 		actor->ProcessActions(false);
 
-		actor->UpdateActorState(core->GetGame()->GameTime);
+		actor->UpdateActorState(game->GameTime);
 
 		actor->inventory.CalculateWeight();
 		actor->SetBase( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
@@ -681,21 +690,20 @@ void Map::UpdateScripts()
 				}
 			}
 		}
-		actor_speeds[q] = speed;
+		actor->speed = speed;
 	}
 
 	// We need to step through the list of actors until all of them are done
 	// taking steps.
 	bool more_steps = true;
-	ieDword time = core->GetGame()->Ticks; // make sure everything moves at the same time
+	ieDword time = game->Ticks; // make sure everything moves at the same time
 	while (more_steps) {
 		more_steps = false;
 
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
-			if (no_more_steps_for_actor[q]) continue;
-
 			Actor* actor = queue[PR_SCRIPT][q];
+			if (actor->no_more_steps) continue;
 
 			// try to exclude actors which only just died
 			// (shouldn't we not be stepping actors which don't have a path anyway?)
@@ -703,13 +711,10 @@ void Map::UpdateScripts()
 			if (!actor->ValidTarget(GA_NO_DEAD)) continue;
 			//if (actor->GetStat(IE_STATE_ID)&STATE_DEAD || actor->GetInternalFlag() & IF_JUSTDIED) continue;
 
-			no_more_steps_for_actor[q] = DoStepForActor(actor, actor_speeds[q], time);
-			if (!no_more_steps_for_actor[q]) more_steps = true;
+			actor->no_more_steps = DoStepForActor(actor, actor->speed, time);
+			if (!actor->no_more_steps) more_steps = true;
 		}
 	}
-
-	free(no_more_steps_for_actor);
-	free(actor_speeds);
 
 	//Check if we need to start some door scripts
 	int doorCount = 0;

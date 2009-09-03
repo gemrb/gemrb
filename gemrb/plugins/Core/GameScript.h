@@ -539,9 +539,9 @@ typedef void (* ActionFunction)(Scriptable*, Action*);
 typedef Targets* (* ObjectFunction)(Scriptable *, Targets*, int ga_flags);
 typedef int (* IDSFunction)(Actor *, int parameter);
 
-#define TF_NONE 	 0
-#define TF_CONDITION     1 //this isn't a trigger, just a condition (0x4000)
-#define TF_MERGESTRINGS  8 //same value as actions' mergestring
+#define TF_NONE 	0
+#define TF_CONDITION    1 //this isn't a trigger, just a condition (0x4000)
+#define TF_MERGESTRINGS 8 //same value as actions' mergestring
 
 struct TriggerLink {
 	const char* Name;
@@ -995,6 +995,8 @@ public:
 	static void AttackNoSound(Scriptable* Sender, Action* parameters);
 	static void AttackOneRound(Scriptable* Sender, Action* parameters);
 	static void AttackReevaluate(Scriptable* Sender, Action* parameters);
+	static void BanterBlockFlag(Scriptable* Sender, Action* parameters);
+	static void BanterBlockTime(Scriptable* Sender, Action* parameters);
 	static void BashDoor(Scriptable* Sender, Action* parameters);
 	static void BattleSong(Scriptable* Sender, Action* parameters);
 	static void Berserk(Scriptable* Sender, Action* parameters);
@@ -1205,7 +1207,7 @@ public:
 	static void MoveGlobalsTo(Scriptable* Sender, Action* parameters);
 	static void MoveInventory(Scriptable *Sender, Action* parameters);
 	static void MoveToCenterOfScreen(Scriptable* Sender, Action* parameters);
-	      static void MoveToExpansion(Scriptable* Sender, Action* parameters);
+	static void MoveToExpansion(Scriptable* Sender, Action* parameters);
 	static void MoveToObject(Scriptable* Sender, Action* parameters);
 	static void MoveToObjectFollow(Scriptable* Sender, Action* parameters);
 	static void MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters);
@@ -1377,6 +1379,8 @@ public:
 	static void StartSong(Scriptable* Sender, Action* parameters);
 	static void StartStore(Scriptable* Sender, Action* parameters);
 	static void StartTimer(Scriptable* Sender, Action* parameters);
+	static void StateOverrideFlag(Scriptable* Sender, Action* parameters);
+	static void StateOverrideTime(Scriptable* Sender, Action* parameters);
 	static void StaticPalette(Scriptable* Sender, Action* parameters);
 	static void StaticStart(Scriptable* Sender, Action* parameters);
 	static void StaticStop(Scriptable* Sender, Action* parameters);

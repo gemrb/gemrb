@@ -280,6 +280,8 @@ public:
 	ieDword *projectileImmunity; //classic bitfield
 	ieDword roundTime;           //these are timers for attack rounds
 	ieDword lastInit;
+	bool no_more_steps;
+	int speed;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
