@@ -2694,6 +2694,28 @@ int GameScript::CurrentAreaIs(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+//lame bg2 uses a constant areaname prefix, this reduces its usability
+//but in the spirit of flexibility, gemrb extension allows arbitrary prefixes
+int GameScript::AreaStartsWith(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+
+	if (!tar) {
+		return 0;
+	}
+	ieResRef arearesref;
+	if (parameters->string0Parameter[0]) {
+		strnlwrcpy(arearesref, parameters->string0Parameter, 8);
+	} else {
+		strnlwrcpy(arearesref, "AR30", 8); //InWatchersKeep
+	}
+	int i = strlen(arearesref);
+	if (!strnicmp(tar->GetCurrentArea()->GetScriptName(), arearesref, i)) {
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::EntirePartyOnMap(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	Map *map = Sender->GetCurrentArea();

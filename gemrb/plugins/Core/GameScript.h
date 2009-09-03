@@ -681,6 +681,7 @@ public: //Script Functions
 	static int AreaCheckObject(Scriptable* Sender, Trigger* parameter);
 	static int AreaFlag(Scriptable* Sender, Trigger* parameter);
 	static int AreaRestDisabled(Scriptable* Sender, Trigger* parameter);
+	static int AreaStartsWith(Scriptable* Sender, Trigger* parameter); //InWatchersKeep
 	static int AreaType(Scriptable* Sender, Trigger* parameter);
 	static int AtLocation(Scriptable* Sender, Trigger* parameter);
 	static int AttackedBy(Scriptable* Sender, Trigger* parameters);

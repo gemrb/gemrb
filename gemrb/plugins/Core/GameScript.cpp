@@ -189,6 +189,7 @@ static const TriggerLink triggernames[] = {
 	{"intrap", GameScript::InTrap, 0},
 	{"inventoryfull", GameScript::InventoryFull, 0},
 	{"inview", GameScript::LOS, 0}, //it seems the same, needs research
+	{"inwatcherskeep", GameScript::AreaStartsWith, 0},
 	{"inweaponrange", GameScript::InWeaponRange, 0},
 	{"isaclown", GameScript::IsAClown, 0},
 	{"isactive", GameScript::IsActive, 0},
