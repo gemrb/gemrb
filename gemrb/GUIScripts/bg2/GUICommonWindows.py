@@ -1000,8 +1000,6 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	return
 
 def GearsClicked():
-	print "PC", GemRB.GameGetFirstSelectedPC ()
-	GemRB.SetPlayerStat(GemRB.GameGetFirstSelectedPC (),44,149990)
 	GemRB.GamePause(2,0)
 
 def OpenWaitForDiscWindow ():
