@@ -2738,6 +2738,7 @@ void Actor::Die(Scriptable *killer)
 	ClearActions();
 	ClearPath();
 	SetModal( MS_NONE );
+	core->DisplayConstantStringName(STR_DEATH, 0xffffff, this);
 	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
 
 	// clearing the search map here means it's not blocked during death animations

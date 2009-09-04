@@ -182,7 +182,8 @@
 #define STR_SEQDUP 148
 #define STR_CRITICAL_HIT 149
 #define STR_CRITICAL_MISS 150
+#define STR_DEATH 151
 
-#define STRREF_COUNT 151
+#define STRREF_COUNT 152
 
 #endif //! IE_STRINGS_H
