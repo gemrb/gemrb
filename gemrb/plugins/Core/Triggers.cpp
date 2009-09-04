@@ -3408,6 +3408,16 @@ int GameScript::Help_Trigger(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::ReceivedOrder(Scriptable* Sender, Trigger* parameters)
+{
+	if (MatchActor(Sender, Sender->LastOrderer, parameters->objectParameter) && 
+		parameters->int0Parameter==Sender->LastOrder) {
+		Sender->AddTrigger(&Sender->LastOrderer);
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::FallenPaladin(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {

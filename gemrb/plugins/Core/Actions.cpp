@@ -4688,6 +4688,15 @@ void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
 	map->Shout((Actor *) Sender, 0, 40);
 }
 
+void GameScript::GiveOrder(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (tar) {
+		tar->LastOrderer = Sender->GetGlobalID();
+		tar->LastOrder = parameters->int0Parameter;
+	}
+}
+
 void GameScript::AddMapnote( Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();

@@ -918,6 +918,7 @@ public: //Script Functions
 	static int RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters);
 	static int RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters);
 	static int RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters);
+	static int ReceivedOrder(Scriptable* Sender, Trigger* parameters);
 	static int Reputation(Scriptable* Sender, Trigger* parameters);
 	static int ReputationGT(Scriptable* Sender, Trigger* parameters);
 	static int ReputationLT(Scriptable* Sender, Trigger* parameters);
@@ -1138,6 +1139,7 @@ public:
 	static void GetItem(Scriptable* Sender, Action* parameters);
 	static void GetStat(Scriptable* Sender, Action* parameters);
 	static void GiveItem(Scriptable* Sender, Action* parameters);
+	static void GiveOrder(Scriptable* Sender, Action* parameters);
 	static void GivePartyAllEquipment(Scriptable* Sender, Action* parameters);
 	static void GivePartyGold(Scriptable* Sender, Action* parameters);
 	static void GivePartyGoldGlobal(Scriptable* Sender, Action* parameters);

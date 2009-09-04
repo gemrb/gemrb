@@ -568,6 +568,7 @@ static const ActionLink actionnames[] = {
 	{"givegoldforce", GameScript::CreatePartyGold, 0}, //this is the same
 	{"giveitem", GameScript::GiveItem, 0},
 	{"giveitemcreate", GameScript::CreateItem, 0}, //actually this is a targeted createitem
+	{"giveorder", GameScript::GiveOrder, 0},
 	{"givepartyallequipment", GameScript::GivePartyAllEquipment, 0},
 	{"givepartygold", GameScript::GivePartyGold, 0},
 	{"givepartygoldglobal", GameScript::GivePartyGoldGlobal,0},//no mergestrings!
