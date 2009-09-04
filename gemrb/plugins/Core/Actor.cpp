@@ -348,6 +348,8 @@ Actor::Actor()
 	ModalSpell[0] = '*';
 	//this one is saved, but not loaded?
 	localID = globalID = 0;
+	//this one is not saved
+	GotLUFeedback = false;
 }
 
 Actor::~Actor(void)
@@ -642,6 +644,7 @@ void pcf_level (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		actor->GetSorcererLevel();
 	actor->SetBase(IE_CLASSLEVELSUM,sum);
 	actor->SetupFist();
+	actor->GotLUFeedback = false;
 }
 
 void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
@@ -786,6 +789,23 @@ void pcf_stat_con(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 void pcf_stat_cha(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_CHR);
+}
+
+void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+{
+	// check if we reached a new level
+	unsigned int pc = actor->InParty;
+	if (pc && !actor->GotLUFeedback) {
+		char varname[16];
+		sprintf(varname, "CheckLevelUp%d", pc);
+		core->GetGUIScriptEngine()->RunFunction("CheckLevelUp", true, pc);
+		ieDword NeedsLevelUp = 0;
+		core->GetDictionary()->Lookup(varname, NeedsLevelUp);
+		if (NeedsLevelUp == 1) {
+			core->DisplayConstantStringName(STR_LEVELUP, 0xffffff, actor);
+			actor->GotLUFeedback = true;
+		}
+	}
 }
 
 void pcf_gold(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
@@ -961,7 +981,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_fatigue, pcf_intoxication, //1f
 NULL,NULL,pcf_level,NULL, pcf_stat_str, NULL, pcf_stat_int, pcf_stat_wis,
-pcf_stat_dex,pcf_stat_con,pcf_stat_cha,NULL, NULL, pcf_gold, pcf_morale, NULL, //2f
+pcf_stat_dex,pcf_stat_con,pcf_stat_cha,NULL, pcf_xp, pcf_gold, pcf_morale, NULL, //2f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_entangle, pcf_sanctuary, //3f
 pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, pcf_level, pcf_level, NULL, NULL,
@@ -4059,7 +4079,6 @@ void Actor::Heal(int days)
 	}
 }
 
-//this function should handle dual classing and multi classing
 void Actor::AddExperience(int exp)
 {
 	SetBase(IE_XP,BaseStats[IE_XP]+exp);
@@ -4076,8 +4095,8 @@ void Actor::AddExperience(int type, int level)
 		l=xpbonuslevels-1;
 	}
 	int xp = xpbonus[type*xpbonuslevels+l];
-	AddExperience(xp);
 	core->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword) xp);
+	AddExperience(xp);
 }
 
 bool Actor::Schedule(ieDword gametime, bool checkhide)

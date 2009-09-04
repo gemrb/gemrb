@@ -2956,7 +2956,6 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	int xp = parameters->int0Parameter;
-	actor->AddExperience(xp);
 	if (core->GetStringReference(STR_GOTQUESTXP) == (ieStrRef) -1) {
 		core->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword)xp);
 	} else {
@@ -2965,6 +2964,7 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 		core->GetTokenDictionary()->SetAtCopy( "EXPERIENCEAMOUNT", tmpstr);
 		core->DisplayConstantStringName(STR_GOTQUESTXP, 0xbcefbc, actor);
 	}
+	actor->AddExperience(xp);
 }
 
 void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)

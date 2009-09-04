@@ -265,6 +265,7 @@ public:
 	char WeaponRef[2];
 	int WeaponType;
 	ieDword multiclass;
+	bool GotLUFeedback;
 
 	int LastCommand;   //lastcommander
 	int LastShout;     //lastheard

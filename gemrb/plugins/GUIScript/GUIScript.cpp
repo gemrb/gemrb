@@ -9796,7 +9796,7 @@ PyObject *GUIScript::CallbackFunction(const char* fname, PyObject* pArgs)
 	return pValue;
 }
 
-bool GUIScript::RunFunction(const char* fname, bool error)
+bool GUIScript::RunFunction(const char* fname, bool error, int intparam)
 {
 	if (!Py_IsInitialized()) {
 		return false;
@@ -9816,8 +9816,13 @@ bool GUIScript::RunFunction(const char* fname, bool error)
 		}
 		return false;
 	}
-	pArgs = NULL;
+	if (intparam == -1) {
+		pArgs = NULL;
+	} else {
+		pArgs = Py_BuildValue("(i)", intparam);
+	}
 	pValue = PyObject_CallObject( pFunc, pArgs );
+	Py_XDECREF( pArgs );
 	if (pValue == NULL) {
 		if (PyErr_Occurred()) {
 			PyErr_Print();

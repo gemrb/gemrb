@@ -662,3 +662,5 @@ def PortraitButtonOnMouseLeave ():
 
 def GearsClicked():
 	GemRB.GamePause(2,0)
+def CheckLevelUp(pc):
+	GemRB.SetVar (CheckLevelUp+str(pc), CanLevelUp (pc))

@@ -609,3 +609,5 @@ def OpenWaitForDiscWindow ():
 	except:
 		DiscWindow.SetVisible (1)
 
+def CheckLevelUp(pc):
+	GemRB.SetVar (CheckLevelUp+str(pc), CanLevelUp (pc))

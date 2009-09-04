@@ -45,7 +45,7 @@ public:
 	/** Load Script */
 	virtual bool LoadScript(const char* filename) = 0;
 	/** Run Function */
-	virtual bool RunFunction(const char* fname, bool error=true) = 0;
+	virtual bool RunFunction(const char* fname, bool error=true, int intparam=-1) = 0;
 	/** Exec a single String */
 	virtual void ExecString(const char* string) = 0;
 };

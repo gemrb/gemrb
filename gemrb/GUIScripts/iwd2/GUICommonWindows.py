@@ -604,3 +604,5 @@ def PortraitButtonOnMouseLeave ():
 	Button.EnableBorder (FRAME_PC_TARGET, 0)
 	return
 
+def CheckLevelUp(pc):
+	GemRB.SetVar (CheckLevelUp+str(pc), CanLevelUp (pc))

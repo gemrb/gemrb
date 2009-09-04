@@ -937,16 +937,16 @@ void Game::ShareXP(int xp, int flags)
 		return;
 	}
 
+	if (xp>0) {
+		core->DisplayConstantStringValue( STR_GOTXP, 0xbcefbc, (ieDword) xp); //you have gained ... xp
+	} else {
+		core->DisplayConstantStringValue( STR_LOSTXP, 0xbcefbc, (ieDword) -xp); //you have lost ... xp
+	}
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			continue;
 		}
 		PCs[i]->AddExperience(individual);
-	}
-	if (xp>0) {
-		core->DisplayConstantStringValue( STR_GOTXP, 0xbcefbc, (ieDword) xp); //you have gained ... xp
-	} else {
-		core->DisplayConstantStringValue( STR_LOSTXP, 0xbcefbc, (ieDword) -xp); //you have lost ... xp
 	}
 }
 
