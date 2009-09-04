@@ -3811,6 +3811,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical failure
 		printBracket("Critical Miss", RED);
 		printf("\n");
+		core->DisplayConstantStringName(STR_CRITICAL_MISS, 0xffffff, this);
 		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
 		if (Flags&WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
@@ -3850,6 +3851,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical success
 		printBracket("Critical Hit", GREEN);
 		printf("\n");
+		core->DisplayConstantStringName(STR_CRITICAL_HIT, 0xffffff, this);
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
 		ModifyDamage (target, damage, resisted, weapon_damagetype[damagetype], &wi, true);
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
