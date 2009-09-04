@@ -2358,6 +2358,8 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	ModifyDamage (this, damage, resisted, damagetype, NULL, false);
 	if (damage) GetHit();
 
+	DisplayCombatFeedback(damage, resisted, damagetype, (Actor *)hitter);
+
 	NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
 
 	LastDamage=damage;
@@ -2391,8 +2393,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	} else {
 		PlayDamageAnimation(damagelevel);
 	}
-
-	DisplayCombatFeedback(damage, resisted, damagetype, (Actor *)hitter);
 
 	if (InParty) {
 		if (chp<(signed) Modified[IE_MAXHITPOINTS]/10) {
