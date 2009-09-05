@@ -2540,8 +2540,7 @@ void Actor::DebugDump()
 			printf("   %d", Modified[IE_COLORS+i]);
 		}
 	}
-	printf ("\nAnimate ID: %x\n", Modified[IE_ANIMATION_ID]);
-	printf( "WaitCounter: %d\n", (int) GetWait());
+	printf( "\nWaitCounter: %d\n", (int) GetWait());
 	printf( "LastTarget: %d %s\n", LastTarget, GetActorNameByID(LastTarget));
 	printf( "LastTalked: %d %s\n", LastTalkedTo, GetActorNameByID(LastTalkedTo));
 	inventory.dump();
