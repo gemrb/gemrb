@@ -58,7 +58,7 @@ def OnLoad():
 			continue
 			
 		Button = ClassWindow.GetControl(i+1)
-		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 
 	GemRB.SetVar("MAGESCHOOL",0) 

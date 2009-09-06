@@ -79,13 +79,19 @@ def OnLoad():
 	CustomButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"CustomPress")
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	
+	Flag = False
 	while True:
 		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
 			SetPicture ()
 			break
 		LastPortrait = LastPortrait + 1
-		if LastPortrait > 100:
+		if LastPortrait >= PortraitsTable.GetRowCount ():
 			LastPortrait = 0
+			if Flag:
+				SetPicture ()
+				break
+			Flag = True
+
 	AppearanceWindow.SetVisible (1)
 	return
 

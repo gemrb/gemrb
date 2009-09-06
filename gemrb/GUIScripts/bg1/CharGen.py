@@ -29,9 +29,9 @@ def init():
 		#(name,script | setFn,commentFn,unsetFn,gaurd)
 	stages = [
 	("gender"	 , 0		, 11956		),
-	("Show name, ceate player" , None    ,getName, unsetPlayer,  setPlayer ),
+	("Show name, create player" , None    ,getName, unsetPlayer,  setPlayer ),
 	("setGender"	, "GUICG1"	, getGender	,unsetGender		, None		), #BG2: same
-	("setPortrait"	, "GUICG12"	, None		,unsetPortrait		, None		), #BG2: different setPicture, PortaitName and extra unused control (TextAreaControl)
+	("setPortrait"	, "GUICG12"	, None		,unsetPortrait		, None		), #BG2: different setPicture, PortraitName and extra unused control (TextAreaControl)
 	("race"		, 1		,11957		),
 	("setRace"	, "GUICG8"	, getRace	,unsetRace 		, None		), #BG2: different resources
 	("class"	, 2		,11959		),
