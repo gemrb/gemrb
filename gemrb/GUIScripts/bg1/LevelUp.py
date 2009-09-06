@@ -93,6 +93,24 @@ def OpenLevelUpWindow():
 	Label = LevelUpWindow.GetControl (0x10000000+90)
 	Label.SetText (GemRB.GetPlayerName (pc))
 
+	# armorclass
+	Label = LevelUpWindow.GetControl (0x10000057)
+	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
+	#This is a temporary solution, the core engine should set the stat correctly!
+	ac += GemRB.GetAbilityBonus (IE_DEX, 2, GemRB.GetPlayerStat (pc, IE_DEX) )
+	Label.SetText (str (ac))
+	Label.SetTooltip (17183)
+
+	# hp now
+	Label = LevelUpWindow.GetControl (0x10000058)
+	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
+	Label.SetTooltip (17184)
+
+	# hp max
+	Label = LevelUpWindow.GetControl (0x10000059)
+	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
+	Label.SetTooltip (17378)
+
 	# some current values
 	OldHPMax = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
 	OldThaco = GemRB.GetPlayerStat (pc, IE_TOHIT, 1)
