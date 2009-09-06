@@ -54,7 +54,8 @@ def FinishCharGen():
 
 	# weapon proficiencies
 	# set the base number of attacks; effects will add the proficiency bonus
-	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 1)
+	# 2 means 1 attack, because this is the number of attacks in 2 rounds
+	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 2)
 
 	#lore, thac0, hp, and saves
 	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)

@@ -68,9 +68,7 @@ def NextPress():
 	if SkillWindow:
 		SkillWindow.Unload()
 
-	print "PROFSSAVE"
 	ProfsSave (MyChar, LUPROFS_TYPE_CHARGEN)
-	print "PROFSSAVE DONE"
 
 	GemRB.SetNextScript("CharGen7") #appearance
 	return

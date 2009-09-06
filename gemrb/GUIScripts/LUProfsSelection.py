@@ -363,7 +363,6 @@ def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 		if GameIsBG1():
 			ProfID = ProfID + IE_PROFICIENCYBASTARDSWORD
 		SaveProf = GemRB.GetVar ("Prof "+str(i))
-		print "SaveProf", SaveProf, " Type:", type
 		if type != LUPROFS_TYPE_CHARGEN and type !=LUPROFS_TYPE_CHARGEN_BG1:
 			if type != LUPROFS_TYPE_DUALCLASS:
 				OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x38

@@ -6604,7 +6604,6 @@ static PyObject* GemRB_DispelEffect(PyObject * /*self*/, PyObject* args)
 
 	work_ref.Name=EffectName;
 	work_ref.EffText=-1;
-	printf("Removing: %x %s(%d)\n",work_ref.EffText, EffectName, Parameter2);
 	actor->fxqueue.RemoveAllEffectsWithParam(work_ref, Parameter2);
 
 	Py_INCREF( Py_None );
@@ -6633,7 +6632,6 @@ static PyObject* GemRB_RemoveEffects(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found!" );
 	}
 
-	printf("Removing: %s\n",SpellResRef);
 	actor->fxqueue.RemoveAllEffects(SpellResRef);
 
 	Py_INCREF( Py_None );
