@@ -2902,6 +2902,7 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 	//evntmgr->Clear();
 	SetOnTop( WindowIndex );
 	evntmgr->AddWindow( win );
+	evntmgr->SetFocused( win, NULL );
 
 	ModalWindow = NULL;
 	DrawWindows();
