@@ -215,6 +215,12 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 				vp.x = MAP_TO_SCREENX(mn->Pos.x);
 				vp.y = MAP_TO_SCREENY(mn->Pos.y);
 			}
+
+			//Skip unexplored map notes
+			bool visible = MyMap->IsVisible( mn->Pos, true );
+			if (!visible)
+				continue;
+
 			if (anim) {
 				video->BlitSprite( anim, vp.x, vp.y, true, &r );
 			} else {
