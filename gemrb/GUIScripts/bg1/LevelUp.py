@@ -351,7 +351,7 @@ def OpenLevelUpWindow():
 	NewSkillPoints = GemRB.GetVar ("SkillPointsLeft")
 
 	TextAreaControl = LevelUpWindow.GetControl(42)
-	TextAreaControl.SetText(GetLevelUpNews())
+	TextAreaControl.SetText(GetStatOverview(pc, LevelDiff))
 
 	RedrawSkills()
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
