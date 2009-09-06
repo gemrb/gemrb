@@ -357,6 +357,8 @@ def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 	ProfCount = ProfsTable.GetRowCount () - ProfsTableOffset + 1
 	for i in range(ProfCount): # skip bg1 weapprof.2da proficiencies
 		ProfID = ProfsTable.GetValue (i+ProfsTableOffset, 0)
+		if type == LUPROFS_TYPE_LEVELUP_BG1 or type == LUPROFS_TYPE_CHARGEN_BG1:
+			ProfID = ProfID + IE_PROFICIENCYBASTARDSWORD
 		SaveProf = GemRB.GetVar ("Prof "+str(i))
 		if type != LUPROFS_TYPE_DUALCLASS:
 			OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x38
@@ -366,7 +368,7 @@ def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 			SaveProf = (OldProf << 3) | SaveProf
 		if SaveProf: # only save if we have a prof to save
 			if type == LUPROFS_TYPE_LEVELUP_BG1 or type == LUPROFS_TYPE_CHARGEN_BG1:
-				GemRB.SetPlayerStat (pc, profID, SaveProf)
+				GemRB.SetPlayerStat (pc, ProfID, SaveProf)
 			else:
 				GemRB.ApplyEffect (pc, "Proficiency", SaveProf, ProfID)
 	return

@@ -66,5 +66,5 @@ def OnLoad():
 
 def NextPress():
 	MyChar = GemRB.GetVar ("Slot")
-	ProfsSave(MyChar)
+	ProfsSave(MyChar, LUPROFS_TYPE_CHARGEN_BG1)
 	next()

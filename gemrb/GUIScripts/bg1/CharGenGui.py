@@ -1,6 +1,7 @@
 import GemRB
 from CharGenCommon import * 
-from GUICommonWindows import *;
+from GUICommonWindows import *
+from LUProfsSelection import *
 
 def Imprt():
 	GemRB.SetToken("NextScript","CharGen")

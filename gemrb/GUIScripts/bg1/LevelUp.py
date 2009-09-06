@@ -530,7 +530,7 @@ def LevelUpDonePress():
 	global SkillTable
 
 	# proficiencies
-	ProfsSave (pc)
+	ProfsSave (pc, LUPROFS_TYPE_LEVELUP_BG1)
 
 	# skills
 	SkillsSave (pc)
