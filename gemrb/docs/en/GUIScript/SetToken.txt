@@ -2,7 +2,7 @@
 Prototype: GemRB.SetToken(VariableName, Value)
 
 Description: Set/Create a token to be replaced in StrRefs. QueryText() will use the actual value of the token when it encounters "<token>" substrings in a retrieved dialog.tlk entry. Some tokens are hardcoded and you can't affect QueryText() by setting them. Usage of those tokens should be avoided. The hardcoded token list:
-FIGHTERTYPE  - always resolves to strref #10086
+FIGHTERTYPE  - always resolves to strref #10174
 RACE         - always resolves to the race of the last speaker
 GABBER       - always resolves to the longname of the last speaker
 SIRMAAM      - strref #27473/#27475 depending on last speaker's gender

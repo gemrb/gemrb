@@ -241,7 +241,7 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 	}
 
 	if (!strcmp( Token, "FIGHTERTYPE" )) {
-		Decoded = GetString( 10086, 0 );
+		Decoded = GetString( 10174, 0 );
 		goto exit_function;
 	}
 	if (!strcmp( Token, "RACE" )) {
