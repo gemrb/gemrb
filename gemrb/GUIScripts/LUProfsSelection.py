@@ -280,7 +280,7 @@ def ProfsRedraw (first=0):
 		Label.SetText(ProfName)
 
 		ActPoint = GemRB.GetVar("Prof "+str(Pos) )
-		for j in range(5):  #5 is maximum distributable
+		for j in range(5): #5 is maximum distributable
 			Star=ProfsWindow.GetControl(i*5+j+ProfsOffsetStar)
 			Star.SetSprites("GUIPFC", 0, 0, 0, 0, 0)
 			if ActPoint > j:
@@ -363,16 +363,20 @@ def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 		if GameIsBG1():
 			ProfID = ProfID + IE_PROFICIENCYBASTARDSWORD
 		SaveProf = GemRB.GetVar ("Prof "+str(i))
-		if type != LUPROFS_TYPE_DUALCLASS:
-			OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x38
-			SaveProf = OldProf | SaveProf
-		else: # gotta move the old prof to the back for dual class
-			OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x07
-			SaveProf = (OldProf << 3) | SaveProf
-		if SaveProf: # only save if we have a prof to save
-			if type == LUPROFS_TYPE_LEVELUP_BG1 or type == LUPROFS_TYPE_CHARGEN_BG1:
-				GemRB.SetPlayerStat (pc, ProfID, SaveProf)
-			else:
+		print "SaveProf", SaveProf, " Type:", type
+		if type != LUPROFS_TYPE_CHARGEN and type !=LUPROFS_TYPE_CHARGEN_BG1:
+			if type != LUPROFS_TYPE_DUALCLASS:
+				OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x38
+				SaveProf = OldProf | SaveProf
+			else: # gotta move the old prof to the back for dual class
+				OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x07
+				SaveProf = (OldProf << 3) | SaveProf
+		elif type == LUPROFS_TYPE_CHARGEN:
+			GemRB.DispelEffect (pc, "Proficiency", ProfID)
+
+		GemRB.SetPlayerStat (pc, ProfID, SaveProf)
+		if type != LUPROFS_TYPE_LEVELUP_BG1 and type != LUPROFS_TYPE_CHARGEN_BG1:
+			if SaveProf:
 				GemRB.ApplyEffect (pc, "Proficiency", SaveProf, ProfID)
 	return
 

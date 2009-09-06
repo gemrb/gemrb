@@ -19,8 +19,7 @@
 #
 #character generation, color (GUICG13)
 import GemRB
-from GUICommonWindows import ClassTable
-from ie_stats import *
+from GUICommon import *
 
 global IE_ANIM_ID
 ColorTable = 0
@@ -38,12 +37,12 @@ SkinColor = 0
 MajorColor = 0
 MinorColor = 0
 PDollButton = 0
+MyChar = 0
 IE_ANIM_ID = 206
 
 def RefreshPDoll():
 	PDollTable = GemRB.LoadTableObject("pdolls")
 	AnimID = 0x6000
-	MyChar = GemRB.GetVar ("Slot")
 	table = GemRB.LoadTableObject("avprefr")
 	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
 	AnimID = AnimID+table.GetValue(Race, 0)
@@ -62,10 +61,12 @@ def OnLoad():
 	global ColorWindow, DoneButton, PDollButton, ColorTable
 	global HairButton, SkinButton, MajorButton, MinorButton
 	global HairColor, SkinColor, MajorColor, MinorColor
+	global MyChar
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	ColorWindow=GemRB.LoadWindowObject(13)
 
+	MyChar = GemRB.GetVar ("Slot")
 	ColorTable = GemRB.LoadTableObject("clowncol")
 	#set these colors to some default
 	PortraitTable = GemRB.LoadTableObject("pictures")

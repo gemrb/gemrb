@@ -23,6 +23,7 @@ from LUProfsSelection import *
 
 SkillWindow = 0
 DoneButton = 0
+MyChar = 0
 
 def RedrawSkills():
 	ProfsPointsLeft = GemRB.GetVar ("ProfsPointsLeft")
@@ -33,7 +34,7 @@ def RedrawSkills():
 	return
 
 def OnLoad():
-	global SkillWindow, DoneButton
+	global SkillWindow, DoneButton, MyChar
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	SkillWindow = GemRB.LoadWindowObject(9)
@@ -67,8 +68,9 @@ def NextPress():
 	if SkillWindow:
 		SkillWindow.Unload()
 
-	MyChar = GemRB.GetVar ("Slot")
+	print "PROFSSAVE"
 	ProfsSave (MyChar, LUPROFS_TYPE_CHARGEN)
+	print "PROFSSAVE DONE"
 
 	GemRB.SetNextScript("CharGen7") #appearance
 	return

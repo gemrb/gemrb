@@ -21,7 +21,7 @@
 
 import GemRB
 from GUIDefines import *
-from GUICommonWindows import *
+from GUICommon import *
 from LUSpellSelection import *
 
 def OnLoad():

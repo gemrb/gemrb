@@ -19,7 +19,7 @@
 #
 #character generation, racial enemy (GUICG15)
 import GemRB
-from GUICommonWindows import ClassTable, ClassSkillsTable
+from GUICommon import *
 
 RaceWindow = 0
 TextAreaControl = 0
@@ -27,6 +27,7 @@ DoneButton = 0
 RaceTable = 0
 RaceCount = 0
 TopIndex = 0
+MyChar = 0
 #the size of the selection list
 LISTSIZE = 11
 
@@ -49,10 +50,11 @@ def DisplayRaces():
 
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
-	global RaceTable, RaceCount, TopIndex
+	global RaceTable, RaceCount, TopIndex, MyChar
 
-	ClassRow = GemRB.GetVar("Class")-1
-	Class = ClassTable.GetValue(ClassRow, 5)
+	MyChar = GemRB.GetVar ("Slot")
+	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
+	Class = ClassTable.FindValue (5, Class)
 	ClassName = ClassSkillsTable.GetRowName(Class)
 	TableName = ClassSkillsTable.GetValue(ClassName, "HATERACE")
 	if TableName == "*":
@@ -113,7 +115,6 @@ def NextPress():
 	if RaceWindow:
 		RaceWindow.Unload()
 	# save the hated race
-	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace"))
 
 	GemRB.SetNextScript("GUICG7") #mage spells

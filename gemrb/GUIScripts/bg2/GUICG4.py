@@ -19,8 +19,7 @@
 #
 #character generation, ability (GUICG4)
 import GemRB
-from GUICommonWindows import ClassTable, KitListTable, RaceTable
-from ie_stats import *
+from GUICommon import *
 
 AbilityWindow = 0
 TextAreaControl = 0
@@ -36,11 +35,12 @@ Maximum = 0
 Add = 0
 KitIndex = 0
 HasStrExtra = 0
+MyChar = 0
 
 def CalcLimits(Abidx):
 	global Minimum, Maximum, Add
 
-	Race = GemRB.GetVar("Race")-1
+	Race = RaceTable.FindValue (1, GemRB.GetPlayerStat (MyChar, IE_RACE) )
 	RaceName = RaceTable.GetRowName(Race)
 
 	Minimum = 3
@@ -108,15 +108,17 @@ def OnLoad():
 	global AbilityWindow, TextAreaControl, DoneButton
 	global PointsLeft, HasStrExtra
 	global AbilityTable, Abclasrq, Abclsmod, Abracerq, Abracead
-	global KitIndex, Minimum, Maximum
+	global KitIndex, Minimum, Maximum, MyChar
 	
 	Abracead = GemRB.LoadTableObject("ABRACEAD")
 	Abclsmod = GemRB.LoadTableObject("ABCLSMOD")
 	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
 	Abracerq = GemRB.LoadTableObject("ABRACERQ")
 
-	Kit = GemRB.GetVar("Class Kit")
-	Class = GemRB.GetVar("Class")-1
+	MyChar = GemRB.GetVar ("Slot")
+	Kit = GetKitIndex (MyChar)
+	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
+	Class = ClassTable.FindValue (5, Class)
 	if Kit == 0:
 		KitName = ClassTable.GetRowName(Class)
 	else:

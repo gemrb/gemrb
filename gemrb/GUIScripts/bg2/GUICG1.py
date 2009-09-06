@@ -24,11 +24,13 @@ from ie_stats import *
 GenderWindow = 0
 TextAreaControl = 0
 DoneButton = 0
+MyChar = 0
 
 def OnLoad():
-	global GenderWindow, TextAreaControl, DoneButton
+	global GenderWindow, TextAreaControl, DoneButton, MyChar
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
+	MyChar = GemRB.GetVar ("Slot")
 	#this hack will redraw the base CG window
 	GenderWindow = GemRB.LoadWindowObject(0)
 	PortraitButton = GenderWindow.GetControl(12)
@@ -98,8 +100,7 @@ def NextPress():
 	if GenderWindow:
 		GenderWindow.Unload()
 
-	MyChar = GemRB.GetVar ("Slot")
-        Gender = GemRB.GetVar ("Gender")
-        GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
+	Gender = GemRB.GetVar ("Gender")
+	GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
 	GemRB.SetNextScript("GUICG12") #appearance
 	return

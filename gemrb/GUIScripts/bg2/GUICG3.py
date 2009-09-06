@@ -19,24 +19,27 @@
 #
 #character generation, alignment (GUICG3)
 import GemRB
-from GUICommonWindows import ClassTable, KitListTable
-from ie_stats import *
+from GUICommon import *
 
 AlignmentWindow = 0
 TextAreaControl = 0
 DoneButton = 0
 AlignmentTable = 0
+MyChar = 0
 
 def OnLoad():
 	global AlignmentWindow, TextAreaControl, DoneButton
-	global AlignmentTable
+	global AlignmentTable, MyChar
 	
-	Kit = GemRB.GetVar("Class Kit")
+	MyChar = GemRB.GetVar ("Slot")
+	Kit = GetKitIndex (MyChar)
+	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
+	Class = ClassTable.FindValue (5, Class)
 	if Kit == 0:
-		Class = GemRB.GetVar("Class")-1
 		KitName = ClassTable.GetRowName(Class)
 	else:
-		KitName = KitListTable.GetValue(Kit, 0) #rowname is just a number
+		#rowname is just a number, first value row what we need here
+		KitName = KitListTable.GetValue(Kit, 0)
 
 	AlignmentOk = GemRB.LoadTableObject("ALIGNMNT")
 
@@ -44,13 +47,13 @@ def OnLoad():
 	AlignmentTable = GemRB.LoadTableObject("aligns")
 	AlignmentWindow = GemRB.LoadWindowObject(3)
 
-	for i in range(0,9):
+	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		Button.SetText(AlignmentTable.GetValue(i,0) )
 
-	for i in range(0,9):
+	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
 		if AlignmentOk.GetValue(KitName, AlignmentTable.GetValue(i, 4) ) != 0:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
@@ -96,7 +99,6 @@ def NextPress():
 	#       alignment abilities
 	Alignment = GemRB.GetVar ("Alignment")
 	AlignmentTable = GemRB.LoadTableObject ("aligns")
-	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment)
 
 	# use the alignment to apply starting reputation

@@ -6579,6 +6579,38 @@ static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( ret );
 }
 
+PyDoc_STRVAR( GemRB_DispelEffect__doc,
+"DispelEffect(PartyID, EffectName, Parameter2)\n\n"
+"Removes all effects from target whose opcode and second parameter matches the arguments." );
+
+static EffectRef work_ref;
+
+static PyObject* GemRB_DispelEffect(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, Parameter2;
+	const char *EffectName;
+
+	if (!PyArg_ParseTuple( args, "isi", &PartyID, &EffectName, &Parameter2 )) {
+		return AttributeError( GemRB_DispelEffect__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found!" );
+	}
+
+	work_ref.Name=EffectName;
+	work_ref.EffText=-1;
+	printf("Removing: %x %s(%d)\n",work_ref.EffText, EffectName, Parameter2);
+	actor->fxqueue.RemoveAllEffectsWithParam(work_ref, Parameter2);
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 
 PyDoc_STRVAR( GemRB_RemoveEffects__doc,
 "RemoveEffects(PartyID, SpellResRef)\n\n"
@@ -8984,8 +9016,6 @@ PyDoc_STRVAR( GemRB_ApplyEffect__doc,
 "This function could be used to add stats that are stored in effect blocks. "
 "The resource fields are optional.");
 
-static EffectRef work_ref;
-
 static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID;
@@ -9338,6 +9368,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CreateWorldMapControl, METH_VARARGS),
 	METHOD(DeleteControl, METH_VARARGS),
 	METHOD(DeleteSaveGame, METH_VARARGS),
+	METHOD(DispelEffect, METH_VARARGS),
 	METHOD(DisplayString, METH_VARARGS),
 	METHOD(DragItem, METH_VARARGS),
 	METHOD(DrawWindows, METH_NOARGS),

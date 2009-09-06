@@ -24,14 +24,19 @@ from LUCommon import *
 ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
+MyChar = 0
 
 def OnLoad():
-	global ClassWindow, TextAreaControl, DoneButton
+	global ClassWindow, TextAreaControl, DoneButton, MyChar
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ClassCount = ClassTable.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindowObject(2)
-	RaceName = RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
+
+	MyChar = GemRB.GetVar ("Slot")
+	Race = RaceTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
+	RaceName = RaceTable.GetRowName(Race)
+
+	ClassCount = ClassTable.GetRowCount()+1
 
 	j = 0
 	#radiobutton groups must be set up before doing anything else to them
@@ -111,8 +116,6 @@ def SetClass():
 	if ClassWindow:
 		ClassWindow.Unload()
 
-	MyChar = GemRB.GetVar ("Slot")
-
 	# find the class from the class table
 	ClassIndex = GemRB.GetVar ("Class") - 1
 	Class = ClassTable.GetValue (ClassIndex, 5)
@@ -151,17 +154,11 @@ def MultiClassPress():
 	return
 
 def ClassPress():
-	Class = GemRB.GetVar("Class")-1
-	#TextAreaControl.SetText(ClassTable.GetValue(Class,1) )
-	#DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-	#if no kit selection for this class, don't go to guicg22
-	#GemRB.DrawWindows()
 	SetClass()
 	GemRB.SetNextScript("GUICG22")
 	return
 
 def NextPress ():
-	Class = GemRB.GetVar("Class")-1
 	SetClass()
 	GemRB.SetNextScript("CharGen4") #alignment
 	return

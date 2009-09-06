@@ -20,8 +20,7 @@
 #character generation, class kit (GUICG22)
 
 import GemRB
-from GUICommonWindows import ClassTable, KitListTable, RaceTable
-from ie_stats import *
+from GUICommon import *
 
 KitWindow = 0
 TextAreaControl = 0
@@ -32,19 +31,23 @@ TopIndex = 0
 RowCount = 10
 KitTable = 0
 Init = 0
+MyChar = 0
 KitSelected = 0 #store clicked kit on redraw as number within RowCount
 EnhanceGUI = GemRB.GetVar("GUIEnhancements") #extra kit button and scroll bar toggle
 
 def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton
 	global SchoolList, ClassID
-	global RowCount, TopIndex, KitTable, Init
+	global RowCount, TopIndex, KitTable, Init, MyChar
 
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	RaceName = RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
-	Class = GemRB.GetVar("Class")-1
-	ClassName = ClassTable.GetRowName(Class)
-	ClassID = ClassTable.GetValue(Class, 5)
+	MyChar = GemRB.GetVar ("Slot")
+	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
+	RaceName = RaceTable.GetRowName(RaceTable.FindValue (3, Race) )
+
+	ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
+	ClassName = ClassTable.GetRowName (ClassTable.FindValue(5, ClassID) )
+
 	KitTable = GemRB.LoadTableObject("kittable")
 	KitTableName = KitTable.GetValue(ClassName, RaceName)
 	KitTable = GemRB.LoadTableObject(KitTableName,1)
@@ -230,7 +233,6 @@ def NextPress():
 		KitWindow.Unload()
 
 	#make gnomes always kitted
-	MyChar = GemRB.GetVar ("Slot")
 	KitIndex = GemRB.GetVar ("Class Kit")
 	MageSchool = GemRB.GetVar ("MAGESCHOOL")
 	if MageSchool and not KitIndex:

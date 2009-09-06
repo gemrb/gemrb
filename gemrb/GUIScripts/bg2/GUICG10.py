@@ -24,14 +24,18 @@ from LUCommon import *
 ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
+MyChar = 0
 
 def OnLoad():
-	global ClassWindow, TextAreaControl, DoneButton
+	global ClassWindow, TextAreaControl, DoneButton, MyChar
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ClassCount = ClassTable.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindowObject(10)
-	RaceName = RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
+
+	MyChar = GemRB.GetVar ("Slot")
+	ClassCount = ClassTable.GetRowCount()+1
+	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
+	RaceName = RaceTable.GetRowName(RaceTable.FindValue (3, Race) )
 
 	j=0
 	for i in range(1,ClassCount):
@@ -98,7 +102,6 @@ def NextPress():
 		ClassWindow.Unload()
 
 	# find the class from the class table
-	MyChar = GemRB.GetVar ("Slot")
 	ClassIndex = GemRB.GetVar ("Class") - 1
 	Class = ClassTable.GetValue (ClassIndex, 5)
 	#protect against barbarians
