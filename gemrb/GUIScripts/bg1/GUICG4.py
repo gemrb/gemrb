@@ -22,6 +22,7 @@ import GemRB
 
 from CharGenCommon import * 
 from GUICommon import CloseOtherWindow
+from GUICommonWindows import SetupHP
 
 
 AbilityWindow = 0
@@ -270,5 +271,6 @@ def NextPress():
 		StatID = AbilityTable.GetValue (i, 3)
 		StatValue = GemRB.GetVar ("Ability "+str(i))
 		GemRB.SetPlayerStat (MyChar, StatID, StatValue)
+	SetupHP(MyChar)
 	next()
 
