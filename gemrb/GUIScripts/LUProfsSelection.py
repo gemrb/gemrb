@@ -29,6 +29,7 @@ LUPROFS_TYPE_LEVELUP = 0
 LUPROFS_TYPE_LEVELUP_BG1 = 1
 LUPROFS_TYPE_DUALCLASS = 2
 LUPROFS_TYPE_CHARGEN = 3
+LUPROFS_TYPE_CHARGEN_BG1 = 4
 
 #refs to the script calling this
 ProfsWindow = 0
@@ -82,6 +83,17 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	ProfsType = type
 
 	if type == LUPROFS_TYPE_CHARGEN: #chargen
+		ProfsOffsetSum = 9
+		ProfsOffsetButton1 = 11
+		ProfsOffsetStar = 27
+		ProfsOffsetLabel = 1
+		ProfsOffsetPress = 69
+		ProfsNumButtons = 8
+		ProfsTextArea = ProfsWindow.GetControl (68)
+		ProfsTextArea.SetText (9588)
+		if (scroll):
+			ProfsScrollBar = ProfsWindow.GetControl (78)
+	elif type == LUPROFS_TYPE_CHARGEN_BG1: #chargen
 		ProfsOffsetSum = 9
 		ProfsOffsetButton1 = 11
 		ProfsOffsetStar = 27
@@ -353,7 +365,7 @@ def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 			OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x07
 			SaveProf = (OldProf << 3) | SaveProf
 		if SaveProf: # only save if we have a prof to save
-			if Type == LUPROFS_TYPE_LEVELUP_BG1:
+			if type == LUPROFS_TYPE_LEVELUP_BG1 or type == LUPROFS_TYPE_CHARGEN_BG1:
 				GemRB.SetPlayerStat (pc, profID, SaveProf)
 			else:
 				GemRB.ApplyEffect (pc, "Proficiency", SaveProf, ProfID)

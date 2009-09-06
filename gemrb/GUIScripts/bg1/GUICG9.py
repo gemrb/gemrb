@@ -48,7 +48,7 @@ def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
 			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
-	SetupProfsWindow (MyChar, LUPROFS_TYPE_CHARGEN, SkillWindow, RedrawSkills, [0,0,0], Levels,scroll=False,profTableOffset=0)
+	SetupProfsWindow (MyChar, LUPROFS_TYPE_CHARGEN_BG1, SkillWindow, RedrawSkills, [0,0,0], Levels,scroll=False,profTableOffset=0)
 
 	BackButton = SkillWindow.GetControl(77)
 	BackButton.SetText(15416)
@@ -62,18 +62,6 @@ def OnLoad():
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	SkillWindow.ShowModal(MODAL_SHADOW_NONE)
-	return
-
-def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
-	"""Updates the actor with the new proficiencies."""
-	ProfsTable = GemRB.LoadTableObject ("weapprof")
-
-	ProfCount = ProfsTable.GetRowCount()
-	for i in range(ProfCount): 
-		ProfID = ProfsTable.GetValue (i, 0)
-		SaveProf = GemRB.GetVar ("Prof "+str(i))
-		#print "prof" , ProfID, SaveProf
-		OldProf = GemRB.SetPlayerStat (pc, ProfID,SaveProf)
 	return
 
 def NextPress():
