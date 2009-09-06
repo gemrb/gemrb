@@ -135,5 +135,7 @@ def NextPress():
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar ("Class Kit")
-	GemRB.SetPlayerStat (MyChar, IE_KIT, KitIndex)
+	#the same as the unusable field
+	Kit = KitList.GetValue(KitIndex, 6)
+	GemRB.SetPlayerStat (MyChar, IE_KIT, Kit)
 	next()
