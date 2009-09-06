@@ -323,7 +323,7 @@ def OpenLevelUpWindow():
 	Level1 = []
 	for i in range (len (Level)):
 		Level1.append (Level[i]-LevelDiff[i])
-	SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP_BG1, LevelUpWindow, RedrawSkills, Level1, Level, False, 0)
+	SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP_BG1, LevelUpWindow, RedrawSkills, Level1, Level, 0, False, 0)
 	NewProfPoints = GemRB.GetVar ("ProfsPointsLeft")
 
 	#we autohide the skills and let SetupSkillsWindow show them if needbe

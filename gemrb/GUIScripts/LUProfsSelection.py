@@ -202,7 +202,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		#we only need the low 3 bits for profeciencies on levelup; otherwise
 		#we just set them all to 0
 		currentprof = 0
-		if type == LUPROFS_TYPE_LEVELUP:
+		if type == LUPROFS_TYPE_LEVELUP or type == LUPROFS_TYPE_LEVELUP_BG1:
 			stat = ProfsTable.GetValue (i+ProfsTableOffset, 0)
 			if GameIsBG1():
 				stat = stat + IE_PROFICIENCYBASTARDSWORD
