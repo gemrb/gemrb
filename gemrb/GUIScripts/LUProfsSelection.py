@@ -353,7 +353,10 @@ def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 			OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x07
 			SaveProf = (OldProf << 3) | SaveProf
 		if SaveProf: # only save if we have a prof to save
-			GemRB.ApplyEffect (pc, "Proficiency", SaveProf, ProfID)
+			if Type == LUPROFS_TYPE_LEVELUP_BG1:
+				GemRB.SetPlayerStat (pc, profID, SaveProf)
+			else:
+				GemRB.ApplyEffect (pc, "Proficiency", SaveProf, ProfID)
 	return
 
 def ProfsNullify ():
