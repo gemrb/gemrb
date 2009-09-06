@@ -61,7 +61,7 @@ class Actor:
 
 			#set the MC_WAS_ID of the first class
 			if len(classnames) == 2:
-				dualswap[classid] = ClassTable.GetValue (i, 6)
+				dualswap[classid-1] = ClassTable.GetValue (i, 8)
 
 	def Classes (self):
 		"""Returns a list with all the class IDs."""
