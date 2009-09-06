@@ -341,7 +341,6 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append (None)
 		for i in range (Multi[0]):
 			ClassIndex = ClassTable.FindValue (5, Multi[i+1])
-			print "AAAAA", ClassIndex, Multi
 			ClassTitle = GemRB.GetString (ClassTable.GetValue (ClassIndex, 2))
 			GemRB.SetToken ("CLASS", ClassTitle)
 			Class = ClassTable.GetRowName (ClassIndex)
