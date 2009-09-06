@@ -203,7 +203,10 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		#we just set them all to 0
 		currentprof = 0
 		if type == LUPROFS_TYPE_LEVELUP:
-			currentprof = GemRB.GetPlayerStat (pc, ProfsTable.GetValue (i+ProfsTableOffset, 0))&0x07
+			stat = ProfsTable.GetValue (i+ProfsTableOffset, 0)
+			if GameIsBG1():
+				stat = stat + IE_PROFICIENCYBASTARDSWORD
+			currentprof = GemRB.GetPlayerStat (pc, stat)&0x07
 		else:
 			#rangers always get 2 points in 2 weapons style
 			if (i+ProfsTableOffset) == TwoWeapIndex and "RANGER" in ClassName.split("_"):
@@ -338,7 +341,7 @@ def ProfsLeftPress():
 	MaxProf = ProfsTable.GetValue(Pos+ProfsTableOffset, ProfsColumn) #we add the bg1 skill count offset
 	if MaxProf>5:
 		MaxProf = 5
-	if GameIsBG1() and (MaxProf>2) and (ProfsType == LUPROFS_TYPE_CHARGEN):
+	if (MaxProf>2) and (ProfsType == LUPROFS_TYPE_CHARGEN_BG1):
 		MaxProf = 2
 
 	ActPoint = GemRB.GetVar("Prof "+str(Pos) )
@@ -357,7 +360,7 @@ def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 	ProfCount = ProfsTable.GetRowCount () - ProfsTableOffset + 1
 	for i in range(ProfCount): # skip bg1 weapprof.2da proficiencies
 		ProfID = ProfsTable.GetValue (i+ProfsTableOffset, 0)
-		if type == LUPROFS_TYPE_LEVELUP_BG1 or type == LUPROFS_TYPE_CHARGEN_BG1:
+		if GameIsBG1():
 			ProfID = ProfID + IE_PROFICIENCYBASTARDSWORD
 		SaveProf = GemRB.GetVar ("Prof "+str(i))
 		if type != LUPROFS_TYPE_DUALCLASS:
