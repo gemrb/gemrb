@@ -4008,7 +4008,10 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 			}
 
 			if (slottype&SLOT_WEAPON) {
+				//melee
 				if (item->GetWeaponHeader(false)) ret = 1;
+				//ranged
+				if (item->GetWeaponHeader(true)) ret = 1;
 			}
 
 			if (slottype&SLOT_ITEM) {
