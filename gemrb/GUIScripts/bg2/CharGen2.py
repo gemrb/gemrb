@@ -26,15 +26,6 @@ def OnLoad():
 	GemRB.SetVar ("Race",0) #race
 	GemRB.SetPlayerStat (MyChar, IE_RACE, 0)
 
-	# save that stats we would have gotten:
-	#	gender
-	Gender = GemRB.GetVar ("Gender")
-	GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
-
-	# diagnostic output
-	print "CharGen2 output:"
-	print "\tGender: ",Gender
-
 	DisplayOverview (2)
 
 	return

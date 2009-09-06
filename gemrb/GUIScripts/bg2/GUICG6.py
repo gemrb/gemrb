@@ -75,6 +75,11 @@ def BackPress():
 def NextPress():
 	if SkillWindow:
 		SkillWindow.Unload()
-	GemRB.SetNextScript("GUICG9") #weapon proficiencies
+	# save all skills
+
+	MyChar = GemRB.GetVar ("Slot")
+	SkillsSave (MyChar)
+
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
+	GemRB.SetNextScript("GUICG9") #weapon proficiencies
 	return

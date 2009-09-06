@@ -46,22 +46,6 @@ def OnLoad():
 	# print our diagnostic as we loop (so as not to duplicate)
 	print "CharGen6 output:"
 
-	for i in range (AbilityCount):
-		StatID = AbilityTable.GetValue (i, 3)
-		StatName = AbilityTable.GetRowName (i)
-		StatValue = GemRB.GetVar ("Ability "+str(i))
-		GemRB.SetPlayerStat (MyChar, StatID, StatValue)
-		print "\t",StatName,":\t", StatValue
-
-	# TODO: don't all chars have an str mod, even if it isn't applied?
-	#	so it should be the cores duty to decide whether or not the char
-	#	has 18 str in game and adjust accordingly; you wouldn't want an
-	#	18/00 char use draw upon holy might to boost his str, then have
-	#	it re-roll when it comes back to normal
-	# apply our extra str
-	GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
-	print "\tSTREXTRA:\t",GemRB.GetVar ("StrExtra")
-
 	#remove all known spells and nullify the memorizable counts
 	RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1,9, 1)
 	RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)

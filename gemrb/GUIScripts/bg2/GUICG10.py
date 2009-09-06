@@ -19,7 +19,7 @@
 #
 #character generation, multi-class (GUICG10)
 import GemRB
-from GUICommonWindows import ClassTable, RaceTable
+from LUCommon import *
 
 ClassWindow = 0
 TextAreaControl = 0
@@ -96,5 +96,14 @@ def BackPress():
 def NextPress():
 	if ClassWindow:
 		ClassWindow.Unload()
+
+	# find the class from the class table
+	MyChar = GemRB.GetVar ("Slot")
+	ClassIndex = GemRB.GetVar ("Class") - 1
+	Class = ClassTable.GetValue (ClassIndex, 5)
+	#protect against barbarians
+	ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class) )
+	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
+
 	GemRB.SetNextScript("CharGen4") #alignment
 	return

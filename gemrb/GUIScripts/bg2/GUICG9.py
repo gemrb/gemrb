@@ -66,5 +66,9 @@ def BackPress():
 def NextPress():
 	if SkillWindow:
 		SkillWindow.Unload()
+
+	MyChar = GemRB.GetVar ("Slot")
+	ProfsSave (MyChar, LUPROFS_TYPE_CHARGEN)
+
 	GemRB.SetNextScript("CharGen7") #appearance
 	return

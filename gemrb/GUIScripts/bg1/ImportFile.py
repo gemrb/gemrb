@@ -62,7 +62,7 @@ def DonePress():
 	FileName = TextAreaControl.QueryText()
 	Slot = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
+	GemRB.SetToken("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1) )
+	GemRB.SetToken("LargePortrait", GemRB.GetPlayerPortrait (Slot, 0) )
 	jumpTo("name")
-        GemRB.SetToken("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1) )
-        GemRB.SetToken("LargePortrait", GemRB.GetPlayerPortrait (Slot, 0) )
 	return

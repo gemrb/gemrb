@@ -20,21 +20,7 @@
 #character generation - skills/profs/spells; next apearance/sound (CharGen7)
 import GemRB
 from CharGenCommon import *
-from LUSkillsSelection import *
 
 def OnLoad():
-	MyChar = GemRB.GetVar ("Slot")
-
-	# we're gonna output diagnostics as we go
-	print "CharGen7 output:"
-
-	# save the hated race
-	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace"))
-	print "\tHated Race: ",GemRB.GetVar ("HatedRace")
-
-	# save all skills
-	SkillsSave (MyChar)
-
 	DisplayOverview (7)
-
 	return

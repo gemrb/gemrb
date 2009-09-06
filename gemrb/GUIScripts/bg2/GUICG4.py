@@ -20,6 +20,7 @@
 #character generation, ability (GUICG4)
 import GemRB
 from GUICommonWindows import ClassTable, KitListTable, RaceTable
+from ie_stats import *
 
 AbilityWindow = 0
 TextAreaControl = 0
@@ -284,8 +285,34 @@ def BackPress():
 def NextPress():
 	if AbilityWindow:
 		AbilityWindow.Unload()
-	GemRB.SetNextScript("CharGen6") #
+	# save our previous stats:
+	#       abilities
+	AbilityTable = GemRB.LoadTableObject ("ability")
+	AbilityCount = AbilityTable.GetRowCount ()
+
+	# print our diagnostic as we loop (so as not to duplicate)
+	print "CharGen6 output:"
+	
+	MyChar = GemRB.GetVar ("Slot")
+
+	for i in range (AbilityCount):
+		StatID = AbilityTable.GetValue (i, 3)
+		StatName = AbilityTable.GetRowName (i)
+		StatValue = GemRB.GetVar ("Ability "+str(i))
+		GemRB.SetPlayerStat (MyChar, StatID, StatValue)
+		print "\t",StatName,":\t", StatValue
+
+	# TODO: don't all chars have an str mod, even if it isn't applied?
+	#       so it should be the cores duty to decide whether or not the char
+	#       has 18 str in game and adjust accordingly; you wouldn't want an
+	#       18/00 char use draw upon holy might to boost his str, then have
+	#       it re-roll when it comes back to normal
+	# apply our extra str
+	GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
+	print "\tSTREXTRA:\t",GemRB.GetVar ("StrExtra")
+
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
+	GemRB.SetNextScript("CharGen6") #
 	return
 
 def OverPress0():

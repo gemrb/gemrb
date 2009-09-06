@@ -35,29 +35,6 @@ def OnLoad():
 		StatID = AbilityTable.GetValue (i, 3)
 		GemRB.SetPlayerStat (MyChar, StatID, 0)
 
-	# save previous stats:
-	#	alignment
-	#	reputation
-	#	alignment abilities
-	Alignment = GemRB.GetVar ("Alignment")
-	AlignmentTable = GemRB.LoadTableObject ("aligns")
-	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment)
-
-	# use the alignment to apply starting reputation
-	RepTable = GemRB.LoadTableObject ("repstart")
-	AlignmentAbbrev = AlignmentTable.FindValue (3, Alignment)
-	Rep = RepTable.GetValue (AlignmentAbbrev, 0) * 10
-	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, Rep)
-
-	# set the party rep if this in the main char
-	if MyChar == 1:
-		GemRB.GameSetReputation (Rep)
-
-	# diagnostic output
-	print "CharGen5 output:"
-	print "\tAlignment: ",Alignment
-	print "\tReputation: ",Rep
-
 	DisplayOverview (5)
 
 	return

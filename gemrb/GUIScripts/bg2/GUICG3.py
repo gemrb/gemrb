@@ -20,6 +20,7 @@
 #character generation, alignment (GUICG3)
 import GemRB
 from GUICommonWindows import ClassTable, KitListTable
+from ie_stats import *
 
 AlignmentWindow = 0
 TextAreaControl = 0
@@ -82,12 +83,36 @@ def AlignmentPress():
 def BackPress():
 	if AlignmentWindow:
 		AlignmentWindow.Unload()
-	GemRB.SetNextScript("CharGen4")
 	GemRB.SetVar("Alignment",-1)  #scrapping the alignment value
+	GemRB.SetNextScript("CharGen4")
 	return
 
 def NextPress():
 	if AlignmentWindow:
 		AlignmentWindow.Unload()
+	# save previous stats:
+	#       alignment
+	#       reputation
+	#       alignment abilities
+	Alignment = GemRB.GetVar ("Alignment")
+	AlignmentTable = GemRB.LoadTableObject ("aligns")
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment)
+
+	# use the alignment to apply starting reputation
+	RepTable = GemRB.LoadTableObject ("repstart")
+	AlignmentAbbrev = AlignmentTable.FindValue (3, Alignment)
+	Rep = RepTable.GetValue (AlignmentAbbrev, 0) * 10
+	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, Rep)
+
+	# set the party rep if this in the main char
+	if MyChar == 1:
+		GemRB.GameSetReputation (Rep)
+
+	# diagnostic output
+	print "CharGen5 output:"
+	print "\tAlignment: ",Alignment
+	print "\tReputation: ",Rep
+
 	GemRB.SetNextScript("CharGen5") #appearance
 	return

@@ -33,16 +33,6 @@ def OnLoad():
 	GemRB.SetPlayerStat (MyChar, IE_LEVEL2, 0)
 	GemRB.SetPlayerStat (MyChar, IE_LEVEL3, 0)
 
-	# set new stats:
-	#	race
-	Race = GemRB.GetVar ("Race") - 1
-	GemRB.SetPlayerStat (MyChar, IE_RACE, RaceTable.GetValue (Race, 3))
-
-	# diagnostic output
-	print "CharGen3 output:"
-	print "\tRace: ",Race
-	print "\tRace Name: ",RaceTable.GetRowName (Race)
-
 	DisplayOverview (3)
 
 	return

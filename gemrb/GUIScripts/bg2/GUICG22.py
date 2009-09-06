@@ -21,6 +21,7 @@
 
 import GemRB
 from GUICommonWindows import ClassTable, KitListTable, RaceTable
+from ie_stats import *
 
 KitWindow = 0
 TextAreaControl = 0
@@ -227,5 +228,19 @@ def BackPress():
 def NextPress():
 	if KitWindow:
 		KitWindow.Unload()
+
+	#make gnomes always kitted
+	MyChar = GemRB.GetVar ("Slot")
+	KitIndex = GemRB.GetVar ("Class Kit")
+	MageSchool = GemRB.GetVar ("MAGESCHOOL")
+	if MageSchool and not KitIndex:
+		SchoolTable = GemRB.LoadTableObject ("magesch")
+		KitIndex = KitListTable.FindValue (6, SchoolTable.GetValue (MageSchool, 3) )
+
+	#save the kit
+	KitValue = (0x4000 + KitIndex)
+	KitName = KitListTable.GetValue (KitIndex, 0)
+	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
+
 	GemRB.SetNextScript("CharGen4") #abilities
 	return

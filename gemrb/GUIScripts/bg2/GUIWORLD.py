@@ -385,8 +385,8 @@ def RemovePlayer ():
 
 def RemovePlayerConfirm ():
 	slot = GemRB.GetVar ("Selected")
-        GemRB.LeaveParty (slot, 2)
-        OpenReformPartyWindow ()
+	GemRB.LeaveParty (slot, 2)
+	OpenReformPartyWindow ()
 	return
 
 def RemovePlayerCancel ():

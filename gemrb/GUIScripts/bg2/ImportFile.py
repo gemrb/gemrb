@@ -63,6 +63,8 @@ def DonePress():
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
 	if ImportWindow:
 		ImportWindow.Unload()
+	GemRB.SetToken("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1) )
+	GemRB.SetToken("LargePortrait", GemRB.GetPlayerPortrait (Slot, 0) )
 	GemRB.SetNextScript("CharGen7")
 	return
 	

@@ -19,7 +19,7 @@
 #
 #character generation, class (GUICG2)
 import GemRB
-from GUICommonWindows import ClassTable, RaceTable
+from LUCommon import *
 
 ClassWindow = 0
 TextAreaControl = 0
@@ -100,6 +100,49 @@ def OnLoad():
 	ClassWindow.SetVisible(1)
 	return
 
+def BackPress():
+	if ClassWindow:
+		ClassWindow.Unload()
+	GemRB.SetNextScript("CharGen3")
+	GemRB.SetVar("Class",0)  #scrapping the class value
+	return
+
+def SetClass():
+	if ClassWindow:
+		ClassWindow.Unload()
+
+	MyChar = GemRB.GetVar ("Slot")
+
+	# find the class from the class table
+	ClassIndex = GemRB.GetVar ("Class") - 1
+	Class = ClassTable.GetValue (ClassIndex, 5)
+	#protect against barbarians
+	ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class) )
+	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
+	#assign the correct XP
+	if GameIsTOB():
+		GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (ClassName, "STARTXP2"))
+	else:
+		GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (ClassName, "STARTXP"))
+
+	#create an array to get all the classes from
+	NumClasses = 1
+	IsMulti = IsMultiClassed (MyChar, 1)
+	if IsMulti[0] > 1:
+		NumClasses = IsMulti[0]
+		Classes = [IsMulti[1], IsMulti[2], IsMulti[3]]
+	else:
+		Classes = [GemRB.GetPlayerStat (MyChar, IE_CLASS)]
+
+	#loop through each class and update it's level
+	xp = GemRB.GetPlayerStat (MyChar, IE_XP)/NumClasses
+	for i in range (NumClasses):
+		CurrentLevel = GetNextLevelFromExp (xp, Classes[i])
+		if i == 0:
+			GemRB.SetPlayerStat (MyChar, IE_LEVEL, CurrentLevel)
+		elif i <= 2:
+			GemRB.SetPlayerStat (MyChar, IE_LEVEL2+i-1, CurrentLevel)
+
 def MultiClassPress():
 	GemRB.SetVar("Class Kit",0)
 	if ClassWindow:
@@ -109,24 +152,16 @@ def MultiClassPress():
 
 def ClassPress():
 	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(ClassTable.GetValue(Class,1) )
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	#TextAreaControl.SetText(ClassTable.GetValue(Class,1) )
+	#DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	#if no kit selection for this class, don't go to guicg22
-	GemRB.DrawWindows()
-	if ClassWindow:
-		ClassWindow.Unload()
+	#GemRB.DrawWindows()
+	SetClass()
 	GemRB.SetNextScript("GUICG22")
 	return
 
-def BackPress():
-	if ClassWindow:
-		ClassWindow.Unload()
-	GemRB.SetNextScript("CharGen3")
-	GemRB.SetVar("Class",0)  #scrapping the class value
-	return
-
-def NextPress():
-	if ClassWindow:
-		ClassWindow.Unload()
+def NextPress ():
+	Class = GemRB.GetVar("Class")-1
+	SetClass()
 	GemRB.SetNextScript("CharGen4") #alignment
 	return

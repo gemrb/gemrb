@@ -20,6 +20,7 @@
 #character generation, color (GUICG13)
 import GemRB
 from GUICommonWindows import ClassTable
+from ie_stats import *
 
 global IE_ANIM_ID
 ColorTable = 0
@@ -42,14 +43,16 @@ IE_ANIM_ID = 206
 def RefreshPDoll():
 	PDollTable = GemRB.LoadTableObject("pdolls")
 	AnimID = 0x6000
+	MyChar = GemRB.GetVar ("Slot")
 	table = GemRB.LoadTableObject("avprefr")
-	AnimID = AnimID+table.GetValue(GemRB.GetVar("Race"),0)
+	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
+	AnimID = AnimID+table.GetValue(Race, 0)
 	table = GemRB.LoadTableObject("avprefc")
-	ClassIndex = GemRB.GetVar ("Class")-1
-	Class = ClassTable.GetValue(ClassIndex, 5)
+	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 	AnimID = AnimID+table.GetValue(Class, 0)
 	table = GemRB.LoadTableObject("avprefg")
-	AnimID = AnimID+table.GetValue(GemRB.GetVar("Gender"),0)
+	Gender = GemRB.GetPlayerStat (MyChar, IE_SEX)
+	AnimID = AnimID+table.GetValue(Gender,0)
 	ResRef = PDollTable.GetValue(hex(AnimID), "LEVEL1")
 
 	PDollButton.SetPLT(ResRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)

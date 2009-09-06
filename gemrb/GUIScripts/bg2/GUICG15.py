@@ -105,12 +105,16 @@ def RacePress():
 def BackPress():
 	if RaceWindow:
 		RaceWindow.Unload()
-	GemRB.SetVar("HatedRace",0) #scrapping the race value
+	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, 0) #scrapping the race value
 	GemRB.SetNextScript("CharGen6")
 	return
 
 def NextPress():
 	if RaceWindow:
 		RaceWindow.Unload()
+	# save the hated race
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace"))
+
 	GemRB.SetNextScript("GUICG7") #mage spells
 	return

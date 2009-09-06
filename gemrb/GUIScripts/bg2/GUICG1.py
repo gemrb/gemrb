@@ -19,6 +19,7 @@
 #
 #character generation, gender (GUICG1)
 import GemRB
+from ie_stats import *
 
 GenderWindow = 0
 TextAreaControl = 0
@@ -96,5 +97,9 @@ def BackPress():
 def NextPress():
 	if GenderWindow:
 		GenderWindow.Unload()
+
+	MyChar = GemRB.GetVar ("Slot")
+        Gender = GemRB.GetVar ("Gender")
+        GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
 	GemRB.SetNextScript("GUICG12") #appearance
 	return
