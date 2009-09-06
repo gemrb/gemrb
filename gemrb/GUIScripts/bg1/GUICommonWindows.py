@@ -24,6 +24,7 @@
 ###################################################
 
 import GemRB
+from math import ceil
 from GUIDefines import *
 from ie_stats import *
 from ie_modal import *
@@ -40,6 +41,7 @@ ActionsWindow = None
 DraggedPortrait = None
 
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
+	"""Sets up all of the basic control windows."""
 	global OptionsWindow
 
 	OptionsWindow = Window
@@ -118,7 +120,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	
 	#gears
 	if Gears:
-		# Pendulum, gears, sun/moon dial  (time)
+		# Pendulum, gears, sun/moon dial (time)
 		# FIXME: display all animations: CPEN, CGEAR, CDIAL
 		Button = Window.GetControl (9)
 		Button.SetAnimation ("CGEAR")
@@ -365,6 +367,7 @@ def ActionRightPressed ():
 	return
 
 def ActionBardSongPressed ():
+	"""Toggles the battle song."""
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
 	UpdateActionsWindow ()
@@ -490,8 +493,11 @@ def OpenPortraitWindow (needcontrols):
 
 	PortraitWindow = Window = GemRB.LoadWindowObject (1)
 
-	# AI
 	if needcontrols:
+		#Button=Window.GetControl (8)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
+
+		# AI
 		Button = Window.GetControl (6)
 		GSFlags = GemRB.GetMessageWindowSize ()&GS_PARTYAI
 		Button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
@@ -509,12 +515,10 @@ def OpenPortraitWindow (needcontrols):
 		Button.SetTooltip (10485)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
 
-	pc = GemRB.GameGetSelectedPCSingle ()
-	Inventory = GemRB.GetVar ("Inventory")
-
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
-		Button.SetVarAssoc ("PressedPortrait", i)
+		Button.SetFont ("STATES2")
+		Button.SetVarAssoc ("PressedPortrait", i+1)
 
 		if (needcontrols):
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenInventoryWindowClick")
@@ -527,11 +531,6 @@ def OpenPortraitWindow (needcontrols):
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, "PortraitButtonOnDrag")
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
-		if Inventory and pc != i+1:
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
-			Button.SetText ("")
-			Button.SetTooltip ("")
 
 		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
@@ -541,16 +540,19 @@ def OpenPortraitWindow (needcontrols):
 	return Window
 
 def UpdatePortraitWindow ():
+	"""Updates all of the portraits."""
+
 	Window = PortraitWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Inventory = GemRB.GetVar ("Inventory")
 
-	for i in range (PARTY_SIZE):
-		Button = Window.GetControl (i)
-		pic = GemRB.GetPlayerPortrait (i+1, 1)
-		if Inventory and pc != i+1:
+	for portid in range (PARTY_SIZE):
+		Button = Window.GetControl (portid)
+		pic = GemRB.GetPlayerPortrait (portid+1, 1)
+		if Inventory and pc != portid+1:
 			pic = None
+
 		if not pic:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -561,9 +563,9 @@ def UpdatePortraitWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_HORIZONTAL|IE_GUI_BUTTON_DRAGGABLE, OP_SET)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetPicture (pic, "NOPORTSM")
-		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
-		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
-		state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
+		hp = GemRB.GetPlayerStat (portid+1, IE_HITPOINTS)
+		hp_max = GemRB.GetPlayerStat (portid+1, IE_MAXHITPOINTS)
+		state = GemRB.GetPlayerStat (portid+1, IE_STATE_ID)
 
 		if (hp_max<1):
 			ratio = 0.0
@@ -574,30 +576,60 @@ def UpdatePortraitWindow ():
 			Button.SetOverlay (ratio, 64,64,64,200, 64,64,64,200)
 		else:
 			Button.SetOverlay (ratio, 255,0,0,200, 128,0,0,200)
-		Button.SetTooltip (GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
+		Button.SetTooltip (GemRB.GetPlayerName (portid+1, 1) + "\n%d/%d" %(hp, hp_max))
+
+		#add effects on the portrait
+		effects = GemRB.GetPlayerStates (portid+1)
+		states = ""
+		for col in range(len(effects)):
+			states = effects[col:col+1] + states
+			if col % 3 == 2: states = "\n" + states
+		for x in range(3 - (len(effects)/3)):
+			states = "\n" + states
+		states = "\n" + states
+
+		# blank space
+		flag = chr(38)
+
+		# shopping icon
+		if pc==portid+1:
+			if GemRB.GetStore()!=None:
+				flag = chr(37)
+		# talk icon
+		if GemRB.GameGetSelectedPCSingle(1)==portid+1:
+			flag = chr(37)
+
+		if CanLevelUp (portid+1):
+			states = flag+chr(238)+chr(39) + states
+		else:
+			states = flag+chr(238)+chr(238) + states
+		Button.SetText(states)
 	return
 
 def PortraitButtonOnDrag ():
 	global DraggedPortrait
 
 	#they start from 1
-	DraggedPortrait = GemRB.GetVar ("PressedPortrait")+1
+	DraggedPortrait = GemRB.GetVar ("PressedPortrait")
 	GemRB.DragItem (DraggedPortrait, -1, "")
 	return
 
 def PortraitButtonOnPress ():
 	i = GemRB.GetVar ("PressedPortrait")
 	
+	if not i:
+		return
+
 	if GemRB.GameControlGetTargetMode() != TARGET_MODE_NONE:
-		GemRB.ActOnPC(i+1)
+		GemRB.ActOnPC (i)
 		return
 
 	if (not SelectionChangeHandler):
-		if GemRB.GameIsPCSelected (i+1):
+		if GemRB.GameIsPCSelected (i):
 			GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_OR)
-		GemRB.GameSelectPC (i + 1, True, SELECT_REPLACE)
+		GemRB.GameSelectPC (i, True, SELECT_REPLACE)
 	else:
-		GemRB.GameSelectPCSingle (i + 1)
+		GemRB.GameSelectPCSingle (i)
 		SelectionChanged ()
 		RunSelectionChangeHandler ()
 	return
@@ -605,12 +637,15 @@ def PortraitButtonOnPress ():
 def PortraitButtonOnShiftPress ():
 	i = GemRB.GetVar ("PressedPortrait")
 
+	if not i:
+		return
+
 	if (not SelectionChangeHandler):
-		sel = GemRB.GameIsPCSelected (i + 1)
+		sel = GemRB.GameIsPCSelected (i)
 		sel = not sel
-		GemRB.GameSelectPC (i + 1, sel)
+		GemRB.GameSelectPC (i, sel)
 	else:
-		GemRB.GameSelectPCSingle (i + 1)
+		GemRB.GameSelectPCSingle (i)
 		SelectionChanged ()
 		RunSelectionChangeHandler ()
 	return
@@ -641,12 +676,14 @@ def PortraitButtonOnMouseEnter ():
 	global DraggedPortrait
 
 	i = GemRB.GetVar ("PressedPortrait")
-
-	if DraggedPortrait != None:
-		GemRB.DragItem (0, -1, "")
-		#this might not work
-		GemRB.SwapPCs (DraggedPortrait, i+1)
-		DraggedPortrait = None
+	if GemRB.IsDraggingItem()==2:
+		if DraggedPortrait != None:
+			GemRB.SwapPCs (DraggedPortrait, i)
+			GemRB.SetVar ("PressedPortrait", DraggedPortrait)
+			DraggedPortrait = i
+			GemRB.SetTimedEvent ("CheckDragging",1)
+		else:
+			OnDropItemToPC2()
 		return
 
 	if GemRB.IsDraggingItem ():
@@ -654,13 +691,299 @@ def PortraitButtonOnMouseEnter ():
 		Button.EnableBorder (FRAME_PC_TARGET, 1)
 	return
 
+def OnDropItemToPC2 ():
+	GemRB.SetVar ("PressedPortrait",0)
+	GemRB.DragItem (0, -1, "")
+	DraggedPortrait = None
+	return
+
+def CheckDragging():
+	"""Contains portrait dragging in case of mouse out-of-range."""
+
+	global DraggedPortrait
+
+	i = GemRB.GetVar ("PressedPortrait")
+	if not i:
+		GemRB.DragItem (0, -1, "")
+
+	if GemRB.IsDraggingItem()!=2:
+		DraggedPortrait = None
+	return
+
 def PortraitButtonOnMouseLeave ():
 	i = GemRB.GetVar ("PressedPortrait")
-	Button = PortraitWindow.GetControl (i)
+	if not i:
+		return
+
+	Button = PortraitWindow.GetControl (i-1)
 	Button.EnableBorder (FRAME_PC_TARGET, 0)
+	GemRB.SetVar ("PressedPortrait", 0)
+	GemRB.SetTimedEvent ("CheckDragging",1)
+	return
+
+def SetupThaco (pc, Level=None):
+	"""Updates an actors THAC0 based upon level.
+
+	Level should contain the actors current level.
+	If Level is None it is filled with the actors current level."""
+
+	#storing levels as an array makes them easier to deal with
+	if not Level:
+		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL)-1, \
+			GemRB.GetPlayerStat (pc, IE_LEVEL2)-1, \
+			GemRB.GetPlayerStat (pc, IE_LEVEL3)-1]
+	else:
+		Levels = []
+		for level in Level:
+			Levels.append (level-1)
+
+	#get some basic values
+	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
+	ThacoTable = GemRB.LoadTableObject ("THAC0")
+
+	#adjust the class for multi/dual chars
+	Multi = IsMultiClassed (pc, 1)
+	Dual = IsDualClassed (pc, 1)
+	NumClasses = 1
+	if Multi[0]>1: #get each of the multi-classes
+		NumClasses = Multi[0]
+		Class = [Multi[1], Multi[2], Multi[3]]
+	elif Dual[0]: #only worry about the newer class
+		Class = [ClassTable.GetValue (Dual[2], 5)]
+		#assume Level is correct if passed
+		if IsDualSwap(pc) and not Level:
+			Levels = [Levels[1], Levels[0], Levels[2]]
+	if NumClasses>len(Levels):
+		return
+
+	#make sure to limit the levels to the table allowable
+	MaxLevel = ThacoTable.GetColumnCount ()-1
+	for i in range (len(Levels)):
+		if Levels[i] > MaxLevel:
+			Levels[i] = MaxLevel
+
+	CurrentThaco = GemRB.GetPlayerStat (pc, IE_TOHIT, 1)
+	NewThaco = 0
+	for i in range (NumClasses):
+		#loop through each class and update the save value if we have
+		#a better thac0
+		ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class[i]))
+		TmpThaco = ThacoTable.GetValue (ClassName, str(Levels[i]+1))
+		if TmpThaco < CurrentThaco:
+			NewThaco = 1
+			CurrentThaco = TmpThaco
+
+	#only update if we have a better thac0
+	if NewThaco:
+		GemRB.SetPlayerStat (pc, IE_TOHIT, CurrentThaco)
+	return
+
+def SetupLore (pc, LevelDiff=None):
+	"""Updates an actors lore based upon level.
+
+	Level should contain the actors current level.
+	LevelDiff should contain the change in levels.
+	Level and LevelDiff must be of the same length.
+	If either are None, they are filled with the actors current level."""
+
+	#storing levels as an array makes them easier to deal with
+	if not LevelDiff:
+		LevelDiffs = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL2), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
+	else:
+		LevelDiffs = []
+		for diff in LevelDiff:
+			LevelDiffs.append (diff)
+
+	#get some basic values
+	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
+	LoreTable = GemRB.LoadTableObject ("lore")
+
+	#adjust the class for multi/dual chars
+	Multi = IsMultiClassed (pc, 1)
+	Dual = IsDualClassed (pc, 1)
+	NumClasses = 1
+	if Multi[0]>1: #get each of the multi-classes
+		NumClasses = Multi[0]
+		Class = [Multi[1], Multi[2], Multi[3]]
+	elif Dual[0]: #only worry about the newer class
+		Class = [ClassTable.GetValue (Dual[2], 5)]
+		#if LevelDiff is passed, we assume it is correct
+		if IsDualSwap(pc) and not LevelDiff:
+			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]
+	if NumClasses>len(LevelDiffs):
+		return
+
+	#loop through each class and update the lore value if we have
+	CurrentLore = GemRB.GetPlayerStat (pc, IE_LORE, 1)
+	for i in range (NumClasses):
+		#correct unlisted progressions
+		ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class[i]) )
+		if ClassName == "SORCERER":
+			ClassName = "MAGE"
+		elif ClassName == "MONK": #monks have a rate of 1, so this is arbitrary
+			ClassName = "CLERIC"
+
+		#add the lore from this class to the total lore
+		TmpLore = LevelDiffs[i] * LoreTable.GetValue (ClassName, "RATE", 1)
+		if TmpLore:
+			CurrentLore += TmpLore
+
+	#update our lore value
+	GemRB.SetPlayerStat (pc, IE_LORE, CurrentLore)
+	return
+
+def SetupHP (pc, Level=None, LevelDiff=None):
+	"""Updates an actors hp based upon level.
+
+	Level should contain the actors current level.
+	LevelDiff should contain the change in levels.
+	Level and LevelDiff must be of the same length.
+	If either are None, they are filled with the actors current level."""
+
+	#storing levels as an array makes them easier to deal with
+	if not Level:
+		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL2), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
+	else:
+		Levels = []
+		for level in Level:
+			Levels.append (level)
+	if not LevelDiff:
+		LevelDiffs = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL2), \
+			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
+	else:
+		LevelDiffs = []
+		for diff in LevelDiff:
+			LevelDiffs.append (diff)
+	if len (Levels) != len (LevelDiffs):
+		return
+
+	#get some basic values
+	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
+		
+	#adjust the class for multi/dual chars
+	Multi = IsMultiClassed (pc, 1)
+	Dual = IsDualClassed (pc, 1)
+	NumClasses = 1
+	if Multi[0]>1: #get each of the multi-classes
+		NumClasses = Multi[0]
+		Class = [Multi[1], Multi[2], Multi[3]]
+	elif Dual[0]: #only worry about the newer class
+		#we only get the hp bonus if the old class is reactivated
+		if (Levels[0]<=Levels[1]):
+			return
+		Class = [ClassTable.GetValue (Dual[2], 5)]
+		#if Level and LevelDiff are passed, we assume it is correct
+		if IsDualSwap(pc) and not Level and not LevelDiff:
+			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]
+	if NumClasses>len(Levels):
+		return
+
+	#get the correct hp for barbarians
+	Kit = GetKitIndex (pc)
+	ClassName = None
+	if Kit and not Dual[0] and Multi[0]<2:
+		KitName = KitListTable.GetValue (Kit, 0, 0)
+		if ClassTable.GetRowIndex (KitName) >= 0:
+			ClassName = KitName
+
+	#loop through each class and update the hp
+	OldHP = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
+	CurrentHP = 0
+	Divisor = float (NumClasses)
+	for i in range (NumClasses):
+		#check this classes hp table for any gain
+		if not ClassName or NumClasses > 1:
+			ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class[i]) )
+		HPTable = ClassTable.GetValue (ClassName, "HP")
+		HPTable = GemRB.LoadTableObject (HPTable)
+
+		#make sure we are within table ranges
+		MaxLevel = HPTable.GetRowCount()-1
+		LowLevel = Levels[i]-LevelDiffs[i]
+		HiLevel = Levels[i]
+		if LowLevel >= HiLevel:
+			continue
+		if LowLevel < 0:
+			LowLevel = 0
+		elif LowLevel > MaxLevel:
+			LowLevel = MaxLevel
+		if HiLevel < 0:
+			HiLevel = 0
+		elif HiLevel > MaxLevel:
+			HiLevel = MaxLevel
+
+		#add all the hp for the given level
+		#we use ceil to ensure each class gets hp
+		for level in range(LowLevel, HiLevel):
+			rolls = HPTable.GetValue (level, 1)
+			bonus = HPTable.GetValue (level, 2)
+
+			# we only do a roll if core diff or higher, or uncheck max
+			if rolls:
+				if GemRB.GetVar ("Difficulty Level") < 3:
+					CurrentHP += ceil (GemRB.Roll (rolls, HPTable.GetValue (level, 0), bonus) / Divisor)
+				else:
+					CurrentHP += ceil ((rolls * HPTable.GetValue (level, 0) + bonus) / Divisor)
+			else:
+				CurrentHP += ceil (bonus / Divisor)
+			CurrentHP = int (CurrentHP)
+
+	#update our hp values
+	GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, CurrentHP+OldHP)
+	GemRB.SetPlayerStat (pc, IE_HITPOINTS, GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1)+CurrentHP)
 	return
 
 def GearsClicked():
 	GemRB.GamePause(2,0)
+
+def OpenWaitForDiscWindow ():
+	global DiscWindow
+
+	if DiscWindow:
+		GemRB.HideGUI ()
+		if DiscWindow:
+			DiscWindow.Unload ()
+		GemRB.SetVar ("OtherWindow", -1)
+		# ...LoadWindowPack()
+		EnableAnimatedWindows ()
+		DiscWindow = None
+		GemRB.UnhideGUI ()
+		return
+
+	try:
+		GemRB.HideGUI ()
+	except:
+		pass
+
+	GemRB.LoadWindowPack ("GUIID")
+	DiscWindow = Window = GemRB.LoadWindowObject (0)
+	GemRB.SetVar ("OtherWindow", Window.ID)
+	label = DiscWindow.GetControl (0)
+
+	disc_num = GemRB.GetVar ("WaitForDisc")
+	#disc_path = GemRB.GetVar ("WaitForDiscPath")
+	disc_path = 'XX:'
+
+	text = GemRB.GetString (31483) + " " + str (disc_num) + " " + GemRB.GetString (31569) + " " + disc_path + "\n" + GemRB.GetString (49152)
+	label.SetText (text)
+	DisableAnimatedWindows ()
+	# 31483 - Please place PS:T disc number
+	# 31568 - Please place the PS:T DVD
+	# 31569 - in drive
+	# 31570 - Wrong disc in drive
+	# 31571 - There is no disc in drive
+	# 31578 - No disc could be found in drive. Please place Disc 1 in drive.
+	# 49152 - To quit the game, press Alt-F4
+
+	try:
+		GemRB.UnhideGUI ()
+	except:
+		DiscWindow.SetVisible (1)
+
 def CheckLevelUp(pc):
-	GemRB.SetVar (CheckLevelUp+str(pc), CanLevelUp (pc))
+	GemRB.SetVar ("CheckLevelUp"+str(pc), CanLevelUp (pc))

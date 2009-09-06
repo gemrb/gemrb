@@ -25,9 +25,10 @@ from ie_stats import *
 from GUICommon import *
 
 #constants
-LUSKILLS_TYPE_CHARGEN = 0
-LUSKILLS_TYPE_LEVELUP = 1
-LUSKILLS_TYPE_DUALCLASS = 2
+LUSKILLS_TYPE_LEVELUP = 0
+LUSKILLS_TYPE_LEVELUP_BG1 = 1
+LUSKILLS_TYPE_CHARGEN = 2
+LUSKILLS_TYPE_DUALCLASS = 3
 LUSKILLS_MAX = 250
 
 #refs to the script calling this
@@ -88,6 +89,16 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillsNumButtons = 4
 		SkillsTextArea = SkillsWindow.GetControl (110)
 		ScrollBar = SkillsWindow.GetControl (109)
+	elif type == LUSKILLS_TYPE_LEVELUP_BG1:
+		SkillsOffsetPress = 17
+		SkillsOffsetButton1 = 17
+		SkillsOffsetSum = 37
+		SkillsOffsetName = 32
+		SkillsOffsetPoints = 43
+		SkillsNumButtons = 4
+		SkillsTextArea = SkillsWindow.GetControl (42)
+		if (scroll):
+			ScrollBar = SkillsWindow.GetControl (109)
 	elif type == LUSKILLS_TYPE_DUALCLASS:
 		SkillsOffsetPress = 5
 		SkillsOffsetButton1 = 14

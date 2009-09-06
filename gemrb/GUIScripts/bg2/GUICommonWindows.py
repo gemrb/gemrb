@@ -566,6 +566,7 @@ def OpenPortraitWindow (needcontrols):
 		Button = Window.GetControl (i)
 		Button.SetFont ("STATES2")
 		Button.SetVarAssoc ("PressedPortrait", i+1)
+
 		if (needcontrols):
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenInventoryWindowClick")
 		else:
@@ -756,7 +757,7 @@ def OnDropItemToPC2 ():
 	GemRB.SetVar ("PressedPortrait",0)
 	GemRB.DragItem (0, -1, "")
 	DraggedPortrait = None
-        return
+	return
 
 def CheckDragging():
 	"""Contains portrait dragging in case of mouse out-of-range."""
@@ -766,7 +767,7 @@ def CheckDragging():
 	i = GemRB.GetVar ("PressedPortrait")
 	if not i:
 		GemRB.DragItem (0, -1, "")
-	
+
 	if GemRB.IsDraggingItem()!=2:
 		DraggedPortrait = None
 	return
@@ -1040,7 +1041,6 @@ def OpenWaitForDiscWindow ():
 	# 31571 - There is no disc in drive
 	# 31578 - No disc could be found in drive. Please place Disc 1 in drive.
 	# 49152 - To quit the game, press Alt-F4
-
 
 	try:
 		GemRB.UnhideGUI ()

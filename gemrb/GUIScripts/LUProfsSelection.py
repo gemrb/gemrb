@@ -26,8 +26,9 @@ from GUICommon import *
 
 #the different types possible
 LUPROFS_TYPE_LEVELUP = 0
-LUPROFS_TYPE_DUALCLASS = 1
-LUPROFS_TYPE_CHARGEN = 2
+LUPROFS_TYPE_LEVELUP_BG1 = 1
+LUPROFS_TYPE_DUALCLASS = 2
+LUPROFS_TYPE_CHARGEN = 3
 
 #refs to the script calling this
 ProfsWindow = 0
@@ -100,6 +101,16 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsNumButtons = 7
 		ProfsTextArea = ProfsWindow.GetControl (110)
 		ProfsScrollBar = ProfsWindow.GetControl (108)
+	elif type == LUPROFS_TYPE_LEVELUP_BG1: #levelup
+		ProfsOffsetSum = 36
+		ProfsOffsetButton1 = 1
+		ProfsOffsetStar = 48
+		ProfsOffsetLabel = 24
+		ProfsOffsetPress = 17
+		ProfsNumButtons = 8
+		ProfsTextArea = ProfsWindow.GetControl (42)
+		if (scroll):
+			ProfsScrollBar = ProfsWindow.GetControl (108)
 	elif type == LUPROFS_TYPE_DUALCLASS: #dualclass
 		ProfsOffsetSum = 40
 		ProfsOffsetButton1 = 50

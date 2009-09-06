@@ -74,9 +74,9 @@ def OpenLevelUpWindow():
 
 	LevelUpWindow = GemRB.LoadWindowObject (3)
 
-	InfoButton = LevelUpWindow.GetControl (125)
-	InfoButton.SetText (13707)
-	InfoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpInfoPress")
+	#InfoButton = LevelUpWindow.GetControl (125)
+	#InfoButton.SetText (13707)
+	#InfoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpInfoPress")
 
 	DoneButton = LevelUpWindow.GetControl (0)
 	DoneButton.SetText (11962)
@@ -312,27 +312,27 @@ def OpenLevelUpWindow():
 		# set values required by the hla level up code
 		HLACount = HLACount / HLATable.GetValue (ClassName, "RATE", 1)
 		GemRB.SetVar ("HLACount", HLACount)
-	HLAButton = LevelUpWindow.GetControl (126)
-	if HLACount:
-		HLAButton.SetText (4954)
-		HLAButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpHLAPress")
-	else:
-		HLAButton.SetFlags (IE_GUI_BUTTON_DISABLED, OP_OR)
+	#HLAButton = LevelUpWindow.GetControl (126)
+	#if HLACount:
+	#	HLAButton.SetText (4954)
+	#	HLAButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpHLAPress")
+	#else:
+	#	HLAButton.SetFlags (IE_GUI_BUTTON_DISABLED, OP_OR)
 
 	# setup our profs
 	Level1 = []
 	for i in range (len (Level)):
 		Level1.append (Level[i]-LevelDiff[i])
-	SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
+	SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP_BG1, LevelUpWindow, RedrawSkills, Level1, Level, False, 0)
 	NewProfPoints = GemRB.GetVar ("ProfsPointsLeft")
 
 	#we autohide the skills and let SetupSkillsWindow show them if needbe
 	for i in range (4):
 		HideSkills (i)
-	SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
+	SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP_BG1, LevelUpWindow, RedrawSkills, Level1, Level, 0, False)
 	NewSkillPoints = GemRB.GetVar ("SkillPointsLeft")
 
-	TextAreaControl = LevelUpWindow.GetControl(110)
+	TextAreaControl = LevelUpWindow.GetControl(42)
 	TextAreaControl.SetText(GetLevelUpNews())
 
 	RedrawSkills()
@@ -367,11 +367,11 @@ def RedrawSkills():
 	global DoneButton, LevelUpWindow, HLACount
 
 	# we need to disable the HLA button if we don't have any HLAs left
-	HLACount = GemRB.GetVar ("HLACount")
-	if HLACount == 0:
-		# turn the HLA button off
-		HLAButton = LevelUpWindow.GetControl (126)
-		HLAButton.SetState(IE_GUI_BUTTON_DISABLED)
+	#HLACount = GemRB.GetVar ("HLACount")
+	#if HLACount == 0:
+	#	# turn the HLA button off
+	#	HLAButton = LevelUpWindow.GetControl (126)
+	#	HLAButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	# enable the done button if they've allocated all points
 	# sorcerer spell selection (if applicable) comes after hitting the done button
