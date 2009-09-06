@@ -85,6 +85,7 @@ public:
 	InfoPoint* GetInfoPoint(const char* Name);
 	InfoPoint* GetInfoPoint(unsigned int idx);
 	InfoPoint* GetTravelTo(const char* Destination);
+	InfoPoint* AdjustNearestTravel(Point &p);
 	size_t GetInfoPointCount() { return infoPoints.size(); }
 
 	TileObject* AddTile(const char* ID, const char* Name, unsigned int Flags,

@@ -618,6 +618,30 @@ InfoPoint* TileMap::GetTravelTo(const char* Destination)
         return NULL;
 }
 
+InfoPoint *TileMap::AdjustNearestTravel(Point &p)
+{
+	int min = -1;
+	InfoPoint *best = NULL;
+
+        size_t i=infoPoints.size();
+        while (i--) {
+                InfoPoint *ip = infoPoints[i];
+
+		if (ip->Type!=ST_TRAVEL)
+			continue;
+
+		unsigned int dist = Distance(p, ip);
+		if (dist<(unsigned int) min) {
+			min = dist;
+			best = ip;
+		}
+        }
+	if (best) {
+		p = best->Pos;
+	}
+	return best;
+}
+
 Point TileMap::GetMapSize()
 {
 	return Point((short) (XCellCount*64), (short) (YCellCount*64));

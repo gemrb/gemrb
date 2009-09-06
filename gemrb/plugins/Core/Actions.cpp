@@ -5433,12 +5433,20 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 /*EscapeAreaMove(S:Area*,I:X*,I:Y*,I:Face*)*/
 void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 {
-	//find nearest exit
-	Point p(0,0);
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
+	Map *map = Sender->GetCurrentArea();
+	if (!map) {
+		return;
+	}
+
+	Point p = Sender->Pos;
+	map->TMap->AdjustNearestTravel(p);
+
 	Sender->SetWait(5);
+	Sender->ReleaseCurrentAction();
+
 	if (parameters->string0Parameter[0]) {
 		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
 		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, q, p, 0 );
