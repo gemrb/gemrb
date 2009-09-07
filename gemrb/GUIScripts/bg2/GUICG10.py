@@ -20,6 +20,7 @@
 #character generation, multi-class (GUICG10)
 import GemRB
 from LUCommon import *
+from GUICG2 import SetClass
 
 ClassWindow = 0
 TextAreaControl = 0
@@ -85,6 +86,7 @@ def OnLoad():
 	return
 
 def ClassPress():
+	SetClass()
 	Class = GemRB.GetVar("Class")-1
 	TextAreaControl.SetText(ClassTable.GetValue(Class,1) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
@@ -98,6 +100,7 @@ def BackPress():
 	return
 
 def NextPress():
+	SetClass()
 	if ClassWindow:
 		ClassWindow.Unload()
 
