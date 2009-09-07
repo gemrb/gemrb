@@ -4936,7 +4936,11 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 		return 0;
 	}
 
-	if (slot<0) {
+
+	if ((slot<0) || (slot == IW_NO_EQUIPPED) ) {
+		if (slot == IW_NO_EQUIPPED) {
+			slot = inventory.GetFistSlot();
+		}
 		int i;
 		for(i=0;i<MAX_QUICKWEAPONSLOT;i++) {
 			if(slot+inventory.GetWeaponSlot()==PCStats->QuickWeaponSlots[i]) {
