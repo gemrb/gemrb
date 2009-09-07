@@ -5920,7 +5920,7 @@ void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
 			return;
 		}
 		if (scr->PCStats) {
-			scr->PCStats->QuickItemHeaders[slot-wslot]=(ieWord) parameters->int1Parameter;
+			scr->PCStats->QuickItemHeaders[slot]=(ieWord) parameters->int1Parameter;
 		}
 	}
 }

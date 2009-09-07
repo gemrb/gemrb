@@ -4930,15 +4930,33 @@ int Actor::GetQuickSlot(int slot)
 //marks the quickslot as equipped
 int Actor::SetEquippedQuickSlot(int slot, int header)
 {
-	//creatures and such
-	if (PCStats) {
-		if (header==-1) {
-			header = PCStats->QuickWeaponHeaders[slot];
-		} else {
-			PCStats->QuickWeaponHeaders[slot]=header;
-		}
-		slot = PCStats->QuickWeaponSlots[slot]-inventory.GetWeaponSlot();
+	if (!PCStats) {
+		if (header<0) header=0;
+		inventory.SetEquippedSlot(slot, header);
+		return 0;
 	}
+
+	if (slot<0) {
+		int i;
+		for(i=0;i<MAX_QUICKWEAPONSLOT;i++) {
+			if(slot+inventory.GetWeaponSlot()==PCStats->QuickWeaponSlots[i]) {
+				slot = i;
+				break;
+			}
+		}
+		if (i==MAX_QUICKWEAPONSLOT) {
+			return 0;
+		}
+	}
+
+	assert(slot<MAX_QUICKWEAPONSLOT);
+	if (header==-1) {
+		header = PCStats->QuickWeaponHeaders[slot];
+	}
+	else {
+		PCStats->QuickWeaponHeaders[slot]=header;
+	}
+	slot = PCStats->QuickWeaponSlots[slot]-inventory.GetWeaponSlot();
 	Equipped = (ieWordSigned) slot;
 	EquippedHeader = (ieWord) header;
 	if (inventory.SetEquippedSlot(slot, header)) {

@@ -1115,6 +1115,11 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header)
 		return false;
 	}
 
+	//if it is an illegal code, make it fist
+	if ((size_t) (slotcode+SLOT_MELEE)>Slots.size()) {
+		slotcode=IW_NO_EQUIPPED;
+	}
+
 	//unequipping (fist slot will be used now)
 	if (slotcode == IW_NO_EQUIPPED || !HasItemInSlot("",slotcode+SLOT_MELEE)) {
 		if (Equipped != IW_NO_EQUIPPED) {
