@@ -113,6 +113,8 @@ def BackPress():
 	return
 
 def SetClass():
+	if ClassWindow:
+		ClassWindow.Unload()
 	# find the class from the class table
 	ClassIndex = GemRB.GetVar ("Class") - 1
 	Class = ClassTable.GetValue (ClassIndex, 5)
@@ -157,8 +159,5 @@ def ClassPress():
 
 def NextPress ():
 	SetClass()
-	if ClassWindow:
-		ClassWindow.Unload()
-
 	GemRB.SetNextScript("CharGen4") #alignment
 	return
