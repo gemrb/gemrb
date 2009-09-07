@@ -604,18 +604,18 @@ InfoPoint* TileMap::GetInfoPoint(unsigned int idx)
 
 InfoPoint* TileMap::GetTravelTo(const char* Destination)
 {
-        size_t i=infoPoints.size();
-        while (i--) {
-                InfoPoint *ip = infoPoints[i];
+	size_t i=infoPoints.size();
+	while (i--) {
+		InfoPoint *ip = infoPoints[i];
 
 		if (ip->Type!=ST_TRAVEL)
 			continue;
 
-                if (strnicmp( ip->Destination, Destination, 8 ) == 0) {
-                        return ip;
-                }
-        }
-        return NULL;
+		if (strnicmp( ip->Destination, Destination, 8 ) == 0) {
+			return ip;
+		}
+	}
+	return NULL;
 }
 
 InfoPoint *TileMap::AdjustNearestTravel(Point &p)
@@ -623,9 +623,9 @@ InfoPoint *TileMap::AdjustNearestTravel(Point &p)
 	int min = -1;
 	InfoPoint *best = NULL;
 
-        size_t i=infoPoints.size();
-        while (i--) {
-                InfoPoint *ip = infoPoints[i];
+	size_t i=infoPoints.size();
+	while (i--) {
+		InfoPoint *ip = infoPoints[i];
 
 		if (ip->Type!=ST_TRAVEL)
 			continue;
@@ -635,7 +635,7 @@ InfoPoint *TileMap::AdjustNearestTravel(Point &p)
 			min = dist;
 			best = ip;
 		}
-        }
+	}
 	if (best) {
 		p = best->Pos;
 	}
