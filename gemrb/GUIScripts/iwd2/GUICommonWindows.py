@@ -411,6 +411,7 @@ def GetActorClassTitle (actor, ClassIndex):
 		return 0
 	return ClassTitle
 
+# overriding the one in GUICommon, since we use a different table and animations
 def GetActorPaperDoll (actor):
 	PortraitTable = GemRB.LoadTableObject ("avatars")
 	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)

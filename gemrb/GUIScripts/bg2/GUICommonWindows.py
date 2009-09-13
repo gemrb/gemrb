@@ -467,14 +467,6 @@ def EquipmentPressed ():
 	UpdateActionsWindow ()
 	return
 
-def GetActorPaperDoll (actor):
-	PortraitTable = GemRB.LoadTableObject ("PDOLLS")
-	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)
-	level = GemRB.GetPlayerStat (actor, IE_ARMOR_TYPE)
-	row = "0x%04X" %anim_id
-	which = "LEVEL%d" %(level+1)
-	return PortraitTable.GetValue (row, which)
-
 SelectionChangeHandler = None
 
 def SetSelectionChangeHandler (handler):
