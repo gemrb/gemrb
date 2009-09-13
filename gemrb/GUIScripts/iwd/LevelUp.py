@@ -23,13 +23,11 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
-from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities, GameIsBG2
+from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities
 from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GSNN
 from GUICommonWindows import *
-from LUCommon import *
 from LUSpellSelection import *
-if HasTOB():
-	from LUHLASelection import *
+from LUCommon import *
 from LUProfsSelection import *
 from LUSkillsSelection import *
 from Actor import *
@@ -76,9 +74,9 @@ def OpenLevelUpWindow():
 
 	LevelUpWindow = GemRB.LoadWindowObject (3)
 
-	InfoButton = LevelUpWindow.GetControl (125)
-	InfoButton.SetText (13707)
-	InfoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpInfoPress")
+	#InfoButton = LevelUpWindow.GetControl (125)
+	#InfoButton.SetText (13707)
+	#InfoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpInfoPress")
 
 	DoneButton = LevelUpWindow.GetControl (0)
 	DoneButton.SetText (11962)
@@ -94,6 +92,24 @@ def OpenLevelUpWindow():
 	actor = Actor(pc)
 	Label = LevelUpWindow.GetControl (0x10000000+90)
 	Label.SetText (GemRB.GetPlayerName (pc))
+
+	# armorclass
+	Label = LevelUpWindow.GetControl (0x10000057)
+	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
+	#This is a temporary solution, the core engine should set the stat correctly!
+	ac += GemRB.GetAbilityBonus (IE_DEX, 2, GemRB.GetPlayerStat (pc, IE_DEX) )
+	Label.SetText (str (ac))
+	Label.SetTooltip (17183)
+
+	# hp now
+	Label = LevelUpWindow.GetControl (0x10000058)
+	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
+	Label.SetTooltip (17184)
+
+	# hp max
+	Label = LevelUpWindow.GetControl (0x10000059)
+	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
+	Label.SetTooltip (17378)
 
 	# some current values
 	OldHPMax = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
@@ -314,28 +330,28 @@ def OpenLevelUpWindow():
 		# set values required by the hla level up code
 		HLACount = HLACount / HLATable.GetValue (ClassName, "RATE", 1)
 		GemRB.SetVar ("HLACount", HLACount)
-	HLAButton = LevelUpWindow.GetControl (126)
-	if HLACount:
-		HLAButton.SetText (4954)
-		HLAButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpHLAPress")
-	else:
-		HLAButton.SetFlags (IE_GUI_BUTTON_DISABLED, OP_OR)
+	#HLAButton = LevelUpWindow.GetControl (126)
+	#if HLACount:
+	#	HLAButton.SetText (4954)
+	#	HLAButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpHLAPress")
+	#else:
+	#	HLAButton.SetFlags (IE_GUI_BUTTON_DISABLED, OP_OR)
 
 	# setup our profs
 	Level1 = []
 	for i in range (len (Level)):
 		Level1.append (Level[i]-LevelDiff[i])
-	SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
+	SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP_BG1, LevelUpWindow, RedrawSkills, Level1, Level, 0, False, 0)
 	NewProfPoints = GemRB.GetVar ("ProfsPointsLeft")
 
 	#we autohide the skills and let SetupSkillsWindow show them if needbe
 	for i in range (4):
 		HideSkills (i)
-	SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
+	SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP_BG1, LevelUpWindow, RedrawSkills, Level1, Level, 0, False)
 	NewSkillPoints = GemRB.GetVar ("SkillPointsLeft")
 
-	TextAreaControl = LevelUpWindow.GetControl(110)
-	TextAreaControl.SetText(GetLevelUpNews())
+	TextAreaControl = LevelUpWindow.GetControl(42)
+	TextAreaControl.SetText(GetStatOverview(pc, LevelDiff))
 
 	RedrawSkills()
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
@@ -369,11 +385,11 @@ def RedrawSkills():
 	global DoneButton, LevelUpWindow, HLACount
 
 	# we need to disable the HLA button if we don't have any HLAs left
-	HLACount = GemRB.GetVar ("HLACount")
-	if HLACount == 0:
-		# turn the HLA button off
-		HLAButton = LevelUpWindow.GetControl (126)
-		HLAButton.SetState(IE_GUI_BUTTON_DISABLED)
+	#HLACount = GemRB.GetVar ("HLACount")
+	#if HLACount == 0:
+	#	# turn the HLA button off
+	#	HLAButton = LevelUpWindow.GetControl (126)
+	#	HLAButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	# enable the done button if they've allocated all points
 	# sorcerer spell selection (if applicable) comes after hitting the done button
@@ -385,144 +401,6 @@ def RedrawSkills():
 		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	return
 
-def GetLevelUpNews():
-	"""Returns a string containing improvements gain on level up.
-
-	These include: HP, spells per level, and lore, among others."""
-
-	News = GemRB.GetString (5259) + '\n\n'
-
-	# display if our class has been reactivated
-	if IsDual:
-		if (Level[0] - LevelDiff[0]) <= Level[1] and Level[0] > Level[1]:
-			News = GemRB.GetString (5261) + '\n\n'
-	
-	# 5271 - Additional weapon proficiencies
-	if NewProfPoints > 0:
-		News += GemRB.GetString (5271) + ": " + str(NewProfPoints) + '\n\n'
-
-	# temps to compare all our new saves against (we get the best of our saving throws)
-	LOHGain = 0
-	BackstabMult = 0
-
-	for i in range(NumClasses):
-		# get the class name
-		TmpClassName = ClassTable.FindValue (5, Classes[i])
-		TmpClassName = ClassTable.GetRowName (TmpClassName)
-
-		# backstab
-		# NOTE: Stalkers and assassins should get the correct mods at the correct levels based
-		#	on AP_SPCL332 in their respective CLAB files.
-		# APND: Stalers appear to get the correct mod at the correct levels; however, because they start
-		#	at backstab multi x1, they are x1 too many at their respective levels.
-		if Classes[i] == 4 and GemRB.GetPlayerStat (pc, IE_BACKSTABDAMAGEMULTIPLIER, 1) > 1: # we have a thief who can backstab (2 at level 1)
-			# save the backstab multiplier if we have a thief
-			BackstabTable = GemRB.LoadTableObject ("BACKSTAB")
-			BackstabMult = BackstabTable.GetValue (0, Level[i])
-
-		# lay on hands
-		if (ClassSkillsTable.GetValue (Classes[i], 6) != "*"):
-			# inquisitors and undead hunters don't get lay on hands out the chute, whereas cavaliers
-			# and unkitted paladins do; therefore, we check for the existence of lay on hands to ensure
-			# the character should get the new value; LoH is defined in GA_SPCL211 if anyone wants to
-			# make a pally kit with LoH
-			if (HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
-				LOHTable = GemRB.LoadTableObject ("layhands")
-				LOHGain = LOHTable.GetValue (0, Level[i]) - LOHTable.GetValue (0, Level[i]-LevelDiff[i])
-
-	# saving throws
-		# 5277 death
-		# 5278 wand
-		# 5279 polymorph
-		# 5282 breath
-		# 5292 spell
-	# include in news if the save is updated
-	Changed = 0
-	for i in range (5):
-		CurrentSave = GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH+i, 1)
-		SaveString = 5277+i
-		if i == 3:
-			SaveString = 5282
-		elif i == 4:
-			SaveString = 5292
-
-		if CurrentSave < OldSaves[i]:
-			News += GemRB.GetString (SaveString) + ": " + str(OldSaves[i]-CurrentSave) + '\n'
-			Changed = 1
-	if Changed:
-		News += '\n'
-
-	# 5305 - THAC0 Reduced by
-	# only output if there is a change in thaco
-	NewThaco = GemRB.GetPlayerStat (pc, IE_TOHIT, 1)
-	if (NewThaco < OldThaco):
-		News += GemRB.GetString (5305) + ": " + str(OldThaco-NewThaco) + '\n\n'
-
-	# new spell slots
-		# 5373 - Additional Priest Spells
-		# 5374 - Additional Mage Spells
-		# 61269 - Level <LEVEL> Spells
-	if DeltaDSpells > 0: # new divine spells
-		News += GemRB.GetString (5373) + '\n'
-		for i in range (len (NewDSpells)):
-			# only display classes with new spells
-			if (NewDSpells[i]-OldDSpells[i]) == 0:
-				continue
-			GemRB.SetToken("level", str(i+1))
-			News += GemRB.GetString(61269)+": " + str(NewDSpells[i]-OldDSpells[i]) + '\n'
-		News += '\n'
-	if DeltaWSpells > 0: # new wizard spells
-		News += GemRB.GetString (5374) + '\n'
-		for i in range (len (NewWSpells)):
-			# only display classes with new spells
-			if (NewWSpells[i]-OldWSpells[i]) == 0:
-				continue
-			GemRB.SetToken("level", str(i+1))
-			News += GemRB.GetString(61269)+": " + str(NewWSpells[i]-OldWSpells[i]) + '\n'
-		News += '\n'
-
-	# 5375 - Backstab Multiplier Increased by
-	# this auto-updates... we just need to inform of the update
-	if (BackstabMult > GemRB.GetPlayerStat (pc, IE_BACKSTABDAMAGEMULTIPLIER, 1)):
-		News += GemRB.GetString (5375) + ": " + str(BackstabMult) + '\n\n'
-
-	# 5376 - Lay on Hands increased
-	if LOHGain > 0:
-		News += GemRB.GetString (5376) + ": " + str(LOHGain) + '\n\n'
-
-	# 5293 - HP increased by
-	if (OldHPMax != GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)):
-		News += GemRB.GetString (5293) + ": " + str(GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1) - OldHPMax) + '\n'
-
-	# 5377 - Lore Increased by
-	# add the lore gain if we haven't done so already
-	NewLore = GemRB.GetPlayerStat (pc, IE_LORE, 1)
-	if NewLore > OldLore:
-		News += GemRB.GetString (5377) + ": " + str(NewLore-OldLore) + '\n\n'
-
-	# 5378 - Additional Skill Points
-	# ranger and bard skill(point) gain is not mentioned here in the original
-	if NewSkillPoints > 0:
-		News += GemRB.GetString (5378) + ": " + str(NewSkillPoints) + '\n'
-
-	return News
-
-def LevelUpInfoPress():
-	"""Displays new abilites gained on level up.
-
-	Alternates between overall and modified stats."""
-
-	global LevelUpWindow, TextAreaControl, InfoCounter, LevelDiff
-
-	if InfoCounter % 2:
-		# call GetStatOverview with the new levels, so the future overview is shown
-		# TODO: show only xp, levels, thac0, #att, lore, reputation, backstab, saving throws
-		TextAreaControl.SetText(GetStatOverview(pc, LevelDiff))
-	else:
-		TextAreaControl.SetText(GetLevelUpNews())
-	InfoCounter += 1
-	return
-
 # save the results
 def LevelUpDonePress():
 	"""Updates the PC with the new choices.
@@ -532,7 +410,7 @@ def LevelUpDonePress():
 	global SkillTable
 
 	# proficiencies
-	ProfsSave (pc)
+	ProfsSave (pc, LUPROFS_TYPE_LEVELUP_BG1)
 
 	# skills
 	SkillsSave (pc)
