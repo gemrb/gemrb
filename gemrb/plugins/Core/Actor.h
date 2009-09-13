@@ -627,5 +627,6 @@ public:
 	bool BlocksSearchMap() const;
 	bool CannotPassEntrance() const;
 	void UseExit(int flag);
+	int GetReaction();
 };
 #endif

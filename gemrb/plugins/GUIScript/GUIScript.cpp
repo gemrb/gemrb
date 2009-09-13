@@ -7728,6 +7728,16 @@ static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iii|i", &stat, &column, &value, &ex)) {
 		return AttributeError( GemRB_GetAbilityBonus__doc );
 	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor *actor = game->FindPC(game->GetSelectedPCSingle());
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+
 	switch (stat) {
 		case IE_STR:
 			ret=core->GetStrengthBonus(column, value, ex);
@@ -7746,6 +7756,9 @@ static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 			break;
 		case IE_LORE:
 			ret=core->GetLoreBonus(column, value);
+			break;
+		case IE_REPUTATION: //both chr and reputation affect the reaction, but chr is already taken
+			ret=actor->GetReaction();
 			break;
 		default:
 			return RuntimeError( "Invalid ability!");

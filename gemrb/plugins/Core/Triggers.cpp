@@ -38,33 +38,33 @@ int GameScript::BreakingPoint(Scriptable* Sender, Trigger* /*parameters*/)
 int GameScript::Reaction(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!scr) {
+	if (!scr || scr->Type != ST_ACTOR) {
 		parameters->Dump();
 		return 0;
 	}
-	int value=GetReaction(scr);
+	int value = ((Actor*) scr)->GetReaction();
 	return value == parameters->int0Parameter;
 }
 
 int GameScript::ReactionGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!scr) {
+	if (!scr || scr->Type != ST_ACTOR) {
 		parameters->Dump();
 		return 0;
 	}
-	int value=GetReaction(scr);
+	int value = ((Actor*) scr)->GetReaction();
 	return value > parameters->int0Parameter;
 }
 
 int GameScript::ReactionLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!scr) {
+	if (!scr || scr->Type != ST_ACTOR) {
 		parameters->Dump();
 		return 0;
 	}
-	int value=GetReaction(scr);
+	int value = ((Actor*) scr)->GetReaction();
 	return value < parameters->int0Parameter;
 }
 

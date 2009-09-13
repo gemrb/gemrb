@@ -543,7 +543,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, 0, 0)>0:
 		stats.append ( (10343, GA (IE_INT,0), '%' ) )
 	# 10347 Reaction
-	stats.append ( (10347, GA (IE_CHR,0), '0') )
+	stats.append ( (10347, GA (IE_REPUTATION,0), '0') )
 	stats.append (None)
 
 	#Bonus spells

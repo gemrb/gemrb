@@ -144,6 +144,10 @@ static int **monkbon = NULL;
 static int monkbon_cols = 0;
 static int monkbon_rows = 0;
 
+//reputation modifiers
+int rmodrep[20];
+int rmodchr[25];
+
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
  ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
@@ -1661,6 +1665,23 @@ static void InitActorTables()
 			}
 		}
 	}
+
+	//initializing the reaction mod. reputation table
+	tm.load("rmodrep");
+	if (tm) {
+		for (int reputation=0;reputation<20;reputation++) {
+			rmodrep[reputation]=strtol(tm->QueryField(0,reputation), NULL, 0);
+		}
+	}
+
+	//initializing the reaction mod. charisma table
+	tm.load("rmodchr");
+	if (tm) {
+		for (int charisma=0;charisma<25;charisma++) {
+			rmodchr[charisma]=strtol(tm->QueryField(0,charisma), NULL, 0);
+		}
+	}
+
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -5677,4 +5698,12 @@ void Actor::UseExit(int flag) {
 	} else {
 		InternalFlags&=~IF_USEEXIT;
 	}
+}
+
+int Actor::GetReaction()
+{
+	//return ::GetReaction((Scriptable*)this);
+	int chr = GetStat(IE_CHR)-1;
+	int rep = core->GetGame()->Reputation/10;
+	return 10 + rmodrep[rep] + rmodchr[chr];
 }

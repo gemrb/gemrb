@@ -60,8 +60,6 @@ int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
 int InDebug = 0;
 int happiness[3][20];
-int rmodrep[20];
-int rmodchr[25];
 int RandomNumValue;
 int *SkillStats=NULL;
 int SkillCount=-1;
@@ -93,37 +91,6 @@ void InitScriptTables()
 		}
 	}
 	}
-
-	//initializing the reaction mod. reputation table
-	{
-	AutoTable tab("rmodrep");
-	if (tab) {
-		for (int reputation=0;reputation<20;reputation++) {
-			rmodrep[reputation]=strtol(tab->QueryField(0,reputation), NULL, 0);
-		}
-	}
-	}
-
-	//initializing the reaction mod. charisma table
-	{
-	AutoTable tab("rmodchr");
-	if (tab) {
-		for (int charisma=0;charisma<25;charisma++) {
-			rmodchr[charisma]=strtol(tab->QueryField(0,charisma), NULL, 0);
-		}
-	}
-	}
-}
-
-int GetReaction(Scriptable* Sender)
-{
-	if (Sender->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor* ab = ( Actor* ) Sender;
-	int chr = ab->GetStat(IE_CHR)-1;
-	int rep = core->GetGame()->Reputation/10;
-	return 10 + rmodrep[rep]+rmodchr[chr];
 }
 
 int GetHappiness(Scriptable* Sender, int reputation)
