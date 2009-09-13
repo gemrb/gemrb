@@ -183,10 +183,6 @@ def SetupFormation ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectFormationPreset")
 	return
 
-def SelectFormation ():
-	GemRB.GameSetFormation ( GemRB.GetVar ("Formation") )
-	return
-
 def GroupControls ():
 	"""Sections that control group actions."""
 

@@ -54,6 +54,10 @@ def RestPress ():
 	GemRB.RestParty(0,0,0)
 	return
 
+def SelectFormation ():
+	GemRB.GameSetFormation (GemRB.GetVar ("Formation"))
+	return
+
 def GetMageSpells (Kit, Alignment, Level):
 	MageSpells = []
 	SpellType = 99
