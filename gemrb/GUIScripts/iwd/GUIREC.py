@@ -25,10 +25,10 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow
+from GUICommon import *
+from LUCommon import CanLevelUp, GetNextLevelExp
 from GUICommonWindows import *
 from GUIWORLD import OpenReformPartyWindow
-from LUCommon import GetNextLevelExp
 
 import Portrait
 
@@ -42,8 +42,6 @@ OptionsWindow = None
 CustomizeWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
-
-NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
 
 ###################################################
 def OpenRecordsWindow ():
@@ -141,6 +139,20 @@ def UpdateRecordsWindow ():
 	# exportable
 	Button = Window.GetControl (36)
 	if GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE:
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+	else:
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
+
+	# dual-classable
+	Button = Window.GetControl (0)
+	if CanDualClass (pc):
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
+	else:
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+	
+	# levelup
+	Button = Window.GetControl (37)
+	if CanLevelUp (pc):
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -263,7 +275,9 @@ def GSNN (pc, stat):
 	else:
 		return 0
 
-def GetStatOverview (pc):
+# LevelDiff is used only from the level up code and holds the level
+# difference for each class
+def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	StateTable = GemRB.LoadTableObject ("statdesc")
 	str_None = GemRB.GetString (41275)
 
@@ -271,85 +285,163 @@ def GetStatOverview (pc):
 	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) )
 
 	stats = []
+	# class levels
 	# 16480 <CLASS>: Level <LEVEL>
 	# Experience: <EXPERIENCE>
 	# Next Level: <NEXTLEVEL>
 
-	#collecting tokens for stat overview
+	# collecting tokens for stat overview
 	ClassTitle = GetActorClassTitle (pc)
-	GemRB.SetToken("CLASS", ClassTitle)
+	GemRB.SetToken ("CLASS", ClassTitle)
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassTable = GemRB.LoadTableObject ("classes")
 	Class = ClassTable.FindValue (5, Class)
-	Multi = ClassTable.GetValue (Class, 4)
 	Class = ClassTable.GetRowName (Class)
+	Dual = IsDualClassed (pc, 1)
+	Multi = IsMultiClassed (pc, 1)
+	XP = GemRB.GetPlayerStat (pc, IE_XP)
+	LevelDrain = GS (IE_LEVELDRAIN)
 
-	if Multi:
-		Levels = [IE_LEVEL, IE_LEVEL2, IE_LEVEL3]
-		Classes = [0,0,0]
-		MultiCount = 0
+	if Multi[0] > 1: # we're multiclassed
+		print "\tMulticlassed"
+		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), GemRB.GetPlayerStat (pc, IE_LEVEL2), GemRB.GetPlayerStat (pc, IE_LEVEL3)]
+
 		stats.append ( (19721,1,'c') )
-		Mask = 1
-		for i in range (16):
-			if Multi&Mask:
-				Classes[MultiCount] = ClassTable.FindValue (5, i+1)
-				MultiCount += 1
-			Mask += Mask
-
-		for i in range (MultiCount):
-			#todo get classtitle for this class
-			Class = Classes[i]
-			ClassTitle = GemRB.GetString(ClassTable.GetValue (Class, 2))
-			GemRB.SetToken("CLASS", ClassTitle)
-			Class = ClassTable.GetRowName (i)
-			Level = GemRB.GetPlayerStat (pc, Levels[i])
-			GemRB.SetToken("LEVEL", str (Level) )
-			GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
-			GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP)/MultiCount ) )
-			#resolve string immediately
-			stats.append ( (GemRB.GetString(16480),"",'b') )
+		stats.append (None)
+		for i in range (Multi[0]):
+			ClassIndex = ClassTable.FindValue (5, Multi[i+1])
+			ClassTitle = GemRB.GetString (ClassTable.GetValue (ClassIndex, 2))
+			GemRB.SetToken ("CLASS", ClassTitle)
+			Class = ClassTable.GetRowName (ClassIndex)
+			GemRB.SetToken ("LEVEL", str (Levels[i]+LevelDiff[i]-int(LevelDrain/Multi[0])) )
+			GemRB.SetToken ("EXPERIENCE", str (XP/Multi[0]) )
+			if LevelDrain:
+				stats.append ( (GemRB.GetString (19720),1,'d') )
+				stats.append ( (GemRB.GetString (57435),1,'d') ) # LEVEL DRAINED
+			else:
+				GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Levels[i]+LevelDiff[i], Class) )
+				stats.append ( (GemRB.GetString (16480),"",'d') )
 			stats.append (None)
+			print "\t\tClass (Level):",Class,"(",Levels[i],")"
 
-	else:
-		Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
-		GemRB.SetToken("LEVEL", str (Level) )
-		GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
-		GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
-		stats.append ( (16480,1,'c') )
+	elif Dual[0] > 0: # dual classed; first show the new class
+		print "\tDual classed"
+		stats.append ( (19722,1,'c') )
 		stats.append (None)
 
-	effects = GemRB.GetPlayerStates (pc)
-	if len(effects):
-		for c in effects:
-			tmp = StateTable.GetValue (ord(c)-66, 0)
-			stats.append ( (tmp,c,'a') )
+		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), GemRB.GetPlayerStat (pc, IE_LEVEL2), GemRB.GetPlayerStat (pc, IE_LEVEL3)]
+
+		# the levels are stored in the class order (eg. FIGHTER_MAGE)
+		# the current active class does not matter!
+		if IsDualSwap (pc):
+			Levels = [Levels[1], Levels[0], Levels[2]]
+
+		Levels[0] += LevelDiff[0]
+
+		ClassTitle = GemRB.GetString (ClassTable.GetValue (Dual[2], 2))
+		GemRB.SetToken ("CLASS", ClassTitle)
+		GemRB.SetToken ("LEVEL", str (Levels[0]-LevelDrain))
+		Class = ClassTable.GetRowName (Dual[2])
+		XP2 = GemRB.GetPlayerStat (pc, IE_XP)
+		GemRB.SetToken ("EXPERIENCE", str (XP2) )
+		if LevelDrain:
+			stats.append ( (GemRB.GetString (19720),1,'d') )
+			stats.append ( (GemRB.GetString (57435),1,'d') ) # LEVEL DRAINED
+		else:
+			GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Levels[0], Class) )
+			stats.append ( (GemRB.GetString (16480),"",'d') )
 		stats.append (None)
+		# the first class (shown second)
+		if Dual[0] == 1:
+			ClassTitle = GemRB.GetString (KitListTable.GetValue (Dual[1], 2))
+		elif Dual[0] == 2:
+			ClassTitle = GemRB.GetString (ClassTable.GetValue (Dual[1], 2))
+		GemRB.SetToken ("CLASS", ClassTitle)
+		GemRB.SetToken ("LEVEL", str (Levels[1]) )
+
+		# the xp table contains only classes, so we have to determine the base class for kits
+		if Dual[0] == 2:
+			BaseClass = ClassTable.GetRowName (Dual[1])
+		else:
+			BaseClass = GetKitIndex (pc)
+			BaseClass = KitListTable.GetValue (BaseClass, 7)
+			BaseClass = ClassTable.FindValue (5, BaseClass)
+			BaseClass = ClassTable.GetRowName (BaseClass)
+		# the first class' XP is discarded and set to the minimum level
+		# requirement, so if you don't dual class right after a levelup,
+		# the game would eat some of your XP
+		XP1 = NextLevelTable.GetValue (BaseClass, str (Levels[1]))
+		GemRB.SetToken ("EXPERIENCE", str (XP1) )
+
+		# inactive until the new class SURPASSES the former
+		if Levels[0] <= Levels[1]:
+			# inactive
+			stats.append ( (19719,1,'c') )
+		else:
+			stats.append ( (19720,1,'c') )
+		stats.append (None)
+	else: # single classed
+		print "\tSingle classed"
+		Level = GemRB.GetPlayerStat (pc, IE_LEVEL) + LevelDiff[0]
+		GemRB.SetToken ("LEVEL", str (Level-LevelDrain))
+		GemRB.SetToken ("EXPERIENCE", str (XP) )
+		if LevelDrain:
+			stats.append ( (19720,1,'c') )
+			stats.append ( (57435,1,'c') ) # LEVEL DRAINED
+		else:
+			GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Level, Class) )
+			stats.append ( (16480,1,'c') )
+		stats.append (None)
+		print "\t\tClass (Level):",Class,"(",Level,")"
+
+	# check to see if we have a level diff anywhere
+	if sum (LevelDiff) == 0:
+		effects = GemRB.GetPlayerStates (pc)
+		if len (effects):
+			for c in effects:
+				tmp = StateTable.GetValue (ord(c)-66, 0)
+				stats.append ( (tmp,c,'a') )
+			stats.append (None)
 
 	stats.append (None)
 
 	stats.append ( (8442,1,'c') )
 
-	stats.append ( (61932, GS (IE_TOHIT), '') )
-	stats.append ( (9457, GS (IE_TOHIT), '') )
+	stats.append ( (61932, GS (IE_TOHIT), '0') )
+	stats.append ( (9457, GemRB.GetCombatDetails(pc, 0)["ToHit"], '0') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
-		tmp2 = str(tmp/2) + chr(188)
+		tmp2 = str (tmp/2) + chr (188)
 	else:
-		tmp2 = str(tmp/2)
+		tmp2 = str (tmp/2)
 	stats.append ( (9458, tmp2, '') )
-	stats.append ( (9459, GS (IE_LORE), '') )
+	stats.append ( (9459, GSNN (pc, IE_LORE), '0') )
+	stats.append ( (19224, GS (IE_RESISTMAGIC), '') )
+
+	# party's reputation
 	reptxt = GetReputation (GemRB.GameGetReputation()/10)
 	stats.append ( (9465, reptxt, '') )
-	stats.append ( (9460, GS (IE_LOCKPICKING), '') )
-	stats.append ( (9462, GS (IE_TRAPS), '') )
-	stats.append ( (9463, GS (IE_PICKPOCKET), '') )
-	stats.append ( (9461, GS (IE_STEALTH), '') )
-	stats.append ( (34120, GS (IE_HIDEINSHADOWS), '') )
-	stats.append ( (34121, GS (IE_DETECTILLUSIONS), '') )
-	stats.append ( (34122, GS (IE_SETTRAPS), '') )
+	stats.append ( (9460, GSNN (pc, IE_LOCKPICKING), '') )
+	stats.append ( (9462, GSNN (pc, IE_TRAPS), '') )
+	stats.append ( (9463, GSNN (pc, IE_PICKPOCKET), '') )
+	stats.append ( (9461, GSNN (pc, IE_STEALTH), '') )
+	stats.append ( (34120, GSNN (pc, IE_HIDEINSHADOWS), '') )
+	stats.append ( (34121, GSNN (pc, IE_DETECTILLUSIONS), '') )
+	stats.append ( (34122, GSNN (pc, IE_SETTRAPS), '') )
+	HatedRace = GS (IE_HATEDRACE)
+	if HatedRace:
+		HateTable = GemRB.LoadTableObject ("haterace")
+		Racist = HateTable.FindValue (1, HatedRace)
+		if Racist != -1:
+			HatedRace = HateTable.GetValue (Racist, 0)
+			stats.append ( (15982, GemRB.GetString (HatedRace), '') )
 	stats.append ( (12128, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
 	stats.append ( (12126, GS (IE_TURNUNDEADLEVEL), '') )
-	stats.append ( (12127, GS (IE_LAYONHANDSAMOUNT), '') )
+
+	#this hack only displays LOH if we know the spell
+	#TODO: the core should just not set LOH if the paladin can't learn it
+	if (HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
+		stats.append ( (12127, GS (IE_LAYONHANDSAMOUNT), '') )
+
 	#script
 	aiscript = GemRB.GetPlayerScript (pc )
 	stats.append ( (2078, aiscript, '') )
@@ -358,26 +450,25 @@ def GetStatOverview (pc):
 	#   17379 Saving Throws
 	stats.append (17379)
 	#   17380 Death
-	stats.append ( (17380, GS (IE_SAVEVSDEATH), '') )
+	stats.append ( (17380, GS (IE_SAVEVSDEATH), '0') )
 	#   17381
-	stats.append ( (17381, GS (IE_SAVEVSWANDS), '') )
+	stats.append ( (17381, GS (IE_SAVEVSWANDS), '0') )
 	#   17382 AC vs. Crushing
-	stats.append ( (17382, GS (IE_SAVEVSPOLY), '') )
+	stats.append ( (17382, GS (IE_SAVEVSPOLY), '0') )
 	#   17383 Rod
-	stats.append ( (17383, GS (IE_SAVEVSBREATH), '') )
+	stats.append ( (17383, GS (IE_SAVEVSBREATH), '0') )
 	#   17384 Spells
-	stats.append ( (17384, GS (IE_SAVEVSSPELL), '') )
+	stats.append ( (17384, GS (IE_SAVEVSSPELL), '0') )
 	stats.append (None)
 
-	# 9466 Weapon profs
+	# 9466 Weapon proficiencies
 	stats.append (9466)
-	table = GemRB.LoadTableObject("weapprof")
+	table = GemRB.LoadTableObject ("weapprof")
 	RowCount = table.GetRowCount ()
-	#
 	for i in range(RowCount):
 		text = table.GetValue (i, 3)
 		stat = table.GetValue (i, 0)
-		stats.append ( (text, GS(stat), '+') )
+		stats.append ( (text, GS(stat)&0x07, '+') )
 	stats.append (None)
 
 	# 11766 AC Bonuses
@@ -406,11 +497,11 @@ def GetStatOverview (pc):
 	stats.append ( (10338, GemRB.GetAbilityBonus(IE_STR,3,value,ex), '0') )
 	# 10339 AC
 	stats.append ( (10339, GA(IE_DEX,2), '0') )
-	# 10340 Missile
+	# 10340 Missile adjustment
 	stats.append ( (10340, GA(IE_DEX,1), '0') )
-	# 10341 Reaction
+	# 10341 Reaction adjustment
 	stats.append ( (10341, GA(IE_DEX,0), '0') )
-	# 10342 Hp/Level
+	# 10342 CON HP Bonus/Level
 	stats.append ( (10342, GA(IE_CON,0), '0') )
 	# 10343 Chance To Learn spell
 	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, 0, 0)>0:
@@ -419,47 +510,30 @@ def GetStatOverview (pc):
 	stats.append ( (10347, GA(IE_REPUTATION,0), '0') )
 	stats.append (None)
 
-	#Bonus spells
+	# 10344 Bonus Priest spells
 	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, 0, 0)>0:
 		stats.append (10344)
-		for level in range(7):
-			GemRB.SetToken ("SPELLLEVEL", str(level+1) )
+		for level in range (7):
+			GemRB.SetToken ("SPELLLEVEL", str (level+1) )
 			#get the bonus spell count
 			base = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level, 0)
 			if base:
 				count = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level)
-				stats.append ( (GemRB.GetString(10345), count-base, 'b') )
+				stats.append ( (GemRB.GetString (10345), count-base, 'b') )
 		stats.append (None)
 
 	# 32204 Resistances
-	stats.append (32204)
-	#   32213 Normal Fire
-	stats.append ((32213, GS (IE_RESISTFIRE), '%'))
-	#   32222 Magic Fire
-	stats.append ((32222, GS (IE_RESISTMAGICFIRE), '%'))
-	#   32214 Normal Cold
-	stats.append ((32214, GS (IE_RESISTCOLD), '%'))
-	#   32223 Magic Cold
-	stats.append ((32223, GS (IE_RESISTMAGICCOLD), '%'))
-	#   32220 Electricity
-	stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
-	#   32221 Acid
-	stats.append ((32221, GS (IE_RESISTACID), '%'))
-	#   32233 Magic Damage
-	stats.append ((32233, GS (IE_RESISTMAGIC), '%'))
+	stats.append (15544)
 	#   67216 Slashing Attacks
-	stats.append ((67216, GS (IE_RESISTSLASHING), '%'))
+	stats.append ((11768, GS (IE_RESISTSLASHING), '%'))
 	#   67217 Piercing Attacks
-	stats.append ((67217, GS (IE_RESISTPIERCING), '%'))
+	stats.append ((11769, GS (IE_RESISTPIERCING), '%'))
 	#   67218 Crushing Attacks
-	stats.append ((67218, GS (IE_RESISTCRUSHING), '%'))
+	stats.append ((11770, GS (IE_RESISTCRUSHING), '%'))
 	#   67219 Missile Attacks
-	stats.append ((67219, GS (IE_RESISTMISSILE), '%'))
-	stats.append (None)
-
-	#Weapon Style bonuses
-	stats.append (32131)
-	#
+	stats.append ((11767, GS (IE_RESISTMISSILE), '%'))
+	# Poison
+	stats.append ((14017, GS (IE_RESISTPOISON), '%'))
 	stats.append (None)
 
 	res = []
@@ -479,10 +553,12 @@ def GetStatOverview (pc):
 				res.append ("[capital=0]"+strref+": "+str(val) )
 			elif type == 'c': #normal string
 				res.append ("[capital=0]"+GemRB.GetString (strref))
+			elif type == 'd': #strref is an already resolved string
+				res.append ("[capital=0]"+strref)
 			elif type == '0': #normal value
 				res.append (GemRB.GetString (strref) + ': ' + str (val) )
 			else: #normal value + type character, for example percent sign
-				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
+				res.append ("[capital=0]"+GemRB.GetString (strref) + ': ' + str (val) + type)
 			lines = 1
 		except:
 			if s != None:

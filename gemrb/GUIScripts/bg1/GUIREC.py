@@ -290,6 +290,7 @@ def GSNN (pc, stat):
 # difference for each class
 def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	StateTable = GemRB.LoadTableObject ("statdesc")
+	str_None = GemRB.GetString (41275)
 
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
 	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) )
@@ -415,7 +416,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	#proficiencies
 	stats.append ( (8442,1,'c') )
 
-	stats.append ( (9457, GS (IE_TOHIT), '0') )
+	stats.append ( (61932, GS (IE_TOHIT), '0') )
+	stats.append ( (9457, GemRB.GetCombatDetails(pc, 0)["ToHit"], '0') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
 		tmp2 = str (tmp/2) + chr (188)
@@ -423,9 +425,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		tmp2 = str (tmp/2)
 	stats.append ( (9458, tmp2, '') )
 	stats.append ( (9459, GSNN (pc, IE_LORE), '0') )
-	stats.append ( (19224, GS (IE_MAGICDAMAGERESISTANCE), '') )
+	stats.append ( (19224, GS (IE_RESISTMAGIC), '') )
 
-	#reputation
+	# party's reputation
 	reptxt = GetReputation (GemRB.GameGetReputation ()/10)
 	stats.append ( (9465, reptxt, '') )
 	stats.append ( (9460, GSNN (pc, IE_LOCKPICKING), '') )
@@ -480,7 +482,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append ( (text, GS (stat)&0x07, '+') )
 	stats.append (None)
 
-	# 11766 AC bonuses
+	# 11766 AC Bonuses
 	stats.append (11766)
 	# 11770 AC vs. Crushing
 	stats.append ((11770, GS (IE_ACCRUSHINGMOD), ''))
@@ -547,7 +549,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				res.append ("[capital=0]"+strref+": "+str (val) )
 			elif type == 'c': #normal string
 				res.append ("[capital=0]"+GemRB.GetString (strref) )
-		        elif type == 'd': #strref is an already resolved string
+			elif type == 'd': #strref is an already resolved string
 				res.append ("[capital=0]"+strref)
 			elif type == '0': #normal value
 				res.append (GemRB.GetString (strref) + ': ' + str (val) )
@@ -559,8 +561,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				res.append ( GemRB.GetString (s) )
 				lines = 0
 			else:
-				if lines:
-					res.append ("")
+				if not lines:
+					res.append (str_None)
+				res.append ("")
 				lines = 0
 
 	return "\n".join (res)
