@@ -353,6 +353,14 @@ def setAccept():
 	t = TmpTable.GetValue (AllignID,0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 
+	#lore, thac0, hp, and saves
+	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
+	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0)
+	SetupSavingThrows (MyChar)
+	SetupThaco (MyChar)
+	SetupLore (MyChar)
+	SetupHP (MyChar)
+
 	#slot 1 is the protagonist
 	if MyChar == 1:
 		GemRB.GameSetReputation( t )

@@ -286,6 +286,7 @@ def NextPress():
 	# print our diagnostic as we loop (so as not to duplicate)
 	for i in range (AbilityCount):
 		StatID = AbilityTable.GetValue (i, 3)
+		StatName = AbilityTable.GetRowName (i)
 		StatValue = GemRB.GetVar ("Ability "+str(i))
 		GemRB.SetPlayerStat (MyChar, StatID, StatValue)
 		print "\t",StatName,":\t", StatValue
@@ -295,6 +296,5 @@ def NextPress():
 
         GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 
-	SetupHP(MyChar)
 	next()
 

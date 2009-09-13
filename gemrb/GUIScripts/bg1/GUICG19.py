@@ -23,9 +23,10 @@ import GemRB
 from CharGenCommon import * 
 from GUICommon import CloseOtherWindow
 
-
+SoundSequence = [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m" ]
 VoiceList = 0
 CharSoundWindow = 0
+SoundIndex = 0
 
 def OnLoad():
 	global CharSoundWindow, VoiceList
@@ -63,18 +64,35 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
+	VoiceList.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, "ChangeVoice")
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	CharSoundWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def PlayPress():
-	global CharSoundWindow
+	global CharSoundWindow, SoundIndex, SoundSequence
 
 	CharSound = VoiceList.QueryText()
-	GemRB.PlaySound (CharSound+"a")
+	# SClassID.h -> IE_WAV_CLASS_ID = 0x00000004
+	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], RES_WAV)):
+		NextSound()
+	# play the sound like it was a speech, so any previous yells are quieted
+	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], 0, 0, 4)
+	NextSound()
 	return
 
+def NextSound():
+	global SoundIndex, SoundSequence
+	SoundIndex += 1
+	if SoundIndex >= len(SoundSequence):
+		SoundIndex = 0
+	return
+
+def ChangeVoice():
+	global SoundIndex
+	SoundIndex = 0
+	return
 
 def NextPress():
 	global CharSoundWindow

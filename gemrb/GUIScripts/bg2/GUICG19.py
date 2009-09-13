@@ -84,11 +84,13 @@ def NextSound():
 	SoundIndex += 1
 	if SoundIndex >= len(SoundSequence):
 		SoundIndex = 0
+	return
 
 # When a new voice is selected, play the sounds again from the beginning of the sequence
 def ChangeVoice():
 	global SoundIndex
 	SoundIndex = 0
+	return
 
 def BackPress():
 	global CharSoundWindow
@@ -102,7 +104,6 @@ def NextPress():
 	global CharSoundWindow
 
 	CharSound = VoiceList.QueryText ()
-	GemRB.SetToken ("CharSound", CharSound)
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerSound (MyChar, CharSound)
 
