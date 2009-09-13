@@ -50,6 +50,10 @@ def CloseOtherWindow (NewWindowFn):
 		OtherWindowFn = NewWindowFn
 		return 0
 
+def RestPress ():
+	GemRB.RestParty(0,0,0)
+	return
+
 def GetMageSpells (Kit, Alignment, Level):
 	MageSpells = []
 	SpellType = 99

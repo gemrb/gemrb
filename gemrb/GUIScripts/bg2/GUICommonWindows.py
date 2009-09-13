@@ -152,10 +152,6 @@ def AIPress ():
 		GemRB.SetVar ("AI", GS_PARTYAI)
 	return
 
-def RestPress ():
-	GemRB.RestParty(0,0,0)
-	return
-
 def EmptyControls ():
 	global ActionsWindow
 

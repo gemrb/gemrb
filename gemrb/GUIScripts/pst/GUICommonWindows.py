@@ -25,6 +25,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from GUIClasses import GWindow
+from GUICommon import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -171,10 +172,6 @@ def AIPress ():
 
 def TxtePress ():
 	print "TxtePress"
-
-def RestPress ():
-	GemRB.RestParty(0,0,0)
-	return
 
 def SetupActionsWindowControls (Window):
 	# time button

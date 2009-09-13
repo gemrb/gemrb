@@ -23,6 +23,7 @@
 
 import GemRB
 from GUIDefines import *
+from GUICommon import *
 from ie_stats import *
 from ie_modal import *
 from ie_action import *
@@ -105,10 +106,6 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 
 def AIPress ():
 	print "AIPress"
-	return
-
-def RestPress ():
-	GemRB.RestParty (0,0,0)
 	return
 
 def EmptyControls ():

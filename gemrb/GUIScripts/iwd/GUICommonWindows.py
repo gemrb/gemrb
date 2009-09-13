@@ -143,10 +143,6 @@ def AIPress ():
 		Button.SetTooltip (15917)
 	return
 
-def RestPress ():
-	GemRB.RestParty(0,0,0)
-	return
-
 def EmptyControls ():
 	global ActionsWindow
 
