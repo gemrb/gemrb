@@ -4,7 +4,7 @@ GemRB svn (7059):
 
   Improved features:
     - 
-    - various guiscripts
+    - various guiscripts (bg1: ability, sound selection)
     - bugfixes
 
   Applied patches:
