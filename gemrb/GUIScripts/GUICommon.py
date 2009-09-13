@@ -87,6 +87,9 @@ def GetActorPaperDoll (actor):
 	which = "LEVEL%d" %(level+1)
 	return PortraitTable.GetValue (row, which)
 
+def SelectAllOnPress ():
+	GemRB.GameSelectPC (0, 1)
+
 def GetMageSpells (Kit, Alignment, Level):
 	MageSpells = []
 	SpellType = 99

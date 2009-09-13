@@ -665,10 +665,6 @@ def PortraitButtonOnShiftPress ():
 		RunSelectionChangeHandler ()
 	return
 
-def SelectAllOnPress ():
-	GemRB.GameSelectPC (0, 1)
-	return
-
 def SelectionChanged ():
 	"""Ran by the Game class when a PC selection is changed."""
 

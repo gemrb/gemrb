@@ -427,9 +427,6 @@ def StopAllOnPress ():
 			GemRB.ClearActions(i + 1)
 	return
 
-def SelectAllOnPress ():
-	GemRB.GameSelectPC (0, 1)
-
 # Run by Game class when selection was changed
 def SelectionChanged ():
 	# FIXME: hack. If defined, display single selection
