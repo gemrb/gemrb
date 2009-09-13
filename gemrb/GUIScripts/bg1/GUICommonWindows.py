@@ -284,21 +284,6 @@ def UpdateActionsWindow ():
 		ActionsWindow.SetupSpellIcons(pc, 4, TopIndex)
 	return
 
-def OpenFloatMenuWindow ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
-
-def ActionTalkPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK)
-
-def ActionAttackPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
-
-def ActionDefendPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND)
-
-def ActionThievingPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK)
-
 def ActionQWeaponPressed (which):
 	pc = GemRB.GameGetFirstSelectedPC ()
 
@@ -323,12 +308,6 @@ def ActionQWeapon3Pressed ():
 
 def ActionQWeapon4Pressed ():
 	ActionQWeaponPressed(3)
-
-def ActionStopPressed ():
-	for i in range (PARTY_SIZE):
-		if GemRB.GameIsPCSelected(i + 1):
-			GemRB.ClearActions(i + 1)
-	return
 
 #no check needed because the button wouldn't be drawn if illegal
 def ActionLeftPressed ():

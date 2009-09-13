@@ -302,21 +302,6 @@ def UpdateActionsWindow ():
 		ActionsWindow.SetupSpellIcons(pc, 4, TopIndex)
 	return
 
-def OpenFloatMenuWindow ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
-
-def ActionTalkPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK,GA_NO_DEAD|GA_NO_ENEMY|GA_NO_HIDDEN)
-
-def ActionAttackPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK,GA_NO_DEAD|GA_NO_SELF|GA_NO_HIDDEN)
-
-def ActionDefendPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND,GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
-
-def ActionThievingPressed ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
-
 def ActionQWeaponPressed (which):
 	"""Selects the given quickslot weapon if possible."""
 
@@ -345,14 +330,6 @@ def ActionQWeapon3Pressed ():
 
 def ActionQWeapon4Pressed ():
 	ActionQWeaponPressed(3)
-
-def ActionStopPressed ():
-	"""Clears all party actions."""
-
-	for i in range (PARTY_SIZE):
-		if GemRB.GameIsPCSelected(i + 1):
-			GemRB.ClearActions(i + 1)
-	return
 
 #no check needed because the button wouldn't be drawn if illegal
 def ActionLeftPressed ():
