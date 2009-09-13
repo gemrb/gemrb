@@ -116,9 +116,11 @@ def SetClass():
 	# find the class from the class table
 	ClassIndex = GemRB.GetVar ("Class") - 1
 	Class = ClassTable.GetValue (ClassIndex, 5)
-	#protect against barbarians
-	ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class) )
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
+	ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class))
+	# protect against barbarians; this stat will be overwritten later
+	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, ClassIndex)
+
 	#assign the correct XP
 	if GameIsTOB():
 		GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (ClassName, "STARTXP2"))

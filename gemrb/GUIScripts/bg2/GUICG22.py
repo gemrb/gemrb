@@ -46,7 +46,7 @@ def OnLoad():
 	RaceName = RaceTable.GetRowName(RaceTable.FindValue (3, Race) )
 
 	ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	ClassName = ClassTable.GetRowName (ClassTable.FindValue(5, ClassID) )
+	ClassName = ClassTable.GetRowName (GemRB.GetPlayerStat (MyChar, IE_HITPOINTS)) # barbarian hack
 
 	KitTable = GemRB.LoadTableObject("kittable")
 	KitTableName = KitTable.GetValue(ClassName, RaceName)
