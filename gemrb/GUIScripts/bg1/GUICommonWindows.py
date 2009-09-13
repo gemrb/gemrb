@@ -897,9 +897,6 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	GemRB.SetPlayerStat (pc, IE_HITPOINTS, GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1)+CurrentHP)
 	return
 
-def GearsClicked():
-	GemRB.GamePause(2,0)
-
 def OpenWaitForDiscWindow ():
 	global DiscWindow
 

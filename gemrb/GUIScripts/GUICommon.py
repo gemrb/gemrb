@@ -90,6 +90,9 @@ def GetActorPaperDoll (actor):
 def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
 
+def GearsClicked ():
+	GemRB.GamePause (2, 0)
+
 def GetMageSpells (Kit, Alignment, Level):
 	MageSpells = []
 	SpellType = 99
