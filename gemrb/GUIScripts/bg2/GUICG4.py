@@ -40,7 +40,7 @@ MyChar = 0
 def CalcLimits(Abidx):
 	global Minimum, Maximum, Add
 
-	Race = RaceTable.FindValue (1, GemRB.GetPlayerStat (MyChar, IE_RACE) )
+	Race = RaceTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
 	RaceName = RaceTable.GetRowName(Race)
 
 	Minimum = 3
@@ -73,7 +73,6 @@ def CalcLimits(Abidx):
 def RollPress():
 	global Minimum, Maximum, Add, HasStrExtra, PointsLeft
 
-	AbilityWindow.Invalidate()
 	GemRB.SetVar("Ability",0)
 	GemRB.SetVar("Ability -1",0)
 	PointsLeft = 0
@@ -125,6 +124,7 @@ def OnLoad():
 		#rowname is just a number, first value row what we need here
 		KitName = KitListTable.GetValue(Kit, 0)
 
+	#if the class uses the warrior table for saves, then it may have the extra strength
 	if ClassTable.GetValue(Class, 3)=="SAVEWAR":
 		HasStrExtra=1
 	else:
@@ -184,10 +184,8 @@ def OnLoad():
 def RightPress():
 	global PointsLeft
 
-	AbilityWindow.Invalidate()
 	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
-	#should be more elaborate
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
@@ -210,7 +208,6 @@ def RightPress():
 def JustPress():
 	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
-	#should be more elaborate
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
@@ -218,15 +215,13 @@ def JustPress():
 	return
 
 def LeftPress():
-	global PointsLeft, HasStrExtra
+	global PointsLeft
 
 	Abidx = GemRB.GetVar("Ability")
-	AbilityWindow.Invalidate()
-	PointsLeft=GemRB.GetVar("Ability -1")
+	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
-	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
 	if PointsLeft == 0:
 		return
@@ -259,7 +254,6 @@ def StorePress():
 def RecallPress():
 	global PointsLeft
 
-	AbilityWindow.Invalidate()
 	e=GemRB.GetVar("StoredStrExtra")
 	GemRB.SetVar("StrExtra",e)
 	for i in range(-1,6):
@@ -287,16 +281,10 @@ def BackPress():
 def NextPress():
 	if AbilityWindow:
 		AbilityWindow.Unload()
-	# save our previous stats:
-	#       abilities
 	AbilityTable = GemRB.LoadTableObject ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 
 	# print our diagnostic as we loop (so as not to duplicate)
-	print "CharGen6 output:"
-	
-	MyChar = GemRB.GetVar ("Slot")
-
 	for i in range (AbilityCount):
 		StatID = AbilityTable.GetValue (i, 3)
 		StatName = AbilityTable.GetRowName (i)
@@ -304,17 +292,11 @@ def NextPress():
 		GemRB.SetPlayerStat (MyChar, StatID, StatValue)
 		print "\t",StatName,":\t", StatValue
 
-	# TODO: don't all chars have an str mod, even if it isn't applied?
-	#       so it should be the cores duty to decide whether or not the char
-	#       has 18 str in game and adjust accordingly; you wouldn't want an
-	#       18/00 char use draw upon holy might to boost his str, then have
-	#       it re-roll when it comes back to normal
-	# apply our extra str
 	GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
 	print "\tSTREXTRA:\t",GemRB.GetVar ("StrExtra")
 
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
-	GemRB.SetNextScript("CharGen6") #
+	GemRB.SetNextScript("CharGen6")
 	return
 
 def OverPress0():

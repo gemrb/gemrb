@@ -24,6 +24,7 @@ from LUSkillsSelection import *
 SkillWindow = 0
 TextAreaControl = 0
 DoneButton = 0
+MyChar = 0
 
 def RedrawSkills():
 	PointsLeft = GemRB.GetVar ("SkillPointsLeft")
@@ -34,7 +35,7 @@ def RedrawSkills():
 	return
 
 def OnLoad():
-	global SkillWindow, DoneButton
+	global SkillWindow, DoneButton, MyChar
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	SkillWindow = GemRB.LoadWindowObject(6)
@@ -77,7 +78,6 @@ def NextPress():
 		SkillWindow.Unload()
 	# save all skills
 
-	MyChar = GemRB.GetVar ("Slot")
 	SkillsSave (MyChar)
 
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)

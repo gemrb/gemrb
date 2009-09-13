@@ -21,38 +21,37 @@
 import GemRB
 
 from CharGenCommon import * 
-from GUICommon import CloseOtherWindow
-from GUICommonWindows import SetupHP
-
+from GUICommon import *
 
 AbilityWindow = 0
 TextAreaControl = 0
 DoneButton = 0
 AbilityTable = 0
+Abclasrq = 0
+Abclsmod = 0
+Abclasrq = 0
+Abracerq = 0
 PointsLeft = 0
 Minimum = 0
 Maximum = 0
 Add = 0
 KitIndex = 0
+HasStrExtra = 0
+MyChar = 0
 
 def CalcLimits(Abidx):
 	global Minimum, Maximum, Add
 
-	RaceTable = GemRB.LoadTableObject("races")
-	Abracead = GemRB.LoadTableObject("ABRACEAD")
-	#Abclsmod = GemRB.LoadTableObject("ABCLSMOD")
-	Race = GemRB.GetVar("Race")-1
+	Race = RaceTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
 	RaceName = RaceTable.GetRowName(Race)
 
 	Minimum = 3
 	Maximum = 18
 
-	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
 	tmp = Abclasrq.GetValue(KitIndex, Abidx)
 	if tmp!=0 and tmp>Minimum:
 		Minimum = tmp
 
-	Abracerq = GemRB.LoadTableObject("ABRACERQ")
 	Race = Abracerq.GetRowIndex(RaceName)
 	tmp = Abracerq.GetValue(Race, Abidx*2)
 	if tmp!=0 and tmp>Minimum:
@@ -74,9 +73,8 @@ def CalcLimits(Abidx):
 	return
 
 def RollPress():
-	global Minimum, Maximum, Add, PointsLeft
+	global Minimum, Maximum, Add, HasStrExtra, PointsLeft
 
-	AbilityWindow.Invalidate()
 	GemRB.SetVar("Ability",0)
 	GemRB.SetVar("Ability -1",0)
 	PointsLeft = 0
@@ -84,6 +82,11 @@ def RollPress():
 	SumLabel.SetText("0")
 	SumLabel.SetUseRGB(1)
 
+	if HasStrExtra:
+		e = GemRB.Roll(1,100,0)
+	else:
+		e = 0
+	GemRB.SetVar("StrExtra", e)
 	for i in range(6):
 		dice = 3
 		size = 5
@@ -95,16 +98,18 @@ def RollPress():
 			v = Maximum
 		GemRB.SetVar("Ability "+str(i), v )
 		Label = AbilityWindow.GetControl(0x10000003+i)
-		Label.SetText(str(v) )
+		if i==0 and v==18 and HasStrExtra:
+			Label.SetText("18/"+str(e) )
+		else:
+			Label.SetText(str(v) )
 		Label.SetUseRGB(1)
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def OnLoad():
 	global AbilityWindow, TextAreaControl, DoneButton
-	global PointsLeft
-	global AbilityTable
-	global KitIndex, Minimum, Maximum
+	global PointsLeft, HasStrExtra
+	global AbilityTable, Abclasrq, Abclsmod, Abracerq, Abracead
+	global KitIndex, Minimum, Maximum, MyChar
 
 	if CloseOtherWindow (OnLoad):
 		if(AbilityWindow):
@@ -112,15 +117,27 @@ def OnLoad():
 			AbilityWindow = None
 		return
 
-	AbilityTable = GemRB.LoadTableObject ("ability")
-	AbilityCount = AbilityTable.GetRowCount ()
-	
+	Abracead = GemRB.LoadTableObject("ABRACEAD")
+	#Abclsmod = GemRB.LoadTableObject("ABCLSMOD")
 	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
+	Abracerq = GemRB.LoadTableObject("ABRACERQ")
 
-	
-	ClassTable = GemRB.LoadTableObject("classes")
-	Class = GemRB.GetVar("Class")-1
-	KitName = ClassTable.GetRowName(Class)
+	MyChar = GemRB.GetVar ("Slot")
+	Kit = GetKitIndex (MyChar)
+	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
+	Class = ClassTable.FindValue (5, Class)
+	if Kit == 0:
+		KitName = ClassTable.GetRowName(Class)
+	else:
+		#rowname is just a number, first value row what we need here
+		KitName = KitListTable.GetValue(Kit, 0)
+
+	#if the class uses the warrior table for saves, then it may have the extra strength
+	if ClassTable.GetValue(Class, 3)=="SAVEWAR":
+		HasStrExtra=1
+	else:
+		HasStrExtra=0
+
 	KitIndex = Abclasrq.GetRowIndex(KitName)
 
 	GemRB.LoadWindowPack("GUICG", 640, 480)
@@ -136,9 +153,11 @@ def OnLoad():
 
 	BackButton = AbilityWindow.GetControl(36)
 	BackButton.SetText(15416)
+	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	DoneButton = AbilityWindow.GetControl(0)
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
 	RollPress()
 	StorePress()
@@ -170,10 +189,8 @@ def OnLoad():
 def RightPress():
 	global PointsLeft
 
-	AbilityWindow.Invalidate()
 	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
-	#should be more elaborate
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
@@ -186,14 +203,16 @@ def RightPress():
 	SumLabel = AbilityWindow.GetControl(0x10000002)
 	SumLabel.SetText(str(PointsLeft) )
 	Label = AbilityWindow.GetControl(0x10000003+Abidx)
-	Label.SetText(str(Ability-1) )
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	StrExtra = GemRB.GetVar("StrExtra")
+	if Abidx==0 and Ability==19 and StrExtra:
+		Label.SetText("18/"+str(StrExtra) )
+	else:
+		Label.SetText(str(Ability-1) )
 	return
 
 def JustPress():
 	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
-	#should be more elaborate
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
@@ -203,15 +222,11 @@ def JustPress():
 def LeftPress():
 	global PointsLeft
 
-	AbilityWindow.Invalidate()
-	PointsLeft=GemRB.GetVar("Ability -1")
-	#should be more elaborate
-	Minimum=3
-	Maximum=18
-	GemRB.SetToken("MINIMUM",str(Minimum) )
-	GemRB.SetToken("MAXIMUM",str(Maximum) )
 	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
+	CalcLimits(Abidx)
+	GemRB.SetToken("MINIMUM",str(Minimum) )
+	GemRB.SetToken("MAXIMUM",str(Maximum) )
 	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
 	if PointsLeft == 0:
 		return
@@ -223,9 +238,11 @@ def LeftPress():
 	SumLabel = AbilityWindow.GetControl(0x10000002)
 	SumLabel.SetText(str(PointsLeft) )
 	Label = AbilityWindow.GetControl(0x10000003+Abidx)
-	Label.SetText(str(Ability+1) )
-	if PointsLeft == 0:
-		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	StrExtra = GemRB.GetVar("StrExtra")
+	if Abidx==0 and Ability==17 and HasStrExtra==1:
+		Label.SetText("18/%02d"%(StrExtra) )
+	else:
+		Label.SetText(str(Ability+1) )
 	return
 
 def EmptyPress():
@@ -234,6 +251,7 @@ def EmptyPress():
 	return
 
 def StorePress():
+	GemRB.SetVar("StoredStrExtra",GemRB.GetVar("StrExtra") )
 	for i in range(-1,6):
 		GemRB.SetVar("Stored "+str(i),GemRB.GetVar("Ability "+str(i) ) )
 	return
@@ -241,18 +259,18 @@ def StorePress():
 def RecallPress():
 	global PointsLeft
 
-	AbilityWindow.Invalidate()
+	e=GemRB.GetVar("StoredStrExtra")
+	GemRB.SetVar("StrExtra",e)
 	for i in range(-1,6):
 		v = GemRB.GetVar("Stored "+str(i) )
 		GemRB.SetVar("Ability "+str(i), v)
 		Label = AbilityWindow.GetControl(0x10000003+i)
-		Label.SetText(str(v) )
+		if i==0 and v==18 and HasStrExtra==1:
+			Label.SetText("18/"+str(e) )
+		else:
+			Label.SetText(str(v) )
 
 	PointsLeft = GemRB.GetVar("Ability -1")
-	if PointsLeft == 0:
-		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-	else:
-		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	return
 
 def BackPress():
@@ -262,15 +280,21 @@ def BackPress():
 def NextPress():
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	
-	MyChar = GemRB.GetVar ("Slot")
-	
 	AbilityTable = GemRB.LoadTableObject ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 	
+	# print our diagnostic as we loop (so as not to duplicate)
 	for i in range (AbilityCount):
 		StatID = AbilityTable.GetValue (i, 3)
 		StatValue = GemRB.GetVar ("Ability "+str(i))
 		GemRB.SetPlayerStat (MyChar, StatID, StatValue)
+		print "\t",StatName,":\t", StatValue
+
+	GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
+	print "\tSTREXTRA:\t",GemRB.GetVar ("StrExtra")
+
+        GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
+
 	SetupHP(MyChar)
 	next()
 
