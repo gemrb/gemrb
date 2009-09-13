@@ -680,63 +680,6 @@ def PortraitButtonOnMouseLeave ():
 	GemRB.SetTimedEvent ("CheckDragging",1)
 	return
 
-def SetupThaco (pc, Level=None):
-	"""Updates an actors THAC0 based upon level.
-
-	Level should contain the actors current level.
-	If Level is None it is filled with the actors current level."""
-
-	#storing levels as an array makes them easier to deal with
-	if not Level:
-		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL)-1, \
-			GemRB.GetPlayerStat (pc, IE_LEVEL2)-1, \
-			GemRB.GetPlayerStat (pc, IE_LEVEL3)-1]
-	else:
-		Levels = []
-		for level in Level:
-			Levels.append (level-1)
-
-	#get some basic values
-	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
-	ThacoTable = GemRB.LoadTableObject ("THAC0")
-
-	#adjust the class for multi/dual chars
-	Multi = IsMultiClassed (pc, 1)
-	Dual = IsDualClassed (pc, 1)
-	NumClasses = 1
-	if Multi[0]>1: #get each of the multi-classes
-		NumClasses = Multi[0]
-		Class = [Multi[1], Multi[2], Multi[3]]
-	elif Dual[0]: #only worry about the newer class
-		Class = [ClassTable.GetValue (Dual[2], 5)]
-		#assume Level is correct if passed
-		if IsDualSwap(pc) and not Level:
-			Levels = [Levels[1], Levels[0], Levels[2]]
-	if NumClasses>len(Levels):
-		return
-
-	#make sure to limit the levels to the table allowable
-	MaxLevel = ThacoTable.GetColumnCount ()-1
-	for i in range (len(Levels)):
-		if Levels[i] > MaxLevel:
-			Levels[i] = MaxLevel
-
-	CurrentThaco = GemRB.GetPlayerStat (pc, IE_TOHIT, 1)
-	NewThaco = 0
-	for i in range (NumClasses):
-		#loop through each class and update the save value if we have
-		#a better thac0
-		ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class[i]))
-		TmpThaco = ThacoTable.GetValue (ClassName, str(Levels[i]+1))
-		if TmpThaco < CurrentThaco:
-			NewThaco = 1
-			CurrentThaco = TmpThaco
-
-	#only update if we have a better thac0
-	if NewThaco:
-		GemRB.SetPlayerStat (pc, IE_TOHIT, CurrentThaco)
-	return
-
 def SetupLore (pc, LevelDiff=None):
 	"""Updates an actors lore based upon level.
 
