@@ -5702,8 +5702,12 @@ void Actor::UseExit(int flag) {
 
 int Actor::GetReaction()
 {
-	//return ::GetReaction((Scriptable*)this);
-	int chr = GetStat(IE_CHR)-1;
-	int rep = core->GetGame()->Reputation/10;
+	int chr, rep;
+	chr = GetStat(IE_CHR)-1;
+	if (GetStat(IE_EA) == EA_PC) {
+		rep = core->GetGame()->Reputation/10;
+	} else {
+		rep = GetStat(IE_REPUTATION);
+	}
 	return 10 + rmodrep[rep] + rmodchr[chr];
 }
