@@ -680,62 +680,6 @@ def PortraitButtonOnMouseLeave ():
 	GemRB.SetTimedEvent ("CheckDragging",1)
 	return
 
-def SetupLore (pc, LevelDiff=None):
-	"""Updates an actors lore based upon level.
-
-	Level should contain the actors current level.
-	LevelDiff should contain the change in levels.
-	Level and LevelDiff must be of the same length.
-	If either are None, they are filled with the actors current level."""
-
-	#storing levels as an array makes them easier to deal with
-	if not LevelDiff:
-		LevelDiffs = [GemRB.GetPlayerStat (pc, IE_LEVEL), \
-			GemRB.GetPlayerStat (pc, IE_LEVEL2), \
-			GemRB.GetPlayerStat (pc, IE_LEVEL3)]
-	else:
-		LevelDiffs = []
-		for diff in LevelDiff:
-			LevelDiffs.append (diff)
-
-	#get some basic values
-	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
-	LoreTable = GemRB.LoadTableObject ("lore")
-
-	#adjust the class for multi/dual chars
-	Multi = IsMultiClassed (pc, 1)
-	Dual = IsDualClassed (pc, 1)
-	NumClasses = 1
-	if Multi[0]>1: #get each of the multi-classes
-		NumClasses = Multi[0]
-		Class = [Multi[1], Multi[2], Multi[3]]
-	elif Dual[0]: #only worry about the newer class
-		Class = [ClassTable.GetValue (Dual[2], 5)]
-		#if LevelDiff is passed, we assume it is correct
-		if IsDualSwap(pc) and not LevelDiff:
-			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]
-	if NumClasses>len(LevelDiffs):
-		return
-
-	#loop through each class and update the lore value if we have
-	CurrentLore = GemRB.GetPlayerStat (pc, IE_LORE, 1)
-	for i in range (NumClasses):
-		#correct unlisted progressions
-		ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class[i]) )
-		if ClassName == "SORCERER":
-			ClassName = "MAGE"
-		elif ClassName == "MONK": #monks have a rate of 1, so this is arbitrary
-			ClassName = "CLERIC"
-
-		#add the lore from this class to the total lore
-		TmpLore = LevelDiffs[i] * LoreTable.GetValue (ClassName, "RATE", 1)
-		if TmpLore:
-			CurrentLore += TmpLore
-
-	#update our lore value
-	GemRB.SetPlayerStat (pc, IE_LORE, CurrentLore)
-	return
-
 def SetupHP (pc, Level=None, LevelDiff=None):
 	"""Updates an actors hp based upon level.
 
