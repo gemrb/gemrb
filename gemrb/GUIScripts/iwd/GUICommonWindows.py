@@ -633,4 +633,4 @@ def PortraitButtonOnMouseLeave ():
 	return
 
 def CheckLevelUp(pc):
-	GemRB.SetVar (CheckLevelUp+str(pc), CanLevelUp (pc))
+	GemRB.SetVar ("CheckLevelUp"+str(pc), CanLevelUp (pc))
