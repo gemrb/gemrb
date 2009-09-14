@@ -42,6 +42,8 @@ ProfsOffsetButton1 = 0
 ProfsOffsetLabel = 0
 ProfsOffsetStar = 0
 ProfsOffsetPress = 0
+Profs2ndOffsetButton1 = Profs2ndOffsetStar = Profs2ndOffsetLabel = -1
+ClassNameSave = 0
 
 #internal variables
 ProfsPointsLeft = 0
@@ -71,6 +73,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	global ProfsOffsetPress, ProfsPointsLeft, ProfsNumButtons, ProfsTopIndex
 	global ProfsScrollBar, ProfsTableOffset, ProfsType
 	global ProfsWindow, ProfsCallback, ProfsTextArea, ProfsColumn, ProfsTable, ProfCount
+	global Profs2ndOffsetButton1, Profs2ndOffsetStar, Profs2ndOffsetLabel, ClassNameSave
 
 	# make sure we're within ranges
 	GemRB.SetVar ("ProfsPointsLeft", 0)
@@ -126,11 +129,14 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 			ProfsScrollBar = ProfsWindow.GetControl (108)
 	elif type == LUPROFS_TYPE_LEVELUP_IWD: #levelup
 		ProfsOffsetSum = 36
-		ProfsOffsetButton1 = 1 # +150-
-		ProfsOffsetStar = 48 #  +115-149
-		ProfsOffsetLabel = 24 # +108-
+		ProfsOffsetButton1 = 1
+		ProfsOffsetStar = 48
+		ProfsOffsetLabel = 24
 		ProfsOffsetPress = -1
-		ProfsNumButtons = 8 # actually 15, but noncontinuous: TODO: the other half
+		ProfsNumButtons = 15 # 8+7, the 7 are done with the following vars
+		Profs2ndOffsetButton1 = 150
+		Profs2ndOffsetStar = 115
+		Profs2ndOffsetLabel = 108
 		ProfsTextArea = ProfsWindow.GetControl (42)
 		if (scroll):
 			ProfsScrollBar = ProfsWindow.GetControl (108)
@@ -163,6 +169,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassName = ClassTable.FindValue (5, Class)
 	ClassName = ClassTable.GetRowName (ClassName)
+	ClassNameSave = ClassName
 
 	#find the class with the greatest prof potential
 	FastestProf = 0
@@ -251,11 +258,15 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 			Button.SetVarAssoc("Prof", i)
 			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ProfsJustPress")
 
-		Button=ProfsWindow.GetControl(i*2+ProfsOffsetButton1)
+		cid = i*2+ProfsOffsetButton1
+		if Profs2ndOffsetButton1 != -1 and i > 7:
+			cid = (i-8)*2+Profs2ndOffsetButton1
+
+		Button=ProfsWindow.GetControl(cid)
 		Button.SetVarAssoc("Prof", i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ProfsLeftPress")
 
-		Button=ProfsWindow.GetControl(i*2+ProfsOffsetButton1+1)
+		Button=ProfsWindow.GetControl(cid+1)
 		Button.SetVarAssoc("Prof", i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ProfsRightPress")
 
@@ -282,27 +293,38 @@ def ProfsRedraw (first=0):
 		Pos=ProfsTopIndex+i
 		ProfName = ProfsTable.GetValue(Pos+ProfsTableOffset, 1) #we add the bg1 skill count offset
 		MaxProf = ProfsTable.GetValue(Pos+ProfsTableOffset, ProfsColumn) #we add the bg1 skill count offset
-		Button1=ProfsWindow.GetControl(i*2+ProfsOffsetButton1)
-		Button2=ProfsWindow.GetControl(i*2+ProfsOffsetButton1+1)
+
+		cid = i*2+ProfsOffsetButton1
+		if Profs2ndOffsetButton1 != -1 and i > 7:
+			cid = (i-8)*2+Profs2ndOffsetButton1
+		Button1=ProfsWindow.GetControl (cid)
+		Button2=ProfsWindow.GetControl (cid+1)
 		if MaxProf == 0:
 			Button1.SetState(IE_GUI_BUTTON_DISABLED)
 			Button2.SetState(IE_GUI_BUTTON_DISABLED)
 			Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 			Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			if (not GameIsBG1()) and (i==0 or ((i-1) in SkipProfs)):
+			if GameIsBG2() and (i==0 or ((i-1) in SkipProfs)):
 				SkipProfs.append (i)
 		else:
 			Button1.SetState(IE_GUI_BUTTON_ENABLED)
 			Button2.SetState(IE_GUI_BUTTON_ENABLED)
 			Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
 			Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-		
-		Label=ProfsWindow.GetControl(0x10000000+ProfsOffsetLabel+i)
+
+		cid = 0x10000000 + ProfsOffsetLabel + i
+		if Profs2ndOffsetLabel != -1 and i > 7:
+			cid = 0x10000000 + Profs2ndOffsetLabel + i - 8
+
+		Label=ProfsWindow.GetControl (cid)
 		Label.SetText(ProfName)
 
 		ActPoint = GemRB.GetVar("Prof "+str(Pos) )
 		for j in range(5): #5 is maximum distributable
-			Star=ProfsWindow.GetControl(i*5+j+ProfsOffsetStar)
+			cid = i*5 + j + ProfsOffsetStar
+			if Profs2ndOffsetStar != -1 and i > 7:
+				cid = (i-8)*5 + j + Profs2ndOffsetStar
+			Star=ProfsWindow.GetControl (cid)
 			Star.SetSprites("GUIPFC", 0, 0, 0, 0, 0)
 			if ActPoint > j:
 				Star.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
@@ -356,13 +378,17 @@ def ProfsLeftPress():
 	global ProfsPointsLeft
 
 	Pos = GemRB.GetVar("Prof")+ProfsTopIndex
-	ProfsTextArea.SetText(ProfsTable.GetValue(Pos+8, 2) )
+	ProfsTextArea.SetText(ProfsTable.GetValue(Pos+ProfsTableOffset, 2) )
 	if ProfsPointsLeft == 0:
 		return
-	MaxProf = ProfsTable.GetValue(Pos+ProfsTableOffset, ProfsColumn) #we add the bg1 skill count offset
+	if GameIsIWD() or GameIsHOW():
+		ProfMaxTable = GemRB.LoadTableObject ("profsmax")
+		MaxProf = ProfMaxTable.GetValue(ClassNameSave, "OTHER_LEVELS")
+	else:
+		MaxProf = ProfsTable.GetValue(Pos+ProfsTableOffset, ProfsColumn)
 	if MaxProf>5:
 		MaxProf = 5
-	# FIXME: use profsmax.2da (in all games)
+	# FIXME: use profsmax.2da (in all games? could be problematic for weapon styles)
 	if (MaxProf>2) and (ProfsType == LUPROFS_TYPE_CHARGEN_BG1):
 		MaxProf = 2
 
