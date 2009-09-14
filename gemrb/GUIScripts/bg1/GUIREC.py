@@ -290,7 +290,6 @@ def GSNN (pc, stat):
 # difference for each class
 def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	StateTable = GemRB.LoadTableObject ("statdesc")
-	str_None = GemRB.GetString (41275)
 
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
 	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) )
@@ -416,7 +415,6 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	#proficiencies
 	stats.append ( (8442,1,'c') )
 
-	stats.append ( (61932, GS (IE_TOHIT), '0') )
 	stats.append ( (9457, GemRB.GetCombatDetails(pc, 0)["ToHit"], '0') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
@@ -561,9 +559,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				res.append ( GemRB.GetString (s) )
 				lines = 0
 			else:
-				if not lines:
-					res.append (str_None)
-				res.append ("")
+				if lines:
+					res.append ("")
 				lines = 0
 
 	return "\n".join (res)
