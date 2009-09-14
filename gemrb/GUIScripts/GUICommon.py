@@ -91,6 +91,7 @@ def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
 
 def GearsClicked ():
+	#GemRB.SetPlayerStat(GemRB.GameGetFirstSelectedPC (),44,249990)
 	GemRB.GamePause (2, 0)
 
 def GetMageSpells (Kit, Alignment, Level):
@@ -207,9 +208,11 @@ def CheckStat20 (Actor, Stat, Diff):
 		return True
 	return False
 
+def GameIsIWD ():
+	return GemRB.GameType == "iwd"
+
 def GameIsBG1 ():
 	return GemRB.GameType == "bg1"
-
 
 def GameIsBG2 ():
 	return GemRB.GameType == "bg2"

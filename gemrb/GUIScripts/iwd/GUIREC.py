@@ -145,10 +145,11 @@ def UpdateRecordsWindow ():
 
 	# dual-classable
 	Button = Window.GetControl (0)
-	if CanDualClass (pc):
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-	else:
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
+#FIXME: there is no dualclass table in iwd or bg1
+#	if CanDualClass (pc):
+	Button.SetState (IE_GUI_BUTTON_DISABLED)
+#	else:
+#		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	
 	# levelup
 	Button = Window.GetControl (37)
@@ -428,13 +429,15 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ( (34120, GSNN (pc, IE_HIDEINSHADOWS), '') )
 	stats.append ( (34121, GSNN (pc, IE_DETECTILLUSIONS), '') )
 	stats.append ( (34122, GSNN (pc, IE_SETTRAPS), '') )
-	HatedRace = GS (IE_HATEDRACE)
-	if HatedRace:
-		HateTable = GemRB.LoadTableObject ("haterace")
-		Racist = HateTable.FindValue (1, HatedRace)
-		if Racist != -1:
-			HatedRace = HateTable.GetValue (Racist, 0)
-			stats.append ( (15982, GemRB.GetString (HatedRace), '') )
+
+	#FIXME: there is no haterace table in iwd or bg1
+	#HatedRace = GS (IE_HATEDRACE)
+	#if HatedRace:
+		#HateTable = GemRB.LoadTableObject ("haterace")
+		#Racist = HateTable.FindValue (1, HatedRace)
+		#if Racist != -1:
+			#HatedRace = HateTable.GetValue (Racist, 0)
+			#stats.append ( (15982, GemRB.GetString (HatedRace), '') )
 	stats.append ( (12128, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
 	stats.append ( (12126, GS (IE_TURNUNDEADLEVEL), '') )
 
