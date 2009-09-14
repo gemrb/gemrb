@@ -15,7 +15,7 @@ DAMAGE_MAGICFIRE        137      19            0x200
 DAMAGE_PIERCINGMISSILE  133      24            0x400
 DAMAGE_MAGICCOLD        139      20            0x400
 DAMAGE_CRUSHINGMISSILE  133      24            0x400
-DAMAGE_STUNNING         141      -1            0x800
-DAMAGE_SOULEATER        141      -1            0x1000
-DAMAGE_DISEASE          141      -1            0x4000
-DAMAGE_CHUNKING         141      -1            0x8000
+DAMAGE_STUNNING         141       0            0x800
+DAMAGE_SOULEATER        141       0            0x1000
+DAMAGE_DISEASE          141       0            0x4000
+DAMAGE_CHUNKING         141       0            0x8000

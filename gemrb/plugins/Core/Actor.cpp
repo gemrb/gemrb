@@ -2485,7 +2485,6 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 		}
 	} else {
 		if (resisted == DR_IMMUNE) {
-			// this will also display for hits on stoneskins and mirrorimages
 			printMessage("Actor", " ", GREEN);
 			printf("is immune to damage type: %s.\n", type_name);
 	
@@ -3952,6 +3951,8 @@ void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagety
 		it = core->DamageInfoMap.find(damagetype);
 		if (it == core->DamageInfoMap.end()) {
 			printf("Unhandled damagetype:%d\n", damagetype);
+		} else if (it->second.resist_stat == 0) {
+			// damage type without a resistance stat
 		} else {
 			resisted = (int) (damage * (signed)target->GetStat(it->second.resist_stat)/100.0);
 			damage -= resisted;
