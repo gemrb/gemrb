@@ -84,10 +84,6 @@ GEM_EXPORT GameData* gamedata;
 GEM_EXPORT HANDLE hConsole;
 #endif
 
-//#include "../../includes/win32def.h"
-//#include "../../includes/globals.h"
-//#include "../../includes/strrefs.h"
-
 //use DialogF.tlk if the protagonist is female, that's why we leave space
 static const char dialogtlk[] = "dialog.tlk\0";
 
