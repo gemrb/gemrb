@@ -308,8 +308,9 @@ def RefreshInventoryWindow ():
 	SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
 
 	#armor class
-	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
 	Label = Window.GetControl (0x10000038)
+	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
+	ac += GemRB.GetAbilityBonus (IE_DEX, 2, GemRB.GetPlayerStat (pc, IE_DEX) )
 	Label.SetText (str (ac))
 	Label.SetTooltip (10339)
 
