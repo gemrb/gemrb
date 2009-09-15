@@ -2457,6 +2457,7 @@ def CharSoundDonePress():
 	AppearanceButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_NAND)
 	BiographyButton.SetState (IE_GUI_BUTTON_ENABLED)
 	NameButton.SetState (IE_GUI_BUTTON_ENABLED)
+	NameButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenState = 7
 	SetCharacterDescription()
 	CharGenWindow.SetVisible (1)
