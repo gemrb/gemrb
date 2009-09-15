@@ -1425,7 +1425,7 @@ static void InitActorTables()
 		maxhpconbon[i] = 9;
 	}
 	tm.load("classes");
-	if (tm && !core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+	if (tm && stricmp(core->GameType, "iwd2") != 0) {
 		AutoTable hptm;
 		//iwd2 just uses levelslotsiwd2 instead
 		printf("Examining classes.2da\n");
@@ -5517,7 +5517,21 @@ void Actor::CreateDerivedStatsIWD2()
 {
 	int i;
 	int turnundeadlevel = 0;
-	ieDword backstabdamagemultiplier = (BaseStats[IE_LEVELTHIEF]+1)/2;
+
+	ieDword backstabdamagemultiplier=GetThiefLevel();
+	if (backstabdamagemultiplier) {
+		AutoTable tm("backstab");
+		if (tm)	{
+			ieDword cols = tm->GetColumnCount();
+			if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols;
+			backstabdamagemultiplier = atoi(tm->QueryField(0, backstabdamagemultiplier));
+		} else {
+			backstabdamagemultiplier = (BaseStats[IE_LEVELTHIEF]+1)/2;
+		}
+		printf("\n");
+		if (backstabdamagemultiplier>7) backstabdamagemultiplier=7;
+	}
+
 	int layonhandsamount = (int) BaseStats[IE_LEVELPALADIN];
 	if (layonhandsamount) {
 		layonhandsamount *= BaseStats[IE_CHR]/2-5;
