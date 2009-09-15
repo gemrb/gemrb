@@ -59,6 +59,9 @@ ProfCount = 0
 ProfsTableOffset = 0
 ProfsScrollBar = None
 
+# iwd table that holds the allowed proficiency <-> class mapping
+ClassWeaponsTable = None
+
 ProfsType = None
 
 def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1], classid=0, scroll=True, profTableOffset=8):
@@ -73,7 +76,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	global ProfsOffsetPress, ProfsPointsLeft, ProfsNumButtons, ProfsTopIndex
 	global ProfsScrollBar, ProfsTableOffset, ProfsType
 	global ProfsWindow, ProfsCallback, ProfsTextArea, ProfsColumn, ProfsTable, ProfCount
-	global Profs2ndOffsetButton1, Profs2ndOffsetStar, Profs2ndOffsetLabel, ClassNameSave
+	global Profs2ndOffsetButton1, Profs2ndOffsetStar, Profs2ndOffsetLabel, ClassNameSave, ClassWeaponsTable
 
 	# make sure we're within ranges
 	GemRB.SetVar ("ProfsPointsLeft", 0)
@@ -140,6 +143,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsTextArea = ProfsWindow.GetControl (42)
 		if (scroll):
 			ProfsScrollBar = ProfsWindow.GetControl (108)
+		ClassWeaponsTable = GemRB.LoadTableObject ("clasweap")
 	elif type == LUPROFS_TYPE_DUALCLASS: #dualclass
 		ProfsOffsetSum = 40
 		ProfsOffsetButton1 = 50
@@ -292,7 +296,10 @@ def ProfsRedraw (first=0):
 	for i in range(ProfsNumButtons):
 		Pos=ProfsTopIndex+i
 		ProfName = ProfsTable.GetValue(Pos+ProfsTableOffset, 1) #we add the bg1 skill count offset
-		MaxProf = ProfsTable.GetValue(Pos+ProfsTableOffset, ProfsColumn) #we add the bg1 skill count offset
+		if ClassWeaponsTable: # iwd
+			MaxProf = ClassWeaponsTable.GetValue (ClassNameSave, ProfsTable.GetRowName(Pos))
+		else:
+			MaxProf = ProfsTable.GetValue(Pos+ProfsTableOffset, ProfsColumn)
 
 		cid = i*2+ProfsOffsetButton1
 		if Profs2ndOffsetButton1 != -1 and i > 7:
