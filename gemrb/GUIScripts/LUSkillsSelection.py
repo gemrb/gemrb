@@ -90,7 +90,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillsTextArea = SkillsWindow.GetControl (110)
 		ScrollBar = SkillsWindow.GetControl (109)
 	elif type == LUSKILLS_TYPE_LEVELUP_BG1:
-		SkillsOffsetPress = 17
+		SkillsOffsetPress = -1
 		SkillsOffsetButton1 = 17
 		SkillsOffsetSum = 37
 		SkillsOffsetName = 32
@@ -253,9 +253,10 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	for i in range(len(SkillsIndices)):
 		if i == SkillsNumButtons:
 			break
-		Button = SkillsWindow.GetControl(i+SkillsOffsetPress)
-		Button.SetVarAssoc("Skill",SkillsIndices[i])
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SkillJustPress")
+		if SkillsOffsetPress != -1:
+			Button = SkillsWindow.GetControl(i+SkillsOffsetPress)
+			Button.SetVarAssoc("Skill",SkillsIndices[i])
+			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SkillJustPress")
 
 		Button = SkillsWindow.GetControl(i*2+SkillsOffsetButton1)
 		Button.SetVarAssoc("Skill",SkillsIndices[i])
