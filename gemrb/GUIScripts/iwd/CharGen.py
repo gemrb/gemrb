@@ -315,10 +315,15 @@ def AcceptPress():
 		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
 		Learnable = GetLearnableMageSpells( KitIndex, t, 1)
 		SpellBook = GemRB.GetVar ("MageSpellBook")
+		MemoBook = GemRB.GetVar ("MageMemorized")
 		j=1
 		for i in range (len(Learnable) ):
 			if SpellBook & j:
-				GemRB.LearnSpell (MyChar, Learnable[i], 0)
+				if MemoBook & j:
+					memorize = 8
+				else:
+					memorize = 0
+				GemRB.LearnSpell (MyChar, Learnable[i], memorize)
 			j=j<<1
 
 	#priest spells
@@ -513,7 +518,7 @@ def SetCharacterDescription():
 					Spell = GemRB.GetSpell (Learnable[i])
 					TextArea.Append (Spell["SpellName"], -1)
 					if (1 << i) & MageMemorized:
-						TextArea.Append ("+")
+						TextArea.Append (" +")
 					TextArea.Append (" ")
 
 		if IsArcane!="*":
