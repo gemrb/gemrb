@@ -335,8 +335,12 @@ def AcceptPress():
 
 	TmpTable = GemRB.LoadTableObject ("repstart")
 	t=AlignmentTable.FindValue (3, t)
-	t = TmpTable.GetValue (t, 0)
+	t = TmpTable.GetValue (t, 0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
+	# set the party rep if this in the main char
+	if MyChar == 1:
+		GemRB.GameSetReputation (t)
+	
 	TmpTable = GemRB.LoadTableObject ("strtgold")
 	a = TmpTable.GetValue (Class, 1) #number of dice
 	b = TmpTable.GetValue (Class, 0) #size
