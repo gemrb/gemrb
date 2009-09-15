@@ -429,14 +429,13 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ( (34121, GSNN (pc, IE_DETECTILLUSIONS), '') )
 	stats.append ( (34122, GSNN (pc, IE_SETTRAPS), '') )
 
-	#FIXME: there is no haterace table in iwd or bg1
-	#HatedRace = GS (IE_HATEDRACE)
-	#if HatedRace:
-		#HateTable = GemRB.LoadTableObject ("haterace")
-		#Racist = HateTable.FindValue (1, HatedRace)
-		#if Racist != -1:
-			#HatedRace = HateTable.GetValue (Racist, 0)
-			#stats.append ( (15982, GemRB.GetString (HatedRace), '') )
+	HatedRace = GS (IE_HATEDRACE)
+	if HatedRace:
+		HateTable = GemRB.LoadTableObject ("haterace")
+		Racist = HateTable.FindValue (1, HatedRace)
+		if Racist != -1:
+			HatedRace = HateTable.GetValue (Racist, 3)
+			stats.append ( (15982, GemRB.GetString (HatedRace), '') )
 	stats.append ( (12128, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
 	stats.append ( (12126, GS (IE_TURNUNDEADLEVEL), '') )
 

@@ -1611,7 +1611,7 @@ def RacialEnemySelect():
 
 	CharGenWindow.SetVisible (0)
 	RacialEnemyWindow = GemRB.LoadWindowObject (15)
-	RacialEnemyTable = GemRB.LoadTableObject ("ENEMIES")
+	RacialEnemyTable = GemRB.LoadTableObject ("haterace")
 	RacialEnemyCount = RacialEnemyTable.GetRowCount ()
 
 	for i in range (2, 8):
