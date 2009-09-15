@@ -332,6 +332,14 @@ def AcceptPress():
 		Learnable = GetLearnablePriestSpells( ClassFlag, t, 1)
 		for i in range (len(Learnable) ):
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
+	
+	# save all the skills
+	# TODO: change the layout of the skills table to match the rest and use shared code
+	for i in range(SkillsTable.GetRowCount()):
+		SkillName = SkillsTable.GetValue (i, 3)
+		SkillValue = GemRB.GetVar ("Skill "+str(i))
+		if SkillValue >= 0:
+			GemRB.SetPlayerStat (MyChar, SkillName, SkillValue)
 
 	TmpTable = GemRB.LoadTableObject ("repstart")
 	t=AlignmentTable.FindValue (3, t)
@@ -462,7 +470,7 @@ def SetCharacterDescription():
 			for i in range (4):
 				TextArea.Append (SkillsTable.GetValue (i, 2), -1)
 				TextArea.Append (": " )
-				TextArea.Append (str(GemRB.GetVar ("Skill" + str(i))) )
+				TextArea.Append (str(GemRB.GetVar ("Skill " + str(i))) )
 				TextArea.Append ("%" )
 		elif IsRanger!="*":
 			TextArea.Append ("", -1)
@@ -1514,8 +1522,8 @@ def SkillsSelect():
 		SkillName = SkillsTable.GetRowName (i)
 		SkillValue = SkillRaceTable.GetValue (RaceName, SkillName)
 		SkillValue = SkillValue + SkillDexterityTable.GetValue (Dexterity, SkillName)
-		GemRB.SetVar ("Skill" + str(i), SkillValue)
-		GemRB.SetVar ("SkillBase" + str(i), SkillValue)
+		GemRB.SetVar ("Skill " + str(i), SkillValue)
+		GemRB.SetVar ("SkillBase " + str(i), SkillValue)
 		SkillLabel = SkillsWindow.GetControl (0x10000001 + i)
 		SkillLabel.SetUseRGB (1)
 		SkillLabel.SetText (str(SkillValue))
@@ -1550,14 +1558,14 @@ def SkillsPlusPress():
 	global SkillsWindow, SkillsTextArea, SkillsTable, SkillsPointsLeft
 
 	SkillIndex = GemRB.GetVar ("SkillIndex")
-	SkillValue = GemRB.GetVar ("Skill" + str(SkillIndex))
+	SkillValue = GemRB.GetVar ("Skill " + str(SkillIndex))
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillIndex, 1) )
 	if SkillValue < 99 and SkillsPointsLeft > 0:
 		SkillsPointsLeft = SkillsPointsLeft - 1
 		SkillsPointsLeftLabel = SkillsWindow.GetControl (0x10000005)
 		SkillsPointsLeftLabel.SetText (str(SkillsPointsLeft))
 		SkillValue = SkillValue + 1
-		GemRB.SetVar ("Skill" + str(SkillIndex), SkillValue)
+		GemRB.SetVar ("Skill " + str(SkillIndex), SkillValue)
 		SkillLabel = SkillsWindow.GetControl (0x10000001 + SkillIndex)
 		SkillLabel.SetText (str(SkillValue))
 		if SkillsPointsLeft == 0:
@@ -1568,11 +1576,11 @@ def SkillsMinusPress():
 	global SkillsWindow, SkillsTextArea, SkillsTable, SkillsPointsLeft
 
 	SkillIndex = GemRB.GetVar ("SkillIndex")
-	SkillValue = GemRB.GetVar ("Skill" + str(SkillIndex))
+	SkillValue = GemRB.GetVar ("Skill " + str(SkillIndex))
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillIndex, 1) )
-	if SkillValue > GemRB.GetVar ("SkillBase" + str(SkillIndex)):
+	if SkillValue > GemRB.GetVar ("SkillBase " + str(SkillIndex)):
 		SkillValue = SkillValue - 1
-		GemRB.SetVar ("Skill" + str(SkillIndex), SkillValue)
+		GemRB.SetVar ("Skill " + str(SkillIndex), SkillValue)
 		SkillLabel = SkillsWindow.GetControl (0x10000001 + SkillIndex)
 		SkillLabel.SetText (str(SkillValue))
 		SkillsPointsLeft = SkillsPointsLeft + 1

@@ -1,7 +1,7 @@
 2DA V1.0
 -1
-             NAME_REF   DESC_REF   CAP_REF
-STEALTH      11984      9600       9461 
-FIND_TRAPS   11985      9599       9462
-PICK_POCKETS 11986      9597       9463
-OPEN_LOCKS   11987      9598       9460
+             NAME_REF   DESC_REF   CAP_REF   ID
+STEALTH      11984      9600       9461      27
+FIND_TRAPS   11985      9599       9462      28
+PICK_POCKETS 11986      9597       9463      29
+OPEN_LOCKS   11987      9598       9460      26
