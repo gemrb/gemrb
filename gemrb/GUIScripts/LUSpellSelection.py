@@ -244,14 +244,14 @@ def SpellsDonePress ():
 			DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 			return
 
-	if not GameIsBG1():
+	if GameIsBG2():
 		# close our window and update our records
 		if SpellsWindow:
 			SpellsWindow.Unload ()
 
 	# move to the next script if this is chargen
 	if chargen:
-		if not GameIsBG1():
+		if GameIsBG2():
 			GemRB.SetNextScript("GUICG6")
 		else:
 			next()
@@ -280,10 +280,10 @@ def ShowSpells ():
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetVarAssoc("ButtonPressed", i)
 		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsSelectPress")
-		if GameIsBG1():
-			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
-		else:
+		if GameIsBG2():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
+		else:
+			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
 
 		SpellButton.SetSpellIcon(Spells[SpellLevel][i+j][0], 1)
 		SpellButton.SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR)
