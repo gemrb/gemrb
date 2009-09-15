@@ -145,11 +145,10 @@ def UpdateRecordsWindow ():
 
 	# dual-classable
 	Button = Window.GetControl (0)
-#FIXME: there is no dualclass table in iwd or bg1
-#	if CanDualClass (pc):
-	Button.SetState (IE_GUI_BUTTON_DISABLED)
-#	else:
-#		Button.SetState (IE_GUI_BUTTON_ENABLED)
+	if CanDualClass (pc):
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
+	else:
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	
 	# levelup
 	Button = Window.GetControl (37)

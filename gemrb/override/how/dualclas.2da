@@ -1,0 +1,29 @@
+2DA V1.0
+0
+                        FIGHTER CLERIC  MAGE    THIEF   DRUID   RANGER
+MAGE                    1       1       0       1       0       0
+FIGHTER                 0       1       1       1       1       0
+CLERIC                  1       0       1       1       0       1
+THIEF                   1       1       1       0       0       0
+BARD                    0       0       0       0       0       0
+PALADIN                 0       0       0       0       0       0
+DRUID                   1       0       0       0       0       0
+RANGER                  0       1       0       0       0       0
+FIGHTER_MAGE            0       0       0       0       0       0
+FIGHTER_CLERIC          0       0       0       0       0       0
+FIGHTER_THIEF           0       0       0       0       0       0
+FIGHTER_MAGE_THIEF      0       0       0       0       0       0
+MAGE_THIEF              0       0       0       0       0       0
+CLERIC_MAGE             0       0       0       0       0       0
+CLERIC_THIEF            0       0       0       0       0       0
+FIGHTER_DRUID           0       0       0       0       0       0
+FIGHTER_MAGE_CLERIC     0       0       0       0       0       0
+CLERIC_RANGER           0       0       0       0       0       0
+ABJURER                 1       1       0       1       0       0
+CONJURER                1       1       0       1       0       0
+DIVINER                 1       1       0       1       0       0
+ENCHANTER               1       1       0       1       0       0
+ILLUSIONIST             1       1       0       1       0       0
+INVOKER                 1       1       0       1       0       0
+NECROMANCER             1       1       0       1       0       0
+TRANSMUTER              1       1       0       1       0       0
