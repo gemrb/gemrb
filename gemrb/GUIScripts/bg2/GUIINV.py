@@ -635,6 +635,16 @@ def OpenItemAmountWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
+def ReleaseFamiliar ():
+	"""Simple Use Item"""
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	# the header is always the first, target is always self
+	GemRB.UseItem (pc, slot, 0, 1)
+	CloseItemInfoWindow ()
+	return
+
 def DrinkItemWindow ():
 	"""Drink?"""
 
