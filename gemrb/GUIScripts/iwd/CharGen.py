@@ -479,7 +479,7 @@ def SetCharacterDescription():
 			TextArea.Append (15982, -1)
 			TextArea.Append (": " )
 			RacialEnemy = GemRB.GetVar ("RacialEnemyIndex") + GemRB.GetVar ("RacialEnemy") - 1
-			TextArea.Append (RacialEnemyTable.GetValue (RacialEnemy, 2) )
+			TextArea.Append (RacialEnemyTable.GetValue (RacialEnemy, 3) )
 		elif IsBard!="*":
 			TextArea.Append ("", -1)
 			TextArea.Append (8442, -1)
@@ -1662,8 +1662,8 @@ def RacialEnemySelectPress():
 	global RacialEnemyWindow, RacialEnemyDoneButton, RacialEnemyTable, RacialEnemyTextArea
 
 	RacialEnemy = GemRB.GetVar ("RacialEnemyIndex") + GemRB.GetVar ("RacialEnemy") - 1
-	RacialEnemyTextArea.SetText (RacialEnemyTable.GetValue (RacialEnemy, 1) )
-	GemRB.SetVar ("HatedRace", RacialEnemyTable.GetValue (RacialEnemy, 3) )
+	RacialEnemyTextArea.SetText (RacialEnemyTable.GetValue (RacialEnemy, 2) )
+	GemRB.SetVar ("HatedRace", RacialEnemyTable.GetValue (RacialEnemy, 1) )
 	RacialEnemyDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 

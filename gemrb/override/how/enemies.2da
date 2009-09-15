@@ -1,15 +1,15 @@
 2DA V1.0
 -1
-                   NAME_REF   DESC_REF   CAP_REF 
-CADEVEROUS_UNDEAD  3284       3304       59
-GIANTS             3279       3291       61
-GOBLINS            3280       3292       29518
-LIZARD_MEN         3281       3293       3275
-ORCS               3282       3294       3271
-SALAMANDERS        3290       3295       3272
-SKELETAL_UNDEAD    3283       3296       3273
-SPECTRAL_UNDEAD    3285       3297       3278
-SPIDERS            3286       3298       3274
-TROLLS             3288       3299       3276
-UMBER_HULKS        3289       3300       3277
-YUAN-TI            30850      3301       30849
+                   NAME_REF   ID    DESC_REF   CAP_REF 
+CADEVEROUS_UNDEAD  3284       108   3304       59
+GIANTS             3279       153   3291       61
+GOBLINS            3280       155   3292       29518
+LIZARD_MEN         3281       157   3293       3275
+ORCS               3282       160   3294       3271
+SALAMANDERS        3290       161   3295       3272
+SKELETAL_UNDEAD    3283       115   3296       3273
+SPECTRAL_UNDEAD    3285       167   3297       3278
+SPIDERS            3286       116   3298       3274
+TROLLS             3288       165   3299       3276
+UMBER_HULKS        3289       166   3300       3277
+YUAN-TI            30850      168   3301       30849
