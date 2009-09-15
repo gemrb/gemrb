@@ -23,7 +23,6 @@ from math import ceil
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import *
-from CharGenCommon import *
 
 # storage variables
 pc = 0
