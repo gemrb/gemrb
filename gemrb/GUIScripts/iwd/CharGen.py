@@ -26,6 +26,7 @@
 import GemRB
 from ie_stats import *
 from GUICommon import *
+from LUSkillsSelection import SkillsSave
 
 CharGenWindow = 0
 CharGenState = 0
@@ -334,12 +335,7 @@ def AcceptPress():
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
 	
 	# save all the skills
-	# TODO: change the layout of the skills table to match the rest and use shared code
-	for i in range(SkillsTable.GetRowCount()):
-		SkillName = SkillsTable.GetValue (i, 3)
-		SkillValue = GemRB.GetVar ("Skill "+str(i))
-		if SkillValue >= 0:
-			GemRB.SetPlayerStat (MyChar, SkillName, SkillValue)
+	SkillsSave (MyChar, 1)
 
 	TmpTable = GemRB.LoadTableObject ("repstart")
 	t=AlignmentTable.FindValue (3, t)

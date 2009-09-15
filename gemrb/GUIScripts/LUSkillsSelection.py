@@ -371,10 +371,21 @@ def SkillScrollBarPress():
 	SkillsRedraw ()
 	return
 
-def SkillsSave (pc):
-	# save all the skills
-	for i in range(SkillsTable.GetRowCount()-2):
-		SkillName = SkillsTable.GetValue (i+2, 2)
+# saves all the skills
+# TODO: change the layout of the iwd/how skills table to match the rest
+def SkillsSave (pc, iwdformat=0):
+	global SkillsTable
+	if not SkillsTable:
+		SkillsTable = GemRB.LoadTableObject ("skills")
+
+	skillcount = SkillsTable.GetRowCount()
+	if not iwdformat:
+		skillcount -= 2
+	for i in range(skillcount):
+		if iwdformat:
+			SkillName = SkillsTable.GetValue (i, 3)
+		else:
+			SkillName = SkillsTable.GetValue (i+2, 2)
 		SkillValue = GemRB.GetVar ("Skill "+str(i))
 		if SkillValue >= 0:
 			GemRB.SetPlayerStat (pc, SkillName, SkillValue)
