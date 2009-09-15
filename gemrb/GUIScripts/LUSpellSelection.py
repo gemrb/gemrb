@@ -508,16 +508,14 @@ def HideUnhideScrollBar (hide = 0):
 	ScrollBar = SpellsWindow.GetControl (1000)
 
 	if hide == 1:
-	      ScrollBar.SetPos(-1,-1)
+		scrollx = -1
+		scrolly = -1
 	else:
-	      scrollx = 0
-	      scrolly = 0
+		if chargen:
+			scrollx = 325
+			scrolly = 42
+		else:
+			scrollx = 290
+			scrolly = 142
 
-	      if chargen:
-		    scrollx = 325
-		    scrolly = 42
-	      else:
-		    scrollx = 290
-		    scrolly = 142
-
-	      ScrollBar.SetPos(scrollx,scrolly)
+	ScrollBar.SetPos (scrollx, scrolly)
