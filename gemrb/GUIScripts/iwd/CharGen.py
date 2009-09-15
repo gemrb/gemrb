@@ -335,7 +335,7 @@ def AcceptPress():
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
 	
 	# save all the skills
-	SkillsSave (MyChar, 1)
+	SkillsSave (MyChar)
 
 	TmpTable = GemRB.LoadTableObject ("repstart")
 	t=AlignmentTable.FindValue (3, t)
@@ -464,7 +464,7 @@ def SetCharacterDescription():
 			TextArea.Append ("", -1)
 			TextArea.Append (8442, -1)
 			for i in range (4):
-				TextArea.Append (SkillsTable.GetValue (i, 2), -1)
+				TextArea.Append (SkillsTable.GetValue (i+2, 2), -1)
 				TextArea.Append (": " )
 				TextArea.Append (str(GemRB.GetVar ("Skill " + str(i))) )
 				TextArea.Append ("%" )
@@ -1515,7 +1515,7 @@ def SkillsSelect():
 		SkillsMinusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SkillsMinusPress")
 		SkillsMinusButton.SetVarAssoc ("SkillIndex", i)
 
-		SkillName = SkillsTable.GetRowName (i)
+		SkillName = SkillsTable.GetRowName (i+2)
 		SkillValue = SkillRaceTable.GetValue (RaceName, SkillName)
 		SkillValue = SkillValue + SkillDexterityTable.GetValue (Dexterity, SkillName)
 		GemRB.SetVar ("Skill " + str(i), SkillValue)
@@ -1547,7 +1547,7 @@ def SkillsLabelPress():
 	global SkillsWindow, SkillsTextArea, SkillsTable
 
 	SkillIndex = GemRB.GetVar ("SkillIndex")
-	SkillsTextArea.SetText (SkillsTable.GetValue (SkillIndex, 1) )
+	SkillsTextArea.SetText (SkillsTable.GetValue (SkillIndex+2, 1) )
 	return
 
 def SkillsPlusPress():
@@ -1555,7 +1555,7 @@ def SkillsPlusPress():
 
 	SkillIndex = GemRB.GetVar ("SkillIndex")
 	SkillValue = GemRB.GetVar ("Skill " + str(SkillIndex))
-	SkillsTextArea.SetText (SkillsTable.GetValue (SkillIndex, 1) )
+	SkillsTextArea.SetText (SkillsTable.GetValue (SkillIndex+2, 1) )
 	if SkillValue < 99 and SkillsPointsLeft > 0:
 		SkillsPointsLeft = SkillsPointsLeft - 1
 		SkillsPointsLeftLabel = SkillsWindow.GetControl (0x10000005)
@@ -1573,7 +1573,7 @@ def SkillsMinusPress():
 
 	SkillIndex = GemRB.GetVar ("SkillIndex")
 	SkillValue = GemRB.GetVar ("Skill " + str(SkillIndex))
-	SkillsTextArea.SetText (SkillsTable.GetValue (SkillIndex, 1) )
+	SkillsTextArea.SetText (SkillsTable.GetValue (SkillIndex+2, 1) )
 	if SkillValue > GemRB.GetVar ("SkillBase " + str(SkillIndex)):
 		SkillValue = SkillValue - 1
 		GemRB.SetVar ("Skill " + str(SkillIndex), SkillValue)

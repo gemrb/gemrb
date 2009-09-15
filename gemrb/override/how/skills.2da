@@ -1,7 +1,9 @@
 2DA V1.0
 -1
-             NAME_REF   DESC_REF   CAP_REF   ID
-STEALTH      11984      9600       9461      27
-FIND_TRAPS   11985      9599       9462      28
-PICK_POCKETS 11986      9597       9463      29
-OPEN_LOCKS   11987      9598       9460      26
+             NAME_REF   DESC_REF   CAP_REF   ID    THIEF	MAGE_THIEF	FIGHTER_THIEF	CLERIC_THIEF	FIGHTER_MAGE_THIEF
+FIRST_LEVEL		*    *			*		*	40		40			40				40				40
+RATE			*    *			*		*	25		25			25				25				25
+STEALTH      11984      9600       9461      27    1	1		1		1		1
+FIND_TRAPS   11985      9599       9462      28    1	1		1		1		1
+PICK_POCKETS 11986      9597       9463      29    1	1		1		1		1
+OPEN_LOCKS   11987      9598       9460      26    1	1		1		1		1

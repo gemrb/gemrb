@@ -181,6 +181,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 			LevelDiff[SkillIndex] -= 1
 		SkillPointsLeft += LevelDiff[SkillIndex] * SkillsTable.GetValue("RATE", SkillsKitName, 1)
 		TotalSkillsAssignable = 0
+
 		if SkillPointsLeft < 0:
 			#really don't have an entry
 			SkillPointsLeft = 0
@@ -194,8 +195,8 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 			#get the skill values
 			for i in range(SkillsTable.GetRowCount()-2):
 				SkillName = SkillsTable.GetRowName (i+2)
-				SkillID = SkillsTable.GetValue (i+2, 2)
-				if type != LUSKILLS_TYPE_LEVELUP: #give racial bonuses to starting classes
+				SkillID = SkillsTable.GetValue (SkillName, "ID")
+				if type != LUSKILLS_TYPE_LEVELUP and type != LUSKILLS_TYPE_LEVELUP_BG1: #give racial bonuses to starting classes
 					SkillValue = SkillRacTable.GetValue (Race, SkillName)
 				else:
 					SkillValue = GemRB.GetPlayerStat (pc, SkillID, 1)
@@ -281,7 +282,7 @@ def SkillsRedraw (direction=0):
 
 		#show the current skills name
 		Pos = SkillsIndices[SkillsTopIndex+i]
-		SkillName = SkillsTable.GetValue (Pos+2, 1)
+		SkillName = SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "CAP_REF")
 		Label = SkillsWindow.GetControl (0x10000000+SkillsOffsetName+i)
 		Label.SetText (SkillName)
 
@@ -320,14 +321,14 @@ def SkillsRedraw (direction=0):
 
 def SkillJustPress():
 	Pos = GemRB.GetVar("Skill")+SkillsTopIndex
-	SkillsTextArea.SetText(SkillsTable.GetValue(Pos+2,0) )
+	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	return
 
 def SkillRightPress():
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
 	Pos = GemRB.GetVar("Skill")+SkillsTopIndex
-	SkillsTextArea.SetText(SkillsTable.GetValue(Pos+2,0) )
+	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
 	BasePoint = GemRB.GetVar("SkillBase "+str(Pos) )
 	if ActPoint <= 0 or ActPoint <= BasePoint:
@@ -347,7 +348,7 @@ def SkillLeftPress():
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
 	Pos = GemRB.GetVar("Skill")+SkillsTopIndex
-	SkillsTextArea.SetText(SkillsTable.GetValue(Pos+2,0) )
+	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	if SkillPointsLeft == 0:
 		return
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
@@ -373,27 +374,23 @@ def SkillScrollBarPress():
 
 # saves all the skills
 # TODO: change the layout of the iwd/how skills table to match the rest
-def SkillsSave (pc, iwdformat=0):
+def SkillsSave (pc):
 	global SkillsTable
 	if not SkillsTable:
 		SkillsTable = GemRB.LoadTableObject ("skills")
 
-	skillcount = SkillsTable.GetRowCount()
-	if not iwdformat:
-		skillcount -= 2
-	for i in range(skillcount):
-		if iwdformat:
-			SkillName = SkillsTable.GetValue (i, 3)
-		else:
-			SkillName = SkillsTable.GetValue (i+2, 2)
+	for i in range(SkillsTable.GetRowCount() - 2):
+		SkillName = SkillsTable.GetRowName (i+2)
+		SkillID = SkillsTable.GetValue (SkillName, "ID")
 		SkillValue = GemRB.GetVar ("Skill "+str(i))
 		if SkillValue >= 0:
-			GemRB.SetPlayerStat (pc, SkillName, SkillValue)
+			GemRB.SetPlayerStat (pc, SkillID, SkillValue)
 
 def SkillsNullify ():
 	global SkillsTable
 	if not SkillsTable:
 		SkillsTable = GemRB.LoadTableObject ("skills")
+
 	for i in range(SkillsTable.GetRowCount()-2):
 		GemRB.SetVar ("Skill "+str(i), 0)
 		GemRB.SetVar ("SkillBase "+str(i), 0)
