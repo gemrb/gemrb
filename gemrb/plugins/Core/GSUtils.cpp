@@ -744,9 +744,19 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 		if (aC) {
 			return aC;
 		}
+		Game *game = core->GetGame();
+
+		//global actors are always found by scripting name!
+		aC = game->FindPC(oC->objectName);
+		if (aC) {
+			return aC;
+		}
+		aC = game->FindNPC(oC->objectName);
+		if (aC) {
+			return aC;
+		}
 
 		if (ga_flags&GA_GLOBAL) {
-			Game *game = core->GetGame();
 			size_t mc = game->GetLoadedMapCount();
 			while(mc--) {
 				Map *map = game->GetMap(mc);
@@ -1351,7 +1361,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		actor->SetTarget( target );
 	}
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
-	       (PersonalDistance(Sender, target) > wi.range) ) {
+		(PersonalDistance(Sender, target) > wi.range) ) {
 		MoveNearerTo(Sender, target, wi.range);
 		return;
 	} else if (target->Type == ST_DOOR) {

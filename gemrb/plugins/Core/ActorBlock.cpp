@@ -124,7 +124,7 @@ void Scriptable::SetScriptName(const char* text)
 }
 
 /** Gets the DeathVariable */
-const char* Scriptable::GetScriptName(void)
+const char* Scriptable::GetScriptName(void) const
 {
 	 return scriptName;
 }
@@ -474,12 +474,12 @@ void Scriptable::SetWait(unsigned long time)
 	WaitCounter = time;
 }
 
-unsigned long Scriptable::GetWait()
+unsigned long Scriptable::GetWait() const
 {
 	return WaitCounter;
 }
 
-Scriptable *Scriptable::GetCutsceneID()
+Scriptable *Scriptable::GetCutsceneID() const
 {
 	return CutSceneId;
 }

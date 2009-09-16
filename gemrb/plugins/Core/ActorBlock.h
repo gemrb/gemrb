@@ -229,9 +229,9 @@ public:
 	}
 	void SetScript(const ieResRef aScript, int idx, bool ai=false);
 	void SetWait(unsigned long time);
-	unsigned long GetWait();
+	unsigned long GetWait() const;
 	void LeaveDialog();
-	Scriptable *GetCutsceneID();
+	Scriptable *GetCutsceneID() const;
 	void ClearCutsceneID();
 	void SetCutsceneID(Scriptable *csid);
 	void Interrupt();
@@ -242,7 +242,7 @@ public:
 	void Deactivate();
 	void PartyRested();
 	ieDword GetInternalFlag();
-	const char* GetScriptName();
+	const char* GetScriptName() const;
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
 	void SetScript(int index, GameScript* script);

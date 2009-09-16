@@ -522,18 +522,14 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	ieResRef Area;
+	const Map *map = tar->GetCurrentArea();
 
-	if (tar->Type == ST_ACTOR) {
-		Actor *ac = ( Actor* ) tar;
-		memcpy(Area, ac->Area, 9);
-	} else {
-		Area[0]=0;
+	if (map) {
+		if (parameters->string0Parameter[0]) {
+			CreateVisualEffectCore(Sender, Sender->Pos, parameters->string0Parameter, 0);
+		}
+		MoveBetweenAreasCore( (Actor *) Sender, map->GetScriptName(), tar->Pos, -1, true);
 	}
-	if (parameters->string0Parameter[0]) {
-		CreateVisualEffectCore(Sender, Sender->Pos, parameters->string0Parameter, 0);
-	}
-	MoveBetweenAreasCore( (Actor *) Sender, Area, tar->Pos, -1, true);
 }
 
 void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
@@ -640,8 +636,12 @@ void GameScript::MoveGlobalObject(Scriptable* Sender, Action* parameters)
 	if (!to) {
 		return;
 	}
-	MoveBetweenAreasCore( (Actor *) tar, parameters->string0Parameter,
-		to->Pos, -1, true);
+	const Map *map = to->GetCurrentArea();
+
+	if (map) {
+		MoveBetweenAreasCore( (Actor *) tar, map->GetScriptName(),
+			to->Pos, -1, true);
+	}
 }
 
 void GameScript::MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameters)
