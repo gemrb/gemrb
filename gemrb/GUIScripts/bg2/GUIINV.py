@@ -641,7 +641,7 @@ def ReleaseFamiliar ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 	# the header is always the first, target is always self
-	GemRB.UseItem (pc, slot, 0, 1)
+	GemRB.UseItem (pc, slot, 0, 5)
 	CloseItemInfoWindow ()
 	return
 
