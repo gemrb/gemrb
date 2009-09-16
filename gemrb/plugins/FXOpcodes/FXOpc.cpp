@@ -4327,12 +4327,18 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		memcpy(fx->Resource, core->GetGame()->Familiars[alignment],sizeof(ieResRef) );
 		fx->Parameter2=FAMILIAR_RESOURCE;
 	}
+
 	//summon familiar with fx->Resource
 	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	Actor *fam = core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_DEFAULT, 0, newfx);
 	delete newfx;
+
 	if (fam) {
+		//Make the familiar an NPC (MoveGlobal needs this)
+		core->GetGame()->AddNPC(fam);
+
+		//Add some essential effects
 		newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, (ieDword) -10, 0, FX_DURATION_INSTANT_PERMANENT);
 		core->ApplyEffect(newfx, fam, fam);
 		delete newfx;
