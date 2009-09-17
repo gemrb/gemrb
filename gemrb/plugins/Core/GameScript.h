@@ -927,6 +927,10 @@ public: //Script Functions
 	static int Sequence(Scriptable* Sender, Trigger* parameters);
 	static int SetLastMarkedObject(Scriptable* Sender, Trigger* parameters);
 	static int Specifics(Scriptable* Sender, Trigger* parameters);
+	static int SpellCast(Scriptable* Sender, Trigger* parameters);
+	static int SpellCastInnate(Scriptable* Sender, Trigger* parameters);
+	static int SpellCastOnMe(Scriptable* Sender, Trigger* parameters);
+	static int SpellCastPriest(Scriptable* Sender, Trigger* parameters);
 	static int StateCheck(Scriptable* Sender, Trigger* parameters);
 	static int StealFailed(Scriptable* Sender, Trigger* parameters);
 	static int StoreHasItem(Scriptable* Sender, Trigger* parameters);

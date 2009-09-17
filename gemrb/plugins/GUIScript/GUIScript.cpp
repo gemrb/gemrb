@@ -9333,6 +9333,7 @@ PyDoc_STRVAR( GemRB_GetSpellCastOn__doc,
 static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
 {
 	int PartyID;
+	ieResRef splname;
 
 	if (!PyArg_ParseTuple( args, "i", &PartyID )) {
 		return AttributeError( GemRB_GetSpellCastOn__doc );
@@ -9346,7 +9347,8 @@ static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 	
-	return PyString_FromString(actor->LastSpell);
+	ResolveSpellName(splname, actor->LastSpellOnMe);
+	return PyString_FromString(splname);
 }
 
 static PyMethodDef GemRBMethods[] = {

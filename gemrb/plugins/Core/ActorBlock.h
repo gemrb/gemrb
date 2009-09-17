@@ -214,7 +214,10 @@ public:
 	ieDword LastPickLockFailed;
 	int LastOrder;
 	ieDword LastOrderer;
-	ieResRef LastSpell; //Last spell cast on this scriptable
+	ieDword LastSpellOnMe;  //Last spell cast on this scriptable
+	ieDword LastCasterOnMe; //Last spellcaster on this scriptable
+	ieDword LastSpellSeen;  //Last spell seen to be cast
+	ieDword LastCasterSeen; //Last spellcaster seen
 	unsigned long playDeadCounter;  //this should be handled by the playdead action
 	Point LastTargetPos;
 	int SpellHeader;

@@ -167,6 +167,34 @@ bool ResolveSpellName(ieResRef spellres, Action *parameters)
 	return gamedata->Exists(spellres, IE_SPL_CLASS_ID);
 }
 
+void ResolveSpellName(ieResRef spellres, ieDword number)
+{
+	//resolve spell
+	unsigned int type = number/1000;
+	 int spellid = number%1000;
+	 if (type>4) {
+		 type=0;
+	 }
+	 sprintf(spellres, "%s%03d", spell_suffices[type], spellid);
+}
+
+ieDword ResolveSpellNumber(const ieResRef spellres)
+{
+	int i;
+
+	for(i=0;i<5;i++) {
+		if(!strnicmp(spellres, spell_suffices[i], 4)) {
+			int n = -1;
+			sscanf(spellres+4,"%d", &n);
+			if (n<0) {
+				return -1;
+			}
+			return i*1000+n;
+		}
+	}
+	return -1;
+}
+
 bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot)
 {
 	CREItem *itm = act->inventory.GetSlotItem(Slot);

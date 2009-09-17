@@ -34,6 +34,7 @@
 #include "Game.h"
 #include "GameControl.h"
 #include "Projectile.h"
+#include "GSUtils.h"
 
 extern Interface* core;
 
@@ -84,7 +85,10 @@ Scriptable::Scriptable(ScriptableType type)
 	Pos.x = 0;
 	Pos.y = 0;
 
-	LastSpell[0]=0;
+	LastCasterOnMe = 0;
+	LastSpellOnMe = -1;
+	LastCasterSeen = 0;
+	LastSpellSeen = -1;
 	SpellHeader = -1;
 	LastTargetPos.empty();
 	locals = new Variables();
@@ -661,6 +665,18 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 			GetCurrentArea()->AddProjectile(pro, origin, LastTargetPos);
 		}
 	}
+	ieDword spellnum=ResolveSpellNumber( SpellResRef );
+	if (spellnum!=0xffffffff) {
+		area->SeeSpellCast(this, spellnum);
+		if(LastTarget) {
+			Scriptable *target = area->GetActorByGlobalID(LastTarget);
+			if (target && (Type==ST_ACTOR) ) {
+				target->LastSpellOnMe = spellnum;
+				target->LastCasterOnMe = ((Actor *) this)->GetID();
+			}
+		}
+	}
+
 	gamedata->FreeSpell(spl, SpellResRef, false);
 	LastTarget = 0;
 	LastTargetPos.empty();

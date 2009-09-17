@@ -4039,3 +4039,61 @@ int GameScript::SystemVariable_Trigger(Scriptable* Sender, Trigger* parameters)
 	return 1;
 }
 
+int GameScript::SpellCast(Scriptable* Sender, Trigger* parameters)
+{
+	if(parameters->int0Parameter) {
+		unsigned int param = 2000+parameters->int0Parameter%1000;
+		if (param!=Sender->LastSpellSeen) {
+			return 0;
+		}
+	}
+	if(MatchActor(Sender, Sender->LastCasterSeen, parameters->objectParameter)) {
+		Sender->AddTrigger(&Sender->LastCasterSeen);
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::SpellCastPriest(Scriptable* Sender, Trigger* parameters)
+{
+	if(parameters->int0Parameter) {
+		unsigned int param = 1000+parameters->int0Parameter%1000;
+		if (param!=Sender->LastSpellSeen) {
+			return 0;
+		}
+	}
+	if(MatchActor(Sender, Sender->LastCasterSeen, parameters->objectParameter)) {
+		Sender->AddTrigger(&Sender->LastCasterSeen);
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::SpellCastInnate(Scriptable* Sender, Trigger* parameters)
+{
+	if(parameters->int0Parameter) {
+		unsigned int param = 3000+parameters->int0Parameter%1000;
+		if (param!=Sender->LastSpellSeen) {
+			return 0;
+		}
+	}
+	if(MatchActor(Sender, Sender->LastCasterSeen, parameters->objectParameter)) {
+		Sender->AddTrigger(&Sender->LastCasterSeen);
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::SpellCastOnMe(Scriptable* Sender, Trigger* parameters)
+{
+	if(parameters->int0Parameter) {
+		if ((ieDword) parameters->int0Parameter!=Sender->LastSpellOnMe) {
+			return 0;
+		}
+	}
+	if(MatchActor(Sender, Sender->LastCasterOnMe, parameters->objectParameter)) {
+		Sender->AddTrigger(&Sender->LastCasterOnMe);
+		return 1;
+	}
+	return 0;
+}

@@ -1879,11 +1879,6 @@ void EffectQueue::AffectAllInRange(Map *map, Point &pos, int idstype, int idsval
 			continue;
 		}
 		AddAllEffects(actor, actor->Pos);
-		std::list< Effect* >::const_iterator fxit = GetFirstEffect();
-		Effect *fx = GetNextEffect(fxit);
-		if (fx) {
-			strnlwrcpy (actor->LastSpell, fx->Source, 8);
-		}
 	}
 }
 

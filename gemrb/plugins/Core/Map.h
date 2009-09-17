@@ -274,6 +274,7 @@ public:
 	TileMap *GetTileMap() { return TMap; }
 	/* gets the signal of daylight changes */
 	bool ChangeMap(bool day_or_night);
+	void SeeSpellCast(Scriptable *caster, ieDword spell);
 	/* low level function to perform the daylight changes */
 	void ChangeTileMap(ImageMgr* lm, ImageMgr* sm);
 	/* sets all the auxiliary maps and the tileset */

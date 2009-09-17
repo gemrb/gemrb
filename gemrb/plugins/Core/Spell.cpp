@@ -122,10 +122,12 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, Point &pos, int block_index
 			features[i].Projectile = 0;
 			features[i].PosX=pos.x;
 			features[i].PosY=pos.y;
-			//self affecting part???
+			//FIXME (r7193):
+			//This is bad, effects should be able to affect non living targets
+			//This is done by NULL target, the position should be enough
+			//to tell which non-actor object is affected
 			if (target) {
 				core->ApplyEffect(features+i, target, self);
-				strnlwrcpy(target->LastSpell, Name, 8);
 			}
 		}
 	}

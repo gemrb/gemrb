@@ -42,6 +42,7 @@
 #include "GameControl.h"
 #include "Palette.h"
 #include "MapMgr.h"
+#include "GSUtils.h"
 
 #ifndef WIN32
 #include <sys/time.h>
@@ -633,14 +634,14 @@ void Map::UpdateScripts()
 			continue;
 		}
 
-    //if the actor is immobile, don't run the scripts
-    if (!game->StateOverrideFlag && !game->StateOverrideTime) {
-      if (actor->Immobile()) {
-        actor->no_more_steps = true;
-        continue;
-      }
-    }
-    actor->no_more_steps = false;
+		//if the actor is immobile, don't run the scripts
+		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
+			if (actor->Immobile()) {
+				actor->no_more_steps = true;
+				continue;
+			}
+		}
+		actor->no_more_steps = false;
 
 		/*
 		 * we run scripts all at once because one of the actions in ProcessActions
@@ -3335,3 +3336,21 @@ bool Map::ChangeMap(bool day_or_night)
 	return true;
 }
 
+void Map::SeeSpellCast(Scriptable *caster, ieDword spell)
+{
+	if (caster->Type!=ST_ACTOR) {
+		return;
+	}
+
+	LastCasterSeen = ((Actor *) caster)->GetID();
+	LastSpellSeen = spell;
+
+	size_t i = actors.size();
+	while (i--) {
+		Actor* witness = actors[i];
+		if (CanSee(witness, caster, true, 0)) {
+			witness->LastSpellSeen=LastSpellSeen;
+			witness->LastCasterSeen=LastCasterSeen;
+		}
+	}
+}

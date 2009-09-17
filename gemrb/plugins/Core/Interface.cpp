@@ -4836,7 +4836,6 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Scriptable *cas
 			}
 			actor = (Actor *) caster;
 		}
-		strnlwrcpy( actor->LastSpell, resname, 8);
 		fxqueue->SetOwner( caster );
 		fxqueue->AddAllEffects(actor, actor->Pos);
 	}
