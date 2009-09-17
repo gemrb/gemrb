@@ -2453,7 +2453,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			// iwd2 also has two Tortoise Shell (spell) absorption strings
 			core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name);
 			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", dmg_str);
-			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter->GetName(0) );
+			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter ? hitter->GetName(0) : this->GetName(0) );
 			int bonus = 0; //TODO: change this once damage bonus is supported
 			char resist_str[8];
 			snprintf(resist_str, 8, "%d", abs(resisted-bonus));
