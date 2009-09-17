@@ -1574,14 +1574,14 @@ int EffectQueue::DisabledSpellcasting(int types) const
 	}
 
 	unsigned int spelltype_mask = 0;
-	int iwd2 = core->HasFeature(GF_IWD2_SCRIPTNAME);
+	bool iwd2 = !stricmp(core->GameType, "iwd2");
 	ieDword opcode = fx_disable_spellcasting_ref.EffText;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
 
-		if( iwd2) {
+		if (iwd2) {
 			switch((*f)->Parameter2) {
 				case 0: // all
 					spelltype_mask |= 7;
