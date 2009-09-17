@@ -408,7 +408,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	#proficiencies
 	stats.append ( (8442,1,'c') )
 
-	stats.append ( (9457, GemRB.GetCombatDetails(pc, 0)["ToHit"], '0') )
+	stats.append ( (9457, str(GS (IE_TOHIT))+" ("+str(GemRB.GetCombatDetails(pc, 0)["ToHit"])+")", '0') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
 		tmp2 = str (tmp/2) + chr (188)
