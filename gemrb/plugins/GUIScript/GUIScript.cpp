@@ -7928,7 +7928,7 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 	int ResType;
 	int silent = 0;
 
-	if (!PyArg_ParseTuple( args, "si|i", &ResRef, &ResType, silent )) {
+	if (!PyArg_ParseTuple( args, "si|i", &ResRef, &ResType, &silent )) {
 		return AttributeError( GemRB_HasResource__doc );
 	}
 	if (gamedata->Exists(ResRef, ResType, silent)) {
