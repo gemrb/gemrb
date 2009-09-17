@@ -2651,7 +2651,7 @@ ieDword Actor::GetXPLevel(int modified) const
 
 	float classcount = 0;
 	float average = 0;
-	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+	if (!stricmp(core->GameType, "iwd2")) {
 		// iwd2
 		for (int i=0; i < 11; i++) {
 			if (stats[levelslotsiwd2[i]] > 0) classcount++;
@@ -5569,7 +5569,7 @@ void Actor::CreateDerivedStats()
 			multiclass = (ieDword)tmp;
 	}
 
-	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+	if (!stricmp(core->GameType, "iwd2")) {
 		CreateDerivedStatsIWD2();
 	} else {
 		CreateDerivedStatsBG();
