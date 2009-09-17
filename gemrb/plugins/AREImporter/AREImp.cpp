@@ -936,6 +936,9 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 				ab->SetScriptName(DefaultName);
 			}
 
+			if (Dialog[0]) {
+				ab->SetDialog(Dialog);
+			}
 			for (int j=0;j<8;j++) {
 				if (Scripts[j][0]) {
 					ab->SetScript(Scripts[j],j);
