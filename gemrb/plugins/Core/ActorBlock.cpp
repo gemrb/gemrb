@@ -86,9 +86,9 @@ Scriptable::Scriptable(ScriptableType type)
 	Pos.y = 0;
 
 	LastCasterOnMe = 0;
-	LastSpellOnMe = -1;
+	LastSpellOnMe = 0xffffffff;
 	LastCasterSeen = 0;
-	LastSpellSeen = -1;
+	LastSpellSeen = 0xffffffff;
 	SpellHeader = -1;
 	LastTargetPos.empty();
 	locals = new Variables();

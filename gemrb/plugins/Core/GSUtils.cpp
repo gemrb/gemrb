@@ -187,12 +187,12 @@ ieDword ResolveSpellNumber(const ieResRef spellres)
 			int n = -1;
 			sscanf(spellres+4,"%d", &n);
 			if (n<0) {
-				return -1;
+				return 0xffffffff;
 			}
 			return i*1000+n;
 		}
 	}
-	return -1;
+	return 0xffffffff;
 }
 
 bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot)
