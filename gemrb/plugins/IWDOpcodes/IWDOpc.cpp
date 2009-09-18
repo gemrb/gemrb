@@ -487,7 +487,7 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 	case STI_CIRCLESIZE:
 		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, spellres[type].relation);
 	case STI_EVASION:
-		if (target->GetStat(IE_LEVELTHIEF) < 7 ) {
+		if (target->GetThiefLevel() < 7 ) {
 			return 0;
 		}
 		val = target->GetSavingThrow(1,0); //breath
