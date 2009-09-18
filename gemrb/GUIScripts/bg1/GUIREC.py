@@ -837,7 +837,7 @@ def OpenCustomizeWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	PortraitSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenAppearanceWindow")
+	PortraitSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenPortraitSelectWindow")
 	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSoundWindow")
 	ColorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenColorWindow")
 	ScriptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenScriptWindow")
@@ -866,7 +866,7 @@ def CloseCustomizeWindow ():
 		CustomizeWindow = None
 	return
 
-def OpenAppearanceWindow ():
+def OpenPortraitSelectWindow ():
 	global SubCustomizeWindow
 	global PortraitButton
 	global Gender, LastPortrait
@@ -897,7 +897,7 @@ def OpenAppearanceWindow ():
 
 	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitLeftPress")
 	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitRightPress")
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePortraitWindow")
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitDonePress")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
 	CustomPortraitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenCustomPortraitWindow")
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
@@ -910,7 +910,7 @@ def OpenAppearanceWindow ():
 
 	return
 
-def DonePortraitWindow ():
+def PortraitDonePress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Name = PortraitsTable.GetRowName (LastPortrait)
 	GemRB.FillPlayerInfo (pc, Name + "L", Name + "S")
@@ -984,15 +984,16 @@ def OpenCustomPortraitWindow ():
 	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
 
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePortraitCustomizeWindow")
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomPortraitDonePress")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubSubCustomizeWindow")
 
 	SubSubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def DonePortraitCustomizeWindow ():
+def CustomPortraitDonePress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	GemRB.FillPlayerInfo (pc, PortraitList1.QueryText () , PortraitList2.QueryText ())
+
 	CloseSubSubCustomizeWindow ()
 	#closing the generic portraits, because we just set a custom one
 	CloseSubCustomizeWindow ()

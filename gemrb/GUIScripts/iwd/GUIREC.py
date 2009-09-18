@@ -1303,10 +1303,8 @@ def PortraitCancelPress ():
 	return 
 
 def PortraitDonePress ():
-
-	Pc = GemRB.GameGetSelectedPCSingle ()
-
-	GemRB.FillPlayerInfo (Pc, Portrait.Name () + "L", Portrait.Name () + "S")
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.FillPlayerInfo (pc, Portrait.Name () + "L", Portrait.Name () + "S")
 	ClosePortraitWindow ()
 	return
 
@@ -1316,9 +1314,7 @@ def ClosePortraitWindow ():
 	if PortraitWindow:
 		PortraitWindow.Unload ()
 		PortraitWindow = None
-	
-	#UpdateRecordsWindow ()
-	# causes error, but dunno how to solve it properly
+
 	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY) 
 	return 
 
@@ -1360,10 +1356,8 @@ def OpenCustomPortraitWindow ():
 	return
 
 def CustomPortraitDonePress ():
-	global PortraitList1, PortraitList2
-	Pc = GemRB.GameGetSelectedPCSingle ()
-
-	GemRB.FillPlayerInfo (Pc, PortraitList1.QueryText () , PortraitList2.QueryText ())
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.FillPlayerInfo (pc, PortraitList1.QueryText () , PortraitList2.QueryText ())
 
 	CloseCustomPortraitWindow ()
 	ClosePortraitWindow ()
