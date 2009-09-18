@@ -6,3 +6,5 @@ Columns -
  GRADIENT - fake coloured animations will be recoloured with this gradient
 
 Rows - damage types
+
+See also: dmgtype.txt

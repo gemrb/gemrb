@@ -432,6 +432,7 @@ static void ReadSpellProtTable(const ieResRef tablename)
 #define STI_AREATYPE          0x106
 #define STI_DAYTIME           0x107
 #define STI_EA                0x108
+#define STI_EVASION           0x109
 #define STI_INVALID           0xffff
 
 //returns true if iwd ids targeting resists the spell
@@ -485,6 +486,15 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 		return 1;
 	case STI_CIRCLESIZE:
 		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, spellres[type].relation);
+	case STI_EVASION:
+		if (target->GetStat(IE_LEVELTHIEF) < 7 ) {
+			return 0;
+		}
+		val = target->GetSavingThrow(1,0); //breath
+		if (val) {
+			return 1;
+		}
+		return 0;
 	default:
 		return DiffCore(STAT_GET(idx), val, spellres[type].relation);
 	}
@@ -1114,7 +1124,7 @@ int fx_blinding_orb (Scriptable* Owner, Actor* target, Effect* fx)
 		damage *= 2;
 	}
 	//check saving throw
-	bool st = target->GetSavingThrow(4,0); //spell
+	bool st = target->GetSavingThrow(0,0); //spell
 	if (st) {
 		target->Damage(damage/2, DAMAGE_FIRE, Owner);
 		return FX_NOT_APPLIED;

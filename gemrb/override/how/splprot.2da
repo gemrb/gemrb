@@ -64,7 +64,7 @@
 60         ALIGNMENT  0x10       5          alignment/not_lawful 
 61         ALIGNMENT  0x30       1          alignment/chaotic 
 62         ALIGNMENT  0x30       5          alignment/not_chaotic 
-63         ?          *          *          evasion_check 
+63         0x109      *          *          evasion_check 
 64         RACE       160        1          race/orc   
 65         RACE       160        5          race/not_orc 
 66         EXTSTATE   ?          9          extstate/deaf 
