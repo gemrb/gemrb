@@ -905,7 +905,7 @@ bool Interface::ReadDamageTypeTable() {
 	DamageInfoStruct di;
 	for (ieDword i = 0; i < tm->GetRowCount(); i++) {
 		di.strref = core->GetStringReference(atoi(tm->QueryField(i, 0)));
-		di.resist_stat = atoi(tm->QueryField(i, 1));
+		di.resist_stat = TranslateStat(tm->QueryField(i, 1));
 		di.value = strtol(tm->QueryField(i, 2), (char **) NULL, 16);
 		DamageInfoMap.insert(std::make_pair <ieDword, DamageInfoStruct> ((ieDword)di.value, di));
 	}
