@@ -5445,7 +5445,6 @@ void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 	map->TMap->AdjustNearestTravel(p);
 
 	Sender->SetWait(5);
-	Sender->ReleaseCurrentAction();
 
 	if (parameters->string0Parameter[0]) {
 		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
@@ -5453,6 +5452,7 @@ void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 	} else {
 		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, p, EA_DESTROY );
 	}
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::EscapeAreaDestroy(Scriptable* Sender, Action* parameters)
