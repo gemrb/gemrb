@@ -7156,6 +7156,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
+
 	Item *item = gamedata->GetItem(si->ItemResRef);
 	if (item) {
 		if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
@@ -7168,6 +7169,16 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	if (Sound[0]) {
 		core->GetAudioDrv()->Play(Sound);
 	}
+
+	//if res is positive, it is gold!
+	int res = core->CanMoveItem(si);
+	if (res>0) {
+		game->AddGold(res);
+		delete si;
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
 	core->DragItem (si, ResRef);
 	Py_INCREF( Py_None );
 	return Py_None;
