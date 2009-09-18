@@ -20,7 +20,6 @@
 
 
 # GUIREC.py - scripts to control stats/records windows from the GUIREC winpack
-
 ###################################################
 import GemRB
 import GUICommonWindows
@@ -31,14 +30,15 @@ from GUICommon import *
 from LUCommon import CanLevelUp, GetNextLevelExp
 from GUICommonWindows import *
 from GUIWORLD import OpenReformPartyWindow
+from GUICG19 import NextSound
 
 ###################################################
 RecordsWindow = None
 InformationWindow = None
 BiographyWindow = None
+OptionsWindow = None
 CustomizeWindow = None
 OldOptionsWindow = None
-OptionsWindow = None
 ExportDoneButton = None
 ExportFileName = ""
 PortraitsTable = None
@@ -46,6 +46,7 @@ ScriptsTable = None
 ColorTable = None
 ColorIndex = None
 ScriptTextArea = None
+SelectedTextArea = None
 
 # the available sounds
 SoundSequence = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', \
@@ -61,7 +62,6 @@ def OpenRecordsWindow ():
 	if CloseOtherWindow (OpenRecordsWindow):
 		if InformationWindow: OpenInformationWindow ()
 
-
 		if RecordsWindow:
 			RecordsWindow.Unload ()
 		if OptionsWindow:
@@ -70,7 +70,7 @@ def OpenRecordsWindow ():
 		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
-		OptionsWindow = OldOptionsWindow
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
 		SetSelectionChangeHandler (None)
 		return
@@ -81,6 +81,7 @@ def OpenRecordsWindow ():
 	GemRB.LoadWindowPack ("GUIREC")
 	RecordsWindow = Window = GemRB.LoadWindowObject (2)
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
+	# saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindowObject (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenRecordsWindow")
@@ -179,7 +180,6 @@ def UpdateRecordsWindow ():
 	# armorclass
 	Label = Window.GetControl (0x10000028)
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
-	#This is a temporary solution, the core engine should set the stat correctly!
 	ac += GemRB.GetAbilityBonus (IE_DEX, 2, GemRB.GetPlayerStat (pc, IE_DEX) )
 	Label.SetText (str (ac))
 	Label.SetTooltip (17183)
@@ -197,13 +197,13 @@ def UpdateRecordsWindow ():
 	# stats
 
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
-	cstr = GetStatColor (pc, IE_STR)
 	sstrx = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-
+	cstr = GetStatColor (pc, IE_STR)
 	if sstrx > 0 and sstr==18:
 		sstr = "%d/%02d" %(sstr, sstrx % 100)
 	else:
 		sstr = str (sstr)
+
 	sint = str (GemRB.GetPlayerStat (pc, IE_INT))
 	cint = GetStatColor (pc, IE_INT)
 	swis = str (GemRB.GetPlayerStat (pc, IE_WIS))
@@ -245,8 +245,8 @@ def UpdateRecordsWindow ():
 	Label.SetText (ClassTitle)
 
 	# race
-	Table = GemRB.LoadTableObject ("races")
-	text = Table.GetValue (GemRB.GetPlayerStat (pc, IE_RACE) - 1, 0)
+	text = RaceTable.GetValue (RaceTable.FindValue (3, GemRB.GetPlayerStat (pc, IE_RACE)) ,
+ 0)
 
 	Label = Window.GetControl (0x1000000f)
 	Label.SetText (text)
@@ -267,6 +267,8 @@ def UpdateRecordsWindow ():
 	stats_overview = GetStatOverview (pc)
 	Text = Window.GetControl (45)
 	Text.SetText (stats_overview)
+	#TODO: making window visible/shaded depending on the pc's state
+	Window.SetVisible (1)
 	return
 
 def GetStatColor (pc, stat):
@@ -412,10 +414,12 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				stats.append ( (tmp,c,'a') )
 			stats.append (None)
 
+	stats.append (None)
+
 	#proficiencies
 	stats.append ( (8442,1,'c') )
 
-	stats.append ( (9457, GemRB.GetCombatDetails(pc, 0)["ToHit"], '0') )
+	stats.append ( (9457, str(GS (IE_TOHIT))+" ("+str(GemRB.GetCombatDetails(pc, 0)["ToHit"])+")", '0') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
 		tmp2 = str (tmp/2) + chr (188)
@@ -517,8 +521,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append ( (10343, GA (IE_INT,0), '%' ) )
 	# 10347 Reaction
 	stats.append ( (10347, GA (IE_REPUTATION,0), '0') )
+	stats.append (None)
 
-	# 10344 Bonus Priest Spell
+	# 10344 Bonus Priest spells
 	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, 0, 0)>0:
 		stats.append (10344)
 		for level in range (7):
@@ -540,17 +545,17 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			if type == '+': #pluses
 				res.append ("[capital=0]"+GemRB.GetString (strref) + ' '+ '+' * val)
 			elif type == 'x': #x character before value
-				res.append ("[capital=0]"+GemRB.GetString (strref)+': x' + str (val) )
+				res.append ("[capital=0]"+GemRB.GetString (strref) +': x' + str (val) )
 			elif type == 'a': #value (portrait icon) + string
-				res.append ("[capital=2]"+val+" "+GemRB.GetString (strref) )
+				res.append ("[capital=2]"+val+" "+GemRB.GetString (strref))
 			elif type == 'b': #strref is an already resolved string
-				res.append ("[capital=0]"+strref+": "+str (val) )
+				res.append ("[capital=0]"+strref+": "+str (val))
 			elif type == 'c': #normal string
-				res.append ("[capital=0]"+GemRB.GetString (strref) )
+				res.append ("[capital=0]"+GemRB.GetString (strref))
 			elif type == 'd': #strref is an already resolved string
 				res.append ("[capital=0]"+strref)
 			elif type == '0': #normal value
-				res.append (GemRB.GetString (strref) + ': ' + str (val) )
+				res.append (GemRB.GetString (strref) + ': ' + str (val))
 			else: #normal value + type character, for example percent sign
 				res.append ("[capital=0]"+GemRB.GetString (strref) + ': ' + str (val) + type)
 			lines = 1
@@ -620,10 +625,10 @@ def OpenInformationWindow ():
 	Label.SetText (GemRB.GetString (stat['BestKilledName']))
 
 	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
-	# (script updates???). In each case, there are 60 seconds
-	# in a minute, 24 hours in a day, but ONLY 5 minutes in an hour!!
+	#   (script updates???). In each case, there are 60 seconds
+	#   in a minute, 24 hours in a day, but ONLY 5 minutes in an hour!!
 	# Hence currentTime (and joinTime after div by 15) has
-	# 7200 secs a day (60 * 5 * 24)
+	#   7200 secs a day (60 * 5 * 24)
 	currentTime = GemRB.GetGameTime ()
 	joinTime = stat['JoinDate'] - stat['AwayTime']
 
@@ -797,10 +802,10 @@ def OpenCustomizeWindow ():
 	ColorTable = GemRB.LoadTableObject ("CLOWNCOL")
 	CustomizeWindow = GemRB.LoadWindowObject (17)
 
-	AppearanceButton = CustomizeWindow.GetControl (0)
-	AppearanceButton.SetText (11961)
+	PortraitSelectButton = CustomizeWindow.GetControl (0)
+	PortraitSelectButton.SetText (11961)
 	if not Exportable:
-		AppearanceButton.SetState (IE_GUI_BUTTON_DISABLED)
+		PortraitSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	SoundButton = CustomizeWindow.GetControl (1)
 	SoundButton.SetText (10647)
@@ -824,43 +829,41 @@ def OpenCustomizeWindow ():
 	TextArea = CustomizeWindow.GetControl (5)
 	TextArea.SetText (11327)
 
-	DoneButton = CustomizeWindow.GetControl (7)
-	DoneButton.SetText (11973)
-	DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+	CustomizeDoneButton = CustomizeWindow.GetControl (7)
+	CustomizeDoneButton.SetText (11973)
+	CustomizeDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 
 	CancelButton = CustomizeWindow.GetControl (8);
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	AppearanceButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenAppearanceWindow")
+	PortraitSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenAppearanceWindow")
 	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSoundWindow")
 	ColorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenColorWindow")
 	ScriptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenScriptWindow")
 	#BiographyButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyEditWindow")
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomizeDonePress")
+	CustomizeDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomizeDonePress")
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomizeCancelPress")
 
 	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def CustomizeDonePress ():
-	global CustomizeWindow
-
-	if CustomizeWindow:
-		CustomizeWindow.Unload ()
-		CustomizeWindow = None
-
+	CloseCustomizeWindow ()
 	UpdateRecordsWindow ()
 	return
 
 def CustomizeCancelPress ():
+	CloseCustomizeWindow ()
+	UpdateRecordsWindow ()
+	return
+
+def CloseCustomizeWindow ():
 	global CustomizeWindow
 
 	if CustomizeWindow:
 		CustomizeWindow.Unload ()
 		CustomizeWindow = None
-
-	UpdateRecordsWindow ()
 	return
 
 def OpenAppearanceWindow ():
