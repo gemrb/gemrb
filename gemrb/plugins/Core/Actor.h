@@ -628,6 +628,6 @@ public:
 	bool CannotPassEntrance() const;
 	void UseExit(int flag);
 	int GetReaction();
-	int LuckyRoll(int dice, int size, int add, bool critical=1) const;
+	int LuckyRoll(int dice, int size, int add, bool critical=1, Actor* opponent=NULL) const;
 };
 #endif

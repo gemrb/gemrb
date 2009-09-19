@@ -3304,7 +3304,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 
 	if (flags & LS_STATS) {
 		// chance to learn roll
-		if (core->Roll(1,100,0) > core->GetIntelligenceBonus(0, GetStat(IE_INT))) {
+		if (LuckyRoll(1,100,0) > core->GetIntelligenceBonus(0, GetStat(IE_INT))) {
 			return LSR_FAILED;
 		}
 	}
@@ -5724,9 +5724,10 @@ int Actor::GetReaction()
 // luck does not affect critical hit chances:
 // if critical is set, it will return 1/20 on a critical, otherwise it can never
 // return a critical miss when luck is positive and can return a false critical hit
-int Actor::LuckyRoll(int dice, int size, int add, bool critical) const
+int Actor::LuckyRoll(int dice, int size, int add, bool critical, Actor* opponent) const
 {
 	int luck = (signed) GetStat(IE_DAMAGELUCK);
+	if (opponent) luck -= (signed) opponent->GetStat(IE_DAMAGELUCK);
 	if (dice < 1 || size < 1) {
 		return add + luck;
 	}

@@ -4556,7 +4556,7 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 	} else {
 		damager=damagee;
 	}
-	int damage = core->Roll( (parameters->int1Parameter>>12)&15, (parameters->int1Parameter>>4)&255, parameters->int1Parameter&15 );
+	int damage = damagee->LuckyRoll( (parameters->int1Parameter>>12)&15, (parameters->int1Parameter>>4)&255, parameters->int1Parameter&15, 0, damager);
 	int type=MOD_ADDITIVE;
 	switch(parameters->int0Parameter) {
 	case 2: //raise
