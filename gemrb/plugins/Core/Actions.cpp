@@ -2274,15 +2274,12 @@ void GameScript::RemoveTraps(Scriptable* Sender, Action* parameters)
 		if (flags) {
 			switch(type) {
 			case ST_DOOR:
-printf("RemoveTraps on door\n");
 				door->TryDisarm(actor);
 				break;
 			case ST_CONTAINER:
-printf("RemoveTraps on container\n");
 				container->TryDisarm(actor);
 				break;
 			case ST_PROXIMITY:
-printf("RemoveTraps on trap\n");
 				trigger->TryDisarm(actor);
 				break;
 			default:
@@ -2519,24 +2516,21 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 	if(Sender->Type==ST_ACTOR) {
 		Actor *act = (Actor *) Sender;
 
-		act->SetModal(MS_NONE);
 		unsigned int dist = GetSpellDistance(spellres, act);
 
+		//move near to target
 		if (PersonalDistance(tar, Sender) > dist) {
-			GoNearAndRetry(Sender, tar, true, dist);
-			Sender->ReleaseCurrentAction();
+			MoveNearerTo(Sender,tar,dist);
 			return;
 		}
-/* we don't need this, do we?
-	}
 
-	//face target
-	if (Sender->Type==ST_ACTOR) {
-		Actor *act = (Actor *) Sender;
-*/
+		//face target
 		if (tar != Sender) {
 			act->SetOrientation( GetOrient( tar->Pos, act->Pos ), false );
 		}
+
+		//stop doing anything else
+		act->SetModal(MS_NONE);
 	}
 	int duration = Sender->CastSpell( spellres, tar, true );
 	if (duration != -1) Sender->SetWait(duration);
@@ -2571,17 +2565,16 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 
 		unsigned int dist = GetSpellDistance(spellres, act);
 
+		//move near to target
 		if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
-			GoNearAndRetry(Sender, parameters->pointParameter, dist);
-			Sender->ReleaseCurrentAction();
+			MoveNearerTo(Sender,parameters->pointParameter,dist);
 			return;
 		}
-	}
 
-	//face target
-	if (Sender->Type==ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
-		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
+		//face target
+		act->SetOrientation( GetOrient( parameters->pointParameter, act->Pos ), false );
+		//stop doing anything else
+		act->SetModal(MS_NONE);
 	}
 
 	int duration = Sender->CastSpellPoint( spellres, parameters->pointParameter, true );
@@ -2629,10 +2622,13 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 
 	//face target
 	if (Sender->Type==ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
+		Actor *act = (Actor *) Sender;
 		if (tar != Sender) {
-			actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+			act->SetOrientation( GetOrient( tar->Pos, act->Pos ), false );
 		}
+
+		//stop doing anything else
+		act->SetModal(MS_NONE);
 	}
 	int duration = Sender->CastSpell( spellres, tar, false );
 	if (duration != -1) Sender->SetWait(duration);
@@ -2665,8 +2661,11 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 
 	//face target
 	if (Sender->Type==ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
-		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
+		Actor *act = (Actor *) Sender;
+		act->SetOrientation( GetOrient( parameters->pointParameter, act->Pos ), false );
+
+		//stop doing anything else
+		act->SetModal(MS_NONE);
 	}
 
 	int duration = Sender->CastSpellPoint( spellres, parameters->pointParameter, false );
@@ -2714,10 +2713,13 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 
 	//face target
 	if (Sender->Type==ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
+		Actor *act = (Actor *) Sender;
 		if (tar != Sender) {
-			actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+			act->SetOrientation( GetOrient( tar->Pos, act->Pos ), false );
 		}
+
+		//stop doing anything else
+		act->SetModal(MS_NONE);
 	}
 	int duration = Sender->CastSpell (spellres, tar, false);
 	if (duration != -1) Sender->SetWait(duration);
@@ -2749,8 +2751,11 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 
 	//face target
 	if (Sender->Type==ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
-		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
+		Actor *act = (Actor *) Sender;
+		act->SetOrientation( GetOrient( parameters->pointParameter, act->Pos ), false );
+
+		//stop doing anything else
+		act->SetModal(MS_NONE);
 	}
 
 	int duration = Sender->CastSpellPoint (spellres, parameters->pointParameter, false);
@@ -2840,10 +2845,13 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Sender->LastTargetPos=parameters->pointParameter;
+	/*
 	if (Sender->Type == ST_ACTOR) {
 		Actor *actor = (Actor *) Sender;
-		actor->SetStance (IE_ANI_CONJURE);
+		//the dead don't wiggle their fingers
+		//actor->SetStance (IE_ANI_CONJURE);
 	}
+	*/
 	Sender->CastSpell (spellres, tar, false, true);
 	if (tar->Type==ST_ACTOR) {
 		Sender->CastSpellEnd(spellres);
@@ -6343,7 +6351,6 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 		return;
 	}
 	const char* string = pcs->QueryField( parameters->int0Parameter, 0 );
-printf ("GeneratePartyMember: %s\n", string);
 	int pos = gamedata->LoadCreature(string,0,false);
 	if (pos<0) {
 		return;

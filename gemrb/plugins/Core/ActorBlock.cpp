@@ -1211,8 +1211,8 @@ void Movable::FixPosition()
 	Pos.x/=16;
 	Pos.y/=12;
 	GetCurrentArea()->AdjustPosition(Pos);
-	Pos.x*=16;
-	Pos.y*=12;
+	Pos.x=Pos.x*16+8;
+	Pos.y=Pos.y*12+6;
 }
 
 void Movable::WalkTo(Point &Des, int distance)
