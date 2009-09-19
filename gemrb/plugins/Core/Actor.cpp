@@ -2102,11 +2102,11 @@ void Actor::RefreshPCStats() {
 void Actor::RollSaves()
 {
 	if (InternalFlags&IF_USEDSAVE) {
-		SavingThrow[0]=(ieByte) core->Roll(1,SAVEROLL,0);
-		SavingThrow[1]=(ieByte) core->Roll(1,SAVEROLL,0);
-		SavingThrow[2]=(ieByte) core->Roll(1,SAVEROLL,0);
-		SavingThrow[3]=(ieByte) core->Roll(1,SAVEROLL,0);
-		SavingThrow[4]=(ieByte) core->Roll(1,SAVEROLL,0);
+		SavingThrow[0]=(ieByte) LuckyRoll(1, SAVEROLL, 0);
+		SavingThrow[1]=(ieByte) LuckyRoll(1, SAVEROLL, 0);
+		SavingThrow[2]=(ieByte) LuckyRoll(1, SAVEROLL, 0);
+		SavingThrow[3]=(ieByte) LuckyRoll(1, SAVEROLL, 0);
+		SavingThrow[4]=(ieByte) LuckyRoll(1, SAVEROLL, 0);
 		InternalFlags&=~IF_USEDSAVE;
 	}
 }
@@ -3826,7 +3826,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		printf("Next: %d ", nextattack);
 	}
 
-	int roll = core->Roll(1,ATTACKROLL,0);
+	int roll = LuckyRoll(1, ATTACKROLL, 0);
 	if (roll==1) {
 		//critical failure
 		printBracket("Critical Miss", RED);
@@ -3852,14 +3852,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	int resisted = 0;
 	
 	if (hittingheader->DiceThrown<256) {
-		int damageluck = (int) GetStat(IE_DAMAGELUCK);
-		int roll;
-		// luck increases the minimum damage rolled per dice, but only up to DiceSides
-		for (int dice=0; dice < hittingheader->DiceThrown; dice++) {
-			roll = core->Roll(1, hittingheader->DiceSides, damageluck);
-			if (roll > hittingheader->DiceSides) roll = hittingheader->DiceSides;
-			damage += roll;
-		}
+		damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, 0, 0);
 		damage += DamageBonus;
 		printf("| Damage %dd%d%+d = %d ",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
 	} else {
@@ -5725,4 +5718,54 @@ int Actor::GetReaction()
 		rep = GetStat(IE_REPUTATION);
 	}
 	return 10 + rmodrep[rep] + rmodchr[chr];
+}
+
+// luck increases the minimum roll per dice, but only up to the number of dice sides;
+// luck does not affect critical hit chances:
+// if critical is set, it will return 1/20 on a critical, otherwise it can never
+// return a critical miss when luck is positive and can return a false critical hit
+int Actor::LuckyRoll(int dice, int size, int add, bool critical) const
+{
+	int luck = (signed) GetStat(IE_DAMAGELUCK);
+	if (dice < 1 || size < 1) {
+		return add + luck;
+	}
+
+	if (dice > 100) {
+		int bonus;
+		if (abs(luck) > size) {
+			bonus = luck/abs(luck) * size;
+		} else {
+			bonus = luck;
+		}
+		int roll = core->Roll(1, dice*size, 0);
+		if (critical && (roll == 1 || roll == size)) {
+			return roll;
+		} else {
+			return add + dice * (size + bonus) / 2;
+		}
+	}
+
+	int roll, result = 0, misses = 0, hits = 0;
+	for (int i = 0; i < dice; i++) {
+		roll = core->Roll(1, size, 0);
+		if (roll == 1) {
+			misses++;
+		} else if (roll == size) {
+			hits++;
+		}
+		roll += luck;
+		if (roll > size) {
+			roll = size;
+		} else if (roll < 1) {
+			roll = 1;
+		}
+		result += roll;
+	}
+
+	// ensure we can still return a critical failure/success
+	if (critical && dice == misses) return 1;
+	if (critical && dice == hits) return size;
+
+	return result + add;
 }
