@@ -356,11 +356,3 @@ def SelectFormation ():
 	Button.SetState (IE_GUI_BUTTON_SELECTED)
 
 	last_formation = formation
-
-
-def GetWindowPack():
-	width = GemRB.GetSystemVariable (SV_WIDTH)
-	if width == 800:
-		return "GUIW08"
-	#default
-	return "GUIWORLD"

@@ -70,14 +70,3 @@ def DeathWindowEnd ():
 	#making the playing field gray
 	GemRB.SetVisible (0,2)
 	return
-
-def GetWindowPack():
-	width = GemRB.GetSystemVariable (SV_WIDTH)
-	if width == 800:
-		return "GUIWORLD"
-	if width == 1024:
-		return "GUIWORLD"
-	if width == 1280:
-		return "GUIWORLD"
-	#default
-	return "GUIWORLD"

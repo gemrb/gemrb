@@ -500,15 +500,3 @@ def LoadPress():
 	GemRB.SetNextScript ("GUILOAD")
 	return
 
-def GetWindowPack():
-	width = GemRB.GetSystemVariable (SV_WIDTH)
-	if GemRB.HasResource("GUIW08", RES_CHU, 1):
-		if width == 800:
-			return "GUIW08"
-		if width == 1024:
-			return "GUIW10"
-		if width == 1280:
-			return "GUIW12"
-	#default
-	return "GUIW"
-
