@@ -33,6 +33,8 @@
 #include <unistd.h>
 #endif
 
+#define SHARED_OVERRIDE "shared"
+
 KeyImp::KeyImp(void)
 {
 #ifndef WIN32
@@ -230,6 +232,11 @@ bool KeyImp::HasResource(const char* resname, SClass_ID type, bool silent)
 	PathJoin( path, "override", core->GameType, NULL ); //this shouldn't change
 	if (FindIn( core->CachePath, "", resname, type)) return true;
 	if (FindIn( core->GemRBOverridePath, path, resname, type)) return true;
+
+	// try also the shared gemrb override path
+	PathJoin( path, "override", SHARED_OVERRIDE, NULL );
+	if (FindIn( core->GemRBOverridePath, path, resname, type)) return true;
+
 	if (FindIn( core->GamePath, core->GameOverridePath, resname, type)) return true;
 	if (FindIn( core->GamePath, core->GameSoundsPath, resname, type)) return true;
 	if (FindIn( core->GamePath, core->GameScriptsPath, resname, type)) return true;
@@ -272,6 +279,11 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type, bool silent
 
 	fs=SearchIn( core->GemRBOverridePath, path, resname, type,
 		"Found in GemRB Override", silent );
+	if (fs) return fs;
+
+	PathJoin( path, "override", SHARED_OVERRIDE, NULL );
+	fs=SearchIn( core->GemRBOverridePath, path, resname, type,
+		"Found in shared GemRB Override", silent );
 	if (fs) return fs;
 
 	fs=SearchIn( core->GamePath, core->GameOverridePath, resname, type,
