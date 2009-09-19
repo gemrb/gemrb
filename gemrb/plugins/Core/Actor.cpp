@@ -2651,7 +2651,7 @@ ieDword Actor::GetXPLevel(int modified) const
 
 	float classcount = 0;
 	float average = 0;
-	if (!core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
+	if (core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
 		// iwd2
 		for (int i=0; i < 11; i++) {
 			if (stats[levelslotsiwd2[i]] > 0) classcount++;
