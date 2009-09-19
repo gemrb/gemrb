@@ -5052,7 +5052,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 		pro->SetCaster(globalID);
 		if(((int)header < 0) && !(flags&UI_MISS)) { //using a weapon
 			ITMExtHeader *which = itm->GetWeaponHeader(header == (ieDword)-2);
-			Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, weapon_damagetype[which->DamageType], FX_DURATION_INSTANT_LIMITED);
+			Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, (weapon_damagetype[which->DamageType])<<16, FX_DURATION_INSTANT_LIMITED);
 			AttackEffect->Projectile = which->ProjectileAnimation;
 			AttackEffect->Target = FX_TARGET_PRESET;
 			pro->GetEffects()->AddEffect(AttackEffect, true);
