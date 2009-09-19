@@ -1408,9 +1408,11 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 	case 0:
 		STATE_SET( STATE_INVISIBLE );
+		STAT_ADD(IE_TOHIT, 4);
 		break;
 	case 1:
 		STATE_SET( STATE_INVIS2 );
+		HandleBonus(target, IE_ARMORCLASS, 4, fx->TimingMode);
 		break;
 	default:
 		break;
