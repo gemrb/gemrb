@@ -1425,7 +1425,7 @@ static void InitActorTables()
 		maxhpconbon[i] = 9;
 	}
 	tm.load("classes");
-	if (tm && stricmp(core->GameType, "iwd2") != 0) {
+	if (tm && !core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
 		AutoTable hptm;
 		//iwd2 just uses levelslotsiwd2 instead
 		printf("Examining classes.2da\n");
@@ -2651,7 +2651,7 @@ ieDword Actor::GetXPLevel(int modified) const
 
 	float classcount = 0;
 	float average = 0;
-	if (!stricmp(core->GameType, "iwd2")) {
+	if (!core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
 		// iwd2
 		for (int i=0; i < 11; i++) {
 			if (stats[levelslotsiwd2[i]] > 0) classcount++;
@@ -5569,7 +5569,7 @@ void Actor::CreateDerivedStats()
 			multiclass = (ieDword)tmp;
 	}
 
-	if (!stricmp(core->GameType, "iwd2")) {
+	if (core->HasFeature(GF_3ED_RULES)) {
 		CreateDerivedStatsIWD2();
 	} else {
 		CreateDerivedStatsBG();

@@ -1574,7 +1574,7 @@ int EffectQueue::DisabledSpellcasting(int types) const
 	}
 
 	unsigned int spelltype_mask = 0;
-	bool iwd2 = !stricmp(core->GameType, "iwd2");
+	bool iwd2 = !!core->HasFeature(GF_ENHANCED_EFFECTS);
 	ieDword opcode = fx_disable_spellcasting_ref.EffText;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {

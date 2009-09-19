@@ -115,7 +115,7 @@
 #define  GF_REVERSE_DOOR        	18 //pst
 #define  GF_PROTAGONIST_TALKS   	19 //pst
 #define  GF_HAS_SPELLLIST       	20 //iwd2
-#define  GF_IWD2_SCRIPTNAME     	21 //iwd2
+#define  GF_IWD2_SCRIPTNAME     	21 //iwd2, iwd, how
 #define  GF_DIALOGUE_SCROLLS    	22 //pst
 #define  GF_KNOW_WORLD          	23 //iwd2
 #define  GF_REVERSE_TOHIT       	24 //all except iwd2
@@ -132,8 +132,10 @@
 #define  GF_RESDATA_INI         	35 //pst
 #define  GF_OVERRIDE_CURSORPOS  	36 //pst, iwd2
 #define  GF_BREAKABLE_WEAPONS     	37 //bg1, not bg2 and iwd2, maybe others
+#define  GF_3ED_RULES              	38 //iwd2
+#define  GF_LEVELSLOT_PER_CLASS    	39 //iwd2
 //update this
-#define GF_COUNT 38
+#define GF_COUNT 40
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

@@ -2221,6 +2221,8 @@ static const char *game_flags[GF_COUNT+1]={
 		"HasResDataIni",      //35GF_RESDATA_INI
 		"OverrideCursorPos",  //36GF_OVERRIDE_CURSORPOS
 		"BreakableWeapons",   //37GF_BREAKABLE_WEAPONS
+		"3EdRules",           //38GF_3ED_RULES
+		"LevelslotPerClass",  //39GF_LEVELSLOT_PER_CLASS
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
