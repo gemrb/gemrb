@@ -709,7 +709,7 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 		for spell in range (count):
 			# see if we need to check for kit
 			if type == IE_SPELL_TYPE_PRIEST and kit:
-				# get the spells ref data
+				# get the spell's ref data
 				ref = GemRB.GetKnownSpell (pc, type, level, mod-spell)
 				ref = GemRB.GetSpell (ref['SpellResRef'], 1)
 
@@ -722,7 +722,7 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 			# remove the spell
 			GemRB.RemoveSpell (pc, type, level, mod-spell)
 
-		# remove memorization counts if disired
+		# remove memorization counts if desired
 		if noslots:
 			GemRB.SetMemorizableSpellsCount (pc, 0, type, level)
 
