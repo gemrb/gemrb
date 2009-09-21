@@ -483,8 +483,9 @@ def GetLevelUpNews():
 
 	# 5375 - Backstab Multiplier Increased by
 	# this auto-updates... we just need to inform of the update
-	if (BackstabMult > GemRB.GetPlayerStat (pc, IE_BACKSTABDAMAGEMULTIPLIER, 1)):
-		News += GemRB.GetString (5375) + ": " + str(BackstabMult) + '\n\n'
+	BSGain = BackstabMult - GemRB.GetPlayerStat (pc, IE_BACKSTABDAMAGEMULTIPLIER, 1)
+	if (BSGain > 0):
+		News += GemRB.GetString (5375) + ": " + str(BSGain) + '\n\n'
 
 	# 5376 - Lay on Hands increased
 	if LOHGain > 0:
