@@ -3892,6 +3892,8 @@ void Actor::PerformAttack(ieDword gameTime)
 		if (Flags&WEAPON_RANGED) {//Launch the projectile anyway
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		}
+		CureInvisibility();
+		CureSanctuary();
 		printBracket("Missed", LIGHT_RED);
 		printf("\n");
 		return;
