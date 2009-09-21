@@ -2223,6 +2223,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"BreakableWeapons",   //37GF_BREAKABLE_WEAPONS
 		"3EdRules",           //38GF_3ED_RULES
 		"LevelslotPerClass",  //39GF_LEVELSLOT_PER_CLASS
+		"SelectiveMagicRes",  //40GF_SELECTIVE_MAGIC_RES
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

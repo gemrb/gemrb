@@ -134,8 +134,9 @@
 #define  GF_BREAKABLE_WEAPONS     	37 //bg1, not bg2 and iwd2, maybe others
 #define  GF_3ED_RULES              	38 //iwd2
 #define  GF_LEVELSLOT_PER_CLASS    	39 //iwd2
+#define  GF_SELECTIVE_MAGIC_RES    	40 //bg2, iwd2, (how)
 //update this
-#define GF_COUNT 40
+#define GF_COUNT 41
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
