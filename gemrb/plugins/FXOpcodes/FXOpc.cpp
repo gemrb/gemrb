@@ -5742,10 +5742,11 @@ int fx_apply_effect_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		Effect *newfx = core->GetEffect(fx->Resource, fx->Power, p);
 		if (newfx) {
 			Effect *myfx = new Effect;
+			memcpy(myfx, newfx, sizeof(Effect));
 			myfx->random_value = core->Roll(1,100,0);
 			myfx->TimingMode=fx->TimingMode;
 			myfx->Duration=fx->Duration;
-			memcpy(myfx, newfx, sizeof(Effect));
+			myfx->Target = FX_TARGET_PRESET;
 			ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply);
 			delete myfx;
 		}
