@@ -316,11 +316,7 @@ def learnDivine(MyChar,ClassFlag,TableName,AllignID):
 def unsetDivineSpells():
 	print("unsetDivineSpells")
 	MyChar = GemRB.GetVar ("Slot")
-	for level in range(0, 5):
-		for j in range(0, GemRB.GetKnownSpellsCount (MyChar, IE_SPELL_TYPE_PRIEST, level) ):
-			GemRB.RemoveSpell(MyChar,IE_SPELL_TYPE_PRIEST, level, 0)
-	GemRB.SetMemorizableSpellsCount(MyChar, 0, IE_SPELL_TYPE_PRIEST, 1)
-			
+	RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1, 1, 1)
 
 def getDivineSpells(TextAreaControl):
 	MyChar = GemRB.GetVar ("Slot")
