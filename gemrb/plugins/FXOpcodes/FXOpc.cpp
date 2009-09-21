@@ -1451,6 +1451,7 @@ int fx_luck_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_luck_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	STAT_MOD( IE_LUCK );
+	STAT_MOD( IE_DAMAGELUCK );
 	return FX_APPLIED;
 }
 
@@ -3418,6 +3419,7 @@ int fx_luck_non_cumulative (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STATE_SET( STATE_LUCK );
 	target->SetSpellState(SS_LUCK);
 	STAT_ADD( IE_LUCK, fx->Parameter1 );
+	STAT_ADD( IE_DAMAGELUCK, fx->Parameter1 );
 	return FX_APPLIED;
 }
 
@@ -3428,6 +3430,7 @@ int fx_luck_cumulative (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	target->SetSpellState(SS_LUCK);
 	STAT_ADD( IE_LUCK, fx->Parameter1 );
+	STAT_ADD( IE_DAMAGELUCK, fx->Parameter1 );
 	return FX_APPLIED;
 }
 
