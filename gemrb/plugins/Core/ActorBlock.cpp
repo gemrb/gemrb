@@ -671,8 +671,13 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 		if(LastTarget) {
 			Scriptable *target = area->GetActorByGlobalID(LastTarget);
 			if (target && (Type==ST_ACTOR) ) {
+				Actor *me = (Actor *) this;
 				target->LastSpellOnMe = spellnum;
-				target->LastCasterOnMe = ((Actor *) this)->GetID();
+				target->LastCasterOnMe = me->GetID();
+				me->CureInvisibility();
+				if (target!=this) {
+					me->CureSanctuary();
+				}
 			}
 		}
 	}

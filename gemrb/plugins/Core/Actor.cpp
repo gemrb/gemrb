@@ -3844,6 +3844,7 @@ void Actor::PerformAttack(ieDword gameTime)
 			}
 		}
 		CureInvisibility();
+		CureSanctuary();
 		return;
 	}
 	//damage type is?
@@ -3870,10 +3871,11 @@ void Actor::PerformAttack(ieDword gameTime)
 		ModifyDamage (target, damage, resisted, weapon_damagetype[damagetype], &wi, true);
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 		CureInvisibility();
+		CureSanctuary();
+
 		return;
 	}
 
-	CureInvisibility();
 
 	//get target's defense against attack
 	int defense = target->GetDefense(damagetype);
@@ -3898,6 +3900,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	printf("\n");
 	ModifyDamage (target, damage, resisted, weapon_damagetype[damagetype], &wi, false);
 	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
+	CureInvisibility();
+	CureSanctuary();
 }
 
 static EffectRef fx_stoneskin_ref={"StoneSkinModifier",NULL,-1};
@@ -5794,13 +5798,40 @@ int Actor::LuckyRoll(int dice, int size, int add, bool critical, bool only_damag
 	return result + add;
 }
 
-static EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
+static EffectRef fx_remove_invisible_state_ref={"ForceVisible",NULL,-1};
 
 // removes the (normal) invisibility state
 void Actor::CureInvisibility()
 {
 	if (Modified[IE_STATE_ID] & (ieDword) (STATE_INVISIBLE)) {
-		SetBaseBit(IE_STATE_ID, STATE_INVISIBLE, false);
-		fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref, 0);
+		//SetBaseBit(IE_STATE_ID, STATE_INVISIBLE, false);
+		//fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref, 0);
+
+		//this is much closer to what the original engine does here
+		Effect *newfx;
+
+		newfx = EffectQueue::CreateEffect(fx_remove_invisible_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+		core->ApplyEffect(newfx, this, this);
+
+		delete newfx;
+
+		//not sure, but better than nothing
+		if (! (Modified[IE_STATE_ID]& STATE_INVISIBLE)) {
+			InternalFlags|=IF_BECAMEVISIBLE;
+		}
 	}
 }
+
+static EffectRef fx_remove_sanctuary_ref={"Cure:Sanctuary",NULL,-1};
+
+// removes the sanctuary effect
+void Actor::CureSanctuary()
+{
+	Effect *newfx;
+
+	newfx = EffectQueue::CreateEffect(fx_remove_sanctuary_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, this, this);
+
+	delete newfx;
+}
+
