@@ -2102,11 +2102,11 @@ void Actor::RefreshPCStats() {
 void Actor::RollSaves()
 {
 	if (InternalFlags&IF_USEDSAVE) {
-		SavingThrow[0]=(ieByte) LuckyRoll(1, SAVEROLL, 0);
-		SavingThrow[1]=(ieByte) LuckyRoll(1, SAVEROLL, 0);
-		SavingThrow[2]=(ieByte) LuckyRoll(1, SAVEROLL, 0);
-		SavingThrow[3]=(ieByte) LuckyRoll(1, SAVEROLL, 0);
-		SavingThrow[4]=(ieByte) LuckyRoll(1, SAVEROLL, 0);
+		SavingThrow[0]=(ieByte) core->Roll(1, SAVEROLL, 0);
+		SavingThrow[1]=(ieByte) core->Roll(1, SAVEROLL, 0);
+		SavingThrow[2]=(ieByte) core->Roll(1, SAVEROLL, 0);
+		SavingThrow[3]=(ieByte) core->Roll(1, SAVEROLL, 0);
+		SavingThrow[4]=(ieByte) core->Roll(1, SAVEROLL, 0);
 		InternalFlags&=~IF_USEDSAVE;
 	}
 }
@@ -2137,7 +2137,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier)
 	int ret = SavingThrow[type];
 	if (ret == 1) return false;
 	if (ret == SAVEROLL) return true;
-	ret += modifier;
+	ret += modifier + GetStat(IE_LUCK);
 	return ret > (int) GetStat(savingthrows[type]);
 }
 
@@ -3852,7 +3852,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	int resisted = 0;
 	
 	if (hittingheader->DiceThrown<256) {
-		damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, 0, 0);
+		damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, 0, 1, 0);
 		damage += DamageBonus;
 		printf("| Damage %dd%d%+d = %d ",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
 	} else {
@@ -3934,6 +3934,8 @@ void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagety
 			return;
 		}
 	}
+
+	//TODO: check for a backstab/IE_ALWAYSBACKSTAB/IE_DISABLEBACKSTAB
 
 	if (wi && target->fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags)) {
 		damage = 0;
@@ -5722,12 +5724,21 @@ int Actor::GetReaction()
 
 // luck increases the minimum roll per dice, but only up to the number of dice sides;
 // luck does not affect critical hit chances:
-// if critical is set, it will return 1/20 on a critical, otherwise it can never
+// if critical is set, it will return 1/sides on a critical, otherwise it can never
 // return a critical miss when luck is positive and can return a false critical hit
-int Actor::LuckyRoll(int dice, int size, int add, bool critical, Actor* opponent) const
+int Actor::LuckyRoll(int dice, int size, int add, bool critical, bool only_damage, Actor* opponent) const
 {
-	int luck = (signed) GetStat(IE_DAMAGELUCK);
-	if (opponent) luck -= (signed) opponent->GetStat(IE_DAMAGELUCK);
+	assert(this != opponent);
+
+	ieDword stat;
+	if (only_damage) {
+		stat = IE_DAMAGELUCK;
+	} else {
+		stat = IE_LUCK;
+	}
+
+	int luck = (signed) GetStat(stat);
+	if (opponent) luck -= (signed) opponent->GetStat(stat);
 	if (dice < 1 || size < 1) {
 		return add + luck;
 	}
