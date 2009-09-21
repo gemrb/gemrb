@@ -143,11 +143,9 @@ def getHatedRace(TextAreaControl):
 def unsetMageSpells():
 	print("unsetMageSpells")
 	MyChar = GemRB.GetVar ("Slot")
-	
+
 	RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1, 5, 1)
-	GemRB.SetMemorizableSpellsCount(MyChar, 0, IE_SPELL_TYPE_WIZARD, 1)
-	
-	
+
 def guardMageSpells():
 	MyChar = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat(MyChar,IE_CLASS)
