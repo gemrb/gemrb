@@ -412,7 +412,7 @@ def ProfsLeftPress():
 def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 	"""Updates the actor with the new proficiencies."""
 
-	ProfCount = ProfsTable.GetRowCount () - ProfsTableOffset + 1
+	ProfCount = ProfsTable.GetRowCount () - ProfsTableOffset
 	for i in range(ProfCount): # skip bg1 weapprof.2da proficiencies
 		ProfID = ProfsTable.GetValue (i+ProfsTableOffset, 0)
 		if GameIsBG1():
@@ -421,7 +421,7 @@ def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 
 		if type == LUPROFS_TYPE_CHARGEN:
 			GemRB.DispelEffect (pc, "Proficiency", ProfID)
-		elif type != LUPROFS_TYPE_CHARGEN_BG1: # any levelup
+		else:
 			if type != LUPROFS_TYPE_DUALCLASS:
 				OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x38
 				SaveProf = OldProf | SaveProf
@@ -429,7 +429,6 @@ def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
 				OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x07
 				SaveProf = (OldProf << 3) | SaveProf
 
-		print "Setting", ProfID, ProfsTable.GetRowName(i+ProfsTableOffset), "to", SaveProf, ";", OldProf, GemRB.GetPlayerStat (pc, ProfID)
 		GemRB.SetPlayerStat (pc, ProfID, SaveProf)
 		if type == LUPROFS_TYPE_LEVELUP or type == LUPROFS_TYPE_CHARGEN:
 			if SaveProf:
