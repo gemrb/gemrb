@@ -3843,6 +3843,7 @@ void Actor::PerformAttack(ieDword gameTime)
 				inventory.BreakItemSlot(wi.slot);
 			}
 		}
+		CureInvisibility();
 		return;
 	}
 	//damage type is?
@@ -3868,8 +3869,11 @@ void Actor::PerformAttack(ieDword gameTime)
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
 		ModifyDamage (target, damage, resisted, weapon_damagetype[damagetype], &wi, true);
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
+		CureInvisibility();
 		return;
 	}
+
+	CureInvisibility();
 
 	//get target's defense against attack
 	int defense = target->GetDefense(damagetype);
@@ -3935,7 +3939,15 @@ void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagety
 		}
 	}
 
-	//TODO: check for a backstab/IE_ALWAYSBACKSTAB/IE_DISABLEBACKSTAB
+	// TODO: in tob you had to be behind the target
+	// TODO: check for the right weapon type too
+	if (Modified[IE_BACKSTABDAMAGEMULTIPLIER] > 1 && !target->Modified[IE_DISABLEBACKSTAB]) {
+		if (Modified[IE_STATE_ID] & (ieDword) (STATE_INVISIBLE) || Modified[IE_ALWAYSBACKSTAB]) {
+			damage *= Modified[IE_BACKSTABDAMAGEMULTIPLIER];
+			// display a simple message instead of hardcoding multiplier names
+			core->DisplayConstantStringValue (STR_BACKSTAB, 0xffffff, Modified[IE_BACKSTABDAMAGEMULTIPLIER]);
+		}
+	}
 
 	if (wi && target->fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags)) {
 		damage = 0;
@@ -5780,4 +5792,15 @@ int Actor::LuckyRoll(int dice, int size, int add, bool critical, bool only_damag
 	if (critical && dice == hits) return size;
 
 	return result + add;
+}
+
+static EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
+
+// removes the (normal) invisibility state
+void Actor::CureInvisibility()
+{
+	if (Modified[IE_STATE_ID] & (ieDword) (STATE_INVISIBLE)) {
+		SetBaseBit(IE_STATE_ID, STATE_INVISIBLE, false);
+		fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref, 0);
+	}
 }

@@ -628,6 +628,9 @@ public:
 	bool CannotPassEntrance() const;
 	void UseExit(int flag);
 	int GetReaction();
+	/* Similar to Roll, but takes luck into account */
 	int LuckyRoll(int dice, int size, int add, bool critical=1, bool only_damage=0, Actor* opponent=NULL) const;
+	/* removes normal invisibility (type 0) */
+	void CureInvisibility();
 };
 #endif
