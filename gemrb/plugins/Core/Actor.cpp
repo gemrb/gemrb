@@ -3843,8 +3843,7 @@ void Actor::PerformAttack(ieDword gameTime)
 				inventory.BreakItemSlot(wi.slot);
 			}
 		}
-		CureInvisibility();
-		CureSanctuary();
+		ResetState();
 		return;
 	}
 	//damage type is?
@@ -3870,8 +3869,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
 		ModifyDamage (target, damage, resisted, weapon_damagetype[damagetype], &wi, true);
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
-		CureInvisibility();
-		CureSanctuary();
+		ResetState();
 
 		return;
 	}
@@ -3892,8 +3890,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		if (Flags&WEAPON_RANGED) {//Launch the projectile anyway
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		}
-		CureInvisibility();
-		CureSanctuary();
+		ResetState();
 		printBracket("Missed", LIGHT_RED);
 		printf("\n");
 		return;
@@ -3902,8 +3899,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	printf("\n");
 	ModifyDamage (target, damage, resisted, weapon_damagetype[damagetype], &wi, false);
 	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
-	CureInvisibility();
-	CureSanctuary();
+	ResetState();
 }
 
 static EffectRef fx_stoneskin_ref={"StoneSkinModifier",NULL,-1};
@@ -5837,3 +5833,9 @@ void Actor::CureSanctuary()
 	delete newfx;
 }
 
+void Actor::ResetState()
+{
+	CureInvisibility();
+	CureSanctuary();
+	SetModal(MS_NONE);
+}

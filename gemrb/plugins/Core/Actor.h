@@ -634,5 +634,7 @@ public:
 	void CureInvisibility();
 	/* removes sanctuary */
 	void CureSanctuary();
+	/* resets the invisibility, sanctuary and modal states */
+	void ResetState();
 };
 #endif
