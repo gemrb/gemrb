@@ -2225,6 +2225,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"LevelslotPerClass",  //39GF_LEVELSLOT_PER_CLASS
 		"SelectiveMagicRes",  //40GF_SELECTIVE_MAGIC_RES
 		"HasHideInShadows",   //41GF_HAS_HIDE_IN_SHADOWS
+		"AreaVisitedVar",     //42GF_AREA_VISITED_VAR
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
