@@ -135,8 +135,9 @@
 #define  GF_3ED_RULES              	38 //iwd2
 #define  GF_LEVELSLOT_PER_CLASS    	39 //iwd2
 #define  GF_SELECTIVE_MAGIC_RES    	40 //bg2, iwd2, (how)
+#define  GF_HAS_HIDE_IN_SHADOWS    	41 // not in bg1 and pst
 //update this
-#define GF_COUNT 41
+#define GF_COUNT 42
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
