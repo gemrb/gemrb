@@ -3157,6 +3157,13 @@ bool Map::DisplayTrackString(Actor *target)
 	return false;
 }
 
+// returns a lightness level in the range of [0-100]
+unsigned int Map::GetLightLevel(Point &Pos)
+{
+	Color c = LightMap->GetPixel(Pos.x/16, Pos.y/12);
+	return (c.r + c.g + c.b)*100/255/3;
+}
+
 ////////////////////AreaAnimation//////////////////
 //Area animation
 

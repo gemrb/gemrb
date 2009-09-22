@@ -456,6 +456,7 @@ public:
 	void SetTrackString(ieStrRef strref, int flg, int difficulty);
 	//returns true if tracking failed
 	bool DisplayTrackString(Actor *actor);
+	unsigned int GetLightLevel(Point &Pos);
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);

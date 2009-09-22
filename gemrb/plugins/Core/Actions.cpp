@@ -5361,8 +5361,7 @@ void GameScript::Hide(Scriptable* Sender, Action* /*parameters*/)
 	}
 
 	// check how bright our spot is
-	Color feet = game->GetCurrentArea()->LightMap->GetPixel(actor->Pos.x/16, actor->Pos.y/12);
-	ieDword lightness = (feet.r + feet.g + feet.b)*100/255/3; //average and convert to [0-100]
+	ieDword lightness = game->GetCurrentArea()->GetLightLevel(actor->Pos);
 	ieDword diff = (100 - lightness) * skill/100;
 	if (roll > diff) {
 		HideFailed(actor);
