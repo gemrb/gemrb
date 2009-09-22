@@ -359,6 +359,8 @@ public:
 	void ShareXP(int XP, int flags);
 	/** returns true if we should start the party overflow window */
 	bool PartyOverflow() const;
+	/** returns true if actor is an attacker or being attacked */
+	bool PCInCombat(Actor *actor) const;
 	/** returns true if any pc is attacker or being attacked */
 	bool AnyPCInCombat() const;
 	/** returns true if the party death condition is true */

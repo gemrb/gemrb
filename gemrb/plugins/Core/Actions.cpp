@@ -5312,13 +5312,69 @@ void GameScript::FindTraps(Scriptable* Sender, Action* /*parameters*/)
 	actor->SetModal( MS_DETECTTRAPS);
 }
 
+static EffectRef fx_disable_button_ref={ "DisableButton", NULL, -1 };
+
+inline void HideFailed(Actor* actor)
+{
+	core->DisplayConstantStringName(STR_HIDEFAILED, 0xffffff, actor);
+	actor->SetModal(MS_NONE);
+
+	Effect *newfx;
+	newfx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_LIMITED);
+	newfx->Duration = 6; // 90 ticks, 1 round
+	core->ApplyEffect(newfx, actor, actor);
+	delete newfx;
+}
+
 void GameScript::Hide(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
+
+	ieDword roll = actor->LuckyRoll(1, 100, 0); 
+	if (roll == 1) {
+		HideFailed(actor);
+		return;
+	}
+
+	// TODO: unknown missing failing check; maybe class?
+
+	if (actor->Modified[IE_DISABLEDBUTTON] & (1<<ACT_STEALTH)) {
+		HideFailed(actor);
+		return;
+	}
+
+	// check if the pc is in combat (seen / heard)
+	Game *game = core->GetGame();
+	if (game->PCInCombat(actor)) {
+		HideFailed(actor);
+		return;
+	}
+
+	ieDword skill;
+	if (core->HasFeature(GF_HAS_HIDE_IN_SHADOWS)) {
+		skill = (actor->GetStat(IE_HIDEINSHADOWS) + actor->GetStat(IE_STEALTH))/2;
+	} else {
+		skill = actor->GetStat(IE_STEALTH);
+	}
+
+	// check how bright our spot is
+	Color feet = game->GetCurrentArea()->LightMap->GetPixel(actor->Pos.x/16, actor->Pos.y/12);
+	ieDword lightness = (feet.r + feet.g + feet.b)*100/255/3; //average and convert to [0-100]
+	ieDword diff = (100 - lightness) * skill/100;
+	if (roll > diff) {
+		HideFailed(actor);
+		return;
+	}
+
 	actor->SetModal( MS_STEALTH);
+	core->DisplayConstantStringName(STR_HIDEDONE, 0xffffff, actor);
+
+	//TODO: show STR_HIDENOMORE on expiry/abort
+	//TODO: expiry isn't instant (skill based transition?)
+
 }
 
 void GameScript::Turn(Scriptable* Sender, Action* /*parameters*/)

@@ -1125,6 +1125,21 @@ bool Game::PartyOverflow() const
 	return (PCs.size()>partysize);
 }
 
+bool Game::PCInCombat(Actor* actor) const
+{
+	if (!CombatCounter) {
+		return false;
+	}
+
+	if (actor->LastTarget) {
+		return true;
+	}
+	if (AttackersOf(actor->GetID(), actor->GetCurrentArea())) {
+		return true;
+	}
+	return false;
+}
+
 bool Game::AnyPCInCombat() const
 {
 	if (!CombatCounter) {
@@ -1132,12 +1147,7 @@ bool Game::AnyPCInCombat() const
 	}
 
 	for (unsigned int i=0; i<PCs.size(); i++) {
-		Actor *actor = PCs[i];
-
-		if ((actor->LastTarget) ) {
-			return true;
-		}
-		if (AttackersOf(actor->GetID(), actor->GetCurrentArea()) ) {
+		if (PCInCombat (PCs[i])) {
 			return true;
 		}
 	}
