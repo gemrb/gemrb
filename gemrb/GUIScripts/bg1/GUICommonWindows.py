@@ -477,6 +477,11 @@ def OpenPortraitWindow (needcontrols):
 		Button = Window.GetControl (7)
 		Button.SetTooltip (10485)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+	else:
+		#Rest
+		Button = Window.GetControl (6)
+		Button.SetTooltip (11942)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RestPress")
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
