@@ -2,7 +2,7 @@
 *
         	SPELL      ACTION
 NONE    	*          *
-BARDSONG	BARDSONG   BattleSong
+BARDSONG	BARDSONG   PlayBardSong
 DETECTTRAPS	FINDTRAP   FindTraps
 STEALTH    	SNEAK      Hide
 TURNUNDEAD	TURN       Turn
