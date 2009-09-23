@@ -485,11 +485,6 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 				pc->ProcessActions(true);
 			}
 		}
-		if (core->HasFeature(GF_AREA_VISITED_VAR)) {
-			char key[32];
-			snprintf(key, sizeof(key),"%s_visited", area);
-			game->locals->SetAt(key, 1);
-		}
 		return;
 	}
 	if (EveryOne&CT_SELECTED) {
@@ -507,11 +502,6 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 				pc->ProcessActions(true);
 			}
 		}
-		if (core->HasFeature(GF_AREA_VISITED_VAR)) {
-			char key[32];
-			snprintf(key, sizeof(key),"%s_visited", area);
-			game->locals->SetAt(key, 1);
-		}
 		return;
 	}
 
@@ -519,11 +509,6 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 	actor->ClearActions();
 	actor->AddAction( GenerateAction( command ) );
 	actor->ProcessActions(true);
-	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
-		char key[32];
-		snprintf(key, sizeof(key),"%s_visited", area);
-		game->locals->SetAt(key, 1);
-	}
 }
 
 void Map::UseExit(Actor *actor, InfoPoint *ip)
@@ -1291,6 +1276,12 @@ void Map::AddActor(Actor* actor)
 	if (IsVisible(actor->Pos, false) && actor->Schedule(gametime, true) ) {
 		ActorSpottedByPlayer(actor);
 	}
+	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
+		char key[32];
+		snprintf(key, sizeof(key),"%s_visited", area);
+		game->locals->SetAt(key, 1);
+	}
+
 }
 
 bool Map::AnyPCSeesEnemy()
