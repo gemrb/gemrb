@@ -1278,8 +1278,8 @@ void Map::AddActor(Actor* actor)
 	}
 	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
 		char key[32];
-		snprintf(key, sizeof(key),"%s_visited", area);
-		game->locals->SetAt(key, 1);
+		snprintf(key, sizeof(key),"%s_visited", scriptName);
+		core->GetGame()->locals->SetAt(key, 1);
 	}
 
 }
