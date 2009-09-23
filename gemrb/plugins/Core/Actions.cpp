@@ -4171,16 +4171,14 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
-		Sender->ReleaseCurrentAction(); //why blocking???
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
 	int slot = actor->inventory.FindItem(parameters->string0Parameter, 0);
 	if (slot<0) {
-		Sender->ReleaseCurrentAction(); //why blocking???
 		return;
 	}
-	if (parameters->int0Parameter==0) { //unequip
+	if (parameters->int0Parameter) { //unequip
 		//move item to inventory if possible
 		if (actor->inventory.UnEquipItem(slot, true)) {
 			CREItem *si = actor->inventory.RemoveItem(slot);
@@ -4188,11 +4186,9 @@ void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 		}
 	} else { //equip
 		//equip item if possible
-		///
 		actor->inventory.EquipItem(slot);
 	}
 	actor->ReinitQuickSlots();
-	Sender->ReleaseCurrentAction(); //why blocking???
 }
 
 void GameScript::DropItem(Scriptable *Sender, Action* parameters)

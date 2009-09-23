@@ -523,7 +523,7 @@ static const ActionLink actionnames[] = {
 	{"endcutscenemode", GameScript::EndCutSceneMode, 0},
 	{"endgame", GameScript::QuitGame, 0}, //ending in iwd2
 	{"enemy", GameScript::Enemy, 0},
-	{"equipitem", GameScript::EquipItem, AF_BLOCKING}, //why blocking???
+	{"equipitem", GameScript::EquipItem, 0},
 	{"equipmostdamagingmelee",GameScript::EquipMostDamagingMelee,0},
 	{"equipranged", GameScript::EquipRanged,0},
 	{"equipweapon", GameScript::EquipWeapon,0},
