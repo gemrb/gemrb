@@ -35,7 +35,7 @@ StartYear = 0
 ###################################################
 def OpenJournalWindow ():
 	global StartTime, StartYear
-	global JournalWindow
+	global JournalWindow, Chapter
 
 	Table = GemRB.LoadTableObject("YEARS")
 	#StartTime is the time offset for ingame time, beginning from the startyear

@@ -41,7 +41,7 @@ StartYear = 0
 def OpenJournalWindow ():
 	global JournalWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
-	global StartTime, StartYear
+	global StartTime, StartYear, Chapter
 
 	if CloseOtherWindow (OpenJournalWindow):
 

@@ -44,6 +44,7 @@ def OpenJournalWindow ():
 	global StartTime, StartYear
 	global JournalWindow, PortraitWindow, OptionsWindow
 	global OldPortraitWindow, OldOptionsWindow
+	global Chapter
 
 	if CloseOtherWindow (OpenJournalWindow):
 		if JournalWindow:
