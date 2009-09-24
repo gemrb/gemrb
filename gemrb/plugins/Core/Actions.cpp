@@ -4178,22 +4178,27 @@ void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 	if (slot<0) {
 		return;
 	}
-	CREItem *si = NULL;
-	int ret = ASI_SUCCESS;
 
-	if (parameters->int0Parameter) { //unequip
-		//move item to inventory if possible
-		if (actor->inventory.UnEquipItem(slot, true)) {
-			si = actor->inventory.RemoveItem(slot);
-			actor->inventory.AddSlotItem(si, SLOT_ONLYINVENTORY);
-		}
-	} else { //equip
+	int slot2;
+
+	if (parameters->int0Parameter) {
+		//unequip item, and move it to the inventory
+		slot2 = SLOT_ONLYINVENTORY;
+	} else {
 		//equip item if possible
-		si = actor->inventory.RemoveItem(slot);
-		actor->inventory.AddSlotItem(si, SLOT_AUTOEQUIP);
+		slot2 = SLOT_AUTOEQUIP;
 	}
-	if (si && (ret==ASI_FAILED) ) {
-		delete si;
+	CREItem *si = actor->inventory.RemoveItem(slot);
+	if (si) {
+		if (actor->inventory.AddSlotItem(si, slot2)==ASI_FAILED) {
+			Map *map = Sender->GetCurrentArea();
+			if (map) {
+				//drop item at the feet of the character instead of destroying it
+				map->AddItemToLocation(Sender->Pos, si);
+			} else {
+				delete si;
+			}
+		}
 	}
 	actor->ReinitQuickSlots();
 }
