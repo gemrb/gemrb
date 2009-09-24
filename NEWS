@@ -1,7 +1,10 @@
-GemRB svn (7159):
+GemRB svn (7259):
   New features:
     - 
-    - initial levelup support for bg1 and iwd
+    - evasion and backstabbing
+    - beginnings of wild magic support
+    - more hardcoded projectiles
+    - levelup support for bg1 and iwd
     - contingency and sequencer spells
     - compatibility with the widescreen mod (unreleased) allows for multiple
       custom resolutions
@@ -11,7 +14,7 @@ GemRB svn (7159):
     - combat
     - better spellcasting timing
     - actions, effects and triggers
-    - various guiscripts (bg1: ability, sound selection)
+    - various guiscripts
     - bugfixes
 
   Applied patches:
