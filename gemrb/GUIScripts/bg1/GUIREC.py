@@ -603,10 +603,10 @@ def OpenInformationWindow ():
 	ChapterCount = 0
 	for i in range (1, GemRB.GetPartySize () + 1):
 		stat = GemRB.GetPCStats(i)
-		TotalPartyExp = TotalPartyExp + stat['KillsChapterXP']
-		ChapterPartyExp = ChapterPartyExp + stat['KillsTotalXP']
-		TotalCount = TotalCount + stat['KillsChapterCount']
-		ChapterCount = ChapterCount + stat['KillsTotalCount']
+		TotalPartyExp = TotalPartyExp + stat['KillsTotalXP']
+		ChapterPartyExp = ChapterPartyExp + stat['KillsChapterXP']
+		TotalCount = TotalCount + stat['KillsTotalCount']
+		ChapterCount = ChapterCount + stat['KillsChapterCount']
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
