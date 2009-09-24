@@ -685,6 +685,9 @@ int Inventory::DepleteItem(ieDword flags)
 	return -1;
 }
 
+// if flags is 0, skips undroppable items
+// if flags is IE_INV_ITEM_UNDROPPABLE, doesn't skip undroppable items
+// TODO: once all callers have been checked, this can be reversed to make more sense
 int Inventory::FindItem(const char *resref, unsigned int flags) const
 {
 	for (size_t i = 0; i < Slots.size(); i++) {
@@ -692,7 +695,7 @@ int Inventory::FindItem(const char *resref, unsigned int flags) const
 		if (!item) {
 			continue;
 		}
-		if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
+		if ( (flags^IE_INV_ITEM_UNDROPPABLE) & item->Flags ) {
 				continue;
 		}
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {

@@ -4174,7 +4174,7 @@ void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	int slot = actor->inventory.FindItem(parameters->string0Parameter, 0);
+	int slot = actor->inventory.FindItem(parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE);
 	if (slot<0) {
 		return;
 	}
