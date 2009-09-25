@@ -3647,9 +3647,18 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 			tohit += core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
 			break;
 	}
+
 	//add strength bonus if we need
 	if (Flags&WEAPON_USESTRENGTH) {
 		tohit += core->GetStrengthBonus(0,GetStat(IE_STR), GetStat(IE_STREXTRA) );
+	}
+
+	// if the target is using a ranged weapon while we're meleeing, we get a +4 bonus
+	if ((Flags&WEAPON_STYLEMASK) != WEAPON_RANGED) {
+		Actor *target = area->GetActorByGlobalID(LastTarget);
+		if (target && target->GetAttackStyle() == WEAPON_RANGED) {
+			tohit += 4;
+		}
 	}
 
 	if (ReverseToHit) {
