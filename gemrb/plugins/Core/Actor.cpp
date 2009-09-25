@@ -338,6 +338,7 @@ Actor::Actor()
 		}
 	}
 	projectileImmunity = (ieDword *) calloc(ProjectileSize,sizeof(ieDword));
+	AppearanceFlags = 0;
 	TalkCount = 0;
 	InteractCount = 0; //numtimesinteracted depends on this
 	appearance = 0xffffff; //might be important for created creatures
