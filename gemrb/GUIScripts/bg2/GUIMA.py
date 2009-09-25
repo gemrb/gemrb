@@ -131,7 +131,7 @@ def ShowMap ():
 	OptionsWindow.SetVisible (3)
 	PortraitWindow.SetVisible (3)
 	Window.SetVisible (3)
-	Map.SetStatus(IE_GUI_CONTROL_FOCUSED)
+	Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	GemRB.GamePause (0,0)
 	return
 
@@ -285,6 +285,10 @@ def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
 	tmp = WorldMapControl.GetDestinationArea (1)
+	if tmp["Distance"]==-1:
+		print "Invalid target", tmp
+		return
+
 	CloseWorldMapWindow ()
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"], tmp["Direction"])
 	return
