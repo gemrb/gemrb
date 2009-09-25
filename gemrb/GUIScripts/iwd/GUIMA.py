@@ -19,7 +19,7 @@
 # $Id$
 
 
-# GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
+# GUIMA.py - scripts to control map windows from the GUIMA and GUIWMAP winpacks
 
 ###################################################
 
@@ -65,6 +65,7 @@ def RevealMap ():
 	GemRB.RevealArea (PosX, PosY, 30, 1)
 	GemRB.GamePause (0,0)
 	return
+
 ###################################################
 # for farsight effect
 ###################################################
@@ -116,15 +117,20 @@ def ShowMap ():
 
 	Label = Window.GetControl (0x10000003)
 	Label.SetText ("")
+
 	# Map Control
 	Window.CreateMapControl (2, 0, 0, 0, 0)
 	Map = Window.GetControl (2)
-	GemRB.SetVar("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
+	GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, "RevealMap")
-	OptionsWindow.SetVisible (2)
 	Window.SetVisible (1)
+	OptionsWindow.SetVisible (2)
 	PortraitWindow.SetVisible (2)
+	OptionsWindow.SetVisible (3)
+	PortraitWindow.SetVisible (3)
+	Window.SetVisible (3)
+	Map.SetStatus(IE_GUI_CONTROL_FOCUSED)
 	GemRB.GamePause (0,0)
 	return
 
@@ -134,17 +140,26 @@ def OpenMapWindow ():
 	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenMapWindow):
-		if WorldMapWindow: OpenWorldMapWindowInside ()
-
-		GemRB.HideGUI ()
 		if MapWindow:
 			MapWindow.Unload ()
+		if OptionsWindow:
+			OptionsWindow.Unload ()
+		if PortraitWindow:
+			PortraitWindow.Unload ()
+
 		MapWindow = None
+		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
+		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
 		return
 
 	GemRB.HideGUI ()
+	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindowObject (2)
@@ -154,7 +169,6 @@ def OpenMapWindow ():
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindowObject (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenMapWindow")
-	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
 	OptionsWindow.SetFrame ()
@@ -171,14 +185,17 @@ def OpenMapWindow ():
 	Window.SetVisible (1)
 	PortraitWindow.SetVisible (1)
 	Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
-	GemRB.UnhideGUI ()
-	return
 
 def LeftDoublePressMap ():
 	print "MoveToPoint"
 	return
 
 def OpenWorldMapWindowInside ():
+	global MapWindow
+
+	OpenMapWindow () #closes mapwindow
+	MapWindow = -1
+	print "MapWindow=",MapWindow
 	WorldMapWindowCommon (-1)
 	return
 
@@ -210,6 +227,16 @@ def ChangeTooltip ():
 def CloseWorldMapWindow ():
 	global WorldMapWindow, WorldMapControl
 
+	print "CloseWorldMapWindow found Mapwindow = ",MapWindow
+	if MapWindow:
+		# reopen map window
+		if WorldMapWindow:
+			WorldMapWindow.Unload ()
+		WorldMapWindow = None
+		WorldMapControl = None
+		OpenMapWindow ()
+		return
+
 	if WorldMapWindow:
 		WorldMapWindow.Unload ()
 	WorldMapWindow = None
@@ -230,7 +257,7 @@ def WorldMapWindowCommon (Travel):
 
 	GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
 	WorldMapWindow = Window = GemRB.LoadWindowObject (0)
-	MapWindow = None
+	#saving the original portrait window
 	Window.SetFrame ()
 
 	Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "infofont")
@@ -250,6 +277,7 @@ def WorldMapWindowCommon (Travel):
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseWorldMapWindow")
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Window.SetVisible (1)
 	return
 

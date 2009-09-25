@@ -198,7 +198,7 @@ def OpenMapWindow ():
 	OptionsWindow.SetVisible (1)
 	Window.SetVisible (1)
 	PortraitWindow.SetVisible (1)
-	Map.SetStatus(IE_GUI_CONTROL_FOCUSED)
+	Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def LeftDoublePressMap ():
 	print "MoveToPoint"
