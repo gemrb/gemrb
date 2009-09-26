@@ -409,10 +409,12 @@ void Actor::SetName(const char* ptr, unsigned char type)
 	if (type!=2) {
 		LongName = ( char * ) realloc( LongName, len );
 		memcpy( LongName, ptr, len );
+		core->StripLine( LongName, len );
 	}
 	if (type!=1) {
 		ShortName = ( char * ) realloc( ShortName, len );
 		memcpy( ShortName, ptr, len );
+		core->StripLine( ShortName, len );
 	}
 }
 
@@ -420,11 +422,11 @@ void Actor::SetName(int strref, unsigned char type)
 {
 	if (type!=2) {
 		if (LongName) free(LongName);
-		LongName = core->GetString( strref );
+		LongName = core->GetString( strref, IE_STR_REMOVE_NEWLINE );
 	}
 	if (type!=1) {
 		if (ShortName) free(ShortName);
-		ShortName = core->GetString( strref );
+		ShortName = core->GetString( strref, IE_STR_REMOVE_NEWLINE );
 	}
 }
 

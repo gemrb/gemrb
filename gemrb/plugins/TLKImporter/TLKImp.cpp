@@ -526,6 +526,10 @@ empty:
 		free( string );
 		return string2;
 	}
+	// remove the linefeed and carriage return if requested
+	if ((flags & IE_STR_REMOVE_NEWLINE)) {
+		core->StripLine( string, Length);
+	}
 	return string;
 }
 

@@ -642,6 +642,8 @@ public:
 	/** Returns the music playlist corresponding to the provided type */
 	/** it allows scrapping the entry, hence it isn't const */
 	char *GetMusicPlaylist(int SongType) const;
+	/** Removes the extraneus EOL newline and carriage return */
+	void StripLine(char * string, size_t size);
 private:
 	int LoadSprites();
 	bool LoadConfig(void);
