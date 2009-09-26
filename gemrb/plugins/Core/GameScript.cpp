@@ -3092,7 +3092,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			Sender->Activate();
 			if (actionflags[actionID]&AF_ALIVE) {
 				if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-					printMessage("GameScript", "Aborted action due to death", YELLOW);
+					printMessage("GameScript", "Aborted action due to death\n", YELLOW);
 					Sender->ReleaseCurrentAction();
 					return;
 				}
