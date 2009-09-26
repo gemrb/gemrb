@@ -357,12 +357,12 @@
 0xE8E8    MBU2      MBU2       MBU2       MBU2       9          2          1          *
 0xE8F9    MOR7      MOR7       MOR7       MOR7       9          2          1          *
 0xE900    MSAL      MSAL       MSAL       MSAL       9          2          1          *
-0xE908    MSH1      MSH1       MSH1       MSH1       9          2          1          *
+0xE908    MSH1      MSH1       MSH1       MSH1       16         2          1          *
 0xE910    MSA2      MSA2       MSA2       MSA2       9          2          1          *
-0xE918    MSH2      MSH2       MSH2       MSH2       9          2          1          *
+0xE918    MSH2      MSH2       MSH2       MSH2       16         2          1          *
 0xE928    MGHO      MGHO       MGHO       MGHO       9          2          1          *
 0xEA00    MSHR      MSHR       MSHR       MSHR       9          2          1          *
-0xEA10    MSH1      MSH1       MSH1       MSH1       9          2          1          *
+0xEA10    MSH1      MSH1       MSH1       MSH1       16         2          1          *
 0xEA20    MCRD      MCRD       MCRD       MCRD       9          2          1          *
 0xEB00    MSKT      MSKT       MSKT       MSKT       9          2          1          *
 0xEB10    MSKA      MSKA       MSKA       MSKA       9          2          1          *
