@@ -2745,8 +2745,8 @@ void Actor::Die(Scriptable *killer)
 		return; //can die only once
 	}
 
-	int minhp=Modified[IE_MINHITPOINTS];
-	if (minhp) { //can't die
+	int minhp = (signed) Modified[IE_MINHITPOINTS];
+	if (minhp > 0) { //can't die
 		SetBase(IE_HITPOINTS, minhp);
 		return;
 	}
