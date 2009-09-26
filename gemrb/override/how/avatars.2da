@@ -255,7 +255,7 @@
 0xD300    ABIRG1    ABIRG1     ABIRG1     ABIRG1     7          0          1          *
 0xD400    ABIRG1    ABIRG1     ABIRG1     ABIRG1     7          0          1          *
 0xE000    MBET      MBET       MBET       MBET       9          2          1          *
-0xE012    MBBM      MBBM       MBBM       MBBM       9          2          1          *
+0xE012    MBBM      MBBM       MBBM       MBBM       16         2          1          *
 0xE020    MTAN      MTAN       MTAN       MTAN       9          4          1          *
 0xE022    MBBR      MBBR       MBBR       MBBR       9          2          1          *
 0xE038    MBFI      MBFI       MBFI       MBFI       9          2          1          *
@@ -301,7 +301,7 @@
 0xE408    MGO1      MGO1       MGO1       MGO1       9          2          1          *
 0xE412    MGO2      MGO2       MGO2       MGO2       9          2          1          *
 0xE428    MGO3      MGO3       MGO3       MGO3       9          2          1          *
-0xE432    MGO4      MGO4       MGO4       MGO4       9          2          1          *
+0xE432    MGO4      MGO4       MGO4       MGO4       16         2          1          *
 0xE449    MSVI      MSVI       MSVI       MSVI       9          2          1          *
 0xE459    MSV2      MSV2       MSV2       MSV2       9          2          1          *
 0xE468    MGWO      MGWO       MGWO       MGWO       9          2          1          *
@@ -336,10 +336,10 @@
 0xE7F9    MUM2      MUM2       MUM2       MUM2       9          2          1          *
 0xE800    MOR1      MOR1       MOR1       MOR1       9          2          1          *
 0xE808    MOR6      MOR6       MOR6       MOR6       9          2          1          *
-0xE810    MOR2      MOR2       MOR2       MOR2       9          2          1          *
+0xE810    MOR2      MOR2       MOR2       MOR2       16         2          1          *
 0xE818    MOR1      MOR1       MOR1       MOR1       9          2          1          *
 0xE820    MOR3      MOR3       MOR3       MOR3       9          2          1          *
-0xE822    MOR2      MOR2       MOR2       MOR2       9          2          1          *
+0xE822    MOR2      MOR2       MOR2       MOR2       16         2          1          *
 0xE830    MOR4      MOR4       MOR4       MOR4       9          2          1          *
 0xE838    MOR3      MOR3       MOR3       MOR3       9          2          1          *
 0xE840    MOR5      MOR5       MOR5       MOR5       9          2          1          *

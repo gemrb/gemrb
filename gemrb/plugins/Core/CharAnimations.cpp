@@ -594,6 +594,17 @@ IE_ANI_TWO_FILES_3:	Animations using this type are stored using the following te
 			This is the standard IWD animation, but BG2 also has it.
 			See MMR
 
+IE_ANI_TWO_FILES_3B:	Animations using this type are stored using the following template:
+			[NAME][ACTIONTYPE][/E]
+
+			Example:
+			MBFI*
+			MBFI*E
+
+			This is a cut down version of IE_ANI_TWO_FILES_3. A2, CA and SP suffixes are missing.
+			This is the standard IWD animation, but BG2 also has it.
+			See MOR2
+
 IE_ANI_FOUR_FRAMES:	These animations are large, four bams make a frame.
 
 
@@ -932,6 +943,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		case IE_ANI_TWENTYTWO:
 		case IE_ANI_TWO_FILES_2:
 		case IE_ANI_TWO_FILES_3:
+		case IE_ANI_TWO_FILES_3B:
 		case IE_ANI_FOUR_FILES:
 		case IE_ANI_FOUR_FILES_2:
 		case IE_ANI_SIX_FILES_2:
@@ -1026,6 +1038,10 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 
 		case IE_ANI_TWO_FILES_3: //IWD style anims
 			AddMMRSuffix( NewResRef, StanceID, Cycle, Orient );
+			break;
+
+		case IE_ANI_TWO_FILES_3B: //IWD style anims
+			AddMMR2Suffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_TWO_FILES:
@@ -2038,6 +2054,81 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 			break;
 		default:
 			printf("LR3 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			abort();
+			break;
+	}
+	if (Orient > 9) {
+		strcat( ResRef, "e" );
+	}
+}
+
+void CharAnimations::AddMMR2Suffix(char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	switch (StanceID) {
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_ATTACK_BACKSLASH:
+		case IE_ANI_ATTACK_JAB:
+		case IE_ANI_CONJURE:
+		case IE_ANI_CAST:
+			strcat( ResRef, "a1" );
+			Cycle = ( Orient / 2 );
+			break;
+
+		case IE_ANI_SHOOT:
+			strcat( ResRef, "a4" );
+			Cycle = ( Orient / 2 );
+			break;
+
+		case IE_ANI_AWAKE:
+		case IE_ANI_READY:
+			strcat( ResRef, "sd" );
+			Cycle = ( Orient / 2 );
+			break;
+
+		case IE_ANI_HEAD_TURN:
+			strcat( ResRef, "sc" );
+			Cycle = ( Orient / 2 );
+			break;
+
+		case IE_ANI_DAMAGE:
+			strcat( ResRef, "gh" );
+			Cycle = ( Orient / 2 );
+			break;
+
+		case IE_ANI_DIE:
+			strcat( ResRef, "de" );
+			Cycle = ( Orient / 2 );
+			break;
+
+		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
+		case IE_ANI_PST_START:
+			strcat( ResRef, "gu" );
+			Cycle = ( Orient / 2 );
+			break;
+
+			//Unknown... maybe only a transparency effect apply
+		case IE_ANI_HIDE:
+			break;
+
+		case IE_ANI_SLEEP:
+			strcat( ResRef, "sl" );
+			Cycle = ( Orient / 2 );
+			break;
+
+		case IE_ANI_TWITCH:
+			strcat( ResRef, "tw" );
+			Cycle = ( Orient / 2 );
+			break;
+
+		case IE_ANI_WALK:
+			strcat( ResRef, "wk" );
+			Cycle = ( Orient / 2 );
+			break;
+		default:
+			printf("MMR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}

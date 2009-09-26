@@ -89,13 +89,14 @@
 #define IE_ANI_FRAGMENT                 13   //fragment animation
 #define IE_ANI_FOUR_FILES_2		14 //METT
 #define IE_ANI_CODE_MIRROR_3	15 //MSPS
+#define IE_ANI_TWO_FILES_3B		16    //iwd animations (eg. MBBM)
 
 //PST animation types
-#define IE_ANI_PST_ANIMATION_1		16   //full animation
-#define IE_ANI_PST_GHOST		17   //no orientations
-#define IE_ANI_PST_STAND		18   //has orientations
-#define IE_ANI_PST_ANIMATION_2		19   //full animation std-->stc
-#define IE_ANI_PST_ANIMATION_3		20   //full animation stc-->std
+#define IE_ANI_PST_ANIMATION_1		56   //full animation
+#define IE_ANI_PST_GHOST		57   //no orientations
+#define IE_ANI_PST_STAND		58   //has orientations
+#define IE_ANI_PST_ANIMATION_2		59   //full animation std-->stc
+#define IE_ANI_PST_ANIMATION_3		60   //full animation stc-->std
 
 //armour levels
 #define IE_ANI_NO_ARMOR			0
@@ -205,6 +206,8 @@ private:
 	void GetMHREquipmentRef(char* ResRef, unsigned char& Cycle,
 		const char* equipRef, bool offhand, EquipResRefData* equip);
 	void AddMMRSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
+	void AddMMR2Suffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddTwoFileSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
