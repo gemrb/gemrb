@@ -644,6 +644,8 @@ public:
 	char *GetMusicPlaylist(int SongType) const;
 	/** Removes the extraneus EOL newline and carriage return */
 	void StripLine(char * string, size_t size);
+        /** Returns the DeathVarFormat of the day */
+	static const char *GetDeathVarFormat();
 private:
 	int LoadSprites();
 	bool LoadConfig(void);

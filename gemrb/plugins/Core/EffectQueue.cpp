@@ -312,7 +312,6 @@ EffectQueue::~EffectQueue()
 
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		delete (*f);
-		//delete( effects[i] );
 	}
 }
 
@@ -352,7 +351,7 @@ ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, i
 //Change the location of an existing effect
 //this is used when some external code needs to adjust the effect's location
 //used when the gui sets the effect's final target
-void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y)
+void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y) const
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.EffText<0) {
@@ -468,15 +467,18 @@ bool EffectQueue::RemoveEffect(Effect* fx)
 
 //this is where we reapply all effects when loading a saved game
 //The effects are already in the fxqueue of the target
-void EffectQueue::ApplyAllEffects(Actor* target)
+void EffectQueue::ApplyAllEffects(Actor* target) const
 {
-	//nah, we already been through this
-	//ieDword random_value = core->Roll( 1, 100, 0 );
-
-	std::list< Effect* >::iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		ApplyEffect( target, *f, 0 );
 	}
+}
+
+void EffectQueue::Cleanup()
+{
+	std::list< Effect* >::iterator f;
+
 	for ( f = effects.begin(); f != effects.end(); ) {
 		if( (*f)->TimingMode == FX_DURATION_JUST_EXPIRED) {
 			delete *f;
@@ -488,7 +490,7 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 }
 
 //Handle the target flag when the effect is applied first
-int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point &dest)
+int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point &dest) const
 {
 	int i;
 	Game *game;
@@ -658,7 +660,7 @@ all_party:
 //will get copied (hence the fxqueue.AddEffect call)
 //if this returns FX_NOT_APPLIED, then the whole stack was resisted
 //or expired
-int EffectQueue::AddAllEffects(Actor* target, Point &destination)
+int EffectQueue::AddAllEffects(Actor* target, Point &destination) const
 {
 	int res = FX_NOT_APPLIED;
 	// pre-roll dice for fx needing them and stow them in the effect
@@ -1034,7 +1036,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 // returns FX_ABORT if the whole spell this effect is in should be aborted
 // it will disable all future effects of same source (only on first apply)
 
-int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
+int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply) const
 {
 	//printf( "FX 0x%02x: %s(%d, %d)\n", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
 	if( fx->Opcode >= MAX_EFFECTS) {
@@ -1667,7 +1669,7 @@ bool EffectQueue::HasAnyDispellableEffect() const
 	return false;
 }
 
-void EffectQueue::dump()
+void EffectQueue::dump() const
 {
 	printf( "EFFECT QUEUE:\n" );
 	int i = 0;

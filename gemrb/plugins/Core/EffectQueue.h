@@ -182,13 +182,15 @@ public:
 	/** Adds an Effect to the queue, subject to level and other checks.
 	 * Returns FX_ABORT is unsuccessful. fx is just a reference, AddEffect()
 	 * will malloc its own copy */
-	int AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point &dest);
+	int AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point &dest) const;
 	/** Removes first Effect matching fx from the queue.
 	 * Effects are matched based on their contents */
 	bool RemoveEffect(Effect* fx);
 
-	int AddAllEffects(Actor* target, Point &dest);
-	void ApplyAllEffects(Actor* target);
+	int AddAllEffects(Actor* target, Point &dest) const;
+	void ApplyAllEffects(Actor* target) const;
+	/** remove effects marked for removal */
+	void Cleanup();
 
 	/* directly removes effects with specified opcode, use effect_reference when you can */
 	void RemoveAllEffects(ieDword opcode) const;
@@ -214,7 +216,6 @@ public:
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource) const;
 	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match) const;
 
-	//Effect *GetEffect(ieDword idx) const;
 	/* returns true if the timing method supports simplified duration */
 	static bool HasDuration(Effect *fx);
 	/* returns true if the effect should be saved */
@@ -227,7 +228,7 @@ public:
 	const Effect *GetNextSavedEffect(std::list< Effect* >::const_iterator &f) const;
 	Effect *GetNextEffect(std::list< Effect* >::const_iterator &f) const;
 	ieDword CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *ResRef) const;
-	void ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y);
+	void ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y) const;
 	/* returns the number of saved effects */
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }
@@ -261,12 +262,12 @@ public:
 	// from pos, in range (no cone size yet)
 	void AffectAllInRange(Map *map, Point &pos, int idstype, int idsvalue, unsigned int range, Actor *except);
 	/** Lists contents of the queue on a terminal for debugging */
-	void dump();
+	void dump() const;
 	//resolve effect
 	static int ResolveEffect(EffectRef &effect_reference);
 	static bool match_ids(Actor *target, int table, ieDword value);
 	/** returns true if the process should abort applying a stack of effects */
-	int ApplyEffect(Actor* target, Effect* fx, ieDword first_apply);
+	int ApplyEffect(Actor* target, Effect* fx, ieDword first_apply) const;
 private:
 	/** counts effects of specific opcode, parameters and resource */
 	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const char *ResRef) const;

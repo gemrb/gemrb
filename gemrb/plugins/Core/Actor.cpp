@@ -74,8 +74,8 @@ static int xpbonuslevels = -1;
 static int **levelslots = NULL;
 static int *dualswap = NULL;
 static int *maxhpconbon = NULL;
-static ieVariable IWDDeathVarFormat = "KILL_%s_CNT";
-static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
+//static ieVariable IWDDeathVarFormat = "KILL_%s_CNT";
+//static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
 static ieVariable CounterNames[4]={"GOOD","LAW","LADY","MURDER"};
 
 static int FistRows = -1;
@@ -1180,9 +1180,9 @@ static void InitActorTables()
 {
 	int i, j;
 
-	if (core->HasFeature(GF_IWD_DEATHVARFORMAT)) {
-		memcpy(DeathVarFormat, IWDDeathVarFormat, sizeof(ieVariable));
-	}
+	//if (core->HasFeature(GF_IWD_DEATHVARFORMAT)) {
+	//	memcpy(DeathVarFormat, IWDDeathVarFormat, sizeof(ieVariable));
+	//}
 
 	if (core->HasFeature(GF_CHALLENGERATING)) {
 		sharexp=SX_DIVIDE|SX_CR;
@@ -1999,11 +1999,11 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 
 	// check if any new portrait icon was removed or added
-	if (PCStats && memcmp(PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons))) {
-		core->SetEventFlag(EF_PORTRAIT);
-	}
 	if (PCStats) {
-		memcpy( PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons) );
+		if (memcmp(PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons))) {
+			core->SetEventFlag(EF_PORTRAIT);
+			memcpy( PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons) );
+		}
 	}
 }
 
@@ -2833,7 +2833,7 @@ void Actor::Die(Scriptable *killer)
 				game->kaputz->SetAt(varname, value+1);
 			}
 		} else {
-			snprintf(varname, 32, DeathVarFormat, scriptName);
+			snprintf(varname, 32, core->GetDeathVarFormat(), scriptName);
 			game->locals->Lookup(varname, value);
 			game->locals->SetAt(varname, value+1);
 		}
@@ -4032,6 +4032,9 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		roundTime = 0;
 		lastattack = 0;
 	}
+
+	//Avenger moved this here from ApplyAllEffects (this one modifies the effect queue)
+	fxqueue.Cleanup();
 }
 
 //idx could be: 0-6, 16-22, 32-38, 48-54

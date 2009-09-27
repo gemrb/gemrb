@@ -548,7 +548,7 @@ int GameScript::NumDead(Scriptable* Sender, Trigger* parameters)
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
-		snprintf(VariableName,32, "SPRITE_IS_DEAD%s",parameters->string0Parameter);
+		snprintf(VariableName, 32, core->GetDeathVarFormat(), parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
 	return ( value == (ieDword) parameters->int0Parameter );
@@ -562,7 +562,7 @@ int GameScript::NumDeadGT(Scriptable* Sender, Trigger* parameters)
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
-		snprintf(VariableName,32, "SPRITE_IS_DEAD%s",parameters->string0Parameter);
+		snprintf(VariableName, 32, core->GetDeathVarFormat(), parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
 	return ( value > (ieDword) parameters->int0Parameter );
@@ -577,7 +577,7 @@ int GameScript::NumDeadLT(Scriptable* Sender, Trigger* parameters)
 	} else {
 		ieVariable VariableName;
 
-		snprintf(VariableName,32, "SPRITE_IS_DEAD%s",parameters->string0Parameter);
+		snprintf(VariableName, 32, core->GetDeathVarFormat(), parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
 	return ( value < (ieDword) parameters->int0Parameter );
@@ -1769,7 +1769,7 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
 			value = CheckVariable( Sender, parameters->string0Parameter, "KAPUTZ");
 		} else {
-			snprintf( Variable, 32, "SPRITE_IS_DEAD%s", parameters->string0Parameter );
+			snprintf( Variable, 32, core->GetDeathVarFormat(), parameters->string0Parameter );
 		}
 		value = CheckVariable( Sender, Variable, "GLOBAL" );
 		if (value>0) {
