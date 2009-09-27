@@ -2526,7 +2526,7 @@ void Actor::DebugDump()
 {
 	unsigned int i;
 
-	printf( "Debugdump of Actor %s:\n", LongName );
+	printf( "Debugdump of Actor %s (%s, %s):\n", LongName, ShortName, GetName(-1) );
 	printf ("Scripts:");
 	for (i = 0; i < MAX_SCRIPTS; i++) {
 		const char* poi = "<none>";

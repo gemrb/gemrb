@@ -2161,8 +2161,8 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 		Signature[7]+=CREVersion%10;
 	}
 	stream->Write( Signature, 8);
-	stream->WriteDword( &actor->ShortStrRef);
 	stream->WriteDword( &actor->LongStrRef);
+	stream->WriteDword( &actor->ShortStrRef);
 	stream->WriteDword( &actor->BaseStats[IE_MC_FLAGS]);
 	stream->WriteDword( &actor->BaseStats[IE_XPVALUE]);
 	stream->WriteDword( &actor->BaseStats[IE_XP]);
