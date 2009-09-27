@@ -1322,6 +1322,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 {
 	strncpy(item->ItemResRef, resref, 8);
+	core->ResolveRandomItem(item);
 	if (a==-1) {
 		Item *origitem = gamedata->GetItem(resref);
 		for(int i=0;i<3;i++) {
