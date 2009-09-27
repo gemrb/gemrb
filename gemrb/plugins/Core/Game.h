@@ -413,6 +413,7 @@ public:
 private:
 	bool DetermineStartPosType(const TableMgr *strta);
 	ieResRef *GetDream(Map *area);
+	void PlayerDream();
 };
 
 #endif  // ! GAME_H

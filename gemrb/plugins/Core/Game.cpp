@@ -28,6 +28,7 @@
 #include "ScriptEngine.h"
 #include "GameControl.h"
 #include "MusicMgr.h"
+#include "GameScript.h"
 #include "../../includes/strrefs.h"
 #include "../../includes/defsounds.h"
 
@@ -1284,9 +1285,21 @@ ieResRef *Game::GetDream(Map *area)
 	return restmovies+dream;
 }
 
+//Start dream cutscenes for player1
+void Game::PlayerDream()
+{
+	Scriptable *Sender = GetPC(0,true);
+	if (!Sender) return;
+
+	GameScript* gs = new GameScript( "player1d", ST_ACTOR);//, Sender->locals,0,0 );
+	gs->MySelf = Sender;
+	gs->Update();
+	delete( gs );
+}
+
 //noareacheck = no random encounters
-//dream = 0 - no dream non-0 - select from list
-//-1 dream based on area
+//dream = 0 - based on area non-0 - select from list
+//-1 no dream
 //hp is how much hp the rest will heal
 void Game::RestParty(int checks, int dream, int hp)
 {
@@ -1346,8 +1359,28 @@ void Game::RestParty(int checks, int dream, int hp)
 	}
 	AdvanceTime(2400*AI_UPDATE_TIME);
 
-	//movie
+
+	int i = GetPartySize(false);
+
+	while (i--) {
+		Actor *tar = GetPC(i, false);
+		tar->ClearPath();
+		tar->ClearActions();
+		tar->SetModal(0);
+		//if hp = 0, then healing will be complete
+		tar->Heal(hp);
+		//removes fatigue, recharges spells
+		tar->Rest(0);
+		tar->PartyRested();
+	}
+
+	//movie and cutscene dreams
 	if (dream>=0) {
+
+		//cutscene dreams
+		if (gamedata->Exists("player1d",IE_BCS_CLASS_ID, true))
+			PlayerDream();
+
 		//select dream based on area
 		ieResRef *movie;
 		if (dream==0 || dream>7) {
@@ -1363,20 +1396,6 @@ void Game::RestParty(int checks, int dream, int hp)
 	//set partyrested flags
 	PartyRested();
 	area->PartyRested();
-
-	int i = GetPartySize(false);
-
-	while (i--) {
-		Actor *tar = GetPC(i, false);
-		tar->ClearPath();
-		tar->ClearActions();
-		tar->SetModal(0);
-		//if hp = 0, then healing will be complete
-		tar->Heal(hp);
-		//removes fatigue, recharges spells
-		tar->Rest(0);
-		tar->PartyRested();
-	}
 	core->SetEventFlag(EF_ACTION);
 
 	//restindex will be -1 in the case of PST
