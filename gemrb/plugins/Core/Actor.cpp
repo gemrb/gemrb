@@ -2456,7 +2456,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			// iwd2 also has two Tortoise Shell (spell) absorption strings
 			core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name);
 			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", dmg_str);
-			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter ? hitter->GetName(0) : this->GetName(0) );
+			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter ? hitter->GetName(1) : this->GetName(1) );
 			int bonus = 0; //TODO: change this once damage bonus is supported
 			char resist_str[8];
 			snprintf(resist_str, 8, "%d", abs(resisted-bonus));
@@ -2480,7 +2480,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			core->DisplayConstantStringName(STR_DAMAGE1, 0xffffff, this);
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
-			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(0) );
+			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
 			// wipe the DAMAGER token, so we can color it
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", "" );
 			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", dmg_str);
@@ -2493,13 +2493,13 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 	
 			if (detailed) {
 				//<DAMAGEE> was immune to my <TYPE> damage
-				core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(0) );
+				core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
 				core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name );
 				core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
 			} else if (core->GetStringReference(STR_DAMAGE_IMMUNITY) != (ieStrRef) -1 && core->GetStringReference(STR_DAMAGE1) != (ieStrRef) -1) {
 				// bg2
 				//<DAMAGEE> was immune to my damage.
-				core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(0) );
+				core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
 				core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
 			} // else: other games don't display anything
 		} else {
