@@ -214,7 +214,8 @@ def OpenStoreShoppingWindow ():
 
 		Button = Window.GetControl (i+13)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectSell")
+		if Store['StoreType'] != 3: # can't sell to temples
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectSell")
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoRightWindow")
 		Button.AttachScrollBar(ScrollBarRight)
 
