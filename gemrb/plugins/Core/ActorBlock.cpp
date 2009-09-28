@@ -1974,7 +1974,11 @@ bool InfoPoint::Entered(Actor *actor)
 	// why is this here? actors which aren't *in* a trap get IF_INTRAP
 	// repeatedly unset, so this triggers again and again and again.
 	// i disabled it for ST_PROXIMITY for now..
-	if (Type != ST_PROXIMITY && (PersonalDistance(Pos, actor)<MAX_OPERATING_DISTANCE) ) {
+	/*if (Type != ST_PROXIMITY && (PersonalDistance(Pos, actor)<MAX_OPERATING_DISTANCE) ) {
+		goto check;
+	}*/
+	// this method is better (fuzzie, 2009) and also works for the iwd ar6002 northeast exit
+	if (Type == ST_TRAVEL && PersonalDistance(TrapLaunch, actor)<MAX_OPERATING_DISTANCE) {
 		goto check;
 	}
 	if (Flags&TRAP_USEPOINT) {
