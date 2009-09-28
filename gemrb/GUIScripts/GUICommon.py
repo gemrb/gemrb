@@ -363,6 +363,28 @@ def RemoveClassAbilities (pc, table, Level):
 				else:
 					print "ERROR, unknown class ability (type): ", ab
 
+def CannotLearnSlotSpell ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+
+	# disqualify sorcerors immediately
+	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
+		return LSR_STAT
+
+	slot_item = GemRB.GetSlotItem (pc, GemRB.GetVar ("ItemButton"))
+	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
+	spell = GemRB.GetSpell (spell_ref)
+
+	# maybe she already knows this spell
+	if HasSpell (pc, IE_SPELL_TYPE_WIZARD, spell['SpellLevel']-1, spell_ref) != -1:
+		return LSR_KNOWN
+
+	# level check (needs enough intelligence for this level of spell)
+	dumbness = GemRB.GetPlayerStat (pc, IE_INT)
+	if spell['SpellLevel'] > GemRB.GetAbilityBonus (IE_INT, 1, dumbness):
+		return LSR_LEVEL
+
+	return 0
+
 def UpdateInventorySlot (pc, Button, Slot, Type):
 	Button.SetFont ("NUMBER")
 	Button.SetBorder (0, 0,0,0,0, 128,128,255,64, 0,1)
@@ -394,6 +416,8 @@ def UpdateInventorySlot (pc, Button, Slot, Type):
 #			Button.SetText (str (Slot["Usages0"])) # this has the correct value for potions, but not for gems (0)
 		if item["StackAmount"] > 1:
 			Button.SetText (str (Slot["Usages0"]))
+		else:
+			Button.SetText ("")
 
 		if not identified or item["ItemNameIdentified"] == -1:
 			Button.SetTooltip (item["ItemName"])

@@ -30,7 +30,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
 from ie_spells import *
-from GUICommon import CloseOtherWindow, SetColorStat, HasTOB, HasSpell
+from GUICommon import CloseOtherWindow, SetColorStat, HasTOB, CannotLearnSlotSpell
 from GUICommonWindows import *
 
 InventoryWindow = None
@@ -956,28 +956,6 @@ def DisplayItem (itemresref, type):
 
 	ItemInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
-
-def CannotLearnSlotSpell ():
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	# disqualify sorcerors immediately
-	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
-		return LSR_STAT
-
-	slot_item = GemRB.GetSlotItem (pc, GemRB.GetVar ("ItemButton"))
-	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
-	spell = GemRB.GetSpell (spell_ref)
-
-	# maybe she already knows this spell
-	if HasSpell (pc, IE_SPELL_TYPE_WIZARD, spell['SpellLevel']-1, spell_ref) != -1:
-		return LSR_KNOWN
-
-	# level check (needs enough intelligence for this level of spell)
-	dumbness = GemRB.GetPlayerStat (pc, IE_INT)
-	if spell['SpellLevel'] > GemRB.GetAbilityBonus (IE_INT, 1, dumbness):
-		return LSR_LEVEL
-
-	return 0
 
 def OpenItemInfoWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()

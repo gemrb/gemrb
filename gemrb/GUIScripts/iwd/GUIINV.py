@@ -28,7 +28,7 @@ import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
-from GUICommon import CloseOtherWindow, SetColorStat, SetEncumbranceLabels
+from GUICommon import CloseOtherWindow, SetColorStat, SetEncumbranceLabels, CannotLearnSlotSpell
 from GUICommonWindows import *
 
 InventoryWindow = None
@@ -53,12 +53,12 @@ def OpenInventoryWindow ():
 	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenInventoryWindow):
-		if GemRB.IsDraggingItem ():
+		if GemRB.IsDraggingItem ()==1:
 			pc = GemRB.GameGetSelectedPCSingle ()
 			#store the item in the inventory before window is closed
 			GemRB.DropDraggedItem (pc, -3)
 			#dropping on ground if cannot store in inventory
-			if GemRB.IsDraggingItem ():
+			if GemRB.IsDraggingItem ()==1:
 				GemRB.DropDraggedItem (pc, -2)
 
 		if InventoryWindow:
@@ -105,11 +105,6 @@ def OpenInventoryWindow ():
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveGround")
 		Button.SetVarAssoc ("GroundItemButton", i)
 		Button.SetSprites ("STONSLOT",0,0,1,2,3)
-		Button.SetFont ("NUMBER")
-		Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
-		Button.SetBorder (1,2,2,2,2,32,32,255,0,0,0)
-		Button.SetBorder (2,0,0,0,0,255,128,128,64,0,1)
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	#major & minor clothing color
 	Button = Window.GetControl (62)
@@ -157,11 +152,6 @@ def OpenInventoryWindow ():
 			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveSlot")
 			Button.SetVarAssoc ("ItemButton", slot+1)
 			Button.SetSprites ("STONSLOT",0,0,1,2,3)
-			Button.SetFont ("NUMBER")
-			Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
-			Button.SetBorder (1,2,2,2,2,32,32,255,0,0,0)
-			Button.SetBorder (2,0,0,0,0,255,128,128,64,0,1)
-			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	GemRB.SetVar ("TopIndex", 0)
 	SetSelectionChangeHandler (UpdateInventoryWindow)
@@ -348,63 +338,39 @@ def RefreshInventoryWindow ():
 	TopIndex = GemRB.GetVar ("TopIndex")
 	for i in range (5):
 		Button = Window.GetControl (i+68)
-		if GemRB.IsDraggingItem ():
+		if GemRB.IsDraggingItem ()==1:
 			Button.SetState (IE_GUI_BUTTON_SECOND)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItemGround")
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
-		if Slot != None:
-			item = GemRB.GetItem (Slot['ItemResRef'])
-			identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
-			magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL
 
-			Button.SetItemIcon (Slot['ItemResRef'],0)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-			if not identified or item["ItemNameIdentified"] == -1:
-				Button.SetTooltip (item["ItemName"])
-				Button.EnableBorder (0, 1)
-				Button.EnableBorder (1, 0)
-			else:
-				Button.SetTooltip (item["ItemNameIdentified"])
-				Button.EnableBorder (0, 0)
-				if magical:
-					Button.EnableBorder (1, 1)
-				else:
-					Button.EnableBorder (1, 0)
-
-			if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc):
-				Button.EnableBorder (2, 0)
-			else:
-				Button.EnableBorder (2, 1)
-
+		if Slot == None:
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+		else:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDragItemGround")
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenGroundItemInfoWindow")
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenGroundItemAmountWindow")
 
-		else:
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetTooltip (12011)
-			Button.EnableBorder (0, 0)
-			Button.EnableBorder (1, 0)
-			Button.EnableBorder (2, 0)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+		UpdateInventorySlot (pc, Button, Slot, "ground")
 
 	#making window visible/shaded depending on the pc's state
 	Window.SetVisible (1)
 	return
 
 def UpdateSlot (pc, slot):
+	"""Updates a specific slot."""
 
 	Window = InventoryWindow
 	SlotType = GemRB.GetSlotType (slot+1, pc)
 	ControlID = SlotType["ID"]
+
 	if not ControlID:
 		return
 
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		#get dragged item
 		drag_item = GemRB.GetSlotItem (0,0)
 		itemname = drag_item["ItemResRef"]
@@ -417,35 +383,9 @@ def UpdateSlot (pc, slot):
 
 	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+	UpdateInventorySlot (pc, Button, slot_item, "inventory")
+
 	if slot_item:
-		item = GemRB.GetItem (slot_item["ItemResRef"])
-		identified = slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED
-		magical = slot_item["Flags"] & IE_INV_ITEM_MAGICAL
-
-		Button.SetItemIcon (slot_item["ItemResRef"])
-		if item["StackAmount"] > 1:
-			Button.SetText (str (slot_item["Usages0"]))
-		else:
-			Button.SetText ("")
-
-		if not identified or item["ItemNameIdentified"] == -1:
-			Button.SetTooltip (item["ItemName"])
-			Button.EnableBorder (0, 1)
-			Button.EnableBorder (1, 0)
-		else:
-			Button.SetTooltip (item["ItemNameIdentified"])
-			Button.EnableBorder (0, 0)
-
-			if magical:
-				Button.EnableBorder (1, 1)
-			else:
-				Button.EnableBorder (1, 0)
-
-		if GemRB.CanUseItemType (SLOT_ANY, slot_item['ItemResRef'], pc):
-			Button.EnableBorder (2, 0)
-		else:
-			Button.EnableBorder (2, 1)
-
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDragItem")
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoWindow")
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountWindow")
@@ -464,14 +404,10 @@ def UpdateSlot (pc, slot):
 			Button.SetBAM (SlotType["ResRef"],0,0)
 			Button.SetTooltip (SlotType["Tip"])
 
-		Button.SetText ("")
-		Button.EnableBorder (0, 0)
-		Button.EnableBorder (1, 0)
-		Button.EnableBorder (2, 0)
-
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, "")
 
 	if OverSlot == slot+1:
 		if GemRB.CanUseItemType (SlotType["Type"], itemname):
@@ -493,7 +429,7 @@ def OnDragItemGround ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("GroundItemButton") + GemRB.GetVar ("TopIndex")
 
-	if not GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==0:
 		slot_item = GemRB.GetContainerItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 1) #container
@@ -504,7 +440,7 @@ def OnDragItemGround ():
 	return
 
 def OnAutoEquip ():
-	if not GemRB.IsDraggingItem ():
+	if not GemRB.IsDraggingItem ()!=1:
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -512,13 +448,18 @@ def OnAutoEquip ():
 	#-1 : drop stuff in equipable slots (but not inventory)
 	GemRB.DropDraggedItem (pc, -1)
 
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		GemRB.PlaySound ("GAM_47") #failed equip
 
 	UpdateInventoryWindow ()
 	return
 
 def OnDragItem ():
+	"""Updates dragging."""
+	
+	if GemRB.IsDraggingItem()==2:
+		return
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 
@@ -539,7 +480,7 @@ def OnDropItemToPC ():
 
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		GemRB.DisplayString (17999,0xffffff)
 	UpdateInventoryWindow ()
 	return
@@ -574,13 +515,9 @@ def DragItemAmount ():
 	return
 
 def OpenItemAmountWindow ():
+	"""Open the split window."""
+
 	global ItemAmountWindow, StackAmount
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
-
-	if GemRB.IsDraggingItem ():
-		GemRB.DropDraggedItem(pc, slot)
 
 	if ItemAmountWindow != None:
 		if ItemAmountWindow:
@@ -590,8 +527,19 @@ def OpenItemAmountWindow ():
 		GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 		return
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+
+	if GemRB.IsDraggingItem ()==1:
+		GemRB.DropDraggedItem(pc, slot)
+		# disallow splitting while holding split items (double splitting)
+		if GemRB.IsDraggingItem () == 1:
+			UpdateSlot (pc, slot-1)
+			return
+	else:
+		return
+
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
-	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
 
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	ResRef = slot_item['ItemResRef']
@@ -602,9 +550,11 @@ def OpenItemAmountWindow ():
 	else:
 		StackAmount = 0
 	if StackAmount<=1:
-		OpenItemAmountWindow ()
+		#OpenItemAmountWindow ()
+		UpdateSlot (pc, slot-1)
 		return
 
+	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
 	# item icon
 	Icon = Window.GetControl (0)
 	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -652,14 +602,61 @@ def DrinkItemWindow ():
 	CloseItemInfoWindow ()
 	return
 
+def OpenErrorWindow (strref):
+	"""Opens the error window and displays the string."""
+
+	global ErrorWindow
+	pc = GemRB.GameGetSelectedPCSingle ()
+
+	ErrorWindow = Window = GemRB.LoadWindowObject (7)
+	Button = Window.GetControl (0)
+	Button.SetText (11973)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseErrorWindow")
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	TextArea = Window.GetControl (3)
+	TextArea.SetText (strref)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def CloseErrorWindow ():
+	if ErrorWindow:
+		ErrorWindow.Unload ()
+	UpdateInventoryWindow ()
+	return
+
 def ReadItemWindow ():
+	"""Tries to learn the mage scroll."""
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
-	# the learn scroll header is always the second
-	# 5 is TARGET_SELF, because some scrolls are buggy
-	GemRB.UseItem (pc, slot, 1, 5)
+	ret = 0
+
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
+	spell = GemRB.GetSpell (spell_ref)
+	if spell:
+		# can we learn more spells of this level?
+		spell_count = GemRB.GetKnownSpellsCount (pc, IE_SPELL_TYPE_WIZARD, spell['SpellLevel']-1)
+		if spell_count > GemRB.GetAbilityBonus (IE_INT, 2, GemRB.GetPlayerStat (pc, IE_INT)):
+			ret = LSR_FULL
+			strref = 32097
+		else:
+			if GemRB.LearnSpell (pc, spell_ref, LS_STATS|LS_ADDXP):
+				ret = LSR_FAILED
+				strref = 10831 # failure
+			else:
+				strref = 10830 # success
+			GemRB.RemoveItem (pc, slot)
+	else:
+		print "WARNING: invalid spell header in item", slot_item['ItemResRef']
+		CloseItemInfoWindow ()
+		return -1
+
 	CloseItemInfoWindow ()
-	return
+	OpenErrorWindow (strref)
+
+	return ret
 
 def OpenItemWindow ():
 	#close inventory
@@ -809,7 +806,7 @@ def DisplayItem (itemresref, type):
 	if drink:
 		Button.SetText (19392)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DrinkItemWindow")
-	elif read:
+	elif read and not CannotLearnSlotSpell ():
 		Button.SetText (17104)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ReadItemWindow")
 	elif container:
@@ -855,7 +852,6 @@ def OpenGroundItemInfoWindow ():
 	global ItemInfoWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-
 	slot = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("GroundItemButton")
 	slot_item = GemRB.GetContainerItem (pc, slot)
 
@@ -872,7 +868,7 @@ def MouseEnterSlot ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	OverSlot = GemRB.GetVar ("ItemButton")
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		UpdateSlot (pc, OverSlot-1)
 	return
 
@@ -890,7 +886,7 @@ def MouseEnterGround ():
 	Window = InventoryWindow
 	i = GemRB.GetVar ("GroundItemButton")
 	Button = Window.GetControl (i+68)
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		Button.SetState (IE_GUI_BUTTON_SELECTED)
 	return
 
@@ -898,7 +894,7 @@ def MouseLeaveGround ():
 	Window = InventoryWindow
 	i = GemRB.GetVar ("GroundItemButton")
 	Button = Window.GetControl (i+68)
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		Button.SetState (IE_GUI_BUTTON_SECOND)
 	return
 
