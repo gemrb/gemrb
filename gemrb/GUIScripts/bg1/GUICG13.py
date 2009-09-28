@@ -43,7 +43,6 @@ PDollButton = 0
 IE_ANIM_ID = 206
 
 def RefreshPDoll():
-	PDollTable = GemRB.LoadTableObject("pdolls")
 	AnimID = 0x6000
 	table = GemRB.LoadTableObject("avprefr")
 	AnimID = AnimID+table.GetValue(GemRB.GetVar("Race"),0)
@@ -51,7 +50,7 @@ def RefreshPDoll():
 	AnimID = AnimID+table.GetValue(GemRB.GetVar("Class"),0)
 	table = GemRB.LoadTableObject("avprefg")
 	AnimID = AnimID+table.GetValue(GemRB.GetVar("Gender"),0)
-	ResRef = PDollTable.GetValue(hex(AnimID), "LEVEL1")
+	ResRef = AppearanceAvatarTable.GetValue(hex(AnimID), "LEVEL1")
 	PDollButton.SetPLT(ResRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
 
 	return

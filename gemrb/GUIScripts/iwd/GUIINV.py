@@ -28,6 +28,7 @@ import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
+from ie_spells import *
 from GUICommon import CloseOtherWindow, SetColorStat, SetEncumbranceLabels, CannotLearnSlotSpell
 from GUICommonWindows import *
 
@@ -38,6 +39,7 @@ StackAmount = 0
 ItemIdentifyWindow = None
 PortraitWindow = None
 OptionsWindow = None
+ErrorWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
 OverSlot = None
@@ -262,10 +264,9 @@ def RefreshInventoryWindow ():
 	Button.SetPLT (GetActorPaperDoll (pc),
 		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
 
-	PortraitTable = GemRB.LoadTableObject ("PDOLLS")
 	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
 	row = "0x%04X" %anim_id
-	size = PortraitTable.GetValue (row, "SIZE")
+	size = AppearanceAvatarTable.GetValue (row, "SIZE")
 
 	#Weapon
 	slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )

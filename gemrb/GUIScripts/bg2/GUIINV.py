@@ -45,8 +45,6 @@ ErrorWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
 OverSlot = None
-print # keeps the keyimporter output in two lines
-PortraitTable = GemRB.LoadTableObject ("PDOLLS")
 
 def OpenInventoryWindowClick ():
 	tmp = GemRB.GetVar ("PressedPortrait")
@@ -288,7 +286,7 @@ def RefreshInventoryWindow ():
 
 	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
 	row = "0x%04X" %anim_id
-	size = PortraitTable.GetValue (row, "SIZE")
+	size = AppearanceAvatarTable.GetValue (row, "SIZE")
 
 	#Weapon
 	slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )

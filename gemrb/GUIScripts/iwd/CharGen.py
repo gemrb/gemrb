@@ -2297,7 +2297,6 @@ def AppearancePress():
 def DrawAvatar():
 	global AppearanceAvatarButton, RaceTable, ClassTable
 
-	AppearanceAvatarTable = GemRB.LoadTableObject ("pdolls")
 	AvatarID = 0x6000
 	table = GemRB.LoadTableObject ("avprefr")
 	AvatarID = AvatarID+table.GetValue (GemRB.GetVar ("Race"),0)

@@ -28,12 +28,14 @@ from ie_stats import *
 from ie_modal import *
 from ie_action import *
 from ie_slots import *
+from ie_spells import *
 
 OtherWindowFn = None
 
 # only used in SetEncumbranceLabels, but that is called very often
 StrModTable = StrModExTable = None
 ClassTable = KitListTable = ClassSkillsTable = RaceTable = NextLevelTable = None
+AppearanceAvatarTable = None
 
 def CloseOtherWindow (NewWindowFn):
 	global OtherWindowFn
@@ -111,12 +113,11 @@ def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
 def GetActorPaperDoll (actor):
-	PortraitTable = GemRB.LoadTableObject ("PDOLLS")
 	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)
 	level = GemRB.GetPlayerStat (actor, IE_ARMOR_TYPE)
 	row = "0x%04X" %anim_id
 	which = "LEVEL%d" %(level+1)
-	return PortraitTable.GetValue (row, which)
+	return AppearanceAvatarTable.GetValue (row, which)
 
 def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
@@ -840,6 +841,7 @@ def CanDualClass(actor):
 
 def LoadCommonTables():
 	global ClassTable, KitListTable, ClassSkillsTable, RaceTable, NextLevelTable
+	global AppearanceAvatarTable
 
 	print # so the following output isn't appended to an existing line
 	if not ClassTable:
@@ -852,3 +854,5 @@ def LoadCommonTables():
 		RaceTable = GemRB.LoadTableObject ("races")
 	if not NextLevelTable:
 		NextLevelTable = GemRB.LoadTableObject ("xplevel")
+	if not AppearanceAvatarTable:
+		AppearanceAvatarTable = GemRB.LoadTableObject ("pdolls")
