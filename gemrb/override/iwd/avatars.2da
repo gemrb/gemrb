@@ -363,8 +363,11 @@
 0xEB28    MAN2      MAN2       MAN2       MAN2       9          2          1          *
 0xEB39    MBE1      MBE1       MBE1       MBE1       9          2          1          *
 0xEB49    MBE2      MBE2       MBE2       MBE2       9          2          1          *
+0xEB51    MSEE      MSEE       MSEE       MSEE       9          2          1          *
+0xEB52    MFIR      MFIR       MFIR       MFIR       9          2          1          *
 0xEB69    MLIC      MLIC       MLIC       MLIC       9          2          1          *
 0xEB79    MLER      MLER       MLER       MLER       9          2          1          *
+0xEB89    MMAN      MMAN       MMAN       MMAN       9          2          1          *
 0xEB99    MMYC      MMYC       MMYC       MMYC       9          2          1          *
 0xEBA9    MMY2      MMY2       MMY2       MMY2       9          2          1          *
 0xEBB1    MSHR      MSHR       MSHR       MSHR       9          2          1          *
