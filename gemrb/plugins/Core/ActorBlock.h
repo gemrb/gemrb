@@ -359,6 +359,7 @@ public:
 	bool VisibleTrap(int only_detected);
 	//returns true if trap has been triggered, tumble skill???
 	virtual bool TriggerTrap(int skill, ieDword ID);
+	bool TryUnlock(Actor *actor, bool removekey);
 };
 
 class GEM_EXPORT Movable : public Selectable {
@@ -504,7 +505,7 @@ public:
 	int IsOpen() const;
 	void TryPickLock(Actor *actor);
 	void TryBashLock(Actor* actor) ;
-	bool TryUnlockDoor(Actor *actor);
+	bool TryUnlock(Actor *actor);
 	void DebugDump();
 	int TrapResets() { return Flags & DOOR_RESET; }
 	void SetNewOverlay(TileOverlay *Overlay);
@@ -528,6 +529,7 @@ public:
 	int IsOpen() const;
 	void TryPickLock(Actor *actor);
 	void TryBashLock(Actor* actor) ;
+	bool TryUnlock(Actor *actor);
 	void DebugDump();
 	int TrapResets() { return Flags & CONT_RESET; }
 private:

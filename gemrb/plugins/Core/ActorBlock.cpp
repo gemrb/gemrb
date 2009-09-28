@@ -997,6 +997,46 @@ void Highlightable::SetCursor(unsigned char CursorIndex)
 	Cursor = CursorIndex;
 }
 
+bool Highlightable::TryUnlock(Actor *actor, bool removekey) {
+	const char *Key = GetKey();
+	Actor *haskey = NULL;
+
+	if (Key && actor->InParty) {
+		Game *game = core->GetGame();
+		//allow unlock when the key is on any partymember
+		for (int idx = 0; idx < game->GetPartySize(false); idx++) {
+			Actor *pc = game->FindPC(idx + 1);
+			if (!pc) continue;
+
+			if (pc->inventory.HasItem(Key,0) ) {
+				haskey = pc;
+				break;
+			}
+		}
+	} else if (Key) {
+		//actor is not in party, check only actor
+		if (actor->inventory.HasItem(Key,0) ) {
+			haskey = actor;
+		}
+	}
+
+	if (!haskey) {
+		return false;
+	}
+
+	if (removekey) {
+		CREItem *item = NULL;
+		haskey->inventory.RemoveItem(Key,0,&item);
+		//the item should always be existing!!!
+		if (item) {
+			delete item;
+		}
+	}
+
+	return true;
+}
+
+
 /*****************
  * Movable Class *
  *****************/
@@ -1663,46 +1703,12 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 	area->ActivateWallgroups(closed_wg_index, closed_wg_count, !(Flags&DOOR_OPEN));
 }
 
-bool Door::TryUnlockDoor(Actor *actor) {
+bool Door::TryUnlock(Actor *actor) {
 	if (!(Flags&DOOR_LOCKED)) return true;
-
-	const char *Key = GetKey();
-	Actor *haskey = NULL;
-
-	if (Key && actor->InParty) {
-		Game *game = core->GetGame();
-		//allow opening/closing of a door when the key is on any partymember
-		for (int idx = 0; idx < game->GetPartySize(false); idx++) {
-			Actor *pc = game->FindPC(idx + 1);
-			if (!pc) continue;
-
-			if (pc->inventory.HasItem(Key,0) ) {
-				haskey = pc;
-				break;
-			}
-		}
-	} else if (Key) {
-		//actor is not in party, check only actor
-		if (actor->inventory.HasItem(Key,0) ) {
-			haskey = actor;
-		}
-	}
-
-	if (!haskey) {
-		return false;
-	}
-
-	// remove the key (but not in PS:T!)
-	if (!core->HasFeature(GF_REVERSE_DOOR) && Flags&DOOR_KEY) {
-		CREItem *item = NULL;
-		haskey->inventory.RemoveItem(Key,0,&item);
-		//the item should always be existing!!!
-		if (item) {
-			delete item;
-		}
-	}
-
-	return true;
+	
+	// don't remove key in PS:T!
+	bool removekey = !core->HasFeature(GF_REVERSE_DOOR) && Flags&DOOR_KEY;
+	return Highlightable::TryUnlock(actor, removekey);
 }
 
 void Door::SetPolygon(bool Open, Gem_Polygon* poly)
@@ -2253,4 +2259,10 @@ void Container::DebugDump()
 	}
 	printf( "Script: %s, Key: %s\n", name, KeyResRef );
 	inventory.dump();
+}
+
+bool Container::TryUnlock(Actor *actor) {
+	if (!(Flags&CONT_LOCKED)) return true;
+	
+	return Highlightable::TryUnlock(actor, false);
 }

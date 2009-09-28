@@ -2374,7 +2374,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters) {
 	if (Sender->Type == ST_ACTOR) {
 		Actor *actor = (Actor *)Sender;
 		actor->SetModal(MS_NONE);
-		if (!door->TryUnlockDoor(actor)) {
+		if (!door->TryUnlock(actor)) {
 			return;
 		}
 	}
@@ -2395,7 +2395,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters) {
 	// see comments in OpenDoor above
 	if (Sender->Type == ST_ACTOR) {
 		Actor *actor = (Actor *)Sender;
-		if (!door->TryUnlockDoor(actor)) {
+		if (!door->TryUnlock(actor)) {
 			return;
 		}
 	}
@@ -2433,7 +2433,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 	distance = FindNearPoint( Sender, p, otherp);
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
-		if (!door->TryUnlockDoor(actor)) {
+		if (!door->TryUnlock(actor)) {
 			core->DisplayConstantString(STR_DOORLOCKED,0xd7d7be,door);
 			//playsound unsuccessful opening of door
 			if(door->IsOpen())
@@ -5192,6 +5192,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	Actor *actor = (Actor *)Sender;
 	Container *container = core->GetCurrentContainer();
 	if (!container) {
 		printMessage("GameScript","No container selected!", YELLOW);
@@ -5207,7 +5208,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 	if (distance<=needed)
 	{
 		//check if the container is unlocked
-		if (container->Flags & CONT_LOCKED) {
+		if (!container->TryUnlock(actor)) {
 			//playsound can't open container
 			//display string, etc
 			core->DisplayConstantString(STR_CONTLOCKED,0xd7d7be,container);
