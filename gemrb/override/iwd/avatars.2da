@@ -287,6 +287,7 @@
 0xE359    MWI2      MWI2       MWI2       MWI2       9          2          1          *
 0xE369    MWI3      MWI3       MWI3       MWI3       9          2          1          *
 0xE388    MMUM      MMUM       MMUM       MMUM       9          2          1          *
+0xE389    MMUM      MMUM       MMUM       MMUM       9          2          1          *
 0xE39C    MHIS      MHIS       MHIS       MHIS       9          2          1          *
 0xE3A8    MDRD      MDRD       MDRD       MDRD       9          2          1          *
 0xE3BB    MWAV      MWAV       MWAV       MWAV       9          2          1          *
