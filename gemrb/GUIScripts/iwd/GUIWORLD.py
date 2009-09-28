@@ -26,7 +26,7 @@
 import GemRB
 from GUIDefines import *
 from ie_restype import *
-from GUICommon import CloseOtherWindow
+from GUICommon import CloseOtherWindow, UpdateInventorySlot
 from GUICommonWindows import *
 from GUIClasses import GWindow
 
@@ -75,6 +75,8 @@ def OpenEndMessageWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (9371)	
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
+	if PortraitWindow:
+		UpdatePortraitWindow ()
 	if hideflag:
 		GemRB.UnhideGUI ()
 
@@ -173,18 +175,11 @@ def RedrawContainerWindow ():
 		#this is an autoselected container, but we could use PC too
 		Slot = GemRB.GetContainerItem (0, i+LeftTopIndex)
 		Button = Window.GetControl (i)
-
 		if Slot != None:
-			Item = GemRB.GetItem (Slot['ItemResRef'])
 			Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
-			Button.SetItemIcon (Slot['ItemResRef'],0)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-			Button.SetTooltip (Slot['ItemName'])
 		else:
 			Button.SetVarAssoc ("LeftIndex", -1)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetTooltip ("")
-
+		UpdateInventorySlot (pc, Button, Slot, "container")
 
 	for i in range (4):
 		if i+RightTopIndex<RightCount:
@@ -193,18 +188,10 @@ def RedrawContainerWindow ():
 			Slot = None
 		Button = Window.GetControl (i+10)
 		if Slot!=None:
-			Item = GemRB.GetItem (Slot['ItemResRef'])
 			Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
-			Button.SetItemIcon (Slot['ItemResRef'],0)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-			#is this needed?
-			#Slot = GemRB.GetItem(Slot['ItemResRef'])
-			#Button.SetTooltip (Slot['ItemName'])
 		else:
 			Button.SetVarAssoc ("RightIndex", -1)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetTooltip ("")
-
+		UpdateInventorySlot (pc, Button, Slot, "inventory")
 
 def OpenContainerWindow ():
 	global OldActionsWindow, OldMessageWindow
@@ -234,15 +221,11 @@ def OpenContainerWindow ():
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ("LeftIndex", i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "TakeItemContainer")
-		Button.SetFont ("NUMBER")
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	for i in range (4):
 		Button = Window.GetControl (i+10)
 		Button.SetVarAssoc ("RightIndex", i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DropItemContainer")
-		Button.SetFont ("NUMBER")
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	# left scrollbar
 	ScrollBar = Window.GetControl (52)
@@ -350,6 +333,7 @@ def UpdateReformWindow ():
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		Button.SetPicture (pic, "NOPORTSM")
+	UpdatePortraitWindow ()
 	return
 
 def RemovePlayer ():
