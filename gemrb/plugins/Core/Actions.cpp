@@ -5884,7 +5884,7 @@ void GameScript::EnablePortalTravel(Scriptable* Sender, Action* parameters)
 //unhardcoded iwd action (for the forge entrance change)
 void GameScript::ChangeDestination(Scriptable* Sender, Action* parameters)
 {
-	InfoPoint *ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->string0Parameter);
+	InfoPoint *ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
 	if (ip && (ip->Type==ST_TRAVEL) ) {
 		strnlwrcpy(ip->Destination, parameters->string0Parameter, 32);
 	}
