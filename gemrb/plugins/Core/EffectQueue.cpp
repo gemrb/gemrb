@@ -998,6 +998,13 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		return false;
 	}
 
+	//don't resist self
+	if (fx->Target==FX_TARGET_SELF) {
+		if (core->HasFeature(GF_SELECTIVE_MAGIC_RES) ) {
+			return false;
+		}
+	}
+
 	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
 	if( fx->random_value < val) {
