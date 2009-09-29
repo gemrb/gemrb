@@ -3133,6 +3133,7 @@ bool Actor::ValidTarget(int ga_flags) const
 
 	if (ga_flags&GA_NO_HIDDEN) {
 		if (Modified[IE_AVATARREMOVAL]) return false;
+		if (Modified[IE_EA]>EA_GOODCUTOFF && State&STATE_INVISIBLE) return false;
 	}
 
 	if (ga_flags&GA_NO_ALLY) {
@@ -4347,7 +4348,7 @@ void Actor::Draw(Region &screen)
 	//adjust invisibility for enemies
 	if (Modified[IE_EA]>EA_GOODCUTOFF) {
 		if (State&STATE_INVISIBLE) {
-			Trans = 256;
+			Trans = 255;
 		}
 	}
 
