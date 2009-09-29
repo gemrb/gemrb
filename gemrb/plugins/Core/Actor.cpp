@@ -3133,7 +3133,7 @@ bool Actor::ValidTarget(int ga_flags) const
 
 	if (ga_flags&GA_NO_HIDDEN) {
 		if (Modified[IE_AVATARREMOVAL]) return false;
-		if (Modified[IE_EA]>EA_GOODCUTOFF && State&STATE_INVISIBLE) return false;
+		if (Modified[IE_EA]>EA_GOODCUTOFF && Modified[IE_STATE_ID]&STATE_INVISIBLE) return false;
 	}
 
 	if (ga_flags&GA_NO_ALLY) {
