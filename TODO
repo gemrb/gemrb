@@ -43,7 +43,6 @@ Actor:
    the character first. - see bg1 chargen for a complete solution
 2. Move position of actor (and ground circle) to the center of a searchmap cell
 3. (PARTLY) Actually handle the iwd2 spelllists. Exporter is still needed.
-4. Sorceror style spellcasting (should be spelltype related)
 
 Game GUI:
 1. (PARTLY) implement class based (but customisable) action button bar. Generally port
@@ -52,8 +51,8 @@ Game GUI:
 3. (PARTLY) Fix drop capitals (initials) Calculate text height/width correctly, display
    it correctly too.
 4. (PARTLY) Fix unwanted screen shake (especially when on bottom of area)
-5. (PARTLY) Level up code, this should be written mostly in GuiScript!!!
-6. Contingency, spell trigger setup windows
+5. (DONE-almost) Level up code, this should be written mostly in GuiScript!!!
+6. (PARTLY) Contingency, spell trigger setup windows
 7. (PARTLY) Customize windows (part of character record window)
 
 General:
