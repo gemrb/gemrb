@@ -1,7 +1,7 @@
 
-Prototype: GemRB.CreateLabelOnButton(WindowIndex, ButtonControlID, NewID, font, text, align)
+Prototype: GemRB.CreateLabelOnButton(WindowIndex, ButtonControlID, NewID, font, align)
 
-Metaclass Prototype: CreateLabelOnButton(NewID, font, text, align)
+Metaclass Prototype: CreateLabelOnButton(NewID, font, align)
 
 Description: Creates and adds a new Label to a Window, based on the dimensions of an existing button. If the NewID is the same as the old button ID, the old button will be converted to this Label (the old button will be removed). 
 
@@ -10,7 +10,6 @@ WindowIndex     - the value returned from LoadWindow
 ButtonControlID - the button control to be copied/converted
 NewID           - the new control will be available via this controlID
 font            - a .bam resref which must be listed in fonts.2da too
-text            - initial text of the label (must be string)
 align           - label text alignment
 
 Return value: N/A
