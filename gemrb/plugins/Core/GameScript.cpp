@@ -429,6 +429,7 @@ static const ActionLink actionnames[] = {
 	{"changeclass", GameScript::ChangeClass, 0},
 	{"changecolor", GameScript::ChangeColor, 0},
 	{"changecurrentscript", GameScript::ChangeAIScript,AF_SCRIPTLEVEL},
+	{"changedestination", GameScript::ChangeDestination,0}, //gemrb extension (iwd hack)
 	{"changedialog", GameScript::ChangeDialogue, 0},
 	{"changedialogue", GameScript::ChangeDialogue, 0},
 	{"changegender", GameScript::ChangeGender, 0},

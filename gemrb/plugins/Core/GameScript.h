@@ -1018,6 +1018,7 @@ public:
 	static void ChangeClass(Scriptable* Sender, Action* parameters);
 	static void ChangeColor(Scriptable* Sender, Action* parameters);
 	static void ChangeCurrentScript(Scriptable* Sender, Action* parameters);
+	static void ChangeDestination(Scriptable* Sender, Action* parameters);
 	static void ChangeDialogue(Scriptable* Sender, Action* parameters);
 	static void ChangeGender(Scriptable* Sender, Action* parameters);
 	static void ChangeGeneral(Scriptable* Sender, Action* parameters);
