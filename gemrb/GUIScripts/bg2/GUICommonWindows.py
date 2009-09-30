@@ -600,7 +600,7 @@ def UpdatePortraitWindow ():
 		states = "\n" + states
 
 		# blank space
-		flag = chr(238)
+		flag = blank = chr(238)
 
 		# shopping icon
 		if pc==portid+1:
@@ -611,9 +611,9 @@ def UpdatePortraitWindow ():
 			flag = chr(154)
 
 		if CanLevelUp (portid+1):
-			states = flag+chr(238)+chr(255) + states
+			states = flag+blank+chr(255) + states
 		else:
-			states = flag+chr(238)+chr(238) + states
+			states = flag+blank+blank + states
 		Button.SetText(states)
 	return
 

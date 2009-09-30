@@ -488,6 +488,9 @@ def OpenPortraitWindow (needcontrols):
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
+		Button.SetFont ("STATES")
+		Button.SetVarAssoc ("PressedPortrait", i)
+
 		if (needcontrols):
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenInventoryWindowClick")
 		else:
@@ -505,6 +508,9 @@ def OpenPortraitWindow (needcontrols):
 			Button.SetText ("")
 			Button.SetTooltip ("")
 
+		# overlay a label, so we can display the hp with the correct font
+		Button.CreateLabelOnButton(100+i, "NUMFONT", IE_GUI_BUTTON_ALIGN_TOP|IE_GUI_BUTTON_ALIGN_LEFT)
+
 		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
 
@@ -518,10 +524,10 @@ def UpdatePortraitWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Inventory = GemRB.GetVar ("Inventory")
 
-	for i in range (PARTY_SIZE):
-		Button = Window.GetControl (i)
-		pic = GemRB.GetPlayerPortrait (i+1, 1)
-		if Inventory and pc != i+1:
+	for portid in range (PARTY_SIZE):
+		Button = Window.GetControl (portid)
+		pic = GemRB.GetPlayerPortrait (portid+1, 1)
+		if Inventory and pc != portid+1:
 			pic = None
 
 		if not pic:
@@ -531,17 +537,17 @@ def UpdatePortraitWindow ():
 			Button.SetTooltip ("")
 			continue
 
-		sel = GemRB.GameGetSelectedPCSingle () == i + 1
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_HORIZONTAL|IE_GUI_BUTTON_DRAGGABLE, OP_SET)
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		sel = GemRB.GameGetSelectedPCSingle () == portid + 1
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE| \
+				IE_GUI_BUTTON_HORIZONTAL| \
+				IE_GUI_BUTTON_ALIGN_LEFT| IE_GUI_BUTTON_ALIGN_TOP| \
+				IE_GUI_BUTTON_DRAGGABLE|IE_GUI_BUTTON_MULTILINE, OP_SET)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetPicture (pic, "NOPORTSM")
-		Button.SetFont ("NUMFONT")
 
-		Button.SetVarAssoc ("PressedPortrait", i)
-
-		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
-		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
-		state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
+		hp = GemRB.GetPlayerStat (portid+1, IE_HITPOINTS)
+		hp_max = GemRB.GetPlayerStat (portid+1, IE_MAXHITPOINTS)
+		state = GemRB.GetPlayerStat (portid+1, IE_STATE_ID)
 
 		if (hp_max<1):
 			ratio = 0.0
@@ -549,12 +555,47 @@ def UpdatePortraitWindow ():
 			ratio = (hp+0.0) / hp_max
 
 		if hp<1 or (state & STATE_DEAD):
-			Button.SetOverlay (ratio, 64,64,64,200, 64,64,64,200)
+			Button.SetOverlay (0, 64,64,64,200, 64,64,64,200)
 		else:
 			Button.SetOverlay (ratio, 255,0,0,200, 128,0,0,200)
+		ratio_str = "\n%d/%d" %(hp, hp_max)
+		Button.SetTooltip (GemRB.GetPlayerName (portid+1, 1) + ratio_str)
 
-		Button.SetText ("%d/%d" %(hp, hp_max))
-		Button.SetTooltip (GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
+		#add effects on the portrait
+		#http://img.jeuxvideo.fr/00002663-photo-icewind-dale-heart-of-winter.jpg
+		effects = GemRB.GetPlayerStates (portid+1)
+		states = ""
+		for col in range(len(effects)):
+			states = effects[col:col+1] + states
+			if col % 3 == 2: states = "\n" + states
+		for x in range(2 - (len(effects)/3)):
+			states = "\n" + states
+		states = "\n" + states
+	
+		# blank space
+ 		# TODO: missing, maybe add another string tag to make glyphs 100% transparent?
+		flag = blank = chr(238)
+	
+		# these two are missing too
+		## shopping icon
+		#if pc==portid+1:
+			#if GemRB.GetStore()!=None:
+				#flag = chr(155)
+		## talk icon
+		#if GemRB.GameGetSelectedPCSingle(1)==portid+1:
+			#flag = chr(154)
+
+		if CanLevelUp (portid+1):
+			states = flag+blank+chr(255) + states
+		else:
+			#states = flag+blank+blank + states
+			#states = "\n" + states
+			pass
+		Button.SetText(states)
+
+		HPLabel = Window.GetControl (100+portid)
+		HPLabel.SetText (ratio_str) # TODO: color depending on the ratio
+
 		Button.EnableBorder (FRAME_PC_SELECTED, sel)
 	return
 
