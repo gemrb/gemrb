@@ -1953,7 +1953,7 @@ void Map::DebugDump(bool show_actors)
 		size_t i = actors.size();
 		while (i--) {
 			if (!(actors[i]->GetInternalFlag()&(IF_JUSTDIED|IF_REALLYDIED))) {
-				printf("Actor: %s at %d.%d\n", actors[i]->GetName(0), actors[i]->Pos.x, actors[i]->Pos.y);
+				printf("Actor: %s at %d.%d\n", actors[i]->GetName(1), actors[i]->Pos.x, actors[i]->Pos.y);
 			}
 		}
 	}
