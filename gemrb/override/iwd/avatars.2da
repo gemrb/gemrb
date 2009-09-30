@@ -349,7 +349,7 @@
 0xE8D9    MNOS      MNOS       MNOS       MNOS       9          2          1          *
 0xE8E8    MBU2      MBU2       MBU2       MBU2       9          2          1          *
 0xE8F9    MOR7      MOR7       MOR7       MOR7       9          2          1          *
-0xE900    MSAL      MSAL       MSAL       MSAL       9          2          1          *
+0xE900    MSAL      MSAL       MSAL       MSAL       16         2          1          *
 0xE908    MSH1      MSH1       MSH1       MSH1       16         2          1          *
 0xE910    MSA2      MSA2       MSA2       MSA2       16         2          1          *
 0xE918    MSH2      MSH2       MSH2       MSH2       16         2          1          *
@@ -373,7 +373,7 @@
 0xEBA9    MMY2      MMY2       MMY2       MMY2       9          2          1          *
 0xEBB1    MSHR      MSHR       MSHR       MSHR       9          2          1          *
 0xEBCD    MTAN      MTAN       MTAN       MTAN       9          4          1          *
-0xEBD8    MSAL      MSAL       MSAL       MSAL       9          2          1          *
+0xEBD8    MSAL      MSAL       MSAL       MSAL       16         2          1          *
 0xEBE8    MSA2      MSA2       MSA2       MSA2       16         2          1          *
 0xEBF1    MARU      MARU       MARU       MARU       9          2          1          *
 0xEC0B    MWDR      MWDR       MWDR       MWDR       9          2          1          *
