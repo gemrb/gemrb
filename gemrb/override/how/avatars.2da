@@ -291,7 +291,7 @@
 0xE318    MGH3      MGH3       MGH3       MGH3       9          2          1          *
 0xE329    MWIG      MWIG       MWIG       MWIG       9          2          1          *
 0xE338    MZO2      MZO2       MZO2       MZO2       9          2          1          *
-0xE348    MZO3      MZO3       MZO3       MZO3       9          2          1          *
+0xE348    MZO3      MZO3       MZO3       MZO3       16         2          1          *
 0xE359    MWI2      MWI2       MWI2       MWI2       9          2          1          *
 0xE369    MWI3      MWI3       MWI3       MWI3       9          2          1          *
 0xE388    MMUM      MMUM       MMUM       MMUM       9          2          1          *
@@ -311,7 +311,7 @@
 0xE498    MGO5      MGO5       MGO5       MGO5       9          2          1          *
 0xE500    MLIZ      MLIZ       MLIZ       MLIZ       9          2          1          *
 0xE510    MLI2      MLI2       MLI2       MLI2       9          2          1          *
-0xE51D    MGIR      MGIR       MGIR       MGIR       9          2          1          *
+0xE51D    MGIR      MGIR       MGIR       MGIR       9          3          1          *
 0xE520    MLI3      MLI3       MLI3       MLI3       9          2          1          *
 0xE528    MGIC      MGIC       MGIC       MGIC       9          2          1          *
 0xE600    MMYC      MMYC       MMYC       MMYC       9          2          1          *
