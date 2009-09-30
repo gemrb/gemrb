@@ -368,7 +368,7 @@
 0xEB00    MSKT      MSKT       MSKT       MSKT       9          2          1          *
 0xEB08    MANI      MANI       MANI       MANI       9          3          1          *
 0xEB10    MSKA      MSKA       MSKA       MSKA       9          2          1          *
-0xEB18    MAN1      MAN1       MAN1       MAN1       9          2          1          *
+0xEB18    MANI      MANI       MANI       MANI       9          2          1          *
 0xEB28    MAN2      MAN2       MAN2       MAN2       9          2          1          *
 0xEB39    MBE1      MBE1       MBE1       MBE1       9          2          1          *
 0xEB49    MBE2      MBE2       MBE2       MBE2       9          2          1          *
