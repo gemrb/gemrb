@@ -3956,7 +3956,7 @@ void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagety
 
 	// TODO: in tob you had to be behind the target
 	// TODO: check for the right weapon type too
-	if (Modified[IE_BACKSTABDAMAGEMULTIPLIER] > 1 && !target->Modified[IE_DISABLEBACKSTAB]) {
+	if (Modified[IE_BACKSTABDAMAGEMULTIPLIER] > 1 && GetAttackStyle() != WEAPON_RANGED && !target->Modified[IE_DISABLEBACKSTAB]) {
 		if (Modified[IE_STATE_ID] & (ieDword) (STATE_INVISIBLE) || Modified[IE_ALWAYSBACKSTAB]) {
 			damage *= Modified[IE_BACKSTABDAMAGEMULTIPLIER];
 			// display a simple message instead of hardcoding multiplier names
