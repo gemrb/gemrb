@@ -218,6 +218,7 @@ gemrb/override/how/Makefile
 gemrb/override/iwd/Makefile
 gemrb/override/iwd2/Makefile
 gemrb/override/pst/Makefile
+gemrb/override/shared/Makefile
 gemrb/override/test1/Makefile
 gemrb/GUIScripts/Makefile
 gemrb/GUIScripts/bg1/Makefile
