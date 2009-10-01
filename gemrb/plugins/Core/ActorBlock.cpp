@@ -272,7 +272,8 @@ bool Scriptable::IsPC()
 
 void Scriptable::ExecuteScript(int scriptCount)
 {
-	if (core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE) {
+	// area scripts still run for at least the current area, in bg1 (see ar2631, confirmed by testing)
+	if ((Type != ST_AREA) && (core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE)) {
 		return;
 	}
 
