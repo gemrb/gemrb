@@ -138,6 +138,7 @@ def EnterGamePress ():
 	if not GameIsHOW():
 		GemRB.SetVar ("PlayMode",2) #using mpsave and second row??
 	else:
+		GemRB.SetGlobal ("EXPANSION_DOOR", "GLOBAL", 1) # entrance to the HOW start
 		if GemRB.GetVar ("oldgame")==0:
 			GemRB.SetVar ("PlayMode",3) #using mpsave and second row
 			GemRB.GameSetExpansion (1)
