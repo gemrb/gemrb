@@ -156,3 +156,7 @@ def UpdateControlStatus ():
 	if hideflag:
 		GemRB.UnhideGUI ()
 
+def UpdateMasterScript():
+	GemRB.SetMasterScript("BALDUR","EXPMAP")
+	return
+
