@@ -3964,6 +3964,12 @@ void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagety
 		}
 	}
 
+	// add strength bonus; backstab does not affect it
+	// TODO: should actually check WEAPON_USESTRENGTH, since a sling in bg2 has it
+	if (wi && GetAttackStyle() != WEAPON_RANGED) {
+		damage += core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA) );
+	}
+
 	if (wi && target->fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags)) {
 		damage = 0;
 		resisted = DR_IMMUNE; // mark immunity for GetCombatDetails
