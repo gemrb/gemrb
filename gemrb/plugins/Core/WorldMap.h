@@ -183,6 +183,8 @@ private:
 	/** internal function to calculate the distances from areaindex */
 	void CalculateDistance(int areaindex, int direction);
 	unsigned int WhoseLinkAmI(int link_index);
+	/** update reachable areas from worlde.2da */
+	void UpdateReachableAreas();
 };
 
 class GEM_EXPORT WorldMapArray {

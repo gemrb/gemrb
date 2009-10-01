@@ -23,6 +23,7 @@
 #include "WorldMap.h"
 #include "Interface.h"
 #include "Video.h"
+#include "Game.h"
 #include <list>
 
 WMPAreaEntry::WMPAreaEntry()
@@ -258,6 +259,7 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 
 	printMessage("WorldMap","", GREEN);
 	printf("CalculateDistances for Area: %s\n", AreaName);
+	UpdateReachableAreas();
 	UpdateAreaVisibility(AreaName, direction);
 
 	size_t memsize =sizeof(int) * area_entries.size();
@@ -447,6 +449,29 @@ void WorldMap::SetAreaStatus(const ieResRef AreaName, int Bits, int Op)
 	if (!ae)
 		return;
 	ae->SetAreaStatus(Bits, Op);
+}
+
+void WorldMap::UpdateReachableAreas()
+{
+	AutoTable tab("worlde");
+	if (!tab) {
+		return;
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return;
+	}
+	int idx = tab->GetRowCount();
+	while (idx--) {
+		// 2da rows in format <name> <variable name> <area>
+		// we set the first three flags for <area> if <variable name> is set
+		ieDword varval = 0;
+		const char *varname = tab->QueryField(idx, 0);
+		if (game->locals->Lookup(varname, varval) && varval) {
+			const char *areaname = tab->QueryField(idx, 1);
+			SetAreaStatus(areaname, WMP_ENTRY_VISIBLE | WMP_ENTRY_ADJACENT | WMP_ENTRY_ACCESSIBLE, BM_OR);
+		}
+	}
 }
 
 /****************** WorldMapArray *******************/
