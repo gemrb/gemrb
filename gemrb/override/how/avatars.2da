@@ -300,7 +300,7 @@
 0xE3A8    MDRD      MDRD       MDRD       MDRD       9          2          1          *
 0xE3BB    MWAV      MWAV       MWAV       MWAV       9          2          1          *
 0xE408    MGO1      MGO1       MGO1       MGO1       9          2          1          *
-0xE412    MGO2      MGO2       MGO2       MGO2       9          2          1          *
+0xE412    MGO2      MGO2       MGO2       MGO2       16         2          1          *
 0xE428    MGO3      MGO3       MGO3       MGO3       9          2          1          *
 0xE432    MGO4      MGO4       MGO4       MGO4       16         2          1          *
 0xE449    MSVI      MSVI       MSVI       MSVI       9          2          1          *
