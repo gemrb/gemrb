@@ -413,7 +413,7 @@ def GetLevelUpNews():
 		# backstab
 		# NOTE: Stalkers and assassins should get the correct mods at the correct levels based
 		#	on AP_SPCL332 in their respective CLAB files.
-		# APND: Stalers appear to get the correct mod at the correct levels; however, because they start
+		# APND: Stalkers appear to get the correct mod at the correct levels; however, because they start
 		#	at backstab multi x1, they are x1 too many at their respective levels.
 		if Classes[i] == 4 and GemRB.GetPlayerStat (pc, IE_BACKSTABDAMAGEMULTIPLIER, 1) > 1: # we have a thief who can backstab (2 at level 1)
 			# save the backstab multiplier if we have a thief
