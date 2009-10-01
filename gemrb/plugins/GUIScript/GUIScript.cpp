@@ -3690,18 +3690,28 @@ static PyObject* GemRB_SetGlobal(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ssi", &Variable, &Context, &Value )) {
 		return AttributeError( GemRB_SetGlobal__doc );
 	}
-	GameControl *gc = core->GetGameControl();
-	if (!gc) {
-		return RuntimeError("Can't find GameControl!");
-	}
-	Scriptable *Sender = (Scriptable *) gc->GetLastActor();
-	if (!Sender) {
-		Sender = (Scriptable *) core->GetGame()->GetCurrentArea();
-	}
-	if (!Sender) {
+
+	Scriptable *Sender = NULL;
+	Game *game = core->GetGame();
+	if (!game) {
 		printMessage("GUIScript","No Game!\n", LIGHT_RED);
 		return NULL;
 	}
+	if (!strnicmp(Context, "MYAREA", 6) || !strnicmp(Context, "LOCALS", 6)) {
+		GameControl *gc = core->GetGameControl();
+		if (!gc) {
+			return RuntimeError("Can't find GameControl!");
+		}
+		Sender = (Scriptable *) gc->GetLastActor();
+		if (!Sender) {
+			Sender = (Scriptable *) game->GetCurrentArea();
+		}
+		if (!Sender) {
+			printMessage("GUIScript","No Sender!\n", LIGHT_RED);
+			return NULL;
+		}
+	} // else GLOBAL, area name or KAPUTZ
+
 	SetVariable(Sender, Variable, Context, (ieDword) Value);
 	Py_INCREF( Py_None );
 	return Py_None;
