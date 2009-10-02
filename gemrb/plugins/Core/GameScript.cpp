@@ -3073,6 +3073,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			scr->ReleaseCurrentAction();
 			//Sender->CurrentAction
 			scr->AddAction(ParamCopyNoOverride(aC));
+			// there are plenty of places where it's vital that ActionOverride is not interrupted and if
+			// there are actions left on the queue after the release above, we can't instant-execute,
+			// so this is my best guess for now..
+			scr->CurrentActionInterruptable = false;
 		} else {
 			printMessage("GameScript","Actionoverride failed for object: \n",LIGHT_RED);
 			aC->objects[0]->Dump();

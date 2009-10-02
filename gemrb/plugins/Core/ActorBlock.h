@@ -191,6 +191,7 @@ protected: //let Actor access this
 public:
 	int CurrentActionState;
 	ieWord CurrentActionTarget;
+	bool CurrentActionInterruptable;
 	ieDword lastDelay;
 	ieDword lastRunTime;
 	Variables* locals;

@@ -67,6 +67,7 @@ Scriptable::Scriptable(ScriptableType type)
 	CurrentAction = NULL;
 	CurrentActionState = 0;
 	CurrentActionTarget = 0;
+	CurrentActionInterruptable = true;
 	UnselectableTimer = 0;
 	startTime = 0;   //executing scripts
 	lastRunTime = 0; //evaluating scripts
@@ -281,6 +282,11 @@ void Scriptable::ExecuteScript(int scriptCount)
 		return;
 	}
 
+	if (!CurrentActionInterruptable) {
+		if (!CurrentAction && !GetNextAction()) abort();
+		return;
+	}
+
 	// only allow death scripts to run once, hopefully?
 	// this is probably terrible logic which needs moving elsewhere
 	if ((lastRunTime != 0) && (InternalFlags & IF_JUSTDIED)) {
@@ -395,6 +401,7 @@ void Scriptable::ReleaseCurrentAction()
 
 	CurrentActionState = 0;
 	CurrentActionTarget = 0;
+	CurrentActionInterruptable = true;
 }
 
 ieWord Scriptable::GetGlobalID()
@@ -427,6 +434,7 @@ void Scriptable::ProcessActions(bool force)
 	}
 
 	while (true) {
+		CurrentActionInterruptable = true;
 		if (!CurrentAction) {
 			CurrentAction = PopNextAction();
 		}
