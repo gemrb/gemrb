@@ -3281,6 +3281,7 @@ void AreaAnimation::BlendAnimation()
 		Sprite2D* spr = animation[0]->GetFrame(0);
 		if (!spr) return;
 		palette = core->GetVideoDriver()->GetPalette(spr)->Copy();
+		PaletteRef[0] = 0;
 	}
 	palette->CreateShadedAlphaChannel();
 }
