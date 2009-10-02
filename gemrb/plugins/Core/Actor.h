@@ -226,7 +226,10 @@ public:
 
 	ieDword AppearanceFlags;
 
-	ieVariable KillVar; //this second field is present in pst and iwd1
+	ieVariable KillVar; //this second field is present in pst, iwd1 and iwd2
+	ieVariable IncKillVar; // iwd1, iwd2
+
+	ieByte SetDeathVar, IncKillCount, UnknownField; // boolean fields from iwd1 and iwd2
 
 	Inventory inventory;
 	ieWordSigned Equipped;         //the equipped weapon slot

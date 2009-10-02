@@ -1687,18 +1687,20 @@ void CREImp::GetActorIWD2(Actor *act)
 	if (tmpByte) {
 		act->BaseStats[IE_AVATARREMOVAL]=tmpByte;
 	}
-	str->Read( &tmpByte, 1); //set death variable
-	str->Read( &tmpByte, 1); //increase kill count
-	str->Read( &tmpByte, 1); //unknown
+	str->Read( &act->SetDeathVar, 1); //set death variable
+	str->Read( &act->IncKillCount, 1); //increase kill count
+	str->Read( &act->UnknownField, 1);
 	for (i = 0; i<5; i++) {
 		str->ReadWord( &tmpWord );
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
 	ieVariable KillVar;
-	str->Read(KillVar,32); //use these as needed
-	KillVar[32]=0;
 	str->Read(KillVar,32);
 	KillVar[32]=0;
+	strnspccpy(act->KillVar, KillVar, 32);
+	str->Read(KillVar,32);
+	KillVar[32]=0;
+	strnspccpy(act->IncKillVar, KillVar, 32);
 	str->Seek( 2, GEM_CURRENT_POS);
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_SAVEDXPOS] = tmpWord;
@@ -1727,7 +1729,6 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
-	strnspccpy(act->KillVar, KillVar, 32);
 
 	KnownSpellsOffset = 0;
 	KnownSpellsCount = 0;
@@ -1932,9 +1933,9 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	if (tmpByte) {
 		act->BaseStats[IE_AVATARREMOVAL]=tmpByte;
 	}
-	str->Read( &tmpByte, 1); //set death variable
-	str->Read( &tmpByte, 1); //increase kill count
-	str->Read( &tmpByte, 1); //unknown
+	str->Read( &act->SetDeathVar, 1); //set death variable
+	str->Read( &act->IncKillCount, 1); //increase kill count
+	str->Read( &act->UnknownField, 1);
 	for (i = 0; i<5; i++) {
 		str->ReadWord( &tmpWord );
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
@@ -1942,8 +1943,10 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	ieVariable KillVar;
 	str->Read(KillVar,32); //use these as needed
 	KillVar[32]=0;
+	strnspccpy(act->KillVar, KillVar, 32);
 	str->Read(KillVar,32);
 	KillVar[32]=0;
+	strnspccpy(act->IncKillVar, KillVar, 32);
 	str->Seek( 2, GEM_CURRENT_POS);
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_SAVEDXPOS] = tmpWord;
@@ -1972,7 +1975,6 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
-	strnspccpy(act->KillVar, KillVar, 32);
 
 	str->ReadDword( &KnownSpellsOffset );
 	str->ReadDword( &KnownSpellsCount );
@@ -2602,13 +2604,15 @@ int CREImp::PutActorIWD1(DataStream *stream, Actor *actor)
 	memset(filling,0,sizeof(filling));
 	tmpByte=(ieByte) actor->BaseStats[IE_AVATARREMOVAL];
 	stream->Write( &tmpByte, 1);
-	stream->Write( filling, 3); //various scripting flags currently down the drain
+	stream->Write( &actor->SetDeathVar, 1);
+	stream->Write( &actor->IncKillCount, 1);
+	stream->Write( &actor->UnknownField, 1); //unknown
 	for (i=0;i<5;i++) {
 		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
 		stream->WriteWord( &tmpWord);
 	}
 	stream->Write( actor->KillVar, 32); //some variable names in iwd
-	stream->Write( actor->KillVar, 32); //some variable names in iwd
+	stream->Write( actor->IncKillVar, 32); //some variable names in iwd
 	stream->Write( filling, 2);
 	tmpWord = actor->BaseStats[IE_SAVEDXPOS];
 	stream->WriteWord( &tmpWord);
@@ -2648,13 +2652,15 @@ int CREImp::PutActorIWD2(DataStream *stream, Actor *actor)
 	memset(filling,0,sizeof(filling));
 	tmpByte=(ieByte) actor->BaseStats[IE_AVATARREMOVAL];
 	stream->Write( &tmpByte, 1);
-	stream->Write( filling, 3); //various scripting flags currently down the drain
+	stream->Write( &actor->SetDeathVar, 1);
+	stream->Write( &actor->IncKillCount, 1);	
+	stream->Write( &actor->UnknownField, 1); //unknown
 	for (i=0;i<5;i++) {
 		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
 		stream->WriteWord( &tmpWord);
 	}
 	stream->Write( actor->KillVar, 32); //some variable names in iwd
-	stream->Write( actor->KillVar, 32); //some variable names in iwd
+	stream->Write( actor->IncKillVar, 32); //some variable names in iwd
 	stream->Write( filling, 2);
 	tmpWord = actor->BaseStats[IE_SAVEDXPOS];
 	stream->WriteWord( &tmpWord);
