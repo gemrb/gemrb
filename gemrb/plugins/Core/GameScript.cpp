@@ -1246,6 +1246,7 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		int tT = core->LoadSymbol( "trigger" );
 		int aT = core->LoadSymbol( "action" );
 		int oT = core->LoadSymbol( "object" );
+		int gaT = core->LoadSymbol( "gemact" );
 		AutoTable objNameTable("script");
 		if (tT < 0 || aT < 0 || oT < 0 || !objNameTable) {
 			printMessage( "GameScript","A critical scripting file is missing!\n",LIGHT_RED );
@@ -1254,6 +1255,7 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		triggersTable = core->GetSymbol( tT );
 		actionsTable = core->GetSymbol( aT );
 		objectsTable = core->GetSymbol( oT );
+		SymbolMgr *overrideActionsTable = core->GetSymbol( gaT );
 		if (!triggersTable || !actionsTable || !objectsTable || !objNameTable) {
 			printMessage( "GameScript","A critical scripting file is damaged!\n",LIGHT_RED );
 			abort();
@@ -1350,6 +1352,27 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 			}
 			actions[i] = poi->Function;
 			actionflags[i] = poi->Flags;
+		}
+
+		if (overrideActionsTable) {
+			/*
+			 * we add/replace some actions from gemact.ids
+			 * right now you can't print or generate these actions!
+			 */
+			j = overrideActionsTable->GetSize();
+			while (j--) {
+				i = overrideActionsTable->GetValueIndex( j );
+				const ActionLink *poi = FindAction( overrideActionsTable->GetStringIndex( j ), i );
+				if (!poi) {
+					continue;
+				}
+				if (actions[i]) {
+					printMessage("GameScript"," ", WHITE);
+					printf("%s overrides existing action %s\n", overrideActionsTable->GetStringIndex( j ), actionsTable->GetStringIndex(actionsTable->FindValue(overrideActionsTable->GetValueIndex( j )) ) );
+				}
+				actions[i] = poi->Function;
+				actionflags[i] = poi->Flags;
+			}
 		}
 
 		j = objectsTable->GetSize();
