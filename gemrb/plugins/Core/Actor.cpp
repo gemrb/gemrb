@@ -3272,7 +3272,16 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright)
 	wi.prof = item->WeaProf;
 
 	//select first weapon header
-	ITMExtHeader *which = item->GetWeaponHeader(GetAttackStyle() == WEAPON_RANGED);
+	ITMExtHeader *which;
+	if (GetAttackStyle() == WEAPON_RANGED) {
+		which = item->GetWeaponHeader(true);
+		wi.backstabbing = false;
+	} else {
+		which = item->GetWeaponHeader(false);
+		// any melee weapon usable by a single class thief is game (UAI does not affect this)
+		wi.backstabbing = !(item->UsabilityBitmask & 0x400000);
+	}
+
 	//make sure we use 'false' in this freeitem
 	//so 'which' won't point into invalid memory
 	gamedata->FreeItem(item, wield->ItemResRef, false);
@@ -3954,20 +3963,31 @@ void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagety
 		}
 	}
 
-	// TODO: in tob you had to be behind the target
-	// TODO: check for the right weapon type too
-	if (Modified[IE_BACKSTABDAMAGEMULTIPLIER] > 1 && GetAttackStyle() != WEAPON_RANGED && !target->Modified[IE_DISABLEBACKSTAB]) {
-		if (Modified[IE_STATE_ID] & (ieDword) (STATE_INVISIBLE) || Modified[IE_ALWAYSBACKSTAB]) {
-			damage *= Modified[IE_BACKSTABDAMAGEMULTIPLIER];
-			// display a simple message instead of hardcoding multiplier names
-			core->DisplayConstantStringValue (STR_BACKSTAB, 0xffffff, Modified[IE_BACKSTABDAMAGEMULTIPLIER]);
+	if (wi) {
+		if (Modified[IE_BACKSTABDAMAGEMULTIPLIER] > 1) {
+ 			if (target->Modified[IE_DISABLEBACKSTAB]) {
+				// The backstab seems to have failed. bg2 3042 iwd2 121
+				core->DisplayConstantString (STR_BACKSTAB_FAIL, 0xffffff);
+			} else {
+				if (wi->backstabbing) {
+					// TODO: in tob you had to be behind the target
+					if (Modified[IE_STATE_ID] & (ieDword) (STATE_INVISIBLE) || Modified[IE_ALWAYSBACKSTAB]) {
+						damage *= Modified[IE_BACKSTABDAMAGEMULTIPLIER];
+						// display a simple message instead of hardcoding multiplier names
+						core->DisplayConstantStringValue (STR_BACKSTAB, 0xffffff, Modified[IE_BACKSTABDAMAGEMULTIPLIER]);
+					}
+				} else {
+					// weapon is unsuitable for backstab
+					core->DisplayConstantString (STR_BACKSTAB_BAD, 0xffffff);
+				}
+			}
 		}
-	}
 
-	// add strength bonus; backstab does not affect it
-	// TODO: should actually check WEAPON_USESTRENGTH, since a sling in bg2 has it
-	if (wi && GetAttackStyle() != WEAPON_RANGED) {
-		damage += core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA) );
+		// add strength bonus; backstab does not affect it
+		// TODO: should actually check WEAPON_USESTRENGTH, since a sling in bg2 has it
+		if (GetAttackStyle() != WEAPON_RANGED) {
+			damage += core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA) );
+		}
 	}
 
 	if (wi && target->fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags)) {

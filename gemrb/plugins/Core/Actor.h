@@ -191,6 +191,7 @@ struct WeaponInfo {
 	unsigned int range;
 	ieDword itemflags;
 	ieDword prof;
+	bool backstabbing;
 };
 
 extern void ReleaseMemoryActor();
