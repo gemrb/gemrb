@@ -129,7 +129,7 @@
 #define  GF_ENHANCED_EFFECTS    	31 //iwd2 (maybe iwd/how too)
 #define  GF_DEATH_ON_ZERO_STAT  	32 //not in iwd2
 #define  GF_SPAWN_INI           	33 //pst, iwd, iwd2
-#define  GF_IWD_DEATHVARFORMAT  	34 //iwd branch (maybe pst)
+#define  GF_IWD2_DEATHVARFORMAT  	34 //iwd branch (maybe pst)
 #define  GF_RESDATA_INI         	35 //pst
 #define  GF_OVERRIDE_CURSORPOS  	36 //pst, iwd2
 #define  GF_BREAKABLE_WEAPONS     	37 //bg1, not bg2 and iwd2, maybe others
