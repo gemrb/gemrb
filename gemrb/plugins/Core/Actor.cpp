@@ -339,6 +339,7 @@ Actor::Actor()
 	}
 	projectileImmunity = (ieDword *) calloc(ProjectileSize,sizeof(ieDword));
 	AppearanceFlags = 0;
+	SetDeathVar = IncKillCount = 0;
 	TalkCount = 0;
 	InteractCount = 0; //numtimesinteracted depends on this
 	appearance = 0xffffff; //might be important for created creatures
@@ -2806,21 +2807,26 @@ void Actor::Die(Scriptable *killer)
 		//handle reputation here
 	}
 
+	ieDword value = 0;
+	ieVariable varname;
+	
 	// death variables are updated at the moment of death
 	if (KillVar[0]) {
-		ieDword value = 0;
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 			game->kaputz->Lookup(KillVar, value);
 			game->kaputz->SetAt(KillVar, value+1);
 		} else {
-			game->locals->Lookup(KillVar, value);
-			game->locals->SetAt(KillVar, value+1);
+			// iwd/iwd2 path *sets* this var, so i changed it, not sure about pst above
+			game->locals->SetAt(KillVar, 1);
 		}
 	}
-	if (scriptName[0]) {
-		ieVariable varname;
-		ieDword value = 0;
+	if (IncKillVar[0]) {
+		value = 0;
+		game->locals->Lookup(IncKillVar, value);
+		game->locals->SetAt(IncKillVar, value + 1);
+	}
 
+	if (scriptName[0]) {
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 			if (AppearanceFlags&APP_DEATHVAR) {
 				snprintf(varname, 32, "%s_DEAD", scriptName);
@@ -2836,6 +2842,35 @@ void Actor::Die(Scriptable *killer)
 			snprintf(varname, 32, core->GetDeathVarFormat(), scriptName);
 			game->locals->Lookup(varname, value);
 			game->locals->SetAt(varname, value+1);
+		}
+
+		if (SetDeathVar) {
+			value = 0;
+			snprintf(varname, 32, "%s_DEAD", scriptName);
+			game->locals->Lookup(varname, value);
+			game->locals->SetAt(varname, 1);
+			if (value) {
+				snprintf(varname, 32, "%s_KILL_CNT", scriptName);
+				value = 1;
+				game->locals->Lookup(varname, value);
+				game->locals->SetAt(varname, value + 1);
+			}
+		}
+	}
+		
+	if (IncKillCount) {
+		// racial dead count
+		value = 0;
+		int racetable = core->LoadSymbol("race");
+		if (racetable != -1) {
+			SymbolMgr *race = core->GetSymbol(racetable);
+			const char *raceName = race->GetValue(Modified[IE_RACE]);
+			if (raceName) {
+				// todo: should probably not set this for humans in iwd?
+				snprintf(varname, 32, "KILL_%s_CNT", raceName);
+				game->locals->Lookup(varname, value);
+				game->locals->SetAt(varname, value+1);
+			}
 		}
 	}
 
