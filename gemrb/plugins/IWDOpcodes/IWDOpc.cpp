@@ -1297,7 +1297,7 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 
 //0x103 SummonCreature2
 
-static int eamods[]={EAM_DEFAULT,EAM_SOURCEALLY,EAM_SOURCEENEMY,EAM_NEUTRAL};
+static int eamods[]={EAM_DEFAULT,EAM_SOURCEALLY,EAM_SOURCEENEMY};
 
 int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1315,11 +1315,15 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 	//creature's target is target
 	//position of appearance is target's pos (not sure!!!)
 	int eamod = EAM_DEFAULT;
-	if (fx->Parameter2<4){
+	if (fx->Parameter2<3){
 		eamod = eamods[fx->Parameter2];
 	}
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, target->Pos, eamod, 0, newfx);
+	if (fx->Parameter2 == 3) { // summon at source
+		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, Owner->Pos, eamod, 0, newfx);
+	} else {
+		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, target->Pos, eamod, 0, newfx);
+	}
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
