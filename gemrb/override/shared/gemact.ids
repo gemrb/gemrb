@@ -1,0 +1,5 @@
+IDS
+400 ApplySpellPoint(P:Target,I:Spell*Spell)
+400 ApplySpellPointRES(S:SpellName,P:Target)
+401 ChangeDestination(O:Object,S:Destination)
+402 UnmakeGlobal(O:Object)
