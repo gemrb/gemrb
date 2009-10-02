@@ -97,7 +97,7 @@ static ieWordSigned *dexmod = NULL;
 static ieWordSigned *conmod = NULL;
 static ieWordSigned *chrmod = NULL;
 static ieWordSigned *lorebon = NULL;
-static ieVariable IWDDeathVarFormat = "KILL_%s_CNT";
+//static ieVariable IWDDeathVarFormat = "KILL_%s_CNT";
 static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
 
 Interface::Interface(int iargc, char* iargv[])
@@ -1536,9 +1536,12 @@ int Interface::Init()
 		}
 	}
 
-	if (HasFeature(GF_IWD_DEATHVARFORMAT)) {
-		memcpy(DeathVarFormat, IWDDeathVarFormat, sizeof(ieVariable));
-	}
+	// removed by fuzzie, if you want to do something special for iwd2
+	// then you need a new game flag and to work out what's actually going on,
+	// see Actor::Die
+	//if (HasFeature(GF_IWD_DEATHVARFORMAT)) {
+	//	memcpy(DeathVarFormat, IWDDeathVarFormat, sizeof(ieVariable));
+	//}
 
 	if (HasFeature( GF_HAS_BEASTS_INI )) {
 		printMessage( "Core", "Loading beasts definition File...\n",
