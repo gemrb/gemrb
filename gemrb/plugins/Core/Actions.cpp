@@ -4277,8 +4277,8 @@ void GameScript::GivePartyAllEquipment(Scriptable *Sender, Action* /*parameters*
 		return;
 	}
 	Game *game = core->GetGame();
-	int i = game->GetPartySize(false);
-	while (i--) {
+	// pick the first actor first
+	for (int i = 0; i < game->GetPartySize(false); i++) {
 		Actor *tar = game->GetPC(i,false);
 		//don't try to give self, it would be an infinite loop
 		if (tar==(Actor *) Sender)
