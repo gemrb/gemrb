@@ -5348,7 +5348,7 @@ void GameScript::Hide(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 
-	// TODO: unknown missing failing check; maybe class?
+	// check for disabled dualclassed thieves (not sure if we need it)
 
 	if (actor->Modified[IE_DISABLEDBUTTON] & (1<<ACT_STEALTH)) {
 		HideFailed(actor);
@@ -5371,8 +5371,13 @@ void GameScript::Hide(Scriptable* Sender, Action* /*parameters*/)
 
 	// check how bright our spot is
 	ieDword lightness = game->GetCurrentArea()->GetLightLevel(actor->Pos);
-	ieDword diff = (100 - lightness) * skill/100;
-	if (roll > diff) {
+	// seems to be the color overlay at midnight; lightness of a point with rgb (200, 100, 100)
+	// TODO: but our NightTint computes to a higher value, which one is bad?
+	ieDword ref_lightness = 43;
+	ieDword light_diff = int((lightness - ref_lightness) * 100 / (100 - ref_lightness)) / 2;
+	ieDword chance = (100 - light_diff) * skill/100;
+
+	if (roll > chance) {
 		HideFailed(actor);
 		return;
 	}

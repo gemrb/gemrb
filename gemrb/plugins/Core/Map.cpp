@@ -3164,10 +3164,13 @@ bool Map::DisplayTrackString(Actor *target)
 }
 
 // returns a lightness level in the range of [0-100]
+// since the lightmap is much smaller than the area, we need to interpolate
 unsigned int Map::GetLightLevel(Point &Pos)
 {
 	Color c = LightMap->GetPixel(Pos.x/16, Pos.y/12);
-	return (c.r + c.g + c.b)*100/255/3;
+	// at night/dusk/dawn the lightmap color is adjusted by the color overlay. (Only get's darker.)
+	const Color *tint = core->GetGame()->GetGlobalTint();
+	return ((c.r-tint->r)*114 + (c.g-tint->g)*587 + (c.b-tint->b)*299)/2550;
 }
 
 ////////////////////AreaAnimation//////////////////
