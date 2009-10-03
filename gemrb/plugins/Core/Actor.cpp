@@ -4096,9 +4096,6 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		roundTime = 0;
 		lastattack = 0;
 	}
-
-	//Avenger moved this here from ApplyAllEffects (this one modifies the effect queue)
-	fxqueue.Cleanup();
 }
 
 //idx could be: 0-6, 16-22, 32-38, 48-54

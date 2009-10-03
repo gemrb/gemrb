@@ -634,6 +634,11 @@ void Map::UpdateScripts()
 			continue;
 		}
 
+		//Avenger moved this here from ApplyAllEffects (this one modifies the effect queue)
+		//.. but then fuzzie moved this here from UpdateActorState, because otherwise
+		//immobile actors (see check below) never become mobile again!
+		actor->fxqueue.Cleanup();
+
 		//if the actor is immobile, don't run the scripts
 		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
 			if (actor->Immobile()) {
