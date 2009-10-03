@@ -1311,6 +1311,11 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 			const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ), i );
 			//bool triggerflag = i & 0x4000;
 			i &= 0x3fff;
+			if (i >= MAX_TRIGGERS) {
+				printMessage("GameScript"," ", RED);
+				printf("trigger %d (%s) is too high, ignoring\n", i, triggersTable->GetStringIndex( j ) );
+				continue;
+			}
 			if (triggers[i]) {
 				if (poi && triggers[i]!=poi->Function) {
 					printMessage("GameScript"," ", YELLOW);
@@ -1334,6 +1339,11 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		j = actionsTable->GetSize();
 		while (j--) {
 			i = actionsTable->GetValueIndex( j );
+			if (i >= MAX_ACTIONS) {
+				printMessage("GameScript"," ", RED);
+				printf("action %d (%s) is too high, ignoring\n", i, actionsTable->GetStringIndex( j ) );
+				continue;
+			}
 			const ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ), i );
 			if (actions[i]) {
 				if (poi && actions[i]!=poi->Function) {
@@ -1362,6 +1372,11 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 			j = overrideActionsTable->GetSize();
 			while (j--) {
 				i = overrideActionsTable->GetValueIndex( j );
+				if (i >= MAX_ACTIONS) {
+					printMessage("GameScript"," ", RED);
+					printf("action %d (%s) is too high, ignoring\n", i, overrideActionsTable->GetStringIndex( j ) );
+					continue;
+				}
 				const ActionLink *poi = FindAction( overrideActionsTable->GetStringIndex( j ), i );
 				if (!poi) {
 					continue;
@@ -1378,6 +1393,11 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		j = objectsTable->GetSize();
 		while (j--) {
 			i = objectsTable->GetValueIndex( j );
+			if (i >= MAX_OBJECTS) {
+				printMessage("GameScript"," ", RED);
+				printf("object %d (%s) is too high, ignoring\n", i, objectsTable->GetStringIndex( j ) );
+				continue;
+			}
 			const ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ), i );
 			if (objects[i]) {
 				if (poi && objects[i]!=poi->Function) {
