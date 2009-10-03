@@ -5439,6 +5439,11 @@ int fx_visual_range_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_backstab_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_visual_range_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//this is how it is done in the original engine, i don't know why they would do this
+	//ctrl-r would probably remove it otherwise
+	//Why they didn't fix it in the spell/item is beyond me
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT)
+		fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	STAT_MOD( IE_BACKSTABDAMAGEMULTIPLIER );
 	return FX_APPLIED;
 }
