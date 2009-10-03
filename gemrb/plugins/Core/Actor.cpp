@@ -2827,6 +2827,7 @@ void Actor::Die(Scriptable *killer)
 	}
 
 	if (scriptName[0]) {
+		value = 0;
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 			if (AppearanceFlags&APP_DEATHVAR) {
 				snprintf(varname, 32, "%s_DEAD", scriptName);
