@@ -3113,9 +3113,9 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 				printMessage("GameScript"," ",YELLOW);
 				printf("Sender: %s-->override: %s\n",Sender->GetScriptName(), scr->GetScriptName() );
 			}
-			scr->ReleaseCurrentAction();
 			//Sender->CurrentAction
 			scr->AddAction(ParamCopyNoOverride(aC));
+			scr->ReleaseCurrentAction(); // goes after AddAction, otherwise we might delete aC!
 			// there are plenty of places where it's vital that ActionOverride is not interrupted and if
 			// there are actions left on the queue after the release above, we can't instant-execute,
 			// so this is my best guess for now..
