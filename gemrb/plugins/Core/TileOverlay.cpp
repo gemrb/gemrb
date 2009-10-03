@@ -69,7 +69,7 @@ void TileOverlay::BumpViewport(Region &viewport, Region &vp)
 		vp.y = 0;
 		bump = true;
 	}
-	if( bump ) {
+	if(bump && !(core->timer->ViewportIsMoving())) {
 		core->timer->SetMoveViewPort( vp.x, vp.y, 0, false );
 	}
 }
