@@ -3850,9 +3850,10 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 	default:;
 	}
 	//create replacement; should we be passing the target instead of NULL?
-	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, EAM_DEFAULT,-1, newfx);
-	delete newfx;
+	//noooo, don't unsummon replacement creatures! - fuzzie
+	//Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, EAM_DEFAULT,-1, NULL);
+	//delete newfx;
 	return FX_NOT_APPLIED;
 }
 
