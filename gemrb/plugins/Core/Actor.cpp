@@ -5573,21 +5573,26 @@ void Actor::CreateDerivedStatsBG()
 
 	ieDword backstabdamagemultiplier=GetThiefLevel();
 	if (backstabdamagemultiplier) {
-		AutoTable tm("backstab");
-		//fallback to a general algorithm (bg2 backstab.2da version) if we can't find backstab.2da
-		//TODO: AP_SPCL332 (increase backstab by one) seems to not be effecting this at all
-		//for assassins perhaps the effect is being called prior to this, and this overwrites it;
-		//stalkers work correctly, which is even more odd, considering as they use the same
-		//effect and backstabmultiplier would be 0 for them
-		if (tm)	{
-			ieDword cols = tm->GetColumnCount();
-			if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols;
-			backstabdamagemultiplier = atoi(tm->QueryField(0, backstabdamagemultiplier));
+		// HACK: swashbucklers can't backstab
+		if ((BaseStats[IE_KIT]&0xfff) == 12) {
+			backstabdamagemultiplier = 1;
 		} else {
-			backstabdamagemultiplier = (backstabdamagemultiplier+7)/4;
+			AutoTable tm("backstab");
+			//fallback to a general algorithm (bg2 backstab.2da version) if we can't find backstab.2da
+			//TODO: AP_SPCL332 (increase backstab by one) seems to not be effecting this at all
+			//for assassins perhaps the effect is being called prior to this, and this overwrites it;
+			//stalkers work correctly, which is even more odd, considering as they use the same
+			//effect and backstabmultiplier would be 0 for them
+			if (tm)	{
+				ieDword cols = tm->GetColumnCount();
+				if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols;
+				backstabdamagemultiplier = atoi(tm->QueryField(0, backstabdamagemultiplier));
+			} else {
+				backstabdamagemultiplier = (backstabdamagemultiplier+7)/4;
+			}
+			printf("\n");
+			if (backstabdamagemultiplier>7) backstabdamagemultiplier=7;
 		}
-		printf("\n");
-		if (backstabdamagemultiplier>7) backstabdamagemultiplier=7;
 	}
 
 	// monk's level dictated ac and ac vs missiles bonus
