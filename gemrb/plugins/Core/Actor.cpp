@@ -3999,7 +3999,7 @@ void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagety
 	}
 
 	if (wi) {
-		if (Modified[IE_BACKSTABDAMAGEMULTIPLIER] > 1) {
+		if (BaseStats[IE_BACKSTABDAMAGEMULTIPLIER] > 1) {
  			if (target->Modified[IE_DISABLEBACKSTAB]) {
 				// The backstab seems to have failed
 				core->DisplayConstantString (STR_BACKSTAB_FAIL, 0xffffff);
