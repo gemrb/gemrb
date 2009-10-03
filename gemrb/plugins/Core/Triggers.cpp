@@ -1389,6 +1389,7 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 		}
 		return 0;
 	}
+	// should this be PersonalDistance?
 	int distance = Distance(parameters->pointParameter, scr);
 	if (distance <= ( parameters->int0Parameter * 10 )) {
 		return 1;
@@ -1401,8 +1402,13 @@ int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
+	if (core->HasFeature(GF_HAS_KAPUTZ)) {
+		// we don't understand how this works in pst yet
+		return 1;
+	}
 	Actor *actor = (Actor *) Sender;
 	Point p( (short) actor->GetStat(IE_SAVEDXPOS), (short) actor->GetStat(IE_SAVEDYPOS) );
+	// should this be PersonalDistance?
 	int distance = Distance(p, Sender);
 	if (distance <= ( parameters->int0Parameter * 10 )) {
 		return 1;
