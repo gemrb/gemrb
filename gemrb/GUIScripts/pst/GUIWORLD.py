@@ -27,7 +27,7 @@
 import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import EnableAnimatedWindows, DisableAnimatedWindows, SetEncumbranceButton, SetItemButton, OpenWaitForDiscWindow
+from GUICommonWindows import EnableAnimatedWindows, DisableAnimatedWindows, SetEncumbranceButton, SetItemButton, OpenWaitForDiscWindow, GetWindowPack
 from GUIClasses import GWindow
 
 ContainerWindow = None

@@ -24,6 +24,7 @@
 
 import GemRB
 from GUIDefines import *
+from GUICommonWindows import GetWindowPack
 
 movies = [None,"T1DEATH","T1ABSORB","FINALE"]
 
