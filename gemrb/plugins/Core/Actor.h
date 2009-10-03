@@ -640,5 +640,7 @@ public:
 	void CureSanctuary();
 	/* resets the invisibility, sanctuary and modal states */
 	void ResetState();
+	/* checks whether the actor is behind the target */
+	bool IsBehind(Actor* target);
 };
 #endif

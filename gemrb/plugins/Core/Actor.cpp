@@ -4001,20 +4001,21 @@ void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagety
 
 	if (wi) {
 		if (BaseStats[IE_BACKSTABDAMAGEMULTIPLIER] > 1) {
- 			if (target->Modified[IE_DISABLEBACKSTAB]) {
-				// The backstab seems to have failed
-				core->DisplayConstantString (STR_BACKSTAB_FAIL, 0xffffff);
-			} else {
-				if (wi->backstabbing) {
-					// TODO: in tob you had to be behind the target
-					if (Modified[IE_STATE_ID] & (ieDword) (STATE_INVISIBLE) || Modified[IE_ALWAYSBACKSTAB]) {
-						damage *= Modified[IE_BACKSTABDAMAGEMULTIPLIER];
-						// display a simple message instead of hardcoding multiplier names
-						core->DisplayConstantStringValue (STR_BACKSTAB, 0xffffff, Modified[IE_BACKSTABDAMAGEMULTIPLIER]);
+			if (Modified[IE_STATE_ID] & (ieDword) (STATE_INVISIBLE) || Modified[IE_ALWAYSBACKSTAB]) {
+				if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) ) {
+ 					if (target->Modified[IE_DISABLEBACKSTAB]) {
+						// The backstab seems to have failed
+						core->DisplayConstantString (STR_BACKSTAB_FAIL, 0xffffff);
+					} else {
+						if (wi->backstabbing) {
+							damage *= Modified[IE_BACKSTABDAMAGEMULTIPLIER];
+							// display a simple message instead of hardcoding multiplier names
+							core->DisplayConstantStringValue (STR_BACKSTAB, 0xffffff, Modified[IE_BACKSTABDAMAGEMULTIPLIER]);
+						} else {
+							// weapon is unsuitable for backstab
+							core->DisplayConstantString (STR_BACKSTAB_BAD, 0xffffff);
+						}
 					}
-				} else {
-					// weapon is unsuitable for backstab
-					core->DisplayConstantString (STR_BACKSTAB_BAD, 0xffffff);
 				}
 			}
 		}
@@ -5931,4 +5932,22 @@ void Actor::ResetState()
 	CureInvisibility();
 	CureSanctuary();
 	SetModal(MS_NONE);
+}
+
+// doesn't check the range, but only that the azimuth and the target
+// orientation match with a +/-2 allowed difference
+bool Actor::IsBehind(Actor* target)
+{
+	unsigned char tar_orient = target->GetOrientation();
+	// computed, since we don't care where we face
+	unsigned char my_orient = GetOrient(target->Pos, Pos);
+
+	char diff;
+	for (int i=-2; i <= 2; i++) {
+		diff = my_orient+i;
+		if (diff >= MAX_ORIENT) diff -= MAX_ORIENT;
+		if (diff <= -1) diff += MAX_ORIENT;
+		if (diff == tar_orient) return true;
+	}
+	return false;
 }

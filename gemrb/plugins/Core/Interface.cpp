@@ -2249,6 +2249,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"SelectiveMagicRes",  //40GF_SELECTIVE_MAGIC_RES
 		"HasHideInShadows",   //41GF_HAS_HIDE_IN_SHADOWS
 		"AreaVisitedVar",     //42GF_AREA_VISITED_VAR
+		"ProperBackstab",     //43GF_PROPER_BACKSTAB
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
