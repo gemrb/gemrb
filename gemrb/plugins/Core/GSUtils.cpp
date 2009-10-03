@@ -832,6 +832,13 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 		ab = gamedata->GetCreature(parameters->string0Parameter);
 	}
 
+	if (!ab) {
+		printMessage("GameScript","Failed to create creature! ",LIGHT_RED);
+		printf("(missing creature file %s?)\n", parameters->string0Parameter);
+		// maybe this should abort()?
+		return;
+	}
+
 	//iwd2 allows an optional scriptname to be set
 	//but bg2 doesn't have this feature
 	//this way it works for both games
