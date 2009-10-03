@@ -97,6 +97,8 @@ int COGGReader::init_reader()
 	return 1;
 }
 
+void fix_endian(ieWord &dest);
+
 int COGGReader::read_samples(short* buffer, int count)
 {
 	int whatisthis;
@@ -120,6 +122,12 @@ int COGGReader::read_samples(short* buffer, int count)
 		samples_need-=rd;
 	}
 	samples_left-=samples_got;
+	if (stream->IsEndianSwitch()) {
+		for (size_t i = 0; i < (size_t)samples_got; i++) {
+			fix_endian(((ieWord *)buffer-samples_got)[i]);
+		}
+	}
+
 	return samples_got;
 }
 
