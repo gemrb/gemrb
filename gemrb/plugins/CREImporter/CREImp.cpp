@@ -1783,17 +1783,17 @@ void CREImp::GetActorIWD2(Actor *act)
 	for(i=0;i<8;i++) {
 		for(int lev=0;lev<9;lev++) {
 			//if everything is alright, then this seek is not needed
-			str->Seek(ClassSpellOffsets[i*9+lev], GEM_STREAM_START);
+			str->Seek(CREOffset+ClassSpellOffsets[i*9+lev], GEM_STREAM_START);
 			GetIWD2Spellpage(act, (ieIWD2SpellType) i, lev, ClassSpellCounts[i*9+lev]);
 		}
 	}
-	str->Seek(InnateOffset, GEM_STREAM_START);
+	str->Seek(CREOffset+InnateOffset, GEM_STREAM_START);
 	GetIWD2Spellpage(act, IE_IWD2_SPELL_INNATE, 0, InnateCount);
 
-	str->Seek(SongOffset, GEM_STREAM_START);
+	str->Seek(CREOffset+SongOffset, GEM_STREAM_START);
 	GetIWD2Spellpage(act, IE_IWD2_SPELL_SONG, 0, SongCount);
 
-	str->Seek(ShapeOffset, GEM_STREAM_START);
+	str->Seek(CREOffset+ShapeOffset, GEM_STREAM_START);
 	GetIWD2Spellpage(act, IE_IWD2_SPELL_SHAPE, 0, ShapeCount);
 }
 
