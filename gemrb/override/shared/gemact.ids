@@ -1,5 +1,5 @@
 IDS
-400 ApplySpellPoint(P:Target,I:Spell*Spell)
-400 ApplySpellPointRES(S:SpellName,P:Target)
-401 ChangeDestination(O:Object,S:Destination)
-402 UnmakeGlobal(O:Object)
+399 ApplySpellPoint(P:Target*,I:Spell*Spell)
+399 ApplySpellPointRES(P:Target*,S:SpellName*)
+398 ChangeDestination(O:Object*,S:Destination*)
+397 UnmakeGlobal(O:Object*)
