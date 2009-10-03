@@ -1772,6 +1772,9 @@ const char* Interface::TypeExt(SClass_ID type) const
 		case IE_MVE_CLASS_ID:
 			return ".mve";
 
+		case IE_OGG_CLASS_ID:
+			return ".ogg";
+
 		case IE_PLT_CLASS_ID:
 			return ".plt";
 

@@ -54,6 +54,7 @@ typedef unsigned long SClass_ID;
 #define IE_MOS_CLASS_ID			0x000003EC
 #define IE_MUS_CLASS_ID			0x00040000
 #define IE_MVE_CLASS_ID			0x00000002
+#define IE_OGG_CLASS_ID			0x00000007
 #define IE_PLT_CLASS_ID			0x00000006
 #define IE_PRO_CLASS_ID			0x000003FD
 #define IE_SAV_CLASS_ID			0x00050000

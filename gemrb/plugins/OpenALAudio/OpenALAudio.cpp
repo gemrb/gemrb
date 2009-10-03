@@ -235,6 +235,8 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 	//no cache entry...
 	DataStream* stream = core->GetResourceMgr()->GetResource(ResRef, IE_WAV_CLASS_ID);
 	if (!stream)
+		stream = core->GetResourceMgr()->GetResource(ResRef, IE_OGG_CLASS_ID);
+	if (!stream)
 		return 0;
 
 	alGenBuffers(1, &Buffer);
