@@ -5566,6 +5566,11 @@ void Actor::CreateDerivedStatsBG()
 		if (turnundeadlevel<0) turnundeadlevel=0;
 	}
 
+	// barbarian immunity to backstab was hardcoded
+	if (GetBarbarianLevel()) {
+		BaseStats[IE_DISABLEBACKSTAB] = 1;
+	}
+
 	ieDword backstabdamagemultiplier=GetThiefLevel();
 	if (backstabdamagemultiplier) {
 		AutoTable tm("backstab");
@@ -5721,6 +5726,11 @@ ieDword Actor::GetClassLevel(const ieDword id) const
 	ieDword	classid = BaseStats[IE_CLASS]-1;
 	if (classid>=(ieDword)classcount || !levelslots[classid])
 		return 0;
+
+	//handle barbarians specially, since they're kits and not in levelslots
+	if (id == ISBARBARIAN && levelslots[classid][ISFIGHTER]) {
+		return BaseStats[IE_LEVEL];
+	}
 
 	//get the levelid (IE_LEVEL,*2,*3)
 	ieDword levelid = levelslots[classid][id];
