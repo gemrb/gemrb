@@ -788,6 +788,17 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				if (!lastActor) {
 					lastActor = area->GetActor( p, GA_DEFAULT);
 				}
+				if (!lastActor) {
+					// ValidTarget never returns immobile targets, making debugging a nightmare
+					// so if we don't have an actor, we make really really sure by checking manually
+					unsigned int count = area->GetActorCount(true);
+					while (count--) {
+						Actor *actor = area->GetActor(count, true);
+						if (actor->IsOver(p)) {
+							actor->DebugDump();
+						}
+					}
+				}
 				if (lastActor) {
 					lastActor->DebugDump();
 					break;
