@@ -102,6 +102,10 @@ Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)
 			frame = 0;
 		}
 		MapIcon = bam->GetFrame((ieWord) frame, (ieByte) IconSeq);
+		if (!MapIcon) {
+			printf("WMPAreaEntry::GetMapIcon failed for frame %d, seq %d\n", frame, IconSeq);
+			return NULL;
+		}
 		if (color>=0) {
 			// Note: should a game use the same map icon for two different
 			// map locations, we have to duplicate the MapIcon sprite here.
