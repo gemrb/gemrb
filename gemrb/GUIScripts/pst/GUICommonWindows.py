@@ -202,11 +202,12 @@ def SetupActionsWindowControls (Window):
 def GetActorPortrait (actor, which):
 	#return GemRB.GetPlayerPortrait( actor, which)
 
+	PortraitTable = GemRB.LoadTableObject ("PDOLLS")
 	# only the lowest byte is meaningful here (OneByteAnimID)
 	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID) & 255
 	row = "0x%02X" %anim_id
 
-	return AppearanceAvatarTable.GetValue (row, which)
+	return PortraitTable.GetValue (row, which)
 	
 
 def UpdateAnimation ():
