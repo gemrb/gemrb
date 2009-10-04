@@ -947,22 +947,39 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 	}
 }
 
-void EscapeAreaCore(Actor* src, const char* resref, Point &enter, Point &exit, int flags)
+void EscapeAreaCore(Scriptable* Sender, Point &p, const char* area, Point &enter, int flags, int wait)
 {
 	char Tmp[256];
+
+	printf("EscapeAreaCore for %s, at point [%d.%d], flags:%d\n", Sender->GetScriptName(), p.x, p.y, flags);
+	if ( !p.isempty() && PersonalDistance(p, Sender)>MAX_OPERATING_DISTANCE) {
+		//MoveNearerTo will return 0, if the actor is in move
+		//it will return 1 (the fourth parameter) if the target is unreachable
+		if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE,1) ) {
+			printf("MoveNearerTo works now.\n");
+			if (!Sender->InMove()) printf("At least it said so...\n");
+			return;
+		}
+	}
 
 	if (flags &EA_DESTROY) {
 		//this must be put into a non-const variable
 		sprintf( Tmp, "DestroySelf()" );
 	} else {
 		// last parameter is 'face', which should be passed from relevant action parameter..
-		sprintf( Tmp, "MoveBetweenAreas(\"%s\",[%hd.%hd],%d)", resref, enter.x, enter.y, 0 );
+		sprintf( Tmp, "MoveBetweenAreas(\"%s\",[%hd.%hd],%d)", area, enter.x, enter.y, 0 );
 	}
-	src->AddActionInFront( GenerateAction( Tmp) );
-	// all of the callers are completely broken, so i disabled this for now
-	(void)exit;
-	/*sprintf( Tmp, "MoveToPoint([%hd.%hd])", exit.x, exit.y );
-	src->AddActionInFront( GenerateAction( Tmp) );*/
+	printf("Executing %s\n", Tmp);
+	//drop this action, but add another (destroyself or movebetweenareas)
+	//between the arrival and the final escape, there should be a wait time
+	//that wait time could be handled here
+	if (wait) {
+		printf("But wait a bit... (%d)\n", wait);
+		Sender->SetWait(wait);
+	}
+	Sender->ReleaseCurrentAction();
+	Action * action = GenerateAction( Tmp);
+	Sender->AddActionInFront( action );
 }
 
 void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
@@ -1834,15 +1851,18 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 		distance += ((Actor *)target)->size*10;
 	}
 
-	MoveNearerTo(Sender, p, distance);
+	MoveNearerTo(Sender, p, distance, 0);
 }
 
-void MoveNearerTo(Scriptable *Sender, Point &p, int distance)
+//It is not always good to release the current action if target is unreachable
+//we should also raise the trigger TargetUnreachable (if this is an Attack, at least)
+//i hacked only this low level function, didn't need the higher ones so far
+int MoveNearerTo(Scriptable *Sender, Point &p, int distance, int dont_release)
 {
 	if (Sender->Type != ST_ACTOR) {
 		printMessage("GameScript","MoveNearerTo only works with actors\n",LIGHT_RED);
 		Sender->ReleaseCurrentAction();
-		return;
+		return 0;
 	}
 
 	Actor *actor = (Actor *)Sender;
@@ -1852,11 +1872,16 @@ void MoveNearerTo(Scriptable *Sender, Point &p, int distance)
 	}
 
 	if (!actor->InMove()) {
+		//didn't release
+		if (dont_release) {
+			return dont_release;
+		}
 		// we can't walk any nearer to destination, give up
 		Sender->ReleaseCurrentAction();
 	}
+	return 0;
 }
-
+/*
 void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool flag, int distance)
 {
 	Point p;
@@ -1882,7 +1907,7 @@ void GoNearAndRetry(Scriptable *Sender, Point &p, int distance)
 	action->int0Parameter = distance+1;
 	Sender->AddActionInFront( action );
 }
-
+*/
 void FreeSrc(SrcVector *poi, const ieResRef key)
 {
 	int res = SrcCache.DecRef((void *) poi, key, true);

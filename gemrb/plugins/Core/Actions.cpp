@@ -2291,7 +2291,8 @@ void GameScript::RemoveTraps(Scriptable* Sender, Action* parameters)
 			//core->DisplayString(STR_NOT_TRAPPED);
 		}
 	} else {
-		GoNearAndRetry(Sender, *p, MAX_OPERATING_DISTANCE);
+		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE,0);
+		return;
 	}
 	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction();
@@ -2354,7 +2355,8 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 			//core->DisplayString(STR_NOT_LOCKED);
 		}
 	} else {
-		GoNearAndRetry(Sender, *p, MAX_OPERATING_DISTANCE);
+		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE,0);
+		return;
 	}
 	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction();
@@ -2448,7 +2450,8 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 		door->TriggerTrap(0, actor->GetID());
 		door->SetDoorOpen( !door->IsOpen(), true, actor->GetID() );
 	} else {
-		GoNearAndRetry(Sender, *p, MAX_OPERATING_DISTANCE);
+		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE,0);
+		return;
 	}
 	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction();
@@ -2567,7 +2570,7 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 
 		//move near to target
 		if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
-			MoveNearerTo(Sender,parameters->pointParameter,dist);
+			MoveNearerTo(Sender,parameters->pointParameter,dist, 0);
 			return;
 		}
 
@@ -4210,8 +4213,7 @@ void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	if (Distance(parameters->pointParameter, Sender) > 10) {
-		GoNearAndRetry(Sender, parameters->pointParameter, 10);
-		Sender->ReleaseCurrentAction();
+		MoveNearerTo(Sender, parameters->pointParameter, 10,0);
 		return;
 	}
 	Actor *scr = (Actor *) Sender;
@@ -4287,6 +4289,7 @@ void GameScript::GivePartyAllEquipment(Scriptable *Sender, Action* /*parameters*
 	}
 }
 
+//This is unsure, Plunder could be just handling ground piles and not dead actors
 void GameScript::Plunder(Scriptable *Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -4294,7 +4297,7 @@ void GameScript::Plunder(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
-	if (!tar || tar->Type!=ST_ACTOR) {
+	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -4305,15 +4308,16 @@ void GameScript::Plunder(Scriptable *Sender, Action* parameters)
 		return;
 	}
 
-	Actor *scr = (Actor *) tar;
-	//can plunder only dead actors
-	if (! (scr->BaseStats[IE_STATE_ID]&STATE_DEAD) ) {
-		Sender->ReleaseCurrentAction();
-		return;
+	if (tar->Type == ST_ACTOR) {
+		Actor *scr = (Actor *) tar;
+		//can plunder only dead actors
+		if (! (scr->BaseStats[IE_STATE_ID]&STATE_DEAD) ) {
+			Sender->ReleaseCurrentAction();
+			return;
+		}
 	}
 	if (PersonalDistance(Sender, tar)>MAX_OPERATING_DISTANCE ) {
-		GoNearAndRetry(Sender, tar, false, MAX_OPERATING_DISTANCE);
-		Sender->ReleaseCurrentAction();
+		MoveNearerTo(Sender, tar->Pos, MAX_OPERATING_DISTANCE,0);
 		return;
 	}
 	//move all movable item from the target to the Sender
@@ -4356,8 +4360,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	//for PP one must go REALLY close
 
 	if (PersonalDistance(Sender, tar)>10 ) {
-		GoNearAndRetry(Sender, tar, true, 10+snd->size+scr->size);
-		Sender->ReleaseCurrentAction();
+		MoveNearerTo(Sender, tar, 10);
 		return;
 	}
 
@@ -5222,8 +5225,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	GoNearAndRetry(Sender, container, false, needed);
-	Sender->ReleaseCurrentAction();
+	MoveNearerTo(Sender, container, needed);
 }
 
 //call the usecontainer action in target (not used)
@@ -5510,66 +5512,108 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 /*EscapeAreaMove(S:Area*,I:X*,I:Y*,I:Face*)*/
 void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 {
+printf("EscapeArea/EscapeAreaMove\n");
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Map *map = Sender->GetCurrentArea();
 	if (!map) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	Point p = Sender->Pos;
 	map->TMap->AdjustNearestTravel(p);
 
-	Sender->SetWait(5);
-
 	if (parameters->string0Parameter[0]) {
 		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
-		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, q, p, 0 );
+		EscapeAreaCore( Sender, p, parameters->string0Parameter, q, 0, parameters->int2Parameter );
 	} else {
-		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, p, EA_DESTROY );
+		EscapeAreaCore( Sender, p, parameters->string0Parameter, p, EA_DESTROY, parameters->int0Parameter );
 	}
-	Sender->ReleaseCurrentAction();
+	//EscapeAreaCore will do its ReleaseCurrentAction
+	//Sender->ReleaseCurrentAction();
 }
 
 void GameScript::EscapeAreaDestroy(Scriptable* Sender, Action* parameters)
 {
+printf("EscapeAreaDestroy\n");
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
+	Map *map = Sender->GetCurrentArea();
+	if (!map) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	//find nearest exit
-	Point p(0,0);
-	Sender->SetWait(parameters->int0Parameter);
-	EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, p, EA_DESTROY );
+	Point p = Sender->Pos;
+	map->TMap->AdjustNearestTravel(p);
+	//EscapeAreaCore will do its ReleaseCurrentAction
+	EscapeAreaCore( Sender, p, parameters->string0Parameter, p, EA_DESTROY, parameters->int0Parameter );
 }
 
 /*EscapeAreaObjectMove(S:Area*,I:X*,I:Y*,I:Face*)*/
 void GameScript::EscapeAreaObject(Scriptable* Sender, Action* parameters)
 {
-	// this is completely wrong, we're meant to escape USING the provided object!
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (tar && tar->Type == ST_ACTOR) {
-		//find nearest exit
-		Point p(0,0);
-		if (parameters->string0Parameter[0]) {
-			Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
-			EscapeAreaCore((Actor *) tar, parameters->string0Parameter, q, p, 0 );
-		} else {
-			EscapeAreaCore((Actor *) tar, 0, p, p, EA_DESTROY );
-		}
+printf("EscapeAreaObject\n");
+	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
 	}
+	Map *map = Sender->GetCurrentArea();
+	if (!map) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Point p = tar->Pos;
+	if (parameters->string0Parameter[0]) {
+		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
+		EscapeAreaCore( Sender, p, parameters->string0Parameter, q, 0, parameters->int2Parameter );
+	} else {
+		EscapeAreaCore( Sender, p, 0, p, EA_DESTROY, parameters->int0Parameter );
+	}
+	//EscapeAreaCore will do its ReleaseCurrentAction
 }
 
+//This one doesn't require the object to be seen?
+//We don't have that feature yet, so this is the same as EscapeAreaObject
 void GameScript::EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters)
 {
-	// this is completely wrong, we're meant to escape USING the provided object!
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (tar && tar->Type == ST_ACTOR) {
-		//find nearest exit
-		Point p(0,0);
-		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
-		EscapeAreaCore((Actor *) tar, parameters->string0Parameter, q, p, EA_DESTROY );
+printf("EscapeAreaObjectNoSee\n");
+	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
 	}
+	Map *map = Sender->GetCurrentArea();
+	if (!map) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Point p = tar->Pos;
+	Sender->SetWait(parameters->int0Parameter);
+	if (parameters->string0Parameter[0]) {
+		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
+		EscapeAreaCore( Sender, p, parameters->string0Parameter, q, 0, parameters->int2Parameter );
+	} else {
+		EscapeAreaCore( Sender, p, 0, p, EA_DESTROY|EA_NOSEE, parameters->int0Parameter );
+	}
+	//EscapeAreaCore will do its ReleaseCurrentAction
 }
 
 //takes first fitting item from container at feet, doesn't seem to be working in the original engines
@@ -6052,8 +6096,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	unsigned int dist = GetItemDistance(itemres, header);
 
 	if (PersonalDistance(tar->Pos, Sender) > dist) {
-		GoNearAndRetry(Sender, tar, true, dist);
-		Sender->ReleaseCurrentAction();
+		MoveNearerTo(Sender, tar, dist);
 		return;
 	}
 
@@ -6099,8 +6142,7 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 	unsigned int dist = GetItemDistance(itemres, header);
 
 	if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
-		GoNearAndRetry(Sender, parameters->pointParameter, dist);
-		Sender->ReleaseCurrentAction();
+		MoveNearerTo(Sender, parameters->pointParameter, dist, 0);
 		return;
 	}
 
