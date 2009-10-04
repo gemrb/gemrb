@@ -145,6 +145,7 @@ GameControl::GameControl(void)
 	originalTargetID = 0;
 	speakerID = 0;
 	targetOB = NULL;
+	DisplayText = NULL;
 }
 
 //TODO:
@@ -566,6 +567,17 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		video->DrawRect( point, red );
 	}
 
+	if (core->HasFeature(GF_ONSCREEN_TEXT) && DisplayText) {
+		core->GetFont(1)->Print(screen, (unsigned char *)DisplayText, core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true);
+		if (update_scripts) {
+			// just replicating original engine behaviour
+			if (DisplayTextTime == 0) {
+				SetDisplayText((char *)NULL, 0);
+			} else {
+				DisplayTextTime--;
+			}
+		}
+	}
 }
 
 /** inherited from Control, GameControl doesn't need it */
@@ -969,6 +981,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			DialogueFlags ^= DF_FREEZE_SCRIPTS;
 	 		if (DialogueFlags&DF_FREEZE_SCRIPTS) {
 				core->DisplayConstantString(STR_PAUSED,0xff0000);
+				SetDisplayText(STR_PAUSED, 0); // time 0 = removed instantly on unpause
 		 	} else {
 				core->DisplayConstantString(STR_UNPAUSED,0xff0000);
 			}
@@ -2912,4 +2925,18 @@ void GameControl::SetupCasting(int type, int level, int idx, Actor *u, int targe
 bool GameControl::SetEvent(int /*eventType*/, const char * /*handler*/)
 {
 	return false;
+}
+
+void GameControl::SetDisplayText(char *text, unsigned int time)
+{
+	if (DisplayText) {
+		core->FreeString(DisplayText);
+	}
+	DisplayTextTime = time;
+	DisplayText = text;
+}
+
+void GameControl::SetDisplayText(ieStrRef text, unsigned int time)
+{
+	SetDisplayText(core->GetString(core->GetStringReference(text), 0), time);
 }

@@ -508,8 +508,14 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	// Save succesful / Quick-save succesful
 	if (index == 1) {
 		core->DisplayConstantString(STR_QSAVESUCCEED, 0xbcefbc);
+		if (core->GetGameControl()) {
+			core->GetGameControl()->SetDisplayText(STR_QSAVESUCCEED, 30);
+		}
 	} else {
 		core->DisplayConstantString(STR_SAVESUCCEED, 0xbcefbc);
+		if (core->GetGameControl()) {
+			core->GetGameControl()->SetDisplayText(STR_SAVESUCCEED, 30);
+		}
 	}
 	return 0;
 }

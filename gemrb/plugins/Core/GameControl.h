@@ -145,6 +145,8 @@ private:
 	unsigned long AIUpdateCounter;
 	int ScreenFlags;
 	int DialogueFlags;
+	char *DisplayText;
+	unsigned int DisplayTextTime;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
@@ -170,6 +172,8 @@ public: //Events
 	int GetDialogueFlags() { return DialogueFlags; }
 	/** this function is called from the area when autosave is needed */
 	void AutoSave();
+	void SetDisplayText(char *text, unsigned int time);
+	void SetDisplayText(ieStrRef text, unsigned int time);
 private:
 	/** this function is called when the user presses 'q' (or equivalent) */
 	void QuickSave();
