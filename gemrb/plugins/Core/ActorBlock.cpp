@@ -1990,6 +1990,11 @@ bool InfoPoint::Entered(Actor *actor)
 	if (Type == ST_TRAVEL && PersonalDistance(TrapLaunch, actor)<MAX_OPERATING_DISTANCE) {
 		goto check;
 	}
+	// fuzzie can't escape pst's ar1405 without this one, maybe we should really be checking
+	// for distance from the outline for travel regions instead?
+	if (Type == ST_TRAVEL && PersonalDistance(TalkPos, actor)<MAX_OPERATING_DISTANCE) {
+		goto check;
+	}
 	if (Flags&TRAP_USEPOINT) {
 		if (PersonalDistance(UsePoint, actor)<MAX_OPERATING_DISTANCE) {
 			goto check;
