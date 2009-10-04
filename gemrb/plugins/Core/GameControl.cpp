@@ -2327,10 +2327,6 @@ void GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgre
 		delete dlg;
 		dlg = NULL;
 	}
-	if (tgt->GetInternalFlag()&IF_NOINT) {
-		core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
-		return;
-	}
 
 	DialogMgr* dm = ( DialogMgr* ) core->GetInterface( IE_DLG_CLASS_ID );
 	dm->Open( core->GetResourceMgr()->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
@@ -2601,6 +2597,14 @@ void GameControl::DialogChoose(unsigned int choose)
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
+			if (target->GetInternalFlag()&IF_NOINT) {
+				// this whole check moved out of InitDialog by fuzzie, see comments
+				// for the IF_NOINT check in BeginDialog
+				core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+				ta->SetMinRow( false );
+				EndDialog();
+				return;
+			}
 			InitDialog( speaker, target, tmpresref );
 			if (!dlg) {
 				// error was displayed by InitDialog

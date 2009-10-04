@@ -1223,6 +1223,15 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	//no, we shouldn't even call this!
 	//Sender->ReleaseCurrentAction();
 
+	// moved this here from InitDialog, because InitDialog doesn't know which side is which
+	// post-swap (and non-actors always have IF_NOINT set) .. also added a check that it's
+	// actually busy doing something, for the same reason
+	if (target->GetInternalFlag()&IF_NOINT && (target->GetCurrentAction() || target->GetNextAction())) {
+		core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	if (speaker!=target) {
 		if (swap) {
 			Scriptable *tmp = tar;
