@@ -222,10 +222,10 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	switch (fx->Parameter2&0x30000) {
 	case 0x20000://foreground
-		sca->twin->ZPos+=9999;
+		sca->ZPos+=9999;
 		break;
 	case 0x30000: //both
-		sca->twin->ZPos+=9999;
+		sca->ZPos+=9999;
 		if (sca->twin) {
 			sca->twin->ZPos-=9999;
 		}
