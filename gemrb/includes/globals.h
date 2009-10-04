@@ -138,9 +138,10 @@
 #define  GF_SELECTIVE_MAGIC_RES    	40 //bg2, iwd2, (how)
 #define  GF_HAS_HIDE_IN_SHADOWS    	41 // not in bg1 and pst
 #define  GF_AREA_VISITED_VAR    	42 //iwd, iwd2
-#define  GF_PROPER_BACKSTAB         43 //bg2, iwd2, how?
+#define  GF_PROPER_BACKSTAB     	43 //bg2, iwd2, how?
+#define  GF_ONSCREEN_TEXT       	44 //pst
 //update this
-#define GF_COUNT 44
+#define GF_COUNT 45
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

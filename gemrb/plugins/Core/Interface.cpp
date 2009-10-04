@@ -2250,6 +2250,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"HasHideInShadows",   //41GF_HAS_HIDE_IN_SHADOWS
 		"AreaVisitedVar",     //42GF_AREA_VISITED_VAR
 		"ProperBackstab",     //43GF_PROPER_BACKSTAB
+		"OnScreenText",       //44GF_ONSCREEN_TEXT
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
