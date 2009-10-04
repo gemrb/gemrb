@@ -5939,7 +5939,7 @@ bool Actor::IsBehind(Actor* target)
 	// computed, since we don't care where we face
 	unsigned char my_orient = GetOrient(target->Pos, Pos);
 
-	char diff;
+	signed char diff;
 	for (int i=-2; i <= 2; i++) {
 		diff = my_orient+i;
 		if (diff >= MAX_ORIENT) diff -= MAX_ORIENT;
