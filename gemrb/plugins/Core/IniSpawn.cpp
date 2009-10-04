@@ -695,7 +695,7 @@ void IniSpawn::InitialSpawn()
 	SpawnGroup(enterspawn);
 	//these variables are set when entering first
 	for (int i=0;i<localscount;i++) {
-		SetVariable(map, Locals[i].Name,"LOCALS", NamelessVar[i].Value);
+		SetVariable(map, Locals[i].Name,"LOCALS", Locals[i].Value);
 	}
 }
 
