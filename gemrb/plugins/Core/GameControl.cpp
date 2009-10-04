@@ -2519,6 +2519,7 @@ void GameControl::DialogChoose(unsigned int choose)
 			// executing actions directly does not work, because dialog
 			// needs to end before final actions are executed due to
 			// actions making new dialogs!
+			if (target->Type == ST_ACTOR) ((Movable *)target)->ClearPath(); // fuzzie added this
 			target->ClearActions();
 
 			for (unsigned int i = 0; i < tr->action->count; i++) {
