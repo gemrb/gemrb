@@ -244,7 +244,6 @@ def OpenSaveDetailWindow ():
 		
 	Edit = Window.GetControl (1)
 	Edit.SetText (Slotname)
-	Edit.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	Edit.SetEvent (IE_GUI_EDIT_ON_CHANGE, "CheckSaveName")
 	Edit.SetEvent (IE_GUI_EDIT_ON_DONE, "ConfirmedSaveGame")
 
@@ -265,6 +264,7 @@ def OpenSaveDetailWindow ():
 	CheckSaveName ()
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	Edit.SetStatus (IE_GUI_CONTROL_FOCUSED) # ShowModal will happily reset this..
 
 
 # Disable Save/Overwrite button if the save slotname is empty,
