@@ -1821,7 +1821,7 @@ void Door::DebugDump()
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	printf( "Script: %s, Key (%s) removed: %s\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY) );
+	printf( "Script: %s, Key (%s) removed: %s, Dialog: %s\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog );
 }
 
 /*******************
