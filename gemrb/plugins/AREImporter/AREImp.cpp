@@ -395,7 +395,12 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	if( map->RestHeader.CreatureNum>MAX_RESCOUNT ) {
 		map->RestHeader.CreatureNum = MAX_RESCOUNT;
 	}
-	str->Seek( 14, GEM_CURRENT_POS );
+	str->Seek( 2, GEM_CURRENT_POS );              //difficulty?
+	str->ReadDword( &map->RestHeader.sduration);  //spawn duration
+	str->ReadWord( &map->RestHeader.rwdist);      //random walk distance
+	str->ReadWord( &map->RestHeader.owdist);      //other walk distance
+	str->ReadWord( &map->RestHeader.Maximum);     //maximum number of creatures
+	str->Seek( 2, GEM_CURRENT_POS );
 	str->ReadWord( &map->RestHeader.DayChance );
 	str->ReadWord( &map->RestHeader.NightChance );
 
@@ -820,7 +825,8 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		ieResRef creatures[MAX_RESCOUNT];
 		ieWord DayChance, NightChance;
 		ieDword Schedule;
-		ieByte Unknown7c[8];
+		ieDword sduration;
+		ieWord rwdist, owdist;
 
 		str->Read( Name, 32 );
 		Name[32] = 0;
@@ -833,7 +839,9 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &Difficulty);
 		str->ReadWord( &Frequency );
 		str->ReadWord( &Method);
-		str->Read( Unknown7c, 8); //skipping unknowns
+		str->ReadDword( &sduration); //time to live for spawns
+		str->ReadWord( &rwdist);     //random walk distance (0 is unlimited)
+		str->ReadWord( &owdist);     //other walk distance (inactive in all engines?)
 		str->ReadWord( &Maximum);
 		str->ReadWord( &Enabled);
 		str->ReadDword( &Schedule);
@@ -849,8 +857,9 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		}
 		sp->Frequency = Frequency;
 		sp->Method = Method;
-		//these seem to be one dword, and two words
-		memcpy(sp->unknown7c, Unknown7c, sizeof(Unknown7c));
+		sp->sduration = sduration;
+		sp->rwdist = rwdist;
+		sp->owdist = owdist;
 		sp->Maximum = Maximum;
 		sp->Enabled = Enabled;
 		sp->appearance = Schedule;
@@ -1757,7 +1766,9 @@ int AREImp::PutSpawns( DataStream *stream, Map *map)
 		stream->WriteWord( &sp->Difficulty);
 		stream->WriteWord( &sp->Frequency);
 		stream->WriteWord( &sp->Method);
-		stream->Write( sp->unknown7c, 8); //these values may actually mean something, but we don't care now
+		stream->WriteDword( &sp->sduration); //spawn duration
+		stream->WriteWord( &sp->rwdist);     //random walk distance
+		stream->WriteWord( &sp->owdist);     //other walk distance
 		stream->WriteWord( &sp->Maximum);
 		stream->WriteWord( &sp->Enabled);
 		stream->WriteDword( &sp->appearance);

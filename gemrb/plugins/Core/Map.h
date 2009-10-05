@@ -114,8 +114,11 @@ struct RestHeaderType {
 	ieDword Strref[MAX_RESCOUNT];
 	ieResRef CreResRef[MAX_RESCOUNT];
 	ieWord CreatureNum;
+	ieWord Maximum;
 	ieWord DayChance;
 	ieWord NightChance;
+	ieDword sduration;
+	ieWord rwdist, owdist;
 };
 
 struct Entrance {
@@ -143,7 +146,8 @@ public:
 	ieWord Difficulty;
 	ieWord Frequency;
 	ieWord Method;
-	ieByte unknown7c[8];
+	ieDword sduration;      //spawn duration
+	ieWord rwdist, owdist;  //maximum walk distances
 	ieWord Maximum;
 	ieWord Enabled;
 	ieDword appearance;
