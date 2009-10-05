@@ -633,6 +633,7 @@ void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 
 void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
+	if (actor->InParty) core->GetGame()->SelectActor(actor, false, SELECT_NORMAL);
 	actor->SetCircleSize();
 }
 
@@ -2291,6 +2292,7 @@ void Actor::Panic()
 		//already in panic
 		return;
 	}
+	if (InParty) core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 	SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 	DisplayStringCore(this, VB_PANIC, DS_CONSOLE|DS_CONST );
 }

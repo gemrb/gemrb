@@ -855,6 +855,7 @@ void Selectable::DrawCircle(Region &vp)
 	bright green for selected party members
 	flashing green/white for a party member the mouse is over
 	bright red for enemies
+	yellow for panicked actors
 	flashing red/white for enemies the mouse is over
 	flashing cyan/white for neutrals the mouse is over
 	*/
