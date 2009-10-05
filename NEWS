@@ -1,17 +1,18 @@
-GemRB svn (7259):
+GemRB svn (7367):
   New features:
     - 
-    - evasion and backstabbing
-    - beginnings of wild magic support
+    - BG1 and IWD are roughly completable!
+    - dream cutscenes in ToB
+    - evasion, backstabbing and basic hide in shadows
     - more hardcoded projectiles
     - levelup support for bg1 and iwd
-    - contingency and sequencer spells
+    - contingency and sequencer spells, beginnings of wild magic support
     - compatibility with the widescreen mod (unreleased) allows for multiple
       custom resolutions
 
   Improved features:
     - 
-    - combat
+    - combat, travelling and feedback
     - better spellcasting timing
     - actions, effects and triggers
     - various guiscripts
