@@ -5733,7 +5733,7 @@ ieDword Actor::GetClassLevel(const ieDword id) const
 		return 0;
 
 	//handle barbarians specially, since they're kits and not in levelslots
-	if (id == ISBARBARIAN && levelslots[classid][ISFIGHTER]) {
+	if (id == ISBARBARIAN && levelslots[classid][ISFIGHTER] && GetKitIndex(BaseStats[IE_KIT]) == 31) {
 		return BaseStats[IE_LEVEL];
 	}
 
