@@ -5690,6 +5690,8 @@ Actor *Actor::CopySelf() const
 	newActor->SetName(GetName(0),0);
 	newActor->SetName(GetName(1),1);
 	memcpy(newActor->BaseStats, BaseStats, sizeof(BaseStats) );
+	// illusions aren't worth any xp
+	newActor->BaseStats[IE_XPVALUE] = 0;
 
 	//IF_INITIALIZED shouldn't be set here, yet
 	newActor->SetMCFlag(MC_EXPORTABLE, BM_NAND);
