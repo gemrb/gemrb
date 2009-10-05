@@ -1565,10 +1565,11 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 static void ParseIdsTarget(const char *&src, Object *&object)
 {
 	for (int i=0;i<ObjectFieldsCount;i++) {
-			object->objectFields[i]=GetIdsValue(src, ObjectIDSTableNames[i]);
+		object->objectFields[i]=GetIdsValue(src, ObjectIDSTableNames[i]);
 		if (*src!='.') {
 			break;
 		}
+		src++;
 	}
 	src++; //skipping ]
 }
