@@ -846,7 +846,7 @@ def LoadCommonTables():
 	print # so the following output isn't appended to an existing line
 	if not ClassTable:
 		ClassTable = GemRB.LoadTableObject ("classes")
-	if not KitListTable:
+	if not KitListTable and GemRB.HasResource("kitlist", RES_2DA):
 		KitListTable = GemRB.LoadTableObject ("kitlist")
 	if not ClassSkillsTable:
 		ClassSkillsTable = GemRB.LoadTableObject ("clskills")
