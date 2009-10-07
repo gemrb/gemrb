@@ -30,22 +30,6 @@
 #include "../Core/Palette.h"
 #include "../Core/AnimationFactory.h"
 
-class Sprite2D_BAM_Internal {
-public:
-	Sprite2D_BAM_Internal() { pal = 0; }
-	~Sprite2D_BAM_Internal() { if (pal) { pal->Release(); pal = 0; } }
-
-	Palette* pal;
-	bool RLE;
-	int transindex;
-	bool flip_hor;
-	bool flip_ver;
-
-	// The AnimationFactory in which the data for this sprite is stored.
-	// (Used for refcounting of the data.)
-	AnimationFactory* source;
-};
-
 SDLVideoDriver::SDLVideoDriver(void)
 {
 	CursorIndex = 0;
@@ -1692,7 +1676,7 @@ void SDLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped
 	SDL_UnlockSurface( backBuf );
 }
 
-void SDLVideoDriver::GetPixel(short x, short y, Color* color)
+void SDLVideoDriver::GetPixel(short x, short y, Color& c)
 {
 	SDL_LockSurface( backBuf );
 	unsigned char * pixels = ( ( unsigned char * ) backBuf->pixels ) +
@@ -1701,105 +1685,35 @@ void SDLVideoDriver::GetPixel(short x, short y, Color* color)
 	ReadPixel(val, pixels, backBuf->format->BytesPerPixel);
 	SDL_UnlockSurface( backBuf );
 
-	SDL_GetRGBA( val, backBuf->format, (Uint8 *) &color->r, (Uint8 *) &color->g, (Uint8 *) &color->b, (Uint8 *) &color->a );
+	SDL_GetRGBA( val, backBuf->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
 }
 
-Color SDLVideoDriver::SpriteGetPixel(Sprite2D* sprite, unsigned short x, unsigned short y)
+void SDLVideoDriver::GetPixel(void *vptr, unsigned short x, unsigned short y, Color &c)
 {
-	Color c = { 0, 0, 0, 0 };
+        SDL_Surface *surf = (SDL_Surface*)(vptr);
 
-	if (x >= sprite->Width || y >= sprite->Height) return c;
+        SDL_LockSurface( surf );
+        unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
+                ( ( y * surf->w + x) * surf->format->BytesPerPixel );
+        long val = 0;
+        ReadPixel(val, pixels, surf->format->BytesPerPixel);
+        SDL_UnlockSurface( surf );
 
-	if (!sprite->BAM) {
-		SDL_Surface *surf = (SDL_Surface*)(sprite->vptr);
-
-		SDL_LockSurface( surf );
-		unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
-			( ( y * surf->w + x) * surf->format->BytesPerPixel );
-		long val = 0;
-		ReadPixel(val, pixels, surf->format->BytesPerPixel);
-		SDL_UnlockSurface( surf );
-
-		SDL_GetRGBA( val, surf->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
-	} else {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
-
-		if (data->flip_ver)
-			y = sprite->Height - y - 1;
-		if (data->flip_hor)
-			x = sprite->Width - x - 1;
-
-		int skipcount = y * sprite->Width + x;
-
-		const Uint8* rle = (const Uint8*)sprite->pixels;
-		if (data->RLE) {
-			while (skipcount > 0) {
-				if (*rle++ == data->transindex)
-					skipcount -= (*rle++)+1;
-				else
-					skipcount--;
-			}
-		} else {
-			// uncompressed
-			rle += skipcount;
-			skipcount = 0;
-		}
-
-		if (skipcount >= 0 && *rle != data->transindex) {
-			c = data->pal->col[*rle];
-			//c.r = data->pal->col[*rle].r;
-			//c.g = data->pal->col[*rle].g;
-			//c.b = data->pal->col[*rle].b;
-			c.a = 0xff;
-		}
-	}
-	return c;
+        SDL_GetRGBA( val, surf->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
 }
 
-// (x,y) is _not_ relative to sprite's (xpos,ypos)
-bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x, unsigned short y)
+long SDLVideoDriver::GetPixel(void *vptr, unsigned short x, unsigned short y)
 {
-	if (x >= sprite->Width || y >= sprite->Height) return true;
+	SDL_Surface *surf = (SDL_Surface*)(vptr);
 
-	if (!sprite->BAM) {
-		SDL_Surface *surf = (SDL_Surface*)(sprite->vptr);
+	SDL_LockSurface( surf );
+	unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
+		( ( y * surf->w + x) * surf->format->BytesPerPixel );
+	long val = 0;
+	ReadPixel(val, pixels, surf->format->BytesPerPixel);
+	SDL_UnlockSurface( surf );
 
-		SDL_LockSurface( surf );
-		unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
-			( ( y * surf->w + x) * surf->format->BytesPerPixel );
-		long val = 0;
-		ReadPixel(val, pixels, surf->format->BytesPerPixel);
-		SDL_UnlockSurface( surf );
-
-		return val == 0;
-	} else {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
-
-		if (data->flip_ver)
-			y = sprite->Height - y - 1;
-		if (data->flip_hor)
-			x = sprite->Width - x - 1;
-
-		int skipcount = y * sprite->Width + x;
-
-		const Uint8* rle = (const Uint8*)sprite->pixels;
-		if (data->RLE) {
-			while (skipcount > 0) {
-				if (*rle++ == data->transindex)
-					skipcount -= (*rle++)+1;
-				else
-					skipcount--;
-			}
-		} else {
-			// uncompressed
-			rle += skipcount;
-			skipcount = 0;
-		}
-		if (skipcount < 0 || *rle == data->transindex)
-			return true;
-		else
-			return false;
-	}
+	return val;
 }
 
 /*
@@ -2214,19 +2128,6 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 	return;
 }
 
-/** Blits a Sprite filling the Region */
-/** This method may be moved to Video.cpp, it is independent of SDL */
-void SDLVideoDriver::BlitTiled(Region rgn, Sprite2D* img, bool anchor)
-{
-	int xrep = ( rgn.w + img->Width - 1 ) / img->Width;
-	int yrep = ( rgn.h + img->Height - 1 ) / img->Height;
-	for (int y = 0; y < yrep; y++) {
-		for (int x = 0; x < xrep; x++) {
-			BlitSprite(img, rgn.x + (x*img->Width),
-				 rgn.y + (y*img->Height), anchor, &rgn);
-		}
-	}
-}
 /** Send a Quit Signal to the Event Queue */
 bool SDLVideoDriver::Quit()
 {
@@ -2237,26 +2138,20 @@ bool SDLVideoDriver::Quit()
 	}
 	return true;
 }
-/** Get the Palette of a Sprite */
-Palette* SDLVideoDriver::GetPalette(Sprite2D* spr)
+
+Palette* SDLVideoDriver::GetPalette(void *vptr)
 {
-	if (!spr->BAM) {
-		SDL_Surface* s = ( SDL_Surface* ) spr->vptr;
-		if (s->format->BitsPerPixel != 8) {
-			return NULL;
-		}
-		Palette* pal = new Palette();
-		for (int i = 0; i < s->format->palette->ncolors; i++) {
-			pal->col[i].r = s->format->palette->colors[i].r;
-			pal->col[i].g = s->format->palette->colors[i].g;
-			pal->col[i].b = s->format->palette->colors[i].b;
-		}
-		return pal;
-	} else {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
-		data->pal->IncRef();
-		return data->pal;
+	SDL_Surface* s = ( SDL_Surface* ) vptr;
+	if (s->format->BitsPerPixel != 8) {
+		return NULL;
 	}
+	Palette* pal = new Palette();
+	for (int i = 0; i < s->format->palette->ncolors; i++) {
+		pal->col[i].r = s->format->palette->colors[i].r;
+		pal->col[i].g = s->format->palette->colors[i].g;
+		pal->col[i].b = s->format->palette->colors[i].b;
+	}
+	return pal;
 }
 
 // Flips given sprite vertically (up-down). If MirrorAnchor=true,
@@ -2334,30 +2229,6 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAn
 	return dest;
 }
 
-Color SDLVideoDriver::SpriteGetPixelSum(Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
-{
-	Color sum;
-	unsigned int count = ratio*ratio;
-	unsigned int r=0, g=0, b=0, a=0;
-
-	for (unsigned int x = 0; x < ratio; x++) {
-		for (unsigned int y = 0; y < ratio; y++) {
-			Color c = SpriteGetPixel( sprite, xbase*ratio+x, ybase*ratio+y );
-			r += c.r;
-			g += c.g;
-			b += c.b;
-			a += c.a;
-		}
-	}
-
-	sum.r = r / count;
-	sum.g = g / count;
-	sum.b = b / count;
-	sum.a = a / count;
-
-	return sum;
-}
-
 Sprite2D* SDLVideoDriver::CreateLight(int radius, int intensity)
 {
 	if(!radius) return NULL;
@@ -2411,37 +2282,6 @@ Sprite2D* SDLVideoDriver::SpriteScaleDown( Sprite2D* sprite, unsigned int ratio 
 	small->YPos = sprite->YPos / ratio;
 
 	return small;
-}
-
-Sprite2D* SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
-{
-	if (!sprite)
-		return 0;
-
-	unsigned int *pixels = (unsigned int *) malloc (sprite->Width * sprite->Height * 4);
-	int i=0;
-	for (int y = 0; y < sprite->Height; y++) {
-		for (int x = 0; x < sprite->Width; x++) {
-			int sum = 0;
-			int cnt = 0;
-			for (int xx=x-3;xx<=x+3;xx++) {
-				for(int yy=y-3;yy<=y+3;yy++) {
-					if (((xx==x-3) || (xx==x+3)) &&
-                                            ((yy==y-3) || (yy==y+3))) continue;
-					if (xx < 0 || xx >= sprite->Width) continue;
-					if (yy < 0 || yy >= sprite->Height) continue;
-					cnt++;
-					if (IsSpritePixelTransparent(sprite, xx, yy))
-						sum++;
-				}
-			}
-			int tmp=255 - (sum * 255 / cnt);
-			tmp = tmp * tmp / 255;
-			pixels[i++]=tmp;
-		}
-	}
-	return CreateSprite( sprite->Width, sprite->Height, 32, 0xFF000000,
-	                     0x00FF0000, 0x0000FF00, 0x000000FF, pixels );
 }
 
 void SDLVideoDriver::SetFadeColor(int r, int g, int b)

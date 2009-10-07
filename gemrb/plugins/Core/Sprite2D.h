@@ -29,6 +29,9 @@
 #define SPRITE2D_H
 
 #include "../../includes/RGBAColor.h"
+#include "Palette.h"
+
+class AnimationFactory;
 
 #ifdef WIN32
 
@@ -48,6 +51,22 @@
  * Objects of this class are usually created by Video driver.
  */
 
+class Sprite2D_BAM_Internal {
+public:
+        Sprite2D_BAM_Internal() { pal = 0; }
+        ~Sprite2D_BAM_Internal() { if (pal) { pal->Release(); pal = 0; } }
+
+        Palette* pal;
+        bool RLE;
+        int transindex;
+        bool flip_hor;
+        bool flip_ver;
+
+        // The AnimationFactory in which the data for this sprite is stored.
+        // (Used for refcounting of the data.)
+        AnimationFactory* source;
+};
+
 class GEM_EXPORT Sprite2D {
 public:
 	/** Pointer to the Driver Video Structure */
@@ -58,6 +77,9 @@ public:
 	int XPos, YPos, Width, Height, Bpp;
 	Sprite2D(void);
 	~Sprite2D(void);
+	bool IsPixelTransparent(unsigned short x, unsigned short y);
+	Palette *GetPalette();
+	Color GetPixel(unsigned short x, unsigned short y);
 };
 
 #endif  // ! SPRITE2D_H

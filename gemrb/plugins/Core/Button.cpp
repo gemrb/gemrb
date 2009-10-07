@@ -689,7 +689,7 @@ bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 	// some buttons have hollow Image frame filled w/ Picture
 	// some buttons in BG2 are text only (if BAM == 'GUICTRL')
 	if (Picture || PictureList.size() || ! Unpressed) return false;
-	return core->GetVideoDriver()->IsSpritePixelTransparent(Unpressed, x, y);
+	return Unpressed->IsPixelTransparent(x, y);
 }
 
 // Set palette used for drawing button label in normal state

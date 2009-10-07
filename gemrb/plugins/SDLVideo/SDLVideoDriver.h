@@ -107,7 +107,10 @@ public:
 	void DrawRectSprite(const Region& rgn, const Color& color, Sprite2D* sprite);
 	/** This functions Draws a Circle */
 	void SetPixel(short x, short y, const Color& color, bool clipped = true);
-	void GetPixel(short x, short y, Color* color);
+	/** Gets the pixel of the backbuffer surface */
+	void GetPixel(short x, short y, Color& color);
+	/** Gets the pixel of any supplied surface */
+	void GetPixel(void *vptr, unsigned short x, unsigned short y, Color& color);
 	void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true);
 	/** This functions Draws an Ellipse Segment */
 	void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
@@ -124,8 +127,8 @@ public:
 	void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false);
 	/** Send a Quit Signal to the Event Queue */
 	bool Quit();
-	/** Get the Palette of a Sprite */
-	Palette* GetPalette(Sprite2D* spr);
+	/** Get the Palette of a surface */
+	Palette* GetPalette(void *vptr);
 	/** Flips sprite vertically */
 	Sprite2D *MirrorSpriteVertical(Sprite2D *sprite, bool MirrorAnchor);
 	/** Flips sprite horizontally */
@@ -165,8 +168,8 @@ private:
 
 public:
 	Color SpriteGetPixel (Sprite2D* sprite, unsigned short x, unsigned short y);
-	Color SpriteGetPixelSum (Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
-	bool IsSpritePixelTransparent (Sprite2D* sprite, unsigned short x, unsigned short y);
+	long GetPixel(void *data, unsigned short x, unsigned short y);
+	//bool IsSpritePixelTransparent (Sprite2D* sprite, unsigned short x, unsigned short y);
 	Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio );
 	Sprite2D* CreateLight(int radius, int intensity); //both parameters must be signed
 	void SetGamma(int brightness, int contrast);

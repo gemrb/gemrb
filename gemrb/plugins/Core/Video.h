@@ -153,7 +153,9 @@ public:
 	/** this function draws a clipped sprite */
 	virtual void DrawRectSprite(const Region& rgn, const Color& color, Sprite2D* sprite) = 0;
 	virtual void SetPixel(short x, short y, const Color& color, bool clipped = false) = 0;
-	virtual void GetPixel(short x, short y, Color* color) = 0;
+	virtual void GetPixel(short x, short y, Color& color) = 0;
+	virtual long GetPixel(void *, unsigned short x, unsigned short y) = 0;
+	virtual void GetPixel(void *, unsigned short x, unsigned short y, Color &color) = 0;
 	/** Draws a circle */
 	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true) = 0;
 	/** Draws an Ellipse Segment */
@@ -169,13 +171,13 @@ public:
 	virtual void DrawLine(short x1, short y1, short x2, short y2,
 		const Color& color, bool clipped = false) = 0;
 	/** Blits a Sprite filling the Region */
-	virtual void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false) = 0;
+	void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false);
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
 	/** Sends a Quit Signal to the Event Queue */
 	virtual bool Quit(void) = 0;
-	/** Gets the Palette of a Sprite */
-	virtual Palette* GetPalette(Sprite2D* spr) = 0;
+	/** Gets the Palette of a surface */
+	virtual Palette* GetPalette(void* surface) = 0;
 	/** Flips sprite vertically, returns new sprite */
 	virtual Sprite2D *MirrorSpriteVertical(Sprite2D *sprite, bool MirrorAnchor) = 0;
 	/** Flips sprite horizontally, returns new sprite */
@@ -223,13 +225,14 @@ public:
 protected:
 	int DisableMouse;
 
+	Color SpriteGetPixelSum (Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
 public:
 	short xCorr, yCorr;
 
 	/** Returns true if a pixel on a given position in the sprite 
 	 * is transparent.
 	 * It is used to mask clicks to non-rectangular shaped controls */
-	virtual bool IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x, unsigned short y) = 0;
+	//virtual bool IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x, unsigned short y) = 0;
 	/** Scales down a sprite by a ratio */
 	virtual Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio ) = 0;
 	/** Creates an ellipse or circle shaped sprite with various intensity
