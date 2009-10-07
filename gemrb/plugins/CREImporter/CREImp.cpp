@@ -790,21 +790,29 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 	if (core->IsAvailable(IE_EFF_CLASS_ID) ) {
 		ReadEffects( act );
 	} else {
-		printf("Effect importer is unavailable!\n");
+		printMessage("CREImp", "Effect importer is unavailable!\n", RED);
 	}
 	// Reading inventory, spellbook, etc
 	ReadInventory( act, Inventory_Size );
 
 	//default is 9 in Tob
-	act->SetBase(IE_MOVEMENTRATE,9) ;
+	act->SetBase(IE_MOVEMENTRATE,9);
+
+	ieWord animID = ( ieWord ) act->BaseStats[IE_ANIMATION_ID];
 	//this is required so the actor has animation already
-	act->SetAnimationID( ( ieWord ) act->BaseStats[IE_ANIMATION_ID] );
+	act->SetAnimationID( animID );
 	//Speed is determined by the number of frames in each cycle of its animation
 	CharAnimations* anims = act->GetAnims();
 	if (anims) {
-		Animation* anim = anims->GetAnimation(IE_ANI_WALK, 0)[0];
+		Animation** tmp = anims->GetAnimation(IE_ANI_WALK, 0);
+		Animation* anim = NULL;
+		if (tmp)
+			anim = tmp[0];
 		if(anim) {
 			act->SetBase(IE_MOVEMENTRATE, anim->GetFrameCount()) ;
+		} else {
+			printMessage("CREImp", "Unable to determine movement rate for animation ", YELLOW);
+			printf("%04x!\n", animID);
 		}
 	}
 	// Setting up derived stats
