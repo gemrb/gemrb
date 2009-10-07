@@ -379,6 +379,18 @@ Palette* CharAnimations::GetPartPalette(int part)
 	return palette[(int)type];
 }
 
+static int compare_avatars(const void *a, const void *b)
+{
+	unsigned int aa = ((AvatarStruct *)a)->AnimID;
+	unsigned int bb = ((AvatarStruct *)b)->AnimID;
+/*
+	if (aa>bb) return 1;
+	if (aa<bb) return -1;
+	return 0;
+*/
+	return (int) (aa-bb);
+}
+
 void CharAnimations::InitAvatarsTable()
 {
 	AutoTable Avatars("avatars");
@@ -427,6 +439,7 @@ void CharAnimations::InitAvatarsTable()
 			AvatarTable[i].Bestiary = resdata->GetKeyAsInt(section, "bestiary", -1);
 		}
 	}
+	qsort(AvatarTable, AvatarsCount, sizeof(AvatarStruct), compare_avatars);
 }
 
 CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
@@ -479,7 +492,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	}
 
 	while (AvatarsRowNum--) {
-		if (AvatarTable[AvatarsRowNum].AnimID==AnimID) {
+		if (AvatarTable[AvatarsRowNum].AnimID<=AnimID) {
 			SetArmourLevel( ArmourLevel );
 			return;
 		}
@@ -809,7 +822,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			if (part < actorPartCount) {
 				char warnbuf[200];
 				snprintf(warnbuf, 200,
-					 "Couldn't create animationfactory: %s\n", NewResRef);
+					 "Couldn't create animationfactory: %s (%04x)\n", NewResRef, GetAnimationID());
 				printMessage("CharAnimations",warnbuf,LIGHT_RED);
 				for (int i = 0; i < part; ++i)
 					delete anims[i];
@@ -992,9 +1005,9 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 static const int one_file[19]={2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4};
 
 void CharAnimations::GetAnimResRef(unsigned char StanceID,
-									 unsigned char Orient,
-									 char* NewResRef, unsigned char& Cycle,
-									 int Part, EquipResRefData*& EquipData)
+					 unsigned char Orient,
+					 char* NewResRef, unsigned char& Cycle,
+					 int Part, EquipResRefData*& EquipData)
 {
 	char tmp[256];
 	EquipData = 0;
