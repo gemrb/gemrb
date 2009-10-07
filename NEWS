@@ -17,6 +17,7 @@ GemRB svn (7367):
     - actions, effects and triggers
     - various guiscripts
     - bugfixes
+    - avatar id ranges
 
   Applied patches:
 
