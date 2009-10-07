@@ -1972,7 +1972,10 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 		return; //don't accept keys in dialog
 	}
 	Region Viewport = core->GetVideoDriver()->GetViewport();
-	Point mapsize = core->GetGame()->GetCurrentArea()->TMap->GetMapSize();
+	Game *game = core->GetGame();
+	Point mapsize = game->GetCurrentArea()->TMap->GetMapSize();
+	int partysize = game->GetPartySize(false);
+	char tmpstr[10];
 	switch (Key) {
 		case GEM_LEFT:
 			if (Viewport.x > 63)
@@ -2006,7 +2009,14 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			DebugFlags |= DEBUG_SHOW_CONTAINERS;
 			return;
 		case GEM_TAB:
-			//no effect, i think
+			// show partymember hp/maxhp as overhead text
+			for (int pm=0; pm < partysize; pm++) {
+				Actor *pc = game->GetPC(pm, true);
+				if (!pc) continue;
+				memset(tmpstr, 0, 10);
+				snprintf(tmpstr, 10, "%d/%d", pc->Modified[IE_HITPOINTS], pc->Modified[IE_MAXHITPOINTS]);
+				pc->DisplayHeadText(strdup(tmpstr));
+			}
 			return;
 		case GEM_MOUSEOUT:
 			moveX = 0;
