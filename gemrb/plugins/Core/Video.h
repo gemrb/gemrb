@@ -183,7 +183,7 @@ public:
 	/** Flips sprite horizontally, returns new sprite */
 	virtual Sprite2D *MirrorSpriteHorizontal(Sprite2D *sprite, bool MirrorAnchor) = 0;
 	/** Duplicates and transforms sprite to have an alpha channel */
-	virtual Sprite2D* CreateAlpha(Sprite2D *sprite) = 0;
+	Sprite2D* CreateAlpha(Sprite2D *sprite);
 
 	/** Converts a Screen Coordinate to a Game Coordinate */
 	virtual void ConvertToGame(short& x, short& y) = 0;
