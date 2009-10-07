@@ -249,7 +249,6 @@ static void GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDw
 		ReadItemSounds();
 	}
 
-	printf("Item animation type: %c%c\n",ID[0], ID[1]);
 	if (ID[1]=='A') {
 		//the last 4 item sounds are used for '1A', '2A', '3A' and '4A'
 		//item animation types
@@ -260,7 +259,6 @@ static void GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDw
 		return;
 	}
 	strnlwrcpy(Sound, ItemSounds[ItemType][Col], 8);
-	printf("Sound resource retrieved: %s\n", Sound);
 }
 
 static int GetCreatureStrRef(Actor *actor, unsigned int Str)
@@ -270,12 +268,7 @@ static int GetCreatureStrRef(Actor *actor, unsigned int Str)
 
 static inline bool CheckStat(Actor * actor, ieDword stat, ieDword value, int op)
 {
-	//ieDword stat = core->TranslateStat(stat_name);
-	//some stats should check for exact value
-	//return actor->GetBase(stat)>=value;
-	//return DiffCore(actor->GetBase(stat), value, op);
 	int dc = DiffCore(actor->GetBase(stat), value, op);
-	printf ("diffcore - %d %d %d: %d\n",actor->GetBase(stat), value, op, dc);
 	return dc;
 }
 
@@ -338,7 +331,7 @@ static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
 {
 	GameControl* gc = (GameControl *) GetControl( 0, 0, IE_GUI_GAMECONTROL);
 	if (!gc) {
-		return NULL;
+		return RuntimeError("No gamecontrol!");
 	}
 	gc->UnhideGUI();
 	//this enables mouse in dialogs, which is wrong
@@ -355,7 +348,7 @@ static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 {
 	GameControl* gc = (GameControl *) GetControl( 0, 0, IE_GUI_GAMECONTROL);
 	if (!gc) {
-		return NULL;
+		return RuntimeError("No gamecontrol!");
 	}
 	int ret = gc->HideGUI();
 
@@ -3354,7 +3347,7 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 		Picture = core->GetVideoDriver()->DuplicateSprite(old);
 		old->RefCount--;
 
-		Palette* newpal = core->GetVideoDriver()->GetPalette(Picture)->Copy();
+		Palette* newpal = Picture->GetPalette()->Copy();
 		core->GetPalette( col1, 12, &newpal->col[4]);
 		core->GetVideoDriver()->SetPalette( Picture, newpal );
 		newpal->Release();
@@ -3811,8 +3804,7 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 
 	SaveGameIterator *sgi = core->GetSaveGameIterator();
 	if (!sgi) {
-		printf("No savegame iterator\n");
-		return NULL;
+		return RuntimeError("No savegame iterator");
 	}
 
 	if (Version>0) {
@@ -7160,7 +7152,9 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	} else {
 		si = TryToUnequip( actor, core->QuerySlot(Slot), Count );
 		actor->RefreshEffects(NULL);
+printf("Actor ac:%d\n", actor->Modified[IE_ARMORCLASS]);
 		actor->ReinitQuickSlots();
+		core->SetEventFlag(EF_SELECTION);
 	}
 	if (! si) {
 		Py_INCREF( Py_None );
@@ -7321,7 +7315,6 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			core->ReleaseDraggedItem ();
 		}
 		//EquipItem (in AddSlotItem) already called RefreshEffects
-		//actor->RefreshEffects();
 		actor->ReinitQuickSlots();
 	//couldn't place item there, try swapping (only if slot is explicit)
 	} else if ( Slot >= 0 ) {
@@ -7341,8 +7334,9 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			// switched items, not returned by normal AddSlotItem
 			res = ASI_SWAPPED;
 			//EquipItem (in AddSlotItem) already called RefreshEffects
-			//actor->RefreshEffects();
+			actor->RefreshEffects(NULL);
 			actor->ReinitQuickSlots();
+			core->SetEventFlag(EF_SELECTION);
 		} else {
 			res = ASI_FAILED;
 		}
@@ -7432,7 +7426,6 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		actor->inventory.SetSlotItemRes( ItemResRef, SlotID, Charge0, Charge1, Charge2 );
 		actor->inventory.EquipItem(SlotID);
 		//EquipItem already called RefreshEffects
-		//actor->RefreshEffects();
 		actor->ReinitQuickSlots();
 	}
 	Py_INCREF( Py_None );

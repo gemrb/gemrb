@@ -230,7 +230,7 @@ void Projectile::GetPaletteCopy(Animation *anim[], Palette *&pal)
 		if (anim[i]) {
 			Sprite2D* spr = anim[i]->GetFrame(0);
 			if (spr) {
-				pal = core->GetVideoDriver()->GetPalette(spr)->Copy();
+				pal = spr->GetPalette()->Copy();
 				break;
 			}
 		}

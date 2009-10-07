@@ -159,8 +159,8 @@ int BAMImp::GetCycleSize(unsigned char Cycle)
 }
 
 Sprite2D* BAMImp::GetFrameInternal(unsigned short findex, unsigned char mode,
-								   bool BAMsprite, const unsigned char* data,
-								   AnimationFactory* datasrc)
+				   bool BAMsprite, const unsigned char* data,
+				   AnimationFactory* datasrc)
 {
 	Sprite2D* spr = 0;
 
@@ -191,7 +191,7 @@ Sprite2D* BAMImp::GetFrameInternal(unsigned short findex, unsigned char mode,
 	if (mode == IE_SHADED) {
 		// CHECKME: is this ever used? Should we modify the sprite's palette
 		// without creating a local copy for this sprite?
-		Palette* pal = core->GetVideoDriver()->GetPalette(spr);
+		Palette* pal = spr->GetPalette();
 		pal->CreateShadedAlphaChannel();
 		pal->Release();
 	}

@@ -864,28 +864,23 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			if(!palette[PAL_MAIN]) {
 				// This is the first time we're loading an Animation.
 				// We copy the palette of its first frame into our own palette
-				palette[PAL_MAIN] =
-					core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
-
+				palette[PAL_MAIN] = a->GetFrame(0)->GetPalette()->Copy();
 				// ...and setup the colours properly
 				SetupColors(PAL_MAIN);
 			}
 		} else if (part == actorPartCount) {
 			if (!palette[PAL_WEAPON]) {
-				palette[PAL_WEAPON] =
-					core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
+				palette[PAL_WEAPON] = a->GetFrame(0)->GetPalette()->Copy();
 				SetupColors(PAL_WEAPON);
 			}
 		} else if (part == actorPartCount+1) {
 			if (!palette[PAL_OFFHAND]) {
-				palette[PAL_OFFHAND] =
-					core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
+				palette[PAL_OFFHAND] = a->GetFrame(0)->GetPalette()->Copy();
 				SetupColors(PAL_OFFHAND);
 			}
 		} else if (part == actorPartCount+2) {
 			if (!palette[PAL_HELMET]) {
-				palette[PAL_HELMET] =
-					core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
+				palette[PAL_HELMET] = a->GetFrame(0)->GetPalette()->Copy();
 				SetupColors(PAL_HELMET);
 			}
 		}

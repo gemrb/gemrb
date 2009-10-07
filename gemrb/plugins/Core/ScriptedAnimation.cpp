@@ -664,7 +664,7 @@ void ScriptedAnimation::GetPaletteCopy()
 		if (anims[i]) {
 			Sprite2D* spr = anims[i]->GetFrame(0);
 			if (spr) {
-				palette = core->GetVideoDriver()->GetPalette(spr)->Copy();
+				palette = spr->GetPalette()->Copy();
 				//we need only one palette, so break here
 				break;
 			}
