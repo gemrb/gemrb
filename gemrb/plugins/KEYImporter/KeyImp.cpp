@@ -132,6 +132,14 @@ bool KeyImp::LoadResFile(const char* resfile)
 			if (be.name[p] == '\\' || be.name[p] == ':')
 				be.name[p] = PathDelimiter;
 		}
+		if (be.name[0] == PathDelimiter) {
+			// totl has '\data\zcMHar.bif' in the key file, and the CaseSensitive
+			// code breaks with that extra slash, so simple fix: remove it
+			ASCIIZLen--;
+			for (int p = 0; p < ASCIIZLen; p++)
+				be.name[p] = be.name[p + 1];
+			// (if you change this, try moving to ar9700 for testing)
+		}
 		if (core->CaseSensitive) {
 			char fullPath[_MAX_PATH], tmpPath[_MAX_PATH] = {0},
 				fn[_MAX_PATH] = {0};
