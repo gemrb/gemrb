@@ -489,7 +489,6 @@ public:
 	ieDword LockDifficulty; //this is a dword?
 	ieStrRef OpenStrRef;
 	ieStrRef NameStrRef;
-	ieResRef Dialog;
 	ieDword  Unknown54;     //not known yet
 private:
 	void SetWallgroups(int count, int value);
