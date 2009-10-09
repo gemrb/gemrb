@@ -954,6 +954,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 				}
 			}
 			ab->SetOrientation( Orientation,0 );
+			ab->appearance = Schedule;
 			ab->TalkCount = TalkCount;
 			ab->RefreshEffects(NULL);
 		}
