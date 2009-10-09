@@ -131,7 +131,7 @@ def MarkMenuButton (WindowIndex):
 	else: # highlight return to game
 		Button = WindowIndex.GetControl (0)
 
-	Button.SetState (IE_GUI_BUTTON_SELECTED)
+	Button.SetState (IE_GUI_BUTTON_PRESSED)
 
 def AIPress ():
 	Button = PortraitWindow.GetControl (6)
