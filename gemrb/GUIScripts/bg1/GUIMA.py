@@ -261,7 +261,7 @@ def WorldMapWindowCommon (Travel):
 	#saving the original portrait window
 	Window.SetFrame ()
 
-	Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "floattxt")
+	Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "toolfont")
 	WorldMapControl = Window.GetControl (4)
 	WorldMapControl.SetAnimation ("WMDAG")
 	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, "MoveToNewArea")
