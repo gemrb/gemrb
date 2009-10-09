@@ -696,9 +696,18 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &maxY );
 		toOpen[1].y = maxY;
 		str->ReadDword( &OpenStrRef);
-		str->Read( LinkedInfo, 32);
+		if (core->HasFeature(GF_AUTOMAP_INI) ) {
+			str->Read( LinkedInfo, 24);
+			LinkedInfo[24] = 0; // LinkedInfo unused in pst anyway?
+		} else {
+			str->Read( LinkedInfo, 32);
+		}
 		str->ReadDword( &NameStrRef);
 		str->ReadResRef( Dialog );
+		if (core->HasFeature(GF_AUTOMAP_INI) ) {
+			// maybe this is important? but seems not
+			str->Seek( 8, GEM_CURRENT_POS );
+		}
 
 		//Reading Open Polygon
 		str->Seek( VerticesOffset + ( OpenFirstVertex * 4 ), GEM_STREAM_START );
@@ -1545,9 +1554,16 @@ int AREImp::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		tmpWord = (ieWord) d->toOpen[1].y;
 		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &d->OpenStrRef);
-		stream->Write( d->LinkedInfo, 32);
+		if (core->HasFeature(GF_AUTOMAP_INI) ) {
+			stream->Write( d->LinkedInfo, 24);
+		} else {
+			stream->Write( d->LinkedInfo, 32);
+		}
 		stream->WriteDword( &d->NameStrRef);
 		stream->WriteResRef( d->GetDialog());
+		if (core->HasFeature(GF_AUTOMAP_INI) ) {
+			stream->Write( filling, 8);
+		}
 	}
 	return 0;
 }
