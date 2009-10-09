@@ -82,8 +82,6 @@ int SDLVideoDriver::Init(void)
 
 int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 {
-	width=w;
-	height=h;
 	bpp=b;
 	fullscreen=fs;
 	printMessage( "SDLVideo", "Creating display\n", WHITE );
@@ -92,7 +90,7 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 		flags |= SDL_FULLSCREEN;
 	}
 	printMessage( "SDLVideo", "SDL_SetVideoMode...", WHITE );
-	disp = SDL_SetVideoMode( width, height, bpp, flags );
+	disp = SDL_SetVideoMode( w, h, bpp, flags );
 	if (disp == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
@@ -105,6 +103,8 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	Viewport.x = Viewport.y = 0;
+	width = disp->w;
+	height = disp->h;
 	Viewport.w = width;
 	Viewport.h = height;
 	printMessage( "SDLVideo", "Creating Main Surface...", WHITE );
@@ -1497,48 +1497,11 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 	return screenshot;
 }
 
-Region SDLVideoDriver::GetViewport()
-{
-	return Viewport;
-}
-
-void SDLVideoDriver::SetViewport(int x, int y, unsigned int w, unsigned int h)
-{
-	if (x>disp->w)
-		x=disp->w;
-	xCorr = x;
-	if (y>disp->h)
-		y=disp->h;
-	yCorr = y;
-	if (w>(unsigned int) disp->w)
-		w=0;
-	Viewport.w = w;
-	if (h>(unsigned int) disp->h)
-		h=0;
-	Viewport.h = h;
-}
-
-void SDLVideoDriver::MoveViewportTo(int x, int y)
-{
-	if (x != Viewport.x || y != Viewport.y) {
-		core->GetAudioDrv()->UpdateListenerPos( (x - xCorr) + disp->w / 2, (y - yCorr) + disp->h / 2 );
-		Viewport.x = x;
-		Viewport.y = y;
-	}
-}
 /** No descriptions */
-void SDLVideoDriver::SetPalette(Sprite2D* spr, Palette* pal)
+void SDLVideoDriver::SetPalette(void *data, Palette* pal)
 {
-	if (!spr->BAM) {
-		SDL_Surface* sur = ( SDL_Surface* ) spr->vptr;
-		SDL_SetPalette( sur, SDL_LOGPAL, ( SDL_Color * ) pal->col, 0, 256 );
-	} else {
-		if (!spr->vptr) return;
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
-		data->pal->Release();
-		pal->IncRef();
-		data->pal = pal;
-	}
+	SDL_Surface* sur = ( SDL_Surface* ) data;
+	SDL_SetPalette( sur, SDL_LOGPAL, ( SDL_Color * ) pal->col, 0, 256 );
 }
 
 void SDLVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
@@ -1632,6 +1595,7 @@ inline void ReadPixel(long &val, unsigned char *pixels, int BytesPerPixel) {
 		val = *(Uint32 *)pixels;
 	}
 }
+
 inline void WritePixel(const long val, unsigned char *pixels, int BytesPerPixel) {
 	if (BytesPerPixel == 1) {
 		*pixels = (unsigned char)val;
@@ -1643,8 +1607,6 @@ inline void WritePixel(const long val, unsigned char *pixels, int BytesPerPixel)
 		*(Uint32 *)pixels = val;
 	}
 }
-
-
 
 void SDLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped)
 {
@@ -2227,61 +2189,6 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAn
 	dest->YPos = sprite->YPos;
 
 	return dest;
-}
-
-Sprite2D* SDLVideoDriver::CreateLight(int radius, int intensity)
-{
-	if(!radius) return NULL;
-	Point p, q;
-	int a;
-	void* pixels = malloc( radius * radius * 4 * 4);
-	int i = 0;
-
-	for (p.y = -radius; p.y < radius; p.y++) {
-		for (p.x = -radius; p.x < radius; p.x++) {
-			a = intensity*(radius-(signed) Distance(p,q))/radius;
-
-			if(a<0) a=0;
-			else if(a>255) a = 255;
-
-			*((unsigned int*)pixels + i++) = 0xffffff + ((a/2) << 24);
-		}
-	}
-
-	Sprite2D* light = CreateSprite( radius*2, radius*2, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels);
-
-	light->XPos = radius;
-	light->YPos = radius;
-
-	return light;
-}
-
-Sprite2D* SDLVideoDriver::SpriteScaleDown( Sprite2D* sprite, unsigned int ratio )
-{
-	unsigned int Width = sprite->Width / ratio;
-	unsigned int Height = sprite->Height / ratio;
-
-	void* pixels = malloc( Width * Height * 4 );
-	int i = 0;
-
-	for (unsigned int y = 0; y < Height; y++) {
-		for (unsigned int x = 0; x < Width; x++) {
-			Color c = SpriteGetPixelSum( sprite, x, y, ratio );
-
-			// this seems unlikely to work on big-endian
-			*((char*)pixels + i++) = c.r;
-			*((char*)pixels + i++) = c.g;
-			*((char*)pixels + i++) = c.b;
-			*((char*)pixels + i++) = c.a;
-		}
-	}
-
-	Sprite2D* small = CreateSprite( Width, Height, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels, false, 0 );
-
-	small->XPos = sprite->XPos / ratio;
-	small->YPos = sprite->YPos / ratio;
-
-	return small;
 }
 
 void SDLVideoDriver::SetFadeColor(int r, int g, int b)

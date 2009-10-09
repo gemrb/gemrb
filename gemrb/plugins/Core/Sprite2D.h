@@ -79,6 +79,7 @@ public:
 	~Sprite2D(void);
 	bool IsPixelTransparent(unsigned short x, unsigned short y);
 	Palette *GetPalette();
+	void SetPalette(Palette *pal);
 	Color GetPixel(unsigned short x, unsigned short y);
 };
 

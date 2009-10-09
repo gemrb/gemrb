@@ -76,10 +76,10 @@ static int gradients[5]={18,22,19,3,4};
 
 void WMPAreaEntry::SetPalette(int gradient, Sprite2D* MapIcon)
 {
-	Video *video = core->GetVideoDriver();
+	if (!MapIcon) return;
 	Palette *palette = new Palette;
 	core->GetPalette( gradient&255, 256, palette->col );
-	video->SetPalette(MapIcon, palette);
+	MapIcon->SetPalette(palette);
 }
 
 Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)

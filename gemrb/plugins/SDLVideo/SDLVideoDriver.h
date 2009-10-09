@@ -32,7 +32,6 @@ private:
 	SDL_Surface* backBuf;
 	SDL_Surface* extra;
 	std::vector< Region> upd;//Regions of the Screen to Update in the next SwapBuffer operation.
-	Region Viewport;
 	Sprite2D* Cursor[3];
 	SDL_Rect CursorPos;
 	unsigned short CursorIndex;
@@ -46,9 +45,6 @@ private:
 	Region subtitleregion;
 	char *subtitletext;
 	ieDword subtitlestrref;
-	int width,height,bpp;
-	bool fullscreen;
-
 public:
 	SDLVideoDriver(void);
 	~SDLVideoDriver(void);
@@ -96,12 +92,9 @@ public:
 	void SetCursor(Sprite2D* up, Sprite2D* down);
 	void SetDragCursor(Sprite2D* drag);
 	Sprite2D* GetScreenshot( Region r );
-	Region GetViewport(void);
-	void SetViewport(int x, int y, unsigned int w, unsigned int h);
-	void MoveViewportTo(int x, int y);
 	void ConvertToVideoFormat(Sprite2D* sprite);
-	/** No descriptions */
-	void SetPalette(Sprite2D* spr, Palette* pal);
+	/** Sets the palette of an SDL surface pointed by */
+	void SetPalette(void* data, Palette* pal);
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);
 	void DrawRectSprite(const Region& rgn, const Color& color, Sprite2D* sprite);
@@ -165,11 +158,7 @@ private:
 	void DrawMovieSubtitle(ieDword strRef);
 
 public:
-	Color SpriteGetPixel (Sprite2D* sprite, unsigned short x, unsigned short y);
 	long GetPixel(void *data, unsigned short x, unsigned short y);
-	//bool IsSpritePixelTransparent (Sprite2D* sprite, unsigned short x, unsigned short y);
-	Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio );
-	Sprite2D* CreateLight(int radius, int intensity); //both parameters must be signed
 	void SetGamma(int brightness, int contrast);
 	void SetMouseScrollSpeed(int speed);
 	void release(void)

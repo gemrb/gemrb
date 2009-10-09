@@ -119,10 +119,9 @@ void ControlAnimation::UpdateAnimation(void)
 	}
 
 	if (has_palette) {
-		Video *video = core->GetVideoDriver();
 		Palette* palette = pic->GetPalette();
 		palette->SetupPaperdollColours(colors, 0);
-		video->SetPalette(pic, palette);
+		pic->SetPalette(palette);
 		palette->Release();
 	}
 

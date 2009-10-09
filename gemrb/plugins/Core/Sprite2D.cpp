@@ -77,6 +77,7 @@ bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y)
 /** Get the Palette of a Sprite */
 Palette* Sprite2D::GetPalette()
 {
+	if (!vptr) return NULL;
 	if (!BAM) {
 		return core->GetVideoDriver()->GetPalette(vptr);
 	}
@@ -86,44 +87,57 @@ Palette* Sprite2D::GetPalette()
 	return data->pal;
 }
 
+void Sprite2D::SetPalette(Palette* pal)
+{
+	if (!vptr) return;
+	if (!BAM) {
+		core->GetVideoDriver()->SetPalette(vptr, pal);
+	} else {
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)vptr;
+		data->pal->Release();
+		pal->IncRef();
+		data->pal = pal;
+	}
+}
+
 Color Sprite2D::GetPixel(unsigned short x, unsigned short y)
 {
 	Color c = { 0, 0, 0, 0 };
 
 	if (x >= Width || y >= Height) return c;
 
-        if (!BAM) {
+	if (!BAM) {
 		core->GetVideoDriver()->GetPixel(vptr, x, y, c);
-        	return c;
+		return c;
 	}
 
-        Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)vptr;
+	Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)vptr;
 
-        if (data->flip_ver)
-                y = Height - y - 1;
-        if (data->flip_hor)
-                x = Width - x - 1;
+	if (data->flip_ver)
+		y = Height - y - 1;
+	if (data->flip_hor)
+		x = Width - x - 1;
 
-        int skipcount = y * Width + x;
+	int skipcount = y * Width + x;
 
-        const ieByte *rle = (const ieByte*)pixels;
-        if (data->RLE) {
-                while (skipcount > 0) {
-                        if (*rle++ == data->transindex)
-                                skipcount -= (*rle++)+1;
-                        else
-                                skipcount--;
-                }
-        } else {
-                // uncompressed
-                rle += skipcount;
-                skipcount = 0;
-        }
+	const ieByte *rle = (const ieByte*)pixels;
+	if (data->RLE) {
+		while (skipcount > 0) {
+			if (*rle++ == data->transindex)
+				skipcount -= (*rle++)+1;
+			else
+				skipcount--;
+		}
+	} else {
+		// uncompressed
+		rle += skipcount;
+		skipcount = 0;
+	}
 
-        if (skipcount >= 0 && *rle != data->transindex) {
-                c = data->pal->col[*rle];
-                c.a = 0xff;
-        }
-        return c;
+	if (skipcount >= 0 && *rle != data->transindex) {
+		c = data->pal->col[*rle];
+		c.a = 0xff;
+	}
+	return c;
 }
 

@@ -127,10 +127,13 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 
 	Video* video = core->GetVideoDriver();
 	Picture2 = video->DuplicateSprite(frames[1]);
+	if (!Picture2) {
+		return NULL;
+	}
 	if (Colors) {
 		Palette* palette = Picture2->GetPalette();
 		palette->SetupPaperdollColours(Colors, type);
-		video->SetPalette(Picture2, palette);
+		Picture2->SetPalette(palette);
 		palette->Release();
 	}
 
@@ -142,7 +145,7 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 	if (Colors) {
 		Palette* palette = spr->GetPalette();
 		palette->SetupPaperdollColours(Colors, type);
-		video->SetPalette(spr, palette);
+		spr->SetPalette(palette);
 		palette->Release();
 	}
 

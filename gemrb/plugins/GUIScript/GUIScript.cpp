@@ -3349,7 +3349,7 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 
 		Palette* newpal = Picture->GetPalette()->Copy();
 		core->GetPalette( col1, 12, &newpal->col[4]);
-		core->GetVideoDriver()->SetPalette( Picture, newpal );
+		Picture->SetPalette( newpal );
 		newpal->Release();
 	}
 

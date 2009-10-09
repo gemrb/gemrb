@@ -142,12 +142,9 @@ public:
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */
 	virtual Sprite2D* GetScreenshot( Region r ) = 0;
-	virtual Region GetViewport(void) = 0;
-	virtual void SetViewport(int x, int y, unsigned int w, unsigned int h) = 0;
-	virtual void MoveViewportTo(int x, int y) = 0;
 	virtual void ConvertToVideoFormat(Sprite2D* sprite) = 0;
-	/** No descriptions */
-	virtual void SetPalette(Sprite2D* spr, Palette* pal) = 0;
+	/** Sets the palette of a plugin specific sprite */
+	virtual void SetPalette(void* data, Palette* pal) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false) = 0;
 	/** this function draws a clipped sprite */
@@ -215,30 +212,30 @@ public:
 		ieDword titleref) = 0;
 	/** handles events during movie */
 	virtual int PollMovieEvents() = 0;
+	virtual void SetGamma(int brightness, int contrast) = 0;
 public:
 	/** Event Manager Pointer */
-	EventMgr* Evnt;
 
 	void SetMouseEnabled(int enabled);
 	void SetMouseGrayed(bool grayed);
 
-protected:
-	int DisableMouse;
-
-	Color SpriteGetPixelSum (Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
-public:
-	short xCorr, yCorr;
-
-	/** Returns true if a pixel on a given position in the sprite 
-	 * is transparent.
-	 * It is used to mask clicks to non-rectangular shaped controls */
-	//virtual bool IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x, unsigned short y) = 0;
 	/** Scales down a sprite by a ratio */
-	virtual Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio ) = 0;
+	Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio );
 	/** Creates an ellipse or circle shaped sprite with various intensity
 	 *  for projectile light spots */
-	virtual Sprite2D* CreateLight(int radius, int intensity) = 0;
-	virtual void SetGamma(int brightness, int contrast) = 0;
+	Sprite2D* CreateLight(int radius, int intensity);
+
+	Color SpriteGetPixelSum (Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
+	Region GetViewport(void);
+	void SetViewport(int x, int y, unsigned int w, unsigned int h);
+	void MoveViewportTo(int x, int y);
+protected:
+	int DisableMouse;
+	short xCorr, yCorr;
+	EventMgr* Evnt;
+	Region Viewport;
+	int width,height,bpp;
+	bool fullscreen;
 };
 
 #endif

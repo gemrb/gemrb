@@ -136,8 +136,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		enablecap=false;
 	}
 
-	Video* video = core->GetVideoDriver();
-	video->SetPalette( sprBuffer, pal );
+	sprBuffer->SetPalette( pal );
 	size_t len = strlen( ( char* ) string );
 	char* tmp = ( char* ) malloc( len + 1 );
 	memcpy( tmp, ( char * ) string, len + 1 );
@@ -180,6 +179,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		y += 5;
 	}
 
+	Video* video = core->GetVideoDriver();
 	int row = 0;
 	for (size_t i = 0; i < len; i++) {
 		if (( ( unsigned char ) tmp[i] ) == '[' && !NoColor) {
@@ -210,12 +210,12 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 					continue;
 				const Color c = {(unsigned char) r,(unsigned char)g, (unsigned char)b, 0};
 				Palette* newPal = core->CreatePalette( c, black );
-				video->SetPalette( sprBuffer, newPal );
+				sprBuffer->SetPalette( newPal );
 				gamedata->FreePalette( newPal );
 				continue;
 			}
 			if (stricmp( tag, "/color" ) == 0) {
-				video->SetPalette( sprBuffer, pal );
+				sprBuffer->SetPalette( pal );
 				continue;
 			}
 			
@@ -304,8 +304,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		initials = NULL;
 	}
 
-	Video* video = core->GetVideoDriver();
-	video->SetPalette( sprBuffer, pal );
+	sprBuffer->SetPalette( pal );
 	size_t len = strlen( ( char* ) string );
 	char* tmp = ( char* ) malloc( len + 1 );
 	memcpy( tmp, ( char * ) string, len + 1 );
@@ -330,6 +329,8 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	}
 	if (!ystep) ystep = maxHeight;
 	int x = psx, y = ystep;
+	Video* video = core->GetVideoDriver();
+
 	if (Alignment & IE_FONT_ALIGN_CENTER) {
 		int w = CalcStringWidth( tmp, NoColor );
 		x = ( rgn.w - w ) / 2;
@@ -384,12 +385,12 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 					continue;
 				const Color c = {(unsigned char) r,(unsigned char) g,(unsigned char)  b, 0};
 				Palette* newPal = core->CreatePalette( c, black );
-				video->SetPalette( sprBuffer, newPal );
+				sprBuffer->SetPalette( newPal );
 				gamedata->FreePalette( newPal );
 				continue;
 			}
 			if (stricmp( tag, "/color" ) == 0) {
-				video->SetPalette( sprBuffer, pal );
+				sprBuffer->SetPalette( pal );
 				continue;
 			}
 			if (stricmp( "p", tag ) == 0) {
