@@ -1936,6 +1936,8 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	//put all special cleanup calls here
 	CharAnimations* anims = GetAnims();
 	if (anims) {
+		anims->GlobalColorMod.type = RGBModifier::NONE;
+		anims->GlobalColorMod.speed = 0;
 		unsigned int location;
 		for (location = 0; location < 32; ++location) {
 			anims->ColorMods[location].type = RGBModifier::NONE;
