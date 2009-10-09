@@ -1024,7 +1024,7 @@ void GameControl::DisplayTooltip() {
 			}
 
 			if (actor) {
-				char *name = actor->GetName(1);
+				char *name = actor->GetName(-1);
 				int hp = actor->GetStat(IE_HITPOINTS);
 				int maxhp = actor->GetStat(IE_MAXHITPOINTS);
 
