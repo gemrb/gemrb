@@ -1975,7 +1975,9 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 	Game *game = core->GetGame();
 	Point mapsize = game->GetCurrentArea()->TMap->GetMapSize();
 	int partysize = game->GetPartySize(false);
+	int pm;
 	char tmpstr[10];
+
 	switch (Key) {
 		case GEM_LEFT:
 			if (Viewport.x > 63)
@@ -2010,7 +2012,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			return;
 		case GEM_TAB:
 			// show partymember hp/maxhp as overhead text
-			for (int pm=0; pm < partysize; pm++) {
+			for (pm=0; pm < partysize; pm++) {
 				Actor *pc = game->GetPC(pm, true);
 				if (!pc) continue;
 				memset(tmpstr, 0, 10);
