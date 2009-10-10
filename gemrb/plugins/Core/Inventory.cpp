@@ -1319,7 +1319,7 @@ void Inventory::dump()
 void Inventory::EquipBestWeapon(int flags)
 {
 	int i;
-	int damage = 0;
+	int damage = -1;
 	ieDword best_slot = SLOT_FIST;
 	ITMExtHeader *header;
 	CREItem *Slot;

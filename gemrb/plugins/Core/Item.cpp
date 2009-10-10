@@ -97,7 +97,7 @@ int Item::GetDamagePotential(bool ranged, ITMExtHeader *&header) const
 	if (header) {
 		return header->DiceThrown*(header->DiceSides+1)/2+header->DamageBonus;
 	}
-	return 0;
+	return -1;
 }
 
 int Item::GetWeaponHeaderNumber(bool ranged) const
