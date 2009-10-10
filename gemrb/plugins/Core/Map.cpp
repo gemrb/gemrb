@@ -92,11 +92,12 @@ void Map::ReleaseMemory()
 	PathFinderInited = false;
 }
 
-inline static AnimationObjectType SelectObject(Actor *actor, AreaAnimation *a, ScriptedAnimation *sca, Particles *spark, Projectile *pro)
+inline static AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimation *a, ScriptedAnimation *sca, Particles *spark, Projectile *pro)
 {
 	int actorh;
 	if (actor) {
 		actorh = actor->Pos.y;
+		if (q) actorh = 0;
 	} else {
 		actorh = 0x7fffffff;
 	}
@@ -1036,7 +1037,7 @@ void Map::DrawMap(Region screen)
 	Particles *spark = GetNextSpark(spaidx);
 
 	while (actor || a || sca || spark || pro) {
-		switch(SelectObject(actor,a,sca,spark,pro)) {
+		switch(SelectObject(actor,q,a,sca,spark,pro)) {
 		case AOT_ACTOR:
 			actor->Draw( screen );
 			actor = GetNextActor(q, index);
