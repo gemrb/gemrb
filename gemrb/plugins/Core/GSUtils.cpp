@@ -904,7 +904,7 @@ static ScriptedAnimation *GetVVCEffect(const char *effect, int iterations)
 			return NULL;
 		}
 		if (iterations) {
-			vvc->SetDefaultDuration( vvc->GetSequenceDuration(1000 * iterations));
+			vvc->SetDefaultDuration( vvc->GetSequenceDuration(AI_UPDATE_TIME * iterations));
 		}
 		return vvc;
 	}
