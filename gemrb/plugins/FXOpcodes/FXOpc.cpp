@@ -3537,7 +3537,11 @@ int fx_set_chantbad_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_animation_stance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_animation_stance (%2d): Stance: %d\n", fx->Opcode, fx->Parameter2 );
-	target->SetStance(fx->Parameter2);
+	
+	//this effect works only on living actors
+	if ( !STATE_GET(STATE_DEAD) ) {
+		target->SetStance(fx->Parameter2);
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -4141,6 +4145,8 @@ int fx_playsound (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_hold_creature_no_icon (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_hold_creature_no_icon (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//actually the original engine just skips this effect if the target is dead
 	if ( STATE_GET(STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
@@ -4160,6 +4166,8 @@ int fx_hold_creature_no_icon (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_hold_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_hold_creature (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//actually the original engine just skips this effect if the target is dead
 	if ( STATE_GET(STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
@@ -4738,6 +4746,12 @@ int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
+
+	//dead actors lose this effect
+	if (STATE_GET( STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
+
 	//this is the bg2 style stoneskin, not normally using spell states
 	//but this way we can support hybrid games
 	if (fx->Parameter2) {
@@ -6093,6 +6107,11 @@ int fx_golem_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* f
 	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
+	//dead actors lose this effect
+	if (STATE_GET( STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
+
 	STAT_SET(IE_STONESKINSGOLEM, fx->Parameter1);
 	SetGradient(target, 14);
 	return FX_APPLIED;
