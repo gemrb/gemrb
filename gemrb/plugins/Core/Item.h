@@ -121,7 +121,11 @@ public:
 	ieByte Target;
 	ieByte TargetNumber;
 	ieWord Range;
-	ieWord ProjectileType; //it is not sure where this value is used
+	//this is partially redundant, but the original engine uses this value to
+	//determine projectile type (ProjectileQualifier is almost always set too)
+	//We use this field only when really needed, and resolve the redundancy
+	//in the exporter. The reason: using bitfields is more flexible.
+	//ieWord ProjectileType;
 	ieWord Speed;
 	ieWord THAC0Bonus;
 	ieWord DiceSides;

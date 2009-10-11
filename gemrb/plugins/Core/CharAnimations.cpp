@@ -169,6 +169,16 @@ void CharAnimations::SetArmourLevel(int ArmourLevel)
 	DropAnims();
 }
 
+//RangedType could be weird, reducing its value to 0,1,2,3
+void CharAnimations::SetRangedType(int rt)
+{
+	if (rt<2) {
+		RangedType=rt;
+	} else {
+		RangedType=3;
+	}
+}
+
 void CharAnimations::SetWeaponType(int wt)
 {
 	if (wt != WeaponType) {

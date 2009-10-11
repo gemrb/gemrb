@@ -5266,9 +5266,9 @@ void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int
 
 	if(header && (header->AttackType == ITEM_AT_BOW)) {
 		ITMExtHeader* projHeader = GetRangedWeapon(wi);
-		if (projHeader->ProjectileType == 0) return; /* no ammo yet? */
+		if (projHeader->ProjectileQualifier == 0) return; /* no ammo yet? */
 		AttackStance = IE_ANI_SHOOT;
-		anims->RangedType = projHeader->ProjectileType - 1;
+		anims->SetRangedType(projHeader->ProjectileQualifier);
 		//bows ARE one handed, from an anim POV at least
 		anims->SetWeaponType(IE_ANI_WEAPON_1H);
 		return;

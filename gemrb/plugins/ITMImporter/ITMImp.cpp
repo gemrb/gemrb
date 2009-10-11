@@ -170,6 +170,7 @@ Item* ITMImp::GetItem(Item *s)
 void ITMImp::GetExtHeader(Item *s, ITMExtHeader* eh)
 {
 	ieByte tmpByte;
+	ieWord ProjectileType;
 
 	str->Read( &eh->AttackType,1 );
 	str->Read( &eh->IDReq,1 );
@@ -183,7 +184,7 @@ void ITMImp::GetExtHeader(Item *s, ITMExtHeader* eh)
 	}
 	eh->TargetNumber = tmpByte;
 	str->ReadWord( &eh->Range );
-	str->ReadWord( &eh->ProjectileType );
+	str->ReadWord( &ProjectileType );
 	str->ReadWord( &eh->Speed );
 	str->ReadWord( &eh->THAC0Bonus );
 	str->ReadWord( &eh->DiceSides );
@@ -217,8 +218,17 @@ void ITMImp::GetExtHeader(Item *s, ITMExtHeader* eh)
 	str->ReadWord( &tmp ); //bullet
 	if (tmp) i|=PROJ_BULLET;
 	//this hack is required for Nordom's crossbow in PST
-	if (!i && (eh->AttackType==ITEM_AT_BOW || eh->AttackType==ITEM_AT_PROJECTILE) ) {
+	if (!i && (eh->AttackType==ITEM_AT_BOW) ) {
 		i|=PROJ_BOLT;
+	}
+
+	//this hack is required for the practicing arrows in BG1
+	if (!i && (eh->AttackType==ITEM_AT_PROJECTILE) ) {
+		//0->0
+		//1->1
+		//2->2
+		//3->4
+		i|=(1<<ProjectileType)>>1;
 	}
 	eh->ProjectileQualifier=i;
 

@@ -154,6 +154,7 @@ public:
 	~CharAnimations(void);
 	static void ReleaseMemory();
 	void SetArmourLevel(int ArmourLevel);
+	void SetRangedType(int Ranged);
 	void SetWeaponType(int WeaponType);
 	void SetHelmetRef(const char* ref);
 	void SetWeaponRef(const char* ref);

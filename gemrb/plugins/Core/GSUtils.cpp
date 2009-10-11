@@ -951,12 +951,10 @@ void EscapeAreaCore(Scriptable* Sender, Point &p, const char* area, Point &enter
 {
 	char Tmp[256];
 
-	printf("EscapeAreaCore for %s, at point [%d.%d], flags:%d\n", Sender->GetScriptName(), p.x, p.y, flags);
 	if ( !p.isempty() && PersonalDistance(p, Sender)>MAX_OPERATING_DISTANCE) {
 		//MoveNearerTo will return 0, if the actor is in move
 		//it will return 1 (the fourth parameter) if the target is unreachable
 		if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE,1) ) {
-			printf("MoveNearerTo works now.\n");
 			if (!Sender->InMove()) printf("At least it said so...\n");
 			return;
 		}
@@ -969,7 +967,8 @@ void EscapeAreaCore(Scriptable* Sender, Point &p, const char* area, Point &enter
 		// last parameter is 'face', which should be passed from relevant action parameter..
 		sprintf( Tmp, "MoveBetweenAreas(\"%s\",[%hd.%hd],%d)", area, enter.x, enter.y, 0 );
 	}
-	printf("Executing %s\n", Tmp);
+	printMessage("GSUtils"," ", WHITE);
+	printf("Executing %s in EscapeAreaCore\n", Tmp);
 	//drop this action, but add another (destroyself or movebetweenareas)
 	//between the arrival and the final escape, there should be a wait time
 	//that wait time could be handled here
