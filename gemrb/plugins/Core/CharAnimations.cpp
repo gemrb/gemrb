@@ -169,13 +169,13 @@ void CharAnimations::SetArmourLevel(int ArmourLevel)
 	DropAnims();
 }
 
-//RangedType could be weird, reducing its value to 0,1,2,3
+//RangedType could be weird, reducing its value to 0,1,2
 void CharAnimations::SetRangedType(int rt)
 {
-	if (rt<2) {
-		RangedType=rt;
+	if ((unsigned int) rt<2) {
+		RangedType=(ieByte) rt;
 	} else {
-		RangedType=3;
+		RangedType=2;
 	}
 }
 
