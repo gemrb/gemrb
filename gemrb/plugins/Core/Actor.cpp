@@ -2513,6 +2513,41 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 		}
 	}
 
+	//PST hit sounds
+	DataFileMgr *resdata = core->GetResDataINI();
+	if (resdata) {
+		PlayHitSound(resdata, damagetype, false);
+	}
+}
+
+//Play PST specific hit sounds (HIT_0<dtype><armor>)
+void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
+{
+	int type;
+
+	switch(damagetype) {
+		case DAMAGE_SLASHING: type = 1; break; //slashing
+		case DAMAGE_PIERCING: type = 2; break; //piercing
+		case DAMAGE_CRUSHING: type = 3; break; //crushing
+		case DAMAGE_MISSILE: type = 4; break;  //missile
+		default: return;                       //other
+	}
+
+	ieResRef Sound;
+	char section[12];
+	unsigned int animid=BaseStats[IE_ANIMATION_ID];
+	if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
+		animid&=0xff;
+	}
+
+	snprintf(section,10,"%d", animid);
+
+	int armor = resdata->GetKeyAsInt(section, "armor",0);
+	if (armor<0 || armor>35) return;
+
+	snprintf(Sound,8,"HIT_0%d%c%c",type, armor+'A', suffix?'1':0);
+
+	core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y,0 );
 }
 
 //Just to quickly inspect debug maximum values
