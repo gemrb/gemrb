@@ -25,6 +25,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from GUIClasses import GWindow
+from LUCommon import CanLevelUp
 from GUICommon import *
 import GUICommon
 
