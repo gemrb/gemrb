@@ -4060,18 +4060,25 @@ int fx_missile_to_hit_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx
 }
 
 // 0xa8 RemoveCreature
-// removes creature specified by resource key
+// removes targeted creature
+// removes creature specified by resource key (gemrb extension)
 int fx_remove_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_remove_creature (%2d)\n", fx->Opcode);
 	Map *map = target->GetCurrentArea();
-	Actor *actor = map->GetActorByResource(fx->Resource);
+	Actor *actor = target;
+
+	if (fx->Resource[0]) {
+		actor = map->GetActorByResource(fx->Resource);
+	}
+
 	if (actor) {
 		//play vvc effect over actor?
 		actor->DestroySelf();
 	}
 	return FX_NOT_APPLIED;
 }
+
 // 0xa9 Icon:Disable
 int fx_disable_portrait_icon (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -4079,6 +4086,7 @@ int fx_disable_portrait_icon (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->DisablePortraitIcon(fx->Parameter2);
 	return FX_APPLIED;
 }
+
 // 0xaa DamageAnimation
 int fx_damage_animation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -4088,6 +4096,7 @@ int fx_damage_animation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->PlayDamageAnimation(fx->Parameter2, !fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
+
 // 0xab Spell:Add
 int fx_add_innate (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -4096,6 +4105,7 @@ int fx_add_innate (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//this is an instant, so it shouldn't stick
 	return FX_NOT_APPLIED;
 }
+
 // 0xac Spell:Remove
 //gemrb extension: deplete spell by resref
 int fx_remove_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
@@ -4117,6 +4127,7 @@ int fx_remove_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//this is an instant, so it shouldn't stick
 	return FX_NOT_APPLIED;
 }
+
 // 0xad PoisonResistanceModifier
 int fx_poison_resistance_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
