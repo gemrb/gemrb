@@ -1332,20 +1332,6 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 //0x105 immunity to effect (same as bg2?)
 //0x106 SummonPomab
 
-//This is ugly, hardcoded, crap, but this is what we got from BlackIsle
-//Use a 2da for the positions and the resrefs.
-/*
-static Point pomab_positions[6]={
-	Point(0x1e8, 0x20a),
-	Point(0x1c6, 0x1f6),
-	Point(0x1d0, 0x20a),
-	Point(0x1b5, 0x204),
-	Point(0x1c2, 0x216),
-	Point(0x1dd, 0x217)
-};
-static ieResRef pomab_resref[2]={"eepomab","pomimg"};
-*/
-
 int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_summon_pomab (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
@@ -1377,10 +1363,10 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	int real = core->Roll(1,cnt,-1);
-	const char *resrefs[2]={tab->QueryField(0,1), tab->QueryField(1,1) };
+	const char *resrefs[2]={tab->QueryField((unsigned int) 0,0), tab->QueryField((int) 0,1) };
 	
 	for (int i=0;i<cnt;i++) {
-		Point p(atoi(tab->QueryField(i+1,1)), atoi(tab->QueryField(i+1,1)));
+		Point p(atoi(tab->QueryField(i+1,0)), atoi(tab->QueryField(i+1,1)));
 		core->SummonCreature(resrefs[real!=i], fx->Resource2, Owner,
 			target, p, EAM_DEFAULT, 0, NULL);
 	}
