@@ -81,6 +81,17 @@ def OnLoad ():
 		DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"EnterGamePress")
 
+	if not GameIsHOW():
+		GemRB.SetVar ("PlayMode",2) #using mpsave and second row??
+	else:
+		GemRB.SetGlobal ("EXPANSION_DOOR", "GLOBAL", 1) # entrance to the HOW start
+		if GemRB.GetVar("ExpansionGame") == 1:
+			GemRB.SetVar ("PlayMode",3) #using mpsave and second row
+			GemRB.GameSetExpansion (1)
+		else:
+			GemRB.SetVar ("PlayMode",2) #using mpsave and first row
+			GemRB.GameSetExpansion (0)
+
 	PartyFormationWindow.SetVisible (1)
 	return
 
@@ -135,17 +146,6 @@ def ModifyCharsPress ():
 	return
 
 def EnterGamePress ():
-	if not GameIsHOW():
-		GemRB.SetVar ("PlayMode",2) #using mpsave and second row??
-	else:
-		GemRB.SetGlobal ("EXPANSION_DOOR", "GLOBAL", 1) # entrance to the HOW start
-		if GemRB.GetVar ("oldgame")==0:
-			GemRB.SetVar ("PlayMode",3) #using mpsave and second row
-			GemRB.GameSetExpansion (1)
-		else:
-			GemRB.SetVar ("PlayMode",2) #using mpsave and first row
-			GemRB.GameSetExpansion (0)
-
 	GemRB.EnterGame ()
 	return
 
