@@ -88,6 +88,7 @@ def OnLoad ():
 		if HasTOTL():
 			GemRB.SetGlobal ("9101_SPAWN_HOBART", "GLOBAL", 1)
 		if GemRB.GetVar("ExpansionGame") == 1:
+			GemRB.SetGlobal ("CHAPTER", "GLOBAL", 1)
 			GemRB.SetVar ("PlayMode",3) #using mpsave and second row
 			GemRB.GameSetExpansion (1)
 		else:
