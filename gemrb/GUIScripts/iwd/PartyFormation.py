@@ -24,7 +24,7 @@
 ###################################################
 
 import GemRB
-from GUICommon import GameIsHOW
+from GUICommon import GameIsHOW, HasTOTL
 
 PartyFormationWindow = 0
 CreateCharWindow = 0
@@ -85,6 +85,8 @@ def OnLoad ():
 		GemRB.SetVar ("PlayMode",2) #using mpsave and second row??
 	else:
 		GemRB.SetGlobal ("EXPANSION_DOOR", "GLOBAL", 1) # entrance to the HOW start
+		if HasTOTL():
+			GemRB.SetGlobal ("9101_SPAWN_HOBART", "GLOBAL", 1)
 		if GemRB.GetVar("ExpansionGame") == 1:
 			GemRB.SetVar ("PlayMode",3) #using mpsave and second row
 			GemRB.GameSetExpansion (1)

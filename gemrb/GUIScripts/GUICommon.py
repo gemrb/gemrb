@@ -258,6 +258,9 @@ def HasTOB ():
 def GameIsHOW ():
 	return GemRB.HasResource ("expmap", RES_WMP)
 
+def HasTOTL ():
+	return GemRB.HasResource ("ar9700", RES_ARE)
+
 def GetIWDSpellButtonCount ():
 	if GameIsHOW():
 		return 24
