@@ -1334,6 +1334,7 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 
 //This is ugly, hardcoded, crap, but this is what we got from BlackIsle
 //Use a 2da for the positions and the resrefs.
+/*
 static Point pomab_positions[6]={
 	Point(0x1e8, 0x20a),
 	Point(0x1c6, 0x1f6),
@@ -1343,6 +1344,7 @@ static Point pomab_positions[6]={
 	Point(0x1dd, 0x217)
 };
 static ieResRef pomab_resref[2]={"eepomab","pomimg"};
+*/
 
 int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1356,11 +1358,31 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
-	int real = core->Roll(1,6,-1);
+	ieResRef tableResRef;
 
-	for (int i=0;i<6;i++) {
-		core->SummonCreature(real==i?pomab_resref[0]:pomab_resref[1], fx->Resource2, Owner,
-			target, pomab_positions[i], EAM_DEFAULT, 100, NULL);
+	if (fx->Resource[0]) {
+		strnlwrcpy(tableResRef, fx->Resource, 8);
+	} else {
+		memcpy(tableResRef,"pomab",6);
+	}
+
+	AutoTable tab(tableResRef);
+	if (!tab) {
+		return FX_NOT_APPLIED;
+	}
+
+	int cnt = tab->GetRowCount()-1;
+	if (cnt<2) {
+		return FX_NOT_APPLIED;
+	}
+
+	int real = core->Roll(1,cnt,-1);
+	const char *resrefs[2]={tab->QueryField(0,1), tab->QueryField(1,1) };
+	
+	for (int i=0;i<cnt;i++) {
+		Point p(atoi(tab->QueryField(i+1,1)), atoi(tab->QueryField(i+1,1)));
+		core->SummonCreature(resrefs[real!=i], fx->Resource2, Owner,
+			target, p, EAM_DEFAULT, 0, NULL);
 	}
 	return FX_NOT_APPLIED;
 }
