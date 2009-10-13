@@ -42,6 +42,7 @@ from GUISAVE import *
 from GUICommonWindows import *
 
 ###################################################
+BackgroundWindow = None
 GameOptionsWindow = None
 PortraitWindow = None
 OldPortraitWindow = None
@@ -54,20 +55,20 @@ QuitMsgWindow = None
 
 ###################################################
 def CloseOptionsWindow ():
-	global GameOptionsWindow, OptionsWindow, PortraitWindow
+	global BackgroundWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
-	if GameOptionsWindow == None:
+	if BackgroundWindow == None:
 		return
 
-	if GameOptionsWindow:
-		GameOptionsWindow.Unload ()
+	if BackgroundWindow:
+		BackgroundWindow.Unload ()
 	if OptionsWindow:
 		OptionsWindow.Unload ()
 	if PortraitWindow:
 		PortraitWindow.Unload ()
 
-	GameOptionsWindow = None
+	BackgroundWindow = None
 	GemRB.SetVar ("OtherWindow", -1)
 	GemRB.SetVisible (0,1)
 	GemRB.UnhideGUI ()
@@ -79,7 +80,7 @@ def CloseOptionsWindow ():
 
 def OpenOptionsWindow ():
 	"""Open main options window"""
-	global GameOptionsWindow, OptionsWindow, PortraitWindow
+	global BackgroundWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow(OpenOptionsWindow):
@@ -90,8 +91,8 @@ def OpenOptionsWindow ():
 	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIOPT", 640, 480)
-	GameOptionsWindow = Window = GemRB.LoadWindowObject (2)
-	GemRB.SetVar ("OtherWindow", GameOptionsWindow.ID)
+	BackgroundWindow = Window = GemRB.LoadWindowObject (2)
+	GemRB.SetVar ("OtherWindow", BackgroundWindow.ID)
 	#saving the original portrait window
 	if OldPortraitWindow == None:
 		OldOptionsWindow = GUICommonWindows.OptionsWindow
@@ -148,18 +149,16 @@ def OpenOptionsWindow ():
 
 ###################################################
 def CloseVideoOptionsWindow ():
-	OpenOptionsWindow ()
-	OpenOptionsWindow ()
-
-
-def OpenVideoOptionsWindow ():
-	"""Open video options window"""
-	global GameOptionsWindow, HelpTextArea
+	global GameOptionsWindow
 
 	if GameOptionsWindow:
 		if GameOptionsWindow:
 			GameOptionsWindow.Unload ()
 		GameOptionsWindow = None
+
+def OpenVideoOptionsWindow ():
+	"""Open video options window"""
+	global GameOptionsWindow, HelpTextArea
 
 	GameOptionsWindow = Window = GemRB.LoadWindowObject (6)
 
@@ -221,19 +220,17 @@ def DisplayHelpStaticAnim ():
 ###################################################
 
 def CloseAudioOptionsWindow ():
-	OpenOptionsWindow ()
-	OpenOptionsWindow ()
-
-
-def OpenAudioOptionsWindow ():
-	"""Open audio options window"""
-	global GameOptionsWindow, HelpTextArea
+	global GameOptionsWindow
 
 	if GameOptionsWindow:
 		if GameOptionsWindow:
 			GameOptionsWindow.Unload ()
 		GameOptionsWindow = None
-	
+
+def OpenAudioOptionsWindow ():
+	"""Open audio options window"""
+	global GameOptionsWindow, HelpTextArea
+
 	GameOptionsWindow = Window = GemRB.LoadWindowObject (7)
 
 	HelpTextArea = OptHelpText ('AudioOptions', Window, 14, 18040)
@@ -251,7 +248,6 @@ def OpenAudioOptionsWindow ():
 	OptCheckbox ('CreativeEAX', Window, 26, 28, 'Environmental Audio', 1)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	
 
 def DisplayHelpAmbientVolume ():
 	HelpTextArea.SetText (18008)
@@ -276,18 +272,17 @@ def DisplayHelpCreativeEAX ():
 ###################################################
 
 def CloseGameplayOptionsWindow ():
-	OpenOptionsWindow ()
-	OpenOptionsWindow ()
-
-def OpenGameplayOptionsWindow ():
-	"""Open gameplay options window"""
-	global GameOptionsWindow, HelpTextArea
+	global GameOptionsWindow
 
 	if GameOptionsWindow:
 		if GameOptionsWindow:
 			GameOptionsWindow.Unload ()
 		GameOptionsWindow = None
-	
+
+def OpenGameplayOptionsWindow ():
+	"""Open gameplay options window"""
+	global GameOptionsWindow, HelpTextArea
+
 	GameOptionsWindow = Window = GemRB.LoadWindowObject (8)
 
 	HelpTextArea = OptHelpText ('GameOptions', Window, 40, 18042)
@@ -482,8 +477,7 @@ def CloseCharacterSoundsWindow ():
 	if GameOptionsWindow:
 		GameOptionsWindow.Unload ()
 	GameOptionsWindow = None
-	OpenGameplayOptionsWindow ()
-
+	OpenAudioOptionsWindow ()
 
 def OpenCharacterSoundsWindow ():
 	"""Open character sounds options window"""
@@ -494,7 +488,6 @@ def OpenCharacterSoundsWindow ():
 			GameOptionsWindow.Unload ()
 		GameOptionsWindow = None
 
-	
 	GameOptionsWindow = Window = GemRB.LoadWindowObject (12)
 
 	HelpTextArea = OptHelpText ('CharacterSounds', Window, 16, 18041)
@@ -572,7 +565,7 @@ def CloseLoadMsgWindow ():
 		LoadMsgWindow.Unload ()
 	LoadMsgWindow = None
 	OptionsWindow.SetVisible (1)
-	GameOptionsWindow.SetVisible (1)
+	BackgroundWindow.SetVisible (1)
 	PortraitWindow.SetVisible (1)
 	return
 
@@ -651,7 +644,7 @@ def CloseQuitMsgWindow ():
 		QuitMsgWindow.Unload ()
 	QuitMsgWindow = None
 	OptionsWindow.SetVisible (1)
-	GameOptionsWindow.SetVisible (1)
+	BackgroundWindow.SetVisible (1)
 	PortraitWindow.SetVisible (1)
 	return
 
