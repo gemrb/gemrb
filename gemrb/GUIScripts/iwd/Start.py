@@ -42,10 +42,12 @@ def OnLoad ():
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos:
-		GemRB.PlayMovie ('BISLOGO')
-		GemRB.PlayMovie ('TSRLOGO')
-		GemRB.PlayMovie ('INTRO')
-
+		GemRB.PlayMovie ("BISLOGO", 1)
+		if GameIsHOW():
+			GemRB.PlayMovie ("WOTC", 1)
+		else:
+			GemRB.PlayMovie ("TSRLOGO", 1)
+		GemRB.PlayMovie("INTRO", 1)
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
 	# Find proper window border for higher resolutions
