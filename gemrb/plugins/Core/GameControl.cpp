@@ -904,7 +904,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				if (Mod & GEM_MOD_SHIFT) {
 					// mwahaha!
 					Effect *newfx;
-					newfx = EffectQueue::CreateEffect(damage_ref, 1000, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
+					newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
 					Actor *victim;
 					for (int i = area->GetActorCount(0)-1; i >= 0; i--) {
 						victim = area->GetActor(i, 0);
@@ -921,12 +921,12 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 						lastActor->ClearPath();
 	
 						Effect *newfx;
-						newfx = EffectQueue::CreateEffect(damage_ref, 1000, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
+						newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
 						core->ApplyEffect(newfx, lastActor, lastActor);
 						if (! (lastActor->GetInternalFlag() & IF_REALLYDIED)) {
-							newfx = EffectQueue::CreateEffect(damage_ref, 1000, DAMAGE_ACID<<16, FX_DURATION_INSTANT_PERMANENT);
+							newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_ACID<<16, FX_DURATION_INSTANT_PERMANENT);
 							core->ApplyEffect(newfx, lastActor, lastActor);
-							newfx = EffectQueue::CreateEffect(damage_ref, 1000, DAMAGE_CRUSHING<<16, FX_DURATION_INSTANT_PERMANENT);
+							newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_CRUSHING<<16, FX_DURATION_INSTANT_PERMANENT);
 							core->ApplyEffect(newfx, lastActor, lastActor);
 						}
 						delete newfx;
