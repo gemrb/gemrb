@@ -3554,11 +3554,15 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 	}
 }
 
-void GameScript::ClearActions(Scriptable* Sender, Action* /*parameters*/)
+void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 {
-	Sender->ClearActions();
-	if (Sender->Type==ST_ACTOR) {
-		Actor* act = (Actor *) Sender;
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		tar = Sender;
+	}
+	tar->ClearActions();
+	if (tar->Type==ST_ACTOR) {
+		Actor* act = (Actor *) tar;
 		act->ClearPath();
 		//not sure about this
 		//act->SetModal(MS_NONE);
