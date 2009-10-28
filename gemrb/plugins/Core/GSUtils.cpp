@@ -1411,8 +1411,10 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	}
 	if (!(flags&AC_NO_SOUND) ) {
 		if (actor->LastTarget != targetID) {
-			//play attack sound
-			DisplayStringCore(Sender, VB_ATTACK, DS_CONSOLE|DS_CONST );
+			//play attack sound for party members
+			if (actor->InParty) {
+				DisplayStringCore(Sender, VB_ATTACK, DS_CONSOLE|DS_CONST );
+			}
 			//display attack message
 			core->DisplayConstantStringAction(STR_ACTION_ATTACK,0xf0f0f0, Sender, target);
 		}
