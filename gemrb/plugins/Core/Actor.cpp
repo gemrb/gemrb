@@ -4010,7 +4010,7 @@ void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagety
 
 	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
 	if (mirrorimages) {
-		if (core->Roll(1,mirrorimages+1,0)!=1) {
+		if (LuckyRoll(1,mirrorimages+1,0) != 1) {
 			target->fxqueue.DecreaseParam1OfEffect(fx_mirrorimage_ref, 1);
 			target->Modified[IE_MIRRORIMAGES]--;
 			damage = 0;
