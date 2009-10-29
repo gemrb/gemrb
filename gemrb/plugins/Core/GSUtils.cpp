@@ -1413,7 +1413,9 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		if (actor->LastTarget != targetID) {
 			//play attack sound for party members
 			if (actor->InParty) {
-				DisplayStringCore(Sender, VB_ATTACK, DS_CONSOLE|DS_CONST );
+				//pick from all 5 possible verbal constants
+				actor->VerbalConstant(VB_ATTACK, 5);
+				//DisplayStringCore(Sender, VB_ATTACK, DS_CONSOLE|DS_CONST );
 			}
 			//display attack message
 			core->DisplayConstantStringAction(STR_ACTION_ATTACK,0xf0f0f0, Sender, target);

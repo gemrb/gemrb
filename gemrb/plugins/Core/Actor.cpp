@@ -2216,9 +2216,13 @@ void Actor::Interact(int type)
 		default:
 			return;
 	}
+	VerbalConstant(start, count);
+}
 
+void Actor::VerbalConstant(int start, int count)
+{
 	count=rand()%count;
-	while(count && StrRefs[start+count]!=0xffff) count--;
+	while(count>=0 && (!StrRefs[start+count] || (StrRefs[start+count]==(ieStrRef) -1)) ) count--;
 	if(count>=0) {
 		DisplayStringCore(this, start+count, DS_CONSOLE|DS_CONST );
 	}

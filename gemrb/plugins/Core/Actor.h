@@ -426,6 +426,8 @@ public:
 	void SetMCFlag(ieDword bitmask, int op);
 	/* inlined dialogue start */
 	void Interact(int type);
+	/* displaying a random verbal constant */
+	void VerbalConstant(int start, int count);
 	/* inlined dialogue response */
 	void Response(int type);
 	/* called when someone died in the party */
