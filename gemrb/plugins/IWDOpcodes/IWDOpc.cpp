@@ -817,7 +817,7 @@ int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1, newfx);
+	core->SummonCreature(monster, areahit, Owner, target, p, EAM_SOURCEALLY, fx->Parameter1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
@@ -878,7 +878,7 @@ int fx_animate_dead (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1, newfx);
+	core->SummonCreature(monster, areahit, Owner, target, p, EAM_SOURCEALLY, fx->Parameter1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
@@ -955,7 +955,7 @@ int fx_summon_monster2 (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1, newfx);
+	core->SummonCreature(monster, areahit, Owner, target, p, EAM_SOURCEALLY, fx->Parameter1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
@@ -1043,7 +1043,7 @@ int fx_summon_shadow_monster (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1, newfx);
+	core->SummonCreature(monster, areahit, Owner, target, p, EAM_SOURCEALLY, fx->Parameter1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
@@ -1644,7 +1644,7 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 		//the monster should appear near the effect position
 		Point p(fx->PosX, fx->PosY);
 		Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-		core->SummonCreature(monster, areahit, Owner, target, p, EAM_DEFAULT, fx->Parameter1, newfx);
+		core->SummonCreature(monster, areahit, Owner, target, p, EAM_SOURCEALLY, fx->Parameter1, newfx);
 		delete newfx;
 	}
 	return FX_NOT_APPLIED;

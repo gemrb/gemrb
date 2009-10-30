@@ -2538,9 +2538,12 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		if (vvcres[0]) {
 			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(vvcres, false);
 			if (vvc) {
-				//This is the final position of the actor, not the original target point
+				//This is the final position of the summoned creature
+				//not the original target point
 				vvc->XPos=ab->Pos.x;
 				vvc->YPos=ab->Pos.y;
+				//force vvc to play only once
+				vvc->PlayOnce();
 				map->AddVVCell( vvc );
 			}
 		}
