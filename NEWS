@@ -1,25 +1,22 @@
-GemRB svn (7367):
+GemRB V0.6.0 (2009-11-03):
   New features:
-    - 
     - BG1 and IWD are roughly completable!
-    - dream cutscenes in ToB
+    - levelup support for bg1 and iwd, dream cutscenes in ToB
+    - more hardcoded projectiles and avatar animations
     - evasion, backstabbing and basic hide in shadows
-    - more hardcoded projectiles
-    - levelup support for bg1 and iwd
-    - contingency and sequencer spells, beginnings of wild magic support
     - compatibility with the widescreen mod (unreleased) allows for multiple
       custom resolutions
+    - contingency and sequencer spells, beginnings of wild magic support
 
   Improved features:
-    - 
     - combat, travelling and feedback
     - better spellcasting timing
     - actions, effects and triggers
     - various guiscripts
     - bugfixes
-    - avatar id ranges
 
   Applied patches:
+    a few patches from nugrud for how/totl support
 
 GemRB V0.5.1 (2009-08-27):
   New features:
