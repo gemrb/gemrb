@@ -1,3 +1,14 @@
+GemRB svn (7428):
+  New features:
+    - 
+
+  Improved features:
+    - 
+    - various guiscripts,
+    - bugfixes
+
+  Applied patches:
+
 GemRB V0.6.0 (2009-11-03):
   New features:
     - BG1 and IWD are roughly completable!
