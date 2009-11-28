@@ -179,8 +179,19 @@ void WorldMapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 void WorldMapControl::AdjustScrolling(short x, short y)
 {
 	WorldMap* worldmap = core->GetWorldMap();
-	ScrollX += x;
-	ScrollY += y;
+	if (x || y) {
+		ScrollX += x;
+		ScrollY += y;
+	} else {
+		//center worldmap on current area
+		unsigned entry;
+
+		WMPAreaEntry *m = worldmap->GetArea(currentArea,entry);
+		if (m) {
+			ScrollX = m->X - Width/2;
+			ScrollY = m->Y - Height/2;
+		}
+	}
 	Sprite2D *MapMOS = worldmap->GetMapMOS();
 	if (ScrollX > MapMOS->Width - Width)
 		ScrollX = MapMOS->Width - Width;

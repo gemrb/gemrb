@@ -199,6 +199,7 @@ def OpenMapWindow ():
 	Window.SetVisible (1)
 	PortraitWindow.SetVisible (1)
 	Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	return
 
 def LeftDoublePressMap ():
 	print "MoveToPoint"
@@ -389,6 +390,7 @@ def WorldMapWindowCommon (Travel):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseWorldMapWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Window.SetVisible (1)
+	MapC()
 	return
 
 def MapN():
@@ -424,6 +426,7 @@ def MapNW():
 	return
 
 def MapC():
+	WorldMapControl.AdjustScrolling (0, 0)
 	return
 
 ###################################################
