@@ -330,27 +330,29 @@ bool Game::DetermineStartPosType(const TableMgr *strta)
 
 void Game::InitActorPos(Actor *actor)
 {
-	bool startorient = 0;
+	//start.2da row labels
+	const char *mode[3] = { "NORMAL", "TUTORIAL", "EXPANSION" };
 
+	unsigned int ip = (unsigned int) (actor->InParty-1);
+	AutoTable start("start");
 	AutoTable strta("startpos");
 	// 0 - single player, 1 - tutorial, 2 - expansion
 	ieDword playmode = 0;
 	core->GetDictionary()->Lookup( "PlayMode", playmode );
-	//hack for iwd2
-	startorient = DetermineStartPosType(strta.ptr());
-	if (startorient || strta->GetRowCount()<6) {
-		playmode %= 2;
-		actor->SetOrientation( atoi( strta->QueryField( playmode+4, actor->InParty-1) ), false );
-	}
-	playmode *= 2;
-	actor->Pos.x = actor->Destination.x = (short) atoi( strta->QueryField( playmode, actor->InParty-1 ) );
-	actor->Pos.y = actor->Destination.y = (short) atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
+	const char *xpos = start->QueryField(mode[playmode],"XPOS");
+	const char *ypos = start->QueryField(mode[playmode],"YPOS");
+	const char *area = start->QueryField(mode[playmode],"AREA");
+	const char *rot = start->QueryField(mode[playmode],"ROT");
+
+	actor->Pos.x = actor->Destination.x = (short) atoi( strta->QueryField( strta->GetRowIndex(xpos), ip ) );
+	actor->Pos.y = actor->Destination.y = (short) atoi( strta->QueryField( strta->GetRowIndex(ypos), ip ) );
+	actor->SetOrientation( atoi( strta->QueryField( strta->GetRowIndex(rot), ip) ), false );
 
 	strta.load("startare");
-	playmode /= 2;
-	playmode *= 3;
-	strnlwrcpy(actor->Area, strta->QueryField( playmode, 0 ), 8 );
+	strnlwrcpy(actor->Area, strta->QueryField( strta->GetRowIndex(area), 0 ), 8 );
 	//TODO: set viewport
+	// strta->QueryField(strta->GetRowIndex(xpos),0);
+	// strta->QueryField(strta->GetColumnIndex(ypos),0);
 
 	SelectActor(actor,true, SELECT_QUIET);
 }
@@ -1545,7 +1547,7 @@ int Game::AttackersOf(ieDword globalID, Map *area) const
 }
 
 /* this method redraws weather. If update is false,
- then the weather particles won't change (game paused)
+then the weather particles won't change (game paused)
 */
 void Game::DrawWeather(Region &screen, bool update)
 {

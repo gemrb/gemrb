@@ -110,13 +110,14 @@ struct Effect {
 	ieDword SourceType; //1-item, 2-spell
 	ieResRef Source;
 	ieDword SourceFlags;
-	ieDword Projectile;           //9c
+	ieDword Projectile;          //9c
 	ieDwordSigned InventorySlot; //a0
 	//Original engine had a VariableName here, but it is stored in the resource fields
 	ieDword CasterLevel;  //c4 in both
 	ieDword FirstApply;   //c8 in bg2, cc in iwd2
 	ieDword SecondaryType;
 	ieDword SecondaryDelay; //still not sure about this
+	ieDword CasterID;       //10c in bg2 (not saved?)
 	// These are not in the IE files, but are our precomputed values
 	ieDword random_value;
 public:
