@@ -1,0 +1,12 @@
+Description: This table is a layer of indirection to support various startpos.2da configurations. It simply describes the used row labels for startpos.2da 
+
+Columns - 
+XPOS  - x position labels
+YPOS  - y position labels
+AREA  - starting area labels
+ROT   - optional facing direction labels
+
+Rows - 
+NORMAL    - data for a normal game starting positions
+TUTORIAL  - data for the tutorial starting positions
+EXPANSION - data for the expansion only game starting positions
