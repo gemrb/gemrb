@@ -54,12 +54,19 @@ def CloseOtherWindow (NewWindowFn):
 
 def GetWindowPack():
 	width = GemRB.GetSystemVariable (SV_WIDTH)
-	gui = -1
+	height = GemRB.GetSystemVariable (SV_HEIGHT)
+
 	if GemRB.GameType == "pst":
 		default = "GUIWORLD"
 	else:
 		default = "GUIW"
 
+	# use a custom gui if there is one
+	gui = "CGUI" + str(width)[:2] + str(height)[:2]
+	if GemRB.HasResource (gui, RES_CHU, 1):
+		return gui
+
+	gui = None
 	if width == 640:
 		gui = default
 	elif width == 800:
@@ -68,20 +75,12 @@ def GetWindowPack():
 		gui = "GUIW10"
 	elif width == 1280:
 		gui = "GUIW12"
-	if gui != -1:
+	if gui:
 		if GemRB.HasResource (gui, RES_CHU, 1):
 			return gui
-		else:
-			return default
 
-	# use a custom gui if there is one
-	height = GemRB.GetSystemVariable (SV_HEIGHT)
-	gui = "CGUI" + str(width)[:2] + str(height)[:2]
-	if GemRB.HasResource (gui, RES_CHU, 1):
-		return gui
-	else:
-		# fallback to the smallest resolution
-		return default
+	# fallback to the smallest resolution
+	return default
 
 def RestPress ():
 	GemRB.RestParty(0,0,0)
