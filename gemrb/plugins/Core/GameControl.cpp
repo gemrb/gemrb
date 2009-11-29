@@ -2333,7 +2333,7 @@ void GameControl::ResizeAdd(Window* win, int type)
 }
 
 //Try to start dialogue between two actors (one of them could be inanimate)
-void GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref)
+int GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref)
 {
 	if (dlg) {
 		delete dlg;
@@ -2348,9 +2348,11 @@ void GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgre
 	if (!dlg) {
 		printMessage("GameControl", " ", LIGHT_RED);
 		printf( "Cannot start dialog: %s\n", dlgref );
-		return;
+		return -1;
 	}
+
 	strnlwrcpy(dlg->ResRef, dlgref, 8); //this isn't handled by GetDialog???
+
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
@@ -2373,9 +2375,14 @@ void GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgre
 		tar->LastTalkedTo=speakerID;
 	}
 
+	int si = dlg->FindFirstState( tgt );
+	if (si < 0) {
+		return -1;
+	}
+
 	//check if we are already in dialog
 	if (DialogueFlags&DF_IN_DIALOG) {
-		return;
+		return 0;
 	}
 	//we need GUI for dialogs
 	UnhideGUI();
@@ -2400,6 +2407,7 @@ void GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgre
 	core->GetGame()->SetControlStatus(CS_HIDEGUI, BM_NAND);
 	core->GetGame()->SetControlStatus(CS_DIALOG, BM_OR);
 	core->SetEventFlag(EF_PORTRAIT);
+	return 0;
 }
 
 /*try to break will only try to break it, false means unconditional stop*/
@@ -2474,17 +2482,14 @@ void GameControl::DialogChoose(unsigned int choose)
 		return;
 	}
 
-	//get the first state with true triggers!
-	int si;
 	if (choose == (unsigned int) -1) {
-		si = dlg->FindFirstState( target );
-		if (si < 0) {
-			core->DisplayConstantStringName(STR_NOTHINGTOSAY,0xff0000,target);
-			ta->SetMinRow( false );
+		//increasing talkcount after top level condition was determined
+
+		int si = dlg->FindFirstState( tgt );
+		if (si<0) {
 			EndDialog();
 			return;
 		}
-		//increasing talkcount after top level condition was determined
 
 		if (tgt) {
 			if (DialogueFlags&DF_TALKCOUNT) {
@@ -2572,13 +2577,6 @@ void GameControl::DialogChoose(unsigned int choose)
 			return;
 		}
 
-		// moved immediate execution of dialog actions here
-		/*if (DialogueFlags & DF_FREEZE_SCRIPTS) {
-			target->ProcessActions(true);
-			//clear queued actions that remained stacked?
-			target->ClearActions();
-		}*/
-
 		//displaying dialog for selected option
 		int si = tr->stateIndex;
 		//follow external linkage, if required
@@ -2617,8 +2615,8 @@ void GameControl::DialogChoose(unsigned int choose)
 				EndDialog();
 				return;
 			}
-			InitDialog( speaker, target, tmpresref );
-			if (!dlg) {
+			int ret = InitDialog( speaker, target, tmpresref);
+			if (ret<0) {
 				// error was displayed by InitDialog
 				ta->SetMinRow( false );
 				EndDialog();

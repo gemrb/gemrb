@@ -2103,7 +2103,7 @@ void GameScript::StartDialogueNoSetInterrupt(Scriptable* Sender,
 //no, they aren't, but they increase interactcount
 void GameScript::Interact(Scriptable* Sender, Action* parameters)
 {
-	BeginDialog( Sender, parameters, BD_INTERACT );
+	BeginDialog( Sender, parameters, BD_INTERACT | BD_NOEMPTY );
 }
 
 static unsigned int FindNearPoint(Scriptable* Sender, Point *&p1, Point *&p2)

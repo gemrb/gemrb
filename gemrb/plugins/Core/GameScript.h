@@ -576,6 +576,7 @@ struct TriggerLink {
 #define BD_INTERRUPT 128 //interrupts action
 #define BD_NUMERIC   256 //target is numeric
 #define BD_ITEM      512 //talk to an item
+#define BD_NOEMPTY   1024 //don't display '... has nothing to say to you'
 
 #define AF_NONE 	 0
 #define AF_INSTANT       1

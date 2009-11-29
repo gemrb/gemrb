@@ -1218,6 +1218,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
 	//maybe we should remove the action queue, but i'm unsure
 	//no, we shouldn't even call this!
 	//Sender->ReleaseCurrentAction();
@@ -1259,6 +1260,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 	}
 
+	int ret;
+
 	if (Dialog[0]) {
 		//increasing NumTimesTalkedTo or NumTimesInteracted
 		if (Flags & BD_TALKCOUNT) {
@@ -1268,13 +1271,25 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 
 		core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
-		gc->InitDialog( scr, tar, Dialog);
+		ret = gc->InitDialog( scr, tar, Dialog);
+	}
+	else {
+		ret = -1;
 	}
 
-	// we should block until dialog is over! here is a hack instead,
-	// we will just hope that the dialog starts in the next frame
+	if (ret<0) {
+		Sender->ReleaseCurrentAction();
+		if (Flags & BD_NOEMPTY) {
+			return;
+		}
+		core->DisplayConstantStringName(STR_NOTHINGTOSAY,0xff0000,tar);
+		return;
+	}
+
+	//this is a bit fishy
 	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction();
+
 }
 
 void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust)
