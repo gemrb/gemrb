@@ -3176,7 +3176,10 @@ unsigned int Map::GetLightLevel(Point &Pos)
 	Color c = LightMap->GetPixel(Pos.x/16, Pos.y/12);
 	// at night/dusk/dawn the lightmap color is adjusted by the color overlay. (Only get's darker.)
 	const Color *tint = core->GetGame()->GetGlobalTint();
-	return ((c.r-tint->r)*114 + (c.g-tint->g)*587 + (c.b-tint->b)*299)/2550;
+	if (tint) {
+		return ((c.r-tint->r)*114 + (c.g-tint->g)*587 + (c.b-tint->b)*299)/2550;
+	}
+	return (c.r*114+c.g*587+c.b*299)/2550;
 }
 
 ////////////////////AreaAnimation//////////////////
