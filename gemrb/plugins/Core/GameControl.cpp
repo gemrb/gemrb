@@ -2375,15 +2375,16 @@ int GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref
 		tar->LastTalkedTo=speakerID;
 	}
 
+	//check if we are already in dialog
+	if (DialogueFlags&DF_IN_DIALOG) {
+		return 0;
+	}
+
 	int si = dlg->FindFirstState( tgt );
 	if (si < 0) {
 		return -1;
 	}
 
-	//check if we are already in dialog
-	if (DialogueFlags&DF_IN_DIALOG) {
-		return 0;
-	}
 	//we need GUI for dialogs
 	UnhideGUI();
 
