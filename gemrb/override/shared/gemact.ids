@@ -3,3 +3,4 @@ IDS
 399 ApplySpellPointRES(P:Target*,S:SpellName*)
 398 ChangeDestination(O:Object*,S:Destination*)
 397 UnmakeGlobal(O:Object*)
+396 SetToken2DA(S:ResRef*)

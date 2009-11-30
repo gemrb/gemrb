@@ -6680,8 +6680,8 @@ void GameScript::DoubleClickRButtonPoint(Scriptable* Sender, Action* parameters)
 //TODO: investigate what happens with * values
 void GameScript::SetupWish(Scriptable* Sender, Action* parameters)
 {
-	int count = 0;
-	char varname[33];
+	int count;
+	ieVariable varname;
 
 	AutoTable tm("wish");
 	if (!tm) {
@@ -6730,6 +6730,31 @@ retry:
 	}
 }
 
+//GemRB specific action
+//Sets up multiple tokens randomly (one per 2da row)
+//the row label column sets the token names
+void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
+{
+	int count;
+	int i,j;
+	ieVariable tokenname;
+
+	AutoTable tm(parameters->string0Parameter);
+	if (!tm) {
+		printStatus( "ERROR", LIGHT_RED );
+		printf( "Cannot find %s.2da.\n", parameters->string0Parameter);
+		return;
+	}
+	
+	count = tm->GetRowCount();
+	for(i=0;i<count;i++) {
+		//roll a random number between 0 and column #
+		j = core->Roll(1,tm->GetColumnCount(i),-1);
+		strnuprcpy(tokenname, tm->GetRowName(i), 32);
+		core->GetTokenDictionary()->SetAtCopy( tokenname, tm->QueryField(i, j) );
+	}
+}
+
 //this is a gemrb extension for scriptable tracks
 void GameScript::SetTrackString(Scriptable* Sender, Action* parameters)
 {
@@ -6757,3 +6782,4 @@ void GameScript::BanterBlockTime(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->BanterBlockTime = parameters->int0Parameter;
 }
+
