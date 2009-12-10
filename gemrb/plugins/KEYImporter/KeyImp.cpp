@@ -251,6 +251,13 @@ bool KeyImp::HasResource(const char* resname, SClass_ID type, bool silent)
 	if (FindIn( core->GamePath, core->GamePortraitsPath, resname, type)) return true;
 	if (FindIn( core->GamePath, core->GameDataPath, resname, type)) return true;
 
+	//IWD2 movies are on the CD but not in the BIF
+	if (FindIn( core->CD1, core->GameDataPath,resname, type)) return true;
+	if (FindIn( core->CD2, core->GameDataPath,resname, type)) return true;
+	if (FindIn( core->CD3, core->GameDataPath,resname, type)) return true;
+	if (FindIn( core->CD4, core->GameDataPath,resname, type)) return true;
+	if (FindIn( core->CD5, core->GameDataPath,resname, type)) return true;
+
 	unsigned int ResLocator;
 	if (resources.Lookup( resname, type, ResLocator )) {
 		return true;
@@ -312,6 +319,26 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type, bool silent
 
 	fs=SearchIn( core->GamePath, core->GameDataPath, resname, type,
 		"Found in Data", silent );
+	if (fs) return fs;
+
+	fs=SearchIn( core->CD1, core->GameDataPath, resname, type,
+		"Found in CD1", silent );
+	if (fs) return fs;
+
+	fs=SearchIn( core->CD2, core->GameDataPath, resname, type,
+		"Found in CD2", silent );
+	if (fs) return fs;
+
+	fs=SearchIn( core->CD3, core->GameDataPath, resname, type,
+		"Found in CD3", silent );
+	if (fs) return fs;
+
+	fs=SearchIn( core->CD4, core->GameDataPath, resname, type,
+		"Found in CD4", silent );
+	if (fs) return fs;
+
+	fs=SearchIn( core->CD5, core->GameDataPath, resname, type,
+		"Found in CD5", silent );
 	if (fs) return fs;
 
 	unsigned int ResLocator;
@@ -430,7 +457,7 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 		return gamedata->GetFactory()->GetFactoryObject( fobjindex );
 
 	// empty resref
-	if (!strcmp(resname, "")) 
+	if (!strcmp(resname, ""))
 		return NULL;
 
 	switch (type) {
