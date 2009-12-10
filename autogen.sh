@@ -83,8 +83,11 @@ then
   my_libtoolize=$LIBTOOLIZE
 else
   for file in libtoolize; do
-    libtool_version=`$file --version | sed -n '1 { s/^[^ ]* (.*) //; s/ .*$//; s,\.,,g; p; }'`
-    if [ "$libtool_version" -gt 15 ];
+    libtool_version=`$file --version | sed -n '1 { s/^[^ ]* (.*) //; s/ .*$//; s,,,g; p; }'`
+    libtool_version_major=`echo "$libtool_version" | cut -d. -f1`
+    libtool_version_minor=`echo "$libtool_version" | cut -d. -f2`
+    echo libtool version: "$libtool_version_major"."$libtool_version_minor"
+    if [ "$libtool_version_major" -gt 1 ] || [ "$libtool_version_minor" -gt 4 ];
     then
       my_libtoolize=$file
       break
@@ -157,7 +160,6 @@ then
 fi
 
 echo Running libtoolize
-libtool_version_major=`echo "libtool_version" | cut -c1`
 if [ "$libtool_version_major" = "2" ]; then
   $my_libtoolize --force --no-warn
 else
