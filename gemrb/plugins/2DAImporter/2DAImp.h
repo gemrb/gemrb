@@ -79,41 +79,28 @@ public:
 		 uses column name and row name to search the field */
 	inline const char* QueryField(const char* row, const char* column) const
 	{
-		unsigned int i;
+		int rowi, coli;
 
-		int rowi = -1, coli = -1;
-		for (i = 0; i < rowNames.size(); i++) {
-			if (stricmp( rowNames[i], row ) == 0) {
-				rowi = i;
-				break;
-			}
-		}
-		if (rowi == -1) {
+		rowi = GetRowIndex(row);
+
+		if (rowi < 0) {
 			return ( char * ) defVal;
 		}
-		for (i = 0; i < colNames.size(); i++) {
-			if (stricmp( colNames[i], column ) == 0) {
-				coli = i;
-				break;
-			}
-		}
-		if (coli == -1) {
+
+		coli = GetColumnIndex(column);
+		 
+		if (coli < 0) {
 			return ( char * ) defVal;
 		}
-		if (rows[rowi].size() <= ( unsigned int ) coli) {
-			return ( char * ) defVal;
-		}
-		if (rows[rowi][coli][0]=='*' && !rows[rowi][coli][1]) {
-			return ( char *) defVal;
-		}
-		return rows[rowi][coli];
+
+		return QueryField((unsigned int) rowi, (unsigned int) coli);
 	};
 
 	inline int GetRowIndex(const char* string) const
 	{
 		for (unsigned int index = 0; index < rowNames.size(); index++) {
 			if (stricmp( rowNames[index], string ) == 0) {
-				return index;
+				return (int) index;
 			}
 		}
 		return -1;
@@ -123,7 +110,7 @@ public:
 	{
 		for (unsigned int index = 0; index < colNames.size(); index++) {
 			if (stricmp( colNames[index], string ) == 0) {
-				return index;
+				return (int) index;
 			}
 		}
 		return -1;
