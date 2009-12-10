@@ -29,6 +29,7 @@ dnl Initialize autoconf and automake
 
 AC_PREREQ([2.57])
 AC_INIT(gemrb, 0.6.0)
+
 AC_CONFIG_AUX_DIR([admin])
 AC_CONFIG_SRCDIR([gemrb/])
 AC_CANONICAL_SYSTEM
@@ -234,6 +235,7 @@ gemrb/plugins/ACMImporter/Makefile
 gemrb/plugins/AREImporter/Makefile 
 gemrb/plugins/BAMImporter/Makefile 
 gemrb/plugins/BIFImporter/Makefile 
+gemrb/plugins/BIKPlayer/Makefile
 gemrb/plugins/BMPImporter/Makefile 
 gemrb/plugins/PNGImporter/Makefile 
 gemrb/plugins/CHUImporter/Makefile 
