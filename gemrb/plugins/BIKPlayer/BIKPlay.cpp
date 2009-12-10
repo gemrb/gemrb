@@ -490,7 +490,7 @@ const uint8_t ff_log2_tab[256]={
 };
  
 static inline int float_to_int16_one(const float *src){
-	register unsigned int tmp = *(const int32_t*)src;
+	register int tmp = *(const int32_t*)src;
 	if(tmp & 0xf0000){
 		tmp = (0x43c0ffff - tmp)>>31;
 		// is this faster on some gcc/cpu combinations?
@@ -589,6 +589,18 @@ void BIKPlay::DecodeBlock(short *out)
 			coeffs[i] *= s_root;
 	}
 
+#if 0
+    if(s_first)
+    {
+        unsigned int count = (unsigned int) s_frame_len;
+        printf("Outbuffer floats: ");
+        for(i=0;i<count;i++) {
+                printf("%f ", s_coeffs_ptr[0][i]);
+        }
+        printf("\n");
+    }
+#endif 
+
 	ff_float_to_int16_interleave_c(out, (const float **)s_coeffs_ptr, s_frame_len, s_channels);
 
 	if (!s_first) {
@@ -598,6 +610,16 @@ void BIKPlay::DecodeBlock(short *out)
 			out[i] = (s_previous[i] * (count - i) + out[i] * i) >> shift;
 		}
 	}
+#if 0
+        else {
+        unsigned int count = s_overlap_len * s_channels;
+        printf("Outbuffer: ");
+        for(i=0;i<count;i++) {
+                printf("%d ", out[i]);
+        }
+        printf("\n");
+	}
+#endif
 
 	memcpy(s_previous, out + s_block_size,
 		   s_overlap_len * s_channels * sizeof(*out));
