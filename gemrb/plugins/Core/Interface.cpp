@@ -200,6 +200,10 @@ Interface::Interface(int iargc, char* iargv[])
 	strncpy( GamePortraitsPath, "portraits", sizeof(GamePortraitsPath) );
 	strncpy( GameCharactersPath, "characters", sizeof(GameCharactersPath) );
 	strncpy( GameDataPath, "data", sizeof(GameDataPath) );
+	for (int i = 0; i < 6; i++) {
+		strncpy( CD[i], "CDi", sizeof(CD[i]) );
+		CD[i][2] = '1' + i;
+	}
 	strncpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
 	strncpy( ButtonFont, "STONESML", sizeof(ButtonFont) );
 	strncpy( TooltipFont, "STONESML", sizeof(TooltipFont) );
@@ -2106,24 +2110,10 @@ bool Interface::LoadConfig(const char* filename)
 		} else if (stricmp( name, "SavePath" ) == 0) {
 			strncpy( SavePath, value, sizeof(SavePath) );
 			ResolveFilePath( SavePath );
-		} else if (stricmp( name, "CD1" ) == 0) {
-			strncpy( CD1, value, sizeof(CD1) );
-			ResolveFilePath( CD1 );
-		} else if (stricmp( name, "CD2" ) == 0) {
-			strncpy( CD2, value, sizeof(CD2) );
-			ResolveFilePath( CD2 );
-		} else if (stricmp( name, "CD3" ) == 0) {
-			strncpy( CD3, value, sizeof(CD3) );
-			ResolveFilePath( CD3 );
-		} else if (stricmp( name, "CD4" ) == 0) {
-			strncpy( CD4, value, sizeof(CD4) );
-			ResolveFilePath( CD4 );
-		} else if (stricmp( name, "CD5" ) == 0) {
-			strncpy( CD5, value, sizeof(CD5) );
-			ResolveFilePath( CD5 );
-		} else if (stricmp( name, "CD6" ) == 0) {
-			strncpy( CD6, value, sizeof(CD6) );
-			ResolveFilePath( CD6 );
+		} else if (strnicmp( name, "CD", 2 ) == 0 &&
+				name[2] >= '1' && name[2] <= '5' && name[3] == 0) {
+			strncpy( CD[name[2]-'1'], value, sizeof(CD[name[2]-'1']) );
+			ResolveFilePath( CD[name[2]-'1'] );
 		}
 	}
 	fclose( config );

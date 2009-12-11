@@ -697,12 +697,7 @@ public:
 	char GamePath[_MAX_PATH];
 	char SavePath[_MAX_PATH];
 	char INIConfig[_MAX_PATH];
-	char CD1[_MAX_PATH];
-	char CD2[_MAX_PATH];
-	char CD3[_MAX_PATH];
-	char CD4[_MAX_PATH];
-	char CD5[_MAX_PATH];
-	char CD6[_MAX_PATH];
+	char CD[6][_MAX_PATH];
 	int Width, Height, Bpp, ForceStereo;
 	unsigned int TooltipDelay;
 	unsigned int FogOfWar;

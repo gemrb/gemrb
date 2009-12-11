@@ -86,25 +86,11 @@ KeyImp::KeyImp(void)
 	searchPath.push_back(path);
 
 	//IWD2 movies are on the CD but not in the BIF
-	PathJoin( path.path, core->CD1, core->GameDataPath, NULL);
-	path.description = "Data";
-	searchPath.push_back(path);
-
-	PathJoin( path.path, core->CD2, core->GameDataPath, NULL);
-	path.description = "Data";
-	searchPath.push_back(path);
-
-	PathJoin( path.path, core->CD3, core->GameDataPath, NULL);
-	path.description = "Data";
-	searchPath.push_back(path);
-
-	PathJoin( path.path, core->CD4, core->GameDataPath, NULL);
-	path.description = "Data";
-	searchPath.push_back(path);
-
-	PathJoin( path.path, core->CD5, core->GameDataPath, NULL);
-	path.description = "Data";
-	searchPath.push_back(path);
+	for (int i = 0; i < 6; i++) {
+		PathJoin( path.path, core->CD[i], core->GameDataPath, NULL);
+		path.description = "Data";
+		searchPath.push_back(path);
+	}
 }
 
 KeyImp::~KeyImp(void)
@@ -200,9 +186,9 @@ bool KeyImp::LoadResFile(const char* resfile)
 			char* ptr = strrchr( be.name, PathDelimiter );
 			if (ptr) {
 				strncpy( tmpPath, be.name, ptr - be.name );
-				char* paths[6] = { core->GamePath, core->CD1, core->CD2, core->CD3, core->CD4, core->CD5};
+				char* paths[7] = { core->GamePath, core->CD[0], core->CD[1], core->CD[2], core->CD[3], core->CD[4], core->CD[5] };
 				char* dirname;
-				for (int i = 0; i < 6; i++) {
+				for (int i = 0; i < 7; i++) {
 					dirname = FindInDir( paths[i], tmpPath );
 					if (dirname) {
 						strncpy( tmpPath, dirname, sizeof(tmpPath) );
@@ -362,19 +348,19 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type, bool silent
 		if (exist == NULL) {
 			int CD;
 			if (( biffiles[bifnum].BIFLocator & ( 1 << 2 ) ) != 0) {
-				strcpy( BasePath, core->CD1 );
+				strcpy( BasePath, core->CD[0] );
 				CD = 1;
 			} else if (( biffiles[bifnum].BIFLocator & ( 1 << 3 ) ) != 0) {
-				strcpy( BasePath, core->CD2 );
+				strcpy( BasePath, core->CD[1] );
 				CD = 2;
 			} else if (( biffiles[bifnum].BIFLocator & ( 1 << 4 ) ) != 0) {
-				strcpy( BasePath, core->CD3 );
+				strcpy( BasePath, core->CD[2] );
 				CD = 3;
 			} else if (( biffiles[bifnum].BIFLocator & ( 1 << 5 ) ) != 0) {
-				strcpy( BasePath, core->CD4 );
+				strcpy( BasePath, core->CD[3] );
 				CD = 4;
 			} else if (( biffiles[bifnum].BIFLocator & ( 1 << 6 ) ) != 0) {
-				strcpy( BasePath, core->CD5 );
+				strcpy( BasePath, core->CD[4] );
 				CD = 5;
 			} else {
 					printStatus( "ERROR", LIGHT_RED );
