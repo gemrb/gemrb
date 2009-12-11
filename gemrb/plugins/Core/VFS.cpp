@@ -408,3 +408,13 @@ void ResolveFilePath(char* FilePath)
 
 #endif
 
+void ExtractFileFromPath(char *file, const char *full_path)
+{
+	const char *p;
+	if ((p = strrchr (full_path, PathDelimiter)))
+		strcpy(file, p+1);
+	else if ((p = strchr (full_path, ':')))
+		strcpy(file, p+1);
+	else
+		strcpy(file, full_path);
+}

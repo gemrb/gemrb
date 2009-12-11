@@ -70,8 +70,6 @@
 #define SPathDelimiter "/"
 #endif
 
-#define ExtractFileFromPath(file, full_path) strcpy (file, ((strrchr (full_path, PathDelimiter)==NULL) ? ((strchr (full_path, ':')==NULL) ? full_path : (strchr(full_path, ':') +1) ) : (strrchr(full_path, PathDelimiter) +1)))
-
 #define IE_NORMAL 0
 #define IE_SHADED 1
 
