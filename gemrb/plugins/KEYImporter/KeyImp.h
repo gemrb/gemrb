@@ -35,6 +35,9 @@ struct RESEntry {
 struct BIFEntry {
 	char* name;
 	ieWord BIFLocator;
+	char path[_MAX_PATH];
+	int cd;
+	bool found;
 };
 
 struct SearchPath {
