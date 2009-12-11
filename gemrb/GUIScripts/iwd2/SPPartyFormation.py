@@ -131,7 +131,7 @@ def GeneratePress ():
 	return
 
 def EnterGamePress ():
-	GemRB.SetVar ("PlayMode",2) #iwd2 is always using 'mpsave'
+	GemRB.SetVar ("SaveDir",1) #iwd2 is always using 'mpsave'
 	GemRB.EnterGame ()
 	return
 

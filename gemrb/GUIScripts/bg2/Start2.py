@@ -173,9 +173,13 @@ def LoadSingle():
 	if TutorialWindow:
 		TutorialWindow.Unload()
 	if GemRB.GetVar ("oldgame") == 0:
+		GemRB.GameSetExpansion(1)
 		GemRB.SetVar ("PlayMode", 2)
+		GemRB.SetVar ("SaveDir", 1)
 	else:
+		GemRB.GameSetExpansion(0)
 		GemRB.SetVar ("PlayMode", 0)
+		GemRB.SetVar ("SaveDir", 0)
 
 	GemRB.SetNextScript ("GUILOAD")
 	return
@@ -187,7 +191,14 @@ def NewSingle():
 		QuitWindow.Unload()
 	if TutorialWindow:
 		TutorialWindow.Unload()
-	GemRB.SetVar("PlayMode",0)
+	if GemRB.GetVar ("oldgame") == 0:
+		GemRB.GameSetExpansion(1)
+		GemRB.SetVar ("PlayMode", 2)
+		GemRB.SetVar ("SaveDir", 1)
+	else:
+		GemRB.GameSetExpansion(0)
+		GemRB.SetVar ("PlayMode", 0)
+		GemRB.SetVar ("SaveDir", 0)
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(-1)
 	GemRB.SetNextScript ("CharGen")
@@ -206,6 +217,8 @@ def PlayPress():
 	if TutorialWindow:
 		TutorialWindow.Unload()
 	GemRB.SetVar("PlayMode",1) #tutorial
+	GemRB.SetVar("SaveDir",0)
+	GemRB.GameSetExpansion(0)
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(-1)
 	GemRB.SetNextScript ("CharGen")

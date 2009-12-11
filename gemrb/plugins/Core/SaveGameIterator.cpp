@@ -121,12 +121,11 @@ void SaveGameIterator::Invalidate()
 }
 
 /* mission pack save */
-static const char* PlayMode()
+static const char* SaveDir()
 {
 	ieDword playmode = 0;
-
-	core->GetDictionary()->Lookup( "PlayMode", playmode );
-	if (playmode >= 2) {
+	core->GetDictionary()->Lookup( "SaveDir", playmode );
+	if (playmode == 1) {
 		return "mpsave";
 	}
 	return "save";
@@ -134,7 +133,7 @@ static const char* PlayMode()
 
 #define FormatQuickSavePath(destination, i) \
 	 snprintf(destination,sizeof(destination),"%s%s%s%09d-%s", \
-		core->SavePath,PlayMode(), SPathDelimiter,i,folder);
+		core->SavePath,SaveDir(), SPathDelimiter,i,folder);
 
 /*
  * Returns the first 0 bit position of an integer
@@ -233,7 +232,7 @@ bool SaveGameIterator::RescanSaveGames()
 	save_slots.clear();
 
 	char Path[_MAX_PATH];
-	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, PlayMode() );
+	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, SaveDir() );
 
 	ResolveFilePath( Path );
 	DIR* dir = opendir( Path );
@@ -293,7 +292,7 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 	int prtrt = 0;
 	char Path[_MAX_PATH];
 	//lets leave space for the filenames
-	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(),
+	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, SaveDir(),
 		 SPathDelimiter, slotname );
 
 	char savegameName[_MAX_PATH]={0};
@@ -440,7 +439,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 		snprintf( Path, _MAX_PATH, "%09d-%s", save->GetSaveID(), slotname );
 	}
 	save_slots.insert( save_slots.end(), strdup( Path ) );
-	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, PlayMode() );
+	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, SaveDir() );
 
 	//if the path exists in different case, don't make it again
 	ResolveFilePath( Path );
@@ -528,7 +527,7 @@ void SaveGameIterator::DeleteSaveGame(int index)
 	}
 
 	char Path[_MAX_PATH];
-	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, slotname );
+	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, SaveDir(), SPathDelimiter, slotname );
 	core->DelTree( Path, false ); //remove all files from folder
 	rmdir( Path );
 

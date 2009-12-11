@@ -53,7 +53,7 @@ def OnLoad():
 	NewGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	LoadGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 
-	GemRB.SetVar("PlayMode",2)
+	GemRB.SetVar("SaveDir",1)
 	GameCount=GemRB.GetSaveGameCount()
 
 	#looking for the quicksave

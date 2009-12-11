@@ -29,11 +29,6 @@ ScrollBar = 0
 def OnLoad():
 	global LoadWindow, TextAreaControl, GameCount, ScrollBar
 
-	if GemRB.GetVar("oldgame")==0:
-		GemRB.GameSetExpansion(1)
-	else:
-		GemRB.GameSetExpansion(0)
-	
 	GemRB.LoadWindowPack("GUILOAD", 640, 480)
 	LoadWindow = GemRB.LoadWindowObject(0)
 	LoadWindow.SetFrame ()
