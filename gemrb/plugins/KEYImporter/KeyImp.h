@@ -37,9 +37,15 @@ struct BIFEntry {
 	ieWord BIFLocator;
 };
 
+struct SearchPath {
+	char path[_MAX_PATH];
+	const char *description;
+};
+
 class KeyImp : public ResourceMgr {
 private:
 	std::vector< BIFEntry> biffiles;
+	std::vector< SearchPath> searchPath;
 	Dictionary resources;
 public:
 	KeyImp(void);

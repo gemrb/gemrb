@@ -51,6 +51,60 @@ KeyImp::KeyImp(void)
 		}
 	}
 #endif
+	SearchPath path;
+
+	PathJoin( path.path, core->CachePath, NULL);
+	path.description = "Cache";
+	searchPath.push_back(path);
+
+	PathJoin( path.path, core->GemRBOverridePath, "override", core->GameType, NULL);
+	path.description = "GemRB Override";
+	searchPath.push_back(path);
+
+	PathJoin( path.path, core->GemRBOverridePath, "override", SHARED_OVERRIDE, NULL);
+	path.description = "shared GemRB Override";
+	searchPath.push_back(path);
+
+	PathJoin( path.path, core->GamePath, core->GameOverridePath, NULL);
+	path.description = "Override";
+	searchPath.push_back(path);
+
+	PathJoin( path.path, core->GamePath, core->GameSoundsPath, NULL);
+	path.description = "Sounds";
+	searchPath.push_back(path);
+
+	PathJoin( path.path, core->GamePath, core->GameScriptsPath, NULL);
+	path.description = "Scripts";
+	searchPath.push_back(path);
+
+	PathJoin( path.path, core->GamePath, core->GamePortraitsPath, NULL);
+	path.description = "Portraits";
+	searchPath.push_back(path);
+
+	PathJoin( path.path, core->GamePath, core->GameDataPath, NULL);
+	path.description = "Data";
+	searchPath.push_back(path);
+
+	//IWD2 movies are on the CD but not in the BIF
+	PathJoin( path.path, core->CD1, core->GameDataPath, NULL);
+	path.description = "Data";
+	searchPath.push_back(path);
+
+	PathJoin( path.path, core->CD2, core->GameDataPath, NULL);
+	path.description = "Data";
+	searchPath.push_back(path);
+
+	PathJoin( path.path, core->CD3, core->GameDataPath, NULL);
+	path.description = "Data";
+	searchPath.push_back(path);
+
+	PathJoin( path.path, core->CD4, core->GameDataPath, NULL);
+	path.description = "Data";
+	searchPath.push_back(path);
+
+	PathJoin( path.path, core->CD5, core->GameDataPath, NULL);
+	path.description = "Data";
+	searchPath.push_back(path);
 }
 
 KeyImp::~KeyImp(void)
@@ -192,14 +246,14 @@ bool KeyImp::LoadResFile(const char* resfile)
 	return true;
 }
 
-static bool FindIn(const char *BasePath, const char *Path, const char *ResRef, SClass_ID Type)
+static bool FindIn(const char *Path, const char *ResRef, SClass_ID Type)
 {
 	char p[_MAX_PATH], f[_MAX_PATH] = {0};
 	strncpy(f, ResRef, 8);
 	f[8] = 0;
 	strcat(f, core->TypeExt(Type));
 	strlwr(f);
-	PathJoin( p, BasePath, Path, f, NULL );
+	PathJoin( p, Path, f, NULL );
 	ResolveFilePath(p);
 	FILE * exist = fopen(p, "rb");
 	if(exist) {
@@ -209,14 +263,14 @@ static bool FindIn(const char *BasePath, const char *Path, const char *ResRef, S
 	return false;
 }
 
-static FileStream *SearchIn(const char * BasePath,const char * Path,const char * ResRef, SClass_ID Type, const char *foundMessage, bool silent=false)
+static FileStream *SearchIn(const char * Path,const char * ResRef, SClass_ID Type, const char *foundMessage, bool silent=false)
 {
 	char p[_MAX_PATH], f[_MAX_PATH] = {0};
 	strncpy(f, ResRef, 8);
 	f[8] = 0;
 	strcat(f, core->TypeExt(Type));
 	strlwr(f);
-	PathJoin( p, BasePath, Path, f, NULL );
+	PathJoin( p, Path, f, NULL );
 	ResolveFilePath(p);
 	FILE * exist = fopen(p, "rb");
 	if(exist) {
@@ -235,28 +289,9 @@ static FileStream *SearchIn(const char * BasePath,const char * Path,const char *
 
 bool KeyImp::HasResource(const char* resname, SClass_ID type, bool silent)
 {
-	char path[_MAX_PATH];
-	//Search it in the GemRB override Directory
-	PathJoin( path, "override", core->GameType, NULL ); //this shouldn't change
-	if (FindIn( core->CachePath, "", resname, type)) return true;
-	if (FindIn( core->GemRBOverridePath, path, resname, type)) return true;
-
-	// try also the shared gemrb override path
-	PathJoin( path, "override", SHARED_OVERRIDE, NULL );
-	if (FindIn( core->GemRBOverridePath, path, resname, type)) return true;
-
-	if (FindIn( core->GamePath, core->GameOverridePath, resname, type)) return true;
-	if (FindIn( core->GamePath, core->GameSoundsPath, resname, type)) return true;
-	if (FindIn( core->GamePath, core->GameScriptsPath, resname, type)) return true;
-	if (FindIn( core->GamePath, core->GamePortraitsPath, resname, type)) return true;
-	if (FindIn( core->GamePath, core->GameDataPath, resname, type)) return true;
-
-	//IWD2 movies are on the CD but not in the BIF
-	if (FindIn( core->CD1, core->GameDataPath,resname, type)) return true;
-	if (FindIn( core->CD2, core->GameDataPath,resname, type)) return true;
-	if (FindIn( core->CD3, core->GameDataPath,resname, type)) return true;
-	if (FindIn( core->CD4, core->GameDataPath,resname, type)) return true;
-	if (FindIn( core->CD5, core->GameDataPath,resname, type)) return true;
+	for (size_t i = 0; i < searchPath.size(); i++) {
+		if (FindIn( searchPath[i].path, resname, type )) return true;
+	}
 
 	unsigned int ResLocator;
 	if (resources.Lookup( resname, type, ResLocator )) {
@@ -287,59 +322,11 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type, bool silent
 	PathJoin( path, "override", core->GameType, NULL ); //this shouldn't change
 
 	FileStream *fs;
-
-	fs=SearchIn( core->CachePath, "", resname, type,
-		"Found in Cache", silent );
-	if (fs) return fs;
-
-	fs=SearchIn( core->GemRBOverridePath, path, resname, type,
-		"Found in GemRB Override", silent );
-	if (fs) return fs;
-
-	PathJoin( path, "override", SHARED_OVERRIDE, NULL );
-	fs=SearchIn( core->GemRBOverridePath, path, resname, type,
-		"Found in shared GemRB Override", silent );
-	if (fs) return fs;
-
-	fs=SearchIn( core->GamePath, core->GameOverridePath, resname, type,
-		"Found in Override", silent );
-	if (fs) return fs;
-
-	fs=SearchIn( core->GamePath, core->GameSoundsPath, resname, type,
-		"Found in Sounds", silent );
-	if (fs) return fs;
-
-	fs=SearchIn( core->GamePath, core->GameScriptsPath, resname, type,
-		"Found in Scripts", silent );
-	if (fs) return fs;
-
-	fs=SearchIn( core->GamePath, core->GamePortraitsPath, resname, type,
-		"Found in Portraits", silent );
-	if (fs) return fs;
-
-	fs=SearchIn( core->GamePath, core->GameDataPath, resname, type,
-		"Found in Data", silent );
-	if (fs) return fs;
-
-	fs=SearchIn( core->CD1, core->GameDataPath, resname, type,
-		"Found in CD1", silent );
-	if (fs) return fs;
-
-	fs=SearchIn( core->CD2, core->GameDataPath, resname, type,
-		"Found in CD2", silent );
-	if (fs) return fs;
-
-	fs=SearchIn( core->CD3, core->GameDataPath, resname, type,
-		"Found in CD3", silent );
-	if (fs) return fs;
-
-	fs=SearchIn( core->CD4, core->GameDataPath, resname, type,
-		"Found in CD4", silent );
-	if (fs) return fs;
-
-	fs=SearchIn( core->CD5, core->GameDataPath, resname, type,
-		"Found in CD5", silent );
-	if (fs) return fs;
+	for (size_t i = 0; i < searchPath.size(); i++) {
+		fs=SearchIn( searchPath[i].path, resname, type,
+				searchPath[i].description, silent );
+		if (fs) return fs;
+	}
 
 	unsigned int ResLocator;
 
