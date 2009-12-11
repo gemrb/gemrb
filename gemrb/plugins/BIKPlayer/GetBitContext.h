@@ -20,8 +20,32 @@
  */
 
 //code derived from FFMPEG
- 
+//using code from get_bits.h, bitstream.c
+
 #include "common.h"
+
+#define INIT_VLC_LE         2
+#define INIT_VLC_USE_NEW_STATIC 4 
+
+class VLC
+{
+public:
+    int bits;
+    int16_t (*table)[2]; ///< code, bits
+    int table_size, table_allocated;
+public:
+int init_vlc(int nb_bits, int nb_codes,
+             const void *bits, int bits_wrap, int bits_size,
+             const void *codes, int codes_wrap, int codes_size,
+             int flags);
+private:
+  int alloc_table(int size);
+  int build_table(int table_nb_bits, int nb_codes,
+             const void *bits, int bits_wrap, int bits_size,
+             const void *codes, int codes_wrap, int codes_size,
+             uint32_t code_prefix, int n_prefix, int flags);
+
+};
 
 
 #define AV_RL32(x)                           \
@@ -37,11 +61,16 @@ public:
     int index;
     int size_in_bits;
 public:
+    void debug(const char *prefix);
     float get_float();
     void skip_bits(int x) { index+=x; }
     int get_bits_count() { return index; }
     void get_bits_align32();
     unsigned int get_bits(int x);
+    unsigned int peek_bits(int x);
     unsigned int get_bits_long(int n);
     void init_get_bits(const uint8_t *b, int bit_size);
+    void read_tree(Tree *tree);
+private:
+    void merge( uint8_t *dst, uint8_t *src, int size);
 };

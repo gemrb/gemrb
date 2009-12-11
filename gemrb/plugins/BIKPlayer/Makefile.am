@@ -7,10 +7,11 @@ libBIKPlayer_la_SOURCES = \
 	BIKPlayer.cpp \
 	BIKPlayerDesc.cpp \
 	GetBitContext.cpp \
+	jrevdct.cpp \
 	dct.cpp \
 	fft.cpp \
 	rdft.cpp \
 	rational.cpp \
 	mem.cpp
 
-noinst_HEADERS = BIKPlay.h BIKPlayerDesc.h GetBitContext.h
+noinst_HEADERS = BIKPlay.h BIKPlayerDesc.h GetBitContext.h binkdata.h

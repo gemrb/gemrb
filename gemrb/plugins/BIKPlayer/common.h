@@ -30,6 +30,10 @@
 #define int32_t signed int
 #define int64_t signed __int64
 
+#ifndef MUL64
+#   define MUL64(a,b) ((int64_t)(a) * (int64_t)(b))
+#endif
+
 //rounded division & shift
 #define RSHIFT(a,b) ((a) > 0 ? ((a) + ((1<<(b))>>1))>>(b) : ((a) + ((1<<(b))>>1)-1)>>(b))
 /* assume b>0 */
@@ -182,23 +186,15 @@ static inline av_const int av_ceil_log2(int x)
 
 int64_t av_const av_gcd(int64_t a, int64_t b);
 
-#define BIK_SIGNATURE_LEN 4
-#define BIK_SIGNATURE_DATA "BIKi"
-
-#define MAX_CHANNELS 2
-#define BINK_BLOCK_MAX_SIZE (MAX_CHANNELS << 11)
-
-enum BinkAudFlags {
-    BINK_AUD_16BITS = 0x4000, ///< prefer 16-bit output
-    BINK_AUD_STEREO = 0x2000,
-    BINK_AUD_USEDCT = 0x1000
-};
-
 void *av_malloc(unsigned int size);
 void av_freep(void **ptr);
 
-//#ifdef HAVE_AV_CONFIG_H
-//#    include "internal.h"
-//#endif /* HAVE_AV_CONFIG_H */
-
+/**
+ * data needed to decode 4-bit Huffman-coded value 
+ */
+typedef struct Tree {
+    int     vlc_num;  ///< tree number (in bink_trees[])
+    uint8_t syms[16]; ///< leaf value to symbol mapping
+} Tree;
+  
 #endif /* AVUTIL_COMMON_H */

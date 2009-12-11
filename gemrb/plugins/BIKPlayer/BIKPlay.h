@@ -31,6 +31,273 @@
 #include "GetBitContext.h"
 #include "dsputil.h"
 
+#define BIK_SIGNATURE_LEN 4
+#define BIK_SIGNATURE_DATA "BIKi"
+
+#define MAX_CHANNELS 2
+#define BINK_BLOCK_MAX_SIZE (MAX_CHANNELS << 11)
+
+enum BinkAudFlags {
+	  BINK_AUD_16BITS = 0x4000, ///< prefer 16-bit output
+	  BINK_AUD_STEREO = 0x2000,
+	  BINK_AUD_USEDCT = 0x1000
+};
+
+/**
+ * IDs for different data types used in Bink video codec
+ */
+enum Sources {
+	  BINK_SRC_BLOCK_TYPES = 0, ///< 8x8 block types
+	  BINK_SRC_SUB_BLOCK_TYPES, ///< 16x16 block types (a subset of 8x8 block types)
+	  BINK_SRC_COLORS,          ///< pixel values used for different block types
+	  BINK_SRC_PATTERN,         ///< 8-bit values for 2-colour pattern fill
+	  BINK_SRC_X_OFF,           ///< X components of motion value
+	  BINK_SRC_Y_OFF,           ///< Y components of motion value
+	  BINK_SRC_INTRA_DC,        ///< DC values for intrablocks with DCT
+	  BINK_SRC_INTER_DC,        ///< DC values for intrablocks with DCT
+	  BINK_SRC_RUN,             ///< run lengths for special fill block
+
+	  BINK_NB_SRC
+};
+
+/**
+ * Bink video block types
+ */
+enum BlockTypes {
+	  SKIP_BLOCK = 0, ///< skipped block
+	  SCALED_BLOCK,   ///< block has size 16x16
+	  MOTION_BLOCK,   ///< block is copied from previous frame with some offset
+	  RUN_BLOCK,      ///< block is composed from runs of colours with custom scan order
+	  RESIDUE_BLOCK,  ///< motion block with some difference added
+	  INTRA_BLOCK,    ///< intra DCT block
+	  FILL_BLOCK,     ///< block is filled with single colour 
+	  INTER_BLOCK,    ///< motion block with DCT applied to the difference
+	  PATTERN_BLOCK,  ///< block is filled with two colours following custom pattern
+	  RAW_BLOCK       ///< uncoded 8x8 block
+};
+ 
+typedef struct AVFrame {
+	  /**
+	   * pointer to the picture planes.
+	   * This might be different from the first allocated byte
+	   * - encoding: 
+	   * - decoding: 
+	   */
+	  uint8_t *data[4];
+	  int linesize[4];
+#if 0
+	  /**
+	   * pointer to the first allocated byte of the picture. Can be used in get_buffer/release_buffer.
+	   * This isn't used by libavcodec unless the default get/release_buffer() is used.
+	   * - encoding: 
+	   * - decoding:
+	   */
+	  uint8_t *base[4];
+	  /**
+	   * 1 -> keyframe, 0-> not
+	   * - encoding: Set by libavcodec.
+	   * - decoding: Set by libavcodec.
+	   */
+	  int key_frame;
+
+	  /**
+	   * Picture type of the frame, see ?_TYPE below.
+	   * - encoding: Set by libavcodec. for coded_picture (and set by user for input).
+	   * - decoding: Set by libavcodec.
+	   */
+	  int pict_type;
+
+	  /**
+	   * presentation timestamp in time_base units (time when frame should be shown to user)
+	   * If AV_NOPTS_VALUE then frame_rate = 1/time_base will be assumed.
+	   * - encoding: MUST be set by user.
+	   * - decoding: Set by libavcodec.
+	   */
+	  int64_t pts;
+
+	  /**
+	   * picture number in bitstream order
+	   * - encoding: set by
+	   * - decoding: Set by libavcodec.
+	   */
+	  int coded_picture_number;
+	  /**
+	   * picture number in display order
+	   * - encoding: set by
+	   * - decoding: Set by libavcodec.
+	   */
+	  int display_picture_number;
+
+	  /**
+	   * quality (between 1 (good) and FF_LAMBDA_MAX (bad)) 
+	   * - encoding: Set by libavcodec. for coded_picture (and set by user for input).
+	   * - decoding: Set by libavcodec.
+	   */
+	  int quality; 
+
+	  /**
+	   * buffer age (1->was last buffer and dint change, 2->..., ...).
+	   * Set to INT_MAX if the buffer has not been used yet.
+	   * - encoding: unused
+	   * - decoding: MUST be set by get_buffer().
+	   */
+	  int age;
+
+	  /**
+	   * is this picture used as reference
+	   * The values for this are the same as the MpegEncContext.picture_structure
+	   * variable, that is 1->top field, 2->bottom field, 3->frame/both fields.
+	   * Set to 4 for delayed, non-reference frames.
+	   * - encoding: unused
+	   * - decoding: Set by libavcodec. (before get_buffer() call)).
+	   */
+	  int reference;
+
+	  /**
+	   * QP table
+	   * - encoding: unused
+	   * - decoding: Set by libavcodec.
+	   */
+	  int8_t *qscale_table;
+	  /**
+	   * QP store stride
+	   * - encoding: unused
+	   * - decoding: Set by libavcodec.
+	   */
+	  int qstride;
+
+	  /**
+	   * mbskip_table[mb]>=1 if MB didn't change
+	   * stride= mb_width = (width+15)>>4
+	   * - encoding: unused
+	   * - decoding: Set by libavcodec.
+	   */
+	  uint8_t *mbskip_table;
+
+	  /**
+	   * motion vector table
+	   * @code
+	   * example:
+	   * int mv_sample_log2= 4 - motion_subsample_log2;
+	   * int mb_width= (width+15)>>4;
+	   * int mv_stride= (mb_width << mv_sample_log2) + 1;
+	   * motion_val[direction][x + y*mv_stride][0->mv_x, 1->mv_y];
+	   * @endcode
+	   * - encoding: Set by user.
+	   * - decoding: Set by libavcodec.
+	   */
+	  int16_t (*motion_val[2])[2];
+
+	  /**
+	   * macroblock type table
+	   * mb_type_base + mb_width + 2
+	   * - encoding: Set by user.
+	   * - decoding: Set by libavcodec.
+	   */
+	  uint32_t *mb_type;
+
+	  /**
+	   * log2 of the size of the block which a single vector in motion_val represents: 
+	   * (4->16x16, 3->8x8, 2-> 4x4, 1-> 2x2)
+	   * - encoding: unused
+	   * - decoding: Set by libavcodec.
+	   */
+	  uint8_t motion_subsample_log2;
+
+	  /**
+	   * for some private data of the user
+	   * - encoding: unused
+	   * - decoding: Set by user.
+	   */
+	  void *opaque;
+
+	  /**
+	   * type of the buffer (to keep track of who has to deallocate data[*])
+	   * - encoding: Set by the one who allocates it.
+	   * - decoding: Set by the one who allocates it.
+	   * Note: User allocated (direct rendering) & internal buffers cannot coexist currently.
+	   */
+	  int type;
+	  
+	  /**
+	   * When decoding, this signals how much the picture must be delayed.
+	   * extra_delay = repeat_pict / (2*fps)
+	   * - encoding: unused
+	   * - decoding: Set by libavcodec.
+	   */
+	  int repeat_pict;
+	  
+	  /**
+	   * 
+	   */
+	  int qscale_type;
+	  
+	  /**
+	   * The content of the picture is interlaced.
+	   * - encoding: Set by user.
+	   * - decoding: Set by libavcodec. (default 0)
+	   */
+	  int interlaced_frame;
+	  
+	  /**
+	   * If the content is interlaced, is top field displayed first.
+	   * - encoding: Set by user.
+	   * - decoding: Set by libavcodec.
+	   */
+	  int top_field_first;
+	  
+	  /**
+	   * Pan scan.
+	   * - encoding: Set by user.
+	   * - decoding: Set by libavcodec.
+	   */
+	  //AVPanScan *pan_scan;
+	  
+	  /**
+	   * Tell user application that palette has changed from previous frame.
+	   * - encoding: ??? (no palette-enabled encoder yet)
+	   * - decoding: Set by libavcodec. (default 0).
+	   */
+	  int palette_has_changed;
+	  
+	  /**
+	   * codec suggestion on buffer type if != 0
+	   * - encoding: unused
+	   * - decoding: Set by libavcodec. (before get_buffer() call)).
+	   */
+	  int buffer_hints;
+
+	  /**
+	   * DCT coefficients
+	   * - encoding: unused
+	   * - decoding: Set by libavcodec.
+	   */\
+	  short *dct_coeff;
+
+	  /**
+	   * motion referece frame index
+	   * - encoding: Set by user.
+	   * - decoding: Set by libavcodec.
+	   */
+	  int8_t *ref_index[2];
+
+	  /**
+	   * reordered opaque 64bit number (generally a PTS) from AVCodecContext.reordered_opaque
+	   * output in AVFrame.reordered_opaque
+	   * - encoding: unused
+	   * - decoding: Read by user.
+	   */
+	  int64_t reordered_opaque;
+
+	  /**
+	   * hardware accelerator private data (FFmpeg allocated)
+	   * - encoding: unused\
+	   * - decoding: Set by libavcodec
+	   */
+	  void *hwaccel_picture_private;
+#endif
+} AVFrame;
+
 typedef struct {
 	char signature[BIK_SIGNATURE_LEN];
 	ieDword filesize;
@@ -52,10 +319,19 @@ typedef struct {
 } binkheader;
 
 typedef struct {
-	int keyframe;
+	int     keyframe;
 	ieDword pos;
 	ieDword size;
 } binkframe;
+
+typedef struct Bundle {
+	  int     len;       ///< length of number of entries to decode (in bits)
+	  Tree    tree;      ///< Huffman tree-related data
+	  uint8_t *data;     ///< buffer for decoded symbols
+	  uint8_t *data_end; ///< buffer end
+	  uint8_t *cur_dec;  ///< pointer to the not yet decoded part of the buffer
+	  uint8_t *cur_ptr;  ///< pointer to the data that is not read from buffer yet
+} Bundle;
 
 class BIKPlay : public MoviePlayer {
 
@@ -107,7 +383,19 @@ private:
 	bool done;
 	int outputwidth, outputheight;
 	unsigned int video_skippedframes;
- 
+	//bink specific
+	uint8_t c_idct_permutation[64];
+	ScanTable c_scantable;
+	Bundle c_bundle[BINK_NB_SRC];  ///< bundles for decoding all data types
+	Tree c_col_high[16];         ///< trees for decoding high nibble in "colours" data type
+	int  c_col_lastval;          ///< value of last decoded high nibble in "colours" data type 
+
+	//huffman trees for video decoding
+	VLC bink_trees[16];
+	int16_t table[16 * 128][2];
+	GetBitContext v_gb;
+	AVFrame c_pic, c_last;
+
 private:
 	void timer_start();
 	void timer_wait();
@@ -119,20 +407,33 @@ private:
 		unsigned int bufh, unsigned int sx, unsigned int sy,
 		unsigned int w, unsigned int h, unsigned int dstx,
 		unsigned int dsty);
-	//void setPalette(unsigned char* p, unsigned start, unsigned count);
 	int pollEvents();
 	int setAudioStream();
 	void freeAudioStream(int stream);
 	void queueBuffer(int stream, unsigned short bits,
-	              int channels, short* memory,
-	              int size, int samplerate);
+		int channels, short* memory, int size, int samplerate);
 	int sound_init(bool need_init);
+	void ff_init_scantable(uint8_t *permutation, ScanTable *st, const uint8_t *src_scantable);
+	int video_init(int w, int h);
 	void av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den);
 	int ReadHeader(DataStream *str);
 	void DecodeBlock(short *out);
 	int DecodeAudioFrame(void *data, int data_size);
+	inline int get_value(int bundle);
+	int read_dct_coeffs(DCTELEM block[64], const uint8_t *scan);
+	int read_residue(DCTELEM block[64], int masks_count);
+	int read_runs(Bundle *b);
+	int read_motion_values(Bundle *b);
+	int read_block_types(Bundle *b);
+	int read_patterns(Bundle *b);
+	int read_colors(Bundle *b);
+	int read_dcs(Bundle *b, int start_bits, int has_sign);
+	int get_vlc2(int16_t (*table)[2], int bits, int max_depth);
+	void read_bundle(int bundle_num);
+	void init_lengths(int width, int bw);
 	int DecodeVideoFrame(void *data, int data_size);
 	int EndAudio();
+	int EndVideo();
 	int PlayBik(DataStream *stream);
 public:
 	BIKPlay(void);
