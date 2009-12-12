@@ -58,8 +58,6 @@
 
 #endif //GLOBALS_ONLY_DEFS
 
-#define GEM_EXPORT_DLL extern "C"
-
 //Global Variables
 
 #ifdef WIN32
@@ -159,8 +157,11 @@
 #define GEM_EXPORT __declspec(dllimport)
 #endif
 
+#define GEM_EXPORT_DLL extern "C" __declspec(dllexport)
+
 #else
 #define GEM_EXPORT
+#define GEM_EXPORT_DLL extern "C"
 #endif
 
 class Scriptable;
