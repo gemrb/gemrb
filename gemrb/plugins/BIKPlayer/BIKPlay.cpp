@@ -288,13 +288,17 @@ bool BIKPlay::next_frame()
 		return false;
 	}
 	binkframe frame = frames[frameCount++];
-	frame.size = fileRead( frame.pos, inbuff, frame.size);
-	ieDword audframesize = *(ieDword *) inbuff;
-	if (DecodeAudioFrame(inbuff+4, audframesize)) {
+	//frame.size = fileRead( frame.pos, inbuff, frame.size);
+	//ieDword audframesize = *(ieDword *) inbuff;
+	str->Seek(frame.pos, GEM_STREAM_START);
+	ieDword audframesize;
+	str->ReadDword(&audframesize);
+	frame.size = str->Read( inbuff, frame.size - 4 );
+	if (DecodeAudioFrame(inbuff, audframesize)) {
 		//buggy frame, we stop immediately
 		return false;
 	}
-	if (DecodeVideoFrame(inbuff+audframesize+4, frame.size-audframesize-4)) {
+	if (DecodeVideoFrame(inbuff+audframesize, frame.size-audframesize)) {
 		//buggy frame, we stop immediately
 		return false;
 	}
