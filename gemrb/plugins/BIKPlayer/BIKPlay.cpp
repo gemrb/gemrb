@@ -606,7 +606,13 @@ const uint8_t ff_log2_tab[256]={
 };
 
 static inline int float_to_int16_one(const float *src){
-	return (int32_t) *src;
+	float f = *src;
+	// clamp the values to the range of an int16.
+	if (f > 32767)
+		f = 32767;
+	else if (f < -32768)
+		f = -32768;
+	return (int32_t) (f);
 }
 
 static void ff_float_to_int16_interleave_c(int16_t *dst, const float **src, long len, int channels){
