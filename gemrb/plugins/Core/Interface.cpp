@@ -200,7 +200,7 @@ Interface::Interface(int iargc, char* iargv[])
 	strncpy( GamePortraitsPath, "portraits", sizeof(GamePortraitsPath) );
 	strncpy( GameCharactersPath, "characters", sizeof(GameCharactersPath) );
 	strncpy( GameDataPath, "data", sizeof(GameDataPath) );
-	for (int i = 0; i < 6; i++) {
+	for (i = 0; i < 6; i++) {
 		strncpy( CD[i], "CDi", sizeof(CD[i]) );
 		CD[i][2] = '1' + i;
 	}
