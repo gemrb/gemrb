@@ -296,12 +296,14 @@ bool BIKPlay::next_frame()
 	frame.size = str->Read( inbuff, frame.size - 4 );
 	if (DecodeAudioFrame(inbuff, audframesize)) {
 		//buggy frame, we stop immediately
-		return false;
+		//return false;
 	}
+/*
 	if (DecodeVideoFrame(inbuff+audframesize, frame.size-audframesize)) {
 		//buggy frame, we stop immediately
 		return false;
 	}
+*/
 
 	if (!timer_last_sec) {
 		timer_start();
@@ -749,7 +751,7 @@ int BIKPlay::DecodeAudioFrame(void *data, int data_size)
 	unsigned int ret = (unsigned int) ((uint8_t*)outbuf - (uint8_t*)samples);
 
 	//sample format is signed 16 bit integers
-	queueBuffer(s_stream, 16, s_channels, samples, ret, header.samplerate);
+	queueBuffer(s_stream, 16, s_channels, samples, reported_size, header.samplerate);
 
 	free(samples);
 	return reported_size!=ret;
@@ -1262,14 +1264,93 @@ static inline void copy_block(DCTELEM block[64], const uint8_t *src, uint8_t *ds
 
 #define clear_block(block) memset( (block), 0, sizeof(DCTELEM)*64);
 
+//This replaces the j_rev_dct module???
+void bink_idct(DCTELEM *block)
+{
+    int i, t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, tA, tB, tC;
+    int tblock[64];
+
+    for (i = 0; i < 8; i++) {
+        t0 = block[i+ 0] + block[i+32];
+        t1 = block[i+ 0] - block[i+32];
+        t2 = block[i+16] + block[i+48];
+        t3 = block[i+16] - block[i+48];
+        t3 = ((t3 * 0xB50) >> 11) - t2;
+
+        t4 = t0 - t2;
+        t5 = t0 + t2;
+        t6 = t1 + t3;
+        t7 = t1 - t3;
+
+        t0 = block[i+40] + block[i+24];
+        t1 = block[i+40] - block[i+24];
+        t2 = block[i+ 8] + block[i+56];
+        t3 = block[i+ 8] - block[i+56];
+
+        t8 = t2 + t0;
+        t9 = t3 + t1;
+        t9 = (0xEC8 * t9) >> 11;
+        tA = ((-0x14E8 * t1) >> 11) + t9 - t8;
+        tB = t2 - t0;
+        tB = ((0xB50 * tB) >> 11) - tA;
+        tC = ((0x8A9 * t3) >> 11) + tB - t9;
+
+        tblock[i+ 0] = t5 + t8;
+        tblock[i+56] = t5 - t8;
+        tblock[i+ 8] = t6 + tA;
+        tblock[i+48] = t6 - tA;
+        tblock[i+16] = t7 + tB;
+        tblock[i+40] = t7 - tB;
+        tblock[i+32] = t4 + tC;
+        tblock[i+24] = t4 - tC;
+    }
+
+    for (i = 0; i < 64; i += 8) {
+        t0 = tblock[i+0] + tblock[i+4];
+        t1 = tblock[i+0] - tblock[i+4];
+        t2 = tblock[i+2] + tblock[i+6];
+        t3 = tblock[i+2] - tblock[i+6];
+        t3 = ((t3 * 0xB50) >> 11) - t2;
+
+        t4 = t0 - t2;
+        t5 = t0 + t2;
+        t6 = t1 + t3;
+        t7 = t1 - t3;
+
+        t0 = tblock[i+5] + tblock[i+3];
+        t1 = tblock[i+5] - tblock[i+3];
+        t2 = tblock[i+1] + tblock[i+7];
+        t3 = tblock[i+1] - tblock[i+7];
+
+        t8 = t2 + t0;
+        t9 = t3 + t1;
+        t9 = (0xEC8 * t9) >> 11;
+        tA = ((-0x14E8 * t1) >> 11) + t9 - t8;
+        tB = t2 - t0;
+        tB = ((0xB50 * tB) >> 11) - tA;
+        tC = ((0x8A9 * t3) >> 11) + tB - t9;
+
+        block[i+0] = (t5 + t8 + 0x7F) >> 8;
+        block[i+7] = (t5 - t8 + 0x7F) >> 8;
+        block[i+1] = (t6 + tA + 0x7F) >> 8;
+        block[i+6] = (t6 - tA + 0x7F) >> 8;
+        block[i+2] = (t7 + tB + 0x7F) >> 8;
+        block[i+5] = (t7 - tB + 0x7F) >> 8;
+        block[i+4] = (t4 + tC + 0x7F) >> 8;
+        block[i+3] = (t4 - tC + 0x7F) >> 8;
+    }
+}
+
 static void idct_put(uint8_t *dest, int line_size, DCTELEM *block)
 {
-	j_rev_dct(block);
+	//j_rev_dct(block);
+	bink_idct(block);
 	put_pixels_clamped(block, dest, line_size);
 }
 static void idct_add(uint8_t *dest, int line_size, DCTELEM *block)
 {
-	j_rev_dct(block);
+	//j_rev_dct(block);
+	bink_idct(block);
 	add_pixels_clamped(block, dest, line_size);
 }
 
@@ -1389,7 +1470,8 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 						read_dct_coeffs(block, c_scantable.permutated);
 						quant = bink_intra_quant[v_gb.get_bits(4)];
 						for (i = 0; i < 64; i++) {
-							block[i] = MUL64(block[i], quant[i]) >> 16;
+							//block[i] = MUL64(block[i], quant[i]) >> 16;
+							block[i] = (block[i] * quant[i]) >> 11;
 						}
 						j_rev_dct(block);
 						for (j = 0; j < 8; j++) {
@@ -1472,8 +1554,10 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 					block[0] = get_value(BINK_SRC_INTRA_DC);
 					read_dct_coeffs(block, c_scantable.permutated);
 					quant = bink_intra_quant[v_gb.get_bits(4)];
-					for (i = 0; i < 64; i++)
-						block[i] = MUL64(block[i], quant[i]) >> 16;
+					for (i = 0; i < 64; i++) {
+						//block[i] = MUL64(block[i], quant[i]) >> 16;
+						block[i] = (block[i] * quant[i]) >> 11;
+					}
 					idct_put(dst, stride, block);
 					break;
 				case FILL_BLOCK:
@@ -1491,7 +1575,8 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 					read_dct_coeffs(block, c_scantable.permutated);
 					quant = bink_inter_quant[v_gb.get_bits(4)];
 					for (i = 0; i < 64; i++) {
-						block[i] = MUL64(block[i], quant[i]) >> 16;
+						//block[i] = MUL64(block[i], quant[i]) >> 16;
+						block[i] = (block[i] * quant[i]) >> 11;
 					}
 					idct_add(dst, stride, block);
 					break;
