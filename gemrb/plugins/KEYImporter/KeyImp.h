@@ -40,7 +40,7 @@ struct BIFEntry {
 	bool found;
 };
 
-struct SearchPath {
+struct PathEntry {
 	char path[_MAX_PATH];
 	const char *description;
 };
@@ -48,7 +48,7 @@ struct SearchPath {
 class KeyImp : public ResourceMgr {
 private:
 	std::vector< BIFEntry> biffiles;
-	std::vector< SearchPath> searchPath;
+	std::vector< PathEntry> searchPath;
 	Dictionary resources;
 public:
 	KeyImp(void);

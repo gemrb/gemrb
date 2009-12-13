@@ -37,7 +37,7 @@
 
 KeyImp::KeyImp(void)
 {
-	SearchPath path;
+	PathEntry path;
 
 	PathJoin( path.path, core->CachePath, NULL);
 	ResolveFilePath(path.path);
