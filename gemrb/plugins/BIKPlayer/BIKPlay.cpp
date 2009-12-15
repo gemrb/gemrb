@@ -298,12 +298,10 @@ bool BIKPlay::next_frame()
 		//buggy frame, we stop immediately
 		//return false;
 	}
-/*
 	if (DecodeVideoFrame(inbuff+audframesize, frame.size-audframesize)) {
 		//buggy frame, we stop immediately
 		return false;
 	}
-*/
 
 	if (!timer_last_sec) {
 		timer_start();
@@ -348,9 +346,8 @@ unsigned int BIKPlay::fileRead(unsigned int pos, void* buf, unsigned int count)
 	return str->Read( buf, count );
 }
 
-void BIKPlay::showFrame(unsigned char* buf, unsigned int bufw,
-	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
-	unsigned int h, unsigned int dstx, unsigned int dsty)
+void BIKPlay::showFrame(unsigned char** buf, unsigned int *strides, unsigned int bufw,
+	unsigned int bufh, unsigned int w, unsigned int h, unsigned int dstx, unsigned int dsty)
 {
 	ieDword titleref = 0;
 
@@ -364,7 +361,7 @@ void BIKPlay::showFrame(unsigned char* buf, unsigned int bufw,
 			titleref = strRef[rowCount-1];
 		}
 	}
-	video->showFrame(buf,bufw,bufh,sx,sy,w,h,dstx,dsty, g_truecolor, g_palette, titleref);
+	video->showYUVFrame(buf,strides,bufw,bufh,w,h,dstx,dsty, titleref);
 }
 
 int BIKPlay::setAudioStream()
@@ -1606,7 +1603,7 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 	} else {
 		unsigned int dest_x = (outputwidth - header.width) >> 1;
 		unsigned int dest_y = (outputheight - header.height) >> 1;
-		showFrame((ieByte *) c_pic.data, header.width, header.height, 0, 0, header.width, header.height, dest_x, dest_y);
+		showFrame((ieByte **) c_pic.data, (unsigned int *) c_pic.linesize, header.width, header.height, header.width, header.height, dest_x, dest_y);
 		release_buffer(&c_last);
 		c_last=c_pic;
 	}

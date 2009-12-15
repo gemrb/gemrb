@@ -2341,6 +2341,43 @@ void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	SDL_FreeSurface( sprite );
 }
 
+void SDLVideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
+	unsigned int bufw, unsigned int bufh,
+	unsigned int w, unsigned int h,
+	unsigned int dstx, unsigned int dsty,
+	ieDword titleref) {
+	SDL_Rect destRect;
+
+	// TODO: create this when movie starts?
+	// BIKPlayer outputs PIX_FMT_YUV420P which is YV12
+	SDL_Overlay *overlay = SDL_CreateYUVOverlay(bufw, bufh, SDL_YV12_OVERLAY, disp);
+
+	SDL_LockYUVOverlay(overlay);
+	for (unsigned int plane = 0; plane < 3; plane++) {
+		unsigned char *data = buf[plane];
+		unsigned int srcoffset = 0, destoffset = 0;
+		for (unsigned int i = 0; i < bufh; i++) {
+			memcpy(overlay->pixels[plane] + destoffset,
+				data + srcoffset, bufw);
+			srcoffset += strides[plane];
+			destoffset += overlay->pitches[plane];
+		}
+	}
+	SDL_UnlockYUVOverlay(overlay);
+
+	destRect.x = dstx;
+	destRect.y = dsty;
+	destRect.w = w;
+	destRect.h = h;
+
+	SDL_DisplayYUVOverlay(overlay, &destRect);
+
+
+	if (titleref>0)
+		DrawMovieSubtitle( titleref );
+	SDL_Flip( disp );
+}
+	
 int SDLVideoDriver::PollMovieEvents()
 {
 	SDL_Event event;

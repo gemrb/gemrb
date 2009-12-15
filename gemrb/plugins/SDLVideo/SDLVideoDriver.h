@@ -152,6 +152,11 @@ public:
 	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
 	unsigned int h, unsigned int dstx, unsigned int dsty, int truecolor,
 	unsigned char *palette, ieDword strRef);
+	void showYUVFrame(unsigned char** buf, unsigned int *strides,
+		unsigned int bufw, unsigned int bufh,
+		unsigned int w, unsigned int h,
+		unsigned int dstx, unsigned int dsty,
+		ieDword titleref);
 	int PollMovieEvents();
 
 private:

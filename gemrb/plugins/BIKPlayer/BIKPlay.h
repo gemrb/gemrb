@@ -192,9 +192,8 @@ private:
 	bool next_frame();
 	int doPlay();
 	unsigned int fileRead(unsigned int pos, void* buf, unsigned int count);
-	void showFrame(unsigned char* buf, unsigned int bufw,
-		unsigned int bufh, unsigned int sx, unsigned int sy,
-		unsigned int w, unsigned int h, unsigned int dstx,
+	void showFrame(unsigned char** buf, unsigned int *strides, unsigned int bufw,
+		unsigned int bufh, unsigned int w, unsigned int h, unsigned int dstx,
 		unsigned int dsty);
 	int pollEvents();
 	int setAudioStream();
