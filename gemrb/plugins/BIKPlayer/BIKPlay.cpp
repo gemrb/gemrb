@@ -563,7 +563,7 @@ static inline void release_buffer(AVFrame *p)
 {
 	int i;
 
-	for(i=0;i<4;i++) {
+	for(i=0;i<3;i++) {
 		av_freep((void **) &p->data[i]);
 	}
 }
