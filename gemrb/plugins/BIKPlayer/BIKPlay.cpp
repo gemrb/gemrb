@@ -1394,34 +1394,24 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 		}
 
 		for (by = 0; by < bh; by++) {
-			v_gb.debug("rbt");
 			if (read_block_types(&c_bundle[BINK_SRC_BLOCK_TYPES]) < 0)
 				return -1;
-			v_gb.debug("rbts");
 			if (read_block_types(&c_bundle[BINK_SRC_SUB_BLOCK_TYPES]) < 0)
 				return -1;
-			v_gb.debug("rc");
 			if (read_colors(&c_bundle[BINK_SRC_COLORS]) < 0)
 				return -1;
-			v_gb.debug("rp");
 			if (read_patterns(&c_bundle[BINK_SRC_PATTERN]) < 0)
 				return -1;
-			v_gb.debug("rmvx");
 			if (read_motion_values(&c_bundle[BINK_SRC_X_OFF]) < 0)
 				return -1;
-			v_gb.debug("rmvy");
 			if (read_motion_values(&c_bundle[BINK_SRC_Y_OFF]) < 0)
 				return -1;
-			v_gb.debug("rdcs0");
 			if (read_dcs(&c_bundle[BINK_SRC_INTRA_DC], DC_START_BITS, 0) < 0)
 				return -1;
-			v_gb.debug("rdcs1");
 			if (read_dcs(&c_bundle[BINK_SRC_INTER_DC], DC_START_BITS, 1) < 0)
 				return -1;
-			v_gb.debug("rr");
 			if (read_runs(&c_bundle[BINK_SRC_RUN]) < 0)
 				return -1;
-			v_gb.debug("end");
 
 			//why is this here?
 			if (by == bh)
@@ -1507,7 +1497,7 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 						}
 						break;
 					default:
-						//av_log(avctx, AV_LOG_ERROR, "Incorrect 16x16 block type %d\n", blk);
+						printf("Incorrect 16x16 block type!\n");
 						return -1;
 					}
 					bx++;
@@ -1598,7 +1588,7 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 					c_bundle[BINK_SRC_COLORS].cur_ptr += 64;
 					break;
 				default:
-					//av_log(avctx, AV_LOG_ERROR, "Unknown block type %d\n", blk);
+					printf("Unknown block type!\n");
 					return -1;
 				}
 			}

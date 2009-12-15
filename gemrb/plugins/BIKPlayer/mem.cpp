@@ -38,33 +38,31 @@
 
 void *av_malloc(unsigned int size)
 {
-    void *ptr = NULL;
-    long diff;
+	void *ptr = NULL;
+	long diff;
 
-printf("Av_malloc: %d\n", size);
-if(size>1000000) abort();
-    /* let's disallow possible ambiguous cases */
-    if(size > (INT_MAX-16) )
-        return NULL;
+	/* let's disallow possible ambiguous cases */
+	if(size > (INT_MAX-16) )
+		return NULL;
 
-    ptr = malloc(size+16);
-    if(!ptr)
-        return ptr;
-    diff= ((-(long)ptr - 1)&15) + 1;
-    ptr = (char*)ptr + diff;
-    ((char*)ptr)[-1]= diff;
-    return ptr;
+	ptr = malloc(size+16);
+	if(!ptr)
+		return ptr;
+	diff= ((-(long)ptr - 1)&15) + 1;
+	ptr = (char*)ptr + diff;
+	((char*)ptr)[-1]= diff;
+	return ptr;
 }
 
 void av_free(void *ptr)
 {
-    /* XXX: this test should not be needed on most libcs */
-    if (ptr)
-        free((char*)ptr - ((char*)ptr)[-1]);
+	/* XXX: this test should not be needed on most libcs */
+	if (ptr)
+		free((char*)ptr - ((char*)ptr)[-1]);
 }
 
 void av_freep(void **arg)
 {
-    av_free(*arg);
-    *arg = NULL;
+	av_free(*arg);
+	*arg = NULL;
 }
