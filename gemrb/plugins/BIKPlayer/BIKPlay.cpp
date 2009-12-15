@@ -52,8 +52,12 @@ static const int ff_wma_critical_freqs[25] = {
 	24500,
 };
 
+static uint8_t ff_cropTbl[256 + 2 * MAX_NEG_CROP] = {0, };
+
 BIKPlay::BIKPlay(void)
 {
+	int i;
+
 	str = NULL;
 	autoFree = false;
 	video = core->GetVideoDriver();
@@ -64,6 +68,12 @@ BIKPlay::BIKPlay(void)
 	//force initialisation of static tables
 	memset(bink_trees, 0, sizeof(bink_trees));
 	memset(table, 0, sizeof(table));
+
+	for(i=0;i<256;i++) ff_cropTbl[i + MAX_NEG_CROP] = i;
+	for(i=0;i<MAX_NEG_CROP;i++) {
+		ff_cropTbl[i] = 0;
+		ff_cropTbl[i + MAX_NEG_CROP + 256] = 255;
+    	}
 }
 
 BIKPlay::~BIKPlay(void)
@@ -444,7 +454,7 @@ int BIKPlay::sound_init(bool need_init)
 	s_overlap_len   = s_frame_len / 16;
 	s_block_size    = (s_frame_len - s_overlap_len) * s_channels;
 	sample_rate_half = (sample_rate + 1) / 2;
-	s_root          = (float) (2.0 / sqrt(s_frame_len));
+	s_root	  = (float) (2.0 / sqrt(s_frame_len));
 
 	/* calculate number of bands */
 	for (s_num_bands = 1; s_num_bands < 25; s_num_bands++) {
@@ -840,7 +850,7 @@ int BIKPlay::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan)
 /**
  * Reads 8x8 block with residue after motion compensation.
  *
- * @param gb          context for reading bits
+ * @param gb	  context for reading bits
  * @param block       place to store read data
  * @param masks_count number of masks to decode
  * @return 0 on success, negative value in other cases
@@ -924,8 +934,8 @@ int BIKPlay::read_residue(DCTELEM block[64], int masks_count)
 /**
  * Prepares bundle for decoding data.
  *
- * @param gb          context for reading bits
- * @param c           decoder context
+ * @param gb	  context for reading bits
+ * @param c	   decoder context
  * @param bundle_num  number of the bundle to initialize
  */
 void BIKPlay::read_bundle(int bundle_num)
@@ -1212,8 +1222,6 @@ static void get_pixels(DCTELEM *block, const uint8_t *pixels, int line_size)
 	}
 }
 
-uint8_t ff_cropTbl[256 + 2 * MAX_NEG_CROP] = {0, };
-
 static void put_pixels_clamped(const DCTELEM *block, uint8_t *pixels, int line_size)
 {
 	int i;
@@ -1229,7 +1237,6 @@ static void put_pixels_clamped(const DCTELEM *block, uint8_t *pixels, int line_s
 		pixels[5] = cm[block[5]];
 		pixels[6] = cm[block[6]];
 		pixels[7] = cm[block[7]];
-
 		pixels += line_size;
 		block += 8;
 	}
@@ -1270,73 +1277,73 @@ void bink_idct(DCTELEM *block)
     int tblock[64];
 
     for (i = 0; i < 8; i++) {
-        t0 = block[i+ 0] + block[i+32];
-        t1 = block[i+ 0] - block[i+32];
-        t2 = block[i+16] + block[i+48];
-        t3 = block[i+16] - block[i+48];
-        t3 = ((t3 * 0xB50) >> 11) - t2;
+	t0 = block[i+ 0] + block[i+32];
+	t1 = block[i+ 0] - block[i+32];
+	t2 = block[i+16] + block[i+48];
+	t3 = block[i+16] - block[i+48];
+	t3 = ((t3 * 0xB50) >> 11) - t2;
 
-        t4 = t0 - t2;
-        t5 = t0 + t2;
-        t6 = t1 + t3;
-        t7 = t1 - t3;
+	t4 = t0 - t2;
+	t5 = t0 + t2;
+	t6 = t1 + t3;
+	t7 = t1 - t3;
 
-        t0 = block[i+40] + block[i+24];
-        t1 = block[i+40] - block[i+24];
-        t2 = block[i+ 8] + block[i+56];
-        t3 = block[i+ 8] - block[i+56];
+	t0 = block[i+40] + block[i+24];
+	t1 = block[i+40] - block[i+24];
+	t2 = block[i+ 8] + block[i+56];
+	t3 = block[i+ 8] - block[i+56];
 
-        t8 = t2 + t0;
-        t9 = t3 + t1;
-        t9 = (0xEC8 * t9) >> 11;
-        tA = ((-0x14E8 * t1) >> 11) + t9 - t8;
-        tB = t2 - t0;
-        tB = ((0xB50 * tB) >> 11) - tA;
-        tC = ((0x8A9 * t3) >> 11) + tB - t9;
+	t8 = t2 + t0;
+	t9 = t3 + t1;
+	t9 = (0xEC8 * t9) >> 11;
+	tA = ((-0x14E8 * t1) >> 11) + t9 - t8;
+	tB = t2 - t0;
+	tB = ((0xB50 * tB) >> 11) - tA;
+	tC = ((0x8A9 * t3) >> 11) + tB - t9;
 
-        tblock[i+ 0] = t5 + t8;
-        tblock[i+56] = t5 - t8;
-        tblock[i+ 8] = t6 + tA;
-        tblock[i+48] = t6 - tA;
-        tblock[i+16] = t7 + tB;
-        tblock[i+40] = t7 - tB;
-        tblock[i+32] = t4 + tC;
-        tblock[i+24] = t4 - tC;
+	tblock[i+ 0] = t5 + t8;
+	tblock[i+56] = t5 - t8;
+	tblock[i+ 8] = t6 + tA;
+	tblock[i+48] = t6 - tA;
+	tblock[i+16] = t7 + tB;
+	tblock[i+40] = t7 - tB;
+	tblock[i+32] = t4 + tC;
+	tblock[i+24] = t4 - tC;
     }
 
     for (i = 0; i < 64; i += 8) {
-        t0 = tblock[i+0] + tblock[i+4];
-        t1 = tblock[i+0] - tblock[i+4];
-        t2 = tblock[i+2] + tblock[i+6];
-        t3 = tblock[i+2] - tblock[i+6];
-        t3 = ((t3 * 0xB50) >> 11) - t2;
+	t0 = tblock[i+0] + tblock[i+4];
+	t1 = tblock[i+0] - tblock[i+4];
+	t2 = tblock[i+2] + tblock[i+6];
+	t3 = tblock[i+2] - tblock[i+6];
+	t3 = ((t3 * 0xB50) >> 11) - t2;
 
-        t4 = t0 - t2;
-        t5 = t0 + t2;
-        t6 = t1 + t3;
-        t7 = t1 - t3;
+	t4 = t0 - t2;
+	t5 = t0 + t2;
+	t6 = t1 + t3;
+	t7 = t1 - t3;
 
-        t0 = tblock[i+5] + tblock[i+3];
-        t1 = tblock[i+5] - tblock[i+3];
-        t2 = tblock[i+1] + tblock[i+7];
-        t3 = tblock[i+1] - tblock[i+7];
+	t0 = tblock[i+5] + tblock[i+3];
+	t1 = tblock[i+5] - tblock[i+3];
+	t2 = tblock[i+1] + tblock[i+7];
+	t3 = tblock[i+1] - tblock[i+7];
 
-        t8 = t2 + t0;
-        t9 = t3 + t1;
-        t9 = (0xEC8 * t9) >> 11;
-        tA = ((-0x14E8 * t1) >> 11) + t9 - t8;
-        tB = t2 - t0;
-        tB = ((0xB50 * tB) >> 11) - tA;
-        tC = ((0x8A9 * t3) >> 11) + tB - t9;
+	t8 = t2 + t0;
+	t9 = t3 + t1;
+	t9 = (0xEC8 * t9) >> 11;
+	tA = ((-0x14E8 * t1) >> 11) + t9 - t8;
+	tB = t2 - t0;
+	tB = ((0xB50 * tB) >> 11) - tA;
+	tC = ((0x8A9 * t3) >> 11) + tB - t9;
 
-        block[i+0] = (t5 + t8 + 0x7F) >> 8;
-        block[i+7] = (t5 - t8 + 0x7F) >> 8;
-        block[i+1] = (t6 + tA + 0x7F) >> 8;
-        block[i+6] = (t6 - tA + 0x7F) >> 8;
-        block[i+2] = (t7 + tB + 0x7F) >> 8;
-        block[i+5] = (t7 - tB + 0x7F) >> 8;
-        block[i+4] = (t4 + tC + 0x7F) >> 8;
-        block[i+3] = (t4 - tC + 0x7F) >> 8;
+	block[i+0] = (t5 + t8 + 0x7F) >> 8;
+	block[i+7] = (t5 - t8 + 0x7F) >> 8;
+	block[i+1] = (t6 + tA + 0x7F) >> 8;
+	block[i+6] = (t6 - tA + 0x7F) >> 8;
+	block[i+2] = (t7 + tB + 0x7F) >> 8;
+	block[i+5] = (t7 - tB + 0x7F) >> 8;
+	block[i+4] = (t4 + tC + 0x7F) >> 8;
+	block[i+3] = (t4 - tC + 0x7F) >> 8;
     }
 }
 
@@ -1364,7 +1371,7 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 	DCTELEM block[64];
 #pragma pack(pop)
 
-		int bits = data_size*8;
+	int bits = data_size*8;
 	v_gb.init_get_bits((uint8_t *) data, bits);
 	//this is compatible only with the BIKi version
 	v_gb.skip_bits(32);

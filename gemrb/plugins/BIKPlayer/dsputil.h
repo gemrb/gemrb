@@ -41,9 +41,6 @@ typedef short IDWTELEM;
 /* pixel operations */
 #define MAX_NEG_CROP 1024
 
-/* temporary */
-extern uint8_t ff_cropTbl[256 + 2 * MAX_NEG_CROP];
-
 /**
  * Scantable.
  */
