@@ -7,7 +7,6 @@ libBIKPlayer_la_SOURCES = \
 	BIKPlayer.cpp \
 	BIKPlayerDesc.cpp \
 	GetBitContext.cpp \
-	jrevdct.cpp \
 	dct.cpp \
 	fft.cpp \
 	rdft.cpp \

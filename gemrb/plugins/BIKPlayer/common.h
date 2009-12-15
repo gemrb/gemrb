@@ -30,9 +30,9 @@
 #define int32_t signed int
 #define int64_t signed __int64
 
-#ifndef MUL64
-#   define MUL64(a,b) ((int64_t)(a) * (int64_t)(b))
-#endif
+//#ifndef MUL64
+//#   define MUL64(a,b) ((int64_t)(a) * (int64_t)(b))
+//#endif
 
 //rounded division & shift
 #define RSHIFT(a,b) ((a) > 0 ? ((a) + ((1<<(b))>>1))>>(b) : ((a) + ((1<<(b))>>1)-1)>>(b))
