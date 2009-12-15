@@ -45,6 +45,8 @@ private:
 	Region subtitleregion;
 	char *subtitletext;
 	ieDword subtitlestrref;
+	/* yuv overlay for bink movie */
+	SDL_Overlay *overlay;
 public:
 	SDLVideoDriver(void);
 	~SDLVideoDriver(void);
@@ -146,7 +148,7 @@ public:
 
 	void SetFadeColor(int r, int g, int b);
 	void SetFadePercent(int percent);
-	void InitMovieScreen(int &w, int &h);
+	void InitMovieScreen(int &w, int &h, bool yuv=false);
 	void SetMovieFont(Font *stfont, Palette *pal);
 	void showFrame(unsigned char* buf, unsigned int bufw,
 	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,

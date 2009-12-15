@@ -47,13 +47,17 @@ SDLVideoDriver::SDLVideoDriver(void)
 	extra=NULL;
 	subtitlestrref = 0;
 	subtitletext = NULL;
+	overlay = NULL;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
 {
 	core->FreeString(subtitletext); //may be NULL
+
 	if(backBuf) SDL_FreeSurface( backBuf );
 	if(extra) SDL_FreeSurface( extra );
+	if (overlay) SDL_FreeYUVOverlay(overlay);
+
 	SDL_Quit();
 
 	// This sprite needs to have been freed earlier, because
@@ -2283,7 +2287,7 @@ void SDLVideoDriver::MouseClickEvent(Uint8 type, Uint8 button)
 	SDL_PushEvent((SDL_Event *) event);
 }
 
-void SDLVideoDriver::InitMovieScreen(int &w, int &h)
+void SDLVideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 {
 	SDL_LockSurface( disp );
 	memset( disp->pixels, 0,
@@ -2297,6 +2301,12 @@ void SDLVideoDriver::InitMovieScreen(int &w, int &h)
 	subtitleregion.h = h/4;
 	subtitleregion.x = 0;
 	subtitleregion.y = h-h/4;
+	if(yuv) {
+		if (overlay) {
+			SDL_FreeYUVOverlay(overlay);
+		}
+		overlay = SDL_CreateYUVOverlay(w, h, SDL_YV12_OVERLAY, disp);
+	}
 }
 
 void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
@@ -2350,11 +2360,16 @@ void SDLVideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 
 	// TODO: create this when movie starts?
 	// BIKPlayer outputs PIX_FMT_YUV420P which is YV12
-	SDL_Overlay *overlay = SDL_CreateYUVOverlay(bufw, bufh, SDL_YV12_OVERLAY, disp);
+
+	assert( bufw == w && bufh == h );
 
 	SDL_LockYUVOverlay(overlay);
 	for (unsigned int plane = 0; plane < 3; plane++) {
 		unsigned char *data = buf[plane];
+		unsigned int size = overlay->pitches[plane];
+		if (strides[plane] < size) {
+			size = strides[plane];
+		}
 		unsigned int srcoffset = 0, destoffset = 0;
 		for (unsigned int i = 0; i < bufh; i++) {
 			unsigned int size = overlay->pitches[plane];
@@ -2366,15 +2381,11 @@ void SDLVideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 		}
 	}
 	SDL_UnlockYUVOverlay(overlay);
-
 	destRect.x = dstx;
 	destRect.y = dsty;
 	destRect.w = w;
 	destRect.h = h;
-
 	SDL_DisplayYUVOverlay(overlay, &destRect);
-	SDL_FreeYUVOverlay(overlay);
-
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
 	SDL_Flip( disp );

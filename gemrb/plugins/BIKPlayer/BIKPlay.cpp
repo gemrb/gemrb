@@ -41,7 +41,6 @@
 #include "binkdata.h"
 
 static Video *video = NULL;
-static unsigned char g_palette[768];
 static int g_truecolor;
 static ieDword *cbAtFrame = NULL;
 static ieDword *strRef = NULL;
@@ -302,7 +301,6 @@ bool BIKPlay::next_frame()
 		//buggy frame, we stop immediately
 		return false;
 	}
-
 	if (!timer_last_sec) {
 		timer_start();
 	}
@@ -315,8 +313,6 @@ int BIKPlay::doPlay()
 
 	//bink is always truecolor
 	g_truecolor = 1;
-	//palette is not really needed
-	memset( g_palette, 0, 768 );
 
 	frame_wait = 0;
 	timer_last_sec = 0;
@@ -327,7 +323,8 @@ int BIKPlay::doPlay()
 		return 1;
 	}
 
-	video->InitMovieScreen(outputwidth,outputheight);
+	//last parameter is to enable YUV overlay
+	video->InitMovieScreen(outputwidth,outputheight, true);
 
 	if (video_init(outputwidth,outputheight)) {
 		return 2;

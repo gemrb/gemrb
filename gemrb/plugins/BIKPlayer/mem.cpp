@@ -41,6 +41,8 @@ void *av_malloc(unsigned int size)
     void *ptr = NULL;
     long diff;
 
+printf("Av_malloc: %d\n", size);
+if(size>1000000) abort();
     /* let's disallow possible ambiguous cases */
     if(size > (INT_MAX-16) )
         return NULL;
