@@ -2371,7 +2371,7 @@ void SDLVideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	destRect.h = h;
 
 	SDL_DisplayYUVOverlay(overlay, &destRect);
-
+	SDL_FreeYUVOverlay(overlay);
 
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
