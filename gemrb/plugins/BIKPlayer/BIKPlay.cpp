@@ -612,9 +612,9 @@ static inline int float_to_int16_one(const float *src){
 	float f = *src;
 	// clamp the values to the range of an int16.
 	if (f > 32767)
-		f = 32767;
+		return 32767;
 	else if (f < -32768)
-		f = -32768;
+		return -32768;
 	return (int32_t) (f);
 }
 
@@ -1606,6 +1606,7 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 		showFrame((ieByte **) c_pic.data, (unsigned int *) c_pic.linesize, header.width, header.height, header.width, header.height, dest_x, dest_y);
 		release_buffer(&c_last);
 		c_last=c_pic;
+		memset(c_pic.data,0, sizeof(c_pic.data));
 	}
 	return 0;
 }
