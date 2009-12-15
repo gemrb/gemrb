@@ -611,9 +611,9 @@ const uint8_t ff_log2_tab[256]={
 static inline int float_to_int16_one(const float *src){
 	float f = *src;
 	// clamp the values to the range of an int16.
-	if (f > 32767)
+	if (f > 32767.0)
 		return 32767;
-	else if (f < -32768)
+	else if (f < -32768.0)
 		return -32768;
 	return (int32_t) (f);
 }
