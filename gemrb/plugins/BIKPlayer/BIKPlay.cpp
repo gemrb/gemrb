@@ -1264,7 +1264,7 @@ static inline void copy_block(DCTELEM block[64], const uint8_t *src, uint8_t *ds
 
 #define clear_block(block) memset( (block), 0, sizeof(DCTELEM)*64);
 
-//This replaces the j_rev_dct module???
+//This replaces the j_rev_dct module
 void bink_idct(DCTELEM *block)
 {
     int i, t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, tA, tB, tC;
@@ -1343,13 +1343,11 @@ void bink_idct(DCTELEM *block)
 
 static void idct_put(uint8_t *dest, int line_size, DCTELEM *block)
 {
-	//j_rev_dct(block);
 	bink_idct(block);
 	put_pixels_clamped(block, dest, line_size);
 }
 static void idct_add(uint8_t *dest, int line_size, DCTELEM *block)
 {
-	//j_rev_dct(block);
 	bink_idct(block);
 	add_pixels_clamped(block, dest, line_size);
 }
@@ -1459,21 +1457,20 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 							}
 							i += run;
 						} while (i < 63);
-							if (i == 63) {
-								int pos = *scan++;
-								PUT2x2(dst, stride, pos & 7, pos >> 3, get_value(BINK_SRC_COLORS));
-							}
-							break;
+						if (i == 63) {
+							int pos = *scan++;
+							PUT2x2(dst, stride, pos & 7, pos >> 3, get_value(BINK_SRC_COLORS));
+						}
+						break;
 					case INTRA_BLOCK:
 						clear_block(block);
 						block[0] = get_value(BINK_SRC_INTRA_DC);
 						read_dct_coeffs(block, c_scantable.permutated);
 						quant = bink_intra_quant[v_gb.get_bits(4)];
 						for (i = 0; i < 64; i++) {
-							//block[i] = MUL64(block[i], quant[i]) >> 16;
 							block[i] = (block[i] * quant[i]) >> 11;
 						}
-						j_rev_dct(block);
+						bink_idct(block);
 						for (j = 0; j < 8; j++) {
 							for (i = 0; i < 8; i++) {
 								PUT2x2(dst, stride, i, j, block[i + j*8]);
@@ -1482,10 +1479,10 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 						break;
 					case FILL_BLOCK:
 						v = get_value(BINK_SRC_COLORS);
-							for (j = 0; j < 16; j++) {
+						for (j = 0; j < 16; j++) {
 							memset(dst + j*stride, v, 16);
 						}
-							break;
+						break;
 					case PATTERN_BLOCK:
 						c1 = get_value(BINK_SRC_COLORS);
 						c2 = get_value(BINK_SRC_COLORS);
@@ -1495,7 +1492,7 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 								PUT2x2(dst, stride, i, j, (v & 1) ? c2 : c1);
 							}
 						}
-							break;
+						break;
 					case RAW_BLOCK:
 						for (j = 0; j < 8; j++) {
 							for (i = 0; i < 8; i++) {
@@ -1555,7 +1552,6 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 					read_dct_coeffs(block, c_scantable.permutated);
 					quant = bink_intra_quant[v_gb.get_bits(4)];
 					for (i = 0; i < 64; i++) {
-						//block[i] = MUL64(block[i], quant[i]) >> 16;
 						block[i] = (block[i] * quant[i]) >> 11;
 					}
 					idct_put(dst, stride, block);
@@ -1575,7 +1571,6 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 					read_dct_coeffs(block, c_scantable.permutated);
 					quant = bink_inter_quant[v_gb.get_bits(4)];
 					for (i = 0; i < 64; i++) {
-						//block[i] = MUL64(block[i], quant[i]) >> 16;
 						block[i] = (block[i] * quant[i]) >> 11;
 					}
 					idct_add(dst, stride, block);

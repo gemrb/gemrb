@@ -100,15 +100,8 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
 
     s->fft_permute = ff_fft_permute_c;
     s->fft_calc    = ff_fft_calc_c;
-//    s->imdct_calc  = ff_imdct_calc_c;
-//    s->imdct_half  = ff_imdct_half_c;
-//    s->mdct_calc   = ff_mdct_calc_c;
     s->exptab1     = NULL;
     s->split_radix = 1;
-
-//    if (ARCH_ARM)     ff_fft_init_arm(s);
-//    if (HAVE_ALTIVEC) ff_fft_init_altivec(s);
-//    if (HAVE_MMX)     ff_fft_init_mmx(s);
 
     if (s->split_radix) {
         for(j=4; j<=nbits; j++) {
