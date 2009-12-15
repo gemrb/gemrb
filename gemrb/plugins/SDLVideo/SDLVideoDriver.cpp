@@ -2289,10 +2289,11 @@ void SDLVideoDriver::MouseClickEvent(Uint8 type, Uint8 button)
 
 void SDLVideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 {
-	if(yuv) {
+	if (yuv) {
 		if (overlay) {
 			SDL_FreeYUVOverlay(overlay);
 		}
+		// BIKPlayer outputs PIX_FMT_YUV420P which is YV12
 		overlay = SDL_CreateYUVOverlay(w, h, SDL_YV12_OVERLAY, disp);
 	}
 	SDL_LockSurface( disp );
@@ -2358,9 +2359,6 @@ void SDLVideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	ieDword titleref) {
 	SDL_Rect destRect;
 
-	// TODO: create this when movie starts?
-	// BIKPlayer outputs PIX_FMT_YUV420P which is YV12
-
 	assert( bufw == w && bufh == h );
 
 	SDL_LockYUVOverlay(overlay);
@@ -2386,7 +2384,8 @@ void SDLVideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	SDL_DisplayYUVOverlay(overlay, &destRect);
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
-	SDL_Flip( disp );
+	//Maybe we don't need this?
+	//SDL_Flip( disp );
 }
 	
 int SDLVideoDriver::PollMovieEvents()
