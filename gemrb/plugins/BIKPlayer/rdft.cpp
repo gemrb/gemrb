@@ -28,7 +28,6 @@
  */
 
 /* sin(2*pi*x/n) for 0<=x<n/4, followed by n/2<=x<3n/4 */
-#if !CONFIG_HARDCODED_TABLES
 SINTABLE(16);
 SINTABLE(32);
 SINTABLE(64);
@@ -42,7 +41,7 @@ SINTABLE(8192);
 SINTABLE(16384);
 SINTABLE(32768);
 SINTABLE(65536);
-#endif
+
 SINTABLE_CONST FFTSample * const ff_sin_tabs[] = {
     NULL, NULL, NULL, NULL,
     ff_sin_16, ff_sin_32, ff_sin_64, ff_sin_128, ff_sin_256, ff_sin_512, ff_sin_1024,
@@ -68,11 +67,9 @@ av_cold int ff_rdft_init(RDFTContext *s, int nbits, enum RDFTransformType trans)
     ff_init_ff_cos_tabs(nbits);
     s->tcos = ff_cos_tabs[nbits];
     s->tsin = ff_sin_tabs[nbits]+(trans == RDFT || trans == IRIDFT)*(n>>2);
-#if !CONFIG_HARDCODED_TABLES
     for (i = 0; i < (n>>2); i++) {
         s->tsin[i] = (float) sin(i*theta);
     }
-#endif
     return 0;
 }
 

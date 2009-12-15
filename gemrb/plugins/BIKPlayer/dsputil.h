@@ -110,13 +110,8 @@ typedef struct FFTContext {
 
 extern FFTSample* const ff_cos_tabs[17];
 
-#if CONFIG_HARDCODED_TABLES
-#define COSTABLE_CONST const
-#define SINTABLE_CONST const
-#else
 #define COSTABLE_CONST
 #define SINTABLE_CONST
-#endif
 
 #define COSTABLE(size) COSTABLE_CONST FFTSample ff_cos_##size[size/2]
 
