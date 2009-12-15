@@ -324,6 +324,8 @@ int BIKPlay::doPlay()
 	}
 
 	//last parameter is to enable YUV overlay
+	outputwidth = (int) header.width;
+	outputheight= (int) header.height;
 	video->InitMovieScreen(outputwidth,outputheight, true);
 
 	if (video_init(outputwidth,outputheight)) {
@@ -745,7 +747,10 @@ int BIKPlay::DecodeAudioFrame(void *data, int data_size)
 	unsigned int ret = (unsigned int) ((uint8_t*)outbuf - (uint8_t*)samples);
 
 	//sample format is signed 16 bit integers
-	queueBuffer(s_stream, 16, s_channels, samples, reported_size, header.samplerate);
+	//ret is a better value here as it provides almost perfect sound.
+	//Original ffmpeg code produces worse results with reported_size.
+	//Ideally ret == reported_size
+	queueBuffer(s_stream, 16, s_channels, samples, ret, header.samplerate);
 
 	free(samples);
 	return reported_size!=ret;

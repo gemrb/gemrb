@@ -2289,6 +2289,12 @@ void SDLVideoDriver::MouseClickEvent(Uint8 type, Uint8 button)
 
 void SDLVideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 {
+	if(yuv) {
+		if (overlay) {
+			SDL_FreeYUVOverlay(overlay);
+		}
+		overlay = SDL_CreateYUVOverlay(w, h, SDL_YV12_OVERLAY, disp);
+	}
 	SDL_LockSurface( disp );
 	memset( disp->pixels, 0,
 		disp->w * disp->h * disp->format->BytesPerPixel );
@@ -2301,12 +2307,6 @@ void SDLVideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	subtitleregion.h = h/4;
 	subtitleregion.x = 0;
 	subtitleregion.y = h-h/4;
-	if(yuv) {
-		if (overlay) {
-			SDL_FreeYUVOverlay(overlay);
-		}
-		overlay = SDL_CreateYUVOverlay(w, h, SDL_YV12_OVERLAY, disp);
-	}
 }
 
 void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
@@ -2372,8 +2372,6 @@ void SDLVideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 		}
 		unsigned int srcoffset = 0, destoffset = 0;
 		for (unsigned int i = 0; i < bufh; i++) {
-			unsigned int size = overlay->pitches[plane];
-			if (strides[plane] < size) size = strides[plane];
 			memcpy(overlay->pixels[plane] + destoffset,
 				data + srcoffset, size);
 			srcoffset += strides[plane];
