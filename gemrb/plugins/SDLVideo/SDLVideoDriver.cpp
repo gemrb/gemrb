@@ -2357,8 +2357,10 @@ void SDLVideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 		unsigned char *data = buf[plane];
 		unsigned int srcoffset = 0, destoffset = 0;
 		for (unsigned int i = 0; i < bufh; i++) {
+			unsigned int size = overlay->pitches[plane];
+			if (strides[plane] < size) size = strides[plane];
 			memcpy(overlay->pixels[plane] + destoffset,
-				data + srcoffset, bufw);
+				data + srcoffset, size);
 			srcoffset += strides[plane];
 			destoffset += overlay->pitches[plane];
 		}
