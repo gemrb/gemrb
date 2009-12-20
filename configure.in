@@ -237,6 +237,7 @@ gemrb/plugins/BAMImporter/Makefile
 gemrb/plugins/BIFImporter/Makefile 
 gemrb/plugins/BIKPlayer/Makefile
 gemrb/plugins/BMPImporter/Makefile 
+gemrb/plugins/BMPWriter/Makefile
 gemrb/plugins/PNGImporter/Makefile 
 gemrb/plugins/CHUImporter/Makefile 
 gemrb/plugins/CREImporter/Makefile 

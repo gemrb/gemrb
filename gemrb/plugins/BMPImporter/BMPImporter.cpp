@@ -245,51 +245,6 @@ void BMPImporter::Read4To4(void *rpixels)
 	}
 }
 
-bool BMPImporter::OpenFromImage(Sprite2D* sprite, bool autoFree)
-{
-	if (sprite == NULL) {
-		return false;
-	}
-	if (this->autoFree) {
-		delete str;
-	}
-
-	free( pixels );
-	pixels = NULL;
-	free( Palette );
-	Palette = NULL;
-
-	// the previous stream was destructed and there won't be next
-	this->autoFree = false;
-	// FIXME: we assume 24bit sprite format here!
-
-	Size = 0;
-	Width = sprite->Width;
-	Height = sprite->Height;
-	Planes = 1;
-	BitCount = sprite->Bpp;
-	Compression = 0;
-	ImageSize = 0;
-	NumColors = 0;
-	PaddedRowLength = Width * 3;
-	if (PaddedRowLength & 3) {
-		PaddedRowLength += 4 - ( PaddedRowLength & 3 );
-	}
-
-	Palette = NULL;
-	// left out some other params
-
-	pixels = malloc( Width * Height * (BitCount / 8) );
-	memcpy( pixels, sprite->pixels, Width * Height * (BitCount / 8) );
-
-	// FIXME: free the sprite if autoFree?
-	if (autoFree) {
-		core->GetVideoDriver()->FreeSprite(sprite);
-	}
-
-	return true;
-}
-
 Sprite2D* BMPImporter::GetImage()
 {
 	Sprite2D* spr = NULL;
@@ -353,60 +308,6 @@ void BMPImporter::GetPalette(int index, int colors, Color* pal)
 	}
 }
 
-
-#define GET_SCANLINE_LENGTH(width, bitsperpixel)  (((width)*(bitsperpixel)+7)/8)
-
-void BMPImporter::PutImage(DataStream *output)
-{
-	ieDword tmpDword;
-	ieWord tmpWord;
-
-	// FIXME
-	ieDword Width = GetWidth();
-	ieDword Height = GetHeight();
-	char filling[3] = {'B','M'};
-	ieDword PaddedRowLength = GET_SCANLINE_LENGTH(Width,24);
-	int stuff = (4-(PaddedRowLength&3))&3; // rounding it up to 4 bytes boundary
-	PaddedRowLength+=stuff;
-	ieDword fullsize = PaddedRowLength*Height;
-
-	//always save in truecolor (24 bit), no palette
-	output->Write( filling, 2);
-	tmpDword = fullsize+BMP_HEADER_SIZE;  // FileSize
-	output->WriteDword( &tmpDword);
-	tmpDword = 0;
-	output->WriteDword( &tmpDword);       // ??
-	tmpDword = BMP_HEADER_SIZE;           // DataOffset
-	output->WriteDword( &tmpDword);
-	tmpDword = 40;                        // Size
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &Width);
-	output->WriteDword( &Height);
-	tmpWord = 1;                          // Planes
-	output->WriteWord( &tmpWord);
-	tmpWord = 24; //24 bits               // BitCount
-	output->WriteWord( &tmpWord);
-	tmpDword = 0;                         // Compression
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &tmpDword);       // ImageSize
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &tmpDword);
-	
-	memset( filling,0,sizeof(filling) );
-	for (unsigned int y=0;y<Height;y++) {
-		for (unsigned int x=0;x<Width;x++) {
-			Color c = GetPixel(x,Height-y-1);
-
-			output->Write( &c.b, 1);
-			output->Write( &c.g, 1);
-			output->Write( &c.r, 1);
-		}
-		output->Write( filling, stuff);
-	}
-}
-
 ImageFactory* BMPImporter::GetImageFactory(const char* ResRef)
 {
 	ImageFactory* fact = new ImageFactory( ResRef, GetImage() );
@@ -416,6 +317,5 @@ ImageFactory* BMPImporter::GetImageFactory(const char* ResRef)
 #include "../../includes/plugindef.h"
 
 GEMRB_PLUGIN(0xD768B1, "BMP File Reader")
-PLUGIN_CLASS(IE_BMP_CLASS_ID, BMPImporter)
 PLUGIN_IE_RESOURCE(&ImageMgr::ID, BMPImporter, ".bmp", (ieWord)IE_BMP_CLASS_ID)
 END_PLUGIN()

@@ -35,10 +35,6 @@ public:
 	ImageMgr(void);
 	virtual ~ImageMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
-	// Swallows an image so it can be saved w/ PutImage() etc.
-	// FIXME: should be abstract, but I don't want to implement it for all
-	// image managers right now
-	virtual bool OpenFromImage(Sprite2D* sprite, bool autoFree = true);
 	virtual Sprite2D* GetImage() = 0;
 	/** No descriptions */
 	virtual void GetPalette(int index, int colors, Color* pal) = 0;
@@ -49,10 +45,6 @@ public:
 	virtual unsigned int GetPixelIndex(unsigned int x, unsigned int y) = 0;
 	virtual int GetWidth() = 0;
 	virtual int GetHeight() = 0;
-	// FIXME: should be abstract, but I don't want to implement it for all
-	// image managers right now
-	virtual void PutImage(DataStream *output);
-
 	virtual ImageFactory* GetImageFactory(const char* ResRef) = 0;
 protected:
 	/** not virtual */

@@ -149,11 +149,6 @@ bool PNGImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-bool PNGImp::OpenFromImage(Sprite2D* /*sprite*/, bool /*autoFree*/)
-{
-	return false;
-}
-
 Sprite2D* PNGImp::GetImage()
 {
 	Sprite2D* spr = 0;
@@ -219,12 +214,6 @@ void PNGImp::GetPalette(int index, int colors, Color* pal)
 			pal[i].a = 0xff;
 		}
 	}
-}
-
-
-void PNGImp::PutImage(DataStream* /*output*/)
-{
-	// FIXME: add png code here
 }
 
 ImageFactory* PNGImp::GetImageFactory(const char* ResRef)

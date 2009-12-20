@@ -11,6 +11,7 @@ SUBDIRS = \
 	BAMImporter \
 	BIFImporter \
 	BMPImporter \
+	BMPWriter \
 	PNGImporter \
 	CHUImporter \
 	CREImporter \

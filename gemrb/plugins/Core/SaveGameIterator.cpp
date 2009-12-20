@@ -25,6 +25,7 @@
 #include "SaveGameMgr.h"
 #include "GameControl.h"
 #include "Video.h"
+#include "ImageWriter.h"
 #include <vector>
 #include <cassert>
 
@@ -459,7 +460,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 		return -1;
 	}
 
-	ImageMgr *im = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID );
+	ImageWriter *im = (ImageWriter *) core->GetInterface( PLUGIN_IMAGE_WRITER_BMP );
 
 	//Create portraits
 	for (int i = 0; i < game->GetPartySize( false ); i++) {
@@ -468,8 +469,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 			snprintf( FName, sizeof(FName), "PORTRT%d", i );
 			FileStream outfile;
 			outfile.Create( Path, FName, IE_BMP_CLASS_ID );
-			im->OpenFromImage( portrait, true );
-			im->PutImage( &outfile );
+			im->PutImage( &outfile, portrait );
 		}
 	}
 
@@ -477,8 +477,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	Sprite2D* preview = core->GetGameControl()->GetPreview();
 	FileStream outfile;
 	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
-	im->OpenFromImage( preview, true );
-	im->PutImage( &outfile );
+	im->PutImage( &outfile, preview );
 
 	core->FreeInterface(im);
 	loaded = false;
