@@ -22,9 +22,11 @@
 #ifndef RESOURCEMGR_H
 #define RESOURCEMGR_H
 
+#include <vector>
 #include "Plugin.h"
 #include "../../includes/SClassID.h"
 #include "DataStream.h"
+#include "Resource.h"
 #include "../../includes/globals.h"
 
 #ifdef WIN32
@@ -39,6 +41,8 @@
 #define GEM_EXPORT
 #endif
 
+class ResourceDesc;
+
 class GEM_EXPORT ResourceMgr : public Plugin {
 public:
 	ResourceMgr(void);
@@ -46,6 +50,7 @@ public:
 	virtual bool LoadResFile(const char* resfile) = 0;
 	virtual bool HasResource(const char* resname, SClass_ID type, bool silent=false) = 0;
 	virtual DataStream* GetResource(const char* resname, SClass_ID type, bool silent=false) = 0;
+	virtual Resource* GetResource(const char* resname, const std::vector<ResourceDesc*> &types, bool silent=false) = 0;
 	virtual void* GetFactoryResource(const char* resname, SClass_ID type,
 		unsigned char mode = IE_NORMAL, bool silent=false) = 0;
 };

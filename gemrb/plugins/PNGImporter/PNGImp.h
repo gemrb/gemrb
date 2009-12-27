@@ -28,8 +28,6 @@ struct PNGInternal;
 
 class PNGImp : public ImageMgr {
 private:
-	DataStream* str;
-	bool autoFree;
 	PNGInternal* inf;
 
 	ieDword Width, Height;
@@ -38,7 +36,7 @@ public:
 	PNGImp(void);
 	~PNGImp(void);
 	void Close();
-	bool Open(DataStream* stream, bool autoFree = true, bool convert = false);
+	bool Open(DataStream* stream, bool autoFree = true);
 	bool OpenFromImage(Sprite2D* sprite, bool autoFree = true);
 	Sprite2D* GetImage();
 	void PutImage(DataStream *output);

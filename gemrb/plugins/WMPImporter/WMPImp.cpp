@@ -91,12 +91,10 @@ void WMPImp::GetWorldMap(WorldMap *m, unsigned int index)
 	str->ReadResRef( m->MapIconResRef );
 
 	// Load map bitmap
-	if (!core->IsAvailable( IE_MOS_CLASS_ID )) {
-		printMessage( "WMPImporter","No MOS Importer Available.\n", LIGHT_RED );
+	ImageMgr* mos = ( ImageMgr* ) gamedata->GetResource( m->MapResRef, &ImageMgr::ID );
+	if (!mos) {
+		printMessage( "WMPImporter","Worldmap image not found.\n", LIGHT_RED );
 	} else {
-		ImageMgr* mos = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
-		DataStream* mosfile = core->GetResourceMgr()->GetResource( m->MapResRef, IE_MOS_CLASS_ID );
-		mos->Open( mosfile, true ); //autofree
 		m->SetMapMOS(mos->GetImage());
 		core->FreeInterface( mos );
 	}

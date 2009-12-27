@@ -39,6 +39,7 @@
 
 class Audio;
 class Video;
+class Resource;
 class ResourceMgr;
 class StringMgr;
 class Container;
@@ -349,6 +350,7 @@ public:
 	ProjectileServer* GetProjectileServer() const;
 	Video * GetVideoDriver() const;
 	ResourceMgr * GetResourceMgr() const;
+	PluginMgr* GetPluginMgr() const;
 	/* create or change a custom string */
 	ieStrRef UpdateString(ieStrRef strref, const char *text) const;
 	/* returns a newly created string */

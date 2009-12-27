@@ -22,6 +22,8 @@
 #include "../../includes/win32def.h"
 #include "ImageMgr.h"
 
+const TypeID ImageMgr::ID = {};
+
 ImageMgr::ImageMgr(void)
 {
 }

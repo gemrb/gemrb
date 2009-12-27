@@ -26,9 +26,6 @@
 
 class BMPImp : public ImageMgr {
 private:
-	DataStream* str;
-	bool autoFree;
-
 	//BITMAPINFOHEADER
 	ieDword Size, Width, Height, Compression, ImageSize, ColorsUsed, ColorsImportant;
 	ieWord Planes, BitCount;
@@ -45,7 +42,7 @@ private:
 public:
 	BMPImp(void);
 	~BMPImp(void);
-	bool Open(DataStream* stream, bool autoFree = true, bool convert = false);
+	bool Open(DataStream* stream, bool autoFree = true);
 	bool OpenFromImage(Sprite2D* sprite, bool autoFree = true);
 	Sprite2D* GetImage();
 	void PutImage(DataStream *output);

@@ -5,12 +5,12 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -19,12 +19,11 @@
  *
  */
 
-#ifndef SOUNDMGR_H
-#define SOUNDMGR_H
+#ifndef RESOURCEDESC_H
+#define RESOURCEDESC_H
 
+#include "../../includes/SClassID.h"
 #include "../../includes/ie_types.h"
-#include "Plugin.h"
-#include "DataStream.h"
 
 #ifdef WIN32
 
@@ -38,20 +37,24 @@
 #define GEM_EXPORT
 #endif
 
-class GEM_EXPORT SoundMgr : public Plugin {
-public:
-	static const TypeID ID;
-public:
-	SoundMgr(void);
-	virtual ~SoundMgr(void);
-	virtual bool Open(DataStream* stream, bool autofree = true ) = 0 ;
-    virtual int get_length() = 0 ;
-    virtual int get_channels() = 0 ;
-    virtual int get_samplerate() = 0 ;
-    virtual int read_samples( short* memory, int cnt ) = 0 ;
-    virtual void rewind(void) = 0 ;
+class Resource;
+class DataStream;
+class TypeID;
 
+class GEM_EXPORT ResourceDesc {
+public:
+	typedef Resource* (*CreateFunc)(DataStream*);
+private:
+	const TypeID *type;
+	const char *ext;
+	ieWord keyType; // IE Specific
+public:
+	ResourceDesc(const TypeID* type, CreateFunc create, const char *ext, ieWord keyType = 0);
+	~ResourceDesc(void);
+	const char* GetExt();
+	const TypeID* GetType();
+	ieWord GetKeyType();
+	const CreateFunc Create;
 };
-
 
 #endif

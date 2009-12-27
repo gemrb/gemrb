@@ -21,6 +21,8 @@
 
 #include "SoundMgr.h"
 
+const TypeID SoundMgr::ID = {};
+
 SoundMgr::SoundMgr(void)
 {
 }

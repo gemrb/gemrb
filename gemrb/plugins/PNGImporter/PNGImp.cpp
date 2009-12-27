@@ -49,12 +49,8 @@ static ieDword green_mask = 0x0000ff00;
 static ieDword red_mask = 0x000000ff;
 static ieDword alpha_mask = 0xff000000;
 
-
 PNGImp::PNGImp(void)
 {
-	str = 0;
-	autoFree = false;
-
 	inf = new PNGInternal();
 	inf->png_ptr = 0;
 	inf->info_ptr = 0;
@@ -78,19 +74,13 @@ void PNGImp::Close()
 		inf->info_ptr = 0;
 		inf->end_info = 0;
 	}
-
-	if (str && autoFree) {
-		delete( str );
-		str = 0;
-	}
 }
 
-bool PNGImp::Open(DataStream* stream, bool autoFree, bool /*convert*/)
+bool PNGImp::Open(DataStream* stream, bool autoFree)
 {
+	if (!Resource::Open(stream, autoFree))
+		return false;
 	Close();
-
-	str = stream;
-	this->autoFree = autoFree;
 
 	png_byte header[8];
 	if (stream->Read(header, 8) < 8) return false;

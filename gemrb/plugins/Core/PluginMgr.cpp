@@ -25,6 +25,7 @@
 #include "PluginMgr.h"
 #include "Plugin.h"
 #include "Interface.h"
+#include "ResourceDesc.h"
 // FIXME: this should be in Interface.h instead
 #include "Variables.h"
 
@@ -39,7 +40,7 @@
 #endif
 
 typedef char*(* charvoid)(void);
-typedef ClassDesc*(* cdvoid)(void);
+typedef ClassDesc*(* cdvoid)(PluginMgr*);
 
 #ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
 #include <assert.h>
@@ -162,7 +163,7 @@ PluginMgr::PluginMgr(char* pluginpath)
 		printf( "..." );
 		printStatus( "OK", LIGHT_GREEN );
 		bool error = false;
-		ClassDesc* plug = LibClassDesc();
+		ClassDesc* plug = LibClassDesc(this);
 		if (plug == NULL) {
 			printMessage( "PluginMgr", "Plug-in Exports Error! ", WHITE );
 			printStatus( "ERROR", LIGHT_RED );
@@ -297,4 +298,14 @@ void PluginMgr::FreePlugin(void* ptr)
 {
 	if (ptr)
 		( ( Plugin * ) ptr )->release();
+}
+
+void PluginMgr::AddResourceDesc(ResourceDesc* rd)
+{
+	resources[rd->GetType()].push_back(rd);
+}
+
+const std::vector<ResourceDesc*>& PluginMgr::GetResourceDesc(const TypeID* type)
+{
+	return resources[type];
 }

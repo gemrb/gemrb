@@ -102,19 +102,13 @@ Window* CHUImp::GetWindow(unsigned int wid)
 
 	Window* win = new Window( WindowID, XPos, YPos, Width, Height );
 	if (BackGround == 1) {
-		if (core->IsAvailable( IE_MOS_CLASS_ID )) {
-			DataStream* bkgr = core->GetResourceMgr()->GetResource( MosFile, IE_MOS_CLASS_ID );
-			if (bkgr != NULL) {
-				ImageMgr* mos = ( ImageMgr* )
-					core->GetInterface( IE_MOS_CLASS_ID );
-				mos->Open( bkgr, true );
-				win->SetBackGround( mos->GetImage(), true );
-				core->FreeInterface( mos );
-			} else
-				printMessage( "CHUImporter","Cannot Load BackGround, skipping\n",YELLOW );
-		} else {
-			printMessage( "CHUImporter","No MOS Importer Available, skipping background\n",LIGHT_RED );
-		}
+		ImageMgr* mos = ( ImageMgr* )
+			gamedata->GetResource( MosFile, &ImageMgr::ID );
+		if (mos != NULL) {
+			win->SetBackGround( mos->GetImage(), true );
+			core->FreeInterface( mos );
+		} else
+			printMessage( "CHUImporter","Cannot Load BackGround, skipping\n",YELLOW );
 	}
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		printMessage( "CHUImporter","No BAM Importer Available, skipping controls\n",LIGHT_RED );
@@ -234,18 +228,17 @@ Window* CHUImp::GetWindow(unsigned int wid)
 
 				Sprite2D* img = NULL;
 				Sprite2D* img2 = NULL;
-				DataStream *s;
-				ImageMgr* mos = ( ImageMgr* )
-					core->GetInterface( IE_MOS_CLASS_ID );
 				if ( MOSFile[0] ) {
-					s = core->GetResourceMgr()->GetResource( MOSFile, IE_MOS_CLASS_ID );
-					mos->Open( s, true );
+					ImageMgr* mos = ( ImageMgr* )
+						gamedata->GetResource( MOSFile, &ImageMgr::ID );
 					img = mos->GetImage();
+					core->FreeInterface( mos );
 				}
 				if ( MOSFile2[0] ) {
-					s = core->GetResourceMgr()->GetResource( MOSFile2, IE_MOS_CLASS_ID );
-					mos->Open( s, true );
+					ImageMgr* mos = ( ImageMgr* )
+						gamedata->GetResource( MOSFile2, &ImageMgr::ID );
 					img2 = mos->GetImage();
+					core->FreeInterface( mos );
 				}
 				
 				pbar->SetImage( img, img2 );
@@ -257,12 +250,12 @@ Window* CHUImp::GetWindow(unsigned int wid)
 						pbar->SetAnimation(af->GetCycle( Cycle & 0xff ) );
 				}
 				else {
-					s = core->GetResourceMgr()->GetResource( BAMFile, IE_MOS_CLASS_ID );
-					mos->Open( s, true );
+					ImageMgr* mos = ( ImageMgr* )
+						gamedata->GetResource( BAMFile, &ImageMgr::ID );
 					Sprite2D* img3 = mos->GetImage();
 					pbar->SetBarCap( img3 );
+					core->FreeInterface( mos );
 				}
-				core->FreeInterface( mos );
 				win->AddControl( pbar );
 			}
 			break;
@@ -289,9 +282,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				sldr->Width = Width;
 				sldr->Height = Height;
 				ImageMgr* mos = ( ImageMgr* )
-					core->GetInterface( IE_MOS_CLASS_ID );
-				DataStream* s = core->GetResourceMgr()->GetResource( MOSFile, IE_MOS_CLASS_ID );
-				mos->Open( s, true );
+					gamedata->GetResource( MOSFile, &ImageMgr::ID );
 				Sprite2D* img = mos->GetImage();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
 				core->FreeInterface( mos );
@@ -344,13 +335,12 @@ Window* CHUImp::GetWindow(unsigned int wid)
 	      }
 
 				ImageMgr* mos = ( ImageMgr* )
-					core->GetInterface( IE_MOS_CLASS_ID );
-				DataStream* ds = core->GetResourceMgr()->GetResource( BGMos, IE_MOS_CLASS_ID );
+					gamedata->GetResource( BGMos, &ImageMgr::ID );
 				Sprite2D *img = NULL;
-				if(mos->Open( ds, true ) ) {
+				if(mos) {
 					img = mos->GetImage();
+					core->FreeInterface( mos );
 				}
-				core->FreeInterface( mos );
 
 				TextEdit* te = new TextEdit( maxInput, PosX, PosY );
 				te->ControlID = ControlID;

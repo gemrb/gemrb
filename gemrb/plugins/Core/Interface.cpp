@@ -29,6 +29,7 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <vector>
 
 #ifdef WIN32
 #include <direct.h>
@@ -1376,35 +1377,9 @@ int Interface::Init()
 	strings->Open( fs, true );
 
 	printMessage( "Core", "Loading Palettes...\n", WHITE );
-	DataStream* bmppal16 = NULL;
-	DataStream* bmppal32 = NULL;
-	DataStream* bmppal256 = NULL;
-	if (!IsAvailable( IE_BMP_CLASS_ID )) {
-		printStatus( "ERROR", LIGHT_RED );
-		printf( "No BMP Importer Available.\nTermination in Progress...\n" );
-		return GEM_ERROR;
-	}
-	bmppal16 = key->GetResource( Palette16, IE_BMP_CLASS_ID );
-	if (bmppal16) {
-		pal16 = ( ImageMgr * ) GetInterface( IE_BMP_CLASS_ID );
-		pal16->Open( bmppal16, true );
-	} else {
-		pal16 = NULL;
-	}
-	bmppal32 = key->GetResource( Palette32, IE_BMP_CLASS_ID );
-	if (bmppal32) {
-		pal32 = ( ImageMgr * ) GetInterface( IE_BMP_CLASS_ID );
-		pal32->Open( bmppal32, true );
-	} else {
-		pal32 = NULL;
-	}
-	bmppal256 = key->GetResource( Palette256, IE_BMP_CLASS_ID );
-	if (bmppal256) {
-		pal256 = ( ImageMgr * ) GetInterface( IE_BMP_CLASS_ID );
-		pal256->Open( bmppal256, true );
-	} else {
-		pal256 = NULL;
-	}
+	pal16 = ( ImageMgr * ) gamedata->GetResource( Palette16, &ImageMgr::ID );
+	pal32 = ( ImageMgr * ) gamedata->GetResource( Palette32, &ImageMgr::ID );
+	pal256 = ( ImageMgr * ) gamedata->GetResource( Palette256, &ImageMgr::ID );
 	printMessage( "Core", "Palettes Loaded\n", WHITE );
 
 	if (!IsAvailable( IE_BAM_CLASS_ID )) {
@@ -1712,6 +1687,11 @@ Video* Interface::GetVideoDriver() const
 ResourceMgr* Interface::GetResourceMgr() const
 {
 	return key;
+}
+
+PluginMgr* Interface::GetPluginMgr() const
+{
+	return plugin;
 }
 
 const char* Interface::TypeExt(SClass_ID type) const
@@ -2658,12 +2638,9 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 	Window* win = new Window( WindowID, (ieWord) XPos, (ieWord) YPos, (ieWord) Width, (ieWord) Height );
 	if (Background[0]) {
 		if (IsAvailable( IE_MOS_CLASS_ID )) {
-			DataStream* bkgr = key->GetResource( Background,
-				IE_MOS_CLASS_ID );
-			if (bkgr != NULL) {
-				ImageMgr* mos = ( ImageMgr* )
-					GetInterface( IE_MOS_CLASS_ID );
-				mos->Open( bkgr, true );
+			ImageMgr* mos = ( ImageMgr* )
+				gamedata->GetResource( Background, &ImageMgr::ID );
+			if (mos != NULL) {
 				win->SetBackGround( mos->GetImage(), true );
 				FreeInterface( mos );
 			} else

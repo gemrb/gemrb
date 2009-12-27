@@ -26,14 +26,14 @@
 #include "../Core/Video.h"
 #include "../Core/ImageFactory.h"
 
+#define BMP_HEADER_SIZE  54
+
 static ieDword red_mask = 0x00ff0000;
 static ieDword green_mask = 0x0000ff00;
 static ieDword blue_mask = 0x000000ff;
 
 BMPImp::BMPImp(void)
 {
-	str = NULL;
-	autoFree = false;
 	Palette = NULL;
 	pixels = NULL;
 	if (DataStream::IsEndianSwitch()) {
@@ -45,21 +45,14 @@ BMPImp::BMPImp(void)
 
 BMPImp::~BMPImp(void)
 {
-	if (autoFree) {
-		delete str;
-	}
 	free( Palette );
 	free( pixels );
 }
 
-bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
+bool BMPImp::Open(DataStream* stream, bool autoFree)
 {
-	if (stream == NULL) {
+	if (!Resource::Open(stream, autoFree))
 		return false;
-	}
-	if (this->autoFree) {
-		delete str;
-	}
 	//we release the previous pixel data
 	free( pixels );
 	pixels = NULL;
@@ -197,11 +190,8 @@ bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
 			src += PaddedRowLength;
 		}
 	} else if (BitCount == 4) {
-		if (convert) {
-			Read4To8(rpixels);
-		} else {
-			Read4To4(rpixels);
-		}
+		Read4To8(rpixels); // FIXME: This is only needed for searchmap: we should really create a seperate representation.
+		//Read4To4(rpixels);
 	}
 	free( rpixels );
 	return true;

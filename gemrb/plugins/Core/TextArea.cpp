@@ -89,18 +89,8 @@ void TextArea::RefreshSprite(const char *portrait)
 	if (!strnicmp(PortraitResRef, "none", 8) ) {
 		return;
 	}
-	DataStream* str = core->GetResourceMgr()->GetResource( PortraitResRef, IE_BMP_CLASS_ID );
-	if (str==NULL) {
-		return;
-	}
-	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
+	ImageMgr* im = ( ImageMgr* ) gamedata->GetResource( PortraitResRef, &ImageMgr::ID );
 	if (im == NULL) {
-		delete ( str );
-		return;
-	}
-
-	if (!im->Open( str, true )) {
-		core->FreeInterface( im );
 		return;
 	}
 

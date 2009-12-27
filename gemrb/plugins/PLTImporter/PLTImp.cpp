@@ -34,8 +34,6 @@ static ieDword blue_mask = 0x0000ff00;
 
 PLTImp::PLTImp(void)
 {
-	str = NULL;
-	autoFree = false;
 	pixels = NULL;
 	if (DataStream::IsEndianSwitch()) {
 		red_mask = 0x000000ff;
@@ -46,9 +44,6 @@ PLTImp::PLTImp(void)
 
 PLTImp::~PLTImp(void)
 {
-	if (str && autoFree) {
-		delete( str );
-	}
 	if (pixels) {
 		free( pixels );
 	}
@@ -59,16 +54,10 @@ PLTImp::~PLTImp(void)
 	}
 }
 
-bool PLTImp::Open(DataStream* stream, bool autoFree, bool /*convert*/)
+bool PLTImp::Open(DataStream* stream, bool autoFree)
 {
-	if (stream == NULL) {
+	if (!Resource::Open(stream, autoFree))
 		return false;
-	}
-	if (str && this->autoFree) {
-		delete( str );
-	}
-	str = stream;
-	this->autoFree = autoFree;
 
 	char Signature[8];
 	unsigned short unknown[4];

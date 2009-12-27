@@ -45,6 +45,8 @@
  * Base class for all GemRB plugins
  */
 
+struct TypeID {};
+
 class GEM_EXPORT Plugin {
 public:
 	Plugin(void);

@@ -2851,13 +2851,12 @@ Sprite2D* GameControl::GetPortraitPreview(int pcslot)
 	if (! actor) {
 		return NULL;
 	}
-	DataStream *str = core->GetResourceMgr()->GetResource( actor->GetPortrait( true ), IE_BMP_CLASS_ID );
-	if (! str) {
+	ImageMgr* im = ( ImageMgr* )
+		gamedata->GetResource( actor->GetPortrait(true), &ImageMgr::ID );
+	if (! im) {
 		return NULL;
 	}
 
-	ImageMgr *im = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID );
-	im->Open( str, true );
 	Sprite2D* img = im->GetImage();
 	core->FreeInterface(im);
 

@@ -26,6 +26,9 @@
 #include "../Core/ResourceMgr.h"
 #include "Dictionary.h"
 
+class Resource;
+class ResourceDesc;
+
 struct RESEntry {
 	ieResRef ResRef;
 	ieWord   Type;
@@ -56,8 +59,10 @@ public:
 	bool LoadResFile(const char* resfile);
 	/* predicts the availability of a resource */
 	bool HasResource(const char* resname, SClass_ID type, bool silent=false);
+	bool HasResource(const char* resname, const std::vector<ResourceDesc*>, bool silent=false);
 	/* returns resource */
 	DataStream* GetResource(const char* resname, SClass_ID type, bool silent=false);
+	Resource* GetResource(const char* resname, const std::vector<ResourceDesc*> &types, bool silent=false);
 	/* returns factory resource, currently works only with animations */
 	void* GetFactoryResource(const char* resname, SClass_ID type,
 		unsigned char mode = IE_NORMAL, bool silent=false);

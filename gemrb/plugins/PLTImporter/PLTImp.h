@@ -26,9 +26,6 @@
 
 class PLTImp : public ImageMgr {
 private:
-	DataStream* str;
-	bool autoFree;
-
 	ieDword Width, Height;
 	void* pixels;
 	Color* Palettes[8];
@@ -36,7 +33,7 @@ private:
 public:
 	PLTImp(void);
 	~PLTImp(void);
-	bool Open(DataStream* stream, bool autoFree = true, bool convert = false);
+	bool Open(DataStream* stream, bool autoFree = true);
 	Sprite2D* GetImage();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);

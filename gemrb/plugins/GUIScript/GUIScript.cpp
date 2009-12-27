@@ -704,24 +704,13 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 	}
 
 
-	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
-	if (im == NULL) {
-		return NULL;
-	}
-
 	for (int i = 0; i < 4; i++) {
 		if (ResRef[i] == 0) {
 			return AttributeError( GemRB_LoadWindowFrame__doc );
 		}
 
-		DataStream* str = core->GetResourceMgr()->GetResource( ResRef[i], IE_MOS_CLASS_ID );
-		if (str == NULL) {
-			core->FreeInterface( im );
-			return NULL;
-		}
-
-		if (!im->Open( str, true )) {
-			core->FreeInterface( im );
+		ImageMgr* im = ( ImageMgr* ) gamedata->GetResource( ResRef[i], &ImageMgr::ID );
+		if (im == NULL) {
 			return NULL;
 		}
 
@@ -734,8 +723,8 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 		// FIXME: delete previous WindowFrames
 		//core->WindowFrames[i] = Picture;
 		core->SetWindowFrame(i, Picture);
+		core->FreeInterface( im );
 	}
-	core->FreeInterface( im );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -778,11 +767,8 @@ static PyObject* GemRB_SetWindowPicture(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!\n");
 	}
 
-	DataStream* bkgr = core->GetResourceMgr()->GetResource( MosResRef, IE_MOS_CLASS_ID );
-
-	if (bkgr != NULL) {
-		ImageMgr* mos = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
-		mos->Open( bkgr, true );
+	ImageMgr* mos = ( ImageMgr* ) gamedata->GetResource( MosResRef, &ImageMgr::ID );
+	if (mos != NULL) {
 		win->SetBackGround( mos->GetImage(), true );
 		core->FreeInterface( mos );
 	}
@@ -2696,16 +2682,16 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 		CtrlIndex = core->GetControl( WindowIndex, LabelID );
 		Control *lc = win->GetControl( CtrlIndex );
 		map->LinkedLabel = lc;
-		ImageMgr *anim = ( ImageMgr* ) core->GetInterface(IE_BMP_CLASS_ID );
-		DataStream* str = core->GetResourceMgr()->GetResource( Flag, IE_BMP_CLASS_ID );
-		if (anim -> Open(str, true) ) {
-				map->Flag[0] = anim->GetImage();
-			}
-		str = core->GetResourceMgr()->GetResource( Flag2, IE_BMP_CLASS_ID );
-		if (anim -> Open(str, true) ) {
-				map->Flag[1] = anim->GetImage();
+		ImageMgr *anim = ( ImageMgr* ) gamedata->GetResource( Flag, &ImageMgr::ID );
+		if (anim) {
+			map->Flag[0] = anim->GetImage();
+			core->FreeInterface( anim );
 		}
-		core->FreeInterface( anim );
+		anim = ( ImageMgr* ) gamedata->GetResource( Flag2, &ImageMgr::ID );
+		if (anim) {
+			map->Flag[1] = anim->GetImage();
+			core->FreeInterface( anim );
+		}
 		goto setup_done;
 	}
 	if (Flag) {
@@ -3188,19 +3174,8 @@ static PyObject* GemRB_SetButtonMOS(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
-		IE_MOS_CLASS_ID );
-	if (str == NULL) {
-		return NULL;
-	}
-	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
+	ImageMgr* im = ( ImageMgr* ) gamedata->GetResource( ResRef, &ImageMgr::ID );
 	if (im == NULL) {
-		delete ( str );
-		return NULL;
-	}
-
-	if (!im->Open( str, true )) {
-		core->FreeInterface( im );
 		return NULL;
 	}
 
@@ -3251,9 +3226,9 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	Sprite2D *Picture;
 	Sprite2D *Picture2=NULL;
 
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_PLT_CLASS_ID );
+	ImageMgr* im = ( ImageMgr* ) gamedata->GetResource( ResRef, &ImageMgr::ID );
 
-	if (str == NULL ) {
+	if (im == NULL ) {
 		AnimationFactory* af = ( AnimationFactory* )
 			core->GetResourceMgr()->GetFactoryResource( ResRef,
 			IE_BAM_CLASS_ID, IE_NORMAL );
@@ -3275,19 +3250,6 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 	} else {
-		ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_PLT_CLASS_ID );
-		if (im == NULL) {
-			printf ("No image manager\n");
-			delete ( str );
-			return NULL;
-		}
-
-		if (!im->Open( str, true )) {
-			printf ("Can't open image\n");
-			core->FreeInterface( im );
-			return NULL;
-		}
-
 		for (int i=0;i<8;i++) {
 			im->GetPalette( i, (col[i] >> (8*type)) & 0xFF, NULL );
 		}
@@ -3952,7 +3914,7 @@ static PyObject* GemRB_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 
 	DataStream* str = sg->GetPortrait( PCSlotCount );
 	delete sg;
-	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
+	ImageMgr* im = ( ImageMgr* ) core->GetInterface(IE_BMP_CLASS_ID );
 	if (im == NULL) {
 		delete ( str );
 		Py_INCREF( Py_None );

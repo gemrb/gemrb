@@ -44,6 +44,8 @@ libgemrb_core_la_SOURCES = \
 	SymbolMgr.cpp \
 	StringMgr.cpp \
 	Sprite2D.cpp \
+	Resource.cpp \
+	ResourceDesc.cpp \
 	ResourceMgr.cpp \
 	Region.cpp \
 	PluginMgr.cpp \

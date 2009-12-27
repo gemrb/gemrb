@@ -24,6 +24,9 @@
 
 #include "../../includes/globals.h"
 #include "MOSImpCD.h"
+#include "MOSImp.h"
+#include "../Core/PluginMgr.h"
+#include "../Core/ResourceDesc.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -36,8 +39,9 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD  ul_reason_for_call,
 
 #endif
 
-GEM_EXPORT_DLL ClassDesc* LibClassDesc()
+GEM_EXPORT_DLL ClassDesc* LibClassDesc(PluginMgr *mgr)
 {
+	mgr->AddResourceDesc(new ResourceDesc(&ImageMgr::ID, &CreateResource<MOSImp>, ".mos", (ieWord)IE_MOS_CLASS_ID));
 	return &MosImpCD;
 }
 

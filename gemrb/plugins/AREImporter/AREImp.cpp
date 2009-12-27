@@ -256,9 +256,9 @@ bool AREImp::ChangeMap(Map *map, bool day_or_night)
 	}
 
 	// Small map for MapControl
-	ImageMgr* sm = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
-	DataStream* smstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_MOS_CLASS_ID );
-	sm->Open( smstr, true );
+	ImageMgr* sm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	if (!sm)
+		abort(); // FIXME
 
 	//the map state was altered, no need to hold this off for any later
 	map->DayNight = day_or_night;
@@ -270,9 +270,9 @@ bool AREImp::ChangeMap(Map *map, bool day_or_night)
 		snprintf( TmpResRef, 9, "%sLN", map->WEDResRef);
 	}
 
-	ImageMgr* lm = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
-	DataStream* lmstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
-	lm->Open( lmstr, true );
+	ImageMgr* lm = ( ImageMgr* ) gamedata->GetResource(TmpResRef, &ImageMgr::ID);
+	if (! lm)
+		abort(); // FIXME
 
 	//alter the lightmap and the minimap (the tileset was already swapped)
 	map->ChangeTileMap(lm, sm);
@@ -342,9 +342,9 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	// Small map for MapControl
-	ImageMgr* sm = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
-	DataStream* smstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_MOS_CLASS_ID );
-	sm->Open( smstr, true );
+	ImageMgr* sm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	if (!sm)
+		abort(); // FIXME
 
 	if (Script[0]) {
 		map->Scripts[0] = new GameScript( Script, ST_AREA );
@@ -361,21 +361,21 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		snprintf( TmpResRef, 9, "%sLN", WEDResRef);
 	}
 
-	ImageMgr* lm = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
-	DataStream* lmstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
-	lm->Open( lmstr, true );
+	ImageMgr* lm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	if (!lm)
+		abort(); // FIXME
 
 	snprintf( TmpResRef, 9, "%sSR", WEDResRef);
 
-	ImageMgr* sr = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
-	DataStream* srstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
-	sr->Open( srstr, true, true );
+	ImageMgr* sr = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	if (!sr)
+		abort(); // FIXME
 
 	snprintf( TmpResRef, 9, "%sHT", WEDResRef);
 
-	ImageMgr* hm = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
-	DataStream* hmstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
-	hm->Open( hmstr, true );
+	ImageMgr* hm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	if (!hm)
+		abort(); // FIXME
 
 	map->AddTileMap( tm, lm, sr, sm, hm );
 

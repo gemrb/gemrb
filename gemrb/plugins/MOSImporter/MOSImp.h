@@ -26,14 +26,12 @@
 
 class MOSImp : public ImageMgr {
 private:
-	DataStream* str;
-	bool autoFree;
 	ieWord Width, Height, Cols, Rows;
 	ieDword BlockSize, PalOffset;
 public:
 	MOSImp(void);
 	~MOSImp(void);
-	bool Open(DataStream* stream, bool autoFree = true, bool convert = false);
+	bool Open(DataStream* stream, bool autoFree = true);
 	Sprite2D* GetImage();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);

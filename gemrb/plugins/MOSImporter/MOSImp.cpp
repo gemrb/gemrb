@@ -34,8 +34,6 @@ static ieDword blue_mask = 0x0000ff00;
 
 MOSImp::MOSImp(void)
 {
-	str = NULL;
-	autoFree = false;
 	if (DataStream::IsEndianSwitch()) {
 		red_mask = 0x000000ff;
 		green_mask = 0x0000ff00;
@@ -45,20 +43,12 @@ MOSImp::MOSImp(void)
 
 MOSImp::~MOSImp(void)
 {
-	if (str && autoFree) {
-		delete( str );
-	}
 }
 
-bool MOSImp::Open(DataStream* stream, bool autoFree, bool /*convert*/)
+bool MOSImp::Open(DataStream* stream, bool autoFree)
 {
-	if (stream == NULL) {
+	if (!Resource::Open(stream, autoFree))
 		return false;
-	}
-	if (str && this->autoFree) {
-		delete( str );
-	}
-	this->autoFree = autoFree;
 	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );

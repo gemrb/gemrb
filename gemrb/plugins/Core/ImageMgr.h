@@ -22,7 +22,7 @@
 #ifndef IMAGEMGR_H
 #define IMAGEMGR_H
 
-#include "Plugin.h"
+#include "Resource.h"
 #include "DataStream.h"
 #include "Sprite2D.h"
 
@@ -40,13 +40,13 @@ class ImageFactory;
 #define GEM_EXPORT
 #endif
 
-#define BMP_HEADER_SIZE  54
-
-class GEM_EXPORT ImageMgr : public Plugin {
+class GEM_EXPORT ImageMgr : public Resource {
+public:
+	static const TypeID ID;
 public:
 	ImageMgr(void);
 	virtual ~ImageMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true, bool convert = false) = 0;
+	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	// Swallows an image so it can be saved w/ PutImage() etc.
 	// FIXME: should be abstract, but I don't want to implement it for all
 	// image managers right now

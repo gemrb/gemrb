@@ -5,12 +5,12 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -19,39 +19,45 @@
  *
  */
 
-#ifndef SOUNDMGR_H
-#define SOUNDMGR_H
+/**
+ * @file Resource.h
+ * Declares Resource class, base class for all resources
+ * @author The GemRB Project
+ */
 
-#include "../../includes/ie_types.h"
+#ifndef RESOURCE_H
+#define RESOURCE_H
+
+#include <cstddef>
 #include "Plugin.h"
-#include "DataStream.h"
 
-#ifdef WIN32
+class DataStream;
 
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
+/**
+ * @class Resource
+ * Base class for all GemRB resources
+ */
 
-#else
-#define GEM_EXPORT
-#endif
-
-class GEM_EXPORT SoundMgr : public Plugin {
+class GEM_EXPORT Resource : public Plugin {
+protected:
+	DataStream* str;
+	bool autoFree;
 public:
-	static const TypeID ID;
-public:
-	SoundMgr(void);
-	virtual ~SoundMgr(void);
-	virtual bool Open(DataStream* stream, bool autofree = true ) = 0 ;
-    virtual int get_length() = 0 ;
-    virtual int get_channels() = 0 ;
-    virtual int get_samplerate() = 0 ;
-    virtual int read_samples( short* memory, int cnt ) = 0 ;
-    virtual void rewind(void) = 0 ;
-
+	Resource(void);
+	virtual ~Resource(void);
+	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 };
 
+template <typename Res>
+Resource* CreateResource(DataStream *str)
+{
+	Res *res = new Res();
+	if (res->Open(str)) {
+		return res;
+	} else {
+		delete res;
+		return NULL;
+	}
+}
 
 #endif

@@ -240,6 +240,11 @@ bool GameData::Exists(const char *ResRef, SClass_ID type, bool silent)
 	return core->GetResourceMgr()->HasResource( ResRef, type, silent );
 }
 
+Resource* GameData::GetResource(const char* resname, const TypeID *type, bool silent) const
+{
+	return core->GetResourceMgr()->GetResource(resname, core->GetPluginMgr()->GetResourceDesc(type) , silent);
+}
+
 Palette *GameData::GetPalette(const ieResRef resname)
 {
 	Palette *palette = (Palette *) PaletteCache.GetResource(resname);
@@ -250,13 +255,9 @@ Palette *GameData::GetPalette(const ieResRef resname)
 	if (PaletteCache.RefCount(resname)!=-1) {
 		return NULL;
 	}
-	DataStream* str = core->GetResourceMgr()->GetResource( resname, IE_BMP_CLASS_ID );
-	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
+	ImageMgr* im = ( ImageMgr* )
+		GetResource( resname, &ImageMgr::ID );
 	if (im == NULL) {
-		delete ( str );
-		return NULL;
-	}
-	if (!im->Open( str, true )) {
 		PaletteCache.SetAt(resname, NULL);
 		core->FreeInterface( im );
 		return NULL;

@@ -35,6 +35,8 @@ class ScriptedAnimation;
 class Factory;
 class Actor;
 class Sprite2D;
+class Resource;
+class TypeID;
 
 struct Table {
 	TableMgr * tm;
@@ -84,6 +86,8 @@ public:
 
 	/** returns true if resource exists */
 	bool Exists(const char *ResRef, SClass_ID type, bool silent=false);
+
+	Resource* GetResource(const char* resname, const TypeID *type, bool silent = false) const;
 
 	Palette* GetPalette(const ieResRef resname);
 	void FreePalette(Palette *&pal, const ieResRef name=NULL);

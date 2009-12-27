@@ -33,6 +33,7 @@
 #include <vector>
 #include <list>
 #include <cstring>
+#include <map>
 
 #ifdef WIN32
 
@@ -51,6 +52,9 @@ typedef HINSTANCE LibHandle;
 #else
 typedef void *LibHandle;
 #endif
+
+class ResourceDesc;
+class TypeID;
 
 /**
  * @class PluginMgr
@@ -71,6 +75,7 @@ public:
 private:
 	std::vector< ClassDesc*> plugins;
 	std::vector< LibHandle> libs;
+	std::map< const TypeID*, std::vector<ResourceDesc*> > resources;
 public:
 	/** Return names of all *.so or *.dll files in the given directory */
 	bool FindFiles( char* path, std::list< char* > &files);
@@ -79,6 +84,8 @@ public:
 	std::vector<InterfaceElement> *GetAllPlugin(SClass_ID plugintype) const;	
 	void FreePlugin(void* ptr);
 	size_t GetPluginCount() const { return plugins.size(); }
+	void AddResourceDesc(ResourceDesc*);
+	const std::vector<ResourceDesc*>& GetResourceDesc(const TypeID*);
 };
 
 #endif

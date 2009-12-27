@@ -29,11 +29,19 @@
 #include "../Core/ImageMgr.h"
 #include "../Core/ImageFactory.h"
 #include "../Core/Factory.h"
+#include "../Core/ResourceDesc.h"
 #ifndef WIN32
 #include <unistd.h>
 #endif
 
 #define SHARED_OVERRIDE "shared"
+
+static void PrintPossibleFiles(const char* resname, const std::vector<ResourceDesc*> types)
+{
+	for (size_t j = 0; j < types.size(); j++) {
+		printf("%.8s%s ", resname, types[j]->GetExt());
+	}
+}
 
 KeyImp::KeyImp(void)
 {
@@ -264,12 +272,12 @@ bool KeyImp::LoadResFile(const char* resfile)
 	return true;
 }
 
-static bool FindIn(const char *Path, const char *ResRef, SClass_ID Type)
+static bool FindIn(const char *Path, const char *ResRef, const char *Type)
 {
 	char p[_MAX_PATH], f[_MAX_PATH] = {0};
 	strncpy(f, ResRef, 8);
 	f[8] = 0;
-	strcat(f, core->TypeExt(Type));
+	strcat(f, Type);
 	strlwr(f);
 	PathJoin( p, Path, f, NULL );
 	ResolveFilePath(p);
@@ -281,12 +289,12 @@ static bool FindIn(const char *Path, const char *ResRef, SClass_ID Type)
 	return false;
 }
 
-static FileStream *SearchIn(const char * Path,const char * ResRef, SClass_ID Type, const char *foundMessage, bool silent=false)
+static FileStream *SearchIn(const char * Path,const char * ResRef, const char *Type)
 {
 	char p[_MAX_PATH], f[_MAX_PATH] = {0};
 	strncpy(f, ResRef, 8);
 	f[8] = 0;
-	strcat(f, core->TypeExt(Type));
+	strcat(f, Type);
 	strlwr(f);
 	PathJoin( p, Path, f, NULL );
 	ResolveFilePath(p);
@@ -296,10 +304,6 @@ static FileStream *SearchIn(const char * Path,const char * ResRef, SClass_ID Typ
 		FileStream * fs = new FileStream();
 		if(!fs) return NULL;
 		fs->Open(p, true);
-		if (!silent) {
-			printBracket(foundMessage, LIGHT_GREEN);
-			printf("\n");
-		}
 		return fs;
 	}
 	return NULL;
@@ -308,18 +312,45 @@ static FileStream *SearchIn(const char * Path,const char * ResRef, SClass_ID Typ
 bool KeyImp::HasResource(const char* resname, SClass_ID type, bool silent)
 {
 	for (size_t i = 0; i < searchPath.size(); i++) {
-		if (FindIn( searchPath[i].path, resname, type )) return true;
+		if (FindIn( searchPath[i].path, resname, core->TypeExt(type) ))
+			return true;
 	}
 
 	unsigned int ResLocator;
-	if (resources.Lookup( resname, type, ResLocator )) {
+	if (resources.Lookup( resname, type, ResLocator ))
 		return true;
-	}
 	if (silent)
 		return false;
 
 	printMessage( "KEYImporter", "Searching for ", WHITE );
 	printf( "%.8s%s...", resname, core->TypeExt( type ) );
+	printStatus( "NOT FOUND", YELLOW );
+	return false;
+}
+
+bool KeyImp::HasResource(const char* resname, std::vector<ResourceDesc*> types, bool silent)
+{
+	if (types.size() == 0)
+		return false;
+	for (size_t i = 0; i < searchPath.size(); i++) {
+		for (size_t j = 0; j < types.size(); j++) {
+			if (FindIn( searchPath[i].path, resname, types[j]->GetExt() )) return true;
+		}
+	}
+
+	unsigned int ResLocator;
+	for (size_t j = 0; j < types.size(); j++) {
+		if (resources.Lookup( resname, types[j]->GetKeyType(), ResLocator )) {
+			return true;
+		}
+	}
+	if (silent)
+		return false;
+
+	printMessage( "KEYImporter", "Searching for ", WHITE );
+	printf( "%.8s... ", resname ); //FIXME: Display extension or something
+	printf("Tried ");
+	PrintPossibleFiles(resname,types);
 	printStatus( "NOT FOUND", YELLOW );
 	return false;
 }
@@ -365,9 +396,14 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type, bool silent
 
 	FileStream *fs;
 	for (size_t i = 0; i < searchPath.size(); i++) {
-		fs=SearchIn( searchPath[i].path, resname, type,
-				searchPath[i].description, silent );
-		if (fs) return fs;
+		fs=SearchIn( searchPath[i].path, resname, core->TypeExt(type));
+		if (fs) {
+			if (!silent) {
+				printBracket(searchPath[i].description, LIGHT_GREEN);
+				printf("\n");
+			}
+			return fs;
+		}
 	}
 
 	unsigned int ResLocator;
@@ -397,10 +433,84 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type, bool silent
 		if (ret) {
 			strnlwrcpy( ret->filename, resname, 8 );
 			strcat( ret->filename, core->TypeExt( type ) );
+			return ret;
 		}
-		return ret;
 	}
 	if (!silent) {
+		printStatus( "ERROR", LIGHT_RED );
+	}
+	return NULL;
+}
+
+
+Resource* KeyImp::GetResource(const char* resname, const std::vector<ResourceDesc*> &types, bool silent)
+{
+	if (!strcmp(resname, "")) return NULL;
+
+	//Search it in the GemRB override Directory
+
+	FileStream *fs;
+	for (size_t i = 0; i < searchPath.size(); i++) {
+		for (size_t j = 0; j < types.size(); j++) {
+			fs=SearchIn( searchPath[i].path, resname, types[j]->GetExt());
+			if (fs) {
+				Resource * res = types[j]->Create(fs);
+				if (res) {
+					if (!silent) {
+						printMessage( "KEYImporter", "Searching for ", WHITE );
+						printf( "%.8s%s... ", resname, types[j]->GetExt() );
+						printBracket(searchPath[i].description, LIGHT_GREEN);
+						printf("\n");
+					}
+					return res;
+				}
+			}
+		}
+	}
+
+	unsigned int ResLocator;
+	char path[_MAX_PATH];
+
+	for (size_t j = 0; j < types.size(); j++) {
+		if (resources.Lookup( resname, types[j]->GetKeyType(), ResLocator )) {
+			int bifnum = ( ResLocator & 0xFFF00000 ) >> 20;
+
+			if (!silent) {
+				printMessage( "KEYImporter", "Searching for ", WHITE );
+				printf( "%.8s%s... ", resname, types[j]->GetExt() );
+			}
+
+			strcpy( path, biffiles[bifnum].path );
+			if (core->GameOnCD)
+				FindBIFOnCD(&biffiles[bifnum]);
+			if (!biffiles[bifnum].found) {
+				printf( "Cannot find %s... Resource unavailable.\n",
+						biffiles[bifnum].name );
+				return NULL;
+			}
+
+			ArchiveImporter* ai = ( ArchiveImporter* )
+				core->GetInterface( IE_BIF_CLASS_ID );
+			if (ai->OpenArchive( path ) == GEM_ERROR) {
+				printf("Cannot open archive %s\n", path );
+				core->FreeInterface( ai );
+				return NULL;
+			}
+			DataStream* ret = ai->GetStream( ResLocator, types[j]->GetKeyType(), silent );
+			core->FreeInterface( ai );
+			if (ret) {
+				strnlwrcpy( ret->filename, resname, 8 );
+				strcat( ret->filename, types[j]->GetExt() );
+
+				return types[j]->Create(ret);
+			}
+		}
+	}
+	if (!silent) {
+		printMessage( "KEYImporter", "Searching for ", WHITE );
+		printf( "%.8s... ", resname );
+		printf("Tried ");
+		PrintPossibleFiles(resname,types);
 		printStatus( "ERROR", LIGHT_RED );
 	}
 	return NULL;
@@ -437,29 +547,12 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 	}
 	case IE_BMP_CLASS_ID:
 	{
-		// check PNG first
-		DataStream* ret = GetResource( resname, IE_PNG_CLASS_ID, silent );
-		if (ret) {
-			ImageMgr* img = (ImageMgr*) core->GetInterface( IE_PNG_CLASS_ID );
-			if (img) {
-				img->Open( ret, true );
-				ImageFactory* fact = img->GetImageFactory( resname );
-				core->FreeInterface( img );
-				gamedata->GetFactory()->AddFactoryObject( fact );
-				return fact;
-			}
-		}
-
-		ret = GetResource( resname, IE_BMP_CLASS_ID, silent );
-		if (ret) {
-			ImageMgr* img = (ImageMgr*) core->GetInterface( IE_BMP_CLASS_ID );
-			if (img) {
-				img->Open( ret, true );
-				ImageFactory* fact = img->GetImageFactory( resname );
-				core->FreeInterface( img );
-				gamedata->GetFactory()->AddFactoryObject( fact );
-				return fact;
-			}
+		ImageMgr* img = (ImageMgr*) gamedata->GetResource( resname, &ImageMgr::ID );
+		if (img) {
+			ImageFactory* fact = img->GetImageFactory( resname );
+			core->FreeInterface( img );
+			gamedata->GetFactory()->AddFactoryObject( fact );
+			return fact;
 		}
 
 		return NULL;
