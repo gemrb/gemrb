@@ -29,23 +29,12 @@
 #ifndef ITEM_H
 #define ITEM_H
 
+#include "../../includes/exports.h"
 #include "../../includes/ie_types.h"
 
 #include "EffectQueue.h"
 
 class Projectile;
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 // Item Flags bits
 // !!! Keep these synchronized with GUIDefines.h !!!

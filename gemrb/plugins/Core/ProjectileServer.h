@@ -22,6 +22,7 @@
 #ifndef PROJSERVER_H
 #define PROJSERVER_H
 
+#include "../../includes/exports.h"
 #include "PluginMgr.h"
 #include "Projectile.h"
 
@@ -56,18 +57,6 @@ public:
 	ieResRef resources[AP_RESCNT];
 	int flags;
 };
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 //this singleton object serves the projectile objects
 class GEM_EXPORT ProjectileServer

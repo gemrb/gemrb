@@ -30,6 +30,7 @@
 
 #include "../../includes/globals.h"
 #include <vector>
+#include "../../includes/exports.h"
 
 class Palette;
 
@@ -42,18 +43,6 @@ struct StringList {
 	int curx;
 	int cury;
 };
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 #define IE_FONT_ALIGN_LEFT   0x00
 #define IE_FONT_ALIGN_CENTER 0x01

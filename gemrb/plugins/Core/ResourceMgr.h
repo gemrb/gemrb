@@ -22,24 +22,13 @@
 #ifndef RESOURCEMGR_H
 #define RESOURCEMGR_H
 
+#include "../../includes/exports.h"
 #include <vector>
 #include "Plugin.h"
 #include "../../includes/SClassID.h"
 #include "DataStream.h"
 #include "Resource.h"
 #include "../../includes/globals.h"
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 class ResourceDesc;
 

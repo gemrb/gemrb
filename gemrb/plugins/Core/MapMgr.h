@@ -33,18 +33,6 @@
 #include "ActorBlock.h"
 #include "Map.h"
 
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
-
 /**
  * @class MapMgr
  * Abstract loader for Map objects

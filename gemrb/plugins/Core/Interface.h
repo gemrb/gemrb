@@ -27,6 +27,7 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
+#include "../../includes/exports.h"
 #include <map>
 #include "InterfaceDesc.h"
 #include "../../includes/SClassID.h"
@@ -127,17 +128,7 @@ public:
 };
 
 #ifdef WIN32
-
 #include <windows.h>
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
 #endif
 
 // Colors of modal window shadow

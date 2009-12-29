@@ -22,21 +22,10 @@
 #ifndef TILEMAP_H
 #define TILEMAP_H
 
+#include "../../includes/exports.h"
 #include "TileOverlay.h"
 #include "Polygon.h"
 #include "GameScript.h"
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 //special container types
 #define IE_CONTAINER_PILE   4

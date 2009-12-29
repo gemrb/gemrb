@@ -33,6 +33,7 @@ class Gem_Polygon;
 #ifndef ACTORBLOCK_H
 #define ACTORBLOCK_H
 
+#include "../../includes/exports.h"
 #include "Sprite2D.h"
 #include "CharAnimations.h"
 #include "TileOverlay.h"
@@ -146,18 +147,6 @@ class Gem_Polygon;
 #define XP_LOCKPICK   0
 #define XP_DISARM     1
 #define XP_LEARNSPELL 2
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
 ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;

@@ -30,22 +30,11 @@
 #define DATASTREAM_H
 
 #include "../../includes/globals.h"
+#include "../../includes/exports.h"
 
 #define GEM_CURRENT_POS 0
 #define GEM_STREAM_START 1
 #define GEM_STREAM_END 2
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 /**
  * @class DataStream

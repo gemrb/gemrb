@@ -21,23 +21,12 @@
 #ifndef GLOBALTIMER_H
 #define GLOBALTIMER_H
 
+#include "../../includes/exports.h"
 #include "../../includes/win32def.h"
 #include <vector>
 #include "Region.h"
 
 class ControlAnimation;
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 struct AnimationRef
 {

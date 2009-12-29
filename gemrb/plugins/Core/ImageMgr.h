@@ -22,23 +22,12 @@
 #ifndef IMAGEMGR_H
 #define IMAGEMGR_H
 
+#include "../../includes/exports.h"
 #include "Resource.h"
 #include "DataStream.h"
 #include "Sprite2D.h"
 
 class ImageFactory;
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 class GEM_EXPORT ImageMgr : public Resource {
 public:

@@ -25,19 +25,8 @@
 #include <time.h>
 #include <sys/stat.h>
 #include <list> 
+#include "../../includes/exports.h"
 #include "FileStream.h"
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 #define SAVEGAME_DIRECTORY_MATCHER "%d - %[A-Za-z0-9- _]"
 

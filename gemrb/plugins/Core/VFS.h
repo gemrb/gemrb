@@ -49,6 +49,8 @@
 #define _MAX_PATH FILENAME_MAX
 #endif
 #endif
+#include "../../includes/exports.h"
+#include "../../includes/globals.h"
 
 //#ifndef S_ISDIR
 //#define S_ISDIR(x) ((x) & S_IFDIR)
@@ -56,19 +58,6 @@
 
 #ifndef S_ISDIR
 #define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
-#endif
-
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
 #endif
 
 #ifndef R_OK
@@ -120,7 +109,7 @@ GEM_EXPORT int _fclose(_FILE* stream);
 #define _feof feof
 #define _fclose fclose
 
-void ResolveFilePath(char* FilePath);
+GEM_EXPORT void ResolveFilePath(char* FilePath);
 
 #endif  // ! WIN32
 

@@ -20,23 +20,12 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
+#include "../../includes/exports.h"
 #include "Region.h"
 #include "../../includes/RGBAColor.h"
 #include "../../includes/globals.h"
 
 #include <list>
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 class GEM_EXPORT Trapezoid {
 public:

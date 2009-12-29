@@ -32,18 +32,6 @@
 #define GEM_SND_VOL_MUSIC    1
 #define GEM_SND_VOL_AMBIENTS 2
 
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
-
 class GEM_EXPORT Audio : public Plugin {
 public:
     Audio(void);

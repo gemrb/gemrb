@@ -23,21 +23,10 @@
 
 #include <cassert>
 
+#include "../../includes/exports.h"
 #include "../../includes/RGBAColor.h"
 #include "../../includes/ie_types.h"
 
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 enum PaletteType {
 	PAL_MAIN,

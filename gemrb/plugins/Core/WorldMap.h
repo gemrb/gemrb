@@ -29,23 +29,12 @@
 #ifndef WORLDMAP_H
 #define WORLDMAP_H
 
+#include "../../includes/exports.h"
 #include <vector>
 #include "../../includes/ie_types.h"
 
 #include "Sprite2D.h"
 #include "AnimationFactory.h"
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 /** Area is visible on WorldMap */
 #define WMP_ENTRY_VISIBLE    0x1

@@ -32,6 +32,7 @@
 #include "Control.h"
 #include "Sprite2D.h"
 #include "Font.h"
+#include "../../includes/exports.h"
 
 #include <list>
 
@@ -90,18 +91,6 @@ class Palette;
 #define IE_GUI_BUTTON_ON_DRAG_DROP   0x00000006
 #define IE_GUI_BUTTON_ON_DRAG        0x00000007
 #define IE_GUI_BUTTON_ON_DOUBLE_PRESS 0x00000008
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 /** Border/frame settings for a button */
 struct ButtonBorder {

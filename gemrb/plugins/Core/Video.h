@@ -39,18 +39,6 @@ class SpriteCover;
 class Palette;
 class AnimationFactory;
 
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
-
 // Note: not all these flags make sense together. Specifically:
 // NOSHADOW overrides TRANSSHADOW
 enum SpriteBlitFlags {

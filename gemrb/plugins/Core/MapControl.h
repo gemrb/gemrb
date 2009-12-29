@@ -29,6 +29,7 @@ class MapControl;
 #ifndef MAPCONTROL_H
 #define MAPCONTROL_H
 
+#include "../../includes/exports.h"
 #include "Control.h"
 #include "Interface.h"
 
@@ -36,18 +37,6 @@ class MapControl;
 #define IE_GUI_MAP_ON_PRESS     	0x09000000
 #define IE_GUI_MAP_ON_RIGHT_PRESS	0x09000005
 #define IE_GUI_MAP_ON_DOUBLE_PRESS	0x09000008
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 
 /**

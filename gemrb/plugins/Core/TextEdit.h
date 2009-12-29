@@ -28,6 +28,7 @@
 #ifndef TEXTEDIT_H
 #define TEXTEDIT_H
 
+#include "../../includes/exports.h"
 #include "Control.h"
 #include "../../includes/RGBAColor.h"
 #include "Font.h"
@@ -41,18 +42,6 @@ class Palette;
 
 //this is stored in 'Value' of Control class
 #define IE_GUI_EDIT_NUMBER         1
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 /**
  * @class TextEdit

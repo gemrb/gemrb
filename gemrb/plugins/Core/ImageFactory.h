@@ -22,21 +22,10 @@
 #ifndef IMAGEFACTORY_H
 #define IMAGEFACTORY_H
 
+#include "../../includes/exports.h"
 #include "FactoryObject.h"
 #include "../../includes/globals.h"
 #include "Sprite2D.h"
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 class GEM_EXPORT ImageFactory : public FactoryObject {
 private:

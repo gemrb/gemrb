@@ -24,6 +24,7 @@
 
 #include <ctype.h>
 #include <cstring>
+#include "../../includes/exports.h"
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include "../../includes/SClassID.h"
@@ -38,18 +39,6 @@ typedef void (*ReleaseFun)(void *);
 #define GEM_VARIABLES_INT      0
 #define GEM_VARIABLES_STRING   1
 #define GEM_VARIABLES_POINTER  2
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 class GEM_EXPORT Variables {
 protected:

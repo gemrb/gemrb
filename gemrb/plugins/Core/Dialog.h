@@ -23,19 +23,8 @@
 #define DIALOG_H
 
 #include "../../includes/globals.h"
+#include "../../includes/exports.h"
 #include <vector>
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 #define IE_DLG_TR_TEXT     0x01
 #define IE_DLG_TR_TRIGGER  0x02

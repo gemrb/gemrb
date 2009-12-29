@@ -29,24 +29,13 @@
 #ifndef STORE_H
 #define STORE_H
 
+#include "../../includes/exports.h"
 #include <vector>
 #include "../../includes/ie_types.h"
 #include "../../includes/globals.h"
 
 //bah!
 class CREItem;
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 typedef enum StoreType { STT_STORE=0, STT_TAVERN=1, STT_INN=2, STT_TEMPLE=3,
 STT_BG2CONT=4, STT_IWD2CONT=5 } StoreType;

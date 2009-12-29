@@ -25,14 +25,6 @@
 #include "../../includes/globals.h"
 #include "WMPImpCD.h"
 
-/*
-#ifdef WIN32
-#define GEM_EXPORT_DLL __declspec(dllexport)
-#else
-#define GEM_EXPORT_DLL
-#endif
-*/
-
 #ifdef WIN32
 #include <windows.h>
 

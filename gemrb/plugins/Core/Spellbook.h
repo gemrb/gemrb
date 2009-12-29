@@ -29,24 +29,13 @@
 #ifndef SPELLBOOK_H
 #define SPELLBOOK_H
 
+#include "../../includes/exports.h"
 #include "../../includes/win32def.h"
 #include "../../includes/ie_types.h"
 #include <vector>
 
 class Actor;
 class Spell;
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 #define MAX_SPELL_LEVEL 16
 

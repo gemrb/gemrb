@@ -149,20 +149,6 @@
 #define MAX_ORIENT				16
 
 /////globally used functions
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#define GEM_EXPORT_DLL extern "C" __declspec(dllexport)
-
-#else
-#define GEM_EXPORT
-#define GEM_EXPORT_DLL extern "C"
-#endif
 
 class Scriptable;
 class Actor;
@@ -189,8 +175,8 @@ GEM_EXPORT char* strndup(const char* s, size_t l);
 #endif
 
 #ifndef WIN32
-char* strupr(char* string);
-char* strlwr(char* string);
+GEM_EXPORT char* strupr(char* string);
+GEM_EXPORT char* strlwr(char* string);
 #endif
 
 #ifdef WIN32

@@ -29,23 +29,12 @@
 #ifndef SPELL_H
 #define SPELL_H
 
+#include "../../includes/exports.h"
 #include "../../includes/ie_types.h"
 
 #include "EffectQueue.h"
 
 class Projectile;
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 //values for Spell usability Flags
 

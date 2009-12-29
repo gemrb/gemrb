@@ -29,6 +29,7 @@
 #ifndef SLIDER_H
 #define SLIDER_H
 
+#include "../../includes/exports.h"
 #include "Control.h"
 #include "Sprite2D.h"
 
@@ -39,18 +40,6 @@
 #define IE_GUI_SLIDER_KNOB        0
 #define IE_GUI_SLIDER_GRABBEDKNOB 1
 #define IE_GUI_SLIDER_BACKGROUND  2
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 /**
  * @class Slider

@@ -29,23 +29,12 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "../../includes/exports.h"
 #include "Sprite2D.h"
 #include "Control.h"
 #include "TextArea.h"
 #include "ScrollBar.h"
 #include <vector>
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 // Window Flags
 #define WF_CHANGED  1     //window changed

@@ -22,6 +22,7 @@
 #ifndef GAMEDATA_H
 #define GAMEDATA_H
 
+#include "../../includes/exports.h"
 #include "../../includes/SClassID.h"
 #include "../../includes/ie_types.h"
 #include "Cache.h"
@@ -43,18 +44,6 @@ struct Table {
 	char ResRef[8];
 	unsigned int refcount;
 };
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 class GEM_EXPORT GameData
 {

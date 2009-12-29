@@ -32,18 +32,6 @@
 #include "DataStream.h"
 #include "Spell.h"
 
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
-
 /**
  * @class SpellMgr
  * Abstract loader for Spell objects

@@ -24,18 +24,7 @@
 
 #include "../Core/Class_ID.h"
 #include "../../includes/SClassID.h"
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
+#include "../../includes/exports.h"
 
 #define CLASS_ID_MASK     0x0fffffff
 #define ALLOW_CONCURRENT  0x80000000

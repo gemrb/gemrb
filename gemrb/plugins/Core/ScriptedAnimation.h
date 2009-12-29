@@ -21,23 +21,12 @@
 #ifndef SCRIPTEDANIMATION_H
 #define SCRIPTEDANIMATION_H
 
+#include "../../includes/exports.h"
 #include "DataStream.h"
 #include "AnimationFactory.h"
 #include "Palette.h"
 #include "SpriteCover.h"
 #include "Map.h"
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 //scripted animation flags 
 #define S_ANI_PLAYONCE        8        //(same as area animation)

@@ -52,18 +52,7 @@
 #include "../../includes/ie_types.h"
 #include "../../includes/win32def.h"
 #include "../../includes/RGBAColor.h"
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
+#include "../../includes/exports.h"
 
 /**
  * Event handler indicates code to be called when a particular

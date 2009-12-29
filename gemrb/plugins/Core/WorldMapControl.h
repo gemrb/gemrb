@@ -31,21 +31,10 @@ class Palette;
 #ifndef WORLDMAPCONTROL_H
 #define WORLDMAPCONTROL_H
 
+#include "../../includes/exports.h"
 #include "Control.h"
 #include "Interface.h"
 #include "Dialog.h"
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 /** Which label color is set with SetColor() */

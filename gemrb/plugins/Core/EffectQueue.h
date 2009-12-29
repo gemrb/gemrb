@@ -33,6 +33,7 @@
 #include <list>
 #include "Effect.h"
 #include "Region.h"
+#include "../../includes/exports.h"
 
 class Scriptable;
 class Actor;

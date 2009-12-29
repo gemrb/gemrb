@@ -51,6 +51,7 @@ BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
 #endif
 
 #include "../../includes/globals.h"
+#include "../../includes/exports.h"
 #include "Interface.h"
 #include "Actor.h"
 

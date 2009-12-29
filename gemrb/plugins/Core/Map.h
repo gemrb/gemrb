@@ -24,6 +24,7 @@ class Map;
 #ifndef MAP_H
 #define MAP_H
 
+#include "../../includes/exports.h"
 #include "../../includes/globals.h"
 #include "ActorBlock.h"
 #include "IniSpawn.h"
@@ -42,18 +43,6 @@ class Wall_Polygon;
 class Particles;
 class Projectile;
 class AnimationFactory;
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 //distance of actors from spawn point
 #define SPAWN_RANGE       400

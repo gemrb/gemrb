@@ -28,22 +28,11 @@
 #ifndef SPRITE2D_H
 #define SPRITE2D_H
 
+#include "../../includes/exports.h"
 #include "../../includes/RGBAColor.h"
 #include "Palette.h"
 
 class AnimationFactory;
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 /**
  * @class Sprite2D

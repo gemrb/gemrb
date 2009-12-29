@@ -29,6 +29,7 @@
 #ifndef INVENTORY_H
 #define INVENTORY_H
 
+#include "../../includes/exports.h"
 #include <vector>
 #include "../../includes/win32def.h"
 #include "../../includes/ie_types.h"
@@ -36,18 +37,6 @@
 #include "Store.h"
 #include "Item.h"  //needs item for itmextheader
 class Map;
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 //AddSlotItem return values
 #define ASI_FAILED     0

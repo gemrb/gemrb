@@ -32,6 +32,7 @@
 #include "Control.h"
 #include "WindowMgr.h"
 #include <vector>
+#include "../../includes/exports.h"
 
 #define GEM_LEFT		0x81
 #define GEM_RIGHT		0x82
@@ -67,18 +68,6 @@
 #define GEM_RK_DOUBLESPEED      1
 #define GEM_RK_DISABLE          2
 #define GEM_RK_QUADRUPLESPEED   4
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 /**
  * @class EventMgr

@@ -28,6 +28,7 @@
 
 #include <vector>
 #include <cstring>
+#include "../../includes/exports.h"
 #include "../../includes/ie_types.h"
 #include "Animation.h"
 #include "CharAnimations.h"
@@ -38,18 +39,6 @@
 
 class Map;
 class ScriptedAnimation;
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 /** USING DEFINITIONS AS DESCRIBED IN STATS.IDS */
 #include "../../includes/ie_stats.h"

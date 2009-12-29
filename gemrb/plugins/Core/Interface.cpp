@@ -23,6 +23,7 @@
 #define INTERFACE
 #endif
 
+#include "../../includes/exports.h"
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include "../../includes/strrefs.h"

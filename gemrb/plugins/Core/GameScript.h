@@ -25,6 +25,7 @@ class Action;
 #ifndef GAMESCRIPT_H
 #define GAMESCRIPT_H
 
+#include "../../includes/exports.h"
 #include <cstdio>
 #include "DataStream.h"
 #include "Variables.h"
@@ -97,18 +98,6 @@ class Action;
  printf("Assertion failed: %s [0x%08lX] Line %d",#f, c, __LINE__); \
 	abort(); \
  }
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 typedef std::vector<ieDword> SrcVector;
 

@@ -28,6 +28,7 @@
 #ifndef LABEL_H
 #define LABEL_H
 
+#include "../../includes/exports.h"
 #include "Control.h"
 #include "Font.h"
 #include "../../includes/RGBAColor.h"
@@ -36,18 +37,6 @@ class Palette;
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_LABEL_ON_PRESS      0x06000000
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 /**
  * @class Label

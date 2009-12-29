@@ -22,7 +22,6 @@
 #ifndef GUISCRIPT_H
 #define GUISCRIPT_H
 
-#include "../Core/ScriptEngine.h"
 #ifdef WIN32
 #ifdef _DEBUG
 #undef _DEBUG
@@ -34,6 +33,7 @@
 #else
 #include <Python.h>
 #endif
+#include "../Core/ScriptEngine.h"
 
 #define SV_BPP 0
 #define SV_WIDTH 1

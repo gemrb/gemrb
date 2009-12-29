@@ -29,6 +29,7 @@
 #ifndef SCROLLBAR_H
 #define SCROLLBAR_H
 
+#include "../../includes/exports.h"
 #include "Control.h"
 #include "TextArea.h"
 #include "Sprite2D.h"
@@ -48,18 +49,6 @@
 #define UP_PRESS	 0x0001
 #define DOWN_PRESS   0x0010
 #define SLIDER_GRAB  0x0100
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 /**
  * @class ScrollBar

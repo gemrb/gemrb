@@ -23,6 +23,7 @@
 #include "Interface.h"
 #include "GameScript.h"
 #include "../../includes/strrefs.h"
+#include "../../includes/exports.h"
 #include "../../includes/defsounds.h"
 //indebug flags
 #define ID_REFERENCE 1

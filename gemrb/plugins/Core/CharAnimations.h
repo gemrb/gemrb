@@ -27,18 +27,7 @@
 #include "TableMgr.h"
 #include <vector>
 #include "Palette.h"
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
+#include "../../includes/exports.h"
 
 #define AV_PREFIX1      0
 #define AV_PREFIX2      1

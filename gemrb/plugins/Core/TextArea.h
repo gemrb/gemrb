@@ -28,6 +28,7 @@
 #ifndef TEXTAREA_H
 #define TEXTAREA_H
 
+#include "../../includes/exports.h"
 #include "Control.h"
 #include "../../includes/RGBAColor.h"
 #include "Font.h"
@@ -51,18 +52,6 @@
 // internal flags
 #define TA_INITIALS    1
 #define TA_BITEMYTAIL  2
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 /**
  * @class TextArea

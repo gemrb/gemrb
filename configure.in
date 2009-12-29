@@ -201,6 +201,9 @@ CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATADIR=\\\"\$(moddir)
 #CXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wpointer-arith -Wcast-qual -Wwrite-strings -Wshadow -Wcast-align -ansi -pedantic -Wbad-function-cast -Winline -Wnested-externs -Wno-format-y2k -Wno-long-long"
 CXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wpointer-arith -Wcast-align -ansi -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing"
 
+# only export symbols explicitly marked to be exported
+CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
+
 dnl Check for "ISO C++ forbids casting between pointer-to-function and pointer-to-object" as in GCC4
 AC_CHECK_OBJECT_TO_FUNCTION_CAST
 

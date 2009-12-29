@@ -28,24 +28,13 @@
 #ifndef PLUGINMGR_H
 #define PLUGINMGR_H
 
+#include "../../includes/exports.h"
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include <vector>
 #include <list>
 #include <cstring>
 #include <map>
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
 
 #ifdef WIN32
 typedef HINSTANCE LibHandle;
