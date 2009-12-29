@@ -815,6 +815,7 @@ static const ActionLink actionnames[] = {
 	{"settoken", GameScript::SetToken, 0},
 	{"settoken2da", GameScript::SetToken2DA, 0}, //GemRB specific
 	{"settokenglobal", GameScript::SetTokenGlobal,AF_MERGESTRINGS},
+	{"settokenobject", GameScript::SetTokenObject,0},
 	{"setupwish", GameScript::SetupWish, 0},
 	{"setvisualrange", GameScript::SetVisualRange, 0},
 	{"sg", GameScript::SG, 0},

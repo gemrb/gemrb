@@ -3240,6 +3240,7 @@ void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
 	core->GetTokenDictionary()->SetAt( parameters->string1Parameter, str);
 }
 
+//Assigns a numeric variable to the token
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 {
 	ieDword value = CheckVariable( Sender, parameters->string0Parameter );
@@ -3247,6 +3248,17 @@ void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 	char tmpstr[10];
 	sprintf( tmpstr, "%d", value );
 	core->GetTokenDictionary()->SetAtCopy( parameters->string1Parameter, tmpstr );
+}
+
+//Assigns the target object's name (not scriptname) to the token
+void GameScript::SetTokenObject(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) tar;
+	core->GetTokenDictionary()->SetAtCopy( parameters->string0Parameter, actor->GetName(0) );
 }
 
 void GameScript::PlayDead(Scriptable* Sender, Action* parameters)

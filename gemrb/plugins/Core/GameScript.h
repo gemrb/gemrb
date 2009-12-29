@@ -1347,6 +1347,7 @@ public:
 	static void SetToken(Scriptable* Sender, Action* parameters);
 	static void SetToken2DA(Scriptable* Sender, Action* parameters);
 	static void SetTokenGlobal(Scriptable* Sender, Action* parameters);
+	static void SetTokenObject(Scriptable* Sender, Action* parameters);
 	static void SetTrackString(Scriptable* Sender, Action* parameters);
 	static void SetupWish(Scriptable* Sender, Action* parameters);
 	static void SetVisualRange(Scriptable* Sender, Action* parameters);
