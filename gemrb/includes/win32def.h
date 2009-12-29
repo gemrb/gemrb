@@ -141,7 +141,7 @@ typedef __POSITION* POSITION;
 #define gotoxy(x,y) printf("\033[%d;%dH", y, x)
 #endif
 
-#ifdef WIN32
+#ifdef _MSC_VER
 # ifndef round
 #  define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 # endif
