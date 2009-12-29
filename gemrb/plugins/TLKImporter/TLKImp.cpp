@@ -25,10 +25,11 @@
 #include "../Core/Audio.h"
 #include "../Core/Game.h"
 #include "../Core/GameControl.h"
+#include "../Core/Calendar.h"
 
-static int *monthnames=NULL;
-static int *days=NULL;
-static int monthnamecount=0;
+//static int *monthnames=NULL;
+//static int *days=NULL;
+//static int monthnamecount=0;
 //set this to -1 if charname is gabber (iwd2)
 static int charname=0;
 
@@ -42,6 +43,7 @@ TLKImp::TLKImp(void)
 	str = NULL;
 	override = NULL;
 	autoFree = false;
+/*
 	if (monthnamecount==0) {
 		int i;
 		AutoTable tab("months");
@@ -57,13 +59,16 @@ TLKImp::TLKImp(void)
 			monthnames[i]=atoi(tab->QueryField(i,1));
 		}
 	}
+*/
 }
 
 TLKImp::~TLKImp(void)
 {
+/*
 	if (monthnames) free(monthnames);
 	if (days) free(days);
 	monthnamecount=0;
+*/
 	if (str && autoFree) {
 		delete( str );
 	}
@@ -198,6 +203,7 @@ int TLKImp::GenderStrRef(int slot, int malestrref, int femalestrref)
 	return malestrref;
 }
 
+/*
 void TLKImp::GetMonthName(int dayandmonth)
 {
 	int month=1;
@@ -223,6 +229,7 @@ void TLKImp::GetMonthName(int dayandmonth)
 		if (days[i]!=1) month++;
 	}
 }
+*/
 
 //if this function returns -1 then it is not a built in token, dest may be NULL
 int TLKImp::BuiltinToken(char* Token, char* dest)
@@ -235,7 +242,7 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		ieDword dayandmonth=0;
 		core->GetDictionary()->Lookup("DAYANDMONTH",dayandmonth);
 		//preparing sub-tokens
-		GetMonthName((int) dayandmonth);
+		core->GetCalendar()->GetMonthName((int) dayandmonth);
 		Decoded = GetString( 15981, 0 );
 		goto exit_function;
 	}

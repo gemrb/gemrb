@@ -25,6 +25,7 @@
 #include "Video.h"
 #include "Game.h"
 #include "GameControl.h"
+#include "Calendar.h"
 
 //-------------------------------------------------------------
 // Trigger Functions
@@ -4103,3 +4104,31 @@ int GameScript::SpellCastOnMe(Scriptable* Sender, Trigger* parameters)
 	}
 	return 0;
 }
+
+int GameScript::CalendarDay(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
+	if(day == parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::CalendarDayGT(Scriptable* /*Sender*/, Trigger* parameters)
+{
+        int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
+        if(day > parameters->int0Parameter) {
+                return 1;
+        }
+        return 0;
+}
+
+int GameScript::CalendarDayLT(Scriptable* /*Sender*/, Trigger* parameters)
+{
+        int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
+        if(day < parameters->int0Parameter) {
+                return 1;
+        }
+        return 0;
+}
+

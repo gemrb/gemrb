@@ -79,7 +79,7 @@ class ScriptedAnimation;
 class Control;
 class Palette;
 class ProjectileServer;
-
+class Calendar;
 
 struct Symbol {
 	SymbolMgr * sm;
@@ -274,6 +274,7 @@ private:
 	DataFileMgr * INIquests;
 	DataFileMgr * INIresdata;
 	Game * game;
+	Calendar * calendar;
 	WorldMapArray* worldmap;
 	ieDword GameFeatures;   //the first 32 bits
 	ieDword GameFeatures2;  //the second 32 bits
@@ -507,6 +508,12 @@ public:
 	{
 		return game;
 	}
+	/** Gets the Calendar class */
+	Calendar * GetCalendar() const
+	{
+		return calendar;
+	}
+
 	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/
 	WorldMap * GetWorldMap(const char *area = NULL);
 	void SetWindowFrame(int i, Sprite2D *Picture);

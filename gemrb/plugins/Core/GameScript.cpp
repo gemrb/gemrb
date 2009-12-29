@@ -59,6 +59,12 @@ static const TriggerLink triggernames[] = {
 	{"bitcheckexact", GameScript::BitCheckExact,TF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
 	{"breakingpoint", GameScript::BreakingPoint, 0},
+	{"calanderday", GameScript::CalendarDay, 0}, //illiterate developers O_o
+	{"calendarday", GameScript::CalendarDay, 0},
+	{"calanderdaygt", GameScript::CalendarDayGT, 0},
+	{"calendardaygt", GameScript::CalendarDayGT, 0},
+	{"calanderdaylt", GameScript::CalendarDayLT, 0},
+	{"calendardaylt", GameScript::CalendarDayLT, 0},
 	{"calledbyname", GameScript::CalledByName, 0}, //this is still a question
 	{"chargecount", GameScript::ChargeCount, 0},
 	{"charname", GameScript::CharName, 0}, //not scripting name

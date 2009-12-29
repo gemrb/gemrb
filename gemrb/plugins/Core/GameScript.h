@@ -692,6 +692,9 @@ public: //Script Functions
 	static int BitCheckExact(Scriptable* Sender, Trigger* parameters);
 	static int BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int BreakingPoint(Scriptable* Sender, Trigger* parameters);
+	static int CalendarDay(Scriptable* Sender, Trigger* parameters);
+	static int CalendarDayGT(Scriptable* Sender, Trigger* parameters);
+	static int CalendarDayLT(Scriptable* Sender, Trigger* parameters);
 	static int CalledByName(Scriptable* Sender, Trigger* parameters);
 	static int ChargeCount(Scriptable* Sender, Trigger* parameters);
 	static int CharName(Scriptable* Sender, Trigger* parameters);

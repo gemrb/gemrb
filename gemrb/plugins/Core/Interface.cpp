@@ -77,6 +77,7 @@
 #include "Palette.h"
 #include "ProjectileServer.h"
 #include "GameData.h"
+#include "Calendar.h"
 
 GEM_EXPORT Interface* core;
 GEM_EXPORT GameData* gamedata;
@@ -335,6 +336,7 @@ Interface::~Interface(void)
 	}
 	//destroy the highest objects in the hierarchy first!
 	delete game;
+	delete calendar;
 	delete worldmap;
 
 	FreeAbilityTables();
@@ -1558,6 +1560,7 @@ int Interface::Init()
 		}
 	}
 	game = NULL;
+	calendar = NULL;
 
 	timer = new GlobalTimer();
 	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
@@ -3647,6 +3650,10 @@ void Interface::LoadGame(int index)
 
 	strings->CloseAux();
 	tokens->RemoveAll(NULL); //clearing the token dictionary
+
+	if(calendar) delete calendar;
+	calendar = new Calendar;
+
 	DataStream* gam_str = NULL;
 	DataStream* sav_str = NULL;
 	DataStream* wmp_str = NULL;
