@@ -22,7 +22,9 @@
 #ifndef CALENDAR_H
 #define CALENDAR_H
 
-class Calendar {
+#include "../../includes/exports.h"
+
+class GEM_EXPORT Calendar {
 private:
 	int daysinyear;
 	int monthnamecount;
