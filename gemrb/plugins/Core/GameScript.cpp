@@ -417,6 +417,8 @@ static const ActionLink actionnames[] = {
 	{"attackoneround", GameScript::AttackOneRound,AF_BLOCKING|AF_ALIVE},
 	{"attackreevaluate", GameScript::AttackReevaluate,AF_BLOCKING|AF_ALIVE},
 	{"backstab", GameScript::Attack,AF_BLOCKING|AF_ALIVE},//actually hide+attack
+	{"banterblockflag", GameScript::BanterBlockFlag,0},
+	{"banterblocktime", GameScript::BanterBlockTime,0},
 	{"bashdoor", GameScript::BashDoor,AF_BLOCKING|AF_ALIVE}, //the same until we know better
 	{"battlesong", GameScript::BattleSong, AF_ALIVE},
 	{"berserk", GameScript::Berserk, AF_ALIVE},
