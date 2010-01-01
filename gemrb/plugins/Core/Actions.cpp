@@ -727,6 +727,22 @@ void GameScript::CreateCreatureObjectOffScreen(Scriptable* Sender, Action* param
 	CreateCreatureCore( Sender, parameters, CC_OFFSCREEN | CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP );
 }
 
+//I think this simply removes the cursor and hides the gui without disabling scripts
+//See Interface::SetCutSceneMode
+void GameScript::SetCursorState(Scriptable* /*Sender*/, Action* parameters)
+{
+	int active = parameters->int0Parameter;
+
+	Game *game = core->GetGame();
+	if (active) {
+		game->ControlStatus |= CS_HIDEGUI;
+	} else {
+		game->ControlStatus &= ~CS_HIDEGUI;
+	}
+	core->SetEventFlag(EF_CONTROL);
+	core->GetVideoDriver()->SetMouseEnabled(!active);
+}
+
 void GameScript::StartCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	core->SetCutSceneMode( true );

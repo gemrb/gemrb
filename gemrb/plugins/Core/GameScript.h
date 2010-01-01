@@ -1300,6 +1300,7 @@ public:
 	static void SetArmourLevel(Scriptable* Sender, Action* parameters);
 	static void SetBeenInPartyFlags(Scriptable* Sender, Action* parameters);
 	static void SetBestWeapon(Scriptable *Sender, Action *parameters);
+	static void SetCursorState(Scriptable* Sender, Action* parameters);
 	static void SetCreatureAreaFlag(Scriptable* Sender, Action* parameters);
 	static void SetCriticalPathObject(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
