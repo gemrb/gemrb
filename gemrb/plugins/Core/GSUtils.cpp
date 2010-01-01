@@ -2679,3 +2679,58 @@ unsigned int GetItemDistance(ieResRef itemres, int header)
 	gamedata->FreeItem(itm, itemres, false);
 	return dist*15;
 }
+
+void SetupWishCore(Scriptable *Sender, int column, int picks)
+{
+	int count;
+	ieVariable varname;
+	int *selects;
+	int i,j;
+
+	AutoTable tm("wish");
+	if (!tm) {
+		printStatus( "ERROR", LIGHT_RED );
+		printf( "Cannot find wish.2da.\n");
+		return;
+	}
+
+	selects = (int *) malloc(picks*sizeof(int));
+	count = tm->GetRowCount();
+
+	for(i=0;i<99;i++) {
+		snprintf(varname,32, "wishpower%02d", i);
+		if(CheckVariable(Sender, varname, "GLOBAL") ) {
+			SetVariable(Sender, varname, "GLOBAL", 0);
+		}
+	}
+
+	if (count<picks) {
+		for(i=0;i<count;i++) {
+			selects[i]=i;
+		}
+		while(i++<picks) {
+			selects[i]=-1;
+		}
+	} else {
+		for(i=0;i<picks;i++) {
+			selects[i]=rand()%count;
+retry:
+			for(j=0;j<i;j++) {
+				if(selects[i]==selects[j]) {
+					selects[i]++;
+					goto retry;
+				}
+			}
+		}
+	}
+
+	for (i = 0; i < picks; i++) {
+		if (selects[i]<0)
+			continue;
+		int spnum = atoi( tm->QueryField( selects[i], column ) );
+		snprintf(varname,32,"wishpower%02d", spnum);
+		SetVariable(Sender, varname, "GLOBAL",1);
+	}
+	free(selects);
+}
+

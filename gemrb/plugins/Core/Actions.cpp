@@ -6692,54 +6692,18 @@ void GameScript::DoubleClickRButtonPoint(Scriptable* Sender, Action* parameters)
 //TODO: investigate what happens with * values
 void GameScript::SetupWish(Scriptable* Sender, Action* parameters)
 {
-	int count;
-	ieVariable varname;
+	SetupWishCore(Sender, parameters->int0Parameter, parameters->int1Parameter);
+}
 
-	AutoTable tm("wish");
-	if (!tm) {
-		printStatus( "ERROR", LIGHT_RED );
-		printf( "Cannot find wish.2da.\n");
+//The same as the previous action, except that the column parameter comes from
+//the target object's wisdom directly (this action is not used in the original)
+void GameScript::SetupWishObject(Scriptable* Sender, Action* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-
-	int picks[5];
-	int i,j;
-	count = tm->GetRowCount();
-
-	for(i=0;i<99;i++) {
-		snprintf(varname,32, "wishpower%02d", i);
-		if(CheckVariable(Sender, varname, "GLOBAL") ) {
-			SetVariable(Sender, varname, "GLOBAL", 0);
-		}
-	}
-
-	if (count<5) {
-		for(i=0;i<count;i++) {
-			picks[i]=i;
-		}
-		while(i++<5) {
-			picks[i]=-1;
-		}
-	} else {
-		for(i=0;i<5;i++) {
-			picks[i]=rand()%count;
-retry:
-			for(j=0;j<i;j++) {
-				if(picks[i]==picks[j]) {
-					picks[i]++;
-					goto retry;
-				}
-			}
-		}
-	}
-
-	for (i = 0; i < 5; i++) {
-		if (picks[i]<0)
-			continue;
-		int spnum = atoi( tm->QueryField( picks[i], parameters->int0Parameter ) );
-		snprintf(varname,32,"wishpower%02d", spnum);
-		SetVariable(Sender, varname, "GLOBAL",1);
-	}
+	SetupWishCore(Sender, ((Actor *)tar)->GetStat(IE_WIS), parameters->int0Parameter);
 }
 
 //GemRB specific action

@@ -144,6 +144,7 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex);
 Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 unsigned int GetSpellDistance(ieResRef spellres, Actor *actor);
 unsigned int GetItemDistance(ieResRef itemres, int header);
+void SetupWishCore(Scriptable *Sender, int column, int picks);
 
 inline int Bones(ieDword value)
 {

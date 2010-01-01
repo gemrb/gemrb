@@ -1350,6 +1350,7 @@ public:
 	static void SetTokenObject(Scriptable* Sender, Action* parameters);
 	static void SetTrackString(Scriptable* Sender, Action* parameters);
 	static void SetupWish(Scriptable* Sender, Action* parameters);
+	static void SetupWishObject(Scriptable* Sender, Action* parameters);
 	static void SetVisualRange(Scriptable* Sender, Action* parameters);
 	static void SG(Scriptable* Sender, Action* parameters);
 	static void Shout(Scriptable* Sender, Action* parameters);
