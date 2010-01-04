@@ -1,14 +1,16 @@
-plugin_LTLIBRARIES = libBIKPlayer.la
-INCLUDES = $(all_includes)
-libBIKPlayer_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
-libBIKPlayer_la_METASOURCES = AUTO
-libBIKPlayer_la_SOURCES = \
+plugin_LTLIBRARIES = BIKPlayer.la
+BIKPlayer_la_LDFLAGS = -module -avoid-version -shared
+BIKPlayer_la_SOURCES = \
 	BIKPlay.cpp \
+	BIKPlay.h \
 	GetBitContext.cpp \
+	GetBitContext.h \
 	dct.cpp \
 	fft.cpp \
 	rdft.cpp \
 	rational.cpp \
-	mem.cpp
-
-noinst_HEADERS = BIKPlay.h GetBitContext.h binkdata.h common.h rational.h dsputil.h
+	rational.h \
+	mem.cpp \
+	binkdata.h \
+	dsputil.h \
+	common.h

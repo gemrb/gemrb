@@ -27,7 +27,7 @@ else
 fi
 
 if test -d Core/.libs; then
-  ln -sf */.libs/lib*.so .
+  ln -sf */.libs/*.so .
 else
   # cmake; expect to be in the build dir since it is arbitrary
   if test -z "$dir"; then
@@ -35,7 +35,7 @@ else
     exit 1
   fi
   cd gemrb/plugins
-  ln -sf */lib*.so .
+  ln -sf */*.so .
 fi
 
 #remove the cuckoo's egg

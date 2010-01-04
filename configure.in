@@ -47,7 +47,6 @@ AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
-AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 
 AC_LANG([C++])
@@ -198,7 +197,6 @@ AC_STRUCT_TM
 AC_TYPE_SIZE_T
 
 CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATADIR=\\\"\$(moddir)\\\" -DPLUGINDIR=\\\"\$(plugindir)\\\""
-#CXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wpointer-arith -Wcast-qual -Wwrite-strings -Wshadow -Wcast-align -ansi -pedantic -Wbad-function-cast -Winline -Wnested-externs -Wno-format-y2k -Wno-long-long"
 CXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wpointer-arith -Wcast-align -ansi -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing"
 
 # only export symbols explicitly marked to be exported
@@ -268,7 +266,7 @@ gemrb/plugins/TISImporter/Makefile
 gemrb/plugins/TLKImporter/Makefile 
 gemrb/plugins/WEDImporter/Makefile 
 gemrb/plugins/WMPImporter/Makefile 
-gemrb/plugins/ZLibMgr/Makefile 
+gemrb/plugins/ZLibMgr/Makefile
 gemrb/docs/Makefile 
 gemrb/docs/en/Makefile 
 gemrb/docs/en/GUIScript/Makefile 

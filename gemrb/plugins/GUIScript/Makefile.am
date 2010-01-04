@@ -1,7 +1,5 @@
-plugin_LTLIBRARIES = libGUIScript.la
-INCLUDES = $(all_includes) \
-	 $(PYTHON_INCLUDES)
-libGUIScript_la_LDFLAGS = -module -version-info 0:0:0 @PYTHON_LIBS@ @LIBPTHREAD@
-libGUIScript_la_METASOURCES = AUTO
-libGUIScript_la_SOURCES = GUIScript.cpp
-noinst_HEADERS = GUIScript.h
+plugin_LTLIBRARIES = GUIScript.la
+INCLUDES = $(PYTHON_INCLUDES)
+GUIScript_la_LDFLAGS = -module -avoid-version -shared
+GUIScript_la_LIBADD = @PYTHON_LIBS@
+GUIScript_la_SOURCES = GUIScript.cpp GUIScript.h

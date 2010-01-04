@@ -1,8 +1,6 @@
 lib_LTLIBRARIES = libgemrb_core.la
-INCLUDES = $(all_includes)
-libgemrb_core_la_LDFLAGS = -version-info 0:0:0 @LIBDL@ @LIBPTHREAD@
+libgemrb_core_la_LDFLAGS = -version-info 0:0:0 @LIBDL@
 AM_CPPFLAGS = -DGEM_BUILD_DLL
-libgemrb_core_la_METASOURCES = AUTO
 libgemrb_core_la_SOURCES = \
 	Audio.cpp \
 	Progressbar.cpp \

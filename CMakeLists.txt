@@ -123,6 +123,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake_config.h.in ${CMAKE_CURRENT_BIN
 #Plugin addition macro
 MACRO(ADD_GEMRB_PLUGIN plugin_name)
 ADD_LIBRARY(${plugin_name} MODULE ${ARGN})
+SET_TARGET_PROPERTIES(${plugin_name} PROPERTIES PREFIX "")
 IF(WIN32)
  TARGET_LINK_LIBRARIES(${plugin_name} gemrb_core)
 ENDIF(WIN32)

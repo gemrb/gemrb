@@ -1,6 +1,3 @@
-plugin_LTLIBRARIES = libDLGImporter.la
-INCLUDES = $(all_includes)
-libDLGImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
-libDLGImporter_la_METASOURCES = AUTO
-libDLGImporter_la_SOURCES = DLGImp.cpp
-noinst_HEADERS = DLGImp.h
+plugin_LTLIBRARIES = DLGImporter.la
+DLGImporter_la_LDFLAGS = -module -avoid-version -shared
+DLGImporter_la_SOURCES = DLGImp.cpp DLGImp.h

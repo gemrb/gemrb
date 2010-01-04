@@ -1,6 +1,4 @@
-plugin_LTLIBRARIES = libSDLVideo.la
-INCLUDES = $(all_includes)
-libSDLVideo_la_LDFLAGS = -module -version-info 0:0:0 @SDL_LIBS@  @LIBPTHREAD@
-libSDLVideo_la_METASOURCES = AUTO
-libSDLVideo_la_SOURCES = SDLVideoDriver.cpp SDLVideoDriver.inl
-noinst_HEADERS = SDLVideoDriver.h
+plugin_LTLIBRARIES = SDLVideo.la
+SDLVideo_la_LDFLAGS = -module -avoid-version -shared
+SDLVideo_la_LIBADD = @SDL_LIBS@
+SDLVideo_la_SOURCES = SDLVideoDriver.cpp SDLVideoDriver.h SDLVideoDriver.inl

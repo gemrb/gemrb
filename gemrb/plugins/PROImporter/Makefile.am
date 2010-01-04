@@ -1,6 +1,3 @@
-plugin_LTLIBRARIES = libPROImporter.la
-INCLUDES = $(all_includes)
-libPROImporter_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
-libPROImporter_la_METASOURCES = AUTO
-libPROImporter_la_SOURCES = PROImp.cpp
-noinst_HEADERS = PROImp.h
+plugin_LTLIBRARIES = PROImporter.la
+PROImporter_la_LDFLAGS = -module -avoid-version -shared
+PROImporter_la_SOURCES = PROImp.cpp PROImp.h

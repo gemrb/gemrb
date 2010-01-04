@@ -1,12 +1,12 @@
-plugin_LTLIBRARIES = libMVEPlayer.la
-INCLUDES = $(all_includes)
-libMVEPlayer_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
-libMVEPlayer_la_METASOURCES = AUTO
-libMVEPlayer_la_SOURCES = \
+plugin_LTLIBRARIES = MVEPlayer.la
+MVEPlayer_la_LDFLAGS = -module -avoid-version -shared
+MVEPlayer_la_SOURCES = \
 	MVEPlay.cpp \
+	MVEPlay.h \
 	mvevideodec8.cpp \
 	mvevideodec16.cpp \
 	mveaudiodec.cpp \
-	mve_player.cpp
-
-noinst_HEADERS = MVEPlay.h gstmvedemux.h mve.h mve_player.h
+	mve_player.cpp \
+	mve_player.h \
+	gstmvedemux.h \
+	mve.h
