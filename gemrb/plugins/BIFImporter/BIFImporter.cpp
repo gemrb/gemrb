@@ -23,7 +23,7 @@
 #include "../Core/Compressor.h"
 #include "../Core/FileStream.h"
 #include "../Core/CachedFileStream.h"
-#include "BIFImp.h"
+#include "BIFImporter.h"
 #include "../Core/Interface.h"
 
 BIFImp::BIFImp(void)

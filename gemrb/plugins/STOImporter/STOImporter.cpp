@@ -22,7 +22,7 @@
 #include "../../includes/win32def.h"
 #include "../Core/Interface.h"
 #include "../Core/Inventory.h"
-#include "STOImp.h"
+#include "STOImporter.h"
 
 STOImp::STOImp(void)
 {

@@ -21,7 +21,7 @@
 
 #include "../../includes/win32def.h"
 #include "../Core/Interface.h"
-#include "2DAImp.h"
+#include "2DAImporter.h"
 #include "../Core/FileStream.h"
 
 #define MAXLENGTH 4096      //if a 2da has longer lines, change this

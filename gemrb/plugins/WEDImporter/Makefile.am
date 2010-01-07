@@ -1,3 +1,3 @@
 plugin_LTLIBRARIES = WEDImporter.la
 WEDImporter_la_LDFLAGS = -module -avoid-version -shared
-WEDImporter_la_SOURCES = WEDImp.cpp WEDImp.h
+WEDImporter_la_SOURCES = WEDImporter.cpp WEDImporter.h

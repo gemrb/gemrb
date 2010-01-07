@@ -1,3 +1,3 @@
-ADD_GEMRB_PLUGIN (TLKImporter TLKImp.cpp TlkOverride.cpp)
+ADD_GEMRB_PLUGIN (TLKImporter TLKImporter.cpp TlkOverride.cpp)
 
 INSTALL( TARGETS TLKImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

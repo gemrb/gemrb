@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "WEDImp.h"
+#include "WEDImporter.h"
 #include "../Core/TileSetMgr.h"
 #include "../Core/Interface.h"
 #include "../Core/ResourceMgr.h"

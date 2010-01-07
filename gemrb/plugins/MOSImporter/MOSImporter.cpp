@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "MOSImp.h"
+#include "MOSImporter.h"
 #include "../../includes/RGBAColor.h"
 #include "../Core/Compressor.h"
 #include "../Core/FileStream.h"

@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "KeyImp.h"
+#include "KEYImporter.h"
 #include "../../includes/globals.h"
 #include "../Core/FileStream.h"
 #include "../Core/Interface.h"

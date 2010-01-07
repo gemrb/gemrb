@@ -22,7 +22,7 @@
 #include <cmath>
 #include <cassert>
 #include <cstdio>
-#include "SDLVideoDriver.h"
+#include "SDLVideo.h"
 #include "../Core/Interface.h"
 #include "../Core/SpriteCover.h"
 #include "../Core/Console.h"

@@ -1,8 +1,8 @@
 plugin_LTLIBRARIES = MVEPlayer.la
 MVEPlayer_la_LDFLAGS = -module -avoid-version -shared
 MVEPlayer_la_SOURCES = \
-	MVEPlay.cpp \
-	MVEPlay.h \
+	MVEPlayer.cpp \
+	MVEPlayer.h \
 	mvevideodec8.cpp \
 	mvevideodec16.cpp \
 	mveaudiodec.cpp \

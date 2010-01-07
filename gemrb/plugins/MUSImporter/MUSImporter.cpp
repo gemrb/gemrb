@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "MUSImp.h"
+#include "MUSImporter.h"
 #include "../Core/Interface.h"
 #include "../Core/Audio.h"
 

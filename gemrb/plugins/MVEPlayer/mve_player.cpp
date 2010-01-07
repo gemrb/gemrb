@@ -27,7 +27,7 @@
  */
 
 #include "mve_player.h"
-#include "MVEPlay.h"
+#include "MVEPlayer.h"
 #include "gstmvedemux.h"
 #include "mve.h"
 

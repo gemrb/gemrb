@@ -22,7 +22,7 @@
 #include "../../includes/win32def.h"
 #include "../Core/Interface.h"
 #include "../Core/EffectMgr.h"
-#include "ITMImp.h"
+#include "ITMImporter.h"
 
 ITMImp::ITMImp(void)
 {

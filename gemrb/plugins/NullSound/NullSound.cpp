@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "NullSnd.h"
+#include "NullSound.h"
 #include "../Core/AmbientMgr.h"
 
 NullSnd::NullSnd(void)

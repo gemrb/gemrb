@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "CREImp.h"
+#include "CREImporter.h"
 #include "../Core/Interface.h"
 #include "../Core/EffectMgr.h"
 #include "../Core/GameScript.h"

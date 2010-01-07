@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/globals.h"
-#include "PNGImp.h"
+#include "PNGImporter.h"
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"
 #include "../Core/Video.h"

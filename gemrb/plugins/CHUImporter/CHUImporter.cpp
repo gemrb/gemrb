@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "CHUImp.h"
+#include "CHUImporter.h"
 #include "../Core/Interface.h"
 #include "../Core/Button.h"
 #include "../Core/Label.h"

@@ -1,8 +1,8 @@
 plugin_LTLIBRARIES = BIKPlayer.la
 BIKPlayer_la_LDFLAGS = -module -avoid-version -shared
 BIKPlayer_la_SOURCES = \
-	BIKPlay.cpp \
-	BIKPlay.h \
+	BIKPlayer.cpp \
+	BIKPlayer.h \
 	GetBitContext.cpp \
 	GetBitContext.h \
 	dct.cpp \

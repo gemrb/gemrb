@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "BMPImp.h"
+#include "BMPImporter.h"
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"
 #include "../Core/Video.h"

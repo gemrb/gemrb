@@ -21,7 +21,7 @@
 
 #include "../../includes/win32def.h"
 #include "../../includes/strrefs.h"
-#include "AREImp.h"
+#include "AREImporter.h"
 #include "../Core/TileMapMgr.h"
 #include "../Core/Interface.h"
 #include "../Core/ActorMgr.h"

@@ -21,7 +21,7 @@
 
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
-#include "IDSImp.h"
+#include "IDSImporter.h"
 #include "IDSImpDefs.h"
 #include <ctype.h>
 #include <cstring>

@@ -3,7 +3,7 @@ SUBDIRS = \
 	GUIScript \
 	SDLVideo \
 	OpenALAudio \
-	ZLibMgr \
+	ZLibManager \
 	2DAImporter \
 	ACMImporter \
 	NullSound \

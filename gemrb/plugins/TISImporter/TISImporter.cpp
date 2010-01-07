@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "TISImp.h"
+#include "TISImporter.h"
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"
 #include "../Core/Video.h"

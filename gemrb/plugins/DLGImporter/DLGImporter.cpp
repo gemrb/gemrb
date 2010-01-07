@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "DLGImp.h"
+#include "DLGImporter.h"
 #include "../Core/FileStream.h"
 #include "../Core/Interface.h"
 

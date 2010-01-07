@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "PLTImp.h"
+#include "PLTImporter.h"
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"
 #include "../Core/Video.h"

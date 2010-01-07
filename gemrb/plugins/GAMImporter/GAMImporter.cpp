@@ -21,7 +21,7 @@
 
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
-#include "GAMImp.h"
+#include "GAMImporter.h"
 #include "../Core/Interface.h"
 #include "../Core/MapMgr.h"
 #include "../Core/ResourceMgr.h"

@@ -35,7 +35,7 @@
 #include "../Core/Video.h"
 #include "../Core/Audio.h"
 #include "../Core/Variables.h"
-#include "BIKPlay.h"
+#include "BIKPlayer.h"
 #include "../../includes/ie_types.h"
 #include "rational.h"
 #include "binkdata.h"

@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "TLKImp.h"
+#include "TLKImporter.h"
 #include "../Core/Interface.h"
 #include "../Core/Audio.h"
 #include "../Core/Game.h"

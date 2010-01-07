@@ -21,7 +21,7 @@
 
 #include "../../includes/win32def.h"
 #include "../Core/Interface.h"
-#include "EFFImp.h"
+#include "EFFImporter.h"
 
 EFFImp::EFFImp(void)
 {

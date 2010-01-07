@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "BAMImp.h"
+#include "BAMImporter.h"
 #include "../Core/Interface.h"
 #include "../Core/Compressor.h"
 #include "../Core/FileStream.h"

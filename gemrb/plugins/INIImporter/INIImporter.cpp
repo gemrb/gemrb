@@ -20,7 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
-#include "INIImp.h"
+#include "INIImporter.h"
 #include "../Core/Interface.h"
 
 INIImp::INIImp(void)

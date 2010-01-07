@@ -266,7 +266,7 @@ gemrb/plugins/TISImporter/Makefile
 gemrb/plugins/TLKImporter/Makefile 
 gemrb/plugins/WEDImporter/Makefile 
 gemrb/plugins/WMPImporter/Makefile 
-gemrb/plugins/ZLibMgr/Makefile
+gemrb/plugins/ZLibManager/Makefile
 gemrb/docs/Makefile 
 gemrb/docs/en/Makefile 
 gemrb/docs/en/GUIScript/Makefile 

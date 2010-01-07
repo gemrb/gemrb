@@ -27,7 +27,7 @@
 #include "../Core/Video.h"
 #include "../Core/Audio.h"
 #include "../Core/Variables.h"
-#include "MVEPlay.h"
+#include "MVEPlayer.h"
 #include "mve_player.h"
 #include "../../includes/ie_types.h"
 
