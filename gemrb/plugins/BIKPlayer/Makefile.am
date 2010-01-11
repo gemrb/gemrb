@@ -13,4 +13,4 @@ libBIKPlayer_la_SOURCES = \
 	rational.cpp \
 	mem.cpp
 
-noinst_HEADERS = BIKPlay.h BIKPlayerDesc.h GetBitContext.h binkdata.h
+noinst_HEADERS = BIKPlay.h BIKPlayerDesc.h GetBitContext.h binkdata.h common.h rational.h dsputil.h
