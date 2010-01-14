@@ -454,7 +454,7 @@ int BIKPlay::sound_init(bool need_init)
 	s_overlap_len   = s_frame_len / 16;
 	s_block_size    = (s_frame_len - s_overlap_len) * s_channels;
 	sample_rate_half = (sample_rate + 1) / 2;
-	s_root	  = (float) (2.0 / sqrt(s_frame_len));
+	s_root	  = (float) (2.0 / sqrt((float) s_frame_len));
 
 	/* calculate number of bands */
 	for (s_num_bands = 1; s_num_bands < 25; s_num_bands++) {
