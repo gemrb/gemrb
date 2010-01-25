@@ -2,6 +2,10 @@ Scripts:
 1. (DONE?) ToB specific actions/triggers, like pocketplane (so ToB will work)
 2. (PARTLY) Properly detect the play mode (sp/mp, normal/extended)
 
+Strings:
+1. fix (finish implementation of) talk table override
+2. implement feature: "<GENDER?stref1:strref2>" (or even more ambitious stat specific strref tokens)
+
 Combat:
 1. (DONE?) fix combat round timings
 2. implement customisable combat calculation, it should be general enough to
