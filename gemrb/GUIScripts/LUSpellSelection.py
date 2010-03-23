@@ -252,7 +252,9 @@ def SpellsDonePress ():
 	if chargen:
 		if GameIsBG2():
 			GemRB.SetNextScript("GUICG6")
-		else:
+		elif GameIsBG1():
+			# HACK
+			from CharGenCommon import next
 			next()
 
 	return
