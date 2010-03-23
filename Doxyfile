@@ -186,7 +186,7 @@ TAB_SIZE = 8
 # will result in a user-defined paragraph with heading "Side Effects:". 
 # You can put \n's in the value part of an alias to insert newlines.
 
-ALIASES = 
+ALIASES = iespecific="\emph{(Infinity Engine specific)}"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 
@@ -483,7 +483,7 @@ EXCLUDE_SYMLINKS = NO
 # EXCLUDE_PATTERNS tag to specify one or more wildcard patterns to exclude 
 # certain files from those directories.
 
-EXCLUDE_PATTERNS = 
+EXCLUDE_PATTERNS = .git */.libs */.deps
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 
