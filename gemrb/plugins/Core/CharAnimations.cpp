@@ -825,8 +825,8 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		NewResRef[8]=0; //cutting right to size
 
 		AnimationFactory* af = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( NewResRef,
-														IE_BAM_CLASS_ID, IE_NORMAL );
+			gamedata->GetFactoryResource( NewResRef,
+					IE_BAM_CLASS_ID, IE_NORMAL );
 
 		if (!af) {
 			if (part < actorPartCount) {

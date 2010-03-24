@@ -3236,7 +3236,7 @@ Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
 void AreaAnimation::InitAnimation()
 {
 	AnimationFactory* af = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
+		gamedata->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
 	if (!af) {
 		printf("Cannot load animation: %s\n", BAM);
 		return;

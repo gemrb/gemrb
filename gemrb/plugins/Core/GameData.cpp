@@ -36,6 +36,10 @@
 #include "EffectMgr.h"
 #include "ResourceMgr.h"
 #include "Game.h"
+#include "ResourceDesc.h"
+#include "AnimationMgr.h"
+#include "ImageMgr.h"
+#include "ImageFactory.h"
 
 static void ReleaseItem(void *poi)
 {
@@ -450,7 +454,7 @@ ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doub
 		ret = new ScriptedAnimation(ds, true);
 	} else {
 		AnimationFactory *af = (AnimationFactory *)
-			core->GetResourceMgr()->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
+			GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
 		if (af) {
 			ret = new ScriptedAnimation();
 			ret->LoadAnimationFactory( af, doublehint?2:0);
@@ -468,7 +472,7 @@ Sprite2D* GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int frame)
 {
 	Sprite2D *tspr;
 	AnimationFactory* af = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( ResRef, IE_BAM_CLASS_ID, IE_NORMAL );
+		GetFactoryResource( ResRef, IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!af) return 0;
 	if (cycle == -1)
 		tspr = af->GetFrameWithoutCycle( (unsigned short) frame );
@@ -477,4 +481,51 @@ Sprite2D* GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int frame)
 	return tspr;
 }
 
+void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
+	unsigned char mode, bool silent)
+{
+	int fobjindex = factory->IsLoaded(resname,type);
+	// already cached
+	if ( fobjindex != -1)
+		return factory->GetFactoryObject( fobjindex );
 
+	// empty resref
+	if (!strcmp(resname, ""))
+		return NULL;
+
+	switch (type) {
+	case IE_BAM_CLASS_ID:
+	{
+		DataStream* ret = core->GetResourceMgr()->GetResource( resname, type, silent );
+		if (ret) {
+			AnimationMgr* ani = ( AnimationMgr* )
+				core->GetInterface( IE_BAM_CLASS_ID );
+			if (!ani)
+				return NULL;
+			ani->Open( ret, true );
+			AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
+			core->FreeInterface( ani );
+			factory->AddFactoryObject( af );
+			return af;
+		}
+		return NULL;
+	}
+	case IE_BMP_CLASS_ID:
+	{
+		ImageMgr* img = (ImageMgr*) GetResource( resname, &ImageMgr::ID );
+		if (img) {
+			ImageFactory* fact = img->GetImageFactory( resname );
+			core->FreeInterface( img );
+			factory->AddFactoryObject( fact );
+			return fact;
+		}
+
+		return NULL;
+	}
+	default:
+		printf( "\n" );
+		printMessage( "KEYImporter", " ", WHITE );
+		printf( "%s files are not supported.\n", core->TypeExt( type ) );
+		return NULL;
+	}
+}

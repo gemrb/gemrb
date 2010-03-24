@@ -104,7 +104,7 @@ void WMPImp::GetWorldMap(WorldMap *m, unsigned int index)
 		printMessage( "WMPImporter","No BAM Importer Available.\n", LIGHT_RED );
 	} else {
 		AnimationFactory* af = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( m->MapIconResRef, IE_BAM_CLASS_ID, IE_NORMAL );
+			gamedata->GetFactoryResource( m->MapIconResRef, IE_BAM_CLASS_ID, IE_NORMAL );
 		if (af)
 			m->SetMapIcons( af );
 	}

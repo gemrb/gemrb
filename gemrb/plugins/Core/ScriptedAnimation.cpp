@@ -265,7 +265,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 
 	if (SequenceFlags&IE_VVC_BAM) {
 		AnimationFactory* af = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( Anim1ResRef, IE_BAM_CLASS_ID );
+			gamedata->GetFactoryResource( Anim1ResRef, IE_BAM_CLASS_ID );
 		//no idea about vvc phases, i think they got no endphase?
 		//they certainly got onset and hold phases
 		//the face target flag should be handled too

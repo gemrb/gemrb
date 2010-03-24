@@ -63,9 +63,6 @@ public:
 	/* returns resource */
 	DataStream* GetResource(const char* resname, SClass_ID type, bool silent=false);
 	Resource* GetResource(const char* resname, const std::vector<ResourceDesc> &types, bool silent=false);
-	/* returns factory resource, currently works only with animations */
-	void* GetFactoryResource(const char* resname, SClass_ID type,
-		unsigned char mode = IE_NORMAL, bool silent=false);
 public:
 	void release(void)
 	{

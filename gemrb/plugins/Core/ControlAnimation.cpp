@@ -35,7 +35,7 @@ ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycl
 	frame = 0;
 	anim_phase = 0;
 
-	bam = ( AnimationFactory* ) core->GetResourceMgr()->GetFactoryResource( ResRef,
+	bam = ( AnimationFactory* ) gamedata->GetFactoryResource( ResRef,
 		IE_BAM_CLASS_ID, IE_NORMAL );
 
 	if (! bam)

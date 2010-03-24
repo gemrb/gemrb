@@ -1043,7 +1043,7 @@ int Interface::LoadSprites()
 
 	//loading cursors
 	AnimationFactory* anim;
-	anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource("cursors", IE_BAM_CLASS_ID);
+	anim = (AnimationFactory*) gamedata->GetFactoryResource("cursors", IE_BAM_CLASS_ID);
 	if (anim)
 	{
 		CursorCount = anim->GetCycleCount();
@@ -1063,7 +1063,7 @@ int Interface::LoadSprites()
 	printStatus( "OK", LIGHT_GREEN );
 
 	// Load fog-of-war bitmaps
-	anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
+	anim = (AnimationFactory*) gamedata->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
 	printMessage( "Core", "Loading Fog-Of-War bitmaps...", WHITE );
 	if (!anim || anim->GetCycleSize( 0 ) != 8) {
 		// unknown type of fog anim
@@ -1141,7 +1141,7 @@ int Interface::LoadSprites()
 	//block required due to msvc6.0 incompatibility
 	for (size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (GroundCircleBam[size][0]) {
-			anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
+			anim = (AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
 				printMessage( "Core", "Loading Ground circle bitmaps...", WHITE );
@@ -1219,7 +1219,7 @@ int Interface::LoadSprites()
 	printStatus( "OK", LIGHT_GREEN );
 
 	if (TooltipBackResRef[0]) {
-		anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource(TooltipBackResRef, IE_BAM_CLASS_ID);
+		anim = (AnimationFactory*) gamedata->GetFactoryResource(TooltipBackResRef, IE_BAM_CLASS_ID);
 		printMessage( "Core", "Initializing Tooltips...", WHITE );
 		if (!anim) {
 			printStatus( "ERROR", LIGHT_RED );

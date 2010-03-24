@@ -107,9 +107,9 @@ void Projectile::InitExtension()
 void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int Seq)
 {
 	AnimationFactory* af = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( bamres,
-		IE_BAM_CLASS_ID, IE_NORMAL );
-	//
+		gamedata->GetFactoryResource( bamres,
+				IE_BAM_CLASS_ID, IE_NORMAL );
+
 	if (!af) {
 		return;
 	}

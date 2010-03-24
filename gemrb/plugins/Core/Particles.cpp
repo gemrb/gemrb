@@ -120,7 +120,7 @@ void Particles::SetBitmap(unsigned int FragAnimID)
 	}
 
 	AnimationFactory* af = ( AnimationFactory* )
-					core->GetResourceMgr()->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
+		gamedata->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
 
 	if (af == NULL) {
 		return;

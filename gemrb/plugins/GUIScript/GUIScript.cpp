@@ -2222,8 +2222,8 @@ static PyObject* GemRB_SetScrollBarSprites(PyObject * /*self*/, PyObject* args)
 	}
 
 	AnimationFactory* af = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( ResRef,
-		IE_BAM_CLASS_ID, IE_NORMAL );
+		gamedata->GetFactoryResource( ResRef,
+				IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!af) {
 		return RuntimeError( "BAM not found" );
 	}
@@ -2275,8 +2275,8 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 	}
 
 	AnimationFactory* af = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( ResRef,
-		IE_BAM_CLASS_ID, IE_NORMAL );
+		gamedata->GetFactoryResource( ResRef,
+				IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!af) {
 		return RuntimeError( "BAM not found" );
 	}
@@ -2700,8 +2700,8 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 		Control *lc = win->GetControl( CtrlIndex );
 		map->LinkedLabel = lc;
 		AnimationFactory* af = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( Flag,
-			IE_BAM_CLASS_ID, IE_NORMAL );
+			gamedata->GetFactoryResource( Flag,
+					IE_BAM_CLASS_ID, IE_NORMAL );
 		if (af) {
 			for (int i=0;i<8;i++) {
 				map->Flag[i] = af->GetFrame(0,i);
@@ -3125,15 +3125,14 @@ static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	ResourceMgr * rm = core->GetResourceMgr();
 	ImageFactory* fact = ( ImageFactory* )
-		rm->GetFactoryResource( ResRef, IE_BMP_CLASS_ID, IE_NORMAL );
+		gamedata->GetFactoryResource( ResRef, IE_BMP_CLASS_ID, IE_NORMAL );
 
 	//if the resource doesn't exist, but we have a default resource
 	//use this resource
 	if (!fact && DefResRef) {
 		fact = ( ImageFactory* )
-			rm->GetFactoryResource( DefResRef, IE_BMP_CLASS_ID, IE_NORMAL );
+			gamedata->GetFactoryResource( DefResRef, IE_BMP_CLASS_ID, IE_NORMAL );
 	}
 
 	if (!fact) {
@@ -3231,7 +3230,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 
 	if (im == NULL ) {
 		AnimationFactory* af = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( ResRef,
+			gamedata->GetFactoryResource( ResRef,
 			IE_BAM_CLASS_ID, IE_NORMAL );
 		if (!af) {
 			printMessage("GUISCript","PLT/BAM not found for ref: ",YELLOW);
@@ -3295,7 +3294,7 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 	}
 
 	AnimationFactory* af = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( ResRef,
+		gamedata->GetFactoryResource( ResRef,
 		IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!af)
 		return NULL;
@@ -5137,8 +5136,8 @@ PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int
 		IconResRef = spell->SpellbookIcon;
 	}
 	AnimationFactory* af = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( IconResRef,
-		IE_BAM_CLASS_ID, IE_NORMAL, 1 );
+		gamedata->GetFactoryResource( IconResRef,
+				IE_BAM_CLASS_ID, IE_NORMAL, 1 );
 	if (!af) {
 		printf("Searched for: %s\n", IconResRef);
 		return RuntimeError( "BAM not found" );
@@ -7855,8 +7854,8 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index, int
 
 	//FIXME: this is a hardcoded resource (pst has no such one)
 	AnimationFactory* bam = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( GUIResRef[Index],
-		IE_BAM_CLASS_ID, IE_NORMAL );
+		gamedata->GetFactoryResource( GUIResRef[Index],
+				IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!bam) {
 		return RuntimeError( "BAM not found" );
 	}
@@ -7956,8 +7955,8 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 	}
 	//FIXME: this is a hardcoded resource (pst has no such one)
 	AnimationFactory* bam = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( "guibtbut",
-		IE_BAM_CLASS_ID, IE_NORMAL );
+		gamedata->GetFactoryResource( "guibtbut",
+				IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!bam) {
 		return RuntimeError( "BAM not found" );
 	}
@@ -8072,8 +8071,8 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 
 	//FIXME: this is a hardcoded resource (pst has no such one)
 	AnimationFactory* bam = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( "guibtbut",
-		IE_BAM_CLASS_ID, IE_NORMAL );
+		gamedata->GetFactoryResource( "guibtbut",
+				IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!bam) {
 		return RuntimeError( "BAM not found" );
 	}

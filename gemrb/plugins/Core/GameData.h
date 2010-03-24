@@ -53,8 +53,6 @@ public:
 
 	void ClearCaches();
 
-	Factory* GetFactory() const { return factory; }
-
 	/** Returns actor */
 	Actor *GetCreature(const char *ResRef, unsigned int PartySlot=0);
 	/** Returns a PC index, by loading a creature */
@@ -94,6 +92,9 @@ public:
 	/** returns a single sprite (not cached) from a BAM resource */
 	Sprite2D* GetBAMSprite(const ieResRef ResRef, int cycle, int frame);
 
+	/** returns factory resource, currently works only with animations */
+	void* GetFactoryResource(const char* resname, SClass_ID type,
+		unsigned char mode = IE_NORMAL, bool silent=false);
 private:
 	Cache ItemCache;
 	Cache SpellCache;

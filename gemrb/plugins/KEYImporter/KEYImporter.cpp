@@ -25,10 +25,6 @@
 #include "../Core/FileStream.h"
 #include "../Core/Interface.h"
 #include "../Core/ArchiveImporter.h"
-#include "../Core/AnimationMgr.h"
-#include "../Core/ImageMgr.h"
-#include "../Core/ImageFactory.h"
-#include "../Core/Factory.h"
 #include "../Core/ResourceDesc.h"
 #ifndef WIN32
 #include <unistd.h>
@@ -513,55 +509,6 @@ Resource* KeyImp::GetResource(const char* resname, const std::vector<ResourceDes
 		printStatus( "ERROR", LIGHT_RED );
 	}
 	return NULL;
-}
-
-void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
-	unsigned char mode, bool silent)
-{
-	int fobjindex = gamedata->GetFactory()->IsLoaded(resname,type);
-	// already cached
-	if ( fobjindex != -1)
-		return gamedata->GetFactory()->GetFactoryObject( fobjindex );
-
-	// empty resref
-	if (!strcmp(resname, ""))
-		return NULL;
-
-	switch (type) {
-	case IE_BAM_CLASS_ID:
-	{
-		DataStream* ret = GetResource( resname, type, silent );
-		if (ret) {
-			AnimationMgr* ani = ( AnimationMgr* )
-				core->GetInterface( IE_BAM_CLASS_ID );
-			if (!ani)
-				return NULL;
-			ani->Open( ret, true );
-			AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
-			core->FreeInterface( ani );
-			gamedata->GetFactory()->AddFactoryObject( af );
-			return af;
-		}
-		return NULL;
-	}
-	case IE_BMP_CLASS_ID:
-	{
-		ImageMgr* img = (ImageMgr*) gamedata->GetResource( resname, &ImageMgr::ID );
-		if (img) {
-			ImageFactory* fact = img->GetImageFactory( resname );
-			core->FreeInterface( img );
-			gamedata->GetFactory()->AddFactoryObject( fact );
-			return fact;
-		}
-
-		return NULL;
-	}
-	default:
-		printf( "\n" );
-		printMessage( "KEYImporter", " ", WHITE );
-		printf( "%s files are not supported.\n", core->TypeExt( type ) );
-		return NULL;
-	}
 }
 
 #include "../../includes/plugindef.h"

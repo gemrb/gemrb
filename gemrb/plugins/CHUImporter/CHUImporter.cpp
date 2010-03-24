@@ -167,8 +167,8 @@ Window* CHUImp::GetWindow(unsigned int wid)
 					}
 				}
 				AnimationFactory* bam = ( AnimationFactory* )
-					core->GetResourceMgr()->GetFactoryResource( BAMFile,
-					IE_BAM_CLASS_ID, IE_NORMAL );
+					gamedata->GetFactoryResource( BAMFile,
+							IE_BAM_CLASS_ID, IE_NORMAL );
 				if (!bam ) {
 					printMessage( "CHUImporter","Cannot Load Button Images, skipping control\n",LIGHT_RED );
 					/* IceWind Dale 2 has fake BAM ResRefs for some Buttons,
@@ -245,7 +245,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				if( KnobStepsCount ) {
 					/* getting the bam */
 					AnimationFactory *af = (AnimationFactory *)
-						core->GetResourceMgr()->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID );
+						gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID );
 					/* Getting the Cycle of the bam */
 						pbar->SetAnimation(af->GetCycle( Cycle & 0xff ) );
 				}
@@ -288,8 +288,8 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				core->FreeInterface( mos );
 
 				AnimationFactory* bam = ( AnimationFactory* )
-					core->GetResourceMgr()->GetFactoryResource( BAMFile,
-					IE_BAM_CLASS_ID, IE_NORMAL );
+					gamedata->GetFactoryResource( BAMFile,
+							IE_BAM_CLASS_ID, IE_NORMAL );
 				if( bam ) {
 					img = bam->GetFrame( Knob, 0 );
 					sldr->SetImage( IE_GUI_SLIDER_KNOB, img );
@@ -326,9 +326,9 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				Font* fnt = core->GetFont( FontResRef );
 	      
 				AnimationFactory* bam = ( AnimationFactory* )
-					core->GetResourceMgr()->GetFactoryResource( CursorResRef,
-															IE_BAM_CLASS_ID,
-															IE_NORMAL );
+					gamedata->GetFactoryResource( CursorResRef,
+							IE_BAM_CLASS_ID,
+							IE_NORMAL );
 				Sprite2D *cursor = NULL;
 	      if (bam) {
 					cursor = bam->GetFrame( CurCycle, CurFrame );
@@ -474,8 +474,8 @@ endalign:
 				sbar->ControlType = ControlType;
 
 				AnimationFactory* bam = ( AnimationFactory* )
-					core->GetResourceMgr()->GetFactoryResource( BAMResRef,
-					IE_BAM_CLASS_ID, IE_NORMAL );
+					gamedata->GetFactoryResource( BAMResRef,
+							IE_BAM_CLASS_ID, IE_NORMAL );
 				if (bam) {
 					sbar->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED,
 									bam->GetFrame( UpUnPressed, Cycle ) );
