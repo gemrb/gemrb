@@ -463,11 +463,6 @@ def LearnPriestSpells (pc, level, mask):
 
 def SetEncumbranceLabels (Window, LabelID, Label2ID, pc):
 	"""Displays the encumarance as a ratio of current to maximum."""
-	global StrModTable, StrModExTable
-
-	if not StrModTable:
-		StrModTable = GemRB.LoadTableObject ("strmod")
-		StrModExTable = GemRB.LoadTableObject ("strmodex")
 
 	# Getting the character's strength
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
