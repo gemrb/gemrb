@@ -20,7 +20,7 @@
 #character generation (GUICG 0)
 import GemRB
 from ie_stats import *
-from GUICommon import SetColorStat
+from GUICommon import SetColorStat, RaceTable
 from CharOverview import *
 
 BioWindow = 0
@@ -130,9 +130,8 @@ def NextPress():
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("BaseRace") )
 	race = GemRB.GetVar ("Race")
 	GemRB.SetPlayerStat (MyChar, IE_SUBRACE, race & 255 )
-	TmpTable = GemRB.LoadTableObject ("races")
-	row = TmpTable.FindValue (3, race )
-	racename = TmpTable.GetRowName (row)
+	row = RaceTable.FindValue (3, race )
+	racename = RaceTable.GetRowName (row)
 	if row!=-1:
 		SetRaceResistances( MyChar, racename )
 		SetRaceAbilities( MyChar, racename )

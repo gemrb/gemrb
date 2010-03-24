@@ -19,6 +19,7 @@
 #
 #character generation, color (GUICG13)
 import GemRB
+from GUICommon import RaceTable
 
 global IE_ANIM_ID
 ColorTable = 0
@@ -59,7 +60,6 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	ColorWindow=GemRB.LoadWindowObject(13)
 
-	RaceTable = GemRB.LoadTableObject("races")
 	Race = RaceTable.FindValue (3, GemRB.GetVar ("Race") )
 	HairTable = GemRB.LoadTableObject(RaceTable.GetValue(Race, 5))
 	SkinTable = GemRB.LoadTableObject(RaceTable.GetValue(Race, 6))

@@ -19,21 +19,20 @@
 #
 #character generation, SubRaces (GUICG54)
 import GemRB
+from GUICommon import RaceTable
 
 RaceWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-RaceTable = 0
 SubRacesTable = 0
 
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
-	global RaceTable, SubRacesTable
+	global SubRacesTable
 	
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	RaceWindow = GemRB.LoadWindowObject(54)
 
-	RaceTable = GemRB.LoadTableObject("races")
 	RaceCount = RaceTable.GetRowCount()
 	
 	SubRacesTable = GemRB.LoadTableObject("SUBRACES")

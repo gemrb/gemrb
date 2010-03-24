@@ -27,7 +27,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow, SetColorStat
+from GUICommon import CloseOtherWindow, SetColorStat, RaceTable
 from GUICommonWindows import *
 
 SelectWindow = 0
@@ -240,7 +240,6 @@ def DisplayGeneral (pc):
 
 	#favoured class
 	RecordsTextArea.Append (40310,-1)
-	RaceTable = GemRB.LoadTableObject("races")
 	ClassTable = GemRB.LoadTableObject("classes")
 	AlignTable = GemRB.LoadTableObject("aligns")
 

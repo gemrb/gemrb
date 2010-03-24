@@ -366,14 +366,13 @@ def EquipmentPressed ():
 	return
 
 def GetActorRaceTitle (actor):
-	Table = GemRB.LoadTableObject ("races")
 	RaceID = GemRB.GetPlayerStat (actor, IE_SUBRACE)
 	if RaceID:
 		RaceID += GemRB.GetPlayerStat (actor, IE_RACE)<<16
 	else:
 		RaceID = GemRB.GetPlayerStat (actor, IE_RACE)
-	row = Table.FindValue (3, RaceID )
-	RaceTitle = Table.GetValue (row, 2)
+	row = RaceTable.FindValue (3, RaceID )
+	RaceTitle = RaceTable.GetValue (row, 2)
 	return RaceTitle
 
 # NOTE: this function is called with the primary classes

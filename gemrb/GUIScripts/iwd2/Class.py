@@ -19,6 +19,7 @@
 #
 #character generation, class (GUICG2)
 import GemRB
+from GUICommon import RaceTable
 
 ClassWindow = 0
 TextAreaControl = 0
@@ -62,9 +63,8 @@ def OnLoad():
 	ClassTable = GemRB.LoadTableObject("classes")
 	ClassCount = ClassTable.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindowObject(2)
-	TmpTable=GemRB.LoadTableObject("races")
-	rid = TmpTable.FindValue(3, GemRB.GetVar('BaseRace'))
-	RaceName = TmpTable.GetRowName(rid)
+	rid = RaceTable.FindValue(3, GemRB.GetVar('BaseRace'))
+	RaceName = RaceTable.GetRowName(rid)
 
 	#radiobutton groups must be set up before doing anything else to them
 	j = 0

@@ -20,6 +20,7 @@
 #character generation, skills (GUICG6)
 import GemRB
 from ie_stats import *
+from GUICommon import RaceTable
 
 FeatWindow = 0
 TextAreaControl = 0
@@ -192,7 +193,6 @@ def OnLoad():
 	GemRB.SetVar("Level",1) #for simplicity
 
 	Race = GemRB.GetVar("Race")
-	RaceTable = GemRB.LoadTableObject("races")
 	RaceColumn = RaceTable.FindValue(3, Race)
 	RaceName = RaceTable.GetRowName(RaceColumn)
 	# could use column ID as well, but they tend to change :)
@@ -239,8 +239,7 @@ def OnLoad():
 	#racial abilities which seem to be hardcoded in the IWD2 engine
 	#are implemented in races.2da
 	if Level<1:
-		TmpTable = GemRB.LoadTableObject('races')
-		PointsLeft += TmpTable.GetValue(RaceName,'FEATBONUS')
+		PointsLeft += RaceTable.GetValue(RaceName,'FEATBONUS')
 	###
 
 	GemRB.SetToken("number",str(PointsLeft) )
