@@ -27,7 +27,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow, SetColorStat, RaceTable, ClassTable
+from GUICommon import CloseOtherWindow, SetColorStat, RaceTable, ClassTable, NextLevelTable
 from GUICommonWindows import *
 
 SelectWindow = 0
@@ -191,8 +191,6 @@ def GetAbilityBonus (pc, stat):
 
 #class is ignored
 def GetNextLevelExp (Level, Adjustment):
-	NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
-
 	if Adjustment>5:
 		Adjustment = 5
 	if (Level < NextLevelTable.GetColumnCount (4) - 5):
