@@ -180,6 +180,8 @@ def SetupActionsWindowControls (Window):
 	Button = Window.GetControl (0)
 	Button.SetAnimation ("WMTIME")
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, "UpdateClock")
 
 	# 41627 - Return to the Game World
 	Button = Window.GetControl (2)
@@ -600,6 +602,26 @@ def OpenWaitForDiscWindow ():
 		GemRB.UnhideGUI ()
 	except:
 		DiscWindow.SetVisible (1)
+
+def SetPSTGamedaysAndHourToken ():
+	currentTime = GemRB.GetGameTime()
+	hours = (currentTime % 7200) / 300
+	if hours < 12:
+		ampm = "AM"
+	else:
+		ampm = "PM"
+		hours -= 12
+	minutes = (currentTime % 300) / 60
+
+	GemRB.SetToken ('CLOCK_HOUR', str (hours))
+	GemRB.SetToken ('CLOCK_MINUTE', str (minutes))
+	GemRB.SetToken ('CLOCK_AMPM', ampm)
+
+def UpdateClock():
+	ActionsWindow = GemRB.LoadWindowObject(0)
+	Button = ActionsWindow.GetControl (0)
+	SetPSTGamedaysAndHourToken ()
+	Button.SetTooltip (65027)
 
 def CheckLevelUp(pc):
 	GemRB.SetVar ("CheckLevelUp"+str(pc), CanLevelUp (pc))
