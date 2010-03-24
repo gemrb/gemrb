@@ -3277,19 +3277,9 @@ bool Interface::DelSymbol(unsigned int index)
 /** Plays a Movie */
 int Interface::PlayMovie(const char* ResRef)
 {
-	MoviePlayer* mp = ( MoviePlayer* ) GetInterface( IE_MVE_CLASS_ID );
+	MoviePlayer* mp = (MoviePlayer*) gamedata->GetResource( ResRef, &MoviePlayer::ID );
 	if (!mp) {
-		return 0;
-	}
-	DataStream* str = key->GetResource( ResRef, IE_MVE_CLASS_ID );
-	if (!str) {
 		FreeInterface( mp );
-		return -1;
-	}
-	if (!mp->Open( str, true )) {
-		FreeInterface( mp );
-		// since mp was opened with autofree, this delete would cause double free
-		//	delete str;
 		return -1;
 	}
 

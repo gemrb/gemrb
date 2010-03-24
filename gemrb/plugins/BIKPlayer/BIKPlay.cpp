@@ -58,8 +58,6 @@ BIKPlay::BIKPlay(void)
 {
 	int i;
 
-	str = NULL;
-	autoFree = false;
 	video = core->GetVideoDriver();
 	inbuff = NULL;
 	maxRow = 0;
@@ -78,9 +76,6 @@ BIKPlay::BIKPlay(void)
 
 BIKPlay::~BIKPlay(void)
 {
-	if (str && autoFree) {
-		delete( str );
-	}
 	av_freep((void **) &inbuff);
 }
 
@@ -95,7 +90,7 @@ void BIKPlay::av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsig
 	time_base.num = time_base.den = 0;
 }
 
-int BIKPlay::ReadHeader(DataStream *str)
+int BIKPlay::ReadHeader()
 {
 	str->Seek(0,GEM_STREAM_START);
 	str->Read( header.signature, BIK_SIGNATURE_LEN );
@@ -198,18 +193,12 @@ int BIKPlay::ReadHeader(DataStream *str)
 bool BIKPlay::Open(DataStream* stream, bool autoFree)
 {
 	validVideo = false;
-	if (stream == NULL) {
+	if (!Resource::Open(stream, autoFree))
 		return false;
-	}
-	if (str && this->autoFree) {
-		delete( str );
-	}
-	str = stream;
-	this->autoFree = autoFree;
 
 	str->Read( &header.signature, BIK_SIGNATURE_LEN );
 	if (memcmp( header.signature, BIK_SIGNATURE_DATA, 4 ) == 0) {
-		validVideo = ReadHeader(stream)==0;
+		validVideo = ReadHeader()==0;
 		return validVideo;
 	}
 	return false;
@@ -1613,5 +1602,5 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 #include "../../includes/plugindef.h"
 
 GEMRB_PLUGIN(0x316E2EDE, "BIK Video Player")
-PLUGIN_CLASS(IE_MVE_CLASS_ID, BIKPlay)
+PLUGIN_RESOURCE(&MoviePlayer::ID, BIKPlay, ".mve")
 END_PLUGIN()

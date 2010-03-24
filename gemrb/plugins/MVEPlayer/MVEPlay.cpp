@@ -45,74 +45,22 @@ static ieDword *strRef = NULL;
 
 MVEPlay::MVEPlay(void)
 {
-	str = NULL;
-	autoFree = false;
 	video = core->GetVideoDriver();
 }
 
 MVEPlay::~MVEPlay(void)
 {
-	if (str && autoFree) {
-		delete( str );
-	}
-}
-
-/** the crudest hack ever been made :), we should really beg for a */
-/** BIK player, miracles happen */
-bool MVEPlay::PlayBik(DataStream *stream)
-{
-	char Tmp[256];
-
-	sprintf(Tmp,"%stmp.bik",core->CachePath);
-	unlink(Tmp);
-	int fhandle = open(Tmp,O_CREAT|O_TRUNC|O_RDWR, S_IWRITE|S_IREAD);
-	if (fhandle<1) {
-		return false;
-	}
-	stream->Seek(0,GEM_STREAM_START);
-	int size=stream->Size();
-	printf("Copying %d bytes... to %s\n",size, Tmp);
-	while(size) {
-		int chunk = size>256?256:size;
-		stream->Read(Tmp, chunk);
-		if (write(fhandle,Tmp, chunk) <= 0) {
-			close(fhandle);
-			return false;
-		}
-		size -= chunk;
-	}
-	close(fhandle);
-#ifdef WIN32
-	sprintf(Tmp,"BinkPlayer.exe %stmp.bik",core->CachePath);
-#else
-	sprintf(Tmp,"BinkPlayer %stmp.bik",core->CachePath);
-#endif
-	int ret=system(Tmp);
-	sprintf(Tmp,"%stmp.bik",core->CachePath);
-	unlink(Tmp);
-	return ret!=0;
 }
 
 bool MVEPlay::Open(DataStream* stream, bool autoFree)
 {
-	validVideo = false;
-	if (stream == NULL) {
+	if (!Resource::Open(stream,autoFree))
 		return false;
-	}
-	if (str && this->autoFree) {
-		delete( str );
-	}
-	str = stream;
-	this->autoFree = autoFree;
+	validVideo = false;
+
 	char Signature[MVE_SIGNATURE_LEN];
 	str->Read( Signature, MVE_SIGNATURE_LEN );
 	if (memcmp( Signature, MVESignature, MVE_SIGNATURE_LEN ) != 0) {
-		if (memcmp( Signature, "BIK", 3 ) == 0) {
-			if( PlayBik(stream) ) {
-				printf( "Warning!!! This is a Bink Video File...\nUnfortunately we cannot provide a Bink Video Player\nWe are sorry!\n" );
-			}
-			return true;
-		}
 		return false;
 	}
 
@@ -235,5 +183,5 @@ void MVEPlay::queueBuffer(int stream, unsigned short bits,
 #include "../../includes/plugindef.h"
 
 GEMRB_PLUGIN(0x218963DC, "MVE Video Player")
-PLUGIN_CLASS(IE_MVE_CLASS_ID, MVEPlay)
+PLUGIN_IE_RESOURCE(&MoviePlayer::ID, MVEPlay, ".mve", (ieWord)IE_MVE_CLASS_ID)
 END_PLUGIN()

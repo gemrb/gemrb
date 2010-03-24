@@ -31,8 +31,6 @@ class MVEPlay : public MoviePlayer {
 	friend class MVEPlayer;
 
 private:
-	DataStream* str;
-	bool autoFree;
 	bool validVideo;
 	int doPlay();
 	unsigned int fileRead(void* buf, unsigned int count);
@@ -53,8 +51,6 @@ public:
 	bool Open(DataStream* stream, bool autoFree = true);
 	void CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2);
 	int Play();
-	/** this function uses an external player to play BIK animations */
-	bool PlayBik(DataStream *stream);
 
 public:
 	void release(void)

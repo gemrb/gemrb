@@ -31,8 +31,7 @@
 
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
-#include "Plugin.h"
-#include "DataStream.h"
+#include "Resource.h"
 
 
 /**
@@ -40,11 +39,11 @@
  * Abstract loader and player for videos
  */
 
-class GEM_EXPORT MoviePlayer : public Plugin {
+class GEM_EXPORT MoviePlayer : public Resource {
 public:
+	static const TypeID ID;
 	MoviePlayer(void);
 	virtual ~MoviePlayer(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	virtual int Play() = 0;
 	virtual void CallBackAtFrames(ieDword cnt, ieDword *frames, ieDword *strrefs) = 0;
 };

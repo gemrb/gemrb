@@ -125,8 +125,6 @@ typedef struct Bundle {
 class BIKPlay : public MoviePlayer {
 
 private:
-	DataStream* str;
-	bool autoFree;
 	bool validVideo;
 	binkheader header;
 	std::vector<binkframe> frames;
@@ -204,7 +202,7 @@ private:
 	void ff_init_scantable(uint8_t *permutation, ScanTable *st, const uint8_t *src_scantable);
 	int video_init(int w, int h);
 	void av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den);
-	int ReadHeader(DataStream *str);
+	int ReadHeader();
 	void DecodeBlock(short *out);
 	int DecodeAudioFrame(void *data, int data_size);
 	inline int get_value(int bundle);
@@ -222,7 +220,6 @@ private:
 	int DecodeVideoFrame(void *data, int data_size);
 	int EndAudio();
 	int EndVideo();
-	int PlayBik(DataStream *stream);
 public:
 	BIKPlay(void);
 	~BIKPlay(void);
