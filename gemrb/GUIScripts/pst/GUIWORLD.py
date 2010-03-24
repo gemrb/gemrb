@@ -27,7 +27,8 @@
 import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import EnableAnimatedWindows, DisableAnimatedWindows, SetEncumbranceButton, SetItemButton, OpenWaitForDiscWindow, GetWindowPack
+from GUICommonWindows import EnableAnimatedWindows, DisableAnimatedWindows, \
+  SetEncumbranceLabels, SetItemButton, OpenWaitForDiscWindow, GetWindowPack
 from GUIClasses import GWindow
 
 ContainerWindow = None
@@ -135,7 +136,7 @@ def UpdateContainerWindow ():
 	Window = ContainerWindow
 
 	pc = GemRB.GameGetFirstSelectedPC ()
-	SetEncumbranceButton (Window, 54, pc)
+	SetEncumbranceLabels (Window, 54, None, pc)
 
 	party_gold = GemRB.GameGetPartyGold ()
 	Text = Window.GetControl (0x10000036)

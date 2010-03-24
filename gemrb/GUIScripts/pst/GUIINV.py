@@ -28,7 +28,7 @@ from ie_stats import *
 from ie_slots import *
 import GemRB
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler, SetEncumbranceButton
+from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler, SetEncumbranceLabels
 
 
 InventoryWindow = None
@@ -188,7 +188,7 @@ def RefreshInventoryWindow ():
 	Button = Window.GetControl (44)
 	Button.SetPicture (GetActorPortrait (pc, 'INVENTORY'))
 
-	SetEncumbranceButton (Window, 46, pc)
+	SetEncumbranceLabels (Window, 46, None, pc)
 
 	# armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)

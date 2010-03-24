@@ -239,8 +239,14 @@ def CheckStat20 (Actor, Stat, Diff):
 		return True
 	return False
 
+def GameIsPST ():
+	return GemRB.GameType == "pst"
+
 def GameIsIWD ():
 	return GemRB.GameType == "iwd"
+
+def GameIsIWD2 ():
+	return GemRB.GameType == "iwd2"
 
 def GameIsBG1 ():
 	return GemRB.GameType == "bg1"
@@ -461,8 +467,9 @@ def LearnPriestSpells (pc, level, mask):
 				GemRB.LearnSpell (pc, spell)
 	return
 
-def SetEncumbranceLabels (Window, LabelID, Label2ID, pc):
-	"""Displays the encumarance as a ratio of current to maximum."""
+# PST uses a button, IWD2 two types, the rest are the same with two labels
+def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
+	"""Displays the encumbrance as a ratio of current to maximum."""
 
 	# Getting the character's strength
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
@@ -472,21 +479,31 @@ def SetEncumbranceLabels (Window, LabelID, Label2ID, pc):
 	max_encumb = StrModTable.GetValue (sstr, 3) + StrModExTable.GetValue (ext_str, 3)
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
 
-	Label = Window.GetControl (LabelID)
-	Label.SetText (str (encumbrance) + ":")
+	Control = Window.GetControl (ControlID)
+	if GameIsPST():
+		# FIXME: there should be a space before LB symbol (':')
+		Control.SetText (str (encumbrance) + ":\n\n\n\n" + str (max_encumb) + ":")
+	elif GameIsIWD2() and not Control2ID:
+		Control.SetText (str (encumbrance) + "/" + str(max_encumb) + GemRB.GetString(39537))
+	else:
+		Control.SetText (str (encumbrance) + ":")
+		if not Control2ID: # shouldn't happen
+			print "Missing second control parameter to SetEncumbranceLabels!"
+			return
+		Control2 = Window.GetControl (Control2ID)
+		Control2.SetText (str (max_encumb) + ":")
 
-	Label2 = Window.GetControl (Label2ID)
-	Label2.SetText (str (max_encumb) + ":")
 	ratio = (0.0 + encumbrance) / max_encumb
 	if ratio > 1.0:
-		Label.SetTextColor (255, 0, 0)
-		Label2.SetTextColor (255, 0, 0)
+		Control.SetTextColor (255, 0, 0)
 	elif ratio > 0.8:
-		Label.SetTextColor (255, 255, 0)
-		Label2.SetTextColor (255, 0, 0)
+		Control.SetTextColor (255, 255, 0)
 	else:
-		Label.SetTextColor (255, 255, 255)
-		Label2.SetTextColor (255, 0, 0)
+		Control.SetTextColor (255, 255, 255)
+
+	if Control2ID:
+		Control2.SetTextColor (255, 0, 0)
+		
 	return
 
 def GetActorClassTitle (actor):
@@ -851,36 +868,9 @@ def LoadCommonTables():
 		RaceTable = GemRB.LoadTableObject ("races")
 	if not NextLevelTable:
 		NextLevelTable = GemRB.LoadTableObject ("xplevel")
-	if not AppearanceAvatarTable:
+	if not AppearanceAvatarTable and GemRB.HasResource("pdolls", RES_2DA):
 		AppearanceAvatarTable = GemRB.LoadTableObject ("pdolls")
 	if not StrModTable:
 		StrModTable = GemRB.LoadTableObject ("strmod")
 		StrModExTable = GemRB.LoadTableObject ("strmodex")
 
-# PST-specific encumbrance
-def SetEncumbranceButton (Window, ButtonID, pc):
-	"""Set current/maximum encumbrance button for a given pc,
-	using numeric font"""
-	
-	# Getting the character's strength
-	sstr = GemRB.GetPlayerStat (pc, IE_STR)
-	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-
-	# Compute encumbrance
-	maximum = StrModTable.GetValue (sstr, 3) + StrModExTable.GetValue (ext_str, 3)
-	current = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
-
-	Button = Window.GetControl (ButtonID)
-	# FIXME: there should be a space before LB symbol (':')
-	Button.SetText (str (current) + ":\n\n\n\n" + str (maximum) + ":")
-
-	# Set button color for overload
-	ratio = (0.0 + current) / maximum
-	if ratio > 1.0:
-		Button.SetTextColor (255, 0, 0, True)
-	elif ratio > 0.8:
-		Button.SetTextColor (255, 255, 0, True)
-	else:
-		Button.SetTextColor (255, 255, 255, True)
-
-	# FIXME: Current encumbrance is hardcoded ??

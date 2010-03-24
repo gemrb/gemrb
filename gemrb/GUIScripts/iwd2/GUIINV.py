@@ -300,25 +300,7 @@ def RefreshInventoryWindow ():
 	Button.SetPicture (GemRB.GetPlayerPortrait (pc,0))
 
 	# encumbrance
-	Label = Window.GetControl (0x10000042)
-	# Loading tables of modifications
-	Table = GemRB.LoadTableObject ("strmod")
-	TableEx = GemRB.LoadTableObject ("strmodex")
-	# Getting the character's strength
-	sstr = GemRB.GetPlayerStat (pc, IE_STR)
-	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-
-	max_encumb = Table.GetValue (sstr, 3) + TableEx.GetValue (ext_str, 3)
-	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
-	Label.SetText (str(encumbrance)+"/"+str(max_encumb)+GemRB.GetString(39537) )
-
-	ratio = (0.0 + encumbrance) / max_encumb
-	if ratio > 1.0:
-		Label.SetTextColor (255, 0, 0)
-	elif ratio > 0.8:
-		Label.SetTextColor (255, 255, 0)
-	else:
-		Label.SetTextColor (0, 255, 0)
+	SetEncumbranceLabels (Window, 0x10000042, None, pc)
 
 	# armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
