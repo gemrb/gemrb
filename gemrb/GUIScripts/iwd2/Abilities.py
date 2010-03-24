@@ -19,7 +19,7 @@
 #
 #character generation, ability (GUICG4)
 import GemRB
-from GUICommon import RaceTable, ClassTable
+from GUICommon import RaceTable, ClassTable, KitListTable
 
 AbilityWindow = 0
 TextAreaControl = 0
@@ -109,9 +109,8 @@ def OnLoad():
 	if Kit == 0:
 		KitName = ClassTable.GetRowName(Class)
 	else:
-		KitList = GemRB.LoadTableObject("kitlist")
 		#rowname is just a number, first value row what we need here
-		KitName = KitList.GetValue(Kit, 0) 
+		KitName = KitListTable.GetValue(Kit, 0) 
 
 	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
 	KitIndex = Abclasrq.GetRowIndex(KitName)
