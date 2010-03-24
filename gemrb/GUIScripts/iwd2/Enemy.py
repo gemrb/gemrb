@@ -19,6 +19,7 @@
 #
 #character generation, racial enemy (GUICG15)
 import GemRB
+from GUICommon import ClassSkillsTable
 
 RaceWindow = 0
 TextAreaControl = 0
@@ -52,8 +53,7 @@ def OnLoad():
 	RaceWindow = GemRB.LoadWindowObject(15)
 
 	Class = GemRB.GetVar("BaseClass")
-	TmpTable = GemRB.LoadTableObject("clskills")
-	TableName = TmpTable.GetValue(Class, 0)
+	TableName = ClassSkillsTable.GetValue(Class, 0)
 	if TableName == "*":
 		GemRB.SetNextScript("Skills")
 		return
