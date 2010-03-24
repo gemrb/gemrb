@@ -843,7 +843,7 @@ def CanDualClass(actor):
 
 def LoadCommonTables():
 	global ClassTable, KitListTable, ClassSkillsTable, RaceTable, NextLevelTable
-	global AppearanceAvatarTable
+	global AppearanceAvatarTable, StrModExTable, StrModTable
 
 	print # so the following output isn't appended to an existing line
 	if not ClassTable:
@@ -858,3 +858,34 @@ def LoadCommonTables():
 		NextLevelTable = GemRB.LoadTableObject ("xplevel")
 	if not AppearanceAvatarTable:
 		AppearanceAvatarTable = GemRB.LoadTableObject ("pdolls")
+	if not StrModTable:
+		StrModTable = GemRB.LoadTableObject ("strmod")
+		StrModExTable = GemRB.LoadTableObject ("strmodex")
+
+# PST-specific encumbrance
+def SetEncumbranceButton (Window, ButtonID, pc):
+	"""Set current/maximum encumbrance button for a given pc,
+	using numeric font"""
+	
+	# Getting the character's strength
+	sstr = GemRB.GetPlayerStat (pc, IE_STR)
+	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
+
+	# Compute encumbrance
+	maximum = StrModTable.GetValue (sstr, 3) + StrModExTable.GetValue (ext_str, 3)
+	current = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
+
+	Button = Window.GetControl (ButtonID)
+	# FIXME: there should be a space before LB symbol (':')
+	Button.SetText (str (current) + ":\n\n\n\n" + str (maximum) + ":")
+
+	# Set button color for overload
+	ratio = (0.0 + current) / maximum
+	if ratio > 1.0:
+		Button.SetTextColor (255, 0, 0, True)
+	elif ratio > 0.8:
+		Button.SetTextColor (255, 255, 0, True)
+	else:
+		Button.SetTextColor (255, 255, 255, True)
+
+	# FIXME: Current encumbrance is hardcoded ??

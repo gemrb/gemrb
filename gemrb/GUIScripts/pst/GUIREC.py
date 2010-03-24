@@ -68,7 +68,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow
+from GUICommon import CloseOtherWindow, StrModTable, StrModExTable
 from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler, RunSelectionChangeHandler
 from GUIWORLD import OpenReformPartyWindow
 
@@ -377,10 +377,6 @@ def OnRecordsHelpStrength ():
 	Window = RecordsWindow
 	TextArea = Window.GetControl (0)
 
-	# Loading tables of modifications
-	Table = GemRB.LoadTableObject("strmod")
-	TableEx = GemRB.LoadTableObject("strmodex")
-
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -388,8 +384,8 @@ def OnRecordsHelpStrength ():
 	s = GemRB.GetPlayerStat (pc, IE_STR)
 	e = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 
-	x = Table.GetValue(s, 0) + TableEx.GetValue(e, 0)
-	y = Table.GetValue(s, 1) + TableEx.GetValue(e, 1)
+	x = StrModTable.GetValue(s, 0) + StrModExTable.GetValue(e, 0)
+	y = StrModTable.GetValue(s, 1) + StrModExTable.GetValue(e, 1)
 	if x==0:
 		x=y
 		y=0

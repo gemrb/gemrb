@@ -483,40 +483,6 @@ def EnableAnimatedWindows ():
 	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
 	GemRB.GamePause (0,1)
 
-
-def SetEncumbranceButton (Window, ButtonID, pc):
-	"""Set current/maximum encumbrance button for a given pc,
-	using numeric font"""
-	
-	# Loading tables of modifications
-	Table = GemRB.LoadTableObject ("strmod")
-	TableEx = GemRB.LoadTableObject ("strmodex")
-	
-	# Getting the character's strength
-	sstr = GemRB.GetPlayerStat (pc, IE_STR)
-	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-
-	# Compute encumbrance
-	maximum = Table.GetValue (sstr, 3) + TableEx.GetValue (ext_str, 3)
-	current = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
-
-	Button = Window.GetControl (ButtonID)
-	# FIXME: there should be a space before LB symbol (':')
-	Button.SetText (str (current) + ":\n\n\n\n" + str (maximum) + ":")
-
-	# Set button color for overload
-	ratio = (0.0 + current) / maximum
-	if ratio > 1.0:
-		Button.SetTextColor (255, 0, 0, True)
-	elif ratio > 0.8:
-		Button.SetTextColor (255, 255, 0, True)
-	else:
-		Button.SetTextColor (255, 255, 255, True)
-
-	# FIXME: Current encumbrance is hardcoded
-	# Unloading tables is not necessary, i think (they will stay cached)
-
-
 def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
 	if Slot != None:
 		Item = GemRB.GetItem (Slot['ItemResRef'])

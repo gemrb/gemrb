@@ -24,6 +24,7 @@
 
 import GemRB
 from ie_stats import *
+from GUICommon import StrModTable, StrModExTable
 
 NewLifeWindow = 0
 QuitWindow = 0
@@ -346,8 +347,6 @@ def YesButton():
 
 def StrPress():
 	TextArea.SetText(18489)
-	Table = GemRB.LoadTableObject("strmod")
-	TableEx = GemRB.LoadTableObject("strmodex")
 	s = Str
 	if s>18:
 		e=extras[s-19]
@@ -355,8 +354,8 @@ def StrPress():
 	else:
 		e=0
 
-	x = Table.GetValue(s,0) + TableEx.GetValue(e,0)
-	y = Table.GetValue(s,1) + TableEx.GetValue(e,1)
+	x = StrModTable.GetValue(s,0) + StrModExTable.GetValue(e,0)
+	y = StrModTable.GetValue(s,1) + StrModExTable.GetValue(e,1)
 	if x==0:
 		x=y
 		y=0
