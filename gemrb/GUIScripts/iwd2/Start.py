@@ -21,6 +21,7 @@
 # 
 import GemRB
 from LoadScreen import *
+from GUICommon import LoadCommonTables
 
 StartWindow = 0
 ProtocolWindow = 0
@@ -91,6 +92,8 @@ def OnLoad():
 	QuickLoadButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "QuickLoadPress")
 	StartWindow.SetVisible(1)
 	GemRB.LoadMusicPL("Theme.mus")
+
+	LoadCommonTables ()
 	return
 
 def ProtocolPress():
