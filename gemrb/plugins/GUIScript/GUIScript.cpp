@@ -2407,7 +2407,7 @@ static PyObject* GemRB_SetButtonTextColor(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, r, g, b, swap = 0;
 
-	if (!PyArg_ParseTuple( args, "iiiiii", &WindowIndex, &ControlIndex, &r, &g, &b, &swap )) {
+	if (!PyArg_ParseTuple( args, "iiiii|i", &WindowIndex, &ControlIndex, &r, &g, &b, &swap )) {
 		return AttributeError( GemRB_SetButtonTextColor__doc );
 	}
 
