@@ -19,7 +19,7 @@
 #
 #character generation, ability (GUICG4)
 import GemRB
-from GUICommon import RaceTable
+from GUICommon import RaceTable, ClassTable
 
 AbilityWindow = 0
 TextAreaControl = 0
@@ -105,7 +105,6 @@ def OnLoad():
 	#enable repeated clicks
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	Kit = GemRB.GetVar("Class Kit")
-	ClassTable = GemRB.LoadTableObject("classes")
 	Class = GemRB.GetVar("Class")-1
 	if Kit == 0:
 		KitName = ClassTable.GetRowName(Class)

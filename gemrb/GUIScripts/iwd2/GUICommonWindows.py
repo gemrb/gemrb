@@ -377,7 +377,6 @@ def GetActorRaceTitle (actor):
 
 # NOTE: this function is called with the primary classes
 def GetKitIndex (actor, ClassIndex):
-	ClassTable = GemRB.LoadTableObject ("classes")
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 
 	KitIndex = -1
@@ -399,7 +398,6 @@ def GetActorClassTitle (actor, ClassIndex):
 		return ClassTitle
 
 	#Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassTable = GemRB.LoadTableObject ("classes")
 	KitIndex = GetKitIndex (actor, ClassIndex)
 	if KitIndex == 0:
 		ClassTitle = ClassTable.GetValue (ClassIndex, 0)

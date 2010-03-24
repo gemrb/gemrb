@@ -20,7 +20,7 @@
 #character generation, skills (GUICG6)
 import GemRB
 from ie_stats import *
-from GUICommon import RaceTable
+from GUICommon import RaceTable, ClassTable
 
 FeatWindow = 0
 TextAreaControl = 0
@@ -199,7 +199,6 @@ def OnLoad():
 	RaceColumn = RaceTable.GetValue(RaceName, "SKILL_COLUMN")
 
 	Class = GemRB.GetVar("Class") - 1
-	ClassTable = GemRB.LoadTableObject("classes")
 	KitName = ClassTable.GetRowName(Class)
 	# classcolumn is base class or 0 if it is not a kit
 	ClassColumn = ClassTable.GetValue(Class, 3) - 1

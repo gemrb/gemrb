@@ -19,6 +19,7 @@
 #
 #character generation, skills (GUICG6)
 import GemRB
+from GUICommon import RaceTable, ClassTable
 
 SkillWindow = 0
 TextAreaControl = 0
@@ -104,7 +105,6 @@ def OnLoad():
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	GemRB.SetVar("Level",1) #for simplicity
 	Class = GemRB.GetVar("Class") - 1
-	ClassTable = GemRB.LoadTableObject("classes")
 	KitName = ClassTable.GetRowName(Class)
 	#classcolumn is base class
 	ClassColumn=GemRB.GetVar("BaseClass") - 1
@@ -122,7 +122,6 @@ def OnLoad():
 	# Humans recieve +2 skill points at level 1 and +1 skill points each level thereafter
 	# Recommend creation of SKILRACE.2da with levels as rows and race names as columns
 	
-	RaceTable = GemRB.LoadTableObject("RACES")
 	RaceName = RaceTable.GetRowName(RaceTable.FindValue(3, GemRB.GetVar('Race')))
 	
 	### Example code for implementation of SKILRACE.2da

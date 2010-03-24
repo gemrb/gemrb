@@ -19,13 +19,12 @@
 #
 #character generation, class (GUICG2)
 import GemRB
-from GUICommon import RaceTable
+from GUICommon import RaceTable, ClassTable
 
 ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
 BackButton = 0
-ClassTable = 0
 ClassCount = 0
 HasSubClass = 0
 ClassID = 0
@@ -56,11 +55,10 @@ def AdjustTextArea():
 
 def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton, BackButton
-	global ClassTable, ClassCount
+	global ClassCount
 
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	#this replaces help02.2da for class restrictions
-	ClassTable = GemRB.LoadTableObject("classes")
 	ClassCount = ClassTable.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindowObject(2)
 	rid = RaceTable.FindValue(3, GemRB.GetVar('BaseRace'))
