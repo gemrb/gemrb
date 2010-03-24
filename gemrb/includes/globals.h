@@ -46,8 +46,6 @@
 #include "errors.h"
 #include "win32def.h"
 #include "SClassID.h"
-#include "../plugins/Core/Class_ID.h"
-#include "../plugins/Core/ClassDesc.h"
 #include "RGBAColor.h"
 #include "../plugins/Core/Region.h"
 #include "../plugins/Core/Sprite2D.h"

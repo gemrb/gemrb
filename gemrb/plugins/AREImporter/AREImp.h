@@ -67,7 +67,6 @@ public:
 	{
 		delete this;
 	}
-	void ReleaseMemory();
 private:
 	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount);
 	CREItem* GetItem();

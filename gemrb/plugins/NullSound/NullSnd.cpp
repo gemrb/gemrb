@@ -112,3 +112,9 @@ void NullSnd::QueueBuffer(int, unsigned short, int, short*, int, int)
 }
 
 
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x96E414D, "Null Sound Driver")
+PLUGIN_CLASS(IE_AUDIO_CLASS_ID, NullSnd)
+END_PLUGIN()

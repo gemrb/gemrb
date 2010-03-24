@@ -156,10 +156,6 @@ TileMap* WEDImp::GetTileMap(TileMap *tm)
 {
 	int usedoverlays;
 
-	if (!core->IsAvailable( IE_TIS_CLASS_ID )) {
-		printf( "[WEDImporter]: No TileSet Importer Available.\n" );
-		return NULL;
-	}
 	if (!overlays.size()) {
 		return NULL;
 	}
@@ -334,3 +330,9 @@ Wall_Polygon **WEDImp::GetWallGroups()
 	return Polygons;
 }
 
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x7486BE7, "WED File Importer")
+PLUGIN_CLASS(IE_WED_CLASS_ID, WEDImp)
+END_PLUGIN()

@@ -144,3 +144,9 @@ void PROImp::GetAreaExtension(ProjectileExtension *e)
 	//we skip the rest
 	str->Seek(188, GEM_CURRENT_POS);
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0xCAD2D64, "PRO File Importer")
+PLUGIN_CLASS(IE_PRO_CLASS_ID, PROImp)
+END_PLUGIN()

@@ -63,8 +63,7 @@ DataFileMgr *INInote = NULL;
 ResRefToStrRef *tracks = NULL;
 int trackcount = 0;
 
-//called from ~Interface
-void AREImp::ReleaseMemory()
+void ReleaseMemory()
 {
 	core->FreeInterface( INInote );
 	INInote = NULL;
@@ -2359,3 +2358,9 @@ int AREImp::PutArea(DataStream *stream, Map *map)
 	return ret;
 }
 
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x145B60F0, "ARE File Importer")
+PLUGIN_CLASS(IE_ARE_CLASS_ID, AREImp)
+PLUGIN_CLEANUP(ReleaseMemory);
+END_PLUGIN()

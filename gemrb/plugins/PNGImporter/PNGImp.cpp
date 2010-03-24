@@ -196,6 +196,12 @@ Sprite2D* PNGImp::GetImage()
 
 	return spr;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x11C3EB12, "PNG File Importer")
+PLUGIN_IE_RESOURCE(&ImageMgr::ID, PNGImp, ".png", (ieWord)IE_PNG_CLASS_ID)
+END_PLUGIN()
 /** No descriptions */
 void PNGImp::GetPalette(int index, int colors, Color* pal)
 {

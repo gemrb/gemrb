@@ -150,7 +150,6 @@ Interface::Interface(int iargc, char* iargv[])
 	InfoTextPalette = NULL;
 	timer = NULL;
 	evntmgr = NULL;
-	opcodemgrs = NULL;
 	console = NULL;
 	slottypes = NULL;
 	slotmatrix = NULL;
@@ -341,12 +340,8 @@ Interface::~Interface(void)
 	delete worldmap;
 
 	FreeAbilityTables();
-	//aww, i'm sure this could be implemented better
-	MapMgr* mm = ( MapMgr* ) GetInterface( IE_ARE_CLASS_ID );
-	if (mm!=NULL) {
-		mm->ReleaseMemory();
-		FreeInterface(mm);
-	}
+	for (size_t i = 0; i < cleanupFunctions.size(); i++)
+		cleanupFunctions[i]();
 
 	ReleaseMemoryActor();
 	EffectQueue_ReleaseMemory();
@@ -453,12 +448,6 @@ Interface::~Interface(void)
 	}
 
 	FreeInterfaceVector( Symbol, symbols, sm );
-
-	if (opcodemgrs) {
-		FreeInterfaceVector( InterfaceElement, *opcodemgrs, mgr );
-		delete opcodemgrs;
-		opcodemgrs=NULL;
-	}
 
 	FreeInterface(INIquests);
 	FreeInterface(INIbeasts);
@@ -1571,16 +1560,6 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing effect opcodes...\n", WHITE );
-	opcodemgrs = GetInterfaceVector(IE_FX_CLASS_ID);
-	if (!opcodemgrs || !opcodemgrs->size()) {
-		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
-	}
-
-	printf("Loaded %d opcode blocks", (int) opcodemgrs->size());
-	printStatus( "OK", LIGHT_GREEN );
-
 	ret = Init_EffectQueue();
 	printMessage( "Core", "Initializing effects...", WHITE );
 	if (!ret) {
@@ -1670,14 +1649,6 @@ void* Interface::GetInterface(SClass_ID filetype) const
 	return plugin->GetPlugin( filetype );
 }
 
-std::vector<InterfaceElement>* Interface::GetInterfaceVector(SClass_ID filetype) const
-{
-	if (!plugin) {
-		return NULL;
-	}
-	return plugin->GetAllPlugin( filetype );
-}
-
 ProjectileServer* Interface::GetProjectileServer() const
 {
 	return projserv;
@@ -1696,6 +1667,11 @@ ResourceMgr* Interface::GetResourceMgr() const
 PluginMgr* Interface::GetPluginMgr() const
 {
 	return plugin;
+}
+
+void Interface::RegisterCleanup(void (*func)(void))
+{
+	cleanupFunctions.push_back(func);
 }
 
 const char* Interface::TypeExt(SClass_ID type) const
@@ -1844,7 +1820,7 @@ char* Interface::GetString(ieStrRef strref, ieDword options) const
 	return strings->GetString( strref, flags | options );
 }
 
-void Interface::FreeInterface(void* ptr)
+void Interface::FreeInterface(Plugin* ptr)
 {
 	plugin->FreePlugin( ptr );
 }

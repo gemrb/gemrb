@@ -34,7 +34,6 @@
 class DataStream;
 
 /**
- * @class Resource
  * Base class for all GemRB resources
  */
 
@@ -43,21 +42,18 @@ protected:
 	DataStream* str;
 	bool autoFree;
 public:
-	Resource(void);
-	virtual ~Resource(void);
+	Resource();
+	virtual ~Resource();
+	/**
+	 * Reads the resource from the given stream.
+	 *
+	 * This should only be called once for a given resource object.
+	 * @param[in] stream Stream containg the resource
+	 * @param[in] autoFree If set to true, the resource deletes the stream on destruction.
+	 * @retval true stream contains the given resource.
+	 * @retval false stream does not contain valid resource.
+	 */
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 };
-
-template <typename Res>
-Resource* CreateResource(DataStream *str)
-{
-	Res *res = new Res();
-	if (res->Open(str)) {
-		return res;
-	} else {
-		delete res;
-		return NULL;
-	}
-}
 
 #endif

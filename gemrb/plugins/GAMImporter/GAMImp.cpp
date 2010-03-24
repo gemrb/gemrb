@@ -1134,3 +1134,9 @@ int GAMImp::PutGame(DataStream *stream, Game *game)
 
 	return 0;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0xD7F7040, "GAM File Importer")
+PLUGIN_CLASS(IE_GAM_CLASS_ID, GAMImp)
+END_PLUGIN()

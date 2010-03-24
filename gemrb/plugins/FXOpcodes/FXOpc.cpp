@@ -35,7 +35,6 @@
 #include "../Core/TileMap.h" //needs for knock!
 #include "../Core/GSUtils.h" //needs for MoveBetweenAreasCore
 #include "../Core/Projectile.h" //needs for clearair
-#include "FXOpc.h"
 
 //FIXME: find a way to handle portrait icons better
 #define PI_CONFUSED  3
@@ -755,15 +754,7 @@ static EffectRef effectnames[] = {
 	{ NULL, NULL, 0 },
 };
 
-
-FXOpc::FXOpc(void)
-{
-	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
-	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
-	default_spell_hit.SequenceFlags|=IE_VVC_BAM;
-}
-
-FXOpc::~FXOpc(void)
+static void Cleanup()
 {
 	core->FreeResRefTable(casting_glows, cgcount);
 	core->FreeResRefTable(spell_hits, shcount);
@@ -772,6 +763,15 @@ FXOpc::~FXOpc(void)
 	if(polymorph_stats) free(polymorph_stats);
 	polymorph_stats=NULL;
 }
+
+void RegisterCoreOpcodes()
+{
+	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
+	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
+	default_spell_hit.SequenceFlags|=IE_VVC_BAM;
+	core->RegisterCleanup(Cleanup);
+}
+
 
 static inline void SetGradient(Actor *target, ieDword gradient)
 {
@@ -6152,3 +6152,9 @@ int fx_unknown (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	printf( "fx_unknown (%2d): P1: %d P2: %d ResRef: %s\n", fx->Opcode, fx->Parameter1, fx->Parameter2, fx->Resource );
 	return FX_NOT_APPLIED;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x1AAA040A, "Effect opcodes for core games")
+RegisterCoreOpcodes();
+END_PLUGIN()

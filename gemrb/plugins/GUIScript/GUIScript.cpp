@@ -44,6 +44,7 @@
 #include "../Core/WorldMap.h"
 #include "../Core/EffectQueue.h"
 #include "../Core/ImageFactory.h"
+#include "../Core/ResourceDesc.h"
 
 #include <cstdio>
 
@@ -9892,3 +9893,9 @@ PyObject* GUIScript::ConstructObject(const char* classname, PyObject* pArgs)
 	}
 	return ret;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x1B01BE6B, "GUI Script Engine (Python)")
+PLUGIN_CLASS(IE_GUI_SCRIPT_CLASS_ID, GUIScript)
+END_PLUGIN()

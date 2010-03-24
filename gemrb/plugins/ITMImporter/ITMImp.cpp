@@ -247,3 +247,9 @@ void ITMImp::GetFeature(Effect *fx)
 	eM->GetEffect( fx );
 	core->FreeInterface( eM );
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0xD913A54, "ITM File Importer")
+PLUGIN_CLASS(IE_ITM_CLASS_ID, ITMImp)
+END_PLUGIN()

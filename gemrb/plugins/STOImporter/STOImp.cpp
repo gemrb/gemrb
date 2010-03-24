@@ -399,3 +399,9 @@ int STOImp::PutStore(DataStream *stream, Store *store)
 
 	return ret;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x1CDFC160, "STO File Importer")
+PLUGIN_CLASS(IE_STO_CLASS_ID, STOImp)
+END_PLUGIN()

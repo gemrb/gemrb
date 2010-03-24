@@ -231,3 +231,9 @@ void MVEPlay::queueBuffer(int stream, unsigned short bits,
 		core->GetAudioDrv()->QueueBuffer(stream, bits, channels, memory, size, samplerate) ;
 }
 
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x218963DC, "MVE Video Player")
+PLUGIN_CLASS(IE_MVE_CLASS_ID, MVEPlay)
+END_PLUGIN()

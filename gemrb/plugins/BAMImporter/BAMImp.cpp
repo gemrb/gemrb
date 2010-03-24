@@ -379,3 +379,9 @@ Sprite2D* BAMImp::GetPalette()
 	}
 	return core->GetVideoDriver()->CreateSprite8( 16, 16, 8, pixels, palette->col, false );
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x3AD6427A, "BAM File Importer")
+PLUGIN_CLASS(IE_BAM_CLASS_ID, BAMImp)
+END_PLUGIN()

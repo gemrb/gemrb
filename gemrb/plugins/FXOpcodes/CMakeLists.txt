@@ -1,3 +1,3 @@
-ADD_GEMRB_PLUGIN (FXOpcodes FXOpc.cpp FXOpcodesCD.cpp FXOpcodes.cpp)
+ADD_GEMRB_PLUGIN (FXOpcodes FXOpc.cpp)
 
 INSTALL( TARGETS FXOpcodes DESTINATION ${PLUGIN_INSTALL_DIR} )

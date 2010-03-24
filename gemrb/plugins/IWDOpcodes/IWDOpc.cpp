@@ -31,7 +31,6 @@
 #include "../Core/damages.h"
 #include "../Core/GSUtils.h" //needs for displaystringcore
 #include "../Core/ProjectileServer.h" //needs for alter_animation
-#include "IWDOpc.h"
 
 static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
 
@@ -350,20 +349,7 @@ struct IWDIDSEntry {
 static int spellrescnt = -1;
 static IWDIDSEntry *spellres = NULL;
 
-IWDOpc::IWDOpc(void)
-{
-	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
-	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
-	//create enemy trigger object for enemy in line of sight check
-	if (!Enemy) {
-		Enemy = new Trigger;
-		Object *o = new Object;
-		Enemy->objectParameter = o;
-		o->objectFields[0]=EA_ENEMY;
-	}
-}
-
-IWDOpc::~IWDOpc(void)
+static void Cleanup()
 {
 	if (Enemy) {
 		delete Enemy;
@@ -377,6 +363,20 @@ IWDOpc::~IWDOpc(void)
 	if (spellres) {
 		free (spellres);
 	}
+}
+
+void RegisterIWDOpcodes()
+{
+	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
+	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
+	//create enemy trigger object for enemy in line of sight check
+	if (!Enemy) {
+		Enemy = new Trigger;
+		Object *o = new Object;
+		Enemy->objectParameter = o;
+		o->objectFields[0]=EA_ENEMY;
+	}
+	core->RegisterCleanup(Cleanup);
 }
 
 //iwd got a weird targeting system
@@ -3226,3 +3226,9 @@ int fx_rapid_shot (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//TODO:
 	return FX_APPLIED;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x4F172B2, "Effect opcodes for the icewind branch of the games")
+RegisterIWDOpcodes();
+END_PLUGIN()

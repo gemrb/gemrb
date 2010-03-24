@@ -413,3 +413,10 @@ ImageFactory* BMPImp::GetImageFactory(const char* ResRef)
 	ImageFactory* fact = new ImageFactory( ResRef, GetImage() );
 	return fact;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0xD768B1, "BMP File Reader")
+PLUGIN_CLASS(IE_BMP_CLASS_ID, BMPImp)
+PLUGIN_IE_RESOURCE(&ImageMgr::ID, BMPImp, ".bmp", (ieWord)IE_BMP_CLASS_ID)
+END_PLUGIN()

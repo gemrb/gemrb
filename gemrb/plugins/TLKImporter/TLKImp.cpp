@@ -567,3 +567,9 @@ void TLKImp::FreeString(char *str)
 	free(str);
 }
 
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0xBB6F380, "TLK File Importer")
+PLUGIN_CLASS(IE_TLK_CLASS_ID, TLKImp)
+END_PLUGIN()

@@ -156,3 +156,9 @@ bool INIImp::GetKeyAsBool(const char* Tag, const char* Key,
 	}
 	return Default;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0xB62F6D7, "INI File Importer")
+PLUGIN_CLASS(IE_INI_CLASS_ID, INIImp)
+END_PLUGIN()

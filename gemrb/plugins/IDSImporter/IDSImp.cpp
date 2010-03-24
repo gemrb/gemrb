@@ -149,3 +149,9 @@ int IDSImp::FindValue(int val)
 	return -1;
 }
 
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x1F41B94C, "IDS File Importer")
+PLUGIN_CLASS(IE_IDS_CLASS_ID, IDSImp)
+END_PLUGIN()

@@ -112,8 +112,15 @@ Sprite2D* PLTImp::GetImage()
 	spr->YPos = 0;
 	return spr;
 }
+
 /** Set Palette color Hack */
 void PLTImp::GetPalette(int index, int colors, Color* /*pal*/)
 {
 	palIndices[pperm[index]] = colors;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x8D0C64F, "PLT File Importer")
+PLUGIN_IE_RESOURCE(&ImageMgr::ID, PLTImp, ".plt", (ieWord)IE_PLT_CLASS_ID)
+END_PLUGIN()

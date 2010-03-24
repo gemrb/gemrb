@@ -4,8 +4,6 @@ libBIKPlayer_la_LDFLAGS = -module -version-info 0:0:0 @LIBPTHREAD@
 libBIKPlayer_la_METASOURCES = AUTO
 libBIKPlayer_la_SOURCES = \
 	BIKPlay.cpp \
-	BIKPlayer.cpp \
-	BIKPlayerDesc.cpp \
 	GetBitContext.cpp \
 	dct.cpp \
 	fft.cpp \
@@ -13,4 +11,4 @@ libBIKPlayer_la_SOURCES = \
 	rational.cpp \
 	mem.cpp
 
-noinst_HEADERS = BIKPlay.h BIKPlayerDesc.h GetBitContext.h binkdata.h common.h rational.h dsputil.h
+noinst_HEADERS = BIKPlay.h GetBitContext.h binkdata.h common.h rational.h dsputil.h

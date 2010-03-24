@@ -152,6 +152,12 @@ Sprite2D* MOSImp::GetImage()
 		pixels, true, green_mask );
 	return ret;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x167B73E, "MOS File Importer")
+PLUGIN_IE_RESOURCE(&ImageMgr::ID, MOSImp, ".mos", (ieWord)IE_MOS_CLASS_ID)
+END_PLUGIN()
 /** No descriptions */
 void MOSImp::GetPalette(int /*index*/, int /*colors*/, Color* /*pal*/)
 {

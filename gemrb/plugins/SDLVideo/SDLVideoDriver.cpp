@@ -2447,3 +2447,8 @@ void SDLVideoDriver::SetGamma(int brightness, int /*contrast*/)
 	SDL_SetGamma(0.8+brightness/50.0,0.8+brightness/50.0,0.8+brightness/50.0);
 }
 
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0xDBAAB50, "SDL Video Driver")
+PLUGIN_CLASS(IE_VIDEO_CLASS_ID, SDLVideoDriver)
+END_PLUGIN()

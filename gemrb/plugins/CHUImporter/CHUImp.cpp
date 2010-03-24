@@ -507,3 +507,9 @@ unsigned int CHUImp::GetWindowsCount()
 {
 	return WindowCount;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x23A7F6CA, "CHU File Importer")
+PLUGIN_CLASS(IE_CHU_CLASS_ID, CHUImp)
+END_PLUGIN()

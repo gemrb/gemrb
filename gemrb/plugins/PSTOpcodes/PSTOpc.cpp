@@ -27,8 +27,6 @@
 #include "../Core/Interface.h"
 #include "../Core/Video.h" //for tints
 #include "../Core/TileMap.h"
-#include "PSTOpc.h"
-
 
 int fx_set_status (Scriptable* Owner, Actor* target, Effect* fx);//ba
 int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx);//bb
@@ -79,13 +77,9 @@ static EffectRef effectnames[] = {
 	{ NULL, NULL, 0 },
 };
 
-PSTOpc::PSTOpc(void)
+void RegisterTormentOpcodes()
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
-}
-
-PSTOpc::~PSTOpc(void)
-{
 }
 
 //0xba fx_set_status
@@ -553,3 +547,9 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET( IE_SPELLFAILUREINNATE, 100);
 	return FX_APPLIED;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x115A670, "Effect opcodes for the torment branch of the games")
+RegisterTormentOpcodes();
+END_PLUGIN()

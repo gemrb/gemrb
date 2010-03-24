@@ -181,3 +181,9 @@ void SPLImp::GetFeature(Spell *s, Effect *fx)
 	fx->SecondaryType = s->SecondaryType;
 	core->FreeInterface( eM );
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0xA8D1014, "SPL File Importer")
+PLUGIN_CLASS(IE_SPL_CLASS_ID, SPLImp)
+END_PLUGIN()

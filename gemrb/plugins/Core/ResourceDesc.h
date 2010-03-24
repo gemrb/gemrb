@@ -30,6 +30,9 @@ class Resource;
 class DataStream;
 class TypeID;
 
+/**
+ * Class that describes a plugin resource type.
+ */
 class GEM_EXPORT ResourceDesc {
 public:
 	typedef Resource* (*CreateFunc)(DataStream*);
@@ -37,13 +40,22 @@ private:
 	const TypeID *type;
 	const char *ext;
 	ieWord keyType; // IE Specific
+	CreateFunc create;
 public:
+	/**
+	 * Create resource descriptor.
+	 *
+	 * @param[in] type Base class for resource.
+	 * @param[in] create Function to create resource from a stream.
+	 * @param[in] ext Extension used for resource files.
+	 * @param[in] keyType \iespecific Type identifier used in key/biff files.
+	 */
 	ResourceDesc(const TypeID* type, CreateFunc create, const char *ext, ieWord keyType = 0);
 	~ResourceDesc(void);
-	const char* GetExt();
-	const TypeID* GetType();
-	ieWord GetKeyType();
-	const CreateFunc Create;
+	const char* GetExt() const;
+	const TypeID* GetType() const;
+	ieWord GetKeyType() const;
+	Resource* Create(DataStream*) const;
 };
 
 #endif

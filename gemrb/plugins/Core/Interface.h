@@ -29,7 +29,6 @@
 
 #include "../../includes/exports.h"
 #include <map>
-#include "InterfaceDesc.h"
 #include "../../includes/SClassID.h"
 #include "Cache.h"
 #include "GlobalTimer.h"
@@ -68,7 +67,6 @@ class Game;
 class WorldMap;
 class WorldMapArray;
 class GameControl;
-class OpcodeMgr;
 class Window;
 class CREItem;
 class Store;
@@ -81,6 +79,7 @@ class Control;
 class Palette;
 class ProjectileServer;
 class Calendar;
+class Plugin;
 
 struct Symbol {
 	SymbolMgr * sm;
@@ -232,7 +231,7 @@ enum PluginFlagsType {
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
  */
 
-class GEM_EXPORT Interface : public InterfaceDesc
+class GEM_EXPORT Interface
 {
 private:
 	PluginMgr * plugin;
@@ -250,8 +249,6 @@ private:
 	Window* ModalWindow;
 	char WindowPack[10];
 	ScriptEngine * guiscript;
-	//OpcodeMgr * opcodemgr;
-	std::vector<InterfaceElement> *opcodemgrs;
 	SaveGameIterator *sgiterator;
 	/** Windows Array */
 	std::vector<Window*> windows;
@@ -303,6 +300,8 @@ private:
 	// Scrolling speed
 	int mousescrollspd;
 	bool update_scripts;
+	/** Array of cleanup functions */
+	std::vector<void (*)(void)> cleanupFunctions;
 public:
 	StringMgr *strings;
 	GlobalTimer * timer;
@@ -337,19 +336,20 @@ public:
 	ieDword HasFeature(int position) const;
 	bool IsAvailable(SClass_ID filetype) const;
 	void * GetInterface(SClass_ID filetype) const;
-	std::vector<InterfaceElement>* GetInterfaceVector(SClass_ID filetype) const;
 	const char * TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const;
 	Video * GetVideoDriver() const;
 	ResourceMgr * GetResourceMgr() const;
 	PluginMgr* GetPluginMgr() const;
+	/** Register cleanup function */
+	void RegisterCleanup(void (*)(void));
 	/* create or change a custom string */
 	ieStrRef UpdateString(ieStrRef strref, const char *text) const;
 	/* returns a newly created string */
 	char * GetString(ieStrRef strref, ieDword options = 0) const;
 	/* makes sure the string is freed in TLKImp */
 	void FreeString(char *&str) const;
-	void FreeInterface(void * ptr);
+	void FreeInterface(Plugin * ptr);
 	/* sets the floattext color */
 	void SetInfoTextColor(Color &color);
 	/** returns a gradient set */

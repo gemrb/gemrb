@@ -22,7 +22,7 @@
 #include "ResourceDesc.h"
 
 ResourceDesc::ResourceDesc(const TypeID* type, CreateFunc create, const char *ext, ieWord keyType)
-	: type(type), ext(ext), keyType(keyType), Create(create)
+	: type(type), ext(ext), keyType(keyType), create(create)
 {
 }
 
@@ -30,17 +30,22 @@ ResourceDesc::~ResourceDesc(void)
 {
 }
 
-const char* ResourceDesc::GetExt()
+const char* ResourceDesc::GetExt() const
 {
 	return ext;
 }
 
-const TypeID* ResourceDesc::GetType()
+const TypeID* ResourceDesc::GetType() const
 {
 	return type;
 }
 
-ieWord ResourceDesc::GetKeyType()
+ieWord ResourceDesc::GetKeyType() const
 {
 	return keyType;
+}
+
+Resource* ResourceDesc::Create(DataStream *stream) const
+{
+	return create(stream);
 }

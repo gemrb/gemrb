@@ -162,3 +162,9 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 
 	return fx;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x14E81128, "EFF File Importer")
+PLUGIN_CLASS(IE_EFF_CLASS_ID, EFFImp)
+END_PLUGIN()

@@ -111,3 +111,9 @@ bool p2DAImp::Open(DataStream* stream, bool autoFree)
 	}
 	return true;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0xB22F938, "2DA File Importer")
+PLUGIN_CLASS(IE_2DA_CLASS_ID, p2DAImp)
+END_PLUGIN()

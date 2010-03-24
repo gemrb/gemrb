@@ -315,3 +315,9 @@ bool MUSImp::CurrentPlayList(const char* name) {
 	return false;
 }
 
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x2DCB9E8, "MUS File Importer")
+PLUGIN_CLASS(IE_MUS_CLASS_ID, MUSImp)
+END_PLUGIN()

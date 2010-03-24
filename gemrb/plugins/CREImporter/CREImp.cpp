@@ -3030,3 +3030,9 @@ int CREImp::PutActor(DataStream *stream, Actor *actor, bool chr)
 	}
 	return 0;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0xE507B60, "CRE File Importer")
+PLUGIN_CLASS(IE_CRE_CLASS_ID, CREImp)
+END_PLUGIN()

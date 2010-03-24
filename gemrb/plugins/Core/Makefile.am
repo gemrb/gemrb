@@ -55,7 +55,6 @@ libgemrb_core_la_SOURCES = \
 	MemoryStream.cpp \
 	MapMgr.cpp \
 	Map.cpp \
-	InterfaceDesc.cpp \
 	Interface.cpp \
 	GameData.cpp \
 	ImageMgr.cpp \
@@ -68,8 +67,6 @@ libgemrb_core_la_SOURCES = \
 	Core.cpp \
 	Control.cpp \
 	Compressor.cpp \
-	Class_ID.cpp \
-	ClassDesc.cpp \
 	CharAnimations.cpp \
 	CachedFileStream.cpp \
 	Button.cpp \
@@ -99,7 +96,6 @@ libgemrb_core_la_SOURCES = \
 	Cache.cpp \
 	ControlAnimation.cpp \
 	EffectMgr.cpp \
-	OpcodeMgr.cpp \
 	SpriteCover.cpp \
 	PCStatStruct.cpp \
 	Palette.cpp \

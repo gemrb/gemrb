@@ -39,8 +39,10 @@
 #include <dlfcn.h>
 #endif
 
-typedef char*(* charvoid)(void);
-typedef ClassDesc*(* cdvoid)(PluginMgr*);
+typedef const char* (*Version_t)(void);
+typedef const char* (*Description_t)(void);
+typedef PluginID (*ID_t)();
+typedef bool (* Register_t)(PluginMgr*);
 
 #ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
 #include <assert.h>
@@ -79,10 +81,6 @@ PluginMgr::PluginMgr(char* pluginpath)
 	if (! FindFiles( path, files ))
 		return;
 	
-	charvoid LibVersion;
-	charvoid LibDescription;
-	cdvoid LibClassDesc;
-
 	//Iterate through all the available modules to load
 	int file_count = files.size (); // keeps track of first-pass files
 	while (! files.empty()) {
@@ -126,6 +124,7 @@ PluginMgr::PluginMgr(char* pluginpath)
 #else
 		// Note: the RTLD_GLOBAL is necessary to export symbols to modules
 		//       which python may have to dlopen (-wjp, 20060716)
+		// (to reproduce, try 'import bz2' or another .so module)
 		void* hMod = dlopen( path, RTLD_NOW | RTLD_GLOBAL ); 
 #endif
 		if (hMod == NULL) {
@@ -138,10 +137,11 @@ PluginMgr::PluginMgr(char* pluginpath)
 		printStatus( "OK", LIGHT_GREEN );
 		//using C bindings, so we don't need to jump through extra hoops
 		//with the symbol name
-		LibVersion = ( charvoid ) GET_PLUGIN_SYMBOL( hMod, "LibVersion" );
-		LibDescription = ( charvoid ) GET_PLUGIN_SYMBOL( hMod, "LibDescription" );
-		LibClassDesc = ( cdvoid ) GET_PLUGIN_SYMBOL( hMod, "LibClassDesc" );
-		
+		Version_t LibVersion = ( Version_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Version" );
+		Description_t Description = ( Description_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Description" );
+		ID_t ID = ( ID_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_ID" );
+		Register_t Register = ( Register_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Register" );
+
 		printMessage( "PluginMgr", "Checking Plugin Version...", WHITE );
 		if (LibVersion==NULL) {
 			printStatus( "ERROR", LIGHT_RED );
@@ -155,41 +155,30 @@ PluginMgr::PluginMgr(char* pluginpath)
 			FREE_PLUGIN( hMod );
 			continue;
 		}
+
+		PluginDesc desc = { hMod, ID(), Description(), Register };
+
 		printStatus( "OK", LIGHT_GREEN );
 		printMessage( "PluginMgr", "Loading Exports for ", WHITE );
 		textcolor( LIGHT_WHITE );
-		printf( "%s", LibDescription() );
+		printf( "%s", desc.Description );
 		textcolor( WHITE );
 		printf( "..." );
 		printStatus( "OK", LIGHT_GREEN );
-		bool error = false;
-		ClassDesc* plug = LibClassDesc(this);
-		if (plug == NULL) {
-			printMessage( "PluginMgr", "Plug-in Exports Error! ", WHITE );
-			printStatus( "ERROR", LIGHT_RED );
-			continue;
-		} 
-		for (unsigned int x = 0; x < plugins.size(); x++) {
-			if (plugins[x]->ClassID() == plug->ClassID()) {
-				printMessage( "PluginMgr", "Plug-in Already Loaded! ", WHITE );
-				printStatus( "SKIPPING", YELLOW );
-				error = true;
-				break;
-			}
-
-			if (plugins[x]->SuperClassID() == plug->SubClassID()) {
-				printMessage( "PluginMgr", "Duplicate Plug-in! ", WHITE );
-				printStatus( "SKIPPING", YELLOW );
-				error = true;
-				break;
-			}
-		}
-		if (error) {
+		if (libs.find(desc.ID) != libs.end()) {
+			printMessage( "PluginMgr", "Plug-in Already Loaded! ", WHITE );
+			printStatus( "SKIPPING", YELLOW );
 			FREE_PLUGIN( hMod );
 			continue;
 		}
-		plugins.push_back( plug );
-		libs.push_back( hMod );
+		if (desc.Register != NULL) {
+			if (!desc.Register(this)) {
+				printMessage( "PluginMgr", "Plug-in Registration Failed! Perhaps a duplicate? ", WHITE );
+				printStatus( "SKIPPING", YELLOW );
+				FREE_PLUGIN( hMod );
+			}
+		}
+		libs[desc.ID] = desc;
 	}
 }
 
@@ -255,57 +244,37 @@ PluginMgr::FindFiles( char* path, std::list<char*> &files )
 
 bool PluginMgr::IsAvailable(SClass_ID plugintype) const
 {
-	for (unsigned int i = 0; i < plugins.size(); i++) {
-		if (plugins[i]->SuperClassID() == plugintype) {
-			return true;
-		}
-	}
-	return false;
+	return plugins.find(plugintype) != plugins.end();
 }
 
-void* PluginMgr::GetPlugin(SClass_ID plugintype) const
+Plugin* PluginMgr::GetPlugin(SClass_ID plugintype) const
 {
-	if (!&plugins) {
-		return NULL;
-	}
-	size_t plugs = plugins.size();
-	while (plugs--) {
-		if (plugins[plugs]->SuperClassID() == plugintype) {
-			return ( plugins[plugs] )->Create();
-		}
-	}
+	std::map<SClass_ID, PluginFunc>::const_iterator iter = plugins.find(plugintype);
+	if (iter != plugins.end())
+		return iter->second();
 	return NULL;
 }
 
-std::vector<InterfaceElement> *PluginMgr::GetAllPlugin(SClass_ID plugintype) const
-{
-	if (!&plugins) {
-		return NULL;
-	}
-	std::vector<InterfaceElement> *ret = new std::vector<InterfaceElement>;
-
-	size_t plugs = plugins.size();
-	while (plugs--) {
-		if (plugins[plugs]->SubClassID() == plugintype) {
-			InterfaceElement tmp={( plugins[plugs] )->Create(), tmp.mgr==NULL};
-			ret->push_back( tmp );
-		}
-	}
-	return ret;
-}
-
-void PluginMgr::FreePlugin(void* ptr)
+void PluginMgr::FreePlugin(Plugin* ptr)
 {
 	if (ptr)
-		( ( Plugin * ) ptr )->release();
+		ptr->release();
 }
 
-void PluginMgr::AddResourceDesc(ResourceDesc* rd)
+bool PluginMgr::RegisterPlugin(SClass_ID id, PluginFunc create)
 {
-	resources[rd->GetType()].push_back(rd);
+	if (plugins.find(id) != plugins.end())
+		return false;
+	plugins[id] = create;
+	return true;
 }
 
-const std::vector<ResourceDesc*>& PluginMgr::GetResourceDesc(const TypeID* type)
+void PluginMgr::RegisterResource(const TypeID* type, ResourceFunc create, const char *ext, ieWord keyType)
+{
+	resources[type].push_back(ResourceDesc(type,create,ext,keyType));
+}
+
+const std::vector<ResourceDesc>& PluginMgr::GetResourceDesc(const TypeID* type)
 {
 	return resources[type];
 }

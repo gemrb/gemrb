@@ -316,3 +316,9 @@ int WMPImp::PutMaps(DataStream *stream, WorldMapArray *wmap)
 	}
 	return 0;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x77918C6, "WMP File Importer")
+PLUGIN_CLASS(IE_WMP_CLASS_ID, WMPImp)
+END_PLUGIN()

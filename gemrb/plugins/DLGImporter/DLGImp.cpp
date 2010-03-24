@@ -336,3 +336,9 @@ char** DLGImp::GetStrings(char* string, unsigned int& count)
 	}
 	return strings;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x1970D894, "DLG File Importer")
+PLUGIN_CLASS(IE_DLG_CLASS_ID, DLGImp)
+END_PLUGIN()

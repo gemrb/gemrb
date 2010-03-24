@@ -1609,3 +1609,9 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 	}
 	return 0;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x316E2EDE, "BIK Video Player")
+PLUGIN_CLASS(IE_MVE_CLASS_ID, BIKPlay)
+END_PLUGIN()

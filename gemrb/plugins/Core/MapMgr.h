@@ -48,8 +48,6 @@ public:
 
 	virtual int GetStoredFileSize(Map *map) = 0;
 	virtual int PutArea(DataStream* stream, Map *map) = 0;
-	/** this function frees some memory common for all MapMgr */
-	virtual void ReleaseMemory() = 0;
 };
 
 #endif

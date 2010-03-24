@@ -136,3 +136,9 @@ Sprite2D* TISImp::GetTile(int index)
 	spr->XPos = spr->YPos = 0;
 	return spr;
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x19F91578, "TIS File Importer")
+PLUGIN_CLASS(IE_TIS_CLASS_ID, TISImp)
+END_PLUGIN()

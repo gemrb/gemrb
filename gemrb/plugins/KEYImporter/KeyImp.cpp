@@ -36,10 +36,10 @@
 
 #define SHARED_OVERRIDE "shared"
 
-static void PrintPossibleFiles(const char* resname, const std::vector<ResourceDesc*> types)
+static void PrintPossibleFiles(const char* resname, const std::vector<ResourceDesc> types)
 {
 	for (size_t j = 0; j < types.size(); j++) {
-		printf("%.8s%s ", resname, types[j]->GetExt());
+		printf("%.8s%s ", resname, types[j].GetExt());
 	}
 }
 
@@ -328,19 +328,19 @@ bool KeyImp::HasResource(const char* resname, SClass_ID type, bool silent)
 	return false;
 }
 
-bool KeyImp::HasResource(const char* resname, std::vector<ResourceDesc*> types, bool silent)
+bool KeyImp::HasResource(const char* resname, std::vector<ResourceDesc> types, bool silent)
 {
 	if (types.size() == 0)
 		return false;
 	for (size_t i = 0; i < searchPath.size(); i++) {
 		for (size_t j = 0; j < types.size(); j++) {
-			if (FindIn( searchPath[i].path, resname, types[j]->GetExt() )) return true;
+			if (FindIn( searchPath[i].path, resname, types[j].GetExt() )) return true;
 		}
 	}
 
 	unsigned int ResLocator;
 	for (size_t j = 0; j < types.size(); j++) {
-		if (resources.Lookup( resname, types[j]->GetKeyType(), ResLocator )) {
+		if (resources.Lookup( resname, types[j].GetKeyType(), ResLocator )) {
 			return true;
 		}
 	}
@@ -442,8 +442,7 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type, bool silent
 	return NULL;
 }
 
-
-Resource* KeyImp::GetResource(const char* resname, const std::vector<ResourceDesc*> &types, bool silent)
+Resource* KeyImp::GetResource(const char* resname, const std::vector<ResourceDesc> &types, bool silent)
 {
 	if (!strcmp(resname, "")) return NULL;
 
@@ -452,13 +451,13 @@ Resource* KeyImp::GetResource(const char* resname, const std::vector<ResourceDes
 	FileStream *fs;
 	for (size_t i = 0; i < searchPath.size(); i++) {
 		for (size_t j = 0; j < types.size(); j++) {
-			fs=SearchIn( searchPath[i].path, resname, types[j]->GetExt());
+			fs=SearchIn( searchPath[i].path, resname, types[j].GetExt());
 			if (fs) {
-				Resource * res = types[j]->Create(fs);
+				Resource * res = types[j].Create(fs);
 				if (res) {
 					if (!silent) {
 						printMessage( "KEYImporter", "Searching for ", WHITE );
-						printf( "%.8s%s... ", resname, types[j]->GetExt() );
+						printf( "%.8s%s... ", resname, types[j].GetExt() );
 						printBracket(searchPath[i].description, LIGHT_GREEN);
 						printf("\n");
 					}
@@ -472,12 +471,12 @@ Resource* KeyImp::GetResource(const char* resname, const std::vector<ResourceDes
 	char path[_MAX_PATH];
 
 	for (size_t j = 0; j < types.size(); j++) {
-		if (resources.Lookup( resname, types[j]->GetKeyType(), ResLocator )) {
+		if (resources.Lookup( resname, types[j].GetKeyType(), ResLocator )) {
 			int bifnum = ( ResLocator & 0xFFF00000 ) >> 20;
 
 			if (!silent) {
 				printMessage( "KEYImporter", "Searching for ", WHITE );
-				printf( "%.8s%s... ", resname, types[j]->GetExt() );
+				printf( "%.8s%s... ", resname, types[j].GetExt() );
 			}
 
 			strcpy( path, biffiles[bifnum].path );
@@ -496,13 +495,13 @@ Resource* KeyImp::GetResource(const char* resname, const std::vector<ResourceDes
 				core->FreeInterface( ai );
 				return NULL;
 			}
-			DataStream* ret = ai->GetStream( ResLocator, types[j]->GetKeyType(), silent );
+			DataStream* ret = ai->GetStream( ResLocator, types[j].GetKeyType(), silent );
 			core->FreeInterface( ai );
 			if (ret) {
 				strnlwrcpy( ret->filename, resname, 8 );
-				strcat( ret->filename, types[j]->GetExt() );
+				strcat( ret->filename, types[j].GetExt() );
 
-				return types[j]->Create(ret);
+				return types[j].Create(ret);
 			}
 		}
 	}
@@ -564,3 +563,9 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 		return NULL;
 	}
 }
+
+#include "../../includes/plugindef.h"
+
+GEMRB_PLUGIN(0x1DFDEF80, "KEY File Importer")
+PLUGIN_CLASS(IE_KEY_CLASS_ID, KeyImp)
+END_PLUGIN()
