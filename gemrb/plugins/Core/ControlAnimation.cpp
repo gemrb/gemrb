@@ -22,7 +22,6 @@
 #include "../../includes/win32def.h"
 #include "ControlAnimation.h"
 #include "Interface.h"
-#include "ResourceMgr.h"
 #include "Video.h"      /* needed only for paperdoll palettes */
 #include "Palette.h"    /* needed only for paperdoll palettes */
 #include "Button.h"

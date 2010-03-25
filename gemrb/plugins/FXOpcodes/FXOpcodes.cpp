@@ -27,7 +27,6 @@
 #include "../Core/Actor.h"
 #include "../Core/EffectQueue.h"
 #include "../Core/Interface.h"
-#include "../Core/ResourceMgr.h"
 #include "../Core/Audio.h"
 #include "../Core/Game.h"
 #include "../Core/GameControl.h"

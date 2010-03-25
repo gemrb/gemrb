@@ -27,7 +27,6 @@
 #include "Game.h"
 #include "Actor.h"
 #include "Map.h"
-#include "ResourceMgr.h"
 #include "Interface.h"
 #include "GSUtils.h"
 
@@ -59,11 +58,11 @@ IniSpawn::~IniSpawn()
 DataFileMgr *GetIniFile(const ieResRef DefaultArea)
 {
 	//the lack of spawn ini files is not a serious problem, happens all the time
-	if (!core->GetResourceMgr()->HasResource( DefaultArea, IE_INI_CLASS_ID)) {
+	if (!gamedata->Exists( DefaultArea, IE_INI_CLASS_ID)) {
 		return NULL;
 	}
 
-	DataStream* inifile = core->GetResourceMgr()->GetResource( DefaultArea, IE_INI_CLASS_ID );
+	DataStream* inifile = gamedata->GetResource( DefaultArea, IE_INI_CLASS_ID );
 	if (!inifile) {
 		return NULL;
 	}

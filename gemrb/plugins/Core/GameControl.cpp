@@ -31,7 +31,6 @@
 #include "GSUtils.h"
 #include "TileMap.h"
 #include "Video.h"
-#include "ResourceMgr.h"
 #include "ScriptEngine.h"
 #include "Item.h"
 #include "Game.h"
@@ -2341,7 +2340,7 @@ int GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref
 	}
 
 	DialogMgr* dm = ( DialogMgr* ) core->GetInterface( IE_DLG_CLASS_ID );
-	dm->Open( core->GetResourceMgr()->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
+	dm->Open( gamedata->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
 	dlg = dm->GetDialog();
 	core->FreeInterface( dm );
 

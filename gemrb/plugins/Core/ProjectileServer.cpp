@@ -21,7 +21,6 @@
 
 #include "ProjectileServer.h"
 #include "Interface.h"
-#include "ResourceMgr.h"
 #include "SymbolMgr.h"
 #include "ProjectileMgr.h"
 
@@ -115,7 +114,7 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 	if (projectiles[idx].projectile) {
 		return ReturnCopy(idx);
 	}
-	DataStream* str = core->GetResourceMgr()->GetResource( projectiles[idx].resname, IE_PRO_CLASS_ID );
+	DataStream* str = gamedata->GetResource( projectiles[idx].resname, IE_PRO_CLASS_ID );
 	ProjectileMgr* sm = ( ProjectileMgr* ) core->GetInterface( IE_PRO_CLASS_ID );
 	if (sm == NULL) {
 		delete ( str );

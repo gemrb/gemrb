@@ -22,7 +22,6 @@
 #include "../../includes/win32def.h"
 #include <cassert>
 #include "TableMgr.h"
-#include "ResourceMgr.h"
 #include "Audio.h" //pst (react to death sounds)
 #include "Actor.h"
 #include "Interface.h"

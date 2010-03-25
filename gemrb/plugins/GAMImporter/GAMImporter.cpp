@@ -24,7 +24,6 @@
 #include "GAMImporter.h"
 #include "../Core/Interface.h"
 #include "../Core/MapMgr.h"
-#include "../Core/ResourceMgr.h"
 #include "../Core/MemoryStream.h"
 #include "../Core/DataFileMgr.h"
 
@@ -464,7 +463,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		}
 		actor->TalkCount = pcInfo.TalkCount;
 	} else {
-		DataStream* ds = core->GetResourceMgr()->GetResource(
+		DataStream* ds = gamedata->GetResource(
 				pcInfo.CREResRef, IE_CRE_CLASS_ID );
 		//another plugin cannot free memory stream from this plugin
 		//so auto free is a no-no

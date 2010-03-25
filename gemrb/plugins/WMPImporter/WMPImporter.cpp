@@ -21,7 +21,6 @@
 
 #include "../../includes/win32def.h"
 #include "../Core/Interface.h"
-#include "../Core/ResourceMgr.h"
 #include "../Core/ImageMgr.h"
 #include "WMPImporter.h"
 

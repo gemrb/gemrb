@@ -22,7 +22,6 @@
 #include "Interface.h"
 #include "Video.h"
 #include "Particles.h"
-#include "ResourceMgr.h"
 
 Color sparkcolors[MAX_SPARK_COLOR][MAX_SPARK_PHASE];
 bool inited = false;

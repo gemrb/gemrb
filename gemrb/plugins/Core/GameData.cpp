@@ -84,6 +84,7 @@ GameData::GameData()
 GameData::~GameData()
 {
 	FreeInterfaceVector( Table, tables, tm );
+	core->FreeInterface(mgr);
 	delete factory;
 }
 
@@ -97,7 +98,7 @@ void GameData::ClearCaches()
 
 Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
 {
-	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef, IE_CRE_CLASS_ID );
+	DataStream* ds = GetResource( ResRef, IE_CRE_CLASS_ID );
 	if (!ds)
 		return 0;
 
@@ -165,7 +166,7 @@ int GameData::LoadTable(const ieResRef ResRef)
 		return ind;
 	}
 	//printf("(%s) Table not found... Loading from file\n", ResRef);
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_2DA_CLASS_ID );
+	DataStream* str = GetResource( ResRef, IE_2DA_CLASS_ID );
 	if (!str) {
 		return -1;
 	}
@@ -241,12 +242,23 @@ bool GameData::DelTable(unsigned int index)
 bool GameData::Exists(const char *ResRef, SClass_ID type, bool silent)
 {
 	// TODO: check various caches before going to KeyImp
-	return core->GetResourceMgr()->HasResource( ResRef, type, silent );
+	return mgr->HasResource( ResRef, type, silent );
+}
+
+bool GameData::Exists(const char *ResRef, const TypeID *type, bool silent)
+{
+	// TODO: check various caches before going to KeyImp
+	return mgr->HasResource(ResRef, core->GetPluginMgr()->GetResourceDesc(type) , silent);
+}
+
+DataStream* GameData::GetResource(const char* resname, SClass_ID type, bool silent) const
+{
+	return mgr->GetResource(resname, type, silent);
 }
 
 Resource* GameData::GetResource(const char* resname, const TypeID *type, bool silent) const
 {
-	return core->GetResourceMgr()->GetResource(resname, core->GetPluginMgr()->GetResourceDesc(type) , silent);
+	return mgr->GetResource(resname, core->GetPluginMgr()->GetResourceDesc(type) , silent);
 }
 
 Palette *GameData::GetPalette(const ieResRef resname)
@@ -314,7 +326,7 @@ Item* GameData::GetItem(const ieResRef resname)
 	if (item) {
 		return item;
 	}
-	DataStream* str = core->GetResourceMgr()->GetResource( resname, IE_ITM_CLASS_ID );
+	DataStream* str = GetResource( resname, IE_ITM_CLASS_ID );
 	ItemMgr* sm = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
 	if (sm == NULL) {
 		delete ( str );
@@ -360,7 +372,7 @@ Spell* GameData::GetSpell(const ieResRef resname, bool silent)
 	if (spell) {
 		return spell;
 	}
-	DataStream* str = core->GetResourceMgr()->GetResource( resname, IE_SPL_CLASS_ID, silent );
+	DataStream* str = GetResource( resname, IE_SPL_CLASS_ID, silent );
 	SpellMgr* sm = ( SpellMgr* ) core->GetInterface( IE_SPL_CLASS_ID );
 	if (sm == NULL) {
 		delete ( str );
@@ -406,7 +418,7 @@ Effect* GameData::GetEffect(const ieResRef resname)
 	if (effect) {
 		return effect;
 	}
-	DataStream* str = core->GetResourceMgr()->GetResource( resname, IE_EFF_CLASS_ID );
+	DataStream* str = GetResource( resname, IE_EFF_CLASS_ID );
 	EffectMgr* em = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
 	if (em == NULL) {
 		delete ( str );
@@ -450,7 +462,7 @@ ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doub
 	ScriptedAnimation *ret = NULL;
 
 	if (Exists( effect, IE_VVC_CLASS_ID ) ) {
-		DataStream *ds = core->GetResourceMgr()->GetResource( effect, IE_VVC_CLASS_ID );
+		DataStream *ds = GetResource( effect, IE_VVC_CLASS_ID );
 		ret = new ScriptedAnimation(ds, true);
 	} else {
 		AnimationFactory *af = (AnimationFactory *)
@@ -496,7 +508,7 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	switch (type) {
 	case IE_BAM_CLASS_ID:
 	{
-		DataStream* ret = core->GetResourceMgr()->GetResource( resname, type, silent );
+		DataStream* ret = GetResource( resname, type, silent );
 		if (ret) {
 			AnimationMgr* ani = ( AnimationMgr* )
 				core->GetInterface( IE_BAM_CLASS_ID );

@@ -34,7 +34,6 @@
 #include "Projectile.h"
 #include "ImageMgr.h"
 #include "Video.h"
-#include "ResourceMgr.h"
 #include "Audio.h"
 #include "MusicMgr.h"
 #include "Game.h"

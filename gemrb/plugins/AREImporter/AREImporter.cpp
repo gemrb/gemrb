@@ -28,7 +28,6 @@
 #include "../Core/CachedFileStream.h"
 #include "../Core/ImageMgr.h"
 #include "../Core/Ambient.h"
-#include "../Core/ResourceMgr.h"
 #include "../Core/DataFileMgr.h"
 #include "../Core/Game.h"
 #include "../Core/Video.h"
@@ -235,7 +234,7 @@ bool AREImp::ChangeMap(Map *map, bool day_or_night)
 		snprintf( TmpResRef, 9, "%sN", map->WEDResRef);
 	}
 	TileMapMgr* tmm = ( TileMapMgr* ) core->GetInterface( IE_WED_CLASS_ID );
-	DataStream* wedfile = core->GetResourceMgr()->GetResource( TmpResRef, IE_WED_CLASS_ID );
+	DataStream* wedfile = gamedata->GetResource( TmpResRef, IE_WED_CLASS_ID );
 	tmm->Open( wedfile );
 
 	//alter the tilemap object, not all parts of that object are coming from the wed/tis
@@ -329,7 +328,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	TileMapMgr* tmm = ( TileMapMgr* ) core->GetInterface( IE_WED_CLASS_ID );
-	DataStream* wedfile = core->GetResourceMgr()->GetResource( WEDResRef, IE_WED_CLASS_ID );
+	DataStream* wedfile = gamedata->GetResource( WEDResRef, IE_WED_CLASS_ID );
 	tmm->Open( wedfile );
 
 	//there was no tilemap set yet, so lets just send a NULL
@@ -933,7 +932,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 				CachedFileStream *fs = new CachedFileStream( (CachedFileStream *) str, CreOffset, CreSize, true);
 				crefile = (DataStream *) fs;
 			} else {
-				crefile = core->GetResourceMgr()->GetResource( CreResRef, IE_CRE_CLASS_ID );
+				crefile = gamedata->GetResource( CreResRef, IE_CRE_CLASS_ID );
 			}
 			if(!actmgr->Open( crefile, true )) {
 				printf("Couldn't read actor: %s!\n", CreResRef);

@@ -38,7 +38,6 @@
 #include "../Core/FileStream.h"
 #include "../Core/SoundMgr.h"
 #include "AmbientMgrAL.h"
-#include "../Core/ResourceMgr.h"
 #include "StackLock.h"
 
 #ifndef WIN32

@@ -129,7 +129,6 @@ Interface::Interface(int iargc, char* iargv[])
 	projserv = NULL;
 	video = NULL;
 	AudioDriver = NULL;
-	key = NULL;
 	strings = NULL;
 	guiscript = NULL;
 	windowmgr = NULL;
@@ -381,7 +380,6 @@ Interface::~Interface(void)
 
 	delete console;
 
-	FreeInterface( key );
 	FreeInterface( pal256 );
 	FreeInterface( pal32 );
 	FreeInterface( pal16 );
@@ -1184,7 +1182,7 @@ int Interface::LoadSprites()
 			const char* ResRef = tab->QueryField( i, 0 );
 			int needpalette = atoi( tab->QueryField( i, 1 ) );
 			int first_char = atoi( tab->QueryField( i, 2 ) );
-			str = key->GetResource( ResRef, IE_BAM_CLASS_ID );
+			str = gamedata->GetResource( ResRef, IE_BAM_CLASS_ID );
 			if (!bamint->Open( str, true )) {
 				continue;
 			}
@@ -1307,7 +1305,7 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Initializing Resource Manager...\n", WHITE );
-	key = ( ResourceMgr * ) GetInterface( IE_KEY_CLASS_ID );
+	ResourceMgr *key = ( ResourceMgr * ) GetInterface( IE_KEY_CLASS_ID );
 	char ChitinPath[_MAX_PATH];
 	PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
 	ResolveFilePath( ChitinPath );
@@ -1316,6 +1314,7 @@ int Interface::Init()
 		printf( "Cannot Load Chitin.key\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
+	gamedata->SetResourceMgr(key);
 
 	printMessage( "Core", "Reading Game Options...\n", WHITE );
 	if (!LoadGemRBINI())
@@ -1490,7 +1489,7 @@ int Interface::Init()
 	if (HasFeature( GF_RESDATA_INI )) {
 		printMessage( "Core", "Loading resource data File...", WHITE );
 		INIresdata = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
-		DataStream* ds = key->GetResource("resdata", IE_INI_CLASS_ID);
+		DataStream* ds = gamedata->GetResource("resdata", IE_INI_CLASS_ID);
 		if (!INIresdata->Open( ds, true )) {
 			printStatus( "ERROR", LIGHT_RED );
 		} else {
@@ -1657,11 +1656,6 @@ ProjectileServer* Interface::GetProjectileServer() const
 Video* Interface::GetVideoDriver() const
 {
 	return video;
-}
-
-ResourceMgr* Interface::GetResourceMgr() const
-{
-	return key;
 }
 
 PluginMgr* Interface::GetPluginMgr() const
@@ -2207,7 +2201,7 @@ static const char *game_flags[GF_COUNT+1]={
 /** Loads gemrb.ini */
 bool Interface::LoadGemRBINI()
 {
-	DataStream* inifile = key->GetResource( "gemrb", IE_INI_CLASS_ID );
+	DataStream* inifile = gamedata->GetResource( "gemrb", IE_INI_CLASS_ID );
 	if (! inifile) {
 		printStatus( "ERROR", LIGHT_RED );
 		return false;
@@ -2539,7 +2533,7 @@ void Interface::RedrawAll()
 /** Loads a WindowPack (CHUI file) in the Window Manager */
 bool Interface::LoadWindowPack(const char* name)
 {
-	DataStream* stream = key->GetResource( name, IE_CHU_CLASS_ID );
+	DataStream* stream = gamedata->GetResource( name, IE_CHU_CLASS_ID );
 	if (stream == NULL) {
 		printMessage( "Interface", "Error: Cannot find ", LIGHT_RED );
 		printf( "%s.chu\n", name );
@@ -3208,7 +3202,7 @@ int Interface::LoadSymbol(const char* ResRef)
 	if (ind != -1) {
 		return ind;
 	}
-	DataStream* str = key->GetResource( ResRef, IE_IDS_CLASS_ID );
+	DataStream* str = gamedata->GetResource( ResRef, IE_IDS_CLASS_ID );
 	if (!str) {
 		return -1;
 	}
@@ -3637,9 +3631,9 @@ void Interface::LoadGame(int index)
 
 	if (index == -1) {
 		//Load the Default Game
-		gam_str = key->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
+		gam_str = gamedata->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
 		sav_str = NULL;
-		wmp_str = key->GetResource( WorldMapName, IE_WMP_CLASS_ID );
+		wmp_str = gamedata->GetResource( WorldMapName, IE_WMP_CLASS_ID );
 	} else {
 		SaveGame* sg = sgiterator->GetSaveGame( index );
 		if (!sg)
@@ -3741,7 +3735,7 @@ void Interface::UpdateMasterScript()
 		return;
 
 	if (worldmap) {
-		DataStream *wmp_str = key->GetResource( WorldMapName, IE_WMP_CLASS_ID );
+		DataStream *wmp_str = gamedata->GetResource( WorldMapName, IE_WMP_CLASS_ID );
 
 		if (!wmp_mgr->Open( wmp_str, true )) {
 			delete wmp_str;
@@ -4655,7 +4649,7 @@ Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner
 		CloseCurrentStore();
 	}
 
-	DataStream* str = key->GetResource( resname, IE_STO_CLASS_ID );
+	DataStream* str = gamedata->GetResource( resname, IE_STO_CLASS_ID );
 	StoreMgr* sm = ( StoreMgr* ) GetInterface( IE_STO_CLASS_ID );
 	if (sm == NULL) {
 		delete ( str );
@@ -4694,7 +4688,7 @@ int Interface::GetMouseScrollSpeed() {
 ieStrRef Interface::GetRumour(const ieResRef dlgref)
 {
 	DialogMgr* dm = ( DialogMgr* ) GetInterface( IE_DLG_CLASS_ID );
-	dm->Open( key->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
+	dm->Open( gamedata->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
 	Dialog *dlg = dm->GetDialog();
 	FreeInterface( dm );
 

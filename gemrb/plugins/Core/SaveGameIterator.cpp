@@ -23,7 +23,6 @@
 #include "../../includes/strrefs.h"
 #include "SaveGameIterator.h"
 #include "Interface.h"
-#include "ResourceMgr.h"
 #include "SaveGameMgr.h"
 #include "GameControl.h"
 #include "Video.h"

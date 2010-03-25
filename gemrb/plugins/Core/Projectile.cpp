@@ -26,7 +26,6 @@
 #include "Interface.h"
 #include "Video.h"
 #include "Game.h"
-#include "ResourceMgr.h"
 #include "Audio.h"
 #include "ProjectileServer.h"
 

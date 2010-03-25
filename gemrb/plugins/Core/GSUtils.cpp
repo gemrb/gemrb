@@ -24,7 +24,6 @@
 #include "Interface.h"
 #include "TileMap.h"
 #include "StringMgr.h"
-#include "ResourceMgr.h"
 #include "Video.h"
 #include "Audio.h"
 #include "Spell.h"
@@ -1955,7 +1954,7 @@ SrcVector *LoadSrc(const ieResRef resname)
 	if (src) {
 		return src;
 	}
-	DataStream* str = core->GetResourceMgr()->GetResource( resname, IE_SRC_CLASS_ID );
+	DataStream* str = gamedata->GetResource( resname, IE_SRC_CLASS_ID );
 	if ( !str) {
 		return NULL;
 	}

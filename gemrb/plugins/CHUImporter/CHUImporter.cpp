@@ -29,7 +29,6 @@
 #include "../Core/ScrollBar.h"
 #include "../Core/TextArea.h"
 #include "../Core/TextEdit.h"
-#include "../Core/ResourceMgr.h"
 #include "../Core/AnimationFactory.h"
 #include "../Core/ImageMgr.h"
 #include "../../includes/RGBAColor.h"

@@ -28,7 +28,6 @@
 #include "GameControl.h"
 #include "Audio.h"
 #include "Actor.h"
-#include "ResourceMgr.h"  //for loading bmp image
 
 #include <stdio.h>
 #include <stdlib.h>

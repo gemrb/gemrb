@@ -23,7 +23,6 @@
 #include "GameScript.h"
 #include "Interface.h"
 #include "GSUtils.h"
-#include "ResourceMgr.h"
 #include "Game.h"
 #include "GameControl.h"
 
@@ -1491,7 +1490,7 @@ Script* GameScript::CacheScript(ieResRef ResRef, SClass_ID type)
 		return newScript;
 	}
 
-	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef, type );
+	DataStream* stream = gamedata->GetResource( ResRef, type );
 	if (!stream) {
 		return NULL;
 	}

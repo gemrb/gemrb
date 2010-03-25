@@ -24,7 +24,6 @@
 #include "MapMgr.h"
 #include "DataStream.h"
 #include "Interface.h"
-#include "ResourceMgr.h"
 #include "ScriptEngine.h"
 #include "GameControl.h"
 #include "MusicMgr.h"
@@ -663,7 +662,7 @@ int Game::LoadMap(const char* ResRef)
 	}
 
 	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
-	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef, IE_ARE_CLASS_ID );
+	DataStream* ds = gamedata->GetResource( ResRef, IE_ARE_CLASS_ID );
 	if (!ds) {
 		core->FreeInterface( mM );
 		return -1;

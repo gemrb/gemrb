@@ -38,6 +38,7 @@ class Actor;
 class Sprite2D;
 class Resource;
 class TypeID;
+class ResourceMgr;
 
 struct Table {
 	TableMgr * tm;
@@ -52,6 +53,9 @@ public:
 	~GameData();
 
 	void ClearCaches();
+
+	/** Allows Interface to setup the resource manager */
+	void SetResourceMgr(ResourceMgr *m) { mgr = m; }
 
 	/** Returns actor */
 	Actor *GetCreature(const char *ResRef, unsigned int PartySlot=0);
@@ -73,7 +77,10 @@ public:
 
 	/** returns true if resource exists */
 	bool Exists(const char *ResRef, SClass_ID type, bool silent=false);
+	/** returns true if resource exists */
+	bool Exists(const char *ResRef, const TypeID *type, bool silent=false);
 
+	DataStream* GetResource(const char* resname, SClass_ID type, bool silent = false) const;
 	Resource* GetResource(const char* resname, const TypeID *type, bool silent = false) const;
 
 	Palette* GetPalette(const ieResRef resname);
@@ -102,6 +109,7 @@ private:
 	Cache PaletteCache;
 	Factory* factory;
 	std::vector<Table> tables;
+	ResourceMgr* mgr;
 };
 
 

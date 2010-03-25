@@ -24,7 +24,6 @@
 #include "Interface.h"
 #include "Video.h"
 #include "Palette.h"
-#include "ResourceMgr.h"
 #include "ImageMgr.h"
 #include "Map.h"
 #include "Game.h"

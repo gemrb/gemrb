@@ -22,7 +22,6 @@
 #include "../../includes/win32def.h"
 #include "ScriptedAnimation.h"
 #include "Interface.h"
-#include "ResourceMgr.h"
 #include "Audio.h"
 #include "Video.h"
 #include "Game.h"

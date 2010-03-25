@@ -40,7 +40,6 @@
 class Audio;
 class Video;
 class Resource;
-class ResourceMgr;
 class StringMgr;
 class Container;
 class Factory;
@@ -237,7 +236,6 @@ private:
 	PluginMgr * plugin;
 	Video * video;
 	Audio * AudioDriver ;
-	ResourceMgr * key;
 	ProjectileServer * projserv;
 	GameData * gamedata;
 	ImageMgr * pal256;
@@ -339,7 +337,6 @@ public:
 	const char * TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const;
 	Video * GetVideoDriver() const;
-	ResourceMgr * GetResourceMgr() const;
 	PluginMgr* GetPluginMgr() const;
 	/** Register cleanup function */
 	void RegisterCleanup(void (*)(void));

@@ -233,9 +233,9 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 		return e->Buffer;
 	}
 	//no cache entry...
-	DataStream* stream = core->GetResourceMgr()->GetResource(ResRef, IE_WAV_CLASS_ID);
+	DataStream* stream = gamedata->GetResource(ResRef, IE_WAV_CLASS_ID);
 	if (!stream)
-		stream = core->GetResourceMgr()->GetResource(ResRef, IE_OGG_CLASS_ID);
+		stream = gamedata->GetResource(ResRef, IE_OGG_CLASS_ID);
 	if (!stream)
 		return 0;
 

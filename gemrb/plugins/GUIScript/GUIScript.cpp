@@ -29,7 +29,6 @@
 #include "../Core/Audio.h"
 #include "../Core/GSUtils.h" //checkvariable
 #include "../Core/TileMap.h"
-#include "../Core/ResourceMgr.h"
 #include "../Core/Video.h"
 #include "../Core/Palette.h"
 #include "../Core/TextEdit.h"

@@ -23,7 +23,6 @@
 #include "WEDImporter.h"
 #include "../Core/TileSetMgr.h"
 #include "../Core/Interface.h"
-#include "../Core/ResourceMgr.h"
 
 struct wed_polygon {
 	ieDword FirstVertex;
@@ -106,7 +105,7 @@ int WEDImp::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 		}
 	}
 	TileOverlay *over = new TileOverlay( overlays->Width, overlays->Height );
-	DataStream* tisfile = core->GetResourceMgr()->GetResource(res, IE_TIS_CLASS_ID);
+	DataStream* tisfile = gamedata->GetResource(res, IE_TIS_CLASS_ID);
 	TileSetMgr* tis = ( TileSetMgr* ) core->GetInterface( IE_TIS_CLASS_ID );
 	tis->Open( tisfile );
 	for (int y = 0; y < overlays->Height; y++) {
