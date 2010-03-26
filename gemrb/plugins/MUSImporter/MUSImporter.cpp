@@ -22,6 +22,7 @@
 #include "MUSImporter.h"
 #include "Interface.h"
 #include "Audio.h"
+#include "SoundMgr.h"
 
 static char musicsubfolder[6] = "music";
 
@@ -33,6 +34,9 @@ MUSImporter::MUSImporter()
 	PLpos = 0;
 	PLName[0] = '\0';
 	lastSound = 0xffffffff;
+	char path[_MAX_PATH];
+	PathJoin(path, core->GamePath, musicsubfolder, NULL);
+	manager.AddSource(path, "Music", PLUGIN_RESOURCE_DIRECTORY);
 }
 
 MUSImporter::~MUSImporter()
@@ -275,20 +279,30 @@ void MUSImporter::PlayMusic(char* name)
 {
 	char FName[_MAX_PATH];
 	if (strnicmp( name, "mx9000", 6 ) == 0) { //iwd2
-		PathJoin(FName, core->GamePath, musicsubfolder, name, "mx9000", name, NULL);
+		PathJoin(FName, "mx9000", name, NULL);
 	} else if (strnicmp( name, "mx0000", 6 ) == 0) { //iwd
-		PathJoin(FName, core->GamePath, musicsubfolder, name, "mx0000", name, NULL);
+		PathJoin(FName, "mx0000", name, NULL);
 	} else if (strnicmp( name, "SPC", 3 ) != 0) { //bg2
 		char File[_MAX_PATH];
-		snprintf(File, _MAX_PATH, "%s%s.acm", PLName, name);
-		PathJoin(FName, core->GamePath, musicsubfolder, PLName, File, NULL);
+		snprintf(File, _MAX_PATH, "%s%s", PLName, name);
+		PathJoin(FName, PLName, File, NULL);
+	} else {
+		strncpy(FName, name, _MAX_PATH);
 	}
-	else {
-		PathJoin(FName, core->GamePath, musicsubfolder, name, NULL);
-	}
-	int soundID = core->GetAudioDrv()->StreamFile( FName );
-	if (soundID == -1) {
+
+	DataStream *stream =  manager.GetResource(FName, IE_ACM_CLASS_ID);
+	SoundMgr* sound = (SoundMgr*) core->GetInterface(IE_WAV_CLASS_ID);
+	if (!sound->Open(stream)) {
+		sound->release();
+		printMessage("MUSImporter", "",WHITE);
+		printf( "Cannot open %s...", FName );
+		printStatus("NOT FOUND", YELLOW );
 		core->GetAudioDrv()->Stop();
+	} else {
+		int soundID = core->GetAudioDrv()->CreateStream( sound );
+		if (soundID == -1) {
+			core->GetAudioDrv()->Stop();
+		}
 	}
 	printf( "Playing: %s\n", FName );
 }

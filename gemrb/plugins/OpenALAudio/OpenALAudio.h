@@ -91,7 +91,7 @@ public:
     void ResetMusics();
     bool Play();
     bool Stop();
-    int StreamFile( const char* filename );
+    int CreateStream( SoundMgr* );
     void UpdateListenerPos(int XPos, int YPos );
     void GetListenerPos( int &XPos, int &YPos );
     bool ReleaseStream(int stream, bool HardStop);

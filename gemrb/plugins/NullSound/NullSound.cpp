@@ -21,6 +21,7 @@
 #include "win32def.h"
 #include "NullSound.h"
 #include "AmbientMgr.h"
+#include "SoundMgr.h"
 
 NullSound::NullSound(void)
 {
@@ -44,8 +45,9 @@ unsigned int NullSound::Play(const char*, int, int, unsigned int)
 	return 1000; //Returning 1 Second Length
 }
 
-int NullSound::StreamFile(const char*)
+int NullSound::CreateStream(SoundMgr *sound)
 {
+	delete sound;
 	return 0;
 }
 
