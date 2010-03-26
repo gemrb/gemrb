@@ -48,6 +48,9 @@ class KEYImporter : public ResourceMgr {
 private:
 	std::vector< BIFEntry> biffiles;
 	Dictionary resources;
+
+	/** Gets the stream assoicated to a RESKey */
+	DataStream *GetStream(const char *resname, ieWord type, bool silent);
 public:
 	KEYImporter(void);
 	~KEYImporter(void);

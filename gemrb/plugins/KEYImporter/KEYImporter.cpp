@@ -258,15 +258,14 @@ static void FindBIFOnCD(BIFEntry *entry)
 	entry->found = false;
 }
 
-DataStream* KEYImporter::GetResource(const char* resname, SClass_ID type, bool silent)
+DataStream* KEYImporter::GetStream(const char *resname, ieWord type, bool silent)
 {
-	if (!strcmp(resname, "")) return NULL;
-
 	char path[_MAX_PATH];
 	unsigned int ResLocator;
 
-	//the word masking is a hack for synonyms, currently used for bcs==bs
-	if (resources.Lookup( resname, type&0xffff, ResLocator )) {
+	if (type == 0)
+		return NULL;
+	if (resources.Lookup( resname, type, ResLocator )) {
 		int bifnum = ( ResLocator & 0xFFF00000 ) >> 20;
 
 		strcpy( path, biffiles[bifnum].path );
@@ -296,42 +295,22 @@ DataStream* KEYImporter::GetResource(const char* resname, SClass_ID type, bool s
 	return NULL;
 }
 
+DataStream* KEYImporter::GetResource(const char* resname, SClass_ID type, bool silent)
+{
+	if (!strcmp(resname, "")) return NULL;
+
+	//the word masking is a hack for synonyms, currently used for bcs==bs
+	return GetStream(resname, type&0xFFFF, silent);
+}
+
 Resource* KEYImporter::GetResource(const char* resname, const std::vector<ResourceDesc> &types, bool silent)
 {
 	if (!strcmp(resname, "")) return NULL;
 
-	char path[_MAX_PATH];
-	unsigned int ResLocator;
-
 	for (size_t j = 0; j < types.size(); j++) {
-		if (resources.Lookup( resname, types[j].GetKeyType(), ResLocator )) {
-			int bifnum = ( ResLocator & 0xFFF00000 ) >> 20;
-
-			strcpy( path, biffiles[bifnum].path );
-			if (core->GameOnCD)
-				FindBIFOnCD(&biffiles[bifnum]);
-			if (!biffiles[bifnum].found) {
-				printf( "Cannot find %s... Resource unavailable.\n",
-						biffiles[bifnum].name );
-				return NULL;
-			}
-
-			ArchiveImporter* ai = ( ArchiveImporter* )
-				core->GetInterface( IE_BIF_CLASS_ID );
-			if (ai->OpenArchive( path ) == GEM_ERROR) {
-				printf("Cannot open archive %s\n", path );
-				core->FreeInterface( ai );
-				return NULL;
-			}
-			DataStream* ret = ai->GetStream( ResLocator, types[j].GetKeyType(), silent );
-			core->FreeInterface( ai );
-			if (ret) {
-				strnlwrcpy( ret->filename, resname, 8 );
-				strcat( ret->filename, types[j].GetExt() );
-
-				Resource *res = types[j].Create(ret);
-				if (res)
-					return res;
+		if (DataStream* ret = GetStream(resname, types[j].GetKeyType(), silent)) {
+			if (Resource *res = types[j].Create(ret)) {
+				return res;
 			}
 		}
 	}
