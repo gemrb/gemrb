@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * $Id$
  *
  */
 
@@ -22,40 +23,24 @@
 #define KEYIMP_H
 
 #include <vector>
+#include <map>
+#include <cstring>
 #include "../Core/ResourceMgr.h"
-#include "Dictionary.h"
 
 class Resource;
 class ResourceDesc;
-class DataStream;
 
-struct RESEntry {
-	ieResRef ResRef;
-	ieWord   Type;
-	ieDword  ResLocator;
-};
-
-struct BIFEntry {
-	char* name;
-	ieWord BIFLocator;
-	char path[_MAX_PATH];
-	int cd;
-	bool found;
-};
-
-
-class KEYImporter : public ResourceMgr {
+class DirectoryImporter : public ResourceMgr {
 private:
-	std::vector< BIFEntry> biffiles;
-	Dictionary resources;
+	char path[_MAX_PATH];
 public:
-	KEYImporter(void);
-	~KEYImporter(void);
-	bool Open(const char *file, const char *desc);
-	/* predicts the availability of a resource */
+	DirectoryImporter(void);
+	~DirectoryImporter(void);
+	bool Open(const char *dir, const char *desc);
+	/** predicts the availability of a resource */
 	bool HasResource(const char* resname, SClass_ID type, bool silent=false);
 	bool HasResource(const char* resname, const std::vector<ResourceDesc>, bool silent=false);
-	/* returns resource */
+	/** returns resource */
 	DataStream* GetResource(const char* resname, SClass_ID type, bool silent=false);
 	Resource* GetResource(const char* resname, const std::vector<ResourceDesc> &types, bool silent=false);
 public:

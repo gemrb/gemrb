@@ -53,8 +53,8 @@ public:
 
 	void ClearCaches();
 
-	/** Allows Interface to setup the resource manager */
-	void SetResourceMgr(ResourceMgr *m) { mgr = m; }
+	/** Add ResourceMgr to search path */
+	void AddPath(ResourceMgr *mgr) { searchPath.push_back(mgr); }
 
 	/** Returns actor */
 	Actor *GetCreature(const char *ResRef, unsigned int PartySlot=0);
@@ -108,7 +108,7 @@ private:
 	Cache PaletteCache;
 	Factory* factory;
 	std::vector<Table> tables;
-	ResourceMgr* mgr;
+	std::vector<ResourceMgr*> searchPath;
 };
 
 

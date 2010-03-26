@@ -25,21 +25,23 @@
 #include <vector>
 #include "Plugin.h"
 #include "../../includes/SClassID.h"
-#include "DataStream.h"
 #include "Resource.h"
 #include "../../includes/globals.h"
 
 class ResourceDesc;
+class DataStream;
 
 class GEM_EXPORT ResourceMgr : public Plugin {
 public:
 	ResourceMgr(void);
 	virtual ~ResourceMgr(void);
-	virtual bool LoadResFile(const char* resfile) = 0;
+	virtual bool Open(const char *filename, const char *description) = 0;
 	virtual bool HasResource(const char* resname, SClass_ID type, bool silent=false) = 0;
 	virtual bool HasResource(const char* resname, const std::vector<ResourceDesc>, bool silent=false) = 0;
 	virtual DataStream* GetResource(const char* resname, SClass_ID type, bool silent=false) = 0;
 	virtual Resource* GetResource(const char* resname, const std::vector<ResourceDesc> &types, bool silent=false) = 0;
+protected:
+	const char *description;
 };
 
 #endif

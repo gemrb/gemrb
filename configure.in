@@ -251,6 +251,7 @@ gemrb/plugins/IDSImporter/Makefile
 gemrb/plugins/INIImporter/Makefile 
 gemrb/plugins/ITMImporter/Makefile 
 gemrb/plugins/KEYImporter/Makefile 
+gemrb/plugins/DirectoryImporter/Makefile
 gemrb/plugins/MOSImporter/Makefile 
 gemrb/plugins/MUSImporter/Makefile 
 gemrb/plugins/MVEPlayer/Makefile

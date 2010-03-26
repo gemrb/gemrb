@@ -1234,6 +1234,14 @@ int Interface::LoadSprites()
 	return GEM_OK;
 }
 
+static void AddDirectory(char *path, const char *description)
+{
+	ResourceMgr *dir = ( ResourceMgr * ) core->GetInterface( PLUGIN_RESOURCE_DIRECTORY );
+	ResolveFilePath(path);
+	dir->Open(path, description);
+	gamedata->AddPath(dir);
+}
+
 int Interface::Init()
 {
 	plugin_flags = new Variables();
@@ -1294,26 +1302,64 @@ int Interface::Init()
 	}
 	Color defcolor={255,255,255,200};
 	SetInfoTextColor(defcolor);
+	printStatus( "OK", LIGHT_GREEN );
 
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Searching for KEY Importer...", WHITE );
-	if (!IsAvailable( IE_KEY_CLASS_ID )) {
-		printStatus( "ERROR", LIGHT_RED );
-		printf( "No KEY Importer Available.\nTermination in Progress...\n" );
-		return GEM_ERROR;
+	{
+		printMessage( "Core", "Initializing Search Path...", WHITE );
+		if (!IsAvailable( PLUGIN_RESOURCE_DIRECTORY )) {
+			printf( "no DirectoryImporter! " );
+			printStatus( "ERROR", LIGHT_RED );
+			return GEM_ERROR;
+		}
+
+		char path[_MAX_PATH];
+
+		PathJoin( path, core->CachePath, NULL);
+		AddDirectory(path, "Cache");
+
+		PathJoin( path, core->GemRBOverridePath, "override", core->GameType, NULL);
+		AddDirectory(path, "GemRB Override");
+
+		PathJoin( path, core->GemRBOverridePath, "override", "shared", NULL);
+		AddDirectory(path, "shared GemRB Override");
+
+		PathJoin( path, core->GamePath, core->GameOverridePath, NULL);
+		AddDirectory(path, "Override");
+
+		PathJoin( path, core->GamePath, core->GameSoundsPath, NULL);
+		AddDirectory(path, "Sounds");
+
+		PathJoin( path, core->GamePath, core->GameScriptsPath, NULL);
+		AddDirectory(path, "Scripts");
+
+		PathJoin( path, core->GamePath, core->GamePortraitsPath, NULL);
+		AddDirectory(path, "Portraits");
+
+		PathJoin( path, core->GamePath, core->GameDataPath, NULL);
+		AddDirectory(path, "Data");
+
+		//IWD2 movies are on the CD but not in the BIF
+		for (int i = 0; i < 6; i++) {
+			PathJoin( path, core->CD[i], core->GameDataPath, NULL);
+			AddDirectory(path, "Data");
+		}
+
+		printStatus( "OK", LIGHT_GREEN );
 	}
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Initializing Resource Manager...\n", WHITE );
-	ResourceMgr *key = ( ResourceMgr * ) GetInterface( IE_KEY_CLASS_ID );
-	char ChitinPath[_MAX_PATH];
-	PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
-	ResolveFilePath( ChitinPath );
-	if (!key->LoadResFile( ChitinPath )) {
-		printStatus( "ERROR", LIGHT_RED );
-		printf( "Cannot Load Chitin.key\nTermination in Progress...\n" );
-		return GEM_ERROR;
+
+	{
+		printMessage( "Core", "Initializing KEY Importer...", WHITE );
+		ResourceMgr *key = ( ResourceMgr * ) GetInterface( PLUGIN_RESOURCE_KEY );
+		char ChitinPath[_MAX_PATH];
+		PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
+		ResolveFilePath( ChitinPath );
+		if (!key || !key->Open( ChitinPath, "chitin.key" )) {
+			printStatus( "ERROR", LIGHT_RED );
+			return GEM_ERROR;
+		}
+		gamedata->AddPath(key);
+		printStatus( "OK", LIGHT_GREEN );
 	}
-	gamedata->SetResourceMgr(key);
 
 	printMessage( "Core", "Reading Game Options...\n", WHITE );
 	if (!LoadGemRBINI())
@@ -1723,9 +1769,6 @@ const char* Interface::TypeExt(SClass_ID type) const
 
 		case IE_ITM_CLASS_ID:
 			return ".itm";
-
-		case IE_KEY_CLASS_ID:
-			return ".key";
 
 		case IE_MOS_CLASS_ID:
 			return ".mos";

@@ -31,66 +31,11 @@
 
 #define SHARED_OVERRIDE "shared"
 
-static void PrintPossibleFiles(const char* resname, const std::vector<ResourceDesc> types)
+KEYImporter::KEYImporter(void)
 {
-	for (size_t j = 0; j < types.size(); j++) {
-		printf("%.8s%s ", resname, types[j].GetExt());
-	}
 }
 
-KeyImp::KeyImp(void)
-{
-	PathEntry path;
-
-	PathJoin( path.path, core->CachePath, NULL);
-	ResolveFilePath(path.path);
-	path.description = "Cache";
-	searchPath.push_back(path);
-
-	PathJoin( path.path, core->GemRBOverridePath, "override", core->GameType, NULL);
-	ResolveFilePath(path.path);
-	path.description = "GemRB Override";
-	searchPath.push_back(path);
-
-	PathJoin( path.path, core->GemRBOverridePath, "override", SHARED_OVERRIDE, NULL);
-	ResolveFilePath(path.path);
-	path.description = "shared GemRB Override";
-	searchPath.push_back(path);
-
-	PathJoin( path.path, core->GamePath, core->GameOverridePath, NULL);
-	ResolveFilePath(path.path);
-	path.description = "Override";
-	searchPath.push_back(path);
-
-	PathJoin( path.path, core->GamePath, core->GameSoundsPath, NULL);
-	ResolveFilePath(path.path);
-	path.description = "Sounds";
-	searchPath.push_back(path);
-
-	PathJoin( path.path, core->GamePath, core->GameScriptsPath, NULL);
-	ResolveFilePath(path.path);
-	path.description = "Scripts";
-	searchPath.push_back(path);
-
-	PathJoin( path.path, core->GamePath, core->GamePortraitsPath, NULL);
-	ResolveFilePath(path.path);
-	path.description = "Portraits";
-	searchPath.push_back(path);
-
-	PathJoin( path.path, core->GamePath, core->GameDataPath, NULL);
-	ResolveFilePath(path.path);
-	path.description = "Data";
-	searchPath.push_back(path);
-
-	//IWD2 movies are on the CD but not in the BIF
-	for (int i = 0; i < 6; i++) {
-		PathJoin( path.path, core->CD[i], core->GameDataPath, NULL);
-		path.description = "Data";
-		searchPath.push_back(path);
-	}
-}
-
-KeyImp::~KeyImp(void)
+KEYImporter::~KEYImporter(void)
 {
 	for (unsigned int i = 0; i < biffiles.size(); i++) {
 		free( biffiles[i].name );
@@ -179,8 +124,9 @@ static void FindBIF(BIFEntry *entry)
 	entry->found = false;
 }
 
-bool KeyImp::LoadResFile(const char* resfile)
+bool KEYImporter::Open(const char *resfile, const char *desc)
 {
+	description = desc;
 	if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
 		printf( "[ERROR]\nAn Archive Plug-in is not Available\n" );
 		return false;
@@ -267,86 +213,22 @@ bool KeyImp::LoadResFile(const char* resfile)
 	return true;
 }
 
-static bool FindIn(const char *Path, const char *ResRef, const char *Type)
+bool KEYImporter::HasResource(const char* resname, SClass_ID type, bool)
 {
-	char p[_MAX_PATH], f[_MAX_PATH] = {0};
-	strncpy(f, ResRef, 8);
-	f[8] = 0;
-	strcat(f, Type);
-	strlwr(f);
-	PathJoin( p, Path, f, NULL );
-	ResolveFilePath(p);
-	FILE * exist = fopen(p, "rb");
-	if(exist) {
-		fclose(exist);
-		return true;
-	}
-	return false;
-}
-
-static FileStream *SearchIn(const char * Path,const char * ResRef, const char *Type)
-{
-	char p[_MAX_PATH], f[_MAX_PATH] = {0};
-	strncpy(f, ResRef, 8);
-	f[8] = 0;
-	strcat(f, Type);
-	strlwr(f);
-	PathJoin( p, Path, f, NULL );
-	ResolveFilePath(p);
-	FILE * exist = fopen(p, "rb");
-	if(exist) {
-		fclose(exist);
-		FileStream * fs = new FileStream();
-		if(!fs) return NULL;
-		fs->Open(p, true);
-		return fs;
-	}
-	return NULL;
-}
-
-bool KeyImp::HasResource(const char* resname, SClass_ID type, bool silent)
-{
-	for (size_t i = 0; i < searchPath.size(); i++) {
-		if (FindIn( searchPath[i].path, resname, core->TypeExt(type) ))
-			return true;
-	}
-
 	unsigned int ResLocator;
 	if (resources.Lookup( resname, type, ResLocator ))
 		return true;
-	if (silent)
-		return false;
-
-	printMessage( "KEYImporter", "Searching for ", WHITE );
-	printf( "%.8s%s...", resname, core->TypeExt( type ) );
-	printStatus( "NOT FOUND", YELLOW );
 	return false;
 }
 
-bool KeyImp::HasResource(const char* resname, std::vector<ResourceDesc> types, bool silent)
+bool KEYImporter::HasResource(const char* resname, std::vector<ResourceDesc> types, bool)
 {
-	if (types.size() == 0)
-		return false;
-	for (size_t i = 0; i < searchPath.size(); i++) {
-		for (size_t j = 0; j < types.size(); j++) {
-			if (FindIn( searchPath[i].path, resname, types[j].GetExt() )) return true;
-		}
-	}
-
 	unsigned int ResLocator;
 	for (size_t j = 0; j < types.size(); j++) {
 		if (resources.Lookup( resname, types[j].GetKeyType(), ResLocator )) {
 			return true;
 		}
 	}
-	if (silent)
-		return false;
-
-	printMessage( "KEYImporter", "Searching for ", WHITE );
-	printf( "%.8s... ", resname ); //FIXME: Display extension or something
-	printf("Tried ");
-	PrintPossibleFiles(resname,types);
-	printStatus( "NOT FOUND", YELLOW );
 	return false;
 }
 
@@ -376,31 +258,11 @@ static void FindBIFOnCD(BIFEntry *entry)
 	entry->found = false;
 }
 
-DataStream* KeyImp::GetResource(const char* resname, SClass_ID type, bool silent)
+DataStream* KEYImporter::GetResource(const char* resname, SClass_ID type, bool silent)
 {
 	if (!strcmp(resname, "")) return NULL;
 
-	if (!silent) {
-		printMessage( "KEYImporter", "Searching for ", WHITE );
-		printf( "%.8s%s...", resname, core->TypeExt( type ) );
-	}
-
 	char path[_MAX_PATH];
-	//Search it in the GemRB override Directory
-	PathJoin( path, "override", core->GameType, NULL ); //this shouldn't change
-
-	FileStream *fs;
-	for (size_t i = 0; i < searchPath.size(); i++) {
-		fs=SearchIn( searchPath[i].path, resname, core->TypeExt(type));
-		if (fs) {
-			if (!silent) {
-				printBracket(searchPath[i].description, LIGHT_GREEN);
-				printf("\n");
-			}
-			return fs;
-		}
-	}
-
 	unsigned int ResLocator;
 
 	//the word masking is a hack for synonyms, currently used for bcs==bs
@@ -431,48 +293,19 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type, bool silent
 			return ret;
 		}
 	}
-	if (!silent) {
-		printStatus( "ERROR", LIGHT_RED );
-	}
 	return NULL;
 }
 
-Resource* KeyImp::GetResource(const char* resname, const std::vector<ResourceDesc> &types, bool silent)
+Resource* KEYImporter::GetResource(const char* resname, const std::vector<ResourceDesc> &types, bool silent)
 {
 	if (!strcmp(resname, "")) return NULL;
 
-	//Search it in the GemRB override Directory
-
-	FileStream *fs;
-	for (size_t i = 0; i < searchPath.size(); i++) {
-		for (size_t j = 0; j < types.size(); j++) {
-			fs=SearchIn( searchPath[i].path, resname, types[j].GetExt());
-			if (fs) {
-				Resource * res = types[j].Create(fs);
-				if (res) {
-					if (!silent) {
-						printMessage( "KEYImporter", "Searching for ", WHITE );
-						printf( "%.8s%s... ", resname, types[j].GetExt() );
-						printBracket(searchPath[i].description, LIGHT_GREEN);
-						printf("\n");
-					}
-					return res;
-				}
-			}
-		}
-	}
-
-	unsigned int ResLocator;
 	char path[_MAX_PATH];
+	unsigned int ResLocator;
 
 	for (size_t j = 0; j < types.size(); j++) {
 		if (resources.Lookup( resname, types[j].GetKeyType(), ResLocator )) {
 			int bifnum = ( ResLocator & 0xFFF00000 ) >> 20;
-
-			if (!silent) {
-				printMessage( "KEYImporter", "Searching for ", WHITE );
-				printf( "%.8s%s... ", resname, types[j].GetExt() );
-			}
 
 			strcpy( path, biffiles[bifnum].path );
 			if (core->GameOnCD)
@@ -502,18 +335,11 @@ Resource* KeyImp::GetResource(const char* resname, const std::vector<ResourceDes
 			}
 		}
 	}
-	if (!silent) {
-		printMessage( "KEYImporter", "Searching for ", WHITE );
-		printf( "%.8s... ", resname );
-		printf("Tried ");
-		PrintPossibleFiles(resname,types);
-		printStatus( "ERROR", LIGHT_RED );
-	}
 	return NULL;
 }
 
 #include "../../includes/plugindef.h"
 
 GEMRB_PLUGIN(0x1DFDEF80, "KEY File Importer")
-PLUGIN_CLASS(IE_KEY_CLASS_ID, KeyImp)
+PLUGIN_CLASS(PLUGIN_RESOURCE_KEY, KEYImporter)
 END_PLUGIN()

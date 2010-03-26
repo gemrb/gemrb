@@ -24,6 +24,7 @@ SUBDIRS = \
 	INIImporter \
 	ITMImporter \
 	KEYImporter \
+	DirectoryImporter \
 	MOSImporter \
 	MUSImporter \
 	MVEPlayer \
