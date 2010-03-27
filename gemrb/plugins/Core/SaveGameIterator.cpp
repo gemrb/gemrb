@@ -432,10 +432,12 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 			// stop gemrb from deleting all our save games
 			printf("gemrb's buggy save code is trying to delete slot %d\n", save->GetSaveID());
 			printf("that is not the slot %d we were trying to save to, erroring out!\n", index);
+			delete save;
 			return -1;
 		}
 		DeleteSaveGame(index);
 		snprintf( Path, _MAX_PATH, "%09d-%s", save->GetSaveID(), slotname );
+                delete save;
 	}
 	save_slots.insert( save_slots.end(), strdup( Path ) );
 	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, SaveDir() );
