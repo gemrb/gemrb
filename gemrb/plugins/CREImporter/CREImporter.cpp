@@ -116,11 +116,11 @@ void SpellEntry::AddLevel(int level, int kit)
 	count++;
 }
 
-static SpellEntry* spllist;
+static SpellEntry* spllist=NULL;
 static int splcount=-1;
-static SpellEntry* domlist;
+static SpellEntry* domlist=NULL;
 static int domcount=-1;
-static SpellEntry* maglist;
+static SpellEntry* maglist=NULL;
 static int magcount=-1;
 
 int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
