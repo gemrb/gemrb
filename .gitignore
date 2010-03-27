@@ -1,17 +1,11 @@
 *.pyc
 *.[oa]
-*~
 *.l[oa]
-*.swp
 Makefile
 Makefile.in
 .deps
 .libs
 .dirstamp
-*.patch
-*.orig
-*.rej
-*.diff
 
 /aclocal.m4
 /admin/config.guess
