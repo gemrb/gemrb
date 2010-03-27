@@ -248,6 +248,7 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 	SoundMgr* acm = (SoundMgr*) core->GetInterface(IE_WAV_CLASS_ID);
 	if (!acm->Open(stream)) {
 		core->FreeInterface(acm);
+		alDeleteBuffers( 1, &Buffer );
 		return 0;
 	}
 	int cnt = acm->get_length();
@@ -492,7 +493,7 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 		printStatus("NOT FOUND", YELLOW );
 		return -1;
 	}
-	SDL_mutexP( musicMutex );
+	StackLock l(musicMutex, "musicMutex in CreateStream()");
 
 	// Free old MusicReader
 	core->FreeInterface(MusicReader);
@@ -540,7 +541,6 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 		checkALError("Unable to set music parameters", "WARNING");
 	}
 
-	SDL_mutexV( musicMutex );
 	return 0;
 }
 
