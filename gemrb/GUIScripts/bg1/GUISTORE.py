@@ -1091,7 +1091,7 @@ def UpdateStoreHealWindow ():
 
 		Button = Window.GetControl (i+8)
 		Label = Window.GetControl (0x1000000c+i)
-		Button.SetVarAssoc ("Index", i)
+		Button.SetVarAssoc ("Index", TopIndex+i)
 		if Cure != None:
 			Spell = GemRB.GetSpell (Cure['CureResRef'])
 			Button.SetSpellIcon (Cure['CureResRef'], 1)
