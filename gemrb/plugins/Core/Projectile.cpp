@@ -255,6 +255,9 @@ void Projectile::CreateIteration()
 	pro->SetEffectsCopy(effects);
 	pro->SetCaster(Caster);
 	area->AddProjectile(pro, Pos, Target);
+
+	// added by fuzzie, to make magic missiles instant, maybe wrong place
+	pro->Setup();
 }
 
 void Projectile::GetSmokeAnim()
@@ -1267,14 +1270,42 @@ void Projectile::DrawTravel(Region &screen)
 	if (face!=Orientation) {
 		SetPos(face, GetTravelPos(face), GetShadowPos(face));
 	}
-	int amp = 0;
 	Point pos = Pos;
 	pos.x+=screen.x;
 	pos.y+=screen.y;
 
-	if(ExtFlags&PEF_CURVE) {
-		amp = (int)sqrt(Distance(Origin, pos)*Distance(pos,Destination));
-		printf("%d  ", amp);
+	if(ExtFlags&PEF_CURVE && phase == P_TRAVEL && Origin != Destination && type >= 68 && type <= 77) {
+		// TODO: we want projectile# (starting at 0) because the lower-level
+		// casts should be near the centre, so this is hard-coding the
+		// magic missile id..
+		int id = type - 68;
+
+		double total_distance = Distance(Origin, Destination);
+		double travelled_distance = Distance(Origin, Pos);
+
+		// distance travelled along the line, from 0.0 to 1.0
+		double travelled = travelled_distance / total_distance;
+		assert(travelled <= 1.0);
+
+		// input to sin(): 0 to pi gives us an arc
+		double arc_angle = travelled * M_PI;
+
+		//printf("id %d, travelled %f, angle %f\n", id, travelled, arc_angle);
+
+		// calculate the distance between the arc and the current pos
+		//  (this could use travelled and a larger constant multiplier,
+		//  to make the arc size fixed rather than relative to the total
+		//  distance to travel)
+		double length_of_normal = travelled_distance * sin(arc_angle) * 0.3 * ((id / 2) + 1);
+		if (id % 2) length_of_normal = -length_of_normal;
+
+		// adjust the to-be-rendered point by that distance
+		double x_vector = (Destination.x - Origin.x) / total_distance,
+			y_vector = (Destination.y - Origin.y) / total_distance;
+		Point newpos = pos;
+		newpos.x += y_vector*length_of_normal;
+		newpos.y -= x_vector*length_of_normal;
+		pos = newpos;
 	}
 
 	if (light) {
