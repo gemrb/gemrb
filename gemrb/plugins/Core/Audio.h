@@ -39,7 +39,7 @@ public:
     virtual bool Init(void) = 0;
     virtual unsigned int Play(const char* ResRef, int XPos = 0, int YPos = 0, unsigned int flags = GEM_SND_RELATIVE) = 0;
     virtual bool IsSpeaking() = 0;
-    virtual AmbientMgr* GetAmbientMgr() { return ambim; };
+    virtual AmbientMgr* GetAmbientMgr() { return ambim; }
     virtual void UpdateVolume(unsigned int flags = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS) = 0;
     virtual bool CanPlay() = 0;
     virtual void ResetMusics() = 0;

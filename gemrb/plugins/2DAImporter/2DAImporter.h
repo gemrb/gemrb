@@ -74,7 +74,7 @@ public:
 			return ( char * ) defVal;
 		}
 		return rows[row][column];
-	};
+	}
 	/** Returns a pointer to a zero terminated 2da element,
 		 uses column name and row name to search the field */
 	inline const char* QueryField(const char* row, const char* column) const
@@ -94,7 +94,7 @@ public:
 		}
 
 		return QueryField((unsigned int) rowi, (unsigned int) coli);
-	};
+	}
 
 	inline int GetRowIndex(const char* string) const
 	{
@@ -104,7 +104,7 @@ public:
 			}
 		}
 		return -1;
-	};
+	}
 
 	inline int GetColumnIndex(const char* string) const
 	{
@@ -114,7 +114,7 @@ public:
 			}
 		}
 		return -1;
-	};
+	}
 
 	inline const char* GetColumnName(unsigned int index) const
 	{
@@ -122,7 +122,7 @@ public:
 			return colNames[index];
 		}
 		return "";
-	};
+	}
 
 	inline const char* GetRowName(unsigned int index) const
 	{
@@ -130,7 +130,7 @@ public:
 			return rowNames[index];
 		}
 		return "";
-	};
+	}
 
 	inline int FindTableValue(unsigned int col, long val, int start) const
 	{

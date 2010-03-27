@@ -64,7 +64,7 @@ public:
 	/** Sets the exit direction (we need this to calculate distances) */
 	void SetDirection(int direction);
 	/** Sets the Text of the current control */
-	int SetText(const char* /*string*/, int /*pos*/) { return 0; };  
+	int SetText(const char* /*string*/, int /*pos*/) { return 0; }
 	/** Set color for one type of area labels */
 	void SetColor(int which, Color color);
 	int ScrollX, ScrollY;

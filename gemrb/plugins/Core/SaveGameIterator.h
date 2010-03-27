@@ -37,27 +37,27 @@ public:
 	int GetPortraitCount()
 	{
 		return PortraitCount;
-	};
+	}
 	int GetSaveID()
 	{
 		return SaveID;
-	};
+	}
 	const char* GetName()
 	{
 		return Name;
-	};
+	}
 	const char* GetPrefix()
 	{
 		return Prefix;
-	};
+	}
 	const char* GetPath()
 	{
 		return Path;
-	};
+	}
 	const char* GetDate()
 	{
 		return Date;
-	};
+	}
 
 	DataStream* GetPortrait(int index);
 	DataStream* GetScreen();

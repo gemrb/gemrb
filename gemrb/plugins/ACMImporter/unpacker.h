@@ -71,14 +71,14 @@ public:
 		buff_middle( NULL ), block_ptr( NULL )
 	{
 		this->stream = stream;
-	};
+	}
 	virtual ~CValueUnpacker()
 	{
 		if (amp_buffer) {
 			free(amp_buffer);
 			amp_buffer = NULL;
 		}
-	};
+	}
 
 	int init_unpacker();
 	int get_one_block(int* block);

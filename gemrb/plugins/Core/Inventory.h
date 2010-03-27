@@ -218,10 +218,10 @@ public:
 
 	void CalculateWeight(void);
 	void SetInventoryType(int arg);
-	void SetOwner(Actor* act) { Owner = act; };
+	void SetOwner(Actor* act) { Owner = act; }
 
 	/** returns number of all slots in the inventory */
-	int GetSlotCount() const { return (int)Slots.size(); };
+	int GetSlotCount() const { return (int)Slots.size(); }
 
 	/** sets inventory size, for the first time */
 	void SetSlotCount(unsigned int size);

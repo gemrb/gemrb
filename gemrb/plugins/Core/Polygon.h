@@ -66,7 +66,7 @@ public:
 
 class GEM_EXPORT Wall_Polygon: public Gem_Polygon {
 public:
-	Wall_Polygon(Point *points,int count,Region *bbox) : Gem_Polygon(points,count,bbox) {};
+	Wall_Polygon(Point *points,int count,Region *bbox) : Gem_Polygon(points,count,bbox) {}
 	//is the point above the baseline
 	bool PointCovered(Point &p);
 	bool PointCovered(int x, int y);

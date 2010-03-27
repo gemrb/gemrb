@@ -175,7 +175,7 @@ public: // Public Events
 	/** Set palette used for drawing button label in normal state.  */
 	void SetTextColor(const Color &fore, const Color &back);
 	/** Sets percent (0-1.0) of width for clipping picture */
-	void SetPictureClipping(double clip)  { Clipping = clip; };
+	void SetPictureClipping(double clip)  { Clipping = clip; }
 private: // Private attributes
 	char* Text;
 	bool hasText;

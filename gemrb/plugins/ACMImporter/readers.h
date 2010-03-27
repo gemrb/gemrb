@@ -57,14 +57,14 @@ public:
 	{
 		this->stream = stream;
 		this->autoFree = autoFree;
-	};
+	}
 
 	virtual ~CSoundReader()
 	{
 		if (stream && autoFree) {
 			delete( stream );
 		}
-	};
+	}
 
 	int get_channels()
 	{
@@ -79,15 +79,15 @@ public:
 	int get_length()
 	{
 		return samples;
-	}; // returns the total samples count
+	} // returns the total samples count
 	int get_samples_left()
 	{
 		return samples_left;
-	};
+	}
 	int get_bits()
 	{
 		return ( is16bit ) ? 16 : 8;
-	};
+	}
 
 	virtual const char* get_file_type() = 0;
 
@@ -109,14 +109,14 @@ public:
 	{
 		is16bit = ( bits == 16 );
 		samples = len;
-	};
+	}
 
 	virtual int init_reader();
 	virtual int read_samples(short* buffer, int count);
 	virtual const char* get_file_type()
 	{
 		return ( is16bit ? "RAW16" : "RAW8" );
-	};
+	}
 };
 
 // WAV files
@@ -125,12 +125,12 @@ public:
 	CWavPCMReader(DataStream* stream, int len, bool autoFree = true) 
 		: CRawPCMReader( stream, 16, len, autoFree )
 	{
-	};
+	}
 	virtual int init_reader();
 	virtual const char* get_file_type()
 	{
 		return "WAV";
-	};
+	}
 };
 
 #ifdef HAS_VORBIS_SUPPORT
@@ -142,16 +142,16 @@ public:
 		: CSoundReader( stream, autoFree)
 	{
 		memset(&OggStream, 0, sizeof(OggStream) );
-	};
+	}
 	virtual ~COGGReader()
 	{
 		ov_clear(&OggStream);
-	};
+	}
 	virtual int init_reader();
 	virtual const char* get_file_type()
 	{
 		return "OGG";
-	};
+	}
 	virtual int read_samples(short* buffer, int count);
 };
 #endif //HAS_VORBIS_SUPPORT
@@ -173,7 +173,7 @@ public:
 		: CSoundReader( stream, autoFree ), block( NULL ), values( NULL ),
 		samples_ready( 0 ), unpacker( NULL ), decoder( NULL )
 	{
-	};
+	}
 	virtual ~CACMReader()
 	{
 		if (block) {
@@ -185,19 +185,19 @@ public:
 		if (decoder) {
 			delete decoder;
 		}
-	};
+	}
 
 	virtual int init_reader();
 	virtual const char* get_file_type()
 	{
 		return "ACM";
-	};
+	}
 	virtual int read_samples(short* buffer, int count);
 
 	int get_levels()
 	{
 		return levels;
-	};
+	}
 	int get_subblocks()
 	{
 		return subblocks;

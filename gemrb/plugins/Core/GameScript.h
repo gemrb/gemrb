@@ -112,12 +112,12 @@ class GEM_EXPORT Targets {
 public:
 	Targets()
 	{
-	};
+	}
 
 	~Targets()
 	{
 		Clear();
-	};
+	}
 private:
 	targetlist objects;
 public:
@@ -142,7 +142,7 @@ public:
 		memset( objectRect, 0, 4 * sizeof( int ) );
 
 		canary = (unsigned long) 0xdeadbeef;
-	};
+	}
 	~Object()
 	{
 	}
@@ -196,7 +196,7 @@ public:
 		int1Parameter = 0;
 		pointParameter.null();
 		canary = (unsigned long) 0xdeadbeef;
-	};
+	}
 	~Trigger()
 	{
 		if (objectParameter) {
@@ -248,7 +248,7 @@ public:
 		triggers = NULL;
 		triggersCount = 0;
 		canary = (unsigned long) 0xdeadbeef;
-	};
+	}
 	~Condition()
 	{
 		if (!triggers) {
@@ -297,7 +297,7 @@ public:
 			RefCount = 1; //one reference hold by the script
 		}
 		canary = (unsigned long) 0xdeadbeef;
-	};
+	}
 	~Action()
 	{
 		for (int c = 0; c < 3; c++) {
@@ -376,7 +376,7 @@ public:
 		weight = 0;
 		actionsCount = 0;
 		canary = (unsigned long) 0xdeadbeef;
-	};
+	}
 	~Response()
 	{
 		if (!actions) {
@@ -415,7 +415,7 @@ public:
 		responses = NULL;
 		responsesCount = 0;
 		canary = (unsigned long) 0xdeadbeef;
-	};
+	}
 	~ResponseSet()
 	{
 		if (!responses) {
@@ -448,7 +448,7 @@ public:
 		condition = NULL;
 		responseSet = NULL;
 		canary = (unsigned long) 0xdeadbeef;
-	};
+	}
 	~ResponseBlock()
 	{
 		if (condition) {
@@ -481,7 +481,7 @@ public:
 		canary = (unsigned long) 0xdeadbeef;
 		responseBlocks = NULL;
 		responseBlocksCount = 0;
-	};
+	}
 	~Script()
 	{
 		FreeResponseBlocks();

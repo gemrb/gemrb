@@ -207,7 +207,7 @@ public:
 			return ItemName;
 		}
 		return ItemNameIdentified;
-	};
+	}
 	ieStrRef GetItemDesc(bool identified) const
 	{
 		if(identified) {

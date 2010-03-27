@@ -34,13 +34,13 @@ public:
 	CSubbandDecoder(int lev_cnt)
 		: levels( lev_cnt ), block_size( 1 << lev_cnt ), memory_buffer( NULL )
 	{
-	};
+	}
 	virtual ~CSubbandDecoder()
 	{
 		if (memory_buffer) {
 			free( memory_buffer );
 		}
-	};
+	}
 
 	int init_decoder();
 	void decode_data(int* buffer, int blocks);
