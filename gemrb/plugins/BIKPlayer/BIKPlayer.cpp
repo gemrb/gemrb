@@ -1592,10 +1592,12 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 		unsigned int dest_x = (outputwidth - header.width) >> 1;
 		unsigned int dest_y = (outputheight - header.height) >> 1;
 		showFrame((ieByte **) c_pic.data, (unsigned int *) c_pic.linesize, header.width, header.height, header.width, header.height, dest_x, dest_y);
-		release_buffer(&c_last);
-		c_last=c_pic;
-		memset(c_pic.data,0, sizeof(c_pic.data));
 	}
+
+	//release the old frame even when frame is skipped
+	release_buffer(&c_last);
+	memcpy(&c_last, &c_pic, sizeof(AVFrame));
+	memset(&c_pic, 0, sizeof(AVFrame));
 	return 0;
 }
 
