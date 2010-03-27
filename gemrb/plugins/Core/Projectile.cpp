@@ -1303,8 +1303,8 @@ void Projectile::DrawTravel(Region &screen)
 		double x_vector = (Destination.x - Origin.x) / total_distance,
 			y_vector = (Destination.y - Origin.y) / total_distance;
 		Point newpos = pos;
-		newpos.x += y_vector*length_of_normal;
-		newpos.y -= x_vector*length_of_normal;
+		newpos.x += (short)(y_vector*length_of_normal);
+		newpos.y -= (short)(x_vector*length_of_normal);
 		pos = newpos;
 	}
 
