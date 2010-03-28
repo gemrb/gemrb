@@ -211,7 +211,7 @@ def getSkills(TextAreaControl):
 	if KitName == 0:
 		KitName = ClassName
 	else:
-		KitName = KitListTableTable.GetValue (KitName, 0)
+		KitName = KitListTable.GetValue (KitName, 0)
 		
 	if SkillTable.GetValue ("RATE", KitName) != -1 or BardSkills != "*" or RangerSkills != "*":
 		for skill in range(SkillTable.GetRowCount () - 2):
