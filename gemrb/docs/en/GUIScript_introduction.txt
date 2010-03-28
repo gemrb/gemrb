@@ -1,6 +1,5 @@
 GUISCRIPT INTRODUCTION
 ----------------------
-$Id$
 
 This file is intended as a brief overview for one of two scripting systems
 in GemRB - GUIScript. You should read it if you want to hack on GemRB's GUI.
@@ -111,7 +110,6 @@ for an example
     # GemRB - Infinity Engine Emulator
     # Copyright (C) 2003 The GemRB Project
     .....
-    # $Id$
   
   
     ## Since this is only a module, GemRB and GUIDefines have to be explicitly 

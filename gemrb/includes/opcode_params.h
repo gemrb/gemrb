@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * $Id: ie_stats.h 4713 2007-06-30 09:20:37Z avenger_teambg $
  *
  */
 

@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * $Id: TLKImp.cpp 4692 2007-06-10 09:08:38Z avenger_teambg $
  *
  * TlkOverride.cpp: implementation of the saved game specific
  * (dynamic) part of the talk table (tlk)

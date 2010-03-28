@@ -16,7 +16,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: ie_restype.py 4793 2007-08-30 20:07:47Z avenger_teambg $
 
 # ie_restype.py - definitions of engine resource types
 

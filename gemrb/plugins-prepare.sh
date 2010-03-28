@@ -16,7 +16,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# $Id$
 #
 # link all plugins to the plugin dir, so gemrb can run from the build dir
 dir=$1

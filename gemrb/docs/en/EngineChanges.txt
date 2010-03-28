@@ -1,6 +1,5 @@
 Changes to the original engines
 *******************************
-$Id$
 
 
 Generally the changes were designed to be compatible with the original game files. No additional fields added (so far), only previously unused parts are used.

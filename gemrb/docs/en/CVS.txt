@@ -1,6 +1,5 @@
 WORKING WITH CVS
 ----------------
-$Id$
 
 
 This document is a short help on using CVS for getting GemRB

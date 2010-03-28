@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * $Id: AnimationFactory.h 4503 2007-02-27 16:43:46Z wjpalenstijn $
  *
  */
 

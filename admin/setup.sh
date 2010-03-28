@@ -16,7 +16,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# $Id$
 #
 # This is a quick and dirty script to pass reasonable values to the
 # configure script. This script compensates for the fact that GemRB

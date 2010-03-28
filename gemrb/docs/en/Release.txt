@@ -1,4 +1,3 @@
-# $Id$
 
 
 How to make a release

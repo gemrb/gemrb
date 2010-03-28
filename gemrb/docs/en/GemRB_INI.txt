@@ -1,6 +1,5 @@
 GAME-SPECIFIC CONFIGURATION FILE GEMRB.INI
 ******************************************
-$Id$
 
 Contents
 --------

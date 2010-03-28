@@ -1,6 +1,5 @@
 #!/bin/sh
 
-# $Id$
 
 # Gentoo and Mandrake specific flags
 export WANT_AUTOMAKE="1.10"

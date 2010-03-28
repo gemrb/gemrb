@@ -1,6 +1,5 @@
 CHEAT AND DEBUG KEYS
 --------------------
-$Id$
 
 
 Following is a list of cheats you can use during development of GemRB.

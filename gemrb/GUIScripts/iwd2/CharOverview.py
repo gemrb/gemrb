@@ -15,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# $Id$
 #
 # Some small attempt to re-use code in character generation.
 # Attempting to emulate lynx's loop method from BG2 GUI

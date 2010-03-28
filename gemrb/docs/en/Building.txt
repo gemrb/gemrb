@@ -1,6 +1,5 @@
 BUILDING GEMRB FROM GIT SOURCES ON UNIX
 ---------------------------------------
-$Id$
 
 
 Tools you will need to build GemRB from GIT:

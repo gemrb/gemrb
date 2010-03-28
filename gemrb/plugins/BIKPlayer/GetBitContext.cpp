@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * $Id: GetBitContext.cpp 6168 2009-05-28 22:28:33Z mattinm $
  *
  */
 
