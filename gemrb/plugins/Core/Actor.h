@@ -315,6 +315,7 @@ private:
 	bool IsDualSwap() const;
 	/** Re/Inits the Modified vector for PCs/NPCs */
 	void RefreshPCStats();
+	bool ShouldHibernate();
 public:
 	Actor(void);
 	~Actor(void);

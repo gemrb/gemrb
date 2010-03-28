@@ -4376,6 +4376,25 @@ static const int OrientdY[16] = { 10, 9, 7, 4, 0, -4, -7, -9, -10, -9, -7, -4, 0
 static const unsigned int MirrorImageLocation[8] = { 4, 12, 8, 0, 6, 14, 10, 2 };
 static const unsigned int MirrorImageZOrder[8] = { 2, 4, 6, 0, 1, 7, 5, 3 };
 
+bool Actor::ShouldHibernate() {
+	//finding an excuse why we don't hybernate the actor
+	if (Modified[IE_ENABLEOFFSCREENAI])
+		return false;
+	if (LastTarget) //currently attacking someone
+		return false;
+	if (!lastRunTime) // haven't had a chance to run a script
+		return false;
+	if (CurrentAction)
+		return false;
+	if (GetNextStep())
+		return false;
+	if (GetNextAction())
+		return false;
+	if (GetWait()) //would never stop waiting
+		return false;
+	return true;
+}
+
 void Actor::Draw(Region &screen)
 {
 	Map* area = GetCurrentArea();
@@ -4386,24 +4405,15 @@ void Actor::Draw(Region &screen)
 	//check the deactivation condition only if needed
 	//this fixes dead actors disappearing from fog of war (they should be permanently visible)
 	if ((!area->IsVisible( Pos, explored) || (InternalFlags&IF_REALLYDIED) ) &&	(InternalFlags&IF_ACTIVE) ) {
-//    if ((!area->IsVisible( Pos, explored) || (InternalFlags&IF_JUSTDIED) ) &&	(InternalFlags&IF_ACTIVE) ) {
-		//finding an excuse why we don't hybernate the actor
-		if (Modified[IE_ENABLEOFFSCREENAI])
-			return;
-		if (LastTarget) //currently attacking someone
-			return;
-		if (!lastRunTime) // haven't had a chance to run a script
-			return;
-		if (CurrentAction)
-			return;
-		if (GetNextStep())
-			return;
-		if (GetNextAction())
-			return;
-		if (GetWait()) //would never stop waiting
-			return;
 		//turning actor inactive if there is no action next turn
-		InternalFlags|=IF_IDLE;
+		if (ShouldHibernate()) {
+			InternalFlags|=IF_IDLE;
+		}
+		if (!(InternalFlags&IF_REALLYDIED)) {
+			// for a while this didn't return (disable drawing) if about to hibernate;
+			// Avenger said (aa10aaed) "we draw the actor now for the last time".
+			return;
+		}
 	}
 
 	if (InTrap) {
