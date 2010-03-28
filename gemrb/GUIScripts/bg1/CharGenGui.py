@@ -1,7 +1,7 @@
 import GemRB
 from CharGenCommon import * 
 from GUICommonWindows import *
-from GUICommon import KitListTable
+from GUICommon import KitListTable, ClassSkillsTable
 from LUProfsSelection import *
 
 def Imprt():
@@ -123,9 +123,8 @@ def unsetHateRace():
 def guardHateRace():
 	MyChar = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat(MyChar,IE_CLASS)
-	TmpTable = GemRB.LoadTableObject("clskills")
-	ClassName = TmpTable.GetRowName(Class)
-	TableName = TmpTable.GetValue(ClassName, "HATERACE")
+	ClassName = ClassSkillsTable.GetRowName(Class)
+	TableName = ClassSkillsTable.GetValue(ClassName, "HATERACE")
 	return TableName != "*"
 
 def getHatedRace(TextAreaControl):
@@ -150,8 +149,7 @@ def unsetMageSpells():
 def guardMageSpells():
 	MyChar = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat(MyChar,IE_CLASS)
-	TmpTable = GemRB.LoadTableObject("clskills")
-	TableName = TmpTable.GetValue(Class, 2)
+	TableName = ClassSkillsTable.GetValue(Class, 2)
 	return TableName != "*"
 
 def getMageSpells(TextAreaControl):
