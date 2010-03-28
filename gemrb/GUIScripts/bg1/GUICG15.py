@@ -20,7 +20,7 @@
 import GemRB
 
 from CharGenCommon import * 
-from GUICommon import CloseOtherWindow, ClassSkillsTable
+from GUICommon import CloseOtherWindow, ClassSkillsTable, ClassTable
 
 
 RaceWindow = 0
@@ -61,7 +61,6 @@ def OnLoad():
 	
 	GemRB.SetVar ("HatedRace",0)
 	
-	ClassTable = GemRB.LoadTableObject("classes")
 	ClassRow = GemRB.GetVar("Class")-1
 	Class = ClassTable.GetValue(ClassRow, 5)
 	ClassName = ClassSkillsTable.GetRowName(Class)

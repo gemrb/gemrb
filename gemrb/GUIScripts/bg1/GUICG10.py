@@ -18,25 +18,22 @@
 #
 #character generation, multi-class (GUICG10)
 import GemRB
-from GUICommon import CloseOtherWindow, RaceTable
+from GUICommon import CloseOtherWindow, RaceTable, ClassTable
 
 from CharGenCommon import * 
 
 ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-ClassTable = 0
 
 def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton
-	global ClassTable
 
 	GemRB.LoadWindowPack("GUICG")
 	ClassWindow = GemRB.LoadWindowObject(10)
 
 	CloseOtherWindow (ClassWindow.Unload)
 
-	ClassTable = GemRB.LoadTableObject("classes")
 	ClassCount = ClassTable.GetRowCount()+1
 	RaceName = RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
 

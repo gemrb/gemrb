@@ -21,17 +21,15 @@ import GemRB
 
 from CharGenCommon import * 
 
-from GUICommon import CloseOtherWindow, RaceTable
+from GUICommon import CloseOtherWindow, RaceTable, ClassTable
 
 
 ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-ClassTable = 0
 
 def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton
-	global ClassTable
 
 	if CloseOtherWindow (OnLoad):
 		if(ClassWindow):
@@ -45,7 +43,6 @@ def OnLoad():
 	GemRB.SetVar("Class Kit",0)
 	
 	GemRB.LoadWindowPack("GUICG")
-	ClassTable = GemRB.LoadTableObject("classes")
 	ClassCount = ClassTable.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindowObject(2)
 	RaceName = RaceTable.GetRowName(GemRB.GetVar("Race")-1 )

@@ -20,7 +20,7 @@
 import GemRB
 
 from CharGenCommon import * 
-from GUICommon import CloseOtherWindow
+from GUICommon import CloseOtherWindow, ClassTable
 
 
 AlignmentWindow = 0
@@ -40,7 +40,6 @@ def OnLoad():
 
 	GemRB.SetVar("Alignment",-1)
 	
-	ClassTable = GemRB.LoadTableObject("classes")
 	Class = GemRB.GetVar("Class")-1
 	KitName = ClassTable.GetRowName(Class)
 
