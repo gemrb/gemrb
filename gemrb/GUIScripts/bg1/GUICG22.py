@@ -20,20 +20,19 @@
 import GemRB
 
 from CharGenCommon import * 
-from GUICommon import CloseOtherWindow, RaceTable
+from GUICommon import CloseOtherWindow, RaceTable, KitListTable
 
 
 KitWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-KitList = 0
 ClassList = 0
 SchoolList = 0
 ClassID = 0
 
 def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton
-	global KitList, ClassList, SchoolList, ClassID
+	global ClassList, SchoolList, ClassID
 
 	if CloseOtherWindow(OnLoad):
 		if(KitWindow):
@@ -52,7 +51,6 @@ def OnLoad():
 	KitTableName = KitTable.GetValue(ClassName, RaceName)
 	KitTable = GemRB.LoadTableObject(KitTableName,1)
 
-	KitList = GemRB.LoadTableObject("kitlist")
 	SchoolList = GemRB.LoadTableObject("magesch")
 
 	#there is only a specialist mage window for bg1
@@ -86,7 +84,7 @@ def OnLoad():
 				KitName = SchoolList.GetValue(Kit, 0)
 			else:
 				if Kit:
-					KitName = KitList.GetValue(Kit, 1)
+					KitName = KitListTable.GetValue(Kit, 1)
 				else:
 					KitName = ClassList.GetValue(GemRB.GetVar("Class")-1, 0)
 
@@ -120,7 +118,7 @@ def KitPress():
 		if ClassID==1:
 			KitName = SchoolList.GetValue(Kit, 1)
 		else:
-			KitName = KitList.GetValue(Kit, 3)
+			KitName = KitListTable.GetValue(Kit, 3)
 	TextAreaControl.SetText(KitName)
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
@@ -134,6 +132,6 @@ def NextPress():
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar ("Class Kit")
 	#the same as the unusable field
-	Kit = KitList.GetValue(KitIndex, 6)
+	Kit = KitListTable.GetValue(KitIndex, 6)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, Kit)
 	next()

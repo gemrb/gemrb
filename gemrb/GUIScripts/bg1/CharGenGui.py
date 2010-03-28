@@ -1,6 +1,7 @@
 import GemRB
 from CharGenCommon import * 
 from GUICommonWindows import *
+from GUICommon import KitListTable
 from LUProfsSelection import *
 
 def Imprt():
@@ -175,8 +176,7 @@ def guardSkills():
 	Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
 
 	if Kit != 0:
-		KitList = GemRB.LoadTableObject("kitlist")
-		KitName = KitList.GetValue(Kit, 0) #rowname is just a number
+		KitName = KitListTable.GetValue(Kit, 0) #rowname is just a number
 		PointsLeft = SkillTable.GetValue("FIRST_LEVEL",KitName)
 		if PointsLeft < 0:
 			Kit = 0
@@ -213,7 +213,7 @@ def getSkills(TextAreaControl):
 	if KitName == 0:
 		KitName = ClassName
 	else:
-		KitName = KitListTable.GetValue (KitName, 0)
+		KitName = KitListTableTable.GetValue (KitName, 0)
 		
 	if SkillTable.GetValue ("RATE", KitName) != -1 or BardSkills != "*" or RangerSkills != "*":
 		for skill in range(SkillTable.GetRowCount () - 2):
