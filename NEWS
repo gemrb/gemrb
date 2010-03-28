@@ -1,13 +1,18 @@
-GemRB svn (7428):
+GemRB git (b4ab52):
   New features:
     - 
+    - a BI(n)K player plugin for the IWD2 movies
+    - new actions
 
   Improved features:
     - 
+    - the design of some internals was cleaned up
+    - magic missiles are now drawn properly
     - various guiscripts,
     - bugfixes
 
   Applied patches:
+    plenty of patches from Tom Prince
 
 GemRB V0.6.0 (2009-11-03):
   New features:
