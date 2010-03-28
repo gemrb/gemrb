@@ -26,7 +26,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow, GetIWDSpellButtonCount
+from GUICommon import CloseOtherWindow, GetIWDSpellButtonCount, ClassSkillsTable
 from GUICommonWindows import *
 
 MageWindow = None
@@ -188,8 +188,7 @@ def UpdateMageWindow ():
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
-	Table = GemRB.LoadTableObject ("clskills")
-	if (Table.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 2)=="*"):
+	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 2)=="*"):
 		Window.SetVisible (2)
 	else:
 		Window.SetVisible (1)

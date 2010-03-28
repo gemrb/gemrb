@@ -26,7 +26,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow, GetIWDSpellButtonCount
+from GUICommon import CloseOtherWindow, GetIWDSpellButtonCount, ClassSkillsTable
 from GUICommonWindows import *
 
 PriestWindow = None
@@ -173,8 +173,7 @@ def UpdatePriestWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
-	Table = GemRB.LoadTableObject ("clskills")
-	if (Table.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
+	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
 		Window.SetVisible (2)
 	else:
 		Window.SetVisible (1)
