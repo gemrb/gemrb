@@ -26,7 +26,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
 import GemRB
-from GUICommon import CloseOtherWindow
+from GUICommon import CloseOtherWindow, ClassTable
 from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler, SetEncumbranceLabels
 
 
@@ -210,7 +210,6 @@ def RefreshInventoryWindow ():
 	Label.SetText (str (GemRB.GameGetPartyGold ()))
 
 	# class
-	ClassTable = GemRB.LoadTableObject ("classes")
 	text = ClassTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
 
 	Label = Window.GetControl (0x1000003f)

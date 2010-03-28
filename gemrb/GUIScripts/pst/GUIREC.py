@@ -67,7 +67,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow, StrModTable, StrModExTable
+from GUICommon import CloseOtherWindow, StrModTable, StrModExTable, ClassTable
 from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler, RunSelectionChangeHandler
 from GUIWORLD import OpenReformPartyWindow
 
@@ -260,7 +260,6 @@ def UpdateRecordsWindow ():
 
 
 	# class
-	ClassTable = GemRB.LoadTableObject ("classes")
 	text = ClassTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
 
 	Label = Window.GetControl (0x10000016)
@@ -481,7 +480,6 @@ def OnRecordsHelpCharisma ():
 def GetCharacterHeader (pc):
 	global avatar_header
 
-	ClassTable = GemRB.LoadTableObject ("classes")
 	BioTable = GemRB.LoadTableObject ("bios")
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
@@ -788,7 +786,6 @@ def OpenInformationWindow ():
 
 
 	# class
-	ClassTable = GemRB.LoadTableObject ("classes")
 	text = ClassTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
 
 	Label = Window.GetControl (0x1000000A)
@@ -983,7 +980,6 @@ def OpenLevelUpWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "AcceptLevelUp")
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	ClassTable = GemRB.LoadTableObject ("classes")
 
 	# These are used to identify Nameless One
 	BioTable = GemRB.LoadTableObject ("bios")
@@ -1272,7 +1268,6 @@ def OpenLevelUpWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 def GetSingleClassHP (Class, Level):
-	ClassTable = GemRB.LoadTableObject ("classes")
 	HPTable = GemRB.LoadTableObject (ClassTable.GetValue (Class, "HP"))
 
 	# We need to check if Level is larger than 20, since after that point
