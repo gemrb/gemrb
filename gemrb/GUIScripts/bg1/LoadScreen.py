@@ -42,11 +42,11 @@ def StartLoadScreen ():
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK")
-	LoadScreen.SetVisible (1)
+	LoadScreen.SetVisible (WINDOW_VISIBLE)
 	return
 
 def EndLoadScreen ():
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK2")
-	LoadScreen.SetVisible (1)
+	LoadScreen.SetVisible (WINDOW_VISIBLE)
 	return

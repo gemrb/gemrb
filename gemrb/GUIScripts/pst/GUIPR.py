@@ -140,9 +140,9 @@ def UpdatePriestWindow ():
 			Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			Icon.SetTooltip ('')
 	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
-		Window.SetVisible (2)
+		Window.SetVisible (WINDOW_GRAYED)
 	else:
-		Window.SetVisible (1)
+		Window.SetVisible (WINDOW_VISIBLE)
 
 
 def PriestPrevLevelPress ():

@@ -78,12 +78,12 @@ def OnLoad ():
 		DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"EnterGamePress")
 
-	PartyFormationWindow.SetVisible (1)
+	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ExitPress ():
 	global PartyFormationWindow, ExitWindow
-	PartyFormationWindow.SetVisible (0)
+	PartyFormationWindow.SetVisible (WINDOW_INVISIBLE)
 	ExitWindow = GemRB.LoadWindowObject (7)
 
 	TextArea = ExitWindow.GetControl (0)
@@ -99,7 +99,7 @@ def ExitPress ():
 	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExitDonePress")
 
-	ExitWindow.SetVisible (1)
+	ExitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ExitDonePress ():
@@ -115,7 +115,7 @@ def ExitCancelPress ():
 	global PartyFormationWindow, ExitWindow
 	if ExitWindow:
 		ExitWindow.Unload ()
-	PartyFormationWindow.SetVisible (1)
+	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def GeneratePress ():

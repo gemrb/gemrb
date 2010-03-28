@@ -145,7 +145,7 @@ def OnLoad ():
 	SpellCastB.SetVarAssoc ("Auto Pause State",256)
 	TrapFoundB.SetVarAssoc ("Auto Pause State",512)
 
-	AutoPauseWindow.SetVisible (1)
+	AutoPauseWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ChHitButtonPress ():

@@ -45,7 +45,7 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "Done1Press")
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	ImportWindow.SetVisible(1)
+	ImportWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def Done1Press():

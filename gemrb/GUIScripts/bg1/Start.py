@@ -147,8 +147,8 @@ def NewSingle():
 	return
 
 def ExitPress():
-	StartWindow.SetVisible(0)
-	QuitWindow.SetVisible(1)
+	StartWindow.SetVisible(WINDOW_INVISIBLE)
+	QuitWindow.SetVisible(WINDOW_VISIBLE)
 	return
 	
 def ExitConfirmed():
@@ -165,8 +165,8 @@ def MoviesPress():
 	return
 
 def ExitCancelled():
-	QuitWindow.SetVisible(0)
-	StartWindow.SetVisible(1)
+	QuitWindow.SetVisible(WINDOW_INVISIBLE)
+	StartWindow.SetVisible(WINDOW_VISIBLE)
 	return
 	
 def BackToMain():
@@ -186,6 +186,6 @@ def BackToMain():
 	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	QuitWindow.SetVisible(0)
-	StartWindow.SetVisible(1)
+	QuitWindow.SetVisible(WINDOW_INVISIBLE)
+	StartWindow.SetVisible(WINDOW_VISIBLE)
 	return

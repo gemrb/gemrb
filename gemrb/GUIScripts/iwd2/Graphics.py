@@ -124,7 +124,7 @@ def OnLoad():
 	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OkPress")
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	
-	GraphicsWindow.SetVisible(1)
+	GraphicsWindow.SetVisible(WINDOW_VISIBLE)
 	return
 	
 def BrightnessPress():

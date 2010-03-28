@@ -64,7 +64,7 @@ def OpenJournalWindow ():
 		return
 		
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIJRNL", 640, 480)
 	JournalWindow = Window = GemRB.LoadWindowObject (2)
@@ -91,9 +91,9 @@ def OpenJournalWindow ():
 
 	Chapter = GemRB.GetGameVar("chapter")
 	UpdateJournalWindow ()
-	OptionsWindow.SetVisible (1)
-	Window.SetVisible (1)
-	PortraitWindow.SetVisible (1)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	Window.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 
 ###################################################
 def UpdateJournalWindow ():

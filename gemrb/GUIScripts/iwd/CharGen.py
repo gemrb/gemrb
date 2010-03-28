@@ -223,7 +223,7 @@ def OnLoad():
 	TextArea = CharGenWindow.GetControl (9)
 	TextArea.SetText (16575)
 
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def BackPress():
@@ -534,7 +534,7 @@ def SetCharacterDescription():
 def GenderPress():
 	global CharGenWindow, GenderWindow, GenderDoneButton, GenderTextArea
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	GenderWindow = GemRB.LoadWindowObject (1)
 	GemRB.SetVar ("Gender", 0)
 
@@ -566,7 +566,7 @@ def GenderPress():
 	GenderCancelButton.SetText (13727)
 	GenderCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	GenderWindow.SetVisible (1)
+	GenderWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def MalePress():
@@ -588,7 +588,7 @@ def GenderDonePress():
 
 	if GenderWindow:
 		GenderWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	PortraitSelect()
 	return
 
@@ -598,13 +598,13 @@ def GenderCancelPress():
 	GemRB.SetVar ("Gender", 0)
 	if GenderWindow:
 		GenderWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def PortraitSelect():
 	global CharGenWindow, PortraitWindow, Portrait, PortraitPortraitButton, PortraitsTable
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	PortraitWindow = GemRB.LoadWindowObject (11)
 
 	# this is not the correct one, but I don't know which is
@@ -645,7 +645,7 @@ def PortraitSelect():
 		Portrait = Portrait + 1
 	PortraitPortraitButton.SetPicture(PortraitsTable.GetRowName (Portrait) + "G")
 
-	PortraitWindow.SetVisible (1)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def PortraitLeftPress():
@@ -692,7 +692,7 @@ def CustomDone():
 	CharGenState = 1
 	Portrait = -1
 	SetCharacterDescription()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def CustomAbort():
@@ -799,7 +799,7 @@ def PortraitDonePress():
 	RaceButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenState = 1
 	SetCharacterDescription()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	if PortraitWindow:
 		PortraitWindow.Unload ()
 	return
@@ -809,7 +809,7 @@ def PortraitCancelPress():
 
 	if PortraitWindow:
 		PortraitWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 # Race Selection
@@ -817,7 +817,7 @@ def PortraitCancelPress():
 def RacePress():
 	global CharGenWindow, RaceWindow, RaceDoneButton, RaceTextArea
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	RaceWindow = GemRB.LoadWindowObject (8)
 	GemRB.SetVar ("Race", 0)
 
@@ -847,7 +847,7 @@ def RacePress():
 	RaceCancelButton.SetText (13727)
 	RaceCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	RaceWindow.SetVisible (1)
+	RaceWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def RaceSelectPress():
@@ -869,7 +869,7 @@ def RaceDonePress():
 	ClassButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenState = 2
 	SetCharacterDescription()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def RaceCancelPress():
@@ -877,7 +877,7 @@ def RaceCancelPress():
 
 	if RaceWindow:
 		RaceWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 # Class Selection
@@ -885,7 +885,7 @@ def RaceCancelPress():
 def ClassPress():
 	global CharGenWindow, ClassWindow, KitTable, ClassTextArea, ClassDoneButton
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	ClassWindow = GemRB.LoadWindowObject (2)
 	KitTable = GemRB.LoadTableObject ("magesch")
 	ClassCount = ClassTable.GetRowCount ()
@@ -949,7 +949,7 @@ def ClassPress():
 	ClassCancelButton.SetText (13727)
 	ClassCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ClassWindow.SetVisible (1)
+	ClassWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ClassSelectPress():
@@ -963,7 +963,7 @@ def ClassSelectPress():
 def ClassMultiPress():
 	global ClassWindow, ClassMultiWindow, ClassMultiTextArea, ClassMultiDoneButton
 
-	ClassWindow.SetVisible (0)
+	ClassWindow.SetVisible (WINDOW_INVISIBLE)
 	ClassMultiWindow = GemRB.LoadWindowObject (10)
 	ClassCount = ClassTable.GetRowCount ()
 	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
@@ -1001,7 +1001,7 @@ def ClassMultiPress():
 	ClassMultiCancelButton.SetText (13727)
 	ClassMultiCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ClassMultiWindow.SetVisible (1)
+	ClassMultiWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ClassMultiSelectPress():
@@ -1025,13 +1025,13 @@ def ClassMultiCancelPress():
 
 	if ClassMultiWindow:
 		ClassMultiWindow.Unload ()
-	ClassWindow.SetVisible (1)
+	ClassWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def KitPress():
 	global ClassWindow, KitWindow, KitTextArea, KitDoneButton, KitTable
 
-	ClassWindow.SetVisible (0)
+	ClassWindow.SetVisible (WINDOW_INVISIBLE)
 	KitWindow = GemRB.LoadWindowObject (12)
 
 	KitTable = GemRB.LoadTableObject ("magesch")
@@ -1062,7 +1062,7 @@ def KitPress():
 	KitCancelButton.SetText (13727)
 	KitCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	KitWindow.SetVisible (1)
+	KitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def KitSelectPress():
@@ -1088,7 +1088,7 @@ def KitCancelPress():
 
 	if KitWindow:
 		KitWindow.Unload ()
-	ClassWindow.SetVisible (1)
+	ClassWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ClassDonePress():
@@ -1102,7 +1102,7 @@ def ClassDonePress():
 	AlignmentButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenState = 3
 	SetCharacterDescription()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ClassCancelPress():
@@ -1110,7 +1110,7 @@ def ClassCancelPress():
 
 	if ClassWindow:
 		ClassWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 # Alignment Selection
@@ -1118,7 +1118,7 @@ def ClassCancelPress():
 def AlignmentPress():
 	global CharGenWindow, AlignmentWindow, AlignmentTable, AlignmentTextArea, AlignmentDoneButton
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	AlignmentWindow = GemRB.LoadWindowObject (3)
 	AlignmentTable = GemRB.LoadTableObject ("aligns")
 	ClassAlignmentTable = GemRB.LoadTableObject ("alignmnt")
@@ -1154,7 +1154,7 @@ def AlignmentPress():
 	AlignmentCancelButton.SetText (13727)
 	AlignmentCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	AlignmentWindow.SetVisible (1)
+	AlignmentWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def AlignmentSelectPress():
@@ -1176,7 +1176,7 @@ def AlignmentDonePress():
 	AbilitiesButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenState = 4
 	SetCharacterDescription()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def AlignmentCancelPress():
@@ -1184,7 +1184,7 @@ def AlignmentCancelPress():
 
 	if AlignmentWindow:
 		AlignmentWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 # Abilities Selection
@@ -1193,7 +1193,7 @@ def AbilitiesPress():
 	global CharGenWindow, AbilitiesWindow, AbilitiesTable, AbilitiesRaceAddTable, AbilitiesRaceReqTable, AbilitiesClassReqTable, AbilitiesTextArea, AbilitiesRecallButton, AbilitiesDoneButton
 
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	AbilitiesWindow = GemRB.LoadWindowObject (4)
 	AbilitiesTable = GemRB.LoadTableObject ("ABILITY")
 	AbilitiesRaceAddTable = GemRB.LoadTableObject ("ABRACEAD")
@@ -1254,7 +1254,7 @@ def AbilitiesPress():
 
 	AbilitiesRerollPress()
 
-	AbilitiesWindow.SetVisible (1)
+	AbilitiesWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def AbilitiesCalcLimits(Index):
@@ -1391,7 +1391,7 @@ def AbilitiesDonePress():
 	SkillsState = 0
 	SetCharacterDescription()
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def AbilitiesCancelPress():
@@ -1400,7 +1400,7 @@ def AbilitiesCancelPress():
 	if AbilitiesWindow:
 		AbilitiesWindow.Unload ()
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 # Skills Selection
@@ -1480,7 +1480,7 @@ def SkillsPress():
 def SkillsSelect():
 	global CharGenWindow, SkillsWindow, SkillsTextArea, SkillsTable, SkillsDoneButton, SkillsPointsLeft
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	SkillsWindow = GemRB.LoadWindowObject (6)
 	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
 	Dexterity = str(GemRB.GetVar ("Ability2") )
@@ -1534,7 +1534,7 @@ def SkillsSelect():
 	SkillsCancelButton.SetText (13727)
 	SkillsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	SkillsWindow.SetVisible (1)
+	SkillsWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def SkillsLabelPress():
@@ -1585,7 +1585,7 @@ def SkillsDonePress():
 	if SkillsWindow:
 		SkillsWindow.Unload ()
 	SkillsState = 1
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	SkillsPress()
 	return
 
@@ -1595,7 +1595,7 @@ def SkillsCancelPress():
 	if SkillsWindow:
 		SkillsWindow.Unload ()
 	SkillsState = 0
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 # Racial Enemy Selection
@@ -1603,7 +1603,7 @@ def SkillsCancelPress():
 def RacialEnemySelect():
 	global CharGenWindow, RacialEnemyWindow, RacialEnemyTable, RacialEnemyTextArea, RacialEnemyDoneButton
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	RacialEnemyWindow = GemRB.LoadWindowObject (15)
 	RacialEnemyTable = GemRB.LoadTableObject ("haterace")
 	RacialEnemyCount = RacialEnemyTable.GetRowCount ()
@@ -1640,7 +1640,7 @@ def RacialEnemySelect():
 	RacialEnemyCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	DisplayRacialEnemies()
-	RacialEnemyWindow.SetVisible (1)
+	RacialEnemyWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def DisplayRacialEnemies():
@@ -1667,7 +1667,7 @@ def RacialEnemyDonePress():
 	if RacialEnemyWindow:
 		RacialEnemyWindow.Unload ()
 	SkillsState = 1
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	SkillsPress()
 	return
 
@@ -1677,7 +1677,7 @@ def RacialEnemyCancelPress():
 	if RacialEnemyWindow:
 		RacialEnemyWindow.Unload ()
 	SkillsState = 0
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 
@@ -1686,7 +1686,7 @@ def RacialEnemyCancelPress():
 def ProficienciesSelect():
 	global CharGenWindow, ProficienciesWindow, ProficienciesTable, ProficienciesTextArea, ProficienciesPointsLeft, ProficienciesDoneButton, ProfsMaxTable
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	ProficienciesWindow = GemRB.LoadWindowObject (9)
 	ClassName = ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
 	ProficienciesTable = GemRB.LoadTableObject ("weapprof")
@@ -1783,7 +1783,7 @@ def ProficienciesSelect():
 	ProficienciesCancelButton.SetText (13727)
 	ProficienciesCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ProficienciesWindow.SetVisible (1)
+	ProficienciesWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ProficienciesLabelPress():
@@ -1848,7 +1848,7 @@ def ProficienciesDonePress():
 	if ProficienciesWindow:
 		ProficienciesWindow.Unload ()
 	SkillsState = 2
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	SkillsPress()
 	return
 
@@ -1858,7 +1858,7 @@ def ProficienciesCancelPress():
 	if ProficienciesWindow:
 		ProficienciesWindow.Unload ()
 	SkillsState = 0
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 # Spells Selection
@@ -1866,7 +1866,7 @@ def ProficienciesCancelPress():
 def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	global CharGenWindow, MageSpellsWindow, MageSpellsTextArea, MageSpellsDoneButton, MageSpellsSelectPointsLeft, Learnable
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	MageSpellsWindow = GemRB.LoadWindowObject (7)
 	#kit (school), alignment, level
 	k = GemRB.GetVar ("Class Kit")
@@ -1916,7 +1916,7 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	MageSpellsCancelButton.SetText (13727)
 	MageSpellsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	MageSpellsWindow.SetVisible (1)
+	MageSpellsWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def MageSpellsSelectPress():
@@ -1965,7 +1965,7 @@ def MageSpellsDonePress():
 	if MageSpellsWindow:
 		MageSpellsWindow.Unload ()
 	SkillsState = 3
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	SkillsPress()
 	return
 
@@ -1975,7 +1975,7 @@ def MageSpellsCancelPress():
 	if MageSpellsWindow:
 		MageSpellsWindow.Unload ()
 	SkillsState = 0
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 
@@ -1984,7 +1984,7 @@ def MageSpellsCancelPress():
 def MageSpellsMemorize(SpellTable, Level, SpellLevel):
 	global CharGenWindow, MageMemorizeWindow, MageMemorizeTextArea, MageMemorizeDoneButton, MageMemorizePointsLeft
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	MageMemorizeWindow = GemRB.LoadWindowObject (16)
 	MaxSpellsMageTable = GemRB.LoadTableObject (SpellTable)
 	MageSpellBook = GemRB.GetVar ("MageSpellBook")
@@ -2033,7 +2033,7 @@ def MageSpellsMemorize(SpellTable, Level, SpellLevel):
 	MageMemorizeCancelButton.SetText (13727)
 	MageMemorizeCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	MageMemorizeWindow.SetVisible (1)
+	MageMemorizeWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def MageMemorizeSelectPress():
@@ -2088,7 +2088,7 @@ def MageMemorizeDonePress():
 	if MageMemorizeWindow:
 		MageMemorizeWindow.Unload ()
 	SkillsState = 4
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	SkillsPress()
 	return
 
@@ -2098,7 +2098,7 @@ def MageMemorizeCancelPress():
 	if MageMemorizeWindow:
 		MageMemorizeWindow.Unload ()
 	SkillsState = 0
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 # Priest Spells Memorize
@@ -2107,7 +2107,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 	global CharGenWindow, PriestMemorizeWindow, Learnable, ClassFlag
 	global PriestMemorizeTextArea, PriestMemorizeDoneButton, PriestMemorizePointsLeft
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	PriestMemorizeWindow = GemRB.LoadWindowObject (17)
 	t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
 	Learnable = GetLearnablePriestSpells( ClassFlag, t, SpellLevel)
@@ -2154,7 +2154,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 	PriestMemorizeCancelButton.SetText (13727)
 	PriestMemorizeCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	PriestMemorizeWindow.SetVisible (1)
+	PriestMemorizeWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def PriestMemorizeSelectPress():
@@ -2199,7 +2199,7 @@ def PriestMemorizeDonePress():
 	if PriestMemorizeWindow:
 		PriestMemorizeWindow.Unload ()
 	SkillsState = 5
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	SkillsPress()
 	return
 
@@ -2209,7 +2209,7 @@ def PriestMemorizeCancelPress():
 	if PriestMemorizeWindow:
 		PriestMemorizeWindow.Unload ()
 	SkillsState = 0
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 # Appearance Selection
@@ -2221,7 +2221,7 @@ def AppearancePress():
 	global AppearanceMajorButton, AppearanceMinorButton
 	global HairColor, SkinColor, MajorColor, MinorColor
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	AppearanceWindow = GemRB.LoadWindowObject (13)
 	AppearanceTable = GemRB.LoadTableObject ("PORTCOLR")
 
@@ -2280,7 +2280,7 @@ def AppearancePress():
 	AppearanceCancelButton.SetText (13727)
 	AppearanceCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	AppearanceWindow.SetVisible (1)
+	AppearanceWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def DrawAvatar():
@@ -2323,7 +2323,7 @@ def AppearanceMinorPress():
 def AppearanceColorChoice (CurrentColor):
 	global AppearanceWindow, AppearanceColorWindow
 
-	AppearanceWindow.SetVisible (0)
+	AppearanceWindow.SetVisible (WINDOW_INVISIBLE)
 	AppearanceColorWindow = GemRB.LoadWindowObject (14)
 	AppearanceColorTable = GemRB.LoadTableObject ("clowncol")
 	ColorType = GemRB.GetVar ("ColorType")
@@ -2342,7 +2342,7 @@ def AppearanceColorChoice (CurrentColor):
 			ColorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "AppearanceColorSelected")
 			ColorButton.SetVarAssoc ("SelectedColor", Color)
 
-	AppearanceColorWindow.SetVisible (1)
+	AppearanceColorWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def AppearanceColorSelected():
@@ -2371,7 +2371,7 @@ def AppearanceColorSelected():
 		GemRB.SetVar ("MinorColor", MinorColor)
 		AppearanceMinorButton.SetBAM ("COLGRAD", 0, 0, MinorColor)
 	DrawAvatar()
-	AppearanceWindow.SetVisible (1)
+	AppearanceWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def AppearanceDonePress():
@@ -2379,7 +2379,7 @@ def AppearanceDonePress():
 
 	if AppearanceWindow:
 		AppearanceWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	CharSoundSelect()
 	return
 
@@ -2388,14 +2388,14 @@ def AppearanceCancelPress():
 
 	if AppearanceWindow:
 		AppearanceWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def CharSoundSelect():
 	global CharGenWindow, CharSoundWindow, CharSoundTable, CharSoundStrings
 	global CharSoundVoiceList
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	CharSoundWindow = GemRB.LoadWindowObject (19)
 	CharSoundTable = GemRB.LoadTableObject ("CHARSND")
 	CharSoundStrings = GemRB.LoadTableObject ("CHARSTR")
@@ -2424,7 +2424,7 @@ def CharSoundSelect():
 	CharSoundCancelButton.SetText (13727)
 	CharSoundCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	CharSoundWindow.SetVisible (1)
+	CharSoundWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def CharSoundPlayPress():
@@ -2448,7 +2448,7 @@ def CharSoundDonePress():
 	NameButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenState = 7
 	SetCharacterDescription()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def CharSoundCancelPress():
@@ -2456,7 +2456,7 @@ def CharSoundCancelPress():
 
 	if CharSoundWindow:
 		CharSoundWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 # Biography Selection
@@ -2464,7 +2464,7 @@ def CharSoundCancelPress():
 def BiographyPress():
 	global CharGenWindow, BiographyWindow, BiographyField
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	BiographyWindow = GemRB.LoadWindowObject (51)
 
 	BiographyField = BiographyWindow.GetControl (4)
@@ -2487,7 +2487,7 @@ def BiographyPress():
 	BiographyDoneButton.SetText (11973)
 	BiographyDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
-	BiographyWindow.SetVisible (1)
+	BiographyWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def BiographyClearPress():
@@ -2501,7 +2501,7 @@ def BiographyCancelPress():
 
 	if BiographyWindow:
 		BiographyWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def BiographyDonePress():
@@ -2510,7 +2510,7 @@ def BiographyDonePress():
 	GemRB.SetToken ("Biography", BiographyField.QueryText () )
 	if BiographyWindow:
 		BiographyWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 # Name Selection
@@ -2518,7 +2518,7 @@ def BiographyDonePress():
 def NamePress():
 	global CharGenWindow, NameWindow, NameDoneButton, NameField
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	NameWindow = GemRB.LoadWindowObject (5)
 
 	NameField = NameWindow.GetControl (2)
@@ -2536,7 +2536,7 @@ def NamePress():
 	NameCancelButton.SetText (13727)
 	NameCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	NameWindow.SetVisible (1)
+	NameWindow.SetVisible (WINDOW_VISIBLE)
 	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
 	return
 
@@ -2559,7 +2559,7 @@ def NameDonePress():
 	AcceptButton.SetState (IE_GUI_BUTTON_ENABLED)
 	AcceptButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	SetCharacterDescription()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def NameCancelPress():
@@ -2568,7 +2568,7 @@ def NameCancelPress():
 	GemRB.SetToken ("CHARNAME", "")
 	if NameWindow:
 		NameWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 # Import Character
@@ -2577,7 +2577,7 @@ def ImportPress():
 	global CharGenWindow, ImportWindow
 	global CharImportList
 
-	CharGenWindow.SetVisible (0)
+	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	ImportWindow = GemRB.LoadWindowObject (20)
 
 	TextAreaControl = ImportWindow.GetControl(4)
@@ -2599,7 +2599,7 @@ def ImportPress():
 	ImportCancelButton.SetText (13727)
 	ImportCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ImportWindow.SetVisible (1)
+	ImportWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ImportDonePress():
@@ -2646,5 +2646,5 @@ def ImportCancelPress():
 
 	if ImportWindow:
 		ImportWindow.Unload ()
-	CharGenWindow.SetVisible (1)
+	CharGenWindow.SetVisible (WINDOW_VISIBLE)
 	return

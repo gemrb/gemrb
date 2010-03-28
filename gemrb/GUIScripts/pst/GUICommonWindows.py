@@ -84,10 +84,10 @@ def OpenCommonWindows ():
 	SetupMenuWindowControls (Window)
 
 
-	TimeWindow.SetVisible (1)
-	PortWindow.SetVisible (1)
-	MenuWindow.SetVisible (1)
-	MainWindow.SetVisible (1)
+	TimeWindow.SetVisible (WINDOW_VISIBLE)
+	PortWindow.SetVisible (WINDOW_VISIBLE)
+	MenuWindow.SetVisible (WINDOW_VISIBLE)
+	MainWindow.SetVisible (WINDOW_VISIBLE)
 	
 def CloseCommonWindows ():
 	global MainWindow
@@ -566,7 +566,7 @@ def OpenWaitForDiscWindow ():
 	try:
 		GemRB.UnhideGUI ()
 	except:
-		DiscWindow.SetVisible (1)
+		DiscWindow.SetVisible (WINDOW_VISIBLE)
 
 def SetPSTGamedaysAndHourToken ():
 	currentTime = GemRB.GetGameTime()

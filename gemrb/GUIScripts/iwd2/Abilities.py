@@ -146,7 +146,7 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	AbilityWindow.SetVisible(1)
+	AbilityWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def RightPress():

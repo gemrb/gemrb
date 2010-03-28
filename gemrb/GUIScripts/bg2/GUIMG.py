@@ -69,7 +69,7 @@ def OpenMageWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMG", 640, 480)
 
@@ -141,10 +141,10 @@ def SetupMageWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	UpdateMageWindow ()
-	OptionsWindow.SetVisible (1)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	#bringing the window front
-	Window.SetVisible (3)
-	PortraitWindow.SetVisible (1)
+	Window.SetVisible (WINDOW_FRONT)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def UpdateMageWindow ():
@@ -220,9 +220,9 @@ def UpdateMageWindow ():
 			Button.EnableBorder (0, 0)
 
 	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 2)=="*"):
-		Window.SetVisible (2)
+		Window.SetVisible (WINDOW_GRAYED)
 	else:
-		Window.SetVisible (1)
+		Window.SetVisible (WINDOW_VISIBLE)
 	return
 
 def MagePrevLevelPress ():

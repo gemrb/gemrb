@@ -176,7 +176,7 @@ def OnLoad():
 	RerollButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"RollPress")
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	AbilityWindow.SetVisible(1)
+	AbilityWindow.SetVisible(WINDOW_VISIBLE)
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	return
 

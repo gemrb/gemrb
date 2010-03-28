@@ -89,7 +89,7 @@ def OpenOptionsWindow ():
 		return
 
 	#hideflag = GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 	SetSelectionChangeHandler (DummyWindow)
 
 	GemRB.LoadWindowPack ("GUIOPT", 640, 480)
@@ -141,9 +141,9 @@ def OpenOptionsWindow ():
 	Label = Window.GetControl (0x1000000b)
 	Label.SetText (GEMRB_VERSION)
 
-	OptionsWindow.SetVisible (1)
-	Window.SetVisible (1)
-	GUICommonWindows.PortraitWindow.SetVisible (1)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	Window.SetVisible (WINDOW_VISIBLE)
+	GUICommonWindows.PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 
@@ -549,7 +549,7 @@ def CloseLoadMsgWindow ():
 	if LoadMsgWindow:
 		LoadMsgWindow.Unload ()
 	LoadMsgWindow = None
-	#OptionsWindow.SetVisible (1)
+	#OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def LoadGamePress ():
@@ -624,7 +624,7 @@ def CloseQuitMsgWindow ():
 	if QuitMsgWindow:
 		QuitMsgWindow.Unload ()
 	QuitMsgWindow = None
-	OptionsWindow.SetVisible (1)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 

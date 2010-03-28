@@ -187,6 +187,14 @@ MODAL_SHADOW_NONE = 0
 MODAL_SHADOW_GRAY = 1
 MODAL_SHADOW_BLACK = 2
 
+# Flags for SetVisible()
+# !!! Keep these synchronized with Interface.h !!!
+#WINDOW_INVALID = -1
+WINDOW_INVISIBLE = 0
+WINDOW_VISIBLE = 1
+WINDOW_GRAYED = 2
+WINDOW_FRONT = 3
+
 # Flags for GameSelectPC()
 # !!! Keep these synchronized with Game.h !!!
 SELECT_NORMAL  = 0x00

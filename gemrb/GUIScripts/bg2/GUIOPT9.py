@@ -101,7 +101,7 @@ def OnLoad():
 	OkButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	FeedbackWindow.SetVisible(1)
+	FeedbackWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def MarkerSliderPress():

@@ -28,15 +28,15 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUIOPT", 800, 600)
 
 	MessageBarWindow = GemRB.LoadWindowObject(0)
-	MessageBarWindow.SetVisible(1) #This will startup the window as grayed
+	MessageBarWindow.SetVisible(WINDOW_VISIBLE) #This will startup the window as grayed
 
 	CharactersBarWindow = GemRB.LoadWindowObject(1)
-	CharactersBarWindow.SetVisible(1)
+	CharactersBarWindow.SetVisible(WINDOW_VISIBLE)
 
 	GemRB.DrawWindows()
 
-	MessageBarWindow.SetVisible(0)
-	CharactersBarWindow.SetVisible(0)
+	MessageBarWindow.SetVisible(WINDOW_INVISIBLE)
+	CharactersBarWindow.SetVisible(WINDOW_INVISIBLE)
 
 	if MessageBarWindow:
 		MessageBarWindow.Unload()
@@ -71,7 +71,7 @@ def OnLoad():
 	ReturnButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ReturnPress")
 	ReturnButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	OptionsWindow.SetVisible(1)
+	OptionsWindow.SetVisible(WINDOW_VISIBLE)
 
 	return
 

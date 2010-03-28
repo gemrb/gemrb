@@ -85,7 +85,7 @@ def OpenRecordsWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIREC", 640, 480) #TODO: remove?
 	RecordsWindow = Window = GemRB.LoadWindowObject (2)
@@ -136,9 +136,9 @@ def OpenRecordsWindow ():
 	SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
 
-	OptionsWindow.SetVisible (1)
-	Window.SetVisible (3)
-	PortraitWindow.SetVisible (1)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	Window.SetVisible (WINDOW_FRONT)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def UpdateRecordsWindow ():
@@ -273,7 +273,7 @@ def UpdateRecordsWindow ():
 	Text = Window.GetControl (45)
 	Text.SetText (stats_overview)
 	#TODO: making window visible/shaded depending on the pc's state
-	Window.SetVisible (1)
+	Window.SetVisible (WINDOW_VISIBLE)
 	return
 
 def GetStatColor (pc, stat):

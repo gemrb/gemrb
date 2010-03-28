@@ -107,9 +107,9 @@ def OnLoad():
 	MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
 	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "Restart")
 	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	QuitWindow.SetVisible (0)
-	TutorialWindow.SetVisible (0)
-	StartWindow.SetVisible (1)
+	QuitWindow.SetVisible (WINDOW_INVISIBLE)
+	TutorialWindow.SetVisible (WINDOW_INVISIBLE)
+	StartWindow.SetVisible (WINDOW_VISIBLE)
 	MusicTable = GemRB.LoadTableObject ("songlist")
 	# the table has useless rownames, so we can't search for BG2Theme
 	theme = MusicTable.GetValue ("33", "RESOURCE")
@@ -204,8 +204,8 @@ def NewSingle():
 	return
 
 def Tutorial():
-	StartWindow.SetVisible (0)
-	TutorialWindow.SetVisible (1)
+	StartWindow.SetVisible (WINDOW_INVISIBLE)
+	TutorialWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def PlayPress():
@@ -224,13 +224,13 @@ def PlayPress():
 	return
 
 def CancelTut():
-	TutorialWindow.SetVisible (0)
-	StartWindow.SetVisible (1)
+	TutorialWindow.SetVisible (WINDOW_INVISIBLE)
+	StartWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ExitPress():
-	StartWindow.SetVisible (0)
-	QuitWindow.SetVisible (1)
+	StartWindow.SetVisible (WINDOW_INVISIBLE)
+	QuitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ExitConfirmed():
@@ -260,8 +260,8 @@ def MoviesPress():
 	return
 
 def ExitCancelled():
-	QuitWindow.SetVisible (0)
-	StartWindow.SetVisible (1)
+	QuitWindow.SetVisible (WINDOW_INVISIBLE)
+	StartWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def BackToMain():
@@ -278,8 +278,8 @@ def BackToMain():
 	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OptionsPress")
 	MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MultiPlayerPress")
 	MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
-	QuitWindow.SetVisible (0)
-	StartWindow.SetVisible (1)
+	QuitWindow.SetVisible (WINDOW_INVISIBLE)
+	StartWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def Restart():

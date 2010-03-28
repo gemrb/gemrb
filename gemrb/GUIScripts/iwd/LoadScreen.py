@@ -41,11 +41,11 @@ def StartLoadScreen ():
 	GemRB.SetVar ("Progress", Progress)
 	Bar.SetVarAssoc ("Progress", Progress)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
-	LoadScreen.SetVisible (1)
+	LoadScreen.SetVisible (WINDOW_VISIBLE)
 	return
 
 def EndLoadScreen ():
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK2")
-	LoadScreen.SetVisible (1)
+	LoadScreen.SetVisible (WINDOW_VISIBLE)
 	return

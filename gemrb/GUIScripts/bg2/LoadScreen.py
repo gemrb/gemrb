@@ -47,4 +47,4 @@ def StartLoadScreen ():
 	TextArea.SetText (HintStr)
 	Bar = LoadScreen.GetControl (0)
 	Bar.SetVarAssoc ("Progress", Progress)
-	LoadScreen.SetVisible (1)
+	LoadScreen.SetVisible (WINDOW_VISIBLE)

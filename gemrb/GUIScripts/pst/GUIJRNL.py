@@ -111,7 +111,7 @@ def OpenJournalWindow ():
 	Button.SetText (20636)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
-	#JournalWindow.SetVisible (1)
+	#JournalWindow.SetVisible (WINDOW_VISIBLE)
 	GemRB.UnhideGUI()
 	
 
@@ -165,7 +165,7 @@ def OpenQuestsWindow ():
 	EvaluateAllQuests ()
 	PopulateQuestsList ()
 
-	#QuestsWindow.SetVisible (1)
+	#QuestsWindow.SetVisible (WINDOW_VISIBLE)
 	GemRB.UnhideGUI()
 	
 
@@ -447,7 +447,7 @@ def OpenLogWindow ():
 		Text.Append (je['Text'], 3*i + 1)
 		Text.Append ("", 3*i + 2)
 			
-	Window.SetVisible (1)
+	Window.SetVisible (WINDOW_VISIBLE)
 	
 	GemRB.UnhideGUI()
 

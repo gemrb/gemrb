@@ -48,7 +48,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, "SelectPress")
-	ImportWindow.SetVisible(1)
+	ImportWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def SelectPress():

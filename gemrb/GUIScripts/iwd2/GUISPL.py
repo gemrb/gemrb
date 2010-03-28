@@ -62,7 +62,7 @@ def OpenSpellBookWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUISPL", 800, 600)
 	SpellBookWindow = Window = GemRB.LoadWindowObject (2)
@@ -191,9 +191,9 @@ def UpdateSpellBookWindow ():
 			Button.EnableBorder (0, 0)
 
 	#if actor is uncontrollable, make this grayed
-	Window.SetVisible (1)
-	PortraitWindow.SetVisible (1)
-	OptionsWindow.SetVisible (1)
+	Window.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 #TODO: spell type selector

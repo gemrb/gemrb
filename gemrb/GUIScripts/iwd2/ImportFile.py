@@ -62,8 +62,8 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, "SelectFile")
-	MainWindow.SetVisible(1)
-	ImportWindow.SetVisible(1)
+	MainWindow.SetVisible(WINDOW_VISIBLE)
+	ImportWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def DonePress():
@@ -94,6 +94,6 @@ def SelectFile():
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
 	Portrait = GemRB.GetPlayerPortrait (Slot,0)
 	PortraitButton.SetPicture (Portrait, "NOPORTLG") 
-	ImportWindow.SetVisible(3) #bring it to the front
+	ImportWindow.SetVisible(WINDOW_FRONT) #bring it to the front
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return

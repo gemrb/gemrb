@@ -78,7 +78,7 @@ def OpenInventoryWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIINV", 640, 480)
 	InventoryWindow = Window = GemRB.LoadWindowObject (2)
@@ -167,9 +167,9 @@ def OpenInventoryWindow ():
 	GemRB.SetVar ("TopIndex", 0)
 	SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()
-	OptionsWindow.SetVisible (1)
-	Window.SetVisible (3)
-	PortraitWindow.SetVisible (1)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	Window.SetVisible (WINDOW_FRONT)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ColorDonePress ():
@@ -177,7 +177,7 @@ def ColorDonePress ():
 
 	if ColorPicker:
 		ColorPicker.Unload ()
-	InventoryWindow.SetVisible (1)
+	InventoryWindow.SetVisible (WINDOW_VISIBLE)
 	ColorTable = GemRB.LoadTableObject ("clowncol")
 	PickedColor=ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
 	if ColorIndex==2:
@@ -209,7 +209,7 @@ def GetColor ():
 	global ColorPicker
 
 	ColorTable = GemRB.LoadTableObject ("clowncol")
-	InventoryWindow.SetVisible (2) #darken it
+	InventoryWindow.SetVisible (WINDOW_GRAYED) #darken it
 	ColorPicker=GemRB.LoadWindowObject (3)
 	GemRB.SetVar ("Selected",-1)
 	for i in range (34):
@@ -230,7 +230,7 @@ def GetColor ():
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc ("Selected",i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ColorDonePress")
-	ColorPicker.SetVisible (1)
+	ColorPicker.SetVisible (WINDOW_VISIBLE)
 	return
 
 #complete update
@@ -390,7 +390,7 @@ def RefreshInventoryWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 
 	#making window visible/shaded depending on the pc's state
-	Window.SetVisible (1)
+	Window.SetVisible (WINDOW_VISIBLE)
 	return
 
 def UpdateSlot (pc, slot):

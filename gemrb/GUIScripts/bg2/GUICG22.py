@@ -120,7 +120,7 @@ def OnLoad():
 	Init = 1
 	RedrawKits()
 	KitPress()
-	KitWindow.SetVisible(1)
+	KitWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def RedrawKits():

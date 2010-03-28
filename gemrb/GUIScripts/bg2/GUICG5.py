@@ -43,7 +43,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE,"EditChange")
-	NameWindow.SetVisible(1)
+	NameWindow.SetVisible(WINDOW_VISIBLE)
 	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
 	return
 

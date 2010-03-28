@@ -62,7 +62,7 @@ def OpenInventoryWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIINV", 800, 600)
 	InventoryWindow = Window = GemRB.LoadWindowObject (2)
@@ -164,7 +164,7 @@ def OpenInventoryWindow ():
 def CancelColor():
 	if ColorPicker:
 		ColorPicker.Unload ()
-	InventoryWindow.SetVisible (1)
+	InventoryWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ColorDonePress():
@@ -225,7 +225,7 @@ def GetColor():
 	global ColorPicker
 
 	ColorTable = GemRB.LoadTableObject ("clowncol")
-	InventoryWindow.SetVisible (2) #darken it
+	InventoryWindow.SetVisible (WINDOW_GRAYED) #darken it
 	ColorPicker=GemRB.LoadWindowObject (3)
 	GemRB.SetVar ("Selected",-1)
 	Button = ColorPicker.GetControl (35)
@@ -250,7 +250,7 @@ def GetColor():
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc ("Selected",i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ColorDonePress")
-	ColorPicker.SetVisible (1)
+	ColorPicker.SetVisible (WINDOW_VISIBLE)
 	return
 
 #complete update
@@ -361,9 +361,9 @@ def RefreshInventoryWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 
 	#if actor is uncontrollable, make this grayed
-	Window.SetVisible (1)
-	PortraitWindow.SetVisible (1)
-	OptionsWindow.SetVisible (1)
+	Window.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def UpdateSlot (pc, slot):

@@ -93,7 +93,7 @@ def ShowMap ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindowObject (2)
@@ -124,12 +124,12 @@ def ShowMap ():
 	GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, "RevealMap")
-	Window.SetVisible (1)
-	OptionsWindow.SetVisible (2)
-	PortraitWindow.SetVisible (2)
-	OptionsWindow.SetVisible (3)
-	PortraitWindow.SetVisible (3)
-	Window.SetVisible (3)
+	Window.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.SetVisible (WINDOW_GRAYED)
+	PortraitWindow.SetVisible (WINDOW_GRAYED)
+	OptionsWindow.SetVisible (WINDOW_FRONT)
+	PortraitWindow.SetVisible (WINDOW_FRONT)
+	Window.SetVisible (WINDOW_FRONT)
 	Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	GemRB.GamePause (0,0)
 	return
@@ -159,7 +159,7 @@ def OpenMapWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindowObject (2)
@@ -194,9 +194,9 @@ def OpenMapWindow ():
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 	Map.SetEvent (IE_GUI_MAP_ON_RIGHT_PRESS, "AddNoteWindow")
 	Map.SetEvent (IE_GUI_MAP_ON_DOUBLE_PRESS, "LeftDoublePressMap")
-	OptionsWindow.SetVisible (1)
-	Window.SetVisible (1)
-	PortraitWindow.SetVisible (1)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	Window.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
 
@@ -207,7 +207,7 @@ def LeftDoublePressMap ():
 def CloseNoteWindow ():
 	if NoteWindow:
 		NoteWindow.Unload ()
-	MapWindow.SetVisible (1)
+	MapWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def RemoveMapNote ():
@@ -335,7 +335,7 @@ def WorldMapWindowCommon (Travel):
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
 	WorldMapWindow = Window = GemRB.LoadWindowObject (0)
@@ -388,7 +388,7 @@ def WorldMapWindowCommon (Travel):
 	Button = Window.GetControl (0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseWorldMapWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	Window.SetVisible (1)
+	Window.SetVisible (WINDOW_VISIBLE)
 	MapC()
 	return
 

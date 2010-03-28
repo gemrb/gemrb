@@ -130,7 +130,7 @@ class CharGen:
 					commentFn(TextAreaControl)
 		
 		#show
-		CharGenWindow.SetVisible(1)
+		CharGenWindow.SetVisible(WINDOW_VISIBLE)
 		CharGenWindow.Invalidate()
 		self.window = CharGenWindow
 	

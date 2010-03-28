@@ -70,8 +70,8 @@ def OnLoad():
 	Label=StartWindow.GetControl(0x0fff0000)
 	Label.SetText(GEMRB_VERSION)
 	
-	QuitWindow.SetVisible(0)
-	StartWindow.SetVisible(1)
+	QuitWindow.SetVisible(WINDOW_INVISIBLE)
+	StartWindow.SetVisible(WINDOW_VISIBLE)
 
 	GemRB.LoadMusicPL("Main.mus")
 	return
@@ -97,8 +97,8 @@ def ResumeLifePress():
 	return
 
 def ExitPress():
-	StartWindow.SetVisible(2)
-	QuitWindow.SetVisible(1)
+	StartWindow.SetVisible(WINDOW_GRAYED)
+	QuitWindow.SetVisible(WINDOW_VISIBLE)
 	return
 	
 def ExitConfirmed():
@@ -106,6 +106,6 @@ def ExitConfirmed():
 	return
 
 def ExitCancelled():
-	QuitWindow.SetVisible(0)
-	StartWindow.SetVisible(1)
+	QuitWindow.SetVisible(WINDOW_INVISIBLE)
+	StartWindow.SetVisible(WINDOW_VISIBLE)
 	return

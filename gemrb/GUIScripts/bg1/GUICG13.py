@@ -175,7 +175,7 @@ def GetColor():
 def HairPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(0)
+	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 0
 	PickedColor = HairColor
 	GetColor()
@@ -184,7 +184,7 @@ def HairPress():
 def SkinPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(0)
+	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 1
 	PickedColor = SkinColor
 	GetColor()
@@ -193,7 +193,7 @@ def SkinPress():
 def MajorPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(0)
+	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 2
 	PickedColor = MinorColor
 	GetColor()
@@ -202,7 +202,7 @@ def MajorPress():
 def MinorPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(0)
+	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 3
 	PickedColor = MajorColor
 	GetColor()

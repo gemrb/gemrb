@@ -122,7 +122,7 @@ def OnLoad():
 		PDollResRef = "CEMB1G1"
 
 	RefreshPDoll()
-	ColorWindow.SetVisible(1)
+	ColorWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def RandomDonePress():
@@ -134,7 +134,7 @@ def DonePress():
 	global Color1, Color2, Color3, Color4, ColorWindow, ColorIndex, PickedColor, ColorPicker
 	if ColorPicker:
 		ColorPicker.Unload()
-	ColorWindow.SetVisible(1)
+	ColorWindow.SetVisible(WINDOW_VISIBLE)
 	
 	if ColorIndex==0:
 		PickedColor=HairTable.GetValue(GemRB.GetVar("Selected"),0)
@@ -165,7 +165,7 @@ def CancelPress():
 	global ColorPicker, ColorWindow
 	if ColorPicker:
 		ColorPicker.Unload ()
-	ColorWindow.SetVisible (1)
+	ColorWindow.SetVisible (WINDOW_VISIBLE)
 
 def GetColor():
 	global ColorPicker, ColorIndex, PickedColor
@@ -212,14 +212,14 @@ def GetColor():
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ColorPicker.SetVisible(1)
+	ColorPicker.SetVisible(WINDOW_VISIBLE)
 	return
 
 def HairPress():
 	global ColorIndex, PickedColor
 
 #	GemRB.UnloadWindow(ColorWindow)
-	ColorWindow.SetVisible(0)
+	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 0
 	PickedColor = Color1
 	GetColor()
@@ -229,7 +229,7 @@ def SkinPress():
 	global ColorIndex, PickedColor
 
 #	GemRB.UnloadWindow(ColorWindow)
-	ColorWindow.SetVisible(0)
+	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 1
 	PickedColor = Color2
 	GetColor()
@@ -239,7 +239,7 @@ def MajorPress():
 	global ColorIndex, PickedColor
 
 #	GemRB.UnloadWindow(ColorWindow)
-	ColorWindow.SetVisible(0)
+	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 2
 	PickedColor = Color3
 	GetColor()
@@ -249,7 +249,7 @@ def MinorPress():
 	global ColorIndex, PickedColor
 
 #	GemRB.UnloadWindow(ColorWindow)
-	ColorWindow.SetVisible(0)
+	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 3
 	PickedColor = Color4
 	GetColor()

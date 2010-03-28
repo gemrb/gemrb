@@ -80,7 +80,7 @@ def OpenOptionsWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIOPT", 800, 600)
 	GameOptionsWindow = Window = GemRB.LoadWindowObject (2)
@@ -126,9 +126,9 @@ def OpenOptionsWindow ():
 	VersionLabel = Window.GetControl (0x1000000B)
 	VersionLabel.SetText (GEMRB_VERSION)
 
-	Window.SetVisible (1)
-	OptionsWindow.SetVisible (1)
-	PortraitWindow.SetVisible (1)
+	Window.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def CloseVideoOptionsWindow ():
@@ -616,9 +616,9 @@ def CloseLoadMsgWindow ():
 	if LoadMsgWindow:
 		LoadMsgWindow.Unload ()
 	LoadMsgWindow = None
-	GameOptionsWindow.SetVisible (1)
-	OptionsWindow.SetVisible (1)
-	PortraitWindow.SetVisible (1)
+	GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def LoadGamePress ():
@@ -694,9 +694,9 @@ def CloseQuitMsgWindow ():
 	if QuitMsgWindow:
 		QuitMsgWindow.Unload ()
 	QuitMsgWindow = None
-	GameOptionsWindow.SetVisible (1)
-	OptionsWindow.SetVisible (1)
-	PortraitWindow.SetVisible (1)
+	GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 ###################################################

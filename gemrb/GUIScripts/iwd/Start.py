@@ -99,13 +99,13 @@ def OnLoad ():
 	MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
 	LoadGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LoadPress")
 	CreateGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CreatePress")
-	StartWindow.SetVisible (1)
+	StartWindow.SetVisible (WINDOW_VISIBLE)
 	GemRB.LoadMusicPL("Theme.mus",1)
 	return
 
 def ProtocolPress ():
 	global StartWindow, ProtocolWindow
-	StartWindow.SetVisible (0)
+	StartWindow.SetVisible (WINDOW_INVISIBLE)
 	ProtocolWindow = GemRB.LoadWindowObject (1)
 	
 	#Disabling Unused Buttons in this Window
@@ -164,7 +164,7 @@ def ProtocolDonePress ():
 		ProtocolButton.SetText (13968)
 		JoinGameButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	
-	StartWindow.SetVisible (1)
+	StartWindow.SetVisible (WINDOW_VISIBLE)
 	return
 	
 def CreatePress ():
@@ -267,7 +267,7 @@ def QuitGameTypePress ():
 		GameTypeWindow.Unload ()
 		GameTypeWindow = None
 	GemRB.SetVar("ExpansionGame", 0)
-	StartWindow.SetVisible (1)
+	StartWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def LoadPress ():
@@ -288,7 +288,7 @@ def MoviesPress ():
 	
 def QuitPress ():
 	global StartWindow, QuitWindow
-	StartWindow.SetVisible (0)
+	StartWindow.SetVisible (WINDOW_INVISIBLE)
 	QuitWindow = GemRB.LoadWindowObject (22)
 	CancelButton = QuitWindow.GetControl (2)
 	CancelButton.SetText (13727)
@@ -310,7 +310,7 @@ def QuitCancelPress ():
 	if QuitWindow:
 		QuitWindow.Unload ()
 		QuitWindow = None
-	StartWindow.SetVisible (1)
+	StartWindow.SetVisible (WINDOW_VISIBLE)
 	return
 	
 def QuitQuitPress ():

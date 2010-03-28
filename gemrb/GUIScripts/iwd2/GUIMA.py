@@ -92,7 +92,7 @@ def ShowMap ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindowObject (2)
@@ -123,12 +123,12 @@ def ShowMap ():
 	GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, "RevealMap")
-	Window.SetVisible (1)
-	OptionsWindow.SetVisible (2)
-	PortraitWindow.SetVisible (2)
-	OptionsWindow.SetVisible (3)
-	PortraitWindow.SetVisible (3)
-	Window.SetVisible (3)
+	Window.SetVisible (WINDOW_VISIBLE)
+	OptionsWindow.SetVisible (WINDOW_GRAYED)
+	PortraitWindow.SetVisible (WINDOW_GRAYED)
+	OptionsWindow.SetVisible (WINDOW_FRONT)
+	PortraitWindow.SetVisible (WINDOW_FRONT)
+	Window.SetVisible (WINDOW_FRONT)
 	Map.SetStatus(IE_GUI_CONTROL_FOCUSED)
 	GemRB.GamePause (0,0)
 	return
@@ -158,7 +158,7 @@ def OpenMapWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMAP", 800, 600)
 	MapWindow = Window = GemRB.LoadWindowObject (2)
@@ -203,7 +203,7 @@ def LeftDoublePressMap ():
 def CloseNoteWindow ():
 	if NoteWindow:
 		NoteWindow.Unload ()
-	MapWindow.SetVisible (1)
+	MapWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def RemoveMapNote ():
@@ -277,8 +277,8 @@ def AddNoteWindow ():
 	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS,"RemoveMapNote")
 	Label.SetText (13957)
 
-	MapWindow.SetVisible (2)
-	NoteWindow.SetVisible (1)
+	MapWindow.SetVisible (WINDOW_GRAYED)
+	NoteWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def OpenWorldMapWindowInside ():
@@ -334,7 +334,7 @@ def WorldMapWindowCommon (Travel):
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIWMAP",800, 600)
 	WorldMapWindow = Window = GemRB.LoadWindowObject (2)
@@ -351,7 +351,7 @@ def WorldMapWindowCommon (Travel):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
 	else:
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
-	Window.SetVisible (1)
+	Window.SetVisible (WINDOW_VISIBLE)
 
 ###################################################
 # End of file GUIMA.py

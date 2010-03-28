@@ -75,7 +75,7 @@ def OnLoad ():
 			SetPicture ()
 			break
 		LastPortrait = LastPortrait + 1
-	AppearanceWindow.SetVisible (1)
+	AppearanceWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def RightPress ():

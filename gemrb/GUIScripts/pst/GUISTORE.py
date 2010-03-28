@@ -72,11 +72,11 @@ def OpenStoreWindow ():
 	global StoreWindow, party_gold, store_name, Store
 	
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0) #removing the game control screen
+	GemRB.SetVisible (0,WINDOW_INVISIBLE) #removing the game control screen
 	
 	GemRB.LoadWindowPack ("GUISTORE")
 	StoreWindow = Window = GemRB.LoadWindowObject (3)
-	Window.SetVisible (1)
+	Window.SetVisible (WINDOW_VISIBLE)
 
 	Store = GemRB.GetStore ()
 	# font used for store name has only uppercase chars

@@ -42,7 +42,7 @@ def OnLoad():
 	GraphicButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "GraphicPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "BackPress")
 	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	OptionsWindow.SetVisible(1)
+	OptionsWindow.SetVisible(WINDOW_VISIBLE)
 	return
 	
 def SoundPress():

@@ -726,7 +726,7 @@ def OpenWaitForDiscWindow ():
 	try:
 		GemRB.UnhideGUI ()
 	except:
-		DiscWindow.SetVisible (1)
+		DiscWindow.SetVisible (WINDOW_VISIBLE)
 
 def CheckLevelUp(pc):
 	GemRB.SetVar ("CheckLevelUp"+str(pc), CanLevelUp (pc))

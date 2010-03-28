@@ -115,7 +115,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	RefreshPDoll()
-	ColorWindow.SetVisible(1)
+	ColorWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def DonePress():
@@ -123,7 +123,7 @@ def DonePress():
 
 	if ColorPicker:
 		ColorPicker.Unload()
-	ColorWindow.SetVisible(1)
+	ColorWindow.SetVisible(WINDOW_VISIBLE)
 	PickedColor=ColorTable.GetValue(ColorIndex, GemRB.GetVar("Selected"))
 	if ColorIndex==0:
 		HairColor=PickedColor
@@ -170,13 +170,13 @@ def GetColor():
 		Button.SetVarAssoc("Selected",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	
-	ColorPicker.SetVisible(1)
+	ColorPicker.SetVisible(WINDOW_VISIBLE)
 	return
 
 def HairPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(0)
+	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 0
 	PickedColor = HairColor
 	GetColor()
@@ -185,7 +185,7 @@ def HairPress():
 def SkinPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(0)
+	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 1
 	PickedColor = SkinColor
 	GetColor()
@@ -194,7 +194,7 @@ def SkinPress():
 def MajorPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(0)
+	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 2
 	PickedColor = MinorColor
 	GetColor()
@@ -203,7 +203,7 @@ def MajorPress():
 def MinorPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(0)
+	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 3
 	PickedColor = MajorColor
 	GetColor()

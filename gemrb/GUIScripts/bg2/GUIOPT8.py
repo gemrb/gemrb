@@ -104,7 +104,7 @@ def OnLoad():
 	OkButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	GamePlayWindow.SetVisible(1)
+	GamePlayWindow.SetVisible(WINDOW_VISIBLE)
 	return
 	
 def DelayPress():
@@ -148,28 +148,28 @@ def HotKeyPress():
 	return
 	
 def FeedbackPress():
-	GamePlayWindow.SetVisible(0)
+	GamePlayWindow.SetVisible(WINDOW_INVISIBLE)
 	if GamePlayWindow:
 		GamePlayWindow.Unload()
 	GemRB.SetNextScript("GUIOPT9")
 	return
 	
 def AutoPausePress():
-	GamePlayWindow.SetVisible(0)
+	GamePlayWindow.SetVisible(WINDOW_INVISIBLE)
 	if GamePlayWindow:
 		GamePlayWindow.Unload()
 	GemRB.SetNextScript("GUIOPT10")
 	return
 	
 def OkPress():
-	GamePlayWindow.SetVisible(0)
+	GamePlayWindow.SetVisible(WINDOW_INVISIBLE)
 	if GamePlayWindow:
 		GamePlayWindow.Unload()
 	GemRB.SetNextScript("StartOpt")
 	return
 	
 def CancelPress():
-	GamePlayWindow.SetVisible(0)
+	GamePlayWindow.SetVisible(WINDOW_INVISIBLE)
 	if GamePlayWindow:
 		GamePlayWindow.Unload()
 	GemRB.SetNextScript("StartOpt")

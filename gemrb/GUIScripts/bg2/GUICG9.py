@@ -53,7 +53,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
-	SkillWindow.SetVisible(1)
+	SkillWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def BackPress():

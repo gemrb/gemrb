@@ -65,9 +65,9 @@ def StartTextScreen ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ReplayTextScreen")
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0, 0) #removing the gamecontrol screen
+	GemRB.SetVisible (0, WINDOW_INVISIBLE) #removing the gamecontrol screen
 
-	TextScreen.SetVisible (1)
+	TextScreen.SetVisible (WINDOW_VISIBLE)
 	TextArea.Rewind (300)
 	GemRB.DisplayString (17556, 0xff0000)
 	GemRB.GamePause (1, 1)
@@ -99,7 +99,7 @@ def ReplayTextScreen ():
 def EndTextScreen ():
 	global TextScreen
 
-	TextScreen.SetVisible (0)
+	TextScreen.SetVisible (WINDOW_INVISIBLE)
 	if TextScreen:
 		TextScreen.Unload ()
 	GemRB.SetVisible (0, 1) #enabling gamecontrol screen

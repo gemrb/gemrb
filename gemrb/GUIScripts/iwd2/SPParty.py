@@ -62,7 +62,7 @@ def OnLoad():
 	ScrollBarPress()
 	PartyButtonPress()
 	
-	PartySelectWindow.SetVisible(1)
+	PartySelectWindow.SetVisible(WINDOW_VISIBLE)
 	
 	return
 

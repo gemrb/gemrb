@@ -110,7 +110,7 @@ def OnLoad():
 	AutoPauseButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "AutoPausePress")
 	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OkPress")
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GamePlayWindow.SetVisible(1)
+	GamePlayWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def DelayPress():
@@ -156,28 +156,28 @@ def MaxHPPress():
 	return
 
 def FeedbackPress():
-	GamePlayWindow.SetVisible(0)
+	GamePlayWindow.SetVisible(WINDOW_INVISIBLE)
 	if GamePlayWindow:
 		GamePlayWindow.Unload()
 	GemRB.SetNextScript("Feedback")
 	return
 
 def AutoPausePress():
-	GamePlayWindow.SetVisible(0)
+	GamePlayWindow.SetVisible(WINDOW_INVISIBLE)
 	if GamePlayWindow:
 		GamePlayWindow.Unload()
 	GemRB.SetNextScript("AutoPause")
 	return
 
 def OkPress():
-	GamePlayWindow.SetVisible(0)
+	GamePlayWindow.SetVisible(WINDOW_INVISIBLE)
 	if GamePlayWindow:
 		GamePlayWindow.Unload()
 	GemRB.SetNextScript("Options")
 	return
 
 def CancelPress():
-	GamePlayWindow.SetVisible(0)
+	GamePlayWindow.SetVisible(WINDOW_INVISIBLE)
 	if GamePlayWindow:
 		GamePlayWindow.Unload()
 	GemRB.SetNextScript("Options")

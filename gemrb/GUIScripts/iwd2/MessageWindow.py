@@ -58,8 +58,8 @@ def OnLoad():
 
 	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 
-	MessageWindow.SetVisible(1)
-	PortraitWindow.SetVisible(1)
+	MessageWindow.SetVisible(WINDOW_VISIBLE)
+	PortraitWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def OnIncreaseSize():

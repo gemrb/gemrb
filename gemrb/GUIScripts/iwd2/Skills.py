@@ -189,7 +189,7 @@ def OnLoad():
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	RedrawSkills()
-	SkillWindow.SetVisible(1)
+	SkillWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 

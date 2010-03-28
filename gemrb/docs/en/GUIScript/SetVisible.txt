@@ -4,12 +4,14 @@ Prototype: GemRB.SetVisible(WindowIndex, Visible)
 Metaclass Prototype: SetVisible(Visible)
 
 Description: Sets the Visibility Flag of a Window.
+Window index 0 can be used to manipulate the game control window
 
 Parameters: WindowIndex - the index returned by LoadWindow()
-            Visible     - 0,1 or 2
-0 - Window is invisible
-1 - Window is visible
-2 - Window is shaded
+            Visible:
+WINDOW_INVISIBLE - Window is invisible
+WINDOW_VISIBLE - Window is visible
+WINDOW_GRAYED - Window is shaded
+WINDOW_FRONT - Window is drawn in the foreground
 
 Return value: N/A
 

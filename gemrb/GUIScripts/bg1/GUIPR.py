@@ -57,7 +57,7 @@ def OpenPriestWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 	
 	GemRB.LoadWindowPack ("GUIPR")
 	PriestWindow = Window = GemRB.LoadWindowObject (2)
@@ -100,9 +100,9 @@ def OpenPriestWindow ():
 	SetSelectionChangeHandler (UpdatePriestWindow)
 	UpdatePriestWindow ()
 
-	OptionsWindow.SetVisible (1)
-	Window.SetVisible (3)
-	GUICommonWindows.PortraitWindow.SetVisible (1)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+	Window.SetVisible (WINDOW_FRONT)
+	GUICommonWindows.PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 
@@ -178,9 +178,9 @@ def UpdatePriestWindow ():
 			Button.EnableBorder (0, 0)
 
 	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
-		Window.SetVisible (2)
+		Window.SetVisible (WINDOW_GRAYED)
 	else:
-		Window.SetVisible (1)
+		Window.SetVisible (WINDOW_VISIBLE)
 	return
 
 def PriestPrevLevelPress ():

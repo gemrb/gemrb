@@ -102,7 +102,7 @@ def OnLoad():
 
 	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OkPress")
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	CSoundWindow.SetVisible(1)
+	CSoundWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def SubtitlesPress():

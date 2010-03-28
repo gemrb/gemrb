@@ -83,7 +83,7 @@ def OnLoad():
 	CharacterSoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CharacterSoundPress")
 	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OkPress")
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	SoundWindow.SetVisible(1)
+	SoundWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def AmbientPress():

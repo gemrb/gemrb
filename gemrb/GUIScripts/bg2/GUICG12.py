@@ -91,7 +91,7 @@ def OnLoad():
 				break
 			Flag = True
 
-	AppearanceWindow.SetVisible (1)
+	AppearanceWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def RightPress():

@@ -62,7 +62,7 @@ def OpenPriestWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIPR", 640, 480)
 	PriestWindow = Window = GemRB.LoadWindowObject (2)
@@ -108,10 +108,10 @@ def OpenPriestWindow ():
 
 	SetSelectionChangeHandler (UpdatePriestWindow)
 	UpdatePriestWindow ()
-	OptionsWindow.SetVisible (1)
+	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	#bringing window front
-	Window.SetVisible (3)
-	PortraitWindow.SetVisible (1)
+	Window.SetVisible (WINDOW_FRONT)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def UpdatePriestWindow ():
@@ -190,9 +190,9 @@ def UpdatePriestWindow ():
 		# also check the DRUIDSPELL column
 		DivineCaster = ClassSkillsTable.GetValue (Class, 0)
 	if DivineCaster == "*":
-		Window.SetVisible (2)
+		Window.SetVisible (WINDOW_GRAYED)
 	else:
-		Window.SetVisible (1)
+		Window.SetVisible (WINDOW_VISIBLE)
 	return
 
 def PriestPrevLevelPress ():

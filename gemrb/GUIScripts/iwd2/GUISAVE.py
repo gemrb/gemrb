@@ -42,7 +42,7 @@ def OpenSaveWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUISAVE", 800, 600)
 	Window = SaveWindow = GemRB.LoadWindowObject (0)
@@ -88,7 +88,7 @@ def OpenSaveWindow ():
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex+1)
 	ScrollBar.SetDefaultScrollBar ()
 	ScrollBarPress ()
-	Window.SetVisible (1)
+	Window.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ScrollBarPress():
@@ -142,7 +142,7 @@ def ScrollBarPress():
 def AbortedSaveGame():
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
-	SaveWindow.SetVisible (1)
+	SaveWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ConfirmedSaveGame():
@@ -155,7 +155,7 @@ def ConfirmedSaveGame():
 	GemRB.SaveGame(Pos, Slotname, 22) #saves a game with version 2.2
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
-	SaveWindow.SetVisible (1)
+	SaveWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def SavePress():
@@ -211,7 +211,7 @@ def SavePress():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "AbortedSaveGame")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ConfirmWindow.SetVisible (1)
+	ConfirmWindow.SetVisible (WINDOW_VISIBLE)
 	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
 
@@ -236,19 +236,19 @@ def DeleteGameConfirm():
 	ScrollBarPress()
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
-	SaveWindow.SetVisible (1)
+	SaveWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def DeleteGameCancel():
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
-	SaveWindow.SetVisible (1)
+	SaveWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def DeleteGamePress():
 	global ConfirmWindow
 
-	SaveWindow.SetVisible (0)
+	SaveWindow.SetVisible (WINDOW_INVISIBLE)
 	ConfirmWindow=GemRB.LoadWindowObject (2)
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (15305)
@@ -260,7 +260,7 @@ def DeleteGamePress():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteGameCancel")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ConfirmWindow.SetVisible (1)
+	ConfirmWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def CloseSaveWindow ():

@@ -49,7 +49,7 @@ def OnLoad():
 	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CreditsPress")
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
 
-	MovieWindow.SetVisible(1)
+	MovieWindow.SetVisible(WINDOW_VISIBLE)
 	return
 	
 def PlayPress():

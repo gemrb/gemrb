@@ -76,7 +76,7 @@ def OnLoad ():
 	GemRB.SetVar ("TopIndex",TopIndex)
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex+1)
 	ScrollBarPress ()
-	LoadWindow.SetVisible (1)
+	LoadWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def ScrollBarPress ():
@@ -143,19 +143,19 @@ def DeleteGameConfirm ():
 	ScrollBarPress ()
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
-	LoadWindow.SetVisible (1)
+	LoadWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def DeleteGameCancel ():
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
-	LoadWindow.SetVisible (1)
+	LoadWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def DeleteGamePress ():
 	global ConfirmWindow
 
-	LoadWindow.SetVisible (0)
+	LoadWindow.SetVisible (WINDOW_INVISIBLE)
 	ConfirmWindow=GemRB.LoadWindowObject (1)
 
 	Text=ConfirmWindow.GetControl (0)
@@ -170,7 +170,7 @@ def DeleteGamePress ():
 	CancelButton.SetText (4196)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteGameCancel")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL,OP_OR)
-	ConfirmWindow.SetVisible (1)
+	ConfirmWindow.SetVisible (WINDOW_VISIBLE)
 	return
 	
 def CancelPress ():

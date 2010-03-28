@@ -66,7 +66,7 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG")
 	#setting up confirmation window
 	QuitWindow = GemRB.LoadWindowObject(1)
-	QuitWindow.SetVisible(0)
+	QuitWindow.SetVisible(WINDOW_INVISIBLE)
 
 	#setting up CG window
 	NewLifeWindow = GemRB.LoadWindowObject(0)
@@ -220,7 +220,7 @@ def OnLoad():
 	
 	UpdateLabels()
 	
-	NewLifeWindow.SetVisible(1)
+	NewLifeWindow.SetVisible(WINDOW_VISIBLE)
 	return
 	
 def UpdateLabels():
@@ -252,8 +252,8 @@ def UpdateLabels():
 	
 
 def OkButton():
-	QuitWindow.SetVisible(0)
-	NewLifeWindow.SetVisible(1)
+	QuitWindow.SetVisible(WINDOW_INVISIBLE)
+	NewLifeWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def AcceptPress():
@@ -270,8 +270,8 @@ def AcceptPress():
 		Button.SetText(46783)
 		Button.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OkButton")
-		NewLifeWindow.SetVisible(2) #go dark
-		QuitWindow.SetVisible(1)
+		NewLifeWindow.SetVisible(WINDOW_GRAYED) #go dark
+		QuitWindow.SetVisible(WINDOW_VISIBLE)
 		return
 
 	if NewLifeWindow:
@@ -332,8 +332,8 @@ def CancelPress():
 	Button.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OkButton")
 
-	NewLifeWindow.SetVisible(2) #go dark
-	QuitWindow.SetVisible(1)
+	NewLifeWindow.SetVisible(WINDOW_GRAYED) #go dark
+	QuitWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def YesButton():

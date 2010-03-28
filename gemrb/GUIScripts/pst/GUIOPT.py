@@ -134,7 +134,7 @@ def OpenOptionsWindow ():
 	Label = Window.GetControl (0x10000007)
 	Label.SetText (GEMRB_VERSION)
 	
-	#Window.SetVisible (1)
+	#Window.SetVisible (WINDOW_VISIBLE)
 	GemRB.UnhideGUI ()
 
 
@@ -253,7 +253,7 @@ def OpenAudioOptionsWindow ():
 	OptCheckbox ('AudioOptions', 'MusicProcessing', Window, 18, 19, 63243, "Music Processing")
 
 
-	#AudioOptionsWindow.SetVisible (1)
+	#AudioOptionsWindow.SetVisible (WINDOW_VISIBLE)
 	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	
@@ -700,7 +700,7 @@ def OpenKeyboardMappingsWindow ():
 	keys_setup_page (0)
 
 
-	#KeysWindow.SetVisible (1)
+	#KeysWindow.SetVisible (WINDOW_VISIBLE)
 	GemRB.UnhideGUI ()
 
 

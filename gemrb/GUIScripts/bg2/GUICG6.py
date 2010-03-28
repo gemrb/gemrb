@@ -62,7 +62,7 @@ def OnLoad():
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 
 	RedrawSkills ()
-	SkillWindow.SetVisible(1)
+	SkillWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def BackPress():
