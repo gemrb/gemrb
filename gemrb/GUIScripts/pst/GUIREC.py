@@ -67,7 +67,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow, StrModTable, StrModExTable, ClassTable
+from GUICommon import CloseOtherWindow, StrModTable, StrModExTable, ClassTable, RaceTable
 from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler, RunSelectionChangeHandler
 from GUIWORLD import OpenReformPartyWindow
 
@@ -243,7 +243,6 @@ def UpdateRecordsWindow ():
 	# race
 	# FIXME: for some strange reason, Morte's race is 1 (Human)
 	# in the save files, instead of 45 (Morte)
-	RaceTable = GemRB.LoadTableObject ("RACES")
 	print "species: %d  race: %d" %(GemRB.GetPlayerStat (pc, IE_SPECIES), GemRB.GetPlayerStat (pc, IE_RACE))
 	text = RaceTable.GetValue (GemRB.GetPlayerStat (pc, IE_RACE) - 1, 0)
 	
