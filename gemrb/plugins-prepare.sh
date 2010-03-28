@@ -23,7 +23,7 @@ if test -z "$dir"; then
   cd `dirname $0`/plugins
 else
   cd "$dir"
-fi
+fi || return 1
 
 if test -d Core/.libs; then
   ln -sf */.libs/*.so .
@@ -32,10 +32,10 @@ else
   if test -z "$dir"; then
     echo missing dir parameter - pass the path to the build dir
     exit 1
-  fi
-  cd gemrb/plugins
+  fi &&
+  cd gemrb/plugins &&
   ln -sf */*.so .
-fi
+fi || return 2
 
 #remove the cuckoo's egg
 rm libgemrb_core.so
