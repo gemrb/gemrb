@@ -44,14 +44,12 @@ PortraitPortraitButton = 0
 
 RaceButton = 0
 RaceWindow = 0
-RaceTable = 0
 RaceTextArea = 0
 RaceDoneButton = 0
 
 ClassButton = 0
 ClassWindow = 0
 KitTable = 0
-ClassSkillsTable = 0
 ClassTextArea = 0
 ClassDoneButton = 0
 
@@ -304,9 +302,8 @@ def AcceptPress():
 	t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)
 
-	TmpTable = GemRB.LoadTableObject ("clskills")
 	#mage spells
-	TableName = TmpTable.GetValue (Class, 2, 0)
+	TableName = ClassSkillsTable.GetValue (Class, 2, 0)
 	if TableName != "*":
 		#todo: set up ALL spell levels not just level 1
 		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
@@ -324,7 +321,7 @@ def AcceptPress():
 			j=j<<1
 
 	#priest spells
-	TableName = TmpTable.GetValue (Class, 1, 0)
+	TableName = ClassSkillsTable.GetValue (Class, 1, 0)
 	if TableName != "*":
 		#there is no separate druid table, falling back to priest
 		if TableName == "MXSPLDRU":
@@ -376,8 +373,7 @@ def AcceptPress():
 	GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability6"))
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
-	TmpTable = GemRB.LoadTableObject ("clskills")
-	GemRB.SetPlayerStat (MyChar, IE_XP, TmpTable.GetValue (Class, 3) )  #this will also set the level (automatically)
+	GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (Class, 3) )
 
 	TmpTable=GemRB.LoadTableObject ("weapprof")
 	ProfCount = TmpTable.GetRowCount ()
@@ -410,7 +406,7 @@ def AcceptPress():
 
 def SetCharacterDescription():
 	global CharGenWindow, TextArea, CharGenState, ClassFlag
-	global KitTable, RaceTable, AlignmentTable, AbilitiesTable
+	global KitTable, AlignmentTable, AbilitiesTable
  	global SkillsTable, ProficienciesTable, RacialEnemyTable
 
 	TextArea.Clear()
@@ -819,11 +815,10 @@ def PortraitCancelPress():
 # Race Selection
 
 def RacePress():
-	global CharGenWindow, RaceWindow, RaceDoneButton, RaceTable, RaceTextArea
+	global CharGenWindow, RaceWindow, RaceDoneButton, RaceTextArea
 
 	CharGenWindow.SetVisible (0)
 	RaceWindow = GemRB.LoadWindowObject (8)
-	RaceTable = GemRB.LoadTableObject ("RACES")
 	GemRB.SetVar ("Race", 0)
 
 	for i in range (2, 8):
@@ -856,7 +851,7 @@ def RacePress():
 	return
 
 def RaceSelectPress():
-	global RaceWindow, RaceDoneButton, RaceTable, RaceTextArea
+	global RaceWindow, RaceDoneButton, RaceTextArea
 
 	Race = GemRB.GetVar ("Race") - 1
 	RaceTextArea.SetText (RaceTable.GetValue (Race, 1) )
@@ -958,7 +953,7 @@ def ClassPress():
 	return
 
 def ClassSelectPress():
-	global ClassWindow, ClassTable, ClassTextArea, ClassDoneButton
+	global ClassWindow, ClassTextArea, ClassDoneButton
 
 	Class = GemRB.GetVar ("Class") - 1
 	ClassTextArea.SetText (ClassTable.GetValue (Class, 1) )
@@ -966,7 +961,7 @@ def ClassSelectPress():
 	return
 
 def ClassMultiPress():
-	global ClassWindow, ClassTable, ClassMultiWindow, ClassMultiTextArea, ClassMultiDoneButton
+	global ClassWindow, ClassMultiWindow, ClassMultiTextArea, ClassMultiDoneButton
 
 	ClassWindow.SetVisible (0)
 	ClassMultiWindow = GemRB.LoadWindowObject (10)
@@ -1010,7 +1005,7 @@ def ClassMultiPress():
 	return
 
 def ClassMultiSelectPress():
-	global ClassMultiWindow, ClassTable, ClassMultiTextArea, ClassMultiDoneButton
+	global ClassMultiWindow, ClassMultiTextArea, ClassMultiDoneButton
 
 	Class = GemRB.GetVar ("Class") - 1
 	ClassMultiTextArea.SetText (ClassTable.GetValue (Class, 1) )
@@ -1263,7 +1258,7 @@ def AbilitiesPress():
 	return
 
 def AbilitiesCalcLimits(Index):
-	global RaceTable, AbilitiesRaceReqTable, AbilitiesRaceAddTable, ClassTable, AbilitiesClassReqTable
+	global AbilitiesRaceReqTable, AbilitiesRaceAddTable, AbilitiesClassReqTable
 	global AbilitiesMinimum, AbilitiesMaximum, AbilitiesModifier
 
 	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
@@ -1413,14 +1408,12 @@ def AbilitiesCancelPress():
 def SkillsPress():
 	global CharGenWindow, AppearanceButton
 	global SkillsState, SkillsButton, CharGenState, ClassFlag
-	global ClassTable, RaceTable, ClassSkillsTable
 
 	Level = 1
 	SpellLevel = 1
 	Class = GemRB.GetVar ("Class")-1
 	ClassName = ClassTable.GetRowName (Class)
 	Class = ClassTable.GetValue (Class, 5)
-	ClassSkillsTable = GemRB.LoadTableObject ("clskills")
 	IsRanger = ClassSkillsTable.GetValue (Class, 0)
 	IsArcane = ClassSkillsTable.GetValue (Class, 1)
 	IsMage = ClassSkillsTable.GetValue (Class, 2)
@@ -1485,7 +1478,7 @@ def SkillsPress():
 
 
 def SkillsSelect():
-	global CharGenWindow, SkillsWindow, SkillsTextArea, SkillsTable, SkillsDoneButton, RaceTable, SkillsPointsLeft
+	global CharGenWindow, SkillsWindow, SkillsTextArea, SkillsTable, SkillsDoneButton, SkillsPointsLeft
 
 	CharGenWindow.SetVisible (0)
 	SkillsWindow = GemRB.LoadWindowObject (6)
@@ -1691,7 +1684,7 @@ def RacialEnemyCancelPress():
 # Weapon Proficiencies Selection
 
 def ProficienciesSelect():
-	global CharGenWindow, ProficienciesWindow, ProficienciesTable, ProficienciesTextArea, ProficienciesPointsLeft, ProficienciesDoneButton, ClassTable, ProfsMaxTable
+	global CharGenWindow, ProficienciesWindow, ProficienciesTable, ProficienciesTextArea, ProficienciesPointsLeft, ProficienciesDoneButton, ProfsMaxTable
 
 	CharGenWindow.SetVisible (0)
 	ProficienciesWindow = GemRB.LoadWindowObject (9)
@@ -2291,7 +2284,7 @@ def AppearancePress():
 	return
 
 def DrawAvatar():
-	global AppearanceAvatarButton, RaceTable, ClassTable
+	global AppearanceAvatarButton
 
 	AvatarID = 0x6000
 	table = GemRB.LoadTableObject ("avprefr")
