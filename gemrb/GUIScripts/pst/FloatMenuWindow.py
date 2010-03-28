@@ -24,6 +24,7 @@
 import GemRB
 from GUIDefines import *
 from GUICommonWindows import GetActorPortrait, SetSelectionChangeMultiHandler
+from GUICommon import ClassSkillsTable
 from ie_stats import *
 
 FloatMenuWindow = None
@@ -302,8 +303,7 @@ def RefreshSpellList(pc, innate):
 	if innate:
 		type = IE_SPELL_TYPE_INNATE
 	else:
-		Table = GemRB.LoadTableObject ("clskills")
-		if (Table.GetValue (GemRB.GetPlayerStat( pc, IE_CLASS), 1)=="*"):
+		if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat( pc, IE_CLASS), 1)=="*"):
 			type = IE_SPELL_TYPE_WIZARD
 		else:
 			type = IE_SPELL_TYPE_PRIEST
