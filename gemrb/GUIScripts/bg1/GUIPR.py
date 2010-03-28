@@ -101,7 +101,7 @@ def OpenPriestWindow ():
 	UpdatePriestWindow ()
 
 	OptionsWindow.SetVisible (1)
-	Window.SetVisible (1)
+	Window.SetVisible (3)
 	GUICommonWindows.PortraitWindow.SetVisible (1)
 	return
 
@@ -177,10 +177,10 @@ def UpdatePriestWindow ():
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
-	#if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
-	#	Window.SetVisible (2)
-	#else:
-	Window.SetVisible (1)
+	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
+		Window.SetVisible (2)
+	else:
+		Window.SetVisible (1)
 	return
 
 def PriestPrevLevelPress ():

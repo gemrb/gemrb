@@ -104,7 +104,7 @@ def OpenMageWindow ():
 	UpdateMageWindow ()
 
 	OptionsWindow.SetVisible (1)
-	Window.SetVisible (1)
+	Window.SetVisible (3)
 	GUICommonWindows.PortraitWindow.SetVisible (1)
 	return
 
