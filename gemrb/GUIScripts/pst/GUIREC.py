@@ -67,7 +67,8 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow, StrModTable, StrModExTable, ClassTable, RaceTable
+from GUICommon import CloseOtherWindow, StrModTable, StrModExTable, ClassTable
+from GUICommon import RaceTable, NextLevelTable
 from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler, RunSelectionChangeHandler
 from GUIWORLD import OpenReformPartyWindow
 
@@ -542,8 +543,6 @@ def GetCharacterHeader (pc):
 
 
 def GetNextLevelExp (Level, Class):
-	NextLevelTable = GemRB.LoadTableObject ("XPLEVEL")
-
 	if (Level < 20):
 		NextLevel = NextLevelTable.GetValue (Class, str (Level + 1))
 	else:
