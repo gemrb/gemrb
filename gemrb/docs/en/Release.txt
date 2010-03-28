@@ -4,7 +4,7 @@
 How to make a release
 *********************
 
-Preparing and testing SVN
+Preparing and testing GIT
 =========================
 
 * Make sure that version numbers in 
@@ -14,18 +14,16 @@ Preparing and testing SVN
 
 * Update NEWS with highlights since the last release 
 
-* Make sure that GemRB SVN is in compilable and runnable state
-  - download a clean SVN tree and test it.
+* Make sure that GemRB GIT is in compilable and runnable state
+  - download a clean GIT tree and test it.
   - Make distribution .tar.gz (see Source release below) and test it as well -
     especially make sure all needed files are included.
 
-* Tag current SVN to version number e.g. GEMRB_0_3_0
+* Tag current GIT to version number e.g. GEMRB_0_9_0
   i.e. in the gemrb root directory do
-    svn cp https://gemrb.svn.sourceforge.net/svnroot/gemrb/gemrb/trunk \
-  https://gemrb.svn.sourceforge.net/svnroot/gemrb/gemrb/tags/GEMRB_0_3_0
-
-* Update from SVN to the tagged version
-
+    git tag -a -m "GemRB 0.9.0" GEMRB_0_9_0
+* Update from GIT to the tagged version
+    git checkout GEMRB_0_9_0
 
 Source release
 ==============
