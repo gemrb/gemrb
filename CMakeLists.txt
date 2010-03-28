@@ -147,7 +147,7 @@ FIND_LIBRARY(VORBIS_LIBRARY vorbisfile)
 
 ADD_DEFINITIONS("-DHAVE_CONFIG_H")
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} gemrb/includes gemrb/plugins/Core)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} gemrb/includes gemrb/core)
 
 #Platform checks
 INCLUDE (CheckTypeSize)

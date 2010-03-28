@@ -196,7 +196,7 @@ AC_STRUCT_TM
 AC_TYPE_SIZE_T
 
 CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATADIR=\\\"\$(moddir)\\\" -DPLUGINDIR=\\\"\$(plugindir)\\\""
-CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/gemrb/includes -I\$(top_srcdir)/gemrb/plugins/Core"
+CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/gemrb/includes -I\$(top_srcdir)/gemrb/core"
 CXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wpointer-arith -Wcast-align -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing"
 
 # only export symbols explicitly marked to be exported
@@ -212,6 +212,7 @@ AC_SUBST(OPENAL_LIBS)
 AC_CONFIG_FILES([
 Makefile
 gemrb/Makefile 
+gemrb/core/Makefile
 gemrb/includes/Makefile 
 gemrb/override/Makefile
 gemrb/override/bg1/Makefile
@@ -230,7 +231,6 @@ gemrb/GUIScripts/iwd2/Makefile
 gemrb/GUIScripts/pst/Makefile
 gemrb/GUIScripts/test1/Makefile
 gemrb/plugins/Makefile 
-gemrb/plugins/Core/Makefile
 gemrb/plugins/2DAImporter/Makefile 
 gemrb/plugins/ACMImporter/Makefile 
 gemrb/plugins/AREImporter/Makefile 

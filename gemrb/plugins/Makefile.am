@@ -1,5 +1,4 @@
 SUBDIRS = \
-	Core \
 	GUIScript \
 	SDLVideo \
 	OpenALAudio \
