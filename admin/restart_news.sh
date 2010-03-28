@@ -25,13 +25,13 @@ if [[ ! -e NEWS ]]; then
   exit 3
 fi
 
-# get the last revision that contains a change in the word svn
+# get the last revision that contains a change in the word git in NEWS
 # that's usually the final release update
-rev=$(git log -Ssvn --pretty="format:%b" NEWS  | sed -n '1 s,^.*@\(\S*\) .*$,\1,p')
+rev=$(git log -Sgit --pretty="format:%h" NEWS)
 rev="${rev:-missing revision}"
 
 cat - NEWS > NEWSNEWS << LILARCOR
-GemRB svn ($rev):
+GemRB git ($rev):
   New features:
     - 
 
