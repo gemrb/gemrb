@@ -404,7 +404,7 @@ def OpenReformPartyWindow ():
 	hideflag = GemRB.HideGUI ()
 
 	if ReformPartyWindow:
-                ReformPartyWindow.Unload ()
+		ReformPartyWindow.Unload ()
 		GemRB.SetVar ("ActionsWindow", OldActionsWindow.ID)
 		GemRB.SetVar ("MessageWindow", OldMessageWindow.ID)
 		GemRB.SetVar ("OtherWindow", -1)

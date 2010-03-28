@@ -132,7 +132,7 @@ def OpenRecordsWindow ():
 #original returns to game before continuing...
 def OpenRecReformPartyWindow ():
 	OpenRecordsWindow ()
-      	GemRB.SetTimedEvent ("OpenReformPartyWindow", 1)
+	GemRB.SetTimedEvent ("OpenReformPartyWindow", 1)
 	return
 
 def UpdateRecordsWindow ():
