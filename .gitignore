@@ -1,6 +1,9 @@
 *.pyc
 *.[oa]
 *.l[oa]
+*.so
+cmake_install.cmake
+CMakeFiles
 Makefile
 Makefile.in
 .deps
@@ -24,3 +27,5 @@ Makefile.in
 /gemrb/gemrb
 /libtool
 /stamp-h1
+/cmake_uninstall.cmake
+/CMakeCache.txt
