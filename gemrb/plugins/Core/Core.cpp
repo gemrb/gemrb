@@ -99,6 +99,22 @@ void strnspccpy(char* dest, const char *source, int count)
 	}
 }
 
+#ifndef HAVE_STRNLEN
+int strnlen(const char* string, int maxlen)
+{
+	if (!string) {
+		return -1;
+	}
+	int i = 0;
+	while (maxlen-- > 0) {
+		if (!string[i])
+			break;
+		i++;
+	}
+	return i;
+}
+#endif // ! HAVE_STRNLEN
+
 static const unsigned char orientations[25]={
 6,7,8,9,10,
 5,6,8,10,11,

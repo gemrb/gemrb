@@ -127,22 +127,14 @@ static EffectRef fx_learn_spell_ref={"Spell:Learn",NULL,-1};
 // Like PyString_FromString(), but for ResRef
 inline PyObject* PyString_FromResRef(char* ResRef)
 {
-	unsigned int i;
-
-	for (i = 0; i < sizeof(ieResRef); i++) {
-		if (ResRef[i]==0) break;
-	}
+	unsigned int i = strnlen(ResRef,sizeof(ieResRef));
 	return PyString_FromStringAndSize( ResRef, i );
 }
 
 // Like PyString_FromString(), but for ResRef
 inline PyObject* PyString_FromAnimID(const char* AnimID)
 {
-	unsigned int i;
-
-	for (i = 0; i < 2; i++) {
-		if (AnimID[i]==0) break;
-	}
+	unsigned int i = strnlen(AnimID,2);
 	return PyString_FromStringAndSize( AnimID, i );
 }
 

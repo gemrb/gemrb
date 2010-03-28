@@ -21,22 +21,6 @@
 #include "Variables.h"
 #include "Interface.h" // for LoadInitialValues
 #include "FileStream.h" // for LoadInitialValues
-#ifndef HAVE_STRNLEN
-
-static int strnlen(const char* string, int maxlen)
-{
-	if (!string) {
-		return -1;
-	}
-	int i = 0;
-	while (maxlen-- > 0) {
-		if (!string[i])
-			break;
-		i++;
-	}
-	return i;
-}
-#endif // ! HAVE_STRNLEN
 
 /////////////////////////////////////////////////////////////////////////////
 // private inlines 
