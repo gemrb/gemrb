@@ -21,7 +21,7 @@ import GemRB
 
 from CharGenCommon import * 
 
-from GUICommon import CloseOtherWindow
+from GUICommon import CloseOtherWindow, RaceTable
 
 
 ClassWindow = 0
@@ -48,8 +48,7 @@ def OnLoad():
 	ClassTable = GemRB.LoadTableObject("classes")
 	ClassCount = ClassTable.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindowObject(2)
-	TmpTable=GemRB.LoadTableObject("races")
-	RaceName = TmpTable.GetRowName(GemRB.GetVar("Race")-1 )
+	RaceName = RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
 
 	#radiobutton groups must be set up before doing anything else to them
 	for i in range(1,ClassCount):

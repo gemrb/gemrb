@@ -20,13 +20,12 @@
 import GemRB
 
 from CharGenCommon import *
-from GUICommon import CloseOtherWindow
+from GUICommon import CloseOtherWindow, RaceTable
 
 
 RaceWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-RaceTable = 0
 
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
@@ -43,7 +42,6 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG")
 	RaceWindow = GemRB.LoadWindowObject(8)
 
-	RaceTable = GemRB.LoadTableObject("races")
 	RaceCount = RaceTable.GetRowCount()
 
 	for i in range(2,RaceCount+2):

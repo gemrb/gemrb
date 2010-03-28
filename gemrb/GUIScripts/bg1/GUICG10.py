@@ -18,7 +18,7 @@
 #
 #character generation, multi-class (GUICG10)
 import GemRB
-from GUICommon import CloseOtherWindow
+from GUICommon import CloseOtherWindow, RaceTable
 
 from CharGenCommon import * 
 
@@ -38,8 +38,7 @@ def OnLoad():
 
 	ClassTable = GemRB.LoadTableObject("classes")
 	ClassCount = ClassTable.GetRowCount()+1
-	TmpTable=GemRB.LoadTableObject("races")
-	RaceName = TmpTable.GetRowName(GemRB.GetVar("Race")-1 )
+	RaceName = RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
 
 	j=0
 	for i in range(1,ClassCount):

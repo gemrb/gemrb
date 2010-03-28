@@ -20,7 +20,7 @@
 import GemRB
 
 from CharGenCommon import * 
-from GUICommon import CloseOtherWindow
+from GUICommon import CloseOtherWindow, RaceTable
 
 
 KitWindow = 0
@@ -42,8 +42,7 @@ def OnLoad():
 		return
 
 	GemRB.LoadWindowPack("GUICG")
-	TmpTable = GemRB.LoadTableObject("races")
-	RaceName = TmpTable.GetRowName(GemRB.GetVar("Race")-1 )
+	RaceName = RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
 	TmpTable = GemRB.LoadTableObject("classes")
 	Class = GemRB.GetVar("Class")-1
 	ClassName = TmpTable.GetRowName(Class)
