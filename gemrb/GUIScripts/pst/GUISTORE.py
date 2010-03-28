@@ -63,7 +63,7 @@ def CloseStoreWindow ():
 		StoreWindow.Unload ()
 	StoreWindow = None
 	GemRB.LeaveStore ()
-	GemRB.SetVisible (0,1) #enabling the game control screen
+	GemRB.SetVisible (0, WINDOW_VISIBLE) #enabling the game control screen
 	GemRB.UnhideGUI () #enabling the other windows
 	SetSelectionChangeHandler (None)
 	
@@ -72,7 +72,7 @@ def OpenStoreWindow ():
 	global StoreWindow, party_gold, store_name, Store
 	
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,WINDOW_INVISIBLE) #removing the game control screen
+	GemRB.SetVisible (0, WINDOW_INVISIBLE) #removing the game control screen
 	
 	GemRB.LoadWindowPack ("GUISTORE")
 	StoreWindow = Window = GemRB.LoadWindowObject (3)

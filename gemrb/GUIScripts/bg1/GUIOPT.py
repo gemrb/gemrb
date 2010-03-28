@@ -70,7 +70,7 @@ def CloseOptionsWindow ():
 	GameOptionsWindow = None
 	SetSelectionChangeHandler (None)
 	GemRB.SetVar ("OtherWindow", -1)
-	GemRB.SetVisible (0,1)
+	GemRB.SetVisible (0, WINDOW_VISIBLE)
 	OptionsWindow = OldOptionsWindow
 	OldOptionsWindow = None
 	return
@@ -89,7 +89,7 @@ def OpenOptionsWindow ():
 		return
 
 	#hideflag = GemRB.HideGUI ()
-	GemRB.SetVisible (0,WINDOW_INVISIBLE)
+	GemRB.SetVisible (0, WINDOW_INVISIBLE)
 	SetSelectionChangeHandler (DummyWindow)
 
 	GemRB.LoadWindowPack ("GUIOPT", 640, 480)

@@ -59,7 +59,7 @@ def OpenMageWindow ():
 
 		MageWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.SetVisible (0,1)
+		GemRB.SetVisible (0, WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -69,7 +69,7 @@ def OpenMageWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,WINDOW_INVISIBLE)
+	GemRB.SetVisible (0, WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMG", 640, 480)
 

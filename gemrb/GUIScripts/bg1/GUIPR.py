@@ -49,7 +49,7 @@ def OpenPriestWindow ():
 			OptionsWindow.Unload ()
 		PriestWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.SetVisible (0,1)
+		GemRB.SetVisible (0, WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
@@ -57,7 +57,7 @@ def OpenPriestWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,WINDOW_INVISIBLE)
+	GemRB.SetVisible (0, WINDOW_INVISIBLE)
 	
 	GemRB.LoadWindowPack ("GUIPR")
 	PriestWindow = Window = GemRB.LoadWindowObject (2)

@@ -107,7 +107,7 @@ def CloseStoreWindow ():
 	if Inventory:
 		GemRB.RunEventHandler("OpenInventoryWindow")
 	else:
-		GemRB.SetVisible (0,1) #enabling the game control screen
+		GemRB.SetVisible (0, WINDOW_VISIBLE) #enabling the game control screen
 		GemRB.UnhideGUI () #enabling the other windows
 		SetSelectionChangeHandler( None )
 	return
@@ -127,7 +127,7 @@ def OpenStoreWindow ():
 	OpenStoreRumourWindow,OpenStoreRentWindow )
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,WINDOW_INVISIBLE) #removing the game control screen
+	GemRB.SetVisible (0, WINDOW_INVISIBLE) #removing the game control screen
 
 	if GemRB.GetVar ("Inventory"):
 		Inventory = 1

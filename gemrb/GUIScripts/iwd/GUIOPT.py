@@ -69,7 +69,7 @@ def CloseOptionsWindow ():
 
 	BackgroundWindow = None
 	GemRB.SetVar ("OtherWindow", -1)
-	GemRB.SetVisible (0,1)
+	GemRB.SetVisible (0, WINDOW_VISIBLE)
 	GemRB.UnhideGUI ()
 	GUICommonWindows.OptionsWindow = OldOptionsWindow
 	OldOptionsWindow = None
@@ -87,7 +87,7 @@ def OpenOptionsWindow ():
 		return
 
 	hideflag = GemRB.HideGUI ()
-	GemRB.SetVisible (0,WINDOW_INVISIBLE)
+	GemRB.SetVisible (0, WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIOPT", 640, 480)
 	BackgroundWindow = Window = GemRB.LoadWindowObject (2)
