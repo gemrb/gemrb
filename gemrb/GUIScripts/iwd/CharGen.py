@@ -50,7 +50,6 @@ RaceDoneButton = 0
 
 ClassButton = 0
 ClassWindow = 0
-ClassTable = 0
 KitTable = 0
 ClassSkillsTable = 0
 ClassTextArea = 0
@@ -297,7 +296,6 @@ def AcceptPress():
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("Race") )
 
 	ClassIndex = GemRB.GetVar ("Class")-1
-	ClassTable = GemRB.LoadTableObject ("classes")
 	Class = ClassTable.GetValue (ClassIndex, 5)
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar ("Class Kit")
@@ -412,7 +410,7 @@ def AcceptPress():
 
 def SetCharacterDescription():
 	global CharGenWindow, TextArea, CharGenState, ClassFlag
-	global ClassTable, KitTable, RaceTable, AlignmentTable, AbilitiesTable
+	global KitTable, RaceTable, AlignmentTable, AbilitiesTable
  	global SkillsTable, ProficienciesTable, RacialEnemyTable
 
 	TextArea.Clear()
@@ -890,11 +888,10 @@ def RaceCancelPress():
 # Class Selection
 
 def ClassPress():
-	global CharGenWindow, ClassWindow, ClassTable, KitTable, ClassTextArea, ClassDoneButton
+	global CharGenWindow, ClassWindow, KitTable, ClassTextArea, ClassDoneButton
 
 	CharGenWindow.SetVisible (0)
 	ClassWindow = GemRB.LoadWindowObject (2)
-	ClassTable = GemRB.LoadTableObject ("classes")
 	KitTable = GemRB.LoadTableObject ("magesch")
 	ClassCount = ClassTable.GetRowCount ()
 	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
