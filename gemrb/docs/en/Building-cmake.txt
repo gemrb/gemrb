@@ -1,10 +1,10 @@
-BUILDING GEMRB FROM SVN SOURCES ON WINDOWS
+BUILDING GEMRB FROM GIT SOURCES ON WINDOWS
 ---------------------------------------
 $Id: Building.txt 5014 2008-01-28 11:18:03Z lynxlupodian $
 
 
-Tools you will need to build GemRB from SVN:
-  - subversion - SVN
+Tools you will need to build GemRB from GIT:
+  - git
   - cmake
   - MinGW automated installer and utilities (base, g++, make)
 

@@ -1,10 +1,10 @@
-BUILDING GEMRB FROM SVN SOURCES ON UNIX
+BUILDING GEMRB FROM GIT SOURCES ON UNIX
 ---------------------------------------
 $Id$
 
 
-Tools you will need to build GemRB from SVN:
-  - subversion - SVN
+Tools you will need to build GemRB from GIT:
+  - git
 
   - libtool
   - automake
