@@ -51,6 +51,7 @@ def OpenMageWindow ():
 		GemRB.UnhideGUI ()
 		OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
+		SetSelectionChangeHandler(None)
 		return
 		
 	GemRB.HideGUI ()
