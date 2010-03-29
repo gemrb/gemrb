@@ -4545,8 +4545,7 @@ void GameScript::QuitGame(Scriptable* Sender, Action* parameters)
 	core->GetDictionary()->SetAt("QuitGame1", (ieDword) parameters->int0Parameter);
 	core->GetDictionary()->SetAt("QuitGame2", (ieDword) parameters->int1Parameter);
 	core->GetDictionary()->SetAt("QuitGame3", (ieDword) parameters->int2Parameter);
-	strncpy( core->NextScript, "QuitGame", sizeof(core->NextScript) );
-	core->QuitFlag |= QF_CHANGESCRIPT;
+	core->SetNextScript("QuitGame");
 }
 
 void GameScript::StopMoving(Scriptable* Sender, Action* /*parameters*/)

@@ -5229,3 +5229,9 @@ void Interface::StripLine(char * string, size_t size) {
 		string[size-3] = '\0'; // remove the carriage return too
 	}
 }
+
+void Interface::SetNextScript(const char *script)
+{
+	strncpy( NextScript, script, sizeof(NextScript) );
+	QuitFlag |= QF_CHANGESCRIPT;
+}

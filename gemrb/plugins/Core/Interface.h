@@ -299,6 +299,8 @@ private:
 	bool update_scripts;
 	/** Array of cleanup functions */
 	std::vector<void (*)(void)> cleanupFunctions;
+	/** Next Script Name */
+	char NextScript[64];
 public:
 	StringMgr *strings;
 	GlobalTimer * timer;
@@ -725,8 +727,8 @@ public:
 		EventFlag|=Flag;
 	}
 
-	/** Next Script Name */
-	char NextScript[64];
+	/** Set Next Script */
+	void SetNextScript(const char *script);
 	/** Console is on Screen */
 	bool ConsolePopped;
 	/** Cheats enabled? */
