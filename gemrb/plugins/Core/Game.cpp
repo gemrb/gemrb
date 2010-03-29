@@ -1360,10 +1360,10 @@ void Game::RestParty(int checks, int dream, int hp)
 	AdvanceTime(2400*AI_UPDATE_TIME);
 
 
-	int i = GetPartySize(false);
+	int i = GetPartySize(true); // party size, only alive
 
 	while (i--) {
-		Actor *tar = GetPC(i, false);
+		Actor *tar = GetPC(i, true);
 		tar->ClearPath();
 		tar->ClearActions();
 		tar->SetModal(0);
