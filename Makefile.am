@@ -35,3 +35,6 @@ install-data-hook:
 
 docs:
 	doxygen
+
+dist-hook:
+	sed -i 's,-Werror,,' $(distdir)/configure.in $(distdir)/configure
