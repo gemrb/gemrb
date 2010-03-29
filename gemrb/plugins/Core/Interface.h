@@ -431,6 +431,8 @@ public:
 	bool IsValidWindow(unsigned short WindowID, Window *wnd) const;
 	/** Removes a Loaded Window */
 	int DelWindow(unsigned short WindowIndex);
+	/** Removes all Loaded Windows */
+	void DelAllWindows();
 	/** Redraws all window */
 	void RedrawAll();
 	/** Refreshes any control associated with the variable name with value*/

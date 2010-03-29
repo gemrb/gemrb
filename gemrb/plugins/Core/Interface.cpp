@@ -480,7 +480,7 @@ GameControl* Interface::StartGameControl()
 	if (ConsolePopped) {
 		PopupConsole();
 	}
-	DelWindow(0xffffu);//deleting ALL windows
+	DelAllWindows();//deleting ALL windows
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Window* gamewin = new Window( 0xffff, 0, 0, (ieWord) Width, (ieWord) Height );
 	gamewin->WindowPack[0]=0;
@@ -3109,26 +3109,6 @@ bool Interface::IsValidWindow(unsigned short WindowID, Window *wnd) const
 //other high level functions from now
 int Interface::DelWindow(unsigned short WindowIndex)
 {
-	if (WindowIndex == 0xffff) {
-		//we clear ALL windows immediately, don't call this
-		//from a guiscript
-		vars->SetAt("MessageWindow", (ieDword) ~0);
-		vars->SetAt("OptionsWindow", (ieDword) ~0);
-		vars->SetAt("PortraitWindow", (ieDword) ~0);
-		vars->SetAt("ActionsWindow", (ieDword) ~0);
-		vars->SetAt("TopWindow", (ieDword) ~0);
-		vars->SetAt("OtherWindow", (ieDword) ~0);
-		vars->SetAt("FloatWindow", (ieDword) ~0);
-		for(unsigned int WindowIndex=0; WindowIndex<windows.size();WindowIndex++) {
-			Window* win = windows[WindowIndex];
-			delete win;
-		}
-		windows.clear();
-		topwin.clear();
-		evntmgr->Clear();
-		ModalWindow = NULL;
-		return 0;
-	}
 	if (WindowIndex >= windows.size()) {
 		return -1;
 	}
@@ -3153,6 +3133,25 @@ int Interface::DelWindow(unsigned short WindowIndex)
 		}
 	}
 	return 0;
+}
+
+void Interface::DelAllWindows()
+{
+	vars->SetAt("MessageWindow", (ieDword) ~0);
+	vars->SetAt("OptionsWindow", (ieDword) ~0);
+	vars->SetAt("PortraitWindow", (ieDword) ~0);
+	vars->SetAt("ActionsWindow", (ieDword) ~0);
+	vars->SetAt("TopWindow", (ieDword) ~0);
+	vars->SetAt("OtherWindow", (ieDword) ~0);
+	vars->SetAt("FloatWindow", (ieDword) ~0);
+	for(unsigned int WindowIndex=0; WindowIndex<windows.size();WindowIndex++) {
+		Window* win = windows[WindowIndex];
+		delete win;
+	}
+	windows.clear();
+	topwin.clear();
+	evntmgr->Clear();
+	ModalWindow = NULL;
 }
 
 /** Popup the Console */
@@ -3572,7 +3571,7 @@ void Interface::QuitGame(int BackToMain)
 		timer->SetFadeFromColor(0);
 	}
 
-	DelWindow(0xffff); //delete all windows, including GameControl
+	DelAllWindows(); //delete all windows, including GameControl
 
 	//shutting down ingame music
 	//(do it before deleting the game)
