@@ -187,9 +187,9 @@ PluginMgr::~PluginMgr(void)
 #ifndef _DEBUG
 	for (unsigned int i = 0; i < libs.size(); i++) {
 #ifdef WIN32
-		FreeLibrary(libs[i]);
+		FreeLibrary(libs[i].handle);
 #else
-	//	dlclose(libs[i]);
+	//	dlclose(libs[i].handle);
 #endif
 	}
 #endif
