@@ -175,6 +175,20 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 		Changed = false;
 	}
 
+	// we're going to paint over labels/etc, so they need to repaint!
+	bool seen_this = false;
+	for (unsigned int i = 0; i < Owner->GetControlCount(); i++) {
+		Control *ctrl = Owner->GetControl(i);
+		if (!ctrl) continue;
+
+		// we could try working out which controls overlap,
+		// but the later controls are cheap to paint..
+		if (ctrl == this) { seen_this = true; continue; }
+		if (!seen_this) continue;
+
+		ctrl->Changed = true;
+	}
+
 	Video* video = core->GetVideoDriver();
 	Region r( XWin + XPos, YWin + YPos, Width, Height );
 

@@ -2664,7 +2664,9 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 		y = ctrl->YPos;
 		w = ctrl->Width;
 		h = ctrl->Height;
-		win->DelControl( CtrlIndex );
+		// do *not* delete the existing control, we want to replace
+		// it in the sort order!
+		//win->DelControl( CtrlIndex );
 	}
 
 	MapControl* map = new MapControl( );

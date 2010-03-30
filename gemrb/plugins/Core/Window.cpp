@@ -210,6 +210,11 @@ void Window::SetMouseFocused(Control* ctrl)
 	}
 }
 
+unsigned int Window::GetControlCount() const
+{
+	return Controls.size();
+}
+
 Control* Window::GetControl(unsigned short i) const
 {
 	if (i < Controls.size()) {
