@@ -221,21 +221,24 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 		while (i--) {
 			MapNote * mn = MyMap -> GetMapNote(i);
 			Sprite2D *anim = Flag[mn->color&7];
+			Point pos = mn->Pos;
 			if (convertToGame) {
 				vp.x = GAME_TO_SCREENX(mn->Pos.x);
 				vp.y = GAME_TO_SCREENY(mn->Pos.y);
 			} else { //pst style
 				vp.x = MAP_TO_SCREENX(mn->Pos.x);
 				vp.y = MAP_TO_SCREENY(mn->Pos.y);
+				pos.x = pos.x * MAP_MULT / MAP_DIV;
+				pos.y = pos.y * MAP_MULT / MAP_DIV;
 			}
 
 			//Skip unexplored map notes
-			bool visible = MyMap->IsVisible( mn->Pos, true );
+			bool visible = MyMap->IsVisible( pos, true );
 			if (!visible)
 				continue;
 
 			if (anim) {
-				video->BlitSprite( anim, vp.x, vp.y, true, &r );
+				video->BlitSprite( anim, vp.x - anim->Width/2, vp.y - anim->Height/2, true, &r );
 			} else {
 				video->DrawEllipse( (short) vp.x, (short) vp.y, 6, 5, colors[mn->color&7], false );
 			}
