@@ -66,6 +66,9 @@ Release and Announcements
 
 * Test the downloads from sourceforge.net
 
-* Announce on homepage, SF, #GemRB in channel and title, Gibberlings3, Happypenguin
+* Announce on homepage, SF, #GemRB in channel and title, Happypenguin and
+  Gibberlings3:
+    - our forum
+    - modding news (Avenger, Theacefes, Grim Squeaker, DavidW and cmorgan have access)
 
 * Run admin/restart_news.sh to restart the NEWS cycle
