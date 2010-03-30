@@ -90,8 +90,6 @@ MapControl::MapControl(void)
 
 	MyMap = core->GetGame()->GetCurrentArea();
 	MapMOS = MyMap->SmallMap->GetImage();
-	if (core->FogOfWar&FOG_DRAWFOG)
-		DrawFog();
 }
 
 MapControl::~MapControl(void)
@@ -109,9 +107,15 @@ MapControl::~MapControl(void)
 }
 
 // Draw fog on the small bitmap
-void MapControl::DrawFog()
+void MapControl::DrawFog(unsigned short XWin, unsigned short YWin)
 {
 	Video *video = core->GetVideoDriver();
+
+	Region old_clip;
+	video->GetClipRect(old_clip);
+
+	Region r( XWin + XPos, YWin + YPos, Width, Height );
+	video->SetClipRect(&r);
 
 	// FIXME: this is ugly, the knowledge of Map and ExploredMask
 	//   sizes should be in Map.cpp
@@ -123,11 +127,13 @@ void MapControl::DrawFog()
 			Point p( (short) (MAP_MULT * x), (short) (MAP_MULT * y) );
 			bool visible = MyMap->IsVisible( p, true );
 			if (! visible) {
-				Region rgn = Region ( MAP_DIV * x, MAP_DIV * y, MAP_DIV, MAP_DIV );
-				video->DrawRectSprite( rgn, colors[black], MapMOS );
+				Region rgn = Region ( MAP_TO_SCREENX(MAP_DIV * x), MAP_TO_SCREENY(MAP_DIV * y), MAP_DIV, MAP_DIV );
+				video->DrawRect( rgn, colors[black] );
 			}
 		}
 	}
+
+	video->SetClipRect(&old_clip);
 }
 
 // To be called after changes in control's or screen geometry
@@ -193,6 +199,9 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 	Region r( XWin + XPos, YWin + YPos, Width, Height );
 
 	video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
+
+	if (core->FogOfWar&FOG_DRAWFOG)
+		DrawFog(XWin, YWin);
 
 	Region vp = video->GetViewport();
 

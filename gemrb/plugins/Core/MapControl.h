@@ -75,7 +75,7 @@ public:
 	void RedrawMapControl(const char *VariableName, unsigned int Sum);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short XWin, unsigned short YWin);
-	void DrawFog();
+	void DrawFog(unsigned short XWin, unsigned short YWin);
 	/** Compute parameters after changes in control's or screen geometry */
 	void Realize();
 	/** Sets the Text of the current control */
