@@ -1593,7 +1593,11 @@ inline void ReadPixel(long &val, unsigned char *pixels, int BytesPerPixel) {
 	} else if (BytesPerPixel == 2) {
 		val = *(Uint16 *)pixels;
 	} else if (BytesPerPixel == 3) {
-		memcpy(&val, pixels, 3); // TODO: big-endian
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+		val = pixels[0] + ((unsigned int)pixels[1] << 8) + ((unsigned int)pixels[2] << 16);
+#else
+		val = pixels[2] + ((unsigned int)pixels[1] << 8) + ((unsigned int)pixels[0] << 16);
+#endif
 	} else if (BytesPerPixel == 4) {
 		val = *(Uint32 *)pixels;
 	}
@@ -1605,7 +1609,15 @@ inline void WritePixel(const long val, unsigned char *pixels, int BytesPerPixel)
 	} else if (BytesPerPixel == 2) {
 		*(Uint16 *)pixels = (Uint16)val;
 	} else if (BytesPerPixel == 3) {
-		memcpy(pixels, &val, 3); // TODO: big-endian
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+		pixels[0] = val & 0xff;
+		pixels[1] = (val >> 8) & 0xff;
+		pixels[2] = (val >> 16) & 0xff;
+#else
+		pixels[2] = val & 0xff;
+		pixels[1] = (val >> 8) & 0xff;
+		pixels[0] = (val >> 16) & 0xff;
+#endif
 	} else if (BytesPerPixel == 4) {
 		*(Uint32 *)pixels = val;
 	}

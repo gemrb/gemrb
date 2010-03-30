@@ -105,14 +105,17 @@ Sprite2D* Video::SpriteScaleDown( Sprite2D* sprite, unsigned int ratio )
 	unsigned int Width = sprite->Width / ratio;
 	unsigned int Height = sprite->Height / ratio;
 
-	unsigned int* pixels = (unsigned int *) malloc( Width * Height * 4 );
+	void* pixels = malloc( Width * Height * 4 );
 	int i = 0;
 
 	for (unsigned int y = 0; y < Height; y++) {
 		for (unsigned int x = 0; x < Width; x++) {
 			Color c = SpriteGetPixelSum( sprite, x, y, ratio );
 
-			*(pixels + i++) = c.r + (c.g << 8) + (c.b << 16) + (c.a << 24);
+			*((char*)pixels + i++) = c.r;
+			*((char*)pixels + i++) = c.g;
+			*((char*)pixels + i++) = c.b;
+			*((char*)pixels + i++) = c.a;
 		}
 	}
 
