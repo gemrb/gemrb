@@ -65,3 +65,8 @@ def DonePress():
 	GemRB.SetToken("LargePortrait", GemRB.GetPlayerPortrait (Slot, 0) )
 	jumpTo("name")
 	return
+
+def CancelPress():
+	CloseOtherWindow(None)
+	GemRB.SetNextScript(GemRB.GetToken("NextScript"))
+	return
