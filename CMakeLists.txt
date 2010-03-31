@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.4.4)
 if(COMMAND cmake_policy)
       cmake_policy(SET CMP0003 NEW)
+      cmake_policy(SET CMP0005 NEW)
 endif(COMMAND cmake_policy)
 
 PROJECT(GemRB)
@@ -79,7 +80,7 @@ ENDIF(UNIX)
 MESSAGE(STATUS "Looking for Ogg Vorbis support")
 FIND_LIBRARY(VORBIS_LIBRARY vorbisfile)
 
-ADD_DEFINITIONS("-DHAVE_CONFIG_H")
+ADD_DEFINITIONS("-DHAVE_CONFIG_H" -DPLUGINDIR="${PLUGIN_INSTALL_DIR}")
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
