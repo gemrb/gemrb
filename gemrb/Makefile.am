@@ -10,7 +10,7 @@ INCLUDES= \
 	$(all_includes) \
 	$(PYTHON_INCLUDES)
 
-gemrb_LDFLAGS = $(all_libraries) 
+gemrb_LDFLAGS = $(all_libraries) @LIBPTHREAD@
 
 #install-data-local:
 #	$(INSTALL_DATA) GemRB.cfg* $(sysconfdir)
