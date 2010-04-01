@@ -1500,7 +1500,7 @@ void CREImp::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, int c
 			}
 		} else {
 			printMessage("CREImporter","Unresolved spell index: ", LIGHT_RED);
-			printf("%d level:%d, type: %d", spellindex, level+1, type);
+			printf("%d level:%d, type: %d\n", spellindex, level+1, type);
 		}
 	}
 	str->ReadDword(&tmpDword);
