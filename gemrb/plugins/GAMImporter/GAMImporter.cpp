@@ -106,6 +106,14 @@ Game* GAMImp::LoadGame(Game *newGame)
 	// otherwise it is set to 0 at construction time
 	if (core->SaveAsOriginal) {
 		newGame->version=version;
+
+		// HACK: default icewind2.gam is 2.0! ack! maybe add a config option to force this?
+		if (stricmp( core->GameType, "iwd2" ) == 0 && version != GAM_VER_IWD2) {
+			newGame->version = GAM_VER_IWD2;
+			printMessage("GAMImp"," ",LIGHT_RED);
+			printf("Trying to load a non-iwd2 game (%d) in iwd2 mode! Patching version up.\n",
+				(int)version);
+		}
 	}
 
 	ieDword GameTime;
