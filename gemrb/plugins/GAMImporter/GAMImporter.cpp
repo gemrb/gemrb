@@ -385,7 +385,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 			//fields, but QuickSpellClass is set correctly, problem is
 			//that GemRB doesn't clear QuickSpellClass
 			for (i = 0; i < MAX_QSLOTS; i++) {
-				str->Read( &tmp[i], 8 );
+				str->Read( tmp, 8 );
 				if ((tmp[0]!=0) && (pcInfo.QuickSpellResRef[0]==0)) {
 					memcpy( pcInfo.QuickSpellResRef[i], tmp, 8);
 					//innates
@@ -395,7 +395,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 			//recently discovered fields (bard songs)
 			//str->Seek( 72, GEM_CURRENT_POS);
 			for(i = 0; i<MAX_QSLOTS;i++) {
-				str->Read( &tmp[i], 8 );
+				str->Read( tmp, 8 );
 				if ((tmp[0]!=0) && (pcInfo.QuickSpellResRef[0]==0)) {
 					memcpy( pcInfo.QuickSpellResRef[i], tmp, 8);
 					//bardsongs
@@ -918,6 +918,7 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 			}
 		}
 		stream->Write(filling,10);
+		memset(filling,0,sizeof(filling) );
 	} else {
 		for (i=0;i<3;i++) {
 			stream->Write(ac->PCStats->QuickSpells[i],8);

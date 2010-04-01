@@ -2090,8 +2090,8 @@ int CREImp::GetStoredFileSize(Actor *actor)
 	headersize += ItemsCount * 20;
 	ItemSlotsOffset = headersize;
 
-	//adding itemslot table size and equipped slot field
-	return headersize + (Inventory_Size)*sizeof(ieWord)+sizeof(ieDword);
+	//adding itemslot table size and equipped slot fields
+	return headersize + (Inventory_Size)*sizeof(ieWord)+sizeof(ieWord)*2;
 }
 
 int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
@@ -2977,6 +2977,7 @@ int CREImp::PutActor(DataStream *stream, Actor *actor, bool chr)
 	stream->WriteDword( &EffectsOffset );
 	tmpDword = EffectsCount+VariablesCount;
 	stream->WriteDword( &tmpDword );
+	tmpDword = 0;
 	stream->WriteResRef( actor->GetDialog(false) );
 	//spells, spellbook etc
 
