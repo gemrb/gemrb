@@ -25,6 +25,7 @@
 #include "../Core/MapMgr.h"
 #include "../Core/MemoryStream.h"
 #include "../Core/DataFileMgr.h"
+#include <cassert>
 
 
 #define MAZE_DATA_SIZE 1720
@@ -1013,16 +1014,20 @@ int GAMImp::PutPCs(DataStream *stream, Game *game)
 	ieDword CREOffset = PCOffset + PCCount * PCSize;
 
 	for(i=0;i<PCCount;i++) {
+		assert(stream->GetPos() == PCOffset + i * PCSize);
 		Actor *ac = game->GetPC(i, false);
 		ieDword CRESize = am->GetStoredFileSize(ac);
 		PutActor(stream, ac, CRESize, CREOffset, game->version);
 		CREOffset += CRESize;
 	}
+	assert(stream->GetPos() == PCOffset + PCCount * PCSize);
 
+	CREOffset = PCOffset + PCCount * PCSize; // just for the asserts..
 	for(i=0;i<PCCount;i++) {
+		assert(stream->GetPos() == CREOffset);
 		Actor *ac = game->GetPC(i, false);
 		//reconstructing offsets again
-		am->GetStoredFileSize(ac);
+		CREOffset += am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
 	}
 	core->FreeInterface( am );
