@@ -118,8 +118,6 @@ Resource* DirectoryImporter::GetResource(const char* resname, const std::vector<
 {
 	if (!strcmp(resname, "")) return NULL;
 
-	//Search it in the GemRB override Directory
-
 	for (size_t j = 0; j < types.size(); j++) {
 		FileStream *fs = SearchIn( path, resname, types[j].GetExt());
 		if (fs) {
