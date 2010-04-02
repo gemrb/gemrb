@@ -81,7 +81,7 @@ bool FileStream::Modify(const char* fname, bool aF)
 		_fclose( str );
 	}
 	autoFree = aF;
-	str = _fopen( fname, "ab" );
+	str = _fopen( fname, "r+b" );
 	if (str == NULL) {
 		return false;
 	}
