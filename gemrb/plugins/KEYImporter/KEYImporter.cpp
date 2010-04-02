@@ -496,7 +496,9 @@ Resource* KeyImp::GetResource(const char* resname, const std::vector<ResourceDes
 				strnlwrcpy( ret->filename, resname, 8 );
 				strcat( ret->filename, types[j].GetExt() );
 
-				return types[j].Create(ret);
+				Resource *res = types[j].Create(ret);
+				if (res)
+					return res;
 			}
 		}
 	}
