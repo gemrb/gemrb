@@ -226,6 +226,7 @@ bool KEYImporter::HasResource(const char* resname, std::vector<ResourceDesc> typ
 	unsigned int ResLocator;
 	for (size_t j = 0; j < types.size(); j++) {
 		if (resources.Lookup( resname, types[j].GetKeyType(), ResLocator )) {
+			printf("Found %s%s.\n", resname, types[j].GetExt()); // FIXME: This output should be on the previous line.
 			return true;
 		}
 	}
@@ -310,6 +311,7 @@ Resource* KEYImporter::GetResource(const char* resname, const std::vector<Resour
 	for (size_t j = 0; j < types.size(); j++) {
 		if (DataStream* ret = GetStream(resname, types[j].GetKeyType(), silent)) {
 			if (Resource *res = types[j].Create(ret)) {
+				printf("Found %s%s.\n", resname, types[j].GetExt()); // FIXME: This output should be on the previous line.
 				return res;
 			}
 		}

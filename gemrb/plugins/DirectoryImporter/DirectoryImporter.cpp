@@ -94,8 +94,10 @@ bool DirectoryImporter::HasResource(const char* resname, std::vector<ResourceDes
 	if (types.size() == 0)
 		return false;
 	for (size_t j = 0; j < types.size(); j++) {
-		if (FindIn( path, resname, types[j].GetExt() ))
+		if (FindIn( path, resname, types[j].GetExt() )) {
+			printf("%s%s ", resname, types[j].GetExt());
 			return true;
+		}
 	}
 	return false;
 }
@@ -124,6 +126,7 @@ Resource* DirectoryImporter::GetResource(const char* resname, const std::vector<
 			Resource * res = types[j].Create(fs);
 			if (res) {
 				if (!silent) {
+					printf("%s%s ", resname, types[j].GetExt());
 					printBracket(description, LIGHT_GREEN);
 					printf("\n");
 				}
