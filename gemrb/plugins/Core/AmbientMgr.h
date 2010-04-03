@@ -30,8 +30,8 @@ class Ambient;
 
 class GEM_EXPORT AmbientMgr {
 public:
-	AmbientMgr() {}
-	virtual ~AmbientMgr() { reset(); }
+	AmbientMgr();
+	virtual ~AmbientMgr();
 	virtual void reset() { ambients = std::vector<Ambient *> (); }
 	virtual void setAmbients(const std::vector<Ambient *> &a) { reset(); ambients = a; activate(); }
 	virtual void activate(const std::string &name);

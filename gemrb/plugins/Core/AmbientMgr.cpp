@@ -20,6 +20,15 @@
 
 #include "AmbientMgr.h"
 #include "Ambient.h"
+
+AmbientMgr::AmbientMgr()
+{
+}
+
+AmbientMgr::~AmbientMgr()
+{
+	reset();
+}
  
 void AmbientMgr::activate(const std::string &name)
 {
