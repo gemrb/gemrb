@@ -33,6 +33,7 @@
 #include "GameControl.h"
 #include "WorldMap.h"
 #include "DataFileMgr.h"
+#include "AmbientMgr.h"
 
 //------------------------------------------------------------
 // Action Functions

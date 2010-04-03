@@ -24,12 +24,13 @@
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include "Plugin.h"
-#include "AmbientMgr.h"
 
 #define GEM_SND_RELATIVE 1
 #define GEM_SND_SPEECH   IE_STR_SPEECH // 4
 #define GEM_SND_VOL_MUSIC    1
 #define GEM_SND_VOL_AMBIENTS 2
+
+class AmbientMgr;
 
 class GEM_EXPORT Audio : public Plugin {
 public:
