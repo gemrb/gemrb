@@ -51,7 +51,7 @@ public:
 	GAMImp(void);
 	~GAMImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	Game* LoadGame(Game *newGame);
+	Game* LoadGame(Game *newGame, int ver_override = 0);
 
 	int GetStoredFileSize(Game *game);
 	/* stores a gane in the savegame folder */

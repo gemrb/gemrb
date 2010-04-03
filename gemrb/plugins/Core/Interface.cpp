@@ -606,7 +606,7 @@ void Interface::HandleFlags()
 
 	if (QuitFlag&QF_LOADGAME) {
 		QuitFlag &= ~QF_LOADGAME;
-		LoadGame(LoadGameIndex);
+		LoadGame(LoadGameIndex, VersionOverride );
 	}
 
 	if (QuitFlag&QF_ENTERGAME) {
@@ -3642,7 +3642,14 @@ void Interface::QuitGame(int BackToMain)
 	GSUpdate(true);
 }
 
-void Interface::LoadGame(int index)
+void Interface::SetupLoadGame(int index, int ver_override)
+{
+	LoadGameIndex = index;
+	VersionOverride = ver_override;
+	QuitFlag |= QF_LOADGAME;
+}
+
+void Interface::LoadGame(int index, int ver_override)
 {
 	// This function has rather painful error handling,
 	// as it should swap all the objects or none at all
@@ -3696,7 +3703,7 @@ void Interface::LoadGame(int index)
 	if (!gam_mgr->Open( gam_str, true ))
 		goto cleanup;
 
-	new_game = gam_mgr->LoadGame(new Game());
+	new_game = gam_mgr->LoadGame(new Game(), ver_override);
 	if (!new_game)
 		goto cleanup;
 

@@ -99,22 +99,28 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Game* GAMImp::LoadGame(Game *newGame)
+Game* GAMImp::LoadGame(Game *newGame, int ver_override)
 {
 	unsigned int i;
 
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time
 	if (core->SaveAsOriginal) {
-		newGame->version=version;
-
-		// HACK: default icewind2.gam is 2.0! ack! maybe add a config option to force this?
+		// HACK: default icewind2.gam is 2.0! handled by script
+		if(ver_override) {
+			newGame->version = ver_override;
+		}
+		else {
+			newGame->version=version;
+		}
+/*
 		if (stricmp( core->GameType, "iwd2" ) == 0 && version != GAM_VER_IWD2) {
 			newGame->version = GAM_VER_IWD2;
 			printMessage("GAMImp"," ",LIGHT_RED);
 			printf("Trying to load a non-iwd2 game (%d) in iwd2 mode! Patching version up.\n",
 				(int)version);
 		}
+*/
 	}
 
 	ieDword GameTime;
