@@ -380,13 +380,12 @@ PyDoc_STRVAR( GemRB_LoadGame__doc,
 
 static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 {
-	int GameIndex;
+	int GameIndex, VersionOverride = 0;
 
-	if (!PyArg_ParseTuple( args, "i", &GameIndex )) {
+	if (!PyArg_ParseTuple( args, "i|i", &GameIndex, &VersionOverride )) {
 		return AttributeError( GemRB_LoadGame__doc );
 	}
-	core->QuitFlag|=QF_LOADGAME;
-	core->LoadGameIndex=GameIndex;
+	core->SetupLoadGame(GameIndex, VersionOverride);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
