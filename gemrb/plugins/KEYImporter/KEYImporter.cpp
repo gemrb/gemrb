@@ -261,7 +261,6 @@ static void FindBIFOnCD(BIFEntry *entry)
 
 DataStream* KEYImporter::GetStream(const char *resname, ieWord type, bool silent)
 {
-	char path[_MAX_PATH];
 	unsigned int ResLocator;
 
 	if (type == 0)
@@ -269,8 +268,7 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type, bool silent
 	if (resources.Lookup( resname, type, ResLocator )) {
 		int bifnum = ( ResLocator & 0xFFF00000 ) >> 20;
 
-		strcpy( path, biffiles[bifnum].path );
-		if (core->GameOnCD)
+		if (core->GameOnCD && (biffiles[bifnum].cd != 0))
 			FindBIFOnCD(&biffiles[bifnum]);
 		if (!biffiles[bifnum].found) {
 			printf( "Cannot find %s... Resource unavailable.\n",
@@ -280,8 +278,8 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type, bool silent
 
 		ArchiveImporter* ai = ( ArchiveImporter* )
 			core->GetInterface( IE_BIF_CLASS_ID );
-		if (ai->OpenArchive( path ) == GEM_ERROR) {
-			printf("Cannot open archive %s\n", path );
+		if (ai->OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
+			printf("Cannot open archive %s\n", biffiles[bifnum].path );
 			core->FreeInterface( ai );
 			return NULL;
 		}
