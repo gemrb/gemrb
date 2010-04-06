@@ -261,6 +261,9 @@ GameControl::~GameControl(void)
 	if (dlg) {
 		delete dlg;
 	}
+	if (DisplayText) {
+		core->FreeString(DisplayText);
+	}
 }
 
 //Autosave was triggered by the GUI
