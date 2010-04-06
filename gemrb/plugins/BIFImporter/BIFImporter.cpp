@@ -286,27 +286,24 @@ int BIFImp::OpenArchive(const char* filename)
 
 DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 {
-	DataStream* s = NULL;
 	if (Type == IE_TIS_CLASS_ID) {
 		unsigned int srcResLoc = Resource & 0xFC000;
 		for (unsigned int i = 0; i < tentcount; i++) {
 			if (( tentries[i].resLocator & 0xFC000 ) == srcResLoc) {
-				s = new CachedFileStream( stream, tentries[i].dataOffset,
+				return new CachedFileStream( stream, tentries[i].dataOffset,
 							tentries[i].tileSize * tentries[i].tilesCount );
-				break;
 			}
 		}
 	} else {
 		ieDword srcResLoc = Resource & 0x3FFF;
 		for (ieDword i = 0; i < fentcount; i++) {
 			if (( fentries[i].resLocator & 0x3FFF ) == srcResLoc) {
-				s = new CachedFileStream( stream, fentries[i].dataOffset,
+				return new CachedFileStream( stream, fentries[i].dataOffset,
 							fentries[i].fileSize );
-				break;
 			}
 		}
 	}
-	return s;
+	return NULL;
 }
 
 void BIFImp::ReadBIF(void)
