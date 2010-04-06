@@ -213,24 +213,15 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	return true;
 }
 
-bool KEYImporter::HasResource(const char* resname, SClass_ID type, bool)
+bool KEYImporter::HasResource(const char* resname, SClass_ID type)
 {
 	unsigned int ResLocator;
-	if (resources.Lookup( resname, type, ResLocator ))
-		return true;
-	return false;
+	return resources.Lookup( resname, type, ResLocator );
 }
 
-bool KEYImporter::HasResource(const char* resname, std::vector<ResourceDesc> types, bool)
+bool KEYImporter::HasResource(const char* resname, const ResourceDesc &type)
 {
-	unsigned int ResLocator;
-	for (size_t j = 0; j < types.size(); j++) {
-		if (resources.Lookup( resname, types[j].GetKeyType(), ResLocator )) {
-			printf("Found %s%s.\n", resname, types[j].GetExt()); // FIXME: This output should be on the previous line.
-			return true;
-		}
-	}
-	return false;
+	return HasResource(resname, type.GetKeyType());
 }
 
 static void FindBIFOnCD(BIFEntry *entry)
@@ -259,7 +250,7 @@ static void FindBIFOnCD(BIFEntry *entry)
 	entry->found = false;
 }
 
-DataStream* KEYImporter::GetStream(const char *resname, ieWord type, bool silent)
+DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 {
 	unsigned int ResLocator;
 
@@ -283,7 +274,7 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type, bool silent
 			core->FreeInterface( ai );
 			return NULL;
 		}
-		DataStream* ret = ai->GetStream( ResLocator, type, silent );
+		DataStream* ret = ai->GetStream( ResLocator, type );
 		core->FreeInterface( ai );
 		if (ret) {
 			strnlwrcpy( ret->filename, resname, 8 );
@@ -294,27 +285,15 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type, bool silent
 	return NULL;
 }
 
-DataStream* KEYImporter::GetResource(const char* resname, SClass_ID type, bool silent)
+DataStream* KEYImporter::GetResource(const char* resname, SClass_ID type)
 {
-	if (!strcmp(resname, "")) return NULL;
-
 	//the word masking is a hack for synonyms, currently used for bcs==bs
-	return GetStream(resname, type&0xFFFF, silent);
+	return GetStream(resname, type&0xFFFF);
 }
 
-Resource* KEYImporter::GetResource(const char* resname, const std::vector<ResourceDesc> &types, bool silent)
+DataStream* KEYImporter::GetResource(const char* resname, const ResourceDesc &type)
 {
-	if (!strcmp(resname, "")) return NULL;
-
-	for (size_t j = 0; j < types.size(); j++) {
-		if (DataStream* ret = GetStream(resname, types[j].GetKeyType(), silent)) {
-			if (Resource *res = types[j].Create(ret)) {
-				printf("Found %s%s.\n", resname, types[j].GetExt()); // FIXME: This output should be on the previous line.
-				return res;
-			}
-		}
-	}
-	return NULL;
+	return GetStream(resname, type.GetKeyType());
 }
 
 #include "../../includes/plugindef.h"

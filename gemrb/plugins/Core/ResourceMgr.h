@@ -22,10 +22,8 @@
 #define RESOURCEMGR_H
 
 #include "../../includes/exports.h"
-#include <vector>
 #include "Plugin.h"
 #include "../../includes/SClassID.h"
-#include "Resource.h"
 #include "../../includes/globals.h"
 
 class ResourceDesc;
@@ -36,10 +34,11 @@ public:
 	ResourceMgr(void);
 	virtual ~ResourceMgr(void);
 	virtual bool Open(const char *filename, const char *description) = 0;
-	virtual bool HasResource(const char* resname, SClass_ID type, bool silent=false) = 0;
-	virtual bool HasResource(const char* resname, const std::vector<ResourceDesc>, bool silent=false) = 0;
-	virtual DataStream* GetResource(const char* resname, SClass_ID type, bool silent=false) = 0;
-	virtual Resource* GetResource(const char* resname, const std::vector<ResourceDesc> &types, bool silent=false) = 0;
+	virtual bool HasResource(const char* resname, SClass_ID type) = 0;
+	virtual bool HasResource(const char* resname, const ResourceDesc &type) = 0;
+	virtual DataStream* GetResource(const char* resname, SClass_ID type) = 0;
+	virtual DataStream* GetResource(const char* resname, const ResourceDesc &type) = 0;
+	const char *GetDescription() const { return description; }
 protected:
 	const char *description;
 };

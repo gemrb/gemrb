@@ -50,17 +50,17 @@ private:
 	Dictionary resources;
 
 	/** Gets the stream assoicated to a RESKey */
-	DataStream *GetStream(const char *resname, ieWord type, bool silent);
+	DataStream *GetStream(const char *resname, ieWord type);
 public:
 	KEYImporter(void);
 	~KEYImporter(void);
 	bool Open(const char *file, const char *desc);
 	/* predicts the availability of a resource */
-	bool HasResource(const char* resname, SClass_ID type, bool silent=false);
-	bool HasResource(const char* resname, const std::vector<ResourceDesc>, bool silent=false);
+	bool HasResource(const char* resname, SClass_ID type);
+	bool HasResource(const char* resname, const ResourceDesc &type);
 	/* returns resource */
-	DataStream* GetResource(const char* resname, SClass_ID type, bool silent=false);
-	Resource* GetResource(const char* resname, const std::vector<ResourceDesc> &types, bool silent=false);
+	DataStream* GetResource(const char* resname, SClass_ID type);
+	DataStream* GetResource(const char* resname, const ResourceDesc &type);
 public:
 	void release(void)
 	{

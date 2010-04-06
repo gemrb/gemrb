@@ -284,7 +284,7 @@ int BIFImp::OpenArchive(const char* filename)
 	return GEM_ERROR;
 }
 
-DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type, bool silent)
+DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 {
 	DataStream* s = NULL;
 	if (Type == IE_TIS_CLASS_ID) {
@@ -304,13 +304,6 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type, bool s
 							fentries[i].fileSize );
 				break;
 			}
-		}
-	}
-	if (!silent) {
-		if (s) {
-			printStatus( "FOUND", LIGHT_GREEN );
-		} else {
-			printStatus( "ERROR", LIGHT_RED );
 		}
 	}
 	return s;

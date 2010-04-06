@@ -252,10 +252,12 @@ static void PrintPossibleFiles(const char* ResRef, const TypeID *type)
 
 bool GameData::Exists(const char *ResRef, SClass_ID type, bool silent)
 {
-	// TODO: check various caches before going to KeyImp
+	if (!strcmp(ResRef, "")) return false;
+	// TODO: check various caches
 	for (size_t i = 0; i < searchPath.size(); i++) {
-		if (searchPath[i]->HasResource( ResRef, type, silent ))
+		if (searchPath[i]->HasResource( ResRef, type )) {
 			return true;
+		}
 	}
 	if (!silent) {
 		printMessage( "GameData", "Searching for ", WHITE );
@@ -267,10 +269,15 @@ bool GameData::Exists(const char *ResRef, SClass_ID type, bool silent)
 
 bool GameData::Exists(const char *ResRef, const TypeID *type, bool silent)
 {
-	// TODO: check various caches before going to KeyImp
-	for (size_t i = 0; i < searchPath.size(); i++) {
-		if (searchPath[i]->HasResource(ResRef, core->GetPluginMgr()->GetResourceDesc(type), silent))
-			return true;
+	if (!strcmp(ResRef, "")) return false;
+	// TODO: check various caches
+	const std::vector<ResourceDesc> &types = core->GetPluginMgr()->GetResourceDesc(type);
+	for (size_t j = 0; j < types.size(); j++) {
+		for (size_t i = 0; i < searchPath.size(); i++) {
+			if (searchPath[i]->HasResource(ResRef, types[j])) {
+				return true;
+			}
+		}
 	}
 	if (!silent) {
 		printMessage( "GameData", "Searching for ", WHITE );
@@ -284,14 +291,19 @@ bool GameData::Exists(const char *ResRef, const TypeID *type, bool silent)
 
 DataStream* GameData::GetResource(const char* ResRef, SClass_ID type, bool silent) const
 {
+	if (!strcmp(ResRef, "")) return NULL;
 	if (!silent) {
 		printMessage( "GameData", "Searching for ", WHITE );
 		printf( "%.8s%s...", ResRef, core->TypeExt( type ) );
 	}
 	for (size_t i = 0; i < searchPath.size(); i++) {
-		DataStream *ds = searchPath[i]->GetResource(ResRef, type, silent);
-		if (ds)
+		DataStream *ds = searchPath[i]->GetResource(ResRef, type);
+		if (ds) {
+			if (!silent) {
+				printStatus( searchPath[i]->GetDescription(), GREEN );
+			}
 			return ds;
+		}
 	}
 	if (!silent) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -301,14 +313,25 @@ DataStream* GameData::GetResource(const char* ResRef, SClass_ID type, bool silen
 
 Resource* GameData::GetResource(const char* ResRef, const TypeID *type, bool silent) const
 {
+	if (!strcmp(ResRef, "")) return NULL;
 	if (!silent) {
 		printMessage( "GameData", "Searching for ", WHITE );
-		printf( "%.8s... ", ResRef );
 	}
-	for (size_t i = 0; i < searchPath.size(); i++) {
-		Resource *res = searchPath[i]->GetResource(ResRef, core->GetPluginMgr()->GetResourceDesc(type) , silent);
-		if (res)
-			return res;
+	const std::vector<ResourceDesc> &types = core->GetPluginMgr()->GetResourceDesc(type);
+	for (size_t j = 0; j < types.size(); j++) {
+		for (size_t i = 0; i < searchPath.size(); i++) {
+			DataStream *str = searchPath[i]->GetResource(ResRef, types[j]);
+			if (str) {
+				Resource *res = types[j].Create(str);
+				if (res) {
+					if (!silent) {
+						printf( "%.8s%s...", ResRef, types[j].GetExt() );
+						printStatus( searchPath[i]->GetDescription(), GREEN );
+					}
+					return res;
+				}
+			}
+		}
 	}
 	if (!silent) {
 		printf("Tried ");

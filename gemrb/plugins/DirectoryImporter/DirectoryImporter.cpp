@@ -101,57 +101,24 @@ static FileStream *SearchIn(const char * Path,const char * ResRef, const char *T
 	return fs;
 }
 
-bool DirectoryImporter::HasResource(const char* resname, SClass_ID type, bool)
+bool DirectoryImporter::HasResource(const char* resname, SClass_ID type)
 {
-	if (FindIn( path, resname, core->TypeExt(type) ))
-		return true;
-	return false;
+	return FindIn( path, resname, core->TypeExt(type) );
 }
 
-bool DirectoryImporter::HasResource(const char* resname, std::vector<ResourceDesc> types, bool)
+bool DirectoryImporter::HasResource(const char* resname, const ResourceDesc &type)
 {
-	if (types.size() == 0)
-		return false;
-	for (size_t j = 0; j < types.size(); j++) {
-		if (FindIn( path, resname, types[j].GetExt() )) {
-			printf("%s%s ", resname, types[j].GetExt());
-			return true;
-		}
-	}
-	return false;
+	return FindIn( path, resname, type.GetExt() );
 }
 
-DataStream* DirectoryImporter::GetResource(const char* resname, SClass_ID type, bool silent)
+DataStream* DirectoryImporter::GetResource(const char* resname, SClass_ID type)
 {
-	if (!strcmp(resname, "")) return NULL;
-
-	DataStream *fs = SearchIn( path, resname, core->TypeExt(type));
-	if (fs && !silent) {
-		printBracket(description, LIGHT_GREEN);
-		printf("\n");
-	}
-	return fs;
+	return SearchIn( path, resname, core->TypeExt(type) );
 }
 
-Resource* DirectoryImporter::GetResource(const char* resname, const std::vector<ResourceDesc> &types, bool silent)
+DataStream* DirectoryImporter::GetResource(const char* resname, const ResourceDesc &type)
 {
-	if (!strcmp(resname, "")) return NULL;
-
-	for (size_t j = 0; j < types.size(); j++) {
-		FileStream *fs = SearchIn( path, resname, types[j].GetExt());
-		if (fs) {
-			Resource * res = types[j].Create(fs);
-			if (res) {
-				if (!silent) {
-					printf("%s%s ", resname, types[j].GetExt());
-					printBracket(description, LIGHT_GREEN);
-					printf("\n");
-				}
-				return res;
-			}
-		}
-	}
-	return NULL;
+	return SearchIn( path, resname, type.GetExt() );
 }
 
 #include "../../includes/plugindef.h"
