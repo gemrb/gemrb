@@ -116,7 +116,7 @@ private:
     int num_streams;
     int CountAvailableSources(int limit);
     bool evictBuffer();
-    void clearBufferCache();
+    void clearBufferCache(bool force);
     ALenum GetFormatEnum(int channels, int bits);
     static int MusicManager(void* args);
     bool stayAlive;

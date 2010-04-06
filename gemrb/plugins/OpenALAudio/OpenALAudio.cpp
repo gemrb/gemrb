@@ -189,7 +189,7 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	}
 	speech.ForceClear();
 	ResetMusics();
-	clearBufferCache();
+	clearBufferCache(true);
 
 	ALCdevice *device;
 
@@ -683,6 +683,7 @@ bool OpenALAudioDriver::evictBuffer()
 			// Buffer was unused. An error would have indicated
 			// the buffer was still attached to a source.
 
+			delete e;
 			buffercache.Remove(k);
 
 			//printf("Removed buffer %s from ACMImp cache\n", k);
@@ -694,7 +695,7 @@ bool OpenALAudioDriver::evictBuffer()
 	return res;
 }
 
-void OpenALAudioDriver::clearBufferCache()
+void OpenALAudioDriver::clearBufferCache(bool force)
 {
 	// Room for optimization: any method of iterating over the buffers
 	// would suffice. It doesn't have to be in LRU-order.
@@ -704,9 +705,10 @@ void OpenALAudioDriver::clearBufferCache()
 	while (buffercache.getLRU(n, k, p)) {
 		CacheEntry* e = (CacheEntry*)p;
 		alDeleteBuffers(1, &e->Buffer);
-		if (alGetError() == AL_NO_ERROR)
+		if (force || alGetError() == AL_NO_ERROR) {
+			delete e;
 			buffercache.Remove(k);
-		else
+		} else
 			++n;
 	}
 }
