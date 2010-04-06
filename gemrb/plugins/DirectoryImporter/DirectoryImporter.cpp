@@ -57,29 +57,48 @@ static bool exists(char *file)
 static bool FindIn(const char *Path, const char *ResRef, const char *Type)
 {
 	char p[_MAX_PATH], f[_MAX_PATH] = {0};
-	strncpy(f, ResRef, _MAX_PATH);
+	strcpy(f, ResRef);
 	strcat(f, Type);
 	strlwr(f);
-	PathJoin( p, Path, f, NULL );
-	ResolveFilePath(p);
-	return exists(p);
+
+	if (core->CaseSensitive) {
+		char *t = FindInDir(Path, f, false);
+		if (!t) return false;
+		PathJoin(p, Path, t, NULL);
+		free(t);
+		assert(exists(p));
+	} else {
+		PathJoin(p, Path, f, NULL);
+		if (!exists(p)) return false;
+	}
+
+	return true;
 }
 
 static FileStream *SearchIn(const char * Path,const char * ResRef, const char *Type)
 {
 	char p[_MAX_PATH], f[_MAX_PATH] = {0};
-	strncpy(f, ResRef, _MAX_PATH);
+	strcpy(f, ResRef);
 	strcat(f, Type);
 	strlwr(f);
-	PathJoin( p, Path, f, NULL );
-	ResolveFilePath(p);
-	if (exists(p)) {
-		FileStream * fs = new FileStream();
-		if(!fs) return NULL;
-		fs->Open(p, true);
-		return fs;
+
+	if (core->CaseSensitive) {
+		char *t = FindInDir(Path, f, false);
+		if (!t) return NULL;
+		PathJoin(p, Path, t, NULL);
+		free(t);
+		//assert(exists(p));
+	} else {
+		PathJoin(p, Path, f, NULL);
 	}
-	return NULL;
+
+	FileStream * fs = new FileStream();
+	if(!fs) return NULL;
+	if(!fs->Open(p, true)) {
+		delete fs;
+		return NULL;
+	}
+	return fs;
 }
 
 bool DirectoryImporter::HasResource(const char* resname, SClass_ID type, bool)
