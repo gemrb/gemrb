@@ -252,7 +252,7 @@ def UpdateActionsWindow ():
 
 	#fully redraw the side panes to cover the actions window
 	#do this only when there is no 'otherwindow'
-	if GemRB.GetVar ("OtherWindow") != -1:
+	if GemRB.GetVar ("OtherWindow") == -1:
 		if PortraitWindow:
 			PortraitWindow.Invalidate ()
 		if OptionsWindow:
