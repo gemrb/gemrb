@@ -218,7 +218,7 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 	//apparently this is needed too, so the artifacts are not visible
 	if (Owner->Visible==WINDOW_VISIBLE) {
 		Changed = true;
-		Owner->Invalidate();
+		Owner->InvalidateForControl(this);
 	}
 }
 

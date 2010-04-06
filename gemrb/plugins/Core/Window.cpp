@@ -108,7 +108,19 @@ void Window::DrawWindow()
 			video->BlitSprite( core->WindowFrames[2], (core->Width - core->WindowFrames[2]->Width) / 2, 0, true );
 		if (core->WindowFrames[3])
 			video->BlitSprite( core->WindowFrames[3], (core->Width - core->WindowFrames[3]->Width) / 2, core->Height - core->WindowFrames[3]->Height, true );
+	} else if (clip_regions.size()) {
+		// clip drawing (we only do Background right now) for InvalidateForControl
+		for (unsigned int i = 0; i < clip_regions.size(); i++) {
+			Region to_clip = clip_regions[i];
+			to_clip.x += XPos;
+			to_clip.y += YPos;
+			video->SetClipRect(&to_clip);
+			if (BackGround) {
+				video->BlitSprite( BackGround, XPos, YPos, true );
+			}
+		}
 	}
+	clip_regions.clear();
 	video->SetClipRect( &clip );
 	//Float || Changed
 	if (BackGround && (Flags & (WF_FLOAT|WF_CHANGED) ) ) {
@@ -317,6 +329,14 @@ void Window::Invalidate()
 		}
 	}
 	Flags |= WF_CHANGED;
+}
+
+/** Redraw enough to update the specified Control */
+void Window::InvalidateForControl(Control *ctrl) {
+	// TODO: for this to be general-purpose, we should mark anything inside this
+	// region with Changed, and also do mass Invalidate() if we overlap with
+	// another window, but for now this just clips the *background*, see DrawWindow()
+	clip_regions.push_back( Region(ctrl->XPos, ctrl->YPos, ctrl->Width, ctrl->Height) );
 }
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
