@@ -20,17 +20,10 @@
 
 // GemRB.cpp : Defines the entry point for the application.
 
-#define GEM_APP
 
-#include "stdio.h"
+#include <cstdio>
 #include "includes/win32def.h"
 #include "plugins/Core/Interface.h"
-#include "plugins/Core/Video.h"
-#include "plugins/Core/ResourceMgr.h"
-#include "plugins/Core/MapMgr.h"
-#include "plugins/Core/ImageMgr.h"
-#include "plugins/Core/DialogMgr.h"
-#include "plugins/Core/WindowMgr.h"
 
 #ifndef WIN32
 #include <ctype.h>
