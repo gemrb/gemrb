@@ -39,6 +39,11 @@ OldMessageWindow = None
 Container = None
 
 def CloseContinueWindow ():
+	if ContinueWindow:
+		# don't close the actual window now to avoid flickering: we might still want it open
+		GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
+
+def NextDialogState ():
 	global ContinueWindow, OldActionsWindow
 
 	if ContinueWindow == None:
@@ -49,7 +54,6 @@ def CloseContinueWindow ():
 	if ContinueWindow:
 		ContinueWindow.Unload ()
 	GemRB.SetVar ("ActionsWindow", OldActionsWindow.ID)
-	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
 	ContinueWindow = None
 	OldActionsWindow = None
 	if hideflag:
@@ -59,18 +63,16 @@ def CloseContinueWindow ():
 def OpenEndMessageWindow ():
 	global ContinueWindow, OldActionsWindow
 
-	if ContinueWindow:
-		return
-
 	hideflag = GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack (GetWindowPack())
-	ContinueWindow = Window = GemRB.LoadWindowObject (9)
-	OldActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
-	GemRB.SetVar ("ActionsWindow", Window.ID)
+	if not ContinueWindow:
+		GemRB.LoadWindowPack (GetWindowPack())
+		ContinueWindow = Window = GemRB.LoadWindowObject (9)
+		OldActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
+		GemRB.SetVar ("ActionsWindow", Window.ID)
 
 	#end dialog
-	Button = Window.GetControl (0)
+	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9371)	
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 	if PortraitWindow:
@@ -82,18 +84,16 @@ def OpenEndMessageWindow ():
 def OpenContinueMessageWindow ():
 	global ContinueWindow, OldActionsWindow
 
-	if ContinueWindow:
-		return
-
 	hideflag = GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack (GetWindowPack())
-	ContinueWindow = Window = GemRB.LoadWindowObject (9)
-	OldActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
-	GemRB.SetVar ("ActionsWindow", Window.ID)
+	if not ContinueWindow:
+		GemRB.LoadWindowPack (GetWindowPack())
+		ContinueWindow = Window = GemRB.LoadWindowObject (9)
+		OldActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
+		GemRB.SetVar ("ActionsWindow", Window.ID)
 
 	#continue
-	Button = Window.GetControl (0)
+	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9372)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 	if hideflag:

@@ -43,6 +43,8 @@ def CloseContinueWindow ():
 	Button.SetText(28082)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 
+def NextDialogState ():
+	pass
 
 def OpenEndMessageWindow ():
 	Window = GWindow(GemRB.GetVar ("MessageWindow"))
