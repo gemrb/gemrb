@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef RESOURCEMGR_H
-#define RESOURCEMGR_H
+#ifndef RESOURCESOURCE_H
+#define RESOURCESOURCE_H
 
 #include "../../includes/exports.h"
 #include "Plugin.h"
