@@ -42,63 +42,41 @@ SaveGame::SaveGame(char* path, char* name, char* prefix, int pCount, int saveID)
 	memset(&my_stat,0,sizeof(my_stat));
 	stat( nPath, &my_stat );
 	strftime( Date, _MAX_PATH, "%c", localtime( &my_stat.st_mtime ) );
+	manager.AddSource(path, Name, PLUGIN_RESOURCE_DIRECTORY);
 }
 
 SaveGame::~SaveGame()
 {
 }
 
-DataStream* SaveGame::GetPortrait(int index)
+ImageMgr* SaveGame::GetPortrait(int index)
 {
-		if (index > PortraitCount) {
-			return NULL;
-		}
-		char nPath[_MAX_PATH];
-		sprintf( nPath, "%s%sPORTRT%d.bmp", Path, SPathDelimiter, index );
-		ResolveFilePath( nPath );
-		FileStream* fs = new FileStream();
-		fs->Open( nPath, true );
-		return fs;
+	if (index > PortraitCount) {
+		return NULL;
+	}
+	char nPath[_MAX_PATH];
+	sprintf( nPath, "PORTRT%d", index );
+	return static_cast<ImageMgr*>(manager.GetResource(nPath, &ImageMgr::ID, true));
 }
 
-DataStream* SaveGame::GetScreen()
+ImageMgr* SaveGame::GetScreen()
 {
-		char nPath[_MAX_PATH];
-		sprintf( nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix );
-		ResolveFilePath( nPath );
-		FileStream* fs = new FileStream();
-		fs->Open( nPath, true );
-		return fs;
+	return static_cast<ImageMgr*>(manager.GetResource(Prefix, &ImageMgr::ID, true));
 }
 
 DataStream* SaveGame::GetGame()
 {
-		char nPath[_MAX_PATH];
-		sprintf( nPath, "%s%s%s.gam", Path, SPathDelimiter, Prefix );
-		ResolveFilePath( nPath );
-		FileStream* fs = new FileStream();
-		fs->Open( nPath, true );
-		return fs;
+	return manager.GetResource(Prefix, IE_GAM_CLASS_ID, true);
 }
 
 DataStream* SaveGame::GetWmap()
 {
-		char nPath[_MAX_PATH];
-		sprintf( nPath, "%s%s%s.wmp", Path, SPathDelimiter, core->WorldMapName );
-		ResolveFilePath( nPath );
-		FileStream* fs = new FileStream();
-		fs->Open( nPath, true );
-		return fs;
+	return manager.GetResource(core->WorldMapName, IE_WMP_CLASS_ID, true);
 }
 
 DataStream* SaveGame::GetSave()
 {
-		char nPath[_MAX_PATH];
-		sprintf( nPath, "%s%s%s.sav", Path, SPathDelimiter, Prefix );
-		ResolveFilePath( nPath );
-		FileStream* fs = new FileStream();
-		fs->Open( nPath, true );
-		return fs;
+	return manager.GetResource(Prefix, IE_SAV_CLASS_ID, true);
 }
 
 SaveGameIterator::SaveGameIterator(void)

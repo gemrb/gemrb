@@ -3902,19 +3902,13 @@ static PyObject* GemRB_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	DataStream* str = sg->GetPortrait( PCSlotCount );
+	ImageMgr* im = sg->GetPortrait( PCSlotCount );
 	delete sg;
-	ImageMgr* im = ( ImageMgr* ) core->GetInterface(IE_BMP_CLASS_ID );
-	if (im == NULL) {
-		delete ( str );
+	if (!im) {
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	if (!im->Open( str, true )) {
-		core->FreeInterface( im );
-		Py_INCREF( Py_None );
-		return Py_None;
-	}
+
 
 	Sprite2D* Picture = im->GetImage();
 	if (Picture == NULL) {
@@ -3951,16 +3945,11 @@ static PyObject* GemRB_SetSaveGamePreview(PyObject * /*self*/, PyObject* args)
 		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
 		return NULL;
 	}
-	DataStream* str = sg->GetScreen();
+	ImageMgr* im = sg->GetScreen();
 	delete sg;
-	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
-	if (im == NULL) {
-		delete ( str );
-		return NULL;
-	}
-	if (!im->Open( str, true )) {
-		core->FreeInterface( im );
-		return NULL;
+	if (!im) {
+		Py_INCREF( Py_None );
+		return Py_None;
 	}
 
 	Sprite2D* Picture = im->GetImage();

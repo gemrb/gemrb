@@ -26,8 +26,11 @@
 #include <list> 
 #include "../../includes/exports.h"
 #include "FileStream.h"
+#include "ResourceManager.h"
 
 #define SAVEGAME_DIRECTORY_MATCHER "%d - %[A-Za-z0-9- _]"
+
+class ImageMgr;
 
 class GEM_EXPORT SaveGame {
 public:
@@ -58,8 +61,8 @@ public:
 		return Date;
 	}
 
-	DataStream* GetPortrait(int index);
-	DataStream* GetScreen();
+	ImageMgr* GetPortrait(int index);
+	ImageMgr* GetScreen();
 	DataStream* GetGame();
 	DataStream* GetWmap();
 	DataStream* GetSave();
@@ -70,6 +73,7 @@ private:
 	char Date[_MAX_PATH];
 	int PortraitCount;
 	int SaveID;
+	ResourceManager manager;
 };
 
 typedef std::list<char *> charlist;
