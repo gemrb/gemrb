@@ -56,7 +56,7 @@
 #include "TileMap.h"
 #include "ScriptedAnimation.h"
 #include "Video.h"
-#include "ResourceMgr.h"
+#include "ResourceSource.h"
 #include "PluginMgr.h"
 #include "StringMgr.h"
 #include "ScriptEngine.h"
@@ -1236,7 +1236,7 @@ int Interface::LoadSprites()
 
 static void AddDirectory(char *path, const char *description)
 {
-	ResourceMgr *dir = ( ResourceMgr * ) core->GetInterface( PLUGIN_RESOURCE_DIRECTORY );
+	ResourceSource *dir = ( ResourceSource * ) core->GetInterface( PLUGIN_RESOURCE_DIRECTORY );
 	ResolveFilePath(path);
 	dir->Open(path, description);
 	gamedata->AddPath(dir);
@@ -1349,7 +1349,7 @@ int Interface::Init()
 
 	{
 		printMessage( "Core", "Initializing KEY Importer...", WHITE );
-		ResourceMgr *key = ( ResourceMgr * ) GetInterface( PLUGIN_RESOURCE_KEY );
+		ResourceSource *key = ( ResourceSource * ) GetInterface( PLUGIN_RESOURCE_KEY );
 		char ChitinPath[_MAX_PATH];
 		PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
 		ResolveFilePath( ChitinPath );

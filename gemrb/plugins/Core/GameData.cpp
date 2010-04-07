@@ -33,7 +33,7 @@
 #include "SpellMgr.h"
 #include "ItemMgr.h"
 #include "EffectMgr.h"
-#include "ResourceMgr.h"
+#include "ResourceSource.h"
 #include "Game.h"
 #include "ResourceDesc.h"
 #include "AnimationMgr.h"
@@ -83,7 +83,7 @@ GameData::GameData()
 GameData::~GameData()
 {
 	FreeInterfaceVector( Table, tables, tm );
-	std::vector<ResourceMgr*>::iterator i;
+	std::vector<ResourceSource*>::iterator i;
 	for (i = searchPath.begin(); i != searchPath.end(); ++i) {
 		core->FreeInterface(*i);
 	}

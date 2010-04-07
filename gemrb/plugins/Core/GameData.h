@@ -37,7 +37,7 @@ class Actor;
 class Sprite2D;
 class Resource;
 class TypeID;
-class ResourceMgr;
+class ResourceSource;
 
 struct Table {
 	TableMgr * tm;
@@ -53,8 +53,8 @@ public:
 
 	void ClearCaches();
 
-	/** Add ResourceMgr to search path */
-	void AddPath(ResourceMgr *mgr) { searchPath.push_back(mgr); }
+	/** Add ResourceSource to search path */
+	void AddPath(ResourceSource *mgr) { searchPath.push_back(mgr); }
 
 	/** Returns actor */
 	Actor *GetCreature(const char *ResRef, unsigned int PartySlot=0);
@@ -108,7 +108,7 @@ private:
 	Cache PaletteCache;
 	Factory* factory;
 	std::vector<Table> tables;
-	std::vector<ResourceMgr*> searchPath;
+	std::vector<ResourceSource*> searchPath;
 };
 
 

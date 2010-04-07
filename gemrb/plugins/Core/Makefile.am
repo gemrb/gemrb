@@ -45,7 +45,7 @@ libgemrb_core_la_SOURCES = \
 	Sprite2D.cpp \
 	Resource.cpp \
 	ResourceDesc.cpp \
-	ResourceMgr.cpp \
+	ResourceSource.cpp \
 	Region.cpp \
 	PluginMgr.cpp \
 	Plugin.cpp \

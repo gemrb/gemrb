@@ -22,7 +22,7 @@
 #define KEYIMP_H
 
 #include <vector>
-#include "../Core/ResourceMgr.h"
+#include "../Core/ResourceSource.h"
 #include "Dictionary.h"
 
 class Resource;
@@ -44,7 +44,7 @@ struct BIFEntry {
 };
 
 
-class KEYImporter : public ResourceMgr {
+class KEYImporter : public ResourceSource {
 private:
 	std::vector< BIFEntry> biffiles;
 	Dictionary resources;

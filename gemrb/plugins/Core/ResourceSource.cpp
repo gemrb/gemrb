@@ -19,12 +19,12 @@
  */
 
 #include "../../includes/win32def.h"
-#include "ResourceMgr.h"
+#include "ResourceSource.h"
 
-ResourceMgr::ResourceMgr(void)
+ResourceSource::ResourceSource(void)
 {
 }
 
-ResourceMgr::~ResourceMgr(void)
+ResourceSource::~ResourceSource(void)
 {
 }

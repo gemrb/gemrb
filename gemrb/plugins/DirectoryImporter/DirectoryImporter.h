@@ -25,12 +25,12 @@
 #include <vector>
 #include <map>
 #include <cstring>
-#include "../Core/ResourceMgr.h"
+#include "../Core/ResourceSource.h"
 
 class Resource;
 class ResourceDesc;
 
-class DirectoryImporter : public ResourceMgr {
+class DirectoryImporter : public ResourceSource {
 private:
 	char path[_MAX_PATH];
 public:
