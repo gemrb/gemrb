@@ -579,7 +579,7 @@ def SetPSTGamedaysAndHourToken ():
 	minutes = (currentTime % 300) / 60
 
 	GemRB.SetToken ('CLOCK_HOUR', str (hours))
-	GemRB.SetToken ('CLOCK_MINUTE', str (minutes))
+	GemRB.SetToken ('CLOCK_MINUTE', '%02d' %minutes)
 	GemRB.SetToken ('CLOCK_AMPM', ampm)
 
 def UpdateClock():
