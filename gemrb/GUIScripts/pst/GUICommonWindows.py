@@ -24,8 +24,8 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from GUIClasses import GWindow
-from LUCommon import CanLevelUp
 from GUICommon import *
+from LUCommon import CanLevelUp
 import GUICommon
 
 FRAME_PC_SELECTED = 0
