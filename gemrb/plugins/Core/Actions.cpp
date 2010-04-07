@@ -5050,7 +5050,7 @@ void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 	// then, calculate the offset (in hours) required to take us to the desired hour.
 	padding = (24 + parameters->int0Parameter - padding) % 24;
 	// then, advance one day (7200), plus the desired number of hours.
-	core->GetGame()->AdvanceTime(7200 + padding*AI_UPDATE_TIME*300);
+	core->GetGame()->AdvanceTime(AI_UPDATE_TIME*(7200 + padding*300));
 }
 
 //implement pst style parameters:
