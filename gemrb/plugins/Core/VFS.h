@@ -112,7 +112,23 @@ GEM_EXPORT void ResolveFilePath(char* FilePath);
 
 #endif  // ! WIN32
 
-GEM_EXPORT char* FindInDir(const char* Dir, const char* Filename, bool wildcard=false);
+/**
+ * Finds a file matching a glob.
+ *
+ * @param[out] target name of matching file
+ * @param[in] Dir directory to look in
+ * @param[in] glob pattern to match
+ * @return true if match is found
+ */
+GEM_EXPORT bool FileGlob(char *target, const char* Dir, const char* glob);
+/**
+ * Finds a file case-insentively.
+ *
+ * @param[in] Dir directory to look in
+ * @param[in,out] Filename
+ * @return true if match is found
+ */
+GEM_EXPORT bool FindInDir(const char* Dir, char* Filename);
 GEM_EXPORT bool dir_exists(const char* path);
 
 GEM_EXPORT char* PathAppend (char* target, const char* dir);

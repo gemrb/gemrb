@@ -44,35 +44,14 @@ bool DirectoryImporter::Open(const char *dir, const char *desc)
 	return true;
 }
 
-static bool exists(char *file)
-{
-	FILE *f = fopen( file, "rb" );
-	if (f) {
-		fclose(f);
-		return true;
-	}
-	return false;
-}
-
 static bool FindIn(const char *Path, const char *ResRef, const char *Type)
 {
-	char p[_MAX_PATH], f[_MAX_PATH] = {0};
+	char f[_MAX_PATH] = {0};
 	strcpy(f, ResRef);
 	strcat(f, Type);
 	strlwr(f);
 
-	if (core->CaseSensitive) {
-		char *t = FindInDir(Path, f, false);
-		if (!t) return false;
-		PathJoin(p, Path, t, NULL);
-		free(t);
-		assert(exists(p));
-	} else {
-		PathJoin(p, Path, f, NULL);
-		if (!exists(p)) return false;
-	}
-
-	return true;
+	return FindInDir(Path, f);
 }
 
 static FileStream *SearchIn(const char * Path,const char * ResRef, const char *Type)
@@ -82,15 +61,10 @@ static FileStream *SearchIn(const char * Path,const char * ResRef, const char *T
 	strcat(f, Type);
 	strlwr(f);
 
-	if (core->CaseSensitive) {
-		char *t = FindInDir(Path, f, false);
-		if (!t) return NULL;
-		PathJoin(p, Path, t, NULL);
-		free(t);
-		//assert(exists(p));
-	} else {
-		PathJoin(p, Path, f, NULL);
-	}
+	if (!FindInDir(Path, f))
+		return NULL;
+
+	PathJoin(p, Path, f, NULL);
 
 	FileStream * fs = new FileStream();
 	if(!fs) return NULL;

@@ -315,22 +315,47 @@ int strmatch(const char *string, const char *mask)
 	return 0;
 }
 
-char* FindInDir(const char* Dir, const char* Filename, bool wildcards)
+bool FileGlob(char* target, const char* Dir, const char *glob)
 {
-	char* fn = NULL;
 	DIR* dir = opendir( Dir );
 	if (dir == NULL) {
-		return NULL;
+		return false;
 	}
 
+	struct dirent* de = readdir( dir );
+	if (de == NULL) {
+		closedir( dir );
+		return false;
+	}
+	do {
+		if (strmatch( de->d_name, glob ) == 0) {
+			strcpy( target, de->d_name );
+			closedir(dir);
+			return true;
+		}
+	} while (( de = readdir( dir ) ) != NULL);
+	closedir( dir ); //No other files in the directory, close it
+	return false;
+}
+
+bool FindInDir(const char* Dir, char *Filename)
+{
 	// First test if there's a Filename with exactly same name
 	// and if yes, return it and do not search in the Dir
 	char TempFilePath[_MAX_PATH];
 	PathJoin( TempFilePath, Dir, Filename, NULL );
 
 	if (!access( TempFilePath, R_OK )) {
-		closedir( dir );
-		return strdup( Filename );
+		return true;
+	}
+
+	if (!core->CaseSensitive) {
+		return false;
+	}
+
+	DIR* dir = opendir( Dir );
+	if (dir == NULL) {
+		return false;
 	}
 
 	// Exact match not found, so try to search for Filename
@@ -338,23 +363,17 @@ char* FindInDir(const char* Dir, const char* Filename, bool wildcards)
 	struct dirent* de = readdir( dir );
 	if (de == NULL) {
 		closedir( dir );
-		return NULL;
+		return false;
 	}
 	do {
-		int match;
-		if (wildcards) {
-			match = strmatch( de->d_name, Filename );
-		} else {
-			match = stricmp( de->d_name, Filename );
-		}
-		if (match == 0) {
-			fn = ( char * ) malloc( strlen( de->d_name ) + 1 );
-			strcpy( fn, de->d_name );
-			break;
+		if (stricmp( de->d_name, Filename ) == 0) {
+			strcpy( Filename, de->d_name );
+			closedir(dir);
+			return true;
 		}
 	} while (( de = readdir( dir ) ) != NULL);
 	closedir( dir ); //No other files in the directory, close it
-	return fn;
+	return false;
 }
 
 #ifndef WIN32
@@ -388,11 +407,9 @@ void ResolveFilePath(char* FilePath)
 		}
 		TempFileName[j] = 0;
 		pos += j;
-		char* NewName = FindInDir( TempFilePath, TempFileName, false );
-		if (NewName) {
+		if (FindInDir( TempFilePath, TempFileName )) {
 			strcat( TempFilePath, SPathDelimiter );
-			strcat( TempFilePath, NewName );
-			free( NewName );
+			strcat( TempFilePath, TempFileName );
 		} else {
 			if (j)
 				return;

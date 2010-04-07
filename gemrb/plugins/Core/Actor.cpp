@@ -4906,19 +4906,15 @@ void Actor::SetSoundFolder(const char *soundset)
 
 		strnlwrcpy(PCStats->SoundFolder, soundset, 32);
 		PathJoin(filepath,core->GamePath,"sounds",PCStats->SoundFolder,0);
-		char *fp = FindInDir(filepath, "?????01", true);
-		if (fp) {
-			fp[5] = 0;
+		char file[_MAX_PATH];
+		if (FileGlob(file, filepath, "?????01")) {
+			file[5] = '\0';
+		} else if (FileGlob(file, filepath, "????01")) {
+			file[4] = '\0';
 		} else {
-			fp = FindInDir(filepath, "????01", true);
-			if (fp) {
-				fp[4] = 0;
-			}
+			return;
 		}
-		if (fp) {
-			strnlwrcpy(PCStats->SoundSet, fp, 8);
-			free(fp);
-		}
+		strnlwrcpy(PCStats->SoundSet, file, 8);
 	} else {
 		strnlwrcpy(PCStats->SoundSet, soundset, 8);
 		PCStats->SoundFolder[0]=0;
