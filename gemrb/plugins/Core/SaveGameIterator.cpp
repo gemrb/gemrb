@@ -360,10 +360,66 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 	}
 }
 
+/** Save game to given directory */
+static bool DoSaveGame(const char *Path)
+{
+	Game *game = core->GetGame();
+	//saving areas to cache currently in memory
+	unsigned int mc = (unsigned int) game->GetLoadedMapCount();
+	while (mc--) {
+		Map *map = game->GetMap(mc);
+		if (core->SwapoutArea(map)) {
+			return false;
+		}
+	}
+
+	//compress files in cache named: .STO and .ARE
+	//no .CRE would be saved in cache
+	if (core->CompressSave(Path)) {
+		return false;
+	}
+
+	//Create .gam file from Game() object
+	if (core->WriteGame(Path)) {
+		return false;
+	}
+
+	//Create .wmp file from WorldMap() object
+	if (core->WriteWorldMap(Path)) {
+		return false;
+	}
+
+	ImageWriter *im = (ImageWriter *) core->GetInterface( PLUGIN_IMAGE_WRITER_BMP );
+	if (!im) {
+		printMessage( "SaveGameIterator", "Couldn't create the BMPWriter!\n", LIGHT_RED );
+		return false;
+	}
+
+	//Create portraits
+	for (int i = 0; i < game->GetPartySize( false ); i++) {
+		Sprite2D* portrait = core->GetGameControl()->GetPortraitPreview( i );
+		if (portrait) {
+			char FName[_MAX_PATH];
+			snprintf( FName, sizeof(FName), "PORTRT%d", i );
+			FileStream outfile;
+			outfile.Create( Path, FName, IE_BMP_CLASS_ID );
+			im->PutImage( &outfile, portrait );
+		}
+	}
+
+	// Create area preview
+	Sprite2D* preview = core->GetGameControl()->GetPreview();
+	FileStream outfile;
+	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
+	im->PutImage( &outfile, preview );
+
+	core->FreeInterface(im);
+	return true;
+}
+
 int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 {
 	char Path[_MAX_PATH];
-	char FName[12];
 
 	//some of these restrictions might not be needed
 	Store * store = core->GetCurrentStore();
@@ -432,58 +488,11 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	core->DelTree(Path, false);
 	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
 	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
-	//save files here
 
-	Game *game = core->GetGame();
-	//saving areas to cache currently in memory
-	unsigned int mc = (unsigned int) game->GetLoadedMapCount();
-	while (mc--) {
-		Map *map = game->GetMap(mc);
-		if (core->SwapoutArea(map)) {
-			return -1;
-		}
-	}
-	
-	//compress files in cache named: .STO and .ARE
-	//no .CRE would be saved in cache
-	if (core->CompressSave(Path)) {
+	if (!DoSaveGame(Path)) {
 		return -1;
 	}
 
-	//Create .gam file from Game() object
-	if (core->WriteGame(Path)) {
-		return -1;
-	}
-
-	//Create .wmp file from WorldMap() object
-	if (core->WriteWorldMap(Path)) {
-		return -1;
-	}
-
-	ImageWriter *im = (ImageWriter *) core->GetInterface( PLUGIN_IMAGE_WRITER_BMP );
-	if (!im) {
-		printMessage( "SaveGameIterator", "Couldn't create the BMPWriter!\n", LIGHT_RED );
-		return -1;
-	}
-
-	//Create portraits
-	for (int i = 0; i < game->GetPartySize( false ); i++) {
-		Sprite2D* portrait = core->GetGameControl()->GetPortraitPreview( i );
-		if (portrait) {
-			snprintf( FName, sizeof(FName), "PORTRT%d", i );
-			FileStream outfile;
-			outfile.Create( Path, FName, IE_BMP_CLASS_ID );
-			im->PutImage( &outfile, portrait );
-		}
-	}
-
-	// Create area preview
-	Sprite2D* preview = core->GetGameControl()->GetPreview();
-	FileStream outfile;
-	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
-	im->PutImage( &outfile, preview );
-
-	core->FreeInterface(im);
 	loaded = false;
 	// Save succesful / Quick-save succesful
 	if (index == 1) {
