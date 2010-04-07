@@ -25,6 +25,7 @@
 #include "../../includes/SClassID.h"
 #include "../../includes/ie_types.h"
 #include "Cache.h"
+#include "ResourceManager.h"
 
 class TableMgr;
 class Palette;
@@ -35,9 +36,6 @@ class ScriptedAnimation;
 class Factory;
 class Actor;
 class Sprite2D;
-class Resource;
-class TypeID;
-class ResourceSource;
 
 struct Table {
 	TableMgr * tm;
@@ -45,16 +43,13 @@ struct Table {
 	unsigned int refcount;
 };
 
-class GEM_EXPORT GameData
+class GEM_EXPORT GameData : public ResourceManager
 {
 public:
 	GameData();
 	~GameData();
 
 	void ClearCaches();
-
-	/** Add ResourceSource to search path */
-	void AddPath(ResourceSource *mgr) { searchPath.push_back(mgr); }
 
 	/** Returns actor */
 	Actor *GetCreature(const char *ResRef, unsigned int PartySlot=0);
@@ -73,14 +68,6 @@ public:
 	TableMgr * GetTable(unsigned int index) const;
 	/** Frees a Loaded Table, returns false on error, true on success */
 	bool DelTable(unsigned int index);
-
-	/** returns true if resource exists */
-	bool Exists(const char *ResRef, SClass_ID type, bool silent=false);
-	/** returns true if resource exists */
-	bool Exists(const char *ResRef, const TypeID *type, bool silent=false);
-
-	DataStream* GetResource(const char* resname, SClass_ID type, bool silent = false) const;
-	Resource* GetResource(const char* resname, const TypeID *type, bool silent = false) const;
 
 	Palette* GetPalette(const ieResRef resname);
 	void FreePalette(Palette *&pal, const ieResRef name=NULL);
@@ -108,7 +95,6 @@ private:
 	Cache PaletteCache;
 	Factory* factory;
 	std::vector<Table> tables;
-	std::vector<ResourceSource*> searchPath;
 };
 
 

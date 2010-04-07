@@ -30,6 +30,7 @@
 #include "../../includes/exports.h"
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
+#include "../../includes/SClassID.h" // For PluginID
 #include <vector>
 #include <list>
 #include <cstring>
@@ -45,8 +46,6 @@ class Resource;
 class ResourceDesc;
 class TypeID;
 class Plugin;
-
-typedef unsigned long PluginID;
 
 /**
  * @class PluginMgr

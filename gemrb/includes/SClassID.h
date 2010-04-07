@@ -76,6 +76,7 @@ typedef unsigned long SClass_ID;
 #define IE_GUI_SCRIPT_CLASS_ID		0x000E0000
 #define IE_COMPRESSION_CLASS_ID 	0x000F0000
 
+typedef unsigned long PluginID;
 enum {
 	PLUGIN_OPCODES_CORE =		0xABCD0001,
 	PLUGIN_OPCODES_ICEWIND,

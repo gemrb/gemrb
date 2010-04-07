@@ -56,7 +56,6 @@
 #include "TileMap.h"
 #include "ScriptedAnimation.h"
 #include "Video.h"
-#include "ResourceSource.h"
 #include "PluginMgr.h"
 #include "StringMgr.h"
 #include "ScriptEngine.h"
@@ -1234,14 +1233,6 @@ int Interface::LoadSprites()
 	return GEM_OK;
 }
 
-static void AddDirectory(char *path, const char *description)
-{
-	ResourceSource *dir = ( ResourceSource * ) core->GetInterface( PLUGIN_RESOURCE_DIRECTORY );
-	ResolveFilePath(path);
-	dir->Open(path, description);
-	gamedata->AddPath(dir);
-}
-
 int Interface::Init()
 {
 	plugin_flags = new Variables();
@@ -1315,33 +1306,35 @@ int Interface::Init()
 		char path[_MAX_PATH];
 
 		PathJoin( path, core->CachePath, NULL);
-		AddDirectory(path, "Cache");
+		gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY);
 
 		PathJoin( path, core->GemRBOverridePath, "override", core->GameType, NULL);
-		AddDirectory(path, "GemRB Override");
+		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_DIRECTORY);
 
 		PathJoin( path, core->GemRBOverridePath, "override", "shared", NULL);
-		AddDirectory(path, "shared GemRB Override");
+		gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_DIRECTORY);
 
 		PathJoin( path, core->GamePath, core->GameOverridePath, NULL);
-		AddDirectory(path, "Override");
+		gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_DIRECTORY);
 
 		PathJoin( path, core->GamePath, core->GameSoundsPath, NULL);
-		AddDirectory(path, "Sounds");
+		gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
 
 		PathJoin( path, core->GamePath, core->GameScriptsPath, NULL);
-		AddDirectory(path, "Scripts");
+		gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_DIRECTORY);
 
 		PathJoin( path, core->GamePath, core->GamePortraitsPath, NULL);
-		AddDirectory(path, "Portraits");
+		gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_DIRECTORY);
 
 		PathJoin( path, core->GamePath, core->GameDataPath, NULL);
-		AddDirectory(path, "Data");
+		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_DIRECTORY);
 
 		//IWD2 movies are on the CD but not in the BIF
 		for (int i = 0; i < 6; i++) {
+			char description[] = "CDi/data";
 			PathJoin( path, core->CD[i], core->GameDataPath, NULL);
-			AddDirectory(path, "Data");
+			description[2] = '1' + i;
+			gamedata->AddSource(path, description, PLUGIN_RESOURCE_DIRECTORY);
 		}
 
 		printStatus( "OK", LIGHT_GREEN );
@@ -1349,15 +1342,12 @@ int Interface::Init()
 
 	{
 		printMessage( "Core", "Initializing KEY Importer...", WHITE );
-		ResourceSource *key = ( ResourceSource * ) GetInterface( PLUGIN_RESOURCE_KEY );
 		char ChitinPath[_MAX_PATH];
 		PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
-		ResolveFilePath( ChitinPath );
-		if (!key || !key->Open( ChitinPath, "chitin.key" )) {
+		if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
 			printStatus( "ERROR", LIGHT_RED );
 			return GEM_ERROR;
 		}
-		gamedata->AddPath(key);
 		printStatus( "OK", LIGHT_GREEN );
 	}
 

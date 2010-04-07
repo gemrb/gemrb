@@ -54,6 +54,7 @@ libgemrb_core_la_SOURCES = \
 	MapMgr.cpp \
 	Map.cpp \
 	Interface.cpp \
+	ResourceManager.cpp \
 	GameData.cpp \
 	ImageMgr.cpp \
 	ImageFactory.cpp \
