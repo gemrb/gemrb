@@ -20,6 +20,9 @@
 
 #include "../../includes/win32def.h"
 #include "ImageMgr.h"
+#include "ImageFactory.h"
+#include "Interface.h"
+#include "Video.h"
 
 const TypeID ImageMgr::ID = {};
 
@@ -29,4 +32,10 @@ ImageMgr::ImageMgr(void)
 
 ImageMgr::~ImageMgr(void)
 {
+}
+
+ImageFactory* ImageMgr::GetImageFactory(const char* ResRef)
+{
+	ImageFactory* fact = new ImageFactory( ResRef, GetImage() );
+	return fact;
 }

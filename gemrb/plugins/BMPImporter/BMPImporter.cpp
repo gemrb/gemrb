@@ -23,7 +23,6 @@
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"
 #include "../Core/Video.h"
-#include "../Core/ImageFactory.h"
 
 #define BMP_HEADER_SIZE  54
 
@@ -306,12 +305,6 @@ void BMPImporter::GetPalette(int index, int colors, Color* pal)
 			pal[i].a = 0xff;
 		}
 	}
-}
-
-ImageFactory* BMPImporter::GetImageFactory(const char* ResRef)
-{
-	ImageFactory* fact = new ImageFactory( ResRef, GetImage() );
-	return fact;
 }
 
 #include "../../includes/plugindef.h"

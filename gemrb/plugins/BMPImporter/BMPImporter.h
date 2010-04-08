@@ -139,8 +139,6 @@ public:
 	}
 	int GetWidth() { return (int) Width; }
 	int GetHeight() { return (int) Height; }
-
-	ImageFactory* GetImageFactory(const char* ResRef);
 private:
 	void Read8To8(void *rpixels);
 	void Read4To8(void *rpixels);

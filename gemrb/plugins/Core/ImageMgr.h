@@ -55,7 +55,7 @@ public:
 	 *
 	 * @param[in] ResRef name of image represented by factory.
 	 */
-	virtual ImageFactory* GetImageFactory(const char* ResRef) = 0;
+	ImageFactory* GetImageFactory(const char* ResRef);
 protected:
 	/** not virtual */
 	Color GetPixelSum(unsigned int x, unsigned int y, unsigned int ratio);

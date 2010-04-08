@@ -215,9 +215,3 @@ void PNGImp::GetPalette(int index, int colors, Color* pal)
 		}
 	}
 }
-
-ImageFactory* PNGImp::GetImageFactory(const char* ResRef)
-{
-	ImageFactory* fact = new ImageFactory( ResRef, GetImage() );
-	return fact;
-}
