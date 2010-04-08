@@ -707,14 +707,19 @@ bool Interface::ReadAbilityTables()
 	ret = ReadAbilityTable("intmod", intmod, 3, MaximumAbility + 1);
 	if (!ret)
 		return ret;
-	ret = ReadAbilityTable("dexmod", dexmod, 3, MaximumAbility + 1);
-	//no dexmod in iwd2???
 	ret = ReadAbilityTable("hpconbon", conmod, 5, MaximumAbility + 1);
 	if (!ret)
 		return ret;
-	ret = ReadAbilityTable("lorebon", lorebon, 1, MaximumAbility + 1);
-	if (!ret)
-		return ret;
+	if (!HasFeature(GF_3ED_RULES)) {
+		//no lorebon in iwd2???
+		ret = ReadAbilityTable("lorebon", lorebon, 1, MaximumAbility + 1);
+		if (!ret)
+			return ret;
+		//no dexmod in iwd2???
+		ret = ReadAbilityTable("dexmod", dexmod, 3, MaximumAbility + 1);
+		if (!ret)
+			return ret;
+	}
 	//this table is a single row (not a single column)
 	ret = ReadAbilityTable("chrmodst", chrmod, MaximumAbility + 1, 1);
 	if (!ret)
@@ -1631,6 +1636,7 @@ int Interface::Init()
 	printMessage( "Core", "Initializing ability tables...", WHITE );
 	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
@@ -1649,6 +1655,7 @@ int Interface::Init()
 	printMessage( "Core", "Reading item tables...", WHITE);
 	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
@@ -1656,6 +1663,7 @@ int Interface::Init()
 	printMessage( "Core", "Reading damage type table...", WHITE);
 	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
@@ -5113,6 +5121,9 @@ int Interface::GetDexterityBonus(int column, int value) const
 	if (column<0 || column>2)
 		return -9999;
 
+	//no dexmod in iwd2???
+	if (HasFeature(GF_3ED_RULES)) return 0;
+
 	return dexmod[column*(MaximumAbility+1)+value];
 }
 
@@ -5138,6 +5149,9 @@ int Interface::GetLoreBonus(int column, int value) const
 {
 	if (column<0 || column>0)
 		return -9999;
+
+	//no lorebon in iwd2???
+	if (HasFeature(GF_3ED_RULES)) return 0;
 
 	return lorebon[value];
 }
