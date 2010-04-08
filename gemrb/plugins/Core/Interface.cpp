@@ -1663,9 +1663,9 @@ int Interface::Init()
 	printMessage( "Core", "Reading damage type table...", WHITE);
 	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
+	} else {
+		printStatus( "OK", LIGHT_GREEN );
 	}
-	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Core Initialization Complete!\n", WHITE );
 
