@@ -28,6 +28,9 @@
 
 class ImageFactory;
 
+/**
+ * Base class for Image plugins.
+ */
 class GEM_EXPORT ImageMgr : public Resource {
 public:
 	static const TypeID ID;
@@ -35,6 +38,7 @@ public:
 	ImageMgr(void);
 	virtual ~ImageMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	/** Returns a \ref Sprite2D containing the image. */
 	virtual Sprite2D* GetImage() = 0;
 	/** No descriptions */
 	virtual void GetPalette(int index, int colors, Color* pal) = 0;
@@ -44,7 +48,13 @@ public:
 	virtual Color GetPixel(unsigned int x, unsigned int y) = 0;
 	virtual unsigned int GetPixelIndex(unsigned int x, unsigned int y) = 0;
 	virtual int GetWidth() = 0;
+	/** Returns the height of the image */
 	virtual int GetHeight() = 0;
+	/**
+	 * Returns a \ref ImageFactory for the current image.
+	 *
+	 * @param[in] ResRef name of image represented by factory.
+	 */
 	virtual ImageFactory* GetImageFactory(const char* ResRef) = 0;
 protected:
 	/** not virtual */
