@@ -77,10 +77,6 @@ public:
 	{
 		delete this;
 	}
-	int GetCycleCount()
-	{
-		return 1;
-	}
 };
 
 #endif
