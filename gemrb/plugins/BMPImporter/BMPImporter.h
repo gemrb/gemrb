@@ -23,7 +23,7 @@
 
 #include "../Core/ImageMgr.h"
 
-class BMPImp : public ImageMgr {
+class BMPImporter : public ImageMgr {
 private:
 	//BITMAPINFOHEADER
 	ieDword Size, Width, Height, Compression, ImageSize, ColorsUsed, ColorsImportant;
@@ -39,8 +39,8 @@ private:
 	//OTHER
 	unsigned int PaddedRowLength;
 public:
-	BMPImp(void);
-	~BMPImp(void);
+	BMPImporter(void);
+	~BMPImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	bool OpenFromImage(Sprite2D* sprite, bool autoFree = true);
 	Sprite2D* GetImage();

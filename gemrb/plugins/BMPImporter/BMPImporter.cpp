@@ -31,7 +31,7 @@ static ieDword red_mask = 0x00ff0000;
 static ieDword green_mask = 0x0000ff00;
 static ieDword blue_mask = 0x000000ff;
 
-BMPImp::BMPImp(void)
+BMPImporter::BMPImporter(void)
 {
 	Palette = NULL;
 	pixels = NULL;
@@ -42,13 +42,13 @@ BMPImp::BMPImp(void)
 	}
 }
 
-BMPImp::~BMPImp(void)
+BMPImporter::~BMPImporter(void)
 {
 	free( Palette );
 	free( pixels );
 }
 
-bool BMPImp::Open(DataStream* stream, bool autoFree)
+bool BMPImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (!Resource::Open(stream, autoFree))
 		return false;
@@ -196,7 +196,7 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-void BMPImp::Read8To8(void *rpixels)
+void BMPImporter::Read8To8(void *rpixels)
 {
 	pixels = malloc( Width * Height );
 	unsigned char * dest = ( unsigned char * ) pixels;
@@ -209,7 +209,7 @@ void BMPImp::Read8To8(void *rpixels)
 	}
 }
 
-void BMPImp::Read4To8(void *rpixels)
+void BMPImporter::Read4To8(void *rpixels)
 {
 	//converting it up to 8 bits, because we'll use it as
 	//whole byte (searchmap)
@@ -231,7 +231,7 @@ void BMPImp::Read4To8(void *rpixels)
 	}
 }
 
-void BMPImp::Read4To4(void *rpixels)
+void BMPImporter::Read4To4(void *rpixels)
 {
 	int size = PaddedRowLength * Height;
 	pixels = malloc( size );
@@ -245,7 +245,7 @@ void BMPImp::Read4To4(void *rpixels)
 	}
 }
 
-bool BMPImp::OpenFromImage(Sprite2D* sprite, bool autoFree)
+bool BMPImporter::OpenFromImage(Sprite2D* sprite, bool autoFree)
 {
 	if (sprite == NULL) {
 		return false;
@@ -290,7 +290,7 @@ bool BMPImp::OpenFromImage(Sprite2D* sprite, bool autoFree)
 	return true;
 }
 
-Sprite2D* BMPImp::GetImage()
+Sprite2D* BMPImporter::GetImage()
 {
 	Sprite2D* spr = NULL;
 	if (BitCount == 24) {
@@ -328,7 +328,7 @@ Sprite2D* BMPImp::GetImage()
 	return spr;
 }
 /** No descriptions */
-void BMPImp::GetPalette(int index, int colors, Color* pal)
+void BMPImporter::GetPalette(int index, int colors, Color* pal)
 {
 	if ((unsigned int) index>=Height) {
 		index = 0;
@@ -356,7 +356,7 @@ void BMPImp::GetPalette(int index, int colors, Color* pal)
 
 #define GET_SCANLINE_LENGTH(width, bitsperpixel)  (((width)*(bitsperpixel)+7)/8)
 
-void BMPImp::PutImage(DataStream *output)
+void BMPImporter::PutImage(DataStream *output)
 {
 	ieDword tmpDword;
 	ieWord tmpWord;
@@ -407,7 +407,7 @@ void BMPImp::PutImage(DataStream *output)
 	}
 }
 
-ImageFactory* BMPImp::GetImageFactory(const char* ResRef)
+ImageFactory* BMPImporter::GetImageFactory(const char* ResRef)
 {
 	ImageFactory* fact = new ImageFactory( ResRef, GetImage() );
 	return fact;
@@ -416,6 +416,6 @@ ImageFactory* BMPImp::GetImageFactory(const char* ResRef)
 #include "../../includes/plugindef.h"
 
 GEMRB_PLUGIN(0xD768B1, "BMP File Reader")
-PLUGIN_CLASS(IE_BMP_CLASS_ID, BMPImp)
-PLUGIN_IE_RESOURCE(&ImageMgr::ID, BMPImp, ".bmp", (ieWord)IE_BMP_CLASS_ID)
+PLUGIN_CLASS(IE_BMP_CLASS_ID, BMPImporter)
+PLUGIN_IE_RESOURCE(&ImageMgr::ID, BMPImporter, ".bmp", (ieWord)IE_BMP_CLASS_ID)
 END_PLUGIN()
