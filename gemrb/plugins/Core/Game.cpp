@@ -244,6 +244,7 @@ int Game::DelPC(unsigned int slot, bool autoFree)
 	if (!PCs[slot]) {
 		return -1;
 	}
+	SelectActor(PCs[slot], false, SELECT_NORMAL);
 	if (autoFree) {
 		delete( PCs[slot] );
 	}
