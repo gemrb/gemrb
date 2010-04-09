@@ -406,7 +406,9 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 {
 	unsigned int destructed = 0;
 	size_t slot = Slots.size();
-	while(slot--) {
+
+	//ignore the 0. slot, it is the fist slot
+	while(slot-->0) {
 		CREItem *item = Slots[slot];
 		if (!item) {
 			continue;
