@@ -18,6 +18,47 @@
  *
  */
 
+// Input macros:
+//
+// SRCDATA
+//   pointer to the pixel data
+// RLE
+//   is the sprite RLE-encoded?
+
+// USE_PALETTE
+//   does the sprite use a palette? (If defined, define PAL too)
+// PAL
+//   the palette
+// PALETTE_ALPHA
+//   use the alpha values from the palette
+
+// BPP16
+//   output surface is 16bpp instead of the default 32bpp
+
+// ALREADYCLIPPED
+//   the variables clipx, clipy, clipw, cliph have already been set
+// FLIP
+//   enable code for flipping sprite H/V, through the following two macros:
+// HFLIP_CONDITIONAL
+//   boolean expression for when to flip the sprite horizontally
+// VFLIP_CONDITIONAL
+//   boolean expression for when to flip the sprite vertically
+
+// COVER
+//   apply wallcovers (The wallcover data is taken from the 'cover' variable)
+
+// TINT
+//   enable tinting (The colour to tint with is taken from the 'tint' variable)
+// TINT_ALPHA
+//   use the alpha component of the tint
+
+// SPECIALPIXEL
+//   special code to be inserted right before rendering a pixel
+
+// HIGHLIGHTCOVER
+//   (debugging) make covered pixels white instead of black
+
+
 //#define HIGHLIGHTCOVER
 
 #define TARGET backBuf
