@@ -41,18 +41,18 @@ class AnimationFactory;
 
 class Sprite2D_BAM_Internal {
 public:
-        Sprite2D_BAM_Internal() { pal = 0; }
-        ~Sprite2D_BAM_Internal() { if (pal) { pal->Release(); pal = 0; } }
+	Sprite2D_BAM_Internal() { pal = 0; }
+	~Sprite2D_BAM_Internal() { if (pal) { pal->Release(); pal = 0; } }
 
-        Palette* pal;
-        bool RLE;
-        int transindex;
-        bool flip_hor;
-        bool flip_ver;
+	Palette* pal;
+	bool RLE;
+	int transindex;
+	bool flip_hor;
+	bool flip_ver;
 
-        // The AnimationFactory in which the data for this sprite is stored.
-        // (Used for refcounting of the data.)
-        AnimationFactory* source;
+	// The AnimationFactory in which the data for this sprite is stored.
+	// (Used for refcounting of the data.)
+	AnimationFactory* source;
 };
 
 class GEM_EXPORT Sprite2D {

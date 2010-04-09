@@ -116,7 +116,7 @@ public: // Public attributes
 	bool InHandler;
 	/** Owner Window */
 	Window* Owner;
-       /** Attached Scroll Bar Pointer*/
+	/** Attached Scroll Bar Pointer*/
 	Control* sb;
 public: //Events
 	/** Reset/init event handler */

@@ -4115,19 +4115,19 @@ int GameScript::CalendarDay(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::CalendarDayGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-        int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
-        if(day > parameters->int0Parameter) {
-                return 1;
-        }
-        return 0;
+	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
+	if(day > parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::CalendarDayLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-        int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
-        if(day < parameters->int0Parameter) {
-                return 1;
-        }
-        return 0;
+	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime/AI_UPDATE_TIME/7200);
+	if(day < parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
 }
 

@@ -102,15 +102,15 @@
 #endif
 
 static size_t dopr(char *buffer, size_t maxlen, const char *format,
-			    va_list args);
+                   va_list args);
 static void fmtstr(char *buffer, size_t *currlen, size_t maxlen,
-				char *value, int flags, int min, int max);
+                   char *value, int flags, int min, int max);
 static void fmtint(char *buffer, size_t *currlen, size_t maxlen,
-				long value, int base, int min, int max, int flags);
+                   long value, int base, int min, int max, int flags);
 static void fmtqword(char *buffer, size_t *currlen, size_t maxlen,
-				sint64 value, int base, int min, int max, int flags);
+                     sint64 value, int base, int min, int max, int flags);
 static void fmtfp(char *buffer, size_t *currlen, size_t maxlen,
-			    LDOUBLE fvalue, int min, int max, int flags);
+                  LDOUBLE fvalue, int min, int max, int flags);
 static void dopr_outch(char *buffer, size_t *currlen, size_t maxlen, char c);
 
 /*
@@ -462,7 +462,7 @@ static size_t dopr(char *buffer, size_t maxlen, const char *format, va_list args
 }
 
 static void fmtstr(char *buffer, size_t *currlen, size_t maxlen,
-				char *value, int flags, int min, int max)
+                   char *value, int flags, int min, int max)
 {
 	int padlen, strln;     /* amount to pad */
 	int cnt = 0;
@@ -497,7 +497,7 @@ static void fmtstr(char *buffer, size_t *currlen, size_t maxlen,
 /* Have to handle DP_F_NUM (ie 0x and 0 alternates) */
 
 static void fmtint(char *buffer, size_t *currlen, size_t maxlen,
-				long value, int base, int min, int max, int flags)
+                   long value, int base, int min, int max, int flags)
 {
 #define MAX_CONVERT_PLACES 40
 	int signvalue = 0;
@@ -579,7 +579,7 @@ static void fmtint(char *buffer, size_t *currlen, size_t maxlen,
 }
 
 static void fmtqword(char *buffer, size_t *currlen, size_t maxlen,
-				sint64 value, int base, int min, int max, int flags)
+                     sint64 value, int base, int min, int max, int flags)
 {
 #undef MAX_CONVERT_PLACES
 #define MAX_CONVERT_PLACES 80
@@ -725,157 +725,157 @@ static double my_modf(double x0, double *iptr)
 
 
 static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
-			    LDOUBLE fvalue, int min, int max, int flags)
+                   LDOUBLE fvalue, int min, int max, int flags)
 {
-	   int signvalue = 0;
-	   double ufvalue;
-	   char iconvert[311];
-	   char fconvert[311];
-	   int iplace = 0;
-	   int fplace = 0;
-	   int padlen = 0; /* amount to pad */
-	   int zpadlen = 0;
-	   int caps = 0;
-	   int index;
-	   double intpart;
-	   double fracpart;
-	   double temp;
+	int signvalue = 0;
+	double ufvalue;
+	char iconvert[311];
+	char fconvert[311];
+	int iplace = 0;
+	int fplace = 0;
+	int padlen = 0; /* amount to pad */
+	int zpadlen = 0;
+	int caps = 0;
+	int index;
+	double intpart;
+	double fracpart;
+	double temp;
 
-	   /*
-	    * AIX manpage says the default is 0, but Solaris says the default
-	    * is 6, and sprintf on AIX defaults to 6
-	    */
-	   if (max < 0)
-			 max = 6;
+	/*
+	 * AIX manpage says the default is 0, but Solaris says the default
+	 * is 6, and sprintf on AIX defaults to 6
+	 */
+	if (max < 0)
+		max = 6;
 
-	   ufvalue = abs_val (fvalue);
+	ufvalue = abs_val (fvalue);
 
-	   if (fvalue < 0) {
-			 signvalue = '-';
-	   } else {
-			 if (flags & DP_F_PLUS) { /* Do a sign (+/i) */
-				    signvalue = '+';
-			 } else {
-				    if (flags & DP_F_SPACE)
-						  signvalue = ' ';
-			 }
-	   }
+	if (fvalue < 0) {
+		signvalue = '-';
+	} else {
+		if (flags & DP_F_PLUS) { /* Do a sign (+/i) */
+			signvalue = '+';
+		} else {
+			if (flags & DP_F_SPACE)
+				signvalue = ' ';
+		}
+	}
 
 #if 0
-	   if (flags & DP_F_UP) caps = 1; /* Should characters be upper case? */
+	if (flags & DP_F_UP) caps = 1; /* Should characters be upper case? */
 #endif
 
 #if 0
-	    if (max == 0) ufvalue += 0.5; /* if max = 0 we must round */
+	if (max == 0) ufvalue += 0.5; /* if max = 0 we must round */
 #endif
 
-	   /*
-	    * Sorry, we only support 16 digits past the decimal because of our
-	    * conversion method
-	    */
-	   if (max > 16)
-			 max = 16;
+	/*
+	 * Sorry, we only support 16 digits past the decimal because of our
+	 * conversion method
+	 */
+	if (max > 16)
+		max = 16;
 
-	   /* We "cheat" by converting the fractional part to integer by
-	    * multiplying by a factor of 10
-	    */
+	/* We "cheat" by converting the fractional part to integer by
+	 * multiplying by a factor of 10
+	 */
 
-	   temp = ufvalue;
-	   my_modf(temp, &intpart);
+	temp = ufvalue;
+	my_modf(temp, &intpart);
 
-	   fracpart = ROUND((POW10(max)) * (ufvalue - intpart));
+	fracpart = ROUND((POW10(max)) * (ufvalue - intpart));
 
-	   if (fracpart >= POW10(max)) {
-			 intpart++;
-			 fracpart -= POW10(max);
-	   }
+	if (fracpart >= POW10(max)) {
+		intpart++;
+		 fracpart -= POW10(max);
+	}
 
 
-	   /* Convert integer part */
-	   do {
-			 temp = intpart;
-			 my_modf(intpart*0.1, &intpart);
-			 temp = temp*0.1;
-			 index = (int) ((temp -intpart +0.05)* 10.0);
-			 /* index = (int) (((double)(temp*0.1) -intpart +0.05) *10.0); */
-			 /* printf ("%llf, %f, %x\n", temp, intpart, index); */
-			 iconvert[iplace++] =
-				    (caps? "0123456789ABCDEF":"0123456789abcdef")[index];
-	   } while (intpart && (iplace < 311));
-	   if (iplace == 311) iplace--;
-	   iconvert[iplace] = 0;
+	/* Convert integer part */
+	do {
+		temp = intpart;
+		my_modf(intpart*0.1, &intpart);
+		temp = temp*0.1;
+		index = (int) ((temp -intpart +0.05)* 10.0);
+		/* index = (int) (((double)(temp*0.1) -intpart +0.05) *10.0); */
+		/* printf ("%llf, %f, %x\n", temp, intpart, index); */
+		iconvert[iplace++] =
+			(caps? "0123456789ABCDEF":"0123456789abcdef")[index];
+	} while (intpart && (iplace < 311));
+	if (iplace == 311) iplace--;
+	iconvert[iplace] = 0;
 
-	   /* Convert fractional part */
-	   if (fracpart)
-	   {
-			 do {
-				    temp = fracpart;
-				    my_modf(fracpart*0.1, &fracpart);
-				    temp = temp*0.1;
-				    index = (int) ((temp -fracpart +0.05)* 10.0);
-				    /* index = (int) ((((temp/10) -fracpart) +0.05) *10); */
-				    /* printf ("%lf, %lf, %ld\n", temp, fracpart, index); */
-				    fconvert[fplace++] =
-				    (caps? "0123456789ABCDEF":"0123456789abcdef")[index];
-			 } while(fracpart && (fplace < 311));
-			 if (fplace == 311) fplace--;
-	   }
-	   fconvert[fplace] = 0;
+	/* Convert fractional part */
+	if (fracpart)
+	{
+		do {
+			temp = fracpart;
+			my_modf(fracpart*0.1, &fracpart);
+			temp = temp*0.1;
+			index = (int) ((temp -fracpart +0.05)* 10.0);
+			/* index = (int) ((((temp/10) -fracpart) +0.05) *10); */
+			/* printf ("%lf, %lf, %ld\n", temp, fracpart, index); */
+			fconvert[fplace++] =
+				(caps? "0123456789ABCDEF":"0123456789abcdef")[index];
+		} while(fracpart && (fplace < 311));
+		if (fplace == 311) fplace--;
+	}
+	fconvert[fplace] = 0;
 
-	   /* -1 for decimal point, another -1 if we are printing a sign */
-	   padlen = min - iplace - max - 1 - ((signvalue) ? 1 : 0);
-	   zpadlen = max - fplace;
-	   if (zpadlen < 0) zpadlen = 0;
-	   if (padlen < 0)
-			 padlen = 0;
-	   if (flags & DP_F_MINUS)
-			 padlen = -padlen; /* Left Justifty */
+	/* -1 for decimal point, another -1 if we are printing a sign */
+	padlen = min - iplace - max - 1 - ((signvalue) ? 1 : 0);
+	zpadlen = max - fplace;
+	if (zpadlen < 0) zpadlen = 0;
+	if (padlen < 0)
+		padlen = 0;
+	if (flags & DP_F_MINUS)
+		padlen = -padlen; /* Left Justifty */
 
-	   if ((flags & DP_F_ZERO) && (padlen > 0)) {
-			 if (signvalue) {
-				    dopr_outch(buffer, currlen, maxlen, signvalue);
-				    --padlen;
-				    signvalue = 0;
-			 }
-			 while (padlen > 0) {
-				    dopr_outch(buffer, currlen, maxlen, '0');
-				    --padlen;
-			 }
-	   }
-	   while (padlen > 0) {
-			 dopr_outch(buffer, currlen, maxlen, ' ');
-			 --padlen;
-	   }
-	   if (signvalue)
-			 dopr_outch(buffer, currlen, maxlen, signvalue);
+	if ((flags & DP_F_ZERO) && (padlen > 0)) {
+		if (signvalue) {
+			dopr_outch(buffer, currlen, maxlen, signvalue);
+			--padlen;
+			signvalue = 0;
+		}
+		while (padlen > 0) {
+			dopr_outch(buffer, currlen, maxlen, '0');
+			--padlen;
+		 }
+	}
+	while (padlen > 0) {
+		dopr_outch(buffer, currlen, maxlen, ' ');
+		--padlen;
+	}
+	if (signvalue)
+		dopr_outch(buffer, currlen, maxlen, signvalue);
 
-	   while (iplace > 0)
-			 dopr_outch(buffer, currlen, maxlen, iconvert[--iplace]);
+	while (iplace > 0)
+		dopr_outch(buffer, currlen, maxlen, iconvert[--iplace]);
 
 #ifdef DEBUG_SNPRINTF
-	   printf("fmtfp: fplace=%d zpadlen=%d\n", fplace, zpadlen);
+	printf("fmtfp: fplace=%d zpadlen=%d\n", fplace, zpadlen);
 #endif
 
-	   /*
-	    * Decimal point.  This should probably use locale to find the correct
-	    * char to print out.
-	    */
-	   if (max > 0) {
-			 dopr_outch(buffer, currlen, maxlen, '.');
+	/*
+	 * Decimal point.  This should probably use locale to find the correct
+	 * char to print out.
+	 */
+	if (max > 0) {
+		dopr_outch(buffer, currlen, maxlen, '.');
 
-			 while (fplace > 0)
-				    dopr_outch(buffer, currlen, maxlen, fconvert[--fplace]);
-	   }
+		while (fplace > 0)
+			dopr_outch(buffer, currlen, maxlen, fconvert[--fplace]);
+	}
 
-	   while (zpadlen > 0) {
-			 dopr_outch(buffer, currlen, maxlen, '0');
-			 --zpadlen;
-	   }
+	while (zpadlen > 0) {
+		dopr_outch(buffer, currlen, maxlen, '0');
+		--zpadlen;
+	}
 
-	   while (padlen < 0) {
-			 dopr_outch(buffer, currlen, maxlen, ' ');
-			 ++padlen;
-	   }
+	while (padlen < 0) {
+		dopr_outch(buffer, currlen, maxlen, ' ');
+		++padlen;
+	}
 }
 
 static void dopr_outch(char *buffer, size_t *currlen, size_t maxlen, char c)

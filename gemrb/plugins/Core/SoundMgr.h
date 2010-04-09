@@ -32,11 +32,11 @@ public:
 	SoundMgr(void);
 	virtual ~SoundMgr(void);
 	virtual bool Open(DataStream* stream, bool autofree = true ) = 0 ;
-    virtual int get_length() = 0 ;
-    virtual int get_channels() = 0 ;
-    virtual int get_samplerate() = 0 ;
-    virtual int read_samples( short* memory, int cnt ) = 0 ;
-    virtual void rewind(void) = 0 ;
+	virtual int get_length() = 0 ;
+	virtual int get_channels() = 0 ;
+	virtual int get_samplerate() = 0 ;
+	virtual int read_samples( short* memory, int cnt ) = 0 ;
+	virtual void rewind(void) = 0 ;
 
 };
 
