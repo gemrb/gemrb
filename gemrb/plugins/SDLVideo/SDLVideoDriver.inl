@@ -207,9 +207,10 @@ assert(cover);
 			// 50% transparent, tinted
 			#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
 				target = ((curval >> 1)&MASK) + \
-				    (((PTYPE)( ((tint.r*(cr)) >> (rloss+8)) << rshift  \
+				    ((((PTYPE)( ((tint.r*(cr)) >> (rloss+8)) << rshift  \
 				               | ((tint.g*(cg)) >> (gloss+8)) << gshift \
-				               | ((tint.b*(cb)) >> (bloss+8)) << bshift)) >> 1)
+				               | ((tint.b*(cb)) >> (bloss+8)) << bshift)) >> 1)\
+				     &MASK)
 
 		#else
 			// 50% transparent, untinted
