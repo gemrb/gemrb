@@ -461,6 +461,10 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	}
 
 	ImageWriter *im = (ImageWriter *) core->GetInterface( PLUGIN_IMAGE_WRITER_BMP );
+	if (!im) {
+		printMessage( "SaveGameIterator", "Couldn't create the BMPWriter!\n", LIGHT_RED );
+		return -1;
+	}
 
 	//Create portraits
 	for (int i = 0; i < game->GetPartySize( false ); i++) {
