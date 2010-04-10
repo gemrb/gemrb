@@ -82,7 +82,14 @@ endif (${LAYOUT} MATCHES "home")
 
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
- SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -W -Wpointer-arith -Wcast-align")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ansi -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing")
+	# only export symbols explicitly marked to be exported.
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+	# Ensure all plugin symbols exist.
+	if (NOT APPLE)
+		set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--no-undefined")
+	endif (NOT APPLE)
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 MESSAGE(STATUS "Looking for Python libraries")
