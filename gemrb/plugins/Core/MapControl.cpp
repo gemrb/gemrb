@@ -89,7 +89,10 @@ MapControl::MapControl(void)
 	ResetEventHandler( MapControlOnDoublePress );
 
 	MyMap = core->GetGame()->GetCurrentArea();
-	MapMOS = MyMap->SmallMap->GetImage();
+	if (MyMap->SmallMap)
+		MapMOS = MyMap->SmallMap->GetImage();
+	else
+		MapMOS = NULL;
 }
 
 MapControl::~MapControl(void)
@@ -144,15 +147,20 @@ void MapControl::Realize()
 	//MapWidth = map->GetWidth();
 	//MapHeight = map->GetHeight();
 
-	MapWidth = (short) MapMOS->Width;
-	MapHeight = (short) MapMOS->Height;
+	if (MapMOS) {
+		MapWidth = (short) MapMOS->Width;
+		MapHeight = (short) MapMOS->Height;
+	} else {
+		MapWidth = 0;
+		MapHeight = 0;
+	}
 
 	// FIXME: ugly hack! What is the actual viewport size?
 	ViewWidth = (short) (core->Width * MAP_DIV / MAP_MULT);
 	ViewHeight = (short) (core->Height * MAP_DIV / MAP_MULT);
 
-	XCenter = (short) (Width - MapMOS->Width ) / 2;
-	YCenter = (short) (Height - MapMOS->Height ) / 2;
+	XCenter = (short) (Width - MapWidth ) / 2;
+	YCenter = (short) (Height - MapHeight ) / 2;
 	if (XCenter < 0) XCenter = 0;
 	if (YCenter < 0) YCenter = 0;
 }
@@ -198,7 +206,9 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 	Video* video = core->GetVideoDriver();
 	Region r( XWin + XPos, YWin + YPos, Width, Height );
 
-	video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
+	if (MapMOS) {
+		video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
+	}
 
 	if (core->FogOfWar&FOG_DRAWFOG)
 		DrawFog(XWin, YWin);
