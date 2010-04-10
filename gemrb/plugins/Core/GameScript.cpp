@@ -1552,6 +1552,7 @@ static void ParseString(const char*& src, char* tmp)
 static Object* DecodeObject(const char* line)
 {
 	int i;
+	const char *origline = line; // for debug below
 
 	Object* oB = new Object();
 	for (i = 0; i < ObjectFieldsCount; i++) {
@@ -1566,13 +1567,13 @@ static Object* DecodeObject(const char* line)
 		for (i = 0; i < 4; i++) {
 			oB->objectRect[i] = ParseInt( line );
 		}
-		if (*line)
+		if (*line == ' ')
 			line++; //Skip ] (not really... it skips a ' ' since the ] was skipped by the ParseInt function
 	}
-	if (*line)
+	if (*line == '"')
 		line++; //Skip "
 	ParseString( line, oB->objectName );
-	if (*line)
+	if (*line == '"')
 		line++; //Skip " (the same as above)
 	//this seems to be needed too
 	if (ExtraParametersCount && *line) {
@@ -1580,6 +1581,10 @@ static Object* DecodeObject(const char* line)
 	}
 	for (i = 0; i < ExtraParametersCount; i++) {
 		oB->objectFields[i + ObjectFieldsCount] = ParseInt( line );
+	}
+	if (*line != 'O' || *(line + 1) != 'B') {
+		printMessage( "GameScript","Got confused parsing object line: ", YELLOW );
+		printf("%s\n", origline);
 	}
 	//let the object realize it has no future (in case of null objects)
 	if (oB->ReadyToDie()) {
