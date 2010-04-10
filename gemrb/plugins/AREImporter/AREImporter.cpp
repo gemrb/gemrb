@@ -254,8 +254,7 @@ bool AREImp::ChangeMap(Map *map, bool day_or_night)
 
 	// Small map for MapControl
 	ImageMgr* sm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
-	if (!sm)
-		abort(); // FIXME
+	// small map is *optional*!
 
 	//the map state was altered, no need to hold this off for any later
 	map->DayNight = day_or_night;
@@ -268,8 +267,10 @@ bool AREImp::ChangeMap(Map *map, bool day_or_night)
 	}
 
 	ImageMgr* lm = ( ImageMgr* ) gamedata->GetResource(TmpResRef, &ImageMgr::ID);
-	if (! lm)
-		abort(); // FIXME
+	if (!lm) {
+		printf( "[AREImporter]: No lightmap available.\n" );
+		return false;
+	}
 
 	//alter the lightmap and the minimap (the tileset was already swapped)
 	map->ChangeTileMap(lm, sm);
@@ -340,8 +341,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 
 	// Small map for MapControl
 	ImageMgr* sm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
-	if (!sm)
-		abort(); // FIXME
+	// small map is *optional*!
 
 	if (Script[0]) {
 		map->Scripts[0] = new GameScript( Script, ST_AREA );
@@ -359,20 +359,26 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	ImageMgr* lm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
-	if (!lm)
-		abort(); // FIXME
+	if (!lm) {
+		printf( "[AREImporter]: No lightmap available.\n" );
+		return false;
+	}
 
 	snprintf( TmpResRef, 9, "%sSR", WEDResRef);
 
 	ImageMgr* sr = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
-	if (!sr)
-		abort(); // FIXME
+	if (!sr) {
+		printf( "[AREImporter]: No searchmap available.\n" );
+		return false;
+	}
 
 	snprintf( TmpResRef, 9, "%sHT", WEDResRef);
 
 	ImageMgr* hm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
-	if (!hm)
-		abort(); // FIXME
+	if (!hm) {
+		printf( "[AREImporter]: No heightmap available.\n" );
+		return false;
+	}
 
 	map->AddTileMap( tm, lm, sr, sm, hm );
 
