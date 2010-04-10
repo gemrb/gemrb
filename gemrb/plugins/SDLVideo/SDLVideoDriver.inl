@@ -55,6 +55,17 @@
 // SPECIALPIXEL
 //   special code to be inserted right before rendering a pixel
 
+// CUSTOMBLENDING
+//   if defined, use CUSTOMBLEND and ALPHAADJUST to pre-process source colour
+// CUSTOMBLEND(r,g,b)
+//   called on colour right before blending with output pixel (post-tinting)
+// APLHAADJUST(a)
+//   called on colour right before blending with output pixel (post-tinting)
+
+// HALFALPHA
+//   draw sprite 50% transparent.
+//   Cannot be used together with TINT_ALPHA, PALETTE_ALPHA or CUSTOMBLENDING
+
 // HIGHLIGHTCOVER
 //   (debugging) make covered pixels white instead of black
 
@@ -65,71 +76,71 @@
 #define WIDTH spr->Width
 #define HEIGHT spr->Height
 
+
+// XNEG(x) is -x when flipping horizontally, x otherwise
+// YNEG(y) is -y when flipping vertically, y otherwise
 #ifdef FLIP
-
-#define XNEG(x) (((x)+xneg)^xneg)
-#define YNEG(y) (((y)+yneg)^yneg)
-
+	#define XNEG(x) (((x)+xneg)^xneg)
+	#define YNEG(y) (((y)+yneg)^yneg)
 #else
-
-#define XNEG(x) (x)
-#define YNEG(y) (y)
-
+	#define XNEG(x) (x)
+	#define YNEG(y) (y)
 #endif
 
 
+// Output 16/32 bpp
 #ifdef BPP16
-#define PTYPE Uint16
-#define PITCHMULT 2
-#define MASK mask16
+	#define PTYPE Uint16
+	#define PITCHMULT 2
+	#define MASK mask16
 #else
-#define PITCHMULT 4
-#define PTYPE Uint32
-#define MASK mask32
+	#define PITCHMULT 4
+	#define PTYPE Uint32
+	#define MASK mask32
 #endif
 
+// Input indexed/32 bpp
 #ifdef USE_PALETTE
-#define RVALUE(p) (col[(p)].r)
-#define GVALUE(p) (col[(p)].g)
-#define BVALUE(p) (col[(p)].b)
-#define AVALUE(p) (col[(p)].a)
-#define ISTRANSPARENT(p) (p == (Uint8)data->transindex)
-#define SRCTYPE Uint8
+	#define RVALUE(p) (col[(p)].r)
+	#define GVALUE(p) (col[(p)].g)
+	#define BVALUE(p) (col[(p)].b)
+	#define AVALUE(p) (col[(p)].a)
+	#define ISTRANSPARENT(p) (p == (Uint8)data->transindex)
+	#define SRCTYPE Uint8
 #else
-// TODO: These shifts might need fixing if we ever use this functionality
-// for sprites not created by SDLVideoDriver::CreateLight
-#define RVALUE(p) (p & 0xff)
-#define GVALUE(p) ((p >> 8) & 0xff)
-#define BVALUE(p) ((p >> 16) & 0xff)
-#define AVALUE(p) (p >> 24)
-#define ISTRANSPARENT(p) (AVALUE(p) == 0)
-#define SRCTYPE Uint32
+	// TODO: These shifts will need fixing if we ever use this functionality
+	// for sprites not created by SDLVideoDriver::CreateLight
+	#define RVALUE(p) (p & 0xff)
+	#define GVALUE(p) ((p >> 8) & 0xff)
+	#define BVALUE(p) ((p >> 16) & 0xff)
+	#define AVALUE(p) (p >> 24)
+	#define ISTRANSPARENT(p) (AVALUE(p) == 0)
+	#define SRCTYPE Uint32
 #endif
 
+// Make ALPHAADJUST, CUSTOMBLEND nops if not doing CUSTOMBLENDING
 #ifndef CUSTOMBLENDING
-#define ALPHAADJUST(a) a
-#define CUSTOMBLEND(r,g,b)
+	#define ALPHAADJUST(a) a
+	#define CUSTOMBLEND(r,g,b)
 #endif
 
 
+// Define ALPHA, ALPHAVALUE macros appropriately for palette/tint alpha settings
 #ifdef PALETTE_ALPHA
-#define ALPHA
-#ifdef TINT_ALPHA
-#define ALPHAVALUE(p) (ALPHAADJUST(((AVALUE(p)) * tint.a)>>8))
+	#define ALPHA
+	#ifdef TINT_ALPHA
+		#define ALPHAVALUE(p) (ALPHAADJUST(((AVALUE(p)) * tint.a)>>8))
+	#else
+		#define ALPHAVALUE(p) (ALPHAADJUST(AVALUE(p)))
+	#endif
 #else
-#define ALPHAVALUE(p) (ALPHAADJUST(AVALUE(p)))
-#endif
-
-#else
-
-#ifdef TINT_ALPHA
-#define ALPHA
-#define ALPHAVALUE(p) (ALPHAADJUST(tint.a))
-#else
-#undef ALPHA
-#define ALPHAVALUE(p) (ALPHAADJUST(255))
-#endif
-
+	#ifdef TINT_ALPHA
+		#define ALPHA
+		#define ALPHAVALUE(p) (ALPHAADJUST(tint.a))
+	#else
+		#undef ALPHA
+		#define ALPHAVALUE(p) (ALPHAADJUST(255))
+	#endif
 #endif
 
 #ifdef COVER
@@ -138,110 +149,126 @@ assert(cover);
 
 // TODO: preconvert palette to surface-specific color values, where possible
 
+
+// Define BLENDPIXEL macro for blending of source and dest pixels
+
 #ifdef ALPHA
-
-#ifdef TINT
-#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
-do { \
-	if ((ca) != 0) { \
-		dR = ((tint.r*(cr)) >> 8); \
-		dG = ((tint.g*(cg)) >> 8); \
-		dB = ((tint.b*(cb)) >> 8); \
-		CUSTOMBLEND(dR,dG,dB); \
-		dR = 1 + (ca)*dR + ((((curval)>>rshift)<<rloss)&0xFF)*(255-(ca)); \
- 		dR = (dR + (dR >> 8)) >> 8; \
-		dG = 1 + (ca)*dG + ((((curval)>>gshift)<<gloss)&0xFF)*(255-(ca)); \
- 		dG = (dG + (dG >> 8)) >> 8; \
-		dB = 1 + (ca)*dB + ((((curval)>>bshift)<<bloss)&0xFF)*(255-(ca)); \
-		dB = (dB + (dB >> 8)) >> 8; \
-		target = (PTYPE) ( ((dR) >> rloss) << rshift \
-						   | ((dG) >> gloss) << gshift \
-						   | ((dB) >> bloss) << bshift); \
-	} \
-} while (0)
-#else
-#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
-do { \
-	if ((ca) != 0) { \
-		dR = (cr); \
-		dG = (cg); \
-		dB = (cb); \
-		CUSTOMBLEND(dR,dG,dB); \
-		dR = 1 + (ca)*dR + ((((curval)>>rshift)<<rloss)&0xFF)*(255-(ca)); \
- 		dR = (dR + (dR >> 8)) >> 8; \
-		dG = 1 + (ca)*dG + ((((curval)>>gshift)<<gloss)&0xFF)*(255-(ca)); \
- 		dG = (dG + (dG >> 8)) >> 8; \
-		dB = 1 + (ca)*dB + ((((curval)>>bshift)<<bloss)&0xFF)*(255-(ca)); \
-		dB = (dB + (dB >> 8)) >> 8; \
-		target = (PTYPE) ( ((dR) >> rloss) << rshift \
-						   | ((dG) >> gloss) << gshift \
-						   | ((dB) >> bloss) << bshift); \
-	} \
-} while (0)
-#endif
-
-#else
-
-#ifdef HALFALPHA
-
-#ifdef TINT
-
-#define BLENDPIXEL(target,cr,cg,cb,ca,curval) target = ((curval >> 1)&MASK) + \
-					(((PTYPE)( ((tint.r*(cr)) >> (rloss+8)) << rshift  \
-						| ((tint.g*(cg)) >> (gloss+8)) << gshift \
-						| ((tint.b*(cb)) >> (bloss+8)) << bshift)) >> 1)
+	#ifdef TINT
+		// alpha, tinted
+		#define BLENDPIXEL(target,cr,cg,cb,ca,curval) do { \
+			if ((ca) != 0) { \
+				dR = ((tint.r*(cr)) >> 8); \
+				dG = ((tint.g*(cg)) >> 8); \
+				dB = ((tint.b*(cb)) >> 8); \
+				CUSTOMBLEND(dR,dG,dB); \
+				dR = 1 + (ca)*dR \
+				       + ((((curval)>>rshift)<<rloss)&0xFF)*(255-(ca)); \
+				dR = (dR + (dR >> 8)) >> 8; \
+				dG = 1 + (ca)*dG \
+				       + ((((curval)>>gshift)<<gloss)&0xFF)*(255-(ca)); \
+				dG = (dG + (dG >> 8)) >> 8; \
+				dB = 1 + (ca)*dB \
+				       + ((((curval)>>bshift)<<bloss)&0xFF)*(255-(ca)); \
+				dB = (dB + (dB >> 8)) >> 8; \
+				target = (PTYPE) ( ((dR) >> rloss) << rshift \
+				                   | ((dG) >> gloss) << gshift \
+				                   | ((dB) >> bloss) << bshift); \
+			} \
+			} while (0)
+	#else
+		// alpha, untinted
+		#define BLENDPIXEL(target,cr,cg,cb,ca,curval) do { \
+			if ((ca) != 0) { \
+				dR = (cr); \
+				dG = (cg); \
+				dB = (cb); \
+				CUSTOMBLEND(dR,dG,dB); \
+				dR = 1 + (ca)*dR \
+				       + ((((curval)>>rshift)<<rloss)&0xFF)*(255-(ca)); \
+				dR = (dR + (dR >> 8)) >> 8; \
+				dG = 1 + (ca)*dG \
+				       + ((((curval)>>gshift)<<gloss)&0xFF)*(255-(ca)); \
+				dG = (dG + (dG >> 8)) >> 8; \
+				dB = 1 + (ca)*dB \
+				       + ((((curval)>>bshift)<<bloss)&0xFF)*(255-(ca)); \
+				dB = (dB + (dB >> 8)) >> 8; \
+				target = (PTYPE) ( ((dR) >> rloss) << rshift \
+				                   | ((dG) >> gloss) << gshift \
+				                   | ((dB) >> bloss) << bshift); \
+			} \
+			} while (0)
+	#endif
 
 #else
 
-#define BLENDPIXEL(target,cr,cg,cb,ca,curval) target = ((curval >> 1)&MASK) + \
-					((((PTYPE)( ((cr) >> rloss) << rshift  \
-						| ((cg) >> gloss) << gshift \
-						| ((cb) >> bloss) << bshift)) >> 1)&MASK)
+	#ifdef HALFALPHA
 
+		#ifdef TINT
+			// 50% transparent, tinted
+			#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
+				target = ((curval >> 1)&MASK) + \
+				    (((PTYPE)( ((tint.r*(cr)) >> (rloss+8)) << rshift  \
+				               | ((tint.g*(cg)) >> (gloss+8)) << gshift \
+				               | ((tint.b*(cb)) >> (bloss+8)) << bshift)) >> 1)
+
+		#else
+			// 50% transparent, untinted
+			#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
+				target = ((curval >> 1)&MASK) + \
+				    ((((PTYPE)( ((cr) >> rloss) << rshift  \
+				                | ((cg) >> gloss) << gshift \
+				                | ((cb) >> bloss) << bshift)) >> 1)&MASK)
+
+		#endif
+
+	#else
+
+		#ifdef CUSTOMBLENDING
+
+			#ifdef TINT
+				// no alpha, tinted (custom blending)
+				#define BLENDPIXEL(target,cr,cg,cb,ca,curval) do { \
+					dR = ((tint.r*(cr)) >> 8); \
+					dG = ((tint.g*(cg)) >> 8); \
+					dB = ((tint.b*(cb)) >> 8); \
+					CUSTOMBLEND(dR,dG,dB); \
+					target = (PTYPE) ( ((dR) >> rloss) << rshift \
+					                   | ((dG) >> gloss) << gshift \
+					                   | ((dB) >> bloss) << bshift); \
+					} while(0)
+			#else
+				// no alpha, untinted (custom blending)
+				#define BLENDPIXEL(target,cr,cg,cb,ca,curval) do { \
+					dR = (cr); \
+					dG = (cg); \
+					dB = (cb); \
+					CUSTOMBLEND(dR,dG,dB); \
+					target = (PTYPE) ( ((dR) >> rloss) << rshift \
+					                   | ((dG) >> gloss) << gshift \
+					                   | ((dB) >> bloss) << bshift); \
+					} while(0)
+			#endif
+
+		#else
+			#ifdef TINT
+				// no alpha, tinted
+				#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
+					target = (PTYPE)( ((tint.r*(cr)) >> (rloss+8)) << rshift  \
+					                  | ((tint.g*(cg)) >> (gloss+8)) << gshift \
+					                  | ((tint.b*(cb)) >> (bloss+8)) << bshift)
+			#else
+				// no alpha, untinted
+				#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
+					target = (PTYPE)( ((cr) >> rloss) << rshift  \
+					                  | ((cg) >> gloss) << gshift \
+					                  | ((cb) >> bloss) << bshift)
+			#endif
+		#endif
+	#endif
 #endif
 
-#else
 
-#ifdef CUSTOMBLENDING
-
-#ifdef TINT
-#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
-do { \
-	dR = ((tint.r*(cr)) >> 8); \
-	dG = ((tint.g*(cg)) >> 8); \
-	dB = ((tint.b*(cb)) >> 8); \
-	CUSTOMBLEND(dR,dG,dB); \
-	target = (PTYPE) ( ((dR) >> rloss) << rshift \
-					   | ((dG) >> gloss) << gshift \
-					   | ((dB) >> bloss) << bshift); \
-} while(0)
-#else
-#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
-do { \
-	dR = (cr); \
-	dG = (cg); \
-	dB = (cb); \
-	CUSTOMBLEND(dR,dG,dB); \
-	target = (PTYPE) ( ((dR) >> rloss) << rshift \
-					   | ((dG) >> gloss) << gshift \
-					   | ((dB) >> bloss) << bshift); \
-} while(0)
-#endif
-
-#else
-
-#ifdef TINT
-#define BLENDPIXEL(target,cr,cg,cb,ca,curval) target = (PTYPE)( ((tint.r*(cr)) >> (rloss+8)) << rshift  \
-								   | ((tint.g*(cg)) >> (gloss+8)) << gshift \
-								   | ((tint.b*(cb)) >> (bloss+8)) << bshift) 
-#else
-#define BLENDPIXEL(target,cr,cg,cb,ca,curval) target = (PTYPE)( ((cr) >> rloss) << rshift  \
-								   | ((cg) >> gloss) << gshift \
-								   | ((cb) >> bloss) << bshift)
-#endif
-#endif
-#endif
-#endif
+// Main rendering code
 
 do {
 #ifdef FLIP
