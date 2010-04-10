@@ -177,15 +177,11 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake_config.h.in ${CMAKE_CURRENT_BIN
 
 #Plugin addition macro
 MACRO(ADD_GEMRB_PLUGIN plugin_name)
-ADD_LIBRARY(${plugin_name} MODULE ${ARGN})
-SET_TARGET_PROPERTIES(${plugin_name} PROPERTIES PREFIX "")
-IF(WIN32)
- TARGET_LINK_LIBRARIES(${plugin_name} gemrb_core)
-ENDIF(WIN32)
-IF(APPLE)
- TARGET_LINK_LIBRARIES(${plugin_name} gemrb_core)
-ENDIF(APPLE)
-INSTALL(TARGETS ${plugin_name} DESTINATION ${PLUGIN_DIR})
+	ADD_LIBRARY(${plugin_name} MODULE ${ARGN})
+	SET_TARGET_PROPERTIES(${plugin_name} PROPERTIES PREFIX ""
+		INSTALL_RPATH ${LIB_DIR})
+	TARGET_LINK_LIBRARIES(${plugin_name} gemrb_core)
+	INSTALL(TARGETS ${plugin_name} DESTINATION ${PLUGIN_DIR})
 ENDMACRO(ADD_GEMRB_PLUGIN)
 
 #gemrb overrides macro
