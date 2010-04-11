@@ -39,7 +39,6 @@
 #define DEBUG_SHOW_INFOPOINTS   0x01
 #define DEBUG_SHOW_CONTAINERS   0x02
 #define DEBUG_SHOW_DOORS	DEBUG_SHOW_CONTAINERS
-#define DEBUG_SHOW_SEARCHMAP    0x04
 #define DEBUG_SHOW_LIGHTMAP     0x08
 
 static const Color cyan = {
@@ -553,14 +552,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		}
 	}
 
-	// Draw searchmap
-	if (DebugFlags & DEBUG_SHOW_SEARCHMAP) {
-		Sprite2D* spr = area->SearchMap->GetSprite2D();
-		video->BlitSprite( spr, 0, 0, true );
-		video->FreeSprite( spr );
-		Region point( p.x / 16, p.y / 12, 2, 2 );
-		video->DrawRect( point, red );
-	} else if (DebugFlags & DEBUG_SHOW_LIGHTMAP) {
+	// Draw lightmap
+	if (DebugFlags & DEBUG_SHOW_LIGHTMAP) {
 		Sprite2D* spr = area->LightMap->GetSprite2D();
 		video->BlitSprite( spr, 0, 0, true );
 		video->FreeSprite( spr );
@@ -951,10 +944,6 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case '4': //show all traps and infopoints
 				DebugFlags ^= DEBUG_SHOW_INFOPOINTS;
 				printf("Show traps and infopoints %s\n", DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
-				break;
-			case '5': //show the searchmap
-				DebugFlags ^= DEBUG_SHOW_SEARCHMAP;
-				printf("Show searchmap %s\n", DebugFlags & DEBUG_SHOW_SEARCHMAP ? "ON" : "OFF");
 				break;
 			case '6': //show the lightmap
 				DebugFlags ^= DEBUG_SHOW_LIGHTMAP;

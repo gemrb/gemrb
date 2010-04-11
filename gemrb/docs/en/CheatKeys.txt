@@ -75,10 +75,7 @@ Ctrl-1 - Changes the armour level
 Ctrl-4 - Toggles debug flag DEBUG_SHOW_INFOPOINTS (show all
          traps, infopoints and wallgroups)
 
-Ctrl-5 - Toggles debug flag DEBUG_SHOW_SEARCHMAP (show the searchmap)
-
-Ctrl-6 - Toggles debug flag DEBUG_SHOW_PALETTES (show original and current
-         palettes for pointed actor)
+Ctrl-6 - Toggles debug flag DEBUG_SHOW_LIGHTMAP (show the lightmap)
 
 Ctrl-7 - Toggle drawing of Fog-Of-War (actually explored bitmap atm.)
          in GameControl.
