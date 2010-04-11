@@ -294,7 +294,7 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef, unsigned char 
 
 	for (i = 0; i < FramesCount; ++i) {
 		Sprite2D* frame = GetFrameInternal(i, mode, videoBAMsupport, data, af);
-		assert(frame->BAM);
+		assert(!videoBAMsupport || frame->BAM);
 		af->AddFrame(frame);
 	}
 	for (i = 0; i < CyclesCount; ++i) {
