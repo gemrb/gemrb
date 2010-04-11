@@ -34,6 +34,29 @@ ImageMgr::~ImageMgr(void)
 {
 }
 
+Bitmap* ImageMgr::GetBitmap()
+{
+	unsigned int height = GetHeight();
+	unsigned int width = GetWidth();
+	Bitmap *data = new Bitmap(width, height);
+
+	printMessage("ImageMgr", "Don't know how to handle 24bit bitmap from ", WHITE);
+	printf( "%s...", str->filename );
+	printStatus( "ERROR", LIGHT_RED );
+
+	Sprite2D *spr = GetSprite2D();
+
+	for (unsigned int y = 0; y < height; y++) {
+		for (unsigned int x = 0; x < width; x++) {
+			data->SetAt(x,y, spr->GetPixel(x,y).r);
+		}
+	}
+
+	core->GetVideoDriver()->FreeSprite(spr);
+
+	return data;
+}
+
 ImageFactory* ImageMgr::GetImageFactory(const char* ResRef)
 {
 	ImageFactory* fact = new ImageFactory( ResRef, GetSprite2D() );

@@ -307,6 +307,46 @@ void BMPImporter::GetPalette(int index, int colors, Color* pal)
 	}
 }
 
+Bitmap* BMPImporter::GetBitmap()
+{
+	Bitmap *data = new Bitmap(Width,Height);
+
+	unsigned char *p = ( unsigned char * ) pixels;
+	switch (BitCount) {
+	case 4:
+		for (unsigned int y = 0; y < Height; y++) {
+			for (unsigned int x = 0; x < Width; x++) {
+				unsigned char ret = p[PaddedRowLength * y + (x >> 1)];
+				if (x & 1) {
+					data->SetAt(x,y,ret & 15);
+				} else {
+					data->SetAt(x,y,( ret >> 4 ) & 15);
+				}
+			}
+		}
+		break;
+	case 8:
+		for (unsigned int y = 0; y < Height; y++) {
+			for (unsigned int x = 0; x < Width; x++) {
+				data->SetAt(x,y,p[y*Width + x]);
+			}
+		}
+		break;
+	case 24:
+		printMessage("BMPImporter", "Don't know how to handle 24bit bitmap from ", WHITE);
+		printf( "%s...", str->filename );
+		printStatus( "ERROR", LIGHT_RED );
+		for (unsigned int y = 0; y < Height; y++) {
+			for (unsigned int x = 0; x < Width; x++) {
+				data->SetAt(x,y,p[3*(y*Width + x)]);
+			}
+		}
+		break;
+	}
+
+	return data;
+}
+
 #include "../../includes/plugindef.h"
 
 GEMRB_PLUGIN(0xD768B1, "BMP File Reader")

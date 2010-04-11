@@ -25,6 +25,7 @@
 #include "Resource.h"
 #include "DataStream.h"
 #include "Sprite2D.h"
+#include "Bitmap.h"
 
 class ImageFactory;
 
@@ -40,6 +41,7 @@ public:
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	/** Returns a \ref Sprite2D containing the image. */
 	virtual Sprite2D* GetSprite2D() = 0;
+	virtual Bitmap* GetBitmap();
 	/** No descriptions */
 	virtual void GetPalette(int index, int colors, Color* pal) = 0;
 	/** Sets a Pixel in the image, only for searchmaps */

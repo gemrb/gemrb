@@ -105,6 +105,7 @@ libgemrb_core_la_SOURCES = \
 	IniSpawn.cpp \
 	LRUCache.cpp \
 	Calendar.cpp \
-	ImageWriter.cpp
+	ImageWriter.cpp \
+	Bitmap.cpp
 
 noinst_HEADERS = *.h

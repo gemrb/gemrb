@@ -43,6 +43,7 @@ public:
 	~BMPImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Sprite2D* GetSprite2D();
+	virtual Bitmap* GetBitmap();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
 	/** Searchmap only */
