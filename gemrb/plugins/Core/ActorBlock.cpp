@@ -1535,11 +1535,11 @@ Door::~Door(void)
 	}
 }
 
-void Door::ImpedeBlocks(int count, Point *points, unsigned int value)
+void Door::ImpedeBlocks(int count, Point *points, unsigned char value)
 {
 	for(int i = 0;i<count;i++) {
-		unsigned int tmp = area->SearchMap->GetPixelIndex( points[i].x, points[i].y ) & PATH_MAP_NOTDOOR;
-		area->SearchMap->SetPixelIndex( points[i].x, points[i].y, (ieByte) (tmp|value) );
+		unsigned char tmp = area->SearchMap->GetAt( points[i].x, points[i].y ) & PATH_MAP_NOTDOOR;
+		area->SearchMap->SetAt( points[i].x, points[i].y, (tmp|value) );
 	}
 }
 
@@ -1550,7 +1550,7 @@ void Door::UpdateDoor()
 	} else {
 		outline = closed;
 	}
-	unsigned int oval, cval;
+	unsigned char oval, cval;
 
 	oval = PATH_MAP_IMPASSABLE;
 	if (Flags & DOOR_TRANSPARENT) {
@@ -1660,7 +1660,7 @@ bool Door::BlockedOpen(int Open, int ForceOpen)
 		Actor** ab;
 		rgn.x = points[i].x*16;
 		rgn.y = points[i].y*12;
-		unsigned int tmp = area->SearchMap->GetPixelIndex( points[i].x, points[i].y ) & PATH_MAP_ACTOR;
+		unsigned char tmp = area->SearchMap->GetAt( points[i].x, points[i].y ) & PATH_MAP_ACTOR;
 		if (tmp) {
 			int ac = area->GetActorInRect(ab, rgn, false);
 			while(ac--) {

@@ -28,6 +28,7 @@ class Map;
 #include "ActorBlock.h"
 #include "IniSpawn.h"
 #include "SpriteCover.h"
+#include "Bitmap.h"
 #include <queue>
 
 class Actor;
@@ -218,8 +219,8 @@ class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
 	ImageMgr* LightMap;
-	ImageMgr* SearchMap;
-	ImageMgr* HeightMap;
+	Bitmap* SearchMap;
+	Bitmap* HeightMap;
 	ImageMgr* SmallMap;
 	IniSpawn *INISpawn;
 	ieDword AreaFlags;
@@ -311,8 +312,8 @@ public:
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(Point &p);
 	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size);
-	int GetBlocked(unsigned int x, unsigned int y);
-	int GetBlocked(Point &p);
+	unsigned char GetBlocked(unsigned int x, unsigned int y);
+	unsigned char GetBlocked(Point &p);
 	Actor* GetActorByGlobalID(ieDword objectID);
 	Actor* GetActor(Point &p, int flags);
 	Actor* GetActorInRadius(Point &p, int flags, unsigned int radius);

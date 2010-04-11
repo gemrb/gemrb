@@ -4472,7 +4472,7 @@ void Actor::Draw(Region &screen)
 	Color tint = area->LightMap->GetPixel( cx / 16, cy / 12);
 	tint.a = (ieByte) (255-Trans);
 
-	unsigned int heightmapindex = area->HeightMap->GetPixelIndex( cx / 16, cy / 12);
+	unsigned char heightmapindex = area->HeightMap->GetAt( cx / 16, cy / 12);
 	if (heightmapindex > 15) {
 		// there are 8bpp lightmaps (eg, bg2's AR1300) and fuzzie
 		// cannot work out how they work, so here is an incorrect

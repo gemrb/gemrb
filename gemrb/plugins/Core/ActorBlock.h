@@ -480,7 +480,7 @@ public:
 	ieDword  Unknown54;     //unused in tob
 private:
 	void SetWallgroups(int count, int value);
-	void ImpedeBlocks(int count, Point *points, unsigned int value);
+	void ImpedeBlocks(int count, Point *points, unsigned char value);
 	void UpdateDoor();
 	bool BlockedOpen(int Open, int ForceOpen);
 public:

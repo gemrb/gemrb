@@ -62,7 +62,7 @@ static int MaxVisibility = 30;
 static int VisibilityPerimeter; //calculated from MaxVisibility
 static int NormalCost = 10;
 static int AdditionalCost = 4;
-static int Passable[16] = {
+static unsigned char Passable[16] = {
 	4, 1, 1, 1, 1, 1, 1, 1, 0, 1, 8, 0, 0, 0, 3, 1
 };
 static Point **VisibilityMasks=NULL;
@@ -340,8 +340,8 @@ Map::~Map(void)
 		delete spawns[i];
 	}
 	core->FreeInterface( LightMap );
-	core->FreeInterface( SearchMap );
-	core->FreeInterface( HeightMap );
+	delete SearchMap;
+	delete HeightMap;
 	core->FreeInterface( SmallMap );
 	for (i = 0; i < QUEUE_COUNT; i++) {
 		free(queue[i]);
@@ -401,8 +401,10 @@ void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, Imag
 	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
 	TMap = tm;
 	LightMap = lm;
-	SearchMap = sr;
-	HeightMap = hm;
+	SearchMap = sr->GetBitmap();
+	core->FreeInterface(sr);
+	HeightMap = hm->GetBitmap();
+	core->FreeInterface(hm);
 	SmallMap = sm;
 	Width = (unsigned int) (TMap->XCellCount * 4);
 	Height = (unsigned int) (( TMap->YCellCount * 64 ) / 12);
@@ -413,7 +415,7 @@ void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, Imag
 	while(y--) {
 		int x=SearchMap->GetWidth();
 		while(x--) {
-			SearchMap->SetPixelIndex(x,y,Passable[SearchMap->GetPixelIndex(x,y)&PATH_MAP_AREAMASK]);
+			SearchMap->SetAt(x,y,Passable[SearchMap->GetAt(x,y)&PATH_MAP_AREAMASK]);
 		}
 	}
 }
@@ -1586,9 +1588,9 @@ void Map::PlayAreaSong(int SongType, bool restart)
 	}
 }
 
-int Map::GetBlocked(unsigned int x, unsigned int y)
+unsigned char Map::GetBlocked(unsigned int x, unsigned int y)
 {
-	int ret = SearchMap->GetPixelIndex( x, y );
+	unsigned char ret = SearchMap->GetAt( x, y );
 	if (ret&(PATH_MAP_DOOR_TRANSPARENT|PATH_MAP_ACTOR)) {
 		ret&=~PATH_MAP_PASSABLE;
 	}
@@ -1624,7 +1626,7 @@ bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
 	return false;
 }
 
-int Map::GetBlocked(Point &c)
+unsigned char Map::GetBlocked(Point &c)
 {
 	return GetBlocked(c.x/16, c.y/12);
 }
@@ -2888,19 +2890,19 @@ void Map::BlockSearchMap(Point &Pos, unsigned int size, unsigned int value)
 	for (unsigned int i=0; i<size; i++) {
 		for (unsigned int j=0; j<size; j++) {
 			if (i*i+j*j <= r) {
-				unsigned int tmp;
+				unsigned char tmp;
 
-				tmp = SearchMap->GetPixelIndex(ppx+i,ppy+j)&PATH_MAP_NOTACTOR;
-				SearchMap->SetPixelIndex(ppx+i,ppy+j,tmp|value);
+				tmp = SearchMap->GetAt(ppx+i,ppy+j)&PATH_MAP_NOTACTOR;
+				SearchMap->SetAt(ppx+i,ppy+j,tmp|value);
 
-				tmp = SearchMap->GetPixelIndex(ppx+i,ppy-j)&PATH_MAP_NOTACTOR;
-				SearchMap->SetPixelIndex(ppx+i,ppy-j,tmp|value);
+				tmp = SearchMap->GetAt(ppx+i,ppy-j)&PATH_MAP_NOTACTOR;
+				SearchMap->SetAt(ppx+i,ppy-j,tmp|value);
 
-				tmp = SearchMap->GetPixelIndex(ppx-i,ppy+j)&PATH_MAP_NOTACTOR;
-				SearchMap->SetPixelIndex(ppx-i,ppy+j,tmp|value);
+				tmp = SearchMap->GetAt(ppx-i,ppy+j)&PATH_MAP_NOTACTOR;
+				SearchMap->SetAt(ppx-i,ppy+j,tmp|value);
 
-				tmp = SearchMap->GetPixelIndex(ppx-i,ppy-j)&PATH_MAP_NOTACTOR;
-				SearchMap->SetPixelIndex(ppx-i,ppy-j,tmp|value);
+				tmp = SearchMap->GetAt(ppx-i,ppy-j)&PATH_MAP_NOTACTOR;
+				SearchMap->SetAt(ppx-i,ppy-j,tmp|value);
 			}
 		}
 	}
