@@ -29,6 +29,7 @@ class Map;
 #include "IniSpawn.h"
 #include "SpriteCover.h"
 #include "Bitmap.h"
+#include "Image.h"
 #include <queue>
 
 class Actor;
@@ -218,7 +219,7 @@ typedef std::list<Particles*>::iterator spaIterator;
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
-	ImageMgr* LightMap;
+	Image* LightMap;
 	Bitmap* SearchMap;
 	Bitmap* HeightMap;
 	ImageMgr* SmallMap;
