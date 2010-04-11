@@ -39,33 +39,6 @@ public:
 	Sprite2D* GetSprite2D();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
-	/** Searchmap only */
-	void SetPixelIndex(unsigned int x, unsigned int y, unsigned int /*idx*/)
-	{
-		if(x>=Width || y>=Height) {
-			return;
-		}
-    //add png code here
-	}
-	unsigned int GetPixelIndex(unsigned int x, unsigned int y)
-	{
-		if(x>=Width || y>=Height) {
-			return 0;
-		}
-    //add png code here
-		return 0;
-	}
-	/** Gets a Pixel from the Image */
-	Color GetPixel(unsigned int x, unsigned int y)
-	{
-		Color ret = {0,0,0,0};
-
-		if(x>=Width || y>=Height) {
-			return ret;
-		}
-    //add png code here (this part may be optional)
-		return ret;
-	}
 	int GetWidth() { return (int) Width; }
 	int GetHeight() { return (int) Height; }
 

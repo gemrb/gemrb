@@ -34,22 +34,6 @@ public:
 	Sprite2D* GetSprite2D();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
-	void SetPixelIndex(unsigned int /*x*/, unsigned int /*y*/, unsigned int /*idx*/)
-	{
-	}
-	/** Gets a Pixel index, not used in MOS */
-	unsigned int GetPixelIndex(unsigned int /*x*/, unsigned int /*y*/)
-	{
-		return 0;
-	}
-	/** Gets a Pixel from the Image, not used in MOS */
-	Color GetPixel(unsigned int /*x*/, unsigned int /*y*/)
-	{
-		Color null = {
-			0x00, 0x00, 0x00, 0x00
-		};
-		return null;
-	}
 	int GetWidth() { return (int) Width; }
 	int GetHeight() { return (int) Height; }
 public:

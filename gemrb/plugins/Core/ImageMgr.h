@@ -46,11 +46,6 @@ public:
 	virtual Bitmap* GetBitmap();
 	/** No descriptions */
 	virtual void GetPalette(int index, int colors, Color* pal) = 0;
-	/** Sets a Pixel in the image, only for searchmaps */
-	virtual void SetPixelIndex(unsigned int x, unsigned int y, unsigned int idx) = 0;
-	/** Gets a Pixel from the Image */
-	virtual Color GetPixel(unsigned int x, unsigned int y) = 0;
-	virtual unsigned int GetPixelIndex(unsigned int x, unsigned int y) = 0;
 	virtual int GetWidth() = 0;
 	/** Returns the height of the image */
 	virtual int GetHeight() = 0;
@@ -60,9 +55,6 @@ public:
 	 * @param[in] ResRef name of image represented by factory.
 	 */
 	ImageFactory* GetImageFactory(const char* ResRef);
-protected:
-	/** not virtual */
-	Color GetPixelSum(unsigned int x, unsigned int y, unsigned int ratio);
 };
 
 #endif
