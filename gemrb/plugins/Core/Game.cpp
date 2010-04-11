@@ -1447,17 +1447,9 @@ const Color *Game::GetGlobalTint() const
 		return &TimeStopTint;
 	}
 	Map *map = GetCurrentArea();
+	if (!map) return NULL;
 	if (map->AreaFlags&AF_DREAM) {
 		return &DreamTint;
-	}
-	if ((map->AreaType&(AT_OUTDOOR|AT_WEATHER)) == (AT_OUTDOOR|AT_WEATHER)) {
-		//get weather tint
-		if (WeatherBits&WB_RAIN) {
-			return &DarkTint;
-		}
-		if (WeatherBits&WB_FOG) {
-			return &FogTint;
-		}
 	}
 	if ((map->AreaType&(AT_OUTDOOR|AT_DAYNIGHT|AT_EXTENDED_NIGHT)) == (AT_OUTDOOR|AT_DAYNIGHT) ) {
 		//get daytime colour
@@ -1467,6 +1459,15 @@ const Color *Game::GetGlobalTint() const
 		}
 		if (daynight>20 || daynight<4) {
 			return &DuskTint;
+		}
+	}
+	if ((map->AreaType&(AT_OUTDOOR|AT_WEATHER)) == (AT_OUTDOOR|AT_WEATHER)) {
+		//get weather tint
+		if (WeatherBits&WB_RAIN) {
+			return &DarkTint;
+		}
+		if (WeatherBits&WB_FOG) {
+			return &FogTint;
 		}
 	}
 	return NULL;
