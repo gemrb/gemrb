@@ -149,7 +149,7 @@ bool PNGImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Sprite2D* PNGImp::GetImage()
+Sprite2D* PNGImp::GetSprite2D()
 {
 	Sprite2D* spr = 0;
 	unsigned char* buffer = 0;

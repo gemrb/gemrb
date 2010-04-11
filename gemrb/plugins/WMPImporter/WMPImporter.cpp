@@ -93,7 +93,7 @@ void WMPImp::GetWorldMap(WorldMap *m, unsigned int index)
 	if (!mos) {
 		printMessage( "WMPImporter","Worldmap image not found.\n", LIGHT_RED );
 	} else {
-		m->SetMapMOS(mos->GetImage());
+		m->SetMapMOS(mos->GetSprite2D());
 		core->FreeInterface( mos );
 	}
 

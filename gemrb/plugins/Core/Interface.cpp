@@ -2655,7 +2655,7 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 			ImageMgr* mos = ( ImageMgr* )
 				gamedata->GetResource( Background, &ImageMgr::ID );
 			if (mos != NULL) {
-				win->SetBackGround( mos->GetImage(), true );
+				win->SetBackGround( mos->GetSprite2D(), true );
 				FreeInterface( mos );
 			} else
 				printf( "[Core]: Cannot Load BackGround, skipping\n" );

@@ -92,7 +92,7 @@ void TextArea::RefreshSprite(const char *portrait)
 		return;
 	}
 
-	SetAnimPicture ( im->GetImage() );
+	SetAnimPicture ( im->GetSprite2D() );
 	core->FreeInterface( im );
 }
 

@@ -39,7 +39,7 @@ public:
 	virtual ~ImageMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	/** Returns a \ref Sprite2D containing the image. */
-	virtual Sprite2D* GetImage() = 0;
+	virtual Sprite2D* GetSprite2D() = 0;
 	/** No descriptions */
 	virtual void GetPalette(int index, int colors, Color* pal) = 0;
 	/** Sets a Pixel in the image, only for searchmaps */

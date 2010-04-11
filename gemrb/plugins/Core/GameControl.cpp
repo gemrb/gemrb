@@ -555,13 +555,13 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 
 	// Draw searchmap
 	if (DebugFlags & DEBUG_SHOW_SEARCHMAP) {
-		Sprite2D* spr = area->SearchMap->GetImage();
+		Sprite2D* spr = area->SearchMap->GetSprite2D();
 		video->BlitSprite( spr, 0, 0, true );
 		video->FreeSprite( spr );
 		Region point( p.x / 16, p.y / 12, 2, 2 );
 		video->DrawRect( point, red );
 	} else if (DebugFlags & DEBUG_SHOW_LIGHTMAP) {
-		Sprite2D* spr = area->LightMap->GetImage();
+		Sprite2D* spr = area->LightMap->GetSprite2D();
 		video->BlitSprite( spr, 0, 0, true );
 		video->FreeSprite( spr );
 		Region point( p.x / 16, p.y / 12, 2, 2 );
@@ -2858,7 +2858,7 @@ Sprite2D* GameControl::GetPortraitPreview(int pcslot)
 		return NULL;
 	}
 
-	Sprite2D* img = im->GetImage();
+	Sprite2D* img = im->GetSprite2D();
 	core->FreeInterface(im);
 
 	if (ratio == 1)

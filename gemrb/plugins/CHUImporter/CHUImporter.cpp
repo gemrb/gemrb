@@ -103,7 +103,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 		ImageMgr* mos = ( ImageMgr* )
 			gamedata->GetResource( MosFile, &ImageMgr::ID );
 		if (mos != NULL) {
-			win->SetBackGround( mos->GetImage(), true );
+			win->SetBackGround( mos->GetSprite2D(), true );
 			core->FreeInterface( mos );
 		} else
 			printMessage( "CHUImporter","Cannot Load BackGround, skipping\n",YELLOW );
@@ -229,13 +229,13 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				if ( MOSFile[0] ) {
 					ImageMgr* mos = ( ImageMgr* )
 						gamedata->GetResource( MOSFile, &ImageMgr::ID );
-					img = mos->GetImage();
+					img = mos->GetSprite2D();
 					core->FreeInterface( mos );
 				}
 				if ( MOSFile2[0] ) {
 					ImageMgr* mos = ( ImageMgr* )
 						gamedata->GetResource( MOSFile2, &ImageMgr::ID );
-					img2 = mos->GetImage();
+					img2 = mos->GetSprite2D();
 					core->FreeInterface( mos );
 				}
 				
@@ -250,7 +250,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				else {
 					ImageMgr* mos = ( ImageMgr* )
 						gamedata->GetResource( BAMFile, &ImageMgr::ID );
-					Sprite2D* img3 = mos->GetImage();
+					Sprite2D* img3 = mos->GetSprite2D();
 					pbar->SetBarCap( img3 );
 					core->FreeInterface( mos );
 				}
@@ -281,7 +281,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				sldr->Height = Height;
 				ImageMgr* mos = ( ImageMgr* )
 					gamedata->GetResource( MOSFile, &ImageMgr::ID );
-				Sprite2D* img = mos->GetImage();
+				Sprite2D* img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
 				core->FreeInterface( mos );
 
@@ -336,7 +336,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 					gamedata->GetResource( BGMos, &ImageMgr::ID );
 				Sprite2D *img = NULL;
 				if(mos) {
-					img = mos->GetImage();
+					img = mos->GetSprite2D();
 					core->FreeInterface( mos );
 				}
 

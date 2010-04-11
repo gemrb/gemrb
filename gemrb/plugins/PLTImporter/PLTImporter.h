@@ -33,7 +33,7 @@ public:
 	PLTImp(void);
 	~PLTImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	Sprite2D* GetImage();
+	Sprite2D* GetSprite2D();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
 	/** Gets a Pixel Index from the Image (not implemented) */

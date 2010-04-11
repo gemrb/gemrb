@@ -42,7 +42,7 @@ public:
 	BMPImporter(void);
 	~BMPImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	Sprite2D* GetImage();
+	Sprite2D* GetSprite2D();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
 	/** Searchmap only */

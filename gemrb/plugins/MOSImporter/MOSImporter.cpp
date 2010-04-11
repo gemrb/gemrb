@@ -99,7 +99,7 @@ bool MOSImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Sprite2D* MOSImp::GetImage()
+Sprite2D* MOSImp::GetSprite2D()
 {
 	RevColor RevCol[256];
 	unsigned char * pixels = ( unsigned char * ) malloc( Width * Height * 4 );

@@ -33,7 +33,7 @@ public:
 	ImageFactory(const char* ResRef, Sprite2D* bitmap);
 	~ImageFactory(void);
 
-	Sprite2D* GetImage() const;
+	Sprite2D* GetSprite2D() const;
 };
 
 #endif

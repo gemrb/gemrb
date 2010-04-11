@@ -90,7 +90,7 @@ MapControl::MapControl(void)
 
 	MyMap = core->GetGame()->GetCurrentArea();
 	if (MyMap->SmallMap)
-		MapMOS = MyMap->SmallMap->GetImage();
+		MapMOS = MyMap->SmallMap->GetSprite2D();
 	else
 		MapMOS = NULL;
 }

@@ -244,7 +244,7 @@ void BMPImporter::Read4To4(void *rpixels)
 	}
 }
 
-Sprite2D* BMPImporter::GetImage()
+Sprite2D* BMPImporter::GetSprite2D()
 {
 	Sprite2D* spr = NULL;
 	if (BitCount == 24) {

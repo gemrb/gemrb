@@ -36,6 +36,6 @@ ImageMgr::~ImageMgr(void)
 
 ImageFactory* ImageMgr::GetImageFactory(const char* ResRef)
 {
-	ImageFactory* fact = new ImageFactory( ResRef, GetImage() );
+	ImageFactory* fact = new ImageFactory( ResRef, GetSprite2D() );
 	return fact;
 }

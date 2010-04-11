@@ -79,7 +79,7 @@ bool PLTImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Sprite2D* PLTImp::GetImage()
+Sprite2D* PLTImp::GetSprite2D()
 {
 	for (int i = 0; i < 8; i++) {
 		if (Palettes[i])

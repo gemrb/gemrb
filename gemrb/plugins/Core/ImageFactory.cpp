@@ -36,7 +36,7 @@ ImageFactory::~ImageFactory(void)
 	core->GetVideoDriver()->FreeSprite( bitmap );
 }
 
-Sprite2D* ImageFactory::GetImage() const
+Sprite2D* ImageFactory::GetSprite2D() const
 {
 	bitmap->RefCount++;
 	return bitmap;
