@@ -95,8 +95,8 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 			if (!anim && tile->tileIndex) {
 				anim = tile->anim[0];
 			}
-			vid->BlitSprite( anim->NextFrame(), viewport.x + ( x * 64 ),
-				viewport.y + ( y * 64 ), false, &viewport );
+			vid->BlitTile( anim->NextFrame(), 0, viewport.x + ( x * 64 ),
+				viewport.y + ( y * 64 ), &viewport, false );
 			if (!tile->om || tile->tileIndex) {
 				continue;
 			}
@@ -109,29 +109,24 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 					Tile *ovtile = ov->tiles[0]; //allow only 1x1 tiles now
 					if (tile->om & mask) {
 						if (RedrawTile) {
-							vid->BlitSprite( ovtile->anim[0]->NextFrame(),
-								viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-								false, &viewport );
+							vid->BlitTile( ovtile->anim[0]->NextFrame(),
+						                   tile->anim[0]->NextFrame(),
+							               viewport.x + ( x * 64 ),
+							               viewport.y + ( y * 64 ),
+							               &viewport, false );
 						} else {
-							vid->BlitSpriteHalfTrans( ovtile->anim[0]->NextFrame(),
-								viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-								false, &viewport );
+							Sprite2D* mask = 0;
+							if (tile->anim[1])
+								mask = tile->anim[1]->NextFrame();
+							vid->BlitTile( ovtile->anim[0]->NextFrame(),
+						                   mask,
+							               viewport.x + ( x * 64 ),
+							               viewport.y + ( y * 64 ),
+							               &viewport, true );
 						}
 					}
 				}
 				mask<<=1;
-			}
-
-			//original frame should be drawn over it
-			if (tile->anim[1]) {
-				vid->BlitSprite( tile->anim[1]->NextFrame(),
-					viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-					false, &viewport );
-			} else if (RedrawTile) {
-				//bg1 redraws the original frame
-				vid->BlitSprite( tile->anim[0]->NextFrame(),
-					viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-					false, &viewport );
 			}
 		}
 	}

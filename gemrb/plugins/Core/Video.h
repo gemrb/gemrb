@@ -105,10 +105,8 @@ public:
 	virtual bool SupportsBAMSprites() { return false; }
 	virtual void FreeSprite(Sprite2D* &spr) = 0;
 	virtual Sprite2D* DuplicateSprite(Sprite2D* spr) = 0;
+	virtual void BlitTile(Sprite2D* spr, Sprite2D* mask, int x, int y, Region* clip, bool trans) = 0;
 	virtual void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
-		Region* clip = NULL) = 0;
-	virtual void BlitSpriteHalfTrans(Sprite2D* spr, int x, int y,
-		bool anchor = false,
 		Region* clip = NULL) = 0;
 
 	// Note: BlitSpriteRegion's clip region is shifted by Viewport.x/y if

@@ -28,6 +28,9 @@
 #include "../Core/Audio.h"
 #include "../Core/Palette.h"
 #include "../Core/AnimationFactory.h"
+#include "../Core/Game.h"
+
+#include "TileRenderer.inl"
 
 SDLVideoDriver::SDLVideoDriver(void)
 {
@@ -563,7 +566,7 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 	spr->vptr = p;
 	spr->pixels = pixels;
 	if (cK) {
-		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY | SDL_RLEACCEL, index );
+		SDL_SetColorKey( ( SDL_Surface * ) p, SDL_SRCCOLORKEY, index );
 	}
 	spr->Width = w;
 	spr->Height = h;
@@ -839,6 +842,99 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 	}
 }
 
+void SDLVideoDriver::BlitTile(Sprite2D* spr, Sprite2D* mask, int x, int y, Region* clip, bool trans)
+{
+	if (spr->BAM) {
+		printMessage( "SDLVideo", "Tile blit not supported for this sprite\n", LIGHT_RED );
+		return;
+	}
+
+	x -= Viewport.x;
+	y -= Viewport.y;
+
+	int clipx, clipy, clipw, cliph;
+	if (clip) {
+		clipx = clip->x;
+		clipy = clip->y;
+		clipw = clip->w;
+		cliph = clip->h;
+	} else {
+		clipx = 0;
+		clipy = 0;
+		clipw = backBuf->w;
+		cliph = backBuf->h;
+	}
+
+	int rx = 0,ry = 0;
+	int w = 64,h = 64;
+
+	if (x < clipx) {
+		rx += (clipx - x);
+		w -= (clipx - x);
+	}
+	if (y < clipy) {
+		ry += (clipy - y);
+		h -= (clipy - y);
+	}
+	if (x + w > clipx + clipw)
+		w -= (x + w - clipx - clipw);
+	if (y + h > clipy + cliph)
+		h -= (y + h - clipy - cliph);
+
+	const Uint8* data = (Uint8*) (( SDL_Surface * ) spr->vptr)->pixels;
+	const SDL_Color* pal = (( SDL_Surface * ) spr->vptr)->format->palette->colors;
+
+	const Uint8* mask_data = 0;
+	Uint8 ck = 0;
+	if (mask) {
+		mask_data = (Uint8*) (( SDL_Surface * ) mask->vptr)->pixels;
+		ck = (( SDL_Surface * ) mask->vptr)->format->colorkey;
+	}
+
+	bool tint = false;
+	Color tintcol = {0,0,0,0};
+
+	if (core->GetGame()) {
+		const Color* totint = core->GetGame()->GetGlobalTint();
+		if (totint) {
+			tintcol = *totint;
+			tint = true;
+		}
+	}
+
+#define DO_BLIT \
+		if (backBuf->format->BytesPerPixel == 4) \
+			BlitTile_internal<Uint32>(backBuf, x, y, rx, ry, w, h, data, pal, mask_data, ck, T, B); \
+		else \
+			BlitTile_internal<Uint16>(backBuf, x, y, rx, ry, w, h, data, pal, mask_data, ck, T, B); \
+
+
+	if (trans) {
+		TRBlender_HalfTrans B(backBuf->format);
+
+		if (tint) {
+			TRTinter_Tint T(tintcol);
+			DO_BLIT
+		} else {
+			TRTinter_NoTint T;
+			DO_BLIT
+		}
+	} else {
+		TRBlender_Opaque B(backBuf->format);
+
+		if (tint) {
+			TRTinter_Tint T(tintcol);
+			DO_BLIT
+		} else {
+			TRTinter_NoTint T;
+			DO_BLIT
+		}
+	}
+
+#undef DO_BLIT
+
+}
+
 
 void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 	Region* clip)
@@ -967,22 +1063,6 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 #undef USE_PALETTE
 
 		SDL_UnlockSurface(backBuf);
-	}
-}
-
-void SDLVideoDriver::BlitSpriteHalfTrans(Sprite2D* spr, int x, int y,
-										 bool anchor, Region* clip)
-{
-	if (!spr->vptr) return;
-
-	if (!spr->BAM) {
-		SDL_Surface* surf = ( SDL_Surface * ) spr->vptr;
-		SDL_SetAlpha(surf, SDL_SRCALPHA | SDL_RLEACCEL, 128);
-		BlitSprite(spr, x, y, anchor, clip);
-		SDL_SetAlpha(surf, SDL_RLEACCEL, 0);
-	} else {
-		printMessage( "SDLVideo", "HalfTrans blit not supported for this sprite\n", LIGHT_RED );
-
 	}
 }
 

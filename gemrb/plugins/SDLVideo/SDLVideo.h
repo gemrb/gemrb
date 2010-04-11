@@ -80,10 +80,9 @@ public:
 	bool SupportsBAMSprites() { return true; }
 	void FreeSprite(Sprite2D* &spr);
 	Sprite2D* DuplicateSprite(Sprite2D* spr);
+	void BlitTile(Sprite2D* spr, Sprite2D* mask, int x, int y, Region* clip, bool trans);
 	void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
 		Region* clip = NULL);
-	void BlitSpriteHalfTrans(Sprite2D* spr, int x, int y,
-		bool anchor = false, Region* clip = NULL);
 	void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
 		bool anchor = true, Region* clip = NULL);
 	void BlitGameSprite(Sprite2D* spr, int x, int y,
