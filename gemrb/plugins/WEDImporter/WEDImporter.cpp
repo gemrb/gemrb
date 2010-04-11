@@ -211,8 +211,6 @@ void WEDImp::SetupOpenDoor(unsigned int &index, unsigned int &count)
 ieWord* WEDImp::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 {
 	ieWord DoorClosed, DoorTileStart, DoorTileCount, * DoorTiles;
-//	ieWord OpenPolyCount, ClosedPolyCount;
-//	ieDword OpenPolyOffset, ClosedPolyOffset;
 	ieResRef Name;
 	unsigned int i;
 
