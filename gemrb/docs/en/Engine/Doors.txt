@@ -29,7 +29,7 @@ typedef struct {
   short countblockopen;      //count of open impeded blocks
   short countblockclose;     //count of closed impeded blocks
   long firstblockclose;      //first closed impeded blocks (for searchmap)
-  long unknown54;           
+  long unknown54;            //unused in tob
   char openres[8];           //opening sound resource reference
   char closeres[8];          //closing sound resource reference
   long cursortype;           //mouse cursor type (when mouse is over the door polygon)
@@ -87,9 +87,9 @@ Value          Meaning if set
 0x00000002 -   The door is locked, the lock difficulty must be set to nonzero to have this any effect.
 0x00000004 -   The script isn't removed when it is triggered.
 0x00000008 -   The trap (script) is detectable (fair to set it for real traps).
-0x00000010 -   ?
-0x00000020 -   ?
-0x00000040 -   ?
+0x00000010 -   Broken?
+0x00000020 -   Can't close?
+0x00000040 -   An info trigger is linked to this door.
 0x00000080 -   Secret door
 0x00000100 -   Secret door already found (purple outline)
 0x00000200 -   The impeded doors are ignored concerning vision (door is transparent)

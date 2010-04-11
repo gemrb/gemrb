@@ -477,7 +477,7 @@ public:
 	ieDword LockDifficulty; //this is a dword?
 	ieStrRef OpenStrRef;
 	ieStrRef NameStrRef;
-	ieDword  Unknown54;     //not known yet
+	ieDword  Unknown54;     //unused in tob
 private:
 	void SetWallgroups(int count, int value);
 	void ImpedeBlocks(int count, Point *points, unsigned int value);
