@@ -342,7 +342,7 @@ Map::~Map(void)
 	delete LightMap;
 	delete SearchMap;
 	delete HeightMap;
-	core->FreeInterface( SmallMap );
+	core->GetVideoDriver()->FreeSprite( SmallMap );
 	for (i = 0; i < QUEUE_COUNT; i++) {
 		free(queue[i]);
 		queue[i] = NULL;
@@ -388,11 +388,12 @@ Map::~Map(void)
 void Map::ChangeTileMap(ImageMgr* lm, ImageMgr* sm)
 {
 	delete LightMap;
-	delete SmallMap;
+	core->GetVideoDriver()->FreeSprite(SmallMap);
 
 	LightMap = lm->GetImage();
 	core->FreeInterface(lm);
-	SmallMap = sm;
+	SmallMap = sm->GetSprite2D();
+	core->FreeInterface(sm);
 
 	TMap->UpdateDoors();
 }
@@ -402,11 +403,13 @@ void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, Imag
 	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
 	TMap = tm;
 	LightMap = lm->GetImage();
+	core->FreeInterface(lm);
 	SearchMap = sr->GetBitmap();
 	core->FreeInterface(sr);
 	HeightMap = hm->GetBitmap();
 	core->FreeInterface(hm);
-	SmallMap = sm;
+	SmallMap = sm->GetSprite2D();
+	core->FreeInterface(sm);
 	Width = (unsigned int) (TMap->XCellCount * 4);
 	Height = (unsigned int) (( TMap->YCellCount * 64 ) / 12);
 	//Filling Matrices

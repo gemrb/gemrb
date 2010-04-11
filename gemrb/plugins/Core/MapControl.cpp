@@ -89,9 +89,10 @@ MapControl::MapControl(void)
 	ResetEventHandler( MapControlOnDoublePress );
 
 	MyMap = core->GetGame()->GetCurrentArea();
-	if (MyMap->SmallMap)
-		MapMOS = MyMap->SmallMap->GetSprite2D();
-	else
+	if (MyMap->SmallMap) {
+		MapMOS = MyMap->SmallMap;
+		MapMOS->RefCount++;
+	} else
 		MapMOS = NULL;
 }
 

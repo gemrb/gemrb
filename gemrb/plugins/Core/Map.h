@@ -222,7 +222,7 @@ public:
 	Image* LightMap;
 	Bitmap* SearchMap;
 	Bitmap* HeightMap;
-	ImageMgr* SmallMap;
+	Sprite2D* SmallMap;
 	IniSpawn *INISpawn;
 	ieDword AreaFlags;
 	ieWord AreaType;
