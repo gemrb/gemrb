@@ -4155,10 +4155,10 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 		return;
 	}
 	if (shift == 15) {
-		value = 0;
-		for (index=0;index<4;index++) {
-			value |= gradient<<=8;
-		}
+		// put gradient in all four bytes of value
+		value = gradient;
+		value |= (value << 8);
+		value |= (value << 16);
 		for (index=0;index<7;index++) {
 			Modified[IE_COLORS+index] = value;
 		}
