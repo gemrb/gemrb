@@ -18,6 +18,8 @@
  *
  */
 
+#include <cmath>
+
 #include "../../includes/win32def.h"
 #include "Video.h"
 #include "Palette.h"
@@ -27,6 +29,12 @@
 Video::Video(void)
 {
 	Evnt = NULL;
+
+	// Initialize gamma correction tables
+	for (int i = 0; i < 256; i++) {
+		Gamma22toGamma10[i] = (unsigned char)(0.5 + (std::pow (i/255.0, 2.2/1.0) * 255.0));
+		Gamma10toGamma22[i] = (unsigned char)(0.5 + (std::pow (i/255.0, 1.0/2.2) * 255.0));
+	}
 }
 
 Video::~Video(void)
@@ -161,17 +169,17 @@ Color Video::SpriteGetPixelSum(Sprite2D* sprite, unsigned short xbase, unsigned 
 	for (unsigned int x = 0; x < ratio; x++) {
 		for (unsigned int y = 0; y < ratio; y++) {
 			Color c = sprite->GetPixel( xbase*ratio+x, ybase*ratio+y );
-			r += c.r;
-			g += c.g;
-			b += c.b;
-			a += c.a;
+			r += Gamma22toGamma10[c.r];
+			g += Gamma22toGamma10[c.g];
+			b += Gamma22toGamma10[c.b];
+			a += Gamma22toGamma10[c.a];
 		}
 	}
 
-	sum.r = r / count;
-	sum.g = g / count;
-	sum.b = b / count;
-	sum.a = a / count;
+	sum.r = Gamma10toGamma22[r / count];
+	sum.g = Gamma10toGamma22[g / count];
+	sum.b = Gamma10toGamma22[b / count];
+	sum.a = Gamma10toGamma22[a / count];
 
 	return sum;
 }
