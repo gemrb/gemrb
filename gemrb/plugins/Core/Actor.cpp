@@ -5998,7 +5998,7 @@ bool Actor::IsBehind(Actor* target)
 		diff = my_orient+i;
 		if (diff >= MAX_ORIENT) diff -= MAX_ORIENT;
 		if (diff <= -1) diff += MAX_ORIENT;
-		if (diff == tar_orient) return true;
+		if (diff == (signed)tar_orient) return true;
 	}
 	return false;
 }
