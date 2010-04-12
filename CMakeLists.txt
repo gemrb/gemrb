@@ -11,15 +11,15 @@ IF(PREFIX)
   SET(CMAKE_INSTALL_PREFIX ${PREFIX})
 ENDIF(PREFIX)
 
-if (NOT "${LAYOUT}")
+if (NOT LAYOUT)
 	if (WIN32)
 		set(LAYOUT "home")
 	else (WIN32)
 		set(LAYOUT "fhs")
 	endif (WIN32)
-endif (NOT "${LAYOUT}")
+endif (NOT LAYOUT)
 
-SET(LAYOUT CACHE STRING "Directory layout.")
+SET(LAYOUT "${LAYOUT}" CACHE STRING "Directory layout.")
 
 if (${LAYOUT} MATCHES "home")
 	IF( NOT PLUGIN_DIR )
