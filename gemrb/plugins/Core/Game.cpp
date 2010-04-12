@@ -1578,8 +1578,7 @@ void Game::DrawWeather(Region &screen, bool update)
 	if (WeatherBits&WB_HASWEATHER) {
 		return;
 	}
-	int w = area->GetWeather() | WB_HASWEATHER;
-	StartRainOrSnow(true, w);
+	StartRainOrSnow(true, area->GetWeather());
 }
 
 /* sets the weather type */
@@ -1589,7 +1588,8 @@ void Game::StartRainOrSnow(bool conditional, int w)
 		if (WeatherBits & (WB_RAIN | WB_SNOW) )
 			return;
 	}
-	WeatherBits = w;
+	// whatever was responsible for calling this, we now have some set weather
+	WeatherBits = w | WB_HASWEATHER;
 	if (w & WB_LIGHTNING) {
 		if (WeatherBits&WB_START) {
 			//already raining
