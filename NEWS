@@ -1,6 +1,7 @@
-GemRB git (b4ab52):
+GemRB git (930101a):
   New features:
     - 
+    - tinting for different times of the day and weather effects
     - a BI(n)K player plugin for the IWD2 movies
     - new actions
 
@@ -8,7 +9,7 @@ GemRB git (b4ab52):
     - 
     - the design of some internals was cleaned up
     - magic missiles are now drawn properly
-    - various guiscripts,
+    - various guiscripts (no more flickering!)
     - bugfixes
 
   Applied patches:
