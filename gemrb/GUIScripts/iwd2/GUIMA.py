@@ -103,7 +103,7 @@ def ShowMap ():
 	OptionsWindow = GemRB.LoadWindowObject (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "ShowMap")
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
+	PortraitWindow = OpenPortraitWindow ()
 	OptionsWindow.SetFrame ()
 
 	# World Map
@@ -194,6 +194,10 @@ def OpenMapWindow ():
 	OptionsWindow.SetVisible(WINDOW_VISIBLE)
 	PortraitWindow.SetVisible(WINDOW_VISIBLE)
 	Window.SetVisible(WINDOW_VISIBLE)
+
+	# 'None' is assumed to return to game, so until someone fixes the SelectionChangeHandler..
+	# (test this by switching a few times between map screen and e.g. inventory)
+	SetSelectionChangeHandler(lambda: None)
 
 def LeftDoublePressMap ():
 	OpenMapWindow()
@@ -312,6 +316,9 @@ def ChangeTooltip ():
 
 def CloseWorldMapWindow ():
 	global WorldMapWindow, WorldMapControl
+	global OldPortraitWindow, OldOptionsWindow
+
+	assert CloseOtherWindow (CloseWorldMapWindow)
 
 	if WorldMapWindow:
 		WorldMapWindow.Unload ()
@@ -321,6 +328,10 @@ def CloseWorldMapWindow ():
 		OptionsWindow.Unload ()
 	WorldMapWindow = None
 	WorldMapControl = None
+	GUICommonWindows.PortraitWindow = OldPortraitWindow
+	OldPortraitWindow = None
+	GUICommonWindows.OptionsWindow = OldOptionsWindow
+	OldOptionsWindow = None
 	GemRB.SetVar ("OtherWindow", -1)
 	GemRB.SetVisible (0, WINDOW_VISIBLE)
 	GemRB.UnhideGUI ()
@@ -328,9 +339,10 @@ def CloseWorldMapWindow ():
 
 def WorldMapWindowCommon (Travel):
 	global WorldMapWindow, WorldMapControl
+	global OptionsWindow, PortraitWindow
+	global OldPortraitWindow, OldOptionsWindow
 
-	if WorldMapWindow:
-		CloseWorldMapWindow ()
+	if CloseOtherWindow (CloseWorldMapWindow):
 		return
 
 	GemRB.HideGUI ()
@@ -338,6 +350,16 @@ def WorldMapWindowCommon (Travel):
 
 	GemRB.LoadWindowPack ("GUIWMAP",800, 600)
 	WorldMapWindow = Window = GemRB.LoadWindowObject (2)
+
+	#(fuzzie just copied this from the map window code..)
+	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)
+	#saving the original portrait window
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow ()
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
+	OptionsWindow = GemRB.LoadWindowObject (0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenMapWindow")
+	OptionsWindow.SetFrame ()
 
 	Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "infofont")
 	WorldMapControl = Window.GetControl (4)
