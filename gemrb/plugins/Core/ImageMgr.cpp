@@ -76,6 +76,13 @@ Image* ImageMgr::GetImage()
 	return data;
 }
 
+void ImageMgr::GetPalette(int /*colors*/, Color* /*pal*/)
+{
+	printMessage("ImageMgr", "Can't get non-existant palette from ", WHITE);
+	printf("%s... ", str->filename);
+	printStatus("ERROR", LIGHT_RED);
+}
+
 ImageFactory* ImageMgr::GetImageFactory(const char* ResRef)
 {
 	ImageFactory* fact = new ImageFactory( ResRef, GetSprite2D() );

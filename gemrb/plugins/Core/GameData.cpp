@@ -256,7 +256,7 @@ Palette *GameData::GetPalette(const ieResRef resname)
 	}
 
 	palette = new Palette();
-	im->GetPalette(0,256,palette->col);
+	im->GetPalette(256,palette->col);
 	core->FreeInterface( im );
 	palette->named=true;
 	PaletteCache.SetAt(resname, (void *) palette);

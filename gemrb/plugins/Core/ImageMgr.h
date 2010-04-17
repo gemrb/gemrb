@@ -44,8 +44,16 @@ public:
 	virtual Sprite2D* GetSprite2D() = 0;
 	virtual Image* GetImage();
 	virtual Bitmap* GetBitmap();
-	/** No descriptions */
-	virtual void GetPalette(int index, int colors, Color* pal) = 0;
+	/**
+	 * Returns image palette.
+	 *
+	 * @param[in] colors Number of colors to return.
+	 * @param[out] pal Array to fill with colors.
+	 *
+	 * This does nothing if there is no palette.
+	 */
+	virtual void GetPalette(int colors, Color* pal);
+	/** Returns the width of the image */
 	virtual int GetWidth() = 0;
 	/** Returns the height of the image */
 	virtual int GetHeight() = 0;

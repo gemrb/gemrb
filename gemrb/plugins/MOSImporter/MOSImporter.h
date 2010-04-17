@@ -32,8 +32,6 @@ public:
 	~MOSImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Sprite2D* GetSprite2D();
-	/** No descriptions */
-	void GetPalette(int index, int colors, Color* pal);
 	int GetWidth() { return (int) Width; }
 	int GetHeight() { return (int) Height; }
 public:

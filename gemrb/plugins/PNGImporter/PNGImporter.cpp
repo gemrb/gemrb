@@ -177,7 +177,7 @@ Sprite2D* PNGImp::GetSprite2D()
 
 	if (hasPalette) {
 		Color* pal = 0;
-		GetPalette(0, 256, pal);
+		GetPalette(256, pal);
 		// TODO: colorkey
 		spr = core->GetVideoDriver()->CreateSprite8(Width, Height, 8,
 													buffer, pal, false, 0);
@@ -191,27 +191,26 @@ Sprite2D* PNGImp::GetSprite2D()
 	return spr;
 }
 
+void PNGImp::GetPalette(int colors, Color* pal)
+{
+	if (!hasPalette) {
+		ImageMgr::GetPalette(colors, pal);
+		return;
+	}
+
+	png_color* palette;
+	int num_palette;
+	png_get_PLTE(inf->png_ptr, inf->info_ptr, &palette, &num_palette);
+	for (int i = 0; i < colors; i++) {
+		pal[i].r = palette[i%num_palette].red;
+		pal[i].g = palette[i%num_palette].green;
+		pal[i].b = palette[i%num_palette].blue;
+		pal[i].a = 0xff;
+	}
+}
+
 #include "../../includes/plugindef.h"
 
 GEMRB_PLUGIN(0x11C3EB12, "PNG File Importer")
 PLUGIN_IE_RESOURCE(&ImageMgr::ID, PNGImp, ".png", (ieWord)IE_PNG_CLASS_ID)
 END_PLUGIN()
-/** No descriptions */
-void PNGImp::GetPalette(int index, int colors, Color* pal)
-{
-	if (!hasPalette) {
-		// TODO: interpret pixel values as palette entries
-		// (or move that functionality elsewhere)
-	} else {
-		png_color* palette;
-		int num_palette;
-		png_get_PLTE(inf->png_ptr, inf->info_ptr, &palette, &num_palette);
-		int p = index;
-		for (int i = 0; i < colors && p+i < num_palette; i++) {
-			pal[i].r = palette[p].red;
-			pal[i].g = palette[p].green;
-			pal[i].b = palette[p++].blue;
-			pal[i].a = 0xff;
-		}
-	}
-}

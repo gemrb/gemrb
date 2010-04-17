@@ -244,29 +244,19 @@ Sprite2D* BMPImporter::GetSprite2D()
 	}
 	return spr;
 }
-/** No descriptions */
-void BMPImporter::GetPalette(int index, int colors, Color* pal)
+
+void BMPImporter::GetPalette(int colors, Color* pal)
 {
-	if ((unsigned int) index>=Height) {
-		index = 0;
+	if (BitCount > 8) {
+		ImageMgr::GetPalette(colors, pal);
+		return;
 	}
-	if (BitCount == 24) {
-		unsigned char * p = ( unsigned char * ) pixels;
-		p += PaddedRowLength * index;
-		for (int i = 0; i < colors; i++) {
-			pal[i].b = *p++;
-			pal[i].g = *p++;
-			pal[i].r = *p++;
-			pal[i].a = 0xff;
-		}
-	} else if (BitCount == 8) {
-		int p = index;
-		for (int i = 0; i < colors; i++) {
-			pal[i].r = Palette[p].r;
-			pal[i].g = Palette[p].g;
-			pal[i].b = Palette[p++].b;
-			pal[i].a = 0xff;
-		}
+
+	for (int i = 0; i < colors; i++) {
+		pal[i].r = Palette[i%NumColors].r;
+		pal[i].g = Palette[i%NumColors].g;
+		pal[i].b = Palette[i%NumColors].b;
+		pal[i].a = 0xff;
 	}
 }
 

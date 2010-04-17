@@ -157,7 +157,3 @@ Sprite2D* MOSImp::GetSprite2D()
 GEMRB_PLUGIN(0x167B73E, "MOS File Importer")
 PLUGIN_IE_RESOURCE(&ImageMgr::ID, MOSImp, ".mos", (ieWord)IE_MOS_CLASS_ID)
 END_PLUGIN()
-/** No descriptions */
-void MOSImp::GetPalette(int /*index*/, int /*colors*/, Color* /*pal*/)
-{
-}
