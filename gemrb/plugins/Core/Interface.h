@@ -78,6 +78,7 @@ class Palette;
 class ProjectileServer;
 class Calendar;
 class Plugin;
+class Image;
 
 struct Symbol {
 	SymbolMgr * sm;
@@ -237,9 +238,9 @@ private:
 	Audio * AudioDriver ;
 	ProjectileServer * projserv;
 	GameData * gamedata;
-	ImageMgr * pal256;
-	ImageMgr * pal32;
-	ImageMgr * pal16;
+	Image * pal256;
+	Image * pal32;
+	Image * pal16;
 	std::vector<Font*> fonts;
 	EventMgr * evntmgr;
 	WindowMgr * windowmgr;
@@ -351,7 +352,7 @@ public:
 	/* sets the floattext color */
 	void SetInfoTextColor(Color &color);
 	/** returns a gradient set */
-	Color * GetPalette(int index, int colors, Color *buffer) const;
+	Color * GetPalette(unsigned index, int colors, Color *buffer) const;
 	/** Returns a preloaded Font */
 	Font * GetFont(const char *) const;
 	Font * GetFont(unsigned int index) const;

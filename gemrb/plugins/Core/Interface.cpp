@@ -378,9 +378,9 @@ Interface::~Interface(void)
 
 	delete console;
 
-	FreeInterface( pal256 );
-	FreeInterface( pal32 );
-	FreeInterface( pal16 );
+	delete pal256;
+	delete pal32;
+	delete pal16;
 
 	delete timer;
 
@@ -1407,11 +1407,19 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 	strings->Open( fs, true );
 
-	printMessage( "Core", "Loading Palettes...\n", WHITE );
-	pal16 = ( ImageMgr * ) gamedata->GetResource( Palette16, &ImageMgr::ID );
-	pal32 = ( ImageMgr * ) gamedata->GetResource( Palette32, &ImageMgr::ID );
-	pal256 = ( ImageMgr * ) gamedata->GetResource( Palette256, &ImageMgr::ID );
-	printMessage( "Core", "Palettes Loaded\n", WHITE );
+	{
+		printMessage( "Core", "Loading Palettes...\n", WHITE );
+		ImageMgr *im =( ImageMgr * ) gamedata->GetResource( Palette16, &ImageMgr::ID );
+		pal16 = im->GetImage();
+		FreeInterface(im);
+		im = ( ImageMgr * ) gamedata->GetResource( Palette32, &ImageMgr::ID );
+		pal32 = im->GetImage();
+		FreeInterface(im);
+		im = ( ImageMgr * ) gamedata->GetResource( Palette256, &ImageMgr::ID );
+		pal256 = im->GetImage();
+		FreeInterface(im);
+		printMessage( "Core", "Palettes Loaded\n", WHITE );
+	}
 
 	if (!IsAvailable( IE_BAM_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -2394,14 +2402,23 @@ Palette* Interface::CreatePalette(const Color &color, const Color &back)
 }
 
 /** No descriptions */
-Color* Interface::GetPalette(int index, int colors, Color *pal) const
+Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
 {
+	Image *img;
 	if (colors == 32) {
-		pal32->GetPalette( index, colors, pal );
+		img = pal32;
 	} else if (colors <= 32) {
-		pal16->GetPalette( index, colors, pal );
+		img = pal16;
 	} else if (colors == 256) {
-		pal256->GetPalette( index, colors, pal );
+		img = pal256;
+	} else {
+		return pal;
+	}
+	if (index >= img->GetHeight()) {
+		index = 0;
+	}
+	for (int i = 0; i < colors; i++) {
+		pal[i] = img->GetPixel(i, index);
 	}
 	return pal;
 }
