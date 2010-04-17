@@ -188,8 +188,7 @@ bool BMPImporter::Open(DataStream* stream, bool autoFree)
 			src += PaddedRowLength;
 		}
 	} else if (BitCount == 4) {
-		Read4To8(rpixels); // FIXME: This is only needed for searchmap: we should really create a seperate representation.
-		//Read4To4(rpixels);
+		Read4To8(rpixels);
 	}
 	free( rpixels );
 	return true;
@@ -210,8 +209,6 @@ void BMPImporter::Read8To8(void *rpixels)
 
 void BMPImporter::Read4To8(void *rpixels)
 {
-	//converting it up to 8 bits, because we'll use it as
-	//whole byte (searchmap)
 	BitCount = 8;
 	pixels = malloc( Width * Height );
 	unsigned char * dest = ( unsigned char * ) pixels;
@@ -230,20 +227,6 @@ void BMPImporter::Read4To8(void *rpixels)
 	}
 }
 
-void BMPImporter::Read4To4(void *rpixels)
-{
-	int size = PaddedRowLength * Height;
-	pixels = malloc( size );
-	unsigned char * dest = ( unsigned char * ) pixels;
-	dest += size;
-	unsigned char * src = ( unsigned char * ) rpixels;
-	for (int i = Height; i; i--) {
-		dest -= PaddedRowLength;
-		memcpy( dest, src, PaddedRowLength );
-		src += PaddedRowLength;
-	}
-}
-
 Sprite2D* BMPImporter::GetSprite2D()
 {
 	Sprite2D* spr = NULL;
@@ -258,26 +241,6 @@ Sprite2D* BMPImporter::GetSprite2D()
 		memcpy( p, pixels, Width * Height );
 		spr = core->GetVideoDriver()->CreateSprite8( Width, Height, NumColors==16?4:8,
 			p, Palette, true, 0 );
-	} else if (BitCount == 4) {
-		void* p = malloc( Width* Height );
-		unsigned char * dst = ( unsigned char * ) p;
-		for (unsigned int y = 0; y < Height; y++) {
-			unsigned char * src = ( unsigned char * ) pixels +
-				( PaddedRowLength * y );
-			for (unsigned int x = 0; x < Width; x++) {
-				*dst = ( *src >> 4 );
-				dst++;
-				if (x == ( Width - 1 ))
-					if (!( Width & 1 ))
-						continue;
-				*dst = ( *src & 0x0f );
-				dst++;
-				src++;
-				x++;
-			}
-		}
-		spr = core->GetVideoDriver()->CreateSprite8( Width, Height, 4,
-			p, Palette, false );
 	}
 	return spr;
 }
@@ -313,18 +276,6 @@ Bitmap* BMPImporter::GetBitmap()
 
 	unsigned char *p = ( unsigned char * ) pixels;
 	switch (BitCount) {
-	case 4:
-		for (unsigned int y = 0; y < Height; y++) {
-			for (unsigned int x = 0; x < Width; x++) {
-				unsigned char ret = p[PaddedRowLength * y + (x >> 1)];
-				if (x & 1) {
-					data->SetAt(x,y,ret & 15);
-				} else {
-					data->SetAt(x,y,( ret >> 4 ) & 15);
-				}
-			}
-		}
-		break;
 	case 8:
 		for (unsigned int y = 0; y < Height; y++) {
 			for (unsigned int x = 0; x < Width; x++) {

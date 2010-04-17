@@ -143,7 +143,6 @@ public:
 private:
 	void Read8To8(void *rpixels);
 	void Read4To8(void *rpixels);
-	void Read4To4(void *rpixels);
 public:
 	void release(void)
 	{
