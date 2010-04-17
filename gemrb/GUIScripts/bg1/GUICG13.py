@@ -81,6 +81,7 @@ def OnLoad():
 		MajorColor=PortraitTable.GetValue(PortraitIndex,4)
 
 	PDollButton = ColorWindow.GetControl(1)
+	PDollButton.SetState (IE_GUI_BUTTON_LOCKED)
 	PDollButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
 
 	HairButton = ColorWindow.GetControl(2)
