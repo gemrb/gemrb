@@ -83,7 +83,7 @@ endif (${LAYOUT} MATCHES "home")
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -W -Wpointer-arith -Wcast-align")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ansi -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing")
 	# only export symbols explicitly marked to be exported.
 	INCLUDE(CheckCXXCompilerFlag)
 	CHECK_CXX_COMPILER_FLAG("-fvisibility=hidden" VISIBILITY_HIDDEN)

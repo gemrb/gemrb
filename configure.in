@@ -196,7 +196,7 @@ AC_STRUCT_TM
 AC_TYPE_SIZE_T
 
 CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATADIR=\\\"\$(moddir)\\\" -DPLUGINDIR=\\\"\$(plugindir)\\\""
-CXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wpointer-arith -Wcast-align -ansi -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing"
+CXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wpointer-arith -Wcast-align -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing"
 
 # only export symbols explicitly marked to be exported
 CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
