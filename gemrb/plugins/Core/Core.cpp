@@ -35,7 +35,7 @@
 #include <string.h>
 #include <stdlib.h>
 #else
-#include <windows.h>
+#include "../../includes/win32def.h"
 #include <sys\stat.h>
 #ifdef _DEBUG
 #include <stdlib.h>
