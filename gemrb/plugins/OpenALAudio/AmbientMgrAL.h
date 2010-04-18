@@ -21,7 +21,7 @@
 #ifndef AMBIENTMGRAL_H
 #define AMBIENTMGRAL_H
 
-#include "../Core/AmbientMgr.h"
+#include "AmbientMgr.h"
 #include <vector>
 #include <string>
 #include <SDL_thread.h>

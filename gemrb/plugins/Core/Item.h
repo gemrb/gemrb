@@ -28,8 +28,8 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-#include "../../includes/exports.h"
-#include "../../includes/ie_types.h"
+#include "exports.h"
+#include "ie_types.h"
 
 #include "EffectQueue.h"
 

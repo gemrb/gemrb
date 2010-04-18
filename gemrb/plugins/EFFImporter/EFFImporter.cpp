@@ -18,8 +18,8 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../Core/Interface.h"
+#include "win32def.h"
+#include "Interface.h"
 #include "EFFImporter.h"
 
 EFFImp::EFFImp(void)
@@ -162,7 +162,7 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	return fx;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x14E81128, "EFF File Importer")
 PLUGIN_CLASS(IE_EFF_CLASS_ID, EFFImp)

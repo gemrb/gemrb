@@ -90,7 +90,7 @@ void ACMImp::rewind()
     SoundReader->rewind() ;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x1AE768FE, "ACM File Importer")
 PLUGIN_CLASS(IE_WAV_CLASS_ID, ACMImp)

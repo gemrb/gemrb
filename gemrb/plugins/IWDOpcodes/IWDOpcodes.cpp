@@ -18,18 +18,18 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../../includes/overlays.h"
-#include "../../includes/opcode_params.h"
-#include "../../includes/ie_feats.h" //cannot avoid declaring these
-#include "../Core/Actor.h"
-#include "../Core/EffectQueue.h"
-#include "../Core/Interface.h"
-#include "../Core/Game.h"
-#include "../Core/Spell.h"
-#include "../Core/damages.h"
-#include "../Core/GSUtils.h" //needs for displaystringcore
-#include "../Core/ProjectileServer.h" //needs for alter_animation
+#include "win32def.h"
+#include "overlays.h"
+#include "opcode_params.h"
+#include "ie_feats.h" //cannot avoid declaring these
+#include "Actor.h"
+#include "EffectQueue.h"
+#include "Interface.h"
+#include "Game.h"
+#include "Spell.h"
+#include "damages.h"
+#include "GSUtils.h" //needs for displaystringcore
+#include "ProjectileServer.h" //needs for alter_animation
 
 static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
 
@@ -3226,7 +3226,7 @@ int fx_rapid_shot (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x4F172B2, "Effect opcodes for the icewind branch of the games")
 RegisterIWDOpcodes();

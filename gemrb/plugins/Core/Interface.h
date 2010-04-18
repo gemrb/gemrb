@@ -26,9 +26,9 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include <map>
-#include "../../includes/SClassID.h"
+#include "SClassID.h"
 #include "Cache.h"
 #include "GlobalTimer.h"
 #include "PluginMgr.h"

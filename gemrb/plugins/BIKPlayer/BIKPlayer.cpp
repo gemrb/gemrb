@@ -31,11 +31,11 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <cstdio>
-#include "../Core/Video.h"
-#include "../Core/Audio.h"
-#include "../Core/Variables.h"
+#include "Video.h"
+#include "Audio.h"
+#include "Variables.h"
 #include "BIKPlayer.h"
-#include "../../includes/ie_types.h"
+#include "ie_types.h"
 #include "rational.h"
 #include "binkdata.h"
 
@@ -1600,7 +1600,7 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 	return 0;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x316E2EDE, "BIK Video Player")
 PLUGIN_RESOURCE(&MoviePlayer::ID, BIKPlay, ".mve")

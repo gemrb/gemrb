@@ -21,7 +21,7 @@
 #ifndef PNGIMP_H
 #define PNGIMP_H
 
-#include "../Core/ImageMgr.h"
+#include "ImageMgr.h"
 
 struct PNGInternal;
 

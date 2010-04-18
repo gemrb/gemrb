@@ -22,8 +22,8 @@
 #define P2DAIMP_H
 
 #include <cstring>
-#include "../Core/TableMgr.h"
-#include "../../includes/globals.h"
+#include "TableMgr.h"
+#include "globals.h"
 
 typedef std::vector< char*> RowEntry;
 

@@ -18,7 +18,7 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "FactoryObject.h"
 
 FactoryObject::FactoryObject(const char* name, SClass_ID SuperClassID)

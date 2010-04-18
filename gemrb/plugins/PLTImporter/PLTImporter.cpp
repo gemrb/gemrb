@@ -18,11 +18,11 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "PLTImporter.h"
-#include "../../includes/RGBAColor.h"
-#include "../Core/Interface.h"
-#include "../Core/Video.h"
+#include "RGBAColor.h"
+#include "Interface.h"
+#include "Video.h"
 
 static int pperm[8]={3,6,0,5,4,1,2,7};
 
@@ -102,7 +102,7 @@ Sprite2D* PLTImp::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 	return spr;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x8D0C64F, "PLT File Importer")
 PLUGIN_IE_RESOURCE(&PalettedImageMgr::ID, PLTImp, ".plt", (ieWord)IE_PLT_CLASS_ID)

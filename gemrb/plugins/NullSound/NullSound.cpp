@@ -18,9 +18,9 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "NullSound.h"
-#include "../Core/AmbientMgr.h"
+#include "AmbientMgr.h"
 
 NullSnd::NullSnd(void)
 {
@@ -112,7 +112,7 @@ void NullSnd::QueueBuffer(int, unsigned short, int, short*, int, int)
 
 
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x96E414D, "Null Sound Driver")
 PLUGIN_CLASS(IE_AUDIO_CLASS_ID, NullSnd)

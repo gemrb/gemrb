@@ -21,7 +21,7 @@
 #ifndef MOSIMP_H
 #define MOSIMP_H
 
-#include "../Core/ImageMgr.h"
+#include "ImageMgr.h"
 
 class MOSImp : public ImageMgr {
 private:

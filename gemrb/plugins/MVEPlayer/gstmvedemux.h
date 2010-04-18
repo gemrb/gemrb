@@ -22,8 +22,8 @@
 #ifndef __GST_MVE_DEMUX_H__
 #define __GST_MVE_DEMUX_H__
 
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
+#include "win32def.h"
+#include "globals.h"
 
 #define G_UNLIKELY(x) (x)
 #define GST_WARNING printf

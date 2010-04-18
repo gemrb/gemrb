@@ -25,8 +25,8 @@
 #include <config.h>
 #endif
 
-#include "../../includes/exports.h"
-#include "../../includes/ie_types.h"
+#include "exports.h"
+#include "ie_types.h"
 
 #define MAX_QUICKITEMSLOT   5   //pst has 5
 #define MAX_QUICKWEAPONSLOT 8   //iwd2 has 4x2

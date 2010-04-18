@@ -18,14 +18,14 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include <cassert>
 #include "TableMgr.h"
 #include "Audio.h" //pst (react to death sounds)
 #include "Actor.h"
 #include "Interface.h"
-#include "../../includes/strrefs.h"
-#include "../../includes/overlays.h"
+#include "strrefs.h"
+#include "overlays.h"
 #include "Item.h"
 #include "Spell.h"
 #include "Projectile.h"

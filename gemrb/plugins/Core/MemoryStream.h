@@ -28,8 +28,8 @@
 #ifndef MEMORYSTREAM_H
 #define MEMORYSTREAM_H
 
-#include "../../includes/exports.h"
-#include "../../includes/globals.h"
+#include "exports.h"
+#include "globals.h"
 
 /**
  * @class MemoryStream

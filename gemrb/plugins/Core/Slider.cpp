@@ -19,7 +19,7 @@
  */
 
 #include <cmath>
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "Slider.h"
 #include "Interface.h"
 #include "Video.h"

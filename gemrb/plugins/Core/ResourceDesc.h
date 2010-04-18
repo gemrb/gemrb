@@ -21,9 +21,9 @@
 #ifndef RESOURCEDESC_H
 #define RESOURCEDESC_H
 
-#include "../../includes/exports.h"
-#include "../../includes/SClassID.h"
-#include "../../includes/ie_types.h"
+#include "exports.h"
+#include "SClassID.h"
+#include "ie_types.h"
 
 class Resource;
 class DataStream;

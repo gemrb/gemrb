@@ -18,9 +18,9 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../Core/Interface.h"
-#include "../Core/EffectMgr.h"
+#include "win32def.h"
+#include "Interface.h"
+#include "EffectMgr.h"
 #include "SPLImporter.h"
 
 SPLImp::SPLImp(void)
@@ -181,7 +181,7 @@ void SPLImp::GetFeature(Spell *s, Effect *fx)
 	core->FreeInterface( eM );
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0xA8D1014, "SPL File Importer")
 PLUGIN_CLASS(IE_SPL_CLASS_ID, SPLImp)

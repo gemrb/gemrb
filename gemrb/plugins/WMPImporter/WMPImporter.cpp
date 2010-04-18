@@ -18,9 +18,9 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../Core/Interface.h"
-#include "../Core/ImageMgr.h"
+#include "win32def.h"
+#include "Interface.h"
+#include "ImageMgr.h"
 #include "WMPImporter.h"
 
 WMPImp::WMPImp(void)
@@ -315,7 +315,7 @@ int WMPImp::PutMaps(DataStream *stream, WorldMapArray *wmap)
 	return 0;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x77918C6, "WMP File Importer")
 PLUGIN_CLASS(IE_WMP_CLASS_ID, WMPImp)

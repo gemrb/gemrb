@@ -23,8 +23,8 @@ class Map;
 #ifndef MAP_H
 #define MAP_H
 
-#include "../../includes/exports.h"
-#include "../../includes/globals.h"
+#include "exports.h"
+#include "globals.h"
 #include "ActorBlock.h"
 #include "IniSpawn.h"
 #include "SpriteCover.h"

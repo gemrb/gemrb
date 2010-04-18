@@ -18,19 +18,19 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "CHUImporter.h"
-#include "../Core/Interface.h"
-#include "../Core/Button.h"
-#include "../Core/Label.h"
-#include "../Core/Progressbar.h"
-#include "../Core/Slider.h"
-#include "../Core/ScrollBar.h"
-#include "../Core/TextArea.h"
-#include "../Core/TextEdit.h"
-#include "../Core/AnimationFactory.h"
-#include "../Core/ImageMgr.h"
-#include "../../includes/RGBAColor.h"
+#include "Interface.h"
+#include "Button.h"
+#include "Label.h"
+#include "Progressbar.h"
+#include "Slider.h"
+#include "ScrollBar.h"
+#include "TextArea.h"
+#include "TextEdit.h"
+#include "AnimationFactory.h"
+#include "ImageMgr.h"
+#include "RGBAColor.h"
 
 CHUImp::CHUImp()
 {
@@ -506,7 +506,7 @@ unsigned int CHUImp::GetWindowsCount()
 	return WindowCount;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x23A7F6CA, "CHU File Importer")
 PLUGIN_CLASS(IE_CHU_CLASS_ID, CHUImp)

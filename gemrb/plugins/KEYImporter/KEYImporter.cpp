@@ -18,13 +18,13 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "KEYImporter.h"
-#include "../../includes/globals.h"
-#include "../Core/FileStream.h"
-#include "../Core/Interface.h"
-#include "../Core/ArchiveImporter.h"
-#include "../Core/ResourceDesc.h"
+#include "globals.h"
+#include "FileStream.h"
+#include "Interface.h"
+#include "ArchiveImporter.h"
+#include "ResourceDesc.h"
 #ifndef WIN32
 #include <unistd.h>
 #endif
@@ -296,7 +296,7 @@ DataStream* KEYImporter::GetResource(const char* resname, const ResourceDesc &ty
 	return GetStream(resname, type.GetKeyType());
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x1DFDEF80, "KEY File Importer")
 PLUGIN_CLASS(PLUGIN_RESOURCE_KEY, KEYImporter)

@@ -27,7 +27,7 @@
 #include "unpacker.h"
 #include "decoder.h"
 #include "general.h"
-#include "../Core/DataStream.h"
+#include "DataStream.h"
 
 #ifdef HAS_VORBIS_SUPPORT
 #include <vorbis/vorbisfile.h>

@@ -48,8 +48,8 @@
 #define _MAX_PATH FILENAME_MAX
 #endif
 #endif
-#include "../../includes/exports.h"
-#include "../../includes/globals.h"
+#include "exports.h"
+#include "globals.h"
 
 //#ifndef S_ISDIR
 //#define S_ISDIR(x) ((x) & S_IFDIR)

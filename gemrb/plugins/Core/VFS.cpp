@@ -24,7 +24,7 @@
 #include <stdarg.h>
 #include <sys/stat.h>
 #include <cstring>
-#include "../../includes/globals.h"
+#include "globals.h"
 #include "VFS.h"
 #include "Interface.h"
 

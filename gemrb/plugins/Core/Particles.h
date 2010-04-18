@@ -27,8 +27,8 @@
 #ifndef PARTICLES_H
 #define PARTICLES_H
 
-#include "../../includes/exports.h"
-#include "../../includes/ie_types.h"
+#include "exports.h"
+#include "ie_types.h"
 
 //global phase for the while spark structure
 #define P_GROW  0

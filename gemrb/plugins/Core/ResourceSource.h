@@ -21,10 +21,10 @@
 #ifndef RESOURCESOURCE_H
 #define RESOURCESOURCE_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "Plugin.h"
-#include "../../includes/SClassID.h"
-#include "../../includes/globals.h"
+#include "SClassID.h"
+#include "globals.h"
 
 class ResourceDesc;
 class DataStream;

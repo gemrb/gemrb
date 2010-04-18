@@ -18,11 +18,11 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "BMPImporter.h"
-#include "../../includes/RGBAColor.h"
-#include "../Core/Interface.h"
-#include "../Core/Video.h"
+#include "RGBAColor.h"
+#include "Interface.h"
+#include "Video.h"
 
 #define BMP_HEADER_SIZE  54
 
@@ -288,7 +288,7 @@ Bitmap* BMPImporter::GetBitmap()
 	return data;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0xD768B1, "BMP File Reader")
 PLUGIN_IE_RESOURCE(&ImageMgr::ID, BMPImporter, ".bmp", (ieWord)IE_BMP_CLASS_ID)

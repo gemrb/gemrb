@@ -31,8 +31,8 @@ class Game;
 #define GAME_H
 
 #include <vector>
-#include "../../includes/exports.h"
-#include "../../includes/ie_types.h"
+#include "exports.h"
+#include "ie_types.h"
 #include "Actor.h"
 #include "Map.h"
 #include "Particles.h"

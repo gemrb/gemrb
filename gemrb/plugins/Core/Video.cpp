@@ -20,7 +20,7 @@
 
 #include <cmath>
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "Video.h"
 #include "Palette.h"
 #include "Audio.h"

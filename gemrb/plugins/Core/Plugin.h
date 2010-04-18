@@ -28,7 +28,7 @@
 #define PLUGIN_H
 
 #include <cstddef>
-#include "../../includes/exports.h"
+#include "exports.h"
 
 /**
  * @class Plugin

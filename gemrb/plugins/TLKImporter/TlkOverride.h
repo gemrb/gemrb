@@ -24,9 +24,9 @@
 #ifndef TLKOVERRIDE_H
 #define TLKOVERRIDE_H
 
-#include "../../includes/globals.h"
-#include "../Core/Interface.h"
-#include "../Core/FileStream.h"
+#include "globals.h"
+#include "Interface.h"
+#include "FileStream.h"
 #ifdef CACHE_TLK_OVERRIDE
 #include <map>
 

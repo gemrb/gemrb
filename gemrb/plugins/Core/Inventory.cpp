@@ -19,8 +19,8 @@
  */
 
 #include <stdio.h>
-#include "../../includes/win32def.h"
-#include "../../includes/strrefs.h"
+#include "win32def.h"
+#include "strrefs.h"
 #include "Interface.h"
 #include "Inventory.h"
 #include "Item.h"

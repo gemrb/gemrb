@@ -25,8 +25,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "readers.h"
-#include "../Core/DataStream.h"
-#include "../Core/SoundMgr.h"
+#include "DataStream.h"
+#include "SoundMgr.h"
 
 #ifdef HAS_VORBIS_SUPPORT
 #include <vorbis/vorbisfile.h>

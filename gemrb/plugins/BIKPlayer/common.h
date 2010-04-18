@@ -1,8 +1,8 @@
 #ifndef AVUTIL_COMMON_H
 #define AVUTIL_COMMON_H
 
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
+#include "win32def.h"
+#include "globals.h"
 
 #include <ctype.h>
 #include <errno.h>

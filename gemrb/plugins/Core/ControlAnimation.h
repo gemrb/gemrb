@@ -27,11 +27,11 @@
 
 #include <vector>
 
-#include "../../includes/RGBAColor.h"
+#include "RGBAColor.h"
 #include "AnimationFactory.h"
 #include "Control.h"
 #include "Sprite2D.h"
-#include "../../includes/exports.h"
+#include "exports.h"
 
 
 class GEM_EXPORT ControlAnimation {

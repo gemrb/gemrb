@@ -28,8 +28,8 @@
 #ifndef PROJECTILE_H
 #define PROJECTILE_H
 
-#include "../../includes/exports.h"
-#include "../../includes/ie_types.h"
+#include "exports.h"
+#include "ie_types.h"
 #include "Palette.h"
 #include "PathFinder.h"
 #include "CharAnimations.h" //contains MAX_ORIENT

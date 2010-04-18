@@ -18,7 +18,7 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "TextArea.h"
 #include "Interface.h"
 #include "Video.h"

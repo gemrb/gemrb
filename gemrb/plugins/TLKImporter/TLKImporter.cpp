@@ -18,13 +18,13 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "TLKImporter.h"
-#include "../Core/Interface.h"
-#include "../Core/Audio.h"
-#include "../Core/Game.h"
-#include "../Core/GameControl.h"
-#include "../Core/Calendar.h"
+#include "Interface.h"
+#include "Audio.h"
+#include "Game.h"
+#include "GameControl.h"
+#include "Calendar.h"
 
 //static int *monthnames=NULL;
 //static int *days=NULL;
@@ -567,7 +567,7 @@ void TLKImp::FreeString(char *str)
 }
 
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0xBB6F380, "TLK File Importer")
 PLUGIN_CLASS(IE_TLK_CLASS_ID, TLKImp)

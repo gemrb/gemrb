@@ -21,7 +21,7 @@
 #ifndef NULLSND_H
 #define NULLSND_H
 
-#include "../Core/Audio.h"
+#include "Audio.h"
 
 class NullSnd : public Audio {
 public:

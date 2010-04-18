@@ -25,9 +25,9 @@
 #include <config.h>
 #endif
 
-#include "../../includes/ie_types.h"
-#include "../Core/Effect.h"
-#include "../Core/EffectMgr.h"
+#include "ie_types.h"
+#include "Effect.h"
+#include "EffectMgr.h"
 
 
 class EFFImp : public EffectMgr {

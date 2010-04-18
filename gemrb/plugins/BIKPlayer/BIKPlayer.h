@@ -21,10 +21,10 @@
 #ifndef BIKPLAY_H
 #define BIKPLAY_H
 
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
-#include "../Core/MoviePlayer.h"
-#include "../Core/Interface.h"
+#include "win32def.h"
+#include "globals.h"
+#include "MoviePlayer.h"
+#include "Interface.h"
 #include "common.h"
 #include "rational.h"
 #include "GetBitContext.h"

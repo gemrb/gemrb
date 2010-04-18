@@ -29,7 +29,7 @@
 #define TABLEMGR_H
 
 #include "Plugin.h"
-#include "../../includes/globals.h"
+#include "globals.h"
 
 /**
  * @class TableMgr

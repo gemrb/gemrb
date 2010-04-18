@@ -21,7 +21,7 @@
 #ifndef IDSIMP_H
 #define IDSIMP_H
 
-#include "../Core/SymbolMgr.h"
+#include "SymbolMgr.h"
 
 struct Pair {
 	int val;

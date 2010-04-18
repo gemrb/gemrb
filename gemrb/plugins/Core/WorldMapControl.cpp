@@ -20,7 +20,7 @@
 #ifndef WIN32
 #include <sys/time.h>
 #endif
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "WorldMapControl.h"
 #include "Interface.h"
 #include "Video.h"

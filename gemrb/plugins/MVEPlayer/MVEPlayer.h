@@ -21,10 +21,10 @@
 #ifndef MVEPLAY_H
 #define MVEPLAY_H
 
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
-#include "../Core/MoviePlayer.h"
-#include "../Core/Interface.h"
+#include "win32def.h"
+#include "globals.h"
+#include "MoviePlayer.h"
+#include "Interface.h"
 
 class MVEPlay : public MoviePlayer {
 	friend class MVEPlayer;

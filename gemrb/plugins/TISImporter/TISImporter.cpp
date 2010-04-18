@@ -18,11 +18,11 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "TISImporter.h"
-#include "../../includes/RGBAColor.h"
-#include "../Core/Interface.h"
-#include "../Core/Video.h"
+#include "RGBAColor.h"
+#include "Interface.h"
+#include "Video.h"
 
 TISImp::TISImp(void)
 {
@@ -136,7 +136,7 @@ Sprite2D* TISImp::GetTile(int index)
 	return spr;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x19F91578, "TIS File Importer")
 PLUGIN_CLASS(IE_TIS_CLASS_ID, TISImp)

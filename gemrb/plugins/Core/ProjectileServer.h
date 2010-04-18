@@ -21,7 +21,7 @@
 #ifndef PROJSERVER_H
 #define PROJSERVER_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "PluginMgr.h"
 #include "Projectile.h"
 

@@ -20,8 +20,8 @@
 #ifndef GLOBALTIMER_H
 #define GLOBALTIMER_H
 
-#include "../../includes/exports.h"
-#include "../../includes/win32def.h"
+#include "exports.h"
+#include "win32def.h"
 #include <vector>
 #include "Region.h"
 

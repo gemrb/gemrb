@@ -27,8 +27,8 @@
 #ifndef SPRITE2D_H
 #define SPRITE2D_H
 
-#include "../../includes/exports.h"
-#include "../../includes/RGBAColor.h"
+#include "exports.h"
+#include "RGBAColor.h"
 #include "Palette.h"
 
 class AnimationFactory;

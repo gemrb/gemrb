@@ -27,9 +27,9 @@
 #ifndef TEXTEDIT_H
 #define TEXTEDIT_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "Control.h"
-#include "../../includes/RGBAColor.h"
+#include "RGBAColor.h"
 #include "Font.h"
 
 class Palette;

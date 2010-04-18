@@ -25,9 +25,9 @@
 #include <config.h>
 #endif
 
-#include "../../includes/ie_types.h"
-#include "../Core/WorldMap.h"
-#include "../Core/WorldMapMgr.h"
+#include "ie_types.h"
+#include "WorldMap.h"
+#include "WorldMapMgr.h"
 
 
 class WMPImp : public WorldMapMgr {

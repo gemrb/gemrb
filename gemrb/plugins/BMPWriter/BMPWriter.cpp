@@ -1,7 +1,7 @@
 #include "BMPWriter.h"
 #include <cstring>
-#include "../Core/Interface.h"
-#include "../Core/Video.h"
+#include "Interface.h"
+#include "Video.h"
 
 #define BMP_HEADER_SIZE  54 //FIXME: duplicate
 
@@ -68,7 +68,7 @@ void BMPWriter::PutImage(DataStream *output, Sprite2D *spr)
 	core->GetVideoDriver()->FreeSprite(spr);
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0xD48051E, "BMP File Writer")
 PLUGIN_CLASS(PLUGIN_IMAGE_WRITER_BMP, BMPWriter)

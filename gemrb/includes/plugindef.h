@@ -28,7 +28,7 @@
 #define PLUGINDEF_H
 
 #include "exports.h"
-#include "../plugins/Core/PluginMgr.h"
+#include "PluginMgr.h"
 
 template <typename T>
 Plugin* CreatePlugin()

@@ -27,9 +27,9 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "../../includes/globals.h"
+#include "globals.h"
 #include <vector>
-#include "../../includes/exports.h"
+#include "exports.h"
 
 class Palette;
 

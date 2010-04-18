@@ -27,10 +27,10 @@
 #ifndef LABEL_H
 #define LABEL_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "Control.h"
 #include "Font.h"
-#include "../../includes/RGBAColor.h"
+#include "RGBAColor.h"
 
 class Palette;
 

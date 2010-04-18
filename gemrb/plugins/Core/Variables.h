@@ -23,10 +23,10 @@
 
 #include <ctype.h>
 #include <cstring>
-#include "../../includes/exports.h"
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
-#include "../../includes/SClassID.h"
+#include "exports.h"
+#include "win32def.h"
+#include "globals.h"
+#include "SClassID.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Variables<ieDword, VALUE>

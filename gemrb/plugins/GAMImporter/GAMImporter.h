@@ -21,8 +21,8 @@
 #ifndef GAMIMP_H
 #define GAMIMP_H
 
-#include "../Core/SaveGameMgr.h"
-#include "../Core/ActorMgr.h"
+#include "SaveGameMgr.h"
+#include "ActorMgr.h"
 
 #define GAM_VER_GEMRB  0 
 #define GAM_VER_BG  10   

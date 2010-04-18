@@ -19,12 +19,12 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "DirectoryImporter.h"
-#include "../../includes/globals.h"
-#include "../Core/FileStream.h"
-#include "../Core/Interface.h"
-#include "../Core/ResourceDesc.h"
+#include "globals.h"
+#include "FileStream.h"
+#include "Interface.h"
+#include "ResourceDesc.h"
 #ifndef WIN32
 #include <unistd.h>
 #endif
@@ -95,7 +95,7 @@ DataStream* DirectoryImporter::GetResource(const char* resname, const ResourceDe
 	return SearchIn( path, resname, type.GetExt() );
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0xAB4534, "Directory Importer")
 PLUGIN_CLASS(PLUGIN_RESOURCE_DIRECTORY, DirectoryImporter)

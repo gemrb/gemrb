@@ -27,7 +27,7 @@
 #ifndef EFFECT_H
 #define EFFECT_H
 
-#include "../../includes/ie_types.h"
+#include "ie_types.h"
 #include "Region.h"
 class Actor;
 

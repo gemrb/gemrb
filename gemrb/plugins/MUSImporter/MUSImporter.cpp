@@ -18,10 +18,10 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "MUSImporter.h"
-#include "../Core/Interface.h"
-#include "../Core/Audio.h"
+#include "Interface.h"
+#include "Audio.h"
 
 static char musicsubfolder[6] = "music";
 
@@ -315,7 +315,7 @@ bool MUSImp::CurrentPlayList(const char* name) {
 }
 
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x2DCB9E8, "MUS File Importer")
 PLUGIN_CLASS(IE_MUS_CLASS_ID, MUSImp)

@@ -24,7 +24,7 @@
 //   Ogg Vorbis and Interplay's ACM.
 
 #include <stdio.h>
-#include "../Core/Interface.h"
+#include "Interface.h"
 #include "readers.h"
 #include "general.h"
 

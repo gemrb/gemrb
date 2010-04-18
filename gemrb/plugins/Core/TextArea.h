@@ -27,9 +27,9 @@
 #ifndef TEXTAREA_H
 #define TEXTAREA_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "Control.h"
-#include "../../includes/RGBAColor.h"
+#include "RGBAColor.h"
 #include "Font.h"
 #include "ScrollBar.h"
 

@@ -22,7 +22,7 @@
 #define KEYIMP_H
 
 #include <vector>
-#include "../Core/ResourceSource.h"
+#include "ResourceSource.h"
 #include "Dictionary.h"
 
 class Resource;

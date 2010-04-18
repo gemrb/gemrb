@@ -18,7 +18,7 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "FileStream.h"
 #include "Interface.h"
 

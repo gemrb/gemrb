@@ -18,9 +18,9 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../Core/Interface.h"
-#include "../Core/EffectMgr.h"
+#include "win32def.h"
+#include "Interface.h"
+#include "EffectMgr.h"
 #include "PROImporter.h"
 
 PROImp::PROImp(void)
@@ -144,7 +144,7 @@ void PROImp::GetAreaExtension(ProjectileExtension *e)
 	str->Seek(188, GEM_CURRENT_POS);
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0xCAD2D64, "PRO File Importer")
 PLUGIN_CLASS(IE_PRO_CLASS_ID, PROImp)

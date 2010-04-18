@@ -18,8 +18,8 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
+#include "win32def.h"
+#include "globals.h"
 #include "Compressor.h"
 
 Compressor::Compressor(void)

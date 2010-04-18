@@ -21,9 +21,9 @@
 #ifndef BIFIMP_H
 #define BIFIMP_H
 
-#include "../../includes/globals.h"
-#include "../Core/ArchiveImporter.h"
-#include "../Core/CachedFileStream.h"
+#include "globals.h"
+#include "ArchiveImporter.h"
+#include "CachedFileStream.h"
 
 struct FileEntry {
 	ieDword resLocator;

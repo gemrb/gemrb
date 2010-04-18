@@ -18,7 +18,7 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "Sprite2D.h"
 #include "Video.h"
 #include "Interface.h"

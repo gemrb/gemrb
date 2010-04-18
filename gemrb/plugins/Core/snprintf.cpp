@@ -61,7 +61,7 @@
  *    * added '%q[dioux]' for formatting qwords.
  *    * added '%b' for formatting in binary notation.
  **************************************************************/
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #ifndef HAVE_SNPRINTF
 
 #include <cctype>

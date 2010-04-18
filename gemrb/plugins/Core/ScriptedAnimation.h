@@ -20,7 +20,7 @@
 #ifndef SCRIPTEDANIMATION_H
 #define SCRIPTEDANIMATION_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "DataStream.h"
 #include "AnimationFactory.h"
 #include "Palette.h"

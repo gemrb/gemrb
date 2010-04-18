@@ -28,10 +28,10 @@
 #ifndef STORE_H
 #define STORE_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include <vector>
-#include "../../includes/ie_types.h"
-#include "../../includes/globals.h"
+#include "ie_types.h"
+#include "globals.h"
 
 //bah!
 class CREItem;

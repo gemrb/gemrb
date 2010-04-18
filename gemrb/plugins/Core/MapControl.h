@@ -28,7 +28,7 @@ class MapControl;
 #ifndef MAPCONTROL_H
 #define MAPCONTROL_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "Control.h"
 #include "Interface.h"
 

@@ -21,7 +21,7 @@
 #ifndef CREIMP_H
 #define CREIMP_H
 
-#include "../Core/ActorMgr.h"
+#include "ActorMgr.h"
 
 #define IE_CRE_GEMRB            0
 #define IE_CRE_V1_0		10  //bg1

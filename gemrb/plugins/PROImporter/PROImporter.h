@@ -25,9 +25,9 @@
 #include <config.h>
 #endif
 
-#include "../../includes/ie_types.h"
-#include "../Core/Projectile.h"
-#include "../Core/ProjectileMgr.h"
+#include "ie_types.h"
+#include "Projectile.h"
+#include "ProjectileMgr.h"
 
 
 class PROImp : public ProjectileMgr {

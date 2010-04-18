@@ -21,7 +21,7 @@
 #ifndef BMPIMP_H
 #define BMPIMP_H
 
-#include "../Core/ImageMgr.h"
+#include "ImageMgr.h"
 
 class BMPImporter : public ImageMgr {
 private:

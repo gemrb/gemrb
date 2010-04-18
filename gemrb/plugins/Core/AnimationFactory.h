@@ -22,9 +22,9 @@
 #define ANIMATIONFACTORY_H
 
 #include "FactoryObject.h"
-#include "../../includes/globals.h"
+#include "globals.h"
 #include "Animation.h"
-#include "../../includes/exports.h"
+#include "exports.h"
 
 class GEM_EXPORT AnimationFactory : public FactoryObject {
 private:

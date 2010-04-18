@@ -21,8 +21,8 @@
 #ifndef VIDEOMODES_H
 #define VIDEOMODES_H
 
-#include "../../includes/exports.h"
-#include "../../includes/win32def.h"
+#include "exports.h"
+#include "win32def.h"
 #include "VideoMode.h"
 #include <vector>
 

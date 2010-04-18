@@ -28,7 +28,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "Sprite2D.h"
 #include "Control.h"
 #include "TextArea.h"

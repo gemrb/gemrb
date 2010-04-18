@@ -22,9 +22,9 @@
 #include <cmath>
 #include <cassert>
 #include <cstdio>
-#include "../Core/Ambient.h"
-#include "../Core/Interface.h"
-#include "../Core/Game.h"
+#include "Ambient.h"
+#include "Interface.h"
+#include "Game.h"
 #include "OpenALAudio.h"
 #include "AmbientMgrAL.h"
 

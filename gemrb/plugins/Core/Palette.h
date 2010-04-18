@@ -22,9 +22,9 @@
 
 #include <cassert>
 
-#include "../../includes/exports.h"
-#include "../../includes/RGBAColor.h"
-#include "../../includes/ie_types.h"
+#include "exports.h"
+#include "RGBAColor.h"
+#include "ie_types.h"
 
 
 enum PaletteType {

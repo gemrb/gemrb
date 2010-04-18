@@ -19,7 +19,7 @@
  */
 
 #include <cstring>
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "Progressbar.h"
 #include "Interface.h"
 #include "Video.h"

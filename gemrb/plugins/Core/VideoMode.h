@@ -21,7 +21,7 @@
 #ifndef VIDEOMODE_H
 #define VIDEOMODE_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 
 class GEM_EXPORT VideoMode {
 public:

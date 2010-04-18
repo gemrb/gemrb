@@ -18,13 +18,13 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
+#include "win32def.h"
+#include "globals.h"
 #include "GAMImporter.h"
-#include "../Core/Interface.h"
-#include "../Core/MapMgr.h"
-#include "../Core/MemoryStream.h"
-#include "../Core/DataFileMgr.h"
+#include "Interface.h"
+#include "MapMgr.h"
+#include "MemoryStream.h"
+#include "DataFileMgr.h"
 #include <cassert>
 
 
@@ -1153,7 +1153,7 @@ int GAMImp::PutGame(DataStream *stream, Game *game)
 	return 0;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0xD7F7040, "GAM File Importer")
 PLUGIN_CLASS(IE_GAM_CLASS_ID, GAMImp)

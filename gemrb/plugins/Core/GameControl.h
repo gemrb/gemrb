@@ -34,7 +34,7 @@ class Window;
 #include "Interface.h"
 #include "Dialog.h"
 #include "Map.h"
-#include "../../includes/exports.h"
+#include "exports.h"
 
 //dialog flags
 #define DF_IN_DIALOG      1

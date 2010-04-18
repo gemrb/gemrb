@@ -32,7 +32,7 @@ class Gem_Polygon;
 #ifndef ACTORBLOCK_H
 #define ACTORBLOCK_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "Sprite2D.h"
 #include "CharAnimations.h"
 #include "TileOverlay.h"

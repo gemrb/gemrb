@@ -21,8 +21,8 @@
 #ifndef AUDIO_H_INCLUDED
 #define AUDIO_H_INCLUDED
 
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
+#include "win32def.h"
+#include "globals.h"
 #include "Plugin.h"
 
 #define GEM_SND_RELATIVE 1

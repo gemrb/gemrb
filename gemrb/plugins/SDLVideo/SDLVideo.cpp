@@ -22,13 +22,13 @@
 #include <cassert>
 #include <cstdio>
 #include "SDLVideo.h"
-#include "../Core/Interface.h"
-#include "../Core/SpriteCover.h"
-#include "../Core/Console.h"
-#include "../Core/Audio.h"
-#include "../Core/Palette.h"
-#include "../Core/AnimationFactory.h"
-#include "../Core/Game.h"
+#include "Interface.h"
+#include "SpriteCover.h"
+#include "Console.h"
+#include "Audio.h"
+#include "Palette.h"
+#include "AnimationFactory.h"
+#include "Game.h" // for GetGlobalTint
 
 #include "TileRenderer.inl"
 
@@ -2555,7 +2555,7 @@ void SDLVideoDriver::SetGamma(int brightness, int /*contrast*/)
 	SDL_SetGamma(0.8+brightness/50.0,0.8+brightness/50.0,0.8+brightness/50.0);
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0xDBAAB50, "SDL Video Driver")
 PLUGIN_CLASS(IE_VIDEO_CLASS_ID, SDLVideoDriver)

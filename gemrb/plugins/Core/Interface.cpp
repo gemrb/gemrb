@@ -22,10 +22,10 @@
 #define INTERFACE
 #endif
 
-#include "../../includes/exports.h"
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
-#include "../../includes/strrefs.h"
+#include "exports.h"
+#include "win32def.h"
+#include "globals.h"
+#include "strrefs.h"
 
 #include <stdlib.h>
 #include <time.h>

@@ -18,7 +18,7 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "ImageMgr.h"
 #include "ImageFactory.h"
 #include "Interface.h"

@@ -21,9 +21,9 @@
 #ifndef IMAGEFACTORY_H
 #define IMAGEFACTORY_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "FactoryObject.h"
-#include "../../includes/globals.h"
+#include "globals.h"
 #include "Sprite2D.h"
 
 class GEM_EXPORT ImageFactory : public FactoryObject {

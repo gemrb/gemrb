@@ -18,10 +18,10 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "WEDImporter.h"
-#include "../Core/TileSetMgr.h"
-#include "../Core/Interface.h"
+#include "TileSetMgr.h"
+#include "Interface.h"
 
 struct wed_polygon {
 	ieDword FirstVertex;
@@ -327,7 +327,7 @@ Wall_Polygon **WEDImp::GetWallGroups()
 }
 
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x7486BE7, "WED File Importer")
 PLUGIN_CLASS(IE_WED_CLASS_ID, WEDImp)

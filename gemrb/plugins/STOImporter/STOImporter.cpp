@@ -18,9 +18,9 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../Core/Interface.h"
-#include "../Core/Inventory.h"
+#include "win32def.h"
+#include "Interface.h"
+#include "Inventory.h"
 #include "STOImporter.h"
 
 STOImp::STOImp(void)
@@ -399,7 +399,7 @@ int STOImp::PutStore(DataStream *stream, Store *store)
 	return ret;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x1CDFC160, "STO File Importer")
 PLUGIN_CLASS(IE_STO_CLASS_ID, STOImp)

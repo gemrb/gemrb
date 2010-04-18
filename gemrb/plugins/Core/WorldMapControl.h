@@ -30,7 +30,7 @@ class Palette;
 #ifndef WORLDMAPCONTROL_H
 #define WORLDMAPCONTROL_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "Control.h"
 #include "Interface.h"
 #include "Dialog.h"

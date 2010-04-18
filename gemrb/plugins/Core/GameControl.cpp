@@ -21,11 +21,11 @@
 #include <sys/time.h>
 #endif
 #include <cmath>
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "GameControl.h"
 #include "Interface.h"
 #include "DialogMgr.h"
-#include "../../includes/strrefs.h"
+#include "strrefs.h"
 #include "Effect.h"
 #include "GSUtils.h"
 #include "TileMap.h"

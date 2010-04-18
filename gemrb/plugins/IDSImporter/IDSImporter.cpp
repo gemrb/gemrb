@@ -18,8 +18,8 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
+#include "win32def.h"
+#include "globals.h"
 #include "IDSImporter.h"
 #include "IDSImpDefs.h"
 #include <ctype.h>
@@ -149,7 +149,7 @@ int IDSImp::FindValue(int val)
 }
 
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x1F41B94C, "IDS File Importer")
 PLUGIN_CLASS(IE_IDS_CLASS_ID, IDSImp)

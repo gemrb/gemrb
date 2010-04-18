@@ -35,7 +35,7 @@
 #include <string.h>
 #include <stdlib.h>
 #else
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include <sys\stat.h>
 #ifdef _DEBUG
 #include <stdlib.h>
@@ -49,8 +49,8 @@ BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
 }
 #endif
 
-#include "../../includes/globals.h"
-#include "../../includes/exports.h"
+#include "globals.h"
+#include "exports.h"
 #include "Interface.h"
 #include "Actor.h"
 

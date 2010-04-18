@@ -19,10 +19,10 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "Region.h"
-#include "../../includes/RGBAColor.h"
-#include "../../includes/globals.h"
+#include "RGBAColor.h"
+#include "globals.h"
 
 #include <list>
 

@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "Control.h"
 #include "ControlAnimation.h"
 #include "Window.h"

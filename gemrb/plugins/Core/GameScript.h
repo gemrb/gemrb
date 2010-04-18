@@ -24,7 +24,7 @@ class Action;
 #ifndef GAMESCRIPT_H
 #define GAMESCRIPT_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include <cstdio>
 #include "DataStream.h"
 #include "Variables.h"

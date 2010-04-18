@@ -19,8 +19,8 @@
 #include <cassert>
 #include <cmath>
 
-#include "../../includes/win32def.h"
-#include "../../includes/strrefs.h"
+#include "win32def.h"
+#include "strrefs.h"
 #include "ActorBlock.h"
 #include "Interface.h"
 #include "SpriteCover.h"

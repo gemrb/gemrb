@@ -21,8 +21,8 @@
 #ifndef CHUIMP_H
 #define CHUIMP_H
 
-#include "../Core/WindowMgr.h"
-#include "../Core/DataStream.h"
+#include "WindowMgr.h"
+#include "DataStream.h"
 
 /**CHU File Importer Class
   *@author GemRB Developement Team

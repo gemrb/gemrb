@@ -21,7 +21,7 @@
 #ifndef _ACM_LAB_VALUE_UNPACKER_H
 #define _ACM_LAB_VALUE_UNPACKER_H
 
-#include "../Core/DataStream.h"
+#include "DataStream.h"
 
 class CValueUnpacker {
 private:

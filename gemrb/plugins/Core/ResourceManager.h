@@ -22,8 +22,8 @@
 #define RESOURCEMANGER_H
 
 #include <vector>
-#include "../../includes/exports.h"
-#include "../../includes/SClassID.h"
+#include "exports.h"
+#include "SClassID.h"
 
 class DataStream;
 class Resource;

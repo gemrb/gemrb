@@ -28,9 +28,9 @@
 #include <string>
 #include <vector>
 #include <bitset>
-#include "../../includes/exports.h"
-#include "../../includes/ie_types.h"
-#include "../../includes/globals.h"
+#include "exports.h"
+#include "ie_types.h"
+#include "globals.h"
 
 #define IE_AMBI_ENABLED 1
 #define IE_AMBI_POINT   2

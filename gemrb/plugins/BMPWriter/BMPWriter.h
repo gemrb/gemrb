@@ -1,4 +1,4 @@
-#include "../Core/ImageWriter.h"
+#include "ImageWriter.h"
 
 class BMPWriter : public ImageWriter {
 public:

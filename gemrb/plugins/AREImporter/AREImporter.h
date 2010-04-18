@@ -21,7 +21,7 @@
 #ifndef AREIMP_H
 #define AREIMP_H
 
-#include "../Core/MapMgr.h"
+#include "MapMgr.h"
 class Animation;
 class AnimationFactory;
 

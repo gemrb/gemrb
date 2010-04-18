@@ -21,9 +21,9 @@
 #define GSUTILS_H
 #include "Interface.h"
 #include "GameScript.h"
-#include "../../includes/strrefs.h"
-#include "../../includes/exports.h"
-#include "../../includes/defsounds.h"
+#include "strrefs.h"
+#include "exports.h"
+#include "defsounds.h"
 //indebug flags
 #define ID_REFERENCE 1
 #define ID_CUTSCENE  2

@@ -25,7 +25,7 @@
 #include <vector>
 #include <map>
 #include <cstring>
-#include "../Core/ResourceSource.h"
+#include "ResourceSource.h"
 
 class Resource;
 class ResourceDesc;

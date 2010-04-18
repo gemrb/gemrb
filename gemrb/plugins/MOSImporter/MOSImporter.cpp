@@ -18,14 +18,14 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "MOSImporter.h"
-#include "../../includes/RGBAColor.h"
-#include "../Core/Compressor.h"
-#include "../Core/FileStream.h"
-#include "../Core/CachedFileStream.h"
-#include "../Core/Interface.h"
-#include "../Core/Video.h"
+#include "RGBAColor.h"
+#include "Compressor.h"
+#include "FileStream.h"
+#include "CachedFileStream.h"
+#include "Interface.h"
+#include "Video.h"
 
 static ieDword red_mask = 0xff000000;
 static ieDword green_mask = 0x00ff0000;
@@ -152,7 +152,7 @@ Sprite2D* MOSImp::GetSprite2D()
 	return ret;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x167B73E, "MOS File Importer")
 PLUGIN_IE_RESOURCE(&ImageMgr::ID, MOSImp, ".mos", (ieWord)IE_MOS_CLASS_ID)

@@ -21,7 +21,7 @@
 #ifndef TLKIMP_H
 #define TLKIMP_H
 
-#include "../Core/StringMgr.h"
+#include "StringMgr.h"
 #include "TlkOverride.h"
 
 class TLKImp : public StringMgr {

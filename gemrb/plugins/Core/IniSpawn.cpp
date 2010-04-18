@@ -21,7 +21,7 @@
 // This class handles the special spawn structures of planescape torment
 // (stored in .ini format)
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "IniSpawn.h"
 #include "Game.h"
 #include "Actor.h"

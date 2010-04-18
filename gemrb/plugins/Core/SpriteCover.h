@@ -21,7 +21,7 @@
 #ifndef SPRITECOVER_H
 #define SPRITECOVER_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 
 class GEM_EXPORT SpriteCover {
 public:

@@ -28,7 +28,7 @@
 #ifndef SLIDER_H
 #define SLIDER_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "Control.h"
 #include "Sprite2D.h"
 

@@ -18,12 +18,12 @@
  *
  */
 
-#include "../../includes/globals.h"
+#include "globals.h"
 #include "PNGImporter.h"
-#include "../../includes/RGBAColor.h"
-#include "../Core/Interface.h"
-#include "../Core/Video.h"
-#include "../Core/ImageFactory.h"
+#include "RGBAColor.h"
+#include "Interface.h"
+#include "Video.h"
+#include "ImageFactory.h"
 
 // CHECKME: how should we include png.h ? (And how should we check for it?)
 #include <png.h>
@@ -209,7 +209,7 @@ void PNGImp::GetPalette(int colors, Color* pal)
 	}
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x11C3EB12, "PNG File Importer")
 PLUGIN_IE_RESOURCE(&ImageMgr::ID, PNGImp, ".png", (ieWord)IE_PNG_CLASS_ID)

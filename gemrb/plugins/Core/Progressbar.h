@@ -26,7 +26,7 @@
 #ifndef PROGRESSBAR_H
 #define PROGRESSBAR_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "Control.h"
 #include "Sprite2D.h"
 #include "Animation.h"

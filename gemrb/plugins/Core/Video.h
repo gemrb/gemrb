@@ -27,7 +27,7 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
-#include "../../includes/globals.h"
+#include "globals.h"
 #include "Plugin.h"
 #include "EventMgr.h"
 #include "Animation.h"

@@ -18,7 +18,7 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "Game.h"
 #include "MapMgr.h"
 #include "DataStream.h"
@@ -27,8 +27,8 @@
 #include "GameControl.h"
 #include "MusicMgr.h"
 #include "GameScript.h"
-#include "../../includes/strrefs.h"
-#include "../../includes/defsounds.h"
+#include "strrefs.h"
+#include "defsounds.h"
 
 #define MAX_MAPS_LOADED 1
 

@@ -22,13 +22,13 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <cstdio>
-#include "../Core/Interface.h"
-#include "../Core/Video.h"
-#include "../Core/Audio.h"
-#include "../Core/Variables.h"
+#include "Interface.h"
+#include "Video.h"
+#include "Audio.h"
+#include "Variables.h"
 #include "MVEPlayer.h"
 #include "mve_player.h"
-#include "../../includes/ie_types.h"
+#include "ie_types.h"
 
 static const char MVESignature[] = "Interplay MVE File\x1A";
 static const int MVE_SIGNATURE_LEN = 19;
@@ -179,7 +179,7 @@ void MVEPlay::queueBuffer(int stream, unsigned short bits,
 }
 
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x218963DC, "MVE Video Player")
 PLUGIN_IE_RESOURCE(&MoviePlayer::ID, MVEPlay, ".mve", (ieWord)IE_MVE_CLASS_ID)

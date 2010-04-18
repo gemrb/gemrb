@@ -21,7 +21,7 @@
 #ifndef TILEMAP_H
 #define TILEMAP_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include "TileOverlay.h"
 #include "Polygon.h"
 #include "GameScript.h"

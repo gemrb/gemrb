@@ -21,7 +21,7 @@
 #ifndef CALENDAR_H
 #define CALENDAR_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 
 class GEM_EXPORT Calendar {
 private:

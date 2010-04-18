@@ -21,7 +21,7 @@
 #ifndef PLTIMP_H
 #define PLTIMP_H
 
-#include "../Core/PalettedImageMgr.h"
+#include "PalettedImageMgr.h"
 
 class PLTImp : public PalettedImageMgr {
 private:

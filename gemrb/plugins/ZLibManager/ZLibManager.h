@@ -21,7 +21,7 @@
 #ifndef ZLIBMANAGER_H
 #define ZLIBMANAGER_H
 
-#include "../Core/Compressor.h"
+#include "Compressor.h"
 
 class ZLibManager : public Compressor {
 public:

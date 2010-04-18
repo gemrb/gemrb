@@ -31,7 +31,7 @@
 #include "Control.h"
 #include "WindowMgr.h"
 #include <vector>
-#include "../../includes/exports.h"
+#include "exports.h"
 
 #define GEM_LEFT		0x81
 #define GEM_RIGHT		0x82

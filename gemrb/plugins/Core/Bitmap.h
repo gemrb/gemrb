@@ -19,7 +19,7 @@
 #ifndef BITMAP_H
 #define BITMAP_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 
 class GEM_EXPORT Bitmap {
 public:

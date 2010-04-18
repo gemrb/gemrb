@@ -18,13 +18,13 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "BAMImporter.h"
-#include "../Core/Interface.h"
-#include "../Core/Compressor.h"
-#include "../Core/FileStream.h"
-#include "../Core/Video.h"
-#include "../Core/Palette.h"
+#include "Interface.h"
+#include "Compressor.h"
+#include "FileStream.h"
+#include "Video.h"
+#include "Palette.h"
 
 BAMImp::BAMImp(void)
 {
@@ -379,7 +379,7 @@ Sprite2D* BAMImp::GetPalette()
 	return core->GetVideoDriver()->CreateSprite8( 16, 16, 8, pixels, palette->col, false );
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x3AD6427A, "BAM File Importer")
 PLUGIN_CLASS(IE_BAM_CLASS_ID, BAMImp)

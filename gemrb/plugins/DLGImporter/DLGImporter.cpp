@@ -18,10 +18,10 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "DLGImporter.h"
-#include "../Core/FileStream.h"
-#include "../Core/Interface.h"
+#include "FileStream.h"
+#include "Interface.h"
 
 DLGImp::DLGImp(void)
 {
@@ -336,7 +336,7 @@ char** DLGImp::GetStrings(char* string, unsigned int& count)
 	return strings;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x1970D894, "DLG File Importer")
 PLUGIN_CLASS(IE_DLG_CLASS_ID, DLGImp)

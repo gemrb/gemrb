@@ -25,9 +25,9 @@
 #include <config.h>
 #endif
 
-#include "../../includes/ie_types.h"
-#include "../Core/Store.h"
-#include "../Core/StoreMgr.h"
+#include "ie_types.h"
+#include "Store.h"
+#include "StoreMgr.h"
 
 
 class STOImp : public StoreMgr {

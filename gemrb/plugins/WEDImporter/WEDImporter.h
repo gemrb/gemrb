@@ -21,7 +21,7 @@
 #ifndef WEDIMP_H
 #define WEDIMP_H
 
-#include "../Core/TileMapMgr.h"
+#include "TileMapMgr.h"
 
 struct Overlay {
 	ieWord  Width;

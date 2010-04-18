@@ -67,7 +67,7 @@
 # ifdef WIN32
 #  define snprintf _snprintf
 # else
-#  include "../plugins/Core/snprintf.h"
+#  include "snprintf.h"
 # endif
 #endif
 
@@ -79,7 +79,7 @@
 //we need 32+6 bytes at least, because we store 'context' in the variable
 //name too
 #define MAX_VARIABLE_LENGTH  40
-#include "../plugins/Core/VFS.h"
+#include "VFS.h"
 
 // abstract iteration position
 struct __POSITION {

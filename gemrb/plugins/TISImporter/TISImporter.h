@@ -21,7 +21,7 @@
 #ifndef TISIMP_H
 #define TISIMP_H
 
-#include "../Core/TileSetMgr.h"
+#include "TileSetMgr.h"
 
 class TISImp : public TileSetMgr {
 private:

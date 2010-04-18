@@ -18,14 +18,14 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../../includes/strrefs.h"
-#include "../Core/Actor.h"
-#include "../Core/Game.h"
-#include "../Core/EffectQueue.h"
-#include "../Core/Interface.h"
-#include "../Core/Video.h" //for tints
-#include "../Core/TileMap.h"
+#include "win32def.h"
+#include "strrefs.h"
+#include "Actor.h"
+#include "Game.h"
+#include "EffectQueue.h"
+#include "Interface.h"
+#include "Video.h" //for tints
+#include "TileMap.h"
 
 int fx_set_status (Scriptable* Owner, Actor* target, Effect* fx);//ba
 int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx);//bb
@@ -547,7 +547,7 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x115A670, "Effect opcodes for the torment branch of the games")
 RegisterTormentOpcodes();

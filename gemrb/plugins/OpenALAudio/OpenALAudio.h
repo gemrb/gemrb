@@ -29,13 +29,13 @@
 #define ACM_BUFFERSIZE 8192
 
 #include "SDL.h"
-#include "../Core/Audio.h"
-#include "../Core/LRUCache.h"
-#include "../Core/Interface.h"
-#include "../Core/MusicMgr.h"
-#include "../../includes/ie_types.h"
-#include "../Core/FileStream.h"
-#include "../Core/SoundMgr.h"
+#include "Audio.h"
+#include "LRUCache.h"
+#include "Interface.h"
+#include "MusicMgr.h"
+#include "ie_types.h"
+#include "FileStream.h"
+#include "SoundMgr.h"
 #include "AmbientMgrAL.h"
 #include "StackLock.h"
 

@@ -27,8 +27,8 @@
 
 #include <vector>
 #include <cstring>
-#include "../../includes/exports.h"
-#include "../../includes/ie_types.h"
+#include "exports.h"
+#include "ie_types.h"
 #include "Animation.h"
 #include "CharAnimations.h"
 #include "ScriptedAnimation.h"
@@ -40,7 +40,7 @@ class Map;
 class ScriptedAnimation;
 
 /** USING DEFINITIONS AS DESCRIBED IN STATS.IDS */
-#include "../../includes/ie_stats.h"
+#include "ie_stats.h"
 
 #include "Inventory.h"
 #include "Spellbook.h"

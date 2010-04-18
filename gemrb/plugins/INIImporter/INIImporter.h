@@ -22,8 +22,8 @@
 #define INIIMP_H
 
 #include <cstring>
-#include "../Core/DataFileMgr.h"
-#include "../../includes/globals.h"
+#include "DataFileMgr.h"
+#include "globals.h"
 
 struct INIPair {
 	char* Name, * Value;

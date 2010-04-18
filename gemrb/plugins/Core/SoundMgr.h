@@ -21,7 +21,7 @@
 #ifndef SOUNDMGR_H
 #define SOUNDMGR_H
 
-#include "../../includes/ie_types.h"
+#include "ie_types.h"
 #include "Plugin.h"
 #include "DataStream.h"
 

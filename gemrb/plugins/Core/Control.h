@@ -48,10 +48,10 @@
 //this is in the control ID
 #define IGNORE_CONTROL 0x10000000
 
-#include "../../includes/ie_types.h"
-#include "../../includes/win32def.h"
-#include "../../includes/RGBAColor.h"
-#include "../../includes/exports.h"
+#include "ie_types.h"
+#include "win32def.h"
+#include "RGBAColor.h"
+#include "exports.h"
 
 /**
  * Event handler indicates code to be called when a particular

@@ -18,8 +18,8 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../../includes/strrefs.h"
+#include "win32def.h"
+#include "strrefs.h"
 #include "SaveGameIterator.h"
 #include "Interface.h"
 #include "SaveGameMgr.h"

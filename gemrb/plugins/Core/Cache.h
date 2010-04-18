@@ -23,8 +23,8 @@
 
 #include <ctype.h>
 #include <cstring>
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
+#include "win32def.h"
+#include "globals.h"
 /////////////////////////////////////////////////////////////////////////////
 // Cache<ieResRef, void*>
 

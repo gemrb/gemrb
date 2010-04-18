@@ -18,12 +18,12 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../Core/Compressor.h"
-#include "../Core/FileStream.h"
-#include "../Core/CachedFileStream.h"
+#include "win32def.h"
+#include "Compressor.h"
+#include "FileStream.h"
+#include "CachedFileStream.h"
 #include "BIFImporter.h"
-#include "../Core/Interface.h"
+#include "Interface.h"
 
 BIFImp::BIFImp(void)
 {
@@ -345,7 +345,7 @@ void BIFImp::ReadBIF(void)
 	}
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0xC7F133C, "BIF File Importer")
 PLUGIN_CLASS(IE_BIF_CLASS_ID, BIFImp)

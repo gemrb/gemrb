@@ -27,10 +27,10 @@
 #ifndef PLUGINMGR_H
 #define PLUGINMGR_H
 
-#include "../../includes/exports.h"
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
-#include "../../includes/SClassID.h" // For PluginID
+#include "exports.h"
+#include "win32def.h"
+#include "globals.h"
+#include "SClassID.h" // For PluginID
 #include <vector>
 #include <list>
 #include <cstring>

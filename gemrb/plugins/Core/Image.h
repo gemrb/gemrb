@@ -19,8 +19,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include "../../includes/exports.h"
-#include "../../includes/RGBAColor.h"
+#include "exports.h"
+#include "RGBAColor.h"
 
 class Sprite2D;
 

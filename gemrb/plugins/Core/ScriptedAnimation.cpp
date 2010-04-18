@@ -18,7 +18,7 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "ScriptedAnimation.h"
 #include "Interface.h"
 #include "Audio.h"

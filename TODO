@@ -86,10 +86,6 @@ Sound:
 5. fix sound settings (currently the volumes get reset on area change, for example)
 6. implement and use as much from EAX (echo, damping, etc) as possible
 
-Building:
-1. fix include paths during compilation, so the files do not 
-   use #include "../../Core/something.h" etc.
-
 Release:
 1. Create packages for various distros and get them to distributions. Requires
    maintainers.

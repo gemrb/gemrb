@@ -18,12 +18,12 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "CREImporter.h"
-#include "../Core/Interface.h"
-#include "../Core/EffectMgr.h"
-#include "../Core/GameScript.h"
-#include "../../includes/ie_stats.h"
+#include "Interface.h"
+#include "EffectMgr.h"
+#include "GameScript.h"
+#include "ie_stats.h"
 #include <cassert>
 
 #define MAXCOLOR 12
@@ -3031,7 +3031,7 @@ int CREImp::PutActor(DataStream *stream, Actor *actor, bool chr)
 	return 0;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0xE507B60, "CRE File Importer")
 PLUGIN_CLASS(IE_CRE_CLASS_ID, CREImp)

@@ -46,12 +46,12 @@
 #include "win32def.h"
 #include "SClassID.h"
 #include "RGBAColor.h"
-#include "../plugins/Core/Region.h"
-#include "../plugins/Core/Sprite2D.h"
-#include "../plugins/Core/VideoMode.h"
-#include "../plugins/Core/VideoModes.h"
-#include "../plugins/Core/DataStream.h"
-#include "../plugins/Core/AnimStructures.h"
+#include "Region.h"
+#include "Sprite2D.h"
+#include "VideoMode.h"
+#include "VideoModes.h"
+#include "DataStream.h"
+#include "AnimStructures.h"
 
 #endif //GLOBALS_ONLY_DEFS
 

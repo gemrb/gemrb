@@ -28,8 +28,8 @@
 #ifndef MOVIEPLAYER_H
 #define MOVIEPLAYER_H
 
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
+#include "win32def.h"
+#include "globals.h"
 #include "Resource.h"
 
 

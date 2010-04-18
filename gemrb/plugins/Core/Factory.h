@@ -21,10 +21,10 @@
 #ifndef FACTORY_H
 #define FACTORY_H
 
-#include "../../includes/globals.h"
+#include "globals.h"
 #include "FactoryObject.h"
 #include "AnimationFactory.h"
-#include "../../includes/exports.h"
+#include "exports.h"
 
 class GEM_EXPORT Factory {
 private:

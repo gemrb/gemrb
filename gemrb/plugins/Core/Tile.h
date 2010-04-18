@@ -21,9 +21,9 @@
 #ifndef TILE_H
 #define TILE_H
 
-#include "../../includes/exports.h"
-#include "../../includes/RGBAColor.h"
-#include "../Core/Animation.h"
+#include "exports.h"
+#include "RGBAColor.h"
+#include "Animation.h"
 
 class GEM_EXPORT Tile {
 public:

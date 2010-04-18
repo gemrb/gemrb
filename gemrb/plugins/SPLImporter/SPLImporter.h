@@ -25,9 +25,9 @@
 #include <config.h>
 #endif
 
-#include "../../includes/ie_types.h"
-#include "../Core/Spell.h"
-#include "../Core/SpellMgr.h"
+#include "ie_types.h"
+#include "Spell.h"
+#include "SpellMgr.h"
 
 
 class SPLImp : public SpellMgr {

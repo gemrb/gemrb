@@ -22,7 +22,7 @@
 #define ANIMATIONMGR_H
 
 #include "Plugin.h"
-#include "../../includes/globals.h"
+#include "globals.h"
 #include "Animation.h"
 #include "AnimationFactory.h"
 #include "Font.h"

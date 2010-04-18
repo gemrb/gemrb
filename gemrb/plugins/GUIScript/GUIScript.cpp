@@ -19,31 +19,31 @@
  */
 
 #include "GUIScript.h"
-#include "../Core/Interface.h"
-#include "../Core/Map.h"
-#include "../Core/Label.h"
-#include "../Core/GameControl.h"
-#include "../Core/WorldMapControl.h"
-#include "../Core/MapControl.h"
-#include "../Core/Audio.h"
-#include "../Core/GSUtils.h" //checkvariable
-#include "../Core/TileMap.h"
-#include "../Core/Video.h"
-#include "../Core/Palette.h"
-#include "../Core/TextEdit.h"
-#include "../Core/Button.h"
-#include "../Core/Spell.h"
-#include "../Core/Item.h"
-#include "../Core/MusicMgr.h"
-#include "../Core/SaveGameIterator.h"
-#include "../Core/Game.h"
-#include "../Core/ControlAnimation.h"
-#include "../Core/DataFileMgr.h"
-#include "../Core/WorldMap.h"
-#include "../Core/EffectQueue.h"
-#include "../Core/ImageFactory.h"
-#include "../Core/ResourceDesc.h"
-#include "../Core/PalettedImageMgr.h"
+#include "Interface.h"
+#include "Map.h"
+#include "Label.h"
+#include "GameControl.h"
+#include "WorldMapControl.h"
+#include "MapControl.h"
+#include "Audio.h"
+#include "GSUtils.h" //checkvariable
+#include "TileMap.h"
+#include "Video.h"
+#include "Palette.h"
+#include "TextEdit.h"
+#include "Button.h"
+#include "Spell.h"
+#include "Item.h"
+#include "MusicMgr.h"
+#include "SaveGameIterator.h"
+#include "Game.h"
+#include "ControlAnimation.h"
+#include "DataFileMgr.h"
+#include "WorldMap.h"
+#include "EffectQueue.h"
+#include "ImageFactory.h"
+#include "ResourceDesc.h"
+#include "PalettedImageMgr.h"
 
 #include <cstdio>
 
@@ -9869,7 +9869,7 @@ PyObject* GUIScript::ConstructObject(const char* classname, PyObject* pArgs)
 	return ret;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x1B01BE6B, "GUI Script Engine (Python)")
 PLUGIN_CLASS(IE_GUI_SCRIPT_CLASS_ID, GUIScript)

@@ -23,8 +23,8 @@
 
 #include <ctype.h>
 #include <cstring>
-#include "../../includes/win32def.h"
-#include "../../includes/SClassID.h"
+#include "win32def.h"
+#include "SClassID.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Dictionary<unsigned long, VALUE>

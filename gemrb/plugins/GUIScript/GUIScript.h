@@ -32,7 +32,7 @@
 #else
 #include <Python.h>
 #endif
-#include "../Core/ScriptEngine.h"
+#include "ScriptEngine.h"
 
 #define SV_BPP 0
 #define SV_WIDTH 1

@@ -21,12 +21,12 @@
 #include <cmath>
 #include <cassert>
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "Map.h"
 #include "Interface.h"
 #include "PathFinder.h"
 #include "Ambient.h"
-#include "../../includes/strrefs.h"
+#include "strrefs.h"
 #include "AmbientMgr.h"
 #include "TileMap.h"
 #include "ScriptedAnimation.h"

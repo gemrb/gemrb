@@ -21,8 +21,8 @@
 #ifndef DIALOG_H
 #define DIALOG_H
 
-#include "../../includes/globals.h"
-#include "../../includes/exports.h"
+#include "globals.h"
+#include "exports.h"
 #include <vector>
 
 #define IE_DLG_TR_TEXT     0x01

@@ -25,8 +25,8 @@
 HANDLE hConsole;
 #endif
 
-#include "../includes/globals.h"
-#include "../includes/win32def.h"
+#include "globals.h"
+#include "win32def.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>

@@ -22,8 +22,8 @@
 #define SDLVIDEODRIVER_H
 
 #include <SDL.h>
-#include "../../includes/win32def.h"
-#include "../Core/Video.h"
+#include "win32def.h"
+#include "Video.h"
 
 class SDLVideoDriver : public Video {
 private:

@@ -18,21 +18,21 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../../includes/strrefs.h"
-#include "../../includes/opcode_params.h"
-#include "../../includes/overlays.h"
-#include "../../includes/ie_feats.h" //cannot avoid declaring these
-#include "../Core/Actor.h"
-#include "../Core/EffectQueue.h"
-#include "../Core/Interface.h"
-#include "../Core/Audio.h"
-#include "../Core/Game.h"
-#include "../Core/GameControl.h"
-#include "../Core/damages.h"
-#include "../Core/TileMap.h" //needs for knock!
-#include "../Core/GSUtils.h" //needs for MoveBetweenAreasCore
-#include "../Core/Projectile.h" //needs for clearair
+#include "win32def.h"
+#include "strrefs.h"
+#include "opcode_params.h"
+#include "overlays.h"
+#include "ie_feats.h" //cannot avoid declaring these
+#include "Actor.h"
+#include "EffectQueue.h"
+#include "Interface.h"
+#include "Audio.h"
+#include "Game.h"
+#include "GameControl.h"
+#include "damages.h"
+#include "TileMap.h" //needs for knock!
+#include "GSUtils.h" //needs for MoveBetweenAreasCore
+#include "Projectile.h" //needs for clearair
 
 //FIXME: find a way to handle portrait icons better
 #define PI_CONFUSED  3
@@ -6151,7 +6151,7 @@ int fx_unknown (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x1AAA040A, "Effect opcodes for core games")
 RegisterCoreOpcodes();

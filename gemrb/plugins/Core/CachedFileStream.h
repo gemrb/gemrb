@@ -22,7 +22,7 @@
 #define CACHEDFILESTREAM_H
 
 #include "FileStream.h"
-#include "../../includes/exports.h"
+#include "exports.h"
 
 class GEM_EXPORT CachedFileStream : public DataStream// : public FileStream
 {

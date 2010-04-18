@@ -21,8 +21,8 @@
 #ifndef DLGIMP_H
 #define DLGIMP_H
 
-#include "../Core/DialogMgr.h"
-#include "../../includes/globals.h"
+#include "DialogMgr.h"
+#include "globals.h"
 
 /*
 struct State {

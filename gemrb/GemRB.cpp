@@ -22,8 +22,8 @@
 
 
 #include <cstdio>
-#include "includes/win32def.h"
-#include "plugins/Core/Interface.h"
+#include "win32def.h"
+#include "Interface.h"
 
 #ifndef WIN32
 #include <ctype.h>

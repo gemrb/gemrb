@@ -17,7 +17,7 @@
  *
  */
 
-#include "../../includes/win32def.h"
+#include "win32def.h"
 #include "MapControl.h"
 #include "Interface.h"
 #include "Video.h"

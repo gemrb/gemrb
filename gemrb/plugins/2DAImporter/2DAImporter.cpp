@@ -18,10 +18,10 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../Core/Interface.h"
+#include "win32def.h"
+#include "Interface.h"
 #include "2DAImporter.h"
-#include "../Core/FileStream.h"
+#include "FileStream.h"
 
 #define MAXLENGTH 4096      //if a 2da has longer lines, change this
 #define SIGNLENGTH 256      //if a 2da has longer default value, change this
@@ -111,7 +111,7 @@ bool p2DAImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0xB22F938, "2DA File Importer")
 PLUGIN_CLASS(IE_2DA_CLASS_ID, p2DAImp)

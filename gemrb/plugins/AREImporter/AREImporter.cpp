@@ -18,21 +18,21 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../../includes/strrefs.h"
+#include "win32def.h"
+#include "strrefs.h"
 #include "AREImporter.h"
-#include "../Core/TileMapMgr.h"
-#include "../Core/Interface.h"
-#include "../Core/ActorMgr.h"
-#include "../Core/CachedFileStream.h"
-#include "../Core/ImageMgr.h"
-#include "../Core/Ambient.h"
-#include "../Core/DataFileMgr.h"
-#include "../Core/Game.h"
-#include "../Core/Video.h"
-#include "../Core/Palette.h"
-#include "../Core/ProjectileServer.h"
-#include "../Core/EffectMgr.h"
+#include "TileMapMgr.h"
+#include "Interface.h"
+#include "ActorMgr.h"
+#include "CachedFileStream.h"
+#include "ImageMgr.h"
+#include "Ambient.h"
+#include "DataFileMgr.h"
+#include "Game.h"
+#include "Video.h"
+#include "Palette.h"
+#include "ProjectileServer.h"
+#include "EffectMgr.h"
 
 #define DEF_OPEN   0
 #define DEF_CLOSE  1
@@ -2362,7 +2362,7 @@ int AREImp::PutArea(DataStream *stream, Map *map)
 	return ret;
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0x145B60F0, "ARE File Importer")
 PLUGIN_CLASS(IE_ARE_CLASS_ID, AREImp)

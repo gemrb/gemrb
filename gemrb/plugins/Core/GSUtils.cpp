@@ -31,8 +31,8 @@
 #include "Game.h"
 #include "GameControl.h"
 
-#include "../../includes/strrefs.h"
-#include "../../includes/defsounds.h"
+#include "strrefs.h"
+#include "defsounds.h"
 
 int initialized = 0;
 bool charactersubtitles = true;

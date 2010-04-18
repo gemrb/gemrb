@@ -18,8 +18,8 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h" //for abort()
+#include "win32def.h"
+#include "globals.h" //for abort()
 #include "PCStatStruct.h"
 #include <string.h>
 

@@ -21,9 +21,9 @@
 #ifndef BAMIMP_H
 #define BAMIMP_H
 
-#include "../Core/AnimationMgr.h"
-#include "../../includes/globals.h"
-#include "../../includes/RGBAColor.h"
+#include "AnimationMgr.h"
+#include "globals.h"
+#include "RGBAColor.h"
 
 struct FrameEntry {
 	ieWord Width;

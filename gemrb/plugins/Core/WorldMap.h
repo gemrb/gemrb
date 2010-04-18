@@ -28,9 +28,9 @@
 #ifndef WORLDMAP_H
 #define WORLDMAP_H
 
-#include "../../includes/exports.h"
+#include "exports.h"
 #include <vector>
-#include "../../includes/ie_types.h"
+#include "ie_types.h"
 
 #include "Sprite2D.h"
 #include "AnimationFactory.h"

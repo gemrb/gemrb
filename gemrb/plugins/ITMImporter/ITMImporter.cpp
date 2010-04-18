@@ -18,9 +18,9 @@
  *
  */
 
-#include "../../includes/win32def.h"
-#include "../Core/Interface.h"
-#include "../Core/EffectMgr.h"
+#include "win32def.h"
+#include "Interface.h"
+#include "EffectMgr.h"
 #include "ITMImporter.h"
 
 ITMImp::ITMImp(void)
@@ -247,7 +247,7 @@ void ITMImp::GetFeature(Effect *fx)
 	core->FreeInterface( eM );
 }
 
-#include "../../includes/plugindef.h"
+#include "plugindef.h"
 
 GEMRB_PLUGIN(0xD913A54, "ITM File Importer")
 PLUGIN_CLASS(IE_ITM_CLASS_ID, ITMImp)
