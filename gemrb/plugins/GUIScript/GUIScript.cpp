@@ -3196,7 +3196,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	char *ResRef;
 
 	memset(col,-1,sizeof(col));
-	if (!PyArg_ParseTuple( args, "iis|iiiiiiiii", &WindowIndex, &ControlIndex,
+	if (!PyArg_ParseTuple( args, "iisiiiiiiii|i", &WindowIndex, &ControlIndex,
 			&ResRef, &(col[0]), &(col[1]), &(col[2]), &(col[3]),
 			&(col[4]), &(col[5]), &(col[6]), &(col[7]), &type) ) {
 		return AttributeError( GemRB_SetButtonPLT__doc );
