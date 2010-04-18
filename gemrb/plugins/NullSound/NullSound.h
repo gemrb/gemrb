@@ -18,15 +18,15 @@
  *
  */
 
-#ifndef NULLSND_H
-#define NULLSND_H
+#ifndef NULLSOUND_H
+#define NULLSOUND_H
 
 #include "Audio.h"
 
-class NullSnd : public Audio {
+class NullSound : public Audio {
 public:
-	NullSnd(void);
-	~NullSnd(void);
+	NullSound(void);
+	~NullSound(void);
 	bool Init(void);
 	unsigned int Play(const char* ResRef, int XPos = 0, int YPos = 0,  unsigned int flags = GEM_SND_RELATIVE);
 	int StreamFile(const char* filename);

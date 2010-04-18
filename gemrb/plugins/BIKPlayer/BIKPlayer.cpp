@@ -53,7 +53,7 @@ static const int ff_wma_critical_freqs[25] = {
 
 static uint8_t ff_cropTbl[256 + 2 * MAX_NEG_CROP] = {0, };
 
-BIKPlay::BIKPlay(void)
+BIKPlayer::BIKPlayer(void)
 {
 	int i;
 
@@ -73,12 +73,12 @@ BIKPlay::BIKPlay(void)
     	}
 }
 
-BIKPlay::~BIKPlay(void)
+BIKPlayer::~BIKPlayer(void)
 {
 	av_freep((void **) &inbuff);
 }
 
-void BIKPlay::av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den)
+void BIKPlayer::av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den)
 {
 	//pts_wrap_bits, if needed, is always 64
 	if(av_reduce(time_base.num, time_base.den, pts_num, pts_den, INT_MAX)) {
@@ -89,7 +89,7 @@ void BIKPlay::av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsig
 	time_base.num = time_base.den = 0;
 }
 
-int BIKPlay::ReadHeader()
+int BIKPlayer::ReadHeader()
 {
 	str->Seek(0,GEM_STREAM_START);
 	str->Read( header.signature, BIK_SIGNATURE_LEN );
@@ -189,7 +189,7 @@ int BIKPlay::ReadHeader()
 	return 0;
 }
 
-bool BIKPlay::Open(DataStream* stream, bool autoFree)
+bool BIKPlayer::Open(DataStream* stream, bool autoFree)
 {
 	validVideo = false;
 	if (!Resource::Open(stream, autoFree))
@@ -203,7 +203,7 @@ bool BIKPlay::Open(DataStream* stream, bool autoFree)
 	return false;
 }
 
-void BIKPlay::CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2 )
+void BIKPlayer::CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2 )
 {
 	maxRow = cnt;
 	frameCount = 0;
@@ -212,7 +212,7 @@ void BIKPlay::CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2 )
 	strRef = arg2;
 }
 
-int BIKPlay::Play()
+int BIKPlayer::Play()
 {
 	if (!validVideo) {
 		return 0;
@@ -244,12 +244,12 @@ void get_current_time(long &sec, long &usec) {
 #endif
 }
 
-void BIKPlay::timer_start()
+void BIKPlayer::timer_start()
 {
 	get_current_time(timer_last_sec, timer_last_usec);
 }
 
-void BIKPlay::timer_wait()
+void BIKPlayer::timer_wait()
 {
 	long sec, usec;
 	get_current_time(sec, usec);
@@ -276,7 +276,7 @@ void BIKPlay::timer_wait()
 	timer_start();
 }
 
-bool BIKPlay::next_frame()
+bool BIKPlayer::next_frame()
 {
 	if (timer_last_sec) {
 		timer_wait();
@@ -305,7 +305,7 @@ bool BIKPlay::next_frame()
 	return true;
 }
 
-int BIKPlay::doPlay()
+int BIKPlayer::doPlay()
 {
 	int done = 0;
 
@@ -337,13 +337,13 @@ int BIKPlay::doPlay()
 	return 0;
 }
 
-unsigned int BIKPlay::fileRead(unsigned int pos, void* buf, unsigned int count)
+unsigned int BIKPlayer::fileRead(unsigned int pos, void* buf, unsigned int count)
 {
 	str->Seek(pos, GEM_STREAM_START);
 	return str->Read( buf, count );
 }
 
-void BIKPlay::showFrame(unsigned char** buf, unsigned int *strides, unsigned int bufw,
+void BIKPlayer::showFrame(unsigned char** buf, unsigned int *strides, unsigned int bufw,
 	unsigned int bufh, unsigned int w, unsigned int h, unsigned int dstx, unsigned int dsty)
 {
 	ieDword titleref = 0;
@@ -361,7 +361,7 @@ void BIKPlay::showFrame(unsigned char** buf, unsigned int *strides, unsigned int
 	video->showYUVFrame(buf,strides,bufw,bufh,w,h,dstx,dsty, titleref);
 }
 
-int BIKPlay::setAudioStream()
+int BIKPlayer::setAudioStream()
 {
 	ieDword volume;
 	core->GetDictionary()->Lookup( "Volume Movie", volume) ;
@@ -369,13 +369,13 @@ int BIKPlay::setAudioStream()
 	return source;
 }
 
-void BIKPlay::freeAudioStream(int stream)
+void BIKPlayer::freeAudioStream(int stream)
 {
 	if (stream > -1)
 		core->GetAudioDrv()->ReleaseStream(stream, true);
 }
 
-void BIKPlay::queueBuffer(int stream, unsigned short bits, int channels, short* memory, int size, int samplerate)
+void BIKPlayer::queueBuffer(int stream, unsigned short bits, int channels, short* memory, int size, int samplerate)
 {
 	if (stream > -1)
 		core->GetAudioDrv()->QueueBuffer(stream, bits, channels, memory, size, samplerate);
@@ -389,7 +389,7 @@ void BIKPlay::queueBuffer(int stream, unsigned short bits, int channels, short* 
  *  http://wiki.multimedia.cx/index.php?title=Bink_Audio
  */
 
-int BIKPlay::sound_init(bool need_init)
+int BIKPlayer::sound_init(bool need_init)
 {
 	int sample_rate = header.samplerate;
 	int sample_rate_half;
@@ -475,7 +475,7 @@ int BIKPlay::sound_init(bool need_init)
 	return ret;
 }
 
-void BIKPlay::ff_init_scantable(uint8_t *permutation, ScanTable *st, const uint8_t *src_scantable){
+void BIKPlayer::ff_init_scantable(uint8_t *permutation, ScanTable *st, const uint8_t *src_scantable){
 	int i,j;
 	int end;
 
@@ -494,7 +494,7 @@ void BIKPlay::ff_init_scantable(uint8_t *permutation, ScanTable *st, const uint8
 	}
 }
 
-int BIKPlay::video_init(int w, int h)
+int BIKPlayer::video_init(int w, int h)
 {
 	int bw, bh, blocks;
 	int i;
@@ -542,7 +542,7 @@ int BIKPlay::video_init(int w, int h)
 	return 0;
 }
 
-int BIKPlay::EndAudio()
+int BIKPlayer::EndAudio()
 {
 	freeAudioStream(s_stream);
 	av_freep((void **) &s_bands);
@@ -579,7 +579,7 @@ static inline void get_buffer(AVFrame *p, int width, int height)
 	}
 }
 
-int BIKPlay::EndVideo()
+int BIKPlayer::EndVideo()
 {
 	int i;
 
@@ -634,7 +634,7 @@ static void ff_float_to_int16_interleave_c(int16_t *dst, const float **src, long
  * Decode Bink Audio block
  * @param[out] out Output buffer (must contain s->block_size elements)
  */
-void BIKPlay::DecodeBlock(short *out)
+void BIKPlayer::DecodeBlock(short *out)
 {
 	unsigned int ch, i, j, k;
 	float q, quant[25];
@@ -721,7 +721,7 @@ void BIKPlay::DecodeBlock(short *out)
 }
 
 //audio samples
-int BIKPlay::DecodeAudioFrame(void *data, int data_size)
+int BIKPlayer::DecodeAudioFrame(void *data, int data_size)
 {
 	int bits = data_size*8;
 	s_gb.init_get_bits((uint8_t *) data, bits);
@@ -762,7 +762,7 @@ int BIKPlay::DecodeAudioFrame(void *data, int data_size)
  * @param scan  scan order table
  * @return 0 for success, negative value in other cases
  */
-int BIKPlay::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan)
+int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan)
 {
 	int mode_list[128];
 	int i, t, mask, bits, ccoef, mode;
@@ -843,7 +843,7 @@ int BIKPlay::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan)
  * @param masks_count number of masks to decode
  * @return 0 on success, negative value in other cases
  */
-int BIKPlay::read_residue(DCTELEM block[64], int masks_count)
+int BIKPlayer::read_residue(DCTELEM block[64], int masks_count)
 {
 	int mode_list[128];
 	int i, mask, ccoef, mode;
@@ -926,7 +926,7 @@ int BIKPlay::read_residue(DCTELEM block[64], int masks_count)
  * @param c	   decoder context
  * @param bundle_num  number of the bundle to initialize
  */
-void BIKPlay::read_bundle(int bundle_num)
+void BIKPlayer::read_bundle(int bundle_num)
 {
 	int i;
 
@@ -948,7 +948,7 @@ void BIKPlay::read_bundle(int bundle_num)
  * @param width plane width
  * @param bw    plane width in 8x8 blocks
  */
-void BIKPlay::init_lengths(int width, int bw)
+void BIKPlayer::init_lengths(int width, int bw)
 {
 	c_bundle[BINK_SRC_BLOCK_TYPES].len = av_log2((width >> 3) + 511) + 1;
 
@@ -975,7 +975,7 @@ void BIKPlay::init_lengths(int width, int bw)
 		return 0; \
 	}
 
-int BIKPlay::get_vlc2(int16_t (*table)[2], int bits, int max_depth)
+int BIKPlayer::get_vlc2(int16_t (*table)[2], int bits, int max_depth)
 {
 	int code;
 	int n, index, nb_bits;
@@ -1010,7 +1010,7 @@ int BIKPlay::get_vlc2(int16_t (*table)[2], int bits, int max_depth)
 	(tree).syms[get_vlc2(bink_trees[(tree).vlc_num].table, \
 		bink_trees[(tree).vlc_num].bits, 1)]
 
-int BIKPlay::read_runs(Bundle *b)
+int BIKPlayer::read_runs(Bundle *b)
 {
 	int i, t, v;
 
@@ -1031,7 +1031,7 @@ int BIKPlay::read_runs(Bundle *b)
 	return 0;
 }
 
-int BIKPlay::read_motion_values(Bundle *b)
+int BIKPlayer::read_motion_values(Bundle *b)
 {
 	int i, t, v;
 
@@ -1060,7 +1060,7 @@ int BIKPlay::read_motion_values(Bundle *b)
 
 const uint8_t bink_rlelens[4] = { 4, 8, 12, 32 };
 
-int BIKPlay::read_block_types(Bundle *b)
+int BIKPlayer::read_block_types(Bundle *b)
 {
 	int i, t, v;
 	int last = 0;
@@ -1088,7 +1088,7 @@ int BIKPlay::read_block_types(Bundle *b)
 	return 0;
 }
 
-int BIKPlay::read_patterns(Bundle *b)
+int BIKPlayer::read_patterns(Bundle *b)
 {
 	int i, t, v;
 
@@ -1102,7 +1102,7 @@ int BIKPlay::read_patterns(Bundle *b)
 	return 0;
 }
 
-int BIKPlay::read_colors(Bundle *b)
+int BIKPlayer::read_colors(Bundle *b)
 {
 	int i, t, v, v2;
 
@@ -1129,7 +1129,7 @@ int BIKPlay::read_colors(Bundle *b)
 /** number of bits used to store first DC value in bundle */
 #define DC_START_BITS 11
 
-int BIKPlay::read_dcs(Bundle *b, int start_bits, int has_sign)
+int BIKPlayer::read_dcs(Bundle *b, int start_bits, int has_sign)
 {
 	int i, j, len, len2, bsize, v, v2;
 	int16_t *dst = (int16_t*)b->cur_dec;
@@ -1170,7 +1170,7 @@ int BIKPlay::read_dcs(Bundle *b, int start_bits, int has_sign)
 	return 0;
 }
 
-inline int BIKPlay::get_value(int bundle)
+inline int BIKPlayer::get_value(int bundle)
 {
 	int16_t ret;
 
@@ -1346,7 +1346,7 @@ static void idct_add(uint8_t *dest, int line_size, DCTELEM *block)
 	add_pixels_clamped(block, dest, line_size);
 }
 
-int BIKPlay::DecodeVideoFrame(void *data, int data_size)
+int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 {
 	int blk, bw, bh;
 	int i, j, plane, bx, by;
@@ -1603,5 +1603,5 @@ int BIKPlay::DecodeVideoFrame(void *data, int data_size)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x316E2EDE, "BIK Video Player")
-PLUGIN_RESOURCE(&MoviePlayer::ID, BIKPlay, ".mve")
+PLUGIN_RESOURCE(&MoviePlayer::ID, BIKPlayer, ".mve")
 END_PLUGIN()

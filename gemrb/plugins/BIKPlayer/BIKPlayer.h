@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef BIKPLAY_H
-#define BIKPLAY_H
+#ifndef BIKPLAYER_H
+#define BIKPLAYER_H
 
 #include "win32def.h"
 #include "globals.h"
@@ -121,7 +121,7 @@ typedef struct Bundle {
 	  uint8_t *cur_ptr;  ///< pointer to the data that is not read from buffer yet
 } Bundle;
 
-class BIKPlay : public MoviePlayer {
+class BIKPlayer : public MoviePlayer {
 
 private:
 	bool validVideo;
@@ -220,8 +220,8 @@ private:
 	int EndAudio();
 	int EndVideo();
 public:
-	BIKPlay(void);
-	~BIKPlay(void);
+	BIKPlayer(void);
+	~BIKPlayer(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	void CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2);
 	int Play();	

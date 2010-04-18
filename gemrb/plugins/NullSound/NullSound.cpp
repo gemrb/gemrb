@@ -22,90 +22,90 @@
 #include "NullSound.h"
 #include "AmbientMgr.h"
 
-NullSnd::NullSnd(void)
+NullSound::NullSound(void)
 {
 	XPos = 0;
 	YPos = 0;
 	ambim = new AmbientMgr();
 }
 
-NullSnd::~NullSnd(void)
+NullSound::~NullSound(void)
 {
 	delete ambim;
 }
 
-bool NullSnd::Init(void)
+bool NullSound::Init(void)
 {
 	return true;
 }
 
-unsigned int NullSnd::Play(const char*, int, int, unsigned int)
+unsigned int NullSound::Play(const char*, int, int, unsigned int)
 {
 	return 1000; //Returning 1 Second Length
 }
 
-int NullSnd::StreamFile(const char*)
+int NullSound::StreamFile(const char*)
 {
 	return 0;
 }
 
-bool NullSnd::Stop()
+bool NullSound::Stop()
 {
 	return true;
 }
 
-bool NullSnd::Play()
+bool NullSound::Play()
 {
 	return true;
 }
 
-void NullSnd::ResetMusics()
+void NullSound::ResetMusics()
 {
 }
 
-bool NullSnd::CanPlay()
-{
-	return false;
-}
-
-bool NullSnd::IsSpeaking()
+bool NullSound::CanPlay()
 {
 	return false;
 }
 
-void NullSnd::UpdateListenerPos(int x, int y)
+bool NullSound::IsSpeaking()
+{
+	return false;
+}
+
+void NullSound::UpdateListenerPos(int x, int y)
 {
 	XPos = x;
 	YPos = y;
 }
 
-void NullSnd::GetListenerPos(int& x, int& y)
+void NullSound::GetListenerPos(int& x, int& y)
 {
 	x = XPos;
 	y = YPos;
 }
 
-int NullSnd::SetupNewStream(ieWord, ieWord, ieWord, ieWord, bool, bool)
+int NullSound::SetupNewStream(ieWord, ieWord, ieWord, ieWord, bool, bool)
 {
 	return -1;
 }
 
-int NullSnd::QueueAmbient(int, const char*)
+int NullSound::QueueAmbient(int, const char*)
 {
 	return -1;
 }
 
-bool NullSnd::ReleaseStream(int, bool)
+bool NullSound::ReleaseStream(int, bool)
 {
 	return true;
 }
 
-void NullSnd::SetAmbientStreamVolume(int, int)
+void NullSound::SetAmbientStreamVolume(int, int)
 {
 
 }
 
-void NullSnd::QueueBuffer(int, unsigned short, int, short*, int, int)
+void NullSound::QueueBuffer(int, unsigned short, int, short*, int, int)
 {
 
 }
@@ -115,5 +115,5 @@ void NullSnd::QueueBuffer(int, unsigned short, int, short*, int, int)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x96E414D, "Null Sound Driver")
-PLUGIN_CLASS(IE_AUDIO_CLASS_ID, NullSnd)
+PLUGIN_CLASS(IE_AUDIO_CLASS_ID, NullSound)
 END_PLUGIN()

@@ -23,21 +23,21 @@
 #include "FileStream.h"
 #include "Interface.h"
 
-DLGImp::DLGImp(void)
+DLGImporter::DLGImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 	Version = 0;
 }
 
-DLGImp::~DLGImp(void)
+DLGImporter::~DLGImporter(void)
 {
 	if (str && autoFree) {
 		delete( str );
 	}
 }
 
-bool DLGImp::Open(DataStream* stream, bool autoFree)
+bool DLGImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -81,7 +81,7 @@ bool DLGImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Dialog* DLGImp::GetDialog()
+Dialog* DLGImporter::GetDialog()
 {
 	if(!Version) {
 		return NULL;
@@ -98,7 +98,7 @@ Dialog* DLGImp::GetDialog()
 	return d;
 }
 
-DialogState* DLGImp::GetDialogState(Dialog *d, unsigned int index)
+DialogState* DLGImporter::GetDialogState(Dialog *d, unsigned int index)
 {
 	DialogState* ds = new DialogState();
 	//16 = sizeof(State)
@@ -116,7 +116,7 @@ DialogState* DLGImp::GetDialogState(Dialog *d, unsigned int index)
 	return ds;
 }
 
-DialogTransition** DLGImp::GetTransitions(unsigned int firstIndex, unsigned int count)
+DialogTransition** DLGImporter::GetTransitions(unsigned int firstIndex, unsigned int count)
 {
 	DialogTransition** trans = ( DialogTransition** )
 		malloc( count*sizeof( DialogTransition* ) );
@@ -126,7 +126,7 @@ DialogTransition** DLGImp::GetTransitions(unsigned int firstIndex, unsigned int 
 	return trans;
 }
 
-DialogTransition* DLGImp::GetTransition(unsigned int index)
+DialogTransition* DLGImporter::GetTransition(unsigned int index)
 {
 	if (index >= TransitionsCount) {
 		return NULL;
@@ -164,7 +164,7 @@ DialogTransition* DLGImp::GetTransition(unsigned int index)
 	return dt;
 }
 
-DialogString* DLGImp::GetStateTrigger(unsigned int index)
+DialogString* DLGImporter::GetStateTrigger(unsigned int index)
 {
 	if (index >= StateTriggersCount) {
 		return NULL;
@@ -190,7 +190,7 @@ DialogString* DLGImp::GetStateTrigger(unsigned int index)
 	return ds;
 }
 
-DialogString* DLGImp::GetTransitionTrigger(unsigned int index)
+DialogString* DLGImporter::GetTransitionTrigger(unsigned int index)
 {
 	if (index >= TransitionTriggersCount) {
 		return NULL;
@@ -209,7 +209,7 @@ DialogString* DLGImp::GetTransitionTrigger(unsigned int index)
 	return ds;
 }
 
-DialogString* DLGImp::GetAction(unsigned int index)
+DialogString* DLGImporter::GetAction(unsigned int index)
 {
 	if (index >= ActionsCount) {
 		return NULL;
@@ -264,7 +264,7 @@ int GetActionLength(const char* string)
 
 /* this function will break up faulty script strings that lack the CRLF
    between commands, common in PST dialog */
-char** DLGImp::GetStrings(char* string, unsigned int& count)
+char** DLGImporter::GetStrings(char* string, unsigned int& count)
 {
 	int col = 0;
 	int level = 0;
@@ -339,5 +339,5 @@ char** DLGImp::GetStrings(char* string, unsigned int& count)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x1970D894, "DLG File Importer")
-PLUGIN_CLASS(IE_DLG_CLASS_ID, DLGImp)
+PLUGIN_CLASS(IE_DLG_CLASS_ID, DLGImporter)
 END_PLUGIN()

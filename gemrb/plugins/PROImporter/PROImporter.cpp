@@ -23,13 +23,13 @@
 #include "EffectMgr.h"
 #include "PROImporter.h"
 
-PROImp::PROImp(void)
+PROImporter::PROImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 }
 
-PROImp::~PROImp(void)
+PROImporter::~PROImporter(void)
 {
 	if (autoFree) {
 		delete str;
@@ -37,7 +37,7 @@ PROImp::~PROImp(void)
 	str = NULL;
 }
 
-bool PROImp::Open(DataStream* stream, bool autoFree)
+bool PROImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -59,7 +59,7 @@ bool PROImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Projectile* PROImp::GetProjectile(Projectile *s)
+Projectile* PROImporter::GetProjectile(Projectile *s)
 {
 	if( !s) {
 		return NULL;
@@ -109,7 +109,7 @@ Projectile* PROImp::GetProjectile(Projectile *s)
 	return s;
 }
 
-void PROImp::GetAreaExtension(ProjectileExtension *e)
+void PROImporter::GetAreaExtension(ProjectileExtension *e)
 {
 	ieWord tmp;
 
@@ -147,5 +147,5 @@ void PROImp::GetAreaExtension(ProjectileExtension *e)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xCAD2D64, "PRO File Importer")
-PLUGIN_CLASS(IE_PRO_CLASS_ID, PROImp)
+PLUGIN_CLASS(IE_PRO_CLASS_ID, PROImporter)
 END_PLUGIN()

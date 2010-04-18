@@ -23,13 +23,13 @@
 #include "EffectMgr.h"
 #include "ITMImporter.h"
 
-ITMImp::ITMImp(void)
+ITMImporter::ITMImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 }
 
-ITMImp::~ITMImp(void)
+ITMImporter::~ITMImporter(void)
 {
 	if (autoFree) {
 		delete str;
@@ -37,7 +37,7 @@ ITMImp::~ITMImp(void)
 	str = NULL;
 }
 
-bool ITMImp::Open(DataStream* stream, bool autoFree)
+bool ITMImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -63,7 +63,7 @@ bool ITMImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Item* ITMImp::GetItem(Item *s)
+Item* ITMImporter::GetItem(Item *s)
 {
 	unsigned int i;
 	ieByte k1,k2,k3,k4;
@@ -166,7 +166,7 @@ Item* ITMImp::GetItem(Item *s)
 	return s;
 }
 
-void ITMImp::GetExtHeader(Item *s, ITMExtHeader* eh)
+void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 {
 	ieByte tmpByte;
 	ieWord ProjectileType;
@@ -239,7 +239,7 @@ void ITMImp::GetExtHeader(Item *s, ITMExtHeader* eh)
 	}
 }
 
-void ITMImp::GetFeature(Effect *fx)
+void ITMImporter::GetFeature(Effect *fx)
 {
 	EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
 	eM->Open( str, false );
@@ -250,5 +250,5 @@ void ITMImp::GetFeature(Effect *fx)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xD913A54, "ITM File Importer")
-PLUGIN_CLASS(IE_ITM_CLASS_ID, ITMImp)
+PLUGIN_CLASS(IE_ITM_CLASS_ID, ITMImporter)
 END_PLUGIN()

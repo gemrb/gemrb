@@ -33,20 +33,20 @@
 // if your compiler chokes on this, use -1 or 0xff whichever works for you
 #define UNINITIALIZED_CHAR '\xff'
 
-GAMImp::GAMImp(void)
+GAMImporter::GAMImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 }
 
-GAMImp::~GAMImp(void)
+GAMImporter::~GAMImporter(void)
 {
 	if (str && autoFree) {
 		delete( str );
 	}
 }
 
-bool GAMImp::Open(DataStream* stream, bool autoFree)
+bool GAMImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -99,7 +99,7 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Game* GAMImp::LoadGame(Game *newGame, int ver_override)
+Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 {
 	unsigned int i;
 
@@ -116,7 +116,7 @@ Game* GAMImp::LoadGame(Game *newGame, int ver_override)
 /*
 		if (stricmp( core->GameType, "iwd2" ) == 0 && version != GAM_VER_IWD2) {
 			newGame->version = GAM_VER_IWD2;
-			printMessage("GAMImp"," ",LIGHT_RED);
+			printMessage("GAMImporter"," ",LIGHT_RED);
 			printf("Trying to load a non-iwd2 game (%d) in iwd2 mode! Patching version up.\n",
 				(int)version);
 		}
@@ -324,13 +324,13 @@ void SanityCheck(ieWord a,ieWord &b,const char *message)
 		return;
 	}
 	if (b==0xffff) {
-		printMessage("GAMImp"," ",LIGHT_RED);
+		printMessage("GAMImporter"," ",LIGHT_RED);
 		printf("Invalid Slot Enabler caught: %s!\n", message);
 		b=0;
 	}
 }
 
-Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
+Actor* GAMImporter::GetActor( ActorMgr* aM, bool is_in_party )
 {
 	unsigned int i;
 	PCStruct pcInfo;
@@ -516,7 +516,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	return actor;
 }
 
-void GAMImp::GetPCStats (PCStatsStruct *ps)
+void GAMImporter::GetPCStats (PCStatsStruct *ps)
 {
 	int i;
 
@@ -548,7 +548,7 @@ void GAMImp::GetPCStats (PCStatsStruct *ps)
 	}
 }
 
-GAMJournalEntry* GAMImp::GetJournalEntry()
+GAMJournalEntry* GAMImporter::GetJournalEntry()
 {
 	GAMJournalEntry* j = new GAMJournalEntry();
 
@@ -563,7 +563,7 @@ GAMJournalEntry* GAMImp::GetJournalEntry()
 	return j;
 }
 
-int GAMImp::GetStoredFileSize(Game *game)
+int GAMImporter::GetStoredFileSize(Game *game)
 {
 	int headersize;
 	unsigned int i;
@@ -664,7 +664,7 @@ int GAMImp::GetStoredFileSize(Game *game)
 	return headersize + (PPLocCount+SavedLocCount) * 20;
 }
 
-int GAMImp::PutJournals(DataStream *stream, Game *game)
+int GAMImporter::PutJournals(DataStream *stream, Game *game)
 {
 	for (unsigned int i=0;i<JournalCount;i++) {
 		GAMJournalEntry *j = game->GetJournalEntry(i);
@@ -682,7 +682,7 @@ int GAMImp::PutJournals(DataStream *stream, Game *game)
 }
 
 //only in ToB
-int GAMImp::PutSavedLocations(DataStream *stream, Game *game)
+int GAMImporter::PutSavedLocations(DataStream *stream, Game *game)
 {
 	ieWord tmpWord;
 
@@ -698,7 +698,7 @@ int GAMImp::PutSavedLocations(DataStream *stream, Game *game)
 	return 0;
 }
 
-int GAMImp::PutPlaneLocations(DataStream *stream, Game *game)
+int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game)
 {
 	ieWord tmpWord;
 
@@ -715,7 +715,7 @@ int GAMImp::PutPlaneLocations(DataStream *stream, Game *game)
 }
 
 //only in PST
-int GAMImp::PutKillVars(DataStream *stream, Game *game)
+int GAMImporter::PutKillVars(DataStream *stream, Game *game)
 {
 	char filling[40];
 	ieVariable tmpname;
@@ -737,7 +737,7 @@ int GAMImp::PutKillVars(DataStream *stream, Game *game)
 	return 0;
 }
 
-int GAMImp::PutVariables(DataStream *stream, Game *game)
+int GAMImporter::PutVariables(DataStream *stream, Game *game)
 {
 	char filling[40];
 	ieVariable tmpname;
@@ -759,7 +759,7 @@ int GAMImp::PutVariables(DataStream *stream, Game *game)
 	return 0;
 }
 
-int GAMImp::PutHeader(DataStream *stream, Game *game)
+int GAMImporter::PutHeader(DataStream *stream, Game *game)
 {
 	int i;
 	char Signature[10];
@@ -842,7 +842,7 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 	return 0;
 }
 
-int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CREOffset, ieDword version)
+int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CREOffset, ieDword version)
 {
 	int i;
 	ieDword tmpDword;
@@ -1014,7 +1014,7 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	return 0;
 }
 
-int GAMImp::PutPCs(DataStream *stream, Game *game)
+int GAMImporter::PutPCs(DataStream *stream, Game *game)
 {
 	unsigned int i;
 	ActorMgr *am = (ActorMgr *) core->GetInterface( IE_CRE_CLASS_ID );
@@ -1041,7 +1041,7 @@ int GAMImp::PutPCs(DataStream *stream, Game *game)
 	return 0;
 }
 
-int GAMImp::PutNPCs(DataStream *stream, Game *game)
+int GAMImporter::PutNPCs(DataStream *stream, Game *game)
 {
 	unsigned int i;
 	ActorMgr *am = (ActorMgr *) core->GetInterface( IE_CRE_CLASS_ID );
@@ -1063,13 +1063,13 @@ int GAMImp::PutNPCs(DataStream *stream, Game *game)
 	return 0;
 }
 
-int GAMImp::PutMaze(DataStream *stream, Game *game)
+int GAMImporter::PutMaze(DataStream *stream, Game *game)
 {
 	stream->Write( game->mazedata, MAZE_DATA_SIZE);
 	return 0;
 }
 
-int GAMImp::PutFamiliars(DataStream *stream, Game *game)
+int GAMImporter::PutFamiliars(DataStream *stream, Game *game)
 {
 	int len = 0;
 	if (core->GetBeastsINI()) {
@@ -1096,7 +1096,7 @@ int GAMImp::PutFamiliars(DataStream *stream, Game *game)
 	return 0;
 }
 
-int GAMImp::PutGame(DataStream *stream, Game *game)
+int GAMImporter::PutGame(DataStream *stream, Game *game)
 {
 	int ret;
 
@@ -1156,5 +1156,5 @@ int GAMImp::PutGame(DataStream *stream, Game *game)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xD7F7040, "GAM File Importer")
-PLUGIN_CLASS(IE_GAM_CLASS_ID, GAMImp)
+PLUGIN_CLASS(IE_GAM_CLASS_ID, GAMImporter)
 END_PLUGIN()

@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef CREIMP_H
-#define CREIMP_H
+#ifndef CREIMPORTER_H
+#define CREIMPORTER_H
 
 #include "ActorMgr.h"
 
@@ -30,7 +30,7 @@
 #define IE_CRE_V2_2		22
 #define IE_CRE_V9_0		90
 
-class CREImp : public ActorMgr {
+class CREImporter : public ActorMgr {
 private:
 	DataStream* str;
 	bool autoFree;
@@ -59,8 +59,8 @@ private:
 	int QSPCount; //spells
 	int QITCount; //items
 public:
-	CREImp(void);
-	~CREImp(void);
+	CREImporter(void);
+	~CREImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Actor* GetActor(unsigned char is_in_party);
 

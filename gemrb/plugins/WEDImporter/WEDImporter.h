@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef WEDIMP_H
-#define WEDIMP_H
+#ifndef WEDIMPORTER_H
+#define WEDIMPORTER_H
 
 #include "TileMapMgr.h"
 
@@ -32,7 +32,7 @@ struct Overlay {
 	ieDword TILOffset;
 };
 
-class WEDImp : public TileMapMgr {
+class WEDImporter : public TileMapMgr {
 private:
 	std::vector< Overlay> overlays;
 	DataStream* str;
@@ -50,8 +50,8 @@ private:
 	void GetDoorPolygonCount(ieWord count, ieDword offset);
 	int AddOverlay(TileMap *tm, Overlay *overlays, bool rain);
 public:
-	WEDImp(void);
-	~WEDImp(void);
+	WEDImporter(void);
+	~WEDImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	//if tilemap already exists, don't create it
 	TileMap* GetTileMap(TileMap *tm);

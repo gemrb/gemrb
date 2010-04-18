@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef STOIMP_H
-#define STOIMP_H
+#ifndef STOIMPORTER_H
+#define STOIMPORTER_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -30,15 +30,15 @@
 #include "StoreMgr.h"
 
 
-class STOImp : public StoreMgr {
+class STOImporter : public StoreMgr {
 private:
 	DataStream* str;
 	bool autoFree;
 	int version;
 
 public:
-	STOImp(void);
-	~STOImp(void);
+	STOImporter(void);
+	~STOImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Store* GetStore(Store *store);
 

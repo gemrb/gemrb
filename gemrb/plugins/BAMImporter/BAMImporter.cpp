@@ -26,7 +26,7 @@
 #include "Video.h"
 #include "Palette.h"
 
-BAMImp::BAMImp(void)
+BAMImporter::BAMImporter(void)
 {
 	str = NULL;
 	autoFree = false;
@@ -37,7 +37,7 @@ BAMImp::BAMImp(void)
 	CyclesCount = 0;
 }
 
-BAMImp::~BAMImp(void)
+BAMImporter::~BAMImporter(void)
 {
 	if (str && autoFree) {
 		delete( str );
@@ -47,7 +47,7 @@ BAMImp::~BAMImp(void)
 	gamedata->FreePalette(palette);
 }
 
-bool BAMImp::Open(DataStream* stream, bool autoFree)
+bool BAMImporter::Open(DataStream* stream, bool autoFree)
 {
 	unsigned int i;
 
@@ -149,7 +149,7 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-int BAMImp::GetCycleSize(unsigned char Cycle)
+int BAMImporter::GetCycleSize(unsigned char Cycle)
 {
 	if(Cycle >= CyclesCount ) {
 		return -1;
@@ -157,7 +157,7 @@ int BAMImp::GetCycleSize(unsigned char Cycle)
 	return cycles[Cycle].FramesCount;
 }
 
-Sprite2D* BAMImp::GetFrameInternal(unsigned short findex, unsigned char mode,
+Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mode,
 				   bool BAMsprite, const unsigned char* data,
 				   AnimationFactory* datasrc)
 {
@@ -197,7 +197,7 @@ Sprite2D* BAMImp::GetFrameInternal(unsigned short findex, unsigned char mode,
 	return spr;
 }
 
-void* BAMImp::GetFramePixels(unsigned short findex)
+void* BAMImporter::GetFramePixels(unsigned short findex)
 {
 	if (findex >= FramesCount) {
 		findex = cycles[0].FirstFrame;
@@ -252,7 +252,7 @@ void* BAMImp::GetFramePixels(unsigned short findex)
 	return pixels;
 }
 
-ieWord * BAMImp::CacheFLT(unsigned int &count)
+ieWord * BAMImporter::CacheFLT(unsigned int &count)
 {
 	int i;
 
@@ -273,7 +273,7 @@ ieWord * BAMImp::CacheFLT(unsigned int &count)
 	return FLT;
 }
 
-AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef, unsigned char mode)
+AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned char mode)
 {
 	unsigned int i, count;
 	AnimationFactory* af = new AnimationFactory( ResRef );
@@ -306,7 +306,7 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef, unsigned char 
 }
 
 /** This function will load the Animation as a Font */
-Font* BAMImp::GetFont()
+Font* BAMImporter::GetFont()
 {
 	unsigned int i;
 
@@ -369,7 +369,7 @@ Font* BAMImp::GetFont()
 }
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 If the Global Animation Palette is NULL, returns NULL. */
-Sprite2D* BAMImp::GetPalette()
+Sprite2D* BAMImporter::GetPalette()
 {
 	unsigned char * pixels = ( unsigned char * ) malloc( 256 );
 	unsigned char * p = pixels;
@@ -382,5 +382,5 @@ Sprite2D* BAMImp::GetPalette()
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x3AD6427A, "BAM File Importer")
-PLUGIN_CLASS(IE_BAM_CLASS_ID, BAMImp)
+PLUGIN_CLASS(IE_BAM_CLASS_ID, BAMImporter)
 END_PLUGIN()

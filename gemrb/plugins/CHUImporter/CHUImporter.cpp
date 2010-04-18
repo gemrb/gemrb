@@ -32,13 +32,13 @@
 #include "ImageMgr.h"
 #include "RGBAColor.h"
 
-CHUImp::CHUImp()
+CHUImporter::CHUImporter()
 {
 	str = NULL;
 	autoFree = false;
 }
 
-CHUImp::~CHUImp()
+CHUImporter::~CHUImporter()
 {
 	if (autoFree) {
 		delete str;
@@ -46,7 +46,7 @@ CHUImp::~CHUImp()
 }
 
 /** This function loads all available windows from the 'stream' parameter. */
-bool CHUImp::Open(DataStream* stream, bool autoFree)
+bool CHUImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -69,7 +69,7 @@ bool CHUImp::Open(DataStream* stream, bool autoFree)
 }
 
 /** Returns the i-th window in the Previously Loaded Stream */
-Window* CHUImp::GetWindow(unsigned int wid)
+Window* CHUImporter::GetWindow(unsigned int wid)
 {
 	ieWord WindowID, XPos, YPos, Width, Height, BackGround;
 	ieWord ControlsCount, FirstControl;
@@ -501,7 +501,7 @@ endalign:
 	return win;
 }
 /** Returns the number of available windows */
-unsigned int CHUImp::GetWindowsCount()
+unsigned int CHUImporter::GetWindowsCount()
 {
 	return WindowCount;
 }
@@ -509,5 +509,5 @@ unsigned int CHUImp::GetWindowsCount()
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x23A7F6CA, "CHU File Importer")
-PLUGIN_CLASS(IE_CHU_CLASS_ID, CHUImp)
+PLUGIN_CLASS(IE_CHU_CLASS_ID, CHUImporter)
 END_PLUGIN()

@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef WMPIMP_H
-#define WMPIMP_H
+#ifndef WMPIMPORTER_H
+#define WMPIMPORTER_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -30,7 +30,7 @@
 #include "WorldMapMgr.h"
 
 
-class WMPImp : public WorldMapMgr {
+class WMPImporter : public WorldMapMgr {
 private:
 	DataStream* str;
 	bool autoFree;
@@ -39,8 +39,8 @@ private:
 	ieDword WorldMapsOffset;
 
 public:
-	WMPImp(void);
-	~WMPImp(void);
+	WMPImporter(void);
+	~WMPImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	WorldMapArray *GetWorldMapArray();
 

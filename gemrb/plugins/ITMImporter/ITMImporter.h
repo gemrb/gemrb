@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef ITMIMP_H
-#define ITMIMP_H
+#ifndef ITMIMPORTER_H
+#define ITMIMPORTER_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -33,15 +33,15 @@
 #define ITM_VER_PST 11
 #define ITM_VER_IWD2 20
 
-class ITMImp : public ItemMgr {
+class ITMImporter : public ItemMgr {
 private:
 	DataStream* str;
 	bool autoFree;
 	int version;
 
 public:
-	ITMImp(void);
-	~ITMImp(void);
+	ITMImporter(void);
+	~ITMImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Item* GetItem(Item *s);
 	void release(void)

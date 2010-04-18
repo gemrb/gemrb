@@ -24,20 +24,20 @@
 #include "Interface.h"
 #include "Video.h"
 
-TISImp::TISImp(void)
+TISImporter::TISImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 }
 
-TISImp::~TISImp(void)
+TISImporter::~TISImporter(void)
 {
 	if (str && autoFree) {
 		delete( str );
 	}
 }
 
-bool TISImp::Open(DataStream* stream, bool autoFree)
+bool TISImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -65,7 +65,7 @@ bool TISImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Tile* TISImp::GetTile(unsigned short* indexes, int count,
+Tile* TISImporter::GetTile(unsigned short* indexes, int count,
 	unsigned short* secondary)
 {
 	Animation* ani = new Animation( count );
@@ -86,7 +86,7 @@ Tile* TISImp::GetTile(unsigned short* indexes, int count,
 	return new Tile( ani );
 }
 
-Sprite2D* TISImp::GetTile(int index)
+Sprite2D* TISImporter::GetTile(int index)
 {
 	RevColor RevCol[256];
 	Color Palette[256];
@@ -94,7 +94,7 @@ Sprite2D* TISImp::GetTile(int index)
 	unsigned long pos = index *(1024+4096) + headerShift;
 	if(str->Size()<pos+1024+4096) {
 		// try to only report error once per file
-		static TISImp *last_corrupt = NULL;
+		static TISImporter *last_corrupt = NULL;
 		if (last_corrupt != this) {
 			/*printf("Invalid tile index: %d\n",index);
 			printf("FileSize: %ld\n", str->Size() );
@@ -123,7 +123,7 @@ Sprite2D* TISImp::GetTile(int index)
 		Palette[i].a = RevCol[i].a;
 		if (Palette[i].g==255 && !Palette[i].r && !Palette[i].b) {
 			if (transparent) {
-				printMessage( "TISImp", "Tile has two green (transparent) palette entries\n", LIGHT_RED );
+				printMessage( "TISImporter", "Tile has two green (transparent) palette entries\n", LIGHT_RED );
 			} else {
 				transparent = true;
 				transindex = i;
@@ -139,5 +139,5 @@ Sprite2D* TISImp::GetTile(int index)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x19F91578, "TIS File Importer")
-PLUGIN_CLASS(IE_TIS_CLASS_ID, TISImp)
+PLUGIN_CLASS(IE_TIS_CLASS_ID, TISImporter)
 END_PLUGIN()

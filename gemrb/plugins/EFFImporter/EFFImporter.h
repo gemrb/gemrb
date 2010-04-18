@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef EFFIMP_H
-#define EFFIMP_H
+#ifndef EFFIMPORTER_H
+#define EFFIMPORTER_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -30,15 +30,15 @@
 #include "EffectMgr.h"
 
 
-class EFFImp : public EffectMgr {
+class EFFImporter : public EffectMgr {
 private:
 	DataStream* str;
 	bool autoFree;
 	int version;
 
 public:
-	EFFImp(void);
-	~EFFImp(void);
+	EFFImporter(void);
+	~EFFImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Effect* GetEffect(Effect *fx);
 	Effect* GetEffectV1(Effect *fx);

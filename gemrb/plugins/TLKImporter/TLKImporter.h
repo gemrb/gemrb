@@ -18,13 +18,13 @@
  *
  */
 
-#ifndef TLKIMP_H
-#define TLKIMP_H
+#ifndef TLKIMPORTER_H
+#define TLKIMPORTER_H
 
 #include "StringMgr.h"
 #include "TlkOverride.h"
 
-class TLKImp : public StringMgr {
+class TLKImporter : public StringMgr {
 private:
 	DataStream* str;
 	bool autoFree;
@@ -34,8 +34,8 @@ private:
 	CTlkOverride *override;
 
 public:
-	TLKImp(void);
-	~TLKImp(void);
+	TLKImporter(void);
+	~TLKImporter(void);
 	/** open string refs coming from saved game */
 	void OpenAux();
 	/** purge string defs coming from saved game */

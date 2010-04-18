@@ -18,18 +18,18 @@
  *
  */
 
-#ifndef MOSIMP_H
-#define MOSIMP_H
+#ifndef MOSIMPORTER_H
+#define MOSIMPORTER_H
 
 #include "ImageMgr.h"
 
-class MOSImp : public ImageMgr {
+class MOSImporter : public ImageMgr {
 private:
 	ieWord Width, Height, Cols, Rows;
 	ieDword BlockSize, PalOffset;
 public:
-	MOSImp(void);
-	~MOSImp(void);
+	MOSImporter(void);
+	~MOSImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Sprite2D* GetSprite2D();
 	int GetWidth() { return (int) Width; }

@@ -23,20 +23,20 @@
 #include "EffectMgr.h"
 #include "SPLImporter.h"
 
-SPLImp::SPLImp(void)
+SPLImporter::SPLImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 }
 
-SPLImp::~SPLImp(void)
+SPLImporter::~SPLImporter(void)
 {
 	if (str && autoFree) {
 		delete( str );
 	}
 }
 
-bool SPLImp::Open(DataStream* stream, bool autoFree)
+bool SPLImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -60,7 +60,7 @@ bool SPLImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Spell* SPLImp::GetSpell(Spell *s, bool /*silent*/)
+Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 {
 	unsigned int i;
 
@@ -131,7 +131,7 @@ Spell* SPLImp::GetSpell(Spell *s, bool /*silent*/)
 	return s;
 }
 
-void SPLImp::GetExtHeader(Spell *s, SPLExtHeader* eh)
+void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 {
 	ieByte tmpByte;
 
@@ -170,7 +170,7 @@ void SPLImp::GetExtHeader(Spell *s, SPLExtHeader* eh)
 	}
 }
 
-void SPLImp::GetFeature(Spell *s, Effect *fx)
+void SPLImporter::GetFeature(Spell *s, Effect *fx)
 {
 	EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
 	eM->Open( str, false );
@@ -184,5 +184,5 @@ void SPLImp::GetFeature(Spell *s, Effect *fx)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xA8D1014, "SPL File Importer")
-PLUGIN_CLASS(IE_SPL_CLASS_ID, SPLImp)
+PLUGIN_CLASS(IE_SPL_CLASS_ID, SPLImporter)
 END_PLUGIN()

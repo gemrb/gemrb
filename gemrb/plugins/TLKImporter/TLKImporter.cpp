@@ -32,7 +32,7 @@
 //set this to -1 if charname is gabber (iwd2)
 static int charname=0;
 
-TLKImp::TLKImp(void)
+TLKImporter::TLKImporter(void)
 {
 	if (core->HasFeature(GF_CHARNAMEISGABBER)) {
 		charname=-1;
@@ -61,7 +61,7 @@ TLKImp::TLKImp(void)
 */
 }
 
-TLKImp::~TLKImp(void)
+TLKImporter::~TLKImporter(void)
 {
 /*
 	if (monthnames) free(monthnames);
@@ -74,7 +74,7 @@ TLKImp::~TLKImp(void)
 	CloseAux();
 }
 
-void TLKImp::CloseAux()
+void TLKImporter::CloseAux()
 {
 	if (override) {
 		delete override;
@@ -82,7 +82,7 @@ void TLKImp::CloseAux()
 	override = NULL;
 }
 
-void TLKImp::OpenAux()
+void TLKImporter::OpenAux()
 {
 	CloseAux();
 	override = new CTlkOverride();
@@ -94,7 +94,7 @@ void TLKImp::OpenAux()
 	}
 }
 
-bool TLKImp::Open(DataStream* stream, bool autoFree)
+bool TLKImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -149,7 +149,7 @@ inline Actor *GetActorFromSlot(int slot)
 	return game->FindPC(slot);
 }
 
-char *TLKImp::Gabber()
+char *TLKImporter::Gabber()
 {
 	Actor *act;
 
@@ -160,7 +160,7 @@ char *TLKImp::Gabber()
 	return override->CS("?");
 }
 
-char *TLKImp::CharName(int slot)
+char *TLKImporter::CharName(int slot)
 {
 	Actor *act;
 
@@ -171,7 +171,7 @@ char *TLKImp::CharName(int slot)
 	return override->CS("?");
 }
 
-int TLKImp::RaceStrRef(int slot)
+int TLKImporter::RaceStrRef(int slot)
 {
 	Actor *act;
 	int race;
@@ -191,7 +191,7 @@ int TLKImp::RaceStrRef(int slot)
 	return atoi(tab->QueryField(row,0) );
 }
 
-int TLKImp::GenderStrRef(int slot, int malestrref, int femalestrref)
+int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref)
 {
 	Actor *act;
 
@@ -203,7 +203,7 @@ int TLKImp::GenderStrRef(int slot, int malestrref, int femalestrref)
 }
 
 /*
-void TLKImp::GetMonthName(int dayandmonth)
+void TLKImporter::GetMonthName(int dayandmonth)
 {
 	int month=1;
 
@@ -231,7 +231,7 @@ void TLKImp::GetMonthName(int dayandmonth)
 */
 
 //if this function returns -1 then it is not a built in token, dest may be NULL
-int TLKImp::BuiltinToken(char* Token, char* dest)
+int TLKImporter::BuiltinToken(char* Token, char* dest)
 {
 	char* Decoded = NULL;
 	int TokenLength;	 //decoded token length
@@ -371,7 +371,7 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 	return -1;
 }
 
-bool TLKImp::ResolveTags(char* dest, char* source, int Length)
+bool TLKImporter::ResolveTags(char* dest, char* source, int Length)
 {
 	int NewLength;
 	char Token[MAX_VARIABLE_LENGTH + 1];
@@ -407,7 +407,7 @@ bool TLKImp::ResolveTags(char* dest, char* source, int Length)
 	return true;
 }
 
-bool TLKImp::GetNewStringLength(char* string, int& Length)
+bool TLKImporter::GetNewStringLength(char* string, int& Length)
 {
 	int NewLength;
 	bool lChange;
@@ -444,10 +444,10 @@ bool TLKImp::GetNewStringLength(char* string, int& Length)
 	return lChange;
 }
 
-ieStrRef TLKImp::UpdateString(ieStrRef strref, const char *newvalue)
+ieStrRef TLKImporter::UpdateString(ieStrRef strref, const char *newvalue)
 {
 	if (!override) {
-		printMessage("TLKImp", "Custom string is not supported by this game format.\n", LIGHT_RED);
+		printMessage("TLKImporter", "Custom string is not supported by this game format.\n", LIGHT_RED);
 		return 0xffffffff;
 	}
 
@@ -455,11 +455,11 @@ ieStrRef TLKImp::UpdateString(ieStrRef strref, const char *newvalue)
 		return override->UpdateString(strref, newvalue);
 	}
 
-	printMessage("TLKImp", "Cannot set custom string.\n", LIGHT_RED);
+	printMessage("TLKImporter", "Cannot set custom string.\n", LIGHT_RED);
 	return 0xffffffff;
 }
 
-char* TLKImp::GetString(ieStrRef strref, ieDword flags)
+char* TLKImporter::GetString(ieStrRef strref, ieDword flags)
 {
 	char* string;
 	
@@ -539,7 +539,7 @@ empty:
 	return string;
 }
 
-StringBlock TLKImp::GetStringBlock(ieStrRef strref, unsigned int flags)
+StringBlock TLKImporter::GetStringBlock(ieStrRef strref, unsigned int flags)
 {
 	StringBlock sb;
 
@@ -561,7 +561,7 @@ empty:
 	return sb;
 }
 
-void TLKImp::FreeString(char *str)
+void TLKImporter::FreeString(char *str)
 {
 	free(str);
 }
@@ -570,5 +570,5 @@ void TLKImp::FreeString(char *str)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xBB6F380, "TLK File Importer")
-PLUGIN_CLASS(IE_TLK_CLASS_ID, TLKImp)
+PLUGIN_CLASS(IE_TLK_CLASS_ID, TLKImporter)
 END_PLUGIN()

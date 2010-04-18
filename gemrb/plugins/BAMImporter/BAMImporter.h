@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef BAMIMP_H
-#define BAMIMP_H
+#ifndef BAMIMPORTER_H
+#define BAMIMPORTER_H
 
 #include "AnimationMgr.h"
 #include "globals.h"
@@ -35,7 +35,7 @@ struct FrameEntry {
 
 class Palette;
 
-class BAMImp : public AnimationMgr {
+class BAMImporter : public AnimationMgr {
 private:
 	DataStream* str;
 	bool autoFree;
@@ -54,8 +54,8 @@ private:
 	void* GetFramePixels(unsigned short findex);
 	ieWord * CacheFLT(unsigned int &count);
 public:
-	BAMImp(void);
-	~BAMImp(void);
+	BAMImporter(void);
+	~BAMImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	int GetCycleSize(unsigned char Cycle);
 	AnimationFactory* GetAnimationFactory(const char* ResRef,

@@ -23,20 +23,20 @@
 #include "ImageMgr.h"
 #include "WMPImporter.h"
 
-WMPImp::WMPImp(void)
+WMPImporter::WMPImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 }
 
-WMPImp::~WMPImp(void)
+WMPImporter::~WMPImporter(void)
 {
 	if (str && autoFree) {
 		delete( str );
 	}
 }
 
-bool WMPImp::Open(DataStream* stream, bool autoFree)
+bool WMPImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -59,7 +59,7 @@ bool WMPImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-WorldMapArray* WMPImp::GetWorldMapArray()
+WorldMapArray* WMPImporter::GetWorldMapArray()
 {
 	WorldMapArray* ma = core->NewWorldMapArray(WorldMapsCount);
 	for (unsigned int i=0;i<WorldMapsCount; i++) {
@@ -69,7 +69,7 @@ WorldMapArray* WMPImp::GetWorldMapArray()
 	return ma;
 }
 
-void WMPImp::GetWorldMap(WorldMap *m, unsigned int index)
+void WMPImporter::GetWorldMap(WorldMap *m, unsigned int index)
 {
 	unsigned int i;
 
@@ -124,7 +124,7 @@ void WMPImp::GetWorldMap(WorldMap *m, unsigned int index)
 
 }
 
-WMPAreaEntry* WMPImp::GetAreaEntry(WMPAreaEntry* ae)
+WMPAreaEntry* WMPImporter::GetAreaEntry(WMPAreaEntry* ae)
 {
 	str->ReadResRef( ae->AreaName );
 	str->ReadResRef( ae->AreaResRef );
@@ -149,7 +149,7 @@ WMPAreaEntry* WMPImp::GetAreaEntry(WMPAreaEntry* ae)
 	return ae;
 }
 
-WMPAreaLink* WMPImp::GetAreaLink(WMPAreaLink* al)
+WMPAreaLink* WMPImporter::GetAreaLink(WMPAreaLink* al)
 {
 	str->ReadDword( &al->AreaIndex );
 	str->Read( al->DestEntryPoint, 32 );
@@ -164,7 +164,7 @@ WMPAreaLink* WMPImp::GetAreaLink(WMPAreaLink* al)
 	return al;
 }
 
-int WMPImp::GetStoredFileSize(WorldMapArray *wmap)
+int WMPImporter::GetStoredFileSize(WorldMapArray *wmap)
 {
 	int headersize = 16;
 	WorldMapsOffset = headersize;
@@ -186,7 +186,7 @@ int WMPImp::GetStoredFileSize(WorldMapArray *wmap)
 	return headersize;
 }
 
-int WMPImp::PutWorldMap(DataStream *stream, WorldMapArray *wmap)
+int WMPImporter::PutWorldMap(DataStream *stream, WorldMapArray *wmap)
 {
 	if (!stream || !wmap) {
 		return -1;
@@ -199,7 +199,7 @@ int WMPImp::PutWorldMap(DataStream *stream, WorldMapArray *wmap)
 	return PutMaps( stream, wmap);
 }
 
-int WMPImp::PutLinks(DataStream *stream, WorldMap *wmap)
+int WMPImporter::PutLinks(DataStream *stream, WorldMap *wmap)
 {
 	char filling[128];
 
@@ -220,7 +220,7 @@ int WMPImp::PutLinks(DataStream *stream, WorldMap *wmap)
 	return 0;
 }
 
-int WMPImp::PutAreas(DataStream *stream, WorldMap *wmap)
+int WMPImporter::PutAreas(DataStream *stream, WorldMap *wmap)
 {
 	char filling[128];
 	ieDword tmpDword;
@@ -250,7 +250,7 @@ int WMPImp::PutAreas(DataStream *stream, WorldMap *wmap)
 	return 0;
 }
 
-int WMPImp::PutMaps(DataStream *stream, WorldMapArray *wmap)
+int WMPImporter::PutMaps(DataStream *stream, WorldMapArray *wmap)
 {
 	unsigned int i;
 	int ret;
@@ -318,5 +318,5 @@ int WMPImp::PutMaps(DataStream *stream, WorldMapArray *wmap)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x77918C6, "WMP File Importer")
-PLUGIN_CLASS(IE_WMP_CLASS_ID, WMPImp)
+PLUGIN_CLASS(IE_WMP_CLASS_ID, WMPImporter)
 END_PLUGIN()

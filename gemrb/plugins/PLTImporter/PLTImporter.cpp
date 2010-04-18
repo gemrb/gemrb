@@ -30,7 +30,7 @@ static ieDword red_mask = 0xff000000;
 static ieDword green_mask = 0x00ff0000;
 static ieDword blue_mask = 0x0000ff00;
 
-PLTImp::PLTImp(void)
+PLTImporter::PLTImporter(void)
 {
 	pixels = NULL;
 	if (DataStream::IsEndianSwitch()) {
@@ -40,14 +40,14 @@ PLTImp::PLTImp(void)
 	}
 }
 
-PLTImp::~PLTImp(void)
+PLTImporter::~PLTImporter(void)
 {
 	if (pixels) {
 		free( pixels );
 	}
 }
 
-bool PLTImp::Open(DataStream* stream, bool autoFree)
+bool PLTImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (!Resource::Open(stream, autoFree))
 		return false;
@@ -71,7 +71,7 @@ bool PLTImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Sprite2D* PLTImp::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
+Sprite2D* PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 {
 	Color Palettes[8][256];
 	for (int i = 0; i < 8; i++) {
@@ -105,5 +105,5 @@ Sprite2D* PLTImp::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x8D0C64F, "PLT File Importer")
-PLUGIN_IE_RESOURCE(&PalettedImageMgr::ID, PLTImp, ".plt", (ieWord)IE_PLT_CLASS_ID)
+PLUGIN_IE_RESOURCE(&PalettedImageMgr::ID, PLTImporter, ".plt", (ieWord)IE_PLT_CLASS_ID)
 END_PLUGIN()

@@ -33,20 +33,20 @@ struct wed_polygon {
 //the net sizeof(wed_polygon) is 0x12 but not all compilers know that
 #define WED_POLYGON_SIZE  0x12
 
-WEDImp::WEDImp(void)
+WEDImporter::WEDImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 }
 
-WEDImp::~WEDImp(void)
+WEDImporter::~WEDImporter(void)
 {
 	if (str && autoFree) {
 		delete( str );
 	}
 }
 
-bool WEDImp::Open(DataStream* stream, bool autoFree)
+bool WEDImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -90,7 +90,7 @@ bool WEDImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-int WEDImp::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
+int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 {
 	ieResRef res;
 	int usedoverlays = 0;
@@ -150,7 +150,7 @@ int WEDImp::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 }
 
 //this will replace the tileset of an existing tilemap, or create a new one
-TileMap* WEDImp::GetTileMap(TileMap *tm)
+TileMap* WEDImporter::GetTileMap(TileMap *tm)
 {
 	int usedoverlays;
 
@@ -183,7 +183,7 @@ TileMap* WEDImp::GetTileMap(TileMap *tm)
 	return tm;
 }
 
-void WEDImp::GetDoorPolygonCount(ieWord count, ieDword offset)
+void WEDImporter::GetDoorPolygonCount(ieWord count, ieDword offset)
 {
 	ieDword basecount = offset-PolygonsOffset;
 	if (basecount%WED_POLYGON_SIZE) {
@@ -196,19 +196,19 @@ void WEDImp::GetDoorPolygonCount(ieWord count, ieDword offset)
 	}
 }
 
-void WEDImp::SetupClosedDoor(unsigned int &index, unsigned int &count)
+void WEDImporter::SetupClosedDoor(unsigned int &index, unsigned int &count)
 {
 	index = (ClosedPolyOffset-PolygonsOffset)/WED_POLYGON_SIZE;
 	count = ClosedPolyCount;
 }
 
-void WEDImp::SetupOpenDoor(unsigned int &index, unsigned int &count)
+void WEDImporter::SetupOpenDoor(unsigned int &index, unsigned int &count)
 {
 	index = (OpenPolyOffset-PolygonsOffset)/WED_POLYGON_SIZE;
 	count = OpenPolyCount;
 }
 
-ieWord* WEDImp::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
+ieWord* WEDImporter::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 {
 	ieWord DoorClosed, DoorTileStart, DoorTileCount, * DoorTiles;
 	ieResRef Name;
@@ -254,7 +254,7 @@ ieWord* WEDImp::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 	return DoorTiles;
 }
 
-Wall_Polygon **WEDImp::GetWallGroups()
+Wall_Polygon **WEDImporter::GetWallGroups()
 {
 	ieDword polygonCount = WallPolygonsCount+DoorPolygonsCount;
 
@@ -330,5 +330,5 @@ Wall_Polygon **WEDImp::GetWallGroups()
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x7486BE7, "WED File Importer")
-PLUGIN_CLASS(IE_WED_CLASS_ID, WEDImp)
+PLUGIN_CLASS(IE_WED_CLASS_ID, WEDImporter)
 END_PLUGIN()

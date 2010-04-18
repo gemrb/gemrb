@@ -18,14 +18,14 @@
  *
  */
 
-#ifndef AREIMP_H
-#define AREIMP_H
+#ifndef AREIMPORTER_H
+#define AREIMPORTER_H
 
 #include "MapMgr.h"
 class Animation;
 class AnimationFactory;
 
-class AREImp : public MapMgr {
+class AREImporter : public MapMgr {
 private:
 	DataStream* str;
 	bool autoFree;
@@ -54,8 +54,8 @@ private:
 	ieResRef Script;
 	ieResRef Dream1, Dream2; //only in ToB
 public:
-	AREImp(void);
-	~AREImp(void);
+	AREImporter(void);
+	~AREImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	bool ChangeMap(Map *map, bool day_or_night);
 	Map* GetMap(const char* ResRef, bool day_or_night);

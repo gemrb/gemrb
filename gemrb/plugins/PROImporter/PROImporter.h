@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef PROIMP_H
-#define PROIMP_H
+#ifndef PROIMPORTER_H
+#define PROIMPORTER_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -30,15 +30,15 @@
 #include "ProjectileMgr.h"
 
 
-class PROImp : public ProjectileMgr {
+class PROImporter : public ProjectileMgr {
 private:
 	DataStream* str;
 	bool autoFree;
 	int version;
 
 public:
-	PROImp(void);
-	~PROImp(void);
+	PROImporter(void);
+	~PROImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Projectile* GetProjectile(Projectile *s);
 	void release(void)

@@ -115,7 +115,7 @@ int GetTrackString(const ieResRef areaName)
 	return -1;
 }
 
-AREImp::AREImp(void)
+AREImporter::AREImporter(void)
 {
 	autoFree = false;
 	str = NULL;
@@ -133,7 +133,7 @@ AREImp::AREImp(void)
 	}
 }
 
-AREImp::~AREImp(void)
+AREImporter::~AREImporter(void)
 {
 	if (autoFree) {
 		delete str;
@@ -141,7 +141,7 @@ AREImp::~AREImp(void)
 	Sounds[0][0]=UNINITIALIZED_BYTE;
 }
 
-bool AREImp::Open(DataStream* stream, bool autoFree)
+bool AREImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -222,7 +222,7 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 
 //alter a map to the night/day version in case of an extended night map (bg2 specific)
 //return true, if change happened, in which case a movie is played by the Game object
-bool AREImp::ChangeMap(Map *map, bool day_or_night)
+bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 {
 	ieResRef TmpResRef;
 
@@ -277,7 +277,7 @@ bool AREImp::ChangeMap(Map *map, bool day_or_night)
 	return true;
 }
 
-Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
+Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 {
 	unsigned int i,x;
 
@@ -1182,7 +1182,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		str->Read( &Owner,1 );
 		int TrapEffectCount = TrapSize/0x108;
 		if(TrapEffectCount*0x108!=TrapSize) {
-			printMessage("AREImp", " ", LIGHT_RED);
+			printMessage("AREImporter", " ", LIGHT_RED);
 			printf("TrapEffectSize in game: %d != %d. Clearing it\n", TrapSize, TrapEffectCount*0x108);
 				continue;
 		}
@@ -1236,7 +1236,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	}
 	else {
 		if( ExploredBitmapSize ) {
-			printMessage("AREImp", " ", LIGHT_RED);
+			printMessage("AREImporter", " ", LIGHT_RED);
 			printf("ExploredBitmapSize in game: %d != %d. Clearing it\n", ExploredBitmapSize, i);
 		}
 		ExploredBitmapSize = i;
@@ -1255,7 +1255,7 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	return map;
 }
 
-void AREImp::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCount)
+void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCount)
 {
 	unsigned int i;
 
@@ -1272,7 +1272,7 @@ void AREImp::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCo
 	core->FreeInterface(eM);
 }
 
-int AREImp::GetStoredFileSize(Map *map)
+int AREImporter::GetStoredFileSize(Map *map)
 {
 	unsigned int i;
 	int headersize = map->version+0x11c;
@@ -1381,7 +1381,7 @@ int AREImp::GetStoredFileSize(Map *map)
 	return headersize;
 }
 
-int AREImp::PutHeader(DataStream *stream, Map *map)
+int AREImporter::PutHeader(DataStream *stream, Map *map)
 {
 	char Signature[56];
 	ieDword tmpDword = 0;
@@ -1475,7 +1475,7 @@ int AREImp::PutHeader(DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
+int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 {
 	char filling[8];
 	ieDword tmpDword = 0;
@@ -1571,7 +1571,7 @@ int AREImp::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 	return 0;
 }
 
-int AREImp::PutPoints( DataStream *stream, Point *p, unsigned int count)
+int AREImporter::PutPoints( DataStream *stream, Point *p, unsigned int count)
 {
 	ieWord tmpWord;
 	unsigned int j;
@@ -1585,7 +1585,7 @@ int AREImp::PutPoints( DataStream *stream, Point *p, unsigned int count)
 	return 0;
 }
 
-int AREImp::PutVertices( DataStream *stream, Map *map)
+int AREImporter::PutVertices( DataStream *stream, Map *map)
 {
 	unsigned int i;
 
@@ -1610,7 +1610,7 @@ int AREImp::PutVertices( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutItems( DataStream *stream, Map *map)
+int AREImporter::PutItems( DataStream *stream, Map *map)
 {
 	for (unsigned int i=0;i<ContainersCount;i++) {
 		Container *c = map->TMap->GetContainer(i);
@@ -1629,7 +1629,7 @@ int AREImp::PutItems( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex)
+int AREImporter::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex)
 {
 	char filling[56];
 	ieDword ItemIndex = 0;
@@ -1694,7 +1694,7 @@ int AREImp::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex)
 	return 0;
 }
 
-int AREImp::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
+int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 {
 	ieDword tmpDword = 0;
 	ieWord tmpWord;
@@ -1760,7 +1760,7 @@ int AREImp::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 	return 0;
 }
 
-int AREImp::PutSpawns( DataStream *stream, Map *map)
+int AREImporter::PutSpawns( DataStream *stream, Map *map)
 {
 	ieWord tmpWord;
 	char filling[56];
@@ -1799,7 +1799,7 @@ int AREImp::PutSpawns( DataStream *stream, Map *map)
 	return 0;
 }
 
-void AREImp::PutScript(DataStream *stream, Actor *ac, unsigned int index)
+void AREImporter::PutScript(DataStream *stream, Actor *ac, unsigned int index)
 {
 	char filling[8];
 
@@ -1812,7 +1812,7 @@ void AREImp::PutScript(DataStream *stream, Actor *ac, unsigned int index)
 	}
 }
 
-int AREImp::PutActors( DataStream *stream, Map *map)
+int AREImporter::PutActors( DataStream *stream, Map *map)
 {
 	ieDword tmpDword = 0;
 	ieWord tmpWord;
@@ -1877,7 +1877,7 @@ int AREImp::PutActors( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutAnimations( DataStream *stream, Map *map)
+int AREImporter::PutAnimations( DataStream *stream, Map *map)
 {
 	ieWord tmpWord;
 
@@ -1904,7 +1904,7 @@ int AREImp::PutAnimations( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutEntrances( DataStream *stream, Map *map)
+int AREImporter::PutEntrances( DataStream *stream, Map *map)
 {
 	ieWord tmpWord;
 	char filling[66];
@@ -1925,7 +1925,7 @@ int AREImp::PutEntrances( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutVariables( DataStream *stream, Map *map)
+int AREImporter::PutVariables( DataStream *stream, Map *map)
 {
 	char filling[40];
 	POSITION pos=NULL;
@@ -1947,7 +1947,7 @@ int AREImp::PutVariables( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutAmbients( DataStream *stream, Map *map)
+int AREImporter::PutAmbients( DataStream *stream, Map *map)
 {
 	char filling[64];
 	ieWord tmpWord;
@@ -1983,7 +1983,7 @@ int AREImp::PutAmbients( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutMapnotes( DataStream *stream, Map *map)
+int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 {
 	char filling[8];
 	ieDword tmpDword;
@@ -2039,7 +2039,7 @@ int AREImp::PutMapnotes( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutEffects( DataStream *stream, EffectQueue *fxqueue)
+int AREImporter::PutEffects( DataStream *stream, EffectQueue *fxqueue)
 {
 	ieDword tmpDword1,tmpDword2;
 	char filling[60];
@@ -2104,7 +2104,7 @@ int AREImp::PutEffects( DataStream *stream, EffectQueue *fxqueue)
 	return 0;
 }
 
-int AREImp::PutTraps( DataStream *stream, Map *map)
+int AREImporter::PutTraps( DataStream *stream, Map *map)
 {
 	ieDword Offset;
 	ieDword tmpDword;
@@ -2159,13 +2159,13 @@ int AREImp::PutTraps( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutExplored( DataStream *stream, Map *map)
+int AREImporter::PutExplored( DataStream *stream, Map *map)
 {
 	stream->Write( map->ExploredBitmap, ExploredBitmapSize);
 	return 0;
 }
 
-int AREImp::PutTiles( DataStream * stream, Map * map)
+int AREImporter::PutTiles( DataStream * stream, Map * map)
 {
 	char filling[48];
 	ieDword tmpDword = 0;
@@ -2187,7 +2187,7 @@ int AREImp::PutTiles( DataStream * stream, Map * map)
 	return 0;
 }
 
-int AREImp::PutSongHeader( DataStream *stream, Map *map)
+int AREImporter::PutSongHeader( DataStream *stream, Map *map)
 {
 	int i;
 	char filling[8];
@@ -2214,7 +2214,7 @@ int AREImp::PutSongHeader( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutRestHeader( DataStream *stream, Map *map)
+int AREImporter::PutRestHeader( DataStream *stream, Map *map)
 {
 	int i;
 	ieDword tmpDword = 0;
@@ -2244,7 +2244,7 @@ int AREImp::PutRestHeader( DataStream *stream, Map *map)
 }
 
 /* no saving of tiled objects, are they used anywhere? */
-int AREImp::PutArea(DataStream *stream, Map *map)
+int AREImporter::PutArea(DataStream *stream, Map *map)
 {
 	ieDword VertIndex = 0;
 	int ret;
@@ -2365,6 +2365,6 @@ int AREImp::PutArea(DataStream *stream, Map *map)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x145B60F0, "ARE File Importer")
-PLUGIN_CLASS(IE_ARE_CLASS_ID, AREImp)
+PLUGIN_CLASS(IE_ARE_CLASS_ID, AREImporter)
 PLUGIN_CLEANUP(ReleaseMemory);
 END_PLUGIN()

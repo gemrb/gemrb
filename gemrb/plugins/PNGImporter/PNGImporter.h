@@ -18,22 +18,22 @@
  *
  */
 
-#ifndef PNGIMP_H
-#define PNGIMP_H
+#ifndef PNGIMPORTER_H
+#define PNGIMPORTER_H
 
 #include "ImageMgr.h"
 
 struct PNGInternal;
 
-class PNGImp : public ImageMgr {
+class PNGImporter : public ImageMgr {
 private:
 	PNGInternal* inf;
 
 	ieDword Width, Height;
 	bool hasPalette;
 public:
-	PNGImp(void);
-	~PNGImp(void);
+	PNGImporter(void);
+	~PNGImporter(void);
 	void Close();
 	bool Open(DataStream* stream, bool autoFree = true);
 	Sprite2D* GetSprite2D();

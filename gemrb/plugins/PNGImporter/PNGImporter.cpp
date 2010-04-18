@@ -48,7 +48,7 @@ static ieDword green_mask = 0x0000ff00;
 static ieDword red_mask = 0x000000ff;
 static ieDword alpha_mask = 0xff000000;
 
-PNGImp::PNGImp(void)
+PNGImporter::PNGImporter(void)
 {
 	inf = new PNGInternal();
 	inf->png_ptr = 0;
@@ -56,13 +56,13 @@ PNGImp::PNGImp(void)
 	inf->end_info = 0;
 }
 
-PNGImp::~PNGImp(void)
+PNGImporter::~PNGImporter(void)
 {
 	Close();
 	delete inf;
 }
 
-void PNGImp::Close()
+void PNGImporter::Close()
 {
 	if (inf) {
 		if (inf->png_ptr) {
@@ -75,7 +75,7 @@ void PNGImp::Close()
 	}
 }
 
-bool PNGImp::Open(DataStream* stream, bool autoFree)
+bool PNGImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (!Resource::Open(stream, autoFree))
 		return false;
@@ -149,7 +149,7 @@ bool PNGImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Sprite2D* PNGImp::GetSprite2D()
+Sprite2D* PNGImporter::GetSprite2D()
 {
 	Sprite2D* spr = 0;
 	unsigned char* buffer = 0;
@@ -191,7 +191,7 @@ Sprite2D* PNGImp::GetSprite2D()
 	return spr;
 }
 
-void PNGImp::GetPalette(int colors, Color* pal)
+void PNGImporter::GetPalette(int colors, Color* pal)
 {
 	if (!hasPalette) {
 		ImageMgr::GetPalette(colors, pal);
@@ -212,5 +212,5 @@ void PNGImp::GetPalette(int colors, Color* pal)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x11C3EB12, "PNG File Importer")
-PLUGIN_IE_RESOURCE(&ImageMgr::ID, PNGImp, ".png", (ieWord)IE_PNG_CLASS_ID)
+PLUGIN_IE_RESOURCE(&ImageMgr::ID, PNGImporter, ".png", (ieWord)IE_PNG_CLASS_ID)
 END_PLUGIN()

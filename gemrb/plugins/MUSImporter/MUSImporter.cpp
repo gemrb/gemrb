@@ -25,7 +25,7 @@
 
 static char musicsubfolder[6] = "music";
 
-MUSImp::MUSImp()
+MUSImporter::MUSImporter()
 {
 	Initialized = false;
 	Playing = false;
@@ -35,20 +35,20 @@ MUSImp::MUSImp()
 	lastSound = 0xffffffff;
 }
 
-MUSImp::~MUSImp()
+MUSImporter::~MUSImporter()
 {
 	if (str) {
 		delete( str );
 	}
 }
 /** Initializes the PlayList Manager */
-bool MUSImp::Init()
+bool MUSImporter::Init()
 {
 	Initialized = true;
 	return true;
 }
 /** Loads a PlayList for playing */
-bool MUSImp::OpenPlaylist(const char* name)
+bool MUSImporter::OpenPlaylist(const char* name)
 {
 	if (PLName[0] != '\0') {
 		int len = ( int ) strlen( PLName );
@@ -175,7 +175,7 @@ bool MUSImp::OpenPlaylist(const char* name)
 	return true;
 }
 /** Start the PlayList Music Execution */
-void MUSImp::Start()
+void MUSImporter::Start()
 {
 	if (!Playing) {
 		PLpos = 0;
@@ -200,7 +200,7 @@ void MUSImp::Start()
 	}
 }
 /** Ends the Current PlayList Execution */
-void MUSImp::End()
+void MUSImporter::End()
 {
 	if (Playing) {
 		if (playlist.size() == 0)
@@ -213,7 +213,7 @@ void MUSImp::End()
 	}
 }
 
-void MUSImp::HardEnd()
+void MUSImporter::HardEnd()
 {
 	core->GetAudioDrv()->Stop();
 	Playing = false;
@@ -221,7 +221,7 @@ void MUSImp::HardEnd()
 }
 
 /** Switches the current PlayList while playing the current one, return nonzero on error */
-int MUSImp::SwitchPlayList(const char* name, bool Hard)
+int MUSImporter::SwitchPlayList(const char* name, bool Hard)
 {
 	//don't do anything if the requested song is already playing
 	//this fixed PST's infinite song start
@@ -242,7 +242,7 @@ int MUSImp::SwitchPlayList(const char* name, bool Hard)
 	return -1;
 }
 /** Plays the Next Entry */
-void MUSImp::PlayNext()
+void MUSImporter::PlayNext()
 {
 	if (!Playing) {
 		return;
@@ -272,12 +272,12 @@ void MUSImp::PlayNext()
 	}
 }
 
-void MUSImp::PlayMusic(int pos)
+void MUSImporter::PlayMusic(int pos)
 {
 	PlayMusic( playlist[pos].PLFile );
 }
 
-void MUSImp::PlayMusic(char* name)
+void MUSImporter::PlayMusic(char* name)
 {
 	char FName[_MAX_PATH];
 	if (strnicmp( name, "mx9000", 6 ) == 0) { //iwd2
@@ -308,7 +308,7 @@ void MUSImp::PlayMusic(char* name)
 	printf( "Playing: %s\n", FName );
 }
 
-bool MUSImp::CurrentPlayList(const char* name) {
+bool MUSImporter::CurrentPlayList(const char* name) {
 	int len = ( int ) strlen( PLName );
 	if (strnicmp( name, PLName, len ) == 0) return true;
 	return false;
@@ -318,5 +318,5 @@ bool MUSImp::CurrentPlayList(const char* name) {
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x2DCB9E8, "MUS File Importer")
-PLUGIN_CLASS(IE_MUS_CLASS_ID, MUSImp)
+PLUGIN_CLASS(IE_MUS_CLASS_ID, MUSImporter)
 END_PLUGIN()

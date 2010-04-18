@@ -26,13 +26,13 @@
 #define MAXLENGTH 4096      //if a 2da has longer lines, change this
 #define SIGNLENGTH 256      //if a 2da has longer default value, change this
 
-p2DAImp::p2DAImp(void)
+p2DAImporter::p2DAImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 }
 
-p2DAImp::~p2DAImp(void)
+p2DAImporter::~p2DAImporter(void)
 {
 	if (str && autoFree) {
 		delete( str );
@@ -42,7 +42,7 @@ p2DAImp::~p2DAImp(void)
 	}
 }
 
-bool p2DAImp::Open(DataStream* stream, bool autoFree)
+bool p2DAImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -114,5 +114,5 @@ bool p2DAImp::Open(DataStream* stream, bool autoFree)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xB22F938, "2DA File Importer")
-PLUGIN_CLASS(IE_2DA_CLASS_ID, p2DAImp)
+PLUGIN_CLASS(IE_2DA_CLASS_ID, p2DAImporter)
 END_PLUGIN()

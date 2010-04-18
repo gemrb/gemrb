@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef CHUIMP_H
-#define CHUIMP_H
+#ifndef CHUIMPORTER_H
+#define CHUIMPORTER_H
 
 #include "WindowMgr.h"
 #include "DataStream.h"
@@ -28,14 +28,14 @@
   *@author GemRB Developement Team
   */
 
-class CHUImp : public WindowMgr {
+class CHUImporter : public WindowMgr {
 private:
 	DataStream* str;
 	bool autoFree;
 	ieDword WindowCount, CTOffset, WEOffset;
 public: 
-	CHUImp();
-	~CHUImp();
+	CHUImporter();
+	~CHUImporter();
 	/** Returns the number of available windows */
 	unsigned int GetWindowsCount();
 	/** Returns the i-th window in the Previously Loaded Stream */

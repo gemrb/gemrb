@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef MUSIMP_H
-#define MUSIMP_H
+#ifndef MUSIMPORTER_H
+#define MUSIMPORTER_H
 
 #include "MusicMgr.h"
 #include "FileStream.h"
@@ -37,7 +37,7 @@ struct PLString {
 	unsigned int soundID;
 };
 
-class MUSImp : public MusicMgr {
+class MUSImporter : public MusicMgr {
 private:
 	bool Initialized;
 	bool Playing;
@@ -50,8 +50,8 @@ private:
 	void PlayMusic(int pos);
 	void PlayMusic(char* name);
 public:
-	MUSImp();
-	~MUSImp();
+	MUSImporter();
+	~MUSImporter();
 	/** Loads a PlayList for playing */
 	bool OpenPlaylist(const char* name);
 	/** Initializes the PlayList Manager */

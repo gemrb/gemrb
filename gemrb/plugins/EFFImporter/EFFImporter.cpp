@@ -22,20 +22,20 @@
 #include "Interface.h"
 #include "EFFImporter.h"
 
-EFFImp::EFFImp(void)
+EFFImporter::EFFImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 }
 
-EFFImp::~EFFImp(void)
+EFFImporter::~EFFImporter(void)
 {
 	if (autoFree) {
 		delete str;
 	}
 }
 
-bool EFFImp::Open(DataStream* stream, bool autoFree)
+bool EFFImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -56,7 +56,7 @@ bool EFFImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Effect* EFFImp::GetEffect(Effect *fx)
+Effect* EFFImporter::GetEffect(Effect *fx)
 {
 	if (version == 1) {
 		return GetEffectV1( fx );
@@ -68,7 +68,7 @@ Effect* EFFImp::GetEffect(Effect *fx)
 	}
 }
 
-Effect* EFFImp::GetEffectV1(Effect *fx)
+Effect* EFFImporter::GetEffectV1(Effect *fx)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -105,7 +105,7 @@ Effect* EFFImp::GetEffectV1(Effect *fx)
 	return fx;
 }
 
-Effect* EFFImp::GetEffectV20(Effect *fx)
+Effect* EFFImporter::GetEffectV20(Effect *fx)
 {
 	ieDword tmp;
 	memset( fx, 0, sizeof( Effect ) );
@@ -165,5 +165,5 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x14E81128, "EFF File Importer")
-PLUGIN_CLASS(IE_EFF_CLASS_ID, EFFImp)
+PLUGIN_CLASS(IE_EFF_CLASS_ID, EFFImporter)
 END_PLUGIN()

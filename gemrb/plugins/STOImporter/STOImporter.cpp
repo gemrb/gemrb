@@ -23,20 +23,20 @@
 #include "Inventory.h"
 #include "STOImporter.h"
 
-STOImp::STOImp(void)
+STOImporter::STOImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 }
 
-STOImp::~STOImp(void)
+STOImporter::~STOImporter(void)
 {
 	if (str && autoFree) {
 		delete( str );
 	}
 }
 
-bool STOImp::Open(DataStream* stream, bool autoFree)
+bool STOImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -65,7 +65,7 @@ bool STOImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Store* STOImp::GetStore(Store *s)
+Store* STOImporter::GetStore(Store *s)
 {
 	unsigned int i;
 
@@ -148,7 +148,7 @@ Store* STOImp::GetStore(Store *s)
 	return s;
 }
 
-void STOImp::GetItem(STOItem *it)
+void STOImporter::GetItem(STOItem *it)
 {
 	str->ReadResRef( it->ItemResRef );
 	str->ReadWord( &it->PurchasedAmount );
@@ -195,7 +195,7 @@ void STOImp::GetItem(STOItem *it)
 	}
 }
 
-void STOImp::GetDrink(STODrink *dr)
+void STOImporter::GetDrink(STODrink *dr)
 {
 	str->ReadResRef( dr->RumourResRef );
 	str->ReadDword( &dr->DrinkName );
@@ -203,13 +203,13 @@ void STOImp::GetDrink(STODrink *dr)
 	str->ReadDword( &dr->Strength );
 }
 
-void STOImp::GetCure(STOCure *cu)
+void STOImporter::GetCure(STOCure *cu)
 {
 	str->ReadResRef( cu->CureResRef );
 	str->ReadDword( &cu->Price );
 }
 
-void STOImp::GetPurchasedCategories(Store* s)
+void STOImporter::GetPurchasedCategories(Store* s)
 {
 	for (unsigned int i = 0; i < s->PurchasedCategoriesCount; i++) {
 		str->ReadDword( &s->purchased_categories[i] );
@@ -217,7 +217,7 @@ void STOImp::GetPurchasedCategories(Store* s)
 }
 
 //call this before any write, it updates offsets!
-int STOImp::GetStoredFileSize(Store *s)
+int STOImporter::GetStoredFileSize(Store *s)
 {
 	int headersize, itemsize;
 
@@ -257,7 +257,7 @@ int STOImp::GetStoredFileSize(Store *s)
 	return headersize;
 }
 
-int STOImp::PutPurchasedCategories(DataStream *stream, Store* s)
+int STOImporter::PutPurchasedCategories(DataStream *stream, Store* s)
 {
 	for (unsigned int i = 0; i < s->PurchasedCategoriesCount; i++) {
 		stream->WriteDword( s->purchased_categories+i );
@@ -265,7 +265,7 @@ int STOImp::PutPurchasedCategories(DataStream *stream, Store* s)
 	return 0;
 }
 
-int STOImp::PutHeader(DataStream *stream, Store *s)
+int STOImporter::PutHeader(DataStream *stream, Store *s)
 {
 	char Signature[8];
 	ieDword tmpDword;
@@ -320,7 +320,7 @@ int STOImp::PutHeader(DataStream *stream, Store *s)
 	return 0;
 }
 
-int STOImp::PutItems(DataStream *stream, Store *store)
+int STOImporter::PutItems(DataStream *stream, Store *store)
 {
 	for (unsigned int ic=0;ic<store->ItemsCount;ic++) {
 		STOItem *it = store->items[ic];
@@ -343,7 +343,7 @@ int STOImp::PutItems(DataStream *stream, Store *store)
 	return 0;
 }
 
-int STOImp::PutCures(DataStream *stream, Store *s)
+int STOImporter::PutCures(DataStream *stream, Store *s)
 {
 	for (unsigned int i=0;i<s->CuresCount;i++) {
 		STOCure *c = s->cures+i;
@@ -353,7 +353,7 @@ int STOImp::PutCures(DataStream *stream, Store *s)
 	return 0;
 }
 
-int STOImp::PutDrinks(DataStream *stream, Store *s)
+int STOImporter::PutDrinks(DataStream *stream, Store *s)
 {
 	for (unsigned int i=0;i<s->DrinksCount;i++) {
 		STODrink *d = s->drinks+i;
@@ -366,7 +366,7 @@ int STOImp::PutDrinks(DataStream *stream, Store *s)
 }
 
 //saves the store into a datastream, be it memory or file
-int STOImp::PutStore(DataStream *stream, Store *store)
+int STOImporter::PutStore(DataStream *stream, Store *store)
 {
 	int ret;
 
@@ -402,5 +402,5 @@ int STOImp::PutStore(DataStream *stream, Store *store)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x1CDFC160, "STO File Importer")
-PLUGIN_CLASS(IE_STO_CLASS_ID, STOImp)
+PLUGIN_CLASS(IE_STO_CLASS_ID, STOImporter)
 END_PLUGIN()

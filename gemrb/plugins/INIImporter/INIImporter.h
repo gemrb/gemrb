@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef INIIMP_H
-#define INIIMP_H
+#ifndef INIIMPORTER_H
+#define INIIMPORTER_H
 
 #include <cstring>
 #include "DataFileMgr.h"
@@ -176,15 +176,15 @@ public:
 	}
 };
 
-class INIImp : public DataFileMgr {
+class INIImporter : public DataFileMgr {
 private:
 	DataStream* str;
 	bool autoFree;
 	std::vector< INITag*> tags;
 
 public:
-	INIImp(void);
-	~INIImp(void);
+	INIImporter(void);
+	~INIImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	int GetTagsCount()
 	{

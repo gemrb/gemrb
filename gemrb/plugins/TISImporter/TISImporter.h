@@ -18,20 +18,20 @@
  *
  */
 
-#ifndef TISIMP_H
-#define TISIMP_H
+#ifndef TISIMPORTER_H
+#define TISIMPORTER_H
 
 #include "TileSetMgr.h"
 
-class TISImp : public TileSetMgr {
+class TISImporter : public TileSetMgr {
 private:
 	DataStream* str;
 	bool autoFree;
 	ieDword headerShift;
 	ieDword TilesCount, TilesSectionLen, TileSize;
 public:
-	TISImp(void);
-	~TISImp(void);
+	TISImporter(void);
+	~TISImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Tile* GetTile(unsigned short* indexes, int count,
 		unsigned short* secondary = NULL);

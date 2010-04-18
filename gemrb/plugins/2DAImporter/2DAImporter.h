@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef P2DAIMP_H
-#define P2DAIMP_H
+#ifndef P2DAIMPORTER_H
+#define P2DAIMPORTER_H
 
 #include <cstring>
 #include "TableMgr.h"
@@ -27,7 +27,7 @@
 
 typedef std::vector< char*> RowEntry;
 
-class p2DAImp : public TableMgr {
+class p2DAImporter : public TableMgr {
 private:
 	DataStream* str;
 	bool autoFree;
@@ -37,8 +37,8 @@ private:
 	std::vector< RowEntry> rows;
 	char defVal[32];
 public:
-	p2DAImp(void);
-	~p2DAImp(void);
+	p2DAImporter(void);
+	~p2DAImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	/** Returns the actual number of Rows in the Table */
 	inline ieDword GetRowCount() const

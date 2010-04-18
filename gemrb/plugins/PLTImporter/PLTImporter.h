@@ -18,18 +18,18 @@
  *
  */
 
-#ifndef PLTIMP_H
-#define PLTIMP_H
+#ifndef PLTIMPORTER_H
+#define PLTIMPORTER_H
 
 #include "PalettedImageMgr.h"
 
-class PLTImp : public PalettedImageMgr {
+class PLTImporter : public PalettedImageMgr {
 private:
 	ieDword Width, Height;
 	void* pixels;
 public:
-	PLTImp(void);
-	~PLTImp(void);
+	PLTImporter(void);
+	~PLTImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Sprite2D* GetSprite2D(unsigned int type, ieDword col[8]);
 public:

@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef GAMIMP_H
-#define GAMIMP_H
+#ifndef GAMIMPORTER_H
+#define GAMIMPORTER_H
 
 #include "SaveGameMgr.h"
 #include "ActorMgr.h"
@@ -32,7 +32,7 @@
 #define GAM_VER_TOB 21 
 #define GAM_VER_IWD2 22
 
-class GAMImp : public SaveGameMgr {
+class GAMImporter : public SaveGameMgr {
 private:
 	DataStream* str;
 	bool autoFree;
@@ -48,8 +48,8 @@ private:
 	ieDword SavedLocOffset, SavedLocCount;
 	ieDword PPLocOffset, PPLocCount;
 public:
-	GAMImp(void);
-	~GAMImp(void);
+	GAMImporter(void);
+	~GAMImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Game* LoadGame(Game *newGame, int ver_override = 0);
 

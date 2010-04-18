@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef DLGIMP_H
-#define DLGIMP_H
+#ifndef DLGIMPORTER_H
+#define DLGIMPORTER_H
 
 #include "DialogMgr.h"
 #include "globals.h"
@@ -49,7 +49,7 @@ struct VarOffset {
 	ieDword Length;
 };
 */
-class DLGImp : public DialogMgr {
+class DLGImporter : public DialogMgr {
 private:
 	DataStream* str;
 	bool autoFree;
@@ -67,8 +67,8 @@ private:
 	ieDword Version;
 
 public:
-	DLGImp(void);
-	~DLGImp(void);
+	DLGImporter(void);
+	~DLGImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Dialog* GetDialog();
 private:

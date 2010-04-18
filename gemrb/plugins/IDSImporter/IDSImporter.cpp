@@ -21,17 +21,17 @@
 #include "win32def.h"
 #include "globals.h"
 #include "IDSImporter.h"
-#include "IDSImpDefs.h"
+#include "IDSImporterDefs.h"
 #include <ctype.h>
 #include <cstring>
 
-IDSImp::IDSImp(void)
+IDSImporter::IDSImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 }
 
-IDSImp::~IDSImp(void)
+IDSImporter::~IDSImporter(void)
 {
 	if (str && autoFree) {
 		delete( str );
@@ -42,7 +42,7 @@ IDSImp::~IDSImp(void)
 	}
 }
 
-bool IDSImp::Open(DataStream* stream, bool autoFree)
+bool IDSImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -90,7 +90,7 @@ bool IDSImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-int IDSImp::GetValue(const char* txt)
+int IDSImporter::GetValue(const char* txt)
 {
 	for (unsigned int i = 0; i < pairs.size(); i++) {
 		if (stricmp( pairs[i].str, txt ) == 0) {
@@ -100,7 +100,7 @@ int IDSImp::GetValue(const char* txt)
 	return -1;
 }
 
-char* IDSImp::GetValue(int val)
+char* IDSImporter::GetValue(int val)
 {
 	for (unsigned int i = 0; i < pairs.size(); i++) {
 		if (pairs[i].val == val) {
@@ -110,7 +110,7 @@ char* IDSImp::GetValue(int val)
 	return NULL;
 }
 
-char* IDSImp::GetStringIndex(unsigned int Index)
+char* IDSImporter::GetStringIndex(unsigned int Index)
 {
 	if (Index >= pairs.size()) {
 		return NULL;
@@ -118,7 +118,7 @@ char* IDSImp::GetStringIndex(unsigned int Index)
 	return pairs[Index].str;
 }
 
-int IDSImp::GetValueIndex(unsigned int Index)
+int IDSImporter::GetValueIndex(unsigned int Index)
 {
 	if (Index >= pairs.size()) {
 		return 0;
@@ -126,7 +126,7 @@ int IDSImp::GetValueIndex(unsigned int Index)
 	return pairs[Index].val;
 }
 
-int IDSImp::FindString(char *str, int len)
+int IDSImporter::FindString(char *str, int len)
 {
 	int i=pairs.size();
 	while(i--) {
@@ -137,7 +137,7 @@ int IDSImp::FindString(char *str, int len)
 	return -1;
 }
 
-int IDSImp::FindValue(int val)
+int IDSImporter::FindValue(int val)
 {
 	int i=pairs.size();
 	while(i--) {
@@ -152,5 +152,5 @@ int IDSImp::FindValue(int val)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x1F41B94C, "IDS File Importer")
-PLUGIN_CLASS(IE_IDS_CLASS_ID, IDSImp)
+PLUGIN_CLASS(IE_IDS_CLASS_ID, IDSImporter)
 END_PLUGIN()

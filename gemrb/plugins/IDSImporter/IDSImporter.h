@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef IDSIMP_H
-#define IDSIMP_H
+#ifndef IDSIMPORTER_H
+#define IDSIMPORTER_H
 
 #include "SymbolMgr.h"
 
@@ -28,7 +28,7 @@ struct Pair {
 	char* str;
 };
 
-class IDSImp : public SymbolMgr {
+class IDSImporter : public SymbolMgr {
 private:
 	DataStream* str;
 	bool autoFree;
@@ -37,8 +37,8 @@ private:
 	std::vector< char*> ptrs;
 
 public:
-	IDSImp(void);
-	~IDSImp(void);
+	IDSImporter(void);
+	~IDSImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	int GetValue(const char* txt);
 	char* GetValue(int val);

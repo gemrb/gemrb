@@ -22,13 +22,13 @@
 #include "INIImporter.h"
 #include "Interface.h"
 
-INIImp::INIImp(void)
+INIImporter::INIImporter(void)
 {
 	str = NULL;
 	autoFree = false;
 }
 
-INIImp::~INIImp(void)
+INIImporter::~INIImporter(void)
 {
 	if (str && autoFree) {
 		delete( str );
@@ -37,7 +37,7 @@ INIImp::~INIImp(void)
 		delete( tags[i] );
 }
 
-bool INIImp::Open(DataStream* stream, bool autoFree)
+bool INIImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (stream == NULL) {
 		return false;
@@ -86,7 +86,7 @@ bool INIImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-int INIImp::GetKeysCount(const char* Tag)
+int INIImporter::GetKeysCount(const char* Tag)
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
 		const char* TagName = tags[i]->GetTagName();
@@ -97,7 +97,7 @@ int INIImp::GetKeysCount(const char* Tag)
 	return 0;
 }
 
-const char* INIImp::GetKeyNameByIndex(const char* Tag, int index)
+const char* INIImporter::GetKeyNameByIndex(const char* Tag, int index)
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
 		const char* TagName = tags[i]->GetTagName();
@@ -108,7 +108,7 @@ const char* INIImp::GetKeyNameByIndex(const char* Tag, int index)
 	return NULL;
 }
 
-const char* INIImp::GetKeyAsString(const char* Tag, const char* Key,
+const char* INIImporter::GetKeyAsString(const char* Tag, const char* Key,
 	const char* Default)
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
@@ -120,7 +120,7 @@ const char* INIImp::GetKeyAsString(const char* Tag, const char* Key,
 	return Default;
 }
 
-int INIImp::GetKeyAsInt(const char* Tag, const char* Key,
+int INIImporter::GetKeyAsInt(const char* Tag, const char* Key,
 	const int Default)
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
@@ -132,7 +132,7 @@ int INIImp::GetKeyAsInt(const char* Tag, const char* Key,
 	return Default;
 }
 
-float INIImp::GetKeyAsFloat(const char* Tag, const char* Key,
+float INIImporter::GetKeyAsFloat(const char* Tag, const char* Key,
 	const float Default)
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
@@ -144,7 +144,7 @@ float INIImp::GetKeyAsFloat(const char* Tag, const char* Key,
 	return Default;
 }
 
-bool INIImp::GetKeyAsBool(const char* Tag, const char* Key,
+bool INIImporter::GetKeyAsBool(const char* Tag, const char* Key,
 	const bool Default)
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
@@ -159,5 +159,5 @@ bool INIImp::GetKeyAsBool(const char* Tag, const char* Key,
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xB62F6D7, "INI File Importer")
-PLUGIN_CLASS(IE_INI_CLASS_ID, INIImp)
+PLUGIN_CLASS(IE_INI_CLASS_ID, INIImporter)
 END_PLUGIN()

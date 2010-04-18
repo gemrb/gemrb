@@ -25,14 +25,14 @@
 #include "BIFImporter.h"
 #include "Interface.h"
 
-BIFImp::BIFImp(void)
+BIFImporter::BIFImporter(void)
 {
 	stream = NULL;
 	fentries = NULL;
 	tentries = NULL;
 }
 
-BIFImp::~BIFImp(void)
+BIFImporter::~BIFImporter(void)
 {
 	if (stream) {
 		delete( stream );
@@ -45,7 +45,7 @@ BIFImp::~BIFImp(void)
 	}
 }
 
-int BIFImp::DecompressSaveGame(DataStream *compressed)
+int BIFImporter::DecompressSaveGame(DataStream *compressed)
 {
 	char Signature[8];
 	compressed->Read( Signature, 8 );
@@ -90,7 +90,7 @@ int BIFImp::DecompressSaveGame(DataStream *compressed)
 }
 
 //this one can create .sav files only
-int BIFImp::CreateArchive(DataStream *compressed)
+int BIFImporter::CreateArchive(DataStream *compressed)
 {
 	if (stream) {
 		delete( stream );
@@ -107,7 +107,7 @@ int BIFImp::CreateArchive(DataStream *compressed)
 	return GEM_OK;
 }
 
-int BIFImp::AddToSaveGame(DataStream *str, DataStream *uncompressed)
+int BIFImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 {
 	ieDword fnlen, declen, complen;
 
@@ -136,7 +136,7 @@ int BIFImp::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 	return GEM_OK;
 }
 
-int BIFImp::OpenArchive(const char* filename)
+int BIFImporter::OpenArchive(const char* filename)
 {
 	if (stream) {
 		delete( stream );
@@ -284,7 +284,7 @@ int BIFImp::OpenArchive(const char* filename)
 	return GEM_ERROR;
 }
 
-DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
+DataStream* BIFImporter::GetStream(unsigned long Resource, unsigned long Type)
 {
 	if (Type == IE_TIS_CLASS_ID) {
 		unsigned int srcResLoc = Resource & 0xFC000;
@@ -306,7 +306,7 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 	return NULL;
 }
 
-void BIFImp::ReadBIF(void)
+void BIFImporter::ReadBIF(void)
 {
 	ieDword foffset;
 	stream->ReadDword( &fentcount );
@@ -348,5 +348,5 @@ void BIFImp::ReadBIF(void)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xC7F133C, "BIF File Importer")
-PLUGIN_CLASS(IE_BIF_CLASS_ID, BIFImp)
+PLUGIN_CLASS(IE_BIF_CLASS_ID, BIFImporter)
 END_PLUGIN()

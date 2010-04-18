@@ -326,7 +326,7 @@ static void InitSpellbook()
 	}
 }
 
-CREImp::CREImp(void)
+CREImporter::CREImporter(void)
 {
 	str = NULL;
 	autoFree = false;
@@ -335,14 +335,14 @@ CREImp::CREImp(void)
 	InitSpellbook();
 }
 
-CREImp::~CREImp(void)
+CREImporter::~CREImporter(void)
 {
 	if (str && autoFree) {
 		delete( str );
 	}
 }
 
-bool CREImp::Open(DataStream* stream, bool aF)
+bool CREImporter::Open(DataStream* stream, bool aF)
 {
 	if (str && this->autoFree) {
 		delete( str );
@@ -390,7 +390,7 @@ bool CREImp::Open(DataStream* stream, bool aF)
 	return false;
 }
 
-void CREImp::SetupSlotCounts()
+void CREImporter::SetupSlotCounts()
 {
 	switch (CREVersion) {
 		case IE_CRE_V1_2: //pst
@@ -416,7 +416,7 @@ void CREImp::SetupSlotCounts()
 	}
 }
 
-void CREImp::WriteChrHeader(DataStream *stream, Actor *act)
+void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 {
 	char Signature[8];
 	ieVariable name;
@@ -539,7 +539,7 @@ void CREImp::WriteChrHeader(DataStream *stream, Actor *act)
 	}
 }
 
-void CREImp::ReadChrHeader(Actor *act)
+void CREImporter::ReadChrHeader(Actor *act)
 {
 	ieVariable name;
 	char Signature[8];
@@ -587,7 +587,7 @@ void CREImp::ReadChrHeader(Actor *act)
 	//here comes the version specific read
 }
 
-bool CREImp::SeekCreHeader(char *Signature)
+bool CREImporter::SeekCreHeader(char *Signature)
 {
 	str->Seek(32, GEM_CURRENT_POS);
 	str->ReadDword( &CREOffset );
@@ -596,7 +596,7 @@ bool CREImp::SeekCreHeader(char *Signature)
 	return true;
 }
 
-CREMemorizedSpell* CREImp::GetMemorizedSpell()
+CREMemorizedSpell* CREImporter::GetMemorizedSpell()
 {
 	CREMemorizedSpell* spl = new CREMemorizedSpell();
 
@@ -606,7 +606,7 @@ CREMemorizedSpell* CREImp::GetMemorizedSpell()
 	return spl;
 }
 
-CREKnownSpell* CREImp::GetKnownSpell()
+CREKnownSpell* CREImporter::GetKnownSpell()
 {
 	CREKnownSpell* spl = new CREKnownSpell();
 
@@ -617,14 +617,14 @@ CREKnownSpell* CREImp::GetKnownSpell()
 	return spl;
 }
 
-void CREImp::ReadScript(Actor *act, int ScriptLevel)
+void CREImporter::ReadScript(Actor *act, int ScriptLevel)
 {
 	ieResRef aScript;
 	str->ReadResRef( aScript );
 	act->SetScript( aScript, ScriptLevel, act->InParty!=0);
 }
 
-CRESpellMemorization* CREImp::GetSpellMemorization()
+CRESpellMemorization* CREImporter::GetSpellMemorization()
 {
 	CRESpellMemorization* spl = new CRESpellMemorization();
 
@@ -638,7 +638,7 @@ CRESpellMemorization* CREImp::GetSpellMemorization()
 	return spl;
 }
 
-void CREImp::SetupColor(ieDword &stat)
+void CREImporter::SetupColor(ieDword &stat)
 {
 	if (RandColor==-1) {
 		RandColor=0;
@@ -685,7 +685,7 @@ void CREImp::SetupColor(ieDword &stat)
 	}
 }
 
-void CREImp::ReadDialog(Actor *act)
+void CREImporter::ReadDialog(Actor *act)
 {
 	ieResRef Dialog;
 
@@ -697,7 +697,7 @@ void CREImp::ReadDialog(Actor *act)
 	act->SetDialog(Dialog);
 }
 
-Actor* CREImp::GetActor(unsigned char is_in_party)
+Actor* CREImporter::GetActor(unsigned char is_in_party)
 {
 	if (!str)
 		return NULL;
@@ -782,14 +782,14 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 			break;
 		default:
 			Inventory_Size=0;
-			printMessage("CREImp","Unknown creature signature.\n", YELLOW);
+			printMessage("CREImporter","Unknown creature signature.\n", YELLOW);
 	}
 
 	// Read saved effects
 	if (core->IsAvailable(IE_EFF_CLASS_ID) ) {
 		ReadEffects( act );
 	} else {
-		printMessage("CREImp", "Effect importer is unavailable!\n", RED);
+		printMessage("CREImporter", "Effect importer is unavailable!\n", RED);
 	}
 	// Reading inventory, spellbook, etc
 	ReadInventory( act, Inventory_Size );
@@ -810,7 +810,7 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 		if(anim) {
 			act->SetBase(IE_MOVEMENTRATE, anim->GetFrameCount()) ;
 		} else {
-			printMessage("CREImp", "Unable to determine movement rate for animation ", YELLOW);
+			printMessage("CREImporter", "Unable to determine movement rate for animation ", YELLOW);
 			printf("%04x!\n", animID);
 		}
 	}
@@ -839,7 +839,7 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 	return act;
 }
 
-void CREImp::GetActorPST(Actor *act)
+void CREImporter::GetActorPST(Actor *act)
 {
 	int i;
 	ieByte tmpByte;
@@ -1048,7 +1048,7 @@ void CREImp::GetActorPST(Actor *act)
 	ReadDialog(act);
 }
 
-void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
+void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 {
 	CREItem** items;
 	unsigned int i,j,k;
@@ -1070,7 +1070,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 		if (index != 0xFFFF) {
 			if (index>=ItemsCount) {
-				printMessage("CREImp"," ",LIGHT_RED);
+				printMessage("CREImporter"," ",LIGHT_RED);
 				printf("Invalid item index (%d) in creature!\n", index);
 				continue;
 			}
@@ -1090,7 +1090,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				items[index] = NULL;
 				continue;
 			}
-			printMessage("CREImp"," ",LIGHT_RED);
+			printMessage("CREImporter"," ",LIGHT_RED);
 			printf("Duplicate or (no-drop) item (%d) in creature!\n", index);
 		}
 	}
@@ -1098,7 +1098,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	i = ItemsCount;
 	while(i--) {
 		if ( items[i]) {
-			printMessage("CREImp"," ",LIGHT_RED);
+			printMessage("CREImporter"," ",LIGHT_RED);
 			printf("Dangling item in creature: %s!\n", items[i]->ItemResRef);
 			delete items[i];
 		}
@@ -1150,7 +1150,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				memorized_spells[k] = NULL;
 				continue;
 			}
-			printf("[CREImp]: Duplicate memorized spell (%d) in creature!\n", k);
+			printf("[CREImporter]: Duplicate memorized spell (%d) in creature!\n", k);
 		}
 		act->spellbook.AddSpellMemorization( sm );
 	}
@@ -1158,7 +1158,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	i=KnownSpellsCount;
 	while(i--) {
 		if (known_spells[i]) {
-			printMessage("CREImp"," ", YELLOW);
+			printMessage("CREImporter"," ", YELLOW);
 			printf("Dangling spell in creature: %s!\n", known_spells[i]->SpellResRef);
 			delete known_spells[i];
 		}
@@ -1168,7 +1168,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	i=MemorizedSpellsCount;
 	while(i--) {
 		if (memorized_spells[i]) {
-			printMessage("CREImp"," ", YELLOW);
+			printMessage("CREImporter"," ", YELLOW);
 			printf("Dangling spell in creature: %s!\n", memorized_spells[i]->SpellResRef);
 			delete memorized_spells[i];
 		}
@@ -1176,7 +1176,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	free(memorized_spells);
 }
 
-void CREImp::ReadEffects(Actor *act)
+void CREImporter::ReadEffects(Actor *act)
 {
 	unsigned int i;
 
@@ -1190,7 +1190,7 @@ void CREImp::ReadEffects(Actor *act)
 	}
 }
 
-void CREImp::GetEffect(Effect *fx)
+void CREImporter::GetEffect(Effect *fx)
 {
 	EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
 
@@ -1203,7 +1203,7 @@ void CREImp::GetEffect(Effect *fx)
 	core->FreeInterface( eM );
 }
 
-ieDword CREImp::GetActorGemRB(Actor *act)
+ieDword CREImporter::GetActorGemRB(Actor *act)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -1284,7 +1284,7 @@ ieDword CREImp::GetActorGemRB(Actor *act)
 	return 0;
 }
 
-void CREImp::GetActorBG(Actor *act)
+void CREImporter::GetActorBG(Actor *act)
 {
 	int i;
 	ieByte tmpByte;
@@ -1455,7 +1455,7 @@ void CREImp::GetActorBG(Actor *act)
 	ReadDialog(act);
 }
 
-void CREImp::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, int count)
+void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, int count)
 {
 	ieDword spellindex;
 	ieDword totalcount;
@@ -1511,7 +1511,7 @@ void CREImp::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, int c
 	act->spellbook.AddSpellMemorization(sm);
 }
 
-void CREImp::GetActorIWD2(Actor *act)
+void CREImporter::GetActorIWD2(Actor *act)
 {
 	int i;
 	ieByte tmpByte;
@@ -1804,7 +1804,7 @@ void CREImp::GetActorIWD2(Actor *act)
 	GetIWD2Spellpage(act, IE_IWD2_SPELL_SHAPE, 0, ShapeCount);
 }
 
-void CREImp::GetActorIWD1(Actor *act) //9.0
+void CREImporter::GetActorIWD1(Actor *act) //9.0
 {
 	int i;
 	ieByte tmpByte;
@@ -1999,7 +1999,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	ReadDialog(act);
 }
 
-int CREImp::GetStoredFileSize(Actor *actor)
+int CREImporter::GetStoredFileSize(Actor *actor)
 {
 	int headersize;
 	unsigned int Inventory_Size;
@@ -2094,7 +2094,7 @@ int CREImp::GetStoredFileSize(Actor *actor)
 	return headersize + (Inventory_Size)*sizeof(ieWord)+sizeof(ieWord)*2;
 }
 
-int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
+int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 {
 	unsigned int i;
 	ieDword tmpDword;
@@ -2142,7 +2142,7 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 }
 
 //this hack is needed for PST to adjust the current hp for compatibility
-int CREImp::GetHpAdjustment(Actor *actor)
+int CREImporter::GetHpAdjustment(Actor *actor)
 {
 	int val;
 
@@ -2154,7 +2154,7 @@ int CREImp::GetHpAdjustment(Actor *actor)
 	return val * actor->GetXPLevel( false );
 }
 
-int CREImp::PutHeader(DataStream *stream, Actor *actor)
+int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 {
 	char Signature[8];
 	ieByte tmpByte;
@@ -2488,7 +2488,7 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImp::PutActorGemRB(DataStream *stream, Actor *actor, ieDword InvSize)
+int CREImporter::PutActorGemRB(DataStream *stream, Actor *actor, ieDword InvSize)
 {
 	ieByte tmpByte;
 	char filling[5];
@@ -2515,7 +2515,7 @@ int CREImp::PutActorGemRB(DataStream *stream, Actor *actor, ieDword InvSize)
 	return 0;
 }
 
-int CREImp::PutActorBG(DataStream *stream, Actor *actor)
+int CREImporter::PutActorBG(DataStream *stream, Actor *actor)
 {
 	ieByte tmpByte;
 	char filling[5];
@@ -2542,7 +2542,7 @@ int CREImp::PutActorBG(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImp::PutActorPST(DataStream *stream, Actor *actor)
+int CREImporter::PutActorPST(DataStream *stream, Actor *actor)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -2601,7 +2601,7 @@ int CREImp::PutActorPST(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImp::PutActorIWD1(DataStream *stream, Actor *actor)
+int CREImporter::PutActorIWD1(DataStream *stream, Actor *actor)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -2649,7 +2649,7 @@ int CREImp::PutActorIWD1(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImp::PutActorIWD2(DataStream *stream, Actor *actor)
+int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -2701,7 +2701,7 @@ int CREImp::PutActorIWD2(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImp::PutKnownSpells( DataStream *stream, Actor *actor)
+int CREImporter::PutKnownSpells( DataStream *stream, Actor *actor)
 {
 	int type=actor->spellbook.GetTypes();
 	for (int i=0;i<type;i++) {
@@ -2719,7 +2719,7 @@ int CREImp::PutKnownSpells( DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImp::PutSpellPages( DataStream *stream, Actor *actor)
+int CREImporter::PutSpellPages( DataStream *stream, Actor *actor)
 {
 	ieWord tmpWord;
 	ieDword tmpDword;
@@ -2746,7 +2746,7 @@ int CREImp::PutSpellPages( DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImp::PutMemorizedSpells(DataStream *stream, Actor *actor)
+int CREImporter::PutMemorizedSpells(DataStream *stream, Actor *actor)
 {
 	int type=actor->spellbook.GetTypes();
 	for (int i=0;i<type;i++) {
@@ -2764,7 +2764,7 @@ int CREImp::PutMemorizedSpells(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImp::PutEffects( DataStream *stream, Actor *actor)
+int CREImporter::PutEffects( DataStream *stream, Actor *actor)
 {
 	ieDword tmpDword1,tmpDword2;
 	ieWord tmpWord;
@@ -2858,7 +2858,7 @@ int CREImp::PutEffects( DataStream *stream, Actor *actor)
 }
 
 //add as effect!
-int CREImp::PutVariables( DataStream *stream, Actor *actor)
+int CREImporter::PutVariables( DataStream *stream, Actor *actor)
 {
 	char filling[104];
 	POSITION pos=NULL;
@@ -2885,7 +2885,7 @@ int CREImp::PutVariables( DataStream *stream, Actor *actor)
 }
 
 /* this function expects GetStoredFileSize to be called before */
-int CREImp::PutActor(DataStream *stream, Actor *actor, bool chr)
+int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 {
 	ieDword tmpDword=0;
 	int ret;
@@ -3034,6 +3034,6 @@ int CREImp::PutActor(DataStream *stream, Actor *actor, bool chr)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xE507B60, "CRE File Importer")
-PLUGIN_CLASS(IE_CRE_CLASS_ID, CREImp)
+PLUGIN_CLASS(IE_CRE_CLASS_ID, CREImporter)
 PLUGIN_CLEANUP(ReleaseMemoryCRE);
 END_PLUGIN()

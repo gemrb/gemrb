@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef BIFIMP_H
-#define BIFIMP_H
+#ifndef BIFIMPORTER_H
+#define BIFIMPORTER_H
 
 #include "globals.h"
 #include "ArchiveImporter.h"
@@ -42,7 +42,7 @@ struct TileEntry {
 	ieWord  u1; //Unknown Field
 };
 
-class BIFImp : public ArchiveImporter {
+class BIFImporter : public ArchiveImporter {
 private:
 	char path[_MAX_PATH];
 	FileEntry* fentries;
@@ -50,8 +50,8 @@ private:
 	ieDword fentcount, tentcount;
 	CachedFileStream* stream;
 public:
-	BIFImp(void);
-	~BIFImp(void);
+	BIFImporter(void);
+	~BIFImporter(void);
 	int DecompressSaveGame(DataStream *compressed);
 	int AddToSaveGame(DataStream *str, DataStream *uncompressed);
 	int OpenArchive(const char* filename);

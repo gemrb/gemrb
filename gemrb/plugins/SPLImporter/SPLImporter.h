@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef SPLIMP_H
-#define SPLIMP_H
+#ifndef SPLIMPORTER_H
+#define SPLIMPORTER_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -30,15 +30,15 @@
 #include "SpellMgr.h"
 
 
-class SPLImp : public SpellMgr {
+class SPLImporter : public SpellMgr {
 private:
 	DataStream* str;
 	bool autoFree;
 	int version;
 
 public:
-	SPLImp(void);
-	~SPLImp(void);
+	SPLImporter(void);
+	~SPLImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Spell* GetSpell(Spell *spl, bool silent=false);
 	void release(void)

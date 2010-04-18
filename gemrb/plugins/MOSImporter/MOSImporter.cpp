@@ -31,7 +31,7 @@ static ieDword red_mask = 0xff000000;
 static ieDword green_mask = 0x00ff0000;
 static ieDword blue_mask = 0x0000ff00;
 
-MOSImp::MOSImp(void)
+MOSImporter::MOSImporter(void)
 {
 	if (DataStream::IsEndianSwitch()) {
 		red_mask = 0x000000ff;
@@ -40,11 +40,11 @@ MOSImp::MOSImp(void)
 	}
 }
 
-MOSImp::~MOSImp(void)
+MOSImporter::~MOSImporter(void)
 {
 }
 
-bool MOSImp::Open(DataStream* stream, bool autoFree)
+bool MOSImporter::Open(DataStream* stream, bool autoFree)
 {
 	if (!Resource::Open(stream, autoFree))
 		return false;
@@ -99,7 +99,7 @@ bool MOSImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Sprite2D* MOSImp::GetSprite2D()
+Sprite2D* MOSImporter::GetSprite2D()
 {
 	RevColor RevCol[256];
 	unsigned char * pixels = ( unsigned char * ) malloc( Width * Height * 4 );
@@ -155,5 +155,5 @@ Sprite2D* MOSImp::GetSprite2D()
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x167B73E, "MOS File Importer")
-PLUGIN_IE_RESOURCE(&ImageMgr::ID, MOSImp, ".mos", (ieWord)IE_MOS_CLASS_ID)
+PLUGIN_IE_RESOURCE(&ImageMgr::ID, MOSImporter, ".mos", (ieWord)IE_MOS_CLASS_ID)
 END_PLUGIN()
