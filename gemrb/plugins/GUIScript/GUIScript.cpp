@@ -43,6 +43,7 @@
 #include "../Core/EffectQueue.h"
 #include "../Core/ImageFactory.h"
 #include "../Core/ResourceDesc.h"
+#include "../Core/PalettedImageMgr.h"
 
 #include <cstdio>
 
@@ -3216,7 +3217,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	Sprite2D *Picture;
 	Sprite2D *Picture2=NULL;
 
-	ImageMgr* im = ( ImageMgr* ) gamedata->GetResource( ResRef, &ImageMgr::ID );
+	PalettedImageMgr* im = ( PalettedImageMgr* ) gamedata->GetResource( ResRef, &PalettedImageMgr::ID );
 
 	if (im == NULL ) {
 		AnimationFactory* af = ( AnimationFactory* )
@@ -3240,11 +3241,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 	} else {
-		for (int i=0;i<8;i++) {
-			im->GetPalette( i, (col[i] >> (8*type)) & 0xFF, NULL );
-		}
-
-		Picture = im->GetSprite2D();
+		Picture = im->GetSprite2D(type, col);
 		core->FreeInterface( im );
 		if (Picture == NULL) {
 			printf ("Picture == NULL\n");

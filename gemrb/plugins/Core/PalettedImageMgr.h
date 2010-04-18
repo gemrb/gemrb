@@ -5,38 +5,46 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- *
  */
 
-#ifndef PLTIMP_H
-#define PLTIMP_H
+#ifndef PALETTEDIMAGEMGR_H
+#define PALETTEDIMAGEMGR_H
 
-#include "../Core/PalettedImageMgr.h"
+#include "Resource.h"
+#include "DataStream.h"
+#include "Sprite2D.h"
 
-class PLTImp : public PalettedImageMgr {
-private:
-	ieDword Width, Height;
-	void* pixels;
+class ImageFactory;
+
+/**
+ * Base class for Paletted Imqge plugins
+ *
+ * This represents a false color image that is combined with
+ * color data to generate a real image.
+ */
+class GEM_EXPORT PalettedImageMgr : public Resource {
 public:
-	PLTImp(void);
-	~PLTImp(void);
-	bool Open(DataStream* stream, bool autoFree = true);
-	Sprite2D* GetSprite2D(unsigned int type, ieDword col[8]);
+	static const TypeID ID;
 public:
-	void release(void)
-	{
-		delete this;
-	}
+	PalettedImageMgr(void);
+	virtual ~PalettedImageMgr(void);
+	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	/**
+	 * Returns a @ref{Sprite2D} that has been colored with the given palette.
+	 *
+	 * @param[in] type Type of palette to use.
+	 * @param[in] paletteIndex Array of palettes to use.
+	 */
+	virtual Sprite2D* GetSprite2D(unsigned int type, ieDword paletteIndex[8]) = 0;
 };
 
 #endif

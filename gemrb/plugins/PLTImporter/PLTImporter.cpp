@@ -24,8 +24,7 @@
 #include "../Core/Interface.h"
 #include "../Core/Video.h"
 
-static int initial[8]={20,31,31,7,14,20,0,0};
-static int pperm[8]={2,5,6,0,4,3,1,7};
+static int pperm[8]={3,6,0,5,4,1,2,7};
 
 static ieDword red_mask = 0xff000000;
 static ieDword green_mask = 0x00ff0000;
@@ -46,11 +45,6 @@ PLTImp::~PLTImp(void)
 	if (pixels) {
 		free( pixels );
 	}
-	for (int i = 0; i < 8; i++) {
-		if (Palettes[i]) {
-			free( Palettes[i] );
-		}
-	}
 }
 
 bool PLTImp::Open(DataStream* stream, bool autoFree)
@@ -67,8 +61,6 @@ bool PLTImp::Open(DataStream* stream, bool autoFree)
 		return false;
 	}
 
-	memset(Palettes,0,sizeof(Palettes) );
-	memcpy(palIndices,initial,sizeof(palIndices));
 	str->Read( unknown, 8 );
 	str->ReadDword( &Width );
 	str->ReadDword( &Height );
@@ -79,13 +71,11 @@ bool PLTImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Sprite2D* PLTImp::GetSprite2D()
+Sprite2D* PLTImp::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 {
+	Color Palettes[8][256];
 	for (int i = 0; i < 8; i++) {
-		if (Palettes[i])
-			free( Palettes[i] );
-		Palettes[i] = (Color *) malloc(256 * sizeof(Color) );
-		core->GetPalette( palIndices[i], 256, Palettes[i] );
+		core->GetPalette( (paletteIndex[pperm[i]] >> (8*type)) & 0xFF, 256, Palettes[i] );
 	}
 	unsigned char * p = ( unsigned char * ) malloc( Width * Height * 4 );
 	unsigned char * dest = p;
@@ -112,14 +102,8 @@ Sprite2D* PLTImp::GetSprite2D()
 	return spr;
 }
 
-/** Set Palette color Hack */
-void PLTImp::GetPalette(int index, int colors, Color* /*pal*/)
-{
-	palIndices[pperm[index]] = colors;
-}
-
 #include "../../includes/plugindef.h"
 
 GEMRB_PLUGIN(0x8D0C64F, "PLT File Importer")
-PLUGIN_IE_RESOURCE(&ImageMgr::ID, PLTImp, ".plt", (ieWord)IE_PLT_CLASS_ID)
+PLUGIN_IE_RESOURCE(&PalettedImageMgr::ID, PLTImp, ".plt", (ieWord)IE_PLT_CLASS_ID)
 END_PLUGIN()

@@ -57,6 +57,7 @@ libgemrb_core_la_SOURCES = \
 	ResourceManager.cpp \
 	GameData.cpp \
 	ImageMgr.cpp \
+	PalettedImageMgr.cpp \
 	ImageFactory.cpp \
 	Font.cpp \
 	FileStream.cpp \
