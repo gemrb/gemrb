@@ -392,7 +392,7 @@ void Map::ChangeTileMap(ImageMgr* lm, ImageMgr* sm)
 
 	LightMap = lm->GetImage();
 	core->FreeInterface(lm);
-	SmallMap = sm->GetSprite2D();
+	SmallMap = sm ? sm->GetSprite2D() : NULL;
 	core->FreeInterface(sm);
 
 	TMap->UpdateDoors();
@@ -408,7 +408,7 @@ void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, Imag
 	core->FreeInterface(sr);
 	HeightMap = hm->GetBitmap();
 	core->FreeInterface(hm);
-	SmallMap = sm->GetSprite2D();
+	SmallMap = sm ? sm->GetSprite2D() : NULL;
 	core->FreeInterface(sm);
 	Width = (unsigned int) (TMap->XCellCount * 4);
 	Height = (unsigned int) (( TMap->YCellCount * 64 ) / 12);
