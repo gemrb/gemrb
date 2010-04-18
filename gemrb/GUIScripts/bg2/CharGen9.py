@@ -201,6 +201,8 @@ def FinishCharGen():
 
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
+		if GemRB.GetVar("GUIEnhancements"):
+			GemRB.SaveCharacter ( GemRB.GetVar ("Slot"), "gembak" )
 		#LETS PLAY!!
 		GemRB.EnterGame()
 		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)

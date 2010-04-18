@@ -384,6 +384,8 @@ def setAccept():
 	close()
 	
 	if playmode >=0:
+		if GemRB.GetVar("GUIEnhancements"):
+			GemRB.SaveCharacter ( GemRB.GetVar ("Slot"), "gembak" )
 		GemRB.EnterGame()
 	else:
 		#leaving multi player pregen
