@@ -75,10 +75,10 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version()
 #define PLUGIN_CLASS(id, cls)					\
 		if (!mgr->RegisterPlugin(id, CreatePlugin<cls>))	\
 			return false;
-#define PLUGIN_RESOURCE(id, cls, ext)				\
-		mgr->RegisterResource(id, &CreateResource<cls>, ext);
-#define PLUGIN_IE_RESOURCE(id, cls, ext, ie_id)			\
-		mgr->RegisterResource(id, &CreateResource<cls>, ext, ie_id);
+#define PLUGIN_RESOURCE(cls, ext)				\
+		mgr->RegisterResource(&cls::ID, &CreateResource<cls>, ext);
+#define PLUGIN_IE_RESOURCE(cls, ext, ie_id)			\
+		mgr->RegisterResource(&cls::ID, &CreateResource<cls>, ext, ie_id);
 #define PLUGIN_CLEANUP(func)					\
 		core->RegisterCleanup(func);
 #define END_PLUGIN()						\

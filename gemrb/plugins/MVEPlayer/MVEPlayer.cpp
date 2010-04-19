@@ -182,5 +182,5 @@ void MVEPlay::queueBuffer(int stream, unsigned short bits,
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x218963DC, "MVE Video Player")
-PLUGIN_IE_RESOURCE(&MoviePlayer::ID, MVEPlay, ".mve", (ieWord)IE_MVE_CLASS_ID)
+PLUGIN_IE_RESOURCE(MVEPlay, ".mve", (ieWord)IE_MVE_CLASS_ID)
 END_PLUGIN()

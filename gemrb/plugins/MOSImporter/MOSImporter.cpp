@@ -155,5 +155,5 @@ Sprite2D* MOSImporter::GetSprite2D()
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x167B73E, "MOS File Importer")
-PLUGIN_IE_RESOURCE(&ImageMgr::ID, MOSImporter, ".mos", (ieWord)IE_MOS_CLASS_ID)
+PLUGIN_IE_RESOURCE(MOSImporter, ".mos", (ieWord)IE_MOS_CLASS_ID)
 END_PLUGIN()

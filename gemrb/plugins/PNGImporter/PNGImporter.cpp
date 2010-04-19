@@ -212,5 +212,5 @@ void PNGImporter::GetPalette(int colors, Color* pal)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x11C3EB12, "PNG File Importer")
-PLUGIN_IE_RESOURCE(&ImageMgr::ID, PNGImporter, ".png", (ieWord)IE_PNG_CLASS_ID)
+PLUGIN_IE_RESOURCE(PNGImporter, ".png", (ieWord)IE_PNG_CLASS_ID)
 END_PLUGIN()
