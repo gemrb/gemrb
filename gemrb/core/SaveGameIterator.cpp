@@ -50,19 +50,29 @@ SaveGame::~SaveGame()
 {
 }
 
-ImageMgr* SaveGame::GetPortrait(int index)
+Sprite2D* SaveGame::GetPortrait(int index)
 {
 	if (index > PortraitCount) {
 		return NULL;
 	}
 	char nPath[_MAX_PATH];
 	sprintf( nPath, "PORTRT%d", index );
-	return static_cast<ImageMgr*>(manager.GetResource(nPath, &ImageMgr::ID, true));
+	ImageMgr *im = (ImageMgr*) manager.GetResource(nPath, &ImageMgr::ID, true);
+	if (!im)
+		return NULL;
+	Sprite2D *portrait = im->GetSprite2D();
+	im->release();
+	return portrait;
 }
 
-ImageMgr* SaveGame::GetScreen()
+Sprite2D* SaveGame::GetScreen()
 {
-	return static_cast<ImageMgr*>(manager.GetResource(Prefix, &ImageMgr::ID, true));
+	ImageMgr *im = (ImageMgr*) manager.GetResource(Prefix, &ImageMgr::ID, true);
+	if (!im)
+		return NULL;
+	Sprite2D *screen = im->GetSprite2D();
+	im->release();
+	return screen;
 }
 
 DataStream* SaveGame::GetGame()

@@ -61,8 +61,8 @@ public:
 		return Date;
 	}
 
-	ImageMgr* GetPortrait(int index);
-	ImageMgr* GetScreen();
+	Sprite2D* GetPortrait(int index);
+	Sprite2D* GetScreen();
 	DataStream* GetGame();
 	DataStream* GetWmap();
 	DataStream* GetSave();
