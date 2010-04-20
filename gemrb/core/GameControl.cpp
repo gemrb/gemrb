@@ -1862,6 +1862,13 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	//we got an actor past this point
 	DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
 
+	PerformActionOn(actor);
+}
+
+void GameControl::PerformActionOn(Actor *actor) {
+	Game* game = core->GetGame();
+	unsigned int i;
+
 	//determining the type of the clicked actor
 	ieDword type;
 
