@@ -132,6 +132,7 @@ GEM_EXPORT bool FindInDir(const char* Dir, char* Filename);
 GEM_EXPORT bool dir_exists(const char* path);
 
 GEM_EXPORT char* PathJoin (char* target, ...);
+GEM_EXPORT char* PathJoinExt (char* target, const char* dir, const char* file, const char* ext = NULL);
 GEM_EXPORT void FixPath (char *path, bool needslash);
 
 GEM_EXPORT void ExtractFileFromPath(char *file, const char *full_path);

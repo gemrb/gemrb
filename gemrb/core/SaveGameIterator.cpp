@@ -38,7 +38,7 @@ SaveGame::SaveGame(char* path, char* name, char* prefix, int pCount, int saveID)
 	SaveID = saveID;
 	char nPath[_MAX_PATH];
 	struct stat my_stat;
-	sprintf( nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix );
+	PathJoinExt(nPath, Path, Prefix, "bmp");
 	ResolveFilePath( nPath );
 	memset(&my_stat,0,sizeof(my_stat));
 	stat( nPath, &my_stat );
@@ -186,8 +186,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 		return false;
 
 	char ftmp[_MAX_PATH];
-	snprintf( ftmp, _MAX_PATH, "%s%s%s.bmp", dtmp, SPathDelimiter,
-		 core->GameNameResRef );
+	PathJoinExt(ftmp, dtmp, core->GameNameResRef, "bmp");
 
 	ResolveFilePath( ftmp );
 	if (access( ftmp, R_OK )) {
@@ -196,8 +195,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 		return false;
 	}
 
-	snprintf( ftmp, _MAX_PATH, "%s%s%s.wmp", dtmp, SPathDelimiter,
-		 core->WorldMapName );
+	PathJoinExt(ftmp, dtmp, core->WorldMapName, "wmp");
 	ResolveFilePath( ftmp );
 	if (access( ftmp, R_OK )) {
 		printMessage("SaveGameIterator"," ",YELLOW);

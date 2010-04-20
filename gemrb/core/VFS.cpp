@@ -279,6 +279,15 @@ char* PathJoin (char* target, ...)
 	return target;
 }
 
+char* PathJoinExt (char* target, const char* dir, const char* base, const char* ext)
+{
+	char file[_MAX_PATH];
+	strcpy(file, base);
+	strcat(file, ".");
+	strcat(file, ext);
+	return PathJoin(target, dir, file, NULL);
+}
+
 /** Fixes path delimiter character (slash).
  * needslash = true : we add a slash
  * needslash = false: we remove the slash
