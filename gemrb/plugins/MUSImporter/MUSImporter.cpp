@@ -65,10 +65,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 		return false;
 	}
 	char path[_MAX_PATH];
-	strcpy( path, core->GamePath );
-	strcat( path, musicsubfolder );
-	strcat( path, SPathDelimiter );
-	strcat( path, name );
+	PathJoin(path, core->GamePath, musicsubfolder, name, NULL);
 #ifndef WIN32
 	ResolveFilePath( path );
 #endif
@@ -281,22 +278,16 @@ void MUSImporter::PlayMusic(char* name)
 {
 	char FName[_MAX_PATH];
 	if (strnicmp( name, "mx9000", 6 ) == 0) { //iwd2
-		snprintf( FName, _MAX_PATH, "%s%s%smx9000%s%s.acm",
-			core->GamePath, musicsubfolder, SPathDelimiter,
-			SPathDelimiter, name);
+		PathJoin(FName, core->GamePath, musicsubfolder, name, "mx9000", name, NULL);
 	} else if (strnicmp( name, "mx0000", 6 ) == 0) { //iwd
-		snprintf( FName, _MAX_PATH, "%s%s%smx0000%s%s.acm",
-			core->GamePath, musicsubfolder, SPathDelimiter,
-			SPathDelimiter, name);
+		PathJoin(FName, core->GamePath, musicsubfolder, name, "mx0000", name, NULL);
 	} else if (strnicmp( name, "SPC", 3 ) != 0) { //bg2
-		snprintf( FName, _MAX_PATH, "%s%s%s%s%s%s%s.acm",
-			core->GamePath, musicsubfolder, SPathDelimiter,
-			PLName, SPathDelimiter, PLName, name);
+		char File[_MAX_PATH];
+		snprintf(File, _MAX_PATH, "%s%s.acm", PLName, name);
+		PathJoin(FName, core->GamePath, musicsubfolder, PLName, File, NULL);
 	}
 	else {
-		snprintf(FName, _MAX_PATH, "%s%s%s%s.acm",
-			core->GamePath, musicsubfolder, SPathDelimiter,
-			name);
+		PathJoin(FName, core->GamePath, musicsubfolder, name, NULL);
 	}
 #ifndef WIN32
 		ResolveFilePath( FName );

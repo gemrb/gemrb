@@ -176,7 +176,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 
 	//The matcher got matched correctly.
 	char dtmp[_MAX_PATH];
-	snprintf( dtmp, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, slotname );
+	PathJoin(dtmp, Path, slotname, NULL);
 
 	struct stat fst;
 	if (stat( dtmp, &fst ))
@@ -219,7 +219,7 @@ bool SaveGameIterator::RescanSaveGames()
 	save_slots.clear();
 
 	char Path[_MAX_PATH];
-	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, SaveDir() );
+	PathJoin(Path, core->SavePath, SaveDir(), NULL);
 
 	ResolveFilePath( Path );
 	DIR* dir = opendir( Path );
@@ -279,8 +279,7 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 	int prtrt = 0;
 	char Path[_MAX_PATH];
 	//lets leave space for the filenames
-	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, SaveDir(),
-		 SPathDelimiter, slotname );
+	PathJoin(Path, core->SavePath, SaveDir(), slotname, NULL);
 
 	char savegameName[_MAX_PATH]={0};
 	int savegameNumber = 0;
@@ -484,15 +483,16 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 		delete save;
 	}
 	save_slots.insert( save_slots.end(), strdup( Path ) );
-	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, SaveDir() );
+	PathJoin( Path, core->SavePath, SaveDir(), NULL );
 
 	//if the path exists in different case, don't make it again
 	ResolveFilePath( Path );
 	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
 	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
 	//keep the first part we already determined existing
-	int len = strlen(Path);
-	snprintf( Path+len, _MAX_PATH-len, "%s%09d-%s", SPathDelimiter, index, slotname );
+	char dir[_MAX_PATH];
+	snprintf( dir, _MAX_PATH, "%09d-%s", index, slotname );
+	PathJoin(Path, Path, dir, NULL);
 	ResolveFilePath( Path );
 	//this is required in case the old slot wasn't recognised but still there
 	core->DelTree(Path, false);

@@ -301,7 +301,7 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 	char nPath[_MAX_PATH];
 	char Signature[TOH_HEADER_SIZE];
 
-	sprintf( nPath, "%s%sdefault.toh", core->CachePath, SPathDelimiter );
+	PathJoin( nPath, core->CachePath, "default.toh", NULL );
 #ifndef WIN32
 	ResolveFilePath( nPath );
 #endif
@@ -325,7 +325,7 @@ retry:
 DataStream* CTlkOverride::GetAuxTlk(bool create)
 {
 	char nPath[_MAX_PATH];
-	sprintf( nPath, "%s%sdefault.tot", core->CachePath, SPathDelimiter );
+	PathJoin( nPath, core->CachePath, "default.tot", NULL );
 #ifndef WIN32
 	ResolveFilePath( nPath );
 #endif
