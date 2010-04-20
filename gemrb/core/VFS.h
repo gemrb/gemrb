@@ -131,7 +131,6 @@ GEM_EXPORT bool FileGlob(char *target, const char* Dir, const char* glob);
 GEM_EXPORT bool FindInDir(const char* Dir, char* Filename);
 GEM_EXPORT bool dir_exists(const char* path);
 
-GEM_EXPORT char* PathAppend (char* target, const char* dir);
 GEM_EXPORT char* PathJoin (char* target, ...);
 GEM_EXPORT void FixPath (char *path, bool needslash);
 
