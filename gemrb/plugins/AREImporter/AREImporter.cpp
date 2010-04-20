@@ -406,12 +406,12 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	if( map->RestHeader.CreatureNum>MAX_RESCOUNT ) {
 		map->RestHeader.CreatureNum = MAX_RESCOUNT;
 	}
-	str->Seek( 2, GEM_CURRENT_POS );              //difficulty?
+	str->ReadWord( &map->RestHeader.Difficulty);  //difficulty?
 	str->ReadDword( &map->RestHeader.sduration);  //spawn duration
 	str->ReadWord( &map->RestHeader.rwdist);      //random walk distance
 	str->ReadWord( &map->RestHeader.owdist);      //other walk distance
 	str->ReadWord( &map->RestHeader.Maximum);     //maximum number of creatures
-	str->Seek( 2, GEM_CURRENT_POS );
+	str->ReadWord( &map->RestHeader.Enabled);
 	str->ReadWord( &map->RestHeader.DayChance );
 	str->ReadWord( &map->RestHeader.NightChance );
 
@@ -2226,7 +2226,6 @@ int AREImporter::PutRestHeader( DataStream *stream, Map *map)
 {
 	int i;
 	ieDword tmpDword = 0;
-	ieWord tmpWord = 0;
 
 	char filling[32];
 	memset(filling,0,sizeof(filling) );
@@ -2238,11 +2237,12 @@ int AREImporter::PutRestHeader( DataStream *stream, Map *map)
 		stream->WriteResRef( map->RestHeader.CreResRef[i]);
 	}
 	stream->WriteWord( &map->RestHeader.CreatureNum);
-	//lots of unknowns
-	stream->WriteWord( &tmpWord);
-	for(i=0;i<6;i++) {
-		stream->WriteWord( &tmpWord);
-	}
+	stream->WriteWord( &map->RestHeader.Difficulty);
+	stream->WriteDword( &map->RestHeader.sduration);
+	stream->WriteWord( &map->RestHeader.rwdist);
+	stream->WriteWord( &map->RestHeader.owdist);
+	stream->WriteWord( &map->RestHeader.Maximum);
+	stream->WriteWord( &map->RestHeader.Enabled);
 	stream->WriteWord( &map->RestHeader.DayChance);
 	stream->WriteWord( &map->RestHeader.NightChance);
 	for(i=0;i<14;i++) {
