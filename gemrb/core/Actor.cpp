@@ -349,6 +349,7 @@ Actor::Actor()
 	TalkCount = 0;
 	InteractCount = 0; //numtimesinteracted depends on this
 	appearance = 0xffffff; //might be important for created creatures
+	RemovalTime = ~0;
 	version = 0;
 	//these are used only in iwd2 so we have to default them
 	for(i=0;i<7;i++) {
