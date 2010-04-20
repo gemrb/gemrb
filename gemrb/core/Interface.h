@@ -348,7 +348,6 @@ public:
 	char * GetString(ieStrRef strref, ieDword options = 0) const;
 	/* makes sure the string is freed in TLKImp */
 	void FreeString(char *&str) const;
-	void FreeInterface(Plugin * ptr);
 	/* sets the floattext color */
 	void SetInfoTextColor(Color &color);
 	/** returns a gradient set */

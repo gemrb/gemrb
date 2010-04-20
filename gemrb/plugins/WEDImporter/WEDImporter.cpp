@@ -145,7 +145,7 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 	} else {
 		tm->AddOverlay( over );
 	}
-	core->FreeInterface( tis );
+	tis->release();
 	return usedoverlays;
 }
 

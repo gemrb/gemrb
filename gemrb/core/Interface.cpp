@@ -251,7 +251,8 @@ Interface::Interface(int iargc, char* iargv[])
 	std::vector<type>::iterator i; \
 	for(i = (variable).begin(); i != (variable).end(); ++i) { \
 	if (!(*i).free) { \
-		FreeInterface((*i).member); \
+		if (i->member) \
+			(*i).member->release(); \
 		(*i).free = true; \
 	} \
 	} \
@@ -325,11 +326,13 @@ Interface::~Interface(void)
 
 	if (music) {
 		music->HardEnd();
+		music->release();
 	}
 	// stop any ambients which are still enqueued
 	if (AudioDriver) {
 		AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
 		if (ambim) ambim->deactivate();
+		AudioDriver->release();
 	}
 	//destroy the highest objects in the hierarchy first!
 	delete game;
@@ -349,9 +352,6 @@ Interface::~Interface(void)
 
 	free( slottypes );
 	free( slotmatrix );
-
-	FreeInterface( music );
-	FreeInterface( AudioDriver );
 
 	delete sgiterator;
 
@@ -384,7 +384,7 @@ Interface::~Interface(void)
 
 	delete timer;
 
-	FreeInterface( windowmgr );
+	windowmgr->release();
 
 	if (video) {
 
@@ -418,7 +418,7 @@ Interface::~Interface(void)
 
 	delete evntmgr;
 
-	FreeInterface( guiscript );
+	guiscript->release();
 
 	delete vars;
 	delete tokens;
@@ -445,10 +445,14 @@ Interface::~Interface(void)
 
 	FreeInterfaceVector( Symbol, symbols, sm );
 
-	FreeInterface(INIquests);
-	FreeInterface(INIbeasts);
-	FreeInterface(INIparty);
-	FreeInterface(INIresdata);
+	if (INIquests)
+		INIquests->release();
+	if (INIbeasts)
+		INIbeasts->release();
+	if (INIparty)
+		INIparty->release();
+	if (INIresdata)
+		INIresdata->release();
 
 	Map::ReleaseMemory();
 	GameScript::ReleaseMemory();
@@ -457,9 +461,9 @@ Interface::~Interface(void)
 	gamedata->ClearCaches();
 	delete gamedata;
 	gamedata = NULL;
-	FreeInterface( video );
+	video->release();
 
-	FreeInterface( strings );
+	strings->release();
 
 	delete plugin;
 
@@ -1214,7 +1218,7 @@ int Interface::LoadSprites()
 			fnt->SetFirstChar( (ieByte) first_char );
 			fonts.push_back( fnt );
 		}
-		FreeInterface(bamint);
+		bamint->release();
 	}
 	printMessage( "Core", "Fonts Loaded...", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
@@ -1411,13 +1415,13 @@ int Interface::Init()
 		printMessage( "Core", "Loading Palettes...\n", WHITE );
 		ImageMgr *im =( ImageMgr * ) gamedata->GetResource( Palette16, &ImageMgr::ID );
 		pal16 = im->GetImage();
-		FreeInterface(im);
+		im->release();
 		im = ( ImageMgr * ) gamedata->GetResource( Palette32, &ImageMgr::ID );
 		pal32 = im->GetImage();
-		FreeInterface(im);
+		im->release();
 		im = ( ImageMgr * ) gamedata->GetResource( Palette256, &ImageMgr::ID );
 		pal256 = im->GetImage();
-		FreeInterface(im);
+		im->release();
 		printMessage( "Core", "Palettes Loaded\n", WHITE );
 	}
 
@@ -1860,11 +1864,6 @@ char* Interface::GetString(ieStrRef strref, ieDword options) const
 		vars->Lookup( "Strref On", flags );
 	}
 	return strings->GetString( strref, flags | options );
-}
-
-void Interface::FreeInterface(Plugin* ptr)
-{
-	plugin->FreePlugin( ptr );
 }
 
 void Interface::SetFeature(int flag, int position)
@@ -2377,7 +2376,7 @@ bool Interface::LoadGemRBINI()
 
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
-	FreeInterface( ini );
+	ini->release();
 	return true;
 }
 
@@ -2673,7 +2672,7 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 				gamedata->GetResource( Background, &ImageMgr::ID );
 			if (mos != NULL) {
 				win->SetBackGround( mos->GetSprite2D(), true );
-				FreeInterface( mos );
+				mos->release();
 			} else
 				printf( "[Core]: Cannot Load BackGround, skipping\n" );
 		} else
@@ -3270,7 +3269,7 @@ int Interface::LoadSymbol(const char* ResRef)
 		return -1;
 	}
 	if (!sm->Open( str, true )) {
-		FreeInterface( sm );
+		sm->release();
 		return -1;
 	}
 	Symbol s;
@@ -3322,7 +3321,8 @@ bool Interface::DelSymbol(unsigned int index)
 	if (symbols[index].free) {
 		return false;
 	}
-	FreeInterface( symbols[index].sm );
+	if (symbols[index].sm)
+		symbols[index].sm->release();
 	symbols[index].free = true;
 	return true;
 }
@@ -3331,7 +3331,6 @@ int Interface::PlayMovie(const char* ResRef)
 {
 	MoviePlayer* mp = (MoviePlayer*) gamedata->GetResource( ResRef, &MoviePlayer::ID );
 	if (!mp) {
-		FreeInterface( mp );
 		return -1;
 	}
 
@@ -3389,7 +3388,7 @@ int Interface::PlayMovie(const char* ResRef)
 	video->SetMovieFont(SubtitleFont, palette );
 	mp->CallBackAtFrames(cnt, frames, strrefs);
 	mp->Play();
-	FreeInterface( mp );
+	mp->release();
 	gamedata->FreePalette( palette );
 	if (frames)
 		free(frames);
@@ -3724,7 +3723,7 @@ void Interface::LoadGame(int index, int ver_override)
 	if (!new_game)
 		goto cleanup;
 
-	FreeInterface( gam_mgr );
+	gam_mgr->release();
 	gam_mgr = NULL;
 	gam_str = NULL;
 
@@ -3738,7 +3737,7 @@ void Interface::LoadGame(int index, int ver_override)
 
 	new_worldmap = wmp_mgr->GetWorldMapArray( );
 
-	FreeInterface( wmp_mgr );
+	wmp_mgr->release();
 	wmp_mgr = NULL;
 	wmp_str = NULL;
 
@@ -3748,10 +3747,10 @@ void Interface::LoadGame(int index, int ver_override)
 		ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);
 		if (ai) {
 			if (ai->DecompressSaveGame(sav_str) != GEM_OK) {
-				FreeInterface( ai );
+				ai->release();
 				goto cleanup;
 			}
-			FreeInterface( ai );
+			ai->release();
 		}
 		delete sav_str;
 		sav_str = NULL;
@@ -3775,11 +3774,11 @@ cleanup:
 	delete new_worldmap;
 
 	if (gam_mgr) {
-		FreeInterface( gam_mgr );
+		gam_mgr->release();
 		gam_str = NULL;
 	}
 	if (wmp_mgr) {
-		FreeInterface( wmp_mgr );
+		wmp_mgr->release();
 		wmp_str = NULL;
 	}
 
@@ -3813,7 +3812,7 @@ void Interface::UpdateMasterScript()
 
 cleanup:
 	// Something went wrong, so try to clean after itself
-	FreeInterface( wmp_mgr );
+	wmp_mgr->release();
 }
 
 GameControl *Interface::GetGameControl() const
@@ -4697,7 +4696,7 @@ int Interface::CloseCurrentStore()
 		RemoveFromCache(CurrentStore->Name, IE_STO_CLASS_ID);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
-	FreeInterface( sm );
+	sm->release();
 	delete CurrentStore;
 	CurrentStore = NULL;
 	return 0;
@@ -4721,7 +4720,7 @@ Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner
 		return NULL;
 	}
 	if (!sm->Open( str, true )) {
-		FreeInterface( sm );
+		sm->release();
 		return NULL;
 	}
 
@@ -4731,10 +4730,10 @@ Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner
 	// Cache anyway!
 	CurrentStore = sm->GetStore( new Store() );
 	if (CurrentStore == NULL) {
-		FreeInterface( sm );
+		sm->release();
 		return NULL;
 	}
-	FreeInterface( sm );
+	sm->release();
 	strnlwrcpy(CurrentStore->Name, resname, 8);
 	if (owner) {
 		CurrentStore->SetOwner(owner);
@@ -4755,7 +4754,7 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 	DialogMgr* dm = ( DialogMgr* ) GetInterface( IE_DLG_CLASS_ID );
 	dm->Open( gamedata->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
 	Dialog *dlg = dm->GetDialog();
-	FreeInterface( dm );
+	dm->release();
 
 	if (!dlg) {
 		printMessage("Interface"," ", LIGHT_RED);
@@ -4965,7 +4964,7 @@ int Interface::SwapoutArea(Map *map)
 		RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
-	FreeInterface( mm );
+	mm->release();
 	return 0;
 }
 
@@ -4993,7 +4992,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 		printMessage("Core"," ", YELLOW);
 		printf("Character cannot be saved: %s\n", name);
 	}
-	FreeInterface(gm);
+	gm->release();
 	return 0;
 }
 
@@ -5021,7 +5020,7 @@ int Interface::WriteGame(const char *folder)
 		printf("Internal error, game cannot be saved: %s\n", GameNameResRef);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
-	FreeInterface( gm );
+	gm->release();
 	return 0;
 }
 
@@ -5049,7 +5048,7 @@ int Interface::WriteWorldMap(const char *folder)
 		printf("Internal error, worldmap cannot be saved: %s\n", WorldMapName);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
-	FreeInterface( wmm );
+	wmm->release();
 	return 0;
 }
 
@@ -5097,7 +5096,7 @@ int Interface::CompressSave(const char *folder)
 			de = readdir( dir );
 		}
 	}
-	FreeInterface( ai );
+	ai->release();
 	return 0;
 }
 

@@ -94,7 +94,7 @@ void WMPImporter::GetWorldMap(WorldMap *m, unsigned int index)
 		printMessage( "WMPImporter","Worldmap image not found.\n", LIGHT_RED );
 	} else {
 		m->SetMapMOS(mos->GetSprite2D());
-		core->FreeInterface( mos );
+		mos->release();
 	}
 
 	// Load location icon bam

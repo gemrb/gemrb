@@ -93,7 +93,7 @@ void TextArea::RefreshSprite(const char *portrait)
 	}
 
 	SetAnimPicture ( im->GetSprite2D() );
-	core->FreeInterface( im );
+	im->release();
 }
 
 void TextArea::Draw(unsigned short x, unsigned short y)

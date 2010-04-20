@@ -271,11 +271,11 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 			core->GetInterface( IE_BIF_CLASS_ID );
 		if (ai->OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
 			printf("Cannot open archive %s\n", biffiles[bifnum].path );
-			core->FreeInterface( ai );
+			ai->release();
 			return NULL;
 		}
 		DataStream* ret = ai->GetStream( ResLocator, type );
-		core->FreeInterface( ai );
+		ai->release();
 		if (ret) {
 			strnlwrcpy( ret->filename, resname, 8 );
 			strcat( ret->filename, core->TypeExt( type ) );

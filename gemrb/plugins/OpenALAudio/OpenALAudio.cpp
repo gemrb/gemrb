@@ -210,7 +210,7 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 
 	free(music_memory);
 	if(MusicReader)
-		core->FreeInterface(MusicReader);
+		MusicReader->release();
 
 	delete ambim;
 }
@@ -246,7 +246,7 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 
 	SoundMgr* acm = (SoundMgr*) core->GetInterface(IE_WAV_CLASS_ID);
 	if (!acm->Open(stream)) {
-		core->FreeInterface(acm);
+		acm->release();
 		alDeleteBuffers( 1, &Buffer );
 		return 0;
 	}
@@ -262,7 +262,7 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 	time_length = ((cnt / riff_chans) * 1000) / samplerate;
 	//it is always reading the stuff into 16 bits
 	alBufferData( Buffer, GetFormatEnum( riff_chans, 16 ), memory, cnt1, samplerate );
-	core->FreeInterface( acm );
+	acm->release();
 	free(memory);
 
 	if (checkALError("Unable to fill buffer", "ERROR")) {
@@ -495,7 +495,8 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 	StackLock l(musicMutex, "musicMutex in CreateStream()");
 
 	// Free old MusicReader
-	core->FreeInterface(MusicReader);
+	if (MusicReader)
+		MusicReader->release();
 	MusicReader = NULL;
 
 	if (MusicBuffer[0] == 0) {
@@ -508,7 +509,7 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 	MusicReader = (SoundMgr*) core->GetInterface( IE_WAV_CLASS_ID );
 	if (!MusicReader->Open(str, true)) {
 		delete str;
-		core->FreeInterface(MusicReader);
+		MusicReader->release();
 		MusicReader = NULL;
 		MusicPlaying = false;
 		printMessage("OpenAL", "",WHITE);

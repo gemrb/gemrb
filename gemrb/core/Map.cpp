@@ -391,9 +391,13 @@ void Map::ChangeTileMap(ImageMgr* lm, ImageMgr* sm)
 	core->GetVideoDriver()->FreeSprite(SmallMap);
 
 	LightMap = lm->GetImage();
-	core->FreeInterface(lm);
-	SmallMap = sm ? sm->GetSprite2D() : NULL;
-	core->FreeInterface(sm);
+	lm->release();
+	if (sm) {
+		SmallMap = sm->GetSprite2D();
+		sm->release();
+	} else {
+		SmallMap = NULL;
+	}
 
 	TMap->UpdateDoors();
 }
@@ -403,13 +407,17 @@ void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, Imag
 	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
 	TMap = tm;
 	LightMap = lm->GetImage();
-	core->FreeInterface(lm);
+	lm->release();
 	SearchMap = sr->GetBitmap();
-	core->FreeInterface(sr);
+	sr->release();
 	HeightMap = hm->GetBitmap();
-	core->FreeInterface(hm);
-	SmallMap = sm ? sm->GetSprite2D() : NULL;
-	core->FreeInterface(sm);
+	hm->release();
+	if (sm) {
+		SmallMap = sm->GetSprite2D();
+		sm->release();
+	} else {
+		SmallMap = NULL;
+	}
 	Width = (unsigned int) (TMap->XCellCount * 4);
 	Height = (unsigned int) (( TMap->YCellCount * 64 ) / 12);
 	//Filling Matrices
@@ -3362,7 +3370,7 @@ bool Map::ChangeMap(bool day_or_night)
 	//using the ARE class for this because ChangeMap is similar to LoadMap
 	//it loads the lightmap and the minimap too, besides swapping the tileset
 	mM->ChangeMap(this, day_or_night);
-	core->FreeInterface( mM );
+	mM->release();
 	return true;
 }
 

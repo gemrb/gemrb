@@ -217,7 +217,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		Actor *actor = GetActor( aM, false );
 		newGame->AddNPC( actor );
 	}
-	core->FreeInterface( aM );
+	aM->release();
 
 	//apparently BG1/IWD2 relies on this, if chapter is unset, it is
 	//set to -1, hopefully it won't break anything
@@ -619,7 +619,7 @@ int GAMImporter::GetStoredFileSize(Game *game)
 		Actor *ac=game->GetNPC(i);
 		headersize +=am->GetStoredFileSize(ac);
 	}
-	core->FreeInterface( am );
+	am->release();
 
 	if (game->mazedata) {
 		MazeOffset = headersize;
@@ -1037,7 +1037,7 @@ int GAMImporter::PutPCs(DataStream *stream, Game *game)
 		CREOffset += am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
 	}
-	core->FreeInterface( am );
+	am->release();
 	return 0;
 }
 
@@ -1059,7 +1059,7 @@ int GAMImporter::PutNPCs(DataStream *stream, Game *game)
 		am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
 	}
-	core->FreeInterface( am );
+	am->release();
 	return 0;
 }
 

@@ -79,7 +79,7 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 		if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
 			return GEM_ERROR;
 		}
-		core->FreeInterface( comp );
+		comp->release();
 		fclose( in_cache );
 		Current = compressed->Remains();
 		//starting at 40% going up to 90%
@@ -125,7 +125,7 @@ int BIFImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 	Compressor* comp = ( Compressor* )
 		core->GetInterface( IE_COMPRESSION_CLASS_ID );  
 	comp->Compress( str, uncompressed );
-	core->FreeInterface( comp );
+	comp->release();
 
 	//writing compressed length (calculated)
 	unsigned long Pos2 = str->GetPos();
@@ -204,7 +204,7 @@ int BIFImporter::OpenArchive(const char* filename)
 		if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
 			return GEM_ERROR;
 		}
-		core->FreeInterface( comp );
+		comp->release();
 		fclose( in_cache );
 		delete( compressed );
 		stream = new CachedFileStream( path );
@@ -269,7 +269,7 @@ int BIFImporter::OpenArchive(const char* filename)
 			}
 		}
 		printf( "\n" );
-		core->FreeInterface( comp );
+		comp->release();
 		fclose( in_cache );
 		delete( compressed );
 		stream = new CachedFileStream( path );

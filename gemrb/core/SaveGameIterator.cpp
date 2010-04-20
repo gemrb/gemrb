@@ -413,7 +413,7 @@ static bool DoSaveGame(const char *Path)
 	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
 	im->PutImage( &outfile, preview );
 
-	core->FreeInterface(im);
+	im->release();
 	return true;
 }
 

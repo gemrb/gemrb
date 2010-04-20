@@ -77,7 +77,6 @@ public:
 	bool IsAvailable(SClass_ID plugintype) const;
 	Plugin* GetPlugin(SClass_ID plugintype) const;
 
-	void FreePlugin(Plugin* ptr);
 	size_t GetPluginCount() const { return plugins.size(); }
 
 	/**

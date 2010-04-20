@@ -244,7 +244,7 @@ void ITMImporter::GetFeature(Effect *fx)
 	EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
 	eM->Open( str, false );
 	eM->GetEffect( fx );
-	core->FreeInterface( eM );
+	eM->release();
 }
 
 #include "plugindef.h"

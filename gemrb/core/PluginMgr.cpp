@@ -254,12 +254,6 @@ Plugin* PluginMgr::GetPlugin(SClass_ID plugintype) const
 	return NULL;
 }
 
-void PluginMgr::FreePlugin(Plugin* ptr)
-{
-	if (ptr)
-		ptr->release();
-}
-
 bool PluginMgr::RegisterPlugin(SClass_ID id, PluginFunc create)
 {
 	if (plugins.find(id) != plugins.end())

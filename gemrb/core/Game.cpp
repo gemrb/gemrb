@@ -661,18 +661,17 @@ int Game::LoadMap(const char* ResRef)
 		return index;
 	}
 
-	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
 	DataStream* ds = gamedata->GetResource( ResRef, IE_ARE_CLASS_ID );
 	if (!ds) {
-		core->FreeInterface( mM );
 		return -1;
 	}
+	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
 	if(!mM->Open( ds, true )) {
-		core->FreeInterface( mM );
+		mM->release();
 		return -1;
 	}
 	Map* newMap = mM->GetMap(ResRef, IsDay());
-	core->FreeInterface( mM );
+	mM->release();
 	if (!newMap) {
 		return -1;
 	}

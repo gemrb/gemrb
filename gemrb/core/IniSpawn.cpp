@@ -505,7 +505,7 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 		}
 		delete[] events;
 	}
-	core->FreeInterface(inifile);
+	inifile->release();
 	//maybe not correct
 	InitialSpawn();
 }

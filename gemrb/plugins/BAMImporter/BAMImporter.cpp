@@ -98,7 +98,7 @@ bool BAMImporter::Open(DataStream* stream, bool autoFree)
 			Compressor* comp = ( Compressor* )
 				core->GetInterface( IE_COMPRESSION_CLASS_ID );
 			comp->Decompress( newfile, str );
-			core->FreeInterface( comp );
+			comp->release();
 			fclose( newfile );
 			if (autoFree)
 				delete( str );

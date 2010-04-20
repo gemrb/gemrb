@@ -1200,7 +1200,7 @@ void CREImporter::GetEffect(Effect *fx)
 	} else {
 		eM->GetEffectV1( fx );
 	}
-	core->FreeInterface( eM );
+	eM->release();
 }
 
 ieDword CREImporter::GetActorGemRB(Actor *act)

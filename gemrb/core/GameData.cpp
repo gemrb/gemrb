@@ -68,7 +68,7 @@ static void ReleasePalette(void *poi)
 	std::vector<type>::iterator i; \
 	for(i = (variable).begin(); i != (variable).end(); ++i) { \
 	if ((*i).refcount) { \
-		core->FreeInterface((*i).member); \
+		(*i).member->release(); \
 		(*i).refcount = 0; \
 	} \
 	} \
@@ -101,11 +101,11 @@ Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
 
 	ActorMgr* actormgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
 	if (!actormgr->Open( ds, true )) {
-		core->FreeInterface( actormgr );
+		actormgr->release();
 		return 0;
 	}
 	Actor* actor = actormgr->GetActor(PartySlot);
-	core->FreeInterface( actormgr );
+	actormgr->release();
 	return actor;
 }
 
@@ -124,11 +124,11 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 		stream = (DataStream *) fs;
 		ActorMgr* actormgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
 		if (!actormgr->Open( stream, true )) {
-			core->FreeInterface( actormgr );
+			actormgr->release();
 			return -1;
 		}
 		actor = actormgr->GetActor(PartySlot);
-		core->FreeInterface( actormgr );
+		actormgr->release();
 	} else {
 		actor = GetCreature(ResRef, PartySlot);
 	}
@@ -173,7 +173,7 @@ int GameData::LoadTable(const ieResRef ResRef)
 		return -1;
 	}
 	if (!tm->Open( str, true )) {
-		core->FreeInterface( tm );
+		tm->release();
 		return -1;
 	}
 	Table t;
@@ -233,7 +233,8 @@ bool GameData::DelTable(unsigned int index)
 	}
 	tables[index].refcount--;
 	if (tables[index].refcount == 0)
-		core->FreeInterface( tables[index].tm );
+		if (tables[index].tm)
+			tables[index].tm->release();
 	return true;
 }
 
@@ -251,13 +252,12 @@ Palette *GameData::GetPalette(const ieResRef resname)
 		GetResource( resname, &ImageMgr::ID );
 	if (im == NULL) {
 		PaletteCache.SetAt(resname, NULL);
-		core->FreeInterface( im );
 		return NULL;
 	}
 
 	palette = new Palette();
 	im->GetPalette(256,palette->col);
-	core->FreeInterface( im );
+	im->release();
 	palette->named=true;
 	PaletteCache.SetAt(resname, (void *) palette);
 	return palette;
@@ -309,7 +309,7 @@ Item* GameData::GetItem(const ieResRef resname)
 		return NULL;
 	}
 	if (!sm->Open( str, true )) {
-		core->FreeInterface( sm );
+		sm->release();
 		return NULL;
 	}
 
@@ -318,11 +318,11 @@ Item* GameData::GetItem(const ieResRef resname)
 	strnlwrcpy(item->Name, resname, 8);
 	sm->GetItem( item );
 	if (item == NULL) {
-		core->FreeInterface( sm );
+		sm->release();
 		return NULL;
 	}
 
-	core->FreeInterface( sm );
+	sm->release();
 	ItemCache.SetAt(resname, (void *) item);
 	return item;
 }
@@ -355,7 +355,7 @@ Spell* GameData::GetSpell(const ieResRef resname, bool silent)
 		return NULL;
 	}
 	if (!sm->Open( str, true )) {
-		core->FreeInterface( sm );
+		sm->release();
 		return NULL;
 	}
 
@@ -364,11 +364,11 @@ Spell* GameData::GetSpell(const ieResRef resname, bool silent)
 	strnlwrcpy(spell->Name, resname, 8);
 	sm->GetSpell( spell, silent );
 	if (spell == NULL) {
-		core->FreeInterface( sm );
+		sm->release();
 		return NULL;
 	}
 
-	core->FreeInterface( sm );
+	sm->release();
 
 	SpellCache.SetAt(resname, (void *) spell);
 	return spell;
@@ -401,17 +401,17 @@ Effect* GameData::GetEffect(const ieResRef resname)
 		return NULL;
 	}
 	if (!em->Open( str, true )) {
-		core->FreeInterface( em );
+		em->release();
 		return NULL;
 	}
 
 	effect = em->GetEffect(new Effect() );
 	if (effect == NULL) {
-		core->FreeInterface( em );
+		em->release();
 		return NULL;
 	}
 
-	core->FreeInterface( em );
+	em->release();
 
 	EffectCache.SetAt(resname, (void *) effect);
 	return effect;
@@ -492,7 +492,7 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 				return NULL;
 			ani->Open( ret, true );
 			AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
-			core->FreeInterface( ani );
+			ani->release();
 			factory->AddFactoryObject( af );
 			return af;
 		}
@@ -503,7 +503,7 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 		ImageMgr* img = (ImageMgr*) GetResource( resname, &ImageMgr::ID );
 		if (img) {
 			ImageFactory* fact = img->GetImageFactory( resname );
-			core->FreeInterface( img );
+			img->release();
 			factory->AddFactoryObject( fact );
 			return fact;
 		}

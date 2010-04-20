@@ -104,7 +104,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 			gamedata->GetResource( MosFile, &ImageMgr::ID );
 		if (mos != NULL) {
 			win->SetBackGround( mos->GetSprite2D(), true );
-			core->FreeInterface( mos );
+			mos->release();
 		} else
 			printMessage( "CHUImporter","Cannot Load BackGround, skipping\n",YELLOW );
 	}
@@ -230,13 +230,13 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					ImageMgr* mos = ( ImageMgr* )
 						gamedata->GetResource( MOSFile, &ImageMgr::ID );
 					img = mos->GetSprite2D();
-					core->FreeInterface( mos );
+					mos->release();
 				}
 				if ( MOSFile2[0] ) {
 					ImageMgr* mos = ( ImageMgr* )
 						gamedata->GetResource( MOSFile2, &ImageMgr::ID );
 					img2 = mos->GetSprite2D();
-					core->FreeInterface( mos );
+					mos->release();
 				}
 				
 				pbar->SetImage( img, img2 );
@@ -252,7 +252,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 						gamedata->GetResource( BAMFile, &ImageMgr::ID );
 					Sprite2D* img3 = mos->GetSprite2D();
 					pbar->SetBarCap( img3 );
-					core->FreeInterface( mos );
+					mos->release();
 				}
 				win->AddControl( pbar );
 			}
@@ -283,7 +283,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					gamedata->GetResource( MOSFile, &ImageMgr::ID );
 				Sprite2D* img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
-				core->FreeInterface( mos );
+				mos->release();
 
 				AnimationFactory* bam = ( AnimationFactory* )
 					gamedata->GetFactoryResource( BAMFile,
@@ -337,7 +337,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				Sprite2D *img = NULL;
 				if(mos) {
 					img = mos->GetSprite2D();
-					core->FreeInterface( mos );
+					mos->release();
 				}
 
 				TextEdit* te = new TextEdit( maxInput, PosX, PosY );

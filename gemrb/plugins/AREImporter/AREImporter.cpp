@@ -63,7 +63,8 @@ int trackcount = 0;
 
 void ReleaseMemory()
 {
-	core->FreeInterface( INInote );
+	if (INInote)
+		INInote->release();
 	INInote = NULL;
 
 	delete [] tracks;
@@ -248,7 +249,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	tm = tmm->GetTileMap(tm);
 	if (!tm) {
 		printf( "[AREImporter]: No Tile Map Available.\n" );
-		core->FreeInterface( tmm );
+		tmm->release();
 		return false;
 	}
 
@@ -335,7 +336,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	TileMap* tm = tmm->GetTileMap(NULL);
 	if (!tm) {
 		printf( "[AREImporter]: No Tile Map Available.\n" );
-		core->FreeInterface( tmm );
+		tmm->release();
 		return false;
 	}
 
@@ -970,7 +971,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ab->TalkCount = TalkCount;
 			ab->RefreshEffects(NULL);
 		}
-		core->FreeInterface( actmgr );
+		actmgr->release();
 	}
 
 	printf( "Loading animations\n" );
@@ -1251,7 +1252,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		Door *door = tm->GetDoor(i);
 		door->SetDoorOpen(door->IsOpen(), false, 0);
 	}
-	core->FreeInterface( tmm );
+	tmm->release();
 	return map;
 }
 
@@ -1269,7 +1270,7 @@ void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword Effe
 		// NOTE: AddEffect() allocates a new effect
 		fxqueue->AddEffect( &fx );
 	}
-	core->FreeInterface(eM);
+	eM->release();
 }
 
 int AREImporter::GetStoredFileSize(Map *map)
@@ -1289,7 +1290,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	for (i=0;i<ActorCount;i++) {
 		headersize += am->GetStoredFileSize(map->GetActor(i, false) );
 	}
-	core->FreeInterface(am);
+	am->release();
 
 	InfoPointsOffset = headersize;
 
@@ -1872,7 +1873,7 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 		am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
 	}
-	core->FreeInterface( am);
+	am->release();
 
 	return 0;
 }

@@ -707,14 +707,14 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 
 		Sprite2D* Picture = im->GetSprite2D();
 		if (Picture == NULL) {
-			core->FreeInterface( im );
+			im->release();
 			return NULL;
 		}
 
 		// FIXME: delete previous WindowFrames
 		//core->WindowFrames[i] = Picture;
 		core->SetWindowFrame(i, Picture);
-		core->FreeInterface( im );
+		im->release();
 	}
 
 	Py_INCREF( Py_None );
@@ -761,7 +761,7 @@ static PyObject* GemRB_SetWindowPicture(PyObject * /*self*/, PyObject* args)
 	ImageMgr* mos = ( ImageMgr* ) gamedata->GetResource( MosResRef, &ImageMgr::ID );
 	if (mos != NULL) {
 		win->SetBackGround( mos->GetSprite2D(), true );
-		core->FreeInterface( mos );
+		mos->release();
 	}
 	win->Invalidate();
 
@@ -2677,12 +2677,12 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 		ImageMgr *anim = ( ImageMgr* ) gamedata->GetResource( Flag, &ImageMgr::ID );
 		if (anim) {
 			map->Flag[0] = anim->GetSprite2D();
-			core->FreeInterface( anim );
+			anim->release();
 		}
 		anim = ( ImageMgr* ) gamedata->GetResource( Flag2, &ImageMgr::ID );
 		if (anim) {
 			map->Flag[1] = anim->GetSprite2D();
-			core->FreeInterface( anim );
+			anim->release();
 		}
 		goto setup_done;
 	}
@@ -3172,13 +3172,13 @@ static PyObject* GemRB_SetButtonMOS(PyObject * /*self*/, PyObject* args)
 
 	Sprite2D* Picture = im->GetSprite2D();
 	if (Picture == NULL) {
-		core->FreeInterface( im );
+		im->release();
 		return NULL;
 	}
 
 	btn->SetPicture( Picture );
 
-	core->FreeInterface( im );
+	im->release();
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3242,7 +3242,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 		}
 	} else {
 		Picture = im->GetSprite2D(type, col);
-		core->FreeInterface( im );
+		im->release();
 		if (Picture == NULL) {
 			printf ("Picture == NULL\n");
 			return NULL;
@@ -3909,13 +3909,13 @@ static PyObject* GemRB_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 
 	Sprite2D* Picture = im->GetSprite2D();
 	if (Picture == NULL) {
-		core->FreeInterface( im );
+		im->release();
 		return NULL;
 	}
 
 	btn->SetPicture( Picture );
 
-	core->FreeInterface( im );
+	im->release();
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3951,13 +3951,13 @@ static PyObject* GemRB_SetSaveGamePreview(PyObject * /*self*/, PyObject* args)
 
 	Sprite2D* Picture = im->GetSprite2D();
 	if (Picture == NULL) {
-		core->FreeInterface( im );
+		im->release();
 		return NULL;
 	}
 
 	btn->SetPicture( Picture );
 
-	core->FreeInterface( im );
+	im->release();
 
 	Py_INCREF( Py_None );
 	return Py_None;

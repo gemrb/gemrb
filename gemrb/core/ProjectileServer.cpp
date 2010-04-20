@@ -120,7 +120,7 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		return CreateDefaultProjectile(idx);
 	}
 	if (!sm->Open( str, true )) {
-		core->FreeInterface( sm );
+		sm->release();
 		return CreateDefaultProjectile(idx);
 	}
 	Projectile *pro = new Projectile();
@@ -172,7 +172,7 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		//fill the explosion/spread animation flags
 		pro->Extension->APFlags = GetExplosionFlags(Type);
 	}
-	core->FreeInterface( sm );
+	sm->release();
 
 	pro->autofree = true;
 	return ReturnCopy(idx);

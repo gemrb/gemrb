@@ -33,7 +33,8 @@ ResourceManager::~ResourceManager()
 {
 	std::vector<ResourceSource*>::iterator i;
 	for (i = searchPath.begin(); i != searchPath.end(); ++i) {
-		core->FreeInterface(*i);
+		if (*i)
+			(*i)->release();
 	}
 }
 
@@ -42,7 +43,7 @@ bool ResourceManager::AddSource(char *path, const char *description, PluginID ty
 	ResourceSource *source = ( ResourceSource * ) core->GetInterface( type );
 	ResolveFilePath(path);
 	if (!source->Open(path, description)) {
-		core->FreeInterface(source);
+		source->release();
 		return false;
 	}
 	searchPath.push_back(source);

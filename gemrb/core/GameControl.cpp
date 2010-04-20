@@ -2333,7 +2333,7 @@ int GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref
 	DialogMgr* dm = ( DialogMgr* ) core->GetInterface( IE_DLG_CLASS_ID );
 	dm->Open( gamedata->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
 	dlg = dm->GetDialog();
-	core->FreeInterface( dm );
+	dm->release();
 
 	if (!dlg) {
 		printMessage("GameControl", " ", LIGHT_RED);
@@ -2848,7 +2848,7 @@ Sprite2D* GameControl::GetPortraitPreview(int pcslot)
 	}
 
 	Sprite2D* img = im->GetSprite2D();
-	core->FreeInterface(im);
+	im->release();
 
 	if (ratio == 1)
 		return img;

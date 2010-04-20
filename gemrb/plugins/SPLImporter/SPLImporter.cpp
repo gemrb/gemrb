@@ -178,7 +178,7 @@ void SPLImporter::GetFeature(Spell *s, Effect *fx)
 	memcpy(fx->Source, s->Name, 9);
 	fx->PrimaryType = s->PrimaryType;
 	fx->SecondaryType = s->SecondaryType;
-	core->FreeInterface( eM );
+	eM->release();
 }
 
 #include "plugindef.h"
