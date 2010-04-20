@@ -31,7 +31,6 @@
 #include "TileMap.h"
 #include "ScriptedAnimation.h"
 #include "Projectile.h"
-#include "ImageMgr.h"
 #include "Video.h"
 #include "Audio.h"
 #include "MusicMgr.h"
@@ -385,39 +384,25 @@ Map::~Map(void)
 	WallCount=0;
 }
 
-void Map::ChangeTileMap(ImageMgr* lm, ImageMgr* sm)
+void Map::ChangeTileMap(Image* lm, Sprite2D* sm)
 {
 	delete LightMap;
 	core->GetVideoDriver()->FreeSprite(SmallMap);
 
-	LightMap = lm->GetImage();
-	lm->release();
-	if (sm) {
-		SmallMap = sm->GetSprite2D();
-		sm->release();
-	} else {
-		SmallMap = NULL;
-	}
+	LightMap = lm;
+	SmallMap = sm;
 
 	TMap->UpdateDoors();
 }
 
-void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, ImageMgr* hm)
+void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm)
 {
 	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
 	TMap = tm;
-	LightMap = lm->GetImage();
-	lm->release();
-	SearchMap = sr->GetBitmap();
-	sr->release();
-	HeightMap = hm->GetBitmap();
-	hm->release();
-	if (sm) {
-		SmallMap = sm->GetSprite2D();
-		sm->release();
-	} else {
-		SmallMap = NULL;
-	}
+	LightMap = lm;
+	SearchMap = sr;
+	HeightMap = hm;
+	SmallMap = sm;
 	Width = (unsigned int) (TMap->XCellCount * 4);
 	Height = (unsigned int) (( TMap->YCellCount * 64 ) / 12);
 	//Filling Matrices

@@ -274,7 +274,10 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	}
 
 	//alter the lightmap and the minimap (the tileset was already swapped)
-	map->ChangeTileMap(lm, sm);
+	map->ChangeTileMap(lm->GetImage(), sm?sm->GetSprite2D():NULL);
+	lm->release();
+	if (sm)
+		sm->release();
 	return true;
 }
 
@@ -381,7 +384,12 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		return false;
 	}
 
-	map->AddTileMap( tm, lm, sr, sm, hm );
+	map->AddTileMap( tm, lm->GetImage(), sr->GetBitmap(), sm ? sm->GetSprite2D() : NULL, hm->GetBitmap() );
+	lm->release();
+	sr->release();
+	if (sm)
+		sm->release();
+	hm->release();
 
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices

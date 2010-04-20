@@ -34,7 +34,6 @@ class Map;
 
 class Actor;
 class TileMap;
-class ImageMgr;
 class Ambient;
 class GameControl;
 struct PathNode;
@@ -270,9 +269,9 @@ public:
 	bool ChangeMap(bool day_or_night);
 	void SeeSpellCast(Scriptable *caster, ieDword spell);
 	/* low level function to perform the daylight changes */
-	void ChangeTileMap(ImageMgr* lm, ImageMgr* sm);
+	void ChangeTileMap(Image* lm, Sprite2D* sm);
 	/* sets all the auxiliary maps and the tileset */
-	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, ImageMgr* hm);
+	void AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm);
 	void UpdateScripts();
 	bool DoStepForActor(Actor *actor, int speed, ieDword time);
 	void UpdateEffects();
