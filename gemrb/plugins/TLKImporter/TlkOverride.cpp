@@ -302,9 +302,6 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 	char Signature[TOH_HEADER_SIZE];
 
 	PathJoin( nPath, core->CachePath, "default.toh", NULL );
-#ifndef WIN32
-	ResolveFilePath( nPath );
-#endif
 	FileStream* fs = new FileStream();
 retry:
 	if (fs->Modify( nPath, true )) {
@@ -326,9 +323,6 @@ DataStream* CTlkOverride::GetAuxTlk(bool create)
 {
 	char nPath[_MAX_PATH];
 	PathJoin( nPath, core->CachePath, "default.tot", NULL );
-#ifndef WIN32
-	ResolveFilePath( nPath );
-#endif
 	FileStream* fs = new FileStream();
 retry:
 	if (fs->Modify( nPath, true )) {

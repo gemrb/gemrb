@@ -78,7 +78,6 @@ void ReadAutonoteINI()
 	FileStream* fs = new FileStream();
 	char tINInote[_MAX_PATH];
 	PathJoin( tINInote, core->GamePath, "autonote.ini", NULL );
-	ResolveFilePath( tINInote );
 	fs->Open( tINInote, true );
 	INInote->Open( fs, true );
 }

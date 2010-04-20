@@ -46,12 +46,12 @@ bool DirectoryImporter::Open(const char *dir, const char *desc)
 
 static bool FindIn(const char *Path, const char *ResRef, const char *Type)
 {
-	char f[_MAX_PATH] = {0};
+	char p[_MAX_PATH], f[_MAX_PATH] = {0};
 	strcpy(f, ResRef);
 	strcat(f, Type);
 	strlwr(f);
 
-	return FindInDir(Path, f);
+	return PathJoin(p, Path, f, NULL);
 }
 
 static FileStream *SearchIn(const char * Path,const char * ResRef, const char *Type)
@@ -61,10 +61,8 @@ static FileStream *SearchIn(const char * Path,const char * ResRef, const char *T
 	strcat(f, Type);
 	strlwr(f);
 
-	if (!FindInDir(Path, f))
+	if (!PathJoin(p, Path, f, NULL))
 		return NULL;
-
-	PathJoin(p, Path, f, NULL);
 
 	FileStream * fs = new FileStream();
 	if(!fs) return NULL;

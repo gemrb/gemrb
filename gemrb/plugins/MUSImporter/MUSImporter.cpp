@@ -66,9 +66,6 @@ bool MUSImporter::OpenPlaylist(const char* name)
 	}
 	char path[_MAX_PATH];
 	PathJoin(path, core->GamePath, musicsubfolder, name, NULL);
-#ifndef WIN32
-	ResolveFilePath( path );
-#endif
 	printMessage("MUSImporter", "", WHITE);
 	printf( "Loading %s...", path );
 	if (!str->Open( path, true )) {
@@ -289,9 +286,6 @@ void MUSImporter::PlayMusic(char* name)
 	else {
 		PathJoin(FName, core->GamePath, musicsubfolder, name, NULL);
 	}
-#ifndef WIN32
-		ResolveFilePath( FName );
-#endif
 	int soundID = core->GetAudioDrv()->StreamFile( FName );
 	if (soundID == -1) {
 		core->GetAudioDrv()->Stop();

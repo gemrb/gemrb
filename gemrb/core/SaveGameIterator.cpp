@@ -39,7 +39,6 @@ SaveGame::SaveGame(char* path, char* name, char* prefix, int pCount, int saveID)
 	char nPath[_MAX_PATH];
 	struct stat my_stat;
 	PathJoinExt(nPath, Path, Prefix, "bmp");
-	ResolveFilePath( nPath );
 	memset(&my_stat,0,sizeof(my_stat));
 	stat( nPath, &my_stat );
 	strftime( Date, _MAX_PATH, "%c", localtime( &my_stat.st_mtime ) );
@@ -188,7 +187,6 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	char ftmp[_MAX_PATH];
 	PathJoinExt(ftmp, dtmp, core->GameNameResRef, "bmp");
 
-	ResolveFilePath( ftmp );
 	if (access( ftmp, R_OK )) {
 		printMessage("SaveGameIterator"," ",YELLOW);
 		printf("Ignoring slot %s because of no appropriate preview!\n", dtmp);
@@ -196,7 +194,6 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	}
 
 	PathJoinExt(ftmp, dtmp, core->WorldMapName, "wmp");
-	ResolveFilePath( ftmp );
 	if (access( ftmp, R_OK )) {
 		printMessage("SaveGameIterator"," ",YELLOW);
 		printf("Ignoring slot %s because of no appropriate worldmap!\n", dtmp);
@@ -219,7 +216,6 @@ bool SaveGameIterator::RescanSaveGames()
 	char Path[_MAX_PATH];
 	PathJoin(Path, core->SavePath, SaveDir(), NULL);
 
-	ResolveFilePath( Path );
 	DIR* dir = opendir( Path );
 	// create the save game directory at first access
 	if (dir == NULL) {
@@ -289,7 +285,6 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 		return NULL;
 	}
 
-	ResolveFilePath( Path );
 	DIR* ndir = opendir( Path );
 	//If we cannot open the Directory
 	if (ndir == NULL) {
@@ -484,14 +479,12 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	PathJoin( Path, core->SavePath, SaveDir(), NULL );
 
 	//if the path exists in different case, don't make it again
-	ResolveFilePath( Path );
 	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
 	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
 	//keep the first part we already determined existing
 	char dir[_MAX_PATH];
 	snprintf( dir, _MAX_PATH, "%09d-%s", index, slotname );
 	PathJoin(Path, Path, dir, NULL);
-	ResolveFilePath( Path );
 	//this is required in case the old slot wasn't recognised but still there
 	core->DelTree(Path, false);
 	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);

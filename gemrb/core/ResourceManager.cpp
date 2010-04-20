@@ -41,7 +41,6 @@ ResourceManager::~ResourceManager()
 bool ResourceManager::AddSource(char *path, const char *description, PluginID type)
 {
 	ResourceSource *source = ( ResourceSource * ) core->GetInterface( type );
-	ResolveFilePath(path);
 	if (!source->Open(path, description)) {
 		source->release();
 		return false;

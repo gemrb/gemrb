@@ -434,7 +434,6 @@ void Variables::LoadInitialValues(const char* name)
 	char nPath[_MAX_PATH];
 	// we only support PST's var.var for now
 	PathJoin( nPath, core->GamePath, "var.var", NULL );
-	ResolveFilePath(nPath);
 	FileStream fs;
 	if (!fs.Open( nPath, true )) {
 		return;

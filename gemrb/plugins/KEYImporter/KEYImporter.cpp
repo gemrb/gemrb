@@ -71,14 +71,12 @@ static void FindBIF(BIFEntry *entry)
 	entry->cd = 0;
 
 	PathJoin(entry->path, core->GamePath, entry->name, NULL);
-	ResolveFilePath(entry->path);
 	if (exists(entry->path)) {
 		entry->found = true;
 		return;
 	}
 
 	PathJoin(entry->path, core->GamePath, AddCBF(entry->name), NULL);
-	ResolveFilePath(entry->path);
 	if (exists(entry->path)) {
 		entry->found = true;
 		return;
@@ -103,14 +101,12 @@ static void FindBIF(BIFEntry *entry)
 			return;
 		}
 		PathJoin(entry->path, core->CD[entry->cd-1], entry->name, NULL);
-		ResolveFilePath(entry->path);
 		entry->found = false;
 		return;
 	}
 
 	for (int i = 0; i < 6; i++) {
 		PathJoin(entry->path, core->CD[i], entry->name, NULL);
-		ResolveFilePath(entry->path);
 		if (exists(entry->path)) {
 			entry->found = true;
 			return;
@@ -118,7 +114,6 @@ static void FindBIF(BIFEntry *entry)
 
 		//Trying CBF Extension
 		PathJoin(entry->path, core->CD[i], AddCBF(entry->name), NULL);
-		ResolveFilePath(entry->path);
 		if (exists(entry->path)) {
 			entry->found = true;
 			return;
@@ -231,7 +226,6 @@ bool KEYImporter::HasResource(const char* resname, const ResourceDesc &type)
 
 static void FindBIFOnCD(BIFEntry *entry)
 {
-	ResolveFilePath(entry->path);
 	if (exists(entry->path)) {
 		entry->found = true;
 		return;
@@ -239,7 +233,6 @@ static void FindBIFOnCD(BIFEntry *entry)
 
 	core->WaitForDisc( entry->cd, core->CD[entry->cd-1] );
 	PathJoin(entry->path, core->CD[entry->cd-1], entry->name, NULL);
-	ResolveFilePath(entry->path);
 	if (exists(entry->path)) {
 		entry->found = true;
 		return;
@@ -247,7 +240,6 @@ static void FindBIFOnCD(BIFEntry *entry)
 
 	//Trying CBF Extension
 	PathJoin(entry->path, core->CD[entry->cd-1], AddCBF(entry->name), NULL);
-	ResolveFilePath(entry->path);
 	if (exists(entry->path)) {
 		entry->found = true;
 		return;
