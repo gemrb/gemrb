@@ -22,23 +22,43 @@
 #define SOUNDMGR_H
 
 #include "ie_types.h"
-#include "Plugin.h"
+#include "Resource.h"
 #include "DataStream.h"
 
-class GEM_EXPORT SoundMgr : public Plugin {
+/**
+ * Base Class for sound plugins
+ */
+class GEM_EXPORT SoundMgr : public Resource {
 public:
 	static const TypeID ID;
 public:
 	SoundMgr(void);
 	virtual ~SoundMgr(void);
 	virtual bool Open(DataStream* stream, bool autofree = true ) = 0 ;
-	virtual int get_length() = 0 ;
-	virtual int get_channels() = 0 ;
-	virtual int get_samplerate() = 0 ;
+	/**
+	 * Read up to cnt samples into memory
+	 *
+	 * @param[out] memory Array to hold samples read.
+	 * @param[in] cnt number of samples to read.
+	 * @returns Number of samples read.
+	 */
 	virtual int read_samples( short* memory, int cnt ) = 0 ;
-	virtual void rewind(void) = 0 ;
-
+	int get_channels()
+	{
+		return channels;
+	}
+	int get_samplerate()
+	{
+		return samplerate;
+	}
+	int get_length()
+	{
+		return samples;
+	} // returns the total samples count
+protected:
+	int samples; // total count of sound samples
+	int channels;
+	int samplerate;
 };
-
 
 #endif

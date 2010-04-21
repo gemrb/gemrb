@@ -260,9 +260,9 @@ void MUSImporter::PlayNext()
 				PLnext = -1;
 			else
 				PLnext = PLpos + 1;
-				if ((unsigned int) PLnext >= playlist.size() ) {
-					PLnext = 0;
-				}
+			if ((unsigned int) PLnext >= playlist.size() ) {
+				PLnext = 0;
+			}
 		}
 	} else {
 		Playing = false;
@@ -290,19 +290,13 @@ void MUSImporter::PlayMusic(char* name)
 		strncpy(FName, name, _MAX_PATH);
 	}
 
-	DataStream *stream =  manager.GetResource(FName, IE_ACM_CLASS_ID);
-	SoundMgr* sound = (SoundMgr*) core->GetInterface(IE_WAV_CLASS_ID);
-	if (!sound->Open(stream)) {
-		sound->release();
-		printMessage("MUSImporter", "",WHITE);
-		printf( "Cannot open %s...", FName );
-		printStatus("NOT FOUND", YELLOW );
-		core->GetAudioDrv()->Stop();
-	} else {
+	if (SoundMgr* sound = (SoundMgr*) manager.GetResource(FName, &SoundMgr::ID)) {
 		int soundID = core->GetAudioDrv()->CreateStream( sound );
 		if (soundID == -1) {
 			core->GetAudioDrv()->Stop();
 		}
+	} else {
+		core->GetAudioDrv()->Stop();
 	}
 	printf( "Playing: %s\n", FName );
 }

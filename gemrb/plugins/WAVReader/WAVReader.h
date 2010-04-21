@@ -18,42 +18,45 @@
  *
  */
 
-#ifndef ACMIMP_H
-#define ACMIMP_H
+#ifndef WAVREADER_H
+#define WAVREADER_H
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "readers.h"
 #include "DataStream.h"
 #include "SoundMgr.h"
 
-#ifdef HAS_VORBIS_SUPPORT
-#include <vorbis/vorbisfile.h>
-#endif
-
-#define INIT_NO_ERROR_MSG 0
-#define INIT_NEED_ERROR_MSG 1
-
-// Abstract Sound Reader class
-class ACMImp : public SoundMgr {
-private:
-	CSoundReader* SoundReader ;
-
+// RAW file reader
+class RawPCMReader : public SoundMgr {
+protected:
+	// one sample consists of
+	// channels * (is16bit ? 2 : 1) bytes
+	int samples_left; // count of unread samples
+	int is16bit; // 1 - if 16 bit file, 0 - otherwise
 public:
-    ACMImp() ;
-    ~ACMImp() ;
-    void release()
-    {
-        delete this ;
-    }
-    bool Open(DataStream* stream, bool autofree );
-    int get_length() ;
-    int get_channels() ;
-    int get_samplerate() ;
-    int read_samples(short* memory, int cnt) ;
-    void rewind(void) ;
+	RawPCMReader(int bits)
+		: is16bit( bits == 16 )
+	{
+	}
+
+	bool Open(DataStream* stream, bool autoFree = true);
+	virtual int read_samples(short* buffer, int count);
+public:
+	void release(void)
+	{
+		delete this;
+	}
 };
 
-#endif //ACMIMP_H
+// WAV files
+class WavPCMReader : public RawPCMReader {
+public:
+	WavPCMReader()
+		: RawPCMReader( 16 )
+	{
+	}
+	bool Open(DataStream* stream, bool autoFree = true);
+};
 
+#endif

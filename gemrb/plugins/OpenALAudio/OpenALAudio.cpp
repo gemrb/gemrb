@@ -231,22 +231,15 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 		time_length = e->Length;
 		return e->Buffer;
 	}
-	//no cache entry...
-	DataStream* stream = gamedata->GetResource(ResRef, IE_WAV_CLASS_ID);
-	if (!stream)
-		stream = gamedata->GetResource(ResRef, IE_OGG_CLASS_ID);
-	if (!stream)
-		return 0;
 
+	//no cache entry...
 	alGenBuffers(1, &Buffer);
 	if (checkALError("Unable to create sound buffer", "ERROR")) {
-		delete stream;
 		return 0;
 	}
 
-	SoundMgr* acm = (SoundMgr*) core->GetInterface(IE_WAV_CLASS_ID);
-	if (!acm->Open(stream)) {
-		acm->release();
+	SoundMgr* acm = (SoundMgr*) gamedata->GetResource(ResRef, &SoundMgr::ID);
+	if (!acm) {
 		alDeleteBuffers( 1, &Buffer );
 		return 0;
 	}
