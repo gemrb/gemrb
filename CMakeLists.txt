@@ -4,7 +4,18 @@ if(COMMAND cmake_policy)
       cmake_policy(SET CMP0005 NEW)
 endif(COMMAND cmake_policy)
 
-PROJECT(GemRB)
+PROJECT(gemrb)
+# try to extract the version from the source
+execute_process(
+  COMMAND sed -n "s/\#define VERSION_GEMRB .\\([^\"]*\\).$/\\1/p" ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/includes/globals.h
+  OUTPUT_VARIABLE GEMRB_VERSION
+  RESULT_VARIABLE RC
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+if(${RC} GREATER 0) # lookup failed
+  set(GEMRB_VERSION "unknown")
+endif(${RC} GREATER 0)
+message("Detected version: ${GEMRB_VERSION}")
 
 IF(PREFIX)
   SET(PREFIX CACHE PATH "Abbreviation for CMAKE_INSTALL_PREFIX.")
@@ -213,3 +224,11 @@ CONFIGURE_FILE(
 
 ADD_CUSTOM_TARGET( uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" )
+
+# make dist for a gzipped tarball of current HEAD
+set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${GEMRB_VERSION})
+add_custom_target( dist
+  COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD
+    | gzip --best > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.gz
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
