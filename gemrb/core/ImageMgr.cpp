@@ -24,7 +24,7 @@
 #include "Interface.h"
 #include "Video.h"
 
-const TypeID ImageMgr::ID = {};
+const TypeID ImageMgr::ID = { "ImageMgr" };
 
 ImageMgr::ImageMgr(void)
 {

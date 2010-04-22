@@ -35,7 +35,10 @@
  * Base class for all GemRB plugins
  */
 
-class TypeID {};
+class TypeID {
+public:
+	const char *description;
+};
 
 class GEM_EXPORT Plugin {
 public:

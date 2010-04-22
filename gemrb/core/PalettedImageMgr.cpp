@@ -22,7 +22,7 @@
 #include "Interface.h"
 #include "Video.h"
 
-const TypeID PalettedImageMgr::ID = {};
+const TypeID PalettedImageMgr::ID = { "PalettedImageMgr" };
 
 PalettedImageMgr::PalettedImageMgr(void)
 {

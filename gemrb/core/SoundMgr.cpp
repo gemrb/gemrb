@@ -20,7 +20,7 @@
 
 #include "SoundMgr.h"
 
-const TypeID SoundMgr::ID = {};
+const TypeID SoundMgr::ID = { "SoundMgr" };
 
 SoundMgr::SoundMgr(void)
 {
