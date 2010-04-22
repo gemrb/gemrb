@@ -340,7 +340,9 @@ Interface::~Interface(void)
 	delete worldmap;
 
 	FreeAbilityTables();
-	for (size_t i = 0; i < cleanupFunctions.size(); i++)
+
+        size_t i;
+	for (i = 0; i < cleanupFunctions.size(); i++)
 		cleanupFunctions[i]();
 
 	ReleaseMemoryActor();
@@ -365,7 +367,6 @@ Interface::~Interface(void)
 	FreeResourceVector( Font, fonts );
 	FreeResourceVector( Window, windows );
 
-	unsigned int i;
 	for (i = 0; i < musiclist.size(); i++) {
 		free((void *)musiclist[i]);
 	}
