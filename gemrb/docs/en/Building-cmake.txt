@@ -1,11 +1,11 @@
-BUILDING GEMRB FROM GIT SOURCES ON WINDOWS
----------------------------------------
-
+BUILDING GEMRB WITH CMAKE FROM GIT SOURCES
+------------------------------------------
 
 Tools you will need to build GemRB from GIT:
   - git
   - cmake
-  - MinGW automated installer and utilities (base, g++, make)
+  - make
+  - g++
 
 Libraries:
   - ZLib
@@ -14,9 +14,23 @@ Libraries:
   - OpenAL
   - libpng
 
+Building GemRB on unix-like systems
+-----------------------------------
 
-Building GemRB
-----------------------------
+The following commands will try to configure, make and install GemRB.
+  mkdir build
+  cd build
+  cmake ..
+  make
+  make install
+
+By default, GemRB is installed into /usr/local ("fhs"). You can pass -DLAYOUT
+with "home" or "opt" to change the general layout and -DPREFIX to change the
+install path prefix.
+Pass -DCMAKE_BUILD_TYPE=Debug to cmake if you want to create a debug build.
+
+Building GemRB with mingw
+-------------------------
 
 The following commands will try to configure, make and install GemRB.
   mkdir build
