@@ -4,6 +4,15 @@ if(COMMAND cmake_policy)
       cmake_policy(SET CMP0005 NEW)
 endif(COMMAND cmake_policy)
 
+# If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
+# and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
+# to Release prior to calling PROJECT()
+IF(DEFINED CMAKE_BUILD_TYPE)
+   SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
+ELSE(DEFINED CMAKE_BUILD_TYPE)
+   SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
+ENDIF(DEFINED CMAKE_BUILD_TYPE)
+
 PROJECT(gemrb)
 # try to extract the version from the source
 execute_process(
