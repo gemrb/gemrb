@@ -35,6 +35,7 @@
 #include <list>
 #include <cstring>
 #include <map>
+#include "ResourceDesc.h"
 
 #ifdef WIN32
 typedef HINSTANCE LibHandle;
@@ -43,7 +44,6 @@ typedef void *LibHandle;
 #endif
 
 class Resource;
-class ResourceDesc;
 class TypeID;
 class Plugin;
 
