@@ -390,6 +390,10 @@ public:
 	const char* GetScript(int ScriptIndex) const;
 	/** Gets the Character's level for XP calculations */
 	ieDword GetXPLevel(int modified) const;
+	/** Returns the wild mage casting level modifier */
+	int GetWildMod(int level) const;
+	/** Returns any casting level modifier */
+	int CastingLevelBonus(int level, int type) const;
 
 	/** Gets the Dialog ResRef */
 	const char* GetDialog(int flags=GD_NORMAL) const;

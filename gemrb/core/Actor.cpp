@@ -77,6 +77,7 @@ static int *maxhpconbon = NULL;
 static ieVariable CounterNames[4]={"GOOD","LAW","LADY","MURDER"};
 
 static int FistRows = -1;
+int *wmlevels[20];
 typedef ieResRef FistResType[MAX_LEVEL+1];
 
 static FistResType *fistres = NULL;
@@ -1147,6 +1148,10 @@ void Actor::ReleaseMemory()
 			free(monkbon);
 			monkbon=NULL;
 		}
+		for(i=0;i<20;i++) {
+			free(wmlevels[i]);
+			wmlevels[i]=NULL;
+		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1686,6 +1691,21 @@ static void InitActorTables()
 		}
 	}
 
+	//wild magic level modifiers
+	for(i=0;i<20;i++) {
+		wmlevels[i]=(int *) calloc(MAX_LEVEL,sizeof(int) );
+	}
+	tm.load("lvlmodwm");
+	if (tm) {
+		int maxrow = tm->GetRowCount();
+		for (i=0;i<20;i++) {
+			for(j=0;j<MAX_LEVEL;j++) {
+				int row = maxrow;
+				if (j<row) row=j;
+				wmlevels[i][j]=strtol(tm->QueryField(row,i), NULL, 0);
+			}
+		}
+	}
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -2724,6 +2744,29 @@ ieDword Actor::GetXPLevel(int modified) const
 		average = average / classcount + 0.5;
 	}
 	return ieDword(average);
+}
+
+int Actor::GetWildMod(int level) const
+{
+	if(GetStat(IE_KIT)&0x8000) {
+		if (level>=MAX_LEVEL) level=MAX_LEVEL;
+		if(level<1) level=1;
+		return wmlevels[core->Roll(1,20,0)][level-1];
+	}
+	return 0;
+}
+
+int Actor::CastingLevelBonus(int level, int type) const
+{
+	switch(type)
+	{
+	case IE_SPL_PRIEST:
+		return GetStat(IE_CASTINGLEVELBONUSCLERIC);
+		break;
+	case IE_SPL_WIZARD:
+		return GetWildMod(level)+GetStat(IE_CASTINGLEVELBONUSMAGE);
+	}
+	return 0;
 }
 
 /** maybe this would be more useful if we calculate with the strength too
