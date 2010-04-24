@@ -50,12 +50,6 @@ public:
 	bool Open(DataStream* stream);
 	void CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2);
 	int Play();
-
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

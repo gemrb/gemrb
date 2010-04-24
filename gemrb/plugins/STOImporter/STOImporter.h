@@ -47,10 +47,6 @@ public:
 	//saves file
 	int PutStore(DataStream *stream, Store *store);
 
-	void release(void)
-	{
-		delete this;
-	}
 private:
 	void GetItem(STOItem *item);
 	void GetDrink(STODrink *drink);

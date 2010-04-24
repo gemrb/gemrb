@@ -44,10 +44,6 @@ public:
 	~ITMImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Item* GetItem(Item *s);
-	void release(void)
-	{
-		delete this;
-	}
 private:
 	void GetExtHeader(Item *s, ITMExtHeader* eh);
 	void GetFeature(Effect *f);

@@ -46,10 +46,6 @@ public:
 
 	int GetStoredFileSize(WorldMapArray *wmap);
 	int PutWorldMap(DataStream* stream, WorldMapArray *wmap);
-	void release(void)
-	{
-		delete this;
-	}
 private:
 	void GetWorldMap(WorldMap *m, unsigned int index);
 

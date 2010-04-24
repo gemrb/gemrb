@@ -46,13 +46,6 @@ public:
 	void QueueBuffer(int stream, unsigned short bits, int channels,
                 short* memory, int size, int samplerate);
 
-
-public:
-	void release(void)
-	{
-		delete this;
-	}
-
 private:
 	int XPos, YPos;
 };

@@ -47,11 +47,6 @@ public:
 	}
 	bool Open(DataStream* stream);
 	int read_samples(short* buffer, int count);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

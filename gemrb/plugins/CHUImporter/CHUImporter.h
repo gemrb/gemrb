@@ -42,11 +42,6 @@ public:
 	Window* GetWindow(unsigned int i);
 	/** This function loads all available windows from the 'stream' parameter. */
 	bool Open(DataStream* stream, bool autoFree = true);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

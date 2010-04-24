@@ -37,10 +37,6 @@ public:
 		unsigned short* secondary = NULL);
 	Sprite2D* GetTile(int index);
 public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

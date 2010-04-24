@@ -6,9 +6,4 @@ public:
 	~BMPWriter(void);
 
 	void PutImage(DataStream *output, Sprite2D *sprite);
-public:
-	void release()
-	{
-		delete this;
-	}
 };

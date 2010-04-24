@@ -144,12 +144,6 @@ public:
 		}
 		return -1;
 	}
-
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

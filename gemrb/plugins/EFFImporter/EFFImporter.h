@@ -43,10 +43,6 @@ public:
 	Effect* GetEffect(Effect *fx);
 	Effect* GetEffectV1(Effect *fx);
 	Effect* GetEffectV20(Effect *fx);
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 

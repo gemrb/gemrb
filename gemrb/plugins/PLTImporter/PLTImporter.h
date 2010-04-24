@@ -32,11 +32,6 @@ public:
 	~PLTImporter(void);
 	bool Open(DataStream* stream);
 	Sprite2D* GetSprite2D(unsigned int type, ieDword col[8]);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

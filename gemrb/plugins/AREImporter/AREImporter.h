@@ -62,10 +62,6 @@ public:
 	int GetStoredFileSize(Map *map);
 	/* stores an area in the Cache (swaps it out) */
 	int PutArea(DataStream *stream, Map *map);
-	void release(void)
-	{
-		delete this;
-	}
 private:
 	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount);
 	CREItem* GetItem();

@@ -51,11 +51,6 @@ public:
 private:
 	void Read8To8(void *rpixels);
 	void Read4To8(void *rpixels);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

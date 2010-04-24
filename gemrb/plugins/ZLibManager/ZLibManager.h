@@ -31,11 +31,6 @@ public:
 	int Decompress(FILE* dest, DataStream* source);
 	// ZLib Compression
 	int Compress(DataStream* dest, DataStream* source);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

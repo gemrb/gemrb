@@ -56,11 +56,6 @@ public:
 	int GetStoredFileSize(Game *game);
 	/* stores a gane in the savegame folder */
 	int PutGame(DataStream *stream, Game *game);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 private:
 	Actor* GetActor( ActorMgr* aM, bool is_in_party );
 	void GetPCStats(PCStatsStruct* ps);

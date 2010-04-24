@@ -80,10 +80,6 @@ public:
 		return null;
 	}
 public:
-	void release(void)
-	{
-		delete this;
-	}
 	int GetCycleCount()
 	{
 		return CyclesCount;

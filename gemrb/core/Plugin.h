@@ -41,7 +41,7 @@ class GEM_EXPORT Plugin {
 public:
 	Plugin(void);
 	virtual ~Plugin(void);
-	virtual void release(void) = 0;
+	void release();
 };
 
 #endif

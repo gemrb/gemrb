@@ -81,10 +81,6 @@ public:
     bool Init(void);
     unsigned int Play(const char* ResRef, int XPos = 0, int YPos = 0,
                       unsigned int flags = GEM_SND_RELATIVE);
-    void release(void)
-    {
-        delete this;
-    }
     bool IsSpeaking();
     void UpdateVolume(unsigned int flags);
     bool CanPlay();

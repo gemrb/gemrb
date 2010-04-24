@@ -47,11 +47,6 @@ public:
 	int FindString(char *str, int len);
 	int FindValue(int val);
 	int GetSize() { return pairs.size(); }
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

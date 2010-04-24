@@ -28,3 +28,8 @@ Plugin::Plugin(void)
 Plugin::~Plugin(void)
 {
 }
+
+void Plugin::release()
+{
+	delete this;
+}

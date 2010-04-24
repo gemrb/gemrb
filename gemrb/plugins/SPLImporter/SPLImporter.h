@@ -41,10 +41,6 @@ public:
 	~SPLImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Spell* GetSpell(Spell *spl, bool silent=false);
-	void release(void)
-	{
-		delete this;
-	}
 private:
 	void GetExtHeader(Spell *s, SPLExtHeader* eh);
 	void GetFeature(Spell *s, Effect *f);

@@ -80,11 +80,6 @@ private:
 	char** GetStrings(char* string, unsigned int& count);
 	DialogTransition** GetTransitions(unsigned int firstIndex,
 		unsigned int count);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif
