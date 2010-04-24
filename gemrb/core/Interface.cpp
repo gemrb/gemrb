@@ -340,8 +340,8 @@ Interface::~Interface(void)
 	delete worldmap;
 
 	FreeAbilityTables();
+	size_t i;
 
-        size_t i;
 	for (i = 0; i < cleanupFunctions.size(); i++)
 		cleanupFunctions[i]();
 
