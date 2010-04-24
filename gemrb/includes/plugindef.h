@@ -31,22 +31,26 @@
 #include "PluginMgr.h"
 
 template <typename T>
-Plugin* CreatePlugin()
-{
-	return new T();
-}
+struct CreatePlugin {
+	static Plugin *func()
+	{
+		return new T();
+	}
+};
 
 template <typename Res>
-Resource* CreateResource(DataStream *str)
-{
-	Res *res = new Res();
-	if (res->Open(str)) {
-		return res;
-	} else {
-		delete res;
-		return NULL;
+struct CreateResource {
+	static Resource* func(DataStream *str)
+	{
+		Res *res = new Res();
+		if (res->Open(str)) {
+			return res;
+		} else {
+			delete res;
+			return NULL;
+		}
 	}
-}
+};
 
 #ifdef WIN32
 #include <windows.h>
@@ -72,18 +76,23 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version()
 		return desc;					\
 	}							\
 	GEM_EXPORT_DLL bool GemRBPlugin_Register(PluginMgr *mgr) {
+
 #define PLUGIN_CLASS(id, cls)					\
-		if (!mgr->RegisterPlugin(id, CreatePlugin<cls>))	\
-			return false;
+	if (!mgr->RegisterPlugin(id, &CreatePlugin<cls>::func ))\
+		return false;
+
 #define PLUGIN_RESOURCE(cls, ext)				\
-		mgr->RegisterResource(&cls::ID, &CreateResource<cls>, ext);
+	mgr->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext);
+
 #define PLUGIN_IE_RESOURCE(cls, ext, ie_id)			\
-		mgr->RegisterResource(&cls::ID, &CreateResource<cls>, ext, ie_id);
+	mgr->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext, ie_id);
+
 #define PLUGIN_CLEANUP(func)					\
 		core->RegisterCleanup(func);
+
 #define END_PLUGIN()						\
 		/* mgr is not null (this makes mgr used) */	\
-		return mgr;					\
+		return mgr!=0;					\
 	}
 
 
