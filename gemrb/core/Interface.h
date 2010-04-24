@@ -26,6 +26,11 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
+//skip messy warnings in MSVC6
+#ifdef WIN32
+#pragma warning(disable:4786)
+#endif
+
 #include "exports.h"
 #include <map>
 #include "SClassID.h"
