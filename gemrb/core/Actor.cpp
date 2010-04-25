@@ -2751,7 +2751,7 @@ int Actor::GetWildMod(int level) const
 	if(GetStat(IE_KIT)&0x8000) {
 		if (level>=MAX_LEVEL) level=MAX_LEVEL;
 		if(level<1) level=1;
-		return wmlevels[core->Roll(1,20,0)][level-1];
+		return wmlevels[core->Roll(1,20,-1)][level-1];
 	}
 	return 0;
 }
