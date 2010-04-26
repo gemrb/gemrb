@@ -117,6 +117,8 @@ struct CreateResource {
 	}
 };
 
+#ifndef STATIC_LINK
+
 #ifdef WIN32
 #include <windows.h>
 
@@ -162,5 +164,28 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version()
 		return mgr!=0;					\
 	}
 
+#else /* STATIC_LINK */
+
+#define GEMRB_PLUGIN(id, desc)	\
+	namespace { bool doRegisterPlugin = (
+
+#define PLUGIN_CLASS(id, cls)					\
+		PluginMgr::Get()->RegisterPlugin(id, &CreatePlugin<cls>::func ),
+
+#define PLUGIN_RESOURCE(cls, ext)				\
+		PluginMgr::Get()->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext),
+
+#define PLUGIN_IE_RESOURCE(cls, ext, ie_id)			\
+		PluginMgr::Get()->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext, ie_id),
+
+#define PLUGIN_INITIALIZER(func)				\
+		PluginMgr::Get()->RegisterInitializer(func),
+#define PLUGIN_CLEANUP(func)					\
+		PluginMgr::Get()->RegisterCleanup(func),
+
+#define END_PLUGIN()						\
+		true); }
+
+#endif /* STATIC_LINK */
 
 #endif
