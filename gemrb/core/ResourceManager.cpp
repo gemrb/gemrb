@@ -129,6 +129,7 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 		return false;
 	if (!silent) {
 		printMessage( "ResourceManager", "Searching for ", WHITE );
+		printf( "%.8s... ", ResRef );
 	}
 	const std::vector<ResourceDesc> &types = PluginMgr::Get()->GetResourceDesc(type);
 	for (size_t j = 0; j < types.size(); j++) {
