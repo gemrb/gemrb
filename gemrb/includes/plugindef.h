@@ -14,14 +14,79 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- *
  */
 
 /**
  * @file plugindef.h
  * Macros for defining plugins.
  * @author The GemRB Project
+ *
+ * This file should be included once in each plugin. This file defines several
+ * entry points to the a plugin, and a set of macros to describe the contents
+ * of the plugin.
+ *
+ * A typical use is
+ * @code
+ * #include "plugindef.h"
+ *
+ * GEMRB_PLUGIN(0xD768B1, "BMP File Reader")
+ * PLUGIN_IE_RESOURCE(BMPImporter, ".bmp", IE_BMP_CLASS_ID)
+ * END_PLUGIN()
+ * @endcode
+ *
+ * The plugin description block should start with a call to GEMRB_PLUGIN and
+ * end with a call to END_PLUGIN, and have only calls to PLUGIN_* macros
+ * defined here in between.
+ *
+ * @def GEMRB_PLUGIN
+ * Starts a plugin declaration block
+ * @param[in] id Arbitraty unique to distinguish loadable modules.
+ * @param[in] desc Description of loadable module.
+ *
+ * PluginMgr will not load multiple plugins with the same id.
+ *
+ * @def PLUGIN_CLASS
+ * Register a class to be accessed through Interface::GetInterface.
+ * @param[in] id Identifier to refer to this class.
+ * @param[in] cls Class to register. Must be a descendent of Plugin.
+ *
+ * PluginMgr will not register multiple classes with the same id, and
+ * will report an error, and unload the module.
+ *
+ * @def PLUGIN_RESOURCE
+ * Registers a resource through ResourceManger.
+ * @param[in] cls Class to register.
+ * @param[in] ext Extention of resource files.
+ *
+ * The class given must derive from a subclass of Resource that
+ * contains a static member ID of type TypeID. Any number of class
+ * extension pairs can be registerd. They will be tried in turn when a
+ * resource of the given subclass is requested.
+ *
+ * If the resource exists in bif files, then \ref{PLUGIN_IE_RESOURCE}
+ * should be used instead.
+ *
+ * @def PLUGIN_IE_RESOURCE
+ * Registers a resource through ResourceManager.
+ * @param[in] ie_id Type id that appears in BIF files.
+ *
+ * See \ref{PLUGIN_RESOURCE} for details. The ie_id will be used when
+ * searching chitin.key.
+ *
+ * @def PLUGIN_INITIALIZER
+ * Registers a function to do global intialization.
+ * @param[in] func Function to call at startup.
+ *
+ * This function is called during Interface initialization.
+ *
+ * @def PLUGIN_CLEANUP
+ * Registers a function to do global cleanup
+ * @param[in] func Function to call at shutdown.
+ *
+ * This function is called during Interface cleanup.
+ *
+ * @def END_PLUGIN
+ * End a plugin declaration block.
  */
 
 #ifndef PLUGINDEF_H
@@ -92,8 +157,8 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version()
 #define PLUGIN_CLEANUP(func)					\
 		mgr->RegisterCleanup(func);
 
+		/* mgr is not null (this makes mgr used) */
 #define END_PLUGIN()						\
-		/* mgr is not null (this makes mgr used) */	\
 		return mgr!=0;					\
 	}
 
