@@ -3035,5 +3035,5 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 
 GEMRB_PLUGIN(0xE507B60, "CRE File Importer")
 PLUGIN_CLASS(IE_CRE_CLASS_ID, CREImporter)
-PLUGIN_CLEANUP(ReleaseMemoryCRE);
+PLUGIN_CLEANUP(ReleaseMemoryCRE)
 END_PLUGIN()

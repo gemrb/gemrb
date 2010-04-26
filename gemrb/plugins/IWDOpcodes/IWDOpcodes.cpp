@@ -375,7 +375,6 @@ void RegisterIWDOpcodes()
 		Enemy->objectParameter = o;
 		o->objectFields[0]=EA_ENEMY;
 	}
-	core->RegisterCleanup(Cleanup);
 }
 
 //iwd got a weird targeting system
@@ -3229,5 +3228,6 @@ int fx_rapid_shot (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x4F172B2, "Effect opcodes for the icewind branch of the games")
-RegisterIWDOpcodes();
+PLUGIN_INITIALIZER(RegisterIWDOpcodes)
+PLUGIN_CLEANUP(Cleanup)
 END_PLUGIN()

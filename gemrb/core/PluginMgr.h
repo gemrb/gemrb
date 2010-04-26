@@ -71,6 +71,10 @@ private:
 	std::map< PluginID, PluginDesc> libs;
 	std::map< SClass_ID, PluginFunc> plugins;
 	std::map< const TypeID*, std::vector<ResourceDesc> > resources;
+	/** Array of initializer functions */
+	std::vector<void (*)(void)> intializerFunctions;
+	/** Array of cleanup functions */
+	std::vector<void (*)(void)> cleanupFunctions;
 public:
 	/** Return names of all *.so or *.dll files in the given directory */
 	bool FindFiles( char* path, std::list< char* > &files);
@@ -95,7 +99,26 @@ public:
 	 * @param[in] keyType \iespecific Type identifier used in key/biff files.
 	 */
 	void RegisterResource(const TypeID* type, ResourceFunc create, const char *ext, ieWord keyType = 0);
+
 	const std::vector<ResourceDesc>& GetResourceDesc(const TypeID*);
+
+	/**
+	 * Registers a static intializer.
+	 *
+	 * @param[in] init Function to call on startup.
+	 */
+	void RegisterInitializer(void (*init)(void));
+	/**
+	 * Registers a static cleanup.
+	 *
+	 * @param[in] cleanup Function to call on shutdown.
+	 */
+	void RegisterCleanup(void (*cleanup)(void));
+
+	/** Run intializer functions. */
+	void RunInitializers();
+	/** Run cleanup functions */
+	void RunCleanup();
 };
 
 #endif

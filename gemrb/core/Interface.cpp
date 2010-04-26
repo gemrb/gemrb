@@ -340,10 +340,8 @@ Interface::~Interface(void)
 	delete worldmap;
 
 	FreeAbilityTables();
-	size_t i;
 
-	for (i = 0; i < cleanupFunctions.size(); i++)
-		cleanupFunctions[i]();
+	plugin->RunCleanup();
 
 	ReleaseMemoryActor();
 	EffectQueue_ReleaseMemory();
@@ -367,6 +365,7 @@ Interface::~Interface(void)
 	FreeResourceVector( Font, fonts );
 	FreeResourceVector( Window, windows );
 
+	size_t i;
 	for (i = 0; i < musiclist.size(); i++) {
 		free((void *)musiclist[i]);
 	}
@@ -1279,6 +1278,8 @@ int Interface::Init()
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
+	plugin->RunInitializers();
+
 	time_t t;
 	t = time( NULL );
 	srand( ( unsigned int ) t );
@@ -1719,10 +1720,6 @@ PluginMgr* Interface::GetPluginMgr() const
 	return plugin;
 }
 
-void Interface::RegisterCleanup(void (*func)(void))
-{
-	cleanupFunctions.push_back(func);
-}
 
 const char* Interface::TypeExt(SClass_ID type) const
 {

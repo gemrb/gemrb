@@ -87,8 +87,10 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version()
 #define PLUGIN_IE_RESOURCE(cls, ext, ie_id)			\
 	mgr->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext, ie_id);
 
+#define PLUGIN_INITIALIZER(func)				\
+		mgr->RegisterInitializer(func);
 #define PLUGIN_CLEANUP(func)					\
-		core->RegisterCleanup(func);
+		mgr->RegisterCleanup(func);
 
 #define END_PLUGIN()						\
 		/* mgr is not null (this makes mgr used) */	\

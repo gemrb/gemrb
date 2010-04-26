@@ -254,6 +254,11 @@ Plugin* PluginMgr::GetPlugin(SClass_ID plugintype) const
 	return NULL;
 }
 
+const std::vector<ResourceDesc>& PluginMgr::GetResourceDesc(const TypeID* type)
+{
+	return resources[type];
+}
+
 bool PluginMgr::RegisterPlugin(SClass_ID id, PluginFunc create)
 {
 	if (plugins.find(id) != plugins.end())
@@ -267,7 +272,24 @@ void PluginMgr::RegisterResource(const TypeID* type, ResourceFunc create, const 
 	resources[type].push_back(ResourceDesc(type,create,ext,keyType));
 }
 
-const std::vector<ResourceDesc>& PluginMgr::GetResourceDesc(const TypeID* type)
+void PluginMgr::RegisterInitializer(void (*func)(void))
 {
-	return resources[type];
+	intializerFunctions.push_back(func);
+}
+
+void PluginMgr::RegisterCleanup(void (*func)(void))
+{
+	cleanupFunctions.push_back(func);
+}
+
+void PluginMgr::RunInitializers()
+{
+	for (size_t i = 0; i < intializerFunctions.size(); i++)
+		intializerFunctions[i]();
+}
+
+void PluginMgr::RunCleanup()
+{
+	for (size_t i = 0; i < cleanupFunctions.size(); i++)
+		cleanupFunctions[i]();
 }

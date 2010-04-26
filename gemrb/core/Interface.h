@@ -303,8 +303,6 @@ private:
 	// Scrolling speed
 	int mousescrollspd;
 	bool update_scripts;
-	/** Array of cleanup functions */
-	std::vector<void (*)(void)> cleanupFunctions;
 	/** Next Script Name */
 	char NextScript[64];
 public:
@@ -345,8 +343,6 @@ public:
 	ProjectileServer* GetProjectileServer() const;
 	Video * GetVideoDriver() const;
 	PluginMgr* GetPluginMgr() const;
-	/** Register cleanup function */
-	void RegisterCleanup(void (*)(void));
 	/* create or change a custom string */
 	ieStrRef UpdateString(ieStrRef strref, const char *text) const;
 	/* returns a newly created string */
