@@ -42,7 +42,6 @@ ResourceManager::~ResourceManager()
 bool ResourceManager::AddSource(char *path, const char *description, PluginID type)
 {
 	ResourceSource *source = ( ResourceSource * ) core->GetInterface( type );
-	ResolveFilePath(path);
 	if (!source->Open(path, description)) {
 		source->release();
 		return false;
@@ -55,7 +54,7 @@ static void PrintPossibleFiles(const char* ResRef, const TypeID *type)
 {
 	const std::vector<ResourceDesc>& types = PluginMgr::Get()->GetResourceDesc(type);
 	for (size_t j = 0; j < types.size(); j++) {
-		printf("%.8s%s ", ResRef, types[j].GetExt());
+		printf("%s%s ", ResRef, types[j].GetExt());
 	}
 }
 
@@ -71,7 +70,7 @@ bool ResourceManager::Exists(const char *ResRef, SClass_ID type, bool silent)
 	}
 	if (!silent) {
 		printMessage( "ResourceManager", "Searching for ", WHITE );
-		printf( "%.8s%s...", ResRef, core->TypeExt( type ) );
+		printf( "%s%s...", ResRef, core->TypeExt( type ) );
 		printStatus( "NOT FOUND", YELLOW );
 	}
 	return false;
@@ -92,7 +91,7 @@ bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent
 	}
 	if (!silent) {
 		printMessage( "ResourceManager", "Searching for ", WHITE );
-		printf( "%.8s... ", ResRef );
+		printf( "%s... ", ResRef );
 		printf("Tried ");
 		PrintPossibleFiles(ResRef,type);
 		printStatus( "NOT FOUND", YELLOW );
@@ -106,7 +105,7 @@ DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, boo
 		return false;
 	if (!silent) {
 		printMessage( "ResourceManager", "Searching for ", WHITE );
-		printf( "%.8s%s...", ResRef, core->TypeExt( type ) );
+		printf( "%s%s...", ResRef, core->TypeExt( type ) );
 	}
 	for (size_t i = 0; i < searchPath.size(); i++) {
 		DataStream *ds = searchPath[i]->GetResource(ResRef, type);
@@ -139,7 +138,7 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 				Resource *res = types[j].Create(str);
 				if (res) {
 					if (!silent) {
-						printf( "%.8s%s...", ResRef, types[j].GetExt() );
+						printf( "%s%s...", ResRef, types[j].GetExt() );
 						printStatus( searchPath[i]->GetDescription(), GREEN );
 					}
 					return res;

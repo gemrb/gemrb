@@ -52,41 +52,46 @@ static bool exists(char *file)
 	return false;
 }
 
+static char* AddCBF(char *file)
+{
+	// This is safe in single-threaded, since the
+	// return value is passed straight to PathJoin.
+	static char cbf[_MAX_PATH];
+	strcpy(cbf,file);
+	char *dot = strrchr(cbf, '.');
+	if (dot)
+		strcpy(dot, ".cbf");
+	else
+		strcat(cbf, ".cbf");
+	return cbf;
+}
+
 static void FindBIF(BIFEntry *entry)
 {
 	entry->cd = 0;
 
-	PathJoin( entry->path, core->GamePath, entry->name, NULL );
-	ResolveFilePath(entry->path);
+	PathJoin(entry->path, core->GamePath, entry->name, NULL);
 	if (exists(entry->path)) {
 		entry->found = true;
 		return;
 	}
 
-	PathJoin( entry->path, core->GamePath, entry->name, NULL );
-	strcpy( entry->path + strlen( entry->path ) - 4, ".cbf" );
-	ResolveFilePath(entry->path);
+	PathJoin(entry->path, core->GamePath, AddCBF(entry->name), NULL);
 	if (exists(entry->path)) {
 		entry->found = true;
 		return;
 	}
 
 	if (core->GameOnCD) {
-		char BasePath[_MAX_PATH];
 		if (( entry->BIFLocator & ( 1 << 2 ) ) != 0) {
-			strcpy( BasePath, core->CD[0] );
 			entry->cd = 1;
 		} else if (( entry->BIFLocator & ( 1 << 3 ) ) != 0) {
-			strcpy( BasePath, core->CD[1] );
 			entry->cd = 2;
 		} else if (( entry->BIFLocator & ( 1 << 4 ) ) != 0) {
-			strcpy( BasePath, core->CD[2] );
 			entry->cd = 3;
 		} else if (( entry->BIFLocator & ( 1 << 5 ) ) != 0) {
-			strcpy( BasePath, core->CD[3] );
 			entry->cd = 4;
 		} else if (( entry->BIFLocator & ( 1 << 6 ) ) != 0) {
-			strcpy( BasePath, core->CD[4] );
 			entry->cd = 5;
 		} else {
 			printStatus( "ERROR", LIGHT_RED );
@@ -95,23 +100,20 @@ static void FindBIF(BIFEntry *entry)
 			entry->found = false;
 			return;
 		}
-		PathJoin( entry->path, BasePath, entry->name, NULL );
+		PathJoin(entry->path, core->CD[entry->cd-1], entry->name, NULL);
 		entry->found = false;
 		return;
 	}
 
 	for (int i = 0; i < 6; i++) {
-		PathJoin( entry->path, core->CD[i], entry->name, NULL );
-		ResolveFilePath(entry->path);
+		PathJoin(entry->path, core->CD[i], entry->name, NULL);
 		if (exists(entry->path)) {
 			entry->found = true;
 			return;
 		}
 
 		//Trying CBF Extension
-		PathJoin( entry->path, core->CD[i], entry->name, NULL );
-		strcpy( entry->path + strlen( entry->path ) - 4, ".cbf" );
-		ResolveFilePath(entry->path);
+		PathJoin(entry->path, core->CD[i], AddCBF(entry->name), NULL);
 		if (exists(entry->path)) {
 			entry->found = true;
 			return;
@@ -180,7 +182,6 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 		be.name = ( char * ) malloc( ASCIIZLen );
 		f->Seek( ASCIIZOffset, GEM_STREAM_START );
 		f->Read( be.name, ASCIIZLen );
-#ifndef WIN32
 		for (int p = 0; p < ASCIIZLen; p++) {
 			//some MAC versions use : as delimiter
 			if (be.name[p] == '\\' || be.name[p] == ':')
@@ -194,7 +195,6 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 				be.name[p] = be.name[p + 1];
 			// (if you change this, try moving to ar9700 for testing)
 		}
-#endif
 		FindBIF(&be);
 		biffiles.push_back( be );
 	}
@@ -226,22 +226,20 @@ bool KEYImporter::HasResource(const char* resname, const ResourceDesc &type)
 
 static void FindBIFOnCD(BIFEntry *entry)
 {
-	ResolveFilePath(entry->path);
 	if (exists(entry->path)) {
 		entry->found = true;
 		return;
 	}
 
 	core->WaitForDisc( entry->cd, core->CD[entry->cd-1] );
-	ResolveFilePath(entry->path);
+	PathJoin(entry->path, core->CD[entry->cd-1], entry->name, NULL);
 	if (exists(entry->path)) {
 		entry->found = true;
 		return;
 	}
 
 	//Trying CBF Extension
-	strcpy( entry->path + strlen( entry->path ) - 4, ".cbf" );
-	ResolveFilePath(entry->path);
+	PathJoin(entry->path, core->CD[entry->cd-1], AddCBF(entry->name), NULL);
 	if (exists(entry->path)) {
 		entry->found = true;
 		return;

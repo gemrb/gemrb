@@ -9635,15 +9635,13 @@ bool GUIScript::Init(void)
 	char path[_MAX_PATH];
 	char path2[_MAX_PATH];
 
-	strncpy (path, core->GUIScriptsPath, _MAX_PATH);
-	PathAppend( path, "GUIScripts" );
+	PathJoin(path, core->GUIScriptsPath, "GUIScripts", NULL);
 
-	memcpy(path2, path,_MAX_PATH);
 	// use the iwd guiscripts for how, but leave its override
 	if (stricmp( core->GameType, "how" ) == 0) {
-		PathAppend( path2, "iwd" );
+		PathJoin(path2, path, "iwd", NULL);
 	} else {
-		PathAppend( path2, core->GameType );
+		PathJoin(path2, path, core->GameType, NULL);
 	}
 
 #ifdef WIN32

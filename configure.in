@@ -167,9 +167,12 @@ AM_CHECK_PYTHON_LIBS([], [AC_MSG_ERROR([
 ])])
 
 
-AC_CHECK_LIB(vorbisfile, ov_info, 
-	AC_DEFINE( HAS_VORBIS_SUPPORT, 1, [Handling of .ogg soundfiles])
-	LIBS="$LIBS -lvorbis -lvorbisfile",, -lvorbis )
+AC_CHECK_HEADER([vorbis/vorbisfile.h],
+	[AC_CHECK_LIB(vorbisfile, ov_info,
+		[AC_DEFINE( HAS_VORBIS_SUPPORT, 1, [Handling of .ogg soundfiles])
+		vorbis_ok=yes],[vorbis_ok=no], -lvorbis )],
+	[vorbis_ok=no])
+AM_CONDITIONAL([VORBIS], [test x$vorbis_ok = xyes])
 
 dnl FIXME: check for libpng properly, using libpng(12)-config
 AC_CHECK_HEADER(png.h,,AC_MSG_ERROR([*** libpng not found!]))
@@ -232,7 +235,9 @@ gemrb/GUIScripts/pst/Makefile
 gemrb/GUIScripts/test1/Makefile
 gemrb/plugins/Makefile 
 gemrb/plugins/2DAImporter/Makefile 
-gemrb/plugins/ACMImporter/Makefile 
+gemrb/plugins/ACMReader/Makefile
+gemrb/plugins/OGGReader/Makefile
+gemrb/plugins/WAVReader/Makefile
 gemrb/plugins/AREImporter/Makefile 
 gemrb/plugins/BAMImporter/Makefile 
 gemrb/plugins/BIFImporter/Makefile 

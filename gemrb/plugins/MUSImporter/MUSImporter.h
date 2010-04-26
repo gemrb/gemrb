@@ -23,6 +23,7 @@
 
 #include "MusicMgr.h"
 #include "FileStream.h"
+#include "ResourceManager.h"
 #include <stdio.h>
 
 /**MUS PlayList Importer
@@ -46,6 +47,7 @@ private:
 	FileStream* str;
 	std::vector< PLString> playlist;
 	unsigned int lastSound;
+	ResourceManager manager;
 private:
 	void PlayMusic(int pos);
 	void PlayMusic(char* name);

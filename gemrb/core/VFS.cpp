@@ -241,42 +241,98 @@ char* PathAppend (char* target, const char* dir)
 	return target;
 }
 
-/**
- * Joins NULL-terminated list of directories and copies it to 'target'.
- * Previous content of 'target' is NOT part of the list, except 'target' can be
- * safely used as a first var arg. Returns pointer to 'target'.
- *
- * Example 1:
- * char filepath[_MAX_PATH];
- * PathJoin( filepath, core->GUIScriptsPath, core->GameType, 'GUIDefines.py', NULL );
- *
- * Example 2:
- * char filepath[_MAX_PATH];
- * strcpy (filepath, core->GUIScriptsPath);
- * PathJoin( filepath, filepath, core->GameType, 'GUIDefines.py', NULL );
- */
-char* PathJoin (char* target, ...)
+
+bool FindInDir(const char* Dir, char *Filename)
+{
+	// First test if there's a Filename with exactly same name
+	// and if yes, return it and do not search in the Dir
+	char TempFilePath[_MAX_PATH];
+	strcpy(TempFilePath, Dir);
+	PathAppend( TempFilePath, Filename );
+
+	if (!access( TempFilePath, R_OK )) {
+		return true;
+	}
+
+	if (!core->CaseSensitive) {
+		return false;
+	}
+
+	DIR* dir = opendir( Dir );
+	if (dir == NULL) {
+		return false;
+	}
+
+	// Exact match not found, so try to search for Filename
+	// with different case
+	struct dirent* de = readdir( dir );
+	if (de == NULL) {
+		closedir( dir );
+		return false;
+	}
+	do {
+		if (stricmp( de->d_name, Filename ) == 0) {
+			strcpy( Filename, de->d_name );
+			closedir(dir);
+			return true;
+		}
+	} while (( de = readdir( dir ) ) != NULL);
+	closedir( dir ); //No other files in the directory, close it
+	return false;
+}
+
+bool PathJoin (char *target, const char *base, ...)
 {
 	va_list ap;
-	char* s;
+	va_start(ap, base);
 
-	va_start( ap, target );
-
-	s = va_arg( ap, char* );
-	if (s == NULL) {
+	if (base == NULL) {
 		target[0] = '\0';
-		return target;
+		return false;
 	}
-	// This allows for 'target' being also the first var arg
-	if (target != s)
-		strcpy( target, s );
 
-	while ((s = va_arg( ap, char* )) != NULL) {
-		PathAppend( target, s );
+	strcpy(target, base);
+
+	while (char *source = va_arg(ap, char*)) {
+		char *slash;
+		do {
+			char filename[_MAX_PATH] = { '\0' };
+			slash = strchr(source, PathDelimiter);
+			if (slash == source) {
+				++source;
+				continue;
+			} else if (slash) {
+				strncat(filename, source, slash-source);
+				source = slash + 1;
+			} else {
+				strcpy(filename, source);
+			}
+			if (!FindInDir(target, filename)) {
+				strcat(target, SPathDelimiter);
+				strcat(target, source);
+				goto finish;
+			}
+			strcat(target, SPathDelimiter);
+			strcat(target, filename);
+		} while (slash);
 	}
 	va_end( ap );
+	return true;
+finish:
+	while (char *source = va_arg(ap, char*)) {
+		PathAppend(target, source);
+	}
+	va_end( ap );
+	return false;
+}
 
-	return target;
+bool PathJoinExt (char* target, const char* dir, const char* base, const char* ext)
+{
+	char file[_MAX_PATH];
+	strcpy(file, base);
+	strcat(file, ".");
+	strcat(file, ext);
+	return PathJoin(target, dir, file, NULL);
 }
 
 /** Fixes path delimiter character (slash).
@@ -338,88 +394,27 @@ bool FileGlob(char* target, const char* Dir, const char *glob)
 	return false;
 }
 
-bool FindInDir(const char* Dir, char *Filename)
-{
-	// First test if there's a Filename with exactly same name
-	// and if yes, return it and do not search in the Dir
-	char TempFilePath[_MAX_PATH];
-	PathJoin( TempFilePath, Dir, Filename, NULL );
-
-	if (!access( TempFilePath, R_OK )) {
-		return true;
-	}
-
-	if (!core->CaseSensitive) {
-		return false;
-	}
-
-	DIR* dir = opendir( Dir );
-	if (dir == NULL) {
-		return false;
-	}
-
-	// Exact match not found, so try to search for Filename
-	// with different case
-	struct dirent* de = readdir( dir );
-	if (de == NULL) {
-		closedir( dir );
-		return false;
-	}
-	do {
-		if (stricmp( de->d_name, Filename ) == 0) {
-			strcpy( Filename, de->d_name );
-			closedir(dir);
-			return true;
-		}
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir ); //No other files in the directory, close it
-	return false;
-}
 
 #ifndef WIN32
 
 void ResolveFilePath(char* FilePath)
 {
 	char TempFilePath[_MAX_PATH];
-	char TempFileName[_MAX_PATH];
-	int j, pos;
 
 	if (FilePath[0]=='~') {
 		const char *home = getenv("HOME");
 		if (home) {
-			PathJoin(TempFilePath, home, FilePath+1, NULL);
-			strncpy(FilePath, TempFilePath, _MAX_PATH);
+			strcpy(TempFilePath, FilePath+1);
+			PathJoin(FilePath, home, TempFilePath, NULL);
+			return;
 		}
 	}
 
 	if (core && !core->CaseSensitive) {
 		return;
 	}
-
-	TempFilePath[0] = FilePath[0];
-	for (pos = 1; FilePath[pos] && FilePath[pos] != '/'; pos++)
-		TempFilePath[pos] = FilePath[pos];
-	TempFilePath[pos] = 0;
-	while (FilePath[pos] == '/') {
-		pos++;
-		for (j = 0; FilePath[pos + j] && FilePath[pos + j] != '/'; j++) {
-			TempFileName[j] = FilePath[pos + j];
-		}
-		TempFileName[j] = 0;
-		pos += j;
-		if (FindInDir( TempFilePath, TempFileName )) {
-			strcat( TempFilePath, SPathDelimiter );
-			strcat( TempFilePath, TempFileName );
-		} else {
-			if (j)
-				return;
-			else {
-				strcat( TempFilePath, SPathDelimiter );
-			}
-		}
-	}
-	//should work (same or less size)
-	strncpy( FilePath, TempFilePath, _MAX_PATH );
+	strcpy(TempFilePath, FilePath);
+	PathJoin(FilePath, "/", TempFilePath, NULL);
 }
 
 #endif

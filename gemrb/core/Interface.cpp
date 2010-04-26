@@ -1372,7 +1372,6 @@ int Interface::Init()
 	{
 		char ini_path[_MAX_PATH];
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
-		ResolveFilePath( ini_path );
 		LoadINI( ini_path );
 		int i;
 		for (i = 0; i < 8; i++) {
@@ -1401,7 +1400,6 @@ int Interface::Init()
 	printMessage( "Core", "Loading Dialog.tlk file...", WHITE );
 	char strpath[_MAX_PATH];
 	PathJoin( strpath, GamePath, dialogtlk, NULL );
-	ResolveFilePath( strpath );
 	FileStream* fs = new FileStream();
 	if (!fs->Open( strpath, true )) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -1557,7 +1555,6 @@ int Interface::Init()
 		FileStream* fs = new FileStream();
 		char tINIparty[_MAX_PATH];
 		PathJoin( tINIparty, GamePath, "Party.ini", NULL );
-		ResolveFilePath( tINIparty );
 		fs->Open( tINIparty, true );
 		if (!INIparty->Open( fs, true )) {
 			printStatus( "ERROR", LIGHT_RED );
@@ -1577,7 +1574,6 @@ int Interface::Init()
 		FileStream* fs = new FileStream();
 		char tINIbeasts[_MAX_PATH];
 		PathJoin( tINIbeasts, GamePath, "beast.ini", NULL );
-		ResolveFilePath( tINIbeasts );
 		// FIXME: crashes if file does not open
 		fs->Open( tINIbeasts, true );
 		if (!INIbeasts->Open( fs, true )) {
@@ -1592,7 +1588,6 @@ int Interface::Init()
 		FileStream* fs2 = new FileStream();
 		char tINIquests[_MAX_PATH];
 		PathJoin( tINIquests, GamePath, "quests.ini", NULL );
-		ResolveFilePath( tINIquests );
 		// FIXME: crashes if file does not open
 		fs2->Open( tINIquests, true );
 		if (!INIquests->Open( fs2, true )) {
@@ -2066,6 +2061,7 @@ bool Interface::LoadConfig(const char* filename)
 			strncpy( GameOverridePath, value, sizeof(GameOverridePath) );
 		} else if (stricmp( name, "GemRBOverridePath" ) == 0) {
 			strncpy( GemRBOverridePath, value, sizeof(GemRBOverridePath) );
+			ResolveFilePath(GemRBOverridePath);
 		} else if (stricmp( name, "GameScriptsPath" ) == 0) {
 			strncpy( GameScriptsPath, value, sizeof(GameScriptsPath) );
 		} else if (stricmp( name, "GameSoundsPath" ) == 0) {
@@ -2086,10 +2082,12 @@ bool Interface::LoadConfig(const char* filename)
 			SaveAsOriginal = atoi(value);
 		} else if (stricmp( name, "GemRBPath" ) == 0) {
 			strcpy( GemRBPath, value );
+			ResolveFilePath(GemRBPath);
 		} else if (stricmp( name, "ScriptDebugMode" ) == 0) {
 			SetScriptDebugMode(atoi(value));
 		} else if (stricmp( name, "CachePath" ) == 0) {
 			strncpy( CachePath, value, sizeof(CachePath) );
+			ResolveFilePath(CachePath);
 		} else if (stricmp( name, "GUIScriptsPath" ) == 0) {
 			strncpy( GUIScriptsPath, value, sizeof(GUIScriptsPath) );
 			ResolveFilePath( GUIScriptsPath );
@@ -3431,7 +3429,6 @@ int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
 		png_suffix[0]='M';
 	}
 	PathJoin( Path, GamePath, GamePortraitsPath, NULL );
-	ResolveFilePath( Path );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
 		return -1;
@@ -3473,7 +3470,6 @@ int Interface::GetCharSounds(TextArea* ta)
 	char Path[_MAX_PATH];
 
 	PathJoin( Path, GamePath, GameSoundsPath, NULL );
-	ResolveFilePath( Path );
 	hasfolders = ( HasFeature( GF_SOUNDFOLDERS ) != 0 );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
@@ -3514,7 +3510,6 @@ int Interface::GetCharacters(TextArea* ta)
 	char Path[_MAX_PATH];
 
 	PathJoin( Path, GamePath, GameCharactersPath, NULL );
-	ResolveFilePath( Path );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
 		return -1;

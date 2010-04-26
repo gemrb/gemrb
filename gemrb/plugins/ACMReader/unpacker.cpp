@@ -48,7 +48,7 @@ short Table2[125] = {
 //		000 001 002 003 004  010 011 012 013 014 ...
 //		100 101 102 103 104 ...
 //		200 ...
-//		... 
+//		...
 unsigned char Table3[121] = {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x10,
 	0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x20, 0x21,
@@ -178,7 +178,7 @@ int CValueUnpacker::k1_3bits(int pass, int /*ind*/)
 			avail_bits--;
 			next_bits >>= 1;
 			block_ptr[i * sb_size + pass] = 0; if (( ++i ) == subblocks)
-											   	break;
+												break;
 			block_ptr[i * sb_size + pass] = 0;
 		} else if (( next_bits & 2 ) == 0) {
 			avail_bits -= 2;
@@ -251,7 +251,7 @@ int CValueUnpacker::k2_4bits(int pass, int /*ind*/)
 			avail_bits--;
 			next_bits >>= 1;
 			block_ptr[i * sb_size + pass] = 0; if (( ++i ) == subblocks)
-											   	break;
+												break;
 			block_ptr[i * sb_size + pass] = 0;
 		} else if (( next_bits & 2 ) == 0) {
 			avail_bits -= 2;
@@ -323,7 +323,7 @@ int CValueUnpacker::k3_5bits(int pass, int /*ind*/)
 			avail_bits--;
 			next_bits >>= 1;
 			block_ptr[i * sb_size + pass] = 0; if (( ++i ) == subblocks)
-											   	break;
+												break;
 			block_ptr[i * sb_size + pass] = 0;
 		} else if (( next_bits & 2 ) == 0) {
 			avail_bits -= 2;
@@ -331,10 +331,10 @@ int CValueUnpacker::k3_5bits(int pass, int /*ind*/)
 			block_ptr[i * sb_size + pass] = 0;
 		} else if (( next_bits & 4 ) == 0) {
 			block_ptr[i * sb_size + pass] = ( next_bits & 8 ) ?
-			   		buff_middle[1] :
-			   		buff_middle[-1];
-			   	avail_bits -= 4;
-			   	next_bits >>= 4;
+					buff_middle[1] :
+					buff_middle[-1];
+				avail_bits -= 4;
+				next_bits >>= 4;
 		} else {
 			avail_bits -= 5;
 			int val = ( next_bits & 0x18 ) >> 3;
@@ -385,7 +385,7 @@ int CValueUnpacker::k4_5bits(int pass, int /*ind*/)
 			avail_bits--;
 			next_bits >>= 1;
 			block_ptr[i * sb_size + pass] = 0; if (( ++i ) == subblocks)
-											   	break;
+												break;
 			block_ptr[i * sb_size + pass] = 0;
 		} else if (( next_bits & 2 ) == 0) {
 			avail_bits -= 2;
