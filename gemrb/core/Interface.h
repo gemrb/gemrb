@@ -36,7 +36,6 @@
 #include "SClassID.h"
 #include "Cache.h"
 #include "GlobalTimer.h"
-#include "PluginMgr.h"
 
 // TODO: remove this header dependency
 #include "GameData.h"
@@ -238,7 +237,6 @@ enum PluginFlagsType {
 class GEM_EXPORT Interface
 {
 private:
-	PluginMgr * plugin;
 	Video * video;
 	Audio * AudioDriver ;
 	ProjectileServer * projserv;
@@ -342,7 +340,6 @@ public:
 	const char * TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const;
 	Video * GetVideoDriver() const;
-	PluginMgr* GetPluginMgr() const;
 	/* create or change a custom string */
 	ieStrRef UpdateString(ieStrRef strref, const char *text) const;
 	/* returns a newly created string */

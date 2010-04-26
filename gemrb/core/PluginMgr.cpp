@@ -68,6 +68,12 @@ inline voidvoid my_dlsym(void *handle, const char *symbol)
 #define PRINT_DLERROR printf( "%s\n", dlerror() )
 #endif
 
+PluginMgr *PluginMgr::Get()
+{
+	static PluginMgr mgr;
+	return &mgr;
+}
+
 PluginMgr::PluginMgr()
 {
 }

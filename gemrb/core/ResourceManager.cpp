@@ -23,6 +23,7 @@
 #include "ResourceDesc.h"
 #include "ResourceSource.h"
 #include "Interface.h"
+#include "PluginMgr.h"
 
 ResourceManager::ResourceManager()
 {
@@ -52,7 +53,7 @@ bool ResourceManager::AddSource(char *path, const char *description, PluginID ty
 
 static void PrintPossibleFiles(const char* ResRef, const TypeID *type)
 {
-	const std::vector<ResourceDesc>& types = core->GetPluginMgr()->GetResourceDesc(type);
+	const std::vector<ResourceDesc>& types = PluginMgr::Get()->GetResourceDesc(type);
 	for (size_t j = 0; j < types.size(); j++) {
 		printf("%.8s%s ", ResRef, types[j].GetExt());
 	}
@@ -81,7 +82,7 @@ bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent
 	if (ResRef[0] == '\0')
 		return false;
 	// TODO: check various caches
-	const std::vector<ResourceDesc> &types = core->GetPluginMgr()->GetResourceDesc(type);
+	const std::vector<ResourceDesc> &types = PluginMgr::Get()->GetResourceDesc(type);
 	for (size_t j = 0; j < types.size(); j++) {
 		for (size_t i = 0; i < searchPath.size(); i++) {
 			if (searchPath[i]->HasResource(ResRef, types[j])) {
@@ -129,7 +130,7 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 	if (!silent) {
 		printMessage( "ResourceManager", "Searching for ", WHITE );
 	}
-	const std::vector<ResourceDesc> &types = core->GetPluginMgr()->GetResourceDesc(type);
+	const std::vector<ResourceDesc> &types = PluginMgr::Get()->GetResourceDesc(type);
 	for (size_t j = 0; j < types.size(); j++) {
 		for (size_t i = 0; i < searchPath.size(); i++) {
 			DataStream *str = searchPath[i]->GetResource(ResRef, types[j]);

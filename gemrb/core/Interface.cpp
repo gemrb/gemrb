@@ -77,6 +77,7 @@
 #include "ProjectileServer.h"
 #include "GameData.h"
 #include "Calendar.h"
+#include "PluginMgr.h"
 
 GEM_EXPORT Interface* core;
 GEM_EXPORT GameData* gamedata;
@@ -156,7 +157,6 @@ Interface::Interface(int iargc, char* iargv[])
 	tooltip_y = 0;
 	tooltip_currtextw = 0;
 	tooltip_ctrl = NULL;
-	plugin = NULL;
 	plugin_flags = NULL;
 
 	pal16 = NULL;
@@ -341,7 +341,7 @@ Interface::~Interface(void)
 
 	FreeAbilityTables();
 
-	plugin->RunCleanup();
+	PluginMgr::Get()->RunCleanup();
 
 	ReleaseMemoryActor();
 	EffectQueue_ReleaseMemory();
@@ -464,8 +464,6 @@ Interface::~Interface(void)
 	video->release();
 
 	strings->release();
-
-	delete plugin;
 
 	// Removing all stuff from Cache, except bifs
 	if (!KeepCache) DelTree((const char *) CachePath, true);
@@ -1269,7 +1267,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
-	plugin = new PluginMgr();
+	PluginMgr *plugin = PluginMgr::Get();
 	plugin->LoadPlugins(PluginsPath);
 	if (plugin && plugin->GetPluginCount()) {
 		printMessage( "Core", "Plugin Loading Complete...", WHITE );
@@ -1689,7 +1687,7 @@ int Interface::Init()
 
 bool Interface::IsAvailable(SClass_ID filetype) const
 {
-	return plugin->IsAvailable( filetype );
+	return PluginMgr::Get()->IsAvailable( filetype );
 }
 
 WorldMap *Interface::GetWorldMap(const char *map)
@@ -1700,10 +1698,10 @@ WorldMap *Interface::GetWorldMap(const char *map)
 
 void* Interface::GetInterface(SClass_ID filetype) const
 {
-	if (!plugin) {
+	if (!PluginMgr::Get()) {
 		return NULL;
 	}
-	return plugin->GetPlugin( filetype );
+	return PluginMgr::Get()->GetPlugin( filetype );
 }
 
 ProjectileServer* Interface::GetProjectileServer() const
@@ -1715,12 +1713,6 @@ Video* Interface::GetVideoDriver() const
 {
 	return video;
 }
-
-PluginMgr* Interface::GetPluginMgr() const
-{
-	return plugin;
-}
-
 
 const char* Interface::TypeExt(SClass_ID type) const
 {
