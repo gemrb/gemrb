@@ -550,5 +550,5 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x115A670, "Effect opcodes for the torment branch of the games")
-RegisterTormentOpcodes();
+PLUGIN_INITIALIZER(RegisterTormentOpcodes)
 END_PLUGIN()

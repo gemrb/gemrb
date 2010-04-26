@@ -32,7 +32,12 @@ typedef unsigned char ColorSet[MAXCOLOR];
 static int RandColor=-1;
 static int RandRows=-1;
 static ColorSet* randcolors=NULL;
-static int MagicBit = core->HasFeature(GF_MAGICBIT);
+static int MagicBit;
+
+static void Initializer()
+{
+	MagicBit = core->HasFeature(GF_MAGICBIT);
+}
 
 //one column, these don't have a level
 static ieResRef* innlist;   //IE_IWD2_SPELL_INNATE
@@ -3035,5 +3040,6 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 
 GEMRB_PLUGIN(0xE507B60, "CRE File Importer")
 PLUGIN_CLASS(IE_CRE_CLASS_ID, CREImporter)
-PLUGIN_CLEANUP(ReleaseMemoryCRE);
+PLUGIN_INITIALIZER(Initializer)
+PLUGIN_CLEANUP(ReleaseMemoryCRE)
 END_PLUGIN()

@@ -2375,5 +2375,5 @@ int AREImporter::PutArea(DataStream *stream, Map *map)
 
 GEMRB_PLUGIN(0x145B60F0, "ARE File Importer")
 PLUGIN_CLASS(IE_ARE_CLASS_ID, AREImporter)
-PLUGIN_CLEANUP(ReleaseMemory);
+PLUGIN_CLEANUP(ReleaseMemory)
 END_PLUGIN()

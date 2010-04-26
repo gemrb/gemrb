@@ -767,7 +767,6 @@ void RegisterCoreOpcodes()
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
 	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
 	default_spell_hit.SequenceFlags|=IE_VVC_BAM;
-	core->RegisterCleanup(Cleanup);
 }
 
 
@@ -6154,5 +6153,6 @@ int fx_unknown (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x1AAA040A, "Effect opcodes for core games")
-RegisterCoreOpcodes();
+PLUGIN_INITIALIZER(RegisterCoreOpcodes)
+PLUGIN_CLEANUP(Cleanup)
 END_PLUGIN()

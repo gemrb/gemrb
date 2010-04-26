@@ -36,7 +36,6 @@
 #include "SClassID.h"
 #include "Cache.h"
 #include "GlobalTimer.h"
-#include "PluginMgr.h"
 
 // TODO: remove this header dependency
 #include "GameData.h"
@@ -238,7 +237,6 @@ enum PluginFlagsType {
 class GEM_EXPORT Interface
 {
 private:
-	PluginMgr * plugin;
 	Video * video;
 	Audio * AudioDriver ;
 	ProjectileServer * projserv;
@@ -303,8 +301,6 @@ private:
 	// Scrolling speed
 	int mousescrollspd;
 	bool update_scripts;
-	/** Array of cleanup functions */
-	std::vector<void (*)(void)> cleanupFunctions;
 	/** Next Script Name */
 	char NextScript[64];
 public:
@@ -344,9 +340,6 @@ public:
 	const char * TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const;
 	Video * GetVideoDriver() const;
-	PluginMgr* GetPluginMgr() const;
-	/** Register cleanup function */
-	void RegisterCleanup(void (*)(void));
 	/* create or change a custom string */
 	ieStrRef UpdateString(ieStrRef strref, const char *text) const;
 	/* returns a newly created string */
