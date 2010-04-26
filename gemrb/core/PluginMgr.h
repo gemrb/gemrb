@@ -59,7 +59,8 @@ public:
 	typedef Resource* (*ResourceFunc)(DataStream*);
 	typedef Plugin* (*PluginFunc)();
 public:
-	PluginMgr(char* pluginpath);
+	PluginMgr();
+	void LoadPlugins(char* pluginpath);
 	~PluginMgr(void);
 private:
 	struct PluginDesc {

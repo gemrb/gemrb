@@ -1269,7 +1269,8 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
-	plugin = new PluginMgr( PluginsPath );
+	plugin = new PluginMgr();
+	plugin->LoadPlugins(PluginsPath);
 	if (plugin && plugin->GetPluginCount()) {
 		printMessage( "Core", "Plugin Loading Complete...", WHITE );
 		printStatus( "OK", LIGHT_GREEN );

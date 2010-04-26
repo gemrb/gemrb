@@ -68,7 +68,11 @@ inline voidvoid my_dlsym(void *handle, const char *symbol)
 #define PRINT_DLERROR printf( "%s\n", dlerror() )
 #endif
 
-PluginMgr::PluginMgr(char* pluginpath)
+PluginMgr::PluginMgr()
+{
+}
+
+void PluginMgr::LoadPlugins(char* pluginpath)
 {
 	printMessage( "PluginMgr", "Loading Plugins from ", WHITE );
 	printf( "%s\n", pluginpath );
