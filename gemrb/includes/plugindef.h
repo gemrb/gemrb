@@ -22,7 +22,7 @@
  * @author The GemRB Project
  *
  * This file should be included once in each plugin. This file defines several
- * entry points to the a plugin, and a set of macros to describe the contents
+ * entry points to the plugin and a set of macros to describe the contents
  * of the plugin.
  *
  * A typical use is
@@ -40,7 +40,7 @@
  *
  * @def GEMRB_PLUGIN
  * Starts a plugin declaration block
- * @param[in] id Arbitraty unique to distinguish loadable modules.
+ * @param[in] id Arbitrary unique to distinguish loadable modules.
  * @param[in] desc Description of loadable module.
  *
  * PluginMgr will not load multiple plugins with the same id.
@@ -50,13 +50,13 @@
  * @param[in] id Identifier to refer to this class.
  * @param[in] cls Class to register. Must be a descendent of Plugin.
  *
- * PluginMgr will not register multiple classes with the same id, and
- * will report an error, and unload the module.
+ * PluginMgr will not register multiple classes with the same id, but
+ * will report an error and unload the module.
  *
  * @def PLUGIN_RESOURCE
- * Registers a resource through ResourceManger.
+ * Registers a resource through ResourceManager.
  * @param[in] cls Class to register.
- * @param[in] ext Extention of resource files.
+ * @param[in] ext Extension of resource files.
  *
  * The class given must derive from a subclass of Resource that
  * contains a static member ID of type TypeID. Any number of class
