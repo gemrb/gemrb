@@ -1193,7 +1193,7 @@ int Interface::LoadSprites()
 		printf( "Cannot find fonts.2da.\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	} else {
-		AnimationMgr* bamint = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
+		PluginHolder<AnimationMgr> bamint(IE_BAM_CLASS_ID);
 		if (!bamint) {
 			printStatus( "ERROR", LIGHT_RED );
 			printf( "No BAM Importer Available.\nTermination in Progress...\n" );
@@ -1235,7 +1235,6 @@ int Interface::LoadSprites()
 			fnt->SetFirstChar( (ieByte) first_char );
 			fonts.push_back( fnt );
 		}
-		bamint->release();
 	}
 	printMessage( "Core", "Fonts Loaded...", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
@@ -3715,8 +3714,6 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	DataStream* sav_str = NULL;
 	DataStream* wmp_str = NULL;
 
-	SaveGameMgr* gam_mgr = NULL;
-	WorldMapMgr* wmp_mgr = NULL;
 
 	Game* new_game = NULL;
 	WorldMapArray* new_worldmap = NULL;
@@ -3736,11 +3733,14 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 		wmp_str = sg->GetWmap();
 	}
 
+	// These are here because of the goto
+	PluginHolder<SaveGameMgr> gam_mgr(IE_GAM_CLASS_ID);
+	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
+
 	if (!gam_str || !wmp_str)
 		goto cleanup;
 
 	// Load GAM file
-	gam_mgr = ( SaveGameMgr* ) GetInterface( IE_GAM_CLASS_ID );
 	if (!gam_mgr)
 		goto cleanup;
 
@@ -3751,13 +3751,10 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	if (!new_game)
 		goto cleanup;
 
-	gam_mgr->release();
-	gam_mgr = NULL;
 	gam_str = NULL;
 
 	// Load WMP (WorldMap) file
-	wmp_mgr = ( WorldMapMgr* ) GetInterface( IE_WMP_CLASS_ID );
-	if (! wmp_mgr)
+	if (!wmp_mgr)
 		goto cleanup;
 
 	if (!wmp_mgr->Open( wmp_str, true ))
@@ -3765,20 +3762,16 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 
 	new_worldmap = wmp_mgr->GetWorldMapArray( );
 
-	wmp_mgr->release();
-	wmp_mgr = NULL;
 	wmp_str = NULL;
 
 	LoadProgress(30);
 	// Unpack SAV (archive) file to Cache dir
 	if (sav_str) {
-		ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);
+		PluginHolder<ArchiveImporter> ai(IE_BIF_CLASS_ID);
 		if (ai) {
 			if (ai->DecompressSaveGame(sav_str) != GEM_OK) {
-				ai->release();
 				goto cleanup;
 			}
-			ai->release();
 		}
 		delete sav_str;
 		sav_str = NULL;
@@ -3801,15 +3794,6 @@ cleanup:
 	delete new_game;
 	delete new_worldmap;
 
-	if (gam_mgr) {
-		gam_mgr->release();
-		gam_str = NULL;
-	}
-	if (wmp_mgr) {
-		wmp_mgr->release();
-		wmp_str = NULL;
-	}
-
 	delete gam_str;
 	delete wmp_str;
 	delete sav_str;
@@ -3822,7 +3806,7 @@ void Interface::UpdateMasterScript()
 		game->SetScript( GlobalScript, 0 );
 	}
 
-	WorldMapMgr* wmp_mgr = ( WorldMapMgr* ) GetInterface( IE_WMP_CLASS_ID );
+	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
 	if (! wmp_mgr)
 		return;
 
@@ -3831,16 +3815,11 @@ void Interface::UpdateMasterScript()
 
 		if (!wmp_mgr->Open( wmp_str, true )) {
 			delete wmp_str;
-			goto cleanup;
 		}
 
 		delete worldmap;
 		worldmap = wmp_mgr->GetWorldMapArray();
 	}
-
-cleanup:
-	// Something went wrong, so try to clean after itself
-	wmp_mgr->release();
 }
 
 GameControl *Interface::GetGameControl() const
@@ -4701,7 +4680,7 @@ int Interface::CloseCurrentStore()
 	if ( !CurrentStore ) {
 		return -1;
 	}
-	StoreMgr* sm = ( StoreMgr* ) GetInterface( IE_STO_CLASS_ID );
+	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
 	if (sm == NULL) {
 		return -1;
 	}
@@ -4724,7 +4703,6 @@ int Interface::CloseCurrentStore()
 		RemoveFromCache(CurrentStore->Name, IE_STO_CLASS_ID);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
-	sm->release();
 	delete CurrentStore;
 	CurrentStore = NULL;
 	return 0;
@@ -4742,13 +4720,12 @@ Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner
 	}
 
 	DataStream* str = gamedata->GetResource( resname, IE_STO_CLASS_ID );
-	StoreMgr* sm = ( StoreMgr* ) GetInterface( IE_STO_CLASS_ID );
+	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
 	if (sm == NULL) {
 		delete ( str );
 		return NULL;
 	}
 	if (!sm->Open( str, true )) {
-		sm->release();
 		return NULL;
 	}
 
@@ -4758,10 +4735,8 @@ Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner
 	// Cache anyway!
 	CurrentStore = sm->GetStore( new Store() );
 	if (CurrentStore == NULL) {
-		sm->release();
 		return NULL;
 	}
-	sm->release();
 	strnlwrcpy(CurrentStore->Name, resname, 8);
 	if (owner) {
 		CurrentStore->SetOwner(owner);
@@ -4779,10 +4754,9 @@ int Interface::GetMouseScrollSpeed() {
 
 ieStrRef Interface::GetRumour(const ieResRef dlgref)
 {
-	DialogMgr* dm = ( DialogMgr* ) GetInterface( IE_DLG_CLASS_ID );
+	PluginHolder<DialogMgr> dm(IE_DLG_CLASS_ID);
 	dm->Open( gamedata->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
 	Dialog *dlg = dm->GetDialog();
-	dm->release();
 
 	if (!dlg) {
 		printMessage("Interface"," ", LIGHT_RED);
@@ -4969,7 +4943,7 @@ Effect *Interface::GetEffect(const ieResRef resname, int level, Point &p)
 // dealing with saved games
 int Interface::SwapoutArea(Map *map)
 {
-	MapMgr* mm = ( MapMgr* ) GetInterface( IE_ARE_CLASS_ID );
+	PluginHolder<MapMgr> mm(IE_ARE_CLASS_ID);
 	if (mm == NULL) {
 		return -1;
 	}
@@ -4992,7 +4966,6 @@ int Interface::SwapoutArea(Map *map)
 		RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
-	mm->release();
 	return 0;
 }
 
@@ -5004,7 +4977,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 	if (!actor) {
 		return -1;
 	}
-	ActorMgr* gm = ( ActorMgr* ) GetInterface( IE_CRE_CLASS_ID );
+	PluginHolder<ActorMgr> gm(IE_CRE_CLASS_ID);
 	if (gm == NULL) {
 		return -1;
 	}
@@ -5020,13 +4993,12 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 		printMessage("Core"," ", YELLOW);
 		printf("Character cannot be saved: %s\n", name);
 	}
-	gm->release();
 	return 0;
 }
 
 int Interface::WriteGame(const char *folder)
 {
-	SaveGameMgr* gm = ( SaveGameMgr* ) GetInterface( IE_GAM_CLASS_ID );
+	PluginHolder<SaveGameMgr> gm(IE_GAM_CLASS_ID);
 	if (gm == NULL) {
 		return -1;
 	}
@@ -5048,13 +5020,12 @@ int Interface::WriteGame(const char *folder)
 		printf("Internal error, game cannot be saved: %s\n", GameNameResRef);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
-	gm->release();
 	return 0;
 }
 
 int Interface::WriteWorldMap(const char *folder)
 {
-	WorldMapMgr* wmm = ( WorldMapMgr* ) GetInterface( IE_WMP_CLASS_ID );
+	PluginHolder<WorldMapMgr> wmm(IE_WMP_CLASS_ID);
 	if (wmm == NULL) {
 		return -1;
 	}
@@ -5076,7 +5047,6 @@ int Interface::WriteWorldMap(const char *folder)
 		printf("Internal error, worldmap cannot be saved: %s\n", WorldMapName);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
-	wmm->release();
 	return 0;
 }
 
@@ -5095,7 +5065,7 @@ int Interface::CompressSave(const char *folder)
 		return -1;
 	}
 	//BIF and SAV are the same
-	ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);
+	PluginHolder<ArchiveImporter> ai(IE_BIF_CLASS_ID);
 	ai->CreateArchive( &str);
 
 	//.tot and .toh should be saved last, because they are updated when an .are is saved
@@ -5124,7 +5094,6 @@ int Interface::CompressSave(const char *folder)
 			de = readdir( dir );
 		}
 	}
-	ai->release();
 	return 0;
 }
 

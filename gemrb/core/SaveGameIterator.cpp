@@ -413,7 +413,7 @@ static bool DoSaveGame(const char *Path)
 		return false;
 	}
 
-	ImageWriter *im = (ImageWriter *) core->GetInterface( PLUGIN_IMAGE_WRITER_BMP );
+	PluginHolder<ImageWriter> im(PLUGIN_IMAGE_WRITER_BMP);
 	if (!im) {
 		printMessage( "SaveGameIterator", "Couldn't create the BMPWriter!\n", LIGHT_RED );
 		return false;
@@ -437,7 +437,6 @@ static bool DoSaveGame(const char *Path)
 	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
 	im->PutImage( &outfile, preview );
 
-	im->release();
 	return true;
 }
 

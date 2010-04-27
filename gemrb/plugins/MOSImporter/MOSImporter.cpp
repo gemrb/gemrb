@@ -71,10 +71,8 @@ bool MOSImporter::Open(DataStream* stream)
 				return false;
 			}	
 			FILE* newfile = fopen( cpath, "wb" );
-			Compressor* comp = ( Compressor* )
-				core->GetInterface( IE_COMPRESSION_CLASS_ID );
+			PluginHolder<Compressor> comp(IE_COMPRESSION_CLASS_ID);
 			comp->Decompress( newfile, str );
-			comp->release();
 			fclose( newfile );
 			delete( str );
 			FileStream* s = new FileStream();

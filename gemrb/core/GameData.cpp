@@ -101,13 +101,11 @@ Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
 	if (!ds)
 		return 0;
 
-	ActorMgr* actormgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
+	PluginHolder<ActorMgr> actormgr(IE_CRE_CLASS_ID);
 	if (!actormgr->Open( ds, true )) {
-		actormgr->release();
 		return 0;
 	}
 	Actor* actor = actormgr->GetActor(PartySlot);
-	actormgr->release();
 	return actor;
 }
 
@@ -123,13 +121,11 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 		FileStream *fs = new FileStream();
 		fs -> Open( nPath, true );
 		stream = (DataStream *) fs;
-		ActorMgr* actormgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
+		PluginHolder<ActorMgr> actormgr(IE_CRE_CLASS_ID);
 		if (!actormgr->Open( stream, true )) {
-			actormgr->release();
 			return -1;
 		}
 		actor = actormgr->GetActor(PartySlot);
-		actormgr->release();
 	} else {
 		actor = GetCreature(ResRef, PartySlot);
 	}
@@ -302,13 +298,12 @@ Item* GameData::GetItem(const ieResRef resname)
 		return item;
 	}
 	DataStream* str = GetResource( resname, IE_ITM_CLASS_ID );
-	ItemMgr* sm = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
-	if (sm == NULL) {
+	PluginHolder<ItemMgr> sm(IE_ITM_CLASS_ID);
+	if (!sm) {
 		delete ( str );
 		return NULL;
 	}
 	if (!sm->Open( str, true )) {
-		sm->release();
 		return NULL;
 	}
 
@@ -317,11 +312,9 @@ Item* GameData::GetItem(const ieResRef resname)
 	strnlwrcpy(item->Name, resname, 8);
 	sm->GetItem( item );
 	if (item == NULL) {
-		sm->release();
 		return NULL;
 	}
 
-	sm->release();
 	ItemCache.SetAt(resname, (void *) item);
 	return item;
 }
@@ -348,13 +341,12 @@ Spell* GameData::GetSpell(const ieResRef resname, bool silent)
 		return spell;
 	}
 	DataStream* str = GetResource( resname, IE_SPL_CLASS_ID, silent );
-	SpellMgr* sm = ( SpellMgr* ) core->GetInterface( IE_SPL_CLASS_ID );
-	if (sm == NULL) {
+	PluginHolder<SpellMgr> sm(IE_SPL_CLASS_ID);
+	if (!sm) {
 		delete ( str );
 		return NULL;
 	}
 	if (!sm->Open( str, true )) {
-		sm->release();
 		return NULL;
 	}
 
@@ -363,11 +355,8 @@ Spell* GameData::GetSpell(const ieResRef resname, bool silent)
 	strnlwrcpy(spell->Name, resname, 8);
 	sm->GetSpell( spell, silent );
 	if (spell == NULL) {
-		sm->release();
 		return NULL;
 	}
-
-	sm->release();
 
 	SpellCache.SetAt(resname, (void *) spell);
 	return spell;
@@ -394,23 +383,19 @@ Effect* GameData::GetEffect(const ieResRef resname)
 		return effect;
 	}
 	DataStream* str = GetResource( resname, IE_EFF_CLASS_ID );
-	EffectMgr* em = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
-	if (em == NULL) {
+	PluginHolder<EffectMgr> em(IE_EFF_CLASS_ID);
+	if (!em) {
 		delete ( str );
 		return NULL;
 	}
 	if (!em->Open( str, true )) {
-		em->release();
 		return NULL;
 	}
 
 	effect = em->GetEffect(new Effect() );
 	if (effect == NULL) {
-		em->release();
 		return NULL;
 	}
-
-	em->release();
 
 	EffectCache.SetAt(resname, (void *) effect);
 	return effect;
@@ -485,13 +470,11 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	{
 		DataStream* ret = GetResource( resname, type, silent );
 		if (ret) {
-			AnimationMgr* ani = ( AnimationMgr* )
-				core->GetInterface( IE_BAM_CLASS_ID );
+			PluginHolder<AnimationMgr> ani(IE_BAM_CLASS_ID);
 			if (!ani)
 				return NULL;
 			ani->Open( ret, true );
 			AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
-			ani->release();
 			factory->AddFactoryObject( af );
 			return af;
 		}

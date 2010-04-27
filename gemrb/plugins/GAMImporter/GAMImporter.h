@@ -57,7 +57,7 @@ public:
 	/* stores a gane in the savegame folder */
 	int PutGame(DataStream *stream, Game *game);
 private:
-	Actor* GetActor( ActorMgr* aM, bool is_in_party );
+	Actor* GetActor(Holder<ActorMgr> aM, bool is_in_party );
 	void GetPCStats(PCStatsStruct* ps);
 	GAMJournalEntry* GetJournalEntry();
 

@@ -3389,12 +3389,11 @@ bool Map::ChangeMap(bool day_or_night)
 	//no need of change if the area already has the right tilemap
 	if ((DayNight == day_or_night) && GetTileMap()) return false;
 
-	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
+	PluginHolder<MapMgr> mM(IE_ARE_CLASS_ID);
 	//no need to open and read the .are file again
 	//using the ARE class for this because ChangeMap is similar to LoadMap
 	//it loads the lightmap and the minimap too, besides swapping the tileset
 	mM->ChangeMap(this, day_or_night);
-	mM->release();
 	return true;
 }
 

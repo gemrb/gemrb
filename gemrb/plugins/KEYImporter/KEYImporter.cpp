@@ -265,15 +265,12 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 			return NULL;
 		}
 
-		ArchiveImporter* ai = ( ArchiveImporter* )
-			core->GetInterface( IE_BIF_CLASS_ID );
+		PluginHolder<ArchiveImporter> ai(IE_BIF_CLASS_ID);
 		if (ai->OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
 			printf("Cannot open archive %s\n", biffiles[bifnum].path );
-			ai->release();
 			return NULL;
 		}
 		DataStream* ret = ai->GetStream( ResLocator, type );
-		ai->release();
 		if (ret) {
 			strnlwrcpy( ret->filename, resname, 8 );
 			strcat( ret->filename, core->TypeExt( type ) );

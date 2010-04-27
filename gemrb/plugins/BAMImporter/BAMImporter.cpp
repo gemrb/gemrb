@@ -96,10 +96,8 @@ bool BAMImporter::Open(DataStream* stream, bool autoFree)
 				printf( "Cannot write %s.\n", cpath );
 				return false;
 			}
-			Compressor* comp = ( Compressor* )
-				core->GetInterface( IE_COMPRESSION_CLASS_ID );
+			PluginHolder<Compressor> comp(IE_COMPRESSION_CLASS_ID);
 			comp->Decompress( newfile, str );
-			comp->release();
 			fclose( newfile );
 			if (autoFree)
 				delete( str );

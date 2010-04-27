@@ -1198,7 +1198,7 @@ void CREImporter::ReadEffects(Actor *act)
 
 void CREImporter::GetEffect(Effect *fx)
 {
-	EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
+	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
 
 	eM->Open( str, false );
 	if (TotSCEFF) {
@@ -1206,7 +1206,6 @@ void CREImporter::GetEffect(Effect *fx)
 	} else {
 		eM->GetEffectV1( fx );
 	}
-	eM->release();
 }
 
 ieDword CREImporter::GetActorGemRB(Actor *act)

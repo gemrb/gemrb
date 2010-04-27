@@ -115,13 +115,12 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		return ReturnCopy(idx);
 	}
 	DataStream* str = gamedata->GetResource( projectiles[idx].resname, IE_PRO_CLASS_ID );
-	ProjectileMgr* sm = ( ProjectileMgr* ) core->GetInterface( IE_PRO_CLASS_ID );
-	if (sm == NULL) {
+	PluginHolder<ProjectileMgr> sm(IE_PRO_CLASS_ID);
+	if (!sm) {
 		delete ( str );
 		return CreateDefaultProjectile(idx);
 	}
 	if (!sm->Open( str, true )) {
-		sm->release();
 		return CreateDefaultProjectile(idx);
 	}
 	Projectile *pro = new Projectile();
@@ -173,7 +172,6 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		//fill the explosion/spread animation flags
 		pro->Extension->APFlags = GetExplosionFlags(Type);
 	}
-	sm->release();
 
 	pro->autofree = true;
 	return ReturnCopy(idx);

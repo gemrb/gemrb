@@ -74,12 +74,10 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 			printf( "Cannot write %s.\n", path );	
 			return GEM_ERROR;
 		}
-		Compressor* comp = ( Compressor* )
-			core->GetInterface( IE_COMPRESSION_CLASS_ID );
+		PluginHolder<Compressor> comp(IE_COMPRESSION_CLASS_ID);
 		if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
 			return GEM_ERROR;
 		}
-		comp->release();
 		fclose( in_cache );
 		Current = compressed->Remains();
 		//starting at 40% going up to 90%
@@ -122,10 +120,8 @@ int BIFImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 	unsigned long Pos = str->GetPos(); //storing the stream position
 	str->WriteDword( &complen);
 
-	Compressor* comp = ( Compressor* )
-		core->GetInterface( IE_COMPRESSION_CLASS_ID );  
+	PluginHolder<Compressor> comp(IE_COMPRESSION_CLASS_ID);
 	comp->Compress( str, uncompressed );
-	comp->release();
 
 	//writing compressed length (calculated)
 	unsigned long Pos2 = str->GetPos();
@@ -199,12 +195,10 @@ int BIFImporter::OpenArchive(const char* filename)
 			printf( "Cannot write %s.\n", path );
 			return GEM_ERROR;
 		}
-		Compressor* comp = ( Compressor* )
-			core->GetInterface( IE_COMPRESSION_CLASS_ID );
+		PluginHolder<Compressor> comp(IE_COMPRESSION_CLASS_ID);
 		if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
 			return GEM_ERROR;
 		}
-		comp->release();
 		fclose( in_cache );
 		delete( compressed );
 		stream = new CachedFileStream( path );
@@ -235,8 +229,7 @@ int BIFImporter::OpenArchive(const char* filename)
 		printf( "Decompressing\n" );
 		if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID ))
 			return GEM_ERROR;
-		Compressor* comp = ( Compressor* )
-			core->GetInterface( IE_COMPRESSION_CLASS_ID );
+		PluginHolder<Compressor> comp(IE_COMPRESSION_CLASS_ID);
 		ieDword unCompBifSize;
 		compressed->ReadDword( &unCompBifSize );
 		printf( "\nDecompressing file: [..........]" );
@@ -269,7 +262,6 @@ int BIFImporter::OpenArchive(const char* filename)
 			}
 		}
 		printf( "\n" );
-		comp->release();
 		fclose( in_cache );
 		delete( compressed );
 		stream = new CachedFileStream( path );

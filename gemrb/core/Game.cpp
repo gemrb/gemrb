@@ -668,13 +668,11 @@ int Game::LoadMap(const char* ResRef)
 	if (!ds) {
 		return -1;
 	}
-	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
+	PluginHolder<MapMgr> mM(IE_ARE_CLASS_ID);
 	if(!mM->Open( ds, true )) {
-		mM->release();
 		return -1;
 	}
 	Map* newMap = mM->GetMap(ResRef, IsDay());
-	mM->release();
 	if (!newMap) {
 		return -1;
 	}
