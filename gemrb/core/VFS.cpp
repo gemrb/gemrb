@@ -312,8 +312,7 @@ bool PathJoin (char *target, const char *base, ...)
 				strcat(target, source);
 				goto finish;
 			}
-			strcat(target, SPathDelimiter);
-			strcat(target, filename);
+			PathAppend(target, filename);
 		} while (slash);
 	}
 	va_end( ap );
