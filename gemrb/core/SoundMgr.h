@@ -34,7 +34,6 @@ public:
 public:
 	SoundMgr(void);
 	virtual ~SoundMgr(void);
-	virtual bool Open(DataStream* stream) = 0 ;
 	/**
 	 * Read up to cnt samples into memory
 	 *

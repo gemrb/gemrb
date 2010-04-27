@@ -39,7 +39,6 @@ public:
 public:
 	ImageMgr(void);
 	virtual ~ImageMgr(void);
-	virtual bool Open(DataStream* stream) = 0;
 	/** Returns a \ref Sprite2D containing the image. */
 	virtual Sprite2D* GetSprite2D() = 0;
 	virtual Image* GetImage();

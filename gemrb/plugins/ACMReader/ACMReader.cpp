@@ -21,8 +21,7 @@
 
 bool ACMReader::Open(DataStream* stream)
 {
-	if (!Resource::Open(stream))
-		return false;
+	str = stream;
 	Close();
 
 	ACM_Header hdr;

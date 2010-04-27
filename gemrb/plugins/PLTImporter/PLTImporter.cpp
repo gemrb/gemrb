@@ -49,8 +49,7 @@ PLTImporter::~PLTImporter(void)
 
 bool PLTImporter::Open(DataStream* stream)
 {
-	if (!Resource::Open(stream))
-		return false;
+	str = stream;
 
 	char Signature[8];
 	unsigned short unknown[4];

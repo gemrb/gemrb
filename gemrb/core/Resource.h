@@ -46,7 +46,7 @@ public:
 	 * Reads the resource from the given stream.
 	 *
 	 * This should only be called once for a given resource object.
-	 * @param[in] stream Stream containg the resource
+	 * @param[in] stream Non-NULL Stream containg the resource
 	 * @retval true stream contains the given resource.
 	 * @retval false stream does not contain valid resource.
 	 */

@@ -54,8 +54,7 @@ const unsigned char data_4cc[] = {
 
 bool RawPCMReader::Open(DataStream* stream)
 {
-	if (!Resource::Open(stream))
-		return false;
+	str = stream;
 
 	samples = str->Size();
 	str->Seek( 0, GEM_STREAM_START );

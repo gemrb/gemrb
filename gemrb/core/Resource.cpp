@@ -33,13 +33,3 @@ Resource::~Resource(void)
 		delete( str );
 	}
 }
-
-bool Resource::Open(DataStream * stream)
-{
-	if (stream == NULL)
-		return false;
-	if (str && str != stream)
-		delete( str );
-	str = stream;
-	return true;
-}

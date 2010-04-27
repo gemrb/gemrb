@@ -67,8 +67,7 @@ static long ovfd_tell(void *datasource) {
 
 bool OGGReader::Open(DataStream* stream)
 {
-	if (!Resource::Open(stream))
-		return false;
+	str = stream;
 	Close();
 
 	char Signature[4];

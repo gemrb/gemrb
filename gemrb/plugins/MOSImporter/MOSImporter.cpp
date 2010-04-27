@@ -46,8 +46,6 @@ MOSImporter::~MOSImporter(void)
 
 bool MOSImporter::Open(DataStream* stream)
 {
-	if (!Resource::Open(stream))
-		return false;
 	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );

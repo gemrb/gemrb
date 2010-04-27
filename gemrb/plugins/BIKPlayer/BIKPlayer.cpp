@@ -192,8 +192,7 @@ int BIKPlayer::ReadHeader()
 bool BIKPlayer::Open(DataStream* stream)
 {
 	validVideo = false;
-	if (!Resource::Open(stream))
-		return false;
+	str = stream;
 
 	str->Read( &header.signature, BIK_SIGNATURE_LEN );
 	if (memcmp( header.signature, BIK_SIGNATURE_DATA, 4 ) == 0) {
