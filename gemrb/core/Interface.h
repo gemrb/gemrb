@@ -36,6 +36,7 @@
 #include "SClassID.h"
 #include "Cache.h"
 #include "GlobalTimer.h"
+#include "Holder.h"
 
 class Audio;
 class Video;
@@ -262,10 +263,10 @@ private:
 	Variables * tokens;
 	MusicMgr * music;
 	std::vector<Symbol> symbols;
-	DataFileMgr * INIparty;
-	DataFileMgr * INIbeasts;
-	DataFileMgr * INIquests;
-	DataFileMgr * INIresdata;
+	Holder<DataFileMgr> INIparty;
+	Holder<DataFileMgr> INIbeasts;
+	Holder<DataFileMgr> INIquests;
+	Holder<DataFileMgr> INIresdata;
 	Game * game;
 	Calendar * calendar;
 	WorldMapArray* worldmap;
@@ -484,19 +485,19 @@ public:
 	/** Get the Party INI Interpreter */
 	DataFileMgr * GetPartyINI() const
 	{
-		return INIparty;
+		return INIparty.get();
 	}
 	DataFileMgr * GetBeastsINI() const
 	{
-		return INIbeasts;
+		return INIbeasts.get();
 	}
 	DataFileMgr * GetQuestsINI() const
 	{
-		return INIquests;
+		return INIquests.get();
 	}
 	DataFileMgr * GetResDataINI() const
 	{
-		return INIresdata;
+		return INIresdata.get();
 	}
 	/** Gets the Game class */
 	Game * GetGame() const

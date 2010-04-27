@@ -55,7 +55,7 @@ IniSpawn::~IniSpawn()
 	}
 }
 
-DataFileMgr *GetIniFile(const ieResRef DefaultArea)
+Holder<DataFileMgr> GetIniFile(const ieResRef DefaultArea)
 {
 	//the lack of spawn ini files is not a serious problem, happens all the time
 	if (!gamedata->Exists( DefaultArea, IE_INI_CLASS_ID)) {
@@ -72,7 +72,7 @@ DataFileMgr *GetIniFile(const ieResRef DefaultArea)
 		return NULL;
 	}
 
-	DataFileMgr *ini = ( DataFileMgr* )core->GetInterface( IE_INI_CLASS_ID );
+	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
 	ini->Open(inifile, true ); //autofree
 	return ini;
 }
@@ -447,10 +447,9 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 
 void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 {
-	DataFileMgr *inifile;
 	const char *s;
 
-	inifile = GetIniFile(DefaultArea);
+	Holder<DataFileMgr> inifile = GetIniFile(DefaultArea);
 	if (!inifile) {
 		strnuprcpy(NamelessSpawnArea, DefaultArea, 8);
 		return;
@@ -492,7 +491,7 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 
 	s = inifile->GetKeyAsString("spawn_main","enter",NULL);
 	if (s) {
-		ReadSpawnEntry(inifile, s, enterspawn);
+		ReadSpawnEntry(inifile.get(), s, enterspawn);
 	}
 	s = inifile->GetKeyAsString("spawn_main","events",NULL);
 	if (s) {
@@ -502,11 +501,10 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 		GetElements(s, events, eventcount);
 		int ec = eventcount;
 		while(ec--) {
-			ReadSpawnEntry(inifile, events[ec], eventspawns[ec]);
+			ReadSpawnEntry(inifile.get(), events[ec], eventspawns[ec]);
 		}
 		delete[] events;
 	}
-	inifile->release();
 	//maybe not correct
 	InitialSpawn();
 }

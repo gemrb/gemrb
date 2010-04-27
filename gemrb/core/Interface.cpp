@@ -136,10 +136,6 @@ Interface::Interface(int iargc, char* iargv[])
 	RtRows = NULL;
 	music = NULL;
 	sgiterator = NULL;
-	INIparty = NULL;
-	INIbeasts = NULL;
-	INIquests = NULL;
-	INIresdata = NULL;
 	game = NULL;
 	worldmap = NULL;
 	CurrentStore = NULL;
@@ -444,15 +440,6 @@ Interface::~Interface(void)
 	}
 
 	FreeInterfaceVector( Symbol, symbols, sm );
-
-	if (INIquests)
-		INIquests->release();
-	if (INIbeasts)
-		INIbeasts->release();
-	if (INIparty)
-		INIparty->release();
-	if (INIresdata)
-		INIresdata->release();
 
 	Map::ReleaseMemory();
 	Actor::ReleaseMemory();
@@ -1554,7 +1541,7 @@ int Interface::Init()
 
 	if (HasFeature( GF_RESDATA_INI )) {
 		printMessage( "Core", "Loading resource data File...", WHITE );
-		INIresdata = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
+		INIresdata = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		DataStream* ds = gamedata->GetResource("resdata", IE_INI_CLASS_ID);
 		if (!INIresdata->Open( ds, true )) {
 			printStatus( "ERROR", LIGHT_RED );
@@ -1566,7 +1553,7 @@ int Interface::Init()
 	if (HasFeature( GF_HAS_PARTY_INI )) {
 		printMessage( "Core", "Loading precreated teams setup...\n",
 			WHITE );
-		INIparty = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
+		INIparty = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		FileStream* fs = new FileStream();
 		char tINIparty[_MAX_PATH];
 		PathJoin( tINIparty, GamePath, "Party.ini", NULL );
@@ -1585,7 +1572,7 @@ int Interface::Init()
 	if (HasFeature( GF_HAS_BEASTS_INI )) {
 		printMessage( "Core", "Loading beasts definition File...\n",
 			WHITE );
-		INIbeasts = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
+		INIbeasts = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		FileStream* fs = new FileStream();
 		char tINIbeasts[_MAX_PATH];
 		PathJoin( tINIbeasts, GamePath, "beast.ini", NULL );
@@ -1599,7 +1586,7 @@ int Interface::Init()
 
 		printMessage( "Core", "Loading quests definition File...\n",
 			WHITE );
-		INIquests = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
+		INIquests = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		FileStream* fs2 = new FileStream();
 		char tINIquests[_MAX_PATH];
 		PathJoin( tINIquests, GamePath, "quests.ini", NULL );
@@ -2294,7 +2281,7 @@ bool Interface::LoadGemRBINI()
 		printf( "[Core]: No INI Importer Available.\n" );
 		return false;
 	}
-	DataFileMgr* ini = ( DataFileMgr* ) GetInterface( IE_INI_CLASS_ID );
+	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
 	ini->Open( inifile, true ); //autofree
 
 	printStatus( "OK", LIGHT_GREEN );
@@ -2408,7 +2395,6 @@ bool Interface::LoadGemRBINI()
 
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
-	ini->release();
 	return true;
 }
 

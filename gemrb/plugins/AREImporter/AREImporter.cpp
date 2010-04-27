@@ -58,15 +58,13 @@ struct ResRefToStrRef {
 	int difficulty;
 };
 
-DataFileMgr *INInote = NULL;
+Holder<DataFileMgr> INInote;
 ResRefToStrRef *tracks = NULL;
 int trackcount = 0;
 
 void ReleaseMemory()
 {
-	if (INInote)
-		INInote->release();
-	INInote = NULL;
+	INInote.release();
 
 	delete [] tracks;
 	tracks = NULL;
@@ -74,8 +72,7 @@ void ReleaseMemory()
 
 void ReadAutonoteINI()
 {
-	INInote = ( DataFileMgr * )
-		core->GetInterface( IE_INI_CLASS_ID );
+	INInote = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	FileStream* fs = new FileStream();
 	char tINInote[_MAX_PATH];
 	PathJoin( tINInote, core->GamePath, "autonote.ini", NULL );
