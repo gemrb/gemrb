@@ -29,6 +29,10 @@
 
 #include <cstddef>
 #include "exports.h"
+#include "Holder.h"
+// FIXME:
+#include "SClassID.h"
+#include "PluginMgr.h"
 
 #include "TypeID.h"
 
@@ -37,11 +41,25 @@
  * Base class for all GemRB plugins
  */
 
-class GEM_EXPORT Plugin {
+class GEM_EXPORT Plugin : public Held<Plugin> {
 public:
 	Plugin(void);
 	virtual ~Plugin(void);
-	void release();
+};
+
+template <class T>
+class PluginHolder : public Holder<T> {
+public:
+	PluginHolder()
+	{
+	}
+	PluginHolder(PluginID id)
+		: Holder<T>(static_cast<T*>(PluginMgr::Get()->GetPlugin(id)))
+	{
+	}
+	~PluginHolder()
+	{
+	}
 };
 
 #endif

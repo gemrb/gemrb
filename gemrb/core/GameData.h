@@ -26,6 +26,7 @@
 #include "ie_types.h"
 #include "Cache.h"
 #include "ResourceManager.h"
+#include "Holder.h"
 
 class TableMgr;
 class Palette;
@@ -98,5 +99,22 @@ private:
 };
 
 extern GEM_EXPORT GameData * gamedata;
+
+template <class T>
+class ResourceHolder : public Holder<T>
+{
+public:
+	ResourceHolder()
+	{
+	}
+	ResourceHolder(const char* resname)
+		: Holder<T>(static_cast<T*>(gamedata->GetResource(resname,&T::ID)))
+	{
+	}
+	ResourceHolder(const char* resname, ResourceManager& manager, bool silent = false)
+		: Holder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)))
+	{
+	}
+};
 
 #endif
