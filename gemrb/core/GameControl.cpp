@@ -35,6 +35,7 @@
 #include "Game.h"
 #include "SaveGameIterator.h"
 #include "damages.h"
+#include "ImageMgr.h"
 
 #define DEBUG_SHOW_INFOPOINTS   0x01
 #define DEBUG_SHOW_CONTAINERS   0x02

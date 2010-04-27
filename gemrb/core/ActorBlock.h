@@ -39,7 +39,6 @@ class Gem_Polygon;
 #include "Variables.h"
 #include "Inventory.h"
 #include "PathFinder.h"
-#include "ImageMgr.h"
 #include <list>
 
 #define MAX_SCRIPTS		8

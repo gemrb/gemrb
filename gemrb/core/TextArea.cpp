@@ -27,6 +27,7 @@
 #include "GameControl.h"
 #include "Audio.h"
 #include "Actor.h"
+#include "ImageMgr.h"
 
 #include <stdio.h>
 #include <stdlib.h>

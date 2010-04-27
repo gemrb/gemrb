@@ -78,6 +78,7 @@
 #include "GameData.h"
 #include "Calendar.h"
 #include "PluginMgr.h"
+#include "ImageMgr.h"
 
 GEM_EXPORT Interface* core;
 GEM_EXPORT GameData* gamedata;

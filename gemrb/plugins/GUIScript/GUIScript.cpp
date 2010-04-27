@@ -44,6 +44,7 @@
 #include "ImageFactory.h"
 #include "ResourceDesc.h"
 #include "PalettedImageMgr.h"
+#include "ImageMgr.h"
 
 #include <cstdio>
 

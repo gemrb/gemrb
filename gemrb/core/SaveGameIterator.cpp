@@ -26,6 +26,7 @@
 #include "GameControl.h"
 #include "Video.h"
 #include "ImageWriter.h"
+#include "ImageMgr.h"
 #include <vector>
 #include <cassert>
 
