@@ -308,8 +308,7 @@ bool PathJoin (char *target, const char *base, ...)
 				strcpy(filename, source);
 			}
 			if (!FindInDir(target, filename)) {
-				strcat(target, SPathDelimiter);
-				strcat(target, source);
+				PathAppend(target, source);
 				goto finish;
 			}
 			PathAppend(target, filename);
