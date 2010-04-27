@@ -126,15 +126,9 @@ Interface::Interface(int iargc, char* iargv[])
 	}
 
 	projserv = NULL;
-	video = NULL;
-	AudioDriver = NULL;
-	strings = NULL;
-	guiscript = NULL;
-	windowmgr = NULL;
 	vars = NULL;
 	tokens = NULL;
 	RtRows = NULL;
-	music = NULL;
 	sgiterator = NULL;
 	game = NULL;
 	worldmap = NULL;
@@ -308,13 +302,11 @@ Interface::~Interface(void)
 
 	if (music) {
 		music->HardEnd();
-		music->release();
 	}
 	// stop any ambients which are still enqueued
 	if (AudioDriver) {
 		AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
 		if (ambim) ambim->deactivate();
-		AudioDriver->release();
 	}
 	//destroy the highest objects in the hierarchy first!
 	delete game;
@@ -368,8 +360,6 @@ Interface::~Interface(void)
 
 	delete timer;
 
-	windowmgr->release();
-
 	if (video) {
 
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
@@ -402,8 +392,6 @@ Interface::~Interface(void)
 
 	delete evntmgr;
 
-	guiscript->release();
-
 	delete vars;
 	delete tokens;
 	if (RtRows) {
@@ -433,9 +421,6 @@ Interface::~Interface(void)
 	gamedata->ClearCaches();
 	delete gamedata;
 	gamedata = NULL;
-	video->release();
-
-	strings->release();
 
 	// Removing all stuff from Cache, except bifs
 	if (!KeepCache) DelTree((const char *) CachePath, true);
@@ -1286,7 +1271,7 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Initializing Video Plugin...", WHITE );
-	video = ( Video * ) GetInterface( IE_VIDEO_CLASS_ID );
+	video = PluginHolder<Video>(IE_VIDEO_CLASS_ID);
 	if (video->Init() == GEM_ERROR) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot Initialize Video Driver.\nTermination in Progress...\n" );
@@ -1387,7 +1372,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
-	strings = ( StringMgr * ) GetInterface( IE_TLK_CLASS_ID );
+	strings = PluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 	printMessage( "Core", "Loading Dialog.tlk file...", WHITE );
 	char strpath[_MAX_PATH];
 	PathJoin( strpath, GamePath, dialogtlk, NULL );
@@ -1431,14 +1416,14 @@ int Interface::Init()
 	video->SetEventMgr( evntmgr );
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Initializing Window Manager...", WHITE );
-	windowmgr = ( WindowMgr * ) GetInterface( IE_CHU_CLASS_ID );
+	windowmgr = PluginHolder<WindowMgr>(IE_CHU_CLASS_ID);
 	if (windowmgr == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Initializing GUI Script Engine...", WHITE );
-	guiscript = ( ScriptEngine * ) GetInterface( IE_GUI_SCRIPT_CLASS_ID );
+	guiscript = PluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
 	if (guiscript == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
@@ -1470,7 +1455,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Starting up the Sound Driver...", WHITE );
-	AudioDriver = ( Audio * ) GetInterface( IE_AUDIO_CLASS_ID );
+	AudioDriver = PluginHolder<Audio>(IE_AUDIO_CLASS_ID);
 	if (AudioDriver == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
@@ -1503,7 +1488,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Initializing Music Manager...", WHITE );
-	music = ( MusicMgr * ) GetInterface( IE_MUS_CLASS_ID );
+	music = PluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
 	if (!music) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
@@ -1692,14 +1677,6 @@ WorldMap *Interface::GetWorldMap(const char *map)
 	return worldmap->GetWorldMap(index);
 }
 
-void* Interface::GetInterface(SClass_ID filetype) const
-{
-	if (!PluginMgr::Get()) {
-		return NULL;
-	}
-	return PluginMgr::Get()->GetPlugin( filetype );
-}
-
 ProjectileServer* Interface::GetProjectileServer() const
 {
 	return projserv;
@@ -1707,7 +1684,11 @@ ProjectileServer* Interface::GetProjectileServer() const
 
 Video* Interface::GetVideoDriver() const
 {
-	return video;
+	return video.get();
+}
+
+Audio* Interface::GetAudioDrv(void) const {
+	return AudioDriver.get();
 }
 
 const char* Interface::TypeExt(SClass_ID type) const
@@ -2458,13 +2439,13 @@ EventMgr* Interface::GetEventMgr() const
 /** Returns the Window Manager */
 WindowMgr* Interface::GetWindowMgr() const
 {
-	return windowmgr;
+	return windowmgr.get();
 }
 
 /** Get GUI Script Manager */
 ScriptEngine* Interface::GetGUIScriptEngine() const
 {
-	return guiscript;
+	return guiscript.get();
 }
 
 //NOTE: if there were more summoned creatures, it will return only the last
@@ -3257,7 +3238,7 @@ Variables* Interface::GetTokenDictionary() const
 /** Get the Music Manager */
 MusicMgr* Interface::GetMusicMgr() const
 {
-	return music;
+	return music.get();
 }
 /** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
 int Interface::LoadSymbol(const char* ResRef)

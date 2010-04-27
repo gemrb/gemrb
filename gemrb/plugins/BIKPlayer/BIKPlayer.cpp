@@ -39,7 +39,6 @@
 #include "rational.h"
 #include "binkdata.h"
 
-static Video *video = NULL;
 static int g_truecolor;
 static ieDword *cbAtFrame = NULL;
 static ieDword *strRef = NULL;

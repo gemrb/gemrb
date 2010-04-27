@@ -28,8 +28,8 @@
 
 class MVEPlay : public MoviePlayer {
 	friend class MVEPlayer;
-
 private:
+	Video *video;
 	bool validVideo;
 	int doPlay();
 	unsigned int fileRead(void* buf, unsigned int count);

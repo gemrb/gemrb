@@ -46,7 +46,7 @@
  * PluginMgr will not load multiple plugins with the same id.
  *
  * @def PLUGIN_CLASS
- * Register a class to be accessed through Interface::GetInterface.
+ * Register a class to be accessed through PluginMgr::GetPlugin
  * @param[in] id Identifier to refer to this class.
  * @param[in] cls Class to register. Must be a descendent of Plugin.
  *

@@ -626,7 +626,6 @@ static PyObject* GemRB_LoadWindowObject(PyObject * self, PyObject* args)
 	PyObject* wintuple = PyTuple_New(1);
 	PyTuple_SET_ITEM(wintuple, 0, win);
 
-	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
 	PyObject* ret = gs->ConstructObject("Window", wintuple);
 	Py_DECREF(wintuple);
 	if (!ret) {
@@ -875,7 +874,6 @@ static PyObject* GemRB_LoadTableObject(PyObject * self, PyObject* args)
 	PyObject* tabtuple = PyTuple_New(1);
 	PyTuple_SET_ITEM(tabtuple, 0, table);
 
-	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
 	PyObject* ret = gs->ConstructObject("Table", tabtuple);
 	Py_DECREF(tabtuple);
 	if (!ret) {
@@ -1291,7 +1289,6 @@ static PyObject* GemRB_Window_GetControl(PyObject * self, PyObject* args)
 	default:
 		break;
 	}
-	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
 	ret = gs->ConstructObject(type, ctrltuple);
 	Py_DECREF(ctrltuple);
 
@@ -7530,9 +7527,6 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 			PyTuple_SetItem( param, i-2, PyInt_FromLong( v[i] ) );
 		}
 
-		//conversion is needed, because the interface is more generic
-		GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
-
 		PyObject *pValue = gs->CallbackFunction(fname, param);
 
 		/* we created this parameter, now we don't need it*/
@@ -9475,6 +9469,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 
 GUIScript::GUIScript(void)
 {
+	gs = this;
 	pDict = NULL; //borrowed, but used outside a function
 	pModule = NULL; //should decref it
 	pMainDic = NULL; //borrowed, but used outside a function

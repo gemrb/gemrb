@@ -59,4 +59,6 @@ public:
 	PyObject* ConstructObject(const char* classname, PyObject* pArgs);
 };
 
+static GUIScript *gs = NULL;
+
 #endif

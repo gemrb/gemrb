@@ -77,7 +77,6 @@ class Control;
 class Palette;
 class ProjectileServer;
 class Calendar;
-class Plugin;
 class Image;
 class SaveGame;
 
@@ -242,25 +241,25 @@ enum PluginFlagsType {
 class GEM_EXPORT Interface
 {
 private:
-	Video * video;
-	Audio * AudioDriver ;
+	Holder<Video> video;
+	Holder<Audio> AudioDriver;
 	ProjectileServer * projserv;
 	Image * pal256;
 	Image * pal32;
 	Image * pal16;
 	std::vector<Font*> fonts;
 	EventMgr * evntmgr;
-	WindowMgr * windowmgr;
+	Holder<WindowMgr> windowmgr;
 	Window* ModalWindow;
 	char WindowPack[10];
-	ScriptEngine * guiscript;
+	Holder<ScriptEngine> guiscript;
 	SaveGameIterator *sgiterator;
 	/** Windows Array */
 	std::vector<Window*> windows;
 	std::vector<int> topwin;
 	Variables * vars;
 	Variables * tokens;
-	MusicMgr * music;
+	Holder<MusicMgr> music;
 	std::vector<Symbol> symbols;
 	Holder<DataFileMgr> INIparty;
 	Holder<DataFileMgr> INIbeasts;
@@ -308,7 +307,7 @@ private:
 	/** Next Script Name */
 	char NextScript[64];
 public:
-	StringMgr *strings;
+	Holder<StringMgr> strings;
 	GlobalTimer * timer;
 	Palette *InfoTextPalette;
 	int SaveAsOriginal; //if true, saves files in compatible mode
@@ -342,7 +341,6 @@ public:
 	/* don't rely on the exact return value of this function */
 	ieDword HasFeature(int position) const;
 	bool IsAvailable(SClass_ID filetype) const;
-	void * GetInterface(SClass_ID filetype) const;
 	const char * TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const;
 	Video * GetVideoDriver() const;
@@ -747,9 +745,7 @@ public:
 	/** The Console Object */
 	Console * console;
 
-	Audio* GetAudioDrv(void) {
-		return AudioDriver;
-	}
+	Audio* GetAudioDrv(void) const;
 
 #ifdef _DEBUG
 	int FileStreamPtrCount;
