@@ -46,7 +46,7 @@ public:
     virtual void ResetMusics() = 0;
     virtual bool Play() = 0;
     virtual bool Stop() = 0;
-    virtual int CreateStream(SoundMgr*) = 0;
+    virtual int CreateStream(Holder<SoundMgr>) = 0;
     virtual void UpdateListenerPos(int XPos, int YPos ) = 0;
     virtual void GetListenerPos(int &XPos, int &YPos ) = 0;
     virtual bool ReleaseStream(int stream, bool HardStop=false ) = 0;

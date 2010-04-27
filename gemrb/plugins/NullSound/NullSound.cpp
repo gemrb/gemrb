@@ -45,9 +45,8 @@ unsigned int NullSound::Play(const char*, int, int, unsigned int)
 	return 1000; //Returning 1 Second Length
 }
 
-int NullSound::CreateStream(SoundMgr *sound)
+int NullSound::CreateStream(Holder<SoundMgr>)
 {
-	delete sound;
 	return 0;
 }
 

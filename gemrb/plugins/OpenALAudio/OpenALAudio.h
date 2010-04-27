@@ -87,7 +87,7 @@ public:
     void ResetMusics();
     bool Play();
     bool Stop();
-    int CreateStream( SoundMgr* );
+    int CreateStream(Holder<SoundMgr>);
     void UpdateListenerPos(int XPos, int YPos );
     void GetListenerPos( int &XPos, int &YPos );
     bool ReleaseStream(int stream, bool HardStop);
@@ -104,7 +104,7 @@ private:
     bool MusicPlaying;
     SDL_mutex* musicMutex;
     ALuint MusicBuffer[MUSICBUFFERS];
-    SoundMgr* MusicReader;
+    Holder<SoundMgr> MusicReader;
     LRUCache buffercache;
     AudioStream speech;
     AudioStream streams[MAX_STREAMS];

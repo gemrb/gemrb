@@ -106,7 +106,6 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 	MusicSource = 0;
 	memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
 	musicMutex = SDL_CreateMutex();
-	MusicReader = 0;
 	ambim = NULL;
 }
 
@@ -210,8 +209,6 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	musicMutex = NULL;
 
 	free(music_memory);
-	if(MusicReader)
-		MusicReader->release();
 
 	delete ambim;
 }
@@ -239,7 +236,7 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 		return 0;
 	}
 
-	SoundMgr* acm = (SoundMgr*) gamedata->GetResource(ResRef, &SoundMgr::ID);
+	ResourceHolder<SoundMgr> acm(ResRef);
 	if (!acm) {
 		alDeleteBuffers( 1, &Buffer );
 		return 0;
@@ -256,7 +253,6 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 	time_length = ((cnt / riff_chans) * 1000) / samplerate;
 	//it is always reading the stuff into 16 bits
 	alBufferData( Buffer, GetFormatEnum( riff_chans, 16 ), memory, cnt1, samplerate );
-	acm->release();
 	free(memory);
 
 	if (checkALError("Unable to fill buffer", "ERROR")) {
@@ -472,13 +468,11 @@ bool OpenALAudioDriver::Stop()
 	return true;
 }
 
-int OpenALAudioDriver::CreateStream(SoundMgr *newMusic)
+int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
 {
 	StackLock l(musicMutex, "musicMutex in CreateStream()");
 
 	// Free old MusicReader
-	if (MusicReader)
-		MusicReader->release();
 	MusicReader = newMusic;
 	if (!MusicReader) {
 		MusicPlaying = false;
