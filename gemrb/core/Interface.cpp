@@ -244,7 +244,6 @@ Interface::Interface(int iargc, char* iargv[])
 	update_scripts = false;
 
 	gamedata = new GameData();
-	::gamedata = gamedata;
 }
 
 #define FreeInterfaceVector(type, variable, member) \

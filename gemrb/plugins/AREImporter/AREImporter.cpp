@@ -33,6 +33,7 @@
 #include "Palette.h"
 #include "ProjectileServer.h"
 #include "EffectMgr.h"
+#include "GameData.h"
 
 #define DEF_OPEN   0
 #define DEF_CLOSE  1

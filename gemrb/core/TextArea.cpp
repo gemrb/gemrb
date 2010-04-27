@@ -28,6 +28,7 @@
 #include "Audio.h"
 #include "Actor.h"
 #include "ImageMgr.h"
+#include "GameData.h"
 
 #include <stdio.h>
 #include <stdlib.h>

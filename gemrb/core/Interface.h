@@ -37,9 +37,6 @@
 #include "Cache.h"
 #include "GlobalTimer.h"
 
-// TODO: remove this header dependency
-#include "GameData.h"
-
 class Audio;
 class Video;
 class Resource;
@@ -81,6 +78,7 @@ class ProjectileServer;
 class Calendar;
 class Plugin;
 class Image;
+class GameData;
 
 struct Symbol {
 	SymbolMgr * sm;
@@ -238,7 +236,6 @@ private:
 	Video * video;
 	Audio * AudioDriver ;
 	ProjectileServer * projserv;
-	GameData * gamedata;
 	Image * pal256;
 	Image * pal32;
 	Image * pal16;

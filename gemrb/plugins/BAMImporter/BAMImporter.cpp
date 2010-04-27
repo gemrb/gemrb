@@ -25,6 +25,7 @@
 #include "FileStream.h"
 #include "Video.h"
 #include "Palette.h"
+#include "GameData.h"
 
 BAMImporter::BAMImporter(void)
 {

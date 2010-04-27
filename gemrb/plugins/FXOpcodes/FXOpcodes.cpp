@@ -33,6 +33,7 @@
 #include "TileMap.h" //needs for knock!
 #include "GSUtils.h" //needs for MoveBetweenAreasCore
 #include "Projectile.h" //needs for clearair
+#include "GameData.h"
 
 //FIXME: find a way to handle portrait icons better
 #define PI_CONFUSED  3

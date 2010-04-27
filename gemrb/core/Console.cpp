@@ -24,6 +24,7 @@
 #include "Video.h"
 #include "Palette.h"
 #include "ScriptEngine.h"
+#include "GameData.h"
 
 Console::Console(void)
 {

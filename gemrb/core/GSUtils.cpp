@@ -30,6 +30,7 @@
 #include "Map.h"
 #include "Game.h"
 #include "GameControl.h"
+#include "GameData.h"
 
 #include "strrefs.h"
 #include "defsounds.h"

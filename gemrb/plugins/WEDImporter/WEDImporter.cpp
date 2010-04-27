@@ -22,6 +22,7 @@
 #include "WEDImporter.h"
 #include "TileSetMgr.h"
 #include "Interface.h"
+#include "GameData.h"
 
 struct wed_polygon {
 	ieDword FirstVertex;

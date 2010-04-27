@@ -24,6 +24,7 @@
 #include "GSUtils.h"
 #include "Game.h"
 #include "GameControl.h"
+#include "GameData.h"
 
 //debug flags
 // 1 - cache

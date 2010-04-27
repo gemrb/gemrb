@@ -22,8 +22,6 @@
 #include "CachedFileStream.h"
 #include "Interface.h"
 
-extern Interface* core;
-
 CachedFileStream::CachedFileStream(const char* stream, bool autoFree)
 {
 	ExtractFileFromPath( filename, stream );
