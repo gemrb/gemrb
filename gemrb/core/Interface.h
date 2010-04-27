@@ -78,7 +78,6 @@ class ProjectileServer;
 class Calendar;
 class Plugin;
 class Image;
-class GameData;
 
 struct Symbol {
 	SymbolMgr * sm;
@@ -745,25 +744,9 @@ public:
 #endif
 };
 
-#ifdef GEM_BUILD_DLL
-
-#ifndef INTERFACE
-extern Interface* core;
-extern GameData* gamedata;
+extern GEM_EXPORT Interface * core;
 #ifdef WIN32
-extern HANDLE hConsole;
-#endif
-#endif
-
-#else
-#ifdef WIN32
-GEM_EXPORT Interface * core;
-GEM_EXPORT GameData * gamedata;
-GEM_EXPORT HANDLE hConsole;
-#else
-extern Interface * core;
-extern GameData * gamedata;
-#endif
+extern GEM_EXPORT HANDLE hConsole;
 #endif
 
 #endif
