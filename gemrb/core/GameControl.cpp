@@ -2840,14 +2840,12 @@ Sprite2D* GameControl::GetPortraitPreview(int pcslot)
 	if (! actor) {
 		return NULL;
 	}
-	ImageMgr* im = ( ImageMgr* )
-		gamedata->GetResource( actor->GetPortrait(true), &ImageMgr::ID );
+	ResourceHolder<ImageMgr> im(actor->GetPortrait(true));
 	if (! im) {
 		return NULL;
 	}
 
 	Sprite2D* img = im->GetSprite2D();
-	im->release();
 
 	if (ratio == 1)
 		return img;

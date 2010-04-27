@@ -254,7 +254,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	}
 
 	// Small map for MapControl
-	ImageMgr* sm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> sm(TmpResRef);
 	// small map is *optional*!
 
 	//the map state was altered, no need to hold this off for any later
@@ -267,7 +267,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 		snprintf( TmpResRef, 9, "%sLN", map->WEDResRef);
 	}
 
-	ImageMgr* lm = ( ImageMgr* ) gamedata->GetResource(TmpResRef, &ImageMgr::ID);
+	ResourceHolder<ImageMgr> lm(TmpResRef);
 	if (!lm) {
 		printf( "[AREImporter]: No lightmap available.\n" );
 		return false;
@@ -275,9 +275,6 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 
 	//alter the lightmap and the minimap (the tileset was already swapped)
 	map->ChangeTileMap(lm->GetImage(), sm?sm->GetSprite2D():NULL);
-	lm->release();
-	if (sm)
-		sm->release();
 	return true;
 }
 
@@ -344,7 +341,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	// Small map for MapControl
-	ImageMgr* sm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> sm(TmpResRef);
 	// small map is *optional*!
 
 	if (Script[0]) {
@@ -359,7 +356,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		snprintf( TmpResRef, 9, "%sLN", WEDResRef);
 	}
 
-	ImageMgr* lm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> lm(TmpResRef);
 	if (!lm) {
 		printf( "[AREImporter]: No lightmap available.\n" );
 		return false;
@@ -367,7 +364,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	snprintf( TmpResRef, 9, "%sSR", WEDResRef);
 
-	ImageMgr* sr = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> sr(TmpResRef);
 	if (!sr) {
 		printf( "[AREImporter]: No searchmap available.\n" );
 		return false;
@@ -375,18 +372,13 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	snprintf( TmpResRef, 9, "%sHT", WEDResRef);
 
-	ImageMgr* hm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> hm(TmpResRef);
 	if (!hm) {
 		printf( "[AREImporter]: No heightmap available.\n" );
 		return false;
 	}
 
 	map->AddTileMap( tm, lm->GetImage(), sr->GetBitmap(), sm ? sm->GetSprite2D() : NULL, hm->GetBitmap() );
-	lm->release();
-	sr->release();
-	if (sm)
-		sm->release();
-	hm->release();
 
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices

@@ -27,6 +27,7 @@
 #include "Video.h"
 #include "ImageWriter.h"
 #include "ImageMgr.h"
+#include "GameData.h" // For ResourceHolder
 #include <set>
 #include <algorithm>
 #include <iterator>
@@ -111,22 +112,18 @@ Sprite2D* SaveGame::GetPortrait(int index)
 	}
 	char nPath[_MAX_PATH];
 	sprintf( nPath, "PORTRT%d", index );
-	ImageMgr *im = (ImageMgr*) manager.GetResource(nPath, &ImageMgr::ID, true);
+	ResourceHolder<ImageMgr> im(nPath, manager, true);
 	if (!im)
 		return NULL;
-	Sprite2D *portrait = im->GetSprite2D();
-	im->release();
-	return portrait;
+	return im->GetSprite2D();
 }
 
 Sprite2D* SaveGame::GetPreview()
 {
-	ImageMgr *im = (ImageMgr*) manager.GetResource(Prefix, &ImageMgr::ID, true);
+	ResourceHolder<ImageMgr> im(Prefix, manager, true);
 	if (!im)
 		return NULL;
-	Sprite2D *preview = im->GetSprite2D();
-	im->release();
-	return preview;
+	return im->GetSprite2D();
 }
 
 DataStream* SaveGame::GetGame()

@@ -90,12 +90,11 @@ void WMPImporter::GetWorldMap(WorldMap *m, unsigned int index)
 	str->ReadResRef( m->MapIconResRef );
 
 	// Load map bitmap
-	ImageMgr* mos = ( ImageMgr* ) gamedata->GetResource( m->MapResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> mos(m->MapResRef);
 	if (!mos) {
 		printMessage( "WMPImporter","Worldmap image not found.\n", LIGHT_RED );
 	} else {
 		m->SetMapMOS(mos->GetSprite2D());
-		mos->release();
 	}
 
 	// Load location icon bam

@@ -704,21 +704,19 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 			return AttributeError( GemRB_LoadWindowFrame__doc );
 		}
 
-		ImageMgr* im = ( ImageMgr* ) gamedata->GetResource( ResRef[i], &ImageMgr::ID );
+		ResourceHolder<ImageMgr> im(ResRef[i]);
 		if (im == NULL) {
 			return NULL;
 		}
 
 		Sprite2D* Picture = im->GetSprite2D();
 		if (Picture == NULL) {
-			im->release();
 			return NULL;
 		}
 
 		// FIXME: delete previous WindowFrames
 		//core->WindowFrames[i] = Picture;
 		core->SetWindowFrame(i, Picture);
-		im->release();
 	}
 
 	Py_INCREF( Py_None );
@@ -762,10 +760,9 @@ static PyObject* GemRB_Window_SetPicture(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!\n");
 	}
 
-	ImageMgr* mos = ( ImageMgr* ) gamedata->GetResource( MosResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> mos(MosResRef);
 	if (mos != NULL) {
 		win->SetBackGround( mos->GetSprite2D(), true );
-		mos->release();
 	}
 	win->Invalidate();
 
@@ -2678,15 +2675,13 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 		CtrlIndex = core->GetControl( WindowIndex, LabelID );
 		Control *lc = win->GetControl( CtrlIndex );
 		map->LinkedLabel = lc;
-		ImageMgr *anim = ( ImageMgr* ) gamedata->GetResource( Flag, &ImageMgr::ID );
+		ResourceHolder<ImageMgr> anim(Flag);
 		if (anim) {
 			map->Flag[0] = anim->GetSprite2D();
-			anim->release();
 		}
-		anim = ( ImageMgr* ) gamedata->GetResource( Flag2, &ImageMgr::ID );
-		if (anim) {
-			map->Flag[1] = anim->GetSprite2D();
-			anim->release();
+		ResourceHolder<ImageMgr> anim2(Flag2);
+		if (anim2) {
+			map->Flag[1] = anim2->GetSprite2D();
 		}
 		goto setup_done;
 	}
@@ -3191,20 +3186,17 @@ static PyObject* GemRB_Button_SetMOS(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	ImageMgr* im = ( ImageMgr* ) gamedata->GetResource( ResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> im(ResRef);
 	if (im == NULL) {
 		return NULL;
 	}
 
 	Sprite2D* Picture = im->GetSprite2D();
 	if (Picture == NULL) {
-		im->release();
 		return NULL;
 	}
 
 	btn->SetPicture( Picture );
-
-	im->release();
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3243,7 +3235,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 	Sprite2D *Picture;
 	Sprite2D *Picture2=NULL;
 
-	PalettedImageMgr* im = ( PalettedImageMgr* ) gamedata->GetResource( ResRef, &PalettedImageMgr::ID );
+	ResourceHolder<PalettedImageMgr> im(ResRef);
 
 	if (im == NULL ) {
 		AnimationFactory* af = ( AnimationFactory* )
@@ -3268,7 +3260,6 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 		}
 	} else {
 		Picture = im->GetSprite2D(type, col);
-		im->release();
 		if (Picture == NULL) {
 			printf ("Picture == NULL\n");
 			return NULL;

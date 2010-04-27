@@ -1431,15 +1431,12 @@ int Interface::Init()
 
 	{
 		printMessage( "Core", "Loading Palettes...\n", WHITE );
-		ImageMgr *im =( ImageMgr * ) gamedata->GetResource( Palette16, &ImageMgr::ID );
-		pal16 = im->GetImage();
-		im->release();
-		im = ( ImageMgr * ) gamedata->GetResource( Palette32, &ImageMgr::ID );
-		pal32 = im->GetImage();
-		im->release();
-		im = ( ImageMgr * ) gamedata->GetResource( Palette256, &ImageMgr::ID );
-		pal256 = im->GetImage();
-		im->release();
+		ResourceHolder<ImageMgr> pal16im(Palette16);
+		pal16 = pal16im->GetImage();
+		ResourceHolder<ImageMgr> pal32im(Palette32);
+		pal32 = pal32im->GetImage();
+		ResourceHolder<ImageMgr> pal256im(Palette256);
+		pal256 = pal256im->GetImage();
 		printMessage( "Core", "Palettes Loaded\n", WHITE );
 	}
 
@@ -2709,11 +2706,9 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 	Window* win = new Window( WindowID, (ieWord) XPos, (ieWord) YPos, (ieWord) Width, (ieWord) Height );
 	if (Background[0]) {
 		if (IsAvailable( IE_MOS_CLASS_ID )) {
-			ImageMgr* mos = ( ImageMgr* )
-				gamedata->GetResource( Background, &ImageMgr::ID );
+			ResourceHolder<ImageMgr> mos(Background);
 			if (mos != NULL) {
 				win->SetBackGround( mos->GetSprite2D(), true );
-				mos->release();
 			} else
 				printf( "[Core]: Cannot Load BackGround, skipping\n" );
 		} else
@@ -3370,7 +3365,7 @@ bool Interface::DelSymbol(unsigned int index)
 /** Plays a Movie */
 int Interface::PlayMovie(const char* ResRef)
 {
-	MoviePlayer* mp = (MoviePlayer*) gamedata->GetResource( ResRef, &MoviePlayer::ID );
+	ResourceHolder<MoviePlayer> mp(ResRef);
 	if (!mp) {
 		return -1;
 	}
@@ -3429,7 +3424,6 @@ int Interface::PlayMovie(const char* ResRef)
 	video->SetMovieFont(SubtitleFont, palette );
 	mp->CallBackAtFrames(cnt, frames, strrefs);
 	mp->Play();
-	mp->release();
 	gamedata->FreePalette( palette );
 	if (frames)
 		free(frames);
