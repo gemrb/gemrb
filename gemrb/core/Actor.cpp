@@ -5550,7 +5550,7 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 	long ret = 0;
 	//don't close this table, it can mess with the guiscripts
 	int table = gamedata->LoadTable(resref);
-	TableMgr *tm = gamedata->GetTable(table);
+	Holder<TableMgr> tm = gamedata->GetTable(table);
 	if (tm) {
 		unsigned int row;
 		if (mcol == 0xff) {
@@ -5580,7 +5580,7 @@ static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist")
 	// carefully looking for kit by the usability flag
 	// since the barbarian kit id clashes with the no-kit value
 	if (kitindex == 0 && kit != KIT_BARBARIAN) {
-		TableMgr *tm = gamedata->GetTable(gamedata->LoadTable(resref) );
+		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref) );
 		if (tm) {
 			kitindex = tm->FindTableValue(6, kit);
 			if (kitindex < 0) {

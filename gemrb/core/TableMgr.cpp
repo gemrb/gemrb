@@ -32,12 +32,10 @@ TableMgr::~TableMgr()
 
 AutoTable::AutoTable()
 {
-	table = 0;
 }
 
 AutoTable::AutoTable(const char* ResRef)
 {
-	table = 0;
 	load(ResRef);
 }
 
@@ -52,7 +50,7 @@ AutoTable& AutoTable::operator=(const AutoTable& other)
 		tableref = other.tableref;
 		table = gamedata->GetTable(tableref);
 	} else {
-		table = 0;
+		table.release();
 	}
 	return *this;
 }
@@ -79,7 +77,7 @@ void AutoTable::release()
 {
 	if (table) {
 		gamedata->DelTable(tableref);
-		table = 0;
+		table.release();
 	}
 }
 

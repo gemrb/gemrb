@@ -222,7 +222,7 @@ static void ReadItemSounds()
 		ItemSounds = NULL;
 		return;
 	}
-	TableMgr *tab = gamedata->GetTable( table );
+	Holder<TableMgr> tab = gamedata->GetTable( table );
 	ItemSoundsCount = tab->GetRowCount();
 	ItemSounds = (ResRefPairs *) malloc( sizeof(ResRefPairs)*ItemSoundsCount);
 	for (int i = 0; i < ItemSoundsCount; i++) {
@@ -955,7 +955,7 @@ static PyObject* GemRB_Table_GetValue(PyObject * /*self*/, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
-	TableMgr* tm = gamedata->GetTable( TableIndex );
+	Holder<TableMgr> tm = gamedata->GetTable( TableIndex );
 	if (!tm) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1003,7 +1003,7 @@ static PyObject* GemRB_Table_FindValue(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_FindValue__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1023,7 +1023,7 @@ static PyObject* GemRB_Table_GetRowIndex(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_GetRowIndex__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1044,7 +1044,7 @@ static PyObject* GemRB_Table_GetRowName(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_GetRowName__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1069,7 +1069,7 @@ static PyObject* GemRB_Table_GetColumnIndex(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_GetColumnIndex__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1090,7 +1090,7 @@ static PyObject* GemRB_Table_GetColumnName(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_GetColumnName__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1114,7 +1114,7 @@ static PyObject* GemRB_Table_GetRowCount(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_GetRowCount__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1135,7 +1135,7 @@ static PyObject* GemRB_Table_GetColumnCount(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_GetColumnCount__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -4060,7 +4060,7 @@ void ReadReputation()
 		memset(ReputationDonation,0,sizeof(ReputationDonation) );
 		return;
 	}
-	TableMgr *tab = gamedata->GetTable( table );
+	Holder<TableMgr> tab = gamedata->GetTable( table );
 	for (int i = 0; i < 20; i++) {
 		ReputationIncrease[i] = atoi( tab->QueryField(i,4) );
 		ReputationDonation[i] = atoi( tab->QueryField(i,8) );
@@ -4971,7 +4971,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		MyActor->SetPortrait( Portrait2, 2);
 	}
 	int mastertable = gamedata->LoadTable( "avprefix" );
-	TableMgr* mtm = gamedata->GetTable( mastertable );
+	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
 	int count = mtm->GetRowCount();
 	if (count< 1 || count>8) {
 		return RuntimeError("Table is invalid." );
@@ -4981,7 +4981,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	for (int i = 1; i < count; i++) {
 		poi = mtm->QueryField( i );
 		int table = gamedata->LoadTable( poi );
-		TableMgr* tm = gamedata->GetTable( table );
+		Holder<TableMgr> tm = gamedata->GetTable( table );
 		int StatID = atoi( tm->QueryField() );
 		StatID = MyActor->GetBase( StatID );
 		poi = tm->QueryField( StatID );
@@ -5898,7 +5898,7 @@ static void ReadSpecialSpells()
 	SpecialSpellsCount = 0;
 	int table = gamedata->LoadTable("splspec");
 	if (table>=0) {
-		TableMgr *tab = gamedata->GetTable(table);
+		Holder<TableMgr> tab = gamedata->GetTable(table);
 		if (!tab) goto table_loaded;
 		SpecialSpellsCount = tab->GetRowCount();
 		SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
@@ -5952,7 +5952,7 @@ static void ReadUsedItems()
 	UsedItemsCount = 0;
 	int table = gamedata->LoadTable("item_use");
 	if (table>=0) {
-		TableMgr *tab = gamedata->GetTable(table);
+		Holder<TableMgr> tab = gamedata->GetTable(table);
 		if (!tab) goto table_loaded;
 		UsedItemsCount = tab->GetRowCount();
 		UsedItems = (UsedItemType *) malloc( sizeof(UsedItemType) * UsedItemsCount);
@@ -5974,7 +5974,7 @@ static void ReadSpecialItems()
 	SpecialItemsCount = 0;
 	int table = gamedata->LoadTable("itemspec");
 	if (table>=0) {
-		TableMgr *tab = gamedata->GetTable(table);
+		Holder<TableMgr> tab = gamedata->GetTable(table);
 		if (!tab) goto table_loaded;
 		SpecialItemsCount = tab->GetRowCount();
 		SpecialItems = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialItemsCount);
@@ -5996,7 +5996,7 @@ static ieStrRef GetSpellDesc(ieResRef CureResRef)
 		StoreSpellsCount = 0;
 		int table = gamedata->LoadTable("speldesc");
 		if (table>=0) {
-			TableMgr *tab = gamedata->GetTable(table);
+			Holder<TableMgr> tab = gamedata->GetTable(table);
 			if (!tab) goto table_loaded;
 			StoreSpellsCount = tab->GetRowCount();
 			StoreSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * StoreSpellsCount);
@@ -7676,7 +7676,7 @@ static void ReadActionButtons()
 	if (table<0) {
 		return;
 	}
-	TableMgr *tab = gamedata->GetTable( table );
+	Holder<TableMgr> tab = gamedata->GetTable( table );
 	for (i = 0; i < MAX_ACT_COUNT; i++) {
 		packtype row;
 

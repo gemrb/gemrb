@@ -62,18 +62,6 @@ static void ReleasePalette(void *poi)
 	((Palette *) poi)->Release();
 }
 
-// TODO: this is duplicated from Interface.cpp
-#define FreeInterfaceVector(type, variable, member) \
-{ \
-	std::vector<type>::iterator i; \
-	for(i = (variable).begin(); i != (variable).end(); ++i) { \
-	if ((*i).refcount) { \
-		(*i).member->release(); \
-		(*i).refcount = 0; \
-	} \
-	} \
-}
-
 GEM_EXPORT GameData* gamedata;
 
 GameData::GameData()
@@ -83,7 +71,6 @@ GameData::GameData()
 
 GameData::~GameData()
 {
-	FreeInterfaceVector( Table, tables, tm );
 	delete factory;
 }
 
@@ -164,13 +151,12 @@ int GameData::LoadTable(const ieResRef ResRef)
 	if (!str) {
 		return -1;
 	}
-	TableMgr* tm = ( TableMgr* ) core->GetInterface( IE_2DA_CLASS_ID );
+	PluginHolder<TableMgr> tm(IE_2DA_CLASS_ID);
 	if (!tm) {
 		delete str;
 		return -1;
 	}
 	if (!tm->Open( str, true )) {
-		tm->release();
 		return -1;
 	}
 	Table t;
@@ -203,7 +189,7 @@ int GameData::GetTableIndex(const char* ResRef) const
 	return -1;
 }
 /** Gets a Loaded Table by its index, returns NULL on error */
-TableMgr* GameData::GetTable(unsigned int index) const
+Holder<TableMgr> GameData::GetTable(unsigned int index) const
 {
 	if (index >= tables.size()) {
 		return NULL;
@@ -218,7 +204,6 @@ TableMgr* GameData::GetTable(unsigned int index) const
 bool GameData::DelTable(unsigned int index)
 {
 	if (index==0xffffffff) {
-		FreeInterfaceVector( Table, tables, tm );
 		tables.clear();
 		return true;
 	}
@@ -231,7 +216,7 @@ bool GameData::DelTable(unsigned int index)
 	tables[index].refcount--;
 	if (tables[index].refcount == 0)
 		if (tables[index].tm)
-			tables[index].tm->release();
+			tables[index].tm.release();
 	return true;
 }
 

@@ -39,7 +39,7 @@ class Actor;
 class Sprite2D;
 
 struct Table {
-	TableMgr * tm;
+	Holder<TableMgr> tm;
 	char ResRef[8];
 	unsigned int refcount;
 };
@@ -66,7 +66,7 @@ public:
 	/** Gets the index of a loaded table, returns -1 on error */
 	int GetTableIndex(const char * ResRef) const;
 	/** Gets a Loaded Table by its index, returns NULL on error */
-	TableMgr * GetTable(unsigned int index) const;
+	Holder<TableMgr> GetTable(unsigned int index) const;
 	/** Frees a Loaded Table, returns false on error, true on success */
 	bool DelTable(unsigned int index);
 
