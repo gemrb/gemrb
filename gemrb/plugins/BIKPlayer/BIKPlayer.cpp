@@ -189,11 +189,10 @@ int BIKPlayer::ReadHeader()
 	return 0;
 }
 
-bool BIKPlayer::Open(DataStream* stream, bool autoFree)
+bool BIKPlayer::Open(DataStream* stream)
 {
 	validVideo = false;
-	if (!Resource::Open(stream, autoFree))
-		return false;
+	str = stream;
 
 	str->Read( &header.signature, BIK_SIGNATURE_LEN );
 	if (memcmp( header.signature, BIK_SIGNATURE_DATA, 4 ) == 0) {

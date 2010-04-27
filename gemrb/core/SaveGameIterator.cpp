@@ -26,6 +26,7 @@
 #include "GameControl.h"
 #include "Video.h"
 #include "ImageWriter.h"
+#include "ImageMgr.h"
 #include <vector>
 #include <cassert>
 
@@ -38,8 +39,7 @@ SaveGame::SaveGame(char* path, char* name, char* prefix, int pCount, int saveID)
 	SaveID = saveID;
 	char nPath[_MAX_PATH];
 	struct stat my_stat;
-	sprintf( nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix );
-	ResolveFilePath( nPath );
+	PathJoinExt(nPath, Path, Prefix, "bmp");
 	memset(&my_stat,0,sizeof(my_stat));
 	stat( nPath, &my_stat );
 	strftime( Date, _MAX_PATH, "%c", localtime( &my_stat.st_mtime ) );
@@ -176,7 +176,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 
 	//The matcher got matched correctly.
 	char dtmp[_MAX_PATH];
-	snprintf( dtmp, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, slotname );
+	PathJoin(dtmp, Path, slotname, NULL);
 
 	struct stat fst;
 	if (stat( dtmp, &fst ))
@@ -186,19 +186,15 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 		return false;
 
 	char ftmp[_MAX_PATH];
-	snprintf( ftmp, _MAX_PATH, "%s%s%s.bmp", dtmp, SPathDelimiter,
-		 core->GameNameResRef );
+	PathJoinExt(ftmp, dtmp, core->GameNameResRef, "bmp");
 
-	ResolveFilePath( ftmp );
 	if (access( ftmp, R_OK )) {
 		printMessage("SaveGameIterator"," ",YELLOW);
 		printf("Ignoring slot %s because of no appropriate preview!\n", dtmp);
 		return false;
 	}
 
-	snprintf( ftmp, _MAX_PATH, "%s%s%s.wmp", dtmp, SPathDelimiter,
-		 core->WorldMapName );
-	ResolveFilePath( ftmp );
+	PathJoinExt(ftmp, dtmp, core->WorldMapName, "wmp");
 	if (access( ftmp, R_OK )) {
 		printMessage("SaveGameIterator"," ",YELLOW);
 		printf("Ignoring slot %s because of no appropriate worldmap!\n", dtmp);
@@ -219,9 +215,8 @@ bool SaveGameIterator::RescanSaveGames()
 	save_slots.clear();
 
 	char Path[_MAX_PATH];
-	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, SaveDir() );
+	PathJoin(Path, core->SavePath, SaveDir(), NULL);
 
-	ResolveFilePath( Path );
 	DIR* dir = opendir( Path );
 	// create the save game directory at first access
 	if (dir == NULL) {
@@ -279,8 +274,7 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 	int prtrt = 0;
 	char Path[_MAX_PATH];
 	//lets leave space for the filenames
-	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, SaveDir(),
-		 SPathDelimiter, slotname );
+	PathJoin(Path, core->SavePath, SaveDir(), slotname, NULL);
 
 	char savegameName[_MAX_PATH]={0};
 	int savegameNumber = 0;
@@ -292,7 +286,6 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 		return NULL;
 	}
 
-	ResolveFilePath( Path );
 	DIR* ndir = opendir( Path );
 	//If we cannot open the Directory
 	if (ndir == NULL) {
@@ -484,16 +477,15 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 		delete save;
 	}
 	save_slots.insert( save_slots.end(), strdup( Path ) );
-	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, SaveDir() );
+	PathJoin( Path, core->SavePath, SaveDir(), NULL );
 
 	//if the path exists in different case, don't make it again
-	ResolveFilePath( Path );
 	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
 	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
 	//keep the first part we already determined existing
-	int len = strlen(Path);
-	snprintf( Path+len, _MAX_PATH-len, "%s%09d-%s", SPathDelimiter, index, slotname );
-	ResolveFilePath( Path );
+	char dir[_MAX_PATH];
+	snprintf( dir, _MAX_PATH, "%09d-%s", index, slotname );
+	PathJoin(Path, Path, dir, NULL);
 	//this is required in case the old slot wasn't recognised but still there
 	core->DelTree(Path, false);
 	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);

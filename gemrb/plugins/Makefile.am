@@ -4,7 +4,9 @@ SUBDIRS = \
 	OpenALAudio \
 	ZLibManager \
 	2DAImporter \
-	ACMImporter \
+	ACMReader \
+	OGGReader \
+	WAVReader \
 	NullSound \
 	AREImporter \
 	BAMImporter \

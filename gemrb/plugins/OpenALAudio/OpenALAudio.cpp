@@ -231,22 +231,15 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 		time_length = e->Length;
 		return e->Buffer;
 	}
-	//no cache entry...
-	DataStream* stream = gamedata->GetResource(ResRef, IE_WAV_CLASS_ID);
-	if (!stream)
-		stream = gamedata->GetResource(ResRef, IE_OGG_CLASS_ID);
-	if (!stream)
-		return 0;
 
+	//no cache entry...
 	alGenBuffers(1, &Buffer);
 	if (checkALError("Unable to create sound buffer", "ERROR")) {
-		delete stream;
 		return 0;
 	}
 
-	SoundMgr* acm = (SoundMgr*) core->GetInterface(IE_WAV_CLASS_ID);
-	if (!acm->Open(stream)) {
-		acm->release();
+	SoundMgr* acm = (SoundMgr*) gamedata->GetResource(ResRef, &SoundMgr::ID);
+	if (!acm) {
 		alDeleteBuffers( 1, &Buffer );
 		return 0;
 	}
@@ -478,43 +471,23 @@ bool OpenALAudioDriver::Stop()
 	return true;
 }
 
-int OpenALAudioDriver::StreamFile(const char* filename)
+int OpenALAudioDriver::CreateStream(SoundMgr *newMusic)
 {
-	char path[_MAX_PATH];
-
-	strcpy( path, core->GamePath );
-	strcpy( path, filename );
-	FileStream* str = new FileStream();
-	if (!str->Open( path, true )) {
-		delete str;
-		printMessage("OpenAL", "",WHITE);
-		printf( "Cannot find %s", path );
-		printStatus("NOT FOUND", YELLOW );
-		return -1;
-	}
 	StackLock l(musicMutex, "musicMutex in CreateStream()");
 
 	// Free old MusicReader
 	if (MusicReader)
 		MusicReader->release();
-	MusicReader = NULL;
+	MusicReader = newMusic;
+	if (!MusicReader) {
+		MusicPlaying = false;
+	}
 
 	if (MusicBuffer[0] == 0) {
 		alGenBuffers( MUSICBUFFERS, MusicBuffer );
 		if (checkALError("Unable to create music buffers", "ERROR")) {
 			return -1;
 		}
-	}
-
-	MusicReader = (SoundMgr*) core->GetInterface( IE_WAV_CLASS_ID );
-	if (!MusicReader->Open(str, true)) {
-		delete str;
-		MusicReader->release();
-		MusicReader = NULL;
-		MusicPlaying = false;
-		printMessage("OpenAL", "",WHITE);
-		printf( "Cannot open %s", path );
-		printStatus("ERROR", YELLOW );
 	}
 
 	if (MusicSource == 0) {

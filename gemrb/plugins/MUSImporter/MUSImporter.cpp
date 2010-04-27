@@ -22,6 +22,7 @@
 #include "MUSImporter.h"
 #include "Interface.h"
 #include "Audio.h"
+#include "SoundMgr.h"
 
 static char musicsubfolder[6] = "music";
 
@@ -33,6 +34,9 @@ MUSImporter::MUSImporter()
 	PLpos = 0;
 	PLName[0] = '\0';
 	lastSound = 0xffffffff;
+	char path[_MAX_PATH];
+	PathJoin(path, core->GamePath, musicsubfolder, NULL);
+	manager.AddSource(path, "Music", PLUGIN_RESOURCE_DIRECTORY);
 }
 
 MUSImporter::~MUSImporter()
@@ -65,13 +69,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 		return false;
 	}
 	char path[_MAX_PATH];
-	strcpy( path, core->GamePath );
-	strcat( path, musicsubfolder );
-	strcat( path, SPathDelimiter );
-	strcat( path, name );
-#ifndef WIN32
-	ResolveFilePath( path );
-#endif
+	PathJoin(path, core->GamePath, musicsubfolder, name, NULL);
 	printMessage("MUSImporter", "", WHITE);
 	printf( "Loading %s...", path );
 	if (!str->Open( path, true )) {
@@ -262,9 +260,9 @@ void MUSImporter::PlayNext()
 				PLnext = -1;
 			else
 				PLnext = PLpos + 1;
-				if ((unsigned int) PLnext >= playlist.size() ) {
-					PLnext = 0;
-				}
+			if ((unsigned int) PLnext >= playlist.size() ) {
+				PLnext = 0;
+			}
 		}
 	} else {
 		Playing = false;
@@ -281,28 +279,23 @@ void MUSImporter::PlayMusic(char* name)
 {
 	char FName[_MAX_PATH];
 	if (strnicmp( name, "mx9000", 6 ) == 0) { //iwd2
-		snprintf( FName, _MAX_PATH, "%s%s%smx9000%s%s.acm",
-			core->GamePath, musicsubfolder, SPathDelimiter,
-			SPathDelimiter, name);
+		PathJoin(FName, "mx9000", name, NULL);
 	} else if (strnicmp( name, "mx0000", 6 ) == 0) { //iwd
-		snprintf( FName, _MAX_PATH, "%s%s%smx0000%s%s.acm",
-			core->GamePath, musicsubfolder, SPathDelimiter,
-			SPathDelimiter, name);
+		PathJoin(FName, "mx0000", name, NULL);
 	} else if (strnicmp( name, "SPC", 3 ) != 0) { //bg2
-		snprintf( FName, _MAX_PATH, "%s%s%s%s%s%s%s.acm",
-			core->GamePath, musicsubfolder, SPathDelimiter,
-			PLName, SPathDelimiter, PLName, name);
+		char File[_MAX_PATH];
+		snprintf(File, _MAX_PATH, "%s%s", PLName, name);
+		PathJoin(FName, PLName, File, NULL);
+	} else {
+		strncpy(FName, name, _MAX_PATH);
 	}
-	else {
-		snprintf(FName, _MAX_PATH, "%s%s%s%s.acm",
-			core->GamePath, musicsubfolder, SPathDelimiter,
-			name);
-	}
-#ifndef WIN32
-		ResolveFilePath( FName );
-#endif
-	int soundID = core->GetAudioDrv()->StreamFile( FName );
-	if (soundID == -1) {
+
+	if (SoundMgr* sound = (SoundMgr*) manager.GetResource(FName, &SoundMgr::ID)) {
+		int soundID = core->GetAudioDrv()->CreateStream( sound );
+		if (soundID == -1) {
+			core->GetAudioDrv()->Stop();
+		}
+	} else {
 		core->GetAudioDrv()->Stop();
 	}
 	printf( "Playing: %s\n", FName );

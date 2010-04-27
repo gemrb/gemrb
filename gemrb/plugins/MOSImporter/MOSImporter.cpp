@@ -44,10 +44,8 @@ MOSImporter::~MOSImporter(void)
 {
 }
 
-bool MOSImporter::Open(DataStream* stream, bool autoFree)
+bool MOSImporter::Open(DataStream* stream)
 {
-	if (!Resource::Open(stream, autoFree))
-		return false;
 	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
@@ -58,8 +56,7 @@ bool MOSImporter::Open(DataStream* stream, bool autoFree)
 		FILE* exist_in_cache = fopen( cpath, "rb" );
 		if (exist_in_cache) {
 			//File was previously cached, using local copy
-			if (autoFree)
-				delete( str );
+			delete( str );
 			fclose( exist_in_cache );
 			FileStream* s = new FileStream();
 			s->Open( cpath );
@@ -79,8 +76,7 @@ bool MOSImporter::Open(DataStream* stream, bool autoFree)
 			comp->Decompress( newfile, str );
 			comp->release();
 			fclose( newfile );
-			if (autoFree)
-				delete( str );
+			delete( str );
 			FileStream* s = new FileStream();
 			s->Open( cpath );
 			str = s;

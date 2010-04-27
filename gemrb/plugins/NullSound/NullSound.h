@@ -29,7 +29,7 @@ public:
 	~NullSound(void);
 	bool Init(void);
 	unsigned int Play(const char* ResRef, int XPos = 0, int YPos = 0,  unsigned int flags = GEM_SND_RELATIVE);
-	int StreamFile(const char* filename);
+	int CreateStream(SoundMgr*);
 	bool Play();
 	bool Stop();
 	bool CanPlay();

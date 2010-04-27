@@ -51,10 +51,9 @@ MVEPlay::~MVEPlay(void)
 {
 }
 
-bool MVEPlay::Open(DataStream* stream, bool autoFree)
+bool MVEPlay::Open(DataStream* stream)
 {
-	if (!Resource::Open(stream,autoFree))
-		return false;
+	str = stream;
 	validVideo = false;
 
 	char Signature[MVE_SIGNATURE_LEN];

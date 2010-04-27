@@ -118,7 +118,6 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 		char nPath[_MAX_PATH], fName[16];
 		snprintf( fName, sizeof(fName), "%s.chr", ResRef);
 		PathJoin( nPath, core->GamePath, "characters", fName, NULL );
-		ResolveFilePath( nPath );
 		FileStream *fs = new FileStream();
 		fs -> Open( nPath, true );
 		stream = (DataStream *) fs;

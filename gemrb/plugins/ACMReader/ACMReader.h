@@ -14,46 +14,62 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- *
  */
 
-#ifndef ACMIMP_H
-#define ACMIMP_H
+#ifndef ACMREADER_H
+#define ACMREADER_H
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "readers.h"
+#include "unpacker.h"
+#include "decoder.h"
+#include "general.h"
 #include "DataStream.h"
 #include "SoundMgr.h"
 
-#ifdef HAS_VORBIS_SUPPORT
-#include <vorbis/vorbisfile.h>
-#endif
-
-#define INIT_NO_ERROR_MSG 0
-#define INIT_NEED_ERROR_MSG 1
-
-// Abstract Sound Reader class
-class ACMImp : public SoundMgr {
+// IP's ACM files
+class ACMReader : public SoundMgr {
 private:
-	CSoundReader* SoundReader ;
+	int samples_left; // count of unread samples
+	int levels, subblocks;
+	int block_size;
+	int* block, * values;
+	int samples_ready;
+	CValueUnpacker* unpacker; // ACM-stream unpacker
+	CSubbandDecoder* decoder; // IP's subband decoder
 
+	int make_new_samples();
 public:
-    ACMImp() ;
-    ~ACMImp() ;
-    void release()
-    {
-        delete this ;
-    }
-    bool Open(DataStream* stream, bool autofree );
-    int get_length() ;
-    int get_channels() ;
-    int get_samplerate() ;
-    int read_samples(short* memory, int cnt) ;
-    void rewind(void) ;
+	ACMReader()
+		: samples_left( 0 ), block( NULL ), values( NULL ),
+		samples_ready( 0 ), unpacker( NULL ), decoder( NULL )
+	{
+	}
+	virtual ~ACMReader()
+	{
+		Close();
+	}
+	void Close()
+	{
+		if (block) {
+			free(block);
+		}
+		if (unpacker) {
+			delete unpacker;
+		}
+		if (decoder) {
+			delete decoder;
+		}
+	}
+
+	bool Open(DataStream* stream);
+	virtual int read_samples(short* buffer, int count);
+public:
+	void release()
+	{
+		delete this;
+	}
 };
 
-#endif //ACMIMP_H
-
+#endif

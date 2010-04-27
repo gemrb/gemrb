@@ -37,7 +37,6 @@ public:
 public:
 	PalettedImageMgr(void);
 	virtual ~PalettedImageMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	/**
 	 * Returns a @ref{Sprite2D} that has been colored with the given palette.
 	 *

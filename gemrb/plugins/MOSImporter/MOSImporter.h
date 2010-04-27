@@ -30,7 +30,7 @@ private:
 public:
 	MOSImporter(void);
 	~MOSImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	Sprite2D* GetSprite2D();
 	int GetWidth() { return (int) Width; }
 	int GetHeight() { return (int) Height; }

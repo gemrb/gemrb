@@ -25,23 +25,11 @@
 Resource::Resource(void)
 {
 	str = NULL;
-	autoFree = false;
 }
 
 Resource::~Resource(void)
 {
-	if (str && autoFree) {
+	if (str) {
 		delete( str );
 	}
-}
-
-bool Resource::Open(DataStream * stream, bool autoFree)
-{
-	if (stream == NULL)
-		return false;
-	if (str && str != stream && this->autoFree)
-		delete( str );
-	str = stream;
-	this->autoFree = autoFree;
-	return true;
 }
