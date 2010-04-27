@@ -3011,7 +3011,7 @@ void Actor::Die(Scriptable *killer)
 		value = 0;
 		int racetable = core->LoadSymbol("race");
 		if (racetable != -1) {
-			SymbolMgr *race = core->GetSymbol(racetable);
+			Holder<SymbolMgr> race = core->GetSymbol(racetable);
 			const char *raceName = race->GetValue(Modified[IE_RACE]);
 			if (raceName) {
 				// todo: should probably not set this for humans in iwd?

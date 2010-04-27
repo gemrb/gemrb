@@ -213,7 +213,6 @@ bool Init_EffectQueue()
 	if( initialized) {
 		return true;
 	}
-	SymbolMgr* effectsTable;
 	memset( effect_refs, 0, sizeof( effect_refs ) );
 	for(i=0;i<MAX_EFFECTS;i++) {
 		effect_refs[i].EffText=-1;
@@ -228,7 +227,7 @@ bool Init_EffectQueue()
 		printMessage( "EffectQueue","A critical scripting file is missing!\n",LIGHT_RED );
 		return false;
 	}
-	effectsTable = core->GetSymbol( eT );
+	Holder<SymbolMgr> effectsTable = core->GetSymbol( eT );
 	if( !effectsTable) {
 		printMessage( "EffectQueue","A critical scripting file is damaged!\n",LIGHT_RED );
 		return false;

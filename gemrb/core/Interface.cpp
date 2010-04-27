@@ -240,18 +240,6 @@ Interface::Interface(int iargc, char* iargv[])
 	gamedata = new GameData();
 }
 
-#define FreeInterfaceVector(type, variable, member) \
-{ \
-	std::vector<type>::iterator i; \
-	for(i = (variable).begin(); i != (variable).end(); ++i) { \
-	if (!(*i).free) { \
-		if (i->member) \
-			(*i).member->release(); \
-		(*i).free = true; \
-	} \
-	} \
-}
-
 #define FreeResourceVector(type, variable) \
 { \
 	size_t i=variable.size(); \
@@ -438,8 +426,6 @@ Interface::~Interface(void)
 		ItemTooltipTable->RemoveAll(ReleaseItemTooltip);
 		delete ItemTooltipTable;
 	}
-
-	FreeInterfaceVector( Symbol, symbols, sm );
 
 	Map::ReleaseMemory();
 	Actor::ReleaseMemory();
@@ -3284,22 +3270,20 @@ int Interface::LoadSymbol(const char* ResRef)
 	if (!str) {
 		return -1;
 	}
-	SymbolMgr* sm = ( SymbolMgr* ) GetInterface( IE_IDS_CLASS_ID );
+	PluginHolder<SymbolMgr> sm(IE_IDS_CLASS_ID);
 	if (!sm) {
 		delete str;
 		return -1;
 	}
 	if (!sm->Open( str, true )) {
-		sm->release();
 		return -1;
 	}
 	Symbol s;
-	s.free = false;
 	strncpy( s.ResRef, ResRef, 8 );
 	s.sm = sm;
 	ind = -1;
 	for (size_t i = 0; i < symbols.size(); i++) {
-		if (symbols[i].free) {
+		if (!symbols[i].sm) {
 			ind = ( int ) i;
 			break;
 		}
@@ -3315,7 +3299,7 @@ int Interface::LoadSymbol(const char* ResRef)
 int Interface::GetSymbolIndex(const char* ResRef) const
 {
 	for (size_t i = 0; i < symbols.size(); i++) {
-		if (symbols[i].free)
+		if (!symbols[i].sm)
 			continue;
 		if (strnicmp( symbols[i].ResRef, ResRef, 8 ) == 0)
 			return ( int ) i;
@@ -3323,13 +3307,13 @@ int Interface::GetSymbolIndex(const char* ResRef) const
 	return -1;
 }
 /** Gets a Loaded Symbol Table by its index, returns NULL on error */
-SymbolMgr* Interface::GetSymbol(unsigned int index) const
+Holder<SymbolMgr> Interface::GetSymbol(unsigned int index) const
 {
 	if (index >= symbols.size()) {
-		return NULL;
+		return Holder<SymbolMgr>();
 	}
-	if (symbols[index].free) {
-		return NULL;
+	if (!symbols[index].sm) {
+		return Holder<SymbolMgr>();
 	}
 	return symbols[index].sm;
 }
@@ -3339,12 +3323,10 @@ bool Interface::DelSymbol(unsigned int index)
 	if (index >= symbols.size()) {
 		return false;
 	}
-	if (symbols[index].free) {
+	if (!symbols[index].sm) {
 		return false;
 	}
-	if (symbols[index].sm)
-		symbols[index].sm->release();
-	symbols[index].free = true;
+	symbols[index].sm.release();
 	return true;
 }
 /** Plays a Movie */
@@ -5250,7 +5232,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	}
 
 	int symbol = LoadSymbol( "stats" );
-	SymbolMgr *sym = GetSymbol( symbol );
+	Holder<SymbolMgr> sym = GetSymbol( symbol );
 	ieDword stat = (ieDword) sym->GetValue( stat_name );
 	if (stat==(ieDword) ~0) {
 		printMessage("Core"," ",YELLOW);

@@ -36,9 +36,9 @@
 #include "defsounds.h"
 
 //these tables will get freed by Core
-SymbolMgr* triggersTable;
-SymbolMgr* actionsTable;
-SymbolMgr* objectsTable;
+Holder<SymbolMgr> triggersTable;
+Holder<SymbolMgr> actionsTable;
+Holder<SymbolMgr> objectsTable;
 TriggerFunction triggers[MAX_TRIGGERS];
 ActionFunction actions[MAX_ACTIONS];
 short actionflags[MAX_ACTIONS];
@@ -1594,7 +1594,7 @@ inline bool ismysymbol(const char letter)
 static int GetIdsValue(const char *&symbol, const char *idsname)
 {
 	int idsfile=core->LoadSymbol(idsname);
-	SymbolMgr *valHook = core->GetSymbol(idsfile);
+	Holder<SymbolMgr> valHook = core->GetSymbol(idsfile);
 	if (!valHook) {
 		//FIXME:missing ids file!!!
 		if (InDebug&ID_TRIGGERS) {

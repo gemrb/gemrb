@@ -82,9 +82,8 @@ class Image;
 class SaveGame;
 
 struct Symbol {
-	SymbolMgr * sm;
+	Holder<SymbolMgr> sm;
 	char ResRef[8];
-	bool free;
 };
 
 struct SlotType {
@@ -459,7 +458,7 @@ public:
 	/** Gets the index of a loaded Symbol Table, returns -1 on error */
 	int GetSymbolIndex(const char * ResRef) const;
 	/** Gets a Loaded Symbol Table by its index, returns NULL on error */
-	SymbolMgr * GetSymbol(unsigned int index) const;
+	Holder<SymbolMgr> GetSymbol(unsigned int index) const;
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */
 	bool DelSymbol(unsigned int index);
 	/** Plays a Movie */

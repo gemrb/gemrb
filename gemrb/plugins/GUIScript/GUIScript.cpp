@@ -1200,7 +1200,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
 		long SymbolIndex = PyInt_AsLong( si );
 		if (PyObject_TypeCheck( sym, &PyString_Type )) {
 			char* syms = PyString_AsString( sym );
-			SymbolMgr* sm = core->GetSymbol( SymbolIndex );
+			Holder<SymbolMgr> sm = core->GetSymbol( SymbolIndex );
 			if (!sm)
 				return NULL;
 			long val = sm->GetValue( syms );
@@ -1208,7 +1208,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
 		}
 		if (PyObject_TypeCheck( sym, &PyInt_Type )) {
 			long symi = PyInt_AsLong( sym );
-			SymbolMgr* sm = core->GetSymbol( SymbolIndex );
+			Holder<SymbolMgr> sm = core->GetSymbol( SymbolIndex );
 			if (!sm)
 				return NULL;
 			const char* str = sm->GetValue( symi );
