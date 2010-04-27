@@ -47,9 +47,9 @@ PLTImporter::~PLTImporter(void)
 	}
 }
 
-bool PLTImporter::Open(DataStream* stream, bool autoFree)
+bool PLTImporter::Open(DataStream* stream)
 {
-	if (!Resource::Open(stream, autoFree))
+	if (!Resource::Open(stream))
 		return false;
 
 	char Signature[8];

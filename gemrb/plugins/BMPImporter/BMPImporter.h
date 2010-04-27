@@ -41,7 +41,7 @@ private:
 public:
 	BMPImporter(void);
 	~BMPImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	Sprite2D* GetSprite2D();
 	virtual Bitmap* GetBitmap();
 	void GetPalette(int colors, Color* pal);

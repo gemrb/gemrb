@@ -52,9 +52,9 @@ const unsigned char data_4cc[] = {
 	'd', 'a', 't', 'a'
 };
 
-bool RawPCMReader::Open(DataStream* stream, bool autoFree)
+bool RawPCMReader::Open(DataStream* stream)
 {
-	if (!Resource::Open(stream, autoFree))
+	if (!Resource::Open(stream))
 		return false;
 
 	samples = str->Size();
@@ -106,9 +106,9 @@ int RawPCMReader::read_samples(short* buffer, int count)
 	return res;
 }
 
-bool WavPCMReader::Open(DataStream* stream, bool autoFree)
+bool WavPCMReader::Open(DataStream* stream)
 {
-	if (!RawPCMReader::Open(stream, autoFree))
+	if (!RawPCMReader::Open(stream))
 		return false;
 
 	char Signature[4];

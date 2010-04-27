@@ -30,7 +30,7 @@ private:
 public:
 	PLTImporter(void);
 	~PLTImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	Sprite2D* GetSprite2D(unsigned int type, ieDword col[8]);
 public:
 	void release(void)

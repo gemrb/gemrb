@@ -19,9 +19,9 @@
 #include "ACMReader.h"
 #include "general.h"
 
-bool ACMReader::Open(DataStream* stream, bool autoFree)
+bool ACMReader::Open(DataStream* stream)
 {
-	if (!Resource::Open(stream, autoFree))
+	if (!Resource::Open(stream))
 		return false;
 	Close();
 

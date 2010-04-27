@@ -47,7 +47,7 @@ private:
 public:
 	MVEPlay(void);
 	~MVEPlay(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	void CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2);
 	int Play();
 

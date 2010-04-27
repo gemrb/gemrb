@@ -65,9 +65,9 @@ static long ovfd_tell(void *datasource) {
 	return (long) vb->GetPos();
 }
 
-bool OGGReader::Open(DataStream* stream, bool autoFree)
+bool OGGReader::Open(DataStream* stream)
 {
-	if (!Resource::Open(stream, autoFree))
+	if (!Resource::Open(stream))
 		return false;
 	Close();
 

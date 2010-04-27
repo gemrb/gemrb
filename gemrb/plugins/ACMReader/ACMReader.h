@@ -63,7 +63,7 @@ public:
 		}
 	}
 
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	virtual int read_samples(short* buffer, int count);
 public:
 	void release()

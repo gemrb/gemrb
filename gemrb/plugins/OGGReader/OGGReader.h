@@ -45,7 +45,7 @@ public:
 	{
 		ov_clear(&OggStream);
 	}
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	int read_samples(short* buffer, int count);
 public:
 	void release(void)

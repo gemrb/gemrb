@@ -39,7 +39,6 @@ class DataStream;
 class GEM_EXPORT Resource : public Plugin {
 protected:
 	DataStream* str;
-	bool autoFree;
 public:
 	Resource();
 	virtual ~Resource();
@@ -48,11 +47,10 @@ public:
 	 *
 	 * This should only be called once for a given resource object.
 	 * @param[in] stream Stream containg the resource
-	 * @param[in] autoFree If set to true, the resource deletes the stream on destruction.
 	 * @retval true stream contains the given resource.
 	 * @retval false stream does not contain valid resource.
 	 */
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream) = 0;
 };
 
 #endif

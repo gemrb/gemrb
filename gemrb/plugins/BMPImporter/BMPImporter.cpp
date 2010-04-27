@@ -47,9 +47,9 @@ BMPImporter::~BMPImporter(void)
 	free( pixels );
 }
 
-bool BMPImporter::Open(DataStream* stream, bool autoFree)
+bool BMPImporter::Open(DataStream* stream)
 {
-	if (!Resource::Open(stream, autoFree))
+	if (!Resource::Open(stream))
 		return false;
 	//we release the previous pixel data
 	free( pixels );
@@ -57,8 +57,6 @@ bool BMPImporter::Open(DataStream* stream, bool autoFree)
 	free( Palette );
 	Palette = NULL;
 
-	str = stream;
-	this->autoFree = autoFree;
 	//BITMAPFILEHEADER
 	char Signature[2];
 	ieDword FileSize, DataOffset;
