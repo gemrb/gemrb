@@ -32,18 +32,12 @@ ResourceManager::ResourceManager()
 
 ResourceManager::~ResourceManager()
 {
-	std::vector<ResourceSource*>::iterator i;
-	for (i = searchPath.begin(); i != searchPath.end(); ++i) {
-		if (*i)
-			(*i)->release();
-	}
 }
 
 bool ResourceManager::AddSource(const char *path, const char *description, PluginID type)
 {
-	ResourceSource *source = ( ResourceSource * ) core->GetInterface( type );
+	PluginHolder<ResourceSource> source(type);
 	if (!source->Open(path, description)) {
-		source->release();
 		return false;
 	}
 	searchPath.push_back(source);
