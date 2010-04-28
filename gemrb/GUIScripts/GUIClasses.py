@@ -17,7 +17,7 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
-import GemRB
+import _GemRB
 
 from MetaClasses import metaIDWrapper, metaControl
 #from exceptions import RuntimeError
@@ -25,159 +25,159 @@ from MetaClasses import metaIDWrapper, metaControl
 class GTable:
   __metaclass__ = metaIDWrapper
   methods = {
-    'GetValue': GemRB.GetTableValue,
-    'FindValue': GemRB.FindTableValue,
-    'GetRowIndex': GemRB.GetTableRowIndex,
-    'GetRowName': GemRB.GetTableRowName,
-    'GetColumnIndex': GemRB.GetTableColumnIndex,
-    'GetColumnName': GemRB.GetTableColumnName,
-    'GetRowCount': GemRB.GetTableRowCount,
-    'GetColumnCount': GemRB.GetTableColumnCount
+    'GetValue': _GemRB.GetTableValue,
+    'FindValue': _GemRB.FindTableValue,
+    'GetRowIndex': _GemRB.GetTableRowIndex,
+    'GetRowName': _GemRB.GetTableRowName,
+    'GetColumnIndex': _GemRB.GetTableColumnIndex,
+    'GetColumnName': _GemRB.GetTableColumnName,
+    'GetRowCount': _GemRB.GetTableRowCount,
+    'GetColumnCount': _GemRB.GetTableColumnCount
   }
   def __del__(self):
-    # don't unload tables if the GemRB module is already unloaded at exit
-    if self.ID != -1 and GemRB:
-      GemRB.UnloadTable(self.ID)
+    # don't unload tables if the _GemRB module is already unloaded at exit
+    if self.ID != -1 and _GemRB:
+      _GemRB.UnloadTable(self.ID)
   def __nonzero__(self):
     return self.ID != -1
 
 class GSymbol:
   __metaclass__ = metaIDWrapper
   methods = {
-    'GetValue': GemRB.GetSymbolValue,
-    'Unload': GemRB.UnloadSymbol
+    'GetValue': _GemRB.GetSymbolValue,
+    'Unload': _GemRB.UnloadSymbol
   }
 
 class GWindow:
   __metaclass__ = metaIDWrapper
   methods = {
-    'SetSize': GemRB.SetWindowSize,
-    'SetFrame': GemRB.SetWindowFrame,
-    'SetPicture': GemRB.SetWindowPicture,
-    'SetPos': GemRB.SetWindowPos,
-    'HasControl': GemRB.HasControl,
-    'DeleteControl': GemRB.DeleteControl,
-    'Unload': GemRB.UnloadWindow,
-    'SetupEquipmentIcons': GemRB.SetupEquipmentIcons,
-    'SetupSpellIcons': GemRB.SetupSpellIcons,
-    'SetupControls': GemRB.SetupControls,
-    'SetVisible': GemRB.SetVisible,
-    'ShowModal': GemRB.ShowModal,
-    'Invalidate': GemRB.InvalidateWindow
+    'SetSize': _GemRB.SetWindowSize,
+    'SetFrame': _GemRB.SetWindowFrame,
+    'SetPicture': _GemRB.SetWindowPicture,
+    'SetPos': _GemRB.SetWindowPos,
+    'HasControl': _GemRB.HasControl,
+    'DeleteControl': _GemRB.DeleteControl,
+    'Unload': _GemRB.UnloadWindow,
+    'SetupEquipmentIcons': _GemRB.SetupEquipmentIcons,
+    'SetupSpellIcons': _GemRB.SetupSpellIcons,
+    'SetupControls': _GemRB.SetupControls,
+    'SetVisible': _GemRB.SetVisible,
+    'ShowModal': _GemRB.ShowModal,
+    'Invalidate': _GemRB.InvalidateWindow
   }
   def GetControl(self, control):
-    return GemRB.GetControlObject(self.ID, control)
+    return _GemRB.GetControlObject(self.ID, control)
   def CreateWorldMapControl(self, control, *args):
-    GemRB.CreateWorldMapControl(self.ID, control, *args)
-    return GemRB.GetControlObject(self.ID, control)
+    _GemRB.CreateWorldMapControl(self.ID, control, *args)
+    return _GemRB.GetControlObject(self.ID, control)
   def CreateMapControl(self, control, *args):
-    GemRB.CreateMapControl(self.ID, control, *args)
-    return GemRB.GetControlObject(self.ID, control)
+    _GemRB.CreateMapControl(self.ID, control, *args)
+    return _GemRB.GetControlObject(self.ID, control)
   def CreateLabel(self, control, *args):
-    GemRB.CreateLabel(self.ID, control, *args)
-    return GemRB.GetControlObject(self.ID, control)
+    _GemRB.CreateLabel(self.ID, control, *args)
+    return _GemRB.GetControlObject(self.ID, control)
   def CreateButton(self, control, *args):
-    GemRB.CreateButton(self.ID, control, *args)
-    return GemRB.GetControlObject(self.ID, control)
+    _GemRB.CreateButton(self.ID, control, *args)
+    return _GemRB.GetControlObject(self.ID, control)
   def CreateScrollBar(self, control, *args):
-    GemRB.CreateScrollBar(self.ID, control, *args)
-    return GemRB.GetControlObject(self.ID, control)
+    _GemRB.CreateScrollBar(self.ID, control, *args)
+    return _GemRB.GetControlObject(self.ID, control)
   def CreateTextEdit(self, control, *args):
-    GemRB.CreateTextEdit(self.ID, control, *args)
-    return GemRB.GetControlObject(self.ID, control)
+    _GemRB.CreateTextEdit(self.ID, control, *args)
+    return _GemRB.GetControlObject(self.ID, control)
  
 
 class GControl:
   __metaclass__ = metaControl
   methods = {
-    'SetVarAssoc': GemRB.SetVarAssoc,
-    'SetPos': GemRB.SetControlPos,
-    'SetSize': GemRB.SetControlSize,
-    'SetAnimationPalette': GemRB.SetAnimationPalette,
-    'SetAnimation': GemRB.SetAnimation,
-    'QueryText': GemRB.QueryText,
-    'SetText': GemRB.SetText,
-    'SetTooltip': GemRB.SetTooltip,
-    'SetEvent': GemRB.SetEvent,
-    'SetStatus': GemRB.SetControlStatus,
+    'SetVarAssoc': _GemRB.SetVarAssoc,
+    'SetPos': _GemRB.SetControlPos,
+    'SetSize': _GemRB.SetControlSize,
+    'SetAnimationPalette': _GemRB.SetAnimationPalette,
+    'SetAnimation': _GemRB.SetAnimation,
+    'QueryText': _GemRB.QueryText,
+    'SetText': _GemRB.SetText,
+    'SetTooltip': _GemRB.SetTooltip,
+    'SetEvent': _GemRB.SetEvent,
+    'SetStatus': _GemRB.SetControlStatus,
   }
   def AttachScrollBar(self, scrollbar):
     if self.WinID != scrollbar.WinID:
       raise RuntimeError, "Scrollbar must be in same Window as Control"
-    return GemRB.AttachScrollBar(self.WinID, self.ID, scrollbar.ID)
+    return _GemRB.AttachScrollBar(self.WinID, self.ID, scrollbar.ID)
 
 class GLabel(GControl):
   __metaclass__ = metaControl
   methods = {
-    'SetTextColor': GemRB.SetLabelTextColor,
-    'SetUseRGB': GemRB.SetLabelUseRGB
+    'SetTextColor': _GemRB.SetLabelTextColor,
+    'SetUseRGB': _GemRB.SetLabelUseRGB
   }
 
 class GTextArea(GControl):
   __metaclass__ = metaControl
   methods = {
-    'Rewind': GemRB.RewindTA,
-    'SetHistory': GemRB.SetTAHistory,
-    'Append': GemRB.TextAreaAppend,
-    'Clear': GemRB.TextAreaClear,
-    'Scroll': GemRB.TextAreaScroll,
-    'SetFlags': GemRB.SetTextAreaFlags,
-    'GetCharSounds': GemRB.GetCharSounds,
-    'GetCharacters': GemRB.GetCharacters,
-    'GetPortraits': GemRB.GetPortraits
+    'Rewind': _GemRB.RewindTA,
+    'SetHistory': _GemRB.SetTAHistory,
+    'Append': _GemRB.TextAreaAppend,
+    'Clear': _GemRB.TextAreaClear,
+    'Scroll': _GemRB.TextAreaScroll,
+    'SetFlags': _GemRB.SetTextAreaFlags,
+    'GetCharSounds': _GemRB.GetCharSounds,
+    'GetCharacters': _GemRB.GetCharacters,
+    'GetPortraits': _GemRB.GetPortraits
   }
   def MoveText(self, other):
-    GemRB.MoveTAText(self.WinID, self.ID, other.WinID, other.ID)
+    _GemRB.MoveTAText(self.WinID, self.ID, other.WinID, other.ID)
 
 class GTextEdit(GControl):
   __metaclass__ = metaControl
   methods = {
-    'SetBufferLength': GemRB.SetBufferLength
+    'SetBufferLength': _GemRB.SetBufferLength
   }
   def ConvertEdit(self, ScrollBarID):
-    newID = GemRB.ConvertEdit(self.WinID, self.ID, ScrollBarID)
-    return GemRB.GetControlObject(self.WinID, newID)
+    newID = _GemRB.ConvertEdit(self.WinID, self.ID, ScrollBarID)
+    return _GemRB.GetControlObject(self.WinID, newID)
 
 class GScrollBar(GControl):
   __metaclass__ = metaControl
   methods = {
-    'SetDefaultScrollBar': GemRB.SetDefaultScrollBar,
-    'SetSprites': GemRB.SetScrollBarSprites
+    'SetDefaultScrollBar': _GemRB.SetDefaultScrollBar,
+    'SetSprites': _GemRB.SetScrollBarSprites
   }
 
 class GButton(GControl):
   __metaclass__ = metaControl
   methods = {
-    'SetSprites': GemRB.SetButtonSprites,
-    'SetOverlay': GemRB.SetButtonOverlay,
-    'SetBorder': GemRB.SetButtonBorder,
-    'EnableBorder': GemRB.EnableButtonBorder,
-    'SetFont': GemRB.SetButtonFont,
-    'SetTextColor': GemRB.SetButtonTextColor,
-    'SetFlags': GemRB.SetButtonFlags,
-    'SetState': GemRB.SetButtonState,
-    'SetPictureClipping': GemRB.SetButtonPictureClipping,
-    'SetPicture': GemRB.SetButtonPicture,
-    'SetMOS': GemRB.SetButtonMOS,
-    'SetPLT': GemRB.SetButtonPLT,
-    'SetBAM': GemRB.SetButtonBAM,
-    'SetSaveGamePortrait': GemRB.SetSaveGamePortrait,
-    'SetSaveGamePreview': GemRB.SetSaveGamePreview,
-    'SetGamePreview': GemRB.SetGamePreview,
-    'SetGamePortraitPreview': GemRB.SetGamePortraitPreview,
-    'SetSpellIcon': GemRB.SetSpellIcon,
-    'SetItemIcon': GemRB.SetItemIcon,
-    'SetActionIcon': GemRB.SetActionIcon
+    'SetSprites': _GemRB.SetButtonSprites,
+    'SetOverlay': _GemRB.SetButtonOverlay,
+    'SetBorder': _GemRB.SetButtonBorder,
+    'EnableBorder': _GemRB.EnableButtonBorder,
+    'SetFont': _GemRB.SetButtonFont,
+    'SetTextColor': _GemRB.SetButtonTextColor,
+    'SetFlags': _GemRB.SetButtonFlags,
+    'SetState': _GemRB.SetButtonState,
+    'SetPictureClipping': _GemRB.SetButtonPictureClipping,
+    'SetPicture': _GemRB.SetButtonPicture,
+    'SetMOS': _GemRB.SetButtonMOS,
+    'SetPLT': _GemRB.SetButtonPLT,
+    'SetBAM': _GemRB.SetButtonBAM,
+    'SetSaveGamePortrait': _GemRB.SetSaveGamePortrait,
+    'SetSaveGamePreview': _GemRB.SetSaveGamePreview,
+    'SetGamePreview': _GemRB.SetGamePreview,
+    'SetGamePortraitPreview': _GemRB.SetGamePortraitPreview,
+    'SetSpellIcon': _GemRB.SetSpellIcon,
+    'SetItemIcon': _GemRB.SetItemIcon,
+    'SetActionIcon': _GemRB.SetActionIcon
   }
   def CreateLabelOnButton(self, control, *args):
-    GemRB.CreateLabelOnButton(self.WinID, self.ID, control, *args)
-    return GemRB.GetControlObject(self.WinID, control)
+    _GemRB.CreateLabelOnButton(self.WinID, self.ID, control, *args)
+    return _GemRB.GetControlObject(self.WinID, control)
 
 class GWorldMap(GControl):
   __metaclass__ = metaControl
   methods = {
-    'AdjustScrolling': GemRB.AdjustScrolling,
-    'GetDestinationArea': GemRB.GetDestinationArea,
-    'SetTextColor': GemRB.SetWorldMapTextColor
+    'AdjustScrolling': _GemRB.AdjustScrolling,
+    'GetDestinationArea': _GemRB.GetDestinationArea,
+    'SetTextColor': _GemRB.SetWorldMapTextColor
   }
 

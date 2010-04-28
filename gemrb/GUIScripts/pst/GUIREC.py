@@ -268,7 +268,7 @@ def UpdateRecordsWindow ():
 	# alignment
 	align = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
 	ss = GemRB.LoadSymbol ("ALIGN")
-	sym = GemRB.GetSymbolValue (ss, align)
+	sym = ss.GetValue (align)
 
 	AlignmentTable = GemRB.LoadTableObject ("ALIGNS")
 	alignment_help = GemRB.GetString (AlignmentTable.GetValue (sym, 'DESC_REF'))
