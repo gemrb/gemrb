@@ -26,6 +26,7 @@ from GUICommonWindows import *
 import GUICommonWindows
 from GUICommon import GameControl
 from GUIClasses import GTextArea
+from GUIClasses import GWindow
 
 from GUIJRNL import *
 from GUIMA import *
@@ -164,7 +165,7 @@ def UpdateControlStatus():
 	MessageTA = GTextArea(MessageWindow,GemRB.GetVar("MessageTextArea"))
 	if MessageWindow>0 and MessageWindow!=TMessageWindow.ID:
 		MessageTA.MoveText(TMessageTA)
-		GemRB.UnloadWindow(MessageWindow)
+		GWindow(MessageWindow).Unload()
 
 	GemRB.SetVar("MessageWindow", TMessageWindow.ID)
 	GemRB.SetVar("MessageTextArea", TMessageTA.ID)
