@@ -25,6 +25,7 @@
 import GemRB
 from LoadScreen import *
 from GUICommon import CloseOtherWindow
+from GUICommon import GameWindow
 
 SaveWindow = 0
 ConfirmWindow = 0
@@ -42,7 +43,7 @@ def OpenSaveWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0, WINDOW_INVISIBLE)
+	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUISAVE", 640, 480)
 	Window = SaveWindow = GemRB.LoadWindowObject (0)
@@ -271,6 +272,6 @@ def CloseSaveWindow ():
 		GemRB.SetNextScript ("Start")
 		return
 
-	GemRB.SetVisible (0, WINDOW_VISIBLE) #enabling the game control screen
+	GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
 	GemRB.UnhideGUI () #enabling the other windows
 	return

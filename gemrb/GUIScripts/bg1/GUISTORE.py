@@ -29,6 +29,7 @@ from GUICommonWindows import *
 from ie_stats import *
 from ie_slots import *
 from GUICommon import CheckStat100
+from GUICommon import GameWindow
 
 StoreWindow = None
 MessageWindow = None
@@ -107,7 +108,7 @@ def CloseStoreWindow ():
 	if Inventory:
 		GemRB.RunEventHandler("OpenInventoryWindow")
 	else:
-		GemRB.SetVisible (0, WINDOW_VISIBLE) #enabling the game control screen
+		GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
 		GemRB.UnhideGUI () #enabling the other windows
 		SetSelectionChangeHandler( None )
 	return
@@ -127,7 +128,7 @@ def OpenStoreWindow ():
 	OpenStoreRumourWindow,OpenStoreRentWindow )
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0, WINDOW_INVISIBLE) #removing the game control screen
+	GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the game control screen
 
 	if GemRB.GetVar ("Inventory"):
 		Inventory = 1

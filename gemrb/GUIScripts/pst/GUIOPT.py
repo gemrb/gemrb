@@ -598,7 +598,6 @@ def OpenQuitMsgWindow ():
 		
 	QuitMsgWindow = Window = GemRB.LoadWindowObject (4)
 	GemRB.SetVar ("FloatWindow", QuitMsgWindow.ID)
-	#GemRB.SetVisible (GemRB.GetVar ("OtherWindow"), 0)
 	
 	# Save
 	Button = Window.GetControl (0)

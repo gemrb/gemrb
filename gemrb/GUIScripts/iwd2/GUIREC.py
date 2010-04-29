@@ -27,6 +27,7 @@ import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import CloseOtherWindow, SetColorStat, RaceTable, ClassTable, NextLevelTable
+from GUICommon import GameWindow
 from GUICommonWindows import *
 
 SelectWindow = 0
@@ -57,7 +58,7 @@ def OpenRecordsWindow ():
 
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.SetVisible (0, WINDOW_VISIBLE)
+		GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -67,7 +68,7 @@ def OpenRecordsWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0, WINDOW_INVISIBLE)
+	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIREC", 800, 600)
 	RecordsWindow = Window = GemRB.LoadWindowObject (2)

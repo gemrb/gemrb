@@ -27,6 +27,7 @@ import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import CloseOtherWindow, SetColorStat
+from GUICommon import GameWindow
 from GUICommonWindows import *
 
 InventoryWindow = None
@@ -52,7 +53,7 @@ def OpenInventoryWindow ():
 
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.SetVisible (0, WINDOW_VISIBLE)
+		GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -62,7 +63,7 @@ def OpenInventoryWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0, WINDOW_INVISIBLE)
+	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIINV", 800, 600)
 	InventoryWindow = Window = GemRB.LoadWindowObject (2)
