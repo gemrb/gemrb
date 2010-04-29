@@ -21,6 +21,7 @@ import GemRB
 
 from GUICommonWindows import *
 import GUICommonWindows
+from GUICommon import GameControl
 from GUIINV import *
 from GUIJRNL import *
 from GUIMA import *
@@ -122,7 +123,7 @@ def UpdateControlStatus():
 		else:
 			Button.SetPicture(Portrait, "NOPORTSM")
 	else:
-		GemRB.SetControlStatus (0,0,IE_GUI_CONTROL_FOCUSED)
+		GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 		
 	if hideflag:
 		GemRB.UnhideGUI()

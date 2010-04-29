@@ -20,6 +20,7 @@
 import GemRB
 from GUICommonWindows import *
 import GUICommonWindows
+from GUICommon import GameControl
 from GUIClasses import GTextArea
 
 from GUIJRNL import *
@@ -159,7 +160,7 @@ def UpdateControlStatus():
 	if Override:
 		TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	else:
-		GemRB.SetControlStatus (0,0,IE_GUI_CONTROL_FOCUSED)
+		GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 
 	if GSFlags & GS_OPTIONPANE:
 		GemRB.SetVar("OptionsWindow", -1)
