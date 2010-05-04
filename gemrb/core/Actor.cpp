@@ -2875,13 +2875,20 @@ void Actor::Die(Scriptable *killer)
 			}
 		}
 
-		if (act && act->InParty) {
-			//adjust kill statistics here
-			PCStatsStruct *stat = act->PCStats;
-			if (stat) {
-				stat->NotifyKill(Modified[IE_XPVALUE], ShortStrRef);
+		if (act) {
+			if (act->InParty) {
+				//adjust kill statistics here
+				PCStatsStruct *stat = act->PCStats;
+				if (stat) {
+					stat->NotifyKill(Modified[IE_XPVALUE], ShortStrRef);
+				}
+				InternalFlags|=IF_GIVEXP;
 			}
-			InternalFlags|=IF_GIVEXP;
+
+			// friendly party summons' kills also grant xp
+			if (act->Modified[IE_SEX] == SEX_SUMMON && act->Modified[IE_EA] == EA_CONTROLLED) {
+				InternalFlags|=IF_GIVEXP;
+			}
 		}
 	}
 
