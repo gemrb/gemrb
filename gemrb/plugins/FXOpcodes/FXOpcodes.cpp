@@ -3853,7 +3853,7 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 	//create replacement; should we be passing the target instead of NULL?
 	//noooo, don't unsummon replacement creatures! - fuzzie
 	//Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, EAM_DEFAULT,-1, NULL);
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, EAM_DEFAULT,-1, NULL, 0);
 	//delete newfx;
 	return FX_NOT_APPLIED;
 }
@@ -4354,7 +4354,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 	//summon familiar with fx->Resource
 	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	Actor *fam = core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_DEFAULT, 0, newfx);
+	Actor *fam = core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_DEFAULT, 0, newfx, 0);
 	delete newfx;
 
 	if (fam) {

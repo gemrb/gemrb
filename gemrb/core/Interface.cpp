@@ -2454,7 +2454,7 @@ ScriptEngine* Interface::GetGUIScriptEngine() const
 }
 
 //NOTE: if there were more summoned creatures, it will return only the last
-Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, Point &position, int eamod, int level, Effect *fx)
+Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, Point &position, int eamod, int level, Effect *fx, bool sexmod)
 {
 	//maximum number of monsters summoned
 	int cnt=10;
@@ -2513,6 +2513,11 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			break;
 		default:
 			break;
+		}
+
+		// mark the summon, but only if they don't have a special sex already
+		if (sexmod && ab->BaseStats[IE_SEX] < SEX_EXTRA) {
+			ab->SetBase(IE_SEX, SEX_SUMMON);
 		}
 
 		Map *map;

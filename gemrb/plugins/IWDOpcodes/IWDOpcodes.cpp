@@ -1366,7 +1366,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 	for (int i=0;i<cnt;i++) {
 		Point p(strtol(tab->QueryField(i+1,0),NULL,0), strtol(tab->QueryField(i+1,1), NULL, 0));
 		core->SummonCreature(resrefs[real!=i], fx->Resource2, Owner,
-			target, p, EAM_DEFAULT, 0, NULL);
+			target, p, EAM_DEFAULT, 0, NULL, 0);
 	}
 	return FX_NOT_APPLIED;
 }
