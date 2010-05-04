@@ -2375,6 +2375,8 @@ bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete)
 	return false;
 }
 
+static EffectRef fx_sleep_ref={"State:Helpless", NULL, -1};
+
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 {
@@ -2412,7 +2414,16 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 
 	DisplayCombatFeedback(damage, resisted, damagetype, (Actor *)hitter);
 
-	NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+	// common fists do normal damage, but cause sleeping for a round instead of death
+	if ((damagetype & DAMAGE_STUNNING) && Modified[IE_MINHITPOINTS] <= 0 && BaseStats[IE_HITPOINTS] <= (ieDword) damage) {
+		NewBase(IE_HITPOINTS, 1, MOD_ABSOLUTE);
+		Effect *fx = EffectQueue::CreateEffect(fx_sleep_ref, 0, 0, FX_DURATION_INSTANT_LIMITED);
+		fx->Duration = 6; // 1 round
+		core->ApplyEffect(fx, this, this);
+		delete fx;
+	} else {
+		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+	}
 
 	LastDamage=damage;
 	InternalFlags|=IF_ACTIVE;
