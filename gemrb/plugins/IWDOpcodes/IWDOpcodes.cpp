@@ -1637,7 +1637,6 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 		ieResRef hit;
 		ieResRef areahit;
 
-		//todo: supply the souleatr.2da file
 		core->GetResRefFrom2DA("souleatr", monster, hit, areahit);
 		//the monster should appear near the effect position
 		Point p(fx->PosX, fx->PosY);
