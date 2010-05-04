@@ -2495,7 +2495,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		case EAM_SOURCEALLY:
 		case EAM_ALLY:
 			if (enemyally) {
-			ab->SetBase(IE_EA, EA_ENEMY); //is this the summoned EA?
+				ab->SetBase(IE_EA, EA_ENEMY); //is this the summoned EA?
 			} else {
 				ab->SetBase(IE_EA, EA_CONTROLLED); //is this the summoned EA?
 			}
