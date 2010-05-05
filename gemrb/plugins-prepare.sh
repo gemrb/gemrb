@@ -25,7 +25,7 @@ else
   cd "$dir"
 fi || return 1
 
-if test -d Core/.libs; then
+if test -d 2DAImporter/.libs; then
   ln -sf */.libs/*.so .
 else
   # cmake; expect to be in the build dir since it is arbitrary
@@ -36,6 +36,3 @@ else
   cd gemrb/plugins &&
   ln -sf */*.so .
 fi || return 2
-
-#remove the cuckoo's egg
-rm libgemrb_core.so

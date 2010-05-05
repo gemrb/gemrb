@@ -303,7 +303,6 @@ bool PathJoin (char *target, const char *base, ...)
 				continue;
 			} else if (slash) {
 				strncat(filename, source, slash-source);
-				source = slash + 1;
 			} else {
 				strcpy(filename, source);
 			}
@@ -312,6 +311,7 @@ bool PathJoin (char *target, const char *base, ...)
 				goto finish;
 			}
 			PathAppend(target, filename);
+			source = slash + 1;
 		} while (slash);
 	}
 	va_end( ap );

@@ -361,7 +361,7 @@ public:
 	ScriptEngine * GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor
 	may apply a single fx on the summoned creature normally an unsummon effect */
-	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, Point &position, int eamod, int level, Effect *fx);
+	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, Point &position, int eamod, int level, Effect *fx, bool sexmod=1);
 	/** Loads a WindowPack (CHUI file) in the Window Manager */
 	bool LoadWindowPack(const char *name);
 	/** Loads a Window in the Window Manager */
