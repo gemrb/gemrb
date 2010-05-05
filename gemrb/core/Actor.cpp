@@ -149,6 +149,9 @@ int rmodchr[25];
 
 // reputation modifiers
 static int **reputationmod = NULL;
+#define CLASS_PCCUTOFF 32
+#define CLASS_INNOCENT 155
+#define CLASS_FLAMINGFIST 156
 
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
@@ -2455,7 +2458,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 
 		// also apply reputation damage if we hurt (but not killed) an innocent
 		int reputation = core->GetGame()->Reputation / 10;
-		if (Modified[IE_CLASS] == 155) {
+		if (Modified[IE_CLASS] == CLASS_INNOCENT) {
 			core->GetGame()->SetReputation(reputation*10 + reputationmod[reputation-1][1]);
 		}
 	}
@@ -2948,9 +2951,9 @@ void Actor::Die(Scriptable *killer)
 			// an innocent, a member of the Flaming Fist or something evil
 			int reputation = game->Reputation / 10;
 			int repmod = 0;
-			if (Modified[IE_CLASS] == 155) {
+			if (Modified[IE_CLASS] == CLASS_INNOCENT) {
 				repmod = reputationmod[reputation-1][0];
-			} else if (Modified[IE_CLASS] == 156) {
+			} else if (Modified[IE_CLASS] == CLASS_FLAMINGFIST) {
 				repmod = reputationmod[reputation-1][3];
 			}
 			if (Modified[IE_ALIGNMENT]&AL_EVIL) {
@@ -5712,7 +5715,7 @@ void Actor::CreateDerivedStatsBG()
 	int classid = BaseStats[IE_CLASS];
 
 	//this works only for PC classes
-	if (classid>=32) return;
+	if (classid>=CLASS_PCCUTOFF) return;
 
 	//recalculate all level based changes
 	pcf_level(this,0,0);
