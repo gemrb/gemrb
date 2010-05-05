@@ -143,7 +143,7 @@ static int **monkbon = NULL;
 static int monkbon_cols = 0;
 static int monkbon_rows = 0;
 
-//reputation modifiers
+// reaction modifiers (by reputation and charisma)
 int rmodrep[20];
 int rmodchr[25];
 
@@ -3811,6 +3811,8 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 			tohit += 4;
 		}
 	}
+
+	// TODO: add hated race +4 attack bonus
 
 	if (ReverseToHit) {
 		tohit = (signed)GetStat(IE_TOHIT)-tohit;
