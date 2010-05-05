@@ -147,6 +147,9 @@ static int monkbon_rows = 0;
 int rmodrep[20];
 int rmodchr[25];
 
+// reputation modifiers
+static int **reputationmod = NULL;
+
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
  ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
@@ -1152,6 +1155,15 @@ void Actor::ReleaseMemory()
 			free(wmlevels[i]);
 			wmlevels[i]=NULL;
 		}
+		if (reputationmod) {
+			for (i=0; i<20; i++) {
+				if (reputationmod[i]) {
+					free(reputationmod[i]);
+				}
+			}
+			free(reputationmod);
+			reputationmod=NULL;
+		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1703,6 +1715,19 @@ static void InitActorTables()
 				int row = maxrow;
 				if (j<row) row=j;
 				wmlevels[i][j]=strtol(tm->QueryField(row,i), NULL, 0);
+			}
+		}
+	}
+
+	// reputation modifiers
+	tm.load("reputati");
+	if (tm) {
+		reputationmod = (int **) calloc(21, sizeof(int *));
+		int cols = tm->GetColumnCount();
+		for (i=0; i<20; i++) {
+			reputationmod[i] = (int *) calloc(cols, sizeof(int));
+			for (int j=0; j<cols; j++) {
+				reputationmod[i][j] = atoi(tm->QueryField(i, j));
 			}
 		}
 	}
@@ -2907,7 +2932,24 @@ void Actor::Die(Scriptable *killer)
 	if (InternalFlags&IF_GIVEXP) {
 		//give experience to party
 		game->ShareXP(Modified[IE_XPVALUE], sharexp );
-		//handle reputation here
+
+		if (!InParty) {
+			// adjust reputation if the corpse was:
+			// an innocent, a member of the Flaming Fist or something evil
+			int reputation = game->Reputation / 10;
+			int repmod = 0;
+			if (Modified[IE_CLASS] == 155) {
+				repmod = reputationmod[reputation-1][0];
+			} else if (Modified[IE_CLASS] == 156) {
+				repmod = reputationmod[reputation-1][3];
+			}
+			if (Modified[IE_ALIGNMENT]&AL_EVIL) {
+				repmod += reputationmod[reputation-1][7];
+			}
+			if (repmod) {
+				game->SetReputation(reputation*10 + repmod);
+			}
+		}
 	}
 
 	ieDword value = 0;
