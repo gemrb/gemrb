@@ -2439,15 +2439,25 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 
 	DisplayCombatFeedback(damage, resisted, damagetype, (Actor *)hitter);
 
-	// common fists do normal damage, but cause sleeping for a round instead of death
-	if ((damagetype & DAMAGE_STUNNING) && Modified[IE_MINHITPOINTS] <= 0 && BaseStats[IE_HITPOINTS] <= (ieDword) damage) {
-		NewBase(IE_HITPOINTS, 1, MOD_ABSOLUTE);
-		Effect *fx = EffectQueue::CreateEffect(fx_sleep_ref, 0, 0, FX_DURATION_INSTANT_LIMITED);
-		fx->Duration = 6; // 1 round
-		core->ApplyEffect(fx, this, this);
-		delete fx;
+	if (BaseStats[IE_HITPOINTS] <= (ieDword) damage) {
+		// common fists do normal damage, but cause sleeping for a round instead of death
+		if ((damagetype & DAMAGE_STUNNING) && Modified[IE_MINHITPOINTS] <= 0) {
+			NewBase(IE_HITPOINTS, 1, MOD_ABSOLUTE);
+			Effect *fx = EffectQueue::CreateEffect(fx_sleep_ref, 0, 0, FX_DURATION_INSTANT_LIMITED);
+			fx->Duration = 6; // 1 round
+			core->ApplyEffect(fx, this, this);
+			delete fx;
+		} else {
+			NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+		}
 	} else {
 		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+
+		// also apply reputation damage if we hurt (but not killed) an innocent
+		int reputation = core->GetGame()->Reputation / 10;
+		if (Modified[IE_CLASS] == 155) {
+			core->GetGame()->SetReputation(reputation*10 + reputationmod[reputation-1][1]);
+		}
 	}
 
 	LastDamage=damage;
