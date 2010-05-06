@@ -406,12 +406,12 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	if( map->RestHeader.CreatureNum>MAX_RESCOUNT ) {
 		map->RestHeader.CreatureNum = MAX_RESCOUNT;
 	}
-	str->Seek( 2, GEM_CURRENT_POS );              //difficulty?
+	str->ReadWord( &map->RestHeader.Difficulty);  //difficulty?
 	str->ReadDword( &map->RestHeader.sduration);  //spawn duration
 	str->ReadWord( &map->RestHeader.rwdist);      //random walk distance
 	str->ReadWord( &map->RestHeader.owdist);      //other walk distance
 	str->ReadWord( &map->RestHeader.Maximum);     //maximum number of creatures
-	str->Seek( 2, GEM_CURRENT_POS );
+	str->ReadWord( &map->RestHeader.Enabled);
 	str->ReadWord( &map->RestHeader.DayChance );
 	str->ReadWord( &map->RestHeader.NightChance );
 
@@ -899,7 +899,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ieVariable DefaultName;
 			ieResRef CreResRef;
 			ieDword TalkCount;
-			ieDword Orientation, Schedule;
+			ieDword Orientation, Schedule, RemovalTime;
 			ieWord XPos, YPos, XDes, YDes;
 			ieResRef Dialog;
 			ieResRef Scripts[8]; //the original order
@@ -913,7 +913,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadDword( &Flags );
 			str->Seek( 8, GEM_CURRENT_POS );
 			str->ReadDword( &Orientation );
-			str->Seek( 8, GEM_CURRENT_POS );
+			str->ReadDword( &RemovalTime );
+			str->Seek( 4, GEM_CURRENT_POS );
 			str->ReadDword( &Schedule );
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
@@ -976,6 +977,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ab->SetOrientation( Orientation,0 );
 			ab->appearance = Schedule;
 			ab->TalkCount = TalkCount;
+			// TODO: remove corpse at removal time?
+			ab->RemovalTime = RemovalTime;
 			ab->RefreshEffects(NULL);
 		}
 		actmgr->release();
@@ -1850,7 +1853,7 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord);
 		tmpWord = 0;
 		stream->WriteWord( &tmpWord); //unknown
-		stream->WriteDword( &tmpDword);
+		stream->WriteDword( &ac->RemovalTime);
 		stream->WriteDword( &tmpDword); //more unknowns
 		stream->WriteDword( &ac->appearance);
 		stream->WriteDword( &ac->TalkCount);
@@ -2226,7 +2229,6 @@ int AREImporter::PutRestHeader( DataStream *stream, Map *map)
 {
 	int i;
 	ieDword tmpDword = 0;
-	ieWord tmpWord = 0;
 
 	char filling[32];
 	memset(filling,0,sizeof(filling) );
@@ -2238,11 +2240,12 @@ int AREImporter::PutRestHeader( DataStream *stream, Map *map)
 		stream->WriteResRef( map->RestHeader.CreResRef[i]);
 	}
 	stream->WriteWord( &map->RestHeader.CreatureNum);
-	//lots of unknowns
-	stream->WriteWord( &tmpWord);
-	for(i=0;i<6;i++) {
-		stream->WriteWord( &tmpWord);
-	}
+	stream->WriteWord( &map->RestHeader.Difficulty);
+	stream->WriteDword( &map->RestHeader.sduration);
+	stream->WriteWord( &map->RestHeader.rwdist);
+	stream->WriteWord( &map->RestHeader.owdist);
+	stream->WriteWord( &map->RestHeader.Maximum);
+	stream->WriteWord( &map->RestHeader.Enabled);
 	stream->WriteWord( &map->RestHeader.DayChance);
 	stream->WriteWord( &map->RestHeader.NightChance);
 	for(i=0;i<14;i++) {

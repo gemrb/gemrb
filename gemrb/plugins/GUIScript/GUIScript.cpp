@@ -4855,13 +4855,10 @@ static PyObject* GemRB_ActOnPC(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "No game loaded!" );
 	}
 	Actor* MyActor = game->FindPC( PartyID );
-	/*Simulate a click where the actor is...*/
 	if (MyActor) {
 		GameControl* gc = core->GetGameControl();
 		if(gc) {
-			Point p = MyActor->Pos ;
-			core->GetVideoDriver()->ConvertToScreen(p.x, p.y);
-			gc->OnMouseUp(p.x, p.y, GEM_MB_ACTION, 0) ;
+			gc->PerformActionOn(MyActor);
 		}
 	}
 	Py_INCREF(Py_None) ;

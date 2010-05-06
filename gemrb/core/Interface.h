@@ -396,23 +396,23 @@ public:
 	/** returns a string reference from a string reference index constant*/
 	ieStrRef GetStringReference(int stridx) const;
 	/** returns the speaker's color and name */
-	unsigned int GetSpeakerColor(const char *&name, Scriptable *&speaker) const;
+	unsigned int GetSpeakerColor(const char *&name, const Scriptable *&speaker) const;
 	/** displays any string in the textarea */
 	void DisplayString(const char *txt, Scriptable *speaker=NULL) const;
 	/** displays a string constant in the textarea */
 	void DisplayConstantString(int stridx, unsigned int color, Scriptable *speaker=NULL) const;
 	/** displays actor name - action : parameter */
-	void DisplayConstantStringNameString(int stridx, unsigned int color, int stridx2, Scriptable *actor) const;
+	void DisplayConstantStringNameString(int stridx, unsigned int color, int stridx2, const Scriptable *actor) const;
 	/** displays a string constant followed by a number in the textarea */
 	void DisplayConstantStringValue(int stridx, unsigned int color, ieDword value) const;
 	/** displays a string constant in the textarea, starting with speaker's name */
-	void DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker) const;
+	void DisplayConstantStringName(int stridx, unsigned int color, const Scriptable *speaker) const;
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
-	void DisplayConstantStringAction(int stridx, unsigned int color, Scriptable *actor, Scriptable *target) const;
+	void DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *actor, const Scriptable *target) const;
 	/** displays a string in the textarea */
 	void DisplayString(int stridx, unsigned int color, ieDword flags) const;
 	/** displays a string in the textarea, starting with speaker's name */
-	void DisplayStringName(int stridx, unsigned int color, Scriptable *speaker, ieDword flags) const;
+	void DisplayStringName(int stridx, unsigned int color, const Scriptable *speaker, ieDword flags) const;
 	/** returns the Window Visible Flag */
 	int GetVisible(unsigned short WindowIndex) const;
 	/** Set a Window Visible Flag */

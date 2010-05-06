@@ -227,6 +227,7 @@ public:
 	int version;
 	//in game or area actor header
 	ieDword TalkCount;
+	ieDword RemovalTime;
 	ieDword InteractCount; //this is accessible in iwd2, probably exists in other games too
 	ieDword appearance;
 	ieDword ModalState;

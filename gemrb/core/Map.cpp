@@ -173,8 +173,8 @@ void InitSpawnGroups()
 		}
 		if (j>0) {
 			SpawnGroup *creatures = new SpawnGroup(j);
-			creatures->Level = (ieDword) atoi( tab->QueryField(i,0) );
 			//difficulty
+			creatures->Level = (ieDword) atoi( tab->QueryField(0,i) );
 			for (;j;j--) {
 				strnlwrcpy( creatures->ResRefs[j-1], tab->QueryField(j,i), 8 );
 			}
@@ -1231,7 +1231,7 @@ bool Map::AnyEnemyNearPoint(Point &p)
 		if (actor->Schedule(gametime, true) ) {
 			continue;
 		}
-		if (Distance(actor->Pos, p) > 400) {
+		if (Distance(actor->Pos, p) > SPAWN_RANGE) {
 			continue;
 		}
 		if (actor->GetStat(IE_EA)<EA_EVILCUTOFF) {
@@ -2708,9 +2708,25 @@ void Map::SpawnCreature(Point &pos, const char *CreName, int radius)
 		return;
 	}
 	sg = (SpawnGroup*)lookup;
-	//adjust this with difflev too
-	unsigned int count = sg->Count;
-	//unsigned int difficulty = sg->Level;
+	unsigned int count = 0;
+	int amount = core->GetGame()->GetPartyLevel(true);
+	// if the difficulty is too high, distribute it equally over all the
+	// critters and summon as many as the summed difficulty allows
+	if (amount - (signed)sg->Level < 0) {
+		unsigned int share = sg->Level/sg->Count;
+		amount -= share;
+		if (amount < 0) {
+			// a single critter is also too powerful
+			return;
+		}
+		while (amount >= 0) {
+			count++;
+			amount -= share;
+		}
+	} else {
+		count = sg->Count;
+	}
+
 	while ( count-- ) {
 		creature = gamedata->GetCreature(sg->ResRefs[count]);
 		if ( creature ) {
@@ -2737,7 +2753,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 	if (rand()%100>spawn->DayChance) {
 		return;
 	}
-	//check difficulty
+	// the difficulty check is done in SpawnCreature
 	//create spawns
 	for(unsigned int i = 0;i<spawn->Count;i++) {
 		SpawnCreature(spawn->Pos, spawn->Creatures[i], 0);
@@ -2747,16 +2763,39 @@ void Map::TriggerSpawn(Spawn *spawn)
 }
 
 //--------restheader----------------
+/*
+Every spawn has a difficulty associated with it. For CREs this is the xp stat
+and for groups it's the value in the difficulty row.
+For every spawn, the difficulty sum of all spawns up to now (including the
+current) is compared against (party level * rest header difficulty). If it's
+greater, the spawning is aborted. If all the other conditions are true, at
+least one creature is summoned, regardless the difficulty cap.
+*/
 bool Map::Rest(Point &pos, int hours, int day)
 {
+	if (!RestHeader.CreatureNum || !RestHeader.Enabled || !RestHeader.Maximum) {
+		return false;
+	}
+
 	//based on ingame timer
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
-	if ( !RestHeader.CreatureNum) return false;
+	int spawncount = 1;
+	int spawnamount = core->GetGame()->GetPartyLevel(true) * RestHeader.Difficulty;
+	if (spawnamount < 1) spawnamount = 1;
 	for (int i=0;i<hours;i++) {
 		if ( rand()%100<chance ) {
 			int idx = rand()%RestHeader.CreatureNum;
+			Actor *creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
+			if (!creature) continue;
+			// ensure a minimum power level, since many creatures have this as 0
+			int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
+
 			core->DisplayString( RestHeader.Strref[idx], 0x00404000, IE_STR_SOUND );
-			SpawnCreature(pos, RestHeader.CreResRef[idx], 20 );
+			while (spawnamount > 0 && spawncount <= RestHeader.Maximum) {
+				SpawnCreature(pos, RestHeader.CreResRef[idx], 20);
+				spawnamount -= cpl;
+				spawncount++;
+			}
 			return true;
 		}
 	}

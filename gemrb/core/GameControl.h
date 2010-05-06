@@ -211,6 +211,7 @@ public:
 	void TryToPick(Actor *source, Door *tgt);
 	void TryToPick(Actor *source, Container *tgt);
 	void TryToDisarm(Actor *source, InfoPoint *tgt);
+	void PerformActionOn(Actor *actor);
 
 	//containers
 	int GetCursorOverContainer(Container *overContainer);

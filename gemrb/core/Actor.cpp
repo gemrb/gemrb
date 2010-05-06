@@ -143,9 +143,15 @@ static int **monkbon = NULL;
 static int monkbon_cols = 0;
 static int monkbon_rows = 0;
 
-//reputation modifiers
+// reaction modifiers (by reputation and charisma)
 int rmodrep[20];
 int rmodchr[25];
+
+// reputation modifiers
+static int **reputationmod = NULL;
+#define CLASS_PCCUTOFF 32
+#define CLASS_INNOCENT 155
+#define CLASS_FLAMINGFIST 156
 
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
@@ -343,6 +349,7 @@ Actor::Actor()
 	TalkCount = 0;
 	InteractCount = 0; //numtimesinteracted depends on this
 	appearance = 0xffffff; //might be important for created creatures
+	RemovalTime = ~0;
 	version = 0;
 	//these are used only in iwd2 so we have to default them
 	for(i=0;i<7;i++) {
@@ -1152,6 +1159,15 @@ void Actor::ReleaseMemory()
 			free(wmlevels[i]);
 			wmlevels[i]=NULL;
 		}
+		if (reputationmod) {
+			for (i=0; i<20; i++) {
+				if (reputationmod[i]) {
+					free(reputationmod[i]);
+				}
+			}
+			free(reputationmod);
+			reputationmod=NULL;
+		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1703,6 +1719,19 @@ static void InitActorTables()
 				int row = maxrow;
 				if (j<row) row=j;
 				wmlevels[i][j]=strtol(tm->QueryField(row,i), NULL, 0);
+			}
+		}
+	}
+
+	// reputation modifiers
+	tm.load("reputati");
+	if (tm) {
+		reputationmod = (int **) calloc(21, sizeof(int *));
+		int cols = tm->GetColumnCount();
+		for (i=0; i<20; i++) {
+			reputationmod[i] = (int *) calloc(cols, sizeof(int));
+			for (int j=0; j<cols; j++) {
+				reputationmod[i][j] = atoi(tm->QueryField(i, j));
 			}
 		}
 	}
@@ -2414,15 +2443,25 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 
 	DisplayCombatFeedback(damage, resisted, damagetype, (Actor *)hitter);
 
-	// common fists do normal damage, but cause sleeping for a round instead of death
-	if ((damagetype & DAMAGE_STUNNING) && Modified[IE_MINHITPOINTS] <= 0 && BaseStats[IE_HITPOINTS] <= (ieDword) damage) {
-		NewBase(IE_HITPOINTS, 1, MOD_ABSOLUTE);
-		Effect *fx = EffectQueue::CreateEffect(fx_sleep_ref, 0, 0, FX_DURATION_INSTANT_LIMITED);
-		fx->Duration = 6; // 1 round
-		core->ApplyEffect(fx, this, this);
-		delete fx;
+	if (BaseStats[IE_HITPOINTS] <= (ieDword) damage) {
+		// common fists do normal damage, but cause sleeping for a round instead of death
+		if ((damagetype & DAMAGE_STUNNING) && Modified[IE_MINHITPOINTS] <= 0) {
+			NewBase(IE_HITPOINTS, 1, MOD_ABSOLUTE);
+			Effect *fx = EffectQueue::CreateEffect(fx_sleep_ref, 0, 0, FX_DURATION_INSTANT_LIMITED);
+			fx->Duration = 6; // 1 round
+			core->ApplyEffect(fx, this, this);
+			delete fx;
+		} else {
+			NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+		}
 	} else {
 		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+
+		// also apply reputation damage if we hurt (but not killed) an innocent
+		int reputation = core->GetGame()->Reputation / 10;
+		if (Modified[IE_CLASS] == CLASS_INNOCENT) {
+			core->GetGame()->SetReputation(reputation*10 + reputationmod[reputation-1][1]);
+		}
 	}
 
 	LastDamage=damage;
@@ -2769,15 +2808,31 @@ int Actor::GetWildMod(int level) const
 
 int Actor::CastingLevelBonus(int level, int type) const
 {
+	int bonus = 0;
 	switch(type)
 	{
 	case IE_SPL_PRIEST:
-		return GetStat(IE_CASTINGLEVELBONUSCLERIC);
+		bonus = GetStat(IE_CASTINGLEVELBONUSCLERIC);
 		break;
 	case IE_SPL_WIZARD:
-		return GetWildMod(level)+GetStat(IE_CASTINGLEVELBONUSMAGE);
+		bonus = GetWildMod(level) + GetStat(IE_CASTINGLEVELBONUSMAGE);
 	}
-	return 0;
+
+	if (!bonus) {
+		return 0;
+	}
+
+	char bonus_str[8];
+	snprintf(bonus_str, 8, "%d", bonus);
+	core->GetTokenDictionary()->SetAtCopy("LEVELDIF", bonus_str);
+
+	if (bonus > 0) {
+		core->DisplayConstantStringName(STR_CASTER_LVL_INC, 0xffffff, this);
+	} else {
+		core->DisplayConstantStringName(STR_CASTER_LVL_DEC, 0xffffff, this);
+	}
+
+	return bonus;
 }
 
 /** maybe this would be more useful if we calculate with the strength too
@@ -2907,7 +2962,24 @@ void Actor::Die(Scriptable *killer)
 	if (InternalFlags&IF_GIVEXP) {
 		//give experience to party
 		game->ShareXP(Modified[IE_XPVALUE], sharexp );
-		//handle reputation here
+
+		if (!InParty) {
+			// adjust reputation if the corpse was:
+			// an innocent, a member of the Flaming Fist or something evil
+			int reputation = game->Reputation / 10;
+			int repmod = 0;
+			if (Modified[IE_CLASS] == CLASS_INNOCENT) {
+				repmod = reputationmod[reputation-1][0];
+			} else if (Modified[IE_CLASS] == CLASS_FLAMINGFIST) {
+				repmod = reputationmod[reputation-1][3];
+			}
+			if (Modified[IE_ALIGNMENT]&AL_EVIL) {
+				repmod += reputationmod[reputation-1][7];
+			}
+			if (repmod) {
+				game->SetReputation(reputation*10 + repmod);
+			}
+		}
 	}
 
 	ieDword value = 0;
@@ -3811,6 +3883,8 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 			tohit += 4;
 		}
 	}
+
+	// TODO: add hated race +4 attack bonus
 
 	if (ReverseToHit) {
 		tohit = (signed)GetStat(IE_TOHIT)-tohit;
@@ -5658,7 +5732,7 @@ void Actor::CreateDerivedStatsBG()
 	int classid = BaseStats[IE_CLASS];
 
 	//this works only for PC classes
-	if (classid>=32) return;
+	if (classid>=CLASS_PCCUTOFF) return;
 
 	//recalculate all level based changes
 	pcf_level(this,0,0);

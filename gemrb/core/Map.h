@@ -102,8 +102,10 @@ struct SongHeaderType {
 struct RestHeaderType {
 	ieDword Strref[MAX_RESCOUNT];
 	ieResRef CreResRef[MAX_RESCOUNT];
+	ieWord Difficulty;
 	ieWord CreatureNum;
 	ieWord Maximum;
+	ieWord Enabled;
 	ieWord DayChance;
 	ieWord NightChance;
 	ieDword sduration;
