@@ -3884,7 +3884,22 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 		}
 	}
 
-	// TODO: add hated race +4 attack bonus
+	// add +4 attack bonus vs racial enemies
+	if (GetRangerLevel()) {
+		Actor *target = area->GetActorByGlobalID(LastTarget);
+		if (target) {
+			if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
+				tohit += 4;
+			} else if (core->HasFeature(GF_3ED_RULES)) {
+				// iwd2 supports multiple racial enemies gained through level progression
+				for (unsigned int i=0; i<7; i++) {
+					if (Modified[IE_HATEDRACE2+i] == target->Modified[IE_RACE]) {
+						tohit += 4;
+					}
+				}
+			}
+		}
+	}
 
 	if (ReverseToHit) {
 		tohit = (signed)GetStat(IE_TOHIT)-tohit;
