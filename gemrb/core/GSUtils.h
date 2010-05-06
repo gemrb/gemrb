@@ -60,7 +60,7 @@ extern int SkillCount;
 #define MIC_NOITEM 0
 #define MIC_GOTITEM 1
 
-GEM_EXPORT int GetReaction(Actor *target, Scriptable *Sender);
+int GetReaction(Scriptable *Sender);
 int GetHappiness(Scriptable *Sender, int reputation);
 int GetHPPercent(Scriptable *Sender);
 bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname);
