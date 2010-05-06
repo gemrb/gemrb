@@ -7691,7 +7691,7 @@ static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 			ret=core->GetLoreBonus(column, value);
 			break;
 		case IE_REPUTATION: //both chr and reputation affect the reaction, but chr is already taken
-			ret=actor->GetReaction();
+			ret=GetReaction(actor, NULL); // this is used only for display, so the null is fine
 			break;
 		default:
 			return RuntimeError( "Invalid ability!");

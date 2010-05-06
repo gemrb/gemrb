@@ -143,10 +143,6 @@ static int **monkbon = NULL;
 static int monkbon_cols = 0;
 static int monkbon_rows = 0;
 
-// reaction modifiers (by reputation and charisma)
-int rmodrep[20];
-int rmodchr[25];
-
 // reputation modifiers
 static int **reputationmod = NULL;
 #define CLASS_PCCUTOFF 32
@@ -1688,22 +1684,6 @@ static void InitActorTables()
 			for (int j=0; j<monkbon_cols; j++) {
 				monkbon[i][j] = atoi(tm->QueryField(i, j));
 			}
-		}
-	}
-
-	//initializing the reaction mod. reputation table
-	tm.load("rmodrep");
-	if (tm) {
-		for (int reputation=0;reputation<20;reputation++) {
-			rmodrep[reputation]=strtol(tm->QueryField(0,reputation), NULL, 0);
-		}
-	}
-
-	//initializing the reaction mod. charisma table
-	tm.load("rmodchr");
-	if (tm) {
-		for (int charisma=0;charisma<25;charisma++) {
-			rmodchr[charisma]=strtol(tm->QueryField(0,charisma), NULL, 0);
 		}
 	}
 
@@ -3887,17 +3867,8 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 	// add +4 attack bonus vs racial enemies
 	if (GetRangerLevel()) {
 		Actor *target = area->GetActorByGlobalID(LastTarget);
-		if (target) {
-			if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
-				tohit += 4;
-			} else if (core->HasFeature(GF_3ED_RULES)) {
-				// iwd2 supports multiple racial enemies gained through level progression
-				for (unsigned int i=0; i<7; i++) {
-					if (Modified[IE_HATEDRACE2+i] == target->Modified[IE_RACE]) {
-						tohit += 4;
-					}
-				}
-			}
+		if (target && IsRacialEnemy(target)) {
+			tohit += 4;
 		}
 	}
 
@@ -6015,18 +5986,6 @@ void Actor::UseExit(int flag) {
 	}
 }
 
-int Actor::GetReaction()
-{
-	int chr, rep;
-	chr = GetStat(IE_CHR)-1;
-	if (GetStat(IE_EA) == EA_PC) {
-		rep = core->GetGame()->Reputation/10;
-	} else {
-		rep = GetStat(IE_REPUTATION);
-	}
-	return 10 + rmodrep[rep] + rmodchr[chr];
-}
-
 // luck increases the minimum roll per dice, but only up to the number of dice sides;
 // luck does not affect critical hit chances:
 // if critical is set, it will return 1/sides on a critical, otherwise it can never
@@ -6145,6 +6104,22 @@ bool Actor::IsBehind(Actor* target)
 		if (diff >= MAX_ORIENT) diff -= MAX_ORIENT;
 		if (diff <= -1) diff += MAX_ORIENT;
 		if (diff == (signed)tar_orient) return true;
+	}
+	return false;
+}
+
+// checks all the actor's stats to see if the target is her racial enemy
+bool Actor::IsRacialEnemy(Actor* target)
+{
+	if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
+		return true;
+	} else if (core->HasFeature(GF_3ED_RULES)) {
+		// iwd2 supports multiple racial enemies gained through level progression
+		for (unsigned int i=0; i<7; i++) {
+			if (Modified[IE_HATEDRACE2+i] == target->Modified[IE_RACE]) {
+				return true;
+			}
+		}
 	}
 	return false;
 }
