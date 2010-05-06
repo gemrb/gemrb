@@ -143,10 +143,6 @@ static int **monkbon = NULL;
 static int monkbon_cols = 0;
 static int monkbon_rows = 0;
 
-// reaction modifiers (by reputation and charisma)
-int rmodrep[20];
-int rmodchr[25];
-
 // reputation modifiers
 static int **reputationmod = NULL;
 #define CLASS_PCCUTOFF 32
@@ -1688,22 +1684,6 @@ static void InitActorTables()
 			for (int j=0; j<monkbon_cols; j++) {
 				monkbon[i][j] = atoi(tm->QueryField(i, j));
 			}
-		}
-	}
-
-	//initializing the reaction mod. reputation table
-	tm.load("rmodrep");
-	if (tm) {
-		for (int reputation=0;reputation<20;reputation++) {
-			rmodrep[reputation]=strtol(tm->QueryField(0,reputation), NULL, 0);
-		}
-	}
-
-	//initializing the reaction mod. charisma table
-	tm.load("rmodchr");
-	if (tm) {
-		for (int charisma=0;charisma<25;charisma++) {
-			rmodchr[charisma]=strtol(tm->QueryField(0,charisma), NULL, 0);
 		}
 	}
 
@@ -6013,18 +5993,6 @@ void Actor::UseExit(int flag) {
 	} else {
 		InternalFlags&=~IF_USEEXIT;
 	}
-}
-
-int Actor::GetReaction()
-{
-	int chr, rep;
-	chr = GetStat(IE_CHR)-1;
-	if (GetStat(IE_EA) == EA_PC) {
-		rep = core->GetGame()->Reputation/10;
-	} else {
-		rep = GetStat(IE_REPUTATION);
-	}
-	return 10 + rmodrep[rep] + rmodchr[chr];
 }
 
 // luck increases the minimum roll per dice, but only up to the number of dice sides;
