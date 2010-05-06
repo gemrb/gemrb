@@ -1231,7 +1231,7 @@ bool Map::AnyEnemyNearPoint(Point &p)
 		if (actor->Schedule(gametime, true) ) {
 			continue;
 		}
-		if (Distance(actor->Pos, p) > 400) {
+		if (Distance(actor->Pos, p) > SPAWN_RANGE) {
 			continue;
 		}
 		if (actor->GetStat(IE_EA)<EA_EVILCUTOFF) {
