@@ -2808,15 +2808,31 @@ int Actor::GetWildMod(int level) const
 
 int Actor::CastingLevelBonus(int level, int type) const
 {
+	int bonus = 0;
 	switch(type)
 	{
 	case IE_SPL_PRIEST:
-		return GetStat(IE_CASTINGLEVELBONUSCLERIC);
+		bonus = GetStat(IE_CASTINGLEVELBONUSCLERIC);
 		break;
 	case IE_SPL_WIZARD:
-		return GetWildMod(level)+GetStat(IE_CASTINGLEVELBONUSMAGE);
+		bonus = GetWildMod(level) + GetStat(IE_CASTINGLEVELBONUSMAGE);
 	}
-	return 0;
+
+	if (!bonus) {
+		return 0;
+	}
+
+	char bonus_str[8];
+	snprintf(bonus_str, 8, "%d", bonus);
+	core->GetTokenDictionary()->SetAtCopy("LEVELDIF", bonus_str);
+
+	if (bonus > 0) {
+		core->DisplayConstantStringName(STR_CASTER_LVL_INC, 0xffffff, this);
+	} else {
+		core->DisplayConstantStringName(STR_CASTER_LVL_DEC, 0xffffff, this);
+	}
+
+	return bonus;
 }
 
 /** maybe this would be more useful if we calculate with the strength too
