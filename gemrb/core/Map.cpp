@@ -2747,16 +2747,39 @@ void Map::TriggerSpawn(Spawn *spawn)
 }
 
 //--------restheader----------------
+/*
+Every spawn has a difficulty associated with it. For CREs this is the xp stat
+and for groups it's the value in the difficulty row.
+For every spawn, the difficulty sum of all spawns up to now (including the
+current) is compared against (party level * rest header difficulty). If it's
+greater, the spawning is aborted. If all the other conditions are true, at
+least one creature is summoned, regardless the difficulty cap.
+*/
 bool Map::Rest(Point &pos, int hours, int day)
 {
+	if (!RestHeader.CreatureNum || !RestHeader.Enabled || !RestHeader.Maximum) {
+		return false;
+	}
+
 	//based on ingame timer
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
-	if ( !RestHeader.CreatureNum) return false;
+	int spawncount = 1;
+	int spawnamount = core->GetGame()->GetPartyLevel(true) * RestHeader.Difficulty;
+	if (spawnamount < 1) spawnamount = 1;
 	for (int i=0;i<hours;i++) {
 		if ( rand()%100<chance ) {
 			int idx = rand()%RestHeader.CreatureNum;
+			Actor *creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
+			if (!creature) continue;
+			// ensure a minimum power level, since many creatures have this as 0
+			int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
+
 			core->DisplayString( RestHeader.Strref[idx], 0x00404000, IE_STR_SOUND );
-			SpawnCreature(pos, RestHeader.CreResRef[idx], 20 );
+			while (spawnamount > 0 && spawncount <= RestHeader.Maximum) {
+				SpawnCreature(pos, RestHeader.CreResRef[idx], 20);
+				spawnamount -= cpl;
+				spawncount++;
+			}
 			return true;
 		}
 	}
