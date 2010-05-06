@@ -640,5 +640,7 @@ public:
 	void ResetState();
 	/* checks whether the actor is behind the target */
 	bool IsBehind(Actor* target);
+	/* checks whether the target is the actor's racial enemy */
+	bool IsRacialEnemy(Actor* target);
 };
 #endif

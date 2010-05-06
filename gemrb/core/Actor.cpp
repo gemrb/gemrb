@@ -3867,17 +3867,8 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 	// add +4 attack bonus vs racial enemies
 	if (GetRangerLevel()) {
 		Actor *target = area->GetActorByGlobalID(LastTarget);
-		if (target) {
-			if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
-				tohit += 4;
-			} else if (core->HasFeature(GF_3ED_RULES)) {
-				// iwd2 supports multiple racial enemies gained through level progression
-				for (unsigned int i=0; i<7; i++) {
-					if (Modified[IE_HATEDRACE2+i] == target->Modified[IE_RACE]) {
-						tohit += 4;
-					}
-				}
-			}
+		if (target && IsRacialEnemy(target)) {
+			tohit += 4;
 		}
 	}
 
@@ -6113,6 +6104,22 @@ bool Actor::IsBehind(Actor* target)
 		if (diff >= MAX_ORIENT) diff -= MAX_ORIENT;
 		if (diff <= -1) diff += MAX_ORIENT;
 		if (diff == (signed)tar_orient) return true;
+	}
+	return false;
+}
+
+// checks all the actor's stats to see if the target is her racial enemy
+bool Actor::IsRacialEnemy(Actor* target)
+{
+	if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
+		return true;
+	} else if (core->HasFeature(GF_3ED_RULES)) {
+		// iwd2 supports multiple racial enemies gained through level progression
+		for (unsigned int i=0; i<7; i++) {
+			if (Modified[IE_HATEDRACE2+i] == target->Modified[IE_RACE]) {
+				return true;
+			}
+		}
 	}
 	return false;
 }
