@@ -4116,7 +4116,7 @@ ieStrRef Interface::GetStringReference(int stridx) const
 }
 
 
-unsigned int Interface::GetSpeakerColor(const char *&name, Scriptable *&speaker) const
+unsigned int Interface::GetSpeakerColor(const char *&name, const Scriptable *&speaker) const
 {
 	unsigned int speaker_color;
 
@@ -4181,7 +4181,7 @@ void Interface::DisplayConstantStringValue(int stridx, unsigned int color, ieDwo
 
 // String format is
 // <charname> - blah blah : whatever
-void Interface::DisplayConstantStringNameString(int stridx, unsigned int color, int stridx2, Scriptable *actor) const
+void Interface::DisplayConstantStringNameString(int stridx, unsigned int color, int stridx2, const Scriptable *actor) const
 {
 	unsigned int actor_color;
 	const char *name;
@@ -4205,7 +4205,7 @@ void Interface::DisplayConstantStringNameString(int stridx, unsigned int color, 
 
 // String format is
 // <charname> - blah blah
-void Interface::DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker) const
+void Interface::DisplayConstantStringName(int stridx, unsigned int color, const Scriptable *speaker) const
 {
 	unsigned int speaker_color;
 	const char *name;
@@ -4224,7 +4224,7 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 	free( newstr );
 }
 
-void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scriptable *attacker, Scriptable *target) const
+void Interface::DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *attacker, const Scriptable *target) const
 {
 	unsigned int attacker_color;
 	const char *name1;
@@ -4246,7 +4246,7 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 	free( newstr );
 }
 
-void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *speaker, ieDword flags) const
+void Interface::DisplayStringName(int stridx, unsigned int color, const Scriptable *speaker, ieDword flags) const
 {
 	unsigned int speaker_color;
 	const char *name;
