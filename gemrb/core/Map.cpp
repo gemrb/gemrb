@@ -2708,9 +2708,9 @@ void Map::SpawnCreature(Point &pos, const char *CreName, int radius)
 		return;
 	}
 	sg = (SpawnGroup*)lookup;
-	//adjust this with difflev too
 	unsigned int count = sg->Count;
-	//unsigned int difficulty = sg->Level;
+	unsigned int amount = core->GetGame()->GetPartyLevel(true) - sg->Level;
+	if (amount < 0) return;
 	while ( count-- ) {
 		creature = gamedata->GetCreature(sg->ResRefs[count]);
 		if ( creature ) {
