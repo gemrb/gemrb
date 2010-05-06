@@ -2708,9 +2708,25 @@ void Map::SpawnCreature(Point &pos, const char *CreName, int radius)
 		return;
 	}
 	sg = (SpawnGroup*)lookup;
-	unsigned int count = sg->Count;
-	unsigned int amount = core->GetGame()->GetPartyLevel(true) - sg->Level;
-	if (amount < 0) return;
+	unsigned int count = 0;
+	int amount = core->GetGame()->GetPartyLevel(true);
+	// if the difficulty is too high, distribute it equally over all the
+	// critters and summon as many as the summed difficulty allows
+	if (amount - (signed)sg->Level < 0) {
+		unsigned int share = sg->Level/sg->Count;
+		amount -= share;
+		if (amount < 0) {
+			// a single critter is also too powerful
+			return;
+		}
+		while (amount >= 0) {
+			count++;
+			amount -= share;
+		}
+	} else {
+		count = sg->Count;
+	}
+
 	while ( count-- ) {
 		creature = gamedata->GetCreature(sg->ResRefs[count]);
 		if ( creature ) {
@@ -2737,7 +2753,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 	if (rand()%100>spawn->DayChance) {
 		return;
 	}
-	//check difficulty
+	// the difficulty check is done in SpawnCreature
 	//create spawns
 	for(unsigned int i = 0;i<spawn->Count;i++) {
 		SpawnCreature(spawn->Pos, spawn->Creatures[i], 0);
