@@ -173,8 +173,8 @@ void InitSpawnGroups()
 		}
 		if (j>0) {
 			SpawnGroup *creatures = new SpawnGroup(j);
-			creatures->Level = (ieDword) atoi( tab->QueryField(i,0) );
 			//difficulty
+			creatures->Level = (ieDword) atoi( tab->QueryField(0,i) );
 			for (;j;j--) {
 				strnlwrcpy( creatures->ResRefs[j-1], tab->QueryField(j,i), 8 );
 			}
