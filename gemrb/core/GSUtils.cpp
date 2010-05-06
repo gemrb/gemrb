@@ -110,16 +110,23 @@ void InitScriptTables()
 	}
 }
 
-int GetReaction(Actor *target, Scriptable */*Sender*/)
+int GetReaction(Actor *target, Scriptable *Sender)
 {
-	int chr, rep;
+	int chr, rep, reaction;
 	chr = target->GetStat(IE_CHR)-1;
 	if (target->GetStat(IE_EA) == EA_PC) {
 		rep = core->GetGame()->Reputation/10;
 	} else {
 		rep = target->GetStat(IE_REPUTATION);
 	}
-	return 10 + rmodrep[rep] + rmodchr[chr];
+	reaction = 10 + rmodrep[rep] + rmodchr[chr];
+
+	// add -4 penalty when dealing with racial enemies
+	if (Sender && target->GetRangerLevel() && Sender->Type == ST_ACTOR && target->IsRacialEnemy((Actor *)Sender)) {
+		reaction -= 4;
+	}
+
+	return reaction;
 }
 
 int GetHappiness(Scriptable* Sender, int reputation)
