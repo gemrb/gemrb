@@ -1338,7 +1338,6 @@ void Game::RestParty(int checks, int dream, int hp)
 
 	//rest check, if PartyRested should be set, area should return true
 	//area should advance gametime too (so partial rest is possible)
-	char buffer[8];
 	int hours = 8;
 	if (!(checks&REST_NOAREA) ) {
 		//you cannot rest here
@@ -1402,9 +1401,8 @@ void Game::RestParty(int checks, int dream, int hp)
 	int restindex = core->GetStringReference(STR_REST);
 	int strindex;
 	char* tmpstr = NULL;
-	snprintf(buffer, 8, "%d", hours);
 
-	core->GetTokenDictionary()->SetAtCopy("HOUR", buffer);
+	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
 	if (restindex != -1) {
 		strindex = core->GetStringReference(STR_HOURS);
 	} else {

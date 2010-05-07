@@ -2506,25 +2506,22 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 	if (damage > 0 && resisted != DR_IMMUNE) {
 		printMessage("Actor", " ", GREEN);
 		printf("%d damage taken.\n", damage);
-		char dmg_str[8];
-		snprintf(dmg_str, 8, "%d", damage);
 
 		if (detailed) {
 			// 3 choices depending on resistance and boni
 			// iwd2 also has two Tortoise Shell (spell) absorption strings
 			core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name);
-			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", dmg_str);
+			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter ? hitter->GetName(1) : this->GetName(1) );
 			int bonus = 0; //TODO: change this once damage bonus is supported
-			char resist_str[8];
-			snprintf(resist_str, 8, "%d", abs(resisted-bonus));
+			unsigned int delta = abs(resisted-bonus);
 			if (bonus-resisted > 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
-				core->GetTokenDictionary()->SetAtCopy( "RESISTED", resist_str);
+				core->GetTokenDictionary()->SetAtCopy( "RESISTED", delta);
 				core->DisplayConstantStringName(STR_DAMAGE3, 0xffffff, this);
 			} else if (bonus-resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage resisted)
-				core->GetTokenDictionary()->SetAtCopy( "RESISTED", resist_str);
+				core->GetTokenDictionary()->SetAtCopy( "RESISTED", delta);
 				core->DisplayConstantStringName(STR_DAMAGE2, 0xffffff, this);
 			} else {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
@@ -2541,7 +2538,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
 			// wipe the DAMAGER token, so we can color it
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", "" );
-			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", dmg_str);
+			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
 			core->DisplayConstantStringName(STR_DAMAGE1, 0xffffff, hitter);
 		}
 	} else {
@@ -2802,9 +2799,7 @@ int Actor::CastingLevelBonus(int level, int type) const
 		return 0;
 	}
 
-	char bonus_str[8];
-	snprintf(bonus_str, 8, "%d", bonus);
-	core->GetTokenDictionary()->SetAtCopy("LEVELDIF", bonus_str);
+	core->GetTokenDictionary()->SetAtCopy("LEVELDIF", bonus);
 
 	if (bonus > 0) {
 		core->DisplayConstantStringName(STR_CASTER_LVL_INC, 0xffffff, this);

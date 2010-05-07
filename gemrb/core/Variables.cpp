@@ -320,6 +320,14 @@ void Variables::SetAtCopy(const char* key, const char* value)
 	SetAt(key, str);
 }
 
+void Variables::SetAtCopy(const char* key, int newValue)
+{
+	char tmpstr[10]; // should be enough
+	sprintf(tmpstr, "%d", newValue);
+
+	SetAtCopy(key, tmpstr);
+}
+
 void Variables::SetAt(const char* key, char* value)
 {
 	unsigned int nHash;

@@ -3804,18 +3804,15 @@ static PyObject *GetGameDate(DataStream *ds)
 	int hours = ((int)GameTime)/300;
 	int days = hours/24;
 	hours -= days*24;
-	char tmpstr[10];
 	char *a=NULL,*b=NULL,*c=NULL;
 	PyObject *retval;
 
-	sprintf(tmpstr,"%d",days);
-	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", tmpstr);
+	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", days);
 	if (days) {
 		if (days==1) a=core->GetString(10698);
 		else a=core->GetString(10697);
 	}
-	sprintf(tmpstr,"%d",hours);
-	core->GetTokenDictionary()->SetAtCopy("HOUR", tmpstr);
+	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
 	if (hours || !a) {
 		if (a) b=core->GetString(10699);
 		if (hours==1) c=core->GetString(10701);
