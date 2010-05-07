@@ -26,9 +26,6 @@
 #include "GameControl.h"
 #include "Calendar.h"
 
-//static int *monthnames=NULL;
-//static int *days=NULL;
-//static int monthnamecount=0;
 //set this to -1 if charname is gabber (iwd2)
 static int charname=0;
 
@@ -42,32 +39,10 @@ TLKImporter::TLKImporter(void)
 	str = NULL;
 	override = NULL;
 	autoFree = false;
-/*
-	if (monthnamecount==0) {
-		int i;
-		AutoTable tab("months");
-		if (!tab) {
-			monthnamecount=-1;
-			return;
-		}
-		monthnamecount = tab->GetRowCount();
-		monthnames = (int *) malloc(sizeof(int) * monthnamecount);
-		days = (int *) malloc(sizeof(int) * monthnamecount);
-		for(i=0;i<monthnamecount;i++) {
-			days[i]=atoi(tab->QueryField(i,0));
-			monthnames[i]=atoi(tab->QueryField(i,1));
-		}
-	}
-*/
 }
 
 TLKImporter::~TLKImporter(void)
 {
-/*
-	if (monthnames) free(monthnames);
-	if (days) free(days);
-	monthnamecount=0;
-*/
 	if (str && autoFree) {
 		delete( str );
 	}
@@ -201,34 +176,6 @@ int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref)
 	}
 	return malestrref;
 }
-
-/*
-void TLKImporter::GetMonthName(int dayandmonth)
-{
-	int month=1;
-
-	for(int i=0;i<monthnamecount;i++) {
-		if (dayandmonth<days[i]) {
-			char *tmp;
-			char tmpstr[10];
-			
-			sprintf(tmpstr,"%d", dayandmonth+1);
-			core->GetTokenDictionary()->SetAtCopy("DAY", tmpstr);
-
-			tmp = GetString( monthnames[i] );
-			core->GetTokenDictionary()->SetAt("MONTHNAME",tmp);
-			//must not free tmp, SetAt doesn't copy the pointer!
-
-			sprintf(tmpstr,"%d", month);
-			core->GetTokenDictionary()->SetAtCopy("MONTH",tmpstr);
-			return;
-		}
-		dayandmonth-=days[i];
-		//ignoring single days (they are not months)
-		if (days[i]!=1) month++;
-	}
-}
-*/
 
 //if this function returns -1 then it is not a built in token, dest may be NULL
 int TLKImporter::BuiltinToken(char* Token, char* dest)
