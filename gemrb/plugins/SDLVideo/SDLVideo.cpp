@@ -445,6 +445,7 @@ bool SDLVideoDriver::ToggleGrabInput()
 	}
 	else {
 		SDL_WM_GrabInput( SDL_GRAB_OFF );
+		MoveMouse(CursorPos.x, CursorPos.y);
 		return false;
 	}
 }
