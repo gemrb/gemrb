@@ -256,6 +256,9 @@ int SDLVideoDriver::SwapBuffers(void)
 				case SDLK_RALT:
 					key = GEM_ALT;
 					break;
+				case SDLK_SCROLLOCK:
+					key = GEM_GRAB;
+					break;
 				default:
 					if (event.key.keysym.sym<256) {
 						key=(unsigned char) event.key.keysym.sym;
@@ -317,6 +320,9 @@ int SDLVideoDriver::SwapBuffers(void)
 					break;
 				case SDLK_PAGEDOWN:
 					key = GEM_PGDOWN;
+					break;
+				case SDLK_SCROLLOCK:
+					key = GEM_GRAB;
 					break;
 				default:
 					break;

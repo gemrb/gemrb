@@ -319,6 +319,10 @@ void EventMgr::KeyRelease(unsigned char Key, unsigned short Mod)
 {
 	if (last_win_focused == NULL) return;
 	Control *ctrl = last_win_focused->GetFocus();
+	if (Key == GEM_GRAB) {
+		core->GetVideoDriver()->ToggleGrabInput();
+		return;
+	}
 	if (ctrl == NULL) return;
 	ctrl->OnKeyRelease( Key, Mod );
 }
