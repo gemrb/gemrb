@@ -5425,7 +5425,17 @@ void GameScript::Turn(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->SetModal( MS_TURNUNDEAD);
+
+	if (actor->Modified[IE_DISABLEDBUTTON] & (1<<ACT_TURN)) {
+		return;
+	}
+
+	int skill = actor->GetStat(IE_TURNUNDEADLEVEL);
+	if (skill < 1) return;
+
+	actor->SetModal(MS_TURNUNDEAD);
+	core->DisplayConstantStringName(STR_TURNING_ON, 0xffffff, actor);
+
 }
 
 void GameScript::TurnAMT(Scriptable* Sender, Action* parameters)
