@@ -73,7 +73,6 @@ static int SpecialSpellsCount = -1;
 static int StoreSpellsCount = -1;
 static int UsedItemsCount = -1;
 static int ItemSoundsCount = -1;
-static int ModalSpellCount = -1;
 
 //#define UIT_ALLOW_REPLACE    1 //item is replaceable with another item on this list
 
@@ -108,7 +107,6 @@ static ItemExtHeader *ItemArray = NULL;
 static SpellExtHeader *SpellArray = NULL;
 static UsedItemType *UsedItems = NULL;
 static ResRefPairs *ItemSounds = NULL;
-static ieResRef *ModalSpells = NULL;
 
 static int ReputationIncrease[20]={(int) UNINIT_IEDWORD};
 static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
@@ -6022,25 +6020,6 @@ table_loaded:
 	}
 }
 
-static void ReadModalSpells()
-{
-	int i;
-
-	ModalSpellCount = 0;
-	int table = gamedata->LoadTable("modal");
-	if (table>=0) {
-		TableMgr *tab = gamedata->GetTable(table);
-		if (!tab) goto table_loaded;
-		ModalSpellCount = tab->GetRowCount();
-		ModalSpells = (ieResRef *) malloc( sizeof(ieResRef) * ModalSpellCount);
-		for (i=0;i<ModalSpellCount;i++) {
-			strnlwrcpy(ModalSpells[i], tab->QueryField(i,0), 8 );
-		}
-table_loaded:
-		gamedata->DelTable(table);
-	}
-}
-
 static void ReadSpecialItems()
 {
 	int i;
@@ -8560,13 +8539,11 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 	if (spell) {
 		strnlwrcpy(actor->ModalSpell, spell, 8);
 	} else {
-		if (ModalSpellCount==-1) {
-			ReadModalSpells();
+		if (state >= (signed)core->ModalStates.size()) {
+			actor->ModalSpell[0] = 0;
+		} else {
+			strnlwrcpy(actor->ModalSpell, core->ModalStates[state].spell, 8);
 		}
-		if (state>=ModalSpellCount)
-			actor->ModalSpell[0]=0;
-		else
-			strnlwrcpy(actor->ModalSpell, ModalSpells[state], 8);
 	}
 
 	Py_INCREF( Py_None );
@@ -9588,16 +9565,12 @@ GUIScript::~GUIScript(void)
 		free(ItemSounds);
 		ItemSounds=NULL;
 	}
-	if (ModalSpells) {
-		free(ModalSpells);
-		ModalSpells=NULL;
-	}
+
 	StoreSpellsCount = -1;
 	SpecialSpellsCount = -1;
 	SpecialItemsCount = -1;
 	UsedItemsCount = -1;
 	ItemSoundsCount = -1;
-	ModalSpellCount = -1;
 	ReputationIncrease[0]=(int) UNINIT_IEDWORD;
 	ReputationDonation[0]=(int) UNINIT_IEDWORD;
 	GUIAction[0]=UNINIT_IEDWORD;

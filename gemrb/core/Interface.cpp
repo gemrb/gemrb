@@ -373,6 +373,8 @@ Interface::~Interface(void)
 
 	DamageInfoMap.clear();
 
+	ModalStates.clear();
+
 	delete plugin_flags;
 
 	delete projserv;
@@ -924,6 +926,25 @@ bool Interface::ReadDamageTypeTable() {
 		di.resist_stat = TranslateStat(tm->QueryField(i, 1));
 		di.value = strtol(tm->QueryField(i, 2), (char **) NULL, 16);
 		DamageInfoMap.insert(std::make_pair <ieDword, DamageInfoStruct> ((ieDword)di.value, di));
+	}
+
+	return true;
+}
+
+bool Interface::ReadModalStates()
+{
+	AutoTable table("modal");
+	if (!table)
+		return false;
+
+	ModalStatesStruct ms;
+	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
+		strncpy(ms.spell, table->QueryField(i, 0), 8);
+		strncpy(ms.action, table->QueryField(i, 1), 16);
+		ms.entering_str = atoi(table->QueryField(i, 2));
+		ms.leaving_str = atoi(table->QueryField(i, 3));
+		ms.failed_str = atoi(table->QueryField(i, 4));
+		ModalStates.push_back(ms);
 	}
 
 	return true;
@@ -1672,6 +1693,15 @@ int Interface::Init()
 	printMessage( "Core", "Reading damage type table...", WHITE);
 	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
+	} else {
+		printStatus( "OK", LIGHT_GREEN );
+	}
+
+	ret = ReadModalStates();
+	printMessage( "Core", "Reading modal states table...", WHITE);
+	if (!ret) {
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
 	} else {
 		printStatus( "OK", LIGHT_GREEN );
 	}

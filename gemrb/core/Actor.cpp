@@ -3585,9 +3585,9 @@ void Actor::SetModal(ieDword newstate, bool force)
 	}
 
 	if (InParty) {
-		// TODO: display the turning-off message
+		// display the turning-off message
 		if (ModalState != MS_NONE) {
-			printf("Turning off state:%d:\n", ModalState);
+			core->DisplayStringName(core->ModalStates[ModalState].leaving_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
 		}
 
 		// when called with the same state twice, toggle to MS_NONE
@@ -3595,7 +3595,7 @@ void Actor::SetModal(ieDword newstate, bool force)
 			ModalState = MS_NONE;
 		} else {
 			ModalState = newstate;
-			// TODO: display the turning-on message
+			core->DisplayStringName(core->ModalStates[ModalState].entering_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
 		}
 
 		//update the action bar
@@ -3826,6 +3826,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	} else {
 		// ranged - no bonus
 	}
+
+	// TODO: Elves get a racial THAC0 bonus with all swords and bows in BG2 (but not daggers)
 
 	//second parameter is left or right hand flag
 	tohit = GetToHit(THAC0Bonus, Flags);
