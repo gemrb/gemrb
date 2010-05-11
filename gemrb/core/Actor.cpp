@@ -3583,12 +3583,27 @@ void Actor::SetModal(ieDword newstate)
 		default:
 			return;
 	}
-	//come here only if success
-	ModalState = newstate;
 
-	//update the action bar
-	if (InParty)
+	// FIXME: check if toggling should work also for npcs
+	if (InParty) {
+		// TODO: display the turning-off message
+		if (ModalState != MS_NONE) {
+			printf("Turning off state:%d:\n", ModalState);
+		}
+
+		// when called with the same state twice, toggle to MS_NONE
+		if (ModalState == newstate) {
+			ModalState = MS_NONE;
+		} else {
+			ModalState = newstate;
+			// TODO: display the turning-on message
+		}
+
+		//update the action bar
 		core->SetEventFlag(EF_ACTION);
+	} else {
+		ModalState = newstate;
+	}
 }
 
 //this is just a stub function for now, attackstyle could be melee/ranged
