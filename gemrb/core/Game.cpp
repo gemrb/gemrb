@@ -1365,7 +1365,7 @@ void Game::RestParty(int checks, int dream, int hp)
 		Actor *tar = GetPC(i, true);
 		tar->ClearPath();
 		tar->ClearActions();
-		tar->SetModal(0);
+		tar->SetModal(MS_NONE, 0);
 		//if hp = 0, then healing will be complete
 		tar->Heal(hp);
 		//removes fatigue, recharges spells

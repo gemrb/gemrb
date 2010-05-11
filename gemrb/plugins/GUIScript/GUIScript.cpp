@@ -8556,7 +8556,7 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
-	actor->SetModal( (ieDword) state);
+	actor->SetModal( (ieDword) state, 0);
 	if (spell) {
 		strnlwrcpy(actor->ModalSpell, spell, 8);
 	} else {

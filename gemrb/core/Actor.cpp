@@ -3567,7 +3567,7 @@ const char* Actor::GetScript(int ScriptIndex) const
 	return Scripts[ScriptIndex]->GetName();
 }
 
-void Actor::SetModal(ieDword newstate)
+void Actor::SetModal(ieDword newstate, bool force)
 {
 	switch(newstate) {
 		case MS_NONE:
@@ -3584,7 +3584,6 @@ void Actor::SetModal(ieDword newstate)
 			return;
 	}
 
-	// FIXME: check if toggling should work also for npcs
 	if (InParty) {
 		// TODO: display the turning-off message
 		if (ModalState != MS_NONE) {
@@ -3592,7 +3591,7 @@ void Actor::SetModal(ieDword newstate)
 		}
 
 		// when called with the same state twice, toggle to MS_NONE
-		if (ModalState == newstate) {
+		if (!force && ModalState == newstate) {
 			ModalState = MS_NONE;
 		} else {
 			ModalState = newstate;
