@@ -1,19 +1,23 @@
-GemRB git (930101a):
+GemRB git (26d60a9):
   New features:
     - 
+    - reputation penalties on death or injury
+    - casting level bonus/malus (wild mages, clerics)
     - tinting for different times of the day and weather effects
     - a BI(n)K player plugin for the IWD2 movies
     - new actions
 
   Improved features:
     - 
-    - the design of some internals was cleaned up
+    - the internal design was cleaned up in many places
+    - combat, spawns
     - magic missiles are now drawn properly
     - various guiscripts (no more flickering!)
     - bugfixes
 
   Applied patches:
     plenty of patches from Tom Prince
+    two patches from Brendan Molloy
 
 GemRB V0.6.0 (2009-11-03):
   New features:

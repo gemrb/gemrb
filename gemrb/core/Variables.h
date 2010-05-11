@@ -92,6 +92,7 @@ public:
 
 	// Operations
 	void SetAtCopy(const char* key, const char* newValue);
+	void SetAtCopy(const char* key, int newValue);
 	void SetAt(const char* key, char* newValue);
 	void SetAt(const char* key, void* newValue);
 	void SetAt(const char* key, ieDword newValue);

@@ -487,7 +487,7 @@ public:
 	/* Receive experience bonus */
 	void AddExperience(int type, int level);
 	/* Sets the modal state after checks */
-	void SetModal(ieDword newstate);
+	void SetModal(ieDword newstate, bool force=1);
 	/* returns current attack style */
 	int GetAttackStyle();
 	/* sets target for immediate attack */
@@ -640,5 +640,7 @@ public:
 	void ResetState();
 	/* checks whether the actor is behind the target */
 	bool IsBehind(Actor* target);
+	/* checks whether the target is the actor's racial enemy */
+	bool IsRacialEnemy(Actor* target);
 };
 #endif

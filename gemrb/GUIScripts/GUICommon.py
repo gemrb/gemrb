@@ -110,6 +110,33 @@ def ActionDefendPressed ():
 def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
+def ActionQItemPressed (action):
+	"""Uses the given quick item."""
+	pc = GemRB.GameGetFirstSelectedPC ()
+	# quick slot
+	GemRB.UseItem (pc, -2, action)
+	return
+
+def ActionQItem1Pressed ():
+	ActionQItemPressed (ACT_QSLOT1)
+	return
+
+def ActionQItem2Pressed ():
+	ActionQItemPressed (ACT_QSLOT2)
+	return
+
+def ActionQItem3Pressed ():
+	ActionQItemPressed (ACT_QSLOT3)
+	return
+
+def ActionQItem4Pressed ():
+	ActionQItemPressed (ACT_QSLOT4)
+	return
+
+def ActionQItem5Pressed ():
+	ActionQItemPressed (ACT_QSLOT5)
+	return
+
 def GetActorPaperDoll (actor):
 	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)
 	level = GemRB.GetPlayerStat (actor, IE_ARMOR_TYPE)

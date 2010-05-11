@@ -167,10 +167,6 @@ void WorldMapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			if (Mod & GEM_MOD_CTRL)
 				core->GetVideoDriver()->ToggleFullscreenMode();
 			break;
-		case 'g':
-			if (Mod & GEM_MOD_CTRL)
-				core->GetVideoDriver()->ToggleGrabInput();
-			break;
 		default:
 			break;
 	}

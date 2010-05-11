@@ -3,6 +3,7 @@ These modal actions were hardcoded in the original engines.
 
 Columns - 
   SPELL - the spell resource assigned to the modal action.
+  ACTION - the name of the equivalent action in GemRB
 
 Rows - the modal actions have a somewhat determined order.
 The first row should be left blank.

@@ -2986,9 +2986,7 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 	if (core->GetStringReference(STR_GOTQUESTXP) == (ieStrRef) -1) {
 		core->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword)xp);
 	} else {
-		char tmpstr[10];
-		sprintf(tmpstr, "%d", xp);
-		core->GetTokenDictionary()->SetAtCopy( "EXPERIENCEAMOUNT", tmpstr);
+		core->GetTokenDictionary()->SetAtCopy("EXPERIENCEAMOUNT", xp);
 		core->DisplayConstantStringName(STR_GOTQUESTXP, 0xbcefbc, actor);
 	}
 	actor->AddExperience(xp);
@@ -3261,9 +3259,7 @@ void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 {
 	ieDword value = CheckVariable( Sender, parameters->string0Parameter );
 	//using SetAtCopy because we need a copy of the value
-	char tmpstr[10];
-	sprintf( tmpstr, "%d", value );
-	core->GetTokenDictionary()->SetAtCopy( parameters->string1Parameter, tmpstr );
+	core->GetTokenDictionary()->SetAtCopy( parameters->string1Parameter, value );
 }
 
 //Assigns the target object's name (not scriptname) to the token
@@ -5429,7 +5425,17 @@ void GameScript::Turn(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->SetModal( MS_TURNUNDEAD);
+
+	if (actor->Modified[IE_DISABLEDBUTTON] & (1<<ACT_TURN)) {
+		return;
+	}
+
+	int skill = actor->GetStat(IE_TURNUNDEADLEVEL);
+	if (skill < 1) return;
+
+	actor->SetModal(MS_TURNUNDEAD);
+	core->DisplayConstantStringName(STR_TURNING_ON, 0xffffff, actor);
+
 }
 
 void GameScript::TurnAMT(Scriptable* Sender, Action* parameters)

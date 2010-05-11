@@ -408,33 +408,6 @@ def ActionCastPressed ():
 	UpdateActionsWindow ()
 	return
 
-def ActionQItemPressed (action):
-	"""Uses the given quick item."""
-	pc = GemRB.GameGetFirstSelectedPC ()
-	#quick slot
-	GemRB.UseItem (pc, -2, action)
-	return
-
-def ActionQItem1Pressed ():
-	ActionQItemPressed (ACT_QSLOT1)
-	return
-
-def ActionQItem2Pressed ():
-	ActionQItemPressed (ACT_QSLOT2)
-	return
-
-def ActionQItem3Pressed ():
-	ActionQItemPressed (ACT_QSLOT3)
-	return
-
-def ActionQItem4Pressed ():
-	ActionQItemPressed (ACT_QSLOT4)
-	return
-
-def ActionQItem5Pressed ():
-	ActionQItemPressed (ACT_QSLOT5)
-	return
-
 def ActionInnatePressed ():
 	"""Opens the innate spell scrollbar."""
 	GemRB.SetVar ("TopIndex", 0)

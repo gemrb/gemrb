@@ -56,17 +56,14 @@ void Calendar::GetMonthName(int dayandmonth)
 	for(int i=0;i<monthnamecount;i++) {
 		if (dayandmonth<days[i]) {
 			char *tmp;
-			char tmpstr[10];
 			
-			sprintf(tmpstr,"%d", dayandmonth+1);
-			core->GetTokenDictionary()->SetAtCopy("DAY", tmpstr);
+			core->GetTokenDictionary()->SetAtCopy("DAY", dayandmonth+1);
 
 			tmp = core->GetString( monthnames[i] );
 			core->GetTokenDictionary()->SetAt("MONTHNAME",tmp);
 			//must not free tmp, SetAt doesn't copy the pointer!
 
-			sprintf(tmpstr,"%d", month);
-			core->GetTokenDictionary()->SetAtCopy("MONTH",tmpstr);
+			core->GetTokenDictionary()->SetAtCopy("MONTH", month);
 			return;
 		}
 		dayandmonth-=days[i];

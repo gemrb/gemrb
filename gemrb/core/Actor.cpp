@@ -143,10 +143,6 @@ static int **monkbon = NULL;
 static int monkbon_cols = 0;
 static int monkbon_rows = 0;
 
-// reaction modifiers (by reputation and charisma)
-int rmodrep[20];
-int rmodchr[25];
-
 // reputation modifiers
 static int **reputationmod = NULL;
 #define CLASS_PCCUTOFF 32
@@ -1691,22 +1687,6 @@ static void InitActorTables()
 		}
 	}
 
-	//initializing the reaction mod. reputation table
-	tm.load("rmodrep");
-	if (tm) {
-		for (int reputation=0;reputation<20;reputation++) {
-			rmodrep[reputation]=strtol(tm->QueryField(0,reputation), NULL, 0);
-		}
-	}
-
-	//initializing the reaction mod. charisma table
-	tm.load("rmodchr");
-	if (tm) {
-		for (int charisma=0;charisma<25;charisma++) {
-			rmodchr[charisma]=strtol(tm->QueryField(0,charisma), NULL, 0);
-		}
-	}
-
 	//wild magic level modifiers
 	for(i=0;i<20;i++) {
 		wmlevels[i]=(int *) calloc(MAX_LEVEL,sizeof(int) );
@@ -2526,25 +2506,22 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 	if (damage > 0 && resisted != DR_IMMUNE) {
 		printMessage("Actor", " ", GREEN);
 		printf("%d damage taken.\n", damage);
-		char dmg_str[8];
-		snprintf(dmg_str, 8, "%d", damage);
 
 		if (detailed) {
 			// 3 choices depending on resistance and boni
 			// iwd2 also has two Tortoise Shell (spell) absorption strings
 			core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name);
-			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", dmg_str);
+			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter ? hitter->GetName(1) : this->GetName(1) );
 			int bonus = 0; //TODO: change this once damage bonus is supported
-			char resist_str[8];
-			snprintf(resist_str, 8, "%d", abs(resisted-bonus));
+			unsigned int delta = abs(resisted-bonus);
 			if (bonus-resisted > 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
-				core->GetTokenDictionary()->SetAtCopy( "RESISTED", resist_str);
+				core->GetTokenDictionary()->SetAtCopy( "RESISTED", delta);
 				core->DisplayConstantStringName(STR_DAMAGE3, 0xffffff, this);
 			} else if (bonus-resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage resisted)
-				core->GetTokenDictionary()->SetAtCopy( "RESISTED", resist_str);
+				core->GetTokenDictionary()->SetAtCopy( "RESISTED", delta);
 				core->DisplayConstantStringName(STR_DAMAGE2, 0xffffff, this);
 			} else {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
@@ -2561,7 +2538,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
 			// wipe the DAMAGER token, so we can color it
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", "" );
-			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", dmg_str);
+			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
 			core->DisplayConstantStringName(STR_DAMAGE1, 0xffffff, hitter);
 		}
 	} else {
@@ -2822,9 +2799,7 @@ int Actor::CastingLevelBonus(int level, int type) const
 		return 0;
 	}
 
-	char bonus_str[8];
-	snprintf(bonus_str, 8, "%d", bonus);
-	core->GetTokenDictionary()->SetAtCopy("LEVELDIF", bonus_str);
+	core->GetTokenDictionary()->SetAtCopy("LEVELDIF", bonus);
 
 	if (bonus > 0) {
 		core->DisplayConstantStringName(STR_CASTER_LVL_INC, 0xffffff, this);
@@ -3592,7 +3567,7 @@ const char* Actor::GetScript(int ScriptIndex) const
 	return Scripts[ScriptIndex]->GetName();
 }
 
-void Actor::SetModal(ieDword newstate)
+void Actor::SetModal(ieDword newstate, bool force)
 {
 	switch(newstate) {
 		case MS_NONE:
@@ -3608,12 +3583,26 @@ void Actor::SetModal(ieDword newstate)
 		default:
 			return;
 	}
-	//come here only if success
-	ModalState = newstate;
 
-	//update the action bar
-	if (InParty)
+	if (InParty) {
+		// TODO: display the turning-off message
+		if (ModalState != MS_NONE) {
+			printf("Turning off state:%d:\n", ModalState);
+		}
+
+		// when called with the same state twice, toggle to MS_NONE
+		if (!force && ModalState == newstate) {
+			ModalState = MS_NONE;
+		} else {
+			ModalState = newstate;
+			// TODO: display the turning-on message
+		}
+
+		//update the action bar
 		core->SetEventFlag(EF_ACTION);
+	} else {
+		ModalState = newstate;
+	}
 }
 
 //this is just a stub function for now, attackstyle could be melee/ranged
@@ -3884,7 +3873,13 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 		}
 	}
 
-	// TODO: add hated race +4 attack bonus
+	// add +4 attack bonus vs racial enemies
+	if (GetRangerLevel()) {
+		Actor *target = area->GetActorByGlobalID(LastTarget);
+		if (target && IsRacialEnemy(target)) {
+			tohit += 4;
+		}
+	}
 
 	if (ReverseToHit) {
 		tohit = (signed)GetStat(IE_TOHIT)-tohit;
@@ -6000,18 +5995,6 @@ void Actor::UseExit(int flag) {
 	}
 }
 
-int Actor::GetReaction()
-{
-	int chr, rep;
-	chr = GetStat(IE_CHR)-1;
-	if (GetStat(IE_EA) == EA_PC) {
-		rep = core->GetGame()->Reputation/10;
-	} else {
-		rep = GetStat(IE_REPUTATION);
-	}
-	return 10 + rmodrep[rep] + rmodchr[chr];
-}
-
 // luck increases the minimum roll per dice, but only up to the number of dice sides;
 // luck does not affect critical hit chances:
 // if critical is set, it will return 1/sides on a critical, otherwise it can never
@@ -6130,6 +6113,22 @@ bool Actor::IsBehind(Actor* target)
 		if (diff >= MAX_ORIENT) diff -= MAX_ORIENT;
 		if (diff <= -1) diff += MAX_ORIENT;
 		if (diff == (signed)tar_orient) return true;
+	}
+	return false;
+}
+
+// checks all the actor's stats to see if the target is her racial enemy
+bool Actor::IsRacialEnemy(Actor* target)
+{
+	if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
+		return true;
+	} else if (core->HasFeature(GF_3ED_RULES)) {
+		// iwd2 supports multiple racial enemies gained through level progression
+		for (unsigned int i=0; i<7; i++) {
+			if (Modified[IE_HATEDRACE2+i] == target->Modified[IE_RACE]) {
+				return true;
+			}
+		}
 	}
 	return false;
 }
