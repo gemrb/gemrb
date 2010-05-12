@@ -5350,19 +5350,6 @@ void GameScript::FindTraps(Scriptable* Sender, Action* /*parameters*/)
 	actor->SetModal( MS_DETECTTRAPS);
 }
 
-static EffectRef fx_disable_button_ref={ "DisableButton", NULL, -1 };
-
-inline void HideFailed(Actor* actor)
-{
-	actor->SetModal(MS_NONE);
-
-	Effect *newfx;
-	newfx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_LIMITED);
-	newfx->Duration = 6; // 90 ticks, 1 round
-	core->ApplyEffect(newfx, actor, actor);
-	delete newfx;
-}
-
 void GameScript::Hide(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -5370,48 +5357,9 @@ void GameScript::Hide(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *actor = (Actor *) Sender;
 
-	ieDword roll = actor->LuckyRoll(1, 100, 0); 
-	if (roll == 1) {
-		HideFailed(actor);
-		return;
+	if (actor->TryToHide()) {
+		actor->SetModal(MS_STEALTH);
 	}
-
-	// check for disabled dualclassed thieves (not sure if we need it)
-
-	if (actor->Modified[IE_DISABLEDBUTTON] & (1<<ACT_STEALTH)) {
-		HideFailed(actor);
-		return;
-	}
-
-	// check if the pc is in combat (seen / heard)
-	Game *game = core->GetGame();
-	if (game->PCInCombat(actor)) {
-		HideFailed(actor);
-		return;
-	}
-
-	ieDword skill;
-	if (core->HasFeature(GF_HAS_HIDE_IN_SHADOWS)) {
-		skill = (actor->GetStat(IE_HIDEINSHADOWS) + actor->GetStat(IE_STEALTH))/2;
-	} else {
-		skill = actor->GetStat(IE_STEALTH);
-	}
-
-	// check how bright our spot is
-	ieDword lightness = game->GetCurrentArea()->GetLightLevel(actor->Pos);
-	// seems to be the color overlay at midnight; lightness of a point with rgb (200, 100, 100)
-	// TODO: but our NightTint computes to a higher value, which one is bad?
-	ieDword ref_lightness = 43;
-	ieDword light_diff = int((lightness - ref_lightness) * 100 / (100 - ref_lightness)) / 2;
-	ieDword chance = (100 - light_diff) * skill/100;
-
-	if (roll > chance) {
-		HideFailed(actor);
-		return;
-	}
-
-	actor->SetModal( MS_STEALTH);
-
 	//TODO: expiry isn't instant (skill based transition?)
 
 }
