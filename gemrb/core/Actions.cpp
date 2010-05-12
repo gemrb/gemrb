@@ -5354,7 +5354,6 @@ static EffectRef fx_disable_button_ref={ "DisableButton", NULL, -1 };
 
 inline void HideFailed(Actor* actor)
 {
-	core->DisplayConstantStringName(STR_HIDEFAILED, 0xffffff, actor);
 	actor->SetModal(MS_NONE);
 
 	Effect *newfx;
@@ -5412,9 +5411,7 @@ void GameScript::Hide(Scriptable* Sender, Action* /*parameters*/)
 	}
 
 	actor->SetModal( MS_STEALTH);
-	core->DisplayConstantStringName(STR_HIDEDONE, 0xffffff, actor);
 
-	//TODO: show STR_HIDENOMORE on expiry/abort
 	//TODO: expiry isn't instant (skill based transition?)
 
 }
@@ -5434,7 +5431,6 @@ void GameScript::Turn(Scriptable* Sender, Action* /*parameters*/)
 	if (skill < 1) return;
 
 	actor->SetModal(MS_TURNUNDEAD);
-	core->DisplayConstantStringName(STR_TURNING_ON, 0xffffff, actor);
 
 }
 
