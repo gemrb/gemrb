@@ -183,16 +183,11 @@
 #define STR_CRITICAL_MISS 150
 #define STR_DEATH 151
 #define STR_BACKSTAB 152
-#define STR_HIDEFAILED 153
-#define STR_HIDEDONE 154
-#define STR_HIDENOMORE 155
-#define STR_BACKSTAB_BAD 156
-#define STR_BACKSTAB_FAIL 157
-#define STR_TURNING_ON 158 // turning undead
-#define STR_TURNING_OFF 159
-#define STR_CASTER_LVL_INC 160 // caster level bonus (wild mages)
-#define STR_CASTER_LVL_DEC 161
+#define STR_BACKSTAB_BAD 153
+#define STR_BACKSTAB_FAIL 154
+#define STR_CASTER_LVL_INC 155 // caster level bonus (wild mages)
+#define STR_CASTER_LVL_DEC 156
 
-#define STRREF_COUNT 162
+#define STRREF_COUNT 157
 
 #endif //! IE_STRINGS_H

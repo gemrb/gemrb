@@ -104,6 +104,14 @@ struct DamageInfoStruct {
 	// maybe also add the ac bonus and/or the DL_ constants
 };
 
+struct ModalStatesStruct {
+	ieResRef spell;
+	char action[16];
+	unsigned int entering_str;
+	unsigned int leaving_str;
+	unsigned int failed_str;
+};
+
 class ItemList {
 public:
 	ieResRef *ResRefs;
@@ -325,6 +333,7 @@ public:
 	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6];
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
+	std::vector<ModalStatesStruct> ModalStates;
 public:
 	Interface(int iargc, char *iargv[]);
 	~Interface(void);
@@ -660,6 +669,7 @@ private:
 	bool ReadAbilityTable(const ieResRef name, ieWordSigned *mem, int cols, int rows);
 	bool ReadMusicTable(const ieResRef name, int col);
 	bool ReadDamageTypeTable();
+	bool ReadModalStates();
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);
 	/** Reads itemexcl, itemdial, tooltip */

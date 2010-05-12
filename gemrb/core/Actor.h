@@ -642,5 +642,9 @@ public:
 	bool IsBehind(Actor* target);
 	/* checks whether the target is the actor's racial enemy */
 	bool IsRacialEnemy(Actor* target);
+	/* checks whether the actor can stay in the current modal state */
+	bool ModalSpellSkillCheck();
+	/* does all the game logic checks to see if the actor can hide */
+	bool TryToHide();
 };
 #endif

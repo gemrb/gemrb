@@ -3585,9 +3585,9 @@ void Actor::SetModal(ieDword newstate, bool force)
 	}
 
 	if (InParty) {
-		// TODO: display the turning-off message
+		// display the turning-off message
 		if (ModalState != MS_NONE) {
-			printf("Turning off state:%d:\n", ModalState);
+			core->DisplayStringName(core->ModalStates[ModalState].leaving_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
 		}
 
 		// when called with the same state twice, toggle to MS_NONE
@@ -3595,7 +3595,6 @@ void Actor::SetModal(ieDword newstate, bool force)
 			ModalState = MS_NONE;
 		} else {
 			ModalState = newstate;
-			// TODO: display the turning-on message
 		}
 
 		//update the action bar
@@ -3826,6 +3825,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	} else {
 		// ranged - no bonus
 	}
+
+	// TODO: Elves get a racial THAC0 bonus with all swords and bows in BG2 (but not daggers)
 
 	//second parameter is left or right hand flag
 	tohit = GetToHit(THAC0Bonus, Flags);
@@ -4248,7 +4249,18 @@ void Actor::UpdateActorState(ieDword gameTime) {
 			printMessage("Actor","Modal Spell Effect was not set!\n", YELLOW);
 			ModalSpell[0]='*';
 		} else if(ModalSpell[0]!='*') {
-			core->ApplySpell(ModalSpell, this, this, 0);
+			if (ModalSpellSkillCheck()) {
+				core->ApplySpell(ModalSpell, this, this, 0);
+				if (InParty) {
+					core->DisplayStringName(core->ModalStates[ModalState].entering_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
+				}
+			} else {
+				if (InParty) {
+					core->DisplayStringName(core->ModalStates[ModalState].failed_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
+				}
+				ModalState = MS_NONE;
+				// TODO: wait for a round until allowing new states?
+			}
 		}
 	}
 
@@ -6132,3 +6144,72 @@ bool Actor::IsRacialEnemy(Actor* target)
 	}
 	return false;
 }
+
+bool Actor::ModalSpellSkillCheck() {
+	switch(ModalState) {
+		case MS_BATTLESONG:
+		case MS_DETECTTRAPS:
+		case MS_TURNUNDEAD:
+			return true;
+		case MS_STEALTH:
+			return TryToHide();
+		case MS_NONE:
+		default:
+			return false;
+	}
+}
+
+static EffectRef fx_disable_button_ref={ "DisableButton", NULL, -1 };
+
+inline void HideFailed(Actor* actor)
+{
+	Effect *newfx;
+	newfx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_LIMITED);
+	newfx->Duration = 6; // 90 ticks, 1 round
+	core->ApplyEffect(newfx, actor, actor);
+	delete newfx;
+}
+
+bool Actor::TryToHide() {
+	ieDword roll = LuckyRoll(1, 100, 0);
+	if (roll == 1) {
+		HideFailed(this);
+		return false;
+	}
+
+	// check for disabled dualclassed thieves (not sure if we need it)
+
+	if (Modified[IE_DISABLEDBUTTON] & (1<<ACT_STEALTH)) {
+		HideFailed(this);
+		return false;
+	}
+
+	// check if the pc is in combat (seen / heard)
+	Game *game = core->GetGame();
+	if (game->PCInCombat(this)) {
+		HideFailed(this);
+		return false;
+	}
+
+	ieDword skill;
+	if (core->HasFeature(GF_HAS_HIDE_IN_SHADOWS)) {
+		skill = (GetStat(IE_HIDEINSHADOWS) + GetStat(IE_STEALTH))/2;
+	} else {
+		skill = GetStat(IE_STEALTH);
+	}
+
+	// check how bright our spot is
+	ieDword lightness = game->GetCurrentArea()->GetLightLevel(Pos);
+	// seems to be the color overlay at midnight; lightness of a point with rgb (200, 100, 100)
+	// TODO: but our NightTint computes to a higher value, which one is bad?
+	ieDword ref_lightness = 43;
+	ieDword light_diff = int((lightness - ref_lightness) * 100 / (100 - ref_lightness)) / 2;
+	ieDword chance = (100 - light_diff) * skill/100;
+
+	if (roll > chance) {
+		HideFailed(this);
+		return false;
+	}
+	return true;
+}
+

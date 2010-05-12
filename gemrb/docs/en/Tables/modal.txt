@@ -4,6 +4,9 @@ These modal actions were hardcoded in the original engines.
 Columns - 
   SPELL - the spell resource assigned to the modal action.
   ACTION - the name of the equivalent action in GemRB
+  STR_ON - the string to display when enabling this action/state
+  STR_OFF - the string to display when disabling this state
+  STR_FAILED - the string to display when enabling of this state fails
 
 Rows - the modal actions have a somewhat determined order.
 The first row should be left blank.
