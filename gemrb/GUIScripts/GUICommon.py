@@ -271,6 +271,9 @@ def GameIsPST ():
 def GameIsIWD ():
 	return GemRB.GameType == "iwd"
 
+def GameIsHOW ():
+	return GemRB.GameType == "how"
+
 def GameIsIWD2 ():
 	return GemRB.GameType == "iwd2"
 
@@ -286,14 +289,14 @@ def GameIsTOB ():
 def HasTOB ():
 	return GemRB.HasResource ("worldm25", RES_WMP)
 
-def GameIsHOW ():
+def HasHOW ():
 	return GemRB.HasResource ("expmap", RES_WMP)
 
 def HasTOTL ():
 	return GemRB.HasResource ("ar9700", RES_ARE)
 
 def GetIWDSpellButtonCount ():
-	if GameIsHOW():
+	if HasHOW():
 		return 24
 	else:
 		return 20
