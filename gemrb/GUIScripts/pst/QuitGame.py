@@ -24,6 +24,7 @@
 import GemRB
 from GUIDefines import *
 from GUICommonWindows import GetWindowPack
+from GUICommon import GameWindow
 
 movies = [None,"T1DEATH","T1ABSORB","FINALE"]
 
@@ -68,5 +69,5 @@ def DeathWindowEnd ():
 	GemRB.SetVar ("PortraitWindow", Window.ID)
 	GemRB.UnhideGUI ()
 	#making the playing field gray
-	GemRB.SetVisible (0, WINDOW_GRAYED)
+	GameWindow.SetVisible(WINDOW_GRAYED)
 	return

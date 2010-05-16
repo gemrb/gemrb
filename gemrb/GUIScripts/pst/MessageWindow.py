@@ -26,6 +26,7 @@ import GemRB
 
 from GUICommonWindows import *
 import GUICommonWindows
+from GUICommon import GameControl
 from GUIClasses import GTextArea
 
 from FloatMenuWindow import *
@@ -123,7 +124,7 @@ def UpdateControlStatus ():
 		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 		GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
 		GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
-		GemRB.SetControlStatus (0,0,IE_GUI_CONTROL_FOCUSED)
+		GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 
 	if hideflags:
 		GemRB.UnhideGUI ()

@@ -37,6 +37,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
+from GUICommon import GameWindow
 from GUISAVE import *
 from GUICommonWindows import *
  
@@ -70,7 +71,7 @@ def CloseOptionsWindow ():
 	GameOptionsWindow = None
 	SetSelectionChangeHandler (None)
 	GemRB.SetVar ("OtherWindow", -1)
-	GemRB.SetVisible (0, WINDOW_VISIBLE)
+	GameWindow.SetVisible(WINDOW_VISIBLE)
 	OptionsWindow = OldOptionsWindow
 	OldOptionsWindow = None
 	return
@@ -89,7 +90,7 @@ def OpenOptionsWindow ():
 		return
 
 	#hideflag = GemRB.HideGUI ()
-	GemRB.SetVisible (0, WINDOW_INVISIBLE)
+	GameWindow.SetVisible(WINDOW_INVISIBLE)
 	SetSelectionChangeHandler (DummyWindow)
 
 	GemRB.LoadWindowPack ("GUIOPT", 640, 480)

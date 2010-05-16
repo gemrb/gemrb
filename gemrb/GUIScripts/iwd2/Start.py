@@ -97,7 +97,7 @@ def OnLoad():
 
 def ProtocolPress():
 	global StartWindow, ProtocolWindow
-	#GemRB.UnloadWindow(StartWindow)
+	#StartWindow.Unload()
 	StartWindow.SetVisible(WINDOW_INVISIBLE)
 	ProtocolWindow = GemRB.LoadWindowObject(1)
 

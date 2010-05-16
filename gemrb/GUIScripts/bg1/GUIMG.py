@@ -27,6 +27,7 @@ import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import CloseOtherWindow, ClassSkillsTable
+from GUICommon import GameWindow
 from GUICommonWindows import *
 
 MageWindow = None
@@ -47,7 +48,7 @@ def OpenMageWindow ():
 			OptionsWindow.Unload ()
 		MageWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.SetVisible (0, WINDOW_VISIBLE)
+		GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
@@ -55,7 +56,7 @@ def OpenMageWindow ():
 		return
 		
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0, WINDOW_INVISIBLE)
+	GameWindow.SetVisible(WINDOW_INVISIBLE)
 	GemRB.LoadWindowPack ("GUIMG")
 	MageWindow = Window = GemRB.LoadWindowObject (2)
 	GemRB.SetVar ("OtherWindow", MageWindow.ID)

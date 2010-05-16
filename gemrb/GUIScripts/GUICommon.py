@@ -20,6 +20,7 @@
 # GUICommon.py - common functions for GUIScripts of all game types
 
 import GemRB
+import GUIClasses
 from ie_restype import *
 from ie_spells import LS_MEMO
 from GUIDefines import *
@@ -903,3 +904,5 @@ def LoadCommonTables():
 		StrModTable = GemRB.LoadTableObject ("strmod")
 		StrModExTable = GemRB.LoadTableObject ("strmodex")
 
+GameWindow = GUIClasses.GWindow(0)
+GameControl = GUIClasses.GControl(0,0)

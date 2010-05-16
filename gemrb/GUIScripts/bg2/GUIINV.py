@@ -30,6 +30,7 @@ from ie_stats import *
 from ie_slots import *
 from ie_spells import *
 from GUICommon import CloseOtherWindow, SetColorStat, HasTOB, CannotLearnSlotSpell
+from GUICommon import GameWindow
 from GUICommonWindows import *
 
 InventoryWindow = None
@@ -82,13 +83,13 @@ def OpenInventoryWindow ():
 		OldOptionsWindow = None
 		#don't go back to multi selection mode when going to the store screen
 		if not GemRB.GetVar ("Inventory"):
-			GemRB.SetVisible (0, WINDOW_VISIBLE)
+			GameWindow.SetVisible(WINDOW_VISIBLE)
 			GemRB.UnhideGUI ()
 			SetSelectionChangeHandler (None)
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0, WINDOW_INVISIBLE)
+	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIINV", 640, 480)
 	InventoryWindow = Window = GemRB.LoadWindowObject (2)
