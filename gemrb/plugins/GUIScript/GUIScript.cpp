@@ -9681,6 +9681,12 @@ bool GUIScript::Init(void)
 		return false;
 	}
 
+	if (PyRun_SimpleString( "from GemRB import *" ) == -1) {
+		printMessage( "GUIScript", " ", RED );
+		printf("builtin GemRB module failed to load!!! ");
+		return false;
+	}
+
 	PyObject *pMainMod = PyImport_AddModule( "__main__" );
 	/* pMainMod is a borrowed reference */
 	pMainDic = PyModule_GetDict( pMainMod );
@@ -9797,16 +9803,6 @@ void GUIScript::ExecString(const char* string)
 		if (PyErr_Occurred()) {
 			PyErr_Print();
 		}
-		// try with GemRB. prefix
-		char * newstr = (char *) malloc( strlen(string) + 7 );
-		strncpy(newstr, "GemRB.", 6);
-		strcpy(newstr + 6, string);
-		if (PyRun_SimpleString( newstr ) == -1) {
-			if (PyErr_Occurred()) {
-				PyErr_Print();
-			}
-		}
-		free( newstr );
 	}
 }
 
