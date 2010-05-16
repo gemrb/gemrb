@@ -23,7 +23,7 @@
 ###################################################
 
 import GemRB
-from GUICommon import GameIsHOW, HasTOTL
+from GUICommon import HasHOW, HasTOTL
 
 PartyFormationWindow = 0
 CreateCharWindow = 0
@@ -80,7 +80,7 @@ def OnLoad ():
 		DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"EnterGamePress")
 
-	if not GameIsHOW():
+	if not HasHOW():
 		GemRB.SetVar ("SaveDir",1) #using mpsave??
 		GemRB.SetVar ("PlayMode",0) #using second row??
 	else:

@@ -333,6 +333,11 @@ def AcceptPress():
 		for i in range (len(Learnable) ):
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
 	
+	# ranger tracking is a hardcoded innate
+	if HasHOW():
+		if ClassSkillsTable.GetValue (GemRB.GetPlayerStat (MyChar, IE_CLASS), 0) != "*":
+			GemRB.LearnSpell (MyChar, "spin139", LS_MEMO)
+
 	# save all the skills
 	SkillsSave (MyChar)
 

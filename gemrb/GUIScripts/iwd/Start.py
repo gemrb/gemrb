@@ -24,7 +24,7 @@
 
 import GemRB
 from ie_restype import *
-from GUICommon import LoadCommonTables, GameIsHOW
+from GUICommon import LoadCommonTables, HasHOW
 
 StartWindow = 0
 JoinGameButton = 0
@@ -42,7 +42,7 @@ def OnLoad ():
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos:
 		GemRB.PlayMovie ("BISLOGO", 1)
-		if GameIsHOW():
+		if HasHOW():
 			GemRB.PlayMovie ("WOTC", 1)
 		else:
 			GemRB.PlayMovie ("TSRLOGO", 1)
@@ -170,7 +170,7 @@ def ProtocolDonePress ():
 def CreatePress ():
 	global StartWindow, GameTypeWindow, ExpansionType
 
-	if not GameIsHOW():
+	if not HasHOW():
 		GameTypeReallyDonePress()
 
 	GameTypeWindow = GemRB.LoadWindowObject (24)

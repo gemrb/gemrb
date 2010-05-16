@@ -25,7 +25,7 @@ import GemRB
 from GUICommonWindows import *
 import GUICommonWindows
 from GUIClasses import GTextArea
-from GUICommon import GameIsHOW
+from GUICommon import HasHOW
 
 from GUIJRNL import *
 from GUIMA import *
@@ -57,7 +57,7 @@ def OnLoad():
 	GUICommonWindows.OptionsWindow = None
 
 	#this is different in IWD (0) and HoW (25)
-	if GameIsHOW():
+	if HasHOW():
 		OptionsWindow = GemRB.LoadWindowObject (25)
 	else:
 		OptionsWindow = GemRB.LoadWindowObject (0)

@@ -3188,10 +3188,12 @@ void Map::SetTrackString(ieStrRef strref, int flg, int difficulty)
 
 bool Map::DisplayTrackString(Actor *target)
 {
-	ieDword skill = target->GetStat(IE_TRACKING);
-	//remove this, if it can succeed without skill
-	if (!skill) return true;
-	if (core->Roll(1,20,skill)<trackDiff) {
+	// this stat isn't saved
+	// according to the HoW manual the chance of success is:
+	// +5% for every three levels and +5% per point of wisdom
+	int skill = target->GetStat(IE_TRACKING);
+	skill += (target->GetStat(IE_LEVEL)/3)*5 + target->GetStat(IE_WIS)*5;
+	if (core->Roll(1, 100, trackDiff) > skill) {
 		core->DisplayConstantStringName(STR_TRACKINGFAILED, 0xd7d7be, target);
 		return true;
 	}

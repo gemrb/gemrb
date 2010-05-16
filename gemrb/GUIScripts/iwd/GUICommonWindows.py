@@ -104,7 +104,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 
 	if Gears:
 		# Gears (time), how doesn't have this in the right place
-		if GameIsHOW():
+		if HasHOW():
 			pos = GemRB.GetSystemVariable (SV_HEIGHT)-71
 			Window.CreateButton (9, 6, pos, 64, 71)
 		Button = Window.GetControl (9)
@@ -411,13 +411,13 @@ def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
 	#take care, this window is different in how/iwd
-	if GameIsHOW() and needcontrols:
+	if HasHOW() and needcontrols:
 		PortraitWindow = Window = GemRB.LoadWindowObject (26)
 	else:
 		PortraitWindow = Window = GemRB.LoadWindowObject (1)
 
 	if needcontrols:
-		if GameIsHOW():
+		if HasHOW():
 			# Rest (how)
 			pos = GemRB.GetSystemVariable (SV_HEIGHT) - 37
 			Window.CreateButton (8, 6, pos, 55, 37)
@@ -444,13 +444,13 @@ def OpenPortraitWindow (needcontrols):
 			Button.SetTooltip (15918)
 
 		#Select All
-		if GameIsHOW():
+		if HasHOW():
 			Window.CreateButton (7, 33, pos, 27, 36)
 		Button = Window.GetControl (7)
 		Button.SetSprites ("GUIBTACT", 0, 50, 51, 50, 51)
 		Button.SetTooltip (10485)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
-		if not GameIsHOW():
+		if not HasHOW():
 			# Rest (iwd)
 			Button = PortraitWindow.GetControl (8)
 			Button.SetTooltip (11942)
