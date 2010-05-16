@@ -9692,6 +9692,11 @@ bool GUIScript::Init(void)
 	pMainDic = PyModule_GetDict( pMainMod );
 	/* pMainDic is a borrowed reference */
 
+	PyObject *pClassesMod = PyImport_AddModule( "GUIClasses" );
+	/* pClassesMod is a borrowed reference */
+	pGUIClasses = PyModule_GetDict( pClassesMod );
+	/* pGUIClasses is a borrowed reference */
+
 	return true;
 }
 
@@ -9808,12 +9813,12 @@ void GUIScript::ExecString(const char* string)
 
 PyObject* GUIScript::ConstructObject(const char* classname, PyObject* pArgs)
 {
-	if (!pDict) {
+	if (!pGUIClasses) {
 		fprintf(stderr, "Tried to use an object (%s) before script compiled!\n", classname);
 		return 0;
 	}
 
-	PyObject* cobj = PyDict_GetItemString( pDict, classname );
+	PyObject* cobj = PyDict_GetItemString( pGUIClasses, classname );
 	if (!cobj) {
 		fprintf(stderr, "Failed to lookup name '%s'\n", classname);
 		return 0;

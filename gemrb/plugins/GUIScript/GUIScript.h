@@ -42,6 +42,7 @@ class GUIScript : public ScriptEngine {
 private:
 	PyObject* pModule, * pDict;
 	PyObject* pMainDic;
+	PyObject* pGUIClasses;
 public:
 	GUIScript(void);
 	~GUIScript(void);
