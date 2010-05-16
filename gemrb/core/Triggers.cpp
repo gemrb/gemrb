@@ -25,6 +25,7 @@
 #include "Game.h"
 #include "GameControl.h"
 #include "Calendar.h"
+#include "GameData.h"
 
 //-------------------------------------------------------------
 // Trigger Functions

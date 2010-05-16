@@ -97,5 +97,6 @@ private:
 	std::vector<Table> tables;
 };
 
+extern GEM_EXPORT GameData * gamedata;
 
 #endif

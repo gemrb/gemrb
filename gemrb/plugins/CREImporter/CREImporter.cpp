@@ -23,6 +23,7 @@
 #include "Interface.h"
 #include "EffectMgr.h"
 #include "GameScript.h"
+#include "GameData.h"
 #include "ie_stats.h"
 #include <cassert>
 

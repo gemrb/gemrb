@@ -22,6 +22,7 @@
 #include "Interface.h"
 #include "Inventory.h"
 #include "STOImporter.h"
+#include "GameData.h"
 
 STOImporter::STOImporter(void)
 {

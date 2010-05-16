@@ -26,6 +26,7 @@
 #include "ImageMgr.h"
 #include "Map.h"
 #include "Game.h"
+#include "GameData.h"
 
 static int AvatarsCount = 0;
 static AvatarStruct *AvatarTable = NULL;

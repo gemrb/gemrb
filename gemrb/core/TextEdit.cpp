@@ -23,6 +23,7 @@
 #include "Interface.h"
 #include "Video.h"
 #include "Palette.h"
+#include "GameData.h"
 
 TextEdit::TextEdit(unsigned short maxLength, unsigned short px, unsigned short py)
 {

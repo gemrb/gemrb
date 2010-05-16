@@ -26,6 +26,7 @@
 #include "Interface.h"
 #include "Video.h"
 #include "Palette.h"
+#include "GameData.h"
 #include <cassert>
 
 unsigned int lastX = 0;

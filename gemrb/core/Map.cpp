@@ -42,17 +42,7 @@
 #include "Palette.h"
 #include "MapMgr.h"
 #include "GSUtils.h"
-
-#ifndef WIN32
-#include <sys/time.h>
-#else
-extern HANDLE hConsole;
-#endif
-
-extern Interface* core;
-#ifdef WIN32
-extern HANDLE hConsole;
-#endif
+#include "GameData.h"
 
 #define YESNO(x) ( (x)?"Yes":"No")
 

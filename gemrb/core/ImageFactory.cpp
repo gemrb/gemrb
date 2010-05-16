@@ -23,8 +23,6 @@
 #include "Interface.h"
 #include "Video.h"
 
-extern Interface* core;
-
 ImageFactory::ImageFactory(const char* ResRef, Sprite2D* bitmap_)
 	: FactoryObject( ResRef, IE_BMP_CLASS_ID ), bitmap(bitmap_)
 {

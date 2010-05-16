@@ -34,6 +34,7 @@
 #include "WorldMap.h"
 #include "DataFileMgr.h"
 #include "AmbientMgr.h"
+#include "GameData.h"
 
 //------------------------------------------------------------
 // Action Functions

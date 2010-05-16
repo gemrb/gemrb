@@ -45,6 +45,7 @@
 #include "ResourceDesc.h"
 #include "PalettedImageMgr.h"
 #include "ImageMgr.h"
+#include "GameData.h"
 
 #include <cstdio>
 

@@ -29,6 +29,7 @@
 #include "Palette.h"
 #include "AnimationFactory.h"
 #include "Game.h" // for GetGlobalTint
+#include "GameData.h"
 
 #include "TileRenderer.inl"
 

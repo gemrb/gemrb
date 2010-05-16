@@ -27,6 +27,7 @@
 #include "Audio.h"
 #include "Video.h"
 #include "Game.h"
+#include "GameData.h"
 
 #define ILLEGAL 0         //
 #define ONE 1             //hold

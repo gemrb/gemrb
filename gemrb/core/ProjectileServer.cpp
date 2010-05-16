@@ -22,6 +22,7 @@
 #include "Interface.h"
 #include "SymbolMgr.h"
 #include "ProjectileMgr.h"
+#include "GameData.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
