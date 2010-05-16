@@ -37,11 +37,7 @@
 #include "Video.h"
 #include "damages.h"
 #include "ProjectileServer.h"
-
-extern Interface* core;
-#ifdef WIN32
-extern HANDLE hConsole;
-#endif
+#include "GameData.h"
 
 static const Color green = {
 	0x00, 0xff, 0x00, 0xff

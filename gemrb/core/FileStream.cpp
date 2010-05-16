@@ -22,8 +22,6 @@
 #include "FileStream.h"
 #include "Interface.h"
 
-extern Interface* core;
-
 FileStream::FileStream(void)
 {
 	opened = false;

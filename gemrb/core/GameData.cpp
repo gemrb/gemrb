@@ -74,6 +74,8 @@ static void ReleasePalette(void *poi)
 	} \
 }
 
+GEM_EXPORT GameData* gamedata;
+
 GameData::GameData()
 {
 	factory = new Factory();

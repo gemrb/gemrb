@@ -26,6 +26,7 @@
 #include "Interface.h"
 #include "Video.h" //for tints
 #include "TileMap.h"
+#include "GameData.h"
 
 int fx_set_status (Scriptable* Owner, Actor* target, Effect* fx);//ba
 int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx);//bb

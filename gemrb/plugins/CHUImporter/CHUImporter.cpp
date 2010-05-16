@@ -31,6 +31,7 @@
 #include "AnimationFactory.h"
 #include "ImageMgr.h"
 #include "RGBAColor.h"
+#include "GameData.h"
 
 CHUImporter::CHUImporter()
 {

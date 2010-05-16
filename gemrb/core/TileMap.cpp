@@ -23,8 +23,6 @@
 #include "Interface.h"
 #include "Video.h"
 
-extern Interface* core;
-
 TileMap::TileMap(void)
 {
 	XCellCount = 0;

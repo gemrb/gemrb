@@ -24,6 +24,7 @@
 #include "GameScript.h"
 #include "Item.h"
 #include "Game.h"
+#include "GameData.h"
 
 Store::Store(void)
 {

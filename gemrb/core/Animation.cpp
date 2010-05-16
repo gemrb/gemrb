@@ -31,8 +31,6 @@
 #include <windows.h>
 #endif
 
-extern Interface* core;
-
 Animation::Animation(int count)
 {
 	frames = (Sprite2D **) calloc(count, sizeof(Sprite2D *));

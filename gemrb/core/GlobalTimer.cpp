@@ -25,8 +25,6 @@
 #include "GameControl.h"
 #include "ControlAnimation.h"
 
-extern Interface* core;
-
 GlobalTimer::GlobalTimer(void)
 {
 	//AI_UPDATE_TIME: how many AI updates in a second

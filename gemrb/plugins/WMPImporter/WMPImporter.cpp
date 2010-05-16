@@ -22,6 +22,7 @@
 #include "Interface.h"
 #include "ImageMgr.h"
 #include "WMPImporter.h"
+#include "GameData.h"
 
 WMPImporter::WMPImporter(void)
 {

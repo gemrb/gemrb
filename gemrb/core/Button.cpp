@@ -25,6 +25,7 @@
 #include "Palette.h"
 #include "Variables.h"
 #include "defsounds.h"
+#include "GameData.h"
 
 Button::Button()
 {

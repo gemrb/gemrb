@@ -29,6 +29,7 @@
 #include "GameScript.h"
 #include "strrefs.h"
 #include "defsounds.h"
+#include "GameData.h"
 
 #define MAX_MAPS_LOADED 1
 

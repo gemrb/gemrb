@@ -25,6 +25,7 @@
 #include "TableMgr.h"
 #include "Actor.h"
 #include "Projectile.h"
+#include "GameData.h"
 
 static bool SBInitialized = false;
 static int NUM_BOOK_TYPES = 3;

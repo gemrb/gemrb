@@ -27,11 +27,7 @@
 #include "Game.h"
 #include "Audio.h"
 #include "ProjectileServer.h"
-
-extern Interface* core;
-#ifdef WIN32
-extern HANDLE hConsole;
-#endif
+#include "GameData.h"
 
 //to get gradient color
 #define PALSIZE 12
