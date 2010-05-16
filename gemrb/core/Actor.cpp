@@ -18,6 +18,10 @@
  *
  */
 
+//This class represents the .cre (creature) files.
+//Any player or non-player character is a creature.
+//Actor is a scriptable object (Scriptable). See ActorBlock.cpp
+
 #include "win32def.h"
 #include <cassert>
 #include "TableMgr.h"

@@ -18,6 +18,9 @@
  *
  */
 
+//This class represents .sto (store) files of the game.
+//Inns, pubs, temples, backpacks are also implemented by stores.
+
 #include "win32def.h"
 #include "Store.h"
 #include "Interface.h"

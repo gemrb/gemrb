@@ -18,6 +18,8 @@
  *
  */
 
+// This class represents the .gam (savegame) file in the engine
+
 #include "win32def.h"
 #include "Game.h"
 #include "MapMgr.h"

@@ -18,6 +18,9 @@
  *
  */
 
+//This class represents game fonts. Fonts are special .bam files.
+//Each cycle stands for a letter. 
+
 #include "win32def.h"
 #include "Font.h"
 #include "Interface.h"

@@ -18,6 +18,8 @@
  *
  */
 
+//This class represents the .spl (spell) files of the game.
+
 #include "win32def.h"
 #include "Actor.h"
 #include "Spell.h"

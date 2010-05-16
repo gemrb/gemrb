@@ -18,6 +18,9 @@
  *
  */
 
+//This class represents the inventory of stores (.sto), area containers (.are)
+//or actors (.cre).
+
 #include <stdio.h>
 #include "win32def.h"
 #include "strrefs.h"
