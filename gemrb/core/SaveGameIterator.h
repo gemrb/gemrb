@@ -62,7 +62,7 @@ public:
 	}
 
 	Sprite2D* GetPortrait(int index);
-	Sprite2D* GetScreen();
+	Sprite2D* GetPreview();
 	DataStream* GetGame();
 	DataStream* GetWmap();
 	DataStream* GetSave();

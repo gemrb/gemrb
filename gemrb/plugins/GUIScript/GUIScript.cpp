@@ -3930,7 +3930,7 @@ static PyObject* GemRB_Button_SetSaveGamePreview(PyObject * /*self*/, PyObject* 
 		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
 		return NULL;
 	}
-	Sprite2D* Picture = sg->GetScreen();
+	Sprite2D* Picture = sg->GetPreview();
 	delete sg;
 	if (Picture == NULL) {
 		Py_INCREF( Py_None );

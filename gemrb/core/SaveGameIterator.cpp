@@ -65,14 +65,14 @@ Sprite2D* SaveGame::GetPortrait(int index)
 	return portrait;
 }
 
-Sprite2D* SaveGame::GetScreen()
+Sprite2D* SaveGame::GetPreview()
 {
 	ImageMgr *im = (ImageMgr*) manager.GetResource(Prefix, &ImageMgr::ID, true);
 	if (!im)
 		return NULL;
-	Sprite2D *screen = im->GetSprite2D();
+	Sprite2D *preview = im->GetSprite2D();
 	im->release();
-	return screen;
+	return preview;
 }
 
 DataStream* SaveGame::GetGame()
