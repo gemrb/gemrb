@@ -78,11 +78,12 @@ static void ParseGameDate(DataStream *ds, char *Date)
 	core->FreeString(c);
 }
 
-SaveGame::SaveGame(const char* path, const char* name, const char* prefix, int pCount, int saveID)
+SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID)
 {
 	strncpy( Prefix, prefix, sizeof( Prefix ) );
 	strncpy( Path, path, sizeof( Path ) );
 	strncpy( Name, name, sizeof( Name ) );
+	strncpy( SlotName, slotname, sizeof( SlotName ) );
 	PortraitCount = pCount;
 	SaveID = saveID;
 	char nPath[_MAX_PATH];
@@ -357,7 +358,7 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 	} while (( de2 = readdir( ndir ) ) != NULL);
 	closedir( ndir ); //No other files in the directory, close it
 
-	SaveGame* sg = new SaveGame( Path, savegameName, core->GameNameResRef, prtrt, savegameNumber );
+	SaveGame* sg = new SaveGame( Path, savegameName, core->GameNameResRef, slotname, prtrt, savegameNumber );
 	return sg;
 }
 

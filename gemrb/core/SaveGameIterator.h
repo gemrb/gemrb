@@ -34,7 +34,7 @@ class ImageMgr;
 
 class GEM_EXPORT SaveGame {
 public:
-	SaveGame(const char* path, const char* name, const char* prefix, int pCount, int saveID);
+	SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID);
 	~SaveGame();
 	int GetPortraitCount()
 	{
@@ -61,6 +61,10 @@ public:
 		return Date;
 	}
 	const char* GetGameDate();
+	const char* GetSlotName()
+	{
+		return SlotName;
+	}
 
 	Sprite2D* GetPortrait(int index);
 	Sprite2D* GetPreview();
@@ -73,6 +77,7 @@ private:
 	char Name[_MAX_PATH];
 	char Date[_MAX_PATH];
 	char GameDate[_MAX_PATH];
+	char SlotName[_MAX_PATH];
 	int PortraitCount;
 	int SaveID;
 	ResourceManager manager;
