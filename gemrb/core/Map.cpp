@@ -18,6 +18,8 @@
  *
  */
 
+// This class represents the .ARE (game area) files in the engine
+
 #include <cmath>
 #include <cassert>
 
@@ -40,20 +42,11 @@
 #include "Palette.h"
 #include "MapMgr.h"
 #include "GSUtils.h"
-
-#ifndef WIN32
-#include <sys/time.h>
-#else
-extern HANDLE hConsole;
-#endif
-
-extern Interface* core;
-#ifdef WIN32
-extern HANDLE hConsole;
-#endif
+#include "GameData.h"
 
 #define YESNO(x) ( (x)?"Yes":"No")
 
+// TODO: fix this hardcoded resource reference
 static ieResRef PortalResRef={"EF03TPR3"};
 static unsigned int PortalTime = 15;
 static unsigned int MAX_CIRCLESIZE = 8;
@@ -75,6 +68,7 @@ void ReleaseSpawnGroup(void *poi)
 {
 	delete (SpawnGroup *) poi;
 }
+
 void Map::ReleaseMemory()
 {
 	if (VisibilityMasks) {
@@ -151,6 +145,7 @@ inline static bool MustSave(Actor *actor)
 	return true;
 }
 
+//Preload spawn group entries (creature resrefs that reference groups of creatures)
 void InitSpawnGroups()
 {
 	ieResRef GroupName;
@@ -184,6 +179,7 @@ void InitSpawnGroups()
 	}
 }
 
+//Preload the searchmap configuration
 void InitPathFinder()
 {
 	PathFinderInited = true;
@@ -986,6 +982,7 @@ ScriptedAnimation *Map::GetNextScriptedAnimation(scaIterator &iter)
 
 static ieDword oldgametime = 0;
 
+//Draw the game area (including overlays, actors, animations, weather)
 void Map::DrawMap(Region screen)
 {
 	if (!TMap) {
@@ -994,6 +991,7 @@ void Map::DrawMap(Region screen)
 	Game *game = core->GetGame();
 	ieDword gametime = game->GameTime;
 
+	//area specific spawn.ini files (a PST feature)
 	if (INISpawn) {
 		INISpawn->CheckSpawn();
 	}

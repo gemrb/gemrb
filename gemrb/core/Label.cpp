@@ -24,6 +24,7 @@
 #include "Video.h"
 #include "Palette.h"
 #include "Variables.h"
+#include "GameData.h"
 
 Label::Label(Font* font)
 {

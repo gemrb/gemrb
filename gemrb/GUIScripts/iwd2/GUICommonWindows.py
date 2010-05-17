@@ -128,8 +128,7 @@ def SetupFormation ():
 	Window = PortraitWindow
 	for i in range (12):
 		Button = Window.GetControl (i+6)
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NORMAL, OP_SET
-)
+		Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%i,0,0,-1)
 		Button.SetVarAssoc ("Value", i)

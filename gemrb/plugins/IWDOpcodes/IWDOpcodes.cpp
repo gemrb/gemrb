@@ -30,6 +30,7 @@
 #include "damages.h"
 #include "GSUtils.h" //needs for displaystringcore
 #include "ProjectileServer.h" //needs for alter_animation
+#include "GameData.h"
 
 static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
 

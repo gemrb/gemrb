@@ -37,9 +37,6 @@
 #include "Cache.h"
 #include "GlobalTimer.h"
 
-// TODO: remove this header dependency
-#include "GameData.h"
-
 class Audio;
 class Video;
 class Resource;
@@ -246,7 +243,6 @@ private:
 	Video * video;
 	Audio * AudioDriver ;
 	ProjectileServer * projserv;
-	GameData * gamedata;
 	Image * pal256;
 	Image * pal32;
 	Image * pal16;
@@ -758,25 +754,9 @@ public:
 #endif
 };
 
-#ifdef GEM_BUILD_DLL
-
-#ifndef INTERFACE
-extern Interface* core;
-extern GameData* gamedata;
+extern GEM_EXPORT Interface * core;
 #ifdef WIN32
-extern HANDLE hConsole;
-#endif
-#endif
-
-#else
-#ifdef WIN32
-GEM_EXPORT Interface * core;
-GEM_EXPORT GameData * gamedata;
-GEM_EXPORT HANDLE hConsole;
-#else
-extern Interface * core;
-extern GameData * gamedata;
-#endif
+extern GEM_EXPORT HANDLE hConsole;
 #endif
 
 #endif

@@ -27,6 +27,7 @@ from GUIDefines import *
 #from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
 from GUICommonWindows import SetSelectionChangeHandler
 #import GUICommonWindows
+from GUICommon import GameWindow
 
 StoreWindow = None
 
@@ -63,7 +64,7 @@ def CloseStoreWindow ():
 		StoreWindow.Unload ()
 	StoreWindow = None
 	GemRB.LeaveStore ()
-	GemRB.SetVisible (0, WINDOW_VISIBLE) #enabling the game control screen
+	GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
 	GemRB.UnhideGUI () #enabling the other windows
 	SetSelectionChangeHandler (None)
 	
@@ -72,7 +73,7 @@ def OpenStoreWindow ():
 	global StoreWindow, party_gold, store_name, Store
 	
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0, WINDOW_INVISIBLE) #removing the game control screen
+	GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the game control screen
 	
 	GemRB.LoadWindowPack ("GUISTORE")
 	StoreWindow = Window = GemRB.LoadWindowObject (3)

@@ -18,6 +18,10 @@
  *
  */
 
+//This class represents the .cre (creature) files.
+//Any player or non-player character is a creature.
+//Actor is a scriptable object (Scriptable). See ActorBlock.cpp
+
 #include "win32def.h"
 #include <cassert>
 #include "TableMgr.h"
@@ -37,11 +41,7 @@
 #include "Video.h"
 #include "damages.h"
 #include "ProjectileServer.h"
-
-extern Interface* core;
-#ifdef WIN32
-extern HANDLE hConsole;
-#endif
+#include "GameData.h"
 
 static const Color green = {
 	0x00, 0xff, 0x00, 0xff
@@ -2778,7 +2778,7 @@ int Actor::GetWildMod(int level) const
 	if(GetStat(IE_KIT)&0x8000) {
 		if (level>=MAX_LEVEL) level=MAX_LEVEL;
 		if(level<1) level=1;
-		return wmlevels[core->Roll(1,20,0)][level-1];
+		return wmlevels[core->Roll(1,20,-1)][level-1];
 	}
 	return 0;
 }

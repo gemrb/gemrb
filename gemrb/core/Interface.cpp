@@ -81,7 +81,6 @@
 #include "ImageMgr.h"
 
 GEM_EXPORT Interface* core;
-GEM_EXPORT GameData* gamedata;
 
 #ifdef WIN32
 GEM_EXPORT HANDLE hConsole;
@@ -244,7 +243,6 @@ Interface::Interface(int iargc, char* iargv[])
 	update_scripts = false;
 
 	gamedata = new GameData();
-	::gamedata = gamedata;
 }
 
 #define FreeInterfaceVector(type, variable, member) \

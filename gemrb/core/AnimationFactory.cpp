@@ -23,8 +23,6 @@
 #include "Interface.h"
 #include "Video.h"
 
-extern Interface* core;
-
 AnimationFactory::AnimationFactory(const char* ResRef)
 	: FactoryObject( ResRef, IE_BAM_CLASS_ID )
 {

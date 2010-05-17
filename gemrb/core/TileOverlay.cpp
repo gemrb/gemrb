@@ -23,7 +23,6 @@
 #include "Interface.h"
 #include "Video.h"
 
-extern Interface* core;
 bool RedrawTile = false;
 
 TileOverlay::TileOverlay(int Width, int Height)

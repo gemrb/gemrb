@@ -34,8 +34,7 @@
 #include "GameControl.h"
 #include "Projectile.h"
 #include "GSUtils.h"
-
-extern Interface* core;
+#include "GameData.h"
 
 #define YESNO(x) ( (x)?"Yes":"No")
 

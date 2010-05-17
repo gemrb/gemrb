@@ -21,6 +21,7 @@ import GemRB
 
 from GUICommonWindows import *
 import GUICommonWindows
+from GUICommon import GameControl
 from GUIINV import *
 from GUIJRNL import *
 from GUIMA import *
@@ -31,6 +32,7 @@ from GUISTORE import *
 from GUIWORLD import *
 from TextScreen import *
 from GUIClasses import GTextArea
+from GUIClasses import GWindow
 
 MessageWindow = 0
 PortraitWindow = 0
@@ -103,7 +105,7 @@ def UpdateControlStatus():
 	MessageTA = GTextArea(MessageWindow, GemRB.GetVar ("MessageTextArea"))
 	if MessageWindow>0 and MessageWindow!=TMessageWindow.ID:
 		MessageTA.MoveText (TMessageTA)
-		GemRB.UnloadWindow(MessageWindow)
+		GWindow(MessageWindow).Unload()
 	GemRB.SetVar ("MessageWindow", TMessageWindow.ID)
 	GemRB.SetVar ("MessageTextArea", TMessageTA.ID)
 
@@ -122,7 +124,7 @@ def UpdateControlStatus():
 		else:
 			Button.SetPicture(Portrait, "NOPORTSM")
 	else:
-		GemRB.SetControlStatus (0,0,IE_GUI_CONTROL_FOCUSED)
+		GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 		
 	if hideflag:
 		GemRB.UnhideGUI()

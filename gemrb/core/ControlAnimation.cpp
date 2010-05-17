@@ -24,6 +24,7 @@
 #include "Video.h"      /* needed only for paperdoll palettes */
 #include "Palette.h"    /* needed only for paperdoll palettes */
 #include "Button.h"
+#include "GameData.h"
 
 ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycle)
 {

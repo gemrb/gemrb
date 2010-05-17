@@ -25,6 +25,7 @@
 #include "MapMgr.h"
 #include "MemoryStream.h"
 #include "DataFileMgr.h"
+#include "GameData.h"
 #include <cassert>
 
 

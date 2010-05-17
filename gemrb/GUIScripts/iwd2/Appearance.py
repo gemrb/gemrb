@@ -218,7 +218,7 @@ def GetColor():
 def HairPress():
 	global ColorIndex, PickedColor
 
-#	GemRB.UnloadWindow(ColorWindow)
+#	ColorWindow.Unload()
 	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 0
 	PickedColor = Color1
@@ -228,7 +228,7 @@ def HairPress():
 def SkinPress():
 	global ColorIndex, PickedColor
 
-#	GemRB.UnloadWindow(ColorWindow)
+#	ColorWindow.Unload()
 	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 1
 	PickedColor = Color2
@@ -238,7 +238,7 @@ def SkinPress():
 def MajorPress():
 	global ColorIndex, PickedColor
 
-#	GemRB.UnloadWindow(ColorWindow)
+#	ColorWindow.Unload()
 	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 2
 	PickedColor = Color3
@@ -248,7 +248,7 @@ def MajorPress():
 def MinorPress():
 	global ColorIndex, PickedColor
 
-#	GemRB.UnloadWindow(ColorWindow)
+#	ColorWindow.Unload()
 	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 3
 	PickedColor = Color4

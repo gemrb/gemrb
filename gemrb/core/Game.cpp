@@ -18,6 +18,8 @@
  *
  */
 
+// This class represents the .gam (savegame) file in the engine
+
 #include "win32def.h"
 #include "Game.h"
 #include "MapMgr.h"
@@ -29,6 +31,7 @@
 #include "GameScript.h"
 #include "strrefs.h"
 #include "defsounds.h"
+#include "GameData.h"
 
 #define MAX_MAPS_LOADED 1
 
