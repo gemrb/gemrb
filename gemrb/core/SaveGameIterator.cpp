@@ -30,7 +30,7 @@
 #include <vector>
 #include <cassert>
 
-SaveGame::SaveGame(char* path, char* name, char* prefix, int pCount, int saveID)
+SaveGame::SaveGame(const char* path, const char* name, const char* prefix, int pCount, int saveID)
 {
 	strncpy( Prefix, prefix, sizeof( Prefix ) );
 	strncpy( Path, path, sizeof( Path ) );
@@ -43,7 +43,7 @@ SaveGame::SaveGame(char* path, char* name, char* prefix, int pCount, int saveID)
 	memset(&my_stat,0,sizeof(my_stat));
 	stat( nPath, &my_stat );
 	strftime( Date, _MAX_PATH, "%c", localtime( &my_stat.st_mtime ) );
-	manager.AddSource(path, Name, PLUGIN_RESOURCE_DIRECTORY);
+	manager.AddSource(Path, Name, PLUGIN_RESOURCE_DIRECTORY);
 }
 
 SaveGame::~SaveGame()

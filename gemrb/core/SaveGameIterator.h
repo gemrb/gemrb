@@ -34,7 +34,7 @@ class ImageMgr;
 
 class GEM_EXPORT SaveGame {
 public:
-	SaveGame(char* path, char* name, char* prefix, int pCount, int saveID);
+	SaveGame(const char* path, const char* name, const char* prefix, int pCount, int saveID);
 	~SaveGame();
 	int GetPortraitCount()
 	{
