@@ -4453,7 +4453,7 @@ void Interface::SetDraggedPortrait(int dp, int idx)
 	DraggedPortrait = dp;
 	if (dp) {
 		//hmm this might work?
-		Cursors[idx]->RefCount++;
+		Cursors[idx]->acquire();
 		video->SetDragCursor(Cursors[idx]);
 	} else {
 		video->SetDragCursor(NULL);

@@ -84,7 +84,7 @@ Animation* AnimationFactory::GetCycle(unsigned char cycle)
 	Animation* anim = new Animation( cycles[cycle].FramesCount );
 	int c = 0;
 	for (int i = ff; i < lf; i++) {
-		frames[FLTable[i]]->RefCount++;
+		frames[FLTable[i]]->acquire();
 		anim->AddFrame( frames[FLTable[i]], c++ );
 	}
 	return anim;
@@ -101,7 +101,7 @@ Sprite2D* AnimationFactory::GetFrame(unsigned short index, unsigned char cycle)
 		return NULL;
 	}
 	Sprite2D* spr = frames[FLTable[ff+index]];
-	spr->RefCount++;
+	spr->acquire();
 	return spr;
 }
 
@@ -111,7 +111,7 @@ Sprite2D* AnimationFactory::GetFrameWithoutCycle(unsigned short index)
 		return NULL;
 	}
 	Sprite2D* spr = frames[index];
-	spr->RefCount++;
+	spr->acquire();
 	return spr;
 }
 

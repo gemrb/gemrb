@@ -36,7 +36,7 @@ ImageFactory::~ImageFactory(void)
 
 Sprite2D* ImageFactory::GetSprite2D() const
 {
-	bitmap->RefCount++;
+	bitmap->acquire();
 	return bitmap;
 }
 

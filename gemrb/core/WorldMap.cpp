@@ -112,7 +112,7 @@ Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)
 			SetPalette(color, MapIcon);
 		}
 	}
-	MapIcon->RefCount++;
+	MapIcon->acquire();
 	return MapIcon;
 }
 

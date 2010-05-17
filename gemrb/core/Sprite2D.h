@@ -60,7 +60,6 @@ public:
 	/** Pointer to the Driver Video Structure */
 	void* vptr;
 	bool BAM;
-	int RefCount;
 	const void* pixels;
 	int XPos, YPos, Width, Height, Bpp;
 	Sprite2D(void);
@@ -69,6 +68,11 @@ public:
 	Palette *GetPalette();
 	void SetPalette(Palette *pal);
 	Color GetPixel(unsigned short x, unsigned short y);
+public: // public only for SDLVideo
+	int RefCount;
+public:
+	void acquire() { ++RefCount; }
+	void release();
 };
 
 #endif  // ! SPRITE2D_H

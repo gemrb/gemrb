@@ -140,3 +140,8 @@ Color Sprite2D::GetPixel(unsigned short x, unsigned short y)
 	return c;
 }
 
+void Sprite2D::release()
+{
+	Sprite2D *that = this;
+	core->GetVideoDriver()->FreeSprite(that);
+}

@@ -91,7 +91,7 @@ MapControl::MapControl(void)
 	MyMap = core->GetGame()->GetCurrentArea();
 	if (MyMap->SmallMap) {
 		MapMOS = MyMap->SmallMap;
-		MapMOS->RefCount++;
+		MapMOS->acquire();
 	} else
 		MapMOS = NULL;
 }
