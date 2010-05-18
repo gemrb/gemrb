@@ -616,7 +616,7 @@ public:
 	bool Update(bool *continuing = NULL, bool *done = NULL);
 	void EvaluateAllBlocks();
 private: //Internal Functions
-	Script* CacheScript(ieResRef ResRef, SClass_ID type);
+	Script* CacheScript(ieResRef ResRef, bool AIScript);
 	ResponseBlock* ReadResponseBlock(DataStream* stream);
 	ResponseSet* ReadResponseSet(DataStream* stream);
 	Response* ReadResponse(DataStream* stream);

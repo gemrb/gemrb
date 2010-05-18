@@ -1437,7 +1437,7 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 
 	strnlwrcpy( Name, ResRef, 8 );
 
-	script = CacheScript( Name, AIScript?IE_BS_CLASS_ID:IE_BCS_CLASS_ID);
+	script = CacheScript( Name, AIScript);
 	MySelf = NULL;
 	scriptType = ScriptType;
 }
@@ -1470,9 +1470,11 @@ GameScript::~GameScript(void)
 	}
 }
 
-Script* GameScript::CacheScript(ieResRef ResRef, SClass_ID type)
+Script* GameScript::CacheScript(ieResRef ResRef, bool AIScript)
 {
 	char line[10];
+
+	SClass_ID type = AIScript ? IE_BS_CLASS_ID : IE_BCS_CLASS_ID;
 
 	Script *newScript = (Script *) BcsCache.GetResource(ResRef);
 	if ( newScript ) {
