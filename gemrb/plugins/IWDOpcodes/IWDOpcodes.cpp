@@ -435,6 +435,7 @@ static void ReadSpellProtTable(const ieResRef tablename)
 #define STI_INVALID           0xffff
 
 //returns true if iwd ids targeting resists the spell
+//FIXME: the constant return values do not match the rest
 static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type)
 {
 	if (spellrescnt==-1) {
@@ -1628,12 +1629,26 @@ int fx_remove_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
+static EffectRef fx_str_ref={"StrengthModifier",NULL,-1};
+static EffectRef fx_con_ref={"ConstitutionModifier",NULL,-1};
+static EffectRef fx_dex_ref={"DexterityModifier",NULL,-1};
+
 //0x115 SoulEater
 int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_soul_eater (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
-	target->Damage(fx->Parameter1, DAMAGE_SOULEATER, Owner);
-	if (STATE_GET(STATE_DEAD) ) {
+	// Soul Eater has no effect on undead, constructs, and elemental creatures,
+	// but this is handled in the spells via fx_resist_spell_and_message
+	int damage = fx->Parameter1;
+	// the how spell has it set to 0, so use the damage from the description
+	if (!damage) {
+		damage = core->Roll(3, 8, 0);
+	}
+
+	target->Damage(damage, DAMAGE_SOULEATER, Owner);
+	//the state is not set soon enough!
+	//if (STATE_GET(STATE_DEAD) ) {
+	if (target->GetInternalFlag() & IF_REALLYDIED) {
 		ieResRef monster;
 		ieResRef hit;
 		ieResRef areahit;
@@ -1643,6 +1658,19 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 		Point p(fx->PosX, fx->PosY);
 		Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 		core->SummonCreature(monster, areahit, Owner, target, p, EAM_SOURCEALLY, fx->Parameter1, newfx);
+
+		// for each kill the caster receives a +1 bonus to Str, Dex and Con for 1 turn
+		if (Owner->Type == ST_ACTOR) {
+			newfx = EffectQueue::CreateEffect(fx_str_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
+			newfx->Duration = ROUND_SECONDS * ROUND_PER_TURN;
+			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
+			newfx = EffectQueue::CreateEffect(fx_dex_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
+			newfx->Duration = ROUND_SECONDS * ROUND_PER_TURN;
+			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
+			newfx = EffectQueue::CreateEffect(fx_con_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
+			newfx->Duration = ROUND_SECONDS * ROUND_PER_TURN;
+			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
+		}
 		delete newfx;
 	}
 	return FX_NOT_APPLIED;
@@ -2940,11 +2968,8 @@ int fx_smite_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //447 Restoration
 
 static EffectRef fx_disease_ref={"Disease",NULL,-1};
-static EffectRef fx_str_ref={"StrengthModifier",NULL,-1};
 static EffectRef fx_int_ref={"IntelligenceModifier",NULL,-1};
 static EffectRef fx_wis_ref={"WisdomModifier",NULL,-1};
-static EffectRef fx_con_ref={"ConstitutionModifier",NULL,-1};
-static EffectRef fx_dex_ref={"DexterityModifier",NULL,-1};
 static EffectRef fx_cha_ref={"CharismaModifier",NULL,-1};
 
 int fx_restoration (Scriptable* /*Owner*/, Actor* target, Effect* fx)
