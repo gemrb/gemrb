@@ -133,8 +133,9 @@
 #define  GF_AREA_VISITED_VAR    	42 //iwd, iwd2
 #define  GF_PROPER_BACKSTAB     	43 //bg2, iwd2, how?
 #define  GF_ONSCREEN_TEXT       	44 //pst
+#define  GF_SPECIFIC_DMG_BONUS      45 //how, iwd2
 //update this
-#define GF_COUNT 45
+#define GF_COUNT 46
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

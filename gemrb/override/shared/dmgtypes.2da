@@ -1,21 +1,21 @@
 2DA V1.0
 -1
-                        LOWER    RESIST_STAT   VALUE
-DAMAGE_CRUSHING         136      22            0
-DAMAGE_ACID             140      17            1
-DAMAGE_COLD             139      15            2
-DAMAGE_ELECTRICITY      138      16            4
-DAMAGE_FIRE             137      14            8
-DAMAGE_PIERCING         135      23            0x10
-DAMAGE_POISON           131      74            0x20
-DAMAGE_MAGIC            132      73            0x40
-DAMAGE_MISSILE          133      24            0x80
-DAMAGE_SLASHING         134      21            0x100
-DAMAGE_MAGICFIRE        137      19            0x200
-DAMAGE_PIERCINGMISSILE  133      24            0x400
-DAMAGE_MAGICCOLD        139      20            0x400
-DAMAGE_CRUSHINGMISSILE  133      24            0x400
-DAMAGE_STUNNING         141       0            0x800
-DAMAGE_SOULEATER        132       0            0x1000
-DAMAGE_DISEASE          141       0            0x4000
-DAMAGE_CHUNKING         141       0            0x8000
+                        LOWER    RESIST_STAT   VALUE     IWDMOD
+DAMAGE_CRUSHING         136      22            0         9
+DAMAGE_ACID             140      17            1         4
+DAMAGE_COLD             139      15            2         2
+DAMAGE_ELECTRICITY      138      16            4         3
+DAMAGE_FIRE             137      14            8         1
+DAMAGE_PIERCING         135      23            0x10      8
+DAMAGE_POISON           131      74            0x20      6
+DAMAGE_MAGIC            132      73            0x40      5
+DAMAGE_MISSILE          133      24            0x80      10
+DAMAGE_SLASHING         134      21            0x100     7
+DAMAGE_MAGICFIRE        137      19            0x200     -1
+DAMAGE_PIERCINGMISSILE  133      24            0x400     -1
+DAMAGE_MAGICCOLD        139      20            0x400     -1
+DAMAGE_CRUSHINGMISSILE  133      24            0x400     -1
+DAMAGE_STUNNING         141       0            0x800     -1
+DAMAGE_SOULEATER        132       0            0x1000    -1
+DAMAGE_DISEASE          141       0            0x4000    -1
+DAMAGE_CHUNKING         141       0            0x8000    -1

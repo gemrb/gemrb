@@ -98,6 +98,7 @@ struct DamageInfoStruct {
 	unsigned int strref;
 	unsigned int resist_stat;
 	unsigned int value;
+	int iwd_mod_type;
 	// maybe also add the ac bonus and/or the DL_ constants
 };
 

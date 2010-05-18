@@ -923,6 +923,7 @@ bool Interface::ReadDamageTypeTable() {
 		di.strref = core->GetStringReference(atoi(tm->QueryField(i, 0)));
 		di.resist_stat = TranslateStat(tm->QueryField(i, 1));
 		di.value = strtol(tm->QueryField(i, 2), (char **) NULL, 16);
+		di.iwd_mod_type = atoi(tm->QueryField(i, 3));
 		DamageInfoMap.insert(std::make_pair <ieDword, DamageInfoStruct> ((ieDword)di.value, di));
 	}
 
@@ -2260,6 +2261,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"AreaVisitedVar",     //42GF_AREA_VISITED_VAR
 		"ProperBackstab",     //43GF_PROPER_BACKSTAB
 		"OnScreenText",       //44GF_ONSCREEN_TEXT
+		"HasSpecificDamageBonus", //45GF_SPECIFIC_DMG_BONUS
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
