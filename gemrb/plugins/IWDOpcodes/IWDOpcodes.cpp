@@ -81,6 +81,7 @@ static ieDword *EntropyProjectileList = NULL;
 #define PI_EMPTYBODY    145
 
 static int fx_ac_vs_damage_type_modifier_iwd2 (Scriptable* Owner, Actor* target, Effect* fx);//0
+static int fx_damage_bonus_modifier (Scriptable* Owner, Actor* target, Effect* fx);//49
 static int fx_draw_upon_holy_might (Scriptable* Owner, Actor* target, Effect* fx);//84 (iwd2)
 static int fx_ironskins (Scriptable* Owner, Actor* target, Effect* fx);//da (iwd2)
 static int fx_fade_rgb (Scriptable* Owner, Actor* target, Effect* fx);//e8
@@ -222,6 +223,7 @@ static int fx_rapid_shot (Scriptable* Owner, Actor* target, Effect* fx); //457
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectRef effectnames[] = {
 	{ "ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, -1}, //0
+	{ "DamageBonusModifier", fx_damage_bonus_modifier, -1 }, //49
 	{ "DrawUponHolyMight", fx_draw_upon_holy_might, -1},//84 (iwd2)
 	{ "IronSkins", fx_ironskins, -1}, //da (iwd2)
 	{ "Color:FadeRGB", fx_fade_rgb, -1}, //e8
@@ -591,6 +593,35 @@ int fx_ac_vs_damage_type_modifier_iwd2 (Scriptable* /*Owner*/, Actor* target, Ef
 	}
 
 	return FX_PERMANENT;
+}
+
+// 0x49 DamageBonusModifier
+// iwd/iwd2 supports different damage types, but only flat and percentage boni
+// only the special type of 0 means a flat bonus
+int fx_damage_bonus_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_damage_bonus_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	switch (fx->Parameter2) {
+		case 0:
+			STAT_MOD(IE_DAMAGEBONUS);
+			break;
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+		case 10:
+			// no stat to save to, so we handle it when dealing damage
+			break;
+		default:
+			return FX_NOT_APPLIED;
+	}
+	return FX_APPLIED;
 }
 
 // 0x84 DrawUponHolyMight
