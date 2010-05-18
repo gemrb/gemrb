@@ -504,7 +504,7 @@ public:
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
 	/* ensures we can deal damage to a target */
-	void ModifyDamage(Actor *target, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical);
+	void ModifyDamage(Actor *target, Actor *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical);
 	/* applies modal spell etc, if needed */
 	void UpdateActorState(ieDword gameTime);
 	/* sets a colour gradient stat, handles location */

@@ -2418,7 +2418,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	}
 
 	int resisted = 0;
-	ModifyDamage (this, damage, resisted, damagetype, NULL, false);
+	ModifyDamage (this, (Actor *)hitter, damage, resisted, damagetype, NULL, false);
 	if (damage) GetHit();
 
 	DisplayCombatFeedback(damage, resisted, damagetype, (Actor *)hitter);
@@ -2489,7 +2489,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 }
 
 //TODO: handle pst
-//TODO: handle bonus damage
 void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Actor *hitter)
 {
 	bool detailed = false;
@@ -2513,15 +2512,13 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name);
 			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter ? hitter->GetName(1) : this->GetName(1) );
-			int bonus = 0; //TODO: change this once damage bonus is supported
-			unsigned int delta = abs(resisted-bonus);
-			if (bonus-resisted > 0) {
+			if (resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
-				core->GetTokenDictionary()->SetAtCopy( "RESISTED", delta);
+				core->GetTokenDictionary()->SetAtCopy( "RESISTED", abs(resisted));
 				core->DisplayConstantStringName(STR_DAMAGE3, 0xffffff, this);
-			} else if (bonus-resisted < 0) {
+			} else if (resisted > 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage resisted)
-				core->GetTokenDictionary()->SetAtCopy( "RESISTED", delta);
+				core->GetTokenDictionary()->SetAtCopy( "RESISTED", abs(resisted));
 				core->DisplayConstantStringName(STR_DAMAGE2, 0xffffff, this);
 			} else {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
@@ -4098,7 +4095,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		printf("\n");
 		core->DisplayConstantStringName(STR_CRITICAL_HIT, 0xffffff, this);
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
-		ModifyDamage (target, damage, resisted, weapon_damagetype[damagetype], &wi, true);
+		ModifyDamage (target, this, damage, resisted, weapon_damagetype[damagetype], &wi, true);
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 		ResetState();
 
@@ -4128,7 +4125,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	printBracket("Hit", GREEN);
 	printf("\n");
-	ModifyDamage (target, damage, resisted, weapon_damagetype[damagetype], &wi, false);
+	ModifyDamage (target, this, damage, resisted, weapon_damagetype[damagetype], &wi, false);
 	UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
 	ResetState();
 }
@@ -4137,8 +4134,9 @@ static EffectRef fx_stoneskin_ref={"StoneSkinModifier",NULL,-1};
 static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
 static EffectRef fx_mirrorimage_ref={"MirrorImageModifier",NULL,-1};
 static EffectRef fx_aegis_ref={"Aegis",NULL,-1};
+static EffectRef fx_damage_bonus_modifier_ref={"DamageBonusModifier",NULL,-1};
 
-void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
+void Actor::ModifyDamage(Actor *target, Actor *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
 {
 
 	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
@@ -4212,11 +4210,22 @@ void Actor::ModifyDamage(Actor *target, int &damage, int &resisted, int damagety
 		} else if (it->second.resist_stat == 0) {
 			// damage type without a resistance stat
 		} else {
+			damage += (signed)target->GetStat(IE_DAMAGEBONUS);
 			resisted = (int) (damage * (signed)target->GetStat(it->second.resist_stat)/100.0);
+			// check for bonuses for specific damage types
+			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS)) {
+				int bonus;
+				//FIXME: combine the bonus effects, as there could be more than one
+				Effect *fx = hitter->fxqueue.HasEffectWithParam(fx_damage_bonus_modifier_ref, it->second.iwd_mod_type);
+				if (fx) {
+					bonus = int (damage * (signed)fx->Parameter1 / 100.0);
+					resisted -= bonus;
+					printf("Bonus damage of %d (%+d%%), neto: %d\n", bonus, fx->Parameter1, -resisted);
+				}
+			}
 			damage -= resisted;
 			printf("Resisted %d of %d at %d%% resistance to %d\n", resisted, damage+resisted, target->GetStat(it->second.resist_stat), damagetype);
 			if (damage <= 0) resisted = DR_IMMUNE;
-			//TODO: figure out how how/iwd2 do damage bonus
 		}
 	}
 
