@@ -2469,13 +2469,13 @@ void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 }
 
 void SDLVideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
-	unsigned int bufw, unsigned int bufh,
+	unsigned int /*bufw*/, unsigned int bufh,
 	unsigned int w, unsigned int h,
 	unsigned int dstx, unsigned int dsty,
 	ieDword titleref) {
 	SDL_Rect destRect;
 
-	assert( bufw == w && bufh == h );
+	assert( /* bufw == w && */ bufh == h );
 
 	SDL_LockYUVOverlay(overlay);
 	for (unsigned int plane = 0; plane < 3; plane++) {
