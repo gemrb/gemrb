@@ -3727,8 +3727,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 {
 	tohit = GetStat(IE_TOHIT);
 	speed = -GetStat(IE_PHYSICALSPEED);
-	leftorright = leftorright && IsDualWielding();
-	header = GetWeapon(wi,leftorright);
+	bool dualwielding = IsDualWielding();
+	header = GetWeapon(wi, leftorright && dualwielding);
 	if (!header) {
 		return false;
 	}
@@ -3765,9 +3765,19 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		SetStance(IE_ANI_READY);
 		return false;
 	}//melee or ranged
-	if (leftorright) Flags|=WEAPON_LEFTHAND;
 	//this flag is set by the bow in case of projectile launcher.
 	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) Flags|=WEAPON_USESTRENGTH;
+
+	// get our dual wielding modifier
+	if (dualwielding) {
+		if (leftorright) {
+			DamageBonus += GetStat(IE_DAMAGEBONUSLEFT);
+		} else {
+			DamageBonus += GetStat(IE_DAMAGEBONUSRIGHT);
+		}
+	}
+	leftorright = leftorright && dualwielding;
+	if (leftorright) Flags|=WEAPON_LEFTHAND;
 
 	//add in proficiency bonuses
 	ieDword stars;
