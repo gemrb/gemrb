@@ -2262,6 +2262,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"ProperBackstab",     //43GF_PROPER_BACKSTAB
 		"OnScreenText",       //44GF_ONSCREEN_TEXT
 		"HasSpecificDamageBonus", //45GF_SPECIFIC_DMG_BONUS
+		"StrrefSaveGame",     //46GF_STRREF_SAVEGAME
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

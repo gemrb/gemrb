@@ -5472,23 +5472,23 @@ void GameScript::PolymorphCopyBase(Scriptable* Sender, Action* parameters)
 
 void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 {
-	int type;
-	char FolderName[_MAX_PATH];
-	const char *folder = "";
-
 	AutoTable tab("savegame");
-	if (tab) {
-		type = atoi(tab->QueryField((unsigned int) -1));
-		if (type) {
-			char * str = core->GetString( parameters->int0Parameter, IE_STR_STRREFOFF);
-			snprintf (FolderName, sizeof(FolderName), "%s - %s", tab->QueryField(0), str);
-			core->FreeString( str );
-			folder = FolderName;
-		} else {
-			folder = tab->QueryField(parameters->int0Parameter);
-		}
+	if (!tab) {
+		core->GetSaveGameIterator()->CreateSaveGame(-1, "Unknown Autosave");
+		return;
 	}
-	core->GetSaveGameIterator()->CreateSaveGame(parameters->int0Parameter, folder);
+
+	if (core->HasFeature(GF_STRREF_SAVEGAME)) {
+		char * str = core->GetString( parameters->int0Parameter, IE_STR_STRREFOFF);
+		char FolderName[_MAX_PATH];
+		snprintf (FolderName, sizeof(FolderName), "%s - %s", tab->QueryField(-1), str);
+		core->FreeString( str );
+		core->GetSaveGameIterator()->CreateSaveGame(-1, FolderName);
+	} else {
+		const char *folder = "";
+		folder = tab->QueryField(parameters->int0Parameter);
+		core->GetSaveGameIterator()->CreateSaveGame(parameters->int0Parameter, folder);
+	}
 }
 
 /*EscapeAreaMove(S:Area*,I:X*,I:Y*,I:Face*)*/
