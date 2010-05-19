@@ -30,6 +30,54 @@
 #include <vector>
 #include <cassert>
 
+/** Extract date from save game ds into Date. */
+static void ParseGameDate(DataStream *ds, char *Date)
+{
+	Date[0] = '\0';
+
+	char Signature[8];
+	ieDword GameTime;
+	ds->Read(Signature, 8);
+	ds->ReadDword(&GameTime);
+	delete ds;
+	if (memcmp(Signature,"GAME",4) ) {
+		return;
+	}
+
+	int hours = ((int)GameTime)/300;
+	int days = hours/24;
+	hours -= days*24;
+	char *a=NULL,*b=NULL,*c=NULL;
+
+	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", days);
+	if (days) {
+		if (days==1) a=core->GetString(10698);
+		else a=core->GetString(10697);
+	}
+	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
+	if (hours || !a) {
+		if (a) b=core->GetString(10699);
+		if (hours==1) c=core->GetString(10701);
+		else c=core->GetString(10700);
+	}
+	if (b) {
+		strcat(Date, a);
+		strcat(Date, " ");
+		strcat(Date, b);
+		strcat(Date, " ");
+		if (c)
+			strcat(Date, c);
+	} else {
+		if (a)
+			strcat(Date, a);
+		if (c)
+			strcat(Date, c);
+	}
+	core->FreeString(a);
+	core->FreeString(b);
+	core->FreeString(c);
+}
+
 SaveGame::SaveGame(const char* path, const char* name, const char* prefix, int pCount, int saveID)
 {
 	strncpy( Prefix, prefix, sizeof( Prefix ) );
@@ -44,6 +92,7 @@ SaveGame::SaveGame(const char* path, const char* name, const char* prefix, int p
 	stat( nPath, &my_stat );
 	strftime( Date, _MAX_PATH, "%c", localtime( &my_stat.st_mtime ) );
 	manager.AddSource(Path, Name, PLUGIN_RESOURCE_DIRECTORY);
+	ParseGameDate(GetGame(), GameDate);
 }
 
 SaveGame::~SaveGame()
@@ -88,6 +137,11 @@ DataStream* SaveGame::GetWmap()
 DataStream* SaveGame::GetSave()
 {
 	return manager.GetResource(Prefix, IE_SAV_CLASS_ID, true);
+}
+
+const char* SaveGame::GetGameDate()
+{
+	return GameDate;
 }
 
 SaveGameIterator::SaveGameIterator(void)

@@ -3789,44 +3789,6 @@ static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-static PyObject *GetGameDate(DataStream *ds)
-{
-	char Signature[8];
-	ieDword GameTime;
-	ds->Read(Signature, 8);
-	ds->ReadDword(&GameTime);
-	delete ds;
-	if (memcmp(Signature,"GAME",4) ) {
-		return NULL;
-	}
-
-	int hours = ((int)GameTime)/300;
-	int days = hours/24;
-	hours -= days*24;
-	char *a=NULL,*b=NULL,*c=NULL;
-	PyObject *retval;
-
-	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", days);
-	if (days) {
-		if (days==1) a=core->GetString(10698);
-		else a=core->GetString(10697);
-	}
-	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
-	if (hours || !a) {
-		if (a) b=core->GetString(10699);
-		if (hours==1) c=core->GetString(10701);
-		else c=core->GetString(10700);
-	}
-	if (b)
-		retval = PyString_FromFormat("%s %s %s",a,b,c?c:"");
-	else {
-		retval = PyString_FromFormat("%s%s",a?a:"",c?c:"");
-	}
-	core->FreeString(a);
-	core->FreeString(b);
-	core->FreeString(c);
-	return retval;
-}
 
 PyDoc_STRVAR( GemRB_GetSaveGameAttrib__doc,
 "GetSaveGameAttrib(Type, SaveSlotCount) => string/int\n\n"
@@ -3855,7 +3817,7 @@ static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
 		case 3:
 			tmp = PyString_FromString( sg->GetDate() ); break;
 		case 4: //ingame date
-			tmp = GetGameDate(sg->GetGame()); break;
+			tmp = PyString_FromString( sg->GetGameDate()); break;
 		case 5:
 			tmp = PyInt_FromLong( sg->GetSaveID() ); break;
 		default:

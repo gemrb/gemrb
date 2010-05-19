@@ -60,6 +60,7 @@ public:
 	{
 		return Date;
 	}
+	const char* GetGameDate();
 
 	Sprite2D* GetPortrait(int index);
 	Sprite2D* GetPreview();
@@ -71,6 +72,7 @@ private:
 	char Prefix[10];
 	char Name[_MAX_PATH];
 	char Date[_MAX_PATH];
+	char GameDate[_MAX_PATH];
 	int PortraitCount;
 	int SaveID;
 	ResourceManager manager;
