@@ -623,7 +623,7 @@ static PyObject* GemRB_LoadWindowObject(PyObject * self, PyObject* args)
 	PyTuple_SET_ITEM(wintuple, 0, win);
 
 	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
-	PyObject* ret = gs->ConstructObject("GWindow", wintuple);
+	PyObject* ret = gs->ConstructObject("Window", wintuple);
 	Py_DECREF(wintuple);
 	if (!ret) {
 		char buf[256];
@@ -875,7 +875,7 @@ static PyObject* GemRB_LoadTableObject(PyObject * self, PyObject* args)
 	PyTuple_SET_ITEM(tabtuple, 0, table);
 
 	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
-	PyObject* ret = gs->ConstructObject("GTable", tabtuple);
+	PyObject* ret = gs->ConstructObject("Table", tabtuple);
 	Py_DECREF(tabtuple);
 	if (!ret) {
 		char buf[256];
@@ -1267,25 +1267,25 @@ static PyObject* GemRB_Window_GetControl(PyObject * self, PyObject* args)
 		// GetControl will already have raised an exception
 		return 0;
 	}
-	const char* type = "GControl";
+	const char* type = "Control";
 	switch(ctrl->ControlType) {
 	case IE_GUI_LABEL:
-		type = "GLabel";
+		type = "Label";
 		break;
 	case IE_GUI_EDIT:
-		type = "GTextEdit";
+		type = "TextEdit";
 		break;
 	case IE_GUI_SCROLLBAR:
-		type = "GScrollBar";
+		type = "ScrollBar";
 		break;
 	case IE_GUI_TEXTAREA:
-		type = "GTextArea";
+		type = "TextArea";
 		break;
 	case IE_GUI_BUTTON:
-		type = "GButton";
+		type = "Button";
 		break;
 	case IE_GUI_WORLDMAP:
-		type = "GWorldMap";
+		type = "WorldMap";
 		break;
 	default:
 		break;
@@ -9811,8 +9811,10 @@ void GUIScript::ExecString(const char* string)
 	}
 }
 
-PyObject* GUIScript::ConstructObject(const char* classname, PyObject* pArgs)
+PyObject* GUIScript::ConstructObject(const char* type, PyObject* pArgs)
 {
+	char classname[_MAX_PATH] = "G";
+	strncat(classname, type, _MAX_PATH - 2);
 	if (!pGUIClasses) {
 		fprintf(stderr, "Tried to use an object (%s) before script compiled!\n", classname);
 		return 0;
