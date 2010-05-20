@@ -3143,6 +3143,33 @@ static PyObject* GemRB_Button_SetPicture(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_Button_SetSprite2D__doc,
+"Button.SetSprite2D(WindowIndex, ControlIndex, Sprite2D)\n\n"
+"Sets a Sprite2D onto a button as picture." );
+
+static PyObject* GemRB_Button_SetSprite2D(PyObject * /*self*/, PyObject* args)
+{
+	int wi, ci;
+	PyObject *obj;
+
+	if (!PyArg_ParseTuple( args, "iiO", &wi, &ci, &obj )) {
+		return AttributeError( GemRB_Button_SetSprite2D__doc );
+	}
+	Button* btn = ( Button* ) GetControl( wi, ci, IE_GUI_BUTTON);
+	if (!btn) {
+		return NULL;
+	}
+
+	CObject<Sprite2D> spr(obj);
+
+	if (spr)
+		spr->acquire();
+	btn->SetPicture( spr.get() );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_Button_SetMOS__doc,
 "SetButtonMOS(WindowIndex, ControlIndex, MOSResRef)\n\n"
 "Sets the Picture of a Button Control from a MOS file." );
@@ -3832,20 +3859,16 @@ static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
 	return tmp;
 }
 
-PyDoc_STRVAR( GemRB_Button_SetSaveGamePortrait__doc,
-"SetSaveGamePortrait(WindowIndex, ControlIndex, SaveSlotCount, PCSlotCount)\n\n"
-"Sets a savegame PC portrait bmp onto a button as picture." );
+PyDoc_STRVAR( GemRB_GetSaveGamePortrait__doc,
+"GetSaveGamePortrait(SaveSlotCount, PCSlotCount)\n\n"
+"Returns a savegame PC portrait." );
 
-static PyObject* GemRB_Button_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 {
-	int wi, ci, SaveSlotCount, PCSlotCount;
+	int SaveSlotCount, PCSlotCount;
 
-	if (!PyArg_ParseTuple( args, "iiii", &wi, &ci, &SaveSlotCount, &PCSlotCount )) {
-		return AttributeError( GemRB_Button_SetSaveGamePortrait__doc );
-	}
-	Button* btn = ( Button* ) GetControl( wi, ci, IE_GUI_BUTTON);
-	if (!btn) {
-		return NULL;
+	if (!PyArg_ParseTuple( args, "ii", &SaveSlotCount, &PCSlotCount )) {
+		return AttributeError( GemRB_GetSaveGamePortrait__doc );
 	}
 
 	SaveGame* sg = core->GetSaveGameIterator()->GetSaveGame( SaveSlotCount );
@@ -3854,39 +3877,23 @@ static PyObject* GemRB_Button_SetSaveGamePortrait(PyObject * /*self*/, PyObject*
 		return NULL;
 	}
 	if (sg->GetPortraitCount() <= PCSlotCount) {
-		btn->SetPicture( NULL );
-		delete sg;
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
 
-	Sprite2D* Picture = sg->GetPortrait( PCSlotCount );
-	delete sg;
-	if (Picture == NULL) {
-		Py_INCREF( Py_None );
-		return Py_None;
-	}
-
-	btn->SetPicture( Picture );
-
-	Py_INCREF( Py_None );
-	return Py_None;
+	return CObject<Sprite2D>(sg->GetPortrait(PCSlotCount));
 }
 
-PyDoc_STRVAR( GemRB_Button_SetSaveGamePreview__doc,
-"SetSaveGamePreview(WindowIndex, ControlIndex, SaveSlotCount)\n\n"
-"Sets a savegame area preview bmp onto a button as picture." );
+PyDoc_STRVAR( GemRB_GetSaveGamePreview__doc,
+"GetSaveGamePreview(SaveSlotCount)\n\n"
+"Returns a savegame area preview." );
 
-static PyObject* GemRB_Button_SetSaveGamePreview(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GetSaveGamePreview(PyObject * /*self*/, PyObject* args)
 {
-	int wi, ci, SlotCount;
+	int SlotCount;
 
-	if (!PyArg_ParseTuple( args, "iii", &wi, &ci, &SlotCount )) {
-		return AttributeError( GemRB_Button_SetSaveGamePreview__doc );
-	}
-	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-	if (!btn) {
-		return NULL;
+	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
+		return AttributeError( GemRB_GetSaveGamePreview__doc );
 	}
 
 	SaveGame* sg = core->GetSaveGameIterator()->GetSaveGame( SlotCount );
@@ -3894,61 +3901,36 @@ static PyObject* GemRB_Button_SetSaveGamePreview(PyObject * /*self*/, PyObject* 
 		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
 		return NULL;
 	}
-	Sprite2D* Picture = sg->GetPreview();
-	delete sg;
-	if (Picture == NULL) {
-		Py_INCREF( Py_None );
-		return Py_None;
-	}
 
-	btn->SetPicture( Picture );
-
-	Py_INCREF( Py_None );
-	return Py_None;
+	return CObject<Sprite2D>(sg->GetPreview());
 }
 
-PyDoc_STRVAR( GemRB_Button_SetGamePreview__doc,
-"SetGamePreview(WindowIndex, ControlIndex)\n\n"
-"Sets current game area preview bmp onto a button as picture." );
+PyDoc_STRVAR( GemRB_GetGamePreview__doc,
+"GetGamePreview()\n\n"
+"Gets current game area preview." );
 
-static PyObject* GemRB_Button_SetGamePreview(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GetGamePreview(PyObject * /*self*/, PyObject* args)
 {
-	int wi, ci;
-
-	if (!PyArg_ParseTuple( args, "ii", &wi, &ci )) {
-		return AttributeError( GemRB_Button_SetGamePreview__doc );
-	}
-	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-	if (!btn) {
-		return NULL;
+	if (!PyArg_ParseTuple( args, "" )) {
+		return AttributeError( GemRB_GetGamePreview__doc );
 	}
 
-	btn->SetPicture (core->GetGameControl()->GetPreview() );
-
-	Py_INCREF( Py_None );
-	return Py_None;
+	return CObject<Sprite2D>(core->GetGameControl()->GetPreview());
 }
 
-PyDoc_STRVAR( GemRB_Button_SetGamePortraitPreview__doc,
-"SetGamePortraitPreview(WindowIndex, ControlIndex, PCSlotCount)\n\n"
-"Sets a current game PC portrait preview bmp onto a button as picture." );
+PyDoc_STRVAR( GemRB_GetGamePortraitPreview__doc,
+"GetGamePortraitPreview(PCSlotCount)\n\n"
+"Gets a current game PC portrait." );
 
-static PyObject* GemRB_Button_SetGamePortraitPreview(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GetGamePortraitPreview(PyObject * /*self*/, PyObject* args)
 {
-	int wi, ci, PCSlotCount;
+	int PCSlotCount;
 
-	if (!PyArg_ParseTuple( args, "iii", &wi, &ci, &PCSlotCount )) {
-		return AttributeError( GemRB_Button_SetGamePreview__doc );
-	}
-	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-	if (!btn) {
-		return NULL;
+	if (!PyArg_ParseTuple( args, "i", &PCSlotCount )) {
+		return AttributeError( GemRB_GetGamePreview__doc );
 	}
 
-	btn->SetPicture (core->GetGameControl()->GetPortraitPreview( PCSlotCount ) );
-
-	Py_INCREF( Py_None );
-	return Py_None;
+	return CObject<Sprite2D>(core->GetGameControl()->GetPortraitPreview(PCSlotCount));
 }
 
 PyDoc_STRVAR( GemRB_Roll__doc,
@@ -9283,6 +9265,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetCurrentArea, METH_NOARGS),
 	METHOD(GetEquippedAmmunition, METH_VARARGS),
 	METHOD(GetEquippedQuickSlot, METH_VARARGS),
+	METHOD(GetGamePortraitPreview, METH_VARARGS),
+	METHOD(GetGamePreview, METH_VARARGS),
 	METHOD(GetGameString, METH_VARARGS),
 	METHOD(GetGameTime, METH_NOARGS),
 	METHOD(GetGameVar, METH_VARARGS),
@@ -9308,6 +9292,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetPlayerScript, METH_VARARGS),
 	METHOD(GetPlayerString, METH_VARARGS),
 	METHOD(GetSaveGameCount, METH_VARARGS),
+	METHOD(GetSaveGamePortrait, METH_VARARGS),
+	METHOD(GetSaveGamePreview, METH_VARARGS),
 	METHOD(GetSelectedSize, METH_NOARGS),
 	METHOD(GetString, METH_VARARGS),
 	METHOD(GetSaveGameAttrib, METH_VARARGS),
@@ -9408,17 +9394,14 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetBorder, METH_VARARGS),
 	METHOD(Button_SetFlags, METH_VARARGS),
 	METHOD(Button_SetFont, METH_VARARGS),
-	METHOD(Button_SetGamePortraitPreview, METH_VARARGS),
-	METHOD(Button_SetGamePreview, METH_VARARGS),
 	METHOD(Button_SetItemIcon, METH_VARARGS),
 	METHOD(Button_SetMOS, METH_VARARGS),
 	METHOD(Button_SetOverlay, METH_VARARGS),
 	METHOD(Button_SetPLT, METH_VARARGS),
 	METHOD(Button_SetPicture, METH_VARARGS),
 	METHOD(Button_SetPictureClipping, METH_VARARGS),
-	METHOD(Button_SetSaveGamePortrait, METH_VARARGS),
-	METHOD(Button_SetSaveGamePreview, METH_VARARGS),
 	METHOD(Button_SetSpellIcon, METH_VARARGS),
+	METHOD(Button_SetSprite2D, METH_VARARGS),
 	METHOD(Button_SetSprites, METH_VARARGS),
 	METHOD(Button_SetState, METH_VARARGS),
 	METHOD(Button_SetTextColor, METH_VARARGS),

@@ -105,13 +105,13 @@ def ScrollBarPress():
 
 		Button=LoadWindow.GetControl(1+i)
 		if ActPos<GameCount:
-			Button.SetSaveGamePreview(ActPos)
+			Button.SetSprite2D(GemRB.GetSaveGamePreview(ActPos))
 		else:
 			Button.SetPicture("")
 		for j in range(PARTY_SIZE):
 			Button=LoadWindow.GetControl(40+i*PARTY_SIZE+j)
 			if ActPos<GameCount:
-				Button.SetSaveGamePortrait(ActPos,j)
+				Button.SetSprite2D(GemRB.GetSaveGamePortrait(ActPos, j))
 			else:
 				Button.SetPicture("")
 	return

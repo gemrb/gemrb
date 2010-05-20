@@ -133,14 +133,14 @@ def ScrollBarPress():
 
 		Button = Window.GetControl (1 + i)
 		if ActPos < GameCount - 1:
-			Button.SetSaveGamePreview (ActPos)
+			Button.SetSprite2D(GemRB.GetSaveGamePreview(ActPos))
 		else:
 			Button.SetPicture ("")
 			
 		for j in range (6):
 			Button = Window.GetControl (22 + i*6 + j)
 			if ActPos < GameCount - 1:
-				Button.SetSaveGamePortrait (ActPos,j)
+				Button.SetSprite2D(GemRB.GetSaveGamePortrait(ActPos, j))
 			else:
 				Button.SetPicture ("")
 
@@ -252,12 +252,12 @@ def OpenSaveDetailWindow ():
 
 	# Areapreview
 	Button = Window.GetControl (0)
-	Button.SetGamePreview ()
+	Button.SetSprite2D(GemRB.GetGamePreview())
 
 	# PC portraits
 	for j in range (PARTY_SIZE):
 		Button = Window.GetControl (6 + j)
-		Button.SetGamePortraitPreview (j)
+		Button.SetSprite2D(GemRB.GetGamePortraitPreview(j))
 
 
 	CheckSaveName ()
