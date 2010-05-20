@@ -2,8 +2,8 @@
 *
                     NAME_REF   DESC_REF   CAP_REF    SAVE       MULTI      ID         HP         USABILITY  HUMAN      ELF        HALF_ELF   DWARF      HALFLING   GNOME
 FIGHTER             10174      9556       10174      SAVEWAR    0          2          HPWAR      0x800      1          1          1          1          1          1
-RANGER              10173      9557       10173      SAVEWAR    0          12         HPWAR      0x20000    1          1          1          0          0          0
-PALADIN             10194      9558       10194      SAVEWAR    0          6          HPWAR      0x10000    1          0          0          0          0          0
+RANGER              10173      9557       10173      SAVEWAR    0          12         HPWAR      0x200000   1          1          1          0          0          0
+PALADIN             10194      9558       10194      SAVEWAR    0          6          HPWAR      0x100000   1          0          0          0          0          0
 CLERIC              10177      9559       10177      SAVEPRS    0          3          HPPRS      128        1          1          1          1          1          1
 DRUID               10186      9560       10186      SAVEPRS    0          11         HPPRS      0x40000000 1          1          1          0          0          0
 MAGE                10176      9563       10176      SAVEWIZ    0          1          HPWIZ      0x40000    1          1          1          0          0          2
