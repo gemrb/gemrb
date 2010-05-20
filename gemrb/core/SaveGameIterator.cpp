@@ -474,10 +474,8 @@ static bool DoSaveGame(const char *Path)
 	return true;
 }
 
-int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
+int CanSave()
 {
-	char Path[_MAX_PATH];
-
 	//some of these restrictions might not be needed
 	Store * store = core->GetCurrentStore();
 	if (store) {
@@ -494,6 +492,35 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	//TODO: can't save while (party) actors are in helpless states
 	//TODO: can't save while AOE spells are in effect
 	//TODO: can't save while IF_NOINT is set on an actor
+	return 0;
+}
+
+static void CreateSavePath(char *Path, int index, const char *slotname)
+{
+	PathJoin( Path, core->SavePath, SaveDir(), NULL );
+
+	//if the path exists in different case, don't make it again
+	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
+	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
+	//keep the first part we already determined existing
+
+	char dir[_MAX_PATH];
+	snprintf( dir, _MAX_PATH, "%09d-%s", index, slotname );
+	snprintf( dir, _MAX_PATH, "%09d-%s", (int)index, slotname );
+	PathJoin(Path, Path, dir, NULL);
+	//this is required in case the old slot wasn't recognised but still there
+	core->DelTree(Path, false);
+	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
+	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
+}
+
+int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
+{
+	{
+		int ret = CanSave();
+		if (ret)
+			return ret;
+	}
 
 	GetSaveGameCount(); //forcing reload
 	if (mqs) {
@@ -513,7 +540,6 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 		while (ExistingSlotName(index) !=-1 ) {
 			index++;
 		}
-		snprintf( Path, _MAX_PATH, "%09d-%s", index, slotname );
 	} else {
 		// the existing filename has the original index of the previous save
 		// this is usually bad since the gui sends the current one
@@ -527,23 +553,12 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 			return -1;
 		}
 		DeleteSaveGame(index);
-		snprintf( Path, _MAX_PATH, "%09d-%s", save->GetSaveID(), slotname );
 		delete save;
 	}
-	save_slots.insert( save_slots.end(), strdup( Path ) );
-	PathJoin( Path, core->SavePath, SaveDir(), NULL );
 
-	//if the path exists in different case, don't make it again
-	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
-	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
-	//keep the first part we already determined existing
-	char dir[_MAX_PATH];
-	snprintf( dir, _MAX_PATH, "%09d-%s", index, slotname );
-	PathJoin(Path, Path, dir, NULL);
-	//this is required in case the old slot wasn't recognised but still there
-	core->DelTree(Path, false);
-	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
-	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
+	char Path[_MAX_PATH];
+	CreateSavePath(Path, index, slotname);
+	save_slots.insert( save_slots.end(), strdup( Path ) );
 
 	if (!DoSaveGame(Path)) {
 		return -1;
