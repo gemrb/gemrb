@@ -4144,7 +4144,6 @@ static EffectRef fx_stoneskin_ref={"StoneSkinModifier",NULL,-1};
 static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
 static EffectRef fx_mirrorimage_ref={"MirrorImageModifier",NULL,-1};
 static EffectRef fx_aegis_ref={"Aegis",NULL,-1};
-static EffectRef fx_damage_bonus_modifier_ref={"DamageBonusModifier",NULL,-1};
 
 void Actor::ModifyDamage(Actor *target, Actor *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
 {
@@ -4224,13 +4223,10 @@ void Actor::ModifyDamage(Actor *target, Actor *hitter, int &damage, int &resiste
 			resisted = (int) (damage * (signed)target->GetStat(it->second.resist_stat)/100.0);
 			// check for bonuses for specific damage types
 			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS)) {
-				int bonus;
-				//FIXME: combine the bonus effects, as there could be more than one
-				Effect *fx = hitter->fxqueue.HasEffectWithParam(fx_damage_bonus_modifier_ref, it->second.iwd_mod_type);
-				if (fx) {
-					bonus = int (damage * (signed)fx->Parameter1 / 100.0);
-					resisted -= bonus;
-					printf("Bonus damage of %d (%+d%%), neto: %d\n", bonus, fx->Parameter1, -resisted);
+				int bonus = hitter->fxqueue.SpecificDamageBonus(it->second.iwd_mod_type);
+				if (bonus) {
+					resisted -= int (damage * bonus / 100.0);
+					printf("Bonus damage of %d (%+d%%), neto: %d\n", int (damage * bonus / 100.0), bonus, -resisted);
 				}
 			}
 			damage -= resisted;
