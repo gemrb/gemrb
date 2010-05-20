@@ -18,30 +18,12 @@
  *
  */
 
-/**
- * @file Plugin.h
- * Declares Plugin class, base class for all plugins
- * @author The GemRB Project
- */
+#ifndef TYPE_ID_H
+#define TYPE_ID_H
 
-#ifndef PLUGIN_H
-#define PLUGIN_H
-
-#include <cstddef>
-#include "exports.h"
-
-#include "TypeID.h"
-
-/**
- * @class Plugin
- * Base class for all GemRB plugins
- */
-
-class GEM_EXPORT Plugin {
+class TypeID {
 public:
-	Plugin(void);
-	virtual ~Plugin(void);
-	virtual void release(void) = 0;
+	const char *description;
 };
 
 #endif
