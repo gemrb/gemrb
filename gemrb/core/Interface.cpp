@@ -3722,13 +3722,12 @@ void Interface::LoadGame(int index, int ver_override)
 		sav_str = NULL;
 		wmp_str = gamedata->GetResource( WorldMapName, IE_WMP_CLASS_ID );
 	} else {
-		SaveGame* sg = sgiterator->GetSaveGame( index );
+		Holder<SaveGame> sg = sgiterator->GetSaveGame( index );
 		if (!sg)
 			return;
 		gam_str = sg->GetGame();
 		sav_str = sg->GetSave();
 		wmp_str = sg->GetWmap();
-		delete sg;
 	}
 
 	if (!gam_str || !wmp_str)

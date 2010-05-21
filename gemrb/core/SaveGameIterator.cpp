@@ -30,6 +30,8 @@
 #include <set>
 #include <cassert>
 
+TypeID SaveGame::ID = { "SaveGame" };
+
 /** Extract date from save game ds into Date. */
 static void ParseGameDate(DataStream *ds, char *Date)
 {
@@ -152,9 +154,6 @@ SaveGameIterator::SaveGameIterator(void)
 
 SaveGameIterator::~SaveGameIterator(void)
 {
-	for (charlist::iterator i = save_slots.begin();i!=save_slots.end();i++) {
-		free (*i);
-	}
 }
 
 void SaveGameIterator::Invalidate()
@@ -264,9 +263,6 @@ bool SaveGameIterator::RescanSaveGames()
 	loaded = true;
 
 	// delete old entries
-	for (charlist::iterator i = save_slots.begin();i!=save_slots.end();i++) {
-		free (*i);
-	}
 	save_slots.clear();
 
 	char Path[_MAX_PATH];
@@ -316,7 +312,7 @@ char *SaveGameIterator::GetSaveName(int index)
 	return save_slots[index];
 }
 
-SaveGame* SaveGameIterator::GetSaveGame(int index)
+Holder<SaveGame> SaveGameIterator::GetSaveGame(int index)
 {
 	char* slotname = GetSaveName(index);
 	if (!slotname) {
@@ -541,17 +537,15 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	} else {
 		// the existing filename has the original index of the previous save
 		// this is usually bad since the gui sends the current one
-		SaveGame *save = GetSaveGame(index);
+		Holder<SaveGame> save = GetSaveGame(index);
 		if (!save) return -1;
 		if (save->GetSaveID() != index) {
 			// stop gemrb from deleting all our save games
 			printf("gemrb's buggy save code is trying to delete slot %d\n", save->GetSaveID());
 			printf("that is not the slot %d we were trying to save to, erroring out!\n", index);
-			delete save;
 			return -1;
 		}
 		DeleteSaveGame(index);
-		delete save;
 	}
 
 	char Path[_MAX_PATH];
@@ -590,6 +584,5 @@ void SaveGameIterator::DeleteSaveGame(int index)
 	core->DelTree( Path, false ); //remove all files from folder
 	rmdir( Path );
 
-	free( save_slots[index]);
 	save_slots.erase(save_slots.begin()+index);
 }

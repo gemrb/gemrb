@@ -3830,7 +3830,7 @@ static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ii", &Type, &SlotCount )) {
 		return AttributeError( GemRB_GetSaveGameAttrib__doc );
 	}
-	SaveGame* sg = core->GetSaveGameIterator()->GetSaveGame( SlotCount );
+	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SlotCount);
 	if (sg == NULL) {
 		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
 		return NULL;
@@ -3855,7 +3855,6 @@ static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
 				LIGHT_RED );
 			return NULL;
 	}
-	delete sg;
 	return tmp;
 }
 
@@ -3871,7 +3870,7 @@ static PyObject* GemRB_GetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetSaveGamePortrait__doc );
 	}
 
-	SaveGame* sg = core->GetSaveGameIterator()->GetSaveGame( SaveSlotCount );
+	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SaveSlotCount);
 	if (sg == NULL) {
 		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
 		return NULL;
@@ -3896,7 +3895,7 @@ static PyObject* GemRB_GetSaveGamePreview(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetSaveGamePreview__doc );
 	}
 
-	SaveGame* sg = core->GetSaveGameIterator()->GetSaveGame( SlotCount );
+	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SlotCount);
 	if (sg == NULL) {
 		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
 		return NULL;

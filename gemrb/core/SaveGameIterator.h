@@ -27,12 +27,15 @@
 #include "exports.h"
 #include "FileStream.h"
 #include "ResourceManager.h"
+#include "Holder.h"
 
 #define SAVEGAME_DIRECTORY_MATCHER "%d - %[A-Za-z0-9- _]"
 
 class ImageMgr;
 
-class GEM_EXPORT SaveGame {
+class GEM_EXPORT SaveGame : public Held<SaveGame> {
+public:
+	static TypeID ID;
 public:
 	SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID);
 	~SaveGame();
@@ -88,6 +91,7 @@ typedef std::vector<char*> charlist;
 class GEM_EXPORT SaveGameIterator {
 private:
 	bool loaded;
+	typedef std::vector<char*> charlist;
 	charlist save_slots;
 
 public:
@@ -96,7 +100,7 @@ public:
 	void Invalidate();
 	bool RescanSaveGames();
 	int GetSaveGameCount();
-	SaveGame* GetSaveGame(int index);
+	Holder<SaveGame> GetSaveGame(int index);
 	void DeleteSaveGame(int index);
 	int ExistingSlotName(int index);
 	int CreateSaveGame(int index, const char *slotname, bool mqs = false);
