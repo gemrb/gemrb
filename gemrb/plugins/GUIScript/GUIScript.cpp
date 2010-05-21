@@ -3813,44 +3813,88 @@ static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GetSaveGameName__doc,
+"GetSaveGameName(SaveSlotCount)\n\n"
+"Returns savegame date." );
 
-PyDoc_STRVAR( GemRB_GetSaveGameAttrib__doc,
-"GetSaveGameAttrib(Type, SaveSlotCount) => string/int\n\n"
-"Returns the name, path, prefix, date or ingame date of the saved game." );
-
-static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GetSaveGameName(PyObject * /*self*/, PyObject* args)
 {
-	int Type, SlotCount;
+	int SlotCount;
 
-	if (!PyArg_ParseTuple( args, "ii", &Type, &SlotCount )) {
-		return AttributeError( GemRB_GetSaveGameAttrib__doc );
+	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
+		return AttributeError( GemRB_GetSaveGameName__doc );
 	}
+
 	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SlotCount);
 	if (sg == NULL) {
 		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
 		return NULL;
 	}
-	PyObject* tmp;
-	switch (Type) {
-		case 0:
-			tmp = PyString_FromString( sg->GetName() ); break;
-		case 1:
-			tmp = PyString_FromString( sg->GetPrefix() ); break;
-		case 2:
-			tmp = PyString_FromString( sg->GetPath() ); break;
-		case 3:
-			tmp = PyString_FromString( sg->GetDate() ); break;
-		case 4: //ingame date
-			tmp = PyString_FromString( sg->GetGameDate()); break;
-		case 5:
-			tmp = PyInt_FromLong( sg->GetSaveID() ); break;
-		default:
-			printMessage( "GUIScript",
-				"Syntax Error: GetSaveGameAttrib(Type, SlotCount)\n",
-				LIGHT_RED );
-			return NULL;
+
+	return PyString_FromString(sg->GetName());
+}
+
+PyDoc_STRVAR( GemRB_GetSaveGameDate__doc,
+"GetSaveGameDate(SaveSlotCount)\n\n"
+"Returns savegame date." );
+
+static PyObject* GemRB_GetSaveGameDate(PyObject * /*self*/, PyObject* args)
+{
+	int SlotCount;
+
+	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
+		return AttributeError( GemRB_GetSaveGameDate__doc );
 	}
-	return tmp;
+
+	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SlotCount);
+	if (sg == NULL) {
+		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
+		return NULL;
+	}
+
+	return PyString_FromString(sg->GetDate());
+}
+
+PyDoc_STRVAR( GemRB_GetSaveGameGameDate__doc,
+"GetSaveGameGameDate(SaveSlotCount)\n\n"
+"Returns savegame in-game date." );
+
+static PyObject* GemRB_GetSaveGameGameDate(PyObject * /*self*/, PyObject* args)
+{
+	int SlotCount;
+
+	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
+		return AttributeError( GemRB_GetSaveGameGameDate__doc );
+	}
+
+	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SlotCount);
+	if (sg == NULL) {
+		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
+		return NULL;
+	}
+
+	return PyString_FromString(sg->GetGameDate());
+}
+
+PyDoc_STRVAR( GemRB_GetSaveGameSaveID__doc,
+"GetSaveGameSaveID(SaveSlotCount)\n\n"
+"Returns savegame slot ID." );
+
+static PyObject* GemRB_GetSaveGameSaveID(PyObject * /*self*/, PyObject* args)
+{
+	int SlotCount;
+
+	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
+		return AttributeError( GemRB_GetSaveGameSaveID__doc );
+	}
+
+	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SlotCount);
+	if (sg == NULL) {
+		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
+		return NULL;
+	}
+
+	return PyLong_FromLong(sg->GetSaveID());
 }
 
 PyDoc_STRVAR( GemRB_GetSaveGamePortrait__doc,
@@ -9286,11 +9330,14 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetPlayerScript, METH_VARARGS),
 	METHOD(GetPlayerString, METH_VARARGS),
 	METHOD(GetSaveGameCount, METH_VARARGS),
+	METHOD(GetSaveGameDate, METH_VARARGS),
+	METHOD(GetSaveGameGameDate, METH_VARARGS),
+	METHOD(GetSaveGameName, METH_VARARGS),
 	METHOD(GetSaveGamePortrait, METH_VARARGS),
 	METHOD(GetSaveGamePreview, METH_VARARGS),
+	METHOD(GetSaveGameSaveID, METH_VARARGS),
 	METHOD(GetSelectedSize, METH_NOARGS),
 	METHOD(GetString, METH_VARARGS),
-	METHOD(GetSaveGameAttrib, METH_VARARGS),
 	METHOD(GetSpellCastOn, METH_VARARGS),
 	METHOD(GetToken, METH_VARARGS),
 	METHOD(GetVar, METH_VARARGS),

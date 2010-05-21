@@ -98,21 +98,21 @@ def ScrollBarPress ():
 			Button2.SetState (IE_GUI_BUTTON_DISABLED)
 
 		if ActPos<GameCount:
-			Slotname = GemRB.GetSaveGameAttrib (0,ActPos)
+			Slotname = GemRB.GetSaveGameName(ActPos)
 		else:
 			Slotname = ""
 		Label = LoadWindow.GetControl (0x10000005+i)
 		Label.SetText (Slotname)
 
 		if ActPos<GameCount:
-			Slotname = GemRB.GetSaveGameAttrib (4,ActPos)
+			Slotname = GemRB.GetSaveGameGameDate(ActPos)
 		else:
 			Slotname = ""
 		Label = LoadWindow.GetControl (0x1000000a+i)
 		Label.SetText (Slotname)
 
 		if ActPos<GameCount:
-			Slotname = GemRB.GetSaveGameAttrib (3,ActPos)
+			Slotname = GemRB.GetSaveGameDate(ActPos)
 		else:
 			Slotname = ""
 		Label = LoadWindow.GetControl (0x1000000f+i)

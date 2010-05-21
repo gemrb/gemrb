@@ -113,8 +113,8 @@ def ScrollBarPress():
 			Button1.SetState(IE_GUI_BUTTON_DISABLED)
 
 		if ActPos < GameCount - 1:
-			Slotname = GemRB.GetSaveGameAttrib (0, ActPos)
-			Slottime = GemRB.GetSaveGameAttrib (3, ActPos)
+			Slotname = GemRB.GetSaveGameName(ActPos)
+			Slottime = GemRB.GetSaveGameDate(ActPos)
 			Button2.SetState(IE_GUI_BUTTON_ENABLED)
 		elif ActPos == GameCount-1:
 			Slotname = 28647    # "Empty"
@@ -235,8 +235,8 @@ def OpenSaveDetailWindow ():
 
 	# Slot name and time
 	if Pos < GameCount - 1:
-		Slotname = GemRB.GetSaveGameAttrib (0, Pos)
-		Slottime = GemRB.GetSaveGameAttrib (4, Pos)
+		Slotname = GemRB.GetSaveGameName(Pos)
+		Slottime = GemRB.GetSaveGameGameDate(Pos)
 	else:
 		Slotname = ""
 		Slottime = ""

@@ -108,7 +108,7 @@ def ScrollBarPress():
 			Button1.SetState (IE_GUI_BUTTON_DISABLED)
 
 		if ActPos<GameCount-1:
-			Slotname = GemRB.GetSaveGameAttrib (0,ActPos)
+			Slotname = GemRB.GetSaveGameName(ActPos)
 			Button2.SetState (IE_GUI_BUTTON_ENABLED)
 		elif ActPos == GameCount-1:
 			Slotname = 15304
@@ -121,7 +121,7 @@ def ScrollBarPress():
 		Label.SetText (Slotname)
 
 		if ActPos<GameCount-1:
-			Slotname = GemRB.GetSaveGameAttrib (4,ActPos)
+			Slotname = GemRB.GetSaveGameGameDate(ActPos)
 		else:
 			Slotname = ""
 		Label = Window.GetControl (0x10000010+i)
@@ -167,7 +167,7 @@ def SavePress():
 
 	#slot name
 	if Pos<GameCount-1:
-		Slotname = GemRB.GetSaveGameAttrib (0,Pos)
+		Slotname = GemRB.GetSaveGameName(Pos)
 	else:
 		Slotname = ""
 	NameField = ConfirmWindow.GetControl (3)
@@ -176,7 +176,7 @@ def SavePress():
 
 	#game hours (should be generated from game)
 	if Pos<GameCount-1:
-		Slotname = GemRB.GetSaveGameAttrib (4,Pos)
+		Slotname = GemRB.GetSaveGameGameDate(Pos)
 	else:
 		Slotname = ""
 	Label = ConfirmWindow.GetControl (0x10000004)

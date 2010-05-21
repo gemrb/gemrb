@@ -58,7 +58,7 @@ def OnLoad():
 	#looking for the quicksave
 	EnableQuickLoad = IE_GUI_BUTTON_DISABLED
 	for ActPos in range(GameCount):
-		Slotname = GemRB.GetSaveGameAttrib(5,ActPos)
+		Slotname = GemRB.GetSaveGameSaveID(ActPos)
 		# quick save is 2
 		if Slotname == 2:
 			EnableQuickLoad = IE_GUI_BUTTON_ENABLED
