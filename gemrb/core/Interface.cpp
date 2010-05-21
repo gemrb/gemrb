@@ -3681,14 +3681,14 @@ void Interface::QuitGame(int BackToMain)
 	GSUpdate(true);
 }
 
-void Interface::SetupLoadGame(int index, int ver_override)
+void Interface::SetupLoadGame(SaveGame *sg, int ver_override)
 {
-	LoadGameIndex = index;
+	LoadGameIndex = sg;
 	VersionOverride = ver_override;
 	QuitFlag |= QF_LOADGAME;
 }
 
-void Interface::LoadGame(int index, int ver_override)
+void Interface::LoadGame(SaveGame *sg, int ver_override)
 {
 	// This function has rather painful error handling,
 	// as it should swap all the objects or none at all
@@ -3716,15 +3716,12 @@ void Interface::LoadGame(int index, int ver_override)
 	if (!KeepCache) DelTree((const char *) CachePath, true);
 	LoadProgress(20);
 
-	if (index == -1) {
+	if (sg == NULL) {
 		//Load the Default Game
 		gam_str = gamedata->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
 		sav_str = NULL;
 		wmp_str = gamedata->GetResource( WorldMapName, IE_WMP_CLASS_ID );
 	} else {
-		Holder<SaveGame> sg = sgiterator->GetSaveGame( index );
-		if (!sg)
-			return;
 		gam_str = sg->GetGame();
 		sav_str = sg->GetSave();
 		wmp_str = sg->GetWmap();

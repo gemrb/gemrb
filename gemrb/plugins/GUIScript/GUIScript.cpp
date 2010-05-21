@@ -383,12 +383,14 @@ PyDoc_STRVAR( GemRB_LoadGame__doc,
 
 static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 {
-	int GameIndex, VersionOverride = 0;
+	PyObject *obj;
+	int VersionOverride = 0;
 
-	if (!PyArg_ParseTuple( args, "i|i", &GameIndex, &VersionOverride )) {
+	if (!PyArg_ParseTuple( args, "O|i", &obj, &VersionOverride )) {
 		return AttributeError( GemRB_LoadGame__doc );
 	}
-	core->SetupLoadGame(GameIndex, VersionOverride);
+	CObject<SaveGame> save(obj);
+	core->SetupLoadGame(save.get(), VersionOverride);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -3762,13 +3764,15 @@ PyDoc_STRVAR( GemRB_SaveGame__doc,
 
 static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 {
-	int SlotCount;
+	PyObject *obj;
 	int Version = -1;
 	const char *folder;
 
-	if (!PyArg_ParseTuple( args, "is|i", &SlotCount, &folder, &Version )) {
+	if (!PyArg_ParseTuple( args, "Os|i", &obj, &folder, &Version )) {
 		return AttributeError( GemRB_SaveGame__doc );
 	}
+
+	CObject<SaveGame> save(obj);
 
 	Game *game = core->GetGame();
 	if (!game) {
@@ -3783,164 +3787,131 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 	if (Version>0) {
 		game->version = Version;
 	}
-	return PyInt_FromLong(sgi->CreateSaveGame(SlotCount, folder) );
+	return PyInt_FromLong(sgi->CreateSaveGame(save.get(), folder) );
 }
 
-PyDoc_STRVAR( GemRB_GetSaveGameCount__doc,
+PyDoc_STRVAR( GemRB_GetSaveGames__doc,
 "GetSaveGameCount() => int\n\n"
-"Returns the number of saved games." );
+"Returns the list of saved games." );
 
-static PyObject* GemRB_GetSaveGameCount(PyObject * /*self*/,
-	PyObject * /*args*/)
+static PyObject* GemRB_GetSaveGames(PyObject * /*self*/, PyObject * /*args*/)
 {
-	return PyInt_FromLong(
-			core->GetSaveGameIterator()->GetSaveGameCount() );
+	return MakePyList<SaveGame>(core->GetSaveGameIterator()->GetSaveGames());
 }
 
 PyDoc_STRVAR( GemRB_DeleteSaveGame__doc,
-"DeleteSaveGame(SlotCount)\n\n"
+"DeleteSaveGame(Slot)\n\n"
 "Deletes a saved game folder completely." );
 
 static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 {
-	int SlotCount;
+	PyObject *Slot;
 
-	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
+	if (!PyArg_ParseTuple( args, "O", &Slot )) {
 		return AttributeError( GemRB_DeleteSaveGame__doc );
 	}
-	core->GetSaveGameIterator()->DeleteSaveGame( SlotCount );
+
+	CObject<SaveGame> game(Slot);
+	core->GetSaveGameIterator()->DeleteSaveGame( game.get() );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_GetSaveGameName__doc,
-"GetSaveGameName(SaveSlotCount)\n\n"
-"Returns savegame date." );
+PyDoc_STRVAR( GemRB_SaveGame_GetName__doc,
+"SaveGame.GetName() => string/int\n\n"
+"Returns name of the saved game." );
 
-static PyObject* GemRB_GetSaveGameName(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SaveGame_GetName(PyObject * /*self*/, PyObject* args)
 {
-	int SlotCount;
+	PyObject* Slot;
 
-	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
-		return AttributeError( GemRB_GetSaveGameName__doc );
+	if (!PyArg_ParseTuple( args, "O", &Slot )) {
+		return AttributeError( GemRB_SaveGame_GetName__doc );
 	}
 
-	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SlotCount);
-	if (sg == NULL) {
-		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
-		return NULL;
-	}
-
-	return PyString_FromString(sg->GetName());
+	CObject<SaveGame> save(Slot);
+	return PyString_FromString(save->GetName());
 }
 
-PyDoc_STRVAR( GemRB_GetSaveGameDate__doc,
-"GetSaveGameDate(SaveSlotCount)\n\n"
-"Returns savegame date." );
+PyDoc_STRVAR( GemRB_SaveGame_GetDate__doc,
+"SaveGame.GetDate() => string/int\n\n"
+"Returns date of the saved game." );
 
-static PyObject* GemRB_GetSaveGameDate(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SaveGame_GetDate(PyObject * /*self*/, PyObject* args)
 {
-	int SlotCount;
+	PyObject* Slot;
 
-	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
-		return AttributeError( GemRB_GetSaveGameDate__doc );
+	if (!PyArg_ParseTuple( args, "O", &Slot )) {
+		return AttributeError( GemRB_SaveGame_GetDate__doc );
 	}
 
-	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SlotCount);
-	if (sg == NULL) {
-		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
-		return NULL;
-	}
-
-	return PyString_FromString(sg->GetDate());
+	CObject<SaveGame> save(Slot);
+	return PyString_FromString(save->GetDate());
 }
 
-PyDoc_STRVAR( GemRB_GetSaveGameGameDate__doc,
-"GetSaveGameGameDate(SaveSlotCount)\n\n"
-"Returns savegame in-game date." );
+PyDoc_STRVAR( GemRB_SaveGame_GetGameDate__doc,
+"SaveGame.GetGameDate() => string/int\n\n"
+"Returns game date of the saved game." );
 
-static PyObject* GemRB_GetSaveGameGameDate(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SaveGame_GetGameDate(PyObject * /*self*/, PyObject* args)
 {
-	int SlotCount;
+	PyObject* Slot;
 
-	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
-		return AttributeError( GemRB_GetSaveGameGameDate__doc );
+	if (!PyArg_ParseTuple( args, "O", &Slot )) {
+		return AttributeError( GemRB_SaveGame_GetGameDate__doc );
 	}
 
-	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SlotCount);
-	if (sg == NULL) {
-		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
-		return NULL;
-	}
-
-	return PyString_FromString(sg->GetGameDate());
+	CObject<SaveGame> save(Slot);
+	return PyString_FromString(save->GetGameDate());
 }
 
-PyDoc_STRVAR( GemRB_GetSaveGameSaveID__doc,
-"GetSaveGameSaveID(SaveSlotCount)\n\n"
-"Returns savegame slot ID." );
+PyDoc_STRVAR( GemRB_SaveGame_GetSaveID__doc,
+"SaveGame.GetSaveID() => string/int\n\n"
+"Returns ID of the saved game." );
 
-static PyObject* GemRB_GetSaveGameSaveID(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SaveGame_GetSaveID(PyObject * /*self*/, PyObject* args)
 {
-	int SlotCount;
+	PyObject* Slot;
 
-	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
-		return AttributeError( GemRB_GetSaveGameSaveID__doc );
+	if (!PyArg_ParseTuple( args, "O", &Slot )) {
+		return AttributeError( GemRB_SaveGame_GetSaveID__doc );
 	}
 
-	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SlotCount);
-	if (sg == NULL) {
-		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
-		return NULL;
-	}
-
-	return PyLong_FromLong(sg->GetSaveID());
+	CObject<SaveGame> save(Slot);
+	return PyInt_FromLong(save->GetSaveID());
 }
 
-PyDoc_STRVAR( GemRB_GetSaveGamePortrait__doc,
-"GetSaveGamePortrait(SaveSlotCount, PCSlotCount)\n\n"
-"Returns a savegame PC portrait." );
+PyDoc_STRVAR( GemRB_SaveGame_GetPreview__doc,
+"SaveGame.GetPreview() => string/int\n\n"
+"Returns preview of the saved game." );
 
-static PyObject* GemRB_GetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SaveGame_GetPreview(PyObject * /*self*/, PyObject* args)
 {
-	int SaveSlotCount, PCSlotCount;
+	PyObject* Slot;
 
-	if (!PyArg_ParseTuple( args, "ii", &SaveSlotCount, &PCSlotCount )) {
-		return AttributeError( GemRB_GetSaveGamePortrait__doc );
+	if (!PyArg_ParseTuple( args, "O", &Slot )) {
+		return AttributeError( GemRB_SaveGame_GetPreview__doc );
 	}
 
-	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SaveSlotCount);
-	if (sg == NULL) {
-		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
-		return NULL;
-	}
-	if (sg->GetPortraitCount() <= PCSlotCount) {
-		Py_INCREF( Py_None );
-		return Py_None;
-	}
-
-	return CObject<Sprite2D>(sg->GetPortrait(PCSlotCount));
+	CObject<SaveGame> save(Slot);
+	return CObject<Sprite2D>(save->GetPreview());
 }
 
-PyDoc_STRVAR( GemRB_GetSaveGamePreview__doc,
-"GetSaveGamePreview(SaveSlotCount)\n\n"
-"Returns a savegame area preview." );
+PyDoc_STRVAR( GemRB_SaveGame_GetPortrait__doc,
+"SaveGame.GetPortrait(int index) => string/int\n\n"
+"Returns portrait of the saved game." );
 
-static PyObject* GemRB_GetSaveGamePreview(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SaveGame_GetPortrait(PyObject * /*self*/, PyObject* args)
 {
-	int SlotCount;
+	PyObject* Slot;
+	int index;
 
-	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
-		return AttributeError( GemRB_GetSaveGamePreview__doc );
+	if (!PyArg_ParseTuple( args, "Oi", &Slot, &index )) {
+		return AttributeError( GemRB_SaveGame_GetPortrait__doc );
 	}
 
-	Holder<SaveGame> sg = core->GetSaveGameIterator()->GetSaveGame(SlotCount);
-	if (sg == NULL) {
-		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
-		return NULL;
-	}
-
-	return CObject<Sprite2D>(sg->GetPreview());
+	CObject<SaveGame> save(Slot);
+	return CObject<Sprite2D>(save->GetPortrait(index));
 }
 
 PyDoc_STRVAR( GemRB_GetGamePreview__doc,
@@ -9329,13 +9300,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetPlayerStates, METH_VARARGS),
 	METHOD(GetPlayerScript, METH_VARARGS),
 	METHOD(GetPlayerString, METH_VARARGS),
-	METHOD(GetSaveGameCount, METH_VARARGS),
-	METHOD(GetSaveGameDate, METH_VARARGS),
-	METHOD(GetSaveGameGameDate, METH_VARARGS),
-	METHOD(GetSaveGameName, METH_VARARGS),
-	METHOD(GetSaveGamePortrait, METH_VARARGS),
-	METHOD(GetSaveGamePreview, METH_VARARGS),
-	METHOD(GetSaveGameSaveID, METH_VARARGS),
+	METHOD(GetSaveGames, METH_VARARGS),
 	METHOD(GetSelectedSize, METH_NOARGS),
 	METHOD(GetString, METH_VARARGS),
 	METHOD(GetSpellCastOn, METH_VARARGS),
@@ -9460,6 +9425,12 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_TextArea_SetFlags, METH_VARARGS),
 	METHOD(Label_SetTextColor, METH_VARARGS),
 	METHOD(Label_SetUseRGB, METH_VARARGS),
+	METHOD(SaveGame_GetDate, METH_VARARGS),
+	METHOD(SaveGame_GetGameDate, METH_VARARGS),
+	METHOD(SaveGame_GetName, METH_VARARGS),
+	METHOD(SaveGame_GetPortrait, METH_VARARGS),
+	METHOD(SaveGame_GetPreview, METH_VARARGS),
+	METHOD(SaveGame_GetSaveID, METH_VARARGS),
 	METHOD(ScrollBar_SetDefaultScrollBar, METH_VARARGS),
 	METHOD(ScrollBar_SetSprites, METH_VARARGS),
 	METHOD(Symbol_GetValue, METH_VARARGS),

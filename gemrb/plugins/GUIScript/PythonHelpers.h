@@ -92,4 +92,14 @@ private:
 	}
 };
 
+template <typename T, class Container>
+PyObject* MakePyList(const Container &source)
+{
+	size_t size = source.size();
+	PyObject *list = PyList_New(size);
+	for (size_t i = 0; i < size; ++i)
+		PyList_SET_ITEM(list, i, CObject<T>(source[i]));
+	return list;
+}
+
 #endif

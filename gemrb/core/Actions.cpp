@@ -5468,22 +5468,19 @@ void GameScript::PolymorphCopyBase(Scriptable* Sender, Action* parameters)
 
 void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 {
-	AutoTable tab("savegame");
-	if (!tab) {
-		core->GetSaveGameIterator()->CreateSaveGame(-1, "Unknown Autosave");
-		return;
-	}
-
 	if (core->HasFeature(GF_STRREF_SAVEGAME)) {
+		const char *basename = "Auto-Save";
+		AutoTable tab("savegame");
+		if (tab) {
+			basename = tab->QueryField(-1);
+		}
 		char * str = core->GetString( parameters->int0Parameter, IE_STR_STRREFOFF);
 		char FolderName[_MAX_PATH];
-		snprintf (FolderName, sizeof(FolderName), "%s - %s", tab->QueryField(-1), str);
+		snprintf (FolderName, sizeof(FolderName), "%s - %s", basename, str);
 		core->FreeString( str );
-		core->GetSaveGameIterator()->CreateSaveGame(-1, FolderName);
+		core->GetSaveGameIterator()->CreateSaveGame(Holder< ::SaveGame>(), FolderName);
 	} else {
-		const char *folder = "";
-		folder = tab->QueryField(parameters->int0Parameter);
-		core->GetSaveGameIterator()->CreateSaveGame(parameters->int0Parameter, folder);
+		core->GetSaveGameIterator()->CreateSaveGame(parameters->int0Parameter);
 	}
 }
 

@@ -270,24 +270,14 @@ GameControl::~GameControl(void)
 //Autosave was triggered by the GUI
 void GameControl::AutoSave()
 {
-	const char *folder;
-	AutoTable tab("savegame");
-	if (tab) {
-		folder = tab->QueryField(0);
-		core->GetSaveGameIterator()->CreateSaveGame(0, folder, 0);
-	}
+	core->GetSaveGameIterator()->CreateSaveGame(0, false);
 }
 
 //QuickSave was triggered by the GUI
 //mqs is the 'multiple quick saves' flag
 void GameControl::QuickSave()
 {
-	const char *folder;
-	AutoTable tab("savegame");
-	if (tab) {
-		folder = tab->QueryField(1);
-		core->GetSaveGameIterator()->CreateSaveGame(1, folder, mqs == 1);
-	}
+	core->GetSaveGameIterator()->CreateSaveGame(1, mqs == 1);
 }
 
 // ArrowSprite cycles

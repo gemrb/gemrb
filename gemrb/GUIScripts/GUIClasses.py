@@ -178,6 +178,17 @@ class GWorldMap(GControl):
     'SetTextColor': _GemRB.WorldMap_SetTextColor
   }
 
+class GSaveGame:
+  __metaclass__ = metaIDWrapper
+  methods = {
+    'GetDate': _GemRB.SaveGame_GetDate,
+    'GetGameDate': _GemRB.SaveGame_GetGameDate,
+    'GetName': _GemRB.SaveGame_GetName,
+    'GetPortrait': _GemRB.SaveGame_GetPortrait,
+    'GetPreview': _GemRB.SaveGame_GetPreview,
+    'GetSaveID': _GemRB.SaveGame_GetSaveID,
+  }
+
 class GSprite2D:
   __metaclass__ = metaIDWrapper
   methods = {}

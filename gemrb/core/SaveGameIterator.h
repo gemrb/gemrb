@@ -94,14 +94,13 @@ private:
 public:
 	SaveGameIterator(void);
 	~SaveGameIterator(void);
-	int GetSaveGameCount();
-	Holder<SaveGame> GetSaveGame(int index);
-	void DeleteSaveGame(int index);
-	int CreateSaveGame(int index, const char *slotname, bool mqs = false);
+	const charlist& GetSaveGames();
+	void DeleteSaveGame(Holder<SaveGame>);
+	int CreateSaveGame(Holder<SaveGame>, const char *slotname);
+	int CreateSaveGame(int index, bool mqs = false);
 private:
 	bool RescanSaveGames();
 	static Holder<SaveGame> GetSaveGame(const char *slotname);
-	char *GetSaveName(int index);
 	void PruneQuickSave(const char *folder);
 };
 

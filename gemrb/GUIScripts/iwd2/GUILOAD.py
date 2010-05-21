@@ -27,11 +27,11 @@ from LoadScreen import *
 
 LoadWindow = 0
 TextAreaControl = 0
-GameCount = 0
+Games = ()
 ScrollBar = 0
 
 def OnLoad ():
-	global LoadWindow, TextAreaControl, GameCount, ScrollBar
+	global LoadWindow, TextAreaControl, Games, ScrollBar
 
 	GemRB.SetVar ("SaveDir",1) #iwd2 is always using 'mpsave'
 	GemRB.LoadWindowPack ("GUILOAD", 800 ,600)
@@ -71,13 +71,10 @@ def OnLoad ():
 
 	ScrollBar=LoadWindow.GetControl (23)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
-	GameCount=GemRB.GetSaveGameCount () #count of games in save folder?
-	if GameCount>4:
-		TopIndex = GameCount-5
-	else:
-		TopIndex = 0
+	Games=GemRB.GetSaveGames()
+	TopIndex = max (0, len(Games) - 5)
 
-	ScrollBar.SetVarAssoc ("TopIndex", GameCount)
+	ScrollBar.SetVarAssoc ("TopIndex", len(Games))
 	ScrollBarPress ()
 	LoadWindow.SetVisible (WINDOW_VISIBLE)
 	return
@@ -90,43 +87,43 @@ def ScrollBarPress ():
 
 		Button1 = LoadWindow.GetControl (55+i)
 		Button2 = LoadWindow.GetControl (60+i)
-		if ActPos<GameCount:
+		if ActPos<len(Games):
 			Button1.SetState (IE_GUI_BUTTON_ENABLED)
 			Button2.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			Button1.SetState (IE_GUI_BUTTON_DISABLED)
 			Button2.SetState (IE_GUI_BUTTON_DISABLED)
 
-		if ActPos<GameCount:
-			Slotname = GemRB.GetSaveGameName(ActPos)
+		if ActPos<len(Games):
+			Slotname = Games[ActPos].GetName()
 		else:
 			Slotname = ""
 		Label = LoadWindow.GetControl (0x10000005+i)
 		Label.SetText (Slotname)
 
-		if ActPos<GameCount:
-			Slotname = GemRB.GetSaveGameGameDate(ActPos)
+		if ActPos<len(Games):
+			Slotname = Games[ActPos].GetGameDate()
 		else:
 			Slotname = ""
 		Label = LoadWindow.GetControl (0x1000000a+i)
 		Label.SetText (Slotname)
 
-		if ActPos<GameCount:
-			Slotname = GemRB.GetSaveGameDate(ActPos)
+		if ActPos<len(Games):
+			Slotname = Games[ActPos].GetDate()
 		else:
 			Slotname = ""
 		Label = LoadWindow.GetControl (0x1000000f+i)
 		Label.SetText (Slotname)
 
 		Button=LoadWindow.GetControl (1+i)
-		if ActPos<GameCount:
-			Button.SetSprite2D(GemRB.GetSaveGamePreview(ActPos))
+		if ActPos<len(Games):
+			Button.SetSprite2D(Games[ActPos].GetPreview())
 		else:
 			Button.SetPicture ("")
 		for j in range (PARTY_SIZE):
 			Button=LoadWindow.GetControl (25 + i*PARTY_SIZE + j)
-			if ActPos<GameCount:
-				Button.SetSprite2D(GemRB.GetSaveGamePortrait(ActPos, j))
+			if ActPos<len(Games):
+				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
 			else:
 				Button.SetPicture ("")
 	return
@@ -136,20 +133,20 @@ def LoadGamePress ():
 		LoadWindow.Unload ()
 	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
 	StartLoadScreen()
-	GemRB.LoadGame (Pos) #loads and enters savegame
+	GemRB.LoadGame(Games[Pos]) #loads and enters savegame
 	GemRB.EnterGame ()
 	return
 
 def DeleteGameConfirm():
-	global GameCount
+	global Games
 
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Pos = TopIndex +GemRB.GetVar ("LoadIdx")
-	GemRB.DeleteSaveGame (Pos)
+	GemRB.DeleteSaveGame(Games[Pos])
 	if TopIndex>0:
 		GemRB.SetVar ("TopIndex",TopIndex-1)
-	GameCount=GemRB.GetSaveGameCount () #count of games in save folder?
-	ScrollBar.SetVarAssoc ("TopIndex", GameCount)
+	del Games[Pos]
+	ScrollBar.SetVarAssoc ("TopIndex", len(Games))
 	ScrollBarPress ()
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()

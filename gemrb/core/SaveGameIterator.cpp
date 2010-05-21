@@ -293,24 +293,15 @@ bool SaveGameIterator::RescanSaveGames()
 	} while (( de = readdir( dir ) ) != NULL);
 	closedir( dir ); //No other files in the directory, close it
 
-	std::transform(slots.begin(), slots.end(), back_inserter(save_slots), (Holder<SaveGame>(*)(const char*))GetSaveGame);
+	std::transform(slots.begin(), slots.end(), back_inserter(save_slots), GetSaveGame);
 	return true;
 }
 
-int SaveGameIterator::GetSaveGameCount()
+const std::vector<Holder<SaveGame> >& SaveGameIterator::GetSaveGames()
 {
-	if (! RescanSaveGames())
-		return -1;
+	RescanSaveGames();
 
-	return (int) save_slots.size();
-}
-
-Holder<SaveGame> SaveGameIterator::GetSaveGame(int index)
-{
-	if (index < 0 || index >= GetSaveGameCount())
-		return NULL;
-
-	return save_slots[index];
+	return save_slots;
 }
 
 Holder<SaveGame> SaveGameIterator::GetSaveGame(const char *slotname)
@@ -493,12 +484,12 @@ static void CreateSavePath(char *Path, int index, const char *slotname)
 	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
 }
 
-int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
+int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 {
-	{
-		int ret = CanSave();
-		if (ret)
-			return ret;
+	AutoTable tab("savegame");
+	const char *slotname = NULL;
+	if (tab) {
+		slotname = tab->QueryField(index);
 	}
 
 	if (mqs) {
@@ -507,34 +498,15 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	}
 
 	//if index is not an existing savegame, we create a unique slotname
-	if (index < 0 || (size_t) index >= save_slots.size()) {
-		//leave space for autosaves
-		//probably the hardcoded slot names should be read by this object
-		//in that case 7 == size of hardcoded slot names array (savegame.2da)
-		index = 7;
-		for (size_t i = 0; i < save_slots.size(); ++i) {
-			Holder<SaveGame> save = save_slots[i];
-			if (save->GetSaveID() >= index) {
-				index = save->GetSaveID() + 1;
-			}
+	for (size_t i = 0; i < save_slots.size(); ++i) {
+		Holder<SaveGame> save = save_slots[i];
+		if (save->GetSaveID() == index) {
+			DeleteSaveGame(save);
+			break;
 		}
-	} else {
-		// the existing filename has the original index of the previous save
-		// this is usually bad since the gui sends the current one
-		Holder<SaveGame> save = save_slots[index];
-		if (!save) return -1;
-		if (save->GetSaveID() != index) {
-			// stop gemrb from deleting all our save games
-			printf("gemrb's buggy save code is trying to delete slot %d\n", save->GetSaveID());
-			printf("that is not the slot %d we were trying to save to, erroring out!\n", index);
-			return -1;
-		}
-		DeleteSaveGame(index);
 	}
-
 	char Path[_MAX_PATH];
 	CreateSavePath(Path, index, slotname);
-	save_slots.insert( save_slots.end(), GetSaveGame( Path ) );
 
 	if (!DoSaveGame(Path)) {
 		return -1;
@@ -555,17 +527,55 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	return 0;
 }
 
-void SaveGameIterator::DeleteSaveGame(int index)
+int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname)
 {
-	const char* slotname = save_slots[index]->GetSlotName();
 	if (!slotname) {
-		return;
+		return -1;
+	}
+
+	if (int cansave = CanSave())
+		return cansave;
+
+	int index;
+	if (save) {
+		index = save->GetSaveID();
+
+		DeleteSaveGame(save);
+		save->release();
+	} else {
+		//leave space for autosaves
+		//probably the hardcoded slot names should be read by this object
+		//in that case 7 == size of hardcoded slot names array (savegame.2da)
+		index = 7;
+		for (size_t i = 0; i < save_slots.size(); ++i) {
+			Holder<SaveGame> save = save_slots[i];
+			if (save->GetSaveID() >= index) {
+				index = save->GetSaveID() + 1;
+			}
+		}
 	}
 
 	char Path[_MAX_PATH];
-	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, SaveDir(), SPathDelimiter, slotname );
-	core->DelTree( Path, false ); //remove all files from folder
-	rmdir( Path );
+	CreateSavePath(Path, index, slotname);
 
-	save_slots.erase(save_slots.begin()+index);
+	if (!DoSaveGame(Path)) {
+		return -1;
+	}
+
+	// Save succesful
+	core->DisplayConstantString(STR_SAVESUCCEED, 0xbcefbc);
+	if (core->GetGameControl()) {
+		core->GetGameControl()->SetDisplayText(STR_SAVESUCCEED, 30);
+	}
+	return 0;
+}
+
+void SaveGameIterator::DeleteSaveGame(Holder<SaveGame> game)
+{
+       if (!game) {
+               return;
+       }
+
+       core->DelTree( game->GetPath(), false ); //remove all files from folder
+       rmdir( game->GetPath() );
 }
