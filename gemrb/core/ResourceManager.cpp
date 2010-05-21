@@ -39,7 +39,7 @@ ResourceManager::~ResourceManager()
 	}
 }
 
-bool ResourceManager::AddSource(char *path, const char *description, PluginID type)
+bool ResourceManager::AddSource(const char *path, const char *description, PluginID type)
 {
 	ResourceSource *source = ( ResourceSource * ) core->GetInterface( type );
 	if (!source->Open(path, description)) {
