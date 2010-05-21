@@ -28,6 +28,8 @@
 #include "ImageWriter.h"
 #include "ImageMgr.h"
 #include <set>
+#include <algorithm>
+#include <iterator>
 #include <cassert>
 
 TypeID SaveGame::ID = { "SaveGame" };
@@ -258,6 +260,13 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	return true;
 }
 
+struct iless {
+	bool operator () (const char *lhs, const char* rhs)
+	{
+		return stricmp(lhs, rhs) < 0;
+	}
+};
+
 bool SaveGameIterator::RescanSaveGames()
 {
 	loaded = true;
@@ -284,7 +293,7 @@ bool SaveGameIterator::RescanSaveGames()
 		return false;
 	}
 
-	std::set<char*,int(*)(const char*,const char*)> slots(stricmp);
+	std::set<char*,iless> slots;
 	do {
 		if (IsSaveGameSlot( Path, de->d_name )) {
 			slots.insert(strdup(de->d_name));
@@ -292,7 +301,7 @@ bool SaveGameIterator::RescanSaveGames()
 	} while (( de = readdir( dir ) ) != NULL);
 	closedir( dir ); //No other files in the directory, close it
 
-	save_slots.insert(save_slots.end(), slots.begin(), slots.end());
+	std::transform(slots.begin(), slots.end(), back_inserter(save_slots), (Holder<SaveGame>(*)(const char*))GetSaveGame);
 	return true;
 }
 
@@ -304,7 +313,7 @@ int SaveGameIterator::GetSaveGameCount()
 	return (int) save_slots.size();
 }
 
-char *SaveGameIterator::GetSaveName(int index)
+Holder<SaveGame> SaveGameIterator::GetSaveGame(int index)
 {
 	if (index < 0 || index >= GetSaveGameCount())
 		return NULL;
@@ -312,9 +321,8 @@ char *SaveGameIterator::GetSaveName(int index)
 	return save_slots[index];
 }
 
-Holder<SaveGame> SaveGameIterator::GetSaveGame(int index)
+Holder<SaveGame> SaveGameIterator::GetSaveGame(const char *slotname)
 {
-	char* slotname = GetSaveName(index);
 	if (!slotname) {
 		return NULL;
 	}
@@ -355,21 +363,6 @@ Holder<SaveGame> SaveGameIterator::GetSaveGame(int index)
 	return sg;
 }
 
-int SaveGameIterator::ExistingSlotName(int index)
-{
-	char strindex[10];
-
-	snprintf(strindex, sizeof(strindex), "%09d", index);
-	int idx = 0;
-	for (charlist::iterator i = save_slots.begin();i!=save_slots.end();i++) {
-		if (!strnicmp((*i), strindex, 9) ) {
-			return idx;
-		}
-		idx++;
-	}
-	return -1;
-}
-
 void SaveGameIterator::PruneQuickSave(const char *folder)
 {
 	char from[_MAX_PATH];
@@ -378,7 +371,7 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 	//storing the quicksave ages in an array
 	std::vector<int> myslots;
 	for (charlist::iterator m = save_slots.begin();m!=save_slots.end();m++) {
-		int tmp = IsQuickSaveSlot(folder, (*m) );
+		int tmp = IsQuickSaveSlot(folder, (*m)->GetSlotName() );
 		if (tmp) {
 			size_t pos = myslots.size();
 			while(pos-- && myslots[pos]>tmp) ;
@@ -516,28 +509,27 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 			return ret;
 	}
 
-	GetSaveGameCount(); //forcing reload
 	if (mqs) {
 		assert(index==1);
 		PruneQuickSave(slotname);
 	}
 
 	//if index is not an existing savegame, we create a unique slotname
-	if (index < 0 || index >= GetSaveGameCount()) {
-		index=GetSaveGameCount();
+	if (index < 0 || (size_t) index >= save_slots.size()) {
 		//leave space for autosaves
 		//probably the hardcoded slot names should be read by this object
 		//in that case 7 == size of hardcoded slot names array (savegame.2da)
-		if (index<7) {
-			index=7; 
-		}
-		while (ExistingSlotName(index) !=-1 ) {
-			index++;
+		index = 7;
+		for (size_t i = 0; i < save_slots.size(); ++i) {
+			Holder<SaveGame> save = save_slots[i];
+			if (save->GetSaveID() >= index) {
+				index = save->GetSaveID() + 1;
+			}
 		}
 	} else {
 		// the existing filename has the original index of the previous save
 		// this is usually bad since the gui sends the current one
-		Holder<SaveGame> save = GetSaveGame(index);
+		Holder<SaveGame> save = save_slots[index];
 		if (!save) return -1;
 		if (save->GetSaveID() != index) {
 			// stop gemrb from deleting all our save games
@@ -550,7 +542,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 
 	char Path[_MAX_PATH];
 	CreateSavePath(Path, index, slotname);
-	save_slots.insert( save_slots.end(), strdup( Path ) );
+	save_slots.insert( save_slots.end(), GetSaveGame( Path ) );
 
 	if (!DoSaveGame(Path)) {
 		return -1;
@@ -574,7 +566,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 
 void SaveGameIterator::DeleteSaveGame(int index)
 {
-	char* slotname = GetSaveName(index);
+	const char* slotname = save_slots[index]->GetSlotName();
 	if (!slotname) {
 		return;
 	}

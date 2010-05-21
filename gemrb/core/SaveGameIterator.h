@@ -86,12 +86,10 @@ private:
 	ResourceManager manager;
 };
 
-typedef std::vector<char*> charlist;
-
 class GEM_EXPORT SaveGameIterator {
 private:
 	bool loaded;
-	typedef std::vector<char*> charlist;
+	typedef std::vector<Holder<SaveGame> > charlist;
 	charlist save_slots;
 
 public:
@@ -102,9 +100,9 @@ public:
 	int GetSaveGameCount();
 	Holder<SaveGame> GetSaveGame(int index);
 	void DeleteSaveGame(int index);
-	int ExistingSlotName(int index);
 	int CreateSaveGame(int index, const char *slotname, bool mqs = false);
 private:
+	static Holder<SaveGame> GetSaveGame(const char *slotname);
 	char *GetSaveName(int index);
 	void PruneQuickSave(const char *folder);
 };
