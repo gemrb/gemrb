@@ -4222,7 +4222,7 @@ void Actor::ModifyDamage(Actor *target, Actor *hitter, int &damage, int &resiste
 			damage += (signed)target->GetStat(IE_DAMAGEBONUS);
 			resisted = (int) (damage * (signed)target->GetStat(it->second.resist_stat)/100.0);
 			// check for bonuses for specific damage types
-			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS)) {
+			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && hitter) {
 				int bonus = hitter->fxqueue.SpecificDamageBonus(it->second.iwd_mod_type);
 				if (bonus) {
 					resisted -= int (damage * bonus / 100.0);
