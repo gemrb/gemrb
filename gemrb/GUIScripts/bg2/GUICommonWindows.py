@@ -371,6 +371,7 @@ def ActionBardSongPressed ():
 	"""Toggles the battle song."""
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
+	GemRB.PlaySound ("act_01")
 	UpdateActionsWindow ()
 	return
 
@@ -385,6 +386,7 @@ def ActionStealthPressed ():
 	"""Toggles stealth."""
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_STEALTH)
+	GemRB.PlaySound ("act_07")
 	UpdateActionsWindow ()
 	return
 
@@ -392,6 +394,7 @@ def ActionTurnPressed ():
 	"""Toggles turn undead."""
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_TURNUNDEAD)
+	GemRB.PlaySound ("act_06")
 	UpdateActionsWindow ()
 	return
 

@@ -269,6 +269,7 @@ def ActionRightPressed ():
 def ActionBardSongPressed ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
+	GemRB.PlaySound ("act_01")
 	UpdateActionsWindow ()
 	return
 
@@ -281,12 +282,14 @@ def ActionSearchPressed ():
 def ActionStealthPressed ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_STEALTH)
+	GemRB.PlaySound ("act_07")
 	UpdateActionsWindow ()
 	return
 
 def ActionTurnPressed ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_TURNUNDEAD)
+	GemRB.PlaySound ("act_06")
 	UpdateActionsWindow ()
 	return
 
