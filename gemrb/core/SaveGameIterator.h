@@ -23,7 +23,7 @@
 
 #include <time.h>
 #include <sys/stat.h>
-#include <list> 
+#include <vector>
 #include "exports.h"
 #include "FileStream.h"
 #include "ResourceManager.h"
@@ -83,7 +83,7 @@ private:
 	ResourceManager manager;
 };
 
-typedef std::list<char *> charlist;
+typedef std::vector<char*> charlist;
 
 class GEM_EXPORT SaveGameIterator {
 private:

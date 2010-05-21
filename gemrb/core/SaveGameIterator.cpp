@@ -27,7 +27,7 @@
 #include "Video.h"
 #include "ImageWriter.h"
 #include "ImageMgr.h"
-#include <vector>
+#include <set>
 #include <cassert>
 
 /** Extract date from save game ds into Date. */
@@ -287,15 +287,16 @@ bool SaveGameIterator::RescanSaveGames()
 		closedir( dir );
 		return false;
 	}
+
+	std::set<char*,int(*)(const char*,const char*)> slots(stricmp);
 	do {
 		if (IsSaveGameSlot( Path, de->d_name )) {
-			charlist::iterator i;
-
-			for (i=save_slots.begin(); i!=save_slots.end() && stricmp((*i), de->d_name)<0; i++) ;
-			save_slots.insert( i, strdup( de->d_name ) );
+			slots.insert(strdup(de->d_name));
 		}
 	} while (( de = readdir( dir ) ) != NULL);
 	closedir( dir ); //No other files in the directory, close it
+
+	save_slots.insert(save_slots.end(), slots.begin(), slots.end());
 	return true;
 }
 
@@ -312,11 +313,7 @@ char *SaveGameIterator::GetSaveName(int index)
 	if (index < 0 || index >= GetSaveGameCount())
 		return NULL;
 
-	charlist::iterator i=save_slots.begin();
-	while (index--) {
-		i++;
-	}
-	return (*i);
+	return save_slots[index];
 }
 
 SaveGame* SaveGameIterator::GetSaveGame(int index)
@@ -593,11 +590,6 @@ void SaveGameIterator::DeleteSaveGame(int index)
 	core->DelTree( Path, false ); //remove all files from folder
 	rmdir( Path );
 
-	charlist::iterator i=save_slots.begin();
-	while (index--) {
-		i++;
-	}
-
-	free( (*i));
-	save_slots.erase(i);
+	free( save_slots[index]);
+	save_slots.erase(save_slots.begin()+index);
 }
