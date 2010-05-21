@@ -1009,7 +1009,7 @@ int fx_burning_blood (Scriptable* Owner, Actor* target, Effect* fx)
 		damage = DAMAGE_COLD;
 	}
 
-	target->Damage(fx->Parameter1, DAMAGE_FIRE, Owner);
+	target->Damage(fx->Parameter1, damage, Owner);
 	STAT_SET(IE_CHECKFORBERSERK,1);
 	return FX_NOT_APPLIED;
 }
@@ -1040,7 +1040,7 @@ int fx_burning_blood2 (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//this effect doesn't use Parameter1 to modify damage, it is a counter instead
-	target->Damage(DICE_ROLL(0), DAMAGE_FIRE, Owner);
+	target->Damage(DICE_ROLL(0), damage, Owner);
 	STAT_SET(IE_CHECKFORBERSERK,1);
 	return FX_APPLIED;
 }
