@@ -560,10 +560,6 @@ void GameScript::MoveToExpansion(Scriptable* Sender, Action* /*parameters*/)
 		game->InitActorPos(actor);
 	}
 
-	SaveGameIterator *sg = core->GetSaveGameIterator();
-	if (sg) {
-		sg->Invalidate();
-	}
 	core->SetEventFlag(EF_MASTERSCRIPT);
 	Sender->ReleaseCurrentAction();
 }

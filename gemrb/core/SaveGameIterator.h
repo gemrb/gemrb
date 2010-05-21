@@ -88,20 +88,18 @@ private:
 
 class GEM_EXPORT SaveGameIterator {
 private:
-	bool loaded;
 	typedef std::vector<Holder<SaveGame> > charlist;
 	charlist save_slots;
 
 public:
 	SaveGameIterator(void);
 	~SaveGameIterator(void);
-	void Invalidate();
-	bool RescanSaveGames();
 	int GetSaveGameCount();
 	Holder<SaveGame> GetSaveGame(int index);
 	void DeleteSaveGame(int index);
 	int CreateSaveGame(int index, const char *slotname, bool mqs = false);
 private:
+	bool RescanSaveGames();
 	static Holder<SaveGame> GetSaveGame(const char *slotname);
 	char *GetSaveName(int index);
 	void PruneQuickSave(const char *folder);

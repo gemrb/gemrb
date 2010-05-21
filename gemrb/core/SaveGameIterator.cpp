@@ -151,16 +151,10 @@ const char* SaveGame::GetGameDate()
 
 SaveGameIterator::SaveGameIterator(void)
 {
-	loaded = false;
 }
 
 SaveGameIterator::~SaveGameIterator(void)
 {
-}
-
-void SaveGameIterator::Invalidate()
-{
-	loaded = false;
 }
 
 /* mission pack save */
@@ -269,8 +263,6 @@ struct iless {
 
 bool SaveGameIterator::RescanSaveGames()
 {
-	loaded = true;
-
 	// delete old entries
 	save_slots.clear();
 
@@ -307,7 +299,7 @@ bool SaveGameIterator::RescanSaveGames()
 
 int SaveGameIterator::GetSaveGameCount()
 {
-	if (! loaded && ! RescanSaveGames())
+	if (! RescanSaveGames())
 		return -1;
 
 	return (int) save_slots.size();
@@ -548,7 +540,6 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 		return -1;
 	}
 
-	loaded = false;
 	// Save succesful / Quick-save succesful
 	if (index == 1) {
 		core->DisplayConstantString(STR_QSAVESUCCEED, 0xbcefbc);

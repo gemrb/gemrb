@@ -2850,11 +2850,6 @@ static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* args)
 		game->SetExpansion( Flags );
 	}
 
-	SaveGameIterator *sg = core->GetSaveGameIterator();
-	if (sg) {
-		sg->Invalidate();
-	}
-
 	Py_INCREF( Py_None );
 	return Py_None;
 }
