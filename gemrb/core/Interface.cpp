@@ -193,16 +193,15 @@ Interface::Interface(int iargc, char* iargv[])
 	CachePath[0] = 0;
 	GemRBOverridePath[0] = 0;
 	GameName[0] = 0;
+	for (i = 0; i < 6; i++) {
+		CD[i][0] = '\0';
+	}
 	strncpy( GameOverridePath, "override", sizeof(GameOverridePath) );
 	strncpy( GameSoundsPath, "sounds", sizeof(GameSoundsPath) );
 	strncpy( GameScriptsPath, "scripts", sizeof(GameScriptsPath) );
 	strncpy( GamePortraitsPath, "portraits", sizeof(GamePortraitsPath) );
 	strncpy( GameCharactersPath, "characters", sizeof(GameCharactersPath) );
 	strncpy( GameDataPath, "data", sizeof(GameDataPath) );
-	for (i = 0; i < 6; i++) {
-		strncpy( CD[i], "CDi", sizeof(CD[i]) );
-		CD[i][2] = '1' + i;
-	}
 	strncpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
 	strncpy( ButtonFont, "STONESML", sizeof(ButtonFont) );
 	strncpy( TooltipFont, "STONESML", sizeof(TooltipFont) );
@@ -2186,8 +2185,13 @@ bool Interface::LoadConfig(const char* filename)
 		ResolveFilePath(CachePath);
 	}
 
-	for (int i = 0; i < 6; i++) {
-		ResolveFilePath( CD[i] );
+	for (int i = 0; i < 6; ++i) {
+		if (!CD[i][0]) {
+			char cd[] = { 'C', 'D', '1'+i, '\0' };
+			PathJoin(CD[i], GamePath, cd, NULL);
+		} else {
+			ResolveFilePath( CD[i] );
+		}
 	}
 
 	FixPath( GUIScriptsPath, true );
