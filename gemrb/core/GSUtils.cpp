@@ -35,7 +35,6 @@
 #include "strrefs.h"
 #include "defsounds.h"
 
-int initialized = 0;
 //these tables will get freed by Core
 SymbolMgr* triggersTable;
 SymbolMgr* actionsTable;

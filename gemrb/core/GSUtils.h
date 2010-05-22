@@ -31,7 +31,6 @@
 #define ID_ACTIONS   8
 #define ID_TRIGGERS  16
 
-extern int initialized;
 extern SymbolMgr* triggersTable;
 extern SymbolMgr* actionsTable;
 extern SymbolMgr* objectsTable;

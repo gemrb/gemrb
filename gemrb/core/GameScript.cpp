@@ -25,6 +25,7 @@
 #include "Game.h"
 #include "GameControl.h"
 #include "GameData.h"
+#include "PluginMgr.h"
 
 //debug flags
 // 1 - cache
@@ -1222,6 +1223,203 @@ void Targets::Clear()
 	objects.clear();
 }
 
+/** releasing global memory */
+static void CleanupIEScript()
+{
+	if (SkillStats)
+		free(SkillStats);
+	SkillStats = NULL;
+	SkillCount = -1;
+	if (ObjectIDSTableNames)
+		free(ObjectIDSTableNames);
+	ObjectIDSTableNames = NULL;
+}
+
+void InitializeIEScript()
+{
+	PluginMgr::Get()->RegisterCleanup(CleanupIEScript);
+
+	if (core->HasFeature(GF_CHARNAMEISGABBER)) {
+		charnameisgabber = true;
+	} else {
+		charnameisgabber = false;
+	}
+
+	InitScriptTables();
+	int tT = core->LoadSymbol( "trigger" );
+	int aT = core->LoadSymbol( "action" );
+	int oT = core->LoadSymbol( "object" );
+	int gaT = core->LoadSymbol( "gemact" );
+	AutoTable objNameTable("script");
+	if (tT < 0 || aT < 0 || oT < 0 || !objNameTable) {
+		printMessage( "GameScript","A critical scripting file is missing!\n",LIGHT_RED );
+		abort();
+	}
+	triggersTable = core->GetSymbol( tT );
+	actionsTable = core->GetSymbol( aT );
+	objectsTable = core->GetSymbol( oT );
+	SymbolMgr *overrideActionsTable = core->GetSymbol( gaT );
+	if (!triggersTable || !actionsTable || !objectsTable || !objNameTable) {
+		printMessage( "GameScript","A critical scripting file is damaged!\n",LIGHT_RED );
+		abort();
+	}
+
+	int i;
+
+	/* Loading Script Configuration Parameters */
+
+	ObjectIDSCount = atoi( objNameTable->QueryField() );
+	if (ObjectIDSCount<0 || ObjectIDSCount>MAX_OBJECT_FIELDS) {
+		printMessage("GameScript","The IDS Count shouldn't be more than 10!\n",LIGHT_RED);
+		abort();
+	}
+
+	ObjectIDSTableNames = (ieResRef *) malloc( sizeof(ieResRef) * ObjectIDSCount );
+	for (i = 0; i < ObjectIDSCount; i++) {
+		const char *idsname;
+		idsname=objNameTable->QueryField( 0, i + 1 );
+		const IDSLink *poi=FindIdentifier( idsname );
+		if (poi==NULL) {
+			idtargets[i]=NULL;
+		}
+		else {
+			idtargets[i]=poi->Function;
+		}
+		strnlwrcpy(ObjectIDSTableNames[i], idsname, 8 );
+	}
+	MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
+	if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
+		printMessage("GameScript","The Object Nesting Count shouldn't be more than 5!\n", LIGHT_RED);
+		abort();
+	}
+	HasAdditionalRect = ( atoi( objNameTable->QueryField( 2 ) ) != 0 );
+	ExtraParametersCount = atoi( objNameTable->QueryField( 3 ) );
+	HasTriggerPoint = ( atoi( objNameTable->QueryField( 4 ) ) != 0 );
+	ObjectFieldsCount = ObjectIDSCount - ExtraParametersCount;
+
+	/* Initializing the Script Engine */
+
+	memset( triggers, 0, sizeof( triggers ) );
+	memset( triggerflags, 0, sizeof( triggerflags ) );
+	memset( actions, 0, sizeof( actions ) );
+	memset( actionflags, 0, sizeof( actionflags ) );
+	memset( objects, 0, sizeof( objects ) );
+
+	int j;
+
+	j = triggersTable->GetSize();
+	while (j--) {
+		i = triggersTable->GetValueIndex( j );
+		//maybe we should watch for this bit?
+		const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ), i );
+		//bool triggerflag = i & 0x4000;
+		i &= 0x3fff;
+		if (i >= MAX_TRIGGERS) {
+			printMessage("GameScript"," ", RED);
+			printf("trigger %d (%s) is too high, ignoring\n", i, triggersTable->GetStringIndex( j ) );
+			continue;
+		}
+		if (triggers[i]) {
+			if (poi && triggers[i]!=poi->Function) {
+				printMessage("GameScript"," ", YELLOW);
+				printf("%s is in collision with %s\n", triggersTable->GetStringIndex( j ), triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ));
+			} else {
+				printMessage("GameScript"," ", WHITE);
+				printf("%s is a synonym of %s\n", triggersTable->GetStringIndex( j ), triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ) );
+			}
+			continue; //we already found an alternative
+		}
+		if (poi == NULL) {
+			triggers[i] = NULL;
+			triggerflags[i] = 0;
+		}
+		else {
+			triggers[i] = poi->Function;
+			triggerflags[i] = poi->Flags;
+		}
+	}
+
+	j = actionsTable->GetSize();
+	while (j--) {
+		i = actionsTable->GetValueIndex( j );
+		if (i >= MAX_ACTIONS) {
+			printMessage("GameScript"," ", RED);
+			printf("action %d (%s) is too high, ignoring\n", i, actionsTable->GetStringIndex( j ) );
+			continue;
+		}
+		const ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ), i );
+		if (actions[i]) {
+			if (poi && actions[i]!=poi->Function) {
+				printMessage("GameScript"," ", YELLOW);
+				printf("%s is in collision with %s\n", actionsTable->GetStringIndex( j ), actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
+			} else {
+				printMessage("GameScript"," ", WHITE);
+				printf("%s is a synonym of %s\n", actionsTable->GetStringIndex( j ), actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
+			}
+			continue; //we already found an alternative
+		}
+		if (poi == NULL) {
+			actions[i] = NULL;
+			actionflags[i] = 0;
+			continue;
+		}
+		actions[i] = poi->Function;
+		actionflags[i] = poi->Flags;
+	}
+
+	if (overrideActionsTable) {
+		/*
+		 * we add/replace some actions from gemact.ids
+		 * right now you can't print or generate these actions!
+		 */
+		j = overrideActionsTable->GetSize();
+		while (j--) {
+			i = overrideActionsTable->GetValueIndex( j );
+			if (i >= MAX_ACTIONS) {
+				printMessage("GameScript"," ", RED);
+				printf("action %d (%s) is too high, ignoring\n", i, overrideActionsTable->GetStringIndex( j ) );
+				continue;
+			}
+			const ActionLink *poi = FindAction( overrideActionsTable->GetStringIndex( j ), i );
+			if (!poi) {
+				continue;
+			}
+			if (actions[i]) {
+				printMessage("GameScript"," ", WHITE);
+				printf("%s overrides existing action %s\n", overrideActionsTable->GetStringIndex( j ), actionsTable->GetStringIndex(actionsTable->FindValue(overrideActionsTable->GetValueIndex( j )) ) );
+			}
+			actions[i] = poi->Function;
+			actionflags[i] = poi->Flags;
+		}
+	}
+
+	j = objectsTable->GetSize();
+	while (j--) {
+		i = objectsTable->GetValueIndex( j );
+		if (i >= MAX_OBJECTS) {
+			printMessage("GameScript"," ", RED);
+			printf("object %d (%s) is too high, ignoring\n", i, objectsTable->GetStringIndex( j ) );
+			continue;
+		}
+		const ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ), i );
+		if (objects[i]) {
+			if (poi && objects[i]!=poi->Function) {
+				printMessage("GameScript"," ", YELLOW);
+				printf("%s is in collision with %s\n", objectsTable->GetStringIndex( j ), objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
+			} else {
+				printMessage("GameScript"," ", WHITE);
+				printf("%s is a synonym of %s\n", objectsTable->GetStringIndex( j ), objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
+			}
+			continue;
+		}
+		if (poi == NULL) {
+			objects[i] = NULL;
+		} else {
+			objects[i] = poi->Function;
+		}
+	}
+}
+
 /********************** GameScript *******************************/
 GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 	Variables* local, int ScriptLevel, bool AIScript)
@@ -1237,190 +1435,6 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 	scriptlevel = ScriptLevel;
 	lastAction = (unsigned int) ~0;
 
-	if (!initialized) {
-		initialized = 1;
-
-		if (core->HasFeature(GF_CHARNAMEISGABBER)) {
-			charnameisgabber=true;
-		} else {
-			charnameisgabber=false;
-		}
-
-		InitScriptTables();
-		int tT = core->LoadSymbol( "trigger" );
-		int aT = core->LoadSymbol( "action" );
-		int oT = core->LoadSymbol( "object" );
-		int gaT = core->LoadSymbol( "gemact" );
-		AutoTable objNameTable("script");
-		if (tT < 0 || aT < 0 || oT < 0 || !objNameTable) {
-			printMessage( "GameScript","A critical scripting file is missing!\n",LIGHT_RED );
-			abort();
-		}
-		triggersTable = core->GetSymbol( tT );
-		actionsTable = core->GetSymbol( aT );
-		objectsTable = core->GetSymbol( oT );
-		SymbolMgr *overrideActionsTable = core->GetSymbol( gaT );
-		if (!triggersTable || !actionsTable || !objectsTable || !objNameTable) {
-			printMessage( "GameScript","A critical scripting file is damaged!\n",LIGHT_RED );
-			abort();
-		}
-
-		int i;
-
-		/* Loading Script Configuration Parameters */
-
-		ObjectIDSCount = atoi( objNameTable->QueryField() );
-		if (ObjectIDSCount<0 || ObjectIDSCount>MAX_OBJECT_FIELDS) {
-			printMessage("GameScript","The IDS Count shouldn't be more than 10!\n",LIGHT_RED);
-			abort();
-		}
-
-		ObjectIDSTableNames = (ieResRef *) malloc( sizeof(ieResRef) * ObjectIDSCount );
-		for (i = 0; i < ObjectIDSCount; i++) {
-			const char *idsname;
-			idsname=objNameTable->QueryField( 0, i + 1 );
-			const IDSLink *poi=FindIdentifier( idsname );
-			if (poi==NULL) {
-				idtargets[i]=NULL;
-			}
-			else {
-				idtargets[i]=poi->Function;
-			}
-			strnlwrcpy(ObjectIDSTableNames[i], idsname, 8 );
-		}
-		MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
-		if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
-			printMessage("GameScript","The Object Nesting Count shouldn't be more than 5!\n", LIGHT_RED);
-			abort();
-		}
-		HasAdditionalRect = ( atoi( objNameTable->QueryField( 2 ) ) != 0 );
-		ExtraParametersCount = atoi( objNameTable->QueryField( 3 ) );
-		HasTriggerPoint = ( atoi( objNameTable->QueryField( 4 ) ) != 0 );
-		ObjectFieldsCount = ObjectIDSCount - ExtraParametersCount;
-
-		/* Initializing the Script Engine */
-
-		memset( triggers, 0, sizeof( triggers ) );
-		memset( triggerflags, 0, sizeof( triggerflags ) );
-		memset( actions, 0, sizeof( actions ) );
-		memset( actionflags, 0, sizeof( actionflags ) );
-		memset( objects, 0, sizeof( objects ) );
-
-		int j;
-
-		j = triggersTable->GetSize();
-		while (j--) {
-			i = triggersTable->GetValueIndex( j );
-			//maybe we should watch for this bit?
-			const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ), i );
-			//bool triggerflag = i & 0x4000;
-			i &= 0x3fff;
-			if (i >= MAX_TRIGGERS) {
-				printMessage("GameScript"," ", RED);
-				printf("trigger %d (%s) is too high, ignoring\n", i, triggersTable->GetStringIndex( j ) );
-				continue;
-			}
-			if (triggers[i]) {
-				if (poi && triggers[i]!=poi->Function) {
-					printMessage("GameScript"," ", YELLOW);
-					printf("%s is in collision with %s\n", triggersTable->GetStringIndex( j ), triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ));
-				} else {
-					printMessage("GameScript"," ", WHITE);
-					printf("%s is a synonym of %s\n", triggersTable->GetStringIndex( j ), triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ) );
-				}
-				continue; //we already found an alternative
-			}
-			if (poi == NULL) {
-				triggers[i] = NULL;
-				triggerflags[i] = 0;
-			}
-			else {
-				triggers[i] = poi->Function;
-				triggerflags[i] = poi->Flags;
-			}
-		}
-
-		j = actionsTable->GetSize();
-		while (j--) {
-			i = actionsTable->GetValueIndex( j );
-			if (i >= MAX_ACTIONS) {
-				printMessage("GameScript"," ", RED);
-				printf("action %d (%s) is too high, ignoring\n", i, actionsTable->GetStringIndex( j ) );
-				continue;
-			}
-			const ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ), i );
-			if (actions[i]) {
-				if (poi && actions[i]!=poi->Function) {
-					printMessage("GameScript"," ", YELLOW);
-					printf("%s is in collision with %s\n", actionsTable->GetStringIndex( j ), actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
-				} else {
-					printMessage("GameScript"," ", WHITE);
-					printf("%s is a synonym of %s\n", actionsTable->GetStringIndex( j ), actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
-				}
-				continue; //we already found an alternative
-			}
-			if (poi == NULL) {
-				actions[i] = NULL;
-				actionflags[i] = 0;
-				continue;
-			}
-			actions[i] = poi->Function;
-			actionflags[i] = poi->Flags;
-		}
-
-		if (overrideActionsTable) {
-			/*
-			 * we add/replace some actions from gemact.ids
-			 * right now you can't print or generate these actions!
-			 */
-			j = overrideActionsTable->GetSize();
-			while (j--) {
-				i = overrideActionsTable->GetValueIndex( j );
-				if (i >= MAX_ACTIONS) {
-					printMessage("GameScript"," ", RED);
-					printf("action %d (%s) is too high, ignoring\n", i, overrideActionsTable->GetStringIndex( j ) );
-					continue;
-				}
-				const ActionLink *poi = FindAction( overrideActionsTable->GetStringIndex( j ), i );
-				if (!poi) {
-					continue;
-				}
-				if (actions[i]) {
-					printMessage("GameScript"," ", WHITE);
-					printf("%s overrides existing action %s\n", overrideActionsTable->GetStringIndex( j ), actionsTable->GetStringIndex(actionsTable->FindValue(overrideActionsTable->GetValueIndex( j )) ) );
-				}
-				actions[i] = poi->Function;
-				actionflags[i] = poi->Flags;
-			}
-		}
-
-		j = objectsTable->GetSize();
-		while (j--) {
-			i = objectsTable->GetValueIndex( j );
-			if (i >= MAX_OBJECTS) {
-				printMessage("GameScript"," ", RED);
-				printf("object %d (%s) is too high, ignoring\n", i, objectsTable->GetStringIndex( j ) );
-				continue;
-			}
-			const ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ), i );
-			if (objects[i]) {
-				if (poi && objects[i]!=poi->Function) {
-					printMessage("GameScript"," ", YELLOW);
-					printf("%s is in collision with %s\n", objectsTable->GetStringIndex( j ), objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
-				} else {
-					printMessage("GameScript"," ", WHITE);
-					printf("%s is a synonym of %s\n", objectsTable->GetStringIndex( j ), objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
-				}
-				continue;
-			}
-			if (poi == NULL) {
-				objects[i] = NULL;
-			} else {
-				objects[i] = poi->Function;
-			}
-		}
-		initialized = 2;
-	}
 	strnlwrcpy( Name, ResRef, 8 );
 
 	script = CacheScript( Name, AIScript?IE_BS_CLASS_ID:IE_BCS_CLASS_ID);
@@ -1454,19 +1468,6 @@ GameScript::~GameScript(void)
 		}
 		script = NULL;
 	}
-}
-
-/** releasing global memory */
-void GameScript::ReleaseMemory()
-{
-	if (SkillStats)
-		free(SkillStats);
-	SkillStats = NULL;
-	SkillCount = -1;
-	if (ObjectIDSTableNames)
-		free(ObjectIDSTableNames);
-	ObjectIDSTableNames = NULL;
-	initialized = 0;
 }
 
 Script* GameScript::CacheScript(ieResRef ResRef, SClass_ID type)

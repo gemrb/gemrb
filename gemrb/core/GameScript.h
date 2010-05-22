@@ -638,7 +638,6 @@ public:
 	GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		Variables* local = NULL, int ScriptLevel = 0, bool AIScript = false);
 	~GameScript();
-	static void ReleaseMemory();
 	const char *GetName() { return this?Name:"NONE\0\0\0\0"; }
 	static void ExecuteString(Scriptable* Sender, char* String);
 	static int EvaluateString(Scriptable* Sender, char* String);
@@ -1540,5 +1539,7 @@ public:
 GEM_EXPORT Action* GenerateAction(char* String);
 Action* GenerateActionDirect(char* String, Actor *object);
 Trigger* GenerateTrigger(char* String);
+
+void InitializeIEScript();
 
 #endif

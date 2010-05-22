@@ -456,7 +456,6 @@ Interface::~Interface(void)
 		INIresdata->release();
 
 	Map::ReleaseMemory();
-	GameScript::ReleaseMemory();
 	Actor::ReleaseMemory();
 
 	gamedata->ClearCaches();
@@ -1704,6 +1703,10 @@ int Interface::Init()
 	} else {
 		printStatus( "OK", LIGHT_GREEN );
 	}
+
+	printMessage( "Core", "Reading modal states table...", WHITE);
+	InitializeIEScript();
+	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Core Initialization Complete!\n", WHITE );
 
