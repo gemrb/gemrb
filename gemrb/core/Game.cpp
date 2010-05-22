@@ -1294,8 +1294,7 @@ void Game::PlayerDream()
 	Scriptable *Sender = GetPC(0,true);
 	if (!Sender) return;
 
-	GameScript* gs = new GameScript( "player1d", ST_ACTOR, Sender->locals,0,0 );
-	gs->MySelf = Sender;
+	GameScript* gs = new GameScript( "player1d", ST_ACTOR, Sender, Sender->locals,0,0 );
 	gs->Update();
 	delete( gs );
 }

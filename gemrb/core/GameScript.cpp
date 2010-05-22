@@ -1421,8 +1421,9 @@ void InitializeIEScript()
 }
 
 /********************** GameScript *******************************/
-GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
+GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType, Scriptable* MySelf,
 	Variables* local, int ScriptLevel, bool AIScript)
+	: MySelf(MySelf)
 {
 	if (local) {
 		locals = local;
@@ -1438,7 +1439,6 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 	strnlwrcpy( Name, ResRef, 8 );
 
 	script = CacheScript( Name, AIScript);
-	MySelf = NULL;
 	scriptType = ScriptType;
 }
 

@@ -756,8 +756,7 @@ void GameScript::EndCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
 
 void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 {
-	GameScript* gs = new GameScript( parameters->string0Parameter, ST_GLOBAL );
-	gs->MySelf = Sender;
+	GameScript* gs = new GameScript( parameters->string0Parameter, ST_GLOBAL, Sender );
 	gs->EvaluateAllBlocks();
 	delete( gs );
 	Sender->ClearCutsceneID();
