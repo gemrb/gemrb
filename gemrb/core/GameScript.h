@@ -606,12 +606,9 @@ extern int RandomNumValue;
 
 class GEM_EXPORT GameScript {
 public:
-	Variables* locals;
 	Script* script;
 	unsigned int lastAction;
-//	unsigned long scriptRunDelay;
 	int scriptlevel;
-//	void RunNow();
 	bool Update(bool *continuing = NULL, bool *done = NULL);
 	void EvaluateAllBlocks();
 private: //Internal Functions
@@ -628,15 +625,11 @@ private: //Internal Functions
 	static void ParseString(const char*& src, char* tmp);
 private: //Internal variables
 	Scriptable* const MySelf;
-	//unsigned long lastRunTime;
-	unsigned long scriptType; // unused
 private: //Script Internal Variables
 	ieResRef Name;
-//	bool continueExecution;
-	bool freeLocals;
 public:
-	GameScript(const ieResRef ResRef, ScriptableType ScriptType, Scriptable* Myself,
-		Variables* local = NULL, int ScriptLevel = 0, bool AIScript = false);
+	GameScript(const ieResRef ResRef, Scriptable* Myself,
+		int ScriptLevel = 0, bool AIScript = false);
 	~GameScript();
 	const char *GetName() { return this?Name:"NONE\0\0\0\0"; }
 	static void ExecuteString(Scriptable* Sender, char* String);

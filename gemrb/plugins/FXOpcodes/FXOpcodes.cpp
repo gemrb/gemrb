@@ -5933,7 +5933,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 		strnlwrcpy(resref,"cut250a",8);
 	}
 
-	GameScript* gs = new GameScript( resref, ST_GLOBAL, game );
+	GameScript* gs = new GameScript( resref, game );
 	gs->EvaluateAllBlocks();
 	delete( gs );
 	//for safety reasons, i get this pointer again

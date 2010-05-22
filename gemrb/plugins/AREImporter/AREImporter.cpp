@@ -348,7 +348,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	// small map is *optional*!
 
 	if (Script[0]) {
-		map->Scripts[0] = new GameScript( Script, ST_AREA, map );
+		map->Scripts[0] = new GameScript( Script, map );
 	} else {
 		map->Scripts[0] = NULL;
 	}
@@ -511,7 +511,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ip->SetDialog(DialogResRef);
 
 		if (Script[0]) {
-			ip->Scripts[0] = new GameScript( Script, ST_TRIGGER, ip );
+			ip->Scripts[0] = new GameScript( Script, ip );
 		} else {
 			ip->Scripts[0] = NULL;
 		}
@@ -613,7 +613,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			Script[0]=0;
 
 		if (Script[0]) {
-			c->Scripts[0] = new GameScript( Script, ST_CONTAINER, c );
+			c->Scripts[0] = new GameScript( Script, c );
 		} else {
 			c->Scripts[0] = NULL;
 		}
@@ -790,7 +790,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		door->Cursor = cursor;
 		memcpy( door->KeyResRef, KeyResRef, sizeof(KeyResRef) );
 		if (Script[0]) {
-			door->Scripts[0] = new GameScript( Script, ST_DOOR, door );
+			door->Scripts[0] = new GameScript( Script, door );
 		} else {
 			door->Scripts[0] = NULL;
 		}

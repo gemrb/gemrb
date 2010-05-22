@@ -1421,34 +1421,20 @@ void InitializeIEScript()
 }
 
 /********************** GameScript *******************************/
-GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType, Scriptable* MySelf,
-	Variables* local, int ScriptLevel, bool AIScript)
+GameScript::GameScript(const ieResRef ResRef, Scriptable* MySelf,
+	int ScriptLevel, bool AIScript)
 	: MySelf(MySelf)
 {
-	if (local) {
-		locals = local;
-		freeLocals = false;
-	} else {
-		locals = new Variables();
-		locals->SetType( GEM_VARIABLES_INT );
-		freeLocals = true;
-	}
 	scriptlevel = ScriptLevel;
 	lastAction = (unsigned int) ~0;
 
 	strnlwrcpy( Name, ResRef, 8 );
 
 	script = CacheScript( Name, AIScript);
-	scriptType = ScriptType;
 }
 
 GameScript::~GameScript(void)
 {
-	if (freeLocals) {
-		if (locals) {
-			delete( locals );
-		}
-	}
 	if (script) {
 		//set 3. parameter to true if you want instant free
 		//and possible death
@@ -1643,15 +1629,6 @@ static Condition* ReadCondition(DataStream* stream)
 	}
 	return cO;
 }
-
-//call this whenever a script was triggered by an event
-//(death, trap entered)
-/*
-void GameScript::RunNow()
-{
-	lastRunTime = 0;
-}
-*/
 
 /*
  * if you pass non-NULL parameters, continuing is set to whether we Continue()ed
