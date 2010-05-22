@@ -32,7 +32,6 @@
 #define ID_TRIGGERS  16
 
 extern int initialized;
-extern bool charactersubtitles;
 extern SymbolMgr* triggersTable;
 extern SymbolMgr* actionsTable;
 extern SymbolMgr* objectsTable;

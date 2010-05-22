@@ -1239,15 +1239,6 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 
 	if (!initialized) {
 		initialized = 1;
-		ieDword tmp = 0;
-
-		//display the verbal constants in the console
-		core->GetDictionary()->Lookup("Subtitles", tmp);
-		if (tmp) {
-			charactersubtitles = true;
-		} else {
-			charactersubtitles = false;
-		}
 
 		if (core->HasFeature(GF_CHARNAMEISGABBER)) {
 			charnameisgabber=true;
