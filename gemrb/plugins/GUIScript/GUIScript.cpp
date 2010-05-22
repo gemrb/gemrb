@@ -19,6 +19,8 @@
  */
 
 #include "GUIScript.h"
+#include "PythonHelpers.h"
+
 #include "Interface.h"
 #include "Map.h"
 #include "Label.h"
