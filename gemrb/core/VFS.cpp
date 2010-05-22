@@ -412,7 +412,7 @@ void ResolveFilePath(char* FilePath)
 		return;
 	}
 	strcpy(TempFilePath, FilePath);
-	PathJoin(FilePath, "/", TempFilePath, NULL);
+	PathJoin(FilePath, TempFilePath[0]==PathDelimiter?SPathDelimiter:"", TempFilePath, NULL);
 }
 
 #endif
