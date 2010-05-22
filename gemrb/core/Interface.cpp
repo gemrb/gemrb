@@ -2094,7 +2094,6 @@ bool Interface::LoadConfig(const char* filename)
 			strncpy( GameOverridePath, value, sizeof(GameOverridePath) );
 		} else if (stricmp( name, "GemRBOverridePath" ) == 0) {
 			strncpy( GemRBOverridePath, value, sizeof(GemRBOverridePath) );
-			ResolveFilePath(GemRBOverridePath);
 		} else if (stricmp( name, "GameScriptsPath" ) == 0) {
 			strncpy( GameScriptsPath, value, sizeof(GameScriptsPath) );
 		} else if (stricmp( name, "GameSoundsPath" ) == 0) {
@@ -2115,28 +2114,21 @@ bool Interface::LoadConfig(const char* filename)
 			SaveAsOriginal = atoi(value);
 		} else if (stricmp( name, "GemRBPath" ) == 0) {
 			strcpy( GemRBPath, value );
-			ResolveFilePath(GemRBPath);
 		} else if (stricmp( name, "ScriptDebugMode" ) == 0) {
 			SetScriptDebugMode(atoi(value));
 		} else if (stricmp( name, "CachePath" ) == 0) {
 			strncpy( CachePath, value, sizeof(CachePath) );
-			ResolveFilePath(CachePath);
 		} else if (stricmp( name, "GUIScriptsPath" ) == 0) {
 			strncpy( GUIScriptsPath, value, sizeof(GUIScriptsPath) );
-			ResolveFilePath( GUIScriptsPath );
 		} else if (stricmp( name, "PluginsPath" ) == 0) {
 			strncpy( PluginsPath, value, sizeof(PluginsPath) );
-			ResolveFilePath( PluginsPath );
 		} else if (stricmp( name, "GamePath" ) == 0) {
 			strncpy( GamePath, value, sizeof(GamePath) );
-			ResolveFilePath( GamePath );
 		} else if (stricmp( name, "SavePath" ) == 0) {
 			strncpy( SavePath, value, sizeof(SavePath) );
-			ResolveFilePath( SavePath );
 		} else if (strnicmp( name, "CD", 2 ) == 0 &&
 				name[2] >= '1' && name[2] <= '5' && name[3] == 0) {
 			strncpy( CD[name[2]-'1'], value, sizeof(CD[name[2]-'1']) );
-			ResolveFilePath( CD[name[2]-'1'] );
 		}
 	}
 	fclose( config );
@@ -2151,9 +2143,12 @@ bool Interface::LoadConfig(const char* filename)
 		strcpy( GemRBPath, DATADIR );
 	}
 #endif
+	ResolveFilePath(GemRBPath);
 
 	if (!GemRBOverridePath[0]) {
 		strcpy( GemRBOverridePath, GemRBPath );
+	} else {
+		ResolveFilePath(GemRBOverridePath);
 	}
 
 	if (!PluginsPath[0]) {
@@ -2162,25 +2157,38 @@ bool Interface::LoadConfig(const char* filename)
 #else
 		PathJoin( PluginsPath, GemRBPath, "plugins", NULL );
 #endif
+	} else {
+		ResolveFilePath( PluginsPath );
 	}
 
 	if (!GUIScriptsPath[0]) {
 		strcpy( GUIScriptsPath, GemRBPath );
+	} else {
+		ResolveFilePath( GUIScriptsPath );
 	}
 
 	if (!GameName[0]) {
 		strcpy( GameName, GEMRB_STRING );
 	}
 
+	ResolveFilePath( GamePath );
+
 	if (!SavePath[0]) {
 		// FIXME: maybe should use UserDir instead of GamePath
 		strcpy( SavePath, GamePath );
+	} else {
+		ResolveFilePath( SavePath );
 	}
 
 	if (! CachePath[0]) {
 		PathJoin( CachePath, UserDir, "Cache", NULL );
+	} else {
+		ResolveFilePath(CachePath);
 	}
 
+	for (int i = 0; i < 6; i++) {
+		ResolveFilePath( CD[i] );
+	}
 
 	FixPath( GUIScriptsPath, true );
 	FixPath( PluginsPath, true );
