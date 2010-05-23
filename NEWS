@@ -1,4 +1,4 @@
-GemRB git (26d60a9):
+GemRB git (ba796199e9c):
   New features:
     - 
     - reputation penalties on death or injury
@@ -10,7 +10,7 @@ GemRB git (26d60a9):
   Improved features:
     - 
     - the internal design was cleaned up in many places
-    - combat, spawns
+    - game saving, modal actions, combat, effects, spawns
     - magic missiles are now drawn properly
     - various guiscripts (no more flickering!)
     - bugfixes
