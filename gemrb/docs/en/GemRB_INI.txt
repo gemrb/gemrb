@@ -253,3 +253,7 @@ Nameless One and others is appended into the window as it comes. If set to 0 (de
 MaximumAbility = 25|40
 - - - - - - - - - - - - -
 Determines the maximum value of character abilities. Setting it to absurd values might cause problems. Its value should be 40 for IWD2, 25 for all other games.
+
+StrrefSaveGame = 0|1
+- - - - - - - - - - - - -
+Determines whether the GameScript action SaveGame uses the int0 paramater to lookup a strref, or to look in savegame.2da for the save game name.

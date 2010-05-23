@@ -255,7 +255,7 @@ def GameTypeReallyDonePress():
 		StartWindow.Unload ()
 		StartWindow = None
 
-	GemRB.LoadGame (-1)
+	GemRB.LoadGame(None)
 	GemRB.SetNextScript ("PartyFormation")
 
 def QuitGameTypePress ():

@@ -30,6 +30,7 @@
 #include "exports.h"
 #include "RGBAColor.h"
 #include "Palette.h"
+#include "TypeID.h"
 
 class AnimationFactory;
 
@@ -56,6 +57,8 @@ public:
 };
 
 class GEM_EXPORT Sprite2D {
+public:
+	static TypeID ID;
 public:
 	/** Pointer to the Driver Video Structure */
 	void* vptr;

@@ -109,7 +109,7 @@ def PregenPress():
 		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0) #loadgame needs this hack
 	GemRB.GameSetExpansion(0)
-	GemRB.LoadGame(-1)
+	GemRB.LoadGame(None)
 	GemRB.SetVar("PlayMode",-1)
 	GemRB.SetNextScript("GUIMP")
 	return
@@ -142,7 +142,7 @@ def NewSingle():
 	GemRB.SetVar("PlayMode",0)
 	GemRB.GameSetExpansion(0)
 	GemRB.SetVar("Slot",1)
-	GemRB.LoadGame(-1)
+	GemRB.LoadGame(None)
 	GemRB.SetNextScript("CharGen") #temporarily
 	return
 

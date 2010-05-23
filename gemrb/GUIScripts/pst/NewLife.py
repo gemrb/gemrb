@@ -61,7 +61,7 @@ def OnLoad():
 	global TextArea
 
 	GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_SET)
-	GemRB.LoadGame(-1)  #loading the base game
+	GemRB.LoadGame(None)  #loading the base game
 	StatTable = GemRB.LoadTableObject("abcomm")
 	GemRB.LoadWindowPack("GUICG")
 	#setting up confirmation window

@@ -78,6 +78,7 @@ class ProjectileServer;
 class Calendar;
 class Plugin;
 class Image;
+class SaveGame;
 
 struct Symbol {
 	SymbolMgr * sm;
@@ -313,7 +314,8 @@ public:
 	int SaveAsOriginal; //if true, saves files in compatible mode
 	int QuitFlag;
 	int EventFlag;
-	int LoadGameIndex, VersionOverride;
+	SaveGame *LoadGameIndex;
+	int VersionOverride;
 	unsigned int SlotTypes; //this is the same as the inventory size
 	ieResRef GlobalScript;
 	ieResRef WorldMapName;
@@ -514,10 +516,10 @@ public:
 	/** if backtomain is not null then goes back to main screen */
 	void QuitGame(int backtomain);
 	/** sets up load game */
-	void SetupLoadGame(int index, int ver_override);
+	void SetupLoadGame(SaveGame *save, int ver_override);
 	/** load saved game by index (-1 is default), ver_override is an optional parameter
 	    to override the saved game's version */
-	void LoadGame(int index, int ver_override);
+	void LoadGame(SaveGame *save, int ver_override);
 	/** fix changes in global script/worldmap*/
 	void UpdateMasterScript();
 	/*reads the filenames of the portraits folder into a list */

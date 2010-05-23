@@ -53,16 +53,16 @@ def OnLoad():
 	LoadGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 
 	GemRB.SetVar("SaveDir",1)
-	GameCount=GemRB.GetSaveGameCount()
+	Games=GemRB.GetSaveGames()
 
 	#looking for the quicksave
 	EnableQuickLoad = IE_GUI_BUTTON_DISABLED
-	for ActPos in range(GameCount):
-		Slotname = GemRB.GetSaveGameAttrib(5,ActPos)
-		# quick save is 2
-		if Slotname == 2:
+	for Game in Games:
+		Slotname = Game.GetSaveID()
+		# quick save is 1
+		if Slotname == 1:
 			EnableQuickLoad = IE_GUI_BUTTON_ENABLED
-			QuickLoadSlot = ActPos
+			QuickLoadSlot = Game
 			break
 
 	QuickLoadButton.SetStatus(EnableQuickLoad)

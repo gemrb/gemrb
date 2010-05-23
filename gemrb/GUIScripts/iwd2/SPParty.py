@@ -94,7 +94,7 @@ def ModifyPress():
 	if Pos == 0: # first entry - behaves same as pressing on done
 		if PartySelectWindow:
 			PartySelectWindow.Unload()
-		GemRB.LoadGame(-1, 22)
+		GemRB.LoadGame(None, 22)
 		GemRB.SetNextScript("SPPartyFormation")
 	#else: # here come the real modifications
 
@@ -104,12 +104,12 @@ def DonePress():
 	if Pos == 0:
 		if PartySelectWindow:
 			PartySelectWindow.Unload()
-		GemRB.LoadGame(-1, 22)
+		GemRB.LoadGame(None, 22)
 		GemRB.SetNextScript("SPPartyFormation")
 	else:
 		if PartySelectWindow:
 			PartySelectWindow.Unload()
-		GemRB.LoadGame(-1, 22)
+		GemRB.LoadGame(None, 22)
 		#here we should load the party characters
 		#but gemrb engine limitations require us to
 		#return to the main engine (loadscreen)

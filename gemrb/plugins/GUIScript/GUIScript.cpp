@@ -19,6 +19,8 @@
  */
 
 #include "GUIScript.h"
+#include "PythonHelpers.h"
+
 #include "Interface.h"
 #include "Map.h"
 #include "Label.h"
@@ -381,12 +383,14 @@ PyDoc_STRVAR( GemRB_LoadGame__doc,
 
 static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 {
-	int GameIndex, VersionOverride = 0;
+	PyObject *obj;
+	int VersionOverride = 0;
 
-	if (!PyArg_ParseTuple( args, "i|i", &GameIndex, &VersionOverride )) {
+	if (!PyArg_ParseTuple( args, "O|i", &obj, &VersionOverride )) {
 		return AttributeError( GemRB_LoadGame__doc );
 	}
-	core->SetupLoadGame(GameIndex, VersionOverride);
+	CObject<SaveGame> save(obj);
+	core->SetupLoadGame(save.get(), VersionOverride);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -623,7 +627,7 @@ static PyObject* GemRB_LoadWindowObject(PyObject * self, PyObject* args)
 	PyTuple_SET_ITEM(wintuple, 0, win);
 
 	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
-	PyObject* ret = gs->ConstructObject("GWindow", wintuple);
+	PyObject* ret = gs->ConstructObject("Window", wintuple);
 	Py_DECREF(wintuple);
 	if (!ret) {
 		char buf[256];
@@ -875,7 +879,7 @@ static PyObject* GemRB_LoadTableObject(PyObject * self, PyObject* args)
 	PyTuple_SET_ITEM(tabtuple, 0, table);
 
 	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
-	PyObject* ret = gs->ConstructObject("GTable", tabtuple);
+	PyObject* ret = gs->ConstructObject("Table", tabtuple);
 	Py_DECREF(tabtuple);
 	if (!ret) {
 		char buf[256];
@@ -1267,25 +1271,25 @@ static PyObject* GemRB_Window_GetControl(PyObject * self, PyObject* args)
 		// GetControl will already have raised an exception
 		return 0;
 	}
-	const char* type = "GControl";
+	const char* type = "Control";
 	switch(ctrl->ControlType) {
 	case IE_GUI_LABEL:
-		type = "GLabel";
+		type = "Label";
 		break;
 	case IE_GUI_EDIT:
-		type = "GTextEdit";
+		type = "TextEdit";
 		break;
 	case IE_GUI_SCROLLBAR:
-		type = "GScrollBar";
+		type = "ScrollBar";
 		break;
 	case IE_GUI_TEXTAREA:
-		type = "GTextArea";
+		type = "TextArea";
 		break;
 	case IE_GUI_BUTTON:
-		type = "GButton";
+		type = "Button";
 		break;
 	case IE_GUI_WORLDMAP:
-		type = "GWorldMap";
+		type = "WorldMap";
 		break;
 	default:
 		break;
@@ -2848,11 +2852,6 @@ static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* args)
 		game->SetExpansion( Flags );
 	}
 
-	SaveGameIterator *sg = core->GetSaveGameIterator();
-	if (sg) {
-		sg->Invalidate();
-	}
-
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -3136,6 +3135,33 @@ static PyObject* GemRB_Button_SetPicture(PyObject * /*self*/, PyObject* args)
 	}
 
 	btn->SetPicture( Picture );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_Button_SetSprite2D__doc,
+"Button.SetSprite2D(WindowIndex, ControlIndex, Sprite2D)\n\n"
+"Sets a Sprite2D onto a button as picture." );
+
+static PyObject* GemRB_Button_SetSprite2D(PyObject * /*self*/, PyObject* args)
+{
+	int wi, ci;
+	PyObject *obj;
+
+	if (!PyArg_ParseTuple( args, "iiO", &wi, &ci, &obj )) {
+		return AttributeError( GemRB_Button_SetSprite2D__doc );
+	}
+	Button* btn = ( Button* ) GetControl( wi, ci, IE_GUI_BUTTON);
+	if (!btn) {
+		return NULL;
+	}
+
+	CObject<Sprite2D> spr(obj);
+
+	if (spr)
+		spr->acquire();
+	btn->SetPicture( spr.get() );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3738,13 +3764,15 @@ PyDoc_STRVAR( GemRB_SaveGame__doc,
 
 static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 {
-	int SlotCount;
+	PyObject *obj;
 	int Version = -1;
 	const char *folder;
 
-	if (!PyArg_ParseTuple( args, "is|i", &SlotCount, &folder, &Version )) {
+	if (!PyArg_ParseTuple( args, "Os|i", &obj, &folder, &Version )) {
 		return AttributeError( GemRB_SaveGame__doc );
 	}
+
+	CObject<SaveGame> save(obj);
 
 	Game *game = core->GetGame();
 	if (!game) {
@@ -3759,232 +3787,159 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 	if (Version>0) {
 		game->version = Version;
 	}
-	return PyInt_FromLong(sgi->CreateSaveGame(SlotCount, folder) );
+	return PyInt_FromLong(sgi->CreateSaveGame(save.get(), folder) );
 }
 
-PyDoc_STRVAR( GemRB_GetSaveGameCount__doc,
+PyDoc_STRVAR( GemRB_GetSaveGames__doc,
 "GetSaveGameCount() => int\n\n"
-"Returns the number of saved games." );
+"Returns the list of saved games." );
 
-static PyObject* GemRB_GetSaveGameCount(PyObject * /*self*/,
-	PyObject * /*args*/)
+static PyObject* GemRB_GetSaveGames(PyObject * /*self*/, PyObject * /*args*/)
 {
-	return PyInt_FromLong(
-			core->GetSaveGameIterator()->GetSaveGameCount() );
+	return MakePyList<SaveGame>(core->GetSaveGameIterator()->GetSaveGames());
 }
 
 PyDoc_STRVAR( GemRB_DeleteSaveGame__doc,
-"DeleteSaveGame(SlotCount)\n\n"
+"DeleteSaveGame(Slot)\n\n"
 "Deletes a saved game folder completely." );
 
 static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 {
-	int SlotCount;
+	PyObject *Slot;
 
-	if (!PyArg_ParseTuple( args, "i", &SlotCount )) {
+	if (!PyArg_ParseTuple( args, "O", &Slot )) {
 		return AttributeError( GemRB_DeleteSaveGame__doc );
 	}
-	core->GetSaveGameIterator()->DeleteSaveGame( SlotCount );
+
+	CObject<SaveGame> game(Slot);
+	core->GetSaveGameIterator()->DeleteSaveGame( game.get() );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
 
-static PyObject *GetGameDate(DataStream *ds)
+PyDoc_STRVAR( GemRB_SaveGame_GetName__doc,
+"SaveGame.GetName() => string/int\n\n"
+"Returns name of the saved game." );
+
+static PyObject* GemRB_SaveGame_GetName(PyObject * /*self*/, PyObject* args)
 {
-	char Signature[8];
-	ieDword GameTime;
-	ds->Read(Signature, 8);
-	ds->ReadDword(&GameTime);
-	delete ds;
-	if (memcmp(Signature,"GAME",4) ) {
-		return NULL;
+	PyObject* Slot;
+
+	if (!PyArg_ParseTuple( args, "O", &Slot )) {
+		return AttributeError( GemRB_SaveGame_GetName__doc );
 	}
 
-	int hours = ((int)GameTime)/300;
-	int days = hours/24;
-	hours -= days*24;
-	char *a=NULL,*b=NULL,*c=NULL;
-	PyObject *retval;
-
-	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", days);
-	if (days) {
-		if (days==1) a=core->GetString(10698);
-		else a=core->GetString(10697);
-	}
-	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
-	if (hours || !a) {
-		if (a) b=core->GetString(10699);
-		if (hours==1) c=core->GetString(10701);
-		else c=core->GetString(10700);
-	}
-	if (b)
-		retval = PyString_FromFormat("%s %s %s",a,b,c?c:"");
-	else {
-		retval = PyString_FromFormat("%s%s",a?a:"",c?c:"");
-	}
-	core->FreeString(a);
-	core->FreeString(b);
-	core->FreeString(c);
-	return retval;
+	CObject<SaveGame> save(Slot);
+	return PyString_FromString(save->GetName());
 }
 
-PyDoc_STRVAR( GemRB_GetSaveGameAttrib__doc,
-"GetSaveGameAttrib(Type, SaveSlotCount) => string/int\n\n"
-"Returns the name, path, prefix, date or ingame date of the saved game." );
+PyDoc_STRVAR( GemRB_SaveGame_GetDate__doc,
+"SaveGame.GetDate() => string/int\n\n"
+"Returns date of the saved game." );
 
-static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SaveGame_GetDate(PyObject * /*self*/, PyObject* args)
 {
-	int Type, SlotCount;
+	PyObject* Slot;
 
-	if (!PyArg_ParseTuple( args, "ii", &Type, &SlotCount )) {
-		return AttributeError( GemRB_GetSaveGameAttrib__doc );
+	if (!PyArg_ParseTuple( args, "O", &Slot )) {
+		return AttributeError( GemRB_SaveGame_GetDate__doc );
 	}
-	SaveGame* sg = core->GetSaveGameIterator()->GetSaveGame( SlotCount );
-	if (sg == NULL) {
-		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
-		return NULL;
-	}
-	PyObject* tmp;
-	switch (Type) {
-		case 0:
-			tmp = PyString_FromString( sg->GetName() ); break;
-		case 1:
-			tmp = PyString_FromString( sg->GetPrefix() ); break;
-		case 2:
-			tmp = PyString_FromString( sg->GetPath() ); break;
-		case 3:
-			tmp = PyString_FromString( sg->GetDate() ); break;
-		case 4: //ingame date
-			tmp = GetGameDate(sg->GetGame()); break;
-		case 5:
-			tmp = PyInt_FromLong( sg->GetSaveID() ); break;
-		default:
-			printMessage( "GUIScript",
-				"Syntax Error: GetSaveGameAttrib(Type, SlotCount)\n",
-				LIGHT_RED );
-			return NULL;
-	}
-	delete sg;
-	return tmp;
+
+	CObject<SaveGame> save(Slot);
+	return PyString_FromString(save->GetDate());
 }
 
-PyDoc_STRVAR( GemRB_Button_SetSaveGamePortrait__doc,
-"SetSaveGamePortrait(WindowIndex, ControlIndex, SaveSlotCount, PCSlotCount)\n\n"
-"Sets a savegame PC portrait bmp onto a button as picture." );
+PyDoc_STRVAR( GemRB_SaveGame_GetGameDate__doc,
+"SaveGame.GetGameDate() => string/int\n\n"
+"Returns game date of the saved game." );
 
-static PyObject* GemRB_Button_SetSaveGamePortrait(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SaveGame_GetGameDate(PyObject * /*self*/, PyObject* args)
 {
-	int wi, ci, SaveSlotCount, PCSlotCount;
+	PyObject* Slot;
 
-	if (!PyArg_ParseTuple( args, "iiii", &wi, &ci, &SaveSlotCount, &PCSlotCount )) {
-		return AttributeError( GemRB_Button_SetSaveGamePortrait__doc );
-	}
-	Button* btn = ( Button* ) GetControl( wi, ci, IE_GUI_BUTTON);
-	if (!btn) {
-		return NULL;
+	if (!PyArg_ParseTuple( args, "O", &Slot )) {
+		return AttributeError( GemRB_SaveGame_GetGameDate__doc );
 	}
 
-	SaveGame* sg = core->GetSaveGameIterator()->GetSaveGame( SaveSlotCount );
-	if (sg == NULL) {
-		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
-		return NULL;
-	}
-	if (sg->GetPortraitCount() <= PCSlotCount) {
-		btn->SetPicture( NULL );
-		delete sg;
-		Py_INCREF( Py_None );
-		return Py_None;
-	}
-
-	Sprite2D* Picture = sg->GetPortrait( PCSlotCount );
-	delete sg;
-	if (Picture == NULL) {
-		Py_INCREF( Py_None );
-		return Py_None;
-	}
-
-	btn->SetPicture( Picture );
-
-	Py_INCREF( Py_None );
-	return Py_None;
+	CObject<SaveGame> save(Slot);
+	return PyString_FromString(save->GetGameDate());
 }
 
-PyDoc_STRVAR( GemRB_Button_SetSaveGamePreview__doc,
-"SetSaveGamePreview(WindowIndex, ControlIndex, SaveSlotCount)\n\n"
-"Sets a savegame area preview bmp onto a button as picture." );
+PyDoc_STRVAR( GemRB_SaveGame_GetSaveID__doc,
+"SaveGame.GetSaveID() => string/int\n\n"
+"Returns ID of the saved game." );
 
-static PyObject* GemRB_Button_SetSaveGamePreview(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SaveGame_GetSaveID(PyObject * /*self*/, PyObject* args)
 {
-	int wi, ci, SlotCount;
+	PyObject* Slot;
 
-	if (!PyArg_ParseTuple( args, "iii", &wi, &ci, &SlotCount )) {
-		return AttributeError( GemRB_Button_SetSaveGamePreview__doc );
-	}
-	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-	if (!btn) {
-		return NULL;
+	if (!PyArg_ParseTuple( args, "O", &Slot )) {
+		return AttributeError( GemRB_SaveGame_GetSaveID__doc );
 	}
 
-	SaveGame* sg = core->GetSaveGameIterator()->GetSaveGame( SlotCount );
-	if (sg == NULL) {
-		printMessage( "GUIScript", "Can't find savegame\n", LIGHT_RED );
-		return NULL;
-	}
-	Sprite2D* Picture = sg->GetPreview();
-	delete sg;
-	if (Picture == NULL) {
-		Py_INCREF( Py_None );
-		return Py_None;
-	}
-
-	btn->SetPicture( Picture );
-
-	Py_INCREF( Py_None );
-	return Py_None;
+	CObject<SaveGame> save(Slot);
+	return PyInt_FromLong(save->GetSaveID());
 }
 
-PyDoc_STRVAR( GemRB_Button_SetGamePreview__doc,
-"SetGamePreview(WindowIndex, ControlIndex)\n\n"
-"Sets current game area preview bmp onto a button as picture." );
+PyDoc_STRVAR( GemRB_SaveGame_GetPreview__doc,
+"SaveGame.GetPreview() => string/int\n\n"
+"Returns preview of the saved game." );
 
-static PyObject* GemRB_Button_SetGamePreview(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SaveGame_GetPreview(PyObject * /*self*/, PyObject* args)
 {
-	int wi, ci;
+	PyObject* Slot;
 
-	if (!PyArg_ParseTuple( args, "ii", &wi, &ci )) {
-		return AttributeError( GemRB_Button_SetGamePreview__doc );
-	}
-	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-	if (!btn) {
-		return NULL;
+	if (!PyArg_ParseTuple( args, "O", &Slot )) {
+		return AttributeError( GemRB_SaveGame_GetPreview__doc );
 	}
 
-	btn->SetPicture (core->GetGameControl()->GetPreview() );
-
-	Py_INCREF( Py_None );
-	return Py_None;
+	CObject<SaveGame> save(Slot);
+	return CObject<Sprite2D>(save->GetPreview());
 }
 
-PyDoc_STRVAR( GemRB_Button_SetGamePortraitPreview__doc,
-"SetGamePortraitPreview(WindowIndex, ControlIndex, PCSlotCount)\n\n"
-"Sets a current game PC portrait preview bmp onto a button as picture." );
+PyDoc_STRVAR( GemRB_SaveGame_GetPortrait__doc,
+"SaveGame.GetPortrait(int index) => string/int\n\n"
+"Returns portrait of the saved game." );
 
-static PyObject* GemRB_Button_SetGamePortraitPreview(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SaveGame_GetPortrait(PyObject * /*self*/, PyObject* args)
 {
-	int wi, ci, PCSlotCount;
+	PyObject* Slot;
+	int index;
 
-	if (!PyArg_ParseTuple( args, "iii", &wi, &ci, &PCSlotCount )) {
-		return AttributeError( GemRB_Button_SetGamePreview__doc );
-	}
-	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-	if (!btn) {
-		return NULL;
+	if (!PyArg_ParseTuple( args, "Oi", &Slot, &index )) {
+		return AttributeError( GemRB_SaveGame_GetPortrait__doc );
 	}
 
-	btn->SetPicture (core->GetGameControl()->GetPortraitPreview( PCSlotCount ) );
+	CObject<SaveGame> save(Slot);
+	return CObject<Sprite2D>(save->GetPortrait(index));
+}
 
-	Py_INCREF( Py_None );
-	return Py_None;
+PyDoc_STRVAR( GemRB_GetGamePreview__doc,
+"GetGamePreview()\n\n"
+"Gets current game area preview." );
+
+static PyObject* GemRB_GetGamePreview(PyObject * /*self*/, PyObject* args)
+{
+	if (!PyArg_ParseTuple( args, "" )) {
+		return AttributeError( GemRB_GetGamePreview__doc );
+	}
+
+	return CObject<Sprite2D>(core->GetGameControl()->GetPreview());
+}
+
+PyDoc_STRVAR( GemRB_GetGamePortraitPreview__doc,
+"GetGamePortraitPreview(PCSlotCount)\n\n"
+"Gets a current game PC portrait." );
+
+static PyObject* GemRB_GetGamePortraitPreview(PyObject * /*self*/, PyObject* args)
+{
+	int PCSlotCount;
+
+	if (!PyArg_ParseTuple( args, "i", &PCSlotCount )) {
+		return AttributeError( GemRB_GetGamePreview__doc );
+	}
+
+	return CObject<Sprite2D>(core->GetGameControl()->GetPortraitPreview(PCSlotCount));
 }
 
 PyDoc_STRVAR( GemRB_Roll__doc,
@@ -9319,6 +9274,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetCurrentArea, METH_NOARGS),
 	METHOD(GetEquippedAmmunition, METH_VARARGS),
 	METHOD(GetEquippedQuickSlot, METH_VARARGS),
+	METHOD(GetGamePortraitPreview, METH_VARARGS),
+	METHOD(GetGamePreview, METH_VARARGS),
 	METHOD(GetGameString, METH_VARARGS),
 	METHOD(GetGameTime, METH_NOARGS),
 	METHOD(GetGameVar, METH_VARARGS),
@@ -9343,10 +9300,9 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetPlayerStates, METH_VARARGS),
 	METHOD(GetPlayerScript, METH_VARARGS),
 	METHOD(GetPlayerString, METH_VARARGS),
-	METHOD(GetSaveGameCount, METH_VARARGS),
+	METHOD(GetSaveGames, METH_VARARGS),
 	METHOD(GetSelectedSize, METH_NOARGS),
 	METHOD(GetString, METH_VARARGS),
-	METHOD(GetSaveGameAttrib, METH_VARARGS),
 	METHOD(GetSpellCastOn, METH_VARARGS),
 	METHOD(GetToken, METH_VARARGS),
 	METHOD(GetVar, METH_VARARGS),
@@ -9444,17 +9400,14 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetBorder, METH_VARARGS),
 	METHOD(Button_SetFlags, METH_VARARGS),
 	METHOD(Button_SetFont, METH_VARARGS),
-	METHOD(Button_SetGamePortraitPreview, METH_VARARGS),
-	METHOD(Button_SetGamePreview, METH_VARARGS),
 	METHOD(Button_SetItemIcon, METH_VARARGS),
 	METHOD(Button_SetMOS, METH_VARARGS),
 	METHOD(Button_SetOverlay, METH_VARARGS),
 	METHOD(Button_SetPLT, METH_VARARGS),
 	METHOD(Button_SetPicture, METH_VARARGS),
 	METHOD(Button_SetPictureClipping, METH_VARARGS),
-	METHOD(Button_SetSaveGamePortrait, METH_VARARGS),
-	METHOD(Button_SetSaveGamePreview, METH_VARARGS),
 	METHOD(Button_SetSpellIcon, METH_VARARGS),
+	METHOD(Button_SetSprite2D, METH_VARARGS),
 	METHOD(Button_SetSprites, METH_VARARGS),
 	METHOD(Button_SetState, METH_VARARGS),
 	METHOD(Button_SetTextColor, METH_VARARGS),
@@ -9472,6 +9425,12 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_TextArea_SetFlags, METH_VARARGS),
 	METHOD(Label_SetTextColor, METH_VARARGS),
 	METHOD(Label_SetUseRGB, METH_VARARGS),
+	METHOD(SaveGame_GetDate, METH_VARARGS),
+	METHOD(SaveGame_GetGameDate, METH_VARARGS),
+	METHOD(SaveGame_GetName, METH_VARARGS),
+	METHOD(SaveGame_GetPortrait, METH_VARARGS),
+	METHOD(SaveGame_GetPreview, METH_VARARGS),
+	METHOD(SaveGame_GetSaveID, METH_VARARGS),
 	METHOD(ScrollBar_SetDefaultScrollBar, METH_VARARGS),
 	METHOD(ScrollBar_SetSprites, METH_VARARGS),
 	METHOD(Symbol_GetValue, METH_VARARGS),
@@ -9811,8 +9770,10 @@ void GUIScript::ExecString(const char* string)
 	}
 }
 
-PyObject* GUIScript::ConstructObject(const char* classname, PyObject* pArgs)
+PyObject* GUIScript::ConstructObject(const char* type, PyObject* pArgs)
 {
+	char classname[_MAX_PATH] = "G";
+	strncat(classname, type, _MAX_PATH - 2);
 	if (!pGUIClasses) {
 		fprintf(stderr, "Tried to use an object (%s) before script compiled!\n", classname);
 		return 0;

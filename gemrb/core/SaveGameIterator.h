@@ -23,18 +23,21 @@
 
 #include <time.h>
 #include <sys/stat.h>
-#include <list> 
+#include <vector>
 #include "exports.h"
 #include "FileStream.h"
 #include "ResourceManager.h"
+#include "Holder.h"
 
 #define SAVEGAME_DIRECTORY_MATCHER "%d - %[A-Za-z0-9- _]"
 
 class ImageMgr;
 
-class GEM_EXPORT SaveGame {
+class GEM_EXPORT SaveGame : public Held<SaveGame> {
 public:
-	SaveGame(const char* path, const char* name, const char* prefix, int pCount, int saveID);
+	static TypeID ID;
+public:
+	SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID);
 	~SaveGame();
 	int GetPortraitCount()
 	{
@@ -60,6 +63,11 @@ public:
 	{
 		return Date;
 	}
+	const char* GetGameDate();
+	const char* GetSlotName()
+	{
+		return SlotName;
+	}
 
 	Sprite2D* GetPortrait(int index);
 	Sprite2D* GetPreview();
@@ -71,30 +79,28 @@ private:
 	char Prefix[10];
 	char Name[_MAX_PATH];
 	char Date[_MAX_PATH];
+	char GameDate[_MAX_PATH];
+	char SlotName[_MAX_PATH];
 	int PortraitCount;
 	int SaveID;
 	ResourceManager manager;
 };
 
-typedef std::list<char *> charlist;
-
 class GEM_EXPORT SaveGameIterator {
 private:
-	bool loaded;
+	typedef std::vector<Holder<SaveGame> > charlist;
 	charlist save_slots;
 
 public:
 	SaveGameIterator(void);
 	~SaveGameIterator(void);
-	void Invalidate();
-	bool RescanSaveGames();
-	int GetSaveGameCount();
-	SaveGame* GetSaveGame(int index);
-	void DeleteSaveGame(int index);
-	int ExistingSlotName(int index);
-	int CreateSaveGame(int index, const char *slotname, bool mqs = false);
+	const charlist& GetSaveGames();
+	void DeleteSaveGame(Holder<SaveGame>);
+	int CreateSaveGame(Holder<SaveGame>, const char *slotname);
+	int CreateSaveGame(int index, bool mqs = false);
 private:
-	char *GetSaveName(int index);
+	bool RescanSaveGames();
+	static Holder<SaveGame> GetSaveGame(const char *slotname);
 	void PruneQuickSave(const char *folder);
 };
 

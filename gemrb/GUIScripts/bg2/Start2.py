@@ -160,7 +160,7 @@ def PregenPress():
 	#do not start game after chargen
 	GemRB.SetVar("PlayMode",-1) #will allow export
 	GemRB.SetVar("Slot",0)
-	GemRB.LoadGame(-1)
+	GemRB.LoadGame(None)
 	GemRB.SetNextScript ("CharGen")
 	return
 
@@ -199,7 +199,7 @@ def NewSingle():
 		GemRB.SetVar ("PlayMode", 0)
 		GemRB.SetVar ("SaveDir", 0)
 	GemRB.SetVar("Slot",1)
-	GemRB.LoadGame(-1)
+	GemRB.LoadGame(None)
 	GemRB.SetNextScript ("CharGen")
 	return
 
@@ -219,7 +219,7 @@ def PlayPress():
 	GemRB.SetVar("SaveDir",0)
 	GemRB.GameSetExpansion(0)
 	GemRB.SetVar("Slot",1)
-	GemRB.LoadGame(-1)
+	GemRB.LoadGame(None)
 	GemRB.SetNextScript ("CharGen")
 	return
 

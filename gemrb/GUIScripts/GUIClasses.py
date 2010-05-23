@@ -158,13 +158,10 @@ class GButton(GControl):
     'SetState': _GemRB.Button_SetState,
     'SetPictureClipping': _GemRB.Button_SetPictureClipping,
     'SetPicture': _GemRB.Button_SetPicture,
+    'SetSprite2D': _GemRB.Button_SetSprite2D,
     'SetMOS': _GemRB.Button_SetMOS,
     'SetPLT': _GemRB.Button_SetPLT,
     'SetBAM': _GemRB.Button_SetBAM,
-    'SetSaveGamePortrait': _GemRB.Button_SetSaveGamePortrait,
-    'SetSaveGamePreview': _GemRB.Button_SetSaveGamePreview,
-    'SetGamePreview': _GemRB.Button_SetGamePreview,
-    'SetGamePortraitPreview': _GemRB.Button_SetGamePortraitPreview,
     'SetSpellIcon': _GemRB.Button_SetSpellIcon,
     'SetItemIcon': _GemRB.Button_SetItemIcon,
     'SetActionIcon': _GemRB.Button_SetActionIcon
@@ -180,3 +177,18 @@ class GWorldMap(GControl):
     'GetDestinationArea': _GemRB.WorldMap_GetDestinationArea,
     'SetTextColor': _GemRB.WorldMap_SetTextColor
   }
+
+class GSaveGame:
+  __metaclass__ = metaIDWrapper
+  methods = {
+    'GetDate': _GemRB.SaveGame_GetDate,
+    'GetGameDate': _GemRB.SaveGame_GetGameDate,
+    'GetName': _GemRB.SaveGame_GetName,
+    'GetPortrait': _GemRB.SaveGame_GetPortrait,
+    'GetPreview': _GemRB.SaveGame_GetPreview,
+    'GetSaveID': _GemRB.SaveGame_GetSaveID,
+  }
+
+class GSprite2D:
+  __metaclass__ = metaIDWrapper
+  methods = {}
