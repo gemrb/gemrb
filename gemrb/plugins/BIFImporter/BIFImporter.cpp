@@ -66,7 +66,7 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 		PathJoin( path, core->CachePath, fname, NULL );
 		printf( "Decompressing %s\n",fname );
 		free( fname );
-		if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID ))
+		if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB ))
 			return GEM_ERROR;
 		FILE *in_cache = fopen( path, "wb" );
 		if (!in_cache) {
@@ -74,7 +74,7 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 			printf( "Cannot write %s.\n", path );	
 			return GEM_ERROR;
 		}
-		PluginHolder<Compressor> comp(IE_COMPRESSION_CLASS_ID);
+		PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 		if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
 			return GEM_ERROR;
 		}
@@ -120,7 +120,7 @@ int BIFImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 	unsigned long Pos = str->GetPos(); //storing the stream position
 	str->WriteDword( &complen);
 
-	PluginHolder<Compressor> comp(IE_COMPRESSION_CLASS_ID);
+	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 	comp->Compress( str, uncompressed );
 
 	//writing compressed length (calculated)
@@ -185,7 +185,7 @@ int BIFImporter::OpenArchive(const char* filename)
 			return GEM_OK;
 		}
 		printf( "Decompressing\n" );
-		if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID )) {
+		if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB )) {
 			printMessage("BIFImporter", "No Compression Manager Available.", RED);
 			return GEM_ERROR;
 		}
@@ -195,7 +195,7 @@ int BIFImporter::OpenArchive(const char* filename)
 			printf( "Cannot write %s.\n", path );
 			return GEM_ERROR;
 		}
-		PluginHolder<Compressor> comp(IE_COMPRESSION_CLASS_ID);
+		PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 		if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
 			return GEM_ERROR;
 		}
@@ -227,9 +227,9 @@ int BIFImporter::OpenArchive(const char* filename)
 			return GEM_OK;
 		}
 		printf( "Decompressing\n" );
-		if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID ))
+		if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB ))
 			return GEM_ERROR;
-		PluginHolder<Compressor> comp(IE_COMPRESSION_CLASS_ID);
+		PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 		ieDword unCompBifSize;
 		compressed->ReadDword( &unCompBifSize );
 		printf( "\nDecompressing file: [..........]" );
