@@ -28,6 +28,7 @@
 #include "ImageWriter.h"
 #include "ImageMgr.h"
 #include "GameData.h" // For ResourceHolder
+#include "iless.h"
 #include <set>
 #include <algorithm>
 #include <iterator>
@@ -250,13 +251,6 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 
 	return true;
 }
-
-struct iless {
-	bool operator () (const char *lhs, const char* rhs)
-	{
-		return stricmp(lhs, rhs) < 0;
-	}
-};
 
 bool SaveGameIterator::RescanSaveGames()
 {
