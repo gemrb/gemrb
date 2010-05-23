@@ -126,6 +126,8 @@ Interface::Interface(int iargc, char* iargv[])
 	}
 
 	projserv = NULL;
+	VideoDriverName = "sdl";
+	AudioDriverName = "openal";
 	vars = NULL;
 	tokens = NULL;
 	RtRows = NULL;
@@ -1265,7 +1267,7 @@ int Interface::Init()
 	printMessage( "Core", "GemRB Core Initialization...\n", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Initializing Video Driver...", WHITE );
-	video = ( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, "");
+	video = ( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, VideoDriverName.c_str());
 	if (!video) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "No Video Driver Available.\nTermination in Progress...\n" );
@@ -1454,7 +1456,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Starting up the Sound Driver...", WHITE );
-	AudioDriver = ( Audio * ) PluginMgr::Get()->GetDriver(&Audio::ID, "");
+	AudioDriver = ( Audio * ) PluginMgr::Get()->GetDriver(&Audio::ID, AudioDriverName.c_str());
 	if (AudioDriver == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
@@ -2077,6 +2079,10 @@ bool Interface::LoadConfig(const char* filename)
 		} else if (strnicmp( name, "CD", 2 ) == 0 &&
 				name[2] >= '1' && name[2] <= '5' && name[3] == 0) {
 			strncpy( CD[name[2]-'1'], value, sizeof(CD[name[2]-'1']) );
+		} else if (stricmp( name, "AudioDriver") == 0) {
+			AudioDriverName = value;
+		} else if (stricmp( name, "VideoDriver") == 0) {
+			VideoDriverName = value;
 		}
 	}
 	fclose( config );

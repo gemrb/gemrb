@@ -33,6 +33,7 @@
 
 #include "exports.h"
 #include <map>
+#include <string>
 #include "SClassID.h"
 #include "Cache.h"
 #include "GlobalTimer.h"
@@ -243,6 +244,8 @@ class GEM_EXPORT Interface
 private:
 	Holder<Video> video;
 	Holder<Audio> AudioDriver;
+	std::string VideoDriverName;
+	std::string AudioDriverName;
 	ProjectileServer * projserv;
 	Image * pal256;
 	Image * pal32;
