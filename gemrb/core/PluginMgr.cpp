@@ -303,3 +303,22 @@ void PluginMgr::RunCleanup()
 	for (size_t i = 0; i < cleanupFunctions.size(); i++)
 		cleanupFunctions[i]();
 }
+
+bool PluginMgr::RegisterDriver(const TypeID* type, const char* name, PluginFunc create)
+{
+	driver_map &map = drivers[type];
+	driver_map::const_iterator iter = map.find(name);
+	if (iter != map.end())
+		return false;
+	map[name] = create;
+	return true;
+}
+
+Plugin* PluginMgr::GetDriver(const TypeID* type, const char* name)
+{
+	driver_map &map = drivers[type];
+	driver_map::const_iterator iter = map.find(name);
+	if (iter != map.end())
+		return iter->second();
+	return map.begin()->second();
+}

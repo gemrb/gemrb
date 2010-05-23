@@ -846,5 +846,5 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x27DD67E0, "OpenAL Audio Driver")
-PLUGIN_CLASS(IE_AUDIO_CLASS_ID, OpenALAudioDriver)
+PLUGIN_DRIVER(OpenALAudioDriver, "openal")
 END_PLUGIN()

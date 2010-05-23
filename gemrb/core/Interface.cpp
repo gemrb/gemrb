@@ -1263,15 +1263,14 @@ int Interface::Init()
 	CachedFileStreamPtrCount = 0;
 #endif
 	printMessage( "Core", "GemRB Core Initialization...\n", WHITE );
-	printMessage( "Core", "Searching for Video Driver...", WHITE );
-	if (!IsAvailable( IE_VIDEO_CLASS_ID )) {
+	printStatus( "OK", LIGHT_GREEN );
+	printMessage( "Core", "Initializing Video Driver...", WHITE );
+	video = ( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, "");
+	if (!video) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "No Video Driver Available.\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Initializing Video Plugin...", WHITE );
-	video = PluginHolder<Video>(IE_VIDEO_CLASS_ID);
 	if (video->Init() == GEM_ERROR) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot Initialize Video Driver.\nTermination in Progress...\n" );
@@ -1455,7 +1454,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Starting up the Sound Driver...", WHITE );
-	AudioDriver = PluginHolder<Audio>(IE_AUDIO_CLASS_ID);
+	AudioDriver = ( Audio * ) PluginMgr::Get()->GetDriver(&Audio::ID, "");
 	if (AudioDriver == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
