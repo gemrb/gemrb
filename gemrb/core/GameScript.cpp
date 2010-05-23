@@ -1258,7 +1258,7 @@ void InitializeIEScript()
 	triggersTable = core->GetSymbol( tT );
 	actionsTable = core->GetSymbol( aT );
 	objectsTable = core->GetSymbol( oT );
-	SymbolMgr *overrideActionsTable = core->GetSymbol( gaT );
+	Holder<SymbolMgr> overrideActionsTable = core->GetSymbol( gaT );
 	if (!triggersTable || !actionsTable || !objectsTable || !objNameTable) {
 		printMessage( "GameScript","A critical scripting file is damaged!\n",LIGHT_RED );
 		abort();
