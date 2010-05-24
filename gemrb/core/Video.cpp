@@ -26,7 +26,7 @@
 #include "Audio.h"
 #include "Interface.h"
 
-TypeID Video::ID = { "Video" };
+const TypeID Video::ID = { "Video" };
 
 Video::Video(void)
 {

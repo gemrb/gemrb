@@ -34,7 +34,7 @@
 #include <iterator>
 #include <cassert>
 
-TypeID SaveGame::ID = { "SaveGame" };
+const TypeID SaveGame::ID = { "SaveGame" };
 
 /** Extract date from save game ds into Date. */
 static void ParseGameDate(DataStream *ds, char *Date)
