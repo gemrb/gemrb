@@ -521,6 +521,8 @@ dnl Syntax: AC_CHECK_OBJECT_TO_FUNCTION_CAST()
 
 AC_DEFUN([AC_CHECK_OBJECT_TO_FUNCTION_CAST],
 [
+SAVE_CXXFLAGS="$CXXFLAGS"
+CXXFLAGS="$CXXFLAGS -Werror"
 AC_MSG_CHECKING(whether compiler permits casting between ptr-to-object and ptr-to-function)
 AC_TRY_COMPILE(
 [
@@ -536,6 +538,7 @@ function = (voidvoid) object;
 [AC_MSG_RESULT(no)
 AC_DEFINE(HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST, 1, [Define to 1 if compiler forbids casting between pointer-to-function and pointer-to-object])
 ])
+CXXFLAGS="$SAVE_CXXFLAGS"
 ])
 
 

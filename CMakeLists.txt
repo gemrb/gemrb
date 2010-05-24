@@ -120,7 +120,10 @@ endif (${LAYOUT} MATCHES "home")
 
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -W -Wpointer-arith -Wcast-align")
+	if ( NOT DISABLE_WERROR )
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+	endif ( NOT DISABLE_WERROR )
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W -Wpointer-arith -Wcast-align")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing")
 	# only export symbols explicitly marked to be exported.
 	INCLUDE(CheckCXXCompilerFlag)
