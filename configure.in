@@ -200,7 +200,12 @@ AC_TYPE_SIZE_T
 
 CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATADIR=\\\"\$(moddir)\\\" -DPLUGINDIR=\\\"\$(plugindir)\\\""
 CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/gemrb/includes -I\$(top_srcdir)/gemrb/core"
-CXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wpointer-arith -Wcast-align -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing"
+CXXFLAGS="$CXXFLAGS -Wall -W -Wpointer-arith -Wcast-align -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing"
+
+AC_ARG_ENABLE(werror, AS_HELP_STRING(--disable-werror,Make compiler warning non-fatal.), enable_werror=$enableval, enable_werror=yes)
+if test "x$enable_werror" = "xyes" ; then
+  CXXFLAGS="$CXXFLAGS -Werror"
+fi
 
 # only export symbols explicitly marked to be exported
 CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
