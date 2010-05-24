@@ -35,7 +35,7 @@ class ImageMgr;
 
 class GEM_EXPORT SaveGame : public Held<SaveGame> {
 public:
-	static TypeID ID;
+	static const TypeID ID;
 public:
 	SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID);
 	~SaveGame();

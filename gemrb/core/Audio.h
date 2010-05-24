@@ -35,7 +35,7 @@ class AmbientMgr;
 
 class GEM_EXPORT Audio : public Plugin {
 public:
-	static TypeID ID;
+	static const TypeID ID;
 public:
     Audio(void);
     virtual ~Audio();
