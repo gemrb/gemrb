@@ -76,8 +76,8 @@ public:
 	T& operator*() const { return *ptr; }
 	T* operator->() const { return ptr; }
 	bool operator!() const { return !ptr; }
-	// FIXME: coerces to int
-	operator bool() const { return ptr; }
+	// Copied from boost/smart_ptr/detail/operator_bool.hpp
+	operator T* Holder<T>::*() const { return ptr == NULL ? NULL : &Holder<T>::ptr; }
 	T* get() const { return ptr; }
 	void release() {
 		if (ptr)
