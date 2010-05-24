@@ -28,6 +28,8 @@
 #ifndef WIN32DEF_H
 #define WIN32DEF_H
 
+#include "exports.h"
+
 #ifdef WIN32
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
