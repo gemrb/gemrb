@@ -27,9 +27,7 @@
 #define INTERFACE_H
 
 //skip messy warnings in MSVC6
-#ifdef WIN32
-#pragma warning(disable:4786)
-#endif
+#include "win32def.h"
 
 #include "exports.h"
 #include <map>
@@ -757,8 +755,5 @@ public:
 };
 
 extern GEM_EXPORT Interface * core;
-#ifdef WIN32
-extern GEM_EXPORT HANDLE hConsole;
-#endif
 
 #endif

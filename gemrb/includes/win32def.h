@@ -43,6 +43,7 @@
 
 # define ADV_TEXT
 # include <conio.h>
+extern GEM_EXPORT HANDLE hConsole;
 # define textcolor(i) SetConsoleTextAttribute(hConsole, i)
 
 # ifndef __MINGW32__
