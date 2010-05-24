@@ -106,7 +106,7 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 	}
 	TileOverlay *over = new TileOverlay( overlays->Width, overlays->Height );
 	DataStream* tisfile = gamedata->GetResource(res, IE_TIS_CLASS_ID);
-	TileSetMgr* tis = ( TileSetMgr* ) core->GetInterface( IE_TIS_CLASS_ID );
+	PluginHolder<TileSetMgr> tis(IE_TIS_CLASS_ID);
 	tis->Open( tisfile );
 	for (int y = 0; y < overlays->Height; y++) {
 		for (int x = 0; x < overlays->Width; x++) {
@@ -146,7 +146,6 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 	} else {
 		tm->AddOverlay( over );
 	}
-	tis->release();
 	return usedoverlays;
 }
 

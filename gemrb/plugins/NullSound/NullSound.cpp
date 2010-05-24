@@ -45,9 +45,8 @@ unsigned int NullSound::Play(const char*, int, int, unsigned int)
 	return 1000; //Returning 1 Second Length
 }
 
-int NullSound::CreateStream(SoundMgr *sound)
+int NullSound::CreateStream(Holder<SoundMgr>)
 {
-	delete sound;
 	return 0;
 }
 
@@ -117,5 +116,5 @@ void NullSound::QueueBuffer(int, unsigned short, int, short*, int, int)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x96E414D, "Null Sound Driver")
-PLUGIN_CLASS(IE_AUDIO_CLASS_ID, NullSound)
+PLUGIN_DRIVER(NullSound, "none")
 END_PLUGIN()

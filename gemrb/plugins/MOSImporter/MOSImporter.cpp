@@ -66,15 +66,13 @@ bool MOSImporter::Open(DataStream* stream)
 			//No file found in Cache, Decompressing and storing for further use
 			str->Seek( 4, GEM_CURRENT_POS );
 
-			if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID )) {
+			if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB )) {
 				printf( "No Compression Manager Available.\nCannot Load Compressed Mos File.\n" );
 				return false;
 			}	
 			FILE* newfile = fopen( cpath, "wb" );
-			Compressor* comp = ( Compressor* )
-				core->GetInterface( IE_COMPRESSION_CLASS_ID );
+			PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 			comp->Decompress( newfile, str );
-			comp->release();
 			fclose( newfile );
 			delete( str );
 			FileStream* s = new FileStream();

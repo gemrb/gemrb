@@ -81,17 +81,13 @@ public:
     bool Init(void);
     unsigned int Play(const char* ResRef, int XPos = 0, int YPos = 0,
                       unsigned int flags = GEM_SND_RELATIVE);
-    void release(void)
-    {
-        delete this;
-    }
     bool IsSpeaking();
     void UpdateVolume(unsigned int flags);
     bool CanPlay();
     void ResetMusics();
     bool Play();
     bool Stop();
-    int CreateStream( SoundMgr* );
+    int CreateStream(Holder<SoundMgr>);
     void UpdateListenerPos(int XPos, int YPos );
     void GetListenerPos( int &XPos, int &YPos );
     bool ReleaseStream(int stream, bool HardStop);
@@ -108,7 +104,7 @@ private:
     bool MusicPlaying;
     SDL_mutex* musicMutex;
     ALuint MusicBuffer[MUSICBUFFERS];
-    SoundMgr* MusicReader;
+    Holder<SoundMgr> MusicReader;
     LRUCache buffercache;
     AudioStream speech;
     AudioStream streams[MAX_STREAMS];

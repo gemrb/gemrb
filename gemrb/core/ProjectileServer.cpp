@@ -115,13 +115,12 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		return ReturnCopy(idx);
 	}
 	DataStream* str = gamedata->GetResource( projectiles[idx].resname, IE_PRO_CLASS_ID );
-	ProjectileMgr* sm = ( ProjectileMgr* ) core->GetInterface( IE_PRO_CLASS_ID );
-	if (sm == NULL) {
+	PluginHolder<ProjectileMgr> sm(IE_PRO_CLASS_ID);
+	if (!sm) {
 		delete ( str );
 		return CreateDefaultProjectile(idx);
 	}
 	if (!sm->Open( str, true )) {
-		sm->release();
 		return CreateDefaultProjectile(idx);
 	}
 	Projectile *pro = new Projectile();
@@ -173,7 +172,6 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		//fill the explosion/spread animation flags
 		pro->Extension->APFlags = GetExplosionFlags(Type);
 	}
-	sm->release();
 
 	pro->autofree = true;
 	return ReturnCopy(idx);
@@ -211,7 +209,7 @@ int ProjectileServer::InitExplosion()
 	return explosioncount;
 }
 
-unsigned int ProjectileServer::PrepareSymbols(SymbolMgr *projlist) {
+unsigned int ProjectileServer::PrepareSymbols(Holder<SymbolMgr> projlist) {
 	unsigned int count = 0;
 
 	unsigned int rows = (unsigned int) projlist->GetSize();
@@ -230,7 +228,7 @@ unsigned int ProjectileServer::PrepareSymbols(SymbolMgr *projlist) {
 	return count;
 }
 
-void ProjectileServer::AddSymbols(SymbolMgr *projlist) {
+void ProjectileServer::AddSymbols(Holder<SymbolMgr> projlist) {
 	unsigned int rows = (unsigned int) projlist->GetSize();
 	while(rows--) {
 		unsigned int value = projlist->GetValueIndex(rows);
@@ -255,9 +253,9 @@ unsigned int ProjectileServer::GetHighestProjectileNumber()
 
 	// built-in gemrb projectiles and game/mod-provided projectiles
 	unsigned int gemresource = core->LoadSymbol("gemprjtl");
-	SymbolMgr *gemprojlist = core->GetSymbol(gemresource);
+	Holder<SymbolMgr> gemprojlist = core->GetSymbol(gemresource);
 	unsigned int resource = core->LoadSymbol("projectl");
-	SymbolMgr *projlist = core->GetSymbol(resource);
+	Holder<SymbolMgr> projlist = core->GetSymbol(resource);
 
 	// first, we must calculate how many projectiles we have
 	if (gemprojlist) {

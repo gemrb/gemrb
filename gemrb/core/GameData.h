@@ -26,6 +26,7 @@
 #include "ie_types.h"
 #include "Cache.h"
 #include "ResourceManager.h"
+#include "Holder.h"
 
 class TableMgr;
 class Palette;
@@ -38,7 +39,7 @@ class Actor;
 class Sprite2D;
 
 struct Table {
-	TableMgr * tm;
+	Holder<TableMgr> tm;
 	char ResRef[8];
 	unsigned int refcount;
 };
@@ -65,7 +66,7 @@ public:
 	/** Gets the index of a loaded table, returns -1 on error */
 	int GetTableIndex(const char * ResRef) const;
 	/** Gets a Loaded Table by its index, returns NULL on error */
-	TableMgr * GetTable(unsigned int index) const;
+	Holder<TableMgr> GetTable(unsigned int index) const;
 	/** Frees a Loaded Table, returns false on error, true on success */
 	bool DelTable(unsigned int index);
 
@@ -98,5 +99,22 @@ private:
 };
 
 extern GEM_EXPORT GameData * gamedata;
+
+template <class T>
+class ResourceHolder : public Holder<T>
+{
+public:
+	ResourceHolder()
+	{
+	}
+	ResourceHolder(const char* resname)
+		: Holder<T>(static_cast<T*>(gamedata->GetResource(resname,&T::ID)))
+	{
+	}
+	ResourceHolder(const char* resname, ResourceManager& manager, bool silent = false)
+		: Holder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)))
+	{
+	}
+};
 
 #endif

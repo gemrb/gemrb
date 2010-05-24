@@ -89,13 +89,12 @@ void TextArea::RefreshSprite(const char *portrait)
 	if (!strnicmp(PortraitResRef, "none", 8) ) {
 		return;
 	}
-	ImageMgr* im = ( ImageMgr* ) gamedata->GetResource( PortraitResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> im(PortraitResRef);
 	if (im == NULL) {
 		return;
 	}
 
 	SetAnimPicture ( im->GetSprite2D() );
-	im->release();
 }
 
 void TextArea::Draw(unsigned short x, unsigned short y)

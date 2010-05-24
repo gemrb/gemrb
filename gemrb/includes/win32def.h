@@ -28,6 +28,8 @@
 #ifndef WIN32DEF_H
 #define WIN32DEF_H
 
+#include "exports.h"
+
 #ifdef WIN32
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
@@ -43,6 +45,7 @@
 
 # define ADV_TEXT
 # include <conio.h>
+extern GEM_EXPORT HANDLE hConsole;
 # define textcolor(i) SetConsoleTextAttribute(hConsole, i)
 
 # ifndef __MINGW32__

@@ -44,7 +44,7 @@ public:
 		if (Holder<T>::ptr) {
 			Holder<T>::ptr->acquire();
 			GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
-			PyObject *obj = PyCObject_FromVoidPtrAndDesc(Holder<T>::ptr,&T::ID,PyRelease);
+			PyObject *obj = PyCObject_FromVoidPtrAndDesc(Holder<T>::ptr,const_cast<TypeID*>(&T::ID),PyRelease);
 			PyObject *tuple = PyTuple_New(1);
 			PyTuple_SET_ITEM(tuple, 0, obj);
 			return gs->ConstructObject(T::ID.description, tuple);

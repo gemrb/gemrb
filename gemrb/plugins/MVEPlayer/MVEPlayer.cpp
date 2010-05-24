@@ -33,7 +33,6 @@
 static const char MVESignature[] = "Interplay MVE File\x1A";
 static const int MVE_SIGNATURE_LEN = 19;
 
-static Video *video = NULL;
 static unsigned char g_palette[768];
 static int g_truecolor;
 static ieDword maxRow = 0;

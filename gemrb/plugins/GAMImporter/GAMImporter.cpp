@@ -202,7 +202,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	}
 
 	//Loading PCs
-	ActorMgr* aM = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
+	PluginHolder<ActorMgr> aM(IE_CRE_CLASS_ID);
 	for (i = 0; i < PCCount; i++) {
 		str->Seek( PCOffset + ( i * PCSize ), GEM_STREAM_START );
 		Actor *actor = GetActor( aM, true );
@@ -218,7 +218,6 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		Actor *actor = GetActor( aM, false );
 		newGame->AddNPC( actor );
 	}
-	aM->release();
 
 	//apparently BG1/IWD2 relies on this, if chapter is unset, it is
 	//set to -1, hopefully it won't break anything
@@ -331,7 +330,7 @@ void SanityCheck(ieWord a,ieWord &b,const char *message)
 	}
 }
 
-Actor* GAMImporter::GetActor( ActorMgr* aM, bool is_in_party )
+Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 {
 	unsigned int i;
 	PCStruct pcInfo;
@@ -605,7 +604,7 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	}
 	PCOffset = headersize;
 
-	ActorMgr *am = (ActorMgr *) core->GetInterface( IE_CRE_CLASS_ID );
+	PluginHolder<ActorMgr> am(IE_CRE_CLASS_ID);
 	PCCount = game->GetPartySize(false);
 	headersize += PCCount * PCSize;
 	for (i = 0;i<PCCount; i++) {
@@ -620,7 +619,6 @@ int GAMImporter::GetStoredFileSize(Game *game)
 		Actor *ac=game->GetNPC(i);
 		headersize +=am->GetStoredFileSize(ac);
 	}
-	am->release();
 
 	if (game->mazedata) {
 		MazeOffset = headersize;
@@ -1018,7 +1016,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 int GAMImporter::PutPCs(DataStream *stream, Game *game)
 {
 	unsigned int i;
-	ActorMgr *am = (ActorMgr *) core->GetInterface( IE_CRE_CLASS_ID );
+	PluginHolder<ActorMgr> am(IE_CRE_CLASS_ID);
 	ieDword CREOffset = PCOffset + PCCount * PCSize;
 
 	for(i=0;i<PCCount;i++) {
@@ -1038,14 +1036,13 @@ int GAMImporter::PutPCs(DataStream *stream, Game *game)
 		CREOffset += am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
 	}
-	am->release();
 	return 0;
 }
 
 int GAMImporter::PutNPCs(DataStream *stream, Game *game)
 {
 	unsigned int i;
-	ActorMgr *am = (ActorMgr *) core->GetInterface( IE_CRE_CLASS_ID );
+	PluginHolder<ActorMgr> am(IE_CRE_CLASS_ID);
 	ieDword CREOffset = NPCOffset + NPCCount * PCSize;
 
 	for(i=0;i<NPCCount;i++) {
@@ -1060,7 +1057,6 @@ int GAMImporter::PutNPCs(DataStream *stream, Game *game)
 		am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
 	}
-	am->release();
 	return 0;
 }
 

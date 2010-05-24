@@ -126,20 +126,12 @@ Interface::Interface(int iargc, char* iargv[])
 	}
 
 	projserv = NULL;
-	video = NULL;
-	AudioDriver = NULL;
-	strings = NULL;
-	guiscript = NULL;
-	windowmgr = NULL;
+	VideoDriverName = "sdl";
+	AudioDriverName = "openal";
 	vars = NULL;
 	tokens = NULL;
 	RtRows = NULL;
-	music = NULL;
 	sgiterator = NULL;
-	INIparty = NULL;
-	INIbeasts = NULL;
-	INIquests = NULL;
-	INIresdata = NULL;
 	game = NULL;
 	worldmap = NULL;
 	CurrentStore = NULL;
@@ -244,18 +236,6 @@ Interface::Interface(int iargc, char* iargv[])
 	gamedata = new GameData();
 }
 
-#define FreeInterfaceVector(type, variable, member) \
-{ \
-	std::vector<type>::iterator i; \
-	for(i = (variable).begin(); i != (variable).end(); ++i) { \
-	if (!(*i).free) { \
-		if (i->member) \
-			(*i).member->release(); \
-		(*i).free = true; \
-	} \
-	} \
-}
-
 #define FreeResourceVector(type, variable) \
 { \
 	size_t i=variable.size(); \
@@ -324,13 +304,11 @@ Interface::~Interface(void)
 
 	if (music) {
 		music->HardEnd();
-		music->release();
 	}
 	// stop any ambients which are still enqueued
 	if (AudioDriver) {
 		AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
 		if (ambim) ambim->deactivate();
-		AudioDriver->release();
 	}
 	//destroy the highest objects in the hierarchy first!
 	delete game;
@@ -384,8 +362,6 @@ Interface::~Interface(void)
 
 	delete timer;
 
-	windowmgr->release();
-
 	if (video) {
 
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
@@ -418,8 +394,6 @@ Interface::~Interface(void)
 
 	delete evntmgr;
 
-	guiscript->release();
-
 	delete vars;
 	delete tokens;
 	if (RtRows) {
@@ -443,26 +417,12 @@ Interface::~Interface(void)
 		delete ItemTooltipTable;
 	}
 
-	FreeInterfaceVector( Symbol, symbols, sm );
-
-	if (INIquests)
-		INIquests->release();
-	if (INIbeasts)
-		INIbeasts->release();
-	if (INIparty)
-		INIparty->release();
-	if (INIresdata)
-		INIresdata->release();
-
 	Map::ReleaseMemory();
 	Actor::ReleaseMemory();
 
 	gamedata->ClearCaches();
 	delete gamedata;
 	gamedata = NULL;
-	video->release();
-
-	strings->release();
 
 	// Removing all stuff from Cache, except bifs
 	if (!KeepCache) DelTree((const char *) CachePath, true);
@@ -1193,7 +1153,7 @@ int Interface::LoadSprites()
 		printf( "Cannot find fonts.2da.\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	} else {
-		AnimationMgr* bamint = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
+		PluginHolder<AnimationMgr> bamint(IE_BAM_CLASS_ID);
 		if (!bamint) {
 			printStatus( "ERROR", LIGHT_RED );
 			printf( "No BAM Importer Available.\nTermination in Progress...\n" );
@@ -1235,7 +1195,6 @@ int Interface::LoadSprites()
 			fnt->SetFirstChar( (ieByte) first_char );
 			fonts.push_back( fnt );
 		}
-		bamint->release();
 	}
 	printMessage( "Core", "Fonts Loaded...", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
@@ -1306,15 +1265,14 @@ int Interface::Init()
 	CachedFileStreamPtrCount = 0;
 #endif
 	printMessage( "Core", "GemRB Core Initialization...\n", WHITE );
-	printMessage( "Core", "Searching for Video Driver...", WHITE );
-	if (!IsAvailable( IE_VIDEO_CLASS_ID )) {
+	printStatus( "OK", LIGHT_GREEN );
+	printMessage( "Core", "Initializing Video Driver...", WHITE );
+	video = ( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, VideoDriverName.c_str());
+	if (!video) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "No Video Driver Available.\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Initializing Video Plugin...", WHITE );
-	video = ( Video * ) GetInterface( IE_VIDEO_CLASS_ID );
 	if (video->Init() == GEM_ERROR) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot Initialize Video Driver.\nTermination in Progress...\n" );
@@ -1415,7 +1373,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
-	strings = ( StringMgr * ) GetInterface( IE_TLK_CLASS_ID );
+	strings = PluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 	printMessage( "Core", "Loading Dialog.tlk file...", WHITE );
 	char strpath[_MAX_PATH];
 	PathJoin( strpath, GamePath, dialogtlk, NULL );
@@ -1431,15 +1389,12 @@ int Interface::Init()
 
 	{
 		printMessage( "Core", "Loading Palettes...\n", WHITE );
-		ImageMgr *im =( ImageMgr * ) gamedata->GetResource( Palette16, &ImageMgr::ID );
-		pal16 = im->GetImage();
-		im->release();
-		im = ( ImageMgr * ) gamedata->GetResource( Palette32, &ImageMgr::ID );
-		pal32 = im->GetImage();
-		im->release();
-		im = ( ImageMgr * ) gamedata->GetResource( Palette256, &ImageMgr::ID );
-		pal256 = im->GetImage();
-		im->release();
+		ResourceHolder<ImageMgr> pal16im(Palette16);
+		pal16 = pal16im->GetImage();
+		ResourceHolder<ImageMgr> pal32im(Palette32);
+		pal32 = pal32im->GetImage();
+		ResourceHolder<ImageMgr> pal256im(Palette256);
+		pal256 = pal256im->GetImage();
 		printMessage( "Core", "Palettes Loaded\n", WHITE );
 	}
 
@@ -1462,14 +1417,14 @@ int Interface::Init()
 	video->SetEventMgr( evntmgr );
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Initializing Window Manager...", WHITE );
-	windowmgr = ( WindowMgr * ) GetInterface( IE_CHU_CLASS_ID );
+	windowmgr = PluginHolder<WindowMgr>(IE_CHU_CLASS_ID);
 	if (windowmgr == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Initializing GUI Script Engine...", WHITE );
-	guiscript = ( ScriptEngine * ) GetInterface( IE_GUI_SCRIPT_CLASS_ID );
+	guiscript = PluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
 	if (guiscript == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
@@ -1501,7 +1456,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Starting up the Sound Driver...", WHITE );
-	AudioDriver = ( Audio * ) GetInterface( IE_AUDIO_CLASS_ID );
+	AudioDriver = ( Audio * ) PluginMgr::Get()->GetDriver(&Audio::ID, AudioDriverName.c_str());
 	if (AudioDriver == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
@@ -1534,7 +1489,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Initializing Music Manager...", WHITE );
-	music = ( MusicMgr * ) GetInterface( IE_MUS_CLASS_ID );
+	music = PluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
 	if (!music) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
@@ -1558,7 +1513,7 @@ int Interface::Init()
 
 	if (HasFeature( GF_RESDATA_INI )) {
 		printMessage( "Core", "Loading resource data File...", WHITE );
-		INIresdata = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
+		INIresdata = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		DataStream* ds = gamedata->GetResource("resdata", IE_INI_CLASS_ID);
 		if (!INIresdata->Open( ds, true )) {
 			printStatus( "ERROR", LIGHT_RED );
@@ -1570,7 +1525,7 @@ int Interface::Init()
 	if (HasFeature( GF_HAS_PARTY_INI )) {
 		printMessage( "Core", "Loading precreated teams setup...\n",
 			WHITE );
-		INIparty = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
+		INIparty = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		FileStream* fs = new FileStream();
 		char tINIparty[_MAX_PATH];
 		PathJoin( tINIparty, GamePath, "Party.ini", NULL );
@@ -1589,7 +1544,7 @@ int Interface::Init()
 	if (HasFeature( GF_HAS_BEASTS_INI )) {
 		printMessage( "Core", "Loading beasts definition File...\n",
 			WHITE );
-		INIbeasts = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
+		INIbeasts = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		FileStream* fs = new FileStream();
 		char tINIbeasts[_MAX_PATH];
 		PathJoin( tINIbeasts, GamePath, "beast.ini", NULL );
@@ -1603,7 +1558,7 @@ int Interface::Init()
 
 		printMessage( "Core", "Loading quests definition File...\n",
 			WHITE );
-		INIquests = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
+		INIquests = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		FileStream* fs2 = new FileStream();
 		char tINIquests[_MAX_PATH];
 		PathJoin( tINIquests, GamePath, "quests.ini", NULL );
@@ -1723,14 +1678,6 @@ WorldMap *Interface::GetWorldMap(const char *map)
 	return worldmap->GetWorldMap(index);
 }
 
-void* Interface::GetInterface(SClass_ID filetype) const
-{
-	if (!PluginMgr::Get()) {
-		return NULL;
-	}
-	return PluginMgr::Get()->GetPlugin( filetype );
-}
-
 ProjectileServer* Interface::GetProjectileServer() const
 {
 	return projserv;
@@ -1738,7 +1685,11 @@ ProjectileServer* Interface::GetProjectileServer() const
 
 Video* Interface::GetVideoDriver() const
 {
-	return video;
+	return video.get();
+}
+
+Audio* Interface::GetAudioDrv(void) const {
+	return AudioDriver.get();
 }
 
 const char* Interface::TypeExt(SClass_ID type) const
@@ -2128,6 +2079,10 @@ bool Interface::LoadConfig(const char* filename)
 		} else if (strnicmp( name, "CD", 2 ) == 0 &&
 				name[2] >= '1' && name[2] <= '5' && name[3] == 0) {
 			strncpy( CD[name[2]-'1'], value, sizeof(CD[name[2]-'1']) );
+		} else if (stricmp( name, "AudioDriver") == 0) {
+			AudioDriverName = value;
+		} else if (stricmp( name, "VideoDriver") == 0) {
+			VideoDriverName = value;
 		}
 	}
 	fclose( config );
@@ -2298,7 +2253,7 @@ bool Interface::LoadGemRBINI()
 		printf( "[Core]: No INI Importer Available.\n" );
 		return false;
 	}
-	DataFileMgr* ini = ( DataFileMgr* ) GetInterface( IE_INI_CLASS_ID );
+	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
 	ini->Open( inifile, true ); //autofree
 
 	printStatus( "OK", LIGHT_GREEN );
@@ -2412,7 +2367,6 @@ bool Interface::LoadGemRBINI()
 
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
-	ini->release();
 	return true;
 }
 
@@ -2490,13 +2444,13 @@ EventMgr* Interface::GetEventMgr() const
 /** Returns the Window Manager */
 WindowMgr* Interface::GetWindowMgr() const
 {
-	return windowmgr;
+	return windowmgr.get();
 }
 
 /** Get GUI Script Manager */
 ScriptEngine* Interface::GetGUIScriptEngine() const
 {
-	return guiscript;
+	return guiscript.get();
 }
 
 //NOTE: if there were more summoned creatures, it will return only the last
@@ -2709,11 +2663,9 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 	Window* win = new Window( WindowID, (ieWord) XPos, (ieWord) YPos, (ieWord) Width, (ieWord) Height );
 	if (Background[0]) {
 		if (IsAvailable( IE_MOS_CLASS_ID )) {
-			ImageMgr* mos = ( ImageMgr* )
-				gamedata->GetResource( Background, &ImageMgr::ID );
+			ResourceHolder<ImageMgr> mos(Background);
 			if (mos != NULL) {
 				win->SetBackGround( mos->GetSprite2D(), true );
-				mos->release();
 			} else
 				printf( "[Core]: Cannot Load BackGround, skipping\n" );
 		} else
@@ -3291,7 +3243,7 @@ Variables* Interface::GetTokenDictionary() const
 /** Get the Music Manager */
 MusicMgr* Interface::GetMusicMgr() const
 {
-	return music;
+	return music.get();
 }
 /** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
 int Interface::LoadSymbol(const char* ResRef)
@@ -3304,22 +3256,20 @@ int Interface::LoadSymbol(const char* ResRef)
 	if (!str) {
 		return -1;
 	}
-	SymbolMgr* sm = ( SymbolMgr* ) GetInterface( IE_IDS_CLASS_ID );
+	PluginHolder<SymbolMgr> sm(IE_IDS_CLASS_ID);
 	if (!sm) {
 		delete str;
 		return -1;
 	}
 	if (!sm->Open( str, true )) {
-		sm->release();
 		return -1;
 	}
 	Symbol s;
-	s.free = false;
 	strncpy( s.ResRef, ResRef, 8 );
 	s.sm = sm;
 	ind = -1;
 	for (size_t i = 0; i < symbols.size(); i++) {
-		if (symbols[i].free) {
+		if (!symbols[i].sm) {
 			ind = ( int ) i;
 			break;
 		}
@@ -3335,7 +3285,7 @@ int Interface::LoadSymbol(const char* ResRef)
 int Interface::GetSymbolIndex(const char* ResRef) const
 {
 	for (size_t i = 0; i < symbols.size(); i++) {
-		if (symbols[i].free)
+		if (!symbols[i].sm)
 			continue;
 		if (strnicmp( symbols[i].ResRef, ResRef, 8 ) == 0)
 			return ( int ) i;
@@ -3343,13 +3293,13 @@ int Interface::GetSymbolIndex(const char* ResRef) const
 	return -1;
 }
 /** Gets a Loaded Symbol Table by its index, returns NULL on error */
-SymbolMgr* Interface::GetSymbol(unsigned int index) const
+Holder<SymbolMgr> Interface::GetSymbol(unsigned int index) const
 {
 	if (index >= symbols.size()) {
-		return NULL;
+		return Holder<SymbolMgr>();
 	}
-	if (symbols[index].free) {
-		return NULL;
+	if (!symbols[index].sm) {
+		return Holder<SymbolMgr>();
 	}
 	return symbols[index].sm;
 }
@@ -3359,18 +3309,16 @@ bool Interface::DelSymbol(unsigned int index)
 	if (index >= symbols.size()) {
 		return false;
 	}
-	if (symbols[index].free) {
+	if (!symbols[index].sm) {
 		return false;
 	}
-	if (symbols[index].sm)
-		symbols[index].sm->release();
-	symbols[index].free = true;
+	symbols[index].sm.release();
 	return true;
 }
 /** Plays a Movie */
 int Interface::PlayMovie(const char* ResRef)
 {
-	MoviePlayer* mp = (MoviePlayer*) gamedata->GetResource( ResRef, &MoviePlayer::ID );
+	ResourceHolder<MoviePlayer> mp(ResRef);
 	if (!mp) {
 		return -1;
 	}
@@ -3429,7 +3377,6 @@ int Interface::PlayMovie(const char* ResRef)
 	video->SetMovieFont(SubtitleFont, palette );
 	mp->CallBackAtFrames(cnt, frames, strrefs);
 	mp->Play();
-	mp->release();
 	gamedata->FreePalette( palette );
 	if (frames)
 		free(frames);
@@ -3721,8 +3668,6 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	DataStream* sav_str = NULL;
 	DataStream* wmp_str = NULL;
 
-	SaveGameMgr* gam_mgr = NULL;
-	WorldMapMgr* wmp_mgr = NULL;
 
 	Game* new_game = NULL;
 	WorldMapArray* new_worldmap = NULL;
@@ -3742,11 +3687,14 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 		wmp_str = sg->GetWmap();
 	}
 
+	// These are here because of the goto
+	PluginHolder<SaveGameMgr> gam_mgr(IE_GAM_CLASS_ID);
+	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
+
 	if (!gam_str || !wmp_str)
 		goto cleanup;
 
 	// Load GAM file
-	gam_mgr = ( SaveGameMgr* ) GetInterface( IE_GAM_CLASS_ID );
 	if (!gam_mgr)
 		goto cleanup;
 
@@ -3757,13 +3705,10 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	if (!new_game)
 		goto cleanup;
 
-	gam_mgr->release();
-	gam_mgr = NULL;
 	gam_str = NULL;
 
 	// Load WMP (WorldMap) file
-	wmp_mgr = ( WorldMapMgr* ) GetInterface( IE_WMP_CLASS_ID );
-	if (! wmp_mgr)
+	if (!wmp_mgr)
 		goto cleanup;
 
 	if (!wmp_mgr->Open( wmp_str, true ))
@@ -3771,20 +3716,16 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 
 	new_worldmap = wmp_mgr->GetWorldMapArray( );
 
-	wmp_mgr->release();
-	wmp_mgr = NULL;
 	wmp_str = NULL;
 
 	LoadProgress(30);
 	// Unpack SAV (archive) file to Cache dir
 	if (sav_str) {
-		ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);
+		PluginHolder<ArchiveImporter> ai(IE_BIF_CLASS_ID);
 		if (ai) {
 			if (ai->DecompressSaveGame(sav_str) != GEM_OK) {
-				ai->release();
 				goto cleanup;
 			}
-			ai->release();
 		}
 		delete sav_str;
 		sav_str = NULL;
@@ -3807,15 +3748,6 @@ cleanup:
 	delete new_game;
 	delete new_worldmap;
 
-	if (gam_mgr) {
-		gam_mgr->release();
-		gam_str = NULL;
-	}
-	if (wmp_mgr) {
-		wmp_mgr->release();
-		wmp_str = NULL;
-	}
-
 	delete gam_str;
 	delete wmp_str;
 	delete sav_str;
@@ -3828,7 +3760,7 @@ void Interface::UpdateMasterScript()
 		game->SetScript( GlobalScript, 0 );
 	}
 
-	WorldMapMgr* wmp_mgr = ( WorldMapMgr* ) GetInterface( IE_WMP_CLASS_ID );
+	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
 	if (! wmp_mgr)
 		return;
 
@@ -3837,16 +3769,11 @@ void Interface::UpdateMasterScript()
 
 		if (!wmp_mgr->Open( wmp_str, true )) {
 			delete wmp_str;
-			goto cleanup;
 		}
 
 		delete worldmap;
 		worldmap = wmp_mgr->GetWorldMapArray();
 	}
-
-cleanup:
-	// Something went wrong, so try to clean after itself
-	wmp_mgr->release();
 }
 
 GameControl *Interface::GetGameControl() const
@@ -4707,7 +4634,7 @@ int Interface::CloseCurrentStore()
 	if ( !CurrentStore ) {
 		return -1;
 	}
-	StoreMgr* sm = ( StoreMgr* ) GetInterface( IE_STO_CLASS_ID );
+	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
 	if (sm == NULL) {
 		return -1;
 	}
@@ -4730,7 +4657,6 @@ int Interface::CloseCurrentStore()
 		RemoveFromCache(CurrentStore->Name, IE_STO_CLASS_ID);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
-	sm->release();
 	delete CurrentStore;
 	CurrentStore = NULL;
 	return 0;
@@ -4748,13 +4674,12 @@ Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner
 	}
 
 	DataStream* str = gamedata->GetResource( resname, IE_STO_CLASS_ID );
-	StoreMgr* sm = ( StoreMgr* ) GetInterface( IE_STO_CLASS_ID );
+	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
 	if (sm == NULL) {
 		delete ( str );
 		return NULL;
 	}
 	if (!sm->Open( str, true )) {
-		sm->release();
 		return NULL;
 	}
 
@@ -4764,10 +4689,8 @@ Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner
 	// Cache anyway!
 	CurrentStore = sm->GetStore( new Store() );
 	if (CurrentStore == NULL) {
-		sm->release();
 		return NULL;
 	}
-	sm->release();
 	strnlwrcpy(CurrentStore->Name, resname, 8);
 	if (owner) {
 		CurrentStore->SetOwner(owner);
@@ -4785,10 +4708,9 @@ int Interface::GetMouseScrollSpeed() {
 
 ieStrRef Interface::GetRumour(const ieResRef dlgref)
 {
-	DialogMgr* dm = ( DialogMgr* ) GetInterface( IE_DLG_CLASS_ID );
+	PluginHolder<DialogMgr> dm(IE_DLG_CLASS_ID);
 	dm->Open( gamedata->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
 	Dialog *dlg = dm->GetDialog();
-	dm->release();
 
 	if (!dlg) {
 		printMessage("Interface"," ", LIGHT_RED);
@@ -4975,7 +4897,7 @@ Effect *Interface::GetEffect(const ieResRef resname, int level, Point &p)
 // dealing with saved games
 int Interface::SwapoutArea(Map *map)
 {
-	MapMgr* mm = ( MapMgr* ) GetInterface( IE_ARE_CLASS_ID );
+	PluginHolder<MapMgr> mm(IE_ARE_CLASS_ID);
 	if (mm == NULL) {
 		return -1;
 	}
@@ -4998,7 +4920,6 @@ int Interface::SwapoutArea(Map *map)
 		RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
-	mm->release();
 	return 0;
 }
 
@@ -5010,7 +4931,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 	if (!actor) {
 		return -1;
 	}
-	ActorMgr* gm = ( ActorMgr* ) GetInterface( IE_CRE_CLASS_ID );
+	PluginHolder<ActorMgr> gm(IE_CRE_CLASS_ID);
 	if (gm == NULL) {
 		return -1;
 	}
@@ -5026,13 +4947,12 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 		printMessage("Core"," ", YELLOW);
 		printf("Character cannot be saved: %s\n", name);
 	}
-	gm->release();
 	return 0;
 }
 
 int Interface::WriteGame(const char *folder)
 {
-	SaveGameMgr* gm = ( SaveGameMgr* ) GetInterface( IE_GAM_CLASS_ID );
+	PluginHolder<SaveGameMgr> gm(IE_GAM_CLASS_ID);
 	if (gm == NULL) {
 		return -1;
 	}
@@ -5054,13 +4974,12 @@ int Interface::WriteGame(const char *folder)
 		printf("Internal error, game cannot be saved: %s\n", GameNameResRef);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
-	gm->release();
 	return 0;
 }
 
 int Interface::WriteWorldMap(const char *folder)
 {
-	WorldMapMgr* wmm = ( WorldMapMgr* ) GetInterface( IE_WMP_CLASS_ID );
+	PluginHolder<WorldMapMgr> wmm(IE_WMP_CLASS_ID);
 	if (wmm == NULL) {
 		return -1;
 	}
@@ -5082,7 +5001,6 @@ int Interface::WriteWorldMap(const char *folder)
 		printf("Internal error, worldmap cannot be saved: %s\n", WorldMapName);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
-	wmm->release();
 	return 0;
 }
 
@@ -5101,7 +5019,7 @@ int Interface::CompressSave(const char *folder)
 		return -1;
 	}
 	//BIF and SAV are the same
-	ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);
+	PluginHolder<ArchiveImporter> ai(IE_BIF_CLASS_ID);
 	ai->CreateArchive( &str);
 
 	//.tot and .toh should be saved last, because they are updated when an .are is saved
@@ -5130,7 +5048,6 @@ int Interface::CompressSave(const char *folder)
 			de = readdir( dir );
 		}
 	}
-	ai->release();
 	return 0;
 }
 
@@ -5301,7 +5218,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	}
 
 	int symbol = LoadSymbol( "stats" );
-	SymbolMgr *sym = GetSymbol( symbol );
+	Holder<SymbolMgr> sym = GetSymbol( symbol );
 	ieDword stat = (ieDword) sym->GetValue( stat_name );
 	if (stat==(ieDword) ~0) {
 		printMessage("Core"," ",YELLOW);

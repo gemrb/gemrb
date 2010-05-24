@@ -62,18 +62,6 @@ static void ReleasePalette(void *poi)
 	((Palette *) poi)->Release();
 }
 
-// TODO: this is duplicated from Interface.cpp
-#define FreeInterfaceVector(type, variable, member) \
-{ \
-	std::vector<type>::iterator i; \
-	for(i = (variable).begin(); i != (variable).end(); ++i) { \
-	if ((*i).refcount) { \
-		(*i).member->release(); \
-		(*i).refcount = 0; \
-	} \
-	} \
-}
-
 GEM_EXPORT GameData* gamedata;
 
 GameData::GameData()
@@ -83,7 +71,6 @@ GameData::GameData()
 
 GameData::~GameData()
 {
-	FreeInterfaceVector( Table, tables, tm );
 	delete factory;
 }
 
@@ -101,13 +88,11 @@ Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
 	if (!ds)
 		return 0;
 
-	ActorMgr* actormgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
+	PluginHolder<ActorMgr> actormgr(IE_CRE_CLASS_ID);
 	if (!actormgr->Open( ds, true )) {
-		actormgr->release();
 		return 0;
 	}
 	Actor* actor = actormgr->GetActor(PartySlot);
-	actormgr->release();
 	return actor;
 }
 
@@ -123,13 +108,11 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 		FileStream *fs = new FileStream();
 		fs -> Open( nPath, true );
 		stream = (DataStream *) fs;
-		ActorMgr* actormgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
+		PluginHolder<ActorMgr> actormgr(IE_CRE_CLASS_ID);
 		if (!actormgr->Open( stream, true )) {
-			actormgr->release();
 			return -1;
 		}
 		actor = actormgr->GetActor(PartySlot);
-		actormgr->release();
 	} else {
 		actor = GetCreature(ResRef, PartySlot);
 	}
@@ -168,13 +151,12 @@ int GameData::LoadTable(const ieResRef ResRef)
 	if (!str) {
 		return -1;
 	}
-	TableMgr* tm = ( TableMgr* ) core->GetInterface( IE_2DA_CLASS_ID );
+	PluginHolder<TableMgr> tm(IE_2DA_CLASS_ID);
 	if (!tm) {
 		delete str;
 		return -1;
 	}
 	if (!tm->Open( str, true )) {
-		tm->release();
 		return -1;
 	}
 	Table t;
@@ -207,7 +189,7 @@ int GameData::GetTableIndex(const char* ResRef) const
 	return -1;
 }
 /** Gets a Loaded Table by its index, returns NULL on error */
-TableMgr* GameData::GetTable(unsigned int index) const
+Holder<TableMgr> GameData::GetTable(unsigned int index) const
 {
 	if (index >= tables.size()) {
 		return NULL;
@@ -222,7 +204,6 @@ TableMgr* GameData::GetTable(unsigned int index) const
 bool GameData::DelTable(unsigned int index)
 {
 	if (index==0xffffffff) {
-		FreeInterfaceVector( Table, tables, tm );
 		tables.clear();
 		return true;
 	}
@@ -235,7 +216,7 @@ bool GameData::DelTable(unsigned int index)
 	tables[index].refcount--;
 	if (tables[index].refcount == 0)
 		if (tables[index].tm)
-			tables[index].tm->release();
+			tables[index].tm.release();
 	return true;
 }
 
@@ -249,8 +230,7 @@ Palette *GameData::GetPalette(const ieResRef resname)
 	if (PaletteCache.RefCount(resname)!=-1) {
 		return NULL;
 	}
-	ImageMgr* im = ( ImageMgr* )
-		GetResource( resname, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> im(resname);
 	if (im == NULL) {
 		PaletteCache.SetAt(resname, NULL);
 		return NULL;
@@ -258,7 +238,6 @@ Palette *GameData::GetPalette(const ieResRef resname)
 
 	palette = new Palette();
 	im->GetPalette(256,palette->col);
-	im->release();
 	palette->named=true;
 	PaletteCache.SetAt(resname, (void *) palette);
 	return palette;
@@ -304,13 +283,12 @@ Item* GameData::GetItem(const ieResRef resname)
 		return item;
 	}
 	DataStream* str = GetResource( resname, IE_ITM_CLASS_ID );
-	ItemMgr* sm = ( ItemMgr* ) core->GetInterface( IE_ITM_CLASS_ID );
-	if (sm == NULL) {
+	PluginHolder<ItemMgr> sm(IE_ITM_CLASS_ID);
+	if (!sm) {
 		delete ( str );
 		return NULL;
 	}
 	if (!sm->Open( str, true )) {
-		sm->release();
 		return NULL;
 	}
 
@@ -319,11 +297,9 @@ Item* GameData::GetItem(const ieResRef resname)
 	strnlwrcpy(item->Name, resname, 8);
 	sm->GetItem( item );
 	if (item == NULL) {
-		sm->release();
 		return NULL;
 	}
 
-	sm->release();
 	ItemCache.SetAt(resname, (void *) item);
 	return item;
 }
@@ -350,13 +326,12 @@ Spell* GameData::GetSpell(const ieResRef resname, bool silent)
 		return spell;
 	}
 	DataStream* str = GetResource( resname, IE_SPL_CLASS_ID, silent );
-	SpellMgr* sm = ( SpellMgr* ) core->GetInterface( IE_SPL_CLASS_ID );
-	if (sm == NULL) {
+	PluginHolder<SpellMgr> sm(IE_SPL_CLASS_ID);
+	if (!sm) {
 		delete ( str );
 		return NULL;
 	}
 	if (!sm->Open( str, true )) {
-		sm->release();
 		return NULL;
 	}
 
@@ -365,11 +340,8 @@ Spell* GameData::GetSpell(const ieResRef resname, bool silent)
 	strnlwrcpy(spell->Name, resname, 8);
 	sm->GetSpell( spell, silent );
 	if (spell == NULL) {
-		sm->release();
 		return NULL;
 	}
-
-	sm->release();
 
 	SpellCache.SetAt(resname, (void *) spell);
 	return spell;
@@ -396,23 +368,19 @@ Effect* GameData::GetEffect(const ieResRef resname)
 		return effect;
 	}
 	DataStream* str = GetResource( resname, IE_EFF_CLASS_ID );
-	EffectMgr* em = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
-	if (em == NULL) {
+	PluginHolder<EffectMgr> em(IE_EFF_CLASS_ID);
+	if (!em) {
 		delete ( str );
 		return NULL;
 	}
 	if (!em->Open( str, true )) {
-		em->release();
 		return NULL;
 	}
 
 	effect = em->GetEffect(new Effect() );
 	if (effect == NULL) {
-		em->release();
 		return NULL;
 	}
-
-	em->release();
 
 	EffectCache.SetAt(resname, (void *) effect);
 	return effect;
@@ -487,13 +455,11 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	{
 		DataStream* ret = GetResource( resname, type, silent );
 		if (ret) {
-			AnimationMgr* ani = ( AnimationMgr* )
-				core->GetInterface( IE_BAM_CLASS_ID );
+			PluginHolder<AnimationMgr> ani(IE_BAM_CLASS_ID);
 			if (!ani)
 				return NULL;
 			ani->Open( ret, true );
 			AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
-			ani->release();
 			factory->AddFactoryObject( af );
 			return af;
 		}
@@ -501,10 +467,9 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	}
 	case IE_BMP_CLASS_ID:
 	{
-		ImageMgr* img = (ImageMgr*) GetResource( resname, &ImageMgr::ID );
+		ResourceHolder<ImageMgr> img(resname);
 		if (img) {
 			ImageFactory* fact = img->GetImageFactory( resname );
-			img->release();
 			factory->AddFactoryObject( fact );
 			return fact;
 		}

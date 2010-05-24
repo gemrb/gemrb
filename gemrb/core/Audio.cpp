@@ -20,6 +20,8 @@
 
 #include "Audio.h"
 
+const TypeID Audio::ID = { "Audio" };
+
 Audio::Audio(void)
 {
 }

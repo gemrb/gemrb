@@ -41,10 +41,6 @@ public:
 	~PROImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Projectile* GetProjectile(Projectile *s);
-	void release(void)
-	{
-		delete this;
-	}
 private:
 	void GetAreaExtension(ProjectileExtension *s);
 };

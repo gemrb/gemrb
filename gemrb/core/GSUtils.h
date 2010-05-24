@@ -31,9 +31,9 @@
 #define ID_ACTIONS   8
 #define ID_TRIGGERS  16
 
-extern SymbolMgr* triggersTable;
-extern SymbolMgr* actionsTable;
-extern SymbolMgr* objectsTable;
+extern Holder<SymbolMgr> triggersTable;
+extern Holder<SymbolMgr> actionsTable;
+extern Holder<SymbolMgr> objectsTable;
 extern TriggerFunction triggers[MAX_TRIGGERS];
 extern ActionFunction actions[MAX_ACTIONS];
 extern short actionflags[MAX_ACTIONS];

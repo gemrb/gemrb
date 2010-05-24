@@ -24,6 +24,7 @@
 #include <vector>
 #include "exports.h"
 #include "SClassID.h"
+#include "Holder.h"
 
 class DataStream;
 class Resource;
@@ -55,7 +56,7 @@ public:
 	Resource* GetResource(const char* resname, const TypeID *type, bool silent = false) const;
 
 private:
-	std::vector<ResourceSource*> searchPath;
+	std::vector<Holder<ResourceSource> > searchPath;
 };
 
 #endif

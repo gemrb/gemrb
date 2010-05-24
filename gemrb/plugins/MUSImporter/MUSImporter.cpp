@@ -23,6 +23,7 @@
 #include "Interface.h"
 #include "Audio.h"
 #include "SoundMgr.h"
+#include "GameData.h" // For ResourceHolder
 
 static char musicsubfolder[6] = "music";
 
@@ -290,7 +291,8 @@ void MUSImporter::PlayMusic(char* name)
 		strncpy(FName, name, _MAX_PATH);
 	}
 
-	if (SoundMgr* sound = (SoundMgr*) manager.GetResource(FName, &SoundMgr::ID)) {
+	ResourceHolder<SoundMgr> sound(FName, manager);
+	if (sound) {
 		int soundID = core->GetAudioDrv()->CreateStream( sound );
 		if (soundID == -1) {
 			core->GetAudioDrv()->Stop();

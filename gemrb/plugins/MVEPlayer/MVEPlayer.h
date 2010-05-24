@@ -28,8 +28,8 @@
 
 class MVEPlay : public MoviePlayer {
 	friend class MVEPlayer;
-
 private:
+	Video *video;
 	bool validVideo;
 	int doPlay();
 	unsigned int fileRead(void* buf, unsigned int count);
@@ -50,12 +50,6 @@ public:
 	bool Open(DataStream* stream);
 	void CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2);
 	int Play();
-
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

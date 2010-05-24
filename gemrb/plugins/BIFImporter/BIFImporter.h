@@ -59,11 +59,6 @@ public:
 	DataStream* GetStream(unsigned long Resource, unsigned long Type);
 private:
 	void ReadBIF(void);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

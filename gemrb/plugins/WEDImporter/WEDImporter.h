@@ -61,11 +61,6 @@ public:
 	ieDword GetPolygonsCount() { return WallPolygonsCount+DoorPolygonsCount; }
 	void SetupOpenDoor(unsigned int &index, unsigned int &count);
 	void SetupClosedDoor(unsigned int &index, unsigned int &count);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

@@ -71,11 +71,6 @@ public:
 	bool IsPlaying() { return Playing; }
 	/** Returns whether given playlist is currently loaded */
 	bool CurrentPlayList(const char* name);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

@@ -58,15 +58,13 @@ struct ResRefToStrRef {
 	int difficulty;
 };
 
-DataFileMgr *INInote = NULL;
+Holder<DataFileMgr> INInote;
 ResRefToStrRef *tracks = NULL;
 int trackcount = 0;
 
 void ReleaseMemory()
 {
-	if (INInote)
-		INInote->release();
-	INInote = NULL;
+	INInote.release();
 
 	delete [] tracks;
 	tracks = NULL;
@@ -74,8 +72,7 @@ void ReleaseMemory()
 
 void ReadAutonoteINI()
 {
-	INInote = ( DataFileMgr * )
-		core->GetInterface( IE_INI_CLASS_ID );
+	INInote = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	FileStream* fs = new FileStream();
 	char tINInote[_MAX_PATH];
 	PathJoin( tINInote, core->GamePath, "autonote.ini", NULL );
@@ -233,7 +230,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	} else {
 		snprintf( TmpResRef, 9, "%sN", map->WEDResRef);
 	}
-	TileMapMgr* tmm = ( TileMapMgr* ) core->GetInterface( IE_WED_CLASS_ID );
+	PluginHolder<TileMapMgr> tmm(IE_WED_CLASS_ID);
 	DataStream* wedfile = gamedata->GetResource( TmpResRef, IE_WED_CLASS_ID );
 	tmm->Open( wedfile );
 
@@ -249,12 +246,11 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	tm = tmm->GetTileMap(tm);
 	if (!tm) {
 		printf( "[AREImporter]: No Tile Map Available.\n" );
-		tmm->release();
 		return false;
 	}
 
 	// Small map for MapControl
-	ImageMgr* sm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> sm(TmpResRef);
 	// small map is *optional*!
 
 	//the map state was altered, no need to hold this off for any later
@@ -267,7 +263,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 		snprintf( TmpResRef, 9, "%sLN", map->WEDResRef);
 	}
 
-	ImageMgr* lm = ( ImageMgr* ) gamedata->GetResource(TmpResRef, &ImageMgr::ID);
+	ResourceHolder<ImageMgr> lm(TmpResRef);
 	if (!lm) {
 		printf( "[AREImporter]: No lightmap available.\n" );
 		return false;
@@ -275,9 +271,6 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 
 	//alter the lightmap and the minimap (the tileset was already swapped)
 	map->ChangeTileMap(lm->GetImage(), sm?sm->GetSprite2D():NULL);
-	lm->release();
-	if (sm)
-		sm->release();
 	return true;
 }
 
@@ -331,7 +324,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		snprintf( TmpResRef, 9, "%sN", WEDResRef);
 	}
 
-	TileMapMgr* tmm = ( TileMapMgr* ) core->GetInterface( IE_WED_CLASS_ID );
+	PluginHolder<TileMapMgr> tmm(IE_WED_CLASS_ID);
 	DataStream* wedfile = gamedata->GetResource( WEDResRef, IE_WED_CLASS_ID );
 	tmm->Open( wedfile );
 
@@ -339,12 +332,11 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	TileMap* tm = tmm->GetTileMap(NULL);
 	if (!tm) {
 		printf( "[AREImporter]: No Tile Map Available.\n" );
-		tmm->release();
 		return false;
 	}
 
 	// Small map for MapControl
-	ImageMgr* sm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> sm(TmpResRef);
 	// small map is *optional*!
 
 	if (Script[0]) {
@@ -359,7 +351,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		snprintf( TmpResRef, 9, "%sLN", WEDResRef);
 	}
 
-	ImageMgr* lm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> lm(TmpResRef);
 	if (!lm) {
 		printf( "[AREImporter]: No lightmap available.\n" );
 		return false;
@@ -367,7 +359,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	snprintf( TmpResRef, 9, "%sSR", WEDResRef);
 
-	ImageMgr* sr = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> sr(TmpResRef);
 	if (!sr) {
 		printf( "[AREImporter]: No searchmap available.\n" );
 		return false;
@@ -375,18 +367,13 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	snprintf( TmpResRef, 9, "%sHT", WEDResRef);
 
-	ImageMgr* hm = ( ImageMgr* ) gamedata->GetResource( TmpResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> hm(TmpResRef);
 	if (!hm) {
 		printf( "[AREImporter]: No heightmap available.\n" );
 		return false;
 	}
 
 	map->AddTileMap( tm, lm->GetImage(), sr->GetBitmap(), sm ? sm->GetSprite2D() : NULL, hm->GetBitmap() );
-	lm->release();
-	sr->release();
-	if (sm)
-		sm->release();
-	hm->release();
 
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
@@ -882,7 +869,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	if (!core->IsAvailable( IE_CRE_CLASS_ID )) {
 		printf( "[AREImporter]: No Actor Manager Available, skipping actors\n" );
 	} else {
-		ActorMgr* actmgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
+		PluginHolder<ActorMgr> actmgr(IE_CRE_CLASS_ID);
 		for (i = 0; i < ActorCount; i++) {
 			ieVariable DefaultName;
 			ieResRef CreResRef;
@@ -969,7 +956,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ab->RemovalTime = RemovalTime;
 			ab->RefreshEffects(NULL);
 		}
-		actmgr->release();
 	}
 
 	printf( "Loading animations\n" );
@@ -1250,7 +1236,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		Door *door = tm->GetDoor(i);
 		door->SetDoorOpen(door->IsOpen(), false, 0);
 	}
-	tmm->release();
 	return map;
 }
 
@@ -1258,7 +1243,7 @@ void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword Effe
 {
 	unsigned int i;
 
-	EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
+	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
 	eM->Open( ds, true );
 
 	for (i = 0; i < EffectsCount; i++) {
@@ -1268,7 +1253,6 @@ void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword Effe
 		// NOTE: AddEffect() allocates a new effect
 		fxqueue->AddEffect( &fx );
 	}
-	eM->release();
 }
 
 int AREImporter::GetStoredFileSize(Map *map)
@@ -1282,13 +1266,12 @@ int AREImporter::GetStoredFileSize(Map *map)
 	ActorCount = (ieWord) map->GetActorCount(false);
 	headersize += ActorCount * 0x110;
 
-	ActorMgr* am = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
+	PluginHolder<ActorMgr> am(IE_CRE_CLASS_ID);
 	EmbeddedCreOffset = headersize;
 
 	for (i=0;i<ActorCount;i++) {
 		headersize += am->GetStoredFileSize(map->GetActor(i, false) );
 	}
-	am->release();
 
 	InfoPointsOffset = headersize;
 
@@ -1819,7 +1802,7 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 	char filling[120];
 	unsigned int i;
 
-	ActorMgr *am = (ActorMgr *) core->GetInterface( IE_CRE_CLASS_ID );
+	PluginHolder<ActorMgr> am(IE_CRE_CLASS_ID);
 	memset(filling,0,sizeof(filling) );
 	for (i=0;i<ActorCount;i++) {
 		Actor *ac = map->GetActor(i, false);
@@ -1871,7 +1854,6 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 		am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
 	}
-	am->release();
 
 	return 0;
 }

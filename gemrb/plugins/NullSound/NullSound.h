@@ -29,7 +29,7 @@ public:
 	~NullSound(void);
 	bool Init(void);
 	unsigned int Play(const char* ResRef, int XPos = 0, int YPos = 0,  unsigned int flags = GEM_SND_RELATIVE);
-	int CreateStream(SoundMgr*);
+	int CreateStream(Holder<SoundMgr>);
 	bool Play();
 	bool Stop();
 	bool CanPlay();
@@ -45,13 +45,6 @@ public:
 	void SetAmbientStreamVolume(int stream, int gain);
 	void QueueBuffer(int stream, unsigned short bits, int channels,
                 short* memory, int size, int samplerate);
-
-
-public:
-	void release(void)
-	{
-		delete this;
-	}
 
 private:
 	int XPos, YPos;

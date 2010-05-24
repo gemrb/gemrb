@@ -42,11 +42,6 @@ public:
 
 	bool Open(DataStream* stream);
 	virtual int read_samples(short* buffer, int count);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 // WAV files

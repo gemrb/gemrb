@@ -25,6 +25,8 @@
 #include "PluginMgr.h"
 #include "Projectile.h"
 
+class SymbolMgr;
+
 //the number of resrefs in areapro.2da (before the flags field)
 #define AP_RESCNT 5
 
@@ -80,9 +82,9 @@ private:
 	ExplosionEntry *explosions;   //this is the list of explosion resources
 	int explosioncount;
 	// internal function: what is max valid projectile id?
-	unsigned int PrepareSymbols(class SymbolMgr *projlist);
+	unsigned int PrepareSymbols(Holder<SymbolMgr> projlist);
 	// internal function: read projectiles
-	void AddSymbols(class SymbolMgr *projlist);
+	void AddSymbols(Holder<SymbolMgr> projlist);
 	//this method is used internally
 	Projectile *GetProjectile(unsigned int idx);
 	//creates a clone from the cached projectiles

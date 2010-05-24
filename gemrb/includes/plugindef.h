@@ -46,12 +46,19 @@
  * PluginMgr will not load multiple plugins with the same id.
  *
  * @def PLUGIN_CLASS
- * Register a class to be accessed through Interface::GetInterface.
+ * Register a class to be accessed through PluginMgr::GetPlugin
  * @param[in] id Identifier to refer to this class.
  * @param[in] cls Class to register. Must be a descendent of Plugin.
  *
  * PluginMgr will not register multiple classes with the same id, but
  * will report an error and unload the module.
+ *
+ * @def PLUGIN_DRIVER
+ * Register a class to be accessed through PluginMgr::GetDriver.
+ * @param[in] cls Class to register. Must be a descendent of Plugin.
+ * @param[in] name
+ *
+ * PluginMgr will not register multiple classes with the same name.
  *
  * @def PLUGIN_RESOURCE
  * Registers a resource through ResourceManager.
@@ -148,6 +155,9 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version()
 	if (!mgr->RegisterPlugin(id, &CreatePlugin<cls>::func ))\
 		return false;
 
+#define PLUGIN_DRIVER(cls, name)					\
+	mgr->RegisterDriver(&cls::ID, name, &CreatePlugin<cls>::func ); \
+
 #define PLUGIN_RESOURCE(cls, ext)				\
 	mgr->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext);
 
@@ -171,6 +181,9 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version()
 
 #define PLUGIN_CLASS(id, cls)					\
 		PluginMgr::Get()->RegisterPlugin(id, &CreatePlugin<cls>::func ),
+
+#define PLUGIN_DRIVER(cls, name)					\
+		PluginMgr::Get()->RegisterDriver(&cls::ID, name, &CreatePlugin<cls>::func ),
 
 #define PLUGIN_RESOURCE(cls, ext)				\
 		PluginMgr::Get()->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext),

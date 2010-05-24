@@ -70,6 +70,8 @@ enum SpriteBlitFlags {
 
 class GEM_EXPORT Video : public Plugin {
 public:
+	static const TypeID ID;
+public:
 	Video(void);
 	virtual ~Video(void);
 	virtual int Init(void) = 0;

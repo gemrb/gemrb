@@ -34,11 +34,6 @@ public:
 	Sprite2D* GetSprite2D();
 	int GetWidth() { return (int) Width; }
 	int GetHeight() { return (int) Height; }
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

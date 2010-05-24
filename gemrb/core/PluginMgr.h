@@ -36,6 +36,7 @@
 #include <cstring>
 #include <map>
 #include "ResourceDesc.h"
+#include "iless.h"
 
 #ifdef WIN32
 typedef HINSTANCE LibHandle;
@@ -79,6 +80,8 @@ private:
 	std::vector<void (*)(void)> intializerFunctions;
 	/** Array of cleanup functions */
 	std::vector<void (*)(void)> cleanupFunctions;
+	typedef std::map<const char*, PluginFunc, iless> driver_map;
+	std::map<const TypeID*, driver_map> drivers;
 public:
 	/** Return names of all *.so or *.dll files in the given directory */
 	bool FindFiles( char* path, std::list< char* > &files);
@@ -123,6 +126,25 @@ public:
 	void RunInitializers();
 	/** Run cleanup functions */
 	void RunCleanup();
+
+	/**
+	 * Registers a driver plugin
+	 *
+	 * @param[in] type Base class for driver.
+	 * @param[in] name Name of driver.
+	 * @param[in] create Function to create instance of plugin.
+	 */
+	bool RegisterDriver(const TypeID* type, const char* name, PluginFunc create);
+
+	/**
+	 * Gets driver of specified type.
+	 *
+	 * @param[in] type Base class for driver.
+	 * @param[in] name Name of driver.
+	 *
+	 * Tries to get driver associated to name, or falls back to a random one.
+	 */
+	Plugin* GetDriver(const TypeID* type, const char* name);
 };
 
 #endif

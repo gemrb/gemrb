@@ -27,12 +27,14 @@
 #include "Video.h"
 #include "ImageWriter.h"
 #include "ImageMgr.h"
+#include "GameData.h" // For ResourceHolder
+#include "iless.h"
 #include <set>
 #include <algorithm>
 #include <iterator>
 #include <cassert>
 
-TypeID SaveGame::ID = { "SaveGame" };
+const TypeID SaveGame::ID = { "SaveGame" };
 
 /** Extract date from save game ds into Date. */
 static void ParseGameDate(DataStream *ds, char *Date)
@@ -111,22 +113,18 @@ Sprite2D* SaveGame::GetPortrait(int index)
 	}
 	char nPath[_MAX_PATH];
 	sprintf( nPath, "PORTRT%d", index );
-	ImageMgr *im = (ImageMgr*) manager.GetResource(nPath, &ImageMgr::ID, true);
+	ResourceHolder<ImageMgr> im(nPath, manager, true);
 	if (!im)
 		return NULL;
-	Sprite2D *portrait = im->GetSprite2D();
-	im->release();
-	return portrait;
+	return im->GetSprite2D();
 }
 
 Sprite2D* SaveGame::GetPreview()
 {
-	ImageMgr *im = (ImageMgr*) manager.GetResource(Prefix, &ImageMgr::ID, true);
+	ResourceHolder<ImageMgr> im(Prefix, manager, true);
 	if (!im)
 		return NULL;
-	Sprite2D *preview = im->GetSprite2D();
-	im->release();
-	return preview;
+	return im->GetSprite2D();
 }
 
 DataStream* SaveGame::GetGame()
@@ -253,13 +251,6 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 
 	return true;
 }
-
-struct iless {
-	bool operator () (const char *lhs, const char* rhs)
-	{
-		return stricmp(lhs, rhs) < 0;
-	}
-};
 
 bool SaveGameIterator::RescanSaveGames()
 {
@@ -416,7 +407,7 @@ static bool DoSaveGame(const char *Path)
 		return false;
 	}
 
-	ImageWriter *im = (ImageWriter *) core->GetInterface( PLUGIN_IMAGE_WRITER_BMP );
+	PluginHolder<ImageWriter> im(PLUGIN_IMAGE_WRITER_BMP);
 	if (!im) {
 		printMessage( "SaveGameIterator", "Couldn't create the BMPWriter!\n", LIGHT_RED );
 		return false;
@@ -440,7 +431,6 @@ static bool DoSaveGame(const char *Path)
 	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
 	im->PutImage( &outfile, preview );
 
-	im->release();
 	return true;
 }
 

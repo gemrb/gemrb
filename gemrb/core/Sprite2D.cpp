@@ -23,7 +23,7 @@
 #include "Video.h"
 #include "Interface.h"
 
-TypeID Sprite2D::ID = { "Sprite2D" };
+const TypeID Sprite2D::ID = { "Sprite2D" };
 
 Sprite2D::Sprite2D()
 {

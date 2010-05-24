@@ -205,11 +205,6 @@ public:
 		const float Default);
 	bool GetKeyAsBool(const char* Tag, const char* Key, 
 		const bool Default);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

@@ -27,15 +27,15 @@
 #define INTERFACE_H
 
 //skip messy warnings in MSVC6
-#ifdef WIN32
-#pragma warning(disable:4786)
-#endif
+#include "win32def.h"
 
 #include "exports.h"
 #include <map>
+#include <string>
 #include "SClassID.h"
 #include "Cache.h"
 #include "GlobalTimer.h"
+#include "Holder.h"
 
 class Audio;
 class Video;
@@ -76,14 +76,12 @@ class Control;
 class Palette;
 class ProjectileServer;
 class Calendar;
-class Plugin;
 class Image;
 class SaveGame;
 
 struct Symbol {
-	SymbolMgr * sm;
+	Holder<SymbolMgr> sm;
 	char ResRef[8];
-	bool free;
 };
 
 struct SlotType {
@@ -242,30 +240,32 @@ enum PluginFlagsType {
 class GEM_EXPORT Interface
 {
 private:
-	Video * video;
-	Audio * AudioDriver ;
+	Holder<Video> video;
+	Holder<Audio> AudioDriver;
+	std::string VideoDriverName;
+	std::string AudioDriverName;
 	ProjectileServer * projserv;
 	Image * pal256;
 	Image * pal32;
 	Image * pal16;
 	std::vector<Font*> fonts;
 	EventMgr * evntmgr;
-	WindowMgr * windowmgr;
+	Holder<WindowMgr> windowmgr;
 	Window* ModalWindow;
 	char WindowPack[10];
-	ScriptEngine * guiscript;
+	Holder<ScriptEngine> guiscript;
 	SaveGameIterator *sgiterator;
 	/** Windows Array */
 	std::vector<Window*> windows;
 	std::vector<int> topwin;
 	Variables * vars;
 	Variables * tokens;
-	MusicMgr * music;
+	Holder<MusicMgr> music;
 	std::vector<Symbol> symbols;
-	DataFileMgr * INIparty;
-	DataFileMgr * INIbeasts;
-	DataFileMgr * INIquests;
-	DataFileMgr * INIresdata;
+	Holder<DataFileMgr> INIparty;
+	Holder<DataFileMgr> INIbeasts;
+	Holder<DataFileMgr> INIquests;
+	Holder<DataFileMgr> INIresdata;
 	Game * game;
 	Calendar * calendar;
 	WorldMapArray* worldmap;
@@ -308,7 +308,7 @@ private:
 	/** Next Script Name */
 	char NextScript[64];
 public:
-	StringMgr *strings;
+	Holder<StringMgr> strings;
 	GlobalTimer * timer;
 	Palette *InfoTextPalette;
 	int SaveAsOriginal; //if true, saves files in compatible mode
@@ -342,7 +342,6 @@ public:
 	/* don't rely on the exact return value of this function */
 	ieDword HasFeature(int position) const;
 	bool IsAvailable(SClass_ID filetype) const;
-	void * GetInterface(SClass_ID filetype) const;
 	const char * TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const;
 	Video * GetVideoDriver() const;
@@ -458,7 +457,7 @@ public:
 	/** Gets the index of a loaded Symbol Table, returns -1 on error */
 	int GetSymbolIndex(const char * ResRef) const;
 	/** Gets a Loaded Symbol Table by its index, returns NULL on error */
-	SymbolMgr * GetSymbol(unsigned int index) const;
+	Holder<SymbolMgr> GetSymbol(unsigned int index) const;
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */
 	bool DelSymbol(unsigned int index);
 	/** Plays a Movie */
@@ -484,19 +483,19 @@ public:
 	/** Get the Party INI Interpreter */
 	DataFileMgr * GetPartyINI() const
 	{
-		return INIparty;
+		return INIparty.get();
 	}
 	DataFileMgr * GetBeastsINI() const
 	{
-		return INIbeasts;
+		return INIbeasts.get();
 	}
 	DataFileMgr * GetQuestsINI() const
 	{
-		return INIquests;
+		return INIquests.get();
 	}
 	DataFileMgr * GetResDataINI() const
 	{
-		return INIresdata;
+		return INIresdata.get();
 	}
 	/** Gets the Game class */
 	Game * GetGame() const
@@ -747,9 +746,7 @@ public:
 	/** The Console Object */
 	Console * console;
 
-	Audio* GetAudioDrv(void) {
-		return AudioDriver;
-	}
+	Audio* GetAudioDrv(void) const;
 
 #ifdef _DEBUG
 	int FileStreamPtrCount;
@@ -758,8 +755,5 @@ public:
 };
 
 extern GEM_EXPORT Interface * core;
-#ifdef WIN32
-extern GEM_EXPORT HANDLE hConsole;
-#endif
 
 #endif

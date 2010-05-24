@@ -61,11 +61,6 @@ public:
 	/* returns resource */
 	DataStream* GetResource(const char* resname, SClass_ID type);
 	DataStream* GetResource(const char* resname, const ResourceDesc &type);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

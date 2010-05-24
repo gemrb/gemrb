@@ -222,7 +222,7 @@ static void ReadItemSounds()
 		ItemSounds = NULL;
 		return;
 	}
-	TableMgr *tab = gamedata->GetTable( table );
+	Holder<TableMgr> tab = gamedata->GetTable( table );
 	ItemSoundsCount = tab->GetRowCount();
 	ItemSounds = (ResRefPairs *) malloc( sizeof(ResRefPairs)*ItemSoundsCount);
 	for (int i = 0; i < ItemSoundsCount; i++) {
@@ -626,7 +626,6 @@ static PyObject* GemRB_LoadWindowObject(PyObject * self, PyObject* args)
 	PyObject* wintuple = PyTuple_New(1);
 	PyTuple_SET_ITEM(wintuple, 0, win);
 
-	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
 	PyObject* ret = gs->ConstructObject("Window", wintuple);
 	Py_DECREF(wintuple);
 	if (!ret) {
@@ -704,21 +703,19 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 			return AttributeError( GemRB_LoadWindowFrame__doc );
 		}
 
-		ImageMgr* im = ( ImageMgr* ) gamedata->GetResource( ResRef[i], &ImageMgr::ID );
+		ResourceHolder<ImageMgr> im(ResRef[i]);
 		if (im == NULL) {
 			return NULL;
 		}
 
 		Sprite2D* Picture = im->GetSprite2D();
 		if (Picture == NULL) {
-			im->release();
 			return NULL;
 		}
 
 		// FIXME: delete previous WindowFrames
 		//core->WindowFrames[i] = Picture;
 		core->SetWindowFrame(i, Picture);
-		im->release();
 	}
 
 	Py_INCREF( Py_None );
@@ -762,10 +759,9 @@ static PyObject* GemRB_Window_SetPicture(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!\n");
 	}
 
-	ImageMgr* mos = ( ImageMgr* ) gamedata->GetResource( MosResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> mos(MosResRef);
 	if (mos != NULL) {
 		win->SetBackGround( mos->GetSprite2D(), true );
-		mos->release();
 	}
 	win->Invalidate();
 
@@ -878,7 +874,6 @@ static PyObject* GemRB_LoadTableObject(PyObject * self, PyObject* args)
 	PyObject* tabtuple = PyTuple_New(1);
 	PyTuple_SET_ITEM(tabtuple, 0, table);
 
-	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
 	PyObject* ret = gs->ConstructObject("Table", tabtuple);
 	Py_DECREF(tabtuple);
 	if (!ret) {
@@ -958,7 +953,7 @@ static PyObject* GemRB_Table_GetValue(PyObject * /*self*/, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
-	TableMgr* tm = gamedata->GetTable( TableIndex );
+	Holder<TableMgr> tm = gamedata->GetTable( TableIndex );
 	if (!tm) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1006,7 +1001,7 @@ static PyObject* GemRB_Table_FindValue(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_FindValue__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1026,7 +1021,7 @@ static PyObject* GemRB_Table_GetRowIndex(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_GetRowIndex__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1047,7 +1042,7 @@ static PyObject* GemRB_Table_GetRowName(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_GetRowName__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1072,7 +1067,7 @@ static PyObject* GemRB_Table_GetColumnIndex(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_GetColumnIndex__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1093,7 +1088,7 @@ static PyObject* GemRB_Table_GetColumnName(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_GetColumnName__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1117,7 +1112,7 @@ static PyObject* GemRB_Table_GetRowCount(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_GetRowCount__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1138,7 +1133,7 @@ static PyObject* GemRB_Table_GetColumnCount(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Table_GetColumnCount__doc );
 	}
 
-	TableMgr* tm = gamedata->GetTable( ti );
+	Holder<TableMgr> tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1203,7 +1198,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
 		long SymbolIndex = PyInt_AsLong( si );
 		if (PyObject_TypeCheck( sym, &PyString_Type )) {
 			char* syms = PyString_AsString( sym );
-			SymbolMgr* sm = core->GetSymbol( SymbolIndex );
+			Holder<SymbolMgr> sm = core->GetSymbol( SymbolIndex );
 			if (!sm)
 				return NULL;
 			long val = sm->GetValue( syms );
@@ -1211,7 +1206,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
 		}
 		if (PyObject_TypeCheck( sym, &PyInt_Type )) {
 			long symi = PyInt_AsLong( sym );
-			SymbolMgr* sm = core->GetSymbol( SymbolIndex );
+			Holder<SymbolMgr> sm = core->GetSymbol( SymbolIndex );
 			if (!sm)
 				return NULL;
 			const char* str = sm->GetValue( symi );
@@ -1294,7 +1289,6 @@ static PyObject* GemRB_Window_GetControl(PyObject * self, PyObject* args)
 	default:
 		break;
 	}
-	GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
 	ret = gs->ConstructObject(type, ctrltuple);
 	Py_DECREF(ctrltuple);
 
@@ -2678,15 +2672,13 @@ static PyObject* GemRB_Window_CreateMapControl(PyObject * /*self*/, PyObject* ar
 		CtrlIndex = core->GetControl( WindowIndex, LabelID );
 		Control *lc = win->GetControl( CtrlIndex );
 		map->LinkedLabel = lc;
-		ImageMgr *anim = ( ImageMgr* ) gamedata->GetResource( Flag, &ImageMgr::ID );
+		ResourceHolder<ImageMgr> anim(Flag);
 		if (anim) {
 			map->Flag[0] = anim->GetSprite2D();
-			anim->release();
 		}
-		anim = ( ImageMgr* ) gamedata->GetResource( Flag2, &ImageMgr::ID );
-		if (anim) {
-			map->Flag[1] = anim->GetSprite2D();
-			anim->release();
+		ResourceHolder<ImageMgr> anim2(Flag2);
+		if (anim2) {
+			map->Flag[1] = anim2->GetSprite2D();
 		}
 		goto setup_done;
 	}
@@ -3191,20 +3183,17 @@ static PyObject* GemRB_Button_SetMOS(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	ImageMgr* im = ( ImageMgr* ) gamedata->GetResource( ResRef, &ImageMgr::ID );
+	ResourceHolder<ImageMgr> im(ResRef);
 	if (im == NULL) {
 		return NULL;
 	}
 
 	Sprite2D* Picture = im->GetSprite2D();
 	if (Picture == NULL) {
-		im->release();
 		return NULL;
 	}
 
 	btn->SetPicture( Picture );
-
-	im->release();
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3243,7 +3232,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 	Sprite2D *Picture;
 	Sprite2D *Picture2=NULL;
 
-	PalettedImageMgr* im = ( PalettedImageMgr* ) gamedata->GetResource( ResRef, &PalettedImageMgr::ID );
+	ResourceHolder<PalettedImageMgr> im(ResRef);
 
 	if (im == NULL ) {
 		AnimationFactory* af = ( AnimationFactory* )
@@ -3268,7 +3257,6 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 		}
 	} else {
 		Picture = im->GetSprite2D(type, col);
-		im->release();
 		if (Picture == NULL) {
 			printf ("Picture == NULL\n");
 			return NULL;
@@ -4069,7 +4057,7 @@ void ReadReputation()
 		memset(ReputationDonation,0,sizeof(ReputationDonation) );
 		return;
 	}
-	TableMgr *tab = gamedata->GetTable( table );
+	Holder<TableMgr> tab = gamedata->GetTable( table );
 	for (int i = 0; i < 20; i++) {
 		ReputationIncrease[i] = atoi( tab->QueryField(i,4) );
 		ReputationDonation[i] = atoi( tab->QueryField(i,8) );
@@ -4980,7 +4968,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		MyActor->SetPortrait( Portrait2, 2);
 	}
 	int mastertable = gamedata->LoadTable( "avprefix" );
-	TableMgr* mtm = gamedata->GetTable( mastertable );
+	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
 	int count = mtm->GetRowCount();
 	if (count< 1 || count>8) {
 		return RuntimeError("Table is invalid." );
@@ -4990,7 +4978,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	for (int i = 1; i < count; i++) {
 		poi = mtm->QueryField( i );
 		int table = gamedata->LoadTable( poi );
-		TableMgr* tm = gamedata->GetTable( table );
+		Holder<TableMgr> tm = gamedata->GetTable( table );
 		int StatID = atoi( tm->QueryField() );
 		StatID = MyActor->GetBase( StatID );
 		poi = tm->QueryField( StatID );
@@ -5907,7 +5895,7 @@ static void ReadSpecialSpells()
 	SpecialSpellsCount = 0;
 	int table = gamedata->LoadTable("splspec");
 	if (table>=0) {
-		TableMgr *tab = gamedata->GetTable(table);
+		Holder<TableMgr> tab = gamedata->GetTable(table);
 		if (!tab) goto table_loaded;
 		SpecialSpellsCount = tab->GetRowCount();
 		SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
@@ -5961,7 +5949,7 @@ static void ReadUsedItems()
 	UsedItemsCount = 0;
 	int table = gamedata->LoadTable("item_use");
 	if (table>=0) {
-		TableMgr *tab = gamedata->GetTable(table);
+		Holder<TableMgr> tab = gamedata->GetTable(table);
 		if (!tab) goto table_loaded;
 		UsedItemsCount = tab->GetRowCount();
 		UsedItems = (UsedItemType *) malloc( sizeof(UsedItemType) * UsedItemsCount);
@@ -5983,7 +5971,7 @@ static void ReadSpecialItems()
 	SpecialItemsCount = 0;
 	int table = gamedata->LoadTable("itemspec");
 	if (table>=0) {
-		TableMgr *tab = gamedata->GetTable(table);
+		Holder<TableMgr> tab = gamedata->GetTable(table);
 		if (!tab) goto table_loaded;
 		SpecialItemsCount = tab->GetRowCount();
 		SpecialItems = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialItemsCount);
@@ -6005,7 +5993,7 @@ static ieStrRef GetSpellDesc(ieResRef CureResRef)
 		StoreSpellsCount = 0;
 		int table = gamedata->LoadTable("speldesc");
 		if (table>=0) {
-			TableMgr *tab = gamedata->GetTable(table);
+			Holder<TableMgr> tab = gamedata->GetTable(table);
 			if (!tab) goto table_loaded;
 			StoreSpellsCount = tab->GetRowCount();
 			StoreSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * StoreSpellsCount);
@@ -7539,9 +7527,6 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 			PyTuple_SetItem( param, i-2, PyInt_FromLong( v[i] ) );
 		}
 
-		//conversion is needed, because the interface is more generic
-		GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
-
 		PyObject *pValue = gs->CallbackFunction(fname, param);
 
 		/* we created this parameter, now we don't need it*/
@@ -7685,7 +7670,7 @@ static void ReadActionButtons()
 	if (table<0) {
 		return;
 	}
-	TableMgr *tab = gamedata->GetTable( table );
+	Holder<TableMgr> tab = gamedata->GetTable( table );
 	for (i = 0; i < MAX_ACT_COUNT; i++) {
 		packtype row;
 
@@ -9484,6 +9469,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 
 GUIScript::GUIScript(void)
 {
+	gs = this;
 	pDict = NULL; //borrowed, but used outside a function
 	pModule = NULL; //should decref it
 	pMainDic = NULL; //borrowed, but used outside a function

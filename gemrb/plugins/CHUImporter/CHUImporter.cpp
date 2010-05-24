@@ -101,11 +101,9 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 
 	Window* win = new Window( WindowID, XPos, YPos, Width, Height );
 	if (BackGround == 1) {
-		ImageMgr* mos = ( ImageMgr* )
-			gamedata->GetResource( MosFile, &ImageMgr::ID );
+		ResourceHolder<ImageMgr> mos(MosFile);
 		if (mos != NULL) {
 			win->SetBackGround( mos->GetSprite2D(), true );
-			mos->release();
 		} else
 			printMessage( "CHUImporter","Cannot Load BackGround, skipping\n",YELLOW );
 	}
@@ -228,16 +226,12 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				Sprite2D* img = NULL;
 				Sprite2D* img2 = NULL;
 				if ( MOSFile[0] ) {
-					ImageMgr* mos = ( ImageMgr* )
-						gamedata->GetResource( MOSFile, &ImageMgr::ID );
+					ResourceHolder<ImageMgr> mos(MOSFile);
 					img = mos->GetSprite2D();
-					mos->release();
 				}
 				if ( MOSFile2[0] ) {
-					ImageMgr* mos = ( ImageMgr* )
-						gamedata->GetResource( MOSFile2, &ImageMgr::ID );
+					ResourceHolder<ImageMgr> mos(MOSFile2);
 					img2 = mos->GetSprite2D();
-					mos->release();
 				}
 				
 				pbar->SetImage( img, img2 );
@@ -249,11 +243,9 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 						pbar->SetAnimation(af->GetCycle( Cycle & 0xff ) );
 				}
 				else {
-					ImageMgr* mos = ( ImageMgr* )
-						gamedata->GetResource( BAMFile, &ImageMgr::ID );
+					ResourceHolder<ImageMgr> mos(BAMFile);
 					Sprite2D* img3 = mos->GetSprite2D();
 					pbar->SetBarCap( img3 );
-					mos->release();
 				}
 				win->AddControl( pbar );
 			}
@@ -280,11 +272,9 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				sldr->ControlType = ControlType;
 				sldr->Width = Width;
 				sldr->Height = Height;
-				ImageMgr* mos = ( ImageMgr* )
-					gamedata->GetResource( MOSFile, &ImageMgr::ID );
+				ResourceHolder<ImageMgr> mos(MOSFile);
 				Sprite2D* img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
-				mos->release();
 
 				AnimationFactory* bam = ( AnimationFactory* )
 					gamedata->GetFactoryResource( BAMFile,
@@ -333,12 +323,10 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					cursor = bam->GetFrame( CurCycle, CurFrame );
 	      }
 
-				ImageMgr* mos = ( ImageMgr* )
-					gamedata->GetResource( BGMos, &ImageMgr::ID );
+				ResourceHolder<ImageMgr> mos(BGMos);
 				Sprite2D *img = NULL;
 				if(mos) {
 					img = mos->GetSprite2D();
-					mos->release();
 				}
 
 				TextEdit* te = new TextEdit( maxInput, PosX, PosY );

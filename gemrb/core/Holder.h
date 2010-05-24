@@ -21,6 +21,8 @@
 #ifndef HOLDER_H
 #define HOLDER_H
 
+#include <cstddef>
+
 template <class T>
 class Held {
 public:

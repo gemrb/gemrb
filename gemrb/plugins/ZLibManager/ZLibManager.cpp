@@ -143,5 +143,5 @@ int ZLibManager::Compress(DataStream* dest, DataStream* source)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x2477C688, "ZLib Compression Manager")
-PLUGIN_CLASS(IE_COMPRESSION_CLASS_ID, ZLibManager)
+PLUGIN_CLASS(PLUGIN_COMPRESSION_ZLIB, ZLibManager)
 END_PLUGIN()

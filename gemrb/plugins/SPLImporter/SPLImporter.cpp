@@ -172,13 +172,12 @@ void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 
 void SPLImporter::GetFeature(Spell *s, Effect *fx)
 {
-	EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
+	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
 	eM->Open( str, false );
 	eM->GetEffect( fx );
 	memcpy(fx->Source, s->Name, 9);
 	fx->PrimaryType = s->PrimaryType;
 	fx->SecondaryType = s->SecondaryType;
-	eM->release();
 }
 
 #include "plugindef.h"

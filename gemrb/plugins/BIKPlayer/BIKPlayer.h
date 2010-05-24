@@ -122,8 +122,8 @@ typedef struct Bundle {
 } Bundle;
 
 class BIKPlayer : public MoviePlayer {
-
 private:
+	Video *video;
 	bool validVideo;
 	binkheader header;
 	std::vector<binkframe> frames;
@@ -225,12 +225,6 @@ public:
 	bool Open(DataStream* stream);
 	void CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2);
 	int Play();	
-
-public:
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

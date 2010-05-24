@@ -166,10 +166,6 @@ public:
 	long GetPixel(void *data, unsigned short x, unsigned short y);
 	void SetGamma(int brightness, int contrast);
 	void SetMouseScrollSpeed(int speed);
-	void release(void)
-	{
-		delete this;
-	}
 };
 
 #endif

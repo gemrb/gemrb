@@ -241,10 +241,9 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 
 void ITMImporter::GetFeature(Effect *fx)
 {
-	EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
+	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
 	eM->Open( str, false );
 	eM->GetEffect( fx );
-	eM->release();
 }
 
 #include "plugindef.h"

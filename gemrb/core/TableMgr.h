@@ -83,11 +83,11 @@ public:
 	operator bool() const { return table != 0; }
 
 	const TableMgr& operator*() const { return *table; }
-	const TableMgr* operator->() const { return table; }
-	const TableMgr* ptr() const { return table; }
+	const TableMgr* operator->() const { return &*table; }
+	const TableMgr* ptr() const { return &*table; }
 
 private:
-	TableMgr* table;
+	Holder<TableMgr> table;
 	unsigned int tableref;
 };
 

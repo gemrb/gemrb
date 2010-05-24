@@ -68,11 +68,6 @@ public:
 	int GetStoredFileSize(Actor *ac);
 	//saves file
 	int PutActor(DataStream *stream, Actor *actor, bool chr=false);
-public:
-	void release(void)
-	{
-		delete this;
-	}
 private:
 	/** sets up some variables based on creature version for serializing the object */
 	void SetupSlotCounts();

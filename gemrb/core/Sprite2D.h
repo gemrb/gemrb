@@ -58,7 +58,7 @@ public:
 
 class GEM_EXPORT Sprite2D {
 public:
-	static TypeID ID;
+	static const TypeID ID;
 public:
 	/** Pointer to the Driver Video Structure */
 	void* vptr;
