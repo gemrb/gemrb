@@ -79,8 +79,8 @@ public:
 
 	bool load(const char* ResRef);
 	void release();
-	bool ok() const { return table != 0; }
-	operator bool() const { return table != 0; }
+	bool ok() const { return table; }
+	operator bool() const { return table; }
 
 	const TableMgr& operator*() const { return *table; }
 	const TableMgr* operator->() const { return &*table; }

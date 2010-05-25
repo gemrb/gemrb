@@ -69,6 +69,7 @@ extern GEM_EXPORT HANDLE hConsole;
 #ifndef HAVE_SNPRINTF
 # ifdef WIN32
 #  define snprintf _snprintf
+#  define HAVE_SNPRINTF
 # else
 #  include "snprintf.h"
 # endif
