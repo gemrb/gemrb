@@ -144,7 +144,7 @@ def SetupSavingThrows (pc, Level=None):
 
 		#add racial bonuses if applicable (small pc's)
 		if RaceSaveTable:
-			CurrentSave += RaceSaveTable.GetValue (row, Con)
+			CurrentSave -= RaceSaveTable.GetValue (row, Con)
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, CurrentSave)
 	return
 
