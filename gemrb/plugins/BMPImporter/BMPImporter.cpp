@@ -264,7 +264,8 @@ Bitmap* BMPImporter::GetBitmap()
 	unsigned char *p = ( unsigned char * ) pixels;
 	switch (BitCount) {
 	case 8:
-		for (unsigned int y = 0; y < Height; y++) {
+		unsigned int y;
+		for (y = 0; y < Height; y++) {
 			for (unsigned int x = 0; x < Width; x++) {
 				data->SetAt(x,y,p[y*Width + x]);
 			}
@@ -274,7 +275,7 @@ Bitmap* BMPImporter::GetBitmap()
 		printMessage("BMPImporter", "Don't know how to handle 24bit bitmap from ", WHITE);
 		printf( "%s...", str->filename );
 		printStatus( "ERROR", LIGHT_RED );
-		for (unsigned int y = 0; y < Height; y++) {
+		for (y = 0; y < Height; y++) {
 			for (unsigned int x = 0; x < Width; x++) {
 				data->SetAt(x,y,p[3*(y*Width + x)]);
 			}
