@@ -107,6 +107,7 @@ struct ModalStatesStruct {
 	unsigned int entering_str;
 	unsigned int leaving_str;
 	unsigned int failed_str;
+	bool aoe_spell;
 };
 
 class ItemList {

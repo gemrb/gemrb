@@ -4265,7 +4265,11 @@ void Actor::UpdateActorState(ieDword gameTime) {
 			ModalSpell[0]='*';
 		} else if(ModalSpell[0]!='*') {
 			if (ModalSpellSkillCheck()) {
-				core->ApplySpell(ModalSpell, this, this, 0);
+				if (core->ModalStates[ModalState].aoe_spell) {
+					core->ApplySpellPoint(ModalSpell, GetCurrentArea(), Pos, this, 0);
+				} else {
+					core->ApplySpell(ModalSpell, this, this, 0);
+				}
 				if (InParty) {
 					core->DisplayStringName(core->ModalStates[ModalState].entering_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
