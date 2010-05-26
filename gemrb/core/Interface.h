@@ -37,6 +37,16 @@
 #include "GlobalTimer.h"
 #include "Holder.h"
 
+#ifdef _MSC_VER // No SFINAE
+#include "Audio.h"
+#include "DataFileMgr.h"
+#include "MusicMgr.h"
+#include "ScriptEngine.h"
+#include "StringMgr.h"
+#include "SymbolMgr.h"
+#include "Video.h"
+#endif
+
 class Audio;
 class Video;
 class Resource;
