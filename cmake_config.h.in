@@ -10,3 +10,6 @@
 #endif
 #cmakedefine HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1
 #cmakedefine HAS_VORBIS_SUPPORT 1
+#define PLUGIN_DIR "${PLUGIN_DIR}"
+#define DATA_DIR "${DATA_DIR}"
+#define SYSCONF_DIR "${SYSCONF_DIR}"
