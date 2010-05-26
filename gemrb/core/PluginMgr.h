@@ -65,6 +65,7 @@ public:
 	void LoadPlugins(char* pluginpath);
 private:
 	PluginMgr();
+public: // HACK: MSVC6 is buggy.
 	~PluginMgr(void);
 private:
 	struct PluginDesc {
