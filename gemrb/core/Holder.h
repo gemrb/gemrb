@@ -77,7 +77,12 @@ public:
 	T* operator->() const { return ptr; }
 	bool operator!() const { return !ptr; }
 	// Copied from boost/smart_ptr/detail/operator_bool.hpp
+#ifndef _MSC_VER
 	operator T* Holder<T>::*() const { return ptr == NULL ? NULL : &Holder<T>::ptr; }
+#else // MSVC6
+	// FIXME: Figure out what version doesn't need this hack.
+	operator bool() const { return ptr != NULL; }
+#endif
 	T* get() const { return ptr; }
 	void release() {
 		if (ptr)
