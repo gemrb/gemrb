@@ -1024,7 +1024,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		if( fx->IsSaveForHalfDamage) {
 			fx->Parameter1/=2;
 		} else {
-			printf ("effect saved: %s\n", (char*) effect_refs[fx->Opcode].Name);
+			printf ("%s saved against effect: %s\n", actor->GetName(1), (char*) effect_refs[fx->Opcode].Name);
 			return true;
 		}
 	}
