@@ -1659,7 +1659,7 @@ int Interface::Init()
 		printStatus( "OK", LIGHT_GREEN );
 	}
 
-	printMessage( "Core", "Reading modal states table...", WHITE);
+	printMessage( "Core", "Reading game script tables...", WHITE);
 	InitializeIEScript();
 	printStatus( "OK", LIGHT_GREEN );
 
