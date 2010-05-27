@@ -198,7 +198,7 @@ int fx_morale_break_modifier (Scriptable* Owner, Actor* target, Effect* fx);//6a
 int fx_portrait_change (Scriptable* Owner, Actor* target, Effect* fx);//6b
 int fx_reputation_modifier (Scriptable* Owner, Actor* target, Effect* fx);//6c
 int fx_hold_creature_no_icon (Scriptable* Owner, Actor* target, Effect* fx);//6d
-int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx);//6e (unknown)
+//int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx);//6e reused
 int fx_create_magic_item (Scriptable* Owner, Actor* target, Effect* fx);//6f
 int fx_remove_item (Scriptable* Owner, Actor* target, Effect* fx);//70
 int fx_equip_item (Scriptable* Owner, Actor* target, Effect* fx);//71
@@ -651,7 +651,6 @@ static EffectRef effectnames[] = {
 	{ "Protection:Weapons", fx_immune_to_weapon, -1},
 	{ "PuppetMarker", fx_puppet_marker, -1},
 	{ "ProjectImage", fx_puppet_master, -1},
-	{ "RetreatFrom", fx_retreat_from, -1 },
 	{ "Reveal:Area", fx_reveal_area, -1 },
 	{ "Reveal:Creatures", fx_reveal_creatures, -1 },
 	{ "Reveal:Magic", fx_reveal_magic, -1 },
@@ -2863,37 +2862,7 @@ int fx_reputation_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x6d --> see later
 
-// 0x6e
-//retreat_from (works in PST) - forces target to run away/walk away from Owner
-int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx)
-{
-	if (0) printf( "fx_retreat_from (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-
-	if (!Owner) {
-		return FX_NOT_APPLIED;
-	}
-
-	//distance to run
-	if (!fx->Parameter3) {
-		fx->Parameter3=100;
-	}
-
-	if (fx->Parameter2==8) {
-		//backs away from owner
-		target->RunAwayFrom(Owner->Pos, fx->Parameter3, false);
-		//one shot
-		return FX_NOT_APPLIED;
-	}
-
-	//walks (7) or runs away (all others) from owner
-	target->RunAwayFrom(Owner->Pos, fx->Parameter3, true);
-	if (fx->Parameter2!=7) {
-		target->SetRunFlags(IF_RUNNING);
-	}
-
-	//has a duration
-	return FX_APPLIED;
-}
+// 0x6e works only in PST, reused for turning undead
 
 // 0x6f Item:CreateMagic
 

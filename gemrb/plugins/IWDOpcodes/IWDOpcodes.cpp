@@ -225,6 +225,7 @@ static EffectRef effectnames[] = {
 	{ "ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, -1}, //0
 	{ "DamageBonusModifier", fx_damage_bonus_modifier, -1 }, //49
 	{ "DrawUponHolyMight", fx_draw_upon_holy_might, -1},//84 (iwd2)
+	{ "RetreatFrom", fx_turn_undead, -1 },//6e
 	{ "IronSkins", fx_ironskins, -1}, //da (iwd2)
 	{ "Color:FadeRGB", fx_fade_rgb, -1}, //e8
 	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, -1}, //e9

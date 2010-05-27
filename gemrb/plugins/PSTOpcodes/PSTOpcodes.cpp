@@ -28,6 +28,7 @@
 #include "TileMap.h"
 #include "GameData.h"
 
+int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx);//6e
 int fx_set_status (Scriptable* Owner, Actor* target, Effect* fx);//ba
 int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx);//bb
 int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx);//bc
@@ -53,6 +54,7 @@ int fx_jumble_curse (Scriptable* Owner, Actor* target, Effect* fx);//d3
 
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectRef effectnames[] = {
+	{ "RetreatFrom", fx_retreat_from, -1 },//6e
 	{ "Bless", fx_bless, -1},//82
 	{ "Curse", fx_curse, -1},//cb
 	{ "DetectEvil", fx_detect_evil, -1}, //d2
@@ -80,6 +82,37 @@ static EffectRef effectnames[] = {
 void RegisterTormentOpcodes()
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
+}
+
+//retreat_from (works only in PST) - forces target to run away/walk away from Owner
+int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_retreat_from (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	if (!Owner) {
+		return FX_NOT_APPLIED;
+	}
+
+	//distance to run
+	if (!fx->Parameter3) {
+		fx->Parameter3=100;
+	}
+
+	if (fx->Parameter2==8) {
+		//backs away from owner
+		target->RunAwayFrom(Owner->Pos, fx->Parameter3, false);
+		//one shot
+		return FX_NOT_APPLIED;
+	}
+
+	//walks (7) or runs away (all others) from owner
+	target->RunAwayFrom(Owner->Pos, fx->Parameter3, true);
+	if (fx->Parameter2!=7) {
+		target->SetRunFlags(IF_RUNNING);
+	}
+
+	//has a duration
+	return FX_APPLIED;
 }
 
 //0xba fx_set_status
