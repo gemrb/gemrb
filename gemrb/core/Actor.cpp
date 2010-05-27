@@ -2814,6 +2814,8 @@ int Actor::GetEncumbrance()
 	return inventory.GetWeight();
 }
 
+EffectRef control_undead_ref = { "ControlUndead", NULL, -1};
+
 //receive turning
 void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 {
@@ -2825,10 +2827,17 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 
 	//determine alignment (if equals, then no turning)
 
-	//determine panic or destruction
+	//determine panic or destruction/control
 	//we get the modified level
 	if (turnlevel>GetXPLevel(true)) {
-		Die(cleric);
+		if (cleric->Type == ST_ACTOR && ((Actor*)cleric)->MatchesAlignmentMask(AL_EVIL)) {
+			Effect *fx = fxqueue.CreateEffect(control_undead_ref, GEN_UNDEAD, 4, FX_DURATION_INSTANT_LIMITED);
+			fx->Duration = ROUND_SECONDS;
+			core->ApplyEffect(fx, this, this);
+			delete fx;
+		} else {
+			Die(cleric);
+		}
 	} else {
 		Panic();
 	}
