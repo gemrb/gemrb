@@ -646,5 +646,7 @@ public:
 	bool ModalSpellSkillCheck();
 	/* does all the game logic checks to see if the actor can hide */
 	bool TryToHide();
+	/* checks if the alignment matches one of the masking constants */
+	bool MatchesAlignmentMask(ieDword mask);
 };
 #endif

@@ -2945,7 +2945,7 @@ void Actor::Die(Scriptable *killer)
 			} else if (Modified[IE_CLASS] == CLASS_FLAMINGFIST) {
 				repmod = reputationmod[reputation-1][3];
 			}
-			if (Modified[IE_ALIGNMENT]&AL_EVIL) {
+			if (MatchesAlignmentMask(AL_EVIL)) {
 				repmod += reputationmod[reputation-1][7];
 			}
 			if (repmod) {
@@ -6232,3 +6232,28 @@ bool Actor::TryToHide() {
 	return true;
 }
 
+// only works with masks; use direct comparison for specific alignment checks
+bool Actor::MatchesAlignmentMask(ieDword mask)
+{
+	ieDword stat = Modified[IE_ALIGNMENT];
+
+	switch (mask) {
+		case AL_EVIL:
+			return stat == AL_LAWFUL_EVIL || stat == AL_NEUTRAL_EVIL || stat == AL_CHAOTIC_EVIL;
+		case AL_GE_NEUTRAL:
+			return stat == AL_NEUTRAL_GOOD || stat == AL_TRUE_NEUTRAL || stat == AL_NEUTRAL_EVIL;
+		case AL_GOOD:
+			return stat == AL_LAWFUL_GOOD || stat == AL_NEUTRAL_GOOD || stat == AL_CHAOTIC_GOOD;
+		case AL_CHAOTIC:
+			return stat == AL_CHAOTIC_GOOD || stat == AL_CHAOTIC_NEUTRAL || stat == AL_CHAOTIC_EVIL;
+		case AL_LC_NEUTRAL:
+			return stat == AL_NEUTRAL_GOOD || stat == AL_TRUE_NEUTRAL || stat == AL_NEUTRAL_EVIL;
+		case AL_LAWFUL:
+			return stat == AL_LAWFUL_GOOD || stat == AL_LAWFUL_NEUTRAL || stat == AL_LAWFUL_EVIL;
+		default:
+			printf("Bad mask parameter (%d) used with Actor::MatchesAlignmentMask!\n", mask);
+			assert(false);
+			return false;
+	}
+
+}
