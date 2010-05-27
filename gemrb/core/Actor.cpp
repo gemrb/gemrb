@@ -6193,7 +6193,7 @@ inline void HideFailed(Actor* actor)
 {
 	Effect *newfx;
 	newfx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_LIMITED);
-	newfx->Duration = 6; // 90 ticks, 1 round
+	newfx->Duration = ROUND_SECONDS; // 90 ticks, 1 round
 	core->ApplyEffect(newfx, actor, actor);
 	delete newfx;
 }

@@ -464,9 +464,9 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 		return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, spellres[type].relation);
 	case STI_MORAL_ALIGNMENT:
 		if(Owner && Owner->Type==ST_ACTOR) {
-			return DiffCore( ((Actor *) Owner)->GetStat(IE_ALIGNMENT)&0x3,STAT_GET(IE_ALIGNMENT)&0x3, spellres[type].relation);
+			return DiffCore( ((Actor *) Owner)->GetStat(IE_ALIGNMENT)&AL_GE_MASK,STAT_GET(IE_ALIGNMENT)&AL_GE_MASK, spellres[type].relation);
 		} else {
-			return DiffCore(AL_TRUE_NEUTRAL,STAT_GET(IE_ALIGNMENT)&0x3, spellres[type].relation);
+			return DiffCore(AL_TRUE_NEUTRAL,STAT_GET(IE_ALIGNMENT)&AL_GE_MASK, spellres[type].relation);
 		}
 	case STI_TWO_ROWS:
 		if (check_iwd_targeting(Owner, target, value, idx)) return 0;
