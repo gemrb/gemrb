@@ -2824,6 +2824,9 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 		return;
 	}
 	//determine if we see the cleric (distance)
+	if (!CanSee(cleric, this, true, GA_NO_DEAD)) {
+		return;
+	}
 
 	//determine alignment (if equals, then no turning)
 
