@@ -2823,6 +2823,11 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 	if (Modified[IE_GENERAL]!=GEN_UNDEAD) {
 		return;
 	}
+
+	if (this == cleric) {//HACK: shouldn't be needed
+		return;
+	}
+
 	//determine if we see the cleric (distance)
 	if (!CanSee(cleric, this, true, GA_NO_DEAD)) {
 		return;
@@ -2834,9 +2839,15 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 	//we get the modified level
 	if (turnlevel>GetXPLevel(true)) {
 		if (cleric->Type == ST_ACTOR && ((Actor*)cleric)->MatchesAlignmentMask(AL_EVIL)) {
-			Effect *fx = fxqueue.CreateEffect(control_undead_ref, GEN_UNDEAD, 4, FX_DURATION_INSTANT_LIMITED);
+			Effect *fx = fxqueue.CreateEffect(control_undead_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
+			if (!fx) { // HACK: currently only works in how and iwd2
+				printMessage("Actor","Invalid control undead effect!\n",RED);
+				delete fx;
+				return;
+			}
 			fx->Duration = ROUND_SECONDS;
-			core->ApplyEffect(fx, this, this);
+			fx->Target = FX_TARGET_PRESET;
+			core->ApplyEffect(fx, this, cleric);
 			delete fx;
 		} else {
 			Die(cleric);
