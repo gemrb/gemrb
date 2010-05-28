@@ -138,7 +138,7 @@ typedef int (* EffectFunction)(Scriptable*, Actor*, Effect*);
 struct EffectRef {
 	const char* Name;
 	EffectFunction Function;
-	int EffText; //also opcode in another context
+	int opcode;
 };
 
 /** Initializes table of available spell Effects used by all the queues. */

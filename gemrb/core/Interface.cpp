@@ -1391,11 +1391,18 @@ int Interface::Init()
 	{
 		printMessage( "Core", "Loading Palettes...\n", WHITE );
 		ResourceHolder<ImageMgr> pal16im(Palette16);
-		pal16 = pal16im->GetImage();
+		if (pal16im)
+			pal16 = pal16im->GetImage();
 		ResourceHolder<ImageMgr> pal32im(Palette32);
-		pal32 = pal32im->GetImage();
+		if (pal32im)
+			pal32 = pal32im->GetImage();
 		ResourceHolder<ImageMgr> pal256im(Palette256);
-		pal256 = pal256im->GetImage();
+		if (pal256im)
+			pal256 = pal256im->GetImage();
+		if (!pal16 || !pal32 || !pal256) {
+			printStatus( "ERROR", LIGHT_RED );
+			return GEM_ERROR;
+		}
 		printMessage( "Core", "Palettes Loaded\n", WHITE );
 	}
 

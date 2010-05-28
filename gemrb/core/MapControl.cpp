@@ -192,7 +192,8 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 
 	// we're going to paint over labels/etc, so they need to repaint!
 	bool seen_this = false;
-	for (unsigned int i = 0; i < Owner->GetControlCount(); i++) {
+	unsigned int i;
+	for (i = 0; i < Owner->GetControlCount(); i++) {
 		Control *ctrl = Owner->GetControl(i);
 		if (!ctrl) continue;
 
@@ -223,7 +224,6 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 
 	video->DrawRect( vp, colors[green], false, false );
 
-	int i;
 	// Draw PCs' ellipses
 	Game *game = core->GetGame();
 	i = game->GetPartySize(true);

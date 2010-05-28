@@ -284,7 +284,7 @@ bool SaveGameIterator::RescanSaveGames()
 	} while (( de = readdir( dir ) ) != NULL);
 	closedir( dir ); //No other files in the directory, close it
 
-	std::transform(slots.begin(), slots.end(), back_inserter(save_slots), GetSaveGame);
+	std::transform(slots.begin(), slots.end(), std::back_inserter(save_slots), GetSaveGame);
 	return true;
 }
 

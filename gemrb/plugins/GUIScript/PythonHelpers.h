@@ -62,7 +62,7 @@ public:
 			obj = id;
 		else
 			PyErr_Clear();
-		if (!PyCObject_Check(obj) || PyCObject_GetDesc(obj) != &T::ID) {
+		if (!PyCObject_Check(obj) || PyCObject_GetDesc(obj) != const_cast<TypeID*>(&T::ID)) {
 			printMessage("GUIScript","Bad CObject extracted.\n",LIGHT_RED);
 			return;
 		}
@@ -84,7 +84,7 @@ public:
 private:
 	static void PyRelease(void *obj, void *desc)
 	{
-		if (desc != &T::ID) {
+		if (desc != const_cast<TypeID*>(&T::ID)) {
 			printMessage("GUIScript","Bad CObject deleted.\n",LIGHT_RED);
 			return;
 		}
@@ -97,8 +97,10 @@ PyObject* MakePyList(const Container &source)
 {
 	size_t size = source.size();
 	PyObject *list = PyList_New(size);
-	for (size_t i = 0; i < size; ++i)
-		PyList_SET_ITEM(list, i, CObject<T>(source[i]));
+	for (size_t i = 0; i < size; ++i) {
+		// SET_ITEM might be preferable to SetItem here, but MSVC6 doesn't like it.
+		PyList_SetItem(list, i, CObject<T>(source[i]));
+	}
 	return list;
 }
 

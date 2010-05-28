@@ -22,7 +22,7 @@
 #include "win32def.h" //for stricmp
 
 struct iless {
-	bool operator () (const char *lhs, const char* rhs)
+	bool operator () (const char *lhs, const char* rhs) const
 	{
 		return stricmp(lhs, rhs) < 0;
 	}

@@ -26,6 +26,10 @@
 #include "SClassID.h"
 #include "Holder.h"
 
+#ifdef _MSC_VER // No SFINAE
+#include "ResourceSource.h"
+#endif
+
 class DataStream;
 class Resource;
 class ResourceSource;
