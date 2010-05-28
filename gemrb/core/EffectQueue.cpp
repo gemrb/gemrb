@@ -27,11 +27,16 @@
 #include "Game.h"
 #include "Map.h"
 
-static int initialized = 0;
-static EffectRef *effectnames = NULL;
-static EffectRef effect_refs[MAX_EFFECTS];
+static struct {
+	const char* Name;
+	EffectFunction Function;
+	int Strref;
+} Opcodes[MAX_EFFECTS];
 
-static int opcodes_count = 0;
+static int initialized = 0;
+
+static EffectRef *effectnames = NULL;
+static int effectnames_count = 0;
 
 bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 {
@@ -161,7 +166,7 @@ static EffectRef* FindEffect(const char* effectname)
 	if( !effectname || !effectnames) {
 		return NULL;
 	}
-	void *tmp = bsearch(effectname, effectnames, opcodes_count, sizeof(EffectRef), find_effect);
+	void *tmp = bsearch(effectname, effectnames, effectnames_count, sizeof(EffectRef), find_effect);
 	if( !tmp) {
 		printMessage( "EffectQueue", "", YELLOW);
 		printf("Couldn't assign effect: %s\n", effectname );
@@ -196,13 +201,13 @@ static EffectRef diced_effects2[] = {
 
 inline static void ResolveEffectRef(EffectRef &effect_reference)
 {
-	if( effect_reference.EffText==-1) {
+	if( effect_reference.opcode==-1) {
 		EffectRef* ref = FindEffect(effect_reference.Name);
-		if( ref && ref->EffText>=0) {
-			effect_reference.EffText = ref->EffText;
+		if( ref && ref->opcode>=0) {
+			effect_reference.opcode = ref->opcode;
 			return;
 		}
-		effect_reference.EffText = -2;
+		effect_reference.opcode = -2;
 	}
 }
 
@@ -213,9 +218,9 @@ bool Init_EffectQueue()
 	if( initialized) {
 		return true;
 	}
-	memset( effect_refs, 0, sizeof( effect_refs ) );
+	memset( Opcodes, 0, sizeof( Opcodes ) );
 	for(i=0;i<MAX_EFFECTS;i++) {
-		effect_refs[i].EffText=-1;
+		Opcodes[i].Strref=-1;
 	}
 
 	initialized = 1;
@@ -241,22 +246,22 @@ bool Init_EffectQueue()
 				const char* ret = efftextTable->GetRowName( row );
 				long val;
 				if( valid_number( ret, val ) && (i == val) ) {
-					effect_refs[i].EffText = atoi( efftextTable->QueryField( row, 1 ) );
+					Opcodes[i].Strref = atoi( efftextTable->QueryField( row, 1 ) );
 				}
 			}
 		}
 
 		EffectRef* poi = FindEffect( effectname );
 		if( poi != NULL) {
-			effect_refs[i].Function = poi->Function;
-			effect_refs[i].Name = poi->Name;
+			Opcodes[i].Function = poi->Function;
+			Opcodes[i].Name = poi->Name;
 			//reverse linking opcode number
 			//using this unused field
-			if( (poi->EffText!=-1) && effectname[0]!='*') {
-				printf("Clashing opcodes FN: %d vs. %d, %s\n", i, poi->EffText, effectname);
+			if( (poi->opcode!=-1) && effectname[0]!='*') {
+				printf("Clashing Opcodes FN: %d vs. %d, %s\n", i, poi->opcode, effectname);
 				abort();
 			}
-			poi->EffText = i;
+			poi->opcode = i;
 		}
 		//printf("-------- FN: %d, %s\n", i, effectname);
 	}
@@ -278,7 +283,7 @@ void EffectQueue_ReleaseMemory()
 	if( effectnames) {
 		free (effectnames);
 	}
-	opcodes_count = 0;
+	effectnames_count = 0;
 	effectnames = NULL;
 }
 
@@ -287,16 +292,16 @@ void EffectQueue_RegisterOpcodes(int count, const EffectRef* opcodes)
 	if( ! effectnames) {
 		effectnames = (EffectRef*) malloc( (count+1) * sizeof( EffectRef ) );
 	} else {
-		effectnames = (EffectRef*) realloc( effectnames, (opcodes_count + count + 1) * sizeof( EffectRef ) );
+		effectnames = (EffectRef*) realloc( effectnames, (effectnames_count + count + 1) * sizeof( EffectRef ) );
 	}
 
-	memcpy( effectnames + opcodes_count, opcodes, count * sizeof( EffectRef ));
-	opcodes_count += count;
-	effectnames[opcodes_count].Name = NULL;
+	memcpy( effectnames + effectnames_count, opcodes, count * sizeof( EffectRef ));
+	effectnames_count += count;
+	effectnames[effectnames_count].Name = NULL;
 	//if we merge two effect lists, then we need to sort their effect tables
 	//actually, we might always want to sort this list, so there is no
 	//need to do it manually (sorted table is needed if we use bsearch)
-	qsort(effectnames, opcodes_count, sizeof(EffectRef), compare_effects);
+	qsort(effectnames, effectnames_count, sizeof(EffectRef), compare_effects);
 }
 
 EffectQueue::EffectQueue()
@@ -340,10 +345,10 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *resource) const
 {
 	ResolveEffectRef(effect_reference);
-	if( effect_reference.EffText<0) {
+	if( effect_reference.opcode<0) {
 		return 0;
 	}
-	return CountEffects(effect_reference.EffText, param1, param2, resource);
+	return CountEffects(effect_reference.opcode, param1, param2, resource);
 }
 
 //Change the location of an existing effect
@@ -352,19 +357,19 @@ ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, i
 void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y) const
 {
 	ResolveEffectRef(effect_reference);
-	if( effect_reference.EffText<0) {
+	if( effect_reference.opcode<0) {
 		return;
 	}
-	ModifyEffectPoint(effect_reference.EffText, x, y);
+	ModifyEffectPoint(effect_reference.opcode, x, y);
 }
 
 Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieWord timing)
 {
 	ResolveEffectRef(effect_reference);
-	if( effect_reference.EffText<0) {
+	if( effect_reference.opcode<0) {
 		return NULL;
 	}
-	return CreateEffect(effect_reference.EffText, param1, param2, timing);
+	return CreateEffect(effect_reference.opcode, param1, param2, timing);
 }
 
 //copies the whole effectqueue (area projectiles use it)
@@ -406,10 +411,10 @@ Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword par
 Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2)
 {
 	ResolveEffectRef(effect_reference);
-	if( effect_reference.EffText<0) {
+	if( effect_reference.opcode<0) {
 		return NULL;
 	}
-	return CreateEffectCopy(oldfx, effect_reference.EffText, param1, param2);
+	return CreateEffectCopy(oldfx, effect_reference.opcode, param1, param2);
 }
 
 static EffectRef fx_unsummon_creature_ref={"UnsummonCreature",NULL,-1};
@@ -698,7 +703,7 @@ inline static bool IsDicedEffect(int opcode)
 	int i;
 
 	for(i=0;diced_effects[i].Name;i++) {
-		if( diced_effects[i].EffText==opcode) {
+		if( diced_effects[i].opcode==opcode) {
 			return true;
 		}
 	}
@@ -712,7 +717,7 @@ inline static bool IsDicedEffect2(int opcode)
 	int i;
 
 	for(i=0;diced_effects2[i].Name;i++) {
-		if( diced_effects2[i].EffText==opcode) {
+		if( diced_effects2[i].opcode==opcode) {
 			return true;
 		}
 	}
@@ -976,11 +981,11 @@ static bool check_resistance(Actor* actor, Effect* fx)
 
 	//opcode immunity
 	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
-		printf ("immune to effect: %s\n", (char*) effect_refs[fx->Opcode].Name);
+		printf ("immune to effect: %s\n", (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
 	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
-		printf ("immune2 to effect: %s\n", (char*) effect_refs[fx->Opcode].Name);
+		printf ("immune2 to effect: %s\n", (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
 
@@ -1006,7 +1011,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
 	if( fx->random_value < val) {
-		printf ("effect resisted: %s\n", (char*) effect_refs[fx->Opcode].Name);
+		printf ("effect resisted: %s\n", (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
 
@@ -1024,7 +1029,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		if( fx->IsSaveForHalfDamage) {
 			fx->Parameter1/=2;
 		} else {
-			printf ("effect saved: %s\n", (char*) effect_refs[fx->Opcode].Name);
+			printf ("effect saved: %s\n", (char*) Opcodes[fx->Opcode].Name);
 			return true;
 		}
 	}
@@ -1115,13 +1120,13 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply) con
 
 	EffectFunction fn = 0;
 	if( fx->Opcode<MAX_EFFECTS) {
-		fn = effect_refs[fx->Opcode].Function;
+		fn = Opcodes[fx->Opcode].Function;
 	}
 	int res = FX_ABORT;
 	if( fn) {
 		if(  target && first_apply ) {
 			if( !target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-				core->DisplayStringName( effect_refs[fx->Opcode].EffText, 0xf0f0f0,
+				core->DisplayStringName( Opcodes[fx->Opcode].Strref, 0xf0f0f0,
 					target, IE_STR_SOUND);
 			}
 		}
@@ -1251,10 +1256,10 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed, ieByte timing) const
 void EffectQueue::RemoveAllEffects(EffectRef &effect_reference) const
 {
 	ResolveEffectRef(effect_reference);
-	if( effect_reference.EffText<0) {
+	if( effect_reference.opcode<0) {
 		return;
 	}
-	RemoveAllEffects(effect_reference.EffText);
+	RemoveAllEffects(effect_reference.opcode);
 }
 
 //Removes all effects with a matching resource field
@@ -1273,7 +1278,7 @@ void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ieResRef re
 void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource) const
 {
 	ResolveEffectRef(effect_reference);
-	RemoveAllEffectsWithResource(effect_reference.EffText, resource);
+	RemoveAllEffectsWithResource(effect_reference.opcode, resource);
 }
 
 //This method could be used to remove stat modifiers that would lower a stat
@@ -1357,13 +1362,13 @@ void EffectQueue::RemoveAllNonPermanentEffects() const
 void EffectQueue::RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current) const
 {
 	ResolveEffectRef(effect_reference);
-	RemoveAllDetrimentalEffects(effect_reference.EffText, current);
+	RemoveAllDetrimentalEffects(effect_reference.opcode, current);
 }
 
 void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2) const
 {
 	ResolveEffectRef(effect_reference);
-	RemoveAllEffectsWithParam(effect_reference.EffText, param2);
+	RemoveAllEffectsWithParam(effect_reference.opcode, param2);
 }
 
 //remove certain levels of effects, possibly matching school/secondary type
@@ -1422,10 +1427,10 @@ Effect *EffectQueue::HasOpcode(ieDword opcode) const
 Effect *EffectQueue::HasEffect(EffectRef &effect_reference) const
 {
 	ResolveEffectRef(effect_reference);
-	if( effect_reference.EffText<0) {
+	if( effect_reference.opcode<0) {
 		return NULL;
 	}
-	return HasOpcode(effect_reference.EffText);
+	return HasOpcode(effect_reference.opcode);
 }
 
 Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2) const
@@ -1444,10 +1449,10 @@ Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2) const
 Effect *EffectQueue::HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const
 {
 	ResolveEffectRef(effect_reference);
-	if( effect_reference.EffText<0) {
+	if( effect_reference.opcode<0) {
 		return NULL;
 	}
-	return HasOpcodeWithParam(effect_reference.EffText, param2);
+	return HasOpcodeWithParam(effect_reference.opcode, param2);
 }
 
 //looks for opcode with pairs of parameters (useful for protection against creature, extra damage or extra thac0 against creature)
@@ -1473,10 +1478,10 @@ Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDw
 Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2) const
 {
 	ResolveEffectRef(effect_reference);
-	if( effect_reference.EffText<0) {
+	if( effect_reference.opcode<0) {
 		return NULL;
 	}
-	return HasOpcodeWithParamPair(effect_reference.EffText, param1, param2);
+	return HasOpcodeWithParamPair(effect_reference.opcode, param1, param2);
 }
 
 // sums all the values of the specific damage bonus effects of the passed "damage type"
@@ -1497,10 +1502,10 @@ static EffectRef fx_damage_bonus_modifier_ref={"DamageBonusModifier",NULL,-1};
 int EffectQueue::SpecificDamageBonus(ieDword damage_type) const
 {
 	ResolveEffectRef(fx_damage_bonus_modifier_ref);
-	if(fx_damage_bonus_modifier_ref.EffText < 0) {
+	if(fx_damage_bonus_modifier_ref.opcode < 0) {
 		return 0;
 	}
-	return SpecificDamageBonus(fx_damage_bonus_modifier_ref.EffText, damage_type);
+	return SpecificDamageBonus(fx_damage_bonus_modifier_ref.opcode, damage_type);
 }
 
 //this could be used for stoneskins and mirror images as well
@@ -1520,10 +1525,10 @@ void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const
 void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount) const
 {
 	ResolveEffectRef(effect_reference);
-	if( effect_reference.EffText<0) {
+	if( effect_reference.opcode<0) {
 		return;
 	}
-	DecreaseParam1OfEffect(effect_reference.EffText, amount);
+	DecreaseParam1OfEffect(effect_reference.opcode, amount);
 }
 
 
@@ -1555,10 +1560,10 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, Actor *actor) const
 {
 	ResolveEffectRef(effect_reference);
-	if( effect_reference.EffText<0) {
+	if( effect_reference.opcode<0) {
 		return 0;
 	}
-	return BonusAgainstCreature(effect_reference.EffText, actor);
+	return BonusAgainstCreature(effect_reference.opcode, actor);
 }
 
 bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const
@@ -1590,23 +1595,23 @@ static EffectRef fx_weapon_immunity_ref={"Protection:Weapons",NULL,-1};
 bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 {
 	ResolveEffectRef(fx_weapon_immunity_ref);
-	if( fx_weapon_immunity_ref.EffText<0) {
+	if( fx_weapon_immunity_ref.opcode<0) {
 		return 0;
 	}
-	return WeaponImmunity(fx_weapon_immunity_ref.EffText, enchantment, weapontype);
+	return WeaponImmunity(fx_weapon_immunity_ref.opcode, enchantment, weapontype);
 }
 
 static EffectRef fx_disable_spellcasting_ref={ "DisableCasting", NULL, -1 };
 int EffectQueue::DisabledSpellcasting(int types) const
 {
 	ResolveEffectRef(fx_disable_spellcasting_ref);
-	if( fx_disable_spellcasting_ref.EffText < 0) {
+	if( fx_disable_spellcasting_ref.opcode < 0) {
 		return 0;
 	}
 
 	unsigned int spelltype_mask = 0;
 	bool iwd2 = !!core->HasFeature(GF_ENHANCED_EFFECTS);
-	ieDword opcode = fx_disable_spellcasting_ref.EffText;
+	ieDword opcode = fx_disable_spellcasting_ref.opcode;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
@@ -1664,7 +1669,7 @@ Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, const ieResRef resour
 Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, const ieResRef resource) const
 {
 	ResolveEffectRef(effect_reference);
-	return HasOpcodeWithResource(effect_reference.EffText, resource);
+	return HasOpcodeWithResource(effect_reference.opcode, resource);
 }
 
 //used in contingency/sequencer code (cannot have the same contingency twice)
@@ -1684,7 +1689,7 @@ Effect *EffectQueue::HasOpcodeWithSource(ieDword opcode, const ieResRef Removed)
 Effect *EffectQueue::HasEffectWithSource(EffectRef &effect_reference, const ieResRef resource) const
 {
 	ResolveEffectRef(effect_reference);
-	return HasOpcodeWithSource(effect_reference.EffText, resource);
+	return HasOpcodeWithSource(effect_reference.opcode, resource);
 }
 
 bool EffectQueue::HasAnyDispellableEffect() const
@@ -1708,7 +1713,7 @@ void EffectQueue::dump() const
 		if( fx) {
 			char *Name = NULL;
 			if( fx->Opcode < MAX_EFFECTS)
-				Name = (char*) effect_refs[fx->Opcode].Name;
+				Name = (char*) Opcodes[fx->Opcode].Name;
 
 			printf( " %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Name, fx->Parameter1, fx->Parameter2, fx->Source );
 		}
@@ -1853,7 +1858,7 @@ void EffectQueue::TransformToDelay(ieByte &TimingMode)
 int EffectQueue::ResolveEffect(EffectRef &effect_reference)
 {
 	ResolveEffectRef(effect_reference);
-	return effect_reference.EffText;
+	return effect_reference.opcode;
 }
 
 // this check goes for the whole effect block, not individual effects

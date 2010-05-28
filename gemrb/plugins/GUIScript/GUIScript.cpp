@@ -6444,7 +6444,7 @@ static PyObject* GemRB_DispelEffect(PyObject * /*self*/, PyObject* args)
 	}
 
 	work_ref.Name=EffectName;
-	work_ref.EffText=-1;
+	work_ref.opcode=-1;
 	actor->fxqueue.RemoveAllEffectsWithParam(work_ref, Parameter2);
 
 	Py_INCREF( Py_None );
@@ -6852,7 +6852,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 
 		//normally the learn spell opcode is 147
 		EffectQueue::ResolveEffect(fx_learn_spell_ref);
-		if (f->Opcode!=(ieDword) fx_learn_spell_ref.EffText) {
+		if (f->Opcode!=(ieDword) fx_learn_spell_ref.opcode) {
 			goto not_a_scroll;
 		}
 		//maybe further checks for school exclusion?
@@ -8897,7 +8897,7 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 	work_ref.Name=opcodename;
-	work_ref.EffText=-1;
+	work_ref.opcode=-1;
 	Effect *fx = EffectQueue::CreateEffect(work_ref, param1, param2, FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES);
 	if (!fx) {
 		//invalid effect name didn't resolve to opcode
@@ -8953,7 +8953,7 @@ static PyObject* GemRB_CountEffects(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 	work_ref.Name=opcodename;
-	work_ref.EffText=-1;
+	work_ref.opcode=-1;
 	ieDword ret = actor->fxqueue.CountEffects(work_ref, param1, param2, resref);
 	return PyInt_FromLong( ret );
 }
@@ -8981,7 +8981,7 @@ static PyObject* GemRB_ModifyEffect(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 	work_ref.Name=opcodename;
-	work_ref.EffText=-1;
+	work_ref.opcode=-1;
 	actor->fxqueue.ModifyEffectPoint(work_ref, px, py);
 	Py_INCREF( Py_None );
 	return Py_None;
