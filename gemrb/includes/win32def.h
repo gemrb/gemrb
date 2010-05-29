@@ -76,11 +76,6 @@ extern GEM_EXPORT HANDLE hConsole;
 # endif
 #endif
 
-#ifndef TRUE
-# define TRUE 1
-# define FALSE 0
-#endif
-
 //we need 32+6 bytes at least, because we store 'context' in the variable
 //name too
 #define MAX_VARIABLE_LENGTH  40

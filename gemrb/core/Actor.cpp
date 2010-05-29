@@ -153,8 +153,8 @@ static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
  ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
  ACT_NONE, ACT_INNATE};
-static int QslotTranslation = FALSE;
-static int DeathOnZeroStat = TRUE;
+static int QslotTranslation = false;
+static int DeathOnZeroStat = true;
 static ieDword TranslucentShadows = 0;
 static int ProjectileSize = 0;  //the size of the projectile immunity bitfield (dwords)
 
@@ -222,8 +222,8 @@ static int *mxsplwis = NULL;
 static int spllevels;
 
 //for every game except IWD2 we need to reverse TOHIT
-static int ReverseToHit=TRUE;
-static int CheckAbilities=FALSE;
+static int ReverseToHit=true;
+static int CheckAbilities=false;
 
 //internal flags for calculating to hit
 #define WEAPON_FIST	0

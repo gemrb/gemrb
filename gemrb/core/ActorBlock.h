@@ -483,7 +483,7 @@ private:
 	void UpdateDoor();
 	bool BlockedOpen(int Open, int ForceOpen);
 public:
-	void ToggleTiles(int State, int playsound = FALSE);
+	void ToggleTiles(int State, int playsound = false);
 	void SetName(const char* Name); // sets door ID
 	void SetTiles(unsigned short* Tiles, int count);
 	void SetDoorLocked(int Locked, int playsound);

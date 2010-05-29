@@ -1700,7 +1700,7 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 
 		// in PS:T, opening a door does not unlock it
 		if (!core->HasFeature(GF_REVERSE_DOOR)) {
-			SetDoorLocked(FALSE,playsound);
+			SetDoorLocked(false,playsound);
 		}
 	} else {
 		LastTriggerObject = LastTrigger = ID; //used as lastCloser
@@ -1779,7 +1779,7 @@ void Door::TryPickLock(Actor *actor)
 		}
 		return;
 	}
-	SetDoorLocked( FALSE, TRUE);
+	SetDoorLocked( false, true);
 	core->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
 	LastUnlocked = actor->GetID();
 	ImmediateEvent();
@@ -1800,7 +1800,7 @@ void Door::TryBashLock(Actor *actor)
 	}
 
 	core->DisplayConstantStringName(STR_DOORBASH_DONE, 0xd7d7be, actor);
-	SetDoorLocked(FALSE, TRUE);
+	SetDoorLocked(false, true);
 	//Is this really useful ?
 	LastUnlocked = actor->GetID();
 	ImmediateEvent();
@@ -2223,9 +2223,9 @@ int Container::WantDither()
 int Container::IsOpen() const
 {
 	if (Flags&CONT_LOCKED) {
-		return FALSE;
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
 void Container::TryPickLock(Actor *actor)
