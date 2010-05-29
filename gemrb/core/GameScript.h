@@ -606,9 +606,14 @@ extern int RandomNumValue;
 
 class GEM_EXPORT GameScript {
 public:
-	Script* script;
-	unsigned int lastAction;
-	int scriptlevel;
+	GameScript(const ieResRef ResRef, Scriptable* Myself,
+		int ScriptLevel = 0, bool AIScript = false);
+	~GameScript();
+	const char *GetName() { return this?Name:"NONE\0\0\0\0"; }
+	static void ExecuteString(Scriptable* Sender, char* String);
+	static int EvaluateString(Scriptable* Sender, char* String);
+	static void ExecuteAction(Scriptable* Sender, Action* aC);
+public:
 	bool Update(bool *continuing = NULL, bool *done = NULL);
 	void EvaluateAllBlocks();
 private: //Internal Functions
@@ -625,16 +630,10 @@ private: //Internal Functions
 	static void ParseString(const char*& src, char* tmp);
 private: //Internal variables
 	Scriptable* const MySelf;
-private: //Script Internal Variables
 	ieResRef Name;
-public:
-	GameScript(const ieResRef ResRef, Scriptable* Myself,
-		int ScriptLevel = 0, bool AIScript = false);
-	~GameScript();
-	const char *GetName() { return this?Name:"NONE\0\0\0\0"; }
-	static void ExecuteString(Scriptable* Sender, char* String);
-	static int EvaluateString(Scriptable* Sender, char* String);
-	static void ExecuteAction(Scriptable* Sender, Action* aC);
+	Script* script;
+	unsigned int lastAction;
+	int scriptlevel;
 public: //Script Functions
 	static int ID_Alignment(Actor *actor, int parameter);
 	static int ID_Allegiance(Actor *actor, int parameter);

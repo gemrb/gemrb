@@ -2617,7 +2617,7 @@ void Actor::DebugDump()
 	printf ("Scripts:");
 	for (i = 0; i < MAX_SCRIPTS; i++) {
 		const char* poi = "<none>";
-		if (Scripts[i] && Scripts[i]->script) {
+		if (Scripts[i]) {
 			poi = Scripts[i]->GetName();
 		}
 		printf( " %.8s", poi );
