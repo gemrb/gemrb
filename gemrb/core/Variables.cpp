@@ -58,7 +58,7 @@ inline unsigned int Variables::MyHashKey(const char* key) const
 }
 /////////////////////////////////////////////////////////////////////////////
 // functions
-POSITION Variables::GetNextAssoc(POSITION rNextPosition, const char*& rKey,
+Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, const char*& rKey,
 	ieDword& rValue) const
 {
 	MYASSERT( m_pHashTable != NULL ); // never call on empty map
@@ -85,7 +85,7 @@ POSITION Variables::GetNextAssoc(POSITION rNextPosition, const char*& rKey,
 	// fill in return data
 	rKey = pAssocRet->key;
 	rValue = pAssocRet->Value.nValue;
-	return ( POSITION ) pAssocNext;
+	return ( iterator ) pAssocNext;
 }
 
 Variables::Variables(int nBlockSize, int nHashTableSize)

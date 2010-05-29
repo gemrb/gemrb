@@ -56,6 +56,10 @@ protected:
 		MemBlock* pNext;
 	};
 public:
+	// abstract iteration position
+	typedef struct POS {
+	} *iterator;
+public:
 	// Construction
 	Variables(int nBlockSize = 10, int nHashTableSize = 2049);
 	void LoadInitialValues(const char* name);
@@ -100,7 +104,7 @@ public:
 	void RemoveAll(ReleaseFun fun);
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
 
-	POSITION GetNextAssoc(POSITION rNextPosition, const char*& rKey,
+	iterator GetNextAssoc(iterator rNextPosition, const char*& rKey,
 		ieDword& rValue) const;
 	// Implementation
 protected:

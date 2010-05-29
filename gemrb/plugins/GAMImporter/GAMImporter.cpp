@@ -718,7 +718,7 @@ int GAMImporter::PutKillVars(DataStream *stream, Game *game)
 {
 	char filling[40];
 	ieVariable tmpname;
-	POSITION pos=NULL;
+	Variables::iterator pos=NULL;
 	const char *name;
 	ieDword value;
 
@@ -740,7 +740,7 @@ int GAMImporter::PutVariables(DataStream *stream, Game *game)
 {
 	char filling[40];
 	ieVariable tmpname;
-	POSITION pos=NULL;
+	Variables::iterator pos=NULL;
 	const char *name;
 	ieDword value;
 

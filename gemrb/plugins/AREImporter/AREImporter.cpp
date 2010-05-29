@@ -1909,7 +1909,7 @@ int AREImporter::PutEntrances( DataStream *stream, Map *map)
 int AREImporter::PutVariables( DataStream *stream, Map *map)
 {
 	char filling[40];
-	POSITION pos=NULL;
+	Variables::iterator pos=NULL;
 	const char *name;
 	ieDword value;
 

@@ -2866,7 +2866,7 @@ int CREImporter::PutEffects( DataStream *stream, Actor *actor)
 int CREImporter::PutVariables( DataStream *stream, Actor *actor)
 {
 	char filling[104];
-	POSITION pos=NULL;
+	Variables::iterator pos=NULL;
 	const char *name;
 	ieDword tmpDword, value;
 
