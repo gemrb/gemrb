@@ -44,14 +44,7 @@
 #  endif
 # endif
 
-# define ADV_TEXT
-# include <conio.h>
-extern GEM_EXPORT HANDLE hConsole;
-# define textcolor(i) SetConsoleTextAttribute(hConsole, i)
-
-# ifndef __MINGW32__
-#  define printf cprintf //broken in mingw !!
-# elif not defined HAVE_SNPRINTF
+# if defined(__MINGW32__) && not defined(HAVE_SNPRINTF)
 #  define HAVE_SNPRINTF
 # endif
 
@@ -59,9 +52,6 @@ extern GEM_EXPORT HANDLE hConsole;
 # include <config.h>
 # include <stdio.h>
 # include <stdlib.h>
-
-# define ADV_TEXT
-# define textcolor(i) i
 
 # define stricmp strcasecmp
 # define strnicmp strncasecmp
@@ -78,50 +68,6 @@ extern GEM_EXPORT HANDLE hConsole;
 
 #include "VFS.h"
 
-#ifdef ADV_TEXT
-
-#ifdef WIN32
-#define BLACK 0
-#define RED FOREGROUND_RED
-#define GREEN FOREGROUND_GREEN
-#define BROWN FOREGROUND_GREEN | FOREGROUND_RED
-#define BLUE FOREGROUND_BLUE
-#define MAGENTA FOREGROUND_RED | FOREGROUND_BLUE
-#define CYAN FOREGROUND_BLUE | FOREGROUND_GREEN
-#define WHITE FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED
-#define LIGHT_RED (RED | FOREGROUND_INTENSITY)
-#define LIGHT_GREEN (GREEN | FOREGROUND_INTENSITY)
-#define YELLOW (GREEN | RED | FOREGROUND_INTENSITY)
-#define LIGHT_BLUE (BLUE | FOREGROUND_INTENSITY)
-#define LIGHT_MAGENTA (MAGENTA | FOREGROUND_INTENSITY)
-#define LIGHT_CYAN (CYAN | FOREGROUND_INTENSITY)
-#define LIGHT_WHITE (WHITE | FOREGROUND_INTENSITY)
-#define DEFAULT WHITE
-#define gotoxy(x,y) \
-	{ \
-	COORD coord = {x,y}; \
-	SetConsoleCursorPosition(hConsole, coord); \
-	}
-#else
-#define DEFAULT printf("\033[0m");
-#define BLACK printf("\033[0m\033[30;40m");
-#define RED printf("\033[0m\033[31;40m");
-#define GREEN printf("\033[0m\033[32;40m");
-#define BROWN printf("\033[0m\033[33;40m");
-#define BLUE printf("\033[0m\033[34;40m");
-#define MAGENTA printf("\033[0m\033[35;40m");
-#define CYAN printf("\033[0m\033[36;40m");
-#define WHITE printf("\033[0m\033[37;40m");
-#define LIGHT_RED printf("\033[1m\033[31;40m");
-#define LIGHT_GREEN printf("\033[1m\033[32;40m");
-#define YELLOW printf("\033[1m\033[33;40m");
-#define LIGHT_BLUE printf("\033[1m\033[34;40m");
-#define LIGHT_MAGENTA printf("\033[1m\033[35;40m");
-#define LIGHT_CYAN printf("\033[1m\033[36;40m");
-#define LIGHT_WHITE printf("\033[1m\033[37;40m");
-#define gotoxy(x,y) printf("\033[%d;%dH", y, x)
-#endif
-
 #ifdef _MSC_VER
 # ifndef round
 #  define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
@@ -135,11 +81,5 @@ extern GEM_EXPORT HANDLE hConsole;
 #define M_PI_2  1.57079632679489661923 // pi/2
 #endif
 
-
-#define printBracket(status, color) textcolor(WHITE); printf("["); textcolor(color); printf("%s", status); textcolor(WHITE); printf("]")
-#define printStatus(status, color) printBracket(status, color); printf("\n")
-#define printMessage(owner, message, color) printBracket(owner, LIGHT_WHITE); printf(": "); textcolor(color); printf("%s", message)
-
-#endif
-
+#include "logging.h"
 #endif  //! WIN32DEF_H
