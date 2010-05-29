@@ -76,9 +76,6 @@ extern GEM_EXPORT HANDLE hConsole;
 # endif
 #endif
 
-//we need 32+6 bytes at least, because we store 'context' in the variable
-//name too
-#define MAX_VARIABLE_LENGTH  40
 #include "VFS.h"
 
 #ifdef ADV_TEXT

@@ -213,5 +213,9 @@ inline bool valid_number(const char* string, long& val)
         return ( const char * ) endpr != string;
 }
 
+//we need 32+6 bytes at least, because we store 'context' in the variable
+//name too
+#define MAX_VARIABLE_LENGTH  40
+
 #endif //! GLOBALS_H
 
