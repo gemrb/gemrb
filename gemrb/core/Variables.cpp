@@ -61,7 +61,7 @@ inline unsigned int Variables::MyHashKey(const char* key) const
 Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, const char*& rKey,
 	ieDword& rValue) const
 {
-	MYASSERT( m_pHashTable != NULL ); // never call on empty map
+	assert( m_pHashTable != NULL ); // never call on empty map
 
 	Variables::MyAssoc* pAssocRet = ( Variables::MyAssoc* ) rNextPosition;
 
@@ -70,7 +70,7 @@ Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, const char*&
 		for (unsigned int nBucket = 0; nBucket < m_nHashTableSize; nBucket++)
 			if (( pAssocRet = m_pHashTable[nBucket] ) != NULL)
 				break;
-		MYASSERT( pAssocRet != NULL ); // must find something
+		assert( pAssocRet != NULL ); // must find something
 	}
 	Variables::MyAssoc* pAssocNext;
 	if (( pAssocNext = pAssocRet->pNext ) == NULL) {
@@ -90,8 +90,8 @@ Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, const char*&
 
 Variables::Variables(int nBlockSize, int nHashTableSize)
 {
-	MYASSERT( nBlockSize > 0 );
-	MYASSERT( nHashTableSize > 16 );
+	assert( nBlockSize > 0 );
+	assert( nHashTableSize > 16 );
 
 	m_pHashTable = NULL;
 	m_nHashTableSize = nHashTableSize; // default size
@@ -108,8 +108,8 @@ void Variables::InitHashTable(unsigned int nHashSize, bool bAllocNow)
 	// Used to force allocation of a hash table or to override the default
 	// hash table size of (which is fairly small)
 {
-	MYASSERT( m_nCount == 0 );
-	MYASSERT( nHashSize > 16 );
+	assert( m_nCount == 0 );
+	assert( nHashSize > 16 );
 
 	if (m_pHashTable != NULL) {
 		// free hash table
@@ -175,7 +175,7 @@ Variables::MyAssoc* Variables::NewAssoc(const char* key)
 	if (m_pFreeList == NULL) {
 		// add another block
 		Variables::MemBlock* newBlock = ( Variables::MemBlock* ) malloc( m_nBlockSize*sizeof( Variables::MyAssoc ) + sizeof( Variables::MemBlock ));
-		MYASSERT( newBlock != NULL ); // we must have something
+		assert( newBlock != NULL ); // we must have something
 		newBlock->pNext = m_pBlocks;
 		m_pBlocks = newBlock;
 
@@ -190,7 +190,7 @@ Variables::MyAssoc* Variables::NewAssoc(const char* key)
 	Variables::MyAssoc* pAssoc = m_pFreeList;
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
-	MYASSERT( m_nCount > 0 ); // make sure we don't overflow
+	assert( m_nCount > 0 ); // make sure we don't overflow
 	if (m_lParseKey) {
 		MyCopyKey( pAssoc->key, key );
 	} else {
@@ -218,7 +218,7 @@ void Variables::FreeAssoc(Variables::MyAssoc* pAssoc)
 	pAssoc->pNext = m_pFreeList;
 	m_pFreeList = pAssoc;
 	m_nCount--;
-	MYASSERT( m_nCount >= 0 ); // make sure we don't underflow
+	assert( m_nCount >= 0 ); // make sure we don't underflow
 
 	// if no more elements, cleanup completely
 	if (m_nCount == 0) {
@@ -262,7 +262,7 @@ int Variables::GetValueLength(const char* key) const
 bool Variables::Lookup(const char* key, char* dest, int MaxLength) const
 {
 	unsigned int nHash;
-	MYASSERT( m_type == GEM_VARIABLES_STRING );
+	assert( m_type == GEM_VARIABLES_STRING );
 	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
 	if (pAssoc == NULL) {
 		dest[0] = 0;
@@ -276,7 +276,7 @@ bool Variables::Lookup(const char* key, char* dest, int MaxLength) const
 bool Variables::Lookup(const char* key, char *&dest) const
 {
 	unsigned int nHash;
-	MYASSERT(m_type==GEM_VARIABLES_STRING);
+	assert(m_type==GEM_VARIABLES_STRING);
 	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
 	if (pAssoc == NULL) {
 		return false;
@@ -289,7 +289,7 @@ bool Variables::Lookup(const char* key, char *&dest) const
 bool Variables::Lookup(const char* key, void *&dest) const
 {
 	unsigned int nHash;
-	MYASSERT(m_type==GEM_VARIABLES_POINTER);
+	assert(m_type==GEM_VARIABLES_POINTER);
 	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
 	if (pAssoc == NULL) {
 		return false;
@@ -302,7 +302,7 @@ bool Variables::Lookup(const char* key, void *&dest) const
 bool Variables::Lookup(const char* key, ieDword& rValue) const
 {
 	unsigned int nHash;
-	MYASSERT(m_type==GEM_VARIABLES_INT);
+	assert(m_type==GEM_VARIABLES_INT);
 	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
 	if (pAssoc == NULL) {
 		return false;
@@ -333,7 +333,7 @@ void Variables::SetAt(const char* key, char* value)
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
 
-	MYASSERT( m_type == GEM_VARIABLES_STRING );
+	assert( m_type == GEM_VARIABLES_STRING );
 	if (( pAssoc = GetAssocAt( key, nHash ) ) == NULL) {
 		if (m_pHashTable == NULL)
 			InitHashTable( m_nHashTableSize );
@@ -362,7 +362,7 @@ void Variables::SetAt(const char* key, void* value)
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
 
-	MYASSERT( m_type == GEM_VARIABLES_POINTER );
+	assert( m_type == GEM_VARIABLES_POINTER );
 	if (( pAssoc = GetAssocAt( key, nHash ) ) == NULL) {
 		if (m_pHashTable == NULL)
 			InitHashTable( m_nHashTableSize );
@@ -392,7 +392,7 @@ void Variables::SetAt(const char* key, ieDword value)
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
 
-	MYASSERT( m_type == GEM_VARIABLES_INT );
+	assert( m_type == GEM_VARIABLES_INT );
 	if (( pAssoc = GetAssocAt( key, nHash ) ) == NULL) {
 		if (m_pHashTable == NULL)
 			InitHashTable( m_nHashTableSize );
@@ -429,7 +429,7 @@ void Variables::Remove(const char* key)
 		// use relatively large tables and small buckets.)
 		while (prev->pNext != pAssoc) {
 			prev = prev->pNext;
-			MYASSERT( prev != NULL );
+			assert( prev != NULL );
 		}
 		prev->pNext = pAssoc->pNext;		
 	}

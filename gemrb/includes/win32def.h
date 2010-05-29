@@ -81,17 +81,6 @@ extern GEM_EXPORT HANDLE hConsole;
 #define MAX_VARIABLE_LENGTH  40
 #include "VFS.h"
 
-#ifdef _DEBUG
-#define MYASSERT(f) \
-  if(!(f))  \
-  {  \
-  printf("Assertion failed: %s %d",#f, __LINE__); \
-				abort(); \
-  }
-#else
-#define MYASSERT(f)
-#endif
-
 #ifdef ADV_TEXT
 
 #ifdef WIN32

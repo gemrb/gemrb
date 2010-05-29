@@ -45,8 +45,8 @@ inline bool Dictionary::IsEmpty() const
 // out of lines
 Dictionary::Dictionary(int nBlockSize, int nHashTableSize)
 {
-	MYASSERT( nBlockSize > 0 );
-	MYASSERT( nHashTableSize > 16 );
+	assert( nBlockSize > 0 );
+	assert( nHashTableSize > 16 );
 
 	m_pHashTable = NULL;
 	m_nHashTableSize = nHashTableSize;  // default size
@@ -60,8 +60,8 @@ void Dictionary::InitHashTable(unsigned int nHashSize, bool bAllocNow)
 	//Used to force allocation of a hash table or to override the default
 	//hash table size of (which is fairly small)
 {
-	MYASSERT( m_nCount == 0 );
-	MYASSERT( nHashSize > 16 );
+	assert( m_nCount == 0 );
+	assert( nHashSize > 16 );
 
 	if (m_pHashTable != NULL) {
 		// free hash table
@@ -110,7 +110,7 @@ Dictionary::MyAssoc* Dictionary::NewAssoc()
 	if (m_pFreeList == NULL) {
 		// add another block
 		Dictionary::MemBlock* newBlock = ( Dictionary::MemBlock* ) malloc(m_nBlockSize * sizeof( Dictionary::MyAssoc ) + sizeof( Dictionary::MemBlock ));
-		MYASSERT( newBlock != NULL );  // we must have something
+		assert( newBlock != NULL );  // we must have something
 
 		newBlock->pNext = m_pBlocks;
 		m_pBlocks = newBlock;
@@ -127,7 +127,7 @@ Dictionary::MyAssoc* Dictionary::NewAssoc()
 	Dictionary::MyAssoc* pAssoc = m_pFreeList;
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
-	MYASSERT( m_nCount > 0 );  // make sure we don't overflow
+	assert( m_nCount > 0 );  // make sure we don't overflow
 #ifdef _DEBUG
 	pAssoc->key[0] = 0;
 	pAssoc->value = 0xcccccccc;
@@ -140,7 +140,7 @@ void Dictionary::FreeAssoc(Dictionary::MyAssoc* pAssoc)
 	pAssoc->pNext = m_pFreeList;
 	m_pFreeList = pAssoc;
 	m_nCount--;
-	MYASSERT( m_nCount >= 0 );  // make sure we don't underflow
+	assert( m_nCount >= 0 );  // make sure we don't underflow
 
 	// if no more elements, cleanup completely
 	if (m_nCount == 0) {

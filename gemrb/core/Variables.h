@@ -69,7 +69,7 @@ public:
 	//you should set this only on an empty mapping
 	inline int ParseKey(int arg)
 	{
-		MYASSERT( m_nCount == 0 );
+		assert( m_nCount == 0 );
 		m_lParseKey = ( arg > 0 );
 		return 0;
 	}

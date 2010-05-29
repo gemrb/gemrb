@@ -32,8 +32,8 @@ inline unsigned int Cache::MyHashKey(const char* key) const
 
 Cache::Cache(int nBlockSize, int nHashTableSize)
 {
-	MYASSERT( nBlockSize > 0 );
-	MYASSERT( nHashTableSize > 16 );
+	assert( nBlockSize > 0 );
+	assert( nHashTableSize > 16 );
 
 	m_pHashTable = NULL;
 	m_nHashTableSize = nHashTableSize; // default size
@@ -47,8 +47,8 @@ void Cache::InitHashTable(unsigned int nHashSize, bool bAllocNow)
 	//Used to force allocation of a hash table or to override the default
 	//hash table size of (which is fairly small)
 {
-	MYASSERT( m_nCount == 0 );
-	MYASSERT( nHashSize > 16 );
+	assert( m_nCount == 0 );
+	assert( nHashSize > 16 );
 
 	if (m_pHashTable != NULL) {
 		// free hash table
@@ -106,7 +106,7 @@ Cache::MyAssoc* Cache::NewAssoc()
 	if (m_pFreeList == NULL) {
 		// add another block
 		Cache::MemBlock* newBlock = ( Cache::MemBlock* ) malloc(m_nBlockSize * sizeof( Cache::MyAssoc ) + sizeof( Cache::MemBlock ));
-		MYASSERT( newBlock != NULL ); // we must have something
+		assert( newBlock != NULL ); // we must have something
 
 		newBlock->pNext = m_pBlocks;
 		m_pBlocks = newBlock;
@@ -123,7 +123,7 @@ Cache::MyAssoc* Cache::NewAssoc()
 	Cache::MyAssoc* pAssoc = m_pFreeList;
 	m_pFreeList = m_pFreeList->pNext;
 	m_nCount++;
-	MYASSERT( m_nCount > 0 ); // make sure we don't overflow
+	assert( m_nCount > 0 ); // make sure we don't overflow
 #ifdef _DEBUG
 	pAssoc->key[0] = 0;
 	pAssoc->data = 0;
@@ -141,7 +141,7 @@ void Cache::FreeAssoc(Cache::MyAssoc* pAssoc)
 	pAssoc->pNext = m_pFreeList;
 	m_pFreeList = pAssoc;
 	m_nCount--;
-	MYASSERT( m_nCount >= 0 ); // make sure we don't underflow
+	assert( m_nCount >= 0 ); // make sure we don't underflow
 
 	// if no more elements, cleanup completely
 	if (m_nCount == 0) {
