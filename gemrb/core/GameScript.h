@@ -31,6 +31,8 @@ class Action;
 #include "SymbolMgr.h"
 #include "Actor.h"
 
+#include <vector>
+
 //escapearea flags
 #define EA_DESTROY 1        //destroy actor at the exit (otherwise move to new place)
 #define EA_NOSEE   2        //no need to see the exit
@@ -244,26 +246,19 @@ class GEM_EXPORT Condition {
 public:
 	Condition()
 	{
-		triggers = NULL;
-		triggersCount = 0;
 		canary = (unsigned long) 0xdeadbeef;
 	}
 	~Condition()
 	{
-		if (!triggers) {
-			return;
-		}
-		for (int c = 0; c < triggersCount; c++) {
+		for (size_t c = 0; c < triggers.size(); ++c) {
 			if (triggers[c]) {
 				triggers[c]->Release();
 				triggers[c] = NULL;
 			}
 		}
-		delete[] triggers;
 	}
 public:
-	unsigned short triggersCount;
-	Trigger** triggers;
+	std::vector<Trigger*> triggers;
 private:
 	volatile unsigned long canary;
 public:

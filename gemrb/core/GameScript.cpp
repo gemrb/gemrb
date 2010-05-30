@@ -1615,17 +1615,11 @@ static Condition* ReadCondition(DataStream* stream)
 		return NULL;
 	}
 	Condition* cO = new Condition();
-	std::vector< Trigger*> tRv;
 	while (true) {
 		Trigger* tR = ReadTrigger( stream );
 		if (!tR)
 			break;
-		tRv.push_back( tR );
-	}
-	cO->triggersCount = ( unsigned short ) tRv.size();
-	cO->triggers = new Trigger * [cO->triggersCount];
-	for (int i = 0; i < cO->triggersCount; i++) {
-		cO->triggers[i] = tRv.at( i );
+		cO->triggers.push_back( tR );
 	}
 	return cO;
 }
@@ -2935,7 +2929,7 @@ bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 	unsigned int result = 0;
 	bool subresult = true;
 
-	for (int i = 0; i < condition->triggersCount; i++) {
+	for (size_t i = 0; i < condition->triggers.size(); i++) {
 		Trigger* tR = condition->triggers[i];
 		//do not evaluate triggers in an Or() block if one of them
 		//was already True()
