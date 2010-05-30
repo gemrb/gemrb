@@ -474,7 +474,7 @@ public:
 		}
 	}
 public:
-	std::deque<ResponseBlock*> responseBlocks;
+	std::vector<ResponseBlock*> responseBlocks;
 private:
 	volatile unsigned long canary;
 public:
