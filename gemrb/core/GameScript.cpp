@@ -1486,17 +1486,12 @@ Script* GameScript::CacheScript(ieResRef ResRef, bool AIScript)
 		printf("Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
 	}
 
-	std::vector< ResponseBlock*> rBv;
 	while (true) {
 		ResponseBlock* rB = ReadResponseBlock( stream );
 		if (!rB)
 			break;
-		rBv.push_back( rB );
+		newScript->responseBlocks.push_back( rB );
 		stream->ReadLine( line, 10 );
-	}
-	newScript->AllocateBlocks( ( unsigned int ) rBv.size() );
-	for (unsigned int i = 0; i < newScript->responseBlocksCount; i++) {
-		newScript->responseBlocks[i] = rBv.at( i );
 	}
 	delete( stream );
 	return newScript;
@@ -1652,7 +1647,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 	if (continuing) continueExecution = *continuing;
 
 	RandomNumValue=rand();
-	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
+	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		if (rB->condition->Evaluate(MySelf)) {
 			//if this isn't a continue-d block, we have to clear the queue
@@ -1714,7 +1709,7 @@ void GameScript::EvaluateAllBlocks()
 //functionality, so i kept the gemrb specific code too.
 #ifdef GEMRB_CUTSCENES
 //this is the logical way of executing a cutscene
-	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
+	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		if (rB->Condition->Evaluate(MySelf)) {
 			rB->Execute(MySelf);
@@ -1722,7 +1717,7 @@ void GameScript::EvaluateAllBlocks()
 	}
 #else
 //this is the apparent IE behaviour
-	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
+	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		ResponseSet * rS = rB->responseSet;
 		if (rS->responses.size()) {

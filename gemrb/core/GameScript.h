@@ -463,40 +463,18 @@ public:
 	Script()
 	{
 		canary = (unsigned long) 0xdeadbeef;
-		responseBlocks = NULL;
-		responseBlocksCount = 0;
 	}
 	~Script()
 	{
-		FreeResponseBlocks();
-	}
-	void AllocateBlocks(unsigned int count)
-	{
-		if (!count) {
-			FreeResponseBlocks();
-			responseBlocks = NULL;
-			responseBlocksCount = 0;
-		}
-		responseBlocks = new ResponseBlock * [count];
-		responseBlocksCount = count;
-	}
-private:
-	void FreeResponseBlocks()
-	{
-		if (!responseBlocks) {
-			return;
-		}
-		for (unsigned int i = 0; i < responseBlocksCount; i++) {
+		for (unsigned int i = 0; i < responseBlocks.size(); i++) {
 			if (responseBlocks[i]) {
 				responseBlocks[i]->Release();
 				responseBlocks[i] = NULL;
 			}
 		}
-		delete[] responseBlocks;
 	}
 public:
-	unsigned int responseBlocksCount;
-	ResponseBlock** responseBlocks;
+	std::deque<ResponseBlock*> responseBlocks;
 private:
 	volatile unsigned long canary;
 public:
