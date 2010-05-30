@@ -368,17 +368,12 @@ class GEM_EXPORT Response {
 public:
 	Response()
 	{
-		actions = NULL;
 		weight = 0;
-		actionsCount = 0;
 		canary = (unsigned long) 0xdeadbeef;
 	}
 	~Response()
 	{
-		if (!actions) {
-			return;
-		}
-		for (int c = 0; c < actionsCount; c++) {
+		for (size_t c = 0; c < actions.size(); c++) {
 			if (actions[c]) {
 				if (actions[c]->GetRef()>2) {
 					printf("Residue action %d with refcount %d\n", actions[c]->actionID, actions[c]->GetRef());
@@ -387,12 +382,11 @@ public:
 				actions[c] = NULL;
 			}
 		}
-		delete[] actions;
 	}
+	int Execute(Scriptable* Sender);
 public:
 	unsigned char weight;
-	unsigned char actionsCount;
-	Action** actions;
+	std::vector<Action*> actions;
 private:
 	volatile unsigned long canary;
 public:
@@ -408,24 +402,18 @@ class GEM_EXPORT ResponseSet {
 public:
 	ResponseSet()
 	{
-		responses = NULL;
-		responsesCount = 0;
 		canary = (unsigned long) 0xdeadbeef;
 	}
 	~ResponseSet()
 	{
-		if (!responses) {
-			return;
-		}
-		for (int b = 0; b < responsesCount; b++) {
+		for (size_t b = 0; b < responses.size(); b++) {
 			responses[b]->Release();
 			responses[b] = NULL;
 		}
-		delete[] responses;
 	}
+	int Execute(Scriptable* Sender);
 public:
-	unsigned short responsesCount;
-	Response** responses;
+	std::vector<Response*> responses;
 private:
 	volatile unsigned long canary;
 public:
@@ -619,8 +607,6 @@ private: //Internal Functions
 	ResponseSet* ReadResponseSet(DataStream* stream);
 	Response* ReadResponse(DataStream* stream);
 	Trigger* ReadTrigger(DataStream* stream);
-	int ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS);
-	int ExecuteResponse(Scriptable* Sender, Response* rE);
 	static int ParseInt(const char*& src);
 	static void ParseString(const char*& src, char* tmp);
 private: //Internal variables

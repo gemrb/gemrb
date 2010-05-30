@@ -1686,8 +1686,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 				}
 				lastAction=a;
 			}
-			continueExecution = ( ExecuteResponseSet( MySelf,
-				rB->responseSet ) != 0 );
+			continueExecution = ( rB->responseSet->Execute(MySelf) != 0);
 			if (continuing) *continuing = continueExecution;
 			//clear triggers after response executed
 			//MySelf->ClearTriggers();
@@ -1718,7 +1717,7 @@ void GameScript::EvaluateAllBlocks()
 	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		if (rB->Condition->Evaluate(MySelf)) {
-			ExecuteResponseSet( MySelf, rB->responseSet );
+			rB->Execute(MySelf);
 		}
 	}
 #else
@@ -1726,8 +1725,8 @@ void GameScript::EvaluateAllBlocks()
 	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		ResponseSet * rS = rB->responseSet;
-		if (rS->responsesCount) {
-			ExecuteResponse( MySelf, rS->responses[0] );
+		if (rS->responses.size()) {
+			rS->responses[0]->Execute(MySelf);
 		}
 	}
 #endif
@@ -1756,17 +1755,11 @@ ResponseSet* GameScript::ReadResponseSet(DataStream* stream)
 		return NULL;
 	}
 	ResponseSet* rS = new ResponseSet();
-	std::vector< Response*> rEv;
 	while (true) {
 		Response* rE = ReadResponse( stream );
 		if (!rE)
 			break;
-		rEv.push_back( rE );
-	}
-	rS->responsesCount = ( unsigned short ) rEv.size();
-	rS->responses = new Response * [rS->responsesCount];
-	for (int i = 0; i < rS->responsesCount; i++) {
-		rS->responses[i] = rEv.at( i );
+		rS->responses.push_back( rE );
 	}
 	return rS;
 }
@@ -1786,7 +1779,6 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	int count = stream->ReadLine( line, 1024 );
 	char *poi;
 	rE->weight = (unsigned char)strtoul(line,&poi,10);
-	std::vector< Action*> aCv;
 	if (strncmp(poi,"AC",2)==0)
 	while (true) {
 		//not autofreed, because it is referenced by the Script
@@ -1815,17 +1807,12 @@ Response* GameScript::ReadResponse(DataStream* stream)
 				aC->int0Parameter = scriptlevel;
 			}
 		}
-		aCv.push_back( aC );
+		rE->actions.push_back( aC );
 		stream->ReadLine( line, 1024 );
 		if (strncmp( line, "RE", 2 ) == 0)
 			break;
 	}
 	free( line );
-	rE->actionsCount = ( unsigned char ) aCv.size();
-	rE->actions = new Action* [rE->actionsCount];
-	for (int i = 0; i < rE->actionsCount; i++) {
-		rE->actions[i] = aCv.at( i );
-	}
 	return rE;
 }
 
@@ -2993,22 +2980,22 @@ int Trigger::Evaluate(Scriptable* Sender)
 	return ret;
 }
 
-int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
+int ResponseSet::Execute(Scriptable* Sender)
 {
-	int i;
+	size_t i;
 
-	switch(rS->responsesCount) {
+	switch(responses.size()) {
 		case 0:
 			return 0;
 		case 1:
-			return ExecuteResponse( Sender, rS->responses[0] );
+			return responses[0]->Execute(Sender);
 	}
 	/*default*/
 	int randWeight;
 	int maxWeight = 0;
 
-	for (i = 0; i < rS->responsesCount; i++) {
-		maxWeight+=rS->responses[i]->weight;
+	for (i = 0; i < responses.size(); i++) {
+		maxWeight += responses[i]->weight;
 	}
 	if (maxWeight) {
 		randWeight = rand() % maxWeight;
@@ -3017,10 +3004,10 @@ int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
 		randWeight = 0;
 	}
 
-	for (i = 0; i < rS->responsesCount; i++) {
-		Response* rE = rS->responses[i];
+	for (i = 0; i < responses.size(); i++) {
+		Response* rE = responses[i];
 		if (rE->weight > randWeight) {
-			return ExecuteResponse( Sender, rE );
+			return rE->Execute(Sender);
 			/* this break is only symbolic */
 			break;
 		}
@@ -3030,14 +3017,14 @@ int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
 }
 
 //continue is effective only as the last action in the block
-int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
+int Response::Execute(Scriptable* Sender)
 {
 	int ret = 0; // continue or not
-	for (int i = 0; i < rE->actionsCount; i++) {
-		Action* aC = rE->actions[i];
+	for (size_t i = 0; i < actions.size(); i++) {
+		Action* aC = actions[i];
 		switch (actionflags[aC->actionID] & AF_MASK) {
 			case AF_INSTANT:
-				ExecuteAction( Sender, aC );
+				GameScript::ExecuteAction( Sender, aC );
 				ret = 0;
 				break;
 			case AF_NONE:
