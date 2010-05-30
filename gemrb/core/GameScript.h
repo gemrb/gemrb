@@ -205,6 +205,7 @@ public:
 			objectParameter = NULL;
 		}
 	}
+	int Evaluate(Scriptable* Sender);
 public:
 	unsigned short triggerID;
 	int int0Parameter;
@@ -257,6 +258,7 @@ public:
 			}
 		}
 	}
+	bool Evaluate(Scriptable* Sender);
 public:
 	std::vector<Trigger*> triggers;
 private:
@@ -617,8 +619,6 @@ private: //Internal Functions
 	ResponseSet* ReadResponseSet(DataStream* stream);
 	Response* ReadResponse(DataStream* stream);
 	Trigger* ReadTrigger(DataStream* stream);
-	bool EvaluateCondition(Scriptable* Sender, Condition* condition);
-	static int EvaluateTrigger(Scriptable* Sender, Trigger* trigger);
 	int ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS);
 	int ExecuteResponse(Scriptable* Sender, Response* rE);
 	static int ParseInt(const char*& src);

@@ -1654,7 +1654,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 	RandomNumValue=rand();
 	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
-		if (EvaluateCondition( MySelf, rB->condition )) {
+		if (rB->condition->Evaluate(MySelf)) {
 			//if this isn't a continue-d block, we have to clear the queue
 			//we cannot clear the queue and cannot execute the new block
 			//if we already have stuff on the queue!
@@ -1717,7 +1717,7 @@ void GameScript::EvaluateAllBlocks()
 //this is the logical way of executing a cutscene
 	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
-		if (EvaluateCondition( MySelf, rB->condition )) {
+		if (rB->Condition->Evaluate(MySelf)) {
 			ExecuteResponseSet( MySelf, rB->responseSet );
 		}
 	}
@@ -2916,25 +2916,25 @@ int GameScript::EvaluateString(Scriptable* Sender, char* String)
 	}
 	Trigger* tri = GenerateTrigger( String );
 	if (tri) {
-		int ret = EvaluateTrigger( Sender, tri );
+		int ret = tri->Evaluate(Sender);
 		tri->Release();
 		return ret;
 	}
 	return 0;
 }
 
-bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
+bool Condition::Evaluate(Scriptable* Sender)
 {
 	int ORcount = 0;
 	unsigned int result = 0;
 	bool subresult = true;
 
-	for (size_t i = 0; i < condition->triggers.size(); i++) {
-		Trigger* tR = condition->triggers[i];
+	for (size_t i = 0; i < triggers.size(); i++) {
+		Trigger* tR = triggers[i];
 		//do not evaluate triggers in an Or() block if one of them
 		//was already True()
 		if (!ORcount || !subresult) {
-			result = EvaluateTrigger( Sender, tR );
+			result = tR->Evaluate(Sender);
 		}
 		if (result > 1) {
 			//we started an Or() block
@@ -2963,31 +2963,31 @@ bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 }
 
 /* this may return more than a boolean, in case of Or(x) */
-int GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
+int Trigger::Evaluate(Scriptable* Sender)
 {
-	if (!trigger) {
+	if (!this) {
 		printMessage( "GameScript","Trigger evaluation fails due to NULL trigger.\n",LIGHT_RED );
 		return 0;
 	}
-	TriggerFunction func = triggers[trigger->triggerID];
-	const char *tmpstr=triggersTable->GetValue(trigger->triggerID);
+	TriggerFunction func = triggers[triggerID];
+	const char *tmpstr=triggersTable->GetValue(triggerID);
 	if (!tmpstr) {
-		tmpstr=triggersTable->GetValue(trigger->triggerID|0x4000);
+		tmpstr=triggersTable->GetValue(triggerID|0x4000);
 	}
 	if (!func) {
-		triggers[trigger->triggerID] = False;
+		triggers[triggerID] = GameScript::False;
 		printMessage("GameScript"," ",YELLOW);
 		printf("Unhandled trigger code: 0x%04x %s\n",
-			trigger->triggerID, tmpstr );
+			triggerID, tmpstr );
 		return 0;
 	}
 	if (InDebug&ID_TRIGGERS) {
 		printMessage("GameScript"," ",YELLOW);
 		printf( "Executing trigger code: 0x%04x %s\n",
-				trigger->triggerID, tmpstr );
+				triggerID, tmpstr );
 	}
-	int ret = func( Sender, trigger );
-	if (trigger->flags & NEGATE_TRIGGER) {
+	int ret = func( Sender, this );
+	if (flags & NEGATE_TRIGGER) {
 		return !ret;
 	}
 	return ret;
