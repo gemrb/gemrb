@@ -23,7 +23,8 @@
 
 #include "globals.h"
 #include "exports.h"
-#include <vector>
+
+#include "GameScript.h"
 
 #define IE_DLG_TR_TEXT     0x01
 #define IE_DLG_TR_TRIGGER  0x02
@@ -43,7 +44,7 @@ struct DialogTransition {
 	ieDword Flags;
 	ieStrRef textStrRef;
 	ieStrRef journalStrRef;
-	DialogString* trigger;
+	Condition* condition;
 	DialogString* action;
 	ieResRef Dialog;
 	ieDword stateIndex;
@@ -53,7 +54,7 @@ struct DialogState {
 	ieStrRef StrRef;
 	DialogTransition** transitions;
 	unsigned int transitionsCount;
-	DialogString* trigger;
+	Condition* condition;
 	unsigned int weight;
 };
 
@@ -70,7 +71,6 @@ public:
 	DialogState* GetState(unsigned int index);
 	int FindFirstState(Scriptable* target);
 	int FindRandomState(Scriptable* target);
-	bool EvaluateDialogTrigger(Scriptable* target, DialogString* trigger);
 
 	void Release()
 	{

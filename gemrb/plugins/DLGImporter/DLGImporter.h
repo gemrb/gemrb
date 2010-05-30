@@ -74,10 +74,9 @@ public:
 private:
 	DialogState* GetDialogState(Dialog *d, unsigned int index) const;
 	DialogTransition* GetTransition(unsigned int index) const;
-	DialogString* GetStateTrigger(unsigned int index) const;
-	DialogString* GetTransitionTrigger(unsigned int index) const;
+	Condition* GetStateTrigger(unsigned int index) const;
+	Condition* GetTransitionTrigger(unsigned int index) const;
 	DialogString* GetAction(unsigned int index) const;
-	char** GetStrings(char* string, unsigned int& count) const;
 	DialogTransition** GetTransitions(unsigned int firstIndex,
 		unsigned int count) const;
 };

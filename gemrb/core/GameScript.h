@@ -1489,7 +1489,7 @@ public:
 
 GEM_EXPORT Action* GenerateAction(char* String);
 Action* GenerateActionDirect(char* String, Actor *object);
-Trigger* GenerateTrigger(char* String);
+GEM_EXPORT Trigger* GenerateTrigger(char* String);
 
 void InitializeIEScript();
 

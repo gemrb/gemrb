@@ -2637,7 +2637,8 @@ void GameControl::DialogChoose(unsigned int choose)
 			continue;
 		}
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-			if (!dlg->EvaluateDialogTrigger(target, ds->transitions[x]->trigger)) {
+			if (!ds->transitions[x]->condition &&
+				ds->transitions[x]->condition->Evaluate(target)) {
 				continue;
 			}
 		}
@@ -2647,7 +2648,8 @@ void GameControl::DialogChoose(unsigned int choose)
 	}
 	for (x = 0; x < ds->transitionsCount; x++) {
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-			if (!dlg->EvaluateDialogTrigger(target, ds->transitions[x]->trigger)) {
+			if (!ds->transitions[x]->condition &&
+				ds->transitions[x]->condition->Evaluate(target)) {
 				continue;
 			}
 		}

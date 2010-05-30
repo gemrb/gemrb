@@ -109,7 +109,7 @@ DialogState* DLGImporter::GetDialogState(Dialog *d, unsigned int index) const
 	str->ReadDword( &FirstTransitionIndex );
 	str->ReadDword( &ds->transitionsCount );
 	str->ReadDword( &TriggerIndex );
-	ds->trigger = GetStateTrigger( TriggerIndex );
+	ds->condition = GetStateTrigger( TriggerIndex );
 	ds->transitions = GetTransitions( FirstTransitionIndex, ds->transitionsCount );
 	if (TriggerIndex<StatesCount)
 		d->Order[TriggerIndex] = index;
@@ -150,10 +150,10 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 	str->ReadResRef( dt->Dialog );
 	str->ReadDword( &dt->stateIndex );
 	if (dt->Flags &IE_DLG_TR_TRIGGER) {
-		dt->trigger = GetTransitionTrigger( TriggerIndex );
+		dt->condition = GetTransitionTrigger( TriggerIndex );
 	}
 	else {
-		dt->trigger = NULL;
+		dt->condition = NULL;
 	}
 	if (dt->Flags & IE_DLG_TR_ACTION) {
 		dt->action = GetAction( ActionIndex );
@@ -164,7 +164,22 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 	return dt;
 }
 
-DialogString* DLGImporter::GetStateTrigger(unsigned int index) const
+static char** GetStrings(char* string, unsigned int& count);
+
+Condition* GetCondition(char* string)
+{
+	unsigned int count;
+	char **lines = GetStrings( string, count );
+	Condition *condition = new Condition();
+	for (size_t i = 0; i < count; ++i) {
+		condition->triggers.push_back(GenerateTrigger(lines[i]));
+		free(lines[i]);
+	}
+	free(lines);
+	return condition;
+}
+
+Condition* DLGImporter::GetStateTrigger(unsigned int index) const
 {
 	if (index >= StateTriggersCount) {
 		return NULL;
@@ -180,17 +195,16 @@ DialogString* DLGImporter::GetStateTrigger(unsigned int index) const
 	if (!Length) {
 		return NULL;
 	}
-	DialogString* ds = new DialogString();
 	str->Seek( Offset, GEM_STREAM_START );
 	char* string = ( char* ) malloc( Length + 1 );
 	str->Read( string, Length );
 	string[Length] = 0;
-	ds->strings = GetStrings( string, ds->count );
-	free( string );
-	return ds;
+	Condition *condition = GetCondition(string);
+	free(string);
+	return condition;
 }
 
-DialogString* DLGImporter::GetTransitionTrigger(unsigned int index) const
+Condition* DLGImporter::GetTransitionTrigger(unsigned int index) const
 {
 	if (index >= TransitionTriggersCount) {
 		return NULL;
@@ -199,14 +213,13 @@ DialogString* DLGImporter::GetTransitionTrigger(unsigned int index) const
 	ieDword Offset, Length;
 	str->ReadDword( &Offset );
 	str->ReadDword( &Length );
-	DialogString* ds = new DialogString();
 	str->Seek( Offset, GEM_STREAM_START );
 	char* string = ( char* ) malloc( Length + 1 );
 	str->Read( string, Length );
 	string[Length] = 0;
-	ds->strings = GetStrings( string, ds->count );
+	Condition *condition = GetCondition(string);
 	free( string );
-	return ds;
+	return condition;
 }
 
 DialogString* DLGImporter::GetAction(unsigned int index) const
@@ -264,7 +277,7 @@ int GetActionLength(const char* string)
 
 /* this function will break up faulty script strings that lack the CRLF
    between commands, common in PST dialog */
-char** DLGImporter::GetStrings(char* string, unsigned int& count) const
+char** GetStrings(char* string, unsigned int& count)
 {
 	int col = 0;
 	int level = 0;
