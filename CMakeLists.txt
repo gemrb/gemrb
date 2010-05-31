@@ -131,9 +131,14 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 	IF (VISIBILITY_HIDDEN)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
 	ENDIF (VISIBILITY_HIDDEN)
+	if (WIN32)
+		# GCC 4.5.0+ has shared libstdc++ without dllimport
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--enable-auto-import")
+		set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,--enable-auto-import")
+	endif (WIN32)
 	# Ensure all plugin symbols exist.
 	if (NOT APPLE)
-		set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--no-undefined")
+		set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,--no-undefined")
 	endif (NOT APPLE)
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
