@@ -2814,7 +2814,7 @@ int Actor::GetEncumbrance()
 	return inventory.GetWeight();
 }
 
-EffectRef control_undead_ref = { "ControlUndead", NULL, -1};
+EffectRef control_undead_ref = { "ControlUndead2", NULL, -1};
 
 //receive turning
 void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
@@ -2824,7 +2824,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 		return;
 	}
 
-	if (this == cleric) {//HACK: shouldn't be needed
+	if (!turnlevel) {
 		return;
 	}
 
@@ -2840,11 +2840,6 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 	if (turnlevel>GetXPLevel(true)) {
 		if (cleric->Type == ST_ACTOR && ((Actor*)cleric)->MatchesAlignmentMask(AL_EVIL)) {
 			Effect *fx = fxqueue.CreateEffect(control_undead_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
-			if (!fx) { // HACK: currently only works in how and iwd2
-				printMessage("Actor","Invalid control undead effect!\n",RED);
-				delete fx;
-				return;
-			}
 			fx->Duration = ROUND_SECONDS;
 			fx->Target = FX_TARGET_PRESET;
 			core->ApplyEffect(fx, this, cleric);
