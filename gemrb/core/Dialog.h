@@ -26,6 +26,8 @@
 
 #include "GameScript.h"
 
+#include <vector>
+
 #define IE_DLG_TR_TEXT     0x01
 #define IE_DLG_TR_TRIGGER  0x02
 #define IE_DLG_TR_ACTION   0x04
@@ -35,17 +37,12 @@
 #define IE_DLG_SOLVED      0x100
 #define IE_DLG_QUEST_GROUP 0x4000 // this is a GemRB extension
 
-struct DialogString {
-	char** strings;
-	unsigned int count;
-};
-
 struct DialogTransition {
 	ieDword Flags;
 	ieStrRef textStrRef;
 	ieStrRef journalStrRef;
 	Condition* condition;
-	DialogString* action;
+	std::vector<Action*> actions;
 	ieResRef Dialog;
 	ieDword stateIndex;
 };
@@ -63,9 +60,7 @@ public:
 	Dialog(void);
 	~Dialog(void);
 private:
-
 	void FreeDialogState(DialogState* ds);
-	void FreeDialogString(DialogString* ds);
 public:
 	void AddState(DialogState* ds);
 	DialogState* GetState(unsigned int index);

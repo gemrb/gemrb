@@ -156,10 +156,7 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 		dt->condition = NULL;
 	}
 	if (dt->Flags & IE_DLG_TR_ACTION) {
-		dt->action = GetAction( ActionIndex );
-	}
-	else {
-		dt->action = NULL;
+		dt->actions = GetAction( ActionIndex );
 	}
 	return dt;
 }
@@ -222,23 +219,33 @@ Condition* DLGImporter::GetTransitionTrigger(unsigned int index) const
 	return condition;
 }
 
-DialogString* DLGImporter::GetAction(unsigned int index) const
+std::vector<Action*> DLGImporter::GetAction(unsigned int index) const
 {
 	if (index >= ActionsCount) {
-		return NULL;
+		return std::vector<Action*>();
 	}
 	str->Seek( ActionsOffset + ( index * 8 ), GEM_STREAM_START );
 	ieDword Offset, Length;
 	str->ReadDword( &Offset );
 	str->ReadDword( &Length );
-	DialogString* ds = new DialogString();
 	str->Seek( Offset, GEM_STREAM_START );
 	char* string = ( char* ) malloc( Length + 1 );
 	str->Read( string, Length );
 	string[Length] = 0;
-	ds->strings = GetStrings( string, ds->count );
-	free( string );
-	return ds;
+	unsigned int count;
+	char ** lines = GetStrings( string, count );
+	std::vector<Action*> actions;
+	for (size_t i = 0; i < count; ++i) {
+		Action *action = GenerateAction(lines[i]);
+		if (!action) {
+			printMessage( "DLGImporter", "Can't compile action: " ,YELLOW);
+			printf("%s\n", lines[i]);
+			continue;
+		}
+		action->IncRef();
+		actions.push_back(action);
+	}
+	return actions;
 }
 
 int GetActionLength(const char* string)

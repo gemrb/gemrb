@@ -76,7 +76,7 @@ private:
 	DialogTransition* GetTransition(unsigned int index) const;
 	Condition* GetStateTrigger(unsigned int index) const;
 	Condition* GetTransitionTrigger(unsigned int index) const;
-	DialogString* GetAction(unsigned int index) const;
+	std::vector<Action*> GetAction(unsigned int index) const;
 	DialogTransition** GetTransitions(unsigned int firstIndex,
 		unsigned int count) const;
 };

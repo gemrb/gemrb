@@ -2439,8 +2439,6 @@ static const int sectionMap[4]={4,1,2,0};
 
 void GameControl::DialogChoose(unsigned int choose)
 {
-	char Tmp[256];
-
 	TextArea* ta = core->GetMessageTextArea();
 	if (!ta) {
 		printMessage("GameControl","Dialog aborted???",LIGHT_RED);
@@ -2528,7 +2526,7 @@ void GameControl::DialogChoose(unsigned int choose)
 			}
 		}
 
-		if (tr->action) {
+		if (tr->actions.size()) {
 			// does this belong here? we must clear actions somewhere before
 			// we start executing them (otherwise queued actions interfere)
 			// executing actions directly does not work, because dialog
@@ -2537,17 +2535,9 @@ void GameControl::DialogChoose(unsigned int choose)
 			if (target->Type == ST_ACTOR) ((Movable *)target)->ClearPath(); // fuzzie added this
 			target->ClearActions();
 
-			for (unsigned int i = 0; i < tr->action->count; i++) {
-				Action* action = GenerateAction( tr->action->strings[i]);
-				if (action) {
-					target->AddAction(action);
-					//GameScript::ExecuteAction( target, action );
-				} else {
-					snprintf(Tmp, sizeof(Tmp),
-						"Can't compile action: %s\n",
-						tr->action->strings[i] );
-					printMessage( "Dialog", Tmp,YELLOW);
-				}
+			for (unsigned int i = 0; i < tr->actions.size(); i++) {
+				target->AddAction(tr->actions[i]);
+				//GameScript::ExecuteAction( target, action );
 			}
 		}
 
@@ -2637,8 +2627,8 @@ void GameControl::DialogChoose(unsigned int choose)
 			continue;
 		}
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-			if (!ds->transitions[x]->condition &&
-				ds->transitions[x]->condition->Evaluate(target)) {
+			if (ds->transitions[x]->condition &&
+				!ds->transitions[x]->condition->Evaluate(target)) {
 				continue;
 			}
 		}
@@ -2648,8 +2638,8 @@ void GameControl::DialogChoose(unsigned int choose)
 	}
 	for (x = 0; x < ds->transitionsCount; x++) {
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-			if (!ds->transitions[x]->condition &&
-				ds->transitions[x]->condition->Evaluate(target)) {
+			if (ds->transitions[x]->condition &&
+				!ds->transitions[x]->condition->Evaluate(target)) {
 				continue;
 			}
 		}

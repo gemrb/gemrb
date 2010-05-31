@@ -51,27 +51,17 @@ DialogState* Dialog::GetState(unsigned int index)
 void Dialog::FreeDialogState(DialogState* ds)
 {
 	for (unsigned int i = 0; i < ds->transitionsCount; i++) {
-		if (ds->transitions[i]->action)
-			FreeDialogString( ds->transitions[i]->action );
-		if (ds->transitions[i]->condition)
-			delete ds->transitions[i]->condition;
-		delete( ds->transitions[i] );
+		DialogTransition *trans = ds->transitions[i];
+		for (size_t j = 0; j < trans->actions.size(); ++j)
+			trans->actions[j]->Release();
+		if (trans->condition)
+			delete trans->condition;
+		delete( trans );
 	}
 	free( ds->transitions );
 	if (ds->condition) {
 		delete ds->condition;
 	}
-	delete( ds );
-}
-
-void Dialog::FreeDialogString(DialogString* ds)
-{
-	for (unsigned int i = 0; i < ds->count; i++) {
-		if (ds->strings[i]) {
-			free( ds->strings[i] );
-		}
-	}
-	free( ds->strings );
 	delete( ds );
 }
 
