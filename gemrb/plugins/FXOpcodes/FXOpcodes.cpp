@@ -843,6 +843,16 @@ inline Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
 	delete tgts;
 	return ac;
 }
+
+inline Scriptable *GetCaster(Scriptable *Owner, Effect *fx) {
+	if (fx->FirstApply) {
+		fx->CasterID = Owner ? Owner->GetGlobalID() : 0;
+		return Owner;
+	} else {
+		return core->GetGame()->GetActorByGlobalID(fx->CasterID);
+	}
+	return NULL;
+}
 // Effect opcodes
 
 // 0x00 ACVsDamageTypeModifier
@@ -1157,7 +1167,9 @@ int fx_damage (Scriptable* Owner, Actor* target, Effect* fx)
 	if (modtype==3) {
 		modtype&=~3;
 	}
-	target->Damage(fx->Parameter1, damagetype, Owner, modtype);
+	Scriptable *caster = GetCaster(Owner, fx);
+
+	target->Damage(fx->Parameter1, damagetype, caster, modtype);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }
@@ -1525,8 +1537,9 @@ int fx_set_poisoned_state (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
+	Scriptable *caster = GetCaster(Owner, fx);
+
 	//percent
-	Actor *caster = Owner?(Actor *) Owner:NULL;
 	target->Damage(damage, DAMAGE_POISON, caster);
 	return FX_APPLIED;
 }
@@ -2469,8 +2482,10 @@ int fx_set_diseased_state (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	}
 	//percent
+	Scriptable *caster = GetCaster(Owner, fx);
+
 	if (damage) {
-		target->Damage(damage, DAMAGE_POISON, Owner);
+		target->Damage(damage, DAMAGE_POISON, caster);
 	}
 	return FX_APPLIED;
 }
