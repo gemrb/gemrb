@@ -2418,17 +2418,17 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	}
 
 	int resisted = 0;
-	ModifyDamage (this, (Actor *)hitter, damage, resisted, damagetype, NULL, false);
+	ModifyDamage (this, hitter, damage, resisted, damagetype, NULL, false);
 	if (damage) GetHit();
 
-	DisplayCombatFeedback(damage, resisted, damagetype, (Actor *)hitter);
+	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
 
 	if (BaseStats[IE_HITPOINTS] <= (ieDword) damage) {
 		// common fists do normal damage, but cause sleeping for a round instead of death
 		if ((damagetype & DAMAGE_STUNNING) && Modified[IE_MINHITPOINTS] <= 0) {
 			NewBase(IE_HITPOINTS, 1, MOD_ABSOLUTE);
 			Effect *fx = EffectQueue::CreateEffect(fx_sleep_ref, 0, 0, FX_DURATION_INSTANT_LIMITED);
-			fx->Duration = 6; // 1 round
+			fx->Duration = ROUND_SECONDS; // 1 round
 			core->ApplyEffect(fx, this, this);
 			delete fx;
 		} else {
@@ -2489,7 +2489,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 }
 
 //TODO: handle pst
-void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Actor *hitter)
+void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Scriptable *hitter)
 {
 	bool detailed = false;
 	const char *type_name = "unknown";
@@ -2511,7 +2511,11 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			// iwd2 also has two Tortoise Shell (spell) absorption strings
 			core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name);
 			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
-			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter ? hitter->GetName(1) : this->GetName(1) );
+			if (hitter && hitter->Type == ST_ACTOR) {
+				core->GetTokenDictionary()->SetAtCopy( "DAMAGER", hitter->GetName(1) );
+			} else {
+				core->GetTokenDictionary()->SetAtCopy( "DAMAGER", "trap" );
+			}
 			if (resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
 				core->GetTokenDictionary()->SetAtCopy( "RESISTED", abs(resisted));
@@ -2526,10 +2530,12 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			}
 		} else if (stricmp( core->GameType, "pst" ) == 0) {
 			if(0) printf("TODO: pst floating text\n");
-		} else if (core->GetStringReference(STR_DAMAGE_IMMUNITY) == (ieStrRef) -1 && core->GetStringReference(STR_DAMAGE1) != (ieStrRef) -1) {
-			// bg1 and how
-			// "Damage Taken"
-			core->DisplayConstantStringName(STR_DAMAGE1, 0xffffff, this);
+		} else if (core->GetStringReference(STR_DAMAGE1) != (ieStrRef) -1 || !hitter || hitter->Type != ST_ACTOR) {
+			// bg1 and iwd
+			// or traps: "Damage Taken (damage)", but there's no token
+			char tmp[32];
+			snprintf(tmp, sizeof(tmp), "Damage Taken (%d)", damage);
+			core->DisplayStringName(tmp, 0xffffff, this);
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
@@ -2542,18 +2548,19 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 		if (resisted == DR_IMMUNE) {
 			printMessage("Actor", " ", GREEN);
 			printf("is immune to damage type: %s.\n", type_name);
-	
-			if (detailed) {
-				//<DAMAGEE> was immune to my <TYPE> damage
-				core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
-				core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name );
-				core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
-			} else if (core->GetStringReference(STR_DAMAGE_IMMUNITY) != (ieStrRef) -1 && core->GetStringReference(STR_DAMAGE1) != (ieStrRef) -1) {
-				// bg2
-				//<DAMAGEE> was immune to my damage.
-				core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
-				core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
-			} // else: other games don't display anything
+			if (hitter && hitter->Type == ST_ACTOR) {
+				if (detailed) {
+					//<DAMAGEE> was immune to my <TYPE> damage
+					core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
+					core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name );
+					core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
+				} else if (core->GetStringReference(STR_DAMAGE_IMMUNITY) != (ieStrRef) -1 && core->GetStringReference(STR_DAMAGE1) != (ieStrRef) -1) {
+					// bg2
+					//<DAMAGEE> was immune to my damage.
+					core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
+					core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
+				} // else: other games don't display anything
+			}
 		} else {
 			// mirror image or stoneskin: no message
 		}
@@ -4176,7 +4183,7 @@ static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
 static EffectRef fx_mirrorimage_ref={"MirrorImageModifier",NULL,-1};
 static EffectRef fx_aegis_ref={"Aegis",NULL,-1};
 
-void Actor::ModifyDamage(Actor *target, Actor *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
+void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
 {
 
 	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
@@ -4253,8 +4260,8 @@ void Actor::ModifyDamage(Actor *target, Actor *hitter, int &damage, int &resiste
 			damage += (signed)target->GetStat(IE_DAMAGEBONUS);
 			resisted = (int) (damage * (signed)target->GetStat(it->second.resist_stat)/100.0);
 			// check for bonuses for specific damage types
-			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && hitter) {
-				int bonus = hitter->fxqueue.SpecificDamageBonus(it->second.iwd_mod_type);
+			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && hitter && hitter->Type == ST_ACTOR) {
+				int bonus = ((Actor *)hitter)->fxqueue.SpecificDamageBonus(it->second.iwd_mod_type);
 				if (bonus) {
 					resisted -= int (damage * bonus / 100.0);
 					printf("Bonus damage of %d (%+d%%), neto: %d\n", int (damage * bonus / 100.0), bonus, -resisted);

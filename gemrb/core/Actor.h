@@ -435,7 +435,7 @@ public:
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Scriptable *hitter, int modtype=MOD_ADDITIVE);
 	/* displays the damage taken and other details (depends on the game type) */
-	void DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Actor *hitter);
+	void DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Scriptable *hitter);
 	/* play the proper hit sound (in pst) */
 	void PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix);
 	/* drops items from inventory to current spot */
@@ -506,7 +506,7 @@ public:
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
 	/* ensures we can deal damage to a target */
-	void ModifyDamage(Actor *target, Actor *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical);
+	void ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical);
 	/* applies modal spell etc, if needed */
 	void UpdateActorState(ieDword gameTime);
 	/* sets a colour gradient stat, handles location */
