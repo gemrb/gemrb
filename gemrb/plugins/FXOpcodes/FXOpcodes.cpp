@@ -1043,7 +1043,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	STATE_SET( STATE_CHARMED );
-	STAT_SET( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
+	STAT_SET_PCF( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
 	//don't stick if permanent
 	return FX_PERMANENT;
 }
