@@ -431,6 +431,7 @@ public:
 	void DisplayString(int stridx, unsigned int color, ieDword flags) const;
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(int stridx, unsigned int color, const Scriptable *speaker, ieDword flags) const;
+	void DisplayStringName(const char *text, unsigned int color, const Scriptable *speaker) const;
 	/** returns the Window Visible Flag */
 	int GetVisible(unsigned short WindowIndex) const;
 	/** Set a Window Visible Flag */

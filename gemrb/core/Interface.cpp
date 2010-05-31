@@ -4241,6 +4241,22 @@ void Interface::DisplayStringName(int stridx, unsigned int color, const Scriptab
 	free( newstr );
 }
 
+void Interface::DisplayStringName(const char *text, unsigned int color, const Scriptable *speaker) const
+{
+	unsigned int speaker_color;
+	const char *name;
+
+	if (!text) return;
+	speaker_color = GetSpeakerColor(name, speaker);
+
+	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
+		+ strlen( text ) + 10);
+	char* newstr = ( char* ) malloc( newlen );
+	snprintf( newstr, newlen, DisplayFormatName, speaker_color, name, color, text );
+	DisplayString( newstr );
+	free( newstr );
+}
+
 static const char *saved_extensions[]={".are",".sto",0};
 static const char *saved_extensions_last[]={".tot",".toh",0};
 
