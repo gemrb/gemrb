@@ -3624,7 +3624,7 @@ void Actor::SetModalSpell(ieDword state, const char *spell)
 	if (spell) {
 		strnlwrcpy(ModalSpell, spell, 8);
 	} else {
-		if (state >= (signed)core->ModalStates.size()) {
+		if (state >= core->ModalStates.size()) {
 			ModalSpell[0] = 0;
 		} else {
 			strnlwrcpy(ModalSpell, core->ModalStates[state].spell, 8);
