@@ -398,7 +398,7 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 
 	if ((Strref != -1) && !sb.Sound[0]) {
 		sb = core->strings->GetStringBlock( Strref );
-		if (sb.text[0] && (flags & DS_CONSOLE)) {
+		if (sb.text[0] && strcmp(sb.text," ") && (flags & DS_CONSOLE)) {
 			//can't play the sound here, we have to delay action
 			//and for that, we have to know how long the text takes
 			if(flags&DS_NONAME) {
@@ -407,7 +407,7 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 				core->DisplayStringName( Strref, 0xf0f0f0, Sender, 0);
 			}
 		}
-		if (sb.text[0] && (flags & (DS_HEAD | DS_AREA))) {
+		if (sb.text[0] && strcmp(sb.text," ") && (flags & (DS_HEAD | DS_AREA))) {
 			Sender->DisplayHeadText( sb.text );
 			//don't free sb.text, it is residing in Sender
 			if (flags & DS_AREA) {
