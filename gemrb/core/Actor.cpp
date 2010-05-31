@@ -3619,6 +3619,19 @@ void Actor::SetModal(ieDword newstate, bool force)
 	}
 }
 
+void Actor::SetModalSpell(ieDword state, const char *spell)
+{
+	if (spell) {
+		strnlwrcpy(ModalSpell, spell, 8);
+	} else {
+		if (state >= (signed)core->ModalStates.size()) {
+			ModalSpell[0] = 0;
+		} else {
+			strnlwrcpy(ModalSpell, core->ModalStates[state].spell, 8);
+		}
+	}
+}
+
 //this is just a stub function for now, attackstyle could be melee/ranged
 //even spells got this attack style
 int Actor::GetAttackStyle()

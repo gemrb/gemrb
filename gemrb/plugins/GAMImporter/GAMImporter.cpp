@@ -509,6 +509,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	actor->SetOrientation( pcInfo.Orientation,0 );
 	actor->TalkCount = pcInfo.TalkCount;
 	actor->ModalState = pcInfo.ModalState;
+	actor->SetModalSpell(pcInfo.ModalState, 0);
 
 	actor->SetPersistent( tmpWord );
 

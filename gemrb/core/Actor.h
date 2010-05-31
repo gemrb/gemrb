@@ -488,6 +488,8 @@ public:
 	void AddExperience(int type, int level);
 	/* Sets the modal state after checks */
 	void SetModal(ieDword newstate, bool force=1);
+	/* Sets the modal spell after checks */
+	void SetModalSpell(ieDword state, const char *spell);
 	/* returns current attack style */
 	int GetAttackStyle();
 	/* sets target for immediate attack */
