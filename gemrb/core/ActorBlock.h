@@ -274,7 +274,7 @@ public:
 	bool TimerActive(ieDword ID);
 	bool TimerExpired(ieDword ID);
 	void StartTimer(ieDword ID, ieDword expiration);
-	virtual char* GetName(int /*which*/) const { return NULL; };
+	virtual char* GetName(int /*which*/) const { return NULL; }
 private:
 	/* used internally to handle start of spellcasting */
 	int SpellCast(const ieResRef SpellResRef, bool instant);
