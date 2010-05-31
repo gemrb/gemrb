@@ -44,6 +44,8 @@ Store::~Store(void)
 	unsigned int i;
 
 	for (i = 0; i < items.size(); i++) {
+		if (items[i]->trigger)
+			items[i]->trigger->Release();
 		delete( items[i] );
 	}
 	if(drinks)
@@ -61,12 +63,9 @@ bool Store::IsItemAvailable(unsigned int slot) const
 	//-1    - infinite
 	//other - pst trigger ref
 
-	ieDwordSigned trigger = items[slot]->InfiniteSupply;
-	if (trigger>0) {
-		char *TriggerCode = core->GetString( (ieStrRef) trigger );
-		bool ret = GameScript::EvaluateString (game->GetPC(game->GetSelectedPCSingle(), false),TriggerCode)!=0;
-		core->FreeString(TriggerCode);
-		return ret;
+	Trigger *trigger = items[slot]->trigger;
+	if (trigger) {
+		return trigger->Evaluate(game->GetPC(game->GetSelectedPCSingle(), false))!=0;
 	}
 	return true;
 }

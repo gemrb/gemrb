@@ -35,6 +35,7 @@
 
 //bah!
 class CREItem;
+class Trigger;
 
 typedef enum StoreType { STT_STORE=0, STT_TAVERN=1, STT_INN=2, STT_TEMPLE=3,
 STT_BG2CONT=4, STT_IWD2CONT=5 } StoreType;
@@ -71,6 +72,7 @@ struct STOItem {
 	ieDword AmountInStock;
 	ieDwordSigned InfiniteSupply;
 	// V1.1
+	Trigger *trigger;
 	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];
 };

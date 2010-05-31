@@ -23,6 +23,7 @@
 #include "Inventory.h"
 #include "STOImporter.h"
 #include "GameData.h"
+#include "GameScript.h"
 
 STOImporter::STOImporter(void)
 {
@@ -130,6 +131,10 @@ Store* STOImporter::GetStore(Store *s)
 		GetItem(item);
 		//it is important to handle this field as signed
 		if (item->InfiniteSupply>0) {
+			char *TriggerCode = core->GetString( (ieStrRef) item->InfiniteSupply );
+			item->trigger = GenerateTrigger(TriggerCode);
+			core->FreeString(TriggerCode);
+
 			//if there are no triggers, GetRealStockSize is simpler
 			//also it is compatible only with pst/gemrb saved stores
 			s->HasTriggers=true;
