@@ -44,7 +44,7 @@
 #  endif
 # endif
 
-# if defined(__MINGW32__) && not defined(HAVE_SNPRINTF)
+# if defined(__MINGW32__) && ! defined(HAVE_SNPRINTF)
 #  define HAVE_SNPRINTF
 # endif
 
