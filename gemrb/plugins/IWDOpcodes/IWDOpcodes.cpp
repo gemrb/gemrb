@@ -1414,12 +1414,17 @@ int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	bool enemyally = true;
-	if (Owner->Type==ST_ACTOR) {
-		enemyally = ((Actor *) Owner)->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
+	Scriptable *caster = target->GetCurrentArea()->GetActorByGlobalID(fx->CasterID);
+	if (caster && caster->Type==ST_ACTOR) {
+		enemyally = ((Actor *) caster)->GetStat(IE_EA) > EA_GOODCUTOFF; //or evilcutoff?
 	}
 
+	//do this only on first use
 	if (fx->FirstApply) {
-		//do this only on first use
+		if (Owner->Type == ST_ACTOR) {
+			fx->CasterID = Owner->GetGlobalID();
+			enemyally = ((Actor *) Owner)->GetStat(IE_EA) > EA_GOODCUTOFF; //or evilcutoff?
+		}
 		switch (fx->Parameter2) {
 		case 0: //charmed (target neutral after charm)
 			core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
@@ -1444,7 +1449,7 @@ int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	STATE_SET( STATE_CHARMED );
-	STAT_SET( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
+	STAT_SET_PCF( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
 	//don't stick if permanent
 	return FX_PERMANENT;
 }
