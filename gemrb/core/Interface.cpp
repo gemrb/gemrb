@@ -4100,7 +4100,7 @@ unsigned int Interface::GetSpeakerColor(const char *&name, const Scriptable *&sp
 	if(!speaker) return 0;
 	switch (speaker->Type) {
 		case ST_ACTOR:
-			name = ((Actor *) speaker)->GetName(-1);
+			name = speaker->GetName(-1);
 			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR) & 0xFF, PALSIZE, ActorColor );
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
