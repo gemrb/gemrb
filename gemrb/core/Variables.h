@@ -42,7 +42,7 @@ typedef void (*ReleaseFun)(void *);
 class GEM_EXPORT Variables {
 protected:
 	// Association
-	struct MyAssoc {
+	class MyAssoc {
 		MyAssoc* pNext;
 		char* key;
 		union {
@@ -51,14 +51,14 @@ protected:
 			void* pValue;
 		} Value;
 		unsigned long nHashValue;
+		friend class Variables;
 	};
 	struct MemBlock {
 		MemBlock* pNext;
 	};
 public:
 	// abstract iteration position
-	typedef struct POS {
-	} *iterator;
+	typedef MyAssoc *iterator;
 public:
 	// Construction
 	Variables(int nBlockSize = 10, int nHashTableSize = 2049);
