@@ -95,6 +95,11 @@ public:
 		return QueryField((unsigned int) rowi, (unsigned int) coli);
 	}
 
+	virtual const char* QueryDefault() const
+	{
+		return defVal;
+	}
+
 	inline int GetRowIndex(const char* string) const
 	{
 		for (unsigned int index = 0; index < rowNames.size(); index++) {

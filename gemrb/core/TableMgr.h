@@ -53,6 +53,8 @@ public:
 	 * uses column name and row name to search the field,
 	 * may return NULL */
 	virtual const char* QueryField(const char* row, const char* column) const = 0;
+	/** Returns default value of table. */
+	virtual const char* QueryDefault() const = 0;
 	virtual int GetColumnIndex(const char* colname) const = 0;
 	virtual int GetRowIndex(const char* rowname) const = 0;
 	virtual const char* GetColumnName(unsigned int index) const = 0;

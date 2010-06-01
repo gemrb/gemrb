@@ -5471,7 +5471,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 		const char *basename = "Auto-Save";
 		AutoTable tab("savegame");
 		if (tab) {
-			basename = tab->QueryField(-1);
+			basename = tab->QueryDefault();
 		}
 		char * str = core->GetString( parameters->int0Parameter, IE_STR_STRREFOFF);
 		char FolderName[_MAX_PATH];
