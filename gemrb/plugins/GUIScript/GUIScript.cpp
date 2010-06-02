@@ -5422,7 +5422,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
  		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
  			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
-				memcpy(Sound,item->ReplacementItem,8);
+				memcpy(Sound,item->ReplacementItem,sizeof(ieResRef));
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
@@ -5454,7 +5454,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
  		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
  			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
-				memcpy(Sound,item->DescriptionIcon,8);
+				memcpy(Sound,item->DescriptionIcon,sizeof(ieResRef));
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 			}
@@ -7003,7 +7003,7 @@ printf("Actor ac:%d\n", actor->Modified[IE_ARMORCLASS]);
 	Item *item = gamedata->GetItem(si->ItemResRef);
 	if (item) {
 		if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
-			memcpy(Sound,item->DescriptionIcon,8);
+			memcpy(Sound,item->DescriptionIcon,sizeof(ieResRef));
 		} else {
 			GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 		}
@@ -7073,7 +7073,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
  		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
  			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
-				memcpy(Sound,item->ReplacementItem,8);
+				memcpy(Sound,item->ReplacementItem,sizeof(ieResRef));
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
