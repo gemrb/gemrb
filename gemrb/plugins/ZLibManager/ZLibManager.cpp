@@ -38,7 +38,7 @@ ZLibManager::~ZLibManager(void)
 #define OUTPUTSIZE 4096
 
 // ZLib Decompression Routine
-int ZLibManager::Decompress(FILE* dest, DataStream* source)
+int ZLibManager::Decompress(FILE* dest, DataStream* source, unsigned int size_guess)
 {
 	unsigned char bufferin[INPUTSIZE], bufferout[OUTPUTSIZE];
 	z_stream stream;
@@ -59,10 +59,21 @@ int ZLibManager::Decompress(FILE* dest, DataStream* source)
 		stream.avail_out = OUTPUTSIZE;
 		if (stream.avail_in == 0) {
 			stream.next_in = bufferin;
-			//Read doesn't allow partial reads, but provides Remains
-			stream.avail_in = source->Remains();
+			if (size_guess) {
+				stream.avail_in = size_guess;
+			}
+			if (!stream.avail_in || stream.avail_in > source->Remains()) {
+				//Read doesn't allow partial reads, but provides Remains
+				stream.avail_in = source->Remains();
+			}
 			if (stream.avail_in > INPUTSIZE) {
 				stream.avail_in=INPUTSIZE;
+			}
+			if (size_guess) {
+				if (size_guess < stream.avail_in)
+					size_guess = 0;
+				else
+					size_guess -= stream.avail_in;
 			}
 			if (source->Read( bufferin, stream.avail_in) != (int) stream.avail_in) {
 				return GEM_ERROR;

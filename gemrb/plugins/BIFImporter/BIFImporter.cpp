@@ -75,7 +75,7 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 			return GEM_ERROR;
 		}
 		PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
-		if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
+		if (comp->Decompress( in_cache, compressed, complen ) != GEM_OK) {
 			return GEM_ERROR;
 		}
 		fclose( in_cache );
@@ -196,7 +196,7 @@ int BIFImporter::OpenArchive(const char* filename)
 			return GEM_ERROR;
 		}
 		PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
-		if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
+		if (comp->Decompress( in_cache, compressed, complen ) != GEM_OK) {
 			return GEM_ERROR;
 		}
 		fclose( in_cache );
@@ -243,8 +243,10 @@ int BIFImporter::OpenArchive(const char* filename)
 		ieDword finalsize = 0;
 		int laststep = 0;
 		while (finalsize < unCompBifSize) {
-			compressed->Seek( 8, GEM_CURRENT_POS );
-			if (comp->Decompress( in_cache, compressed ) != GEM_OK) {
+			ieDword complen, declen;
+			compressed->ReadDword( &declen );
+			compressed->ReadDword( &complen );
+			if (comp->Decompress( in_cache, compressed, complen ) != GEM_OK) {
 				return GEM_ERROR;
 			}
 			finalsize = ftell( in_cache );

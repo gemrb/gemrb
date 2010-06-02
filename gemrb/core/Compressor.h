@@ -32,7 +32,7 @@ public:
 	/** Initialization Function. Returns FALSE if there was an error during initialization, else returns TRUE. */
 	virtual int Init(void);
 	/** decompresses a datastream (memory or file) to a FILE * stream */
-	virtual int Decompress(FILE* dest, DataStream* source) = 0;
+	virtual int Decompress(FILE* dest, DataStream* source, unsigned int size_guess = 0) = 0;
 	/** compresses a datastream (memory or file) to another DataStream */
 	virtual int Compress(DataStream *dest, DataStream* source) = 0;
 };
