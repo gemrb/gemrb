@@ -853,6 +853,15 @@ inline Scriptable *GetCaster(Scriptable *Owner, Effect *fx) {
 	}
 	return NULL;
 }
+
+// handles the percentage damage spread over time by converting it to absolute damage
+inline void HandlePercentageDamage(Effect *fx, Actor *target) {
+	if (fx->Parameter2 == RPD_PERCENT && fx->FirstApply) {
+		// distribute the damage to one second intervals
+		int seconds = (fx->Duration - core->GetGame()->GameTime) / AI_UPDATE_TIME;
+		fx->Parameter1 = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100 / seconds;
+	}
+}
 // Effect opcodes
 
 // 0x00 ACVsDamageTypeModifier
@@ -1504,23 +1513,21 @@ int fx_set_poisoned_state (Scriptable* Owner, Actor* target, Effect* fx)
 	ieDword damage;
 	int tmp = fx->Parameter1;
 
+	HandlePercentageDamage(fx, target);
+
 	switch(fx->Parameter2) {
-	case RPD_PERCENT:
-		// this is all wrong
-		tmp = 1;
-		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
-		break;
 	case RPD_ROUNDS:
-		tmp *= 6;
+		tmp *= ROUND_SECONDS;
 		damage = 1;
 		break;
 	case RPD_TURNS:
-		tmp *= 30;
+		tmp *= ROUND_PER_TURN*ROUND_SECONDS;
 		damage = 1;
 		break;
 	case RPD_SECONDS:
 		damage = 1;
 		break;
+	case RPD_PERCENT: // handled in HandlePercentageDamage
 	case RPD_POINTS:
 		tmp = 1; // hit points per second
 		damage = fx->Parameter1;
@@ -2439,17 +2446,16 @@ int fx_set_diseased_state (Scriptable* Owner, Actor* target, Effect* fx)
 	//setting damage to 0 because not all types do damage
 	ieDword damage = 0;
 
+	HandlePercentageDamage(fx, target);
+
 	switch(fx->Parameter2) {
-	case RPD_PERCENT:
-		// this is all wrong
-		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
-		break;
 	case RPD_SECONDS:
 		damage = 1;
 		if (fx->Parameter1 && (core->GetGame()->GameTime%(fx->Parameter1*AI_UPDATE_TIME))) {
 			return FX_APPLIED;
 		}
 		break;
+	case RPD_PERCENT: // handled in HandlePercentageDamage
 	case RPD_POINTS:
 		damage = fx->Parameter1;
 		// per second
@@ -2725,11 +2731,9 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//just go to gameTime+1 to ensure one call
 	if (nextHeal>=gameTime) return FX_APPLIED;
 
+	HandlePercentageDamage(fx, target);
+
 	switch(fx->Parameter2) {
-	case RPD_PERCENT:
-		// this is all wrong
-		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
-		break;
 	case RPD_TURNS:		//restore param3 hp every param1 turns
 		//assuming 1 turn = 10 rounds
 		tmp *= ROUND_PER_TURN;
@@ -2741,6 +2745,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->Parameter3 = nextHeal + tmp*AI_UPDATE_TIME;
 		damage = 1;
 		break;
+	case RPD_PERCENT: // handled in HandlePercentageDamage
 	case RPD_POINTS:	//restore param1 hp every second? that's crazy!
 		damage = fx->Parameter1;
 		fx->Parameter3 = nextHeal + AI_UPDATE_TIME;
