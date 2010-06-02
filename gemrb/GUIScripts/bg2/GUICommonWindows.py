@@ -511,6 +511,7 @@ def OpenPortraitWindow (needcontrols):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
+		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT, "OnDropPortraitToPC")
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, "PortraitButtonOnDrag")
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
@@ -677,7 +678,7 @@ def PortraitButtonOnMouseEnter ():
 			DraggedPortrait = i
 			GemRB.SetTimedEvent ("CheckDragging",1)
 		else:
-			OnDropItemToPC2()
+			OnDropPortraitToPC()
 		return
 
 	if GemRB.IsDraggingItem ():
@@ -685,7 +686,7 @@ def PortraitButtonOnMouseEnter ():
 		Button.EnableBorder (FRAME_PC_TARGET, 1)
 	return
 
-def OnDropItemToPC2 ():
+def OnDropPortraitToPC ():
 	GemRB.SetVar ("PressedPortrait",0)
 	GemRB.DragItem (0, -1, "")
 	DraggedPortrait = None

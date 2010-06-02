@@ -477,23 +477,12 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 		}
 	}
 
-	//FIXME: you may want to clean this mess up
-	//normally there is only one handler allowed, but the portraits need
-	//another, i didn't want to have another 64 bytes allocated for every
-	//button control, so this hack calls a different function in case
-	//a portrait was dropped
-	//If the original was: DropItemToPC, then it calls DropItemToPC2
 	switch (dragtype) {
 		case 1:
 			RunEventHandler( ButtonOnDragDrop );
 			return;
 		case 2:
-			//very ugly hack
-			EventHandler tmp;
-
-			memcpy(tmp, ButtonOnDragDrop, sizeof(tmp));
-			strncat(tmp,"2", sizeof(EventHandler) );
-			RunEventHandler( tmp );
+			RunEventHandler( ButtonOnDragDropPortrait );
 			return;
 	}
 
@@ -614,6 +603,9 @@ bool Button::SetEvent(int eventType, const char *handler)
 			break;
 		case IE_GUI_BUTTON_ON_DRAG_DROP:
 			SetEventHandler( ButtonOnDragDrop, handler );
+			break;
+		case IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT:
+			SetEventHandler( ButtonOnDragDropPortrait, handler );
 			break;
 		case IE_GUI_BUTTON_ON_DRAG:
 			SetEventHandler( ButtonOnDrag, handler );

@@ -88,8 +88,9 @@ class Palette;
 #define IE_GUI_BUTTON_ON_SHIFT_PRESS 0x00000004
 #define IE_GUI_BUTTON_ON_RIGHT_PRESS 0x00000005
 #define IE_GUI_BUTTON_ON_DRAG_DROP   0x00000006
-#define IE_GUI_BUTTON_ON_DRAG        0x00000007
-#define IE_GUI_BUTTON_ON_DOUBLE_PRESS 0x00000008
+#define IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT   0x00000007
+#define IE_GUI_BUTTON_ON_DRAG        0x00000008
+#define IE_GUI_BUTTON_ON_DOUBLE_PRESS 0x00000009
 
 /** Border/frame settings for a button */
 struct ButtonBorder {
@@ -165,6 +166,7 @@ public: // Public Events
 	EventHandler ButtonOnRightPress;
 	EventHandler ButtonOnDoublePress;
 	EventHandler ButtonOnDragDrop;
+	EventHandler ButtonOnDragDropPortrait;
 	EventHandler ButtonOnDrag;
 	EventHandler MouseEnterButton;
 	EventHandler MouseLeaveButton;
