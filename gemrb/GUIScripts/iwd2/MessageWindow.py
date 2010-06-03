@@ -33,6 +33,7 @@ from GUIWORLD import *
 from TextScreen import *
 from GUIClasses import GTextArea
 from GUIClasses import GWindow
+from CommonWindow import OnIncreaseSize, OnDecreaseSize
 
 MessageWindow = 0
 PortraitWindow = 0
@@ -63,12 +64,6 @@ def OnLoad():
 	MessageWindow.SetVisible(WINDOW_VISIBLE)
 	PortraitWindow.SetVisible(WINDOW_VISIBLE)
 	return
-
-def OnIncreaseSize():
-	GemRB.GameSetScreenFlags(GS_LARGEDIALOG, OP_OR)
-
-def OnDecreaseSize():
-	GemRB.GameSetScreenFlags(GS_LARGEDIALOG, OP_NAND)
 
 def UpdateControlStatus():
 	global MessageWindow

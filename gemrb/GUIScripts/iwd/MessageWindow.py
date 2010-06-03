@@ -28,6 +28,7 @@ from GUIClasses import GTextArea
 from GUIClasses import GWindow
 from GUICommon import HasHOW
 from GUICommon import GameControl
+from CommonWindow import OnIncreaseSize, OnDecreaseSize
 
 from GUIJRNL import *
 from GUIMA import *
@@ -83,24 +84,6 @@ def OnLoad():
 	GemRB.SetVar ("TopPosition", 5) #Inactivating
 	
 	UpdateControlStatus ()
-
-def OnIncreaseSize ():
-	GSFlags = GemRB.GetMessageWindowSize ()
-	Expand = GSFlags&GS_DIALOGMASK
-	GSFlags = GSFlags-Expand
-	if Expand>2:
-		return
-	Expand = (Expand + 1)*2
-	GemRB.GameSetScreenFlags (Expand + GSFlags, OP_SET)
-
-def OnDecreaseSize ():
-	GSFlags = GemRB.GetMessageWindowSize ()
-	Expand = GSFlags&GS_DIALOGMASK
-	GSFlags = GSFlags-Expand
-	if Expand<2:
-		return
-	Expand = Expand/2 - 1 # 6->2, 2->0
-	GemRB.GameSetScreenFlags (Expand + GSFlags, OP_SET)
 
 def UpdateControlStatus ():
 	global MessageWindow, ExpandButton, ContractButton

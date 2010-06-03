@@ -23,6 +23,7 @@ import GUICommonWindows
 from GUICommon import GameControl
 from GUIClasses import GTextArea
 from GUIClasses import GWindow
+from CommonWindow import OnIncreaseSize, OnDecreaseSize
 
 from GUIJRNL import *
 from GUIMA import *
@@ -74,24 +75,6 @@ def OnLoad():
 	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 
 	UpdateControlStatus()
-
-def OnIncreaseSize():
-	GSFlags = GemRB.GetMessageWindowSize()
-	Expand = GSFlags&GS_DIALOGMASK
-	GSFlags = GSFlags-Expand
-	if Expand>2:
-		return
-	Expand = (Expand + 1)*2
-	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
-
-def OnDecreaseSize():
-	GSFlags = GemRB.GetMessageWindowSize()
-	Expand = GSFlags&GS_DIALOGMASK
-	GSFlags = GSFlags-Expand
-	if Expand<2:
-		return
-	Expand = Expand/2 - 1
-	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
 
 def ScrollUp ():
 	TMessageWindow = GemRB.GetVar("MessageWindow")

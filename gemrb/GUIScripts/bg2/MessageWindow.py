@@ -27,6 +27,7 @@ import GUICommonWindows
 from GUICommon import GameControl
 from GUIClasses import GTextArea
 from GUIClasses import GWindow
+from CommonWindow import OnIncreaseSize, OnDecreaseSize
 
 from GUIJRNL import *
 from GUIMA import *
@@ -103,24 +104,6 @@ def MaximizePortraits():
 
 def TogglePartyAI():
 	GemRB.GameSetScreenFlags(GS_PARTYAI, OP_XOR)
-
-def OnIncreaseSize():
-	GSFlags = GemRB.GetMessageWindowSize()
-	Expand = GSFlags&GS_DIALOGMASK
-	GSFlags = GSFlags-Expand
-	if Expand>2:
-		return
-	Expand = (Expand + 1)*2
-	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
-
-def OnDecreaseSize():
-	GSFlags = GemRB.GetMessageWindowSize()
-	Expand = GSFlags&GS_DIALOGMASK
-	GSFlags = GSFlags-Expand
-	if Expand<2:
-		return
-	Expand = Expand/2 - 1 # 6->2, 2->0
-	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
 
 def UpdateControlStatus():
 	global MessageWindow, ExpandButton, ContractButton

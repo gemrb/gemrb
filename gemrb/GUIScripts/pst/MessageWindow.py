@@ -28,6 +28,7 @@ from GUICommonWindows import *
 import GUICommonWindows
 from GUICommon import GameControl
 from GUIClasses import GTextArea
+from CommonWindow import OnIncreaseSize, OnDecreaseSize
 
 from FloatMenuWindow import *
 
@@ -96,15 +97,6 @@ def OnLoad():
 	SetupMenuWindowControls (OptionsWindow)
 
 	UpdateControlStatus ()
-
-	
-def OnIncreaseSize():
-	GemRB.GameSetScreenFlags (GS_LARGEDIALOG, OP_OR)
-
-
-def OnDecreaseSize():
-	GemRB.GameSetScreenFlags (GS_LARGEDIALOG, OP_NAND)
-
 
 def UpdateControlStatus ():
 	global MessageWindow, PortraitWindow, ActionsWindow, OptionsWindow
