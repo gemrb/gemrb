@@ -32,7 +32,7 @@ public:
 	SpriteCover(void);
 	~SpriteCover(void);
 
-	bool Covers(int x, int y, int xpos, int ypos, int width, int height);
+	bool Covers(int x, int y, int xpos, int ypos, int width, int height) const;
 };
 
 

@@ -50,17 +50,17 @@ public:
 		}
 	}
 
-	const char* GetTagName()
+	const char* GetTagName() const
 	{
 		return TagName;
 	}
 
-	int GetKeyCount()
+	int GetKeyCount() const
 	{
 		return (int) pairs.size();
 	}
 
-	const char* GetKeyNameByIndex(int index)
+	const char* GetKeyNameByIndex(int index) const
 	{
 		return pairs[index].Name;
 	}
@@ -114,7 +114,7 @@ public:
 		return false;
 	}
 
-	const char* GetKeyAsString(const char* Key, const char* Default)
+	const char* GetKeyAsString(const char* Key, const char* Default) const
 	{
 		for (unsigned int i = 0; i < pairs.size(); i++) {
 			if (stricmp( Key, pairs[i].Name ) == 0) {
@@ -124,7 +124,7 @@ public:
 		return Default;
 	}
 
-	int GetKeyAsInt(const char* Key, const int Default)
+	int GetKeyAsInt(const char* Key, const int Default) const
 	{
 		const char* ret = NULL;
 		for (unsigned int i = 0; i < pairs.size(); i++) {
@@ -139,7 +139,7 @@ public:
 		return atoi( ret );
 	}
 
-	float GetKeyAsFloat(const char* Key, const float Default)
+	float GetKeyAsFloat(const char* Key, const float Default) const
 	{
 		const char* ret = NULL;
 		for (unsigned int i = 0; i < pairs.size(); i++) {
@@ -154,7 +154,7 @@ public:
 		return atof( ret );
 	}
 
-	bool GetKeyAsBool(const char* Key, const bool Default)
+	bool GetKeyAsBool(const char* Key, const bool Default) const
 	{
 		const char* ret = NULL;
 		for (unsigned int i = 0; i < pairs.size(); i++) {
@@ -186,25 +186,25 @@ public:
 	INIImporter(void);
 	~INIImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	int GetTagsCount()
+	int GetTagsCount() const
 	{
 		return ( int ) tags.size();
 	}
-	const char* GetTagNameByIndex(int index)
+	const char* GetTagNameByIndex(int index) const
 	{
 		return tags[index]->GetTagName();
 	}
 
-	int GetKeysCount(const char* Tag);
-	const char* GetKeyNameByIndex(const char* Tag, int index);
+	int GetKeysCount(const char* Tag) const;
+	const char* GetKeyNameByIndex(const char* Tag, int index) const;
 	const char* GetKeyAsString(const char* Tag, const char* Key,
-		const char* Default);
+		const char* Default) const;
 	int GetKeyAsInt(const char* Tag, const char* Key, 
-		const int Default);
+		const int Default) const;
 	float GetKeyAsFloat(const char* Tag, const char* Key, 
-		const float Default);
+		const float Default) const;
 	bool GetKeyAsBool(const char* Tag, const char* Key, 
-		const bool Default);
+		const bool Default) const;
 };
 
 #endif

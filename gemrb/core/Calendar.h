@@ -33,8 +33,8 @@ private:
 public:
 	Calendar(void);
 	~Calendar(void);
-	void GetMonthName(int dayandmonth);
-	int GetCalendarDay(int date);
+	void GetMonthName(int dayandmonth) const;
+	int GetCalendarDay(int date) const;
 };
 
 #endif

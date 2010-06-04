@@ -355,7 +355,7 @@ public:
 	bool EveryoneDead() const;
 	/** returns true if no one moves */
 	bool EveryoneStopped() const;
-	bool EveryoneNearPoint(Map *map, Point &p, int flags) const;
+	bool EveryoneNearPoint(Map *map, const Point &p, int flags) const;
 	/** returns true if a PC just died */
 	int PartyMemberDied() const;
 	/** a party member just died now */
@@ -389,7 +389,7 @@ public:
 	may return NULL */
 	const Color *GetGlobalTint() const;
 	/** draw weather */
-	void DrawWeather(Region &screen, bool update);
+	void DrawWeather(const Region &screen, bool update);
 	/** updates current area music */
 	void ChangeSong(bool force = true);
 	/** sets expansion mode */

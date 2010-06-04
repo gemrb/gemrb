@@ -167,14 +167,14 @@ private:
 	void QuickSave();
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetActorByGlobalID(ieWord ID);
-	void CalculateSelection(Point &p);
+	void CalculateSelection(const Point &p);
 	void ResizeDel(Window* win, int type);
 	void ResizeAdd(Window* win, int type);
 	void HandleWindowHide(const char *WindowName, const char *WindowPosition);
 	void HandleWindowReveal(const char *WindowName, const char *WindowPosition);
 	void ReadFormations();
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
-	void DrawArrowMarker(Region &screen, Point p, Region &viewport);
+	void DrawArrowMarker(const Region &screen, Point p, const Region &viewport);
 
 private:
 	unsigned char LeftCount, BottomCount, RightCount, TopCount;
@@ -203,7 +203,7 @@ public:
 	int UnhideGUI();
 	void TryToAttack(Actor *source, Actor *target);
 	void TryToBash(Actor *source, Scriptable *tgt);
-	void TryToCast(Actor *source, Point &p);
+	void TryToCast(Actor *source, const Point &p);
 	void TryToCast(Actor *source, Actor *target);
 	void TryToDefend(Actor *source, Actor *target);
 	void TryToTalk(Actor *source, Actor *target);
@@ -226,14 +226,14 @@ public:
 	Point GetFormationOffset(ieDword formation, ieDword pos);
 	void MoveToPointFormation(Actor *actor, unsigned int pos, Point src, Point p);
 	/** calls MoveToPoint or RunToPoint */
-	void CreateMovement(Actor *actor, Point &p);
+	void CreateMovement(Actor *actor, const Point &p);
 	int InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);
 	/** Displays a string over an object */
 	void DisplayString(Scriptable* target);
 	/** Displays a string on screen */
-	void DisplayString(Point &p, const char *Text);
+	void DisplayString(const Point &p, const char *Text);
 	Actor *GetLastActor();
 	/** changes map to the current PC */
 	void ChangeMap(Actor *pc, bool forced);

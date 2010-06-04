@@ -244,7 +244,7 @@ public:
 	void DelayedEvent();
 	//call this to enable script running as soon as possible
 	void ImmediateEvent();
-	bool IsPC();
+	bool IsPC() const;
 	void ExecuteScript(int scriptCount);
 	void AddAction(Action* aC);
 	void AddActionInFront(Action* aC);
@@ -253,7 +253,7 @@ public:
 	Action* PopNextAction();
 	void ClearActions();
 	void ReleaseCurrentAction();
-	bool InMove();
+	bool InMove() const;
 	void ProcessActions(bool force);
 	//these functions handle clearing of triggers that resulted a
 	//true condition (whole triggerblock returned true)
@@ -262,9 +262,9 @@ public:
 	void SetBitTrigger(ieDword bittrigger);
 	void AddTrigger(ieDword *actorref);
 	/* re/draws overhead text on the map screen */
-	void DrawOverheadText(Region &screen);
+	void DrawOverheadText(const Region &screen);
 	/* actor/scriptable casts spell */
-	int CastSpellPoint( const ieResRef SpellResRef, Point &Target, bool deplete, bool instant = false );
+	int CastSpellPoint( const ieResRef SpellResRef, const Point &Target, bool deplete, bool instant = false );
 	int CastSpell( const ieResRef SpellResRef, Scriptable* Target, bool deplete, bool instant = false );
 	/* spellcasting finished */
 	void CastSpellPointEnd( const ieResRef SpellResRef);
@@ -296,11 +296,11 @@ private:
 	// current SpriteCover for wallgroups
 	SpriteCover* cover;
 public:
-	void SetBBox(Region &newBBox);
-	void DrawCircle(Region &vp);
-	bool IsOver(Point &Pos);
+	void SetBBox(const Region &newBBox);
+	void DrawCircle(const Region &vp);
+	bool IsOver(const Point &Pos) const;
 	void SetOver(bool over);
-	bool IsSelected();
+	bool IsSelected() const;
 	void Select(int Value);
 	void SetCircle(int size, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle);
 
@@ -316,9 +316,9 @@ class GEM_EXPORT Highlightable : public Scriptable {
 public:
 	Highlightable(ScriptableType type);
 	virtual ~Highlightable(void);
-	virtual int TrapResets() = 0;
-	virtual bool CanDetectTrap() { return true; }
-	virtual bool PossibleToSeeTrap();
+	virtual int TrapResets() const = 0;
+	virtual bool CanDetectTrap() const { return true; }
+	virtual bool PossibleToSeeTrap() const;
 public:
 	Gem_Polygon* outline;
 	Color outlineColor;
@@ -331,8 +331,8 @@ public:
 	ieWord TrapDetected;
 	ieResRef KeyResRef;
 public:
-	bool IsOver(Point &Pos);
-	void DrawOutline();
+	bool IsOver(const Point &Pos) const;
+	void DrawOutline() const;
 	void SetCursor(unsigned char CursorIndex);
 	const char* GetKey(void) const
 	{
@@ -345,7 +345,7 @@ public:
 	void DetectTrap(int skill);
 	//returns true if trap is visible, only_detected must be true
 	//if you want to see discovered traps, false is for cheats
-	bool VisibleTrap(int only_detected);
+	bool VisibleTrap(int only_detected) const;
 	//returns true if trap has been triggered, tumble skill???
 	virtual bool TriggerTrap(int skill, ieDword ID);
 	bool TryUnlock(Actor *actor, bool removekey);
@@ -409,15 +409,15 @@ public:
 	void SetStance(unsigned int arg);
 	void SetAttackMoveChances(ieWord *amc);
 	bool DoStep(unsigned int walk_speed, ieDword time = 0);
-	void AddWayPoint(Point &Des);
-	void RunAwayFrom(Point &Des, int PathLength, int flags);
+	void AddWayPoint(const Point &Des);
+	void RunAwayFrom(const Point &Des, int PathLength, int flags);
 	void RandomWalk(bool can_stop, bool run);
 	void MoveLine(int steps, int Pass, ieDword Orient);
 	void FixPosition();
-	void WalkTo(Point &Des, int MinDistance = 0);
-	void MoveTo(Point &Des);
+	void WalkTo(const Point &Des, int MinDistance = 0);
+	void MoveTo(const Point &Des);
 	void ClearPath();
-	void DrawTargetPoint(Region &vp);
+	void DrawTargetPoint(const Region &vp);
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition();
 	virtual bool BlocksSearchMap() const = 0;
@@ -494,8 +494,8 @@ public:
 	void TryPickLock(Actor *actor);
 	void TryBashLock(Actor* actor) ;
 	bool TryUnlock(Actor *actor);
-	void DebugDump();
-	int TrapResets() { return Flags & DOOR_RESET; }
+	void DebugDump() const;
+	int TrapResets() const { return Flags & DOOR_RESET; }
 	void SetNewOverlay(TileOverlay *Overlay);
 };
 
@@ -518,8 +518,8 @@ public:
 	void TryPickLock(Actor *actor);
 	void TryBashLock(Actor* actor) ;
 	bool TryUnlock(Actor *actor);
-	void DebugDump();
-	int TrapResets() { return Flags & CONT_RESET; }
+	void DebugDump() const;
+	int TrapResets() const { return Flags & CONT_RESET; }
 private:
 	//updates the ground icons for a pile
 	void RefreshGroundIcons();
@@ -548,11 +548,11 @@ public:
 	bool Entered(Actor *actor);
 	//checks if the actor may use this travel trigger
 	int CheckTravel(Actor *actor);
-	void DebugDump();
-	int TrapResets() { return Flags & TRAP_RESET; }
-	bool CanDetectTrap();
-	bool PossibleToSeeTrap();
-	bool IsPortal();
+	void DebugDump() const;
+	int TrapResets() const { return Flags & TRAP_RESET; }
+	bool CanDetectTrap() const;
+	bool PossibleToSeeTrap() const;
+	bool IsPortal() const;
 
 public:
 	ieResRef Destination;

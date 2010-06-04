@@ -124,9 +124,9 @@ public:
 	void RegisterCleanup(void (*cleanup)(void));
 
 	/** Run intializer functions. */
-	void RunInitializers();
+	void RunInitializers() const;
 	/** Run cleanup functions */
-	void RunCleanup();
+	void RunCleanup() const;
 
 	/**
 	 * Registers a driver plugin

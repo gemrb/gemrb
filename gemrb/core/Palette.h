@@ -49,7 +49,7 @@ struct RGBModifier {
 
 class GEM_EXPORT Palette {
 public:
-	Palette(Color* colours, bool alpha_=false) {
+	Palette(const Color* colours, bool alpha_=false) {
 		for (int i = 0; i < 256; ++i) {
 			col[i] = colours[i];
 		}

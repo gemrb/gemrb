@@ -111,7 +111,7 @@ public:
 		: Holder<T>(static_cast<T*>(gamedata->GetResource(resname,&T::ID)))
 	{
 	}
-	ResourceHolder(const char* resname, ResourceManager& manager, bool silent = false)
+	ResourceHolder(const char* resname, const ResourceManager& manager, bool silent = false)
 		: Holder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)))
 	{
 	}

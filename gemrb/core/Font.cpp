@@ -116,7 +116,7 @@ void Font::AddChar(unsigned char* spr, int w, int h, short xPos, short yPos)
 
 void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	Palette* hicolor, unsigned char Alignment, Font* initials,
-	Sprite2D* cursor, unsigned int curpos, bool NoColor)
+	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
 	bool enablecap=false;
 	int capital = 0;
@@ -281,14 +281,14 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 
 void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 	unsigned char Alignment, bool anchor, Font* initials,
-	Sprite2D* cursor, unsigned int curpos, bool NoColor)
+	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
 	Print(rgn, rgn, string, hicolor, Alignment, anchor, initials, cursor, curpos, NoColor);
 }
 
 void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	Palette* hicolor, unsigned char Alignment, bool anchor, Font* initials,
-	Sprite2D* cursor, unsigned int curpos, bool NoColor)
+	Sprite2D* cursor, unsigned int curpos, bool NoColor) const
 {
 	bool enablecap=false;
 	int capital = 0;
@@ -437,7 +437,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 	free( tmp );
 }
 
-int Font::PrintInitial(int x, int y, Region &rgn, unsigned char currChar)
+int Font::PrintInitial(int x, int y, const Region &rgn, unsigned char currChar) const
 {
 	Video *video = core->GetVideoDriver();
 	video->BlitSpriteRegion( sprBuffer, size[currChar],
@@ -446,7 +446,7 @@ int Font::PrintInitial(int x, int y, Region &rgn, unsigned char currChar)
 	return x;
 }
 
-int Font::CalcStringWidth(const char* string, bool NoColor)
+int Font::CalcStringWidth(const char* string, bool NoColor) const
 {
 	size_t ret = 0, len = strlen( string );
 	for (size_t i = 0; i < len; i++) {
@@ -470,7 +470,7 @@ int Font::CalcStringWidth(const char* string, bool NoColor)
 	return ( int ) ret;
 }
 
-void Font::SetupString(char* string, unsigned int width, bool NoColor)
+void Font::SetupString(char* string, unsigned int width, bool NoColor) const
 {
 	size_t len = strlen( string );
 	unsigned int psx = PARAGRAPH_START_X;
@@ -537,7 +537,7 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor)
 	}
 }
 
-Palette* Font::GetPalette()
+Palette* Font::GetPalette() const
 {
 	assert(palette);
 	palette->IncRef();

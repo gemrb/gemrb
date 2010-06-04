@@ -197,7 +197,7 @@ public:
 	void SetPalette(ieResRef PaletteRef);
 	void BlendAnimation();
 	bool Schedule(ieDword gametime);
-	void Draw(Region &screen, Map *area);
+	void Draw(const Region &screen, Map *area);
 private:
 	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle);
 };
@@ -265,7 +265,7 @@ public:
 	static void ReleaseMemory();
 
 	/** prints useful information on console */
-	void DebugDump(bool show_actors=0);
+	void DebugDump(bool show_actors=0) const;
 	TileMap *GetTileMap() { return TMap; }
 	/* gets the signal of daylight changes */
 	bool ChangeMap(bool day_or_night);
@@ -280,7 +280,7 @@ public:
 	/* removes empty heaps and returns total itemcount */
 	int ConsolidateContainers();
 	/* transfers all piles (loose items) to another map */
-	void CopyGroundPiles(Map *othermap, Point &Pos);
+	void CopyGroundPiles(Map *othermap, const Point &Pos);
 	/* draws stationary vvc graphics */
 	//void DrawVideocells(Region screen);
 	void DrawHighlightables(Region screen);
@@ -312,14 +312,14 @@ public:
 	void ActorSpottedByPlayer(Actor *actor);
 	void AddActor(Actor* actor);
 	//returns true if an enemy is near P (used in resting/saving)
-	bool AnyEnemyNearPoint(Point &p);
+	bool AnyEnemyNearPoint(const Point &p);
 	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size);
 	unsigned char GetBlocked(unsigned int x, unsigned int y);
-	unsigned char GetBlocked(Point &p);
+	unsigned char GetBlocked(const Point &p);
 	Actor* GetActorByGlobalID(ieDword objectID);
-	Actor* GetActor(Point &p, int flags);
-	Actor* GetActorInRadius(Point &p, int flags, unsigned int radius);
-	Actor **GetAllActorsInRadius(Point &p, int flags, unsigned int radius);
+	Actor* GetActor(const Point &p, int flags);
+	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius);
+	Actor **GetAllActorsInRadius(const Point &p, int flags, unsigned int radius);
 	Actor* GetActor(const char* Name, int flags);
 	Actor* GetActor(int i, bool any);
 	Actor* GetActorByDialog(const char* resref);
@@ -346,20 +346,20 @@ public:
 	//get the next saved projectile
 	Projectile* GetNextTrap(proIterator &iter);
 	//add a projectile to the area
-	void AddProjectile(Projectile* pro, Point &source, Point &dest);
-	void AddProjectile(Projectile* pro, Point &source, ieWord actorID);
+	void AddProjectile(Projectile* pro, const Point &source, const Point &dest);
+	void AddProjectile(Projectile* pro, const Point &source, ieWord actorID);
 
 	//returns the duration of a VVC cell set in the area (point may be set to empty)
-	ieDword HasVVCCell(const ieResRef resource, Point &p);
+	ieDword HasVVCCell(const ieResRef resource, const Point &p);
 	void AddVVCell(ScriptedAnimation* vvc);
 	bool CanFree();
-	int GetCursor( Point &p);
+	int GetCursor( const Point &p);
 	//adds a sparkle puff of colour to a point in the area
 	//FragAnimID is an optional avatar animation ID (see avatars.2da) for
 	//fragment animation
-	void Sparkle(ieDword color, ieDword type, Point &pos, unsigned int FragAnimID = 0);
+	void Sparkle(ieDword color, ieDword type, const Point &pos, unsigned int FragAnimID = 0);
 	//removes or fades the sparkle puff at a point
-	void FadeSparkle(Point &pos, bool forced);
+	void FadeSparkle(const Point &pos, bool forced);
 
 	//entrances
 	void AddEntrance(char* Name, int XPos, int YPos, short Face);
@@ -371,8 +371,8 @@ public:
 	/* this function returns/creates a pile container at position */
 	Container* AddContainer(const char* Name, unsigned short Type,
 		Gem_Polygon* outline);
-	Container *GetPile(Point &position);
-	void AddItemToLocation(Point &position, CREItem *item);
+	Container *GetPile(Point position);
+	void AddItemToLocation(const Point &position, CREItem *item);
 
 	int GetWidth() const { return Width; }
 	int GetHeight() const { return Height; }
@@ -382,11 +382,11 @@ public:
 	/*fills the visible bitmap with setreset */
 	void SetMapVisibility(int setreset = 0);
 	/* set one fog tile as visible. x, y are tile coordinates */
-	void ExploreTile(Point &Tile);
+	void ExploreTile(const Point &Tile);
 	/* explore map from given point in map coordinates */
-	void ExploreMapChunk(Point &Pos, int range, int los);
+	void ExploreMapChunk(const Point &Pos, int range, int los);
 	/* block or unblock searchmap with value */
-	void BlockSearchMap(Point &Pos, unsigned int size, unsigned int value);
+	void BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value);
 	void ClearSearchMapFor(Movable *actor);
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
@@ -394,15 +394,15 @@ public:
 	/* Finds the nearest passable point */
 	void AdjustPosition(Point &goal, unsigned int radius=0);
 	/* Finds the path which leads the farthest from d */
-	PathNode* RunAway(Point &s, Point &d, unsigned int size, unsigned int PathLen, int flags);
+	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int flags);
 	/* Returns true if there is no path to d */
-	bool TargetUnreachable(Point &s, Point &d, unsigned int size);
+	bool TargetUnreachable(const Point &s, const Point &d, unsigned int size);
 	/* returns true if there is enemy visible */
 	bool AnyPCSeesEnemy();
 	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
-	PathNode* GetLine(Point &start, Point &dest, int flags);
-	PathNode* GetLine(Point &start, int Steps, int Orientation, int flags);
-	PathNode* GetLine(Point &start, Point &dest, int speed, int Orientation, int flags);
+	PathNode* GetLine(const Point &start, const Point &dest, int flags);
+	PathNode* GetLine(const Point &start, int Steps, int Orientation, int flags);
+	PathNode* GetLine(const Point &start, const Point &dest, int speed, int Orientation, int flags);
 	/* Finds the path which leads to near d */
 	PathNode* FindPathNear(const Point &s, const Point &d, unsigned int size, unsigned int MinDistance = 0, bool sight = true);
 	/* Finds the path which leads to d */
@@ -412,7 +412,7 @@ public:
 	/* returns false if point d cannot be seen from point d due to searchmap */
 	bool IsVisible(const Point &s, const Point &d);
 	/* returns edge direction of map boundary, only worldmap regions */
-	int WhichEdge(Point &s);
+	int WhichEdge(const Point &s);
 
 	//ambients
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
@@ -421,16 +421,16 @@ public:
 	unsigned int GetAmbientCount() { return (unsigned int) ambients.size(); }
 
 	//mapnotes
-	void AddMapNote(Point &point, int color, char *text, ieStrRef strref);
-	void RemoveMapNote(Point &point);
+	void AddMapNote(const Point &point, int color, char *text, ieStrRef strref);
+	void RemoveMapNote(const Point &point);
 	MapNote *GetMapNote(int i) { return mapnotes[i]; }
-	MapNote *GetMapNote(Point &point);
+	MapNote *GetMapNote(const Point &point);
 	unsigned int GetMapNoteCount() { return (unsigned int) mapnotes.size(); }
 	//restheader
 	/* May spawn creature(s), returns true in case of an interrupted rest */
-	bool Rest(Point &pos, int hours, int day);
+	bool Rest(const Point &pos, int hours, int day);
 	/* Spawns creature(s) in radius of position */
-	void SpawnCreature(Point &pos, const char *CreName, int radius = 0);
+	void SpawnCreature(const Point &pos, const char *CreName, int radius = 0);
 
 	//spawns
 	void LoadIniSpawn();
@@ -440,7 +440,7 @@ public:
 	Spawn *GetSpawn(const char *Name);
 	//returns spawn inside circle, checks for schedule and other
 	//conditions as well
-	Spawn *GetSpawnRadius(Point &point, unsigned int radius);
+	Spawn *GetSpawnRadius(const Point &point, unsigned int radius);
 	unsigned int GetSpawnCount() { return (unsigned int) spawns.size(); }
 	void TriggerSpawn(Spawn *spawn);
 	//move some or all players to a new area
@@ -451,13 +451,13 @@ public:
 	void SetTrackString(ieStrRef strref, int flg, int difficulty);
 	//returns true if tracking failed
 	bool DisplayTrackString(Actor *actor);
-	unsigned int GetLightLevel(Point &Pos);
+	unsigned int GetLightLevel(const Point &Pos);
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);
 	ScriptedAnimation *GetNextScriptedAnimation(scaIterator &iter);
 	Actor *GetNextActor(int &q, int &index);
-	void DrawSearchMap(Region &screen);
+	void DrawSearchMap(const Region &screen);
 	void GenerateQueues();
 	void SortQueues();
 	//Actor* GetRoot(int priority, int &index);

@@ -44,13 +44,13 @@ public:
 	SymbolMgr(void);
 	virtual ~SymbolMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
-	virtual int GetValue(const char* text) = 0;
-	virtual char* GetValue(int val) = 0;
-	virtual char* GetStringIndex(unsigned int Index) = 0;
-	virtual int GetValueIndex(unsigned int Index) = 0;
-	virtual int FindValue(int val) = 0;
-	virtual int FindString(char *str, int len) = 0;
-	virtual int GetSize() = 0;
+	virtual int GetValue(const char* text) const = 0;
+	virtual char* GetValue(int val) const = 0;
+	virtual char* GetStringIndex(unsigned int Index) const = 0;
+	virtual int GetValueIndex(unsigned int Index) const = 0;
+	virtual int FindValue(int val) const = 0;
+	virtual int FindString(char *str, int len) const = 0;
+	virtual int GetSize() const = 0;
 };
 
 #endif  // ! SYMBOLMGR_H

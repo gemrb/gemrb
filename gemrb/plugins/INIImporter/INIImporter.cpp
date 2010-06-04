@@ -86,7 +86,7 @@ bool INIImporter::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-int INIImporter::GetKeysCount(const char* Tag)
+int INIImporter::GetKeysCount(const char* Tag) const
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
 		const char* TagName = tags[i]->GetTagName();
@@ -97,7 +97,7 @@ int INIImporter::GetKeysCount(const char* Tag)
 	return 0;
 }
 
-const char* INIImporter::GetKeyNameByIndex(const char* Tag, int index)
+const char* INIImporter::GetKeyNameByIndex(const char* Tag, int index) const
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
 		const char* TagName = tags[i]->GetTagName();
@@ -109,7 +109,7 @@ const char* INIImporter::GetKeyNameByIndex(const char* Tag, int index)
 }
 
 const char* INIImporter::GetKeyAsString(const char* Tag, const char* Key,
-	const char* Default)
+	const char* Default) const
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
 		const char* TagName = tags[i]->GetTagName();
@@ -121,7 +121,7 @@ const char* INIImporter::GetKeyAsString(const char* Tag, const char* Key,
 }
 
 int INIImporter::GetKeyAsInt(const char* Tag, const char* Key,
-	const int Default)
+	const int Default) const
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
 		const char* TagName = tags[i]->GetTagName();
@@ -133,7 +133,7 @@ int INIImporter::GetKeyAsInt(const char* Tag, const char* Key,
 }
 
 float INIImporter::GetKeyAsFloat(const char* Tag, const char* Key,
-	const float Default)
+	const float Default) const
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
 		const char* TagName = tags[i]->GetTagName();
@@ -145,7 +145,7 @@ float INIImporter::GetKeyAsFloat(const char* Tag, const char* Key,
 }
 
 bool INIImporter::GetKeyAsBool(const char* Tag, const char* Key,
-	const bool Default)
+	const bool Default) const
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
 		const char* TagName = tags[i]->GetTagName();

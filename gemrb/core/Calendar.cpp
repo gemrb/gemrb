@@ -49,7 +49,7 @@ Calendar::~Calendar(void)
 	if (days) free(days);
 }
 
-void Calendar::GetMonthName(int dayandmonth)
+void Calendar::GetMonthName(int dayandmonth) const
 {
 	int month=1;
 
@@ -72,7 +72,7 @@ void Calendar::GetMonthName(int dayandmonth)
 	}
 }
 
-int Calendar::GetCalendarDay(int date)
+int Calendar::GetCalendarDay(int date) const
 {
 	int dayandmonth;
 	int month=1;

@@ -231,7 +231,7 @@ void GameControl::MoveToPointFormation(Actor *actor, unsigned int pos, Point src
 
 // generate an action to do the actual movement
 // only PST supports RunToPoint
-void GameControl::CreateMovement(Actor *actor, Point &p)
+void GameControl::CreateMovement(Actor *actor, const Point &p)
 {
 	char Tmp[256];
 
@@ -301,7 +301,7 @@ static const int arrow_orientations[16]={
 
 //Draws arrow markers along the edge of the game window
 //WARNING:don't use reference for point, because it is altered
-void GameControl::DrawArrowMarker(Region &screen, Point p, Region &viewport)
+void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &viewport)
 {
 	Video* video = core->GetVideoDriver();
 
@@ -1448,7 +1448,7 @@ void GameControl::TryToBash(Actor *source, Scriptable *tgt)
 }
 
 //generate action code for source actor to use item/cast spell on a point
-void GameControl::TryToCast(Actor *source, Point &tgt)
+void GameControl::TryToCast(Actor *source, const Point &tgt)
 {
 	char Tmp[40];
 
@@ -2038,7 +2038,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 	}
 }
 
-void GameControl::CalculateSelection(Point &p)
+void GameControl::CalculateSelection(const Point &p)
 {
 	unsigned int i;
 	Game* game = core->GetGame();
@@ -2684,7 +2684,7 @@ end_of_choose:
 }
 
 //Create an overhead text over an arbitrary point
-void GameControl::DisplayString(Point &p, const char *Text)
+void GameControl::DisplayString(const Point &p, const char *Text)
 {
 	Scriptable* scr = new Scriptable( ST_TRIGGER );
 	scr->overHeadText = (char *) Text;

@@ -97,7 +97,7 @@ bool Point::isempty() const
 	return false;
 }
 
-bool Point::PointInside(Point &p)
+bool Point::PointInside(const Point &p) const
 {
 	if (( p.x < 0 ) || ( p.x > x )) {
 		return false;
@@ -167,7 +167,7 @@ Region::Region(const Point &p, int w, int h)
 	this->h = h;
 }
 
-bool Region::PointInside(Point &p)
+bool Region::PointInside(const Point &p) const
 {
 	if (( p.x < x ) || ( p.x > ( x + w ) )) {
 		return false;
@@ -178,7 +178,7 @@ bool Region::PointInside(Point &p)
 	return true;
 }
 
-bool Region::PointInside(unsigned short XPos, unsigned short YPos)
+bool Region::PointInside(unsigned short XPos, unsigned short YPos) const
 {
 	if (( XPos < x ) || ( XPos > ( x + w ) )) {
 		return false;
@@ -189,7 +189,7 @@ bool Region::PointInside(unsigned short XPos, unsigned short YPos)
 	return true;
 }
 
-bool Region::InsideRegion(Region& rgn)
+bool Region::InsideRegion(const Region& rgn) const
 {
 	if (x > ( rgn.x + rgn.w )) {
 		return false;

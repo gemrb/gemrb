@@ -38,7 +38,7 @@ void Factory::AddFactoryObject(FactoryObject* fobject)
 	fobjects.push_back( fobject );
 }
 
-int Factory::IsLoaded(const char* ResRef, SClass_ID type)
+int Factory::IsLoaded(const char* ResRef, SClass_ID type) const
 {
 	for (unsigned int i = 0; i < fobjects.size(); i++) {
 		if (fobjects[i]->SuperClassID == type) {
@@ -50,7 +50,7 @@ int Factory::IsLoaded(const char* ResRef, SClass_ID type)
 	return -1;
 }
 
-FactoryObject* Factory::GetFactoryObject(int pos)
+FactoryObject* Factory::GetFactoryObject(int pos) const
 {
 	return fobjects[pos];
 }

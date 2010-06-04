@@ -131,7 +131,7 @@ void Particles::SetBitmap(unsigned int FragAnimID)
 */
 }
 
-bool Particles::AddNew(Point &point)
+bool Particles::AddNew(const Point &point)
 {
 	int st;
 
@@ -173,7 +173,7 @@ bool Particles::AddNew(Point &point)
 	return true;
 }
 
-void Particles::Draw(Region &screen)
+void Particles::Draw(const Region &screen)
 {
 	int length; //used only for raindrops
 

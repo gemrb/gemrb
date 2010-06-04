@@ -182,12 +182,12 @@ public:
 	/** Adds an Effect to the queue, subject to level and other checks.
 	 * Returns FX_ABORT is unsuccessful. fx is just a reference, AddEffect()
 	 * will malloc its own copy */
-	int AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point &dest) const;
+	int AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const Point &dest) const;
 	/** Removes first Effect matching fx from the queue.
 	 * Effects are matched based on their contents */
 	bool RemoveEffect(Effect* fx);
 
-	int AddAllEffects(Actor* target, Point &dest) const;
+	int AddAllEffects(Actor* target, const Point &dest) const;
 	void ApplyAllEffects(Actor* target) const;
 	/** remove effects marked for removal */
 	void Cleanup();
@@ -261,7 +261,7 @@ public:
 	int CheckImmunity(Actor *target) const;
 	// apply this effectqueue on all actors matching ids targeting
 	// from pos, in range (no cone size yet)
-	void AffectAllInRange(Map *map, Point &pos, int idstype, int idsvalue, unsigned int range, Actor *except);
+	void AffectAllInRange(Map *map, const Point &pos, int idstype, int idsvalue, unsigned int range, Actor *except);
 	/** Lists contents of the queue on a terminal for debugging */
 	void dump() const;
 	//resolve effect

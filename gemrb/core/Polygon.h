@@ -40,8 +40,8 @@ public:
 	Point* points;
 	unsigned int count;
 	std::list<Trapezoid> trapezoids;
-	bool PointIn(Point &p);
-	bool PointIn(int x, int y);
+	bool PointIn(const Point &p) const;
+	bool PointIn(int x, int y) const;
 	void RecalcBBox();
 	void ComputeTrapezoids();
 };
@@ -67,11 +67,11 @@ class GEM_EXPORT Wall_Polygon: public Gem_Polygon {
 public:
 	Wall_Polygon(Point *points,int count,Region *bbox) : Gem_Polygon(points,count,bbox) {}
 	//is the point above the baseline
-	bool PointCovered(Point &p);
-	bool PointCovered(int x, int y);
-	ieDword GetPolygonFlag() { return wall_flag; }
+	bool PointCovered(const Point &p) const;
+	bool PointCovered(int x, int y) const;
+	ieDword GetPolygonFlag() const { return wall_flag; }
 	void SetPolygonFlag(ieDword flg) { wall_flag=flg; }
-	void SetBaseline(Point &a, Point &b);
+	void SetBaseline(const Point &a, const Point &b);
 public:
 	ieDword wall_flag;
 	Point base0, base1;

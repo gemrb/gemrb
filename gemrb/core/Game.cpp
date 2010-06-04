@@ -961,7 +961,7 @@ bool Game::EveryoneStopped() const
 }
 
 //canmove=true: if some PC can't move (or hostile), then this returns false
-bool Game::EveryoneNearPoint(Map *area, Point &p, int flags) const
+bool Game::EveryoneNearPoint(Map *area, const Point &p, int flags) const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (flags&ENP_ONLYSELECT) {
@@ -1546,7 +1546,7 @@ int Game::AttackersOf(ieDword globalID, Map *area) const
 /* this method redraws weather. If update is false,
 then the weather particles won't change (game paused)
 */
-void Game::DrawWeather(Region &screen, bool update)
+void Game::DrawWeather(const Region &screen, bool update)
 {
 	if (!weather) {
 		return;

@@ -52,7 +52,7 @@ static void PrintPossibleFiles(const char* ResRef, const TypeID *type)
 	}
 }
 
-bool ResourceManager::Exists(const char *ResRef, SClass_ID type, bool silent)
+bool ResourceManager::Exists(const char *ResRef, SClass_ID type, bool silent) const 
 {
 	if (ResRef[0] == '\0')
 		return false;
@@ -70,7 +70,7 @@ bool ResourceManager::Exists(const char *ResRef, SClass_ID type, bool silent)
 	return false;
 }
 
-bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent)
+bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent) const
 {
 	if (ResRef[0] == '\0')
 		return false;

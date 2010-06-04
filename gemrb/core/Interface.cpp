@@ -2462,7 +2462,7 @@ ScriptEngine* Interface::GetGUIScriptEngine() const
 }
 
 //NOTE: if there were more summoned creatures, it will return only the last
-Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, Point &position, int eamod, int level, Effect *fx, bool sexmod)
+Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod)
 {
 	//maximum number of monsters summoned
 	int cnt=10;
@@ -4854,7 +4854,7 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Scriptable *cas
 	delete fxqueue;
 }
 
-void Interface::ApplySpellPoint(const ieResRef resname, Map* area, Point &pos, Scriptable *caster, int level)
+void Interface::ApplySpellPoint(const ieResRef resname, Map* area, const Point &pos, Scriptable *caster, int level)
 {
 	Spell *spell = gamedata->GetSpell(resname);
 	if (!spell) {
@@ -4902,7 +4902,7 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
 	return res;
 }
 
-Effect *Interface::GetEffect(const ieResRef resname, int level, Point &p)
+Effect *Interface::GetEffect(const ieResRef resname, int level, const Point &p)
 {
 	//Don't free this reference, it is cached!
 	Effect *effect = gamedata->GetEffect(resname);
@@ -5179,7 +5179,7 @@ void Interface::RegisterOpcodes(int count, const EffectRef *opcodes)
 	EffectQueue_RegisterOpcodes(count, opcodes);
 }
 
-void Interface::SetInfoTextColor(Color &color)
+void Interface::SetInfoTextColor(const Color &color)
 {
 	if (InfoTextPalette) {
 		gamedata->FreePalette(InfoTextPalette);

@@ -206,7 +206,7 @@ void Scriptable::FixHeadTextPos()
 #define MAX_DELAY  6000
 static const Color black={0,0,0,0};
 
-void Scriptable::DrawOverheadText(Region &screen)
+void Scriptable::DrawOverheadText(const Region &screen)
 {
 	unsigned long time = core->GetGame()->Ticks;
 	Palette *palette = NULL;
@@ -258,7 +258,7 @@ void Scriptable::ImmediateEvent()
 	lastRunTime = 0;
 }
 
-bool Scriptable::IsPC()
+bool Scriptable::IsPC() const
 {
 	if(Type == ST_ACTOR) {
 		if (((Actor *) this)->GetStat(IE_EA) <= EA_CHARMED) {
@@ -470,7 +470,7 @@ void Scriptable::ProcessActions(bool force)
 	}
 }
 
-bool Scriptable::InMove()
+bool Scriptable::InMove() const
 {
 	if (Type!=ST_ACTOR) {
 		return false;
@@ -696,7 +696,7 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 //set target as point
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-int Scriptable::CastSpellPoint( const ieResRef SpellResRef, Point &target, bool deplete, bool instant )
+int Scriptable::CastSpellPoint( const ieResRef SpellResRef, const Point &target, bool deplete, bool instant )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
@@ -840,14 +840,14 @@ Selectable::~Selectable(void)
 	delete cover;
 }
 
-void Selectable::SetBBox(Region &newBBox)
+void Selectable::SetBBox(const Region &newBBox)
 {
 	BBox = newBBox;
 }
 
 static const unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
 
-void Selectable::DrawCircle(Region &vp)
+void Selectable::DrawCircle(const Region &vp)
 {
 	/*  BG2 colours ground circles as follows:
 	dark green for unselected party members
@@ -896,7 +896,7 @@ void Selectable::DrawCircle(Region &vp)
 }
 
 // Check if P is over our ground circle
-bool Selectable::IsOver(Point &P)
+bool Selectable::IsOver(const Point &P) const
 {
 	int csize = size;
 	if (csize < 2) csize = 2;
@@ -914,7 +914,7 @@ bool Selectable::IsOver(Point &P)
 	return (r <= 48*48*(csize-1)*(csize-1));
 }
 
-bool Selectable::IsSelected()
+bool Selectable::IsSelected() const
 {
 	return Selected == 1;
 }
@@ -985,7 +985,7 @@ Highlightable::~Highlightable(void)
 	}
 }
 
-bool Highlightable::IsOver(Point &Pos)
+bool Highlightable::IsOver(const Point &Pos) const
 {
 	if (!outline) {
 		return false;
@@ -993,7 +993,7 @@ bool Highlightable::IsOver(Point &Pos)
 	return outline->PointIn( Pos );
 }
 
-void Highlightable::DrawOutline()
+void Highlightable::DrawOutline() const
 {
 	if (!outline) {
 		return;
@@ -1230,7 +1230,7 @@ bool Movable::DoStep(unsigned int walk_speed, ieDword time)
 	return true;
 }
 
-void Movable::AddWayPoint(Point &Des)
+void Movable::AddWayPoint(const Point &Des)
 {
 	if (!path) {
 		WalkTo(Des);
@@ -1269,7 +1269,7 @@ void Movable::FixPosition()
 	Pos.y=Pos.y*12+6;
 }
 
-void Movable::WalkTo(Point &Des, int distance)
+void Movable::WalkTo(const Point &Des, int distance)
 {
 	Point from;
 
@@ -1337,7 +1337,7 @@ void Movable::WalkTo(Point &Des, int distance)
 	}
 }
 
-void Movable::RunAwayFrom(Point &Des, int PathLength, int flags)
+void Movable::RunAwayFrom(const Point &Des, int PathLength, int flags)
 {
 	ClearPath();
 	area->ClearSearchMapFor(this);
@@ -1376,7 +1376,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	path = area->RunAway( Pos, p, size, 50, 1 );
 }
 
-void Movable::MoveTo(Point &Des)
+void Movable::MoveTo(const Point &Des)
 {
 	area->ClearSearchMapFor(this);
 	Pos = Des;
@@ -1407,7 +1407,7 @@ void Movable::ClearPath()
 	//don't call ReleaseCurrentAction
 }
 
-void Movable::DrawTargetPoint(Region &vp)
+void Movable::DrawTargetPoint(const Region &vp)
 {
 	if (!path || !Selected || (InternalFlags&IF_NORECTICLE) )
 		return;
@@ -1806,7 +1806,7 @@ void Door::TryBashLock(Actor *actor)
 	ImmediateEvent();
 }
 
-void Door::DebugDump()
+void Door::DebugDump() const
 {
 	printf( "Debugdump of Door %s:\n", GetScriptName() );
 	printf( "Door Open: %s\n", YESNO(IsOpen()));
@@ -1880,18 +1880,18 @@ void Highlightable::DetectTrap(int skill)
 	}
 }
 
-bool Highlightable::PossibleToSeeTrap()
+bool Highlightable::PossibleToSeeTrap() const
 {
 	return CanDetectTrap();
 }
 
-bool InfoPoint::PossibleToSeeTrap()
+bool InfoPoint::PossibleToSeeTrap() const
 {
 	// Only detectable trap-type infopoints.
 	return (CanDetectTrap() && (Type == ST_PROXIMITY) );
 }
 
-bool InfoPoint::CanDetectTrap()
+bool InfoPoint::CanDetectTrap() const
 {
 	// Traps can be detected on all types of infopoint, as long
 	// as the trap is detectable and isn't deactivated.
@@ -1900,7 +1900,7 @@ bool InfoPoint::CanDetectTrap()
 
 // returns true if the infopoint is a PS:T portal
 // GF_REVERSE_DOOR is the closest game feature (exists only in PST, and about area objects)
-bool InfoPoint::IsPortal()
+bool InfoPoint::IsPortal() const
 {
 	if (Type!=ST_TRAVEL) return false;
 	if (Cursor != IE_CURSOR_PORTAL) return false;
@@ -1910,7 +1910,7 @@ bool InfoPoint::IsPortal()
 //trap that is visible on screen (marked by red)
 //if TrapDetected is a bitflag, we could show traps selectively for
 //players, really nice for multiplayer
-bool Highlightable::VisibleTrap(int see_all)
+bool Highlightable::VisibleTrap(int see_all) const
 {
 	if (!Trapped) return false;
 	if (!PossibleToSeeTrap()) return false;
@@ -2017,7 +2017,7 @@ check:
 	return false;
 }
 
-void InfoPoint::DebugDump()
+void InfoPoint::DebugDump() const
 {
 	switch (Type) {
 		case ST_TRIGGER:
@@ -2266,7 +2266,7 @@ void Container::TryBashLock(Actor *actor)
 	ImmediateEvent();
 }
 
-void Container::DebugDump()
+void Container::DebugDump() const
 {
 	printf( "Debugdump of Container %s\n", GetScriptName() );
 	printf( "Type: %d,  LockDifficulty: %d\n", Type, LockDifficulty );
@@ -2278,7 +2278,8 @@ void Container::DebugDump()
 		name = Scripts[0]->GetName();
 	}
 	printf( "Script: %s, Key: %s\n", name, KeyResRef );
-	inventory.dump();
+	// FIXME: const_cast
+	const_cast<Inventory&>(inventory).dump();
 }
 
 bool Container::TryUnlock(Actor *actor) {

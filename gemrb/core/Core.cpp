@@ -124,7 +124,7 @@ static const unsigned char orientations[25]={
 };
 
 /** Calculates the orientation of a character (or projectile) facing a point */
-unsigned char GetOrient(Point &s, Point &d)
+unsigned char GetOrient(const Point &s, const Point &d)
 {
 	int deltaX = s.x - d.x;
 	int deltaY = s.y - d.y;

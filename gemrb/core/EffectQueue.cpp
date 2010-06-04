@@ -493,7 +493,7 @@ void EffectQueue::Cleanup()
 }
 
 //Handle the target flag when the effect is applied first
-int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, Point &dest) const
+int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const Point &dest) const
 {
 	int i;
 	Game *game;
@@ -663,7 +663,7 @@ all_party:
 //will get copied (hence the fxqueue.AddEffect call)
 //if this returns FX_NOT_APPLIED, then the whole stack was resisted
 //or expired
-int EffectQueue::AddAllEffects(Actor* target, Point &destination) const
+int EffectQueue::AddAllEffects(Actor* target, const Point &destination) const
 {
 	int res = FX_NOT_APPLIED;
 	// pre-roll dice for fx needing them and stow them in the effect
@@ -1893,7 +1893,7 @@ int EffectQueue::CheckImmunity(Actor *target) const
 	return 0;
 }
 
-void EffectQueue::AffectAllInRange(Map *map, Point &pos, int idstype, int idsvalue,
+void EffectQueue::AffectAllInRange(Map *map, const Point &pos, int idstype, int idsvalue,
 		unsigned int range, Actor *except)
 {
 	int cnt = map->GetActorCount(true);

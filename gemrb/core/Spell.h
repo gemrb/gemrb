@@ -158,11 +158,11 @@ public:
 	//converts a wanted level to block index count
 	int GetHeaderIndexFromLevel(int level) const;
 	//-1 will return the cfb
-	EffectQueue *GetEffectBlock(Scriptable *self, Point &pos, int block_index, ieDword pro=0) const;
+	EffectQueue *GetEffectBlock(Scriptable *self, const Point &pos, int block_index, ieDword pro=0) const;
 	// add appropriate casting glow effect
 	void AddCastingGlow(EffectQueue *fxqueue, ieDword duration);
 	//returns a projectile created from an extended header
-	Projectile *GetProjectile(Scriptable *self, int headerindex, Point &pos) const;
+	Projectile *GetProjectile(Scriptable *self, int headerindex, const Point &pos) const;
 	unsigned int GetCastingDistance(Actor *actor) const;
 };
 

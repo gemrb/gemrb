@@ -81,7 +81,7 @@ bool DLGImporter::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Dialog* DLGImporter::GetDialog()
+Dialog* DLGImporter::GetDialog() const
 {
 	if(!Version) {
 		return NULL;
@@ -98,7 +98,7 @@ Dialog* DLGImporter::GetDialog()
 	return d;
 }
 
-DialogState* DLGImporter::GetDialogState(Dialog *d, unsigned int index)
+DialogState* DLGImporter::GetDialogState(Dialog *d, unsigned int index) const
 {
 	DialogState* ds = new DialogState();
 	//16 = sizeof(State)
@@ -116,7 +116,7 @@ DialogState* DLGImporter::GetDialogState(Dialog *d, unsigned int index)
 	return ds;
 }
 
-DialogTransition** DLGImporter::GetTransitions(unsigned int firstIndex, unsigned int count)
+DialogTransition** DLGImporter::GetTransitions(unsigned int firstIndex, unsigned int count) const
 {
 	DialogTransition** trans = ( DialogTransition** )
 		malloc( count*sizeof( DialogTransition* ) );
@@ -126,7 +126,7 @@ DialogTransition** DLGImporter::GetTransitions(unsigned int firstIndex, unsigned
 	return trans;
 }
 
-DialogTransition* DLGImporter::GetTransition(unsigned int index)
+DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 {
 	if (index >= TransitionsCount) {
 		return NULL;
@@ -164,7 +164,7 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index)
 	return dt;
 }
 
-DialogString* DLGImporter::GetStateTrigger(unsigned int index)
+DialogString* DLGImporter::GetStateTrigger(unsigned int index) const
 {
 	if (index >= StateTriggersCount) {
 		return NULL;
@@ -190,7 +190,7 @@ DialogString* DLGImporter::GetStateTrigger(unsigned int index)
 	return ds;
 }
 
-DialogString* DLGImporter::GetTransitionTrigger(unsigned int index)
+DialogString* DLGImporter::GetTransitionTrigger(unsigned int index) const
 {
 	if (index >= TransitionTriggersCount) {
 		return NULL;
@@ -209,7 +209,7 @@ DialogString* DLGImporter::GetTransitionTrigger(unsigned int index)
 	return ds;
 }
 
-DialogString* DLGImporter::GetAction(unsigned int index)
+DialogString* DLGImporter::GetAction(unsigned int index) const
 {
 	if (index >= ActionsCount) {
 		return NULL;
@@ -264,7 +264,7 @@ int GetActionLength(const char* string)
 
 /* this function will break up faulty script strings that lack the CRLF
    between commands, common in PST dialog */
-char** DLGImporter::GetStrings(char* string, unsigned int& count)
+char** DLGImporter::GetStrings(char* string, unsigned int& count) const
 {
 	int col = 0;
 	int level = 0;

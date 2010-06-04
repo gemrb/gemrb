@@ -38,7 +38,7 @@ ZLibManager::~ZLibManager(void)
 #define OUTPUTSIZE 4096
 
 // ZLib Decompression Routine
-int ZLibManager::Decompress(FILE* dest, DataStream* source, unsigned int size_guess)
+int ZLibManager::Decompress(FILE* dest, DataStream* source, unsigned int size_guess) const
 {
 	unsigned char bufferin[INPUTSIZE], bufferout[OUTPUTSIZE];
 	z_stream stream;
@@ -98,7 +98,7 @@ int ZLibManager::Decompress(FILE* dest, DataStream* source, unsigned int size_gu
 	}
 }
 
-int ZLibManager::Compress(DataStream* dest, DataStream* source)
+int ZLibManager::Compress(DataStream* dest, DataStream* source) const
 {
 	unsigned char bufferin[INPUTSIZE], bufferout[OUTPUTSIZE];
 	z_stream stream;

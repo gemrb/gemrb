@@ -715,7 +715,7 @@ int Inventory::FindItem(const char *resref, unsigned int flags) const
 	return -1;
 }
 
-bool Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc)
+bool Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, const Point &loc)
 {
 	if (slot >= Slots.size()) {
 		return false;
@@ -743,7 +743,7 @@ bool Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *m
 	return true;
 }
 
-bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc)
+bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *map, const Point &loc)
 {
 	bool dropped = false;
 

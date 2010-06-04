@@ -363,7 +363,7 @@ public:
 	/* makes sure the string is freed in TLKImp */
 	void FreeString(char *&str) const;
 	/* sets the floattext color */
-	void SetInfoTextColor(Color &color);
+	void SetInfoTextColor(const Color &color);
 	/** returns a gradient set */
 	Color * GetPalette(unsigned index, int colors, Color *buffer) const;
 	/** Returns a preloaded Font */
@@ -379,7 +379,7 @@ public:
 	ScriptEngine * GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor
 	may apply a single fx on the summoned creature normally an unsummon effect */
-	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, Point &position, int eamod, int level, Effect *fx, bool sexmod=1);
+	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod=1);
 	/** Loads a WindowPack (CHUI file) in the Window Manager */
 	bool LoadWindowPack(const char *name);
 	/** Loads a Window in the Window Manager */
@@ -615,12 +615,12 @@ public:
 	/** applies the spell on the target */
 	void ApplySpell(const ieResRef resname, Actor *target, Scriptable *caster, int level);
 	/** applies the spell on the area or on a scriptable object */
-	void ApplySpellPoint(const ieResRef resname, Map *area, Point &pos, Scriptable *caster, int level);
+	void ApplySpellPoint(const ieResRef resname, Map *area, const Point &pos, Scriptable *caster, int level);
 	/** applies a single effect on the target */
 	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster);
-	//int ApplyEffect(const ieResRef resname, Actor *target, Scriptable *caster, int level, Point &p);
+	//int ApplyEffect(const ieResRef resname, Actor *target, Scriptable *caster, int level, const Point &p);
 	//Actor *target, Scriptable *caster, 
-	Effect *GetEffect(const ieResRef resname, int level, Point &p);
+	Effect *GetEffect(const ieResRef resname, int level, const Point &p);
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map);
 	/** saves (exports a character to the characters folder */

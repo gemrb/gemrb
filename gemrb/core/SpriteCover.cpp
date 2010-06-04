@@ -33,7 +33,7 @@ SpriteCover::~SpriteCover()
 }
 
 bool SpriteCover::Covers(int x, int y, int xpos, int ypos,
-						 int width, int height)
+						 int width, int height) const
 {
 	// if basepoint changed, no longer valid
 	if (x != worldx || y != worldy) return false;

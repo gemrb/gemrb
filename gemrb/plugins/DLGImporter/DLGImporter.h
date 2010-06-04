@@ -70,16 +70,16 @@ public:
 	DLGImporter(void);
 	~DLGImporter(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	Dialog* GetDialog();
+	Dialog* GetDialog() const;
 private:
-	DialogState* GetDialogState(Dialog *d, unsigned int index);
-	DialogTransition* GetTransition(unsigned int index);
-	DialogString* GetStateTrigger(unsigned int index);
-	DialogString* GetTransitionTrigger(unsigned int index);
-	DialogString* GetAction(unsigned int index);
-	char** GetStrings(char* string, unsigned int& count);
+	DialogState* GetDialogState(Dialog *d, unsigned int index) const;
+	DialogTransition* GetTransition(unsigned int index) const;
+	DialogString* GetStateTrigger(unsigned int index) const;
+	DialogString* GetTransitionTrigger(unsigned int index) const;
+	DialogString* GetAction(unsigned int index) const;
+	char** GetStrings(char* string, unsigned int& count) const;
 	DialogTransition** GetTransitions(unsigned int firstIndex,
-		unsigned int count);
+		unsigned int count) const;
 };
 
 #endif

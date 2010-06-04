@@ -66,7 +66,7 @@ void Video::SetMouseGrayed(bool grayed)
 	}
 }
 
-void Video::BlitTiled(Region rgn, Sprite2D* img, bool anchor)
+void Video::BlitTiled(Region rgn, const Sprite2D* img, bool anchor)
 {
 	int xrep = ( rgn.w + img->Width - 1 ) / img->Width;
 	int yrep = ( rgn.h + img->Height - 1 ) / img->Height;
@@ -79,7 +79,7 @@ void Video::BlitTiled(Region rgn, Sprite2D* img, bool anchor)
 }
 
 //Sprite conversion, creation
-Sprite2D* Video::CreateAlpha( Sprite2D *sprite)
+Sprite2D* Video::CreateAlpha( const Sprite2D *sprite)
 {
 	if (!sprite)
 		return 0;
@@ -110,7 +110,7 @@ Sprite2D* Video::CreateAlpha( Sprite2D *sprite)
 		0x00FF0000, 0x0000FF00, 0x000000FF, pixels );
 }
 
-Sprite2D* Video::SpriteScaleDown( Sprite2D* sprite, unsigned int ratio )
+Sprite2D* Video::SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio )
 {
 	unsigned int Width = sprite->Width / ratio;
 	unsigned int Height = sprite->Height / ratio;
@@ -162,7 +162,7 @@ Sprite2D* Video::CreateLight(int radius, int intensity)
 	return light;
 }
 
-Color Video::SpriteGetPixelSum(Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
+Color Video::SpriteGetPixelSum(const Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
 {
 	Color sum;
 	unsigned int count = ratio*ratio;

@@ -199,7 +199,7 @@ Cache::MyAssoc* Cache::GetAssocAt(const ieResRef key) const
 	return NULL;
 }
 
-void *Cache::GetResource(const ieResRef key)
+void *Cache::GetResource(const ieResRef key) const
 {
 	Cache::MyAssoc* pAssoc = GetAssocAt( key );
 	if (pAssoc == NULL) {

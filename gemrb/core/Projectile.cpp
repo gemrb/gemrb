@@ -629,12 +629,12 @@ void Projectile::SetCaster(ieDword caster)
 	Caster=caster;
 }
 
-ieDword Projectile::GetCaster()
+ieDword Projectile::GetCaster() const
 {
 	return Caster;
 }
 
-void Projectile::NextTarget(Point &p)
+void Projectile::NextTarget(const Point &p)
 {
 	ClearPath();
 	Destination = p;
@@ -659,7 +659,7 @@ void Projectile::NextTarget(Point &p)
 	path = area->GetLine( Pos, Destination, Speed, Orientation, GL_PASS );
 }
 
-void Projectile::SetTarget(Point &p)
+void Projectile::SetTarget(const Point &p)
 {
 	Target = 0;
 	NextTarget(p);
@@ -689,7 +689,7 @@ void Projectile::SetTarget(ieDword tar)
 	}
 }
 
-void Projectile::MoveTo(Map *map, Point &Des)
+void Projectile::MoveTo(Map *map, const Point &Des)
 {
 	area = map;
 	Origin = Des;
@@ -911,7 +911,7 @@ int Projectile::Update()
 	return 1;
 }
 
-void Projectile::Draw(Region &screen)
+void Projectile::Draw(const Region &screen)
 {
 	switch (phase) {
 		case P_UNINITED:
@@ -937,7 +937,7 @@ void Projectile::Draw(Region &screen)
 	}
 }
 
-bool Projectile::DrawChildren(Region &screen)
+bool Projectile::DrawChildren(const Region &screen)
 {
 	bool drawn = false;
 
@@ -959,7 +959,7 @@ bool Projectile::DrawChildren(Region &screen)
 }
 
 //draw until all children expire
-void Projectile::DrawExploded(Region &screen)
+void Projectile::DrawExploded(const Region &screen)
 {
 	if (DrawChildren(screen)) {
 		return;
@@ -967,7 +967,7 @@ void Projectile::DrawExploded(Region &screen)
 	phase = P_EXPIRED;
 }
 
-void Projectile::DrawExplosion(Region &screen)
+void Projectile::DrawExplosion(const Region &screen)
 {
 	//This seems to be a needless safeguard
 	if (!Extension) {
@@ -1219,7 +1219,7 @@ void Projectile::SetupWall()
 	SetTarget(p2);
 }
 
-void Projectile::DrawLine(Region &screen, int face, ieDword flag)
+void Projectile::DrawLine(const Region &screen, int face, ieDword flag)
 {
  	Video *video = core->GetVideoDriver();
 	PathNode *iter = path;
@@ -1238,7 +1238,7 @@ void Projectile::DrawLine(Region &screen, int face, ieDword flag)
 	}
 }
 
-void Projectile::DrawTravel(Region &screen)
+void Projectile::DrawTravel(const Region &screen)
 {
 	Video *video = core->GetVideoDriver();
 	ieDword flag;
@@ -1370,7 +1370,7 @@ void Projectile::SetIdentifiers(const char *resref, ieWord id)
 	type=id;
 }
 
-bool Projectile::PointInRadius(Point &p)
+bool Projectile::PointInRadius(const Point &p) const
 {
 	switch(phase) {
 		//better not trigger on projectiles unset/expired
@@ -1399,7 +1399,7 @@ void Projectile::SetGradient(int gradient, bool type)
 	}
 }
 
-void Projectile::StaticTint(Color &newtint)
+void Projectile::StaticTint(const Color &newtint)
 {
 	tint = newtint;
 	TFlags &= ~PTF_TINT; //turn off area tint

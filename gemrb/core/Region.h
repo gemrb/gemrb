@@ -60,7 +60,7 @@ public:
 		x=0;
 		y=0;
 	}
-	bool PointInside(Point &p);
+	bool PointInside(const Point &p) const;
 
 	ieDword asDword() const; // store coordinates in uint32 ((y << 16) | x)
 	void fromDword(ieDword val); // extract coordinates from uint32
@@ -88,9 +88,9 @@ public:
 	bool operator==(const Region& rgn);
 	bool operator!=(const Region& rgn);
 	Region(int x, int y, int w, int h);
-	bool PointInside(unsigned short XPos, unsigned short YPos);
-	bool PointInside(Point &p);
-	bool InsideRegion(Region& rgn);
+	bool PointInside(unsigned short XPos, unsigned short YPos) const;
+	bool PointInside(const Point &p) const;
+	bool InsideRegion(const Region& rgn) const;
 	void Normalize();
 };
 

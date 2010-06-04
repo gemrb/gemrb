@@ -42,15 +42,15 @@ public:
 	 * @returns Number of samples read.
 	 */
 	virtual int read_samples( short* memory, int cnt ) = 0 ;
-	int get_channels()
+	int get_channels() const
 	{
 		return channels;
 	}
-	int get_samplerate()
+	int get_samplerate() const
 	{
 		return samplerate;
 	}
-	int get_length()
+	int get_length() const
 	{
 		return samples;
 	} // returns the total samples count

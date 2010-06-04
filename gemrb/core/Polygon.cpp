@@ -75,13 +75,13 @@ void Gem_Polygon::RecalcBBox()
 	BBox.h-=BBox.y;
 }
 
-bool Gem_Polygon::PointIn(Point &p)
+bool Gem_Polygon::PointIn(const Point &p) const
 {
 	if(!BBox.PointInside(p) ) return false;
 	return PointIn(p.x, p.y);
 }
 
-bool Gem_Polygon::PointIn(int tx, int ty)
+bool Gem_Polygon::PointIn(int tx, int ty) const
 {
 	register int   j, yflag0, yflag1, xflag0 , index;
 	bool inside_flag = false;
@@ -120,20 +120,20 @@ bool Gem_Polygon::PointIn(int tx, int ty)
 
 // returns twice the area of triangle a, b, c.
 // (can also be negative depending on orientation of a,b,c)
-inline int area2(Point& a, Point& b, Point& c)
+inline int area2(const Point& a, const Point& b, const Point& c)
 {
 	return (b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y);
 }
 
 
 // return (c is to the left of a-b)
-inline bool left(Point& a, Point& b, Point& c)
+inline bool left(const Point& a, const Point& b, const Point& c)
 {
 	return (area2(a, b, c) > 0);
 }
 
 // { return (c is collinear with a-b)
-inline bool collinear(Point& a, Point& b, Point& c)
+inline bool collinear(const Point& a, const Point& b, const Point& c)
 {
 	return (area2(a, b, c) == 0);
 }
@@ -352,7 +352,7 @@ void Gem_Polygon::ComputeTrapezoids()
 
 
 // wall polygons
-void Wall_Polygon::SetBaseline(Point &a, Point &b)
+void Wall_Polygon::SetBaseline(const Point &a, const Point &b)
 {
 	if ((a.x<b.x) || ((a.x==b.x) && (a.y<b.y)) ) {
 		base0=a;
@@ -363,7 +363,7 @@ void Wall_Polygon::SetBaseline(Point &a, Point &b)
 	base1=a;
 }
 
-bool Wall_Polygon::PointCovered(Point &p)
+bool Wall_Polygon::PointCovered(const Point &p) const
 {
 	if (wall_flag&WF_DISABLED)
 		return false;
@@ -376,7 +376,7 @@ bool Wall_Polygon::PointCovered(Point &p)
 	return true;
 }
 
-bool Wall_Polygon::PointCovered(int tx, int ty)
+bool Wall_Polygon::PointCovered(int tx, int ty) const
 {
 	Point p((short) tx, (short) ty);
 	return PointCovered(p);

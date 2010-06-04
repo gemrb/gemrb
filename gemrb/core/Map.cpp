@@ -1146,7 +1146,7 @@ void Map::DrawMap(Region screen)
 	oldgametime=gametime;
 }
 
-void Map::DrawSearchMap(Region &screen)
+void Map::DrawSearchMap(const Region &screen)
 {
 	Color inaccessible = { 128, 128, 128, 128 };
 	Video *vid=core->GetVideoDriver();
@@ -1219,7 +1219,7 @@ void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
 	}
 }
 
-bool Map::AnyEnemyNearPoint(Point &p)
+bool Map::AnyEnemyNearPoint(const Point &p)
 {
 	ieDword gametime = core->GetGame()->GameTime;
 	size_t i = actors.size();
@@ -1338,7 +1338,7 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
  GA_POINT     64  - not actor specific
  GA_NO_HIDDEN 128 - hidden actors don't play
 */
-Actor* Map::GetActor(Point &p, int flags)
+Actor* Map::GetActor(const Point &p, int flags)
 {
 	ieDword gametime = core->GetGame()->GameTime;
 	size_t i = actors.size();
@@ -1358,7 +1358,7 @@ Actor* Map::GetActor(Point &p, int flags)
 	return NULL;
 }
 
-Actor* Map::GetActorInRadius(Point &p, int flags, unsigned int radius)
+Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 {
 	ieDword gametime = core->GetGame()->GameTime;
 	size_t i = actors.size();
@@ -1378,7 +1378,7 @@ Actor* Map::GetActorInRadius(Point &p, int flags, unsigned int radius)
 	return NULL;
 }
 
-Actor **Map::GetAllActorsInRadius(Point &p, int flags, unsigned int radius)
+Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius)
 {
 	ieDword count = 1;
 	size_t i;
@@ -1621,7 +1621,7 @@ bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
 	return false;
 }
 
-unsigned char Map::GetBlocked(Point &c)
+unsigned char Map::GetBlocked(const Point &c)
 {
 	return GetBlocked(c.x/16, c.y/12);
 }
@@ -1788,7 +1788,7 @@ void Map::SortQueues()
 	}
 }
 
-void Map::AddProjectile(Projectile* pro, Point &source, ieWord actorID)
+void Map::AddProjectile(Projectile* pro, const Point &source, ieWord actorID)
 {
 	proIterator iter;
 
@@ -1800,7 +1800,7 @@ void Map::AddProjectile(Projectile* pro, Point &source, ieWord actorID)
 }
 
 //adding projectile in order, based on its height parameter
-void Map::AddProjectile(Projectile* pro, Point &source, Point &dest)
+void Map::AddProjectile(Projectile* pro, const Point &source, const Point &dest)
 {
 	proIterator iter;
 
@@ -1813,7 +1813,7 @@ void Map::AddProjectile(Projectile* pro, Point &source, Point &dest)
 
 //returns the longest duration of the VVC cell named 'resource' (if it exists)
 //if P is empty, the position won't be checked
-ieDword Map::HasVVCCell(const ieResRef resource, Point &p)
+ieDword Map::HasVVCCell(const ieResRef resource, const Point &p)
 {
 	scaIterator iter;
 	ieDword ret = 0;
@@ -1939,7 +1939,7 @@ bool Map::CanFree()
 	return true;
 }
 
-void Map::DebugDump(bool show_actors)
+void Map::DebugDump(bool show_actors) const
 {
 	printf( "DebugDump of Area %s:\n", scriptName );
 	printf( "OutDoor: %s\n", YESNO(AreaType & AT_OUTDOOR ) );
@@ -2096,7 +2096,7 @@ void Map::AdjustPosition(Point &goal, unsigned int radius)
 }
 
 //run away from dX, dY (ie.: find the best path of limited length that brings us the farthest from dX, dY)
-PathNode* Map::RunAway(Point &s, Point &d, unsigned int size, unsigned int PathLen, int flags)
+PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsigned int PathLen, int flags)
 {
 	Point start(s.x/16, s.y/12);
 	Point goal (d.x/16, d.y/12);
@@ -2196,7 +2196,7 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int size, unsigned int PathL
 	return Return;
 }
 
-bool Map::TargetUnreachable(Point &s, Point &d, unsigned int size)
+bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size)
 {
 	Point start( s.x/16, s.y/12 );
 	Point goal ( d.x/16, d.y/12 );
@@ -2237,13 +2237,13 @@ bool Map::TargetUnreachable(Point &s, Point &d, unsigned int size)
 /* Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
 */
 
-PathNode* Map::GetLine(Point &start, Point &dest, int flags)
+PathNode* Map::GetLine(const Point &start, const Point &dest, int flags)
 {
 	int Orientation = GetOrient(start, dest);
 	return GetLine(start, dest, 1, Orientation, flags);
 }
 
-PathNode* Map::GetLine(Point &start, int Steps, int Orientation, int flags)
+PathNode* Map::GetLine(const Point &start, int Steps, int Orientation, int flags)
 {
 	Point dest=start;
 
@@ -2255,7 +2255,7 @@ PathNode* Map::GetLine(Point &start, int Steps, int Orientation, int flags)
 	return GetLine(start, dest, Steps, Orientation, flags);
 }
 
-PathNode* Map::GetLine(Point &start, Point &dest, int Speed, int Orientation, int flags)
+PathNode* Map::GetLine(const Point &start, const Point &dest, int Speed, int Orientation, int flags)
 {
 	PathNode* StartNode = new PathNode;
 	PathNode *Return = StartNode;
@@ -2616,7 +2616,7 @@ bool Map::IsVisible(const Point &s, const Point &d)
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
-int Map::WhichEdge(Point &s)
+int Map::WhichEdge(const Point &s)
 {
 	unsigned int sX=s.x/16;
 	unsigned int sY=s.y/12;
@@ -2650,7 +2650,7 @@ void Map::SetupAmbients()
 }
 //--------mapnotes----------------
 //text must be a pointer we can claim ownership of
-void Map::AddMapNote(Point &point, int color, char *text, ieStrRef strref)
+void Map::AddMapNote(const Point &point, int color, char *text, ieStrRef strref)
 {
 	MapNote *mn = new MapNote;
 
@@ -2662,7 +2662,7 @@ void Map::AddMapNote(Point &point, int color, char *text, ieStrRef strref)
 	mapnotes.push_back(mn);
 }
 
-void Map::RemoveMapNote(Point &point)
+void Map::RemoveMapNote(const Point &point)
 {
 	size_t i = mapnotes.size();
 	while (i--) {
@@ -2674,7 +2674,7 @@ void Map::RemoveMapNote(Point &point)
 	}
 }
 
-MapNote *Map::GetMapNote(Point &point)
+MapNote *Map::GetMapNote(const Point &point)
 {
 	size_t i = mapnotes.size();
 	while (i--) {
@@ -2691,7 +2691,7 @@ void Map::LoadIniSpawn()
 	INISpawn->InitSpawn(WEDResRef);
 }
 
-void Map::SpawnCreature(Point &pos, const char *CreName, int radius)
+void Map::SpawnCreature(const Point &pos, const char *CreName, int radius)
 {
 	SpawnGroup *sg=NULL;
 	Actor *creature;
@@ -2769,7 +2769,7 @@ current) is compared against (party level * rest header difficulty). If it's
 greater, the spawning is aborted. If all the other conditions are true, at
 least one creature is summoned, regardless the difficulty cap.
 */
-bool Map::Rest(Point &pos, int hours, int day)
+bool Map::Rest(const Point &pos, int hours, int day)
 {
 	if (!RestHeader.CreatureNum || !RestHeader.Enabled || !RestHeader.Maximum) {
 		return false;
@@ -2823,7 +2823,7 @@ void Map::SetMapVisibility(int setreset)
 }
 
 // x, y are in tile coordinates
-void Map::ExploreTile(Point &pos)
+void Map::ExploreTile(const Point &pos)
 {
 	int h = TMap->YCellCount * 2 + LargeFog;
 	int y = pos.y/32;
@@ -2843,7 +2843,7 @@ void Map::ExploreTile(Point &pos)
 	VisibleBitmap[by] |= bi;
 }
 
-void Map::ExploreMapChunk(Point &Pos, int range, int los)
+void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 {
 	Point Tile;
 
@@ -2905,7 +2905,7 @@ void Map::UpdateFog()
 }
 
 //Valid values are - PATH_MAP_FREE, PATH_MAP_PC, PATH_MAP_NPC
-void Map::BlockSearchMap(Point &Pos, unsigned int size, unsigned int value)
+void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value)
 {
 	// We block a circle of radius size-1 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -2953,7 +2953,7 @@ Spawn* Map::GetSpawn(const char* Name)
 	return NULL;
 }
 
-Spawn *Map::GetSpawnRadius(Point &point, unsigned int radius)
+Spawn *Map::GetSpawnRadius(const Point &point, unsigned int radius)
 {
 	for (size_t i = 0; i < spawns.size(); i++) {
 		Spawn* sp = spawns[i];
@@ -2982,7 +2982,7 @@ int Map::ConsolidateContainers()
 
 //Pos could be [-1,-1] in which case it copies the ground piles to their
 //original position in the second area
-void Map::CopyGroundPiles(Map *othermap, Point &Pos)
+void Map::CopyGroundPiles(Map *othermap, const Point &Pos)
 {
 	int containercount = (int) TMap->GetContainerCount();
 	while (containercount--) {
@@ -3005,7 +3005,7 @@ void Map::CopyGroundPiles(Map *othermap, Point &Pos)
 	}
 }
 
-Container *Map::GetPile(Point &position)
+Container *Map::GetPile(Point position)
 {
 	Point tmp[4];
 	char heapname[32];
@@ -3035,7 +3035,7 @@ Container *Map::GetPile(Point &position)
 	return container;
 }
 
-void Map::AddItemToLocation(Point &position, CREItem *item)
+void Map::AddItemToLocation(const Point &position, CREItem *item)
 {
 	Container *container = GetPile(position);
 	container->AddItem(item);
@@ -3053,7 +3053,7 @@ Container* Map::AddContainer(const char* Name, unsigned short Type,
 	return c;
 }
 
-int Map::GetCursor( Point &p)
+int Map::GetCursor( const Point &p)
 {
 	if (!IsVisible( p, true ) ) {
 		return IE_CURSOR_INVALID;
@@ -3093,7 +3093,7 @@ int Map::GetWeather()
 	return WB_NORMAL;
 }
 
-void Map::FadeSparkle(Point &pos, bool forced)
+void Map::FadeSparkle(const Point &pos, bool forced)
 {
 	spaIterator iter;
 
@@ -3110,7 +3110,7 @@ void Map::FadeSparkle(Point &pos, bool forced)
 	}
 }
 
-void Map::Sparkle(ieDword color, ieDword type, Point &pos, unsigned int FragAnimID)
+void Map::Sparkle(ieDword color, ieDword type, const Point &pos, unsigned int FragAnimID)
 {
 	int style, path, grow, size, width;
 
@@ -3207,7 +3207,7 @@ bool Map::DisplayTrackString(Actor *target)
 
 // returns a lightness level in the range of [0-100]
 // since the lightmap is much smaller than the area, we need to interpolate
-unsigned int Map::GetLightLevel(Point &Pos)
+unsigned int Map::GetLightLevel(const Point &Pos)
 {
 	Color c = LightMap->GetPixel(Pos.x/16, Pos.y/12);
 	// at night/dusk/dawn the lightmap color is adjusted by the color overlay. (Only get's darker.)
@@ -3348,7 +3348,7 @@ bool AreaAnimation::Schedule(ieDword gametime)
 	return false;
 }
 
-void AreaAnimation::Draw(Region &screen, Map *area)
+void AreaAnimation::Draw(const Region &screen, Map *area)
 {
 	int ac=animcount;
 	Video* video = core->GetVideoDriver();

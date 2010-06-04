@@ -292,13 +292,13 @@ void PluginMgr::RegisterCleanup(void (*func)(void))
 	cleanupFunctions.push_back(func);
 }
 
-void PluginMgr::RunInitializers()
+void PluginMgr::RunInitializers() const
 {
 	for (size_t i = 0; i < intializerFunctions.size(); i++)
 		intializerFunctions[i]();
 }
 
-void PluginMgr::RunCleanup()
+void PluginMgr::RunCleanup() const
 {
 	for (size_t i = 0; i < cleanupFunctions.size(); i++)
 		cleanupFunctions[i]();

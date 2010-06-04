@@ -66,7 +66,7 @@ bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags);
 void ClickCore(Scriptable *Sender, Point point, int type, int speed);
 void TransformItemCore(Actor *actor, Action *parameters, bool onlyone);
 void CreateVisualEffectCore(Actor *target, const char *effect, int iterations);
-void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *effect, int iterations);
+void CreateVisualEffectCore(Scriptable *Sender, const Point &position, const char *effect, int iterations);
 void GetPositionFromScriptable(Scriptable* scr, Point &position, bool trap);
 void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect);
@@ -86,12 +86,12 @@ bool ResolveSpellName(ieResRef spellres, Action *parameter);
 GEM_EXPORT void ResolveSpellName(ieResRef spellres, ieDword number);
 ieDword ResolveSpellNumber(const ieResRef spellres);
 bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot);
-void EscapeAreaCore(Scriptable *Sender, Point &p, const char *area, Point &enter, int flags, int wait);
-void GoNear(Scriptable *Sender, Point &p);
+void EscapeAreaCore(Scriptable *Sender, const Point &p, const char *area, const Point &enter, int flags, int wait);
+void GoNear(Scriptable *Sender, const Point &p);
 void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance);
-int MoveNearerTo(Scriptable *Sender, Point &p, int distance, int no_release);
+int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int no_release);
 void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool destination, int distance);
-void GoNearAndRetry(Scriptable *Sender, Point &p, int distance);
+void GoNearAndRetry(Scriptable *Sender, const Point &p, int distance);
 
 #define NO_OPERATION -1
 #define LESS_OR_EQUALS 0
@@ -134,7 +134,7 @@ GEM_EXPORT int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos);
 GEM_EXPORT int DiffCore(ieDword a, ieDword b, int diffmode);
 GEM_EXPORT void DisplayStringCore(Scriptable* Sender, int Strref, int flags);
 GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);
-GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust);
+GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust);
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid = NULL);
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context, bool *valid = NULL);
 Action* GenerateActionCore(const char *src, const char *str, int acIndex);

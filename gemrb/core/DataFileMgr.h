@@ -41,18 +41,18 @@ public:
 	DataFileMgr(void);
 	virtual ~DataFileMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = false) = 0;
-	virtual int GetTagsCount() = 0;
-	virtual const char* GetTagNameByIndex(int index) = 0;
-	virtual int GetKeysCount(const char* Tag) = 0;
-	virtual const char* GetKeyNameByIndex(const char* Tag, int index) = 0;
+	virtual int GetTagsCount() const = 0;
+	virtual const char* GetTagNameByIndex(int index) const = 0;
+	virtual int GetKeysCount(const char* Tag) const = 0;
+	virtual const char* GetKeyNameByIndex(const char* Tag, int index) const = 0;
 	virtual const char* GetKeyAsString(const char* Tag, const char* Key,
-		const char* Default) = 0;
+		const char* Default) const = 0;
 	virtual int GetKeyAsInt(const char* Tag, const char* Key,
-		const int Default) = 0;
+		const int Default) const = 0;
 	virtual float GetKeyAsFloat(const char* Tag, const char* Key,
-		const float Default) = 0;
+		const float Default) const = 0;
 	virtual bool GetKeyAsBool(const char* Tag, const char* Key,
-		const bool Default) = 0;
+		const bool Default) const = 0;
 };
 
 #endif

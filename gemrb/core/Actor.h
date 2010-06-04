@@ -292,9 +292,9 @@ private:
 	/*The projectile bringing the current attack*/
 	Projectile* attackProjectile ;
 	/** paint the actor itself. Called internally by Draw() */
-	void DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
+	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 				 SpriteCover*& sc, Animation** anims,
-				 unsigned char Face, Color& tint);
+				 unsigned char Face, const Color& tint);
 
 	/** fixes the palette */
 	void SetupColors();
@@ -519,7 +519,7 @@ public:
 	/* call this when path needs to be changed */
 	void NewPath();
 	/* overridden method, won't walk if dead */
-	void WalkTo(Point &Des, ieDword flags, int MinDistance = 0);
+	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
 	void ResolveStringConstant(ieResRef sound, unsigned int index);
 	void GetSoundFromINI(ieResRef Sound, unsigned int index);
@@ -533,7 +533,7 @@ public:
 	bool HandleActorStance();
 
 	/* if necessary, advance animation and draw actor */
-	void Draw(Region &screen);
+	void Draw(const Region &screen);
 
 	/* add mobile vvc (spell effects) to actor's list */
 	void AddVVCell(ScriptedAnimation* vvc);
@@ -545,7 +545,7 @@ public:
 	/* if it exists (faster than hasvvccell) */
 	ScriptedAnimation *FindOverlay(int index);
 	/* draw videocells */
-	void DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint);
+	void DrawVideocells(const Region &screen, vvcVector &vvcCells, const Color &tint);
 
 	void SetLockedPalette(const ieDword *gradients);
 	void UnlockPalette();
@@ -567,7 +567,7 @@ public:
 	/* Sets equipped Quick slot, if header is -1, then use the current one */
 	int SetEquippedQuickSlot(int slot, int header);
 	/* Uses an item on the target or point */
-	bool UseItemPoint(ieDword slot, ieDword header, Point &point, ieDword flags);
+	bool UseItemPoint(ieDword slot, ieDword header, const Point &point, ieDword flags);
 	bool UseItem(ieDword slot, ieDword header, Scriptable *target, ieDword flags, int damage = 0);
 	/* Deducts a charge from an item */
 	void ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent);

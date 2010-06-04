@@ -958,7 +958,7 @@ void CreateVisualEffectCore(Actor *target, const char *effect, int iterations)
 	}
 }
 
-void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *effect, int iterations)
+void CreateVisualEffectCore(Scriptable *Sender, const Point &position, const char *effect, int iterations)
 {
 	ScriptedAnimation *vvc = GetVVCEffect(effect, iterations);
 	if (vvc) {
@@ -986,7 +986,7 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 	}
 }
 
-void EscapeAreaCore(Scriptable* Sender, Point &p, const char* area, Point &enter, int flags, int wait)
+void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const Point &enter, int flags, int wait)
 {
 	char Tmp[256];
 
@@ -1331,7 +1331,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 }
 
-void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust)
+void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust)
 {
 	printMessage("GameScript", " ", WHITE);
 	printf("MoveBetweenAreas: %s to %s [%d.%d] face: %d\n", actor->GetName(0), area,position.x,position.y, face);
@@ -1868,7 +1868,7 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 	return newAction;
 }
 
-void GoNear(Scriptable *Sender, Point &p)
+void GoNear(Scriptable *Sender, const Point &p)
 {
 	if (Sender->GetCurrentAction()) {
 		printMessage("GameScript","Target busy???\n",LIGHT_RED);
@@ -1924,7 +1924,7 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 //It is not always good to release the current action if target is unreachable
 //we should also raise the trigger TargetUnreachable (if this is an Attack, at least)
 //i hacked only this low level function, didn't need the higher ones so far
-int MoveNearerTo(Scriptable *Sender, Point &p, int distance, int dont_release)
+int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_release)
 {
 	if (Sender->Type != ST_ACTOR) {
 		printMessage("GameScript","MoveNearerTo only works with actors\n",LIGHT_RED);
@@ -1956,7 +1956,7 @@ void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool flag, int dista
 	GoNearAndRetry(Sender, p, distance);
 }
 
-void GoNearAndRetry(Scriptable *Sender, Point &p, int distance)
+void GoNearAndRetry(Scriptable *Sender, const Point &p, int distance)
 {
 	if (!Sender->GetCurrentAction() ) {
 		printMessage("GameScript","NULL action retried???\n",LIGHT_RED);

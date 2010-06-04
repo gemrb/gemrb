@@ -144,7 +144,7 @@ bool Label::SetEvent(int eventType, const char *handler)
 }
 
 /** Simply returns the pointer to the text, don't modify it! */
-const char* Label::QueryText()
+const char* Label::QueryText() const
 {
 	return ( const char * ) Buffer;
 }

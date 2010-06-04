@@ -39,7 +39,7 @@ Sprite2D::~Sprite2D(void)
 {
 }
 
-bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y)
+bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y) const
 {
 	if (x >= Width || y >= Height) return true;
 
@@ -76,7 +76,7 @@ bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y)
 }
 
 /** Get the Palette of a Sprite */
-Palette* Sprite2D::GetPalette()
+Palette* Sprite2D::GetPalette() const
 {
 	if (!vptr) return NULL;
 	if (!BAM) {
@@ -101,7 +101,7 @@ void Sprite2D::SetPalette(Palette* pal)
 	}
 }
 
-Color Sprite2D::GetPixel(unsigned short x, unsigned short y)
+Color Sprite2D::GetPixel(unsigned short x, unsigned short y) const
 {
 	Color c = { 0, 0, 0, 0 };
 

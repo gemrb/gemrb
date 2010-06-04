@@ -221,10 +221,10 @@ protected:
 	int pathcounter;
 public:
 	void SetCaster(ieDword t);
-	ieDword GetCaster();
+	ieDword GetCaster() const;
 	void SetTarget(ieDword t);
-	void SetTarget(Point &p);
-	bool PointInRadius(Point &p);
+	void SetTarget(const Point &p);
+	bool PointInRadius(const Point &p) const;
 	void Cleanup();
 
 	//inliners to protect data consistency
@@ -240,7 +240,7 @@ public:
 	inline ieWord GetType() const { return type; }
 	//This assumes that the effect queue cannot be bigger than 65535
 	//which is a sane expectation
-	inline EffectQueue *GetEffects() {
+	inline EffectQueue *GetEffects() const {
 		return effects;
 	}
 
@@ -298,14 +298,14 @@ public:
 	//sets how long a created travel projectile will hover over a spot
 	//before vanishing (without the need of area extension)
 	void SetDelay(int delay);
-	void MoveTo(Map *map, Point &Des);
+	void MoveTo(Map *map, const Point &Des);
 	void ClearPath();
 	//handle phases, return 0 when expired
 	int Update();
 	//draw object
-	void Draw(Region &screen);
+	void Draw(const Region &screen);
 	void SetGradient(int gradient, bool tint);
-	void StaticTint(Color &newtint);
+	void StaticTint(const Color &newtint);
 private:
 	//creates a child projectile with current_projectile_id - 1
 	void CreateIteration();
@@ -326,18 +326,18 @@ private:
 	void SecondaryTarget(); //area projectiles (circles, cones)
 	void CheckTrigger(unsigned int radius);
 	void SetupWall();
-	void DrawLine(Region &screen, int face, ieDword flag);
-	void DrawTravel(Region &screen);
-	bool DrawChildren(Region &screen);
-	void DrawExplosion(Region &screen);
-	void DrawExploded(Region &screen);
+	void DrawLine(const Region &screen, int face, ieDword flag);
+	void DrawTravel(const Region &screen);
+	bool DrawChildren(const Region &screen);
+	void DrawExplosion(const Region &screen);
+	void DrawExploded(const Region &screen);
 	int GetTravelPos(int face);
 	int GetShadowPos(int face);
 	void SetPos(int face, int frame1, int frame2);
 	//logic to resolve target when single projectile hit destination
 	int CalculateTargetFlag();
 	Actor *GetTarget();
-	void NextTarget(Point &p);
+	void NextTarget(const Point &p);
 	void SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gradients);
 };
 

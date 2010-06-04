@@ -106,21 +106,21 @@ public:
 		 int /*transindex*/) { return 0; }
 	virtual bool SupportsBAMSprites() { return false; }
 	virtual void FreeSprite(Sprite2D* &spr) = 0;
-	virtual Sprite2D* DuplicateSprite(Sprite2D* spr) = 0;
-	virtual void BlitTile(Sprite2D* spr, Sprite2D* mask, int x, int y, Region* clip, bool trans) = 0;
-	virtual void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
-		Region* clip = NULL) = 0;
+	virtual Sprite2D* DuplicateSprite(const Sprite2D* spr) = 0;
+	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, bool trans) = 0;
+	virtual void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
+		const Region* clip = NULL) = 0;
 
 	// Note: BlitSpriteRegion's clip region is shifted by Viewport.x/y if
 	// anchor is false. This is different from the other BlitSprite functions.
-	virtual void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
-		bool anchor = true, Region* clip = NULL) = 0;
+	virtual void BlitSpriteRegion(const Sprite2D* spr, const Region& size, int x, int y,
+		bool anchor = true, const Region* clip = NULL) = 0;
 	// Note: Tint cannot be constified, because it is modified locally
 	// not a pretty interface :)
-	virtual void BlitGameSprite(Sprite2D* spr, int x, int y,
+	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y,
 		unsigned int flags, Color tint,
 		SpriteCover* cover, Palette *palette = NULL,
-		Region* clip = NULL, bool anchor = false) = 0;
+		const Region* clip = NULL, bool anchor = false) = 0;
 	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
 	/** Sets a temporary cursor when dragging an Item from Inventory.
 	  * VideoDriver will call FreeSprite on it.
@@ -135,7 +135,7 @@ public:
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false) = 0;
 	/** this function draws a clipped sprite */
-	virtual void DrawRectSprite(const Region& rgn, const Color& color, Sprite2D* sprite) = 0;
+	virtual void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite) = 0;
 	virtual void SetPixel(short x, short y, const Color& color, bool clipped = false) = 0;
 	virtual void GetPixel(short x, short y, Color& color) = 0;
 	virtual long GetPixel(void *, unsigned short x, unsigned short y) = 0;
@@ -155,7 +155,7 @@ public:
 	virtual void DrawLine(short x1, short y1, short x2, short y2,
 		const Color& color, bool clipped = false) = 0;
 	/** Blits a Sprite filling the Region */
-	void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false);
+	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
 	/** Sends a Quit Signal to the Event Queue */
@@ -163,11 +163,11 @@ public:
 	/** Gets the Palette of a surface */
 	virtual Palette* GetPalette(void* surface) = 0;
 	/** Flips sprite vertically, returns new sprite */
-	virtual Sprite2D *MirrorSpriteVertical(Sprite2D *sprite, bool MirrorAnchor) = 0;
+	virtual Sprite2D *MirrorSpriteVertical(const Sprite2D *sprite, bool MirrorAnchor) = 0;
 	/** Flips sprite horizontally, returns new sprite */
-	virtual Sprite2D *MirrorSpriteHorizontal(Sprite2D *sprite, bool MirrorAnchor) = 0;
+	virtual Sprite2D *MirrorSpriteHorizontal(const Sprite2D *sprite, bool MirrorAnchor) = 0;
 	/** Duplicates and transforms sprite to have an alpha channel */
-	Sprite2D* CreateAlpha(Sprite2D *sprite);
+	Sprite2D* CreateAlpha(const Sprite2D *sprite);
 
 	/** Converts a Screen Coordinate to a Game Coordinate */
 	virtual void ConvertToGame(short& x, short& y) = 0;
@@ -212,12 +212,12 @@ public:
 	void SetMouseGrayed(bool grayed);
 
 	/** Scales down a sprite by a ratio */
-	Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio );
+	Sprite2D* SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio );
 	/** Creates an ellipse or circle shaped sprite with various intensity
 	 *  for projectile light spots */
 	Sprite2D* CreateLight(int radius, int intensity);
 
-	Color SpriteGetPixelSum (Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
+	Color SpriteGetPixelSum (const Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
 	Region GetViewport(void);
 	void SetViewport(int x, int y, unsigned int w, unsigned int h);
 	void MoveViewportTo(int x, int y);

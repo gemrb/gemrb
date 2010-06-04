@@ -636,7 +636,7 @@ void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
 	spr = NULL;
 }
 
-Sprite2D* SDLVideoDriver::DuplicateSprite(Sprite2D* sprite)
+Sprite2D* SDLVideoDriver::DuplicateSprite(const Sprite2D* sprite)
 {
 	if (!sprite) return NULL;
 	Sprite2D* dest = 0;
@@ -668,8 +668,8 @@ Sprite2D* SDLVideoDriver::DuplicateSprite(Sprite2D* sprite)
 }
 
 
-void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
-	int y, bool anchor, Region* clip)
+void SDLVideoDriver::BlitSpriteRegion(const Sprite2D* spr, const Region& size, int x,
+	int y, bool anchor, const Region* clip)
 {
 	if (!spr->vptr) return;
 
@@ -850,7 +850,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 	}
 }
 
-void SDLVideoDriver::BlitTile(Sprite2D* spr, Sprite2D* mask, int x, int y, Region* clip, bool trans)
+void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, bool trans)
 {
 	if (spr->BAM) {
 		printMessage( "SDLVideo", "Tile blit not supported for this sprite\n", LIGHT_RED );
@@ -944,8 +944,8 @@ void SDLVideoDriver::BlitTile(Sprite2D* spr, Sprite2D* mask, int x, int y, Regio
 }
 
 
-void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
-	Region* clip)
+void SDLVideoDriver::BlitSprite(const Sprite2D* spr, int x, int y, bool anchor,
+	const Region* clip)
 {
 	if (!spr->vptr) return;
 
@@ -1075,10 +1075,10 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 }
 
 //cannot make const reference from tint, it is modified locally
-void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
-									unsigned int flags, Color tint,
-									SpriteCover* cover, Palette *palette,
-									Region* clip, bool anchor)
+void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
+		unsigned int flags, Color tint,
+		SpriteCover* cover, Palette *palette,
+		const Region* clip, bool anchor)
 {
 	if (!spr->vptr) return;
 
@@ -1663,7 +1663,7 @@ void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, 
 }
 
 /** This function Draws a clipped sprite */
-void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, Sprite2D* sprite)
+void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite)
 {
 	if (sprite->BAM) {
 		printMessage( "SDLVideo", "DrawRectSprite not supported for this sprite\n", LIGHT_RED );
@@ -2240,7 +2240,7 @@ Palette* SDLVideoDriver::GetPalette(void *vptr)
 // flips its anchor (i.e. origin//base point) as well
 // returns new sprite
 
-Sprite2D *SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnchor)
+Sprite2D *SDLVideoDriver::MirrorSpriteVertical(const Sprite2D* sprite, bool MirrorAnchor)
 {
 	if (!sprite || !sprite->vptr)
 		return NULL;
@@ -2278,7 +2278,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnch
 
 // Flips given sprite horizontally (left-right). If MirrorAnchor=true,
 //   flips its anchor (i.e. origin//base point) as well
-Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAnchor)
+Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(const Sprite2D* sprite, bool MirrorAnchor)
 {
 	if (!sprite || !sprite->vptr)
 		return NULL;

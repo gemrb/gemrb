@@ -83,7 +83,7 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration)
 	delete fx;
 }
 
-EffectQueue *Spell::GetEffectBlock(Scriptable *self, Point &pos, int block_index, ieDword pro) const
+EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, ieDword pro) const
 {
 	Effect *features;
 	int count;
@@ -135,7 +135,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, Point &pos, int block_index
 	return fxqueue;
 }
 
-Projectile *Spell::GetProjectile(Scriptable *self, int header, Point &target) const
+Projectile *Spell::GetProjectile(Scriptable *self, int header, const Point &target) const
 {
 	SPLExtHeader *seh = GetExtHeader(header);
 	if (!seh) {

@@ -91,7 +91,7 @@ Animation* AnimationFactory::GetCycle(unsigned char cycle)
 }
 
 /* returns the required frame of the named cycle, cycle defaults to 0 */
-Sprite2D* AnimationFactory::GetFrame(unsigned short index, unsigned char cycle)
+Sprite2D* AnimationFactory::GetFrame(unsigned short index, unsigned char cycle) const
 {
 	if (cycle >= cycles.size()) {
 		return NULL;
@@ -105,7 +105,7 @@ Sprite2D* AnimationFactory::GetFrame(unsigned short index, unsigned char cycle)
 	return spr;
 }
 
-Sprite2D* AnimationFactory::GetFrameWithoutCycle(unsigned short index)
+Sprite2D* AnimationFactory::GetFrameWithoutCycle(unsigned short index) const
 {
 	if(index >= frames.size()) {
 		return NULL;
@@ -116,7 +116,7 @@ Sprite2D* AnimationFactory::GetFrameWithoutCycle(unsigned short index)
 }
 
 Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
-		Sprite2D *&Picture2, unsigned int type)
+		Sprite2D *&Picture2, unsigned int type) const
 {
 	if (frames.size()<2) {
 		return NULL;

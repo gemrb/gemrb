@@ -67,10 +67,10 @@ public:
 	int XPos, YPos, Width, Height, Bpp;
 	Sprite2D(void);
 	~Sprite2D(void);
-	bool IsPixelTransparent(unsigned short x, unsigned short y);
-	Palette *GetPalette();
+	bool IsPixelTransparent(unsigned short x, unsigned short y) const;
+	Palette *GetPalette() const;
 	void SetPalette(Palette *pal);
-	Color GetPixel(unsigned short x, unsigned short y);
+	Color GetPixel(unsigned short x, unsigned short y) const;
 public: // public only for SDLVideo
 	int RefCount;
 public:

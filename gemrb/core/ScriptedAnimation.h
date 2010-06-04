@@ -87,7 +87,7 @@ public:
 	ScriptedAnimation *twin;
 public:
 	//draws the next frame of the videocell
-	bool Draw(Region &screen, Point &Pos, Color &tint, Map *area, int dither, int orientation);
+	bool Draw(const Region &screen, const Point &Pos, const Color &tint, Map *area, int dither, int orientation);
 	//sets phase (0-2)
 	void SetPhase(int arg);
 	//sets sound for phase (p_onset, p_hold, p_release)

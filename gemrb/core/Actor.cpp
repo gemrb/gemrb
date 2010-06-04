@@ -4492,7 +4492,7 @@ void Actor::SetRunFlags(ieDword flags)
 	InternalFlags |= (flags & IF_RUNFLAGS);
 }
 
-void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
+void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 {
 	PathTries = 0;
 	if (InternalFlags&IF_REALLYDIED) {
@@ -4509,7 +4509,7 @@ void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 }
 
 //there is a similar function in Map for stationary vvcs
-void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint)
+void Actor::DrawVideocells(const Region &screen, vvcVector &vvcCells, const Color &tint)
 {
 	Map* area = GetCurrentArea();
 
@@ -4530,9 +4530,9 @@ void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint)
 	}
 }
 
-void Actor::DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
+void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
 			SpriteCover*& newsc, Animation** anims,
-			unsigned char Face, Color& tint)
+			unsigned char Face, const Color& tint)
 {
 	CharAnimations* ca = GetAnims();
 	int PartCount = ca->GetTotalPartCount();
@@ -4594,7 +4594,7 @@ bool Actor::ShouldHibernate() {
 	return true;
 }
 
-void Actor::Draw(Region &screen)
+void Actor::Draw(const Region &screen)
 {
 	Map* area = GetCurrentArea();
 
@@ -5326,7 +5326,7 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 //if target is a non living scriptable, then we simply shoot for its position
 //the fx should get a NULL target, and handle itself by using the position
 //(shouldn't crash when target is NULL)
-bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, ieDword flags)
+bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDword flags)
 {
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)

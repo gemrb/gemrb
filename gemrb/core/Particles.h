@@ -85,8 +85,8 @@ public:
 
 	void SetBitmap(unsigned int FragAnimID);
 	void SetPhase(ieByte ph) { phase = ph; }
-	int GetPhase() { return phase; }
-	bool MatchPos(Point &p) { return pos.x==p.x && pos.y==p.y; }
+	int GetPhase() const { return phase; }
+	bool MatchPos(const Point &p) const { return pos.x==p.x && pos.y==p.y; }
 	void SetType(ieByte t, ieByte p=SP_PATH_FALL, ieByte st=SP_SPAWN_NONE)
 	{
 		type=t;
@@ -103,12 +103,12 @@ public:
 	void SetColor(ieByte c) { color=c; }
 	void SetOwner(Scriptable *o) { owner=o; }
 	/* returns true if it cannot add new elements */
-	bool AddNew(Point &point);
-	void Draw(Region &screen);
+	bool AddNew(const Point &point);
+	void Draw(const Region &screen);
 	void AddParticles(int count);
 	/* returns true if it could be destroyed (didn't draw anything) */
 	int Update();
-	int GetHeight() { return pos.y+pos.h; }
+	int GetHeight() const { return pos.y+pos.h; }
 private:
 	Element *points;
 	ieDword target;    //could be 0, in that case target is pos

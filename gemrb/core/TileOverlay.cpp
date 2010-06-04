@@ -46,7 +46,7 @@ void TileOverlay::AddTile(Tile* tile)
 	tiles[count++] = tile;
 }
 
-void TileOverlay::BumpViewport(Region &viewport, Region &vp)
+void TileOverlay::BumpViewport(const Region &viewport, Region &vp)
 {
 	bool bump = false;
 	vp.w = viewport.w;

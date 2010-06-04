@@ -46,11 +46,11 @@ public:
 		int ClosedIndex, unsigned short* indices, int count,
 		Gem_Polygon* open, Gem_Polygon* closed);
 	//gets door by active region (click target)
-	Door* GetDoor(Point &position);
+	Door* GetDoor(const Point &position) const;
 	//gets door by activation position (spell target)
-	Door* GetDoorByPosition(Point &position);
-	Door* GetDoor(unsigned int idx);
-	Door* GetDoor(const char* Name);
+	Door* GetDoorByPosition(const Point &position) const;
+	Door* GetDoor(unsigned int idx) const;
+	Door* GetDoor(const char* Name) const;
 	size_t GetDoorCount() { return doors.size(); }
 	//update doors for a new overlay
 	void UpdateDoors();
@@ -58,23 +58,23 @@ public:
 	/* type is an optional filter for container type*/
 	void AddContainer(Container *c);
 	//gets container by active region (click target)
-	Container* GetContainer(Point &position, int type=-1);
+	Container* GetContainer(const Point &position, int type=-1) const;
 	//gets container by activation position (spell target)
-	Container* GetContainerByPosition(Point &position, int type=-1);
-	Container* GetContainer(const char* Name);
-	Container* GetContainer(unsigned int idx);
+	Container* GetContainerByPosition(const Point &position, int type=-1) const;
+	Container* GetContainer(const char* Name) const;
+	Container* GetContainer(unsigned int idx) const;
 	/* cleans up empty heaps, returns 1 if container removed*/
 	int CleanupContainer(Container *container);
-	size_t GetContainerCount() { return containers.size(); }
+	size_t GetContainerCount() const { return containers.size(); }
 
 	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type,
 		Gem_Polygon* outline);
-	InfoPoint* GetInfoPoint(Point &position, bool detectable);
-	InfoPoint* GetInfoPoint(const char* Name);
-	InfoPoint* GetInfoPoint(unsigned int idx);
-	InfoPoint* GetTravelTo(const char* Destination);
+	InfoPoint* GetInfoPoint(const Point &position, bool detectable) const;
+	InfoPoint* GetInfoPoint(const char* Name) const;
+	InfoPoint* GetInfoPoint(unsigned int idx) const;
+	InfoPoint* GetTravelTo(const char* Destination) const;
 	InfoPoint* AdjustNearestTravel(Point &p);
-	size_t GetInfoPointCount() { return infoPoints.size(); }
+	size_t GetInfoPointCount() const { return infoPoints.size(); }
 
 	TileObject* AddTile(const char* ID, const char* Name, unsigned int Flags,
 		unsigned short* openindices, int opencount,unsigned short* closeindices, int closecount);

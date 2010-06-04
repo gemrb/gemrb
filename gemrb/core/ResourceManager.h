@@ -50,9 +50,9 @@ public:
 	bool AddSource(const char *path, const char *description, PluginID type);
 
 	/** returns true if resource exists */
-	bool Exists(const char *ResRef, SClass_ID type, bool silent=false);
+	bool Exists(const char *ResRef, SClass_ID type, bool silent=false) const;
 	/** returns true if resource exists */
-	bool Exists(const char *ResRef, const TypeID *type, bool silent=false);
+	bool Exists(const char *ResRef, const TypeID *type, bool silent=false) const;
 
 	/** Returns stream associated to given resource */
 	DataStream* GetResource(const char* resname, SClass_ID type, bool silent = false) const;

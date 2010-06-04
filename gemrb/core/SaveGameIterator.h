@@ -39,41 +39,41 @@ public:
 public:
 	SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID);
 	~SaveGame();
-	int GetPortraitCount()
+	int GetPortraitCount() const
 	{
 		return PortraitCount;
 	}
-	int GetSaveID()
+	int GetSaveID() const
 	{
 		return SaveID;
 	}
-	const char* GetName()
+	const char* GetName() const
 	{
 		return Name;
 	}
-	const char* GetPrefix()
+	const char* GetPrefix() const
 	{
 		return Prefix;
 	}
-	const char* GetPath()
+	const char* GetPath() const
 	{
 		return Path;
 	}
-	const char* GetDate()
+	const char* GetDate() const
 	{
 		return Date;
 	}
-	const char* GetGameDate();
-	const char* GetSlotName()
+	const char* GetGameDate() const;
+	const char* GetSlotName() const
 	{
 		return SlotName;
 	}
 
-	Sprite2D* GetPortrait(int index);
-	Sprite2D* GetPreview();
-	DataStream* GetGame();
-	DataStream* GetWmap();
-	DataStream* GetSave();
+	Sprite2D* GetPortrait(int index) const;
+	Sprite2D* GetPreview() const;
+	DataStream* GetGame() const;
+	DataStream* GetWmap() const;
+	DataStream* GetSave() const;
 private:
 	char Path[_MAX_PATH];
 	char Prefix[10];

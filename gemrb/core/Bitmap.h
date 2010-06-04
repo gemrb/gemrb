@@ -25,7 +25,7 @@ class GEM_EXPORT Bitmap {
 public:
 	Bitmap(unsigned int height, unsigned int width);
 	~Bitmap();
-	unsigned char GetAt(unsigned int x, unsigned int y)
+	unsigned char GetAt(unsigned int x, unsigned int y) const
 	{
 		if (x >= width || y >= height)
 			return 0;
@@ -39,11 +39,11 @@ public:
 		data[width*y+x] = idx;
 
 	}
-	unsigned int GetHeight()
+	unsigned int GetHeight() const
 	{
 		return height;
 	}
-	unsigned int GetWidth()
+	unsigned int GetWidth() const
 	{
 		return width;
 	}

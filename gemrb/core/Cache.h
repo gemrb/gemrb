@@ -64,7 +64,7 @@ public:
 		return m_nCount==0;
 	}
 	// Lookup
-	void *GetResource(const ieResRef key);
+	void *GetResource(const ieResRef key) const;
 	// Operations
 	bool SetAt(const ieResRef key, void *rValue);
 	// decreases refcount or drops data

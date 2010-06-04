@@ -50,7 +50,7 @@ public:
 	ieWord getRadius() const { return radius; }
 	ieWord getHeight() const { return height; }
 	ieWord getGain() const { return gain; }
-	char *getSound(ieDword i)
+	char *getSound(ieDword i) const
 	{
 		if(i<sounds.size()) return sounds[i];
 		return NULL;

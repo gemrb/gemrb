@@ -106,7 +106,7 @@ SaveGame::~SaveGame()
 {
 }
 
-Sprite2D* SaveGame::GetPortrait(int index)
+Sprite2D* SaveGame::GetPortrait(int index) const
 {
 	if (index > PortraitCount) {
 		return NULL;
@@ -119,7 +119,7 @@ Sprite2D* SaveGame::GetPortrait(int index)
 	return im->GetSprite2D();
 }
 
-Sprite2D* SaveGame::GetPreview()
+Sprite2D* SaveGame::GetPreview() const
 {
 	ResourceHolder<ImageMgr> im(Prefix, manager, true);
 	if (!im)
@@ -127,22 +127,22 @@ Sprite2D* SaveGame::GetPreview()
 	return im->GetSprite2D();
 }
 
-DataStream* SaveGame::GetGame()
+DataStream* SaveGame::GetGame() const
 {
 	return manager.GetResource(Prefix, IE_GAM_CLASS_ID, true);
 }
 
-DataStream* SaveGame::GetWmap()
+DataStream* SaveGame::GetWmap() const
 {
 	return manager.GetResource(core->WorldMapName, IE_WMP_CLASS_ID, true);
 }
 
-DataStream* SaveGame::GetSave()
+DataStream* SaveGame::GetSave() const
 {
 	return manager.GetResource(Prefix, IE_SAV_CLASS_ID, true);
 }
 
-const char* SaveGame::GetGameDate()
+const char* SaveGame::GetGameDate() const
 {
 	return GameDate;
 }

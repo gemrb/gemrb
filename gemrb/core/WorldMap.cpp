@@ -145,7 +145,7 @@ void WorldMap::AddAreaLink(WMPAreaLink *al)
 	area_links.push_back(al);
 }
 
-WMPAreaEntry *WorldMap::GetNewAreaEntry()
+WMPAreaEntry *WorldMap::GetNewAreaEntry() const
 {
 	return new WMPAreaEntry();
 }
@@ -225,7 +225,7 @@ void WorldMap::SetMapMOS(Sprite2D *newmos)
 	MapMOS = newmos;
 }
 
-WMPAreaEntry* WorldMap::GetArea(const ieResRef AreaName, unsigned int &i)
+WMPAreaEntry* WorldMap::GetArea(const ieResRef AreaName, unsigned int &i) const
 {
 	i=(unsigned int) area_entries.size();
 	while (i--) {
@@ -322,7 +322,7 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 }
 
 //returns the index of the area owning this link
-unsigned int WorldMap::WhoseLinkAmI(int link_index)
+unsigned int WorldMap::WhoseLinkAmI(int link_index) const
 {
 	for (unsigned int i=0;i<AreaEntriesCount;i++) {
 		WMPAreaEntry *ae=area_entries[i];
@@ -340,7 +340,7 @@ unsigned int WorldMap::WhoseLinkAmI(int link_index)
 	return (ieDword) -1;
 }
 
-WMPAreaLink *WorldMap::GetLink(const ieResRef A, const ieResRef B)
+WMPAreaLink *WorldMap::GetLink(const ieResRef A, const ieResRef B) const
 {
 	unsigned int i,j,k;
 
@@ -367,7 +367,7 @@ WMPAreaLink *WorldMap::GetLink(const ieResRef A, const ieResRef B)
 //call this function to find out which area we fall into
 //not necessarily the target area
 //if it isn't the same, then a random encounter happened!
-WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter)
+WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter) const
 {
 	if (!GotHereFrom) {
 		return NULL;
@@ -410,7 +410,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 	return lastpath;
 }
 
-int WorldMap::GetDistance(const ieResRef AreaName)
+int WorldMap::GetDistance(const ieResRef AreaName) const
 {
 	if (!Distances) {
 		return -1;

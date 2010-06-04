@@ -30,7 +30,7 @@ public:
 	DialogMgr(void);
 	virtual ~DialogMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
-	virtual Dialog* GetDialog() = 0;
+	virtual Dialog* GetDialog() const = 0;
 };
 
 #endif

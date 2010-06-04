@@ -121,7 +121,7 @@ struct Effect {
 	ieDword random_value;
 public:
 	//don't modify position in case it was already set
-	void SetPosition(Point &p) {
+	void SetPosition(const Point &p) {
 		if(PosX==0xffffffff && PosY==0xffffffff) {
 			PosX=p.x;
 			PosY=p.y;

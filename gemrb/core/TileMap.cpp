@@ -105,7 +105,7 @@ Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
 	return door;
 }
 
-Door* TileMap::GetDoor(unsigned int idx)
+Door* TileMap::GetDoor(unsigned int idx) const
 {
 	if (idx >= doors.size()) {
 		return NULL;
@@ -113,7 +113,7 @@ Door* TileMap::GetDoor(unsigned int idx)
 	return doors[idx];
 }
 
-Door* TileMap::GetDoor(Point &p)
+Door* TileMap::GetDoor(const Point &p) const
 {
 	for (size_t i = 0; i < doors.size(); i++) {
 		Gem_Polygon *doorpoly;
@@ -138,7 +138,7 @@ Door* TileMap::GetDoor(Point &p)
 	return NULL;
 }
 
-Door* TileMap::GetDoorByPosition(Point &p)
+Door* TileMap::GetDoorByPosition(const Point &p) const
 {
 	for (size_t i = 0; i < doors.size(); i++) {
 		Door* door = doors[i];
@@ -153,7 +153,7 @@ Door* TileMap::GetDoorByPosition(Point &p)
 	return NULL;
 }
 
-Door* TileMap::GetDoor(const char* Name)
+Door* TileMap::GetDoor(const char* Name) const
 {
 	if (!Name) {
 		return NULL;
@@ -413,7 +413,7 @@ void TileMap::AddContainer(Container *c)
 	containers.push_back(c);
 }
 
-Container* TileMap::GetContainer(unsigned int idx)
+Container* TileMap::GetContainer(unsigned int idx) const
 {
 	if (idx >= containers.size()) {
 		return NULL;
@@ -421,7 +421,7 @@ Container* TileMap::GetContainer(unsigned int idx)
 	return containers[idx];
 }
 
-Container* TileMap::GetContainer(const char* Name)
+Container* TileMap::GetContainer(const char* Name) const
 {
 	for (size_t i = 0; i < containers.size(); i++) {
 		Container* cn = containers[i];
@@ -434,7 +434,7 @@ Container* TileMap::GetContainer(const char* Name)
 //look for a container at position
 //use type = IE_CONTAINER_PILE if you want to find ground piles only
 //in this case, empty piles won't be found!
-Container* TileMap::GetContainer(Point &position, int type)
+Container* TileMap::GetContainer(const Point &position, int type) const
 {
 	for (size_t i = 0; i < containers.size(); i++) {
 		Container* c = containers[i];
@@ -467,7 +467,7 @@ Container* TileMap::GetContainer(Point &position, int type)
 	return NULL;
 }
 
-Container* TileMap::GetContainerByPosition(Point &position, int type)
+Container* TileMap::GetContainerByPosition(const Point &position, int type) const
 {
 	for (size_t i = 0; i < containers.size(); i++) {
 		Container* c = containers[i];
@@ -544,7 +544,7 @@ InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,
 }
 
 //if detectable is set, then only detectable infopoints will be returned
-InfoPoint* TileMap::GetInfoPoint(Point &p, bool detectable)
+InfoPoint* TileMap::GetInfoPoint(const Point &p, bool detectable) const
 {
 	for (size_t i = 0; i < infoPoints.size(); i++) {
 		InfoPoint* ip = infoPoints[i];
@@ -581,7 +581,7 @@ InfoPoint* TileMap::GetInfoPoint(Point &p, bool detectable)
 	return NULL;
 }
 
-InfoPoint* TileMap::GetInfoPoint(const char* Name)
+InfoPoint* TileMap::GetInfoPoint(const char* Name) const
 {
 	for (size_t i = 0; i < infoPoints.size(); i++) {
 		InfoPoint* ip = infoPoints[i];
@@ -591,7 +591,7 @@ InfoPoint* TileMap::GetInfoPoint(const char* Name)
 	return NULL;
 }
 
-InfoPoint* TileMap::GetInfoPoint(unsigned int idx)
+InfoPoint* TileMap::GetInfoPoint(unsigned int idx) const
 {
 	if (idx >= infoPoints.size()) {
 		return NULL;
@@ -599,7 +599,7 @@ InfoPoint* TileMap::GetInfoPoint(unsigned int idx)
 	return infoPoints[idx];
 }
 
-InfoPoint* TileMap::GetTravelTo(const char* Destination)
+InfoPoint* TileMap::GetTravelTo(const char* Destination) const
 {
 	size_t i=infoPoints.size();
 	while (i--) {

@@ -84,27 +84,27 @@ public:
 	void Print(Region cliprgn, Region rgn, const unsigned char* string,
 		Palette* color, unsigned char Alignment, bool anchor = false,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
-		unsigned int curpos = 0, bool NoColor = false);
+		unsigned int curpos = 0, bool NoColor = false) const;
 	void Print(Region rgn, const unsigned char* string, Palette* color,
 		unsigned char Alignment, bool anchor = false,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
-		unsigned int curpos = 0, bool NoColor = false);
+		unsigned int curpos = 0, bool NoColor = false) const;
 	void PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		Palette* color, unsigned char Alignment,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
-		unsigned int curpos = 0, bool NoColor = false);
+		unsigned int curpos = 0, bool NoColor = false) const;
 
-	Palette* GetPalette();
+	Palette* GetPalette() const;
 	void SetPalette(Palette* pal);
 	/** Returns width of the string rendered in this font in pixels */
-	int CalcStringWidth(const char* string, bool NoColor = false);
-	void SetupString(char* string, unsigned int width, bool NoColor = false);
+	int CalcStringWidth(const char* string, bool NoColor = false) const;
+	void SetupString(char* string, unsigned int width, bool NoColor = false) const;
 	/** Sets ASCII code of the first character in the font.
 	 * (it allows remapping numeric fonts from \000 to '0') */
 	void SetFirstChar(unsigned char first);
 
 private:
-	int PrintInitial(int x, int y, Region &rgn, unsigned char currChar);
+	int PrintInitial(int x, int y, const Region &rgn, unsigned char currChar) const;
 };
 
 #endif

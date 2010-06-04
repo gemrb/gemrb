@@ -33,8 +33,8 @@ public:
 	Factory(void);
 	~Factory(void);
 	void AddFactoryObject(FactoryObject* fobject);
-	int IsLoaded(const char* ResRef, SClass_ID type);
-	FactoryObject* GetFactoryObject(int pos);
+	int IsLoaded(const char* ResRef, SClass_ID type) const;
+	FactoryObject* GetFactoryObject(int pos) const;
 	void FreeObjects(void);
 };
 

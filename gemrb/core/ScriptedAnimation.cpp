@@ -559,7 +559,7 @@ retry:
 }
 
 //it is not sure if we need tint at all
-bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &p_tint, Map *area, int dither, int orientation)
+bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color &p_tint, Map *area, int dither, int orientation)
 {
 	if (FaceTarget) {
 		SetOrientation(orientation);

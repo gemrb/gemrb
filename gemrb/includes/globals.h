@@ -163,10 +163,10 @@ GEM_EXPORT void strnspccpy(char* d, const char *s, int l);
 #ifndef HAVE_STRNLEN
 GEM_EXPORT int strnlen(const char* string, int maxlen);
 #endif
-GEM_EXPORT unsigned char GetOrient(Point &s, Point &d);
-GEM_EXPORT unsigned int Distance(Point pos, Point pos2);
-GEM_EXPORT unsigned int Distance(Point pos, Scriptable *b);
-GEM_EXPORT unsigned int PersonalDistance(Point pos, Scriptable *b);
+GEM_EXPORT unsigned char GetOrient(const Point &s, const Point &d);
+GEM_EXPORT unsigned int Distance(const Point pos, const Point pos2);
+GEM_EXPORT unsigned int Distance(const Point pos, Scriptable *b);
+GEM_EXPORT unsigned int PersonalDistance(const Point pos, Scriptable *b);
 GEM_EXPORT unsigned int Distance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int PersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT int EARelation(Scriptable *a, Actor *b);

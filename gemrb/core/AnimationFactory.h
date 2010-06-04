@@ -42,13 +42,13 @@ public:
 	void SetFrameData(unsigned char* FrameData);
 	Animation* GetCycle(unsigned char cycle);
 	/** No descriptions */
-	Sprite2D* GetFrame(unsigned short index, unsigned char cycle=0);
-	Sprite2D* GetFrameWithoutCycle(unsigned short index);
-	size_t GetCycleCount() { return cycles.size(); }
-	size_t GetFrameCount() { return frames.size(); }
-	int GetCycleSize(int idx) { return cycles[idx].FramesCount; }
+	Sprite2D* GetFrame(unsigned short index, unsigned char cycle=0) const;
+	Sprite2D* GetFrameWithoutCycle(unsigned short index) const;
+	size_t GetCycleCount() const { return cycles.size(); }
+	size_t GetFrameCount() const { return frames.size(); }
+	int GetCycleSize(int idx) const { return cycles[idx].FramesCount; }
 	Sprite2D* GetPaperdollImage(ieDword *Colors, Sprite2D *&Picture2,
-		unsigned int type);
+		unsigned int type) const;
 
 	void IncDataRefCount();
 	void DecDataRefCount();

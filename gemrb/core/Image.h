@@ -28,7 +28,7 @@ class GEM_EXPORT Image {
 public:
 	Image(unsigned int height, unsigned int width);
 	~Image();
-	Color GetPixel(unsigned int x, unsigned int y)
+	Color GetPixel(unsigned int x, unsigned int y) const
 	{
 		if (x >= width || y >= height) {
 			static const Color black = { 0, 0, 0, 0 };
@@ -44,11 +44,11 @@ public:
 		data[width*y+x] = idx;
 
 	}
-	unsigned int GetHeight()
+	unsigned int GetHeight() const
 	{
 		return height;
 	}
-	unsigned int GetWidth()
+	unsigned int GetWidth() const
 	{
 		return width;
 	}
