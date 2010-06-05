@@ -150,7 +150,10 @@ def ConfirmedSaveGame():
 	Label = ConfirmWindow.GetControl (3)
 	Slotname = Label.QueryText ()
 	StartLoadScreen()
-	GemRB.SaveGame(Games[Pos], Slotname, 22) #saves a game with version 2.2
+	if Pos < len(Games):
+		GemRB.SaveGame(Games[Pos], Slotname, 22) #saves a game with version 2.2
+	else:
+		GemRB.SaveGame(None, Slotname, 22) #saves a game with version 2.2
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
 	SaveWindow.SetVisible (WINDOW_VISIBLE)
