@@ -169,7 +169,13 @@ Condition* GetCondition(char* string)
 	char **lines = GetStrings( string, count );
 	Condition *condition = new Condition();
 	for (size_t i = 0; i < count; ++i) {
-		condition->triggers.push_back(GenerateTrigger(lines[i]));
+		Trigger *trigger = GenerateTrigger(lines[i]);
+		if (!trigger) {
+			printMessage( "DLGImporter", "Can't compile trigger: " ,YELLOW);
+			printf("%s\n", lines[i]);
+		} else {
+			condition->triggers.push_back(trigger);
+		}
 		free(lines[i]);
 	}
 	free(lines);
@@ -240,10 +246,11 @@ std::vector<Action*> DLGImporter::GetAction(unsigned int index) const
 		if (!action) {
 			printMessage( "DLGImporter", "Can't compile action: " ,YELLOW);
 			printf("%s\n", lines[i]);
-			continue;
+		} else {
+			action->IncRef();
+			actions.push_back(action);
 		}
-		action->IncRef();
-		actions.push_back(action);
+		free(lines[i]);
 	}
 	return actions;
 }
