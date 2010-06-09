@@ -413,6 +413,8 @@ public:
 	TextArea *GetMessageTextArea() const;
 	/** returns a string reference from a string reference index constant*/
 	ieStrRef GetStringReference(int stridx) const;
+	/** returns true if a string reference for a string reference index constant exists */
+	bool HasStringReference(int stridx) const;
 	/** returns the speaker's color and name */
 	unsigned int GetSpeakerColor(const char *&name, const Scriptable *&speaker) const;
 	/** displays any string in the textarea */

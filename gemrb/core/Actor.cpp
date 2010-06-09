@@ -2493,7 +2493,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 {
 	bool detailed = false;
 	const char *type_name = "unknown";
-	if (core->GetStringReference(STR_DMG_SLASHING) != (ieStrRef) -1) { // how and iwd2
+	if (core->HasStringReference(STR_DMG_SLASHING)) { // how and iwd2
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it != core->DamageInfoMap.end()) {
@@ -2530,7 +2530,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			}
 		} else if (stricmp( core->GameType, "pst" ) == 0) {
 			if(0) printf("TODO: pst floating text\n");
-		} else if (core->GetStringReference(STR_DAMAGE1) != (ieStrRef) -1 || !hitter || hitter->Type != ST_ACTOR) {
+		} else if (core->HasStringReference(STR_DAMAGE1) || !hitter || hitter->Type != ST_ACTOR) {
 			// bg1 and iwd
 			// or traps: "Damage Taken (damage)", but there's no token
 			char tmp[32];
@@ -2554,7 +2554,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 					core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
 					core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name );
 					core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
-				} else if (core->GetStringReference(STR_DAMAGE_IMMUNITY) != (ieStrRef) -1 && core->GetStringReference(STR_DAMAGE1) != (ieStrRef) -1) {
+				} else if (core->HasStringReference(STR_DAMAGE_IMMUNITY) && core->HasStringReference(STR_DAMAGE1)) {
 					// bg2
 					//<DAMAGEE> was immune to my damage.
 					core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );

@@ -4092,6 +4092,10 @@ ieStrRef Interface::GetStringReference(int stridx) const
 	return strref_table[stridx];
 }
 
+bool Interface::HasStringReference(int stridx) const
+{
+	return strref_table[stridx] != -1;
+}
 
 unsigned int Interface::GetSpeakerColor(const char *&name, const Scriptable *&speaker) const
 {
