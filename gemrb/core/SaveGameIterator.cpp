@@ -47,6 +47,7 @@ static void ParseGameDate(DataStream *ds, char *Date)
 	ds->ReadDword(&GameTime);
 	delete ds;
 	if (memcmp(Signature,"GAME",4) ) {
+		strcpy(Date, "ERROR");
 		return;
 	}
 
@@ -99,7 +100,7 @@ SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const
 	stat( nPath, &my_stat );
 	strftime( Date, _MAX_PATH, "%c", localtime( &my_stat.st_mtime ) );
 	manager.AddSource(Path, Name, PLUGIN_RESOURCE_DIRECTORY);
-	ParseGameDate(GetGame(), GameDate);
+	GameDate[0] = '\0';
 }
 
 SaveGame::~SaveGame()
@@ -144,6 +145,8 @@ DataStream* SaveGame::GetSave() const
 
 const char* SaveGame::GetGameDate() const
 {
+	if (GameDate[0] == '\0')
+		ParseGameDate(GetGame(), GameDate);
 	return GameDate;
 }
 

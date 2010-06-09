@@ -79,7 +79,7 @@ private:
 	char Prefix[10];
 	char Name[_MAX_PATH];
 	char Date[_MAX_PATH];
-	char GameDate[_MAX_PATH];
+	mutable char GameDate[_MAX_PATH];
 	char SlotName[_MAX_PATH];
 	int PortraitCount;
 	int SaveID;
