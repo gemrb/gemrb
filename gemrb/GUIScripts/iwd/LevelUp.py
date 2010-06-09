@@ -132,7 +132,7 @@ def OpenLevelUpWindow():
 	Kit = GetKitIndex (pc)
 	print "Kit:", Kit, "\tActor Kit:",actor.KitIndex()
 	print "ClassName:",ClassName,"\tActor ClassNames:",actor.ClassNames()
-	
+
 	# need this for checking gnomes
 	RaceName = GemRB.GetPlayerStat (pc, IE_RACE, 1)
 	RaceName = RaceTable.FindValue (3, RaceName)
@@ -152,7 +152,7 @@ def OpenLevelUpWindow():
 	IsMulti = NumClasses > 1
 	IsDual = 0
 	DualSwap = 0
-	
+
 	# not multi, check dual
 	if not IsMulti:
 		# check if we're dual classed
@@ -161,7 +161,7 @@ def OpenLevelUpWindow():
 
 		# either dual or single only care about 1 class
 		NumClasses = 1
-		
+
 		# not dual, must be single
 		if IsDual[0] == 0:
 			Classes = [Class]
@@ -233,7 +233,7 @@ def OpenLevelUpWindow():
 		DruidTable = ClassSkillsTable.GetValue (Classes[i], 0, 0)
 		ClericTable = ClassSkillsTable.GetValue (Classes[i], 1, 0)
 		MageTable = ClassSkillsTable.GetValue (Classes[i], 2, 0)
-		
+
 		# see if we have mage spells
 		if MageTable != "*":
 			# we get 1 extra spell per level if we're a specialist
@@ -293,7 +293,7 @@ def OpenLevelUpWindow():
 	SetupThaco (pc, Level)
 	SetupLore (pc, LevelDiff)
 	SetupHP (pc, Level, LevelDiff)
-	
+
 	# use total levels for HLAs
 	HLACount = 0
 	if HasTOB(): # make sure SoA doesn't try to get it
@@ -304,7 +304,7 @@ def OpenLevelUpWindow():
 				for name in actor.ClassNames()]
 		else:
 			print "Actor HLA Names:",actor.ClassNames()
-			
+
 		for i in range (NumClasses):
 			if IsMulti:
 				# get the row name for lookup ex. MULTI2FIGHTER, MULTI3THIEF
@@ -325,7 +325,7 @@ def OpenLevelUpWindow():
 				HLACount += (Level[i] - FirstLevel + 1)
 			else:
 				HLACount += LevelDiff[i]
-			
+
 		# set values required by the hla level up code
 		HLACount = HLACount / HLATable.GetValue (ClassName, "RATE", 1)
 		GemRB.SetVar ("HLACount", HLACount)
@@ -355,7 +355,7 @@ def OpenLevelUpWindow():
 	RedrawSkills()
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	LevelUpWindow.ShowModal (MODAL_SHADOW_GRAY)
-	
+
 	# if we have a sorcerer who can learn spells, we need to do spell selection
 	if (Classes[0] == 19) and (DeltaWSpells > 0): # open our sorc spell selection window
 		OpenSpellsWindow (pc, "SPLSRCKN", Level[0], LevelDiff[0])
@@ -431,7 +431,7 @@ def LevelUpDonePress():
 		for i in range(len(NewWSpells)):
 			if NewWSpells[i] > 0: # we have new spells, so update
 				GemRB.SetMemorizableSpellsCount(pc, NewWSpells[i], IE_SPELL_TYPE_WIZARD, i)
-	
+
 	# save our number of memorizable priest spells
 	if DeltaDSpells > 0: # druids and clerics count
 		for i in range (len(NewDSpells)):
@@ -465,7 +465,7 @@ def LevelUpDonePress():
 		if (Level[0] - LevelDiff[0]) <= Level[1] and Level[0] > Level[1]: # our new classes now surpasses our old class
 			print "reactivating base class"
 			ReactivateBaseClass ()
-	
+
 	if LevelUpWindow:
 		LevelUpWindow.Unload()
 	UpdatePortraitWindow ()

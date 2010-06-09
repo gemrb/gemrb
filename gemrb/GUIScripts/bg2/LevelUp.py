@@ -22,11 +22,11 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
-from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities, GameIsBG2
+from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities, GameIsBG1, GameIsBG2, GameIsIWD1
 from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GSNN
 from GUICommonWindows import *
-from LUCommon import *
 from LUSpellSelection import *
+from LUCommon import *
 if HasTOB():
 	from LUHLASelection import *
 from LUProfsSelection import *
@@ -75,9 +75,10 @@ def OpenLevelUpWindow():
 
 	LevelUpWindow = GemRB.LoadWindowObject (3)
 
-	InfoButton = LevelUpWindow.GetControl (125)
-	InfoButton.SetText (13707)
-	InfoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpInfoPress")
+	if GameIsBG2():
+		InfoButton = LevelUpWindow.GetControl (125)
+		InfoButton.SetText (13707)
+		InfoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpInfoPress")
 
 	DoneButton = LevelUpWindow.GetControl (0)
 	DoneButton.SetText (11962)
@@ -93,6 +94,25 @@ def OpenLevelUpWindow():
 	actor = Actor(pc)
 	Label = LevelUpWindow.GetControl (0x10000000+90)
 	Label.SetText (GemRB.GetPlayerName (pc))
+
+	if GameIsBG1() or GameIsIWD1():
+		# armorclass
+		Label = LevelUpWindow.GetControl (0x10000057)
+		ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
+		#This is a temporary solution, the core engine should set the stat correctly!
+		ac += GemRB.GetAbilityBonus (IE_DEX, 2, GemRB.GetPlayerStat (pc, IE_DEX) )
+		Label.SetText (str (ac))
+		Label.SetTooltip (17183)
+
+		# hp now
+		Label = LevelUpWindow.GetControl (0x10000058)
+		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
+		Label.SetTooltip (17184)
+
+		# hp max
+		Label = LevelUpWindow.GetControl (0x10000059)
+		Label.SetText (str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
+		Label.SetTooltip (17378)
 
 	# some current values
 	OldHPMax = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1)
@@ -116,7 +136,7 @@ def OpenLevelUpWindow():
 	Kit = GetKitIndex (pc)
 	print "Kit:", Kit, "\tActor Kit:",actor.KitIndex()
 	print "ClassName:",ClassName,"\tActor ClassNames:",actor.ClassNames()
-	
+
 	# need this for checking gnomes
 	RaceName = GemRB.GetPlayerStat (pc, IE_RACE, 1)
 	RaceName = RaceTable.FindValue (3, RaceName)
@@ -136,7 +156,7 @@ def OpenLevelUpWindow():
 	IsMulti = NumClasses > 1
 	IsDual = 0
 	DualSwap = 0
-	
+
 	# not multi, check dual
 	if not IsMulti:
 		# check if we're dual classed
@@ -145,7 +165,7 @@ def OpenLevelUpWindow():
 
 		# either dual or single only care about 1 class
 		NumClasses = 1
-		
+
 		# not dual, must be single
 		if IsDual[0] == 0:
 			Classes = [Class]
@@ -217,7 +237,7 @@ def OpenLevelUpWindow():
 		DruidTable = ClassSkillsTable.GetValue (Classes[i], 0, 0)
 		ClericTable = ClassSkillsTable.GetValue (Classes[i], 1, 0)
 		MageTable = ClassSkillsTable.GetValue (Classes[i], 2, 0)
-		
+
 		# see if we have mage spells
 		if MageTable != "*":
 			# we get 1 extra spell per level if we're a specialist
@@ -277,7 +297,7 @@ def OpenLevelUpWindow():
 	SetupThaco (pc, Level)
 	SetupLore (pc, LevelDiff)
 	SetupHP (pc, Level, LevelDiff)
-	
+
 	# use total levels for HLAs
 	HLACount = 0
 	if HasTOB(): # make sure SoA doesn't try to get it
@@ -288,7 +308,7 @@ def OpenLevelUpWindow():
 				for name in actor.ClassNames()]
 		else:
 			print "Actor HLA Names:",actor.ClassNames()
-			
+
 		for i in range (NumClasses):
 			if IsMulti:
 				# get the row name for lookup ex. MULTI2FIGHTER, MULTI3THIEF
@@ -309,37 +329,48 @@ def OpenLevelUpWindow():
 				HLACount += (Level[i] - FirstLevel + 1)
 			else:
 				HLACount += LevelDiff[i]
-			
+
 		# set values required by the hla level up code
 		HLACount = HLACount / HLATable.GetValue (ClassName, "RATE", 1)
 		GemRB.SetVar ("HLACount", HLACount)
-	HLAButton = LevelUpWindow.GetControl (126)
-	if HLACount:
-		HLAButton.SetText (4954)
-		HLAButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpHLAPress")
-	else:
-		HLAButton.SetFlags (IE_GUI_BUTTON_DISABLED, OP_OR)
+	if GameIsBG2():
+		HLAButton = LevelUpWindow.GetControl (126)
+		if HLACount:
+			HLAButton.SetText (4954)
+			HLAButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpHLAPress")
+		else:
+			HLAButton.SetFlags (IE_GUI_BUTTON_DISABLED, OP_OR)
 
 	# setup our profs
 	Level1 = []
 	for i in range (len (Level)):
 		Level1.append (Level[i]-LevelDiff[i])
-	SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
+	if GameIsBG2():
+		SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
+	else:
+		SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level, 0, False, 0)
 	NewProfPoints = GemRB.GetVar ("ProfsPointsLeft")
 
 	#we autohide the skills and let SetupSkillsWindow show them if needbe
 	for i in range (4):
 		HideSkills (i)
-	SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
+	if GameIsBG2():
+		SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
+	else:
+		SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP_BG1, LevelUpWindow, RedrawSkills, Level1, Level, 0, False)
 	NewSkillPoints = GemRB.GetVar ("SkillPointsLeft")
 
-	TextAreaControl = LevelUpWindow.GetControl(110)
-	TextAreaControl.SetText(GetLevelUpNews())
+	if GameIsBG2():
+		TextAreaControl = LevelUpWindow.GetControl(110)
+		TextAreaControl.SetText(GetLevelUpNews())
+	else:
+		TextAreaControl = LevelUpWindow.GetControl(42)
+		TextAreaControl.SetText(GetStatOverview(pc, LevelDiff))
 
 	RedrawSkills()
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	LevelUpWindow.ShowModal (MODAL_SHADOW_GRAY)
-	
+
 	# if we have a sorcerer who can learn spells, we need to do spell selection
 	if (Classes[0] == 19) and (DeltaWSpells > 0): # open our sorc spell selection window
 		OpenSpellsWindow (pc, "SPLSRCKN", Level[0], LevelDiff[0])
@@ -369,7 +400,7 @@ def RedrawSkills():
 
 	# we need to disable the HLA button if we don't have any HLAs left
 	HLACount = GemRB.GetVar ("HLACount")
-	if HLACount == 0:
+	if GameIsBG2() and HLACount == 0:
 		# turn the HLA button off
 		HLAButton = LevelUpWindow.GetControl (126)
 		HLAButton.SetState(IE_GUI_BUTTON_DISABLED)
@@ -395,7 +426,7 @@ def GetLevelUpNews():
 	if IsDual:
 		if (Level[0] - LevelDiff[0]) <= Level[1] and Level[0] > Level[1]:
 			News = GemRB.GetString (5261) + '\n\n'
-	
+
 	# 5271 - Additional weapon proficiencies
 	if NewProfPoints > 0:
 		News += GemRB.GetString (5271) + ": " + str(NewProfPoints) + '\n\n'
@@ -554,7 +585,7 @@ def LevelUpDonePress():
 		for i in range(len(NewWSpells)):
 			if NewWSpells[i] > 0: # we have new spells, so update
 				GemRB.SetMemorizableSpellsCount(pc, NewWSpells[i], IE_SPELL_TYPE_WIZARD, i)
-	
+
 	# save our number of memorizable priest spells
 	if DeltaDSpells > 0: # druids and clerics count
 		for i in range (len(NewDSpells)):
@@ -588,7 +619,7 @@ def LevelUpDonePress():
 		if (Level[0] - LevelDiff[0]) <= Level[1] and Level[0] > Level[1]: # our new classes now surpasses our old class
 			print "reactivating base class"
 			ReactivateBaseClass ()
-	
+
 	if LevelUpWindow:
 		LevelUpWindow.Unload()
 	UpdatePortraitWindow ()
