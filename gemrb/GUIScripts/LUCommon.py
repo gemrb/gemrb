@@ -20,7 +20,9 @@
 # LUCommon.py - common functions related to leveling up
 
 import GemRB
-from GUICommon import *
+from GUICommon import NextLevelTable, ClassTable, RaceTable, ClassSkillsTable, KitListTable
+from GUICommon import IsMultiClassed, IsDualClassed, IsDualSwap, GetKitIndex
+from GUICommon import GameIsBG2, GetLearnablePriestSpells, HasSpell, AddClassAbilities
 from ie_stats import *
 
 def GetNextLevelExp (Level, Class):
