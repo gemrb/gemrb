@@ -275,6 +275,9 @@ def GameIsIWD ():
 def GameIsHOW ():
 	return GemRB.GameType == "how"
 
+def GameIsIWD1 ():
+	return GemRB.GameType == "iwd" or GemRB.GameType == "how"
+
 def GameIsIWD2 ():
 	return GemRB.GameType == "iwd2"
 

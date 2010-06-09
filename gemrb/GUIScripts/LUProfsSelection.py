@@ -206,7 +206,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		if ClassName == "SORCERER":
 			ProfsColumn = ProfsTable.GetColumnIndex ("MAGE")
 		else:
-			if GameIsIWD() or GameIsHOW():
+			if GameIsIWD1():
 				# these two have a nice table (unlike the rest we had to override)
 				# but it is transposed when compared
 				ClassWeapTable = GemRB.LoadTableObject ("clasweap")
@@ -242,7 +242,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		GemRB.SetVar ("ProfBase "+str(i), currentprof)
 
 		#see if we can assign to this prof
-		if GameIsIWD() or GameIsHOW():
+		if GameIsIWD1():
 			maxprof = ClassWeapTable.GetValue (ProfsColumn, i) # this table has profs as rows
 		else:
 			maxprof = ProfsTable.GetValue(i+ProfsTableOffset, ProfsColumn)
@@ -387,7 +387,7 @@ def ProfsLeftPress():
 	ProfsTextArea.SetText(ProfsTable.GetValue(Pos+ProfsTableOffset, 2) )
 	if ProfsPointsLeft == 0:
 		return
-	if GameIsIWD() or GameIsHOW():
+	if GameIsIWD1():
 		ProfMaxTable = GemRB.LoadTableObject ("profsmax")
 		MaxProf = ProfMaxTable.GetValue(ClassNameSave, "OTHER_LEVELS")
 	else:

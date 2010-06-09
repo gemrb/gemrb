@@ -20,7 +20,7 @@
 
 import GemRB
 from GUIDefines import *
-from GUICommon import GameWindow, GameIsBG1, GameIsBG2, GameIsIWD, GameIsHOW, GameIsIWD2
+from GUICommon import GameWindow, GameIsBG1, GameIsBG2, GameIsIWD1, GameIsIWD2
 
 TextScreen = None
 TextArea = None
@@ -53,7 +53,7 @@ def StartTextScreen ():
 		ID = (GemRB.GetGameVar("CHAPTER") + 1) & 0x7fffffff
 		Chapter = ID + 1
 
-	if GameIsIWD() or GameIsHOW() or GameIsIWD2():
+	if GameIsIWD1() or GameIsIWD2():
 		#fixme: this is also a guess; are there more, one per chapter?
 		if LoadPic == "":
 			GemRB.LoadMusicPL ("chap0.mus")
