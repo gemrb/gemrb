@@ -19,6 +19,7 @@
  */
 
 #include "TableMgr.h"
+
 #include "GameData.h"
 #include "Interface.h"
 

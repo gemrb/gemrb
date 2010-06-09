@@ -27,16 +27,18 @@
 #ifndef PLUGINMGR_H
 #define PLUGINMGR_H
 
-#include "exports.h"
-#include "win32def.h"
-#include "globals.h"
 #include "SClassID.h" // For PluginID
-#include <vector>
-#include <list>
-#include <cstring>
-#include <map>
-#include "ResourceDesc.h"
+#include "exports.h"
+#include "globals.h"
 #include "iless.h"
+#include "win32def.h"
+
+#include "ResourceDesc.h"
+
+#include <cstring>
+#include <list>
+#include <map>
+#include <vector>
 
 #ifdef WIN32
 typedef HINSTANCE LibHandle;
@@ -44,9 +46,9 @@ typedef HINSTANCE LibHandle;
 typedef void *LibHandle;
 #endif
 
+class Plugin;
 class Resource;
 class TypeID;
-class Plugin;
 
 /**
  * @class PluginMgr

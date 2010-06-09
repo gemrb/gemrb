@@ -27,17 +27,21 @@
  * Copyright (c) 2009 Konstantin Shishkov
 */
 
-#include <assert.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <cstdio>
-#include "Video.h"
-#include "Audio.h"
-#include "Variables.h"
 #include "BIKPlayer.h"
-#include "ie_types.h"
+
 #include "rational.h"
 #include "binkdata.h"
+
+#include "ie_types.h"
+
+#include "Audio.h"
+#include "Variables.h"
+#include "Video.h"
+
+#include <cassert>
+#include <cstdio>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 static int g_truecolor;
 static ieDword *cbAtFrame = NULL;

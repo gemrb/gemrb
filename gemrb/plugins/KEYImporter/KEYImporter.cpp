@@ -18,18 +18,19 @@
  *
  */
 
-#include "win32def.h"
 #include "KEYImporter.h"
+
+#include "win32def.h"
 #include "globals.h"
+
+#include "ArchiveImporter.h"
 #include "FileStream.h"
 #include "Interface.h"
-#include "ArchiveImporter.h"
 #include "ResourceDesc.h"
+
 #ifndef WIN32
 #include <unistd.h>
 #endif
-
-#define SHARED_OVERRIDE "shared"
 
 KEYImporter::KEYImporter(void)
 {

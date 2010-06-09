@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "ResourceSource.h"
 
 ResourceSource::ResourceSource(void)

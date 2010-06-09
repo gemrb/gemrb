@@ -29,13 +29,15 @@
 //skip messy warnings in MSVC6
 #include "win32def.h"
 
-#include "exports.h"
-#include <map>
-#include <string>
 #include "SClassID.h"
+#include "exports.h"
+
 #include "Cache.h"
 #include "GlobalTimer.h"
 #include "Holder.h"
+
+#include <map>
+#include <string>
 
 #ifdef _MSC_VER // No SFINAE
 #include "Audio.h"
@@ -47,47 +49,47 @@
 #include "Video.h"
 #endif
 
-class Audio;
-class Video;
-class Resource;
-class StringMgr;
-class Container;
-class Factory;
-class Font;
-class EventMgr;
-class WindowMgr;
-class ScriptEngine;
-class Console;
-class Label;
-class TextArea;
-class SaveGameIterator;
-class Variables;
-class Item;
-class Spell;
-class MusicMgr;
-class TableMgr;
-class SymbolMgr;
-class ITMExtHeader;
-class SPLExtHeader;
-class DataFileMgr;
-class Game;
-class WorldMap;
-class WorldMapArray;
-class GameControl;
-class Window;
-class CREItem;
-class Store;
 class Actor;
+class Audio;
+class CREItem;
+class Calendar;
+class Console;
+class Container;
+class Control;
+class DataFileMgr;
 struct Effect;
 struct EffectRef;
+class EventMgr;
+class Factory;
+class Font;
+class Game;
+class GameControl;
+class ITMExtHeader;
+class Image;
+class Item;
+class Label;
 class Map;
-class ScriptedAnimation;
-class Control;
+class MusicMgr;
 class Palette;
 class ProjectileServer;
-class Calendar;
-class Image;
+class Resource;
+class SPLExtHeader;
 class SaveGame;
+class SaveGameIterator;
+class ScriptEngine;
+class ScriptedAnimation;
+class Spell;
+class Store;
+class StringMgr;
+class SymbolMgr;
+class TableMgr;
+class TextArea;
+class Variables;
+class Video;
+class Window;
+class WindowMgr;
+class WorldMap;
+class WorldMapArray;
 
 struct Symbol {
 	Holder<SymbolMgr> sm;

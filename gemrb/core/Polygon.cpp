@@ -16,13 +16,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  */
-#include "win32def.h"
+
 #include "Polygon.h"
+
+#include "win32def.h"
+
 #include "Interface.h"
 
 #include <algorithm>
-#include <vector>
 #include <cstring>
+#include <vector>
 
 Gem_Polygon::Gem_Polygon(Point* points, unsigned int cnt, Region *bbox)
 {

@@ -18,13 +18,15 @@
  *
  */
 
-#include "win32def.h"
 #include "Label.h"
+
+#include "win32def.h"
+
+#include "GameData.h"
 #include "Interface.h"
-#include "Video.h"
 #include "Palette.h"
 #include "Variables.h"
-#include "GameData.h"
+#include "Video.h"
 
 Label::Label(Font* font)
 {

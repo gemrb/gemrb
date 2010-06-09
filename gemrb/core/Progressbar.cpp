@@ -18,11 +18,14 @@
  *
  */
 
-#include <cstring>
-#include "win32def.h"
 #include "Progressbar.h"
+
+#include "win32def.h"
+
 #include "Interface.h"
 #include "Video.h"
+
+#include <cstring>
 
 Progressbar::Progressbar( unsigned short KnobStepsCount, bool Clear)
 {

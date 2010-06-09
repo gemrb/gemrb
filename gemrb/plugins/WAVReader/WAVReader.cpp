@@ -17,6 +17,7 @@
  */
 
 #include "WAVReader.h"
+
 #include <utility>
 
 // WAVEFORMATEX structure (from MS SDK)

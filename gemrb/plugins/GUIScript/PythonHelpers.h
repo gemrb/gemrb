@@ -19,6 +19,11 @@
 #ifndef PYTHON_HELPERS_H
 #define PYTHON_HELPERS_H
 
+#include "win32def.h" // For Logging
+
+#include "Holder.h"
+#include "Interface.h"
+
 #ifdef WIN32
 #ifdef _DEBUG
 #undef _DEBUG
@@ -30,10 +35,6 @@
 #else
 #include <Python.h>
 #endif
-
-#include "Holder.h"
-#include "win32def.h" // For Logging
-#include "Interface.h"
 
 template <typename T>
 class CObject : public Holder<T> {

@@ -18,13 +18,15 @@
  *
  */
 
-#include "win32def.h"
 #include "ControlAnimation.h"
-#include "Interface.h"
-#include "Video.h"      /* needed only for paperdoll palettes */
-#include "Palette.h"    /* needed only for paperdoll palettes */
+
+#include "win32def.h"
+
 #include "Button.h"
 #include "GameData.h"
+#include "Interface.h"
+#include "Palette.h"    /* needed only for paperdoll palettes */
+#include "Video.h"      /* needed only for paperdoll palettes */
 
 ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycle)
 {

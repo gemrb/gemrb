@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "ItemMgr.h"
 
 ItemMgr::ItemMgr(void)

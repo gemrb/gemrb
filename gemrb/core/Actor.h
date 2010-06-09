@@ -25,16 +25,18 @@
 #include <config.h>
 #endif
 
-#include <vector>
-#include <cstring>
 #include "exports.h"
 #include "ie_types.h"
+
+#include "ActorBlock.h"
 #include "Animation.h"
 #include "CharAnimations.h"
-#include "ScriptedAnimation.h"
-#include "ActorBlock.h"
 #include "EffectQueue.h"
 #include "PCStatStruct.h"
+#include "ScriptedAnimation.h"
+
+#include <cstring>
+#include <vector>
 
 class Map;
 class ScriptedAnimation;

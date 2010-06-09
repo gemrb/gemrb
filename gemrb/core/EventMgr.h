@@ -28,10 +28,12 @@
 #ifndef EVENTMGR_H
 #define EVENTMGR_H
 
+#include "exports.h"
+
 #include "Control.h"
 #include "WindowMgr.h"
+
 #include <vector>
-#include "exports.h"
 
 #define GEM_LEFT		0x81
 #define GEM_RIGHT		0x82

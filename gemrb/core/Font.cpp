@@ -21,12 +21,15 @@
 //This class represents game fonts. Fonts are special .bam files.
 //Each cycle stands for a letter. 
 
-#include "win32def.h"
 #include "Font.h"
-#include "Interface.h"
-#include "Video.h"
-#include "Palette.h"
+
+#include "win32def.h"
+
 #include "GameData.h"
+#include "Interface.h"
+#include "Palette.h"
+#include "Video.h"
+
 #include <cassert>
 
 unsigned int lastX = 0;

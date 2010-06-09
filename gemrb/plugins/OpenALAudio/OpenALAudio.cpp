@@ -19,7 +19,9 @@
  */
 
 #include "OpenALAudio.h"
+
 #include "GameData.h"
+
 #include <cassert>
 #include <cstdio>
 

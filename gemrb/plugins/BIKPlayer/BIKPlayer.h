@@ -21,14 +21,19 @@
 #ifndef BIKPLAYER_H
 #define BIKPLAYER_H
 
-#include "win32def.h"
-#include "globals.h"
 #include "MoviePlayer.h"
+
+#include "globals.h"
+#include "win32def.h"
+
 #include "Interface.h"
-#include "common.h"
-#include "rational.h"
+
+// FIXME: This has to be included last, since it defines int*_t, which causes
+// mingw g++ 4.5.0 to choke.
 #include "GetBitContext.h"
+#include "common.h"
 #include "dsputil.h"
+#include "rational.h"
 
 #define BIK_SIGNATURE_LEN 4
 #define BIK_SIGNATURE_DATA "BIKi"

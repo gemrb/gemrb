@@ -48,10 +48,10 @@
 //this is in the control ID
 #define IGNORE_CONTROL 0x10000000
 
-#include "ie_types.h"
-#include "win32def.h"
 #include "RGBAColor.h"
 #include "exports.h"
+#include "ie_types.h"
+#include "win32def.h"
 
 /**
  * Event handler indicates code to be called when a particular
@@ -61,8 +61,8 @@
 typedef char EventHandler[64];
 
 class ControlAnimation;
-class Window;
 class Sprite2D;
+class Window;
 
 /**
  * @class Control

@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "SaveGameMgr.h"
 
 SaveGameMgr::SaveGameMgr(void)

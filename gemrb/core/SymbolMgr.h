@@ -31,8 +31,8 @@
 /** GetValue returns this if text is not found in arrays */
 #define SYMBOL_VALUE_NOT_LOCATED -65535
 
-#include "Plugin.h"
 #include "DataStream.h"
+#include "Plugin.h"
 
 /**
  * @class SymbolMgr

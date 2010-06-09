@@ -1,7 +1,9 @@
 #include "BMPWriter.h"
-#include <cstring>
+
 #include "Interface.h"
 #include "Video.h"
+
+#include <cstring>
 
 #define BMP_HEADER_SIZE  54 //FIXME: duplicate
 

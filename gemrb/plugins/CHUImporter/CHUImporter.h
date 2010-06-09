@@ -22,6 +22,7 @@
 #define CHUIMPORTER_H
 
 #include "WindowMgr.h"
+
 #include "DataStream.h"
 
 /**CHU File Importer Class

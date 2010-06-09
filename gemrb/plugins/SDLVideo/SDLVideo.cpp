@@ -18,20 +18,22 @@
  *
  */
 
+#include "SDLVideo.h"
+
+#include "TileRenderer.inl"
+
+#include "AnimationFactory.h"
+#include "Audio.h"
+#include "Console.h"
+#include "Game.h" // for GetGlobalTint
+#include "GameData.h"
+#include "Interface.h"
+#include "Palette.h"
+#include "SpriteCover.h"
+
 #include <cmath>
 #include <cassert>
 #include <cstdio>
-#include "SDLVideo.h"
-#include "Interface.h"
-#include "SpriteCover.h"
-#include "Console.h"
-#include "Audio.h"
-#include "Palette.h"
-#include "AnimationFactory.h"
-#include "Game.h" // for GetGlobalTint
-#include "GameData.h"
-
-#include "TileRenderer.inl"
 
 SDLVideoDriver::SDLVideoDriver(void)
 {

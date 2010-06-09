@@ -21,23 +21,20 @@
 #ifndef OPENALAUDIO_H_INCLUDED
 #define OPENALAUDIO_H_INCLUDED
 
-#define RETRY 5
-#define BUFFER_CACHE_SIZE 100
-#define MAX_STREAMS 30
-#define MUSICBUFFERS 10
-#define REFERENCE_DISTANCE 50
-#define ACM_BUFFERSIZE 8192
-
-#include "SDL.h"
 #include "Audio.h"
-#include "LRUCache.h"
-#include "Interface.h"
-#include "MusicMgr.h"
-#include "ie_types.h"
-#include "FileStream.h"
-#include "SoundMgr.h"
+
 #include "AmbientMgrAL.h"
 #include "StackLock.h"
+
+#include "ie_types.h"
+
+#include "FileStream.h"
+#include "Interface.h"
+#include "LRUCache.h"
+#include "MusicMgr.h"
+#include "SoundMgr.h"
+
+#include <SDL.h>
 
 #ifndef WIN32
 #ifdef __APPLE_CC__
@@ -52,6 +49,12 @@
 #include <alc.h>
 #endif
 
+#define RETRY 5
+#define BUFFER_CACHE_SIZE 100
+#define MAX_STREAMS 30
+#define MUSICBUFFERS 10
+#define REFERENCE_DISTANCE 50
+#define ACM_BUFFERSIZE 8192
 
 struct AudioStream {
     AudioStream() : Buffer(0), Source(0), Duration(0), free(true), ambient(false), locked(false), delete_buffers(false) { }

@@ -18,16 +18,18 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
-#include "win32def.h"
 #include "Control.h"
+
+#include "win32def.h"
+
 #include "ControlAnimation.h"
-#include "Window.h"
 #include "Interface.h"
 #include "ScriptEngine.h"
 #include "Video.h"
+#include "Window.h"
 
+#include <cstdio>
+#include <cstring>
 
 Control::Control()
 {

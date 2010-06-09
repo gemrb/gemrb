@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "DialogMgr.h"
 
 DialogMgr::DialogMgr(void)

@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "EffectMgr.h"
 
 EffectMgr::EffectMgr(void)

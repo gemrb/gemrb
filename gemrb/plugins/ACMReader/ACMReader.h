@@ -19,14 +19,17 @@
 #ifndef ACMREADER_H
 #define ACMREADER_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "unpacker.h"
+#include "SoundMgr.h"
+
 #include "decoder.h"
 #include "general.h"
+#include "unpacker.h"
+
 #include "DataStream.h"
-#include "SoundMgr.h"
+
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 
 // IP's ACM files
 class ACMReader : public SoundMgr {

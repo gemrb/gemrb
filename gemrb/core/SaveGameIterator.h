@@ -21,17 +21,19 @@
 #ifndef SAVEGAMEITERATOR_H
 #define SAVEGAMEITERATOR_H
 
-#include <time.h>
-#include <sys/stat.h>
-#include <vector>
 #include "exports.h"
-#include "FileStream.h"
-#include "ResourceManager.h"
-#include "Holder.h"
 
-#define SAVEGAME_DIRECTORY_MATCHER "%d - %[A-Za-z0-9- _]"
+#include "FileStream.h"
+#include "Holder.h"
+#include "ResourceManager.h"
+
+#include <sys/stat.h>
+#include <time.h>
+#include <vector>
 
 class ImageMgr;
+
+#define SAVEGAME_DIRECTORY_MATCHER "%d - %[A-Za-z0-9- _]"
 
 class GEM_EXPORT SaveGame : public Held<SaveGame> {
 public:

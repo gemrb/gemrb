@@ -18,12 +18,13 @@
  *
  */
 
-#include "win32def.h"
+
 #include "TextEdit.h"
-#include "Interface.h"
-#include "Video.h"
-#include "Palette.h"
+
 #include "GameData.h"
+#include "Interface.h"
+#include "Palette.h"
+#include "Video.h"
 
 TextEdit::TextEdit(unsigned short maxLength, unsigned short px, unsigned short py)
 {

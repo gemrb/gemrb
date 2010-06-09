@@ -18,9 +18,11 @@
  *
  */
 
-#include "win32def.h"
 #include "VideoModes.h"
+
 #include "errors.h"
+#include "win32def.h"
+
 #include <vector>
 
 using namespace std;

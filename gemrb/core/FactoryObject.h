@@ -21,8 +21,8 @@
 #ifndef FACTORYOBJECT_H
 #define FACTORYOBJECT_H
 
-#include "globals.h"
 #include "exports.h"
+#include "globals.h"
 
 class GEM_EXPORT FactoryObject {
 public:

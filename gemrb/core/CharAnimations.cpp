@@ -18,15 +18,17 @@
  *
  */
 
-#include "win32def.h"
 #include "CharAnimations.h"
-#include "Interface.h"
-#include "Video.h"
-#include "Palette.h"
-#include "ImageMgr.h"
-#include "Map.h"
+
+#include "win32def.h"
+
 #include "Game.h"
 #include "GameData.h"
+#include "ImageMgr.h"
+#include "Interface.h"
+#include "Map.h"
+#include "Palette.h"
+#include "Video.h"
 
 static int AvatarsCount = 0;
 static AvatarStruct *AvatarTable = NULL;

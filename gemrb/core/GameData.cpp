@@ -18,26 +18,27 @@
 *
 */
 
-#include <cstdio>
 #include "GameData.h"
 
 #include "Actor.h"
-#include "Cache.h"
-#include "Factory.h"
-#include "Item.h"
-#include "Spell.h"
-#include "Effect.h"
 #include "ActorMgr.h"
-#include "FileStream.h"
-#include "Interface.h"
-#include "SpellMgr.h"
-#include "ItemMgr.h"
-#include "EffectMgr.h"
-#include "Game.h"
-#include "ResourceDesc.h"
 #include "AnimationMgr.h"
-#include "ImageMgr.h"
+#include "Cache.h"
+#include "Effect.h"
+#include "EffectMgr.h"
+#include "Factory.h"
+#include "FileStream.h"
+#include "Game.h"
 #include "ImageFactory.h"
+#include "ImageMgr.h"
+#include "Interface.h"
+#include "Item.h"
+#include "ItemMgr.h"
+#include "ResourceDesc.h"
+#include "Spell.h"
+#include "SpellMgr.h"
+
+#include <cstdio>
 
 static void ReleaseItem(void *poi)
 {

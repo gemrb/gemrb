@@ -18,8 +18,10 @@
  *
  */
 
-#include "win32def.h"
 #include "DLGImporter.h"
+
+#include "win32def.h"
+
 #include "FileStream.h"
 #include "Interface.h"
 

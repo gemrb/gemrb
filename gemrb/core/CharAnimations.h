@@ -21,12 +21,14 @@
 #ifndef CHARANIMATIONS_H
 #define CHARANIMATIONS_H
 
-#include "Animation.h"
 #include "RGBAColor.h"
-#include "TableMgr.h"
-#include <vector>
-#include "Palette.h"
 #include "exports.h"
+
+#include "Animation.h"
+#include "Palette.h"
+#include "TableMgr.h"
+
+#include <vector>
 
 #define AV_PREFIX1      0
 #define AV_PREFIX2      1

@@ -18,20 +18,22 @@
  *
  */
 
-#include "win32def.h"
 #include "TextArea.h"
+
+#include "win32def.h"
+
+#include "Actor.h"
+#include "Audio.h"
+#include "GameControl.h"
+#include "GameData.h"
+#include "ImageMgr.h"
 #include "Interface.h"
-#include "Video.h"
 #include "Palette.h"
 #include "Variables.h"
-#include "GameControl.h"
-#include "Audio.h"
-#include "Actor.h"
-#include "ImageMgr.h"
-#include "GameData.h"
+#include "Video.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {

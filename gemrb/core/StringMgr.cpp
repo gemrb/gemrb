@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "StringMgr.h"
 
 StringMgr::StringMgr(void)

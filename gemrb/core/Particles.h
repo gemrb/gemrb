@@ -30,6 +30,11 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#include "Region.h"
+
+class CharAnimations;
+class Scriptable;
+
 //global phase for the while spark structure
 #define P_GROW  0
 #define P_FADE  1

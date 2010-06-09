@@ -40,18 +40,20 @@
 
 #ifndef GLOBALS_ONLY_DEFS
 
-#include "stdlib.h"
-#include "stdio.h"
+#include "RGBAColor.h"
+#include "SClassID.h"
 #include "errors.h"
 #include "win32def.h"
-#include "SClassID.h"
-#include "RGBAColor.h"
+
+#include "AnimStructures.h"
+#include "DataStream.h"
 #include "Region.h"
 #include "Sprite2D.h"
 #include "VideoMode.h"
 #include "VideoModes.h"
-#include "DataStream.h"
-#include "AnimStructures.h"
+
+#include "cstdio"
+#include "cstdlib"
 
 #endif //GLOBALS_ONLY_DEFS
 

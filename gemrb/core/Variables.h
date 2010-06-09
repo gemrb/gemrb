@@ -18,15 +18,17 @@
  *
  */
 
-#if !defined(VARIABLES_H)
+#ifndef VARIABLES_H 
 #define VARIABLES_H
 
-#include <ctype.h>
-#include <cstring>
-#include "exports.h"
-#include "win32def.h"
-#include "globals.h"
+
 #include "SClassID.h"
+#include "exports.h"
+#include "globals.h"
+#include "win32def.h"
+
+#include <cstring>
+#include <ctype.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // Variables<ieDword, VALUE>
@@ -127,4 +129,4 @@ public:
 	~Variables();
 };
 
-#endif // !defined(VARIABLES_H)
+#endif

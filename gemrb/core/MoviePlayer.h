@@ -28,10 +28,10 @@
 #ifndef MOVIEPLAYER_H
 #define MOVIEPLAYER_H
 
-#include "win32def.h"
 #include "globals.h"
-#include "Resource.h"
+#include "win32def.h"
 
+#include "Resource.h"
 
 /**
  * @class MoviePlayer

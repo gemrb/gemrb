@@ -27,8 +27,9 @@
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
-#include <cstddef>
 #include "Plugin.h"
+
+#include <cstddef>
 
 class DataStream;
 

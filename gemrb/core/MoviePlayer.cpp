@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "MoviePlayer.h"
 
 const TypeID MoviePlayer::ID = { "MoviePlayer" };

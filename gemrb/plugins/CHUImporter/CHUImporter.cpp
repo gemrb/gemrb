@@ -18,20 +18,22 @@
  *
  */
 
-#include "win32def.h"
 #include "CHUImporter.h"
-#include "Interface.h"
+
+#include "RGBAColor.h"
+#include "win32def.h"
+
+#include "AnimationFactory.h"
 #include "Button.h"
+#include "GameData.h"
+#include "ImageMgr.h"
+#include "Interface.h"
 #include "Label.h"
 #include "Progressbar.h"
-#include "Slider.h"
 #include "ScrollBar.h"
+#include "Slider.h"
 #include "TextArea.h"
 #include "TextEdit.h"
-#include "AnimationFactory.h"
-#include "ImageMgr.h"
-#include "RGBAColor.h"
-#include "GameData.h"
 
 CHUImporter::CHUImporter()
 {

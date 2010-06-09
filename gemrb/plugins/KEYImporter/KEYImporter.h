@@ -21,13 +21,15 @@
 #ifndef KEYIMP_H
 #define KEYIMP_H
 
-#include <vector>
 #include "ResourceSource.h"
+
 #include "Dictionary.h"
 
+#include <vector>
+
+class DataStream;
 class Resource;
 class ResourceDesc;
-class DataStream;
 
 struct RESEntry {
 	ieResRef ResRef;

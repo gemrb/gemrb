@@ -18,9 +18,11 @@
  *
  */
 
-#include <cstring>
-#include "win32def.h"
 #include "Factory.h"
+
+#include "win32def.h"
+
+#include <cstring>
 
 Factory::Factory(void)
 {

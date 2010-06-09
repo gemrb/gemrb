@@ -21,13 +21,15 @@
 //This class represents .sto (store) files of the game.
 //Inns, pubs, temples, backpacks are also implemented by stores.
 
-#include "win32def.h"
 #include "Store.h"
-#include "Interface.h"
-#include "GameScript.h"
-#include "Item.h"
+
+#include "win32def.h"
+
 #include "Game.h"
 #include "GameData.h"
+#include "GameScript.h"
+#include "Interface.h"
+#include "Item.h"
 
 Store::Store(void)
 {

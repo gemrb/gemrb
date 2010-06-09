@@ -28,8 +28,8 @@
 #ifndef DATASTREAM_H
 #define DATASTREAM_H
 
-#include "globals.h"
 #include "exports.h"
+#include "globals.h"
 
 #define GEM_CURRENT_POS 0
 #define GEM_STREAM_START 1

@@ -30,10 +30,11 @@
 
 #include "exports.h"
 #include "ie_types.h"
-#include "Palette.h"
-#include "PathFinder.h"
+
 #include "CharAnimations.h" //contains MAX_ORIENT
 #include "Map.h"
+#include "Palette.h"
+#include "PathFinder.h"
 
 //this is the height of the projectile when Spark Flag Fly = 1
 #define FLY_HEIGHT 50

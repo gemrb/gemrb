@@ -18,16 +18,55 @@
 *
 */
 
-#ifndef INTERFACE
-#define INTERFACE
-#endif
+#include "Interface.h"
 
 #include "exports.h"
-#include "win32def.h"
 #include "globals.h"
 #include "strrefs.h"
+#include "win32def.h"
 
-#include <stdlib.h>
+#include "ActorMgr.h"
+#include "AmbientMgr.h"
+#include "AnimationMgr.h"
+#include "ArchiveImporter.h"
+#include "Audio.h"
+#include "Button.h"
+#include "Calendar.h"
+#include "Console.h"
+#include "DataFileMgr.h"
+#include "DialogMgr.h"
+#include "EffectMgr.h"
+#include "EffectQueue.h"
+#include "Factory.h"
+#include "FileStream.h"
+#include "Game.h"
+#include "GameControl.h"
+#include "GameData.h"
+#include "ImageMgr.h"
+#include "ItemMgr.h"
+#include "Label.h"
+#include "MapControl.h"
+#include "MapMgr.h"
+#include "MoviePlayer.h"
+#include "MusicMgr.h"
+#include "Palette.h"
+#include "PluginMgr.h"
+#include "PluginMgr.h"
+#include "ProjectileServer.h"
+#include "SaveGameIterator.h"
+#include "SaveGameMgr.h"
+#include "ScriptEngine.h"
+#include "ScriptedAnimation.h"
+#include "SoundMgr.h"
+#include "SpellMgr.h"
+#include "StoreMgr.h"
+#include "StringMgr.h"
+#include "TileMap.h"
+#include "Video.h"
+#include "WorldMapControl.h"
+#include "WorldMapMgr.h"
+
+#include <cstdlib>
 #include <time.h>
 #include <vector>
 
@@ -37,48 +76,6 @@
 #else
 #include <dirent.h>
 #endif
-
-#include "Interface.h"
-#include "Audio.h"
-#include "FileStream.h"
-#include "AnimationMgr.h"
-#include "ArchiveImporter.h"
-#include "WorldMapMgr.h"
-#include "AmbientMgr.h"
-#include "ItemMgr.h"
-#include "SpellMgr.h"
-#include "EffectMgr.h"
-#include "StoreMgr.h"
-#include "DialogMgr.h"
-#include "MapControl.h"
-#include "EffectQueue.h"
-#include "MapMgr.h"
-#include "TileMap.h"
-#include "ScriptedAnimation.h"
-#include "Video.h"
-#include "PluginMgr.h"
-#include "StringMgr.h"
-#include "ScriptEngine.h"
-#include "ActorMgr.h"
-#include "Factory.h"
-#include "Console.h"
-#include "Label.h"
-#include "Button.h"
-#include "SoundMgr.h"
-#include "SaveGameIterator.h"
-#include "MusicMgr.h"
-#include "MoviePlayer.h"
-#include "GameControl.h"
-#include "Game.h"
-#include "DataFileMgr.h"
-#include "SaveGameMgr.h"
-#include "WorldMapControl.h"
-#include "Palette.h"
-#include "ProjectileServer.h"
-#include "GameData.h"
-#include "Calendar.h"
-#include "PluginMgr.h"
-#include "ImageMgr.h"
 
 GEM_EXPORT Interface* core;
 

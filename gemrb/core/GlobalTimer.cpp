@@ -19,11 +19,12 @@
  */
 
 #include "GlobalTimer.h"
-#include "Interface.h"
-#include "Video.h"
+
+#include "ControlAnimation.h"
 #include "Game.h"
 #include "GameControl.h"
-#include "ControlAnimation.h"
+#include "Interface.h"
+#include "Video.h"
 
 GlobalTimer::GlobalTimer(void)
 {

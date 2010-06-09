@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "WindowMgr.h"
 
 WindowMgr::WindowMgr()

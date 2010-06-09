@@ -18,15 +18,16 @@
  *
  */
 
-#include "win32def.h"
 #include "strrefs.h"
+#include "win32def.h"
+
 #include "Actor.h"
-#include "Game.h"
 #include "EffectQueue.h"
-#include "Interface.h"
-#include "Video.h" //for tints
-#include "TileMap.h"
+#include "Game.h"
 #include "GameData.h"
+#include "Interface.h"
+#include "TileMap.h"
+#include "Video.h" //for tints
 
 int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx);//6e
 int fx_set_status (Scriptable* Owner, Actor* target, Effect* fx);//ba

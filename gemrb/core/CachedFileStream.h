@@ -21,8 +21,9 @@
 #ifndef CACHEDFILESTREAM_H
 #define CACHEDFILESTREAM_H
 
-#include "FileStream.h"
 #include "exports.h"
+
+#include "FileStream.h"
 
 class GEM_EXPORT CachedFileStream : public DataStream// : public FileStream
 {

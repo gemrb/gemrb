@@ -28,7 +28,9 @@
 #define EFFECT_H
 
 #include "ie_types.h"
+
 #include "Region.h"
+
 class Actor;
 
 //local variables in creatures are stored in fake opcodes

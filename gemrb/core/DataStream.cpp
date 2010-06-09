@@ -18,9 +18,11 @@
  *
  */
 
-#include "win32def.h"
-#include <ctype.h>
 #include "DataStream.h"
+
+#include "win32def.h"
+
+#include <ctype.h>
 
 static bool EndianSwitch = false;
 

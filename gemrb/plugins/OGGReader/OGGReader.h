@@ -19,12 +19,12 @@
 #ifndef ACMREADER_H
 #define ACMREADER_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include "DataStream.h"
 #include "SoundMgr.h"
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <vorbis/vorbisfile.h>
 
 class OGGReader : public SoundMgr {

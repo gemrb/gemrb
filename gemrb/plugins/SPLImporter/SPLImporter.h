@@ -25,9 +25,11 @@
 #include <config.h>
 #endif
 
-#include "ie_types.h"
-#include "Spell.h"
 #include "SpellMgr.h"
+
+#include "ie_types.h"
+
+#include "Spell.h"
 
 
 class SPLImporter : public SpellMgr {

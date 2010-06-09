@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2004 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,18 +20,20 @@
 
 // This class represents the .gam (savegame) file in the engine
 
-#include "win32def.h"
 #include "Game.h"
-#include "MapMgr.h"
-#include "DataStream.h"
-#include "Interface.h"
-#include "ScriptEngine.h"
-#include "GameControl.h"
-#include "MusicMgr.h"
-#include "GameScript.h"
-#include "strrefs.h"
+
 #include "defsounds.h"
+#include "strrefs.h"
+#include "win32def.h"
+
+#include "DataStream.h"
+#include "GameControl.h"
 #include "GameData.h"
+#include "GameScript.h"
+#include "Interface.h"
+#include "MapMgr.h"
+#include "MusicMgr.h"
+#include "ScriptEngine.h"
 
 #define MAX_MAPS_LOADED 1
 

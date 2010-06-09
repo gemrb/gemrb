@@ -27,14 +27,14 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-#include <cstddef>
+#include "SClassID.h" // FIXME
 #include "exports.h"
-#include "Holder.h"
-// FIXME:
-#include "SClassID.h"
-#include "PluginMgr.h"
 
+#include "Holder.h"
+#include "PluginMgr.h"
 #include "TypeID.h"
+
+#include <cstddef>
 
 /**
  * @class Plugin

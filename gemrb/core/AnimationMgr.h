@@ -21,11 +21,12 @@
 #ifndef ANIMATIONMGR_H
 #define ANIMATIONMGR_H
 
-#include "Plugin.h"
 #include "globals.h"
+
 #include "Animation.h"
 #include "AnimationFactory.h"
 #include "Font.h"
+#include "Plugin.h"
 
 class GEM_EXPORT AnimationMgr : public Plugin {
 public:

@@ -18,22 +18,24 @@
  *
  */
 
-#include <cstdio>
 #include "GSUtils.h"
-#include "Interface.h"
-#include "TileMap.h"
-#include "StringMgr.h"
-#include "Video.h"
-#include "Audio.h"
-#include "Spell.h"
-#include "Item.h"
-#include "Map.h"
-#include "Game.h"
-#include "GameControl.h"
-#include "GameData.h"
 
 #include "strrefs.h"
 #include "defsounds.h"
+
+#include "Audio.h"
+#include "Game.h"
+#include "GameControl.h"
+#include "GameData.h"
+#include "Interface.h"
+#include "Item.h"
+#include "Map.h"
+#include "Spell.h"
+#include "StringMgr.h"
+#include "TileMap.h"
+#include "Video.h"
+
+#include <cstdio>
 
 //these tables will get freed by Core
 Holder<SymbolMgr> triggersTable;

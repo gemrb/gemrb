@@ -29,11 +29,12 @@
 #define WORLDMAP_H
 
 #include "exports.h"
-#include <vector>
 #include "ie_types.h"
 
-#include "Sprite2D.h"
 #include "AnimationFactory.h"
+#include "Sprite2D.h"
+
+#include <vector>
 
 /** Area is visible on WorldMap */
 #define WMP_ENTRY_VISIBLE    0x1

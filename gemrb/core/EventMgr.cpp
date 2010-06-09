@@ -18,8 +18,10 @@
  *
  */
 
-#include "win32def.h"
 #include "EventMgr.h"
+
+#include "win32def.h"
+
 #include "GameControl.h"
 #include "Interface.h"
 #include "Video.h"

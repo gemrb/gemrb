@@ -24,6 +24,12 @@
  * @author The GemRB Project
  */
 
+#include "globals.h"
+#include "exports.h"
+
+#include "Actor.h"
+#include "Interface.h"
+
 #include <cmath>
 #ifndef WIN32
 #include <ctype.h>
@@ -48,11 +54,6 @@ BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
 	return true;
 }
 #endif
-
-#include "globals.h"
-#include "exports.h"
-#include "Interface.h"
-#include "Actor.h"
 
 //// Globally used functions
 

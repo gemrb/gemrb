@@ -23,17 +23,19 @@
  * Declares WorldMapControl, widget for displaying world map
  */
 
-class WorldMapControl;
-class WMPAreaEntry;
-class Palette;
 
 #ifndef WORLDMAPCONTROL_H
 #define WORLDMAPCONTROL_H
 
 #include "exports.h"
+
 #include "Control.h"
-#include "Interface.h"
 #include "Dialog.h"
+#include "Interface.h"
+
+class Palette;
+class WMPAreaEntry;
+class WorldMapControl;
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 /** Which label color is set with SetColor() */

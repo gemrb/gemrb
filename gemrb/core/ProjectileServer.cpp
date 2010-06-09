@@ -19,10 +19,11 @@
  */
 
 #include "ProjectileServer.h"
-#include "Interface.h"
-#include "SymbolMgr.h"
-#include "ProjectileMgr.h"
+
 #include "GameData.h"
+#include "Interface.h"
+#include "ProjectileMgr.h"
+#include "SymbolMgr.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

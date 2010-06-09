@@ -21,10 +21,11 @@
 #ifndef CACHE_H
 #define CACHE_H
 
-#include <ctype.h>
-#include <cstring>
-#include "win32def.h"
 #include "globals.h"
+#include "win32def.h"
+
+#include <cstring>
+#include <ctype.h>
 /////////////////////////////////////////////////////////////////////////////
 // Cache<ieResRef, void*>
 

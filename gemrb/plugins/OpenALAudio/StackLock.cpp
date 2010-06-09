@@ -18,8 +18,9 @@
  *
  */
 
-#include <cstdio>
 #include "StackLock.h"
+
+#include <cstdio>
 
 // adapted from ScummVM's mutex.cpp
 

@@ -50,8 +50,9 @@
 
 #else //WIN32
 # include <config.h>
-# include <stdio.h>
-# include <stdlib.h>
+# include <cstdio>
+# include <cstdlib>
+# include <cstring>
 
 # define stricmp strcasecmp
 # define strnicmp strncasecmp

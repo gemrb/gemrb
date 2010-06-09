@@ -31,7 +31,6 @@
 #include "exports.h"
 #include "ie_types.h"
 
-
 /**
  * @class Point
  * Point in 2d-space: [x, y]

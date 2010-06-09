@@ -28,8 +28,8 @@
 #ifndef STRINGMGR_H
 #define STRINGMGR_H
 
-#include "Plugin.h"
 #include "DataStream.h"
+#include "Plugin.h"
 
 /**
  * @struct StringBlock

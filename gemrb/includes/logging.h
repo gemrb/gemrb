@@ -62,8 +62,8 @@ extern GEM_EXPORT HANDLE hConsole;
 
 #else //WIN32
 # include <config.h>
-# include <stdio.h>
-# include <stdlib.h>
+# include <cstdio>
+# include <cstdlib>
 
 # define textcolor(i) i
 

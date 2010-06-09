@@ -18,14 +18,16 @@
  *
  */
 
-#include "win32def.h"
 #include "Button.h"
+
+#include "defsounds.h"
+#include "win32def.h"
+
+#include "GameData.h"
 #include "Interface.h"
-#include "Video.h"
 #include "Palette.h"
 #include "Variables.h"
-#include "defsounds.h"
-#include "GameData.h"
+#include "Video.h"
 
 Button::Button()
 {

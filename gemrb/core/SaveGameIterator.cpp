@@ -18,21 +18,24 @@
  *
  */
 
-#include "win32def.h"
-#include "strrefs.h"
 #include "SaveGameIterator.h"
+
+#include "iless.h"
+#include "strrefs.h"
+#include "win32def.h"
+
+#include "GameControl.h"
+#include "GameData.h" // For ResourceHolder
+#include "ImageMgr.h"
+#include "ImageWriter.h"
 #include "Interface.h"
 #include "SaveGameMgr.h"
-#include "GameControl.h"
 #include "Video.h"
-#include "ImageWriter.h"
-#include "ImageMgr.h"
-#include "GameData.h" // For ResourceHolder
-#include "iless.h"
-#include <set>
+
 #include <algorithm>
-#include <iterator>
 #include <cassert>
+#include <iterator>
+#include <set>
 
 const TypeID SaveGame::ID = { "SaveGame" };
 

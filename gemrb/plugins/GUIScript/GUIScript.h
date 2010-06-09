@@ -21,6 +21,8 @@
 #ifndef GUISCRIPT_H
 #define GUISCRIPT_H
 
+// NOTE: Python.h has to be included first.
+
 #ifdef WIN32
 #ifdef _DEBUG
 #undef _DEBUG
@@ -32,6 +34,7 @@
 #else
 #include <Python.h>
 #endif
+
 #include "ScriptEngine.h"
 
 #define SV_BPP 0

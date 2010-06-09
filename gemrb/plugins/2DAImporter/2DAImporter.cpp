@@ -18,9 +18,11 @@
  *
  */
 
-#include "win32def.h"
-#include "Interface.h"
 #include "2DAImporter.h"
+
+#include "win32def.h"
+
+#include "Interface.h"
 #include "FileStream.h"
 
 #define MAXLENGTH 4096      //if a 2da has longer lines, change this

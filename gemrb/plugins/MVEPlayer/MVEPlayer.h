@@ -21,9 +21,11 @@
 #ifndef MVEPLAY_H
 #define MVEPLAY_H
 
-#include "win32def.h"
-#include "globals.h"
 #include "MoviePlayer.h"
+
+#include "globals.h"
+#include "win32def.h"
+
 #include "Interface.h"
 
 class MVEPlay : public MoviePlayer {

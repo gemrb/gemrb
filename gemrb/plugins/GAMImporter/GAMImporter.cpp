@@ -18,16 +18,18 @@
  *
  */
 
-#include "win32def.h"
-#include "globals.h"
 #include "GAMImporter.h"
+
+#include "globals.h"
+#include "win32def.h"
+
+#include "DataFileMgr.h"
+#include "GameData.h"
 #include "Interface.h"
 #include "MapMgr.h"
 #include "MemoryStream.h"
-#include "DataFileMgr.h"
-#include "GameData.h"
-#include <cassert>
 
+#include <cassert>
 
 #define MAZE_DATA_SIZE 1720
 #define FAMILIAR_FILL_SIZE 324

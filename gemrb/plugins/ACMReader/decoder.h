@@ -21,7 +21,7 @@
 #ifndef _ACM_LAB_SUBBAND_DECODER_H
 #define _ACM_LAB_SUBBAND_DECODER_H
 
-#include <stdlib.h>
+#include <cstdlib>
 
 class CSubbandDecoder {
 private:

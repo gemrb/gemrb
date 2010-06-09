@@ -18,13 +18,15 @@
  *
  */
 
-#include "win32def.h"
 #include "GameScript.h"
-#include "Interface.h"
+
+#include "win32def.h"
+
 #include "GSUtils.h"
 #include "Game.h"
 #include "GameControl.h"
 #include "GameData.h"
+#include "Interface.h"
 #include "PluginMgr.h"
 
 //debug flags

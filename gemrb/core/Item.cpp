@@ -21,11 +21,13 @@
 // This class represents the .itm (item) files of the engine
 // Items are all the weapons, armor, carriable quest objects, etc.
 
-#include "win32def.h"
 #include "Item.h"
+
+#include "win32def.h"
+
+#include "Interface.h"
 #include "Projectile.h"
 #include "ProjectileServer.h"
-#include "Interface.h"
 
 ITMExtHeader::ITMExtHeader(void)
 {

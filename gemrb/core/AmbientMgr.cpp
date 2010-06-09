@@ -19,6 +19,7 @@
  */
 
 #include "AmbientMgr.h"
+
 #include "Ambient.h"
 
 AmbientMgr::AmbientMgr()

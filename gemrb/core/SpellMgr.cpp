@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "SpellMgr.h"
 
 SpellMgr::SpellMgr(void)

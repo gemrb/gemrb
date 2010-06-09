@@ -21,10 +21,12 @@
 #ifndef RESOURCEMANGER_H
 #define RESOURCEMANGER_H
 
-#include <vector>
-#include "exports.h"
 #include "SClassID.h"
+#include "exports.h"
+
 #include "Holder.h"
+
+#include <vector>
 
 #ifdef _MSC_VER // No SFINAE
 #include "ResourceSource.h"

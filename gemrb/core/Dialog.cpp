@@ -18,8 +18,10 @@
  *
  */
 
-#include "win32def.h"
 #include "Dialog.h"
+
+#include "win32def.h"
+
 #include "GameScript.h"
 
 Dialog::Dialog(void)

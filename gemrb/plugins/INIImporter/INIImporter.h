@@ -21,9 +21,11 @@
 #ifndef INIIMPORTER_H
 #define INIIMPORTER_H
 
-#include <cstring>
 #include "DataFileMgr.h"
+
 #include "globals.h"
+
+#include <cstring>
 
 struct INIPair {
 	char* Name, * Value;

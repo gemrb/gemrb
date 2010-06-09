@@ -22,6 +22,7 @@
 #define AREIMPORTER_H
 
 #include "MapMgr.h"
+
 class Animation;
 class AnimationFactory;
 

@@ -20,13 +20,15 @@
 
 //This class represents the .spl (spell) files of the game.
 
-#include "win32def.h"
-#include "Actor.h"
 #include "Spell.h"
+
+#include "win32def.h"
+
+#include "Actor.h"
+#include "Game.h"
+#include "Interface.h"
 #include "Projectile.h"
 #include "ProjectileServer.h"
-#include "Interface.h"
-#include "Game.h"
 
 SPLExtHeader::SPLExtHeader(void)
 {

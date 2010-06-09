@@ -21,12 +21,14 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include "globals.h"
 #include "RGBAColor.h"
-#include "Sprite2D.h"
-#include "Region.h"
-#include <vector>
 #include "exports.h"
+#include "globals.h"
+
+#include "Region.h"
+#include "Sprite2D.h"
+
+#include <vector>
 
 class GEM_EXPORT Animation {
 private:

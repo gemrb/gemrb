@@ -25,12 +25,13 @@
 #include <config.h>
 #endif
 
+#include "exports.h"
+#include "globals.h"
+#include "ie_types.h"
+
+#include <bitset>
 #include <string>
 #include <vector>
-#include <bitset>
-#include "exports.h"
-#include "ie_types.h"
-#include "globals.h"
 
 #define IE_AMBI_ENABLED 1
 #define IE_AMBI_POINT   2

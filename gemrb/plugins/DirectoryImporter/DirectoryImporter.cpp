@@ -16,12 +16,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "win32def.h"
 #include "DirectoryImporter.h"
+
 #include "globals.h"
+#include "win32def.h"
+
 #include "FileStream.h"
 #include "Interface.h"
 #include "ResourceDesc.h"
+
 #ifndef WIN32
 #include <unistd.h>
 #endif

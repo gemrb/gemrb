@@ -17,6 +17,7 @@
  */
 
 #include "ACMReader.h"
+
 #include "general.h"
 
 bool ACMReader::Open(DataStream* stream)

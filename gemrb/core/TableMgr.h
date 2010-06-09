@@ -28,8 +28,9 @@
 #ifndef TABLEMGR_H
 #define TABLEMGR_H
 
-#include "Plugin.h"
 #include "globals.h"
+
+#include "Plugin.h"
 
 /**
  * @class TableMgr

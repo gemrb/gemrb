@@ -29,9 +29,10 @@
 #define STORE_H
 
 #include "exports.h"
-#include <vector>
-#include "ie_types.h"
 #include "globals.h"
+#include "ie_types.h"
+
+#include <vector>
 
 //bah!
 class CREItem;

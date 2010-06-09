@@ -27,8 +27,9 @@
 #ifndef SPRITE2D_H
 #define SPRITE2D_H
 
-#include "exports.h"
 #include "RGBAColor.h"
+#include "exports.h"
+
 #include "Palette.h"
 #include "TypeID.h"
 

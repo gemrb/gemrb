@@ -18,11 +18,13 @@
  *
  */
 
+#include "BIFImporter.h"
+
 #include "win32def.h"
+
+#include "CachedFileStream.h"
 #include "Compressor.h"
 #include "FileStream.h"
-#include "CachedFileStream.h"
-#include "BIFImporter.h"
 #include "Interface.h"
 
 BIFImporter::BIFImporter(void)

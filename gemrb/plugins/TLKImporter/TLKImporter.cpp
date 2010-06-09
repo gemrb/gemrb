@@ -18,13 +18,15 @@
  *
  */
 
-#include "win32def.h"
 #include "TLKImporter.h"
-#include "Interface.h"
+
+#include "win32def.h"
+
 #include "Audio.h"
+#include "Calendar.h"
 #include "Game.h"
 #include "GameControl.h"
-#include "Calendar.h"
+#include "Interface.h"
 
 //set this to -1 if charname is gabber (iwd2)
 static int charname=0;

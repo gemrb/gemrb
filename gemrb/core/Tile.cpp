@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "Tile.h"
 
 Tile::Tile(Animation* anim, Animation* sec)

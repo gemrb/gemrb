@@ -18,11 +18,11 @@
  *
  */
 
-//#include "stdafx.h"
 // IP's ACM-stream unpacker.
 
-#include <stdio.h>
 #include "unpacker.h"
+
+#include <cstdio>
 
 char Table1[27] = {
 	0, 1, 2, 4, 5, 6, 8, 9, 10, 16, 17, 18, 20, 21, 22, 24, 25, 26, 32, 33,

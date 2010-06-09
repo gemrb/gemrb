@@ -20,9 +20,9 @@
 #ifndef SAVEGAMEMGR_H
 #define SAVEGAMEMGR_H
 
-#include "Plugin.h"
 #include "DataStream.h"
 #include "Game.h"
+#include "Plugin.h"
 
 class GEM_EXPORT SaveGameMgr : public Plugin {
 public:

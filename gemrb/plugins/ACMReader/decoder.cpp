@@ -18,10 +18,9 @@
  *
  */
 
-//#include "stdafx.h"
-
-#include <stdlib.h>
 #include "decoder.h"
+
+#include <cstdlib>
 
 int CSubbandDecoder::init_decoder()
 {

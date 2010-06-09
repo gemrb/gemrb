@@ -18,14 +18,16 @@
  *
  */
 
-#include "win32def.h"
 #include "GameScript.h"
+
+#include "win32def.h"
+
+#include "Calendar.h"
 #include "GSUtils.h"
-#include "Video.h"
 #include "Game.h"
 #include "GameControl.h"
-#include "Calendar.h"
 #include "GameData.h"
+#include "Video.h"
 
 //-------------------------------------------------------------
 // Trigger Functions

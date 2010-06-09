@@ -28,15 +28,16 @@
 #ifndef EFFECTQUEUE_H
 #define EFFECTQUEUE_H
 
-
-#include <list>
-#include "Effect.h"
-#include "Region.h"
 #include "exports.h"
 
-class Scriptable;
+#include "Effect.h"
+#include "Region.h"
+
+#include <list>
+
 class Actor;
 class Map;
+class Scriptable;
 
 /** Maximum number of different Effect opcodes */
 #define MAX_EFFECTS 512

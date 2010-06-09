@@ -18,8 +18,8 @@
  *
  */
 
-#include "win32def.h"
 #include "Resource.h"
+
 #include "DataStream.h"
 
 Resource::Resource(void)

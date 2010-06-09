@@ -18,14 +18,16 @@
  *
  */
 
-#include <stdio.h>
-#include "Interface.h"
+#include "EffectQueue.h"
+
 #include "Actor.h"
 #include "Effect.h"
-#include "EffectQueue.h"
-#include "SymbolMgr.h"
 #include "Game.h"
+#include "Interface.h"
 #include "Map.h"
+#include "SymbolMgr.h"
+
+#include <cstdio>
 
 static struct {
 	const char* Name;

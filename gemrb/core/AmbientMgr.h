@@ -21,10 +21,11 @@
 #ifndef AMBIENTMGR_H
 #define AMBIENTMGR_H
 
-#include "win32def.h"
-#include <vector>
-#include <string>
 #include "exports.h"
+#include "win32def.h"
+
+#include <string>
+#include <vector>
 
 class Ambient;
 

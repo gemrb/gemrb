@@ -21,13 +21,15 @@
 // This class handles VVC files of BG2/ToB and converts BAM files to the
 // common internal animation format on the fly.
 
-#include "win32def.h"
 #include "ScriptedAnimation.h"
-#include "Interface.h"
+
+#include "win32def.h"
+
 #include "Audio.h"
-#include "Video.h"
 #include "Game.h"
 #include "GameData.h"
+#include "Interface.h"
+#include "Video.h"
 
 #define ILLEGAL 0         //
 #define ONE 1             //hold

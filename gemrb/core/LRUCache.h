@@ -22,6 +22,7 @@
 #define LRUCACHE_H 
 
 #include "exports.h"
+
 #include "Variables.h"
 
 struct VarEntry;

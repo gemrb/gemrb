@@ -18,12 +18,14 @@
  *
  */
 
-#include "win32def.h"
 #include "Animation.h"
-#include "Interface.h"
-#include "Video.h"
-#include "Map.h"
+
+#include "win32def.h"
+
 #include "Game.h"
+#include "Interface.h"
+#include "Map.h"
+#include "Video.h"
 
 #ifndef WIN32
 #include <sys/time.h>

@@ -21,8 +21,8 @@
 #ifndef DIALOG_H
 #define DIALOG_H
 
-#include "globals.h"
 #include "exports.h"
+#include "globals.h"
 
 #include "GameScript.h"
 

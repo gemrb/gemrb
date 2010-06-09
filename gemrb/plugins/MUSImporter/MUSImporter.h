@@ -22,9 +22,11 @@
 #define MUSIMPORTER_H
 
 #include "MusicMgr.h"
+
 #include "FileStream.h"
 #include "ResourceManager.h"
-#include <stdio.h>
+
+#include <cstdio>
 
 /**MUS PlayList Importer
   *@author GemRB Development Team

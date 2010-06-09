@@ -29,9 +29,10 @@
 #define SCROLLBAR_H
 
 #include "exports.h"
+
 #include "Control.h"
-#include "TextArea.h"
 #include "Sprite2D.h"
+#include "TextArea.h"
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_SCROLLBAR_ON_CHANGE  0x07000000

@@ -22,11 +22,12 @@
 #define IMAGEMGR_H
 
 #include "exports.h"
-#include "Resource.h"
-#include "DataStream.h"
-#include "Sprite2D.h"
+
 #include "Bitmap.h"
+#include "DataStream.h"
 #include "Image.h"
+#include "Resource.h"
+#include "Sprite2D.h"
 
 class ImageFactory;
 

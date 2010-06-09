@@ -18,10 +18,12 @@
  *
  */
 
-#include "win32def.h"
 #include "Sprite2D.h"
-#include "Video.h"
+
+#include "win32def.h"
+
 #include "Interface.h"
+#include "Video.h"
 
 const TypeID Sprite2D::ID = { "Sprite2D" };
 

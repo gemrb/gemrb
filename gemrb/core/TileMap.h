@@ -22,9 +22,10 @@
 #define TILEMAP_H
 
 #include "exports.h"
-#include "TileOverlay.h"
-#include "Polygon.h"
+
 #include "GameScript.h"
+#include "Polygon.h"
+#include "TileOverlay.h"
 
 //special container types
 #define IE_CONTAINER_PILE   4

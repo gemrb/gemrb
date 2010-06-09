@@ -18,22 +18,24 @@
  *
  */
 
+#include "AREImporter.h"
+
 #include "win32def.h"
 #include "strrefs.h"
-#include "AREImporter.h"
-#include "TileMapMgr.h"
-#include "Interface.h"
+
 #include "ActorMgr.h"
-#include "CachedFileStream.h"
-#include "ImageMgr.h"
 #include "Ambient.h"
+#include "CachedFileStream.h"
 #include "DataFileMgr.h"
+#include "EffectMgr.h"
 #include "Game.h"
-#include "Video.h"
+#include "GameData.h"
+#include "ImageMgr.h"
+#include "Interface.h"
 #include "Palette.h"
 #include "ProjectileServer.h"
-#include "EffectMgr.h"
-#include "GameData.h"
+#include "TileMapMgr.h"
+#include "Video.h"
 
 #define DEF_OPEN   0
 #define DEF_CLOSE  1

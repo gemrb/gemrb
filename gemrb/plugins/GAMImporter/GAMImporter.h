@@ -22,6 +22,7 @@
 #define GAMIMPORTER_H
 
 #include "SaveGameMgr.h"
+
 #include "ActorMgr.h"
 
 #define GAM_VER_GEMRB  0 

@@ -23,7 +23,9 @@
 
 #include "exports.h"
 #include "win32def.h"
+
 #include "VideoMode.h"
+
 #include <vector>
 
 class GEM_EXPORT VideoModes {

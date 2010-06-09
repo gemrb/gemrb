@@ -18,12 +18,14 @@
  *
  */
 
-#include "win32def.h"
 #include "MOSImporter.h"
+
 #include "RGBAColor.h"
+#include "win32def.h"
+
+#include "CachedFileStream.h"
 #include "Compressor.h"
 #include "FileStream.h"
-#include "CachedFileStream.h"
 #include "Interface.h"
 #include "Video.h"
 

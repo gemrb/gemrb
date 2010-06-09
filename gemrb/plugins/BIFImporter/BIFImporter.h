@@ -21,8 +21,10 @@
 #ifndef BIFIMPORTER_H
 #define BIFIMPORTER_H
 
-#include "globals.h"
 #include "ArchiveImporter.h"
+
+#include "globals.h"
+
 #include "CachedFileStream.h"
 
 struct FileEntry {

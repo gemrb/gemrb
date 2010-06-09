@@ -21,9 +21,9 @@
 #ifndef __SNPRINTF_H__
 #define __SNPRINTF_H__
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 
 int ht_asprintf(char **ptr, const char *format, ...);
 int ht_vasprintf(char **ptr, const char *format, va_list ap);

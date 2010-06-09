@@ -28,8 +28,8 @@
 #ifndef DATAFILEMGR_H
 #define DATAFILEMGR_H
 
-#include "Plugin.h"
 #include "DataStream.h"
+#include "Plugin.h"
 
 /**
  * @class DataFileMgr

@@ -19,6 +19,7 @@
  */
 
 #include "SpriteCover.h"
+
 #include "Interface.h"
 #include "Video.h"
 

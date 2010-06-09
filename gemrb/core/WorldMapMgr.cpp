@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "WorldMapMgr.h"
 
 WorldMapMgr::WorldMapMgr(void)

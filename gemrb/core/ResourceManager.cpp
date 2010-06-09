@@ -19,11 +19,12 @@
 */
 
 #include "ResourceManager.h"
+
+#include "Interface.h"
+#include "PluginMgr.h"
 #include "Resource.h"
 #include "ResourceDesc.h"
 #include "ResourceSource.h"
-#include "Interface.h"
-#include "PluginMgr.h"
 
 ResourceManager::ResourceManager()
 {

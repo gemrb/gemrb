@@ -21,12 +21,12 @@
 #ifndef RESOURCEDESC_H
 #define RESOURCEDESC_H
 
-#include "exports.h"
 #include "SClassID.h"
+#include "exports.h"
 #include "ie_types.h"
 
-class Resource;
 class DataStream;
+class Resource;
 class TypeID;
 
 /**

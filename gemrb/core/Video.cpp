@@ -18,13 +18,15 @@
  *
  */
 
-#include <cmath>
+#include "Video.h"
 
 #include "win32def.h"
-#include "Video.h"
-#include "Palette.h"
+
 #include "Audio.h"
 #include "Interface.h"
+#include "Palette.h"
+
+#include <cmath>
 
 const TypeID Video::ID = { "Video" };
 

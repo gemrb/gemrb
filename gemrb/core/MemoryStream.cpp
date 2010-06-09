@@ -18,8 +18,10 @@
  *
  */
 
-#include "win32def.h"
 #include "MemoryStream.h"
+
+#include "win32def.h"
+
 #include <cstring>
 
 MemoryStream::MemoryStream(void* buffer, int length, bool autoFree)

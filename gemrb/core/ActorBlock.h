@@ -18,28 +18,30 @@
  *
  */
 
-class GameScript;
-class Action;
-class Scriptable;
-class Selectable;
-class Highlightable;
-class Actor;
-class Movable;
-class Door;
-class SpriteCover;
-class Gem_Polygon;
-
 #ifndef ACTORBLOCK_H
 #define ACTORBLOCK_H
 
 #include "exports.h"
-#include "Sprite2D.h"
+
 #include "CharAnimations.h"
-#include "TileOverlay.h"
-#include "Variables.h"
 #include "Inventory.h"
 #include "PathFinder.h"
+#include "Sprite2D.h"
+#include "TileOverlay.h"
+#include "Variables.h"
+
 #include <list>
+
+class Action;
+class Actor;
+class Door;
+class GameScript;
+class Gem_Polygon;
+class Highlightable;
+class Movable;
+class Scriptable;
+class Selectable;
+class SpriteCover;
 
 #define MAX_SCRIPTS		8
 #define MAX_GROUND_ICON_DRAWN   3

@@ -27,20 +27,6 @@
 #ifndef VFS_H
 #define VFS_H
 
-#ifdef WIN32
-#include <io.h>
-#include <windows.h>
-#include <direct.h>
-#else
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <dirent.h>
-#include <fnmatch.h>
-#include <dlfcn.h>
-#endif
-
 #ifndef _MAX_PATH
 #ifdef WIN32
 #define _MAX_PATH 260
@@ -48,8 +34,23 @@
 #define _MAX_PATH FILENAME_MAX
 #endif
 #endif
+
 #include "exports.h"
 #include "globals.h"
+
+#ifdef WIN32
+#include <direct.h>
+#include <io.h>
+#include <windows.h>
+#else
+#include <dirent.h>
+#include <dlfcn.h>
+#include <fnmatch.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
 
 //#ifndef S_ISDIR
 //#define S_ISDIR(x) ((x) & S_IFDIR)

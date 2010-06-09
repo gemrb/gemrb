@@ -22,26 +22,29 @@
 //Any player or non-player character is a creature.
 //Actor is a scriptable object (Scriptable). See ActorBlock.cpp
 
-#include "win32def.h"
-#include <cassert>
-#include "TableMgr.h"
-#include "Audio.h" //pst (react to death sounds)
 #include "Actor.h"
-#include "Interface.h"
-#include "strrefs.h"
+
 #include "overlays.h"
-#include "Item.h"
-#include "Spell.h"
-#include "Projectile.h"
-#include "Game.h"
-#include "GameScript.h"
-#include "GameControl.h" //checking for dialog
-#include "ScriptEngine.h"
+#include "strrefs.h"
+#include "win32def.h"
+
+#include "Audio.h" //pst (react to death sounds)
 #include "GSUtils.h" //needed for DisplayStringCore
+#include "Game.h"
+#include "GameControl.h" //checking for dialog
+#include "GameData.h"
+#include "GameScript.h"
+#include "Interface.h"
+#include "Item.h"
+#include "Projectile.h"
+#include "ProjectileServer.h"
+#include "ScriptEngine.h"
+#include "Spell.h"
+#include "TableMgr.h"
 #include "Video.h"
 #include "damages.h"
-#include "ProjectileServer.h"
-#include "GameData.h"
+
+#include <cassert>
 
 static const Color green = {
 	0x00, 0xff, 0x00, 0xff

@@ -25,24 +25,26 @@ class Map;
 
 #include "exports.h"
 #include "globals.h"
+
 #include "ActorBlock.h"
-#include "IniSpawn.h"
-#include "SpriteCover.h"
 #include "Bitmap.h"
 #include "Image.h"
+#include "IniSpawn.h"
+#include "SpriteCover.h"
+
 #include <queue>
 
 class Actor;
-class TileMap;
 class Ambient;
-class GameControl;
-struct PathNode;
-class ScriptedAnimation;
 class Animation;
-class Wall_Polygon;
-class Particles;
-class Projectile;
 class AnimationFactory;
+class GameControl;
+class Particles;
+struct PathNode;
+class Projectile;
+class ScriptedAnimation;
+class TileMap;
+class Wall_Polygon;
 
 //distance of actors from spawn point
 #define SPAWN_RANGE       400

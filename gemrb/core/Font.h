@@ -28,8 +28,9 @@
 #define FONT_H
 
 #include "globals.h"
-#include <vector>
 #include "exports.h"
+
+#include <vector>
 
 class Palette;
 

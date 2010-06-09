@@ -18,13 +18,15 @@
  *
  */
 
-#include "win32def.h"
-#include "Interface.h"
 #include "Console.h"
-#include "Video.h"
+
+#include "win32def.h"
+
+#include "GameData.h"
+#include "Interface.h"
 #include "Palette.h"
 #include "ScriptEngine.h"
-#include "GameData.h"
+#include "Video.h"
 
 Console::Console(void)
 {

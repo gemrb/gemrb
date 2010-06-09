@@ -27,9 +27,10 @@
 #define PROGRESSBAR_H
 
 #include "exports.h"
+
+#include "Animation.h"
 #include "Control.h"
 #include "Sprite2D.h"
-#include "Animation.h"
 
 // !!! Keep in sync with GUIDefines.py !!!
 #define IE_GUI_PROGRESS_END_REACHED  0x01000000

@@ -25,10 +25,11 @@
 #include <config.h>
 #endif
 
-#include "ie_types.h"
-#include "Effect.h"
 #include "EffectMgr.h"
 
+#include "ie_types.h"
+
+#include "Effect.h"
 
 class EFFImporter : public EffectMgr {
 private:

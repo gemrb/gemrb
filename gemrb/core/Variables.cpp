@@ -19,8 +19,9 @@
  */
 
 #include "Variables.h"
-#include "Interface.h" // for LoadInitialValues
+
 #include "FileStream.h" // for LoadInitialValues
+#include "Interface.h" // for LoadInitialValues
 
 /////////////////////////////////////////////////////////////////////////////
 // private inlines 

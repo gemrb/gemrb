@@ -19,6 +19,7 @@
  */
 
 #include "Palette.h"
+
 #include "Interface.h"
 
 #define MINCOL 2

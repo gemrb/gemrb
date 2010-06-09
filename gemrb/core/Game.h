@@ -30,13 +30,15 @@ class Game;
 #ifndef GAME_H
 #define GAME_H
 
-#include <vector>
 #include "exports.h"
 #include "ie_types.h"
+
 #include "Actor.h"
 #include "Map.h"
 #include "Particles.h"
 #include "Variables.h"
+
+#include <vector>
 
 //the length of a round in game ticks?
 //default (ROUND_SIZE) is 6 seconds: 15 (AI_UPDATE_TIME)*6 (ROUND_SECODS)=90

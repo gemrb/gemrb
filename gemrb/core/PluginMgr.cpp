@@ -18,16 +18,17 @@
  *
  */
 
-#include "win32def.h"
-#include "stdio.h"
-#include "stdlib.h"
 #include "PluginMgr.h"
-#include "Plugin.h"
-#include "Interface.h"
-#include "ResourceDesc.h"
-// FIXME: this should be in Interface.h instead
-#include "Variables.h"
 
+#include "win32def.h"
+
+#include "Interface.h"
+#include "Plugin.h"
+#include "ResourceDesc.h"
+#include "Variables.h" // FIXME: this should be in Interface.h instead
+
+#include <cstdio>
+#include <cstdlib>
 #ifdef WIN32
 #include <io.h>
 #include <windows.h>

@@ -28,8 +28,8 @@
 #ifndef FILESTREAM_H
 #define FILESTREAM_H
 
-#include "globals.h"
 #include "exports.h"
+#include "globals.h"
 
 /**
  * @class FileStream

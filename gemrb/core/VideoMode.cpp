@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "VideoMode.h"
 
 VideoMode::VideoMode(void)

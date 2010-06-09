@@ -21,9 +21,11 @@
 #ifndef P2DAIMPORTER_H
 #define P2DAIMPORTER_H
 
-#include <cstring>
 #include "TableMgr.h"
+
 #include "globals.h"
+
+#include <cstring>
 
 typedef std::vector< char*> RowEntry;
 

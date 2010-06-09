@@ -22,8 +22,10 @@
 
 #include "exports.h"
 #include "win32def.h"
-#include <vector>
+
 #include "Region.h"
+
+#include <vector>
 
 class ControlAnimation;
 

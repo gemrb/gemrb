@@ -22,7 +22,9 @@
 #define TILEOVERLAY_H
 
 #include "exports.h"
+
 #include "Tile.h"
+
 #include <vector>
 
 extern bool RedrawTile;

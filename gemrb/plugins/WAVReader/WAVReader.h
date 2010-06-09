@@ -21,11 +21,13 @@
 #ifndef WAVREADER_H
 #define WAVREADER_H
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "DataStream.h"
 #include "SoundMgr.h"
+
+#include "DataStream.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 // RAW file reader
 class RawPCMReader : public SoundMgr {

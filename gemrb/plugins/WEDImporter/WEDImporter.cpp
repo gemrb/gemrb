@@ -18,11 +18,13 @@
  *
  */
 
-#include "win32def.h"
 #include "WEDImporter.h"
-#include "TileSetMgr.h"
-#include "Interface.h"
+
+#include "win32def.h"
+
 #include "GameData.h"
+#include "Interface.h"
+#include "TileSetMgr.h"
 
 struct wed_polygon {
 	ieDword FirstVertex;

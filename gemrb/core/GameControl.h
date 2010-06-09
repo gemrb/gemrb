@@ -24,17 +24,18 @@
  * @author The GemRB Project
  */
 
-class GameControl;
-class Window;
-
 #ifndef GAMECONTROL_H
 #define GAMECONTROL_H
 
-#include "Control.h"
-#include "Interface.h"
-#include "Dialog.h"
-#include "Map.h"
 #include "exports.h"
+
+#include "Control.h"
+#include "Dialog.h"
+#include "Interface.h"
+#include "Map.h"
+
+class GameControl;
+class Window;
 
 //dialog flags
 #define DF_IN_DIALOG      1

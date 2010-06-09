@@ -18,11 +18,13 @@
  *
  */
 
-#include "win32def.h"
-#include "Interface.h"
-#include "ImageMgr.h"
 #include "WMPImporter.h"
+
+#include "win32def.h"
+
 #include "GameData.h"
+#include "ImageMgr.h"
+#include "Interface.h"
 
 WMPImporter::WMPImporter(void)
 {

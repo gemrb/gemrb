@@ -21,22 +21,23 @@
 #ifndef GAMEDATA_H
 #define GAMEDATA_H
 
-#include "exports.h"
 #include "SClassID.h"
+#include "exports.h"
 #include "ie_types.h"
-#include "Cache.h"
-#include "ResourceManager.h"
-#include "Holder.h"
 
-class TableMgr;
-class Palette;
-class Item;
-class Spell;
-struct Effect;
-class ScriptedAnimation;
-class Factory;
+#include "Cache.h"
+#include "Holder.h"
+#include "ResourceManager.h"
+
 class Actor;
+struct Effect;
+class Factory;
+class Item;
+class Palette;
+class ScriptedAnimation;
+class Spell;
 class Sprite2D;
+class TableMgr;
 
 struct Table {
 	Holder<TableMgr> tm;

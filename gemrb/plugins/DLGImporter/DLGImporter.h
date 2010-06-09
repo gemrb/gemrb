@@ -22,6 +22,7 @@
 #define DLGIMPORTER_H
 
 #include "DialogMgr.h"
+
 #include "globals.h"
 
 /*

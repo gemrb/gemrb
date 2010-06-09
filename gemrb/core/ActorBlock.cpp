@@ -16,25 +16,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  */
-#include <cassert>
-#include <cmath>
 
-#include "win32def.h"
-#include "strrefs.h"
 #include "ActorBlock.h"
+
+#include "strrefs.h"
+#include "win32def.h"
+
+#include "Audio.h"
+#include "GSUtils.h"
+#include "Game.h"
+#include "GameControl.h"
+#include "GameData.h"
 #include "Interface.h"
+#include "Item.h"
+#include "Map.h"
+#include "Projectile.h"
+#include "Spell.h"
 #include "SpriteCover.h"
 #include "TileMap.h"
 #include "Video.h"
-#include "Audio.h"
-#include "Item.h"
-#include "Spell.h"
-#include "Map.h"
-#include "Game.h"
-#include "GameControl.h"
-#include "Projectile.h"
-#include "GSUtils.h"
-#include "GameData.h"
+
+#include <cassert>
+#include <cmath>
 
 #define YESNO(x) ( (x)?"Yes":"No")
 

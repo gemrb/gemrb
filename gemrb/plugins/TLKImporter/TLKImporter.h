@@ -22,6 +22,7 @@
 #define TLKIMPORTER_H
 
 #include "StringMgr.h"
+
 #include "TlkOverride.h"
 
 class TLKImporter : public StringMgr {

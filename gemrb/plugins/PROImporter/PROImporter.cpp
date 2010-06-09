@@ -18,10 +18,12 @@
  *
  */
 
-#include "win32def.h"
-#include "Interface.h"
-#include "EffectMgr.h"
 #include "PROImporter.h"
+
+#include "win32def.h"
+
+#include "EffectMgr.h"
+#include "Interface.h"
 
 PROImporter::PROImporter(void)
 {

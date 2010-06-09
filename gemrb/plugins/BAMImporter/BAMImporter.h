@@ -22,8 +22,9 @@
 #define BAMIMPORTER_H
 
 #include "AnimationMgr.h"
-#include "globals.h"
+
 #include "RGBAColor.h"
+#include "globals.h"
 
 struct FrameEntry {
 	ieWord Width;

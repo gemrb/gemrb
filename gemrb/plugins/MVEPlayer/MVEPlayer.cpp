@@ -18,17 +18,21 @@
  *
  */
 
-#include <assert.h>
+#include "MVEPlayer.h"
+
+#include "mve_player.h"
+
+#include "ie_types.h"
+
+#include "Audio.h"
+#include "Interface.h"
+#include "Variables.h"
+#include "Video.h"
+
+#include <cassert>
+#include <cstdio>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <cstdio>
-#include "Interface.h"
-#include "Video.h"
-#include "Audio.h"
-#include "Variables.h"
-#include "MVEPlayer.h"
-#include "mve_player.h"
-#include "ie_types.h"
 
 static const char MVESignature[] = "Interplay MVE File\x1A";
 static const int MVE_SIGNATURE_LEN = 19;

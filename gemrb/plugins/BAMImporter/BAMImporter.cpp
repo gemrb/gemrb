@@ -18,14 +18,16 @@
  *
  */
 
-#include "win32def.h"
 #include "BAMImporter.h"
-#include "Interface.h"
+
+#include "win32def.h"
+
 #include "Compressor.h"
 #include "FileStream.h"
-#include "Video.h"
-#include "Palette.h"
 #include "GameData.h"
+#include "Interface.h"
+#include "Palette.h"
+#include "Video.h"
 
 BAMImporter::BAMImporter(void)
 {

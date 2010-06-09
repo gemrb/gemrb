@@ -21,12 +21,15 @@
 // VFS.cpp : functions to access filesystem in os-independent way
 // and POSIX-like compatibility layer for win
 
-#include <stdarg.h>
-#include <sys/stat.h>
-#include <cstring>
-#include "globals.h"
 #include "VFS.h"
+
+#include "globals.h"
+
 #include "Interface.h"
+
+#include <cstdarg>
+#include <cstring>
+#include <sys/stat.h>
 
 #ifdef WIN32
 

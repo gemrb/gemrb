@@ -16,11 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "win32def.h"
 #include "PalettedImageMgr.h"
-#include "ImageFactory.h"
-#include "Interface.h"
-#include "Video.h"
 
 const TypeID PalettedImageMgr::ID = { "PalettedImageMgr" };
 

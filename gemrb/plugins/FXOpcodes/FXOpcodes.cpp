@@ -18,22 +18,23 @@
  *
  */
 
-#include "win32def.h"
-#include "strrefs.h"
+#include "ie_feats.h" //cannot avoid declaring these
 #include "opcode_params.h"
 #include "overlays.h"
-#include "ie_feats.h" //cannot avoid declaring these
+#include "strrefs.h"
+#include "win32def.h"
+
 #include "Actor.h"
-#include "EffectQueue.h"
-#include "Interface.h"
 #include "Audio.h"
+#include "EffectQueue.h"
+#include "GSUtils.h" //needs for MoveBetweenAreasCore
 #include "Game.h"
 #include "GameControl.h"
-#include "damages.h"
-#include "TileMap.h" //needs for knock!
-#include "GSUtils.h" //needs for MoveBetweenAreasCore
-#include "Projectile.h" //needs for clearair
 #include "GameData.h"
+#include "Interface.h"
+#include "Projectile.h" //needs for clearair
+#include "TileMap.h" //needs for knock!
+#include "damages.h"
 
 //FIXME: find a way to handle portrait icons better
 #define PI_CONFUSED  3

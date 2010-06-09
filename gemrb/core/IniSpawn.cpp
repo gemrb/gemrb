@@ -21,14 +21,16 @@
 // This class handles the special spawn structures of planescape torment
 // (stored in .ini format)
 
-#include "win32def.h"
 #include "IniSpawn.h"
-#include "Game.h"
+
+#include "win32def.h"
+
 #include "Actor.h"
-#include "Map.h"
-#include "Interface.h"
 #include "GSUtils.h"
+#include "Game.h"
 #include "GameData.h"
+#include "Interface.h"
+#include "Map.h"
 
 static const int StatValues[9]={
 IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, 

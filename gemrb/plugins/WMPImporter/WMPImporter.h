@@ -25,9 +25,11 @@
 #include <config.h>
 #endif
 
-#include "ie_types.h"
-#include "WorldMap.h"
 #include "WorldMapMgr.h"
+
+#include "ie_types.h"
+
+#include "WorldMap.h"
 
 
 class WMPImporter : public WorldMapMgr {

@@ -21,9 +21,10 @@
 #ifndef COMPRESSOR_H
 #define COMPRESSOR_H
 
-#include "Plugin.h"
 #include "DataStream.h"
-#include <stdio.h>
+#include "Plugin.h"
+
+#include <cstdio>
 
 class GEM_EXPORT Compressor : public Plugin {
 public:

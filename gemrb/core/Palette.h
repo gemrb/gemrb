@@ -20,12 +20,11 @@
 #ifndef PALETTE_H
 #define PALETTE_H
 
-#include <cassert>
-
-#include "exports.h"
 #include "RGBAColor.h"
+#include "exports.h"
 #include "ie_types.h"
 
+#include <cassert>
 
 enum PaletteType {
 	PAL_MAIN,

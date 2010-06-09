@@ -25,14 +25,15 @@
 #include <config.h>
 #endif
 
-#include <vector>
 
 #include "RGBAColor.h"
+#include "exports.h"
+
 #include "AnimationFactory.h"
 #include "Control.h"
 #include "Sprite2D.h"
-#include "exports.h"
 
+#include <vector>
 
 class GEM_EXPORT ControlAnimation {
 private:

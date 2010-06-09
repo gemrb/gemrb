@@ -25,9 +25,11 @@
 #include <config.h>
 #endif
 
-#include "ie_types.h"
-#include "Projectile.h"
 #include "ProjectileMgr.h"
+
+#include "ie_types.h"
+
+#include "Projectile.h"
 
 
 class PROImporter : public ProjectileMgr {

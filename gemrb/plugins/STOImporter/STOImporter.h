@@ -25,9 +25,11 @@
 #include <config.h>
 #endif
 
-#include "ie_types.h"
-#include "Store.h"
 #include "StoreMgr.h"
+
+#include "ie_types.h"
+
+#include "Store.h"
 
 
 class STOImporter : public StoreMgr {

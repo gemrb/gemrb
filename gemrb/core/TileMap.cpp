@@ -18,8 +18,8 @@
  *
  */
 
-#include "win32def.h"
 #include "TileMap.h"
+
 #include "Interface.h"
 #include "Video.h"
 

@@ -18,8 +18,10 @@
  *
  */
 
-#include "win32def.h"
 #include "CachedFileStream.h"
+
+#include "win32def.h"
+
 #include "Interface.h"
 
 CachedFileStream::CachedFileStream(const char* stream, bool autoFree)

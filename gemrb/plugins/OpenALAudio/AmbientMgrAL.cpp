@@ -18,17 +18,20 @@
  *
  */
 
-#include <limits.h>
-#include <cmath>
-#include <cassert>
-#include <cstdio>
-#include "Ambient.h"
-#include "Interface.h"
-#include "Game.h"
-#include "OpenALAudio.h"
 #include "AmbientMgrAL.h"
 
-#include "SDL.h"
+#include "OpenALAudio.h"
+
+#include "Ambient.h"
+#include "Game.h"
+#include "Interface.h"
+
+#include <cassert>
+#include <climits>
+#include <cmath>
+#include <cstdio>
+
+#include <SDL.h>
 
 // TODO: remove last dependencies on OpenAL, and then rename and move it?
 

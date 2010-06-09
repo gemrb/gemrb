@@ -18,7 +18,6 @@
  *
  */
 
-#include "win32def.h"
 #include "StoreMgr.h"
 
 StoreMgr::StoreMgr(void)

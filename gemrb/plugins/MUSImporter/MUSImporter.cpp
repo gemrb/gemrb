@@ -18,12 +18,14 @@
  *
  */
 
-#include "win32def.h"
 #include "MUSImporter.h"
-#include "Interface.h"
+
+#include "win32def.h"
+
 #include "Audio.h"
-#include "SoundMgr.h"
 #include "GameData.h" // For ResourceHolder
+#include "Interface.h"
+#include "SoundMgr.h"
 
 static char musicsubfolder[6] = "music";
 

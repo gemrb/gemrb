@@ -18,9 +18,10 @@
  *
  */
 
-#include "win32def.h"
-#include "globals.h"
 #include "Dictionary.h"
+
+#include "globals.h"
+#include "win32def.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // inlines

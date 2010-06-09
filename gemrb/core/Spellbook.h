@@ -29,8 +29,9 @@
 #define SPELLBOOK_H
 
 #include "exports.h"
-#include "win32def.h"
 #include "ie_types.h"
+#include "win32def.h"
+
 #include <vector>
 
 class Actor;

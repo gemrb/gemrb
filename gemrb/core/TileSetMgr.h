@@ -21,8 +21,8 @@
 #ifndef TILESETMGR_H
 #define TILESETMGR_H
 
-#include "Plugin.h"
 #include "DataStream.h"
+#include "Plugin.h"
 #include "Tile.h"
 
 class GEM_EXPORT TileSetMgr : public Plugin {

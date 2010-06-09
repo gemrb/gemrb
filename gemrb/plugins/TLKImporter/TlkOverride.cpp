@@ -20,9 +20,10 @@
  * (dynamic) part of the talk table (tlk)
  */
 
+#include "TlkOverride.h"
+
 #include <cstdio>
 #include <cassert>
-#include "TlkOverride.h"
 
 CTlkOverride::CTlkOverride()
 {

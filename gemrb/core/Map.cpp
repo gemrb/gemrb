@@ -20,29 +20,31 @@
 
 // This class represents the .ARE (game area) files in the engine
 
-#include <cmath>
-#include <cassert>
+#include "Map.h"
 
 #include "win32def.h"
-#include "Map.h"
-#include "Interface.h"
-#include "PathFinder.h"
+
 #include "Ambient.h"
-#include "strrefs.h"
 #include "AmbientMgr.h"
-#include "TileMap.h"
-#include "ScriptedAnimation.h"
-#include "Projectile.h"
-#include "Video.h"
 #include "Audio.h"
-#include "MusicMgr.h"
-#include "Game.h"
-#include "WorldMap.h"
-#include "GameControl.h"
-#include "Palette.h"
-#include "MapMgr.h"
 #include "GSUtils.h"
+#include "Game.h"
+#include "GameControl.h"
 #include "GameData.h"
+#include "Interface.h"
+#include "MapMgr.h"
+#include "MusicMgr.h"
+#include "Palette.h"
+#include "PathFinder.h"
+#include "Projectile.h"
+#include "ScriptedAnimation.h"
+#include "TileMap.h"
+#include "Video.h"
+#include "WorldMap.h"
+#include "strrefs.h"
+
+#include <cmath>
+#include <cassert>
 
 #define YESNO(x) ( (x)?"Yes":"No")
 

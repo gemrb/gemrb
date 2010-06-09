@@ -28,8 +28,8 @@
 #ifndef STOREMGR_H
 #define STOREMGR_H
 
-#include "Plugin.h"
 #include "DataStream.h"
+#include "Plugin.h"
 #include "Store.h"
 
 /**

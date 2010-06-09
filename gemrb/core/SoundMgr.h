@@ -22,8 +22,9 @@
 #define SOUNDMGR_H
 
 #include "ie_types.h"
-#include "Resource.h"
+
 #include "DataStream.h"
+#include "Resource.h"
 
 /**
  * Base Class for sound plugins

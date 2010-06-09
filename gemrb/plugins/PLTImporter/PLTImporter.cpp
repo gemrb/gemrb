@@ -18,9 +18,11 @@
  *
  */
 
-#include "win32def.h"
 #include "PLTImporter.h"
+
 #include "RGBAColor.h"
+#include "win32def.h"
+
 #include "Interface.h"
 #include "Video.h"
 

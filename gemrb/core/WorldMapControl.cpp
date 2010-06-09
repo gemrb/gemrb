@@ -17,16 +17,19 @@
  *
  */
 
+#include "WorldMapControl.h"
+
+#include "win32def.h"
+
+#include "Game.h"
+#include "GameData.h"
+#include "Interface.h"
+#include "Video.h"
+#include "WorldMap.h"
+
 #ifndef WIN32
 #include <sys/time.h>
 #endif
-#include "win32def.h"
-#include "WorldMapControl.h"
-#include "Interface.h"
-#include "Video.h"
-#include "Game.h"
-#include "WorldMap.h"
-#include "GameData.h"
 
 #define MAP_TO_SCREENX(x) XWin + XPos - ScrollX + (x)
 #define MAP_TO_SCREENY(y) YWin + YPos - ScrollY + (y)

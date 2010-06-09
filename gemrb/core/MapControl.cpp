@@ -17,12 +17,14 @@
  *
  */
 
-#include "win32def.h"
 #include "MapControl.h"
-#include "Interface.h"
-#include "Video.h"
-#include "Map.h"
+
+#include "win32def.h"
+
 #include "Game.h"
+#include "Interface.h"
+#include "Map.h"
+#include "Video.h"
 
 #define MAP_NO_NOTES   0
 #define MAP_VIEW_NOTES 1

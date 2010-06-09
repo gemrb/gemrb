@@ -18,10 +18,12 @@
  *
  */
 
-#include "win32def.h"
-#include "globals.h" //for abort()
 #include "PCStatStruct.h"
-#include <string.h>
+
+#include "globals.h" //for abort()
+#include "win32def.h"
+
+#include <cstring>
 
 PCStatsStruct::PCStatsStruct()
 {

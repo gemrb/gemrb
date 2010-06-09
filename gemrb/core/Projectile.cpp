@@ -18,16 +18,19 @@
  *
  */
 
-#include <cmath>
-#include "win32def.h"
-#include <stdlib.h>
 #include "Projectile.h"
-#include "Interface.h"
-#include "Video.h"
-#include "Game.h"
+
+#include "win32def.h"
+
 #include "Audio.h"
-#include "ProjectileServer.h"
+#include "Game.h"
 #include "GameData.h"
+#include "Interface.h"
+#include "ProjectileServer.h"
+#include "Video.h"
+
+#include <cmath>
+#include <cstdlib>
 
 //to get gradient color
 #define PALSIZE 12

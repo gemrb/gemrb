@@ -21,11 +21,12 @@
 #define SCRIPTEDANIMATION_H
 
 #include "exports.h"
-#include "DataStream.h"
+
 #include "AnimationFactory.h"
+#include "DataStream.h"
+#include "Map.h"
 #include "Palette.h"
 #include "SpriteCover.h"
-#include "Map.h"
 
 //scripted animation flags 
 #define S_ANI_PLAYONCE        8        //(same as area animation)

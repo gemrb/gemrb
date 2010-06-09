@@ -21,16 +21,19 @@
 //This class represents the inventory of stores (.sto), area containers (.are)
 //or actors (.cre).
 
-#include <stdio.h>
+#include "Inventory.h"
+
 #include "win32def.h"
 #include "strrefs.h"
-#include "Interface.h"
-#include "Inventory.h"
-#include "Item.h"
+
 #include "Actor.h"
 #include "Game.h"
-#include "ScriptEngine.h"
 #include "GameData.h"
+#include "Interface.h"
+#include "Item.h"
+#include "ScriptEngine.h"
+
+#include <cstdio>
 
 static int SLOT_HEAD = -1;
 static int SLOT_MAGIC = -1;

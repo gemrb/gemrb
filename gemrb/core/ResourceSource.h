@@ -21,13 +21,14 @@
 #ifndef RESOURCESOURCE_H
 #define RESOURCESOURCE_H
 
-#include "exports.h"
-#include "Plugin.h"
 #include "SClassID.h"
+#include "exports.h"
 #include "globals.h"
 
-class ResourceDesc;
+#include "Plugin.h"
+
 class DataStream;
+class ResourceDesc;
 
 class GEM_EXPORT ResourceSource : public Plugin {
 public:

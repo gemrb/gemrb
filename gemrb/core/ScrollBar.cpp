@@ -18,11 +18,13 @@
  *
  */
 
-#include "win32def.h"
 #include "ScrollBar.h"
+
+#include "win32def.h"
+
 #include "Interface.h"
-#include "Video.h"
 #include "Variables.h"
+#include "Video.h"
 
 ScrollBar::ScrollBar(void)
 {

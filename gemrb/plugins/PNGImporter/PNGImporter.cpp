@@ -18,12 +18,14 @@
  *
  */
 
-#include "globals.h"
 #include "PNGImporter.h"
+
 #include "RGBAColor.h"
+#include "globals.h"
+
+#include "ImageFactory.h"
 #include "Interface.h"
 #include "Video.h"
-#include "ImageFactory.h"
 
 // CHECKME: how should we include png.h ? (And how should we check for it?)
 #include <png.h>

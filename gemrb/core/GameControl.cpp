@@ -17,26 +17,29 @@
  *
  */
 
+#include "GameControl.h"
+
+#include "strrefs.h"
+#include "win32def.h"
+
+#include "DialogMgr.h"
+#include "Effect.h"
+#include "GSUtils.h"
+#include "Game.h"
+#include "GameData.h"
+#include "ImageMgr.h"
+#include "Interface.h"
+#include "Item.h"
+#include "SaveGameIterator.h"
+#include "ScriptEngine.h"
+#include "TileMap.h"
+#include "Video.h"
+#include "damages.h"
+
+#include <cmath>
 #ifndef WIN32
 #include <sys/time.h>
 #endif
-#include <cmath>
-#include "win32def.h"
-#include "GameControl.h"
-#include "Interface.h"
-#include "DialogMgr.h"
-#include "strrefs.h"
-#include "Effect.h"
-#include "GSUtils.h"
-#include "TileMap.h"
-#include "Video.h"
-#include "ScriptEngine.h"
-#include "Item.h"
-#include "Game.h"
-#include "SaveGameIterator.h"
-#include "damages.h"
-#include "ImageMgr.h"
-#include "GameData.h"
 
 #define DEBUG_SHOW_INFOPOINTS   0x01
 #define DEBUG_SHOW_CONTAINERS   0x02

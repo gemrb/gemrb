@@ -18,13 +18,16 @@
  *
  */
 
-#include "win32def.h"
 #include "CREImporter.h"
-#include "Interface.h"
-#include "EffectMgr.h"
-#include "GameScript.h"
-#include "GameData.h"
+
 #include "ie_stats.h"
+#include "win32def.h"
+
+#include "EffectMgr.h"
+#include "GameData.h"
+#include "GameScript.h"
+#include "Interface.h"
+
 #include <cassert>
 
 #define MAXCOLOR 12

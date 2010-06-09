@@ -18,9 +18,9 @@
  *
  */
 
-#include "win32def.h"
-#include "globals.h"
 #include "Compressor.h"
+
+#include "globals.h"
 
 Compressor::Compressor(void)
 {

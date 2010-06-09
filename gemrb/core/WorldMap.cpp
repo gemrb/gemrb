@@ -18,11 +18,14 @@
  *
  */
 
-#include "win32def.h"
 #include "WorldMap.h"
+
+#include "win32def.h"
+
+#include "Game.h"
 #include "Interface.h"
 #include "Video.h"
-#include "Game.h"
+
 #include <list>
 
 WMPAreaEntry::WMPAreaEntry()

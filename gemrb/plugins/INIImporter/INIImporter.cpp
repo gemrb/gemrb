@@ -18,8 +18,10 @@
  *
  */
 
-#include "win32def.h"
 #include "INIImporter.h"
+
+#include "win32def.h"
+
 #include "Interface.h"
 
 INIImporter::INIImporter(void)

@@ -29,12 +29,14 @@
 #define INVENTORY_H
 
 #include "exports.h"
-#include <vector>
-#include "win32def.h"
 #include "ie_types.h"
+#include "win32def.h"
 
-#include "Store.h"
 #include "Item.h"  //needs item for itmextheader
+#include "Store.h"
+
+#include <vector>
+
 class Map;
 
 //AddSlotItem return values

@@ -25,9 +25,11 @@
 #include <config.h>
 #endif
 
-#include "ie_types.h"
-#include "Item.h"
 #include "ItemMgr.h"
+
+#include "ie_types.h"
+
+#include "Item.h"
 
 #define ITM_VER_BG 10
 #define ITM_VER_PST 11

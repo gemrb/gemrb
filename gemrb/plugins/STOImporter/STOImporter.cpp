@@ -18,12 +18,14 @@
  *
  */
 
-#include "win32def.h"
-#include "Interface.h"
-#include "Inventory.h"
 #include "STOImporter.h"
+
+#include "win32def.h"
+
 #include "GameData.h"
 #include "GameScript.h"
+#include "Interface.h"
+#include "Inventory.h"
 
 STOImporter::STOImporter(void)
 {

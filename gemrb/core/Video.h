@@ -28,15 +28,16 @@
 #define VIDEO_H
 
 #include "globals.h"
-#include "Plugin.h"
-#include "EventMgr.h"
+
 #include "Animation.h"
+#include "EventMgr.h"
+#include "Plugin.h"
 #include "Polygon.h"
 #include "ScriptedAnimation.h"
 
-class SpriteCover;
-class Palette;
 class AnimationFactory;
+class Palette;
+class SpriteCover;
 
 // Note: not all these flags make sense together. Specifically:
 // NOSHADOW overrides TRANSSHADOW

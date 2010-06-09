@@ -19,10 +19,11 @@
 #ifndef KEYIMP_H
 #define KEYIMP_H
 
-#include <vector>
-#include <map>
-#include <cstring>
 #include "ResourceSource.h"
+
+#include <cstring>
+#include <map>
+#include <vector>
 
 class Resource;
 class ResourceDesc;

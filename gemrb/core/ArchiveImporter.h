@@ -22,6 +22,7 @@
 #define ARCHIVEIMPORTER_H
 
 #include "globals.h"
+
 #include "Plugin.h"
 
 class GEM_EXPORT ArchiveImporter : public Plugin {

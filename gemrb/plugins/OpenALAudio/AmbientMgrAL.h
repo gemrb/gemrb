@@ -22,8 +22,10 @@
 #define AMBIENTMGRAL_H
 
 #include "AmbientMgr.h"
+
 #include <vector>
 #include <string>
+
 #include <SDL_thread.h>
 
 #ifndef WIN32

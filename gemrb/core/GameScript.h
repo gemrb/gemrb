@@ -18,20 +18,21 @@
  *
  */
 
-class GameScript;
-class Action;
-
 #ifndef GAMESCRIPT_H
 #define GAMESCRIPT_H
 
 #include "exports.h"
-#include <cstdio>
-#include "DataStream.h"
-#include "Variables.h"
-#include "SymbolMgr.h"
-#include "Actor.h"
 
+#include "Actor.h"
+#include "DataStream.h"
+#include "SymbolMgr.h"
+#include "Variables.h"
+
+#include <cstdio>
 #include <vector>
+
+class Action;
+class GameScript;
 
 //escapearea flags
 #define EA_DESTROY 1        //destroy actor at the exit (otherwise move to new place)

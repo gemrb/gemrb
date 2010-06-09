@@ -18,23 +18,25 @@
  *
  */
 
-#include "win32def.h"
 #include "GameScript.h"
-#include "GSUtils.h"
-#include "TileMap.h"
-#include "Video.h"
-#include "ScriptEngine.h"
+
+#include "win32def.h"
+
+#include "AmbientMgr.h"
 #include "Audio.h"
-#include "MusicMgr.h"
-#include "Item.h"
-#include "SaveGameIterator.h"
-#include "Map.h"
+#include "DataFileMgr.h"
+#include "GSUtils.h"
 #include "Game.h"
 #include "GameControl.h"
-#include "WorldMap.h"
-#include "DataFileMgr.h"
-#include "AmbientMgr.h"
 #include "GameData.h"
+#include "Item.h"
+#include "Map.h"
+#include "MusicMgr.h"
+#include "SaveGameIterator.h"
+#include "ScriptEngine.h"
+#include "TileMap.h"
+#include "Video.h"
+#include "WorldMap.h"
 
 //------------------------------------------------------------
 // Action Functions

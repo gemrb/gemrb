@@ -29,10 +29,12 @@
 #define WINDOW_H
 
 #include "exports.h"
-#include "Sprite2D.h"
+
 #include "Control.h"
-#include "TextArea.h"
 #include "ScrollBar.h"
+#include "Sprite2D.h"
+#include "TextArea.h"
+
 #include <vector>
 
 // Window Flags

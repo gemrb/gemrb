@@ -21,8 +21,9 @@
 #ifndef AUDIO_H_INCLUDED
 #define AUDIO_H_INCLUDED
 
-#include "win32def.h"
 #include "globals.h"
+#include "win32def.h"
+
 #include "Plugin.h"
 
 #define GEM_SND_RELATIVE 1
@@ -30,8 +31,8 @@
 #define GEM_SND_VOL_MUSIC    1
 #define GEM_SND_VOL_AMBIENTS 2
 
-class SoundMgr;
 class AmbientMgr;
+class SoundMgr;
 
 class GEM_EXPORT Audio : public Plugin {
 public:

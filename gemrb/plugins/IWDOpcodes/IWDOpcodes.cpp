@@ -18,19 +18,20 @@
  *
  */
 
-#include "win32def.h"
-#include "overlays.h"
-#include "opcode_params.h"
 #include "ie_feats.h" //cannot avoid declaring these
+#include "opcode_params.h"
+#include "overlays.h"
+#include "win32def.h"
+
 #include "Actor.h"
 #include "EffectQueue.h"
-#include "Interface.h"
+#include "GSUtils.h" //needs for displaystringcore
 #include "Game.h"
+#include "GameData.h"
+#include "Interface.h"
+#include "ProjectileServer.h" //needs for alter_animation
 #include "Spell.h"
 #include "damages.h"
-#include "GSUtils.h" //needs for displaystringcore
-#include "ProjectileServer.h" //needs for alter_animation
-#include "GameData.h"
 
 static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
 
