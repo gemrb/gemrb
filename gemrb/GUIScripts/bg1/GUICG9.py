@@ -47,7 +47,7 @@ def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
 			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
-	SetupProfsWindow (MyChar, LUPROFS_TYPE_CHARGEN_BG1, SkillWindow, RedrawSkills, [0,0,0], Levels,scroll=False,profTableOffset=0)
+	SetupProfsWindow (MyChar, LUPROFS_TYPE_CHARGEN, SkillWindow, RedrawSkills, [0,0,0], Levels,scroll=False,profTableOffset=0)
 
 	BackButton = SkillWindow.GetControl(77)
 	BackButton.SetText(15416)
@@ -65,5 +65,5 @@ def OnLoad():
 
 def NextPress():
 	MyChar = GemRB.GetVar ("Slot")
-	ProfsSave(MyChar, LUPROFS_TYPE_CHARGEN_BG1)
+	ProfsSave(MyChar, LUPROFS_TYPE_CHARGEN)
 	next()

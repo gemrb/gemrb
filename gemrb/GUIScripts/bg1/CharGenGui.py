@@ -231,7 +231,7 @@ def getSkills(TextAreaControl):
 def unsetProfi():
 	MyChar = GemRB.GetVar ("Slot")
 	ProfsNullify ()
-	ProfsSave(MyChar, LUPROFS_TYPE_CHARGEN_BG1)
+	ProfsSave(MyChar, LUPROFS_TYPE_CHARGEN)
 
 def getProfi(TextAreaControl):
 	MyChar = GemRB.GetVar ("Slot")
