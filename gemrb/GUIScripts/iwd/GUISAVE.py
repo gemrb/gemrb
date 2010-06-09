@@ -185,7 +185,7 @@ def SavePress():
 	#areapreview
 	Button=ConfirmWindow.GetControl (0)
 	if Pos<len(Games):
-		Button.SetSprite2D(Games[ActPos].GetPreview())
+		Button.SetSprite2D(Games[Pos].GetPreview())
 	else:
 		Button.SetPicture("")
 
@@ -193,7 +193,7 @@ def SavePress():
 	for j in range(PARTY_SIZE):
 		Button=ConfirmWindow.GetControl (40+j)
 		if Pos<len(Games):
-			Button.SetSprite2D(Games[ActPos].GetPortrait(j))
+			Button.SetSprite2D(Games[Pos].GetPortrait(j))
 		else:
 			Button.SetPicture("")
 

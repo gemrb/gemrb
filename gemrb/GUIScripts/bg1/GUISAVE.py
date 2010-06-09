@@ -185,7 +185,7 @@ def SavePress():
 	#areapreview
 	Button=ConfirmWindow.GetControl (0)
 	if Pos<len(Games):
-		Button.SetSprite2D(Games[ActPos].GetPreview())
+		Button.SetSprite2D(Games[Pos].GetPreview())
 	else:
 		Button.SetPicture("")
 
