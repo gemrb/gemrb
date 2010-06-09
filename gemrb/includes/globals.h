@@ -57,14 +57,6 @@
 
 //Global Variables
 
-#ifdef WIN32
-#define PathDelimiter '\\'
-#define SPathDelimiter "\\"
-#else
-#define PathDelimiter '/'
-#define SPathDelimiter "/"
-#endif
-
 #define IE_NORMAL 0
 #define IE_SHADED 1
 

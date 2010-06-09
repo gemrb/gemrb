@@ -113,6 +113,13 @@ GEM_EXPORT void ResolveFilePath(char* FilePath);
 
 #endif  // ! WIN32
 
+#ifdef WIN32
+const char PathDelimiter = '\\';
+#else
+const char PathDelimiter = '/';
+#endif
+const char SPathDelimiter[] = { PathDelimiter, '\0' };
+
 /**
  * Finds a file matching a glob.
  *
