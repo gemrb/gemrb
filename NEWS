@@ -1,6 +1,8 @@
-GemRB git (ba796199e9c):
+GemRB git (475cee20):
   New features:
     - 
+    - a minimal dataset
+    - turn undead
     - reputation penalties on death or injury
     - casting level bonus/malus (wild mages, clerics)
     - tinting for different times of the day and weather effects
