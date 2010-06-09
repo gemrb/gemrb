@@ -83,7 +83,7 @@ void ReadAutonoteINI()
 int GetTrackString(const ieResRef areaName)
 {
 	int i;
-	bool trackflag = core->GetStringReference(STR_TRACKING)!=(ieStrRef) -1;
+	bool trackflag = core->HasStringReference(STR_TRACKING);
 
 	if (!tracks) {
 		AutoTable tm("tracking");
