@@ -45,7 +45,7 @@
 # endif
 
 # if defined(__MINGW32__) && ! defined(HAVE_SNPRINTF)
-#  define HAVE_SNPRINTF
+#  define HAVE_SNPRINTF 1
 # endif
 
 #else //WIN32
@@ -61,7 +61,7 @@
 #ifndef HAVE_SNPRINTF
 # ifdef WIN32
 #  define snprintf _snprintf
-#  define HAVE_SNPRINTF
+#  define HAVE_SNPRINTF 1
 # else
 #  include "snprintf.h"
 # endif
