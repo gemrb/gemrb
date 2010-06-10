@@ -1294,6 +1294,10 @@ int Interface::Init()
 		PathJoin( path, core->GemRBOverridePath, "override", core->GameType, NULL);
 		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_DIRECTORY);
 
+		size_t i;
+		for (i = 0; i < ModPath.size(); ++i)
+			gamedata->AddSource(ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_DIRECTORY);
+
 		PathJoin( path, core->GemRBOverridePath, "override", "shared", NULL);
 		gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_DIRECTORY);
 
@@ -1313,7 +1317,7 @@ int Interface::Init()
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_DIRECTORY);
 
 		//IWD2 movies are on the CD but not in the BIF
-		for (int i = 0; i < 6; i++) {
+		for (i = 0; i < 6; i++) {
 			char description[] = "CDi/data";
 			PathJoin( path, core->CD[i], core->GameDataPath, NULL);
 			description[2] = '1' + i;
@@ -2061,6 +2065,12 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_PATH("CD4", CD[3]);
 		CONFIG_PATH("CD5", CD[4]);
 #undef CONFIG_PATH
+		} else if (stricmp( name, "ModPath" ) == 0) {
+			for (char *path = strtok(value,SPathListSeparator);
+					path;
+					path = strtok(NULL,SPathListSeparator)) {
+				ModPath.push_back(path);
+			}
 		} else if (stricmp( name, "SkipPlugin" ) == 0) {
 			plugin_flags->SetAt( value, PLF_SKIP );
 		} else if (stricmp( name, "DelayPlugin" ) == 0) {
@@ -2125,13 +2135,18 @@ bool Interface::LoadConfig(const char* filename)
 		ResolveFilePath(CachePath);
 	}
 
-	for (int i = 0; i < 6; ++i) {
+	size_t i;
+	for (i = 0; i < 6; ++i) {
 		if (!CD[i][0]) {
 			char cd[] = { 'C', 'D', '1'+i, '\0' };
 			PathJoin(CD[i], GamePath, cd, NULL);
 		} else {
 			ResolveFilePath( CD[i] );
 		}
+	}
+
+	for (i = 0; i < ModPath.size(); ++i) {
+		ResolveFilePath(ModPath[i]);
 	}
 
 	FixPath( GUIScriptsPath, true );

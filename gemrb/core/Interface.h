@@ -718,6 +718,7 @@ public:
 	char SavePath[_MAX_PATH];
 	char INIConfig[_MAX_PATH];
 	char CD[6][_MAX_PATH];
+	std::vector<std::string> ModPath;
 	int Width, Height, Bpp, ForceStereo;
 	unsigned int TooltipDelay;
 	unsigned int FogOfWar;

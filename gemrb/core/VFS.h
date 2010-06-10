@@ -38,7 +38,9 @@
 #include "exports.h"
 #include "globals.h"
 
+#include <string>
 #include <sys/stat.h>
+
 #ifdef WIN32
 #include <direct.h>
 #include <io.h>
@@ -111,15 +113,19 @@ GEM_EXPORT int _fclose(_FILE* stream);
 
 /** Handle ~ -> $HOME mapping and do initial case-sensitity check */
 GEM_EXPORT void ResolveFilePath(char* FilePath);
+GEM_EXPORT void ResolveFilePath(std::string& FilePath);
 
 #endif  // ! WIN32
 
 #ifdef WIN32
 const char PathDelimiter = '\\';
+const char PathListSeparator = ';';
 #else
 const char PathDelimiter = '/';
+const char PathListSeparator = ':';
 #endif
 const char SPathDelimiter[] = { PathDelimiter, '\0' };
+const char SPathListSeparator[] = { PathListSeparator, '\0' };
 
 /**
  * Finds a file matching a glob.

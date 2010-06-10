@@ -417,6 +417,26 @@ void ResolveFilePath(char* FilePath)
 	PathJoin(FilePath, TempFilePath[0]==PathDelimiter?SPathDelimiter:"", TempFilePath, NULL);
 }
 
+void ResolveFilePath(std::string& FilePath)
+{
+	char TempFilePath[_MAX_PATH];
+
+	if (FilePath[0]=='~') {
+		const char *home = getenv("HOME");
+		if (home) {
+			PathJoin(TempFilePath, home, FilePath.c_str()+1, NULL);
+			FilePath = TempFilePath;
+			return;
+		}
+	}
+
+	if (core && !core->CaseSensitive) {
+		return;
+	}
+	PathJoin(TempFilePath, FilePath[0]==PathDelimiter?SPathDelimiter:"", FilePath.c_str(), NULL);
+	FilePath = TempFilePath;
+}
+
 #endif
 
 void ExtractFileFromPath(char *file, const char *full_path)
