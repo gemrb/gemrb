@@ -2003,89 +2003,68 @@ bool Interface::LoadConfig(const char* filename)
 			}
 		}
 
-		if (stricmp( name, "Width" ) == 0) {
-			Width = atoi( value );
-		} else if (stricmp( name, "Height" ) == 0) {
-			Height = atoi( value );
-		} else if (stricmp( name, "Bpp" ) == 0) {
-			Bpp = atoi( value );
-		} else if (stricmp( name, "FullScreen" ) == 0) {
-			FullScreen = ( atoi( value ) == 0 ) ? false : true;
-		} else if (stricmp( name, "GUIEnhancements" ) == 0) {
-			GUIEnhancements = ( atoi( value ) == 0 ) ? false : true;
-		} else if (stricmp( name, "TooltipDelay" ) == 0) {
-			TooltipDelay = atoi( value );
-		} else if (stricmp( name, "DoubleClickDelay" ) == 0) {
-			evntmgr->SetDCDelay( atoi( value ) );
-		} else if (stricmp( name, "RepeatKeyDelay" ) == 0) {
-			evntmgr->SetRKDelay( atoi( value ) );
-		} else if (stricmp( name, "SkipIntroVideos" ) == 0) {
-			SkipIntroVideos = ( atoi( value ) == 0 ) ? false : true;
-		} else if (stricmp( name, "DrawFPS" ) == 0) {
-			DrawFPS = ( atoi( value ) == 0 ) ? false : true;
-		} else if (stricmp( name, "EnableCheatKeys" ) == 0) {
-			EnableCheatKeys ( atoi( value ) );
-		} else if (stricmp( name, "KeepCache" ) == 0) {
-			KeepCache = ( atoi( value ) == 0 ) ? false : true;
+		if (false) {
+#define CONFIG_INT(str, var) \
+		} else if (stricmp(name, str) == 0) { \
+			var ( atoi(value) )
+		CONFIG_INT("Bpp", Bpp = );
+		CONFIG_INT("CaseSensitive", CaseSensitive = );
+		CONFIG_INT("DoubleClickDelay", evntmgr->SetDCDelay);
+		CONFIG_INT("DrawFPS", DrawFPS = );
+		CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
+		CONFIG_INT("EndianSwitch", DataStream::SetEndianSwitch);
+		CONFIG_INT("FogOfWar", FogOfWar = );
+		CONFIG_INT("FullScreen", FullScreen = );
+		CONFIG_INT("GUIEnhancements", GUIEnhancements = );
+		CONFIG_INT("GameOnCD", GameOnCD = );
+		CONFIG_INT("Height", Height = );
+		CONFIG_INT("KeepCache", KeepCache = );
+		CONFIG_INT("MultipleQuickSaves", GameControl::MultipleQuickSaves);
+		CONFIG_INT("RepeatKeyDelay", evntmgr->SetRKDelay);
+		CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
+		CONFIG_INT("ScriptDebugMode", SetScriptDebugMode);
+		CONFIG_INT("SkipIntroVideos", SkipIntroVideos = );
+		CONFIG_INT("TooltipDelay", TooltipDelay = );
+		CONFIG_INT("Width", Width = );
+#undef CONFIG_INT
+#define CONFIG_STRING(str, var) \
+		} else if (stricmp(name, str) == 0) { \
+			strncpy(var, value, sizeof(var))
+		CONFIG_STRING("GameCharactersPath", GameCharactersPath);
+		CONFIG_STRING("GameDataPath", GameDataPath);
+		CONFIG_STRING("GameName", GameName);
+		CONFIG_STRING("GameOverridePath", GameOverridePath);
+		CONFIG_STRING("GamePortraitsPath", GamePortraitsPath);
+		CONFIG_STRING("GameScriptsPath", GameScriptsPath);
+		CONFIG_STRING("GameSoundsPath", GameSoundsPath);
+		CONFIG_STRING("GameType", GameType);
+#undef CONFIG_STRING
+#define CONFIG_STRING(str, var) \
+		} else if (stricmp(name, str) == 0) { \
+			var = value
+		CONFIG_STRING("AudioDriver", AudioDriverName);
+		CONFIG_STRING("VideoDriver", VideoDriverName);
+#undef CONFIG_STRING
+#define CONFIG_PATH(str, var) \
+		} else if (stricmp(name, str) == 0) { \
+			strncpy(var, value, sizeof(var));
+		CONFIG_PATH("CachePath", CachePath);
+		CONFIG_PATH("GUIScriptsPath", GUIScriptsPath);
+		CONFIG_PATH("GamePath", GamePath);
+		CONFIG_PATH("GemRBOverridePath", GemRBOverridePath);
+		CONFIG_PATH("GemRBPath", GemRBPath);
+		CONFIG_PATH("PluginsPath", PluginsPath);
+		CONFIG_PATH("SavePath", SavePath);
+		CONFIG_PATH("CD1", CD[0]);
+		CONFIG_PATH("CD2", CD[1]);
+		CONFIG_PATH("CD3", CD[2]);
+		CONFIG_PATH("CD4", CD[3]);
+		CONFIG_PATH("CD5", CD[4]);
+#undef CONFIG_PATH
 		} else if (stricmp( name, "SkipPlugin" ) == 0) {
 			plugin_flags->SetAt( value, PLF_SKIP );
 		} else if (stricmp( name, "DelayPlugin" ) == 0) {
 			plugin_flags->SetAt( value, PLF_DELAY );
-		} else if (stricmp( name, "FogOfWar" ) == 0) {
-			FogOfWar = atoi( value );
-		} else if (stricmp( name, "EndianSwitch" ) == 0) {
-			DataStream::SetEndianSwitch(atoi(value) );
-		} else if (stricmp( name, "CaseSensitive" ) == 0) {
-			CaseSensitive = ( atoi( value ) == 0 ) ? false : true;
-		} else if (stricmp( name, "MultipleQuickSaves" ) == 0) {
-			GameControl::MultipleQuickSaves(atoi(value));
-		} else if (stricmp( name, "GameOnCD" ) == 0) {
-			GameOnCD = ( atoi( value ) == 0 ) ? false : true;
-		} else if (stricmp( name, "GameDataPath" ) == 0) {
-			strncpy( GameDataPath, value, sizeof(GameDataPath) );
-		} else if (stricmp( name, "GameOverridePath" ) == 0) {
-			strncpy( GameOverridePath, value, sizeof(GameOverridePath) );
-		} else if (stricmp( name, "GemRBOverridePath" ) == 0) {
-			strncpy( GemRBOverridePath, value, sizeof(GemRBOverridePath) );
-		} else if (stricmp( name, "GameScriptsPath" ) == 0) {
-			strncpy( GameScriptsPath, value, sizeof(GameScriptsPath) );
-		} else if (stricmp( name, "GameSoundsPath" ) == 0) {
-			strncpy( GameSoundsPath, value, sizeof(GameSoundsPath) );
-		} else if (stricmp( name, "GamePortraitsPath" ) == 0) {
-			strncpy( GamePortraitsPath, value, sizeof(GamePortraitsPath) );
-		} else if (stricmp( name, "GameCharactersPath" ) == 0) {
-			strncpy( GameCharactersPath, value, sizeof(GameCharactersPath) );
-		} else if (stricmp( name, "GameName" ) == 0) {
-			strncpy( GameName, value, sizeof(GameName) );
-		} else if (stricmp( name, "GameType" ) == 0) {
-			if (stricmp( value, "tob" ) == 0) {
-				strncpy( GameType, "bg2", sizeof(GameType) );
-			} else {
-				strncpy( GameType, value, sizeof(GameType) );
-			}
-		} else if (stricmp( name, "SaveAsOriginal") == 0) {
-			SaveAsOriginal = atoi(value);
-		} else if (stricmp( name, "GemRBPath" ) == 0) {
-			strcpy( GemRBPath, value );
-		} else if (stricmp( name, "ScriptDebugMode" ) == 0) {
-			SetScriptDebugMode(atoi(value));
-		} else if (stricmp( name, "CachePath" ) == 0) {
-			strncpy( CachePath, value, sizeof(CachePath) );
-		} else if (stricmp( name, "GUIScriptsPath" ) == 0) {
-			strncpy( GUIScriptsPath, value, sizeof(GUIScriptsPath) );
-		} else if (stricmp( name, "PluginsPath" ) == 0) {
-			strncpy( PluginsPath, value, sizeof(PluginsPath) );
-		} else if (stricmp( name, "GamePath" ) == 0) {
-			strncpy( GamePath, value, sizeof(GamePath) );
-		} else if (stricmp( name, "SavePath" ) == 0) {
-			strncpy( SavePath, value, sizeof(SavePath) );
-		} else if (strnicmp( name, "CD", 2 ) == 0 &&
-				name[2] >= '1' && name[2] <= '5' && name[3] == 0) {
-			strncpy( CD[name[2]-'1'], value, sizeof(CD[name[2]-'1']) );
-		} else if (stricmp( name, "AudioDriver") == 0) {
-			AudioDriverName = value;
-		} else if (stricmp( name, "VideoDriver") == 0) {
-			VideoDriverName = value;
 		}
 	}
 	fclose( config );
