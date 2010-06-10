@@ -45,21 +45,6 @@
 #include <direct.h>
 #include <io.h>
 #include <windows.h>
-#else
-#include <dirent.h>
-#include <dlfcn.h>
-#include <fnmatch.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <unistd.h>
-#endif
-
-//#ifndef S_ISDIR
-//#define S_ISDIR(x) ((x) & S_IFDIR)
-//#endif
-
-#ifndef S_ISDIR
-#define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
 #endif
 
 #ifndef R_OK
@@ -67,21 +52,6 @@
 #endif
 
 #ifdef WIN32
-
-typedef struct DIR {
-	char path[_MAX_PATH];
-	bool is_first;
-	struct _finddata_t c_file;
-	long hFile;
-} DIR;
-
-typedef struct dirent {
-	char d_name[_MAX_PATH];
-} dirent;
-
-DIR* opendir(const char* filename);
-dirent* readdir(DIR* dirp);
-void closedir(DIR* dirp);
 
 typedef struct _FILE {
 	HANDLE hFile;
@@ -159,5 +129,35 @@ GEM_EXPORT bool PathJoinExt (char* target, const char* dir, const char* file, co
 GEM_EXPORT void FixPath (char *path, bool needslash);
 
 GEM_EXPORT void ExtractFileFromPath(char *file, const char *full_path);
+
+class DirectoryIterator {
+public:
+	/**
+	 * @param[in] path Path to direcrtory to search.
+	 *
+	 * WARNING: the lifetime of path must be longer than the lifetime
+	 * of DirectoryIterator.
+	 */
+	DirectoryIterator(const char *path);
+	~DirectoryIterator();
+	bool IsDirectory();
+	/**
+	 * Returns name of current entry.
+	 *
+	 * The returned string is only valid until the iterator is advanced.
+	 * FIXME: This should return a const char*
+	 */
+	char *GetName();
+	void GetFullPath(char *);
+	DirectoryIterator& operator++();
+#include "operatorbool.h"
+	OPERATOR_BOOL(DirectoryIterator,void,Entry)
+	bool operator !() { return !Entry; }
+	void Rewind();
+private:
+	void* Directory;
+	void* Entry;
+	const char *Path;
+};
 
 #endif  // !VFS_H

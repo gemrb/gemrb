@@ -30,11 +30,29 @@
 #include <cstdarg>
 #include <cstring>
 
+#ifndef WIN32
+#include <dirent.h>
+#endif
+
+#ifndef S_ISDIR
+#define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
+#endif
+
 #ifdef WIN32
+
+struct DIR {
+	char path[_MAX_PATH];
+	bool is_first;
+	struct _finddata_t c_file;
+	long hFile;
+};
+
+struct dirent {
+	char d_name[_MAX_PATH];
+};
 
 // buffer which readdir returns
 static dirent de;
-
 
 DIR* opendir(const char* filename)
 {
@@ -260,26 +278,20 @@ bool FindInDir(const char* Dir, char *Filename)
 		return false;
 	}
 
-	DIR* dir = opendir( Dir );
-	if (dir == NULL) {
+	DirectoryIterator dir(Dir);
+	if (!dir) {
 		return false;
 	}
 
 	// Exact match not found, so try to search for Filename
 	// with different case
-	struct dirent* de = readdir( dir );
-	if (de == NULL) {
-		closedir( dir );
-		return false;
-	}
 	do {
-		if (stricmp( de->d_name, Filename ) == 0) {
-			strcpy( Filename, de->d_name );
-			closedir(dir);
+		const char *name = dir.GetName();
+		if (stricmp( name, Filename ) == 0) {
+			strcpy( Filename, name );
 			return true;
 		}
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir ); //No other files in the directory, close it
+	} while (++dir);
 	return false;
 }
 
@@ -373,24 +385,18 @@ int strmatch(const char *string, const char *mask)
 
 bool FileGlob(char* target, const char* Dir, const char *glob)
 {
-	DIR* dir = opendir( Dir );
-	if (dir == NULL) {
+	DirectoryIterator dir(Dir);
+	if (!dir) {
 		return false;
 	}
 
-	struct dirent* de = readdir( dir );
-	if (de == NULL) {
-		closedir( dir );
-		return false;
-	}
 	do {
-		if (strmatch( de->d_name, glob ) == 0) {
-			strcpy( target, de->d_name );
-			closedir(dir);
+		const char *name = dir.GetName();
+		if (strmatch( name, glob ) == 0) {
+			strcpy( target, name );
 			return true;
 		}
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir ); //No other files in the directory, close it
+	} while (++dir);
 	return false;
 }
 
@@ -448,4 +454,52 @@ void ExtractFileFromPath(char *file, const char *full_path)
 		strcpy(file, p+1);
 	else
 		strcpy(file, full_path);
+}
+
+DirectoryIterator::DirectoryIterator(const char *path)
+	: Directory(), Entry(), Path(path)
+{
+	Rewind();
+}
+
+DirectoryIterator::~DirectoryIterator()
+{
+	if (Directory)
+		closedir(static_cast<DIR*>(Directory));
+}
+
+bool DirectoryIterator::IsDirectory()
+{
+	char dtmp[_MAX_PATH];
+	struct stat fst;
+	GetFullPath(dtmp);
+	stat( dtmp, &fst );
+	return S_ISDIR( fst.st_mode );
+}
+
+char* DirectoryIterator::GetName()
+{
+	return static_cast<dirent*>(Entry)->d_name;
+}
+
+void DirectoryIterator::GetFullPath(char *name)
+{
+	snprintf(name, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, static_cast<dirent*>(Entry)->d_name);
+}
+
+DirectoryIterator& DirectoryIterator::operator++()
+{
+	Entry = readdir(static_cast<DIR*>(Directory));
+	return *this;
+}
+
+void DirectoryIterator::Rewind()
+{
+	if (Directory)
+		closedir(static_cast<DIR*>(Directory));
+	Directory = opendir(Path);
+	if (Directory == NULL)
+		Entry = NULL;
+	else
+		Entry = readdir(static_cast<DIR*>(Directory));
 }

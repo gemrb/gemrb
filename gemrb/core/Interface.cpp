@@ -3430,37 +3430,27 @@ int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
 		png_suffix[0]='M';
 	}
 	PathJoin( Path, GamePath, GamePortraitsPath, NULL );
-	DIR* dir = opendir( Path );
-	if (dir == NULL) {
-		return -1;
-	}
-	//Lookup the first entry in the Directory
-	struct dirent* de = readdir( dir );
-	if (de == NULL) {
-		closedir( dir );
+	DirectoryIterator dir(Path);
+	if (!dir) {
 		return -1;
 	}
 	printf( "Looking in %s\n", Path );
 	do {
-		if (de->d_name[0] == '.')
+		char *name = dir.GetName();
+		if (name[0] == '.')
 			continue;
-		char dtmp[_MAX_PATH];
-		PathJoin( dtmp, Path, de->d_name, NULL );
-		struct stat fst;
-		stat( dtmp, &fst );
-		if ( S_ISDIR( fst.st_mode ))
+		if (dir.IsDirectory())
 			continue;
-		strupr(de->d_name);
-		char *pos = strstr(de->d_name,bmp_suffix);
+		strupr(name);
+		char *pos = strstr(name,bmp_suffix);
 		if (!pos && IsAvailable(IE_PNG_CLASS_ID) ) {
-			pos = strstr(de->d_name,png_suffix);
+			pos = strstr(name,png_suffix);
 		}
 		if (!pos) continue;
 		pos[1]=0;
 		count++;
-		ta->AppendText( de->d_name, -1 );
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir );
+		ta->AppendText( name, -1 );
+	} while (++dir);
 	return count;
 }
 
@@ -3472,36 +3462,26 @@ int Interface::GetCharSounds(TextArea* ta)
 
 	PathJoin( Path, GamePath, GameSoundsPath, NULL );
 	hasfolders = ( HasFeature( GF_SOUNDFOLDERS ) != 0 );
-	DIR* dir = opendir( Path );
-	if (dir == NULL) {
-		return -1;
-	}
-	//Lookup the first entry in the Directory
-	struct dirent* de = readdir( dir );
-	if (de == NULL) {
-		closedir( dir );
+	DirectoryIterator dir(Path);
+	if (!dir) {
 		return -1;
 	}
 	printf( "Looking in %s\n", Path );
 	do {
-		if (de->d_name[0] == '.')
+		char *name = dir.GetName();
+		if (name[0] == '.')
 			continue;
-		char dtmp[_MAX_PATH];
-		PathJoin( dtmp, Path, de->d_name, NULL );
-		struct stat fst;
-		stat( dtmp, &fst );
-		if (hasfolders == !S_ISDIR( fst.st_mode ))
+		if (hasfolders == !dir.IsDirectory())
 			continue;
 		if (!hasfolders) {
-			strupr(de->d_name);
-			char *pos = strstr(de->d_name,"A.WAV");
+			strupr(name);
+			char *pos = strstr(name,"A.WAV");
 			if (!pos) continue;
 			*pos=0;
 		}
 		count++;
-		ta->AppendText( de->d_name, -1 );
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir );
+		ta->AppendText( name, -1 );
+	} while (++dir);
 	return count;
 }
 
@@ -3511,32 +3491,24 @@ int Interface::GetCharacters(TextArea* ta)
 	char Path[_MAX_PATH];
 
 	PathJoin( Path, GamePath, GameCharactersPath, NULL );
-	DIR* dir = opendir( Path );
-	if (dir == NULL) {
-		return -1;
-	}
-	//Lookup the first entry in the Directory
-	struct dirent* de = readdir( dir );
-	if (de == NULL) {
-		closedir( dir );
+	DirectoryIterator dir(Path);
+	if (!dir) {
 		return -1;
 	}
 	printf( "Looking in %s\n", Path );
 	do {
-		if (de->d_name[0] == '.')
+		char *name = dir.GetName();
+		if (name[0] == '.')
 			continue;
-		char dtmp[_MAX_PATH];
-		PathJoin( dtmp, Path, de->d_name, NULL );
-		struct stat fst;
-		stat( dtmp, &fst );
-		strupr(de->d_name);
-		char *pos = strstr(de->d_name,".CHR");
+		if (dir.IsDirectory())
+			continue;
+		strupr(name);
+		char *pos = strstr(name,".CHR");
 		if (!pos) continue;
 		*pos=0;
 		count++;
-		ta->AppendText( de->d_name, -1 );
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir );
+		ta->AppendText( name, -1 );
+	} while (++dir);
 	return count;
 }
 
@@ -4309,36 +4281,28 @@ bool Interface::StupidityDetector(const char* Pt)
 {
 	char Path[_MAX_PATH];
 	strcpy( Path, Pt );
-	DIR* dir = opendir( Path );
-	if (dir == NULL) {
+	DirectoryIterator dir(Path);
+	if (!dir) {
 		printf("\n**cannot open**\n");
-		return true; //no directory?
-	}
-	struct dirent* de = readdir( dir ); //Lookup the first entry in the Directory
-	if (de == NULL) {
-		closedir( dir );
-		printf("\n**cannot read**\n");
-		return true; //cannot read it?
+		return true;
 	}
 	do {
-		char dtmp[_MAX_PATH];
-		struct stat fst;
-		snprintf( dtmp, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, de->d_name );
-		stat( dtmp, &fst );
-		if (S_ISDIR( fst.st_mode )) {
-			if (de->d_name[0] == '.')
-				continue;
-			closedir( dir );
+		const char *name = dir.GetName();
+		if (dir.IsDirectory()) {
+			if (name[0] == '.') {
+				if (name[1] == '\0')
+					continue;
+				if (name[1] == '.' && name[2] == '\0')
+					continue;
+			}
 			printf("\n**contains another dir**\n");
 			return true; //a directory in there???
 		}
-		if (ProtectedExtension(de->d_name) ) {
-			closedir( dir );
+		if (ProtectedExtension(name) ) {
 			printf("\n**contains alien files**\n");
 			return true; //an executable file in there???
 		}
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir );
+	} while (++dir);
 	//ok, we got a good conscience
 	return false;
 }
@@ -4349,29 +4313,22 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 
 	if (!Pt[0]) return; //Don't delete the root filesystem :)
 	strcpy( Path, Pt );
-	DIR* dir = opendir( Path );
-	if (dir == NULL) {
-		return;
-	}
-	struct dirent* de = readdir( dir ); //Lookup the first entry in the Directory
-	if (de == NULL) {
-		closedir( dir );
+	DirectoryIterator dir(Path);
+	if (!dir) {
 		return;
 	}
 	do {
-		char dtmp[_MAX_PATH];
-		struct stat fst;
-		snprintf( dtmp, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, de->d_name );
-		stat( dtmp, &fst );
-		if (S_ISDIR( fst.st_mode ))
+		char *name = dir.GetName();
+		if (dir.IsDirectory())
 			continue;
-		if (de->d_name[0] == '.')
+		if (name[0] == '.')
 			continue;
-		if (!onlysave || SavedExtension(de->d_name) ) {
+		if (!onlysave || SavedExtension(name) ) {
+			char dtmp[_MAX_PATH];
+			dir.GetFullPath(dtmp);
 			unlink( dtmp );
 		}
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir );
+	} while (++dir);
 }
 
 void Interface::LoadProgress(int percent)
@@ -5031,13 +4988,8 @@ int Interface::CompressSave(const char *folder)
 	FileStream str;
 
 	str.Create( folder, GameNameResRef, IE_SAV_CLASS_ID );
-	DIR* dir = opendir( CachePath );
-	if (dir == NULL) {
-		return -1;
-	}
-	struct dirent* de = readdir( dir ); //Lookup the first entry in the Directory
-	if (de == NULL) {
-		closedir( dir );
+	DirectoryIterator dir(CachePath);
+	if (!dir) {
 		return -1;
 	}
 	//BIF and SAV are the same
@@ -5048,26 +5000,23 @@ int Interface::CompressSave(const char *folder)
 	int priority=2;
 	while(priority) {
 		do {
-			char dtmp[_MAX_PATH];
-			struct stat fst;
-			snprintf( dtmp, _MAX_PATH, "%s%s", CachePath, de->d_name );
-			stat( dtmp, &fst );
-			if (S_ISDIR( fst.st_mode ))
+			const char *name = dir.GetName();
+			if (dir.IsDirectory())
 				continue;
-			if (de->d_name[0] == '.')
+			if (name[0] == '.')
 				continue;
-			if (SavedExtension(de->d_name)==priority) {
+			if (SavedExtension(name)==priority) {
+				char dtmp[_MAX_PATH];
+				dir.GetFullPath(dtmp);
 				FileStream fs;
 				fs.Open(dtmp, true);
 				ai->AddToSaveGame(&str, &fs);
 			}
-		} while (( de = readdir( dir ) ) != NULL);
-		closedir( dir );
+		} while (++dir);
 		//reopen list for the second round
 		priority--;
 		if (priority>0) {
-			dir = opendir( CachePath );
-			de = readdir( dir );
+			dir.Rewind();
 		}
 	}
 	return 0;

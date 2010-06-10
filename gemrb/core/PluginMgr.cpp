@@ -230,24 +230,17 @@ PluginMgr::FindFiles( char* path, std::list<char*> &files )
 bool
 PluginMgr::FindFiles( char* path, std::list<char*> &files )
 {
-	DIR* dir = opendir( path );
-	if (dir == NULL) //If we cannot open the Directory
+	DirectoryIterator dir(path);
+	if (!dir) //If we cannot open the Directory
 		return false;
 
-	struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
-	if (de == NULL) {
-		//If no entry exists just return
-		closedir( dir );
-		return false;
-	}
-	
 	do {
-		if (fnmatch( "*.so", de->d_name, 0 ) != 0) //If the current file has no ".so" extension, skip it
+		const char *name = dir.GetName();
+		if (fnmatch( "*.so", name, 0 ) != 0) //If the current file has no ".so" extension, skip it
 			continue;
-		files.push_back( strdup( de->d_name ));		
-	} while (( de = readdir( dir ) ) != NULL);
-	
-	closedir( dir ); //No other files in the directory, close it
+		files.push_back( strdup( name ));
+	} while (++dir);
+
 	return true;
 }
 #endif  // ! WIN32

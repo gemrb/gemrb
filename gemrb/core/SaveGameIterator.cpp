@@ -233,13 +233,6 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	char dtmp[_MAX_PATH];
 	PathJoin(dtmp, Path, slotname, NULL);
 
-	struct stat fst;
-	if (stat( dtmp, &fst ))
-		return false;
-
-	if (! S_ISDIR( fst.st_mode ))
-		return false;
-
 	char ftmp[_MAX_PATH];
 	PathJoinExt(ftmp, dtmp, core->GameNameResRef, "bmp");
 
@@ -267,29 +260,24 @@ bool SaveGameIterator::RescanSaveGames()
 	char Path[_MAX_PATH];
 	PathJoin(Path, core->SavePath, SaveDir(), NULL);
 
-	DIR* dir = opendir( Path );
+	DirectoryIterator dir(Path);
 	// create the save game directory at first access
-	if (dir == NULL) {
+	if (!dir) {
 		mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
 		chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
-		dir = opendir( Path );
+		dir.Rewind();
 	}
-	if (dir == NULL) { //If we cannot open the Directory
-		return false;
-	}
-	struct dirent* de = readdir( dir ); //Lookup the first entry in the Directory
-	if (de == NULL) {
-		closedir( dir );
+	if (!dir) { //If we cannot open the Directory
 		return false;
 	}
 
 	std::set<char*,iless> slots;
 	do {
-		if (IsSaveGameSlot( Path, de->d_name )) {
-			slots.insert(strdup(de->d_name));
+		const char *name = dir.GetName();
+		if (dir.IsDirectory() && IsSaveGameSlot( Path, name )) {
+			slots.insert(strdup(name));
 		}
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir ); //No other files in the directory, close it
+	} while (++dir);
 
 	std::transform(slots.begin(), slots.end(), std::back_inserter(save_slots), GetSaveGame);
 	return true;
@@ -323,22 +311,14 @@ Holder<SaveGame> SaveGameIterator::GetSaveGame(const char *slotname)
 		return NULL;
 	}
 
-	DIR* ndir = opendir( Path );
-	//If we cannot open the Directory
-	if (ndir == NULL) {
-		return NULL;
-	}
-	struct dirent* de2 = readdir( ndir ); //Lookup the first entry in the Directory
-	if (de2 == NULL) {
-		// No first entry!!!
-		closedir( ndir );
+	DirectoryIterator dir(Path);
+	if (!dir) {
 		return NULL;
 	}
 	do {
-		if (strnicmp( de2->d_name, "PORTRT", 6 ) == 0)
+		if (strnicmp( dir.GetName(), "PORTRT", 6 ) == 0)
 			prtrt++;
-	} while (( de2 = readdir( ndir ) ) != NULL);
-	closedir( ndir ); //No other files in the directory, close it
+	} while (++dir);
 
 	SaveGame* sg = new SaveGame( Path, savegameName, core->GameNameResRef, slotname, prtrt, savegameNumber );
 	return sg;
