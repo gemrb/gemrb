@@ -359,7 +359,7 @@ def OpenLevelUpWindow():
 	if GameIsBG2():
 		SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
 	else:
-		SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP_BG1, LevelUpWindow, RedrawSkills, Level1, Level, 0, False)
+		SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level, 0, False)
 	NewSkillPoints = GemRB.GetVar ("SkillPointsLeft")
 
 	if GameIsBG2():

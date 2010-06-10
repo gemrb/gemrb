@@ -24,10 +24,9 @@ from ie_stats import *
 from GUICommon import *
 
 #constants
-LUSKILLS_TYPE_LEVELUP = 0
-LUSKILLS_TYPE_LEVELUP_BG1 = 1
+LUSKILLS_TYPE_LEVELUP = 1
 LUSKILLS_TYPE_CHARGEN = 2
-LUSKILLS_TYPE_DUALCLASS = 3
+LUSKILLS_TYPE_DUALCLASS = 4
 LUSKILLS_MAX = 250
 
 #refs to the script calling this
@@ -79,7 +78,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		return
 
 	#setup the offsets
-	if type == LUSKILLS_TYPE_LEVELUP:
+	if type == LUSKILLS_TYPE_LEVELUP and GameIsBG2():
 		SkillsOffsetPress = 120
 		SkillsOffsetButton1 = 17
 		SkillsOffsetSum = 37
@@ -88,7 +87,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillsNumButtons = 4
 		SkillsTextArea = SkillsWindow.GetControl (110)
 		ScrollBar = SkillsWindow.GetControl (109)
-	elif type == LUSKILLS_TYPE_LEVELUP_BG1:
+	elif type == LUSKILLS_TYPE_LEVELUP:
 		SkillsOffsetPress = -1
 		SkillsOffsetButton1 = 17
 		SkillsOffsetSum = 37
@@ -195,7 +194,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 			for i in range(SkillsTable.GetRowCount()-2):
 				SkillName = SkillsTable.GetRowName (i+2)
 				SkillID = SkillsTable.GetValue (SkillName, "ID")
-				if type != LUSKILLS_TYPE_LEVELUP and type != LUSKILLS_TYPE_LEVELUP_BG1: #give racial bonuses to starting classes
+				if type != LUSKILLS_TYPE_LEVELUP: #give racial bonuses to starting classes
 					SkillValue = SkillRacTable.GetValue (Race, SkillName)
 				else:
 					SkillValue = GemRB.GetPlayerStat (pc, SkillID, 1)
