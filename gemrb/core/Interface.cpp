@@ -2090,6 +2090,9 @@ bool Interface::LoadConfig(const char* filename)
 	}
 	fclose( config );
 
+	// WARNING: Don't move ResolveFilePath into the loop
+	// Otherwise, it won't obey CaseSensitive set at the end
+	// of the config file.
 
 	if (!GameType[0]) {
 		strcpy( GameType, "gemrb" );
