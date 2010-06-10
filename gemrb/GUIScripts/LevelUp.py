@@ -256,6 +256,8 @@ def OpenLevelUpWindow():
 			DeltaWSpells = sum(NewWSpells)-sum(OldWSpells)
 		elif ClericTable != "*":
 			# check for cleric spells
+			if not GemRB.HasResource(ClericTable, RES_2DA, 1):
+				ClericTable = "MXSPLPRS" # iwd1 doesn't have a DRUIDSPELL column in the table
 			ClericTable = GemRB.LoadTableObject (ClericTable)
 			HaveCleric = 1
 			# same as above
