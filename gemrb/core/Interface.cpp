@@ -2085,6 +2085,8 @@ bool Interface::LoadConfig(const char* filename)
 
 	if (!GameType[0]) {
 		strcpy( GameType, "gemrb" );
+	} else if (stricmp( GameType, "tob" ) == 0) {
+		strncpy( GameType, "bg2", sizeof(GameType) );
 	}
 
 #ifdef DATADIR
