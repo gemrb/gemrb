@@ -66,6 +66,7 @@
 #include "StoreMgr.h"
 #include "StringMgr.h"
 #include "TileMap.h"
+#include "VFS.h"
 #include "Video.h"
 #include "WorldMapControl.h"
 #include "WorldMapMgr.h"
@@ -73,13 +74,6 @@
 #include <cstdlib>
 #include <time.h>
 #include <vector>
-
-#ifdef WIN32
-#include <direct.h>
-#include <io.h>
-#else
-#include <dirent.h>
-#endif
 
 GEM_EXPORT Interface* core;
 

@@ -30,10 +30,6 @@
 #include "gstmvedemux.h"
 #include "mve.h"
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 /* mvevideodec8.cpp */
 extern int ipvideo_decode_frame8 (const GstMveDemuxStream * s,
 	const unsigned char *data, unsigned short len);

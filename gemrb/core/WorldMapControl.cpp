@@ -27,10 +27,6 @@
 #include "Video.h"
 #include "WorldMap.h"
 
-#ifndef WIN32
-#include <sys/time.h>
-#endif
-
 #define MAP_TO_SCREENX(x) XWin + XPos - ScrollX + (x)
 #define MAP_TO_SCREENY(y) YWin + YPos - ScrollY + (y)
 

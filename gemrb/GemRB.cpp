@@ -20,18 +20,12 @@
 
 // GemRB.cpp : Defines the entry point for the application.
 
+#include "win32def.h" // logging
 
 #include <cstdio>
-#include "win32def.h"
+
 #include "Interface.h"
 
-#ifndef WIN32
-#include <ctype.h>
-#include <sys/time.h>
-#include <dirent.h>
-#else
-#include <windows.h>
-#endif
 
 //this supposed to convince SDL to work on OS/X
 #ifdef __APPLE_CC__ // we need startup SDL here

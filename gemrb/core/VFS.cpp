@@ -29,7 +29,6 @@
 
 #include <cstdarg>
 #include <cstring>
-#include <sys/stat.h>
 
 #ifdef WIN32
 

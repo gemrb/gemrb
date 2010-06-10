@@ -20,6 +20,8 @@
 
 #include "Cache.h"
 
+#include <ctype.h>
+
 // private inlines
 inline unsigned int Cache::MyHashKey(const char* key) const
 {

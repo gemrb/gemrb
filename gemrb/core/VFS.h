@@ -38,6 +38,7 @@
 #include "exports.h"
 #include "globals.h"
 
+#include <sys/stat.h>
 #ifdef WIN32
 #include <direct.h>
 #include <io.h>
@@ -47,7 +48,6 @@
 #include <dlfcn.h>
 #include <fnmatch.h>
 #include <stdio.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #endif

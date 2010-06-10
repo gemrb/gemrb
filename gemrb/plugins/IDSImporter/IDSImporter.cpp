@@ -26,7 +26,6 @@
 #include "win32def.h"
 
 #include <cstring>
-#include <ctype.h>
 
 IDSImporter::IDSImporter(void)
 {

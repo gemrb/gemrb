@@ -27,12 +27,6 @@
 #include "Map.h"
 #include "Video.h"
 
-#ifndef WIN32
-#include <sys/time.h>
-#else
-#include <windows.h>
-#endif
-
 Animation::Animation(int count)
 {
 	frames = (Sprite2D **) calloc(count, sizeof(Sprite2D *));

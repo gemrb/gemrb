@@ -31,18 +31,9 @@
 #include "Interface.h"
 
 #include <cmath>
-#ifndef WIN32
 #include <ctype.h>
-#include <sys/time.h>
-#include <dirent.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#else
+#ifdef WIN32
 #include "win32def.h"
-#include <sys\stat.h>
 #ifdef _DEBUG
 #include <stdlib.h>
 #include <crtdbg.h>

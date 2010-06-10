@@ -40,8 +40,6 @@
 
 #include <cassert>
 #include <cstdio>
-#include <fcntl.h>
-#include <sys/stat.h>
 
 static int g_truecolor;
 static ieDword *cbAtFrame = NULL;

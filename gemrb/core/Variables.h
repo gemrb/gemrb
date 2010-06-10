@@ -27,12 +27,6 @@
 #include "globals.h"
 #include "win32def.h"
 
-#include <cstring>
-#include <ctype.h>
-
-/////////////////////////////////////////////////////////////////////////////
-// Variables<ieDword, VALUE>
-
 #ifndef ReleaseFun
 typedef void (*ReleaseFun)(void *);
 #endif

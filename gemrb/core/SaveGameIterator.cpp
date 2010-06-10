@@ -36,6 +36,7 @@
 #include <cassert>
 #include <iterator>
 #include <set>
+#include <time.h>
 
 const TypeID SaveGame::ID = { "SaveGame" };
 

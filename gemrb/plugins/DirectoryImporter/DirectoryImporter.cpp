@@ -25,10 +25,6 @@
 #include "Interface.h"
 #include "ResourceDesc.h"
 
-#ifndef WIN32
-#include <unistd.h>
-#endif
-
 DirectoryImporter::DirectoryImporter(void)
 {
 }

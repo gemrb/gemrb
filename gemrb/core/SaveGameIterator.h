@@ -27,8 +27,6 @@
 #include "Holder.h"
 #include "ResourceManager.h"
 
-#include <sys/stat.h>
-#include <time.h>
 #include <vector>
 
 class ImageMgr;

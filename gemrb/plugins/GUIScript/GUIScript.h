@@ -23,14 +23,10 @@
 
 // NOTE: Python.h has to be included first.
 
-#ifdef WIN32
-#ifdef _DEBUG
+#if defined(WIN32) && defined(_DEBUG)
 #undef _DEBUG
 #include <Python.h>
 #define _DEBUG
-#else
-#include <Python.h>
-#endif
 #else
 #include <Python.h>
 #endif

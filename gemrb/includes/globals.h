@@ -52,8 +52,8 @@
 #include "VideoMode.h"
 #include "VideoModes.h"
 
-#include "cstdio"
-#include "cstdlib"
+#include <cstdio>
+#include <cstdlib>
 
 #endif //GLOBALS_ONLY_DEFS
 

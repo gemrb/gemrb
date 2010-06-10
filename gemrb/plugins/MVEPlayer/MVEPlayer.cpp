@@ -31,8 +31,6 @@
 
 #include <cassert>
 #include <cstdio>
-#include <fcntl.h>
-#include <sys/stat.h>
 
 static const char MVESignature[] = "Interplay MVE File\x1A";
 static const int MVE_SIGNATURE_LEN = 19;

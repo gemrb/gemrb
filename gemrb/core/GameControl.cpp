@@ -37,9 +37,6 @@
 #include "damages.h"
 
 #include <cmath>
-#ifndef WIN32
-#include <sys/time.h>
-#endif
 
 #define DEBUG_SHOW_INFOPOINTS   0x01
 #define DEBUG_SHOW_CONTAINERS   0x02

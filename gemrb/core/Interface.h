@@ -145,10 +145,6 @@ public:
 	}
 };
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 // Colors of modal window shadow
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define MODAL_SHADOW_NONE	0
