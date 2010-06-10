@@ -174,10 +174,8 @@ Sprite2D* PNGImporter::GetSprite2D()
 	// the end_info struct isn't used, but passing it anyway for now
 	png_read_end(inf->png_ptr, inf->end_info);
 
-	png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);
-
 	if (hasPalette) {
-		Color* pal = 0;
+		Color pal[256];
 		GetPalette(256, pal);
 		// TODO: colorkey
 		spr = core->GetVideoDriver()->CreateSprite8(Width, Height, 8,
@@ -188,6 +186,8 @@ Sprite2D* PNGImporter::GetSprite2D()
 												   blue_mask, alpha_mask,
 												   buffer, false, 0);
 	}
+
+	png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);
 
 	return spr;
 }
