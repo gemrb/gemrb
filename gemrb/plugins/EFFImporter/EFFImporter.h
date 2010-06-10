@@ -21,10 +21,6 @@
 #ifndef EFFIMPORTER_H
 #define EFFIMPORTER_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "EffectMgr.h"
 
 #include "ie_types.h"

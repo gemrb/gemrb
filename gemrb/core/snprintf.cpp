@@ -78,10 +78,6 @@
 #include "system/types.h"
 #include "data.h"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif

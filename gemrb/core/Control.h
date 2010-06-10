@@ -26,11 +26,6 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #define IE_GUI_BUTTON		0
 #define IE_GUI_PROGRESSBAR	1 //gemrb extension
 #define IE_GUI_SLIDER		2

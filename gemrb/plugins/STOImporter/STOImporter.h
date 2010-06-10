@@ -21,10 +21,6 @@
 #ifndef STOIMPORTER_H
 #define STOIMPORTER_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "StoreMgr.h"
 
 #include "ie_types.h"

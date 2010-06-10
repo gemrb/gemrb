@@ -21,11 +21,6 @@
 #ifndef CONTROLANIMATIONS_H
 #define CONTROLANIMATIONS_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-
 #include "RGBAColor.h"
 #include "exports.h"
 

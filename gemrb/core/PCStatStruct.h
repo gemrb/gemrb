@@ -21,10 +21,6 @@
 #ifndef PCSTATSTRUCT_H
 #define PCSTATSTRUCT_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "exports.h"
 #include "ie_types.h"
 

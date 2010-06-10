@@ -21,10 +21,6 @@
 #ifndef PROIMPORTER_H
 #define PROIMPORTER_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "ProjectileMgr.h"
 
 #include "ie_types.h"

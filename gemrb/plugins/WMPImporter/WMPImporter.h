@@ -21,10 +21,6 @@
 #ifndef WMPIMPORTER_H
 #define WMPIMPORTER_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "WorldMapMgr.h"
 
 #include "ie_types.h"

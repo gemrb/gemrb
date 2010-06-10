@@ -21,10 +21,6 @@
 #ifndef SPLIMPORTER_H
 #define SPLIMPORTER_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "SpellMgr.h"
 
 #include "ie_types.h"
