@@ -538,7 +538,7 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 		index = save->GetSaveID();
 
 		DeleteSaveGame(save);
-		save->release();
+		save.release();
 	} else {
 		//leave space for autosaves
 		//probably the hardcoded slot names should be read by this object
