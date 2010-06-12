@@ -900,6 +900,7 @@ public: //Script Functions
 	static int TriggerTrigger(Scriptable* Sender, Trigger* parameters);
 	static int TriggerSetGlobal(Scriptable* Sender, Trigger* parameters);
 	static int True(Scriptable* Sender, Trigger* parameters);
+	static int TurnedBy(Scriptable* Sender, Trigger* parameters);
 	static int Unlocked(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariable(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariableGT(Scriptable* Sender, Trigger* parameters);

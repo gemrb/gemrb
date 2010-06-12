@@ -309,6 +309,7 @@ Actor::Actor()
 	LastShout = 0; //used by heard
 	LastDamage = 0;
 	LastDamageType = 0;
+	LastTurner = 0;
 	HotKey = 0;
 	attackcount = 0;
 	attacksperround = 0;
@@ -2844,6 +2845,8 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 	}
 
 	//determine alignment (if equals, then no turning)
+
+	LastTurner = cleric->GetGlobalID();
 
 	//determine panic or destruction/control
 	//we get the modified level

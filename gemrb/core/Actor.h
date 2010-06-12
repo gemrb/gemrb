@@ -262,6 +262,7 @@ public:
 	int LastShout;     //lastheard
 	int LastDamage;    //lasthitter
 	int LastDamageType;//lasthitter
+	ieDword LastTurner;
 	Point FollowOffset;//follow lastfollowed at this offset
 
 	class Door *TargetDoor;

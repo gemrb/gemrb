@@ -1841,18 +1841,22 @@ int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx)
 	{
 	case 0: //command
 		target->Panic();
+		target->LastTurner = Owner->GetGlobalID();
 		break;
 	case 1://rebuke
 		if (target->SetSpellState(SS_REBUKED)) {
 			//display string rebuked
 		}
 		STAT_SUB(IE_ARMORCLASS,4);
+		target->LastTurner = Owner->GetGlobalID();
 		break;
 	case 2://destroy
 		target->Die(Owner);
+		target->LastTurner = Owner->GetGlobalID();
 		break;
 	case 3://panic
 		target->Panic();
+		target->LastTurner = Owner->GetGlobalID();
 		break;
 	default://depends on caster
 		if (fx->Parameter1) {

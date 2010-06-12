@@ -4134,3 +4134,16 @@ int GameScript::CalendarDayLT(Scriptable* /*Sender*/, Trigger* parameters)
 	return 0;
 }
 
+//NT Returns true only if the active CRE was turned by the specified priest or paladin.
+int GameScript::TurnedBy(Scriptable* Sender, Trigger* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	if (MatchActor(Sender, actor->LastTurner, NULL)) {
+		Sender->AddTrigger(&actor->LastTurner);
+		return 1;
+	}
+	return 0;
+}
