@@ -90,6 +90,8 @@ static void FindBIF(BIFEntry *entry)
 			entry->cd = 4;
 		} else if (( entry->BIFLocator & ( 1 << 6 ) ) != 0) {
 			entry->cd = 5;
+		} else if (( entry->BIFLocator & ( 1 << 7 ) ) != 0) {
+			entry->cd = 6;
 		} else {
 			printStatus( "ERROR", LIGHT_RED );
 			printf( "Cannot find %s... Resource unavailable.\n",
