@@ -2064,6 +2064,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_PATH("CD3", CD[2]);
 		CONFIG_PATH("CD4", CD[3]);
 		CONFIG_PATH("CD5", CD[4]);
+		CONFIG_PATH("CD6", CD[5]);
 #undef CONFIG_PATH
 		} else if (stricmp( name, "ModPath" ) == 0) {
 			for (char *path = strtok(value,SPathListSeparator);
