@@ -573,7 +573,7 @@ def GetStatOverview (pc):
 		stats.append ((19673, avatar_header['XP'], ''))
 		stats.append ((19674, avatar_header['PrimNextLevXP'], ''))
 	else:
-		stats.append ((19414, "", 'd'))
+		stats.append ((19414, "", ''))
 		stats.append (None)
 		stats.append ((avatar_header['PrimClass'], "", 'd'))
 		stats.append ((48156, avatar_header['PrimLevel'], ''))
