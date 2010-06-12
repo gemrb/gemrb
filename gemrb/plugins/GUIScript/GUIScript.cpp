@@ -9731,19 +9731,20 @@ PyObject* GUIScript::ConstructObject(const char* type, PyObject* pArgs)
 	char classname[_MAX_PATH] = "G";
 	strncat(classname, type, _MAX_PATH - 2);
 	if (!pGUIClasses) {
-		fprintf(stderr, "Tried to use an object (%s) before script compiled!\n", classname);
-		return 0;
+		char buf[256];
+		snprintf(buf, sizeof(buf), "Tried to use an object (%s) before script compiled!", classname);
+		return RuntimeError(buf);
 	}
 
 	PyObject* cobj = PyDict_GetItemString( pGUIClasses, classname );
 	if (!cobj) {
-		fprintf(stderr, "Failed to lookup name '%s'\n", classname);
-		return 0;
+		char buf[256];
+		snprintf(buf, sizeof(buf), "Failed to lookup name '%s'", classname);
+		return RuntimeError(buf);
 	}
 	PyObject* ret = PyObject_Call(cobj, pArgs, NULL);
 	if (!ret) {
-		fprintf(stderr, "Failed to call constructor\n");
-		return 0;
+		return RuntimeError("Failed to call constructor");
 	}
 	return ret;
 }
