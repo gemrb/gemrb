@@ -367,6 +367,7 @@ static const TriggerLink triggernames[] = {
 	{"triggerclick", GameScript::Clicked, 0}, //not sure
 	{"triggersetglobal", GameScript::TriggerSetGlobal,0}, //iwd2, but never used
 	{"true", GameScript::True, 0},
+	{"turnedby", GameScript::TurnedBy, 0},
 	{"unlocked", GameScript::Unlocked, 0},
 	{"unselectablevariable", GameScript::UnselectableVariable, 0},
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT, 0},
