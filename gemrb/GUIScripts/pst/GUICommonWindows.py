@@ -24,7 +24,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from GUIClasses import GWindow
-from GUICommon import *
+from GUICommon import GearsClicked, RestPress, OpenFloatMenuWindow
 from LUCommon import CanLevelUp
 import GUICommon
 

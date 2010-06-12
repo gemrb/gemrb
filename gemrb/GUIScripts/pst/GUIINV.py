@@ -26,8 +26,8 @@ from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
 import GemRB
-from GUICommon import CloseOtherWindow, ClassTable
-from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler, SetEncumbranceLabels
+from GUICommon import CloseOtherWindow, ClassTable, SetEncumbranceLabels
+from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler
 
 
 InventoryWindow = None
