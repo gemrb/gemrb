@@ -567,29 +567,32 @@ def GetStatOverview (pc):
 	stats = []
 
 	# Displaying Class, Level, Experience and Next Level Experience
-	# FIXME: This looks ugly
 	if (avatar_header['SecoLevel'] == 0):
-		DispLevel = GemRB.GetString (48156) + ': ' + str (avatar_header['PrimLevel']) + "\n"
-		DispXP = GemRB.GetString (19673) + ': ' + str (avatar_header['XP']) + "\n"
-		DispNextLevel = GemRB.GetString (19674) + ': ' + str (avatar_header['PrimNextLevXP']) + "\n"
-		Main = avatar_header['PrimClass'] + "\n" + DispLevel + DispXP + DispNextLevel + "\n"
+		stats.append ((avatar_header['PrimClass'], "", 'd'))
+		stats.append ((48156, avatar_header['PrimLevel'], ''))
+		stats.append ((19673, avatar_header['XP'], ''))
+		stats.append ((19674, avatar_header['PrimNextLevXP'], ''))
 	else:
-		DispPrimClass = avatar_header['PrimClass'] + "\n"
-		DispPrimLevel = GemRB.GetString (48156) + ': ' + str (avatar_header['PrimLevel']) + "\n"
-		DispXP = GemRB.GetString (19673) + ': ' + str (avatar_header['XP']) + "\n"
-		DispPrimNextLevel = GemRB.GetString (19674) + ': ' + str (avatar_header['PrimNextLevXP']) + "\n"
-
-		DispSecoClass = avatar_header['SecoClass'] + "\n"
-		DispSecoLevel = GemRB.GetString (48156) + ': ' + str (avatar_header['SecoLevel']) + "\n"
-		DispSecoNextLevel = GemRB.GetString (19674) + ': ' + str (avatar_header['SecoNextLevXP']) + "\n"
-		Main = GemRB.GetString (19414) + "\n\n" + DispPrimClass + DispPrimLevel + DispXP + DispPrimNextLevel + "\n"
-		Main = Main + DispSecoClass + DispSecoLevel + DispXP + DispSecoNextLevel + "\n"
+		stats.append ((19414, "", 'd'))
+		stats.append (None)
+		stats.append ((avatar_header['PrimClass'], "", 'd'))
+		stats.append ((48156, avatar_header['PrimLevel'], ''))
+		stats.append ((19673, avatar_header['XP'], ''))
+		stats.append ((19674, avatar_header['PrimNextLevXP'], ''))
+		stats.append (None)
+		stats.append ((avatar_header['SecoClass'], "", 'd'))
+		stats.append ((48156, avatar_header['SecoLevel'], ''))
+		stats.append ((19673, avatar_header['XP'], ''))
+		stats.append ((19674, avatar_header['SecoNextLevXP'], ''))
 
 	# 59856 Current State
+	stats.append (None)
 	StatesTable = GemRB.LoadTable ("states")
 	StateID = GS (IE_STATE_ID)
 	State = GemRB.GetString (StatesTable.GetValue (str (StateID), "NAME_REF"))
-	CurrentState = won + GemRB.GetString (59856) + woff + "\n" + State + "\n\n"
+	stats.append ((won + GemRB.GetString (59856) + woff, "", 'd'))
+	stats.append ((State, "", 'd'))
+	stats.append (None)
 
 	# 67049 AC Bonuses
 	stats.append (67049)
@@ -729,6 +732,8 @@ def GetStatOverview (pc):
 				continue
 			if type == '+':
 				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
+			elif type == 'd': #strref is an already resolved string
+				res.append (strref)
 			elif type == 'x':
 				res.append (GemRB.GetString (strref) + ': x' + str (val))
 			else:
@@ -745,7 +750,7 @@ def GetStatOverview (pc):
 				res.append ("")
 				lines = 0
 
-	return Main + CurrentState + "\n".join (res)
+	return "\n".join (res)
 	pass
 
 
