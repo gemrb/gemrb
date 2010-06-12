@@ -606,37 +606,8 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	if (CHUHeight && CHUHeight != core->Height)
 		win->YPos += (core->Height - CHUHeight) / 2;
 
-	return PyInt_FromLong( ret );
+	return gs->ConstructObject("Window", ret);
 }
-
-PyDoc_STRVAR( GemRB_LoadWindowObject__doc,
-"LoadWindowObject(WindowID) => GWindow\n\n"
-"Returns a Window as an object." );
-
-static PyObject* GemRB_LoadWindowObject(PyObject * self, PyObject* args)
-{
-	int WindowID;
-	if (!PyArg_ParseTuple( args, "i", &WindowID )) {
-		return AttributeError( GemRB_LoadWindowObject__doc );
-	}
-
-	PyObject* win = GemRB_LoadWindow(self, args);
-	if (!win || !PyObject_TypeCheck( win, &PyInt_Type ))
-		return win; // exception
-
-	PyObject* wintuple = PyTuple_New(1);
-	PyTuple_SET_ITEM(wintuple, 0, win);
-
-	PyObject* ret = gs->ConstructObject("Window", wintuple);
-	Py_DECREF(wintuple);
-	if (!ret) {
-		char buf[256];
-		snprintf( buf, sizeof( buf ), "Couldn't construct Window object for window %d!", WindowID );
-		return RuntimeError(buf);
-	}
-	return ret;
-}
-
 
 PyDoc_STRVAR( GemRB_Window_SetSize__doc,
 "SetWindowSize(WindowIndex, Width, Height)\n\n"
@@ -9282,7 +9253,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(LoadTable, METH_VARARGS),
 	METHOD(LoadWindowPack, METH_VARARGS),
 	METHOD(LoadWindow, METH_VARARGS),
-	METHOD(LoadWindowObject, METH_VARARGS),
 	METHOD(LoadWindowFrame, METH_VARARGS),
 	METHOD(MemorizeSpell, METH_VARARGS),
 	METHOD(ModifyEffect, METH_VARARGS),

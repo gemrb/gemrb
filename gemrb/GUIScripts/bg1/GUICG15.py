@@ -67,7 +67,7 @@ def OnLoad():
 	TableName = ClassSkillsTable.GetValue(ClassName, "HATERACE")
 	
 	GemRB.LoadWindowPack("GUICG")
-	RaceWindow = GemRB.LoadWindowObject(15)
+	RaceWindow = GemRB.LoadWindow(15)
 	RaceTable = GemRB.LoadTable(TableName)
 	RaceCount = RaceTable.GetRowCount()-LISTSIZE+1
 	if RaceCount<0:

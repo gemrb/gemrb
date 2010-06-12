@@ -66,11 +66,11 @@ def OpenPriestWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIPR", 640, 480)
-	PriestWindow = Window = GemRB.LoadWindowObject (2)
+	PriestWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", PriestWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	MarkMenuButton (OptionsWindow)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenPriestWindow")
 	OptionsWindow.SetFrame ()
@@ -228,7 +228,7 @@ def OpenPriestSpellInfoWindow ():
 		PriestSpellInfoWindow = None
 		return
 
-	PriestSpellInfoWindow = Window = GemRB.LoadWindowObject (3)
+	PriestSpellInfoWindow = Window = GemRB.LoadWindow (3)
 
 	#back
 	Button = Window.GetControl (5)
@@ -269,7 +269,7 @@ def OnPriestMemorizeSpell ():
 def OpenPriestSpellRemoveWindow ():
 	global PriestSpellUnmemorizeWindow
 
-	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindowObject (5)
+	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -301,7 +301,7 @@ def ClosePriestSpellUnmemorizeWindow ():
 def OpenPriestSpellUnmemorizeWindow ():
 	global PriestSpellUnmemorizeWindow
 
-	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindowObject (5)
+	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)

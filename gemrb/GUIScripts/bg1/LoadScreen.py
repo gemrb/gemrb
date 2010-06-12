@@ -30,7 +30,7 @@ def StartLoadScreen ():
 	global LoadScreen
 
 	GemRB.LoadWindowPack ("guils")
-	LoadScreen = GemRB.LoadWindowObject (0)
+	LoadScreen = GemRB.LoadWindow (0)
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	if LoadPic=="":
 		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))

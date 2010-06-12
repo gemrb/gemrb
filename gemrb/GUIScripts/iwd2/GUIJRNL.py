@@ -54,7 +54,7 @@ def OpenJournalWindow ():
 		
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIJRNL", 800, 600)
-	JournalWindow = Window = GemRB.LoadWindowObject (2)
+	JournalWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar("OtherWindow", JournalWindow.ID)
 
 	

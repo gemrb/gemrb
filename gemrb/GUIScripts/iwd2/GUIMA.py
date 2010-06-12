@@ -96,12 +96,12 @@ def ShowMap ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
-	MapWindow = Window = GemRB.LoadWindowObject (2)
+	MapWindow = Window = GemRB.LoadWindow (2)
 	#this window type blocks the game normally, but map window doesn't
 	GemRB.SetVar ("OtherWindow", MapWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "ShowMap")
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow ()
@@ -162,13 +162,13 @@ def OpenMapWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMAP", 800, 600)
-	MapWindow = Window = GemRB.LoadWindowObject (2)
+	MapWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", MapWindow.ID)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow ()
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenMapWindow")
 	OptionsWindow.SetFrame ()
 
@@ -250,7 +250,7 @@ def AddNoteWindow ():
 
 	Label = MapWindow.GetControl (0x10000003)
 	Text = Label.QueryText ()
-	NoteWindow = GemRB.LoadWindowObject (5)
+	NoteWindow = GemRB.LoadWindow (5)
 	NoteLabel = NoteWindow.GetControl (1)
 	NoteLabel = NoteLabel.ConvertEdit (1)
 	NoteLabel.SetText (Text)
@@ -350,7 +350,7 @@ def WorldMapWindowCommon (Travel):
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIWMAP",800, 600)
-	WorldMapWindow = Window = GemRB.LoadWindowObject (2)
+	WorldMapWindow = Window = GemRB.LoadWindow (2)
 
 	#(fuzzie just copied this from the map window code..)
 	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)
@@ -358,7 +358,7 @@ def WorldMapWindowCommon (Travel):
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow ()
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenMapWindow")
 	OptionsWindow.SetFrame ()
 

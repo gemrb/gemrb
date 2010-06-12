@@ -66,11 +66,11 @@ def OpenMageWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMG", 640, 480)
-	MageWindow = Window = GemRB.LoadWindowObject (2)
+	MageWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", MageWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenMageWindow")
 	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
@@ -238,7 +238,7 @@ def OpenMageSpellInfoWindow ():
 		MageSpellInfoWindow = None
 		return
 
-	MageSpellInfoWindow = Window = GemRB.LoadWindowObject (3)
+	MageSpellInfoWindow = Window = GemRB.LoadWindow (3)
 
 	#back
 	Button = Window.GetControl (5)
@@ -282,7 +282,7 @@ def CloseMageSpellUnmemorizeWindow ():
 def OpenMageSpellRemoveWindow ():
 	global MageSpellUnmemorizeWindow
 
-	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindowObject (5)
+	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -304,7 +304,7 @@ def OpenMageSpellRemoveWindow ():
 def OpenMageSpellUnmemorizeWindow ():
 	global MageSpellUnmemorizeWindow
 
-	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindowObject (5)
+	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)

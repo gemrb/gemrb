@@ -28,7 +28,7 @@ def OnLoad():
 	global ImportWindow, TextAreaControl
 
 	GemRB.LoadWindowPack("GUICG")
-	ImportWindow = GemRB.LoadWindowObject(20)
+	ImportWindow = GemRB.LoadWindow(20)
 
 	CloseOtherWindow(ImportWindow.Unload)
 

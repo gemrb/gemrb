@@ -49,7 +49,7 @@ def OnLoad():
 	global RaceTable, RaceCount, TopIndex
 	
 	GemRB.LoadWindowPack("GUICG", 800 ,600)
-	RaceWindow = GemRB.LoadWindowObject(15)
+	RaceWindow = GemRB.LoadWindow(15)
 
 	Class = GemRB.GetVar("BaseClass")
 	TableName = ClassSkillsTable.GetValue(Class, 0)

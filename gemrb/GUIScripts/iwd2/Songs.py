@@ -27,7 +27,7 @@ def OnLoad():
 	global MovieWindow, TextAreaControl, MoviesTable
 
 	GemRB.LoadWindowPack("GUIMOVIE", 800, 600)
-	MovieWindow = GemRB.LoadWindowObject(2)
+	MovieWindow = GemRB.LoadWindow(2)
 	MovieWindow.SetFrame ()
 	TextAreaControl = MovieWindow.GetControl(0)
 	TextAreaControl.SetFlags(IE_GUI_TEXTAREA_SELECTABLE)

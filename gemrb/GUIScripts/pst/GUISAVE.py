@@ -53,7 +53,7 @@ def OpenSaveWindow ():
 
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUISAVE", 640, 480)
-	SaveWindow = Window = GemRB.LoadWindowObject (0)
+	SaveWindow = Window = GemRB.LoadWindow (0)
 	OptionsWindow = GWindow( GemRB.GetVar ("OtherWindow") )
 	GemRB.SetVar ("OtherWindow", SaveWindow.ID)
 
@@ -175,7 +175,7 @@ def DeleteGamePress():
 	global ConfirmWindow
 
 	SaveWindow.SetVisible(WINDOW_INVISIBLE)
-	ConfirmWindow=GemRB.LoadWindowObject(1)
+	ConfirmWindow=GemRB.LoadWindow(1)
 
 	Text=ConfirmWindow.GetControl(0)
 	Text.SetText(15305)
@@ -211,7 +211,7 @@ def OpenSaveDetailWindow ():
 		GemRB.UnhideGUI ()
 		return
 		
-	SaveDetailWindow = Window = GemRB.LoadWindowObject (1)
+	SaveDetailWindow = Window = GemRB.LoadWindow (1)
 	GemRB.SetVar ("FloatWindow", SaveDetailWindow.ID)	
 
 

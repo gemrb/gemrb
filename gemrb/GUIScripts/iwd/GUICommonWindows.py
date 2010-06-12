@@ -415,9 +415,9 @@ def OpenPortraitWindow (needcontrols):
 
 	#take care, this window is different in how/iwd
 	if HasHOW() and needcontrols:
-		PortraitWindow = Window = GemRB.LoadWindowObject (26)
+		PortraitWindow = Window = GemRB.LoadWindow (26)
 	else:
-		PortraitWindow = Window = GemRB.LoadWindowObject (1)
+		PortraitWindow = Window = GemRB.LoadWindow (1)
 
 	if needcontrols:
 		if HasHOW():

@@ -96,12 +96,12 @@ def ShowMap ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
-	MapWindow = Window = GemRB.LoadWindowObject (2)
+	MapWindow = Window = GemRB.LoadWindow (2)
 	#this window type blocks the game normally, but map window doesn't
 	GemRB.SetVar ("OtherWindow", MapWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "ShowMap")
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
@@ -155,12 +155,12 @@ def OpenMapWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
-	MapWindow = Window = GemRB.LoadWindowObject (2)
+	MapWindow = Window = GemRB.LoadWindow (2)
 	#this window type blocks the game normally, but map window doesn't
 	GemRB.SetVar ("OtherWindow", MapWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	MarkMenuButton (OptionsWindow)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenMapWindow")
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
@@ -257,7 +257,7 @@ def WorldMapWindowCommon (Travel):
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
-	WorldMapWindow = Window = GemRB.LoadWindowObject (0)
+	WorldMapWindow = Window = GemRB.LoadWindow (0)
 	#saving the original portrait window
 	Window.SetFrame ()
 

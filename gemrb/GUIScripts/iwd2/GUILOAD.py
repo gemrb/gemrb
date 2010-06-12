@@ -35,7 +35,7 @@ def OnLoad ():
 
 	GemRB.SetVar ("SaveDir",1) #iwd2 is always using 'mpsave'
 	GemRB.LoadWindowPack ("GUILOAD", 800 ,600)
-	LoadWindow = GemRB.LoadWindowObject (0)
+	LoadWindow = GemRB.LoadWindow (0)
 	LoadWindow.SetFrame ()
 
 	CancelButton=LoadWindow.GetControl (22)
@@ -163,7 +163,7 @@ def DeleteGamePress ():
 	global ConfirmWindow
 
 	LoadWindow.SetVisible (WINDOW_INVISIBLE)
-	ConfirmWindow=GemRB.LoadWindowObject (1)
+	ConfirmWindow=GemRB.LoadWindow (1)
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (15305)
 	DeleteButton=ConfirmWindow.GetControl (1)

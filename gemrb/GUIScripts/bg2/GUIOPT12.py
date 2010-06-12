@@ -25,7 +25,7 @@ TextAreaControl = 0
 def OnLoad():
 	global SoundWindow, TextAreaControl
 	GemRB.LoadWindowPack("GUIOPT", 640, 480)
-	SoundWindow = GemRB.LoadWindowObject(12)
+	SoundWindow = GemRB.LoadWindow(12)
 	TextAreaControl = SoundWindow.GetControl(16)
 	SubtitleButton = SoundWindow.GetControl(20)
 	SubtitleButtonB = SoundWindow.GetControl(5)

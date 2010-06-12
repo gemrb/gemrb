@@ -50,7 +50,7 @@ def OpenPriestWindow ():
 		
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIPR")
-	PriestWindow = Window = GemRB.LoadWindowObject (3)
+	PriestWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("OtherWindow", PriestWindow.ID)
 
 	Button = Window.GetControl (0)
@@ -175,7 +175,7 @@ def OpenPriestSpellInfoWindow ():
 		GemRB.UnhideGUI ()
 		return
 		
-	PriestSpellInfoWindow = Window = GemRB.LoadWindowObject (4)
+	PriestSpellInfoWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("FloatWindow", PriestSpellInfoWindow.ID)
 
 	Button = Window.GetControl (4)
@@ -236,7 +236,7 @@ def OpenPriestSpellUnmemorizeWindow ():
 		GemRB.UnhideGUI ()
 		return
 		
-	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindowObject (6)
+	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
 	GemRB.SetVar ("FloatWindow", PriestSpellUnmemorizeWindow.ID)
 
 	# "Are you sure you want to ....?"

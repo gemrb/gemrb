@@ -52,7 +52,7 @@ def OnLoad():
 		return
 
 	GemRB.LoadWindowPack("START", 640, 480)
-	StartWindow = GemRB.LoadWindowObject(7)
+	StartWindow = GemRB.LoadWindow(7)
 	StartWindow.SetFrame ()
 	StartWindow.CreateLabel(0x0fff0000, 0,0,640,30, "REALMS", "", 1)
 	Label=StartWindow.GetControl(0x0fff0000)

@@ -88,11 +88,11 @@ def OpenRecordsWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIREC", 640, 480) #TODO: remove?
-	RecordsWindow = Window = GemRB.LoadWindowObject (2)
+	RecordsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 	# saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenRecordsWindow")
 	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
@@ -609,7 +609,7 @@ def OpenInformationWindow ():
 		GemRB.SetVar ("FloatWindow", -1)
 		return
 
-	InformationWindow = Window = GemRB.LoadWindowObject (4)
+	InformationWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("FloatWindow", InformationWindow.ID)
 
 	# Biography
@@ -736,7 +736,7 @@ def OpenBiographyWindow ():
 		InformationWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
-	BiographyWindow = Window = GemRB.LoadWindowObject (12)
+	BiographyWindow = Window = GemRB.LoadWindow (12)
 	GemRB.SetVar ("FloatWindow", BiographyWindow.ID)
 
 	TextArea = Window.GetControl (0)
@@ -754,7 +754,7 @@ def OpenBiographyWindow ():
 def OpenExportWindow ():
 	global ExportWindow, NameField, ExportDoneButton
 
-	ExportWindow = GemRB.LoadWindowObject (13)
+	ExportWindow = GemRB.LoadWindow (13)
 
 	TextArea = ExportWindow.GetControl (2)
 	TextArea.SetText (10962)
@@ -811,7 +811,7 @@ def OpenCustomizeWindow ():
 	PortraitsTable = GemRB.LoadTable ("PICTURES")
 	ScriptsTable = GemRB.LoadTable ("SCRPDESC")
 	ColorTable = GemRB.LoadTable ("CLOWNCOL")
-	CustomizeWindow = GemRB.LoadWindowObject (17)
+	CustomizeWindow = GemRB.LoadWindow (17)
 
 	PortraitSelectButton = CustomizeWindow.GetControl (0)
 	PortraitSelectButton.SetText (11961)
@@ -881,7 +881,7 @@ def OpenSoundWindow ():
 	global VoiceList
 	global Gender
 
-	SubCustomizeWindow = GemRB.LoadWindowObject (20)
+	SubCustomizeWindow = GemRB.LoadWindow (20)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
 	VoiceList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
@@ -944,7 +944,7 @@ def OpenColorWindow ():
 	MajorColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
 	SkinColor = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
 	HairColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-	SubCustomizeWindow = GemRB.LoadWindowObject (21)
+	SubCustomizeWindow = GemRB.LoadWindow (21)
 
 	PortraitButton = SubCustomizeWindow.GetControl (0)
 	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -1032,7 +1032,7 @@ def OpenColorPicker ():
 	global SubSubCustomizeWindow
 	#global Selected
 
-	SubSubCustomizeWindow = GemRB.LoadWindowObject (22)
+	SubSubCustomizeWindow = GemRB.LoadWindow (22)
 
 	GemRB.SetVar ("Selected",-1)
 	for i in range (1,35):
@@ -1084,7 +1084,7 @@ def OpenScriptWindow ():
 	global SubCustomizeWindow
 	global ScriptTextArea, SelectedTextArea
 
-	SubCustomizeWindow = GemRB.LoadWindowObject (11)
+	SubCustomizeWindow = GemRB.LoadWindow (11)
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
 	ScriptTextArea.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
@@ -1156,7 +1156,7 @@ def OpenBiographyEditWindow ():
 	if BioStrRef != 33347:
 		Changed = 1
 
-	SubCustomizeWindow = GemRB.LoadWindowObject (51)
+	SubCustomizeWindow = GemRB.LoadWindow (51)
 
 	ClearButton = SubCustomizeWindow.GetControl (5)
 	ClearButton.SetText (34881)
@@ -1231,7 +1231,7 @@ def CloseSubSubCustomizeWindow ():
 def OpenPortraitSelectWindow ():
 	global CharGenWindow, PortraitWindow, PortraitPictureButton 
 
-	PortraitWindow = GemRB.LoadWindowObject (18)
+	PortraitWindow = GemRB.LoadWindow (18)
 
 	PortraitPictureButton = PortraitWindow.GetControl (0)
 	PortraitPictureButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -1322,7 +1322,7 @@ def OpenCustomPortraitWindow ():
 	global PortraitList1, PortraitList2
 	global RowCount1, RowCount2
 
-	CustomPortraitWindow = GemRB.LoadWindowObject (19)
+	CustomPortraitWindow = GemRB.LoadWindow (19)
 
 	CustomPortraitDoneButton = CustomPortraitWindow.GetControl (10)
 	CustomPortraitDoneButton.SetState (IE_GUI_BUTTON_DISABLED)

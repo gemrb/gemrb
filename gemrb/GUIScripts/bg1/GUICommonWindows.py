@@ -430,7 +430,7 @@ def RunSelectionChangeHandler ():
 def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
-	PortraitWindow = Window = GemRB.LoadWindowObject (1)
+	PortraitWindow = Window = GemRB.LoadWindow (1)
 
 	if needcontrols:
 		#Button=Window.GetControl (8)
@@ -682,7 +682,7 @@ def OpenWaitForDiscWindow ():
 		pass
 
 	GemRB.LoadWindowPack ("GUIID")
-	DiscWindow = Window = GemRB.LoadWindowObject (0)
+	DiscWindow = Window = GemRB.LoadWindow (0)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	label = DiscWindow.GetControl (0)
 

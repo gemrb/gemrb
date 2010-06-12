@@ -30,7 +30,7 @@ def OnLoad():
 	global SubRacesTable
 	
 	GemRB.LoadWindowPack("GUICG", 800, 600)
-	RaceWindow = GemRB.LoadWindowObject(54)
+	RaceWindow = GemRB.LoadWindow(54)
 
 	RaceCount = RaceTable.GetRowCount()
 	

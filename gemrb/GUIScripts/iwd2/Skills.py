@@ -151,7 +151,7 @@ def OnLoad():
 	GemRB.SetToken("number",str(PointsLeft) )
 
 	GemRB.LoadWindowPack("GUICG", 800 ,600)
-	SkillWindow = GemRB.LoadWindowObject(6)
+	SkillWindow = GemRB.LoadWindow(6)
 
 	for i in range(10):
 		Button = SkillWindow.GetControl(i+93)

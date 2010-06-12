@@ -54,8 +54,8 @@ def OnLoad():
 	GUICommonWindows.ActionsWindow = None
 	GUICommonWindows.OptionsWindow = None
  
-	ActionsWindow = GemRB.LoadWindowObject(3)
-	OptionsWindow = GemRB.LoadWindowObject(0)
+	ActionsWindow = GemRB.LoadWindow(3)
+	OptionsWindow = GemRB.LoadWindow(0)
 	PortraitWindow = OpenPortraitWindow(1)
 
 	GemRB.SetVar("PortraitWindow", PortraitWindow.ID)
@@ -105,7 +105,7 @@ def UpdateControlStatus():
 	GemRB.LoadWindowPack(GetWindowPack())
 
 	if Expand == GS_MEDIUMDIALOG:
-		TMessageWindow = GemRB.LoadWindowObject(12)
+		TMessageWindow = GemRB.LoadWindow(12)
 		TMessageTA = TMessageWindow.GetControl(1)
 		ExpandButton = TMessageWindow.GetControl(0)
 		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
@@ -113,13 +113,13 @@ def UpdateControlStatus():
 		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 
 	elif Expand == GS_LARGEDIALOG:
-		TMessageWindow = GemRB.LoadWindowObject(7)
+		TMessageWindow = GemRB.LoadWindow(7)
 		TMessageTA = TMessageWindow.GetControl(1)
 		ContractButton = TMessageWindow.GetControl(0)
 		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 
 	else:
-		TMessageWindow = GemRB.LoadWindowObject(4)
+		TMessageWindow = GemRB.LoadWindow(4)
 		TMessageTA = TMessageWindow.GetControl(3)		
 		ExpandButton = TMessageWindow.GetControl(2)
 		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")

@@ -78,11 +78,11 @@ def OpenRecordsWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIREC")
-	RecordsWindow = Window = GemRB.LoadWindowObject (2)
+	RecordsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 	# saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenRecordsWindow")
 	OptionsWindow.SetFrame ()
 
@@ -584,7 +584,7 @@ def OpenInformationWindow ():
 
 		return
 
-	InformationWindow = Window = GemRB.LoadWindowObject (4)
+	InformationWindow = Window = GemRB.LoadWindow (4)
 
 	# Biography
 	Button = Window.GetControl (26)
@@ -715,7 +715,7 @@ def OpenBiographyWindow ():
 	if BiographyWindow != None:
 		return
 
-	BiographyWindow = Window = GemRB.LoadWindowObject (12)
+	BiographyWindow = Window = GemRB.LoadWindow (12)
 	GemRB.SetVar ("FloatWindow", BiographyWindow.ID)
 
 	TextArea = Window.GetControl (0)
@@ -742,7 +742,7 @@ def CloseBiographyWindow ():
 def OpenExportWindow ():
 	global ExportWindow, NameField, ExportDoneButton
 
-	ExportWindow = GemRB.LoadWindowObject (13)
+	ExportWindow = GemRB.LoadWindow (13)
 
 	TextArea = ExportWindow.GetControl (2)
 	TextArea.SetText (10962)
@@ -799,7 +799,7 @@ def OpenCustomizeWindow ():
 	PortraitsTable = GemRB.LoadTable ("PICTURES")
 	ScriptsTable = GemRB.LoadTable ("SCRPDESC")
 	ColorTable = GemRB.LoadTable ("CLOWNCOL")
-	CustomizeWindow = GemRB.LoadWindowObject (17)
+	CustomizeWindow = GemRB.LoadWindow (17)
 
 	PortraitSelectButton = CustomizeWindow.GetControl (0)
 	PortraitSelectButton.SetText (11961)
@@ -870,7 +870,7 @@ def OpenPortraitSelectWindow ():
 	global PortraitButton
 	global Gender, LastPortrait
 
-	SubCustomizeWindow = GemRB.LoadWindowObject (18)
+	SubCustomizeWindow = GemRB.LoadWindow (18)
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Gender = GemRB.GetPlayerStat (pc, IE_SEX, 1)
 	PortraitName = GemRB.GetPlayerPortrait (pc, 0)
@@ -952,7 +952,7 @@ def OpenCustomPortraitWindow ():
 	global PortraitList1, PortraitList2
 	global RowCount1, RowCount2
 
-	SubSubCustomizeWindow = GemRB.LoadWindowObject (19)
+	SubSubCustomizeWindow = GemRB.LoadWindow (19)
 
 	SmallPortraitButton = SubSubCustomizeWindow.GetControl (1)
 	SmallPortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -1049,7 +1049,7 @@ def OpenSoundWindow ():
 	global VoiceList
 	global Gender
 
-	SubCustomizeWindow = GemRB.LoadWindowObject (20)
+	SubCustomizeWindow = GemRB.LoadWindow (20)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
 	VoiceList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
@@ -1109,7 +1109,7 @@ def OpenColorWindow ():
 	MajorColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
 	SkinColor = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
 	HairColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-	SubCustomizeWindow = GemRB.LoadWindowObject (21)
+	SubCustomizeWindow = GemRB.LoadWindow (21)
 
 	PortraitButton = SubCustomizeWindow.GetControl (0)
 	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -1197,7 +1197,7 @@ def OpenColorPicker ():
 	global SubSubCustomizeWindow
 	#global Selected
 
-	SubSubCustomizeWindow = GemRB.LoadWindowObject (22)
+	SubSubCustomizeWindow = GemRB.LoadWindow (22)
 
 	GemRB.SetVar ("Selected",-1)
 	for i in range (1,35):
@@ -1249,7 +1249,7 @@ def OpenScriptWindow ():
 	global SubCustomizeWindow
 	global ScriptTextArea, SelectedTextArea
 
-	SubCustomizeWindow = GemRB.LoadWindowObject (11)
+	SubCustomizeWindow = GemRB.LoadWindow (11)
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
 	ScriptTextArea.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
@@ -1321,7 +1321,7 @@ def OpenBiographyEditWindow ():
 	if BioStrRef != 33347:
 		Changed = 1
 
-	SubCustomizeWindow = GemRB.LoadWindowObject (23)
+	SubCustomizeWindow = GemRB.LoadWindow (23)
 
 	ClearButton = SubCustomizeWindow.GetControl (5)
 	ClearButton.SetText (34881)

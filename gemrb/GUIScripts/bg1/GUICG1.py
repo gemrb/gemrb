@@ -37,7 +37,7 @@ def OnLoad():
 	
 	GemRB.LoadWindowPack("GUICG")
 	
-	GenderWindow = GemRB.LoadWindowObject(1)
+	GenderWindow = GemRB.LoadWindow(1)
 
 	BackButton = GenderWindow.GetControl(6)
 	BackButton.SetText(15416)

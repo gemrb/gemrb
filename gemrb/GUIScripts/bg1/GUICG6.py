@@ -46,7 +46,7 @@ def OnLoad():
 		return
 
 	GemRB.LoadWindowPack("GUICG")
-	SkillWindow = GemRB.LoadWindowObject(6)
+	SkillWindow = GemRB.LoadWindow(6)
 
 	MyChar = GemRB.GetVar ("Slot")
 

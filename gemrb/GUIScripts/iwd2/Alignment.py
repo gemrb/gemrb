@@ -36,7 +36,7 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	AlignmentTable = GemRB.LoadTable("aligns")
-	AlignmentWindow = GemRB.LoadWindowObject(3)
+	AlignmentWindow = GemRB.LoadWindow(3)
 	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)

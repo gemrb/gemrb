@@ -76,7 +76,7 @@ def OpenStoreWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the game control screen
 	
 	GemRB.LoadWindowPack ("GUISTORE")
-	StoreWindow = Window = GemRB.LoadWindowObject (3)
+	StoreWindow = Window = GemRB.LoadWindow (3)
 	Window.SetVisible (WINDOW_VISIBLE)
 
 	Store = GemRB.GetStore ()
@@ -167,7 +167,7 @@ def OpenStoreShoppingWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	StoreShoppingWindow = Window = GemRB.LoadWindowObject (4)
+	StoreShoppingWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	# title ...
@@ -216,7 +216,7 @@ def OpenStoreIdentifyWindow ():
 		GemRB.UnhideGUI ()
 		return
 	
-	StoreIdentifyWindow = Window = GemRB.LoadWindowObject (5)
+	StoreIdentifyWindow = Window = GemRB.LoadWindow (5)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	# title ...
@@ -252,7 +252,7 @@ def OpenStoreStealWindow ():
 		GemRB.UnhideGUI ()
 		return
 	
-	StoreStealWindow = Window = GemRB.LoadWindowObject (7)
+	StoreStealWindow = Window = GemRB.LoadWindow (7)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	# title ...
@@ -280,7 +280,7 @@ def OpenStoreDonateWindow ():
 		GemRB.UnhideGUI ()
 		return
 	
-	StoreDonateWindow = Window = GemRB.LoadWindowObject (10)
+	StoreDonateWindow = Window = GemRB.LoadWindow (10)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	# title ...
@@ -312,7 +312,7 @@ def OpenStoreHealWindow ():
 		GemRB.UnhideGUI ()
 		return
 	
-	StoreHealWindow = Window = GemRB.LoadWindowObject (6)
+	StoreHealWindow = Window = GemRB.LoadWindow (6)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	# title ...
@@ -351,7 +351,7 @@ def OpenStoreRumourWindow ():
 		GemRB.UnhideGUI ()
 		return
 	
-	StoreRumourWindow = Window = GemRB.LoadWindowObject (9)
+	StoreRumourWindow = Window = GemRB.LoadWindow (9)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	
 	# title ...
@@ -377,7 +377,7 @@ def OpenStoreRentWindow ():
 		GemRB.UnhideGUI ()
 		return
 	
-	StoreRentWindow = Window = GemRB.LoadWindowObject (8)
+	StoreRentWindow = Window = GemRB.LoadWindow (8)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	# title ...

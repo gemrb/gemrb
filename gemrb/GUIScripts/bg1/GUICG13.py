@@ -60,7 +60,7 @@ def OnLoad():
 	global HairColor, SkinColor, MinorColor, MajorColor
 	
 	GemRB.LoadWindowPack("GUICG")
-	ColorWindow=GemRB.LoadWindowObject(13)
+	ColorWindow=GemRB.LoadWindow(13)
 	CloseOtherWindow (ColorWindow.Unload)
 
 	ColorTable = GemRB.LoadTable("clowncol")
@@ -148,7 +148,7 @@ def DonePress():
 def GetColor():
 	global ColorPicker
 
-	ColorPicker=GemRB.LoadWindowObject(14)
+	ColorPicker=GemRB.LoadWindow(14)
 	GemRB.SetVar("Selected",-1)
 	for i in range(34):
 		Button = ColorPicker.GetControl(i)

@@ -47,7 +47,7 @@ def OnLoad():
 		return
 
 	GemRB.LoadWindowPack("GUICG")
-	AppearanceWindow = GemRB.LoadWindowObject (11)
+	AppearanceWindow = GemRB.LoadWindow (11)
 	
 	#Load the Gender
 	MyChar = GemRB.GetVar ("Slot")
@@ -191,7 +191,7 @@ def CustomPress():
 	global RowCount1, RowCount2
 	global CustomWindow
 
-	CustomWindow = Window = GemRB.LoadWindowObject (18)
+	CustomWindow = Window = GemRB.LoadWindow (18)
 	PortraitList1 = Window.GetControl (2)
 	RowCount1 = PortraitList1.GetPortraits (0)
 	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "LargeCustomPortrait")

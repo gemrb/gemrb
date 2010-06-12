@@ -94,11 +94,11 @@ def OpenOptionsWindow ():
 	SetSelectionChangeHandler (DummyWindow)
 
 	GemRB.LoadWindowPack ("GUIOPT", 640, 480)
-	GameOptionsWindow = Window = GemRB.LoadWindowObject (2)
+	GameOptionsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", GameOptionsWindow.ID)
 	if OldOptionsWindow == None:
 		OldOptionsWindow = OptionsWindow
-		OptionsWindow = GemRB.LoadWindowObject (0)
+		OptionsWindow = GemRB.LoadWindow (0)
 		SetupMenuWindowControls (OptionsWindow, 0, "OpenOptionsWindow")
 		OptionsWindow.SetFrame ()
 
@@ -166,7 +166,7 @@ def OpenVideoOptionsWindow ():
 			SubOptionsWindow.Unload()
 		SubOptionsWindow = None 
 
-	SubOptionsWindow = Window = GemRB.LoadWindowObject (6)
+	SubOptionsWindow = Window = GemRB.LoadWindow (6)
 
 	HelpTextArea = OptHelpText ('VideoOptions', Window, 33, 18038)
 
@@ -236,7 +236,7 @@ def OpenAudioOptionsWindow ():
 			SubOptionsWindow.Unload ()
 		SubOptionsWindow = None 
 
-	SubOptionsWindow = Window = GemRB.LoadWindowObject (7)
+	SubOptionsWindow = Window = GemRB.LoadWindow (7)
 
 	HelpTextArea = OptHelpText ('AudioOptions', Window, 14, 18040)
 
@@ -296,7 +296,7 @@ def OpenCharacterSoundsWindow ():
 			SubSubOptionsWindow.Unload ()
 		SubSubOptionsWindow = None
 
-	SubSubOptionsWindow = Window = GemRB.LoadWindowObject (12)
+	SubSubOptionsWindow = Window = GemRB.LoadWindow (12)
 
 	HelpTextArea2 = OptHelpText ('CharacterSounds', Window, 16, 18041)
 
@@ -333,7 +333,7 @@ def OpenGameplayOptionsWindow ():
 			SubOptionsWindow.Unload ()
 		SubOptionsWindow = None 
 
-	SubOptionsWindow = Window = GemRB.LoadWindowObject (8)
+	SubOptionsWindow = Window = GemRB.LoadWindow (8)
 
 	HelpTextArea = OptHelpText ('GameplayOptions', Window, 40, 18042)
 
@@ -404,7 +404,7 @@ def OpenFeedbackOptionsWindow ():
 			SubSubOptionsWindow.Unload ()
 		SubSubOptionsWindow = None 
 
-	SubSubOptionsWindow = Window = GemRB.LoadWindowObject (9)
+	SubSubOptionsWindow = Window = GemRB.LoadWindow (9)
 
 	HelpTextArea2 = OptHelpText ('FeedbackOptions', Window, 28, 18043)
 
@@ -466,7 +466,7 @@ def OpenAutopauseOptionsWindow ():
 			SubSubOptionsWindow.Unload ()
 		SubSubOptionsWindow = None 
 
-	SubSubOptionsWindow = Window = GemRB.LoadWindowObject (10)
+	SubSubOptionsWindow = Window = GemRB.LoadWindow (10)
 
 	HelpTextArea2 = OptHelpText ('AutopauseOptions', Window, 15, 18044)
 
@@ -526,7 +526,7 @@ def OpenLoadMsgWindow ():
 	if LoadMsgWindow:
 		return
 
-	LoadMsgWindow = Window = GemRB.LoadWindowObject (4)
+	LoadMsgWindow = Window = GemRB.LoadWindow (4)
 
 	# Load
 	Button = Window.GetControl (0)
@@ -595,7 +595,7 @@ def OpenQuitMsgWindow ():
 	if QuitMsgWindow:
 		return
 
-	QuitMsgWindow = Window = GemRB.LoadWindowObject (5)
+	QuitMsgWindow = Window = GemRB.LoadWindow (5)
 
 	# Save
 	Button = Window.GetControl (0)

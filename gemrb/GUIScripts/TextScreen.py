@@ -64,7 +64,7 @@ def StartTextScreen ():
 		GemRB.LoadMusicPL ("chapter.mus")
 	#else: TODO: what about bg2?
 
-	TextScreen = GemRB.LoadWindowObject (ID)
+	TextScreen = GemRB.LoadWindow (ID)
 	TextScreen.SetFrame ()
 
 	TextArea = TextScreen.GetControl (2)

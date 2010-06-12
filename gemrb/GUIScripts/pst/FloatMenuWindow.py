@@ -98,7 +98,7 @@ def OpenFloatMenuWindow ():
 	GemRB.GamePause (True, 0)
 
 	GemRB.LoadWindowPack ("GUIWORLD")
-	FloatMenuWindow = Window = GemRB.LoadWindowObject (3)
+	FloatMenuWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("FloatWindow", Window.ID)
 
 	x, y = GemRB.GetVar ("MenuX"), GemRB.GetVar ("MenuY")

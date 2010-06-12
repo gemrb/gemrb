@@ -138,11 +138,11 @@ def OpenStoreWindow ():
 
 	GemRB.SetVar ("Action", 0)
 	GemRB.LoadWindowPack ("GUISTORE", 640, 480)
-	StoreWindow = Window = GemRB.LoadWindowObject (3)
+	StoreWindow = Window = GemRB.LoadWindow (3)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	#PortraitWindow = OpenPortraitWindow (0)
-	ActionWindow = GemRB.LoadWindowObject (0)
+	ActionWindow = GemRB.LoadWindow (0)
 	#this window is static and grey, but good to stick the frame onto
 	ActionWindow.SetFrame ()
 
@@ -189,7 +189,7 @@ def OpenStoreShoppingWindow ():
 
 	CloseWindows()
 
-	StoreShoppingWindow = Window = GemRB.LoadWindowObject (2)
+	StoreShoppingWindow = Window = GemRB.LoadWindow (2)
 
 	if Inventory:
 		# Title
@@ -278,7 +278,7 @@ def OpenStoreIdentifyWindow ():
 	GemRB.SetVar ("TopIndex", 0)
 	CloseWindows()
 
-	StoreIdentifyWindow = Window = GemRB.LoadWindowObject (4)
+	StoreIdentifyWindow = Window = GemRB.LoadWindow (4)
 
 	# Identify
 	Button = Window.GetControl (5)
@@ -315,7 +315,7 @@ def OpenStoreStealWindow ():
 	GemRB.SetVar ("LeftIndex", 0)
 	CloseWindows()
 
-	StoreStealWindow = Window = GemRB.LoadWindowObject (6)
+	StoreStealWindow = Window = GemRB.LoadWindow (6)
 
 	for i in range (4):
 		Button = Window.GetControl (i+4)
@@ -356,7 +356,7 @@ def OpenStoreDonateWindow ():
 
 	CloseWindows ()
 
-	StoreDonateWindow = Window = GemRB.LoadWindowObject (9)
+	StoreDonateWindow = Window = GemRB.LoadWindow (9)
 
 	# graphics
 	Button = Window.GetControl (10)
@@ -394,7 +394,7 @@ def OpenStoreHealWindow ():
 	GemRB.SetVar ("TopIndex", 0)
 	CloseWindows()
 
-	StoreHealWindow = Window = GemRB.LoadWindowObject (5)
+	StoreHealWindow = Window = GemRB.LoadWindow (5)
 
 	#spell buttons
 	for i in range (4):
@@ -432,7 +432,7 @@ def OpenStoreRumourWindow ():
 	GemRB.SetVar ("TopIndex", 0)
 	CloseWindows()
 
-	StoreRumourWindow = Window = GemRB.LoadWindowObject (8)
+	StoreRumourWindow = Window = GemRB.LoadWindow (8)
 
 	#removing those pesky labels
 	for i in range (5):
@@ -465,7 +465,7 @@ def OpenStoreRentWindow ():
 
 	CloseWindows()
 
-	StoreRentWindow = Window = GemRB.LoadWindowObject (7)
+	StoreRentWindow = Window = GemRB.LoadWindow (7)
 
 	# room types
 	RentIndex = -1
@@ -909,7 +909,7 @@ def InfoWindow (Slot, Item):
 
 	Identify = Slot['Flags'] & IE_INV_ITEM_IDENTIFIED
 
-	MessageWindow = Window = GemRB.LoadWindowObject (12)
+	MessageWindow = Window = GemRB.LoadWindow (12)
 
 	#fake label
 	Label = Window.GetControl (0x10000000)
@@ -1164,7 +1164,7 @@ def InfoHealWindow ():
 	Cure = GemRB.GetStoreCure (Index)
 	Spell = GemRB.GetSpell (Cure['CureResRef'])
 
-	MessageWindow = Window = GemRB.LoadWindowObject (14)
+	MessageWindow = Window = GemRB.LoadWindow (14)
 
 	Label = Window.GetControl (0x10000000)
 	Label.SetText (Spell['SpellName'])
@@ -1299,7 +1299,7 @@ def RentRoom ():
 		ErrorWindow (11051)
 		return
 
-	RentConfirmWindow = Window = GemRB.LoadWindowObject (11)
+	RentConfirmWindow = Window = GemRB.LoadWindow (11)
 	#confirm
 	Button = Window.GetControl (0)
 	Button.SetText (17199)
@@ -1385,7 +1385,7 @@ def CloseStoreRentWindow ():
 def ErrorWindow (strref):
 	global MessageWindow
 
-	MessageWindow = Window = GemRB.LoadWindowObject (10)
+	MessageWindow = Window = GemRB.LoadWindow (10)
 
 	TextArea = Window.GetControl (3)
 	TextArea.SetText (strref)

@@ -419,7 +419,7 @@ def RunSelectionChangeHandler ():
 def OpenPortraitWindow ():
 	global PortraitWindow
 
-	PortraitWindow = Window = GemRB.LoadWindowObject (1)
+	PortraitWindow = Window = GemRB.LoadWindow (1)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Inventory = GemRB.GetVar ("Inventory")

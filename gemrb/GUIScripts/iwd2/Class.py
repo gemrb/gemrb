@@ -59,7 +59,7 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	#this replaces help02.2da for class restrictions
 	ClassCount = ClassTable.GetRowCount()+1
-	ClassWindow = GemRB.LoadWindowObject(2)
+	ClassWindow = GemRB.LoadWindow(2)
 	rid = RaceTable.FindValue(3, GemRB.GetVar('BaseRace'))
 	RaceName = RaceTable.GetRowName(rid)
 

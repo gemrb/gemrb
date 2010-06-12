@@ -25,7 +25,7 @@ TextAreaControl = 0
 def OnLoad():
 	global GraphicsWindow, TextAreaControl
 	GemRB.LoadWindowPack("GUIOPT", 800, 600)
-	GraphicsWindow = GemRB.LoadWindowObject(6)
+	GraphicsWindow = GemRB.LoadWindow(6)
 	GraphicsWindow.SetFrame( )
 	
 	TextAreaControl = GraphicsWindow.GetControl(33)

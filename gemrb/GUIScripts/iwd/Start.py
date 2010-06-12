@@ -63,7 +63,7 @@ def OnLoad ():
 	GemRB.LoadWindowPack("GUICONN", 640, 480)
 
 #main window
-	StartWindow = GemRB.LoadWindowObject (0)
+	StartWindow = GemRB.LoadWindow (0)
 	StartWindow.SetFrame ()
 	ProtocolButton = StartWindow.GetControl (0x00)
 	CreateGameButton = StartWindow.GetControl (0x02)
@@ -106,7 +106,7 @@ def OnLoad ():
 def ProtocolPress ():
 	global StartWindow, ProtocolWindow
 	StartWindow.SetVisible (WINDOW_INVISIBLE)
-	ProtocolWindow = GemRB.LoadWindowObject (1)
+	ProtocolWindow = GemRB.LoadWindow (1)
 	
 	#Disabling Unused Buttons in this Window
 	Button = ProtocolWindow.GetControl (2)
@@ -173,7 +173,7 @@ def CreatePress ():
 	if not HasHOW():
 		GameTypeReallyDonePress()
 
-	GameTypeWindow = GemRB.LoadWindowObject (24)
+	GameTypeWindow = GemRB.LoadWindow (24)
 
 	CancelButton = GameTypeWindow.GetControl (1)
 	CancelButton.SetText (13727)
@@ -224,7 +224,7 @@ def GameTypeDonePress():
 	if ExpansionGame == 0: #start in Easthaven
 		GameTypeReallyDonePress()
 	elif ExpansionGame == 1: #show a warning message first
-		GameType2Window = GemRB.LoadWindowObject (25)
+		GameType2Window = GemRB.LoadWindow (25)
 
 		TextArea = GameType2Window.GetControl(0)
 		TextArea.SetText(26318)
@@ -289,7 +289,7 @@ def MoviesPress ():
 def QuitPress ():
 	global StartWindow, QuitWindow
 	StartWindow.SetVisible (WINDOW_INVISIBLE)
-	QuitWindow = GemRB.LoadWindowObject (22)
+	QuitWindow = GemRB.LoadWindow (22)
 	CancelButton = QuitWindow.GetControl (2)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "QuitCancelPress")

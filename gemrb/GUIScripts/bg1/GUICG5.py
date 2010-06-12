@@ -37,7 +37,7 @@ def OnLoad():
 		return
 	
 	GemRB.LoadWindowPack("GUICG")
-	NameWindow = GemRB.LoadWindowObject(5)
+	NameWindow = GemRB.LoadWindow(5)
 
 	BackButton = NameWindow.GetControl(3)
 	BackButton.SetText(15416)

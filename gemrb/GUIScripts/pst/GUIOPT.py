@@ -81,7 +81,7 @@ def OpenOptionsWindow ():
 		
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIOPT")
-	OptionsWindow = Window = GemRB.LoadWindowObject (0)
+	OptionsWindow = Window = GemRB.LoadWindow (0)
 	GemRB.SetVar ("OtherWindow", OptionsWindow.ID)
 	DisableAnimatedWindows ()
 	
@@ -157,7 +157,7 @@ def OpenVideoOptionsWindow ():
 		return
 
 	
-	VideoOptionsWindow = Window = GemRB.LoadWindowObject (1)
+	VideoOptionsWindow = Window = GemRB.LoadWindow (1)
 	GemRB.SetVar ("FloatWindow", VideoOptionsWindow.ID)
 
 
@@ -227,7 +227,7 @@ def OpenAudioOptionsWindow ():
 		return
 
 	
-	AudioOptionsWindow = Window = GemRB.LoadWindowObject (5)
+	AudioOptionsWindow = Window = GemRB.LoadWindow (5)
 	GemRB.SetVar ("FloatWindow", AudioOptionsWindow.ID)
 	
 
@@ -311,7 +311,7 @@ def OpenGameplayOptionsWindow ():
 		return
 
 	
-	GameplayOptionsWindow = Window = GemRB.LoadWindowObject (6)
+	GameplayOptionsWindow = Window = GemRB.LoadWindow (6)
 	GemRB.SetVar ("FloatWindow", GameplayOptionsWindow.ID)
 	
 
@@ -397,7 +397,7 @@ def OpenFeedbackOptionsWindow ():
 		return
 
 	
-	FeedbackOptionsWindow = Window = GemRB.LoadWindowObject (8)
+	FeedbackOptionsWindow = Window = GemRB.LoadWindow (8)
 	GemRB.SetVar ("FloatWindow", FeedbackOptionsWindow.ID)
 
 
@@ -468,7 +468,7 @@ def OpenAutopauseOptionsWindow ():
 		return
 
 	
-	AutopauseOptionsWindow = Window = GemRB.LoadWindowObject (9)
+	AutopauseOptionsWindow = Window = GemRB.LoadWindow (9)
 	GemRB.SetVar ("FloatWindow", AutopauseOptionsWindow.ID)
 
 
@@ -552,7 +552,7 @@ def OpenLoadMsgWindow ():
 		GemRB.UnhideGUI ()
 		return
 		
-	LoadMsgWindow = Window = GemRB.LoadWindowObject (3)
+	LoadMsgWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("FloatWindow", LoadMsgWindow.ID)
 	
 	# Load
@@ -596,7 +596,7 @@ def OpenQuitMsgWindow ():
 		#GemRB.UnhideGUI ()
 		return
 		
-	QuitMsgWindow = Window = GemRB.LoadWindowObject (4)
+	QuitMsgWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("FloatWindow", QuitMsgWindow.ID)
 	
 	# Save
@@ -675,7 +675,7 @@ def OpenKeyboardMappingsWindow ():
 		return
 		
 	GemRB.LoadWindowPack ("GUIKEYS")
-	KeysWindow = Window = GemRB.LoadWindowObject (0)
+	KeysWindow = Window = GemRB.LoadWindow (0)
 	GemRB.SetVar ("OtherWindow", KeysWindow.ID)
 
 
@@ -786,7 +786,7 @@ def OpenMoviesWindow ():
 		
 	GemRB.LoadWindowPack ("GUIMOVIE")
 	# FIXME: clean the window to black
-	MoviesWindow = Window = GemRB.LoadWindowObject (0)
+	MoviesWindow = Window = GemRB.LoadWindow (0)
 	GemRB.SetVar ("FloatWindow", MoviesWindow.ID)
 
 

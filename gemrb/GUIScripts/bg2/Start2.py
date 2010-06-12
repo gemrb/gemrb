@@ -38,7 +38,7 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("START", 640, 480)
 #tutorial subwindow
-	TutorialWindow = GemRB.LoadWindowObject (5)
+	TutorialWindow = GemRB.LoadWindow (5)
 	TextAreaControl = TutorialWindow.GetControl (1)
 	CancelButton = TutorialWindow.GetControl (11)
 	PlayButton = TutorialWindow.GetControl (10)
@@ -50,7 +50,7 @@ def OnLoad():
 	PlayButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 #quit subwindow
-	QuitWindow = GemRB.LoadWindowObject (3)
+	QuitWindow = GemRB.LoadWindow (3)
 	QuitTextArea = QuitWindow.GetControl (0)
 	CancelButton = QuitWindow.GetControl (2)
 	ConfirmButton = QuitWindow.GetControl (1)
@@ -62,7 +62,7 @@ def OnLoad():
 	ConfirmButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 #main window
-	StartWindow = GemRB.LoadWindowObject (0)
+	StartWindow = GemRB.LoadWindow (0)
 	StartWindow.SetFrame ()
 	#this is the ToB specific part of Start.py
 	if GemRB.GetVar("oldgame")==1:

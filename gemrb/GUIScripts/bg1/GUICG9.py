@@ -40,7 +40,7 @@ def OnLoad():
 	global SkillWindow, DoneButton
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	SkillWindow = GemRB.LoadWindowObject(9)
+	SkillWindow = GemRB.LoadWindow(9)
 
 	CloseOtherWindow(SkillWindow.Unload)
 

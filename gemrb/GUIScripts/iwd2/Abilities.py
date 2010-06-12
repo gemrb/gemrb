@@ -116,7 +116,7 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG", 800 ,600)
 	AbilityTable = GemRB.LoadTable("ability")
-	AbilityWindow = GemRB.LoadWindowObject(4)
+	AbilityWindow = GemRB.LoadWindow(4)
 
 	RollPress()
 	for i in range(0,6):

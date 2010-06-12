@@ -29,7 +29,7 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG", 800,  600)
 	#this hack will redraw the base CG window
-	SoundWindow = GemRB.LoadWindowObject(19)
+	SoundWindow = GemRB.LoadWindow(19)
 	GemRB.SetVar("Sound",0)  #scrapping the sound value
 
 	BackButton = SoundWindow.GetControl(10)

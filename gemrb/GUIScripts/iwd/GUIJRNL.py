@@ -68,11 +68,11 @@ def OpenJournalWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIJRNL", 640, 480)
-	JournalWindow = Window = GemRB.LoadWindowObject (2)
+	JournalWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenJournalWindow")
 	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow

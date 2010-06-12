@@ -24,7 +24,7 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUIOPT", 640, 480)
 	
-	AutoPauseWindow = GemRB.LoadWindowObject(10)
+	AutoPauseWindow = GemRB.LoadWindow(10)
 	TextAreaControl = AutoPauseWindow.GetControl(15)
 
 	ChHitButton = AutoPauseWindow.GetControl(17)

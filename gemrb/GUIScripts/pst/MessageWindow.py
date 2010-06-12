@@ -55,9 +55,9 @@ def OnLoad():
 	GemRB.GameSetProtagonistMode(0)
 	GemRB.LoadWindowPack (GetWindowPack())
 	GemRB.SetInfoTextColor(0,255,0,255)
-	ActionsWindow = GemRB.LoadWindowObject(0)
-	OptionsWindow = GemRB.LoadWindowObject(2)
-	MessageWindow = GemRB.LoadWindowObject(7)
+	ActionsWindow = GemRB.LoadWindow(0)
+	OptionsWindow = GemRB.LoadWindow(2)
+	MessageWindow = GemRB.LoadWindow(7)
 	PortraitWindow = OpenPortraitWindow (1)
 
 	MessageTA = MessageWindow.GetControl (1)

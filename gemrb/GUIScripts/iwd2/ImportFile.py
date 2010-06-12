@@ -31,13 +31,13 @@ def OnLoad():
 	global ImportWindow, TextAreaControl, DoneButton
 
 	GemRB.LoadWindowPack("GUICG", 800, 600)
-	MainWindow = GemRB.LoadWindowObject(0)
+	MainWindow = GemRB.LoadWindow(0)
 	MainWindow.SetFrame()
 
 	PortraitButton = MainWindow.GetControl (12)
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 
-	ImportWindow = GemRB.LoadWindowObject(20)
+	ImportWindow = GemRB.LoadWindow(20)
 
 	TextAreaControl = ImportWindow.GetControl(4)
 	TextAreaControl.SetText(10963)

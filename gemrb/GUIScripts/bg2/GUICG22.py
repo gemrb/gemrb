@@ -55,7 +55,7 @@ def OnLoad():
 
 	#there is a specialist mage window, but it is easier to use
 	#the class kit window for both
-	KitWindow = GemRB.LoadWindowObject(22)
+	KitWindow = GemRB.LoadWindow(22)
 	if ClassID == 1:
 		Label = KitWindow.GetControl(0xfffffff)
 		Label.SetText(595)

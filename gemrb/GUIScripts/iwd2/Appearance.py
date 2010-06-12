@@ -57,7 +57,7 @@ def OnLoad():
 	global Color1, Color2, Color3, Color4, PDollResRef
 	
 	GemRB.LoadWindowPack("GUICG", 800, 600)
-	ColorWindow=GemRB.LoadWindowObject(13)
+	ColorWindow=GemRB.LoadWindow(13)
 
 	Race = RaceTable.FindValue (3, GemRB.GetVar ("Race") )
 	HairTable = GemRB.LoadTable(RaceTable.GetValue(Race, 5))
@@ -170,7 +170,7 @@ def CancelPress():
 def GetColor():
 	global ColorPicker, ColorIndex, PickedColor
 
-	ColorPicker=GemRB.LoadWindowObject(14)
+	ColorPicker=GemRB.LoadWindow(14)
 	GemRB.SetVar("Selected",-1)
 	for i in range(33):
 		Button = ColorPicker.GetControl(i)

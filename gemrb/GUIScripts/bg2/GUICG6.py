@@ -37,7 +37,7 @@ def OnLoad():
 	global SkillWindow, DoneButton, MyChar
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	SkillWindow = GemRB.LoadWindowObject(6)
+	SkillWindow = GemRB.LoadWindow(6)
 	MyChar = GemRB.GetVar ("Slot")
 
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), \

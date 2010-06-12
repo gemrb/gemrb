@@ -77,7 +77,7 @@ def OpenInventoryWindow ():
 
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIINV")
-	InventoryWindow = Window = GemRB.LoadWindowObject (3)
+	InventoryWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
 	GemRB.SetVar ("MessageLabel", Window.GetControl(0x1000003d).ID)
 
@@ -430,7 +430,7 @@ def OpenItemAmountWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
+	ItemAmountWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("FloatWindow", ItemAmountWindow.ID)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -583,7 +583,7 @@ def IdentifyItemWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	ItemIdentifyWindow = Window = GemRB.LoadWindowObject (9)
+	ItemIdentifyWindow = Window = GemRB.LoadWindow (9)
 
 	# how would you like to identify ....
 	Text = Window.GetControl (3)
@@ -622,7 +622,7 @@ def DisplayItem (itemresref, type):
 	global ItemInfoWindow
 
 	item = GemRB.GetItem (itemresref)
-	ItemInfoWindow = Window = GemRB.LoadWindowObject (5)
+	ItemInfoWindow = Window = GemRB.LoadWindow (5)
 
 	# Done
 	Button = Window.GetControl (4)

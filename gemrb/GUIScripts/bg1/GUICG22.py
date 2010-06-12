@@ -51,7 +51,7 @@ def OnLoad():
 	SchoolList = GemRB.LoadTable("magesch")
 
 	#there is only a specialist mage window for bg1
-	KitWindow = GemRB.LoadWindowObject(12)
+	KitWindow = GemRB.LoadWindow(12)
 
 	for i in range(8):
 		Button = KitWindow.GetControl(i+2)

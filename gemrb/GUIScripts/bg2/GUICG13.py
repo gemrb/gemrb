@@ -62,7 +62,7 @@ def OnLoad():
 	global MyChar
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ColorWindow=GemRB.LoadWindowObject(13)
+	ColorWindow=GemRB.LoadWindow(13)
 
 	MyChar = GemRB.GetVar ("Slot")
 	ColorTable = GemRB.LoadTable("clowncol")
@@ -150,7 +150,7 @@ def DonePress():
 def GetColor():
 	global ColorPicker
 
-	ColorPicker=GemRB.LoadWindowObject(14)
+	ColorPicker=GemRB.LoadWindow(14)
 	GemRB.SetVar("Selected",-1)
 	for i in range(34):
 		Button = ColorPicker.GetControl(i)

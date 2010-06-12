@@ -66,13 +66,13 @@ def OpenInventoryWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIINV", 800, 600)
-	InventoryWindow = Window = GemRB.LoadWindowObject (2)
+	InventoryWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow ()
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenInventoryWindow")
 	Window.SetFrame ()
 
@@ -227,7 +227,7 @@ def GetColor():
 
 	ColorTable = GemRB.LoadTable ("clowncol")
 	InventoryWindow.SetVisible (WINDOW_GRAYED) #darken it
-	ColorPicker=GemRB.LoadWindowObject (3)
+	ColorPicker=GemRB.LoadWindow (3)
 	GemRB.SetVar ("Selected",-1)
 	Button = ColorPicker.GetControl (35)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CancelColor")
@@ -482,7 +482,7 @@ def OpenItemAmountWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
+	ItemAmountWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("FloatWindow", ItemAmountWindow.ID)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -607,7 +607,7 @@ def IdentifyItemWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	ItemIdentifyWindow = Window = GemRB.LoadWindowObject (9)
+	ItemIdentifyWindow = Window = GemRB.LoadWindow (9)
 	Button = Window.GetControl (0)
 	Button.SetText (17105)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "IdentifyUseSpell")
@@ -631,7 +631,7 @@ def DisplayItem (itemresref, type):
 	global ItemInfoWindow
 
 	item = GemRB.GetItem (itemresref)
-	ItemInfoWindow = Window = GemRB.LoadWindowObject (5)
+	ItemInfoWindow = Window = GemRB.LoadWindow (5)
 
 	#item icon
 	Button = Window.GetControl (2)

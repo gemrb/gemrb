@@ -49,7 +49,7 @@ def OpenMageWindow ():
 		
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIMG")
-	MageWindow = Window = GemRB.LoadWindowObject (3)
+	MageWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("OtherWindow", MageWindow.ID)
 	
 	Button = Window.GetControl (0)
@@ -170,7 +170,7 @@ def OpenMageSpellInfoWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	MageSpellInfoWindow = Window = GemRB.LoadWindowObject (4)
+	MageSpellInfoWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("FloatWindow", MageSpellInfoWindow.ID)
 
 	Button = Window.GetControl (4)
@@ -231,7 +231,7 @@ def OpenMageSpellUnmemorizeWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindowObject (6)
+	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
 	GemRB.SetVar ("FloatWindow", MageSpellUnmemorizeWindow.ID)
 
 	# "Are you sure you want to ....?"

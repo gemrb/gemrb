@@ -46,7 +46,7 @@ def OpenSaveWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUISAVE", 640, 480)
-	Window = SaveWindow = GemRB.LoadWindowObject (0)
+	Window = SaveWindow = GemRB.LoadWindow (0)
 	Window.SetFrame ()
 	CancelButton=Window.GetControl (34)
 	CancelButton.SetText (13727)
@@ -163,7 +163,7 @@ def SavePress():
 	global ConfirmWindow, NameField, SaveButton
 
 	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
-	ConfirmWindow = GemRB.LoadWindowObject (1)
+	ConfirmWindow = GemRB.LoadWindow (1)
 
 	#slot name
 	if Pos<len(Games):
@@ -250,7 +250,7 @@ def DeleteGamePress():
 	global ConfirmWindow
 
 	SaveWindow.SetVisible (WINDOW_INVISIBLE)
-	ConfirmWindow=GemRB.LoadWindowObject (2)
+	ConfirmWindow=GemRB.LoadWindow (2)
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (15305)
 	DeleteButton=ConfirmWindow.GetControl (1)

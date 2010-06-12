@@ -69,7 +69,7 @@ def OpenContainerWindow ():
 	hideflag = GemRB.HideGUI ()
 
 	GemRB.LoadWindowPack (GetWindowPack())
-	ContainerWindow = Window = GemRB.LoadWindowObject (8)
+	ContainerWindow = Window = GemRB.LoadWindow (8)
 	DisableAnimatedWindows ()
 	GemRB.SetVar ("ActionsWindow", Window.ID)
 
@@ -272,7 +272,7 @@ def OpenReformPartyWindow ():
 
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack (GetWindowPack())
-	ReformPartyWindow = Window = GemRB.LoadWindowObject (24)
+	ReformPartyWindow = Window = GemRB.LoadWindow (24)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	DisableAnimatedWindows ()
 
@@ -308,7 +308,7 @@ def OpenFormationWindow ():
 
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack (GetWindowPack())
-	FormationWindow = Window = GemRB.LoadWindowObject (27)
+	FormationWindow = Window = GemRB.LoadWindow (27)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	DisableAnimatedWindows ()
 

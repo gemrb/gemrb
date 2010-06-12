@@ -29,7 +29,7 @@ def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton, MyChar
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	RaceWindow = GemRB.LoadWindowObject(8)
+	RaceWindow = GemRB.LoadWindow(8)
 
 	MyChar = GemRB.GetVar ("Slot")
 	RaceCount = RaceTable.GetRowCount()

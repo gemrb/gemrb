@@ -34,7 +34,7 @@ def OnLoad ():
 	global LoadWindow, TextAreaControl, Games, ScrollBar
 
 	GemRB.LoadWindowPack ("GUILOAD")
-	LoadWindow = GemRB.LoadWindowObject (0)
+	LoadWindow = GemRB.LoadWindow (0)
 	CancelButton=LoadWindow.GetControl (46)
 	CancelButton.SetText (4196)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
@@ -156,7 +156,7 @@ def DeleteGamePress ():
 	global ConfirmWindow
 
 	LoadWindow.SetVisible (WINDOW_INVISIBLE)
-	ConfirmWindow=GemRB.LoadWindowObject (1)
+	ConfirmWindow=GemRB.LoadWindow (1)
 
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (28639)

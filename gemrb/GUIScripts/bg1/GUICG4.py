@@ -141,7 +141,7 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	AbilityTable = GemRB.LoadTable("ability")
-	AbilityWindow = GemRB.LoadWindowObject(4)
+	AbilityWindow = GemRB.LoadWindow(4)
 
 	RerollButton = AbilityWindow.GetControl(2)
 	RerollButton.SetText(11982)

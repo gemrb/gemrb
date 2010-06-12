@@ -8,7 +8,7 @@ Description: Returns a Window. You must call LoadWindowPack before using this co
 
 Parameters: a window ID, see the .chu file specification
 
-Return value: a window index
+Return value: GWindow
 
 See also: LoadWindowPack, GetControl, SetVisible, ShowModal, accessing_gui_controls
 

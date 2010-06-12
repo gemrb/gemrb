@@ -58,10 +58,10 @@ DiscWindow = None
 def OpenCommonWindows ():
 	global TimeWindow, PortWindow, MenuWindow, MainWindow
 
-	TimeWindow = GemRB.LoadWindowObject (0)
-	PortWindow = GemRB.LoadWindowObject (1)
-	MenuWindow = GemRB.LoadWindowObject (2)
-	MainWindow = GemRB.LoadWindowObject (3)
+	TimeWindow = GemRB.LoadWindow (0)
+	PortWindow = GemRB.LoadWindow (1)
+	MenuWindow = GemRB.LoadWindow (2)
+	MainWindow = GemRB.LoadWindow (3)
 
 	Window = MenuWindow
 
@@ -277,7 +277,7 @@ portrait_hp_numeric = [0, 0, 0, 0, 0, 0]
 def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
-	PortraitWindow = Window = GemRB.LoadWindowObject (1)
+	PortraitWindow = Window = GemRB.LoadWindow (1)
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
@@ -542,7 +542,7 @@ def OpenWaitForDiscWindow ():
 		pass
 
 	GemRB.LoadWindowPack ("GUIID")
-	DiscWindow = Window = GemRB.LoadWindowObject (0)
+	DiscWindow = Window = GemRB.LoadWindow (0)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	label = DiscWindow.GetControl (0)
 
@@ -583,7 +583,7 @@ def SetPSTGamedaysAndHourToken ():
 	GemRB.SetToken ('CLOCK_AMPM', ampm)
 
 def UpdateClock():
-	ActionsWindow = GemRB.LoadWindowObject(0)
+	ActionsWindow = GemRB.LoadWindow(0)
 	Button = ActionsWindow.GetControl (0)
 	SetPSTGamedaysAndHourToken ()
 	Button.SetTooltip (65027)

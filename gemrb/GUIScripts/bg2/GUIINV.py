@@ -92,11 +92,11 @@ def OpenInventoryWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIINV", 640, 480)
-	InventoryWindow = Window = GemRB.LoadWindowObject (2)
+	InventoryWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
 	GemRB.SetVar ("MessageLabel", Window.GetControl (0x1000003f).ID )
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	MarkMenuButton (OptionsWindow)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenInventoryWindow")
 	OptionsWindow.SetFrame ()
@@ -219,7 +219,7 @@ def GetColor ():
 
 	ColorTable = GemRB.LoadTable ("clowncol")
 	InventoryWindow.SetVisible (WINDOW_GRAYED) #darken it
-	ColorPicker=GemRB.LoadWindowObject (3)
+	ColorPicker=GemRB.LoadWindow (3)
 	GemRB.SetVar ("Selected",-1)
 	for i in range (34):
 		Button = ColorPicker.GetControl (i)
@@ -599,7 +599,7 @@ def OpenItemAmountWindow ():
 		UpdateSlot (pc, slot-1)
 		return
 
-	ItemAmountWindow = Window = GemRB.LoadWindowObject (4)
+	ItemAmountWindow = Window = GemRB.LoadWindow (4)
 	# item icon
 	Icon = Window.GetControl (0)
 	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -659,7 +659,7 @@ def OpenErrorWindow (strref):
 	global ErrorWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	ErrorWindow = Window = GemRB.LoadWindowObject (7)
+	ErrorWindow = Window = GemRB.LoadWindow (7)
 	Button = Window.GetControl (0)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseErrorWindow")
@@ -782,7 +782,7 @@ def IdentifyItemWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	ItemIdentifyWindow = Window = GemRB.LoadWindowObject (9)
+	ItemIdentifyWindow = Window = GemRB.LoadWindow (9)
 	Button = Window.GetControl (0)
 	Button.SetText (17105)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "IdentifyUseSpell")
@@ -823,7 +823,7 @@ def CloseAbilitiesItemWindow ():
 def AbilitiesItemWindow ():
 	global ItemAbilitiesWindow
 
-	ItemAbilitiesWindow = Window = GemRB.LoadWindowObject (6)
+	ItemAbilitiesWindow = Window = GemRB.LoadWindow (6)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
@@ -872,7 +872,7 @@ def DisplayItem (itemresref, type):
 	global ItemInfoWindow
 
 	item = GemRB.GetItem (itemresref)
-	ItemInfoWindow = Window = GemRB.LoadWindowObject (5)
+	ItemInfoWindow = Window = GemRB.LoadWindow (5)
 
 	#item icon
 	Button = Window.GetControl (2)

@@ -66,13 +66,13 @@ def OpenSpellBookWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUISPL", 800, 600)
-	SpellBookWindow = Window = GemRB.LoadWindowObject (2)
+	SpellBookWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", SpellBookWindow.ID)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow ()
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenSpellBookWindow")
 	Window.SetFrame ()
 
@@ -232,7 +232,7 @@ def OpenSpellBookSpellInfoWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	SpellBookSpellInfoWindow = Window = GemRB.LoadWindowObject (3)
+	SpellBookSpellInfoWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("FloatWindow", SpellBookSpellInfoWindow.ID)
 
 	#back
@@ -294,7 +294,7 @@ def OpenSpellBookSpellRemoveWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindowObject (5)
+	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
 	GemRB.SetVar ("FloatWindow", SpellBookSpellUnmemorizeWindow.ID)
 
 	# "Are you sure you want to ....?"
@@ -331,7 +331,7 @@ def OpenSpellBookSpellUnmemorizeWindow ():
 		GemRB.UnhideGUI ()
 		return
 
-	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindowObject (5)
+	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
 	GemRB.SetVar ("FloatWindow", SpellBookSpellUnmemorizeWindow.ID)
 
 	# "Are you sure you want to ....?"

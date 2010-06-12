@@ -44,7 +44,7 @@ def OnLoad():
 	GemRB.GameSetProtagonistMode(2)
 	GemRB.SetDefaultActions(1,14,16,17)
 	GemRB.LoadWindowPack(GetWindowPack())
-	OptionsWindow = MessageWindow = GemRB.LoadWindowObject(0)
+	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)
 	ActionsWindow = PortraitWindow = OpenPortraitWindow()
 
 	GemRB.SetVar ("MessageWindow", MessageWindow.ID)
@@ -85,11 +85,11 @@ def UpdateControlStatus():
 	hideflag = GemRB.HideGUI()
 	if Expand == GS_LARGEDIALOG:
 		GemRB.SetVar ("PortraitWindow", -1)
-		TMessageWindow = GemRB.LoadWindowObject(7)
+		TMessageWindow = GemRB.LoadWindow(7)
 		TMessageTA = TMessageWindow.GetControl (1)
 	else:
 		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
-		TMessageWindow = GemRB.LoadWindowObject(0)
+		TMessageWindow = GemRB.LoadWindow(0)
 		TMessageTA = TMessageWindow.GetControl (1)
 		SetupMenuWindowControls (TMessageWindow, 1, "ReturnToGame")
 

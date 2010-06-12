@@ -28,7 +28,7 @@ def OnLoad():
 	
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	#this hack will redraw the base CG window
-	GenderWindow = GemRB.LoadWindowObject(0)
+	GenderWindow = GemRB.LoadWindow(0)
 	GenderWindow.SetFrame( )
 	PortraitButton = GenderWindow.GetControl(12)
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -48,7 +48,7 @@ def OnLoad():
 	GemRB.DrawWindows()
 	if GenderWindow:
 		GenderWindow.Unload()
-	GenderWindow = GemRB.LoadWindowObject(1)
+	GenderWindow = GemRB.LoadWindow(1)
 
 	BackButton = GenderWindow.GetControl(6)
 	BackButton.SetText(15416)

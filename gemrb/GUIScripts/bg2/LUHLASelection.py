@@ -56,7 +56,7 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	HLACount = GemRB.GetVar ("HLACount")
 
 	# we use the same window as sorcerer spell selection
-	HLAWindow = GemRB.LoadWindowObject (8)
+	HLAWindow = GemRB.LoadWindow (8)
 
 	# get all our HLAs (stored in HLAAbilities)
 	GetHLAs ()

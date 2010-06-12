@@ -51,7 +51,7 @@ def DeathWindowEnd ():
 	GemRB.GamePause (1,1)
 
 	GemRB.LoadWindowPack (GetWindowPack())
-	Window = GemRB.LoadWindowObject (25)
+	Window = GemRB.LoadWindow (25)
 
 	#reason for death
 	Label = Window.GetControl (0x0fffffff)

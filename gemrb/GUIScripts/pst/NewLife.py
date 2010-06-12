@@ -65,11 +65,11 @@ def OnLoad():
 	StatTable = GemRB.LoadTable("abcomm")
 	GemRB.LoadWindowPack("GUICG")
 	#setting up confirmation window
-	QuitWindow = GemRB.LoadWindowObject(1)
+	QuitWindow = GemRB.LoadWindow(1)
 	QuitWindow.SetVisible(WINDOW_INVISIBLE)
 
 	#setting up CG window
-	NewLifeWindow = GemRB.LoadWindowObject(0)
+	NewLifeWindow = GemRB.LoadWindow(0)
 	
 	Str = 9
 	Dex = 9

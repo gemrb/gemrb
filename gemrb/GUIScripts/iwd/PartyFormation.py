@@ -33,7 +33,7 @@ def OnLoad ():
 	global PartyFormationWindow
 
 	GemRB.LoadWindowPack ("GUISP", 640, 480)
-	PartyFormationWindow = GemRB.LoadWindowObject (0)
+	PartyFormationWindow = GemRB.LoadWindow (0)
 	PartyFormationWindow.SetFrame ()
 
 	ModifyCharsButton = PartyFormationWindow.GetControl (43)
@@ -104,7 +104,7 @@ def CreateCharPress ():
 	global PartyFormationWindow, CreateCharWindow
 
 	PartyFormationWindow.SetVisible (WINDOW_INVISIBLE)
-	CreateCharWindow = GemRB.LoadWindowObject (3)
+	CreateCharWindow = GemRB.LoadWindow (3)
 
 	CreateButton = CreateCharWindow.GetControl (0)
 	CreateButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CreateCharCreatePress")
@@ -158,7 +158,7 @@ def ExitPress ():
 	global PartyFormationWindow, ExitWindow
 
 	PartyFormationWindow.SetVisible (WINDOW_INVISIBLE)
-	ExitWindow = GemRB.LoadWindowObject (7)
+	ExitWindow = GemRB.LoadWindow (7)
 
 	ExitButton = ExitWindow.GetControl (1)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExitExitPress")

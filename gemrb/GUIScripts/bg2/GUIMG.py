@@ -76,7 +76,7 @@ def OpenMageWindow ():
 
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	MarkMenuButton (OptionsWindow)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenMageWindow")
 	OptionsWindow.SetFrame ()
@@ -101,9 +101,9 @@ def SetupMageWindow ():
 		MageWindow = None
 
 	if BookType:
-		MageWindow = Window = GemRB.LoadWindowObject (8)
+		MageWindow = Window = GemRB.LoadWindow (8)
 	else:
-		MageWindow = Window = GemRB.LoadWindowObject (2)
+		MageWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", MageWindow.ID)
 
 	Button = Window.GetControl (1)
@@ -258,7 +258,7 @@ def OpenMageSpellInfoWindow ():
 		MageSpellInfoWindow = None
 		return
 
-	MageSpellInfoWindow = Window = GemRB.LoadWindowObject (3)
+	MageSpellInfoWindow = Window = GemRB.LoadWindow (3)
 
 	#back
 	Button = Window.GetControl (5)
@@ -316,7 +316,7 @@ def CloseMageSpellUnmemorizeWindow ():
 def OpenMageSpellRemoveWindow ():
 	global MageSpellUnmemorizeWindow
 
-	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindowObject (101)
+	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (101)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -340,7 +340,7 @@ def OpenMageSpellRemoveWindow ():
 def OpenMageSpellUnmemorizeWindow ():
 	global MageSpellUnmemorizeWindow
 
-	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindowObject (101)
+	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (101)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -445,7 +445,7 @@ def OpenSequencerWindow ():
 	GemRB.LoadWindowPack ("GUIMG", 640, 480)
 
 	#saving the original portrait window
-	OtherWindow = Window = GemRB.LoadWindowObject (6)
+	OtherWindow = Window = GemRB.LoadWindow (6)
 
 	Title = Window.GetControl (0x0fffffff)
 

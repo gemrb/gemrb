@@ -243,7 +243,7 @@ def OnLoad():
 	GemRB.SetToken("number",str(PointsLeft) )
 
 	GemRB.LoadWindowPack("GUICG", 800, 600)
-	FeatWindow = GemRB.LoadWindowObject(55)
+	FeatWindow = GemRB.LoadWindow(55)
 	for i in range(10):
 		Button = FeatWindow.GetControl(i+93)
 		Button.SetVarAssoc("Feat",i)

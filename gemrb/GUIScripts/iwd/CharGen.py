@@ -147,7 +147,7 @@ def OnLoad():
 	global GenderButton, RaceButton, ClassButton, AlignmentButton, AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
 
 	GemRB.LoadWindowPack ("GUICG", 640, 480)
-	CharGenWindow = GemRB.LoadWindowObject (0)
+	CharGenWindow = GemRB.LoadWindow (0)
 	CharGenWindow.SetFrame ()
 	CharGenState = 0
 
@@ -540,7 +540,7 @@ def GenderPress():
 	global CharGenWindow, GenderWindow, GenderDoneButton, GenderTextArea
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	GenderWindow = GemRB.LoadWindowObject (1)
+	GenderWindow = GemRB.LoadWindow (1)
 	GemRB.SetVar ("Gender", 0)
 
 	MaleButton = GenderWindow.GetControl (2)
@@ -610,7 +610,7 @@ def PortraitSelect():
 	global CharGenWindow, PortraitWindow, Portrait, PortraitPortraitButton, PortraitsTable
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	PortraitWindow = GemRB.LoadWindowObject (11)
+	PortraitWindow = GemRB.LoadWindow (11)
 
 	# this is not the correct one, but I don't know which is
 	PortraitsTable = GemRB.LoadTable ("PICTURES")
@@ -756,7 +756,7 @@ def PortraitCustomPress():
 	global RowCount1, RowCount2
 	global CustomWindow
 
-	CustomWindow = Window = GemRB.LoadWindowObject (18)
+	CustomWindow = Window = GemRB.LoadWindow (18)
 	PortraitList1 = Window.GetControl (2)
 	RowCount1 = PortraitList1.GetPortraits (0)
 	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "LargeCustomPortrait")
@@ -823,7 +823,7 @@ def RacePress():
 	global CharGenWindow, RaceWindow, RaceDoneButton, RaceTextArea
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	RaceWindow = GemRB.LoadWindowObject (8)
+	RaceWindow = GemRB.LoadWindow (8)
 	GemRB.SetVar ("Race", 0)
 
 	for i in range (2, 8):
@@ -891,7 +891,7 @@ def ClassPress():
 	global CharGenWindow, ClassWindow, KitTable, ClassTextArea, ClassDoneButton
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	ClassWindow = GemRB.LoadWindowObject (2)
+	ClassWindow = GemRB.LoadWindow (2)
 	KitTable = GemRB.LoadTable ("magesch")
 	ClassCount = ClassTable.GetRowCount ()
 	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
@@ -969,7 +969,7 @@ def ClassMultiPress():
 	global ClassWindow, ClassMultiWindow, ClassMultiTextArea, ClassMultiDoneButton
 
 	ClassWindow.SetVisible (WINDOW_INVISIBLE)
-	ClassMultiWindow = GemRB.LoadWindowObject (10)
+	ClassMultiWindow = GemRB.LoadWindow (10)
 	ClassCount = ClassTable.GetRowCount ()
 	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
 
@@ -1037,7 +1037,7 @@ def KitPress():
 	global ClassWindow, KitWindow, KitTextArea, KitDoneButton, KitTable
 
 	ClassWindow.SetVisible (WINDOW_INVISIBLE)
-	KitWindow = GemRB.LoadWindowObject (12)
+	KitWindow = GemRB.LoadWindow (12)
 
 	KitTable = GemRB.LoadTable ("magesch")
 	#only mage class has schools
@@ -1124,7 +1124,7 @@ def AlignmentPress():
 	global CharGenWindow, AlignmentWindow, AlignmentTable, AlignmentTextArea, AlignmentDoneButton
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	AlignmentWindow = GemRB.LoadWindowObject (3)
+	AlignmentWindow = GemRB.LoadWindow (3)
 	AlignmentTable = GemRB.LoadTable ("aligns")
 	ClassAlignmentTable = GemRB.LoadTable ("alignmnt")
 	ClassName = ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
@@ -1199,7 +1199,7 @@ def AbilitiesPress():
 
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	AbilitiesWindow = GemRB.LoadWindowObject (4)
+	AbilitiesWindow = GemRB.LoadWindow (4)
 	AbilitiesTable = GemRB.LoadTable ("ABILITY")
 	AbilitiesRaceAddTable = GemRB.LoadTable ("ABRACEAD")
 	AbilitiesRaceReqTable = GemRB.LoadTable ("ABRACERQ")
@@ -1486,7 +1486,7 @@ def SkillsSelect():
 	global CharGenWindow, SkillsWindow, SkillsTextArea, SkillsTable, SkillsDoneButton, SkillsPointsLeft
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	SkillsWindow = GemRB.LoadWindowObject (6)
+	SkillsWindow = GemRB.LoadWindow (6)
 	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
 	Dexterity = str(GemRB.GetVar ("Ability2") )
 	SkillsTable = GemRB.LoadTable ("SKILLS")
@@ -1609,7 +1609,7 @@ def RacialEnemySelect():
 	global CharGenWindow, RacialEnemyWindow, RacialEnemyTable, RacialEnemyTextArea, RacialEnemyDoneButton
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	RacialEnemyWindow = GemRB.LoadWindowObject (15)
+	RacialEnemyWindow = GemRB.LoadWindow (15)
 	RacialEnemyTable = GemRB.LoadTable ("haterace")
 	RacialEnemyCount = RacialEnemyTable.GetRowCount ()
 
@@ -1692,7 +1692,7 @@ def ProficienciesSelect():
 	global CharGenWindow, ProficienciesWindow, ProficienciesTable, ProficienciesTextArea, ProficienciesPointsLeft, ProficienciesDoneButton, ProfsMaxTable
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	ProficienciesWindow = GemRB.LoadWindowObject (9)
+	ProficienciesWindow = GemRB.LoadWindow (9)
 	ClassName = ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
 	ProficienciesTable = GemRB.LoadTable ("weapprof")
 	ProfsTable = GemRB.LoadTable ("profs")
@@ -1872,7 +1872,7 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	global CharGenWindow, MageSpellsWindow, MageSpellsTextArea, MageSpellsDoneButton, MageSpellsSelectPointsLeft, Learnable
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	MageSpellsWindow = GemRB.LoadWindowObject (7)
+	MageSpellsWindow = GemRB.LoadWindow (7)
 	#kit (school), alignment, level
 	k = GemRB.GetVar ("Class Kit")
 	t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
@@ -1990,7 +1990,7 @@ def MageSpellsMemorize(SpellTable, Level, SpellLevel):
 	global CharGenWindow, MageMemorizeWindow, MageMemorizeTextArea, MageMemorizeDoneButton, MageMemorizePointsLeft
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	MageMemorizeWindow = GemRB.LoadWindowObject (16)
+	MageMemorizeWindow = GemRB.LoadWindow (16)
 	MaxSpellsMageTable = GemRB.LoadTable (SpellTable)
 	MageSpellBook = GemRB.GetVar ("MageSpellBook")
 	GemRB.SetVar ("MageMemorized", 0)
@@ -2113,7 +2113,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 	global PriestMemorizeTextArea, PriestMemorizeDoneButton, PriestMemorizePointsLeft
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	PriestMemorizeWindow = GemRB.LoadWindowObject (17)
+	PriestMemorizeWindow = GemRB.LoadWindow (17)
 	t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
 	Learnable = GetLearnablePriestSpells( ClassFlag, t, SpellLevel)
 
@@ -2227,7 +2227,7 @@ def AppearancePress():
 	global HairColor, SkinColor, MajorColor, MinorColor
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	AppearanceWindow = GemRB.LoadWindowObject (13)
+	AppearanceWindow = GemRB.LoadWindow (13)
 	AppearanceTable = GemRB.LoadTable ("PORTCOLR")
 
 	if Portrait<0:
@@ -2330,7 +2330,7 @@ def AppearanceColorChoice (CurrentColor):
 	global AppearanceWindow, AppearanceColorWindow
 
 	AppearanceWindow.SetVisible (WINDOW_INVISIBLE)
-	AppearanceColorWindow = GemRB.LoadWindowObject (14)
+	AppearanceColorWindow = GemRB.LoadWindow (14)
 	AppearanceColorTable = GemRB.LoadTable ("clowncol")
 	ColorType = GemRB.GetVar ("ColorType")
 	GemRB.SetVar ("SelectedColor", CurrentColor)
@@ -2402,7 +2402,7 @@ def CharSoundSelect():
 	global CharSoundVoiceList
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	CharSoundWindow = GemRB.LoadWindowObject (19)
+	CharSoundWindow = GemRB.LoadWindow (19)
 	CharSoundTable = GemRB.LoadTable ("CHARSND")
 	CharSoundStrings = GemRB.LoadTable ("CHARSTR")
 
@@ -2471,7 +2471,7 @@ def BiographyPress():
 	global CharGenWindow, BiographyWindow, BiographyField
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	BiographyWindow = GemRB.LoadWindowObject (51)
+	BiographyWindow = GemRB.LoadWindow (51)
 
 	BiographyField = BiographyWindow.GetControl (4)
 	BiographyField.SetText (19423)
@@ -2525,7 +2525,7 @@ def NamePress():
 	global CharGenWindow, NameWindow, NameDoneButton, NameField
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	NameWindow = GemRB.LoadWindowObject (5)
+	NameWindow = GemRB.LoadWindow (5)
 
 	NameField = NameWindow.GetControl (2)
 	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, "NameEditChange")
@@ -2584,7 +2584,7 @@ def ImportPress():
 	global CharImportList
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
-	ImportWindow = GemRB.LoadWindowObject (20)
+	ImportWindow = GemRB.LoadWindow (20)
 
 	TextAreaControl = ImportWindow.GetControl(4)
 	TextAreaControl.SetText(10963)

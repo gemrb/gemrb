@@ -44,7 +44,7 @@ def OnLoad():
 	
 	GemRB.LoadWindowPack("GUICG")
 	ClassCount = ClassTable.GetRowCount()+1
-	ClassWindow = GemRB.LoadWindowObject(2)
+	ClassWindow = GemRB.LoadWindow(2)
 	RaceName = RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
 
 	#radiobutton groups must be set up before doing anything else to them

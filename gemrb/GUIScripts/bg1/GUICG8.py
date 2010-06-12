@@ -40,7 +40,7 @@ def OnLoad():
 	GemRB.SetVar("Race",0) 
 
 	GemRB.LoadWindowPack("GUICG")
-	RaceWindow = GemRB.LoadWindowObject(8)
+	RaceWindow = GemRB.LoadWindow(8)
 
 	RaceCount = RaceTable.GetRowCount()
 

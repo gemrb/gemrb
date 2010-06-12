@@ -51,7 +51,7 @@ def UpdateOverview(CurrentStep):
 	GlobalStep = CurrentStep
 	
 	GemRB.LoadWindowPack("GUICG", 800 ,600)
-	CharGenWindow = GemRB.LoadWindowObject(0)
+	CharGenWindow = GemRB.LoadWindow(0)
 	CharGenWindow.SetFrame()
 	PortraitButton = CharGenWindow.GetControl(12)
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -216,7 +216,7 @@ def UpdateOverview(CurrentStep):
 				if value > 1: AddText(': ' + str(value))
 
 	# Handle StartOverWindow
-	StartOverWindow = GemRB.LoadWindowObject(53)
+	StartOverWindow = GemRB.LoadWindow(53)
 	
 	YesButton = StartOverWindow.GetControl(0)
 	YesButton.SetText(13912)

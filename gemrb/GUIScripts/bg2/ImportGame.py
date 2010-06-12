@@ -26,7 +26,7 @@ def OnLoad():
 	global ImportWindow
 
 	GemRB.LoadWindowPack("GUICG",640,480)
-	ImportWindow = GemRB.LoadWindowObject(20)
+	ImportWindow = GemRB.LoadWindow(20)
 
 	TextAreaControl = ImportWindow.GetControl(4)
 	TextAreaControl.SetText(53774)

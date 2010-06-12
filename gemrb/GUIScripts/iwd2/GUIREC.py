@@ -71,13 +71,13 @@ def OpenRecordsWindow ():
 	GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIREC", 800, 600)
-	RecordsWindow = Window = GemRB.LoadWindowObject (2)
+	RecordsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow ()
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindowObject (0)
+	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenRecordsWindow")
 	Window.SetFrame ()
 
@@ -633,7 +633,7 @@ def CloseHelpWindow ():
 def OpenHelpWindow ():
 	global HelpTable, InformationWindow
 
-	InformationWindow = Window = GemRB.LoadWindowObject (57)
+	InformationWindow = Window = GemRB.LoadWindow (57)
 
 	HelpTable = GemRB.LoadTable ("topics")
 	GemRB.SetVar("Topic", 0)
@@ -749,7 +749,7 @@ def CloseBiographyWindow ():
 def OpenBiographyWindow ():
 	global BiographyWindow
 
-	BiographyWindow = Window = GemRB.LoadWindowObject (12)
+	BiographyWindow = Window = GemRB.LoadWindow (12)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -767,7 +767,7 @@ def OpenBiographyWindow ():
 def OpenExportWindow ():
 	global ExportWindow, NameField, ExportDoneButton
 
-	ExportWindow = GemRB.LoadWindowObject(13)
+	ExportWindow = GemRB.LoadWindow(13)
 
 	TextArea = ExportWindow.GetControl(2)
 	TextArea.SetText(10962)

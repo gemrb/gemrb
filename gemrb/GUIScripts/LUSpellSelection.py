@@ -85,7 +85,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 	# load our window
 	if chargen:
 		GemRB.LoadWindowPack("GUICG", 640, 480)
-		SpellsWindow = GemRB.LoadWindowObject (7)
+		SpellsWindow = GemRB.LoadWindow (7)
 		if not recommend:
 			CloseOtherWindow (SpellsWindow.Unload)
 		DoneButton = SpellsWindow.GetControl (0)
@@ -113,7 +113,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 			SpellsPickButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsPickPress")
 			SpellsPickButton.SetText(34210)
 	else:
-		SpellsWindow = GemRB.LoadWindowObject (8)
+		SpellsWindow = GemRB.LoadWindow (8)
 		DoneButton = SpellsWindow.GetControl (28)
 		SpellsTextArea = SpellsWindow.GetControl(26)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)

@@ -26,7 +26,7 @@ def OnLoad ():
 	global BioWindow, EditControl
 
 	GemRB.LoadWindowPack ("GUICG", 640, 480)
-	BioWindow = GemRB.LoadWindowObject (23)
+	BioWindow = GemRB.LoadWindow (23)
 
 	EditControl = BioWindow.GetControl (3)
 	BIO = GemRB.GetToken("BIO")

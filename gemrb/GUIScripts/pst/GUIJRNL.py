@@ -87,7 +87,7 @@ def OpenJournalWindow ():
 		
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIJRNL")
-	JournalWindow = GemRB.LoadWindowObject (0)
+	JournalWindow = GemRB.LoadWindow (0)
 	GemRB.SetVar ("OtherWindow", JournalWindow.ID)
 	DisableAnimatedWindows ()
 
@@ -132,7 +132,7 @@ def OpenQuestsWindow ():
 		GemRB.UnhideGUI()
 		return
 	
-	QuestsWindow = Window = GemRB.LoadWindowObject (1)
+	QuestsWindow = Window = GemRB.LoadWindow (1)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 	
 	# Assigned
@@ -301,7 +301,7 @@ def OpenBeastsWindow ():
 		GemRB.UnhideGUI()
 		return
 	
-	BeastsWindow = Window = GemRB.LoadWindowObject (2)
+	BeastsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", BeastsWindow.ID)
 
 	# PC
@@ -410,7 +410,7 @@ def OpenLogWindow ():
 		GemRB.UnhideGUI()
 		return
 	
-	LogWindow = Window = GemRB.LoadWindowObject (3)
+	LogWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	# Back

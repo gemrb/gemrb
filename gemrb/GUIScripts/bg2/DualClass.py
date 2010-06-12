@@ -72,7 +72,7 @@ def DualClassWindow ():
 	NewClassId = 0
 	
 	# set up our main window
-	DCMainWindow = GemRB.LoadWindowObject (5)
+	DCMainWindow = GemRB.LoadWindow (5)
 
 	# done button (off)
 	DCMainDoneButton = DCMainWindow.GetControl (2)
@@ -264,7 +264,7 @@ def DCMainClassPress ():
 	GemRB.SetVar ("DCClass", DCClass)
 
 	# open the window
-	DCClassWindow = GemRB.LoadWindowObject (6)
+	DCClassWindow = GemRB.LoadWindow (6)
 
 	# string refs for the given classes
 	DCClassStrings = []
@@ -427,7 +427,7 @@ def DCOpenProfsWindow ():
 	global DCProfsWindow, DCProfsDoneButton
 
 	# load up our window and set some basic variables
-	DCProfsWindow = GemRB.LoadWindowObject (15)
+	DCProfsWindow = GemRB.LoadWindow (15)
 	NewClassId = ClassTable.GetValue (ClassName, "ID", 1)
 	SetupProfsWindow (pc, LUPROFS_TYPE_DUALCLASS, DCProfsWindow, DCProfsRedraw, classid=NewClassId)
 
@@ -524,7 +524,7 @@ def OpenSkillsWindow ():
 
 	global DCSkillsWindow, DCSkillsDoneButton
 
-	DCSkillsWindow = GemRB.LoadWindowObject (7)
+	DCSkillsWindow = GemRB.LoadWindow (7)
 	SetupSkillsWindow (pc, LUSKILLS_TYPE_DUALCLASS, DCSkillsWindow, DCSkillsRedraw, classid=NewClassId)
 
 	#just go back if we can't assign skills

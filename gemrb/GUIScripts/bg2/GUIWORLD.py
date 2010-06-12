@@ -67,7 +67,7 @@ def OpenEndMessageWindow ():
 
 	if not ContinueWindow:
 		GemRB.LoadWindowPack (GetWindowPack())
-		ContinueWindow = Window = GemRB.LoadWindowObject (9)
+		ContinueWindow = Window = GemRB.LoadWindow (9)
 		OldActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
 		GemRB.SetVar ("ActionsWindow", Window.ID)
 
@@ -88,7 +88,7 @@ def OpenContinueMessageWindow ():
 
 	if not ContinueWindow:
 		GemRB.LoadWindowPack (GetWindowPack())
-		ContinueWindow = Window = GemRB.LoadWindowObject (9)
+		ContinueWindow = Window = GemRB.LoadWindow (9)
 		OldActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
 		GemRB.SetVar ("ActionsWindow", Window.ID)
 
@@ -202,7 +202,7 @@ def OpenContainerWindow ():
 	hideflag = GemRB.HideGUI ()
 
 	GemRB.LoadWindowPack (GetWindowPack())
-	ContainerWindow = Window = GemRB.LoadWindowObject (8)
+	ContainerWindow = Window = GemRB.LoadWindow (8)
 	OldActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
 	OldMessageWindow = GWindow( GemRB.GetVar ("MessageWindow") )
 	GemRB.SetVar ("ActionsWindow", Window.ID)
@@ -356,7 +356,7 @@ def RemovePlayer ():
 	GemRB.LoadWindowPack (GetWindowPack())
 	if ReformPartyWindow:
 		ReformPartyWindow.Unload ()
-	ReformPartyWindow = Window = GemRB.LoadWindowObject (25)
+	ReformPartyWindow = Window = GemRB.LoadWindow (25)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	#are you sure
@@ -420,7 +420,7 @@ def OpenReformPartyWindow ():
 		return
 
 	GemRB.LoadWindowPack (GetWindowPack())
-	ReformPartyWindow = Window = GemRB.LoadWindowObject (24)
+	ReformPartyWindow = Window = GemRB.LoadWindow (24)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
 	#PC portraits
@@ -465,7 +465,7 @@ def DeathWindowEnd ():
 	GemRB.GamePause (1,1)
 
 	GemRB.LoadWindowPack (GetWindowPack())
-	Window = GemRB.LoadWindowObject (17)
+	Window = GemRB.LoadWindow (17)
 
 	#reason for death
 	Label = Window.GetControl (0x0fffffff)

@@ -36,7 +36,7 @@ def OnLoad():
 		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
 	GemRB.LoadWindowPack("GUICONN", 800, 600)
 #main window
-	StartWindow = GemRB.LoadWindowObject(0)
+	StartWindow = GemRB.LoadWindow(0)
 	StartWindow.SetFrame ()
 	ProtocolButton = StartWindow.GetControl(0x00)
 	NewGameButton = StartWindow.GetControl(0x02)
@@ -99,7 +99,7 @@ def ProtocolPress():
 	global StartWindow, ProtocolWindow
 	#StartWindow.Unload()
 	StartWindow.SetVisible(WINDOW_INVISIBLE)
-	ProtocolWindow = GemRB.LoadWindowObject(1)
+	ProtocolWindow = GemRB.LoadWindow(1)
 
 	#Disabling Unused Buttons in this Window
 	Button = ProtocolWindow.GetControl(2)
@@ -183,7 +183,7 @@ def OptionsPress():
 def QuitPress():
 	global StartWindow, QuitWindow
 	StartWindow.SetVisible(WINDOW_INVISIBLE)
-	QuitWindow = GemRB.LoadWindowObject(22)
+	QuitWindow = GemRB.LoadWindow(22)
 	CancelButton = QuitWindow.GetControl(2)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "QuitCancelPress")
 	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)

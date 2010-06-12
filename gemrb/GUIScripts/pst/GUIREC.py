@@ -101,7 +101,7 @@ def OpenRecordsWindow ():
 
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIREC")
-	RecordsWindow = Window = GemRB.LoadWindowObject (3)
+	RecordsWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 
 
@@ -763,7 +763,7 @@ def OpenInformationWindow ():
 		GemRB.UnhideGUI()
 		return
 
-	InformationWindow = Window = GemRB.LoadWindowObject (5)
+	InformationWindow = Window = GemRB.LoadWindow (5)
 	GemRB.SetVar ("FloatWindow", InformationWindow.ID)
 
 
@@ -899,7 +899,7 @@ def OpenBiographyWindow ():
 		InformationWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
-	BiographyWindow = Window = GemRB.LoadWindowObject (12)
+	BiographyWindow = Window = GemRB.LoadWindow (12)
 	GemRB.SetVar ("FloatWindow", BiographyWindow.ID)
 
 	# These are used to get the bio
@@ -969,7 +969,7 @@ def OpenLevelUpWindow ():
 		GemRB.UnhideGUI()
 		return
 
-	LevelUpWindow = Window = GemRB.LoadWindowObject (4)
+	LevelUpWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("FloatWindow", LevelUpWindow.ID)
 
 	# Accept

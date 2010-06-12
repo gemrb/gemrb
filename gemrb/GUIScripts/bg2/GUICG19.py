@@ -33,7 +33,7 @@ def OnLoad():
 	global CharSoundWindow, VoiceList
 	
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	CharSoundWindow=GemRB.LoadWindowObject(19)
+	CharSoundWindow=GemRB.LoadWindow(19)
 
 	VoiceList = CharSoundWindow.GetControl (45)
 	VoiceList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)

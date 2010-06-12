@@ -44,7 +44,7 @@ def OnLoad():
 	GemRB.LoadWindowPack("START")
 
 	#quit subwindow
-	QuitWindow = GemRB.LoadWindowObject(3)
+	QuitWindow = GemRB.LoadWindow(3)
 	QuitTextArea = QuitWindow.GetControl(0)
 	CancelButton = QuitWindow.GetControl(2)
 	ConfirmButton = QuitWindow.GetControl(1)
@@ -57,7 +57,7 @@ def OnLoad():
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	#main window
-	StartWindow = GemRB.LoadWindowObject(0)
+	StartWindow = GemRB.LoadWindow(0)
 	SinglePlayerButton = StartWindow.GetControl(0)
 	MultiPlayerButton = StartWindow.GetControl(1)
 	MoviesButton = StartWindow.GetControl(2)

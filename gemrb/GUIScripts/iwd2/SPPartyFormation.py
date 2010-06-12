@@ -28,7 +28,7 @@ def OnLoad ():
 	global PartyFormationWindow
 	GemRB.LoadWindowPack ("GUISP", 800, 600)
 
-	PartyFormationWindow = GemRB.LoadWindowObject (0)
+	PartyFormationWindow = GemRB.LoadWindow (0)
 	PartyFormationWindow.SetFrame ( )
 	ExitButton = PartyFormationWindow.GetControl (30)
 	ExitButton.SetText (13906)
@@ -84,7 +84,7 @@ def OnLoad ():
 def ExitPress ():
 	global PartyFormationWindow, ExitWindow
 	PartyFormationWindow.SetVisible (WINDOW_INVISIBLE)
-	ExitWindow = GemRB.LoadWindowObject (7)
+	ExitWindow = GemRB.LoadWindow (7)
 
 	TextArea = ExitWindow.GetControl (0)
 	TextArea.SetText (11329)
