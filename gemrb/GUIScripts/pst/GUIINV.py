@@ -62,7 +62,7 @@ def OpenInventoryWindow ():
 	global AvSlotsTable
 	global InventoryWindow
 
-	AvSlotsTable = GemRB.LoadTableObject ('avslots')
+	AvSlotsTable = GemRB.LoadTable ('avslots')
 
 	if CloseOtherWindow (OpenInventoryWindow):
 		GemRB.HideGUI ()

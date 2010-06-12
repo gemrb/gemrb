@@ -134,7 +134,7 @@ def DualClassWindow ():
 	DCLabel.SetText (GetActorClassTitle (pc))
 
 	# get the names of the classes we can dual to
-	DualClassTable = GemRB.LoadTableObject ("dualclas")
+	DualClassTable = GemRB.LoadTable ("dualclas")
 	for i in range (DualClassTable.GetColumnCount ()):
 		DCClasses.append (DualClassTable.GetColumnName (i))
 
@@ -196,12 +196,12 @@ def DCMainDonePress ():
 	GemRB.SetPlayerStat (pc, IE_XP, 0)
 
 	# new thac0
-	ThacoTable = GemRB.LoadTableObject ("THAC0")
+	ThacoTable = GemRB.LoadTable ("THAC0")
 	GemRB.SetPlayerStat (pc, IE_TOHIT, ThacoTable.GetValue (NewClassId-1, 0, 1))
 
 	# new saves
 	SavesTable = ClassTable.GetValue (ClassTable.FindValue (5, NewClassId), 3, 0)
-	SavesTable = GemRB.LoadTableObject (SavesTable)
+	SavesTable = GemRB.LoadTable (SavesTable)
 	for i in range (5):
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+i, SavesTable.GetValue (i, 0))
 
@@ -380,8 +380,8 @@ def CanDualInto (index):
 		return 0
 
 	# make sure we aren't restricted by alignment
-	AlignmentTable = GemRB.LoadTableObject ("alignmnt")
-	AlignsTable = GemRB.LoadTableObject ("aligns")
+	AlignmentTable = GemRB.LoadTable ("alignmnt")
+	AlignsTable = GemRB.LoadTable ("aligns")
 	Alignment = GemRB.GetPlayerStat (pc, IE_ALIGNMENT) # our alignment
 	Alignment = AlignsTable.FindValue (3, Alignment)
 	Alignment = AlignsTable.GetValue (Alignment, 4) # convert the alignment
@@ -389,7 +389,7 @@ def CanDualInto (index):
 		return 0
 
 	# make sure we have the minimum stats required for the next class
-	StatTable = GemRB.LoadTableObject ("abdcdsrq")
+	StatTable = GemRB.LoadTable ("abdcdsrq")
 	ClassStatIndex = StatTable.GetRowIndex (DCClasses[index])
 	for stat in range (6): # loop through each stat
 		minimum = StatTable.GetValue (ClassStatIndex, stat)
@@ -477,19 +477,19 @@ def DCProfsDonePress ():
 		# we go 2,2 to get an extra spell
 		# TODO: add a mod to the function instead?
 		OpenSpellsWindow (pc, SpellTable, 2, 2, 0)
-		SpellTable = GemRB.LoadTableObject (SpellTable)
+		SpellTable = GemRB.LoadTable (SpellTable)
 		GemRB.SetMemorizableSpellsCount (pc, SpellTable.GetValue (0, 0), IE_SPELL_TYPE_WIZARD, 0)
 		NewMageSpells = 1
 	if ClericTable != "*":
 		print "Setting PriestMask"
 		# make sure we can cast spells at this level (paladins)
-		ClericTable = GemRB.LoadTableObject (ClericTable)
+		ClericTable = GemRB.LoadTable (ClericTable)
 		if ClericTable.GetRowName (0) == "1":
 			NewPriestMask = 0x4000
 	elif DruidTable != "*":
 		# make sure we can cast spells at this level (rangers)
 		if HasTOB ():
-			DruidTable = GemRB.LoadTableObject (DruidTable)
+			DruidTable = GemRB.LoadTable (DruidTable)
 			if DruidTable.GetRowName (0) == "1":
 				NewPriestMask = 0x8000
 		else:

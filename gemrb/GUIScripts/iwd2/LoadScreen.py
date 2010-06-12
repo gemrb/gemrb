@@ -40,7 +40,7 @@ def StartLoadScreen ():
 	Progress = 0
 	GemRB.SetVar ("Progress", Progress)
 
-	Table = GemRB.LoadTableObject ("loadhint")
+	Table = GemRB.LoadTable ("loadhint")
 	tmp = Table.GetRowCount ()
 	tmp = GemRB.Roll (1,tmp,0)
 	HintStr = Table.GetValue (tmp, 0)

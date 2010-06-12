@@ -37,7 +37,7 @@ def Init (PortraitGender):
 	global PortraitsTable, PortraitCount, Gender
 
 	if PortraitsTable is None:
-		PortraitsTable = GemRB.LoadTableObject ("PICTURES")
+		PortraitsTable = GemRB.LoadTable ("PICTURES")
 
 	PortraitCount = 0
 	Gender = PortraitGender

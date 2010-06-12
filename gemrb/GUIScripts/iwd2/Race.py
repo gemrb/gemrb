@@ -34,7 +34,7 @@ def OnLoad():
 
 	RaceCount = RaceTable.GetRowCount ()
 	
-	SubRacesTable = GemRB.LoadTableObject ("SUBRACES")
+	SubRacesTable = GemRB.LoadTable ("SUBRACES")
 
 	for i in range(2,9):
 		Button = RaceWindow.GetControl (i)

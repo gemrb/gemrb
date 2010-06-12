@@ -836,7 +836,7 @@ static PyObject* GemRB_Window_SetPos(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_LoadTable__doc,
-"LoadTable(2DAResRef, [ignore_error=0]) => TableIndex\n\n"
+"LoadTable(2DAResRef, [ignore_error=0]) => GTable\n\n"
 "Loads a 2DA Table." );
 
 static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
@@ -852,39 +852,8 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 	if (!noerror && ind == -1) {
 		return RuntimeError("Can't find resource");
 	}
-	return PyInt_FromLong( ind );
+	return gs->ConstructObject("Table", ind);
 }
-
-PyDoc_STRVAR( GemRB_LoadTableObject__doc,
-"LoadTableObject(2DAResRef, [ignore_error=0]) => GTable\n\n"
-"Loads a 2DA Table and returns it as an object." );
-
-static PyObject* GemRB_LoadTableObject(PyObject * self, PyObject* args)
-{
-	const char* tablename;
-	int noerror = 0;
-
-	if (!PyArg_ParseTuple( args, "s|i", &tablename, &noerror )) {
-		return AttributeError( GemRB_LoadTable__doc );
-	}
-
-	PyObject* table = GemRB_LoadTable(self, args);
-	if (!table || !PyObject_TypeCheck( table, &PyInt_Type ))
-		return table; // exception
-
-	PyObject* tabtuple = PyTuple_New(1);
-	PyTuple_SET_ITEM(tabtuple, 0, table);
-
-	PyObject* ret = gs->ConstructObject("Table", tabtuple);
-	Py_DECREF(tabtuple);
-	if (!ret) {
-		char buf[256];
-		snprintf( buf, sizeof( buf ), "Couldn't construct Table object for 2DA Table %s!", tablename );
-		return RuntimeError(buf);
-	}
-	return ret;
-}
-
 
 PyDoc_STRVAR( GemRB_Table_Unload__doc,
 "UnloadTable(TableIndex)\n\n"
@@ -9311,7 +9280,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(LoadMusicPL, METH_VARARGS),
 	METHOD(LoadSymbol, METH_VARARGS),
 	METHOD(LoadTable, METH_VARARGS),
-	METHOD(LoadTableObject, METH_VARARGS),
 	METHOD(LoadWindowPack, METH_VARARGS),
 	METHOD(LoadWindow, METH_VARARGS),
 	METHOD(LoadWindowObject, METH_VARARGS),

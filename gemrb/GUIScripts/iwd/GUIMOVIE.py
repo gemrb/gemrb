@@ -39,7 +39,7 @@ def OnLoad ():
 	PlayButton = MovieWindow.GetControl (2)
 	CreditsButton = MovieWindow.GetControl (3)
 	DoneButton = MovieWindow.GetControl (4)
-	MoviesTable = GemRB.LoadTableObject ("MOVIDESC")
+	MoviesTable = GemRB.LoadTable ("MOVIDESC")
 	for i in range (0, MoviesTable.GetRowCount () ):
 		t = MoviesTable.GetRowName (i)
 		if GemRB.GetVar(t)==1:

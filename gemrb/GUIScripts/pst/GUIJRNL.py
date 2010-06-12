@@ -63,7 +63,7 @@ def OpenJournalWindow ():
 	global JournalWindow, PortraitWindow, ActionsWindow
 	global StartTime
 
-	Table = GemRB.LoadTableObject("YEARS")
+	Table = GemRB.LoadTable("YEARS")
 	StartTime = Table.GetValue("STARTTIME", "VALUE")
 	
 	if CloseOtherWindow (OpenJournalWindow):

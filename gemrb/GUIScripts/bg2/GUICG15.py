@@ -61,7 +61,7 @@ def OnLoad():
 		return
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	RaceWindow = GemRB.LoadWindowObject(15)
-	RaceTable = GemRB.LoadTableObject(TableName)
+	RaceTable = GemRB.LoadTable(TableName)
 	RaceCount = RaceTable.GetRowCount()-LISTSIZE+1
 	if RaceCount<0:
 		RaceCount=0

@@ -129,7 +129,7 @@ def OpenLevelUpWindow():
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	print "Class:",Class,"\tActor Class:",actor.classid
 	ClassIndex = ClassTable.FindValue (5, Class)
-	SkillTable = GemRB.LoadTableObject("skills")
+	SkillTable = GemRB.LoadTable("skills")
 
 	# kit
 	ClassName = ClassTable.GetRowName(ClassIndex)
@@ -244,7 +244,7 @@ def OpenLevelUpWindow():
 			Specialist = 0
 			if KitListTable.GetValue (Kit, 7) == 1: # see if we're a kitted mage
 				Specialist = 1
-			MageTable = GemRB.LoadTableObject (MageTable)
+			MageTable = GemRB.LoadTable (MageTable)
 			# loop through each spell level and save the amount possible to cast (current)
 			for j in range (MageTable.GetColumnCount ()):
 				NewWSpells[j] = MageTable.GetValue (str(Level[i]), str(j+1), 1)
@@ -258,7 +258,7 @@ def OpenLevelUpWindow():
 			# check for cleric spells
 			if not GemRB.HasResource(ClericTable, RES_2DA, 1):
 				ClericTable = "MXSPLPRS" # iwd1 doesn't have a DRUIDSPELL column in the table
-			ClericTable = GemRB.LoadTableObject (ClericTable)
+			ClericTable = GemRB.LoadTable (ClericTable)
 			HaveCleric = 1
 			# same as above
 			for j in range (ClericTable.GetColumnCount ()):
@@ -273,7 +273,7 @@ def OpenLevelUpWindow():
 					DruidTable = "MXSPLPRS"
 
 				# check druid spells
-				DruidTable = GemRB.LoadTableObject (DruidTable)
+				DruidTable = GemRB.LoadTable (DruidTable)
 				# same as above
 				for j in range (DruidTable.GetColumnCount ()):
 					NewDSpells[j] = DruidTable.GetValue (str(Level[i]), str(j+1), 1)
@@ -303,7 +303,7 @@ def OpenLevelUpWindow():
 	# use total levels for HLAs
 	HLACount = 0
 	if HasTOB(): # make sure SoA doesn't try to get it
-		HLATable = GemRB.LoadTableObject("lunumab")
+		HLATable = GemRB.LoadTable("lunumab")
 		# we need to check each level against a multi value (this is kinda screwy)
 		if actor.multiclass:
 			print "Actor HLA Names:",["MULTI"+str(actor.NumClasses())+name \
@@ -449,7 +449,7 @@ def GetLevelUpNews():
 		#	at backstab multi x1, they are x1 too many at their respective levels.
 		if Classes[i] == 4 and GemRB.GetPlayerStat (pc, IE_BACKSTABDAMAGEMULTIPLIER, 1) > 1: # we have a thief who can backstab (2 at level 1)
 			# save the backstab multiplier if we have a thief
-			BackstabTable = GemRB.LoadTableObject ("BACKSTAB")
+			BackstabTable = GemRB.LoadTable ("BACKSTAB")
 			BackstabMult = BackstabTable.GetValue (0, Level[i])
 
 		# lay on hands
@@ -459,7 +459,7 @@ def GetLevelUpNews():
 			# the character should get the new value; LoH is defined in GA_SPCL211 if anyone wants to
 			# make a pally kit with LoH
 			if (HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
-				LOHTable = GemRB.LoadTableObject ("layhands")
+				LOHTable = GemRB.LoadTable ("layhands")
 				LOHGain = LOHTable.GetValue (0, Level[i]) - LOHTable.GetValue (0, Level[i]-LevelDiff[i])
 
 	# saving throws

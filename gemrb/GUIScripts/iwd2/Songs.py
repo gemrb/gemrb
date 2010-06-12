@@ -34,7 +34,7 @@ def OnLoad():
 	PlayButton = MovieWindow.GetControl(2)
 	CreditsButton = MovieWindow.GetControl(3)
 	DoneButton = MovieWindow.GetControl(4)
-	MoviesTable = GemRB.LoadTableObject("MUSIC")
+	MoviesTable = GemRB.LoadTable("MUSIC")
 	for i in range(0, MoviesTable.GetRowCount() ):
 			s = MoviesTable.GetRowName(i)
 			TextAreaControl.Append(s,-1)

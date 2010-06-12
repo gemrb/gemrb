@@ -173,7 +173,7 @@ def ColorDonePress():
 
 	if ColorPicker:
 		ColorPicker.Unload ()
-	ColorTable = GemRB.LoadTableObject ("clowncol")
+	ColorTable = GemRB.LoadTable ("clowncol")
 	PickedColor=ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
 	if ColorIndex==0:
 		SetColorStat (pc, IE_HAIR_COLOR, PickedColor)
@@ -225,7 +225,7 @@ def MinorPress():
 def GetColor():
 	global ColorPicker
 
-	ColorTable = GemRB.LoadTableObject ("clowncol")
+	ColorTable = GemRB.LoadTable ("clowncol")
 	InventoryWindow.SetVisible (WINDOW_GRAYED) #darken it
 	ColorPicker=GemRB.LoadWindowObject (3)
 	GemRB.SetVar ("Selected",-1)

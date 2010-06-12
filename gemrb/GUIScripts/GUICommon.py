@@ -155,11 +155,11 @@ def GearsClicked ():
 def GetMageSpells (Kit, Alignment, Level):
 	MageSpells = []
 	SpellType = 99
-	Table = GemRB.LoadTableObject ("aligns")
+	Table = GemRB.LoadTable ("aligns")
 	v = Table.FindValue (3, Alignment)
 	Usability = Kit | Table.GetValue(v, 5)
 
-	SpellsTable = GemRB.LoadTableObject ("spells")
+	SpellsTable = GemRB.LoadTable ("spells")
 	for i in range(SpellsTable.GetValue ("MAGE", str(Level), 1) ):
 		SpellName = "SPWI%d%02d"%(Level,i+1)
 		ms = GemRB.GetSpell (SpellName, 1)
@@ -193,12 +193,12 @@ def GetLearnableMageSpells (Kit, Alignment, Level):
 def GetLearnablePriestSpells (Class, Alignment, Level):
 	Learnable =[]
 
-	Table=GemRB.LoadTableObject("aligns")
+	Table=GemRB.LoadTable("aligns")
 	v = Table.FindValue(3, Alignment)
 	#usability is the bitset we look for
 	Usability=Table.GetValue(v, 5)
 
-	SpellsTable = GemRB.LoadTableObject ("spells")
+	SpellsTable = GemRB.LoadTable ("spells")
 	for i in range(SpellsTable.GetValue ("PRIEST", str (Level), 1) ):
 		SpellName = "SPPR%d%02d"%(Level,i+1)
 		ms = GemRB.GetSpell(SpellName, 1)
@@ -219,7 +219,7 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 			SetupSpellLevels (pc, "MXSPLPRS", Type, Level)
 		return
 
-	Table = GemRB.LoadTableObject (TableName)
+	Table = GemRB.LoadTable (TableName)
 	for i in range(Table.GetColumnCount ()):
 		# do a string lookup since some tables don't have entries for all levels
 		value = Table.GetValue (str(Level), str(i+1), 1)
@@ -240,7 +240,7 @@ def UnsetupSpellLevels (pc, TableName, Type, Level):
 			UnsetupSpellLevels (pc, "MXSPLPRS", Type, Level)
 		return
 
-	Table = GemRB.LoadTableObject (TableName)
+	Table = GemRB.LoadTable (TableName)
 	for i in range(Table.GetColumnCount ()):
 		GemRB.SetMemorizableSpellsCount (pc, 0, Type, i)
 	return
@@ -325,7 +325,7 @@ def HasSpell (Actor, SpellType, Level, Ref):
 
 # Adds class/kit abilities
 def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
-	TmpTable = GemRB.LoadTableObject (table)
+	TmpTable = GemRB.LoadTable (table)
 
 	# gotta stay positive
 	if Level-LevelDiff < 0:
@@ -370,7 +370,7 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 # remove all class abilities up to a give level
 # for dual-classing mainly
 def RemoveClassAbilities (pc, table, Level):
-	TmpTable = GemRB.LoadTableObject (table)
+	TmpTable = GemRB.LoadTable (table)
 
 	# gotta stay positive
 	if Level < 0:
@@ -811,8 +811,8 @@ def CanDualClass(actor):
 	if Dual[0] > 0:
 		return 1
 
-	DualClassTable = GemRB.LoadTableObject ("dualclas")
-	CurrentStatTable = GemRB.LoadTableObject ("abdcscrq")
+	DualClassTable = GemRB.LoadTable ("dualclas")
+	CurrentStatTable = GemRB.LoadTable ("abdcscrq")
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	ClassIndex = ClassTable.FindValue (5, Class)
 	ClassName = ClassTable.GetRowName (ClassIndex)
@@ -843,8 +843,8 @@ def CanDualClass(actor):
 		print "CannotDualClass: the only choice for dc is already the same as the actors base class"
 		return 1
 
-	AlignmentTable = GemRB.LoadTableObject ("alignmnt")
-	AlignsTable = GemRB.LoadTableObject ("aligns")
+	AlignmentTable = GemRB.LoadTable ("alignmnt")
+	AlignsTable = GemRB.LoadTable ("aligns")
 	Alignment = GemRB.GetPlayerStat (actor, IE_ALIGNMENT)
 	AlignmentColName = AlignsTable.FindValue (3, Alignment)
 	AlignmentColName = AlignsTable.GetValue (AlignmentColName, 4)
@@ -867,7 +867,7 @@ def CanDualClass(actor):
 			return 1
 
 	# check new class' stat limitations - make sure there are any good class choices
-	TargetStatTable = GemRB.LoadTableObject ("abdcdsrq")
+	TargetStatTable = GemRB.LoadTable ("abdcdsrq")
 	for match in matches:
 		ClassStatIndex = TargetStatTable.GetRowIndex (match)
 		for stat in range (6):
@@ -892,20 +892,20 @@ def LoadCommonTables():
 
 	print # so the following output isn't appended to an existing line
 	if not ClassTable:
-		ClassTable = GemRB.LoadTableObject ("classes")
+		ClassTable = GemRB.LoadTable ("classes")
 	if not KitListTable and GemRB.HasResource("kitlist", RES_2DA):
-		KitListTable = GemRB.LoadTableObject ("kitlist")
+		KitListTable = GemRB.LoadTable ("kitlist")
 	if not ClassSkillsTable:
-		ClassSkillsTable = GemRB.LoadTableObject ("clskills")
+		ClassSkillsTable = GemRB.LoadTable ("clskills")
 	if not RaceTable:
-		RaceTable = GemRB.LoadTableObject ("races")
+		RaceTable = GemRB.LoadTable ("races")
 	if not NextLevelTable:
-		NextLevelTable = GemRB.LoadTableObject ("xplevel")
+		NextLevelTable = GemRB.LoadTable ("xplevel")
 	if not AppearanceAvatarTable and GemRB.HasResource("pdolls", RES_2DA):
-		AppearanceAvatarTable = GemRB.LoadTableObject ("pdolls")
+		AppearanceAvatarTable = GemRB.LoadTable ("pdolls")
 	if not StrModTable:
-		StrModTable = GemRB.LoadTableObject ("strmod")
-		StrModExTable = GemRB.LoadTableObject ("strmodex")
+		StrModTable = GemRB.LoadTable ("strmod")
+		StrModExTable = GemRB.LoadTable ("strmodex")
 
 GameWindow = GUIClasses.GWindow(0)
 GameControl = GUIClasses.GControl(0,0)

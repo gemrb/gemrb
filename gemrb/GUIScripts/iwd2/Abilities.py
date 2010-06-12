@@ -33,7 +33,7 @@ KitIndex = 0
 def CalcLimits(Abidx):
 	global Minimum, Maximum, Add
 
-	Abracead = GemRB.LoadTableObject("ABRACEAD")
+	Abracead = GemRB.LoadTable("ABRACEAD")
 	RaceID = GemRB.GetVar("Race")
 	RowIndex = RaceTable.FindValue(3, RaceID)
 	RaceName = RaceTable.GetRowName(RowIndex)
@@ -41,12 +41,12 @@ def CalcLimits(Abidx):
 	Minimum = 3
 	Maximum = 18
 
-	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
+	Abclasrq = GemRB.LoadTable("ABCLASRQ")
 	tmp = Abclasrq.GetValue(KitIndex, Abidx)
 	if tmp!=0 and tmp>Minimum:
 		Minimum = tmp
 
-	Abracerq = GemRB.LoadTableObject("ABRACERQ")
+	Abracerq = GemRB.LoadTable("ABRACERQ")
 	Race = Abracerq.GetRowIndex(RaceName)
 	tmp = Abracerq.GetValue(Race, Abidx*2)
 	if tmp!=0 and tmp>Minimum:
@@ -111,11 +111,11 @@ def OnLoad():
 		#rowname is just a number, first value row what we need here
 		KitName = KitListTable.GetValue(Kit, 0) 
 
-	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
+	Abclasrq = GemRB.LoadTable("ABCLASRQ")
 	KitIndex = Abclasrq.GetRowIndex(KitName)
 
 	GemRB.LoadWindowPack("GUICG", 800 ,600)
-	AbilityTable = GemRB.LoadTableObject("ability")
+	AbilityTable = GemRB.LoadTable("ability")
 	AbilityWindow = GemRB.LoadWindowObject(4)
 
 	RollPress()

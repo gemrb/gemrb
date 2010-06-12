@@ -44,11 +44,11 @@ def OnLoad():
 	Class = GemRB.GetVar("Class")-1
 	ClassName = ClassTable.GetRowName(Class)
 	ClassID = ClassTable.GetValue(Class, 5)
-	KitTable = GemRB.LoadTableObject("kittable")
+	KitTable = GemRB.LoadTable("kittable")
 	KitTableName = KitTable.GetValue(ClassName, RaceName)
-	KitTable = GemRB.LoadTableObject(KitTableName,1)
+	KitTable = GemRB.LoadTable(KitTableName,1)
 
-	SchoolList = GemRB.LoadTableObject("magesch")
+	SchoolList = GemRB.LoadTable("magesch")
 
 	#there is only a specialist mage window for bg1
 	KitWindow = GemRB.LoadWindowObject(12)

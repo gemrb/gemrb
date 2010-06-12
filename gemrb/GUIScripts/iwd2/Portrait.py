@@ -43,7 +43,7 @@ def OnLoad ():
 	#AppearanceWindow.SetFrame ()
 
 	#Load the Portraits Table
-	PortraitsTable = GemRB.LoadTableObject ("PICTURES")
+	PortraitsTable = GemRB.LoadTable ("PICTURES")
 	LastPortrait = 0
 
 	PortraitButton = AppearanceWindow.GetControl (1)
@@ -215,7 +215,7 @@ def CustomPress ():
 def NextPress ():
 	if AppearanceWindow:
 		AppearanceWindow.Unload ()
-	PortraitTable = GemRB.LoadTableObject ("pictures")
+	PortraitTable = GemRB.LoadTable ("pictures")
 	PortraitName = PortraitTable.GetRowName (LastPortrait )
 	GemRB.SetToken ("SmallPortrait", PortraitName+"S")
 	GemRB.SetToken ("LargePortrait", PortraitName+"L")

@@ -659,7 +659,7 @@ def SelectionChanged ():
 		GemRB.SetVar ("MAGESCHOOL", 0)
 		Kit = GetKitIndex (sel)
 		if Kit and KitListTable.GetValue (Kit, 7) == 1:
-			MageTable = GemRB.LoadTableObject ("magesch")
+			MageTable = GemRB.LoadTable ("magesch")
 			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, KitListTable.GetValue (Kit, 6) ) )
 
 		for i in range (PARTY_SIZE):

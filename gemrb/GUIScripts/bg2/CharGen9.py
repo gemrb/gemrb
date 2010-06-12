@@ -95,12 +95,12 @@ def FinishCharGen():
 
 	# apply starting (alignment dictated) abilities
 	# pc, table, new level, level diff, alignment
-	AlignmentTable = GemRB.LoadTableObject ("aligns")
+	AlignmentTable = GemRB.LoadTable ("aligns")
 	AlignmentAbbrev = AlignmentTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
 	AddClassAbilities (MyChar, "abstart", 6,6, AlignmentAbbrev)
 
 	# setup starting gold (uses a roll dictated by class
-	TmpTable = GemRB.LoadTableObject ("strtgold")
+	TmpTable = GemRB.LoadTable ("strtgold")
 	temp = GemRB.Roll (TmpTable.GetValue (Class, 1),TmpTable.GetValue (Class, 0), TmpTable.GetValue (Class, 2))
 	GemRB.SetPlayerStat (MyChar, IE_GOLD, temp * TmpTable.GetValue (Class, 3))
 
@@ -133,7 +133,7 @@ def FinishCharGen():
 		else:
 			EquipmentColName = KitListTable.GetValue (KitIndex, 0)
 
-		EquipmentTable = GemRB.LoadTableObject ("25stweap")
+		EquipmentTable = GemRB.LoadTable ("25stweap")
 
 		# a map of slots in the table to the real slots
 		# SLOT_BAG is invalid, so use the inventory (first occurence)

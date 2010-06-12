@@ -298,7 +298,7 @@ def AcceptPress():
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar ("Class Kit")
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitIndex)
-	AlignmentTable = GemRB.LoadTableObject ("aligns")
+	AlignmentTable = GemRB.LoadTable ("aligns")
 	t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)
 
@@ -341,7 +341,7 @@ def AcceptPress():
 	# save all the skills
 	SkillsSave (MyChar)
 
-	TmpTable = GemRB.LoadTableObject ("repstart")
+	TmpTable = GemRB.LoadTable ("repstart")
 	t=AlignmentTable.FindValue (3, t)
 	t = TmpTable.GetValue (t, 0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
@@ -349,7 +349,7 @@ def AcceptPress():
 	if MyChar == 1:
 		GemRB.GameSetReputation (t)
 	
-	TmpTable = GemRB.LoadTableObject ("strtgold")
+	TmpTable = GemRB.LoadTable ("strtgold")
 	a = TmpTable.GetValue (Class, 1) #number of dice
 	b = TmpTable.GetValue (Class, 0) #size
 	c = TmpTable.GetValue (Class, 2) #adjustment
@@ -380,7 +380,7 @@ def AcceptPress():
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 	GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (Class, 3) )
 
-	TmpTable=GemRB.LoadTableObject ("weapprof")
+	TmpTable=GemRB.LoadTable ("weapprof")
 	ProfCount = TmpTable.GetRowCount ()
 	for i in range(ProfCount):
 		StatID = TmpTable.GetValue (i, 0)
@@ -613,7 +613,7 @@ def PortraitSelect():
 	PortraitWindow = GemRB.LoadWindowObject (11)
 
 	# this is not the correct one, but I don't know which is
-	PortraitsTable = GemRB.LoadTableObject ("PICTURES")
+	PortraitsTable = GemRB.LoadTable ("PICTURES")
 	Portrait = 0
 
 	PortraitPortraitButton = PortraitWindow.GetControl (1)
@@ -892,7 +892,7 @@ def ClassPress():
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	ClassWindow = GemRB.LoadWindowObject (2)
-	KitTable = GemRB.LoadTableObject ("magesch")
+	KitTable = GemRB.LoadTable ("magesch")
 	ClassCount = ClassTable.GetRowCount ()
 	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
 	GemRB.SetVar ("Class", 0)
@@ -1039,7 +1039,7 @@ def KitPress():
 	ClassWindow.SetVisible (WINDOW_INVISIBLE)
 	KitWindow = GemRB.LoadWindowObject (12)
 
-	KitTable = GemRB.LoadTableObject ("magesch")
+	KitTable = GemRB.LoadTable ("magesch")
 	#only mage class has schools
 	GemRB.SetVar ("Class",6)
 	GemRB.SetVar ("MAGESCHOOL",0)
@@ -1125,8 +1125,8 @@ def AlignmentPress():
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	AlignmentWindow = GemRB.LoadWindowObject (3)
-	AlignmentTable = GemRB.LoadTableObject ("aligns")
-	ClassAlignmentTable = GemRB.LoadTableObject ("alignmnt")
+	AlignmentTable = GemRB.LoadTable ("aligns")
+	ClassAlignmentTable = GemRB.LoadTable ("alignmnt")
 	ClassName = ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
 	GemRB.SetVar ("Alignment", 0)
 
@@ -1200,10 +1200,10 @@ def AbilitiesPress():
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	AbilitiesWindow = GemRB.LoadWindowObject (4)
-	AbilitiesTable = GemRB.LoadTableObject ("ABILITY")
-	AbilitiesRaceAddTable = GemRB.LoadTableObject ("ABRACEAD")
-	AbilitiesRaceReqTable = GemRB.LoadTableObject ("ABRACERQ")
-	AbilitiesClassReqTable = GemRB.LoadTableObject ("ABCLASRQ")
+	AbilitiesTable = GemRB.LoadTable ("ABILITY")
+	AbilitiesRaceAddTable = GemRB.LoadTable ("ABRACEAD")
+	AbilitiesRaceReqTable = GemRB.LoadTable ("ABRACERQ")
+	AbilitiesClassReqTable = GemRB.LoadTable ("ABCLASRQ")
 
 	PointsLeftLabel = AbilitiesWindow.GetControl (0x10000002)
 	PointsLeftLabel.SetUseRGB (1)
@@ -1430,16 +1430,16 @@ def SkillsPress():
 		if IsThief!="*":
 			SkillsSelect()
 		elif IsRanger!="*":
-			SkillRaceTable = GemRB.LoadTableObject ("SKILLRAC")
-			SkillDexterityTable = GemRB.LoadTableObject ("SKILLDEX")
+			SkillRaceTable = GemRB.LoadTable ("SKILLRAC")
+			SkillDexterityTable = GemRB.LoadTable ("SKILLDEX")
 			Dexterity = str(GemRB.GetVar ("Ability2") )
-			GemRB.SetVar ("Skill0", SkillRaceTable.GetValue (RaceName, "STEALTH") + SkillDexterityTable.GetValue(Dexterity, "STEALTH") + GemRB.LoadTableObject("SKILLRNG").GetValue(str(Level), "STEALTH"))
+			GemRB.SetVar ("Skill0", SkillRaceTable.GetValue (RaceName, "STEALTH") + SkillDexterityTable.GetValue(Dexterity, "STEALTH") + GemRB.LoadTable("SKILLRNG").GetValue(str(Level), "STEALTH"))
 			RacialEnemySelect()
 		elif IsBard!="*":
-			SkillRaceTable = GemRB.LoadTableObject ("SKILLRAC")
-			SkillDexterityTable = GemRB.LoadTableObject ("SKILLDEX")
+			SkillRaceTable = GemRB.LoadTable ("SKILLRAC")
+			SkillDexterityTable = GemRB.LoadTable ("SKILLDEX")
 			Dexterity = str(GemRB.GetVar ("Ability2") )
-			GemRB.SetVar ("Skill2", SkillRaceTable.GetValue (RaceName, "PICK_POCKETS") + SkillDexterityTable.GetValue(Dexterity, "PICK_POCKETS") + GemRB.LoadTableObject(IsBard).GetValue(str(Level), "PICK_POCKETS"))
+			GemRB.SetVar ("Skill2", SkillRaceTable.GetValue (RaceName, "PICK_POCKETS") + SkillDexterityTable.GetValue(Dexterity, "PICK_POCKETS") + GemRB.LoadTable(IsBard).GetValue(str(Level), "PICK_POCKETS"))
 			SkillsState = 1
 		else:
 			SkillsState = 1
@@ -1489,9 +1489,9 @@ def SkillsSelect():
 	SkillsWindow = GemRB.LoadWindowObject (6)
 	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
 	Dexterity = str(GemRB.GetVar ("Ability2") )
-	SkillsTable = GemRB.LoadTableObject ("SKILLS")
-	SkillRaceTable = GemRB.LoadTableObject ("SKILLRAC")
-	SkillDexterityTable = GemRB.LoadTableObject ("SKILLDEX")
+	SkillsTable = GemRB.LoadTable ("SKILLS")
+	SkillRaceTable = GemRB.LoadTable ("SKILLRAC")
+	SkillDexterityTable = GemRB.LoadTable ("SKILLDEX")
 
 	SkillsPointsLeft = 30
 	SkillsPointsLeftLabel = SkillsWindow.GetControl (0x10000005)
@@ -1610,7 +1610,7 @@ def RacialEnemySelect():
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	RacialEnemyWindow = GemRB.LoadWindowObject (15)
-	RacialEnemyTable = GemRB.LoadTableObject ("haterace")
+	RacialEnemyTable = GemRB.LoadTable ("haterace")
 	RacialEnemyCount = RacialEnemyTable.GetRowCount ()
 
 	for i in range (2, 8):
@@ -1694,10 +1694,10 @@ def ProficienciesSelect():
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	ProficienciesWindow = GemRB.LoadWindowObject (9)
 	ClassName = ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
-	ProficienciesTable = GemRB.LoadTableObject ("weapprof")
-	ProfsTable = GemRB.LoadTableObject ("profs")
-	ProfsMaxTable = GemRB.LoadTableObject ("profsmax")
-	ClassWeaponsTable = GemRB.LoadTableObject ("clasweap")
+	ProficienciesTable = GemRB.LoadTable ("weapprof")
+	ProfsTable = GemRB.LoadTable ("profs")
+	ProfsMaxTable = GemRB.LoadTable ("profsmax")
+	ClassWeaponsTable = GemRB.LoadTable ("clasweap")
 
 	Class = ProfsTable.GetRowIndex (ClassName)
 	ProficienciesPointsLeft = ProfsTable.GetValue (Class, 0)
@@ -1991,7 +1991,7 @@ def MageSpellsMemorize(SpellTable, Level, SpellLevel):
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	MageMemorizeWindow = GemRB.LoadWindowObject (16)
-	MaxSpellsMageTable = GemRB.LoadTableObject (SpellTable)
+	MaxSpellsMageTable = GemRB.LoadTable (SpellTable)
 	MageSpellBook = GemRB.GetVar ("MageSpellBook")
 	GemRB.SetVar ("MageMemorized", 0)
 	GemRB.SetVar ("SpellMask", 0)
@@ -2117,7 +2117,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 	t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
 	Learnable = GetLearnablePriestSpells( ClassFlag, t, SpellLevel)
 
-	MaxSpellsPriestTable = GemRB.LoadTableObject (SpellTable)
+	MaxSpellsPriestTable = GemRB.LoadTable (SpellTable)
 	GemRB.SetVar ("PriestMemorized", 0)
 	GemRB.SetVar ("SpellMask", 0)
 
@@ -2228,7 +2228,7 @@ def AppearancePress():
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	AppearanceWindow = GemRB.LoadWindowObject (13)
-	AppearanceTable = GemRB.LoadTableObject ("PORTCOLR")
+	AppearanceTable = GemRB.LoadTable ("PORTCOLR")
 
 	if Portrait<0:
 		PortraitIndex = 0
@@ -2293,11 +2293,11 @@ def DrawAvatar():
 	global AppearanceAvatarButton
 
 	AvatarID = 0x6000
-	table = GemRB.LoadTableObject ("avprefr")
+	table = GemRB.LoadTable ("avprefr")
 	AvatarID = AvatarID+table.GetValue (GemRB.GetVar ("Race"),0)
-	table = GemRB.LoadTableObject ("avprefc")
+	table = GemRB.LoadTable ("avprefc")
 	AvatarID = AvatarID+table.GetValue (GemRB.GetVar ("Class"),0)
-	table = GemRB.LoadTableObject ("avprefg")
+	table = GemRB.LoadTable ("avprefg")
 	AvatarID = AvatarID+table.GetValue (GemRB.GetVar ("Gender"),0)
 
 	AvatarRef = AppearanceAvatarTable.GetValue (hex(AvatarID), "LEVEL1")
@@ -2331,7 +2331,7 @@ def AppearanceColorChoice (CurrentColor):
 
 	AppearanceWindow.SetVisible (WINDOW_INVISIBLE)
 	AppearanceColorWindow = GemRB.LoadWindowObject (14)
-	AppearanceColorTable = GemRB.LoadTableObject ("clowncol")
+	AppearanceColorTable = GemRB.LoadTable ("clowncol")
 	ColorType = GemRB.GetVar ("ColorType")
 	GemRB.SetVar ("SelectedColor", CurrentColor)
 
@@ -2403,8 +2403,8 @@ def CharSoundSelect():
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	CharSoundWindow = GemRB.LoadWindowObject (19)
-	CharSoundTable = GemRB.LoadTableObject ("CHARSND")
-	CharSoundStrings = GemRB.LoadTableObject ("CHARSTR")
+	CharSoundTable = GemRB.LoadTable ("CHARSND")
+	CharSoundStrings = GemRB.LoadTable ("CHARSTR")
 
 	CharSoundVoiceList = CharSoundWindow.GetControl (45)
 	CharSoundVoiceList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
@@ -2618,15 +2618,15 @@ def ImportDonePress():
 
 	# We still have to set starting reputation and gold
 	Alignment = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-	AlignmentTable = GemRB.LoadTableObject ("aligns")
-	TmpTable = GemRB.LoadTableObject ("repstart")
+	AlignmentTable = GemRB.LoadTable ("aligns")
+	TmpTable = GemRB.LoadTable ("repstart")
 	t = AlignmentTable.GetValue ( Alignment-1, 3)
 	t = AlignmentTable.FindValue (3, t)
 	t = TmpTable.GetValue (t, 0)
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	TmpTable = GemRB.LoadTableObject ("strtgold")
+	TmpTable = GemRB.LoadTable ("strtgold")
 	a = TmpTable.GetValue (Class, 1) #number of dice
 	b = TmpTable.GetValue (Class, 0) #size
 	c = TmpTable.GetValue (Class, 2) #adjustment

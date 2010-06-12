@@ -43,11 +43,11 @@ IE_ANIM_ID = 206
 
 def RefreshPDoll():
 	AnimID = 0x6000
-	table = GemRB.LoadTableObject("avprefr")
+	table = GemRB.LoadTable("avprefr")
 	AnimID = AnimID+table.GetValue(GemRB.GetVar("Race"),0)
-	table = GemRB.LoadTableObject("avprefc")
+	table = GemRB.LoadTable("avprefc")
 	AnimID = AnimID+table.GetValue(GemRB.GetVar("Class"),0)
-	table = GemRB.LoadTableObject("avprefg")
+	table = GemRB.LoadTable("avprefg")
 	AnimID = AnimID+table.GetValue(GemRB.GetVar("Gender"),0)
 	ResRef = AppearanceAvatarTable.GetValue(hex(AnimID), "LEVEL1")
 	PDollButton.SetPLT(ResRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
@@ -63,9 +63,9 @@ def OnLoad():
 	ColorWindow=GemRB.LoadWindowObject(13)
 	CloseOtherWindow (ColorWindow.Unload)
 
-	ColorTable = GemRB.LoadTableObject("clowncol")
+	ColorTable = GemRB.LoadTable("clowncol")
 	#set these colors to some default
-	PortraitTable = GemRB.LoadTableObject("pictures")
+	PortraitTable = GemRB.LoadTable("pictures")
 	PortraitName = GemRB.GetToken("LargePortrait")
 	PortraitName = PortraitName[0:len(PortraitName)-1]
 	PortraitIndex = PortraitTable.GetRowIndex(PortraitName)

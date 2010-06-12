@@ -68,7 +68,7 @@ def OpenJournalWindow ():
 		SetSelectionChangeHandler (None)
 		return
 		
-	Table = GemRB.LoadTableObject("YEARS")
+	Table = GemRB.LoadTable("YEARS")
 	StartTime = Table.GetValue("STARTTIME", "VALUE") / 4500
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 

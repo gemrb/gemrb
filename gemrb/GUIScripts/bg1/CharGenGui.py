@@ -79,7 +79,7 @@ def unsetAlignment():
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT,0)
 	
 def getAlignment(area):
-	AlignmentTable = GemRB.LoadTableObject("aligns")
+	AlignmentTable = GemRB.LoadTable("aligns")
 	
 	MyChar = GemRB.GetVar ("Slot")
 	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
@@ -94,7 +94,7 @@ def getAlignment(area):
 #Abilties
 def unsetAbilities():
 	MyChar = GemRB.GetVar ("Slot")
-	AbilityTable = GemRB.LoadTableObject ("ability")
+	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 	
 	# set all our abilites to zero
@@ -105,7 +105,7 @@ def unsetAbilities():
 
 def getAbilities(area):
 	MyChar = GemRB.GetVar ("Slot")
-	AbilityTable = GemRB.LoadTableObject ("ability")
+	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 	for i in range(AbilityCount):
 		v = AbilityTable.GetValue(i,2)
@@ -131,7 +131,7 @@ def getHatedRace(TextAreaControl):
 	MyChar = GemRB.GetVar ("Slot")
 	Race = GemRB.GetPlayerStat(MyChar, IE_HATEDRACE)
 	if Race:
-		HateRaceTable = GemRB.LoadTableObject ("HATERACE")
+		HateRaceTable = GemRB.LoadTable ("HATERACE")
 		Row = HateRaceTable.FindValue (1, Race)
 		info = GemRB.GetString (HateRaceTable.GetValue(Row, 0))
 		if info != "":
@@ -167,7 +167,7 @@ def getMageSpells(TextAreaControl):
 		TextAreaControl.Append (info)
 
 def guardSkills():
-	SkillTable = GemRB.LoadTableObject("skills")
+	SkillTable = GemRB.LoadTable("skills")
 	RowCount = SkillTable.GetRowCount()-2
 
 	MyChar = GemRB.GetVar ("Slot")
@@ -201,7 +201,7 @@ def getSkills(TextAreaControl):
 	MyChar = GemRB.GetVar ("Slot")
 	# thieving and other skills
 	info = ""
-	SkillTable = GemRB.LoadTableObject ("skills")
+	SkillTable = GemRB.LoadTable ("skills")
 	ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 	Class = ClassTable.FindValue (5, ClassID)
 	ClassName = ClassTable.GetRowName(Class)
@@ -239,7 +239,7 @@ def getProfi(TextAreaControl):
 	TextAreaControl.Append ("\n")
 	TextAreaControl.Append (9466)
 	TextAreaControl.Append ("\n")
-	TmpTable=GemRB.LoadTableObject ("weapprof")
+	TmpTable=GemRB.LoadTable ("weapprof")
 	ProfCount = TmpTable.GetRowCount ()
 	#bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
 	for i in range(ProfCount):
@@ -340,8 +340,8 @@ def setAccept():
 	#reputation
 	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	
-	TmpTable=GemRB.LoadTableObject ("repstart")
-	AlignmentTable = GemRB.LoadTableObject ("aligns")
+	TmpTable=GemRB.LoadTable ("repstart")
+	AlignmentTable = GemRB.LoadTable ("aligns")
 	t = TmpTable.GetValue (AllignID,0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 
@@ -358,7 +358,7 @@ def setAccept():
 		GemRB.GameSetReputation( t )
 
 	#gold
-	TmpTable=GemRB.LoadTableObject ("strtgold")
+	TmpTable=GemRB.LoadTable ("strtgold")
 	t = GemRB.Roll (TmpTable.GetValue (ClassName,"ROLLS"),TmpTable.GetValue(ClassName,"SIDES"), TmpTable.GetValue (ClassName,"MODIFIER") )
 	GemRB.SetPlayerStat (MyChar, IE_GOLD, t*TmpTable.GetValue (ClassName,"MULTIPLIER") )
 

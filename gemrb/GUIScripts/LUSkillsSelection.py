@@ -68,7 +68,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	SkillsClickCount = 0
 	SkillsOldDirection = 0
 	SkillsAssignable = 0
-	SkillsTable = GemRB.LoadTableObject ("skills")
+	SkillsTable = GemRB.LoadTable ("skills")
 	SkillPointsLeft = 0
 	GemRB.SetVar ("SkillPointsLeft", 0)
 	SkillsNullify ()
@@ -185,8 +185,8 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 			SkillPointsLeft = 0
 		else:
 			#get racial values for dual-classing
-			SkillRacTable = GemRB.LoadTableObject ("SKILLRAC")
-			RaceTable = GemRB.LoadTableObject ("RACES")
+			SkillRacTable = GemRB.LoadTable ("SKILLRAC")
+			RaceTable = GemRB.LoadTable ("RACES")
 			Race = RaceTable.FindValue (3, GemRB.GetPlayerStat (pc, IE_RACE))
 			Race = RaceTable.GetRowName (Race)
 
@@ -221,7 +221,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 					SpecialSkillsMap.append((SpecialSkillsTable, i))
 					break
 		for skills in SpecialSkillsMap:
-			SpecialSkillsTable = GemRB.LoadTableObject (skills[0])
+			SpecialSkillsTable = GemRB.LoadTable (skills[0])
 			for skill in range(SpecialSkillsTable.GetColumnCount ()):
 				skillname = SpecialSkillsTable.GetColumnName (skill)
 				value = SpecialSkillsTable.GetValue (str(level2[skills[1]]), skillname)
@@ -376,7 +376,7 @@ def SkillScrollBarPress():
 def SkillsSave (pc):
 	global SkillsTable
 	if not SkillsTable:
-		SkillsTable = GemRB.LoadTableObject ("skills")
+		SkillsTable = GemRB.LoadTable ("skills")
 
 	for i in range(SkillsTable.GetRowCount() - 2):
 		SkillName = SkillsTable.GetRowName (i+2)
@@ -388,7 +388,7 @@ def SkillsSave (pc):
 def SkillsNullify ():
 	global SkillsTable
 	if not SkillsTable:
-		SkillsTable = GemRB.LoadTableObject ("skills")
+		SkillsTable = GemRB.LoadTable ("skills")
 
 	for i in range(SkillsTable.GetRowCount()-2):
 		GemRB.SetVar ("Skill "+str(i), 0)

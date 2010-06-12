@@ -207,16 +207,16 @@ def OnLoad():
 	else:
 		FeatsClassColumn = ClassTable.GetValue(Class, 3) + 2
 
-	FeatTable = GemRB.LoadTableObject("feats")
+	FeatTable = GemRB.LoadTable("feats")
 	RowCount = FeatTable.GetRowCount()
-	FeatReqTable = GemRB.LoadTableObject("featreq")
+	FeatReqTable = GemRB.LoadTable("featreq")
 
 	for i in range(RowCount):
 		GemRB.SetVar("Feat "+str(i), GetBaseValue(i))
 		GemRB.SetVar("BaseFeatValue " + str(i), GetBaseValue(i))
 
-	FeatLevelTable = GemRB.LoadTableObject("featlvl")
-	FeatClassTable = GemRB.LoadTableObject("featclas")
+	FeatLevelTable = GemRB.LoadTable("featlvl")
+	FeatClassTable = GemRB.LoadTable("featclas")
 	#calculating the number of new feats for the next level
 	PointsLeft = 0
 	#levels start with 1

@@ -84,7 +84,7 @@ def OpenRecordsWindow ():
 	global RecordsWindow
 	global StatTable
 
-	StatTable = GemRB.LoadTableObject("abcomm")
+	StatTable = GemRB.LoadTable("abcomm")
 	
 	if CloseOtherWindow (OpenRecordsWindow):
 		GemRB.HideGUI ()
@@ -252,7 +252,7 @@ def UpdateRecordsWindow ():
 
 
 	# sex
-	GenderTable = GemRB.LoadTableObject ("GENDERS")
+	GenderTable = GemRB.LoadTable ("GENDERS")
 	text = GenderTable.GetValue (GemRB.GetPlayerStat (pc, IE_SEX) - 1, 0)
 	
 	Label = Window.GetControl (0x10000015)
@@ -270,7 +270,7 @@ def UpdateRecordsWindow ():
 	ss = GemRB.LoadSymbol ("ALIGN")
 	sym = ss.GetValue (align)
 
-	AlignmentTable = GemRB.LoadTableObject ("ALIGNS")
+	AlignmentTable = GemRB.LoadTable ("ALIGNS")
 	alignment_help = GemRB.GetString (AlignmentTable.GetValue (sym, 'DESC_REF'))
 	frame = (3 * int (align / 16) + align % 16) - 4
 	
@@ -283,7 +283,7 @@ def UpdateRecordsWindow ():
 
 	# faction
 	faction = GemRB.GetPlayerStat (pc, IE_FACTION)
-	FactionTable = GemRB.LoadTableObject ("FACTIONS")
+	FactionTable = GemRB.LoadTable ("FACTIONS")
 	faction_help = GemRB.GetString (FactionTable.GetValue (faction, 0))
 	frame = FactionTable.GetValue (faction, 1)
 	
@@ -400,7 +400,7 @@ def OnRecordsHelpDexterity ():
 	TextArea = Window.GetControl (0)
 
 	# Loading table of modifications
-	Table = GemRB.LoadTableObject("dexmod")
+	Table = GemRB.LoadTable("dexmod")
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -448,7 +448,7 @@ def OnRecordsHelpConstitution ():
 	TextArea = Window.GetControl (0)
 
 	# Loading table of modifications
-	Table = GemRB.LoadTableObject("hpconbon")
+	Table = GemRB.LoadTable("hpconbon")
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -480,7 +480,7 @@ def OnRecordsHelpCharisma ():
 def GetCharacterHeader (pc):
 	global avatar_header
 
-	BioTable = GemRB.LoadTableObject ("bios")
+	BioTable = GemRB.LoadTable ("bios")
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
 	Multi = ClassTable.GetValue (Class, 4)
@@ -546,7 +546,7 @@ def GetNextLevelExp (Level, Class):
 	if (Level < 20):
 		NextLevel = NextLevelTable.GetValue (Class, str (Level + 1))
 	else:
-		After21ExpTable = GemRB.LoadTableObject ("LVL21PLS")
+		After21ExpTable = GemRB.LoadTable ("LVL21PLS")
 		ExpGap = After21ExpTable.GetValue (Class, 'XPGAP')
 		LevDiff = Level - 19
 		Lev20Exp = NextLevelTable.GetValue (Class, "20")
@@ -584,7 +584,7 @@ def GetStatOverview (pc):
 		Main = Main + DispSecoClass + DispSecoLevel + DispXP + DispSecoNextLevel + "\n"
 
 	# 59856 Current State
-	StatesTable = GemRB.LoadTableObject ("states")
+	StatesTable = GemRB.LoadTable ("states")
 	StateID = GS (IE_STATE_ID)
 	State = GemRB.GetString (StatesTable.GetValue (str (StateID), "NAME_REF"))
 	CurrentState = won + GemRB.GetString (59856) + woff + "\n" + State + "\n\n"
@@ -905,7 +905,7 @@ def OpenBiographyWindow ():
 	# These are used to get the bio
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	BioTable = GemRB.LoadTableObject ("bios")
+	BioTable = GemRB.LoadTable ("bios")
 	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 	BioText = int (BioTable.GetValue (Specific, 'BIO'))
 
@@ -980,7 +980,7 @@ def OpenLevelUpWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	# These are used to identify Nameless One
-	BioTable = GemRB.LoadTableObject ("bios")
+	BioTable = GemRB.LoadTable ("bios")
 	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 	AvatarName = BioTable.GetValue (Specific, "PC")
 
@@ -999,7 +999,7 @@ def OpenLevelUpWindow ():
 	Thac0 = 0
 	WeapProfGained = 0
 
-	ClasWeapTable = GemRB.LoadTableObject ("weapprof")
+	ClasWeapTable = GemRB.LoadTable ("weapprof")
 	WeapProfType = -1
 	CurrWeapProf = -1
 	#This does not apply to Nameless since he uses unused slots system
@@ -1069,9 +1069,9 @@ def OpenLevelUpWindow ():
 		if Specific == "1":
 			# Saving Throws
 			# Nameless One gets the best possible throws from all the classes except Priest
-			FigSavThrTable = GemRB.LoadTableObject ("SAVEWAR")
-			MagSavThrTable = GemRB.LoadTableObject ("SAVEWIZ")
-			ThiSavThrTable = GemRB.LoadTableObject ("SAVEROG")
+			FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
+			MagSavThrTable = GemRB.LoadTable ("SAVEWIZ")
+			ThiSavThrTable = GemRB.LoadTable ("SAVEROG")
 			# For Nameless, we also need to know his levels in every class, so that we pick
 			# the right values from the corresponding tables. Also we substract one, so
 			# that we may use them as column indices in tables.
@@ -1122,7 +1122,7 @@ def OpenLevelUpWindow ():
 
 			# Saving Throws
 			# Loading the right saving throw table
-			SavThrTable = GemRB.LoadTableObject (ClassTable.GetValue (Class, "SAVE"))
+			SavThrTable = GemRB.LoadTable (ClassTable.GetValue (Class, "SAVE"))
 			# Updating the current saving throws. They are changed only if the
 			# new ones are better than current. The smaller the number, the better.
 			# We need to substract one from the NextLevel, so that we get right values.
@@ -1173,7 +1173,7 @@ def OpenLevelUpWindow ():
 				WeapProfGained += 1
 
 		# Saving Throws
-		FigSavThrTable = GemRB.LoadTableObject ("SAVEWAR")
+		FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
 		if PrimNextLevel < 22:
 			for i in range (5):
 				Throw = FigSavThrTable.GetValue (i, PrimNextLevel - 1)
@@ -1184,11 +1184,11 @@ def OpenLevelUpWindow ():
 		if GemRB.GetPlayerStat (pc, IE_CLASS) == 7:
 			# avatar is Fighter/Mage (Dak'kon)
 			Class = "MAGE"
-			SavThrTable = GemRB.LoadTableObject ("SAVEWIZ")
+			SavThrTable = GemRB.LoadTable ("SAVEWIZ")
 		else:
 			# avatar is Fighter/Thief (Annah)
 			Class = "THIEF"
-			SavThrTable = GemRB.LoadTableObject ("SAVEROG")
+			SavThrTable = GemRB.LoadTable ("SAVEROG")
 		
 		SecoNextLevel = avatar_header['SecoLevel']
 		while avatar_header['XP'] >= GetNextLevelExp (SecoNextLevel, Class):
@@ -1266,7 +1266,7 @@ def OpenLevelUpWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 def GetSingleClassHP (Class, Level):
-	HPTable = GemRB.LoadTableObject (ClassTable.GetValue (Class, "HP"))
+	HPTable = GemRB.LoadTable (ClassTable.GetValue (Class, "HP"))
 
 	# We need to check if Level is larger than 20, since after that point
 	# the table runs out, and the formula remain the same.
@@ -1284,7 +1284,7 @@ def GetSingleClassHP (Class, Level):
 	return GemRB.Roll (Rolls, Sides, Modif)
 
 def GetConHPBonus (pc, numPrimLevels, numSecoLevels, levelUpType):
-	ConHPBonTable = GemRB.LoadTableObject ("HPCONBON")
+	ConHPBonTable = GemRB.LoadTable ("HPCONBON")
 
 	con = str (GemRB.GetPlayerStat (pc, IE_CON))
 	if levelUpType == 0:
@@ -1296,7 +1296,7 @@ def GetConHPBonus (pc, numPrimLevels, numSecoLevels, levelUpType):
 	return ConHPBonTable.GetValue (con, "WARRIOR") * numPrimLevels / 2 + ConHPBonTable.GetValue (con, "OTHER") * numSecoLevels / 2
 
 def GetThac0 (Class, Level):
-	Thac0Table = GemRB.LoadTableObject ("THAC0")
+	Thac0Table = GemRB.LoadTable ("THAC0")
 	# We need to check if Level is larger than 60, since after that point
 	# the table runs out, and the value remains the same.
 	if Level > 60:

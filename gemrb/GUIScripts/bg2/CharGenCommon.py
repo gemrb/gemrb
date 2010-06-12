@@ -122,8 +122,8 @@ def DisplayOverview(step):
 	###
 	# Stat overview
 	###
-	AlignmentTable = GemRB.LoadTableObject ("aligns")
-	AbilityTable = GemRB.LoadTableObject ("ability")
+	AlignmentTable = GemRB.LoadTable ("aligns")
+	AbilityTable = GemRB.LoadTable ("ability")
 
 	MyChar = GemRB.GetVar ("Slot")
 
@@ -182,7 +182,7 @@ def DisplayOverview(step):
 			TextAreaControl.Append ("\n\n")
 			# thieving and other skills
 			info = ""
-			SkillTable = GemRB.LoadTableObject ("skills")
+			SkillTable = GemRB.LoadTable ("skills")
 			ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 			Class = ClassTable.FindValue (5, ClassID)
 			ClassName = ClassTable.GetRowName (Class)
@@ -242,7 +242,7 @@ def DisplayOverview(step):
 			info = ""
 			Race = GemRB.GetVar ("HatedRace")
 			if Race:
-				HateRaceTable = GemRB.LoadTableObject ("HATERACE")
+				HateRaceTable = GemRB.LoadTable ("HATERACE")
 				Row = HateRaceTable.FindValue (1, Race)
 				info = GemRB.GetString (HateRaceTable.GetValue(Row, 0))
 				if info != "":
@@ -253,7 +253,7 @@ def DisplayOverview(step):
 			# weapon proficiencies
 			TextAreaControl.Append (9466)
 			TextAreaControl.Append ("\n")
-			TmpTable=GemRB.LoadTableObject ("weapprof")
+			TmpTable=GemRB.LoadTable ("weapprof")
 			ProfCount = TmpTable.GetRowCount ()
 			#bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
 			for i in range(ProfCount-8):

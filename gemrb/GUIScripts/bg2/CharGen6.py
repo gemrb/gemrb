@@ -39,7 +39,7 @@ def OnLoad():
 
 	# save our previous stats:
 	# 	abilities
-	AbilityTable = GemRB.LoadTableObject ("ability")
+	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 
 	# print our diagnostic as we loop (so as not to duplicate)

@@ -24,7 +24,7 @@ from CharGenCommon import *
 from LUSpellSelection import *
 
 def OnLoad():
-	KitTable = GemRB.LoadTableObject("magesch")
+	KitTable = GemRB.LoadTable("magesch")
 	Slot = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat (Slot, IE_CLASS)
 	TableName = ClassSkillsTable.GetValue(Class, 2)

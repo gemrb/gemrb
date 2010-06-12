@@ -256,7 +256,7 @@ def UpdateRecordsWindow ():
 	Label = Window.GetControl (0x1000000f)
 	Label.SetText (text)
 
-	Table = GemRB.LoadTableObject ("aligns")
+	Table = GemRB.LoadTable ("aligns")
 
 	text = Table.GetValue (Table.FindValue ( 3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT) ), 0)
 	Label = Window.GetControl (0x10000010)
@@ -296,7 +296,7 @@ def GSNN (pc, stat):
 # LevelDiff is used only from the level up code and holds the level
 # difference for each class
 def GetStatOverview (pc, LevelDiff=[0,0,0]):
-	StateTable = GemRB.LoadTableObject ("statdesc")
+	StateTable = GemRB.LoadTable ("statdesc")
 
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
 	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) )
@@ -447,7 +447,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	HatedRace = GS (IE_HATEDRACE)
 	if HatedRace:
-		HateTable = GemRB.LoadTableObject ("haterace")
+		HateTable = GemRB.LoadTable ("haterace")
 		Racist = HateTable.FindValue (1, HatedRace)
 		if Racist != -1:
 			HatedRace = HateTable.GetValue (Racist, 3)
@@ -482,7 +482,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	# 9466 Weapon proficiencies
 	stats.append (9466)
-	table = GemRB.LoadTableObject ("weapprof")
+	table = GemRB.LoadTable ("weapprof")
 	RowCount = table.GetRowCount ()
 	for i in range (RowCount):
 		text = table.GetValue (i, 3)
@@ -591,7 +591,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	return "\n".join (res)
 
 def GetReputation (repvalue):
-	table = GemRB.LoadTableObject ("reptxt")
+	table = GemRB.LoadTable ("reptxt")
 	if repvalue>20:
 		repvalue=20
 	txt = GemRB.GetString (table.GetValue (repvalue, 0) )
@@ -808,9 +808,9 @@ def OpenCustomizeWindow ():
 	else:
 		Exportable = 0
 
-	PortraitsTable = GemRB.LoadTableObject ("PICTURES")
-	ScriptsTable = GemRB.LoadTableObject ("SCRPDESC")
-	ColorTable = GemRB.LoadTableObject ("CLOWNCOL")
+	PortraitsTable = GemRB.LoadTable ("PICTURES")
+	ScriptsTable = GemRB.LoadTable ("SCRPDESC")
+	ColorTable = GemRB.LoadTable ("CLOWNCOL")
 	CustomizeWindow = GemRB.LoadWindowObject (17)
 
 	PortraitSelectButton = CustomizeWindow.GetControl (0)

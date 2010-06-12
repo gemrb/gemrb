@@ -116,7 +116,7 @@ def SetupSavingThrows (pc, Level=None):
 	RaceSaveTable = None
 	if RaceSaveTableName != "-1" and RaceSaveTableName != "*":
 		Con = GemRB.GetPlayerStat (pc, IE_CON, 1)-1
-		RaceSaveTable = GemRB.LoadTableObject (RaceSaveTableName)
+		RaceSaveTable = GemRB.LoadTable (RaceSaveTableName)
 		if Con >= RaceSaveTable.GetRowCount ():
 			Con = RaceSaveTable.GetRowCount ()-1
 
@@ -124,7 +124,7 @@ def SetupSavingThrows (pc, Level=None):
 	SaveTables = []
 	for i in range (NumClasses):
 		SaveName = ClassTable.GetValue (ClassTable.FindValue (5, Class[i]), 3, 0)
-		SaveTables.append (GemRB.LoadTableObject (SaveName) )
+		SaveTables.append (GemRB.LoadTable (SaveName) )
 	if not len (SaveTables):
 		return
 
@@ -161,7 +161,7 @@ def ReactivateBaseClass ():
 	KitIndex = GetKitIndex (pc)
 
 	# reactivate all our proficiencies
-	TmpTable = GemRB.LoadTableObject ("weapprof")
+	TmpTable = GemRB.LoadTable ("weapprof")
 	ProfCount = TmpTable.GetRowCount ()
 	if GameIsBG2 ():
 		ProfCount -= 8 # skip bg1 weapprof.2da proficiencies
@@ -176,14 +176,14 @@ def ReactivateBaseClass ():
 			GemRB.ApplyEffect (pc, "Proficiency", Value, StatID )
 
 	# see if this thac0 is lower than our current thac0
-	ThacoTable = GemRB.LoadTableObject ("THAC0")
+	ThacoTable = GemRB.LoadTable ("THAC0")
 	TmpThaco = ThacoTable.GetValue(Classes[1]-1, Level[1]-1, 1)
 	if TmpThaco < GemRB.GetPlayerStat (pc, IE_TOHIT, 1):
 		GemRB.SetPlayerStat (pc, IE_TOHIT, TmpThaco)
 
 	# see if all our saves are lower than our current saves
 	SavesTable = ClassTable.GetValue (ClassIndex, 3, 0)
-	SavesTable = GemRB.LoadTableObject (SavesTable)
+	SavesTable = GemRB.LoadTable (SavesTable)
 	for i in range (5):
 		# see if this save is lower than our old save
 		TmpSave = SavesTable.GetValue (i, Level[1]-1)
@@ -194,7 +194,7 @@ def ReactivateBaseClass ():
 	SpellTables = [ClassSkillsTable.GetValue (Classes[1], 0, 0), ClassSkillsTable.GetValue (Classes[1], 1, 0), ClassSkillsTable.GetValue (Classes[1], 2, 0)]
 	if SpellTables[2] != "*": # casts mage spells
 		# set up our memorizations
-		SpellTable = GemRB.LoadTableObject (SpellTables[2])
+		SpellTable = GemRB.LoadTable (SpellTables[2])
 		for i in range (9):
 			# if we can cast more spells at this level (should be always), then update
 			NumSpells = SpellTable.GetValue (Level[1]-1, i)
@@ -203,12 +203,12 @@ def ReactivateBaseClass ():
 	elif SpellTables[1] != "*" or SpellTables[0] != "*": # casts priest spells
 		# get the correct table and mask
 		if SpellTables[1] != "*": # clerical spells
-			SpellTable = GemRB.LoadTableObject (SpellTables[1])
+			SpellTable = GemRB.LoadTable (SpellTables[1])
 			ClassMask = 0x4000
 		else: # druidic spells
 			if not GameRB.HasResource(SpellTables[0], RES_2DA):
 				SpellTables[0] = "MXSPLPRS"
-			SpellTable = GemRB.LoadTableObject (SpellTables[0])
+			SpellTable = GemRB.LoadTable (SpellTables[0])
 			ClassMask = 0x8000
 
 		# loop through each spell level
@@ -271,7 +271,7 @@ def SetupThaco (pc, Level=None):
 
 	#get some basic values
 	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
-	ThacoTable = GemRB.LoadTableObject ("THAC0")
+	ThacoTable = GemRB.LoadTable ("THAC0")
 
 	#adjust the class for multi/dual chars
 	Multi = IsMultiClassed (pc, 1)
@@ -330,7 +330,7 @@ def SetupLore (pc, LevelDiff=None):
 
 	#get some basic values
 	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
-	LoreTable = GemRB.LoadTableObject ("lore")
+	LoreTable = GemRB.LoadTable ("lore")
 
 	#adjust the class for multi/dual chars
 	Multi = IsMultiClassed (pc, 1)
@@ -432,7 +432,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		if not ClassName or NumClasses > 1:
 			ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class[i]) )
 		HPTable = ClassTable.GetValue (ClassName, "HP")
-		HPTable = GemRB.LoadTableObject (HPTable)
+		HPTable = GemRB.LoadTable (HPTable)
 
 		#make sure we are within table ranges
 		MaxLevel = HPTable.GetRowCount()-1

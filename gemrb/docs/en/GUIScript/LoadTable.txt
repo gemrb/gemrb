@@ -6,7 +6,7 @@ Description: Loads a 2DA Table. In case it was already loaded, it will return th
 Parameters: 2DAResRef    - the table's name (.2da resref)
             ignore_error - boolean, if set, then the script won't be blocked by missing files.
 
-Return value: The table's internal reference.
+Return value: GTable
 
 See also: UnloadTable, LoadSymbol
 

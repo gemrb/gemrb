@@ -79,7 +79,7 @@ def OpenMapWindow ():
 
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, "SetMapNote")
 
-	MapTable = GemRB.LoadTableObject( "MAPNAME" )
+	MapTable = GemRB.LoadTable( "MAPNAME" )
 	MapName = MapTable.GetValue (GemRB.GetCurrentArea (), "STRING")
 	
 	Label = Window.GetControl (0x10000005)

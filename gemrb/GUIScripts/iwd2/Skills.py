@@ -107,7 +107,7 @@ def OnLoad():
 	KitName = ClassTable.GetRowName(Class)
 	#classcolumn is base class
 	ClassColumn=GemRB.GetVar("BaseClass") - 1
-	SkillPtsTable = GemRB.LoadTableObject("skillpts")
+	SkillPtsTable = GemRB.LoadTable("skillpts")
 	p = SkillPtsTable.GetValue(0, ClassColumn)
 	IntBonus = GemRB.GetVar("Ability 3")/2-5  #intelligence bonus
 	p = p + IntBonus
@@ -124,7 +124,7 @@ def OnLoad():
 	RaceName = RaceTable.GetRowName(RaceTable.FindValue(3, GemRB.GetVar('Race')))
 	
 	### Example code for implementation of SKILRACE.2da
-	# TmpTable = GemRB.LoadTableObject('skilrace')
+	# TmpTable = GemRB.LoadTable('skilrace')
 	# PointsLeft += TmpTable.GetValue(str(Level), RaceName)
 	###
 	
@@ -137,12 +137,12 @@ def OnLoad():
 		else: PointsLeft += 1
 	
 
-	SkillTable = GemRB.LoadTableObject("skills")
+	SkillTable = GemRB.LoadTable("skills")
 	RowCount = SkillTable.GetRowCount()
 
-	CostTable = GemRB.LoadTableObject("skilcost")
+	CostTable = GemRB.LoadTable("skilcost")
 
-	SkillRacTable = GemRB.LoadTableObject("SKILLRAC")
+	SkillRacTable = GemRB.LoadTable("SKILLRAC")
 
 	for i in range(RowCount):
 		GemRB.SetVar("Skill "+str(i),0) # Racial/Class bonuses don't factor in char-gen or leveling
@@ -236,7 +236,7 @@ def LeftPress():
 
 def BackPress():
 	MyChar = GemRB.GetVar("Slot")
-	TmpTable = GemRB.LoadTableObject ("skillsta")
+	TmpTable = GemRB.LoadTable ("skillsta")
 	for i in range(TmpTable.GetRowCount()):
 		GemRB.SetVar("Skill "+str(i),0)
 		StatID=TmpTable.GetValue (i, 2)
@@ -249,7 +249,7 @@ def BackPress():
 def NextPress():
 	MyChar = GemRB.GetVar("Slot")
 	#setting skills
-	TmpTable = GemRB.LoadTableObject ("skillsta")
+	TmpTable = GemRB.LoadTable ("skillsta")
 	SkillCount = TmpTable.GetRowCount ()
 	for i in range (SkillCount):
 		StatID=TmpTable.GetValue (i, 2)

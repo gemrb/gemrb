@@ -60,12 +60,12 @@ def OnLoad():
 	ColorWindow=GemRB.LoadWindowObject(13)
 
 	Race = RaceTable.FindValue (3, GemRB.GetVar ("Race") )
-	HairTable = GemRB.LoadTableObject(RaceTable.GetValue(Race, 5))
-	SkinTable = GemRB.LoadTableObject(RaceTable.GetValue(Race, 6))
-	ColorTable = GemRB.LoadTableObject("clowncol")
+	HairTable = GemRB.LoadTable(RaceTable.GetValue(Race, 5))
+	SkinTable = GemRB.LoadTable(RaceTable.GetValue(Race, 6))
+	ColorTable = GemRB.LoadTable("clowncol")
 
 	#set these colors to some default
-	PortraitTable = GemRB.LoadTableObject("pictures")
+	PortraitTable = GemRB.LoadTable("pictures")
 	PortraitIndex = GemRB.GetVar("PortraitIndex")
 	Color1=PortraitTable.GetValue(PortraitIndex,1)
 	Color2=PortraitTable.GetValue(PortraitIndex,2)
@@ -105,14 +105,14 @@ def OnLoad():
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 
 	# calculate the paperdoll animation id from the race, class and gender
-	PDollTable = GemRB.LoadTableObject ("avatars")
-	table = GemRB.LoadTableObject ("avprefr")
+	PDollTable = GemRB.LoadTable ("avatars")
+	table = GemRB.LoadTable ("avprefr")
 	AnimID = 0x6000 + table.GetValue (GemRB.GetVar("BaseRace"), 0)
 
-	table = GemRB.LoadTableObject ("avprefc")
+	table = GemRB.LoadTable ("avprefc")
 	AnimID = AnimID + table.GetValue (GemRB.GetVar("BaseClass"), 0)
 
-	table = GemRB.LoadTableObject ("avprefg")
+	table = GemRB.LoadTable ("avprefg")
 	AnimID = AnimID + table.GetValue (GemRB.GetVar("Gender"), 0)
 
 	PDollResRef = PDollTable.GetValue (hex(AnimID), "AT_1") + "G1"

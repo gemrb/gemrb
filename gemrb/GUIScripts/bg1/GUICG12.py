@@ -54,7 +54,7 @@ def OnLoad():
 	Gender = GemRB.GetPlayerStat (MyChar, IE_SEX)
 
 	#Load the Portraits Table
-	PortraitsTable = GemRB.LoadTableObject ("PICTURES")
+	PortraitsTable = GemRB.LoadTable ("PICTURES")
 	PortraitsStart = PortraitsTable.FindValue (0, 2)
 	FemaleCount = PortraitsTable.GetRowCount () - PortraitsStart + 1
 	if Gender == 2:
@@ -227,7 +227,7 @@ def CustomPress():
 	return
 
 def NextPress():
-	PortraitTable = GemRB.LoadTableObject ("pictures")
+	PortraitTable = GemRB.LoadTable ("pictures")
 	PortraitName = PortraitTable.GetRowName (LastPortrait )
 	GemRB.SetToken ("SmallPortrait", PortraitName+"S")
 	GemRB.SetToken ("LargePortrait", PortraitName+"L")

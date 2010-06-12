@@ -125,7 +125,7 @@ def UpdateOverview(CurrentStep):
 	TextAreaControl = CharGenWindow.GetControl(9)
 	Tables = []
 	for tbl in ['races', 'classes', 'aligns', 'ability', 'skillsta', 'skills', 'featreq', 'feats']:
-		Tables.append(GemRB.LoadTableObject(tbl))
+		Tables.append(GemRB.LoadTable(tbl))
 	
 	if GemRB.GetVar('Gender') > 0:
 		if GemRB.GetToken('CHARNAME') == '':

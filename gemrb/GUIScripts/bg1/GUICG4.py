@@ -116,10 +116,10 @@ def OnLoad():
 			AbilityWindow = None
 		return
 
-	Abracead = GemRB.LoadTableObject("ABRACEAD")
-	#Abclsmod = GemRB.LoadTableObject("ABCLSMOD")
-	Abclasrq = GemRB.LoadTableObject("ABCLASRQ")
-	Abracerq = GemRB.LoadTableObject("ABRACERQ")
+	Abracead = GemRB.LoadTable("ABRACEAD")
+	#Abclsmod = GemRB.LoadTable("ABCLSMOD")
+	Abclasrq = GemRB.LoadTable("ABCLASRQ")
+	Abracerq = GemRB.LoadTable("ABRACERQ")
 
 	MyChar = GemRB.GetVar ("Slot")
 	Kit = GetKitIndex (MyChar)
@@ -140,7 +140,7 @@ def OnLoad():
 	KitIndex = Abclasrq.GetRowIndex(KitName)
 
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	AbilityTable = GemRB.LoadTableObject("ability")
+	AbilityTable = GemRB.LoadTable("ability")
 	AbilityWindow = GemRB.LoadWindowObject(4)
 
 	RerollButton = AbilityWindow.GetControl(2)
@@ -279,7 +279,7 @@ def BackPress():
 def NextPress():
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	
-	AbilityTable = GemRB.LoadTableObject ("ability")
+	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 	
 	# print our diagnostic as we loop (so as not to duplicate)

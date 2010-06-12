@@ -161,7 +161,7 @@ def UpdateRecordsWindow ():
 	GemRB.SetVar ("MAGESCHOOL", 0)
 	Kit = GetKitIndex (pc)
 	if Kit and KitListTable.GetValue (Kit, 7) == 1:
-		MageTable = GemRB.LoadTableObject ("magesch")
+		MageTable = GemRB.LoadTable ("magesch")
 		GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, KitListTable.GetValue (Kit, 6) ) )
 
 	# exportable
@@ -269,7 +269,7 @@ def UpdateRecordsWindow ():
 	Label = Window.GetControl (0x1000000f)
 	Label.SetText (text)
 
-	Table = GemRB.LoadTableObject ("aligns")
+	Table = GemRB.LoadTable ("aligns")
 
 	text = Table.GetValue (Table.FindValue ( 3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT) ), 0)
 	Label = Window.GetControl (0x10000010)
@@ -309,7 +309,7 @@ def GSNN (pc, stat):
 # LevelDiff is used only from the level up code and holds the level
 # difference for each class
 def GetStatOverview (pc, LevelDiff=[0,0,0]):
-	StateTable = GemRB.LoadTableObject ("statdesc")
+	StateTable = GemRB.LoadTable ("statdesc")
 	str_None = GemRB.GetString (61560)
 
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
@@ -460,7 +460,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	stats.append ( (9461, GSNN (pc, IE_STEALTH), '') )
 	HatedRace = GS (IE_HATEDRACE)
 	if HatedRace:
-		HateTable = GemRB.LoadTableObject ("haterace")
+		HateTable = GemRB.LoadTable ("haterace")
 		Racist = HateTable.FindValue (1, HatedRace)
 		if Racist != -1:
 			HatedRace = HateTable.GetValue (Racist, 0)
@@ -497,7 +497,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	# 9466 Weapon proficiencies
 	stats.append (9466)
-	table = GemRB.LoadTableObject ("weapprof")
+	table = GemRB.LoadTable ("weapprof")
 	RowCount = table.GetRowCount ()
 	# the first 7 profs are foobared
 	for i in range (8,RowCount):
@@ -594,7 +594,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	if profcount:
 		wstyletables = { IE_PROFICIENCY2WEAPON:"wstwowpn", IE_PROFICIENCY2HANDED:"wstwohnd", IE_PROFICIENCYSINGLEWEAPON:"wssingle", IE_PROFICIENCYSWORDANDSHIELD:"wsshield" }
 		bonusrefs = { "THAC0BONUSRIGHT":56911, "THAC0BONUSLEFT":56910, "DAMAGEBONUS":10336, "CRITICALHITBONUS":32140, "PHYSICALSPEED":32141, "AC":10339, "ACVSMISSLE":10340 }
-		WStyleTable = GemRB.LoadTableObject (wstyletables[wstyle%1000])
+		WStyleTable = GemRB.LoadTable (wstyletables[wstyle%1000])
 		for col in range(WStyleTable.GetColumnCount()):
 			value = WStyleTable.GetValue (profcount, col)
 			stats.append ((bonusrefs[WStyleTable.GetColumnName(col)], value, ''))
@@ -638,7 +638,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 
 def GetReputation (repvalue):
-	table = GemRB.LoadTableObject ("reptxt")
+	table = GemRB.LoadTable ("reptxt")
 	if repvalue>20:
 		repvalue=20
 	txt = GemRB.GetString (table.GetValue (repvalue, 0) )
@@ -914,9 +914,9 @@ def OpenCustomizeWindow ():
 	else:
 		Exportable = 0
 
-	PortraitsTable = GemRB.LoadTableObject ("PICTURES")
-	ScriptsTable = GemRB.LoadTableObject ("SCRPDESC")
-	ColorTable = GemRB.LoadTableObject ("CLOWNCOL")
+	PortraitsTable = GemRB.LoadTable ("PICTURES")
+	ScriptsTable = GemRB.LoadTable ("SCRPDESC")
+	ColorTable = GemRB.LoadTable ("CLOWNCOL")
 	CustomizeWindow = GemRB.LoadWindowObject (17)
 
 	AppearanceButton = CustomizeWindow.GetControl (0)

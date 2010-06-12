@@ -308,7 +308,7 @@ def GetHLAs ():
 	HLANewAbilities = []
 
 	# the HLA table lookup table
-	HLAAbbrTable = GemRB.LoadTableObject ("luabbr")
+	HLAAbbrTable = GemRB.LoadTable ("luabbr")
 
 	# get all the HLAs for each class
 	for i in range (NumClasses):
@@ -324,7 +324,7 @@ def GetHLAs ():
 			HLAClassTable = "lu" + HLAAbbrTable.GetValue (ClassName, "ABBREV")
 
 		# actually load the table
-		HLAClassTable = GemRB.LoadTableObject (HLAClassTable)
+		HLAClassTable = GemRB.LoadTable (HLAClassTable)
 		print "HLA Class/Kit:",ClassName
 
 		# save all our HLAs from this class

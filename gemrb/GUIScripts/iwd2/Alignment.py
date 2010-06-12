@@ -32,10 +32,10 @@ def OnLoad():
 	Class = GemRB.GetVar("Class")-1
 	KitName = ClassTable.GetRowName(Class)
 
-	AlignmentOk = GemRB.LoadTableObject("ALIGNMNT")
+	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
 	GemRB.LoadWindowPack("GUICG", 800, 600)
-	AlignmentTable = GemRB.LoadTableObject("aligns")
+	AlignmentTable = GemRB.LoadTable("aligns")
 	AlignmentWindow = GemRB.LoadWindowObject(3)
 	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)

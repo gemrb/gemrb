@@ -139,7 +139,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsTextArea = ProfsWindow.GetControl (42)
 		if (scroll):
 			ProfsScrollBar = ProfsWindow.GetControl (108)
-		ClassWeaponsTable = GemRB.LoadTableObject ("clasweap")
+		ClassWeaponsTable = GemRB.LoadTable ("clasweap")
 	elif type == LUPROFS_TYPE_DUALCLASS: #dualclass
 		ProfsOffsetSum = 40
 		ProfsOffsetButton1 = 50
@@ -157,7 +157,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	GemRB.SetVar ("ProfsTopIndex", 0)
 	ProfsPointsLeft = 0
 	ProfsTopIndex = 0
-	ProfsTable = GemRB.LoadTableObject ("profs")
+	ProfsTable = GemRB.LoadTable ("profs")
 
 	#get the class name
 	IsDual = IsDualClassed (pc, 1)
@@ -192,7 +192,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	ProfsPointsLeft += level2[FastestProf]/ProfsRate - level1[FastestProf]/ProfsRate
 
 	#setup prof vars for passing between functions
-	ProfsTable = GemRB.LoadTableObject ("weapprof")
+	ProfsTable = GemRB.LoadTable ("weapprof")
 	Kit = GetKitIndex (pc)
 	if Kit and type != LUPROFS_TYPE_DUALCLASS and IsMulti[0]<2 and not IsDual[0]:
 		#if we do kit with dualclass, we'll get the old kit
@@ -206,7 +206,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 			if GameIsIWD1():
 				# these two have a nice table (unlike the rest we had to override)
 				# but it is transposed when compared
-				ClassWeapTable = GemRB.LoadTableObject ("clasweap")
+				ClassWeapTable = GemRB.LoadTable ("clasweap")
 				ProfsColumn = ClassWeapTable.GetRowIndex (ClassName)
 			else:
 				ProfsColumn = ProfsTable.GetColumnIndex (ClassName)
@@ -385,7 +385,7 @@ def ProfsLeftPress():
 	if ProfsPointsLeft == 0:
 		return
 	if GameIsIWD1():
-		ProfMaxTable = GemRB.LoadTableObject ("profsmax")
+		ProfMaxTable = GemRB.LoadTable ("profsmax")
 		MaxProf = ProfMaxTable.GetValue(ClassNameSave, "OTHER_LEVELS")
 	else:
 		MaxProf = ProfsTable.GetValue(Pos+ProfsTableOffset, ProfsColumn)
@@ -436,7 +436,7 @@ def ProfsNullify ():
 
 	global ProfsTable
 	if not ProfsTable:
-		ProfsTable = GemRB.LoadTableObject ("weapprof")
+		ProfsTable = GemRB.LoadTable ("weapprof")
 	for i in range (ProfsTable.GetRowCount()-ProfsTableOffset+1): #skip bg1 profs
 		GemRB.SetVar ("Prof "+str(i), 0)
 		GemRB.SetVar ("ProfBase "+str(i), 0)

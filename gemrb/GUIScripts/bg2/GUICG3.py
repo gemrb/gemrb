@@ -40,10 +40,10 @@ def OnLoad():
 		#rowname is just a number, first value row what we need here
 		KitName = KitListTable.GetValue(Kit, 0)
 
-	AlignmentOk = GemRB.LoadTableObject("ALIGNMNT")
+	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	AlignmentTable = GemRB.LoadTableObject("aligns")
+	AlignmentTable = GemRB.LoadTable("aligns")
 	AlignmentWindow = GemRB.LoadWindowObject(3)
 
 	for i in range(9):
@@ -97,11 +97,11 @@ def NextPress():
 	#       reputation
 	#       alignment abilities
 	Alignment = GemRB.GetVar ("Alignment")
-	AlignmentTable = GemRB.LoadTableObject ("aligns")
+	AlignmentTable = GemRB.LoadTable ("aligns")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment)
 
 	# use the alignment to apply starting reputation
-	RepTable = GemRB.LoadTableObject ("repstart")
+	RepTable = GemRB.LoadTable ("repstart")
 	AlignmentAbbrev = AlignmentTable.FindValue (3, Alignment)
 	Rep = RepTable.GetValue (AlignmentAbbrev, 0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, Rep)

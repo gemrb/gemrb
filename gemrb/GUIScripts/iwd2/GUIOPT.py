@@ -558,7 +558,7 @@ def OpenMovieWindow ():
 	PlayButton = Window.GetControl(2)
 	CreditsButton = Window.GetControl(3)
 	DoneButton = Window.GetControl(4)
-	MoviesTable = GemRB.LoadTableObject("MOVIDESC")
+	MoviesTable = GemRB.LoadTable("MOVIDESC")
 	for i in range(0, MoviesTable.GetRowCount() ):
 		t = MoviesTable.GetRowName(i)
 		if GemRB.GetVar(t)==1:

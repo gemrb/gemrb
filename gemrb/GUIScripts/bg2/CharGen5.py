@@ -22,7 +22,7 @@ from CharGenCommon import *
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
-	AbilityTable = GemRB.LoadTableObject ("ability")
+	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 	
 	# set all our abilites to zero

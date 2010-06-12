@@ -393,7 +393,7 @@ def OnMageRemoveSpell ():
 def LoadCondition ():
 	global ContCond, ContTarg
 
-	Table = GemRB.LoadTableObject ("contcond")
+	Table = GemRB.LoadTable ("contcond")
 	CondCount = Table.GetRowCount ()
 	ContCond = [0] * CondCount
 
@@ -402,7 +402,7 @@ def LoadCondition ():
 		tuple = (Table.GetValue (i, 0),Table.GetValue (i, 1) )
 		ContCond[i] = tuple
 
-	Table = GemRB.LoadTableObject ("conttarg")
+	Table = GemRB.LoadTable ("conttarg")
 	TargCount = Table.GetRowCount ()
 	ContTarg = [0] * TargCount
 
@@ -672,7 +672,7 @@ def ContingencyHelpTarget ():
 def LoadExclusions():
 	global Exclusions
 
-	ExclusionTable = GemRB.LoadTableObject ("contingx")
+	ExclusionTable = GemRB.LoadTable ("contingx")
 	Columns = ExclusionTable.GetColumnCount ()
 	Rows = ExclusionTable.GetRowCount ()
 	Exclusions = []

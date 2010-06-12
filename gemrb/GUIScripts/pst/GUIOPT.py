@@ -813,7 +813,7 @@ def OpenMoviesWindow ():
 	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMoviesWindow")
 
 
-	MovieTable = GemRB.LoadTableObject ("MOVIDESC")
+	MovieTable = GemRB.LoadTable ("MOVIDESC")
 
 	for i in range (MovieTable.GetRowCount ()):
 		#key = MovieTable.GetRowName (i)
@@ -835,7 +835,7 @@ def OnPlayMoviePress ():
 	if selected == -1:
 		return
 	
-	MovieTable = GemRB.LoadTableObject ("MOVIDESC")
+	MovieTable = GemRB.LoadTable ("MOVIDESC")
 	key = MovieTable.GetRowName (selected)
 
 	GemRB.PlayMovie (key, 1)

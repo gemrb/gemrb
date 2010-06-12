@@ -229,10 +229,10 @@ def UpdateAnimation ():
 			if item:
 				animid = item["AnimationType"]
 
-	BioTable = GemRB.LoadTableObject ("BIOS")
+	BioTable = GemRB.LoadTable ("BIOS")
 	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 	AvatarName = BioTable.GetValue (Specific, "PC")
-	AnimTable = GemRB.LoadTableObject ("ANIMS")
+	AnimTable = GemRB.LoadTable ("ANIMS")
 	if animid=="":
 		animid="*"
 	value = AnimTable.GetValue (animid, AvatarName)

@@ -114,7 +114,7 @@ def CloseContainerWindow ():
 	ContainerWindow = None
 	GemRB.SetVar ("ActionsWindow", OldActionsWindow.ID)
 	GemRB.SetVar ("MessageWindow", OldMessageWindow.ID)
-	Table = GemRB.LoadTableObject ("containr")
+	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']
 	tmp = Table.GetValue (row, 2)
 	#play closing sound if applicable
@@ -241,7 +241,7 @@ def OpenContainerWindow ():
 
 	Button = Window.GetControl (50)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Table = GemRB.LoadTableObject ("containr")
+	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']
 	tmp = Table.GetValue (row, 0)
 	if tmp!='*':

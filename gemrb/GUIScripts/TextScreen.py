@@ -72,7 +72,7 @@ def StartTextScreen ():
 	TextArea.SetEvent (IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
 
 	#caption
-	Table = GemRB.LoadTableObject (TableName)
+	Table = GemRB.LoadTable (TableName)
 	if GameIsBG1():
 		#these suckers couldn't use a fix row
 		Row = Table.GetRowIndex("DEFAULT")
@@ -112,7 +112,7 @@ def StartTextScreen ():
 def FeedScroll ():
 	global TextArea, Position
 
-	Table = GemRB.LoadTableObject (TableName)
+	Table = GemRB.LoadTable (TableName)
 	if GameIsBG2():
 		#this is a rather primitive selection but works for the games
 		Value = Table.GetValue (0, 1)

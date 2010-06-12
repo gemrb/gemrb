@@ -76,7 +76,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 		KitMask = kit 
 
 	# make sure there is an entry at the given level (bard)
-	SpellsKnownTable = GemRB.LoadTableObject (table)
+	SpellsKnownTable = GemRB.LoadTable (table)
 	if not SpellsKnownTable.GetValue (str(level), str(1), 1):
 		if chargen:
 			GemRB.SetNextScript("GUICG6")
@@ -421,7 +421,7 @@ def SpellsPickPress ():
 	global SpellBook, SpellsSelectPointsLeft
 
 	# load up our table
-	AutoTable = GemRB.LoadTableObject ("splautop")
+	AutoTable = GemRB.LoadTable ("splautop")
 
 	for i in range (AutoTable.GetRowCount ()):
 		if SpellsSelectPointsLeft[SpellLevel] == 0:

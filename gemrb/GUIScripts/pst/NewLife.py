@@ -62,7 +62,7 @@ def OnLoad():
 
 	GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_SET)
 	GemRB.LoadGame(None)  #loading the base game
-	StatTable = GemRB.LoadTableObject("abcomm")
+	StatTable = GemRB.LoadTable("abcomm")
 	GemRB.LoadWindowPack("GUICG")
 	#setting up confirmation window
 	QuitWindow = GemRB.LoadWindowObject(1)
@@ -375,14 +375,14 @@ def WisPress():
 	return
 
 def DexPress():
-	Table = GemRB.LoadTableObject("dexmod")
+	Table = GemRB.LoadTable("dexmod")
 	x = -Table.GetValue(Dex,2)
 	TextArea.SetText(18487)
 	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(Dex,3),x,0) )
 	return
 
 def ConPress():
-	Table = GemRB.LoadTableObject("hpconbon")
+	Table = GemRB.LoadTable("hpconbon")
 	x = Table.GetValue(Con-1,1)
 	TextArea.SetText(18491)
 	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(Con,4),x,0) )

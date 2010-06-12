@@ -238,7 +238,7 @@ def DisplayGeneral (pc):
 
 	#favoured class
 	RecordsTextArea.Append (40310,-1)
-	AlignTable = GemRB.LoadTableObject("aligns")
+	AlignTable = GemRB.LoadTable("aligns")
 
 	#get the subrace value
 	Value = GemRB.GetPlayerStat(pc,IE_RACE)
@@ -276,7 +276,7 @@ def DisplayGeneral (pc):
 		RecordsTextArea.Append ("\n\n[color=ffff00]")
 		RecordsTextArea.Append (32052)
 		RecordsTextArea.Append ("[/color][capital=2]")
-		StateTable = GemRB.LoadTableObject ("statdesc")
+		StateTable = GemRB.LoadTable ("statdesc")
 		for c in effects:
 			tmp = StateTable.GetValue (ord(c)-66, 0)
 			RecordsTextArea.Append (c+" ", -1)
@@ -370,8 +370,8 @@ def DisplayWeapons (pc):
 def DisplaySkills (pc):
 	Window = RecordsWindow
 
-	SkillTable = GemRB.LoadTableObject ("skillsta")
-	SkillName = GemRB.LoadTableObject ("skills")
+	SkillTable = GemRB.LoadTable ("skillsta")
+	SkillName = GemRB.LoadTable ("skills")
 	rows = SkillTable.GetRowCount ()
 
 	#skills
@@ -390,8 +390,8 @@ def DisplaySkills (pc):
 			RecordsTextArea.Append (" "+str(value)+"("+str(base)+")")
 
 
-	FeatTable = GemRB.LoadTableObject ("featreq")
-	FeatName = GemRB.LoadTableObject ("feats")
+	FeatTable = GemRB.LoadTable ("featreq")
+	FeatName = GemRB.LoadTable ("feats")
 	rows = FeatTable.GetRowCount ()
 	#feats
 	featbits = [GemRB.GetPlayerStat (pc, IE_FEATS1), GemRB.GetPlayerStat (pc, IE_FEATS2), GemRB.GetPlayerStat (pc, IE_FEATS3)]
@@ -635,7 +635,7 @@ def OpenHelpWindow ():
 
 	InformationWindow = Window = GemRB.LoadWindowObject (57)
 
-	HelpTable = GemRB.LoadTableObject ("topics")
+	HelpTable = GemRB.LoadTable ("topics")
 	GemRB.SetVar("Topic", 0)
 	GemRB.SetVar("TopIndex", 0)
 
@@ -683,7 +683,7 @@ def UpdateHelpWindow ():
 	if DescTable:
 		DescTable = None
 
-	DescTable = GemRB.LoadTableObject (resource)
+	DescTable = GemRB.LoadTable (resource)
 
 	ScrollBar = Window.GetControl (4)
 

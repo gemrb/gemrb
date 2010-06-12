@@ -47,11 +47,11 @@ def OnLoad():
 	ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 	ClassName = ClassTable.GetRowName (GemRB.GetPlayerStat (MyChar, IE_HITPOINTS)) # barbarian hack
 
-	KitTable = GemRB.LoadTableObject("kittable")
+	KitTable = GemRB.LoadTable("kittable")
 	KitTableName = KitTable.GetValue(ClassName, RaceName)
-	KitTable = GemRB.LoadTableObject(KitTableName,1)
+	KitTable = GemRB.LoadTable(KitTableName,1)
 
-	SchoolList = GemRB.LoadTableObject("magesch")
+	SchoolList = GemRB.LoadTable("magesch")
 
 	#there is a specialist mage window, but it is easier to use
 	#the class kit window for both
@@ -235,7 +235,7 @@ def NextPress():
 	KitIndex = GemRB.GetVar ("Class Kit")
 	MageSchool = GemRB.GetVar ("MAGESCHOOL")
 	if MageSchool and not KitIndex:
-		SchoolTable = GemRB.LoadTableObject ("magesch")
+		SchoolTable = GemRB.LoadTable ("magesch")
 		KitIndex = KitListTable.FindValue (6, SchoolTable.GetValue (MageSchool, 3) )
 
 	#save the kit
