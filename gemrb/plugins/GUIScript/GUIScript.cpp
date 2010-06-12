@@ -1158,8 +1158,8 @@ static PyObject* GemRB_LoadSymbol(PyObject * /*self*/, PyObject* args)
 	if (ind == -1) {
 		return NULL;
 	}
-
-	return PyInt_FromLong( ind );
+	
+	return gs->ConstructObject("Symbol", ind);
 }
 
 PyDoc_STRVAR( GemRB_Symbol_Unload__doc,
@@ -9747,6 +9747,15 @@ void GUIScript::ExecString(const char* string)
 			PyErr_Print();
 		}
 	}
+}
+
+PyObject* GUIScript::ConstructObject(const char* type, int arg)
+{
+	PyObject* tuple = PyTuple_New(1);
+	PyTuple_SET_ITEM(tuple, 0, PyInt_FromLong(arg));
+	PyObject* ret = gs->ConstructObject(type, tuple);
+	Py_DECREF(tuple);
+	return ret;
 }
 
 PyObject* GUIScript::ConstructObject(const char* type, PyObject* pArgs)
