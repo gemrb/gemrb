@@ -242,10 +242,12 @@ def UpdateRecordsWindow ():
 		Label.SetText (str (stats[i]))
 
 	# race
-	# FIXME: for some strange reason, Morte's race is 1 (Human)
-	# in the save files, instead of 45 (Morte)
+	# HACK: for some strange reason, Morte's race is 1 (Human), instead of 45 (Morte)
 	print "species: %d  race: %d" %(GemRB.GetPlayerStat (pc, IE_SPECIES), GemRB.GetPlayerStat (pc, IE_RACE))
-	text = RaceTable.GetValue (GemRB.GetPlayerStat (pc, IE_RACE) - 1, 0)
+	if GemRB.GetPlayerStat (pc, IE_SPECIFIC) == 9: # unique to Morte
+		text = "Morte"
+	else:
+		text = RaceTable.GetValue (GemRB.GetPlayerStat (pc, IE_RACE) - 1, 0)
 	
 	Label = Window.GetControl (0x10000014)
 	Label.SetText (text)
