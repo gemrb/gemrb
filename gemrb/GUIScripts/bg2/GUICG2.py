@@ -18,6 +18,7 @@
 #
 #character generation, class (GUICG2)
 import GemRB
+from GUICommon import GameIsTOB
 from LUCommon import *
 
 ClassWindow = 0
