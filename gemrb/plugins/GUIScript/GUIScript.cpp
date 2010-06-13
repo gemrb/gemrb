@@ -52,6 +52,8 @@
 
 #include <cstdio>
 
+GUIScript *gs = NULL;
+
 //this stuff is missing from Python 2.2
 #ifndef PyDoc_VAR
 #define PyDoc_VAR(name) static char name[]
