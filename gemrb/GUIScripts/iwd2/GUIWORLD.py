@@ -25,7 +25,7 @@
 
 import GemRB
 from GUIDefines import *
-from GUICommon import CloseOtherWindow, SetEncumbranceLabels
+from GUICommon import SetEncumbranceLabels
 from GUICommonWindows import *
 from GUIClasses import GWindow
 

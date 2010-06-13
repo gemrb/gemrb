@@ -21,7 +21,6 @@ import GemRB
 
 from CharGenCommon import * 
 from LUProfsSelection import *
-from ie_stats import IE_PROFICIENCYBASTARDSWORD
 from GUICommonWindows import *
 
 SkillWindow = 0

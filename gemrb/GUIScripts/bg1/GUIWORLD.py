@@ -25,7 +25,6 @@
 import GemRB
 from GUIDefines import *
 from ie_restype import *
-from GUICommon import CloseOtherWindow
 from GUICommonWindows import *
 from GUIClasses import GWindow
 

@@ -19,7 +19,6 @@
 # character generation, mage spells (GUICG7)
 
 import GemRB
-from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells,CloseOtherWindow
 from CharGenCommon import * 
 from LUSpellSelection import *
 

@@ -23,7 +23,6 @@
 ###################################################
 
 import GemRB
-from math import ceil
 from GUIDefines import *
 from ie_stats import *
 from ie_modal import *

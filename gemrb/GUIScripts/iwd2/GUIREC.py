@@ -26,7 +26,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow, SetColorStat, RaceTable, ClassTable, NextLevelTable
+from GUICommon import CloseOtherWindow, RaceTable, ClassTable, NextLevelTable
 from GUICommon import GameWindow
 from GUICommonWindows import *
 

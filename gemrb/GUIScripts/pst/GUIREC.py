@@ -69,7 +69,7 @@ from GUIDefines import *
 from ie_stats import *
 from GUICommon import CloseOtherWindow, StrModTable, StrModExTable, ClassTable
 from GUICommon import RaceTable, NextLevelTable
-from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler, RunSelectionChangeHandler
+from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler
 from GUIWORLD import OpenReformPartyWindow
 
 ###################################################

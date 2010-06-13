@@ -24,7 +24,7 @@
 
 import GemRB
 from GUIDefines import *
-from GUICommon import CloseOtherWindow, SetGamedaysAndHourToken, UpdateInventorySlot
+from GUICommon import SetGamedaysAndHourToken, UpdateInventorySlot
 from GUICommonWindows import *
 from GUIClasses import GWindow
 

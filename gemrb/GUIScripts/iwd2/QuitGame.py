@@ -21,9 +21,7 @@
 
 ###################################################
 
-import GemRB
-from GUIDefines import *
-from GUIWORLD import *
+from GUIWORLD import DeathWindowEnd
 
 def OnLoad ():
 	DeathWindowEnd ()

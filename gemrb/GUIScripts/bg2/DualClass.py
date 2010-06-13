@@ -20,7 +20,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import HasTOB, GetLearnablePriestSpells, HasSpell, AddClassAbilities, RemoveClassAbilities
+from GUICommon import HasTOB, AddClassAbilities, RemoveClassAbilities
 from GUICommon import LearnPriestSpells
 from GUIREC import UpdateRecordsWindow
 from GUICommonWindows import *

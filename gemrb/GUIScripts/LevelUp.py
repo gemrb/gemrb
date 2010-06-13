@@ -22,8 +22,8 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
-from GUICommon import HasTOB, GetLearnablePriestSpells, GetMageSpells, HasSpell, AddClassAbilities, GameIsBG1, GameIsBG2, GameIsIWD1
-from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle, GSNN
+from GUICommon import HasTOB, GetLearnablePriestSpells, HasSpell, AddClassAbilities, GameIsBG1, GameIsBG2, GameIsIWD1
+from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle
 from GUICommonWindows import *
 from LUSpellSelection import *
 from LUCommon import *
