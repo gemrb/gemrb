@@ -369,9 +369,9 @@ def RefreshInventoryWindow ():
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 
 		if Slot == None:
-			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-			Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 		else:
 			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnDragItemGround")
 			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenGroundItemInfoWindow")
@@ -427,10 +427,10 @@ def UpdateSlot (pc, slot):
 			Button.SetBAM (SlotType["ResRef"],0,0)
 			Button.SetTooltip (SlotType["Tip"])
 
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_DOUBLE_PRESS, "")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, None)
 
 	if OverSlot == slot+1:
 		if GemRB.CanUseItemType (SlotType["Type"], itemname):

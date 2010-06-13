@@ -516,10 +516,10 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
 		Button.SetText ('')
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-		#Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
-		#Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, "")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, None)
 
 def OpenWaitForDiscWindow ():
 	global DiscWindow

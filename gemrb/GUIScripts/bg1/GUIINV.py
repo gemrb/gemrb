@@ -386,9 +386,9 @@ def RefreshInventoryWindow ():
 			Button.EnableBorder (0, 0)
 			Button.EnableBorder (1, 0)
 			Button.EnableBorder (2, 0)
-			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-			Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 
 	#making window visible/shaded depending on the pc's state
 	Window.SetVisible (WINDOW_VISIBLE)
@@ -467,9 +467,9 @@ def UpdateSlot (pc, slot):
 		Button.EnableBorder (1, 0)
 		Button.EnableBorder (2, 0)
 
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 
 	if OverSlot == slot+1:
 		if GemRB.CanUseItemType (SlotType["Type"], itemname):

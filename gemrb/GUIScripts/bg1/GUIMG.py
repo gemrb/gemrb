@@ -153,8 +153,8 @@ def UpdateMageWindow ():
 				Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
 			else:
 				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
@@ -174,8 +174,8 @@ def UpdateMageWindow ():
 
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 

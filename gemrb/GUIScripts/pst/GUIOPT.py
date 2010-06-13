@@ -682,7 +682,7 @@ def OpenKeyboardMappingsWindow ():
 	# Default
 	Button = Window.GetControl (3)
 	Button.SetText (49051)
-	#Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")	
+	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 
 	# Done
 	Button = Window.GetControl (4)

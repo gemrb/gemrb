@@ -137,7 +137,7 @@ def MultiPlayerPress():
 	ExitButton.SetText (15416)
 	MultiPlayerButton.SetText ("")
 	MoviesButton.SetText (11825)
-	MultiPlayerButton.SetEventByName (0, "")
+	MultiPlayerButton.SetEvent (0, None)
 	SinglePlayerButton.SetEventByName (0, "ConnectPress")
 	MoviesButton.SetEventByName (0, "PregenPress")
 	ExitButton.SetEventByName (0, "BackToMain")

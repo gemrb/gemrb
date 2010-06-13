@@ -114,8 +114,8 @@ def UpdatePriestWindow ():
 				Icon.SetSprites ("IVSLOT", 0,  0, 0, 0, 0)
 			else:
 				Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Icon.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-			Icon.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Icon.SetTooltip ('')
 			Icon.EnableBorder (0, 0)
 
@@ -136,8 +136,8 @@ def UpdatePriestWindow ():
 
 		else:
 			Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Icon.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-			Icon.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Icon.SetTooltip ('')
 	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
 		Window.SetVisible (WINDOW_GRAYED)

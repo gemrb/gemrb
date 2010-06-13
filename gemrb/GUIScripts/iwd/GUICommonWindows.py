@@ -100,7 +100,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	# Party mgmt
 	Button = Window.GetControl (8)
 	Button.SetTooltip (16312)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 
 	if Gears:
 		# Gears (time), how doesn't have this in the right place

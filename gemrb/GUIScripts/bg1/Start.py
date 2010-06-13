@@ -90,7 +90,7 @@ def MultiPlayerPress():
 	MultiPlayerButton.SetEventByName(0, "ConnectPress")
 	MoviesButton.SetEventByName(0, "BackToMain")
 	MoviesButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
-	ExitButton.SetEventByName(0, "")
+	ExitButton.SetEvent(0, None)
 	ExitButton.SetStatus(IE_GUI_BUTTON_DISABLED)
 	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	return

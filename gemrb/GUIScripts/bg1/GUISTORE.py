@@ -172,7 +172,7 @@ def OpenStoreWindow ():
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Button.SetTooltip ("")
-			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	ActionWindow.SetVisible (WINDOW_VISIBLE)

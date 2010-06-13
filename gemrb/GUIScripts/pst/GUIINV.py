@@ -246,9 +246,9 @@ def RefreshInventoryWindow ():
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 			Button.SetTooltip (4273)
 			Button.EnableBorder (0, 0)
-			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-			Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
  	return
 
 def UpdateSlot (pc, i):
@@ -319,15 +319,15 @@ def UpdateSlot (pc, i):
 			Button.SetTooltip (SlotType["Tip"])
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, '')
+			Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, None)
 			Button.SetTooltip ('')
 			itemname = ""
 
 		Button.EnableBorder (0, 0)
 		Button.EnableBorder (1, 0)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 
 	if OverSlot == slot-1:
 		if GemRB.CanUseItemType (SlotType["Type"], itemname):

@@ -357,9 +357,9 @@ def RefreshInventoryWindow ():
 			Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountGroundWindow")
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-			Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 
 	#if actor is uncontrollable, make this grayed
 	Window.SetVisible (WINDOW_VISIBLE)
@@ -404,9 +404,9 @@ def UpdateSlot (pc, slot):
 		Button.SetText ("")
 		Button.SetTooltip (SlotType["Tip"])
 
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 	return
 
 def OnDragItemGround ():
