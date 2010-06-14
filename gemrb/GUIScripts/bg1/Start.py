@@ -17,7 +17,6 @@
 #
 #
 import GemRB
-from GUICommon import LoadCommonTables
 
 StartWindow = 0
 QuitWindow = 0
@@ -38,8 +37,6 @@ def OnLoad():
 		GemRB.PlayMovie ('INFELOGO',1)
 		GemRB.PlayMovie ('INTRO',1)
 		GemRB.SetVar ("SkipIntroVideos", 1)
-
-	LoadCommonTables ()
 
 	GemRB.LoadWindowPack("START")
 

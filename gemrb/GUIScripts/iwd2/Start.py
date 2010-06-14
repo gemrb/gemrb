@@ -20,7 +20,6 @@
 # 
 import GemRB
 from LoadScreen import *
-from GUICommon import LoadCommonTables
 
 StartWindow = 0
 ProtocolWindow = 0
@@ -92,7 +91,6 @@ def OnLoad():
 	StartWindow.SetVisible(WINDOW_VISIBLE)
 	GemRB.LoadMusicPL("Theme.mus")
 
-	LoadCommonTables ()
 	return
 
 def ProtocolPress():

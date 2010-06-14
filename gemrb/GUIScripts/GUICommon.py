@@ -907,5 +907,7 @@ def LoadCommonTables():
 		StrModTable = GemRB.LoadTable ("strmod")
 		StrModExTable = GemRB.LoadTable ("strmodex")
 
+LoadCommonTables ()
+
 GameWindow = GUIClasses.GWindow(0)
 GameControl = GUIClasses.GControl(0,0)

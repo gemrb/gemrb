@@ -24,7 +24,6 @@
 
 import GemRB
 from GUICommonWindows import OpenWaitForDiscWindow
-from GUICommon import LoadCommonTables
 
 StartWindow = 0
 QuitWindow = 0
@@ -39,8 +38,6 @@ def OnLoad():
 		GemRB.PlayMovie ("OPENING")
 
 		GemRB.SetVar ("SkipIntroVideos", 1)
-
-	LoadCommonTables()
 
 	GemRB.LoadWindowPack("START")
 #quit subwindow
