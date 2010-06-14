@@ -143,8 +143,8 @@ static int **wssingle = NULL;
 
 //unhardcoded monk bonuses
 static int **monkbon = NULL;
-static int monkbon_cols = 0;
-static int monkbon_rows = 0;
+static unsigned int monkbon_cols = 0;
+static unsigned int monkbon_rows = 0;
 
 // reputation modifiers
 static int **reputationmod = NULL;
@@ -1147,7 +1147,7 @@ void Actor::ReleaseMemory()
 			wssingle=NULL;
 		}
 		if (monkbon) {
-			for (i=0; i<monkbon_rows; i++) {
+			for (unsigned i=0; i<monkbon_rows; i++) {
 				if (monkbon[i]) {
 					free(monkbon[i]);
 				}
@@ -1683,9 +1683,9 @@ static void InitActorTables()
 		monkbon_rows = tm->GetRowCount();
 		monkbon_cols = tm->GetColumnCount();
 		monkbon = (int **) calloc(monkbon_rows, sizeof(int *));
-		for (i=0; i<monkbon_rows; i++) {
+		for (unsigned i=0; i<monkbon_rows; i++) {
 			monkbon[i] = (int *) calloc(monkbon_cols, sizeof(int));
-			for (int j=0; j<monkbon_cols; j++) {
+			for (unsigned  j=0; j<monkbon_cols; j++) {
 				monkbon[i][j] = atoi(tm->QueryField(i, j));
 			}
 		}
@@ -2115,7 +2115,9 @@ void Actor::RefreshPCStats() {
 		//HACK: attacks per round bonus for monks should only apply to fists
 		if (isclass[ISMONK]&(1<<BaseStats[IE_CLASS])) {
 			unsigned int level = GetMonkLevel()-1;
-			SetBase(IE_NUMBEROFATTACKS, 2 + monkbon[0][level]);
+			if (level < monkbon_cols) {
+				SetBase(IE_NUMBEROFATTACKS, 2 + monkbon[0][level]);
+			}
 		} else {
 			//wspattack appears to only effect warriors
 			int defaultattacks = 2 + 2*dualwielding;
@@ -5851,8 +5853,10 @@ void Actor::CreateDerivedStatsBG()
 	// attacks per round bonus will be handled elsewhere, since it only applies to fist apr
 	if (isclass[ISMONK]&(1<<classid)) {
 		unsigned int level = GetMonkLevel()-1;
-		BaseStats[IE_ARMORCLASS] = DEFAULTAC - monkbon[1][level];
-		BaseStats[IE_ACMISSILEMOD] = - monkbon[2][level];
+		if (level < monkbon_cols) {
+			BaseStats[IE_ARMORCLASS] = DEFAULTAC - monkbon[1][level];
+			BaseStats[IE_ACMISSILEMOD] = - monkbon[2][level];
+		}
 	}
 
 	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;
