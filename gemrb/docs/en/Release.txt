@@ -1,5 +1,3 @@
-
-
 How to make a release
 *********************
 
@@ -28,7 +26,6 @@ Source release
 ==============
 
 * on Unix/Linux: 
-  ./autogen.sh
   make dist
 
 
@@ -55,6 +52,10 @@ Windows binary release
 Release and Announcements
 =========================
 
+* Write the release notes if necessary. They are mainly for packagers, so
+create them if there are structural or build related changes. New config
+options should also be mentioned here if they're not part of the changelog.
+
 * Put the tarballs/binaries into Releases on SF
   - create a new directory in the appropriate section by rightclicking
   - mark it for upload
@@ -69,5 +70,6 @@ Release and Announcements
   Gibberlings3:
     - our forum
     - modding news (Avenger, Theacefes, Grim Squeaker, DavidW and cmorgan have access)
+  (a template is available in admin/announcement.template)
 
 * Run admin/restart_news.sh to restart the NEWS cycle
