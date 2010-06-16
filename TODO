@@ -7,10 +7,9 @@ Strings:
 2. implement feature: "<GENDER?stref1:strref2>" (or even more ambitious stat specific strref tokens)
 
 Combat:
-1. (DONE?) fix combat round timings
+1. (PARTLY) fix combat round timings
 2. implement customisable combat calculation, it should be general enough to
 simulate all games, without any hardcoded parts
-3. (PARTLY) implement wspatck.2da and wspecial.2da handling
 
 Items:
 1. (DONE-almost) Break items, count charges
@@ -87,8 +86,6 @@ Sound:
 6. implement and use as much from EAX (echo, damping, etc) as possible
 
 Release:
-1. Create packages for various distros and get them to distributions. Requires
-   maintainers.
 2. Get a sample game with some free license which could be distributed
    with GemRB.
 
@@ -101,5 +98,4 @@ Documentation:
 
 
 Community:
-1. (DONE-needs more work) Update the web page, get rid of postnuke
 2. Move this todo to bug/task tracker at Sourceforge :-)
