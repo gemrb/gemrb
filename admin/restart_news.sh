@@ -26,7 +26,7 @@ fi
 
 # get the last revision that contains a change in the word git in NEWS
 # that's usually the final release update
-rev=$(git log -Sgit --pretty="format:%h" NEWS)
+rev=$(git log -Sgit --pretty="format:%h" NEWS | head -n 1)
 rev="${rev:-missing revision}"
 
 cat - NEWS > NEWSNEWS << LILARCOR
@@ -36,7 +36,6 @@ GemRB git ($rev):
 
   Improved features:
     - 
-    - various guiscripts
     - bugfixes
 
   Applied patches:
