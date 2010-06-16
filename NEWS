@@ -1,16 +1,13 @@
-GemRB git (475cee20):
+GemRB V0.6.1 (2010-06-16):
   New features:
-    - 
     - a minimal dataset
-    - turn undead
     - reputation penalties on death or injury
     - casting level bonus/malus (wild mages, clerics)
     - tinting for different times of the day and weather effects
     - a BI(n)K player plugin for the IWD2 movies
-    - new actions
+    - new actions, turn undead
 
   Improved features:
-    - 
     - the internal design was cleaned up in many places
     - game saving, modal actions, combat, effects, spawns
     - magic missiles are now drawn properly
