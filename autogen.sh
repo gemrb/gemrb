@@ -9,6 +9,13 @@ export WANT_AUTOCONF="2.5"
 #export CXXFLAGS="-ggdb -I/usr/local/include"
 #export LDFLAGS="-ggdb -L/usr/local/lib"
 
+echo "
+
+The autotools build system is NO LONGER MAINTAINED and may be dropped in
+future versions! Please switch to using cmake instead.
+
+"
+
 if [ "$1" = "" ]; then
   dest=$HOME/GemRB
 else
