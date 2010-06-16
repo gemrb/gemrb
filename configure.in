@@ -238,14 +238,12 @@ gemrb/override/iwd/Makefile
 gemrb/override/iwd2/Makefile
 gemrb/override/pst/Makefile
 gemrb/override/shared/Makefile
-gemrb/override/test1/Makefile
 gemrb/GUIScripts/Makefile
 gemrb/GUIScripts/bg1/Makefile
 gemrb/GUIScripts/bg2/Makefile
 gemrb/GUIScripts/iwd/Makefile
 gemrb/GUIScripts/iwd2/Makefile
 gemrb/GUIScripts/pst/Makefile
-gemrb/GUIScripts/test1/Makefile
 gemrb/plugins/Makefile 
 gemrb/plugins/2DAImporter/Makefile 
 gemrb/plugins/ACMReader/Makefile

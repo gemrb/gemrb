@@ -365,9 +365,3 @@ if argv[1] == "bg2":
 	generate_wedge()
 	generate_s(True)
 	generate_line("LINE")
-
-if argv[1] == "test1":
-	generate_line("LINE")
-	generate_t()
-	generate_v()
-

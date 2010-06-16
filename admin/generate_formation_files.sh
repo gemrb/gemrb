@@ -5,5 +5,4 @@
 ./make_formation.py iwd2 > ../gemrb/override/iwd2/formatio.2da
 ./make_formation.py pst > ../gemrb/override/pst/formatio.2da
 ./make_formation.py how > ../gemrb/override/how/formatio.2da
-./make_formation.py test1 > ../gemrb/override/test1/formatio.2da
 
