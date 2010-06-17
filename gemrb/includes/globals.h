@@ -129,8 +129,9 @@
 #define  GF_ONSCREEN_TEXT       	44 //pst
 #define  GF_SPECIFIC_DMG_BONUS		45 //how, iwd2
 #define  GF_STRREF_SAVEGAME       	46 //iwd2
+#define  GF_WISDOM_BONUS      	 	47 //pst
 //update this
-#define GF_COUNT 47
+#define GF_COUNT 48
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
