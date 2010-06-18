@@ -94,6 +94,7 @@ static ieWordSigned *dexmod = NULL;
 static ieWordSigned *conmod = NULL;
 static ieWordSigned *chrmod = NULL;
 static ieWordSigned *lorebon = NULL;
+static ieWordSigned *wisbon = NULL;
 static ieVariable IWD2DeathVarFormat = "_DEAD%s";
 static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
 
@@ -277,6 +278,10 @@ void FreeAbilityTables()
 		free(lorebon);
 	}
 	lorebon = NULL;
+	if (wisbon) {
+		free(wisbon);
+	}
+	wisbon = NULL;
 }
 
 void Interface::FreeResRefTable(ieResRef *&table, int &count)
@@ -620,6 +625,9 @@ bool GenerateAbilityTables()
 	lorebon = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
 	if (!lorebon)
 		return false;
+	wisbon = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
+	if (!wisbon)
+		return false;
 	return true;
 }
 
@@ -680,6 +688,11 @@ bool Interface::ReadAbilityTables()
 	ret = ReadAbilityTable("chrmodst", chrmod, MaximumAbility + 1, 1);
 	if (!ret)
 		return ret;
+	if (HasFeature(GF_WISDOM_BONUS)) {
+		ret = ReadAbilityTable("wisxpbon", wisbon, 1, MaximumAbility + 1);
+		if (!ret)
+			return ret;
+	}
 	return true;
 }
 
@@ -2236,6 +2249,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"OnScreenText",       //44GF_ONSCREEN_TEXT
 		"HasSpecificDamageBonus", //45GF_SPECIFIC_DMG_BONUS
 		"StrrefSaveGame",     //46GF_STRREF_SAVEGAME
+		"HasWisdomBonusTable",//47GF_WISDOM_BONUS
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -5093,6 +5107,17 @@ int Interface::GetLoreBonus(int column, int value) const
 	if (HasFeature(GF_3ED_RULES)) return 0;
 
 	return lorebon[value];
+}
+
+int Interface::GetWisdomBonus(int column, int value) const
+{
+	// xp bonus
+	if (column<0 || column>0)
+		return -9999;
+
+	if (!HasFeature(GF_WISDOM_BONUS)) return 0;
+
+	return wisbon[value];
 }
 
 // -3, -2 if request is illegal or in cutscene

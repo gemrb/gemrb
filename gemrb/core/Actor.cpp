@@ -4439,6 +4439,9 @@ void Actor::Heal(int days)
 
 void Actor::AddExperience(int exp)
 {
+	if (core->HasFeature(GF_WISDOM_BONUS)) {
+		exp = (exp * (100 + core->GetWisdomBonus(0, Modified[IE_WIS]))) / 100;
+	}
 	SetBase(IE_XP,BaseStats[IE_XP]+exp);
 }
 

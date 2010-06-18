@@ -311,22 +311,10 @@ def OnRecordsButtonLeave ():
 
 def OnRecordsHelpFaction ():
 	Window = RecordsWindow
-	#Help = GemRB.GetVar ("ControlHelp")
 	Help = GemRB.GetString (20106) + "\n\n" + faction_help
 	TextArea = Window.GetControl (0)
 	TextArea.SetText (Help)
 	return
-	
-	# 20106 faction
-
-	# 34584 no align 1/8
-	# 34588 Dustmen 4/8 
-	# 34585 godsmen 8/8
-	# 34587 Sensates 3/8
-	# 34589 Anarchists 5/8
-	# 34590 Xaositects 6/8
-	# 3789 indeps 7/8
-	# 34586 Mercykillers 2/8
 
 def OnRecordsHelpArmorClass ():
 	Window = RecordsWindow
@@ -348,20 +336,6 @@ def OnRecordsHelpAlignment ():
 	TextArea = Window.GetControl (0)
 	TextArea.SetText (Help)
 	return
-	
-	# 20105 alignment
-
-	# 33657 LG desc
-	# 33927 NG
-	# 33928 CG
-	# 33929 LN
-	# 33948 TN
-	# 33949 CN
-	# 33950 LE
-	# 33951 NE
-	# 33952 CE
-
-	# 33930 - attr comments
 
 #Bio:
 # 38787 no
@@ -394,7 +368,6 @@ def OnRecordsHelpStrength ():
 	TextArea.SetText(18489)
 	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(s,0),x,y) )
 
-	# Unloading tables
 	return
 
 def OnRecordsHelpDexterity ():
