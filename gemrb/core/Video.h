@@ -203,6 +203,7 @@ public:
 		unsigned int w, unsigned int h,
 		unsigned int dstx, unsigned int dsty,
 		ieDword titleref) = 0;
+	virtual void DrawMovieSubtitle(ieStrRef text) = 0;
 	/** handles events during movie */
 	virtual int PollMovieEvents() = 0;
 	virtual void SetGamma(int brightness, int contrast) = 0;

@@ -588,6 +588,7 @@ int BIKPlayer::EndVideo()
 	for (i = 0; i < BINK_NB_SRC; i++) {
 		av_freep((void **) &c_bundle[i].data);
 	}
+	video->DrawMovieSubtitle(0);
 	return 0;
 }
 static const uint8_t rle_length_tab[16] = {

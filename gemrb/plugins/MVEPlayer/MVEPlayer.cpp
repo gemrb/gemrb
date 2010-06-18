@@ -114,6 +114,7 @@ int MVEPlay::doPlay()
 		done = video->PollMovieEvents();
 	}
 
+	video->DrawMovieSubtitle(0);
 	return 0;
 }
 
