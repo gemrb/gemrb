@@ -673,7 +673,7 @@ def PortraitButtonOnMouseEnter ():
 			GemRB.SwapPCs (DraggedPortrait, i)
 			GemRB.SetVar ("PressedPortrait", DraggedPortrait)
 			DraggedPortrait = i
-			GemRB.SetTimedEvent ("CheckDragging",1)
+			GemRB.SetTimedEventByName ("CheckDragging",1)
 		else:
 			OnDropPortraitToPC()
 		return
@@ -710,7 +710,7 @@ def PortraitButtonOnMouseLeave ():
 	Button = PortraitWindow.GetControl (i-1)
 	Button.EnableBorder (FRAME_PC_TARGET, 0)
 	GemRB.SetVar ("PressedPortrait", 0)
-	GemRB.SetTimedEvent ("CheckDragging",1)
+	GemRB.SetTimedEventByName ("CheckDragging",1)
 	return
 
 def OpenWaitForDiscWindow ():

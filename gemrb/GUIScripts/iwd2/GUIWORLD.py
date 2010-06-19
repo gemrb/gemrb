@@ -348,7 +348,7 @@ def DeathWindowPlot():
 	GemRB.LoadMusicPL ("Theme.mus",1)
 	GemRB.HideGUI ()
 	GemRB.SetVar("QuitGame1", 32848)
-	GemRB.SetTimedEvent ("DeathWindowEnd", 10)
+	GemRB.SetTimedEventByName ("DeathWindowEnd", 10)
 	return
 
 def DeathWindow():
@@ -356,7 +356,7 @@ def DeathWindow():
 	GemRB.LoadMusicPL ("Theme.mus",1)
 	GemRB.HideGUI ()
 	GemRB.SetVar("QuitGame1", 16498)
-	GemRB.SetTimedEvent ("DeathWindowEnd", 10)
+	GemRB.SetTimedEventByName ("DeathWindowEnd", 10)
 	return
 
 def DeathWindowEnd ():

@@ -444,7 +444,7 @@ def DeathWindow ():
 	#no death movie, but music is changed
 	GemRB.LoadMusicPL ("Theme.mus",1)
 	GemRB.HideGUI ()
-	GemRB.SetTimedEvent ("DeathWindowEnd", 10)
+	GemRB.SetTimedEventByName ("DeathWindowEnd", 10)
 	return
 
 def DeathWindowEnd ():

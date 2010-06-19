@@ -456,7 +456,7 @@ def OpenReformPartyWindow ():
 
 def DeathWindow ():
 	GemRB.HideGUI ()
-	GemRB.SetTimedEvent ("DeathWindowEnd", 10)
+	GemRB.SetTimedEventByName ("DeathWindowEnd", 10)
 	return
 
 def DeathWindowEnd ():
