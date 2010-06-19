@@ -18,7 +18,9 @@
 #
 #character generation, (thief) skills (GUICG6)
 import GemRB
-from LUSkillsSelection import *
+import LUSkillsSelection
+from GUIDefines import *
+from ie_stats import *
 
 SkillWindow = 0
 TextAreaControl = 0
@@ -43,7 +45,8 @@ def OnLoad():
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), \
 			GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
 			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
-	SetupSkillsWindow (MyChar, LUSKILLS_TYPE_CHARGEN, SkillWindow, RedrawSkills, [0,0,0], Levels)
+	LUSkillsSelection.SetupSkillsWindow (MyChar, \
+		LUSkillsSelection.LUSKILLS_TYPE_CHARGEN, SkillWindow, RedrawSkills, [0,0,0], Levels)
 
 	if not GemRB.GetVar ("SkillPointsLeft"): #skipping
 		GemRB.SetNextScript("GUICG9")
@@ -77,7 +80,7 @@ def NextPress():
 		SkillWindow.Unload()
 	# save all skills
 
-	SkillsSave (MyChar)
+	LUSkillsSelection.SkillsSave (MyChar)
 
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	GemRB.SetNextScript("GUICG9") #weapon proficiencies

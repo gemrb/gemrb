@@ -18,14 +18,9 @@
 #
 #character generation (GUICG 0)
 import GemRB
-import GUICommon
-from CharGenCommon import *
-
-CharGenWindow = 0
+import CharGenCommon
 
 def OnLoad():
-	global CharGenWindow
-
 	GemRB.SetVar("Gender",0) #gender
 	GemRB.SetVar("Race",0) #race
 	GemRB.SetVar("Class",0) #class
@@ -34,6 +29,6 @@ def OnLoad():
 
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.CreatePlayer ("charbase", MyChar | 0x8000 )
-	DisplayOverview (1)	
+	CharGenCommon.DisplayOverview (1)
 
 	return

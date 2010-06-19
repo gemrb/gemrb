@@ -22,7 +22,7 @@ import GemRB
 import GUICommon
 from ie_stats import *
 from GUIDefines import *
-from LUSpellSelection import *
+import LUSpellSelection
 
 def OnLoad():
 	KitTable = GemRB.LoadTable("magesch")
@@ -58,6 +58,6 @@ def OnLoad():
 			if GUICommon.ClassSkillsTable.GetValue (IsMulti[i], 2, 0) != "*":
 				Level = GemRB.GetPlayerStat (Slot, IE_LEVEL2+i-1)
 			break
-	OpenSpellsWindow (Slot, TableName, Level, Level, KitValue, 1)
+	LUSpellSelection.OpenSpellsWindow (Slot, TableName, Level, Level, KitValue, 1)
 
 	return

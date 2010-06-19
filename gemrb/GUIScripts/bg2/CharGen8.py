@@ -18,10 +18,9 @@
 #
 #character generation (GUICG 0)
 import GemRB
-import GUICommon
-from CharGenCommon import *
+import CharGenCommon
 
 def OnLoad():
-	DisplayOverview (8)
+	CharGenCommon.DisplayOverview (8)
 
 	return

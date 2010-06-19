@@ -18,9 +18,8 @@
 #
 #character generation - skills/profs/spells; next apearance/sound (CharGen7)
 import GemRB
-import GUICommon
-from CharGenCommon import *
+import CharGenCommon
 
 def OnLoad():
-	DisplayOverview (7)
+	CharGenCommon.DisplayOverview (7)
 	return

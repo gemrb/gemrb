@@ -18,8 +18,8 @@
 #
 #character generation - alignment; next abilities (GUICG 0)
 import GemRB
-import GUICommon
-from CharGenCommon import *
+import CharGenCommon
+from ie_stats import IE_STREXTRA
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
@@ -35,6 +35,6 @@ def OnLoad():
 		StatID = AbilityTable.GetValue (i, 3)
 		GemRB.SetPlayerStat (MyChar, StatID, 0)
 
-	DisplayOverview (5)
+	CharGenCommon.DisplayOverview (5)
 
 	return

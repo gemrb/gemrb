@@ -19,19 +19,21 @@
 # character generation - ability; next skills/profs/spells (CharGen6)
 import GemRB
 import GUICommon
-from CharGenCommon import *
-from LUSkillsSelection import *
-from LUProfsSelection import *
+import CharGenCommon
+import LUSkillsSelection
+import LUProfsSelection
+from GUIDefines import IE_SPELL_TYPE_PRIEST, IE_SPELL_TYPE_WIZARD
+from ie_stats import *
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
 
 	# nullify our thieving skills
-	SkillsNullify ()
-	SkillsSave (MyChar)
+	LUSkillsSelection.SkillsNullify ()
+	LUSkillsSelection.SkillsSave (MyChar)
 
 	# nullify our proficiencies
-	ProfsNullify ()
+	LUProfsSelection.ProfsNullify ()
 
 	# nully other variables
 	GemRB.SetVar ("HatedRace", 0)
@@ -91,5 +93,5 @@ def OnLoad():
 			if GemRB.GetMemorizableSpellsCount (MyChar, IE_SPELL_TYPE_PRIEST, level, 1) <= 0:
 				GUICommon.LearnPriestSpells (MyChar, level, ClassFlag)
 				break
-	DisplayOverview (6)
+	CharGenCommon.DisplayOverview (6)
 	return

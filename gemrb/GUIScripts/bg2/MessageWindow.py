@@ -22,12 +22,11 @@
 ###################################################
 
 import GemRB
-from GUICommonWindows import *
+import GUICommon
 import GUICommonWindows
-from GUICommon import GameControl
+import CommonWindow
 from GUIClasses import GTextArea
 from GUIClasses import GWindow
-from CommonWindow import OnIncreaseSize, OnDecreaseSize
 
 from GUIJRNL import *
 from GUIMA import *
@@ -53,15 +52,15 @@ def OnLoad():
 
 	GemRB.GameSetPartySize(PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
-	GemRB.LoadWindowPack(GetWindowPack())
+	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
 
 	GUICommonWindows.PortraitWindow = None
 	GUICommonWindows.ActionsWindow = None
 	GUICommonWindows.OptionsWindow = None
 
 	OptionsWindow = GemRB.LoadWindow(0)
-	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
-	PortraitWindow = OpenPortraitWindow(1)
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
 
 	Button=OptionsWindow.GetControl(10)
 	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MinimizeOptions")
@@ -69,7 +68,7 @@ def OnLoad():
 	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
 
 	ActionsWindow = GemRB.LoadWindow(3)
-	OpenActionsWindowControls (ActionsWindow)
+	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
 	Button=ActionsWindow.GetControl(60)
 	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MaximizeOptions")
 	Button=ActionsWindow.GetControl(61)
@@ -121,26 +120,26 @@ def UpdateControlStatus():
 	
 	MessageWindow = GemRB.GetVar("MessageWindow")
 
-	GemRB.LoadWindowPack(GetWindowPack())
+	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
 
 	if Expand == GS_MEDIUMDIALOG:
 		TMessageWindow = GemRB.LoadWindow(12)
 		TMessageTA = TMessageWindow.GetControl(1)
 		ExpandButton = TMessageWindow.GetControl(0)
-		ExpandButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
 		ContractButton = TMessageWindow.GetControl(3)
-		ContractButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 
 	elif Expand == GS_LARGEDIALOG:
 		TMessageWindow = GemRB.LoadWindow(7)
 		TMessageTA = TMessageWindow.GetControl(1)
 		ContractButton = TMessageWindow.GetControl(0)
-		ContractButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 	else:
 		TMessageWindow = GemRB.LoadWindow(4)
 		TMessageTA = TMessageWindow.GetControl(3)
 		ExpandButton = TMessageWindow.GetControl(2)
-		ExpandButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
 
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_SPEAKER)
 	TMessageTA.SetHistory(100)
@@ -155,7 +154,7 @@ def UpdateControlStatus():
 	if Override:
 		TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	else:
-		GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
+		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 
 	if GSFlags & GS_OPTIONPANE:
 		GemRB.SetVar("OptionsWindow", -1)

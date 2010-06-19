@@ -18,8 +18,8 @@
 #
 # character generation - race; next class/kit (CharGen3)
 import GemRB
-import GUICommon
-from CharGenCommon import *
+import CharGenCommon
+from ie_stats import *
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
@@ -33,6 +33,6 @@ def OnLoad():
 	GemRB.SetPlayerStat (MyChar, IE_LEVEL2, 0)
 	GemRB.SetPlayerStat (MyChar, IE_LEVEL3, 0)
 
-	DisplayOverview (3)
+	CharGenCommon.DisplayOverview (3)
 
 	return

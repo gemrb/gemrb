@@ -18,8 +18,8 @@
 #
 # character generation - classes+kits; next alignment/reputation(CharGen4.py)
 import GemRB
-import GUICommon
-from CharGenCommon import *
+import CharGenCommon
+from ie_stats import IE_ALIGNMENT, IE_REPUTATION
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
@@ -27,6 +27,6 @@ def OnLoad():
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, 0)
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, 0)
 
-	DisplayOverview (4)
+	CharGenCommon.DisplayOverview (4)
 
 	return

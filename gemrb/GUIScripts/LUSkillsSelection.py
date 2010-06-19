@@ -238,7 +238,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	#skills scrollbar
 	GemRB.SetVar ("SkillsTopIndex", 0)
 	if len(SkillsIndices) > SkillsNumButtons:
-		ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "SkillScrollBarPress")
+		ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, SkillScrollBarPress)
 		#decrease it with the number of controls on screen (list size) and two unrelated rows
 		ScrollBar.SetVarAssoc ("SkillsTopIndex", SkillsTable.GetRowCount()-SkillsNumButtons-1)
 	else:
@@ -253,15 +253,15 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		if SkillsOffsetPress != -1:
 			Button = SkillsWindow.GetControl(i+SkillsOffsetPress)
 			Button.SetVarAssoc("Skill",SkillsIndices[i])
-			Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SkillJustPress")
+			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SkillJustPress)
 
 		Button = SkillsWindow.GetControl(i*2+SkillsOffsetButton1)
 		Button.SetVarAssoc("Skill",SkillsIndices[i])
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SkillLeftPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SkillLeftPress)
 
 		Button = SkillsWindow.GetControl(i*2+SkillsOffsetButton1+1)
 		Button.SetVarAssoc("Skill",SkillsIndices[i])
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SkillRightPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SkillRightPress)
 	
 	SkillsRedraw ()
 	return

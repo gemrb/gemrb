@@ -19,9 +19,9 @@
 #character generation, class (GUICG2)
 import GemRB
 import GUICommon
+import LUCommon
 from ie_stats import *
 from GUIDefines import *
-from LUCommon import *
 
 ClassWindow = 0
 TextAreaControl = 0
@@ -141,7 +141,7 @@ def SetClass():
 	#loop through each class and update it's level
 	xp = GemRB.GetPlayerStat (MyChar, IE_XP)/NumClasses
 	for i in range (NumClasses):
-		CurrentLevel = GetNextLevelFromExp (xp, Classes[i])
+		CurrentLevel = LUCommon.GetNextLevelFromExp (xp, Classes[i])
 		if i == 0:
 			GemRB.SetPlayerStat (MyChar, IE_LEVEL, CurrentLevel)
 		elif i <= 2:

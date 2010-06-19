@@ -21,7 +21,7 @@ import GemRB
 import GUICommon
 from ie_stats import *
 from GUIDefines import *
-from GUICG2 import SetClass
+import GUICG2
 
 ClassWindow = 0
 TextAreaControl = 0
@@ -87,7 +87,7 @@ def OnLoad():
 	return
 
 def ClassPress():
-	SetClass()
+	GUICG2.SetClass()
 	Class = GemRB.GetVar("Class")-1
 	TextAreaControl.SetText(GUICommon.ClassTable.GetValue(Class,1) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
@@ -101,7 +101,7 @@ def BackPress():
 	return
 
 def NextPress():
-	SetClass()
+	GUICG2.SetClass()
 	if ClassWindow:
 		ClassWindow.Unload()
 

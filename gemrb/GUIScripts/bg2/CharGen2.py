@@ -18,14 +18,14 @@
 #
 # character generation - gender; next race (CharGen2)
 import GemRB
-import GUICommon
-from CharGenCommon import *
+import CharGenCommon
+from ie_stats import IE_RACE
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetVar ("Race",0) #race
 	GemRB.SetPlayerStat (MyChar, IE_RACE, 0)
 
-	DisplayOverview (2)
+	CharGenCommon.DisplayOverview (2)
 
 	return

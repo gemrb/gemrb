@@ -256,7 +256,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		if ProfsOffsetPress != -1:
 			Button=ProfsWindow.GetControl(i+ProfsOffsetPress)
 			Button.SetVarAssoc("Prof", i)
-			Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ProfsJustPress")
+			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProfsJustPress)
 
 		cid = i*2+ProfsOffsetButton1
 		if Profs2ndOffsetButton1 != -1 and i > 7:
@@ -264,15 +264,15 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 
 		Button=ProfsWindow.GetControl(cid)
 		Button.SetVarAssoc("Prof", i)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ProfsLeftPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProfsLeftPress)
 
 		Button=ProfsWindow.GetControl(cid+1)
 		Button.SetVarAssoc("Prof", i)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ProfsRightPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProfsRightPress)
 
 	if(ProfsScrollBar):
 		# proficiencies scrollbar
-		ProfsScrollBar.SetEventByName(IE_GUI_SCROLLBAR_ON_CHANGE, "ProfsScrollBarPress")
+		ProfsScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, ProfsScrollBarPress)
 		ProfsScrollBar.SetDefaultScrollBar ()
 		ProfsScrollBar.SetVarAssoc ("ProfsTopIndex", ProfCount)
 	ProfsRedraw (1)

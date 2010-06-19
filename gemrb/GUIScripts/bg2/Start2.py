@@ -18,7 +18,7 @@
 #
 #this is essentially Start.py from the SoA game, except for a very small change
 import GemRB
-from GUICommon import HasTOB
+import GUICommon
 
 StartWindow = 0
 TutorialWindow = 0
@@ -66,7 +66,7 @@ def OnLoad():
 	StartWindow.SetFrame ()
 	#this is the ToB specific part of Start.py
 	if GemRB.GetVar("oldgame")==1:
-		if HasTOB():
+		if GUICommon.HasTOB():
 			StartWindow.SetPicture("STARTOLD")
 		if not skip_videos:
 			GemRB.PlayMovie ("INTRO15F", 1)
@@ -84,7 +84,7 @@ def OnLoad():
 	StartWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", 1)
 	Label=StartWindow.GetControl (0x0fff0000)
 	Label.SetText (GEMRB_VERSION)
-	if not HasTOB():
+	if not GUICommon.HasTOB():
 		BackButton.SetState (IE_GUI_BUTTON_DISABLED)
 		BackButton.SetText ("")
 	else:
