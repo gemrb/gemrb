@@ -18,7 +18,7 @@
 #
 #load window
 import GemRB
-from LoadScreen import *
+import LoadScreen
 
 LoadWindow = 0
 TextAreaControl = 0
@@ -117,7 +117,7 @@ def LoadGamePress():
 	if LoadWindow:
 		LoadWindow.Unload()
 	Pos = GemRB.GetVar("TopIndex")+GemRB.GetVar("LoadIdx")
-	StartLoadScreen()
+	LoadScreen.StartLoadScreen()
 	GemRB.LoadGame(Games[Pos]) #loads and enters savegame 
 	GemRB.EnterGame() #it will close windows, including the loadscreen
 	return

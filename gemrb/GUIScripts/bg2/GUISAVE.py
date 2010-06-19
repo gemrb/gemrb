@@ -23,9 +23,8 @@
 ###################################################
 
 import GemRB
-from LoadScreen import *
-from GUICommon import CloseOtherWindow
-from GUICommon import GameWindow
+import GUICommon
+import LoadScreen
 
 SaveWindow = 0
 ConfirmWindow = 0
@@ -38,12 +37,12 @@ ScrollBar = 0
 def OpenSaveWindow ():
 	global SaveWindow, TextAreaControl, Games, ScrollBar
 
-	if CloseOtherWindow (OpenSaveWindow):
+	if GUICommon.CloseOtherWindow (OpenSaveWindow):
 		CloseSaveWindow ()
 		return
 
 	GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUISAVE", 640, 480)
 	Window = SaveWindow = GemRB.LoadWindow (0)
@@ -149,7 +148,7 @@ def ConfirmedSaveGame():
 	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
 	Label = ConfirmWindow.GetControl (3)
 	Slotname = Label.QueryText ()
-	StartLoadScreen()
+	LoadScreen.StartLoadScreen()
 	if Pos < len(Games):
 		GemRB.SaveGame(Games[Pos], Slotname)
 	else:
@@ -272,6 +271,6 @@ def CloseSaveWindow ():
 		GemRB.SetNextScript ("Start")
 		return
 
-	GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
+	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
 	GemRB.UnhideGUI () #enabling the other windows
 	return
