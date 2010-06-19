@@ -292,3 +292,17 @@ add_custom_target( dist
     | gzip --best > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.gz
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
+
+message(STATUS "")
+message(STATUS "These are the configured paths:")
+message(STATUS "  PREFIX: ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "  LIB_DIR: ${LIB_DIR}")
+message(STATUS "  PLUGIN_DIR: ${PLUGIN_DIR}")
+message(STATUS "  BIN_DIR: ${BIN_DIR}")
+message(STATUS "  DATA_DIR: ${DATA_DIR}")
+message(STATUS "  MAN_DIR: ${MAN_DIR}")
+message(STATUS "  SYSCONF_DIR: ${SYSCONF_DIR}")
+message(STATUS "  DOC_DIR: ${DOC_DIR}")
+message(STATUS "  ICON_DIR: ${ICON_DIR}")
+message(STATUS "  MENU_DIR: ${MENU_DIR}")
+message(STATUS "")
