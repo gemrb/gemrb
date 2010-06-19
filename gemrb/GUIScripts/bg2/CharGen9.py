@@ -18,12 +18,12 @@
 #
 # character generation (CharGen9.py)
 import GemRB
+import GUICommon
+import GUICommonWindows
 from CharGenCommon import *
 from ie_stats import *
 from ie_slots import *
 from ie_spells import *
-from GUICommon import *
-from GUICommonWindows import *
 from LUCommon import *
 from LUProfsSelection import *
 
@@ -45,9 +45,9 @@ def FinishCharGen():
 	# set my character up
 	MyChar = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	ClassIndex = ClassTable.FindValue (5, Class)
-	ClassName = ClassTable.GetRowName (ClassIndex)
-	IsMulti = IsMultiClassed (MyChar, 1)
+	ClassIndex = GUICommon.ClassTable.FindValue (5, Class)
+	ClassName = GUICommon.ClassTable.GetRowName (ClassIndex)
+	IsMulti = GUICommon.IsMultiClassed (MyChar, 1)
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
 			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
 
@@ -65,39 +65,39 @@ def FinishCharGen():
 	SetupHP (MyChar)
 
 	# mage spells
-	TableName = ClassSkillsTable.GetValue (Class, 2, 0)
+	TableName = GUICommon.ClassSkillsTable.GetValue (Class, 2, 0)
 	if TableName != "*":
 		index = 0
 		if IsMulti[0]>1:
 			#find out which class gets mage spells
 			for i in range (IsMulti[0]):
-				if ClassSkillsTable.GetValue (IsMulti[i+1], 2, 0) != "*":
+				if GUICommon.ClassSkillsTable.GetValue (IsMulti[i+1], 2, 0) != "*":
 					index = i
 					break
-		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, Levels[index])
+		GUICommon.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, Levels[index])
 
 	# apply class/kit abilities
-	KitIndex = GetKitIndex (MyChar)
+	KitIndex = GUICommon.GetKitIndex (MyChar)
 	if IsMulti[0]>1:
 		#get the class abilites for each class
 		for i in range (IsMulti[0]):
-			TmpClassName = ClassTable.GetRowName (ClassTable.FindValue (5, IsMulti[i+1]) )
-			ABTable = ClassSkillsTable.GetValue (TmpClassName, "ABILITIES")
+			TmpClassName = GUICommon.ClassTable.GetRowName (GUICommon.ClassTable.FindValue (5, IsMulti[i+1]) )
+			ABTable = GUICommon.ClassSkillsTable.GetValue (TmpClassName, "ABILITIES")
 			if ABTable != "*" and ABTable[:6] != "CLABMA":
-				AddClassAbilities (MyChar, ABTable, Levels[i], Levels[i])
+				GUICommon.AddClassAbilities (MyChar, ABTable, Levels[i], Levels[i])
 	else:
 		if KitIndex:
-			ABTable = KitListTable.GetValue (str(KitIndex), "ABILITIES")
+			ABTable = GUICommon.KitListTable.GetValue (str(KitIndex), "ABILITIES")
 		else:
-			ABTable = ClassSkillsTable.GetValue (ClassName, "ABILITIES")
+			ABTable = GUICommon.ClassSkillsTable.GetValue (ClassName, "ABILITIES")
 		if ABTable != "*" and ABTable[:6] != "CLABMA": # mage kits specify ability tables which don't exist
-			AddClassAbilities (MyChar, ABTable, Levels[0], Levels[0])
+			GUICommon.AddClassAbilities (MyChar, ABTable, Levels[0], Levels[0])
 
 	# apply starting (alignment dictated) abilities
 	# pc, table, new level, level diff, alignment
 	AlignmentTable = GemRB.LoadTable ("aligns")
 	AlignmentAbbrev = AlignmentTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
-	AddClassAbilities (MyChar, "abstart", 6,6, AlignmentAbbrev)
+	GUICommon.AddClassAbilities (MyChar, "abstart", 6,6, AlignmentAbbrev)
 
 	# setup starting gold (uses a roll dictated by class
 	TmpTable = GemRB.LoadTable ("strtgold")
@@ -105,13 +105,13 @@ def FinishCharGen():
 	GemRB.SetPlayerStat (MyChar, IE_GOLD, temp * TmpTable.GetValue (Class, 3))
 
 	# save the appearance
-	SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
-	SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
-	SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("MajorColor") )
-	SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("MinorColor") )
-	#SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
-	#SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
-	#SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
+	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
+	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
+	GUICommon.SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("MajorColor") )
+	GUICommon.SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("MinorColor") )
+	#GUICommon.SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
+	#GUICommon.SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
+	#GUICommon.SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
 
 	# save the name and starting xp (can level right away in game)
@@ -123,7 +123,7 @@ def FinishCharGen():
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 
 	# add the starting inventory for tob
-	if GameIsTOB():
+	if GUICommon.GameIsTOB():
 		# get the kit (or use class if no kit) to load the start table
 		if KitIndex == 0:
 			EquipmentColName = ClassName
@@ -131,7 +131,7 @@ def FinishCharGen():
 			if EquipmentColName == "SORCERER":
 				EquipmentColName = "MAGE"
 		else:
-			EquipmentColName = KitListTable.GetValue (KitIndex, 0)
+			EquipmentColName = GUICommon.KitListTable.GetValue (KitIndex, 0)
 
 		EquipmentTable = GemRB.LoadTable ("25stweap")
 
@@ -211,7 +211,7 @@ def FinishCharGen():
 		if CharGenWindow:
 			CharGenWindow.Unload ()
 		#when export is done, go to start
-		if HasTOB():
+		if GUICommon.HasTOB():
 			GemRB.SetToken ("NextScript","Start2")
 		else:
 			GemRB.SetToken ("NextScript","Start")

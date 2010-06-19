@@ -18,6 +18,8 @@
 #
 # character generation - gender; next race (CharGen2)
 import GemRB
+import GUICommon
+import GUICommonWindows
 from CharGenCommon import *
 
 def OnLoad():

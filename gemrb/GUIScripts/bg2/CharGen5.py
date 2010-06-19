@@ -18,6 +18,8 @@
 #
 #character generation - alignment; next abilities (GUICG 0)
 import GemRB
+import GUICommon
+import GUICommonWindows
 from CharGenCommon import *
 
 def OnLoad():

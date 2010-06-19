@@ -25,9 +25,7 @@
 import GemRB
 import GUICommonWindows
 from GUIDefines import *
-from GUICommon import CloseOtherWindow
-from GUICommon import GameWindow
-from GUICommonWindows import *
+import GUICommon
 
 MapWindow = None
 NoteWindow = None
@@ -42,7 +40,7 @@ def RevealMap ():
 	global MapWindow
 	global OldPortraitWindow, OldOptionsWindow
 
-	if CloseOtherWindow (ShowMap):
+	if GUICommon.CloseOtherWindow (ShowMap):
 		if MapWindow:
 			MapWindow.Unload ()
 		if OptionsWindow:
@@ -53,7 +51,7 @@ def RevealMap ():
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
-		GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -74,7 +72,7 @@ def ShowMap ():
 	global MapWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
-	if CloseOtherWindow (ShowMap):
+	if GUICommon.CloseOtherWindow (ShowMap):
 		if MapWindow:
 			MapWindow.Unload ()
 		if OptionsWindow:
@@ -85,7 +83,7 @@ def ShowMap ():
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
-		GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -94,7 +92,7 @@ def ShowMap ():
 		return
 
 	GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindow (2)
@@ -140,7 +138,7 @@ def OpenMapWindow ():
 	global MapWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
-	if CloseOtherWindow (OpenMapWindow):
+	if GUICommon.CloseOtherWindow (OpenMapWindow):
 		if MapWindow:
 			MapWindow.Unload ()
 		if OptionsWindow:
@@ -151,7 +149,7 @@ def OpenMapWindow ():
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
-		GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -160,7 +158,7 @@ def OpenMapWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindow (2)
@@ -169,10 +167,10 @@ def OpenMapWindow ():
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	MarkMenuButton (OptionsWindow)
-	SetupMenuWindowControls (OptionsWindow, 0, "OpenMapWindow")
+	GUICommonWindows.MarkMenuButton (OptionsWindow)
+	GUICommonWindows. SetupMenuWindowControls (OptionsWindow, 0, "OpenMapWindow")
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 	OptionsWindow.SetFrame ()
 
 	# World Map
@@ -324,7 +322,7 @@ def CloseWorldMapWindow ():
 		WorldMapWindow.Unload ()
 	WorldMapWindow = None
 	WorldMapControl = None
-	GameWindow.SetVisible(WINDOW_VISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 	GemRB.UnhideGUI ()
 	return
 
@@ -336,7 +334,7 @@ def WorldMapWindowCommon (Travel):
 		return
 
 	GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
 	WorldMapWindow = Window = GemRB.LoadWindow (0)

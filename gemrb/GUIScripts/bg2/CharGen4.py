@@ -18,8 +18,9 @@
 #
 # character generation - classes+kits; next alignment/reputation(CharGen4.py)
 import GemRB
+import GUICommon
+import GUICommonWindows
 from CharGenCommon import *
-from GUICommonWindows import *
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")

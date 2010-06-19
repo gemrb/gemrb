@@ -18,6 +18,8 @@
 #
 #character generation (GUICG 0)
 import GemRB
+import GUICommon
+import GUICommonWindows
 from CharGenCommon import *
 
 def OnLoad():

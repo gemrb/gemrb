@@ -19,6 +19,8 @@
 #character generation, gender (GUICG1)
 import GemRB
 from ie_stats import *
+from GUIDefines import *
+import GUICommon
 
 GenderWindow = 0
 TextAreaControl = 0

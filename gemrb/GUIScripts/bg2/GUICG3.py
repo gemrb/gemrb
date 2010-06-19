@@ -18,7 +18,9 @@
 #
 #character generation, alignment (GUICG3)
 import GemRB
-from GUICommon import *
+import GUICommon
+from ie_stats import *
+from GUIDefines import *
 
 AlignmentWindow = 0
 TextAreaControl = 0
@@ -31,14 +33,14 @@ def OnLoad():
 	global AlignmentTable, MyChar
 	
 	MyChar = GemRB.GetVar ("Slot")
-	Kit = GetKitIndex (MyChar)
+	Kit = GUICommon.GetKitIndex (MyChar)
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = ClassTable.FindValue (5, Class)
+	Class = GUICommon.ClassTable.FindValue (5, Class)
 	if Kit == 0:
-		KitName = ClassTable.GetRowName(Class)
+		KitName = GUICommon.ClassTable.GetRowName(Class)
 	else:
 		#rowname is just a number, first value row what we need here
-		KitName = KitListTable.GetValue(Kit, 0)
+		KitName = GUICommon.KitListTable.GetValue(Kit, 0)
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 

@@ -26,9 +26,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow, HasTOB
-from GUICommon import GameWindow
-from GUICommonWindows import *
+import GUICommon
 
 MageWindow = None
 MageSpellInfoWindow = None
@@ -50,7 +48,7 @@ def OpenMageWindow ():
 	global MageWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
-	if CloseOtherWindow (OpenMageWindow):
+	if GUICommon.CloseOtherWindow (OpenMageWindow):
 		if MageWindow:
 			MageWindow.Unload ()
 		if OptionsWindow:
@@ -60,31 +58,31 @@ def OpenMageWindow ():
 
 		MageWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
-		SetSelectionChangeHandler (None)
+		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 
 	GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIMG", 640, 480)
 
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	MarkMenuButton (OptionsWindow)
-	SetupMenuWindowControls (OptionsWindow, 0, "OpenMageWindow")
+	GUICommonWindows.MarkMenuButton (OptionsWindow)
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, "OpenMageWindow")
 	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 
-	PortraitWindow = OpenPortraitWindow (0)
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 	SetupMageWindow()
-	SetSelectionChangeHandler (SetupMageWindow)
+	GUICommonWindows.SetSelectionChangeHandler (SetupMageWindow)
 	return
 
 def SetupMageWindow ():
@@ -93,7 +91,7 @@ def SetupMageWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	BookType = 0
-	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 8)==2):
+	if (GUICommon.ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 8)==2):
 		BookType = 1
 
 	if MageWindow:
@@ -220,7 +218,7 @@ def UpdateMageWindow ():
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
-	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 2)=="*"):
+	if (GUICommon.ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 2)=="*"):
 		Window.SetVisible (WINDOW_GRAYED)
 	else:
 		Window.SetVisible (WINDOW_VISIBLE)
@@ -267,7 +265,7 @@ def OpenMageSpellInfoWindow ():
 
 	#erase
 	index = GemRB.GetVar ("SpellButton")
-	if HasTOB():
+	if GUICommon.HasTOB():
 		Button = Window.GetControl (6)
 		if index < 100:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
@@ -472,8 +470,8 @@ def OpenSequencerWindow ():
 	TypeButton = Window.GetControl (8)
 
 	#no cleric spells available
-	if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 0)=="*" and
-			ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 1)=="*"):
+	if (GUICommon.ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 0)=="*" and
+			GUICommon.ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 1)=="*"):
 		TypeButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	if Target == 2:

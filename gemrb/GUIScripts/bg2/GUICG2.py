@@ -18,7 +18,9 @@
 #
 #character generation, class (GUICG2)
 import GemRB
-from GUICommon import GameIsTOB
+import GUICommon
+from ie_stats import *
+from GUIDefines import *
 from LUCommon import *
 
 ClassWindow = 0
@@ -33,15 +35,15 @@ def OnLoad():
 	ClassWindow = GemRB.LoadWindow(2)
 
 	MyChar = GemRB.GetVar ("Slot")
-	Race = RaceTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
-	RaceName = RaceTable.GetRowName(Race)
+	Race = GUICommon.RaceTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
+	RaceName = GUICommon.RaceTable.GetRowName(Race)
 
-	ClassCount = ClassTable.GetRowCount()+1
+	ClassCount = GUICommon.ClassTable.GetRowCount()+1
 
 	j = 0
 	#radiobutton groups must be set up before doing anything else to them
 	for i in range(1,ClassCount):
-		if ClassTable.GetValue(i-1,4):
+		if GUICommon.ClassTable.GetValue(i-1,4):
 			continue
 		if j>7:
 			Button = ClassWindow.GetControl(j+7)
@@ -55,9 +57,9 @@ def OnLoad():
 	GemRB.SetVar("MAGESCHOOL",0) 
 	HasMulti = 0
 	for i in range(1,ClassCount):
-		ClassName = ClassTable.GetRowName(i-1)
-		Allowed = ClassTable.GetValue(ClassName, RaceName)
-		if ClassTable.GetValue(i-1,4):
+		ClassName = GUICommon.ClassTable.GetRowName(i-1)
+		Allowed = GUICommon.ClassTable.GetValue(ClassName, RaceName)
+		if GUICommon.ClassTable.GetValue(i-1,4):
 			if Allowed!=0:
 				HasMulti = 1
 			continue
@@ -66,7 +68,7 @@ def OnLoad():
 		else:
 			Button = ClassWindow.GetControl(j+2)
 		j = j+1
-		t = ClassTable.GetValue(i-1, 0)
+		t = GUICommon.ClassTable.GetValue(i-1, 0)
 		Button.SetText(t )
 
 		if Allowed==0:
@@ -96,7 +98,7 @@ def OnLoad():
 		TextAreaControl.SetText(17242)
 		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	else:
-		TextAreaControl.SetText(ClassTable.GetValue(Class,1) )
+		TextAreaControl.SetText(GUICommon.ClassTable.GetValue(Class,1) )
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
 	MultiClassButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"MultiClassPress")
@@ -115,21 +117,21 @@ def BackPress():
 def SetClass():
 	# find the class from the class table
 	ClassIndex = GemRB.GetVar ("Class") - 1
-	Class = ClassTable.GetValue (ClassIndex, 5)
+	Class = GUICommon.ClassTable.GetValue (ClassIndex, 5)
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
-	ClassName = ClassTable.GetRowName (ClassTable.FindValue (5, Class))
+	ClassName = GUICommon.ClassTable.GetRowName (GUICommon.ClassTable.FindValue (5, Class))
 	# protect against barbarians; this stat will be overwritten later
 	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, ClassIndex)
 
 	#assign the correct XP
-	if GameIsTOB():
-		GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (ClassName, "STARTXP2"))
+	if GUICommon.GameIsTOB():
+		GemRB.SetPlayerStat (MyChar, IE_XP, GUICommon.ClassSkillsTable.GetValue (ClassName, "STARTXP2"))
 	else:
-		GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (ClassName, "STARTXP"))
+		GemRB.SetPlayerStat (MyChar, IE_XP, GUICommon.ClassSkillsTable.GetValue (ClassName, "STARTXP"))
 
 	#create an array to get all the classes from
 	NumClasses = 1
-	IsMulti = IsMultiClassed (MyChar, 1)
+	IsMulti = GUICommon.IsMultiClassed (MyChar, 1)
 	if IsMulti[0] > 1:
 		NumClasses = IsMulti[0]
 		Classes = [IsMulti[1], IsMulti[2], IsMulti[3]]

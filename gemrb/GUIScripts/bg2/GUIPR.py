@@ -26,9 +26,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow
-from GUICommon import GameWindow
-from GUICommonWindows import *
+import GUICommon
 
 PriestWindow = None
 PriestSpellInfoWindow = None
@@ -43,7 +41,7 @@ def OpenPriestWindow ():
 	global PriestWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
-	if CloseOtherWindow (OpenPriestWindow):
+	if GUICommon.CloseOtherWindow (OpenPriestWindow):
 		if PriestWindow:
 			PriestWindow.Unload ()
 		if OptionsWindow:
@@ -53,17 +51,17 @@ def OpenPriestWindow ():
 
 		PriestWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
-		SetSelectionChangeHandler (None)
+		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 
 	GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIPR", 640, 480)
 	PriestWindow = Window = GemRB.LoadWindow (2)
@@ -71,11 +69,11 @@ def OpenPriestWindow ():
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	MarkMenuButton (OptionsWindow)
-	SetupMenuWindowControls (OptionsWindow, 0, "OpenPriestWindow")
+	GUICommonWindows.MarkMenuButton (OptionsWindow)
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, "OpenPriestWindow")
 	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	Button = Window.GetControl (1)
 	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PriestPrevLevelPress")
@@ -107,7 +105,7 @@ def OpenPriestWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-	SetSelectionChangeHandler (UpdatePriestWindow)
+	GUICommonWindows.SetSelectionChangeHandler (UpdatePriestWindow)
 	UpdatePriestWindow ()
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	#bringing window front
@@ -186,10 +184,10 @@ def UpdatePriestWindow ():
 			Button.EnableBorder (0, 0)
 
 	Class = GemRB.GetPlayerStat (GemRB.GameGetSelectedPCSingle(), IE_CLASS)
-	DivineCaster = ClassSkillsTable.GetValue (Class, 1)
+	DivineCaster = GUICommon.ClassSkillsTable.GetValue (Class, 1)
 	if DivineCaster == "*":
 		# also check the DRUIDSPELL column
-		DivineCaster = ClassSkillsTable.GetValue (Class, 0)
+		DivineCaster = GUICommon.ClassSkillsTable.GetValue (Class, 0)
 	if DivineCaster == "*":
 		Window.SetVisible (WINDOW_GRAYED)
 	else:

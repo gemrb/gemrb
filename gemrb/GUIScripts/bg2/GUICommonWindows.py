@@ -24,10 +24,10 @@
 
 import GemRB
 from GUIDefines import *
-from ie_stats import IE_MAXHITPOINTS, IE_STATE_ID, IE_HITPOINTS
+from ie_stats import IE_MAXHITPOINTS, IE_STATE_ID, IE_HITPOINTS, STATE_DEAD
 from ie_modal import *
-from GUICommon import *
-from LUCommon import *
+import GUICommon
+import LUCommon
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -107,8 +107,8 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button.SetBAM ("CDIAL", 0, 0)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
-		SetGamedaysAndHourToken()
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
+		GUICommon.SetGamedaysAndHourToken()
 		Button.SetTooltip(16041)
 		rb = 11
 	else:
@@ -116,7 +116,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 
 	# Rest
 	Button = Window.GetControl (rb)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RestPress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
 	Button.SetTooltip (11942)
 
 	if PortraitWindow:
@@ -229,8 +229,8 @@ def OpenActionsWindowControls (Window):
 	Button.SetBAM ("CDIAL", 0, 0)
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
-	SetGamedaysAndHourToken()
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
+	GUICommon.SetGamedaysAndHourToken()
 	Button.SetTooltip(16041)
 	UpdateActionsWindow ()
 	return
@@ -583,7 +583,7 @@ def UpdatePortraitWindow ():
 		if GemRB.GameGetSelectedPCSingle(1)==portid+1:
 			flag = chr(154)
 
-		if CanLevelUp (portid+1):
+		if LUCommon.CanLevelUp (portid+1):
 			states = flag+blank+chr(255) + states
 		else:
 			states = flag+blank+blank + states
@@ -654,10 +654,10 @@ def SelectionChanged ():
 
 		#update mage school
 		GemRB.SetVar ("MAGESCHOOL", 0)
-		Kit = GetKitIndex (sel)
-		if Kit and KitListTable.GetValue (Kit, 7) == 1:
+		Kit = GUICommon.GetKitIndex (sel)
+		if Kit and GUICommon.KitListTable.GetValue (Kit, 7) == 1:
 			MageTable = GemRB.LoadTable ("magesch")
-			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, KitListTable.GetValue (Kit, 6) ) )
+			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, GUICommon.KitListTable.GetValue (Kit, 6) ) )
 
 		for i in range (PARTY_SIZE):
 			Button = PortraitWindow.GetControl (i)
@@ -758,4 +758,4 @@ def OpenWaitForDiscWindow ():
 		DiscWindow.SetVisible (WINDOW_VISIBLE)
 
 def CheckLevelUp(pc):
-	GemRB.SetVar ("CheckLevelUp"+str(pc), CanLevelUp (pc))
+	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))

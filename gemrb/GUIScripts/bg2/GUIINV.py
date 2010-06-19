@@ -24,14 +24,12 @@
 
 import GemRB
 import GUICommonWindows
+import GUICommon
 from GUISTORE import *
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
 from ie_spells import *
-from GUICommon import CloseOtherWindow, SetColorStat, HasTOB, CannotLearnSlotSpell
-from GUICommon import GameWindow
-from GUICommonWindows import *
 
 InventoryWindow = None
 ItemInfoWindow = None
@@ -58,7 +56,7 @@ def OpenInventoryWindow ():
 	global InventoryWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
-	if CloseOtherWindow (OpenInventoryWindow):
+	if GUICommon.CloseOtherWindow (OpenInventoryWindow):
 		if GemRB.IsDraggingItem ()==1:
 			pc = GemRB.GameGetSelectedPCSingle ()
 			#store the item in the inventory before window is closed
@@ -83,13 +81,13 @@ def OpenInventoryWindow ():
 		OldOptionsWindow = None
 		#don't go back to multi selection mode when going to the store screen
 		if not GemRB.GetVar ("Inventory"):
-			GameWindow.SetVisible(WINDOW_VISIBLE)
+			GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 			GemRB.UnhideGUI ()
 			SetSelectionChangeHandler (None)
 		return
 
 	GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIINV", 640, 480)
 	InventoryWindow = Window = GemRB.LoadWindow (2)
@@ -186,9 +184,9 @@ def ColorDonePress ():
 	ColorTable = GemRB.LoadTable ("clowncol")
 	PickedColor=ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
 	if ColorIndex==2:
-		SetColorStat (pc, IE_MAJOR_COLOR, PickedColor)
+		GUICommon.SetColorStat (pc, IE_MAJOR_COLOR, PickedColor)
 	else:
-		SetColorStat (pc, IE_MINOR_COLOR, PickedColor)
+		GUICommon.SetColorStat (pc, IE_MINOR_COLOR, PickedColor)
 	UpdateInventoryWindow ()
 	return
 
@@ -281,12 +279,12 @@ def RefreshInventoryWindow ():
 	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
 	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
 	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-	Button.SetPLT (GetActorPaperDoll (pc),
+	Button.SetPLT (GUICommon.GetActorPaperDoll (pc),
 		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
 
 	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
 	row = "0x%04X" %anim_id
-	size = AppearanceAvatarTable.GetValue (row, "SIZE")
+	size = GUICommon.AppearanceAvatarTable.GetValue (row, "SIZE")
 
 	#Weapon
 	slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )
@@ -316,7 +314,7 @@ def RefreshInventoryWindow ():
 			Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
 
 	#encumbrance
-	SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
+	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
 
 	#armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
@@ -344,7 +342,7 @@ def RefreshInventoryWindow ():
 	Label.SetText (str (GemRB.GameGetPartyGold ()))
 
 	#class
-	ClassTitle = GetActorClassTitle (pc)
+	ClassTitle = GUICommon.GetActorClassTitle (pc)
 	Label = Window.GetControl (0x10000042)
 	Label.SetText (ClassTitle)
 
@@ -377,7 +375,7 @@ def RefreshInventoryWindow ():
 			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenGroundItemInfoWindow")
 			Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenGroundItemAmountWindow")
 
-		UpdateInventorySlot (pc, Button, Slot, "ground")
+		GUICommon.UpdateInventorySlot (pc, Button, Slot, "ground")
 
 	#making window visible/shaded depending on the pc's state
 	Window.SetVisible (WINDOW_VISIBLE)
@@ -406,7 +404,7 @@ def UpdateSlot (pc, slot):
 
 	Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-	UpdateInventorySlot (pc, Button, slot_item, "inventory")
+	GUICommon.UpdateInventorySlot (pc, Button, slot_item, "inventory")
 	
 	if slot_item:
 		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnDragItem")
@@ -517,7 +515,7 @@ def OnDropItemToPC ():
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
 	if GemRB.IsDraggingItem ()==1:
-		if HasTOB ():
+		if GUICommon.HasTOB ():
 			GemRB.DisplayString (61794,0xfffffff)
 		else:
 			GemRB.DisplayString (17999,0xfffffff)
@@ -924,7 +922,7 @@ def DisplayItem (itemresref, type):
 	if drink:
 		Button.SetText (19392)
 		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DrinkItemWindow")
-	elif read and not CannotLearnSlotSpell ():
+	elif read and not GUICommon.CannotLearnSlotSpell ():
 		Button.SetText (17104)
 		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ReadItemWindow")
 	elif container:

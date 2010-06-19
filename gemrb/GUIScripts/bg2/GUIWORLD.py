@@ -24,8 +24,8 @@
 
 import GemRB
 from GUIDefines import *
-from GUICommon import SetGamedaysAndHourToken, UpdateInventorySlot
-from GUICommonWindows import *
+import GUICommonWindows
+import GUICommon
 from GUIClasses import GWindow
 
 FRAME_PC_SELECTED = 0
@@ -66,7 +66,7 @@ def OpenEndMessageWindow ():
 	hideflag = GemRB.HideGUI ()
 
 	if not ContinueWindow:
-		GemRB.LoadWindowPack (GetWindowPack())
+		GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 		ContinueWindow = Window = GemRB.LoadWindow (9)
 		OldActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
 		GemRB.SetVar ("ActionsWindow", Window.ID)
@@ -75,8 +75,8 @@ def OpenEndMessageWindow ():
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9371)	
 	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
-	if PortraitWindow:
-		UpdatePortraitWindow ()
+	if GUICommonWindows.PortraitWindow:
+		GUICommonWindows.UpdatePortraitWindow ()
 	if hideflag:
 		GemRB.UnhideGUI ()
 
@@ -87,7 +87,7 @@ def OpenContinueMessageWindow ():
 	hideflag = GemRB.HideGUI ()
 
 	if not ContinueWindow:
-		GemRB.LoadWindowPack (GetWindowPack())
+		GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 		ContinueWindow = Window = GemRB.LoadWindow (9)
 		OldActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
 		GemRB.SetVar ("ActionsWindow", Window.ID)
@@ -177,7 +177,7 @@ def RedrawContainerWindow ():
 			Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
 		else:
 			Button.SetVarAssoc ("LeftIndex", -1)
-		UpdateInventorySlot (pc, Button, Slot, "container")
+		GUICommon.UpdateInventorySlot (pc, Button, Slot, "container")
 
 	for i in range (4):
 		if i+RightTopIndex<RightCount:
@@ -189,7 +189,7 @@ def RedrawContainerWindow ():
 			Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 		else:
 			Button.SetVarAssoc ("RightIndex", -1)
-		UpdateInventorySlot (pc, Button, Slot, "inventory")
+		GUICommon.UpdateInventorySlot (pc, Button, Slot, "inventory")
 
 
 def OpenContainerWindow ():
@@ -201,7 +201,7 @@ def OpenContainerWindow ():
 
 	hideflag = GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack (GetWindowPack())
+	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	ContainerWindow = Window = GemRB.LoadWindow (8)
 	OldActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
 	OldMessageWindow = GWindow( GemRB.GetVar ("MessageWindow") )
@@ -220,7 +220,7 @@ def OpenContainerWindow ():
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
-	SetGamedaysAndHourToken()
+	GUICommon.SetGamedaysAndHourToken()
 	Button.SetTooltip(16041)
 
 	# 0 - 5 - Ground Item
@@ -345,7 +345,7 @@ def UpdateReformWindow ():
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		Button.SetPicture (pic, "NOPORTSM")
-	UpdatePortraitWindow ()
+	GUICommonWindows.UpdatePortraitWindow ()
 	return
 
 def RemovePlayer ():
@@ -353,7 +353,7 @@ def RemovePlayer ():
 
 	hideflag = GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack (GetWindowPack())
+	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	if ReformPartyWindow:
 		ReformPartyWindow.Unload ()
 	ReformPartyWindow = Window = GemRB.LoadWindow (25)
@@ -416,10 +416,10 @@ def OpenReformPartyWindow ():
 			GemRB.UnhideGUI ()
 		#re-enabling party size control
 		GemRB.GameSetPartySize (PARTY_SIZE)
-		UpdatePortraitWindow()
+		GUICommonWindows.UpdatePortraitWindow()
 		return
 
-	GemRB.LoadWindowPack (GetWindowPack())
+	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	ReformPartyWindow = Window = GemRB.LoadWindow (24)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
@@ -464,7 +464,7 @@ def DeathWindowEnd ():
 	GemRB.PlayMovie ("deathand",1)
 	GemRB.GamePause (1,1)
 
-	GemRB.LoadWindowPack (GetWindowPack())
+	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	Window = GemRB.LoadWindow (17)
 
 	#reason for death

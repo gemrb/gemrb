@@ -18,6 +18,8 @@
 #
 # character generation - race; next class/kit (CharGen3)
 import GemRB
+import GUICommon
+import GUICommonWindows
 from CharGenCommon import *
 
 def OnLoad():
