@@ -124,8 +124,8 @@ def OpenLevelUpWindow():
 
 	# class
 	Label = LevelUpWindow.GetControl (0x10000000+106)
-	Label.SetText (GUIREC.GetActorClassTitle (pc))
-	print "Title:",GUIREC.GetActorClassTitle (pc),"\tActor Title:",actor.ClassTitle()
+	Label.SetText (GUICommon.GetActorClassTitle (pc))
+	print "Title:",GUICommon.GetActorClassTitle (pc),"\tActor Title:",actor.ClassTitle()
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	print "Class:",Class,"\tActor Class:",actor.classid
