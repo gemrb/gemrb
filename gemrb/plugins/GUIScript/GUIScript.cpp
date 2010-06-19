@@ -1611,6 +1611,39 @@ static PyObject* GemRB_Window_ShowModal(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetTimedEvent__doc,
+"SetTimedEvent(Function, Rounds)\n\n"
+"Sets a timed event, the timing is handled by the game object\n"
+"if the game object doesn't exist, this command is ignored." );
+
+static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
+{
+	PyObject* function;
+	int rounds;
+
+	if (!PyArg_ParseTuple( args, "Oi", &function, &rounds )) {
+		return AttributeError( GemRB_SetTimedEvent__doc );
+	}
+
+	EventHandler handler;
+	if (function == Py_None) {
+		handler = new Callback();
+	} else if (PyCallable_Check(function)) {
+		handler = new PythonCallback(function);
+	} else {
+		char buf[256];
+		// TODO: Print function name. (func.__name__)
+		snprintf(buf, sizeof(buf), "Can't set timed event handler!");
+		return RuntimeError(buf);
+	}
+	Game *game = core->GetGame();
+	if (game) {
+		game->SetTimedEvent(handler, rounds);
+	}
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SetTimedEventByName__doc,
 "SetTimedEventByName(FunctionName, Rounds)\n\n"
 "Sets a timed event, the timing is handled by the game object\n"
@@ -9330,6 +9363,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetPlayerSound, METH_VARARGS),
 	METHOD(SetPurchasedAmount, METH_VARARGS),
 	METHOD(SetRepeatClickFlags, METH_VARARGS),
+	METHOD(SetTimedEvent, METH_VARARGS),
 	METHOD(SetTimedEventByName, METH_VARARGS),
 	METHOD(SetToken, METH_VARARGS),
 	METHOD(SetTooltipDelay, METH_VARARGS),
