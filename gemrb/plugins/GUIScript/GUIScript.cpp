@@ -1633,6 +1633,42 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_Control_SetEvent__doc,
+"Control.SetEvent(EventMask, Function)\n\n"
+"Sets an event of a control on a window to a script defined function." );
+
+static PyObject* GemRB_Control_SetEvent(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+	int event;
+	PyObject* func;
+
+	if (!PyArg_ParseTuple(args, "iiiO", &WindowIndex, &ControlIndex,
+				&event, &func)) {
+		return AttributeError(GemRB_Control_SetEvent__doc);
+	}
+
+	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
+	if (!ctrl)
+		return NULL;
+
+	EventHandler handler;
+	if (func == Py_None) {
+		handler = new Callback();
+	} else if (PyCallable_Check(func)) {
+		handler = new PythonCallback(func);
+	}
+	if (!handler || !ctrl->SetEvent(event, handler)) {
+		char buf[256];
+		// TODO: Print function name. (func.__name__)
+		snprintf(buf, sizeof(buf), "Can't set event handler!");
+		return RuntimeError(buf);
+	}
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_Control_SetEventByName__doc,
 "Control.SetEventByName(EventMask, FunctionName)\n\n"
 "Sets an event of a control on a window to a script defined function." );
@@ -9336,6 +9372,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_QueryText, METH_VARARGS),
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
+	METHOD(Control_SetEvent, METH_VARARGS),
 	METHOD(Control_SetEventByName, METH_VARARGS),
 	METHOD(Control_SetPos, METH_VARARGS),
 	METHOD(Control_SetSize, METH_VARARGS),
