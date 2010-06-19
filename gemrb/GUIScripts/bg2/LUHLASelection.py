@@ -21,9 +21,8 @@ import GemRB
 from math import ceil
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import HasSpell
-from GUIREC import GetKitIndex
-from GUICommonWindows import IsDualClassed, KitListTable, ClassTable
+import GUICommon
+import GUIREC
 
 # HLA selection
 HLAWindow = 0		# << HLA selection window
@@ -126,7 +125,7 @@ def HLADonePress ():
 			GemRB.ApplySpell(pc, HLARef[3:])
 		elif HLARef[:2] == "GA":
 			# make sure it isn't already learned
-			SpellIndex = HasSpell (pc, HLAType, HLALevel, HLARef[3:])
+			SpellIndex = GUICommon.HasSpell (pc, HLAType, HLALevel, HLARef[3:])
 			if SpellIndex < 0: # gotta learn it
 				GemRB.LearnSpell (pc, HLARef[3:], 8)
 			else: # memorize it again
@@ -298,8 +297,8 @@ def GetHLAs ():
 	global HLAAbilities, HLANewAbilities, HLACount
 
 	# get some needed values
-	Kit = GetKitIndex (pc)
-	IsDual = IsDualClassed (pc, 0)
+	Kit = GUIREC.GetKitIndex (pc)
+	IsDual = GUICommon.IsDualClassed (pc, 0)
 	IsDual = IsDual[0] > 0
 	MaxHLACount = 0
 
@@ -312,12 +311,12 @@ def GetHLAs ():
 
 	# get all the HLAs for each class
 	for i in range (NumClasses):
-		ClassIndex = ClassTable.FindValue (5, Classes[i])
-		ClassName = ClassTable.GetRowName (ClassIndex)
+		ClassIndex = GUICommon.ClassTable.FindValue (5, Classes[i])
+		ClassName = GUICommon.ClassTable.GetRowName (ClassIndex)
 		CurrentLevel = Level[i]
 
 		if Kit != 0 and NumClasses == 1 and not IsDual: # kitted single-class
-			KitName = KitListTable.GetValue (Kit, 0)
+			KitName = GUICommon.KitListTable.GetValue (Kit, 0)
 			HLAClassTable = "lu" + HLAAbbrTable.GetValue (KitName, "ABBREV")
 			ClassName = KitName
 		else: # everyone else
