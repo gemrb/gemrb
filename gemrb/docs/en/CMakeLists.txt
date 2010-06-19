@@ -3,4 +3,5 @@ INSTALL(
   DESTINATION ${DOC_DIR}
   PATTERN CMakeLists.txt EXCLUDE
   PATTERN Makefile.am EXCLUDE
+  PATTERN doxygen/* EXCLUDE
 )
