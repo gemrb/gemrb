@@ -20,7 +20,7 @@
 
 import GemRB
 from GUIDefines import *
-from GUICommon import GameWindow, GameIsBG1, GameIsBG2, GameIsIWD1, GameIsIWD2
+import GUICommon
 
 TextScreen = None
 TextArea = None
@@ -34,17 +34,17 @@ Ticks = IWDTICKS = 200 # TODO: verify for suitability in iwd1
 def StartTextScreen ():
 	global TextScreen, TextArea, Chapter, TableName, Row, Ticks
 
-	if GameIsIWD2():
+	if GUICommon.GameIsIWD2():
 		GemRB.LoadWindowPack ("GUICHAP", 800, 600)
 	else:
 		GemRB.LoadWindowPack ("GUICHAP", 640, 480)
-		if GameIsBG1() or GameIsBG2():
+		if GUICommon.GameIsBG1() or GUICommon.GameIsBG2():
 			Ticks = BGTICKS
 
 	LoadPic = TableName = GemRB.GetGameString (STR_LOADMOS)
 	#if there is no preset loadpic, try to determine it from the chapter
 	#fixme: we always assume there isn't for non-bg2
-	if GameIsBG2():
+	if GUICommon.GameIsBG2():
 		if TableName == "":
 			Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
 			TableName = "CHPTXT"+str(Chapter)
@@ -53,14 +53,14 @@ def StartTextScreen ():
 		ID = (GemRB.GetGameVar("CHAPTER") + 1) & 0x7fffffff
 		Chapter = ID + 1
 
-	if GameIsIWD1() or GameIsIWD2():
+	if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
 		#fixme: this is also a guess; are there more, one per chapter?
 		if LoadPic == "":
 			GemRB.LoadMusicPL ("chap0.mus")
 		else:
 			GemRB.LoadMusicPL ("chap1.mus")
 		TableName = "chapters"
-	elif GameIsBG1() and TableName[:6] == "chptxt":
+	elif GUICommon.GameIsBG1() and TableName[:6] == "chptxt":
 		GemRB.LoadMusicPL ("chapter.mus")
 	#else: TODO: what about bg2?
 
@@ -73,11 +73,11 @@ def StartTextScreen ():
 
 	#caption
 	Table = GemRB.LoadTable (TableName)
-	if GameIsBG1():
+	if GUICommon.GameIsBG1():
 		#these suckers couldn't use a fix row
 		Row = Table.GetRowIndex("DEFAULT")
 		Value = Table.GetValue (Row, 0)
-	elif GameIsBG2():
+	elif GUICommon.GameIsBG2():
 		LoadPic = Table.GetValue (-1, -1)
 		if LoadPic != "":
 			TextScreen.SetPicture (LoadPic)
@@ -101,7 +101,7 @@ def StartTextScreen ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ReplayTextScreen")
 
 	GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the gamecontrol screen
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the gamecontrol screen
 	TextScreen.SetVisible (WINDOW_VISIBLE)
 
 	TextArea.Rewind (Ticks)
@@ -113,7 +113,7 @@ def FeedScroll ():
 	global TextArea, Position
 
 	Table = GemRB.LoadTable (TableName)
-	if GameIsBG2():
+	if GUICommon.GameIsBG2():
 		#this is a rather primitive selection but works for the games
 		Value = Table.GetValue (0, 1)
 		if Value == "REPUTATION":
@@ -121,7 +121,7 @@ def FeedScroll ():
 		else:
 			line = 1
 		Value = Table.GetValue (line, 1)
-	elif GameIsBG1():
+	elif GUICommon.GameIsBG1():
 		Value = Table.GetValue (Row, Position)
 		if Value == 'NONE':
 			Position = 1
@@ -140,7 +140,7 @@ def EndTextScreen ():
 	if TextScreen:
 		TextScreen.Unload ()
 		GemRB.PlaySound(None, 0, 0, 4)
-	GameWindow.SetVisible(WINDOW_VISIBLE) # enable the gamecontrol screen
+	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) # enable the gamecontrol screen
 	GemRB.UnhideGUI ()
 	GemRB.GamePause (0, 1)
 	return
