@@ -23,7 +23,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 #this import is primarily for the tables
-from GUICommonWindows import *
+import GUICommon
 
 ##############################################################################
 ## GLOBALS TO BE INITIALIZED ONCE
@@ -51,30 +51,30 @@ class Actor:
 		Will only be called by the first Actor created."""
 
 		global classcount, dualswap
-		classcount = ClassTable.GetRowCount ()
+		classcount = GUICommon.ClassTable.GetRowCount ()
 		dualswap = [0]*classcount
 
 		for i in range(classcount):
-			classid = ClassTable.GetValue (i, 5)
-			classnames = ClassTable.GetRowName(i).split("_")
+			classid = GUICommon.ClassTable.GetValue (i, 5)
+			classnames = GUICommon.ClassTable.GetRowName(i).split("_")
 
 			#set the MC_WAS_ID of the first class
 			if len(classnames) == 2:
-				dualswap[classid-1] = ClassTable.GetValue (i, 8)
+				dualswap[classid-1] = GUICommon.ClassTable.GetValue (i, 8)
 
 	def Classes (self):
 		"""Returns a list with all the class IDs."""
 
 		if self.__classes == None:
 			#already reversed in ClassNames
-			self.__classes = [ClassTable.GetValue (name, "ID", 1) for name in self.ClassNames()]
+			self.__classes = [GUICommon.ClassTable.GetValue (name, "ID", 1) for name in self.ClassNames()]
 		return self.__classes
 
 	def ClassNames (self):
 		"""Returns a list will all the class names."""
 
 		if self.__classnames == None:
-			self.__classnames = ClassTable.GetRowName (ClassTable.FindValue (5, self.classid) ).split("_")
+			self.__classnames = GUICommon.ClassTable.GetRowName (GUICommon.ClassTable.FindValue (5, self.classid) ).split("_")
 			if self.IsDualSwap():
 				self.__classnames.reverse()
 		return self.__classnames
@@ -89,24 +89,24 @@ class Actor:
 
 		if self.__classtitle == 0:
 			if self.multiclass and self.isdual == 0:
-				self.__classtitle = ClassTable.GetValue (self.classindex, 2)
+				self.__classtitle = GUICommon.ClassTable.GetValue (self.classindex, 2)
 				self.__classtitle = GemRB.GetString (self.__classtitle)
 			elif self.isdual:
 				# first (previous) kit or class of the dual class
 				self.Classes()
 				if self.KitIndex():
-					self.__classtitle = KitListTable.GetValue (self.__kitindex, 2)
+					self.__classtitle = GUICommon.KitListTable.GetValue (self.__kitindex, 2)
 				else:
-					self.__classtitle = ClassTable.GetValue (ClassTable.FindValue \
+					self.__classtitle = GUICommon.ClassTable.GetValue (GUICommon.ClassTable.FindValue \
 						(5, self.__classes[1]), 2)
 				self.__classtitle = GemRB.GetString (self.__classtitle) + " / " + \
-					GemRB.GetString (ClassTable.GetValue (ClassTable.FindValue \
+					GemRB.GetString (GUICommon.ClassTable.GetValue (GUICommon.ClassTable.FindValue \
 						(5, self.__classes[0]), 2) )
 			else: # ordinary class or kit
 				if self.KitIndex():
-					self.__classtitle = KitListTable.GetValue (self.__kitindex, 2)
+					self.__classtitle = GUICommon.KitListTable.GetValue (self.__kitindex, 2)
 				else:
-					self.__classtitle = ClassTable.GetValue (self.classindex, 2)
+					self.__classtitle = GUICommon.ClassTable.GetValue (self.classindex, 2)
 				self.__classtitle = GemRB.GetString (self.__classtitle)
 
 		if self.__classtitle == "*":
@@ -117,7 +117,7 @@ class Actor:
 		"""Returns true if IE_LEVEL is opposite of expectations."""
 
 		if self.__dualswap == None:
-			self.__dualswap = (self.isdual & ClassTable.GetValue \
+			self.__dualswap = (self.isdual & GUICommon.ClassTable.GetValue \
 				(self.ClassNames()[0], "MC_WAS_ID", 1)) > 0
 		return self.__dualswap
 
@@ -136,7 +136,7 @@ class Actor:
 		# carefully looking for kit by the usability flag
 		# since the barbarian kit id clashes with the no-kit value
 		if self.__kitindex == 0 and Kit != 0x4000:
-			self.__kitindex = KitListTable.FindValue (6, Kit)
+			self.__kitindex = GUICommon.KitListTable.FindValue (6, Kit)
 			if self.__kitindex == -1:
 				self.__kitindex = 0
 
@@ -161,7 +161,7 @@ class Actor:
 
 		#filtering the old dual class out seems unnecessary
 		#just be sure to use NumClasses() or isdual to check
-		return [NextLevelTable.GetValue (name, str(level+1)) for name,level \
+		return [GUICommon.NextLevelTable.GetValue (name, str(level+1)) for name,level \
 			in zip(self.ClassNames(), self.Levels())]
 
 	def NextLevels (self):
@@ -178,8 +178,8 @@ class Actor:
 
 			#we only want the current level for the old part of a dual-class
 			if len(self.__nextlevels) < self.__numclasses:
-				for current in range(level+1, NextLevelTable.GetColumnCount () ):
-					if NextLevelTable.GetValue (name, str(current)) <= xp:
+				for current in range(level+1, GUICommon.NextLevelTable.GetColumnCount () ):
+					if GUICommon.NextLevelTable.GetValue (name, str(current)) <= xp:
 						next = current
 					else:
 						break
@@ -210,9 +210,9 @@ class Actor:
 		#accessible variables
 		self.pc = pc
 		self.classid = GemRB.GetPlayerStat (self.pc, IE_CLASS)
-		self.classindex = ClassTable.FindValue (5, self.classid)
+		self.classindex = GUICommon.ClassTable.FindValue (5, self.classid)
 		self.isdual = GemRB.GetPlayerStat (self.pc, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
-		self.multiclass = ClassTable.GetValue (self.classindex, 4)
+		self.multiclass = GUICommon.ClassTable.GetValue (self.classindex, 4)
 
 		#internal variables - these are only intialized on the first
 		#call to their respective function, and stored thereafter
