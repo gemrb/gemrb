@@ -1651,10 +1651,13 @@ PyDoc_STRVAR( GemRB_SetTimedEventByName__doc,
 
 static PyObject* GemRB_SetTimedEventByName(PyObject * /*self*/, PyObject* args)
 {
-	char* funcName;
+	PyObject* funcName;
 	int rounds;
 
-	if (!PyArg_ParseTuple( args, "si", &funcName, &rounds )) {
+	if (!PyArg_ParseTuple( args, "Oi", &funcName, &rounds )) {
+		return AttributeError( GemRB_SetTimedEventByName__doc );
+	}
+	if (!PyString_Check(funcName)) {
 		return AttributeError( GemRB_SetTimedEventByName__doc );
 	}
 
@@ -1710,11 +1713,14 @@ static PyObject* GemRB_Control_SetEventByName(PyObject * /*self*/, PyObject* arg
 {
 	int WindowIndex, ControlIndex;
 	int event;
-	char* funcName;
+	PyObject* funcName;
 
-	if (!PyArg_ParseTuple( args, "iiis", &WindowIndex, &ControlIndex, &event,
+	if (!PyArg_ParseTuple( args, "iiiO", &WindowIndex, &ControlIndex, &event,
 			&funcName )) {
 		return AttributeError( GemRB_Control_SetEventByName__doc );
+	}
+	if (!PyString_Check(funcName)) {
+		return AttributeError( GemRB_SetTimedEventByName__doc );
 	}
 
 	Control* ctrl = GetControl( WindowIndex, ControlIndex, -1 );
@@ -1723,7 +1729,7 @@ static PyObject* GemRB_Control_SetEventByName(PyObject * /*self*/, PyObject* arg
 
 	if (! ctrl->SetEvent( event, new StringCallback(funcName) )) {
 		char buf[256];
-		snprintf( buf, sizeof( buf ), "Can't set event handler: %s!", funcName );
+		snprintf( buf, sizeof( buf ), "Can't set event handler: %s!", PyString_AsString(funcName) );
 		return RuntimeError( buf );
 	}
 
