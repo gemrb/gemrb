@@ -77,22 +77,22 @@ def OnLoad():
 
 	HairButton = ColorWindow.GetControl(2)
 	HairButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-	HairButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"HairPress")
+	HairButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"HairPress")
 	HairButton.SetBAM("COLGRAD", 1, 0, Color1)
 
 	SkinButton = ColorWindow.GetControl(3)
 	SkinButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-	SkinButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"SkinPress")
+	SkinButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"SkinPress")
 	SkinButton.SetBAM("COLGRAD", 1, 0, Color2)
 
 	MajorButton = ColorWindow.GetControl(5)
 	MajorButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-	MajorButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"MajorPress")
+	MajorButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"MajorPress")
 	MajorButton.SetBAM("COLGRAD", 1, 0, Color3)
 
 	MinorButton = ColorWindow.GetControl(4)
 	MinorButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-	MinorButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"MinorPress")
+	MinorButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"MinorPress")
 	MinorButton.SetBAM("COLGRAD", 1, 0, Color4)
 
 	BackButton = ColorWindow.GetControl(13)
@@ -101,8 +101,8 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 
 	# calculate the paperdoll animation id from the race, class and gender
 	PDollTable = GemRB.LoadTable ("avatars")
@@ -199,17 +199,17 @@ def GetColor():
 			Selected = i
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc("Selected",i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	
 	Button = ColorPicker.GetControl(33)
 	#default button
 	Button.SetVarAssoc("Selected", 0)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "RandomDonePress")
+	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "RandomDonePress")
 	Button.SetText("RND")
 
 	CancelButton = ColorPicker.GetControl(35)
 	CancelButton.SetText(13727)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ColorPicker.SetVisible(WINDOW_VISIBLE)

@@ -51,7 +51,7 @@ def OnLoad():
 		Button = RaceWindow.GetControl(i)
 		Button.SetText(RaceTable.GetValue(i-2,0) )
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,"RacePress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"RacePress")
 		Button.SetVarAssoc("Race",i-1)
 
 	BackButton = RaceWindow.GetControl(10)
@@ -64,8 +64,8 @@ def OnLoad():
 	TextAreaControl = RaceWindow.GetControl(8)
 	TextAreaControl.SetText(17237)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	RaceWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 

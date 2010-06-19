@@ -100,9 +100,9 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 		SpellsCancelButton = SpellsWindow.GetControl(29)
 		SpellsCancelButton.SetState(IE_GUI_BUTTON_ENABLED)
 		if recommend:
-			SpellsCancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsCancelPress")
+			SpellsCancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SpellsCancelPress")
 		else:
-			SpellsCancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "BackPress")
+			SpellsCancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "BackPress")
 		SpellsCancelButton.SetText(13727)
 		SpellsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -110,7 +110,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 			# recommended spell picks
 			SpellsPickButton = SpellsWindow.GetControl(30)
 			SpellsPickButton.SetState(IE_GUI_BUTTON_ENABLED)
-			SpellsPickButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsPickPress")
+			SpellsPickButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SpellsPickPress")
 			SpellsPickButton.SetText(34210)
 	else:
 		SpellsWindow = GemRB.LoadWindow (8)
@@ -129,7 +129,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 
 	# the done button also doubles as a next button
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsDonePress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SpellsDonePress")
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
 		
@@ -174,7 +174,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 				# setup the scrollbar
 				ScrollBar = SpellsWindow.GetControl (1000)
 				ScrollBar.SetSprites ("GUISCRCW", 0, 0,1,2,3,5,4)
-				ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "ShowSpells")
+				ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "ShowSpells")
 				ScrollBar.SetDefaultScrollBar ()
 
 				# only scroll if we have more than 24 spells or 25 if extra 25th spell slot is available in sorcs LevelUp
@@ -279,7 +279,7 @@ def ShowSpells ():
 		Spell = GemRB.GetSpell (Spells[SpellLevel][i+j][0], 1)
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetVarAssoc("ButtonPressed", i)
-		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsSelectPress")
+		SpellButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SpellsSelectPress")
 		if GameIsBG2():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
 		else:

@@ -92,7 +92,7 @@ def OnLoad():
 			ScrollBar = KitWindow.GetControl (1000)
 			ScrollBar.SetSprites("GUISCRCW", 0, 0,1,2,3,5,4)
 			ScrollBar.SetVarAssoc("TopIndex",tmpRowCount-10)
-			ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawKits")
+			ScrollBar.SetEventByName(IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawKits")
 			ScrollBar.SetDefaultScrollBar()
 	elif not EnhanceGUI and RowCount>10:
 		RowCount = 10
@@ -103,7 +103,7 @@ def OnLoad():
 		else:
 			Button = KitWindow.GetControl(i+5)
 		Button.SetVarAssoc("ButtonPressed", i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "KitPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "KitPress")
 
 	BackButton = KitWindow.GetControl(8)
 	BackButton.SetText(15416)
@@ -115,8 +115,8 @@ def OnLoad():
 	TextAreaControl = KitWindow.GetControl(5)
 	TextAreaControl.SetText(17247)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	Init = 1
 	RedrawKits()
 	KitPress()

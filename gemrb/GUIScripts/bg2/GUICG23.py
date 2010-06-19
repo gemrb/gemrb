@@ -50,9 +50,9 @@ def OnLoad ():
 	CancelButton.SetText (12896)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OkPress")
-	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ClearPress")
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	OkButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OkPress")
+	ClearButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ClearPress")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	BioWindow.SetVisible (WINDOW_VISIBLE)
 	return
 

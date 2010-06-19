@@ -70,10 +70,10 @@ def OnLoad():
 
 	MaleButton.SetVarAssoc("Gender",1)
 	FemaleButton.SetVarAssoc("Gender",2)
-	MaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"ClickedMale")
-	FemaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"ClickedFemale")
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	MaleButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"ClickedMale")
+	FemaleButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"ClickedFemale")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	GenderWindow.SetVisible(WINDOW_VISIBLE)
 	return

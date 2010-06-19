@@ -40,20 +40,20 @@ def OnLoad ():
 	LoadWindow.SetFrame ()
 	CancelButton=LoadWindow.GetControl (34)
 	CancelButton.SetText (13727)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	GemRB.SetVar ("LoadIdx",0)
 	for i in range (4):
 		Button = LoadWindow.GetControl (26+i)
 		Button.SetText (15590)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LoadGamePress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LoadGamePress")
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetVarAssoc ("LoadIdx",i)
 
 		Button = LoadWindow.GetControl (30+i)
 		Button.SetText (13957)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteGamePress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DeleteGamePress")
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetVarAssoc ("LoadIdx",i)
 
@@ -69,7 +69,7 @@ def OnLoad ():
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 	ScrollBar=LoadWindow.GetControl (25)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
+	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
 	Games=GemRB.GetSaveGames ()
 	TopIndex = max (0, len(Games) - 4)
 	GemRB.SetVar ("TopIndex",TopIndex)
@@ -160,10 +160,10 @@ def DeleteGamePress ():
 	Text.SetText (15305)
 	DeleteButton=ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (13957)
-	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteGameConfirm")
+	DeleteButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DeleteGameConfirm")
 	CancelButton=ConfirmWindow.GetControl (2)
 	CancelButton.SetText (13727)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteGameCancel")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DeleteGameCancel")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ConfirmWindow.SetVisible (WINDOW_VISIBLE)

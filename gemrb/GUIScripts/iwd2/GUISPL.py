@@ -77,15 +77,15 @@ def OpenSpellBookWindow ():
 	Window.SetFrame ()
 
 	Button = Window.GetControl (92)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SpellBookPrevPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SpellBookPrevPress")
 
 	Button = Window.GetControl (93)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SpellBookNextPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SpellBookNextPress")
 
 	#setup level buttons
 	for i in range (9):
 		Button = Window.GetControl (55 + i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RefreshSpellBookLevel")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RefreshSpellBookLevel")
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 	for i in range (9):
@@ -147,10 +147,10 @@ def UpdateSpellBookWindow ():
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 			if ms['Flags']:
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookSpellUnmemorizeWindow")
+				Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookSpellUnmemorizeWindow")
 			else:
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnSpellBookUnmemorizeSpell")
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenSpellBookSpellInfoWindow")
+				Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnSpellBookUnmemorizeSpell")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenSpellBookSpellInfoWindow")
 			spell = GemRB.GetSpell (ms['SpellResRef'])
 			Button.SetTooltip (spell['SpellName'])
 			SpellBookMemorizedSpellList.append (ms['SpellResRef'])
@@ -163,8 +163,8 @@ def UpdateSpellBookWindow ():
 			else:
 				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 				Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
@@ -176,8 +176,8 @@ def UpdateSpellBookWindow ():
 			ks = GemRB.GetKnownSpell (pc, type, level, i+TopIndex)
 			Button.SetSpellIcon (ks['SpellResRef'])
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnSpellBookMemorizeSpell")
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenSpellBookSpellInfoWindow")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnSpellBookMemorizeSpell")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenSpellBookSpellInfoWindow")
 			spell = GemRB.GetSpell (ks['SpellResRef'])
 			Button.SetTooltip (spell['SpellName'])
 			SpellBookKnownSpellList.append (ks['SpellResRef'])
@@ -186,8 +186,8 @@ def UpdateSpellBookWindow ():
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
@@ -239,7 +239,7 @@ def OpenSpellBookSpellInfoWindow ():
 	Button = Window.GetControl (5)
 	Button.SetText (15416)
 	Button.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookSpellInfoWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookSpellInfoWindow")
 
 	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
@@ -304,13 +304,13 @@ def OpenSpellBookSpellRemoveWindow ():
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnSpellBookRemoveSpell")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnSpellBookRemoveSpell")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookSpellRemoveWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookSpellRemoveWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	GemRB.UnhideGUI ()
@@ -341,13 +341,13 @@ def OpenSpellBookSpellUnmemorizeWindow ():
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnSpellBookUnmemorizeSpell")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnSpellBookUnmemorizeSpell")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookSpellUnmemorizeWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookSpellUnmemorizeWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	GemRB.UnhideGUI ()

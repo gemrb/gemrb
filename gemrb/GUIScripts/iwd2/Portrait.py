@@ -64,11 +64,11 @@ def OnLoad ():
 	DoneButton.SetText (36789)
 	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"RightPress")
-	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"LeftPress")
-	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	CustomButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"CustomPress")
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	RightButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"RightPress")
+	LeftButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"LeftPress")
+	BackButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	CustomButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"CustomPress")
+	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"NextPress")
 
 	while True:
 		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
@@ -178,26 +178,26 @@ def CustomPress ():
 	CustomWindow = Window = GemRB.LoadWindow (18)
 	PortraitList1 = Window.GetControl (2)
 	RowCount1 = PortraitList1.GetPortraits (0)
-	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "LargeCustomPortrait")
+	PortraitList1.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "LargeCustomPortrait")
 	GemRB.SetVar ("Row1", RowCount1)
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	PortraitList2 = Window.GetControl (4)
 	RowCount2 = PortraitList2.GetPortraits (1)
-	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "SmallCustomPortrait")
+	PortraitList2.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "SmallCustomPortrait")
 	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
 
 	Button = Window.GetControl (6)
 	Button.SetText (11973)
 	BackButton.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomDone")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CustomDone")
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (7)
 	Button.SetText (15416)
 	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomAbort")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CustomAbort")
 
 	Button = Window.GetControl (0)
 	PortraitName = PortraitsTable.GetRowName (LastPortrait)+"L"

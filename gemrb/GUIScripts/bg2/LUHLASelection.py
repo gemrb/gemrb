@@ -68,7 +68,7 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	# create the done button
 	HLADoneButton = HLAWindow.GetControl (28)
 	HLADoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	HLADoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "HLADonePress")
+	HLADoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "HLADonePress")
 	HLADoneButton.SetText(11973)
 	HLADoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
 
@@ -88,7 +88,7 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 			HLAWindow.CreateScrollBar (1000, 290,142, 16,252)
 			ScrollBar = HLAWindow.GetControl (1000)
 			ScrollBar.SetSprites ("GUISCRCW", 0, 0,1,2,3,5,4)
-			ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "HLAShowAbilities")
+			ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "HLAShowAbilities")
 			#with enhanced GUI we have 5 rows of 5 abilities (the last one is 'the extra slot')
 			ScrollBar.SetVarAssoc ("HLATopIndex", int ( ceil ( ( len (HLAAbilities)-25 ) / 5.0 ) ) + 1 )
 			ScrollBar.SetDefaultScrollBar ()
@@ -174,7 +174,7 @@ def HLAShowAbilities ():
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetSpellIcon(HLARef, 1)
 		SpellButton.SetVarAssoc("ButtonPressed", i)
-		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "HLASelectPress")
+		SpellButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "HLASelectPress")
 		SpellButton.SetSprites("GUIBTBUT", 0,0,1,2,3)
 		SpellButton.SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR)
 

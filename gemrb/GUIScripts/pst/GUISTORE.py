@@ -86,48 +86,48 @@ def OpenStoreWindow ():
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseStoreWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseStoreWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# buy / sell
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenStoreShoppingWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenStoreShoppingWindow")
 	store_buttons['shopping'] = Button
 	store_update_functions['shopping'] = UpdateStoreShoppingWindow
 
 	# identify
 	Button = Window.GetControl (2)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenStoreIdentifyWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenStoreIdentifyWindow")
 	store_buttons['identify'] = Button
 	store_update_functions['identify'] = UpdateStoreIdentifyWindow
 
 	# steal
 	Button = Window.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenStoreStealWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenStoreStealWindow")
 	store_buttons['steal'] = Button
 	store_update_functions['steal'] = UpdateStoreStealWindow
 
 	# donate
 	Button = Window.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenStoreDonateWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenStoreDonateWindow")
 	store_buttons['donate'] = Button
 	store_update_functions['donate'] = UpdateStoreDonateWindow
 
 	# heal / cure
 	Button = Window.GetControl (5)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenStoreHealWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenStoreHealWindow")
 	store_buttons['heal'] = Button
 	store_update_functions['heal'] = UpdateStoreHealWindow
 
 	# rumour
 	Button = Window.GetControl (6)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenStoreRumourWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenStoreRumourWindow")
 	store_buttons['rumour'] = Button
 	store_update_functions['rumour'] = UpdateStoreRumourWindow
 
 	# rent room
 	Button = Window.GetControl (7)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenStoreRentWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenStoreRentWindow")
 	store_buttons['rent'] = Button
 	store_update_functions['rent'] = UpdateStoreRentWindow
 
@@ -386,31 +386,31 @@ def OpenStoreRentWindow ():
 
 	# Peasant
 	Button = Window.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentPeasant")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentPeasant")
 	Button = Window.GetControl (4)
 	Button.SetText (45308)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentPeasant")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentPeasant")
 
 	# Merchant
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentMerchant")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentMerchant")
 	Button = Window.GetControl (5)
 	Button.SetText (45310)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentMerchant")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentMerchant")
 
 	# Noble
 	Button = Window.GetControl (2)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentNoble")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentNoble")
 	Button = Window.GetControl (6)
 	Button.SetText (45313)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentNoble")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentNoble")
 
 	# Royal
 	Button = Window.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentRoyal")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentRoyal")
 	Button = Window.GetControl (7)
 	Button.SetText (45316)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentRoyal")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectStoreRentRoyal")
 
 	
 	# Rent

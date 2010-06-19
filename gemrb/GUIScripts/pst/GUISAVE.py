@@ -60,20 +60,20 @@ def OpenSaveWindow ():
 	# Cancel button
 	CancelButton = Window.GetControl (46)
 	CancelButton.SetText (4196)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	GemRB.SetVar ("SaveIdx", 0)
 
 	for i in range (4):
 		Button = Window.GetControl (14 + i)
 		Button.SetText (28645)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SaveGamePress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SaveGamePress")
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetVarAssoc ("SaveIdx", i)
 
 		Button = Window.GetControl (18 + i)
 		Button.SetText (28640)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteGamePress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DeleteGamePress")
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetVarAssoc ("SaveIdx", i)
 
@@ -87,7 +87,7 @@ def OpenSaveWindow ():
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
 
 	ScrollBar = Window.GetControl(13)
-	ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
+	ScrollBar.SetEventByName(IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
 	Games = GemRB.GetSaveGames()
 	TopIndex = max (0, len(Games) - 4 + 1) #one more for the 'new game'
 
@@ -182,12 +182,12 @@ def DeleteGamePress():
 
 	DeleteButton=ConfirmWindow.GetControl(1)
 	DeleteButton.SetText(13957)
-	DeleteButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DeleteGameConfirm")
+	DeleteButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DeleteGameConfirm")
 	DeleteButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	CancelButton=ConfirmWindow.GetControl(2)
 	CancelButton.SetText(4196)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DeleteGameCancel")
+	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DeleteGameCancel")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ConfirmWindow.SetVisible(WINDOW_VISIBLE)
@@ -224,13 +224,13 @@ def OpenSaveDetailWindow ():
 		Button.SetText (28644)   # Overwrite
 	else:
 		Button.SetText (28645)   # Save
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ConfirmedSaveGame")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ConfirmedSaveGame")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (5)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSaveDetailWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenSaveDetailWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# Slot name and time
@@ -243,8 +243,8 @@ def OpenSaveDetailWindow ():
 		
 	Edit = Window.GetControl (1)
 	Edit.SetText (Slotname)
-	Edit.SetEvent (IE_GUI_EDIT_ON_CHANGE, "CheckSaveName")
-	Edit.SetEvent (IE_GUI_EDIT_ON_DONE, "ConfirmedSaveGame")
+	Edit.SetEventByName (IE_GUI_EDIT_ON_CHANGE, "CheckSaveName")
+	Edit.SetEventByName (IE_GUI_EDIT_ON_DONE, "ConfirmedSaveGame")
 
 	Label = Window.GetControl (0x10000002)
 	Label.SetText (Slottime)

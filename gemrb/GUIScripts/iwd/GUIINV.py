@@ -98,32 +98,32 @@ def OpenInventoryWindow ():
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshInventoryWindow")
+	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshInventoryWindow")
 
 	#Ground Item
 	for i in range (5):
 		Button = Window.GetControl (i+68)
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, "MouseEnterGround")
-		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveGround")
+		Button.SetEventByName (IE_GUI_MOUSE_ENTER_BUTTON, "MouseEnterGround")
+		Button.SetEventByName (IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveGround")
 		Button.SetVarAssoc ("GroundItemButton", i)
 		Button.SetSprites ("STONSLOT",0,0,1,2,3)
 
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS,"MajorPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"MajorPress")
 	Button.SetTooltip (12007)
 
 	Button = Window.GetControl (63)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS,"MinorPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"MinorPress")
 	Button.SetTooltip (12008)
 
 	#portrait
 	Button = Window.GetControl (50)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnAutoEquip")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, "OnAutoEquip")
 
 	#encumbrance
 	Label = Window.CreateLabel (0x10000043, 5,385,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
@@ -150,8 +150,8 @@ def OpenInventoryWindow ():
 		SlotType = GemRB.GetSlotType (slot+1)
 		if SlotType["ID"]:
 			Button = Window.GetControl (SlotType["ID"])
-			Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, "MouseEnterSlot")
-			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveSlot")
+			Button.SetEventByName (IE_GUI_MOUSE_ENTER_BUTTON, "MouseEnterSlot")
+			Button.SetEventByName (IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveSlot")
 			Button.SetVarAssoc ("ItemButton", slot+1)
 			Button.SetSprites ("STONSLOT",0,0,1,2,3)
 
@@ -220,7 +220,7 @@ def GetColor ():
 			Selected = i
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc ("Selected",i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ColorDonePress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ColorDonePress")
 	ColorPicker.SetVisible (WINDOW_VISIBLE)
 	return
 
@@ -343,17 +343,17 @@ def RefreshInventoryWindow ():
 			Button.SetState (IE_GUI_BUTTON_SECOND)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItemGround")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItemGround")
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 
 		if Slot == None:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 		else:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDragItemGround")
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenGroundItemInfoWindow")
-			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenGroundItemAmountWindow")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnDragItemGround")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenGroundItemInfoWindow")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenGroundItemAmountWindow")
 
 		UpdateInventorySlot (pc, Button, Slot, "ground")
 
@@ -382,15 +382,15 @@ def UpdateSlot (pc, slot):
 	Button = Window.GetControl (ControlID)
 	slot_item = GemRB.GetSlotItem (pc, slot+1)
 
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 	UpdateInventorySlot (pc, Button, slot_item, "inventory")
 
 	if slot_item:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDragItem")
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoWindow")
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountWindow")
-		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, "OpenItemAmountWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnDragItem")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_DOUBLE_PRESS, "OpenItemAmountWindow")
 	else:
 		if SlotType["ResRef"]=="*":
 			Button.SetBAM ("",0,0)
@@ -405,10 +405,10 @@ def UpdateSlot (pc, slot):
 			Button.SetBAM (SlotType["ResRef"],0,0)
 			Button.SetTooltip (SlotType["Tip"])
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
-		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, "")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_DOUBLE_PRESS, "")
 
 	if OverSlot == slot+1:
 		if GemRB.CanUseItemType (SlotType["Type"], itemname):
@@ -568,22 +568,22 @@ def OpenItemAmountWindow ():
 
 	# Decrease
 	Button = Window.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS,"DecreaseStackAmount")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"DecreaseStackAmount")
 
 	# Increase
 	Button = Window.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS,"IncreaseStackAmount")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"IncreaseStackAmount")
 
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DragItemAmount")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DragItemAmount")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenItemAmountWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenItemAmountWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# 0 bmp
@@ -612,7 +612,7 @@ def OpenErrorWindow (strref):
 	ErrorWindow = Window = GemRB.LoadWindow (7)
 	Button = Window.GetControl (0)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseErrorWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseErrorWindow")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	TextArea = Window.GetControl (3)
@@ -727,19 +727,19 @@ def IdentifyItemWindow ():
 	ItemIdentifyWindow = Window = GemRB.LoadWindow (9)
 	Button = Window.GetControl (0)
 	Button.SetText (17105)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "IdentifyUseSpell")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "IdentifyUseSpell")
 	if not GemRB.HasSpecialSpell (pc, 1, 0):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (1)
 	Button.SetText (17106)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "IdentifyUseScroll")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "IdentifyUseScroll")
 	if not GemRB.HasSpecialItem (pc, 1, 0):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseIdentifyItemWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseIdentifyItemWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	TextArea = Window.GetControl (3)
@@ -772,7 +772,7 @@ def DisplayItem (itemresref, type):
 	#middle button
 	Button = Window.GetControl (4)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseItemInfoWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseItemInfoWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	#textarea
@@ -788,7 +788,7 @@ def DisplayItem (itemresref, type):
 
 	if type&2:
 		Button.SetText (14133)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "IdentifyItemWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "IdentifyItemWindow")
 	else:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -806,16 +806,16 @@ def DisplayItem (itemresref, type):
 	dialog = (type&1) and (item["Dialog"]!="")
 	if drink:
 		Button.SetText (19392)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DrinkItemWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DrinkItemWindow")
 	elif read and not CannotLearnSlotSpell ():
 		Button.SetText (17104)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ReadItemWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ReadItemWindow")
 	elif container:
 		Button.SetText (24891)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenItemWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenItemWindow")
 	elif dialog:
 		Button.SetText (item["DialogName"])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DialogItemWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DialogItemWindow")
 	else:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)

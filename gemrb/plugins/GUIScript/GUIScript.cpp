@@ -1631,11 +1631,11 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_Control_SetEvent__doc,
-"SetEvent(WindowIndex, ControlIndex, EventMask, FunctionName)\n\n"
+PyDoc_STRVAR( GemRB_Control_SetEventByName__doc,
+"Control.SetEventByName(EventMask, FunctionName)\n\n"
 "Sets an event of a control on a window to a script defined function." );
 
-static PyObject* GemRB_Control_SetEvent(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_Control_SetEventByName(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	int event;
@@ -1643,7 +1643,7 @@ static PyObject* GemRB_Control_SetEvent(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "iiis", &WindowIndex, &ControlIndex, &event,
 			&funcName )) {
-		return AttributeError( GemRB_Control_SetEvent__doc );
+		return AttributeError( GemRB_Control_SetEventByName__doc );
 	}
 
 	Control* ctrl = GetControl( WindowIndex, ControlIndex, -1 );
@@ -9334,7 +9334,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_QueryText, METH_VARARGS),
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
-	METHOD(Control_SetEvent, METH_VARARGS),
+	METHOD(Control_SetEventByName, METH_VARARGS),
 	METHOD(Control_SetPos, METH_VARARGS),
 	METHOD(Control_SetSize, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),

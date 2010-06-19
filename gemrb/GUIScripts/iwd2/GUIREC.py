@@ -89,22 +89,22 @@ def OpenRecordsWindow ():
 	#information (help files)
 	Button = Window.GetControl (1)
 	Button.SetText (11946)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenHelpWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenHelpWindow")
 
 	#biography
 	Button = Window.GetControl (59)
 	Button.SetText (18003)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
 	#export
 	Button = Window.GetControl (36)
 	Button.SetText (13956)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenExportWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenExportWindow")
 
 	#customize
 	Button = Window.GetControl (50)
 	Button.SetText (10645)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenCustomizeWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenCustomizeWindow")
 
 	#general
 	GemRB.SetVar ("SelectWindow", 1)
@@ -113,33 +113,33 @@ def OpenRecordsWindow ():
 	Button.SetTooltip (40316)
 	Button.SetVarAssoc ("SelectWindow", 1)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RefreshRecordsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RefreshRecordsWindow")
 
 	#weapons and armour
 	Button = Window.GetControl (61)
 	Button.SetTooltip (40317)
 	Button.SetVarAssoc ("SelectWindow", 2)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RefreshRecordsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RefreshRecordsWindow")
 
 	#skills and feats
 	Button = Window.GetControl (62)
 	Button.SetTooltip (40318)
 	Button.SetVarAssoc ("SelectWindow", 3)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RefreshRecordsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RefreshRecordsWindow")
 
 	#miscellaneous
 	Button = Window.GetControl (63)
 	Button.SetTooltip (33500)
 	Button.SetVarAssoc ("SelectWindow", 4)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RefreshRecordsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RefreshRecordsWindow")
 
 	#level up
 	Button = Window.GetControl (37)
 	Button.SetText (7175)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LevelUpWindow")
 
 	SetSelectionChangeHandler (RefreshRecordsWindow)
 
@@ -648,7 +648,7 @@ def OpenHelpWindow ():
 		if title:
 			Label.SetText (title)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateHelpWindow")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateHelpWindow")
 		else:
 			Label.SetText ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -656,7 +656,7 @@ def OpenHelpWindow ():
 	#done
 	Button = Window.GetControl (1)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseHelpWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseHelpWindow")
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	UpdateHelpWindow ()
 	return
@@ -696,7 +696,7 @@ def UpdateHelpWindow ():
 	if i<1: i=1
 
 	ScrollBar.SetVarAssoc ("TopIndex", i)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshHelpWindow")
+	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshHelpWindow")
 
 	RefreshHelpWindow ()
 	return
@@ -726,7 +726,7 @@ def RefreshHelpWindow ():
 			Label.SetText (title)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetVarAssoc ("Selected", i+TopIndex)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RefreshHelpWindow")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RefreshHelpWindow")
 		else:
 			Label.SetText ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -759,7 +759,7 @@ def OpenBiographyWindow ():
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseBiographyWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseBiographyWindow")
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -785,9 +785,9 @@ def OpenExportWindow ():
 
 	NameField = ExportWindow.GetControl(6)
 
-	ExportDoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
-	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
+	ExportDoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
+	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
+	NameField.SetEventByName(IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
 	ExportWindow.ShowModal (MODAL_SHADOW_GRAY)
 	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return

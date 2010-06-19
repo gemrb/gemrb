@@ -51,12 +51,12 @@ def OnLoad():
 	BackButton = SkillWindow.GetControl(77)
 	BackButton.SetText(15416)
 	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	SkillWindow.ShowModal(MODAL_SHADOW_NONE)

@@ -85,10 +85,10 @@ def OpenJournalWindow ():
 	PortraitWindow = OpenPortraitWindow (0)
 	
 	Button = Window.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "JournalPrevSectionPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "JournalPrevSectionPress")
 
 	Button = Window.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "JournalNextSectionPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "JournalNextSectionPress")
 
 	Chapter = GemRB.GetGameVar("chapter")
 	GemRB.SetVar("TopIndex", 0)

@@ -43,9 +43,9 @@ def OnLoad():
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)
 	DoneButton.SetText(11973)
-	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "PlayPress")
-	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CreditsPress")
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	PlayButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "PlayPress")
+	CreditsButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CreditsPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	MovieWindow.SetVisible(WINDOW_VISIBLE)
 	return
 	

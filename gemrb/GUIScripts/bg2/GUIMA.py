@@ -124,7 +124,7 @@ def ShowMap ():
 	Map = Window.GetControl (2)
 	GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
-	Map.SetEvent (IE_GUI_MAP_ON_PRESS, "RevealMap")
+	Map.SetEventByName (IE_GUI_MAP_ON_PRESS, "RevealMap")
 	Window.SetVisible (WINDOW_VISIBLE)
 	OptionsWindow.SetVisible (WINDOW_GRAYED)
 	PortraitWindow.SetVisible (WINDOW_GRAYED)
@@ -177,7 +177,7 @@ def OpenMapWindow ():
 
 	# World Map
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindowInside")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindowInside")
 
 	# Hide or Show mapnotes
 	Button = Window.GetControl (3)
@@ -193,8 +193,8 @@ def OpenMapWindow ():
 	Window.CreateMapControl (2, 0, 0, 0, 0, 0x10000003, "FLAG1")
 	Map = Window.GetControl (2)
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
-	Map.SetEvent (IE_GUI_MAP_ON_RIGHT_PRESS, "AddNoteWindow")
-	Map.SetEvent (IE_GUI_MAP_ON_DOUBLE_PRESS, "LeftDoublePressMap")
+	Map.SetEventByName (IE_GUI_MAP_ON_RIGHT_PRESS, "AddNoteWindow")
+	Map.SetEventByName (IE_GUI_MAP_ON_DOUBLE_PRESS, "LeftDoublePressMap")
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_VISIBLE)
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
@@ -246,23 +246,23 @@ def AddNoteWindow ():
 		Label.SetSprites ("FLAG1", i,0,1,2,0)
 		Label.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 		Label.SetVarAssoc ("Color", i)
-		Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SetFocusBack")
+		Label.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SetFocusBack")
 
 	#set
 	Label = NoteWindow.GetControl (0)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS,"SetMapNote")
+	Label.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"SetMapNote")
 	Label.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	Label.SetText (11973)
 
 	#cancel
 	Label = NoteWindow.GetControl (2)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS,"CloseNoteWindow")
+	Label.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"CloseNoteWindow")
 	Label.SetText (13727)
 	Label.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	#remove
 	Label = NoteWindow.GetControl (3)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS,"RemoveMapNote")
+	Label.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"RemoveMapNote")
 	Label.SetText (13957)
 
 	NoteWindow.ShowModal (MODAL_SHADOW_GRAY)
@@ -346,48 +346,48 @@ def WorldMapWindowCommon (Travel):
 	Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "floattxt")
 	WorldMapControl = Window.GetControl (4)
 	WorldMapControl.SetAnimation ("WMDAG")
-	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, "MoveToNewArea")
-	WorldMapControl.SetEvent (IE_GUI_MOUSE_ENTER_WORLDMAP, "ChangeTooltip")
+	WorldMapControl.SetEventByName (IE_GUI_WORLDMAP_ON_PRESS, "MoveToNewArea")
+	WorldMapControl.SetEventByName (IE_GUI_MOUSE_ENTER_WORLDMAP, "ChangeTooltip")
 
 	#north
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MapN")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MapN")
 
 	#south
 	Button = Window.GetControl (2)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MapS")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MapS")
 
 	#northwest
 	Button = Window.GetControl (8)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MapNW")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MapNW")
 
 	#northeast
 	Button = Window.GetControl (9)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MapNE")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MapNE")
 
 	#west
 	Button = Window.GetControl (10)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MapW")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MapW")
 
 	#center
 	Button = Window.GetControl (11)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MapC")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MapC")
 
 	#east
 	Button = Window.GetControl (12)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MapE")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MapE")
 
 	#southwest
 	Button = Window.GetControl (13)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MapSW")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MapSW")
 
 	#southeast
 	Button = Window.GetControl (14)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MapSE")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MapSE")
 
 	# Done
 	Button = Window.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseWorldMapWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseWorldMapWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Window.SetVisible (WINDOW_VISIBLE)
 	MapC()

@@ -105,38 +105,38 @@ def OpenOptionsWindow ():
 	# Load game
 	Button = Window.GetControl (5)
 	Button.SetText (13729)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenLoadMsgWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenLoadMsgWindow")
 
 	# Save Game
 	Button = Window.GetControl (6)
 	Button.SetText (13730)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSaveMsgWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenSaveMsgWindow")
 
 	# Quit Game
 	Button = Window.GetControl (10)
 	Button.SetText (13731)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenQuitMsgWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenQuitMsgWindow")
 
 	# Graphics
 	Button = Window.GetControl (7)
 	Button.SetText (17162)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenVideoOptionsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenVideoOptionsWindow")
 
 	# Audio
 	Button = Window.GetControl (8)
 	Button.SetText (17164)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenAudioOptionsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenAudioOptionsWindow")
 
 	# Gameplay
 	Button = Window.GetControl (9)
 	Button.SetText (17165)
 	#Button.SetText (10308)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenGameplayOptionsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenGameplayOptionsWindow")
 
 	# Return to game
 	Button = Window.GetControl (11)
 	Button.SetText (10308)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
 
 	# game version, e.g. v1.1.0000
 	Label = Window.GetControl (0x1000000b)
@@ -531,12 +531,12 @@ def OpenLoadMsgWindow ():
 	# Load
 	Button = Window.GetControl (0)
 	Button.SetText (15590)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LoadGamePress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LoadGamePress")
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseLoadMsgWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseLoadMsgWindow")
 
 	# Loading a game will destroy ...
 	Text = Window.GetControl (3)
@@ -600,17 +600,17 @@ def OpenQuitMsgWindow ():
 	# Save
 	Button = Window.GetControl (0)
 	Button.SetText (15589)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SaveGamePress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SaveGamePress")
 
 	# Quit Game
 	Button = Window.GetControl (1)
 	Button.SetText (15417)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "QuitGamePress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "QuitGamePress")
 
 	# Cancel
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseQuitMsgWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseQuitMsgWindow")
 
 	# Do you wish to save the game ....
 	Text = Window.GetControl (3)
@@ -641,13 +641,13 @@ def OptSlider (name, window, slider_id, variable, value):
 	"""Standard slider for option windows"""
 	slider = window.GetControl (slider_id)
 	slider.SetVarAssoc (variable, value)
-	slider.SetEvent (IE_GUI_SLIDER_ON_CHANGE, "DisplayHelp" + name)
+	slider.SetEventByName (IE_GUI_SLIDER_ON_CHANGE, "DisplayHelp" + name)
 
 	#label = window.GetControl (label_id)
 	#label.SetText (label_strref)
 	#label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	#label.SetState (IE_GUI_BUTTON_LOCKED)
-	#label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + name)
+	#label.SetEventByName (IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + name)
 
 	return slider
 
@@ -656,7 +656,7 @@ def OptRadio (name, window, button_id, label_id, variable, value):
 
 	button = window.GetControl (button_id)
 	button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DisplayHelp" + name)
+	button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DisplayHelp" + name)
 	button.SetVarAssoc (variable, value)
 
 	label = window.GetControl (label_id)
@@ -671,14 +671,14 @@ def OptCheckbox (name, window, button_id, label_id, variable, value):
 	button = window.GetControl (button_id)
 	button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	button.SetState (IE_GUI_BUTTON_SELECTED)
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DisplayHelp" + name)
+	button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DisplayHelp" + name)
 	button.SetVarAssoc (variable, value)
 	return button
 
 def OptButton (name, window, button_id, button_strref):
 	"""Standard subwindow button for option windows"""
 	button = window.GetControl (button_id)
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "Open%sWindow" %name)
+	button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "Open%sWindow" %name)
 
 	button.SetText (button_strref)
 
@@ -687,14 +687,14 @@ def OptDone (name, window, button_id):
 	"""Standard `Done' button for option windows"""
 	button = window.GetControl (button_id)
 	button.SetText (11973) # Done
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "Close%sWindow" %name)
+	button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "Close%sWindow" %name)
 	button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 def OptCancel (name, window, button_id):
 	"""Standard `Cancel' button for option windows"""
 	button = window.GetControl (button_id)
 	button.SetText (13727) # Cancel
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "Close%sWindow" %name)
+	button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "Close%sWindow" %name)
 	button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 def OptHelpText (name, window, text_id, text_strref):

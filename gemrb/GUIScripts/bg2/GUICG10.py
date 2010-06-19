@@ -65,7 +65,7 @@ def OnLoad():
 		if Allowed ==0:
 			continue
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
 		Button.SetVarAssoc("Class", i) #multiclass, actually
 
 	BackButton = ClassWindow.GetControl(14)
@@ -78,8 +78,8 @@ def OnLoad():
 	TextAreaControl = ClassWindow.GetControl(12)
 	TextAreaControl.SetText(17244)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	ClassWindow.SetVisible(WINDOW_VISIBLE)
 	return

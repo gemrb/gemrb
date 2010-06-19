@@ -108,54 +108,54 @@ def OpenFloatMenuWindow ():
 
 	# portrait button
 	Button = Window.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectNextPC")
-	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenFloatMenuWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectNextPC")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenFloatMenuWindow")
 
 	# Initiate Dialogue
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectDialog")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectDialog")
 	Button.SetTooltip (8191)
 
 	# Attack/Select Weapon
 	Button = Window.GetControl (2)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectWeapons")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectWeapons")
 	Button.SetTooltip (8192)
 
 	# Cast spell
 	Button = Window.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectSpells")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectSpells")
 	Button.SetTooltip (8193)
 
 	# Use Item
 	Button = Window.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectItems")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectItems")
 	Button.SetTooltip (8194)
 
 	# Use Special Ability
 	Button = Window.GetControl (5)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectAbilities")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectAbilities")
 	Button.SetTooltip (8195)
 
 	# Menu Anchors/Handles
 	Button = Window.GetControl (11)
 	Button.SetTooltip (8199)
 	Button.SetFlags (IE_GUI_BUTTON_DRAGGABLE, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, "FloatMenuDrag")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG, "FloatMenuDrag")
 
 	Button = Window.GetControl (12)
 	Button.SetTooltip (8199)
 	Button.SetFlags (IE_GUI_BUTTON_DRAGGABLE, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, "FloatMenuDrag")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG, "FloatMenuDrag")
 
 	# Rotate Items left (to begin)
 	Button = Window.GetControl (13)
 	Button.SetTooltip (8197)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "FloatMenuPreviousItem")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuPreviousItem")
 
 	# Rotate Items right (to end)
 	Button = Window.GetControl (14)
 	Button.SetTooltip (8198)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "FloatMenuNextItem")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuNextItem")
 
 	# 6 - 10 - items/spells/other
 	for i in range (6, 11):
@@ -364,7 +364,7 @@ def UpdateFloatMenuItem (pc, i, weapons):
 		else:
 			Button.SetTooltip (item['ItemNameIdentified'])
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectItem")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectItem")
 		Button.SetVarAssoc ('ItemButton', i)
 		return
 
@@ -403,7 +403,7 @@ def UpdateFloatMenuSpell (pc, i):
 
 		spell = GemRB.GetSpell (SpellResRef)
 		Button.SetTooltip (spell['SpellName'])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectItem")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectItem")
 		Button.SetVarAssoc ('ItemButton', i)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:

@@ -38,48 +38,48 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	global OptionsWindow
 
 	OptionsWindow = Window
-	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
+	#Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
 
 	# Spellbook
 	Button = Window.GetControl (4)
 	Button.SetTooltip (16309)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookWindow")
 
 	# Inventory
 	Button = Window.GetControl (5)
 	Button.SetTooltip (16307)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
 
 	# Journal
 	Button = Window.GetControl (6)
 	Button.SetTooltip (16308)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 2)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 	# Map
 	Button = Window.GetControl (7)
 	Button.SetTooltip (16310)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
 
 	# Records
 	Button = Window.GetControl (8)
 	Button.SetTooltip (16306)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenRecordsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenRecordsWindow")
 
 	# Options
 	Button = Window.GetControl (9)
 	Button.SetTooltip (16311)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 7)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
 
 	# Gears
 	Button = Window.GetControl (10)
@@ -91,16 +91,16 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		# Select All
 		Button = Window.GetControl (11)
 		Button.SetTooltip (10485)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
 		# Rest
 		Button = Window.GetControl (12)
 		Button.SetTooltip (11942)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RestPress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RestPress")
 
 		# Character Arbitration
 		Button = Window.GetControl (13)
 		Button.SetTooltip (16312)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CharacterWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CharacterWindow")
 	return
 
 def AIPress ():
@@ -132,7 +132,7 @@ def SetupFormation ():
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%i,0,0,-1)
 		Button.SetVarAssoc ("Value", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectFormationPreset")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectFormationPreset")
 	return
 
 def GroupControls ():
@@ -162,8 +162,8 @@ def GroupControls ():
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%idx,0,0,-1)
 		Button.SetVarAssoc ("Formation", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectFormation")
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "SetupFormation")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectFormation")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "SetupFormation")
 		str = GemRB.GetString (4935)
 		Button.SetTooltip ("F%d - %s"%(8+i,str) )
 	return
@@ -426,12 +426,12 @@ def OpenPortraitWindow ():
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, "PortraitButtonOnDrag")
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
-		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG, "PortraitButtonOnDrag")
+		Button.SetEventByName (IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
+		Button.SetEventByName (IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
 
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_TOP|IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_PICTURE, OP_SET)
 

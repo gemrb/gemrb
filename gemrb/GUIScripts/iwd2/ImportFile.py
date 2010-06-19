@@ -59,9 +59,9 @@ def OnLoad():
 		TmpButton = MainWindow.GetControl(i)
 		TmpButton.SetState(IE_GUI_BUTTON_DISABLED)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, "SelectFile")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	TextAreaControl.SetEventByName(IE_GUI_TEXTAREA_ON_CHANGE, "SelectFile")
 	MainWindow.SetVisible(WINDOW_VISIBLE)
 	ImportWindow.SetVisible(WINDOW_VISIBLE)
 	return

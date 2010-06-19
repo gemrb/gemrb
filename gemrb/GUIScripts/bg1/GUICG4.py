@@ -162,25 +162,25 @@ def OnLoad():
 	StorePress()
 	for i in range(6):
 		Button = AbilityWindow.GetControl(i+30)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "JustPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "JustPress")
 		Button.SetVarAssoc("Ability", i)
 
 		Button = AbilityWindow.GetControl(i*2+16)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
 		Button.SetVarAssoc("Ability", i )
 
 		Button = AbilityWindow.GetControl(i*2+17)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "RightPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "RightPress")
 		Button.SetVarAssoc("Ability", i )
 
 	TextAreaControl = AbilityWindow.GetControl(29)
 	TextAreaControl.SetText(17247)
 
-	StoreButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"StorePress")
-	RecallButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"RecallPress")
-	RerollButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"RollPress")
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	StoreButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"StorePress")
+	RecallButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"RecallPress")
+	RerollButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"RollPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	AbilityWindow.ShowModal(MODAL_SHADOW_NONE)
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	return

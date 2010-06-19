@@ -51,9 +51,9 @@ def OnLoad():
 	DefaultButton = SoundWindow.GetControl(47)
 	DefaultButton.SetText(33479)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	DefaultButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"DefaultPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DefaultButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"DefaultPress")
 	SoundWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
