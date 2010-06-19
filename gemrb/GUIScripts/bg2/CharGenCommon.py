@@ -21,7 +21,6 @@ import GemRB
 from ie_stats import *
 from GUIDefines import *
 import GUICommon
-import GUICommonWindows
 
 CharGenWindow = 0
 TextAreaControl = 0

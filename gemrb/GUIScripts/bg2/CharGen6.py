@@ -19,7 +19,6 @@
 # character generation - ability; next skills/profs/spells (CharGen6)
 import GemRB
 import GUICommon
-import GUICommonWindows
 from CharGenCommon import *
 from LUSkillsSelection import *
 from LUProfsSelection import *

@@ -19,7 +19,6 @@
 #character generation - skills/profs/spells; next apearance/sound (CharGen7)
 import GemRB
 import GUICommon
-import GUICommonWindows
 from CharGenCommon import *
 
 def OnLoad():

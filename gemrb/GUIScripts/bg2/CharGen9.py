@@ -19,7 +19,6 @@
 # character generation (CharGen9.py)
 import GemRB
 import GUICommon
-import GUICommonWindows
 from CharGenCommon import *
 from ie_stats import *
 from ie_slots import *

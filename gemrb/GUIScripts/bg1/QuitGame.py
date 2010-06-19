@@ -22,7 +22,6 @@
 ###################################################
 
 import GemRB
-from GUIDefines import *
 
 def OnLoad ():
 	GemRB.HideGUI ()

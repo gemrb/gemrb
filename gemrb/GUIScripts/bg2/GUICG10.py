@@ -19,7 +19,6 @@
 #character generation, multi-class (GUICG10)
 import GemRB
 import GUICommon
-from LUCommon import *
 from ie_stats import *
 from GUIDefines import *
 from GUICG2 import SetClass

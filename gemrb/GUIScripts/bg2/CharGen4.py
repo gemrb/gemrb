@@ -19,7 +19,6 @@
 # character generation - classes+kits; next alignment/reputation(CharGen4.py)
 import GemRB
 import GUICommon
-import GUICommonWindows
 from CharGenCommon import *
 
 def OnLoad():
