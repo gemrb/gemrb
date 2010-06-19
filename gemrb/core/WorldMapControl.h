@@ -74,7 +74,7 @@ public:
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area;
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, const char *handler);
+	bool SetEvent(int eventType, EventHandler handler);
 private:
 	//font for printing area names
 	Font* ftext;

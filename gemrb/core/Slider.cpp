@@ -280,13 +280,13 @@ int Slider::SetText(const char* /*string*/, int /*pos*/)
 }
 
 /** Sets the slider change event */
-bool Slider::SetEvent(int eventType, const char *handler)
+bool Slider::SetEvent(int eventType, EventHandler handler)
 {
 	Changed = true;
 
 	switch (eventType) {
 	case IE_GUI_SLIDER_ON_CHANGE:
-		SetEventHandler( SliderOnChange, handler );
+		SliderOnChange = handler;
 		break;
 	default:
 		return false;

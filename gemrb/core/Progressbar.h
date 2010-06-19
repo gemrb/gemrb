@@ -64,7 +64,7 @@ public:
 	/** Redraws a progressbar which is associated with VariableName */
 	void RedrawProgressbar(const char *VariableName, int Sum);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, const char *handler);
+	bool SetEvent(int eventType, EventHandler handler);
 
 private: // Private attributes
 	/** BackGround Images. If smaller than the Control Size, the image will be tiled. */

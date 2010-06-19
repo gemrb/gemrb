@@ -368,7 +368,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		return;
 	}
 
-	if (core->GetDraggedItem () && !ButtonOnDragDrop[0]) {
+	if (core->GetDraggedItem () && !ButtonOnDragDrop) {
 		Control::OnMouseDown(x,y,Button,Mod);
 		return;
 	}
@@ -397,7 +397,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		if (Flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound( DS_BUTTON_PRESSED );
 		}
-		if ((Button & GEM_MB_DOUBLECLICK) && ButtonOnDoublePress[0]) {
+		if ((Button & GEM_MB_DOUBLECLICK) && ButtonOnDoublePress) {
 			RunEventHandler( ButtonOnDoublePress );
 			printMessage("Button","Doubleclick detected\n",GREEN);
 		}
@@ -430,7 +430,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	if (core->GetDraggedPortrait ()) dragtype=2;
 
 	//if something was dropped, but it isn't handled here: it didn't happen
-	if (dragtype && !ButtonOnDragDrop[0])
+	if (dragtype && !ButtonOnDragDrop)
 		return;
 
 	switch (State) {
@@ -489,12 +489,12 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	}
 
 	if ((Button&GEM_MB_NORMAL) == GEM_MB_ACTION) {
-		if ((Mod & GEM_MOD_SHIFT) && ButtonOnShiftPress[0])
+		if ((Mod & GEM_MOD_SHIFT) && ButtonOnShiftPress)
 			RunEventHandler( ButtonOnShiftPress );
 		else
 			RunEventHandler( ButtonOnPress );
 	} else {
-		if (Button == GEM_MB_MENU && ButtonOnRightPress[0])
+		if (Button == GEM_MB_MENU && ButtonOnRightPress)
 			RunEventHandler( ButtonOnRightPress );
 	}
 }
@@ -537,7 +537,7 @@ void Button::OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/)
 		return;
 	}
 
-	if (MouseEnterButton[0] !=0 && VarName[0] != 0) {
+	if (MouseEnterButton !=0 && VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, Value );
 	}
 
@@ -550,7 +550,7 @@ void Button::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 		return;
 	}
 
-	if (MouseLeaveButton[0] !=0 && VarName[0] != 0) {
+	if (MouseLeaveButton !=0 && VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, Value );
 	}
 
@@ -580,40 +580,40 @@ int Button::SetText(const char* string, int /*pos*/)
 }
 
 /** Set Event Handler */
-bool Button::SetEvent(int eventType, const char *handler)
+bool Button::SetEvent(int eventType, EventHandler handler)
 {
 	Changed = true;
 
 	switch (eventType) {
 		case IE_GUI_BUTTON_ON_PRESS:
-			SetEventHandler( ButtonOnPress, handler );
+			ButtonOnPress = handler;
 			break;
 		case IE_GUI_MOUSE_OVER_BUTTON:
-			SetEventHandler( MouseOverButton, handler );
+			MouseOverButton = handler;
 			break;
 		case IE_GUI_MOUSE_ENTER_BUTTON:
-			SetEventHandler( MouseEnterButton, handler );
+			MouseEnterButton = handler;
 			break;
 		case IE_GUI_MOUSE_LEAVE_BUTTON:
-			SetEventHandler( MouseLeaveButton, handler );
+			MouseLeaveButton = handler;
 			break;
 		case IE_GUI_BUTTON_ON_SHIFT_PRESS:
-			SetEventHandler( ButtonOnShiftPress, handler );
+			ButtonOnShiftPress = handler;
 			break;
 		case IE_GUI_BUTTON_ON_RIGHT_PRESS:
-			SetEventHandler( ButtonOnRightPress, handler );
+			ButtonOnRightPress = handler;
 			break;
 		case IE_GUI_BUTTON_ON_DRAG_DROP:
-			SetEventHandler( ButtonOnDragDrop, handler );
+			ButtonOnDragDrop = handler;
 			break;
 		case IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT:
-			SetEventHandler( ButtonOnDragDropPortrait, handler );
+			ButtonOnDragDropPortrait = handler;
 			break;
 		case IE_GUI_BUTTON_ON_DRAG:
-			SetEventHandler( ButtonOnDrag, handler );
+			ButtonOnDrag = handler;
 			break;
 		case IE_GUI_BUTTON_ON_DOUBLE_PRESS:
-			SetEventHandler( ButtonOnDoublePress, handler );
+			ButtonOnDoublePress = handler;
 			break;
 	default:
 		return false;

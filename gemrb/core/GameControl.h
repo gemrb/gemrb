@@ -248,7 +248,7 @@ public:
 	void SetupItemUse(int slot, int header, Actor *actor, int targettype, int cnt);
 	/** Page is the spell type + spell level info */
 	void SetupCasting(int type, int level, int slot, Actor *actor, int targettype, int cnt);
-	bool SetEvent(int eventType, const char *handler);
+	bool SetEvent(int eventType, EventHandler handler);
 };
 
 #endif

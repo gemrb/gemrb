@@ -215,7 +215,7 @@ void Console::HistoryAdd(bool force)
 	}
 }
 
-bool Console::SetEvent(int /*eventType*/, const char * /*handler*/)
+bool Console::SetEvent(int /*eventType*/, EventHandler /*handler*/)
 {
 	return false;
 }

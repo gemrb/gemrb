@@ -209,19 +209,19 @@ const char* TextEdit::QueryText()
 	return ( const char * ) Buffer;
 }
 
-bool TextEdit::SetEvent(int eventType, const char *handler)
+bool TextEdit::SetEvent(int eventType, EventHandler handler)
 {
 	Changed = true;
 
 	switch (eventType) {
 	case IE_GUI_EDIT_ON_CHANGE:
-		SetEventHandler( EditOnChange, handler );
+		EditOnChange = handler;
 		break;
 	case IE_GUI_EDIT_ON_DONE:
-		SetEventHandler( EditOnDone, handler );
+		EditOnDone = handler;
 		break;
 	case IE_GUI_EDIT_ON_CANCEL:
-		SetEventHandler( EditOnCancel, handler );
+		EditOnCancel = handler;
 		break;
 	default:
 		return false;

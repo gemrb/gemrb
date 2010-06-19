@@ -162,7 +162,7 @@ public: //Events
 	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, const char *handler);
+	bool SetEvent(int eventType, EventHandler handler);
 	/** OnChange Scripted Event Function Name */
 	EventHandler TextAreaOnChange;
 	/** OutOfText Scripted Event Function Name */

@@ -281,13 +281,13 @@ void ScrollBar::SetMax(unsigned short Max)
 }
 
 /** Sets the ScrollBarOnChange event (guiscript callback) */
-bool ScrollBar::SetEvent(int eventType, const char *handler)
+bool ScrollBar::SetEvent(int eventType, EventHandler handler)
 {
 	Changed = true;
 
 	switch (eventType) {
 	case IE_GUI_SCROLLBAR_ON_CHANGE:
-		SetEventHandler( ScrollBarOnChange, handler );
+		ScrollBarOnChange = handler;
 		break;
 	default:
 		return false;

@@ -88,12 +88,7 @@ void Control::DisplayTooltip()
 
 void Control::ResetEventHandler(EventHandler handler)
 {
-	handler[0] = 0;
-}
-
-void Control::SetEventHandler(EventHandler handler, const char* funcName)
-{
-	strncpy( handler, funcName, sizeof( EventHandler ) );
+	handler = NULL;
 }
 
 int Control::RunEventHandler(EventHandler handler)
@@ -102,7 +97,7 @@ int Control::RunEventHandler(EventHandler handler)
 		printMessage("Control","Nested event handlers are not supported!\n", YELLOW);
 		return -1;
 	}
-	if (handler[0]) {
+	if (handler) {
 		Window *wnd = Owner;
 		if (!wnd) {
 			return -1;
@@ -110,7 +105,7 @@ int Control::RunEventHandler(EventHandler handler)
 		unsigned short WID = wnd->WindowID;
 		unsigned short ID = (unsigned short) ControlID;
 		InHandler = true;
-		core->GetGUIScriptEngine()->RunFunction( (char*)handler );
+		handler->call();
 		if (!core->IsValidWindow(WID,wnd) ) {
 			printMessage ("Control","Owner window destructed!\n", LIGHT_RED);
 			return -1;

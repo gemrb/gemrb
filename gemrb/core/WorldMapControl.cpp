@@ -349,16 +349,16 @@ void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 		ScrollY = 0;
 }
 
-bool WorldMapControl::SetEvent(int eventType, const char *handler)
+bool WorldMapControl::SetEvent(int eventType, EventHandler handler)
 {
 	Changed = true;
 
 	switch (eventType) {
 	case IE_GUI_WORLDMAP_ON_PRESS:
-		SetEventHandler( WorldMapControlOnPress, handler );
+		WorldMapControlOnPress = handler;
 		break;
 	case IE_GUI_MOUSE_ENTER_WORLDMAP:
-		SetEventHandler( WorldMapControlOnEnter, handler );
+		WorldMapControlOnEnter = handler;
 		break;
 	default:
 		return false;
