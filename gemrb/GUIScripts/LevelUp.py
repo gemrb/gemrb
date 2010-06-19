@@ -621,7 +621,7 @@ def LevelUpDonePress():
 		print "activation?"
 		if (Level[0] - LevelDiff[0]) <= Level[1] and Level[0] > Level[1]: # our new classes now surpasses our old class
 			print "reactivating base class"
-			LUCommon.ReactivateBaseClass ()
+			ReactivateBaseClass ()
 
 	if LevelUpWindow:
 		LevelUpWindow.Unload()
@@ -644,3 +644,94 @@ def LevelUpHLAPress ():
 
 	LUHLASelection.OpenHLAWindow (pc, NumClasses, Classes, Level)
 	return
+
+def ReactivateBaseClass ():
+	"""Regains all abilities of the base dual-class.
+
+	Proficiencies, THACO, saves, spells, and innate abilites,
+	most noteably."""
+
+	ClassIndex = GUICommon.ClassTable.FindValue (5, Classes[1])
+	ClassName = GUICommon.ClassTable.GetRowName (ClassIndex)
+	KitIndex = GUICommon.GetKitIndex (pc)
+
+	# reactivate all our proficiencies
+	TmpTable = GemRB.LoadTable ("weapprof")
+	ProfCount = TmpTable.GetRowCount ()
+	if GUICommon.GameIsBG2 ():
+		ProfCount -= 8 # skip bg1 weapprof.2da proficiencies
+	for i in range(ProfCount):
+		StatID = TmpTable.GetValue (i+8, 0)
+		Value = GemRB.GetPlayerStat (pc, StatID)
+		OldProf = (Value & 0x38) >> 3
+		NewProf = Value & 0x07
+		if OldProf > NewProf:
+			Value = (OldProf << 3) | OldProf
+			print "Value:",Value
+			GemRB.ApplyEffect (pc, "Proficiency", Value, StatID )
+
+	# see if this thac0 is lower than our current thac0
+	ThacoTable = GemRB.LoadTable ("THAC0")
+	TmpThaco = ThacoTable.GetValue(Classes[1]-1, Level[1]-1, 1)
+	if TmpThaco < GemRB.GetPlayerStat (pc, IE_TOHIT, 1):
+		GemRB.SetPlayerStat (pc, IE_TOHIT, TmpThaco)
+
+	# see if all our saves are lower than our current saves
+	SavesTable = GUICommon.ClassTable.GetValue (ClassIndex, 3, 0)
+	SavesTable = GemRB.LoadTable (SavesTable)
+	for i in range (5):
+		# see if this save is lower than our old save
+		TmpSave = SavesTable.GetValue (i, Level[1]-1)
+		if TmpSave < GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH+i, 1):
+			GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+i, TmpSave)
+
+	# see if we're a caster
+	SpellTables = [GUICommon.ClassSkillsTable.GetValue (Classes[1], 0, 0), GUICommon.ClassSkillsTable.GetValue (Classes[1], 1, 0), GUICommon.ClassSkillsTable.GetValue (Classes[1], 2, 0)]
+	if SpellTables[2] != "*": # casts mage spells
+		# set up our memorizations
+		SpellTable = GemRB.LoadTable (SpellTables[2])
+		for i in range (9):
+			# if we can cast more spells at this level (should be always), then update
+			NumSpells = SpellTable.GetValue (Level[1]-1, i)
+			if NumSpells > GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, i, 1):
+				GemRB.SetMemorizableSpellsCount (pc, NumSpells, IE_SPELL_TYPE_WIZARD, i)
+	elif SpellTables[1] != "*" or SpellTables[0] != "*": # casts priest spells
+		# get the correct table and mask
+		if SpellTables[1] != "*": # clerical spells
+			SpellTable = GemRB.LoadTable (SpellTables[1])
+			ClassMask = 0x4000
+		else: # druidic spells
+			if not GameRB.HasResource(SpellTables[0], RES_2DA):
+				SpellTables[0] = "MXSPLPRS"
+			SpellTable = GemRB.LoadTable (SpellTables[0])
+			ClassMask = 0x8000
+
+		# loop through each spell level
+		for i in range (7):
+			# update if we can cast more spells at this level
+			NumSpells = SpellTable.GetValue (str(Level[1]), str(i+1), 1)
+			if not NumSpells:
+				continue
+			if NumSpells > GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 1):
+				GemRB.SetMemorizableSpellsCount (pc, NumSpells, IE_SPELL_TYPE_PRIEST, i)
+
+			# also re-learn the spells if we have to
+			# WARNING: this fixes the error whereby rangers dualed to clerics still got all druid spells
+			#	they will now only get druid spells up to the level they could cast
+			#	this should probably be noted somewhere (ranger/cleric multis still function the same,
+			#	but that could be remedied if desired)
+			Learnable = GUICommon.GetLearnablePriestSpells(ClassMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
+			for k in range (len (Learnable)): # loop through all the learnable spells
+				if GUICommon.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
+					GemRB.LearnSpell(pc, Learnable[k])
+
+	# setup class bonuses for this class
+	if KitIndex == 0: # no kit
+		ABTable = GUICommon.ClassSkillsTable.GetValue (ClassName, "ABILITIES")
+	else: # kit
+		ABTable = GUICommon.KitListTable.GetValue (KitIndex, 4, 0)
+	print "ABTable:",ABTable
+
+	# add the abilites if we aren't a mage and have a table to ref
+	if ABTable != "*" and ABTable[:6] != "CLABMA":
+		GUICommon.AddClassAbilities (pc, ABTable, Level[1], Level[1]) # relearn class abilites
