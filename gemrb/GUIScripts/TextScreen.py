@@ -69,7 +69,7 @@ def StartTextScreen ():
 
 	TextArea = TextScreen.GetControl (2)
 	TextArea.SetFlags (IE_GUI_TEXTAREA_SMOOTHSCROLL)
-	TextArea.SetEvent (IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
+	TextArea.SetEventByName (IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
 
 	#caption
 	Table = GemRB.LoadTable (TableName)
@@ -92,13 +92,13 @@ def StartTextScreen ():
 	#done
 	Button=TextScreen.GetControl (0)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "EndTextScreen")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "EndTextScreen")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT|IE_GUI_BUTTON_CANCEL,OP_OR)
 
 	#replay
 	Button=TextScreen.GetControl (3)
 	Button.SetText (16510)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ReplayTextScreen")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ReplayTextScreen")
 
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the gamecontrol screen
@@ -149,6 +149,6 @@ def ReplayTextScreen ():
 	global TextArea, Position
 
 	Position = 1
-	TextArea.SetEvent (IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
+	TextArea.SetEventByName (IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
 	TextArea.Rewind (Ticks)
 	return

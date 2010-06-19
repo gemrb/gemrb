@@ -77,21 +77,21 @@ def OnLoad():
 	
 	CloseButton= MessageWindow.GetControl (0)
 	CloseButton.SetText(28082)
-	CloseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+	CloseButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 	
 	OpenButton = OptionsWindow.GetControl (10)
-	OpenButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+	OpenButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 
 	# Select all
 	Button = ActionsWindow.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
 
 	# Select all
 	Button = ActionsWindow.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "StopAllOnPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "StopAllOnPress")
 
 	FormationButton = ActionsWindow.GetControl (4)
-	FormationButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
+	FormationButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
 
 	SetupActionsWindowControls (ActionsWindow)
 	SetupMenuWindowControls (OptionsWindow)

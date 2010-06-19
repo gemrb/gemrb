@@ -68,17 +68,17 @@ def OpenCommonWindows ():
 	# Can't Reach ???
 	Button = Window.GetControl (0)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CntReachPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CntReachPress")
 
 	# AI
 	Button = Window.GetControl (4)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "AIPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AIPress")
 
 	# Message popup
 	Button = Window.GetControl (10)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "TxtePress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "TxtePress")
 
 
 	SetupMenuWindowControls (Window)
@@ -112,52 +112,52 @@ def SetupMenuWindowControls (Window):
 	# Inventory
 	Button = Window.GetControl (1)
 	Button.SetTooltip (41601)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
 
 	# Map
 	Button = Window.GetControl (2)
 	Button.SetTooltip (41625)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
 
 	# Mage
 	Button = Window.GetControl (3)
 	Button.SetTooltip (41624)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMageWindow")
 	# Stats
 	Button = Window.GetControl (5)
 	Button.SetTooltip (4707)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenRecordsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenRecordsWindow")
 
 	# Journal
 	Button = Window.GetControl (6)
 	Button.SetTooltip (41623)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	# Priest
 	Button = Window.GetControl (7)
 	Button.SetTooltip (4709)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenPriestWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenPriestWindow")
 
 	# Options
 	Button = Window.GetControl (8)
 	Button.SetTooltip (41626)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
 
 	# Rest
 	Button = Window.GetControl (9)
 	Button.SetTooltip (41628)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RestPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RestPress")
 
 
 	# AI
 	Button = Window.GetControl (4)
 	Button.SetTooltip (41631) # or 41646 Activate ...
-	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
+	#Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
 
 	# (Un)Lock view on character
 	Button = Window.GetControl (0)
 	Button.SetTooltip (41647)  # or 41648 Unlock ...
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnLockViewPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnLockViewPress")
 
 	# Message popup
 	Button = Window.GetControl (10)
@@ -179,8 +179,8 @@ def SetupActionsWindowControls (Window):
 	Button = Window.GetControl (0)
 	Button.SetAnimation ("WMTIME")
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
-	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, "UpdateClock")
+	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
+	Button.SetEventByName(IE_GUI_MOUSE_ENTER_BUTTON, "UpdateClock")
 
 	# 41627 - Return to the Game World
 	Button = Window.GetControl (2)
@@ -282,19 +282,19 @@ def OpenPortraitWindow (needcontrols):
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ('PressedPortrait', i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, "PortraitButtonOnDrag")
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
-		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG, "PortraitButtonOnDrag")
+		Button.SetEventByName (IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
+		Button.SetEventByName (IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
 
 		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
 
 		ButtonHP = Window.GetControl (6 + i)
 		ButtonHP.SetVarAssoc ('PressedPortraitHP', i)
-		ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonHPOnPress")
+		ButtonHP.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonHPOnPress")
 
 		portrait_hp_numeric[i] = 0
 
@@ -504,10 +504,10 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
 		#Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 		#Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PressHandler)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, RightPressHandler)
-		#Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, ShiftPressHandler)
-		#Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, DragDropHandler)
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, PressHandler)
+		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, RightPressHandler)
+		#Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, ShiftPressHandler)
+		#Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, DragDropHandler)
 
 	else:
 		#Button.SetVarAssoc ("LeftIndex", -1)
@@ -516,10 +516,10 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
 		Button.SetText ('')
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-		#Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
-		#Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, None)
 
 def OpenWaitForDiscWindow ():
 	global DiscWindow

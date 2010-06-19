@@ -52,6 +52,8 @@
 
 #include <cstdio>
 
+GUIScript *gs = NULL;
+
 //this stuff is missing from Python 2.2
 #ifndef PyDoc_VAR
 #define PyDoc_VAR(name) static char name[]
@@ -1632,10 +1634,46 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Control_SetEvent__doc,
-"SetEvent(WindowIndex, ControlIndex, EventMask, FunctionName)\n\n"
+"Control.SetEvent(EventMask, Function)\n\n"
 "Sets an event of a control on a window to a script defined function." );
 
 static PyObject* GemRB_Control_SetEvent(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+	int event;
+	PyObject* func;
+
+	if (!PyArg_ParseTuple(args, "iiiO", &WindowIndex, &ControlIndex,
+				&event, &func)) {
+		return AttributeError(GemRB_Control_SetEvent__doc);
+	}
+
+	Control* ctrl = GetControl(WindowIndex, ControlIndex, -1);
+	if (!ctrl)
+		return NULL;
+
+	EventHandler handler;
+	if (func == Py_None) {
+		handler = new Callback();
+	} else if (PyCallable_Check(func)) {
+		handler = new PythonCallback(func);
+	}
+	if (!handler || !ctrl->SetEvent(event, handler)) {
+		char buf[256];
+		// TODO: Print function name. (func.__name__)
+		snprintf(buf, sizeof(buf), "Can't set event handler!");
+		return RuntimeError(buf);
+	}
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_Control_SetEventByName__doc,
+"Control.SetEventByName(EventMask, FunctionName)\n\n"
+"Sets an event of a control on a window to a script defined function." );
+
+static PyObject* GemRB_Control_SetEventByName(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	int event;
@@ -1643,14 +1681,14 @@ static PyObject* GemRB_Control_SetEvent(PyObject * /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple( args, "iiis", &WindowIndex, &ControlIndex, &event,
 			&funcName )) {
-		return AttributeError( GemRB_Control_SetEvent__doc );
+		return AttributeError( GemRB_Control_SetEventByName__doc );
 	}
 
 	Control* ctrl = GetControl( WindowIndex, ControlIndex, -1 );
 	if (!ctrl)
 		return NULL;
 
-	if (! ctrl->SetEvent( event, funcName )) {
+	if (! ctrl->SetEvent( event, new StringCallback(funcName) )) {
 		char buf[256];
 		snprintf( buf, sizeof( buf ), "Can't set event handler: %s!", funcName );
 		return RuntimeError( buf );
@@ -7659,7 +7697,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index, int
 		btn->SetImage( IE_GUI_BUTTON_SELECTED, 0 );
 		btn->SetImage( IE_GUI_BUTTON_DISABLED, 0 );
 		btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE, BM_SET );
-		btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, "" );
+		btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, NULL );
 		core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, "" );
 		//no incref
 		return Py_None;
@@ -7687,7 +7725,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index, int
 	btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, BM_NAND );
 	ieVariable Event;
 	snprintf(Event,sizeof(Event)-1, "Action%sPressed", GUIEvent[Index]);
-	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, Event );
+	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, new StringCallback(Event) );
 	//cannot make this const, because it will be freed
 	char *txt = core->GetString( GUITooltip[Index] );
 	//will free txt
@@ -7782,7 +7820,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
 		int ci = core->GetControl(wi, i+Offset+(Start?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, "EquipmentPressed");
+		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new StringCallback("EquipmentPressed"));
 		strcpy(btn->VarName,"Equipment");
 		btn->Value = Start+i;
 
@@ -7913,10 +7951,10 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 		if (CheckSpecialSpell(spell->spellname, actor) || (disabled_spellcasting&(1<<spell->type)) ) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
 			btn->EnableBorder(1, IE_GUI_BUTTON_DISABLED);
-			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS,"UpdateActionsWindow"); //noop
+			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new StringCallback("UpdateActionsWindow")); //noop
 		} else {
 			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
-			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS,"SpellPressed");
+			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new StringCallback("SpellPressed"));
 		}
 		Sprite2D *Picture = NULL;
 
@@ -9335,6 +9373,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
 	METHOD(Control_SetEvent, METH_VARARGS),
+	METHOD(Control_SetEventByName, METH_VARARGS),
 	METHOD(Control_SetPos, METH_VARARGS),
 	METHOD(Control_SetSize, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),

@@ -64,16 +64,16 @@ def OnLoad():
 	PortraitWindow = OpenPortraitWindow(1)
 
 	Button=OptionsWindow.GetControl(10)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MinimizeOptions")
+	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MinimizeOptions")
 	Button=PortraitWindow.GetControl(8)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
+	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
 
 	ActionsWindow = GemRB.LoadWindow(3)
 	OpenActionsWindowControls (ActionsWindow)
 	Button=ActionsWindow.GetControl(60)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MaximizeOptions")
+	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MaximizeOptions")
 	Button=ActionsWindow.GetControl(61)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "MaximizePortraits")
+	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MaximizePortraits")
 
 	GemRB.SetVar("PortraitWindow", PortraitWindow.ID)
 	GemRB.SetVar("ActionsWindow", ActionsWindow.ID)
@@ -127,20 +127,20 @@ def UpdateControlStatus():
 		TMessageWindow = GemRB.LoadWindow(12)
 		TMessageTA = TMessageWindow.GetControl(1)
 		ExpandButton = TMessageWindow.GetControl(0)
-		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+		ExpandButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 		ContractButton = TMessageWindow.GetControl(3)
-		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+		ContractButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 
 	elif Expand == GS_LARGEDIALOG:
 		TMessageWindow = GemRB.LoadWindow(7)
 		TMessageTA = TMessageWindow.GetControl(1)
 		ContractButton = TMessageWindow.GetControl(0)
-		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+		ContractButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 	else:
 		TMessageWindow = GemRB.LoadWindow(4)
 		TMessageTA = TMessageWindow.GetControl(3)
 		ExpandButton = TMessageWindow.GetControl(2)
-		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+		ExpandButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_SPEAKER)
 	TMessageTA.SetHistory(100)

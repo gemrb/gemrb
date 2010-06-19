@@ -247,15 +247,15 @@ def OnLoad():
 	for i in range(10):
 		Button = FeatWindow.GetControl(i+93)
 		Button.SetVarAssoc("Feat",i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "JustPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "JustPress")
 
 		Button = FeatWindow.GetControl(i*2+14)
 		Button.SetVarAssoc("Feat",i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
 
 		Button = FeatWindow.GetControl(i*2+15)
 		Button.SetVarAssoc("Feat",i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "RightPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "RightPress")
 		for j in range(5):
 			Star=FeatWindow.GetControl(i*5+j+36)
 			Star.SetState(IE_GUI_BUTTON_DISABLED)
@@ -273,15 +273,15 @@ def OnLoad():
 	TextAreaControl.SetText(36476)
 
 	ScrollBarControl = FeatWindow.GetControl(104)
-	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE,"ScrollBarPress")
+	ScrollBarControl.SetEventByName(IE_GUI_SCROLLBAR_ON_CHANGE,"ScrollBarPress")
 	#decrease it with the number of controls on screen (list size)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl.SetVarAssoc("TopIndex",RowCount-10)
 	ScrollBarControl.SetDefaultScrollBar ()
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	RedrawFeats()
 	FeatWindow.SetVisible(WINDOW_VISIBLE)
 	return

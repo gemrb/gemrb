@@ -76,7 +76,7 @@ def OnLoad():
 		if Allowed!=1:
 			continue
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
 		Button.SetVarAssoc("Class", i)
 
 	MultiClassButton = ClassWindow.GetControl(10)
@@ -103,10 +103,10 @@ def OnLoad():
 		TextAreaControl.SetText(ClassTable.GetValue(Class,1) )
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
-	MultiClassButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"MultiClassPress")
-	SpecialistButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpecialistPress")
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	MultiClassButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"MultiClassPress")
+	SpecialistButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SpecialistPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	ClassWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 

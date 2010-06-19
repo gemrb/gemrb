@@ -108,27 +108,27 @@ def UpdateControlStatus():
 		TMessageWindow = GemRB.LoadWindow(12)
 		TMessageTA = TMessageWindow.GetControl(1)
 		ExpandButton = TMessageWindow.GetControl(0)
-		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+		ExpandButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 		ContractButton = TMessageWindow.GetControl(3)
-		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+		ContractButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 
 	elif Expand == GS_LARGEDIALOG:
 		TMessageWindow = GemRB.LoadWindow(7)
 		TMessageTA = TMessageWindow.GetControl(1)
 		ContractButton = TMessageWindow.GetControl(0)
-		ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+		ContractButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 
 	else:
 		TMessageWindow = GemRB.LoadWindow(4)
 		TMessageTA = TMessageWindow.GetControl(3)		
 		ExpandButton = TMessageWindow.GetControl(2)
-		ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+		ExpandButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 		#up button (instead of scrollbar)
 		Button = TMessageWindow.GetControl(0)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ScrollUp")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ScrollUp")
 		#down button (instead of scrollbar)
 		Button = TMessageWindow.GetControl(1)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ScrollDown")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ScrollDown")
 
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL)
 	TMessageTA.SetHistory(100)

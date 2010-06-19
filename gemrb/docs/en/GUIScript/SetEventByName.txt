@@ -1,12 +1,10 @@
 
-Prototype: GemRB.SetEvent(WindowIndex, ControlIndex, EventMask, FunctionName)
+Prototype: Control.SetEvent(EventMask, FunctionName)
 
-Metaclass Prototype: SetEvent(EventMask, FunctionName)
-
-Description: Sets an event of a control on a window to a script defined function. 
+Description: Sets an event of a control on a window to a named function
+defined in the currently loaded scripts namespace.
 
 Parameters: 
-WindowIndex, ControlIndex  - the control's reference
 EventMask                  - a dword describing the event. Its high byte is actually the control's type.
 FunctionName               - must be shorter than 32 bytes
 
@@ -30,17 +28,17 @@ IE_GUI_SCROLLBAR_ON_CHANGE= 0x07000000, the scrollbar's knob position has change
 Return value: N/A
 
 Examples:
- GemRB.SetEvent (LoadScreen, Bar, IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
+ Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
  ...
  def EndLoadScreen ():
         Skull = GemRB.GetControl (LoadScreen, 1)
         GemRB.SetButtonMOS (LoadScreen, Skull, "GSKULON")
 The above example changes the image on the loadscreen when the progressbar reaches the end.
 
- GemRB.SetEvent(QuitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "YesButton")
+ Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "YesButton")
 The above example sets up the 'YesButton' function to be called when the button was pressed.
 
- GemRB.SetEvent(NewLifeWindow, Button,IE_GUI_MOUSE_OVER_BUTTON, "ChaPress")
+ Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, "ChaPress")
 The above example shows how to implement 'context sensitive help'. the 'ChaPress' function displays a help text on the screen when you hover the mouse over a button.
 
 See also: GetControl, SetVarAssoc, accessing_gui_controls

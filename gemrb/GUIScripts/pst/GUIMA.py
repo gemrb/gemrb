@@ -56,7 +56,7 @@ def OpenMapWindow ():
 	# World Map
 	Button = Window.GetControl (0)
 	Button.SetText (20429)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
 
 	# Add Note
 	Button = Window.GetControl (1)
@@ -77,7 +77,7 @@ def OpenMapWindow ():
 	GemRB.SetVar ("x",IE_GUI_MAP_VIEW_NOTES)
 	Map.SetVarAssoc ("x", IE_GUI_MAP_VIEW_NOTES)
 
-	Map.SetEvent (IE_GUI_MAP_ON_PRESS, "SetMapNote")
+	Map.SetEventByName (IE_GUI_MAP_ON_PRESS, "SetMapNote")
 
 	MapTable = GemRB.LoadTable( "MAPNAME" )
 	MapName = MapTable.GetValue (GemRB.GetCurrentArea (), "STRING")
@@ -92,7 +92,7 @@ def OpenMapWindow ():
 	# Done
 	Button = Window.GetControl (5)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	GemRB.UnhideGUI ()
@@ -107,7 +107,7 @@ def SetMapNote ():
 	global PosX, PosY
 
 	Label = MapWindow.GetControl (6)
-	Label.SetEvent (IE_GUI_EDIT_ON_CHANGE, "NoteChanged")
+	Label.SetEventByName (IE_GUI_EDIT_ON_CHANGE, "NoteChanged")
 	PosX = GemRB.GetVar("MapControlX")
 	PosY = GemRB.GetVar("MapControlY")
 	Label.SetStatus (IE_GUI_CONTROL_FOCUSED)
@@ -155,9 +155,9 @@ def WorldMapWindowCommon (Travel):
 	Button = Window.GetControl (0)
 	Button.SetText (1403)
 	if Travel>=0:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
 	else:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
 	GemRB.UnhideGUI ()
 
 ###################################################

@@ -47,7 +47,7 @@ def OnLoad():
 		Button = AlignmentWindow.GetControl(i+2)
 		if AlignmentOk.GetValue(KitName, AlignmentTable.GetValue(i, 4) ) != 0:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
-			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "AlignmentPress")
+			Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "AlignmentPress")
 			Button.SetVarAssoc("Alignment", i+1)
 
 	BackButton = AlignmentWindow.GetControl(13)
@@ -61,8 +61,8 @@ def OnLoad():
 	TextAreaControl = AlignmentWindow.GetControl(11)
 	TextAreaControl.SetText(9602)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	AlignmentWindow.SetVisible(WINDOW_VISIBLE)
 	return

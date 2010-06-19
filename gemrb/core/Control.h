@@ -48,12 +48,7 @@
 #include "ie_types.h"
 #include "win32def.h"
 
-/**
- * Event handler indicates code to be called when a particular
- * (usually GUI) event occurs.
- * Currently it's a name of a python function.
- */
-typedef char EventHandler[64];
+#include "Callback.h"
 
 class ControlAnimation;
 class Sprite2D;
@@ -116,14 +111,12 @@ public: // Public attributes
 public: //Events
 	/** Reset/init event handler */
 	void ResetEventHandler(EventHandler handler);
-	/** Set handler from function name */
-	void SetEventHandler(EventHandler handler, const char *funcName);
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }
 	/** Set the Flags */
 	int SetFlags(int arg_flags, int opcode);
 	/** Set handler for specified event. Override in child classes */
-	virtual bool SetEvent(int eventType, const char *handler) = 0;
+	virtual bool SetEvent(int eventType, EventHandler handler) = 0;
 	/** Run specified handler, it may return error code */
 	int RunEventHandler(EventHandler handler);
 	/** Key Press Event */

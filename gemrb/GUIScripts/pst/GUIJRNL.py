@@ -94,22 +94,22 @@ def OpenJournalWindow ():
 	# Quests
 	Button = JournalWindow.GetControl (0)
 	Button.SetText (20430)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenQuestsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenQuestsWindow")
 
 	# Beasts
 	Button = JournalWindow.GetControl (1)
 	Button.SetText (20634)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenBeastsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBeastsWindow")
 
 	# Journal
 	Button = JournalWindow.GetControl (2)
 	Button.SetText (20635)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenLogWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenLogWindow")
 
 	# Done
 	Button = JournalWindow.GetControl (3)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	#JournalWindow.SetVisible (WINDOW_VISIBLE)
 	GemRB.UnhideGUI()
@@ -138,27 +138,27 @@ def OpenQuestsWindow ():
 	# Assigned
 	Button = Window.GetControl (8)
 	Button.SetText (39433)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnJournalAssignedPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnJournalAssignedPress")
 
 	# Completed
 	Button = Window.GetControl (9)
 	Button.SetText (39434)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnJournalCompletedPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnJournalCompletedPress")
 
 	# Back
 	Button = Window.GetControl (5)
 	Button.SetText (46677)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenQuestsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenQuestsWindow")
 
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	QuestsList = List = Window.GetControl (1)
 	List.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	List.SetVarAssoc ('SelectedQuest', -1)
-	List.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "OnJournalQuestSelect")
+	List.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "OnJournalQuestSelect")
 
 	QuestDesc = Window.GetControl (3)
 
@@ -307,27 +307,27 @@ def OpenBeastsWindow ():
 	# PC
 	Button = BeastsWindow.GetControl (5)
 	Button.SetText (20637)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnJournalPCPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnJournalPCPress")
 
 	# NPC
 	Button = BeastsWindow.GetControl (6)
 	Button.SetText (20638)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnJournalNPCPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnJournalNPCPress")
 
 	# Back
 	Button = BeastsWindow.GetControl (7)
 	Button.SetText (46677)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenBeastsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBeastsWindow")
 
 	# Done
 	Button = BeastsWindow.GetControl (4)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	BeastsList = List = Window.GetControl (0)
 	List.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	List.SetVarAssoc ('SelectedBeast', -1)
-	List.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, "OnJournalBeastSelect")
+	List.SetEventByName(IE_GUI_TEXTAREA_ON_CHANGE, "OnJournalBeastSelect")
 
 	Window.CreateButton (8, 19, 19, 281, 441)
 	BeastImage = Window.GetControl (8)
@@ -416,12 +416,12 @@ def OpenLogWindow ():
 	# Back
 	Button = Window.GetControl (1)
 	Button.SetText (46677)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenLogWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenLogWindow")
 
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	# text area
 	Text = Window.GetControl (2)

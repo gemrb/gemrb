@@ -89,11 +89,11 @@ def OpenJournalWindow ():
 
 	# prev. chapter
 	Button = JournalWindow.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PrevChapterPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PrevChapterPress")
 
 	# next chapter
 	Button = JournalWindow.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "NextChapterPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "NextChapterPress")
 
 	GemRB.SetVar ("Section", Section)
 	# Quests
@@ -101,38 +101,38 @@ def OpenJournalWindow ():
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 1)
 	Button.SetText (45485)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# Quests completed
 	Button = JournalWindow.GetControl (7)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 2)
 	Button.SetText (45486)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# Journal
 	Button = JournalWindow.GetControl (8)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 4)
 	Button.SetText (15333)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# User
 	Button = JournalWindow.GetControl (9)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 0)
 	Button.SetText (45487)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# Order
 	Button = JournalWindow.GetControl (10)
 	Button.SetText (4627)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ToggleOrderWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ToggleOrderWindow")
 
 	# Done
 	#Button = JournalWindow.GetControl (3)
 	#Button.SetText (20636)
-	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	#Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	Chapter = GemRB.GetGameVar("chapter")
 	if Chapter>65535:

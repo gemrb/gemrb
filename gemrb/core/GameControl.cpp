@@ -2914,7 +2914,7 @@ void GameControl::SetupCasting(int type, int level, int idx, Actor *u, int targe
 }
 
 //another method inherited from Control which has no use here
-bool GameControl::SetEvent(int /*eventType*/, const char * /*handler*/)
+bool GameControl::SetEvent(int /*eventType*/, EventHandler /*handler*/)
 {
 	return false;
 }

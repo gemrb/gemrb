@@ -67,9 +67,9 @@ def OnLoad():
 	ExitButton = StartWindow.GetControl(4)
 	ExitButton.SetText(13731)
 	ExitButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	SoAButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SoAPress")
-	ToBButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ToBPress")
-	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "ExitPress")
+	SoAButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SoAPress")
+	ToBButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ToBPress")
+	ExitButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ExitPress")
 	StartWindow.SetVisible(WINDOW_VISIBLE)
 	GemRB.LoadMusicPL("Cred.mus")
 	return

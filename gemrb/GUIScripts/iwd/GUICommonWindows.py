@@ -45,7 +45,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetTooltip (16313)
 	#Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	# Map
@@ -53,53 +53,53 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetTooltip (16310)
 	#Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
 
 	# Journal
 	Button = Window.GetControl (2)
 	Button.SetTooltip (16308)
 	#Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 2)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	# Inventory
 	Button = Window.GetControl (3)
 	Button.SetTooltip (16307)
 	#Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
 
 	# Records
 	Button = Window.GetControl (4)
 	Button.SetTooltip (16306)
 	#Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenRecordsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenRecordsWindow")
 
 	# Mage
 	Button = Window.GetControl (5)
 	Button.SetTooltip (16309)
 	#Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 5)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMageWindow")
 	# Priest
 	Button = Window.GetControl (6)
 	Button.SetTooltip (14930)
 	#Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 6)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenPriestWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenPriestWindow")
 
 	# Options
 	Button = Window.GetControl (7)
 	Button.SetTooltip (16311)
 	#Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 7)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
 
 	# Party mgmt
 	Button = Window.GetControl (8)
 	Button.SetTooltip (16312)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 
 	if Gears:
 		# Gears (time), how doesn't have this in the right place
@@ -110,7 +110,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button.SetAnimation ("CGEAR")
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
 		SetGamedaysAndHourToken()
 		Button.SetTooltip(16041)
 
@@ -168,7 +168,7 @@ def SetupFormation ():
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%i,0,0,-1)
 		Button.SetVarAssoc ("Value", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectFormationPreset")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectFormationPreset")
 	return
 
 def GroupControls ():
@@ -199,8 +199,8 @@ def GroupControls ():
 		Button.SetSprites ("GUIBTBUT",0,i*2,i*2+1,i*2+24,i*2+25)
 		Button.SetBAM ("FORM%x"%idx,0,0,-1)
 		Button.SetVarAssoc ("Formation", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectFormation")
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "SetupFormation")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectFormation")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "SetupFormation")
 		str = GemRB.GetString (4935)
 		Button.SetTooltip ("F%d - %s"%(8+i,str) )
 	return
@@ -426,7 +426,7 @@ def OpenPortraitWindow (needcontrols):
 			Button = Window.GetControl (8)
 			Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 			Button.SetTooltip (11942)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RestPress")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RestPress")
 
 			pos = pos - 37
 			Window.CreateButton (6, 6, pos, 27, 36)
@@ -437,7 +437,7 @@ def OpenPortraitWindow (needcontrols):
 		GSFlags = GemRB.GetMessageWindowSize ()&GS_PARTYAI
 
 		GemRB.SetVar ("AI", GSFlags)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "AIPress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AIPress")
 		Button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
 		Button.SetVarAssoc ("AI", 1)
 		if GSFlags:
@@ -451,12 +451,12 @@ def OpenPortraitWindow (needcontrols):
 		Button = Window.GetControl (7)
 		Button.SetSprites ("GUIBTACT", 0, 50, 51, 50, 51)
 		Button.SetTooltip (10485)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
 		if not HasHOW():
 			# Rest (iwd)
 			Button = PortraitWindow.GetControl (8)
 			Button.SetTooltip (11942)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RestPress")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RestPress")
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Inventory = GemRB.GetVar ("Inventory")
@@ -467,16 +467,16 @@ def OpenPortraitWindow (needcontrols):
 		Button.SetVarAssoc ("PressedPortrait", i)
 
 		if (needcontrols):
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenInventoryWindowClick")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenInventoryWindowClick")
 		else:
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "PortraitButtonOnPress")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "PortraitButtonOnPress")
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, "PortraitButtonOnDrag")
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
-		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG, "PortraitButtonOnDrag")
+		Button.SetEventByName (IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
+		Button.SetEventByName (IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
 		if Inventory and pc != i+1:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)

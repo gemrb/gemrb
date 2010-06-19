@@ -75,7 +75,7 @@ def OpenEndMessageWindow ():
 	#end dialog
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9371)	
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 	if PortraitWindow:
 		UpdatePortraitWindow ()
 	if hideflag:
@@ -96,7 +96,7 @@ def OpenContinueMessageWindow ():
 	#continue
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9372)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 	if hideflag:
 		GemRB.UnhideGUI ()
 
@@ -219,20 +219,20 @@ def OpenContainerWindow ():
 	for i in range (6):
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ("LeftIndex", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "TakeItemContainer")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "TakeItemContainer")
 
 	for i in range (4):
 		Button = Window.GetControl (i+10)
 		Button.SetVarAssoc ("RightIndex", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DropItemContainer")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DropItemContainer")
 
 	# left scrollbar
 	ScrollBar = Window.GetControl (52)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
+	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
 
 	# right scrollbar
 	ScrollBar = Window.GetControl (53)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
+	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
 
 	Button = Window.GetControl (54)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
@@ -253,7 +253,7 @@ def OpenContainerWindow ():
 	# Done
 	Button = Window.GetControl (51)
 	#no text
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LeaveContainer")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LeaveContainer")
 
 	GemRB.SetVar ("LeftTopIndex", 0)
 	GemRB.SetVar ("RightTopIndex", 0)
@@ -353,13 +353,13 @@ def RemovePlayer ():
 	#confirm
 	Button = Window.GetControl (1)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RemovePlayerConfirm")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RemovePlayerConfirm")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	#cancel
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RemovePlayerCancel")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RemovePlayerCancel")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 def RemovePlayerConfirm ():
@@ -422,17 +422,17 @@ def OpenReformPartyWindow ():
 		#protagonist is skipped
 		index = j + 2
 		Button.SetVarAssoc ("Selected", index)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateReformWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateReformWindow")
 
 	# Remove
 	Button = Window.GetControl (15)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RemovePlayer")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RemovePlayer")
 
 	# Done
 	Button = Window.GetControl (8)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
 	GemRB.SetVar ("ActionsWindow", -1)
 	UpdateReformWindow ()
 	if hideflag:
@@ -460,12 +460,12 @@ def DeathWindowEnd ():
 	#load
 	Button = Window.GetControl (1)
 	Button.SetText (15590)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LoadPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LoadPress")
 
 	#quit
 	Button = Window.GetControl (2)
 	Button.SetText (15417)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "QuitPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "QuitPress")
 
 	GemRB.HideGUI ()
 	GemRB.SetVar ("MessageWindow", -1)

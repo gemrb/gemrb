@@ -92,11 +92,11 @@ def OnLoad ():
 	JoinGameButton.SetText (13964)
 	MoviesButton.SetText (15415)
 	QuitGameButton.SetText (13731)
-	QuitGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "QuitPress")
-	ProtocolButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ProtocolPress")
-	MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
-	LoadGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LoadPress")
-	CreateGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CreatePress")
+	QuitGameButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "QuitPress")
+	ProtocolButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ProtocolPress")
+	MoviesButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
+	LoadGameButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LoadPress")
+	CreateGameButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CreatePress")
 	StartWindow.SetVisible (WINDOW_VISIBLE)
 	GemRB.LoadMusicPL("Theme.mus",1)
 	return
@@ -138,7 +138,7 @@ def ProtocolPress ():
 	
 	DoneButton = ProtocolWindow.GetControl (6)
 	DoneButton.SetText (11973)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ProtocolDonePress")
+	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ProtocolDonePress")
 	
 	ProtocolWindow.ShowModal (1)
 	return
@@ -175,21 +175,21 @@ def CreatePress ():
 
 	CancelButton = GameTypeWindow.GetControl (1)
 	CancelButton.SetText (13727)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "QuitGameTypePress")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "QuitGameTypePress")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	DoneButton = GameTypeWindow.GetControl (2)
 	DoneButton.SetText (11973)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "GameTypeDonePress")
+	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "GameTypeDonePress")
 
 	FullGameButton = GameTypeWindow.GetControl (4)
 	FullGameButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	FullGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "GameTypeButtonPress")
+	FullGameButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "GameTypeButtonPress")
 	FullGameButton.SetText (24869)
 
 	ExpansionGameButton = GameTypeWindow.GetControl (5)
 	ExpansionGameButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	ExpansionGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "GameTypeButtonPress")
+	ExpansionGameButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "GameTypeButtonPress")
 	ExpansionGameButton.SetText (24871)
 
 	FullGameButton.SetVarAssoc ("ExpansionGame", 0)
@@ -229,16 +229,16 @@ def GameTypeDonePress():
 
 		YesButton = GameType2Window.GetControl (1)
 		YesButton.SetText (13912)
-		YesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "GameTypeReallyDonePress")
+		YesButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "GameTypeReallyDonePress")
 
 		NoButton = GameType2Window.GetControl (2)
 		NoButton.SetText (13913)
-		NoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "QuitGameTypePress")
+		NoButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "QuitGameTypePress")
 		NoButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 		CancelButton = GameType2Window.GetControl (3)
 		CancelButton.SetText (13727)
-		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "QuitGameTypePress")
+		CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "QuitGameTypePress")
 		CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 		GameType2Window.ShowModal(1)
@@ -290,12 +290,12 @@ def QuitPress ():
 	QuitWindow = GemRB.LoadWindow (22)
 	CancelButton = QuitWindow.GetControl (2)
 	CancelButton.SetText (13727)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "QuitCancelPress")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "QuitCancelPress")
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	QuitButton = QuitWindow.GetControl (1)
 	QuitButton.SetText (15417)
-	QuitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "QuitQuitPress")
+	QuitButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "QuitQuitPress")
 	QuitButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	TextArea = QuitWindow.GetControl (0)

@@ -40,9 +40,9 @@ def OnLoad():
 	CancelButton.SetText(13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	FileButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "FilePress")
-	SavedGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "GamePress")
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	FileButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "FilePress")
+	SavedGameButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "GamePress")
+	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	ImportWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
 

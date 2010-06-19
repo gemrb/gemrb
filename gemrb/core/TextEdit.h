@@ -90,7 +90,7 @@ public: //Events
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, const char *handler);
+	bool SetEvent(int eventType, EventHandler handler);
 	/** OnChange Scripted Event Function Name */
 	EventHandler EditOnChange;
 	EventHandler EditOnDone;

@@ -121,15 +121,15 @@ def OnLoad():
 	RollPress()
 	for i in range(0,6):
 		Button = AbilityWindow.GetControl(i+30)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "JustPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "JustPress")
 		Button.SetVarAssoc("Ability", i)
 
 		Button = AbilityWindow.GetControl(i*2+16)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
 		Button.SetVarAssoc("Ability", i )
 
 		Button = AbilityWindow.GetControl(i*2+17)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "RightPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "RightPress")
 		Button.SetVarAssoc("Ability", i )
 
 	BackButton = AbilityWindow.GetControl(36)
@@ -144,8 +144,8 @@ def OnLoad():
 	TextAreaControl = AbilityWindow.GetControl(29)
 	TextAreaControl.SetText(17247)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	AbilityWindow.SetVisible(WINDOW_VISIBLE)
 	return
 

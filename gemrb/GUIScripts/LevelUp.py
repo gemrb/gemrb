@@ -79,11 +79,11 @@ def OpenLevelUpWindow():
 	if GUICommon.GameIsBG2():
 		InfoButton = LevelUpWindow.GetControl (125)
 		InfoButton.SetText (13707)
-		InfoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpInfoPress")
+		InfoButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LevelUpInfoPress")
 
 	DoneButton = LevelUpWindow.GetControl (0)
 	DoneButton.SetText (11962)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpDonePress")
+	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LevelUpDonePress")
 	DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
@@ -340,7 +340,7 @@ def OpenLevelUpWindow():
 		HLAButton = LevelUpWindow.GetControl (126)
 		if HLACount:
 			HLAButton.SetText (4954)
-			HLAButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpHLAPress")
+			HLAButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LevelUpHLAPress")
 		else:
 			HLAButton.SetFlags (IE_GUI_BUTTON_DISABLED, OP_OR)
 

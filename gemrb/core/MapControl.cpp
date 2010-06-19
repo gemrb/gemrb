@@ -504,19 +504,19 @@ void MapControl::OnSpecialKeyPress(unsigned char Key)
 		ScrollY = 0;
 }
 
-bool MapControl::SetEvent(int eventType, const char *handler)
+bool MapControl::SetEvent(int eventType, EventHandler handler)
 {
 	Changed = true;
 
 	switch (eventType) {
 		case IE_GUI_MAP_ON_PRESS:
-			SetEventHandler( MapControlOnPress, handler );
+			MapControlOnPress = handler;
 			break;
 		case IE_GUI_MAP_ON_RIGHT_PRESS:
-			SetEventHandler( MapControlOnRightPress, handler );
+			MapControlOnRightPress = handler;
 			break;
 		case IE_GUI_MAP_ON_DOUBLE_PRESS:
-			SetEventHandler( MapControlOnDoublePress, handler );
+			MapControlOnDoublePress = handler;
 			break;
 		default:
 			return false;

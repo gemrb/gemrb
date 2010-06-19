@@ -830,16 +830,16 @@ const char* TextArea::QueryText()
 	return ( const char *) "";
 }
 
-bool TextArea::SetEvent(int eventType, const char *handler)
+bool TextArea::SetEvent(int eventType, EventHandler handler)
 {
 	Changed = true;
 
 	switch (eventType) {
 	case IE_GUI_TEXTAREA_ON_CHANGE:
-		SetEventHandler( TextAreaOnChange, handler );
+		TextAreaOnChange = handler;
 		break;
 	case IE_GUI_TEXTAREA_OUT_OF_TEXT:
-		SetEventHandler( TextAreaOutOfText, handler );
+		TextAreaOutOfText = handler;
 		break;
 	default:
 		return false;

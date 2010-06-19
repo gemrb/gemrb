@@ -83,7 +83,7 @@ class CharGen:
 				if i == step:
 					button.SetState(IE_GUI_BUTTON_ENABLED)
 					button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-					button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "NextPress")
+					button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "NextPress")
 				else:
 					button.SetState(IE_GUI_BUTTON_DISABLED)
 			i = i + 1
@@ -95,7 +95,7 @@ class CharGen:
 			BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			BackButton.SetState(IE_GUI_BUTTON_DISABLED)
-		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "BackPress")
+		BackButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BackPress")
 		BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 		#set scrollbar
@@ -106,7 +106,7 @@ class CharGen:
 		ImportButton = CharGenWindow.GetControl (13)
 		ImportButton.SetText (13955)
 		ImportButton.SetState (IE_GUI_BUTTON_ENABLED)
-		ImportButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ImportPress")
+		ImportButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ImportPress")
 
 		#set cancel and start over
 		CancelButton = CharGenWindow.GetControl (15)
@@ -115,7 +115,7 @@ class CharGen:
 		else:
 			CancelButton.SetText (8159) # Start over
 		CancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+		CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 
 		#set and fill overview
 		TextAreaControl = CharGenWindow.GetControl (9)

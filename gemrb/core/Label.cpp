@@ -124,19 +124,19 @@ void Label::OnMouseUp(unsigned short x, unsigned short y,
 		if (VarName[0] != 0) {
 			core->GetDictionary()->SetAt( VarName, Value );
 		}
-		if (LabelOnPress[0]) {
+		if (LabelOnPress) {
 			RunEventHandler( LabelOnPress );
 		}
 	}
 }
 
-bool Label::SetEvent(int eventType, const char *handler)
+bool Label::SetEvent(int eventType, EventHandler handler)
 {
 	Changed = true;
 
 	switch (eventType) {
 	case IE_GUI_LABEL_ON_PRESS:
-		SetEventHandler( LabelOnPress, handler );
+		LabelOnPress = handler;
 		break;
 	default:
 		return false;

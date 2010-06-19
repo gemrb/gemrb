@@ -45,9 +45,9 @@ def OnLoad():
 	CancelButton.SetText(15416)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "DonePress")
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, "SelectPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	TextAreaControl.SetEventByName(IE_GUI_TEXTAREA_ON_CHANGE, "SelectPress")
 	ImportWindow.SetVisible(WINDOW_VISIBLE)
 	return
 

@@ -48,7 +48,7 @@ def OnLoad():
 	RaceStrRef = RaceTable.GetValue(PureRace, "CAP_REF")
 	Button.SetText(RaceStrRef )
 	Button.SetState(IE_GUI_BUTTON_ENABLED)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,"SubRacePress")
+	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"SubRacePress")
 	RaceID = RaceTable.GetValue(PureRace, "ID")
 	Button.SetVarAssoc("Race",RaceID)
 	
@@ -67,7 +67,7 @@ def OnLoad():
 			RaceStrRef = RaceTable.GetValue(HasSubRace, "CAP_REF")
 			Button.SetText(RaceStrRef )
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
-			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,"SubRacePress")
+			Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"SubRacePress")
 			RaceID = RaceTable.GetValue(HasSubRace, "ID")
 			Button.SetVarAssoc("Race",RaceID)
 
@@ -83,8 +83,8 @@ def OnLoad():
 	TextAreaControl = RaceWindow.GetControl(6)
 	TextAreaControl.SetText(RaceTable.GetValue(RaceName, "DESC_REF"))
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	RaceWindow.SetVisible(WINDOW_VISIBLE)
 	return
 

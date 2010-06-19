@@ -108,17 +108,17 @@ def OpenRecordsWindow ():
 	# Information
 	Button = Window.GetControl (7)
 	Button.SetText (4245)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
 	
 	# Reform Party
 	Button = Window.GetControl (8)
 	Button.SetText (4244)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
 
 	# Level Up
 	Button = Window.GetControl (9)
 	Button.SetText (4246)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenLevelUpWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenLevelUpWindow")
 
 	# stat buttons
 	for i in range (6):
@@ -126,16 +126,16 @@ def OpenRecordsWindow ():
 		Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.SetSprites("", 0, 0, 0, 0, 0)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, statevents[i])
-		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
+		Button.SetEventByName (IE_GUI_MOUSE_OVER_BUTTON, statevents[i])
+		Button.SetEventByName (IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
 
 	# AC button
 	Button = Window.GetControl (37)
 	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpArmorClass")
-	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
+	Button.SetEventByName (IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpArmorClass")
+	Button.SetEventByName (IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
 
 
 	# HP button
@@ -143,8 +143,8 @@ def OpenRecordsWindow ():
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	Button.SetSprites ("", 0, 0, 0, 0, 0)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpHitPoints")
-	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
+	Button.SetEventByName (IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpHitPoints")
+	Button.SetEventByName (IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
 
 
 	SetSelectionChangeHandler (UpdateRecordsWindow)
@@ -279,8 +279,8 @@ def UpdateRecordsWindow ():
 	Button = Window.GetControl (5)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites ('STALIGN', 0, frame, 0, 0, 0)
-	Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpAlignment")
-	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
+	Button.SetEventByName (IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpAlignment")
+	Button.SetEventByName (IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
 
 
 	# faction
@@ -292,8 +292,8 @@ def UpdateRecordsWindow ():
 	Button = Window.GetControl (6)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites ('STFCTION', 0, frame, 0, 0, 0)
-	Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpFaction")
-	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
+	Button.SetEventByName (IE_GUI_MOUSE_OVER_BUTTON, "OnRecordsHelpFaction")
+	Button.SetEventByName (IE_GUI_MOUSE_LEAVE_BUTTON, "OnRecordsButtonLeave")
 	
 	# help, info textarea
 	stats_overview = GetStatOverview (pc)
@@ -851,12 +851,12 @@ def OpenInformationWindow ():
 	# Biography
 	Button = Window.GetControl (1)
 	Button.SetText (4247)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	GemRB.UnhideGUI ()
@@ -896,7 +896,7 @@ def OpenBiographyWindow ():
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	
 	GemRB.UnhideGUI ()
@@ -956,7 +956,7 @@ def OpenLevelUpWindow ():
 	# Accept
 	Button = Window.GetControl (0)
 	Button.SetText (4192)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "AcceptLevelUp")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AcceptLevelUp")
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 

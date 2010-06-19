@@ -102,37 +102,37 @@ def OpenRecordsWindow ():
 	# dual class
 	Button = Window.GetControl (0)
 	Button.SetText (7174)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DualClassWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DualClassWindow")
 
 	# levelup
 	Button = Window.GetControl (37)
 	Button.SetText (7175)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenLevelUpWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenLevelUpWindow")
 
 	# information
 	Button = Window.GetControl (1)
 	Button.SetText (11946)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
 
 	# reform party
 	Button = Window.GetControl (51)
 	Button.SetText (16559)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenRecReformPartyWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenRecReformPartyWindow")
 
 	# customize
 	Button = Window.GetControl (50)
 	Button.SetText (10645)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenCustomizeWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenCustomizeWindow")
 
 	# export
 	Button = Window.GetControl (36)
 	Button.SetText (13956)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenExportWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenExportWindow")
 
 	# kit info
 	Button = Window.GetControl (52)
 	Button.SetText (61265)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "KitInfoWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "KitInfoWindow")
 
 	SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
@@ -666,12 +666,12 @@ def OpenInformationWindow ():
 	# Biography
 	Button = Window.GetControl (26)
 	Button.SetText (18003)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
 	# Done
 	Button = Window.GetControl (24)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
 
 	TotalPartyExp = 0
 	ChapterPartyExp = 0
@@ -795,7 +795,7 @@ def OpenBiographyWindow ():
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
 	return
 
@@ -820,9 +820,9 @@ def OpenExportWindow ():
 
 	NameField = ExportWindow.GetControl (6)
 
-	ExportDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
-	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
+	ExportDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
+	NameField.SetEventByName (IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
 	ExportWindow.ShowModal (MODAL_SHADOW_GRAY)
 	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
@@ -858,7 +858,7 @@ def KitInfoWindow ():
 	#back button (setting first, to be less error prone)
 	DoneButton = KitInfoWindow.GetControl (2)
 	DoneButton.SetText (11973)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "KitDonePress")
+	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "KitDonePress")
 
 	#kit or class description
 	TextArea = KitInfoWindow.GetControl (0)
@@ -953,13 +953,13 @@ def OpenCustomizeWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	AppearanceButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenAppearanceWindow")
-	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenSoundWindow")
-	ColorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenColorWindow")
-	ScriptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenScriptWindow")
-	BiographyButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyEditWindow")
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomizeDonePress")
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CustomizeCancelPress")
+	AppearanceButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenAppearanceWindow")
+	SoundButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenSoundWindow")
+	ColorButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenColorWindow")
+	ScriptButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenScriptWindow")
+	BiographyButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyEditWindow")
+	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CustomizeDonePress")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CustomizeCancelPress")
 
 	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1013,11 +1013,11 @@ def OpenAppearanceWindow ():
 	CustomPortraitButton = SubCustomizeWindow.GetControl (5)
 	CustomPortraitButton.SetText (17545)
 
-	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitLeftPress")
-	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PortraitRightPress")
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePortraitWindow")
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
-	CustomPortraitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenCustomPortraitWindow")
+	LeftButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitLeftPress")
+	RightButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitRightPress")
+	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DonePortraitWindow")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
+	CustomPortraitButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenCustomPortraitWindow")
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	while True:
@@ -1091,19 +1091,19 @@ def OpenCustomPortraitWindow ():
 	# Portrait List Large
 	PortraitList1 = SubSubCustomizeWindow.GetControl (2)
 	RowCount1 = PortraitList1.GetPortraits (0)
-	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "LargeCustomPortrait")
+	PortraitList1.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "LargeCustomPortrait")
 	GemRB.SetVar ("Row1", RowCount1)
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	# Portrait List Small
 	PortraitList2 = SubSubCustomizeWindow.GetControl (3)
 	RowCount2 = PortraitList2.GetPortraits (1)
-	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "SmallCustomPortrait")
+	PortraitList2.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "SmallCustomPortrait")
 	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
 
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePortraitCustomizeWindow")
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubSubCustomizeWindow")
+	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DonePortraitCustomizeWindow")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseSubSubCustomizeWindow")
 
 	SubSubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1191,9 +1191,9 @@ def OpenSoundWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "PlaySoundPressed")
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneSoundWindow")
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
+	PlayButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PlaySoundPressed")
+	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DoneSoundWindow")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1246,12 +1246,12 @@ def OpenColorWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	HairButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SetHairColor")
-	SkinButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SetSkinColor")
-	MajorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SetMajorColor")
-	MinorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SetMinorColor")
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneColorWindow")
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
+	HairButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SetHairColor")
+	SkinButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SetSkinColor")
+	MajorButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SetMajorColor")
+	MinorButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SetMinorColor")
+	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DoneColorWindow")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
 	UpdatePaperDoll ()
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
@@ -1335,7 +1335,7 @@ def OpenColorPicker ():
 			#Selected = i
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc("Selected",i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonePress")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DonePress")
 
 	SubSubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1389,9 +1389,9 @@ def OpenScriptWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneScriptWindow")
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
-	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "UpdateScriptSelection")
+	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DoneScriptWindow")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
+	ScriptTextArea.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "UpdateScriptSelection")
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1461,10 +1461,10 @@ def OpenBiographyEditWindow ():
 	TextArea.SetBufferLength (65535)
 	TextArea.SetText (BioStrRef)
 
-	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ClearBiography")
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DoneBiographyWindow")
-	RevertButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RevertBiography")
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
+	ClearButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ClearBiography")
+	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DoneBiographyWindow")
+	RevertButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RevertBiography")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

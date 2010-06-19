@@ -91,7 +91,7 @@ def OnLoad():
 		if Allowed==0:
 			continue
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
 		Button.SetVarAssoc("Class", i)
 
 	BackButton = ClassWindow.GetControl(17)
@@ -113,8 +113,8 @@ def OnLoad():
 	else:
 		AdjustTextArea()
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	ClassWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
@@ -150,10 +150,10 @@ def ClassPress():
 		t = ClassTable.GetValue(ClassName, "NAME_REF")
 		Button.SetText(t )
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  "ClassPress2")
+		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,  "ClassPress2")
 		Button.SetVarAssoc("Class", i)
 
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,"BackPress2")
+	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress2")
 	return
 
 def ClassPress2():

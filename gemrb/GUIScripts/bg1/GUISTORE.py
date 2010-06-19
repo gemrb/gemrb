@@ -149,7 +149,7 @@ def OpenStoreWindow ():
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseStoreWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseStoreWindow")
 
 	#Store type icon
 	Button = Window.GetControl (5)
@@ -167,12 +167,12 @@ def OpenStoreWindow ():
 			#this is different from BG???
 			Button.SetSprites ("GUISTBBC", Action, 0,1,2,0)
 			Button.SetTooltip (storetips[Action])
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, store_funcs[Action])
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, store_funcs[Action])
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Button.SetTooltip ("")
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	ActionWindow.SetVisible (WINDOW_VISIBLE)
@@ -199,35 +199,35 @@ def OpenStoreShoppingWindow ():
 
 	# left scrollbar
 	ScrollBarLeft = Window.GetControl (11)
-	ScrollBarLeft.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreShoppingWindow")
+	ScrollBarLeft.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreShoppingWindow")
 
 	# right scrollbar
 	ScrollBarRight = Window.GetControl (12)
-	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreShoppingWindow")
+	ScrollBarRight.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreShoppingWindow")
 
 	for i in range (4):
 		Button = Window.GetControl (i+5)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectBuy")
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoLeftWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectBuy")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoLeftWindow")
 		Button.AttachScrollBar(ScrollBarLeft)
 
 		Button = Window.GetControl (i+13)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		if Store['StoreType'] != 3: # can't sell to temples
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectSell")
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoRightWindow")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectSell")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoRightWindow")
 		Button.AttachScrollBar(ScrollBarRight)
 
 	# Buy
 	LeftButton = Button = Window.GetControl (2)
 	Button.SetText (13703)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "BuyPressed")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BuyPressed")
 
 	# Sell
 	RightButton = Button = Window.GetControl (3)
 	Button.SetText (13704)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SellPressed")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SellPressed")
 
 	# inactive button
 	#Button = Window.GetControl (50)
@@ -260,22 +260,22 @@ def OpenStoreIdentifyWindow ():
 	# Identify
 	LeftButton = Button = Window.GetControl (5)
 	Button.SetText (14133)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "IdentifyPressed")
-	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoIdentifyWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "IdentifyPressed")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoIdentifyWindow")
 
 	# price ...
 	Label = Window.GetControl (0x10000003)
 	Label.SetText ("0")
 
 	ScrollBar = Window.GetControl (7)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreIdentifyWindow")
+	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreIdentifyWindow")
 
 	# 8-11 item slots, 0x1000000c-f labels
 	for i in range (4):
 		Button = Window.GetControl (i+8)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RedrawStoreIdentifyWindow")
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoIdentifyWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RedrawStoreIdentifyWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoIdentifyWindow")
 		Button.AttachScrollBar(ScrollBar)
 
 	SetSelectionChangeHandler( UpdateStoreIdentifyWindow )
@@ -296,27 +296,27 @@ def OpenStoreStealWindow ():
 
 	# left scrollbar
 	ScrollBarLeft = Window.GetControl (9)
-	ScrollBarLeft.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreStealWindow")
+	ScrollBarLeft.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreStealWindow")
 
 	# right scrollbar
 	ScrollBarRight = Window.GetControl (10)
-	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreStealWindow")
+	ScrollBarRight.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreStealWindow")
 
 	for i in range (4):
 		Button = Window.GetControl (i+4)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RedrawStoreStealWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RedrawStoreStealWindow")
 		Button.AttachScrollBar (ScrollBarLeft)
 
 		Button = Window.GetControl (i+11)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoRightWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoRightWindow")
 		Button.AttachScrollBar (ScrollBarRight)
 
 	# Steal
 	LeftButton = Button = Window.GetControl (1)
 	Button.SetText (14179)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "StealPressed")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "StealPressed")
 
 	Button = Window.GetControl (37)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
@@ -345,21 +345,21 @@ def OpenStoreDonateWindow ():
 	# Donate
 	Button = Window.GetControl (3)
 	Button.SetText (15101)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DonateGold")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DonateGold")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Entry
 	Field = Window.GetControl (5)
 	Field.SetText ("0")
-	Field.SetEvent (IE_GUI_EDIT_ON_CHANGE, "UpdateStoreDonateWindow")
+	Field.SetEventByName (IE_GUI_EDIT_ON_CHANGE, "UpdateStoreDonateWindow")
 	Field.SetStatus (IE_GUI_EDIT_NUMBER)
 
 	# +
 	Button = Window.GetControl (6)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "IncrementDonation")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "IncrementDonation")
 	# -
 	Button = Window.GetControl (7)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DecrementDonation")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DecrementDonation")
 
 	SetSelectionChangeHandler( UpdateStoreDonateWindow )
 	UpdateStoreDonateWindow ()
@@ -376,14 +376,14 @@ def OpenStoreHealWindow ():
 	StoreHealWindow = Window = GemRB.LoadWindow (5)
 
 	ScrollBar = Window.GetControl (7)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "UpdateStoreHealWindow")
+	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "UpdateStoreHealWindow")
 
 	#spell buttons
 	for i in range (4):
 		Button = Window.GetControl (i+8)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateStoreHealWindow")
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoHealWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateStoreHealWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoHealWindow")
 		Button.AttachScrollBar (ScrollBar)
 
 	# price tag
@@ -393,7 +393,7 @@ def OpenStoreHealWindow ():
 	# Heal
 	Button = Window.GetControl (5)
 	Button.SetText (13703)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "BuyHeal")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BuyHeal")
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Count = Store['StoreCureCount']
@@ -429,7 +429,7 @@ def OpenStoreRumourWindow ():
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	ScrollBar = Window.GetControl (5)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, "UpdateStoreRumourWindow")
+	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "UpdateStoreRumourWindow")
 	Count = Store['StoreDrinkCount']
 	if Count>4:
 		Count = Count-4
@@ -453,7 +453,7 @@ def OpenStoreRentWindow ():
 	for i in range (4):
 		ok = Store['StoreRoomPrices'][i]
 		Button = Window.GetControl (i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateStoreRentWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateStoreRentWindow")
 		if ok<0:
 			Button.SetState (IE_GUI_BUTTON_DISABLED) #disabled room icons are selected, not disabled
 		else:
@@ -463,7 +463,7 @@ def OpenStoreRentWindow ():
 
 		Button = Window.GetControl (i+4)
 		Button.SetText (14294+i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "UpdateStoreRentWindow")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateStoreRentWindow")
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetVarAssoc ("RentIndex", i)
 		#these bioware guys screw up everything possible
@@ -475,7 +475,7 @@ def OpenStoreRentWindow ():
 	# Rent
 	Button = Window.GetControl (11)
 	Button.SetText (14293)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RentRoom")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RentRoom")
 
 	GemRB.SetVar ("RentIndex", RentIndex)
 
@@ -891,7 +891,7 @@ def InfoWindow (Slot, Item):
 	#Done
 	Button = Window.GetControl (4)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ErrorDone")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ErrorDone")
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1138,7 +1138,7 @@ def InfoHealWindow ():
 	#Done
 	Button = Window.GetControl (5)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ErrorDone")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ErrorDone")
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1171,7 +1171,7 @@ def UpdateStoreRumourWindow ():
 			GemRB.SetToken ("ITEMCOST", str(Drink['Price']) )
 			Button.SetText (10162)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "GulpDrink")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "GulpDrink")
 		else:
 			Button.SetText ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1263,13 +1263,13 @@ def RentRoom ():
 	#confirm
 	Button = Window.GetControl (0)
 	Button.SetText (17199)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RentConfirm")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RentConfirm")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	#deny
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RentDeny")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RentDeny")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	#textarea
@@ -1353,7 +1353,7 @@ def ErrorWindow (strref):
 	#done
 	Button = Window.GetControl (0)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ErrorDone")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ErrorDone")
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

@@ -107,10 +107,10 @@ def SetupMageWindow ():
 	GemRB.SetVar ("OtherWindow", MageWindow.ID)
 
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MagePrevLevelPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MagePrevLevelPress")
 
 	Button = Window.GetControl (2)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "MageNextLevelPress")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MageNextLevelPress")
 
 	#unknown usage
 	Button = Window.GetControl (55)
@@ -119,7 +119,7 @@ def SetupMageWindow ():
 	#setup level buttons
 	for i in range (9):
 		Button = Window.GetControl (56 + i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "RefreshMageLevel")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RefreshMageLevel")
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 	for i in range (9):
@@ -178,10 +178,10 @@ def UpdateMageWindow ():
 				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 				Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 				if ms['Flags']:
-					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellUnmemorizeWindow")
+					Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellUnmemorizeWindow")
 				else:
-					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnMageUnmemorizeSpell")
-				Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenMageSpellInfoWindow")
+					Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnMageUnmemorizeSpell")
+				Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenMageSpellInfoWindow")
 				spell = GemRB.GetSpell (ms['SpellResRef'])
 				Button.SetTooltip (spell['SpellName'])
 				MageMemorizedSpellList.append (ms['SpellResRef'])
@@ -192,8 +192,8 @@ def UpdateMageWindow ():
 					Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
 				else:
 					Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
-				Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+				Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 				Button.SetTooltip ('')
 				Button.EnableBorder (0, 0)
 	else:
@@ -206,8 +206,8 @@ def UpdateMageWindow ():
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
 			Button.SetSpellIcon (ks['SpellResRef'], 0)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnMageMemorizeSpell")
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenMageSpellInfoWindow")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnMageMemorizeSpell")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenMageSpellInfoWindow")
 			spell = GemRB.GetSpell (ks['SpellResRef'])
 			Button.SetTooltip (spell['SpellName'])
 			MageKnownSpellList.append (ks['SpellResRef'])
@@ -215,8 +215,8 @@ def UpdateMageWindow ():
 
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
@@ -263,17 +263,17 @@ def OpenMageSpellInfoWindow ():
 	#back
 	Button = Window.GetControl (5)
 	Button.SetText (15416)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellInfoWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellInfoWindow")
 
 	#erase
 	index = GemRB.GetVar ("SpellButton")
 	if HasTOB():
 		Button = Window.GetControl (6)
 		if index < 100:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellRemoveWindow")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellRemoveWindow")
 			Button.SetText (63668)
 	if index < 100:
 		ResRef = MageMemorizedSpellList[index]
@@ -325,13 +325,13 @@ def OpenMageSpellRemoveWindow ():
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnMageRemoveSpell")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnMageRemoveSpell")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseMageSpellUnmemorizeWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseMageSpellUnmemorizeWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -349,13 +349,13 @@ def OpenMageSpellUnmemorizeWindow ():
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnMageUnmemorizeSpell")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnMageUnmemorizeSpell")
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseMageSpellUnmemorizeWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseMageSpellUnmemorizeWindow")
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -487,13 +487,13 @@ def OpenSequencerWindow ():
 		sb.SetPos (-1,-1)
 	else:
 		CondSelect.SetFlags (IE_GUI_TEXTAREA_SELECTABLE, OP_SET)
-		CondSelect.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "ContingencyHelpCondition")
+		CondSelect.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "ContingencyHelpCondition")
 		CondSelect.SetVarAssoc ("ContCond", 0)
 		for elem in ContCond:
 			CondSelect.Append (elem[0], -1)
 
 		TargSelect.SetFlags (IE_GUI_TEXTAREA_SELECTABLE, OP_SET)
-		TargSelect.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, "ContingencyHelpTarget")
+		TargSelect.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "ContingencyHelpTarget")
 		TargSelect.SetVarAssoc ("ContTarg", 0)
 		for elem in ContTarg:
 			TargSelect.Append (elem[0], -1)
@@ -505,12 +505,12 @@ def OpenSequencerWindow ():
 	GemRB.SetVar ("SpellType", 0)
 	TypeButton.SetVarAssoc ("SpellType", 1)
 	TypeButton.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	TypeButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ContTypePressed")
+	TypeButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ContTypePressed")
 
 	Button = Window.GetControl (9)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "LevelIncrease")
+	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "LevelIncrease")
 	Button = Window.GetControl (10)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, "LevelDecrease")
+	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "LevelDecrease")
 
 	OkButton = Window.GetControl (27)
 	OkButton.SetText (11973)
@@ -521,8 +521,8 @@ def OpenSequencerWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ContingencyOk")
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ContingencyCancel")
+	OkButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ContingencyOk")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ContingencyCancel")
 	ContTypePressed ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -553,7 +553,7 @@ def UpdateSpellList ():
 			Button.SetSpellIcon (names[j], 1)
 			Button.SetText( str(SpellList[names[j]]) )
 			Button.SetVarAssoc("Index", j)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ContingencyHelpSpell")
+			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ContingencyHelpSpell")
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			Button.SetSpellIcon("")
@@ -563,13 +563,13 @@ def UpdateSpellList ():
 
 	Button = Window.GetControl (22)
 	Button.SetSpellIcon(Spell1, 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteSpell1")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DeleteSpell1")
 	Button = Window.GetControl (23)
 	Button.SetSpellIcon(Spell2, 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteSpell2")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DeleteSpell2")
 	Button = Window.GetControl (24)
 	Button.SetSpellIcon(Spell3, 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "DeleteSpell3")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DeleteSpell3")
 
 	if not Spell1:
 		OkButton.SetState (IE_GUI_BUTTON_DISABLED)

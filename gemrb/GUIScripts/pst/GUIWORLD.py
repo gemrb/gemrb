@@ -41,7 +41,7 @@ def CloseContinueWindow ():
 	Window = GWindow(GemRB.GetVar ("MessageWindow"))
 	Button = Window.GetControl (0)
 	Button.SetText(28082)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 
 def NextDialogState ():
 	pass
@@ -50,14 +50,14 @@ def OpenEndMessageWindow ():
 	Window = GWindow(GemRB.GetVar ("MessageWindow"))
 	Button = Window.GetControl (0)
 	Button.SetText (34602)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 
 
 def OpenContinueMessageWindow ():
 	Window = GWindow(GemRB.GetVar ("MessageWindow"))
 	Button = Window.GetControl (0)
 	Button.SetText (34603)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 
 
 def OpenContainerWindow ():
@@ -109,13 +109,13 @@ def OpenContainerWindow ():
 
 	# Ground items scrollbar
 	ScrollBar = Window.GetControl (52)
-	ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
+	ScrollBar.SetEventByName(IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
 	GemRB.SetVar ("LeftTopIndex", 0)
 	ScrollBar.SetVarAssoc ("LeftTopIndex", Count)
 
 	# Personal items scrollbar
 	ScrollBar = Window.GetControl (53)
-	ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
+	ScrollBar.SetEventByName(IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
 	GemRB.SetVar ("RightTopIndex", 0)
 	ScrollBar.SetVarAssoc ("RightTopIndex", Count)
 
@@ -123,7 +123,7 @@ def OpenContainerWindow ():
 	# Done
 	Button = Window.GetControl (51)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LeaveContainer")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LeaveContainer")
 
 	UpdateContainerWindow ()
 
@@ -284,7 +284,7 @@ def OpenReformPartyWindow ():
 	# Done
 	Button = Window.GetControl (8)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
 
 	GemRB.UnhideGUI ()
 
@@ -315,7 +315,7 @@ def OpenFormationWindow ():
 	# Done
 	Button = Window.GetControl (13)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
+	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
 
 	tooltips = (
 		44957,  # Follow
@@ -337,7 +337,7 @@ def OpenFormationWindow ():
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ("SelectedFormation", i)
 		Button.SetTooltip (tooltips[i])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "SelectFormation")
+		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectFormation")
 
 	GemRB.SetVar ("SelectedFormation", GemRB.GameGetFormation (0))
 	SelectFormation ()

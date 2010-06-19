@@ -168,13 +168,13 @@ int Progressbar::SetText(const char* /*string*/, int /*pos*/)
 	return 0;
 }
 
-bool Progressbar::SetEvent(int eventType, const char *handler)
+bool Progressbar::SetEvent(int eventType, EventHandler handler)
 {
 	Changed = true;
 
 	switch (eventType) {
 	case IE_GUI_PROGRESS_END_REACHED:
-		SetEventHandler( EndReached, handler );
+		EndReached = handler;
 		break;
 	default:
 		return false;

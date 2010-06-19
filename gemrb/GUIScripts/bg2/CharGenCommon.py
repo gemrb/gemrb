@@ -82,7 +82,7 @@ def DisplayOverview(step):
 	BackButton = CharGenWindow.GetControl (11)
 	BackButton.SetText (15416)
 	BackButton.SetState (IE_GUI_BUTTON_ENABLED)
-	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "BackPress")
+	BackButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BackPress")
 	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	AcceptButton = CharGenWindow.GetControl (8)
@@ -93,7 +93,7 @@ def DisplayOverview(step):
 		AcceptButton.SetText (13956)
 	SetButtonStateFromStep ("AcceptButton", AcceptButton, step)
 	#AcceptButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
-	#AcceptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "NextPress")
+	#AcceptButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "NextPress")
 
 	ScrollBar = CharGenWindow.GetControl (10)
 	ScrollBar.SetDefaultScrollBar ()
@@ -101,7 +101,7 @@ def DisplayOverview(step):
 	ImportButton = CharGenWindow.GetControl (13)
 	ImportButton.SetText (13955)
 	ImportButton.SetState (IE_GUI_BUTTON_ENABLED)
-	ImportButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "ImportPress")
+	ImportButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ImportPress")
 
 	CancelButton = CharGenWindow.GetControl (15)
 	if step == 1:
@@ -109,11 +109,11 @@ def DisplayOverview(step):
 	else:
 		CancelButton.SetText (8159) # Start over
 	CancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 
 	BiographyButton = CharGenWindow.GetControl (16)
 	BiographyButton.SetText (18003)
-	BiographyButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "BiographyPress")
+	BiographyButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "BiographyPress")
 	if step == 9:
 		BiographyButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
@@ -313,7 +313,7 @@ def SetButtonStateFromStep (buttonName, button, step):
 
 	if state == IE_GUI_BUTTON_ENABLED:
 		button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "NextPress")
+		button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "NextPress")
 	return
 
 def CancelPress():

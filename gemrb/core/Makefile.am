@@ -108,6 +108,7 @@ libgemrb_core_la_SOURCES = \
 	Calendar.cpp \
 	ImageWriter.cpp \
 	Bitmap.cpp \
-	Image.cpp
+	Image.cpp \
+	Callback.cpp
 
 noinst_HEADERS = *.h
