@@ -25,7 +25,6 @@ from GUIDefines import *
 from GUICommon import *
 from ie_stats import *
 from ie_modal import *
-from ie_action import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1

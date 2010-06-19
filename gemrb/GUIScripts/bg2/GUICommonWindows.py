@@ -24,10 +24,8 @@
 
 import GemRB
 from GUIDefines import *
-from ie_stats import *
+from ie_stats import IE_MAXHITPOINTS, IE_STATE_ID, IE_HITPOINTS
 from ie_modal import *
-from ie_action import *
-from ie_slots import *
 from GUICommon import *
 from LUCommon import *
 

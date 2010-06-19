@@ -21,14 +21,12 @@
 
 import GemRB
 import GUIClasses
-from ie_restype import *
-from ie_spells import LS_MEMO
+from ie_restype import RES_CHU, RES_2DA, RES_WMP, RES_ARE
+from ie_spells import LS_MEMO, LSR_KNOWN, LSR_LEVEL, LSR_STAT
 from GUIDefines import *
 from ie_stats import *
-from ie_modal import *
-from ie_action import *
-from ie_slots import *
-from ie_spells import *
+from ie_action import ACT_QSLOT1, ACT_QSLOT2, ACT_QSLOT3, ACT_QSLOT4, ACT_QSLOT5
+from ie_slots import SLOT_ANY
 
 OtherWindowFn = None
 
