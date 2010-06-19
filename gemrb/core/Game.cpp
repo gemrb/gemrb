@@ -64,7 +64,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	timestop_owner = NULL;
 	timestop_end = 0;
 	event_timer = 0;
-	event_handler[0] = 0;
+	event_handler = NULL;
 	weather = new Particles(200);
 	weather->SetRegion(0, 0, core->Width, core->Height);
 	LastScriptUpdate = 0;
@@ -1234,10 +1234,10 @@ void Game::UpdateScripts()
 	}
 
 	//this is used only for the death delay so far
-	if (event_handler[0]) {
+	if (event_handler) {
 		if (!event_timer) {
-			core->GetGUIScriptEngine()->RunFunction(event_handler);
-			event_handler[0]=0;
+			event_handler->call();
+			event_handler = NULL;
 		}
 		event_timer--;
 	}
@@ -1256,10 +1256,10 @@ void Game::UpdateScripts()
 	}
 }
 
-void Game::SetTimedEvent(const char *fname, int count)
+void Game::SetTimedEvent(EventHandler func, int count)
 {
 	event_timer = count;
-	strncpy(event_handler, fname, sizeof(event_handler) );
+	event_handler = func;
 }
 
 void Game::SetProtagonistMode(int mode)

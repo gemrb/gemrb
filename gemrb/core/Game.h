@@ -34,6 +34,7 @@ class Game;
 #include "ie_types.h"
 
 #include "Actor.h"
+#include "Callback.h"
 #include "Map.h"
 #include "Particles.h"
 #include "Variables.h"
@@ -221,7 +222,7 @@ public:
 	ieDword timestop_end;
 	Particles *weather;
 	int event_timer;
-	char event_handler[64]; //like in Control
+	EventHandler event_handler; //like in Control
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();
@@ -371,7 +372,7 @@ public:
 	/** Sets party size (1-32000) */
 	void SetPartySize(int value);
 	/** Sets a guiscript function to happen after x AI cycles have elapsed */
-	void SetTimedEvent(const char *fname, int count);
+	void SetTimedEvent(EventHandler func, int count);
 	/** Sets protagonist mode to 0-none,1-protagonist,2-team */
 	void SetProtagonistMode(int value);
 	void StartRainOrSnow(bool conditional, int weather);

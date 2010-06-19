@@ -1627,7 +1627,7 @@ static PyObject* GemRB_SetTimedEventByName(PyObject * /*self*/, PyObject* args)
 
 	Game *game = core->GetGame();
 	if (game) {
-		game->SetTimedEvent(funcName, rounds);
+		game->SetTimedEvent(new StringCallback(funcName), rounds);
 	}
 	Py_INCREF( Py_None );
 	return Py_None;
