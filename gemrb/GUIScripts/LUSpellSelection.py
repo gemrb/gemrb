@@ -21,7 +21,7 @@ import GemRB
 from math import ceil
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import *
+import GUICommon
 
 # storage variables
 pc = 0
@@ -154,13 +154,13 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 			SpellsSelectPointsLeft[i] += 1
 
 		# get all the spells of the given level
-		Spells[i] = GetMageSpells (KitMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
+		Spells[i] = GUICommon.GetMageSpells (KitMask, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
 
 		# dump all the spells we already know
 		NumDeleted = 0
 		for j in range (len (Spells[i])):
 			CurrentIndex = j - NumDeleted # this ensure we don't go out of range
-			if HasSpell (pc, IE_SPELL_TYPE_WIZARD, i, Spells[i][CurrentIndex][0]) >= 0:
+			if GUICommon.HasSpell (pc, IE_SPELL_TYPE_WIZARD, i, Spells[i][CurrentIndex][0]) >= 0:
 				del Spells[i][CurrentIndex]
 				NumDeleted += 1
 
@@ -242,16 +242,16 @@ def SpellsDonePress ():
 			DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 			return
 
-	if GameIsBG2():
+	if GUICommon.GameIsBG2():
 		# close our window and update our records
 		if SpellsWindow:
 			SpellsWindow.Unload ()
 
 	# move to the next script if this is chargen
 	if chargen:
-		if GameIsBG2():
+		if GUICommon.GameIsBG2():
 			GemRB.SetNextScript("GUICG6")
-		elif GameIsBG1():
+		elif GUICommon.GameIsBG1():
 			# HACK
 			from CharGenCommon import next
 			next()
@@ -280,7 +280,7 @@ def ShowSpells ():
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetVarAssoc("ButtonPressed", i)
 		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, "SpellsSelectPress")
-		if GameIsBG2():
+		if GUICommon.GameIsBG2():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
 		else:
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
