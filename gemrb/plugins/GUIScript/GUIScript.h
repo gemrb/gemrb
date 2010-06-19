@@ -38,7 +38,7 @@
 #define SV_HEIGHT 2
 
 class GUIScript : public ScriptEngine {
-private:
+public:
 	PyObject* pModule, * pDict;
 	PyObject* pMainDic;
 	PyObject* pGUIClasses;

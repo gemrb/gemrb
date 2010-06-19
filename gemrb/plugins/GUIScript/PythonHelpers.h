@@ -24,8 +24,29 @@
 
 #include "win32def.h" // For Logging
 
+#include "Callback.h"
 #include "Holder.h"
 #include "Interface.h"
+
+class StringCallback : public Callback {
+public:
+	StringCallback(const char*);
+	StringCallback(PyObject*);
+	~StringCallback();
+	bool call();
+private:
+	PyObject* Name;
+};
+
+struct PythonCallback : public Callback {
+public:
+	PythonCallback(PyObject *Function);
+	~PythonCallback();
+	bool call();
+private:
+	PyObject *Function;
+};
+
 
 template <typename T>
 class CObject : public Holder<T> {
