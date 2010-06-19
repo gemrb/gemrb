@@ -22,16 +22,17 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
-from GUICommon import HasTOB, GetLearnablePriestSpells, HasSpell, AddClassAbilities, GameIsBG1, GameIsBG2, GameIsIWD1
-from GUIREC import GetStatOverview, UpdateRecordsWindow, GetActorClassTitle
-from GUICommonWindows import *
-from LUSpellSelection import *
-from LUCommon import *
-if HasTOB():
-	from LUHLASelection import *
-from LUProfsSelection import *
-from LUSkillsSelection import *
-from Actor import *
+import GUICommon
+import GUICommonWindows
+import GUIREC
+import LUSpellSelection
+import LUCommon
+if GUICommon.HasTOB():
+	import LUHLASelection
+	from LUHLASelection import HLASelectPress, HLADonePress #HACK
+import LUProfsSelection
+import LUSkillsSelection
+import Actor
 
 LevelUpWindow = None
 DoneButton = 0
@@ -75,7 +76,7 @@ def OpenLevelUpWindow():
 
 	LevelUpWindow = GemRB.LoadWindow (3)
 
-	if GameIsBG2():
+	if GUICommon.GameIsBG2():
 		InfoButton = LevelUpWindow.GetControl (125)
 		InfoButton.SetText (13707)
 		InfoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, "LevelUpInfoPress")
@@ -91,11 +92,11 @@ def OpenLevelUpWindow():
 
 	# name
 	pc = GemRB.GameGetSelectedPCSingle ()
-	actor = Actor(pc)
+	actor = Actor.Actor(pc)
 	Label = LevelUpWindow.GetControl (0x10000000+90)
 	Label.SetText (GemRB.GetPlayerName (pc))
 
-	if GameIsBG1() or GameIsIWD1():
+	if GUICommon.GameIsBG1() or GUICommon.GameIsIWD1():
 		# armorclass
 		Label = LevelUpWindow.GetControl (0x10000057)
 		ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
@@ -123,34 +124,34 @@ def OpenLevelUpWindow():
 
 	# class
 	Label = LevelUpWindow.GetControl (0x10000000+106)
-	Label.SetText (GetActorClassTitle (pc))
-	print "Title:",GetActorClassTitle (pc),"\tActor Title:",actor.ClassTitle()
+	Label.SetText (GUIREC.GetActorClassTitle (pc))
+	print "Title:",GUIREC.GetActorClassTitle (pc),"\tActor Title:",actor.ClassTitle()
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	print "Class:",Class,"\tActor Class:",actor.classid
-	ClassIndex = ClassTable.FindValue (5, Class)
+	ClassIndex = GUICommon.ClassTable.FindValue (5, Class)
 	SkillTable = GemRB.LoadTable("skills")
 
 	# kit
-	ClassName = ClassTable.GetRowName(ClassIndex)
-	Kit = GetKitIndex (pc)
+	ClassName = GUICommon.ClassTable.GetRowName(ClassIndex)
+	Kit = GUICommon.GetKitIndex (pc)
 	print "Kit:", Kit, "\tActor Kit:",actor.KitIndex()
 	print "ClassName:",ClassName,"\tActor ClassNames:",actor.ClassNames()
 
 	# need this for checking gnomes
 	RaceName = GemRB.GetPlayerStat (pc, IE_RACE, 1)
-	RaceName = RaceTable.FindValue (3, RaceName)
-	RaceName = RaceTable.GetRowName (RaceName)
+	RaceName = GUICommon.RaceTable.FindValue (3, RaceName)
+	RaceName = GUICommon.RaceTable.GetRowName (RaceName)
 
 	# figure our our proficiency table and index
 	if Kit == 0:
 		KitName = ClassName
 	else:
 		#rowname is just a number, the kitname is the first data column
-		KitName = KitListTable.GetValue(Kit, 0)
+		KitName = GUICommon.KitListTable.GetValue(Kit, 0)
 
 	# our multiclass variables
-	IsMulti = IsMultiClassed (pc, 1)
+	IsMulti = GUICommon.IsMultiClassed (pc, 1)
 	Classes = [IsMulti[1], IsMulti[2], IsMulti[3]]
 	NumClasses = IsMulti[0] # 2 or 3 if IsMulti; 0 otherwise
 	IsMulti = NumClasses > 1
@@ -160,7 +161,7 @@ def OpenLevelUpWindow():
 	# not multi, check dual
 	if not IsMulti:
 		# check if we're dual classed
-		IsDual = IsDualClassed (pc, 1)
+		IsDual = GUICommon.IsDualClassed (pc, 1)
 		Classes = [IsDual[2], IsDual[1]] # make sure the new class is first
 
 		# either dual or single only care about 1 class
@@ -171,9 +172,9 @@ def OpenLevelUpWindow():
 			Classes = [Class]
 		else: # make sure Classes[1] is a class, not a kit
 			if IsDual[0] == 1: # kit
-				Classes[1] = KitListTable.GetValue (IsDual[1], 7)
+				Classes[1] = GUICommon.KitListTable.GetValue (IsDual[1], 7)
 			else: # class
-				Classes[1] = ClassTable.GetValue (Classes[1], 5)
+				Classes[1] = GUICommon.ClassTable.GetValue (Classes[1], 5)
 
 		# store a boolean for IsDual
 		IsDual = IsDual[0] > 0
@@ -187,10 +188,10 @@ def OpenLevelUpWindow():
 	# and the old one is in Level[1] (used to regain old class abilities)
 	if IsDual:
 		# convert the classes from indicies to class id's
-		DualSwap = IsDualSwap (pc)
-		ClassName = ClassTable.GetRowName (Classes[0])
+		DualSwap = GUICommon.IsDualSwap (pc)
+		ClassName = GUICommon.ClassTable.GetRowName (Classes[0])
 		KitName = ClassName # for simplicity throughout the code
-		Classes[0] = ClassTable.GetValue (Classes[0], 5)
+		Classes[0] = GUICommon.ClassTable.GetValue (Classes[0], 5)
 		# Class[1] is taken care of above
 
 		# we need the old level as well
@@ -212,9 +213,9 @@ def OpenLevelUpWindow():
 #		print "Class:",Classes[i]
 		# we don't care about the current level, but about the to-be-achieved one
 		# get the next level
-		Level[i] = GetNextLevelFromExp (GemRB.GetPlayerStat (pc, IE_XP)/NumClasses, Classes[i])
-		TmpIndex = ClassTable.FindValue (5, Classes[i])
-		TmpName = ClassTable.GetRowName (TmpIndex) 
+		Level[i] = LUCommon.GetNextLevelFromExp (GemRB.GetPlayerStat (pc, IE_XP)/NumClasses, Classes[i])
+		TmpIndex = GUICommon.ClassTable.FindValue (5, Classes[i])
+		TmpName = GUICommon.ClassTable.GetRowName (TmpIndex) 
 
 #		print "Name:",TmpName
 
@@ -234,15 +235,15 @@ def OpenLevelUpWindow():
 
 		# save our current and next spell amounts
 		StartLevel = Level[i] - LevelDiff[i]
-		DruidTable = ClassSkillsTable.GetValue (Classes[i], 0, 0)
-		ClericTable = ClassSkillsTable.GetValue (Classes[i], 1, 0)
-		MageTable = ClassSkillsTable.GetValue (Classes[i], 2, 0)
+		DruidTable = GUICommon.ClassSkillsTable.GetValue (Classes[i], 0, 0)
+		ClericTable = GUICommon.ClassSkillsTable.GetValue (Classes[i], 1, 0)
+		MageTable = GUICommon.ClassSkillsTable.GetValue (Classes[i], 2, 0)
 
 		# see if we have mage spells
 		if MageTable != "*":
 			# we get 1 extra spell per level if we're a specialist
 			Specialist = 0
-			if KitListTable.GetValue (Kit, 7) == 1: # see if we're a kitted mage
+			if GUICommon.KitListTable.GetValue (Kit, 7) == 1: # see if we're a kitted mage
 				Specialist = 1
 			MageTable = GemRB.LoadTable (MageTable)
 			# loop through each spell level and save the amount possible to cast (current)
@@ -282,27 +283,27 @@ def OpenLevelUpWindow():
 
 		# setup class bonuses for this class
 		if IsMulti or IsDual or Kit == 0:
-			ABTable = ClassSkillsTable.GetValue (TmpName, "ABILITIES")
+			ABTable = GUICommon.ClassSkillsTable.GetValue (TmpName, "ABILITIES")
 		else: # single-classed with a kit
-			ABTable = KitListTable.GetValue (str(Kit), "ABILITIES")
+			ABTable = GUICommon.KitListTable.GetValue (str(Kit), "ABILITIES")
 
 		# add the abilites if we aren't a mage and have a table to ref
 		if ABTable != "*" and ABTable[:6] != "CLABMA":
-			AddClassAbilities (pc, ABTable, Level[i], LevelDiff[i])
+			GUICommon.AddClassAbilities (pc, ABTable, Level[i], LevelDiff[i])
 
 	print "Actor CurrentLevels:",actor.Levels()
 	print "Levels:",Level,"Actor NextLevels:",actor.NextLevels()
 	print "LevelDiffs:",LevelDiff,"Actor LevelDiffs:",actor.LevelDiffs()
 
 	#update our saves, thaco, hp and lore
-	SetupSavingThrows (pc, Level)
-	SetupThaco (pc, Level)
-	SetupLore (pc, LevelDiff)
-	SetupHP (pc, Level, LevelDiff)
+	LUCommon.SetupSavingThrows (pc, Level)
+	LUCommon.SetupThaco (pc, Level)
+	LUCommon.SetupLore (pc, LevelDiff)
+	LUCommon.SetupHP (pc, Level, LevelDiff)
 
 	# use total levels for HLAs
 	HLACount = 0
-	if HasTOB(): # make sure SoA doesn't try to get it
+	if GUICommon.HasTOB(): # make sure SoA doesn't try to get it
 		HLATable = GemRB.LoadTable("lunumab")
 		# we need to check each level against a multi value (this is kinda screwy)
 		if actor.multiclass:
@@ -314,8 +315,8 @@ def OpenLevelUpWindow():
 		for i in range (NumClasses):
 			if IsMulti:
 				# get the row name for lookup ex. MULTI2FIGHTER, MULTI3THIEF
-				MultiName = ClassTable.FindValue (5, Classes[i])
-				MultiName = ClassTable.GetRowName (MultiName)
+				MultiName = GUICommon.ClassTable.FindValue (5, Classes[i])
+				MultiName = GUICommon.ClassTable.GetRowName (MultiName)
 				MultiName = "MULTI" + str(NumClasses) + MultiName
 			else:
 				MultiName = ClassName
@@ -335,7 +336,7 @@ def OpenLevelUpWindow():
 		# set values required by the hla level up code
 		HLACount = HLACount / HLATable.GetValue (ClassName, "RATE", 1)
 		GemRB.SetVar ("HLACount", HLACount)
-	if GameIsBG2():
+	if GUICommon.GameIsBG2():
 		HLAButton = LevelUpWindow.GetControl (126)
 		if HLACount:
 			HLAButton.SetText (4954)
@@ -347,27 +348,27 @@ def OpenLevelUpWindow():
 	Level1 = []
 	for i in range (len (Level)):
 		Level1.append (Level[i]-LevelDiff[i])
-	if GameIsBG2():
-		SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
+	if GUICommon.GameIsBG2():
+		LUProfsSelection.SetupProfsWindow (pc, LUProfsSelection.LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
 	else:
-		SetupProfsWindow (pc, LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level, 0, False, 0)
+		LUProfsSelection.SetupProfsWindow (pc, LUProfsSelection.LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level, 0, False, 0)
 	NewProfPoints = GemRB.GetVar ("ProfsPointsLeft")
 
 	#we autohide the skills and let SetupSkillsWindow show them if needbe
 	for i in range (4):
 		HideSkills (i)
-	if GameIsBG2():
-		SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
+	if GUICommon.GameIsBG2():
+		LUSkillsSelection.SetupSkillsWindow (pc, LUSkillsSelection.LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
 	else:
-		SetupSkillsWindow (pc, LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level, 0, False)
+		LUSkillsSelection.SetupSkillsWindow (pc, LUSkillsSelection.LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level, 0, False)
 	NewSkillPoints = GemRB.GetVar ("SkillPointsLeft")
 
-	if GameIsBG2():
+	if GUICommon.GameIsBG2():
 		TextAreaControl = LevelUpWindow.GetControl(110)
 		TextAreaControl.SetText(GetLevelUpNews())
 	else:
 		TextAreaControl = LevelUpWindow.GetControl(42)
-		TextAreaControl.SetText(GetStatOverview(pc, LevelDiff))
+		TextAreaControl.SetText(GUIREC.GetStatOverview(pc, LevelDiff))
 
 	RedrawSkills()
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
@@ -375,7 +376,7 @@ def OpenLevelUpWindow():
 
 	# if we have a sorcerer who can learn spells, we need to do spell selection
 	if (Classes[0] == 19) and (DeltaWSpells > 0): # open our sorc spell selection window
-		OpenSpellsWindow (pc, "SPLSRCKN", Level[0], LevelDiff[0])
+		LUSpellSelection.OpenSpellsWindow (pc, "SPLSRCKN", Level[0], LevelDiff[0])
 
 def HideSkills(i):
 	"""Hides the given skill label from view."""
@@ -402,7 +403,7 @@ def RedrawSkills():
 
 	# we need to disable the HLA button if we don't have any HLAs left
 	HLACount = GemRB.GetVar ("HLACount")
-	if GameIsBG2() and HLACount == 0:
+	if GUICommon.GameIsBG2() and HLACount == 0:
 		# turn the HLA button off
 		HLAButton = LevelUpWindow.GetControl (126)
 		HLAButton.SetState(IE_GUI_BUTTON_DISABLED)
@@ -439,8 +440,8 @@ def GetLevelUpNews():
 
 	for i in range(NumClasses):
 		# get the class name
-		TmpClassName = ClassTable.FindValue (5, Classes[i])
-		TmpClassName = ClassTable.GetRowName (TmpClassName)
+		TmpClassName = GUICommon.ClassTable.FindValue (5, Classes[i])
+		TmpClassName = GUICommon.ClassTable.GetRowName (TmpClassName)
 
 		# backstab
 		# NOTE: Stalkers and assassins should get the correct mods at the correct levels based
@@ -453,12 +454,12 @@ def GetLevelUpNews():
 			BackstabMult = BackstabTable.GetValue (0, Level[i])
 
 		# lay on hands
-		if (ClassSkillsTable.GetValue (Classes[i], 6) != "*"):
+		if (GUICommon.ClassSkillsTable.GetValue (Classes[i], 6) != "*"):
 			# inquisitors and undead hunters don't get lay on hands out the chute, whereas cavaliers
 			# and unkitted paladins do; therefore, we check for the existence of lay on hands to ensure
 			# the character should get the new value; LoH is defined in GA_SPCL211 if anyone wants to
 			# make a pally kit with LoH
-			if (HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
+			if (GUICommon.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
 				LOHTable = GemRB.LoadTable ("layhands")
 				LOHGain = LOHTable.GetValue (0, Level[i]) - LOHTable.GetValue (0, Level[i]-LevelDiff[i])
 
@@ -550,7 +551,7 @@ def LevelUpInfoPress():
 	if InfoCounter % 2:
 		# call GetStatOverview with the new levels, so the future overview is shown
 		# TODO: show only xp, levels, thac0, #att, lore, reputation, backstab, saving throws
-		TextAreaControl.SetText(GetStatOverview(pc, LevelDiff))
+		TextAreaControl.SetText(GUIREC.GetStatOverview(pc, LevelDiff))
 	else:
 		TextAreaControl.SetText(GetLevelUpNews())
 	InfoCounter += 1
@@ -565,10 +566,10 @@ def LevelUpDonePress():
 	global SkillTable
 
 	# proficiencies
-	ProfsSave (pc)
+	LUProfsSelection.ProfsSave (pc)
 
 	# skills
-	SkillsSave (pc)
+	LUSkillsSelection.SkillsSave (pc)
 
 	# level
 	if DualSwap: # swap the IE_LEVELs around if a backward dual
@@ -598,8 +599,8 @@ def LevelUpDonePress():
 			# learn all the spells we're given, but don't have, up to our given casting level
 			if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 1) > 0: # we can memorize spells of this level
 				for j in range(NumClasses): # loop through each class
-					IsDruid = ClassSkillsTable.GetValue (Classes[j], 0, 0)
-					IsCleric = ClassSkillsTable.GetValue (Classes[j], 1, 0)
+					IsDruid = GUICommon.ClassSkillsTable.GetValue (Classes[j], 0, 0)
+					IsCleric = GUICommon.ClassSkillsTable.GetValue (Classes[j], 1, 0)
 					if IsCleric == "*" and IsDruid == "*": # no divine spells (so mage/cleric multis don't screw up)
 						continue
 					elif IsCleric == "*": # druid spells
@@ -607,9 +608,9 @@ def LevelUpDonePress():
 					else: # cleric spells
 						ClassFlag = 0x4000
 
-					Learnable = GetLearnablePriestSpells(ClassFlag, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
+					Learnable = GUICommon.GetLearnablePriestSpells(ClassFlag, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
 					for k in range(len(Learnable)): # loop through all the learnable spells
-						if HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
+						if GUICommon.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
 							GemRB.LearnSpell(pc, Learnable[k])
 
 	# hlas
@@ -620,12 +621,12 @@ def LevelUpDonePress():
 		print "activation?"
 		if (Level[0] - LevelDiff[0]) <= Level[1] and Level[0] > Level[1]: # our new classes now surpasses our old class
 			print "reactivating base class"
-			ReactivateBaseClass ()
+			LUCommon.ReactivateBaseClass ()
 
 	if LevelUpWindow:
 		LevelUpWindow.Unload()
-	UpdatePortraitWindow ()
-	UpdateRecordsWindow()
+	GUICommonWindows.UpdatePortraitWindow ()
+	GUIREC.UpdateRecordsWindow()
 
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 	return
@@ -641,5 +642,5 @@ def LevelUpHLAPress ():
 	RedrawSkills ()
 	GemRB.SetVar ("HLACount", TmpCount)
 
-	OpenHLAWindow (pc, NumClasses, Classes, Level)
+	LUHLASelection.OpenHLAWindow (pc, NumClasses, Classes, Level)
 	return
