@@ -20,6 +20,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+from ie_restype import RES_2DA
 import GUICommon
 import LUSpellSelection
 import LUProfsSelection
