@@ -25,6 +25,7 @@
 import GemRB
 import GUICommon
 import LoadScreen
+from GUIDefines import *
 
 SaveWindow = 0
 ConfirmWindow = 0
