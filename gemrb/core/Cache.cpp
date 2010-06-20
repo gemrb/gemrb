@@ -205,7 +205,7 @@ void *Cache::GetResource(const ieResRef key) const
 {
 	Cache::MyAssoc* pAssoc = GetAssocAt( key );
 	if (pAssoc == NULL) {
-		return false;
+		return NULL;
 	} // not in map
 
 	pAssoc->nRefCount++;

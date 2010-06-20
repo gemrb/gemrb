@@ -97,7 +97,7 @@ bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent
 DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, bool silent) const
 {
 	if (ResRef[0] == '\0')
-		return false;
+		return NULL;
 	if (!silent) {
 		printMessage( "ResourceManager", "Searching for ", WHITE );
 		printf( "%s%s...", ResRef, core->TypeExt( type ) );
@@ -120,7 +120,7 @@ DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, boo
 Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, bool silent) const
 {
 	if (ResRef[0] == '\0')
-		return false;
+		return NULL;
 	if (!silent) {
 		printMessage( "ResourceManager", "Searching for ", WHITE );
 		printf( "%s... ", ResRef );

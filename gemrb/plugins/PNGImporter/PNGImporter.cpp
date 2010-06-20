@@ -163,7 +163,7 @@ Sprite2D* PNGImporter::GetSprite2D()
 		delete[] row_pointers;
 		free( buffer );
 		png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);
-		return false;
+		return NULL;
 	}
 
 	png_read_image(inf->png_ptr, row_pointers);

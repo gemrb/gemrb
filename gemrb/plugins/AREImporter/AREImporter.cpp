@@ -316,7 +316,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
 		printf( "[AREImporter]: No Tile Map Manager Available.\n" );
-		return false;
+		return NULL;
 	}
 	ieResRef TmpResRef;
 
@@ -334,7 +334,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	TileMap* tm = tmm->GetTileMap(NULL);
 	if (!tm) {
 		printf( "[AREImporter]: No Tile Map Available.\n" );
-		return false;
+		return NULL;
 	}
 
 	// Small map for MapControl
@@ -356,7 +356,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	ResourceHolder<ImageMgr> lm(TmpResRef);
 	if (!lm) {
 		printf( "[AREImporter]: No lightmap available.\n" );
-		return false;
+		return NULL;
 	}
 
 	snprintf( TmpResRef, 9, "%sSR", WEDResRef);
@@ -364,7 +364,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	ResourceHolder<ImageMgr> sr(TmpResRef);
 	if (!sr) {
 		printf( "[AREImporter]: No searchmap available.\n" );
-		return false;
+		return NULL;
 	}
 
 	snprintf( TmpResRef, 9, "%sHT", WEDResRef);
@@ -372,7 +372,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	ResourceHolder<ImageMgr> hm(TmpResRef);
 	if (!hm) {
 		printf( "[AREImporter]: No heightmap available.\n" );
-		return false;
+		return NULL;
 	}
 
 	map->AddTileMap( tm, lm->GetImage(), sr->GetBitmap(), sm ? sm->GetSprite2D() : NULL, hm->GetBitmap() );
