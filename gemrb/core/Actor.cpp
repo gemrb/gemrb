@@ -184,6 +184,10 @@ static void InitActorTables();
 #define SAVEROLL      20
 #define DEFAULTAC     10
 
+//TODO: externalise
+#define TURN_PANIC_LVL_MOD 3
+#define TURN_DEATH_LVL_MOD 7
+
 static ieResRef d_main[DAMAGE_LEVELS] = {
 	//slot 0 is not used in the original engine
 	"BLOODCR","BLOODS","BLOODM","BLOODL", //blood
@@ -2852,7 +2856,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 
 	//determine panic or destruction/control
 	//we get the modified level
-	if (turnlevel>GetXPLevel(true)) {
+	if (turnlevel - TURN_DEATH_LVL_MOD >= GetXPLevel(true)) {
 		if (cleric->Type == ST_ACTOR && ((Actor*)cleric)->MatchesAlignmentMask(AL_EVIL)) {
 			Effect *fx = fxqueue.CreateEffect(control_undead_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
 			fx->Duration = ROUND_SECONDS;
@@ -2862,7 +2866,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 		} else {
 			Die(cleric);
 		}
-	} else {
+	} else if (turnlevel - TURN_PANIC_LVL_MOD >= GetXPLevel(true)) {
 		Panic();
 	}
 }
