@@ -50,7 +50,7 @@ public:
 	/** Load Script */
 	bool LoadScript(const char* filename);
 	/** Run Function */
-	bool RunFunction(const char* fname, bool error=true, int intparam=-1);
+	bool RunFunction(const char *module, const char* fname, bool error=true, int intparam=-1);
 	/** Exec a single String */
 	void ExecString(const char* string);
 	/** lets hope this one can be here without screwing up the general interface */

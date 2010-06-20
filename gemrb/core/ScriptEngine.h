@@ -31,8 +31,13 @@ public:
 	virtual bool Init(void) = 0;
 	/** Load Script */
 	virtual bool LoadScript(const char* filename) = 0;
+	// FIXME
+	bool RunFunction(const char* FunctionName, bool error=true, int intparam=-1)
+	{
+		return RunFunction(NULL, FunctionName, error, intparam);
+	}
 	/** Run Function */
-	virtual bool RunFunction(const char* fname, bool error=true, int intparam=-1) = 0;
+	virtual bool RunFunction(const char *ModuleName, const char* FunctionName, bool error=true, int intparam=-1) = 0;
 	/** Exec a single String */
 	virtual void ExecString(const char* string) = 0;
 };

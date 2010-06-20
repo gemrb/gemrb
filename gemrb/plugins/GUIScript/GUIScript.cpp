@@ -9722,40 +9722,51 @@ PyObject *GUIScript::CallbackFunction(const char* fname, PyObject* pArgs)
 	return pValue;
 }
 
-bool GUIScript::RunFunction(const char* fname, bool error, int intparam)
+bool GUIScript::RunFunction(const char *ModuleName, const char* FunctionName, bool error, int intparam)
 {
 	if (!Py_IsInitialized()) {
 		return false;
 	}
-	if (pDict == NULL) {
+
+	PyObject *module;
+	if (ModuleName) {
+		module = PyImport_Import(PyString_FromString(ModuleName));
+	} else {
+		module = pModule;
+		Py_INCREF(module);
+	}
+	if (module == NULL) {
 		return false;
 	}
+	PyObject *dict = PyModule_GetDict(module);
 
-	PyObject* pFunc, * pArgs, * pValue;
-
-	pFunc = PyDict_GetItemString( pDict, (char *) fname );
+	PyObject *pFunc = PyDict_GetItemString( dict, const_cast<char*>(FunctionName) );
 	/* pFunc: Borrowed reference */
 	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
 		if (error) {
 			printMessage( "GUIScript", "Missing function:", LIGHT_RED );
-			printf("%s\n", fname);
+			printf("%s\n", FunctionName);
 		}
+		Py_DECREF(module);
 		return false;
 	}
+	PyObject *pArgs;
 	if (intparam == -1) {
 		pArgs = NULL;
 	} else {
 		pArgs = Py_BuildValue("(i)", intparam);
 	}
-	pValue = PyObject_CallObject( pFunc, pArgs );
+	PyObject *pValue = PyObject_CallObject( pFunc, pArgs );
 	Py_XDECREF( pArgs );
 	if (pValue == NULL) {
 		if (PyErr_Occurred()) {
 			PyErr_Print();
 		}
+		Py_DECREF(module);
 		return false;
 	}
 	Py_DECREF( pValue );
+	Py_DECREF(module);
 	return true;
 }
 
