@@ -797,6 +797,8 @@ def OpenBiographyWindow ():
 	Button.SetText (11973)
 	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+
 	return
 
 def OpenExportWindow ():
