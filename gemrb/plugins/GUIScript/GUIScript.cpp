@@ -178,7 +178,7 @@ inline Control *GetControl( int wi, int ci, int ct)
 
 	Window* win = core->GetWindow( wi );
 	if (win == NULL) {
-		snprintf(errorbuffer, sizeof(errorbuffer), "Cannot find window #%d", wi);
+		snprintf(errorbuffer, sizeof(errorbuffer), "Cannot find window index #%d (unloaded?)", wi);
 		RuntimeError(errorbuffer);
 		return NULL;
 	}
