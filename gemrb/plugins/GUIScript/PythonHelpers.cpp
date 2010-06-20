@@ -44,7 +44,7 @@ bool StringCallback::call()
 	/* Borrowed reference */
 	PyObject *Function = PyDict_GetItem(gs->pDict, Name);
 	if (!Function || !PyCallable_Check(Function)) {
-		printMessage("GUIScript", "Missing function:", LIGHT_RED);
+		printMessage("GUIScript", "Missing callback function:", LIGHT_RED);
 		printf("%s\n", PyString_AsString(Name));
 		return false;
 	}
