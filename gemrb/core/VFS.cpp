@@ -249,14 +249,18 @@ bool dir_exists(const char* path)
 
 
 /**
- * Appends dir 'dir' to path 'target' and returns 'target'.
+ * Appends 'name' to path 'target' and returns 'target'.
  * It takes care of inserting PathDelimiter ('/' or '\\') if needed
  */
-char* PathAppend (char* target, const char* dir)
+char* PathAppend (char* target, const char* name)
 {
-	if (target[0] != 0 && target[strlen( target ) - 1] != PathDelimiter)
-		strncat( target, SPathDelimiter, _MAX_PATH );
-	strncat( target, dir, _MAX_PATH );
+	size_t len = strlen(target);
+
+	if (target[0] != 0 && target[len-1] != PathDelimiter && len+1 < _MAX_PATH) {
+		target[len++] = PathDelimiter;
+		target[len] = 0;
+	}
+	strncat( target+len, name, _MAX_PATH - len - 1 );
 
 	return target;
 }

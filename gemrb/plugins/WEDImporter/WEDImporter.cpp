@@ -100,7 +100,8 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 
 	memcpy(res, overlays->TilesetResRef,sizeof(ieResRef));
 	if (rain) {
-		strncat(res,"R",8);
+		if (strlen(res) < 8)
+			strcat(res,"R");
 		//no rain tileset available, rolling back
 		if (!gamedata->Exists(res,IE_TIS_CLASS_ID)) {
 			memcpy(res, overlays->TilesetResRef,sizeof(ieResRef));
