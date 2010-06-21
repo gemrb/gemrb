@@ -116,25 +116,51 @@ def THac0RollsPress():
 	TextAreaControl.SetText(18026)
 	return
 
+def THac0RollsBPress():
+	#TODO: TextAreaControl.SetText()
+	return
+
 def CombatInfoPress():
 	TextAreaControl.SetText(18027)
+	return
+
+def CombatInfoBPress():
+	#TODO: TextAreaControl.SetText()
 	return
 
 def ActionsPress():
 	TextAreaControl.SetText(18028)
 	return
 
+def ActionsBPress():
+	#TODO: TextAreaControl.SetText(18028)
+	return
+
+
 def StateChangesPress():
 	TextAreaControl.SetText(18029)
+	return
+
+def StateChangesBPress():
+	#TODO: TextAreaControl.SetText(18029)
 	return
 
 def SelectionTextPress():
 	TextAreaControl.SetText(18030)
 	return
 
+def SelectionTextBPress():
+	#TODO: TextAreaControl.SetText(18030)
+	return
+
 def MiscellaneousPress():
 	TextAreaControl.SetText(18031)
 	return
+
+def MiscellaneousBPress():
+	#TODO: TextAreaControl.SetText(18031)
+	return
+
 
 def OkPress():
 	if FeedbackWindow:
