@@ -7714,10 +7714,10 @@ static void SetButtonCycle(AnimationFactory *bam, Button *btn, int cycle, unsign
 }
 
 PyDoc_STRVAR( GemRB_Button_SetActionIcon__doc,
-"SetActionIcon(Window, Button, ActionIndex[, Function])\n\n"
+"SetActionIcon(Window, Button, Dict, ActionIndex[, Function])\n\n"
 "Sets up an action button. The ActionIndex should be less than 34." );
 
-static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index, int Function)
+static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict, int Index, int Function)
 {
 	if (ControlIndex>99) {
 		return AttributeError( GemRB_Button_SetActionIcon__doc );
@@ -7762,9 +7762,9 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index, int
 	SetButtonCycle(bam, btn, (char) row.bytes[2], IE_GUI_BUTTON_SELECTED);
 	SetButtonCycle(bam, btn, (char) row.bytes[3], IE_GUI_BUTTON_DISABLED);
 	btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, BM_NAND );
-	ieVariable Event;
-	snprintf(Event,sizeof(Event)-1, "Action%sPressed", GUIEvent[Index]);
-	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, new StringCallback(Event) );
+	PyObject *Event = PyString_FromFormat("Action%sPressed", GUIEvent[Index]);
+	PyObject *func = PyDict_GetItem(dict, Event);
+	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, new PythonCallback(func) );
 	//cannot make this const, because it will be freed
 	char *txt = core->GetString( GUITooltip[Index] );
 	//will free txt
@@ -7777,12 +7777,13 @@ static PyObject* GemRB_Button_SetActionIcon(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, Index;
 	int Function = 0;
+	PyObject *dict;
 
-	if (!PyArg_ParseTuple( args, "iii|i", &WindowIndex, &ControlIndex, &Index, &Function )) {
+	if (!PyArg_ParseTuple( args, "iiOi|i", &WindowIndex, &ControlIndex, &dict, &Index, &Function )) {
 		return AttributeError( GemRB_Button_SetActionIcon__doc );
 	}
 
-	PyObject* ret = SetActionIcon(WindowIndex, ControlIndex, Index, Function);
+	PyObject* ret = SetActionIcon(WindowIndex, ControlIndex, dict, Index, Function);
 	if (ret) {
 		Py_INCREF(ret);
 	}
@@ -7812,7 +7813,7 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Window_SetupEquipmentIcons__doc,
-"SetupEquipmentIcons(WindowIndex, slot[, Start, Offset])\n\n"
+"SetupEquipmentIcons(WindowIndex, dict slot[, Start, Offset])\n\n"
 "Automagically sets up the controls of the equipment list window for a PC indexed by slot.\n"
 "Start is the beginning of the visible part of the item list.\n"
 "Offset is the ID of the first usable button.");
@@ -7822,8 +7823,9 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	int wi, slot;
 	int Start = 0;
 	int Offset = 0; //control offset (iwd2 has the action buttons starting at 6)
+	PyObject *dict;
 
-	if (!PyArg_ParseTuple( args, "ii|ii", &wi, &slot, &Start, &Offset )) {
+	if (!PyArg_ParseTuple( args, "iOi|ii", &wi, &dict, &slot, &Start, &Offset )) {
 		return AttributeError( GemRB_Window_SetupEquipmentIcons__doc );
 	}
 
@@ -7843,7 +7845,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT-(Start?1:0));
 	int i;
 	if (Start) {
-		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, Offset),ACT_LEFT,0);
+		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, Offset),dict, ACT_LEFT,0);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -7859,7 +7861,8 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
 		int ci = core->GetControl(wi, i+Offset+(Start?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new StringCallback("EquipmentPressed"));
+		PyObject *Function = PyDict_GetItemString(dict, "EquipmentPressed");
+		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new PythonCallback(Function));
 		strcpy(btn->VarName,"Equipment");
 		btn->Value = Start+i;
 
@@ -7906,7 +7909,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	}
 
 	if (more) {
-		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+Offset+1),ACT_RIGHT,i+1);
+		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+Offset+1),dict,ACT_RIGHT,i+1);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -7927,8 +7930,9 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 	int wi, slot, Type;
 	int Start = 0;
 	int Offset = 0;
+	PyObject *dict;
 
-	if (!PyArg_ParseTuple( args, "iii|ii", &wi, &slot, &Type, &Start, &Offset )) {
+	if (!PyArg_ParseTuple( args, "iOii|ii", &wi, &dict, &slot, &Type, &Start, &Offset )) {
 		return AttributeError( GemRB_Window_SetupSpellIcons__doc );
 	}
 
@@ -7952,7 +7956,7 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 	}
 	if (more) {
 		int ci = core->GetControl(wi, Offset);
-		PyObject *ret = SetActionIcon(wi, ci, ACT_LEFT, 0);
+		PyObject *ret = SetActionIcon(wi, ci, dict, ACT_LEFT, 0);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -7990,10 +7994,12 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 		if (CheckSpecialSpell(spell->spellname, actor) || (disabled_spellcasting&(1<<spell->type)) ) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
 			btn->EnableBorder(1, IE_GUI_BUTTON_DISABLED);
-			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new StringCallback("UpdateActionsWindow")); //noop
+			PyObject *Function = PyDict_GetItemString(dict, "UpdateActionsWindow");
+			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new PythonCallback(Function)); //noop
 		} else {
 			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
-			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new StringCallback("SpellPressed"));
+			PyObject *Function = PyDict_GetItemString(dict, "SpellPressed");
+			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, new PythonCallback(Function));
 		}
 		Sprite2D *Picture = NULL;
 
@@ -8030,7 +8036,7 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 
 	if (more) {
 		int ci = core->GetControl(wi, i+Offset+1);
-		PyObject *ret = SetActionIcon(wi, ci, ACT_RIGHT, i+1);
+		PyObject *ret = SetActionIcon(wi, ci, dict, ACT_RIGHT, i+1);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
@@ -8056,8 +8062,9 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 {
 	int wi, slot;
 	int Start = 0;
+	PyObject *dict;
 
-	if (!PyArg_ParseTuple( args, "ii|i", &wi, &slot, &Start )) {
+	if (!PyArg_ParseTuple( args, "iOi|i", &wi, &dict, &slot, &Start )) {
 		return AttributeError( GemRB_Window_SetupControls__doc );
 	}
 
@@ -8099,7 +8106,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 		}
 		btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
 		SetItemText(wi, ci, 0, false);
-		PyObject *ret = SetActionIcon(wi,ci,action,i+1);
+		PyObject *ret = SetActionIcon(wi,ci,dict, action,i+1);
 
 		int state = IE_GUI_BUTTON_UNPRESSED;
 		ieDword modalstate = actor->ModalState;

@@ -177,19 +177,19 @@ def GroupControls ():
 	GemRB.SetVar ("ActionLevel", 0)
 	Window = ActionsWindow
 	Button = Window.GetControl (0)
-	Button.SetActionIcon (7)
+	Button.SetActionIcon (globals(), 7)
 	Button = Window.GetControl (1)
-	Button.SetActionIcon (15)
+	Button.SetActionIcon (globals(), 15)
 	Button = Window.GetControl (2)
-	Button.SetActionIcon (21)
+	Button.SetActionIcon (globals(), 21)
 	Button = Window.GetControl (3)
-	Button.SetActionIcon (-1)
+	Button.SetActionIcon (globals(), -1)
 	Button = Window.GetControl (4)
-	Button.SetActionIcon (-1)
+	Button.SetActionIcon (globals(), -1)
 	Button = Window.GetControl (5)
-	Button.SetActionIcon (-1)
+	Button.SetActionIcon (globals(), -1)
 	Button = Window.GetControl (6)
-	Button.SetActionIcon (-1)
+	Button.SetActionIcon (globals(), -1)
 	GemRB.SetVar ("Formation", GemRB.GameGetFormation ())
 	for i in range (5):
 		Button = Window.GetControl (7+i)
@@ -255,15 +255,15 @@ def UpdateActionsWindow ():
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == 0:
-		ActionsWindow.SetupControls (pc)
+		ActionsWindow.SetupControls (globals(), pc)
 	elif level == 1:
-		ActionsWindow.SetupEquipmentIcons(pc, TopIndex)
+		ActionsWindow.SetupEquipmentIcons(globals(), pc, TopIndex)
 	elif level == 2: #spells
 		GemRB.SetVar ("Type", 3)
-		ActionsWindow.SetupSpellIcons(pc, 3, TopIndex)
+		ActionsWindow.SetupSpellIcons(globals(), pc, 3, TopIndex)
 	elif level == 3: #innates
 		GemRB.SetVar ("Type", 4)
-		ActionsWindow.SetupSpellIcons(pc, 4, TopIndex)
+		ActionsWindow.SetupSpellIcons(globals(), pc, 4, TopIndex)
 	return
 
 def ActionQWeaponPressed (which):
@@ -275,7 +275,7 @@ def ActionQWeaponPressed (which):
 		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 		GemRB.SetEquippedQuickSlot (pc, which)
 
-	ActionsWindow.SetupControls (pc)
+	ActionsWindow.SetupControls (globals(), pc)
 	UpdateActionsWindow ()
 	return
 
