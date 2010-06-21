@@ -685,6 +685,9 @@ def SelectionChanged ():
 
 	global PortraitWindow
 
+	if not PortraitWindow:
+		return
+
 	GemRB.SetVar ("ActionLevel", 0)
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
