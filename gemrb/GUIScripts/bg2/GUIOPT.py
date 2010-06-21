@@ -22,12 +22,9 @@
 
 ###################################################
 import GemRB
-import GUICommonWindows
 from GUIDefines import *
-from GUICommon import CloseOtherWindow
-from GUICommon import GameWindow
-from GUISAVE import *
-from GUICommonWindows import *
+import GUICommon
+import GUISAVE
 
 ###################################################
 GameOptionsWindow = None
@@ -42,6 +39,7 @@ QuitMsgWindow = None
 
 ###################################################
 def CloseOptionsWindow ():
+	import GUICommonWindows
 	global GameOptionsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
@@ -57,7 +55,7 @@ def CloseOptionsWindow ():
 
 	GameOptionsWindow = None
 	GemRB.SetVar ("OtherWindow", -1)
-	GameWindow.SetVisible(WINDOW_VISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 	GemRB.UnhideGUI ()
 	GUICommonWindows.OptionsWindow = OldOptionsWindow
 	OldOptionsWindow = None
@@ -67,15 +65,16 @@ def CloseOptionsWindow ():
 
 ###################################################
 def OpenOptionsWindow ():
+	import GUICommonWindows
 	global GameOptionsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
-	if CloseOtherWindow(OpenOptionsWindow):
+	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
 		CloseOptionsWindow()
 		return
 
 	hideflag = GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIOPT", 640, 480)
 	GameOptionsWindow = Window = GemRB.LoadWindow (2)
@@ -84,46 +83,46 @@ def OpenOptionsWindow ():
 	if OldPortraitWindow == None:
 		OldOptionsWindow = GUICommonWindows.OptionsWindow
 		OptionsWindow = GemRB.LoadWindow (0)
-		MarkMenuButton (OptionsWindow)
-		SetupMenuWindowControls (OptionsWindow, 0, "OpenOptionsWindow")
+		GUICommonWindows.MarkMenuButton (OptionsWindow)
+		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenOptionsWindow)
 		OptionsWindow.SetFrame ()
 		OldPortraitWindow = GUICommonWindows.PortraitWindow
-		PortraitWindow = OpenPortraitWindow (0)
+		PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	# Return to Game
 	Button = Window.GetControl (11)
 	Button.SetText (10308)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenOptionsWindow)
 
 	# Quit Game
 	Button = Window.GetControl (10)
 	Button.SetText (13731)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenQuitMsgWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenQuitMsgWindow)
 
 	# Load Game
 	Button = Window.GetControl (5)
 	Button.SetText (13729)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenLoadMsgWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLoadMsgWindow)
 
 	# Save Game
 	Button = Window.GetControl (6)
 	Button.SetText (13730)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenSaveMsgWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSaveMsgWindow)
 
 	# Video Options
 	Button = Window.GetControl (7)
 	Button.SetText (17162)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenVideoOptionsWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenVideoOptionsWindow)
 
 	# Audio Options
 	Button = Window.GetControl (8)
 	Button.SetText (17164)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenAudioOptionsWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenAudioOptionsWindow)
 
 	# Gameplay Options
 	Button = Window.GetControl (9)
 	Button.SetText (17165)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenGameplayOptionsWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenGameplayOptionsWindow)
 
 	# game version, e.g. v1.1.0000
 	Label = Window.GetControl (0x1000000b)
@@ -524,7 +523,7 @@ def DisplayHelpSelectionSounds ():
 
 def OpenSaveMsgWindow ():
 	GemRB.SetVar("QuitAfterSave",0)
-	OpenSaveWindow ()
+	GUISAVE.OpenSaveWindow ()
 	#save the game without quitting
 	return
 
@@ -541,12 +540,12 @@ def OpenLoadMsgWindow ():
 	# Load
 	Button = Window.GetControl (0)
 	Button.SetText (15590)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LoadGamePress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGamePress)
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseLoadMsgWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseLoadMsgWindow)
 
 	# Loading a game will destroy ...
 	Text = Window.GetControl (3)
@@ -587,7 +586,7 @@ def SaveGamePress ():
 	#we need to set a state: quit after save
 	GemRB.SetVar("QuitAfterSave",1)
 	OpenOptionsWindow()
-	OpenSaveWindow ()
+	GUISAVE.OpenSaveWindow ()
 	return
 
 def QuitGamePress ():
@@ -614,17 +613,17 @@ def OpenQuitMsgWindow ():
 	# Save
 	Button = Window.GetControl (0)
 	Button.SetText (15589)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SaveGamePress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SaveGamePress)
 
 	# Quit Game
 	Button = Window.GetControl (1)
 	Button.SetText (15417)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "QuitGamePress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitGamePress)
 
 	# Cancel
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseQuitMsgWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseQuitMsgWindow)
 
 	# The game has not been saved ....
 	Text = Window.GetControl (3)
@@ -645,6 +644,14 @@ def CloseQuitMsgWindow ():
 	return
 
 ###################################################
+#TODO
+def OpenHotkeyOptionsWindow ():
+	return
+
+def CloseotkeyOptionsWindow ():
+	return
+
+###################################################
 ###################################################
 
 # These functions help to setup controls found
@@ -659,7 +666,7 @@ def OptSlider (name, window, slider_id, variable, value):
 	"""Standard slider for option windows"""
 	slider = window.GetControl (slider_id)
 	slider.SetVarAssoc (variable, value)
-	slider.SetEventByName (IE_GUI_SLIDER_ON_CHANGE, "DisplayHelp" + name)
+	slider.SetEvent (IE_GUI_SLIDER_ON_CHANGE, eval("DisplayHelp" + name))
 	return slider
 
 def OptRadio (name, window, button_id, label_id, variable, value):
@@ -667,7 +674,7 @@ def OptRadio (name, window, button_id, label_id, variable, value):
 
 	button = window.GetControl (button_id)
 	button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DisplayHelp" + name)
+	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, eval("DisplayHelp" + name))
 	button.SetVarAssoc (variable, value)
 
 	label = window.GetControl (label_id)
@@ -681,7 +688,7 @@ def OptCheckbox (name, window, button_id, label_id, variable, value):
 
 	button = window.GetControl (button_id)
 	button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DisplayHelp" + name)
+	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, eval("DisplayHelp" + name))
 	button.SetVarAssoc (variable, value)
 
 	label = window.GetControl (label_id)
@@ -693,21 +700,21 @@ def OptCheckbox (name, window, button_id, label_id, variable, value):
 def OptButton (name, window, button_id, label_strref):
 	"""Standard subwindow button for option windows"""
 	button = window.GetControl (button_id)
-	button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "Open%sWindow" %name)
+	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, eval("Open%sWindow" %name))
 	button.SetText (label_strref)
 
 def OptDone (name, window, button_id):
 	"""Standard `Done' button for option windows"""
 	button = window.GetControl (button_id)
 	button.SetText (11973) # Done
-	button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "Close%sWindow" %name)
+	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, eval("Close%sWindow" %name))
 	button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 def OptCancel (name, window, button_id):
 	"""Standard `Cancel' button for option windows"""
 	button = window.GetControl (button_id)
 	button.SetText (13727) # Cancel
-	button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "Close%sWindow" %name)
+	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, eval("Close%sWindow" %name))
 	button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 def OptHelpText (name, window, text_id, text_strref):

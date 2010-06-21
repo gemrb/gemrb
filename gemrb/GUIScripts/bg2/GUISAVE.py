@@ -50,20 +50,20 @@ def OpenSaveWindow ():
 	Window.SetFrame ()
 	CancelButton=Window.GetControl (34)
 	CancelButton.SetText (13727)
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenSaveWindow")
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSaveWindow)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	GemRB.SetVar ("LoadIdx",0)
 
 	for i in range(4):
 		Button = Window.GetControl (26+i)
 		Button.SetText (15588)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SavePress")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SavePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetVarAssoc ("LoadIdx",i)
 
 		Button = Window.GetControl (30+i)
 		Button.SetText (13957)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DeleteGamePress")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetVarAssoc ("LoadIdx",i)
 
@@ -79,7 +79,7 @@ def OpenSaveWindow ():
 			Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 	ScrollBar=Window.GetControl (25)
-	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
 	Games=GemRB.GetSaveGames ()
 	TopIndex = max (0, len(Games) - 4 + 1) #one more for the 'new game'
 	GemRB.SetVar ("TopIndex",TopIndex)
@@ -172,7 +172,7 @@ def SavePress():
 		Slotname = ""
 	NameField = ConfirmWindow.GetControl (3)
 	NameField.SetText (Slotname)
-	NameField.SetEventByName (IE_GUI_EDIT_ON_CHANGE,"EditChange")
+	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, EditChange)
 
 	#game hours (should be generated from game)
 	if Pos<len(Games):
@@ -200,7 +200,7 @@ def SavePress():
 	#save
 	SaveButton=ConfirmWindow.GetControl (7)
 	SaveButton.SetText (15588)
-	SaveButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ConfirmedSaveGame")
+	SaveButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConfirmedSaveGame)
 	SaveButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	#SaveButton.SetState (IE_GUI_BUTTON_DISABLED)
 	if Slotname == "":
@@ -209,7 +209,7 @@ def SavePress():
 	#cancel
 	CancelButton=ConfirmWindow.GetControl (8)
 	CancelButton.SetText (13727)
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AbortedSaveGame")
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbortedSaveGame)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ConfirmWindow.SetVisible (WINDOW_VISIBLE)
@@ -255,10 +255,10 @@ def DeleteGamePress():
 	Text.SetText (15305)
 	DeleteButton=ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (13957)
-	DeleteButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DeleteGameConfirm")
+	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameConfirm)
 	CancelButton=ConfirmWindow.GetControl (2)
 	CancelButton.SetText (13727)
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DeleteGameCancel")
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ConfirmWindow.SetVisible (WINDOW_VISIBLE)

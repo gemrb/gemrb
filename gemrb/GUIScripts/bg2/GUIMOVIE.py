@@ -42,14 +42,14 @@ def OnLoad():
 			TextAreaControl.Append (s,-1)
 	TextAreaControl.SetVarAssoc ("MovieIndex",0)
 	TextAreaControl.SetFlags (IE_GUI_TEXTAREA_SELECTABLE, OP_NAND)
-	TextAreaControl.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "MoviePress")
+	TextAreaControl.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, MoviePress)
 	PlayButton.SetText (17318)
 	CreditsButton.SetText (15591)
 	DoneButton.SetText (11973)
-	PlayButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PlayPress")
+	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
 	PlayButton.SetStatus (IE_GUI_BUTTON_DISABLED)
-	CreditsButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CreditsPress")
-	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	CreditsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreditsPress)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
 	MovieWindow.SetVisible (WINDOW_VISIBLE)
 	return
 

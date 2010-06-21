@@ -22,14 +22,14 @@
 
 ###################################################
 import GemRB
-import GUICommonWindows
+import GUICommon
+import LUCommon
+import GUIWORLD
+import DualClass
+import LevelUp
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import *
-from GUICommon import *
-from LUCommon import CanLevelUp, GetNextLevelExp
-from GUICommonWindows import *
-from GUIWORLD import OpenReformPartyWindow
 
 ###################################################
 RecordsWindow = None
@@ -60,10 +60,12 @@ SoundIndex = 0
 
 ###################################################
 def OpenRecordsWindow ():
+	import GUICommonWindows
+
 	global RecordsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
-	if CloseOtherWindow (OpenRecordsWindow):
+	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
 		if InformationWindow: OpenInformationWindow ()
 
 		if RecordsWindow:
@@ -75,17 +77,17 @@ def OpenRecordsWindow ():
 
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
-		SetSelectionChangeHandler (None)
+		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 
 	GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIREC", 640, 480)
 	RecordsWindow = Window = GemRB.LoadWindow (2)
@@ -93,48 +95,48 @@ def OpenRecordsWindow ():
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	MarkMenuButton (OptionsWindow)
-	SetupMenuWindowControls (OptionsWindow, 0, "OpenRecordsWindow")
+	GUICommonWindows.MarkMenuButton (OptionsWindow)
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
 	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	# dual class
 	Button = Window.GetControl (0)
 	Button.SetText (7174)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DualClassWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DualClass.DualClassWindow)
 
 	# levelup
 	Button = Window.GetControl (37)
 	Button.SetText (7175)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenLevelUpWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LevelUp.OpenLevelUpWindow)
 
 	# information
 	Button = Window.GetControl (1)
 	Button.SetText (11946)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInformationWindow)
 
 	# reform party
 	Button = Window.GetControl (51)
 	Button.SetText (16559)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenRecReformPartyWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenRecReformPartyWindow)
 
 	# customize
 	Button = Window.GetControl (50)
 	Button.SetText (10645)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenCustomizeWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenCustomizeWindow)
 
 	# export
 	Button = Window.GetControl (36)
 	Button.SetText (13956)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenExportWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenExportWindow)
 
 	# kit info
 	Button = Window.GetControl (52)
 	Button.SetText (61265)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "KitInfoWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, KitInfoWindow)
 
-	SetSelectionChangeHandler (UpdateRecordsWindow)
+	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_FRONT)
@@ -144,7 +146,7 @@ def OpenRecordsWindow ():
 #original returns to game before continuing...
 def OpenRecReformPartyWindow ():
 	OpenRecordsWindow ()
-	GemRB.SetTimedEventByName ("OpenReformPartyWindow", 1)
+	GemRB.SetTimedEvent (GUIWORLD.OpenReformPartyWindow, 1)
 	return
 
 def UpdateRecordsWindow ():
@@ -159,8 +161,8 @@ def UpdateRecordsWindow ():
 
 	#update mage school
 	GemRB.SetVar ("MAGESCHOOL", 0)
-	Kit = GetKitIndex (pc)
-	if Kit and KitListTable.GetValue (Kit, 7) == 1:
+	Kit = GUICommon.GetKitIndex (pc)
+	if Kit and GUICommon.KitListTable.GetValue (Kit, 7) == 1:
 		MageTable = GemRB.LoadTable ("magesch")
 		GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, KitListTable.GetValue (Kit, 6) ) )
 
@@ -173,14 +175,14 @@ def UpdateRecordsWindow ():
 
 	# dual-classable
 	Button = Window.GetControl (0)
-	if CanDualClass (pc):
+	if GUICommon.CanDualClass (pc):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 	# levelup
 	Button = Window.GetControl (37)
-	if CanLevelUp (pc):
+	if LUCommon.CanLevelUp (pc):
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -259,12 +261,12 @@ def UpdateRecordsWindow ():
 	Label.SetTextColor (cchr[0], cchr[1], cchr[2])
 
 	# class
-	ClassTitle = GetActorClassTitle (pc)
+	ClassTitle = GUICommon.GetActorClassTitle (pc)
 	Label = Window.GetControl (0x10000030)
 	Label.SetText (ClassTitle)
 
 	# race
-	text = RaceTable.GetValue (RaceTable.FindValue (3, GemRB.GetPlayerStat (pc, IE_RACE)) , 0)
+	text = GUICommon.RaceTable.GetValue (GUICommon.RaceTable.FindValue (3, GemRB.GetPlayerStat (pc, IE_RACE)) , 0)
 
 	Label = Window.GetControl (0x1000000f)
 	Label.SetText (text)
@@ -322,13 +324,13 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# Next Level: <NEXTLEVEL>
 
 	# collecting tokens for stat overview
-	ClassTitle = GetActorClassTitle (pc)
+	ClassTitle = GUICommon.GetActorClassTitle (pc)
 	GemRB.SetToken ("CLASS", ClassTitle)
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	Class = ClassTable.FindValue (5, Class)
-	Class = ClassTable.GetRowName (Class)
-	Dual = IsDualClassed (pc, 1)
-	Multi = IsMultiClassed (pc, 1)
+	Class = GUICommon.ClassTable.FindValue (5, Class)
+	Class = GUICommon.ClassTable.GetRowName (Class)
+	Dual = GUICommon.IsDualClassed (pc, 1)
+	Multi = GUICommon.IsMultiClassed (pc, 1)
 	XP = GemRB.GetPlayerStat (pc, IE_XP)
 	LevelDrain = GS (IE_LEVELDRAIN)
 
@@ -339,17 +341,17 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append ( (19721,1,'c') )
 		stats.append (None)
 		for i in range (Multi[0]):
-			ClassIndex = ClassTable.FindValue (5, Multi[i+1])
-			ClassTitle = GemRB.GetString (ClassTable.GetValue (ClassIndex, 2))
+			ClassIndex = GUICommon.ClassTable.FindValue (5, Multi[i+1])
+			ClassTitle = GemRB.GetString (GUICommon.ClassTable.GetValue (ClassIndex, 2))
 			GemRB.SetToken ("CLASS", ClassTitle)
-			Class = ClassTable.GetRowName (ClassIndex)
+			Class = GUICommon.ClassTable.GetRowName (ClassIndex)
 			GemRB.SetToken ("LEVEL", str (Levels[i]+LevelDiff[i]-int(LevelDrain/Multi[0])) )
 			GemRB.SetToken ("EXPERIENCE", str (XP/Multi[0]) )
 			if LevelDrain:
 				stats.append ( (GemRB.GetString (19720),1,'d') )
 				stats.append ( (GemRB.GetString (57435),1,'d') ) # LEVEL DRAINED
 			else:
-				GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Levels[i]+LevelDiff[i], Class) )
+				GemRB.SetToken ("NEXTLEVEL", LUCommon.GetNextLevelExp (Levels[i]+LevelDiff[i], Class) )
 				stats.append ( (GemRB.GetString (16480),"",'d') )
 			stats.append (None)
 			print "\t\tClass (Level):",Class,"(",Levels[i],")"
@@ -363,45 +365,45 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 		# the levels are stored in the class order (eg. FIGHTER_MAGE)
 		# the current active class does not matter!
-		if IsDualSwap (pc):
+		if GUICommon.IsDualSwap (pc):
 			Levels = [Levels[1], Levels[0], Levels[2]]
 
 		Levels[0] += LevelDiff[0]
 
-		ClassTitle = GemRB.GetString (ClassTable.GetValue (Dual[2], 2))
+		ClassTitle = GemRB.GetString (GUICommon.ClassTable.GetValue (Dual[2], 2))
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[0]-LevelDrain))
-		Class = ClassTable.GetRowName (Dual[2])
+		Class = GUICommon.ClassTable.GetRowName (Dual[2])
 		XP2 = GemRB.GetPlayerStat (pc, IE_XP)
 		GemRB.SetToken ("EXPERIENCE", str (XP2) )
 		if LevelDrain:
 			stats.append ( (GemRB.GetString (19720),1,'d') )
 			stats.append ( (GemRB.GetString (57435),1,'d') ) # LEVEL DRAINED
 		else:
-			GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Levels[0], Class) )
+			GemRB.SetToken ("NEXTLEVEL", LUCommon.GetNextLevelExp (Levels[0], Class) )
 			stats.append ( (GemRB.GetString (16480),"",'d') )
 		stats.append (None)
 
 		# the first class (shown second)
 		if Dual[0] == 1:
-			ClassTitle = GemRB.GetString (KitListTable.GetValue (Dual[1], 2))
+			ClassTitle = GemRB.GetString (GUICommon.KitListTable.GetValue (Dual[1], 2))
 		elif Dual[0] == 2:
-			ClassTitle = GemRB.GetString (ClassTable.GetValue (Dual[1], 2))
+			ClassTitle = GemRB.GetString (GUICommon.ClassTable.GetValue (Dual[1], 2))
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[1]) )
 
 		# the xp table contains only classes, so we have to determine the base class for kits
 		if Dual[0] == 2:
-			BaseClass = ClassTable.GetRowName (Dual[1])
+			BaseClass = GUICommon.ClassTable.GetRowName (Dual[1])
 		else:
-			BaseClass = GetKitIndex (pc)
-			BaseClass = KitListTable.GetValue (BaseClass, 7)
-			BaseClass = ClassTable.FindValue (5, BaseClass)
-			BaseClass = ClassTable.GetRowName (BaseClass)
+			BaseClass = GUICommon.GetKitIndex (pc)
+			BaseClass = GUICommon.KitListTable.GetValue (BaseClass, 7)
+			BaseClass = GUICommon.ClassTable.FindValue (5, BaseClass)
+			BaseClass = GUICommon.ClassTable.GetRowName (BaseClass)
 		# the first class' XP is discarded and set to the minimum level
 		# requirement, so if you don't dual class right after a levelup,
 		# the game would eat some of your XP
-		XP1 = NextLevelTable.GetValue (BaseClass, str (Levels[1]))
+		XP1 = GUICommon.NextLevelTable.GetValue (BaseClass, str (Levels[1]))
 		GemRB.SetToken ("EXPERIENCE", str (XP1) )
 
 		# inactive until the new class SURPASSES the former
@@ -420,7 +422,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			stats.append ( (19720,1,'c') )
 			stats.append ( (57435,1,'c') ) # LEVEL DRAINED
 		else:
-			GemRB.SetToken ("NEXTLEVEL", GetNextLevelExp (Level, Class) )
+			GemRB.SetToken ("NEXTLEVEL", LUCommon.GetNextLevelExp (Level, Class) )
 			stats.append ( (16480,1,'c') )
 		stats.append (None)
 		print "\t\tClass (Level):",Class,"(",Level,")"
@@ -474,7 +476,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	#this hack only displays LOH if we know the spell
 	#TODO: the core should just not set LOH if the paladin can't learn it
-	if (HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
+	if (GUICommon.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, "SPCL211") >= 0):
 		stats.append ( (12127, GS (IE_LAYONHANDSAMOUNT), '') )
 	#script
 	aiscript = GemRB.GetPlayerScript (pc )
@@ -666,12 +668,12 @@ def OpenInformationWindow ():
 	# Biography
 	Button = Window.GetControl (26)
 	Button.SetText (18003)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyWindow)
 
 	# Done
 	Button = Window.GetControl (24)
 	Button.SetText (11973)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInformationWindow)
 
 	TotalPartyExp = 0
 	ChapterPartyExp = 0
@@ -691,7 +693,7 @@ def OpenInformationWindow ():
 	Label = Window.GetControl (0x10000000)
 	Label.SetText (GemRB.GetPlayerName (pc, 1))
 	# class
-	ClassTitle = GetActorClassTitle (pc)
+	ClassTitle = GUICommon.GetActorClassTitle (pc)
 	Label = Window.GetControl (0x10000018)
 	Label.SetText (ClassTitle)
 
@@ -795,7 +797,7 @@ def OpenBiographyWindow ():
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (11973)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyWindow)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
@@ -822,9 +824,9 @@ def OpenExportWindow ():
 
 	NameField = ExportWindow.GetControl (6)
 
-	ExportDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
-	NameField.SetEventByName (IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
+	ExportDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExportDonePress)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExportCancelPress)
+	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, ExportEditChanged)
 	ExportWindow.ShowModal (MODAL_SHADOW_GRAY)
 	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return
@@ -860,41 +862,41 @@ def KitInfoWindow ():
 	#back button (setting first, to be less error prone)
 	DoneButton = KitInfoWindow.GetControl (2)
 	DoneButton.SetText (11973)
-	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "KitDonePress")
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, KitDonePress)
 
 	#kit or class description
 	TextArea = KitInfoWindow.GetControl (0)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassIndex = ClassTable.FindValue (5, Class)
-	Multi = ClassTable.GetValue (ClassIndex, 4)
-	Dual = IsDualClassed (pc, 1)
+	ClassIndex = GUICommon.ClassTable.FindValue (5, Class)
+	Multi = GUICommon.ClassTable.GetValue (ClassIndex, 4)
+	Dual = GUICommon.IsDualClassed (pc, 1)
 
 	if Multi and Dual[0] == 0: # true multi class
-		text = ClassTable.GetValue (ClassIndex, 1)
+		text = GUICommon.ClassTable.GetValue (ClassIndex, 1)
 		TextArea.SetText (text)
 		KitInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
-	KitIndex = GetKitIndex (pc)
+	KitIndex = GUICommon.GetKitIndex (pc)
 
 	if Dual[0]: # dual class
 		# first (previous) kit or class of the dual class
 		if Dual[0] == 1:
-			text = KitListTable.GetValue (Dual[1], 3)
+			text = GUICommon.KitListTable.GetValue (Dual[1], 3)
 		elif Dual[0] == 2:
-			text = ClassTable.GetValue (Dual[1], 1)
+			text = GUICommon.ClassTable.GetValue (Dual[1], 1)
 
 		TextArea.SetText (text)
 		TextArea.Append ("\n\n")
-		text = ClassTable.GetValue (Dual[2], 1)
+		text = GUICommon.ClassTable.GetValue (Dual[2], 1)
 
 	else: # ordinary class or kit
 		if KitIndex:
-			text = KitListTable.GetValue (KitIndex, 3)
+			text = GUICommon.KitListTable.GetValue (KitIndex, 3)
 		else:
-			text = ClassTable.GetValue (ClassIndex, 1)
+			text = GUICommon.ClassTable.GetValue (ClassIndex, 1)
 
 	TextArea.Append (text)
 
@@ -955,13 +957,13 @@ def OpenCustomizeWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	AppearanceButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenAppearanceWindow")
-	SoundButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenSoundWindow")
-	ColorButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenColorWindow")
-	ScriptButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenScriptWindow")
-	BiographyButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyEditWindow")
-	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CustomizeDonePress")
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CustomizeCancelPress")
+	AppearanceButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenAppearanceWindow)
+	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSoundWindow)
+	ColorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenColorWindow)
+	ScriptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenScriptWindow)
+	BiographyButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyEditWindow)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomizeDonePress)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomizeCancelPress)
 
 	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1015,11 +1017,11 @@ def OpenAppearanceWindow ():
 	CustomPortraitButton = SubCustomizeWindow.GetControl (5)
 	CustomPortraitButton.SetText (17545)
 
-	LeftButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitLeftPress")
-	RightButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitRightPress")
-	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DonePortraitWindow")
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
-	CustomPortraitButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenCustomPortraitWindow")
+	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitLeftPress)
+	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitRightPress)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePortraitWindow)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
+	CustomPortraitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenCustomPortraitWindow)
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	while True:
@@ -1093,19 +1095,19 @@ def OpenCustomPortraitWindow ():
 	# Portrait List Large
 	PortraitList1 = SubSubCustomizeWindow.GetControl (2)
 	RowCount1 = PortraitList1.GetPortraits (0)
-	PortraitList1.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "LargeCustomPortrait")
+	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, LargeCustomPortrait)
 	GemRB.SetVar ("Row1", RowCount1)
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	# Portrait List Small
 	PortraitList2 = SubSubCustomizeWindow.GetControl (3)
 	RowCount2 = PortraitList2.GetPortraits (1)
-	PortraitList2.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "SmallCustomPortrait")
+	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, SmallCustomPortrait)
 	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
 
-	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DonePortraitCustomizeWindow")
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseSubSubCustomizeWindow")
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePortraitCustomizeWindow)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubSubCustomizeWindow)
 
 	SubSubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1193,9 +1195,9 @@ def OpenSoundWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	PlayButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PlaySoundPressed")
-	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DoneSoundWindow")
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
+	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlaySoundPressed)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneSoundWindow)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1248,12 +1250,12 @@ def OpenColorWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	HairButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SetHairColor")
-	SkinButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SetSkinColor")
-	MajorButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SetMajorColor")
-	MinorButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SetMinorColor")
-	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DoneColorWindow")
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
+	HairButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetHairColor)
+	SkinButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetSkinColor)
+	MajorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetMajorColor)
+	MinorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetMinorColor)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneColorWindow)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
 	UpdatePaperDoll ()
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
@@ -1337,7 +1339,7 @@ def OpenColorPicker ():
 			#Selected = i
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc("Selected",i)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DonePress")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
 
 	SubSubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1391,9 +1393,9 @@ def OpenScriptWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DoneScriptWindow")
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
-	ScriptTextArea.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "UpdateScriptSelection")
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneScriptWindow)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
+	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, UpdateScriptSelection)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1463,10 +1465,10 @@ def OpenBiographyEditWindow ():
 	TextArea.SetBufferLength (65535)
 	TextArea.SetText (BioStrRef)
 
-	ClearButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ClearBiography")
-	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DoneBiographyWindow")
-	RevertButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RevertBiography")
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseSubCustomizeWindow")
+	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClearBiography)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneBiographyWindow)
+	RevertButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RevertBiography)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

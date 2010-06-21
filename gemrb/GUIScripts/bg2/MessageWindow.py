@@ -25,21 +25,7 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 import CommonWindow
-from GUIClasses import GTextArea
-from GUIClasses import GWindow
-
-from GUIJRNL import *
-from GUIMA import *
-from GUIMG import *
-from GUIINV import *
-from GUIOPT import *
-from GUIPR import *
-from GUIREC import *
-from GUISTORE import *
-from GUIWORLD import *
-from TextScreen import *
-from LevelUp import *
-from DualClass import *
+import GUIClasses
 
 MessageWindow = 0
 PortraitWindow = 0
@@ -59,20 +45,20 @@ def OnLoad():
 	GUICommonWindows.OptionsWindow = None
 
 	OptionsWindow = GemRB.LoadWindow(0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
 
 	Button=OptionsWindow.GetControl(10)
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MinimizeOptions")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MinimizeOptions)
 	Button=PortraitWindow.GetControl(8)
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.MinimizePortraits)
 
 	ActionsWindow = GemRB.LoadWindow(3)
 	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
 	Button=ActionsWindow.GetControl(60)
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MaximizeOptions")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizeOptions)
 	Button=ActionsWindow.GetControl(61)
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MaximizePortraits")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizePortraits)
 
 	GemRB.SetVar("PortraitWindow", PortraitWindow.ID)
 	GemRB.SetVar("ActionsWindow", ActionsWindow.ID)
@@ -95,8 +81,7 @@ def MinimizeOptions():
 def MaximizeOptions():
 	GemRB.GameSetScreenFlags(GS_OPTIONPANE, OP_NAND)
 
-def MinimizePortraits():
-	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_OR)
+# MinimizePortraits is in GUICommonWindows for dependency reasons
 
 def MaximizePortraits():
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_NAND)
@@ -144,10 +129,10 @@ def UpdateControlStatus():
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_SPEAKER)
 	TMessageTA.SetHistory(100)
 	hideflag = GemRB.HideGUI()
-	MessageTA = GTextArea(MessageWindow,GemRB.GetVar("MessageTextArea"))
+	MessageTA = GUIClasses.GTextArea(MessageWindow,GemRB.GetVar("MessageTextArea"))
 	if MessageWindow>0 and MessageWindow!=TMessageWindow.ID:
 		MessageTA.MoveText(TMessageTA)
-		GWindow(MessageWindow).Unload()
+		GUIClasses.GWindow(MessageWindow).Unload()
 
 	GemRB.SetVar("MessageWindow", TMessageWindow.ID)
 	GemRB.SetVar("MessageTextArea", TMessageTA.ID)

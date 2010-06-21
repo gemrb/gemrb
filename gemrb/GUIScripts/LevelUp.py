@@ -23,13 +23,10 @@ from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
 import GUICommon
-import GUICommonWindows
-import GUIREC
 import LUSpellSelection
 import LUCommon
 if GUICommon.HasTOB():
 	import LUHLASelection
-	from LUHLASelection import HLASelectPress, HLADonePress #HACK
 import LUProfsSelection
 import LUSkillsSelection
 import Actor
@@ -66,6 +63,7 @@ DeltaWSpells = 0	# << total new wizard spells
 
 def OpenLevelUpWindow():
 	"""Sets up the level up window."""
+	import GUIREC
 
 	global LevelUpWindow, TextAreaControl, NewProfPoints, actor
 	global DoneButton
@@ -79,11 +77,11 @@ def OpenLevelUpWindow():
 	if GUICommon.GameIsBG2():
 		InfoButton = LevelUpWindow.GetControl (125)
 		InfoButton.SetText (13707)
-		InfoButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LevelUpInfoPress")
+		InfoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LevelUpInfoPress)
 
 	DoneButton = LevelUpWindow.GetControl (0)
 	DoneButton.SetText (11962)
-	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LevelUpDonePress")
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LevelUpDonePress)
 	DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
@@ -340,7 +338,7 @@ def OpenLevelUpWindow():
 		HLAButton = LevelUpWindow.GetControl (126)
 		if HLACount:
 			HLAButton.SetText (4954)
-			HLAButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LevelUpHLAPress")
+			HLAButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LevelUpHLAPress)
 		else:
 			HLAButton.SetFlags (IE_GUI_BUTTON_DISABLED, OP_OR)
 
@@ -545,7 +543,7 @@ def LevelUpInfoPress():
 	"""Displays new abilites gained on level up.
 
 	Alternates between overall and modified stats."""
-
+	import GUIREC
 	global LevelUpWindow, TextAreaControl, InfoCounter, LevelDiff
 
 	if InfoCounter % 2:
@@ -562,7 +560,8 @@ def LevelUpDonePress():
 	"""Updates the PC with the new choices.
 
 	Closes the window when finished."""
-
+	import GUICommonWindows
+	import GUIREC
 	global SkillTable
 
 	# proficiencies

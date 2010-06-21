@@ -43,8 +43,8 @@ def OnLoad():
 	CancelButton.SetText(15416)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "Done1Press")
-	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, Done1Press)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
 	ImportWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
@@ -52,7 +52,7 @@ def Done1Press():
 	DoneButton = ImportWindow.GetControl(0)
 	DoneButton.SetText(11973)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "Done2Press")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, Done2Press)
 	return
 	
 def Done2Press():

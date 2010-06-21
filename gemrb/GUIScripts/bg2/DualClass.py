@@ -25,7 +25,6 @@ import GUICommon
 import LUSpellSelection
 import LUProfsSelection
 import LUSkillsSelection
-import GUIREC
 
 #######################
 pc = 0
@@ -76,35 +75,35 @@ def DualClassWindow ():
 	# done button (off)
 	DCMainDoneButton = DCMainWindow.GetControl (2)
 	DCMainDoneButton.SetText (11973)
-	DCMainDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DCMainDonePress")
+	DCMainDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainDonePress)
 	DCMainDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	DCMainDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# cancel button (on)
 	DCMainCancelButton = DCMainWindow.GetControl (1)
 	DCMainCancelButton.SetText (13727)
-	DCMainCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DCMainCancelPress")
+	DCMainCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainCancelPress)
 	DCMainCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	DCMainCancelButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# class button (on)
 	DCMainClassButton = DCMainWindow.GetControl (3)
 	DCMainClassButton.SetText (11959)
-	DCMainClassButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DCMainClassPress")
+	DCMainClassButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainClassPress)
 	DCMainClassButton.SetState (IE_GUI_BUTTON_ENABLED)
 	DCMainClassButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# skills button (off)
 	DCMainSkillsButton = DCMainWindow.GetControl (4)
 	DCMainSkillsButton.SetText (17372)
-	DCMainSkillsButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DCMainSkillsPress")
+	DCMainSkillsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainSkillsPress)
 	DCMainSkillsButton.SetState (IE_GUI_BUTTON_DISABLED)
 	DCMainSkillsButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# back button (on)
 	DCMainBackButton = DCMainWindow.GetControl (5)
 	DCMainBackButton.SetText (15416)
-	DCMainBackButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DCMainBackPress")
+	DCMainBackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainBackPress)
 	DCMainBackButton.SetState (IE_GUI_BUTTON_ENABLED)
 	DCMainBackButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
@@ -146,6 +145,7 @@ def DCMainDonePress ():
 
 	This de-activates our old class and readjusts the basic actor stats, such as
 	THAC0, spell casting, proficiencies, and so forth, to the new class."""
+	import GUIREC
 
 	# save our proficiencies
 	LUProfsSelection.ProfsSave (pc, LUProfsSelection.LUPROFS_TYPE_DUALCLASS)
@@ -274,7 +274,7 @@ def DCMainClassPress ():
 	for i in range (6):
 		# get the button and associate it with the correct var
 		DCClassButton = DCClassWindow.GetControl (i+1)
-		DCClassButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DCClassSelect")
+		DCClassButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCClassSelect)
 		DCClassButton.SetVarAssoc ("DCClass", i)
 		DCClassButton.SetText (DCClassStrings[i])
 		DCClassButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
@@ -288,14 +288,14 @@ def DCMainClassPress ():
 	# done button (off)
 	DCClassDoneButton = DCClassWindow.GetControl (8)
 	DCClassDoneButton.SetText (11973)
-	DCClassDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DCClassDonePress")
+	DCClassDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCClassDonePress)
 	DCClassDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	DCClassDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# back button (on)
 	DCClassBackButton = DCClassWindow.GetControl (7)
 	DCClassBackButton.SetText (15416)
-	DCClassBackButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DCClassBackPress")
+	DCClassBackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCClassBackPress)
 	DCClassBackButton.SetState (IE_GUI_BUTTON_ENABLED)
 	DCClassBackButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
@@ -434,13 +434,13 @@ def DCOpenProfsWindow ():
 	# setup the done and cancel
 	DCProfsDoneButton = DCProfsWindow.GetControl (76)
 	DCProfsDoneButton.SetText (11973)
-	DCProfsDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DCProfsDonePress")
+	DCProfsDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCProfsDonePress)
 	DCProfsDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	DCProfsDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	DCProfsCancelButton = DCProfsWindow.GetControl (77)
 	DCProfsCancelButton.SetText (13727)
-	DCProfsCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DCProfsCancelPress")
+	DCProfsCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCProfsCancelPress)
 	DCProfsCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	DCProfsCancelButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
@@ -538,12 +538,12 @@ def OpenSkillsWindow ():
 	BackButton = DCSkillsWindow.GetControl(24)
 	BackButton.SetText(15416)
 	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"DCSkillsBackPress")
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,DCSkillsBackPress)
 
 	DCSkillsDoneButton = DCSkillsWindow.GetControl(25)
 	DCSkillsDoneButton.SetText(11973)
 	DCSkillsDoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
-	DCSkillsDoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DCSkillsDonePress")
+	DCSkillsDoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DCSkillsDonePress)
 	DCSkillsDoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	# setup the default text area
