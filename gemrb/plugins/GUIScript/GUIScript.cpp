@@ -9733,7 +9733,7 @@ bool GUIScript::RunFunction(const char *ModuleName, const char* FunctionName, bo
 		module = PyImport_Import(PyString_FromString(ModuleName));
 	} else {
 		module = pModule;
-		Py_INCREF(module);
+		Py_XINCREF(module);
 	}
 	if (module == NULL) {
 		return false;
