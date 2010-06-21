@@ -61,7 +61,7 @@ bool CTlkOverride::Init()
 	char Signature[8];
 	toh_str->Read( Signature, 4 );
 	if (strncmp( Signature, "TLK ", 4 ) != 0) {
-		printf( "[TLKImporter]: Not a valid TOH File.\n" );
+		printMessage("TLKImporter", "Not a valid TOH file.\n", LIGHT_RED);
 		return false;
 	}
 	toh_str->Seek( 8, GEM_CURRENT_POS );
@@ -70,7 +70,7 @@ bool CTlkOverride::Init()
 	tot_str->ReadDword( &FreeOffset );
 	tot_str->Read(Signature,4);
 	if (strncmp( Signature, "\xff\xff\xff\xff",4) !=0) {
-		printf( "[TLKImporter]: Not a valid TOT File.\n" );
+		printMessage("TLKImporter", "Not a valid TOT file.\n", LIGHT_RED);
 		return false;
 	}
 
