@@ -156,28 +156,28 @@ def OnLoad():
 	StorePress()
 	for i in range(6):
 		Label = AbilityWindow.GetControl(i+0x10000009)
-		Label.SetEventByName(IE_GUI_LABEL_ON_PRESS, "OverPress"+str(i) )
+		Label.SetEvent(IE_GUI_LABEL_ON_PRESS, eval("OverPress"+str(i)))
 		Button = AbilityWindow.GetControl(i+30)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "JustPress")
-		Button.SetEventByName(IE_GUI_MOUSE_LEAVE_BUTTON, "EmptyPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
+		Button.SetEvent(IE_GUI_MOUSE_LEAVE_BUTTON, EmptyPress)
 		Button.SetVarAssoc("Ability", i)
 
 		Button = AbilityWindow.GetControl(i*2+16)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
 		Button.SetVarAssoc("Ability", i )
 
 		Button = AbilityWindow.GetControl(i*2+17)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "RightPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
 		Button.SetVarAssoc("Ability", i )
 
 	TextAreaControl = AbilityWindow.GetControl(29)
 	TextAreaControl.SetText(17247)
 
-	StoreButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"StorePress")
-	RecallButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"RecallPress")
-	RerollButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"RollPress")
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	StoreButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, StorePress)
+	RecallButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RecallPress)
+	RerollButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RollPress)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	AbilityWindow.SetVisible(WINDOW_VISIBLE)
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	return

@@ -50,7 +50,7 @@ def OnLoad():
 		Button = RaceWindow.GetControl(i)
 		Button.SetText(GUICommon.RaceTable.GetValue(i-2,0) )
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"RacePress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RacePress)
 		Button.SetVarAssoc("Race", i-2 )
 
 	BackButton = RaceWindow.GetControl(i+2)  #i=8 now (when race count is 7)
@@ -64,8 +64,8 @@ def OnLoad():
 	TextAreaControl = RaceWindow.GetControl(12)
 	TextAreaControl.SetText(17237)
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	RaceWindow.SetVisible(WINDOW_VISIBLE)
 	return
 

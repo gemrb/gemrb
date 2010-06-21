@@ -90,22 +90,22 @@ def OnLoad():
 
 	HairButton = ColorWindow.GetControl(2)
 	HairButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-	HairButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"HairPress")
+	HairButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, HairPress)
 	HairButton.SetBAM("COLGRAD", 1, 0, HairColor)
 
 	SkinButton = ColorWindow.GetControl(3)
 	SkinButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-	SkinButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"SkinPress")
+	SkinButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SkinPress)
 	SkinButton.SetBAM("COLGRAD", 1, 0, SkinColor)
 
 	MajorButton = ColorWindow.GetControl(5)
 	MajorButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-	MajorButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"MajorPress")
+	MajorButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MajorPress)
 	MajorButton.SetBAM("COLGRAD", 1, 0, MinorColor)
 
 	MinorButton = ColorWindow.GetControl(4)
 	MinorButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-	MinorButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"MinorPress")
+	MinorButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MinorPress)
 	MinorButton.SetBAM("COLGRAD", 1, 0, MajorColor)
 
 	BackButton = ColorWindow.GetControl(13)
@@ -115,8 +115,8 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	RefreshPDoll()
 	ColorWindow.SetVisible(WINDOW_VISIBLE)
 	return
@@ -171,7 +171,7 @@ def GetColor():
 			Selected = i
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc("Selected",i)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DonePress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
 	
 	ColorPicker.SetVisible(WINDOW_VISIBLE)
 	return

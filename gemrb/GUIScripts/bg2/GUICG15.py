@@ -45,7 +45,7 @@ def DisplayRaces():
 		else:
 			Button.SetText(Val)
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
-			Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"RacePress")
+			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RacePress)
 			Button.SetVarAssoc("HatedRace",RaceTable.GetValue(i+TopIndex,1) )
 	return
 
@@ -72,7 +72,7 @@ def OnLoad():
 	GemRB.SetVar("TopIndex", 0)
 	ScrollBarControl = RaceWindow.GetControl(1)
 	ScrollBarControl.SetVarAssoc("TopIndex", RaceCount)
-	ScrollBarControl.SetEventByName(IE_GUI_SCROLLBAR_ON_CHANGE, "DisplayRaces")
+	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, DisplayRaces)
 	ScrollBarControl.SetDefaultScrollBar ()
 
 	for i in range(LISTSIZE):
@@ -92,8 +92,8 @@ def OnLoad():
 	TextAreaControl = RaceWindow.GetControl(2)
 	TextAreaControl.SetText(17256)
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	RaceWindow.SetVisible(WINDOW_VISIBLE)
 	DisplayRaces()
 	return
