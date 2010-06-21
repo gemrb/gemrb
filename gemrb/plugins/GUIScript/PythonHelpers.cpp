@@ -28,12 +28,12 @@ StringCallback::StringCallback(const char *str)
 StringCallback::StringCallback(PyObject *Name)
 	: Name(Name)
 {
-	Py_INCREF(Name);
+	Py_XINCREF(Name);
 }
 
 StringCallback::~StringCallback()
 {
-	Py_DECREF(Name);
+	Py_XDECREF(Name);
 }
 
 bool StringCallback::call()
@@ -72,7 +72,7 @@ PythonCallback::PythonCallback(PyObject *Function)
 PythonCallback::~PythonCallback()
 {
 	if (Py_IsInitialized()) {
-		Py_DECREF(Function);
+		Py_XDECREF(Function);
 	}
 }
 
