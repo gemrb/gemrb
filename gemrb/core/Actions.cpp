@@ -2089,7 +2089,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	core->GetDictionary()->SetAt("Travel", (ieDword) direction);
-	core->GetGUIScriptEngine()->RunFunction( "OpenWorldMapWindow" );
+	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenWorldMapWindow" );
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->ReleaseCurrentAction();
 }
@@ -3120,7 +3120,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		}
 	}
 	core->GetGame()->JoinParty( act, JP_JOIN );
-	core->GetGUIScriptEngine()->RunFunction( "UpdatePortraitWindow" );
+	core->GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
 }
 
 void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
@@ -3130,7 +3130,7 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* act = ( Actor* ) Sender;
 	core->GetGame()->LeaveParty( act );
-	core->GetGUIScriptEngine()->RunFunction( "UpdatePortraitWindow" );
+	core->GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
 }
 
 //HideCreature hides only the visuals of a creature
@@ -3620,7 +3620,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 void GameScript::TextScreen(Scriptable* Sender, Action* parameters)
 {
 	strnlwrcpy(core->GetGame()->LoadMos, parameters->string0Parameter,8);
-	core->GetGUIScriptEngine()->RunFunction( "StartTextScreen" );
+	core->GetGUIScriptEngine()->RunFunction( "TextScreen", "StartTextScreen" );
 	core->GetVideoDriver()->SetMouseEnabled(true);
 	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction(); // should this be blocking?

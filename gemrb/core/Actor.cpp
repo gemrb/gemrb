@@ -818,7 +818,7 @@ void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	if (pc && !actor->GotLUFeedback) {
 		char varname[16];
 		sprintf(varname, "CheckLevelUp%d", pc);
-		core->GetGUIScriptEngine()->RunFunction("CheckLevelUp", true, pc);
+		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CheckLevelUp", true, pc);
 		ieDword NeedsLevelUp = 0;
 		core->GetDictionary()->Lookup(varname, NeedsLevelUp);
 		if (NeedsLevelUp == 1) {
@@ -3095,7 +3095,7 @@ void Actor::Die(Scriptable *killer)
 
 	//a plot critical creature has died (iwd2)
 	if (BaseStats[IE_MC_FLAGS]&MC_PLOT_CRITICAL) {
-		core->GetGUIScriptEngine()->RunFunction("DeathWindowPlot", false);
+		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindowPlot", false);
 	}
 	//ensure that the scripts of the actor will run as soon as possible
 	ImmediateEvent();

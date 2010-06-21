@@ -1245,13 +1245,13 @@ void Game::UpdateScripts()
 	if (EveryoneDead()) {
 		//don't check it any more
 		protagonist = PM_NO;
-		core->GetGUIScriptEngine()->RunFunction("DeathWindow");
+		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindow");
 		return;
 	}
 
 	if (PartyOverflow()) {
 		partysize = 0;
-		core->GetGUIScriptEngine()->RunFunction("OpenReformPartyWindow");
+		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "OpenReformPartyWindow");
 		return;
 	}
 }

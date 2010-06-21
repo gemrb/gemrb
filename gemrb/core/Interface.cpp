@@ -479,12 +479,12 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_SELECTION) {
 		EventFlag&=~EF_SELECTION;
-		guiscript->RunFunction( "SelectionChanged", false);
+		guiscript->RunFunction( "GUICommonWindows", "SelectionChanged", false);
 	}
 
 	if (EventFlag&EF_UPDATEANIM) {
 		EventFlag&=~EF_UPDATEANIM;
-		guiscript->RunFunction( "UpdateAnimation", false);
+		guiscript->RunFunction( "GUICommonWindows", "UpdateAnimation", false);
 	}
 
 	if (EventFlag&EF_PORTRAIT) {
@@ -492,7 +492,7 @@ void Interface::HandleEvents()
 		vars->Lookup( "PortraitWindow", tmp );
 		if (tmp != (ieDword) ~0) {
 			EventFlag&=~EF_PORTRAIT;
-			guiscript->RunFunction( "UpdatePortraitWindow" );
+			guiscript->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
 		}
 	}
 
@@ -501,7 +501,7 @@ void Interface::HandleEvents()
 		vars->Lookup( "ActionsWindow", tmp );
 		if (tmp != (ieDword) ~0) {
 			EventFlag&=~EF_ACTION;
-			guiscript->RunFunction( "UpdateActionsWindow" );
+			guiscript->RunFunction( "GUICommonWindows", "UpdateActionsWindow" );
 		}
 	}
 
@@ -520,14 +520,14 @@ void Interface::HandleEvents()
 		vars->Lookup( "OtherWindow", tmp );
 		if (tmp == (ieDword) ~0) {
 			EventFlag &= ~EF_SHOWMAP;
-			guiscript->RunFunction( "ShowMap" );
+			guiscript->RunFunction( "GUIMA", "ShowMap" );
 		}
 		return;
 	}
 
 	if (EventFlag&EF_SEQUENCER) {
 		EventFlag&=~EF_SEQUENCER;
-		guiscript->RunFunction( "OpenSequencerWindow" );
+		guiscript->RunFunction( "GUIMG", "OpenSequencerWindow" );
 		return;
 	}
 
@@ -538,7 +538,7 @@ void Interface::HandleEvents()
 	}
 	if (EventFlag&EF_OPENSTORE) {
 		EventFlag&=~EF_OPENSTORE;
-		guiscript->RunFunction( "OpenStoreWindow" );
+		guiscript->RunFunction( "GUISTORE", "OpenStoreWindow" );
 		return;
 	}
 
@@ -3013,7 +3013,7 @@ void Interface::HandleGUIBehaviour(void)
 			} else if ( (int)var !=-3) {
 				gc->DialogChoose(var);
 				if (!(gc->GetDialogueFlags() & (DF_OPENCONTINUEWINDOW | DF_OPENENDWINDOW)))
-					guiscript->RunFunction( "NextDialogState" );
+					guiscript->RunFunction( "GUIWORLD", "NextDialogState" );
 
 				// the last node of a dialog can have a new-dialog action! don't interfere in that case
 				ieDword newvar = 0; vars->Lookup("DialogChoose", newvar);
@@ -3022,10 +3022,10 @@ void Interface::HandleGUIBehaviour(void)
 				}
 			}
 			if (flg & DF_OPENCONTINUEWINDOW) {
-				guiscript->RunFunction( "OpenContinueMessageWindow" );
+				guiscript->RunFunction( "GUIWORLD", "OpenContinueMessageWindow" );
 				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
 			} else if (flg & DF_OPENENDWINDOW) {
-				guiscript->RunFunction( "OpenEndMessageWindow" );
+				guiscript->RunFunction( "GUIWORLD", "OpenEndMessageWindow" );
 				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
 			}
 		}
@@ -3034,12 +3034,12 @@ void Interface::HandleGUIBehaviour(void)
 		if (CurrentContainer && UseContainer) {
 			if (!(flg & DF_IN_CONTAINER) ) {
 				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_OR);
-				guiscript->RunFunction( "OpenContainerWindow" );
+				guiscript->RunFunction( "GUIWORLD", "OpenContainerWindow" );
 			}
 		} else {
 			if (flg & DF_IN_CONTAINER) {
 				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_NAND);
-				guiscript->RunFunction( "CloseContainerWindow" );
+				guiscript->RunFunction( "GUIWORLD", "CloseContainerWindow" );
 			}
 		}
 		//end of gui hacks
@@ -5228,11 +5228,11 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 {
 	GetDictionary()->SetAt( "WaitForDisc", (ieDword) disc_number );
 
-	GetGUIScriptEngine()->RunFunction( "OpenWaitForDiscWindow" );
+	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 	do {
 		core->DrawWindows();
 		if (dir_exists (path)) {
-			GetGUIScriptEngine()->RunFunction( "OpenWaitForDiscWindow" );
+			GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 			break;
 		}
 
