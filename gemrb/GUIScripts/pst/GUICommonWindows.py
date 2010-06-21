@@ -588,5 +588,23 @@ def UpdateClock():
 	SetPSTGamedaysAndHourToken ()
 	Button.SetTooltip (65027)
 
+def ActionStopPressed ():
+	for i in range (PARTY_SIZE):
+		if GemRB.GameIsPCSelected (i + 1):
+			GemRB.ClearActions (i + 1)
+	return
+
+def ActionTalkPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK,GA_NO_DEAD|GA_NO_ENEMY|GA_NO_HIDDEN)
+
+def ActionAttackPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK,GA_NO_DEAD|GA_NO_SELF|GA_NO_HIDDEN)
+
+def ActionDefendPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND,GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
+
+def ActionThievingPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
+
 def CheckLevelUp(pc):
 	GemRB.SetVar ("CheckLevelUp"+str(pc), CanLevelUp (pc))

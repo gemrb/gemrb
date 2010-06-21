@@ -737,8 +737,29 @@ def PortraitButtonOnMouseLeave ():
 	Button = PortraitWindow.GetControl (i-1)
 	Button.EnableBorder (FRAME_PC_TARGET, 0)
 	GemRB.SetVar ("PressedPortrait", 0)
-	GemRB.SetTimedEventByName ("CheckDragging",1)
+	GemRB.SetTimedEvent (CheckDragging, 1)
 	return
+
+def ActionStopPressed ():
+	for i in range (PARTY_SIZE):
+		if GemRB.GameIsPCSelected (i + 1):
+			GemRB.ClearActions (i + 1)
+	return
+
+def ActionTalkPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK,GA_NO_DEAD|GA_NO_ENEMY|GA_NO_HIDDEN)
+
+def ActionAttackPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK,GA_NO_DEAD|GA_NO_SELF|GA_NO_HIDDEN)
+
+def ActionDefendPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND,GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
+
+def ActionThievingPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
+
+def MinimizePortraits():
+	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_OR)
 
 def OpenWaitForDiscWindow ():
 	global DiscWindow
