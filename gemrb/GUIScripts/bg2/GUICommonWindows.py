@@ -224,7 +224,7 @@ def GroupControls ():
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%idx,0,0,-1)
 		Button.SetVarAssoc ("Formation", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectFormation)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectFormation)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SetupFormation)
 		str = GemRB.GetString (4935)
 		Button.SetTooltip ("F%d - %s"%(8+i,str) )
