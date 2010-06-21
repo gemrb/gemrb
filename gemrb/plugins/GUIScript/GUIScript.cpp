@@ -1720,7 +1720,7 @@ static PyObject* GemRB_Control_SetEventByName(PyObject * /*self*/, PyObject* arg
 		return AttributeError( GemRB_Control_SetEventByName__doc );
 	}
 	if (!PyString_Check(funcName)) {
-		return AttributeError( GemRB_SetTimedEventByName__doc );
+		return AttributeError( GemRB_Control_SetEventByName__doc );
 	}
 
 	Control* ctrl = GetControl( WindowIndex, ControlIndex, -1 );
