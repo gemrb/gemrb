@@ -26,6 +26,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_modal import *
+from ie_action import *
 from GUICommon import *
 from LUCommon import *
 

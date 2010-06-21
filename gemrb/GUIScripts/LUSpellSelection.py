@@ -87,7 +87,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 		GemRB.LoadWindowPack("GUICG", 640, 480)
 		SpellsWindow = GemRB.LoadWindow (7)
 		if not recommend:
-			CloseOtherWindow (SpellsWindow.Unload)
+			GUICommon.CloseOtherWindow (SpellsWindow.Unload)
 		DoneButton = SpellsWindow.GetControl (0)
 		SpellsTextArea = SpellsWindow.GetControl (27)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x1000001b)
