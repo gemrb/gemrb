@@ -621,12 +621,12 @@ def PortraitSelect():
 
 	PortraitLeftButton = PortraitWindow.GetControl (2)
 	PortraitLeftButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitLeftButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitLeftPress")
+	PortraitLeftButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CGPortraitLeftPress")
 	PortraitLeftButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 	PortraitRightButton = PortraitWindow.GetControl (3)
 	PortraitRightButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitRightButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitRightPress")
+	PortraitRightButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CGPortraitRightPress")
 	PortraitRightButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 	PortraitCustomButton = PortraitWindow.GetControl (6)
@@ -636,13 +636,13 @@ def PortraitSelect():
 
 	PortraitDoneButton = PortraitWindow.GetControl (0)
 	PortraitDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitDonePress")
+	PortraitDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CGPortraitDonePress")
 	PortraitDoneButton.SetText (11973)
 	PortraitDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	PortraitCancelButton = PortraitWindow.GetControl (5)
 	PortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitCancelPress")
+	PortraitCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CGPortraitCancelPress")
 	PortraitCancelButton.SetText (13727)
 	PortraitCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -653,7 +653,7 @@ def PortraitSelect():
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
-def PortraitLeftPress():
+def CGPortraitLeftPress():
 	global PortraitWindow, Portrait, PortraitsTable, PortraitPortraitButton
 
 	while True:
@@ -664,7 +664,7 @@ def PortraitLeftPress():
 			PortraitPortraitButton.SetPicture(PortraitsTable.GetRowName (Portrait) + "G")
 			return
 
-def PortraitRightPress():
+def CGPortraitRightPress():
 	global PortraitWindow, Portrait, PortraitsTable, PortraitPortraitButton
 
 	while True:
@@ -705,7 +705,7 @@ def CustomAbort():
 		CustomWindow.Unload ()
 	return
 
-def LargeCustomPortrait():
+def CGLargeCustomPortrait():
 	Window = CustomWindow
 
 	Portrait = PortraitList1.QueryText ()
@@ -728,7 +728,7 @@ def LargeCustomPortrait():
 	Button.SetPicture (Portrait, "NOPORTMD")
 	return
 
-def SmallCustomPortrait():
+def CGSmallCustomPortrait():
 	Window = CustomWindow
 
 	Portrait = PortraitList2.QueryText ()
@@ -759,13 +759,13 @@ def PortraitCustomPress():
 	CustomWindow = Window = GemRB.LoadWindow (18)
 	PortraitList1 = Window.GetControl (2)
 	RowCount1 = PortraitList1.GetPortraits (0)
-	PortraitList1.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "LargeCustomPortrait")
+	PortraitList1.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "CGLargeCustomPortrait")
 	GemRB.SetVar ("Row1", RowCount1)
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	PortraitList2 = Window.GetControl (4)
 	RowCount2 = PortraitList2.GetPortraits (1)
-	PortraitList2.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "SmallCustomPortrait")
+	PortraitList2.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "CGSmallCustomPortrait")
 	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
 
@@ -791,7 +791,7 @@ def PortraitCustomPress():
 	Window.ShowModal (MODAL_SHADOW_NONE)
 	return
 
-def PortraitDonePress():
+def CGPortraitDonePress():
 	global CharGenWindow, CharGenState, PortraitWindow, PortraitButton, PortraitsTable, Portrait, GenderButton, RaceButton
 
 	PortraitName = PortraitsTable.GetRowName (Portrait )
@@ -809,7 +809,7 @@ def PortraitDonePress():
 		PortraitWindow.Unload ()
 	return
 
-def PortraitCancelPress():
+def CGPortraitCancelPress():
 	global CharGenWindow, PortraitWindow
 
 	if PortraitWindow:
