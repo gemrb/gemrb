@@ -176,21 +176,11 @@ void DisplayMessage::DisplayConstantStringNameString(int stridx, unsigned int co
 // <charname> - blah blah
 void DisplayMessage::DisplayConstantStringName(int stridx, unsigned int color, const Scriptable *speaker) const
 {
-	unsigned int speaker_color;
-	const char *name;
-
 	if (stridx<0) return;
 	if(!speaker) return;
-	speaker_color = GetSpeakerColor(name, speaker);
-	char* text = core->GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
-	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
-		+ strlen( text ) + 18);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormatName, speaker_color, name, color,
-		text );
-	core->FreeString( text );
-	DisplayString( newstr );
-	free( newstr );
+
+	const char* text = core->GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
+	DisplayStringName(text, color, speaker);
 }
 
 void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *attacker, const Scriptable *target) const
@@ -217,20 +207,10 @@ void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color,
 
 void DisplayMessage::DisplayStringName(int stridx, unsigned int color, const Scriptable *speaker, ieDword flags) const
 {
-	unsigned int speaker_color;
-	const char *name;
-
 	if (stridx<0) return;
-	speaker_color = GetSpeakerColor(name, speaker);
 
-	char* text = core->GetString( stridx, flags);
-	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
-		+ strlen( text ) + 10);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormatName, speaker_color, name, color, text );
-	core->FreeString( text );
-	DisplayString( newstr );
-	free( newstr );
+	const char* text = core->GetString( stridx, flags);
+	DisplayStringName(text, color, speaker);
 }
 
 void DisplayMessage::DisplayStringName(const char *text, unsigned int color, const Scriptable *speaker) const
@@ -242,7 +222,7 @@ void DisplayMessage::DisplayStringName(const char *text, unsigned int color, con
 	speaker_color = GetSpeakerColor(name, speaker);
 
 	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
-		+ strlen( text ) + 10);
+		+ strlen( text ) + 18);
 	char* newstr = ( char* ) malloc( newlen );
 	snprintf( newstr, newlen, DisplayFormatName, speaker_color, name, color, text );
 	DisplayString( newstr );
