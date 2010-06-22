@@ -92,6 +92,9 @@ def CloseWindows ():
 	return
 
 def CloseStoreWindow ():
+	import GUICommonWindows
+	import GUIINV
+
 	global StoreWindow, ActionWindow, PortraitWindow
 	global OldPortraitWindow
 
@@ -107,7 +110,7 @@ def CloseStoreWindow ():
 	GemRB.LeaveStore ()
 	GUICommonWindows.PortraitWindow = OldPortraitWindow
 	if Inventory:
-		GemRB.RunEventHandler("OpenInventoryWindow")
+		GUIINV.OpenInventoryWindow ()
 	else:
 		GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
 		GemRB.UnhideGUI () #enabling the other windows
