@@ -1279,7 +1279,7 @@ def UpdatePaperDoll ():
 	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
 	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
 	HairButton.SetBAM ("COLGRAD", 0, 0, HairColor&0xff)
-	PortraitButton.SetPLT (GetActorPaperDoll (pc),
+	PortraitButton.SetPLT (GUICommon.GetActorPaperDoll (pc),
 		Color1, MinorColor, MajorColor, SkinColor, Color5, Color6, HairColor, 0, 0)
 	return
 
