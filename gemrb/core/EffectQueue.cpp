@@ -21,6 +21,7 @@
 #include "EffectQueue.h"
 
 #include "Actor.h"
+#include "DisplayMessage.h"
 #include "Effect.h"
 #include "Game.h"
 #include "Interface.h"
@@ -1128,7 +1129,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply) con
 	if( fn) {
 		if(  target && first_apply ) {
 			if( !target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-				core->DisplayStringName( Opcodes[fx->Opcode].Strref, 0xf0f0f0,
+				displaymsg->DisplayStringName( Opcodes[fx->Opcode].Strref, 0xf0f0f0,
 					target, IE_STR_SOUND);
 			}
 		}

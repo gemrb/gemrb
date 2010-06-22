@@ -23,6 +23,7 @@
 #include "win32def.h"
 
 #include "Audio.h"
+#include "DisplayMessage.h"
 #include "GSUtils.h"
 #include "Game.h"
 #include "GameControl.h"
@@ -1762,10 +1763,10 @@ void Highlightable::TryDisarm(Actor *actor)
 		LastDisarmed = actor->GetID();
 		//trap removed
 		Trapped = 0;
-		core->DisplayConstantStringName(STR_DISARM_DONE, 0xd7d7be, actor);
+		displaymsg->DisplayConstantStringName(STR_DISARM_DONE, 0xd7d7be, actor);
 		actor->AddExperience(XP_DISARM, actor->GetXPLevel(1));
 	} else {
-		core->DisplayConstantStringName(STR_DISARM_FAIL, 0xd7d7be, actor);
+		displaymsg->DisplayConstantStringName(STR_DISARM_FAIL, 0xd7d7be, actor);
 		TriggerTrap(skill, LastTrigger);
 	}
 	ImmediateEvent();
@@ -1775,15 +1776,15 @@ void Door::TryPickLock(Actor *actor)
 {
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		if (LockDifficulty == 100) {
-			core->DisplayConstantStringName(STR_DOOR_NOPICK, 0xbcefbc, actor);
+			displaymsg->DisplayConstantStringName(STR_DOOR_NOPICK, 0xbcefbc, actor);
 		} else {
-			core->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
+			displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
 			LastPickLockFailed = actor->GetID();
 		}
 		return;
 	}
 	SetDoorLocked( false, true);
-	core->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
+	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
 	LastUnlocked = actor->GetID();
 	ImmediateEvent();
 	actor->AddExperience(XP_LOCKPICK, actor->GetXPLevel(1));
@@ -1798,11 +1799,11 @@ void Door::TryBashLock(Actor *actor)
 
 	//bonus will never reach 100
 	if(bonus < LockDifficulty) {
-		core->DisplayConstantStringName(STR_DOORBASH_FAIL, 0xbcefbc, actor);
+		displaymsg->DisplayConstantStringName(STR_DOORBASH_FAIL, 0xbcefbc, actor);
 		return;
 	}
 
-	core->DisplayConstantStringName(STR_DOORBASH_DONE, 0xd7d7be, actor);
+	displaymsg->DisplayConstantStringName(STR_DOORBASH_DONE, 0xd7d7be, actor);
 	SetDoorLocked(false, true);
 	//Is this really useful ?
 	LastUnlocked = actor->GetID();
@@ -2235,15 +2236,15 @@ void Container::TryPickLock(Actor *actor)
 {
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		if (LockDifficulty == 100) {
-			core->DisplayConstantStringName(STR_CONT_NOPICK, 0xbcefbc, actor);
+			displaymsg->DisplayConstantStringName(STR_CONT_NOPICK, 0xbcefbc, actor);
 		} else {
-			core->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
+			displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
 			LastPickLockFailed = actor->GetID();
 		}
 		return;
 	}
 	SetContainerLocked(false);
-	core->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
+	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
 	LastUnlocked = actor->GetID();
 	ImmediateEvent();
 	actor->AddExperience(XP_LOCKPICK, actor->GetXPLevel(1));
@@ -2258,11 +2259,11 @@ void Container::TryBashLock(Actor *actor)
 
 	//bonus will never reach 100
 	if(bonus < LockDifficulty) {
-		core->DisplayConstantStringName(STR_CONTBASH_FAIL, 0xbcefbc, actor);
+		displaymsg->DisplayConstantStringName(STR_CONTBASH_FAIL, 0xbcefbc, actor);
 		return;
 	}
 
-	core->DisplayConstantStringName(STR_CONTBASH_DONE, 0xd7d7be, actor);
+	displaymsg->DisplayConstantStringName(STR_CONTBASH_DONE, 0xd7d7be, actor);
 	SetContainerLocked(false);
 	//Is this really useful ?
 	LastUnlocked = actor->GetID();

@@ -26,6 +26,7 @@
 #include "Button.h"
 #include "ControlAnimation.h"
 #include "DataFileMgr.h"
+#include "DisplayMessage.h"
 #include "EffectQueue.h"
 #include "GSUtils.h" //checkvariable
 #include "Game.h"
@@ -6925,7 +6926,7 @@ int CheckRemoveItem(Actor *actor, CREItem *si)
 		if (UsedItems[i].username[0] && strnicmp(UsedItems[i].username, actor->GetScriptName(), 32) ) {
 			continue;
 		}
-		core->DisplayString(UsedItems[i].value,0xffffff, IE_STR_SOUND);
+		displaymsg->DisplayString(UsedItems[i].value,0xffffff, IE_STR_SOUND);
 		return 1;
 	}
 	return 0;
@@ -6949,7 +6950,7 @@ CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 	///fixme: make difference between cursed/unmovable
 	if (! actor->inventory.UnEquipItem( Slot, false )) {
 		// Item is currently undroppable/cursed
-		core->DisplayConstantString(STR_CANT_DROP_ITEM,0xffffff);
+		displaymsg->DisplayConstantString(STR_CANT_DROP_ITEM,0xffffff);
 		return NULL;
 	}
 	si = actor->inventory.RemoveItem( Slot, Count );
@@ -7133,7 +7134,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	// can't equip item because of similar already equipped
 	if (Effect) {
 		if (item->ItemExcl & actor->inventory.GetEquipExclusion(Slot)) {
-			core->DisplayConstantString(STR_ITEMEXCL, 0xf0f0f0);
+			displaymsg->DisplayConstantString(STR_ITEMEXCL, 0xf0f0f0);
 			//freeing the item before returning
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
 			return PyInt_FromLong( 0 );
@@ -7144,7 +7145,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if ( (Slottype == SLOT_ITEM) && !(slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
 		ITMExtHeader *eh = item->GetExtHeader(0);
 		if (eh && eh->IDReq) {
-			core->DisplayConstantString(STR_ITEMID, 0xf0f0f0);
+			displaymsg->DisplayConstantString(STR_ITEMID, 0xf0f0f0);
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
 			return PyInt_FromLong( 0 );
 		}
@@ -7178,7 +7179,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		//swapping won't cure this
 		res = actor->inventory.WhyCantEquip(Slot, slotitem->Flags&IE_INV_ITEM_TWOHANDED);
 		if (res) {
-			core->DisplayConstantString(res,0xffffff);
+			displaymsg->DisplayConstantString(res,0xffffff);
 			return PyInt_FromLong( 0 );
 		}
 		CREItem *tmp = TryToUnequip(actor, Slot, 0 );
@@ -7460,9 +7461,9 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 		}
 		if (!quiet) {
 			if (gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) {
-				core->DisplayConstantString(STR_PAUSED,0xff0000);
+				displaymsg->DisplayConstantString(STR_PAUSED,0xff0000);
 			} else {
-				core->DisplayConstantString(STR_UNPAUSED,0xff0000);
+				displaymsg->DisplayConstantString(STR_UNPAUSED,0xff0000);
 			}
 		}
 	}
@@ -9110,9 +9111,9 @@ static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 		if (!actor) {
 			return RuntimeError( "Actor not found" );
 		}
-		core->DisplayStringName(strref, (unsigned int) color, actor, IE_STR_SOUND);
+		displaymsg->DisplayStringName(strref, (unsigned int) color, actor, IE_STR_SOUND);
 	} else {
-		core->DisplayString(strref, (unsigned int) color, IE_STR_SOUND);
+		displaymsg->DisplayString(strref, (unsigned int) color, IE_STR_SOUND);
 	}
 	Py_INCREF( Py_None );
 	return Py_None;

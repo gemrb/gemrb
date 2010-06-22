@@ -39,6 +39,7 @@
 #include "Console.h"
 #include "DataFileMgr.h"
 #include "DialogMgr.h"
+#include "DisplayMessage.h"
 #include "EffectMgr.h"
 #include "EffectQueue.h"
 #include "Factory.h"
@@ -83,8 +84,6 @@ GEM_EXPORT HANDLE hConsole;
 
 //use DialogF.tlk if the protagonist is female, that's why we leave space
 static const char dialogtlk[] = "dialog.tlk\0";
-
-static int strref_table[STRREF_COUNT];
 
 static int MaximumAbility = 25;
 static ieWordSigned *strmod = NULL;
@@ -135,6 +134,7 @@ Interface::Interface(int iargc, char* iargv[])
 	UseContainer = false;
 	InfoTextPalette = NULL;
 	timer = NULL;
+	displaymsg = NULL;
 	evntmgr = NULL;
 	console = NULL;
 	slottypes = NULL;
@@ -361,6 +361,7 @@ Interface::~Interface(void)
 	delete pal16;
 
 	delete timer;
+	delete displaymsg;
 
 	if (video) {
 
@@ -886,7 +887,7 @@ bool Interface::ReadDamageTypeTable() {
 
 	DamageInfoStruct di;
 	for (ieDword i = 0; i < tm->GetRowCount(); i++) {
-		di.strref = core->GetStringReference(atoi(tm->QueryField(i, 0)));
+		di.strref = displaymsg->GetStringReference(atoi(tm->QueryField(i, 0)));
 		di.resist_stat = TranslateStat(tm->QueryField(i, 1));
 		di.value = strtol(tm->QueryField(i, 2), (char **) NULL, 16);
 		di.iwd_mod_type = atoi(tm->QueryField(i, 3));
@@ -981,20 +982,6 @@ void Interface::Main()
 		}
 	} while (video->SwapBuffers() == GEM_OK);
 	gamedata->FreePalette( palette );
-}
-
-bool Interface::ReadStrrefs()
-{
-	int i;
-	memset(strref_table,-1,sizeof(strref_table) );
-	AutoTable tab("strings");
-	if (!tab) {
-		return false;
-	}
-	for(i=0;i<STRREF_COUNT;i++) {
-		strref_table[i]=atoi(tab->QueryField(i,0));
-	}
-	return true;
 }
 
 int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
@@ -1617,9 +1604,9 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	ret = ReadStrrefs();
+	displaymsg = new DisplayMessage();
 	printMessage( "Core", "Initializing string constants...", WHITE );
-	if (!ret) {
+	if (!displaymsg) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
@@ -3947,14 +3934,14 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 		//switch for IE_INV_ITEM_* if it is a CREItem
 		if (item->Flags&IE_ITEM_TWO_HANDED) {
 			//cannot equip twohanded in offhand
-			if (feedback) DisplayConstantString(STR_NOT_IN_OFFHAND, 0xf0f0f0);
+			if (feedback) displaymsg->DisplayConstantString(STR_NOT_IN_OFFHAND, 0xf0f0f0);
 			return 0;
 		}
 	}
 
 	if ( (unsigned int) item->ItemType>=(unsigned int) ItemTypes) {
 		//invalid itemtype
-		if (feedback) DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
+		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
 		return 0;
 	}
 
@@ -3962,7 +3949,7 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 	if (actor) {
 		ieStrRef str = actor->Unusable(item);
 		if (str) {
-			if (feedback) DisplayConstantString(str, 0xf0f0f0);
+			if (feedback) displaymsg->DisplayConstantString(str, 0xf0f0f0);
 			return 0;
 		}
 	}
@@ -3973,7 +3960,7 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 		ret = 1;
 	}
 	if (!ret) {
-		if (feedback) DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
+		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
 		return 0;
 	}
 
@@ -3997,7 +3984,7 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 			}
 
 			if (!ret) {
-				DisplayConstantString(STR_UNUSABLEITEM, 0xf0f0f0);
+				displaymsg->DisplayConstantString(STR_UNUSABLEITEM, 0xf0f0f0);
 				return 0;
 			}
 		}
@@ -4040,206 +4027,6 @@ TextArea *Interface::GetMessageTextArea() const
 		}
 	}
 	return NULL;
-}
-
-void Interface::DisplayString(const char* Text, Scriptable *target) const
-{
-	Label *l = GetMessageLabel();
-	if (l) {
-		l->SetText(Text, 0);
-	}
-	TextArea *ta = GetMessageTextArea();
-	if (ta) {
-		ta->AppendText( Text, -1 );
-	} else {
-		if(target) {
-			char *tmp = strdup(Text);
-
-			target->DisplayHeadText(tmp);
-		}
-	}
-}
-
-#define PALSIZE 8
-static Color ActorColor[PALSIZE];
-static const char* DisplayFormatName = "[color=%lX]%s - [/color][p][color=%lX]%s[/color][/p]";
-static const char* DisplayFormatAction = "[color=%lX]%s - [/color][p][color=%lX]%s %s[/color][/p]";
-static const char* DisplayFormat = "[/color][p][color=%lX]%s[/color][/p]";
-static const char* DisplayFormatValue = "[/color][p][color=%lX]%s: %d[/color][/p]";
-static const char* DisplayFormatNameString = "[color=%lX]%s - [/color][p][color=%lX]%s: %s[/color][/p]";
-
-ieStrRef Interface::GetStringReference(int stridx) const
-{
-	return strref_table[stridx];
-}
-
-bool Interface::HasStringReference(int stridx) const
-{
-	return strref_table[stridx] != -1;
-}
-
-unsigned int Interface::GetSpeakerColor(const char *&name, const Scriptable *&speaker) const
-{
-	unsigned int speaker_color;
-
-	if(!speaker) return 0;
-	switch (speaker->Type) {
-		case ST_ACTOR:
-			name = speaker->GetName(-1);
-			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR) & 0xFF, PALSIZE, ActorColor );
-			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
-			break;
-		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-			name = GetString( ((InfoPoint *) speaker)->DialogName );
-			speaker_color = 0xc0c0c0;
-			break;
-		default:
-			name = "";
-			speaker_color = 0x800000;
-			break;
-	}
-	return speaker_color;
-}
-
-
-//simply displaying a constant string
-void Interface::DisplayConstantString(int stridx, unsigned int color, Scriptable *target) const
-{
-	if (stridx<0) return;
-	char* text = GetString( strref_table[stridx], IE_STR_SOUND );
-	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 12);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormat, color, text );
-	FreeString( text );
-	DisplayString( newstr, target);
-	free( newstr );
-}
-
-void Interface::DisplayString(int stridx, unsigned int color, ieDword flags) const
-{
-	if (stridx<0) return;
-	char* text = GetString( stridx, flags);
-	int newlen = (int)(strlen( DisplayFormat) + strlen( text ) + 10);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormat, color, text );
-	FreeString( text );
-	DisplayString( newstr );
-	free( newstr );
-}
-
-// String format is
-// blah : whatever
-void Interface::DisplayConstantStringValue(int stridx, unsigned int color, ieDword value) const
-{
-	if (stridx<0) return;
-	char* text = GetString( strref_table[stridx], IE_STR_SOUND );
-	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 28);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormatValue, color, text, (int) value );
-	FreeString( text );
-	DisplayString( newstr );
-	free( newstr );
-}
-
-// String format is
-// <charname> - blah blah : whatever
-void Interface::DisplayConstantStringNameString(int stridx, unsigned int color, int stridx2, const Scriptable *actor) const
-{
-	unsigned int actor_color;
-	const char *name;
-
-	if (stridx<0) return;
-	actor_color = GetSpeakerColor(name, actor);
-	char* text = GetString( strref_table[stridx], IE_STR_SOUND );
-	char* text2 = GetString( strref_table[stridx2], IE_STR_SOUND );
-	int newlen = (int)(strlen( DisplayFormat ) + strlen(name) + strlen( text ) + strlen(text2) + 18);
-	char* newstr = ( char* ) malloc( newlen );
-	if (strlen(text2)) {
-		snprintf( newstr, newlen, DisplayFormatNameString, actor_color, name, color, text, text2 );
-	} else {
-		snprintf( newstr, newlen, DisplayFormatName, color, name, color, text );
-	}
-	FreeString( text );
-	FreeString( text2 );
-	DisplayString( newstr );
-	free( newstr );
-}
-
-// String format is
-// <charname> - blah blah
-void Interface::DisplayConstantStringName(int stridx, unsigned int color, const Scriptable *speaker) const
-{
-	unsigned int speaker_color;
-	const char *name;
-
-	if (stridx<0) return;
-	if(!speaker) return;
-	speaker_color = GetSpeakerColor(name, speaker);
-	char* text = GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
-	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
-		+ strlen( text ) + 18);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormatName, speaker_color, name, color,
-		text );
-	FreeString( text );
-	DisplayString( newstr );
-	free( newstr );
-}
-
-void Interface::DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *attacker, const Scriptable *target) const
-{
-	unsigned int attacker_color;
-	const char *name1;
-	const char *name2;
-
-	if (stridx<0) return;
-
-	GetSpeakerColor(name2, target);
-	attacker_color = GetSpeakerColor(name1, attacker);
-
-	char* text = GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
-	int newlen = (int)(strlen( DisplayFormatAction ) + strlen( name1 ) +
-		+ strlen( name2 ) + strlen( text ) + 18);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormatAction, attacker_color, name1, color,
-		text, name2);
-	FreeString( text );
-	DisplayString( newstr );
-	free( newstr );
-}
-
-void Interface::DisplayStringName(int stridx, unsigned int color, const Scriptable *speaker, ieDword flags) const
-{
-	unsigned int speaker_color;
-	const char *name;
-
-	if (stridx<0) return;
-	speaker_color = GetSpeakerColor(name, speaker);
-
-	char* text = GetString( stridx, flags);
-	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
-		+ strlen( text ) + 10);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormatName, speaker_color, name, color, text );
-	FreeString( text );
-	DisplayString( newstr );
-	free( newstr );
-}
-
-void Interface::DisplayStringName(const char *text, unsigned int color, const Scriptable *speaker) const
-{
-	unsigned int speaker_color;
-	const char *name;
-
-	if (!text) return;
-	speaker_color = GetSpeakerColor(name, speaker);
-
-	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
-		+ strlen( text ) + 10);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormatName, speaker_color, name, color, text );
-	DisplayString( newstr );
-	free( newstr );
 }
 
 static const char *saved_extensions[]={".are",".sto",0};
@@ -5140,7 +4927,7 @@ int Interface::Autopause(ieDword flag)
 
 	vars->Lookup("Auto Pause State", autopause_flags);
 	if (autopause_flags & (1<<flag)) {
-		DisplayConstantString(STR_AP_UNUSABLE+flag, 0xff0000);
+		displaymsg->DisplayConstantString(STR_AP_UNUSABLE+flag, 0xff0000);
 		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
 		return 1;
 	}

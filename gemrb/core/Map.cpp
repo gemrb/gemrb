@@ -27,6 +27,7 @@
 #include "Ambient.h"
 #include "AmbientMgr.h"
 #include "Audio.h"
+#include "DisplayMessage.h"
 #include "GSUtils.h"
 #include "Game.h"
 #include "GameControl.h"
@@ -514,7 +515,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	int EveryOne = ip->CheckTravel(actor);
 	switch(EveryOne) {
 	case CT_GO_CLOSER:
-		core->DisplayConstantString(STR_WHOLEPARTY,0xffffff); //white
+		displaymsg->DisplayConstantString(STR_WHOLEPARTY,0xffffff); //white
 		if (game->EveryoneStopped()) {
 			ip->Flags&=~TRAP_RESET; //exit triggered
 		}
@@ -2790,7 +2791,7 @@ bool Map::Rest(const Point &pos, int hours, int day)
 			// ensure a minimum power level, since many creatures have this as 0
 			int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
 
-			core->DisplayString( RestHeader.Strref[idx], 0x00404000, IE_STR_SOUND );
+			displaymsg->DisplayString( RestHeader.Strref[idx], 0x00404000, IE_STR_SOUND );
 			while (spawnamount > 0 && spawncount <= RestHeader.Maximum) {
 				SpawnCreature(pos, RestHeader.CreResRef[idx], 20);
 				spawnamount -= cpl;
@@ -3194,16 +3195,16 @@ bool Map::DisplayTrackString(Actor *target)
 	int skill = target->GetStat(IE_TRACKING);
 	skill += (target->GetStat(IE_LEVEL)/3)*5 + target->GetStat(IE_WIS)*5;
 	if (core->Roll(1, 100, trackDiff) > skill) {
-		core->DisplayConstantStringName(STR_TRACKINGFAILED, 0xd7d7be, target);
+		displaymsg->DisplayConstantStringName(STR_TRACKINGFAILED, 0xd7d7be, target);
 		return true;
 	}
 	if (trackFlag) {
 			char * str = core->GetString( trackString);
 			core->GetTokenDictionary()->SetAt( "CREATURE", str);
-			core->DisplayConstantStringName(STR_TRACKING, 0xd7d7be, target);
+			displaymsg->DisplayConstantStringName(STR_TRACKING, 0xd7d7be, target);
 			return false;
 	}
-	core->DisplayStringName(trackString, 0xd7d7be, target, 0);
+	displaymsg->DisplayStringName(trackString, 0xd7d7be, target, 0);
 	return false;
 }
 

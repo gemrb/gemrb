@@ -25,6 +25,7 @@
 #include "AmbientMgr.h"
 #include "Audio.h"
 #include "DataFileMgr.h"
+#include "DisplayMessage.h"
 #include "GSUtils.h"
 #include "Game.h"
 #include "GameControl.h"
@@ -2302,7 +2303,7 @@ void GameScript::RemoveTraps(Scriptable* Sender, Action* parameters)
 			}
 		} else {
 			//no trap here
-			//core->DisplayString(STR_NOT_TRAPPED);
+			//displaymsg->DisplayString(STR_NOT_TRAPPED);
 		}
 	} else {
 		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE,0);
@@ -2366,7 +2367,7 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 			}
 		} else {
 			//notlocked
-			//core->DisplayString(STR_NOT_LOCKED);
+			//displaymsg->DisplayString(STR_NOT_LOCKED);
 		}
 	} else {
 		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE,0);
@@ -2450,7 +2451,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 		if (!door->TryUnlock(actor)) {
-			core->DisplayConstantString(STR_DOORLOCKED,0xd7d7be,door);
+			displaymsg->DisplayConstantString(STR_DOORLOCKED,0xd7d7be,door);
 			//playsound unsuccessful opening of door
 			if(door->IsOpen())
 				core->PlaySound(DS_CLOSE_FAIL);
@@ -2981,11 +2982,11 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	int xp = parameters->int0Parameter;
-	if (core->HasStringReference(STR_GOTQUESTXP)) {
+	if (displaymsg->HasStringReference(STR_GOTQUESTXP)) {
 		core->GetTokenDictionary()->SetAtCopy("EXPERIENCEAMOUNT", xp);
-		core->DisplayConstantStringName(STR_GOTQUESTXP, 0xbcefbc, actor);
+		displaymsg->DisplayConstantStringName(STR_GOTQUESTXP, 0xbcefbc, actor);
 	} else {
-		core->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword)xp);
+		displaymsg->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword)xp);
 	}
 	actor->AddExperience(xp);
 }
@@ -3001,7 +3002,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 	}
 
 	if (parameters->int0Parameter>0) {
-		core->DisplayString(parameters->int0Parameter, 0x40f0f000,IE_STR_SOUND);
+		displaymsg->DisplayString(parameters->int0Parameter, 0x40f0f000,IE_STR_SOUND);
 	}
 	if (!xptable) {
 		printMessage("GameScript","Can't perform ADDXP2DA",LIGHT_RED);
@@ -4121,9 +4122,9 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 			Map *map=tar->GetCurrentArea();
 			// drop it at my feet
 			map->AddItemToLocation(tar->Pos, item);
-			if (((Actor *)tar)->InParty) core->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
+			if (((Actor *)tar)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
 		} else {
-			if (((Actor *)tar)->InParty) core->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
+			if (((Actor *)tar)->InParty) displaymsg->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
 		}
 	}
 }
@@ -4152,9 +4153,9 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
 			map->AddItemToLocation(Sender->Pos, item);
-			if (((Actor *)Sender)->InParty) core->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
+			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
 		} else {
-			if (((Actor *)Sender)->InParty) core->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
+			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
 		}
 	}
 }
@@ -4391,7 +4392,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 
 	if (scr->LastTarget) {
-		core->DisplayConstantString(STR_PICKPOCKET_EVIL,0xffffff);
+		displaymsg->DisplayConstantString(STR_PICKPOCKET_EVIL,0xffffff);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -4400,7 +4401,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	skill+=core->Roll(1,100,1);
 	if (skill<100) {
 		//noticed
-		core->DisplayConstantString(STR_PICKPOCKET_FAIL,0xffffff);
+		displaymsg->DisplayConstantString(STR_PICKPOCKET_FAIL,0xffffff);
 		tar->LastOpenFailed=snd->GetID();
 		Sender->ReleaseCurrentAction();
 		return;
@@ -4416,7 +4417,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		}
 		if (!money) {
 			//no stuff to steal
-			core->DisplayConstantString(STR_PICKPOCKET_NONE,0xffffff);
+			displaymsg->DisplayConstantString(STR_PICKPOCKET_NONE,0xffffff);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -4428,13 +4429,13 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
 			map->AddItemToLocation(Sender->Pos, item);
-			if (((Actor *)Sender)->InParty) core->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
+			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
 	}
 
-	core->DisplayConstantString(STR_PICKPOCKET_DONE,0xffffff);
+	displaymsg->DisplayConstantString(STR_PICKPOCKET_DONE,0xffffff);
 	DisplayStringCore(snd, VB_PP_SUCC, DS_CONSOLE|DS_CONST );
 	Sender->ReleaseCurrentAction();
 }
@@ -4670,7 +4671,7 @@ void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
 	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BM_OR);
-	core->DisplayConstantString(STR_WORLDMAPCHANGE, 0xc8ffc8);
+	displaymsg->DisplayConstantString(STR_WORLDMAPCHANGE, 0xc8ffc8);
 }
 
 void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
@@ -5239,7 +5240,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		if (!container->TryUnlock(actor)) {
 			//playsound can't open container
 			//display string, etc
-			core->DisplayConstantString(STR_CONTLOCKED,0xd7d7be,container);
+			displaymsg->DisplayConstantString(STR_CONTLOCKED,0xd7d7be,container);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -5803,7 +5804,7 @@ void GameScript::PauseGame(Scriptable* Sender, Action* /*parameters*/)
 	GameControl *gc = core->GetGameControl();
 	if (gc) {
 		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
-		core->DisplayConstantString(STR_SCRIPTPAUSED,0xff0000);
+		displaymsg->DisplayConstantString(STR_SCRIPTPAUSED,0xff0000);
 	}
 	// releasing this action allows actions to continue executing,
 	// so we force a wait

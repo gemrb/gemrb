@@ -34,6 +34,7 @@
 #include "GameControl.h" //checking for dialog
 #include "GameData.h"
 #include "GameScript.h"
+#include "DisplayMessage.h"
 #include "Interface.h"
 #include "Item.h"
 #include "Projectile.h"
@@ -574,15 +575,15 @@ void ApplyClab(Actor *actor, const char *clab, int level)
 				}
 				else if (!memcmp(res,"FA_",3)) {//iwd2 only
 					int x=atoi(res+3);
-					core->DisplayStringName(x,0xffffff,actor,0);
+					displaymsg->DisplayStringName(x,0xffffff,actor,0);
 				}
 				else if (!memcmp(res,"FS_",3)) {//iwd2? (song?)
 					int x=atoi(res+3);
-					core->DisplayStringName(x,0xffffff,actor,0);
+					displaymsg->DisplayStringName(x,0xffffff,actor,0);
 				}
 				else if (!memcmp(res,"RA_",3)) {//iwd2
 					int x=atoi(res+3);
-					core->DisplayStringName(x,0xffffff,actor,0);
+					displaymsg->DisplayStringName(x,0xffffff,actor,0);
 				}
 			}
 		}
@@ -822,7 +823,7 @@ void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		ieDword NeedsLevelUp = 0;
 		core->GetDictionary()->Lookup(varname, NeedsLevelUp);
 		if (NeedsLevelUp == 1) {
-			core->DisplayConstantStringName(STR_LEVELUP, 0xffffff, actor);
+			displaymsg->DisplayConstantStringName(STR_LEVELUP, 0xffffff, actor);
 			actor->GotLUFeedback = true;
 		}
 	}
@@ -2503,7 +2504,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 {
 	bool detailed = false;
 	const char *type_name = "unknown";
-	if (core->HasStringReference(STR_DMG_SLASHING)) { // how and iwd2
+	if (displaymsg->HasStringReference(STR_DMG_SLASHING)) { // how and iwd2
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it != core->DamageInfoMap.end()) {
@@ -2529,30 +2530,30 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			if (resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
 				core->GetTokenDictionary()->SetAtCopy( "RESISTED", abs(resisted));
-				core->DisplayConstantStringName(STR_DAMAGE3, 0xffffff, this);
+				displaymsg->DisplayConstantStringName(STR_DAMAGE3, 0xffffff, this);
 			} else if (resisted > 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage resisted)
 				core->GetTokenDictionary()->SetAtCopy( "RESISTED", abs(resisted));
-				core->DisplayConstantStringName(STR_DAMAGE2, 0xffffff, this);
+				displaymsg->DisplayConstantStringName(STR_DAMAGE2, 0xffffff, this);
 			} else {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
-				core->DisplayConstantStringName(STR_DAMAGE1, 0xffffff, this);
+				displaymsg->DisplayConstantStringName(STR_DAMAGE1, 0xffffff, this);
 			}
 		} else if (stricmp( core->GameType, "pst" ) == 0) {
 			if(0) printf("TODO: pst floating text\n");
-		} else if (core->HasStringReference(STR_DAMAGE1) || !hitter || hitter->Type != ST_ACTOR) {
+		} else if (displaymsg->HasStringReference(STR_DAMAGE1) || !hitter || hitter->Type != ST_ACTOR) {
 			// bg1 and iwd
 			// or traps: "Damage Taken (damage)", but there's no token
 			char tmp[32];
 			snprintf(tmp, sizeof(tmp), "Damage Taken (%d)", damage);
-			core->DisplayStringName(tmp, 0xffffff, this);
+			displaymsg->DisplayStringName(tmp, 0xffffff, this);
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
 			// wipe the DAMAGER token, so we can color it
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", "" );
 			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
-			core->DisplayConstantStringName(STR_DAMAGE1, 0xffffff, hitter);
+			displaymsg->DisplayConstantStringName(STR_DAMAGE1, 0xffffff, hitter);
 		}
 	} else {
 		if (resisted == DR_IMMUNE) {
@@ -2563,12 +2564,12 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 					//<DAMAGEE> was immune to my <TYPE> damage
 					core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
 					core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name );
-					core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
-				} else if (core->HasStringReference(STR_DAMAGE_IMMUNITY) && core->HasStringReference(STR_DAMAGE1)) {
+					displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
+				} else if (displaymsg->HasStringReference(STR_DAMAGE_IMMUNITY) && displaymsg->HasStringReference(STR_DAMAGE1)) {
 					// bg2
 					//<DAMAGEE> was immune to my damage.
 					core->GetTokenDictionary()->SetAtCopy( "DAMAGEE", GetName(1) );
-					core->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
+					displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, 0xffffff, hitter);
 				} // else: other games don't display anything
 			}
 		} else {
@@ -2816,9 +2817,9 @@ int Actor::CastingLevelBonus(int level, int type) const
 	core->GetTokenDictionary()->SetAtCopy("LEVELDIF", bonus);
 
 	if (bonus > 0) {
-		core->DisplayConstantStringName(STR_CASTER_LVL_INC, 0xffffff, this);
+		displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, 0xffffff, this);
 	} else {
-		core->DisplayConstantStringName(STR_CASTER_LVL_DEC, 0xffffff, this);
+		displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, 0xffffff, this);
 	}
 
 	return bonus;
@@ -2921,7 +2922,7 @@ void Actor::Die(Scriptable *killer)
 	ClearActions();
 	ClearPath();
 	SetModal( MS_NONE );
-	core->DisplayConstantStringName(STR_DEATH, 0xffffff, this);
+	displaymsg->DisplayConstantStringName(STR_DEATH, 0xffffff, this);
 	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
 
 	// clearing the search map here means it's not blocked during death animations
@@ -3563,7 +3564,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		return LSR_INVALID;
 	}
 	if (tmp) {
-		core->DisplayConstantStringName(tmp, 0xbcefbc, this);
+		displaymsg->DisplayConstantStringName(tmp, 0xbcefbc, this);
 	}
 	if (flags&LS_ADDXP) {
 		AddExperience(XP_LEARNSPELL, explev);
@@ -3582,7 +3583,7 @@ const char *Actor::GetDialog(int flags) const
 
 	if ( (InternalFlags & IF_NOINT) && CurrentAction) {
 		if (flags>1) {
-			core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+			displaymsg->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 		}
 		return NULL;
 	}
@@ -3621,7 +3622,7 @@ void Actor::SetModal(ieDword newstate, bool force)
 	if (InParty) {
 		// display the turning-off message
 		if (ModalState != MS_NONE) {
-			core->DisplayStringName(core->ModalStates[ModalState].leaving_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
+			displaymsg->DisplayStringName(core->ModalStates[ModalState].leaving_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
 		}
 
 		// when called with the same state twice, toggle to MS_NONE
@@ -4119,7 +4120,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical failure
 		printBracket("Critical Miss", RED);
 		printf("\n");
-		core->DisplayConstantStringName(STR_CRITICAL_MISS, 0xffffff, this);
+		displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, 0xffffff, this);
 		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
 		if (Flags&WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
@@ -4153,7 +4154,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical success
 		printBracket("Critical Hit", GREEN);
 		printf("\n");
-		core->DisplayConstantStringName(STR_CRITICAL_HIT, 0xffffff, this);
+		displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, 0xffffff, this);
 		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
 		ModifyDamage (target, this, damage, resisted, weapon_damagetype[damagetype], &wi, true);
 		UseItem(wi.slot, Flags&WEAPON_RANGED?-2:-1, target, 0, damage);
@@ -4235,15 +4236,15 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 				if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) ) {
  					if (target->Modified[IE_DISABLEBACKSTAB]) {
 						// The backstab seems to have failed
-						core->DisplayConstantString (STR_BACKSTAB_FAIL, 0xffffff);
+						displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, 0xffffff);
 					} else {
 						if (wi->backstabbing) {
 							damage *= Modified[IE_BACKSTABDAMAGEMULTIPLIER];
 							// display a simple message instead of hardcoding multiplier names
-							core->DisplayConstantStringValue (STR_BACKSTAB, 0xffffff, Modified[IE_BACKSTABDAMAGEMULTIPLIER]);
+							displaymsg->DisplayConstantStringValue (STR_BACKSTAB, 0xffffff, Modified[IE_BACKSTABDAMAGEMULTIPLIER]);
 						} else {
 							// weapon is unsuitable for backstab
-							core->DisplayConstantString (STR_BACKSTAB_BAD, 0xffffff);
+							displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, 0xffffff);
 						}
 					}
 				}
@@ -4298,7 +4299,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 		int head = inventory.GetHeadSlot();
 		if ((head!=-1) && target->inventory.HasItemInSlot("",(ieDword) head)) {
 			//critical hit is averted by helmet
-			core->DisplayConstantStringName(STR_NO_CRITICAL, 0xffffff, target);
+			displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, 0xffffff, target);
 		} else {
 			damage <<=1; //critical damage is always double?
 			core->timer->SetScreenShake(16,16,8);
@@ -4321,11 +4322,11 @@ void Actor::UpdateActorState(ieDword gameTime) {
 					core->ApplySpell(ModalSpell, this, this, 0);
 				}
 				if (InParty) {
-					core->DisplayStringName(core->ModalStates[ModalState].entering_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
+					displaymsg->DisplayStringName(core->ModalStates[ModalState].entering_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
 			} else {
 				if (InParty) {
-					core->DisplayStringName(core->ModalStates[ModalState].failed_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
+					displaymsg->DisplayStringName(core->ModalStates[ModalState].failed_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
 				ModalState = MS_NONE;
 				// TODO: wait for a round until allowing new states?
@@ -4460,7 +4461,7 @@ void Actor::AddExperience(int type, int level)
 		l=xpbonuslevels-1;
 	}
 	int xp = xpbonus[type*xpbonuslevels+l];
-	core->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword) xp);
+	displaymsg->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword) xp);
 	AddExperience(xp);
 }
 

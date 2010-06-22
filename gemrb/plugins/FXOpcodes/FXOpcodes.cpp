@@ -26,6 +26,7 @@
 
 #include "Actor.h"
 #include "Audio.h"
+#include "DisplayMessage.h"
 #include "EffectQueue.h"
 #include "GSUtils.h" //needs for MoveBetweenAreasCore
 #include "Game.h"
@@ -1026,36 +1027,36 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 
 	switch (fx->Parameter2) {
 	case 0: //charmed (target neutral after charm)
-		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
 	case 1000:
 		break;
 	case 1: //charmed (target hostile after charm)
-		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
 	case 1001:
 		if (!target->InParty) {
 			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
 		}
 		break;
 	case 2: //dire charmed (target neutral after charm)
-		core->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
 	case 1002:
 		break;
 	case 3: //dire charmed (target hostile after charm)
-		core->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
 	case 1003:
 		if (!target->InParty) {
 			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
 		}
 		break;
 	case 4: //controlled by cleric
-		core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
 	case 1004:
 		if (!target->InParty) {
 			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
 		}
 		break;
 	case 5: //thrall (typo comes from original engine doc)
-		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
 	case 1005:
 		STAT_SET(IE_EA, EA_ENEMY );
 		STAT_SET(IE_THRULLCHARM, 1);
@@ -2963,37 +2964,37 @@ int fx_detect_alignment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch (msk) {
 	case AL_EVIL:
 		if (!color) color = 0xff0000;
-		core->DisplayConstantStringName(STR_EVIL, color, target);
+		displaymsg->DisplayConstantStringName(STR_EVIL, color, target);
 		//glow red
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xff, 0, 0, 0);
 		break;
 	case AL_GOOD:
 		if (!color) color = 0xff00;
-		core->DisplayConstantStringName(STR_GOOD, color, target);
+		displaymsg->DisplayConstantStringName(STR_GOOD, color, target);
 		//glow green
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0, 0xff, 0, 0);
 		break;
 	case AL_GE_NEUTRAL:
 		if (!color) color = 0xff;
-		core->DisplayConstantStringName(STR_GE_NEUTRAL, color, target);
+		displaymsg->DisplayConstantStringName(STR_GE_NEUTRAL, color, target);
 		//glow blue
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0, 0, 0xff, 0);
 		break;
 	case AL_CHAOTIC:
 		if (!color) color = 0xff00ff;
-		core->DisplayConstantStringName(STR_CHAOTIC, color, target);
+		displaymsg->DisplayConstantStringName(STR_CHAOTIC, color, target);
 		//glow purple
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xff, 0, 0xff, 0);
 		break;
 	case AL_LAWFUL:
 		if (!color) color = 0xffffff;
-		core->DisplayConstantStringName(STR_LAWFUL, color, target);
+		displaymsg->DisplayConstantStringName(STR_LAWFUL, color, target);
 		//glow white
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xff, 0xff, 0xff, 0);
 		break;
 	case AL_LC_NEUTRAL:
 		if (!color) color = 0xff;
-		core->DisplayConstantStringName(STR_LC_NEUTRAL, color, target);
+		displaymsg->DisplayConstantStringName(STR_LC_NEUTRAL, color, target);
 		//glow blue
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0, 0, 0xff, 0);
 		break;
@@ -3541,7 +3542,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_display_string (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
 	if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-		core->DisplayStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:0xffffff, target, IE_STR_SOUND|IE_STR_SPEECH);
+		displaymsg->DisplayStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:0xffffff, target, IE_STR_SOUND|IE_STR_SPEECH);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -3697,7 +3698,7 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			if (target->spellbook.GetKnownSpellsCount(IE_SPELL_TYPE_WIZARD, 0)) display_warning = true;
 	}
 	if (target->InParty && display_warning) {
-		core->DisplayConstantStringName(STR_DISABLEDMAGE, 0xff0000, target);
+		displaymsg->DisplayConstantStringName(STR_DISABLEDMAGE, 0xff0000, target);
 		core->SetEventFlag(EF_ACTION);
 	}
 	return FX_APPLIED;
@@ -4994,7 +4995,7 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 printf("Check source:%s\n", fx->Source);
 	if (target->fxqueue.HasEffectWithSource(fx_contingency_ref, fx->Source)) {
-		core->DisplayConstantStringName(STR_CONTDUP, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_CONTDUP, 0xf0f0f0, target);
 		return FX_NOT_APPLIED;
 	}
 
@@ -5276,13 +5277,13 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	//check if trap count is over an amount (only saved traps count)
 	//actually, only projectiles in trigger phase should count here
 	if (map->GetTrapCount(iter)>6) {
-		core->DisplayConstantStringName(STR_NOMORETRAP, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_NOMORETRAP, 0xf0f0f0, target);
 		return FX_NOT_APPLIED;
 	}
 
 	//check if we are under attack
 	if (GetNearestEnemyOf(map, target, ORIGIN_SEES_ENEMY|ENEMY_SEES_ORIGIN)) {
-		core->DisplayConstantStringName(STR_MAYNOTSETTRAP, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_MAYNOTSETTRAP, 0xf0f0f0, target);
 		return FX_NOT_APPLIED;
 	}
 
@@ -5296,12 +5297,12 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (roll>skill) {
 		//failure
-		core->DisplayConstantStringName(STR_SNAREFAILED, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_SNAREFAILED, 0xf0f0f0, target);
 		//TODO check luck and do some damage effect on target
 		return FX_NOT_APPLIED;
 	}
 	//success
-	core->DisplayConstantStringName(STR_SNARESUCCEED, 0xf0f0f0, target);
+	displaymsg->DisplayConstantStringName(STR_SNARESUCCEED, 0xf0f0f0, target);
 	Owner->CastSpellPoint(fx->Resource, target->Pos, false);
 	return FX_NOT_APPLIED;
 }
@@ -5372,7 +5373,7 @@ int fx_create_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_create_spell_sequencer (%2d): Level: %d, Count: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 printf("Check source:%s\n", fx->Source);
 	if (target->fxqueue.HasEffectWithSource(fx_spell_sequencer_active_ref, fx->Source)) {
-		core->DisplayConstantStringName(STR_SEQDUP, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_SEQDUP, 0xf0f0f0, target);
 		return FX_NOT_APPLIED;
 	}
 	//just a call to activate the spell sequencer creation gui

@@ -24,6 +24,7 @@
 #include "defsounds.h"
 
 #include "Audio.h"
+#include "DisplayMessage.h"
 #include "Game.h"
 #include "GameControl.h"
 #include "GameData.h"
@@ -404,9 +405,9 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 			//can't play the sound here, we have to delay action
 			//and for that, we have to know how long the text takes
 			if(flags&DS_NONAME) {
-				core->DisplayString( sb.text );
+				displaymsg->DisplayString( sb.text );
 			} else {
-				core->DisplayStringName( Strref, 0xf0f0f0, Sender, 0);
+				displaymsg->DisplayStringName( Strref, 0xf0f0f0, Sender, 0);
 			}
 		}
 		if (sb.text[0] && strcmp(sb.text," ") && (flags & (DS_HEAD | DS_AREA))) {
@@ -547,16 +548,16 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	}
 	if (!myinv) {
 		delete item;
-		if (lostitem) core->DisplayConstantString(STR_LOSTITEM, 0xbcefbc);
+		if (lostitem) displaymsg->DisplayConstantString(STR_LOSTITEM, 0xbcefbc);
 		return MIC_GOTITEM; // actually it was lost, not gained
 	}
 	if ( myinv->AddSlotItem(item, SLOT_ONLYINVENTORY) !=ASI_SUCCESS) {
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
-		if (gotitem) core->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
+		if (gotitem) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
 		return MIC_FULL;
 	}
-	if (gotitem) core->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
+	if (gotitem) displaymsg->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
 	return MIC_GOTITEM;
 }
 
@@ -1268,7 +1269,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	// post-swap (and non-actors always have IF_NOINT set) .. also added a check that it's
 	// actually busy doing something, for the same reason
 	if (target->GetInternalFlag()&IF_NOINT && (target->GetCurrentAction() || target->GetNextAction())) {
-		core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+		displaymsg->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1282,7 +1283,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			if (!(Flags & BD_INTERRUPT)) {
 				// added CurrentAction as part of blocking action fixes
 				if (tar->GetCurrentAction() || tar->GetNextAction()) {
-					core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+					displaymsg->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 					Sender->ReleaseCurrentAction();
 					return;
 				}
@@ -1323,7 +1324,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		if (Flags & BD_NOEMPTY) {
 			return;
 		}
-		core->DisplayConstantStringName(STR_NOTHINGTOSAY,0xff0000,tar);
+		displaymsg->DisplayConstantStringName(STR_NOTHINGTOSAY,0xff0000,tar);
 		return;
 	}
 
@@ -1474,7 +1475,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 				//DisplayStringCore(Sender, VB_ATTACK, DS_CONSOLE|DS_CONST );
 			}
 			//display attack message
-			core->DisplayConstantStringAction(STR_ACTION_ATTACK,0xf0f0f0, Sender, target);
+			displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK,0xf0f0f0, Sender, target);
 		}
 	}
 	//action performed

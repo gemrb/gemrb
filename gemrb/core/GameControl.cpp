@@ -23,6 +23,7 @@
 #include "win32def.h"
 
 #include "DialogMgr.h"
+#include "DisplayMessage.h"
 #include "Effect.h"
 #include "GSUtils.h"
 #include "Game.h"
@@ -962,10 +963,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		case ' ': //soft pause
 			DialogueFlags ^= DF_FREEZE_SCRIPTS;
 	 		if (DialogueFlags&DF_FREEZE_SCRIPTS) {
-				core->DisplayConstantString(STR_PAUSED,0xff0000);
+				displaymsg->DisplayConstantString(STR_PAUSED,0xff0000);
 				SetDisplayText(STR_PAUSED, 0); // time 0 = removed instantly on unpause
 		 	} else {
-				core->DisplayConstantString(STR_UNPAUSED,0xff0000);
+				displaymsg->DisplayConstantString(STR_UNPAUSED,0xff0000);
 			}
 			break;
 		case 'm':
@@ -1022,7 +1023,7 @@ void GameControl::DisplayTooltip() {
 					// a guess at a neutral check
 					bool neutral = actor->GetStat(IE_EA) == EA_NEUTRAL;
 					// test for an injured string being present for this game
-					int strindex = core->GetStringReference(STR_UNINJURED);
+					int strindex = displaymsg->GetStringReference(STR_UNINJURED);
 					// normal tooltips
 					if (actor->InParty) {
 						// in party: display hp
@@ -1049,7 +1050,7 @@ void GameControl::DisplayTooltip() {
 						} else  {
 							strindex = STR_INJURED4;
 						}
-						strindex = core->GetStringReference(strindex);
+						strindex = displaymsg->GetStringReference(strindex);
 						if (strindex != -1) {
 							injuredstring = core->GetString(strindex, 0);
 						}
@@ -2506,21 +2507,21 @@ void GameControl::DialogChoose(unsigned int choose)
 				Section |= 2;
 			}
 			if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
-				core->DisplayConstantString(STR_JOURNALCHANGE,0xffff00);
+				displaymsg->DisplayConstantString(STR_JOURNALCHANGE,0xffff00);
 				char *string = core->GetString( tr->journalStrRef );
 				//cutting off the strings at the first crlf
 				char *poi = strchr(string,'\n');
 				if (poi) {
 					*poi='\0';
 				}
-				core->DisplayString( string );
+				displaymsg->DisplayString( string );
 				free( string );
 			}
 		}
 
 		if (tr->textStrRef != 0xffffffff) {
 			//allow_zero is for PST (deionarra's text)
-			core->DisplayStringName( (int) (tr->textStrRef), 0x8080FF, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
+			displaymsg->DisplayStringName( (int) (tr->textStrRef), 0x8080FF, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
 			if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
 				ta->AppendText( "", -1 );
 			}
@@ -2589,7 +2590,7 @@ void GameControl::DialogChoose(unsigned int choose)
 			if (target->GetInternalFlag()&IF_NOINT) {
 				// this whole check moved out of InitDialog by fuzzie, see comments
 				// for the IF_NOINT check in BeginDialog
-				core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+				displaymsg->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 				ta->SetMinRow( false );
 				EndDialog();
 				return;
@@ -2611,7 +2612,7 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 	}
 	//displaying npc text
-	core->DisplayStringName( ds->StrRef, 0x70FF70, target, IE_STR_SOUND|IE_STR_SPEECH);
+	displaymsg->DisplayStringName( ds->StrRef, 0x70FF70, target, IE_STR_SOUND|IE_STR_SPEECH);
 	//adding a gap between options and npc text
 	ta->AppendText("",-1);
 	int i;
@@ -2930,5 +2931,5 @@ void GameControl::SetDisplayText(char *text, unsigned int time)
 
 void GameControl::SetDisplayText(ieStrRef text, unsigned int time)
 {
-	SetDisplayText(core->GetString(core->GetStringReference(text), 0), time);
+	SetDisplayText(core->GetString(displaymsg->GetStringReference(text), 0), time);
 }

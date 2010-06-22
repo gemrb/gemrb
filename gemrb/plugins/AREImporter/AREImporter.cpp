@@ -27,6 +27,7 @@
 #include "Ambient.h"
 #include "CachedFileStream.h"
 #include "DataFileMgr.h"
+#include "DisplayMessage.h"
 #include "EffectMgr.h"
 #include "Game.h"
 #include "GameData.h"
@@ -85,7 +86,7 @@ void ReadAutonoteINI()
 int GetTrackString(const ieResRef areaName)
 {
 	int i;
-	bool trackflag = core->HasStringReference(STR_TRACKING);
+	bool trackflag = displaymsg->HasStringReference(STR_TRACKING);
 
 	if (!tracks) {
 		AutoTable tm("tracking");

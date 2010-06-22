@@ -27,6 +27,7 @@
 #include "strrefs.h"
 
 #include "Actor.h"
+#include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
@@ -455,7 +456,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 		if (count && (destructed>=count) )
 			break;
 	}
-	if (Changed && Owner && Owner->InParty) core->DisplayConstantString(STR_LOSTITEM, 0xbcefbc);
+	if (Changed && Owner && Owner->InParty) displaymsg->DisplayConstantString(STR_LOSTITEM, 0xbcefbc);
 
 	return destructed;
 }

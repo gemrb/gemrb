@@ -23,6 +23,7 @@
 #include "win32def.h"
 
 #include "Audio.h"
+#include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
@@ -288,7 +289,7 @@ void Projectile::Setup()
 	if(ExtFlags&PEF_TEXT) {
 		Actor *act = area->GetActorByGlobalID(Caster);
 		if(act) {
-			core->DisplayStringName(StrRef,0xd7d7be,act,0);
+			displaymsg->DisplayStringName(StrRef,0xd7d7be,act,0);
 		}
 	}
 

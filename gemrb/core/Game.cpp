@@ -27,6 +27,7 @@
 #include "win32def.h"
 
 #include "DataStream.h"
+#include "DisplayMessage.h"
 #include "GameControl.h"
 #include "GameData.h"
 #include "GameScript.h"
@@ -942,9 +943,9 @@ void Game::ShareXP(int xp, int flags)
 	}
 
 	if (xp>0) {
-		core->DisplayConstantStringValue( STR_GOTXP, 0xbcefbc, (ieDword) xp); //you have gained ... xp
+		displaymsg->DisplayConstantStringValue( STR_GOTXP, 0xbcefbc, (ieDword) xp); //you have gained ... xp
 	} else {
-		core->DisplayConstantStringValue( STR_LOSTXP, 0xbcefbc, (ieDword) -xp); //you have lost ... xp
+		displaymsg->DisplayConstantStringValue( STR_LOSTXP, 0xbcefbc, (ieDword) -xp); //you have lost ... xp
 	}
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
@@ -1043,9 +1044,9 @@ void Game::SetReputation(ieDword r)
 	if (r<10) r=10;
 	else if (r>200) r=200;
 	if (Reputation>r) {
-		core->DisplayConstantStringValue(STR_LOSTREP,0xc0c000,(Reputation-r)/10);
+		displaymsg->DisplayConstantStringValue(STR_LOSTREP,0xc0c000,(Reputation-r)/10);
 	} else if (Reputation<r) {
-		core->DisplayConstantStringValue(STR_GOTREP,0xc0c000,(r-Reputation)/10);
+		displaymsg->DisplayConstantStringValue(STR_GOTREP,0xc0c000,(r-Reputation)/10);
 	}
 	Reputation = r;
 	for (unsigned int i=0; i<PCs.size(); i++) {
@@ -1075,9 +1076,9 @@ void Game::AddGold(ieDword add)
 	old = PartyGold;
 	PartyGold += add;
 	if (old<PartyGold) {
-		core->DisplayConstantStringValue( STR_GOTGOLD, 0xc0c000, PartyGold-old);
+		displaymsg->DisplayConstantStringValue( STR_GOTGOLD, 0xc0c000, PartyGold-old);
 	} else {
-		core->DisplayConstantStringValue( STR_LOSTGOLD, 0xc0c000, old-PartyGold);
+		displaymsg->DisplayConstantStringValue( STR_LOSTGOLD, 0xc0c000, old-PartyGold);
 	}
 }
 
@@ -1320,7 +1321,7 @@ void Game::RestParty(int checks, int dream, int hp)
 	if (!(checks&REST_NOSCATTER) ) {
 		if (!EveryoneNearPoint( area, leader->Pos, 0 ) ) {
 			//party too scattered
-			core->DisplayConstantString( STR_SCATTERED, 0xff0000 );
+			displaymsg->DisplayConstantString( STR_SCATTERED, 0xff0000 );
 			return;
 		}
 	}
@@ -1328,12 +1329,12 @@ void Game::RestParty(int checks, int dream, int hp)
 	if (!(checks&REST_NOCRITTER) ) {
 		//don't allow resting while in combat
 		if (AnyPCInCombat()) {
-			core->DisplayConstantString( STR_CANTRESTMONS, 0xff0000 );
+			displaymsg->DisplayConstantString( STR_CANTRESTMONS, 0xff0000 );
 			return;
 		}
 		//don't allow resting if hostiles are nearby
 		if (area->AnyEnemyNearPoint(leader->Pos)) {
-			core->DisplayConstantString( STR_CANTRESTMONS, 0xff0000 );
+			displaymsg->DisplayConstantString( STR_CANTRESTMONS, 0xff0000 );
 			return;
 		}
 	}
@@ -1344,13 +1345,13 @@ void Game::RestParty(int checks, int dream, int hp)
 	if (!(checks&REST_NOAREA) ) {
 		//you cannot rest here
 		if (area->AreaFlags&1) {
-			core->DisplayConstantString( STR_MAYNOTREST, 0xff0000 );
+			displaymsg->DisplayConstantString( STR_MAYNOTREST, 0xff0000 );
 			return;
 		}
 		//you may not rest here, find an inn
 		if (!(area->AreaType&(AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST) ))
 		{
-			core->DisplayConstantString( STR_MAYNOTREST, 0xff0000 );
+			displaymsg->DisplayConstantString( STR_MAYNOTREST, 0xff0000 );
 			return;
 		}
 		//area encounters
@@ -1400,16 +1401,16 @@ void Game::RestParty(int checks, int dream, int hp)
 	core->SetEventFlag(EF_ACTION);
 
 	//restindex will be -1 in the case of PST
-	int restindex = core->GetStringReference(STR_REST);
+	int restindex = displaymsg->GetStringReference(STR_REST);
 	int strindex;
 	char* tmpstr = NULL;
 
 	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
 	if (restindex != -1) {
-		strindex = core->GetStringReference(STR_HOURS);
+		strindex = displaymsg->GetStringReference(STR_HOURS);
 	} else {
-		strindex = core->GetStringReference(STR_PST_HOURS);
-		restindex = core->GetStringReference(STR_PST_REST);
+		strindex = displaymsg->GetStringReference(STR_PST_HOURS);
+		restindex = displaymsg->GetStringReference(STR_PST_REST);
 	}
 
 	//this would be bad
@@ -1420,7 +1421,7 @@ void Game::RestParty(int checks, int dream, int hp)
 
 	core->GetTokenDictionary()->SetAtCopy("DURATION", tmpstr);
 	core->FreeString(tmpstr);
-	core->DisplayString(restindex, 0xffffff, 0);
+	displaymsg->DisplayString(restindex, 0xffffff, 0);
 }
 
 //timestop effect

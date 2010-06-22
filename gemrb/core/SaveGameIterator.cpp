@@ -24,6 +24,7 @@
 #include "strrefs.h"
 #include "win32def.h"
 
+#include "DisplayMessage.h"
 #include "GameControl.h"
 #include "GameData.h" // For ResourceHolder
 #include "ImageMgr.h"
@@ -491,12 +492,12 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 
 	// Save succesful / Quick-save succesful
 	if (index == 1) {
-		core->DisplayConstantString(STR_QSAVESUCCEED, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_QSAVESUCCEED, 0xbcefbc);
 		if (core->GetGameControl()) {
 			core->GetGameControl()->SetDisplayText(STR_QSAVESUCCEED, 30);
 		}
 	} else {
-		core->DisplayConstantString(STR_SAVESUCCEED, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_SAVESUCCEED, 0xbcefbc);
 		if (core->GetGameControl()) {
 			core->GetGameControl()->SetDisplayText(STR_SAVESUCCEED, 30);
 		}
@@ -540,7 +541,7 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 	}
 
 	// Save succesful
-	core->DisplayConstantString(STR_SAVESUCCEED, 0xbcefbc);
+	displaymsg->DisplayConstantString(STR_SAVESUCCEED, 0xbcefbc);
 	if (core->GetGameControl()) {
 		core->GetGameControl()->SetDisplayText(STR_SAVESUCCEED, 30);
 	}

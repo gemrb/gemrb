@@ -24,6 +24,7 @@
 #include "win32def.h"
 
 #include "Actor.h"
+#include "DisplayMessage.h"
 #include "EffectQueue.h"
 #include "GSUtils.h" //needs for displaystringcore
 #include "Game.h"
@@ -1428,21 +1429,21 @@ int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 		}
 		switch (fx->Parameter2) {
 		case 0: //charmed (target neutral after charm)
-			core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+			displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
 			break;
 		case 1: //charmed (target hostile after charm)
-			core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+			displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
 			target->SetBase(IE_EA, EA_ENEMY);
 			break;
 		case 2: //controlled by cleric
-			core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+			displaymsg->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
 			break;
 		case 3: //controlled by cleric (hostile after charm)
-			core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+			displaymsg->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
 			target->SetBase(IE_EA, EA_ENEMY);
 			break;
 		case 4: //turn undead
-			core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+			displaymsg->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
 			target->SetBase(IE_EA, EA_ENEMY);
 			target->SetStat(IE_MORALE, 0, 0);
 			break;
@@ -2447,14 +2448,14 @@ int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
 	switch(fx->Parameter2)
 	{
 	case 0:
-		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
 		break;
 	case 1:
-		core->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target)
+		displaymsg->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target)
 ;
 		break;
 	default:
-		core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
 
 		break;
 	}
@@ -3120,7 +3121,7 @@ int fx_call_lightning (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//calculate victim (an opponent of target)
 	Actor *victim = GetRandomEnemySeen(map, target);
 	if (!victim) {
-		core->DisplayConstantStringName(STR_LIGHTNING_DISS, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_LIGHTNING_DISS, 0xf0f0f0, target);
 		return ret;
 	}
 
