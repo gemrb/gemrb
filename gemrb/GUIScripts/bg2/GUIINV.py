@@ -372,7 +372,7 @@ def RefreshInventoryWindow ():
 		else:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItemGround)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenGroundItemInfoWindow)
-			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenGroundItemAmountWindow)
+			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None) #TODO: implement OpenGroundItemAmountWindow
 
 		GUICommon.UpdateInventorySlot (pc, Button, Slot, "ground")
 
