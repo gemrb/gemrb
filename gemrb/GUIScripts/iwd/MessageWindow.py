@@ -22,25 +22,11 @@
 ###################################################
 
 import GemRB
-from GUICommonWindows import *
+import GUICommon
 import GUICommonWindows
-from GUIClasses import GTextArea
-from GUIClasses import GWindow
-from GUICommon import HasHOW
-from GUICommon import GameControl
-from CommonWindow import OnIncreaseSize, OnDecreaseSize
-
-from GUIJRNL import *
-from GUIMA import *
-from GUIMG import *
-from GUIINV import *
-from GUIOPT import *
-from GUIPR import *
-from GUIREC import *
-from GUISTORE import *
-from GUIWORLD import *
-from TextScreen import *
-from LevelUp import *
+import CommonWindow
+from GUIDefines import *
+import GUIClasses
 
 MessageWindow = 0
 PortraitWindow = 0
@@ -53,22 +39,22 @@ def OnLoad():
 
 	GemRB.GameSetPartySize (PARTY_SIZE)
 	GemRB.GameSetProtagonistMode (2)
-	GemRB.LoadWindowPack (GetWindowPack())
+	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 
 	GUICommonWindows.PortraitWindow = None
 	GUICommonWindows.ActionsWindow = None
 	GUICommonWindows.OptionsWindow = None
 
 	#this is different in IWD (0) and HoW (25)
-	if HasHOW():
+	if GUICommon.HasHOW():
 		OptionsWindow = GemRB.LoadWindow (25)
 	else:
 		OptionsWindow = GemRB.LoadWindow (0)
-	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
-	PortraitWindow = OpenPortraitWindow (1)
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow (1)
 
 	ActionsWindow = GemRB.LoadWindow (3)
-	OpenActionsWindowControls (ActionsWindow)
+	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
 
 	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
@@ -100,42 +86,42 @@ def UpdateControlStatus ():
 
 	MessageWindow = GemRB.GetVar ("MessageWindow")
 
-	GemRB.LoadWindowPack (GetWindowPack())
+	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	
 	if Expand == GS_MEDIUMDIALOG:
 		TMessageWindow = GemRB.LoadWindow (12)
 		TMessageTA = TMessageWindow.GetControl (1)
 		ExpandButton = TMessageWindow.GetControl (0)
-		ExpandButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+		ExpandButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
 		ContractButton = TMessageWindow.GetControl (3)
-		ContractButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+		ContractButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 
 	elif Expand == GS_LARGEDIALOG:
 		TMessageWindow = GemRB.LoadWindow (7)
 		TMessageTA = TMessageWindow.GetControl (1)
 		ContractButton = TMessageWindow.GetControl (0)
-		ContractButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+		ContractButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 	else:
 		TMessageWindow = GemRB.LoadWindow (4)
 		TMessageTA = TMessageWindow.GetControl (3)
 		ExpandButton = TMessageWindow.GetControl (2)
-		ExpandButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+		ExpandButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
 
 	TMessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
 	TMessageTA.SetHistory (100)
 
 	hideflag = GemRB.HideGUI ()
-	MessageTA = GTextArea (MessageWindow,GemRB.GetVar ("MessageTextArea"))
+	MessageTA = GUIClasses.GTextArea (MessageWindow,GemRB.GetVar ("MessageTextArea"))
 	if MessageWindow>0 and MessageWindow!=TMessageWindow.ID:
 		MessageTA.MoveText (TMessageTA)
-		GWindow(MessageWindow).Unload()
+		GUIClasses.GWindow(MessageWindow).Unload()
 
 	GemRB.SetVar ("MessageWindow", TMessageWindow.ID)
 	GemRB.SetVar ("MessageTextArea", TMessageTA.ID)
 	if Override:
 		TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	else:
-		GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
+		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 
 	if hideflag:
 		GemRB.UnhideGUI ()

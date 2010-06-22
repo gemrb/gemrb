@@ -23,9 +23,10 @@
 ###################################################
 
 import GemRB
+from GUIDefines import *
 from ie_stats import *
-from GUICommon import *
-from LUSkillsSelection import SkillsSave
+import GUICommon
+import LUSkillsSelection
 
 CharGenWindow = 0
 CharGenState = 0
@@ -154,52 +155,52 @@ def OnLoad():
 	GenderButton = CharGenWindow.GetControl (0)
 	GenderButton.SetState (IE_GUI_BUTTON_ENABLED)
 	GenderButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	GenderButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "GenderPress")
+	GenderButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GenderPress)
 	GenderButton.SetText (11956)
 
 	RaceButton = CharGenWindow.GetControl (1)
 	RaceButton.SetState (IE_GUI_BUTTON_DISABLED)
-	RaceButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RacePress")
+	RaceButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RacePress)
 	RaceButton.SetText (11957)
 
 	ClassButton = CharGenWindow.GetControl (2)
 	ClassButton.SetState (IE_GUI_BUTTON_DISABLED)
-	ClassButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ClassPress")
+	ClassButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClassPress)
 	ClassButton.SetText (11959)
 
 	AlignmentButton = CharGenWindow.GetControl (3)
 	AlignmentButton.SetState (IE_GUI_BUTTON_DISABLED)
-	AlignmentButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AlignmentPress")
+	AlignmentButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AlignmentPress)
 	AlignmentButton.SetText (11958)
 
 	AbilitiesButton = CharGenWindow.GetControl (4)
 	AbilitiesButton.SetState (IE_GUI_BUTTON_DISABLED)
-	AbilitiesButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AbilitiesPress")
+	AbilitiesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesPress)
 	AbilitiesButton.SetText (11960)
 
 	SkillsButton = CharGenWindow.GetControl (5)
 	SkillsButton.SetState (IE_GUI_BUTTON_DISABLED)
-	SkillsButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SkillsPress")
+	SkillsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsPress)
 	SkillsButton.SetText (11983)
 
 	AppearanceButton = CharGenWindow.GetControl (6)
 	AppearanceButton.SetState (IE_GUI_BUTTON_DISABLED)
-	AppearanceButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AppearancePress")
+	AppearanceButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AppearancePress)
 	AppearanceButton.SetText (11961)
 
 	BiographyButton = CharGenWindow.GetControl (16)
 	BiographyButton.SetState (IE_GUI_BUTTON_DISABLED)
-	BiographyButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BiographyPress")
+	BiographyButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BiographyPress)
 	BiographyButton.SetText (18003)
 
 	NameButton = CharGenWindow.GetControl (7)
 	NameButton.SetState (IE_GUI_BUTTON_DISABLED)
-	NameButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "NamePress")
+	NameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NamePress)
 	NameButton.SetText (11963)
 
 	BackButton = CharGenWindow.GetControl (11)
 	BackButton.SetState (IE_GUI_BUTTON_ENABLED)
-	BackButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BackPress")
+	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
 	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	PortraitButton = CharGenWindow.GetControl (12)
@@ -208,17 +209,17 @@ def OnLoad():
 	ImportButton = CharGenWindow.GetControl (13)
 	ImportButton.SetState (IE_GUI_BUTTON_ENABLED)
 	ImportButton.SetText (13955)
-	ImportButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ImportPress")
+	ImportButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ImportPress)
 
 	CancelButton = CharGenWindow.GetControl (15)
 	CancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	CancelButton.SetText (13727)
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
 
 	AcceptButton = CharGenWindow.GetControl (8)
 	AcceptButton.SetState (IE_GUI_BUTTON_DISABLED)
 	AcceptButton.SetText (11962)
-	AcceptButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AcceptPress")
+	AcceptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AcceptPress)
 
 	TextArea = CharGenWindow.GetControl (9)
 	TextArea.SetText (16575)
@@ -294,7 +295,7 @@ def AcceptPress():
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("Race") )
 
 	ClassIndex = GemRB.GetVar ("Class")-1
-	Class = ClassTable.GetValue (ClassIndex, 5)
+	Class = GUICommon.ClassTable.GetValue (ClassIndex, 5)
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar ("Class Kit")
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitIndex)
@@ -303,11 +304,11 @@ def AcceptPress():
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)
 
 	#mage spells
-	TableName = ClassSkillsTable.GetValue (Class, 2, 0)
+	TableName = GUICommon.ClassSkillsTable.GetValue (Class, 2, 0)
 	if TableName != "*":
 		#todo: set up ALL spell levels not just level 1
-		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
-		Learnable = GetLearnableMageSpells( KitIndex, t, 1)
+		GUICommon.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
+		Learnable = GUICommon.GetLearnableMageSpells( KitIndex, t, 1)
 		SpellBook = GemRB.GetVar ("MageSpellBook")
 		MemoBook = GemRB.GetVar ("MageMemorized")
 		j=1
@@ -321,25 +322,25 @@ def AcceptPress():
 			j=j<<1
 
 	#priest spells
-	TableName = ClassSkillsTable.GetValue (Class, 1, 0)
+	TableName = GUICommon.ClassSkillsTable.GetValue (Class, 1, 0)
 	if TableName != "*":
 		#there is no separate druid table, falling back to priest
 		if TableName == "MXSPLDRU":
 			TableName = "MXSPLPRS"
 		#todo: set up ALL spell levels not just level 1
-		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
+		GUICommon.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
 		ClassFlag = 0 #set this according to class
-		Learnable = GetLearnablePriestSpells( ClassFlag, t, 1)
+		Learnable = GUICommon.GetLearnablePriestSpells( ClassFlag, t, 1)
 		for i in range (len(Learnable) ):
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
 	
 	# ranger tracking is a hardcoded innate
-	if HasHOW():
-		if ClassSkillsTable.GetValue (GemRB.GetPlayerStat (MyChar, IE_CLASS), 0) != "*":
+	if GUICommon.HasHOW():
+		if GUICommon.ClassSkillsTable.GetValue (GemRB.GetPlayerStat (MyChar, IE_CLASS), 0) != "*":
 			GemRB.LearnSpell (MyChar, "spin139", LS_MEMO)
 
 	# save all the skills
-	SkillsSave (MyChar)
+	LUSkillsSelection.SkillsSave (MyChar)
 
 	TmpTable = GemRB.LoadTable ("repstart")
 	t=AlignmentTable.FindValue (3, t)
@@ -378,7 +379,7 @@ def AcceptPress():
 	GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability6"))
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
-	GemRB.SetPlayerStat (MyChar, IE_XP, ClassSkillsTable.GetValue (Class, 3) )
+	GemRB.SetPlayerStat (MyChar, IE_XP, GUICommon.ClassSkillsTable.GetValue (Class, 3) )
 
 	TmpTable=GemRB.LoadTable ("weapprof")
 	ProfCount = TmpTable.GetRowCount ()
@@ -387,13 +388,13 @@ def AcceptPress():
 		Value = GemRB.GetVar ("Proficiency"+str(i) )
 		GemRB.SetPlayerStat (MyChar, StatID, Value )
 
-	SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
-	SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
-	SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("MajorColor") )
-	SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("MinorColor") )
-	SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
-	SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
-	SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
+	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
+	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
+	GUICommon.SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("MajorColor") )
+	GUICommon.SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("MinorColor") )
+	GUICommon.SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
+	GUICommon.SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
+	GUICommon.SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
@@ -455,13 +456,13 @@ def SetCharacterDescription():
 			TextArea.Append (str(GemRB.GetVar ("Ability" + str(i + 1))) )
 	if CharGenState > 5:
 		Class = GemRB.GetVar ("Class")-1
-		ClassName = ClassTable.GetRowName (Class)
-		Class = ClassTable.GetValue (Class, 5)
-		IsRanger = ClassSkillsTable.GetValue (Class, 0)
-		IsArcane = ClassSkillsTable.GetValue (Class, 1)
-		IsMage = ClassSkillsTable.GetValue (Class, 2)
-		IsBard = ClassSkillsTable.GetValue (Class, 4)
-		IsThief = ClassSkillsTable.GetValue (Class, 5)
+		ClassName = GUICommon.ClassTable.GetRowName (Class)
+		Class = GUICommon.ClassTable.GetValue (Class, 5)
+		IsRanger = GUICommon.ClassSkillsTable.GetValue (Class, 0)
+		IsArcane = GUICommon.ClassSkillsTable.GetValue (Class, 1)
+		IsMage = GUICommon.ClassSkillsTable.GetValue (Class, 2)
+		IsBard = GUICommon.ClassSkillsTable.GetValue (Class, 4)
+		IsThief = GUICommon.ClassSkillsTable.GetValue (Class, 5)
 
 		if IsThief!="*":
 			TextArea.Append ("", -1)
@@ -508,7 +509,7 @@ def SetCharacterDescription():
 			TextArea.Append (11027, -1)
 			TextArea.Append (": " )
 			t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
-			Learnable = GetLearnableMageSpells(GemRB.GetVar ("Class Kit"), t,1)
+			Learnable = GUICommon.GetLearnableMageSpells(GemRB.GetVar ("Class Kit"), t,1)
 			MageSpellBook = GemRB.GetVar ("MageSpellBook")
 			MageMemorized = GemRB.GetVar ("MageMemorized")
 			for i in range (len(Learnable)):
@@ -524,7 +525,7 @@ def SetCharacterDescription():
 			TextArea.Append (11028, -1)
 			TextArea.Append (": " )
 			t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
-			Learnable = GetLearnablePriestSpells( ClassFlag, t, 1)
+			Learnable = GUICommon.GetLearnablePriestSpells( ClassFlag, t, 1)
 			PriestMemorized = GemRB.GetVar ("PriestMemorized")
 			for i in range (len(Learnable)):
 				if (1 << i) & PriestMemorized:
@@ -546,12 +547,12 @@ def GenderPress():
 	MaleButton = GenderWindow.GetControl (2)
 	MaleButton.SetState (IE_GUI_BUTTON_ENABLED)
 	MaleButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	MaleButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MalePress")
+	MaleButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MalePress)
 
 	FemaleButton = GenderWindow.GetControl (3)
 	FemaleButton.SetState (IE_GUI_BUTTON_ENABLED)
 	FemaleButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	FemaleButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FemalePress")
+	FemaleButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, FemalePress)
 
 	MaleButton.SetVarAssoc ("Gender", 1)
 	FemaleButton.SetVarAssoc ("Gender", 2)
@@ -561,13 +562,13 @@ def GenderPress():
 
 	GenderDoneButton = GenderWindow.GetControl (0)
 	GenderDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	GenderDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "GenderDonePress")
+	GenderDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GenderDonePress)
 	GenderDoneButton.SetText (11973)
 	GenderDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	GenderCancelButton = GenderWindow.GetControl (6)
 	GenderCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	GenderCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "GenderCancelPress")
+	GenderCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GenderCancelPress)
 	GenderCancelButton.SetText (13727)
 	GenderCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -621,28 +622,28 @@ def PortraitSelect():
 
 	PortraitLeftButton = PortraitWindow.GetControl (2)
 	PortraitLeftButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitLeftButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CGPortraitLeftPress")
+	PortraitLeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CGPortraitLeftPress)
 	PortraitLeftButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 	PortraitRightButton = PortraitWindow.GetControl (3)
 	PortraitRightButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitRightButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CGPortraitRightPress")
+	PortraitRightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CGPortraitRightPress)
 	PortraitRightButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 	PortraitCustomButton = PortraitWindow.GetControl (6)
 	PortraitCustomButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitCustomButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitCustomPress")
+	PortraitCustomButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitCustomPress)
 	PortraitCustomButton.SetText (17545)
 
 	PortraitDoneButton = PortraitWindow.GetControl (0)
 	PortraitDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CGPortraitDonePress")
+	PortraitDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CGPortraitDonePress)
 	PortraitDoneButton.SetText (11973)
 	PortraitDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	PortraitCancelButton = PortraitWindow.GetControl (5)
 	PortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CGPortraitCancelPress")
+	PortraitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CGPortraitCancelPress)
 	PortraitCancelButton.SetText (13727)
 	PortraitCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -759,24 +760,24 @@ def PortraitCustomPress():
 	CustomWindow = Window = GemRB.LoadWindow (18)
 	PortraitList1 = Window.GetControl (2)
 	RowCount1 = PortraitList1.GetPortraits (0)
-	PortraitList1.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "CGLargeCustomPortrait")
+	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, CGLargeCustomPortrait)
 	GemRB.SetVar ("Row1", RowCount1)
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	PortraitList2 = Window.GetControl (4)
 	RowCount2 = PortraitList2.GetPortraits (1)
-	PortraitList2.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "CGSmallCustomPortrait")
+	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, CGSmallCustomPortrait)
 	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
 
 	Button = Window.GetControl (6)
 	Button.SetText (11973)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CustomDone")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomDone)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (7)
 	Button.SetText (13727) 
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CustomAbort")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomAbort)
 
 	Button = Window.GetControl (0)
 	PortraitName = PortraitsTable.GetRowName (Portrait)+"L"
@@ -833,7 +834,7 @@ def RacePress():
 	for i in range (2, 8):
 		RaceSelectButton = RaceWindow.GetControl (i)
 		RaceSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
-		RaceSelectButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RaceSelectPress")
+		RaceSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RaceSelectPress)
 		RaceSelectButton.SetText (RaceTable.GetValue (i - 2, 0))
 		RaceSelectButton.SetVarAssoc ("Race", i - 1)
 
@@ -842,13 +843,13 @@ def RacePress():
 
 	RaceDoneButton = RaceWindow.GetControl (0)
 	RaceDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	RaceDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RaceDonePress")
+	RaceDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RaceDonePress)
 	RaceDoneButton.SetText (11973)
 	RaceDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	RaceCancelButton = RaceWindow.GetControl (10)
 	RaceCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	RaceCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RaceCancelPress")
+	RaceCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RaceCancelPress)
 	RaceCancelButton.SetText (13727)
 	RaceCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -893,8 +894,8 @@ def ClassPress():
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	ClassWindow = GemRB.LoadWindow (2)
 	KitTable = GemRB.LoadTable ("magesch")
-	ClassCount = ClassTable.GetRowCount ()
-	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
+	ClassCount = GUICommon.ClassTable.GetRowCount ()
+	RaceName = GUICommon.RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
 	GemRB.SetVar ("Class", 0)
 	GemRB.SetVar ("Class Kit", 0)
 	GemRB.SetVar ("MAGESCHOOL", 0)
@@ -906,8 +907,8 @@ def ClassPress():
 	HasMulti = 0
 	j = 2
 	for i in range (ClassCount):
-		Allowed = ClassTable.GetValue (ClassTable.GetRowName (i), RaceName)
-		if ClassTable.GetValue (i, 4):
+		Allowed = GUICommon.ClassTable.GetValue (ClassTable.GetRowName (i), RaceName)
+		if GUICommon.ClassTable.GetValue (i, 4):
 			if Allowed != 0:
 				HasMulti = 1
 		else:
@@ -917,7 +918,7 @@ def ClassPress():
 				ClassSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
 			else:
 				ClassSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
-			ClassSelectButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS,  "ClassSelectPress")
+			ClassSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,  ClassSelectPress)
 			ClassSelectButton.SetText (ClassTable.GetValue (i, 0) )
 			ClassSelectButton.SetVarAssoc ("Class", i + 1)
 
@@ -926,17 +927,17 @@ def ClassPress():
 		ClassMultiButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
 		ClassMultiButton.SetState (IE_GUI_BUTTON_ENABLED)
-	ClassMultiButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ClassMultiPress")
+	ClassMultiButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClassMultiPress)
 	ClassMultiButton.SetText (11993)
 
 	KitButton = ClassWindow.GetControl (11)
 	#only the mage class has schools
-	Allowed = ClassTable.GetValue ("MAGE", RaceName)
+	Allowed = GUICommon.ClassTable.GetValue ("MAGE", RaceName)
 	if Allowed:
 		KitButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		KitButton.SetState (IE_GUI_BUTTON_DISABLED)
-	KitButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "KitPress")
+	KitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, KitPress)
 	KitButton.SetText (11994)
 
 	ClassTextArea = ClassWindow.GetControl (13)
@@ -944,13 +945,13 @@ def ClassPress():
 
 	ClassDoneButton = ClassWindow.GetControl (0)
 	ClassDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	ClassDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ClassDonePress")
+	ClassDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClassDonePress)
 	ClassDoneButton.SetText (11973)
 	ClassDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	ClassCancelButton = ClassWindow.GetControl (14)
 	ClassCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	ClassCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ClassCancelPress")
+	ClassCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClassCancelPress)
 	ClassCancelButton.SetText (13727)
 	ClassCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -970,8 +971,8 @@ def ClassMultiPress():
 
 	ClassWindow.SetVisible (WINDOW_INVISIBLE)
 	ClassMultiWindow = GemRB.LoadWindow (10)
-	ClassCount = ClassTable.GetRowCount ()
-	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
+	ClassCount = GUICommon.ClassTable.GetRowCount ()
+	RaceName = GUICommon.RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
 
 	for i in range (2, 10):
 		ClassMultiSelectButton = ClassMultiWindow.GetControl (i)
@@ -979,7 +980,7 @@ def ClassMultiPress():
 
 	j = 2
 	for i in range (ClassCount):
-		ClassName = ClassTable.GetRowName (i)
+		ClassName = GUICommon.ClassTable.GetRowName (i)
 		if (ClassTable.GetValue (ClassName, "MULTI") > 0):
 			ClassMultiSelectButton = ClassMultiWindow.GetControl (j)
 			j = j + 1
@@ -987,7 +988,7 @@ def ClassMultiPress():
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
 			else:
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
-			ClassMultiSelectButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS,  "ClassMultiSelectPress")
+			ClassMultiSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,  ClassMultiSelectPress)
 			ClassMultiSelectButton.SetText (ClassTable.GetValue (i, 0) )
 			ClassMultiSelectButton.SetVarAssoc ("Class", i + 1)
 
@@ -996,13 +997,13 @@ def ClassMultiPress():
 
 	ClassMultiDoneButton = ClassMultiWindow.GetControl (0)
 	ClassMultiDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	ClassMultiDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ClassMultiDonePress")
+	ClassMultiDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClassMultiDonePress)
 	ClassMultiDoneButton.SetText (11973)
 	ClassMultiDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	ClassMultiCancelButton = ClassMultiWindow.GetControl (14)
 	ClassMultiCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	ClassMultiCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ClassMultiCancelPress")
+	ClassMultiCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClassMultiCancelPress)
 	ClassMultiCancelButton.SetText (13727)
 	ClassMultiCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -1050,20 +1051,20 @@ def KitPress():
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetText (KitTable.GetValue (i+1, 0) )
 		Button.SetVarAssoc ("MAGESCHOOL", i+1)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "KitSelectPress")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, KitSelectPress)
 
 	KitTextArea = KitWindow.GetControl (11)
 	KitTextArea.SetText (17245)
 
 	KitDoneButton = KitWindow.GetControl (0)
 	KitDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	KitDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "KitDonePress")
+	KitDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, KitDonePress)
 	KitDoneButton.SetText (11973)
 	KitDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	KitCancelButton = KitWindow.GetControl (12)
 	KitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	KitCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "KitCancelPress")
+	KitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, KitCancelPress)
 	KitCancelButton.SetText (13727)
 	KitCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -1127,7 +1128,7 @@ def AlignmentPress():
 	AlignmentWindow = GemRB.LoadWindow (3)
 	AlignmentTable = GemRB.LoadTable ("aligns")
 	ClassAlignmentTable = GemRB.LoadTable ("alignmnt")
-	ClassName = ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
+	ClassName = GUICommon.ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
 	GemRB.SetVar ("Alignment", 0)
 
 	for i in range (2, 11):
@@ -1140,7 +1141,7 @@ def AlignmentPress():
 			AlignmentSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
 		else:
 			AlignmentSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
-		AlignmentSelectButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AlignmentSelectPress")
+		AlignmentSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AlignmentSelectPress)
 		AlignmentSelectButton.SetText (AlignmentTable.GetValue (i, 0) )
 		AlignmentSelectButton.SetVarAssoc ("Alignment", i + 1)
 
@@ -1149,13 +1150,13 @@ def AlignmentPress():
 
 	AlignmentDoneButton = AlignmentWindow.GetControl (0)
 	AlignmentDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	AlignmentDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AlignmentDonePress")
+	AlignmentDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AlignmentDonePress)
 	AlignmentDoneButton.SetText (11973)
 	AlignmentDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	AlignmentCancelButton = AlignmentWindow.GetControl (13)
 	AlignmentCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AlignmentCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AlignmentCancelPress")
+	AlignmentCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AlignmentCancelPress)
 	AlignmentCancelButton.SetText (13727)
 	AlignmentCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -1211,17 +1212,17 @@ def AbilitiesPress():
 	for i in range (6):
 		AbilitiesLabelButton = AbilitiesWindow.GetControl (30 + i)
 		AbilitiesLabelButton.SetState (IE_GUI_BUTTON_ENABLED)
-		AbilitiesLabelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AbilitiesLabelPress")
+		AbilitiesLabelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesLabelPress)
 		AbilitiesLabelButton.SetVarAssoc ("AbilityIndex", i + 1)
 
 		AbilitiesPlusButton = AbilitiesWindow.GetControl (16 + i * 2)
 		AbilitiesPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
-		AbilitiesPlusButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AbilitiesPlusPress")
+		AbilitiesPlusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesPlusPress)
 		AbilitiesPlusButton.SetVarAssoc ("AbilityIndex", i + 1)
 
 		AbilitiesMinusButton = AbilitiesWindow.GetControl (17 + i * 2)
 		AbilitiesMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
-		AbilitiesMinusButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AbilitiesMinusPress")
+		AbilitiesMinusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesMinusPress)
 		AbilitiesMinusButton.SetVarAssoc ("AbilityIndex", i + 1)
 
 		AbilityLabel = AbilitiesWindow.GetControl (0x10000003 + i)
@@ -1229,17 +1230,17 @@ def AbilitiesPress():
 
 	AbilitiesStoreButton = AbilitiesWindow.GetControl (37)
 	AbilitiesStoreButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AbilitiesStoreButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AbilitiesStorePress")
+	AbilitiesStoreButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesStorePress)
 	AbilitiesStoreButton.SetText (17373)
 
 	AbilitiesRecallButton = AbilitiesWindow.GetControl (38)
 	AbilitiesRecallButton.SetState (IE_GUI_BUTTON_DISABLED)
-	AbilitiesRecallButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AbilitiesRecallPress")
+	AbilitiesRecallButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesRecallPress)
 	AbilitiesRecallButton.SetText (17374)
 
 	AbilitiesRerollButton = AbilitiesWindow.GetControl (2)
 	AbilitiesRerollButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AbilitiesRerollButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AbilitiesRerollPress")
+	AbilitiesRerollButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesRerollPress)
 	AbilitiesRerollButton.SetText (11982)
 
 	AbilitiesTextArea = AbilitiesWindow.GetControl (29)
@@ -1247,13 +1248,13 @@ def AbilitiesPress():
 
 	AbilitiesDoneButton = AbilitiesWindow.GetControl (0)
 	AbilitiesDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AbilitiesDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AbilitiesDonePress")
+	AbilitiesDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesDonePress)
 	AbilitiesDoneButton.SetText (11973)
 	AbilitiesDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	AbilitiesCancelButton = AbilitiesWindow.GetControl (36)
 	AbilitiesCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AbilitiesCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AbilitiesCancelPress")
+	AbilitiesCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesCancelPress)
 	AbilitiesCancelButton.SetText (13727)
 	AbilitiesCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -1266,13 +1267,13 @@ def AbilitiesCalcLimits(Index):
 	global AbilitiesRaceReqTable, AbilitiesRaceAddTable, AbilitiesClassReqTable
 	global AbilitiesMinimum, AbilitiesMaximum, AbilitiesModifier
 
-	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
+	RaceName = GUICommon.RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
 	Race = AbilitiesRaceReqTable.GetRowIndex (RaceName)
 	AbilitiesMinimum = AbilitiesRaceReqTable.GetValue (Race, Index * 2)
 	AbilitiesMaximum = AbilitiesRaceReqTable.GetValue (Race, Index * 2 + 1)
 	AbilitiesModifier = AbilitiesRaceAddTable.GetValue (Race, Index)
 
-	ClassName = ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
+	ClassName = GUICommon.ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
 	Class = AbilitiesClassReqTable.GetRowIndex (ClassName)
 	Min = AbilitiesClassReqTable.GetValue (Class, Index)
 	if Min > 0 and AbilitiesMinimum < Min:
@@ -1417,16 +1418,16 @@ def SkillsPress():
 	Level = 1
 	SpellLevel = 1
 	Class = GemRB.GetVar ("Class")-1
-	ClassName = ClassTable.GetRowName (Class)
-	Class = ClassTable.GetValue (Class, 5)
-	IsRanger = ClassSkillsTable.GetValue (Class, 0)
-	IsArcane = ClassSkillsTable.GetValue (Class, 1)
-	IsMage = ClassSkillsTable.GetValue (Class, 2)
-	IsBard = ClassSkillsTable.GetValue (Class, 4)
-	IsThief = ClassSkillsTable.GetValue (Class, 5)
+	ClassName = GUICommon.ClassTable.GetRowName (Class)
+	Class = GUICommon.ClassTable.GetValue (Class, 5)
+	IsRanger = GUICommon.ClassSkillsTable.GetValue (Class, 0)
+	IsArcane = GUICommon.ClassSkillsTable.GetValue (Class, 1)
+	IsMage = GUICommon.ClassSkillsTable.GetValue (Class, 2)
+	IsBard = GUICommon.ClassSkillsTable.GetValue (Class, 4)
+	IsThief = GUICommon.ClassSkillsTable.GetValue (Class, 5)
 
 	if SkillsState == 0:
-		RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
+		RaceName = GUICommon.RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
 		if IsThief!="*":
 			SkillsSelect()
 		elif IsRanger!="*":
@@ -1487,7 +1488,7 @@ def SkillsSelect():
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	SkillsWindow = GemRB.LoadWindow (6)
-	RaceName = RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
+	RaceName = GUICommon.RaceTable.GetRowName (GemRB.GetVar ("Race") - 1)
 	Dexterity = str(GemRB.GetVar ("Ability2") )
 	SkillsTable = GemRB.LoadTable ("SKILLS")
 	SkillRaceTable = GemRB.LoadTable ("SKILLRAC")
@@ -1501,17 +1502,17 @@ def SkillsSelect():
 	for i in range (4):
 		SkillsLabelButton = SkillsWindow.GetControl (21 + i)
 		SkillsLabelButton.SetState (IE_GUI_BUTTON_ENABLED)
-		SkillsLabelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SkillsLabelPress")
+		SkillsLabelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsLabelPress)
 		SkillsLabelButton.SetVarAssoc ("SkillIndex", i)
 
 		SkillsPlusButton = SkillsWindow.GetControl (11 + i * 2)
 		SkillsPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
-		SkillsPlusButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SkillsPlusPress")
+		SkillsPlusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsPlusPress)
 		SkillsPlusButton.SetVarAssoc ("SkillIndex", i)
 
 		SkillsMinusButton = SkillsWindow.GetControl (12 + i * 2)
 		SkillsMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
-		SkillsMinusButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SkillsMinusPress")
+		SkillsMinusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsMinusPress)
 		SkillsMinusButton.SetVarAssoc ("SkillIndex", i)
 
 		SkillName = SkillsTable.GetRowName (i+2)
@@ -1529,13 +1530,13 @@ def SkillsSelect():
 
 	SkillsDoneButton = SkillsWindow.GetControl (0)
 	SkillsDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	SkillsDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SkillsDonePress")
+	SkillsDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsDonePress)
 	SkillsDoneButton.SetText (11973)
 	SkillsDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	SkillsCancelButton = SkillsWindow.GetControl (25)
 	SkillsCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	SkillsCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SkillsCancelPress")
+	SkillsCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsCancelPress)
 	SkillsCancelButton.SetText (13727)
 	SkillsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -1620,27 +1621,27 @@ def RacialEnemySelect():
 	for i in range (2, 8):
 		RacialEnemySelectButton = RacialEnemyWindow.GetControl (i)
 		RacialEnemySelectButton.SetState (IE_GUI_BUTTON_ENABLED)
-		RacialEnemySelectButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RacialEnemySelectPress")
+		RacialEnemySelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RacialEnemySelectPress)
 		RacialEnemySelectButton.SetVarAssoc ("RacialEnemy", i - 1)
 
 	GemRB.SetVar ("RacialEnemyIndex", 0)
 	GemRB.SetVar ("HatedRace", 0)
 	RacialEnemyScrollBar = RacialEnemyWindow.GetControl (1)
 	RacialEnemyScrollBar.SetVarAssoc ("RacialEnemyIndex", RacialEnemyCount - 5)
-	RacialEnemyScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "DisplayRacialEnemies")
+	RacialEnemyScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, DisplayRacialEnemies)
 
 	RacialEnemyTextArea = RacialEnemyWindow.GetControl (8)
 	RacialEnemyTextArea.SetText (17256)
 
 	RacialEnemyDoneButton = RacialEnemyWindow.GetControl (11)
 	RacialEnemyDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	RacialEnemyDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RacialEnemyDonePress")
+	RacialEnemyDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RacialEnemyDonePress)
 	RacialEnemyDoneButton.SetText (11973)
 	RacialEnemyDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	RacialEnemyCancelButton = RacialEnemyWindow.GetControl (10)
 	RacialEnemyCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	RacialEnemyCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RacialEnemyCancelPress")
+	RacialEnemyCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RacialEnemyCancelPress)
 	RacialEnemyCancelButton.SetText (13727)
 	RacialEnemyCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -1693,7 +1694,7 @@ def ProficienciesSelect():
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	ProficienciesWindow = GemRB.LoadWindow (9)
-	ClassName = ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
+	ClassName = GUICommon.ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
 	ProficienciesTable = GemRB.LoadTable ("weapprof")
 	ProfsTable = GemRB.LoadTable ("profs")
 	ProfsMaxTable = GemRB.LoadTable ("profsmax")
@@ -1708,7 +1709,7 @@ def ProficienciesSelect():
 	for i in range (8):
 		ProficienciesLabel = ProficienciesWindow.GetControl (69 + i)
 		ProficienciesLabel.SetState (IE_GUI_BUTTON_ENABLED)
-		ProficienciesLabel.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ProficienciesLabelPress")
+		ProficienciesLabel.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProficienciesLabelPress)
 		ProficienciesLabel.SetVarAssoc ("ProficienciesIndex", i + 1)
 
 		for j in range (5):
@@ -1725,7 +1726,7 @@ def ProficienciesSelect():
 			ProficienciesPlusButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		else:
 			ProficienciesPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
-		ProficienciesPlusButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ProficienciesPlusPress")
+		ProficienciesPlusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProficienciesPlusPress)
 		ProficienciesPlusButton.SetVarAssoc ("ProficienciesIndex", i + 1)
 
 		ProficienciesMinusButton = ProficienciesWindow.GetControl (12 + i * 2)
@@ -1734,13 +1735,13 @@ def ProficienciesSelect():
 			ProficienciesMinusButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		else:
 			ProficienciesMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
-		ProficienciesMinusButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ProficienciesMinusPress")
+		ProficienciesMinusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProficienciesMinusPress)
 		ProficienciesMinusButton.SetVarAssoc ("ProficienciesIndex", i + 1)
 
 	for i in range (7):
 		ProficienciesLabel = ProficienciesWindow.GetControl (85 + i)
 		ProficienciesLabel.SetState (IE_GUI_BUTTON_ENABLED)
-		ProficienciesLabel.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ProficienciesLabelPress")
+		ProficienciesLabel.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProficienciesLabelPress)
 		ProficienciesLabel.SetVarAssoc ("ProficienciesIndex", i + 9)
 
 		for j in range (5):
@@ -1757,7 +1758,7 @@ def ProficienciesSelect():
 			ProficienciesPlusButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		else:
 			ProficienciesPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
-		ProficienciesPlusButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ProficienciesPlusPress")
+		ProficienciesPlusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProficienciesPlusPress)
 		ProficienciesPlusButton.SetVarAssoc ("ProficienciesIndex", i + 9)
 
 		ProficienciesMinusButton = ProficienciesWindow.GetControl (128 + i * 2)
@@ -1766,7 +1767,7 @@ def ProficienciesSelect():
 			ProficienciesMinusButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		else:
 			ProficienciesMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
-		ProficienciesMinusButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ProficienciesMinusPress")
+		ProficienciesMinusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProficienciesMinusPress)
 		ProficienciesMinusButton.SetVarAssoc ("ProficienciesIndex", i + 9)
 
 	for i in range (15):
@@ -1778,13 +1779,13 @@ def ProficienciesSelect():
 
 	ProficienciesDoneButton = ProficienciesWindow.GetControl (0)
 	ProficienciesDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	ProficienciesDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ProficienciesDonePress")
+	ProficienciesDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProficienciesDonePress)
 	ProficienciesDoneButton.SetText (11973)
 	ProficienciesDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	ProficienciesCancelButton = ProficienciesWindow.GetControl (77)
 	ProficienciesCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	ProficienciesCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ProficienciesCancelPress")
+	ProficienciesCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProficienciesCancelPress)
 	ProficienciesCancelButton.SetText (13727)
 	ProficienciesCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -1803,7 +1804,7 @@ def ProficienciesPlusPress():
 
 	ProficienciesIndex = GemRB.GetVar ("ProficienciesIndex") - 1
 	ProficienciesValue = GemRB.GetVar ("Proficiency" + str(ProficienciesIndex) )
-	ClassName = ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
+	ClassName = GUICommon.ClassTable.GetRowName (GemRB.GetVar ("Class") - 1)
 	Class = ProfsMaxTable.GetRowIndex (ClassName)
 	if ProficienciesPointsLeft > 0 and ProficienciesValue < ProfsMaxTable.GetValue (Class, 0):
 		ProficienciesPointsLeft = ProficienciesPointsLeft - 1
@@ -1876,7 +1877,7 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	#kit (school), alignment, level
 	k = GemRB.GetVar ("Class Kit")
 	t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
-	Learnable = GetLearnableMageSpells(k, t, SpellLevel)
+	Learnable = GUICommon.GetLearnableMageSpells(k, t, SpellLevel)
 	GemRB.SetVar ("MageSpellBook", 0)
 	GemRB.SetVar ("SpellMask", 0)
 
@@ -1899,7 +1900,7 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 			Spell = GemRB.GetSpell (Learnable[i])
 			SpellButton.SetSpellIcon(Learnable[i], 1)
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
-			SpellButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MageSpellsSelectPress")
+			SpellButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MageSpellsSelectPress)
 			SpellButton.SetVarAssoc ("SpellMask", 1 << i)
 			SpellButton.SetTooltip(Spell["SpellName"])
 		else:
@@ -1911,13 +1912,13 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 
 	MageSpellsDoneButton = MageSpellsWindow.GetControl (0)
 	MageSpellsDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	MageSpellsDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MageSpellsDonePress")
+	MageSpellsDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MageSpellsDonePress)
 	MageSpellsDoneButton.SetText (11973)
 	MageSpellsDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	MageSpellsCancelButton = MageSpellsWindow.GetControl (29)
 	MageSpellsCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	MageSpellsCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MageSpellsCancelPress")
+	MageSpellsCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MageSpellsCancelPress)
 	MageSpellsCancelButton.SetText (13727)
 	MageSpellsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -2016,7 +2017,7 @@ def MageSpellsMemorize(SpellTable, Level, SpellLevel):
 			SpellButton.SetTooltip(Spell["SpellName"])
 			SpellButton.SetSpellIcon(Learnable[j], 1)
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
-			SpellButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MageMemorizeSelectPress")
+			SpellButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MageMemorizeSelectPress)
 			SpellButton.SetVarAssoc ("SpellMask", 1 << j)
 			j = j + 1
 		else:
@@ -2028,13 +2029,13 @@ def MageSpellsMemorize(SpellTable, Level, SpellLevel):
 
 	MageMemorizeDoneButton = MageMemorizeWindow.GetControl (0)
 	MageMemorizeDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	MageMemorizeDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MageMemorizeDonePress")
+	MageMemorizeDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MageMemorizeDonePress)
 	MageMemorizeDoneButton.SetText (11973)
 	MageMemorizeDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	MageMemorizeCancelButton = MageMemorizeWindow.GetControl (29)
 	MageMemorizeCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	MageMemorizeCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "MageMemorizeCancelPress")
+	MageMemorizeCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MageMemorizeCancelPress)
 	MageMemorizeCancelButton.SetText (13727)
 	MageMemorizeCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -2115,7 +2116,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	PriestMemorizeWindow = GemRB.LoadWindow (17)
 	t = AlignmentTable.GetValue ( GemRB.GetVar ("Alignment")-1, 3)
-	Learnable = GetLearnablePriestSpells( ClassFlag, t, SpellLevel)
+	Learnable = GUICommon.GetLearnablePriestSpells( ClassFlag, t, SpellLevel)
 
 	MaxSpellsPriestTable = GemRB.LoadTable (SpellTable)
 	GemRB.SetVar ("PriestMemorized", 0)
@@ -2138,7 +2139,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 			SpellButton.SetTooltip(Spell["SpellName"])
 			SpellButton.SetSpellIcon(Learnable[i])
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
-			SpellButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PriestMemorizeSelectPress")
+			SpellButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestMemorizeSelectPress)
 			SpellButton.SetVarAssoc ("SpellMask", 1 << i)
 		else:
 			SpellButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -2149,13 +2150,13 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 
 	PriestMemorizeDoneButton = PriestMemorizeWindow.GetControl (0)
 	PriestMemorizeDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	PriestMemorizeDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PriestMemorizeDonePress")
+	PriestMemorizeDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestMemorizeDonePress)
 	PriestMemorizeDoneButton.SetText (11973)
 	PriestMemorizeDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	PriestMemorizeCancelButton = PriestMemorizeWindow.GetControl (29)
 	PriestMemorizeCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PriestMemorizeCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PriestMemorizeCancelPress")
+	PriestMemorizeCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestMemorizeCancelPress)
 	PriestMemorizeCancelButton.SetText (13727)
 	PriestMemorizeCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -2253,36 +2254,36 @@ def AppearancePress():
 	AppearanceHairButton = AppearanceWindow.GetControl (2)
 	AppearanceHairButton.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 	AppearanceHairButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AppearanceHairButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AppearanceHairPress")
+	AppearanceHairButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AppearanceHairPress)
 	AppearanceHairButton.SetBAM ("COLGRAD", 0, 0, HairColor)
 
 	AppearanceSkinButton = AppearanceWindow.GetControl (3)
 	AppearanceSkinButton.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 	AppearanceSkinButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AppearanceSkinButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AppearanceSkinPress")
+	AppearanceSkinButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AppearanceSkinPress)
 	AppearanceSkinButton.SetBAM ("COLGRAD", 0, 0, SkinColor)
 
 	AppearanceMajorButton = AppearanceWindow.GetControl (4)
 	AppearanceMajorButton.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 	AppearanceMajorButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AppearanceMajorButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AppearanceMajorPress")
+	AppearanceMajorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AppearanceMajorPress)
 	AppearanceMajorButton.SetBAM ("COLGRAD", 0, 0, MajorColor)
 
 	AppearanceMinorButton = AppearanceWindow.GetControl (5)
 	AppearanceMinorButton.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 	AppearanceMinorButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AppearanceMinorButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AppearanceMinorPress")
+	AppearanceMinorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AppearanceMinorPress)
 	AppearanceMinorButton.SetBAM ("COLGRAD", 0, 0, MinorColor)
 
 	AppearanceDoneButton = AppearanceWindow.GetControl (0)
 	AppearanceDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AppearanceDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AppearanceDonePress")
+	AppearanceDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AppearanceDonePress)
 	AppearanceDoneButton.SetText (11973)
 	AppearanceDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	AppearanceCancelButton = AppearanceWindow.GetControl (13)
 	AppearanceCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AppearanceCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AppearanceCancelPress")
+	AppearanceCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AppearanceCancelPress)
 	AppearanceCancelButton.SetText (13727)
 	AppearanceCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -2300,7 +2301,7 @@ def DrawAvatar():
 	table = GemRB.LoadTable ("avprefg")
 	AvatarID = AvatarID+table.GetValue (GemRB.GetVar ("Gender"),0)
 
-	AvatarRef = AppearanceAvatarTable.GetValue (hex(AvatarID), "LEVEL1")
+	AvatarRef = GUICommon.AppearanceAvatarTable.GetValue (hex(AvatarID), "LEVEL1")
 	AppearanceAvatarButton.SetPLT(AvatarRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
 
 	#AppearanceAvatarButton.SetBAM (AvatarRef, 0, 0, 0)
@@ -2345,7 +2346,7 @@ def AppearanceColorChoice (CurrentColor):
 		if Color != "*":
 			ColorButton = AppearanceColorWindow.GetControl (i)
 			ColorButton.SetBAM ("COLGRAD", 0, 0, Color)
-			ColorButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AppearanceColorSelected")
+			ColorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AppearanceColorSelected)
 			ColorButton.SetVarAssoc ("SelectedColor", Color)
 
 	AppearanceColorWindow.SetVisible (WINDOW_VISIBLE)
@@ -2412,7 +2413,7 @@ def CharSoundSelect():
 
 	CharSoundPlayButton = CharSoundWindow.GetControl (47)
 	CharSoundPlayButton.SetState (IE_GUI_BUTTON_ENABLED)
-	CharSoundPlayButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CharSoundPlayPress")
+	CharSoundPlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CharSoundPlayPress)
 	CharSoundPlayButton.SetText (17318)
 
 	CharSoundTextArea = CharSoundWindow.GetControl (50)
@@ -2420,13 +2421,13 @@ def CharSoundSelect():
 
 	CharSoundDoneButton = CharSoundWindow.GetControl (0)
 	CharSoundDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	CharSoundDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CharSoundDonePress")
+	CharSoundDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CharSoundDonePress)
 	CharSoundDoneButton.SetText (11973)
 	CharSoundDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	CharSoundCancelButton = CharSoundWindow.GetControl (10)
 	CharSoundCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	CharSoundCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CharSoundCancelPress")
+	CharSoundCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CharSoundCancelPress)
 	CharSoundCancelButton.SetText (13727)
 	CharSoundCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -2478,18 +2479,18 @@ def BiographyPress():
 
 	BiographyClearButton = BiographyWindow.GetControl (5)
 	BiographyClearButton.SetState (IE_GUI_BUTTON_ENABLED)
-	BiographyClearButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BiographyClearPress")
+	BiographyClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BiographyClearPress)
 	BiographyClearButton.SetText (18622)
 
 	BiographyCancelButton = BiographyWindow.GetControl (2)
 	BiographyCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	BiographyCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BiographyCancelPress")
+	BiographyCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BiographyCancelPress)
 	BiographyCancelButton.SetText (13727)
 	BiographyCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	BiographyDoneButton = BiographyWindow.GetControl (1)
 	BiographyDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	BiographyDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BiographyDonePress")
+	BiographyDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BiographyDonePress)
 	BiographyDoneButton.SetText (11973)
 	BiographyDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
@@ -2528,17 +2529,17 @@ def NamePress():
 	NameWindow = GemRB.LoadWindow (5)
 
 	NameField = NameWindow.GetControl (2)
-	NameField.SetEventByName (IE_GUI_EDIT_ON_CHANGE, "NameEditChange")
+	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, NameEditChange)
 
 	NameDoneButton = NameWindow.GetControl (0)
 	NameDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	NameDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "NameDonePress")
+	NameDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NameDonePress)
 	NameDoneButton.SetText (11973)
 	NameDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	NameCancelButton = NameWindow.GetControl (3)
 	NameCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	NameCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "NameCancelPress")
+	NameCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NameCancelPress)
 	NameCancelButton.SetText (13727)
 	NameCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -2595,13 +2596,13 @@ def ImportPress():
 
 	ImportDoneButton = ImportWindow.GetControl (0)
 	ImportDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	ImportDoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ImportDonePress")
+	ImportDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ImportDonePress)
 	ImportDoneButton.SetText (11973)
 	ImportDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	ImportCancelButton = ImportWindow.GetControl (1)
 	ImportCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	ImportCancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ImportCancelPress")
+	ImportCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ImportCancelPress)
 	ImportCancelButton.SetText (13727)
 	ImportCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 

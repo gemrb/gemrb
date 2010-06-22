@@ -40,7 +40,7 @@ def StartLoadScreen ():
 	Progress = 0
 	GemRB.SetVar ("Progress", Progress)
 	Bar.SetVarAssoc ("Progress", Progress)
-	Bar.SetEventByName (IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
+	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	LoadScreen.SetVisible (WINDOW_VISIBLE)
 	return
 

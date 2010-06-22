@@ -22,11 +22,9 @@
 
 ###################################################
 import GemRB
+import GUICommon
 import GUICommonWindows
 from GUIDefines import *
-from GUICommon import CloseOtherWindow
-from GUICommon import GameWindow
-from GUICommonWindows import *
 
 ###################################################
 JournalWindow = None
@@ -46,7 +44,7 @@ def OpenJournalWindow ():
 	global OldPortraitWindow, OldOptionsWindow
 	global Chapter
 
-	if CloseOtherWindow (OpenJournalWindow):
+	if GUICommon.CloseOtherWindow (OpenJournalWindow):
 		if JournalWindow:
 			JournalWindow.Unload ()
 		if OptionsWindow:
@@ -56,7 +54,7 @@ def OpenJournalWindow ():
  
 		JournalWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
@@ -65,7 +63,7 @@ def OpenJournalWindow ():
 		return
 		
 	GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIJRNL", 640, 480)
 	JournalWindow = Window = GemRB.LoadWindow (2)
@@ -73,10 +71,10 @@ def OpenJournalWindow ():
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	SetupMenuWindowControls (OptionsWindow, 0, "OpenJournalWindow")
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenJournalWindow)
 	OptionsWindow.SetFrame ()
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	Table = GemRB.LoadTable("YEARS")
 	#StartTime is the time offset for ingame time, beginning from the startyear
@@ -85,10 +83,10 @@ def OpenJournalWindow ():
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 
 	Button = Window.GetControl (3)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "JournalPrevSectionPress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, JournalPrevSectionPress)
 
 	Button = Window.GetControl (4)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "JournalNextSectionPress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, JournalNextSectionPress)
 
 	Chapter = GemRB.GetGameVar("chapter")
 	UpdateJournalWindow ()
