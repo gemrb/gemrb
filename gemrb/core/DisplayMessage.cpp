@@ -113,24 +113,24 @@ unsigned int DisplayMessage::GetSpeakerColor(const char *&name, const Scriptable
 void DisplayMessage::DisplayConstantString(int stridx, unsigned int color, Scriptable *target) const
 {
 	if (stridx<0) return;
-	char* text = core->GetString( strref_table[stridx], IE_STR_SOUND );
-	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 12);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormat, color, text );
-	core->FreeString( text );
-	DisplayString( newstr, target);
-	free( newstr );
+	const char* text = core->GetString( strref_table[stridx], IE_STR_SOUND );
+	DisplayString(text, color, target);
 }
 
 void DisplayMessage::DisplayString(int stridx, unsigned int color, ieDword flags) const
 {
 	if (stridx<0) return;
-	char* text = core->GetString( stridx, flags);
-	int newlen = (int)(strlen( DisplayFormat) + strlen( text ) + 10);
+	const char* text = core->GetString( stridx, flags);
+	DisplayString(text, color, NULL);
+}
+
+void DisplayMessage::DisplayString(const char *text, unsigned int color, Scriptable *target) const
+{
+	if (!text) return;
+	int newlen = (int)(strlen( DisplayFormat) + strlen( text ) + 12);
 	char* newstr = ( char* ) malloc( newlen );
 	snprintf( newstr, newlen, DisplayFormat, color, text );
-	core->FreeString( text );
-	DisplayString( newstr );
+	DisplayString( newstr, target );
 	free( newstr );
 }
 

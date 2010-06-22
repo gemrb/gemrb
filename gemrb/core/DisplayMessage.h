@@ -59,6 +59,7 @@ public:
 	void DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *actor, const Scriptable *target) const;
 	/** displays a string in the textarea */
 	void DisplayString(int stridx, unsigned int color, ieDword flags) const;
+	void DisplayString(const char *text, unsigned int color, Scriptable *target) const;
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(int stridx, unsigned int color, const Scriptable *speaker, ieDword flags) const;
 	void DisplayStringName(const char *text, unsigned int color, const Scriptable *speaker) const;
