@@ -561,6 +561,9 @@ def IsDualClassed(actor, verbose):
 	Return[2] contains the class index of the new class.
 	If verbose is false, only Return[0] contains useable data."""
 
+	if GameIsIWD2():
+		return (0,-1,-1)
+
 	Dual = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
 	Dual = Dual & ~(MC_EXPORTABLE|MC_PLOT_CRITICAL|MC_BEENINPARTY|MC_HIDDEN)
 
@@ -644,6 +647,10 @@ def IsMultiClassed (actor, verbose):
 	Return[0] contains the total number of classes.
 	Return[1-3] contain the ID of their respective classes.
 	If verbose is false, only Return[0] has useable data."""
+
+	# change this if it will ever be needed
+	if GameIsIWD2():
+		return (0,-1,-1,-1)
 
 	# get our base class
 	ClassIndex = ClassTable.FindValue (5, GemRB.GetPlayerStat (actor, IE_CLASS))
