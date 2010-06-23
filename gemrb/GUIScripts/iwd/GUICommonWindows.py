@@ -177,7 +177,7 @@ def SetupFormation ():
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%i,0,0,-1)
 		Button.SetVarAssoc ("Value", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectFormationPreset)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectFormationPreset)
 	return
 
 def GroupControls ():
