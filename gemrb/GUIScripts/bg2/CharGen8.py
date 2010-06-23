@@ -17,7 +17,6 @@
 #
 #
 #character generation (GUICG 0)
-import GemRB
 import CharGenCommon
 
 def OnLoad():

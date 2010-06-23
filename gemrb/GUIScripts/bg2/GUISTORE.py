@@ -24,6 +24,7 @@
 
 import GemRB
 import GUICommon
+import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -86,7 +87,6 @@ def CloseWindows ():
 	return
 
 def CloseStoreWindow ():
-	import GUICommonWindows
 	import GUIINV
 	global StoreWindow, ActionWindow, PortraitWindow
 	global OldPortraitWindow
@@ -111,7 +111,6 @@ def CloseStoreWindow ():
 	return
 
 def OpenStoreWindow ():
-	import GUICommonWindows
 	global Store
 	global StoreWindow, ActionWindow, PortraitWindow
 	global OldPortraitWindow
@@ -181,7 +180,6 @@ def OpenStoreWindow ():
 	return
 
 def OpenStoreShoppingWindow ():
-	import GUICommonWindows
 	global StoreShoppingWindow
 	global LeftButton, RightButton
 
@@ -272,7 +270,6 @@ def OpenStoreShoppingWindow ():
 	return
 
 def OpenStoreIdentifyWindow ():
-	import GUICommonWindows
 	global StoreIdentifyWindow
 
 	GemRB.SetVar ("Index", -1)
@@ -352,7 +349,6 @@ def OpenStoreStealWindow ():
 	return
 
 def OpenStoreDonateWindow ():
-	import GUICommonWindows
 	global StoreDonateWindow
 
 	CloseWindows ()

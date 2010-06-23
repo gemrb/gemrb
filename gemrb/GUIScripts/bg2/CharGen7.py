@@ -17,7 +17,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 #character generation - skills/profs/spells; next apearance/sound (CharGen7)
-import GemRB
 import CharGenCommon
 
 def OnLoad():

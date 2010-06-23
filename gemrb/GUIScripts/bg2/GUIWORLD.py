@@ -25,6 +25,7 @@
 import GemRB
 from GUIDefines import *
 import GUICommon
+import GUICommonWindows
 import GUIClasses
 
 FRAME_PC_SELECTED = 0
@@ -60,7 +61,6 @@ def NextDialogState ():
 
 
 def OpenEndMessageWindow ():
-	import GUICommonWindows
 	global ContinueWindow, OldActionsWindow
 
 	hideflag = GemRB.HideGUI ()
@@ -306,7 +306,6 @@ def TakeItemContainer ():
 
 
 def UpdateReformWindow ():
-	import GUICommonWindows
 	Window = ReformPartyWindow
 
 	select = GemRB.GetVar ("Selected")
@@ -397,7 +396,6 @@ def RemovePlayerCancel ():
 	return
 
 def OpenReformPartyWindow ():
-	import GUICommonWindows
 	global ReformPartyWindow, OldActionsWindow, OldMessageWindow
 
 	GemRB.SetVar ("Selected", 0)
