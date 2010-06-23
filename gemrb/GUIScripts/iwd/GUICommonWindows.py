@@ -37,10 +37,6 @@ import GUIINV
 import GUIOPT
 import GUIPR
 import GUIREC
-#import GUISTORE
-#import GUIWORLD
-#import TextScreen
-#import LevelUp
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1

@@ -435,7 +435,7 @@ def SetCharacterDescription():
 		KitIndex = GemRB.GetVar ("MAGESCHOOL")
 		if KitIndex == 0:
 			Class = GemRB.GetVar ("Class")-1
-			ClassTitle=ClassTable.GetValue (Class, 2)
+			ClassTitle = GUICommon.ClassTable.GetValue (Class, 2)
 		else:
 			ClassTitle=KitTable.GetValue (KitIndex, 2)
 		TextArea.Append (ClassTitle)
@@ -443,7 +443,7 @@ def SetCharacterDescription():
 	if CharGenState > 1:
 		TextArea.Append (1048, -1)
 		TextArea.Append (": ")
-		TextArea.Append (RaceTable.GetValue (GemRB.GetVar ("Race") - 1, 2) )
+		TextArea.Append (GUICommon.RaceTable.GetValue (GemRB.GetVar ("Race") - 1, 2) )
 	if CharGenState > 3:
 		TextArea.Append (1049, -1)
 		TextArea.Append (": ")
@@ -835,7 +835,7 @@ def RacePress():
 		RaceSelectButton = RaceWindow.GetControl (i)
 		RaceSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
 		RaceSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RaceSelectPress)
-		RaceSelectButton.SetText (RaceTable.GetValue (i - 2, 0))
+		RaceSelectButton.SetText (GUICommon.RaceTable.GetValue (i - 2, 0))
 		RaceSelectButton.SetVarAssoc ("Race", i - 1)
 
 	RaceTextArea = RaceWindow.GetControl (8)
@@ -860,7 +860,7 @@ def RaceSelectPress():
 	global RaceWindow, RaceDoneButton, RaceTextArea
 
 	Race = GemRB.GetVar ("Race") - 1
-	RaceTextArea.SetText (RaceTable.GetValue (Race, 1) )
+	RaceTextArea.SetText (GUICommon.RaceTable.GetValue (Race, 1) )
 	RaceDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -907,7 +907,7 @@ def ClassPress():
 	HasMulti = 0
 	j = 2
 	for i in range (ClassCount):
-		Allowed = GUICommon.ClassTable.GetValue (ClassTable.GetRowName (i), RaceName)
+		Allowed = GUICommon.ClassTable.GetValue (GUICommon.ClassTable.GetRowName (i), RaceName)
 		if GUICommon.ClassTable.GetValue (i, 4):
 			if Allowed != 0:
 				HasMulti = 1
@@ -919,7 +919,7 @@ def ClassPress():
 			else:
 				ClassSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
 			ClassSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,  ClassSelectPress)
-			ClassSelectButton.SetText (ClassTable.GetValue (i, 0) )
+			ClassSelectButton.SetText (GUICommon.ClassTable.GetValue (i, 0) )
 			ClassSelectButton.SetVarAssoc ("Class", i + 1)
 
 	ClassMultiButton = ClassWindow.GetControl (10)
@@ -962,7 +962,7 @@ def ClassSelectPress():
 	global ClassWindow, ClassTextArea, ClassDoneButton
 
 	Class = GemRB.GetVar ("Class") - 1
-	ClassTextArea.SetText (ClassTable.GetValue (Class, 1) )
+	ClassTextArea.SetText (GUICommon.ClassTable.GetValue (Class, 1) )
 	ClassDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -981,15 +981,15 @@ def ClassMultiPress():
 	j = 2
 	for i in range (ClassCount):
 		ClassName = GUICommon.ClassTable.GetRowName (i)
-		if (ClassTable.GetValue (ClassName, "MULTI") > 0):
+		if (GUICommon.ClassTable.GetValue (ClassName, "MULTI") > 0):
 			ClassMultiSelectButton = ClassMultiWindow.GetControl (j)
 			j = j + 1
-			if (ClassTable.GetValue (ClassName, RaceName) > 0):
+			if (GUICommon.ClassTable.GetValue (ClassName, RaceName) > 0):
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
 			else:
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
 			ClassMultiSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,  ClassMultiSelectPress)
-			ClassMultiSelectButton.SetText (ClassTable.GetValue (i, 0) )
+			ClassMultiSelectButton.SetText (GUICommon.ClassTable.GetValue (i, 0) )
 			ClassMultiSelectButton.SetVarAssoc ("Class", i + 1)
 
 	ClassMultiTextArea = ClassMultiWindow.GetControl (12)
@@ -1014,7 +1014,7 @@ def ClassMultiSelectPress():
 	global ClassMultiWindow, ClassMultiTextArea, ClassMultiDoneButton
 
 	Class = GemRB.GetVar ("Class") - 1
-	ClassMultiTextArea.SetText (ClassTable.GetValue (Class, 1) )
+	ClassMultiTextArea.SetText (GUICommon.ClassTable.GetValue (Class, 1) )
 	ClassMultiDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 

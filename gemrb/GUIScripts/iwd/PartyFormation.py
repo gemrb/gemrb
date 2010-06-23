@@ -38,7 +38,7 @@ def OnLoad ():
 	PartyFormationWindow.SetFrame ()
 
 	ModifyCharsButton = PartyFormationWindow.GetControl (43)
-	ModifyCharsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ModifyPress)
+	ModifyCharsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: ModifyPress
 	ModifyCharsButton.SetStatus (IE_GUI_BUTTON_DISABLED)
 	ModifyCharsButton.SetText (18816)
 
