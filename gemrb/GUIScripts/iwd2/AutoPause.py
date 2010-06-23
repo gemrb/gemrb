@@ -20,6 +20,7 @@
 # autopause options using GUIOPT
 
 import GemRB
+from GUIDefines import *
 
 def OnLoad ():
 	global AutoPauseWindow, TextAreaControl
@@ -85,52 +86,52 @@ def OnLoad ():
 	CancelButton.SetText (13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	ChHitButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ChHitButtonPress")
+	ChHitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ChHitButtonPress)
 	ChHitButtonB.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	ChHitButtonB.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ChHitButtonPress")
+	ChHitButtonB.SetEvent (IE_GUI_BUTTON_ON_PRESS, ChHitButtonPress)
 
-	ChInjured.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ChInjuredPress")
+	ChInjured.SetEvent (IE_GUI_BUTTON_ON_PRESS, ChInjuredPress)
 	ChInjuredB.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	ChInjuredB.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ChInjuredPress")
+	ChInjuredB.SetEvent (IE_GUI_BUTTON_ON_PRESS, ChInjuredPress)
 
-	ChDeath.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ChDeathPress")
+	ChDeath.SetEvent (IE_GUI_BUTTON_ON_PRESS, ChDeathPress)
 	ChDeathB.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	ChDeathB.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ChDeathPress")
+	ChDeathB.SetEvent (IE_GUI_BUTTON_ON_PRESS, ChDeathPress)
 
-	ChAttacked.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ChAttackedPress")
+	ChAttacked.SetEvent (IE_GUI_BUTTON_ON_PRESS, ChAttackedPress)
 	ChAttackedB.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	ChAttackedB.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ChAttackedPress")
+	ChAttackedB.SetEvent (IE_GUI_BUTTON_ON_PRESS, ChAttackedPress)
 
-	WeaponUnusable.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "WeaponUnusablePress")
+	WeaponUnusable.SetEvent (IE_GUI_BUTTON_ON_PRESS, WeaponUnusablePress)
 	WeaponUnusableB.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	WeaponUnusableB.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "WeaponUnusablePress")
+	WeaponUnusableB.SetEvent (IE_GUI_BUTTON_ON_PRESS, WeaponUnusablePress)
 
-	TargetDestroyed.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "TargetDestroyedPress")
+	TargetDestroyed.SetEvent (IE_GUI_BUTTON_ON_PRESS, TargetDestroyedPress)
 	TargetDestroyedB.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	TargetDestroyedB.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "TargetDestroyedPress")
+	TargetDestroyedB.SetEvent (IE_GUI_BUTTON_ON_PRESS, TargetDestroyedPress)
 
-	EndOfRound.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "EndOfRoundPress")
+	EndOfRound.SetEvent (IE_GUI_BUTTON_ON_PRESS, EndOfRoundPress)
 	EndOfRoundB.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	EndOfRoundB.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "EndOfRoundPress")
+	EndOfRoundB.SetEvent (IE_GUI_BUTTON_ON_PRESS, EndOfRoundPress)
 
-	EnemySighted.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "EnemySightedPress")
+	EnemySighted.SetEvent (IE_GUI_BUTTON_ON_PRESS, EnemySightedPress)
 	EnemySightedB.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	EnemySightedB.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "EnemySightedPress")
+	EnemySightedB.SetEvent (IE_GUI_BUTTON_ON_PRESS, EnemySightedPress)
 
-	SpellCast.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SpellCastPress")
+	SpellCast.SetEvent (IE_GUI_BUTTON_ON_PRESS, SpellCastPress)
 	SpellCastB.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	SpellCastB.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SpellCastPress")
+	SpellCastB.SetEvent (IE_GUI_BUTTON_ON_PRESS, SpellCastPress)
 
-	TrapFound.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "TrapFoundPress")
+	TrapFound.SetEvent (IE_GUI_BUTTON_ON_PRESS, TrapFoundPress)
 	TrapFoundB.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	TrapFoundB.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "TrapFoundPress")
+	TrapFoundB.SetEvent (IE_GUI_BUTTON_ON_PRESS, TrapFoundPress)
 
-	AutopauseCenter.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AutopauseCenterPress")
+	AutopauseCenter.SetEvent (IE_GUI_BUTTON_ON_PRESS, AutopauseCenterPress)
 	AutopauseCenterB.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	AutopauseCenterB.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AutopauseCenterPress")
+	AutopauseCenterB.SetEvent (IE_GUI_BUTTON_ON_PRESS, AutopauseCenterPress)
 
-	OkButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OkPress")
-	CancelButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OkPress)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
 
 	AutopauseCenterB.SetVarAssoc ("Auto Pause Center",1)
 

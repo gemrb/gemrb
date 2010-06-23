@@ -17,15 +17,22 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
 
 import GemRB
+import GUICommon
 from GUIDefines import *
-from GUICommon import *
 from ie_stats import *
 from ie_modal import *
 from ie_action import *
+
+import GUIINV
+import GUIJRNL
+import GUIMA
+import GUIOPT
+import GUISPL
+import GUIREC
+import LUCommon
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -38,48 +45,48 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	global OptionsWindow
 
 	OptionsWindow = Window
-	#Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
+	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
 
 	# Spellbook
 	Button = Window.GetControl (4)
 	Button.SetTooltip (16309)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 0)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenSpellBookWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUISPL.OpenSpellBookWindow)
 
 	# Inventory
 	Button = Window.GetControl (5)
 	Button.SetTooltip (16307)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 1)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
 
 	# Journal
 	Button = Window.GetControl (6)
 	Button.SetTooltip (16308)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 2)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIJRNL.OpenJournalWindow)
 	# Map
 	Button = Window.GetControl (7)
 	Button.SetTooltip (16310)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 3)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMA.OpenMapWindow)
 
 	# Records
 	Button = Window.GetControl (8)
 	Button.SetTooltip (16306)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 4)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenRecordsWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIREC.OpenRecordsWindow)
 
 	# Options
 	Button = Window.GetControl (9)
 	Button.SetTooltip (16311)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 7)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenOptionsWindow)
 
 	# Gears
 	Button = Window.GetControl (10)
@@ -91,16 +98,16 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		# Select All
 		Button = Window.GetControl (11)
 		Button.SetTooltip (10485)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
 		# Rest
 		Button = Window.GetControl (12)
 		Button.SetTooltip (11942)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RestPress")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
 
 		# Character Arbitration
 		Button = Window.GetControl (13)
 		Button.SetTooltip (16312)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CharacterWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: CharacterWindow
 	return
 
 def AIPress ():
@@ -132,7 +139,7 @@ def SetupFormation ():
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%i,0,0,-1)
 		Button.SetVarAssoc ("Value", i)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectFormationPreset")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectFormationPreset)
 	return
 
 def GroupControls ():
@@ -162,8 +169,8 @@ def GroupControls ():
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%idx,0,0,-1)
 		Button.SetVarAssoc ("Formation", i)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectFormation")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "SetupFormation")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectFormation)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SetupFormation)
 		str = GemRB.GetString (4935)
 		Button.SetTooltip ("F%d - %s"%(8+i,str) )
 	return
@@ -372,8 +379,8 @@ def GetActorRaceTitle (actor):
 		RaceID += GemRB.GetPlayerStat (actor, IE_RACE)<<16
 	else:
 		RaceID = GemRB.GetPlayerStat (actor, IE_RACE)
-	row = RaceTable.FindValue (3, RaceID )
-	RaceTitle = RaceTable.GetValue (row, 2)
+	row = GUICommon.RaceTable.FindValue (3, RaceID )
+	RaceTitle = GUICommon.RaceTable.GetValue (row, 2)
 	return RaceTitle
 
 # NOTE: this function is called with the primary classes
@@ -381,11 +388,11 @@ def GetKitIndex (actor, ClassIndex):
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 
 	KitIndex = -1
-	ClassID = ClassTable.GetValue (ClassIndex, 2)
+	ClassID = GUICommon.ClassTable.GetValue (ClassIndex, 2)
 	# skip the primary classes
-	for ci in range (10, ClassTable.GetRowCount ()):
-		BaseClass = ClassTable.GetValue (ci, 3)
-		if BaseClass == ClassID and Kit & ClassTable.GetValue (ci, 2):
+	for ci in range (10, GUICommon.ClassTable.GetRowCount ()):
+		BaseClass = GUICommon.ClassTable.GetValue (ci, 3)
+		if BaseClass == ClassID and Kit & GUICommon.ClassTable.GetValue (ci, 2):
 			KitIndex = ci
 
 	if KitIndex == -1:
@@ -401,9 +408,9 @@ def GetActorClassTitle (actor, ClassIndex):
 	#Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	KitIndex = GetKitIndex (actor, ClassIndex)
 	if KitIndex == 0:
-		ClassTitle = ClassTable.GetValue (ClassIndex, 0)
+		ClassTitle = GUICommon.ClassTable.GetValue (ClassIndex, 0)
 	else:
-		ClassTitle = ClassTable.GetValue (KitIndex, 0)
+		ClassTitle = GUICommon.ClassTable.GetValue (KitIndex, 0)
 
 	if ClassTitle == "*":
 		return 0
@@ -452,12 +459,12 @@ def OpenPortraitWindow ():
 
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG, "PortraitButtonOnDrag")
-		Button.SetEventByName (IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
-		Button.SetEventByName (IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
+		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, PortraitButtonOnShiftPress)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, GUIINV.OnDropItemToPC)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, PortraitButtonOnDrag)
+		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, PortraitButtonOnMouseEnter)
+		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, PortraitButtonOnMouseLeave)
 
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_TOP|IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_PICTURE, OP_SET)
 
@@ -534,6 +541,9 @@ def PortraitButtonOnShiftPress ():
 
 # Run by Game class when selection was changed
 def SelectionChanged ():
+	if not PortraitWindow:
+		return
+
 	# FIXME: hack. If defined, display single selection
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
@@ -590,4 +600,4 @@ def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
 def CheckLevelUp(pc):
-	GemRB.SetVar (CheckLevelUp+str(pc), CanLevelUp (pc))
+	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))

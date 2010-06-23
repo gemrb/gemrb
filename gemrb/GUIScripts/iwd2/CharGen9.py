@@ -18,9 +18,10 @@
 #
 #character generation (GUICG 0)
 import GemRB
+from GUIDefines import *
 from ie_stats import *
-from GUICommon import SetColorStat, RaceTable
-from CharOverview import *
+import GUICommon
+import CharOverview
 
 BioWindow = 0
 EditControl = 0
@@ -28,9 +29,9 @@ AlignmentTable = 0
 PortraitName = ""
 
 def OnLoad():
-	UpdateOverview(9)
-	if CharGenWindow:
-		PersistButtons['Next'].SetState(IE_GUI_BUTTON_UNPRESSED) # Fixes button being pre-pressed
+	CharOverview.UpdateOverview(9)
+	if CharOverview.CharGenWindow:
+		CharOverview.PersistButtons['Next'].SetState(IE_GUI_BUTTON_UNPRESSED) # Fixes button being pre-pressed
 	return
 	
 def SetRaceAbilities(MyChar, racetitle):
@@ -96,19 +97,19 @@ def BioPress():
 	BioWindow = Window = GemRB.LoadWindow (51)
 	Button = Window.GetControl (5)
 	Button.SetText (2240)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RevertPress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RevertPress)
 
 	Button = Window.GetControl (6)
 	Button.SetText (18622)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ClearPress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClearPress)
 
 	Button = Window.GetControl (1)
 	Button.SetText (11962)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BioDonePress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BioDonePress)
 	
 	Button = Window.GetControl (2)
 	Button.SetText (36788)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BioCancelPress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BioCancelPress)
 	
 	EditControl = Window.GetControl (4)
 	BioData = GemRB.GetToken("BIO")
@@ -120,17 +121,14 @@ def BioPress():
 	return
 
 def NextPress():
-
-	if CharGenWindow:
-		CharGenWindow.Unload ()
 	#set my character up
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("BaseRace") )
 	race = GemRB.GetVar ("Race")
 	GemRB.SetPlayerStat (MyChar, IE_SUBRACE, race & 255 )
-	row = RaceTable.FindValue (3, race )
-	racename = RaceTable.GetRowName (row)
+	row = GUICommon.RaceTable.FindValue (3, race )
+	racename = GUICommon.RaceTable.GetRowName (row)
 	if row!=-1:
 		SetRaceResistances( MyChar, racename )
 		SetRaceAbilities( MyChar, racename )
@@ -172,13 +170,13 @@ def NextPress():
 #	for i in range(ProfCount):
 #		StatID=TmpTable.GetValue (i, 0)
 #		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Prof "+str(i) ) )
-	SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("Color1") )
-	SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("Color2") )
-	SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("Color4") )
-	SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("Color3") )
-	SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
-	SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
-	SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
+	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("Color1") )
+	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("Color2") )
+	GUICommon.SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("Color4") )
+	GUICommon.SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("Color3") )
+	GUICommon.SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
+	GUICommon.SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
+	GUICommon.SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
 	Str=GemRB.GetVar ("Ability 1")
 	GemRB.SetPlayerStat (MyChar, IE_STR, Str)

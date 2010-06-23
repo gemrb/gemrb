@@ -18,7 +18,8 @@
 #
 #character generation, ability (GUICG4)
 import GemRB
-from GUICommon import RaceTable, ClassTable, KitListTable
+from GUIDefines import *
+import GUICommon
 
 AbilityWindow = 0
 TextAreaControl = 0
@@ -35,8 +36,8 @@ def CalcLimits(Abidx):
 
 	Abracead = GemRB.LoadTable("ABRACEAD")
 	RaceID = GemRB.GetVar("Race")
-	RowIndex = RaceTable.FindValue(3, RaceID)
-	RaceName = RaceTable.GetRowName(RowIndex)
+	RowIndex = GUICommon.RaceTable.FindValue(3, RaceID)
+	RaceName = GUICommon.RaceTable.GetRowName(RowIndex)
 
 	Minimum = 3
 	Maximum = 18
@@ -106,10 +107,10 @@ def OnLoad():
 	Kit = GemRB.GetVar("Class Kit")
 	Class = GemRB.GetVar("Class")-1
 	if Kit == 0:
-		KitName = ClassTable.GetRowName(Class)
+		KitName = GUICommon.ClassTable.GetRowName(Class)
 	else:
 		#rowname is just a number, first value row what we need here
-		KitName = KitListTable.GetValue(Kit, 0) 
+		KitName = GUICommon.KitListTable.GetValue(Kit, 0)
 
 	Abclasrq = GemRB.LoadTable("ABCLASRQ")
 	KitIndex = Abclasrq.GetRowIndex(KitName)
@@ -121,15 +122,15 @@ def OnLoad():
 	RollPress()
 	for i in range(0,6):
 		Button = AbilityWindow.GetControl(i+30)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "JustPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
 		Button.SetVarAssoc("Ability", i)
 
 		Button = AbilityWindow.GetControl(i*2+16)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
 		Button.SetVarAssoc("Ability", i )
 
 		Button = AbilityWindow.GetControl(i*2+17)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "RightPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
 		Button.SetVarAssoc("Ability", i )
 
 	BackButton = AbilityWindow.GetControl(36)
@@ -144,8 +145,8 @@ def OnLoad():
 	TextAreaControl = AbilityWindow.GetControl(29)
 	TextAreaControl.SetText(17247)
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	AbilityWindow.SetVisible(WINDOW_VISIBLE)
 	return
 

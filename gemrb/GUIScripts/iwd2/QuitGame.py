@@ -21,7 +21,7 @@
 
 ###################################################
 
-from GUIWORLD import DeathWindowEnd
+import GUIWORLD
 
 def OnLoad ():
-	DeathWindowEnd ()
+	GUIWORLD.DeathWindowEnd ()

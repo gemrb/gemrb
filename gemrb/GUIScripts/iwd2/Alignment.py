@@ -18,7 +18,8 @@
 #
 #character generation, alignment (GUICG3)
 import GemRB
-from GUICommon import ClassTable
+from GUIDefines import *
+import GUICommon
 
 AlignmentWindow = 0
 TextAreaControl = 0
@@ -30,7 +31,7 @@ def OnLoad():
 	global AlignmentTable
 	
 	Class = GemRB.GetVar("Class")-1
-	KitName = ClassTable.GetRowName(Class)
+	KitName = GUICommon.ClassTable.GetRowName(Class)
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
@@ -47,7 +48,7 @@ def OnLoad():
 		Button = AlignmentWindow.GetControl(i+2)
 		if AlignmentOk.GetValue(KitName, AlignmentTable.GetValue(i, 4) ) != 0:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
-			Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "AlignmentPress")
+			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, AlignmentPress)
 			Button.SetVarAssoc("Alignment", i+1)
 
 	BackButton = AlignmentWindow.GetControl(13)
@@ -61,8 +62,8 @@ def OnLoad():
 	TextAreaControl = AlignmentWindow.GetControl(11)
 	TextAreaControl.SetText(9602)
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	AlignmentWindow.SetVisible(WINDOW_VISIBLE)
 	return

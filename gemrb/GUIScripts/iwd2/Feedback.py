@@ -18,6 +18,7 @@
 #
 #feedback
 import GemRB
+from GUIDefines import *
 
 FeedbackWindow = 0
 TextAreaControl = 0
@@ -70,46 +71,46 @@ def OnLoad():
 	CancelButton.SetText(13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	MarkerSlider.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MarkerSliderPress")
-	MarkerSliderS.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "MarkerSliderPress")
+	MarkerSlider.SetEvent(IE_GUI_BUTTON_ON_PRESS, MarkerSliderPress)
+	MarkerSliderS.SetEvent(IE_GUI_SLIDER_ON_CHANGE, MarkerSliderPress)
 	MarkerSliderS.SetVarAssoc("GUI Feedback Level",1)
 
-	LocatorSlider.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "LocatorSliderPress")
-	LocatorSliderS.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "LocatorSliderPress")
+	LocatorSlider.SetEvent(IE_GUI_BUTTON_ON_PRESS, LocatorSliderPress)
+	LocatorSliderS.SetEvent(IE_GUI_SLIDER_ON_CHANGE, LocatorSliderPress)
 	LocatorSliderS.SetVarAssoc("Locator Feedback Level",1)
 
-	THac0Rolls.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "THac0RollsPress")
-	THac0RollsB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "THac0RollsBPress")
+	THac0Rolls.SetEvent(IE_GUI_BUTTON_ON_PRESS, THac0RollsPress)
+	THac0RollsB.SetEvent(IE_GUI_BUTTON_ON_PRESS, THac0RollsBPress)
 	THac0RollsB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	THac0RollsB.SetVarAssoc("Rolls",1)
 
-	CombatInfo.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CombatInfoPress")
-	CombatInfoB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CombatInfoBPress")
+	CombatInfo.SetEvent(IE_GUI_BUTTON_ON_PRESS, CombatInfoPress)
+	CombatInfoB.SetEvent(IE_GUI_BUTTON_ON_PRESS, CombatInfoBPress)
 	CombatInfoB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	CombatInfoB.SetVarAssoc("Combat Info",1)
 
-	Actions.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ActionsPress")
-	ActionsB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ActionsBPress")
+	Actions.SetEvent(IE_GUI_BUTTON_ON_PRESS, ActionsPress)
+	ActionsB.SetEvent(IE_GUI_BUTTON_ON_PRESS, ActionsBPress)
 	ActionsB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	ActionsB.SetVarAssoc("Actions",1)
 
-	StateChanges.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "StateChangesPress")
-	StateChangesB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "StateChangesBPress")
+	StateChanges.SetEvent(IE_GUI_BUTTON_ON_PRESS, StateChangesPress)
+	StateChangesB.SetEvent(IE_GUI_BUTTON_ON_PRESS, StateChangesBPress)
 	StateChangesB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	StateChangesB.SetVarAssoc("State Changes",1)
 
-	SelectionText.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SelectionTextPress")
-	SelectionTextB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SelectionTextBPress")
+	SelectionText.SetEvent(IE_GUI_BUTTON_ON_PRESS, SelectionTextPress)
+	SelectionTextB.SetEvent(IE_GUI_BUTTON_ON_PRESS, SelectionTextBPress)
 	SelectionTextB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	SelectionTextB.SetVarAssoc("Selection Text",1)
 
-	Miscellaneous.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MiscellaneousPress")
-	MiscellaneousB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MiscellaneousBPress")
+	Miscellaneous.SetEvent(IE_GUI_BUTTON_ON_PRESS, MiscellaneousPress)
+	MiscellaneousB.SetEvent(IE_GUI_BUTTON_ON_PRESS, MiscellaneousBPress)
 	MiscellaneousB.SetFlags(IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	MiscellaneousB.SetVarAssoc("Miscellaneous Text",1)
 
-	OkButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OkPress")
-	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkPress)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
 	FeedbackWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
@@ -125,7 +126,15 @@ def THac0RollsPress():
 	TextAreaControl.SetText(18026)
 	return
 
+def THac0RollsBPress():
+	TextAreaControl.SetText(18026)
+	return
+
 def CombatInfoPress():
+	TextAreaControl.SetText(18027)
+	return
+
+def CombatInfoBPress():
 	TextAreaControl.SetText(18027)
 	return
 
@@ -133,7 +142,15 @@ def ActionsPress():
 	TextAreaControl.SetText(18028)
 	return
 
+def ActionsBPress():
+	TextAreaControl.SetText(18028)
+	return
+
 def StateChangesPress():
+	TextAreaControl.SetText(18029)
+	return
+
+def StateChangesBPress():
 	TextAreaControl.SetText(18029)
 	return
 
@@ -141,7 +158,15 @@ def SelectionTextPress():
 	TextAreaControl.SetText(18030)
 	return
 
+def SelectionTextBPress():
+	TextAreaControl.SetText(18030)
+	return
+
 def MiscellaneousPress():
+	TextAreaControl.SetText(18031)
+	return
+
+def MiscellaneousBPress():
 	TextAreaControl.SetText(18031)
 	return
 

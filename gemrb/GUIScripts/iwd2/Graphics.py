@@ -18,6 +18,7 @@
 #
 #Graphics Menu
 import GemRB
+from GUIDefines import *
 
 GraphicsWindow = 0
 TextAreaControl = 0
@@ -99,30 +100,30 @@ def OnLoad():
 	CancelButton.SetText(13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	BrightnessButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "BrightnessPress")
-	BrightnessSlider.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "BrightnessPress")
-	ContrastButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ContrastPress")
-	ContrastSlider.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "ContrastPress")
-	BppButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "BppPress")
-	BppButtonB1.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "BppPress")
-	BppButtonB2.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "BppPress")
-	BppButtonB3.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "BppPress")
-	FullScreenButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "FullScreenPress")
-	FullScreenButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "FullScreenPress")
-	TransShadowButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "TransShadowPress")
-	TransShadowButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "TransShadowPress")
-	SoftMirrBltButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SoftMirrBltPress")
-	SoftMirrBltButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SoftMirrBltPress")
-	SoftTransBltButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SoftTransBltPress")
-	SoftTransBltButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SoftTransBltPress")
-	SoftStandBltButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SoftStandBltPress")
-	SoftStandBltButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SoftStandBltPress")
-	TransBlitButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "TransBlitPress")
-	TransBlitButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "TransBlitPress")
-	StaticAniButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "StaticAniPress")
-	StaticAniButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "StaticAniPress")
-	OkButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OkPress")
-	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	BrightnessButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BrightnessPress)
+	BrightnessSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, BrightnessPress)
+	ContrastButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ContrastPress)
+	ContrastSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, ContrastPress)
+	BppButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BppPress)
+	BppButtonB1.SetEvent(IE_GUI_BUTTON_ON_PRESS, BppPress)
+	BppButtonB2.SetEvent(IE_GUI_BUTTON_ON_PRESS, BppPress)
+	BppButtonB3.SetEvent(IE_GUI_BUTTON_ON_PRESS, BppPress)
+	FullScreenButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, FullScreenPress)
+	FullScreenButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, FullScreenPress)
+	TransShadowButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, TransShadowPress)
+	TransShadowButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, TransShadowPress)
+	SoftMirrBltButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoftMirrBltPress)
+	SoftMirrBltButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoftMirrBltPress)
+	SoftTransBltButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoftTransBltPress)
+	SoftTransBltButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoftTransBltPress)
+	SoftStandBltButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoftStandBltPress)
+	SoftStandBltButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoftStandBltPress)
+	TransBlitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, TransBlitPress)
+	TransBlitButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, TransBlitPress)
+	StaticAniButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, StaticAniPress)
+	StaticAniButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, StaticAniPress)
+	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkPress)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
 	
 	GraphicsWindow.SetVisible(WINDOW_VISIBLE)
 	return

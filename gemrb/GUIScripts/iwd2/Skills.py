@@ -18,7 +18,8 @@
 #
 #character generation, skills (GUICG6)
 import GemRB
-from GUICommon import RaceTable, ClassTable
+from GUIDefines import *
+import GUICommon
 
 SkillWindow = 0
 TextAreaControl = 0
@@ -104,7 +105,7 @@ def OnLoad():
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	GemRB.SetVar("Level",1) #for simplicity
 	Class = GemRB.GetVar("Class") - 1
-	KitName = ClassTable.GetRowName(Class)
+	KitName = GUICommon.ClassTable.GetRowName(Class)
 	#classcolumn is base class
 	ClassColumn=GemRB.GetVar("BaseClass") - 1
 	SkillPtsTable = GemRB.LoadTable("skillpts")
@@ -121,7 +122,7 @@ def OnLoad():
 	# Humans recieve +2 skill points at level 1 and +1 skill points each level thereafter
 	# Recommend creation of SKILRACE.2da with levels as rows and race names as columns
 	
-	RaceName = RaceTable.GetRowName(RaceTable.FindValue(3, GemRB.GetVar('Race')))
+	RaceName = GUICommon.RaceTable.GetRowName(GUICommon.RaceTable.FindValue(3, GemRB.GetVar('Race')))
 	
 	### Example code for implementation of SKILRACE.2da
 	# TmpTable = GemRB.LoadTable('skilrace')
@@ -156,15 +157,15 @@ def OnLoad():
 	for i in range(10):
 		Button = SkillWindow.GetControl(i+93)
 		Button.SetVarAssoc("Skill",i)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "JustPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
 
 		Button = SkillWindow.GetControl(i*2+14)
 		Button.SetVarAssoc("Skill",i)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "LeftPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
 
 		Button = SkillWindow.GetControl(i*2+15)
 		Button.SetVarAssoc("Skill",i)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "RightPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
 
 	BackButton = SkillWindow.GetControl(105)
 	BackButton.SetText(15416)
@@ -178,15 +179,15 @@ def OnLoad():
 	TextAreaControl.SetText(17248)
 
 	ScrollBarControl = SkillWindow.GetControl(104)
-	ScrollBarControl.SetEventByName(IE_GUI_SCROLLBAR_ON_CHANGE,"ScrollBarPress")
+	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
 	ScrollBarControl.SetDefaultScrollBar ()
 	#decrease it with the number of controls on screen (list size)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl.SetVarAssoc("TopIndex",RowCount-10+1)
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	RedrawSkills()
 	SkillWindow.SetVisible(WINDOW_VISIBLE)

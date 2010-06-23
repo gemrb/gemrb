@@ -18,6 +18,7 @@
 #
 #sound options
 import GemRB
+from GUIDefines import *
 
 SoundWindow = 0
 TextAreaControl = 0
@@ -54,35 +55,35 @@ def OnLoad():
 	CancelButton.SetText(13727)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	AmbientButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "AmbientPress")
-	AmbientSlider.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "AmbientPress")
+	AmbientButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, AmbientPress)
+	AmbientSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, AmbientPress)
 	AmbientSlider.SetVarAssoc("Volume Ambients",10)
 
-	SoundEffectsButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SoundEffectsPress")
-	SoundEffectsSlider.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "SoundEffectsPress")
+	SoundEffectsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoundEffectsPress)
+	SoundEffectsSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, SoundEffectsPress)
 	SoundEffectsSlider.SetVarAssoc("Volume SFX",10)
 
-	DialogueButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DialoguePress")
-	DialogueSlider.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "DialoguePress")
+	DialogueButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DialoguePress)
+	DialogueSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, DialoguePress)
 	DialogueSlider.SetVarAssoc("Volume Voices",10)
 
-	MusicButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MusicPress")
-	MusicSlider.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "MusicPress")
+	MusicButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MusicPress)
+	MusicSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, MusicPress)
 	MusicSlider.SetVarAssoc("Volume Music",10)
 
-	MoviesButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
-	MoviesSlider.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "MoviesPress")
+	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MoviesPress)
+	MoviesSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, MoviesPress)
 	MoviesSlider.SetVarAssoc("Volume Movie",10)
 
-	EnvironmentalButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "EnvironmentalPress")
-	EnvironmentalButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "EnvironmentalPress")
+	EnvironmentalButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, EnvironmentalPress)
+	EnvironmentalButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, EnvironmentalPress)
 	EnvironmentalButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX,OP_OR)
 	EnvironmentalButtonB.SetVarAssoc("Environmental Audio",1)
 	EnvironmentalButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	CharacterSoundButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CharacterSoundPress")
-	OkButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OkPress")
-	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CharacterSoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharacterSoundPress)
+	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkPress)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
 	SoundWindow.SetVisible(WINDOW_VISIBLE)
 	return
 

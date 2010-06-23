@@ -23,12 +23,10 @@
 ###################################################
 
 import GemRB
+import GUICommon
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow, RaceTable, ClassTable, NextLevelTable
-from GUICommon import GameWindow
-from GUICommonWindows import *
 
 SelectWindow = 0
 Topic = None
@@ -48,7 +46,7 @@ def OpenRecordsWindow ():
 	global RecordsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow, SelectWindow
 
-	if CloseOtherWindow (OpenRecordsWindow):
+	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
 		if RecordsWindow:
 			RecordsWindow.Unload ()
 		if OptionsWindow:
@@ -58,27 +56,27 @@ def OpenRecordsWindow ():
 
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GameWindow.SetVisible(WINDOW_VISIBLE)
+		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
-		SetSelectionChangeHandler (None)
+		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 
 	GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
 	GemRB.LoadWindowPack ("GUIREC", 800, 600)
 	RecordsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow ()
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
-	SetupMenuWindowControls (OptionsWindow, 0, "OpenRecordsWindow")
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
 	Window.SetFrame ()
 
 	#portrait icon
@@ -89,22 +87,22 @@ def OpenRecordsWindow ():
 	#information (help files)
 	Button = Window.GetControl (1)
 	Button.SetText (11946)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenHelpWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenHelpWindow)
 
 	#biography
 	Button = Window.GetControl (59)
 	Button.SetText (18003)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyWindow)
 
 	#export
 	Button = Window.GetControl (36)
 	Button.SetText (13956)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenExportWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenExportWindow)
 
 	#customize
 	Button = Window.GetControl (50)
 	Button.SetText (10645)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenCustomizeWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshRecordsWindow) #TODO: OpenCustomizeWindow
 
 	#general
 	GemRB.SetVar ("SelectWindow", 1)
@@ -113,35 +111,35 @@ def OpenRecordsWindow ():
 	Button.SetTooltip (40316)
 	Button.SetVarAssoc ("SelectWindow", 1)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RefreshRecordsWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshRecordsWindow)
 
 	#weapons and armour
 	Button = Window.GetControl (61)
 	Button.SetTooltip (40317)
 	Button.SetVarAssoc ("SelectWindow", 2)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RefreshRecordsWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshRecordsWindow)
 
 	#skills and feats
 	Button = Window.GetControl (62)
 	Button.SetTooltip (40318)
 	Button.SetVarAssoc ("SelectWindow", 3)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RefreshRecordsWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshRecordsWindow)
 
 	#miscellaneous
 	Button = Window.GetControl (63)
 	Button.SetTooltip (33500)
 	Button.SetVarAssoc ("SelectWindow", 4)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RefreshRecordsWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshRecordsWindow)
 
 	#level up
 	Button = Window.GetControl (37)
 	Button.SetText (7175)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LevelUpWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshRecordsWindow) #TODO: OpenLevelUpWindow
 
-	SetSelectionChangeHandler (RefreshRecordsWindow)
+	GUICommonWindows.SetSelectionChangeHandler (RefreshRecordsWindow)
 
 	RefreshRecordsWindow ()
 	return
@@ -193,8 +191,8 @@ def GetAbilityBonus (pc, stat):
 def GetNextLevelExp (Level, Adjustment):
 	if Adjustment>5:
 		Adjustment = 5
-	if (Level < NextLevelTable.GetColumnCount (4) - 5):
-		return str(NextLevelTable.GetValue (4, Level + Adjustment ) )
+	if (Level < GUICommon.NextLevelTable.GetColumnCount (4) - 5):
+		return str(GUICommon.NextLevelTable.GetValue (4, Level + Adjustment ) )
 
 	return GemRB.GetString(24342) #godhood
 
@@ -223,7 +221,7 @@ def DisplayGeneral (pc):
 		level = GemRB.GetPlayerStat (pc, Classes[i])
 
 		if level:
-			Class = GetActorClassTitle (pc, i )
+			Class = GUICommonWindows.GetActorClassTitle (pc, i )
 			RecordsTextArea.Append (Class, -1)
 			RecordsTextArea.Append (": "+str(level) )
 			if tmp<level:
@@ -245,16 +243,16 @@ def DisplayGeneral (pc):
 	Value2 = GemRB.GetPlayerStat(pc,IE_SUBRACE)
 	if Value2:
 		Value = Value<<16 | Value2
-	tmp = RaceTable.FindValue (3, Value)
-	Race = RaceTable.GetValue (tmp, 2)
-	tmp = RaceTable.GetValue (tmp, 8)
+	tmp = GUICommon.RaceTable.FindValue (3, Value)
+	Race = GUICommon.RaceTable.GetValue (tmp, 2)
+	tmp = GUICommon.RaceTable.GetValue (tmp, 8)
 
 	if tmp == -1:
 		tmp = highest
 	else:
 		tmp = GetFavoredClass(pc, tmp)
 
-	tmp = ClassTable.GetValue (tmp, 0)
+	tmp = GUICommon.ClassTable.GetValue (tmp, 0)
 	RecordsTextArea.Append (": ")
 	RecordsTextArea.Append (tmp)
 
@@ -648,7 +646,7 @@ def OpenHelpWindow ():
 		if title:
 			Label.SetText (title)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
-			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateHelpWindow")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateHelpWindow)
 		else:
 			Label.SetText ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -656,7 +654,7 @@ def OpenHelpWindow ():
 	#done
 	Button = Window.GetControl (1)
 	Button.SetText (11973)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseHelpWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseHelpWindow)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	UpdateHelpWindow ()
 	return
@@ -696,7 +694,7 @@ def UpdateHelpWindow ():
 	if i<1: i=1
 
 	ScrollBar.SetVarAssoc ("TopIndex", i)
-	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshHelpWindow")
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RefreshHelpWindow)
 
 	RefreshHelpWindow ()
 	return
@@ -726,7 +724,7 @@ def RefreshHelpWindow ():
 			Label.SetText (title)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetVarAssoc ("Selected", i+TopIndex)
-			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RefreshHelpWindow")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshHelpWindow)
 		else:
 			Label.SetText ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -759,7 +757,7 @@ def OpenBiographyWindow ():
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (11973)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseBiographyWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseBiographyWindow)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -785,9 +783,9 @@ def OpenExportWindow ():
 
 	NameField = ExportWindow.GetControl(6)
 
-	ExportDoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
-	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
-	NameField.SetEventByName(IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
+	ExportDoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExportDonePress)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExportCancelPress)
+	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE, ExportEditChanged)
 	ExportWindow.ShowModal (MODAL_SHADOW_GRAY)
 	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	return

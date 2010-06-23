@@ -18,7 +18,8 @@
 #
 #character generation (GUICG 0)
 import GemRB
-from CharOverview import *
+from ie_stats import *
+import CharOverview
 
 def OnLoad():
 	MyChar = GemRB.GetVar("Slot")
@@ -26,5 +27,5 @@ def OnLoad():
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("BaseRace") )
 	race = GemRB.GetVar ("Race")
 	GemRB.SetPlayerStat (MyChar, IE_SUBRACE, race & 255 )
-	UpdateOverview(3)
+	CharOverview.UpdateOverview(3)
 	return

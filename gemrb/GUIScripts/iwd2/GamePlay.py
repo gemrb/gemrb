@@ -18,6 +18,7 @@
 #
 #GamePlay Options Menu
 import GemRB
+from GUIDefines import *
 
 GamePlayWindow = 0
 TextAreaControl = 0
@@ -60,56 +61,56 @@ def OnLoad():
 
 	FeedbackButton.SetText(17163)
 	AutoPauseButton.SetText(17166)
-	DelayButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DelayPress")
-	DelaySlider.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "DelayPress")
+	DelayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DelayPress)
+	DelaySlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, DelayPress)
 	DelaySlider.SetVarAssoc("Tooltips",TOOLTIP_DELAY_FACTOR)
 
-	KeySpdButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "KeySpdPress")
-	KeySpdSlider.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "KeySpdPress")
+	KeySpdButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, KeySpdPress)
+	KeySpdSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, KeySpdPress)
 	KeySpdSlider.SetVarAssoc("Keyboard Scroll Speed",36)
 
-	MouseSpdButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MouseSpdPress")
-	MouseSpdSlider.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "MouseSpdPress")
+	MouseSpdButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MouseSpdPress)
+	MouseSpdSlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, MouseSpdPress)
 	MouseSpdSlider.SetVarAssoc("Mouse Scroll Speed",36)
 
-	DifficultyButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DifficultyPress")
-	DifficultySlider.SetEventByName(IE_GUI_SLIDER_ON_CHANGE, "DifficultyPress")
+	DifficultyButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DifficultyPress)
+	DifficultySlider.SetEvent(IE_GUI_SLIDER_ON_CHANGE, DifficultyPress)
 	DifficultySlider.SetVarAssoc("Difficulty Level",2)
 
-	BloodButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "BloodPress")
-	BloodButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "BloodPress")
+	BloodButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BloodPress)
+	BloodButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, BloodPress)
 	BloodButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX,OP_OR)
 	BloodButtonB.SetVarAssoc("Gore",1)
 	BloodButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	DitherButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DitherPress")
-	DitherButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DitherPress")
+	DitherButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DitherPress)
+	DitherButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, DitherPress)
 	DitherButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX,OP_OR)
 	DitherButtonB.SetVarAssoc("Always Dither",1)
 	DitherButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	InfravisionButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "InfravisionPress")
-	InfravisionButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "InfravisionPress")
+	InfravisionButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, InfravisionPress)
+	InfravisionButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, InfravisionPress)
 	InfravisionButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX,OP_OR)
 	InfravisionButtonB.SetVarAssoc("Darkvision",1)
 	InfravisionButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	WeatherButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "WeatherPress")
-	WeatherButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "WeatherPress")
+	WeatherButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, WeatherPress)
+	WeatherButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, WeatherPress)
 	WeatherButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX,OP_OR)
 	WeatherButtonB.SetVarAssoc("Weather",1)
 	WeatherButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	MaxHPButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MaxHPPress")
-	MaxHPButtonB.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MaxHPPressB")
+	MaxHPButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaxHPPress)
+	MaxHPButtonB.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaxHPPressB)
 	MaxHPButtonB.SetFlags(IE_GUI_BUTTON_CHECKBOX,OP_OR)
 	MaxHPButtonB.SetVarAssoc("Maximum HP",1)
 	MaxHPButtonB.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 
-	FeedbackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "FeedbackPress")
-	AutoPauseButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "AutoPausePress")
-	OkButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OkPress")
-	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	FeedbackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, FeedbackPress)
+	AutoPauseButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, AutoPausePress)
+	OkButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkPress)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
 	GamePlayWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
@@ -153,6 +154,10 @@ def RestUntilHealPress():
 
 def MaxHPPress():
 	TextAreaControl.SetText(15136)
+	return
+
+def MaxHPPressB():
+	#TODO: TextAreaControl.SetText(15136)
 	return
 
 def FeedbackPress():

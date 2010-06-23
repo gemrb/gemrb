@@ -17,9 +17,8 @@
 #
 #
 #character generation (GUICG 0)
-import GemRB
-from CharOverview import *
+import CharOverview
 
 def OnLoad():
-	UpdateOverview(8)
+	CharOverview.UpdateOverview(8)
 	return

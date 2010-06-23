@@ -18,22 +18,10 @@
 #
 
 import GemRB
-
-from GUICommonWindows import *
+import GUICommon
 import GUICommonWindows
-from GUICommon import GameControl
-from GUIINV import *
-from GUIJRNL import *
-from GUIMA import *
-from GUIOPT import *
-from GUISPL import *
-from GUIREC import *
-from GUISTORE import *
-from GUIWORLD import *
-from TextScreen import *
-from GUIClasses import GTextArea
-from GUIClasses import GWindow
-from CommonWindow import OnIncreaseSize, OnDecreaseSize
+import GUIClasses
+from GUIDefines import *
 
 MessageWindow = 0
 PortraitWindow = 0
@@ -43,9 +31,9 @@ def OnLoad():
 	GemRB.GameSetPartySize(PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(2)
 	GemRB.SetDefaultActions(1,14,16,17)
-	GemRB.LoadWindowPack(GetWindowPack())
+	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
 	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)
-	ActionsWindow = PortraitWindow = OpenPortraitWindow()
+	ActionsWindow = PortraitWindow = GUICommonWindows.OpenPortraitWindow()
 
 	GemRB.SetVar ("MessageWindow", MessageWindow.ID)
 	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
@@ -59,7 +47,7 @@ def OnLoad():
 	GemRB.SetVar ("OtherPosition", 5) #Inactivating
 	GemRB.SetVar ("TopPosition", 5) #Inactivating
 
-	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 
 	MessageWindow.SetVisible(WINDOW_VISIBLE)
 	PortraitWindow.SetVisible(WINDOW_VISIBLE)
@@ -81,7 +69,7 @@ def UpdateControlStatus():
 
 	MessageWindow = GemRB.GetVar ("MessageWindow")
 
-	GemRB.LoadWindowPack(GetWindowPack())
+	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
 	hideflag = GemRB.HideGUI()
 	if Expand == GS_LARGEDIALOG:
 		GemRB.SetVar ("PortraitWindow", -1)
@@ -91,16 +79,16 @@ def UpdateControlStatus():
 		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 		TMessageWindow = GemRB.LoadWindow(0)
 		TMessageTA = TMessageWindow.GetControl (1)
-		SetupMenuWindowControls (TMessageWindow, 1, "ReturnToGame")
+		GUICommonWindows.SetupMenuWindowControls (TMessageWindow, 1, None)
 
 
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL)
 	TMessageTA.SetHistory(100)
 
-	MessageTA = GTextArea(MessageWindow, GemRB.GetVar ("MessageTextArea"))
+	MessageTA = GUIClasses.GTextArea(MessageWindow, GemRB.GetVar ("MessageTextArea"))
 	if MessageWindow>0 and MessageWindow!=TMessageWindow.ID:
 		MessageTA.MoveText (TMessageTA)
-		GWindow(MessageWindow).Unload()
+		GUIClasses.GWindow(MessageWindow).Unload()
 	GemRB.SetVar ("MessageWindow", TMessageWindow.ID)
 	GemRB.SetVar ("MessageTextArea", TMessageTA.ID)
 
@@ -119,7 +107,7 @@ def UpdateControlStatus():
 		else:
 			Button.SetPicture(Portrait, "NOPORTSM")
 	else:
-		GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
+		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 		
 	if hideflag:
 		GemRB.UnhideGUI()

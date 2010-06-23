@@ -20,6 +20,7 @@
 # Options.py - scripts to control options windows mostly from GUIOPT winpack
 
 import GemRB
+from GUIDefines import *
 
 OptionsWindow = 0
 
@@ -57,18 +58,18 @@ def OnLoad():
 	ReturnButton = OptionsWindow.GetControl(11)
 
 	GraphicsButton.SetText(17162)
-	GraphicsButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "GraphicsPress")
+	GraphicsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GraphicsPress)
 	SoundButton.SetText(17164)
-	SoundButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SoundPress")
+	SoundButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoundPress)
 	GamePlayButton.SetText(17165)
-	GamePlayButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "GamePlayPress")
+	GamePlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GamePlayPress)
 	MoviesButton.SetText(15415)
-	MoviesButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MoviePress")
+	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MoviePress)
 	KeyboardButton.SetText(33468)
-	KeyboardButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "KeyboardPress")
+	KeyboardButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, None) #TODO: KeyboardPress
 
 	ReturnButton.SetText(10308)
-	ReturnButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ReturnPress")
+	ReturnButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ReturnPress)
 	ReturnButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	OptionsWindow.SetVisible(WINDOW_VISIBLE)

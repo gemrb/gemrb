@@ -19,7 +19,8 @@
 
 # 
 import GemRB
-from LoadScreen import *
+import LoadScreen
+from GUIDefines import *
 
 StartWindow = 0
 ProtocolWindow = 0
@@ -82,12 +83,12 @@ def OnLoad():
 	OptionsButton.SetText(13905)
 	QuitGameButton.SetText(13731)
 	QuitGameButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
-	NewGameButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "NewGamePress")
-	QuitGameButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "QuitPress")
-	ProtocolButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ProtocolPress")
-	OptionsButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OptionsPress")
-	LoadGameButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "LoadPress")
-	QuickLoadButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "QuickLoadPress")
+	NewGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewGamePress)
+	QuitGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitPress)
+	ProtocolButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProtocolPress)
+	OptionsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OptionsPress)
+	LoadGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, LoadPress)
+	QuickLoadButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuickLoadPress)
 	StartWindow.SetVisible(WINDOW_VISIBLE)
 	GemRB.LoadMusicPL("Theme.mus")
 
@@ -131,7 +132,7 @@ def ProtocolPress():
 
 	DoneButton = ProtocolWindow.GetControl(6)
 	DoneButton.SetText(11973)
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ProtocolDonePress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProtocolDonePress)
 	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	ProtocolWindow.SetVisible(WINDOW_VISIBLE)
@@ -166,7 +167,7 @@ def LoadPress():
 def QuickLoadPress():
 	global StartWindow, QuickLoadSlot
 
-	StartLoadScreen()
+	LoadScreen.StartLoadScreen()
 	GemRB.LoadGame(QuickLoadSlot) # load & start game
 	GemRB.EnterGame()
 	return
@@ -183,11 +184,11 @@ def QuitPress():
 	StartWindow.SetVisible(WINDOW_INVISIBLE)
 	QuitWindow = GemRB.LoadWindow(22)
 	CancelButton = QuitWindow.GetControl(2)
-	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "QuitCancelPress")
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitCancelPress)
 	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	QuitButton = QuitWindow.GetControl(1)
-	QuitButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "QuitQuitPress")
+	QuitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitQuitPress)
 	QuitButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	TextArea = QuitWindow.GetControl(0)

@@ -18,7 +18,8 @@
 #
 #character generation (GUICG 0)
 import GemRB
-from CharOverview import *
+from ie_stats import *
+import CharOverview
 
 #this is the same list as in GUIREC
 #barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
@@ -42,5 +43,5 @@ def OnLoad():
 
 	GemRB.SetPlayerStat (MyChar, Classes[Class-1], 1)
 	print "Set class stat ",Classes[Class-1], " to 1"
-	UpdateOverview(4)
+	CharOverview.UpdateOverview(4)
 	return

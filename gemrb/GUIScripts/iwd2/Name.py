@@ -18,6 +18,7 @@
 #
 #character generation, name (GUICG5)
 import GemRB
+from GUIDefines import *
 
 NameWindow = 0
 NameField = 0
@@ -40,9 +41,9 @@ def OnLoad():
 
 	NameField = NameWindow.GetControl(2)
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	NameField.SetEventByName(IE_GUI_EDIT_ON_CHANGE,"EditChange")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE, EditChange)
 	NameWindow.SetVisible(WINDOW_VISIBLE)
 	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
 	return

@@ -18,7 +18,8 @@
 #
 #character generation, class (GUICG2)
 import GemRB
-from GUICommon import RaceTable, ClassTable
+from GUIDefines import *
+import GUICommon
 
 ClassWindow = 0
 TextAreaControl = 0
@@ -32,15 +33,15 @@ def AdjustTextArea():
 	global HasSubClass, ClassID
 
 	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(ClassTable.GetValue(Class,1) )
-	ClassName = ClassTable.GetRowName(Class)
-	ClassID = ClassTable.GetValue(ClassName, "ID")
+	TextAreaControl.SetText(GUICommon.ClassTable.GetValue(Class,1) )
+	ClassName = GUICommon.ClassTable.GetRowName(Class)
+	ClassID = GUICommon.ClassTable.GetValue(ClassName, "ID")
 	#determining if this class has any subclasses
 	HasSubClass = 0
 	for i in range(1, ClassCount):
-		ClassName = ClassTable.GetRowName(i-1)
+		ClassName = GUICommon.ClassTable.GetRowName(i-1)
 		#determining if this is a kit or class
-		Allowed = ClassTable.GetValue(ClassName, "CLASS")
+		Allowed = GUICommon.ClassTable.GetValue(ClassName, "CLASS")
 		if Allowed != ClassID:
 			continue
 		HasSubClass = 1
@@ -58,16 +59,16 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	#this replaces help02.2da for class restrictions
-	ClassCount = ClassTable.GetRowCount()+1
+	ClassCount = GUICommon.ClassTable.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindow(2)
-	rid = RaceTable.FindValue(3, GemRB.GetVar('BaseRace'))
-	RaceName = RaceTable.GetRowName(rid)
+	rid = GUICommon.RaceTable.FindValue(3, GemRB.GetVar('BaseRace'))
+	RaceName = GUICommon.RaceTable.GetRowName(rid)
 
 	#radiobutton groups must be set up before doing anything else to them
 	j = 0
 	for i in range(1,ClassCount):
-		ClassName = ClassTable.GetRowName(i-1)
-		Allowed = ClassTable.GetValue(ClassName, "CLASS")
+		ClassName = GUICommon.ClassTable.GetRowName(i-1)
+		Allowed = GUICommon.ClassTable.GetValue(ClassName, "CLASS")
 		if Allowed > 0:
 			continue
 		Button = ClassWindow.GetControl(j+2)
@@ -77,21 +78,21 @@ def OnLoad():
 
 	j = 0
 	for i in range(1,ClassCount):
-		ClassName = ClassTable.GetRowName(i-1)
+		ClassName = GUICommon.ClassTable.GetRowName(i-1)
 		#determining if this is a kit or class
-		Allowed = ClassTable.GetValue(ClassName, "CLASS")
+		Allowed = GUICommon.ClassTable.GetValue(ClassName, "CLASS")
 		if Allowed > 0:
 			continue
-		Allowed = ClassTable.GetValue(ClassName, RaceName)
+		Allowed = GUICommon.ClassTable.GetValue(ClassName, RaceName)
 		Button = ClassWindow.GetControl(j+2)
 		j = j+1
-		t = ClassTable.GetValue(ClassName, "NAME_REF")
+		t = GUICommon.ClassTable.GetValue(ClassName, "NAME_REF")
 		Button.SetText(t )
 
 		if Allowed==0:
 			continue
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,  "ClassPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  ClassPress)
 		Button.SetVarAssoc("Class", i)
 
 	BackButton = ClassWindow.GetControl(17)
@@ -113,8 +114,8 @@ def OnLoad():
 	else:
 		AdjustTextArea()
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	ClassWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
@@ -128,8 +129,8 @@ def ClassPress():
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	j = 0
 	for i in range(1,ClassCount):
-		ClassName = ClassTable.GetRowName(i-1)
-		Allowed = ClassTable.GetValue(ClassName, "CLASS")
+		ClassName = GUICommon.ClassTable.GetRowName(i-1)
+		Allowed = GUICommon.ClassTable.GetValue(ClassName, "CLASS")
 		if Allowed > 0:
 			continue
 		Button = ClassWindow.GetControl(j+2)
@@ -140,25 +141,25 @@ def ClassPress():
 
 	j=0
 	for i in range(1, ClassCount):
-		ClassName = ClassTable.GetRowName(i-1)
+		ClassName = GUICommon.ClassTable.GetRowName(i-1)
 		#determining if this is a kit or class
-		Allowed = ClassTable.GetValue(ClassName, "CLASS")
+		Allowed = GUICommon.ClassTable.GetValue(ClassName, "CLASS")
 		if Allowed != ClassID:
 			continue
 		Button = ClassWindow.GetControl(j+2)
 		j = j+1
-		t = ClassTable.GetValue(ClassName, "NAME_REF")
+		t = GUICommon.ClassTable.GetValue(ClassName, "NAME_REF")
 		Button.SetText(t )
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,  "ClassPress2")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  ClassPress2)
 		Button.SetVarAssoc("Class", i)
 
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress2")
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress2)
 	return
 
 def ClassPress2():
 	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(ClassTable.GetValue(Class,1) )
+	TextAreaControl.SetText(GUICommon.ClassTable.GetValue(Class,1) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -181,7 +182,7 @@ def BackPress():
 def NextPress():
 	#classcolumn is base class
 	Class = GemRB.GetVar("Class")
-	ClassColumn = ClassTable.GetValue(Class - 1, 3)
+	ClassColumn = GUICommon.ClassTable.GetValue(Class - 1, 3)
 	if ClassColumn <= 0:  #it was already a base class
 		ClassColumn = Class 
 	GemRB.SetVar("BaseClass", ClassColumn)

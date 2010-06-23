@@ -23,13 +23,12 @@
 ###################################################
 
 import GemRB
+import GUICommon
 import GUICommonWindows
+import GUIINV
 from GUIDefines import *
-from GUICommonWindows import *
 from ie_stats import *
 from ie_slots import *
-from GUICommon import CheckStat100
-from GUICommon import GameWindow
 
 StoreWindow = None
 MessageWindow = None
@@ -76,10 +75,7 @@ total_income = 0
 storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORBAG","STORBAG")
 storetips = (14288,14292,14291,12138,15013,14289,14287)
 roomtypes = (17389,17517,17521,17519)
-store_funcs = ( "OpenStoreShoppingWindow", "OpenStoreIdentifyWindow",
-"OpenStoreStealWindow", "OpenStoreHealWindow", "OpenStoreDonateWindow",
-"OpenStoreRumourWindow", "OpenStoreRentWindow" )
-store_update_funcs = None
+store_funcs = None
 
 def CloseWindows ():
 	CloseStoreShoppingWindow ()
@@ -107,29 +103,29 @@ def CloseStoreWindow ():
 	GemRB.LeaveStore ()
 	GUICommonWindows.PortraitWindow = OldPortraitWindow
 	if Inventory:
-		GemRB.RunEventHandler("OpenInventoryWindow")
+		GUIINV.OpenInventoryWindow ()
 	else:
-		GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
+		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
 		GemRB.UnhideGUI () #enabling the other windows
-		SetSelectionChangeHandler( None )
+		GUICommonWindows.SetSelectionChangeHandler( None )
 	return
 
 def OpenStoreWindow ():
 	global Store
 	global StoreWindow, ActionWindow, PortraitWindow
 	global OldPortraitWindow
-	global store_update_funcs
+	global store_funcs
 	global Inventory
 
 	#these are function pointers, not strings
 	#can't put this in global init, doh!
-	store_update_funcs = (OpenStoreShoppingWindow,
+	store_funcs = (OpenStoreShoppingWindow,
 	OpenStoreIdentifyWindow,OpenStoreStealWindow,
 	OpenStoreHealWindow, OpenStoreDonateWindow,
 	OpenStoreRumourWindow,OpenStoreRentWindow )
 
 	GemRB.HideGUI ()
-	GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the game control screen
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the game control screen
 
 	if GemRB.GetVar ("Inventory"):
 		Inventory = 1
@@ -141,7 +137,7 @@ def OpenStoreWindow ():
 	StoreWindow = Window = GemRB.LoadWindow (3)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	#PortraitWindow = OpenPortraitWindow (0)
+	#PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 	ActionWindow = GemRB.LoadWindow (0)
 	#this window is static and grey, but good to stick the frame onto
 	ActionWindow.SetFrame ()
@@ -151,7 +147,7 @@ def OpenStoreWindow ():
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (11973)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseStoreWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseStoreWindow)
 
 	#Store type icon
 	Button = Window.GetControl (5)
@@ -169,7 +165,7 @@ def OpenStoreWindow ():
 			#this is different from BG???
 			Button.SetSprites ("GUISTBBC", Action, 1,2,0,0)
 			Button.SetTooltip (storetips[Action])
-			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, store_funcs[Action])
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, store_funcs[Action])
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
@@ -179,7 +175,7 @@ def OpenStoreWindow ():
 
 	ActionWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_VISIBLE)
-	store_update_funcs[store_buttons[0]] ()
+	store_funcs[store_buttons[0]] ()
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
@@ -219,31 +215,31 @@ def OpenStoreShoppingWindow ():
 	for i in range (4):
 		Button = Window.GetControl (i+5)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectBuy")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoLeftWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
 
 		Button = Window.GetControl (i+13)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectSell")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoRightWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 
 	# Buy
 	LeftButton = Button = Window.GetControl (2)
 	if Inventory:
 		Button.SetText (26287)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ToBackpackPressed")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ToBackpackPressed)
 	else:
 		Button.SetText (13703)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BuyPressed")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BuyPressed)
 
 	# Sell
 	RightButton = Button = Window.GetControl (3)
 	if Inventory:
 		Button.SetText (26288)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ToBagPressed")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ToBagPressed)
 	else:
 		Button.SetText (13704)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SellPressed")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SellPressed)
 
 	# inactive button
 	#Button = Window.GetControl (50)
@@ -260,13 +256,13 @@ def OpenStoreShoppingWindow ():
 
 	# left scrollbar
 	ScrollBar = Window.GetControl (11)
-	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreShoppingWindow")
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreShoppingWindow)
 
 	# right scrollbar
 	ScrollBar = Window.GetControl (12)
-	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreShoppingWindow")
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreShoppingWindow)
 
-	SetSelectionChangeHandler( UpdateStoreShoppingWindow )
+	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreShoppingWindow )
 	UpdateStoreShoppingWindow ()
 	Window.SetVisible (WINDOW_VISIBLE)
 	return
@@ -283,8 +279,8 @@ def OpenStoreIdentifyWindow ():
 	# Identify
 	Button = Window.GetControl (5)
 	Button.SetText (14133)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "IdentifyPressed")
-	Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoIdentifyWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyPressed)
+	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
 
 	# price ...
 	Label = Window.GetControl (0x10000003)
@@ -296,13 +292,13 @@ def OpenStoreIdentifyWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RedrawStoreIdentifyWindow")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoIdentifyWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreIdentifyWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
 
 	ScrollBar = Window.GetControl (7)
-	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreIdentifyWindow")
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreIdentifyWindow)
 
-	SetSelectionChangeHandler( UpdateStoreIdentifyWindow )
+	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreIdentifyWindow )
 	UpdateStoreIdentifyWindow ()
 	Window.SetVisible (WINDOW_VISIBLE)
 	return
@@ -320,16 +316,16 @@ def OpenStoreStealWindow ():
 	for i in range (4):
 		Button = Window.GetControl (i+4)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RedrawStoreStealWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreStealWindow)
 
 		Button = Window.GetControl (i+11)
 		Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoRightWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 
 	# Steal
 	LeftButton = Button = Window.GetControl (1)
 	Button.SetText (14179)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "StealPressed")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, StealPressed)
 
 	Button = Window.GetControl (37)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
@@ -340,13 +336,13 @@ def OpenStoreStealWindow ():
 
 	# left scrollbar
 	ScrollBar = Window.GetControl (9)
-	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreStealWindow")
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreStealWindow)
 
 	# right scrollbar
 	ScrollBar = Window.GetControl (10)
-	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreStealWindow")
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreStealWindow)
 
-	SetSelectionChangeHandler( UpdateStoreStealWindow )
+	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreStealWindow )
 	UpdateStoreStealWindow ()
 	Window.SetVisible (WINDOW_VISIBLE)
 	return
@@ -366,23 +362,23 @@ def OpenStoreDonateWindow ():
 	# Donate
 	Button = Window.GetControl (3)
 	Button.SetText (15101)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DonateGold")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonateGold)
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Entry
 	Field = Window.GetControl (5)
 	Field.SetText ("0")
-	Field.SetEventByName (IE_GUI_EDIT_ON_CHANGE, "UpdateStoreDonateWindow")
+	Field.SetEvent (IE_GUI_EDIT_ON_CHANGE, UpdateStoreDonateWindow)
 	Field.SetStatus (IE_GUI_EDIT_NUMBER)
 
 	# +
 	Button = Window.GetControl (6)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "IncrementDonation")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncrementDonation)
 	# -
 	Button = Window.GetControl (7)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "DecrementDonation")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecrementDonation)
 
-	SetSelectionChangeHandler( UpdateStoreDonateWindow )
+	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreDonateWindow )
 	UpdateStoreDonateWindow ()
 	Window.SetVisible (WINDOW_VISIBLE)
 	return
@@ -400,8 +396,8 @@ def OpenStoreHealWindow ():
 	for i in range (4):
 		Button = Window.GetControl (i+8)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateStoreHealWindow")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoHealWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateStoreHealWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoHealWindow)
 
 	# price tag
 	Label = Window.GetControl (0x10000003)
@@ -410,11 +406,11 @@ def OpenStoreHealWindow ():
 	# Heal
 	Button = Window.GetControl (5)
 	Button.SetText (13703)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "BuyHeal")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BuyHeal)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	ScrollBar = Window.GetControl (7)
-	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "UpdateStoreHealWindow")
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, UpdateStoreHealWindow)
 	Count = Store['StoreCureCount']
 	if Count>4:
 		Count = Count-4
@@ -448,7 +444,7 @@ def OpenStoreRumourWindow ():
 	#Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	ScrollBar = Window.GetControl (5)
-	ScrollBar.SetEventByName (IE_GUI_SCROLLBAR_ON_CHANGE, "UpdateStoreRumourWindow")
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, UpdateStoreRumourWindow)
 	Count = Store['StoreDrinkCount']
 	if Count>4:
 		Count = Count-4
@@ -472,7 +468,7 @@ def OpenStoreRentWindow ():
 	for i in range (4):
 		ok = Store['StoreRoomPrices'][i]
 		Button = Window.GetControl (i)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateStoreRentWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateStoreRentWindow)
 		if ok<0:
 			Button.SetState (IE_GUI_BUTTON_DISABLED) #disabled room icons are selected, not disabled
 		else:
@@ -482,7 +478,7 @@ def OpenStoreRentWindow ():
 
 		Button = Window.GetControl (i+4)
 		Button.SetText (14294+i)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "UpdateStoreRentWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateStoreRentWindow)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetVarAssoc ("RentIndex", i)
 		if ok<0:
@@ -491,7 +487,7 @@ def OpenStoreRentWindow ():
 	# Rent
 	Button = Window.GetControl (11)
 	Button.SetText (14293)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RentRoom")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RentRoom)
 
 	GemRB.SetVar ("RentIndex", RentIndex)
 
@@ -931,7 +927,7 @@ def InfoWindow (Slot, Item):
 	#Done
 	Button = Window.GetControl (4)
 	Button.SetText (11973)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ErrorDone")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ErrorDone)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -967,7 +963,7 @@ def StealPressed ():
 	#if difficulty = 0 and skill=50, 50% success
 	#if difficulty = 50 and skill=50, 0% success
 	#if skill>random(100)+difficulty - success
-	if CheckStat100 (pc, IE_PICKPOCKET, Store['StealFailure']):
+	if GUICommon.CheckStat100 (pc, IE_PICKPOCKET, Store['StealFailure']):
 		GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_STEAL)
 		UpdateStoreStealWindow ()
 	else:
@@ -1178,7 +1174,7 @@ def InfoHealWindow ():
 	#Done
 	Button = Window.GetControl (5)
 	Button.SetText (11973)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ErrorDone")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ErrorDone)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1211,7 +1207,7 @@ def UpdateStoreRumourWindow ():
 			GemRB.SetToken ("ITEMCOST", str(Drink['Price']) )
 			Button.SetText (10162)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-			Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "GulpDrink")
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GulpDrink)
 		else:
 			Button.SetText ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1303,13 +1299,13 @@ def RentRoom ():
 	#confirm
 	Button = Window.GetControl (0)
 	Button.SetText (17199)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RentConfirm")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RentConfirm)
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	#deny
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RentDeny")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RentDeny)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	#textarea
@@ -1393,7 +1389,7 @@ def ErrorWindow (strref):
 	#done
 	Button = Window.GetControl (0)
 	Button.SetText (11973)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "ErrorDone")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ErrorDone)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

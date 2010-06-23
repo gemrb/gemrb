@@ -18,6 +18,7 @@
 #
 #character generation, sound (GUICG19)
 import GemRB
+from GUIDefines import *
 
 SoundWindow = 0
 TextAreaControl = 0
@@ -51,9 +52,9 @@ def OnLoad():
 	DefaultButton = SoundWindow.GetControl(47)
 	DefaultButton.SetText(33479)
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	DefaultButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"DefaultPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	DefaultButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DefaultPress)
 	SoundWindow.SetVisible(WINDOW_VISIBLE)
 	return
 

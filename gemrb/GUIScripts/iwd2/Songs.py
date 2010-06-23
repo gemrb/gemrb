@@ -18,6 +18,7 @@
 #
 #instead of credits, you can listen the songs of the game :)
 import GemRB
+from GUIDefines import *
 
 MovieWindow = 0
 TextAreaControl = 0
@@ -44,9 +45,9 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
-	PlayButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "PlayPress")
-	CreditsButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CreditsPress")
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, PlayPress)
+	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CreditsPress)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
 	MovieWindow.SetVisible(WINDOW_VISIBLE)
 	return
 	
