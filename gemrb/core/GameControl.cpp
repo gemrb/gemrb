@@ -1956,7 +1956,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 		switch(Key) {
 			case GEM_RETURN:
 				//simulating the continue/end button pressed
-				core->GetGUIScriptEngine()->RunFunction("CloseContinueWindow");
+				core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "CloseContinueWindow");
 				break;
 		}
 		return; //don't accept keys in dialog
