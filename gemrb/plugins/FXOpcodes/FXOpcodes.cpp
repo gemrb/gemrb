@@ -3996,6 +3996,7 @@ int fx_cure_hold_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_cure_hold_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	//note that this effect doesn't remove 185 (another hold effect)
 	target->fxqueue.RemoveAllEffects( fx_hold_creature_ref );
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_HELD);
 	return FX_NOT_APPLIED;
 }
 
