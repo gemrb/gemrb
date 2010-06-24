@@ -970,16 +970,16 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			}
 			break;
 		case 'm':
-			core->GetGUIScriptEngine()->RunFunction("OpenMapWindow");
+			core->GetGUIScriptEngine()->RunFunction("GUIMA","OpenMapWindow");
 			break;
 		case 'j':
-			core->GetGUIScriptEngine()->RunFunction("OpenJournalWindow");
+			core->GetGUIScriptEngine()->RunFunction("GUIJRNL","OpenJournalWindow");
 			break;
 		case 'i':
-			core->GetGUIScriptEngine()->RunFunction("OpenInventoryWindow");
+			core->GetGUIScriptEngine()->RunFunction("GUIINV","OpenInventoryWindow");
 			break;
 		case 'r':
-			core->GetGUIScriptEngine()->RunFunction("OpenRecordsWindow");
+			core->GetGUIScriptEngine()->RunFunction("GUIREC","OpenRecordsWindow");
 			break;
 		case 'q': //quicksave
 			QuickSave();
@@ -2019,10 +2019,10 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			core->SetEventFlag(EF_ACTION);
 			return;
 		case GEM_PGUP:
-			core->GetGUIScriptEngine()->RunFunction("OnIncreaseSize");
+			core->GetGUIScriptEngine()->RunFunction("GUICommonWindows","OnIncreaseSize");
 			return;
 		case GEM_PGDOWN:
-			core->GetGUIScriptEngine()->RunFunction("OnDecreaseSize");
+			core->GetGUIScriptEngine()->RunFunction("GUICommonWindows","OnDecreaseSize");
 			return;
 		default:
 			return;
