@@ -20,12 +20,13 @@
 
 #include "PythonHelpers.h"
 
-static bool CallPython(PyObject *Function)
+static bool CallPython(PyObject *Function, PyObject *args = NULL)
 {
 	if (!Function) {
 		return false;
 	}
-	PyObject *ret = PyObject_CallObject(Function, NULL);
+	PyObject *ret = PyObject_CallObject(Function, args);
+	Py_XDECREF( args );
 	if (ret == NULL) {
 		if (PyErr_Occurred()) {
 			PyErr_Print();
@@ -34,6 +35,15 @@ static bool CallPython(PyObject *Function)
 	}
 	Py_DECREF(ret);
 	return true;
+}
+
+static bool CallPython(PyObject *Function, int arg)
+{
+	if (!Function) {
+		return false;
+	}
+	PyObject *args = Py_BuildValue("(i)", arg);
+	return CallPython(Function, args);
 }
 
 StringCallback::StringCallback(const char *str)
@@ -72,6 +82,11 @@ bool StringCallback::call()
 	return CallPython(GetFunction());
 }
 
+bool StringCallback::call(int arg)
+{
+	return CallPython(GetFunction(), arg);
+}
+
 PythonCallback::PythonCallback(PyObject *Function)
 	: Function(Function)
 {
@@ -95,4 +110,12 @@ bool PythonCallback::call ()
 		return false;
 	}
 	return CallPython(Function);
+}
+
+bool PythonCallback::call (int arg)
+{
+	if (!Function || !Py_IsInitialized()) {
+		return false;
+	}
+	return CallPython(Function, arg);
 }

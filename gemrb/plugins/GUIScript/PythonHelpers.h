@@ -34,6 +34,7 @@ public:
 	StringCallback(PyObject*);
 	~StringCallback();
 	bool call();
+	bool call(int);
 private:
 	PyObject *GetFunction();
 	PyObject* Name;
@@ -44,6 +45,7 @@ public:
 	PythonCallback(PyObject *Function);
 	~PythonCallback();
 	bool call();
+	bool call(int);
 private:
 	PyObject *Function;
 };

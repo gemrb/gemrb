@@ -26,3 +26,8 @@ bool Callback::call()
 {
 	return true;
 }
+
+bool Callback::call(int)
+{
+	return true;
+}

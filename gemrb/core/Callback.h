@@ -27,6 +27,7 @@ class GEM_EXPORT Callback : public Held<Callback> {
 public:
 	virtual ~Callback();
 	virtual bool call ();
+	virtual bool call (int);
 };
 
 typedef Holder<Callback> EventHandler;
