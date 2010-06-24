@@ -35,6 +35,7 @@ public:
 	~StringCallback();
 	bool call();
 private:
+	PyObject *GetFunction();
 	PyObject* Name;
 };
 

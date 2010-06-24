@@ -20,6 +20,22 @@
 
 #include "PythonHelpers.h"
 
+static bool CallPython(PyObject *Function)
+{
+	if (!Function) {
+		return false;
+	}
+	PyObject *ret = PyObject_CallObject(Function, NULL);
+	if (ret == NULL) {
+		if (PyErr_Occurred()) {
+			PyErr_Print();
+		}
+		return false;
+	}
+	Py_DECREF(ret);
+	return true;
+}
+
 StringCallback::StringCallback(const char *str)
 	: Name(PyString_FromString(const_cast<char*>(str)))
 {
@@ -36,27 +52,24 @@ StringCallback::~StringCallback()
 	Py_XDECREF(Name);
 }
 
-bool StringCallback::call()
+PyObject *StringCallback::GetFunction()
 {
 	if (!Name || !Py_IsInitialized()) {
-		return false;
+		return NULL;
 	}
 	/* Borrowed reference */
 	PyObject *Function = PyDict_GetItem(gs->pDict, Name);
 	if (!Function || !PyCallable_Check(Function)) {
 		printMessage("GUIScript", "Missing callback function:", LIGHT_RED);
 		printf("%s\n", PyString_AsString(Name));
-		return false;
+		return NULL;
 	}
-	PyObject *ret = PyObject_CallObject(Function, NULL);
-	if (ret == NULL) {
-		if (PyErr_Occurred()) {
-			PyErr_Print();
-		}
-		return false;
-	}
-	Py_DECREF(ret);
-	return true;
+	return Function;
+}
+
+bool StringCallback::call()
+{
+	return CallPython(GetFunction());
 }
 
 PythonCallback::PythonCallback(PyObject *Function)
@@ -81,13 +94,5 @@ bool PythonCallback::call ()
 	if (!Function || !Py_IsInitialized()) {
 		return false;
 	}
-	PyObject *ret = PyObject_CallObject(Function, NULL);
-	if (ret == NULL) {
-		if (PyErr_Occurred()) {
-			PyErr_Print();
-		}
-		return false;
-	}
-	Py_DECREF(ret);
-	return true;
+	return CallPython(Function);
 }
