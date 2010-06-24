@@ -2019,10 +2019,10 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			core->SetEventFlag(EF_ACTION);
 			return;
 		case GEM_PGUP:
-			core->GetGUIScriptEngine()->RunFunction("GUICommonWindows","OnIncreaseSize");
+			core->GetGUIScriptEngine()->RunFunction("CommonWindow","OnIncreaseSize");
 			return;
 		case GEM_PGDOWN:
-			core->GetGUIScriptEngine()->RunFunction("GUICommonWindows","OnDecreaseSize");
+			core->GetGUIScriptEngine()->RunFunction("CommonWindow","OnDecreaseSize");
 			return;
 		default:
 			return;
