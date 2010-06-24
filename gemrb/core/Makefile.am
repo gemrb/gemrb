@@ -29,6 +29,7 @@ libgemrb_core_la_SOURCES = \
 	DataStream.cpp \
 	Dialog.cpp \
 	DialogMgr.cpp \
+	DisplayMessage.cpp \
 	EffectMgr.cpp \
 	EffectQueue.cpp \
 	EventMgr.cpp \
