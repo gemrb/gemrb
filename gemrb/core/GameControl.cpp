@@ -2015,7 +2015,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			moveY = 0;
 			return;
 		case GEM_ESCAPE:
-			core->GetGUIScriptEngine()->RunFunction("EmptyControls");
+			core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "EmptyControls");
 			core->SetEventFlag(EF_ACTION);
 			return;
 		case GEM_PGUP:
