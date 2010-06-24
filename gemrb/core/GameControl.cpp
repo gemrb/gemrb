@@ -1755,7 +1755,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		}
 		core->GetDictionary()->SetAt( "MenuX", x );
 		core->GetDictionary()->SetAt( "MenuY", y );
-		core->GetGUIScriptEngine()->RunFunction( "OpenFloatMenuWindow" );
+		core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow" );
 		return;
 	}
 

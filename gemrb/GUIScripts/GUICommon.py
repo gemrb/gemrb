@@ -89,7 +89,11 @@ def SelectFormation ():
 	return
 
 def OpenFloatMenuWindow ():
-	GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
+	if GameIsPST():
+		import FloatMenuWindow
+		FloatMenuWindow.OpenFloatMenuWindow()
+	else:
+		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 
 def GetActorPaperDoll (actor):
 	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)
