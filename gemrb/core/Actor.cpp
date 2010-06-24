@@ -2901,6 +2901,12 @@ void Actor::Resurrect()
 	//clear effects?
 }
 
+static EffectRef fx_cure_poisoned_state_ref={"Cure:Poison",NULL,-1};
+static EffectRef fx_cure_hold_state_ref={"Cure:Hold",NULL,-1};
+static EffectRef fx_cure_stun_state_ref={"Cure:Stun",NULL,-1};
+static EffectRef fx_remove_portrait_icon_ref={"Icon:Remove",NULL,-1};
+static EffectRef fx_unpause_caster_ref={"Cure:CasterHold",NULL,-1};
+
 void Actor::Die(Scriptable *killer)
 {
 	int i,j;
@@ -2924,6 +2930,24 @@ void Actor::Die(Scriptable *killer)
 	SetModal( MS_NONE );
 	displaymsg->DisplayConstantStringName(STR_DEATH, 0xffffff, this);
 	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
+
+	// remove poison, hold, casterhold, stun and its icon
+	Effect *newfx;
+	newfx = EffectQueue::CreateEffect(fx_cure_poisoned_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, this, this);
+	delete newfx;
+	newfx = EffectQueue::CreateEffect(fx_cure_hold_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, this, this);
+	delete newfx;
+	newfx = EffectQueue::CreateEffect(fx_unpause_caster_ref, 0, 100, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, this, this);
+	delete newfx;
+	newfx = EffectQueue::CreateEffect(fx_cure_stun_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, this, this);
+	delete newfx;
+	newfx = EffectQueue::CreateEffect(fx_remove_portrait_icon_ref, 0, 37, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, this, this);
+	delete newfx;
 
 	// clearing the search map here means it's not blocked during death animations
 	// this is perhaps not ideal, but matches other searchmap code which uses
