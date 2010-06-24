@@ -17,17 +17,23 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
 
 import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_action import *
-from GUIClasses import GWindow
-from GUICommon import GearsClicked, RestPress, OpenFloatMenuWindow
-from LUCommon import CanLevelUp
+import GUIClasses
 import GUICommon
+import LUCommon
+
+import GUIJRNL
+import GUIMA
+import GUIMG
+import GUIINV
+import GUIOPT
+import GUIPR
+import GUIREC
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -69,17 +75,17 @@ def OpenCommonWindows ():
 	# Can't Reach ???
 	Button = Window.GetControl (0)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CntReachPress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: CntReachPress
 
 	# AI
 	Button = Window.GetControl (4)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "AIPress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
 
 	# Message popup
 	Button = Window.GetControl (10)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "TxtePress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, TxtePress)
 
 
 	SetupMenuWindowControls (Window)
@@ -113,52 +119,52 @@ def SetupMenuWindowControls (Window):
 	# Inventory
 	Button = Window.GetControl (1)
 	Button.SetTooltip (41601)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
 
 	# Map
 	Button = Window.GetControl (2)
 	Button.SetTooltip (41625)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMA.OpenMapWindow)
 
 	# Mage
 	Button = Window.GetControl (3)
 	Button.SetTooltip (41624)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMageWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMG.OpenMageWindow)
 	# Stats
 	Button = Window.GetControl (5)
 	Button.SetTooltip (4707)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenRecordsWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIREC.OpenRecordsWindow)
 
 	# Journal
 	Button = Window.GetControl (6)
 	Button.SetTooltip (41623)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIJRNL.OpenJournalWindow)
 
 	# Priest
 	Button = Window.GetControl (7)
 	Button.SetTooltip (4709)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenPriestWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIPR.OpenPriestWindow)
 
 	# Options
 	Button = Window.GetControl (8)
 	Button.SetTooltip (41626)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenOptionsWindow)
 
 	# Rest
 	Button = Window.GetControl (9)
 	Button.SetTooltip (41628)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "RestPress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
 
 
 	# AI
 	Button = Window.GetControl (4)
 	Button.SetTooltip (41631) # or 41646 Activate ...
-	#Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
+	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.OpenFloatMenuWindow)
 
 	# (Un)Lock view on character
 	Button = Window.GetControl (0)
 	Button.SetTooltip (41647)  # or 41648 Unlock ...
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnLockViewPress")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnLockViewPress)
 
 	# Message popup
 	Button = Window.GetControl (10)
@@ -180,8 +186,8 @@ def SetupActionsWindowControls (Window):
 	Button = Window.GetControl (0)
 	Button.SetAnimation ("WMTIME")
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
-	Button.SetEventByName(IE_GUI_MOUSE_ENTER_BUTTON, "UpdateClock")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, UpdateClock)
 
 	# 41627 - Return to the Game World
 	Button = Window.GetControl (2)
@@ -283,19 +289,19 @@ def OpenPortraitWindow (needcontrols):
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ('PressedPortrait', i)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
-		Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG, "PortraitButtonOnDrag")
-		Button.SetEventByName (IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
-		Button.SetEventByName (IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
+		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, PortraitButtonOnShiftPress)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, GUIINV.OnDropItemToPC)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, PortraitButtonOnDrag)
+		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, PortraitButtonOnMouseEnter)
+		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, PortraitButtonOnMouseLeave)
 
 		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		Button.SetBorder (FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
 
 		ButtonHP = Window.GetControl (6 + i)
 		ButtonHP.SetVarAssoc ('PressedPortraitHP', i)
-		ButtonHP.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PortraitButtonHPOnPress")
+		ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonHPOnPress)
 
 		portrait_hp_numeric[i] = 0
 
@@ -471,9 +477,9 @@ def PortraitButtonOnMouseLeave ():
 def DisableAnimatedWindows ():
 	global ActionsWindow, OptionsWindow
 	GemRB.SetVar ("PortraitWindow", -1)
-	ActionsWindow = GWindow( GemRB.GetVar ("ActionsWindow") )
+	ActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
 	GemRB.SetVar ("ActionsWindow", -1)
-	OptionsWindow = GWindow( GemRB.GetVar ("OptionsWindow") )
+	OptionsWindow = GUIClasses.GWindow( GemRB.GetVar ("OptionsWindow") )
 	GemRB.SetVar ("OptionsWindow", -1)
 	GemRB.GamePause (1,1)
 
@@ -505,10 +511,10 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
 		#Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 		#Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, PressHandler)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, RightPressHandler)
-		#Button.SetEventByName (IE_GUI_BUTTON_ON_SHIFT_PRESS, ShiftPressHandler)
-		#Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG_DROP, DragDropHandler)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PressHandler)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, RightPressHandler)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, ShiftPressHandler)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, DragDropHandler)
 
 	else:
 		#Button.SetVarAssoc ("LeftIndex", -1)
@@ -589,6 +595,10 @@ def UpdateClock():
 	SetPSTGamedaysAndHourToken ()
 	Button.SetTooltip (65027)
 
+def UpdateActionsWindow():
+	# pst doesn't need this, but it is one of the core callbacks, so it has to be defined
+	return
+
 def ActionStopPressed ():
 	for i in range (PARTY_SIZE):
 		if GemRB.GameIsPCSelected (i + 1):
@@ -608,4 +618,4 @@ def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
 
 def CheckLevelUp(pc):
-	GemRB.SetVar ("CheckLevelUp"+str(pc), CanLevelUp (pc))
+	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))

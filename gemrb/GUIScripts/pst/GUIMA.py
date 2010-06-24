@@ -23,9 +23,9 @@
 ###################################################
 
 import GemRB
+import GUICommon
+import GUICommonWindows
 from GUIDefines import *
-from GUICommon import CloseOtherWindow
-from GUICommonWindows import EnableAnimatedWindows, DisableAnimatedWindows
 
 MapWindow = None
 WorldMapWindow = None
@@ -36,7 +36,7 @@ PosY = 0
 def OpenMapWindow ():
 	global MapWindow
 
-	if CloseOtherWindow (OpenMapWindow):
+	if GUICommon.CloseOtherWindow (OpenMapWindow):
 		GemRB.HideGUI ()
 		if WorldMapWindow: OpenWorldMapWindowInside ()
 		
@@ -56,7 +56,7 @@ def OpenMapWindow ():
 	# World Map
 	Button = Window.GetControl (0)
 	Button.SetText (20429)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindow)
 
 	# Add Note
 	Button = Window.GetControl (1)
@@ -77,7 +77,7 @@ def OpenMapWindow ():
 	GemRB.SetVar ("x",IE_GUI_MAP_VIEW_NOTES)
 	Map.SetVarAssoc ("x", IE_GUI_MAP_VIEW_NOTES)
 
-	Map.SetEventByName (IE_GUI_MAP_ON_PRESS, "SetMapNote")
+	Map.SetEvent (IE_GUI_MAP_ON_PRESS, SetMapNote)
 
 	MapTable = GemRB.LoadTable( "MAPNAME" )
 	MapName = MapTable.GetValue (GemRB.GetCurrentArea (), "STRING")
@@ -92,7 +92,7 @@ def OpenMapWindow ():
 	# Done
 	Button = Window.GetControl (5)
 	Button.SetText (1403)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	GemRB.UnhideGUI ()
@@ -107,7 +107,7 @@ def SetMapNote ():
 	global PosX, PosY
 
 	Label = MapWindow.GetControl (6)
-	Label.SetEventByName (IE_GUI_EDIT_ON_CHANGE, "NoteChanged")
+	Label.SetEvent (IE_GUI_EDIT_ON_CHANGE, NoteChanged)
 	PosX = GemRB.GetVar("MapControlX")
 	PosY = GemRB.GetVar("MapControlY")
 	Label.SetStatus (IE_GUI_CONTROL_FOCUSED)
@@ -134,11 +134,11 @@ def WorldMapWindowCommon (Travel):
 			WorldMapWindow.Unload ()
 		WorldMapWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		EnableAnimatedWindows ()
+		GUICommonWindows.EnableAnimatedWindows ()
 		GemRB.UnhideGUI ()
 		return
 
-	DisableAnimatedWindows ()
+	GUICommonWindows.DisableAnimatedWindows ()
 	GemRB.LoadWindowPack ("GUIWMAP")
 	WorldMapWindow = Window = GemRB.LoadWindow (0)
 	MapWindow = None
@@ -155,9 +155,9 @@ def WorldMapWindowCommon (Travel):
 	Button = Window.GetControl (0)
 	Button.SetText (1403)
 	if Travel>=0:
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindow)
 	else:
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
 	GemRB.UnhideGUI ()
 
 ###################################################

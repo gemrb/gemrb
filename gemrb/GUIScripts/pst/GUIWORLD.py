@@ -24,11 +24,10 @@
 ###################################################
 
 import GemRB
+import GUIClasses
+import GUICommon
+import GUICommonWindows
 from GUIDefines import *
-from GUICommon import CloseOtherWindow, SetEncumbranceLabels, GetWindowPack
-from GUICommonWindows import EnableAnimatedWindows, DisableAnimatedWindows, \
-  SetItemButton, OpenWaitForDiscWindow
-from GUIClasses import GWindow
 
 ContainerWindow = None
 FormationWindow = None
@@ -38,26 +37,26 @@ Container = None
 
 def CloseContinueWindow ():
 	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
-	Window = GWindow(GemRB.GetVar ("MessageWindow"))
+	Window = GUIClasses.GWindow(GemRB.GetVar ("MessageWindow"))
 	Button = Window.GetControl (0)
 	Button.SetText(28082)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 
 def NextDialogState ():
 	pass
 
 def OpenEndMessageWindow ():
-	Window = GWindow(GemRB.GetVar ("MessageWindow"))
+	Window = GUIClasses.GWindow(GemRB.GetVar ("MessageWindow"))
 	Button = Window.GetControl (0)
 	Button.SetText (34602)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 
 
 def OpenContinueMessageWindow ():
-	Window = GWindow(GemRB.GetVar ("MessageWindow"))
+	Window = GUIClasses.GWindow(GemRB.GetVar ("MessageWindow"))
 	Button = Window.GetControl (0)
 	Button.SetText (34603)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 
 
 def OpenContainerWindow ():
@@ -68,9 +67,9 @@ def OpenContainerWindow ():
 
 	hideflag = GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack (GetWindowPack())
+	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	ContainerWindow = Window = GemRB.LoadWindow (8)
-	DisableAnimatedWindows ()
+	GUICommonWindows.DisableAnimatedWindows ()
 	GemRB.SetVar ("ActionsWindow", Window.ID)
 
 	Container = GemRB.GetContainer(0)
@@ -109,13 +108,13 @@ def OpenContainerWindow ():
 
 	# Ground items scrollbar
 	ScrollBar = Window.GetControl (52)
-	ScrollBar.SetEventByName(IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
+	ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, RedrawContainerWindow)
 	GemRB.SetVar ("LeftTopIndex", 0)
 	ScrollBar.SetVarAssoc ("LeftTopIndex", Count)
 
 	# Personal items scrollbar
 	ScrollBar = Window.GetControl (53)
-	ScrollBar.SetEventByName(IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
+	ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, RedrawContainerWindow)
 	GemRB.SetVar ("RightTopIndex", 0)
 	ScrollBar.SetVarAssoc ("RightTopIndex", Count)
 
@@ -123,7 +122,7 @@ def OpenContainerWindow ():
 	# Done
 	Button = Window.GetControl (51)
 	Button.SetText (1403)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "LeaveContainer")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeaveContainer)
 
 	UpdateContainerWindow ()
 
@@ -137,7 +136,7 @@ def UpdateContainerWindow ():
 	Window = ContainerWindow
 
 	pc = GemRB.GameGetFirstSelectedPC ()
-	SetEncumbranceLabels (Window, 54, None, pc)
+	GUICommon.SetEncumbranceLabels (Window, 54, None, pc)
 
 	party_gold = GemRB.GameGetPartyGold ()
 	Text = Window.GetControl (0x10000036)
@@ -181,10 +180,10 @@ def RedrawContainerWindow ():
 
 
 		if Slot != None:
-			SetItemButton (Window, Button, Slot, 'TakeItemContainer', '')
+			GUICommonWindows.SetItemButton (Window, Button, Slot, TakeItemContainer, None)
 			Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
 		else:
-			SetItemButton (Window, Button, Slot, '', '')
+			GUICommonWindows.SetItemButton (Window, Button, Slot, None, None)
 			Button.SetVarAssoc ("LeftIndex", -1)
 
 
@@ -195,13 +194,13 @@ def RedrawContainerWindow ():
 			Slot = None
 		Button = Window.GetControl (i + 10)
 		
-		SetItemButton (Window, Button, Slot, '', '')
+		GUICommonWindows.SetItemButton (Window, Button, Slot, None, None)
 
 		if Slot != None:
-			SetItemButton (Window, Button, Slot, 'DropItemContainer', '')
+			GUICommonWindows.SetItemButton (Window, Button, Slot, DropItemContainer, None)
 			Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 		else:
-			SetItemButton (Window, Button, Slot, '', '')
+			GUICommonWindows.SetItemButton (Window, Button, Slot, None, None)
 			Button.SetVarAssoc ("RightIndex", -1)
 
 
@@ -217,7 +216,7 @@ def CloseContainerWindow ():
 	if ContainerWindow:
 		ContainerWindow.Unload ()
 	ContainerWindow = None
-	EnableAnimatedWindows ()
+	GUICommonWindows.EnableAnimatedWindows ()
 	
 	if hideflag:
 		GemRB.UnhideGUI ()
@@ -258,23 +257,23 @@ def TakeItemContainer ():
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
 
-	if CloseOtherWindow(OpenReformPartyWindow):
+	if GUICommon.CloseOtherWindow(OpenReformPartyWindow):
 		GemRB.HideGUI ()
 		if ReformPartyWindow:
 			ReformPartyWindow.Unload ()
 		ReformPartyWindow = None
 
 		GemRB.SetVar ("OtherWindow", -1)
-		EnableAnimatedWindows ()
+		GUICommonWindows.EnableAnimatedWindows ()
 		GemRB.LoadWindowPack ("GUIREC")
 		GemRB.UnhideGUI ()
 		return
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack (GetWindowPack())
+	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	ReformPartyWindow = Window = GemRB.LoadWindow (24)
 	GemRB.SetVar ("OtherWindow", Window.ID)
-	DisableAnimatedWindows ()
+	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Remove
 	Button = Window.GetControl (15)
@@ -284,7 +283,7 @@ def OpenReformPartyWindow ():
 	# Done
 	Button = Window.GetControl (8)
 	Button.SetText (1403)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenReformPartyWindow)
 
 	GemRB.UnhideGUI ()
 
@@ -294,28 +293,28 @@ last_formation = None
 def OpenFormationWindow ():
 	global FormationWindow
 
-	if CloseOtherWindow(OpenFormationWindow):
+	if GUICommon.CloseOtherWindow(OpenFormationWindow):
 		GemRB.HideGUI ()
 		if FormationWindow:
 			FormationWindow.Unload ()
 		FormationWindow = None
 
 		GemRB.GameSetFormation (last_formation, 0)
-		EnableAnimatedWindows ()
+		GUICommonWindows.EnableAnimatedWindows ()
 		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.UnhideGUI ()
 		return
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack (GetWindowPack())
+	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	FormationWindow = Window = GemRB.LoadWindow (27)
 	GemRB.SetVar ("OtherWindow", Window.ID)
-	DisableAnimatedWindows ()
+	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Done
 	Button = Window.GetControl (13)
 	Button.SetText (1403)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenFormationWindow)
 
 	tooltips = (
 		44957,  # Follow
@@ -337,10 +336,10 @@ def OpenFormationWindow ():
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ("SelectedFormation", i)
 		Button.SetTooltip (tooltips[i])
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectFormation")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectFormation)
 
 	GemRB.SetVar ("SelectedFormation", GemRB.GameGetFormation (0))
-	SelectFormation ()
+	GUICommon.SelectFormation ()
 
 	GemRB.UnhideGUI ()
 

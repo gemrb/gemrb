@@ -23,7 +23,7 @@
 ###################################################
 
 import GemRB
-from GUICommonWindows import OpenWaitForDiscWindow
+from GUIDefines import *
 
 StartWindow = 0
 QuitWindow = 0
@@ -46,11 +46,11 @@ def OnLoad():
 	QuitTextArea.SetText(20582)
 	ConfirmButton = QuitWindow.GetControl(1)
 	ConfirmButton.SetText(23787)
-	ConfirmButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ExitConfirmed")
+	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
 	ConfirmButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CancelButton = QuitWindow.GetControl(2)
 	CancelButton.SetText(23789)
-	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ExitCancelled")
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitCancelled)
 	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
 
 #main window
@@ -58,9 +58,9 @@ def OnLoad():
 	NewLifeButton = StartWindow.GetControl(0)
 	ResumeLifeButton = StartWindow.GetControl(2)
 	ExitButton = StartWindow.GetControl(3)
-	NewLifeButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "NewLifePress")
-	ResumeLifeButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ResumeLifePress")
-	ExitButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ExitPress")
+	NewLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewLifePress)
+	ResumeLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ResumeLifePress)
+	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	ExitButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "EXOFONT", "", 1)

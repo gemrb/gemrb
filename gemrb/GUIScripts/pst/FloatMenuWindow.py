@@ -22,9 +22,9 @@
 ###################################################
 
 import GemRB
+import GUICommon
+import GUICommonWindows
 from GUIDefines import *
-from GUICommonWindows import GetActorPortrait, SetSelectionChangeMultiHandler
-from GUICommon import ClassSkillsTable
 from ie_stats import *
 
 FloatMenuWindow = None
@@ -72,7 +72,7 @@ def OpenFloatMenuWindow ():
 		#FIXME: UnpauseGameTimer
 		GemRB.GamePause (False, 0)
 		GemRB.SetVar ("FloatWindow", -1)
-		SetSelectionChangeMultiHandler (None)
+		GUICommonWindows.SetSelectionChangeMultiHandler (None)
 		GemRB.UnhideGUI ()
 
 		if float_menu_selected==None:
@@ -108,54 +108,54 @@ def OpenFloatMenuWindow ():
 
 	# portrait button
 	Button = Window.GetControl (0)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectNextPC")
-	Button.SetEventByName (IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenFloatMenuWindow")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectNextPC)
+	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUICommon.OpenFloatMenuWindow)
 
 	# Initiate Dialogue
 	Button = Window.GetControl (1)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectDialog")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectDialog)
 	Button.SetTooltip (8191)
 
 	# Attack/Select Weapon
 	Button = Window.GetControl (2)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectWeapons")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectWeapons)
 	Button.SetTooltip (8192)
 
 	# Cast spell
 	Button = Window.GetControl (3)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectSpells")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectSpells)
 	Button.SetTooltip (8193)
 
 	# Use Item
 	Button = Window.GetControl (4)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectItems")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectItems)
 	Button.SetTooltip (8194)
 
 	# Use Special Ability
 	Button = Window.GetControl (5)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectAbilities")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectAbilities)
 	Button.SetTooltip (8195)
 
 	# Menu Anchors/Handles
 	Button = Window.GetControl (11)
 	Button.SetTooltip (8199)
 	Button.SetFlags (IE_GUI_BUTTON_DRAGGABLE, OP_OR)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG, "FloatMenuDrag")
+	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, FloatMenuDrag)
 
 	Button = Window.GetControl (12)
 	Button.SetTooltip (8199)
 	Button.SetFlags (IE_GUI_BUTTON_DRAGGABLE, OP_OR)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_DRAG, "FloatMenuDrag")
+	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, FloatMenuDrag)
 
 	# Rotate Items left (to begin)
 	Button = Window.GetControl (13)
 	Button.SetTooltip (8197)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuPreviousItem")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuPreviousItem)
 
 	# Rotate Items right (to end)
 	Button = Window.GetControl (14)
 	Button.SetTooltip (8198)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "FloatMenuNextItem")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuNextItem)
 
 	# 6 - 10 - items/spells/other
 	for i in range (6, 11):
@@ -203,7 +203,7 @@ def OpenFloatMenuWindow ():
 
 	float_menu_index = 0
 
-	SetSelectionChangeMultiHandler (FloatMenuSelectAnotherPC)
+	GUICommonWindows.SetSelectionChangeMultiHandler (FloatMenuSelectAnotherPC)
 	UpdateFloatMenuWindow ()
 
 	GemRB.UnhideGUI ()
@@ -215,7 +215,7 @@ def UpdateFloatMenuWindow ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 
 	Button = Window.GetControl (0)
-	Button.SetSprites (GetActorPortrait (pc, 'FMENU'), 0, 0, 1, 2, 3)
+	Button.SetSprites (GUICommonWindows.GetActorPortrait (pc, 'FMENU'), 0, 0, 1, 2, 3)
 	Button = Window.GetControl (13)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button = Window.GetControl (14)
@@ -303,7 +303,7 @@ def RefreshSpellList(pc, innate):
 	if innate:
 		type = IE_SPELL_TYPE_INNATE
 	else:
-		if (ClassSkillsTable.GetValue (GemRB.GetPlayerStat( pc, IE_CLASS), 1)=="*"):
+		if (GUICommon.ClassSkillsTable.GetValue (GemRB.GetPlayerStat( pc, IE_CLASS), 1)=="*"):
 			type = IE_SPELL_TYPE_WIZARD
 		else:
 			type = IE_SPELL_TYPE_PRIEST
@@ -364,7 +364,7 @@ def UpdateFloatMenuItem (pc, i, weapons):
 		else:
 			Button.SetTooltip (item['ItemNameIdentified'])
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectItem")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItem)
 		Button.SetVarAssoc ('ItemButton', i)
 		return
 
@@ -403,7 +403,7 @@ def UpdateFloatMenuSpell (pc, i):
 
 		spell = GemRB.GetSpell (SpellResRef)
 		Button.SetTooltip (spell['SpellName'])
-		Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "SelectItem")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItem)
 		Button.SetVarAssoc ('ItemButton', i)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
@@ -416,7 +416,7 @@ def UpdateFloatMenuSpell (pc, i):
 def FloatMenuSelectNextPC ():
 	sel = GemRB.GameGetFirstSelectedPC ()
 	if sel == 0:
-		OpenFloatMenuWindow ()
+		GUICommon.OpenFloatMenuWindow ()
 		return
 
 	GemRB.GameSelectPC (sel % GemRB.GetPartySize () + 1, 1, SELECT_REPLACE)

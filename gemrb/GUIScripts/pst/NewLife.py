@@ -22,8 +22,9 @@
 ###################################################
 
 import GemRB
+from GUIDefines import *
 from ie_stats import *
-from GUICommon import StrModTable, StrModExTable
+import GUICommon
 
 NewLifeWindow = 0
 QuitWindow = 0
@@ -88,107 +89,107 @@ def OnLoad():
 	
 	Button = NewLifeWindow.GetControl(2)
 	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "StrPress")
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, StrPress)
 
 	Button = NewLifeWindow.GetControl(3)
 	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "IntPress")
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, IntPress)
 
 	Button = NewLifeWindow.GetControl(4)
 	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "WisPress")
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, WisPress)
 
 	Button = NewLifeWindow.GetControl(5)
 	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "DexPress")
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, DexPress)
 
 	Button = NewLifeWindow.GetControl(6)
 	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "ConPress")
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, ConPress)
 
 	Button = NewLifeWindow.GetControl(7)
 	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "ChaPress")
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, ChaPress)
 
 	Button = NewLifeWindow.GetControl(8)
 	Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetText(5025)
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "AcPress")
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, AcPress)
 
 	Button = NewLifeWindow.GetControl(9)
 	Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetText(5026)
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "HpPress")
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, HpPress)
 
 	Button = NewLifeWindow.GetControl(10)
 	Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetText(5027)
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "PointPress")
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, PointPress)
 
 	Button = NewLifeWindow.GetControl(11) #str +
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "IncreasePress")
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "StrPress")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, IncreasePress)
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, StrPress)
 	Button.SetVarAssoc("Pressed", 0)
 	
 	Button = NewLifeWindow.GetControl(13) #int +
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,  "IncreasePress")
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "IntPress")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  IncreasePress)
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, IntPress)
 	Button.SetVarAssoc("Pressed", 1)
 	
 	Button = NewLifeWindow.GetControl(15) #wis +
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,  "IncreasePress")
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "WisPress")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  IncreasePress)
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, WisPress)
 	Button.SetVarAssoc("Pressed", 2)
 	
 	Button = NewLifeWindow.GetControl(17) #dex +
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,  "IncreasePress")
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "DexPress")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  IncreasePress)
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, DexPress)
 	Button.SetVarAssoc("Pressed", 3)
 	
 	Button = NewLifeWindow.GetControl(19) #con +
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "IncreasePress")
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "ConPress")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, IncreasePress)
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, ConPress)
 	Button.SetVarAssoc("Pressed", 4)
 	
 	Button = NewLifeWindow.GetControl(21) #chr +
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "IncreasePress")
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "ChaPress")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, IncreasePress)
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, ChaPress)
 	Button.SetVarAssoc("Pressed", 5)
 	
 	Button = NewLifeWindow.GetControl(12) #str -
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DecreasePress")
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "StrPress")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, DecreasePress)
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, StrPress)
 	Button.SetVarAssoc("Pressed", 0)
 	
 	Button = NewLifeWindow.GetControl(14) #int -
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DecreasePress")
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "IntPress")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, DecreasePress)
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, IntPress)
 	Button.SetVarAssoc("Pressed", 1)
 	
 	Button = NewLifeWindow.GetControl(16) #wis -
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DecreasePress")
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "WisPress")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, DecreasePress)
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, WisPress)
 	Button.SetVarAssoc("Pressed", 2)
 	
 	Button = NewLifeWindow.GetControl(18) #dex -
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DecreasePress")
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "DexPress")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, DecreasePress)
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, DexPress)
 	Button.SetVarAssoc("Pressed", 3)
 	
 	Button = NewLifeWindow.GetControl( 20) #con -
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DecreasePress")
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "ConPress")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, DecreasePress)
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, ConPress)
 	Button.SetVarAssoc("Pressed", 4)
 	
 	Button = NewLifeWindow.GetControl( 22) #chr -
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "DecreasePress")
-	Button.SetEventByName(IE_GUI_MOUSE_OVER_BUTTON, "ChaPress")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, DecreasePress)
+	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, ChaPress)
 	Button.SetVarAssoc("Pressed", 5)
 	
 	NewLifeLabel = NewLifeWindow.GetControl(0x10000023)
@@ -211,12 +212,12 @@ def OnLoad():
 	
 	AcceptButton = NewLifeWindow.GetControl(0)
 	AcceptButton.SetText(4192)
-	AcceptButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "AcceptPress")
+	AcceptButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, AcceptPress)
 	AcceptButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 	
 	CancelButton = NewLifeWindow.GetControl(1)
 	CancelButton.SetText(4196)	
-	CancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
 	
 	UpdateLabels()
 	
@@ -269,7 +270,7 @@ def AcceptPress():
 		Button = QuitWindow.GetControl(2)
 		Button.SetText(46783)
 		Button.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OkButton")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkButton)
 		NewLifeWindow.SetVisible(WINDOW_GRAYED) #go dark
 		QuitWindow.SetVisible(WINDOW_VISIBLE)
 		return
@@ -325,12 +326,12 @@ def CancelPress():
 	Button.SetText(23787)
 	Button.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_SET)
 	Button.SetState(IE_GUI_BUTTON_ENABLED)
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "YesButton")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, YesButton)
 
 	Button = QuitWindow.GetControl(2)
 	Button.SetText(23789)
 	Button.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
-	Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "OkButton")
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkButton)
 
 	NewLifeWindow.SetVisible(WINDOW_GRAYED) #go dark
 	QuitWindow.SetVisible(WINDOW_VISIBLE)
@@ -353,8 +354,8 @@ def StrPress():
 	else:
 		e=0
 
-	x = StrModTable.GetValue(s,0) + StrModExTable.GetValue(e,0)
-	y = StrModTable.GetValue(s,1) + StrModExTable.GetValue(e,1)
+	x = GUICommon.StrModTable.GetValue(s,0) + GUICommon.StrModExTable.GetValue(e,0)
+	y = GUICommon.StrModTable.GetValue(s,1) + GUICommon.StrModExTable.GetValue(e,1)
 	if x==0:
 		x=y
 		y=0
