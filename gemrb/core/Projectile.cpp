@@ -774,17 +774,26 @@ int Projectile::CalculateTargetFlag()
 //get actors covered in area of trigger radius
 void Projectile::CheckTrigger(unsigned int radius)
 {
-	if (area->GetActorInRadius(Pos, CalculateTargetFlag(), radius)) {
-		if (phase == P_TRIGGER) {
+	if (phase == P_TRIGGER) {
+		//special trigger flag, explode only if the trigger animation has
+		//passed a hardcoded sequence number
+		if (Extension->AFlags&PAF_TRIGGER_D) {
+			if (travel[Orientation]) {
+				int anim = travel[Orientation]->GetCurrentFrame();
+				if (anim<30)
+					return;
+			}
+		}
+		if (area->GetActorInRadius(Pos, CalculateTargetFlag(), radius)) {
 			phase = P_EXPLODING1;
 			extension_delay = Extension->Delay;
 		}
-	} else {
-		if (phase == P_EXPLODING1) {
-			//the explosion is revoked
-			if (Extension->AFlags&PAF_SYNC) {
-				phase = P_TRIGGER;
-			}
+		return;
+	}
+	if (phase == P_EXPLODING1) {
+		//the explosion is revoked
+		if (Extension->AFlags&PAF_SYNC) {
+			phase = P_TRIGGER;
 		}
 	}
 }
@@ -1100,7 +1109,7 @@ void Projectile::DrawExplosion(const Region &screen)
 			if (apflags&APF_FILL) child_size*=2;
 			if (apflags&APF_SPREAD) child_size*=2;
 			if (apflags&APF_BOTH) child_size/=2;  //intentionally decreases
-			if (apflags&APF_MORE) child_size*=2;  
+			if (apflags&APF_MORE) child_size*=2;
 			children = (Projectile **) calloc(sizeof(Projectile *), child_size);
 		}
 		
@@ -1159,7 +1168,7 @@ void Projectile::DrawExplosion(const Region &screen)
 
 				//a bit of difference in case crowding is needed
 				//make this a separate flag if speed difference
-				//is not always wanted 
+				//is not always wanted
 				pro->Speed-=rand()&7;
 
 				delay = Extension->Delay*extension_explosioncount;

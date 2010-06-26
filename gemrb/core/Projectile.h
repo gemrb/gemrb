@@ -103,7 +103,9 @@
 #define PAF_LEV_MAGE   256
 #define PAF_LEV_CLERIC 512
 #define PAF_VVC        1024   //
-#define PAF_CONE       2048   //
+#define PAF_CONE       2048   //enable cone shape
+#define PAF_NO_WALL    0x1000 //pass through walls
+#define PAF_TRIGGER_D  0x2000 //delayed trigger (only if animation is over 30)
 #define PAF_DELAY      0x4000 //
 #define PAF_AFFECT_ONE 0x8000 //
 
