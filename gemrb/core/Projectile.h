@@ -91,19 +91,21 @@
 #define PEF_RGB        0x800000//rgb pulse on hit
 
 //projectile area flags
-#define PAF_VISIBLE    1     //the travel projectile is visible until explosion
-#define PAF_INANIMATE  2     //target inanimates
-#define PAF_TRIGGER    4     //explosion needs to be triggered
-#define PAF_SYNC       8     //one explosion at a time
-#define PAF_SECONDARY  16    //secondary projectiles at explosion
-#define PAF_FRAGMENT   32    //fragments (charanimation) at explosion
-#define PAF_ENEMY      64    //target party or not party
-#define PAF_PARTY      128   //target party
+#define PAF_VISIBLE    1      //the travel projectile is visible until explosion
+#define PAF_INANIMATE  2      //target inanimates
+#define PAF_TRIGGER    4      //explosion needs to be triggered
+#define PAF_SYNC       8      //one explosion at a time
+#define PAF_SECONDARY  16     //secondary projectiles at explosion
+#define PAF_FRAGMENT   32     //fragments (charanimation) at explosion
+#define PAF_ENEMY      64     //target party or not party
+#define PAF_PARTY      128    //target party
 #define PAF_TARGET     (64|128)
-#define PAF_VVC        1024
-#define PAF_CONE       2048
-#define PAF_DELAY      0x4000
-#define PAF_AFFECT_ONE 0x8000
+#define PAF_LEV_MAGE   256
+#define PAF_LEV_CLERIC 512
+#define PAF_VVC        1024   //
+#define PAF_CONE       2048   //
+#define PAF_DELAY      0x4000 //
+#define PAF_AFFECT_ONE 0x8000 //
 
 
 //area projectile flags (in areapro.2da)
@@ -335,8 +337,12 @@ private:
 	int GetTravelPos(int face);
 	int GetShadowPos(int face);
 	void SetPos(int face, int frame1, int frame2);
+
 	//logic to resolve target when single projectile hit destination
 	int CalculateTargetFlag();
+	//logic to resolve the explosion count (may be based on caster level)
+	int CalculateExplosionCount();
+
 	Actor *GetTarget();
 	void NextTarget(const Point &p);
 	void SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gradients);

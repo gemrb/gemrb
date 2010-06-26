@@ -313,9 +313,22 @@ void Projectile::Setup()
 
 	//cone area of effect always disables the travel flag
 	//but also makes the caster immune to the effect
-	if (Extension && (Extension->AFlags&PAF_CONE)) {
-		Destination=Pos;
-		ExtFlags|=PEF_NO_TRAVEL;
+	if (Extension) {
+		if (Extension->AFlags&PAF_CONE) {
+			Destination=Pos;
+			ExtFlags|=PEF_NO_TRAVEL;
+		}
+
+		//this flag says the first explosion is delayed
+		//(works for delaying triggers too)
+		//getting the explosion count here, so an absent caster won't cut short
+		//on the explosion count
+		if(Extension->AFlags&PAF_DELAY) {
+			extension_delay=Extension->Delay;
+		} else {
+			extension_delay=0;
+		}
+		extension_explosioncount=CalculateExplosionCount();
 	}
 
 	//set any static tint
@@ -491,22 +504,34 @@ void Projectile::ChangePhase()
 	EndTravel();
 }
 
+//Call this only if Extension exists!
+int Projectile::CalculateExplosionCount()
+{
+	int count = 0;
+	Actor *act = area->GetActorByGlobalID(Caster);
+	if(act) {
+		if (Extension->AFlags&PAF_LEV_MAGE) {
+			count = act->GetMageLevel();
+		}
+		else if (Extension->AFlags&PAF_LEV_CLERIC) {
+			count = act->GetClericLevel();
+		}
+	}
+
+	if (!count) {
+		 count = Extension->ExplosionCount;
+	}
+	if (!count) {
+		count = 1;
+	}
+	return count;
+}
+
 void Projectile::EndTravel()
 {
 	if(!Extension) {
 		phase = P_EXPIRED;
 		return;
-	}
-
-	//this flag says the first explosion is delayed (works for delaying triggers too)
-	if(Extension->AFlags&PAF_DELAY) {
-		extension_delay=Extension->Delay;
-	} else {
-		extension_delay=0;
-	}
-	extension_explosioncount=Extension->ExplosionCount;
-	if (!extension_explosioncount) {
-		extension_explosioncount=1;
 	}
 
 	//this flag says that the explosion should occur only when triggered
