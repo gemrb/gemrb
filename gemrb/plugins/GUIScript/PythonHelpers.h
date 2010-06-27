@@ -63,7 +63,9 @@ public:
 			PyObject *obj = PyCObject_FromVoidPtrAndDesc(Holder<T>::ptr,const_cast<TypeID*>(&T::ID),PyRelease);
 			PyObject *tuple = PyTuple_New(1);
 			PyTuple_SET_ITEM(tuple, 0, obj);
-			return gs->ConstructObject(T::ID.description, tuple);
+			PyObject *ret = gs->ConstructObject(T::ID.description, tuple);
+			Py_DECREF(tuple);
+			return ret;
 		} else {
 			Py_INCREF( Py_None );
 			return Py_None;
