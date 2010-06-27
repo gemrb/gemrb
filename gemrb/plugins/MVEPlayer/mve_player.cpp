@@ -299,6 +299,13 @@ void MVEPlayer::segment_video_init(unsigned char version) {
 	if (version > 1) temp = GST_READ_UINT16_LE(buffer + 6);
 	truecolour = !!temp;
 
+	// some files have multiple initialisations
+	if (video_data) {
+		if (video_data->code_map) free(video_data->code_map);
+		free(video_data);
+	}
+	if (video_back_buf) free(video_back_buf);
+
 	unsigned int size = width * height * (truecolour ? 2 : 1);
 	video_back_buf = (char *)malloc(size * 2);
 	memset(video_back_buf, 0, size * 2);
@@ -428,6 +435,7 @@ void MVEPlayer::segment_audio_init(unsigned char version) {
 
 	min_buffer_len *= audio_num_channels;
 	if (audio_sample_size == 16) min_buffer_len *= 2;
+	if (audio_buffer) free(audio_buffer);
 	audio_buffer = (short *)malloc(min_buffer_len);
 
 /*	printf("Movie audio: Sample rate %d, %d channels, %d bit, requested buffer size 0x%02x, %s\n",
