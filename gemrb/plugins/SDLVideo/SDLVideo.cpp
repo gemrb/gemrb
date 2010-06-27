@@ -94,7 +94,7 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 	bpp=b;
 	fullscreen=fs;
 	printMessage( "SDLVideo", "Creating display\n", WHITE );
-	ieDword flags = SDL_SWSURFACE;// | SDL_DOUBLEBUF;
+	ieDword flags = SDL_SWSURFACE;
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
 	}
@@ -199,7 +199,7 @@ bool SDLVideoDriver::ToggleFullscreenMode(int set_reset)
 	}
 	if (fullscreen == !set_reset) {
 		fullscreen=set_reset;
-		ieDword flags = SDL_SWSURFACE;// | SDL_DOUBLEBUF;
+		ieDword flags = SDL_SWSURFACE;
 		if (fullscreen) {
 			flags |= SDL_FULLSCREEN;
 		}
@@ -2426,6 +2426,12 @@ void SDLVideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
 	subtitleregion.h = h/4;
 	subtitleregion.x = 0;
 	subtitleregion.y = h-h/4;
+
+	//same for SDL
+	subtitleregion_sdl.w = w;
+	subtitleregion_sdl.h = h/4;
+	subtitleregion_sdl.x = 0;
+	subtitleregion_sdl.y = h-h/4;
 }
 
 void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
@@ -2555,6 +2561,9 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		// FIXME: ugly hack!
 		SDL_Surface* temp = backBuf;
 		backBuf = disp;
+		
+		//FYI: that 0 is pitch black
+		SDL_FillRect(disp, &subtitleregion_sdl, 0);
 		subtitlefont->Print(subtitleregion, (unsigned char *) subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM, true);
 		backBuf = temp;
 	}
