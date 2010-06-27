@@ -44,6 +44,7 @@ private:
 	Font *subtitlefont;
 	Palette *subtitlepal;
 	Region subtitleregion;
+	SDL_Rect subtitleregion_sdl;  //we probably have the same stuff, twice
 	char *subtitletext;
 	ieDword subtitlestrref;
 	/* yuv overlay for bink movie */
