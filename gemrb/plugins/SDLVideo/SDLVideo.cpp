@@ -2469,6 +2469,7 @@ void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	destRect.w = w;
 	destRect.h = h;
 
+	SDL_FillRect(disp, &subtitleregion_sdl, 0);
 	SDL_BlitSurface( sprite, &srcRect, disp, &destRect );
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
@@ -2505,6 +2506,7 @@ void SDLVideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
 	destRect.y = dsty;
 	destRect.w = w;
 	destRect.h = h;
+	SDL_FillRect(disp, &subtitleregion_sdl, 0);
 	SDL_DisplayYUVOverlay(overlay, &destRect);
 	if (titleref>0)
 		DrawMovieSubtitle( titleref );
@@ -2563,7 +2565,7 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		backBuf = disp;
 		
 		//FYI: that 0 is pitch black
-		SDL_FillRect(disp, &subtitleregion_sdl, 0);
+		//SDL_FillRect(disp, &subtitleregion_sdl, 0);
 		subtitlefont->Print(subtitleregion, (unsigned char *) subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM, true);
 		backBuf = temp;
 	}
