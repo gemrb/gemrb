@@ -127,21 +127,29 @@ void PROImporter::GetAreaExtension(ProjectileExtension *e)
 	//the area puff type (flames, puffs, clouds) fireball.ids
 	//gemrb uses areapro.2da for this
 	//It overrides Spread, VVCRes, Secondary, SoundRes, AreaSound, APFlags
-	str->Read( &e->ExplType,1);
-	str->ReadWord( &e->ExplColor);
-	str->ReadWord( &e->ExplProjIdx);
-	//i don't know why is this here
-	if (e->ExplProjIdx) {
-		e->ExplProjIdx--;
+	str->Read( &e->ExplType,1 );
+	str->ReadWord( &e->ExplColor );
+	//this index is off by one in the .pro files, consolidating it here
+	str->ReadWord( &tmp);
+	if (tmp) {
+		tmp--;
 	}
+	e->ExplProjIdx = tmp;
 
 	str->ReadResRef( e->VVCRes );
-	str->ReadWord( &e->ConeWidth);
 	str->ReadWord( &tmp);
-	str->ReadResRef( e->Spread);
-	str->ReadResRef( e->Secondary);
-	str->ReadResRef( e->AreaSound);
-	str->ReadDword( &e->APFlags);
+	//limit the cone width to 359 degrees (for full compatibility)
+	if (tmp>359) {
+		tmp=359;
+	}
+	e->ConeWidth = tmp;
+	str->ReadWord( &tmp);
+
+	//These are GemRB specific, not used in the original engine
+	str->ReadResRef( e->Spread );
+	str->ReadResRef( e->Secondary );
+	str->ReadResRef( e->AreaSound );
+	str->ReadDword( &e->APFlags );
 	//we skip the rest
 	str->Seek(188, GEM_CURRENT_POS);
 }
