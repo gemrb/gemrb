@@ -274,14 +274,19 @@ bool SaveGameIterator::RescanSaveGames()
 
 	std::set<char*,iless> slots;
 	do {
-		char *name = dir.GetName();
+		const char *name = dir.GetName();
 		if (dir.IsDirectory() && IsSaveGameSlot( Path, name )) {
-			//slots.insert(strdup(name));
-			slots.insert(name);
+			slots.insert(strdup(name));
+			//slots.insert(name);
 		}
 	} while (++dir);
 
-	std::transform(slots.begin(), slots.end(), std::back_inserter(save_slots), GetSaveGame);
+	//std::transform(slots.begin(), slots.end(), std::back_inserter(save_slots), GetSaveGame);
+	for (std::set<char*,iless>::iterator i = slots.begin(); i != slots.end(); i++) {
+		save_slots.push_back(GetSaveGame(*i));
+		free(*i);
+	}
+
 	return true;
 }
 
