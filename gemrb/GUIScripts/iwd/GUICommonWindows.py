@@ -635,11 +635,11 @@ def PortraitButtonOnPress ():
 	i = GemRB.GetVar ("PressedPortrait")
 
 	if (not SelectionChangeHandler):
-		if GemRB.GameIsPCSelected (i+1):
+		if GemRB.GameIsPCSelected (i):
 			GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_OR)
-		GemRB.GameSelectPC (i + 1, True, SELECT_REPLACE)
+		GemRB.GameSelectPC (i, True, SELECT_REPLACE)
 	else:
-		GemRB.GameSelectPCSingle (i + 1)
+		GemRB.GameSelectPCSingle (i)
 		SelectionChanged ()
 		RunSelectionChangeHandler ()
 	return
@@ -648,11 +648,11 @@ def PortraitButtonOnShiftPress ():
 	i = GemRB.GetVar ("PressedPortrait")
 
 	if (not SelectionChangeHandler):
-		sel = GemRB.GameIsPCSelected (i + 1)
+		sel = GemRB.GameIsPCSelected (i)
 		sel = not sel
-		GemRB.GameSelectPC (i + 1, sel)
+		GemRB.GameSelectPC (i, sel)
 	else:
-		GemRB.GameSelectPCSingle (i + 1)
+		GemRB.GameSelectPCSingle (i)
 		SelectionChanged ()
 		RunSelectionChangeHandler ()
 	return
