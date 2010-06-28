@@ -27,13 +27,13 @@
 #include "Audio.h"
 #include "DisplayMessage.h"
 #include "EffectQueue.h"
-#include "GSUtils.h" //needs for MoveBetweenAreasCore
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Projectile.h" //needs for clearair
 #include "TileMap.h" //needs for knock!
 #include "damages.h"
+#include "GameScript/GSUtils.h" //needs for MoveBetweenAreasCore
 #include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
 

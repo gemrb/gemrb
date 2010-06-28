@@ -18,12 +18,13 @@
  *
  */
 
-#include "GameScript.h"
+#include "GameScript/GameScript.h"
+
+#include "GameScript/GSUtils.h"
 
 #include "win32def.h"
 
 #include "Calendar.h"
-#include "GSUtils.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Video.h"

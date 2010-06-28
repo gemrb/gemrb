@@ -29,10 +29,8 @@
 #include "win32def.h"
 
 #include "Audio.h" //pst (react to death sounds)
-#include "GSUtils.h" //needed for DisplayStringCore
 #include "Game.h"
 #include "GameData.h"
-#include "GameScript.h"
 #include "DisplayMessage.h"
 #include "Interface.h"
 #include "Item.h"
@@ -43,6 +41,8 @@
 #include "TableMgr.h"
 #include "Video.h"
 #include "damages.h"
+#include "GameScript/GSUtils.h" //needed for DisplayStringCore
+#include "GameScript/GameScript.h"
 #include "GUI/GameControl.h" //checking for dialog
 
 #include <cassert>

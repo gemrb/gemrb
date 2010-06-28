@@ -24,7 +24,7 @@
 #include "exports.h"
 #include "globals.h"
 
-#include "GameScript.h"
+#include "GameScript/GameScript.h"
 
 #include <vector>
 

@@ -23,9 +23,9 @@
 
 #include "exports.h"
 
-#include "GameScript.h"
 #include "Polygon.h"
 #include "TileOverlay.h"
+#include "GameScript/GameScript.h"
 
 //special container types
 #define IE_CONTAINER_PILE   4

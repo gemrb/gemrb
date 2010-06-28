@@ -3,6 +3,10 @@ ADD_DEFINITIONS(-DGEM_BUILD_DLL)
 FILE(GLOB gemrb_core_LIB_SRCS "*.cpp")
 
 ADD_LIBRARY(gemrb_core SHARED ${gemrb_core_LIB_SRCS}
+	GameScript/Actions.cpp
+	GameScript/GSUtils.cpp
+	GameScript/GameScript.cpp
+	GameScript/Triggers.cpp
 	GUI/Button.cpp
 	GUI/Console.cpp
 	GUI/Control.cpp

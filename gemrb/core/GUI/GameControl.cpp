@@ -25,7 +25,6 @@
 #include "DialogMgr.h"
 #include "DisplayMessage.h"
 #include "Effect.h"
-#include "GSUtils.h"
 #include "Game.h"
 #include "GameData.h"
 #include "ImageMgr.h"
@@ -36,6 +35,7 @@
 #include "TileMap.h"
 #include "Video.h"
 #include "damages.h"
+#include "GameScript/GSUtils.h"
 
 #include <cmath>
 

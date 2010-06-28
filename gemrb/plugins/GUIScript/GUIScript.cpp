@@ -27,7 +27,6 @@
 #include "DataFileMgr.h"
 #include "DisplayMessage.h"
 #include "EffectQueue.h"
-#include "GSUtils.h" //checkvariable
 #include "Game.h"
 #include "GameData.h"
 #include "ImageFactory.h"
@@ -44,6 +43,7 @@
 #include "TileMap.h"
 #include "Video.h"
 #include "WorldMap.h"
+#include "GameScript/GSUtils.h" //checkvariable
 #include "GUI/Button.h"
 #include "GUI/GameControl.h"
 #include "GUI/Label.h"

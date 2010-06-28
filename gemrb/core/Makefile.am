@@ -2,7 +2,6 @@ lib_LTLIBRARIES = libgemrb_core.la
 libgemrb_core_la_LDFLAGS = -version-info 0:0:0 @LIBDL@
 AM_CPPFLAGS = -DGEM_BUILD_DLL
 libgemrb_core_la_SOURCES = \
-	Actions.cpp \
 	ActorMgr.cpp \
 	Ambient.cpp \
 	AmbientMgr.cpp \
@@ -32,7 +31,6 @@ libgemrb_core_la_SOURCES = \
 	FactoryObject.cpp \
 	FileStream.cpp \
 	Font.cpp \
-	GSUtils.cpp \
 	GUI/Button.cpp \
 	GUI/Control.cpp \
 	GUI/EventMgr.cpp \
@@ -48,7 +46,10 @@ libgemrb_core_la_SOURCES = \
 	GUI/WorldMapControl.cpp \
 	Game.cpp \
 	GameData.cpp \
-	GameScript.cpp \
+	GameScript/Actions.cpp \
+	GameScript/GSUtils.cpp \
+	GameScript/GameScript.cpp \
+	GameScript/Triggers.cpp \
 	GlobalTimer.cpp \
 	Image.cpp \
 	ImageFactory.cpp \
@@ -102,7 +103,6 @@ libgemrb_core_la_SOURCES = \
 	TileMapMgr.cpp \
 	TileOverlay.cpp \
 	TileSetMgr.cpp \
-	Triggers.cpp \
 	VFS.cpp \
 	Variables.cpp \
 	Video.cpp \

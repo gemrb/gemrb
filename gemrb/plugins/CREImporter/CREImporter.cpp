@@ -25,8 +25,8 @@
 
 #include "EffectMgr.h"
 #include "GameData.h"
-#include "GameScript.h"
 #include "Interface.h"
+#include "GameScript/GameScript.h"
 
 #include <cassert>
 

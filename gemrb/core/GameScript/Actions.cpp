@@ -18,7 +18,9 @@
  *
  */
 
-#include "GameScript.h"
+#include "GameScript/GameScript.h"
+
+#include "GameScript/GSUtils.h"
 
 #include "win32def.h"
 
@@ -26,7 +28,6 @@
 #include "Audio.h"
 #include "DataFileMgr.h"
 #include "DisplayMessage.h"
-#include "GSUtils.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Item.h"

@@ -24,7 +24,6 @@
 
 #include "Audio.h"
 #include "DisplayMessage.h"
-#include "GSUtils.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
@@ -35,6 +34,7 @@
 #include "SpriteCover.h"
 #include "TileMap.h"
 #include "Video.h"
+#include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
 
 #include <cassert>

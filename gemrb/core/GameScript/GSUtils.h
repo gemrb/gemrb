@@ -19,12 +19,15 @@
  */
 #ifndef GSUTILS_H
 #define GSUTILS_H
+
+#include "GameScript/GameScript.h"
+
 #include "defsounds.h"
 #include "exports.h"
 #include "strrefs.h"
 
-#include "GameScript.h"
 #include "Interface.h"
+
 //indebug flags
 #define ID_REFERENCE 1
 #define ID_CUTSCENE  2

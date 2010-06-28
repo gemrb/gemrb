@@ -18,7 +18,7 @@
  *
  */
 
-#include "GSUtils.h"
+#include "GameScript/GSUtils.h"
 
 #include "strrefs.h"
 #include "defsounds.h"

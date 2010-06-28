@@ -25,7 +25,6 @@
 
 #include "DisplayMessage.h"
 #include "EffectQueue.h"
-#include "GSUtils.h" //needs for displaystringcore
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
@@ -33,6 +32,7 @@
 #include "Spell.h"
 #include "damages.h"
 #include "Scriptable/Actor.h"
+#include "GameScript/GSUtils.h" //needs for displaystringcore
 
 static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
 

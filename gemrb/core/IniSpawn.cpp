@@ -25,11 +25,11 @@
 
 #include "win32def.h"
 
-#include "GSUtils.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Map.h"
+#include "GameScript/GSUtils.h"
 #include "Scriptable/Actor.h"
 
 static const int StatValues[9]={

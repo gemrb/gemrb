@@ -23,9 +23,9 @@
 #include "win32def.h"
 
 #include "GameData.h"
-#include "GameScript.h"
 #include "Interface.h"
 #include "Inventory.h"
+#include "GameScript/GameScript.h"
 
 STOImporter::STOImporter(void)
 {
