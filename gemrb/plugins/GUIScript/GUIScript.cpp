@@ -4797,6 +4797,34 @@ static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*a
 	return PyInt_FromLong( 0 );
 }
 
+PyDoc_STRVAR( GemRB_GameControlSetLastActor__doc,
+"GameControlSetLastActor() => int\n\n"
+"Sets the last actor that was hovered over by the mouse." );
+
+static PyObject* GemRB_GameControlSetLastActor(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID = 0;
+
+	if (!PyArg_ParseTuple( args, "|i", &PartyID )) {
+		return AttributeError( GemRB_GameControlSetLastActor__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	GameControl *gc = core->GetGameControl();
+	if (!gc) {
+		return RuntimeError("Can't find GameControl!");
+	}
+	Actor* actor = game->FindPC( PartyID );
+	gc->SetLastActor(actor, gc->GetLastActor() );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_ActOnPC__doc,
 "ActOnPC(player)\n\n"
 "Targets the selected PC for an action (cast spell, attack, ...)" );
@@ -9253,6 +9281,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(ExploreArea, METH_VARARGS),
 	METHOD(FillPlayerInfo, METH_VARARGS),
 	METHOD(GameControlGetTargetMode, METH_NOARGS),
+	METHOD(GameControlSetLastActor, METH_VARARGS),
 	METHOD(GameControlSetScreenFlags, METH_VARARGS),
 	METHOD(GameControlSetTargetMode, METH_VARARGS),
 	METHOD(GameGetReputation, METH_NOARGS),
