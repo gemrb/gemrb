@@ -16,7 +16,6 @@ libgemrb_core_la_SOURCES = \
 	Callback.cpp \
 	CharAnimations.cpp \
 	Compressor.cpp \
-	Console.cpp \
 	ControlAnimation.cpp \
 	Core.cpp \
 	DataFileMgr.cpp \
@@ -29,6 +28,7 @@ libgemrb_core_la_SOURCES = \
 	FactoryObject.cpp \
 	Font.cpp \
 	GUI/Button.cpp \
+	GUI/Console.cpp \
 	GUI/Control.cpp \
 	GUI/EventMgr.cpp \
 	GUI/GameControl.cpp \
