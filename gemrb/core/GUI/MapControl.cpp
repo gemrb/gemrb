@@ -17,7 +17,7 @@
  *
  */
 
-#include "MapControl.h"
+#include "GUI/MapControl.h"
 
 #include "win32def.h"
 

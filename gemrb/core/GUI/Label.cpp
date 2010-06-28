@@ -18,7 +18,7 @@
  *
  */
 
-#include "Label.h"
+#include "GUI/Label.h"
 
 #include "win32def.h"
 

@@ -28,13 +28,13 @@
 
 #include "DataStream.h"
 #include "DisplayMessage.h"
-#include "GameControl.h"
 #include "GameData.h"
 #include "GameScript.h"
 #include "Interface.h"
 #include "MapMgr.h"
 #include "MusicMgr.h"
 #include "ScriptEngine.h"
+#include "GUI/GameControl.h"
 
 #define MAX_MAPS_LOADED 1
 

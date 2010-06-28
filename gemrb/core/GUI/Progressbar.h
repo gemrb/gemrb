@@ -26,10 +26,11 @@
 #ifndef PROGRESSBAR_H
 #define PROGRESSBAR_H
 
+#include "GUI/Control.h"
+
 #include "exports.h"
 
 #include "Animation.h"
-#include "Control.h"
 #include "Sprite2D.h"
 
 // !!! Keep in sync with GUIDefines.py !!!

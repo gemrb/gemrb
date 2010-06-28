@@ -26,7 +26,6 @@
 #include "DisplayMessage.h"
 #include "GSUtils.h"
 #include "Game.h"
-#include "GameControl.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Item.h"
@@ -36,6 +35,7 @@
 #include "SpriteCover.h"
 #include "TileMap.h"
 #include "Video.h"
+#include "GUI/GameControl.h"
 
 #include <cassert>
 #include <cmath>

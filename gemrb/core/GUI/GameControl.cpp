@@ -17,7 +17,7 @@
  *
  */
 
-#include "GameControl.h"
+#include "GUI/GameControl.h"
 
 #include "strrefs.h"
 #include "win32def.h"

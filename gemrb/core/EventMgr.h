@@ -28,9 +28,10 @@
 #ifndef EVENTMGR_H
 #define EVENTMGR_H
 
+#include "GUI/Control.h"
+
 #include "exports.h"
 
-#include "Control.h"
 #include "WindowMgr.h"
 
 #include <vector>

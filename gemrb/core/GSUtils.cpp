@@ -26,7 +26,6 @@
 #include "Audio.h"
 #include "DisplayMessage.h"
 #include "Game.h"
-#include "GameControl.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Item.h"
@@ -35,6 +34,7 @@
 #include "StringMgr.h"
 #include "TileMap.h"
 #include "Video.h"
+#include "GUI/GameControl.h"
 
 #include <cstdio>
 

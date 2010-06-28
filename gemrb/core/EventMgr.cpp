@@ -20,9 +20,10 @@
 
 #include "EventMgr.h"
 
+#include "GUI/GameControl.h"
+
 #include "win32def.h"
 
-#include "GameControl.h"
 #include "Interface.h"
 #include "Video.h"
 

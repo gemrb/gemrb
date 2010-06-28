@@ -18,12 +18,13 @@
  *
  */
 
-#include "TextArea.h"
+#include "GUI/TextArea.h"
+
+#include "GUI/GameControl.h"
 
 #include "win32def.h"
 
 #include "Audio.h"
-#include "GameControl.h"
 #include "GameData.h"
 #include "ImageMgr.h"
 #include "Interface.h"

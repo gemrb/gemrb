@@ -24,10 +24,10 @@
 
 #include "GSUtils.h"
 #include "Game.h"
-#include "GameControl.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"
+#include "GUI/GameControl.h"
 
 //debug flags
 // 1 - cache

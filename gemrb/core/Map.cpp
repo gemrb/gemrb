@@ -30,7 +30,6 @@
 #include "DisplayMessage.h"
 #include "GSUtils.h"
 #include "Game.h"
-#include "GameControl.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "MapMgr.h"
@@ -43,6 +42,7 @@
 #include "Video.h"
 #include "WorldMap.h"
 #include "strrefs.h"
+#include "GUI/GameControl.h"
 
 #include <cmath>
 #include <cassert>

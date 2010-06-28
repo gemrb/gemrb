@@ -25,8 +25,8 @@
 #include "exports.h"
 
 #include "AnimationFactory.h"
-#include "Control.h"
 #include "Sprite2D.h"
+#include "GUI/Control.h"
 
 #include <vector>
 

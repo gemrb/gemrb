@@ -18,7 +18,7 @@
  *
  */
 
-#include "Progressbar.h"
+#include "GUI/Progressbar.h"
 
 #include "win32def.h"
 

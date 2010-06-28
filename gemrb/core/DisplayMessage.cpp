@@ -23,9 +23,9 @@
 #include "strrefs.h"
 
 #include "Interface.h"
-#include "Label.h"
 #include "TableMgr.h"
-#include "TextArea.h"
+#include "GUI/Label.h"
+#include "GUI/TextArea.h"
 
 GEM_EXPORT DisplayMessage * displaymsg;
 

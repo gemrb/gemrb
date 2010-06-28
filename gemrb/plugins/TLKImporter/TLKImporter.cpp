@@ -25,8 +25,8 @@
 #include "Audio.h"
 #include "Calendar.h"
 #include "Game.h"
-#include "GameControl.h"
 #include "Interface.h"
+#include "GUI/GameControl.h"
 
 //set this to -1 if charname is gabber (iwd2)
 static int charname=0;

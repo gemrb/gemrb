@@ -27,8 +27,8 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include "Control.h"
-#include "TextArea.h"
+#include "GUI/Control.h"
+#include "GUI/TextArea.h"
 
 class Palette;
 

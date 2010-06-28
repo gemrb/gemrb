@@ -18,7 +18,7 @@
  *
  */
 
-#include "ScrollBar.h"
+#include "GUI/ScrollBar.h"
 
 #include "win32def.h"
 

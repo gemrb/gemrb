@@ -24,12 +24,12 @@
 
 #include "AnimationFactory.h"
 #include "Audio.h"
-#include "Console.h"
 #include "Game.h" // for GetGlobalTint
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
 #include "SpriteCover.h"
+#include "GUI/Console.h"
 
 #include <cmath>
 #include <cassert>

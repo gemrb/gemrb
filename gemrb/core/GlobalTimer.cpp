@@ -22,9 +22,9 @@
 
 #include "ControlAnimation.h"
 #include "Game.h"
-#include "GameControl.h"
 #include "Interface.h"
 #include "Video.h"
+#include "GUI/GameControl.h"
 
 GlobalTimer::GlobalTimer(void)
 {

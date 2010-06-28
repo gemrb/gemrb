@@ -27,9 +27,10 @@
 #ifndef GAMECONTROL_H
 #define GAMECONTROL_H
 
+#include "GUI/Control.h"
+
 #include "exports.h"
 
-#include "Control.h"
 #include "Dialog.h"
 #include "Interface.h"
 #include "Map.h"

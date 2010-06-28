@@ -28,12 +28,13 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "GUI/Control.h"
+#include "GUI/ScrollBar.h"
+#include "GUI/TextArea.h"
+
 #include "exports.h"
 
-#include "Control.h"
-#include "ScrollBar.h"
 #include "Sprite2D.h"
-#include "TextArea.h"
 
 #include <vector>
 

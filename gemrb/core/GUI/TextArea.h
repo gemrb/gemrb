@@ -27,12 +27,13 @@
 #ifndef TEXTAREA_H
 #define TEXTAREA_H
 
+#include "GUI/Control.h"
+#include "GUI/ScrollBar.h"
+
 #include "RGBAColor.h"
 #include "exports.h"
 
-#include "Control.h"
 #include "Font.h"
-#include "ScrollBar.h"
 
 // Keep these synchronized with GUIDefines.py
 // 0x05 is the control type of TextArea

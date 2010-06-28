@@ -3,8 +3,6 @@ libgemrb_core_la_LDFLAGS = -version-info 0:0:0 @LIBDL@
 AM_CPPFLAGS = -DGEM_BUILD_DLL
 libgemrb_core_la_SOURCES = \
 	Actions.cpp \
-	Scriptable/Actor.cpp \
-	Scriptable/ActorBlock.cpp \
 	ActorMgr.cpp \
 	Ambient.cpp \
 	AmbientMgr.cpp \
@@ -14,7 +12,6 @@ libgemrb_core_la_SOURCES = \
 	ArchiveImporter.cpp \
 	Audio.cpp \
 	Bitmap.cpp \
-	Button.cpp \
 	Cache.cpp \
 	CachedFileStream.cpp \
 	Calendar.cpp \
@@ -22,7 +19,6 @@ libgemrb_core_la_SOURCES = \
 	CharAnimations.cpp \
 	Compressor.cpp \
 	Console.cpp \
-	Control.cpp \
 	ControlAnimation.cpp \
 	Core.cpp \
 	DataFileMgr.cpp \
@@ -38,8 +34,19 @@ libgemrb_core_la_SOURCES = \
 	FileStream.cpp \
 	Font.cpp \
 	GSUtils.cpp \
+	GUI/Button.cpp \
+	GUI/Control.cpp \
+	GUI/GameControl.cpp \
+	GUI/Label.cpp \
+	GUI/MapControl.cpp \
+	GUI/Progressbar.cpp \
+	GUI/ScrollBar.cpp \
+	GUI/Slider.cpp \
+	GUI/TextArea.cpp \
+	GUI/TextEdit.cpp \
+	GUI/Window.cpp \
+	GUI/WorldMapControl.cpp \
 	Game.cpp \
-	GameControl.cpp \
 	GameData.cpp \
 	GameScript.cpp \
 	GlobalTimer.cpp \
@@ -53,9 +60,7 @@ libgemrb_core_la_SOURCES = \
 	Item.cpp \
 	ItemMgr.cpp \
 	LRUCache.cpp \
-	Label.cpp \
 	Map.cpp \
-	MapControl.cpp \
 	MapMgr.cpp \
 	MemoryStream.cpp \
 	MoviePlayer.cpp \
@@ -67,7 +72,6 @@ libgemrb_core_la_SOURCES = \
 	Plugin.cpp \
 	PluginMgr.cpp \
 	Polygon.cpp \
-	Progressbar.cpp \
 	Projectile.cpp \
 	ProjectileMgr.cpp \
 	ProjectileServer.cpp \
@@ -79,9 +83,9 @@ libgemrb_core_la_SOURCES = \
 	SaveGameIterator.cpp \
 	SaveGameMgr.cpp \
 	ScriptEngine.cpp \
+	Scriptable/Actor.cpp \
+	Scriptable/ActorBlock.cpp \
 	ScriptedAnimation.cpp \
-	ScrollBar.cpp \
-	Slider.cpp \
 	SoundMgr.cpp \
 	Spell.cpp \
 	SpellMgr.cpp \
@@ -93,8 +97,6 @@ libgemrb_core_la_SOURCES = \
 	StringMgr.cpp \
 	SymbolMgr.cpp \
 	TableMgr.cpp \
-	TextArea.cpp \
-	TextEdit.cpp \
 	Tile.cpp \
 	TileMap.cpp \
 	TileMapMgr.cpp \
@@ -106,10 +108,8 @@ libgemrb_core_la_SOURCES = \
 	Video.cpp \
 	VideoMode.cpp \
 	VideoModes.cpp \
-	Window.cpp \
 	WindowMgr.cpp \
 	WorldMap.cpp \
-	WorldMapControl.cpp \
 	WorldMapMgr.cpp
 
 noinst_HEADERS = *.h

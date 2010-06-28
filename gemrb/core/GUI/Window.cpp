@@ -18,16 +18,17 @@
  *
  */
 
-#include "Window.h"
+#include "GUI/Window.h"
+
+#include "GUI/Button.h"
+#include "GUI/Control.h"
+#include "GUI/MapControl.h"
+#include "GUI/Progressbar.h"
+#include "GUI/Slider.h"
 
 #include "win32def.h"
 
-#include "Button.h"
-#include "Control.h"
 #include "Interface.h"
-#include "MapControl.h"
-#include "Progressbar.h"
-#include "Slider.h"
 #include "Video.h"
 
 Window::Window(unsigned short WindowID, unsigned short XPos,

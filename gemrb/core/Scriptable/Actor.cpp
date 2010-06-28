@@ -31,7 +31,6 @@
 #include "Audio.h" //pst (react to death sounds)
 #include "GSUtils.h" //needed for DisplayStringCore
 #include "Game.h"
-#include "GameControl.h" //checking for dialog
 #include "GameData.h"
 #include "GameScript.h"
 #include "DisplayMessage.h"
@@ -44,6 +43,7 @@
 #include "TableMgr.h"
 #include "Video.h"
 #include "damages.h"
+#include "GUI/GameControl.h" //checking for dialog
 
 #include <cassert>
 

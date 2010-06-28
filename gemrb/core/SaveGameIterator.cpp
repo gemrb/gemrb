@@ -25,13 +25,13 @@
 #include "win32def.h"
 
 #include "DisplayMessage.h"
-#include "GameControl.h"
 #include "GameData.h" // For ResourceHolder
 #include "ImageMgr.h"
 #include "ImageWriter.h"
 #include "Interface.h"
 #include "SaveGameMgr.h"
 #include "Video.h"
+#include "GUI/GameControl.h"
 
 #include <cassert>
 #include <set>

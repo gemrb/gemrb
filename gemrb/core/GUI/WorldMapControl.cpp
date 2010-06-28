@@ -17,7 +17,7 @@
  *
  */
 
-#include "WorldMapControl.h"
+#include "GUI/WorldMapControl.h"
 
 #include "win32def.h"
 

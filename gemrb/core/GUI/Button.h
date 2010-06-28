@@ -28,9 +28,10 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
+#include "GUI/Control.h"
+
 #include "exports.h"
 
-#include "Control.h"
 #include "Font.h"
 #include "Sprite2D.h"
 

@@ -19,7 +19,7 @@
  */
 
 
-#include "TextEdit.h"
+#include "GUI/TextEdit.h"
 
 #include "GameData.h"
 #include "Interface.h"

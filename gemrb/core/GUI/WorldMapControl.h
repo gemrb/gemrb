@@ -27,9 +27,10 @@
 #ifndef WORLDMAPCONTROL_H
 #define WORLDMAPCONTROL_H
 
+#include "GUI/Control.h"
+
 #include "exports.h"
 
-#include "Control.h"
 #include "Dialog.h"
 #include "Interface.h"
 

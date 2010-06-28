@@ -18,7 +18,7 @@
  *
  */
 
-#include "Console.h"
+#include "GUI/Console.h"
 
 #include "win32def.h"
 

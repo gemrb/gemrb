@@ -24,16 +24,16 @@
 #include "win32def.h"
 
 #include "AnimationFactory.h"
-#include "Button.h"
 #include "GameData.h"
 #include "ImageMgr.h"
 #include "Interface.h"
-#include "Label.h"
-#include "Progressbar.h"
-#include "ScrollBar.h"
-#include "Slider.h"
-#include "TextArea.h"
-#include "TextEdit.h"
+#include "GUI/Button.h"
+#include "GUI/Label.h"
+#include "GUI/Progressbar.h"
+#include "GUI/ScrollBar.h"
+#include "GUI/Slider.h"
+#include "GUI/TextArea.h"
+#include "GUI/TextEdit.h"
 
 CHUImporter::CHUImporter()
 {

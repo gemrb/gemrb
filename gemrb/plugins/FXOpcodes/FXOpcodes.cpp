@@ -29,12 +29,12 @@
 #include "EffectQueue.h"
 #include "GSUtils.h" //needs for MoveBetweenAreasCore
 #include "Game.h"
-#include "GameControl.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Projectile.h" //needs for clearair
 #include "TileMap.h" //needs for knock!
 #include "damages.h"
+#include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
 
 //FIXME: find a way to handle portrait icons better

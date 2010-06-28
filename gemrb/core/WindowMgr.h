@@ -29,7 +29,7 @@
 
 #include "DataStream.h"
 #include "Plugin.h"
-#include "Window.h"
+#include "GUI/Window.h"
 
 /**
  * @class WindowMgr

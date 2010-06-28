@@ -28,7 +28,6 @@
 #include "DisplayMessage.h"
 #include "GSUtils.h"
 #include "Game.h"
-#include "GameControl.h"
 #include "GameData.h"
 #include "Item.h"
 #include "Map.h"
@@ -38,6 +37,7 @@
 #include "TileMap.h"
 #include "Video.h"
 #include "WorldMap.h"
+#include "GUI/GameControl.h"
 
 //------------------------------------------------------------
 // Action Functions

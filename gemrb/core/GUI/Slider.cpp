@@ -18,7 +18,7 @@
  *
  */
 
-#include "Slider.h"
+#include "GUI/Slider.h"
 
 #include "win32def.h"
 

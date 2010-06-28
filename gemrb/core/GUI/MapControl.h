@@ -28,8 +28,9 @@ class MapControl;
 #ifndef MAPCONTROL_H
 #define MAPCONTROL_H
 
+#include "GUI/Control.h"
+
 #include "exports.h"
-#include "Control.h"
 #include "Interface.h"
 
 // !!! Keep these synchronized with GUIDefines.py !!!
