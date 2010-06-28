@@ -34,7 +34,6 @@
 #include "Video.h"
 
 #include <cassert>
-#include <iterator>
 #include <set>
 #include <time.h>
 
