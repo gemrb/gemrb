@@ -6,6 +6,7 @@ ADD_LIBRARY(gemrb_core SHARED ${gemrb_core_LIB_SRCS}
 	GameScript/Actions.cpp
 	GameScript/GSUtils.cpp
 	GameScript/GameScript.cpp
+	GameScript/Objects.cpp
 	GameScript/Triggers.cpp
 	GUI/Button.cpp
 	GUI/Console.cpp
