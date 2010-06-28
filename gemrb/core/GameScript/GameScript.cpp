@@ -37,8 +37,6 @@
 // 8 - action execution
 //16 - trigger evaluation
 
-static bool charnameisgabber = false;
-
 //Make this an ordered list, so we could use bsearch!
 static const TriggerLink triggernames[] = {
 	{"actionlistempty", GameScript::ActionListEmpty, 0},
@@ -1243,12 +1241,6 @@ void InitializeIEScript()
 {
 	PluginMgr::Get()->RegisterCleanup(CleanupIEScript);
 
-	if (core->HasFeature(GF_CHARNAMEISGABBER)) {
-		charnameisgabber = true;
-	} else {
-		charnameisgabber = false;
-	}
-
 	InitScriptTables();
 	int tT = core->LoadSymbol( "trigger" );
 	int aT = core->LoadSymbol( "action" );
@@ -1899,6 +1891,7 @@ Targets *GameScript::Protagonist(Scriptable* Sender, Targets *parameters, int ga
 {
 	parameters->Clear();
 	//this sucks but IWD2 is like that...
+	static bool charnameisgabber = core->HasFeature(GF_CHARNAMEISGABBER);
 	if (charnameisgabber) {
 		GameControl* gc = core->GetGameControl();
 		if (gc) {
