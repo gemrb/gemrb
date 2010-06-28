@@ -33,7 +33,6 @@
 #include "SaveGameMgr.h"
 #include "Video.h"
 
-#include <algorithm>
 #include <cassert>
 #include <iterator>
 #include <set>
@@ -277,11 +276,9 @@ bool SaveGameIterator::RescanSaveGames()
 		const char *name = dir.GetName();
 		if (dir.IsDirectory() && IsSaveGameSlot( Path, name )) {
 			slots.insert(strdup(name));
-			//slots.insert(name);
 		}
 	} while (++dir);
 
-	//std::transform(slots.begin(), slots.end(), std::back_inserter(save_slots), GetSaveGame);
 	for (std::set<char*,iless>::iterator i = slots.begin(); i != slots.end(); i++) {
 		save_slots.push_back(GetSaveGame(*i));
 		free(*i);
