@@ -12,7 +12,12 @@ ELSE(WIN32)
  IF(APPLE)
   TARGET_LINK_LIBRARIES(gemrb gemrb_core ${SDL_LIBRARY} ${SDL_MAIN_LIBRARY_PATH} ${COCOA_LIBRARY_PATH} ${DLD_LIBRARY_PATH})
  ELSE(APPLE)
-  TARGET_LINK_LIBRARIES(gemrb gemrb_core ${DLD_LIBRARY_PATH})
+  if (STATIC_LINK)
+	TARGET_LINK_LIBRARIES(gemrb ${DLD_LIBRARY_PATH}
+		-Wl,--whole-archive gemrb_core ${plugins} -Wl,--no-whole-archive)
+  else (STATIC_LINK)
+	TARGET_LINK_LIBRARIES(gemrb gemrb_core ${DLD_LIBRARY_PATH})
+  endif (STATIC_LINK)
  ENDIF(APPLE)
 ENDIF(WIN32)
 
