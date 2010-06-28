@@ -708,6 +708,8 @@ def PortraitButtonOnMouseEnter ():
 	global DraggedPortrait
 
 	i = GemRB.GetVar ("PressedPortrait")
+
+	GemRB.GameControlSetLastActor( i )
 	if GemRB.IsDraggingItem()==2:
 		if DraggedPortrait != None:
 			GemRB.SwapPCs (DraggedPortrait, i)
