@@ -23,13 +23,14 @@
 
 #include "Scriptable/ActorBlock.h"
 
+#include "Scriptable/PCStatStruct.h"
+
 #include "exports.h"
 #include "ie_types.h"
 
 #include "Animation.h"
 #include "CharAnimations.h"
 #include "EffectQueue.h"
-#include "PCStatStruct.h"
 #include "ScriptedAnimation.h"
 
 #include <cstring>

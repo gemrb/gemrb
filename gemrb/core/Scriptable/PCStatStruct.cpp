@@ -18,7 +18,7 @@
  *
  */
 
-#include "PCStatStruct.h"
+#include "Scriptable/PCStatStruct.h"
 
 #include "globals.h" //for abort()
 #include "win32def.h"

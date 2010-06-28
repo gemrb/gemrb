@@ -62,7 +62,6 @@ libgemrb_core_la_SOURCES = \
 	MapMgr.cpp \
 	MoviePlayer.cpp \
 	MusicMgr.cpp \
-	PCStatStruct.cpp \
 	Palette.cpp \
 	PalettedImageMgr.cpp \
 	Particles.cpp \
@@ -82,6 +81,7 @@ libgemrb_core_la_SOURCES = \
 	ScriptEngine.cpp \
 	Scriptable/Actor.cpp \
 	Scriptable/ActorBlock.cpp \
+	Scriptable/PCStatStruct.cpp \
 	ScriptedAnimation.cpp \
 	SoundMgr.cpp \
 	Spell.cpp \

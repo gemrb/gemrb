@@ -23,6 +23,7 @@ ADD_LIBRARY(gemrb_core SHARED ${gemrb_core_LIB_SRCS}
 	GUI/WorldMapControl.cpp
 	Scriptable/Actor.cpp
 	Scriptable/ActorBlock.cpp
+	Scriptable/PCStatStruct.cpp
 	System/CachedFileStream.cpp
 	System/DataStream.cpp
 	System/FileStream.cpp
