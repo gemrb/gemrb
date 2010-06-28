@@ -336,10 +336,10 @@ def OpenFormationWindow ():
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ("SelectedFormation", i)
 		Button.SetTooltip (tooltips[i])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectFormation)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectFormation)
 
 	GemRB.SetVar ("SelectedFormation", GemRB.GameGetFormation (0))
-	GUICommon.SelectFormation ()
+	SelectFormation ()
 
 	GemRB.UnhideGUI ()
 
