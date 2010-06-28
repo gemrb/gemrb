@@ -222,7 +222,10 @@ def OpenActionsWindowControls (Window):
 	return
 
 def UpdateActionsWindow ():
+	"""Redraws the actions section of the window."""
+
 	global ActionsWindow, PortraitWindow, OptionsWindow
+	global level, TopIndex
 
 	if ActionsWindow == -1:
 		return
@@ -232,34 +235,40 @@ def UpdateActionsWindow ():
 
 	#fully redraw the side panes to cover the actions window
 	#do this only when there is no 'otherwindow'
-	if GemRB.GetVar ("OtherWindow") != -1:
+	if GemRB.GetVar ("OtherWindow") == -1:
 		if PortraitWindow:
 			PortraitWindow.Invalidate ()
 		if OptionsWindow:
 			OptionsWindow.Invalidate ()
 
-	pc = 0
-	for i in range (PARTY_SIZE):
-		if GemRB.GameIsPCSelected (i+1):
-			if pc == 0:
-				pc = i+1
-			else:
-				pc = -1
-				break
+	Selected = GemRB.GetSelectedSize()
 
+	#setting up the disabled button overlay (using the second border slot)
 	for i in range (12):
 		Button = ActionsWindow.GetControl (i)
 		Button.SetBorder (1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
 		Button.SetFont ("NUMBER")
 		Button.SetText ("")
 
-	if pc == 0:
+	if Selected == 0:
 		EmptyControls ()
 		return
-	if pc == -1:
+	if Selected > 1:
 		GroupControls ()
 		return
 	#this is based on class
+	#we are sure there is only one actor selected
+	pc = 0
+	for i in range (PARTY_SIZE):
+		if GemRB.GameIsPCSelected (i+1):
+			pc = i+1
+			break
+
+	if pc == 0:
+		#summoned/charmed creature.
+		#TODO: some creatures have real actions window!!
+		GroupControls()
+		return
 
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
@@ -276,10 +285,14 @@ def UpdateActionsWindow ():
 	return
 
 def ActionQWeaponPressed (which):
-	pc = GemRB.GameGetFirstSelectedPC ()
+	"""Selects the given quickslot weapon if possible."""
 
-	if GemRB.GetEquippedQuickSlot (pc,1)==which and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
-		GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
+	pc = GemRB.GameGetFirstSelectedPC ()
+	qs = GemRB.GetEquippedQuickSlot (pc,1)
+
+	#38 is the magic slot
+	if ((qs==which) or (qs==38)) and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
+		GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK, GA_NO_DEAD|GA_NO_SELF|GA_NO_HIDDEN)
 	else:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 		GemRB.SetEquippedQuickSlot (pc, which)
@@ -499,7 +512,7 @@ def OpenPortraitWindow (needcontrols):
 	for i in range (PARTY_SIZE):
 		Button = Window.GetControl (i)
 		Button.SetFont ("STATES")
-		Button.SetVarAssoc ("PressedPortrait", i)
+		Button.SetVarAssoc ("PressedPortrait", i+1)
 
 		if (needcontrols):
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, GUIINV.OpenInventoryWindowClick)
@@ -509,6 +522,7 @@ def OpenPortraitWindow (needcontrols):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, PortraitButtonOnShiftPress)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, GUIINV.OnDropItemToPC)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT, OnDropPortraitToPC)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, PortraitButtonOnDrag)
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, PortraitButtonOnMouseEnter)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, PortraitButtonOnMouseLeave)
@@ -613,7 +627,7 @@ def PortraitButtonOnDrag ():
 	global DraggedPortrait
 
 	#they start from 1
-	DraggedPortrait = GemRB.GetVar ("PressedPortrait")+1
+	DraggedPortrait = GemRB.GetVar ("PressedPortrait")
 	GemRB.DragItem (DraggedPortrait, -1, "")
 	return
 
@@ -669,16 +683,39 @@ def PortraitButtonOnMouseEnter ():
 
 	i = GemRB.GetVar ("PressedPortrait")
 
-	if DraggedPortrait != None:
-		GemRB.DragItem (0, -1, "")
-		#this might not work
-		GemRB.SwapPCs (DraggedPortrait, i+1)
-		DraggedPortrait = None
+	GemRB.GameControlSetLastActor( i )
+	if GemRB.IsDraggingItem()==2:
+		if DraggedPortrait != None:
+			GemRB.SwapPCs (DraggedPortrait, i)
+			GemRB.SetVar ("PressedPortrait", DraggedPortrait)
+			DraggedPortrait = i
+			GemRB.SetTimedEvent (CheckDragging, 1)
+		else:
+			OnDropPortraitToPC()
 		return
 
 	if GemRB.IsDraggingItem ():
 		Button = PortraitWindow.GetControl (i)
 		Button.EnableBorder (FRAME_PC_TARGET, 1)
+	return
+
+def OnDropPortraitToPC ():
+	GemRB.SetVar ("PressedPortrait",0)
+	GemRB.DragItem (0, -1, "")
+	DraggedPortrait = None
+	return
+
+def CheckDragging():
+	"""Contains portrait dragging in case of mouse out-of-range."""
+
+	global DraggedPortrait
+
+	i = GemRB.GetVar ("PressedPortrait")
+	if not i:
+		GemRB.DragItem (0, -1, "")
+
+	if GemRB.IsDraggingItem()!=2:
+		DraggedPortrait = None
 	return
 
 def PortraitButtonOnMouseLeave ():
