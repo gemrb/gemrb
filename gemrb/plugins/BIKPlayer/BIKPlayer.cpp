@@ -228,7 +228,7 @@ int BIKPlayer::Play()
 }
 
 //this code could be in the movieplayer parent class
-void get_current_time(long &sec, long &usec) {
+void static get_current_time(long &sec, long &usec) {
 #ifdef _WIN32
 	DWORD time;
 	time = GetTickCount();

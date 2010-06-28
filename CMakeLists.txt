@@ -206,6 +206,14 @@ FIND_LIBRARY(VORBIS_LIBRARY vorbisfile)
 
 ADD_DEFINITIONS("-DHAVE_CONFIG_H")
 
+if (STATIC_LINK)
+	if (NOT WIN32 AND NOT APPLE)
+		ADD_DEFINITIONS("-DSTATIC_LINK")
+	else (NOT WIN32 AND NOT APPLE)
+		unset(STATIC_LINK)
+	endif (NOT WIN32 AND NOT APPLE)
+endif (STATIC_LINK)
+
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} gemrb/includes gemrb/core)
 
 #Platform checks
@@ -248,14 +256,19 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake_config.h.in
 
 #Plugin addition macro
 MACRO(ADD_GEMRB_PLUGIN plugin_name)
-	ADD_LIBRARY(${plugin_name} MODULE ${ARGN})
+	if (STATIC_LINK)
+		ADD_LIBRARY(${plugin_name} STATIC ${ARGN})
+		set(plugins "${plugins};${plugin_name}" PARENT_SCOPE)
+	else (STATIC_LINK)
+		ADD_LIBRARY(${plugin_name} MODULE ${ARGN})
+		if (NOT UNSAFE_PLUGIN)
+			TARGET_LINK_LIBRARIES(${plugin_name} gemrb_core)
+		endif (NOT UNSAFE_PLUGIN)
+		INSTALL(TARGETS ${plugin_name} DESTINATION ${PLUGIN_DIR})
+	endif (STATIC_LINK)
 	SET_TARGET_PROPERTIES(${plugin_name} PROPERTIES PREFIX ""
 		INSTALL_RPATH ${LIB_DIR}
 		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/gemrb/plugins)
-	if (NOT UNSAFE_PLUGIN)
-		TARGET_LINK_LIBRARIES(${plugin_name} gemrb_core)
-	endif (NOT UNSAFE_PLUGIN)
-	INSTALL(TARGETS ${plugin_name} DESTINATION ${PLUGIN_DIR})
 ENDMACRO(ADD_GEMRB_PLUGIN)
 
 #gemrb overrides macro
