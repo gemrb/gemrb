@@ -28,8 +28,8 @@
 #define WORLDMAPMGR_H
 
 #include "Plugin.h"
-#include "DataStream.h"
 #include "WorldMap.h"
+#include "System/DataStream.h"
 
 /**
  * @class WorldMapMgr

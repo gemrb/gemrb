@@ -22,8 +22,8 @@
 
 #include "win32def.h"
 
-#include "FileStream.h"
 #include "Interface.h"
+#include "System/FileStream.h"
 
 DLGImporter::DLGImporter(void)
 {

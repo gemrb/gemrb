@@ -21,9 +21,9 @@
 #ifndef ACTORMGR_H
 #define ACTORMGR_H
 
-#include "DataStream.h"
 #include "Plugin.h"
 #include "Scriptable/Actor.h"
+#include "System/DataStream.h"
 
 class GEM_EXPORT ActorMgr : public Plugin {
 public:

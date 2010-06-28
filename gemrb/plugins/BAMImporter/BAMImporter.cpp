@@ -23,11 +23,11 @@
 #include "win32def.h"
 
 #include "Compressor.h"
-#include "FileStream.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
 #include "Video.h"
+#include "System/FileStream.h"
 
 BAMImporter::BAMImporter(void)
 {

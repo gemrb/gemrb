@@ -24,10 +24,10 @@
 #include "exports.h"
 
 #include "Bitmap.h"
-#include "DataStream.h"
 #include "Image.h"
 #include "Resource.h"
 #include "Sprite2D.h"
+#include "System/DataStream.h"
 
 class ImageFactory;
 

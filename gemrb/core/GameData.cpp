@@ -26,7 +26,6 @@
 #include "Effect.h"
 #include "EffectMgr.h"
 #include "Factory.h"
-#include "FileStream.h"
 #include "Game.h"
 #include "ImageFactory.h"
 #include "ImageMgr.h"
@@ -37,6 +36,7 @@
 #include "Spell.h"
 #include "SpellMgr.h"
 #include "Scriptable/Actor.h"
+#include "System/FileStream.h"
 
 #include <cstdio>
 

@@ -46,7 +46,7 @@
 #include "win32def.h"
 
 #include "AnimStructures.h"
-#include "DataStream.h"
+#include "System/DataStream.h"
 #include "Region.h"
 #include "Sprite2D.h"
 #include "VideoMode.h"

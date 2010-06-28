@@ -18,7 +18,7 @@
  *
  */
 
-#include "MemoryStream.h"
+#include "System/MemoryStream.h"
 
 #include "win32def.h"
 

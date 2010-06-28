@@ -23,8 +23,8 @@
 
 #include "MusicMgr.h"
 
-#include "FileStream.h"
 #include "ResourceManager.h"
+#include "System/FileStream.h"
 
 #include <cstdio>
 

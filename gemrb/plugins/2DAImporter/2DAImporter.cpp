@@ -23,7 +23,7 @@
 #include "win32def.h"
 
 #include "Interface.h"
-#include "FileStream.h"
+#include "System/FileStream.h"
 
 #define MAXLENGTH 4096      //if a 2da has longer lines, change this
 #define SIGNLENGTH 256      //if a 2da has longer default value, change this

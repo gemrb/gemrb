@@ -19,43 +19,40 @@
  */
 
 /**
- * @file FileStream.h
- * Declares FileStream class, stream reading/writing data from/to a file in a filesystem.
+ * @file MemoryStream.h
+ * Declares MemoryStream class, stream reading/writing data from/to a buffer in memory.
  * @author The GemRB Project
  */
 
 
-#ifndef FILESTREAM_H
-#define FILESTREAM_H
+#ifndef MEMORYSTREAM_H
+#define MEMORYSTREAM_H
+
+#include "System/DataStream.h"
 
 #include "exports.h"
 #include "globals.h"
 
 /**
- * @class FileStream
- * Reads and writes data from/to files on a filesystem
+ * @class MemoryStream
+ * Reads and writes data from/to a buffer in memory.
  */
 
-class GEM_EXPORT FileStream : public DataStream {
+class GEM_EXPORT MemoryStream : public DataStream {
 private:
+	void* ptr;
+	//unsigned long length;
 	bool autoFree;
-	unsigned long startpos;
-	_FILE* str;
-	bool opened, created;
 public:
-	FileStream(void);
-	~FileStream(void);
-
-	bool Open(const char* filename, bool autoFree = true);
-	bool Open(_FILE* stream, int startpos, int size, bool autoFree = false);
-	bool Modify(const char* filename, bool autoFree = true);
-	bool Create(const char* folder, const char* filename, SClass_ID ClassID);
-	bool Create(const char* filename, SClass_ID ClassID);
+	MemoryStream(void* buffer, int length, bool autoFree = true);
+	~MemoryStream(void);
 	int Read(void* dest, unsigned int length);
-	int Write(const void* src, unsigned int length);
+	int Write(const void * /*src*/, unsigned int /*length*/)
+	{
+		return GEM_ERROR;
+	}
 	int Seek(int pos, int startpos);
-	unsigned long GetStartPos() const;
 	int ReadLine(void* buf, unsigned int maxlen);
 };
 
-#endif  // ! FILESTREAM_H
+#endif  // ! MEMORYSTREAM_H

@@ -23,10 +23,10 @@
 #include "exports.h"
 
 #include "AnimationFactory.h"
-#include "DataStream.h"
 #include "Map.h"
 #include "Palette.h"
 #include "SpriteCover.h"
+#include "System/DataStream.h"
 
 //scripted animation flags 
 #define S_ANI_PLAYONCE        8        //(same as area animation)

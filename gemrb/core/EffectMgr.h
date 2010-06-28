@@ -28,9 +28,9 @@
 #ifndef EFFECTMGR_H
 #define EFFECTMGR_H
 
-#include "DataStream.h"
 #include "Effect.h"
 #include "Plugin.h"
+#include "System/DataStream.h"
 
 /**
  * @class EffectMgr

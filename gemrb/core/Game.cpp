@@ -26,7 +26,6 @@
 #include "strrefs.h"
 #include "win32def.h"
 
-#include "DataStream.h"
 #include "DisplayMessage.h"
 #include "GameData.h"
 #include "Interface.h"
@@ -35,6 +34,7 @@
 #include "ScriptEngine.h"
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
+#include "System/DataStream.h"
 
 #define MAX_MAPS_LOADED 1
 

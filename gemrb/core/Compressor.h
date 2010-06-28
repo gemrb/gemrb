@@ -21,8 +21,8 @@
 #ifndef COMPRESSOR_H
 #define COMPRESSOR_H
 
-#include "DataStream.h"
 #include "Plugin.h"
+#include "System/DataStream.h"
 
 #include <cstdio>
 

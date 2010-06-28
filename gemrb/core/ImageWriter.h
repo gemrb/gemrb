@@ -19,9 +19,9 @@
 #ifndef IMAGEWRITER_H
 #define IMAGEWRITER_H
 
-#include "DataStream.h"
 #include "Plugin.h"
 #include "Sprite2D.h"
+#include "System/DataStream.h"
 
 class GEM_EXPORT ImageWriter : public Plugin {
 public:

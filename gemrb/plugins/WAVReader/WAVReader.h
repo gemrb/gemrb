@@ -23,7 +23,7 @@
 
 #include "SoundMgr.h"
 
-#include "DataStream.h"
+#include "System/DataStream.h"
 
 #include <cstdio>
 #include <cstdlib>

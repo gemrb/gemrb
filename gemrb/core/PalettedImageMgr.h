@@ -19,9 +19,9 @@
 #ifndef PALETTEDIMAGEMGR_H
 #define PALETTEDIMAGEMGR_H
 
-#include "DataStream.h"
 #include "Resource.h"
 #include "Sprite2D.h"
+#include "System/DataStream.h"
 
 class ImageFactory;
 

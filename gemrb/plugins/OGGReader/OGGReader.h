@@ -19,8 +19,8 @@
 #ifndef ACMREADER_H
 #define ACMREADER_H
 
-#include "DataStream.h"
 #include "SoundMgr.h"
+#include "System/DataStream.h"
 
 #include <cstdio>
 #include <cstdlib>

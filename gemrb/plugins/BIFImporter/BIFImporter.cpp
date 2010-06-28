@@ -22,10 +22,10 @@
 
 #include "win32def.h"
 
-#include "CachedFileStream.h"
 #include "Compressor.h"
-#include "FileStream.h"
 #include "Interface.h"
+#include "System/CachedFileStream.h"
+#include "System/FileStream.h"
 
 BIFImporter::BIFImporter(void)
 {

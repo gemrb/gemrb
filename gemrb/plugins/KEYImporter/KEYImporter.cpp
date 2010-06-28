@@ -24,9 +24,9 @@
 #include "globals.h"
 
 #include "ArchiveImporter.h"
-#include "FileStream.h"
 #include "Interface.h"
 #include "ResourceDesc.h"
+#include "System/FileStream.h"
 
 KEYImporter::KEYImporter(void)
 {

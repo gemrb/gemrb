@@ -12,7 +12,6 @@ libgemrb_core_la_SOURCES = \
 	Audio.cpp \
 	Bitmap.cpp \
 	Cache.cpp \
-	CachedFileStream.cpp \
 	Calendar.cpp \
 	Callback.cpp \
 	CharAnimations.cpp \
@@ -21,7 +20,6 @@ libgemrb_core_la_SOURCES = \
 	ControlAnimation.cpp \
 	Core.cpp \
 	DataFileMgr.cpp \
-	DataStream.cpp \
 	Dialog.cpp \
 	DialogMgr.cpp \
 	DisplayMessage.cpp \
@@ -29,7 +27,6 @@ libgemrb_core_la_SOURCES = \
 	EffectQueue.cpp \
 	Factory.cpp \
 	FactoryObject.cpp \
-	FileStream.cpp \
 	Font.cpp \
 	GUI/Button.cpp \
 	GUI/Control.cpp \
@@ -63,7 +60,6 @@ libgemrb_core_la_SOURCES = \
 	LRUCache.cpp \
 	Map.cpp \
 	MapMgr.cpp \
-	MemoryStream.cpp \
 	MoviePlayer.cpp \
 	MusicMgr.cpp \
 	PCStatStruct.cpp \
@@ -97,13 +93,17 @@ libgemrb_core_la_SOURCES = \
 	StoreMgr.cpp \
 	StringMgr.cpp \
 	SymbolMgr.cpp \
+	System/CachedFileStream.cpp \
+	System/DataStream.cpp \
+	System/FileStream.cpp \
+	System/MemoryStream.cpp \
+	System/VFS.cpp \
 	TableMgr.cpp \
 	Tile.cpp \
 	TileMap.cpp \
 	TileMapMgr.cpp \
 	TileOverlay.cpp \
 	TileSetMgr.cpp \
-	VFS.cpp \
 	Variables.cpp \
 	Video.cpp \
 	VideoMode.cpp \

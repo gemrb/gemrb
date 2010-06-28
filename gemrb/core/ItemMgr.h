@@ -28,9 +28,9 @@
 #ifndef ITEMMGR_H
 #define ITEMMGR_H
 
-#include "DataStream.h"
 #include "Item.h"
 #include "Plugin.h"
+#include "System/DataStream.h"
 
 /**
  * @class ItemMgr

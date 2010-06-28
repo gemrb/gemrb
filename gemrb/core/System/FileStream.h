@@ -18,28 +18,46 @@
  *
  */
 
-#ifndef CACHEDFILESTREAM_H
-#define CACHEDFILESTREAM_H
+/**
+ * @file FileStream.h
+ * Declares FileStream class, stream reading/writing data from/to a file in a filesystem.
+ * @author The GemRB Project
+ */
+
+
+#ifndef FILESTREAM_H
+#define FILESTREAM_H
+
+#include "System/DataStream.h"
 
 #include "exports.h"
+#include "globals.h"
 
-#include "FileStream.h"
+/**
+ * @class FileStream
+ * Reads and writes data from/to files on a filesystem
+ */
 
-class GEM_EXPORT CachedFileStream : public DataStream// : public FileStream
-{
+class GEM_EXPORT FileStream : public DataStream {
 private:
 	bool autoFree;
 	unsigned long startpos;
 	_FILE* str;
+	bool opened, created;
 public:
-	CachedFileStream(const char* stream, bool autoFree = true);
-	CachedFileStream(CachedFileStream* cfs, int startpos, int size,
-		bool autoFree = true);
-	~CachedFileStream(void);
+	FileStream(void);
+	~FileStream(void);
+
+	bool Open(const char* filename, bool autoFree = true);
+	bool Open(_FILE* stream, int startpos, int size, bool autoFree = false);
+	bool Modify(const char* filename, bool autoFree = true);
+	bool Create(const char* folder, const char* filename, SClass_ID ClassID);
+	bool Create(const char* filename, SClass_ID ClassID);
 	int Read(void* dest, unsigned int length);
 	int Write(const void* src, unsigned int length);
 	int Seek(int pos, int startpos);
-	/** No descriptions */
+	unsigned long GetStartPos() const;
 	int ReadLine(void* buf, unsigned int maxlen);
 };
-#endif
+
+#endif  // ! FILESTREAM_H

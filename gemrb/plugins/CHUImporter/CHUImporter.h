@@ -23,7 +23,7 @@
 
 #include "WindowMgr.h"
 
-#include "DataStream.h"
+#include "System/DataStream.h"
 
 /**CHU File Importer Class
   *@author GemRB Developement Team

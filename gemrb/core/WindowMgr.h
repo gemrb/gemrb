@@ -27,9 +27,9 @@
 #ifndef WINDOWMGR_H
 #define WINDOWMGR_H
 
-#include "DataStream.h"
 #include "Plugin.h"
 #include "GUI/Window.h"
+#include "System/DataStream.h"
 
 /**
  * @class WindowMgr

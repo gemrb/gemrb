@@ -28,11 +28,11 @@
 
 #include "ie_types.h"
 
-#include "FileStream.h"
 #include "Interface.h"
 #include "LRUCache.h"
 #include "MusicMgr.h"
 #include "SoundMgr.h"
+#include "System/FileStream.h"
 
 #include <SDL.h>
 

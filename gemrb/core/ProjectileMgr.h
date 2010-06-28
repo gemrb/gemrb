@@ -21,9 +21,9 @@
 #ifndef PROJECTILEMGR_H
 #define PROJECTILEMGR_H
 
-#include "DataStream.h"
 #include "Plugin.h"
 #include "Projectile.h"
+#include "System/DataStream.h"
 
 class GEM_EXPORT ProjectileMgr : public Plugin {
 public:

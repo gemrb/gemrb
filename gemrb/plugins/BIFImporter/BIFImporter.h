@@ -25,7 +25,7 @@
 
 #include "globals.h"
 
-#include "CachedFileStream.h"
+#include "System/CachedFileStream.h"
 
 struct FileEntry {
 	ieDword resLocator;

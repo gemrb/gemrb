@@ -28,9 +28,9 @@
 #ifndef STOREMGR_H
 #define STOREMGR_H
 
-#include "DataStream.h"
 #include "Plugin.h"
 #include "Store.h"
+#include "System/DataStream.h"
 
 /**
  * @class StoreMgr

@@ -23,11 +23,11 @@
 #include "RGBAColor.h"
 #include "win32def.h"
 
-#include "CachedFileStream.h"
 #include "Compressor.h"
-#include "FileStream.h"
 #include "Interface.h"
 #include "Video.h"
+#include "System/CachedFileStream.h"
+#include "System/FileStream.h"
 
 static ieDword red_mask = 0xff000000;
 static ieDword green_mask = 0x00ff0000;

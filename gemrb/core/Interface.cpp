@@ -41,7 +41,6 @@
 #include "EffectMgr.h"
 #include "EffectQueue.h"
 #include "Factory.h"
-#include "FileStream.h"
 #include "Game.h"
 #include "GameData.h"
 #include "ImageMgr.h"
@@ -62,7 +61,6 @@
 #include "StoreMgr.h"
 #include "StringMgr.h"
 #include "TileMap.h"
-#include "VFS.h"
 #include "Video.h"
 #include "WorldMapMgr.h"
 #include "GUI/Button.h"
@@ -71,6 +69,8 @@
 #include "GUI/Label.h"
 #include "GUI/MapControl.h"
 #include "GUI/WorldMapControl.h"
+#include "System/FileStream.h"
+#include "System/VFS.h"
 
 #include <cstdlib>
 #include <time.h>

@@ -18,7 +18,7 @@
  *
  */
 
-#include "FileStream.h"
+#include "System/FileStream.h"
 
 #include "win32def.h"
 

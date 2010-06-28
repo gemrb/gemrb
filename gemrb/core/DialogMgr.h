@@ -21,9 +21,9 @@
 #ifndef DIALOGMGR_H
 #define DIALOGMGR_H
 
-#include "DataStream.h"
 #include "Dialog.h"
 #include "Plugin.h"
+#include "System/DataStream.h"
 
 class GEM_EXPORT DialogMgr : public Plugin {
 public:

@@ -27,9 +27,9 @@
 #ifndef SPELLMGR_H
 #define SPELLMGR_H
 
-#include "DataStream.h"
 #include "Plugin.h"
 #include "Spell.h"
+#include "System/DataStream.h"
 
 /**
  * @class SpellMgr

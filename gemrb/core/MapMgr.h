@@ -27,10 +27,10 @@
 #ifndef MAPMGR_H
 #define MAPMGR_H
 
-#include "DataStream.h"
 #include "Map.h"
 #include "Plugin.h"
 #include "Scriptable/ActorBlock.h"
+#include "System/DataStream.h"
 
 /**
  * @class MapMgr

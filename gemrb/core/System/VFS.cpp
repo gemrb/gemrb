@@ -21,7 +21,7 @@
 // VFS.cpp : functions to access filesystem in os-independent way
 // and POSIX-like compatibility layer for win
 
-#include "VFS.h"
+#include "System/VFS.h"
 
 #include "globals.h"
 

@@ -23,8 +23,8 @@
 
 #include "ie_types.h"
 
-#include "DataStream.h"
 #include "Resource.h"
+#include "System/DataStream.h"
 
 /**
  * Base Class for sound plugins

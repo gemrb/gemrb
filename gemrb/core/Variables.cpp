@@ -20,8 +20,8 @@
 
 #include "Variables.h"
 
-#include "FileStream.h" // for LoadInitialValues
 #include "Interface.h" // for LoadInitialValues
+#include "System/FileStream.h" // for LoadInitialValues
 
 /////////////////////////////////////////////////////////////////////////////
 // private inlines 

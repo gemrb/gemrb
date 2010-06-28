@@ -63,11 +63,11 @@
 #  define snprintf _snprintf
 #  define HAVE_SNPRINTF 1
 # else
-#  include "snprintf.h"
+#  include "System/snprintf.h"
 # endif
 #endif
 
-#include "VFS.h"
+#include "System/VFS.h"
 
 #ifdef _MSC_VER
 # ifndef round

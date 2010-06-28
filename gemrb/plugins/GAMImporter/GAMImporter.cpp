@@ -27,7 +27,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "MapMgr.h"
-#include "MemoryStream.h"
+#include "System/MemoryStream.h"
 
 #include <cassert>
 

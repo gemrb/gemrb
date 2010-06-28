@@ -20,7 +20,7 @@
 
 #include "Resource.h"
 
-#include "DataStream.h"
+#include "System/DataStream.h"
 
 Resource::Resource(void)
 {

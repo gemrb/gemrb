@@ -23,6 +23,12 @@ ADD_LIBRARY(gemrb_core SHARED ${gemrb_core_LIB_SRCS}
 	GUI/WorldMapControl.cpp
 	Scriptable/Actor.cpp
 	Scriptable/ActorBlock.cpp
+	System/CachedFileStream.cpp
+	System/DataStream.cpp
+	System/FileStream.cpp
+	System/MemoryStream.cpp
+	System/VFS.cpp
+	System/snprintf.cpp
 	)
 
 IF(WIN32)
