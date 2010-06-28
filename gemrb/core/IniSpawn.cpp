@@ -25,12 +25,12 @@
 
 #include "win32def.h"
 
-#include "Actor.h"
 #include "GSUtils.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Map.h"
+#include "Scriptable/Actor.h"
 
 static const int StatValues[9]={
 IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, 

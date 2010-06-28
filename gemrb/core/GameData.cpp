@@ -20,7 +20,6 @@
 
 #include "GameData.h"
 
-#include "Actor.h"
 #include "ActorMgr.h"
 #include "AnimationMgr.h"
 #include "Cache.h"
@@ -37,6 +36,7 @@
 #include "ResourceDesc.h"
 #include "Spell.h"
 #include "SpellMgr.h"
+#include "Scriptable/Actor.h"
 
 #include <cstdio>
 

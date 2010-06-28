@@ -33,11 +33,11 @@ class Game;
 #include "exports.h"
 #include "ie_types.h"
 
-#include "Actor.h"
 #include "Callback.h"
 #include "Map.h"
 #include "Particles.h"
 #include "Variables.h"
+#include "Scriptable/Actor.h"
 
 #include <vector>
 

@@ -26,11 +26,11 @@ class Map;
 #include "exports.h"
 #include "globals.h"
 
-#include "ActorBlock.h"
 #include "Bitmap.h"
 #include "Image.h"
 #include "IniSpawn.h"
 #include "SpriteCover.h"
+#include "Scriptable/ActorBlock.h"
 
 #include <queue>
 

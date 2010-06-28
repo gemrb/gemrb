@@ -21,10 +21,11 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
+#include "Scriptable/ActorBlock.h"
+
 #include "exports.h"
 #include "ie_types.h"
 
-#include "ActorBlock.h"
 #include "Animation.h"
 #include "CharAnimations.h"
 #include "EffectQueue.h"

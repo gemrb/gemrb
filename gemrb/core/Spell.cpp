@@ -24,11 +24,11 @@
 
 #include "win32def.h"
 
-#include "Actor.h"
 #include "Game.h"
 #include "Interface.h"
 #include "Projectile.h"
 #include "ProjectileServer.h"
+#include "Scriptable/Actor.h"
 
 SPLExtHeader::SPLExtHeader(void)
 {

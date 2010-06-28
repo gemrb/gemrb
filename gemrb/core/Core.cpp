@@ -27,8 +27,8 @@
 #include "globals.h"
 #include "exports.h"
 
-#include "Actor.h"
 #include "Interface.h"
+#include "Scriptable/Actor.h"
 
 #include <cmath>
 #include <ctype.h>

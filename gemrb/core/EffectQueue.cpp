@@ -20,13 +20,13 @@
 
 #include "EffectQueue.h"
 
-#include "Actor.h"
 #include "DisplayMessage.h"
 #include "Effect.h"
 #include "Game.h"
 #include "Interface.h"
 #include "Map.h"
 #include "SymbolMgr.h"
+#include "Scriptable/Actor.h"
 
 #include <cstdio>
 

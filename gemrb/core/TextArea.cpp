@@ -22,7 +22,6 @@
 
 #include "win32def.h"
 
-#include "Actor.h"
 #include "Audio.h"
 #include "GameControl.h"
 #include "GameData.h"
@@ -31,6 +30,7 @@
 #include "Palette.h"
 #include "Variables.h"
 #include "Video.h"
+#include "Scriptable/Actor.h"
 
 #include <cstdio>
 #include <cstdlib>

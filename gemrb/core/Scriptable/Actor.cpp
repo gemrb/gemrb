@@ -22,7 +22,7 @@
 //Any player or non-player character is a creature.
 //Actor is a scriptable object (Scriptable). See ActorBlock.cpp
 
-#include "Actor.h"
+#include "Scriptable/Actor.h"
 
 #include "overlays.h"
 #include "strrefs.h"

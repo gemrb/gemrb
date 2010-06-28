@@ -3,8 +3,8 @@ libgemrb_core_la_LDFLAGS = -version-info 0:0:0 @LIBDL@
 AM_CPPFLAGS = -DGEM_BUILD_DLL
 libgemrb_core_la_SOURCES = \
 	Actions.cpp \
-	Actor.cpp \
-	ActorBlock.cpp \
+	Scriptable/Actor.cpp \
+	Scriptable/ActorBlock.cpp \
 	ActorMgr.cpp \
 	Ambient.cpp \
 	AmbientMgr.cpp \

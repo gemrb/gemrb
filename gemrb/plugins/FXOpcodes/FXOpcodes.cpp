@@ -24,7 +24,6 @@
 #include "strrefs.h"
 #include "win32def.h"
 
-#include "Actor.h"
 #include "Audio.h"
 #include "DisplayMessage.h"
 #include "EffectQueue.h"
@@ -36,6 +35,7 @@
 #include "Projectile.h" //needs for clearair
 #include "TileMap.h" //needs for knock!
 #include "damages.h"
+#include "Scriptable/Actor.h"
 
 //FIXME: find a way to handle portrait icons better
 #define PI_CONFUSED  3

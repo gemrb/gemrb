@@ -20,12 +20,12 @@
 
 #include "Spellbook.h"
 
-#include "Actor.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Projectile.h"
 #include "Spell.h"
 #include "TableMgr.h"
+#include "Scriptable/Actor.h"
 
 #include <cstdio>
 

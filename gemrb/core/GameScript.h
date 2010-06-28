@@ -23,10 +23,10 @@
 
 #include "exports.h"
 
-#include "Actor.h"
 #include "DataStream.h"
 #include "SymbolMgr.h"
 #include "Variables.h"
+#include "Scriptable/Actor.h"
 
 #include <cstdio>
 #include <vector>

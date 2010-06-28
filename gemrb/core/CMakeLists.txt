@@ -2,7 +2,10 @@ ADD_DEFINITIONS(-DGEM_BUILD_DLL)
 
 FILE(GLOB gemrb_core_LIB_SRCS "*.cpp")
 
-ADD_LIBRARY(gemrb_core SHARED ${gemrb_core_LIB_SRCS} )
+ADD_LIBRARY(gemrb_core SHARED ${gemrb_core_LIB_SRCS}
+	Scriptable/Actor.cpp
+	Scriptable/ActorBlock.cpp
+	)
 
 IF(WIN32)
   INSTALL(TARGETS gemrb_core RUNTIME DESTINATION ${LIB_DIR})
