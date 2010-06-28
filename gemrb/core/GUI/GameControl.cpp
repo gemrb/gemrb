@@ -2042,6 +2042,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 void GameControl::CalculateSelection(const Point &p)
 {
 	unsigned int i;
+
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentArea( );
 	if (DrawSelectionRect) {
@@ -2073,6 +2074,8 @@ void GameControl::CalculateSelection(const Point &p)
 		free( ab );
 	} else {
 		Actor* actor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD | GA_NO_ENEMY);
+		SetLastActor( actor, area->GetActorByGlobalID(lastActorID) );
+/*
 		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 		if (lastActor)
 			lastActor->SetOver( false );
@@ -2082,6 +2085,19 @@ void GameControl::CalculateSelection(const Point &p)
 			lastActorID = actor->globalID;
 			actor->SetOver( true );
 		}
+*/
+	}
+}
+
+void GameControl::SetLastActor(Actor *actor, Actor *prevActor)
+{
+	if (prevActor)
+		prevActor->SetOver( false );
+	if (!actor) {
+		lastActorID = 0;
+	} else {
+		lastActorID = actor->globalID;
+		actor->SetOver( true );
 	}
 }
 

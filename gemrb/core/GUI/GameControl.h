@@ -200,6 +200,7 @@ public:
 	Actor *GetSpeaker();
 	/** Selects one or all PC */
 	void SelectActor(int whom, int type = -1);
+	void SetLastActor(Actor *actor, Actor *prevActor);
 	void SetCutSceneMode(bool active);
 	int HideGUI();
 	int UnhideGUI();
