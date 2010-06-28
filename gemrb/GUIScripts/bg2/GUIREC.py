@@ -134,7 +134,7 @@ def OpenRecordsWindow ():
 	# kit info
 	Button = Window.GetControl (52)
 	Button.SetText (61265)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, KitInfoWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKitInfoWindow)
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
@@ -854,7 +854,7 @@ def ExportEditChanged():
 		ExportDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
-def KitInfoWindow ():
+def OpenKitInfoWindow ():
 	global KitInfoWindow
 
 	KitInfoWindow = GemRB.LoadWindow (24)
