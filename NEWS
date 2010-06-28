@@ -1,9 +1,12 @@
-GemRB git (be15d3f):
+GemRB git (a3e093):
   New features:
     - 
+    - wisdom xp bonus (pst)
 
   Improved features:
     - 
+    - projectiles
+    - the core and guiscript design was cleaned up in many places
     - bugfixes
 
   Applied patches:
