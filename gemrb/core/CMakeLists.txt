@@ -6,6 +6,7 @@ ADD_LIBRARY(gemrb_core SHARED ${gemrb_core_LIB_SRCS}
 	GUI/Button.cpp
 	GUI/Console.cpp
 	GUI/Control.cpp
+	GUI/EventMgr.cpp
 	GUI/GameControl.cpp
 	GUI/Label.cpp
 	GUI/MapControl.cpp
@@ -14,6 +15,7 @@ ADD_LIBRARY(gemrb_core SHARED ${gemrb_core_LIB_SRCS}
 	GUI/Slider.cpp
 	GUI/TextArea.cpp
 	GUI/TextEdit.cpp
+	GUI/Window.cpp
 	GUI/WorldMapControl.cpp
 	Scriptable/Actor.cpp
 	Scriptable/ActorBlock.cpp

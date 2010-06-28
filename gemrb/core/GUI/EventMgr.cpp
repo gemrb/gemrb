@@ -18,7 +18,7 @@
  *
  */
 
-#include "EventMgr.h"
+#include "GUI/EventMgr.h"
 
 #include "GUI/GameControl.h"
 

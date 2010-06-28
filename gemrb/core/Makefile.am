@@ -28,7 +28,6 @@ libgemrb_core_la_SOURCES = \
 	DisplayMessage.cpp \
 	EffectMgr.cpp \
 	EffectQueue.cpp \
-	EventMgr.cpp \
 	Factory.cpp \
 	FactoryObject.cpp \
 	FileStream.cpp \
@@ -36,6 +35,7 @@ libgemrb_core_la_SOURCES = \
 	GSUtils.cpp \
 	GUI/Button.cpp \
 	GUI/Control.cpp \
+	GUI/EventMgr.cpp \
 	GUI/GameControl.cpp \
 	GUI/Label.cpp \
 	GUI/MapControl.cpp \

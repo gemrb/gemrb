@@ -30,10 +30,10 @@
 #include "globals.h"
 
 #include "Animation.h"
-#include "EventMgr.h"
 #include "Plugin.h"
 #include "Polygon.h"
 #include "ScriptedAnimation.h"
+#include "GUI/EventMgr.h"
 
 class AnimationFactory;
 class Palette;
