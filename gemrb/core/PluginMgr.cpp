@@ -311,6 +311,8 @@ bool PluginMgr::RegisterDriver(const TypeID* type, const char* name, PluginFunc 
 Plugin* PluginMgr::GetDriver(const TypeID* type, const char* name)
 {
 	driver_map &map = drivers[type];
+	if (map.begin() == map.end())
+		return NULL;
 	driver_map::const_iterator iter = map.find(name);
 	if (iter != map.end())
 		return iter->second();
