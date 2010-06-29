@@ -1,8 +1,9 @@
 
-Prototype: Control.SetEvent(EventMask, FunctionName)
+Prototype: Control.SetEventByName(EventMask, FunctionName)
+           Control.SetEvent(EventMask, PythonFunction)
 
 Description: Sets an event of a control on a window to a named function
-defined in the currently loaded scripts namespace.
+defined in the currently loaded script's namespace.
 
 Parameters: 
 EventMask                  - a dword describing the event. Its high byte is actually the control's type.
@@ -28,7 +29,7 @@ IE_GUI_SCROLLBAR_ON_CHANGE= 0x07000000, the scrollbar's knob position has change
 Return value: N/A
 
 Examples:
- Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
+ Bar.SetEventByName (IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
  ...
  def EndLoadScreen ():
         Skull = GemRB.GetControl (LoadScreen, 1)
