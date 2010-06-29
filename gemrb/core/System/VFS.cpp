@@ -461,9 +461,8 @@ void ExtractFileFromPath(char *file, const char *full_path)
 }
 
 DirectoryIterator::DirectoryIterator(const char *path)
-	: Directory(), Entry(), Path(path)
+	: Directory(NULL), Entry(NULL), Path(path)
 {
-	Directory = NULL;
 	Rewind();
 }
 
