@@ -620,7 +620,7 @@ def UpdatePortraitWindow ():
 		HPLabel = Window.GetControl (100+portid)
 		HPLabel.SetText (ratio_str) # TODO: color depending on the ratio
 
-		Button.EnableBorder (FRAME_PC_SELECTED, sel)
+		#Button.EnableBorder (FRAME_PC_SELECTED, sel)
 	return
 
 def PortraitButtonOnDrag ():
