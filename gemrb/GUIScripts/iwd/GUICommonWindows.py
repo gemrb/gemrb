@@ -634,6 +634,13 @@ def PortraitButtonOnDrag ():
 def PortraitButtonOnPress ():
 	i = GemRB.GetVar ("PressedPortrait")
 
+	if not i:
+		return
+
+	if GemRB.GameControlGetTargetMode() != TARGET_MODE_NONE:
+		GemRB.ActOnPC (i)
+		return
+
 	if (not SelectionChangeHandler):
 		if GemRB.GameIsPCSelected (i):
 			GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_OR)
@@ -646,6 +653,9 @@ def PortraitButtonOnPress ():
 
 def PortraitButtonOnShiftPress ():
 	i = GemRB.GetVar ("PressedPortrait")
+
+	if not i:
+		return
 
 	if (not SelectionChangeHandler):
 		sel = GemRB.GameIsPCSelected (i)
@@ -720,8 +730,13 @@ def CheckDragging():
 
 def PortraitButtonOnMouseLeave ():
 	i = GemRB.GetVar ("PressedPortrait")
-	Button = PortraitWindow.GetControl (i)
+	if not i:
+		return
+
+	Button = PortraitWindow.GetControl (i-1)
 	Button.EnableBorder (FRAME_PC_TARGET, 0)
+	GemRB.SetVar ("PressedPortrait", 0)
+	GemRB.SetTimedEvent (CheckDragging, 1)
 	return
 
 def ActionStopPressed ():
