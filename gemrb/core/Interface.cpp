@@ -459,7 +459,7 @@ GameControl* Interface::StartGameControl()
 	//setting the focus to the game control
 	evntmgr->SetFocused(gamewin, gc);
 	if (guiscript->LoadScript( "MessageWindow" )) {
-		guiscript->RunFunction( "OnLoad" );
+		guiscript->RunFunction( "MessageWindow", "OnLoad" );
 		gc->UnhideGUI();
 	}
 
@@ -508,7 +508,7 @@ void Interface::HandleEvents()
 
 	if ((EventFlag&EF_CONTROL) && gc) {
 		EventFlag&=~EF_CONTROL;
-		guiscript->RunFunction( "UpdateControlStatus" );
+		guiscript->RunFunction( "MessageWindow", "UpdateControlStatus" );
 		//this is the only value we can use here
 		if (game->ControlStatus & CS_HIDEGUI)
 			gc->HideGUI();
@@ -534,7 +534,8 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_IDENTIFY) {
 		EventFlag&=~EF_IDENTIFY;
-		guiscript->RunFunction( "OpenIdentifyWindow" );
+		// FIXME: Implement this.
+		guiscript->RunFunction( "GUICommonWindows", "OpenIdentifyWindow" );
 		return;
 	}
 	if (EventFlag&EF_OPENSTORE) {
@@ -545,7 +546,7 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_MASTERSCRIPT) {
 		EventFlag&=~EF_MASTERSCRIPT;
-		guiscript->RunFunction( "UpdateMasterScript" );
+		guiscript->RunFunction( "MessageWindow", "UpdateMasterScript" );
 		return;
 	}
 
@@ -595,7 +596,7 @@ void Interface::HandleFlags()
 	if (QuitFlag&QF_CHANGESCRIPT) {
 		QuitFlag &= ~QF_CHANGESCRIPT;
 		guiscript->LoadScript( NextScript );
-		guiscript->RunFunction( "OnLoad" );
+		guiscript->RunFunction( NextScript, "OnLoad" );
 	}
 }
 

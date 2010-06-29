@@ -4988,7 +4988,6 @@ void GameScript::StartStore( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	core->SetCurrentStore( parameters->string0Parameter, Sender->GetScriptName());
-	//core->GetGUIScriptEngine()->RunFunction( "OpenStoreWindow" );
 	core->SetEventFlag(EF_OPENSTORE);
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->ReleaseCurrentAction();
