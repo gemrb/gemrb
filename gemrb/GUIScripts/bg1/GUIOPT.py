@@ -479,7 +479,8 @@ def OpenAutopauseOptionsWindow ():
 	OptCheckbox ('WeaponUnusable', Window, 5, 21, 'Auto Pause State', 16)
 	OptCheckbox ('TargetGone', Window, 13, 22, 'Auto Pause State', 32)
 	OptCheckbox ('EndOfRound', Window, 25, 24, 'Auto Pause State', 64)
-	OptCheckbox ('EnemySighted', Window, 26, 27, 'Auto Pause State', 128)
+	if Window.HasControl(26, IE_GUI_BUTTON):
+		OptCheckbox ('EnemySighted', Window, 26, 27, 'Auto Pause State', 128)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
