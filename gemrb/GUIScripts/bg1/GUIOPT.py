@@ -313,6 +313,22 @@ def OpenCharacterSoundsWindow ():
 	OptRadio ('SelectionSounds', Window, 60, 57, 'Selection Sounds Frequency', 3)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY) 
+
+def DisplayHelpSubtitles ():
+	HelpTextArea2.SetText (18015)
+
+def DisplayHelpAttackSounds ():
+	HelpTextArea2.SetText (18013)
+
+def DisplayHelpFootsteps ():
+	HelpTextArea2.SetText (18014)
+
+def DisplayHelpCommandSounds ():
+	HelpTextArea2.SetText (18016)
+
+def DisplayHelpSelectionSounds ():
+	HelpTextArea2.SetText (11352)
+
 ###################################################
 
 def CloseGameplayOptionsWindow ():
