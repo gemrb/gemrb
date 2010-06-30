@@ -1645,31 +1645,6 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_SetTimedEventByName__doc,
-"SetTimedEventByName(FunctionName, Rounds)\n\n"
-"Sets a timed event, the timing is handled by the game object\n"
-"if the game object doesn't exist, this command is ignored." );
-
-static PyObject* GemRB_SetTimedEventByName(PyObject * /*self*/, PyObject* args)
-{
-	PyObject* funcName;
-	int rounds;
-
-	if (!PyArg_ParseTuple( args, "Oi", &funcName, &rounds )) {
-		return AttributeError( GemRB_SetTimedEventByName__doc );
-	}
-	if (!PyString_Check(funcName)) {
-		return AttributeError( GemRB_SetTimedEventByName__doc );
-	}
-
-	Game *game = core->GetGame();
-	if (game) {
-		game->SetTimedEvent(new StringCallback(funcName), rounds);
-	}
-	Py_INCREF( Py_None );
-	return Py_None;
-}
-
 PyDoc_STRVAR( GemRB_Control_SetEvent__doc,
 "Control.SetEvent(EventMask, Function)\n\n"
 "Sets an event of a control on a window to a script defined function." );
@@ -1703,38 +1678,6 @@ static PyObject* GemRB_Control_SetEvent(PyObject * /*self*/, PyObject* args)
 	}
 
 	Py_INCREF(Py_None);
-	return Py_None;
-}
-
-PyDoc_STRVAR( GemRB_Control_SetEventByName__doc,
-"Control.SetEventByName(EventMask, FunctionName)\n\n"
-"Sets an event of a control on a window to a script defined function." );
-
-static PyObject* GemRB_Control_SetEventByName(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlIndex;
-	int event;
-	PyObject* funcName;
-
-	if (!PyArg_ParseTuple( args, "iiiO", &WindowIndex, &ControlIndex, &event,
-			&funcName )) {
-		return AttributeError( GemRB_Control_SetEventByName__doc );
-	}
-	if (!PyString_Check(funcName)) {
-		return AttributeError( GemRB_Control_SetEventByName__doc );
-	}
-
-	Control* ctrl = GetControl( WindowIndex, ControlIndex, -1 );
-	if (!ctrl)
-		return NULL;
-
-	if (! ctrl->SetEvent( event, new StringCallback(funcName) )) {
-		char buf[256];
-		snprintf( buf, sizeof( buf ), "Can't set event handler: %s!", PyString_AsString(funcName) );
-		return RuntimeError( buf );
-	}
-
-	Py_INCREF( Py_None );
 	return Py_None;
 }
 
@@ -9407,7 +9350,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetPurchasedAmount, METH_VARARGS),
 	METHOD(SetRepeatClickFlags, METH_VARARGS),
 	METHOD(SetTimedEvent, METH_VARARGS),
-	METHOD(SetTimedEventByName, METH_VARARGS),
 	METHOD(SetToken, METH_VARARGS),
 	METHOD(SetTooltipDelay, METH_VARARGS),
 	METHOD(SetupQuickSlot, METH_VARARGS),
@@ -9450,7 +9392,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
 	METHOD(Control_SetEvent, METH_VARARGS),
-	METHOD(Control_SetEventByName, METH_VARARGS),
 	METHOD(Control_SetPos, METH_VARARGS),
 	METHOD(Control_SetSize, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),
