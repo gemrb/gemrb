@@ -6070,24 +6070,6 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_RunEventHandler__doc,
-"RunEventHandler(String[, error])\n\n"
-"Executes a GUIScript event handler function named String. "
-"If error is set to nonzero, then a missing handler will cause an error." );
-
-static PyObject* GemRB_RunEventHandler(PyObject * /*self*/, PyObject* args)
-{
-	char* String;
-	int error = 0;
-
-	if (!PyArg_ParseTuple( args, "s|i", &String, error )) {
-		return AttributeError( GemRB_RunEventHandler__doc );
-	}
-	core->GetGUIScriptEngine()->RunFunction( String, error );
-	Py_INCREF( Py_None );
-	return Py_None;
-}
-
 PyDoc_STRVAR( GemRB_EvaluateString__doc,
 "EvaluateString(String)\n\n"
 "Evaluate an In-Game Script Trigger in the current Area Script Context." );
@@ -9327,7 +9309,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(RestParty, METH_VARARGS),
 	METHOD(RevealArea, METH_VARARGS),
 	METHOD(Roll, METH_VARARGS),
-	METHOD(RunEventHandler, METH_VARARGS),
 	METHOD(SaveCharacter, METH_VARARGS),
 	METHOD(SaveGame, METH_VARARGS),
 	METHOD(SetDefaultActions, METH_VARARGS),
