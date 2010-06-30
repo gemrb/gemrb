@@ -18,9 +18,10 @@
 #
 #character generation, name (GUICG5)
 import GemRB
+from GUIDefines import *
 
-from CharGenCommon import * 
-from GUICommon import CloseOtherWindow
+import CharGenCommon
+import GUICommon
 
 
 NameWindow = 0
@@ -30,7 +31,7 @@ DoneButton = 0
 def OnLoad():
 	global NameWindow, NameField, DoneButton
 
-	if CloseOtherWindow (OnLoad):
+	if GUICommon.CloseOtherWindow (OnLoad):
 		if(NameWindow):
 			NameWindow.Unload()
 			NameWindow = None
@@ -49,9 +50,9 @@ def OnLoad():
 
 	NameField = NameWindow.GetControl(2)
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	NameField.SetEventByName(IE_GUI_EDIT_ON_CHANGE,"EditChange")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE, EditChange)
 	NameWindow.ShowModal(MODAL_SHADOW_NONE)
 	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
 	return
@@ -62,7 +63,7 @@ def NextPress():
 	#seems like a good idea to store it here for the time being
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerName (MyChar, Name, 0)
-	next()
+	CharGenCommon.next()
 	return
 
 def EditChange():

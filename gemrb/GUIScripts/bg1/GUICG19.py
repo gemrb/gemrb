@@ -18,9 +18,10 @@
 #
 #character generation, sounds (GUICG19)
 import GemRB
-
-from CharGenCommon import * 
-from GUICommon import CloseOtherWindow
+from GUIDefines import *
+from ie_restype import RES_WAV
+import CharGenCommon
+import GUICommon
 
 SoundSequence = [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m" ]
 VoiceList = 0
@@ -30,7 +31,7 @@ SoundIndex = 0
 def OnLoad():
 	global CharSoundWindow, VoiceList
 
-	if CloseOtherWindow (OnLoad):
+	if GUICommon.CloseOtherWindow (OnLoad):
 		if(CharSoundWindow):
 			CharSoundWindow.Unload()
 			CharSoundWindow = None
@@ -51,7 +52,7 @@ def OnLoad():
 
 	PlayButton = CharSoundWindow.GetControl (47)
 	PlayButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PlayButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "PlayPress")
+	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
 	PlayButton.SetText (17318)
 
 	TextArea = CharSoundWindow.GetControl (50)
@@ -63,9 +64,9 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	VoiceList.SetEventByName(IE_GUI_TEXTAREA_ON_CHANGE, "ChangeVoice")
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	VoiceList.SetEvent(IE_GUI_TEXTAREA_ON_CHANGE, ChangeVoice)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
 	CharSoundWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
@@ -98,5 +99,5 @@ def NextPress():
 	CharSound = VoiceList.QueryText ()
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerSound(MyChar,CharSound)
-	next()
+	CharGenCommon.next()
 	return

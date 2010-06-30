@@ -17,6 +17,7 @@
 #
 #
 import GemRB
+from GUIDefines import *
 
 StartWindow = 0
 QuitWindow = 0
@@ -48,8 +49,8 @@ def OnLoad():
 	QuitTextArea.SetText(19532)
 	CancelButton.SetText(13727)
 	ConfirmButton.SetText(15417)
-	ConfirmButton.SetEventByName(0, "ExitConfirmed")
-	CancelButton.SetEventByName(0, "ExitCancelled")
+	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitCancelled)
 	ConfirmButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -71,10 +72,10 @@ def SinglePlayerPress():
 	MultiPlayerButton.SetText(13729)
 	MoviesButton.SetText(24110)
 	ExitButton.SetText(15416)
-	MultiPlayerButton.SetEventByName(0, "LoadSingle")
-	SinglePlayerButton.SetEventByName(0, "NewSingle")
-	MoviesButton.SetEventByName(0, "MissionPack")
-	ExitButton.SetEventByName(0, "BackToMain")
+	MultiPlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, LoadSingle)
+	SinglePlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewSingle)
+	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MissionPack)
+	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackToMain)
 	ExitButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
 	if GemRB.GetString(24110) == "": # TODO: better way to detect lack of mission pack?
 		MoviesButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
@@ -86,11 +87,11 @@ def MultiPlayerPress():
 	MultiPlayerButton.SetText(20642)
 	MoviesButton.SetText(15416)
 	ExitButton.SetText("")
-	SinglePlayerButton.SetEventByName(0, "PregenPress")
-	MultiPlayerButton.SetEventByName(0, "ConnectPress")
-	MoviesButton.SetEventByName(0, "BackToMain")
+	SinglePlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, PregenPress)
+	MultiPlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ConnectPress)
+	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackToMain)
 	MoviesButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
-	ExitButton.SetEvent(0, None)
+	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, None)
 	ExitButton.SetStatus(IE_GUI_BUTTON_DISABLED)
 	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	return
@@ -175,10 +176,10 @@ def BackToMain():
 	MultiPlayerButton.SetText(15414)
 	MoviesButton.SetText(15415)
 	ExitButton.SetText(15417)
-	SinglePlayerButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "SinglePlayerPress")
-	MultiPlayerButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MultiPlayerPress")
-	MoviesButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "MoviesPress")
-	ExitButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "ExitPress")
+	SinglePlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SinglePlayerPress)
+	MultiPlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MultiPlayerPress)
+	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MoviesPress)
+	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	MoviesButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)

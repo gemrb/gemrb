@@ -1,8 +1,10 @@
 import GemRB
-from CharGenCommon import * 
-from GUICommonWindows import *
-from GUICommon import KitListTable, ClassSkillsTable
-from LUProfsSelection import *
+from GUIDefines import *
+from ie_stats import *
+import CharGenCommon
+import GUICommon
+import LUCommon
+import LUProfsSelection
 
 def Imprt():
 	GemRB.SetToken("NextScript","CharGen")
@@ -46,8 +48,8 @@ def unsetRace():
 def getRace(area):
 	MyChar = GemRB.GetVar ("Slot")
 	RaceID = GemRB.GetPlayerStat (MyChar, IE_RACE)
-	RaceIndex = RaceTable.FindValue(3,RaceID)
-	RaceCap = RaceTable.GetValue(RaceIndex,2)
+	RaceIndex = GUICommon.RaceTable.FindValue(3,RaceID)
+	RaceCap = GUICommon.RaceTable.GetValue(RaceIndex,2)
 	area.Append(1048,-1) # new line
 	area.Append(": ")
 	area.Append(RaceCap)
@@ -60,7 +62,7 @@ def unsetClass():
 	
 def getClass(area):
 	MyChar = GemRB.GetVar ("Slot")
-	ClassTitle = GetActorClassTitle(MyChar)
+	ClassTitle = GUICommon.GetActorClassTitle(MyChar)
 
 	area.Append(12136, -1)
 	area.Append(": ")
@@ -123,8 +125,8 @@ def unsetHateRace():
 def guardHateRace():
 	MyChar = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat(MyChar,IE_CLASS)
-	ClassName = ClassSkillsTable.GetRowName(Class)
-	TableName = ClassSkillsTable.GetValue(ClassName, "HATERACE")
+	ClassName = GUICommon.ClassSkillsTable.GetRowName(Class)
+	TableName = GUICommon.ClassSkillsTable.GetValue(ClassName, "HATERACE")
 	return TableName != "*"
 
 def getHatedRace(TextAreaControl):
@@ -144,12 +146,12 @@ def unsetMageSpells():
 	print("unsetMageSpells")
 	MyChar = GemRB.GetVar ("Slot")
 
-	RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1, 5, 1)
+	GUICommon.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1, 5, 1)
 
 def guardMageSpells():
 	MyChar = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat(MyChar,IE_CLASS)
-	TableName = ClassSkillsTable.GetValue(Class, 2)
+	TableName = GUICommon.ClassSkillsTable.GetValue(Class, 2)
 	return TableName != "*"
 
 def getMageSpells(TextAreaControl):
@@ -174,15 +176,15 @@ def guardSkills():
 	Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
 
 	if Kit != 0:
-		KitName = KitListTable.GetValue(Kit, 0) #rowname is just a number
+		KitName = GUICommon.KitListTable.GetValue(Kit, 0) #rowname is just a number
 		PointsLeft = SkillTable.GetValue("FIRST_LEVEL",KitName)
 		if PointsLeft < 0:
 			Kit = 0
 		
 	if Kit == 0:
 		ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-		ClassIndex = ClassTable.FindValue(5,ClassID)
-		KitName = ClassTable.GetRowName(ClassIndex)
+		ClassIndex = GUICommon.ClassTable.FindValue(5,ClassID)
+		KitName = GUICommon.ClassTable.GetRowName(ClassIndex)
 
 	for i in range(RowCount):
 		SkillName = SkillTable.GetRowName(i+2)
@@ -192,10 +194,10 @@ def guardSkills():
 	return False
 		
 def unsetSkill():
-	from LUSkillsSelection import SkillsNullify,SkillsSave
+	import LUSkillsSelection
 	MyChar = GemRB.GetVar ("Slot")
-	SkillsNullify ()
-	SkillsSave (MyChar)
+	LUSkillsSelection.SkillsNullify ()
+	LUSkillsSelection.SkillsSave (MyChar)
 	
 def getSkills(TextAreaControl):
 	MyChar = GemRB.GetVar ("Slot")
@@ -203,15 +205,15 @@ def getSkills(TextAreaControl):
 	info = ""
 	SkillTable = GemRB.LoadTable ("skills")
 	ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = ClassTable.FindValue (5, ClassID)
-	ClassName = ClassTable.GetRowName(Class)
-	RangerSkills = ClassSkillsTable.GetValue (ClassName, "RANGERSKILL")
-	BardSkills = ClassSkillsTable.GetValue (ClassName, "BARDSKILL")
-	KitName = GetKitIndex (MyChar)
+	Class = GUICommon.ClassTable.FindValue (5, ClassID)
+	ClassName = GUICommon.ClassTable.GetRowName(Class)
+	RangerSkills = GUICommon.ClassSkillsTable.GetValue (ClassName, "RANGERSKILL")
+	BardSkills = GUICommon.ClassSkillsTable.GetValue (ClassName, "BARDSKILL")
+	KitName = GUICommon.GetKitIndex (MyChar)
 	if KitName == 0:
 		KitName = ClassName
 	else:
-		KitName = KitListTable.GetValue (KitName, 0)
+		KitName = GUICommon.KitListTable.GetValue (KitName, 0)
 		
 	if SkillTable.GetValue ("RATE", KitName) != -1 or BardSkills != "*" or RangerSkills != "*":
 		for skill in range(SkillTable.GetRowCount () - 2):
@@ -230,8 +232,8 @@ def getSkills(TextAreaControl):
 	
 def unsetProfi():
 	MyChar = GemRB.GetVar ("Slot")
-	ProfsNullify ()
-	ProfsSave(MyChar, LUPROFS_TYPE_CHARGEN)
+	LUProfsSelection.ProfsNullify ()
+	LUProfsSelection.ProfsSave(MyChar, LUProfsSelection.LUPROFS_TYPE_CHARGEN)
 
 def getProfi(TextAreaControl):
 	MyChar = GemRB.GetVar ("Slot")
@@ -256,10 +258,10 @@ def getProfi(TextAreaControl):
 #Appearance
 def unsetColors():
 	MyChar = GemRB.GetVar ("Slot")
-	SetColorStat (MyChar, IE_HAIR_COLOR, 0 )
-	SetColorStat (MyChar, IE_SKIN_COLOR, 0 )
-	SetColorStat (MyChar, IE_MAJOR_COLOR, 0 )
-	SetColorStat (MyChar, IE_MINOR_COLOR, 0 )
+	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, 0 )
+	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, 0 )
+	GUICommon.SetColorStat (MyChar, IE_MAJOR_COLOR, 0 )
+	GUICommon.SetColorStat (MyChar, IE_MINOR_COLOR, 0 )
 
 def unsetSounds():
 	MyChar = GemRB.GetVar ("Slot")
@@ -282,11 +284,11 @@ def setDivineSpells():
 	MyChar = GemRB.GetVar ("Slot")
 	
 	ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = ClassTable.FindValue (5, ClassID)
-	ClassName = ClassTable.GetRowName(Class)
+	Class = GUICommon.ClassTable.FindValue (5, ClassID)
+	ClassName = GUICommon.ClassTable.GetRowName(Class)
 	
-	DruidTable = ClassSkillsTable.GetValue (ClassName, "DRUIDSPELL")
-	ClericTable = ClassSkillsTable.GetValue (ClassName, "CLERICSPELL")
+	DruidTable = GUICommon.ClassSkillsTable.GetValue (ClassName, "DRUIDSPELL")
+	ClericTable = GUICommon.ClassSkillsTable.GetValue (ClassName, "CLERICSPELL")
 	
 	print("CGG setDivineSpells: CP1",ClassID,Class,ClassName,DruidTable,ClericTable)
 	
@@ -301,18 +303,18 @@ def setDivineSpells():
 
 def learnDivine(MyChar,ClassFlag,TableName,AllignID):
 	#print ("CGG setDivineSpells: CP2",MyChar,ClassFlag,TableName,AllignID )
-	SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
-	Learnable = GetLearnablePriestSpells( ClassFlag, AllignID, 1)
+	GUICommon.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
+	Learnable = GUICommon.GetLearnablePriestSpells( ClassFlag, AllignID, 1)
 	for i in range(len(Learnable) ):
 		#print ("CGG setDivineSpells: CP3",Learnable[i])
-		if -1 == HasSpell(MyChar,IE_SPELL_TYPE_PRIEST,1,Learnable[i]):
+		if -1 == GUICommon.HasSpell(MyChar,IE_SPELL_TYPE_PRIEST,1,Learnable[i]):
 			#print ("CGG setDivineSpells: CP4",Learnable[i])
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
 
 def unsetDivineSpells():
 	print("unsetDivineSpells")
 	MyChar = GemRB.GetVar ("Slot")
-	RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1, 1, 1)
+	GUICommon.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1, 1, 1)
 
 def getDivineSpells(TextAreaControl):
 	MyChar = GemRB.GetVar ("Slot")
@@ -334,8 +336,8 @@ def setAccept():
 	MyChar = GemRB.GetVar ("Slot")
 
 	ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = ClassTable.FindValue (5, ClassID)
-	ClassName = ClassTable.GetRowName(Class)
+	Class = GUICommon.ClassTable.FindValue (5, ClassID)
+	ClassName = GUICommon.ClassTable.GetRowName(Class)
 	
 	#reputation
 	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
@@ -348,10 +350,10 @@ def setAccept():
 	#lore, thac0, hp, and saves
 	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
 	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0)
-	SetupSavingThrows (MyChar)
-	SetupThaco (MyChar)
-	SetupLore (MyChar)
-	SetupHP (MyChar)
+	LUCommon.SetupSavingThrows (MyChar)
+	LUCommon.SetupThaco (MyChar)
+	LUCommon.SetupLore (MyChar)
+	LUCommon.SetupHP (MyChar)
 
 	#slot 1 is the protagonist
 	if MyChar == 1:
@@ -366,9 +368,9 @@ def setAccept():
 	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 2)
 
 	#colors
-	SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
-	SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
-	SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
+	GUICommon.SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
+	GUICommon.SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
+	GUICommon.SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
@@ -380,8 +382,8 @@ def setAccept():
 	#LETS PLAY!!
 	playmode = GemRB.GetVar ("PlayMode")
 	
-	CloseOtherWindow(None)
-	close()
+	GUICommon.CloseOtherWindow(None)
+	CharGenCommon.close()
 	
 	if playmode >=0:
 		if GemRB.GetVar("GUIEnhancements"):

@@ -18,10 +18,11 @@
 #
 #character generation, skills (GUICG6)
 import GemRB
-
-from CharGenCommon import * 
-from GUICommon import CloseOtherWindow
-from LUSkillsSelection import *
+from GUIDefines import *
+from ie_stats import *
+import CharGenCommon
+import GUICommon
+import LUSkillsSelection
 
 
 SkillWindow = 0
@@ -39,7 +40,7 @@ def RedrawSkills():
 def OnLoad():
 	global SkillWindow, DoneButton
 
-	if CloseOtherWindow (OnLoad):
+	if GUICommon.CloseOtherWindow (OnLoad):
 		if(SkillWindow):
 			SkillWindow.Unload()
 			SkillWindow = None
@@ -53,16 +54,16 @@ def OnLoad():
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), \
 			GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
 			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
-	SetupSkillsWindow (MyChar, LUSKILLS_TYPE_CHARGEN, SkillWindow, RedrawSkills, [0,0,0], Levels,0,False)
+	LUSkillsSelection.SetupSkillsWindow (MyChar, LUSkillsSelection.LUSKILLS_TYPE_CHARGEN, SkillWindow, RedrawSkills, [0,0,0], Levels,0,False)
 	
 	BackButton = SkillWindow.GetControl(25)
 	BackButton.SetText(15416)
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")	
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	RedrawSkills()
@@ -71,5 +72,5 @@ def OnLoad():
 
 def NextPress():
 	MyChar = GemRB.GetVar ("Slot")
-	SkillsSave(MyChar)
-	next()
+	LUSkillsSelection.SkillsSave(MyChar)
+	CharGenCommon.next()

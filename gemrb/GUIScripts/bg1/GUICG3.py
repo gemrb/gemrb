@@ -18,9 +18,10 @@
 #
 #character generation, alignment (GUICG3)
 import GemRB
-
-from CharGenCommon import * 
-from GUICommon import CloseOtherWindow, ClassTable
+from GUIDefines import *
+from ie_stats import *
+import CharGenCommon
+import GUICommon
 
 
 AlignmentWindow = 0
@@ -32,7 +33,7 @@ def OnLoad():
 	global AlignmentWindow, TextAreaControl, DoneButton
 	global AlignmentTable
 
-	if CloseOtherWindow (OnLoad):
+	if GUICommon.CloseOtherWindow (OnLoad):
 		if(AlignmentWindow):
 			AlignmentWindow.Unload()
 			AlignmentWindow = None
@@ -41,7 +42,7 @@ def OnLoad():
 	GemRB.SetVar("Alignment",-1)
 	
 	Class = GemRB.GetVar("Class")-1
-	KitName = ClassTable.GetRowName(Class)
+	KitName = GUICommon.ClassTable.GetRowName(Class)
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
@@ -65,7 +66,7 @@ def OnLoad():
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
 		else:
 			Button.SetState(IE_GUI_BUTTON_DISABLED)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "AlignmentPress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, AlignmentPress)
 		Button.SetVarAssoc("Alignment", i)
 
 	BackButton = AlignmentWindow.GetControl(13)
@@ -78,8 +79,8 @@ def OnLoad():
 	TextAreaControl = AlignmentWindow.GetControl(11)
 	TextAreaControl.SetText(9602)
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	AlignmentWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
@@ -95,4 +96,4 @@ def NextPress():
 	MyChar = GemRB.GetVar ("Slot")
 	Alignment = GemRB.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment)
-	next()
+	CharGenCommon.next()

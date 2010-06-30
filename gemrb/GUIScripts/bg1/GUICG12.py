@@ -18,9 +18,10 @@
 #
 #character generation, appearance (GUICG12)
 import GemRB
-
-from CharGenCommon import * 
-from GUICommon import CloseOtherWindow
+from GUIDefines import *
+from ie_stats import *
+import CharGenCommon
+import GUICommon
 
 
 AppearanceWindow = 0
@@ -41,7 +42,7 @@ def OnLoad():
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
 	global Gender
 
-	if CloseOtherWindow (OnLoad):
+	if GUICommon.CloseOtherWindow (OnLoad):
 		if(AppearanceWindow):AppearanceWindow.Unload()
 		AppearanceWindow = None
 		return
@@ -79,11 +80,11 @@ def OnLoad():
 	DoneButton.SetText (11973)
 	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
 
-	RightButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"RightPress")
-	LeftButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"LeftPress")
-	BackButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"BackPress")
-	CustomButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"CustomPress")
-	DoneButton.SetEventByName (IE_GUI_BUTTON_ON_PRESS,"NextPress")
+	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RightPress)
+	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeftPress)
+	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	CustomButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomPress)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
 	
 	flag = False 
 	while True:
@@ -132,7 +133,7 @@ def CustomDone():
 		Window.Unload ()
 	if AppearanceWindow:
 		AppearanceWindow.Unload ()
-	next()
+	CharGenCommon.next()
 	return
 
 def CustomAbort():
@@ -194,24 +195,24 @@ def CustomPress():
 	CustomWindow = Window = GemRB.LoadWindow (18)
 	PortraitList1 = Window.GetControl (2)
 	RowCount1 = PortraitList1.GetPortraits (0)
-	PortraitList1.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "LargeCustomPortrait")
+	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, LargeCustomPortrait)
 	GemRB.SetVar ("Row1", RowCount1)
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	PortraitList2 = Window.GetControl (4)
 	RowCount2 = PortraitList2.GetPortraits (1)
-	PortraitList2.SetEventByName (IE_GUI_TEXTAREA_ON_CHANGE, "SmallCustomPortrait")
+	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_CHANGE, SmallCustomPortrait)
 	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
 
 	Button = Window.GetControl (6)
 	Button.SetText (11973)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CustomDone")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomDone)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (7)
 	Button.SetText (15416)
-	Button.SetEventByName (IE_GUI_BUTTON_ON_PRESS, "CustomAbort")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomAbort)
 
 	Button = Window.GetControl (0)
 	PortraitName = PortraitsTable.GetRowName (LastPortrait)+"L"
@@ -231,7 +232,7 @@ def NextPress():
 	PortraitName = PortraitTable.GetRowName (LastPortrait )
 	GemRB.SetToken ("SmallPortrait", PortraitName+"S")
 	GemRB.SetToken ("LargePortrait", PortraitName+"L")
-	next()
+	CharGenCommon.next()
 	#GemRB.SetVar("Step",1)
 	#GemRB.SetNextScript("CharGen")
 	#GemRB.SetNextScript ("CharGen2") #Before race

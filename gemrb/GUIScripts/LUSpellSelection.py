@@ -21,6 +21,7 @@ import GemRB
 from math import ceil
 from GUIDefines import *
 from ie_stats import *
+from ie_restype import RES_BAM
 import GUICommon
 
 # storage variables
@@ -99,10 +100,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 		# cancel button only applicable for chargen
 		SpellsCancelButton = SpellsWindow.GetControl(29)
 		SpellsCancelButton.SetState(IE_GUI_BUTTON_ENABLED)
-		if recommend:
-			SpellsCancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsCancelPress)
-		else:
-			SpellsCancelButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS, "BackPress")
+		SpellsCancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsCancelPress)
 		SpellsCancelButton.SetText(13727)
 		SpellsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -173,7 +171,9 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 			if(EnhanceGUI):
 				# setup the scrollbar
 				ScrollBar = SpellsWindow.GetControl (1000)
-				ScrollBar.SetSprites ("GUISCRCW", 0, 0,1,2,3,5,4)
+				#FIXME: use other resources instead, this one is bg2-only
+				if GemRB.HasResource ("GUISCRCW", RES_BAM):
+					ScrollBar.SetSprites ("GUISCRCW", 0, 0,1,2,3,5,4)
 				ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ShowSpells)
 				ScrollBar.SetDefaultScrollBar ()
 
@@ -406,10 +406,16 @@ def SpellsCancelPress ():
 	# remove all learned spells
 	GUICommon.RemoveKnownSpells (pc, IE_SPELL_TYPE_WIZARD, 1, 9, 1)
 
-	# unload teh window and go back
-	if SpellsWindow:
-		SpellsWindow.Unload()
-	GemRB.SetNextScript("CharGen6") #haterace
+	if GUICommon.GameIsBG2():
+		# unload teh window and go back
+		if SpellsWindow:
+			SpellsWindow.Unload()
+		GemRB.SetNextScript("CharGen6") #haterace
+	elif GUICommon.GameIsBG1():
+		import CharGenCommon
+		CharGenCommon.BackPress()
+	else:
+		print "Uh-oh in SpellsCancelPress in", GemRB.GameType
 	return
 
 def SpellsPickPress ():

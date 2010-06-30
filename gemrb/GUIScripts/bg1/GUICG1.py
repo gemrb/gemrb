@@ -18,9 +18,11 @@
 #
 #character generation, gender (GUICG1)
 import GemRB
+from GUIDefines import *
+from ie_stats import *
 
-from CharGenCommon import * 
-from GUICommon import CloseOtherWindow
+import CharGenCommon
+import GUICommon
 
 GenderWindow = 0
 TextAreaControl = 0
@@ -29,7 +31,7 @@ DoneButton = 0
 def OnLoad():
 	global GenderWindow, TextAreaControl, DoneButton
 
-	if CloseOtherWindow (OnLoad):
+	if GUICommon.CloseOtherWindow (OnLoad):
 		if(GenderWindow):
 			GenderWindow.Unload()
 			GenderWindow = None
@@ -57,10 +59,10 @@ def OnLoad():
 	GemRB.SetVar("Gender",0)
 	MaleButton.SetVarAssoc("Gender",1)
 	FemaleButton.SetVarAssoc("Gender",2)
-	MaleButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"ClickedMale")
-	FemaleButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"ClickedFemale")
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	MaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClickedMale)
+	FemaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClickedFemale)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	GenderWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
@@ -80,5 +82,5 @@ def NextPress():
 	#GemRB.CreatePlayer ("charbase", MyChar | 0x8000 )
 	Gender = GemRB.GetVar ("Gender")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
-	next()
+	CharGenCommon.next()
 	return

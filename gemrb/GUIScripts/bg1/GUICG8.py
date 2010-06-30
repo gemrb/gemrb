@@ -18,9 +18,10 @@
 #
 #character generation, race (GUICG2)
 import GemRB
-
-from CharGenCommon import *
-from GUICommon import CloseOtherWindow, RaceTable
+from GUIDefines import *
+from ie_stats import *
+import CharGenCommon
+import GUICommon
 
 
 RaceWindow = 0
@@ -31,7 +32,7 @@ def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
 	global RaceTable
 
-	if CloseOtherWindow (OnLoad):
+	if GUICommon.CloseOtherWindow (OnLoad):
 		if(RaceWindow):
 			RaceWindow.Unload()
 			RaceWindow = None
@@ -42,16 +43,16 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG")
 	RaceWindow = GemRB.LoadWindow(8)
 
-	RaceCount = RaceTable.GetRowCount()
+	RaceCount = GUICommon.RaceTable.GetRowCount()
 
 	for i in range(2,RaceCount+2):
 		Button = RaceWindow.GetControl(i)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 	for i in range(2, RaceCount+2):
 		Button = RaceWindow.GetControl(i)
-		Button.SetText(RaceTable.GetValue(i-2,0) )
+		Button.SetText(GUICommon.RaceTable.GetValue(i-2,0) )
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"RacePress")
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RacePress)
 		Button.SetVarAssoc("Race",i-1)
 
 	BackButton = RaceWindow.GetControl(10)
@@ -64,19 +65,19 @@ def OnLoad():
 	TextAreaControl = RaceWindow.GetControl(8)
 	TextAreaControl.SetText(17237)
 
-	DoneButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"NextPress")
-	BackButton.SetEventByName(IE_GUI_BUTTON_ON_PRESS,"BackPress")
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
 	RaceWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def RacePress():
 	Race = GemRB.GetVar("Race")-1
-	TextAreaControl.SetText(RaceTable.GetValue(Race,1) )
+	TextAreaControl.SetText(GUICommon.RaceTable.GetValue(Race,1) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def NextPress():
 	Race = GemRB.GetVar ("Race") - 1
 	MyChar = GemRB.GetVar ("Slot")
-	GemRB.SetPlayerStat (MyChar, IE_RACE, RaceTable.GetValue (Race, 3))
-	next()
+	GemRB.SetPlayerStat (MyChar, IE_RACE, GUICommon.RaceTable.GetValue (Race, 3))
+	CharGenCommon.next()
