@@ -1,13 +1,11 @@
 
-Prototype: Control.SetEventByName(EventMask, FunctionName)
-           Control.SetEvent(EventMask, PythonFunction)
+Prototype: Control.SetEvent(EventMask, PythonFunction)
 
-Description: Sets an event of a control on a window to a named function
-defined in the currently loaded script's namespace.
+Description: Sets an event of a control on a window to a python function
 
 Parameters: 
 EventMask                  - a dword describing the event. Its high byte is actually the control's type.
-FunctionName               - must be shorter than 32 bytes
+PythonFunction             - the function object
 
 Implemented events:
 IE_GUI_BUTTON_ON_PRESS    = 0x00000000, the user pressed the button.
@@ -29,20 +27,17 @@ IE_GUI_SCROLLBAR_ON_CHANGE= 0x07000000, the scrollbar's knob position has change
 Return value: N/A
 
 Examples:
- Bar.SetEventByName (IE_GUI_PROGRESS_END_REACHED, "EndLoadScreen")
+ Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
  ...
  def EndLoadScreen ():
         Skull = GemRB.GetControl (LoadScreen, 1)
         GemRB.SetButtonMOS (LoadScreen, Skull, "GSKULON")
 The above example changes the image on the loadscreen when the progressbar reaches the end.
 
- Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, "YesButton")
-The above example sets up the 'YesButton' function to be called when the button was pressed.
+ Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Buttons.YesButton)
+The above example sets up the 'YesButton' function from the Buttons module to be called when the button is pressed.
 
- Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, "ChaPress")
-The above example shows how to implement 'context sensitive help'. the 'ChaPress' function displays a help text on the screen when you hover the mouse over a button.
+ Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, ChaPress)
+The above example shows how to implement 'context sensitive help'. The 'ChaPress' function displays a help text on the screen when you hover the mouse over a button.
 
-See also: GetControl, SetVarAssoc, accessing_gui_controls
-
-
-MD5: 08464003da92b1a1e4609a21c59bbf1c
+See also: GetControl, SetVarAssoc, SetTimedEvent, accessing_gui_controls
