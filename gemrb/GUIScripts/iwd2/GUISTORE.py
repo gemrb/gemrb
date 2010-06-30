@@ -149,9 +149,9 @@ def OpenStoreWindow ():
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseStoreWindow)
 
-	#Store type icon
-	Button = Window.GetControl (5)
-	Button.SetSprites (storebams[Store['StoreType']],0,0,0,0,0)
+	#Store type icon (not in iwd2)
+	#Button = Window.GetControl (5)
+	#Button.SetSprites (storebams[Store['StoreType']],0,0,0,0,0)
 
 	#based on shop type, these buttons will change
 	store_type = Store['StoreType']
@@ -176,7 +176,7 @@ def OpenStoreWindow ():
 	ActionWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_VISIBLE)
 	store_funcs[store_buttons[0]] ()
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	#PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def OpenStoreShoppingWindow ():
@@ -806,7 +806,7 @@ def RedrawStoreIdentifyWindow ():
 		else:
 			Slot = None
 		Button = Window.GetControl (i+8)
-		Label = Window.GetControl (0x1000000c+i)
+		Label = Window.GetControl (0x1000000d+i)
 		Button.SetVarAssoc ("Index", TopIndex+i)
 		if Slot != None:
 			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[TopIndex+i], ITEM_PC)
