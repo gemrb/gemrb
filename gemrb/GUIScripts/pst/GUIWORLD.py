@@ -27,6 +27,7 @@ import GemRB
 import GUIClasses
 import GUICommon
 import GUICommonWindows
+import CommonWindow
 from GUIDefines import *
 
 ContainerWindow = None
