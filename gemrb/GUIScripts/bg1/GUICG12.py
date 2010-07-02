@@ -43,8 +43,8 @@ def OnLoad():
 	global Gender
 
 	if GUICommon.CloseOtherWindow (OnLoad):
-		if(AppearanceWindow):AppearanceWindow.Unload()
-		AppearanceWindow = None
+		if(AppearanceWindow):
+			AppearanceWindow.Unload()
 		return
 
 	GemRB.LoadWindowPack("GUICG")
@@ -123,20 +123,21 @@ def LeftPress():
 			return
 
 def CustomDone():
-	Window = CustomWindow
+	global AppearanceWindow
 
+	Window = CustomWindow
 	Portrait = PortraitList1.QueryText ()
 	GemRB.SetToken ("LargePortrait", Portrait)
 	Portrait = PortraitList2.QueryText ()
 	GemRB.SetToken ("SmallPortrait", Portrait)
 	if Window:
 		Window.Unload ()
-	if AppearanceWindow:
-		AppearanceWindow.Unload ()
 	CharGenCommon.next()
 	return
 
 def CustomAbort():
+	global CustomWindow
+
 	if CustomWindow:
 		CustomWindow.Unload ()
 	return
@@ -237,10 +238,3 @@ def NextPress():
 	#GemRB.SetNextScript("CharGen")
 	#GemRB.SetNextScript ("CharGen2") #Before race
 	#return
-
-#def BackPress():
-#	if AppearanceWindow:
-#		AppearanceWindow.Unload ()
-#	GemRB.SetNextScript ("GUICG1")
-	#GemRB.SetVar ("Gender",0) #scrapping the gender value
-#	return
