@@ -5036,7 +5036,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 			char name[_MAX_PATH];
 
 			PathJoin(name, CD[disc_number-1][i].c_str(),path,NULL);
-			if (file_exists (path)) {
+			if (file_exists (name)) {
 				return;
 			}
 		}
