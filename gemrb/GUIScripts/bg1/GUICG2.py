@@ -84,8 +84,11 @@ def OnLoad():
 	if HasMulti == 0:
 		MultiClassButton.SetState(IE_GUI_BUTTON_DISABLED)
 
+	Allowed = GUICommon.ClassTable.GetValue ("MAGE", RaceName)
 	SpecialistButton = ClassWindow.GetControl(11)
 	SpecialistButton.SetText(11994)
+	if Allowed == 0:
+		SpecialistButton.SetState(IE_GUI_BUTTON_DISABLED)
 	
 	BackButton = ClassWindow.GetControl(14)
 	BackButton.SetText(15416)
