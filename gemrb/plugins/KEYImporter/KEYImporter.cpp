@@ -109,6 +109,7 @@ static void FindBIF(BIFEntry *entry)
 				entry->cd = cd;
 				break;
 			}
+			mask += mask;
 		}
 
 		if (!entry->cd) {
