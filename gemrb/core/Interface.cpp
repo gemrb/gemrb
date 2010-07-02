@@ -181,9 +181,7 @@ Interface::Interface(int iargc, char* iargv[])
 	CachePath[0] = 0;
 	GemRBOverridePath[0] = 0;
 	GameName[0] = 0;
-	for (i = 0; i < 6; i++) {
-		CD[i][0] = '\0';
-	}
+
 	strncpy( GameOverridePath, "override", sizeof(GameOverridePath) );
 	strncpy( GameSoundsPath, "sounds", sizeof(GameSoundsPath) );
 	strncpy( GameScriptsPath, "scripts", sizeof(GameScriptsPath) );
@@ -1318,11 +1316,13 @@ int Interface::Init()
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_DIRECTORY);
 
 		//IWD2 movies are on the CD but not in the BIF
-		for (i = 0; i < 6; i++) {
+		for (i = 0; i < MAX_CD; i++) {
 			char description[] = "CDi/data";
-			PathJoin( path, core->CD[i], core->GameDataPath, NULL);
-			description[2] = '1' + i;
-			gamedata->AddSource(path, description, PLUGIN_RESOURCE_DIRECTORY);
+			for (size_t j=0;j<core->CD[i].size();j++) {
+				PathJoin( path, core->CD[i][j].c_str(), core->GameDataPath, NULL);
+				description[2] = '1' + i;
+				gamedata->AddSource(path, description, PLUGIN_RESOURCE_DIRECTORY);
+			}
 		}
 
 		printStatus( "OK", LIGHT_GREEN );
@@ -1968,6 +1968,7 @@ bool Interface::LoadConfig(void)
 bool Interface::LoadConfig(const char* filename)
 {
 	FILE* config;
+	size_t i;
 
 	printMessage("Config","Trying to open ", WHITE);
 	textcolor(LIGHT_WHITE);
@@ -1999,7 +2000,7 @@ bool Interface::LoadConfig(const char* filename)
 		//the * element is not counted
 		if (fscanf( config, "%64[^= ] = %[^\r\n]%*[\r\n]", name, value )!=2)
 			continue;
-		for (int i=_MAX_PATH + 2; i > 0; i--) {
+		for (i=_MAX_PATH + 2; i > 0; i--) {
 			if (value[i] == '\0') continue;
 			if (value[i] == ' ') {
 				value[i] = '\0';
@@ -2060,13 +2061,6 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_PATH("GemRBPath", GemRBPath);
 		CONFIG_PATH("PluginsPath", PluginsPath);
 		CONFIG_PATH("SavePath", SavePath);
-		CONFIG_PATH("CD1", CD[0]);
-		CONFIG_PATH("CD2", CD[1]);
-		CONFIG_PATH("CD3", CD[2]);
-		CONFIG_PATH("CD4", CD[3]);
-		CONFIG_PATH("CD5", CD[4]);
-		CONFIG_PATH("CD6", CD[5]);
-#undef CONFIG_PATH
 		} else if (stricmp( name, "ModPath" ) == 0) {
 			for (char *path = strtok(value,SPathListSeparator);
 					path;
@@ -2077,7 +2071,21 @@ bool Interface::LoadConfig(const char* filename)
 			plugin_flags->SetAt( value, PLF_SKIP );
 		} else if (stricmp( name, "DelayPlugin" ) == 0) {
 			plugin_flags->SetAt( value, PLF_DELAY );
+		} else {
+			for(i=0;i<MAX_CD;i++) {
+				char keyname[10];
+
+				snprintf(keyname, 10, "CD%ld",i);
+				if (stricmp(name, keyname) == 0) {
+					for(char *path = strtok(value, SPathListSeparator);
+							path;
+							path = strtok(NULL,SPathListSeparator)) {
+						CD[i].push_back(path);
+					}
+				}
+			}
 		}
+#undef CONFIG_PATH
 	}
 	fclose( config );
 
@@ -2139,13 +2147,18 @@ bool Interface::LoadConfig(const char* filename)
 		ResolveFilePath(CachePath);
 	}
 
-	size_t i;
-	for (i = 0; i < 6; ++i) {
-		if (!CD[i][0]) {
+	for (i = 0; i < MAX_CD; ++i) {
+		if (!CD[i].size()) {
 			char cd[] = { 'C', 'D', '1'+i, '\0' };
-			PathJoin(CD[i], GamePath, cd, NULL);
+			char name[_MAX_PATH];
+
+			PathJoin(name, GamePath, cd, NULL);
+			CD[i].push_back(name);
 		} else {
-			ResolveFilePath( CD[i] );
+			size_t cnt = CD[i].size();
+			while(cnt--) {
+				ResolveFilePath( CD[i][cnt] );
+			}
 		}
 	}
 
@@ -5016,12 +5029,16 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 {
 	GetDictionary()->SetAt( "WaitForDisc", (ieDword) disc_number );
 
-	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 	do {
+		GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 		core->DrawWindows();
-		if (dir_exists (path)) {
-			GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
-			break;
+		for (size_t i=0;i<CD[disc_number-1].size();i++) {
+			char name[_MAX_PATH];
+
+			PathJoin(name, CD[disc_number-1][i].c_str(),path,NULL);
+			if (file_exists (path)) {
+				return;
+			}
 		}
 
 	} while (video->SwapBuffers() == GEM_OK);

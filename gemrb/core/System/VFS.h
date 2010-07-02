@@ -107,6 +107,7 @@ const char SPathListSeparator[] = { PathListSeparator, '\0' };
  */
 GEM_EXPORT bool FileGlob(char *target, const char* Dir, const char* glob);
 GEM_EXPORT bool dir_exists(const char* path);
+GEM_EXPORT bool file_exists(const char* path);
 
 /**
  * Joins NULL-terminated list of directories and copies it to 'target'.

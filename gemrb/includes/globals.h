@@ -212,5 +212,8 @@ inline bool valid_number(const char* string, long& val)
 //name too
 #define MAX_VARIABLE_LENGTH  40
 
+//the maximum supported game CD count
+#define MAX_CD               6
+
 #endif //! GLOBALS_H
 

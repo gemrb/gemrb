@@ -691,10 +691,10 @@ public:
 	char PluginsPath[_MAX_PATH];
 	char CachePath[_MAX_PATH];
 	char GUIScriptsPath[_MAX_PATH];
-	char GamePath[_MAX_PATH];
 	char SavePath[_MAX_PATH];
 	char INIConfig[_MAX_PATH];
-	char CD[6][_MAX_PATH];
+	char GamePath[_MAX_PATH];
+	std::vector<std::string> CD[MAX_CD];
 	std::vector<std::string> ModPath;
 	int Width, Height, Bpp, ForceStereo;
 	unsigned int TooltipDelay;

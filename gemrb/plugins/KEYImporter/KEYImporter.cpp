@@ -39,6 +39,7 @@ KEYImporter::~KEYImporter(void)
 	}
 }
 
+/*
 static bool exists(char *file)
 {
 	FILE *f = fopen( file, "rb" );
@@ -48,6 +49,7 @@ static bool exists(char *file)
 	}
 	return false;
 }
+*/
 
 static char* AddCBF(char *file)
 {
@@ -63,57 +65,65 @@ static char* AddCBF(char *file)
 	return cbf;
 }
 
+static bool PathExists(BIFEntry *entry, const char *path)
+{
+	PathJoin(entry->path, path, entry->name, NULL);
+	if (file_exists(entry->path)) {
+		return true;
+	}
+	PathJoin(entry->path, path, AddCBF(entry->name), NULL);
+	if (file_exists(entry->path)) {
+		return true;
+	}
+
+	return false;
+}
+
+static bool PathExists(BIFEntry *entry, std::vector<std::string> pathlist)
+{
+	size_t i;
+	
+	for(i=0;i<pathlist.size();i++) {
+printf("Trying %s of %ld\n", pathlist[i].c_str(), pathlist.size() );
+
+		if (PathExists(entry, pathlist[i].c_str() )) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 static void FindBIF(BIFEntry *entry)
 {
 	entry->cd = 0;
-
-	PathJoin(entry->path, core->GamePath, entry->name, NULL);
-	if (exists(entry->path)) {
-		entry->found = true;
-		return;
-	}
-
-	PathJoin(entry->path, core->GamePath, AddCBF(entry->name), NULL);
-	if (exists(entry->path)) {
-		entry->found = true;
+	entry->found = PathExists(entry, core->GamePath);
+	if (entry->found) {
 		return;
 	}
 
 	if (core->GameOnCD) {
-		if (( entry->BIFLocator & ( 1 << 2 ) ) != 0) {
-			entry->cd = 1;
-		} else if (( entry->BIFLocator & ( 1 << 3 ) ) != 0) {
-			entry->cd = 2;
-		} else if (( entry->BIFLocator & ( 1 << 4 ) ) != 0) {
-			entry->cd = 3;
-		} else if (( entry->BIFLocator & ( 1 << 5 ) ) != 0) {
-			entry->cd = 4;
-		} else if (( entry->BIFLocator & ( 1 << 6 ) ) != 0) {
-			entry->cd = 5;
-		} else if (( entry->BIFLocator & ( 1 << 7 ) ) != 0) {
-			entry->cd = 6;
-		} else {
+		int mask = 1<<2;
+		for(int cd = 1; cd<=MAX_CD; cd++) {
+			if ((entry->BIFLocator & mask) != 0) {
+				entry->cd = cd;
+				break;
+			}
+		}
+
+		if (!entry->cd) {
 			printStatus( "ERROR", LIGHT_RED );
 			printf( "Cannot find %s... Resource unavailable.\n",
 					entry->name );
 			entry->found = false;
 			return;
 		}
-		PathJoin(entry->path, core->CD[entry->cd-1], entry->name, NULL);
-		entry->found = false;
+		entry->found = PathExists(entry, core->CD[entry->cd-1]);
 		return;
 	}
 
-	for (int i = 0; i < 6; i++) {
-		PathJoin(entry->path, core->CD[i], entry->name, NULL);
-		if (exists(entry->path)) {
-			entry->found = true;
-			return;
-		}
-
-		//Trying CBF Extension
-		PathJoin(entry->path, core->CD[i], AddCBF(entry->name), NULL);
-		if (exists(entry->path)) {
+	for (int i = 0; i < MAX_CD; i++) {
+		if (PathExists(entry, core->CD[i]) ) {
 			entry->found = true;
 			return;
 		}
@@ -122,7 +132,6 @@ static void FindBIF(BIFEntry *entry)
 	printMessage( "KEYImporter", " ", WHITE );
 	printf( "Cannot find %s...", entry->name );
 	printStatus( "ERROR", LIGHT_RED );
-	entry->found = false;
 }
 
 bool KEYImporter::Open(const char *resfile, const char *desc)
@@ -225,26 +234,14 @@ bool KEYImporter::HasResource(const char* resname, const ResourceDesc &type)
 
 static void FindBIFOnCD(BIFEntry *entry)
 {
-	if (exists(entry->path)) {
+	if (file_exists(entry->path)) {
 		entry->found = true;
 		return;
 	}
 
-	core->WaitForDisc( entry->cd, core->CD[entry->cd-1] );
-	PathJoin(entry->path, core->CD[entry->cd-1], entry->name, NULL);
-	if (exists(entry->path)) {
-		entry->found = true;
-		return;
-	}
+	core->WaitForDisc( entry->cd, entry->path );
 
-	//Trying CBF Extension
-	PathJoin(entry->path, core->CD[entry->cd-1], AddCBF(entry->name), NULL);
-	if (exists(entry->path)) {
-		entry->found = true;
-		return;
-	}
-
-	entry->found = false;
+	entry->found = PathExists(entry, core->CD[entry->cd-1]);
 }
 
 DataStream* KEYImporter::GetStream(const char *resname, ieWord type)

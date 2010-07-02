@@ -38,6 +38,10 @@
 #define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
 #endif
 
+#ifndef S_ISREG
+#define S_ISREG(mode) (((mode) & S_IFMT) == S_IFREG)
+#endif
+
 #ifdef WIN32
 
 struct DIR {
@@ -246,6 +250,15 @@ bool dir_exists(const char* path)
 	return S_ISDIR( buf.st_mode ) != 0;
 }
 
+/** Returns true if path is an existing directory */
+bool file_exists(const char* path)
+{
+	struct stat buf;
+
+	buf.st_mode = 0;
+	stat( path, &buf );
+	return S_ISREG( buf.st_mode ) != 0;
+}
 
 
 /**
