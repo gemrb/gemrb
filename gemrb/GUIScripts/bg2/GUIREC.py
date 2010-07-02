@@ -164,7 +164,7 @@ def UpdateRecordsWindow ():
 	Kit = GUICommon.GetKitIndex (pc)
 	if Kit and GUICommon.KitListTable.GetValue (Kit, 7) == 1:
 		MageTable = GemRB.LoadTable ("magesch")
-		GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, KitListTable.GetValue (Kit, 6) ) )
+		GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, GUICommon.KitListTable.GetValue (Kit, 6) ) )
 
 	# exportable
 	Button = Window.GetControl (36)
