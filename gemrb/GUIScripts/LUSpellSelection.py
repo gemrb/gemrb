@@ -80,7 +80,13 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 	SpellsKnownTable = GemRB.LoadTable (table)
 	if not SpellsKnownTable.GetValue (str(level), str(1), 1):
 		if chargen:
-			GemRB.SetNextScript("GUICG6")
+			if GUICommon.GameIsBG2():
+				# HACK
+				GemRB.SetNextScript("GUICG6")
+			elif GUICommon.GameIsBG1():
+				# HACK
+				from CharGenCommon import next
+				next()
 		return
 
 	# load our window
@@ -250,6 +256,7 @@ def SpellsDonePress ():
 	# move to the next script if this is chargen
 	if chargen:
 		if GUICommon.GameIsBG2():
+			# HACK
 			GemRB.SetNextScript("GUICG6")
 		elif GUICommon.GameIsBG1():
 			# HACK
