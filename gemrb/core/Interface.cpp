@@ -2075,7 +2075,7 @@ bool Interface::LoadConfig(const char* filename)
 			for(i=0;i<MAX_CD;i++) {
 				char keyname[10];
 
-				snprintf(keyname, 10, "CD%ld",i);
+				snprintf(keyname, 10, "CD%d",(unsigned int)i);
 				if (stricmp(name, keyname) == 0) {
 					for(char *path = strtok(value, SPathListSeparator);
 							path;
