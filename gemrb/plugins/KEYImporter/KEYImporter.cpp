@@ -84,8 +84,6 @@ static bool PathExists(BIFEntry *entry, std::vector<std::string> pathlist)
 	size_t i;
 	
 	for(i=0;i<pathlist.size();i++) {
-printf("Trying %s of %ld\n", pathlist[i].c_str(), pathlist.size() );
-
 		if (PathExists(entry, pathlist[i].c_str() )) {
 			return true;
 		}
