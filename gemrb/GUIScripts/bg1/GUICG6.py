@@ -65,6 +65,7 @@ def OnLoad():
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 
 	RedrawSkills()
 	SkillWindow.ShowModal(MODAL_SHADOW_NONE)
@@ -73,4 +74,5 @@ def OnLoad():
 def NextPress():
 	MyChar = GemRB.GetVar ("Slot")
 	LUSkillsSelection.SkillsSave(MyChar)
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	CharGenCommon.next()
