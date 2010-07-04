@@ -3378,6 +3378,33 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 }
 
 
+PyDoc_STRVAR( GemRB_VerbalConstant__doc,
+"VerbalConstant(SoundResource, xpos, ypos, type)\n\n"
+"Plays a Character's SoundSet entry." );
+
+static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
+{
+        int PartyID, str;
+
+        if (!PyArg_ParseTuple( args, "ii", &PartyID, &str )) {
+                return AttributeError( GemRB_VerbalConstant__doc );
+        }
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor *actor = game->FindPC(PartyID);
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+
+	DisplayStringCore(actor, str, DS_CONST);
+        Py_INCREF( Py_None );
+        return Py_None;
+}
+
+
 PyDoc_STRVAR( GemRB_PlaySound__doc,
 "PlaySound(SoundResource, xpos, ypos, type)\n\n"
 "Plays a Sound." );
@@ -9345,6 +9372,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
 	METHOD(UpdateMusicVolume, METH_NOARGS),
 	METHOD(UseItem, METH_VARARGS),
+	METHOD(VerbalConstant, METH_VARARGS),
 	// terminating entry
 	{NULL, NULL, 0, NULL}
 };
