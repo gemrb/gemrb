@@ -182,6 +182,7 @@ def CreatePress ():
 	DoneButton = GameTypeWindow.GetControl (2)
 	DoneButton.SetText (11973)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GameTypeDonePress)
+	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	FullGameButton = GameTypeWindow.GetControl (4)
 	FullGameButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
