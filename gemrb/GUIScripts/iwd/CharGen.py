@@ -27,6 +27,7 @@ from GUIDefines import *
 from ie_stats import *
 import GUICommon
 import LUSkillsSelection
+from ie_spells import LS_MEMO
 
 CharGenWindow = 0
 CharGenState = 0

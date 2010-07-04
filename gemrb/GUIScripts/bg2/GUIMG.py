@@ -26,6 +26,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 import GUICommon
+from ie_spells import LS_MEMO
 
 MageWindow = None
 MageSpellInfoWindow = None
