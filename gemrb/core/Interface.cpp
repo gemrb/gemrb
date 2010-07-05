@@ -5026,14 +5026,15 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 {
 	GetDictionary()->SetAt( "WaitForDisc", (ieDword) disc_number );
 
+	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 	do {
-		GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 		core->DrawWindows();
 		for (size_t i=0;i<CD[disc_number-1].size();i++) {
 			char name[_MAX_PATH];
 
 			PathJoin(name, CD[disc_number-1][i].c_str(),path,NULL);
 			if (file_exists (name)) {
+				GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 				return;
 			}
 		}
