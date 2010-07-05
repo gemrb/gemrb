@@ -2060,6 +2060,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_PATH("GemRBPath", GemRBPath);
 		CONFIG_PATH("PluginsPath", PluginsPath);
 		CONFIG_PATH("SavePath", SavePath);
+#undef CONFIG_PATH
 		} else if (stricmp( name, "ModPath" ) == 0) {
 			for (char *path = strtok(value,SPathListSeparator);
 					path;
@@ -2082,7 +2083,6 @@ bool Interface::LoadConfig(const char* filename)
 				}
 			}
 		}
-#undef CONFIG_PATH
 	}
 	fclose( config );
 
