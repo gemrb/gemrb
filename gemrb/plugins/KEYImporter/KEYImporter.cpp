@@ -238,7 +238,7 @@ static void FindBIFOnCD(BIFEntry *entry)
 		return;
 	}
 
-	core->WaitForDisc( entry->cd, entry->path );
+	core->WaitForDisc(entry->cd, entry->name);
 
 	entry->found = PathExists(entry, core->CD[entry->cd-1]);
 }

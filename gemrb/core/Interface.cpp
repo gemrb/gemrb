@@ -1317,10 +1317,9 @@ int Interface::Init()
 
 		//IWD2 movies are on the CD but not in the BIF
 		for (i = 0; i < MAX_CD; i++) {
-			char description[] = "CDi/data";
 			for (size_t j=0;j<core->CD[i].size();j++) {
+				char description[] = {'C', 'D', '1'+i, '/', 'd', 'a', 't', 'a', '\0'};
 				PathJoin( path, core->CD[i][j].c_str(), core->GameDataPath, NULL);
-				description[2] = '1' + i;
 				gamedata->AddSource(path, description, PLUGIN_RESOURCE_DIRECTORY);
 			}
 		}
@@ -2061,6 +2060,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_PATH("GemRBPath", GemRBPath);
 		CONFIG_PATH("PluginsPath", PluginsPath);
 		CONFIG_PATH("SavePath", SavePath);
+#undef CONFIG_PATH
 		} else if (stricmp( name, "ModPath" ) == 0) {
 			for (char *path = strtok(value,SPathListSeparator);
 					path;
@@ -2073,9 +2073,7 @@ bool Interface::LoadConfig(const char* filename)
 			plugin_flags->SetAt( value, PLF_DELAY );
 		} else {
 			for(i=0;i<MAX_CD;i++) {
-				char keyname[10];
-
-				snprintf(keyname, 10, "CD%d",(unsigned int)i);
+				char keyname[] = { 'C', 'D', '1'+i, '\0' };
 				if (stricmp(name, keyname) == 0) {
 					for(char *path = strtok(value, SPathListSeparator);
 							path;
@@ -2085,7 +2083,6 @@ bool Interface::LoadConfig(const char* filename)
 				}
 			}
 		}
-#undef CONFIG_PATH
 	}
 	fclose( config );
 
@@ -5029,14 +5026,15 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 {
 	GetDictionary()->SetAt( "WaitForDisc", (ieDword) disc_number );
 
+	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 	do {
-		GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 		core->DrawWindows();
 		for (size_t i=0;i<CD[disc_number-1].size();i++) {
 			char name[_MAX_PATH];
 
 			PathJoin(name, CD[disc_number-1][i].c_str(),path,NULL);
 			if (file_exists (name)) {
+				GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 				return;
 			}
 		}
