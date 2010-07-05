@@ -1,5 +1,5 @@
 bin_PROGRAMS = gemrb
-sysconf_DATA = GemRB.cfg.sample GemRB.cfg.subdir.sample
+sysconf_DATA = GemRB.cfg.sample
 gemrb_SOURCES = GemRB.cpp 
 
 gemrb_LDADD =  ./core/libgemrb_core.la
