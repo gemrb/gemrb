@@ -65,6 +65,7 @@ typedef unsigned long SClass_ID;
 #define IE_TOH_CLASS_ID			0x00070000
 #define IE_TOT_CLASS_ID			0x00080000
 #define IE_VAR_CLASS_ID			0x00090000
+#define IE_VEF_CLASS_ID			0x000003FC
 #define IE_VVC_CLASS_ID			0x000003FB
 #define IE_WAV_CLASS_ID			0x00000004
 #define IE_WED_CLASS_ID			0x000003E9
