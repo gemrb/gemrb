@@ -77,19 +77,19 @@ TooltipDelay=500
 #AudioDriver = openal
 
 # Volume of ambient sounds
-VolumeAmbients = 100
+#VolumeAmbients = 100
 
 # Volume during movie playback
-VolumeMovie = 100
+#VolumeMovie = 100
 
 # Volume of background music
-VolumeMusic = 100
+#VolumeMusic = 100
 
 # Volume of sound effects
-VolumeSFX = 100
+#VolumeSFX = 100
 
 # Volume of PC or NPC voices
-VolumeVoices = 100
+#VolumeVoices = 100
 
 #####################################################
 #  Case Sensitive Filesystem [Boolean]              #
@@ -100,9 +100,27 @@ VolumeVoices = 100
 #  effect on Windows                                #
 #####################################################
 
-CaseSensitive=1
+#CaseSensitive=1
 
 #GameOnCD=0
+
+#####################################################
+#  GUI Parameters                                   #
+#####################################################
+#                                                   #
+# GemRB may enhance the GUI of the Infinity Engine  #
+# games (so far only in bg2) creating functionally  #
+# new buttons or scrollbars where they weren't      #
+# present in original games. It may improve its     #
+# usability, but is not quite compatible with       #
+# mods changing graphics and alignment in the *.chu #
+# files (e.g. the buttons will appear in old        #
+# coordinates and may stop being clickable).        #
+#####################################################
+
+# Enable all gui enhancements ? [Boolean]
+GUIEnhancements = 1
+
 
 #####################################################
 #  Debug                                            #
@@ -141,15 +159,6 @@ CD4=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD4/
 CD5=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD5/
 
 #####################################################
-#  GemRB Path [String]                              #
-#                                                   #
-#  This is the path where GemRB is stored, just     #
-#  enter the full path to the GemRB executable      #
-#####################################################
-
-GemRBPath=./
-
-#####################################################
 #  GemRB Cache Path [String]                        #
 #                                                   #
 #  This is the path where GemRB will store the      #
@@ -158,31 +167,6 @@ GemRBPath=./
 #####################################################
 
 CachePath=./Cache/
-
-#####################################################
-#  GemRB GUI Scripts Path [String]                  #
-#                                                   #
-#  This is the path where GemRB GUI scripts are     #
-#  stored, usually these are in the GemRB directory #
-#  Enter the full path to the directory containing  #
-#  the 'GUIScript' subdirectory.                    #
-#####################################################
-
-GUIScriptsPath=./
-
-#####################################################
-#  GemRB Plugins Path [String]                      #
-#                                                   #
-#  This is the path containing GemRB plugins        #
-#  - shared libraries (.so) on Unixes, or           #
-#  DLLs (.dll) on windows.                          #
-#  Enter the full path to the directory.            #
-#                                                   #
-#  You may need to specify this path if running     #
-#  GemRB from source directory on Linux.            #
-#####################################################
-
-#PluginsPath=./plugins/
 
 #####################################################
 #  GemRB Save Path [String]                         #
@@ -197,6 +181,45 @@ GUIScriptsPath=./
 #####################################################
 
 #SavePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/
+
+###### HERE BE DRAGONS #############################
+###### HERE BE DRAGONS #############################
+###### HERE BE DRAGONS #############################
+# You shouldn't need to change anything below this point.
+
+#####################################################
+#  GemRB Path [String]                              #
+#                                                   #
+#  This is the path where GemRB is stored, just     #
+#  enter the full path to the GemRB executable      #
+#####################################################
+
+#GemRBPath=./
+
+#####################################################
+#  GemRB GUI Scripts Path [String]                  #
+#                                                   #
+#  This is the path where GemRB GUI scripts are     #
+#  stored, usually these are in the GemRB directory #
+#  Enter the full path to the directory containing  #
+#  the 'GUIScript' subdirectory.                    #
+#####################################################
+
+#GUIScriptsPath=./
+
+#####################################################
+#  GemRB Plugins Path [String]                      #
+#                                                   #
+#  This is the path containing GemRB plugins        #
+#  - shared libraries (.so) on Unixes, or           #
+#  DLLs (.dll) on windows.                          #
+#  Enter the full path to the directory.            #
+#                                                   #
+#  You may need to specify this path if running     #
+#  GemRB from source directory on Linux.            #
+#####################################################
+
+#PluginsPath=./plugins/
 
 #####################################################
 #  Game Data Path [String]                          #
@@ -230,23 +253,6 @@ GUIScriptsPath=./
 #####################################################
 
 #GemRBOverridePath=/usr/share/games/gemrb
-
-#####################################################
-#  GUI Parameters                                   #
-#####################################################
-#                                                   #
-# GemRB may enhance the GUI of the Infinity Engine  #
-# games (so far only in bg2) creating functionally  #
-# new buttons or scrollbars where they weren't      #
-# present in original games. It may improve its     #
-# usability, but is not quite compatible with       #
-# mods changing graphics and alignment in the *.chu #
-# files (e.g. the buttons will appear in old        #
-# coordinates and may stop being clickable).        #
-#####################################################
-
-# Enable all gui enhancements ? [Boolean]
-GUIEnhancements = 1
 
 #####################################################
 #  END                                              #
