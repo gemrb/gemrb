@@ -3379,16 +3379,17 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_VerbalConstant__doc,
-"VerbalConstant(SoundResource, xpos, ypos, type)\n\n"
+"VerbalConstant(PartyID, str)\n\n"
 "Plays a Character's SoundSet entry." );
 
 static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 {
-        int PartyID, str;
+	int PartyID, str;
+	char Sound[_MAX_PATH];
 
-        if (!PyArg_ParseTuple( args, "ii", &PartyID, &str )) {
-                return AttributeError( GemRB_VerbalConstant__doc );
-        }
+	if (!PyArg_ParseTuple( args, "ii", &PartyID, &str )) {
+		return AttributeError( GemRB_VerbalConstant__doc );
+	}
 
 	Game *game = core->GetGame();
 	if (!game) {
@@ -3399,9 +3400,16 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 
-	DisplayStringCore(actor, str, DS_CONST);
-        Py_INCREF( Py_None );
-        return Py_None;
+	if (str<0 || str>=VCONST_COUNT) {
+		return AttributeError( "SoundSet Entry is too large" );
+	}
+
+	//get soundset based string constant
+	snprintf(Sound, _MAX_PATH, "%s/%s%02d",
+		actor->PCStats->SoundFolder, actor->PCStats->SoundSet, str);
+	core->GetAudioDrv()->Play( Sound, 0, 0,  GEM_SND_RELATIVE|GEM_SND_SPEECH);
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 

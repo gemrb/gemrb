@@ -39,18 +39,6 @@ KEYImporter::~KEYImporter(void)
 	}
 }
 
-/*
-static bool exists(char *file)
-{
-	FILE *f = fopen( file, "rb" );
-	if (f) {
-		fclose(f);
-		return true;
-	}
-	return false;
-}
-*/
-
 static char* AddCBF(char *file)
 {
 	// This is safe in single-threaded, since the

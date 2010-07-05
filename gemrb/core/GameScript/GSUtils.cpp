@@ -365,6 +365,7 @@ bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags)
 void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 {
 	StringBlock sb;
+	char Sound[_MAX_PATH];
 
 	//no one hears you when you are in the Limbo!
 	if (!Sender->GetCurrentArea()) {
@@ -372,6 +373,7 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 	}
 
 	memset(&sb,0,sizeof(sb));
+	Sound[0]=0;
 	printf( "Displaying string on: %s\n", Sender->GetScriptName() );
 	if (flags & DS_CONST) {
 		if (Sender->Type!=ST_ACTOR) {
@@ -388,6 +390,12 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 		if (tmp <= 0 || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
 			//get soundset based string constant
 			actor->ResolveStringConstant( sb.Sound, (unsigned int) Strref);
+			if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
+				snprintf(Sound, _MAX_PATH, "%s/%s",
+					 actor->PCStats->SoundFolder, sb.Sound);
+			} else {
+				memcpy(Sound, sb.Sound, sizeof(ieStrRef) );
+			}
 		}
 		Strref = tmp;
 
@@ -420,10 +428,10 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 			core->FreeString( sb.text );
 		}
 	}
-	if (sb.Sound[0] && !(flags&DS_SILENT) ) {
+	if (Sound[0] && !(flags&DS_SILENT) ) {
 		ieDword speech = GEM_SND_RELATIVE; //disable position
 		if (flags&DS_SPEECH) speech|=GEM_SND_SPEECH;
-		ieDword len = core->GetAudioDrv()->Play( sb.Sound,0,0,speech );
+		ieDword len = core->GetAudioDrv()->Play( Sound,0,0,speech );
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 		if ((counter != 0) && (flags &DS_WAIT) )
 			Sender->SetWait( counter );

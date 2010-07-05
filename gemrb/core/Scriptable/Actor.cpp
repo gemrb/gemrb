@@ -5064,9 +5064,14 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index)
 
 void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
 {
-	//resolving soundset (bg1/bg2 style)
-	if (PCStats && PCStats->SoundSet[0]&& csound[index]) {
-		snprintf(Sound, sizeof(ieResRef), "%s%c", PCStats->SoundSet, csound[index]);
+	if (PCStats && PCStats->SoundSet[0]) {
+		//resolving soundset (bg1/bg2 style)
+		if (csound[index]) {
+			snprintf(Sound, sizeof(ieResRef), "%s%c", PCStats->SoundSet, csound[index]);
+			return;
+		}
+		//icewind style
+		snprintf(Sound, sizeof(ieResRef), "%s%02d", PCStats->SoundSet, index);
 		return;
 	}
 

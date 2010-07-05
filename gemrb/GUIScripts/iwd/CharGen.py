@@ -308,6 +308,8 @@ def CancelPress():
 
 def AcceptPress():
 	#mage spells
+	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
+	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	TableName = GUICommon.ClassSkillsTable.GetValue (Class, 2, 0)
 	if TableName != "*":
 		#todo: set up ALL spell levels not just level 1
@@ -328,12 +330,18 @@ def AcceptPress():
 	#priest spells
 	TableName = GUICommon.ClassSkillsTable.GetValue (Class, 1, 0)
 	if TableName != "*":
-		#there is no separate druid table, falling back to priest
-		if TableName == "MXSPLDRU":
+		if TableName == "MXSPLPRS" or TableName == "MXSPLPAL":
+			ClassFlag = 0x8000
+		elif TableName == "MXSPLDRU":
+			#there is no separate druid table, falling back to priest
 			TableName = "MXSPLPRS"
+			ClassFlag = 0x4000
+		elif TableName == "MXSPLRAN":
+			ClassFlag = 0x4000
+		else:
+			ClassFlag = 0
 		#todo: set up ALL spell levels not just level 1
 		GUICommon.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
-		ClassFlag = 0 #set this according to class
 		Learnable = GUICommon.GetLearnablePriestSpells( ClassFlag, t, 1)
 		for i in range (len(Learnable) ):
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
@@ -347,7 +355,7 @@ def AcceptPress():
 	LUSkillsSelection.SkillsSave (MyChar)
 
 	TmpTable = GemRB.LoadTable ("repstart")
-	t=AlignmentTable.FindValue (3, t)
+	t = AlignmentTable.FindValue (3, t)
 	t = TmpTable.GetValue (t, 0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 	# set the party rep if this in the main char
@@ -383,6 +391,7 @@ def AcceptPress():
 	#GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability6"))
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
+	print "XP:", GUICommon.ClassSkillsTable.GetValue (Class, 3)
 	GemRB.SetPlayerStat (MyChar, IE_XP, GUICommon.ClassSkillsTable.GetValue (Class, 3) )
 
 	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
@@ -545,9 +554,9 @@ def SetCharacterDescription():
 			TextArea.Append (11028, -1)
 			TextArea.Append (": " )
 			t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-			if IsArcane=="MXSPLPRS" or IsArcane =="MXSPLPAL":
+			if IsArcane == "MXSPLPRS" or IsArcane == "MXSPLPAL":
 				ClassFlag = 0x4000
-			elif IsArcane=="MXSPLDRU" or IsArcane =="MXSPLRAN":
+			elif IsArcane == "MXSPLDRU" or IsArcane == "MXSPLRAN":
 				ClassFlag = 0x8000
 			else:
 				ClassFlag = 0
@@ -2572,12 +2581,12 @@ def CharSoundPlayPress():
 
 	GemRB.SetPlayerSound (MyChar, row)
 
+	#play sound as sound slot
+	GemRB.VerbalConstant (MyChar, int(VerbalConstants[SoundIndex]))
+
 	SoundIndex += 1
 	if SoundIndex >= len(VerbalConstants):
 		SoundIndex = 0
-
-	#play sound as sound slot
-	GemRB.VerbalConstant (MyChar, int(VerbalConstants[SoundIndex]))
 	return
 
 def CharSoundDonePress():
