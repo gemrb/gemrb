@@ -223,6 +223,7 @@ def OnLoad():
 
 	PortraitButton = CharGenWindow.GetControl (12)
 	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	PortraitButton.SetState (IE_GUI_BUTTON_LOCKED)
 
 	ImportButton = CharGenWindow.GetControl (13)
 	ImportButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -303,7 +304,7 @@ def CancelPress():
 
 	if CharGenWindow:
 		CharGenWindow.Unload ()
-	GemRB.SetNextScript("PartyFormation")
+	GemRB.SetNextScript ("PartyFormation")
 	return
 
 def AcceptPress():
@@ -313,8 +314,8 @@ def AcceptPress():
 	TableName = GUICommon.ClassSkillsTable.GetValue (Class, 2, 0)
 	if TableName != "*":
 		#todo: set up ALL spell levels not just level 1
-		GUICommon.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
-		Learnable = GUICommon.GetLearnableMageSpells( KitIndex, t, 1)
+		GUICommon.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
+		Learnable = GUICommon.GetLearnableMageSpells (KitIndex, t, 1)
 		SpellBook = GemRB.GetVar ("MageSpellBook")
 		MemoBook = GemRB.GetVar ("MageMemorized")
 		j=1
@@ -341,11 +342,11 @@ def AcceptPress():
 		else:
 			ClassFlag = 0
 		#todo: set up ALL spell levels not just level 1
-		GUICommon.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
-		Learnable = GUICommon.GetLearnablePriestSpells( ClassFlag, t, 1)
+		GUICommon.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
+		Learnable = GUICommon.GetLearnablePriestSpells (ClassFlag, t, 1)
 		for i in range (len(Learnable) ):
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
-	
+
 	# ranger tracking is a hardcoded innate
 	if GUICommon.HasHOW():
 		if GUICommon.ClassSkillsTable.GetValue (GemRB.GetPlayerStat (MyChar, IE_CLASS), 0) != "*":
@@ -361,7 +362,7 @@ def AcceptPress():
 	# set the party rep if this in the main char
 	if MyChar == 1:
 		GemRB.GameSetReputation (t)
-	
+
 	TmpTable = GemRB.LoadTable ("strtgold")
 	a = TmpTable.GetValue (Class, 1) #number of dice
 	b = TmpTable.GetValue (Class, 0) #size
@@ -408,8 +409,8 @@ def AcceptPress():
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 
 	#10 is a weapon slot (see slottype.2da row 10)
-	GemRB.CreateItem(MyChar, "staf01", 10, 1, 0, 0)
-	GemRB.SetEquippedQuickSlot(MyChar, 0)
+	GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
+	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	if CharGenWindow:
 		CharGenWindow.Unload ()
@@ -693,7 +694,7 @@ def PortraitSelect():
 
 	while PortraitsTable.GetValue (Portrait, 0) != GemRB.GetPlayerStat (MyChar, IE_SEX):
 		Portrait = Portrait + 1
-	PortraitPortraitButton.SetPicture(PortraitsTable.GetRowName (Portrait) + "G")
+	PortraitPortraitButton.SetPicture (PortraitsTable.GetRowName (Portrait) + "G")
 
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
@@ -707,7 +708,7 @@ def CGPortraitLeftPress():
 		if Portrait < 0:
 			Portrait = PortraitsTable.GetRowCount () - 1
 		if PortraitsTable.GetValue (Portrait, 0) == GemRB.GetPlayerStat(MyChar, IE_SEX):
-			PortraitPortraitButton.SetPicture(PortraitsTable.GetRowName (Portrait) + "G")
+			PortraitPortraitButton.SetPicture (PortraitsTable.GetRowName (Portrait) + "G")
 			return
 
 def CGPortraitRightPress():
@@ -716,10 +717,10 @@ def CGPortraitRightPress():
 
 	while True:
 		Portrait = Portrait + 1
-		if Portrait == PortraitsTable.GetRowCount ():
+		if Portrait == PortraitsTable.GetRowCount():
 			Portrait = 0
 		if PortraitsTable.GetValue (Portrait, 0) == GemRB.GetPlayerStat(MyChar, IE_SEX):
-			PortraitPortraitButton.SetPicture(PortraitsTable.GetRowName (Portrait) + "G")
+			PortraitPortraitButton.SetPicture (PortraitsTable.GetRowName (Portrait) + "G")
 			return
 
 def CustomDone():
@@ -824,7 +825,7 @@ def PortraitCustomPress():
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (7)
-	Button.SetText (13727) 
+	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomAbort)
 
 	Button = Window.GetControl (0)
@@ -2372,7 +2373,7 @@ def AppearancePress():
 	else:
 		PortraitName = PortraitsTable.GetRowName (Portrait)
 		PortraitIndex = AppearanceTable.GetRowIndex (PortraitName + "L")
-	
+
 	HairColor = AppearanceTable.GetValue (PortraitIndex, 1)
 	GemRB.SetVar ("HairColor", HairColor)
 	SkinColor = AppearanceTable.GetValue (PortraitIndex, 2)
@@ -2543,7 +2544,7 @@ def CharSoundSelect():
 	CharSoundTable = GemRB.LoadTable ("CHARSND")
 	CharSoundStrings = GemRB.LoadTable ("CHARSTR")
 
-	VerbalConstants =  [CharSoundTable.GetRowName(i) for i in range(CharSoundTable.GetRowCount())] 
+	VerbalConstants =  [CharSoundTable.GetRowName(i) for i in range(CharSoundTable.GetRowCount())]
 	print VerbalConstants
 
 	CharSoundVoiceList = CharSoundWindow.GetControl (45)
@@ -2736,8 +2737,10 @@ def ImportPress():
 	TextAreaControl = ImportWindow.GetControl(4)
 	TextAreaControl.SetText(10963)
 
+	GemRB.SetVar ("Selected", 0)
 	CharImportList = ImportWindow.GetControl(2)
 	CharImportList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
+	CharImportList.SetVarAssoc ("Selected",0)
 	CharImportList.GetCharacters()
 
 	ImportDoneButton = ImportWindow.GetControl (0)
@@ -2757,14 +2760,20 @@ def ImportPress():
 
 def ImportDonePress():
 	global CharGenWindow, ImportWindow, CharImportList
-	global CharGenState, SkillsState
+	global CharGenState, SkillsState, Portrait
 
 	# Import the character from the chosen name
 	GemRB.CreatePlayer (CharImportList.QueryText(), MyChar|0x8000, 1)
 
+	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (MyChar, 1) )
+	PortraitName = GemRB.GetPlayerPortrait (MyChar, 0)
+	GemRB.SetToken ("LargePortrait", PortraitName )
+	PortraitButton.SetPicture (PortraitName)
+	Portrait = -1
+
 	CharGenState = 7
 	SkillsState = 5
-	SetCharacterDescription()
+	SetCharacterDescription ()
 	GenderButton.SetState (IE_GUI_BUTTON_DISABLED)
 	GenderButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_NAND)
 	RaceButton.SetState (IE_GUI_BUTTON_DISABLED)

@@ -64,6 +64,7 @@ def OnLoad ():
 			Button.SetPicture (ResRef)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 			Portraits = Portraits+1
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 		CreateCharButton = PartyFormationWindow.GetControl (i)
 		CreateCharButton.SetVarAssoc ("Slot", i-17)
