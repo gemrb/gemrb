@@ -1550,13 +1550,19 @@ def SkillsPress():
 			SkillRaceTable = GemRB.LoadTable ("SKILLRAC")
 			SkillDexterityTable = GemRB.LoadTable ("SKILLDEX")
 			Dexterity = str(GemRB.GetPlayerStat (MyChar, IE_DEX) )
-			GemRB.SetVar ("Skill0", SkillRaceTable.GetValue (RaceName, "STEALTH") + SkillDexterityTable.GetValue(Dexterity, "STEALTH") + GemRB.LoadTable("SKILLRNG").GetValue(str(Level), "STEALTH"))
+			Skill = SkillRaceTable.GetValue (RaceName, "STEALTH")
+			Skill = Skill + SkillDexterityTable.GetValue(Dexterity, "STEALTH")
+			Skill = Skill + GemRB.LoadTable("SKILLRNG").GetValue(str(Level), "STEALTH")
+			GemRB.SetPlayerStat (MyChar, IE_STEALTH, Skill)
 			RacialEnemySelect()
 		elif IsBard!="*":
 			SkillRaceTable = GemRB.LoadTable ("SKILLRAC")
 			SkillDexterityTable = GemRB.LoadTable ("SKILLDEX")
 			Dexterity = str(GemRB.GetPlayerStat (MyChar, IE_DEX) )
-			GemRB.SetVar ("Skill2", SkillRaceTable.GetValue (RaceName, "PICK_POCKETS") + SkillDexterityTable.GetValue(Dexterity, "PICK_POCKETS") + GemRB.LoadTable(IsBard).GetValue(str(Level), "PICK_POCKETS"))
+			Skill = SkillRaceTable.GetValue (RaceName, "PICK_POCKETS")
+			Skill = Skill + SkillDexterityTable.GetValue(Dexterity, "PICK_POCKETS")
+			Skill = Skill + GemRB.LoadTable(IsBard).GetValue(str(Level), "PICK_POCKETS")
+			GemRB.SetPlayerStat (MyChar, IE_PICKPOCKET, Skill)
 			SkillsState = 1
 		else:
 			SkillsState = 1
@@ -1608,7 +1614,6 @@ def SkillsPress():
 		SetCharacterDescription()
 	return
 
-
 def SkillsSelect():
 	global CharGenWindow, SkillsWindow, SkillsTextArea, SkillsDoneButton, SkillsPointsLeft
 
@@ -1619,39 +1624,50 @@ def SkillsSelect():
 	SkillRaceTable = GemRB.LoadTable ("SKILLRAC")
 	SkillDexterityTable = GemRB.LoadTable ("SKILLDEX")
 
-	SkillsPointsLeft = 30
-	SkillsPointsLeftLabel = SkillsWindow.GetControl (0x10000005)
-	SkillsPointsLeftLabel.SetUseRGB (1)
-	SkillsPointsLeftLabel.SetText (str(SkillsPointsLeft))
+	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), \
+		GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
+		GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
 
-	for i in range (4):
-		SkillsLabelButton = SkillsWindow.GetControl (21 + i)
-		SkillsLabelButton.SetState (IE_GUI_BUTTON_ENABLED)
-		SkillsLabelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsLabelPress)
-		SkillsLabelButton.SetVarAssoc ("SkillIndex", i)
+	LUSkillsSelection.SetupSkillsWindow (MyChar, \
+		LUSkillsSelection.LUSKILLS_TYPE_CHARGEN, SkillsWindow, RedrawSkills, [0,0,0], Levels, 0, False)
 
-		SkillsPlusButton = SkillsWindow.GetControl (11 + i * 2)
-		SkillsPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
-		SkillsPlusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsPlusPress)
-		SkillsPlusButton.SetVarAssoc ("SkillIndex", i)
+	SkillsPointsLeft = GemRB.GetVar ("SkillPointsLeft")
+	if SkillsPointsLeft<=0:
+		SkillsDonePress()
+		return
 
-		SkillsMinusButton = SkillsWindow.GetControl (12 + i * 2)
-		SkillsMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
-		SkillsMinusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsMinusPress)
-		SkillsMinusButton.SetVarAssoc ("SkillIndex", i)
+	#SkillsPointsLeftLabel = SkillsWindow.GetControl (0x10000005)
+	#SkillsPointsLeftLabel.SetUseRGB (1)
+	#SkillsPointsLeftLabel.SetText (str(SkillsPointsLeft))
 
-		SkillName = SkillsTable.GetRowName (i+2)
-		SkillValue = SkillRaceTable.GetValue (RaceName, SkillName)
-		SkillValue = SkillValue + SkillDexterityTable.GetValue (Dexterity, SkillName)
-		GemRB.SetVar ("Skill " + str(i), SkillValue)
-		GemRB.SetVar ("SkillBase " + str(i), SkillValue)
-		SkillLabel = SkillsWindow.GetControl (0x10000001 + i)
-		SkillLabel.SetUseRGB (1)
-		SkillLabel.SetText (str(SkillValue))
+	#for i in range (4):
+	#	SkillsLabelButton = SkillsWindow.GetControl (21 + i)
+	#	SkillsLabelButton.SetState (IE_GUI_BUTTON_ENABLED)
+	#	SkillsLabelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsLabelPress)
+	#	SkillsLabelButton.SetVarAssoc ("SkillIndex", i)
 
-	GemRB.SetToken ("number", str(SkillsPointsLeft) )
-	SkillsTextArea = SkillsWindow.GetControl (19)
-	SkillsTextArea.SetText (17248)
+	#	SkillsPlusButton = SkillsWindow.GetControl (11 + i * 2)
+	#	SkillsPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
+	#	SkillsPlusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsPlusPress)
+	#	SkillsPlusButton.SetVarAssoc ("SkillIndex", i)
+
+	#	SkillsMinusButton = SkillsWindow.GetControl (12 + i * 2)
+	#	SkillsMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
+	#	SkillsMinusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsMinusPress)
+	#	SkillsMinusButton.SetVarAssoc ("SkillIndex", i)
+
+	#	SkillName = SkillsTable.GetRowName (i+2)
+	#	SkillValue = SkillRaceTable.GetValue (RaceName, SkillName)
+	#	SkillValue = SkillValue + SkillDexterityTable.GetValue (Dexterity, SkillName)
+	#	GemRB.SetVar ("Skill " + str(i), SkillValue)
+	#	GemRB.SetVar ("SkillBase " + str(i), SkillValue)
+	#	SkillLabel = SkillsWindow.GetControl (0x10000001 + i)
+	#	SkillLabel.SetUseRGB (1)
+	#	SkillLabel.SetText (str(SkillValue))
+
+	#GemRB.SetToken ("number", str(SkillsPointsLeft) )
+	#SkillsTextArea = SkillsWindow.GetControl (19)
+	#SkillsTextArea.SetText (17248)
 
 	SkillsDoneButton = SkillsWindow.GetControl (0)
 	SkillsDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1664,50 +1680,18 @@ def SkillsSelect():
 	SkillsCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsCancelPress)
 	SkillsCancelButton.SetText (13727)
 	SkillsCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 
+	RedrawSkills()
 	SkillsWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
-def SkillsLabelPress():
-	global SkillsWindow, SkillsTextArea, SkillsTable
-
-	SkillIndex = GemRB.GetVar ("SkillIndex")
-	SkillsTextArea.SetText (SkillsTable.GetValue (SkillIndex+2, 1) )
-	return
-
-def SkillsPlusPress():
-	global SkillsWindow, SkillsTextArea, SkillsTable, SkillsPointsLeft
-
-	SkillIndex = GemRB.GetVar ("SkillIndex")
-	SkillValue = GemRB.GetVar ("Skill " + str(SkillIndex))
-	SkillsTextArea.SetText (SkillsTable.GetValue (SkillIndex+2, 1) )
-	if SkillValue < 99 and SkillsPointsLeft > 0:
-		SkillsPointsLeft = SkillsPointsLeft - 1
-		SkillsPointsLeftLabel = SkillsWindow.GetControl (0x10000005)
-		SkillsPointsLeftLabel.SetText (str(SkillsPointsLeft))
-		SkillValue = SkillValue + 1
-		GemRB.SetVar ("Skill " + str(SkillIndex), SkillValue)
-		SkillLabel = SkillsWindow.GetControl (0x10000001 + SkillIndex)
-		SkillLabel.SetText (str(SkillValue))
-		if SkillsPointsLeft == 0:
-			SkillsDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	return
-
-def SkillsMinusPress():
-	global SkillsWindow, SkillsTextArea, SkillsTable, SkillsPointsLeft
-
-	SkillIndex = GemRB.GetVar ("SkillIndex")
-	SkillValue = GemRB.GetVar ("Skill " + str(SkillIndex))
-	SkillsTextArea.SetText (SkillsTable.GetValue (SkillIndex+2, 1) )
-	if SkillValue > GemRB.GetVar ("SkillBase " + str(SkillIndex)):
-		SkillValue = SkillValue - 1
-		GemRB.SetVar ("Skill " + str(SkillIndex), SkillValue)
-		SkillLabel = SkillsWindow.GetControl (0x10000001 + SkillIndex)
-		SkillLabel.SetText (str(SkillValue))
-		SkillsPointsLeft = SkillsPointsLeft + 1
-		SkillsPointsLeftLabel = SkillsWindow.GetControl (0x10000005)
-		SkillsPointsLeftLabel.SetText (str(SkillsPointsLeft))
-		SkillsDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
+def RedrawSkills():
+	PointsLeft = GemRB.GetVar ("SkillPointsLeft")
+	if PointsLeft == 0:
+		SkillsDoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	else:
+		SkillsDoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	return
 
 def SkillsDonePress():
