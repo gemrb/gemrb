@@ -304,6 +304,7 @@ def CancelPress():
 
 	if CharGenWindow:
 		CharGenWindow.Unload ()
+	GemRB.CreatePlayer ("", MyChar | 0x8000 )
 	GemRB.SetNextScript ("PartyFormation")
 	return
 
