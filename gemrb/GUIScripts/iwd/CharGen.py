@@ -309,6 +309,8 @@ def CancelPress():
 
 def AcceptPress():
 	#mage spells
+	Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
+	KitIndex = KitTable.FindValue (3, Kit)
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	TableName = GUICommon.ClassSkillsTable.GetValue (Class, 2, 0)
@@ -363,6 +365,7 @@ def AcceptPress():
 	if MyChar == 1:
 		GemRB.GameSetReputation (t)
 
+	print "Reputation", t
 	TmpTable = GemRB.LoadTable ("strtgold")
 	a = TmpTable.GetValue (Class, 1) #number of dice
 	b = TmpTable.GetValue (Class, 0) #size
