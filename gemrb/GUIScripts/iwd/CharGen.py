@@ -2266,7 +2266,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 		if i < len(Learnable):
 			Spell = GemRB.GetSpell (Learnable[i])
 			SpellButton.SetTooltip(Spell["SpellName"])
-			SpellButton.SetSpellIcon(Learnable[i])
+			SpellButton.SetSpellIcon(Learnable[i], 1)
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
 			SpellButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestMemorizeSelectPress)
 			SpellButton.SetVarAssoc ("SpellMask", 1 << i)
