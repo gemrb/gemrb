@@ -1636,39 +1636,6 @@ def SkillsSelect():
 		SkillsDonePress()
 		return
 
-	#SkillsPointsLeftLabel = SkillsWindow.GetControl (0x10000005)
-	#SkillsPointsLeftLabel.SetUseRGB (1)
-	#SkillsPointsLeftLabel.SetText (str(SkillsPointsLeft))
-
-	#for i in range (4):
-	#	SkillsLabelButton = SkillsWindow.GetControl (21 + i)
-	#	SkillsLabelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	#	SkillsLabelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsLabelPress)
-	#	SkillsLabelButton.SetVarAssoc ("SkillIndex", i)
-
-	#	SkillsPlusButton = SkillsWindow.GetControl (11 + i * 2)
-	#	SkillsPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
-	#	SkillsPlusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsPlusPress)
-	#	SkillsPlusButton.SetVarAssoc ("SkillIndex", i)
-
-	#	SkillsMinusButton = SkillsWindow.GetControl (12 + i * 2)
-	#	SkillsMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
-	#	SkillsMinusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsMinusPress)
-	#	SkillsMinusButton.SetVarAssoc ("SkillIndex", i)
-
-	#	SkillName = SkillsTable.GetRowName (i+2)
-	#	SkillValue = SkillRaceTable.GetValue (RaceName, SkillName)
-	#	SkillValue = SkillValue + SkillDexterityTable.GetValue (Dexterity, SkillName)
-	#	GemRB.SetVar ("Skill " + str(i), SkillValue)
-	#	GemRB.SetVar ("SkillBase " + str(i), SkillValue)
-	#	SkillLabel = SkillsWindow.GetControl (0x10000001 + i)
-	#	SkillLabel.SetUseRGB (1)
-	#	SkillLabel.SetText (str(SkillValue))
-
-	#GemRB.SetToken ("number", str(SkillsPointsLeft) )
-	#SkillsTextArea = SkillsWindow.GetControl (19)
-	#SkillsTextArea.SetText (17248)
-
 	SkillsDoneButton = SkillsWindow.GetControl (0)
 	SkillsDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	SkillsDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SkillsDonePress)
