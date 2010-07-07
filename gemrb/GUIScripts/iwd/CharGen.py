@@ -392,7 +392,6 @@ def AcceptPress():
 	#GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability6"))
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
-	print "XP:", GUICommon.ClassSkillsTable.GetValue (Class, 3)
 	GemRB.SetPlayerStat (MyChar, IE_XP, GUICommon.ClassSkillsTable.GetValue (Class, 3) )
 
 	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
@@ -439,16 +438,12 @@ def SetCharacterDescription():
 		TextArea.Append (12136, -1)
 		TextArea.Append (": ")
 		#this is only mage school in iwd
-		#KitIndex = GemRB.GetVar ("MAGESCHOOL")
 		Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
 		KitIndex = KitTable.FindValue (3, Kit)
-		if KitIndex == -1:
+		if KitIndex <= 0:
 			ClassTitle = GUICommon.ClassTable.GetValue (Class, 2)
-			print "ClassTitle (base):", ClassTitle
 		else:
 			ClassTitle = KitTable.GetValue (KitIndex, 2)
-			print "ClassTitle (kit):", ClassTitle
-		print "ClassIndex:", Class
 		TextArea.Append (ClassTitle)
 
 	if CharGenState > 1:
@@ -469,14 +464,12 @@ def SetCharacterDescription():
 			TextArea.Append (": " )
 			StatID = AbilitiesTable.GetValue (i, 3)
 			stat = GemRB.GetPlayerStat (MyChar, StatID)
-			print "StatID for ", AbilitiesTable.GetRowName(i)," : ",StatID
 			if (i == 0) and HasStrExtra and (stat==18):
 				TextArea.Append (str(stat) + "/" + str(strextra) )
 			else:
 				TextArea.Append (str(stat) )
 	if CharGenState > 5:
 		ClassName = GUICommon.ClassTable.GetRowName (Class)
-		print "ClassName: ", ClassName
 		Row = GUICommon.ClassTable.GetValue (Class, 5)
 		IsRanger = GUICommon.ClassSkillsTable.GetValue (Row, 0)
 		IsArcane = GUICommon.ClassSkillsTable.GetValue (Row, 1)
@@ -947,8 +940,7 @@ def ClassPress():
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	ClassWindow = GemRB.LoadWindow (2)
 	ClassCount = GUICommon.ClassTable.GetRowCount ()
-	RaceName = GUICommon.RaceTable.GetRowName (GemRB.GetPlayerStat (MyChar, IE_RACE) - 1 )
-	print "RaceName", RaceName
+	RaceName = GUICommon.RaceTable.GetRowName (GemRB.GetPlayerStat (MyChar, IE_RACE) - 1)
 	GemRB.SetVar ("Class", 0)
 	GemRB.SetVar ("Class Kit", 0)
 	GemRB.SetVar ("MAGESCHOOL", 0)
@@ -1025,9 +1017,9 @@ def ClassMultiPress():
 	ClassWindow.SetVisible (WINDOW_INVISIBLE)
 	ClassMultiWindow = GemRB.LoadWindow (10)
 	ClassCount = GUICommon.ClassTable.GetRowCount ()
-	RaceName = GUICommon.RaceTable.GetRowName (GemRB.GetPlayerStat (MyChar, IE_RACE) )
-	print "RaceName", RaceName
+	RaceName = GUICommon.RaceTable.GetRowName (GemRB.GetPlayerStat (MyChar, IE_RACE) - 1)
 
+	print "Multi racename:", RaceName
 	for i in range (2, 10):
 		ClassMultiSelectButton = ClassMultiWindow.GetControl (i)
 		ClassMultiSelectButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
@@ -1043,6 +1035,7 @@ def ClassMultiPress():
 			else:
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
 			ClassMultiSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,  ClassMultiSelectPress)
+			ClassMultiSelectButton.SetText (GUICommon.ClassTable.GetValue (i, 0) )
 			ClassMultiSelectButton.SetVarAssoc ("Class", i + 1)
 
 	ClassMultiTextArea = ClassMultiWindow.GetControl (12)
@@ -1093,8 +1086,8 @@ def KitPress():
 	ClassWindow.SetVisible (WINDOW_INVISIBLE)
 	KitWindow = GemRB.LoadWindow (12)
 
-	#only mage class (1) has schools
-	GemRB.SetPlayerStat (MyChar, IE_CLASS, 1)
+	#only mage class (1) has schools. It is the sixth button
+	GemRB.SetVar ("Class", 6)
 	GemRB.SetVar ("Class Kit",0)
 	GemRB.SetVar ("MAGESCHOOL",0)
 
@@ -1159,16 +1152,13 @@ def ClassDonePress():
 	AlignmentButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	ClassIndex = GemRB.GetVar ("Class")-1
-	print "ClassIndex", ClassIndex
 	Class = GUICommon.ClassTable.GetValue (ClassIndex, 5)
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
-	print "Setting class", Class
 
-	Kit = KitTable.GetValue (5, GemRB.GetVar ("MAGESCHOOL") )
+	Kit = KitTable.GetValue (GemRB.GetVar ("MAGESCHOOL"), 3 )
 	if (Kit == -1 ):
-		Kit = 0x00004000
+		Kit = 0x4000
 
-	print "Setting Kit:", Kit
 	GemRB.SetPlayerStat (MyChar, IE_KIT, Kit)
 
 	CharGenState = 3
@@ -1249,7 +1239,6 @@ def AlignmentDonePress():
 	AbilitiesButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	Alignment = AlignmentTable.GetValue (GemRB.GetVar ("Alignment")-1, 3)
-	print "Setting alignment: %x"%(Alignment)
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment )
 
 	CharGenState = 4
@@ -1550,7 +1539,7 @@ def SkillsPress():
 
 	if SkillsState == 0:
 		GemRB.SetVar ("HatedRace", 0)
-		RaceName = GUICommon.RaceTable.GetRowName (GemRB.GetPlayerStat (MyChar, IE_RACE))
+		RaceName = GUICommon.RaceTable.GetRowName (GemRB.GetPlayerStat (MyChar, IE_RACE) - 1)
 		if IsThief!="*":
 			SkillsSelect()
 		elif IsRanger!="*":
@@ -1621,7 +1610,7 @@ def SkillsSelect():
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	SkillsWindow = GemRB.LoadWindow (6)
-	RaceName = GUICommon.RaceTable.GetRowName (GetPlayerStat (MyChar, IE_RACE) )
+	RaceName = GUICommon.RaceTable.GetRowName (GemRB.GetPlayerStat (MyChar, IE_RACE) - 1)
 	Dexterity = str(GetPlayerStat (MyChar, IE_DEX) )
 	SkillRaceTable = GemRB.LoadTable ("SKILLRAC")
 	SkillDexterityTable = GemRB.LoadTable ("SKILLDEX")
@@ -2545,8 +2534,6 @@ def CharSoundSelect():
 	CharSoundStrings = GemRB.LoadTable ("CHARSTR")
 
 	VerbalConstants =  [CharSoundTable.GetRowName(i) for i in range(CharSoundTable.GetRowCount())]
-	print VerbalConstants
-
 	CharSoundVoiceList = CharSoundWindow.GetControl (45)
 	CharSoundVoiceList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
 	RowCount=CharSoundVoiceList.GetCharSounds()
