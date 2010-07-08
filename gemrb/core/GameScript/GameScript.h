@@ -73,6 +73,7 @@ class GameScript;
 #define VB_TIMMUNE   67
 #define VB_INVENTORY 68
 #define VB_PP_SUCC   69
+#define VB_BIO       74
 
 //diffmode (iwd2)
 #define DM_EQUAL   1
@@ -1060,6 +1061,7 @@ public:
 	static void ExpansionEndCredits(Scriptable* Sender, Action* parameters);
 	static void Explore(Scriptable *Sender, Action *parameters);
 	static void ExploreMapChunk(Scriptable *Sender, Action *parameters);
+	static void ExportParty(Scriptable *Sender, Action *parameters);
 	static void Face(Scriptable* Sender, Action* parameters);
 	static void FaceObject(Scriptable* Sender, Action* parameters);
 	static void FaceSavedLocation(Scriptable* Sender, Action* parameters);

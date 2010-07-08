@@ -386,7 +386,7 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 			return;
 		}
 
-		int tmp=(int) actor->StrRefs[Strref];
+		int tmp=(int) actor->GetVerbalConstant(Strref);
 		if (tmp <= 0 || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
 			//get soundset based string constant
 			actor->ResolveStringConstant( sb.Sound, (unsigned int) Strref);

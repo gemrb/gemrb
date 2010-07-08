@@ -5468,6 +5468,19 @@ void GameScript::PolymorphCopyBase(Scriptable* Sender, Action* parameters)
 	act->SetBase(IE_ANIMATION_ID, actor->GetBase(IE_ANIMATION_ID) );
 }
 
+void GameScript::ExportParty(Scriptable* /*Sender*/, Action* parameters)
+{
+	char FileName[_MAX_PATH];
+
+	Game *game = core->GetGame();
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *actor = game->GetPC(i, false);
+		snprintf(FileName,_MAX_PATH,"%s%d",parameters->string0Parameter,i+1);
+		core->WriteCharacter(FileName, actor);
+	}
+}
+
 void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 {
 	if (core->HasFeature(GF_STRREF_SAVEGAME)) {
@@ -6682,7 +6695,7 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 		printf( "Cannot find %s.2da.\n", parameters->string0Parameter);
 		return;
 	}
-	
+
 	count = tm->GetRowCount();
 	for(i=0;i<count;i++) {
 		//roll a random number between 0 and column #

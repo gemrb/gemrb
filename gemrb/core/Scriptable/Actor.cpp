@@ -87,6 +87,8 @@ typedef ieResRef FistResType[MAX_LEVEL+1];
 static FistResType *fistres = NULL;
 static ieResRef DefaultFist = {"FIST"};
 
+static int VCMap[VCONST_COUNT];
+
 //item usability array
 struct ItemUseType {
 	ieResRef table; //which table contains the stat usability flags
@@ -1724,6 +1726,24 @@ static void InitActorTables()
 			}
 		}
 	}
+
+	// verbal constant remapping, if omitted, it is an 1-1 mapping
+	// TODO: allow disabled VC slots
+	for (i=0;i<VCONST_COUNT;i++) {
+		VCMap[i]=i;
+	}
+	tm.load("vcremap");
+	if (tm) {
+		int rows = tm->GetRowCount();
+
+		for (i=0;i<rows;i++) {
+			int row = atoi(tm->QueryField(i,0));
+			if (row<0 || row>=VCONST_COUNT) continue;
+			int value = atoi(tm->QueryField(i,1));
+			if (value<0 || value>=VCONST_COUNT) continue;
+			VCMap[row]=value;
+		}
+	}
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -2255,6 +2275,20 @@ void Actor::Interact(int type)
 			return;
 	}
 	VerbalConstant(start, count);
+}
+
+ieStrRef Actor::GetVerbalConstant(int index) const
+{
+	if (index<0 || index>=VCONST_COUNT) {
+		return -1;
+	}
+
+	int idx = VCMap[index];
+
+	if (idx<0 || idx>=VCONST_COUNT) {
+		return -1;
+	}
+	return StrRefs[idx];
 }
 
 void Actor::VerbalConstant(int start, int count)

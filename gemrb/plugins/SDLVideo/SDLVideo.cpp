@@ -2557,7 +2557,6 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 			return;
 		subtitletext = core->GetString(strRef);
 		subtitlestrref = strRef;
-		printf("Fetched subtitle %s\n", subtitletext);
 	}
 	if (subtitlefont && subtitletext) {
 		// FIXME: ugly hack!

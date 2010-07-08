@@ -38,6 +38,7 @@ typedef unsigned long SClass_ID;
 #define IE_BCS_CLASS_ID			0x000003EF
 #define IE_BS_CLASS_ID			0x100003EF
 #define IE_BIF_CLASS_ID			0x00020000
+#define IE_BIO_CLASS_ID			0x000003FE  //also .res
 #define IE_BMP_CLASS_ID			0x00000001
 #define IE_PNG_CLASS_ID			0x00000003
 #define IE_CHR_CLASS_ID			0x000003FA

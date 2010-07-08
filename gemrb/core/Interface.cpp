@@ -1723,6 +1723,12 @@ const char* Interface::TypeExt(SClass_ID type) const
 		case IE_BIF_CLASS_ID:
 			return ".bif";
 
+		case IE_BIO_CLASS_ID:
+			if (HasFeature(GF_BIOGRAPHY_RES)) {
+				return ".res";
+			}
+			return ".bio";
+
 		case IE_BMP_CLASS_ID:
 			return ".bmp";
 
@@ -2248,6 +2254,8 @@ static const char *game_flags[GF_COUNT+1]={
 		"HasSpecificDamageBonus", //45GF_SPECIFIC_DMG_BONUS
 		"StrrefSaveGame",     //46GF_STRREF_SAVEGAME
 		"HasWisdomBonusTable",//47GF_WISDOM_BONUS
+		"BiographyIsRes",     //48GF_BIOGRAPHY_RES
+		"NoBiography",        //49GF_NO_BIOGRAPHY
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -4727,17 +4735,30 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 	if (gm == NULL) {
 		return -1;
 	}
-	FileStream str;
 
-	str.Create( Path, name, IE_CHR_CLASS_ID );
+	//str is freed
+	{
+		FileStream str;
 
-	//this is not needed, because the chr header writer automatically
-	//calls it
-	//int size = gm->GetStoredFileSize (actor);
-	int ret = gm->PutActor(&str, actor, true);
-	if (ret <0) {
-		printMessage("Core"," ", YELLOW);
-		printf("Character cannot be saved: %s\n", name);
+		str.Create( Path, name, IE_CHR_CLASS_ID );
+
+		int ret = gm->PutActor(&str, actor, true);
+		if (ret <0) {
+			printMessage("Core"," ", YELLOW);
+			printf("Character cannot be saved: %s\n", name);
+			return -1;
+		}
+	}
+
+	//write the BIO string
+	if (!HasFeature(GF_NO_BIOGRAPHY)) {
+		FileStream str;
+
+		str.Create( Path, name, IE_BIO_CLASS_ID );
+		//never write the string reference into this string
+		char *tmp = GetString(actor->GetVerbalConstant(VB_BIO),IE_STR_STRREFOFF);
+		str.Write (tmp, strlen(tmp));
+		free(tmp);
 	}
 	return 0;
 }

@@ -546,6 +546,7 @@ static const ActionLink actionnames[] = {
 	{"expansionendcredits", GameScript::QuitGame, 0},//ends game too
 	{"explore", GameScript::Explore, 0},
 	{"exploremapchunk", GameScript::ExploreMapChunk, 0},
+	{"exportparty", GameScript::ExportParty, 0},
 	{"face", GameScript::Face,AF_BLOCKING},
 	{"faceobject", GameScript::FaceObject, AF_BLOCKING},
 	{"facesavedlocation", GameScript::FaceSavedLocation, AF_BLOCKING},

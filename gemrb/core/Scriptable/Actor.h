@@ -421,6 +421,8 @@ public:
 	void SetMCFlag(ieDword bitmask, int op);
 	/* inlined dialogue start */
 	void Interact(int type);
+	/* returns a remapped verbal constant strref */
+	ieStrRef GetVerbalConstant(int index) const;
 	/* displaying a random verbal constant */
 	void VerbalConstant(int start, int count);
 	/* inlined dialogue response */
