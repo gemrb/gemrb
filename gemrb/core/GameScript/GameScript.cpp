@@ -717,6 +717,8 @@ static const ActionLink actionnames[] = {
 	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},
 	{"reallyforcespell", GameScript::ReallyForceSpell, AF_BLOCKING},
 	{"reallyforcespelldead", GameScript::ReallyForceSpellDead, AF_BLOCKING},
+	{"reallyforcespelllevel", GameScript::ReallyForceSpell, AF_BLOCKING},//this is the same action
+	{"reallyforcespellpoint", GameScript::ReallyForceSpellPoint, AF_BLOCKING},
 	{"recoil", GameScript::Recoil, AF_ALIVE},
 	{"regainpaladinhood", GameScript::RegainPaladinHood, 0},
 	{"regainrangerhood", GameScript::RegainRangerHood, 0},

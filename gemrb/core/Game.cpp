@@ -1401,6 +1401,8 @@ void Game::RestParty(int checks, int dream, int hp)
 	core->SetEventFlag(EF_ACTION);
 
 	//restindex will be -1 in the case of PST
+	//FIXME: I don't quite see why we can't sumply use the same strings.2da entry
+	//It seems we could reduce complexity here, and free up 2-3 string slots too
 	int restindex = displaymsg->GetStringReference(STR_REST);
 	int strindex;
 	char* tmpstr = NULL;

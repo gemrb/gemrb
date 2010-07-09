@@ -236,7 +236,7 @@ static int ReverseToHit=true;
 static int CheckAbilities=false;
 
 //internal flags for calculating to hit
-#define WEAPON_FIST	0
+#define WEAPON_FIST	   0
 #define WEAPON_MELEE       1
 #define WEAPON_RANGED      2
 #define WEAPON_STYLEMASK   15
@@ -2280,21 +2280,26 @@ void Actor::Interact(int type)
 ieStrRef Actor::GetVerbalConstant(int index) const
 {
 	if (index<0 || index>=VCONST_COUNT) {
-		return -1;
+		return (ieStrRef) -1;
 	}
 
 	int idx = VCMap[index];
 
 	if (idx<0 || idx>=VCONST_COUNT) {
-		return -1;
+		return (ieStrRef) -1;
 	}
 	return StrRefs[idx];
 }
 
 void Actor::VerbalConstant(int start, int count)
 {
+	ieStrRef vc;
+
 	count=rand()%count;
-	while(count>=0 && (!StrRefs[start+count] || (StrRefs[start+count]==(ieStrRef) -1)) ) count--;
+
+	while(count>=0 && (!(vc = GetVerbalConstant(start+count)) || (vc==(ieStrRef) -1)) ) {
+		count--;
+	}
 	if(count>=0) {
 		DisplayStringCore(this, start+count, DS_CONSOLE|DS_CONST );
 	}
@@ -2304,6 +2309,7 @@ void Actor::Response(int type)
 {
 	int start;
 	int count;
+	ieStrRef vc;
 
 	switch(type) {
 		case I_INSULT: start=VB_RESP_INS; count=3; break;
@@ -2313,7 +2319,9 @@ void Actor::Response(int type)
 	}
 
 	count=rand()%count;
-	while(count && StrRefs[start+count]!=0xffff) count--;
+	while(count && ((vc = GetVerbalConstant(start+count))!=(ieStrRef) -1)) {
+		count--;
+	}
 	if(count>=0) {
 		DisplayStringCore(this, start+count, DS_CONSOLE|DS_CONST );
 	}
@@ -4292,7 +4300,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 		if (BaseStats[IE_BACKSTABDAMAGEMULTIPLIER] > 1) {
 			if (Modified[IE_STATE_ID] & (ieDword) (STATE_INVISIBLE) || Modified[IE_ALWAYSBACKSTAB]) {
 				if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) ) {
- 					if (target->Modified[IE_DISABLEBACKSTAB]) {
+					if (target->Modified[IE_DISABLEBACKSTAB]) {
 						// The backstab seems to have failed
 						displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, 0xffffff);
 					} else {

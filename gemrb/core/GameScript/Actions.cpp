@@ -2789,6 +2789,7 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 //ForceSpell with zero casting time
 //zero casting time, no depletion, not interruptable
 //FIXME The caster must meet the level requirements as set in the spell file
+//FIXME The spell level is taken as parameter2 in some cases
 void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
@@ -5479,6 +5480,7 @@ void GameScript::ExportParty(Scriptable* /*Sender*/, Action* parameters)
 		snprintf(FileName,_MAX_PATH,"%s%d",parameters->string0Parameter,i+1);
 		core->WriteCharacter(FileName, actor);
 	}
+	displaymsg->DisplayConstantString(STR_EXPORTED, 0xbcefbc);
 }
 
 void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
