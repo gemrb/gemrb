@@ -4404,7 +4404,11 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	if (skill<100) {
 		//noticed
 		displaymsg->DisplayConstantString(STR_PICKPOCKET_FAIL,0xffffff);
-		tar->LastOpenFailed=snd->GetID();
+		if (core->HasFeature(GF_STEAL_IS_ATTACK) ) {
+			tar->LastAttacker = snd->GetID();
+		} else {
+			tar->LastOpenFailed = snd->GetID();
+		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}

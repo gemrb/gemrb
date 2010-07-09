@@ -2256,6 +2256,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"HasWisdomBonusTable",//47GF_WISDOM_BONUS
 		"BiographyIsRes",     //48GF_BIOGRAPHY_RES
 		"NoBiography",        //49GF_NO_BIOGRAPHY
+		"StealIsAttack",      //50GF_STEAL_IS_ATTACK
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

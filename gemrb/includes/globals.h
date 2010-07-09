@@ -132,8 +132,9 @@
 #define  GF_WISDOM_BONUS      	 	47 //pst
 #define  GF_BIOGRAPHY_RES               48 //iwd branch
 #define  GF_NO_BIOGRAPHY                49 //pst
+#define  GF_STEAL_IS_ATTACK             50 //bg2 for sure
 //update this
-#define GF_COUNT 50
+#define GF_COUNT 51
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
