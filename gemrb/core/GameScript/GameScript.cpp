@@ -692,6 +692,7 @@ static const ActionLink actionnames[] = {
 	{"picklock", GameScript::PickLock,AF_BLOCKING},
 	{"pickpockets", GameScript::PickPockets, AF_BLOCKING},
 	{"pickupitem", GameScript::PickUpItem, 0},
+	{"playbardsong", GameScript::PlayBardSong, AF_ALIVE},
 	{"playdead", GameScript::PlayDead,AF_BLOCKING|AF_ALIVE},
 	{"playdeadinterruptable", GameScript::PlayDeadInterruptable,AF_BLOCKING|AF_ALIVE},
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},

@@ -5321,7 +5321,7 @@ void GameScript::CopyGroundPilesTo(Scriptable* Sender, Action* parameters)
 	map->CopyGroundPiles( othermap, parameters->pointParameter );
 }
 
-//iwd2 specific
+//iwd specific
 void GameScript::PlayBardSong(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {
