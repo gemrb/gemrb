@@ -1048,7 +1048,7 @@ static const IDSLink idsnames[] = {
 	{ NULL,NULL}
 };
 
-static const TriggerLink* FindTrigger(const char* triggername, int index)
+static const TriggerLink* FindTrigger(const char* triggername)
 {
 	if (!triggername) {
 		return NULL;
@@ -1061,11 +1061,10 @@ static const TriggerLink* FindTrigger(const char* triggername, int index)
 			}
 		}
 	}
-	printf( "Warning: Couldn't assign trigger: 0x%x %.*s\n", index, len, triggername );
 	return NULL;
 }
 
-static const ActionLink* FindAction(const char* actionname, int index)
+static const ActionLink* FindAction(const char* actionname)
 {
 	if (!actionname) {
 		return NULL;
@@ -1078,11 +1077,10 @@ static const ActionLink* FindAction(const char* actionname, int index)
 			}
 		}
 	}
-	printf( "Warning: Couldn't assign action: %d %.*s\n", index, len, actionname );
 	return NULL;
 }
 
-static const ObjectLink* FindObject(const char* objectname, int index)
+static const ObjectLink* FindObject(const char* objectname)
 {
 	if (!objectname) {
 		return NULL;
@@ -1095,7 +1093,6 @@ static const ObjectLink* FindObject(const char* objectname, int index)
 			}
 		}
 	}
-	printf( "Warning: Couldn't assign object: %d %.*s\n", index, len, objectname );
 	return NULL;
 }
 
@@ -1110,7 +1107,9 @@ static const IDSLink* FindIdentifier(const char* idsname)
 			return idsnames + i;
 		}
 	}
-	printf( "Warning: Couldn't assign ids target: %.*s\n", len, idsname );
+	
+	printMessage( "GameScript"," ", YELLOW );
+	printf( "Couldn't assign ids target: %.*s\n", len, idsname );
 	return NULL;
 }
 
@@ -1240,8 +1239,22 @@ static void CleanupIEScript()
 	ObjectIDSTableNames = NULL;
 }
 
+void printFunction(const char *str)
+{
+	int len = strchr(str,'(')-str;
+	if (len<0) {
+		printf("%s\n", str);
+	} else {
+		printf("%.*s\n", len, str);
+	}
+}
+
 void InitializeIEScript()
 {
+	std::list<int> missing_triggers;
+	std::list<int> missing_actions;
+	std::list<int> missing_objects;
+
 	PluginMgr::Get()->RegisterCleanup(CleanupIEScript);
 
 	InitScriptTables();
@@ -1309,8 +1322,8 @@ void InitializeIEScript()
 	j = triggersTable->GetSize();
 	while (j--) {
 		i = triggersTable->GetValueIndex( j );
+		const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ));
 		//maybe we should watch for this bit?
-		const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ), i );
 		//bool triggerflag = i & 0x4000;
 		i &= 0x3fff;
 		if (i >= MAX_TRIGGERS) {
@@ -1321,21 +1334,46 @@ void InitializeIEScript()
 		if (triggers[i]) {
 			if (poi && triggers[i]!=poi->Function) {
 				printMessage("GameScript"," ", YELLOW);
-				printf("%s is in collision with %s\n", triggersTable->GetStringIndex( j ), triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ));
+				printf("%s is in collision with ", triggersTable->GetStringIndex( j ) );
+				printFunction(triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ));
 			} else {
 				printMessage("GameScript"," ", WHITE);
-				printf("%s is a synonym of %s\n", triggersTable->GetStringIndex( j ), triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ) );
+				printf("%s is a synonym of ", triggersTable->GetStringIndex( j ) );
+				printFunction(triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j ) ) ) );
 			}
 			continue; //we already found an alternative
 		}
 		if (poi == NULL) {
 			triggers[i] = NULL;
 			triggerflags[i] = 0;
+			missing_triggers.push_back(j);
+			continue;
 		}
-		else {
-			triggers[i] = poi->Function;
-			triggerflags[i] = poi->Flags;
+		triggers[i] = poi->Function;
+		triggerflags[i] = poi->Flags;
+	}
+
+	for (std::list<int>::iterator l = missing_triggers.begin(); l!=missing_triggers.end();l++) {
+		j = *l;
+		// found later as a different name
+		int ii = triggersTable->GetValueIndex( j ) & 0x3fff;
+		if (ii >= MAX_TRIGGERS) {
+			continue;
 		}
+		
+		TriggerFunction f = triggers[ii];
+		if (f) {
+			for (i = 0; triggernames[i].Name; i++) {
+				if (f == triggernames[i].Function) {
+					printMessage("GameScript"," ", WHITE);
+					printf("%s is a synonym of %s\n", triggersTable->GetStringIndex( j ), triggernames[i].Name );
+					break;
+				}
+			}
+			continue;
+		}
+		printMessage("GameScript","Couldn't assign function to trigger: ", YELLOW);
+		printFunction(triggersTable->GetStringIndex(j) );
 	}
 
 	j = actionsTable->GetSize();
@@ -1346,20 +1384,23 @@ void InitializeIEScript()
 			printf("action %d (%s) is too high, ignoring\n", i, actionsTable->GetStringIndex( j ) );
 			continue;
 		}
-		const ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ), i );
+		const ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ));
 		if (actions[i]) {
 			if (poi && actions[i]!=poi->Function) {
 				printMessage("GameScript"," ", YELLOW);
-				printf("%s is in collision with %s\n", actionsTable->GetStringIndex( j ), actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
+				printf("%s is in collision with ", actionsTable->GetStringIndex( j ) );
+				printFunction(actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
 			} else {
 				printMessage("GameScript"," ", WHITE);
-				printf("%s is a synonym of %s\n", actionsTable->GetStringIndex( j ), actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
+				printf("%s is a synonym of ", actionsTable->GetStringIndex( j ) );
+				printFunction(actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
 			}
 			continue; //we already found an alternative
 		}
 		if (poi == NULL) {
 			actions[i] = NULL;
 			actionflags[i] = 0;
+			missing_actions.push_back(j);
 			continue;
 		}
 		actions[i] = poi->Function;
@@ -1379,17 +1420,41 @@ void InitializeIEScript()
 				printf("action %d (%s) is too high, ignoring\n", i, overrideActionsTable->GetStringIndex( j ) );
 				continue;
 			}
-			const ActionLink *poi = FindAction( overrideActionsTable->GetStringIndex( j ), i );
+			const ActionLink *poi = FindAction( overrideActionsTable->GetStringIndex( j ));
 			if (!poi) {
 				continue;
 			}
 			if (actions[i]) {
 				printMessage("GameScript"," ", WHITE);
-				printf("%s overrides existing action %s\n", overrideActionsTable->GetStringIndex( j ), actionsTable->GetStringIndex(actionsTable->FindValue(overrideActionsTable->GetValueIndex( j )) ) );
+				printf("%s overrides existing action ", overrideActionsTable->GetStringIndex( j ) );
+				printFunction( actionsTable->GetStringIndex(actionsTable->FindValue(overrideActionsTable->GetValueIndex( j )) ) );
 			}
 			actions[i] = poi->Function;
 			actionflags[i] = poi->Flags;
 		}
+	}
+
+	for (std::list<int>::iterator l = missing_actions.begin(); l!=missing_actions.end();l++) {
+		j = *l;
+		// found later as a different name
+		int ii = actionsTable->GetValueIndex( j );
+		if (ii>=MAX_ACTIONS) {
+			continue;
+		}
+
+		ActionFunction f = actions[ii];
+		if (f) {
+			for (i = 0; actionnames[i].Name; i++) {
+				if (f == actionnames[i].Function) {
+					printMessage("GameScript"," ", WHITE);
+					printf("%s is a synonym of %s\n", actionsTable->GetStringIndex( j ), actionnames[i].Name );
+					break;
+				}
+			}
+			continue;
+		}
+		printMessage("GameScript","Couldn't assign function to action: ", YELLOW);
+		printFunction(actionsTable->GetStringIndex(j) );
 	}
 
 	j = objectsTable->GetSize();
@@ -1400,23 +1465,50 @@ void InitializeIEScript()
 			printf("object %d (%s) is too high, ignoring\n", i, objectsTable->GetStringIndex( j ) );
 			continue;
 		}
-		const ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ), i );
+		const ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ));
 		if (objects[i]) {
 			if (poi && objects[i]!=poi->Function) {
 				printMessage("GameScript"," ", YELLOW);
-				printf("%s is in collision with %s\n", objectsTable->GetStringIndex( j ), objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
+				printf("%s is in collision with ", objectsTable->GetStringIndex( j ) );
+				printFunction(objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
 			} else {
 				printMessage("GameScript"," ", WHITE);
-				printf("%s is a synonym of %s\n", objectsTable->GetStringIndex( j ), objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
+				printf("%s is a synonym of ", objectsTable->GetStringIndex( j ) );
+				printFunction(objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
 			}
 			continue;
 		}
 		if (poi == NULL) {
 			objects[i] = NULL;
+			missing_objects.push_back(j);
 		} else {
 			objects[i] = poi->Function;
 		}
 	}
+
+	for (std::list<int>::iterator l = missing_objects.begin(); l!=missing_objects.end();l++) {
+		j = *l;
+		// found later as a different name
+		int ii = objectsTable->GetValueIndex( j );
+		if (ii>=MAX_ACTIONS) {
+			continue;
+		}
+
+		ObjectFunction f = objects[ii];
+		if (f) {
+			for (i = 0; objectnames[i].Name; i++) {
+				if (f == objectnames[i].Function) {
+					printMessage("GameScript"," ", WHITE);
+					printf("%s is a synonym of %s\n", objectsTable->GetStringIndex( j ), objectnames[i].Name );
+					break;
+				}
+			}
+			continue;
+		}
+		printMessage("GameScript","Couldn't assign function to object: ", YELLOW);
+		printFunction(objectsTable->GetStringIndex(j) );
+	}
+
 }
 
 /********************** GameScript *******************************/
