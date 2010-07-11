@@ -67,8 +67,8 @@ def OpenLevelUpWindow():
 
 	global LevelUpWindow, TextAreaControl, NewProfPoints, actor
 	global DoneButton
-	global NewSkillPoints, KitName, LevelDiff, RaceTable
-	global ClassTable, Level, Classes, NumClasses, DualSwap, ClassSkillsTable, IsMulti
+	global NewSkillPoints, KitName, LevelDiff
+	global Level, Classes, NumClasses, DualSwap, IsMulti
 	global OldHPMax, OldSaves, OldLore, OldThaco, DeltaDSpells, DeltaWSpells
 	global NewDSpells, NewWSpells, OldDSpells, OldWSpells, pc, HLACount, ClassName, IsDual
 
