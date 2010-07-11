@@ -369,9 +369,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 		stats.append (None)
 		# the first class (shown second)
 		if Dual[0] == 1:
-			ClassTitle = GemRB.GetString (KitListTable.GetValue (Dual[1], 2))
+			ClassTitle = GemRB.GetString (GUICommon.KitListTable.GetValue (Dual[1], 2))
 		elif Dual[0] == 2:
-			ClassTitle = GemRB.GetString (ClassTable.GetValue (Dual[1], 2))
+			ClassTitle = GemRB.GetString (GUICommon.ClassTable.GetValue (Dual[1], 2))
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[1]) )
 
