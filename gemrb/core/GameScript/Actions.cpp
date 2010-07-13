@@ -156,12 +156,16 @@ void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
 void GameScript::SetGlobalTimerRandom(Scriptable* Sender, Action* parameters)
 {
 	ieDword mytime;
+	int random;
 
-	int random=parameters->int1Parameter-parameters->int0Parameter+1;
-	if (random>0) {
+	//This works both ways in the original engine
+	if (parameters->int1Parameter>parameters->int0Parameter) {
+		random = parameters->int1Parameter-parameters->int0Parameter+1;
+		//random cannot be 0, its minimal value is 1
 		random = RandomNumValue % random + parameters->int0Parameter;
 	} else {
-		random = 0;
+		random = parameters->int0Parameter-parameters->int1Parameter+1;
+		random = RandomNumValue % random + parameters->int1Parameter;
 	}
 	mytime=core->GetGame()->GameTime; //gametime (should increase it)
 	SetVariable( Sender, parameters->string0Parameter, random*AI_UPDATE_TIME + mytime);
