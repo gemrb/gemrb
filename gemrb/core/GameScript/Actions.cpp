@@ -5147,6 +5147,76 @@ void GameScript::MarkObject(Scriptable* Sender, Action* parameters)
 	actor->LastSeen = actor->LastMarked;
 }
 
+void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor *me = (Actor *) Sender;
+	if (me->LastMarkedSpell) {
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1]);
+	Actor *actor = NULL;
+	if (tar->Type == ST_ACTOR) {
+		actor = (Actor *) tar;
+	}
+
+	int flags = parameters->int0Parameter;
+	if (!(flags & MSO_IGNORE_NULL) && !actor) {
+		return;
+	}
+	if (!(flags & MSO_IGNORE_INVALID) && actor && actor->InvalidSpellTarget() ) {
+		return;
+	}
+	if (!(flags & MSO_IGNORE_SEE) && actor && !CanSee(Sender, actor, true, 0) ) {
+		return;
+	}
+	int len = strlen(parameters->string0Parameter);
+	//
+	if (len&3) {
+		return;
+	}
+	len/=4;
+	int max = len;
+	int pos;
+	if (flags & MSO_RANDOM_SPELL) {
+		pos = core->Roll(1,len,0);
+	} else {
+		pos = 0;
+	}
+	while(len--) {
+		char spl[5];
+
+		memcpy(spl, parameters->string0Parameter+pos*4, 4);
+		spl[4]=0;
+		int splnum = atoi(spl);
+
+		if (!(flags & MSO_IGNORE_HAVE) && !me->spellbook.HaveSpell(splnum, 0) ) {
+			goto end_mso_loop;
+		}
+		int range;
+		if (flags & MSO_IGNORE_RANGE) {
+			range = 0;
+		} else {
+			range = Distance(me, actor);
+		}
+		if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget(splnum, me, range)) {
+			goto end_mso_loop;
+		}
+		//mark spell and target
+		me->LastMarkedSpell = splnum;
+		me->LastMarked = actor->GetID();
+		break;
+end_mso_loop:
+		pos++;
+		if (pos==max) {
+			pos = 0;
+		}
+	}
+}
+
 void GameScript::SetDialogueRange(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {

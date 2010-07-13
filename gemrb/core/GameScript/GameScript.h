@@ -80,6 +80,14 @@ class GameScript;
 #define DM_LESS    2
 #define DM_GREATER 3
 
+//markspellandobject (iwd2)
+#define MSO_IGNORE_SEE     1
+#define MSO_IGNORE_INVALID 2
+#define MSO_RANDOM_SPELL   4
+#define MSO_IGNORE_HAVE    8
+#define MSO_IGNORE_RANGE   16
+#define MSO_IGNORE_NULL    32
+
 //delta (pst)
 #define DM_LOWER   1
 #define DM_RAISE   2
@@ -1148,6 +1156,7 @@ public:
 	static void MakeGlobal(Scriptable* Sender, Action* parameters);
 	static void MakeUnselectable(Scriptable* Sender, Action* parameters);
 	static void MarkObject(Scriptable* Sender, Action* parameters);
+	static void MarkSpellAndObject(Scriptable* Sender, Action* parameters);
 	static void MatchHP(Scriptable* Sender, Action* parameters);
 	static void MoraleDec(Scriptable* Sender, Action* parameters);
 	static void MoraleInc(Scriptable* Sender, Action* parameters);

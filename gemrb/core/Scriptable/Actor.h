@@ -250,7 +250,8 @@ public:
 	ieDword LastCommander;
 	ieDword LastHelp;
 	ieDword LastSeen;
-	ieDword LastMarked; // no idea if non-actors could mark objects
+	ieDword LastMarked;  // no idea if non-actors could mark objects
+	int LastMarkedSpell; //a spell number to cast
 	ieDword LastHeard;
 	ieDword HotKey;
 	char ShieldRef[2];
@@ -653,5 +654,10 @@ public:
 	bool TryToHide();
 	/* checks if the alignment matches one of the masking constants */
 	bool MatchesAlignmentMask(ieDword mask);
+	/* returns true if this actor is untargetable */
+	bool InvalidSpellTarget();
+	/* returns true if the spell is useless to cast on target
+           or the spell's range is smaller than range */
+	bool InvalidSpellTarget(int spellnum, Actor *caster, int range);
 };
 #endif

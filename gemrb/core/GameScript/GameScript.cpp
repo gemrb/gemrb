@@ -646,6 +646,7 @@ static const ActionLink actionnames[] = {
 	{"makeglobal", GameScript::MakeGlobal, 0},
 	{"makeunselectable", GameScript::MakeUnselectable, 0},
 	{"markobject", GameScript::MarkObject, 0},
+	{"markspellandobject", GameScript::MarkSpellAndObject, 0},
 	{"moraledec", GameScript::MoraleDec, 0},
 	{"moraleinc", GameScript::MoraleInc, 0},
 	{"moraleset", GameScript::MoraleSet, 0},

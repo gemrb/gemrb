@@ -26,6 +26,7 @@
 
 #include "overlays.h"
 #include "strrefs.h"
+#include "opcode_params.h"
 #include "win32def.h"
 
 #include "Audio.h" //pst (react to death sounds)
@@ -310,6 +311,7 @@ Actor::Actor()
 	LastHelp = 0;
 	LastSeen = 0;
 	LastMarked = 0;
+	LastMarkedSpell = 0;
 	LastHeard = 0;
 	PCStats = NULL;
 	LastCommand = 0; //used by order
@@ -6384,3 +6386,25 @@ bool Actor::MatchesAlignmentMask(ieDword mask)
 	}
 
 }
+
+bool Actor::InvalidSpellTarget()
+{
+	if (GetStat(IE_STATE_ID) & (STATE_DEAD)) return true;
+	if (HasSpellState(SS_SANCTUARY)) return true;
+	return false;
+}
+
+bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range)
+{
+	ieResRef spellres;
+
+	//TODO: spell specific state checks
+	if (!range) return false;
+
+	ResolveSpellName(spellres, spellnum);
+	Spell *spl = gamedata->GetSpell(spellres);
+	int srange = spl->GetCastingDistance(caster);
+
+	return srange<range;
+}
+
