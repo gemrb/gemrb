@@ -2247,6 +2247,42 @@ int GameScript::SetLastMarkedObject(Scriptable* Sender, Trigger* parameters)
 	return 1;
 }
 
+int GameScript::IsSpellTargetValid(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *scr = (Actor *) Sender;
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	Actor *actor = NULL;
+	if (tar->Type == ST_ACTOR) {
+		actor = (Actor *) tar;
+	}
+
+	int flags = parameters->int1Parameter;
+	if (!(flags & MSO_IGNORE_NULL) && !actor) {
+		return 0;
+	}
+	if (!(flags & MSO_IGNORE_INVALID) && actor && actor->InvalidSpellTarget() ) {
+		return 0;
+	}
+	int splnum = parameters->int0Parameter;
+	if (!(flags & MSO_IGNORE_HAVE) && !scr->spellbook.HaveSpell(splnum, 0) ) {
+		return 0;
+	}
+	int range;
+	if ((flags & MSO_IGNORE_RANGE) || !actor) {
+		range = 0;
+	} else {
+		range = Distance(scr, actor);
+	}
+	if (!(flags & MSO_IGNORE_INVALID) && actor->InvalidSpellTarget(splnum, scr, range)) {
+		return 0;
+	}
+	return 1;
+}
+
 //This trigger seems to always return true for actors...
 //Always manages to set spell to 0, otherwise it sets if there was nothing set earlier
 int GameScript::SetMarkedSpell_Trigger(Scriptable* Sender, Trigger* parameters)

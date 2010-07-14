@@ -775,6 +775,7 @@ public: //Script Functions
 	static int IsPathCriticalObject( Scriptable* Sender, Trigger* parameters);
 	static int IsPlayerNumber( Scriptable* Sender, Trigger* parameters);
 	static int IsRotation(Scriptable* Sender, Trigger* parameters);
+	static int IsSpellTargetValid( Scriptable* Sender, Trigger* parameters);
 	static int IsTeamBitOn(Scriptable* Sender, Trigger* parameters);
 	static int IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters);
 	static int IsWeaponRanged(Scriptable* Sender, Trigger* parameters);

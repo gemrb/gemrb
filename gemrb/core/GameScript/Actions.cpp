@@ -5197,7 +5197,7 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 			goto end_mso_loop;
 		}
 		int range;
-		if (flags & MSO_IGNORE_RANGE) {
+		if ((flags & MSO_IGNORE_RANGE) || !actor) {
 			range = 0;
 		} else {
 			range = Distance(me, actor);

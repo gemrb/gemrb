@@ -214,6 +214,7 @@ static const TriggerLink triggernames[] = {
 	{"isplayernumber", GameScript::IsPlayerNumber, 0},
 	{"isrotation", GameScript::IsRotation, 0},
 	{"isscriptname", GameScript::CalledByName, 0}, //seems the same
+	{"isspelltargetvalid", GameScript::IsSpellTargetValid, 0},
 	{"isteambiton", GameScript::IsTeamBitOn, 0},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog, 0},
 	{"isvalidforpartydialogue", GameScript::IsValidForPartyDialog, 0},
