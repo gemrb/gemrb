@@ -693,6 +693,7 @@ public: //Script Functions
 	static int FallenPaladin(Scriptable* Sender, Trigger* parameters);
 	static int FallenRanger(Scriptable* Sender, Trigger* parameters);
 	static int False(Scriptable* Sender, Trigger* parameters);
+	static int ForceMarkedSpell_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int Frame(Scriptable* Sender, Trigger* parameters);
 	static int Gender(Scriptable* Sender, Trigger* parameters);
 	static int General(Scriptable* Sender, Trigger* parameters);
@@ -769,6 +770,7 @@ public: //Script Functions
 	static int IsFacingObject(Scriptable* Sender, Trigger* parameters);
 	static int IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsLocked(Scriptable* Sender, Trigger* parameters);
+	static int IsMarkedSpell(Scriptable* Sender, Trigger* parameters);
 	static int IsOverMe(Scriptable* Sender, Trigger* parameters);
 	static int IsPathCriticalObject( Scriptable* Sender, Trigger* parameters);
 	static int IsPlayerNumber( Scriptable* Sender, Trigger* parameters);
@@ -880,6 +882,7 @@ public: //Script Functions
 	static int See(Scriptable* Sender, Trigger* parameters);
 	static int Sequence(Scriptable* Sender, Trigger* parameters);
 	static int SetLastMarkedObject(Scriptable* Sender, Trigger* parameters);
+	static int SetMarkedSpell_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int Specifics(Scriptable* Sender, Trigger* parameters);
 	static int SpellCast(Scriptable* Sender, Trigger* parameters);
 	static int SpellCastInnate(Scriptable* Sender, Trigger* parameters);
@@ -1091,6 +1094,7 @@ public:
 	static void ForceFacing(Scriptable* Sender, Action* parameters);
 	static void ForceHide(Scriptable* Sender, Action* parameters);
 	static void ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters);
+	static void ForceMarkedSpell(Scriptable* Sender, Action* parameters);
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
 	static void ForceSpellPoint(Scriptable* Sender, Action* parameters);
 	static void ForceUseContainer(Scriptable* Sender, Action* parameters);
@@ -1285,6 +1289,7 @@ public:
 	static void SetInternal(Scriptable* Sender, Action* parameters);
 	static void SetInterrupt(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
+	static void SetMarkedSpell(Scriptable* Sender, Action* parameters);
 	static void SetMasterArea(Scriptable* Sender, Action* parameters);
 	static void SetMazeEasier(Scriptable* Sender, Action* parameters);
 	static void SetMazeHarder(Scriptable* Sender, Action* parameters);

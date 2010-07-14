@@ -5217,6 +5217,35 @@ end_mso_loop:
 	}
 }
 
+void GameScript::ForceMarkedSpell(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->LastMarkedSpell = parameters->int0Parameter;
+}
+
+void GameScript::SetMarkedSpell(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	if (parameters->int0Parameter) {
+		if (actor->LastMarkedSpell) {
+			return;
+		}
+		if (!actor->spellbook.HaveSpell(parameters->int0Parameter, 0) ) {
+			return;
+		}
+	}
+
+	//TODO: check if spell exists (not really important)
+	actor->LastMarkedSpell = parameters->int0Parameter;
+	return;
+}
+
 void GameScript::SetDialogueRange(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {

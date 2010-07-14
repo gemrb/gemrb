@@ -118,6 +118,7 @@ static const TriggerLink triggernames[] = {
 	{"fallenpaladin", GameScript::FallenPaladin, 0},
 	{"fallenranger", GameScript::FallenRanger, 0},
 	{"false", GameScript::False, 0},
+	{"forcemarkedspell", GameScript::ForceMarkedSpell_Trigger, 0},
 	{"frame", GameScript::Frame, 0},
 	{"g", GameScript::G_Trigger, 0},
 	{"gender", GameScript::Gender, 0},
@@ -335,6 +336,7 @@ static const TriggerLink triggernames[] = {
 	{"see", GameScript::See, 0},
 	{"sequence", GameScript::Sequence, 0},
 	{"setlastmarkedobject", GameScript::SetLastMarkedObject, 0},
+	{"setmarkedspell", GameScript::SetMarkedSpell_Trigger, 0},
 	{"specifics", GameScript::Specifics, 0},
 	{"spellcast", GameScript::SpellCast, 0},
 	{"spellcastinnate", GameScript::SpellCastInnate, 0},
@@ -572,6 +574,7 @@ static const ActionLink actionnames[] = {
 	{"forcefacing", GameScript::ForceFacing, 0},
 	{"forcehide", GameScript::ForceHide, 0},
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA, 0},
+	{"forcemarkedspell", GameScript::ForceMarkedSpell, 0},
 	{"forcespell", GameScript::ForceSpell, AF_BLOCKING},
 	{"forcespellpoint", GameScript::ForceSpellPoint, AF_BLOCKING},
 	{"forceusecontainer", GameScript::ForceUseContainer,AF_BLOCKING},
@@ -798,6 +801,7 @@ static const ActionLink actionnames[] = {
 	{"setinterrupt", GameScript::SetInterrupt, 0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile, 0},
 	{"setleavepartydialoguefile", GameScript::SetLeavePartyDialogFile, 0},
+	{"setmarkedspell", GameScript::SetMarkedSpell, 0},
 	{"setmasterarea", GameScript::SetMasterArea, 0},
 	{"setmazeeasier", GameScript::SetMazeEasier, 0}, //pst specific crap
 	{"setmazeharder", GameScript::SetMazeHarder, 0}, //pst specific crap
