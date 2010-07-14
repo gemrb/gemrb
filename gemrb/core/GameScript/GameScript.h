@@ -770,6 +770,7 @@ public: //Script Functions
 	static int IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsLocked(Scriptable* Sender, Trigger* parameters);
 	static int IsOverMe(Scriptable* Sender, Trigger* parameters);
+	static int IsPathCriticalObject( Scriptable* Sender, Trigger* parameters);
 	static int IsPlayerNumber( Scriptable* Sender, Trigger* parameters);
 	static int IsRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsTeamBitOn(Scriptable* Sender, Trigger* parameters);

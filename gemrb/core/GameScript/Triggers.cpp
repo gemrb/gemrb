@@ -3664,6 +3664,19 @@ int GameScript::IsCreatureAreaFlag( Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::IsPathCriticalObject( Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if (actor->GetStat(IE_MC_FLAGS) & MC_PLOT_CRITICAL) {
+		return 1;
+	}
+	return 0;
+}
+
 // 0 - ability, 1 - number, 2 - mode
 int GameScript::ChargeCount( Scriptable* Sender, Trigger* parameters)
 {

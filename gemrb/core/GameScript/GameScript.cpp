@@ -208,6 +208,7 @@ static const TriggerLink triggernames[] = {
 	{"islocked", GameScript::IsLocked, 0},
 	{"isextendednight", GameScript::IsExtendedNight, 0},
 	{"isoverme", GameScript::IsOverMe, 0},
+	{"ispathcriticalobject", GameScript::IsPathCriticalObject, 0},
 	{"isplayernumber", GameScript::IsPlayerNumber, 0},
 	{"isrotation", GameScript::IsRotation, 0},
 	{"isscriptname", GameScript::CalledByName, 0}, //seems the same
