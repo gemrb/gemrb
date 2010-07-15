@@ -19,7 +19,7 @@
 #character generation, ability (GUICG4)
 import GemRB
 from GUIDefines import *
-import GUICommon
+import CommonTables
 
 AbilityWindow = 0
 TextAreaControl = 0
@@ -36,8 +36,8 @@ def CalcLimits(Abidx):
 
 	Abracead = GemRB.LoadTable("ABRACEAD")
 	RaceID = GemRB.GetVar("Race")
-	RowIndex = GUICommon.RaceTable.FindValue(3, RaceID)
-	RaceName = GUICommon.RaceTable.GetRowName(RowIndex)
+	RowIndex = CommonTables.RaceTable.FindValue(3, RaceID)
+	RaceName = CommonTables.RaceTable.GetRowName(RowIndex)
 
 	Minimum = 3
 	Maximum = 18
@@ -107,10 +107,10 @@ def OnLoad():
 	Kit = GemRB.GetVar("Class Kit")
 	Class = GemRB.GetVar("Class")-1
 	if Kit == 0:
-		KitName = GUICommon.ClassTable.GetRowName(Class)
+		KitName = CommonTables.ClassTable.GetRowName(Class)
 	else:
 		#rowname is just a number, first value row what we need here
-		KitName = GUICommon.KitListTable.GetValue(Kit, 0)
+		KitName = CommonTables.KitListTable.GetValue(Kit, 0)
 
 	Abclasrq = GemRB.LoadTable("ABCLASRQ")
 	KitIndex = Abclasrq.GetRowIndex(KitName)

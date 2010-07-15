@@ -23,6 +23,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
 import GUICommon
+import CommonTables
 import LUSpellSelection
 import LUCommon
 if GUICommon.HasTOB():
@@ -127,26 +128,26 @@ def OpenLevelUpWindow():
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	print "Class:",Class,"\tActor Class:",actor.classid
-	ClassIndex = GUICommon.ClassTable.FindValue (5, Class)
+	ClassIndex = CommonTables.ClassTable.FindValue (5, Class)
 	SkillTable = GemRB.LoadTable("skills")
 
 	# kit
-	ClassName = GUICommon.ClassTable.GetRowName(ClassIndex)
+	ClassName = CommonTables.ClassTable.GetRowName(ClassIndex)
 	Kit = GUICommon.GetKitIndex (pc)
 	print "Kit:", Kit, "\tActor Kit:",actor.KitIndex()
 	print "ClassName:",ClassName,"\tActor ClassNames:",actor.ClassNames()
 
 	# need this for checking gnomes
 	RaceName = GemRB.GetPlayerStat (pc, IE_RACE, 1)
-	RaceName = GUICommon.RaceTable.FindValue (3, RaceName)
-	RaceName = GUICommon.RaceTable.GetRowName (RaceName)
+	RaceName = CommonTables.RaceTable.FindValue (3, RaceName)
+	RaceName = CommonTables.RaceTable.GetRowName (RaceName)
 
 	# figure our our proficiency table and index
 	if Kit == 0:
 		KitName = ClassName
 	else:
 		#rowname is just a number, the kitname is the first data column
-		KitName = GUICommon.KitListTable.GetValue(Kit, 0)
+		KitName = CommonTables.KitListTable.GetValue(Kit, 0)
 
 	# our multiclass variables
 	IsMulti = GUICommon.IsMultiClassed (pc, 1)
@@ -170,9 +171,9 @@ def OpenLevelUpWindow():
 			Classes = [Class]
 		else: # make sure Classes[1] is a class, not a kit
 			if IsDual[0] == 1: # kit
-				Classes[1] = GUICommon.KitListTable.GetValue (IsDual[1], 7)
+				Classes[1] = CommonTables.KitListTable.GetValue (IsDual[1], 7)
 			else: # class
-				Classes[1] = GUICommon.ClassTable.GetValue (Classes[1], 5)
+				Classes[1] = CommonTables.ClassTable.GetValue (Classes[1], 5)
 
 		# store a boolean for IsDual
 		IsDual = IsDual[0] > 0
@@ -187,9 +188,9 @@ def OpenLevelUpWindow():
 	if IsDual:
 		# convert the classes from indicies to class id's
 		DualSwap = GUICommon.IsDualSwap (pc)
-		ClassName = GUICommon.ClassTable.GetRowName (Classes[0])
+		ClassName = CommonTables.ClassTable.GetRowName (Classes[0])
 		KitName = ClassName # for simplicity throughout the code
-		Classes[0] = GUICommon.ClassTable.GetValue (Classes[0], 5)
+		Classes[0] = CommonTables.ClassTable.GetValue (Classes[0], 5)
 		# Class[1] is taken care of above
 
 		# we need the old level as well
@@ -212,8 +213,8 @@ def OpenLevelUpWindow():
 		# we don't care about the current level, but about the to-be-achieved one
 		# get the next level
 		Level[i] = LUCommon.GetNextLevelFromExp (GemRB.GetPlayerStat (pc, IE_XP)/NumClasses, Classes[i])
-		TmpIndex = GUICommon.ClassTable.FindValue (5, Classes[i])
-		TmpName = GUICommon.ClassTable.GetRowName (TmpIndex) 
+		TmpIndex = CommonTables.ClassTable.FindValue (5, Classes[i])
+		TmpName = CommonTables.ClassTable.GetRowName (TmpIndex) 
 
 #		print "Name:",TmpName
 
@@ -233,15 +234,15 @@ def OpenLevelUpWindow():
 
 		# save our current and next spell amounts
 		StartLevel = Level[i] - LevelDiff[i]
-		DruidTable = GUICommon.ClassSkillsTable.GetValue (Classes[i], 0, 0)
-		ClericTable = GUICommon.ClassSkillsTable.GetValue (Classes[i], 1, 0)
-		MageTable = GUICommon.ClassSkillsTable.GetValue (Classes[i], 2, 0)
+		DruidTable = CommonTables.ClassSkillsTable.GetValue (Classes[i], 0, 0)
+		ClericTable = CommonTables.ClassSkillsTable.GetValue (Classes[i], 1, 0)
+		MageTable = CommonTables.ClassSkillsTable.GetValue (Classes[i], 2, 0)
 
 		# see if we have mage spells
 		if MageTable != "*":
 			# we get 1 extra spell per level if we're a specialist
 			Specialist = 0
-			if GUICommon.KitListTable.GetValue (Kit, 7) == 1: # see if we're a kitted mage
+			if CommonTables.KitListTable.GetValue (Kit, 7) == 1: # see if we're a kitted mage
 				Specialist = 1
 			MageTable = GemRB.LoadTable (MageTable)
 			# loop through each spell level and save the amount possible to cast (current)
@@ -281,9 +282,9 @@ def OpenLevelUpWindow():
 
 		# setup class bonuses for this class
 		if IsMulti or IsDual or Kit == 0:
-			ABTable = GUICommon.ClassSkillsTable.GetValue (TmpName, "ABILITIES")
+			ABTable = CommonTables.ClassSkillsTable.GetValue (TmpName, "ABILITIES")
 		else: # single-classed with a kit
-			ABTable = GUICommon.KitListTable.GetValue (str(Kit), "ABILITIES")
+			ABTable = CommonTables.KitListTable.GetValue (str(Kit), "ABILITIES")
 
 		# add the abilites if we aren't a mage and have a table to ref
 		if ABTable != "*" and ABTable[:6] != "CLABMA":
@@ -313,8 +314,8 @@ def OpenLevelUpWindow():
 		for i in range (NumClasses):
 			if IsMulti:
 				# get the row name for lookup ex. MULTI2FIGHTER, MULTI3THIEF
-				MultiName = GUICommon.ClassTable.FindValue (5, Classes[i])
-				MultiName = GUICommon.ClassTable.GetRowName (MultiName)
+				MultiName = CommonTables.ClassTable.FindValue (5, Classes[i])
+				MultiName = CommonTables.ClassTable.GetRowName (MultiName)
 				MultiName = "MULTI" + str(NumClasses) + MultiName
 			else:
 				MultiName = ClassName
@@ -438,8 +439,8 @@ def GetLevelUpNews():
 
 	for i in range(NumClasses):
 		# get the class name
-		TmpClassName = GUICommon.ClassTable.FindValue (5, Classes[i])
-		TmpClassName = GUICommon.ClassTable.GetRowName (TmpClassName)
+		TmpClassName = CommonTables.ClassTable.FindValue (5, Classes[i])
+		TmpClassName = CommonTables.ClassTable.GetRowName (TmpClassName)
 
 		# backstab
 		# NOTE: Stalkers and assassins should get the correct mods at the correct levels based
@@ -452,7 +453,7 @@ def GetLevelUpNews():
 			BackstabMult = BackstabTable.GetValue (0, Level[i])
 
 		# lay on hands
-		if (GUICommon.ClassSkillsTable.GetValue (Classes[i], 6) != "*"):
+		if (CommonTables.ClassSkillsTable.GetValue (Classes[i], 6) != "*"):
 			# inquisitors and undead hunters don't get lay on hands out the chute, whereas cavaliers
 			# and unkitted paladins do; therefore, we check for the existence of lay on hands to ensure
 			# the character should get the new value; LoH is defined in GA_SPCL211 if anyone wants to
@@ -598,8 +599,8 @@ def LevelUpDonePress():
 			# learn all the spells we're given, but don't have, up to our given casting level
 			if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 1) > 0: # we can memorize spells of this level
 				for j in range(NumClasses): # loop through each class
-					IsDruid = GUICommon.ClassSkillsTable.GetValue (Classes[j], 0, 0)
-					IsCleric = GUICommon.ClassSkillsTable.GetValue (Classes[j], 1, 0)
+					IsDruid = CommonTables.ClassSkillsTable.GetValue (Classes[j], 0, 0)
+					IsCleric = CommonTables.ClassSkillsTable.GetValue (Classes[j], 1, 0)
 					if IsCleric == "*" and IsDruid == "*": # no divine spells (so mage/cleric multis don't screw up)
 						continue
 					elif IsCleric == "*": # druid spells
@@ -650,8 +651,8 @@ def ReactivateBaseClass ():
 	Proficiencies, THACO, saves, spells, and innate abilites,
 	most noteably."""
 
-	ClassIndex = GUICommon.ClassTable.FindValue (5, Classes[1])
-	ClassName = GUICommon.ClassTable.GetRowName (ClassIndex)
+	ClassIndex = CommonTables.ClassTable.FindValue (5, Classes[1])
+	ClassName = CommonTables.ClassTable.GetRowName (ClassIndex)
 	KitIndex = GUICommon.GetKitIndex (pc)
 
 	# reactivate all our proficiencies
@@ -676,7 +677,7 @@ def ReactivateBaseClass ():
 		GemRB.SetPlayerStat (pc, IE_TOHIT, TmpThaco)
 
 	# see if all our saves are lower than our current saves
-	SavesTable = GUICommon.ClassTable.GetValue (ClassIndex, 3, 0)
+	SavesTable = CommonTables.ClassTable.GetValue (ClassIndex, 3, 0)
 	SavesTable = GemRB.LoadTable (SavesTable)
 	for i in range (5):
 		# see if this save is lower than our old save
@@ -685,7 +686,7 @@ def ReactivateBaseClass ():
 			GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+i, TmpSave)
 
 	# see if we're a caster
-	SpellTables = [GUICommon.ClassSkillsTable.GetValue (Classes[1], 0, 0), GUICommon.ClassSkillsTable.GetValue (Classes[1], 1, 0), GUICommon.ClassSkillsTable.GetValue (Classes[1], 2, 0)]
+	SpellTables = [CommonTables.ClassSkillsTable.GetValue (Classes[1], 0, 0), CommonTables.ClassSkillsTable.GetValue (Classes[1], 1, 0), CommonTables.ClassSkillsTable.GetValue (Classes[1], 2, 0)]
 	if SpellTables[2] != "*": # casts mage spells
 		# set up our memorizations
 		SpellTable = GemRB.LoadTable (SpellTables[2])
@@ -726,9 +727,9 @@ def ReactivateBaseClass ():
 
 	# setup class bonuses for this class
 	if KitIndex == 0: # no kit
-		ABTable = GUICommon.ClassSkillsTable.GetValue (ClassName, "ABILITIES")
+		ABTable = CommonTables.ClassSkillsTable.GetValue (ClassName, "ABILITIES")
 	else: # kit
-		ABTable = GUICommon.KitListTable.GetValue (KitIndex, 4, 0)
+		ABTable = CommonTables.KitListTable.GetValue (KitIndex, 4, 0)
 	print "ABTable:",ABTable
 
 	# add the abilites if we aren't a mage and have a table to ref

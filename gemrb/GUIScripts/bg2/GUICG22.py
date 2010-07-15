@@ -19,7 +19,7 @@
 #character generation, class kit (GUICG22)
 
 import GemRB
-import GUICommon
+import CommonTables
 from ie_stats import *
 from GUIDefines import *
 
@@ -44,10 +44,10 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	MyChar = GemRB.GetVar ("Slot")
 	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
-	RaceName = GUICommon.RaceTable.GetRowName(GUICommon.RaceTable.FindValue (3, Race) )
+	RaceName = CommonTables.RaceTable.GetRowName(CommonTables.RaceTable.FindValue (3, Race) )
 
 	ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	ClassName = GUICommon.ClassTable.GetRowName (GemRB.GetPlayerStat (MyChar, IE_HITPOINTS)) # barbarian hack
+	ClassName = CommonTables.ClassTable.GetRowName (GemRB.GetPlayerStat (MyChar, IE_HITPOINTS)) # barbarian hack
 
 	KitTable = GemRB.LoadTable("kittable")
 	KitTableName = KitTable.GetValue(ClassName, RaceName)
@@ -144,7 +144,7 @@ def RedrawKits():
 				Kit = SchoolList.GetValue (Kit, 3)
 			else:
 				Kit = 0
-				KitName = GUICommon.ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
+				KitName = CommonTables.ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
 		else:
 			Kit = KitTable.GetValue (i+TopIndex,0)
 			if ClassID == 1:
@@ -160,9 +160,9 @@ def RedrawKits():
 					EnabledButtons.append(Kit-21)
 			else:
 				if Kit:
-					KitName = GUICommon.KitListTable.GetValue(Kit, 1)
+					KitName = CommonTables.KitListTable.GetValue(Kit, 1)
 				else:
-					KitName = GUICommon.ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
+					KitName = CommonTables.ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
 		Button.SetText(KitName)
 		if not EnabledButtons or i+TopIndex in EnabledButtons:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
@@ -210,9 +210,9 @@ def KitPress():
 		GemRB.SetVar("MAGESCHOOL", 0) # so bards don't get schools
 
 	if Kit == 0:
-		KitDescription = GUICommon.ClassTable.GetValue(GemRB.GetVar("Class")-1, 1)
+		KitDescription = CommonTables.ClassTable.GetValue(GemRB.GetVar("Class")-1, 1)
 	else:
-		KitDescription = GUICommon.KitListTable.GetValue(Kit, 3)
+		KitDescription = CommonTables.KitListTable.GetValue(Kit, 3)
 
 	TextAreaControl.SetText(KitDescription)
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
@@ -238,11 +238,11 @@ def NextPress():
 	MageSchool = GemRB.GetVar ("MAGESCHOOL")
 	if MageSchool and not KitIndex:
 		SchoolTable = GemRB.LoadTable ("magesch")
-		KitIndex = GUICommon.KitListTable.FindValue (6, SchoolTable.GetValue (MageSchool, 3) )
+		KitIndex = CommonTables.KitListTable.FindValue (6, SchoolTable.GetValue (MageSchool, 3) )
 
 	#save the kit
 	KitValue = (0x4000 + KitIndex)
-	KitName = GUICommon.KitListTable.GetValue (KitIndex, 0)
+	KitName = CommonTables.KitListTable.GetValue (KitIndex, 0)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 
 	GemRB.SetNextScript("CharGen4") #abilities

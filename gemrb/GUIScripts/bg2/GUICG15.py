@@ -18,7 +18,7 @@
 #
 #character generation, racial enemy (GUICG15)
 import GemRB
-import GUICommon
+import CommonTables
 from GUIDefines import *
 from ie_stats import *
 
@@ -55,9 +55,9 @@ def OnLoad():
 
 	MyChar = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = GUICommon.ClassTable.FindValue (5, Class)
-	ClassName = GUICommon.ClassTable.GetRowName(Class)
-	TableName = GUICommon.ClassSkillsTable.GetValue(ClassName, "HATERACE")
+	Class = CommonTables.ClassTable.FindValue (5, Class)
+	ClassName = CommonTables.ClassTable.GetRowName(Class)
+	TableName = CommonTables.ClassSkillsTable.GetValue(ClassName, "HATERACE")
 	if TableName == "*":
 		GemRB.SetNextScript("GUICG7")
 		return

@@ -21,6 +21,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 import GUICommon
+import CommonTables
 import CharOverview
 
 BioWindow = 0
@@ -127,8 +128,8 @@ def NextPress():
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("BaseRace") )
 	race = GemRB.GetVar ("Race")
 	GemRB.SetPlayerStat (MyChar, IE_SUBRACE, race & 255 )
-	row = GUICommon.RaceTable.FindValue (3, race )
-	racename = GUICommon.RaceTable.GetRowName (row)
+	row = CommonTables.RaceTable.FindValue (3, race )
+	racename = CommonTables.RaceTable.GetRowName (row)
 	if row!=-1:
 		SetRaceResistances( MyChar, racename )
 		SetRaceAbilities( MyChar, racename )

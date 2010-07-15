@@ -18,7 +18,7 @@
 #
 #character generation, multi-class (GUICG10)
 import GemRB
-import GUICommon
+import CommonTables
 from ie_stats import *
 from GUIDefines import *
 import GUICG2
@@ -35,13 +35,13 @@ def OnLoad():
 	ClassWindow = GemRB.LoadWindow(10)
 
 	MyChar = GemRB.GetVar ("Slot")
-	ClassCount = GUICommon.ClassTable.GetRowCount()+1
+	ClassCount = CommonTables.ClassTable.GetRowCount()+1
 	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
-	RaceName = GUICommon.RaceTable.GetRowName(GUICommon.RaceTable.FindValue (3, Race) )
+	RaceName = CommonTables.RaceTable.GetRowName(CommonTables.RaceTable.FindValue (3, Race) )
 
 	j=0
 	for i in range(1,ClassCount):
-		if GUICommon.ClassTable.GetValue(i-1,4)==0:
+		if CommonTables.ClassTable.GetValue(i-1,4)==0:
 			continue
 		if j>11:
 			Button = ClassWindow.GetControl(j+7)
@@ -52,16 +52,16 @@ def OnLoad():
 		j = j + 1
 	j=0
 	for i in range(1,ClassCount):
-		ClassName = GUICommon.ClassTable.GetRowName(i-1)
-		Allowed = GUICommon.ClassTable.GetValue(ClassName, RaceName)
-		if GUICommon.ClassTable.GetValue(i-1,4)==0:
+		ClassName = CommonTables.ClassTable.GetRowName(i-1)
+		Allowed = CommonTables.ClassTable.GetValue(ClassName, RaceName)
+		if CommonTables.ClassTable.GetValue(i-1,4)==0:
 			continue
 		if j>11:
 			Button = ClassWindow.GetControl(j+7)
 		else:
 			Button = ClassWindow.GetControl(j+2)
 
-		t = GUICommon.ClassTable.GetValue(i-1, 0)
+		t = CommonTables.ClassTable.GetValue(i-1, 0)
 		Button.SetText(t )
 		j=j+1
 		if Allowed ==0:
@@ -89,7 +89,7 @@ def OnLoad():
 def ClassPress():
 	GUICG2.SetClass()
 	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(GUICommon.ClassTable.GetValue(Class,1) )
+	TextAreaControl.SetText(CommonTables.ClassTable.GetValue(Class,1) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -107,9 +107,9 @@ def NextPress():
 
 	# find the class from the class table
 	ClassIndex = GemRB.GetVar ("Class") - 1
-	Class = GUICommon.ClassTable.GetValue (ClassIndex, 5)
+	Class = CommonTables.ClassTable.GetValue (ClassIndex, 5)
 	#protect against barbarians
-	ClassName = GUICommon.ClassTable.GetRowName (GUICommon.ClassTable.FindValue (5, Class) )
+	ClassName = CommonTables.ClassTable.GetRowName (CommonTables.ClassTable.FindValue (5, Class) )
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 
 	GemRB.SetNextScript("CharGen4") #alignment

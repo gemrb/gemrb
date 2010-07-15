@@ -22,6 +22,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 import GUICommon
+import CommonTables
 
 #the different types possible
 LUPROFS_TYPE_LEVELUP = 1
@@ -164,11 +165,11 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	if classid: #for dual classes when we can't get the class dualing to
 		Class = classid
 	elif IsDual[0]:
-		Class = GUICommon.ClassTable.GetValue (IsDual[2], 5)
+		Class = CommonTables.ClassTable.GetValue (IsDual[2], 5)
 	else:
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassName = GUICommon.ClassTable.FindValue (5, Class)
-	ClassName = GUICommon.ClassTable.GetRowName (ClassName)
+	ClassName = CommonTables.ClassTable.FindValue (5, Class)
+	ClassName = CommonTables.ClassTable.GetRowName (ClassName)
 	ClassNameSave = ClassName
 
 	#find the class with the greatest prof potential
@@ -197,7 +198,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	if Kit and type != LUPROFS_TYPE_DUALCLASS and IsMulti[0]<2 and not IsDual[0]:
 		#if we do kit with dualclass, we'll get the old kit
 		#also don't want to worry about kitted multis
-		ProfsColumn = GUICommon.KitListTable.GetValue (Kit, 5)
+		ProfsColumn = CommonTables.KitListTable.GetValue (Kit, 5)
 	else:
 		#sorcerers don't have a column, so ref mages
 		if ClassName == "SORCERER":

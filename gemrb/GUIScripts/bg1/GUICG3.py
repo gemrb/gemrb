@@ -22,6 +22,7 @@ from GUIDefines import *
 from ie_stats import *
 import CharGenCommon
 import GUICommon
+import CommonTables
 
 
 AlignmentWindow = 0
@@ -42,7 +43,7 @@ def OnLoad():
 	GemRB.SetVar("Alignment",-1)
 	
 	Class = GemRB.GetVar("Class")-1
-	KitName = GUICommon.ClassTable.GetRowName(Class)
+	KitName = CommonTables.ClassTable.GetRowName(Class)
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 

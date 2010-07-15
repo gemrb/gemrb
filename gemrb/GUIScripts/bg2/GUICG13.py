@@ -18,7 +18,7 @@
 #
 #character generation, color (GUICG13)
 import GemRB
-import GUICommon
+import CommonTables
 from GUIDefines import *
 from ie_stats import *
 
@@ -52,7 +52,7 @@ def RefreshPDoll():
 	table = GemRB.LoadTable("avprefg")
 	Gender = GemRB.GetPlayerStat (MyChar, IE_SEX)
 	AnimID = AnimID+table.GetValue(Gender,0)
-	ResRef = GUICommon.AppearanceAvatarTable.GetValue(hex(AnimID), "LEVEL1")
+	ResRef = CommonTables.AppearanceAvatarTable.GetValue(hex(AnimID), "LEVEL1")
 
 	PDollButton.SetPLT(ResRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
 	return

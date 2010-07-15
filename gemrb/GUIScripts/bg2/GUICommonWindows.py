@@ -28,6 +28,7 @@ from ie_stats import IE_MAXHITPOINTS, IE_STATE_ID, IE_HITPOINTS, STATE_DEAD
 from ie_modal import *
 from ie_action import *
 import GUICommon
+import CommonTables
 import LUCommon
 
 # needed for all the Open*Window callbacks in the OptionsWindow
@@ -695,9 +696,9 @@ def SelectionChanged ():
 		#update mage school
 		GemRB.SetVar ("MAGESCHOOL", 0)
 		Kit = GUICommon.GetKitIndex (sel)
-		if Kit and GUICommon.KitListTable.GetValue (Kit, 7) == 1:
+		if Kit and CommonTables.KitListTable.GetValue (Kit, 7) == 1:
 			MageTable = GemRB.LoadTable ("magesch")
-			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, GUICommon.KitListTable.GetValue (Kit, 6) ) )
+			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, CommonTables.KitListTable.GetValue (Kit, 6) ) )
 
 		for i in range (PARTY_SIZE):
 			Button = PortraitWindow.GetControl (i)

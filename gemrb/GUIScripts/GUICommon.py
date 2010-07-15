@@ -21,6 +21,7 @@
 
 import GemRB
 import GUIClasses
+import CommonTables
 from ie_restype import RES_CHU, RES_2DA, RES_WMP, RES_ARE
 from ie_spells import LS_MEMO, LSR_KNOWN, LSR_LEVEL, LSR_STAT
 from GUIDefines import *
@@ -30,10 +31,7 @@ from ie_slots import SLOT_ANY
 
 OtherWindowFn = None
 
-# only used in SetEncumbranceLabels, but that is called very often
-StrModTable = StrModExTable = None
-ClassTable = KitListTable = ClassSkillsTable = RaceTable = NextLevelTable = None
-AppearanceAvatarTable = None
+CommonTables.Load ()
 
 def CloseOtherWindow (NewWindowFn):
 	global OtherWindowFn
@@ -100,7 +98,7 @@ def GetActorPaperDoll (actor):
 	level = GemRB.GetPlayerStat (actor, IE_ARMOR_TYPE)
 	row = "0x%04X" %anim_id
 	which = "LEVEL%d" %(level+1)
-	return AppearanceAvatarTable.GetValue (row, which)
+	return CommonTables.AppearanceAvatarTable.GetValue (row, which)
 
 def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
@@ -466,7 +464,7 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
 	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 
 	# encumbrance
-	max_encumb = StrModTable.GetValue (sstr, 3) + StrModExTable.GetValue (ext_str, 3)
+	max_encumb = CommonTables.StrModTable.GetValue (sstr, 3) + CommonTables.StrModExTable.GetValue (ext_str, 3)
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
 
 	Control = Window.GetControl (ControlID)
@@ -503,28 +501,28 @@ def GetActorClassTitle (actor):
 
 	if ClassTitle == 0:
 		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-		ClassIndex = ClassTable.FindValue ( 5, Class )
+		ClassIndex = CommonTables.ClassTable.FindValue ( 5, Class )
 		KitIndex = GetKitIndex (actor)
-		Multi = ClassTable.GetValue (ClassIndex, 4)
+		Multi = CommonTables.ClassTable.GetValue (ClassIndex, 4)
 		Dual = IsDualClassed (actor, 1)
 
 		if Multi and Dual[0] == 0: # true multi class
-			ClassTitle = ClassTable.GetValue (ClassIndex, 2)
+			ClassTitle = CommonTables.ClassTable.GetValue (ClassIndex, 2)
 			ClassTitle = GemRB.GetString (ClassTitle)
 		else:
 			if Dual[0]: # dual class
 				# first (previous) kit or class of the dual class
 				if Dual[0] == 1:
-					ClassTitle = KitListTable.GetValue (Dual[1], 2)
+					ClassTitle = CommonTables.KitListTable.GetValue (Dual[1], 2)
 				elif Dual[0] == 2:
-					ClassTitle = ClassTable.GetValue (Dual[1], 2)
+					ClassTitle = CommonTables.ClassTable.GetValue (Dual[1], 2)
 				ClassTitle = GemRB.GetString (ClassTitle) + " / "
-				ClassTitle += GemRB.GetString (ClassTable.GetValue (Dual[2], 2))
+				ClassTitle += GemRB.GetString (CommonTables.ClassTable.GetValue (Dual[2], 2))
 			else: # ordinary class or kit
 				if KitIndex:
-					ClassTitle = KitListTable.GetValue (KitIndex, 2)
+					ClassTitle = CommonTables.KitListTable.GetValue (KitIndex, 2)
 				else:
-					ClassTitle = ClassTable.GetValue (ClassIndex, 2)
+					ClassTitle = CommonTables.ClassTable.GetValue (ClassIndex, 2)
 				ClassTitle = GemRB.GetString (ClassTitle)
 	else:
 		ClassTitle = GemRB.GetString (ClassTitle)
@@ -551,7 +549,7 @@ def GetKitIndex (actor):
 	# carefully looking for kit by the usability flag
 	# since the barbarian kit id clashes with the no-kit value
 	if KitIndex == 0 and Kit != 0x4000:
-		KitIndex = KitListTable.FindValue (6, Kit)
+		KitIndex = CommonTables.KitListTable.FindValue (6, Kit)
 		if KitIndex == -1:
 			KitIndex = 0
 
@@ -573,14 +571,14 @@ def IsDualClassed(actor, verbose):
 
 	if verbose:
 		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-		ClassIndex = ClassTable.FindValue (5, Class)
-		Multi = ClassTable.GetValue (ClassIndex, 4)
+		ClassIndex = CommonTables.ClassTable.FindValue (5, Class)
+		Multi = CommonTables.ClassTable.GetValue (ClassIndex, 4)
 		DualInfo = []
 		KitIndex = GetKitIndex (actor)
 
 		if (Dual & MC_WAS_ANY_CLASS) > 0: # first (previous) class of the dual class
-			MCColumn = ClassTable.GetColumnIndex ("MC_WAS_ID")
-			FirstClassIndex = ClassTable.FindValue (MCColumn, Dual & MC_WAS_ANY_CLASS)
+			MCColumn = CommonTables.ClassTable.GetColumnIndex ("MC_WAS_ID")
+			FirstClassIndex = CommonTables.ClassTable.FindValue (MCColumn, Dual & MC_WAS_ANY_CLASS)
 			if KitIndex:
 				DualInfo.append (1)
 				DualInfo.append (KitIndex)
@@ -592,7 +590,7 @@ def IsDualClassed(actor, verbose):
 			Mask = 1
 			for i in range (1,16):
 				if Multi & Mask:
-					ClassIndex = ClassTable.FindValue (5, i)
+					ClassIndex = CommonTables.ClassTable.FindValue (5, i)
 					if ClassIndex == FirstClassIndex:
 						Mask = 1 << i
 						continue
@@ -626,18 +624,18 @@ def IsDualSwap (actor):
 	# split the full class name into its individual parts
 	# i.e FIGHTER_MAGE becomes [FIGHTER, MAGE]
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	Class = ClassTable.FindValue (5, Class)
-	Class = ClassTable.GetRowName (Class)
+	Class = CommonTables.ClassTable.FindValue (5, Class)
+	Class = CommonTables.ClassTable.GetRowName (Class)
 	Class = Class.split("_")
 
 	# get our old class name
 	if Dual[0] == 2:
-		BaseClass = ClassTable.GetRowName (Dual[1])
+		BaseClass = CommonTables.ClassTable.GetRowName (Dual[1])
 	else:
 		BaseClass = GetKitIndex (actor)
-		BaseClass = KitListTable.GetValue (BaseClass, 7)
-		BaseClass = ClassTable.FindValue (5, BaseClass)
-		BaseClass = ClassTable.GetRowName (BaseClass)
+		BaseClass = CommonTables.KitListTable.GetValue (BaseClass, 7)
+		BaseClass = CommonTables.ClassTable.FindValue (5, BaseClass)
+		BaseClass = CommonTables.ClassTable.GetRowName (BaseClass)
 
 	# if our old class is the first class, we need to swap
 	if Class[0] == BaseClass:
@@ -657,8 +655,8 @@ def IsMultiClassed (actor, verbose):
 		return (0,-1,-1,-1)
 
 	# get our base class
-	ClassIndex = ClassTable.FindValue (5, GemRB.GetPlayerStat (actor, IE_CLASS))
-	IsMulti = ClassTable.GetValue (ClassIndex, 4) # 0 if not multi'd
+	ClassIndex = CommonTables.ClassTable.FindValue (5, GemRB.GetPlayerStat (actor, IE_CLASS))
+	IsMulti = CommonTables.ClassTable.GetValue (ClassIndex, 4) # 0 if not multi'd
 	IsDual = IsDualClassed (actor, 0)
 
 	# dual-class char's look like multi-class chars
@@ -671,7 +669,7 @@ def IsMultiClassed (actor, verbose):
 	Classes = [0]*3
 	NumClasses = 0
 	Mask = 1 # we're looking at multiples of 2
-	ClassNames = ClassTable.GetRowName(ClassIndex).split("_")
+	ClassNames = CommonTables.ClassTable.GetRowName(ClassIndex).split("_")
 
 	# loop through each class and test it as a mask
 	# TODO: make 16 dynamic? -- allows for custom classes (not just kits)
@@ -679,7 +677,7 @@ def IsMultiClassed (actor, verbose):
 		if IsMulti&Mask: # it's part of this class
 			#we need to place the classes in the array based on their order in the name,
 			#NOT the order they are detected in
-			CurrentName = ClassTable.GetRowName (ClassTable.FindValue (5, i));
+			CurrentName = CommonTables.ClassTable.GetRowName (CommonTables.ClassTable.FindValue (5, i));
 			for j in range(len(ClassNames)):
 				if ClassNames[j] == CurrentName:
 					Classes[j] = i # mask is (i-1)^2 where i is class id
@@ -711,15 +709,15 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 			originalkit = GetKitIndex (pc)
 
 			if originalkit: # kitted; find the class value
-				originalkit = KitListTable.GetValue (originalkit, 7)
+				originalkit = CommonTables.KitListTable.GetValue (originalkit, 7)
 			else: # just get the class value
 				originalkit = GemRB.GetPlayerStat (pc, IE_CLASS)
 
 			# this is is specifically for dual-classes and will not work to remove only one
 			# spell type from a ranger/cleric multi-class
-			if ClassSkillsTable.GetValue (originalkit, 0, 0) != "*": # knows druid spells
+			if CommonTables.ClassSkillsTable.GetValue (originalkit, 0, 0) != "*": # knows druid spells
 				originalkit = 0x8000
-			elif ClassSkillsTable.GetValue (originalkit, 1, 0) != "*": # knows cleric spells
+			elif CommonTables.ClassSkillsTable.GetValue (originalkit, 1, 0) != "*": # knows cleric spells
 				originalkit = 0x4000
 			else: # don't know any other spells
 				originalkit = 0
@@ -778,13 +776,13 @@ def CanDualClass(actor):
 	DualClassTable = GemRB.LoadTable ("dualclas")
 	CurrentStatTable = GemRB.LoadTable ("abdcscrq")
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassIndex = ClassTable.FindValue (5, Class)
-	ClassName = ClassTable.GetRowName (ClassIndex)
+	ClassIndex = CommonTables.ClassTable.FindValue (5, Class)
+	ClassName = CommonTables.ClassTable.GetRowName (ClassIndex)
 	KitIndex = GetKitIndex (actor)
 	if KitIndex == 0:
 		ClassTitle = ClassName
 	else:
-		ClassTitle = KitListTable.GetValue (KitIndex, 0)
+		ClassTitle = CommonTables.KitListTable.GetValue (KitIndex, 0)
 	Row = DualClassTable.GetRowIndex (ClassTitle)
 
 	# a lookup table for the DualClassTable columns
@@ -849,29 +847,6 @@ def CanDualClass(actor):
 		print "CannotDualClass: level 1"
 		return 1
 	return 0
-
-def LoadCommonTables():
-	global ClassTable, KitListTable, ClassSkillsTable, RaceTable, NextLevelTable
-	global AppearanceAvatarTable, StrModExTable, StrModTable
-
-	print # so the following output isn't appended to an existing line
-	if not ClassTable:
-		ClassTable = GemRB.LoadTable ("classes")
-	if not KitListTable and GemRB.HasResource("kitlist", RES_2DA):
-		KitListTable = GemRB.LoadTable ("kitlist")
-	if not ClassSkillsTable:
-		ClassSkillsTable = GemRB.LoadTable ("clskills")
-	if not RaceTable:
-		RaceTable = GemRB.LoadTable ("races")
-	if not NextLevelTable:
-		NextLevelTable = GemRB.LoadTable ("xplevel")
-	if not AppearanceAvatarTable and GemRB.HasResource("pdolls", RES_2DA):
-		AppearanceAvatarTable = GemRB.LoadTable ("pdolls")
-	if not StrModTable:
-		StrModTable = GemRB.LoadTable ("strmod")
-		StrModExTable = GemRB.LoadTable ("strmodex")
-
-LoadCommonTables ()
 
 GameWindow = GUIClasses.GWindow(0)
 GameControl = GUIClasses.GControl(0,0)

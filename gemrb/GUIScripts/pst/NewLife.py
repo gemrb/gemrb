@@ -24,7 +24,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
-import GUICommon
+import CommonTables
 
 NewLifeWindow = 0
 QuitWindow = 0
@@ -354,8 +354,8 @@ def StrPress():
 	else:
 		e=0
 
-	x = GUICommon.StrModTable.GetValue(s,0) + GUICommon.StrModExTable.GetValue(e,0)
-	y = GUICommon.StrModTable.GetValue(s,1) + GUICommon.StrModExTable.GetValue(e,1)
+	x = CommonTables.StrModTable.GetValue(s,0) + CommonTables.StrModExTable.GetValue(e,0)
+	y = CommonTables.StrModTable.GetValue(s,1) + CommonTables.StrModExTable.GetValue(e,1)
 	if x==0:
 		x=y
 		y=0

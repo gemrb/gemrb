@@ -19,7 +19,7 @@
 #character generation, alignment (GUICG3)
 import GemRB
 from GUIDefines import *
-import GUICommon
+import CommonTables
 
 AlignmentWindow = 0
 TextAreaControl = 0
@@ -31,7 +31,7 @@ def OnLoad():
 	global AlignmentTable
 	
 	Class = GemRB.GetVar("Class")-1
-	KitName = GUICommon.ClassTable.GetRowName(Class)
+	KitName = CommonTables.ClassTable.GetRowName(Class)
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 

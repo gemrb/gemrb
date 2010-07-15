@@ -21,6 +21,7 @@
 
 import GemRB
 import GUICommon
+import CommonTables
 from GUIDefines import *
 from ie_stats import *
 from ie_modal import *
@@ -379,8 +380,8 @@ def GetActorRaceTitle (actor):
 		RaceID += GemRB.GetPlayerStat (actor, IE_RACE)<<16
 	else:
 		RaceID = GemRB.GetPlayerStat (actor, IE_RACE)
-	row = GUICommon.RaceTable.FindValue (3, RaceID )
-	RaceTitle = GUICommon.RaceTable.GetValue (row, 2)
+	row = CommonTables.RaceTable.FindValue (3, RaceID )
+	RaceTitle = CommonTables.RaceTable.GetValue (row, 2)
 	return RaceTitle
 
 # NOTE: this function is called with the primary classes
@@ -388,11 +389,11 @@ def GetKitIndex (actor, ClassIndex):
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 
 	KitIndex = -1
-	ClassID = GUICommon.ClassTable.GetValue (ClassIndex, 2)
+	ClassID = CommonTables.ClassTable.GetValue (ClassIndex, 2)
 	# skip the primary classes
-	for ci in range (10, GUICommon.ClassTable.GetRowCount ()):
-		BaseClass = GUICommon.ClassTable.GetValue (ci, 3)
-		if BaseClass == ClassID and Kit & GUICommon.ClassTable.GetValue (ci, 2):
+	for ci in range (10, CommonTables.ClassTable.GetRowCount ()):
+		BaseClass = CommonTables.ClassTable.GetValue (ci, 3)
+		if BaseClass == ClassID and Kit & CommonTables.ClassTable.GetValue (ci, 2):
 			KitIndex = ci
 
 	if KitIndex == -1:
@@ -408,9 +409,9 @@ def GetActorClassTitle (actor, ClassIndex):
 	#Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	KitIndex = GetKitIndex (actor, ClassIndex)
 	if KitIndex == 0:
-		ClassTitle = GUICommon.ClassTable.GetValue (ClassIndex, 0)
+		ClassTitle = CommonTables.ClassTable.GetValue (ClassIndex, 0)
 	else:
-		ClassTitle = GUICommon.ClassTable.GetValue (KitIndex, 0)
+		ClassTitle = CommonTables.ClassTable.GetValue (KitIndex, 0)
 
 	if ClassTitle == "*":
 		return 0

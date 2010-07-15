@@ -19,6 +19,7 @@
 # character generation - ability; next skills/profs/spells (CharGen6)
 import GemRB
 import GUICommon
+import CommonTables
 import CharGenCommon
 import LUSkillsSelection
 import LUProfsSelection
@@ -52,12 +53,12 @@ def OnLoad():
 
 	# learn divine spells if appropriate
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	TableName = GUICommon.ClassSkillsTable.GetValue (Class, 1, 0) # cleric spells
+	TableName = CommonTables.ClassSkillsTable.GetValue (Class, 1, 0) # cleric spells
 
 	if TableName == "*": # only druid spells or no spells at all
-		TableName = GUICommon.ClassSkillsTable.GetValue (Class, 0, 0)
+		TableName = CommonTables.ClassSkillsTable.GetValue (Class, 0, 0)
 		ClassFlag = 0x8000
-	elif GUICommon.ClassSkillsTable.GetValue (Class, 0, 0) != "*": # cleric and druid spells
+	elif CommonTables.ClassSkillsTable.GetValue (Class, 0, 0) != "*": # cleric and druid spells
 		ClassFlag = 0
 	else: # only cleric spells
 		ClassFlag = 0x4000
@@ -76,9 +77,9 @@ def OnLoad():
 			#be looked at first in Cleric/Ranger multi's, which is correct
 			foundindex = 0
 			for i in range (IsMulti[0]):
-				ClassName = GUICommon.ClassTable.GetRowName (GUICommon.ClassTable.FindValue (5, IsMulti[i+1]) )
+				ClassName = CommonTables.ClassTable.GetRowName (CommonTables.ClassTable.FindValue (5, IsMulti[i+1]) )
 				for table in "CLERICSPELL", "DRUIDSPELL":
-					if GUICommon.ClassSkillsTable.GetValue (ClassName, table) != "*":
+					if CommonTables.ClassSkillsTable.GetValue (ClassName, table) != "*":
 						index = i
 						foundindex = 1
 						break

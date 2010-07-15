@@ -22,13 +22,14 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 import GUICommon
+import CommonTables
 import LUSpellSelection
 
 def OnLoad():
 	KitTable = GemRB.LoadTable("magesch")
 	Slot = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat (Slot, IE_CLASS)
-	TableName = GUICommon.ClassSkillsTable.GetValue(Class, 2)
+	TableName = CommonTables.ClassSkillsTable.GetValue(Class, 2)
 
 	# make sure we have a correct table
 	if Class == 19:
@@ -52,7 +53,7 @@ def OnLoad():
 	Level = GemRB.GetPlayerStat (Slot, IE_LEVEL)
 	if IsMulti[0]>1:
 		for i in range (2, IsMulti[0]+1):
-			if GUICommon.ClassSkillsTable.GetValue (IsMulti[i], 2, 0) != "*":
+			if CommonTables.ClassSkillsTable.GetValue (IsMulti[i], 2, 0) != "*":
 				Level = GemRB.GetPlayerStat (Slot, IE_LEVEL2+i-1)
 			break
 	GUICommon.SetupSpellLevels(Slot, TableName, IE_SPELL_TYPE_WIZARD, 1)

@@ -21,6 +21,7 @@ import GemRB
 from ie_stats import *
 from GUIDefines import *
 import GUICommon
+import CommonTables
 
 CharGenWindow = 0
 TextAreaControl = 0
@@ -149,8 +150,8 @@ def DisplayOverview(step):
 			TextAreaControl.Append (1048, -1) # new line
 			TextAreaControl.Append (": ")
 			stat = GemRB.GetPlayerStat(MyChar, IE_RACE)
-			v = GUICommon.RaceTable.FindValue (3, stat)
-			TextAreaControl.Append (GUICommon.RaceTable.GetValue (v,2) )
+			v = CommonTables.RaceTable.FindValue (3, stat)
+			TextAreaControl.Append (CommonTables.RaceTable.GetValue (v,2) )
 		elif part == 4:
 			TextAreaControl.Append (12136, -1)
 			TextAreaControl.Append (": ")
@@ -165,8 +166,8 @@ def DisplayOverview(step):
 		elif part == 6:
 			TextAreaControl.Append ("\n")
 			ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-			Class = GUICommon.ClassTable.FindValue (5, ClassID)
-			hasextra = GUICommon.ClassTable.GetValue (Class, 3)=="SAVEWAR"
+			Class = CommonTables.ClassTable.FindValue (5, ClassID)
+			hasextra = CommonTables.ClassTable.GetValue (Class, 3)=="SAVEWAR"
 			strextra = GemRB.GetPlayerStat (MyChar, IE_STREXTRA)
 			for i in range(6):
 				v = AbilityTable.GetValue (i, 2)
@@ -183,15 +184,15 @@ def DisplayOverview(step):
 			info = ""
 			SkillTable = GemRB.LoadTable ("skills")
 			ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-			Class = GUICommon.ClassTable.FindValue (5, ClassID)
-			ClassName = GUICommon.ClassTable.GetRowName (Class)
-			RangerSkills = GUICommon.ClassSkillsTable.GetValue (ClassName, "RANGERSKILL")
-			BardSkills = GUICommon.ClassSkillsTable.GetValue (ClassName, "BARDSKILL")
+			Class = CommonTables.ClassTable.FindValue (5, ClassID)
+			ClassName = CommonTables.ClassTable.GetRowName (Class)
+			RangerSkills = CommonTables.ClassSkillsTable.GetValue (ClassName, "RANGERSKILL")
+			BardSkills = CommonTables.ClassSkillsTable.GetValue (ClassName, "BARDSKILL")
 			KitName = GUICommon.GetKitIndex (MyChar)
 			if KitName == 0:
 				KitName = ClassName
 			else:
-				KitName = GUICommon.KitListTable.GetValue (KitName, 0)
+				KitName = CommonTables.KitListTable.GetValue (KitName, 0)
 
 			if SkillTable.GetValue ("RATE", KitName) != -1:
 				for skill in range(SkillTable.GetRowCount () - 2):

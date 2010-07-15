@@ -21,6 +21,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 import GUICommon
+import CommonTables
 
 import CharGenCommon
 
@@ -36,12 +37,12 @@ def OnLoad():
 
 	GUICommon.CloseOtherWindow (ClassWindow.Unload)
 
-	ClassCount = GUICommon.ClassTable.GetRowCount()+1
-	RaceName = GUICommon.RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
+	ClassCount = CommonTables.ClassTable.GetRowCount()+1
+	RaceName = CommonTables.RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
 
 	j=0
 	for i in range(1,ClassCount):
-		if GUICommon.ClassTable.GetValue(i-1,4)==0:
+		if CommonTables.ClassTable.GetValue(i-1,4)==0:
 			continue
 		if j>11:
 			Button = ClassWindow.GetControl(j+7)
@@ -52,16 +53,16 @@ def OnLoad():
 		j = j + 1
 	j=0
 	for i in range(1,ClassCount):
-		ClassName = GUICommon.ClassTable.GetRowName(i-1)
-		Allowed = GUICommon.ClassTable.GetValue(ClassName, RaceName)
-		if GUICommon.ClassTable.GetValue(i-1,4)==0:
+		ClassName = CommonTables.ClassTable.GetRowName(i-1)
+		Allowed = CommonTables.ClassTable.GetValue(ClassName, RaceName)
+		if CommonTables.ClassTable.GetValue(i-1,4)==0:
 			continue
 		if j>11:
 			Button = ClassWindow.GetControl(j+7)
 		else:
 			Button = ClassWindow.GetControl(j+2)
 
-		t = GUICommon.ClassTable.GetValue(i-1, 0)
+		t = CommonTables.ClassTable.GetValue(i-1, 0)
 		Button.SetText(t )
 		j=j+1
 		if Allowed ==0:
@@ -86,14 +87,14 @@ def OnLoad():
 
 def ClassPress():
 	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(GUICommon.ClassTable.GetValue(Class,1) )
+	TextAreaControl.SetText(CommonTables.ClassTable.GetValue(Class,1) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def NextPress():
 	#class	
 	ClassIndex = GemRB.GetVar ("Class")-1
-	Class = GUICommon.ClassTable.GetValue (ClassIndex, 5)
+	Class = CommonTables.ClassTable.GetValue (ClassIndex, 5)
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	CharGenCommon.next()

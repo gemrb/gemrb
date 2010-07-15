@@ -22,6 +22,7 @@ from GUIDefines import *
 from ie_stats import *
 import CharGenCommon
 import GUICommon
+import CommonTables
 
 RaceWindow = 0
 TextAreaControl = 0
@@ -62,9 +63,9 @@ def OnLoad():
 	GemRB.SetVar ("HatedRace",0)
 	
 	ClassRow = GemRB.GetVar("Class")-1
-	Class = GUICommon.ClassTable.GetValue(ClassRow, 5)
-	ClassName = GUICommon.ClassSkillsTable.GetRowName(Class)
-	TableName = GUICommon.ClassSkillsTable.GetValue(ClassName, "HATERACE")
+	Class = CommonTables.ClassTable.GetValue(ClassRow, 5)
+	ClassName = CommonTables.ClassSkillsTable.GetRowName(Class)
+	TableName = CommonTables.ClassSkillsTable.GetValue(ClassName, "HATERACE")
 	
 	GemRB.LoadWindowPack("GUICG")
 	RaceWindow = GemRB.LoadWindow(15)

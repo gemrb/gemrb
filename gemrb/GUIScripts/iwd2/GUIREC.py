@@ -24,6 +24,7 @@
 
 import GemRB
 import GUICommon
+import CommonTables
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
@@ -191,8 +192,8 @@ def GetAbilityBonus (pc, stat):
 def GetNextLevelExp (Level, Adjustment):
 	if Adjustment>5:
 		Adjustment = 5
-	if (Level < GUICommon.NextLevelTable.GetColumnCount (4) - 5):
-		return str(GUICommon.NextLevelTable.GetValue (4, Level + Adjustment ) )
+	if (Level < CommonTables.NextLevelTable.GetColumnCount (4) - 5):
+		return str(CommonTables.NextLevelTable.GetValue (4, Level + Adjustment ) )
 
 	return GemRB.GetString(24342) #godhood
 
@@ -243,16 +244,16 @@ def DisplayGeneral (pc):
 	Value2 = GemRB.GetPlayerStat(pc,IE_SUBRACE)
 	if Value2:
 		Value = Value<<16 | Value2
-	tmp = GUICommon.RaceTable.FindValue (3, Value)
-	Race = GUICommon.RaceTable.GetValue (tmp, 2)
-	tmp = GUICommon.RaceTable.GetValue (tmp, 8)
+	tmp = CommonTables.RaceTable.FindValue (3, Value)
+	Race = CommonTables.RaceTable.GetValue (tmp, 2)
+	tmp = CommonTables.RaceTable.GetValue (tmp, 8)
 
 	if tmp == -1:
 		tmp = highest
 	else:
 		tmp = GetFavoredClass(pc, tmp)
 
-	tmp = GUICommon.ClassTable.GetValue (tmp, 0)
+	tmp = CommonTables.ClassTable.GetValue (tmp, 0)
 	RecordsTextArea.Append (": ")
 	RecordsTextArea.Append (tmp)
 

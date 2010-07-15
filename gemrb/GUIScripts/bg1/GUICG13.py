@@ -22,6 +22,7 @@ from GUIDefines import *
 from ie_stats import *
 import CharGenCommon
 import GUICommon
+import CommonTables
 
 
 global IE_ANIM_ID
@@ -50,7 +51,7 @@ def RefreshPDoll():
 	AnimID = AnimID+table.GetValue(GemRB.GetVar("Class"),0)
 	table = GemRB.LoadTable("avprefg")
 	AnimID = AnimID+table.GetValue(GemRB.GetVar("Gender"),0)
-	ResRef = GUICommon.AppearanceAvatarTable.GetValue(hex(AnimID), "LEVEL1")
+	ResRef = CommonTables.AppearanceAvatarTable.GetValue(hex(AnimID), "LEVEL1")
 	PDollButton.SetPLT(ResRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
 
 	return

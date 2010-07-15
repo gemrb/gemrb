@@ -18,7 +18,7 @@
 #
 #character generation, race (GUICG2)
 import GemRB
-import GUICommon
+import CommonTables
 from ie_stats import IE_RACE
 from GUIDefines import *
 
@@ -34,7 +34,7 @@ def OnLoad():
 	RaceWindow = GemRB.LoadWindow(8)
 
 	MyChar = GemRB.GetVar ("Slot")
-	RaceCount = GUICommon.RaceTable.GetRowCount()
+	RaceCount = CommonTables.RaceTable.GetRowCount()
 
 	for i in range(2,RaceCount+2):
 		#hack to stop if the race table has more entries than the gui resource
@@ -48,7 +48,7 @@ def OnLoad():
 	GemRB.SetVar ("Race", -1)
 	for i in range(2, RaceCount+2):
 		Button = RaceWindow.GetControl(i)
-		Button.SetText(GUICommon.RaceTable.GetValue(i-2,0) )
+		Button.SetText(CommonTables.RaceTable.GetValue(i-2,0) )
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RacePress)
 		Button.SetVarAssoc("Race", i-2 )
@@ -71,7 +71,7 @@ def OnLoad():
 
 def RacePress():
 	Race = GemRB.GetVar("Race")
-	TextAreaControl.SetText(GUICommon.RaceTable.GetValue(Race,1) )
+	TextAreaControl.SetText(CommonTables.RaceTable.GetValue(Race,1) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -87,7 +87,7 @@ def NextPress():
 		RaceWindow.Unload()
 
 	Race = GemRB.GetVar ("Race")
-	GemRB.SetPlayerStat (MyChar, IE_RACE, GUICommon.RaceTable.GetValue(Race,3) )
+	GemRB.SetPlayerStat (MyChar, IE_RACE, CommonTables.RaceTable.GetValue(Race,3) )
 
 	GemRB.SetNextScript("CharGen3") #class
 	return

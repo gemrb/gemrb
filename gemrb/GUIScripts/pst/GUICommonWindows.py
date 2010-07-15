@@ -25,6 +25,7 @@ from ie_stats import *
 from ie_action import *
 import GUIClasses
 import GUICommon
+import CommonTables
 import LUCommon
 
 import GUIJRNL
@@ -216,7 +217,7 @@ def GetActorPortrait (actor, which):
 	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID) & 255
 	row = "0x%02X" %anim_id
 
-	return GUICommon.AppearanceAvatarTable.GetValue (row, which)
+	return CommonTables.AppearanceAvatarTable.GetValue (row, which)
 	
 
 def UpdateAnimation ():

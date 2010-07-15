@@ -22,6 +22,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_2DA
 import GUICommon
+import CommonTables
 import LUSpellSelection
 import LUProfsSelection
 import LUSkillsSelection
@@ -123,9 +124,9 @@ def DualClassWindow ():
 
 	# class name
 	Kit = GUICommon.GetKitIndex (pc)
-	OldClassName = GUICommon.ClassTable.GetRowName (GUICommon.ClassTable.FindValue (5, GemRB.GetPlayerStat (pc, IE_CLASS) ) )
+	OldClassName = CommonTables.ClassTable.GetRowName (CommonTables.ClassTable.FindValue (5, GemRB.GetPlayerStat (pc, IE_CLASS) ) )
 	if Kit:
-		OldKitName = GUICommon.KitListTable.GetValue (Kit, 0, 0)
+		OldKitName = CommonTables.KitListTable.GetValue (Kit, 0, 0)
 	else:
 		OldKitName = OldClassName
 	DCLabel = DCMainWindow.GetControl (0x10000009)
@@ -153,9 +154,9 @@ def DCMainDonePress ():
 	# remove old class abilities
 	KitIndex = GUICommon.GetKitIndex (pc)
 	if KitIndex:
-		ABTable = GUICommon.KitListTable.GetValue (str(KitIndex), "ABILITIES")
+		ABTable = CommonTables.KitListTable.GetValue (str(KitIndex), "ABILITIES")
 	else:
-		ABTable = GUICommon.ClassSkillsTable.GetValue (OldClassName, "ABILITIES")
+		ABTable = CommonTables.ClassSkillsTable.GetValue (OldClassName, "ABILITIES")
 	if ABTable != "*" and ABTable[:6] != "CLABMA": # mage kits specify ability tables which don't exist
 		GUICommon.RemoveClassAbilities (pc, ABTable, GemRB.GetPlayerStat (pc, IE_LEVEL))
 
@@ -166,7 +167,7 @@ def DCMainDonePress ():
 	GUICommon.RemoveKnownSpells (pc, IE_SPELL_TYPE_PRIEST, 1,7, 1)
 
 	# apply our class abilities
-	ABTable = GUICommon.ClassSkillsTable.GetValue (ClassName, "ABILITIES")
+	ABTable = CommonTables.ClassSkillsTable.GetValue (ClassName, "ABILITIES")
 	if ABTable != "*" and ABTable[:6] != "CLABMA": # mage kits specify ability tables which don't exist
 		GUICommon.AddClassAbilities (pc, ABTable)
 
@@ -181,10 +182,10 @@ def DCMainDonePress ():
 	# save our new class and say was multi
 	OldClassId = GemRB.GetPlayerStat (pc, IE_CLASS)
 	MultClassId = (1 << (NewClassId-1)) | (1 << (OldClassId-1))
-	MultClassId = GUICommon.ClassTable.FindValue (4, MultClassId)
-	MultClassId = GUICommon.ClassTable.GetValue (MultClassId, 5)
+	MultClassId = CommonTables.ClassTable.FindValue (4, MultClassId)
+	MultClassId = CommonTables.ClassTable.GetValue (MultClassId, 5)
 	GemRB.SetPlayerStat (pc, IE_CLASS, MultClassId)
-	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, GUICommon.ClassTable.GetValue (OldClassName, "MC_WAS_ID", 1))
+	GemRB.SetPlayerStat (pc, IE_MC_FLAGS, CommonTables.ClassTable.GetValue (OldClassName, "MC_WAS_ID", 1))
 
 	# update our levels and xp
 	if GUICommon.IsDualSwap (pc):
@@ -199,7 +200,7 @@ def DCMainDonePress ():
 	GemRB.SetPlayerStat (pc, IE_TOHIT, ThacoTable.GetValue (NewClassId-1, 0, 1))
 
 	# new saves
-	SavesTable = GUICommon.ClassTable.GetValue (GUICommon.ClassTable.FindValue (5, NewClassId), 3, 0)
+	SavesTable = CommonTables.ClassTable.GetValue (CommonTables.ClassTable.FindValue (5, NewClassId), 3, 0)
 	SavesTable = GemRB.LoadTable (SavesTable)
 	for i in range (5):
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+i, SavesTable.GetValue (i, 0))
@@ -268,7 +269,7 @@ def DCMainClassPress ():
 	# string refs for the given classes
 	DCClassStrings = []
 	for classname in DCClasses:
-		DCClassStrings.append(GUICommon.ClassTable.GetValue (classname, "NAME_REF", 1))
+		DCClassStrings.append(CommonTables.ClassTable.GetValue (classname, "NAME_REF", 1))
 
 	# setup the class buttons
 	for i in range (6):
@@ -335,7 +336,7 @@ def DCClassSelect ():
 	# all the possible strrefs for the different classes
 	DCClassStrings = []
 	for classname in DCClasses:
-		DCClassStrings.append (GUICommon.ClassTable.GetValue (classname, "DESC_REF", 1))
+		DCClassStrings.append (CommonTables.ClassTable.GetValue (classname, "DESC_REF", 1))
 
 	# update the text are with the new string
 	DCClassTextArea = DCClassWindow.GetControl (9)
@@ -358,7 +359,7 @@ def DCClassDonePress ():
 
 	# save the class
 	ClassName = DCClasses[DCClass]
-	NewClassId = GUICommon.ClassTable.GetValue (ClassName, "ID", 1)
+	NewClassId = CommonTables.ClassTable.GetValue (ClassName, "ID", 1)
 
 	# set our step to 2 so that the back button knows where we are
 	DCMainStep = 2
@@ -427,7 +428,7 @@ def DCOpenProfsWindow ():
 
 	# load up our window and set some basic variables
 	DCProfsWindow = GemRB.LoadWindow (15)
-	NewClassId = GUICommon.ClassTable.GetValue (ClassName, "ID", 1)
+	NewClassId = CommonTables.ClassTable.GetValue (ClassName, "ID", 1)
 	LUProfsSelection.SetupProfsWindow (pc, \
 		LUProfsSelection.LUPROFS_TYPE_DUALCLASS, DCProfsWindow, DCProfsRedraw, classid=NewClassId)
 
@@ -470,9 +471,9 @@ def DCProfsDonePress ():
 	global NewMageSpells, NewPriestMask
 
 	# check for mage spells and thief skills
-	SpellTable = GUICommon.ClassSkillsTable.GetValue (ClassName, "MAGESPELL")
-	ClericTable = GUICommon.ClassSkillsTable.GetValue (ClassName, "CLERICSPELL")
-	DruidTable = GUICommon.ClassSkillsTable.GetValue (ClassName, "DRUIDSPELL")
+	SpellTable = CommonTables.ClassSkillsTable.GetValue (ClassName, "MAGESPELL")
+	ClericTable = CommonTables.ClassSkillsTable.GetValue (ClassName, "CLERICSPELL")
+	DruidTable = CommonTables.ClassSkillsTable.GetValue (ClassName, "DRUIDSPELL")
 	if SpellTable != "*":
 		# we go 2,2 to get an extra spell
 		# TODO: add a mod to the function instead?

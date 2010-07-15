@@ -22,6 +22,7 @@ from math import ceil
 from GUIDefines import *
 from ie_stats import *
 import GUICommon
+import CommonTables
 
 # HLA selection
 HLAWindow = 0		# << HLA selection window
@@ -310,12 +311,12 @@ def GetHLAs ():
 
 	# get all the HLAs for each class
 	for i in range (NumClasses):
-		ClassIndex = GUICommon.ClassTable.FindValue (5, Classes[i])
-		ClassName = GUICommon.ClassTable.GetRowName (ClassIndex)
+		ClassIndex = CommonTables.ClassTable.FindValue (5, Classes[i])
+		ClassName = CommonTables.ClassTable.GetRowName (ClassIndex)
 		CurrentLevel = Level[i]
 
 		if Kit != 0 and NumClasses == 1 and not IsDual: # kitted single-class
-			KitName = GUICommon.KitListTable.GetValue (Kit, 0)
+			KitName = CommonTables.KitListTable.GetValue (Kit, 0)
 			HLAClassTable = "lu" + HLAAbbrTable.GetValue (KitName, "ABBREV")
 			ClassName = KitName
 		else: # everyone else
