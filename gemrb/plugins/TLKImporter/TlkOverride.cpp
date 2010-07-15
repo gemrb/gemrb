@@ -59,6 +59,8 @@ bool CTlkOverride::Init()
 	}
 
 	char Signature[8];
+
+	memset(Signature,0,8);
 	toh_str->Read( Signature, 4 );
 	if (strncmp( Signature, "TLK ", 4 ) != 0) {
 		printMessage("TLKImporter", "Not a valid TOH file.\n", LIGHT_RED);
