@@ -620,6 +620,7 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	headersize += NPCCount * PCSize;
 	for (i = 0;i<NPCCount; i++) {
 		Actor *ac=game->GetNPC(i);
+		printf("NPC: %s\n", ac->GetScriptName() );
 		headersize +=am->GetStoredFileSize(ac);
 	}
 
@@ -865,9 +866,9 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	stream->WriteDword( &CREOffset);
 	stream->WriteDword( &CRESize);
 	//creature resref is always unused in saved games
-	filling[0]='*';                       //make it the same as in the original
+	//BG1 doesn't even like the * in there, zero fill
+	//seems to be accepted by all
 	stream->Write( filling, 8);
-	filling[0]=0;
 	tmpDword = ac->GetOrientation();
 	stream->WriteDword( &tmpDword);
 	stream->WriteResRef(ac->Area);
