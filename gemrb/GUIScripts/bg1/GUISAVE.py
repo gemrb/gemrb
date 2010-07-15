@@ -193,7 +193,7 @@ def SavePress():
 	for j in range(PARTY_SIZE):
 		Button=ConfirmWindow.GetControl (40+j)
 		if Pos<len(Games):
-			Button.SetSprite2D(Games[ActPos].GetPortrait(j))
+			Button.SetSprite2D(Games[Pos].GetPortrait(j))
 		else:
 			Button.SetPicture("")
 
