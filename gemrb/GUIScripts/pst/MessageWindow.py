@@ -51,14 +51,18 @@ def OnLoad():
 	MessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
 	MessageTA.SetHistory (100)
 	GemRB.SetVar ("MessageTextArea", MessageTA.ID)
+	GemRB.SetVar ("MessageWindow", MessageWindow.ID)
+	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
 	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
 	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
-	GemRB.SetVar ("MessageWindow", -1)
+	GemRB.SetVar ("TopWindow", -1)
 	GemRB.SetVar ("OtherWindow", -1)
-	GemRB.SetVar ("ActionsPosition", 1) #Bottom
-	GemRB.SetVar ("OptionsPosition", 1) #Bottom
-	GemRB.SetVar ("MessagePosition", 1) #Bottom
+	GemRB.SetVar ("ActionsPosition", -1)
+	GemRB.SetVar ("OptionsPosition", -1)
+	GemRB.SetVar ("PortraitPosition", 4) #BottomAdded
+	GemRB.SetVar ("MessagePosition", 4) #BottomAdded
 	GemRB.SetVar ("OtherPosition", 0) #Left
+	GemRB.SetVar ("TopPosition", 5) #Invalidated
 	
 	GemRB.GameSetScreenFlags (0, OP_SET)
 	
