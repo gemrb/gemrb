@@ -620,7 +620,6 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	headersize += NPCCount * PCSize;
 	for (i = 0;i<NPCCount; i++) {
 		Actor *ac=game->GetNPC(i);
-		printf("NPC: %s\n", ac->GetScriptName() );
 		headersize +=am->GetStoredFileSize(ac);
 	}
 
