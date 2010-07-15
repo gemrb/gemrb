@@ -1482,8 +1482,12 @@ void Map::PurgeArea(bool items)
 			if (ac->Modified[IE_MC_FLAGS] & MC_KEEP_CORPSE) {
 				continue;
 			}
-			delete ac;
-			actors.erase( actors.begin()+i );
+			//don't delete persistent actors
+			if (ac->Persistent()) {
+				continue;
+			}
+			//even if you delete it, be very careful!
+			DeleteActor (i);
 		}
 	}
 	//2. remove any non critical items

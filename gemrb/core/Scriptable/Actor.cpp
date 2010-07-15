@@ -3226,7 +3226,7 @@ bool Actor::CheckOnDeath()
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
 
 	// party actors are never removed
-	if (InParty) return false;
+	if (Persistent()) return false;
 
 	if (Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) return true;
 	if (Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
