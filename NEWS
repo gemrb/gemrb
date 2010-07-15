@@ -1,11 +1,13 @@
-GemRB git (a3e093):
+GemRB git (e5fb6d):
   New features:
     - 
+    - new triggers, actions
+    - feet circle flickering on portrait hover
     - wisdom xp bonus (pst)
 
   Improved features:
     - 
-    - projectiles
+    - projectiles, subtitles, verbal constants
     - the core and guiscript design was cleaned up in many places
     - bugfixes
 
