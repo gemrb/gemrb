@@ -1290,7 +1290,13 @@ ieDword CREImporter::GetActorGemRB(Actor *act)
 	act->BaseStats[IE_INTOXICATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LUCK]=tmpByte;
+	str->Read( &tmpByte, 1 );
 	//these could be used to save iwd2 skills
+	//TODO: gemrb format
+	act->BaseStats[IE_TRACKING]=tmpByte;
+	for (int i=0;i<100;i++) {
+		str->ReadDword( &act->StrRefs[i] );
+	}
 	return 0;
 }
 
@@ -1447,7 +1453,8 @@ void CREImporter::GetActorBG(Actor *act)
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
-	act->KillVar[0]=0;
+	memset(act->KillVar, 0, 32);
+	memset(act->IncKillVar, 0, 32);
 
 	str->ReadDword( &KnownSpellsOffset );
 	str->ReadDword( &KnownSpellsCount );
