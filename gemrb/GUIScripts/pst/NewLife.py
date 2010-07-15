@@ -354,8 +354,8 @@ def StrPress():
 	else:
 		e=0
 
-	x = CommonTables.StrModTable.GetValue(s,0) + CommonTables.StrModExTable.GetValue(e,0)
-	y = CommonTables.StrModTable.GetValue(s,1) + CommonTables.StrModExTable.GetValue(e,1)
+	x = CommonTables.StrMod.GetValue(s,0) + CommonTables.StrModEx.GetValue(e,0)
+	y = CommonTables.StrMod.GetValue(s,1) + CommonTables.StrModEx.GetValue(e,1)
 	if x==0:
 		x=y
 		y=0

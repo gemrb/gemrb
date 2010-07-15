@@ -275,7 +275,7 @@ def RefreshInventoryWindow ():
 
 	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
 	row = "0x%04X" %anim_id
-	size = CommonTables.AppearanceAvatarTable.GetValue (row, "SIZE")
+	size = CommonTables.Pdolls.GetValue (row, "SIZE")
 
 	#Weapon
 	slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )

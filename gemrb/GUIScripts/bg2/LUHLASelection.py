@@ -311,12 +311,12 @@ def GetHLAs ():
 
 	# get all the HLAs for each class
 	for i in range (NumClasses):
-		ClassIndex = CommonTables.ClassTable.FindValue (5, Classes[i])
-		ClassName = CommonTables.ClassTable.GetRowName (ClassIndex)
+		ClassIndex = CommonTables.Classes.FindValue (5, Classes[i])
+		ClassName = CommonTables.Classes.GetRowName (ClassIndex)
 		CurrentLevel = Level[i]
 
 		if Kit != 0 and NumClasses == 1 and not IsDual: # kitted single-class
-			KitName = CommonTables.KitListTable.GetValue (Kit, 0)
+			KitName = CommonTables.KitList.GetValue (Kit, 0)
 			HLAClassTable = "lu" + HLAAbbrTable.GetValue (KitName, "ABBREV")
 			ClassName = KitName
 		else: # everyone else

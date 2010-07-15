@@ -55,9 +55,9 @@ def OnLoad():
 
 	MyChar = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = CommonTables.ClassTable.FindValue (5, Class)
-	ClassName = CommonTables.ClassTable.GetRowName(Class)
-	TableName = CommonTables.ClassSkillsTable.GetValue(ClassName, "HATERACE")
+	Class = CommonTables.Classes.FindValue (5, Class)
+	ClassName = CommonTables.Classes.GetRowName(Class)
+	TableName = CommonTables.ClassSkills.GetValue(ClassName, "HATERACE")
 	if TableName == "*":
 		GemRB.SetNextScript("GUICG7")
 		return

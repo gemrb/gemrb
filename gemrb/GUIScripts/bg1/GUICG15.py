@@ -63,9 +63,9 @@ def OnLoad():
 	GemRB.SetVar ("HatedRace",0)
 	
 	ClassRow = GemRB.GetVar("Class")-1
-	Class = CommonTables.ClassTable.GetValue(ClassRow, 5)
-	ClassName = CommonTables.ClassSkillsTable.GetRowName(Class)
-	TableName = CommonTables.ClassSkillsTable.GetValue(ClassName, "HATERACE")
+	Class = CommonTables.Classes.GetValue(ClassRow, 5)
+	ClassName = CommonTables.ClassSkills.GetRowName(Class)
+	TableName = CommonTables.ClassSkills.GetValue(ClassName, "HATERACE")
 	
 	GemRB.LoadWindowPack("GUICG")
 	RaceWindow = GemRB.LoadWindow(15)

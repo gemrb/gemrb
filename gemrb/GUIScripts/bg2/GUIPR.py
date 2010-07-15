@@ -185,10 +185,10 @@ def UpdatePriestWindow ():
 			Button.EnableBorder (0, 0)
 
 	Class = GemRB.GetPlayerStat (GemRB.GameGetSelectedPCSingle(), IE_CLASS)
-	DivineCaster = CommonTables.ClassSkillsTable.GetValue (Class, 1)
+	DivineCaster = CommonTables.ClassSkills.GetValue (Class, 1)
 	if DivineCaster == "*":
 		# also check the DRUIDSPELL column
-		DivineCaster = CommonTables.ClassSkillsTable.GetValue (Class, 0)
+		DivineCaster = CommonTables.ClassSkills.GetValue (Class, 0)
 	if DivineCaster == "*":
 		Window.SetVisible (WINDOW_GRAYED)
 	else:

@@ -31,7 +31,7 @@ def OnLoad():
 	global AlignmentTable
 	
 	Class = GemRB.GetVar("Class")-1
-	KitName = CommonTables.ClassTable.GetRowName(Class)
+	KitName = CommonTables.Classes.GetRowName(Class)
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 

@@ -130,10 +130,10 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	if classid: #used when dual-classing
 		Class = classid
 	elif IsDual[0]: #only care about the current class
-		Class = CommonTables.ClassTable.GetValue (IsDual[2], 5)
+		Class = CommonTables.Classes.GetValue (IsDual[2], 5)
 	else:
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	ClassName = CommonTables.ClassTable.GetRowName (CommonTables.ClassTable.FindValue (5, Class) )
+	ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, Class) )
 
 	#get the number of classes
 	if IsMulti[0]>1:
@@ -149,7 +149,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	if not Kit or type == LUSKILLS_TYPE_DUALCLASS or IsDual[0] or IsMulti[0]>1:
 		SkillsKitName = ClassName
 	else:
-		SkillsKitName = CommonTables.KitListTable.GetValue (Kit, 0, 0)
+		SkillsKitName = CommonTables.KitList.GetValue (Kit, 0, 0)
 
 	#figure out the correct skills table
 	SkillIndex = -1
@@ -157,7 +157,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		TmpClass = Class
 		if NumClasses > 1:
 			TmpClass = IsMulti[i+1]
-		if (CommonTables.ClassSkillsTable.GetValue (TmpClass, 5, 0) != "*"):
+		if (CommonTables.ClassSkills.GetValue (TmpClass, 5, 0) != "*"):
 			SkillIndex = i
 			break
 
@@ -187,8 +187,8 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		else:
 			#get racial values for dual-classing
 			SkillRacTable = GemRB.LoadTable ("SKILLRAC")
-			Race = CommonTables.RaceTable.FindValue (3, GemRB.GetPlayerStat (pc, IE_RACE))
-			Race = CommonTables.RaceTable.GetRowName (Race)
+			Race = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (pc, IE_RACE))
+			Race = CommonTables.Races.GetRowName (Race)
 
 			#get the skill values
 			for i in range(SkillsTable.GetRowCount()-2):
@@ -214,9 +214,9 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 				classname = IsMulti[i+1]
 			else:
 				classname = Class
-			classname = CommonTables.ClassTable.GetRowName (CommonTables.ClassTable.FindValue (5, classname))
+			classname = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, classname))
 			for table in "RANGERSKILL", "BARDSKILL":
-				SpecialSkillsTable = CommonTables.ClassSkillsTable.GetValue (classname, table)
+				SpecialSkillsTable = CommonTables.ClassSkills.GetValue (classname, table)
 				if SpecialSkillsTable != "*":
 					SpecialSkillsMap.append((SpecialSkillsTable, i))
 					break

@@ -35,13 +35,13 @@ def OnLoad():
 	ClassWindow = GemRB.LoadWindow(10)
 
 	MyChar = GemRB.GetVar ("Slot")
-	ClassCount = CommonTables.ClassTable.GetRowCount()+1
+	ClassCount = CommonTables.Classes.GetRowCount()+1
 	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
-	RaceName = CommonTables.RaceTable.GetRowName(CommonTables.RaceTable.FindValue (3, Race) )
+	RaceName = CommonTables.Races.GetRowName(CommonTables.Races.FindValue (3, Race) )
 
 	j=0
 	for i in range(1,ClassCount):
-		if CommonTables.ClassTable.GetValue(i-1,4)==0:
+		if CommonTables.Classes.GetValue(i-1,4)==0:
 			continue
 		if j>11:
 			Button = ClassWindow.GetControl(j+7)
@@ -52,16 +52,16 @@ def OnLoad():
 		j = j + 1
 	j=0
 	for i in range(1,ClassCount):
-		ClassName = CommonTables.ClassTable.GetRowName(i-1)
-		Allowed = CommonTables.ClassTable.GetValue(ClassName, RaceName)
-		if CommonTables.ClassTable.GetValue(i-1,4)==0:
+		ClassName = CommonTables.Classes.GetRowName(i-1)
+		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
+		if CommonTables.Classes.GetValue(i-1,4)==0:
 			continue
 		if j>11:
 			Button = ClassWindow.GetControl(j+7)
 		else:
 			Button = ClassWindow.GetControl(j+2)
 
-		t = CommonTables.ClassTable.GetValue(i-1, 0)
+		t = CommonTables.Classes.GetValue(i-1, 0)
 		Button.SetText(t )
 		j=j+1
 		if Allowed ==0:
@@ -89,7 +89,7 @@ def OnLoad():
 def ClassPress():
 	GUICG2.SetClass()
 	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(CommonTables.ClassTable.GetValue(Class,1) )
+	TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -107,9 +107,9 @@ def NextPress():
 
 	# find the class from the class table
 	ClassIndex = GemRB.GetVar ("Class") - 1
-	Class = CommonTables.ClassTable.GetValue (ClassIndex, 5)
+	Class = CommonTables.Classes.GetValue (ClassIndex, 5)
 	#protect against barbarians
-	ClassName = CommonTables.ClassTable.GetRowName (CommonTables.ClassTable.FindValue (5, Class) )
+	ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, Class) )
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 
 	GemRB.SetNextScript("CharGen4") #alignment

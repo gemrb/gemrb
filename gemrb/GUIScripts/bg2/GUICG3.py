@@ -36,12 +36,12 @@ def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
 	Kit = GUICommon.GetKitIndex (MyChar)
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = CommonTables.ClassTable.FindValue (5, Class)
+	Class = CommonTables.Classes.FindValue (5, Class)
 	if Kit == 0:
-		KitName = CommonTables.ClassTable.GetRowName(Class)
+		KitName = CommonTables.Classes.GetRowName(Class)
 	else:
 		#rowname is just a number, first value row what we need here
-		KitName = CommonTables.KitListTable.GetValue(Kit, 0)
+		KitName = CommonTables.KitList.GetValue(Kit, 0)
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 

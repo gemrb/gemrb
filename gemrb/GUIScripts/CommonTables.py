@@ -21,27 +21,27 @@ import GemRB
 from ie_restype import RES_2DA
 
 # these two are only used in SetEncumbranceLabels, but that is called very often
-StrModTable = StrModExTable = None
-ClassTable = KitListTable = ClassSkillsTable = RaceTable = NextLevelTable = None
-AppearanceAvatarTable = None
+StrMod = StrModEx = None
+Classes = KitList = ClassSkills = Races = NextLevel = None
+Pdolls = None
 
 def Load():
-	global ClassTable, KitListTable, ClassSkillsTable, RaceTable, NextLevelTable
-	global AppearanceAvatarTable, StrModExTable, StrModTable
+	global Classes, KitList, ClassSkills, Races, NextLevel
+	global Pdolls, StrModEx, StrMod
 
 	print # so the following output isn't appended to an existing line
-	if not ClassTable:
-		ClassTable = GemRB.LoadTable ("classes")
-	if not KitListTable and GemRB.HasResource("kitlist", RES_2DA):
-		KitListTable = GemRB.LoadTable ("kitlist")
-	if not ClassSkillsTable:
-		ClassSkillsTable = GemRB.LoadTable ("clskills")
-	if not RaceTable:
-		RaceTable = GemRB.LoadTable ("races")
-	if not NextLevelTable:
-		NextLevelTable = GemRB.LoadTable ("xplevel")
-	if not AppearanceAvatarTable and GemRB.HasResource("pdolls", RES_2DA):
-		AppearanceAvatarTable = GemRB.LoadTable ("pdolls")
-	if not StrModTable:
-		StrModTable = GemRB.LoadTable ("strmod")
-		StrModExTable = GemRB.LoadTable ("strmodex")
+	if not Classes:
+		Classes = GemRB.LoadTable ("classes")
+	if not KitList and GemRB.HasResource("kitlist", RES_2DA):
+		KitList = GemRB.LoadTable ("kitlist")
+	if not ClassSkills:
+		ClassSkills= GemRB.LoadTable ("clskills")
+	if not Races:
+		Races = GemRB.LoadTable ("races")
+	if not NextLevel:
+		NextLevel = GemRB.LoadTable ("xplevel")
+	if not Pdolls and GemRB.HasResource("pdolls", RES_2DA):
+		Pdolls = GemRB.LoadTable ("pdolls")
+	if not StrMod:
+		StrMod = GemRB.LoadTable ("strmod")
+		StrModEx = GemRB.LoadTable ("strmodex")

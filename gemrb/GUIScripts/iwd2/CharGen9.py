@@ -128,8 +128,8 @@ def NextPress():
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("BaseRace") )
 	race = GemRB.GetVar ("Race")
 	GemRB.SetPlayerStat (MyChar, IE_SUBRACE, race & 255 )
-	row = CommonTables.RaceTable.FindValue (3, race )
-	racename = CommonTables.RaceTable.GetRowName (row)
+	row = CommonTables.Races.FindValue (3, race )
+	racename = CommonTables.Races.GetRowName (row)
 	if row!=-1:
 		SetRaceResistances( MyChar, racename )
 		SetRaceAbilities( MyChar, racename )

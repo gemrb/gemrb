@@ -44,13 +44,13 @@ def OnLoad():
 	GemRB.SetVar("Class Kit",0)
 	
 	GemRB.LoadWindowPack("GUICG")
-	ClassCount = CommonTables.ClassTable.GetRowCount()+1
+	ClassCount = CommonTables.Classes.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindow(2)
-	RaceName = CommonTables.RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
+	RaceName = CommonTables.Races.GetRowName(GemRB.GetVar("Race")-1 )
 
 	#radiobutton groups must be set up before doing anything else to them
 	for i in range(1,ClassCount):
-		if CommonTables.ClassTable.GetValue(i-1,4):
+		if CommonTables.Classes.GetValue(i-1,4):
 			continue
 			
 		Button = ClassWindow.GetControl(i+1)
@@ -60,16 +60,16 @@ def OnLoad():
 	GemRB.SetVar("MAGESCHOOL",0) 
 	HasMulti = 0
 	for i in range(1,ClassCount):
-		ClassName = CommonTables.ClassTable.GetRowName(i-1)
-		Allowed = CommonTables.ClassTable.GetValue(ClassName, RaceName)
-		if CommonTables.ClassTable.GetValue(i-1,4):
+		ClassName = CommonTables.Classes.GetRowName(i-1)
+		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
+		if CommonTables.Classes.GetValue(i-1,4):
 			if Allowed!=0:
 				HasMulti = 1
 			continue
 			
 		Button = ClassWindow.GetControl(i+1)
 		
-		t = CommonTables.ClassTable.GetValue(i-1, 0)
+		t = CommonTables.Classes.GetValue(i-1, 0)
 		Button.SetText(t )
 
 		if Allowed==2:
@@ -85,7 +85,7 @@ def OnLoad():
 	if HasMulti == 0:
 		MultiClassButton.SetState(IE_GUI_BUTTON_DISABLED)
 
-	Allowed = CommonTables.ClassTable.GetValue ("MAGE", RaceName)
+	Allowed = CommonTables.Classes.GetValue ("MAGE", RaceName)
 	SpecialistButton = ClassWindow.GetControl(11)
 	SpecialistButton.SetText(11994)
 	if Allowed == 0:
@@ -104,7 +104,7 @@ def OnLoad():
 		TextAreaControl.SetText(17242)
 		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	else:
-		TextAreaControl.SetText(CommonTables.ClassTable.GetValue(Class,1) )
+		TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
 	MultiClassButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MultiClassPress)
@@ -127,16 +127,16 @@ def SpecialistPress():
 	
 def ClassPress():
 	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(CommonTables.ClassTable.GetValue(Class,1) )
+	TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def NextPress():
 	# find the class from the class table
 	ClassIndex = GemRB.GetVar ("Class") - 1
-	Class = CommonTables.ClassTable.GetValue (ClassIndex, 5)
+	Class = CommonTables.Classes.GetValue (ClassIndex, 5)
 	#protect against barbarians
-	ClassName = CommonTables.ClassTable.GetRowName (CommonTables.ClassTable.FindValue (5, Class) )
+	ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, Class) )
 	
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)

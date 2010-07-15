@@ -60,9 +60,9 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	ColorWindow=GemRB.LoadWindow(13)
 
-	Race = CommonTables.RaceTable.FindValue (3, GemRB.GetVar ("Race") )
-	HairTable = GemRB.LoadTable(CommonTables.RaceTable.GetValue(Race, 5))
-	SkinTable = GemRB.LoadTable(CommonTables.RaceTable.GetValue(Race, 6))
+	Race = CommonTables.Races.FindValue (3, GemRB.GetVar ("Race") )
+	HairTable = GemRB.LoadTable(CommonTables.Races.GetValue(Race, 5))
+	SkinTable = GemRB.LoadTable(CommonTables.Races.GetValue(Race, 6))
 	ColorTable = GemRB.LoadTable("clowncol")
 
 	#set these colors to some default

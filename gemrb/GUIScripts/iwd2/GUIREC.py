@@ -192,8 +192,8 @@ def GetAbilityBonus (pc, stat):
 def GetNextLevelExp (Level, Adjustment):
 	if Adjustment>5:
 		Adjustment = 5
-	if (Level < CommonTables.NextLevelTable.GetColumnCount (4) - 5):
-		return str(CommonTables.NextLevelTable.GetValue (4, Level + Adjustment ) )
+	if (Level < CommonTables.NextLevel.GetColumnCount (4) - 5):
+		return str(CommonTables.NextLevel.GetValue (4, Level + Adjustment ) )
 
 	return GemRB.GetString(24342) #godhood
 
@@ -244,16 +244,16 @@ def DisplayGeneral (pc):
 	Value2 = GemRB.GetPlayerStat(pc,IE_SUBRACE)
 	if Value2:
 		Value = Value<<16 | Value2
-	tmp = CommonTables.RaceTable.FindValue (3, Value)
-	Race = CommonTables.RaceTable.GetValue (tmp, 2)
-	tmp = CommonTables.RaceTable.GetValue (tmp, 8)
+	tmp = CommonTables.Races.FindValue (3, Value)
+	Race = CommonTables.Races.GetValue (tmp, 2)
+	tmp = CommonTables.Races.GetValue (tmp, 8)
 
 	if tmp == -1:
 		tmp = highest
 	else:
 		tmp = GetFavoredClass(pc, tmp)
 
-	tmp = CommonTables.ClassTable.GetValue (tmp, 0)
+	tmp = CommonTables.Classes.GetValue (tmp, 0)
 	RecordsTextArea.Append (": ")
 	RecordsTextArea.Append (tmp)
 

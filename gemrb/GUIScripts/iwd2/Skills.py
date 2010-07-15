@@ -105,7 +105,7 @@ def OnLoad():
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	GemRB.SetVar("Level",1) #for simplicity
 	Class = GemRB.GetVar("Class") - 1
-	KitName = CommonTables.ClassTable.GetRowName(Class)
+	KitName = CommonTables.Classes.GetRowName(Class)
 	#classcolumn is base class
 	ClassColumn=GemRB.GetVar("BaseClass") - 1
 	SkillPtsTable = GemRB.LoadTable("skillpts")
@@ -122,7 +122,7 @@ def OnLoad():
 	# Humans recieve +2 skill points at level 1 and +1 skill points each level thereafter
 	# Recommend creation of SKILRACE.2da with levels as rows and race names as columns
 	
-	RaceName = CommonTables.RaceTable.GetRowName(CommonTables.RaceTable.FindValue(3, GemRB.GetVar('Race')))
+	RaceName = CommonTables.Races.GetRowName(CommonTables.Races.FindValue(3, GemRB.GetVar('Race')))
 	
 	### Example code for implementation of SKILRACE.2da
 	# TmpTable = GemRB.LoadTable('skilrace')

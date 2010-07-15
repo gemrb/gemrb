@@ -42,10 +42,10 @@ def OnLoad():
 		return
 
 	GemRB.LoadWindowPack("GUICG")
-	RaceName = CommonTables.RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
+	RaceName = CommonTables.Races.GetRowName(GemRB.GetVar("Race")-1 )
 	Class = GemRB.GetVar("Class")-1
-	ClassName = CommonTables.ClassTable.GetRowName(Class)
-	ClassID = CommonTables.ClassTable.GetValue(Class, 5)
+	ClassName = CommonTables.Classes.GetRowName(Class)
+	ClassID = CommonTables.Classes.GetValue(Class, 5)
 	KitTable = GemRB.LoadTable("kittable")
 	KitTableName = KitTable.GetValue(ClassName, RaceName)
 	KitTable = GemRB.LoadTable(KitTableName,1)
@@ -73,7 +73,7 @@ def OnLoad():
 				KitName = SchoolList.GetValue(i, 0)
 			else:
 				Kit = 0
-				KitName = CommonTables.ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
+				KitName = CommonTables.Classes.GetValue(GemRB.GetVar("Class")-1, 0)
 
 		else:
 			Kit = KitTable.GetValue(i,0)
@@ -83,9 +83,9 @@ def OnLoad():
 				KitName = SchoolList.GetValue(Kit, 0)
 			else:
 				if Kit:
-					KitName = CommonTables.KitListTable.GetValue(Kit, 1)
+					KitName = CommonTables.KitList.GetValue(Kit, 1)
 				else:
-					KitName = CommonTables.ClassTable.GetValue(GemRB.GetVar("Class")-1, 0)
+					KitName = CommonTables.Classes.GetValue(GemRB.GetVar("Class")-1, 0)
 
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetText(KitName)
@@ -112,12 +112,12 @@ def OnLoad():
 def KitPress():
 	Kit = GemRB.GetVar("Class Kit")
 	if Kit == 0:
-		KitName = CommonTables.ClassTable.GetValue(GemRB.GetVar("Class")-1, 1)
+		KitName = CommonTables.Classes.GetValue(GemRB.GetVar("Class")-1, 1)
 	else:
 		if ClassID==1:
 			KitName = SchoolList.GetValue(Kit, 1)
 		else:
-			KitName = CommonTables.KitListTable.GetValue(Kit, 3)
+			KitName = CommonTables.KitList.GetValue(Kit, 3)
 	TextAreaControl.SetText(KitName)
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
@@ -125,11 +125,11 @@ def KitPress():
 def NextPress():
 	#class	
 	ClassIndex = GemRB.GetVar ("Class")-1
-	Class = CommonTables.ClassTable.GetValue (ClassIndex, 5)
+	Class = CommonTables.Classes.GetValue (ClassIndex, 5)
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar ("Class Kit")
 	#the same as the unusable field
-	Kit = CommonTables.KitListTable.GetValue(KitIndex, 6)
+	Kit = CommonTables.KitList.GetValue(KitIndex, 6)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, Kit)
 	CharGenCommon.next()

@@ -173,7 +173,7 @@ def UpdatePriestWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
-	if (CommonTables.ClassSkillsTable.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
+	if (CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
 		Window.SetVisible (WINDOW_GRAYED)
 	else:
 		Window.SetVisible (WINDOW_VISIBLE)

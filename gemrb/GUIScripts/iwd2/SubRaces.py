@@ -33,7 +33,7 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	RaceWindow = GemRB.LoadWindow(54)
 
-	RaceCount = CommonTables.RaceTable.GetRowCount()
+	RaceCount = CommonTables.Races.GetRowCount()
 	
 	SubRacesTable = GemRB.LoadTable("SUBRACES")
 
@@ -42,15 +42,15 @@ def OnLoad():
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		
 	Race = GemRB.GetVar("BaseRace")
-	RaceName = CommonTables.RaceTable.GetRowName(CommonTables.RaceTable.FindValue(3, Race) )
+	RaceName = CommonTables.Races.GetRowName(CommonTables.Races.FindValue(3, Race) )
 
 	PureRace = SubRacesTable.GetValue(RaceName , "PURE_RACE")
 	Button = RaceWindow.GetControl(1)
-	RaceStrRef = CommonTables.RaceTable.GetValue(PureRace, "CAP_REF")
+	RaceStrRef = CommonTables.Races.GetValue(PureRace, "CAP_REF")
 	Button.SetText(RaceStrRef )
 	Button.SetState(IE_GUI_BUTTON_ENABLED)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SubRacePress)
-	RaceID = CommonTables.RaceTable.GetValue(PureRace, "ID")
+	RaceID = CommonTables.Races.GetValue(PureRace, "ID")
 	Button.SetVarAssoc("Race",RaceID)
 	
 	#if you want a fourth subrace you can safely add a control id #5 to
@@ -65,11 +65,11 @@ def OnLoad():
 			Button.SetText("")
 		else:
 			HasSubRace = PureRace+"_"+HasSubRace
-			RaceStrRef = CommonTables.RaceTable.GetValue(HasSubRace, "CAP_REF")
+			RaceStrRef = CommonTables.Races.GetValue(HasSubRace, "CAP_REF")
 			Button.SetText(RaceStrRef )
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
 			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SubRacePress)
-			RaceID = CommonTables.RaceTable.GetValue(HasSubRace, "ID")
+			RaceID = CommonTables.Races.GetValue(HasSubRace, "ID")
 			Button.SetVarAssoc("Race",RaceID)
 
 	BackButton = RaceWindow.GetControl(8) 
@@ -82,7 +82,7 @@ def OnLoad():
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = RaceWindow.GetControl(6)
-	TextAreaControl.SetText(CommonTables.RaceTable.GetValue(RaceName, "DESC_REF"))
+	TextAreaControl.SetText(CommonTables.Races.GetValue(RaceName, "DESC_REF"))
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
@@ -91,8 +91,8 @@ def OnLoad():
 
 def SubRacePress():
 	global RaceWindow, TextAreaControl
-	Race = CommonTables.RaceTable.FindValue(3, GemRB.GetVar("Race") )
-	TextAreaControl.SetText(CommonTables.RaceTable.GetValue(Race, 1))
+	Race = CommonTables.Races.FindValue(3, GemRB.GetVar("Race") )
+	TextAreaControl.SetText(CommonTables.Races.GetValue(Race, 1))
 	return
 
 def BackPress():

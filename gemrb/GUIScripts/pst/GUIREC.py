@@ -247,7 +247,7 @@ def UpdateRecordsWindow ():
 	#be careful, some saves got this field corrupted
 	race = GemRB.GetPlayerStat (pc, IE_SPECIES) - 1
 
-	text = CommonTables.RaceTable.GetValue (race, 0)
+	text = CommonTables.Races.GetValue (race, 0)
 	
 	Label = Window.GetControl (0x10000014)
 	Label.SetText (text)
@@ -262,7 +262,7 @@ def UpdateRecordsWindow ():
 
 
 	# class
-	text = CommonTables.ClassTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
+	text = CommonTables.Classes.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
 
 	Label = Window.GetControl (0x10000016)
 	Label.SetText (text)
@@ -358,8 +358,8 @@ def OnRecordsHelpStrength ():
 	s = GemRB.GetPlayerStat (pc, IE_STR)
 	e = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 
-	x = CommonTables.StrModTable.GetValue(s, 0) + CommonTables.StrModExTable.GetValue(e, 0)
-	y = CommonTables.StrModTable.GetValue(s, 1) + CommonTables.StrModExTable.GetValue(e, 1)
+	x = CommonTables.StrMod.GetValue(s, 0) + CommonTables.StrModEx.GetValue(e, 0)
+	y = CommonTables.StrMod.GetValue(s, 1) + CommonTables.StrModEx.GetValue(e, 1)
 	if x==0:
 		x=y
 		y=0
@@ -458,7 +458,7 @@ def GetCharacterHeader (pc):
 	BioTable = GemRB.LoadTable ("bios")
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
-	Multi = CommonTables.ClassTable.GetValue (Class, 4)
+	Multi = CommonTables.Classes.GetValue (Class, 4)
 	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 
 	#Nameless is Specific == 1
@@ -466,7 +466,7 @@ def GetCharacterHeader (pc):
 
 	# Nameless is a special case (dual class)
 	if Specific == 1:
-		avatar_header['PrimClass'] = CommonTables.ClassTable.GetRowName (Class)
+		avatar_header['PrimClass'] = CommonTables.Classes.GetRowName (Class)
 		avatar_header['SecoClass'] = "*"
 
 		avatar_header['SecoLevel'] = 0
@@ -498,33 +498,33 @@ def GetCharacterHeader (pc):
 			else:
 				#fighter/thief
 				Class = 3
-			avatar_header['SecoClass'] = CommonTables.ClassTable.GetRowName (Class)
+			avatar_header['SecoClass'] = CommonTables.Classes.GetRowName (Class)
 
 			avatar_header['PrimNextLevXP'] = GetNextLevelExp (avatar_header['PrimLevel'], avatar_header['PrimClass'])
 			avatar_header['SecoNextLevXP'] = GetNextLevelExp (avatar_header['SecoLevel'], avatar_header['SecoClass'])
 
 			# Converting to the displayable format
-			avatar_header['SecoClass'] = GemRB.GetString (CommonTables.ClassTable.GetValue (avatar_header['SecoClass'], "NAME_REF"))
+			avatar_header['SecoClass'] = GemRB.GetString (CommonTables.Classes.GetValue (avatar_header['SecoClass'], "NAME_REF"))
 		else:
 			avatar_header['SecoLevel'] = 0
-			avatar_header['PrimClass'] = CommonTables.ClassTable.GetRowName (Class)
+			avatar_header['PrimClass'] = CommonTables.Classes.GetRowName (Class)
 			avatar_header['SecoClass'] = "*"
 			avatar_header['PrimNextLevXP'] = GetNextLevelExp (avatar_header['PrimLevel'], avatar_header['PrimClass'])
 			avatar_header['SecoNextLevXP'] = 0
 
 	# Converting to the displayable format
-	avatar_header['PrimClass'] = GemRB.GetString (CommonTables.ClassTable.GetValue (avatar_header['PrimClass'], "NAME_REF"))
+	avatar_header['PrimClass'] = GemRB.GetString (CommonTables.Classes.GetValue (avatar_header['PrimClass'], "NAME_REF"))
 
 
 
 def GetNextLevelExp (Level, Class):
 	if (Level < 20):
-		NextLevel = CommonTables.NextLevelTable.GetValue (Class, str (Level + 1))
+		NextLevel = CommonTables.NextLevel.GetValue (Class, str (Level + 1))
 	else:
 		After21ExpTable = GemRB.LoadTable ("LVL21PLS")
 		ExpGap = After21ExpTable.GetValue (Class, 'XPGAP')
 		LevDiff = Level - 19
-		Lev20Exp = CommonTables.NextLevelTable.GetValue (Class, "20")
+		Lev20Exp = CommonTables.NextLevel.GetValue (Class, "20")
 		NextLevel = Lev20Exp + (LevDiff * ExpGap)
 
 	return NextLevel
@@ -764,7 +764,7 @@ def OpenInformationWindow ():
 
 
 	# class
-	text = CommonTables.ClassTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
+	text = CommonTables.Classes.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0)
 
 	Label = Window.GetControl (0x1000000A)
 	Label.SetText (text)
@@ -1001,7 +1001,7 @@ def OpenLevelUpWindow ():
 	# Since Nameless one is not covered, hammer and club can't occur
 	# What is the avatar's class (Which we can use to lookup XP)
 	ClassRow = GemRB.GetPlayerStat (pc, IE_CLASS)-1
-	Class = CommonTables.ClassTable.GetRowName (ClassRow)
+	Class = CommonTables.Classes.GetRowName (ClassRow)
 
 	# name
 	Label = Window.GetControl (0x10000000)
@@ -1009,7 +1009,7 @@ def OpenLevelUpWindow ():
 
 	# class
 	Label = Window.GetControl (0x10000001)
-	Label.SetText (CommonTables.ClassTable.GetValue (ClassRow, 0))
+	Label.SetText (CommonTables.Classes.GetValue (ClassRow, 0))
 
 	# Armor Class
 	Label = Window.GetControl (0x10000023)
@@ -1103,7 +1103,7 @@ def OpenLevelUpWindow ():
 
 			# Saving Throws
 			# Loading the right saving throw table
-			SavThrTable = GemRB.LoadTable (CommonTables.ClassTable.GetValue (Class, "SAVE"))
+			SavThrTable = GemRB.LoadTable (CommonTables.Classes.GetValue (Class, "SAVE"))
 			# Updating the current saving throws. They are changed only if the
 			# new ones are better than current. The smaller the number, the better.
 			# We need to substract one from the NextLevel, so that we get right values.
@@ -1247,7 +1247,7 @@ def OpenLevelUpWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 def GetSingleClassHP (Class, Level):
-	HPTable = GemRB.LoadTable (CommonTables.ClassTable.GetValue (Class, "HP"))
+	HPTable = GemRB.LoadTable (CommonTables.Classes.GetValue (Class, "HP"))
 
 	# We need to check if Level is larger than 20, since after that point
 	# the table runs out, and the formula remain the same.

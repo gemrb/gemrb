@@ -380,8 +380,8 @@ def GetActorRaceTitle (actor):
 		RaceID += GemRB.GetPlayerStat (actor, IE_RACE)<<16
 	else:
 		RaceID = GemRB.GetPlayerStat (actor, IE_RACE)
-	row = CommonTables.RaceTable.FindValue (3, RaceID )
-	RaceTitle = CommonTables.RaceTable.GetValue (row, 2)
+	row = CommonTables.Races.FindValue (3, RaceID )
+	RaceTitle = CommonTables.Races.GetValue (row, 2)
 	return RaceTitle
 
 # NOTE: this function is called with the primary classes
@@ -389,11 +389,11 @@ def GetKitIndex (actor, ClassIndex):
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 
 	KitIndex = -1
-	ClassID = CommonTables.ClassTable.GetValue (ClassIndex, 2)
+	ClassID = CommonTables.Classes.GetValue (ClassIndex, 2)
 	# skip the primary classes
-	for ci in range (10, CommonTables.ClassTable.GetRowCount ()):
-		BaseClass = CommonTables.ClassTable.GetValue (ci, 3)
-		if BaseClass == ClassID and Kit & CommonTables.ClassTable.GetValue (ci, 2):
+	for ci in range (10, CommonTables.Classes.GetRowCount ()):
+		BaseClass = CommonTables.Classes.GetValue (ci, 3)
+		if BaseClass == ClassID and Kit & CommonTables.Classes.GetValue (ci, 2):
 			KitIndex = ci
 
 	if KitIndex == -1:
@@ -409,9 +409,9 @@ def GetActorClassTitle (actor, ClassIndex):
 	#Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	KitIndex = GetKitIndex (actor, ClassIndex)
 	if KitIndex == 0:
-		ClassTitle = CommonTables.ClassTable.GetValue (ClassIndex, 0)
+		ClassTitle = CommonTables.Classes.GetValue (ClassIndex, 0)
 	else:
-		ClassTitle = CommonTables.ClassTable.GetValue (KitIndex, 0)
+		ClassTitle = CommonTables.Classes.GetValue (KitIndex, 0)
 
 	if ClassTitle == "*":
 		return 0

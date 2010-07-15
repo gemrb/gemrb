@@ -37,12 +37,12 @@ def OnLoad():
 
 	GUICommon.CloseOtherWindow (ClassWindow.Unload)
 
-	ClassCount = CommonTables.ClassTable.GetRowCount()+1
-	RaceName = CommonTables.RaceTable.GetRowName(GemRB.GetVar("Race")-1 )
+	ClassCount = CommonTables.Classes.GetRowCount()+1
+	RaceName = CommonTables.Races.GetRowName(GemRB.GetVar("Race")-1 )
 
 	j=0
 	for i in range(1,ClassCount):
-		if CommonTables.ClassTable.GetValue(i-1,4)==0:
+		if CommonTables.Classes.GetValue(i-1,4)==0:
 			continue
 		if j>11:
 			Button = ClassWindow.GetControl(j+7)
@@ -53,16 +53,16 @@ def OnLoad():
 		j = j + 1
 	j=0
 	for i in range(1,ClassCount):
-		ClassName = CommonTables.ClassTable.GetRowName(i-1)
-		Allowed = CommonTables.ClassTable.GetValue(ClassName, RaceName)
-		if CommonTables.ClassTable.GetValue(i-1,4)==0:
+		ClassName = CommonTables.Classes.GetRowName(i-1)
+		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
+		if CommonTables.Classes.GetValue(i-1,4)==0:
 			continue
 		if j>11:
 			Button = ClassWindow.GetControl(j+7)
 		else:
 			Button = ClassWindow.GetControl(j+2)
 
-		t = CommonTables.ClassTable.GetValue(i-1, 0)
+		t = CommonTables.Classes.GetValue(i-1, 0)
 		Button.SetText(t )
 		j=j+1
 		if Allowed ==0:
@@ -87,14 +87,14 @@ def OnLoad():
 
 def ClassPress():
 	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(CommonTables.ClassTable.GetValue(Class,1) )
+	TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def NextPress():
 	#class	
 	ClassIndex = GemRB.GetVar ("Class")-1
-	Class = CommonTables.ClassTable.GetValue (ClassIndex, 5)
+	Class = CommonTables.Classes.GetValue (ClassIndex, 5)
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	CharGenCommon.next()

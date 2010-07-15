@@ -217,7 +217,7 @@ def GetActorPortrait (actor, which):
 	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID) & 255
 	row = "0x%02X" %anim_id
 
-	return CommonTables.AppearanceAvatarTable.GetValue (row, which)
+	return CommonTables.Pdolls.GetValue (row, which)
 	
 
 def UpdateAnimation ():

@@ -42,8 +42,8 @@ MyChar = 0
 def CalcLimits(Abidx):
 	global Minimum, Maximum, Add
 
-	Race = CommonTables.RaceTable.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
-	RaceName = CommonTables.RaceTable.GetRowName(Race)
+	Race = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
+	RaceName = CommonTables.Races.GetRowName(Race)
 
 	Minimum = 3
 	Maximum = 18
@@ -119,15 +119,15 @@ def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
 	Kit = GUICommon.GetKitIndex (MyChar)
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	Class = CommonTables.ClassTable.FindValue (5, Class)
+	Class = CommonTables.Classes.FindValue (5, Class)
 	if Kit == 0:
-		KitName = CommonTables.ClassTable.GetRowName(Class)
+		KitName = CommonTables.Classes.GetRowName(Class)
 	else:
 		#rowname is just a number, first value row what we need here
-		KitName = CommonTables.KitListTable.GetValue(Kit, 0)
+		KitName = CommonTables.KitList.GetValue(Kit, 0)
 
 	#if the class uses the warrior table for saves, then it may have the extra strength
-	if CommonTables.ClassTable.GetValue(Class, 3)=="SAVEWAR":
+	if CommonTables.Classes.GetValue(Class, 3)=="SAVEWAR":
 		HasStrExtra=1
 	else:
 		HasStrExtra=0

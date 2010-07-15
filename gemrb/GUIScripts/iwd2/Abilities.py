@@ -36,8 +36,8 @@ def CalcLimits(Abidx):
 
 	Abracead = GemRB.LoadTable("ABRACEAD")
 	RaceID = GemRB.GetVar("Race")
-	RowIndex = CommonTables.RaceTable.FindValue(3, RaceID)
-	RaceName = CommonTables.RaceTable.GetRowName(RowIndex)
+	RowIndex = CommonTables.Races.FindValue(3, RaceID)
+	RaceName = CommonTables.Races.GetRowName(RowIndex)
 
 	Minimum = 3
 	Maximum = 18
@@ -107,10 +107,10 @@ def OnLoad():
 	Kit = GemRB.GetVar("Class Kit")
 	Class = GemRB.GetVar("Class")-1
 	if Kit == 0:
-		KitName = CommonTables.ClassTable.GetRowName(Class)
+		KitName = CommonTables.Classes.GetRowName(Class)
 	else:
 		#rowname is just a number, first value row what we need here
-		KitName = CommonTables.KitListTable.GetValue(Kit, 0)
+		KitName = CommonTables.KitList.GetValue(Kit, 0)
 
 	Abclasrq = GemRB.LoadTable("ABCLASRQ")
 	KitIndex = Abclasrq.GetRowIndex(KitName)

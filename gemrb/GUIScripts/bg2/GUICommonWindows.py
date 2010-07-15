@@ -696,9 +696,9 @@ def SelectionChanged ():
 		#update mage school
 		GemRB.SetVar ("MAGESCHOOL", 0)
 		Kit = GUICommon.GetKitIndex (sel)
-		if Kit and CommonTables.KitListTable.GetValue (Kit, 7) == 1:
+		if Kit and CommonTables.KitList.GetValue (Kit, 7) == 1:
 			MageTable = GemRB.LoadTable ("magesch")
-			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, CommonTables.KitListTable.GetValue (Kit, 6) ) )
+			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, CommonTables.KitList.GetValue (Kit, 6) ) )
 
 		for i in range (PARTY_SIZE):
 			Button = PortraitWindow.GetControl (i)

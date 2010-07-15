@@ -30,8 +30,8 @@ def OnLoad():
 	# set my character up
 	MyChar = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	ClassIndex = CommonTables.ClassTable.FindValue (5, Class)
-	ClassName = CommonTables.ClassTable.GetRowName (ClassIndex)
+	ClassIndex = CommonTables.Classes.FindValue (5, Class)
+	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
 	IsMulti = GUICommon.IsMultiClassed (MyChar, 1)
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
 			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
@@ -50,13 +50,13 @@ def OnLoad():
 	LUCommon.SetupHP (MyChar)
 
 	# mage spells
-	TableName = CommonTables.ClassSkillsTable.GetValue (Class, 2, 0)
+	TableName = CommonTables.ClassSkills.GetValue (Class, 2, 0)
 	if TableName != "*":
 		index = 0
 		if IsMulti[0]>1:
 			#find out which class gets mage spells
 			for i in range (IsMulti[0]):
-				if CommonTables.ClassSkillsTable.GetValue (IsMulti[i+1], 2, 0) != "*":
+				if CommonTables.ClassSkills.GetValue (IsMulti[i+1], 2, 0) != "*":
 					index = i
 					break
 		GUICommon.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, Levels[index])
@@ -66,15 +66,15 @@ def OnLoad():
 	if IsMulti[0]>1:
 		#get the class abilites for each class
 		for i in range (IsMulti[0]):
-			TmpClassName = CommonTables.ClassTable.GetRowName (CommonTables.ClassTable.FindValue (5, IsMulti[i+1]) )
-			ABTable = CommonTables.ClassSkillsTable.GetValue (TmpClassName, "ABILITIES")
+			TmpClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, IsMulti[i+1]) )
+			ABTable = CommonTables.ClassSkills.GetValue (TmpClassName, "ABILITIES")
 			if ABTable != "*" and ABTable[:6] != "CLABMA":
 				GUICommon.AddClassAbilities (MyChar, ABTable, Levels[i], Levels[i])
 	else:
 		if KitIndex:
-			ABTable = CommonTables.KitListTable.GetValue (str(KitIndex), "ABILITIES")
+			ABTable = CommonTables.KitList.GetValue (str(KitIndex), "ABILITIES")
 		else:
-			ABTable = CommonTables.ClassSkillsTable.GetValue (ClassName, "ABILITIES")
+			ABTable = CommonTables.ClassSkills.GetValue (ClassName, "ABILITIES")
 		if ABTable != "*" and ABTable[:6] != "CLABMA": # mage kits specify ability tables which don't exist
 			GUICommon.AddClassAbilities (MyChar, ABTable, Levels[0], Levels[0])
 
@@ -116,7 +116,7 @@ def OnLoad():
 			if EquipmentColName == "SORCERER":
 				EquipmentColName = "MAGE"
 		else:
-			EquipmentColName = CommonTables.KitListTable.GetValue (KitIndex, 0)
+			EquipmentColName = CommonTables.KitList.GetValue (KitIndex, 0)
 
 		EquipmentTable = GemRB.LoadTable ("25stweap")
 

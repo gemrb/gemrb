@@ -53,12 +53,12 @@ def OnLoad():
 
 	# learn divine spells if appropriate
 	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	TableName = CommonTables.ClassSkillsTable.GetValue (Class, 1, 0) # cleric spells
+	TableName = CommonTables.ClassSkills.GetValue (Class, 1, 0) # cleric spells
 
 	if TableName == "*": # only druid spells or no spells at all
-		TableName = CommonTables.ClassSkillsTable.GetValue (Class, 0, 0)
+		TableName = CommonTables.ClassSkills.GetValue (Class, 0, 0)
 		ClassFlag = 0x8000
-	elif CommonTables.ClassSkillsTable.GetValue (Class, 0, 0) != "*": # cleric and druid spells
+	elif CommonTables.ClassSkills.GetValue (Class, 0, 0) != "*": # cleric and druid spells
 		ClassFlag = 0
 	else: # only cleric spells
 		ClassFlag = 0x4000
@@ -77,9 +77,9 @@ def OnLoad():
 			#be looked at first in Cleric/Ranger multi's, which is correct
 			foundindex = 0
 			for i in range (IsMulti[0]):
-				ClassName = CommonTables.ClassTable.GetRowName (CommonTables.ClassTable.FindValue (5, IsMulti[i+1]) )
+				ClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, IsMulti[i+1]) )
 				for table in "CLERICSPELL", "DRUIDSPELL":
-					if CommonTables.ClassSkillsTable.GetValue (ClassName, table) != "*":
+					if CommonTables.ClassSkills.GetValue (ClassName, table) != "*":
 						index = i
 						foundindex = 1
 						break

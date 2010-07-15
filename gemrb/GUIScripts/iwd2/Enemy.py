@@ -53,7 +53,7 @@ def OnLoad():
 	RaceWindow = GemRB.LoadWindow(15)
 
 	Class = GemRB.GetVar("BaseClass")
-	TableName = CommonTables.ClassSkillsTable.GetValue(Class, 0)
+	TableName = CommonTables.ClassSkills.GetValue(Class, 0)
 	if TableName == "*":
 		GemRB.SetNextScript("Skills")
 		return

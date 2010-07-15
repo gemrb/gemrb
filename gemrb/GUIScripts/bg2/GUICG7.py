@@ -29,7 +29,7 @@ def OnLoad():
 	KitTable = GemRB.LoadTable("magesch")
 	Slot = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat (Slot, IE_CLASS)
-	TableName = CommonTables.ClassSkillsTable.GetValue(Class, 2)
+	TableName = CommonTables.ClassSkills.GetValue(Class, 2)
 
 	# make sure we have a correct table
 	if TableName == "*":
@@ -56,7 +56,7 @@ def OnLoad():
 	Level = GemRB.GetPlayerStat (Slot, IE_LEVEL)
 	if IsMulti[0]>1:
 		for i in range (2, IsMulti[0]+1):
-			if CommonTables.ClassSkillsTable.GetValue (IsMulti[i], 2, 0) != "*":
+			if CommonTables.ClassSkills.GetValue (IsMulti[i], 2, 0) != "*":
 				Level = GemRB.GetPlayerStat (Slot, IE_LEVEL2+i-1)
 			break
 	LUSpellSelection.OpenSpellsWindow (Slot, TableName, Level, Level, KitValue, 1)

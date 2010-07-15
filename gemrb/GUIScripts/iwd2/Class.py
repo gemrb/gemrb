@@ -33,15 +33,15 @@ def AdjustTextArea():
 	global HasSubClass, ClassID
 
 	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(CommonTables.ClassTable.GetValue(Class,1) )
-	ClassName = CommonTables.ClassTable.GetRowName(Class)
-	ClassID = CommonTables.ClassTable.GetValue(ClassName, "ID")
+	TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
+	ClassName = CommonTables.Classes.GetRowName(Class)
+	ClassID = CommonTables.Classes.GetValue(ClassName, "ID")
 	#determining if this class has any subclasses
 	HasSubClass = 0
 	for i in range(1, ClassCount):
-		ClassName = CommonTables.ClassTable.GetRowName(i-1)
+		ClassName = CommonTables.Classes.GetRowName(i-1)
 		#determining if this is a kit or class
-		Allowed = CommonTables.ClassTable.GetValue(ClassName, "CLASS")
+		Allowed = CommonTables.Classes.GetValue(ClassName, "CLASS")
 		if Allowed != ClassID:
 			continue
 		HasSubClass = 1
@@ -59,16 +59,16 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	#this replaces help02.2da for class restrictions
-	ClassCount = CommonTables.ClassTable.GetRowCount()+1
+	ClassCount = CommonTables.Classes.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindow(2)
-	rid = CommonTables.RaceTable.FindValue(3, GemRB.GetVar('BaseRace'))
-	RaceName = CommonTables.RaceTable.GetRowName(rid)
+	rid = CommonTables.Races.FindValue(3, GemRB.GetVar('BaseRace'))
+	RaceName = CommonTables.Races.GetRowName(rid)
 
 	#radiobutton groups must be set up before doing anything else to them
 	j = 0
 	for i in range(1,ClassCount):
-		ClassName = CommonTables.ClassTable.GetRowName(i-1)
-		Allowed = CommonTables.ClassTable.GetValue(ClassName, "CLASS")
+		ClassName = CommonTables.Classes.GetRowName(i-1)
+		Allowed = CommonTables.Classes.GetValue(ClassName, "CLASS")
 		if Allowed > 0:
 			continue
 		Button = ClassWindow.GetControl(j+2)
@@ -78,15 +78,15 @@ def OnLoad():
 
 	j = 0
 	for i in range(1,ClassCount):
-		ClassName = CommonTables.ClassTable.GetRowName(i-1)
+		ClassName = CommonTables.Classes.GetRowName(i-1)
 		#determining if this is a kit or class
-		Allowed = CommonTables.ClassTable.GetValue(ClassName, "CLASS")
+		Allowed = CommonTables.Classes.GetValue(ClassName, "CLASS")
 		if Allowed > 0:
 			continue
-		Allowed = CommonTables.ClassTable.GetValue(ClassName, RaceName)
+		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
 		Button = ClassWindow.GetControl(j+2)
 		j = j+1
-		t = CommonTables.ClassTable.GetValue(ClassName, "NAME_REF")
+		t = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
 		Button.SetText(t )
 
 		if Allowed==0:
@@ -129,8 +129,8 @@ def ClassPress():
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	j = 0
 	for i in range(1,ClassCount):
-		ClassName = CommonTables.ClassTable.GetRowName(i-1)
-		Allowed = CommonTables.ClassTable.GetValue(ClassName, "CLASS")
+		ClassName = CommonTables.Classes.GetRowName(i-1)
+		Allowed = CommonTables.Classes.GetValue(ClassName, "CLASS")
 		if Allowed > 0:
 			continue
 		Button = ClassWindow.GetControl(j+2)
@@ -141,14 +141,14 @@ def ClassPress():
 
 	j=0
 	for i in range(1, ClassCount):
-		ClassName = CommonTables.ClassTable.GetRowName(i-1)
+		ClassName = CommonTables.Classes.GetRowName(i-1)
 		#determining if this is a kit or class
-		Allowed = CommonTables.ClassTable.GetValue(ClassName, "CLASS")
+		Allowed = CommonTables.Classes.GetValue(ClassName, "CLASS")
 		if Allowed != ClassID:
 			continue
 		Button = ClassWindow.GetControl(j+2)
 		j = j+1
-		t = CommonTables.ClassTable.GetValue(ClassName, "NAME_REF")
+		t = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
 		Button.SetText(t )
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  ClassPress2)
@@ -159,7 +159,7 @@ def ClassPress():
 
 def ClassPress2():
 	Class = GemRB.GetVar("Class")-1
-	TextAreaControl.SetText(CommonTables.ClassTable.GetValue(Class,1) )
+	TextAreaControl.SetText(CommonTables.Classes.GetValue(Class,1) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -182,7 +182,7 @@ def BackPress():
 def NextPress():
 	#classcolumn is base class
 	Class = GemRB.GetVar("Class")
-	ClassColumn = CommonTables.ClassTable.GetValue(Class - 1, 3)
+	ClassColumn = CommonTables.Classes.GetValue(Class - 1, 3)
 	if ClassColumn <= 0:  #it was already a base class
 		ClassColumn = Class 
 	GemRB.SetVar("BaseClass", ClassColumn)

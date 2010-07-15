@@ -93,7 +93,7 @@ def SetupMageWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	BookType = 0
-	if (CommonTables.ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 8)==2):
+	if (CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 8)==2):
 		BookType = 1
 
 	if MageWindow:
@@ -220,7 +220,7 @@ def UpdateMageWindow ():
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
-	if (CommonTables.ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 2)=="*"):
+	if (CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 2)=="*"):
 		Window.SetVisible (WINDOW_GRAYED)
 	else:
 		Window.SetVisible (WINDOW_VISIBLE)
@@ -472,8 +472,8 @@ def OpenSequencerWindow ():
 	TypeButton = Window.GetControl (8)
 
 	#no cleric spells available
-	if (CommonTables.ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 0)=="*" and
-			CommonTables.ClassSkillsTable.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 1)=="*"):
+	if (CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 0)=="*" and
+			CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 1)=="*"):
 		TypeButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	if Target == 2:
