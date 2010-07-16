@@ -376,7 +376,7 @@ def OpenStoreDonateWindow ():
 	Field = Window.GetControl (3)
 	Field.SetText ("0")
 	Field.SetEvent (IE_GUI_EDIT_ON_CHANGE, UpdateStoreDonateWindow)
-	Field.SetStatus (IE_GUI_EDIT_NUMBER)
+	Field.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
 
 	# +
 	Button = Window.GetControl (4)
