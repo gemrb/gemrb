@@ -589,6 +589,7 @@ public:
 	int GetCharismaBonus(int column, int value) const;
 	int GetLoreBonus(int column, int value) const;
 	int GetWisdomBonus(int column, int value) const;
+	int GetReputationMod(int column) const;
 
 	/** applies the spell on the target */
 	void ApplySpell(const ieResRef resname, Actor *target, Scriptable *caster, int level);
@@ -656,6 +657,7 @@ private:
 	bool ReadAbilityTable(const ieResRef name, ieWordSigned *mem, int cols, int rows);
 	bool ReadMusicTable(const ieResRef name, int col);
 	bool ReadDamageTypeTable();
+	bool ReadReputationModTable();
 	bool ReadModalStates();
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);

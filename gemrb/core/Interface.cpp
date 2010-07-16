@@ -94,6 +94,7 @@ static ieWordSigned *conmod = NULL;
 static ieWordSigned *chrmod = NULL;
 static ieWordSigned *lorebon = NULL;
 static ieWordSigned *wisbon = NULL;
+static int **reputationmod = NULL;
 static ieVariable IWD2DeathVarFormat = "_DEAD%s";
 static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
 
@@ -314,6 +315,16 @@ Interface::~Interface(void)
 	delete worldmap;
 
 	FreeAbilityTables();
+
+	if (reputationmod) {
+		for (unsigned int i=0; i<20; i++) {
+			if (reputationmod[i]) {
+				free(reputationmod[i]);
+			}
+		}
+		free(reputationmod);
+		reputationmod=NULL;
+	}
 
 	PluginMgr::Get()->RunCleanup();
 
@@ -891,6 +902,23 @@ bool Interface::ReadDamageTypeTable() {
 		di.value = strtol(tm->QueryField(i, 2), (char **) NULL, 16);
 		di.iwd_mod_type = atoi(tm->QueryField(i, 3));
 		DamageInfoMap.insert(std::make_pair <ieDword, DamageInfoStruct> ((ieDword)di.value, di));
+	}
+
+	return true;
+}
+
+bool Interface::ReadReputationModTable() {
+	AutoTable tm("reputati");
+	if (!tm)
+		return false;
+
+	reputationmod = (int **) calloc(21, sizeof(int *));
+	int cols = tm->GetColumnCount();
+	for (unsigned int i=0; i<20; i++) {
+		reputationmod[i] = (int *) calloc(cols, sizeof(int));
+		for (int j=0; j<cols; j++) {
+			reputationmod[i][j] = atoi(tm->QueryField(i, j));
+		}
 	}
 
 	return true;
@@ -1628,6 +1656,14 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
+
+	ret = ReadReputationModTable();
+	printMessage( "Core", "Reading reputation mod table...", WHITE);
+	if (ret) {
+		printStatus( "OK", LIGHT_GREEN );
+	} else {
+		printStatus( "NOT FOUND", LIGHT_RED );
+	}
 
 	if ( gamedata->Exists("WMAPLAY", IE_2DA_CLASS_ID) ) {
 		ret = ReadAreaAliasTable( "WMAPLAY" );
@@ -4938,6 +4974,23 @@ int Interface::GetWisdomBonus(int column, int value) const
 	if (!HasFeature(GF_WISDOM_BONUS)) return 0;
 
 	return wisbon[value];
+}
+
+int Interface::GetReputationMod(int column) const
+{
+	int reputation = game->Reputation / 10 - 1;
+
+	if (column<0 || column>8) {
+		return -9999;
+	}
+	if (reputation > 19) {
+		reputation = 19;
+	}
+	if (reputation < 0) {
+		reputation = 0;
+	}
+
+	return reputationmod[reputation][column];
 }
 
 // -3, -2 if request is illegal or in cutscene

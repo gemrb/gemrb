@@ -151,7 +151,6 @@ static unsigned int monkbon_cols = 0;
 static unsigned int monkbon_rows = 0;
 
 // reputation modifiers
-static int **reputationmod = NULL;
 #define CLASS_PCCUTOFF 32
 #define CLASS_INNOCENT 155
 #define CLASS_FLAMINGFIST 156
@@ -1168,15 +1167,6 @@ void Actor::ReleaseMemory()
 			free(wmlevels[i]);
 			wmlevels[i]=NULL;
 		}
-		if (reputationmod) {
-			for (i=0; i<20; i++) {
-				if (reputationmod[i]) {
-					free(reputationmod[i]);
-				}
-			}
-			free(reputationmod);
-			reputationmod=NULL;
-		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1712,19 +1702,6 @@ static void InitActorTables()
 				int row = maxrow;
 				if (j<row) row=j;
 				wmlevels[i][j]=strtol(tm->QueryField(row,i), NULL, 0);
-			}
-		}
-	}
-
-	// reputation modifiers
-	tm.load("reputati");
-	if (tm) {
-		reputationmod = (int **) calloc(21, sizeof(int *));
-		int cols = tm->GetColumnCount();
-		for (i=0; i<20; i++) {
-			reputationmod[i] = (int *) calloc(cols, sizeof(int));
-			for (int j=0; j<cols; j++) {
-				reputationmod[i][j] = atoi(tm->QueryField(i, j));
 			}
 		}
 	}
@@ -2493,9 +2470,8 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
 
 		// also apply reputation damage if we hurt (but not killed) an innocent
-		int reputation = core->GetGame()->Reputation / 10;
 		if (Modified[IE_CLASS] == CLASS_INNOCENT) {
-			core->GetGame()->SetReputation(reputation*10 + reputationmod[reputation-1][1]);
+			core->GetGame()->SetReputation(core->GetGame()->Reputation + core->GetReputationMod(1));
 		}
 	}
 
@@ -3044,18 +3020,17 @@ void Actor::Die(Scriptable *killer)
 		if (!InParty) {
 			// adjust reputation if the corpse was:
 			// an innocent, a member of the Flaming Fist or something evil
-			int reputation = game->Reputation / 10;
 			int repmod = 0;
 			if (Modified[IE_CLASS] == CLASS_INNOCENT) {
-				repmod = reputationmod[reputation-1][0];
+				repmod = core->GetReputationMod(0);
 			} else if (Modified[IE_CLASS] == CLASS_FLAMINGFIST) {
-				repmod = reputationmod[reputation-1][3];
+				repmod = core->GetReputationMod(3);
 			}
 			if (MatchesAlignmentMask(AL_EVIL)) {
-				repmod += reputationmod[reputation-1][7];
+				repmod += core->GetReputationMod(7);
 			}
 			if (repmod) {
-				game->SetReputation(reputation*10 + repmod);
+				game->SetReputation(game->Reputation + repmod);
 			}
 		}
 	}

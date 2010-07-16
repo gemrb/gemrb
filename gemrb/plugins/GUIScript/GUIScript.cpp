@@ -4046,22 +4046,6 @@ static PyObject* GemRB_GameSetReputation(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-void ReadReputation()
-{
-	int table = gamedata->LoadTable( "reputati" );
-	if (table<0) {
-		memset(ReputationIncrease,0,sizeof(ReputationIncrease) );
-		memset(ReputationDonation,0,sizeof(ReputationDonation) );
-		return;
-	}
-	Holder<TableMgr> tab = gamedata->GetTable( table );
-	for (int i = 0; i < 20; i++) {
-		ReputationIncrease[i] = atoi( tab->QueryField(i,4) );
-		ReputationDonation[i] = atoi( tab->QueryField(i,8) );
-	}
-	gamedata->DelTable( table );
-}
-
 PyDoc_STRVAR( GemRB_IncreaseReputation__doc,
 "IncreaseReputation( donation ) => int\n\n"
 "Increases party reputation according to the donation. (See reputati.2da)" );
@@ -4079,16 +4063,10 @@ static PyObject* GemRB_IncreaseReputation(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	int Row = (game->Reputation-9)/10;
-	if (Row>19) {
-		Row = 19;
-	}
-	if (ReputationDonation[0]==(int) UNINIT_IEDWORD) {
-		ReadReputation();
-	}
-	int Limit = ReputationDonation[Row];
+
+	int Limit = core->GetReputationMod(8);
 	if (Limit<=Donation) {
-		Increase = ReputationIncrease[Row];
+		Increase = core->GetReputationMod(4);
 		if (Increase) {
 			game->SetReputation( game->Reputation + Increase );
 		}
