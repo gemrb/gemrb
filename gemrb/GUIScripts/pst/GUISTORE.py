@@ -78,13 +78,14 @@ roomtypes = (66865, 66866, 66867, 66868)
 store_funcs = None
 
 def CloseWindows ():
-	CloseStoreShoppingWindow ()
-	CloseStoreIdentifyWindow ()
-	CloseStoreStealWindow ()
-	CloseStoreHealWindow ()# +1?
-	CloseStoreDonateWindow ()# -1?
-	CloseStoreRumourWindow ()
-	CloseStoreRentWindow ()
+	global StoreShoppingWindow, StoreIdentifyWindow, StoreStealWindow
+	global StoreHealWindow, StoreDonateWindow, StoreRumourWindow, StoreRentWindow
+
+	for win in StoreShoppingWindow, StoreIdentifyWindow, StoreStealWindow, StoreHealWindow, StoreDonateWindow, StoreRumourWindow, StoreRentWindow:
+		if win:
+			win.Unload ()
+
+	StoreShoppingWindow = StoreIdentifyWindow = StoreStealWindow = StoreHealWindow = StoreDonateWindow = StoreRumourWindow = StoreRentWindow = None
 	return
 
 def CloseStoreWindow ():
@@ -1335,69 +1336,6 @@ def RentRoom ():
 	TextArea.SetText (4241)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def CloseStoreShoppingWindow ():
-	global StoreShoppingWindow
-
-	if StoreShoppingWindow != None:
-		if StoreShoppingWindow:
-			StoreShoppingWindow.Unload ()
-		StoreShoppingWindow = None
-	return
-
-def CloseStoreIdentifyWindow ():
-	global StoreIdentifyWindow
-
-	if StoreIdentifyWindow != None:
-		if StoreIdentifyWindow:
-			StoreIdentifyWindow.Unload ()
-		StoreIdentifyWindow = None
-	return
-
-def CloseStoreStealWindow ():
-	global StoreStealWindow
-
-	if StoreStealWindow != None:
-		if StoreStealWindow:
-			StoreStealWindow.Unload ()
-		StoreStealWindow = None
-	return
-
-def CloseStoreDonateWindow ():
-	global StoreDonateWindow
-
-	if StoreDonateWindow != None:
-		if StoreDonateWindow:
-			StoreDonateWindow.Unload ()
-		StoreDonateWindow = None
-	return
-
-def CloseStoreHealWindow ():
-	global StoreHealWindow
-
-	if StoreHealWindow != None:
-		if StoreHealWindow:
-			StoreHealWindow.Unload ()
-		StoreHealWindow = None
-	return
-
-def CloseStoreRumourWindow ():
-	global StoreRumourWindow
-
-	if StoreRumourWindow != None:
-		if StoreRumourWindow:
-			StoreRumourWindow.Unload ()
-		StoreRumourWindow = None
-	return
-
-def CloseStoreRentWindow ():
-	global StoreRentWindow
-
-	if StoreRentWindow != None:
-		if StoreRentWindow:
-			StoreRentWindow.Unload ()
-		StoreRentWindow = None
 	return
 
 def ErrorWindow (strref):
