@@ -9005,6 +9005,13 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
+
+	// apply the reputation penalty
+	int repmod = core->GetReputationMod(2);
+	if (repmod) {
+		game->SetReputation(game->Reputation + repmod);
+	}
+
 	//not sure if this is ok
 	//owner->LastAttacker = attacker->GetID();
 	owner->LastDisarmFailed = attacker->GetID();
