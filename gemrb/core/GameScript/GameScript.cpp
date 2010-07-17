@@ -1264,6 +1264,7 @@ void InitializeIEScript()
 	std::list<int> missing_triggers;
 	std::list<int> missing_actions;
 	std::list<int> missing_objects;
+	std::list<int>::iterator l;
 
 	PluginMgr::Get()->RegisterCleanup(CleanupIEScript);
 
@@ -1363,7 +1364,7 @@ void InitializeIEScript()
 		triggerflags[i] = poi->Flags;
 	}
 
-	for (std::list<int>::iterator l = missing_triggers.begin(); l!=missing_triggers.end();l++) {
+	for (l = missing_triggers.begin(); l!=missing_triggers.end();l++) {
 		j = *l;
 		// found later as a different name
 		int ii = triggersTable->GetValueIndex( j ) & 0x3fff;
@@ -1444,7 +1445,7 @@ void InitializeIEScript()
 		}
 	}
 
-	for (std::list<int>::iterator l = missing_actions.begin(); l!=missing_actions.end();l++) {
+	for (l = missing_actions.begin(); l!=missing_actions.end();l++) {
 		j = *l;
 		// found later as a different name
 		int ii = actionsTable->GetValueIndex( j );
@@ -1496,7 +1497,7 @@ void InitializeIEScript()
 		}
 	}
 
-	for (std::list<int>::iterator l = missing_objects.begin(); l!=missing_objects.end();l++) {
+	for (l = missing_objects.begin(); l!=missing_objects.end();l++) {
 		j = *l;
 		// found later as a different name
 		int ii = objectsTable->GetValueIndex( j );

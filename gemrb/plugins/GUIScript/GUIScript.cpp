@@ -1101,7 +1101,7 @@ static PyObject* GemRB_LoadSymbol(PyObject * /*self*/, PyObject* args)
 	if (ind == -1) {
 		return NULL;
 	}
-	
+
 	return gs->ConstructObject("Symbol", ind);
 }
 
@@ -4489,6 +4489,30 @@ static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 	MyActor->SetSoundFolder(Sound);
 	Py_INCREF( Py_None );
 	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_GetPlayerSound__doc,
+"SetPlayerSound(Slot)\n\n"
+"Gets the player character's sound set." );
+
+static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
+{
+	char Sound[33];
+	int PlayerSlot;
+
+	if (!PyArg_ParseTuple( args, "i", &PlayerSlot )) {
+		return AttributeError( GemRB_GetPlayerSound__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* MyActor = game->FindPC( PlayerSlot );
+	if (!MyActor) {
+		return RuntimeError( "Actor not found!" );
+	}
+	MyActor->GetSoundFolder(Sound);
+	return PyString_FromString(Sound);
 }
 
 PyDoc_STRVAR( GemRB_GetSlotType__doc,
@@ -9188,7 +9212,7 @@ static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
-	
+
 	ResolveSpellName(splname, actor->LastSpellOnMe);
 	return PyString_FromString(splname);
 }
@@ -9279,6 +9303,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetPlayerStat, METH_VARARGS),
 	METHOD(GetPlayerStates, METH_VARARGS),
 	METHOD(GetPlayerScript, METH_VARARGS),
+	METHOD(GetPlayerSound, METH_VARARGS),
 	METHOD(GetPlayerString, METH_VARARGS),
 	METHOD(GetSaveGames, METH_VARARGS),
 	METHOD(GetSelectedSize, METH_NOARGS),

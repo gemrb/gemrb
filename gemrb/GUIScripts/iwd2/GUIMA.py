@@ -283,6 +283,11 @@ def AddNoteWindow ():
 	return
 
 def OpenWorldMapWindowInside ():
+	global MapWindow
+
+	OpenMapWindow () #closes mapwindow
+	MapWindow = -1
+	print "MapWindow=",MapWindow
 	WorldMapWindowCommon (-1)
 	return
 
@@ -294,6 +299,10 @@ def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
 	tmp = WorldMapControl.GetDestinationArea (1)
+	if tmp["Distance"]==-1:
+		print "Invalid target", tmp
+		return
+
 	CloseWorldMapWindow ()
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"], tmp["Direction"])
 	return

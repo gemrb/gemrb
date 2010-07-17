@@ -2739,7 +2739,7 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 		//It is signed to have the correct math
 		//when adding it to the base slot (SLOT_WEAPON) in
 		//case of quivers. (weird IE magic)
-		//The other word is the equipped header. 
+		//The other word is the equipped header.
 		//find a quiver for the bow, etc
 		if (Equipped!=IW_NO_EQUIPPED) {
 			inventory.EquipItem( Equipped+inventory.GetWeaponSlot());
@@ -3037,7 +3037,7 @@ void Actor::Die(Scriptable *killer)
 
 	ieDword value = 0;
 	ieVariable varname;
-	
+
 	// death variables are updated at the moment of death
 	if (KillVar[0]) {
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
@@ -3086,7 +3086,7 @@ void Actor::Die(Scriptable *killer)
 			}
 		}
 	}
-		
+
 	if (IncKillCount) {
 		// racial dead count
 		value = 0;
@@ -4183,7 +4183,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	ieDword damagetype = hittingheader->DamageType;
 	int damage = 0;
 	int resisted = 0;
-	
+
 	if (hittingheader->DiceThrown<256) {
 		damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, 0, 1, 0);
 		damage += DamageBonus;
@@ -4754,7 +4754,7 @@ void Actor::Draw(const Region &screen)
 		// (eg, via VerbalConstant), please fix :)
 		drawcircle = false;
 	}
-	if (BaseStats[IE_STATE_ID]&STATE_DEAD || InternalFlags&IF_JUSTDIED) { 
+	if (BaseStats[IE_STATE_ID]&STATE_DEAD || InternalFlags&IF_JUSTDIED) {
 		drawcircle = false;
 	}
 	bool drawtarget = drawcircle;
@@ -5181,6 +5181,16 @@ void Actor::SetSoundFolder(const char *soundset)
 	} else {
 		strnlwrcpy(PCStats->SoundSet, soundset, 8);
 		PCStats->SoundFolder[0]=0;
+	}
+}
+
+void Actor::GetSoundFolder(char *soundset) const
+{
+	if (core->HasFeature(GF_SOUNDFOLDERS)) {
+		strnlwrcpy(soundset, PCStats->SoundFolder, 32);
+	}
+	else {
+		strnlwrcpy(soundset, PCStats->SoundSet, 8);
 	}
 }
 

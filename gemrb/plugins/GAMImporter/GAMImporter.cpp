@@ -140,7 +140,8 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		newGame->WhichFormation = 0;
 	}
 	str->ReadDword( &newGame->PartyGold );
-	str->ReadWord( &newGame->NpcInParty);                 //npc count in party???
+	//npc count in party???
+	str->ReadWord( &newGame->NpcInParty );
 	str->ReadWord( &newGame->WeatherBits );
 	str->ReadDword( &PCOffset );
 	str->ReadDword( &PCCount );
@@ -276,6 +277,11 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			str->Seek( FamiliarsOffset, GEM_STREAM_START );
 			for (i=0; i<9;i++) {
 				str->ReadResRef( newGame->GetFamiliar(i) );
+			}
+		} else {
+			//clear these fields up
+			for (i=0;i<9;i++) {
+				memset(newGame->GetFamiliar(i), 0, sizeof(ieResRef));
 			}
 		}
 	}
@@ -656,14 +662,14 @@ int GAMImporter::GetStoredFileSize(Game *game)
 		}
 	}
 
-	//TODO: Fix this for ToB and BG2 (saved locations and pocket plane locations)
 	SavedLocOffset = headersize;
-	SavedLocCount = 0;
+	SavedLocCount = game->GetSavedLocationCount();
+	headersize +=SavedLocCount*20;
 
 	PPLocOffset = headersize;
-	PPLocCount = 0;
+	PPLocCount = game->GetPlaneLocationCount();
 
-	return headersize + (PPLocCount+SavedLocCount) * 20;
+	return headersize + PPLocCount * 20;
 }
 
 int GAMImporter::PutJournals(DataStream *stream, Game *game)
@@ -807,7 +813,7 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game)
 	stream->WriteDword( &GlobalCount );
 	stream->WriteResRef( game->CurrentArea );
 	//this is always 0xffffffff
-	stream->WriteDword( &game->Unknown48 );        
+	stream->WriteDword( &game->Unknown48 );
 	stream->WriteDword( &JournalCount );
 	stream->WriteDword( &JournalOffset );
 

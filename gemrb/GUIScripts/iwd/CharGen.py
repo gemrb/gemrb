@@ -251,7 +251,6 @@ def BackPress():
 	global CharGenWindow, CharGenState, SkillsState
 	global GenderButton, RaceButton, ClassButton, AlignmentButton, AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
 
-	GemRB.SetToken ("CHARNAME","")
 	if CharGenState > 0:
 		CharGenState = CharGenState - 1
 	else:
@@ -260,6 +259,7 @@ def BackPress():
 
 	if CharGenState > 6:
 		CharGenState = 6
+		GemRB.SetToken ("CHARNAME","")
 
 	if CharGenState == 0:
 		RaceButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -2618,9 +2618,6 @@ def NamePress():
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	NameWindow = GemRB.LoadWindow (5)
 
-	NameField = NameWindow.GetControl (2)
-	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, NameEditChange)
-
 	NameDoneButton = NameWindow.GetControl (0)
 	NameDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	NameDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NameDonePress)
@@ -2633,8 +2630,13 @@ def NamePress():
 	NameCancelButton.SetText (13727)
 	NameCancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
+	NameField = NameWindow.GetControl (2)
+	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, NameEditChange)
+	NameField.SetText (GemRB.GetToken ("CHARNAME") )
+	NameField.SetStatus (IE_GUI_CONTROL_FOCUSED)
+
 	NameWindow.SetVisible (WINDOW_VISIBLE)
-	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
+	NameEditChange()
 	return
 
 def NameEditChange():
@@ -2708,6 +2710,7 @@ def ImportDonePress():
 	# Import the character from the chosen name
 	GemRB.CreatePlayer (CharImportList.QueryText(), MyChar|0x8000, 1)
 
+	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (MyChar) )
 	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (MyChar, 1) )
 	PortraitName = GemRB.GetPlayerPortrait (MyChar, 0)
 	GemRB.SetToken ("LargePortrait", PortraitName )

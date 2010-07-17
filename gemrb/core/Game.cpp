@@ -782,6 +782,7 @@ bool Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
 	ieDword chapter = 0;
 	locals->Lookup("CHAPTER", chapter);
 	je->Chapter = (ieByte) chapter;
+	je->unknown09 = 0;
 	je->Section = (ieByte) Section;
 	je->Group = (ieByte) Group;
 	je->Text = strref;
