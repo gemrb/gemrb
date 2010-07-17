@@ -2250,6 +2250,13 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 {
 	char newVarName[8];
+	const char *poi;
+
+	poi = &VarName[6];
+	//some HoW triggers use a : to separate the scope from the variable name
+	if (*poi==':') {
+		poi++;
+	}
 
 	if (InDebug&ID_VARIABLES) {
 		printf( "Setting variable(\"%s\", %d)\n", VarName, value );
@@ -2257,22 +2264,22 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 	strncpy( newVarName, VarName, 6 );
 	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
-		Sender->GetCurrentArea()->locals->SetAt( &VarName[6], value );
+		Sender->GetCurrentArea()->locals->SetAt( poi, value );
 		return;
 	}
 	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
-		Sender->locals->SetAt( &VarName[6], value );
+		Sender->locals->SetAt( poi, value );
 		return;
 	}
 	Game *game = core->GetGame();
 	if (!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
-		game->kaputz->SetAt( &VarName[6], value );
+		game->kaputz->SetAt( poi, value );
 		return;
 	}
 	if (strnicmp(newVarName,"GLOBAL",6) ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
-			map->locals->SetAt( &VarName[6], value);
+			map->locals->SetAt( poi, value);
 		}
 		else if (InDebug&ID_VARIABLES) {
 			printMessage("GameScript"," ",YELLOW);
@@ -2280,26 +2287,33 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 		}
 	}
 	else {
-		game->locals->SetAt( &VarName[6], ( ieDword ) value );
+		game->locals->SetAt( poi, ( ieDword ) value );
 	}
 }
 
 ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 {
 	char newVarName[8];
+	const char *poi;
 	ieDword value = 0;
 
 	strncpy( newVarName, VarName, 6 );
 	newVarName[6]=0;
+	poi = &VarName[6];
+	//some HoW triggers use a : to separate the scope from the variable name
+	if (*poi==':') {
+		poi++;
+	}
+
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
-		Sender->GetCurrentArea()->locals->Lookup( &VarName[6], value );
+		Sender->GetCurrentArea()->locals->Lookup( poi, value );
 		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s: %d\n",VarName, value);
 		}
 		return value;
 	}
 	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
-		Sender->locals->Lookup( &VarName[6], value );
+		Sender->locals->Lookup( poi, value );
 		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s: %d\n",VarName, value);
 		}
@@ -2307,7 +2321,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 	}
 	Game *game = core->GetGame();
 	if (!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
-		game->kaputz->Lookup( &VarName[6], value );
+		game->kaputz->Lookup( poi, value );
 		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s: %d\n",VarName, value);
 		}
@@ -2316,7 +2330,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 	if (strnicmp(newVarName,"GLOBAL",6) ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
-			map->locals->Lookup( &VarName[6], value);
+			map->locals->Lookup( poi, value);
 		} else {
 			if (valid) {
 				*valid=false;
@@ -2327,7 +2341,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 			}
 		}
 	} else {
-		game->locals->Lookup( &VarName[6], value );
+		game->locals->Lookup( poi, value );
 	}
 	if (InDebug&ID_VARIABLES) {
 		printf("CheckVariable %s: %d\n",VarName, value);

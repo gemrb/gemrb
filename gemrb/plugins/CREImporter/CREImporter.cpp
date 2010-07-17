@@ -2890,8 +2890,12 @@ int CREImporter::PutVariables( DataStream *stream, Actor *actor)
 		stream->WriteDword( &tmpDword);
 		stream->Write(filling,8); //type, power
 		stream->WriteDword( &value); //param #1
-		//param #2, timing, duration, chance, resource, dices, saves
-		stream->Write( filling, 40);
+		stream->Write(filling,4); //param #2
+		//HoW has an assertion to ensure timing is nonzero (even for variables)
+		value = 1;
+		stream->WriteDword( &value); //timing
+		//duration, chance, resource, dices, saves
+		stream->Write( filling, 32);
 		tmpDword = FAKE_VARIABLE_MARKER;
 		stream->WriteDword( &tmpDword); //variable marker
 		stream->Write( filling, 92); //23 * 4
