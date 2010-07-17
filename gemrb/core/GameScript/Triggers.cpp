@@ -344,6 +344,22 @@ int GameScript::InTrap(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+/* checks if targeted actor is in the specified region
+   GemRB allows different regions, referenced by int0Parameter
+   The polygons are stored in island<nn>.2da files */
+int GameScript::OnIsland(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		return 0;
+	}
+	Gem_Polygon *p = GetPolygon2DA(parameters->int0Parameter);
+	if (!p) {
+		return 0;
+	}
+	return p->PointIn(scr->Pos);
+}
+
 int GameScript::School(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );

@@ -835,6 +835,7 @@ public: //Script Functions
 	static int NumTimesTalkedToLT(Scriptable* Sender, Trigger* parameters);
 	static int ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters);
 	static int OnCreation(Scriptable* Sender, Trigger* parameters);
+	static int OnIsland(Scriptable* Sender, Trigger* parameters);
 	static int OnScreen(Scriptable* Sender, Trigger* parameters);
 	static int Opened(Scriptable* Sender, Trigger* parameters);
 	static int OpenFailed(Scriptable* Sender, Trigger* parameters);
@@ -1331,6 +1332,7 @@ public:
 	static void SpawnPtDeactivate(Scriptable* Sender, Action* parameters);
 	static void SpawnPtSpawn(Scriptable* Sender, Action* parameters);
 	static void Spell(Scriptable* Sender, Action* parameters);
+	static void SpellCastEffect(Scriptable* Sender, Action* parameters);
 	static void SpellHitEffectPoint(Scriptable* Sender, Action* parameters);
 	static void SpellHitEffectSprite(Scriptable* Sender, Action* parameters);
 	static void SpellNoDec(Scriptable* Sender, Action* parameters);

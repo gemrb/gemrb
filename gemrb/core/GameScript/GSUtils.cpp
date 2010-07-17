@@ -66,6 +66,7 @@ int SkillCount=-1;
 // reaction modifiers (by reputation and charisma)
 int rmodrep[20];
 int rmodchr[25];
+Gem_Polygon **polygons;
 
 void InitScriptTables()
 {
@@ -2730,6 +2731,7 @@ unsigned int GetItemDistance(ieResRef itemres, int header)
 	return dist*15;
 }
 
+//read the wish 2da
 void SetupWishCore(Scriptable *Sender, int column, int picks)
 {
 	int count;
@@ -2782,5 +2784,44 @@ retry:
 		SetVariable(Sender, varname, "GLOBAL",1);
 	}
 	free(selects);
+}
+
+#define MAX_ISLAND_POLYGONS  10
+
+//read a polygon 2da
+Gem_Polygon *GetPolygon2DA(ieDword index)
+{
+	ieResRef resref;
+
+	if (index>=MAX_ISLAND_POLYGONS) {
+		return NULL;
+	}
+
+	if (!polygons) {
+		polygons = (Gem_Polygon **) calloc(MAX_ISLAND_POLYGONS, sizeof(Gem_Polygon *) );
+	}
+	if (polygons[index]) {
+		return polygons[index];
+	}
+	snprintf(resref, sizeof(ieResRef), "ISLAND%02d", index);
+	AutoTable tm(resref);
+	if (!tm) {
+		return NULL;
+	}
+	int cnt = tm->GetRowCount();
+	if (!cnt) {
+		return NULL;
+	}
+	Point *p = new Point[cnt];
+
+	int i = cnt;
+	while(i--) {
+		p[i].x = atoi(tm->QueryField(i, 0));
+		p[i].y = atoi(tm->QueryField(i, 1));
+	}
+
+	polygons[index] = new Gem_Polygon(p, cnt, NULL);
+	delete [] p;
+	return polygons[index];
 }
 

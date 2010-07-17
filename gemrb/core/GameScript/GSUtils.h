@@ -56,6 +56,7 @@ extern int ExtraParametersCount;
 extern int InDebug;
 extern int *SkillStats;
 extern int SkillCount;
+extern Gem_Polygon **polygons;
 
 #define MIC_INVALID -2
 #define MIC_FULL -1
@@ -146,6 +147,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 unsigned int GetSpellDistance(ieResRef spellres, Actor *actor);
 unsigned int GetItemDistance(ieResRef itemres, int header);
 void SetupWishCore(Scriptable *Sender, int column, int picks);
+Gem_Polygon *GetPolygon2DA(ieDword index);
 
 inline int Bones(ieDword value)
 {

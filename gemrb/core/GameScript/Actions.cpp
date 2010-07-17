@@ -6652,6 +6652,15 @@ void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
 	SetVariable( Sender, variable, "GLOBAL", value );
 }
 
+void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* src = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!src) {
+		return;
+	}
+	//TODO: finish this
+}
+
 //this action plays a vvc animation over target
 //we simply apply the appropriate opcode on the target (see iwdopcodes)
 //the list of vvcs is in iwdshtab.2da
