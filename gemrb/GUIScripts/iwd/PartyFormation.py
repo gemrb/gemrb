@@ -70,6 +70,7 @@ def OnLoad ():
 		CreateCharButton.SetVarAssoc ("Slot", i-17)
 		CreateCharButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreateCharPress)
 		CreateCharButton.SetStatus (IE_GUI_BUTTON_ENABLED)
+		CreateCharButton.SetFont ("NORMAL")
 		if ResRef == "":
 			CreateCharButton.SetText (10264)
 		else:
