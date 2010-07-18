@@ -26,6 +26,8 @@ from GUIDefines import *
 from ie_stats import *
 import CommonTables
 
+CommonTables.Load()
+
 NewLifeWindow = 0
 QuitWindow = 0
 TextArea = 0
