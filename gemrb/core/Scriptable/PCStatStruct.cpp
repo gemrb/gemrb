@@ -103,6 +103,19 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 		return;
 	}
 
+	//precalculate field values. Empty slots will get their ability header
+	//initialized to the invalid value of 0xffff to stay binary compatible
+	//with original
+	int slot2, header;
+
+	if (slot==0xffff) {
+		slot2 = 0xffff;
+		header = 0xffff;
+	}
+	else {
+		slot2 = slot+1;
+		header = 0;
+	}
 	switch(which) {
 	case ACT_QSLOT1: SetQuickItemSlot(0,slot,headerindex); break;
 	case ACT_QSLOT2: SetQuickItemSlot(1,slot,headerindex); break;
@@ -111,27 +124,27 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 	case ACT_QSLOT5: SetQuickItemSlot(4,slot,headerindex); break;
 	case ACT_WEAPON1:
 		QuickWeaponSlots[0]=slot;
-		QuickWeaponHeaders[0]=0;
-		QuickWeaponSlots[4]=slot+1;
-		QuickWeaponHeaders[4]=0;
+		QuickWeaponHeaders[0]=header;
+		QuickWeaponSlots[4]=slot2;
+		QuickWeaponHeaders[4]=header;
 		break;
 	case ACT_WEAPON2:
 		QuickWeaponSlots[1]=slot;
-		QuickWeaponHeaders[1]=0;
-		QuickWeaponSlots[5]=slot+1;
-		QuickWeaponHeaders[5]=0;
+		QuickWeaponHeaders[1]=header;
+		QuickWeaponSlots[5]=slot2;
+		QuickWeaponHeaders[5]=header;
 		break;
 	case ACT_WEAPON3:
 		QuickWeaponSlots[2]=slot;
-		QuickWeaponHeaders[2]=0;
-		QuickWeaponSlots[6]=slot+1;
-		QuickWeaponHeaders[6]=0;
+		QuickWeaponHeaders[2]=header;
+		QuickWeaponSlots[6]=slot2;
+		QuickWeaponHeaders[6]=header;
 		break;
 	case ACT_WEAPON4:
 		QuickWeaponSlots[3]=slot;
-		QuickWeaponHeaders[3]=0;
-		QuickWeaponSlots[7]=slot+1;
-		QuickWeaponHeaders[7]=0;
+		QuickWeaponHeaders[3]=header;
+		QuickWeaponSlots[7]=slot2;
+		QuickWeaponHeaders[7]=header;
 		break;
 	}
 }
