@@ -90,7 +90,7 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 {
 	int ret;
 
-	//don't allow any movement of undroppable items 
+	//don't allow any movement of undroppable items
 	if (invflags&IE_INV_ITEM_UNDROPPABLE ) {
 		ret = 0;
 	} else {
@@ -112,7 +112,7 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 		if ((invflags&(IE_INV_ITEM_DESTRUCTIBLE|IE_INV_ITEM_CRITICAL))!=IE_INV_ITEM_DESTRUCTIBLE) {
 			ret &= ~IE_STORE_SELL;
 		}
-	
+
 		//check if store buys stolen items
 		if ((invflags&IE_INV_ITEM_STOLEN) && !(Type&IE_STORE_FENCE) ) {
 			ret &= ~IE_STORE_SELL;
@@ -251,8 +251,9 @@ void Store::AddItem(CREItem *item)
 	}
 
 	temp = new STOItem();
-	//wonder if this is needed
-	//memset( temp, 0, sizeof (STOItem ) );
+	//It is important to initialize these fields, if STOItem ever changes to
+	//a real class from struct, make sure the fields are cleared
+	memset( temp, 0, sizeof (STOItem ) );
 	memcpy( temp, item, sizeof( CREItem ) );
 	items.push_back (temp );
 	ItemsCount++;

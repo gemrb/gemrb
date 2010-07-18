@@ -107,7 +107,7 @@ Interface::Interface(int iargc, char* iargv[])
 #endif
 	textcolor( LIGHT_WHITE );
 	printf( "GemRB Core Version v%s Loading...\n", VERSION_GEMRB );
-	
+
 	// default to the correct endianswitch
 	ieWord endiantest = 1;
 	if (((char *)&endiantest)[1] == 1) {
@@ -4576,8 +4576,11 @@ void Interface::DoTheStoreHack(Store *s)
 	size = s->DrinksCount * sizeof( STODrink );
 	s->drinks=(STODrink *) malloc(size);
 
-	for(size=0;size<s->ItemsCount;size++)
-		s->items.push_back( new STOItem() );
+	for(size=0;size<s->ItemsCount;size++) {
+		STOItem *si = new STOItem();
+		memset(si, 0, sizeof(STOItem) );
+		s->items.push_back( si );
+	}
 }
 
 //plays stock sound listed in defsound.2da
