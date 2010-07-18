@@ -26,9 +26,9 @@ ExitWindow = 0
 def OnLoad():
 	global PartyFormationWindow
 	GemRB.LoadWindowPack("GUIMP")
-	
+
 	PartyFormationWindow = GemRB.LoadWindow(0)
-	
+
 	ExitButton = PartyFormationWindow.GetControl(30)
 	ExitButton.SetText(13906)
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitPress)
@@ -37,12 +37,13 @@ def OnLoad():
 	ModifyCharactersButton = PartyFormationWindow.GetControl(43)
 	ModifyCharactersButton.SetText(18816)
 	ModifyCharactersButton.SetState(IE_GUI_BUTTON_DISABLED)
-	ModifyCharactersButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ModifyCharactersPress)
+	#TODO: implement ModifyCharacters
+	#ModifyCharactersButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ModifyCharactersPress)
 
 	DoneButton = PartyFormationWindow.GetControl(28)
 	DoneButton.SetText(11973)
 	Portraits = 0
-	
+
 	for i in range(18,24):
 		Label = PartyFormationWindow.GetControl(0x10000012+i)
 		#removing this label, it just disturbs us
@@ -67,7 +68,7 @@ def OnLoad():
 			Button.SetText(GemRB.GetPlayerName(i-17,0) )
 
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GeneratePress)
-	
+
 	if Portraits == 0:
 		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	else:
@@ -76,28 +77,28 @@ def OnLoad():
 
 	PartyFormationWindow.SetVisible(WINDOW_VISIBLE)
 	return
-	
+
 def ExitPress():
 	global PartyFormationWindow, ExitWindow
 	PartyFormationWindow.SetVisible(WINDOW_INVISIBLE)
 	ExitWindow = GemRB.LoadWindow(7)
-	
+
 	TextArea = ExitWindow.GetControl(0)
 	TextArea.SetText(11329)
-	
+
 	CancelButton = ExitWindow.GetControl(2)
 	CancelButton.SetText(13727)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitCancelPress)
 	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
-	
+
 	DoneButton = ExitWindow.GetControl(1)
 	DoneButton.SetText(11973)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitDonePress)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
-	
+
 	ExitWindow.SetVisible(WINDOW_VISIBLE)
 	return
-	
+
 def ExitDonePress():
 	global PartyFormationWindow, ExitWindow
 	if ExitWindow:
@@ -106,14 +107,14 @@ def ExitDonePress():
 		PartyFormationWindow.Unload()
 	GemRB.SetNextScript("Start")
 	return
-	
+
 def ExitCancelPress():
 	global PartyFormationWindow, ExitWindow
 	if ExitWindow:
 		ExitWindow.Unload()
 	PartyFormationWindow.SetVisible(WINDOW_VISIBLE)
 	return
-	
+
 def GeneratePress():
 	global PartyFormationWindow
 	slot = GemRB.GetVar("Slot")
