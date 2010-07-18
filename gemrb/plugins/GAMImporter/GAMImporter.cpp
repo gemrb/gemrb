@@ -114,16 +114,8 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			newGame->version = ver_override;
 		}
 		else {
-			newGame->version=version;
+			newGame->version = version;
 		}
-/*
-		if (stricmp( core->GameType, "iwd2" ) == 0 && version != GAM_VER_IWD2) {
-			newGame->version = GAM_VER_IWD2;
-			printMessage("GAMImporter"," ",LIGHT_RED);
-			printf("Trying to load a non-iwd2 game (%d) in iwd2 mode! Patching version up.\n",
-				(int)version);
-		}
-*/
 	}
 
 	ieDword GameTime;
@@ -225,7 +217,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	//apparently BG1/IWD2 relies on this, if chapter is unset, it is
 	//set to -1, hopefully it won't break anything
 	newGame->locals->SetAt("CHAPTER", (ieDword) -1);
-	
+
 	// load initial values from var.var
 	newGame->locals->LoadInitialValues("GLOBAL");
 
@@ -617,16 +609,16 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	PCCount = game->GetPartySize(false);
 	headersize += PCCount * PCSize;
 	for (i = 0;i<PCCount; i++) {
-		Actor *ac=game->GetPC(i, false);
-		headersize +=am->GetStoredFileSize(ac);
+		Actor *ac = game->GetPC(i, false);
+		headersize += am->GetStoredFileSize(ac);
 	}
 	NPCOffset = headersize;
 
 	NPCCount = game->GetNPCCount();
 	headersize += NPCCount * PCSize;
 	for (i = 0;i<NPCCount; i++) {
-		Actor *ac=game->GetNPC(i);
-		headersize +=am->GetStoredFileSize(ac);
+		Actor *ac = game->GetNPC(i);
+		headersize += am->GetStoredFileSize(ac);
 	}
 
 	if (game->mazedata) {
@@ -655,7 +647,7 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	} else {
 		FamiliarsOffset = headersize;
 		if (core->GetBeastsINI()) {
-			headersize +=BESTIARY_SIZE;
+			headersize += BESTIARY_SIZE;
 		}
 		if (game->version!=GAM_VER_PST) {
 			headersize += 9 * 8 + 82 * 4;
@@ -775,7 +767,7 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game)
 
 	memcpy( Signature, "GAMEV0.0", 8);
 	Signature[5]+=game->version/10;
-	if (game->version==GAM_VER_PST) { //pst version
+	if (game->version==GAM_VER_PST || game->version==GAM_VER_BG) { //pst/bg1 saved version
 		Signature[7]+=1;
 	}
 	else {
