@@ -25,6 +25,7 @@
 import GemRB
 from GUIDefines import *
 import GUICommon
+import GUICommonWindows
 
 PartyFormationWindow = 0
 CreateCharWindow = 0
@@ -32,6 +33,8 @@ ExitWindow = 0
 
 def OnLoad ():
 	global PartyFormationWindow
+
+	GUICommonWindows.SelectionChangeHandler = None
 
 	GemRB.LoadWindowPack ("GUISP", 640, 480)
 	PartyFormationWindow = GemRB.LoadWindow (0)
