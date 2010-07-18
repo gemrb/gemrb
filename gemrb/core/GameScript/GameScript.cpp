@@ -414,6 +414,8 @@ static const ActionLink actionnames[] = {
 	{"allowarearesting", GameScript::SetAreaRestFlag, 0},//iwd2
 	{"ally", GameScript::Ally, 0},
 	{"ambientactivate", GameScript::AmbientActivate, 0},
+	{"ankhegemerge", GameScript::AnkhegEmerge, AF_ALIVE},
+	{"ankheghide", GameScript::AnkhegHide, AF_ALIVE},
 	{"applydamage", GameScript::ApplyDamage, 0},
 	{"applydamagepercent", GameScript::ApplyDamagePercent, 0},
 	{"applyspell", GameScript::ApplySpell, 0},

@@ -3344,6 +3344,30 @@ void GameScript::Recoil(Scriptable* Sender, Action* /*parameters*/)
 	actor->SetWait( 1 );
 }
 
+void GameScript::AnkhegEmerge(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	if (actor->GetStance()!=IE_ANI_EMERGE) {
+		actor->SetStance( IE_ANI_EMERGE );
+		actor->SetWait( 1 );
+	}
+}
+
+void GameScript::AnkhegHide(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	if (actor->GetStance()!=IE_ANI_HIDE) {
+		actor->SetStance( IE_ANI_HIDE );
+		actor->SetWait( 1 );
+	}
+}
+
 void GameScript::GlobalSetGlobal(Scriptable* Sender, Action* parameters)
 {
 	ieDword value = CheckVariable( Sender, parameters->string0Parameter );

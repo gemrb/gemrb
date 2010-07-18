@@ -951,6 +951,8 @@ public:
 	static void AdvanceTime(Scriptable *Sender, Action* parameters);
 	static void Ally(Scriptable* Sender, Action* parameters);
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
+	static void AnkhegEmerge(Scriptable* Sender, Action* parameters);
+	static void AnkhegHide(Scriptable* Sender, Action* parameters);
 	static void ApplyDamage(Scriptable* Sender, Action* parameters);
 	static void ApplyDamagePercent(Scriptable* Sender, Action* parameters);
 	static void ApplySpell(Scriptable* Sender, Action* parameters);
@@ -1053,7 +1055,6 @@ public:
 	static void DoubleClickLButtonPoint(Scriptable* Sender, Action* parameters);
 	static void DoubleClickRButtonObject(Scriptable* Sender, Action* parameters);
 	static void DoubleClickRButtonPoint(Scriptable* Sender, Action* parameters);
-
 	static void DropInventory(Scriptable* Sender, Action* parameters);
 	static void DropInventoryEX(Scriptable* Sender, Action* parameters);
 	static void DropItem(Scriptable* Sender, Action* parameters);
