@@ -59,6 +59,8 @@ struct TRBlender_HalfTrans {
 };
 
 
+//the dummy variable is a hint for MSVC6, otherwise it compiles bad code
+//because it cannot select between the 16 and 32 bit variants
 template<typename PixelType, class Tinter, class Blender>
 static void BlitTile_internal(SDL_Surface* target,
               int tx, int ty,
@@ -66,12 +68,13 @@ static void BlitTile_internal(SDL_Surface* target,
               int w, int h,
               const Uint8* data, const SDL_Color* pal,
               const Uint8* mask, Uint8 mask_key,
-              Tinter& tint, Blender& blend)
+              Tinter& tint, Blender& blend, PixelType /*dummy*/=0)
 {
 	PixelType* buf_line = (PixelType*)(target->pixels) + (ty+ry)*(target->pitch / sizeof(PixelType));
 	const Uint8* data_line = data + ry*64;
 
 	PixelType opal[256];
+
 	for (unsigned int i = 0; i < 256; ++i)
 	{
 		Uint8 r = tint.r(pal[i].r);
@@ -83,7 +86,6 @@ static void BlitTile_internal(SDL_Surface* target,
 	}
 
 	if (mask) {
-
 		const Uint8* mask_line = mask + ry*64;
 		for (int y = 0; y < h; ++y) {
 			PixelType* buf = buf_line + tx + rx;
