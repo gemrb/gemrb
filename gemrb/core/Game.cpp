@@ -333,10 +333,12 @@ bool Game::DetermineStartPosType(const TableMgr *strta)
 	return false;
 }
 
+#define PMODE_COUNT 3
+
 void Game::InitActorPos(Actor *actor)
 {
 	//start.2da row labels
-	const char *mode[3] = { "NORMAL", "TUTORIAL", "EXPANSION" };
+	const char *mode[PMODE_COUNT] = { "NORMAL", "TUTORIAL", "EXPANSION" };
 
 	unsigned int ip = (unsigned int) (actor->InParty-1);
 	AutoTable start("start");
@@ -344,6 +346,13 @@ void Game::InitActorPos(Actor *actor)
 	// 0 - single player, 1 - tutorial, 2 - expansion
 	ieDword playmode = 0;
 	core->GetDictionary()->Lookup( "PlayMode", playmode );
+
+	//Sometimes playmode is set to -1 (in pregenerate)
+	//normally execution shouldn't ever come here, but it actually does
+	//preventing problems by defaulting to the regular entry points
+	if (playmode>PMODE_COUNT) {
+		playmode = 0;
+	}
 	const char *xpos = start->QueryField(mode[playmode],"XPOS");
 	const char *ypos = start->QueryField(mode[playmode],"YPOS");
 	const char *area = start->QueryField(mode[playmode],"AREA");
