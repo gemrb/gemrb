@@ -145,7 +145,7 @@ class CharGen:
 			(name,setFn,commentFn,unsetFn,guardFn) = self.stages[self.step]
 			if(guardFn and not guardFn()):
 				return False
-			if(callable(setFn)):
+			if(hasattr(setFn, "__call__")):
 				setFn()
 			else:
 				GemRB.SetNextScript(setFn)
