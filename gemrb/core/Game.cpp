@@ -307,7 +307,9 @@ int Game::LeaveParty (Actor* actor)
 	std::vector< Actor*>::iterator m = PCs.begin() + slot;
 	PCs.erase( m );
 
+	ieDword id = actor->GetID();
 	for ( m = PCs.begin(); m != PCs.end(); ++m) {
+		(*m)->PCStats->LastLeft = id;
 		if ( (*m)->InParty>actor->InParty) {
 			(*m)->InParty--;
 		}
@@ -383,9 +385,18 @@ int Game::JoinParty(Actor* actor, int join)
 	if (slot != -1) {
 		return slot;
 	}
+	size_t size = PCs.size();
+	//set the lastjoined trigger
+
 	if (join&JP_JOIN) {
 		actor->PCStats->JoinDate = GameTime;
-		if (!PCs.size() ) {
+		if (size) {
+			ieDword id = actor->GetID();
+			for (size_t i=0;i<size; i++) {
+				Actor *a = GetPC(i, false);
+				a->PCStats->LastJoined = id;
+			}
+		} else {
 			Reputation = actor->GetStat(IE_REPUTATION);
 		}
 	}
@@ -394,7 +405,7 @@ int Game::JoinParty(Actor* actor, int join)
 		std::vector< Actor*>::iterator m = NPCs.begin() + slot;
 		NPCs.erase( m );
 	}
-	size_t size = PCs.size();
+
 
 	PCs.push_back( actor );
 	if (!actor->InParty) {
