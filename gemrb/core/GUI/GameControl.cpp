@@ -1215,6 +1215,11 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 				nextCursor = IE_CURSOR_ATTACK;
 			} else if ( type > EA_CHARMED ) {
 				nextCursor = IE_CURSOR_TALK;
+				//don't let the pc to talk to frozen/stoned creatures
+				ieDword state = lastActor->GetStat(IE_STATE_ID);
+				if (state & STATE_CANTMOVE) {
+					nextCursor |= IE_CURSOR_GRAY;
+				}
 			} else {
 				nextCursor = IE_CURSOR_NORMAL;
 			}
@@ -1226,6 +1231,12 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			nextCursor = IE_CURSOR_TALK;
 			if (!lastActor) {
 				nextCursor |= IE_CURSOR_GRAY;
+			} else {
+				//don't let the pc to talk to frozen/stoned creatures
+				ieDword state = lastActor->GetStat(IE_STATE_ID);
+				if (state & STATE_CANTMOVE) {
+					nextCursor |= IE_CURSOR_GRAY;
+				}
 			}
 		} else if (target_mode == TARGET_MODE_ATTACK) {
 			nextCursor = IE_CURSOR_ATTACK;
@@ -1790,15 +1801,6 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			actor->ClearPath();
 			actor->ClearActions();
 			CreateMovement(actor, p);
-/*
-			if (DoubleClick) {
-				sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
-			} else {
-				sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
-			}
-
-			actor->AddAction( GenerateAction( Tmp) );
-*/
 			//p is a searchmap travel region
 			if ( actor->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
 				sprintf( Tmp, "NIDSpecial2()" );
@@ -1851,13 +1853,15 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		return;
 	}
 	if (!actor) return;
+
 	//we got an actor past this point
 	DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
 
 	PerformActionOn(actor);
 }
 
-void GameControl::PerformActionOn(Actor *actor) {
+void GameControl::PerformActionOn(Actor *actor)
+{
 	Game* game = core->GetGame();
 	unsigned int i;
 
@@ -1899,10 +1903,14 @@ void GameControl::PerformActionOn(Actor *actor) {
 			else if (actor->GetStat(IE_EA) <= EA_CHARMED) {
 				/*let's select charmed/summoned creatures
 				EA_CHARMED is the maximum value known atm*/
-				core->GetGame()->SelectActor(actor, true, SELECT_REPLACE) ;
+				core->GetGame()->SelectActor(actor, true, SELECT_REPLACE);
 			}
 			break;
 		case ACT_TALK:
+			if (!actor->ValidTarget(GA_TALK)) {
+				return;
+			}
+
 			//talk (first selected talks)
 			if (game->selected.size()) {
 				//if we are in PST modify this to NO!

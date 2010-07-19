@@ -519,6 +519,23 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 	if (Slots[slot]) {
 		delete Slots[slot];
 	}
+
+	//This hack sets the charge counters for non-rechargeable items,
+	//if their charge is zero
+	Item *itm = gamedata->GetItem( item->ItemResRef );
+	if (itm) {
+		for (int i=0;i<3;i++) {
+			if (item->Usages[i]) {
+				continue;
+			}
+			ITMExtHeader *h = itm->GetExtHeader(i);
+			if (h && !(h->RechargeFlags&IE_ITEM_RECHARGE)) {
+				item->Usages[i]=h->Charges;
+			}
+		}
+		gamedata->FreeItem( itm, item->ItemResRef, false );
+	}
+
 	Slots[slot] = item;
 
 	//update the action bar next time

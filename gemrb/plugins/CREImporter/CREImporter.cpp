@@ -1088,16 +1088,6 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			CREItem *item = items[index];
 			if (item && gamedata->Exists(item->ItemResRef, IE_ITM_CLASS_ID)) {
 				act->inventory.SetSlotItem( item, Slot );
-				/* this stuff will be done in Actor::SetMap
-				 * after the actor gets an area (and game obj)
-				int slottype = core->QuerySlotEffects( Slot );
-				//weapons will be equipped differently, see SetEquippedSlot later
-				//i think missiles equipping effects are always
-				//in effect, if not, then add SLOT_EFFECT_MISSILE
-				if (slottype != SLOT_EFFECT_NONE && slottype != SLOT_EFFECT_MELEE) {
-					act->inventory.EquipItem( Slot, true );
-				}
-				*/
 				items[index] = NULL;
 				continue;
 			}
