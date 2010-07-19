@@ -95,6 +95,8 @@ public:
 	ieWord    PortraitIcons[MAX_PORTRAIT_ICONS];
 	ieWord    PreviousPortraitIcons[MAX_PORTRAIT_ICONS];
 	ieByte    PortraitIconString[MAX_PORTRAIT_ICONS+2];
+	ieDword   LastLeft;   //trigger
+	ieDword   LastJoined; //trigger
 private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);
 public:

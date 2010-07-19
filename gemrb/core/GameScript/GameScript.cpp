@@ -221,10 +221,12 @@ static const TriggerLink triggernames[] = {
 	{"isweaponranged", GameScript::IsWeaponRanged, 0},
 	{"isweather", GameScript::IsWeather, 0}, //gemrb extension
 	{"itemisidentified", GameScript::ItemIsIdentified, 0},
+	{"joins", GameScript::Joins, 0},
 	{"kit", GameScript::Kit, 0},
 	{"knowspell", GameScript::KnowSpell, 0}, //gemrb specific
 	{"lastmarkedobject", GameScript::LastMarkedObject_Trigger, 0},
 	{"lastpersontalkedto", GameScript::LastPersonTalkedTo, 0}, //pst
+	{"leaves", GameScript::Leaves, 0},
 	{"level", GameScript::Level, 0},
 	{"levelgt", GameScript::LevelGT, 0},
 	{"levelinclass", GameScript::ClassLevel, 0}, //iwd2

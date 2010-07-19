@@ -3522,6 +3522,40 @@ int GameScript::ReceivedOrder(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::Joins(Scriptable* Sender, Trigger* parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor * actor = ( Actor* ) Sender;
+	//this trigger is sent only to PCs in a party
+	if(!actor->PCStats) {
+		return 0;
+	}
+	if (MatchActor(Sender, actor->PCStats->LastJoined, parameters->objectParameter)) {
+		Sender->AddTrigger(&actor->PCStats->LastJoined);
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::Leaves(Scriptable* Sender, Trigger* parameters)
+{
+	if(Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor * actor = ( Actor* ) Sender;
+	//this trigger is sent only to PCs in a party
+	if(!actor->PCStats) {
+		return 0;
+	}
+	if (MatchActor(Sender, actor->PCStats->LastLeft, parameters->objectParameter)) {
+		Sender->AddTrigger(&actor->PCStats->LastLeft);
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::FallenPaladin(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {

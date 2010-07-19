@@ -52,6 +52,8 @@ PCStatsStruct::PCStatsStruct()
 	memset( PortraitIcons, -1, sizeof(PortraitIcons) );
 	memset( PreviousPortraitIcons, -1, sizeof(PreviousPortraitIcons) );
 	memset( PortraitIconString, 0, sizeof(PortraitIconString) );
+	LastLeft = 0;
+	LastJoined = 0;
 }
 
 void PCStatsStruct::IncrementChapter()

@@ -781,10 +781,12 @@ public: //Script Functions
 	static int IsWeaponRanged(Scriptable* Sender, Trigger* parameters);
 	static int IsWeather(Scriptable* Sender, Trigger* parameters);
 	static int ItemIsIdentified(Scriptable* Sender, Trigger* parameters);
+	static int Joins(Scriptable* Sender, Trigger* parameters);
 	static int Kit(Scriptable* Sender, Trigger* parameters);
 	static int KnowSpell(Scriptable* Sender, Trigger* parameters);
 	static int LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int LastPersonTalkedTo(Scriptable* Sender, Trigger* parameters);
+	static int Leaves(Scriptable* Sender, Trigger* parameters);
 	static int Level(Scriptable* Sender, Trigger* parameters);
 	static int LevelGT(Scriptable* Sender, Trigger* parameters);
 	static int LevelLT(Scriptable* Sender, Trigger* parameters);
