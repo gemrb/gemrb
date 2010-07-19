@@ -3772,7 +3772,7 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 	if (Version>0) {
 		game->version = Version;
 	}
-	return PyInt_FromLong(sgi->CreateSaveGame(save.get(), folder) );
+	return PyInt_FromLong(sgi->CreateSaveGame(save, folder) );
 }
 
 PyDoc_STRVAR( GemRB_GetSaveGames__doc,
