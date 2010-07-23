@@ -4003,9 +4003,16 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 
 	//if actor is supplied, check its usability fields
 	if (actor) {
-		ieStrRef str = actor->Unusable(item);
+		//constant strings
+		int idx = actor->Unusable(item);
+		if (idx) {
+			if (feedback) displaymsg->DisplayConstantString(idx, 0xf0f0f0);
+			return 0;
+		}
+		//custom strings
+		ieStrRef str = actor->Disabled(item->Name, item->ItemType);
 		if (str) {
-			if (feedback) displaymsg->DisplayConstantString(str, 0xf0f0f0);
+			if (feedback) displaymsg->DisplayString(str, 0xf0f0f0, 0);
 			return 0;
 		}
 	}

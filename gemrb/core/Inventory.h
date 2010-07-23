@@ -200,6 +200,7 @@ private:
 	ieWord EquippedHeader;
 	/** this isn't saved */
 	ieDword ItemExcl;
+	ieDword ItemTypes[4]; //256 bits
 public: 
 	Inventory();
 	virtual ~Inventory();
@@ -213,6 +214,8 @@ public:
 	int CountItems(const char *resref, bool charges) const;
 	/** looks for a particular item in a slot */
 	bool HasItemInSlot(const char *resref, unsigned int slot) const;
+	/** returns true if contains one itemtype equipped */
+	bool HasItemType(ieDword type) const;
 	/** Looks for a particular item in the inventory. */
 	/* flags: see ieCREItemFlagBits */
 	bool HasItem(const char *resref, ieDword flags) const;

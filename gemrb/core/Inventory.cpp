@@ -95,6 +95,7 @@ Inventory::Inventory()
 	Equipped = IW_NO_EQUIPPED;
 	EquippedHeader = 0;
 	ItemExcl = 0;
+	memset(ItemTypes, 0, sizeof(ItemTypes));
 }
 
 Inventory::~Inventory()
@@ -201,6 +202,11 @@ void Inventory::AddSlotEffects(ieDword index)
 		return;
 	}
 	ItemExcl|=itm->ItemExcl;
+	ieDword pos = itm->ItemType/32;
+	ieDword bit = itm->ItemType%32;
+	if (pos<4) {
+		ItemTypes[pos]|=1<<bit;
+	}
 
 	ieWord gradient = itm->GetWieldedGradient();
 	if (gradient!=0xffff) {
@@ -263,6 +269,14 @@ bool Inventory::HasItemInSlot(const char *resref, unsigned int slot) const
 		return true;
 	}
 	return false;
+}
+
+bool Inventory::HasItemType(ieDword type) const
+{
+	if (type>255) return false;
+	int idx = type/32;
+	int bit = type%32;
+	return (ItemTypes[idx] & (1<<bit) )!=0;
 }
 
 /** counts the items in the inventory, if stacks == 1 then stacks are
@@ -619,9 +633,6 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 				continue;
 			}
 		}
-		//this is called by AddSlotItem as well
-		//if (WhyCantEquip(i,twohanded))
-		//	continue;
 		int part_res = AddSlotItem (item, i);
 		if (part_res == ASI_SUCCESS) return ASI_SUCCESS;
 		else if (part_res == ASI_PARTIAL) res = ASI_PARTIAL;

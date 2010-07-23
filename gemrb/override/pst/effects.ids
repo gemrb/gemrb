@@ -176,6 +176,15 @@ IDS
 0xae	PlaySound
 0xaf	State:Hold
 0xb0	MovementRateModifier2
+0xb1    ApplyEffect
+0xb2    ToHitVsCreature
+0xb3    DamageVsCreature
+0xb4    CantUseItem
+0xb5    CantUseItemType
+0xb6    ApplyEffectItem
+0xb7    ApplyEffectItemType
+0xb8    DontJumpModifier
+0xb9    State:Hold2
 0xba    SetStatus
 0xbb    PlayBAM1
 0xbc    PlayBAM2

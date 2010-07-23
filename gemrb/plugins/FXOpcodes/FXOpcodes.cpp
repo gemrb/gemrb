@@ -271,10 +271,10 @@ int fx_hold_creature (Scriptable* Owner, Actor* target, Effect* fx);//af
 int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx);//b1
 //b2 //hitbonus against creature (generic_effect)
 //b3 //damagebonus against creature (generic effect)
-//b4 //unknown
-//b5 //unknown
-//b6 //unknown
-//b7 //unknown
+//b4 //restrict item (generic effect)
+//b5 //restrict itemtype (generic effect)
+int fx_apply_effect_item (Scriptable* Owner, Actor* target, Effect* fx);//b6
+int fx_apply_effect_item_type (Scriptable* Owner, Actor* target, Effect* fx);//b7
 int fx_dontjump_modifier (Scriptable* Owner, Actor* target, Effect* fx);//b8
 // this function is exactly the same as 0xaf hold_creature (in bg2 at least) //b9
 int fx_move_to_area (Scriptable* Owner, Actor* target, Effect* fx);//ba
@@ -431,7 +431,8 @@ static EffectRef effectnames[] = {
 	{ "AnimationStateChange", fx_animation_stance, -1 },
 	{ "ApplyEffect", fx_apply_effect, -1 },
 	{ "ApplyEffectCurse", fx_apply_effect_curse, -1 },
-	{ "ApplyEffectItemType", fx_generic_effect, -1 }, //apply effect when itemtype is equipped
+	{ "ApplyEffectItem", fx_apply_effect_item, -1 },
+	{ "ApplyEffectItemType", fx_apply_effect_item_type, -1 },
 	{ "ApplyEffectRepeat", fx_apply_effect_repeat, -1 },
 	{ "CutScene2", fx_cutscene2, -1 },
 	{ "AttackSpeedModifier", fx_attackspeed_modifier, -1 },
@@ -4227,8 +4228,29 @@ int fx_apply_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xb3 damagebonus generic effect DamageVsCreature
 // b4 can't use item (resource) generic effect CantUseItem
 // b5 can't use itemtype (resource) generic effect CantUseItemType
+
 // b6 generic effect ApplyEffectItem
+int fx_apply_effect_item (Scriptable* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf("fx_apply_effect_item (%2d) (%.8s)\n", fx->Opcode, fx->Resource);
+	if (target->inventory.HasItem(fx->Resource, 0) ) {
+		core->ApplySpell(fx->Resource2, target, Owner, fx->Parameter1);
+		return FX_NOT_APPLIED;
+	}
+	return FX_APPLIED;
+}
+
 // b7 generic effect ApplyEffectItemType
+int fx_apply_effect_item_type (Scriptable* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf("fx_apply_effect_item (%2d), Type: %d\n", fx->Opcode, fx->Parameter2);
+	if (target->inventory.HasItemType(fx->Parameter2) ) {
+		core->ApplySpell(fx->Resource, target, Owner, fx->Parameter1);
+		return FX_NOT_APPLIED;
+	}
+	return FX_APPLIED;
+}
+
 // b8 DontJumpModifier
 int fx_dontjump_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {

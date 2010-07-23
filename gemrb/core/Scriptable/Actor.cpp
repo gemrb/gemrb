@@ -5731,6 +5731,26 @@ int Actor::CheckUsability(Item *item) const
 	return 0;
 }
 
+static EffectRef fx_cant_use_item_ref={"CantUseItem",NULL,-1};
+static EffectRef fx_cant_use_item_type_ref={"CantUseItemType",NULL,-1};
+
+//this one is the same, but returns strrefs based on effects
+ieStrRef Actor::Disabled(ieResRef name, ieDword type) const
+{
+	Effect *fx;
+
+	fx = fxqueue.HasEffectWithResource(fx_cant_use_item_ref, name);
+	if (fx) {
+		return fx->Parameter1;
+	}
+
+	fx = fxqueue.HasEffectWithParam(fx_cant_use_item_type_ref, type);
+	if (fx) {
+		return fx->Parameter1;
+	}
+	return 0;
+}
+
 //checks usability only
 int Actor::Unusable(Item *item) const
 {
@@ -5740,7 +5760,6 @@ int Actor::Unusable(Item *item) const
 			return unusable;
 		}
 	}
-
 	// iesdp says this is always checked?
 	if (item->MinLevel>GetXPLevel(true)) {
 		return STR_CANNOT_USE_ITEM;

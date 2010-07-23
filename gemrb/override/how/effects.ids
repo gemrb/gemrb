@@ -181,7 +181,7 @@ IDS
 0xb3	DamageVsCreature
 0xb4	CantUseItem
 0xb5	CantUseItemType
-0xb6	Unknown
+0xb6	ApplyEffectItem
 0xb7	ApplyEffectItemType
 0xb8	DontJumpModifier
 0xb9	State:Hold2

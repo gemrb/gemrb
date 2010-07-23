@@ -590,7 +590,9 @@ public:
 	void SetupFist();
 	/* Returns nonzero if the caster is held */
 	int Immobile() const;
-	/* Returns negative error code if the item is unusable */
+	/* Returns strref if the item is unusable due to name/type restrictions */
+	ieStrRef Disabled(ieResRef name, ieDword type) const;
+	/* Returns constant string if the item is unusable */
 	int Unusable(Item *item) const;
 	/* Sets all clown colour to the given gradient */
 	void SetGradient(ieDword gradient);
