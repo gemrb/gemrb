@@ -395,7 +395,7 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 				snprintf(Sound, _MAX_PATH, "%s/%s",
 					 actor->PCStats->SoundFolder, sb.Sound);
 			} else {
-				memcpy(Sound, sb.Sound, sizeof(ieStrRef) );
+				memcpy(Sound, sb.Sound, sizeof(ieResRef) );
 			}
 		}
 		Strref = tmp;
