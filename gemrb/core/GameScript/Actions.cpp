@@ -4227,6 +4227,34 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 	actor->ReinitQuickSlots();
 }
 
+//GemRB extension: if int1Parameter is nonzero, don't destroy existing items
+void GameScript::FillSlot(Scriptable *Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+
+	CREItem *tmp = NULL;
+	Actor *actor = (Actor *) Sender;
+	int slot = parameters->int0Parameter;
+
+	//free up target slot
+	tmp = actor->inventory.RemoveItem(slot);
+
+	actor->inventory.TryEquipAll(slot);
+
+	if (tmp) {
+		if (actor->inventory.HasItemInSlot("",slot) ) {
+			slot = SLOT_ONLYINVENTORY;
+		}
+
+		//reequip original item
+		if(actor->inventory.AddSlotItem(tmp, slot)!=ASI_SUCCESS) {
+			delete tmp;    
+		}
+	}
+}
+
 //iwd2 also has a flag for unequip (it might collide with original!)
 void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 {

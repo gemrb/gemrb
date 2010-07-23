@@ -566,6 +566,7 @@ static const ActionLink actionnames[] = {
 	{"fadetoblack", GameScript::FadeToColor, AF_BLOCKING}, //probably the same
 	{"fadetocolor", GameScript::FadeToColor, AF_BLOCKING},
 	{"fakeeffectexpirycheck", GameScript::FakeEffectExpiryCheck, 0},
+	{"fillslot", GameScript::FillSlot, 0},
 	{"finalsave", GameScript::SaveGame, 0}, //synonym
 	{"findtraps", GameScript::FindTraps, 0},
 	{"floatmessage", GameScript::DisplayStringHead, 0},

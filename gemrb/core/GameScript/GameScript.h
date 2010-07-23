@@ -1086,6 +1086,7 @@ public:
 	static void FadeToAndFromColor(Scriptable* Sender, Action* parameters);
 	static void FadeToColor(Scriptable* Sender, Action* parameters);
 	static void FakeEffectExpiryCheck(Scriptable* Sender, Action* parameters);
+	static void FillSlot(Scriptable *Sender, Action* parameters);
 	static void FindTraps(Scriptable* Sender, Action* parameters);
 	static void FloatMessageFixed(Scriptable* Sender, Action* parameters);
 	static void FloatMessageFixedRnd(Scriptable* Sender, Action* parameters);

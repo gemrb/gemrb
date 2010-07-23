@@ -471,6 +471,11 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 	}
 	Changed = true;
 	item = Slots[slot];
+
+	if (!item) {
+		return NULL;
+	}
+
 	if (!count || !(item->Flags&IE_INV_ITEM_STACKED) ) {
 		KillSlot(slot);
 		return item;
@@ -623,6 +628,26 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 	}
 
 	return res;
+}
+
+//Used by FillSlot
+void Inventory::TryEquipAll(int slot)
+{
+	for(int i=SLOT_INV;i<=LAST_INV;i++) {
+		CREItem *item = Slots[i];
+		if (!item) {
+			continue;
+		}
+
+		Slots[i]=NULL;
+		if (AddSlotItem(item, slot) == ASI_SUCCESS) {
+			return;
+		}
+		//try to stuff it back, it should work
+		if (AddSlotItem(item, i) != ASI_SUCCESS) {
+			delete item;
+		}
+	}
 }
 
 int Inventory::AddStoreItem(STOItem* item, int action)
@@ -1377,7 +1402,7 @@ void Inventory::EquipBestWeapon(int flags)
 		}
 
 		//ranged melee weapons like throwing daggers (not bows!)
-		for(i=SLOT_MELEE;i<LAST_MELEE;i++) {
+		for(i=SLOT_MELEE;i<=LAST_MELEE;i++) {
 			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
 			//best ranged
@@ -1393,7 +1418,7 @@ void Inventory::EquipBestWeapon(int flags)
 	}
 
 	if (flags&EQUIP_MELEE) {
-		for(i=SLOT_MELEE;i<LAST_MELEE;i++) {
+		for(i=SLOT_MELEE;i<=LAST_MELEE;i++) {
 			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
 			//the Slot flag is enough for this

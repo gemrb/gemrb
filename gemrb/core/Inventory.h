@@ -240,6 +240,8 @@ public:
 	** Returns 2 if completely successful, 1 if partially, 0 else.
 	** slottype is an optional filter for searching eligible slots */
 	int AddSlotItem(CREItem* item, int slot, int slottype=-1);
+	/** tries to equip all inventory items in a given slot */
+	void TryEquipAll(int slot);
 	/** Adds STOItem to the inventory, it is never wielded, action might be STA_STEAL or STA_BUY */
 	/** The amount of items is stored in PurchasedAmount */
 	int AddStoreItem(STOItem* item, int action);
