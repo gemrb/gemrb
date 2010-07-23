@@ -6399,14 +6399,32 @@ void GameScript::ChangeAIType(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::Follow(Scriptable* Sender, Action* parameters)
+//same as MoveToPoint, but not blocking
+void GameScript::Leader(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
 
-	Actor *scr = (Actor *)Sender;
-	scr->FollowOffset = parameters->pointParameter;
+	char Tmp[256];
+
+	snprintf(Tmp, 256, "MoveToPoint([%d.%d])", parameters->pointParameter.x, parameters->pointParameter.y);
+	Action *newact = GenerateAction(Tmp);
+	Sender->AddAction(newact);
+}
+
+//same as MoveToPointNoRecticle, but not blocking
+void GameScript::Follow(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return;
+	}
+
+	char Tmp[256];
+
+	snprintf(Tmp, 256, "MoveToPointNoRecticle([%d.%d])", parameters->pointParameter.x, parameters->pointParameter.y);  	
+	Action *newact = GenerateAction(Tmp);
+	Sender->AddAction(newact);
 }
 
 void GameScript::FollowCreature(Scriptable* Sender, Action* parameters)

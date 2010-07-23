@@ -645,6 +645,7 @@ static const ActionLink actionnames[] = {
 	{"jumptosavedlocation", GameScript::JumpToSavedLocation, 0},
 	{"kill", GameScript::Kill, 0},
 	{"killfloatmessage", GameScript::KillFloatMessage, 0},
+	{"leader", GameScript::Leader, AF_ALIVE},
 	{"leavearea", GameScript::LeaveAreaLUA, 0}, //so far the same
 	{"leavearealua", GameScript::LeaveAreaLUA, 0},
 	{"leavearealuaentry", GameScript::LeaveAreaLUAEntry,AF_BLOCKING},

@@ -1155,6 +1155,7 @@ public:
 	static void JumpToSavedLocation(Scriptable* Sender, Action* parameters);
 	static void Kill(Scriptable* Sender, Action* parameters);
 	static void KillFloatMessage(Scriptable* Sender, Action* parameters);
+	static void Leader(Scriptable* Sender, Action* parameters);
 	static void LeaveArea(Scriptable* Sender, Action* parameters);
 	static void LeaveAreaLUA(Scriptable* Sender, Action* parameters);
 	static void LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters);
