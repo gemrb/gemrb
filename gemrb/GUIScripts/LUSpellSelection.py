@@ -215,7 +215,7 @@ def SpellsDonePress ():
 	If there is not another assignable level, then save all the new spells and
 	close the window."""
 
-	global SpellBook, SpellLevel
+	global SpellBook, SpellLevel, SpellsWindow
 
 	# save all the spells
 	for i in range (len (Spells[SpellLevel])):
@@ -248,10 +248,10 @@ def SpellsDonePress ():
 			DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 			return
 
-	if GUICommon.GameIsBG2():
-		# close our window and update our records
-		if SpellsWindow:
-			SpellsWindow.Unload ()
+	# close our window and update our records
+	if SpellsWindow:
+		SpellsWindow.Unload ()
+		SpellsWindow = None
 
 	# move to the next script if this is chargen
 	if chargen:
