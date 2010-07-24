@@ -36,6 +36,7 @@ ItemInfoWindow = None
 ItemAmountWindow = None
 StackAmount = 0
 ItemIdentifyWindow = None
+ItemAbilitiesWindow = None
 PortraitWindow = None
 OptionsWindow = None
 ErrorWindow = None
@@ -44,7 +45,7 @@ OldOptionsWindow = None
 OverSlot = None
 
 def OpenInventoryWindowClick ():
-	tmp = GemRB.GetVar ("PressedPortrait")+1
+	tmp = GemRB.GetVar ("PressedPortrait")
 	GemRB.GameSelectPC (tmp, True, SELECT_REPLACE)
 	OpenInventoryWindow ()
 	return
@@ -476,7 +477,7 @@ def OnDragItem ():
 	return
 
 def OnDropItemToPC ():
-	pc = GemRB.GetVar ("PressedPortrait") + 1
+	pc = GemRB.GetVar ("PressedPortrait")
 
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
@@ -746,6 +747,63 @@ def IdentifyItemWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
+def DoneAbilitiesItemWindow ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	GemRB.SetupQuickSlot (pc, 0, slot, GemRB.GetVar ("Ability") )
+	CloseAbilitiesItemWindow ()
+	return
+
+def CloseAbilitiesItemWindow ():
+	global ItemAbilitiesWindow
+
+	if ItemAbilitiesWindow:
+		ItemAbilitiesWindow.Unload ()
+		ItemAbilitiesWindow = None
+	return
+
+def AbilitiesItemWindow ():
+	global ItemAbilitiesWindow
+
+	ItemAbilitiesWindow = Window = GemRB.LoadWindow (6)
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	item = GemRB.GetItem (slot_item["ItemResRef"])
+	Tips = item["Tooltips"]
+
+	GemRB.SetVar ("Ability", slot_item["Header"])
+	for i in range(3):
+		Button = Window.GetControl (i+1)
+		Button.SetSprites ("GUIBTBUT",i,0,1,2,0)
+		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		Button.SetVarAssoc ("Ability",i)
+		Text = Window.GetControl (i+0x10000003)
+		if i<len(Tips):
+			Button.SetItemIcon (slot_item['ItemResRef'],i+6)
+			Text.SetText (Tips[i])
+		else:
+			#disable button
+			Button.SetItemIcon ("",3)
+			Text.SetText ("")
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+
+	TextArea = Window.GetControl (8)
+	TextArea.SetText (11322)
+
+	Button = Window.GetControl (7)
+	Button.SetText (11973)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneAbilitiesItemWindow)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+
+	Button = Window.GetControl (10)
+	Button.SetText (13727)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseAbilitiesItemWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
 def CloseItemInfoWindow ():
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
@@ -784,10 +842,14 @@ def DisplayItem (itemresref, type):
 
 	#left button
 	Button = Window.GetControl (8)
+	select = (type&1) and (item["Function"]&8)
 
 	if type&2:
 		Button.SetText (14133)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyItemWindow)
+	elif select:
+		Button.SetText (11960)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesItemWindow)
 	else:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
