@@ -429,8 +429,13 @@ def DCOpenProfsWindow ():
 	# load up our window and set some basic variables
 	DCProfsWindow = GemRB.LoadWindow (15)
 	NewClassId = CommonTables.Classes.GetValue (ClassName, "ID", 1)
-	LUProfsSelection.SetupProfsWindow (pc, \
-		LUProfsSelection.LUPROFS_TYPE_DUALCLASS, DCProfsWindow, DCProfsRedraw, classid=NewClassId)
+	if GUICommon.GameIsBG2():
+		LUProfsSelection.SetupProfsWindow (pc, \
+			LUProfsSelection.LUPROFS_TYPE_DUALCLASS, DCProfsWindow, DCProfsRedraw, classid=NewClassId)
+	else:
+		LUProfsSelection.SetupProfsWindow (pc, \
+			LUProfsSelection.LUPROFS_TYPE_DUALCLASS, DCProfsWindow, \
+			DCProfsRedraw, [0,0,0], [1,1,1], NewClassId, False, 0)
 
 	# setup the done and cancel
 	DCProfsDoneButton = DCProfsWindow.GetControl (76)
@@ -528,8 +533,13 @@ def OpenSkillsWindow ():
 	global DCSkillsWindow, DCSkillsDoneButton
 
 	DCSkillsWindow = GemRB.LoadWindow (7)
-	LUSkillsSelection.SetupSkillsWindow (pc, \
-		LUSkillsSelection.LUSKILLS_TYPE_DUALCLASS, DCSkillsWindow, DCSkillsRedraw, classid=NewClassId)
+	if GUICommon.GameIsBG2():
+		LUSkillsSelection.SetupSkillsWindow (pc, \
+			LUSkillsSelection.LUSKILLS_TYPE_DUALCLASS, DCSkillsWindow, DCSkillsRedraw, classid=NewClassId)
+	else:
+		LUSkillsSelection.SetupSkillsWindow (pc, \
+			LUSkillsSelection.LUSKILLS_TYPE_DUALCLASS, DCSkillsWindow, \
+			DCSkillsRedraw, [0,0,0], [1,1,1], NewClassId, False)
 
 	#just go back if we can't assign skills
 	if GemRB.GetVar ("SkillPointsLeft") <= 0:
