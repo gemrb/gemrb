@@ -159,6 +159,17 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 			ProfsScrollBar = ProfsWindow.GetControl (None)
 		OddIDs = 1
 		ClassWeaponsTable = GemRB.LoadTable ("clasweap")
+	elif type == LUPROFS_TYPE_DUALCLASS and GUICommon.GameIsBG1(): #dualclass
+		ProfsOffsetSum = 40
+		ProfsOffsetButton1 = 50
+		ProfsOffsetStar = 0
+		ProfsOffsetLabel = 41
+		ProfsOffsetPress = -1 #FIXME
+		ProfsNumButtons = 8
+		ProfsTextArea = ProfsWindow.GetControl (74)
+		ProfsTextArea.SetText (9588)
+		if (scroll):
+			ProfsScrollBar = ProfsWindow.GetControl (None)
 	elif type == LUPROFS_TYPE_DUALCLASS: #dualclass
 		ProfsOffsetSum = 40
 		ProfsOffsetButton1 = 50
