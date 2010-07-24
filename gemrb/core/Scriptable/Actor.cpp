@@ -1761,6 +1761,8 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 {
 	int i;
 
+	printf("Damage animation type: %d\n", type);
+
 	switch(type) {
 		case 0: case 1: case 2: case 3: //blood
 			i = (int) GetStat(IE_ANIMATION_ID)>>16;
@@ -2478,19 +2480,12 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	LastDamage=damage;
 	InternalFlags|=IF_ACTIVE;
 	int chp = (signed) BaseStats[IE_HITPOINTS];
-	int damagelevel = 3;
-	if (damage<5) {
+	int damagelevel = 0;
+	if (damage<10) {
 		damagelevel = 1;
-	} else if (damage<10) {
-		damagelevel = 2;
 	} else {
 		NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
-		if (chp<-10) {
-			damagelevel = 0; //chunky death
-		}
-		else {
-			damagelevel = 3;
-		}
+		damagelevel = 2;
 	}
 
 	if (damagetype & (DAMAGE_FIRE|DAMAGE_MAGICFIRE) ) {
@@ -2504,7 +2499,11 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	} else if (damagetype & (DAMAGE_MAGIC) ) {
 		PlayDamageAnimation(DL_DISINTEGRATE+damagelevel);
 	} else {
-		PlayDamageAnimation(damagelevel);
+		if (chp<-10) {
+			PlayDamageAnimation(DL_CRITICAL);
+		} else {
+			PlayDamageAnimation(DL_BLOOD+damagelevel);
+		}
 	}
 
 	if (InParty) {

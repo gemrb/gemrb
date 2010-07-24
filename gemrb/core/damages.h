@@ -42,8 +42,8 @@
 
 #define DAMAGE_CHUNKING 0x8000
 //damage levels
-#define DL_BLOOD  0
-#define DL_CRITICAL 3
+#define DL_CRITICAL 0
+#define DL_BLOOD  1
 #define DL_FIRE   4
 #define DL_ELECTRICITY  7
 #define DL_COLD   11
