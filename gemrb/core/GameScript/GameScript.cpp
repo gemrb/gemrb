@@ -1255,13 +1255,16 @@ static void CleanupIEScript()
 	ObjectIDSTableNames = NULL;
 }
 
-void printFunction(const char *str)
+void printFunction(Holder<SymbolMgr> table, int index)
 {
+	const char *str = table->GetStringIndex(index);
+	int value = table->GetValueIndex(index);
+
 	int len = strchr(str,'(')-str;
 	if (len<0) {
-		printf("%s\n", str);
+		printf("%d %s\n", value, str);
 	} else {
-		printf("%.*s\n", len, str);
+		printf("%d %.*s\n", value, len, str);
 	}
 }
 
@@ -1352,11 +1355,13 @@ void InitializeIEScript()
 			if (poi && triggers[i]!=poi->Function) {
 				printMessage("GameScript"," ", YELLOW);
 				printf("%s is in collision with ", triggersTable->GetStringIndex( j ) );
-				printFunction(triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ));
+				printFunction(triggersTable,triggersTable->FindValue(triggersTable->GetValueIndex( j )));
+				//printFunction(triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ));
 			} else {
 				printMessage("GameScript"," ", WHITE);
 				printf("%s is a synonym of ", triggersTable->GetStringIndex( j ) );
-				printFunction(triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j ) ) ) );
+				printFunction(triggersTable,triggersTable->FindValue(triggersTable->GetValueIndex( j )));
+				//printFunction(triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j ) ) ) );
 			}
 			continue; //we already found an alternative
 		}
@@ -1390,7 +1395,8 @@ void InitializeIEScript()
 			continue;
 		}
 		printMessage("GameScript","Couldn't assign function to trigger: ", YELLOW);
-		printFunction(triggersTable->GetStringIndex(j) );
+		printFunction(triggersTable,j);
+//->GetStringIndex(j) );
 	}
 
 	j = actionsTable->GetSize();
@@ -1406,11 +1412,13 @@ void InitializeIEScript()
 			if (poi && actions[i]!=poi->Function) {
 				printMessage("GameScript"," ", YELLOW);
 				printf("%s is in collision with ", actionsTable->GetStringIndex( j ) );
-				printFunction(actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
+				printFunction(actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
+//->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
 			} else {
 				printMessage("GameScript"," ", WHITE);
 				printf("%s is a synonym of ", actionsTable->GetStringIndex( j ) );
-				printFunction(actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
+				printFunction(actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex( j )));
+//actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
 			}
 			continue; //we already found an alternative
 		}
@@ -1444,7 +1452,8 @@ void InitializeIEScript()
 			if (actions[i]) {
 				printMessage("GameScript"," ", WHITE);
 				printf("%s overrides existing action ", overrideActionsTable->GetStringIndex( j ) );
-				printFunction( actionsTable->GetStringIndex(actionsTable->FindValue(overrideActionsTable->GetValueIndex( j )) ) );
+				printFunction( actionsTable, actionsTable->FindValue(overrideActionsTable->GetValueIndex( j )));
+				//printFunction( actionsTable->GetStringIndex(actionsTable->FindValue(overrideActionsTable->GetValueIndex( j )) ) );
 			}
 			actions[i] = poi->Function;
 			actionflags[i] = poi->Flags;
@@ -1471,7 +1480,8 @@ void InitializeIEScript()
 			continue;
 		}
 		printMessage("GameScript","Couldn't assign function to action: ", YELLOW);
-		printFunction(actionsTable->GetStringIndex(j) );
+		printFunction(actionsTable,j);
+		//printFunction(actionsTable->GetStringIndex(j) );
 	}
 
 	j = objectsTable->GetSize();
@@ -1487,11 +1497,13 @@ void InitializeIEScript()
 			if (poi && objects[i]!=poi->Function) {
 				printMessage("GameScript"," ", YELLOW);
 				printf("%s is in collision with ", objectsTable->GetStringIndex( j ) );
-				printFunction(objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
+				printFunction(objectsTable,objectsTable->FindValue(objectsTable->GetValueIndex( j )));
+				//printFunction(objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
 			} else {
 				printMessage("GameScript"," ", WHITE);
 				printf("%s is a synonym of ", objectsTable->GetStringIndex( j ) );
-				printFunction(objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
+				printFunction(objectsTable, objectsTable->FindValue(objectsTable->GetValueIndex( j )));
+				//printFunction(objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
 			}
 			continue;
 		}
@@ -1523,7 +1535,8 @@ void InitializeIEScript()
 			continue;
 		}
 		printMessage("GameScript","Couldn't assign function to object: ", YELLOW);
-		printFunction(objectsTable->GetStringIndex(j) );
+		printFunction(objectsTable,j);
+		//printFunction(objectsTable->GetStringIndex(j) );
 	}
 
 }
