@@ -831,7 +831,7 @@ void Projectile::LineTarget()
 						RGB >> 8, RGB >> 16, RGB >> 24);
 				}
 
-				effects->AddAllEffects(target, target->Pos);
+				eff->AddAllEffects(target, target->Pos);
 			}
 		}
 		iter = iter->Next;
