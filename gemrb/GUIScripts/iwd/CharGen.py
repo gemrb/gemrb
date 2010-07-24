@@ -397,6 +397,7 @@ def AcceptPress():
 	#GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability6"))
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
+	GemRB.SetToken ("CHARNAME","")
 	GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (Class, 3) )
 
 	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
