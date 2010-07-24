@@ -30,7 +30,7 @@ import LUCommon
 import LevelUp
 import GUIWORLD
 import GUICG19
-
+import DualClass
 ###################################################
 RecordsWindow = None
 InformationWindow = None
@@ -90,7 +90,7 @@ def OpenRecordsWindow ():
 	# dual class
 	Button = Window.GetControl (0)
 	Button.SetText (7174)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: DualClassWindow
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DualClass.DualClassWindow)
 
 	# levelup
 	Button = Window.GetControl (37)
