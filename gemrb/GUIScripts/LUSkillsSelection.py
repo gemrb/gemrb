@@ -107,8 +107,9 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillsNumButtons = 4
 		SkillsTextArea = SkillsWindow.GetControl (22)
 		SkillsTextArea.SetText(17248)
-		ScrollBar = SkillsWindow.GetControl (26)
-		ScrollBar.SetDefaultScrollBar ()
+		if (scroll):
+			ScrollBar = SkillsWindow.GetControl (26)
+			ScrollBar.SetDefaultScrollBar ()
 	elif type == LUSKILLS_TYPE_CHARGEN:
 		SkillsOffsetPress = 21
 		SkillsOffsetButton1 = 11

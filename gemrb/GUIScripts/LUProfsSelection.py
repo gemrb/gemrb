@@ -41,6 +41,7 @@ ProfsOffsetStar = 0
 ProfsOffsetPress = 0
 Profs2ndOffsetButton1 = Profs2ndOffsetStar = Profs2ndOffsetLabel = -1
 ClassNameSave = 0
+OddIDs = 0
 
 #internal variables
 ProfsPointsLeft = 0
@@ -69,7 +70,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	callback specifies the function to call on changes.
 	classid is sent only during dualclassing to specify the new class."""
 
-	global ProfsOffsetSum, ProfsOffsetButton1, ProfsOffsetLabel, ProfsOffsetStar
+	global ProfsOffsetSum, ProfsOffsetButton1, ProfsOffsetLabel, ProfsOffsetStar, OddIDs
 	global ProfsOffsetPress, ProfsPointsLeft, ProfsNumButtons, ProfsTopIndex
 	global ProfsScrollBar, ProfsTableOffset, ProfsType
 	global ProfsWindow, ProfsCallback, ProfsTextArea, ProfsColumn, ProfsTable, ProfCount
@@ -140,6 +141,23 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsTextArea = ProfsWindow.GetControl (42)
 		if (scroll):
 			ProfsScrollBar = ProfsWindow.GetControl (108)
+		OddIDs = 0
+		ClassWeaponsTable = GemRB.LoadTable ("clasweap")
+	elif type == LUPROFS_TYPE_DUALCLASS and GUICommon.GameIsIWD1(): #dualclass
+		ProfsOffsetSum = 40
+		ProfsOffsetButton1 = 50
+		ProfsOffsetStar = 0
+		ProfsOffsetLabel = 41
+		ProfsOffsetPress = -1 #66
+		ProfsNumButtons = 15
+		Profs2ndOffsetButton1 = 78
+		Profs2ndOffsetStar = 92
+		Profs2ndOffsetLabel = 126
+		ProfsTextArea = ProfsWindow.GetControl (74)
+		ProfsTextArea.SetText (9588)
+		if (scroll):
+			ProfsScrollBar = ProfsWindow.GetControl (None)
+		OddIDs = 1
 		ClassWeaponsTable = GemRB.LoadTable ("clasweap")
 	elif type == LUPROFS_TYPE_DUALCLASS: #dualclass
 		ProfsOffsetSum = 40
@@ -150,7 +168,8 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 		ProfsNumButtons = 8
 		ProfsTextArea = ProfsWindow.GetControl (74)
 		ProfsTextArea.SetText (9588)
-		ProfsScrollBar = ProfsWindow.GetControl (78)
+		if (scroll):
+			ProfsScrollBar = ProfsWindow.GetControl (78)
 	else: #unknown
 		return
 
@@ -318,7 +337,10 @@ def ProfsRedraw (first=0):
 
 		cid = 0x10000000 + ProfsOffsetLabel + i
 		if Profs2ndOffsetLabel != -1 and i > 7:
-			cid = 0x10000000 + Profs2ndOffsetLabel + i - 8
+			if OddIDs:
+				cid = 0x10000000 + Profs2ndOffsetLabel + 2*(i - 8)
+			else:
+				cid = 0x10000000 + Profs2ndOffsetLabel + i - 8
 
 		Label=ProfsWindow.GetControl (cid)
 		Label.SetText(ProfName)
