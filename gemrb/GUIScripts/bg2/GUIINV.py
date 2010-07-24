@@ -806,7 +806,7 @@ def IdentifyItemWindow ():
 def DoneAbilitiesItemWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
-	GemRB.SetupQuickSlot (pc, -1, slot, GemRB.GetVar ("Ability") )
+	GemRB.SetupQuickSlot (pc, 0, slot, GemRB.GetVar ("Ability") )
 	CloseAbilitiesItemWindow ()
 	return
 
@@ -829,7 +829,7 @@ def AbilitiesItemWindow ():
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 	Tips = item["Tooltips"]
 
-	GemRB.SetVar ("Ability", 0)
+	GemRB.SetVar ("Ability", slot_item["Header"])
 	for i in range(3):
 		Button = Window.GetControl (i+1)
 		Button.SetSprites ("GUIBTBUT",i,0,1,2,0)

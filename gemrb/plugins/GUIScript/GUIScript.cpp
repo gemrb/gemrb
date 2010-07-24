@@ -7756,6 +7756,11 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict
 	PyObject *Event = PyString_FromFormat("Action%sPressed", GUIEvent[Index]);
 	PyObject *func = PyDict_GetItem(dict, Event);
 	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, new PythonCallback(func) );
+
+	PyObject *Event2 = PyString_FromFormat("Action%sRightPressed", GUIEvent[Index]);
+	PyObject *func2 = PyDict_GetItem(dict, Event2);
+	btn->SetEvent( IE_GUI_BUTTON_ON_RIGHT_PRESS, new PythonCallback(func2) );
+
 	//cannot make this const, because it will be freed
 	char *txt = core->GetString( GUITooltip[Index] );
 	//will free txt
@@ -8367,6 +8372,8 @@ static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
+
+	slot = core->QuerySlot(slot);
 	actor->SetupQuickSlot(which, slot, headerindex);
 	Py_INCREF( Py_None );
 	return Py_None;

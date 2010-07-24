@@ -246,6 +246,36 @@ def OpenActionsWindowControls (Window):
 	UpdateActionsWindow ()
 	return
 
+def SelectItemAbility():
+	pc = GemRB.GameGetFirstSelectedPC ()
+	slot = GemRB.GetVar ("Slot")
+	ability = GemRB.GetVar ("Ability")
+	GemRB.SetupQuickSlot (pc, 0, slot, ability)
+	GemRB.SetVar ("ActionLevel", 0)
+	return
+
+def SetupItemAbilities(pc, slot):
+	Window = ActionsWindow
+
+	slot_item = GemRB.GetSlotItem(pc, slot)
+	item = GemRB.GetItem (slot_item["ItemResRef"])
+	Tips = item["Tooltips"]
+
+	for i in range (12):
+		Button = Window.GetControl (i)
+		Button.SetPicture ("")
+		if i<len(Tips):
+			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
+			Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
+			Button.SetItemIcon (slot_item['ItemResRef'], i+6)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItemAbility)
+			Button.SetVarAssoc ("Ability", i)
+	
+			Button.SetTooltip ("F%d - %s"%(i+1,GemRB.GetString(Tips[i])) )
+		else:
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	return
+
 def UpdateActionsWindow ():
 	"""Redraws the actions section of the window."""
 
@@ -288,13 +318,13 @@ def UpdateActionsWindow ():
 		if GemRB.GameIsPCSelected (i+1):
 			pc = i+1
 			break
-		
+
 	if pc == 0:
 		#summoned/charmed creature.
 		#TODO: some creatures have real actions window!!
 		GroupControls()
 		return
-		
+
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == 0:
@@ -307,6 +337,8 @@ def UpdateActionsWindow ():
 	elif level == 3: #innates
 		GemRB.SetVar ("Type", 4)
 		ActionsWindow.SetupSpellIcons(globals(), pc, 4, TopIndex)
+	elif level == 4: #quick weapon/item ability selection
+		SetupItemAbilities(pc, GemRB.GetVar("Slot") )
 	return
 
 def ActionQWeaponPressed (which):
@@ -445,6 +477,41 @@ def ActionQItem4Pressed ():
 def ActionQItem5Pressed ():
 	ActionQItemPressed (ACT_QSLOT5)
 	return
+
+def ActionQItemRightPressed (action):
+	"""Selects the used ability of the quick item."""
+	pc = GemRB.GameGetFirstSelectedPC ()
+	GemRB.SetVar ("Slot", action)
+	GemRB.SetVar ("ActionLevel", 4)
+	UpdateActionsWindow ()
+	return
+
+def ActionQItem1RightPressed ():
+	ActionQItemRightPressed (19)
+
+def ActionQItem2RightPressed ():
+	ActionQItemRightPressed (20)
+
+def ActionQItem3RightPressed ():
+	ActionQItemRightPressed (21)
+
+def ActionQItem4RightPressed ():
+	ActionQItemRightPressed (22)
+
+def ActionQItem5RightPressed ():
+	ActionQItemRightPressed (23)
+
+def ActionQWeapon1RightPressed ():
+	ActionQItemRightPressed (10)
+
+def ActionQWeapon2RightPressed ():
+	ActionQItemRightPressed (11)
+
+def ActionQWeapon3RightPressed ():
+	ActionQItemRightPressed (12)
+
+def ActionQWeapon4RightPressed ():
+	ActionQItemRightPressed (13)
 
 def ActionInnatePressed ():
 	"""Opens the innate spell scrollbar."""
