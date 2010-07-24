@@ -657,18 +657,24 @@ def ReactivateBaseClass ():
 
 	# reactivate all our proficiencies
 	TmpTable = GemRB.LoadTable ("weapprof")
-	ProfCount = TmpTable.GetRowCount ()
+	ProfsTableOffset = 0
 	if GUICommon.GameIsBG2 ():
-		ProfCount -= 8 # skip bg1 weapprof.2da proficiencies
+		ProfsTableOffset = 8 # skip bg1 weapprof.2da proficiencies
+	ProfCount = TmpTable.GetRowCount () - ProfsTableOffset
 	for i in range(ProfCount):
-		StatID = TmpTable.GetValue (i+8, 0)
-		Value = GemRB.GetPlayerStat (pc, StatID)
+		ProfID = TmpTable.GetValue (i+ProfsTableOffset, 0)
+		if GUICommon.GameIsBG1():
+			ProfID = ProfID + IE_PROFICIENCYBASTARDSWORD
+		Value = GemRB.GetPlayerStat (pc, ProfID)
 		OldProf = (Value & 0x38) >> 3
 		NewProf = Value & 0x07
 		if OldProf > NewProf:
 			Value = (OldProf << 3) | OldProf
 			print "Value:",Value
-			GemRB.ApplyEffect (pc, "Proficiency", Value, StatID )
+			if GUICommon.GameIsBG2():
+				GemRB.ApplyEffect (pc, "Proficiency", Value, ProfID )
+			else:
+				GemRB.SetPlayerStat (pc, ProfID, Value)
 
 	# see if this thac0 is lower than our current thac0
 	ThacoTable = GemRB.LoadTable ("THAC0")
