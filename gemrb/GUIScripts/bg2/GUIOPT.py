@@ -161,6 +161,7 @@ def OpenVideoOptionsWindow ():
 	OptRadio ('BPP', Window, 5, 37, 'BitsPerPixel', 16)
 	OptRadio ('BPP', Window, 6, 37, 'BitsPerPixel', 24)
 	OptRadio ('BPP', Window, 7, 37, 'BitsPerPixel', 32)
+
 	OptCheckbox ('FullScreen', Window, 9, 38, 'Full Screen', 1)
 
 	OptCheckbox ('TransShadow', Window, 51, 50, 'Translucent Shadows', 1)

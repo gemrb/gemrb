@@ -212,6 +212,7 @@ public:
 
 	void SetMouseEnabled(int enabled);
 	void SetMouseGrayed(bool grayed);
+	bool GetFullscreenMode() const;
 
 	/** Scales down a sprite by a ratio */
 	Sprite2D* SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio );
@@ -220,7 +221,7 @@ public:
 	Sprite2D* CreateLight(int radius, int intensity);
 
 	Color SpriteGetPixelSum (const Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
-	Region GetViewport(void);
+	Region GetViewport(void) const;
 	void SetViewport(int x, int y, unsigned int w, unsigned int h);
 	void MoveViewportTo(int x, int y);
 protected:

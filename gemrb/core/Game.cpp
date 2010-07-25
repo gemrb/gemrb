@@ -579,7 +579,7 @@ Map *Game::GetMap(const char *areaname, bool change)
 			area->SetupAmbients();
 			//change the tileset if needed
 			area->ChangeMap(IsDay());
-			ChangeSong();
+			ChangeSong(false, true);
 			return area;
 		}
 		return GetMap(index);
@@ -1228,6 +1228,10 @@ void Game::UpdateScripts()
 			if (actor) {
 				//each attacker handles their own round initiation
 				//FIXME: individual combat counter
+				//Also: combatcounter in the original game is always
+				//set to 150 when a PC gets attacked (battlemusic started)
+				//then ticks down to 0
+				//when it reaches 0, the battlemusic stops
 				CombatCounter++;
 				actor->InitRound(GameTime, !(CombatCounter&1) );
 			}
@@ -1252,7 +1256,7 @@ void Game::UpdateScripts()
 	// (we should probably find a less silly way to handle this,
 	// because nothing can ever stop area music now..)
 	if (!core->GetMusicMgr()->IsPlaying()) {
-		 ChangeSong(false);
+		 ChangeSong(false,false);
 	}
 
 	//this is used only for the death delay so far
@@ -1515,7 +1519,7 @@ void Game::InAttack(ieDword globalID)
 	Attackers.push_back(globalID);
 	if (!CombatCounter) {
 		CombatCounter++;
-		ChangeSong();
+		ChangeSong(true, true);
 	}
 }
 
@@ -1528,14 +1532,14 @@ void Game::OutAttack(ieDword globalID)
 			Attackers.erase(idx);
 			if (!Attackers.size()) {
 				CombatCounter = 0;
-				ChangeSong();
+				ChangeSong(false, false);
 			}
 			break;
 		}
 	}
 }
 
-void Game::ChangeSong(bool force)
+void Game::ChangeSong(bool always, bool force)
 {
 	int Song;
 
@@ -1547,7 +1551,10 @@ void Game::ChangeSong(bool force)
 		Song = (GameTime/AI_UPDATE_TIME)%7200/3600;
 	}
 	//area may override the song played (stick in battlemusic)
-	area->PlayAreaSong( Song, force );
+	//always transition gracefully with ChangeSong
+	//force just means, we schedule the song for later, if currently
+	//is playing
+	area->PlayAreaSong( Song, always, force );
 }
 
 int Game::AttackersOf(ieDword globalID, Map *area) const

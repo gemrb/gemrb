@@ -36,6 +36,7 @@ MUSImporter::MUSImporter()
 	str = new FileStream();
 	PLpos = 0;
 	PLName[0] = '\0';
+	PLNameNew[0] = '\0';
 	lastSound = 0xffffffff;
 	char path[_MAX_PATH];
 	PathJoin(path, core->GamePath, musicsubfolder, NULL);
@@ -224,9 +225,9 @@ void MUSImporter::HardEnd()
 /** Switches the current PlayList while playing the current one, return nonzero on error */
 int MUSImporter::SwitchPlayList(const char* name, bool Hard)
 {
-	//don't do anything if the requested song is already playing
-	//this fixed PST's infinite song start
 	if (Playing) {
+		//don't do anything if the requested song is already playing
+		//this fixed PST's infinite song start
 		int len = ( int ) strlen( PLName );
 		if (strnicmp( name, PLName, len ) == 0)
 			return 0;
@@ -235,11 +236,20 @@ int MUSImporter::SwitchPlayList(const char* name, bool Hard)
 		} else {
 			End();
 		}
+		//if still playing, then don't insist on trying to open it now
+		//either HardEnd stopped it for us, or End marked it for early ending
+		if (Playing) {
+			strncpy(PLNameNew, name, sizeof(PLNameNew) );
+			return 0;
+		}
 	}
+
+
 	if (OpenPlaylist( name )) {
 		Start();
 		return 0;
 	}
+
 	return -1;
 }
 /** Plays the Next Entry */
@@ -270,6 +280,11 @@ void MUSImporter::PlayNext()
 	} else {
 		Playing = false;
 		core->GetAudioDrv()->Stop();
+		//start new music after the old faded out
+		if (PLNameNew[0]) {
+			OpenPlaylist(PLNameNew);
+			PLNameNew[0]='\0';			
+		}
 	}
 }
 

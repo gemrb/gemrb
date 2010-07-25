@@ -1574,15 +1574,17 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 	return count;
 }
 
-void Map::PlayAreaSong(int SongType, bool restart)
+void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 {
 	//Ok, we use a non constant pointer here, so it is easy to disable
 	//a faulty music list on the fly. I don't want to add a method just for that
 	//crap when we already have that pointer at hand!
 	char* poi = core->GetMusicPlaylist( SongHeader.SongList[SongType] );
 	if (!poi) return;
+
+	//check if restart needed (either forced or the current song is different)
 	if (!restart && core->GetMusicMgr()->CurrentPlayList(poi)) return;
-	int ret = core->GetMusicMgr()->SwitchPlayList( poi, true );
+	int ret = core->GetMusicMgr()->SwitchPlayList( poi, hard );
 	//Here we disable the faulty musiclist entry
 	if (ret) {
 		//Apparently, the playlist manager prefers a *

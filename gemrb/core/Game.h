@@ -394,7 +394,7 @@ public:
 	/** draw weather */
 	void DrawWeather(const Region &screen, bool update);
 	/** updates current area music */
-	void ChangeSong(bool force = true);
+	void ChangeSong(bool always = true, bool force = true);
 	/** sets expansion mode */
 	void SetExpansion(int exp);
 	/** Dumps information about the object */

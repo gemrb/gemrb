@@ -701,7 +701,7 @@ public:
 	int Width, Height, Bpp, ForceStereo;
 	unsigned int TooltipDelay;
 	unsigned int FogOfWar;
-	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
+	bool CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
 	bool GUIEnhancements;
 	bool KeepCache;
 	Variables *plugin_flags;

@@ -1369,6 +1369,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 	if (actor->InParty) {
 		GameControl *gc=core->GetGameControl();
 		gc->SetScreenFlags(SF_CENTERONACTOR,BM_OR);
+		game->ChangeSong(false, true);
 	}
 }
 

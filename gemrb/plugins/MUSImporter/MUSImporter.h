@@ -45,6 +45,7 @@ private:
 	bool Initialized;
 	bool Playing;
 	char PLName[32];
+	char PLNameNew[32];
 	int PLpos, PLnext;
 	FileStream* str;
 	std::vector< PLString> playlist;

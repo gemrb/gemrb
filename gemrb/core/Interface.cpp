@@ -959,11 +959,14 @@ static const Region bg( 0, 0, 100, 30 );
 /** this is the main loop */
 void Interface::Main()
 {
-	video->CreateDisplay( Width, Height, Bpp, FullScreen );
-	video->SetDisplayTitle( GameName, GameType );
+	ieDword FullScreen = 0;
 	ieDword brightness = 10;
 	ieDword contrast = 5;
 	ieDword speed = 10;
+
+	vars->Lookup("FullScreen", FullScreen);
+	video->CreateDisplay( Width, Height, Bpp, FullScreen);
+	video->SetDisplayTitle( GameName, GameType );
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
 	vars->Lookup("Mouse Scroll Speed", speed);
@@ -2061,7 +2064,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
 		CONFIG_INT("EndianSwitch", DataStream::SetEndianSwitch);
 		CONFIG_INT("FogOfWar", FogOfWar = );
-		CONFIG_INT("FullScreen", FullScreen = );
+		//CONFIG_INT("FullScreen", FullScreen = );
 		CONFIG_INT("GUIEnhancements", GUIEnhancements = );
 		CONFIG_INT("GameOnCD", GameOnCD = );
 		CONFIG_INT("Height", Height = );

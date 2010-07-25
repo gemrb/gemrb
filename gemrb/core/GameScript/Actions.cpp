@@ -1723,24 +1723,59 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 {
 	const char* string = core->GetMusicPlaylist( parameters->int0Parameter );
 	if (!string || string[0] == '*') {
-		core->GetMusicMgr()->HardEnd();
-	} else {
-		core->GetMusicMgr()->SwitchPlayList( string, true );
+		//if parameter is 'play' and there is nothing to play
+		//don't stop the music
+		if (parameters->int1Parameter!=2) {
+			core->GetMusicMgr()->HardEnd();
+		}
+		return;
 	}
+
+	bool force;
+
+	//if parameter is force, force the music, otherwise just schedule it for next
+	if (parameters->int1Parameter==1) {
+		force = true;
+	} else {
+		force = false;
+	}
+	core->GetMusicMgr()->SwitchPlayList( string, force );
 }
 
+//starts the current area music (songtype is in int0Parameter)
+//actually, PlayAreaSong should set the CombatCounter to 150
+//when it is battlemusic (and it ticks back to 0)
 void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 {
+	//don't break on bad values
+	if (parameters->int0Parameter>10) return;
 	Map *map = Sender->GetCurrentArea();
-	map->PlayAreaSong(parameters->int0Parameter);
+	if (!map) return;
+	bool force, restart;
+
+	switch (parameters->int1Parameter) {
+	case 1: //force switch
+		force = true;
+		restart = true;
+		break;
+	case 3: //force switch, but wait for previous music to end gracefully
+		force = false;
+		restart = true;
+	default:
+		force = false;
+		restart = false;
+		break;
+	}
+	map->PlayAreaSong(parameters->int0Parameter, restart, force);
 }
 
 /*iwd2 can set an areasong slot*/
 void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 {
-	//iwd2 seems to have 10 slots, dunno if it is important
-	if (parameters->int0Parameter>4) return;
+	//iwd2 allows setting all 10 slots, though, there is no evidence they are used
+	if (parameters->int0Parameter>10) return;
 	Map *map = Sender->GetCurrentArea();
+	if (!map) return;
 	map->SongHeader.SongList[parameters->int0Parameter]=parameters->int1Parameter;
 }
 

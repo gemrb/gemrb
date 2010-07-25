@@ -68,6 +68,12 @@ void Video::SetMouseGrayed(bool grayed)
 	}
 }
 
+/** Get the fullscreen mode */
+bool Video::GetFullscreenMode() const
+{
+	return fullscreen;
+}
+
 void Video::BlitTiled(Region rgn, const Sprite2D* img, bool anchor)
 {
 	int xrep = ( rgn.w + img->Width - 1 ) / img->Width;
@@ -189,7 +195,7 @@ Color Video::SpriteGetPixelSum(const Sprite2D* sprite, unsigned short xbase, uns
 }
 
 //Viewport specific
-Region Video::GetViewport()
+Region Video::GetViewport() const
 {
 	return Viewport;
 }

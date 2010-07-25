@@ -141,11 +141,11 @@ void SDLVideoDriver::SetDisplayTitle(char* title, char* icon)
 	SDL_WM_SetCaption( title, icon );
 }
 
-VideoModes SDLVideoDriver::GetVideoModes(bool fullscreen)
+VideoModes SDLVideoDriver::GetVideoModes(bool fs)
 {
 	SDL_Rect** modes;
 	ieDword flags = SDL_SWSURFACE;
-	if (fullscreen) {
+	if (fs) {
 		flags |= SDL_FULLSCREEN;
 	}
 	VideoModes vm;
@@ -162,19 +162,19 @@ VideoModes SDLVideoDriver::GetVideoModes(bool fullscreen)
 	pf.Gshift = 16;
 	pf.Bshift = 8;
 	pf.Ashift = 0;
-	modes = SDL_ListModes( &pf, fullscreen );
+	modes = SDL_ListModes( &pf, fs );
 	if (modes == ( SDL_Rect * * ) 0) {
 		return vm;
 	}
 	if (modes == ( SDL_Rect * * ) - 1) {
-		vm.AddVideoMode( 640, 480, 32, fullscreen );
-		vm.AddVideoMode( 800, 600, 32, fullscreen );
-		vm.AddVideoMode( 1024, 786, 32, fullscreen );
-		vm.AddVideoMode( 1280, 1024, 32, fullscreen );
-		vm.AddVideoMode( 1600, 1200, 32, fullscreen );
+		vm.AddVideoMode( 640, 480, 32, fs );
+		vm.AddVideoMode( 800, 600, 32, fs );
+		vm.AddVideoMode( 1024, 786, 32, fs );
+		vm.AddVideoMode( 1280, 1024, 32, fs );
+		vm.AddVideoMode( 1600, 1200, 32, fs );
 	} else {
 		for (int i = 0; modes[i]; i++) {
-			vm.AddVideoMode( modes[i]->w, modes[i]->h, 32, fullscreen );
+			vm.AddVideoMode( modes[i]->w, modes[i]->h, 32, fs );
 		}
 	}
 	return vm;
@@ -195,20 +195,16 @@ bool SDLVideoDriver::TestVideoMode(VideoMode& vm)
 bool SDLVideoDriver::ToggleFullscreenMode(int set_reset)
 {
 	if (set_reset==-1) {
-		 set_reset=fullscreen;
+		 set_reset=!fullscreen;
 	}
-	if (fullscreen == !set_reset) {
+	if (fullscreen != set_reset) {
 		fullscreen=set_reset;
-		ieDword flags = SDL_SWSURFACE;
-		if (fullscreen) {
-			flags |= SDL_FULLSCREEN;
-		}
-		SDL_Surface* disp2 = SDL_SetVideoMode( width, height, bpp, flags );
-		if (disp2) {
-			disp = disp2;
-			MoveMouse(CursorPos.x,CursorPos.y);
-			return true;
-		}
+		SDL_WM_ToggleFullScreen( disp );
+		//readjust mouse to original position
+		MoveMouse(CursorPos.x, CursorPos.y);
+		//synchronise internal variable
+		core->GetDictionary()->SetAt( "Full Screen", (ieDword) fullscreen );
+		return true;
 	}
 	return false;
 }
@@ -245,6 +241,8 @@ int SDLVideoDriver::SwapBuffers(void)
 	}
 
 	while ( SDL_PollEvent(&event) ) {
+		int modstate = GetModState(event.key.keysym.mod);
+
 		/* Loop until there are no events left on the queue */
 		switch (event.type) {
 		/* Process the appropriate event type */
@@ -262,6 +260,11 @@ int SDLVideoDriver::SwapBuffers(void)
 				case SDLK_SCROLLOCK:
 					key = GEM_GRAB;
 					break;
+				case SDLK_f:
+					if (modstate & GEM_MOD_CTRL) {
+						ToggleFullscreenMode(-1);
+					}
+					break;
 				default:
 					if (event.key.keysym.sym<256) {
 						key=(unsigned char) event.key.keysym.sym;
@@ -269,11 +272,11 @@ int SDLVideoDriver::SwapBuffers(void)
 					break;
 			}
 			if (!ConsolePopped && Evnt && ( key != 0 ))
-				Evnt->KeyRelease( key, GetModState(event.key.keysym.mod) );
+				Evnt->KeyRelease( key, modstate );
 			break;
 
 		case SDL_KEYDOWN:
-			if ((event.key.keysym.sym == SDLK_SPACE) && GetModState(event.key.keysym.mod) & GEM_MOD_CTRL) {
+			if ((event.key.keysym.sym == SDLK_SPACE) && modstate & GEM_MOD_CTRL) {
 				core->PopupConsole();
 				break;
 			}
@@ -336,9 +339,9 @@ int SDLVideoDriver::SwapBuffers(void)
 					Evnt->OnSpecialKeyPress( key );
 			} else if (( key != 0 )) {
 				if (ConsolePopped)
-					core->console->OnKeyPress( key, GetModState(event.key.keysym.mod) );
+					core->console->OnKeyPress( key, modstate);
 				else if (Evnt)
-					Evnt->KeyPress( key, GetModState(event.key.keysym.mod) );
+					Evnt->KeyPress( key, modstate);
 			}
 			break;
 		case SDL_MOUSEMOTION:
@@ -2529,7 +2532,7 @@ int SDLVideoDriver::PollMovieEvents()
 					case SDLK_q:
 						return 1;
 					case SDLK_f:
-						SDL_WM_ToggleFullScreen( disp );
+						ToggleFullscreenMode(-1);
 						break;
 					default:
 						break;
