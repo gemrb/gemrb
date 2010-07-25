@@ -1213,20 +1213,42 @@ void Game::UpdateScripts()
 	ProcessActions(false);
 	size_t idx;
 
+	bool PartyAttack = false;
+
 	for (idx=0;idx<Maps.size();idx++) {
 		Maps[idx]->UpdateScripts();
 		size_t acnt=Attackers.size();
 		while(acnt--) {
 			Actor *actor = Maps[idx]->GetActorByGlobalID(Attackers[acnt]);
 			if (actor) {
-				//each attacker handles their own round initiation
-				//FIXME: individual combat counter
-				//Also: combatcounter in the original game is always
-				//set to 150 when a PC gets attacked (battlemusic started)
-				//then ticks down to 0
-				//when it reaches 0, the battlemusic stops
-				CombatCounter++;
-				actor->InitRound(GameTime, !(CombatCounter&1) );
+				if ( !Maps[idx]->GetActorByGlobalID(actor->LastTarget) ) {
+					//Actor's target left area
+					OutAttack(Attackers[acnt]);
+					continue;
+				} else {
+					//each attacker handles their own round initiation
+					actor->InitRound(GameTime);
+					if (actor->InParty) {
+						PartyAttack = true;
+					}
+				}
+			} else {
+				//Attacker is gone from area
+				OutAttack(Attackers[acnt]);
+			}
+		}
+	}
+
+	if (PartyAttack) {
+		//ChangeSong will set the battlesong only if CombatCounter is nonzero
+		CombatCounter=150;
+		ChangeSong(false, true);
+	} else {
+		if (CombatCounter) {
+			CombatCounter--;
+			//Change song if combatcounter went down to 0
+			if (!CombatCounter) {
+				ChangeSong(false, false);
 			}
 		}
 	}
@@ -1510,10 +1532,6 @@ void Game::InAttack(ieDword globalID)
 		if (*idx==globalID) return;
 	}
 	Attackers.push_back(globalID);
-	if (!CombatCounter) {
-		CombatCounter++;
-		ChangeSong(true, true);
-	}
 }
 
 void Game::OutAttack(ieDword globalID)
@@ -1523,10 +1541,6 @@ void Game::OutAttack(ieDword globalID)
 	for(idx=Attackers.begin(); idx!=Attackers.end();idx++) {
 		if (*idx==globalID) {
 			Attackers.erase(idx);
-			if (!Attackers.size()) {
-				CombatCounter = 0;
-				ChangeSong(false, false);
-			}
 			break;
 		}
 	}
@@ -1538,9 +1552,9 @@ void Game::ChangeSong(bool always, bool force)
 
 	if (CombatCounter) {
 		//battlesong
-		Song = 3;
+		Song = SONG_BATTLE;
 	} else {
-		//night or day
+		//will select SONG_DAY or SONG_NIGHT
 		Song = (GameTime/AI_UPDATE_TIME)%7200/3600;
 	}
 	//area may override the song played (stick in battlemusic)
@@ -1661,6 +1675,16 @@ void Game::DebugDump()
 	printf("Global script: %s\n", Scripts[0]->GetName());
 	printf("CombatCounter: %d\n", (int) CombatCounter);
 	printf("Attackers count: %d\n", (int) Attackers.size());
+	for(idx=0;idx<Attackers.size(); idx++) {
+		Actor *actor = GetActorByGlobalID(Attackers[idx]);
+		if (!actor) {
+			printf("Name: ???\n");
+			continue;
+		}
+		Actor *whom = GetActorByGlobalID(actor->LastTarget);
+		printf("Name: %s Attacking : %s\n", actor->ShortName, whom?whom->ShortName:"???");
+	}
+
 	printf("Party size: %d\n", (int) PCs.size());
 	for(idx=0;idx<PCs.size();idx++) {
 		Actor *actor = PCs[idx];

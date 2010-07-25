@@ -1716,22 +1716,17 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
-/*pst and bg2 can play a song designated by index*/
-/*actually pst has some extra params not currently implemented*/
-/*switchplaylist could implement fade */
+//pst and bg2 can play a song designated by index
+//actually pst has some extra params not currently implemented
+//switchplaylist implements fade by simply scheduling the next 
+//music after the currently running one
+//FIXME: This code is similar to PlayAreaSong, consider refactoring
 void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 {
-	const char* string = core->GetMusicPlaylist( parameters->int0Parameter );
-	if (!string || string[0] == '*') {
-		//if parameter is 'play' and there is nothing to play
-		//don't stop the music
-		if (parameters->int1Parameter!=2) {
-			core->GetMusicMgr()->HardEnd();
-		}
-		return;
-	}
-
+	//the force play logic should be handled by SwitchPlayList
 	bool force;
+	char* poi = core->GetMusicPlaylist( parameters->int0Parameter );
+	if (!poi) return;
 
 	//if parameter is force, force the music, otherwise just schedule it for next
 	if (parameters->int1Parameter==1) {
@@ -1739,12 +1734,18 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 	} else {
 		force = false;
 	}
-	core->GetMusicMgr()->SwitchPlayList( string, force );
+	int ret = core->GetMusicMgr()->SwitchPlayList( poi, force );
+	if (ret) {
+		*poi = '*';
+	}
+        if (parameters->int0Parameter == SONG_BATTLE) {
+                core->GetGame()->CombatCounter = 150;
+        }
 }
 
 //starts the current area music (songtype is in int0Parameter)
-//actually, PlayAreaSong should set the CombatCounter to 150
-//when it is battlemusic (and it ticks back to 0)
+//PlayAreaSong will set the CombatCounter to 150 if
+//it is battlemusic (the Counter will tick back to 0)
 void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 {
 	//don't break on bad values

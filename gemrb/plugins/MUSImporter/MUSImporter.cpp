@@ -244,7 +244,6 @@ int MUSImporter::SwitchPlayList(const char* name, bool Hard)
 		}
 	}
 
-
 	if (OpenPlaylist( name )) {
 		Start();
 		return 0;
@@ -282,8 +281,10 @@ void MUSImporter::PlayNext()
 		core->GetAudioDrv()->Stop();
 		//start new music after the old faded out
 		if (PLNameNew[0]) {
-			OpenPlaylist(PLNameNew);
-			PLNameNew[0]='\0';			
+			if (OpenPlaylist(PLNameNew)) {
+				Start();
+			}
+			PLNameNew[0]='\0';
 		}
 	}
 }

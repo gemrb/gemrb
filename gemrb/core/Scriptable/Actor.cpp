@@ -320,6 +320,7 @@ Actor::Actor()
 	LastTurner = 0;
 	HotKey = 0;
 	attackcount = 0;
+	secondround = 0;
 	attacksperround = 0;
 	nextattack = 0;
 	InTrap = 0;
@@ -3724,6 +3725,7 @@ void Actor::SetTarget( Scriptable *target)
 void Actor::StopAttack()
 {
 	SetStance(IE_ANI_READY);
+	secondround = 0;
 	core->GetGame()->OutAttack(GetID());
 	InternalFlags|=IF_TARGETGONE; //this is for the trigger!
 	if (InParty) {
@@ -3746,9 +3748,10 @@ int Actor::Immobile() const
 //in the next round
 //only called when Game thinks we are in attack
 //so it is safe to do cleanup here (it will be called only once)
-void Actor::InitRound(ieDword gameTime, bool secondround)
+void Actor::InitRound(ieDword gameTime)
 {
 	lastInit = gameTime;
+	secondround = !secondround;
 
 	//roundTime will equal 0 if we aren't attacking something
 	if (roundTime) {
@@ -4055,7 +4058,9 @@ void Actor::PerformAttack(ieDword gameTime)
 {
 	// start a new round if we really don't have one yet
 	if (!roundTime) {
-		InitRound(gameTime, false);
+		printMessage("Actor", "Unregistered attack. We shouldn't be here?\n", RED);
+		secondround = 0;
+		InitRound(gameTime);
 	}
 
 	//only return if we don't have any attacks left this round
@@ -4991,13 +4996,6 @@ bool Actor::HandleActorStance()
 
 	if (ca->autoSwitchOnEnd) {
 		int nextstance = ca->nextStanceID;
-/*
-		if (nextstance == IE_ANI_READY) {
-			if (!core->GetGame()->CombatCounter) {
-				nextstance = IE_ANI_AWAKE;
-			}
-		}
-*/
 		SetStance( nextstance );
 		ca->autoSwitchOnEnd = false;
 		return true;

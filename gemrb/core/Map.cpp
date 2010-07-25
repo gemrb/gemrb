@@ -1589,6 +1589,10 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 	if (ret) {
 		//Apparently, the playlist manager prefers a *
 		*poi='*';
+		return;
+	}
+	if (SongType == SONG_BATTLE) {
+		core->GetGame()->CombatCounter = 150;
 	}
 }
 

@@ -285,12 +285,14 @@ private:
 	ieByte SavingThrow[5];
 	//how many attacks in this round
 	int attackcount;
+	//true every second round of attack
+	bool secondround;
 	int attacksperround;
 	//time of our next attack
 	ieDword nextattack;
 	ieDword lastattack;
 	ieDword InTrap;
-	char AttackStance ;
+	char AttackStance;
 	/*The projectile bringing the current attack*/
 	Projectile* attackProjectile ;
 	/** paint the actor itself. Called internally by Draw() */
@@ -499,8 +501,8 @@ public:
 	int GetAttackStyle();
 	/* sets target for immediate attack */
 	void SetTarget( Scriptable *actor);
-	/* starts combat round, possibly one more attacks in every second round*/
-	void InitRound(ieDword gameTime, bool secondround);
+	/* starts combat round*/
+	void InitRound(ieDword gameTime);
 	/* gets the to hit value */
 	int GetToHit(int bonus, ieDword Flags);
 	/* gets the defense against an attack */

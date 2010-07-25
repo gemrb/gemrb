@@ -100,6 +100,12 @@ class Game;
 #define REST_NOSCATTER  2 //no scatter check
 #define REST_NOMOVE     4 //no movement check
 #define REST_NOCRITTER  8 //no hostiles check
+
+//Song types (hardcoded)
+#define SONG_DAY        0
+#define SONG_NIGHT      1
+#define SONG_BATTLE     3
+
 /**
  * @struct PCStruct
  * Information about party member.
