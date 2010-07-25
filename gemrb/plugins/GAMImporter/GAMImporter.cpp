@@ -201,10 +201,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	for (i = 0; i < PCCount; i++) {
 		str->Seek( PCOffset + ( i * PCSize ), GEM_STREAM_START );
 		Actor *actor = GetActor( aM, true );
-		newGame->JoinParty( actor, 0 );
-		if (actor->Selected) {
-			newGame->SelectActor(actor, true, SELECT_QUIET);
-		}
+		newGame->JoinParty( actor, actor->Selected?JP_SELECT:0 );
 	}
 
 	//Loading NPCs

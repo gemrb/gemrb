@@ -366,11 +366,6 @@ void Game::InitActorPos(Actor *actor)
 
 	strta.load("startare");
 	strnlwrcpy(actor->Area, strta->QueryField( strta->GetRowIndex(area), 0 ), 8 );
-	//TODO: set viewport
-	// strta->QueryField(strta->GetRowIndex(xpos),0);
-	// strta->QueryField(strta->GetColumnIndex(ypos),0);
-
-	SelectActor(actor,true, SELECT_QUIET);
 }
 
 int Game::JoinParty(Actor* actor, int join)
@@ -410,6 +405,10 @@ int Game::JoinParty(Actor* actor, int join)
 	PCs.push_back( actor );
 	if (!actor->InParty) {
 		actor->InParty = (ieByte) (size+1);
+	}
+
+	if (join&(JP_INITPOS|JP_SELECT)) {
+		SelectActor(actor,true, SELECT_NORMAL);
 	}
 
 	return ( int ) size;
@@ -499,12 +498,6 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 	}
 
 	// actor was specified, so we will work with him
-
-	// If actor is already (de)selected, report success, but do nothing
-	//if (actor->IsSelected() == select)
-	//	return true;
-
-
 	if (select) {
 		if (! actor->ValidTarget( GA_SELECT | GA_NO_DEAD ))
 			return false;
@@ -1665,13 +1658,14 @@ void Game::DebugDump()
 
 		printf("%s\n",map->GetScriptName());
 	}
+	printf("Global script: %s\n", Scripts[0]->GetName());
 	printf("CombatCounter: %d\n", (int) CombatCounter);
 	printf("Attackers count: %d\n", (int) Attackers.size());
 	printf("Party size: %d\n", (int) PCs.size());
 	for(idx=0;idx<PCs.size();idx++) {
 		Actor *actor = PCs[idx];
 
-		printf("Name: %s Order %d\n",actor->ShortName, actor->InParty);
+		printf("Name: %s Order %d %s\n",actor->ShortName, actor->InParty, actor->Selected?"x":"-");
 	}
 }
 

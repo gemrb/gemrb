@@ -57,6 +57,7 @@ class Game;
 //joinparty flags
 #define JP_JOIN     1  //refresh join time
 #define JP_INITPOS  2  //init startpos
+#define JP_SELECT   4  //select the actor after joining
 
 //protagonist mode
 #define PM_NO       0  //no death checks

@@ -645,9 +645,11 @@ void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	actor->SetCircleSize();
 }
 
-void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
-	if (actor->InParty) core->GetGame()->SelectActor(actor, false, SELECT_NORMAL);
+	if (actor->Selected && (newValue>EA_GOODCUTOFF) ) {
+		core->GetGame()->SelectActor(actor, false, SELECT_NORMAL);
+	}
 	actor->SetCircleSize();
 }
 
