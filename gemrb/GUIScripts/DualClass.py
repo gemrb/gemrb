@@ -103,7 +103,8 @@ def DualClassWindow ():
 
 	# back button (on)
 	DCMainBackButton = DCMainWindow.GetControl (5)
-	DCMainBackButton.SetText (15416)
+	if GUICommon.GameIsBG2():
+		DCMainBackButton.SetText (15416)
 	DCMainBackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainBackPress)
 	DCMainBackButton.SetState (IE_GUI_BUTTON_ENABLED)
 	DCMainBackButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
