@@ -128,7 +128,7 @@ def ShowMap ():
 	OptionsWindow.SetVisible (WINDOW_FRONT)
 	PortraitWindow.SetVisible (WINDOW_FRONT)
 	Window.SetVisible (WINDOW_FRONT)
-	Map.SetStatus(IE_GUI_CONTROL_FOCUSED)
+	Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	GemRB.GamePause (0,0)
 	return
 
@@ -178,6 +178,7 @@ def OpenMapWindow ():
 	# Map Control
 	Window.CreateMapControl (2, 0, 0, 0, 0)
 	Map = Window.GetControl (2)
+	Map.SetEvent (IE_GUI_MAP_ON_DOUBLE_PRESS, LeftDoublePressMap)
 
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_VISIBLE)
@@ -185,7 +186,7 @@ def OpenMapWindow ():
 	Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def LeftDoublePressMap ():
-	print "MoveToPoint"
+	OpenMapWindow()
 	return
 
 def OpenWorldMapWindowInside ():

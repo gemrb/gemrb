@@ -20,7 +20,6 @@
 import _GemRB
 
 from MetaClasses import metaIDWrapper, metaControl
-#from exceptions import RuntimeError
 
 class GTable:
   __metaclass__ = metaIDWrapper
@@ -136,7 +135,7 @@ class GTextEdit(GControl):
   }
   def ConvertEdit(self, ScrollBarID):
     newID = _GemRB.TextEdit_ConvertEdit(self.WinID, self.ID, ScrollBarID)
-    return _GemRB.Window_GetControl(self.WinID, newID)
+    return GTextArea(self.WinID, self.ID)
 
 class GScrollBar(GControl):
   __metaclass__ = metaControl

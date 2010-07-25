@@ -67,17 +67,18 @@ def OpenMapWindow ():
 	Text = Window.GetControl (4)
 	Text.SetText ("")
 
-	Edit = Window.CreateTextEdit (6, 0, 0, 200, 100, "FONTDLG", "                      ")
+	Edit = Window.CreateTextEdit (6, 54, 353, 416, 25, "FONTDLG", "")
 
 	# Map Control
 	# ronote and usernote are the pins for the notes
 	# 4 is the Label's control ID
 	Window.CreateMapControl (3, 24, 23, 480, 360, 4, "USERNOTE","RONOTE")
 	Map = Window.GetControl (3)
-	GemRB.SetVar ("x",IE_GUI_MAP_VIEW_NOTES)
+	GemRB.SetVar ("x", IE_GUI_MAP_VIEW_NOTES)
 	Map.SetVarAssoc ("x", IE_GUI_MAP_VIEW_NOTES)
 
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, SetMapNote)
+	Map.SetEvent (IE_GUI_MAP_ON_DOUBLE_PRESS, LeftDoublePressMap)
 
 	MapTable = GemRB.LoadTable( "MAPNAME" )
 	MapName = MapTable.GetValue (GemRB.GetCurrentArea (), "STRING")
@@ -93,26 +94,49 @@ def OpenMapWindow ():
 	Button = Window.GetControl (5)
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 	GemRB.UnhideGUI ()
 
+def LeftDoublePressMap ():
+	OpenMapWindow()
+	return
+
 def NoteChanged ():
-	Label = MapWindow.GetControl (6)
-	Text = Label.QueryText ()
+	#shift focus to the static label
+	Label = MapWindow.GetControl (4)
+	Label.SetStatus (IE_GUI_CONTROL_FOCUSED)
+
+	Edit = MapWindow.GetControl (6)
+	Edit.SetEvent (IE_GUI_EDIT_ON_DONE, None)
+	Text = Edit.QueryText ()
+	Edit.SetText ("")
 	GemRB.SetMapnote (PosX, PosY, 0, Text)
+	#the mapcontrol is a bit sluggish, update the label now
+	Label.SetText (Text)
 	return
 	
 def SetMapNote ():
 	global PosX, PosY
 
-	Label = MapWindow.GetControl (6)
-	Label.SetEvent (IE_GUI_EDIT_ON_CHANGE, NoteChanged)
+	if GemRB.GetVar ("x")!=IE_GUI_MAP_SET_NOTE:
+		return
+
+	Label = MapWindow.GetControl (4)
+
+	Edit = MapWindow.GetControl (6)
+	Edit.SetEvent (IE_GUI_EDIT_ON_DONE, NoteChanged)
+	Edit.SetStatus (IE_GUI_CONTROL_FOCUSED)
+
+	#copy the text from the static label into the editbox
+	Edit.SetText (Label.QueryText())
+	Label.SetText ("")
+
 	PosX = GemRB.GetVar("MapControlX")
 	PosY = GemRB.GetVar("MapControlY")
-	Label.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	Map = MapWindow.GetControl (3)
-	GemRB.SetVar ("x",IE_GUI_MAP_VIEW_NOTES)
+	GemRB.SetVar ("x", IE_GUI_MAP_VIEW_NOTES)
 	Map.SetVarAssoc ("x", IE_GUI_MAP_VIEW_NOTES)
 	return
 

@@ -181,8 +181,7 @@ def OpenMapWindow ():
 	Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def LeftDoublePressMap ():
-	#OpenMapWindow()
-	print "MoveToPoint"
+	OpenMapWindow()
 	return
 
 def OpenWorldMapWindowInside ():

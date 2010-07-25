@@ -198,7 +198,6 @@ def OpenMapWindow ():
 
 def LeftDoublePressMap ():
 	OpenMapWindow()
-	print "MoveToPoint"
 	return
 
 def CloseNoteWindow ():
@@ -247,10 +246,13 @@ def AddNoteWindow ():
 	Label = MapWindow.GetControl (0x10000003)
 	Text = Label.QueryText ()
 	NoteWindow = GemRB.LoadWindow (5)
+	#convert to multiline, destroy unwanted resources
 	NoteLabel = NoteWindow.GetControl (1)
-	NoteLabel = NoteLabel.ConvertEdit (1)
+	#0 is the default Scrollbar ID
+	NoteLabel = NoteLabel.ConvertEdit (0)
 	NoteLabel.SetText (Text)
 	NoteLabel.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	print "Just set this:", NoteLabel.QueryText()
 
 	for i in range(8):
 		Label = NoteWindow.GetControl (4+i)
@@ -258,8 +260,6 @@ def AddNoteWindow ():
 		Label.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 		Label.SetVarAssoc ("Color", i)
 		Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetFocusBack)
-
-	#convert to multiline, destroy unwanted resources
 
 	#set
 	Label = NoteWindow.GetControl (0)

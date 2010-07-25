@@ -202,7 +202,8 @@ def OpenMapWindow ():
 	return
 
 def LeftDoublePressMap ():
-	print "MoveToPoint"
+	#close the map on doubleclick
+	OpenMapWindow()
 	return
 
 def CloseNoteWindow ():

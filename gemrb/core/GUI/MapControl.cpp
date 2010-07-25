@@ -316,7 +316,19 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 	lastMouseX = x;
 	lastMouseY = y;
 
-	if (Value==MAP_VIEW_NOTES) {
+	switch (Value) {
+		case MAP_REVEAL: //for farsee effect
+			Owner->Cursor = IE_CURSOR_CAST;
+			break;
+		case MAP_SET_NOTE:
+			Owner->Cursor = IE_CURSOR_GRAB;
+			break;
+		default:
+			Owner->Cursor = IE_CURSOR_NORMAL;
+			break;
+	}
+
+	if (Value == MAP_VIEW_NOTES || Value == MAP_SET_NOTE || Value == MAP_REVEAL) {
 		Point mp;
 		unsigned int dist;
 
@@ -347,17 +359,6 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 	if (LinkedLabel) {
 		LinkedLabel->SetText( "" );
 	}
-	switch (Value) {
-		case MAP_REVEAL: //for farsee effect
-			Owner->Cursor = IE_CURSOR_CAST;
-			break;
-		case MAP_SET_NOTE:
-			Owner->Cursor = IE_CURSOR_GRAB;
-			break;
-		default:
-			Owner->Cursor = IE_CURSOR_NORMAL;
-			break;
-	}
 }
 
 /** Mouse Leave Event */
@@ -374,7 +375,6 @@ void MapControl::ClickHandle(unsigned short Button)
 		case GEM_MB_ACTION:
 			if (Button&GEM_MB_DOUBLECLICK) {
 				RunEventHandler( MapControlOnDoublePress );
-				printMessage("MapControl","Doubleclick detected\n",GREEN);
 			} else {
 				RunEventHandler( MapControlOnPress );
 			}
