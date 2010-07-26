@@ -236,7 +236,7 @@ static int ReverseToHit=true;
 static int CheckAbilities=false;
 
 //internal flags for calculating to hit
-#define WEAPON_FIST	   0
+#define WEAPON_FIST		 0
 #define WEAPON_MELEE       1
 #define WEAPON_RANGED      2
 #define WEAPON_STYLEMASK   15
@@ -2714,7 +2714,17 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 {
 	//Did we have an area?
 	bool effinit=!GetCurrentArea();
-	Scriptable::SetMap(map); //now we have an area
+	//now we have an area
+	Scriptable::SetMap(map);
+	//unless we just lost it, in that case clear up some fields and leave
+	if (!map) {
+		//the local ID is surely illegal after the map is nulled
+		localID = 0;
+		//more bits may or may not be needed
+		InternalFlags &=~IF_CLEANUP;
+		return;
+	}
+
 	localID = LID;
 	globalID = GID;
 
@@ -2894,6 +2904,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 	}
 }
 
+//TODO: needs a way to respawn at a point
 void Actor::Resurrect()
 {
 	if (!(Modified[IE_STATE_ID ] & STATE_DEAD)) {

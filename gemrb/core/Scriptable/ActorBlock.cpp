@@ -144,8 +144,9 @@ Map* Scriptable::GetCurrentArea() const
 
 void Scriptable::SetMap(Map *map)
 {
-	if (!map) {
-		printMessage("Scriptable","Null map set!\n",LIGHT_RED);
+	if (map && (map->GetCurrentArea()!=map)) {
+		//a map always points to itself (if it is a real map)
+		printMessage("Scriptable","Invalid map set!\n",LIGHT_RED);
 		abort();
 	}
 	area = map;

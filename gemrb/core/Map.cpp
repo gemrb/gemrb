@@ -1303,18 +1303,30 @@ bool Map::AnyPCSeesEnemy()
 	return false;
 }
 
+//Make an actor gone for (almost) good
+//If the actor was in the party, it will be moved to the npc storage
+//If the actor is in the NPC storage, its area and some other fields
+//that are needed for proper reentry will be zeroed out
+//If the actor isn't in the NPC storage, it is destructed
 void Map::DeleteActor(int i)
 {
 	Actor *actor = actors[i];
-
-	Game *game = core->GetGame();
-	game->LeaveParty( actor );
-	game->DelNPC( game->InStore(actor) );
-
-	ClearSearchMapFor(actor);
-
+	if (actor) {
+		Game *game = core->GetGame();
+		//this makes sure that a PC will be demoted to NPC
+		game->LeaveParty( actor );
+		//this frees up the spot under the feet circle
+		ClearSearchMapFor( actor );
+		//remove the area reference from the actor
+		actor->SetMap(NULL,0,0);
+		//don't destroy the object in case it is a persistent object
+		//otherwise there is a dead reference causing a crash on save
+		if (!game->InStore(actor) ) {
+			delete actor;
+		}
+	}
+	//remove the actor from the area's actor list
 	actors.erase( actors.begin()+i );
-	delete actor;
 }
 
 Actor* Map::GetActorByGlobalID(ieDword objectID)
