@@ -27,6 +27,7 @@ from GUIDefines import *
 import GUICommon
 import GUICommonWindows
 import GUIClasses
+from ie_stats import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -37,6 +38,8 @@ ReformPartyWindow = None
 OldActionsWindow = None
 OldMessageWindow = None
 Container = None
+
+removable_pcs = []
 
 def CloseContinueWindow ():
 	if ContinueWindow:
@@ -334,14 +337,19 @@ def UpdateReformWindow ():
 
 	for i in range (PARTY_SIZE+1):
 		Button = Window.GetControl (i)
-		Button.EnableBorder (FRAME_PC_SELECTED, select == i+2 )
-		#+2 because protagonist is skipped
-		pic = GemRB.GetPlayerPortrait (i+2,1)
-		if not pic:
+		if i+1 not in removable_pcs:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			continue
 
+	for i in removable_pcs:
+		Button = Window.GetControl (removable_pcs.index(i))
+		Button.EnableBorder (FRAME_PC_SELECTED, select == i )
+		pic = GemRB.GetPlayerPortrait (i, 1)
+		if not pic:
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			Button.SetState (IE_GUI_BUTTON_LOCKED)
+			continue
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		Button.SetPicture (pic, "NOPORTSM")
@@ -397,6 +405,7 @@ def RemovePlayerCancel ():
 
 def OpenReformPartyWindow ():
 	global ReformPartyWindow, OldActionsWindow, OldMessageWindow
+	global removable_pcs
 
 	GemRB.SetVar ("Selected", 0)
 	hideflag = GemRB.HideGUI ()
@@ -423,15 +432,20 @@ def OpenReformPartyWindow ():
 	ReformPartyWindow = Window = GemRB.LoadWindow (24)
 	GemRB.SetVar ("OtherWindow", Window.ID)
 
+	# skip exportable party members (usually only the protagonist)
+	removable_pcs = []
+	for i in range (1, GemRB.GetPartySize()+1):
+		if not GemRB.GetPlayerStat (i, IE_MC_FLAGS)&MC_EXPORTABLE:
+			removable_pcs.append(i)
+
 	#PC portraits
 	for j in range (PARTY_SIZE+1):
 		Button = Window.GetControl (j)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
-		#protagonist is skipped
-		index = j + 2
-		Button.SetVarAssoc ("Selected", index)
+		if j < len(removable_pcs):
+			Button.SetVarAssoc ("Selected", removable_pcs[j])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateReformWindow)
 
 	# Remove
