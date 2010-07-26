@@ -462,6 +462,14 @@ def OpenReformPartyWindow ():
 	OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
 	GemRB.SetVar ("ActionsWindow", -1)
 	GemRB.SetVar ("MessageWindow", -1)
+
+	# if nobody can be removed, just close the window
+	if not removable_pcs:
+		OpenReformPartyWindow ()
+		if hideflag:
+			GemRB.UnhideGUI ()
+		return
+
 	UpdateReformWindow ()
 	if hideflag:
 		GemRB.UnhideGUI ()
