@@ -416,6 +416,10 @@ def UpdateInventorySlot (pc, Button, Slot, Type):
 		else:
 			Button.SetText ("")
 
+		# auto-identify mundane items; the actual indentification will happen on transfer
+		if not identified and item["LoreToID"] == 0:
+			identified = True
+
 		if not identified or item["ItemNameIdentified"] == -1:
 			Button.SetTooltip (item["ItemName"])
 			Button.EnableBorder (0, 1)

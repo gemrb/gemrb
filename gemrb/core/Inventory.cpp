@@ -119,10 +119,30 @@ CREItem *Inventory::GetItem(unsigned int slot)
 	return item;
 }
 
+//This hack sets the charge counters for non-rechargeable items,
+//if their charge is zero
+inline void HackCharges(CREItem *item)
+{
+	Item *itm = gamedata->GetItem( item->ItemResRef );
+	if (itm) {
+		for (int i=0;i<3;i++) {
+			if (item->Usages[i]) {
+				continue;
+			}
+			ITMExtHeader *h = itm->GetExtHeader(i);
+			if (h && !(h->RechargeFlags&IE_ITEM_RECHARGE)) {
+				item->Usages[i]=h->Charges;
+			}
+		}
+		gamedata->FreeItem( itm, item->ItemResRef, false );
+	}
+}
+
 void Inventory::AddItem(CREItem *item)
 {
 	if (!item) return; //invalid items get no slot
 	Slots.push_back(item);
+	HackCharges(item);
 	//Changed=true; //probably not needed, chests got no encumbrance
 }
 
@@ -539,21 +559,7 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 		delete Slots[slot];
 	}
 
-	//This hack sets the charge counters for non-rechargeable items,
-	//if their charge is zero
-	Item *itm = gamedata->GetItem( item->ItemResRef );
-	if (itm) {
-		for (int i=0;i<3;i++) {
-			if (item->Usages[i]) {
-				continue;
-			}
-			ITMExtHeader *h = itm->GetExtHeader(i);
-			if (h && !(h->RechargeFlags&IE_ITEM_RECHARGE)) {
-				item->Usages[i]=h->Charges;
-			}
-		}
-		gamedata->FreeItem( itm, item->ItemResRef, false );
-	}
+	HackCharges(item);
 
 	Slots[slot] = item;
 
@@ -579,8 +585,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 
 		if (!Slots[slot]) {
 			item->Flags |= IE_INV_ITEM_ACQUIRED;
-			Slots[slot] = item;
-			Changed = true;
+			SetSlotItem(item, slot);
 			EquipItem(slot);
 			return ASI_SUCCESS;
 		}
