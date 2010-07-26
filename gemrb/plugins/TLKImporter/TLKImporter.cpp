@@ -30,9 +30,21 @@
 
 //set this to -1 if charname is gabber (iwd2)
 static int charname=0;
+typedef struct gt_type
+{
+	int type;
+	ieStrRef male;
+	ieStrRef female;
+};
+static Variables gtmap;
 
 TLKImporter::TLKImporter(void)
 {
+	int gtcount;
+
+	gtmap.RemoveAll(NULL);
+	gtmap.SetType(GEM_VARIABLES_POINTER);
+
 	if (core->HasFeature(GF_CHARNAMEISGABBER)) {
 		charname=-1;
 	} else {
@@ -41,6 +53,28 @@ TLKImporter::TLKImporter(void)
 	str = NULL;
 	override = NULL;
 	autoFree = false;
+
+	AutoTable tm("gender");
+	if (tm) {
+		gtcount = tm->GetRowCount();
+	} else {
+		gtcount = 0;
+	}
+	for(int i=0;i<gtcount;i++) {
+		ieVariable key;
+
+		strnuprcpy(key, tm->GetRowName(i), sizeof(ieVariable) );
+		gt_type *entry = (gt_type *) malloc(sizeof(gt_type) );
+		entry->type = atoi(tm->QueryField(i,0));
+		entry->male = atoi(tm->QueryField(i,1));
+		entry->female = atoi(tm->QueryField(i,2));
+		gtmap.SetAt(key, (void *) entry);
+	}
+}
+
+void ReleaseGtEntry(void *poi)
+{
+	delete (gt_type *) poi;
 }
 
 TLKImporter::~TLKImporter(void)
@@ -48,6 +82,10 @@ TLKImporter::~TLKImporter(void)
 	if (str && autoFree) {
 		delete( str );
 	}
+
+	
+	gtmap.RemoveAll(ReleaseGtEntry);
+
 	CloseAux();
 }
 
@@ -184,6 +222,13 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 {
 	char* Decoded = NULL;
 	int TokenLength;	 //decoded token length
+	gt_type *entry;
+
+	//these are gender specific tokens, they are customisable by gender.2da
+	if (gtmap.Lookup(Token, (void *&) entry) ) {
+		Decoded = GetString( GenderStrRef(entry->type, entry->male, entry->female) );
+		goto exit_function;
+	}
 
 	//these are hardcoded, all engines are the same or don't use them
 	if (!strcmp( Token, "DAYANDMONTH")) {
@@ -203,6 +248,7 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 		Decoded = GetString( RaceStrRef(-1), 0);
 		goto exit_function;
 	}
+/*
 	if (!strcmp( Token, "SIRMAAM" )) {
 		Decoded = GetString( GenderStrRef(-1,27473,27475), 0);
 		goto exit_function;
@@ -239,6 +285,7 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 		Decoded = GetString( GenderStrRef(-1,27489,27490), 0);
 		goto exit_function;
 	}
+*/
 	if (!strncmp( Token, "PLAYER",6 )) {
 		Decoded = CharName(Token[6]-'1');
 		goto exit_function;
@@ -256,6 +303,7 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 		Decoded = GetString( RaceStrRef(0), 0);
 		goto exit_function;
 	}
+/*
 	if (!strcmp( Token, "PRO_SIRMAAM" )) {
 		Decoded = GetString( GenderStrRef(0,27473,27475), 0);
 		goto exit_function;
@@ -292,7 +340,7 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 		Decoded = GetString( GenderStrRef(0,27489,27490), 0);
 		goto exit_function;
 	}
-
+*/
 	if (!strcmp( Token, "MAGESCHOOL" )) {
 		ieDword row = 0; //default value is 0 (generalist)
 		//this is subject to change, the row number in magesch.2da
