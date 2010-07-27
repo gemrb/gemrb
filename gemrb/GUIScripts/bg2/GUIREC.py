@@ -735,15 +735,16 @@ def OpenInformationWindow ():
 	#are they used?
 	Label.SetText (stat['FavouriteWeapon'])
 
-	#total xp
-	Label = Window.GetControl (0x1000000f)
+	#total party xp
+	Label = Window.GetControl (0x10000013)
 	if TotalPartyExp != 0:
 		PartyExp = int ((stat['KillsTotalXP'] * 100) / TotalPartyExp)
 		Label.SetText (str (PartyExp) + '%')
 	else:
 		Label.SetText ("0%")
 
-	Label = Window.GetControl (0x10000013)
+	#chapter party xp
+	Label = Window.GetControl (0x1000000f)
 	if ChapterPartyExp != 0:
 		PartyExp = int ((stat['KillsChapterXP'] * 100) / ChapterPartyExp)
 		Label.SetText (str (PartyExp) + '%')
@@ -751,14 +752,15 @@ def OpenInformationWindow ():
 		Label.SetText ("0%")
 
 	#total xp
-	Label = Window.GetControl (0x10000010)
+	Label = Window.GetControl (0x10000014)
 	if TotalCount != 0:
 		PartyExp = int ((stat['KillsTotalCount'] * 100) / TotalCount)
 		Label.SetText (str (PartyExp) + '%')
 	else:
 		Label.SetText ("0%")
 
-	Label = Window.GetControl (0x10000014)
+	#chapter xp
+	Label = Window.GetControl (0x10000010)
 	if ChapterCount != 0:
 		PartyExp = int ((stat['KillsChapterCount'] * 100) / ChapterCount)
 		Label.SetText (str (PartyExp) + '%')
