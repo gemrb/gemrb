@@ -586,14 +586,14 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	switch (Key) {
 		case '0':
 			game->SelectActor( NULL, false, SELECT_NORMAL );
-			i = game->GetPartySize(false)/2;
+			i = game->GetPartySize(false)/2+1;
 			while(i--) {
 				SelectActor(i, true);
 			}
 			break;
 		case '-':
 			game->SelectActor( NULL, true, SELECT_NORMAL );
-			i = game->GetPartySize(false)/2;
+			i = game->GetPartySize(false)/2+1;
 			while(i--) {
 				SelectActor(i, false);
 			}
