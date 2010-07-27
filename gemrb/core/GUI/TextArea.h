@@ -64,6 +64,8 @@ class GEM_EXPORT TextArea : public Control {
 public:
 	TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor);
 	~TextArea(void);
+	/** global configuration */
+	static void SetNoteString(const char *s);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
 	/** Sets the Actual Text */

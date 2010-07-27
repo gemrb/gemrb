@@ -193,7 +193,6 @@ Interface::Interface(int iargc, char* iargv[])
 	strncpy( ButtonFont, "STONESML", sizeof(ButtonFont) );
 	strncpy( TooltipFont, "STONESML", sizeof(TooltipFont) );
 	strncpy( MovieFont, "STONESML", sizeof(MovieFont) );
-	//strncpy( CursorBam, "CAROT", sizeof(CursorBam) );
 	strncpy( ScrollCursorBam, "CURSARW", sizeof(ScrollCursorBam) );
 	strncpy( GlobalScript, "BALDUR", sizeof(GlobalScript) );
 	strncpy( WorldMapName, "WORLDMAP", sizeof(WorldMapName) );
@@ -2383,6 +2382,9 @@ bool Interface::LoadGemRBINI()
 			}
 		}
 	}
+
+	s = ini->GetKeyAsString( "resources", "NoteString", NULL );
+	TextArea::SetNoteString(s);
 
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
 	if (s)

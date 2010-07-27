@@ -350,8 +350,18 @@ void TextArea::DiscardLines()
 	PopLines(drop, true);
 }
 
+static char *note_const = NULL;
 static const char inserted_crap[]="[/color][color=ffffff]";
 #define CRAPLENGTH sizeof(inserted_crap)-1
+
+void TextArea::SetNoteString(const char *s)
+{
+	free(note_const);
+	if (s) {
+		note_const = (char *) malloc(strlen(s)+5);
+		sprintf(note_const, "\r\n\r\n%s", s);
+	}
+}
 
 /** Appends a String to the current Text */
 int TextArea::AppendText(const char* text, int pos)
@@ -363,11 +373,14 @@ int TextArea::AppendText(const char* text, int pos)
 	int newlen = ( int ) strlen( text );
 
 	if (pos == -1) {
-		const char *note = strstr(text,"\r\n\r\nNOTE:");
+		const char *note = NULL;
+		if (note_const) {
+			note = strstr(text,note_const);
+		}
 		char *str;
 		if (NULL == note) {
 			str = (char *) malloc( newlen +1 );
-			memcpy(str,text, newlen+1);
+			memcpy(str, text, newlen+1);
 		}
 		else {
 			unsigned int notepos = (unsigned int) (note - text);
