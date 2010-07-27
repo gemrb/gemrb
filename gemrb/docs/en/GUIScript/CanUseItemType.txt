@@ -1,5 +1,5 @@
 
-Prototype: GemRB.CanUseItemType(slottype, itemname[, actor])
+Prototype: GemRB.CanUseItemType(slottype, itemname[, actor, equipped])
 
 Description: Checks the itemtype vs. slottype, and also checks the usability flags vs. Actor's stats (alignment, class, race, kit etc.)
 
@@ -7,6 +7,7 @@ Parameters:
 slottype    - the slot to check (See ie_slots.py)
 itemname    - the resource reference of the item
 actor       - the actor's number in the team (if 0, then actor is not unimportant)
+equipped    - whether the item is equipped (if so, don't consider disabled items to be unusable)
 
 Return value: boolean
 
