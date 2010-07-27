@@ -267,6 +267,14 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 	stream->ReadDword( &seq3 );
 	stream->ReadResRef( sounds[P_RELEASE] );
 
+	//if there are no separate phases, then fill the p_hold fields
+	bool phases = (seq2 || seq3);
+
+	// hacks for seq2/seq3, same as for seq1 above
+	// (not sure if seq3 is needed)
+	if (seq2>0) seq2--;
+	if (seq3>0) seq3--;
+
 	if (SequenceFlags&IE_VVC_BAM) {
 		AnimationFactory* af = ( AnimationFactory* )
 			gamedata->GetFactoryResource( Anim1ResRef, IE_BAM_CLASS_ID );
@@ -277,9 +285,6 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			unsigned int p_hold = P_HOLD*MAX_ORIENT+i;
 			unsigned int p_onset = P_ONSET*MAX_ORIENT+i;
 			unsigned int p_release = P_RELEASE*MAX_ORIENT+i;
-
-			//if there are no separate phases, then fill the p_hold fields
-			bool phases = (seq2 || seq3);
 
 			int c = seq1;
 			if (phases) {
