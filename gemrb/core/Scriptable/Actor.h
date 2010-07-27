@@ -491,8 +491,8 @@ public:
 	void Heal(int days);
 	/* Receive experience (handle dual/multi class) */
 	void AddExperience(int exp);
-	/* Receive experience bonus */
-	void AddExperience(int type, int level);
+	/* Calculate experience bonus */
+	int CalculateExperience(int type, int level);
 	/* Sets the modal state after checks */
 	void SetModal(ieDword newstate, bool force=1);
 	/* Sets the modal spell after checks */

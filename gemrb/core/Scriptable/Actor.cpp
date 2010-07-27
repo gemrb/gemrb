@@ -3628,7 +3628,9 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		displaymsg->DisplayConstantStringName(tmp, 0xbcefbc, this);
 	}
 	if (flags&LS_ADDXP) {
-		AddExperience(XP_LEARNSPELL, explev);
+		int xp = CalculateExperience(XP_LEARNSPELL, explev);
+		Game *game = core->GetGame();
+		game->ShareXP(xp, SX_DIVIDE);
 	}
 	return LSR_OK;
 }
@@ -4515,19 +4517,17 @@ void Actor::AddExperience(int exp)
 	SetBase(IE_XP,BaseStats[IE_XP]+exp);
 }
 
-void Actor::AddExperience(int type, int level)
+int Actor::CalculateExperience(int type, int level)
 {
 	if (type>=xpbonustypes) {
-		return;
+		return 0;
 	}
 	unsigned int l = (unsigned int) (level - 1);
 
 	if (l>=(unsigned int) xpbonuslevels) {
 		l=xpbonuslevels-1;
 	}
-	int xp = xpbonus[type*xpbonuslevels+l];
-	displaymsg->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword) xp);
-	AddExperience(xp);
+	return xpbonus[type*xpbonuslevels+l];
 }
 
 bool Actor::Schedule(ieDword gametime, bool checkhide)

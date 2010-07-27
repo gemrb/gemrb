@@ -1765,7 +1765,9 @@ void Highlightable::TryDisarm(Actor *actor)
 		//trap removed
 		Trapped = 0;
 		displaymsg->DisplayConstantStringName(STR_DISARM_DONE, 0xd7d7be, actor);
-		actor->AddExperience(XP_DISARM, actor->GetXPLevel(1));
+		int xp = actor->CalculateExperience(XP_DISARM, actor->GetXPLevel(1));
+		Game *game = core->GetGame();
+		game->ShareXP(xp, SX_DIVIDE);
 	} else {
 		displaymsg->DisplayConstantStringName(STR_DISARM_FAIL, 0xd7d7be, actor);
 		TriggerTrap(skill, LastTrigger);
@@ -1788,7 +1790,9 @@ void Door::TryPickLock(Actor *actor)
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
 	LastUnlocked = actor->GetID();
 	ImmediateEvent();
-	actor->AddExperience(XP_LOCKPICK, actor->GetXPLevel(1));
+	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
+	Game *game = core->GetGame();
+	game->ShareXP(xp, SX_DIVIDE);
 }
 
 void Door::TryBashLock(Actor *actor)
@@ -2248,7 +2252,9 @@ void Container::TryPickLock(Actor *actor)
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
 	LastUnlocked = actor->GetID();
 	ImmediateEvent();
-	actor->AddExperience(XP_LOCKPICK, actor->GetXPLevel(1));
+	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
+	Game *game = core->GetGame();
+	game->ShareXP(xp, SX_DIVIDE);
 }
 
 void Container::TryBashLock(Actor *actor)
