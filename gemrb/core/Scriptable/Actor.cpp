@@ -2456,7 +2456,12 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 
 	int resisted = 0;
 	ModifyDamage (this, hitter, damage, resisted, damagetype, NULL, false);
-	if (damage) GetHit();
+	if (damage) {
+		if (InParty) {
+			core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "CloseContainerWindow");
+		}
+		GetHit();
+	}
 
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
 
