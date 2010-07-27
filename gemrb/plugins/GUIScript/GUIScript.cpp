@@ -6684,16 +6684,16 @@ static PyObject* GemRB_ChangeItemFlag(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_CanUseItemType__doc,
-"CanUseItemType( slottype, itemname[, actor])=>bool\n\n"
+"CanUseItemType( slottype, itemname[, actor, equipped])=>bool\n\n"
 "Checks the itemtype vs. slottype, and also checks the usability flags vs. Actor's stats (alignment, class, race, kit etc.)" );
 
 static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 {
-	int SlotType, PartyID;
+	int SlotType, PartyID, Equipped;
 	const char *ItemName;
 
 	PartyID = 0;
-	if (!PyArg_ParseTuple( args, "is|i", &SlotType, &ItemName, &PartyID)) {
+	if (!PyArg_ParseTuple( args, "is|ii", &SlotType, &ItemName, &PartyID, &Equipped)) {
 		return AttributeError( GemRB_CanUseItemType__doc );
 	}
 	if (!ItemName[0]) {
@@ -6715,7 +6715,7 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-	int ret=core->CanUseItemType(SlotType, item, actor, false);
+	int ret=core->CanUseItemType(SlotType, item, actor, false, Equipped != 0);
 	gamedata->FreeItem(item, ItemName, false);
 	return PyInt_FromLong(ret);
 }

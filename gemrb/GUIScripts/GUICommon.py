@@ -382,7 +382,7 @@ def CannotLearnSlotSpell ():
 
 	return 0
 
-def UpdateInventorySlot (pc, Button, Slot, Type):
+def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 	Button.SetFont ("NUMBER")
 	Button.SetBorder (0, 0,0,0,0, 128,128,255,64, 0,1)
 	Button.SetBorder (1, 2,2,2,2, 32,32,255,0, 0,0)
@@ -432,7 +432,7 @@ def UpdateInventorySlot (pc, Button, Slot, Type):
 			else:
 				Button.EnableBorder (1, 0)
 
-		if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc):
+		if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc, Equipped):
 			Button.EnableBorder (2, 0)
 		else:
 			Button.EnableBorder (2, 1)

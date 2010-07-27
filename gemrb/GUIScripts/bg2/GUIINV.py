@@ -404,7 +404,7 @@ def UpdateSlot (pc, slot):
 
 	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, OnDragItem)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-	GUICommon.UpdateInventorySlot (pc, Button, slot_item, "inventory")
+	GUICommon.UpdateInventorySlot (pc, Button, slot_item, "inventory", SlotType["Type"]&SLOT_INVENTORY == 0)
 	
 	if slot_item:
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)

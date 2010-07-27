@@ -3979,7 +3979,7 @@ const char *Interface::QuerySlotResRef(unsigned int idx) const
 
 // checks the itemtype vs. slottype, and also checks the usability flags
 // vs. Actor's stats (alignment, class, race, kit etc.)
-int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedback) const
+int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedback, bool equipped) const
 {
 	//inventory is a special case, we allow any items to enter it
 	if ( slottype==SLOT_ALL ) {
@@ -4013,7 +4013,7 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 		}
 		//custom strings
 		ieStrRef str = actor->Disabled(item->Name, item->ItemType);
-		if (str) {
+		if (str && !equipped) {
 			if (feedback) displaymsg->DisplayString(str, 0xf0f0f0, 0);
 			return 0;
 		}
