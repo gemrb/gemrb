@@ -589,11 +589,7 @@ void Interface::HandleFlags()
 			game->ConsolidateParty();
 			GameControl* gc = StartGameControl();
 			//switch map to protagonist
-			Actor* actor = core->GetFirstSelectedPC(false);
-
-			if (!actor) {
-				actor = game->GetPC (0, false);
-			}
+			Actor* actor = core->GetFirstSelectedPC(true);
 			if (actor) {
 				gc->ChangeMap(actor, true);
 			}
