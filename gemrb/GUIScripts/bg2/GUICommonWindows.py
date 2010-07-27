@@ -779,6 +779,9 @@ def PortraitButtonOnMouseEnter ():
 
 	i = GemRB.GetVar ("PressedPortrait")
 
+	if not i:
+		return
+
 	GemRB.GameControlSetLastActor( i )
 	if GemRB.IsDraggingItem()==2:
 		if DraggedPortrait != None:
@@ -791,7 +794,7 @@ def PortraitButtonOnMouseEnter ():
 		return
 
 	if GemRB.IsDraggingItem ():
-		Button = PortraitWindow.GetControl (i)
+		Button = PortraitWindow.GetControl (i-1)
 		Button.EnableBorder (FRAME_PC_TARGET, 1)
 	return
 
