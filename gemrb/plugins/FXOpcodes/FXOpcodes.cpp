@@ -4678,8 +4678,8 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//if it is sticky, don't add it if it is already played
 	if (fx->Parameter2) {
-		if (!target->HasVVCCell(fx->Resource) ) {
-			return FX_NOT_APPLIED;
+		if (target->HasVVCCell(fx->Resource) ) {
+			return FX_APPLIED;
 		}
 	}
 
