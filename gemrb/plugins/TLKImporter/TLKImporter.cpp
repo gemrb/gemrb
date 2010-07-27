@@ -30,7 +30,7 @@
 
 //set this to -1 if charname is gabber (iwd2)
 static int charname=0;
-typedef struct gt_type
+struct gt_type
 {
 	int type;
 	ieStrRef male;
@@ -63,7 +63,7 @@ TLKImporter::TLKImporter(void)
 	for(int i=0;i<gtcount;i++) {
 		ieVariable key;
 
-		strnuprcpy(key, tm->GetRowName(i), sizeof(ieVariable) );
+		strnuprcpy(key, tm->GetRowName(i), sizeof(ieVariable)-1 );
 		gt_type *entry = (gt_type *) malloc(sizeof(gt_type) );
 		entry->type = atoi(tm->QueryField(i,0));
 		entry->male = atoi(tm->QueryField(i,1));
