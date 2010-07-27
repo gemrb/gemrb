@@ -588,7 +588,7 @@ void Interface::HandleFlags()
 			game->ConsolidateParty();
 			GameControl* gc = StartGameControl();
 			//switch map to protagonist
-			Actor* actor = core->GetFirstSelectedPC(true);
+			Actor* actor = GetFirstSelectedPC(true);
 			if (actor) {
 				gc->ChangeMap(actor, true);
 			}
@@ -1314,39 +1314,39 @@ int Interface::Init()
 
 		char path[_MAX_PATH];
 
-		PathJoin( path, core->CachePath, NULL);
+		PathJoin( path, CachePath, NULL);
 		gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY);
 
-		PathJoin( path, core->GemRBOverridePath, "override", core->GameType, NULL);
+		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
 		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_DIRECTORY);
 
 		size_t i;
 		for (i = 0; i < ModPath.size(); ++i)
 			gamedata->AddSource(ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_DIRECTORY);
 
-		PathJoin( path, core->GemRBOverridePath, "override", "shared", NULL);
+		PathJoin( path, GemRBOverridePath, "override", "shared", NULL);
 		gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_DIRECTORY);
 
-		PathJoin( path, core->GamePath, core->GameOverridePath, NULL);
+		PathJoin( path, GamePath, GameOverridePath, NULL);
 		gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_DIRECTORY);
 
-		PathJoin( path, core->GamePath, core->GameSoundsPath, NULL);
+		PathJoin( path, GamePath, GameSoundsPath, NULL);
 		gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
 
-		PathJoin( path, core->GamePath, core->GameScriptsPath, NULL);
+		PathJoin( path, GamePath, GameScriptsPath, NULL);
 		gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_DIRECTORY);
 
-		PathJoin( path, core->GamePath, core->GamePortraitsPath, NULL);
+		PathJoin( path, GamePath, GamePortraitsPath, NULL);
 		gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_DIRECTORY);
 
-		PathJoin( path, core->GamePath, core->GameDataPath, NULL);
+		PathJoin( path, GamePath, GameDataPath, NULL);
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_DIRECTORY);
 
 		//IWD2 movies are on the CD but not in the BIF
 		for (i = 0; i < MAX_CD; i++) {
-			for (size_t j=0;j<core->CD[i].size();j++) {
+			for (size_t j=0;j<CD[i].size();j++) {
 				char description[] = {'C', 'D', '1'+i, '/', 'd', 'a', 't', 'a', '\0'};
-				PathJoin( path, core->CD[i][j].c_str(), core->GameDataPath, NULL);
+				PathJoin( path, CD[i][j].c_str(), GameDataPath, NULL);
 				gamedata->AddSource(path, description, PLUGIN_RESOURCE_DIRECTORY);
 			}
 		}
@@ -3028,7 +3028,7 @@ void Interface::GameLoop(void)
 	//in multi player (if we ever get to it), only the server must call this
 	if (update_scripts) {
 		if ( game->selected.size() > 0 ) {
-			gc->ChangeMap(core->GetFirstSelectedPC(true), false);
+			gc->ChangeMap(GetFirstSelectedPC(true), false);
 		}
 		// the game object will run the area scripts as well
 		game->UpdateScripts();
@@ -5115,7 +5115,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 
 	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 	do {
-		core->DrawWindows();
+		DrawWindows();
 		for (size_t i=0;i<CD[disc_number-1].size();i++) {
 			char name[_MAX_PATH];
 

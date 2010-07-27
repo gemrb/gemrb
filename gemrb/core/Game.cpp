@@ -1480,8 +1480,25 @@ static const Color TimeStopTint={0xe0,0xe0,0xe0,0x20}; //greyscale
 static const Color DreamTint={0xf0,0xe0,0xd0,0x10};    //light brown scale
 static const Color NightTint={0x80,0x80,0xe0,0x40};    //dark, bluish
 static const Color DuskTint={0xe0,0x80,0x80,0x40};     //dark, reddish
+//TODO: make this actually lighter?
+static const Color InfraTint={0xff,0xa0,0xa0,0x40};     //dark, reddish
 static const Color FogTint={0xff,0xff,0xff,0x40};      //whitish
 static const Color DarkTint={0x80,0x80,0xe0,0x10};     //slightly dark bluish
+
+bool Game::Infravision() const
+{
+	Map *map = GetCurrentArea();
+	if (!map) return false;
+	for(size_t i=0;i<PCs.size();i++) {
+		Actor *actor = PCs[i];
+		if (!IsAlive(actor)) continue;
+		if (actor->GetCurrentArea()!=map) continue;
+		//Group infravision overrides this???
+		if (!actor->Selected) continue;
+		if (actor->GetStat(IE_STATE_ID) & STATE_INFRA) return true;
+	}
+	return false;
+}
 
 const Color *Game::GetGlobalTint() const
 {
@@ -1497,6 +1514,7 @@ const Color *Game::GetGlobalTint() const
 		//get daytime colour
 		ieDword daynight = ((GameTime/AI_UPDATE_TIME)%7200/300);
 		if (daynight<2 || daynight>22) {
+			if (Infravision()) return &InfraTint;
 			return &NightTint;
 		}
 		if (daynight>20 || daynight<4) {
@@ -1512,6 +1530,8 @@ const Color *Game::GetGlobalTint() const
 			return &FogTint;
 		}
 	}
+
+	if (Infravision() && core->GetFirstSelectedPC(true)->PCInDark()) return &InfraTint;
 	return NULL;
 }
 

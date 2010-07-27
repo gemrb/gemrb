@@ -6427,3 +6427,17 @@ bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range)
 	return srange<range;
 }
 
+bool Actor::PCInDark() const
+{
+        if (!this) return false;
+        int cx = Pos.x/16;
+        int cy = Pos.y/12;
+        Color tint = area->LightMap->GetPixel( cx, cy);
+        //FIXME:
+        //determine if tint is dark enough
+        if (tint.r+tint.g+tint.b<512) {
+                return true;
+        }
+        return false;
+}
+

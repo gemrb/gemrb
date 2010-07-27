@@ -664,5 +664,7 @@ public:
 	/* returns true if the spell is useless to cast on target
            or the spell's range is smaller than range */
 	bool InvalidSpellTarget(int spellnum, Actor *caster, int range);
+	/* returns true if the lightmap under the actor is dark */
+	bool PCInDark() const;
 };
 #endif

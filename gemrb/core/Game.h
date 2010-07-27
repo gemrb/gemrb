@@ -395,6 +395,8 @@ public:
 	void RestParty(int checks, int dream, int hp);
 	/** timestop effect initiated by actor */
 	void TimeStop(Actor *actor, ieDword end);
+	/** returns true if anyone selected has infravision */
+	bool Infravision() const;
 	/** gets the colour which should be applied over the game area,
 	may return NULL */
 	const Color *GetGlobalTint() const;
