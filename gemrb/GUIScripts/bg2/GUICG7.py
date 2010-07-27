@@ -55,10 +55,11 @@ def OnLoad():
 	IsMulti = GUICommon.IsMultiClassed (Slot, 1)
 	Level = GemRB.GetPlayerStat (Slot, IE_LEVEL)
 	if IsMulti[0]>1:
-		for i in range (2, IsMulti[0]+1):
+		for i in range (1, IsMulti[0]):
 			if CommonTables.ClassSkills.GetValue (IsMulti[i], 2, 0) != "*":
 				Level = GemRB.GetPlayerStat (Slot, IE_LEVEL2+i-1)
 			break
+
 	LUSpellSelection.OpenSpellsWindow (Slot, TableName, Level, Level, KitValue, 1)
 
 	return
