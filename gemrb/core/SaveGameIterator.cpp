@@ -456,7 +456,6 @@ static void CreateSavePath(char *Path, int index, const char *slotname)
 
 	char dir[_MAX_PATH];
 	snprintf( dir, _MAX_PATH, "%09d-%s", index, slotname );
-	snprintf( dir, _MAX_PATH, "%09d-%s", (int)index, slotname );
 	PathJoin(Path, Path, dir, NULL);
 	//this is required in case the old slot wasn't recognised but still there
 	core->DelTree(Path, false);
