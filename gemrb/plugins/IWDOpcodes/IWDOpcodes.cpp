@@ -2576,13 +2576,18 @@ seconds:
 }
 
 //417 AreaEffect
-//move these flags to a header file if used by elsewhere
+//move these flags to a header file if used elsewhere
 #define AE_REPEAT     1
 #define AE_TARGETEXCL 2
 
 int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_area_effect (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
+
+	//this effect ceases to affect dead targets
+	if (STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
 
 	Point pos(fx->PosX, fx->PosY);
 
