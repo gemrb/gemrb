@@ -32,6 +32,8 @@ Calendar::Calendar(void)
 	AutoTable tab("months");
 	if (!tab) {
 		monthnamecount=-1;
+		monthnames = NULL;
+		days = NULL;
 		return;
 	}
 	monthnamecount = tab->GetRowCount();
@@ -58,7 +60,7 @@ void Calendar::GetMonthName(int dayandmonth) const
 	for(int i=0;i<monthnamecount;i++) {
 		if (dayandmonth<days[i]) {
 			char *tmp;
-			
+
 			core->GetTokenDictionary()->SetAtCopy("DAY", dayandmonth+1);
 
 			tmp = core->GetString( monthnames[i] );

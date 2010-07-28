@@ -129,6 +129,7 @@ Interface::Interface(int iargc, char* iargv[])
 	RtRows = NULL;
 	sgiterator = NULL;
 	game = NULL;
+	calendar = NULL;
 	worldmap = NULL;
 	CurrentStore = NULL;
 	CurrentContainer = NULL;
