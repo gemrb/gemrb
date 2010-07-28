@@ -1087,7 +1087,7 @@ void GameControl::DisplayTooltip() {
 }
 
 //returns the appropriate cursor over an active region (trap, infopoint, travel region)
-int GameControl::GetCursorOverInfoPoint(InfoPoint *overInfoPoint)
+int GameControl::GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const
 {
 	if (target_mode == TARGET_MODE_PICK) {
 		if (overInfoPoint->VisibleTrap(0)) {
@@ -1104,7 +1104,7 @@ int GameControl::GetCursorOverInfoPoint(InfoPoint *overInfoPoint)
 }
 
 //returns the appropriate cursor over a door
-int GameControl::GetCursorOverDoor(Door *overDoor)
+int GameControl::GetCursorOverDoor(Door *overDoor) const
 {
 	if (target_mode == TARGET_MODE_PICK) {
 		if (overDoor->VisibleTrap(0)) {
@@ -1120,7 +1120,7 @@ int GameControl::GetCursorOverDoor(Door *overDoor)
 }
 
 //returns the appropriate cursor over a container (or pile)
-int GameControl::GetCursorOverContainer(Container *overContainer)
+int GameControl::GetCursorOverContainer(Container *overContainer) const
 {
 	if (target_mode == TARGET_MODE_PICK) {
 		if (overContainer->VisibleTrap(0)) {
@@ -1133,6 +1133,23 @@ int GameControl::GetCursorOverContainer(Container *overContainer)
 		return IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
 	}
 	return IE_CURSOR_TAKE;
+}
+
+int GameControl::GetDefaultCursor() const
+{
+	switch(target_mode) {
+	case TARGET_MODE_TALK:
+			return IE_CURSOR_TALK;
+		case TARGET_MODE_ATTACK:
+			return IE_CURSOR_ATTACK;
+		case TARGET_MODE_CAST:
+			return IE_CURSOR_CAST;
+		case TARGET_MODE_DEFEND:
+			return IE_CURSOR_DEFEND;
+		case TARGET_MODE_PICK:
+			return IE_CURSOR_PICK;
+		}
+	return IE_CURSOR_NORMAL;
 }
 
 /** Mouse Over Event */
@@ -2957,3 +2974,4 @@ void GameControl::SetDisplayText(ieStrRef text, unsigned int time)
 {
 	SetDisplayText(core->GetString(displaymsg->GetStringReference(text), 0), time);
 }
+

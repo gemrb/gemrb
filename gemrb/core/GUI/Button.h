@@ -80,7 +80,10 @@ class Palette;
 #define IE_GUI_BUTTON_CANCEL          0x00400000 // cancel key triggers it
 #define IE_GUI_BUTTON_CAPS            0x00800000 // convert text to uppercase
 
+//composite button flags
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
+#define IE_GUI_BUTTON_PORTRAIT     0x0000c002   // portrait
+#define IE_GUI_BUTTON_DISABLED_P   0x0000c003   // disabled portrait
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_BUTTON_ON_PRESS       0x00000000

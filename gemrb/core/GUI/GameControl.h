@@ -216,14 +216,16 @@ public:
 	void TryToDisarm(Actor *source, InfoPoint *tgt);
 	void PerformActionOn(Actor *actor);
 
+	// returns the default cursor fitting the targeting mode 
+	int GetDefaultCursor() const;
 	//containers
-	int GetCursorOverContainer(Container *overContainer);
+	int GetCursorOverContainer(Container *overContainer) const;
 	void HandleContainer(Container *container, Actor *actor);
 	//doors
-	int GetCursorOverDoor(Door *overDoor);
+	int GetCursorOverDoor(Door *overDoor) const;
 	void HandleDoor(Door *door, Actor *actor);
 	//infopoints
-	int GetCursorOverInfoPoint(InfoPoint *overInfoPoint);
+	int GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const;
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
 
 	Point GetFormationOffset(ieDword formation, ieDword pos);

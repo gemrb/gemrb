@@ -28,6 +28,7 @@
 #include "Palette.h"
 #include "Variables.h"
 #include "Video.h"
+#include "GameControl.h"
 
 Button::Button()
 {
@@ -501,6 +502,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 
 void Button::OnMouseOver(unsigned short x, unsigned short y)
 {
+	Owner->Cursor = IE_CURSOR_NORMAL;
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
@@ -510,11 +512,18 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 	}
 
+	//well, no more flags for buttons, and the portraits we can perform action on
+	//are in fact 'draggable multiline pictures' (with image)
+	if ((Flags & IE_GUI_BUTTON_DISABLED_P) == IE_GUI_BUTTON_PORTRAIT) {
+		GameControl *gc = core->GetGameControl();
+		if (gc) {
+			Owner->Cursor = gc->GetDefaultCursor();
+		}
+	}
+
 	if (State == IE_GUI_BUTTON_LOCKED) {
 		return;
 	}
-
-	Owner->Cursor = IE_CURSOR_NORMAL;
 
 	//portrait buttons are draggable and locked
 	if ((Flags & IE_GUI_BUTTON_DRAGGABLE) && 
