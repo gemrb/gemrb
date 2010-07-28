@@ -3457,7 +3457,7 @@ void CopyPolymorphStats(Actor *source, Actor *target)
 	//copy polymorphed stats, no need of using STAT_SET, because the stats
 	//are copied from a consistent state
 	for(i=0;i<polystatcount;i++) {
-		target->Modified[polymorph_stats[i]]=source->Modified[polymorph_stats[i]];
+		target->SetStat(polymorph_stats[i], source->Modified[polymorph_stats[i]], 1);
 	}
 }
 
@@ -3482,12 +3482,13 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	//copy the animation ID; never resets back! shapeshift to natural doesn't work either
-	//target->SetAnimationID( newCreature->GetStat(IE_ANIMATION_ID) );
 	//TODO: also change the inventory paper doll
 
 	//copy all polymorphed stats
 	if(fx->Parameter2) {
+		//copy only the animation ID
+		target->SetStat(IE_ANIMATION_ID, newCreature->GetStat(IE_ANIMATION_ID), 1);
+	} else {
 		STAT_SET( IE_POLYMORPHED, 1 );
 		//FIXME: of course, the first parameter should be the creature we copy
 		CopyPolymorphStats(newCreature, target);
