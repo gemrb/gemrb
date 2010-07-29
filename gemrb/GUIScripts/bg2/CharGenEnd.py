@@ -188,6 +188,10 @@ def OnLoad():
  			GemRB.ChangeItemFlag (MyChar, targetslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 			inventory_exclusion |= item['Exclusion']
 
+		# grant the slayer change ability
+		# using 1 instead of MyChar, so only the protagonist gets it in multiplayer
+		GemRB.LearnSpell (1, "SPIN822", LS_MEMO)
+
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
 		if GemRB.GetVar("GUIEnhancements"):
