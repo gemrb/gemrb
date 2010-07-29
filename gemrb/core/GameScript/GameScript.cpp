@@ -1816,6 +1816,13 @@ bool GameScript::Update(bool *continuing, bool *done)
 	return true;
 }
 
+//FIXME: cutscene execution is even more simpler than this implementation
+//CutSceneID is a dummy object, a placeholder for the cutscene object
+//when evaluating all blocks (filling cutscene object action queues,
+//IE simply takes the first action's object for cutscene object
+//then adds these actions to its queue:
+// SetInterrupt(false), <actions>, SetInterrupt(true)
+
 void GameScript::EvaluateAllBlocks()
 {
 	if (!MySelf || !(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
