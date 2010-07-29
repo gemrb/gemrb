@@ -98,7 +98,12 @@ def GetActorPaperDoll (actor):
 	level = GemRB.GetPlayerStat (actor, IE_ARMOR_TYPE)
 	row = "0x%04X" %anim_id
 	which = "LEVEL%d" %(level+1)
-	return CommonTables.Pdolls.GetValue (row, which)
+	doll = CommonTables.Pdolls.GetValue (row, which)
+	if doll == "*":
+		print "GetActorPaperDoll: Missing paper doll for animation", row, which
+	else:
+		print "GetActorPaperDoll", doll
+	return doll
 
 def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
