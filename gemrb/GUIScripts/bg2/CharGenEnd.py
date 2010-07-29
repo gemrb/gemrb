@@ -49,6 +49,10 @@ def OnLoad():
 	LUCommon.SetupLore (MyChar)
 	LUCommon.SetupHP (MyChar)
 
+	# no table for innates, so we make it a high value
+	# to guarantee innate, class ability and HLA memorization works
+	GemRB.SetMemorizableSpellsCount (MyChar, 50, IE_SPELL_TYPE_INNATE, 0)
+
 	# mage spells
 	TableName = CommonTables.ClassSkills.GetValue (Class, 2, 0)
 	if TableName != "*":
