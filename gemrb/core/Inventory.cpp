@@ -131,7 +131,12 @@ inline void HackCharges(CREItem *item)
 			}
 			ITMExtHeader *h = itm->GetExtHeader(i);
 			if (h && !(h->RechargeFlags&IE_ITEM_RECHARGE)) {
-				item->Usages[i]=h->Charges;
+				//HACK: the original (bg2) allows for 0 charged gems
+				if (h->Charges) {
+					item->Usages[i] = h->Charges;
+				} else {
+					item->Usages[i] = 1;
+				}
 			}
 		}
 		gamedata->FreeItem( itm, item->ItemResRef, false );
