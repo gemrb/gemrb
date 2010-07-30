@@ -411,11 +411,7 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 		identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
 		magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL
 
-		# TODO: figure out this mess
-#		if item["StackAmount"] > 1:
-#			Button.SetText (str (item["StackAmount"])) # wrong for potions, correct for arrows
-#		if Slot["Usages0"] > 1:
-#			Button.SetText (str (Slot["Usages0"])) # this has the correct value for potions, but not for gems (0)
+		# StackAmount holds the *maximum* item count in the stack while Usages0 holds the actual
 		if item["StackAmount"] > 1:
 			Button.SetText (str (Slot["Usages0"]))
 		else:
