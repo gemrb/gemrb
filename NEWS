@@ -1,13 +1,15 @@
-GemRB git (e5fb6d):
+GemRB git (b4f3f54e):
   New features:
     - 
-    - new triggers, actions
+    - dualclassing for bg1 and iwd
+    - new triggers, actions, infravision
     - feet circle flickering on portrait hover
     - wisdom xp bonus (pst)
 
   Improved features:
     - 
-    - projectiles, subtitles, verbal constants
+    - item loading and ability selection
+    - projectiles, effects, subtitles, verbal constants
     - the core and guiscript design was cleaned up in many places
     - bugfixes
 
