@@ -317,7 +317,6 @@ void Variables::SetAtCopy(const char* key, const char* value)
 {
 	size_t len = strlen(value)+1;
 	char *str=(char *) malloc(len);
-	memcpy(str,value,len);
 	SetAt(key, str);
 }
 
@@ -325,7 +324,6 @@ void Variables::SetAtCopy(const char* key, int newValue)
 {
 	char tmpstr[10]; // should be enough
 	sprintf(tmpstr, "%d", newValue);
-
 	SetAtCopy(key, tmpstr);
 }
 
@@ -333,6 +331,9 @@ void Variables::SetAt(const char* key, char* value)
 {
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
+
+  assert(strlen(key)<256);
+  assert(key[0]!=-51);
 
 	assert( m_type == GEM_VARIABLES_STRING );
 	if (( pAssoc = GetAssocAt( key, nHash ) ) == NULL) {
@@ -385,6 +386,7 @@ void Variables::SetAt(const char* key, void* value)
 		pAssoc->Value.pValue = value;
 		pAssoc->nHashValue = nHash;
 	}
+
 }
 
 
@@ -451,6 +453,7 @@ void Variables::LoadInitialValues(const char* name)
 	char buffer[41];
 	ieDword value;
 	buffer[40] = 0;
+	ieVariable varname;
 	
 	// first value is useless
 	if (!fs.Read(buffer, 40)) return;
@@ -461,9 +464,9 @@ void Variables::LoadInitialValues(const char* name)
 		if (!fs.Read(buffer, 40)) return;
 		if (fs.ReadDword(&value) != 4) return;
 		// is it the type we want? if not, skip
-		if (strncmp(buffer, name, 6)) continue;
-		// set variable (types have two extra spaces)
-		SetAt(buffer + 8, value);
-	}
+		if (strnicmp(buffer, name, 6)) continue;
+		// copy variable (types got 2 extra spaces, and the name is padded too)
+		strnspccpy(varname,buffer+8,32);
+		SetAt(varname, value);
+	}  
 }
-

@@ -233,6 +233,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	if(core->HasFeature(GF_HAS_KAPUTZ) ) {
 		newGame->kaputz = new Variables();
 		newGame->kaputz->SetType( GEM_VARIABLES_INT );
+		newGame->kaputz->ParseKey( 1 );
 		// load initial values from var.var
 		newGame->kaputz->LoadInitialValues("KAPUTZ");
 		str->Seek( KillVarsOffset, GEM_STREAM_START );
@@ -746,7 +747,7 @@ int GAMImporter::PutVariables(DataStream *stream, Game *game)
 	for (unsigned int i=0;i<GlobalCount;i++) {
 		//global variables are locals for game, that's why the local/global confusion
 		pos=game->locals->GetNextAssoc( pos, name, value);
-		strnspccpy(tmpname,name,32);
+		strnspccpy(tmpname, name, 32);
 		stream->Write( tmpname, 32);
 		stream->Write( filling, 8);
 		stream->WriteDword( &value);

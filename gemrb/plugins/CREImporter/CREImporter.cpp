@@ -847,6 +847,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	act->SetupFist();
 	//initial setup
 	memcpy(act->Modified,act->BaseStats, sizeof(act->Modified));
+
 	return act;
 }
 
@@ -1042,6 +1043,7 @@ void CREImporter::GetActorPST(Actor *act)
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
 	strnspccpy(act->KillVar, KillVar, 32);
+	memset(act->IncKillVar, 0, 32);
 
 	str->ReadDword( &KnownSpellsOffset );
 	str->ReadDword( &KnownSpellsCount );
