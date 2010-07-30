@@ -317,6 +317,7 @@ void Variables::SetAtCopy(const char* key, const char* value)
 {
 	size_t len = strlen(value)+1;
 	char *str=(char *) malloc(len);
+	memcpy(str,value,len);
 	SetAt(key, str);
 }
 
