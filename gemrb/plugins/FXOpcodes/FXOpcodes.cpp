@@ -2948,10 +2948,11 @@ int fx_detect_alignment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	ieDword msk;
 	ieDword stat;
+	static int ge[] = {AL_EVIL, AL_GE_NEUTRAL, AL_GOOD};
 
 	if (fx->Parameter2<3) {
-		//0,1,2 -> 1,2,3
-		msk = fx->Parameter2+1;
+		//0,1,2 -> 3,2,1
+		msk = ge[fx->Parameter2];
 		stat = target->GetStat(IE_ALIGNMENT)&AL_GE_MASK;
 	}
 	else {
