@@ -1466,8 +1466,11 @@ static void InitActorTables()
 		if (tm) {
 			for(i=0;i<VCONST_COUNT;i++) {
 				const char *tmp = tm->QueryField( i, 0 );
-				if (tmp[0]!='*') {
-					csound[i]=tmp[0];
+				switch(tmp[0]) {
+					case '*': break;
+					//I have no idea what this ! mean
+					case '!': csound[i]=tmp[1]; break;
+					default: csound[i]=tmp[0]; break;
 				}
 			}
 		}
