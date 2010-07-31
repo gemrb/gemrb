@@ -3691,8 +3691,11 @@ void Actor::GetNextStance()
 
 int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 {
-	if (spellbook.HaveSpell(spellname, 0) ) {
-		return LSR_KNOWN;
+	//don't fail if the spell is also memorized (for innates)
+	if (! (flags&LS_MEMO)) {
+		if (spellbook.HaveSpell(spellname, 0) ) {
+			return LSR_KNOWN;
+		}
 	}
 	Spell *spell = gamedata->GetSpell(spellname);
 	if (!spell) {
