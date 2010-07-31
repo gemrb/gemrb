@@ -1520,11 +1520,11 @@ int fx_set_poisoned_state (Scriptable* Owner, Actor* target, Effect* fx)
 
 	switch(fx->Parameter2) {
 	case RPD_ROUNDS:
-		tmp *= ROUND_SECONDS;
+		tmp *= core->Time.round_sec;
 		damage = 1;
 		break;
 	case RPD_TURNS:
-		tmp *= ROUND_PER_TURN*ROUND_SECONDS;
+		tmp *= core->Time.turn_sec;
 		damage = 1;
 		break;
 	case RPD_SECONDS:
@@ -1863,7 +1863,7 @@ int power_word_stun_iwd2(Actor *target, Effect *fx)
 	else stuntime = core->Roll(4,4,0);
 	fx->Parameter2 = 0;
 	fx->TimingMode = FX_DURATION_ABSOLUTE;
-	fx->Duration = stuntime*6*ROUND_SIZE + core->GetGame()->GameTime;
+	fx->Duration = stuntime*6*core->Time.round_size + core->GetGame()->GameTime;
 	STATE_SET( STATE_STUNNED );
 	target->AddPortraitIcon(PI_STUN);
 	return FX_APPLIED;
@@ -2738,11 +2738,10 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	switch(fx->Parameter2) {
 	case RPD_TURNS:		//restore param3 hp every param1 turns
-		//assuming 1 turn = 10 rounds
-		tmp *= ROUND_PER_TURN;
+		tmp *= core->Time.rounds_per_turn;
 		//fall
 	case RPD_ROUNDS:	//restore param3 hp every param1 rounds
-		tmp *= ROUND_SECONDS;
+		tmp *= core->Time.round_sec;
 		//fall
 	case RPD_SECONDS:	//restore param3 hp every param1 seconds
 		fx->Parameter3 = nextHeal + tmp*AI_UPDATE_TIME;
@@ -4617,7 +4616,7 @@ int fx_power_word_stun (Scriptable* Owner, Actor* target, Effect* fx)
 	stat = (stat * 3 + limit - 1) / limit;
 	//delay will be calculated as 1dx/2dx/3dx
 	//depending on the current hitpoints (or the stat in param2)
-	stat = core->Roll(stat,x?x:4,0) * ROUND_SIZE;
+	stat = core->Roll(stat,x?x:4,0) * core->Time.round_size;
 	fx->Duration = core->GetGame()->GameTime+stat;
 	fx->TimingMode = FX_DURATION_ABSOLUTE;
 	fx->Opcode = EffectQueue::ResolveEffect(fx_set_stun_state_ref);
@@ -4757,7 +4756,7 @@ int fx_power_word_sleep (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	//translate this effect to a normal sleep effect
 	//recalculate delay
-	fx->Duration = core->GetGame()->GameTime+x*ROUND_SIZE;
+	fx->Duration = core->GetGame()->GameTime+x*core->Time.round_size;
 	fx->TimingMode = FX_DURATION_ABSOLUTE;
 	fx->Opcode = EffectQueue::ResolveEffect(fx_sleep_ref);
 	fx->Parameter2=0;

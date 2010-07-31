@@ -709,6 +709,21 @@ bool Interface::ReadAbilityTables()
 	return true;
 }
 
+bool Interface::ReadGameTimeTable()
+{
+	AutoTable table("gametime");
+	if (!table) {
+		return false;
+	}
+
+	Time.round_sec = atoi(table->QueryField("ROUND_SECONDS", "DURATION"));
+	Time.turn_sec = atoi(table->QueryField("TURN_SECONDS", "DURATION"));
+	Time.round_size = Time.round_sec * AI_UPDATE_TIME;
+	Time.rounds_per_turn = Time.turn_sec / Time.round_sec;
+
+	return true;
+}
+
 bool Interface::ReadAuxItemTables()
 {
 	int idx;
@@ -1680,6 +1695,14 @@ int Interface::Init()
 			printStatus( "NOT FOUND", YELLOW );
 		}
 	}
+
+	ret = ReadGameTimeTable();
+	printMessage( "Core", "Reading game time table...", WHITE);
+	if (!ret) {
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
+	}
+	printStatus( "OK", LIGHT_GREEN );
 
 	ret = ReadAuxItemTables();
 	printMessage( "Core", "Reading item tables...", WHITE);
