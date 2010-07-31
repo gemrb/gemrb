@@ -28,6 +28,7 @@ import CommonTables
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
+from ie_action import ACT_CAST
 
 PriestWindow = None
 PriestSpellInfoWindow = None
@@ -176,12 +177,12 @@ def UpdatePriestWindow ():
 			Button.SetTooltip ('')
 			Button.EnableBorder (0, 0)
 
-	Class = GemRB.GetPlayerStat (GemRB.GameGetSelectedPCSingle(), IE_CLASS)
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	DivineCaster = CommonTables.ClassSkills.GetValue (Class, 1)
 	if DivineCaster == "*":
 		# also check the DRUIDSPELL column
 		DivineCaster = CommonTables.ClassSkills.GetValue (Class, 0)
-	if DivineCaster == "*":
+	if DivineCaster == "*" or GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST):
 		Window.SetVisible (WINDOW_GRAYED)
 	else:
 		Window.SetVisible (WINDOW_VISIBLE)
