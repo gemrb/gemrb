@@ -4027,9 +4027,11 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 
 	//if any bit is true, the answer counts as true
 	int ret = (slotmatrix[item->ItemType]&slottype);
-	if (slottype == SLOT_INVENTORY || slottype == SLOT_ANY) {
+
+	//this part is not needed, in any case, don't use ret = 1
+	/*if (slottype == SLOT_INVENTORY || slottype == SLOT_ANY) {
 		ret = 1;
-	}
+	}*/
 	if (!ret) {
 		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
 		return 0;
@@ -4037,24 +4039,27 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 
 	//this warning comes only when feedback is enabled
 	if (feedback) {
-		if (slotmatrix[item->ItemType]&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
-			ret = 0;
-			if (slottype&SLOT_QUIVER) {
-				if (item->GetWeaponHeader(true)) ret = 1;
+		//this was, but that disabled equipping of amber earrings in PST
+		//if (slotmatrix[item->ItemType]&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
+		if (ret&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
+			//don't ruin the return variable, it contains the usable slot bits
+			int flg = 0;
+			if (ret&SLOT_QUIVER) {
+				if (item->GetWeaponHeader(true)) flg = 1;
 			}
 
-			if (slottype&SLOT_WEAPON) {
+			if (ret&SLOT_WEAPON) {
 				//melee
-				if (item->GetWeaponHeader(false)) ret = 1;
+				if (item->GetWeaponHeader(false)) flg = 1;
 				//ranged
-				if (item->GetWeaponHeader(true)) ret = 1;
+				if (item->GetWeaponHeader(true)) flg = 1;
 			}
 
-			if (slottype&SLOT_ITEM) {
-				if (item->GetEquipmentHeaderNumber(0)!=0xffff) ret = 1;
+			if (ret&SLOT_ITEM) {
+				if (item->GetEquipmentHeaderNumber(0)!=0xffff) flg = 1;
 			}
 
-			if (!ret) {
+			if (!flg) {
 				displaymsg->DisplayConstantString(STR_UNUSABLEITEM, 0xf0f0f0);
 				return 0;
 			}
