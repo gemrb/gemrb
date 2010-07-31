@@ -249,7 +249,7 @@ def SpellsDonePress ():
 			return
 
 	# close our window and update our records
-	if SpellsWindow:
+	if SpellsWindow and (not chargen or GUICommon.GameIsBG2()):
 		SpellsWindow.Unload ()
 		SpellsWindow = None
 
