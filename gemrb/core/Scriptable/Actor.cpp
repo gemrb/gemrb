@@ -362,7 +362,8 @@ Actor::Actor()
 	}
 	projectileImmunity = (ieDword *) calloc(ProjectileSize,sizeof(ieDword));
 	AppearanceFlags = 0;
-	SetDeathVar = IncKillCount = 0;
+	SetDeathVar = IncKillCount = UnknownField = 0;
+	memset( DeathCounters, 0, sizeof(DeathCounters) );
 	InParty = 0;
 	TalkCount = 0;
 	InteractCount = 0; //numtimesinteracted depends on this
@@ -381,6 +382,7 @@ Actor::Actor()
 	localID = globalID = 0;
 	//this one is not saved
 	GotLUFeedback = false;
+	RollSaves();
 }
 
 Actor::~Actor(void)
