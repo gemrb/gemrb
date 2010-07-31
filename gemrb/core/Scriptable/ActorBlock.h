@@ -208,7 +208,6 @@ public:
 	ieDword LastCasterOnMe; //Last spellcaster on this scriptable
 	ieDword LastSpellSeen;  //Last spell seen to be cast
 	ieDword LastCasterSeen; //Last spellcaster seen
-	unsigned long playDeadCounter;  //this should be handled by the playdead action
 	Point LastTargetPos;
 	int SpellHeader;
 public:

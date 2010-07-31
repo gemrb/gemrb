@@ -78,7 +78,6 @@ Scriptable::Scriptable(ScriptableType type)
 
 	interval = ( 1000 / AI_UPDATE_TIME );
 	WaitCounter = 0;
-	playDeadCounter = 0;
 	if (Type == ST_ACTOR) {
 		InternalFlags = IF_VISIBLE | IF_ONCREATION | IF_USEDSAVE;
 	} else {
@@ -382,7 +381,6 @@ void Scriptable::ClearActions()
 	}
 	actionQueue.clear();
 	WaitCounter = 0;
-	playDeadCounter = 0; // i'm not sure about this
 	LastTarget = 0;
 	//clear the triggers as fast as possible when queue ended?
 	ClearTriggers();
@@ -423,13 +421,6 @@ void Scriptable::ProcessActions(bool force)
 		return;
 	}
 	startTime = thisTime;
-	if (playDeadCounter) {
-		playDeadCounter--;
-		if (!playDeadCounter) {
-			Movable* mov = ( Movable* ) this;
-			mov->SetStance( IE_ANI_GET_UP );
-		}
-	}
 	if (WaitCounter) {
 		WaitCounter--;
 		if (WaitCounter) return;

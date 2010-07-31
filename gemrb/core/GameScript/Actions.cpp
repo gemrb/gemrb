@@ -3322,32 +3322,37 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (Sender->CurrentActionState == 0) {
-		Sender->CurrentActionState = 1;
+		// TODO: what if parameter is 0? see orphan2
+		Sender->CurrentActionState = parameters->int0Parameter;
 		actor->SetStance( IE_ANI_DIE );
-		actor->playDeadCounter = parameters->int0Parameter;
-		//the bg2 starting cutscene doesn't run well with NoInterrupt
-		//actor->NoInterrupt();
 		actor->CurrentActionInterruptable = false;
-	}
-	if (actor->playDeadCounter == 0) {
-		Sender->ReleaseCurrentAction();
+	} else {
+		actor->CurrentActionState--;
+		if (Sender->CurrentActionState == 0) {
+			actor->SetStance( IE_ANI_GET_UP );
+			Sender->ReleaseCurrentAction();
+		}
 	}
 }
 
-/** no difference at this moment, but this action should be interruptable */
-/** probably that means, we don't have to issue the SetWait, but this needs */
-/** further research */
 void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetStance( IE_ANI_DIE );
-	//also set time for playdead!
-	actor->playDeadCounter = parameters->int0Parameter;
-	actor->SetWait( 1 );
-	Sender->ReleaseCurrentAction(); // todo, blocking?
+	if (Sender->CurrentActionState == 0) {
+		// TODO: what if parameter is 0? see orphan2
+		Sender->CurrentActionState = parameters->int0Parameter;
+		actor->SetStance( IE_ANI_DIE );
+	} else {
+		actor->CurrentActionState--;
+		if (Sender->CurrentActionState == 0) {
+			actor->SetStance( IE_ANI_GET_UP );
+			Sender->ReleaseCurrentAction();
+		}
+	}
 }
 
 /* this may not be correct, just a placeholder you can fix */
