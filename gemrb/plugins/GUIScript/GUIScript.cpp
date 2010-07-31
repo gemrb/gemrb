@@ -9785,7 +9785,33 @@ bool GUIScript::RunFunction(const char *ModuleName, const char* FunctionName, bo
 /** Exec a single String */
 void GUIScript::ExecString(const char* string)
 {
-	if (PyRun_SimpleString( (char *) string ) == -1) {
+	char *buffer;
+	char include[_MAX_PATH];
+	FileStream fs;
+
+	PathJoin(include, core->GUIScriptsPath, "GUIScripts/include.py", NULL);
+	
+	int len1 = 0;
+	int len2 = strlen(string)+1;
+        if (fs.Open( include, true )) {
+		len1 = fs.Remains();
+		if (len1<0) len1=0;
+	}
+
+	buffer = (char *) malloc(len1+len2);
+	if (!buffer) {
+		return;
+	}
+
+	if (len1) {
+		len1 = fs.Read(buffer, len1);
+		if (len1==GEM_ERROR) len1=0;
+	}
+	memcpy(buffer+len1, string, len2);
+
+	int ret = PyRun_SimpleString( (char *) buffer );
+	free(buffer);
+	if (ret == -1) {
 		if (PyErr_Occurred()) {
 			PyErr_Print();
 		}
