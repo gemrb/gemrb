@@ -559,6 +559,11 @@ void Interface::HandleEvents()
 		return;
 	}
 
+	if (EventFlag&EF_CLOSECONTAINER) {
+		EventFlag&=~EF_CLOSECONTAINER;
+		guiscript->RunFunction( "GUIWORLD", "CloseContainerWindow" );
+		return;
+	}
 }
 
 /* handle main loop events that might destroy or create windows

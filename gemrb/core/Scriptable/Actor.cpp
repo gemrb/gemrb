@@ -48,6 +48,9 @@
 
 #include <cassert>
 
+//configurable?
+ieDword ref_lightness = 43;
+
 static const Color green = {
 	0x00, 0xff, 0x00, 0xff
 };
@@ -751,7 +754,7 @@ void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 		hp=hptmp;
 	}
 	if ((signed) hp<=0) {
-		actor->Die(NULL);
+ 		actor->Die(NULL);
 	}
 	actor->BaseStats[IE_HITPOINTS]=hp;
 	actor->Modified[IE_HITPOINTS]=hp;
@@ -2426,6 +2429,11 @@ static EffectRef fx_sleep_ref={"State:Helpless", NULL, -1};
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 {
+  //won't get any more hurt
+  if (InternalFlags & IF_REALLYDIED) {
+    return 0;
+  }
+
 	//add lastdamagetype up ? maybe
 	LastDamageType|=damagetype;
 	if(hitter && hitter->Type==ST_ACTOR) {
@@ -2438,14 +2446,11 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	switch(modtype)
 	{
 	case MOD_ADDITIVE:
-		//damage = -NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
 		break;
 	case MOD_ABSOLUTE:
-		//damage = -NewBase(IE_HITPOINTS, (ieDword) damage, MOD_ABSOLUTE);
 		damage = GetBase(IE_HITPOINTS) - damage;
 		break;
 	case MOD_PERCENT:
-		//damage = -NewBase(IE_HITPOINTS, (ieDword) damage, MOD_PERCENT);
 		damage = GetStat(IE_MAXHITPOINTS) * 100 / damage;
 		break;
 	default:
@@ -2458,7 +2463,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	ModifyDamage (this, hitter, damage, resisted, damagetype, NULL, false);
 	if (damage) {
 		if (InParty) {
-			core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "CloseContainerWindow");
+      core->SetEventFlag(EF_CLOSECONTAINER);
 		}
 		GetHit();
 	}
@@ -2958,14 +2963,12 @@ void Actor::Die(Scriptable *killer)
 		SetBase(IE_HITPOINTS, minhp);
 		return;
 	}
+
 	//Can't simply set Selected to false, game has its own little list
 	Game *game = core->GetGame();
 	game->SelectActor(this, false, SELECT_NORMAL);
 	game->OutAttack(GetID());
 
-	ClearActions();
-	ClearPath();
-	SetModal( MS_NONE );
 	displaymsg->DisplayConstantStringName(STR_DEATH, 0xffffff, this);
 	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
 
@@ -3052,6 +3055,12 @@ void Actor::Die(Scriptable *killer)
 			}
 		}
 	}
+
+	//moved clear actions after xp is given
+	//it clears some triggers, including the LastHitter
+	ClearActions();
+	ClearPath();
+	SetModal( MS_NONE );
 
 	ieDword value = 0;
 	ieVariable varname;
@@ -3822,7 +3831,9 @@ void Actor::InitRound(ieDword gameTime)
 	attackcount >>= 1;
 
 	//make sure we always get at least 1apr
-	if (attackcount < 1)      attackcount = 1;
+	if (attackcount < 1) {
+		attackcount = 1;
+	}
 
 	//set our apr and starting round time
 	attacksperround = attackcount;
@@ -6369,7 +6380,6 @@ bool Actor::TryToHide() {
 	ieDword lightness = game->GetCurrentArea()->GetLightLevel(Pos);
 	// seems to be the color overlay at midnight; lightness of a point with rgb (200, 100, 100)
 	// TODO: but our NightTint computes to a higher value, which one is bad?
-	ieDword ref_lightness = 43;
 	ieDword light_diff = int((lightness - ref_lightness) * 100 / (100 - ref_lightness)) / 2;
 	ieDword chance = (100 - light_diff) * skill/100;
 
@@ -6429,15 +6439,11 @@ bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range)
 
 bool Actor::PCInDark() const
 {
-        if (!this) return false;
-        int cx = Pos.x/16;
-        int cy = Pos.y/12;
-        Color tint = area->LightMap->GetPixel( cx, cy);
-        //FIXME:
-        //determine if tint is dark enough
-        if (tint.r+tint.g+tint.b<512) {
-                return true;
-        }
-        return false;
+	if (!this) return false;
+	unsigned int level = area->GetLightLevel(Pos);
+	if (level<ref_lightness) {
+		return true;
+	}
+	return false;
 }
 

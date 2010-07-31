@@ -3325,7 +3325,9 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 		Sender->CurrentActionState = 1;
 		actor->SetStance( IE_ANI_DIE );
 		actor->playDeadCounter = parameters->int0Parameter;
-		actor->NoInterrupt();
+		//the bg2 starting cutscene doesn't run well with NoInterrupt
+		//actor->NoInterrupt();
+		actor->CurrentActionInterruptable = false;
 	}
 	if (actor->playDeadCounter == 0) {
 		Sender->ReleaseCurrentAction();
