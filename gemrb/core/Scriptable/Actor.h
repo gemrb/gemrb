@@ -190,7 +190,7 @@ public:
 	ieDword BaseStats[MAX_STATS];
 	ieDword Modified[MAX_STATS];
 	ieByteSigned DeathCounters[4];   //PST specific (good, law, lady, murder)
-	
+
 	ieResRef applyWhenHittingMelee;  //set melee effect
 	ieResRef applyWhenHittingRanged; //set ranged effect
 	ieResRef applyWhenNearLiving;    //cast spell on condition
@@ -321,6 +321,7 @@ private:
 	/** Re/Inits the Modified vector for PCs/NPCs */
 	void RefreshPCStats();
 	bool ShouldHibernate();
+  void ApplyClassClab(ieDword cls, bool remove);
 public:
 	Actor(void);
 	~Actor(void);
@@ -459,7 +460,9 @@ public:
 	/* sets some of the internal flags */
 	void SetRunFlags(ieDword flags);
 	/* applies the kit abilities, returns false if kit is not applicable */
-	bool ApplyKit(ieDword Value);
+	bool ApplyKit(ieDword Value, bool remove);
+	/* applies the class abilities*/
+	void ApplyClassClab(bool remove);
 	/* calls InitQuickSlot in PCStatStruct */
 	void SetupQuickSlot(unsigned int which, int slot, int headerindex);
 	/* returns true if the actor is PC/joinable*/
@@ -580,7 +583,7 @@ public:
 	void ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent);
 	/* If it returns true, then default AC=10 and the lesser the better */
 	int IsReverseToHit();
-	/* initialize the action buttons based on class. If forced, it will override 
+	/* initialize the action buttons based on class. If forced, it will override
 		previously customized or set buttons. */
 	void InitButtons(ieDword cls, bool forced);
 	void SetFeat(unsigned int feat, int mode);

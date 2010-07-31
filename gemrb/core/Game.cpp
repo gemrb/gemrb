@@ -384,6 +384,9 @@ int Game::JoinParty(Actor* actor, int join)
 	//set the lastjoined trigger
 
 	if (join&JP_JOIN) {
+		//update kit abilities of actor
+		actor->ApplyKit(actor->GetBase(IE_KIT), false);
+		actor->ApplyClassClab(false);
 		actor->PCStats->JoinDate = GameTime;
 		if (size) {
 			ieDword id = actor->GetID();

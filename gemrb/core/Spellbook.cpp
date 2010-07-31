@@ -291,8 +291,8 @@ bool Spellbook::RemoveSpell(CREKnownSpell* spell)
 	return false;
 }
 
-
 //removes all instances of spellid (probably not needed)
+//IWD2 clab files use it
 void Spellbook::RemoveSpell(int spellid)
 {
 	int type = spellid/1000;

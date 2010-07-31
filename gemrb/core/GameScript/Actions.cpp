@@ -4062,6 +4062,7 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->SetMCFlag(MC_FALLEN_PALADIN, BM_OR);
+	act->ApplyKit(act->GetBase(IE_KIT), true);
 }
 
 void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -4071,6 +4072,7 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->SetMCFlag(MC_FALLEN_RANGER, BM_OR);
+	act->ApplyKit(act->GetBase(IE_KIT), true);
 }
 
 void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
@@ -4080,6 +4082,7 @@ void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->SetMCFlag(MC_FALLEN_PALADIN, BM_NAND);
+	act->ApplyKit(act->GetBase(IE_KIT), false);
 }
 
 void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -4089,6 +4092,7 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->SetMCFlag(MC_FALLEN_RANGER, BM_NAND);
+	act->ApplyKit(act->GetBase(IE_KIT), false);
 }
 
 //transfering item from Sender to target, target must be an actor
@@ -6389,6 +6393,7 @@ void GameScript::ChangeColor(Scriptable* Sender, Action* parameters)
 	scr->SetBase(stat, (scr->GetBase(stat)&~255)|(parameters->int1Parameter&255));
 }
 
+//removes previous kit, adds new
 void GameScript::AddKit(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -6396,9 +6401,13 @@ void GameScript::AddKit(Scriptable* Sender, Action* parameters)
 	}
 	Actor *scr = (Actor *) Sender;
 	//remove previous kit stuff
+	scr->ApplyKit(scr->GetBase(IE_KIT), false);
+	//this adds the current level abilities
 	scr->SetBase(IE_KIT, parameters->int0Parameter);
+	scr->ApplyKit(scr->GetBase(IE_KIT), true);
 }
 
+//doesn't remove old kit
 void GameScript::AddSuperKit(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -6406,6 +6415,7 @@ void GameScript::AddSuperKit(Scriptable* Sender, Action* parameters)
 	}
 	Actor *scr = (Actor *) Sender;
 	scr->SetBase(IE_KIT, parameters->int0Parameter);
+	scr->ApplyKit(scr->GetBase(IE_KIT), true);
 }
 
 void GameScript::SetSelection(Scriptable* /*Sender*/, Action* parameters)

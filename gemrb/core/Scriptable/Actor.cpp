@@ -72,6 +72,7 @@ static int classcount = -1;
 static char **clericspelltables = NULL;
 static char **druidspelltables = NULL;
 static char **wizardspelltables = NULL;
+static char **classabilities = NULL;
 static int *turnlevels = NULL;
 static int *booktypes = NULL;
 static int *xpbonus = NULL;
@@ -125,6 +126,11 @@ static const int mcwasflags[11] = {
 static const char *isclassnames[11] = {
 	"FIGHTER", "MAGE", "THIEF", "BARBARIAN", "BARD", "CLERIC",
 	"DRUID", "MONK", "PALADIN", "RANGER", "SORCERER" };
+
+//fighter is the default level here
+//fixme, make this externalized
+static const int levelslotsbg[21]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERIC, ISTHIEF,
+	ISBARD, ISPALADIN, 0, 0, 0, 0, ISDRUID, ISRANGER, 0,0,0,0,0,0,ISSORCERER, ISMONK};
 static const int levelslotsiwd2[11]={IE_LEVELFIGHTER,IE_LEVELMAGE,IE_LEVELTHIEF,
 	IE_LEVELBARBARIAN,IE_LEVELBARD,IE_LEVELCLERIC,IE_LEVELDRUID,IE_LEVELMONK,
 	IE_LEVELPALADIN,IE_LEVELRANGER,IE_LEVELSORCEROR};
@@ -160,8 +166,8 @@ static unsigned int monkbon_rows = 0;
 
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
- ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
- ACT_NONE, ACT_INNATE};
+	ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
+	ACT_NONE, ACT_INNATE};
 static int QslotTranslation = false;
 static int DeathOnZeroStat = true;
 static ieDword TranslucentShadows = 0;
@@ -566,7 +572,7 @@ void Actor::SetCircleSize()
 	SetCircle( anims->GetCircleSize(), *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
 
-void ApplyClab(Actor *actor, const char *clab, int level)
+void ApplyClab(Actor *actor, const char *clab, int level, bool remove)
 {
 	AutoTable table(clab);
 	if (table) {
@@ -574,23 +580,40 @@ void ApplyClab(Actor *actor, const char *clab, int level)
 		for(int i=0;i<level;i++) {
 			for (int j=0;j<row;j++) {
 				const char *res = table->QueryField(j,i);
+				if (res[0]=='*') continue;
+
 				if (!memcmp(res,"AP_",3)) {
-					core->ApplySpell(res+2, actor, actor, 0);
+					if (remove) {
+						actor->fxqueue.RemoveAllEffects(res+3);
+					} else {
+						core->ApplySpell(res+3, actor, actor, 0);
+					}
 				}
 				else if (!memcmp(res,"GA_",3)) {
-					actor->LearnSpell(res+2, 0);
+					if (remove) {
+						actor->spellbook.RemoveSpell(res+3);
+					} else {
+						actor->LearnSpell(res+3, LS_MEMO);
+					}
 				}
 				else if (!memcmp(res,"FA_",3)) {//iwd2 only
+					//memorize these
 					int x=atoi(res+3);
-					displaymsg->DisplayStringName(x,0xffffff,actor,0);
+					ieResRef resref;
+					ResolveSpellName(resref, x);
+					actor->LearnSpell(resref, LS_MEMO);
 				}
-				else if (!memcmp(res,"FS_",3)) {//iwd2? (song?)
+				else if (!memcmp(res,"FS_",3)) {//iwd2 only
+					//don't memorize these
 					int x=atoi(res+3);
-					displaymsg->DisplayStringName(x,0xffffff,actor,0);
+					ieResRef resref;
+					ResolveSpellName(resref, x);
+					actor->LearnSpell(resref, 0);
 				}
-				else if (!memcmp(res,"RA_",3)) {//iwd2
+				else if (!memcmp(res,"RA_",3)) {//iwd2 only
+					//remove ability
 					int x=atoi(res+3);
-					displaymsg->DisplayStringName(x,0xffffff,actor,0);
+					actor->spellbook.RemoveSpell(x);
 				}
 			}
 		}
@@ -602,40 +625,91 @@ void ApplyClab(Actor *actor, const char *clab, int level)
 #define KIT_BASECLASS 0x40000000
 
 //applies a kit on the character (only bg2)
-bool Actor::ApplyKit(ieDword Value)
+bool Actor::ApplyKit(ieDword Value, bool remove)
 {
-	//get current unmodified level (i guess)
-	int level = GetXPLevel(false);
 	AutoTable table("kitlist");
-	if (table) {
-		ieDword row;
-		//find row by unusability
-		row = table->GetRowCount();
-		while (row) {
-			row--;
-			ieDword Unusability = (ieDword) strtol(table->QueryField(row, 6),NULL,0);
-			if (Value == Unusability) {
-				goto found_row;
-			}
+	if (!table) {
+		return false;
+	}
+
+	ieDword row;
+	//find row by unusability
+	row = table->GetRowCount();
+	while (row) {
+		row--;
+		ieDword Unusability = (ieDword) strtol(table->QueryField(row, 6),NULL,0);
+		if (Value == Unusability) {
+			goto found_row;
 		}
-		//if it wasn't found, try the bg2 kit format
-		if ((Value&BG2_KITMASK)==KIT_BARBARIAN) {
-			row = (Value<<16);
-		}
-		//cannot find kit
-		if (table->GetRowCount()>=row) {
-			return false;
-		}
+	}
+	//if it wasn't found, try the bg2 kit format
+	if ((Value&BG2_KITMASK)==KIT_BARBARIAN) {
+		row = Value & 0xfff;
+	}
+	//cannot find kit
+	if (table->GetRowCount()<=row) {
+		return false;
+	}
 found_row:
-		ieDword cls = (ieDword) atoi(table->QueryField(row, 7));
-		if (cls!=BaseStats[IE_CLASS]) {
-			//cannot apply kit, because the class doesn't fit
-			return false;
+	//kit abilities
+	ieDword cls = (ieDword) atoi(table->QueryField(row, 7));
+	if (!cls || cls>=sizeof(levelslotsbg) ) {
+		return true;
+	}
+	const char *clab = table->QueryField(row, 4);
+
+	if (clab[0]=='*') {
+		return true;
+	}
+
+	ieDword max = GetClassLevel(levelslotsbg[cls]);
+
+	if (max) {
+		if (remove) {
+			ApplyClab(this, clab, max, true);
+		} else {
+			ApplyClab(this, clab, max, true);
+			ApplyClab(this, clab, max, false);
 		}
-		const char *clab = table->QueryField(row, 4);
-		ApplyClab(this, clab, level);
 	}
 	return true;
+}
+
+void Actor::ApplyClassClab(bool remove)
+{
+	//multi class
+	if (multiclass) {
+		ieDword msk = 1;
+		for(int i=1;(i<32) && (msk<=multiclass);i++) {
+			if (multiclass & msk) {
+				ApplyClassClab(i, remove);
+			}
+			msk+=msk;
+		}
+		return;
+	}
+	//single class
+	ApplyClassClab(GetBase(IE_CLASS), remove);
+}
+
+void Actor::ApplyClassClab(int cls, bool remove)
+{
+	if (cls>classcount) {
+		cls=0;
+	}
+	const char *clab = classabilities[cls];
+	if (clab[0]!='*') {
+		ieDword max = GetClassLevel(levelslotsbg[cls]);
+		if (max) {
+			//singleclass
+			if (remove) {
+				ApplyClab(this, clab, max, true);
+			} else {
+				ApplyClab(this, clab, max, true);
+				ApplyClab(this, clab, max, false);
+			}
+		}
+	}
 }
 
 //call this when morale or moralebreak changed
@@ -658,7 +732,7 @@ void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 }
 
 //this is a good place to recalculate level up stuff
-void pcf_level (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	ieDword sum =
 		actor->GetFighterLevel()+
@@ -674,6 +748,10 @@ void pcf_level (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		actor->GetSorcererLevel();
 	actor->SetBase(IE_CLASSLEVELSUM,sum);
 	actor->SetupFist();
+	if (newValue!=oldValue) {
+		actor->ApplyKit(actor->GetBase(IE_KIT), false);
+		actor->ApplyClassClab(false);
+	}
 	actor->GotLUFeedback = false;
 }
 
@@ -754,7 +832,7 @@ void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 		hp=hptmp;
 	}
 	if ((signed) hp<=0) {
- 		actor->Die(NULL);
+		actor->Die(NULL);
 	}
 	actor->BaseStats[IE_HITPOINTS]=hp;
 	actor->Modified[IE_HITPOINTS]=hp;
@@ -1073,6 +1151,15 @@ void Actor::ReleaseMemory()
 			free(wizardspelltables);
 			wizardspelltables=NULL;
 		}
+		if (classabilities) {
+			for (i=0;i<classcount;i++) {
+				if (classabilities[i]) {
+					free (classabilities[i]);
+				}
+			}
+			free(classabilities);
+			classabilities=NULL;
+		}
 		if (turnlevels) {
 			free(turnlevels);
 			turnlevels=NULL;
@@ -1250,6 +1337,7 @@ static void InitActorTables()
 		wizardspelltables = (char **) calloc(classcount, sizeof(char*));
 		turnlevels = (int *) calloc(classcount, sizeof(int));
 		booktypes = (int *) calloc(classcount, sizeof(int));
+		classabilities = (char **) calloc(classcount, sizeof(char*));
 
 		ieDword bitmask = 1;
 
@@ -1311,6 +1399,7 @@ static void InitActorTables()
 			if (!strnicmp(field, "CLABMO", 6)) {
 				isclass[ISMONK] |= bitmask;
 			}
+			classabilities[i]=strdup(field);
 			bitmask <<=1;
 		}
 	} else {
@@ -2195,7 +2284,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier)
 }
 
 /** implements a generic opcode function, modify modified stats
- returns the change
+returns the change
 */
 int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType)
 {
@@ -2429,10 +2518,10 @@ static EffectRef fx_sleep_ref={"State:Helpless", NULL, -1};
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 {
-  //won't get any more hurt
-  if (InternalFlags & IF_REALLYDIED) {
-    return 0;
-  }
+	//won't get any more hurt
+	if (InternalFlags & IF_REALLYDIED) {
+		return 0;
+	}
 
 	//add lastdamagetype up ? maybe
 	LastDamageType|=damagetype;
@@ -2463,7 +2552,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	ModifyDamage (this, hitter, damage, resisted, damagetype, NULL, false);
 	if (damage) {
 		if (InParty) {
-      core->SetEventFlag(EF_CLOSECONTAINER);
+			core->SetEventFlag(EF_CLOSECONTAINER);
 		}
 		GetHit();
 	}
