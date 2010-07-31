@@ -410,6 +410,7 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 
 	if ((Strref != -1) && !sb.Sound[0]) {
 		sb = core->strings->GetStringBlock( Strref );
+		memcpy(Sound, sb.Sound, sizeof(ieResRef) );
 		if (sb.text[0] && strcmp(sb.text," ") && (flags & DS_CONSOLE)) {
 			//can't play the sound here, we have to delay action
 			//and for that, we have to know how long the text takes
