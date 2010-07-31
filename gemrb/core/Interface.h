@@ -122,6 +122,13 @@ struct ModalStatesStruct {
 	bool aoe_spell;
 };
 
+struct TimeStruct {
+	unsigned int round_sec;
+	unsigned int turn_sec;
+	unsigned int round_size; // in ticks
+	unsigned int rounds_per_turn;
+};
+
 class ItemList {
 public:
 	ieResRef *ResRefs;
@@ -343,6 +350,7 @@ public:
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
 	std::vector<ModalStatesStruct> ModalStates;
+	TimeStruct Time;
 public:
 	Interface(int iargc, char *iargv[]);
 	~Interface(void);
@@ -659,6 +667,7 @@ private:
 	bool ReadMusicTable(const ieResRef name, int col);
 	bool ReadDamageTypeTable();
 	bool ReadReputationModTable();
+	bool ReadGameTimeTable();
 	bool ReadModalStates();
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);

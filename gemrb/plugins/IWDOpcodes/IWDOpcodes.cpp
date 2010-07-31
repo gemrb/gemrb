@@ -1701,13 +1701,13 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 		// for each kill the caster receives a +1 bonus to Str, Dex and Con for 1 turn
 		if (Owner->Type == ST_ACTOR) {
 			newfx = EffectQueue::CreateEffect(fx_str_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
-			newfx->Duration = ROUND_SECONDS * ROUND_PER_TURN;
+			newfx->Duration = core->Time.turn_sec;
 			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
 			newfx = EffectQueue::CreateEffect(fx_dex_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
-			newfx->Duration = ROUND_SECONDS * ROUND_PER_TURN;
+			newfx->Duration = core->Time.turn_sec;
 			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
 			newfx = EffectQueue::CreateEffect(fx_con_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
-			newfx->Duration = ROUND_SECONDS * ROUND_PER_TURN;
+			newfx->Duration = core->Time.turn_sec;
 			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
 		}
 		delete newfx;

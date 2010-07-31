@@ -4886,7 +4886,7 @@ void GameScript::AttackOneRound( Scriptable* Sender, Action* parameters)
 	}
 
 	if (!Sender->CurrentActionState) {
-		Sender->CurrentActionState = ROUND_SIZE;
+		Sender->CurrentActionState = core->Time.round_size;
 	}
 
 	AttackCore(Sender, tar, 0);

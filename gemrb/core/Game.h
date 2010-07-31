@@ -41,12 +41,6 @@ class Game;
 
 #include <vector>
 
-//the length of a round in game ticks?
-//default (ROUND_SIZE) is 6 seconds: 15 (AI_UPDATE_TIME)*6 (ROUND_SECODS)=90
-#define ROUND_SIZE     90
-#define ROUND_SECONDS  6
-#define ROUND_PER_TURN 10
-
 //the size of the bestiary register
 #define BESTIARY_SIZE 260
 

@@ -2475,7 +2475,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 		if ((damagetype & DAMAGE_STUNNING) && Modified[IE_MINHITPOINTS] <= 0) {
 			NewBase(IE_HITPOINTS, 1, MOD_ABSOLUTE);
 			Effect *fx = EffectQueue::CreateEffect(fx_sleep_ref, 0, 0, FX_DURATION_INSTANT_LIMITED);
-			fx->Duration = ROUND_SECONDS; // 1 round
+			fx->Duration = core->Time.round_sec; // 1 round
 			core->ApplyEffect(fx, this, this);
 			delete fx;
 		} else {
@@ -2902,7 +2902,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 	if (turnlevel - TURN_DEATH_LVL_MOD >= GetXPLevel(true)) {
 		if (cleric->Type == ST_ACTOR && ((Actor*)cleric)->MatchesAlignmentMask(AL_EVIL)) {
 			Effect *fx = fxqueue.CreateEffect(control_undead_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
-			fx->Duration = ROUND_SECONDS;
+			fx->Duration = core->Time.round_sec;
 			fx->Target = FX_TARGET_PRESET;
 			core->ApplyEffect(fx, this, cleric);
 			delete fx;
@@ -3783,7 +3783,7 @@ void Actor::InitRound(ieDword gameTime)
 	//roundTime will equal 0 if we aren't attacking something
 	if (roundTime) {
 		//only perform calculations at the beginning of the round!
-		if (((gameTime-roundTime)%ROUND_SIZE != 0) || \
+		if (((gameTime-roundTime)%core->Time.round_size != 0) || \
 		(roundTime == lastInit)) {
 			return;
 		}
@@ -4160,7 +4160,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		if (spdfactor>10) spdfactor = 10;
 
 		//(round_size/attacks_per_round)*(initiative) is the first delta
-		nextattack = ROUND_SIZE*spdfactor/(attacksperround*10) + gameTime;
+		nextattack = core->Time.round_size*spdfactor/(attacksperround*10) + gameTime;
 
 		//we can still attack this round if we have a speed factor of 0
 		if (nextattack > gameTime) {
@@ -4179,7 +4179,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	//figure out the time for our next attack since the old time has the initiative
 	//in it, we only have to add the basic delta
 	attackcount--;
-	nextattack += (ROUND_SIZE/attacksperround);
+	nextattack += (core->Time.round_size/attacksperround);
 	lastattack = gameTime;
 
 	//debug messages
@@ -4388,7 +4388,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 
 void Actor::UpdateActorState(ieDword gameTime) {
 	//apply the modal effect on the beginning of each round
-	if (((gameTime-roundTime)%ROUND_SIZE==0) && ModalState) {
+	if (((gameTime-roundTime)%core->Time.round_size==0) && ModalState) {
 		if (!ModalSpell[0]) {
 			printMessage("Actor","Modal Spell Effect was not set!\n", YELLOW);
 			ModalSpell[0]='*';
@@ -4550,7 +4550,7 @@ bool Actor::Schedule(ieDword gametime, bool checkhide)
 	}
 
 	//check for schedule
-	ieDword bit = 1<<((gametime/ROUND_SIZE)%7200/300);
+	ieDword bit = 1<<((gametime/6)%7200/300);
 	if (appearance & bit) {
 		return true;
 	}
@@ -6343,7 +6343,7 @@ inline void HideFailed(Actor* actor)
 {
 	Effect *newfx;
 	newfx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_LIMITED);
-	newfx->Duration = ROUND_SECONDS; // 90 ticks, 1 round
+	newfx->Duration = core->Time.round_sec; // 90 ticks, 1 round
 	core->ApplyEffect(newfx, actor, actor);
 	delete newfx;
 }

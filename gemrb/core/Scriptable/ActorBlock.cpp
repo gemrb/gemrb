@@ -758,7 +758,7 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 		if (casting_time < 0) casting_time = 0;
 	}
 	// this is a guess which seems approximately right so far
-	int duration = (casting_time*ROUND_SIZE) / 10;
+	int duration = (casting_time*core->Time.round_size) / 10;
 	if (instant)
 		duration = 0;
 
