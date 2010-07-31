@@ -689,11 +689,15 @@ void Actor::ApplyClassClab(bool remove)
 		return;
 	}
 	//single class
-	ApplyClassClab(GetBase(IE_CLASS), remove);
+	ApplyClassClab((int) GetBase(IE_CLASS), remove);
 }
 
 void Actor::ApplyClassClab(int cls, bool remove)
 {
+	if (classcount<0) {
+		return; //can this happen?
+	}
+
 	if (cls>classcount) {
 		cls=0;
 	}

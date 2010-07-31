@@ -321,7 +321,7 @@ private:
 	/** Re/Inits the Modified vector for PCs/NPCs */
 	void RefreshPCStats();
 	bool ShouldHibernate();
-  void ApplyClassClab(ieDword cls, bool remove);
+	void ApplyClassClab(int cls, bool remove);
 public:
 	Actor(void);
 	~Actor(void);
