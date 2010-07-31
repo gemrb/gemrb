@@ -3419,7 +3419,7 @@ void Actor::ReinitQuickSlots()
 			case ACT_WEAPON2:
 			case ACT_WEAPON3:
 			case ACT_WEAPON4:
-				CheckWeaponQuickSlot(which);
+				CheckWeaponQuickSlot(which-ACT_WEAPON1);
 				slot = 0;
 				break;
 				//WARNING:this cannot be condensed, because the symbols don't come in order!!!
