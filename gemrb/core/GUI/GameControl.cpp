@@ -1837,9 +1837,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		// TODO: this is still ugly, help?
 		std::vector<Actor *> party;
 		// first, from the actual party
-		int idx = game->GetPartySize(false);
-		while(idx--) {
-			Actor *act = game->FindPC(idx+1);
+		int max = game->GetPartySize(false);
+		for(int idx = 1; idx<=max; idx++) {
+			Actor *act = game->FindPC(idx);
 			if(act->IsSelected()) {
 				party.push_back(act);
 			}
