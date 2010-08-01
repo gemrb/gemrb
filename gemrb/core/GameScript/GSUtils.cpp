@@ -1519,10 +1519,30 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 {
-	if (!Sender) {
+	if (!Sender || !oC) {
 		return false;
 	}
-	Targets *tgts;
+	Actor *ac = core->GetGame()->GetActorByGlobalID(actorID);
+	if (!ac) {
+		return false;
+	}
+	for (int j = 0; j < ObjectIDSCount; j++) {
+		if (!oC->objectFields[j]) {
+			continue;
+		}
+		IDSFunction func = idtargets[j];
+		if (!func) {
+			printf("Unimplemented IDS targeting opcode!\n");
+			continue;
+		}
+		if (!func( ac, oC->objectFields[j] ) ) {
+			return false;
+		}
+	}
+	// TODO: check distance? area? visibility?
+	return true;
+
+	/*Targets *tgts;
 	if (oC) {
 		tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, 0);
 	} else {
@@ -1545,7 +1565,7 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 		}
 	}
 	delete tgts;
-	return ret;
+	return ret;*/
 }
 
 int GetObjectCount(Scriptable* Sender, Object* oC)
