@@ -1534,7 +1534,9 @@ const Color *Game::GetGlobalTint() const
 		}
 	}
 
-	if (Infravision() && core->GetFirstSelectedPC(true)->PCInDark()) return &InfraTint;
+	// BUG: this causes a crash (stack overflow) due to recursion
+	// PCInDark() calls GetLightLevel() calls GetGlobalTint()
+	//if (Infravision() && core->GetFirstSelectedPC(true)->PCInDark()) return &InfraTint;
 	return NULL;
 }
 
