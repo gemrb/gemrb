@@ -1791,18 +1791,26 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		return;
 	}
 
-	if (!actor && ( game->selected.size() > 0 )) {
-		if (overDoor) {
-			HandleDoor(overDoor, core->GetFirstSelectedPC(false));
-			return;
-		}
-		if (overContainer) {
-			HandleContainer(overContainer, core->GetFirstSelectedPC(false));
-			return;
-		}
-		if (overInfoPoint) {
-			if (HandleActiveRegion(overInfoPoint, core->GetFirstSelectedPC(false), p)) {
+	//this could be a non-PC
+	Actor *pc = NULL;
+	if (game->selected.size()>0) {
+		pc = game->selected[0];
+	}
+
+	if (!actor) {
+		if (pc) {
+			if (overDoor) {
+				HandleDoor(overDoor, pc);
 				return;
+			}
+			if (overContainer) {
+				HandleContainer(overContainer, pc);
+				return;
+			}
+			if (overInfoPoint) {
+				if (HandleActiveRegion(overInfoPoint, pc, p)) {
+					return;
+				}
 			}
 		}
 
@@ -1810,53 +1818,44 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		if (game->selected.size()==1) {
 			//the player is using an item or spell on the ground
 			if ((target_mode == TARGET_MODE_CAST) && spellCount) {
-				TryToCast(core->GetFirstSelectedPC(false), p);
+				TryToCast(pc, p);
 				return;
 			}
 
-			actor=game->selected[0];
-			actor->ClearPath();
-			actor->ClearActions();
-			CreateMovement(actor, p);
+			pc->ClearPath();
+			pc->ClearActions();
+			CreateMovement(pc, p);
 			//p is a searchmap travel region
-			if ( actor->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
+			if ( pc->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
 				sprintf( Tmp, "NIDSpecial2()" );
-				actor->AddAction( GenerateAction( Tmp) );
+				pc->AddAction( GenerateAction( Tmp) );
 			}
 			return;
 		}
 
 		// construct a sorted party
-		// TODO: this is beyond horrible, help
+		// TODO: this is still ugly, help?
 		std::vector<Actor *> party;
 		// first, from the actual party
-		for (int idx = 0; idx < game->GetPartySize(false); idx++) {
-			Actor *pc = game->FindPC(idx + 1);
-			if (!pc) continue;
-
-			for (unsigned int j = 0; j < game->selected.size(); j++) {
-				if (game->selected[j] == pc) {
-					party.push_back(pc);
-				}
+		int idx = game->GetPartySize(false);
+		while(idx--) {
+			Actor *act = game->FindPC(idx+1);
+			if(act->IsSelected()) {
+				party.push_back(act);
 			}
 		}
-
-		// then, anything else we selected
 		for (i = 0; i < game->selected.size(); i++) {
-			bool found = false;
-			for (unsigned int j = 0; j < party.size(); j++) {
-				if (game->selected[i] == party[j]) {
-					found = true;
-					break;
-				}
+			Actor *act = game->selected[i];
+			if (!act->InParty) {
+				party.push_back(act);
 			}
-			if (!found) party.push_back(game->selected[i]);
 		}
 
 		//party formation movement
 		Point src = party[0]->Pos;
 		for(i = 0; i < party.size(); i++) {
 			actor = party[i];
+printf("Party order:%d  %s\n", i+1, actor->ShortName);
 			actor->ClearPath();
 			actor->ClearActions();
 			MoveToPointFormation(actor, i, src, p);

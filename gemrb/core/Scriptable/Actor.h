@@ -169,6 +169,10 @@ class ScriptedAnimation;
 #define DR_IMMUNE 999999
 
 typedef ieByte ActionButtonRow[GUIBT_COUNT];
+struct ActionButtonRow2 {
+	ActionButtonRow buttons;
+	ieByte clss;
+};
 
 typedef std::vector< ScriptedAnimation*> vvcVector;
 typedef std::list<ieResRef*> resourceList;

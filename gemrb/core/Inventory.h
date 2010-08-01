@@ -67,7 +67,7 @@ class Map;
 #define SLOT_POTION    16384
 #define SLOT_ANY       32767
 #define SLOT_INVENTORY 32768
-#define SLOT_ALL       -1
+#define SLOT_ALL       65535
 
 //weapon slot types (1000==not equipped)
 #define IW_NO_EQUIPPED  1000

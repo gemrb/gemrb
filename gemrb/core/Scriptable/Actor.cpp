@@ -69,6 +69,7 @@ static const Color magenta = {
 
 static int sharexp = SX_DIVIDE;
 static int classcount = -1;
+static int extraslots = -1;
 static char **clericspelltables = NULL;
 static char **druidspelltables = NULL;
 static char **wizardspelltables = NULL;
@@ -81,8 +82,6 @@ static int xpbonuslevels = -1;
 static int **levelslots = NULL;
 static int *dualswap = NULL;
 static int *maxhpconbon = NULL;
-//static ieVariable IWDDeathVarFormat = "KILL_%s_CNT";
-//static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
 static ieVariable CounterNames[4]={"GOOD","LAW","LADY","MURDER"};
 
 static int FistRows = -1;
@@ -165,6 +164,7 @@ static unsigned int monkbon_rows = 0;
 #define CLASS_FLAMINGFIST 156
 
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
+static ActionButtonRow2 *OtherGUIButtons = NULL;
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
 	ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
 	ACT_NONE, ACT_INNATE};
@@ -1271,6 +1271,9 @@ void Actor::ReleaseMemory()
 		free (GUIBTDefaults);
 		GUIBTDefaults=NULL;
 	}
+	if (OtherGUIButtons) {
+		free (OtherGUIButtons);
+	}
 	classcount = -1;
 }
 
@@ -1484,6 +1487,20 @@ static void InitActorTables()
 		if (tm) {
 			for (int j=0;j<MAX_QSLOTS;j++) {
 				GUIBTDefaults[i][j+3]=(ieByte) atoi( tm->QueryField(i,j) );
+			}
+		}
+	}
+
+	tm.load("qslot2");
+	if (tm) {
+		extraslots = tm->GetRowCount();
+		OtherGUIButtons = (ActionButtonRow2 *) calloc( extraslots, sizeof (ActionButtonRow2) );
+
+		for (i=0; i<usecount; i++) {
+			OtherGUIButtons[i].clss = (ieByte) atoi( tm->QueryField(i,0) );
+			memcpy(OtherGUIButtons[i].buttons, &DefaultButtons, sizeof(ActionButtonRow));
+			for (int j=0;j<MAX_QSLOTS;j++) {
+				OtherGUIButtons[i].buttons[j+3]=(ieByte) atoi( tm->QueryField(i,j+1) );
 			}
 		}
 	}
@@ -5665,6 +5682,12 @@ void Actor::InitButtons(ieDword cls, bool forced)
 	ActionButtonRow myrow;
 	if ((int) cls >= classcount) {
 		memcpy(&myrow, &DefaultButtons, sizeof(ActionButtonRow));
+		for (int i=0;i<extraslots;i++) {
+			if (cls==OtherGUIButtons[i].clss) {
+				memcpy(&myrow, &OtherGUIButtons[i].buttons, sizeof(ActionButtonRow));
+				break;
+			}
+		}
 	} else {
 		memcpy(&myrow, GUIBTDefaults+cls, sizeof(ActionButtonRow));
 	}

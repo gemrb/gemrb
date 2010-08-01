@@ -4012,15 +4012,19 @@ const char *Interface::QuerySlotResRef(unsigned int idx) const
 int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedback, bool equipped) const
 {
 	//inventory is a special case, we allow any items to enter it
-	if ( slottype==SLOT_ALL ) {
+	if ( slottype==-1 ) {
 		return SLOT_INVENTORY;
 	}
 	//if we look for ALL slot types, then SLOT_SHIELD shouldn't interfere
 	//with twohandedness
-	if ((slottype&SLOT_SHIELD) && (slottype!=SLOT_ANY) ) {
-		//As long as this is an Item, use the ITEM constant
-		//switch for IE_INV_ITEM_* if it is a CREItem
-		if (item->Flags&IE_ITEM_TWO_HANDED) {
+	//As long as this is an Item, use the ITEM constant
+	//switch for IE_INV_ITEM_* if it is a CREItem
+	if (item->Flags&IE_ITEM_TWO_HANDED) {
+		//if the item is twohanded and there are more slots, drop the shield slot
+		if (slottype&~SLOT_SHIELD) {
+			slottype&=~SLOT_SHIELD;
+		}
+		if (slottype&SLOT_SHIELD) {
 			//cannot equip twohanded in offhand
 			if (feedback) displaymsg->DisplayConstantString(STR_NOT_IN_OFFHAND, 0xf0f0f0);
 			return 0;
@@ -4052,10 +4056,6 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 	//if any bit is true, the answer counts as true
 	int ret = (slotmatrix[item->ItemType]&slottype);
 
-	//this part is not needed, in any case, don't use ret = 1
-	/*if (slottype == SLOT_INVENTORY || slottype == SLOT_ANY) {
-		ret = 1;
-	}*/
 	if (!ret) {
 		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
 		return 0;
