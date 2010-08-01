@@ -3880,7 +3880,8 @@ bool Interface::InitItemTypes()
 				}
 				k <<= 1;
 			}
-			slotmatrix[i] = (ieDword) value;
+			//we let any items in the inventory
+			slotmatrix[i] = (ieDword) value | SLOT_INVENTORY;
 		}
 	}
 

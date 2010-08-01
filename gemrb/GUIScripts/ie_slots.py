@@ -37,7 +37,8 @@ SLOT_SCROLL    = 4096
 SLOT_BAG       = 8192
 SLOT_POTION    = 16384
 SLOT_INVENTORY = 32768
-SLOT_ANY       = 32767
+SLOT_ANY       = 32767 #any except inventory
+SLOT_ALL       = 65535 #all including inventory
 
 TYPE_NORMAL    = 0     #inventory
 TYPE_ARMOR     = 1     #normal armor

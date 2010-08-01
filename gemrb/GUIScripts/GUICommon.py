@@ -27,7 +27,7 @@ from ie_spells import LS_MEMO, LSR_KNOWN, LSR_LEVEL, LSR_STAT
 from GUIDefines import *
 from ie_stats import *
 from ie_action import ACT_QSLOT1, ACT_QSLOT2, ACT_QSLOT3, ACT_QSLOT4, ACT_QSLOT5
-from ie_slots import SLOT_ANY
+from ie_slots import SLOT_ALL
 
 OtherWindowFn = None
 
@@ -433,7 +433,7 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 			else:
 				Button.EnableBorder (1, 0)
 
-		if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc, Equipped):
+		if GemRB.CanUseItemType (SLOT_ALL, Slot['ItemResRef'], pc, Equipped):
 			Button.EnableBorder (2, 0)
 		else:
 			Button.EnableBorder (2, 1)

@@ -675,45 +675,54 @@ def CloseErrorWindow ():
 	return
 
 def ReadItemWindow ():
+	global level, spell_ref
 	"""Tries to learn the mage scroll."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
-	ret = 0
+	ret = GUICommon.CannotLearnSlotSpell()
+
+	if ret:
+		strref = 72873
+		CloseItemInfoWindow ()
+		OpenErrorWindow (strref)
+		return
 
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
 	spell = GemRB.GetSpell (spell_ref)
 	if spell:
 		# can we learn more spells of this level?
-		spell_count = GemRB.GetKnownSpellsCount (pc, IE_SPELL_TYPE_WIZARD, spell['SpellLevel']-1)
+		level = spell['SpellLevel']-1
+		spell_count = GemRB.GetKnownSpellsCount (pc, IE_SPELL_TYPE_WIZARD, level)
 		if spell_count > GemRB.GetAbilityBonus (IE_INT, 2, GemRB.GetPlayerStat (pc, IE_INT)):
 			ret = LSR_FULL
 			strref = 32097
 		else:
-			if GemRB.LearnSpell (pc, spell_ref, LS_STATS|LS_ADDXP):
-				ret = LSR_FAILED
-				strref = 10831 # failure
-			else:
-				strref = 10830 # success
-
-			# HACK: above is broken because we *must* do the below,
-			# since the header can contain other things
-
-			# the learn scroll header is always the second
-			# 5 is TARGET_SELF, because some scrolls are buggy
 			GemRB.UseItem (pc, slot, 1, 5)
-			#GemRB.RemoveItem (pc, slot)
+			GemRB.SetTimedEvent(DelayedReadItemWindow, 1)
+			return
 	else:
 		print "WARNING: invalid spell header in item", slot_item['ItemResRef']
-		CloseItemInfoWindow ()
-		return -1
+		return
 
 	CloseItemInfoWindow ()
 	OpenErrorWindow (strref)
+	return
 
-	return ret
+def DelayedReadItemWindow ():
+	global level, spell_ref
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+	if GUICommon.HasSpell (pc, IE_SPELL_TYPE_WIZARD, level, spell_ref):
+		strref = 10830
+	else:
+		ret = LSR_FAILED
+		strref = 10831
+	CloseItemInfoWindow ()
+	OpenErrorWindow (strref)
+	return
+	
 def OpenItemWindow ():
 	"""Displays information about an item."""
 
@@ -923,13 +932,17 @@ def DisplayItem (itemresref, type):
 	Button = Window.GetControl (9)
 	drink = (type&1) and (item["Function"]&1)
 	read = (type&1) and (item["Function"]&2)
+	#sorcerors cannot learn spells
+	pc = GemRB.GameGetSelectedPCSingle ()
+	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
+		read = 0
 	container = (type&1) and (item["Function"]&4)
 	dialog = (type&1) and (item["Dialog"]!="")
 	familiar = (type&1) and (item["Type"] == 38)
 	if drink:
 		Button.SetText (19392)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DrinkItemWindow)
-	elif read and not GUICommon.CannotLearnSlotSpell ():
+	elif read:
 		Button.SetText (17104)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReadItemWindow)
 	elif container:
