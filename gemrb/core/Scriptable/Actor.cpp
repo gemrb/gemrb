@@ -3534,7 +3534,6 @@ void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
 
 bool Actor::ValidTarget(int ga_flags) const
 {
-	if (Immobile()) return false;
 	//scripts can still see this type of actor
 
 	if (ga_flags&GA_NO_HIDDEN) {
@@ -3572,6 +3571,7 @@ bool Actor::ValidTarget(int ga_flags) const
 	}
 	if (ga_flags&GA_SELECT) {
 		if (UnselectableTimer) return false;
+		if (Immobile()) return false;
 	}
 	return true;
 }
