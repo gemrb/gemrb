@@ -540,8 +540,12 @@ int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_
 		if (!item) {
 			continue;
 		}
-		if ( ((flags^(IE_INV_ITEM_UNDROPPABLE|IE_INV_ITEM_EQUIPPED))&item->Flags)==flags) {
-				continue;
+		unsigned int mask = (flags^(IE_INV_ITEM_UNDROPPABLE|IE_INV_ITEM_EQUIPPED));
+		if (flags && (mask&item->Flags)==flags) {
+			continue;
+		}
+		if (!flags && (mask&item->Flags)!=0) {
+			continue;
 		}
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
