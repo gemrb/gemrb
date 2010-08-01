@@ -134,6 +134,11 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	printf( "%s...", resfile );
 	FileStream* f = new FileStream();
 	if (!f->Open( resfile )) {
+		// Check for backslashes (false escape characters)
+		// this check probably belongs elsewhere (e.g. ResolveFilePath)
+		if (strstr( resfile, "\\ " )) {
+			printf("%s", "\nEscaped space(s) detected in path!. Do not escape spaces in your GamePath! " );
+		}
 		printStatus( "ERROR", LIGHT_RED );
 		printMessage( "KEYImporter", "Cannot open Chitin.key\n", LIGHT_RED );
 		textcolor( WHITE );
