@@ -1768,13 +1768,13 @@ void Highlightable::TryDisarm(Actor *actor)
 
 void Door::TryPickLock(Actor *actor)
 {
+	if (LockDifficulty == 100) {
+		displaymsg->DisplayConstantStringName(STR_DOOR_NOPICK, 0xbcefbc, actor);
+		return;
+	}
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
-		if (LockDifficulty == 100) {
-			displaymsg->DisplayConstantStringName(STR_DOOR_NOPICK, 0xbcefbc, actor);
-		} else {
-			displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
-			LastPickLockFailed = actor->GetID();
-		}
+		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
+		LastPickLockFailed = actor->GetID();
 		return;
 	}
 	SetDoorLocked( false, true);
@@ -2230,13 +2230,13 @@ int Container::IsOpen() const
 
 void Container::TryPickLock(Actor *actor)
 {
+	if (LockDifficulty == 100) {
+		displaymsg->DisplayConstantStringName(STR_CONT_NOPICK, 0xbcefbc, actor);
+		return;
+	}
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
-		if (LockDifficulty == 100) {
-			displaymsg->DisplayConstantStringName(STR_CONT_NOPICK, 0xbcefbc, actor);
-		} else {
-			displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
-			LastPickLockFailed = actor->GetID();
-		}
+		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
+		LastPickLockFailed = actor->GetID();
 		return;
 	}
 	SetContainerLocked(false);
