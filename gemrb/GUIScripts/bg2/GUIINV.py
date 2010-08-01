@@ -696,7 +696,14 @@ def ReadItemWindow ():
 				strref = 10831 # failure
 			else:
 				strref = 10830 # success
-			GemRB.RemoveItem (pc, slot)
+
+			# HACK: above is broken because we *must* do the below,
+			# since the header can contain other things
+
+			# the learn scroll header is always the second
+			# 5 is TARGET_SELF, because some scrolls are buggy
+			GemRB.UseItem (pc, slot, 1, 5)
+			#GemRB.RemoveItem (pc, slot)
 	else:
 		print "WARNING: invalid spell header in item", slot_item['ItemResRef']
 		CloseItemInfoWindow ()
