@@ -1791,26 +1791,25 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		return;
 	}
 
-	//this could be a non-PC
-	Actor *pc = NULL;
-	if (game->selected.size()>0) {
-		pc = game->selected[0];
+	if (!game->selected.size()) {
+		return;
 	}
 
+	//this could be a non-PC
+	Actor *pc = game->selected[0];
 	if (!actor) {
-		if (pc) {
-			if (overDoor) {
-				HandleDoor(overDoor, pc);
+		//add a check if you don't want some random monster handle doors and such
+		if (overDoor) {
+			HandleDoor(overDoor, pc);
+			return;
+		}
+		if (overContainer) {
+			HandleContainer(overContainer, pc);
+			return;
+		}
+		if (overInfoPoint) {
+			if (HandleActiveRegion(overInfoPoint, pc, p)) {
 				return;
-			}
-			if (overContainer) {
-				HandleContainer(overContainer, pc);
-				return;
-			}
-			if (overInfoPoint) {
-				if (HandleActiveRegion(overInfoPoint, pc, p)) {
-					return;
-				}
 			}
 		}
 
@@ -1855,7 +1854,6 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		Point src = party[0]->Pos;
 		for(i = 0; i < party.size(); i++) {
 			actor = party[i];
-printf("Party order:%d  %s\n", i+1, actor->ShortName);
 			actor->ClearPath();
 			actor->ClearActions();
 			MoveToPointFormation(actor, i, src, p);
