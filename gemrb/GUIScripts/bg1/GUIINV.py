@@ -388,7 +388,10 @@ def RefreshInventoryWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 
 	#making window visible/shaded depending on the pc's state
-	Window.SetVisible (WINDOW_VISIBLE)
+	if GemRB.GetPlayerStat (pc, IE_HELD) == 0 and GemRB.GetPlayerStat (pc, IE_CASTERHOLD) == 0:
+		Window.SetVisible (WINDOW_VISIBLE)
+	else:
+		Window.SetVisible (WINDOW_GRAYED)
 	return
 
 def UpdateSlot (pc, slot):
