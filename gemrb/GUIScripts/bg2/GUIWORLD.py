@@ -69,6 +69,9 @@ def OpenEndMessageWindow ():
 	hideflag = GemRB.HideGUI ()
 
 	if not ContinueWindow:
+		# try to force-close anything which is open
+		GUICommon.CloseOtherWindow(None)
+
 		GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 		ContinueWindow = Window = GemRB.LoadWindow (9)
 		OldActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
@@ -90,6 +93,9 @@ def OpenContinueMessageWindow ():
 	hideflag = GemRB.HideGUI ()
 
 	if not ContinueWindow:
+		# try to force-close anything which is open
+		GUICommon.CloseOtherWindow(None)
+
 		GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 		ContinueWindow = Window = GemRB.LoadWindow (9)
 		OldActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
