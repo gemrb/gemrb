@@ -1028,36 +1028,48 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 
 	switch (fx->Parameter2) {
 	case 0: //charmed (target neutral after charm)
-		displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+		if (fx->FirstApply) {
+			displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+		}
 	case 1000:
 		break;
 	case 1: //charmed (target hostile after charm)
-		displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+		if (fx->FirstApply) {
+			displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+		}
 	case 1001:
 		if (!target->InParty) {
 			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
 		}
 		break;
 	case 2: //dire charmed (target neutral after charm)
-		displaymsg->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
+		if (fx->FirstApply) {
+			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
+		}
 	case 1002:
 		break;
 	case 3: //dire charmed (target hostile after charm)
-		displaymsg->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
+		if (fx->FirstApply) {
+			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
+		}
 	case 1003:
 		if (!target->InParty) {
 			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
 		}
 		break;
 	case 4: //controlled by cleric
-		displaymsg->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+		if (fx->FirstApply) {
+			displaymsg->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+		}
 	case 1004:
 		if (!target->InParty) {
 			target->SetBaseNoPCF(IE_EA, EA_ENEMY);
 		}
 		break;
 	case 5: //thrall (typo comes from original engine doc)
-		displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+		if (fx->FirstApply) {
+			displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+		}
 	case 1005:
 		STAT_SET(IE_EA, EA_ENEMY );
 		STAT_SET(IE_THRULLCHARM, 1);
