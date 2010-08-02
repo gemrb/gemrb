@@ -300,6 +300,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	StateTable = GemRB.LoadTable ("statdesc")
 
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
+	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
 	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) )
 
 	stats = []
@@ -470,15 +471,15 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# 17379 Saving throws
 	stats.append (17379)
 	# 17380 Paralyze/Poison/Death
-	stats.append ( (17380, GS (IE_SAVEVSDEATH), '0') )
+	stats.append ( (17380, IE_SAVEVSDEATH, 's') )
 	# 17381 Rod/Staff/Wand
-	stats.append ( (17381, GS (IE_SAVEVSWANDS), '0') )
+	stats.append ( (17381, IE_SAVEVSWANDS, 's') )
 	# 17382 Petrify/Polymorph
-	stats.append ( (17382, GS (IE_SAVEVSPOLY), '0') )
+	stats.append ( (17382, IE_SAVEVSPOLY, 's') )
 	# 17383 Breath weapon
-	stats.append ( (17383, GS (IE_SAVEVSBREATH), '0') )
+	stats.append ( (17383, IE_SAVEVSBREATH, 's') )
 	# 17384 Spells
-	stats.append ( (17384, GS (IE_SAVEVSSPELL), '0') )
+	stats.append ( (17384, IE_SAVEVSSPELL, 's') )
 	stats.append (None)
 
 	# 9466 Weapon proficiencies
@@ -570,6 +571,13 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 					res.append ("[capital=0]" + GemRB.GetString (strref) + ' +' + str (val) )
 				else:
 					res.append ("[capital=0]" + GemRB.GetString (strref) + ' ' + str (val) )
+			elif type == 's': #both base and (modified) stat, but only if they differ
+				base = str (GB (val))
+				stat = str (GS (val))
+				if base == stat:
+					res.append ("[capital=0]" + GemRB.GetString (strref) + ': ' + base)
+				else:
+					res.append ("[capital=0]" + GemRB.GetString (strref) + ': ' + base + " (" + stat + ")")
 			elif type == 'x': #x character before value
 				res.append ("[capital=0]"+GemRB.GetString (strref) +': x' + str (val) )
 			elif type == 'a': #value (portrait icon) + string
