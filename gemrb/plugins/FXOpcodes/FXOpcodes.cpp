@@ -1021,9 +1021,11 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter1 && (STAT_GET(IE_GENERAL)!=fx->Parameter1)) {
 		return FX_NOT_APPLIED;
 	}
+
+	Scriptable *caster = GetCaster(Owner, fx);
 	bool enemyally = true;
-	if (Owner->Type==ST_ACTOR) {
-		enemyally = ((Actor *) Owner)->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
+	if (caster->Type==ST_ACTOR) {
+		enemyally = ((Actor *) caster)->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
 	}
 
 	switch (fx->Parameter2) {
