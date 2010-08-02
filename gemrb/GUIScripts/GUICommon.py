@@ -327,11 +327,7 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 				if ab[:2] == "AP":
 					GemRB.ApplySpell (pc, ab[3:])
 				elif ab[:2] == "GA":
-					SpellIndex = HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
-					if SpellIndex < 0: # don't know it yet
-						GemRB.LearnSpell (pc, ab[3:], LS_MEMO)
-					else: # memorize another one
-						GemRB.MemorizeSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
+					GemRB.LearnSpell (pc, ab[3:], LS_MEMO)
 				else:
 					print "ERROR, unknown class ability (type): ", ab
 
