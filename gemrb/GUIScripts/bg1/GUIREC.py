@@ -515,7 +515,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# 10341 Reaction adjustment
 	stats.append ( (10341, GA (IE_DEX,0), '0') )
 	# 10342 CON HP Bonus/Level
-	stats.append ( (10342, GA (IE_CON,0), '0') )
+	stats.append ( (10342, GA (IE_CON,0), 'p') )
 	# 10343 Chance To Learn spell
 	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, 0, 0)>0:
 		stats.append ( (10343, GA (IE_INT,0), '%' ) )
@@ -544,6 +544,11 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				continue
 			if type == '+': #pluses
 				res.append ("[capital=0]"+GemRB.GetString (strref) + ' '+ '+' * val)
+			elif type == 'p': #a plus prefix if positive
+				if val > 0:
+					res.append ("[capital=0]" + GemRB.GetString (strref) + ' +' + str (val) )
+				else:
+					res.append ("[capital=0]" + GemRB.GetString (strref) + ' ' + str (val) )
 			elif type == 'x': #x character before value
 				res.append ("[capital=0]"+GemRB.GetString (strref) +': x' + str (val) )
 			elif type == 'a': #value (portrait icon) + string
