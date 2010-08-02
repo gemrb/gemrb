@@ -2921,7 +2921,7 @@ void Map::UpdateFog()
 		if (state & STATE_CANTSEE) continue;
 		int vis2 = actor->Modified[IE_VISUALRANGE];
 		if ((state&STATE_BLIND) || (vis2<2)) vis2=2; //can see only themselves
-		ExploreMapChunk (actor->Pos, vis2, 1);
+		ExploreMapChunk (actor->Pos, vis2+actor->GetAnims()->GetCircleSize(), 1);
 		Spawn *sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
 		if (sp) {
 			TriggerSpawn(sp);
