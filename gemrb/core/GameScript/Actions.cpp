@@ -4591,8 +4591,8 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 	}
 	Game *game = core->GetGame();
 	int rows = tab->GetRowCount();
+	int count = parameters->int0Parameter;
 	for (int i=0;i<rows;i++) {
-		int count = parameters->int0Parameter;
 		int j = game->GetPartySize(false);
 		while (j--) {
 			Actor *tar = game->GetPC(j, false);
@@ -4603,6 +4603,13 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 			}
 			if (!count) break;
 		}
+	}
+	if (count == 1) {
+		// grant the default table item to the Sender in regular games
+		Action *params = new Action(true);
+		sprintf(params->string0Parameter, "%s", tab->QueryField(9999,9999));
+		CreateItem(Sender, params);
+		delete params;
 	}
 }
 
