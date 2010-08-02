@@ -1758,11 +1758,11 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	if (DrawSelectionRect) {
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
-		for (i = 0; i < highlighted.size(); i++)
-			highlighted[i]->SetOver( false );
-		highlighted.clear();
-		game->SelectActor( NULL, false, SELECT_NORMAL );
 		if (count != 0) {
+			for (i = 0; i < highlighted.size(); i++)
+				highlighted[i]->SetOver( false );
+			highlighted.clear();
+			game->SelectActor( NULL, false, SELECT_NORMAL );
 			for (i = 0; i < count; i++) {
 				// FIXME: should call handler only once
 				game->SelectActor( ab[i], true, SELECT_NORMAL );
