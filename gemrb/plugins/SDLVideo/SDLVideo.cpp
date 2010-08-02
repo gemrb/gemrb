@@ -220,10 +220,6 @@ inline int GetModState(int modstate)
 
 int SDLVideoDriver::SwapBuffers(void)
 {
-	static bool lastevent = false; /* last event was a mousedown */
-	static unsigned long lastmousetime = 0;
-	int x,y;
-
 	int ret = GEM_OK;
 	unsigned long time;
 	GetTime( time );
@@ -233,12 +229,71 @@ int SDLVideoDriver::SwapBuffers(void)
 	}
 	lastTime = time;
 
-	unsigned char key = 0;
 	bool ConsolePopped = core->ConsolePopped;
 
 	if (ConsolePopped) {
 		core->DrawConsole();
 	}
+
+	ret = PollEvents();
+
+	SDL_BlitSurface( backBuf, NULL, disp, NULL );
+	if (fadeColor.a) {
+		SDL_SetAlpha( extra, SDL_SRCALPHA, fadeColor.a );
+		SDL_Rect src = {
+			0, 0, Viewport.w, Viewport.h
+		};
+		SDL_Rect dst = {
+			xCorr, yCorr, 0, 0
+		};
+		SDL_BlitSurface( extra, &src, disp, &dst );
+	}
+
+	if (Cursor[CursorIndex] && !(DisableMouse&MOUSE_DISABLED)) {
+		SDL_Surface* temp = backBuf;
+		backBuf = disp; // FIXME: UGLY HACK!
+		if (DisableMouse&MOUSE_GRAYED) {
+			//used for greyscale blitting, fadeColor is unused
+			BlitGameSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, BLIT_GREY, fadeColor, NULL, NULL, NULL, true);
+		} else {
+			BlitSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, true);
+		}
+		backBuf = temp;
+	}
+
+	//handle tooltips
+	unsigned int delay = core->TooltipDelay;
+	// The multiplication by 10 is there since the last, disabling slider position is the eleventh
+	if (!ConsolePopped && (delay<TOOLTIP_DELAY_FACTOR*10) ) {
+		GetTime( time );
+		/** Display tooltip if mouse is idle */
+		if (( time - lastMouseTime ) > delay) {
+			if (Evnt)
+				Evnt->MouseIdle( time - lastMouseTime );
+		}
+
+		/** This causes the tooltip to be rendered directly to display */
+		SDL_Surface* tmp = backBuf;
+		backBuf = disp; // FIXME: UGLY HACK!
+		core->DrawTooltip();
+		backBuf = tmp;
+	}
+
+	SDL_Flip( disp );
+
+	return ret;
+}
+
+int SDLVideoDriver::PollEvents() {
+	static bool lastevent = false; /* last event was a mousedown */
+	static unsigned long lastmousetime = 0;
+
+	int ret = GEM_OK;
+
+	bool ConsolePopped = core->ConsolePopped;
+	unsigned long time = lastTime;
+	unsigned char key = 0;
+	int x,y;
 
 	while ( SDL_PollEvent(&event) ) {
 		int modstate = GetModState(event.key.keysym.mod);
@@ -397,49 +452,6 @@ int SDLVideoDriver::SwapBuffers(void)
 			Evnt->MouseUp( x, y, 1 << ( 0 ), GetModState(SDL_GetModState()) );
 	}
 
-	SDL_BlitSurface( backBuf, NULL, disp, NULL );
-	if (fadeColor.a) {
-		SDL_SetAlpha( extra, SDL_SRCALPHA, fadeColor.a );
-		SDL_Rect src = {
-			0, 0, Viewport.w, Viewport.h
-		};
-		SDL_Rect dst = {
-			xCorr, yCorr, 0, 0
-		};
-		SDL_BlitSurface( extra, &src, disp, &dst );
-	}
-
-	if (Cursor[CursorIndex] && !(DisableMouse&MOUSE_DISABLED)) {
-		SDL_Surface* temp = backBuf;
-		backBuf = disp; // FIXME: UGLY HACK!
-		if (DisableMouse&MOUSE_GRAYED) {
-			//used for greyscale blitting, fadeColor is unused
-			BlitGameSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, BLIT_GREY, fadeColor, NULL, NULL, NULL, true);
-		} else {
-			BlitSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, true);
-		}
-		backBuf = temp;
-	}
-
-	//handle tooltips
-	unsigned int delay = core->TooltipDelay;
-	// The multiplication by 10 is there since the last, disabling slider position is the eleventh
-	if (!ConsolePopped && (delay<TOOLTIP_DELAY_FACTOR*10) ) {
-		GetTime( time );
-		/** Display tooltip if mouse is idle */
-		if (( time - lastMouseTime ) > delay) {
-			if (Evnt)
-				Evnt->MouseIdle( time - lastMouseTime );
-		}
-
-		/** This causes the tooltip to be rendered directly to display */
-		SDL_Surface* tmp = backBuf;
-		backBuf = disp; // FIXME: UGLY HACK!
-		core->DrawTooltip();
-		backBuf = tmp;
-	}
-
-	SDL_Flip( disp );
 	return ret;
 }
 
