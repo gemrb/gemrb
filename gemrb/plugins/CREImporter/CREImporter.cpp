@@ -805,26 +805,13 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	// Reading inventory, spellbook, etc
 	ReadInventory( act, Inventory_Size );
 
-	//default is 9 in Tob
+	//default is 9 in Tob (is this true? or just most anims are 9?)
 	act->SetBase(IE_MOVEMENTRATE,9);
 
 	ieWord animID = ( ieWord ) act->BaseStats[IE_ANIMATION_ID];
 	//this is required so the actor has animation already
 	act->SetAnimationID( animID );
-	//Speed is determined by the number of frames in each cycle of its animation
-	CharAnimations* anims = act->GetAnims();
-	if (anims) {
-		Animation** tmp = anims->GetAnimation(IE_ANI_WALK, 0);
-		Animation* anim = NULL;
-		if (tmp)
-			anim = tmp[0];
-		if(anim) {
-			act->SetBase(IE_MOVEMENTRATE, anim->GetFrameCount()) ;
-		} else {
-			printMessage("CREImporter", "Unable to determine movement rate for animation ", YELLOW);
-			printf("%04x!\n", animID);
-		}
-	}
+
 	// Setting up derived stats
 	if (act->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		act->SetStance( IE_ANI_TWITCH );

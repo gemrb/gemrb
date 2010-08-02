@@ -511,6 +511,18 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	}
 	SetCircleSize();
 	anims->SetColors(BaseStats+IE_COLORS);
+
+	//Speed is determined by the number of frames in each cycle of its animation
+	// (beware! GetAnimation has side effects!)
+	// TODO: we should have a more efficient way to look this up
+	Animation** anim = anims->GetAnimation(IE_ANI_WALK, 0);
+	if (anim && anim[0]) {
+		SetBase(IE_MOVEMENTRATE, anim[0]->GetFrameCount()) ;
+	} else {
+		printMessage("Actor", "Unable to determine movement rate for animation ", YELLOW);
+		printf("%04x!\n", AnimID);
+	}
+
 }
 
 CharAnimations* Actor::GetAnims()
