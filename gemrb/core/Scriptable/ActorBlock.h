@@ -475,6 +475,7 @@ public:
 	ieResRef CloseSound;
 	ieResRef LockSound;
 	ieResRef UnLockSound;
+	ieDword DiscoveryDiff;
 	ieDword LockDifficulty; //this is a dword?
 	ieStrRef OpenStrRef;
 	ieStrRef NameStrRef;

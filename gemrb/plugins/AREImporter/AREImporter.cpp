@@ -805,6 +805,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			else
 				memcpy( door->CloseSound, Sounds[DEF_CLOSE], 9 );
 		}
+		door->DiscoveryDiff=DiscoveryDiff;
 		door->LockDifficulty=LockRemoval;
 		door->OpenStrRef=OpenStrRef;
 		strnspccpy(door->LinkedInfo, LinkedInfo, 32);
