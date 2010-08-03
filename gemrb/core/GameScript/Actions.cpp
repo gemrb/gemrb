@@ -5664,7 +5664,7 @@ void GameScript::PolymorphCopy(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-	PolymorphCopyCore((Actor *) Sender, (Actor *) tar, false);
+	PolymorphCopyCore((Actor *) tar, (Actor *) Sender, false);
 }
 
 /* according to IESDP this only copies the animation ID */
