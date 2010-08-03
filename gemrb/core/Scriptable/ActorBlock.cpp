@@ -1546,8 +1546,11 @@ void Door::UpdateDoor()
 	} else {
 		outline = closed;
 	}
-	unsigned char oval, cval;
+	// update the Scriptable position
+	Pos.x = outline->BBox.x + outline->BBox.w/2;
+	Pos.y = outline->BBox.y + outline->BBox.h/2;
 
+	unsigned char oval, cval;
 	oval = PATH_MAP_IMPASSABLE;
 	if (Flags & DOOR_TRANSPARENT) {
 		cval = PATH_MAP_DOOR_TRANSPARENT;
