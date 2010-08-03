@@ -4353,6 +4353,7 @@ int fx_castinglevel_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 static EffectRef fx_familiar_constitution_loss_ref={"FamiliarBond",NULL,-1};
 static EffectRef fx_familiar_marker_ref={"FamiliarMarker",NULL,-1};
+static EffectRef fx_maximum_hp_modifier_ref={"MaximumHPModifier",NULL,-1};
 
 int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -4383,24 +4384,49 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//summon familiar with fx->Resource
+	Actor *fam = gamedata->GetCreature(fx->Resource);
+	if (!fam) {
+		return FX_NOT_APPLIED;
+	}
+	fam->SetBase(IE_EA, EA_FAMILIAR);
+	fam->LastSummoner = ((Actor *) Owner)->GetID();
+
+	Map *map = target->GetCurrentArea();
+	map->AddActor(fam);
 	Point p(fx->PosX, fx->PosY);
-	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	Actor *fam = core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_DEFAULT, 0, newfx, 0);
+	fam->SetPosition(p, true, 0);
+	fam->RefreshEffects(NULL);
+
+	if (fx->Resource2[0]) {
+		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(fx->Resource2, false);
+		if (vvc) {
+			//This is the final position of the summoned creature
+			//not the original target point
+			vvc->XPos=fam->Pos.x;
+			vvc->YPos=fam->Pos.y;
+			//force vvc to play only once
+			vvc->PlayOnce();
+			map->AddVVCell( vvc );
+		}
+	}
+
+	//Make the familiar an NPC (MoveGlobal needs this)
+	core->GetGame()->AddNPC(fam);
+
+	//Add some essential effects
+	Effect *newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, fam->GetBase(IE_HITPOINTS)/2, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, fam, fam);
 	delete newfx;
 
-	if (fam) {
-		//Make the familiar an NPC (MoveGlobal needs this)
-		core->GetGame()->AddNPC(fam);
+	newfx = EffectQueue::CreateEffect(fx_familiar_marker_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, fam, fam);
+	delete newfx;
 
-		//Add some essential effects
-		newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, (ieDword) -10, 0, FX_DURATION_INSTANT_PERMANENT);
-		core->ApplyEffect(newfx, fam, fam);
-		delete newfx;
+	//maximum hp bonus of half the familiar's hp
+	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, fam->GetBase(IE_HITPOINTS)/2, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, (Actor *) Owner, Owner);
+	delete newfx;
 
-		newfx = EffectQueue::CreateEffect(fx_familiar_marker_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
-		core->ApplyEffect(newfx, fam, fam);
-		delete newfx;
-	}
 	return FX_NOT_APPLIED;
 }
 
@@ -4423,7 +4449,7 @@ int fx_ignore_dialogpause_modifier (Scriptable* /*Owner*/, Actor* target, Effect
 //0xc3 FamiliarBond
 //when this effect's target dies it should incur damage on protagonist
 static EffectRef fx_damage_opcode_ref={"Damage",NULL,-1};
-static EffectRef fx_maximum_hp_modifier_ref={"MaximumHPModifier",NULL,-1};
+static EffectRef fx_constitution_modifier_ref={"ConstitutionModifier",NULL,-1};
 
 int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -4435,13 +4461,19 @@ int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect*
 	//familiar died
 	Actor *master = core->GetGame()->FindPC(1);
 	if (!master) return FX_NOT_APPLIED;
-	//maximum hp (param1 is a negative value)
-	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, fx->Parameter1, 0, FX_DURATION_INSTANT_PERMANENT);
+
+	//lose 1 point of constitution
+	newfx = EffectQueue::CreateEffect(fx_constitution_modifier_ref, (ieDword) -1, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
 	delete newfx;
 
-	//damage
-	newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	//remove the maximum hp bonus
+	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, (ieDword) -fx->Parameter1, 3, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, master, master);
+	delete newfx;
+
+	//damage for half of the familiar's hitpoints
+	newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, DAMAGE_CRUSHING, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
 	delete newfx;
 
