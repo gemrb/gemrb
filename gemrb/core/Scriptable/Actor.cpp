@@ -4882,6 +4882,7 @@ void Actor::Draw(const Region &screen)
 	if (Modified[IE_EA]>EA_GOODCUTOFF) {
 		if (State&STATE_INVISIBLE) {
 			Trans = 255;
+			NoCircle = 1;
 		}
 	}
 
