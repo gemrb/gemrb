@@ -3801,6 +3801,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (Distance(door->Pos, target->Pos)<range) {
 			//when was door trap noticed
 			door->DetectTrap(skill);
+			door->TryDetectSecret(skill);
 //			door->TrapDetected = 1;
 		}
 	}

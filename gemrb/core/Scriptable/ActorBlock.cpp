@@ -1719,6 +1719,17 @@ bool Door::TryUnlock(Actor *actor) {
 	return Highlightable::TryUnlock(actor, removekey);
 }
 
+void Door::TryDetectSecret(int skill)
+{
+	if (Type != ST_DOOR) return;
+	if (!(Flags & DOOR_SECRET) || (Flags & DOOR_FOUND)) return;
+	//FIXME: this part is just copied from the trap detection
+	if ((skill>=100) && (skill!=256) ) skill = 100;
+	if (skill/2+core->Roll(1,skill/2,0) > (signed)DiscoveryDiff) {
+		Flags |= DOOR_FOUND;
+	}
+}
+
 void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 {
 	if (Open) {
