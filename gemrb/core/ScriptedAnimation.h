@@ -87,6 +87,7 @@ public:
 	SpriteCover* cover;
 	ScriptedAnimation *twin;
 	bool active;
+	bool effect_owned;
 public:
 	//draws the next frame of the videocell
 	bool Draw(const Region &screen, const Point &Pos, const Color &tint, Map *area, int dither, int orientation);

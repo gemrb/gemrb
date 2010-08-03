@@ -2151,11 +2151,12 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		spellbook.ClearBonus();
 	}
 
+	// some VVCs are controlled by stats (and so by PCFs), the rest have 'effect_owned' set
 	for (unsigned int i = 0; i < vvcOverlays.size(); i++) {
-		if (vvcOverlays[i]) vvcOverlays[i]->active = false;
+		if (vvcOverlays[i] && vvcOverlays[i]->effect_owned) vvcOverlays[i]->active = false;
 	}
 	for (unsigned int i = 0; i < vvcShields.size(); i++) {
-		if (vvcShields[i]) vvcShields[i]->active = false;
+		if (vvcShields[i] && vvcShields[i]->effect_owned) vvcShields[i]->active = false;
 	}
 
 	fxqueue.ApplyAllEffects( this );
