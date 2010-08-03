@@ -2384,8 +2384,8 @@ PathNode* Map::FindPathNear(const Point &s, const Point &d, unsigned int size, u
 			 * simply between the specified points
 			 */
 
-			int distx = (x - orig_goal.x)*16;
-			int disty = (y - orig_goal.y)*12;
+			int distx = (x*16 + 8) - d.x;
+			int disty = (y*12 + 6) - d.y;
 			if ((unsigned int)(distx*distx + disty*disty) <= squaredmindistance) {
 				// we are within the minimum distance of the goal
 				Point ourpos(x*16 + 8, y*12 + 6);
