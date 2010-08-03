@@ -414,7 +414,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		d->Highlight = false;
 		if (overDoor == d) {
 			if (target_mode) {
-				if (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED)) {
+				if ((d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED)) && ((!(d->Flags & DOOR_SECRET)) || (d->Flags & DOOR_FOUND))) {
 					// only highlight targettable doors
 					d->outlineColor = green;
 					d->Highlight = true;
