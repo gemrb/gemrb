@@ -84,6 +84,7 @@ void ScriptedAnimation::Init()
 	PaletteName[0]=0;
 	twin = NULL;
 	Phase = P_NOTINITED;
+	active = true;
 }
 
 void ScriptedAnimation::Override(ScriptedAnimation *templ)
@@ -528,6 +529,11 @@ retry:
 		if (sounds[Phase][0] != 0) {
 			core->GetAudioDrv()->Play( sounds[Phase] );
 		}
+	}
+
+	// if we're looping forever and we didn't get 'bumped' by an effect
+	if ((SequenceFlags&IE_VVC_LOOP) && Duration==0xffffffff && !active) {
+		PlayOnce();
 	}
 
 	if (!anims[Phase*MAX_ORIENT+Orientation]) {

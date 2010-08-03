@@ -555,6 +555,8 @@ public:
 	void RemoveVVCell(const ieResRef vvcname, bool graceful);
 	/* returns true if actor already has the overlay (slow) */
 	bool HasVVCCell(const ieResRef resource);
+	/* returns overlay if actor already has it (slow) */
+	ScriptedAnimation *GetVVCCell(const ieResRef resource);
 	/* returns the vvc pointer to a hardcoded overlay */
 	/* if it exists (faster than hasvvccell) */
 	ScriptedAnimation *FindOverlay(int index);

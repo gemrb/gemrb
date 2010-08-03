@@ -86,6 +86,7 @@ public:
 	int Phase;
 	SpriteCover* cover;
 	ScriptedAnimation *twin;
+	bool active;
 public:
 	//draws the next frame of the videocell
 	bool Draw(const Region &screen, const Point &Pos, const Color &tint, Map *area, int dither, int orientation);

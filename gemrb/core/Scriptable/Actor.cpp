@@ -2151,6 +2151,13 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		spellbook.ClearBonus();
 	}
 
+	for (unsigned int i = 0; i < vvcOverlays.size(); i++) {
+		if (vvcOverlays[i]) vvcOverlays[i]->active = false;
+	}
+	for (unsigned int i = 0; i < vvcShields.size(); i++) {
+		if (vvcShields[i]) vvcShields[i]->active = false;
+	}
+
 	fxqueue.ApplyAllEffects( this );
 
 	// IE_CLASS is >classcount for non-PCs/NPCs
@@ -5356,6 +5363,11 @@ void Actor::GetSoundFolder(char *soundset) const
 
 bool Actor::HasVVCCell(const ieResRef resource)
 {
+	return GetVVCCell(resource) != NULL;
+}
+
+ScriptedAnimation *Actor::GetVVCCell(const ieResRef resource)
+{
 	int j = true;
 	vvcVector *vvcCells=&vvcShields;
 retry:
@@ -5366,12 +5378,12 @@ retry:
 			continue;
 		}
 		if ( strnicmp(vvc->ResName, resource, 8) == 0) {
-			return true;
+			return vvc;
 		}
 	}
 	vvcCells=&vvcOverlays;
 	if (j) { j = false; goto retry; }
-	return false;
+	return NULL;
 }
 
 void Actor::RemoveVVCell(const ieResRef resource, bool graceful)
