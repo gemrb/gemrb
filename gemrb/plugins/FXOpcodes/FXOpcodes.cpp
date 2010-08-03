@@ -36,6 +36,7 @@
 #include "GameScript/GSUtils.h" //needs for MoveBetweenAreasCore
 #include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
+#include "PolymorphCache.h" // fx_polymorph
 
 //FIXME: find a way to handle portrait icons better
 #define PI_CONFUSED  3
@@ -3467,10 +3468,14 @@ void CopyPolymorphStats(Actor *source, Actor *target)
 		}
 	}
 
-	//copy polymorphed stats, no need of using STAT_SET, because the stats
-	//are copied from a consistent state
+	assert(target->polymorphCache);
+
+	if (!target->polymorphCache->stats) {
+		target->polymorphCache->stats = new ieDword[polystatcount];
+	}
+
 	for(i=0;i<polystatcount;i++) {
-		target->SetStat(polymorph_stats[i], source->Modified[polymorph_stats[i]], 1);
+		target->polymorphCache->stats[i] = source->Modified[polymorph_stats[i]];
 	}
 }
 
@@ -3486,30 +3491,40 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	//FIXME:
-	//This pointer should be cached, or we are in deep trouble
-	Actor *newCreature = gamedata->GetCreature(fx->Resource,0);
-
-	//I don't know how could this happen, existance of the resource was already checked
-	if (!newCreature) {
-		return FX_NOT_APPLIED;
+	// to avoid repeatedly loading the file or keeping all the data around
+	// wasting memory, we keep a PolymorphCache object around, with only
+	// the data we need from the polymorphed creature
+	bool cached = true;
+	if (!target->polymorphCache) {
+		cached = false;
+		target->polymorphCache = new PolymorphCache();
 	}
+	if (!cached || strnicmp(fx->Resource,target->polymorphCache->Resource,sizeof(fx->Resource))) {
+		Actor *newCreature = gamedata->GetCreature(fx->Resource,0);
 
-	//TODO: also change the inventory paper doll
+		//I don't know how could this happen, existance of the resource was already checked
+		if (!newCreature) {
+			return FX_NOT_APPLIED;
+		}
+
+		memcpy(target->polymorphCache->Resource, fx->Resource, sizeof(fx->Resource));
+		CopyPolymorphStats(newCreature, target);
+
+		delete newCreature;
+	}
 
 	//copy all polymorphed stats
-	if(fx->Parameter2) {
-		//copy only the animation ID
-		target->SetStat(IE_ANIMATION_ID, newCreature->GetStat(IE_ANIMATION_ID), 1);
-	} else {
+	if(!fx->Parameter2) {
 		STAT_SET( IE_POLYMORPHED, 1 );
-		//FIXME: of course, the first parameter should be the creature we copy
-		CopyPolymorphStats(newCreature, target);
 	}
 
-	//FIXME:
-	//Be careful when this became a cached pointer
-	delete newCreature;
+	for(int i=0;i<polystatcount;i++) {
+		//copy only the animation ID
+		if (fx->Parameter2 && polymorph_stats[i] != IE_ANIMATION_ID) continue;
+
+		target->SetStat(polymorph_stats[i], target->polymorphCache->stats[i], 1);
+	}
+
 	return FX_APPLIED;
 }
 

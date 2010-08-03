@@ -38,6 +38,7 @@
 
 class Map;
 class ScriptedAnimation;
+struct PolymorphCache;
 
 /** USING DEFINITIONS AS DESCRIBED IN STATS.IDS */
 #include "ie_stats.h"
@@ -282,6 +283,8 @@ public:
 	ieDword lastInit;
 	bool no_more_steps;
 	int speed;
+
+	PolymorphCache *polymorphCache; // fx_polymorph etc
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;

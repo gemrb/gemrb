@@ -45,6 +45,7 @@
 #include "GameScript/GSUtils.h" //needed for DisplayStringCore
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h" //checking for dialog
+#include "PolymorphCache.h" // stupid polymorph cache hack
 
 #include <cassert>
 
@@ -383,6 +384,8 @@ Actor::Actor()
 	//this one is not saved
 	GotLUFeedback = false;
 	RollSaves();
+
+	polymorphCache = NULL;
 }
 
 Actor::~Actor(void)
@@ -412,6 +415,7 @@ Actor::~Actor(void)
 		delete extraCovers[i];
 
 	delete attackProjectile;
+	delete polymorphCache;
 
 	free(projectileImmunity);
 }
