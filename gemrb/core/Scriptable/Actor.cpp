@@ -3156,6 +3156,9 @@ void Actor::Die(Scriptable *killer)
 			// friendly party summons' kills also grant xp
 			if (act->Modified[IE_SEX] == SEX_SUMMON && act->Modified[IE_EA] == EA_CONTROLLED) {
 				InternalFlags|=IF_GIVEXP;
+			} else if (act->Modified[IE_EA] == EA_FAMILIAR) {
+				// familiar's kills also grant xp
+				InternalFlags|=IF_GIVEXP;
 			}
 		}
 	}
