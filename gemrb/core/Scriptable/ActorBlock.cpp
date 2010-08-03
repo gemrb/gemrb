@@ -1722,12 +1722,18 @@ bool Door::TryUnlock(Actor *actor) {
 void Door::TryDetectSecret(int skill)
 {
 	if (Type != ST_DOOR) return;
-	if (!(Flags & DOOR_SECRET) || (Flags & DOOR_FOUND)) return;
+	if (Visible()) return;
 	//FIXME: this part is just copied from the trap detection
 	if ((skill>=100) && (skill!=256) ) skill = 100;
 	if (skill/2+core->Roll(1,skill/2,0) > (signed)DiscoveryDiff) {
 		Flags |= DOOR_FOUND;
 	}
+}
+
+// return true if the door isn't secret or if it is, but was already discovered
+bool Door::Visible()
+{
+	return (!(Flags & DOOR_SECRET) || (Flags & DOOR_FOUND));
 }
 
 void Door::SetPolygon(bool Open, Gem_Polygon* poly)

@@ -497,6 +497,7 @@ public:
 	void TryBashLock(Actor* actor) ;
 	bool TryUnlock(Actor *actor);
 	void TryDetectSecret(int skill);
+	bool Visible();
 	void DebugDump() const;
 	int TrapResets() const { return Flags & DOOR_RESET; }
 	void SetNewOverlay(TileOverlay *Overlay);

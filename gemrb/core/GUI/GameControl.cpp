@@ -414,7 +414,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		d->Highlight = false;
 		if (overDoor == d) {
 			if (target_mode) {
-				if ((d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED)) && ((!(d->Flags & DOOR_SECRET)) || (d->Flags & DOOR_FOUND))) {
+				if (d->Visible() && (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED))) {
 					// only highlight targettable doors
 					d->outlineColor = green;
 					d->Highlight = true;
@@ -1106,7 +1106,7 @@ int GameControl::GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const
 //returns the appropriate cursor over a door
 int GameControl::GetCursorOverDoor(Door *overDoor) const
 {
-	if ((overDoor->Flags & DOOR_SECRET) && !(overDoor->Flags & DOOR_FOUND)) {
+	if (!overDoor->Visible()) {
 		if (target_mode == TARGET_MODE_NONE) {
 			return IE_CURSOR_BLOCKED;
 		} else {
@@ -1265,7 +1265,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		} else if (target_mode == TARGET_MODE_ATTACK) {
 			nextCursor = IE_CURSOR_ATTACK;
 			if (overDoor) {
-				if ((overDoor->Flags & DOOR_SECRET) && !(overDoor->Flags & DOOR_FOUND)) {
+				if (!overDoor->Visible()) {
 					nextCursor |= IE_CURSOR_GRAY;
 				}
 			} else if (!lastActor && !overContainer) {
