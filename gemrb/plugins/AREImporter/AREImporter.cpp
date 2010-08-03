@@ -630,7 +630,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieWord TrapDetect, TrapRemoval;
 		ieWord Trapped, TrapDetected;
 		ieWord LaunchX, LaunchY;
-		ieDword Locked, LockRemoval;
+		ieDword DiscoveryDiff, LockRemoval;
 		Region BBClosed, BBOpen;
 		ieStrRef OpenStrRef;
 		ieStrRef NameStrRef;
@@ -678,7 +678,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &LaunchY );
 		str->ReadResRef( KeyResRef );
 		str->ReadResRef( Script );
-		str->ReadDword( &Locked );
+		str->ReadDword( &DiscoveryDiff );
 		str->ReadDword( &LockRemoval );
 		Point toOpen[2];
 		str->ReadWord( &minX );
@@ -1464,7 +1464,6 @@ int AREImporter::PutHeader(DataStream *stream, Map *map)
 int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 {
 	char filling[8];
-	ieDword tmpDword = 0;
 	ieWord tmpWord = 0;
 
 	memset(filling,0,sizeof(filling) );
@@ -1528,9 +1527,7 @@ int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		} else {
 			stream->Write( filling, 8);
 		}
-		//unknown field 0-100
-		//stream->WriteDword( &d->Locked);
-		stream->WriteDword( &tmpDword);
+		stream->WriteDword( &d->DiscoveryDiff);
 		//lock difficulty field
 		stream->WriteDword( &d->LockDifficulty);
 		//opening locations
