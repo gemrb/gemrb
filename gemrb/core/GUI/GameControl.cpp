@@ -1106,6 +1106,13 @@ int GameControl::GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const
 //returns the appropriate cursor over a door
 int GameControl::GetCursorOverDoor(Door *overDoor) const
 {
+	if ((overDoor->Flags & DOOR_SECRET) && !(overDoor->Flags & DOOR_FOUND)) {
+		if (target_mode == TARGET_MODE_NONE) {
+			return IE_CURSOR_BLOCKED;
+		} else {
+			return lastCursor|IE_CURSOR_GRAY;
+		}
+	}
 	if (target_mode == TARGET_MODE_PICK) {
 		if (overDoor->VisibleTrap(0)) {
 			return IE_CURSOR_TRAP;
@@ -1257,7 +1264,11 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 		} else if (target_mode == TARGET_MODE_ATTACK) {
 			nextCursor = IE_CURSOR_ATTACK;
-			if (!lastActor && !overDoor && !overContainer) {
+			if (overDoor) {
+				if ((overDoor->Flags & DOOR_SECRET) && !(overDoor->Flags & DOOR_FOUND)) {
+					nextCursor |= IE_CURSOR_GRAY;
+				}
+			} else if (!lastActor && !overContainer) {
 				nextCursor |= IE_CURSOR_GRAY;
 			}
 		} else if (target_mode == TARGET_MODE_CAST) {
