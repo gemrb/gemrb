@@ -5717,7 +5717,9 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 /*EscapeAreaMove(S:Area*,I:X*,I:Y*,I:Face*)*/
 void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 {
-printf("EscapeArea/EscapeAreaMove\n");
+	if (InDebug&ID_ACTIONS) {
+		printf("EscapeArea/EscapeAreaMove\n");
+	}
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
