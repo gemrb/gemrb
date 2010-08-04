@@ -435,7 +435,8 @@ def SetSelectionChangeHandler (handler):
 	# Switching from walking to non-walking environment:
 	# set the first selected PC in walking env as a selected
 	# in nonwalking env
-	if (not SelectionChangeHandler) and handler:
+	#if (not SelectionChangeHandler) and handler:
+	if (not SelectionChangeHandler) and handler and (not GUICommon.NextWindowFn):
 		sel = GemRB.GameGetFirstSelectedPC ()
 		if not sel:
 			sel = 1
