@@ -166,7 +166,10 @@ TileMap* WEDImporter::GetTileMap(TileMap *tm)
 	}
 
 	usedoverlays = AddOverlay(tm, &overlays.at(0), false);
-	AddOverlay(tm, &overlays.at(0), true);
+	// rain_overlays[0] is never used
+	// XXX: should fix AddOverlay not to load an overlay twice if there's no rain version!!
+	//AddOverlay(tm, &overlays.at(0), true);
+	tm->AddRainOverlay( NULL );
 
 	//reading additional overlays
 	int mask=2;
