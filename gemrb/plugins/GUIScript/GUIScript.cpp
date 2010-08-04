@@ -1693,6 +1693,10 @@ static PyObject* GemRB_SetNextScript(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetNextScript__doc );
 	}
 
+	if (!strcmp(funcName, "")) {
+		return AttributeError( GemRB_SetNextScript__doc );
+	}
+
 	core->SetNextScript(funcName);
 
 	Py_INCREF( Py_None );
