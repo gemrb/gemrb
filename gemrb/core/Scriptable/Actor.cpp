@@ -52,6 +52,9 @@
 //configurable?
 ieDword ref_lightness = 43;
 
+static const Color white = {
+	0xff, 0xff, 0xff, 0xff
+};
 static const Color green = {
 	0x00, 0xff, 0x00, 0xff
 };
@@ -551,12 +554,16 @@ void Actor::SetCircleSize()
 	if (!anims)
 		return;
 
+	GameControl *gc = core->GetGameControl();
 	if (UnselectableTimer) {
 		color = &magenta;
 		color_index = 4;
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
 		color = &yellow;
 		color_index = 5;
+	} else if (gc && gc->targetID == globalID && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
+		color = &white;
+		color_index = 3; //?? made up
 	} else {
 		switch (Modified[IE_EA]) {
 			case EA_PC:
@@ -4927,18 +4934,21 @@ void Actor::Draw(const Region &screen)
 	Region vp = video->GetViewport();
 
 	bool drawcircle = (NoCircle == 0);
-	if ((core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE)) {
+	GameControl *gc = core->GetGameControl();
+	if (gc->GetScreenFlags()&SF_CUTSCENE) {
 		// ground circles are not drawn in cutscenes
-		// they SHOULD be drawn for at least white speaker circles
-		// (eg, via VerbalConstant), please fix :)
 		drawcircle = false;
+	}
+	// the speaker should get a circle even in cutscenes
+	if (gc->targetID == globalID && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
+		drawcircle = true;
 	}
 	if (BaseStats[IE_STATE_ID]&STATE_DEAD || InternalFlags&IF_JUSTDIED) {
 		drawcircle = false;
 	}
 	bool drawtarget = drawcircle;
 	// we always show circle/target on pause
-	if (drawcircle && !(core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
+	if (drawcircle && !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 		// check marker feedback level
 		ieDword markerfeedback = 4;
 		core->GetDictionary()->Lookup("GUI Feedback Level", markerfeedback);

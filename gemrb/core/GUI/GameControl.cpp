@@ -2397,6 +2397,7 @@ int GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref
 
 	Actor *spe = (Actor *) spk;
 	speakerID = spe->globalID;
+	Actor *oldTarget = GetActorByGlobalID(targetID);
 	if (tgt->Type!=ST_ACTOR) {
 		targetID=0xffff;
 		//most likely this dangling object reference
@@ -2411,7 +2412,9 @@ int GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref
 		if (!originalTargetID) originalTargetID = tar->globalID;
 		spe->LastTalkedTo=targetID;
 		tar->LastTalkedTo=speakerID;
+		tar->SetCircleSize();
 	}
+	if (oldTarget) oldTarget->SetCircleSize();
 
 	//check if we are already in dialog
 	if (DialogueFlags&DF_IN_DIALOG) {
@@ -2471,6 +2474,7 @@ void GameControl::EndDialog(bool try_to_break)
 	}
 	targetOB = NULL;
 	targetID = 0;
+	if (tmp) tmp->SetCircleSize();
 	originalTargetID = 0;
 	ds = NULL;
 	if (dlg) {
@@ -2632,7 +2636,10 @@ void GameControl::DialogChoose(unsigned int choose)
 				EndDialog();
 				return;
 			}
+			Actor *oldTarget = GetActorByGlobalID(targetID);
 			targetID = tgt->globalID;
+			tgt->SetCircleSize();
+			if (oldTarget) oldTarget->SetCircleSize();
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
