@@ -1032,11 +1032,53 @@ int GameScript::ID_Allegiance(Actor *actor, int parameter)
 	return parameter == value;
 }
 
+// Dual-classed characters will detect only as their new class until their
+// original class is re-activated, when they will detect as a multi-class
+// GetClassLevel takes care of this automatically!
 int GameScript::ID_Class(Actor *actor, int parameter)
 {
-	//TODO: if parameter >=202, it is of *_ALL type
-	int value = actor->GetStat(IE_CLASS);
-	return parameter==value;
+	int value;
+	if (parameter < 202 || parameter > 209) {
+		value = actor->GetStat(IE_CLASS);
+		return parameter==value;
+	}
+	// we got one of the *_ALL values
+	//TODO: unhardcode
+	switch (parameter) {
+		case 202:
+			// MAGE_ALL (also sorcerers)
+			value = actor->GetMageLevel() + actor->GetSorcererLevel();
+			break;
+		case 203:
+			// FIGHTER_ALL (also monks)
+			value = actor->GetFighterLevel() + actor->GetMonkLevel();
+			break;
+		case 204:
+			// CLERIC_ALL
+			value = actor->GetClericLevel();
+			break;
+		case 205:
+			// THIEF_ALL
+			value = actor->GetThiefLevel();
+			break;
+		case 206:
+			// BARD_ALL
+			value = actor->GetBardLevel();
+			break;
+		case 207:
+			// PALADIN_ALL
+			value = actor->GetPaladinLevel();
+			break;
+		case 208:
+			// DRUID_ALL
+			value = actor->GetDruidLevel();
+			break;
+		case 209:
+			// RANGER_ALL
+			value = actor->GetRangerLevel();
+			break;
+	}
+	return value > 0;
 }
 
 int GameScript::ID_ClassMask(Actor *actor, int parameter)
