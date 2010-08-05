@@ -784,13 +784,13 @@ void Projectile::CheckTrigger(unsigned int radius)
 					return;
 			}
 		}
-		if (area->GetActorInRadius(Pos, CalculateTargetFlag(), radius)) {
+	}
+	if (area->GetActorInRadius(Pos, CalculateTargetFlag(), radius)) {
+		if (phase == P_TRIGGER) {
 			phase = P_EXPLODING1;
 			extension_delay = Extension->Delay;
 		}
-		return;
-	}
-	if (phase == P_EXPLODING1) {
+	} else if (phase == P_EXPLODING1) {
 		//the explosion is revoked
 		if (Extension->AFlags&PAF_SYNC) {
 			phase = P_TRIGGER;
