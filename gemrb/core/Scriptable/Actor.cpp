@@ -810,6 +810,7 @@ static const ieDword fullstone[7]={STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,
 
 void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
 {
+	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
 	if (State & STATE_PETRIFIED) {
 		actor->SetLockedPalette(fullstone);
 		return;
@@ -818,7 +819,8 @@ void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
 		actor->SetLockedPalette(fullwhite);
 		return;
 	}
-	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
+	//it is not enough to check the new state
+	core->GetGame()->Infravision();
 	actor->UnlockPalette();
 }
 
@@ -4805,6 +4807,7 @@ void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& 
 			assert(newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
 			unsigned int flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
+
 			if (!ca->lockPalette) flags|=BLIT_TINTED;
 
 			video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
@@ -5095,6 +5098,13 @@ void Actor::Draw(const Region &screen)
 					}
 				}
 			}
+		}
+
+		//infravision tint
+		if (!(State&(STATE_DEAD|STATE_FROZEN|STATE_PETRIFIED) ) &&
+			(area->GetLightLevel(Pos)<128) &&
+			core->GetGame()->PartyHasInfravision()) {
+			tint.r=255;
 		}
 
 		// actor itself

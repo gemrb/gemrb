@@ -224,6 +224,7 @@ public:
 	Particles *weather;
 	int event_timer;
 	EventHandler event_handler; //like in Control
+	bool hasInfra;
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();
@@ -389,11 +390,11 @@ public:
 	void RestParty(int checks, int dream, int hp);
 	/** timestop effect initiated by actor */
 	void TimeStop(Actor *actor, ieDword end);
-	/** returns true if anyone selected has infravision */
-	bool Infravision() const;
 	/** gets the colour which should be applied over the game area,
 	may return NULL */
 	const Color *GetGlobalTint() const;
+	/** returns true if party has infravision */
+	bool PartyHasInfravision() const { return hasInfra; }
 	/** draw weather */
 	void DrawWeather(const Region &screen, bool update);
 	/** updates current area music */
@@ -404,6 +405,8 @@ public:
 	void DebugDump();
 	/** Finds an actor by global ID */
 	Actor *GetActorByGlobalID(ieWord objectID);
+	/** updates the infravision info */
+	void Infravision();
 private:
 	bool DetermineStartPosType(const TableMgr *strta);
 	ieResRef *GetDream(Map *area);
