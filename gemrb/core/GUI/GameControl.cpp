@@ -579,7 +579,7 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	if (DialogueFlags&DF_IN_DIALOG) {
 		return;
 	}
-	unsigned int i;
+	unsigned int i, pc;
 	Game* game = core->GetGame();
 	if (!game) return;
 
@@ -607,10 +607,20 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		case '4':
 		case '5':
 		case '6':
-		case '7':
-		case '8':
-		case '9':
 			SelectActor(Key-'0');
+			break;
+		case '7': // 1 & 2
+		case '8': // 3 & 4
+		case '9': // 5 & 6
+			game->SelectActor( NULL, false, SELECT_NORMAL );
+			i = game->GetPartySize(false);
+			pc = 2*(Key - '6')-1;
+			if (pc >= i) {
+				SelectActor(i, true);
+				break;
+			}
+			SelectActor(pc, true);
+			SelectActor(pc+1, true);
 			break;
 	default:
 		core->GetGame()->SetHotKey(toupper(Key));
