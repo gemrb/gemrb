@@ -957,6 +957,8 @@ static ScriptedAnimation *GetVVCEffect(const char *effect, int iterations)
 		}
 		if (iterations) {
 			vvc->SetDefaultDuration( vvc->GetSequenceDuration(AI_UPDATE_TIME * iterations));
+		} else {
+			vvc->PlayOnce();
 		}
 		return vvc;
 	}
