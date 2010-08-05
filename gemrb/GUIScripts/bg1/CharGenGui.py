@@ -384,12 +384,13 @@ def setAccept():
 	playmode = GemRB.GetVar ("PlayMode")
 	
 	GUICommon.CloseOtherWindow(None)
-	CharGenCommon.close()
 	
 	if playmode >=0:
+		CharGenCommon.close()
 		if GemRB.GetVar("GUIEnhancements"):
 			GemRB.SaveCharacter ( GemRB.GetVar ("Slot"), "gembak" )
 		GemRB.EnterGame()
 	else:
-		#leaving multi player pregen
-		GemRB.SetNextScript ("GUIMP")
+		#show the export window
+		GemRB.SetToken("NextScript","CharGen")
+		GemRB.SetNextScript ("ExportFile")

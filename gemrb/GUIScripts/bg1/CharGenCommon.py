@@ -96,6 +96,13 @@ class CharGen:
 		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
 		BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
+		AcceptButton = CharGenWindow.GetControl (8)
+		playmode = GemRB.GetVar ("PlayMode")
+		if playmode>=0:
+			AcceptButton.SetText (11962)
+		else:
+			AcceptButton.SetText (13956)
+
 		#set scrollbar
 		ScrollBar = CharGenWindow.GetControl (10)
 		ScrollBar.SetDefaultScrollBar()	

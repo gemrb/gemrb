@@ -44,13 +44,17 @@ PDollButton = 0
 IE_ANIM_ID = 206
 
 def RefreshPDoll():
+	MyChar = GemRB.GetVar ("Slot")
 	AnimID = 0x6000
 	table = GemRB.LoadTable("avprefr")
-	AnimID = AnimID+table.GetValue(GemRB.GetVar("Race"),0)
+	AnimID = AnimID+table.GetValue(GemRB.GetPlayerStat (MyChar, IE_RACE),0)
+	charclass = GemRB.GetPlayerStat (MyChar, IE_CLASS)
+	charclass = CommonTables.Classes.FindValue(5,charclass)
+	charclass = CommonTables.Classes.GetRowName(charclass)
 	table = GemRB.LoadTable("avprefc")
-	AnimID = AnimID+table.GetValue(GemRB.GetVar("Class"),0)
+	AnimID = AnimID+table.GetValue(table.GetRowIndex(charclass),0)
 	table = GemRB.LoadTable("avprefg")
-	AnimID = AnimID+table.GetValue(GemRB.GetVar("Gender"),0)
+	AnimID = AnimID+table.GetValue(GemRB.GetPlayerStat (MyChar, IE_SEX),0)
 	ResRef = CommonTables.Pdolls.GetValue(hex(AnimID), "LEVEL1")
 	PDollButton.SetPLT(ResRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
 

@@ -37,6 +37,8 @@ def OnLoad():
 			ClassWindow.Unload()
 			ClassWindow = None
 		return
+
+	MyChar = GemRB.GetVar ("Slot")
 	
 	GemRB.SetVar("Class",0)
 	GemRB.SetVar("Multi Class",0)
@@ -46,7 +48,8 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG")
 	ClassCount = CommonTables.Classes.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindow(2)
-	RaceName = CommonTables.Races.GetRowName(GemRB.GetVar("Race")-1 )
+	RaceRow = CommonTables.Races.FindValue(3,GemRB.GetPlayerStat (MyChar, IE_RACE))
+	RaceName = CommonTables.Races.GetRowName(RaceRow)
 
 	#radiobutton groups must be set up before doing anything else to them
 	for i in range(1,ClassCount):

@@ -40,10 +40,13 @@ def OnLoad():
 			AlignmentWindow = None
 		return
 
+	MyChar = GemRB.GetVar ("Slot")
+
 	GemRB.SetVar("Alignment",-1)
 	
-	Class = GemRB.GetVar("Class")-1
-	KitName = CommonTables.Classes.GetRowName(Class)
+	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
+	ClassRow = CommonTables.Classes.FindValue(5,Class)
+	KitName = CommonTables.Classes.GetRowName(ClassRow)
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 

@@ -42,11 +42,12 @@ def OnLoad():
 	TextAreaControl.GetCharacters()
 
 	DoneButton = ImportWindow.GetControl(0)
-	DoneButton.SetText(13955)
+	DoneButton.SetText (11973)
+
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	CancelButton = ImportWindow.GetControl(1)
-	CancelButton.SetText(15416)
+	CancelButton.SetText (13727)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
@@ -65,7 +66,7 @@ def DonePress():
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
 	GemRB.SetToken("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1) )
 	GemRB.SetToken("LargePortrait", GemRB.GetPlayerPortrait (Slot, 0) )
-	CharGenCommon.jumpTo("name")
+	CharGenCommon.jumpTo("appearance")
 	return
 
 def CancelPress():
