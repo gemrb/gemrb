@@ -1534,9 +1534,14 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 		return true;
 	}
 
+	bool filtered = false;
+
 	// name matching
 	if (oC->objectName[0]) {
-		return (strnicmp(ac->GetScriptName(), oC->objectName, 32) == 0);
+		if (strnicmp(ac->GetScriptName(), oC->objectName, 32) != 0) {
+			return false;
+		}
+		filtered = true;
 	}
 
 	// IDS targeting
@@ -1554,6 +1559,7 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 		if (!func( ac, oC->objectFields[j] ) ) {
 			return false;
 		}
+		filtered = true;
 	}
 
 	// globalID hack should never get here
@@ -1565,7 +1571,11 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 		// so we waste a lot of time here
 		Targets *tgts = new Targets();
 		int ga_flags = 0; // TODO: correct?
-		tgts->AddTarget(ac, 0, ga_flags);
+
+		// handle already-filtered vs not-yet-filtered cases
+		// e.g. LastTalkedToBy(Myself) vs LastTalkedToBy
+		if (filtered) tgts->AddTarget(ac, 0, ga_flags);
+
 		for (int i = 0; i < MaxObjectNesting; i++) {
 			int filterid = oC->objectFilters[i];
 			if (!filterid) break;
