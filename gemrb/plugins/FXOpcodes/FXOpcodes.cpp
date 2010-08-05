@@ -3059,7 +3059,11 @@ int fx_mirror_image (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	else {
 		// 2-8 mirror images
-		images = target->GetStat(IE_LEVEL)/3 + 2;
+		unsigned int level = target->GetMageLevel();
+		if (!level) level = target->GetSorcererLevel();
+		if (!level) level = target->GetBardLevel();
+		if (!level) level = target->GetStat(IE_LEVEL);
+		images = level/3 + 2;
 		if (images > 8) images = 8;
 	}
 
