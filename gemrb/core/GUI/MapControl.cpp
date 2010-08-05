@@ -397,7 +397,11 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 	if (xp < 0) xp = 0;
 	if (yp < 0) yp = 0;
 
-	core->timer->SetMoveViewPort( xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV, 0, false );
+	// clear any previously scheduled moves and then do it asap, so it works while paused
+	unsigned int vpx = xp * MAP_MULT / MAP_DIV;
+	unsigned int vpy = yp * MAP_MULT / MAP_DIV;
+	core->timer->SetMoveViewPort( vpx, vpy, 0, false );
+	core->GetVideoDriver()->MoveViewportTo( vpx, vpy );
 }
 
 /** Mouse Button Down */

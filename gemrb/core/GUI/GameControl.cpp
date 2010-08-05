@@ -2449,8 +2449,11 @@ int GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref
 	}
 
 	//allow mouse selection from dialog (even though screen is locked)
-	core->GetVideoDriver()->SetMouseEnabled(true);
+	Video *video = core->GetVideoDriver();
+	Region vp = video->GetViewport();
+	video->SetMouseEnabled(true);
 	core->timer->SetMoveViewPort( tgt->Pos.x, tgt->Pos.y, 0, true );
+	video->MoveViewportTo( tgt->Pos.x-vp.w/2, tgt->Pos.y-vp.h/2 );
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
 	if (!(dlg->Flags&7) ) {
 		DialogueFlags |= DF_FREEZE_SCRIPTS;
@@ -2789,9 +2792,11 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		ScreenFlags|=SF_CENTERONACTOR;
 	}
 	//center on first selected actor
-	Region vp = core->GetVideoDriver()->GetViewport();
+	Video *video = core->GetVideoDriver();
+	Region vp = video->GetViewport();
 	if (ScreenFlags&SF_CENTERONACTOR) {
 		core->timer->SetMoveViewPort( pc->Pos.x, pc->Pos.y, 0, true );
+		video->MoveViewportTo( pc->Pos.x-vp.w/2, pc->Pos.y-vp.h/2 );
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
 }
