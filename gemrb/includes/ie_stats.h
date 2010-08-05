@@ -424,11 +424,12 @@
 #define IE_ENABLEOFFSCREENAI    183 // bg2 has this on this spot
 #define IE_EXISTANCEDELAY       184 // affects the displaying of EXISTANCE strings
 #define IE_ATTACKNUMBERDOUBLE   185 // used by haste option 2
-#define IE_DISABLECHUNKING      186 //
+#define IE_DISABLECHUNKING      186 // no permanent death
 #define IE_NOTURNABLE           187 // immune to turn
-//188 IE_NOTINTERRUPTABLE
+//the IE sets this stat the same time as stat 150
+//188 IE_SUMMONDISABLE2
 #define IE_CHAOSSHIELD          189 // defense against wild surge
-#define IE_NPCBUMP              190 // not entirely sure what is this
+#define IE_NPCBUMP              190 // allow npcs to be bumped?
 #define IE_CANUSEANYITEM        191
 #define IE_ALWAYSBACKSTAB       192
 #define IE_SEX_CHANGED          193 // modified by opcode 0x47
@@ -438,6 +439,7 @@
 #define IE_DISABLETIMESTOP      197
 #define IE_NOSEQUESTER          198 // this doesn't work in IE, but intended
 #define IE_STONESKINSGOLEM	199
+//actually this stat is not used for level drain
 #define IE_LEVELDRAIN		200
 #define IE_AVATARREMOVAL        201
 
