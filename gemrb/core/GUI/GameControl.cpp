@@ -2536,6 +2536,12 @@ void GameControl::DialogChoose(unsigned int choose)
 		return;
 	}
 
+	Video *video = core->GetVideoDriver();
+	Region vp = video->GetViewport();
+	video->SetMouseEnabled(true);
+	core->timer->SetMoveViewPort( target->Pos.x, target->Pos.y, 0, true );
+	video->MoveViewportTo( target->Pos.x-vp.w/2, target->Pos.y-vp.h/2 );
+
 	if (choose == (unsigned int) -1) {
 		//increasing talkcount after top level condition was determined
 
