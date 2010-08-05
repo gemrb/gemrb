@@ -4767,6 +4767,7 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//not sticky
 	sca->XPos=fx->PosX;
 	sca->YPos=fx->PosY;
+	sca->PlayOnce();
 	map->AddVVCell( sca );
 	return FX_NOT_APPLIED;
 }
