@@ -589,8 +589,7 @@ void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 		}
 	}
 
-	// presumably this is correct
-	game->ClearPlaneLocations();
+	// don't clear locations!
 }
 
 //moves pcs and npcs from an area to another area

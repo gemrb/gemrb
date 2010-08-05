@@ -6004,6 +6004,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	game = core->GetGame();
 	if (!game) return FX_NOT_APPLIED;
 
+	game->ClearPlaneLocations();
 	for (int i = 0; i < game->GetPartySize(false); i++) {
 		Actor* act = game->GetPC( i, false );
 		GAMLocationEntry *gle = game->GetPlaneLocationEntry(i);
