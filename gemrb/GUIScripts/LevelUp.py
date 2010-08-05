@@ -204,8 +204,13 @@ def OpenLevelUpWindow():
 
 	hp = 0
 	HaveCleric = 0
+	# clear some globals, since we may get called multiple times with different classes
 	DeltaWSpells = 0
 	DeltaDSpells = 0
+	OldDSpells = [0]*7
+	OldWSpells = [0]*9
+	NewDSpells = [0]*7
+	NewWSpells = [0]*9
 
 	# get a bunch of different things each level
 	for i in range(NumClasses):
