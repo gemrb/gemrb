@@ -3058,7 +3058,9 @@ int fx_mirror_image (Scriptable* Owner, Actor* target, Effect* fx)
 		images = 1; //reflection
 	}
 	else {
-		images = core->Roll(2, fx->Parameter1, 0); //mirror image
+		// 2-8 mirror images
+		images = target->GetStat(IE_LEVEL)/3 + 2;
+		if (images > 8) images = 8;
 	}
 
 	Effect *fx2 = target->fxqueue.HasEffect(fx_mirror_image_modifier_ref);
