@@ -1037,7 +1037,7 @@ int GameScript::ID_Allegiance(Actor *actor, int parameter)
 // GetClassLevel takes care of this automatically!
 int GameScript::ID_Class(Actor *actor, int parameter)
 {
-	int value;
+	int value = 0;
 	if (parameter < 202 || parameter > 209) {
 		value = actor->GetStat(IE_CLASS);
 		return parameter==value;
