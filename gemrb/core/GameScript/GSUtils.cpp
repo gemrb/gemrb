@@ -1519,40 +1519,71 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 {
-	if (!Sender || !oC) {
+	if (!Sender) {
 		return false;
 	}
 	Actor *ac = core->GetGame()->GetActorByGlobalID(actorID);
 	if (!ac) {
 		return false;
 	}
+
+	// [0]/[ANYONE] can match all actors
+	if (!oC) {
+		return true;
+	}
+
+	// name matching
+	if (oC->objectName[0]) {
+		return (strnicmp(ac->GetScriptName(), oC->objectName, 32) == 0);
+	}
+
+	// IDS targeting
+	// TODO: check distance? area? visibility?
 	for (int j = 0; j < ObjectIDSCount; j++) {
 		if (!oC->objectFields[j]) {
 			continue;
 		}
 		IDSFunction func = idtargets[j];
 		if (!func) {
-			printf("Unimplemented IDS targeting opcode!\n");
+			printMessage("GameScript"," ", YELLOW);
+			printf("Unimplemented IDS targeting opcode: %d\n", j);
 			continue;
 		}
 		if (!func( ac, oC->objectFields[j] ) ) {
 			return false;
 		}
 	}
-	// TODO: check distance? area? visibility?
-	return true;
 
-	/*Targets *tgts;
-	if (oC) {
-		tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, 0);
-	} else {
-		// [0]/[ANYONE] can match all actors
-		tgts = GetAllActors(Sender, 0);
-	}
+	// globalID hack should never get here
+	assert(oc->objectFilters[0] != -1);
 
-	bool ret = false;
+	// object filters
+	if (oC->objectFilters[0]) {
+		// object filters insist on having a stupid targets list,
+		// so we waste a lot of time here
+		Targets *tgts = new Targets();
+		int ga_flags = 0; // TODO: correct?
+		tgts->AddTarget(ac, 0, ga_flags);
+		for (int i = 0; i < MaxObjectNesting; i++) {
+			int filterid = oC->objectFilters[i];
+			if (!filterid) break;
+			ObjectFunction func = objects[filterid];
+			if (!func) {
+				printMessage("GameScript"," ", YELLOW);
+				printf("Unknown object filter: %d %s\n", filterid, objectsTable->GetValue(filterid));
+				continue;
+			}
+			tgts = func(Sender, tgts, ga_flags);
+			if (!tgts->Count()) {
+				delete tgts;
+				return false;
+			}
+		}
 
-	if (tgts) {
+		// and sometimes object filters are lazy and not only don't filter
+		// what we give them, they clear it and return a list :(
+		// so we have to search the whole list..
+		bool ret = false;
 		targetlist::iterator m;
 		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
@@ -1563,9 +1594,10 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 			}
 			tt = tgts->GetNextTarget(m, ST_ACTOR);
 		}
+		delete tgts;
+		if (!ret) return false;
 	}
-	delete tgts;
-	return ret;*/
+	return true;
 }
 
 int GetObjectCount(Scriptable* Sender, Object* oC)
