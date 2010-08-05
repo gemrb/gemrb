@@ -1557,7 +1557,7 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 	}
 
 	// globalID hack should never get here
-	assert(oc->objectFilters[0] != -1);
+	assert(oC->objectFilters[0] != -1);
 
 	// object filters
 	if (oC->objectFilters[0]) {
