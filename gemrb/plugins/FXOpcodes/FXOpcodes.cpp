@@ -3058,11 +3058,13 @@ int fx_mirror_image (Scriptable* Owner, Actor* target, Effect* fx)
 		images = 1; //reflection
 	}
 	else {
-		// 2-8 mirror images
+		// the original uses only IE_LEVEL, but that can be awefully bad in
+		// the case of dual- and multiclasses
 		unsigned int level = target->GetMageLevel();
 		if (!level) level = target->GetSorcererLevel();
 		if (!level) level = target->GetBardLevel();
 		if (!level) level = target->GetStat(IE_LEVEL);
+		// 2-8 mirror images
 		images = level/3 + 2;
 		if (images > 8) images = 8;
 	}
