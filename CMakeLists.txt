@@ -206,6 +206,12 @@ FIND_LIBRARY(VORBIS_LIBRARY vorbisfile)
 
 ADD_DEFINITIONS("-DHAVE_CONFIG_H")
 
+# On Release builds cmake automatically defines NDEBUG, so we
+# explicitly undefine it:
+if(CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT MSVC)
+	ADD_DEFINITIONS("-UNDEBUG")
+endif()
+
 if (STATIC_LINK)
 	if (NOT WIN32 AND NOT APPLE)
 		ADD_DEFINITIONS("-DSTATIC_LINK")
