@@ -3058,7 +3058,7 @@ int fx_mirror_image (Scriptable* Owner, Actor* target, Effect* fx)
 		images = 1; //reflection
 	}
 	else {
-		images = core->Roll(1, fx->Parameter1, 0); //mirror image
+		images = core->Roll(2, fx->Parameter1, 0); //mirror image
 	}
 
 	Effect *fx2 = target->fxqueue.HasEffect(fx_mirror_image_modifier_ref);
