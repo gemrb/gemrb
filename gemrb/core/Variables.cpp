@@ -336,7 +336,8 @@ void Variables::SetAt(const char* key, char* value)
 	assert(strlen(key)<256);
 
 #ifdef _DEBUG
-	assert((unsigned char)key[0]!=0xcc);
+	// for Avenger, debugging memory issues
+	assert((unsigned char)key[0]!=0xcd);
 #endif
 
 	assert( m_type == GEM_VARIABLES_STRING );
