@@ -333,8 +333,11 @@ void Variables::SetAt(const char* key, char* value)
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
 
-  assert(strlen(key)<256);
-  assert(key[0]!=-51);
+	assert(strlen(key)<256);
+
+#ifdef _DEBUG
+	assert((unsigned char)key[0]!=0xcc);
+#endif
 
 	assert( m_type == GEM_VARIABLES_STRING );
 	if (( pAssoc = GetAssocAt( key, nHash ) ) == NULL) {
