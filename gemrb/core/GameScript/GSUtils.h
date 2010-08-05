@@ -77,10 +77,6 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect);
 void PolymorphCopyCore(Actor *src, Actor *tar, bool base);
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
-Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags);
-Targets* GetAllActors(Scriptable* Sender, int ga_flags);
-Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0);
-Scriptable* GetStoredActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0);
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag);
 void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee);
 void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c);
@@ -114,23 +110,11 @@ void GoNearAndRetry(Scriptable *Sender, const Point &p, int distance);
 #define BINARY_LESS 11          //left has less bits than right
 
 GEM_EXPORT int GetGroup(Actor *actor);
-Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters, int ga_flags);
-Targets *XthNearestOf(Targets *parameters, int count, int ga_flags);
-Targets *XthNearestDoor(Targets *parameters, unsigned int count);
-Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags);
-Targets *ClosestEnemySummoned(Scriptable *origin, Targets *parameters, int ga_flags);
-Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags);
-Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags);
 
 void FreeSrc(SrcVector *poi, const ieResRef key);
 SrcVector *LoadSrc(const ieResRef resname);
 Action *ParamCopy(Action *parameters);
 Action *ParamCopyNoOverride(Action *parameters);
-/* returns true if actor matches the object specs. */
-bool MatchActor(Scriptable *Sender, ieDword ID, Object* oC);
-/* returns the number of actors matching the IDS targeting */
-int GetObjectCount(Scriptable* Sender, Object* oC);
-int GetObjectLevelCount(Scriptable* Sender, Object* oC);
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 Point GetEntryPoint(const char *areaname, const char *entryname);
 //these are used from other plugins

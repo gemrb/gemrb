@@ -4,6 +4,7 @@ FILE(GLOB gemrb_core_LIB_SRCS "*.cpp"
 	GameScript/Actions.cpp
 	GameScript/GSUtils.cpp
 	GameScript/GameScript.cpp
+	GameScript/Matching.cpp
 	GameScript/Objects.cpp
 	GameScript/Triggers.cpp
 	GUI/Button.cpp

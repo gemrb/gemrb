@@ -30,6 +30,7 @@
 #include "Interface.h"
 #include "Map.h"
 #include "GameScript/GSUtils.h"
+#include "GameScript/Matching.h"
 #include "Scriptable/Actor.h"
 
 static const int StatValues[9]={
