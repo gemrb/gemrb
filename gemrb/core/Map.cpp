@@ -2609,29 +2609,41 @@ bool Map::IsVisible(const Point &s, const Point &d)
 	int dY=d.y/12;
 	int diffx = sX - dX;
 	int diffy = sY - dY;
+
+	// we basically draw a 'line' from (sX, sY) to (dX, dY)
+	// we want to move along the larger axis, to make sure we don't miss anything
 	if (abs( diffx ) >= abs( diffy )) {
-		//vertical
+		// (sX - startX)/elevationy = (sX - startX)/fabs(diffx) * diffy
 		double elevationy = fabs((double)diffx ) / diffy;
 		if (sX > dX) {
-			for (int startx = sX; startx > dX; startx--) {
+			// right to left
+			for (int startx = sX; startx >= dX; startx--) {
+				// sX - startx >= 0, so subtract (due to sign of diffy)
 				if (GetBlocked( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
 					return false;
 			}
 		} else {
-			for (int startx = sX; startx < dX; startx++) {
+			// left to right
+			for (int startx = sX; startx <= dX; startx++) {
+				// sX - startx <= 0, so add (due to sign of diffy)
 				if (GetBlocked( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
 					return false;
 			}
 		}
 	} else {
+		// (sY - startY)/elevationx = (sY - startY)/fabs(diffy) * diffx
 		double elevationx = fabs((double)diffy ) / diffx;
 		if (sY > dY) {
-			for (int starty = sY; starty > dY; starty--) {
+			// bottom to top
+			for (int starty = sY; starty >= dY; starty--) {
+				// sY - starty >= 0, so subtract (due to sign of diffx)
 				if (GetBlocked( sX - ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
 					return false;
 			}
 		} else {
-			for (int starty = sY; starty < dY; starty++) {
+			// top to bottom
+			for (int starty = sY; starty <= dY; starty++) {
+				// sY - starty <= 0, so add (due to sign of diffx)
 				if (GetBlocked( sX + ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
 					return false;
 			}
