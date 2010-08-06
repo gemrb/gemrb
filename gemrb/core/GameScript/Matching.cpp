@@ -26,7 +26,7 @@
 #include "TileMap.h"
 
 /* return a Targets object with a single actor inside */
-static Targets* ReturnActorAsTarget(Actor *aC)
+inline static Targets* ReturnActorAsTarget(Actor *aC)
 {
 	if (!aC) return NULL;
 	Targets *tgts = new Targets();
@@ -50,7 +50,7 @@ static Targets* ReturnActorAsTarget(Actor *aC)
 }*/
 
 /* do IDS filtering: [PC], [ENEMY], etc */
-bool DoObjectIDSCheck(Object *oC, Actor *ac, bool *filtered) {
+inline static bool DoObjectIDSCheck(Object *oC, Actor *ac, bool *filtered) {
 	for (int j = 0; j < ObjectIDSCount; j++) {
 		if (!oC->objectFields[j]) {
 			continue;
@@ -70,7 +70,7 @@ bool DoObjectIDSCheck(Object *oC, Actor *ac, bool *filtered) {
 }
 
 /* do object filtering: Myself, LastAttackerOf(Player1), etc */
-Targets *DoObjectFiltering(Scriptable *Sender, Targets *tgts, Object *oC, int ga_flags) {
+inline static Targets *DoObjectFiltering(Scriptable *Sender, Targets *tgts, Object *oC, int ga_flags) {
 	for (int i = 0; i < MaxObjectNesting; i++) {
 		int filterid = oC->objectFilters[i];
 		if (!filterid) break;
@@ -89,6 +89,53 @@ Targets *DoObjectFiltering(Scriptable *Sender, Targets *tgts, Object *oC, int ga
 		}
 	}
 	return tgts;
+}
+
+static EffectRef fx_protection_creature_ref = { "Protection:Creature", NULL, -1 };
+
+inline static bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, int &dist, bool ignoreinvis=false)
+{
+	dist = SquaredMapDistance(Sender, target);
+
+	// TODO: what do we check for non-actors?
+
+	if (Sender->Type == ST_ACTOR) {
+		Actor *source = (Actor *)Sender;
+
+		// Detect() ignores invisibility completely
+		if (!ignoreinvis) {
+			// TODO: move this stuff into a shared function so it can be used elsewhere?
+
+			// SEEINVISIBLE skips these checks :-)
+			if (source->Modified[IE_SEEINVISIBLE] != 0) {
+				ieDword state = target->Modified[IE_STATE_ID];
+				// check for invisibility
+				if ((state & STATE_INVISIBLE) != 0) return false;
+				// check for improved invisibility
+				if ((state & STATE_INVIS2) != 0) return false;
+			}
+		}
+
+		// visual range check
+		int visualrange = source->Modified[IE_VISUALRANGE];
+		if (dist > visualrange*visualrange) return false;
+
+		// LOS check
+		if (!map->IsVisible(Sender->Pos, target->Pos)) return false;
+
+		// protection against creature
+		if (target->fxqueue.HasEffect(fx_protection_creature_ref)) {
+			// TODO: de-hardcode these (may not all be correct anyway)
+			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 2, source->Modified[IE_EA])) return false;
+			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 3, source->Modified[IE_GENERAL])) return false;
+			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 4, source->Modified[IE_RACE])) return false;
+			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 5, source->Modified[IE_CLASS])) return false;
+			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 6, source->Modified[IE_SPECIFIC])) return false;
+			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 7, source->Modified[IE_SEX])) return false;
+			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, 8, source->Modified[IE_ALIGNMENT])) return false;
+		}
+	}
+	return true;
 }
 
 /* returns actors that match the [x.y.z] expression */
@@ -134,9 +181,11 @@ static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_
 				assert(!tgts);
 				return NULL;
 			}
-			if (!tgts) tgts = new Targets();
-			int dist = Distance(Sender->Pos, ac->Pos);
-			tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
+			int dist;
+			if (DoObjectChecks(map, Sender, ac, dist, (ga_flags & GA_DETECT) != 0)) {
+				if (!tgts) tgts = new Targets();
+				tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
+			}
 		}
 	}
 
@@ -580,6 +629,7 @@ Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned
 			continue;
 		}
 		Actor *actor = (Actor *) (t->actor);
+		// IDS targeting already did object checks (unless we need to override Detect?)
 		if (type) { //origin is PC
 			if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
 				t=parameters->RemoveTargetAt(m);
@@ -614,7 +664,11 @@ Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags)
 	Actor *ac;
 	while (i--) {
 		ac=map->GetActor(i,true);
-		int distance = Distance(ac, origin);
+		int distance;
+		//int distance = Distance(ac, origin);
+		// TODO: if it turns out you need to check Sender here, beware you take the right distance!
+		// (n the original games, this is only used for NearestEnemyOf(Player1) in obsgolem.bcs)
+		if (!DoObjectChecks(map, origin, ac, distance)) continue;
 		if (type) { //origin is PC
 			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 				parameters->AddTarget(ac, distance, ga_flags);

@@ -486,7 +486,7 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 	int flags;
 
 	if (parameters->int0Parameter) {
-		flags = 0;
+		flags = GA_DETECT;
 	} else {
 		flags = GA_NO_DEAD;
 	}

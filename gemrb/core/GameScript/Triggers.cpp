@@ -2355,10 +2355,9 @@ int GameScript::See(Scriptable* Sender, Trigger* parameters)
 	return see;
 }
 
-//unsure if this should be different from see, we'll see :)
 int GameScript::Detect(Scriptable* Sender, Trigger* parameters)
 {
-	parameters->int0Parameter=1; //seedead
+	parameters->int0Parameter=1; //seedead/invis
 	int see = SeeCore(Sender, parameters, 0);
 	if (!see) {
 		return 0;
