@@ -454,11 +454,11 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 	}
 
 	map = target->GetCurrentArea();
-	if (!(seeflag&GA_GLOBAL)) {
+	//if (!(seeflag&GA_GLOBAL)) {
 		if ( map!=Sender->GetCurrentArea() ) {
 			return 0;
 		}
-	}
+	//}
 
 	if (range) {
 		unsigned int dist;

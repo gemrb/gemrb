@@ -25,19 +25,16 @@
 #include "Game.h"
 #include "TileMap.h"
 
+/* return a Targets object with a single actor inside */
 static Targets* ReturnActorAsTarget(Actor *aC)
 {
-		if (!aC) {
-			return NULL;
-		}
-		//Ok :) we now have our Object. Let's create a Target struct and add the object to it
-		Targets *tgts = new Targets( );
-		tgts->AddTarget( aC, 0, 0 );
-		//return here because object name/IDS targeting are mutually exclusive
-		return tgts;
+	if (!aC) return NULL;
+	Targets *tgts = new Targets();
+	tgts->AddTarget(aC, 0, 0);
+	return tgts;
 }
 
-Actor *FindActorNearby(const char *name, Map *except, int ga_flags)
+/*Actor *FindActorNearby(const char *name, Map *except, int ga_flags)
 {
 	Game *game = core->GetGame();
 	size_t mc = game->GetLoadedMapCount();
@@ -50,6 +47,48 @@ Actor *FindActorNearby(const char *name, Map *except, int ga_flags)
 		}
 	}
 	return NULL;
+}*/
+
+/* do IDS filtering: [PC], [ENEMY], etc */
+bool DoObjectIDSCheck(Object *oC, Actor *ac, bool *filtered) {
+	for (int j = 0; j < ObjectIDSCount; j++) {
+		if (!oC->objectFields[j]) {
+			continue;
+		}
+		*filtered = true;
+		IDSFunction func = idtargets[j];
+		if (!func) {
+			printMessage("GameScript"," ", YELLOW);
+			printf("Unimplemented IDS targeting opcode: %d\n", j);
+			continue;
+		}
+		if (!func( ac, oC->objectFields[j] ) ) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/* do object filtering: Myself, LastAttackerOf(Player1), etc */
+Targets *DoObjectFiltering(Scriptable *Sender, Targets *tgts, Object *oC, int ga_flags) {
+	for (int i = 0; i < MaxObjectNesting; i++) {
+		int filterid = oC->objectFilters[i];
+		if (!filterid) break;
+
+		ObjectFunction func = objects[filterid];
+		if (!func) {
+			printMessage("GameScript"," ", YELLOW);
+			printf("Unknown object filter: %d %s\n", filterid, objectsTable->GetValue(filterid));
+			continue;
+		}
+
+		tgts = func(Sender, tgts, ga_flags);
+		if (!tgts->Count()) {
+			delete tgts;
+			return NULL;
+		}
+	}
+	return tgts;
 }
 
 /* returns actors that match the [x.y.z] expression */
@@ -59,14 +98,16 @@ static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_
 		//We want the object by its name... (doors/triggers don't play here!)
 		Actor* aC = map->GetActor( oC->objectName, ga_flags );
 
-		if (!aC && (ga_flags&GA_GLOBAL) ) {
+		/*if (!aC && (ga_flags&GA_GLOBAL) ) {
 			aC = FindActorNearby(oC->objectName, map, ga_flags );
-		}
+		}*/
 
+		//return here because object name/IDS targeting are mutually exclusive
 		return ReturnActorAsTarget(aC);
 	}
 
 	if (oC->objectFields[0]==-1) {
+		// this is an internal hack, allowing us to pass actor ids around as objects
 		Actor* aC = map->GetActorByGlobalID( (ieDword) oC->objectFields[1] );
 		/* TODO: this hack will throw away an invalid target */
 		/* Consider putting this in GetActorByGlobalID */
@@ -76,57 +117,29 @@ static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_
 		return ReturnActorAsTarget(aC);
 	}
 
-	Targets *tgts=NULL;
+	Targets *tgts = NULL;
 
-	//else branch, IDS targeting
-	for (int j = 0; j < ObjectIDSCount; j++) {
-		if (!oC->objectFields[j]) {
-			continue;
-		}
-		IDSFunction func = idtargets[j];
-		if (!func) {
-			printf("Unimplemented IDS targeting opcode!\n");
-			continue;
-		}
-		if (tgts) {
-			//we already got a subset of actors
-			int i = tgts->Count();
-			/*premature end, filtered everything*/
-			if (!i) {
-				break; //leaving the loop
+	//we need to get a subset of actors from the large array
+	//if this gets slow, we will need some index tables
+	int i = map->GetActorCount(true);
+	while (i--) {
+		Actor *ac = map->GetActor(i, true);
+		if (!ac) continue; // is this check really needed?
+		// don't return Sender in IDS targeting!
+		if (ac == Sender) continue;
+		bool filtered = false;
+		if (DoObjectIDSCheck(oC, ac, &filtered)) {
+			if (!filtered) {
+				// if no filters were applied..
+				assert(!tgts);
+				return NULL;
 			}
-			targetlist::iterator m;
-			const targettype *t = tgts->GetFirstTarget(m, -1);
-			while (t) {
-				if (t->actor->Type!=ST_ACTOR) {
-//we should never stumble here
-abort();
-//					t = tgts->RemoveTargetAt(m);
-					continue;
-				}
-				if (!func( (Actor *) (t->actor), oC->objectFields[j] ) ) {
-					t = tgts->RemoveTargetAt(m);
-					continue;
-				}
-				t = tgts->GetNextTarget(m, -1);
-			}
-		} else {
-			//we need to get a subset of actors from the large array
-			//if this gets slow, we will need some index tables
-			int i = map->GetActorCount(true);
-			tgts = new Targets();
-			while (i--) {
-				Actor *ac=map->GetActor(i,true);
-				int dist = Distance(Sender->Pos, ac->Pos);
-				if (ac && func(ac, oC->objectFields[j]) ) {
-					// don't return Sender in IDS targeting!
-					if (ac != Sender) {
-						tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
-					}
-				}
-			}
+			if (!tgts) tgts = new Targets();
+			int dist = Distance(Sender->Pos, ac->Pos);
+			tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
 		}
 	}
+
 	return tgts;
 }
 
@@ -147,28 +160,11 @@ Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags)
 	if (!tgts) {
 		tgts = new Targets();
 	}
-	for (int i = 0; i < MaxObjectNesting; i++) {
-		int filterid = oC->objectFilters[i];
-		if (!filterid) {
-			break;
-		}
-		ObjectFunction func = objects[filterid];
-		if (func) {
-			tgts = func( Sender, tgts, ga_flags);
-		}
-		else {
-			printMessage("GameScript"," ", YELLOW);
-			printf("Unknown object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
-		}
-		if (!tgts->Count()) {
-			delete tgts;
-			return NULL;
-		}
-	}
+	tgts = DoObjectFiltering(Sender, tgts, oC, ga_flags);
 	return tgts;
 }
 
-Targets *GetAllObjectsNearby(Scriptable* Sender, Object* oC, int ga_flags)
+/*Targets *GetAllObjectsNearby(Scriptable* Sender, Object* oC, int ga_flags)
 {
 	Game *game = core->GetGame();
 	size_t mc = game->GetLoadedMapCount();
@@ -181,25 +177,25 @@ Targets *GetAllObjectsNearby(Scriptable* Sender, Object* oC, int ga_flags)
 		}
 	}
 	return NULL;
-}
+}*/
 
 Targets *GetAllActors(Scriptable *Sender, int ga_flags)
 {
-	Map *map=Sender->GetCurrentArea();
+	Map *map = Sender->GetCurrentArea();
 
 	int i = map->GetActorCount(true);
 	Targets *tgts = new Targets();
 	while (i--) {
-		Actor *ac=map->GetActor(i,true);
+		Actor *ac = map->GetActor(i,true);
 		int dist = Distance(Sender->Pos, ac->Pos);
 		tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
 	}
 	return tgts;
 }
 
+/* get a non-actor object from a map, by name */
 Scriptable *GetActorObject(TileMap *TMap, const char *name)
 {
-
 	Scriptable * aC = TMap->GetDoor( name );
 	if (aC) {
 		return aC;
@@ -209,6 +205,7 @@ Scriptable *GetActorObject(TileMap *TMap, const char *name)
 	//AR1512 sanity test quest would fail
 	//If this order couldn't be maintained, then 'Contains' should have a
 	//unique call to get containers only
+
 	//No... it was not an door... maybe a Container?
 	aC = TMap->GetContainer( name );
 	if (aC) {
@@ -261,7 +258,7 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 		//now this could return other than actor objects
 		aC = tgts->GetTarget(0,-1);
 		delete tgts;
-		if (!aC && (ga_flags&GA_GLOBAL) )
+		/*if (!aC && (ga_flags&GA_GLOBAL) )
 		{
 			tgts = GetAllObjectsNearby(Sender, oC, ga_flags);
 			if (tgts) {
@@ -269,7 +266,7 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 				aC = tgts->GetTarget(0,-1);
 				delete tgts;
 			}
-		}
+		}*/
 		return aC;
 	}
 
@@ -290,7 +287,7 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 			return aC;
 		}
 
-		if (ga_flags&GA_GLOBAL) {
+		/*if (ga_flags&GA_GLOBAL) {
 			size_t mc = game->GetLoadedMapCount();
 			while(mc--) {
 				Map *map = game->GetMap(mc);
@@ -300,7 +297,7 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 					return aC;
 				}
 			}
-		}
+		}*/
 	}
 	return NULL;
 }
@@ -331,22 +328,9 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 	}
 
 	// IDS targeting
+	// (if we already matched by name, we don't do this)
 	// TODO: check distance? area? visibility?
-	for (int j = 0; j < ObjectIDSCount; j++) {
-		if (!oC->objectFields[j]) {
-			continue;
-		}
-		IDSFunction func = idtargets[j];
-		if (!func) {
-			printMessage("GameScript"," ", YELLOW);
-			printf("Unimplemented IDS targeting opcode: %d\n", j);
-			continue;
-		}
-		if (!func( ac, oC->objectFields[j] ) ) {
-			return false;
-		}
-		filtered = true;
-	}
+	if (!filtered && !DoObjectIDSCheck(oC, ac, &filtered)) return false;
 
 	// globalID hack should never get here
 	assert(oC->objectFilters[0] != -1);
@@ -362,21 +346,8 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 		// e.g. LastTalkedToBy(Myself) vs LastTalkedToBy
 		if (filtered) tgts->AddTarget(ac, 0, ga_flags);
 
-		for (int i = 0; i < MaxObjectNesting; i++) {
-			int filterid = oC->objectFilters[i];
-			if (!filterid) break;
-			ObjectFunction func = objects[filterid];
-			if (!func) {
-				printMessage("GameScript"," ", YELLOW);
-				printf("Unknown object filter: %d %s\n", filterid, objectsTable->GetValue(filterid));
-				continue;
-			}
-			tgts = func(Sender, tgts, ga_flags);
-			if (!tgts->Count()) {
-				delete tgts;
-				return false;
-			}
-		}
+		tgts = DoObjectFiltering(Sender, tgts, oC, ga_flags);
+		if (!tgts) return false;
 
 		// and sometimes object filters are lazy and not only don't filter
 		// what we give them, they clear it and return a list :(

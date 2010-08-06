@@ -109,7 +109,9 @@ struct PolymorphCache;
 //cannot target self
 #define GA_NO_SELF    2048
 //try other areas too
-#define GA_GLOBAL     4096
+//(unused and removed, see git history of the commit which
+//added this comment for some clues if you really need it)
+//#define GA_GLOBAL     4096
 
 #define GUIBT_COUNT  12
 
