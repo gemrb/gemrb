@@ -1376,15 +1376,8 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 	if (!scr) {
 		return 0;
 	}
-	Point from = Sender->Pos;
-	from.x /= 16;
-	from.y /= 12;
-	Point to = scr->Pos;
-	to.x /= 16;
-	to.y /= 12;
-
-	int distance = Distance(from, to);
-	return DiffCore(distance, parameters->int0Parameter+1, parameters->int1Parameter);
+	int distance = SquaredMapDistance(Sender, scr);
+	return DiffCore(distance, (parameters->int0Parameter+1)*(parameters->int0Parameter+1), parameters->int1Parameter);
 }
 
 //PST

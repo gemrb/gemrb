@@ -136,6 +136,13 @@ unsigned int Distance(Point p, Point q)
 	return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
 }
 
+unsigned int SquaredMapDistance(Point p, Scriptable *b)
+{
+	long x = ( p.x/16 - b->Pos.x/16 );
+	long y = ( p.y/12 - b->Pos.y/12 );
+	return (unsigned int)(x*x + y*y);
+}
+
 /** Calculates distance between 2 points */
 unsigned int Distance(Point p, Scriptable *b)
 {
@@ -154,6 +161,13 @@ unsigned int PersonalDistance(Point p, Scriptable *b)
 	}
 	if (ret<0) return (unsigned int) 0;
 	return (unsigned int) ret;
+}
+
+unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b)
+{
+	long x = (a->Pos.x/16 - b->Pos.x/16 );
+	long y = (a->Pos.y/12 - b->Pos.y/12 );
+	return (unsigned int)(x*x + y*y);
 }
 
 /** Calculates distance between 2 scriptables */
