@@ -107,12 +107,12 @@ inline static bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, i
 			// TODO: move this stuff into a shared function so it can be used elsewhere?
 
 			// SEEINVISIBLE skips these checks :-)
-			if (source->Modified[IE_SEEINVISIBLE] != 0) {
+			if (source->Modified[IE_SEEINVISIBLE] == 0) {
 				ieDword state = target->Modified[IE_STATE_ID];
 				// check for invisibility
 				if ((state & STATE_INVISIBLE) != 0) return false;
-				// check for improved invisibility
-				if ((state & STATE_INVIS2) != 0) return false;
+				// check for improved invisibility? probably not
+				//if ((state & STATE_INVIS2) != 0) return false;
 			}
 		}
 
