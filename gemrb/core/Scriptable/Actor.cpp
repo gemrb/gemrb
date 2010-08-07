@@ -3922,6 +3922,9 @@ int Actor::Immobile() const
 	if (GetStat(IE_HELD)) {
 		return 1;
 	}
+	if (GetStat(IE_STATE_ID) & STATE_STILL) {
+		return 1;
+	}
 	return 0;
 }
 
