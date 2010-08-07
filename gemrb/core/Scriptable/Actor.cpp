@@ -4992,10 +4992,11 @@ void Actor::Draw(const Region &screen)
 		//make actor unselectable and unselected when it is not moving
 		//dead, petriefied, frozen, paralysed etc.
 		if (Frozen) {
-			if (Selected!=0x80) {
+			// this 0x80 stuff was broken and is more broken now, disabled
+			//if (Selected!=0x80) {
+			//	Selected = 0x80;
 				core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
-				Selected = 0x80;
-			}
+			//}
 		}
 		//If you find a better place for it, I'll really be glad to put it there
 		//IN BG1 and BG2, this is at the ninth frame...
