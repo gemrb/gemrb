@@ -411,6 +411,7 @@ int Game::JoinParty(Actor* actor, int join)
 	}
 
 	if (join&(JP_INITPOS|JP_SELECT)) {
+		actor->Selected = 0; // don't confuse SelectActor!
 		SelectActor(actor,true, SELECT_NORMAL);
 	}
 
@@ -483,8 +484,8 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 			(*m)->Select( false );
 			(*m)->SetOver( false );
 		}
-
 		selected.clear();
+
 		if (select) {
 			for ( m = PCs.begin(); m != PCs.end(); ++m) {
 				if (! *m) {
@@ -508,12 +509,35 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 
 		// deselect all actors first when exclusive
 		if (flags & SELECT_REPLACE) {
+			if (selected.size() == 1 && actor->IsSelected()) {
+				assert(selected[0] == actor);
+				// already the only selected actor
+				return true;
+			}
 			SelectActor( NULL, false, SELECT_QUIET );
+		} else if (actor->IsSelected()) {
+			// already selected
+			return true;
+
+			/*for ( m = selected.begin(); m != selected.end(); ++m) {
+				if ((*m) == actor) return true;
+			}
+			assert(false);*/
 		}
 
 		actor->Select( true );
+		assert(actor->IsSelected());
 		selected.push_back( actor );
 	} else {
+		if (!actor->IsSelected()) {
+			// already not selected
+			return true;
+
+			/*for ( m = selected.begin(); m != selected.end(); ++m) {
+				assert((*m) != actor);
+			}
+			return true;*/
+		}
 		for ( m = selected.begin(); m != selected.end(); ++m) {
 			if ((*m) == actor) {
 				selected.erase( m );
@@ -521,6 +545,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 			}
 		}
 		actor->Select( false );
+		assert(!actor->IsSelected());
 	}
 
 	if (! (flags & SELECT_QUIET)) {

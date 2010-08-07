@@ -4993,8 +4993,8 @@ void Actor::Draw(const Region &screen)
 		//dead, petriefied, frozen, paralysed etc.
 		if (Frozen) {
 			if (Selected!=0x80) {
-				Selected = 0x80;
 				core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
+				Selected = 0x80;
 			}
 		}
 		//If you find a better place for it, I'll really be glad to put it there
