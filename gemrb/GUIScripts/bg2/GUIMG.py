@@ -600,7 +600,7 @@ def ContingencyOk ():
 	if Target == 2:
 		GemRB.ApplyEffect (pc, "Sequencer:Store", 0, 0, Spell1, Spell2, Spell3, Source)
 	else:
-		GemRB.ApplyEffect (pc, "CastSpellOnCondition", Target, Condition, Spell1, Spell2, Spell3, Source)
+		GemRB.ApplyEffect (pc, "CastSpellOnCondition", 0, GemRB.GetVar ("ContCond"), Spell1, Spell2, Spell3, Source)
 	#set the innate
 	GemRB.LearnSpell (pc, Source+"d", LS_MEMO)
 	OtherWindow.Unload()
