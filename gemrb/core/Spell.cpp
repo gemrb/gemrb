@@ -155,16 +155,23 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, const Point &targ
 //get the casting distance of the spell
 //it depends on the casting level of the actor
 //if actor isn't given, then the first header is used
-//TODO: fix casting level for all class combos
 unsigned int Spell::GetCastingDistance(Actor *actor) const
 {
-	int level = 1;
+	int level = 0;
 	if(actor) {
-		level = actor->GetStat(IE_LEVEL);
 		if(SpellType==IE_SPL_WIZARD) {
+			level = actor->GetMageLevel();
+			if (!level) level = actor->GetSorcererLevel();
+			if (!level) level = actor->GetBardLevel();
+			if (!level) level = actor->GetStat(IE_LEVEL);
 			level+=actor->GetStat(IE_CASTINGLEVELBONUSMAGE);
 		}
 		else if(SpellType==IE_SPL_PRIEST) {
+			level = actor->GetClericLevel();
+			if (!level) level = actor->GetDruidLevel();
+			if (!level) level = actor->GetPaladinLevel();
+			if (!level) level = actor->GetRangerLevel();
+			if (!level) level = actor->GetStat(IE_LEVEL);
 			level+=actor->GetStat(IE_CASTINGLEVELBONUSCLERIC);
 		}
 	}
