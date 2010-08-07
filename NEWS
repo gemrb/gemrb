@@ -1,4 +1,4 @@
-GemRB git (b4f3f54e):
+GemRB git (13bb69c85):
   New features:
     - 
     - dualclassing for bg1 and iwd
@@ -8,12 +8,15 @@ GemRB git (b4f3f54e):
 
   Improved features:
     - 
-    - item loading and ability selection
+    - actions, triggers, object matching
+    - item loading and ability selection, inventory
     - projectiles, effects, subtitles, verbal constants
     - the core and guiscript design was cleaned up in many places
     - bugfixes
 
   Applied patches:
+    backslash check patch from anthiste
+    bg1 character generation patch from Maighstir
 
 GemRB V0.6.1 (2010-06-16):
   New features:
