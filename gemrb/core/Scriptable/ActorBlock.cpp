@@ -635,6 +635,8 @@ void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 	LastTargetPos.empty();
 }
 
+static EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
+
 void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 {
 	if (Type == ST_ACTOR) {
@@ -676,8 +678,23 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 				Actor *me = (Actor *) this;
 				target->LastSpellOnMe = spellnum;
 				target->LastCasterOnMe = me->GetID();
-				me->CureInvisibility();
-				if (target!=this) {
+				// don't cure invisibility if this is a self targetting invisibility spell
+				// like shadow door
+				//can't check GetEffectBlock, since it doesn't construct the queue for selftargetting spells
+				bool invis = false;
+				unsigned int opcode = EffectQueue::ResolveEffect(fx_set_invisible_state_ref);
+				for (unsigned int i=0; i < spl->ext_headers[SpellHeader].FeatureCount; i++) {
+					if (spl->GetExtHeader(SpellHeader)->features[i].Opcode == opcode) {
+						invis = true;
+						break;
+					}
+				}
+				if (invis && spl->GetExtHeader(SpellHeader)->Target == TARGET_SELF) {
+					//pass
+				} else {
+					me->CureInvisibility();
+				}
+				if (target!=this) { //FIXME: only dispel it for hostile spells
 					me->CureSanctuary();
 				}
 			}
