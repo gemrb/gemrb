@@ -111,7 +111,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 			//fxqueue->AddEffect will copy the effect,
 			//so we don't risk any overwriting
 			if (EffectQueue::HasDuration(features+i)) {
-				features[i].Duration = (TimePerLevel*block_index+TimeConstant)*7;
+				features[i].Duration = (TimePerLevel*block_index+TimeConstant)*core->Time.round_sec;
 			}
 		}
 		//fill these for completeness, inventoryslot is a good way
