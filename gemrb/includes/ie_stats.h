@@ -136,7 +136,8 @@
 #define STATE_EMBALM     0x40000000
 #define STATE_CONFUSED   0x80000000
 
-#define STATE_STILL      0xc8       //not animated
+#define STATE_STILL      (STATE_STUNNED | STATE_FROZEN | STATE_PETRIFIED) //not animated
+
 #define STATE_CANTMOVE   0x80180fef
 #define STATE_CANTLISTEN 0x80080fef
 #define STATE_CANTSTEAL  0x00180fc0 //can't steal from
