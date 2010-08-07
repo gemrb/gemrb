@@ -168,8 +168,9 @@ def UpdateMageWindow ():
 	Label = Window.GetControl (0x10000035)
 	Label.SetText (Name)
 
+	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
+	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
 	if not BookType:
-		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
 		for i in range (12):
 			Button = Window.GetControl (3 + i)
 			if i < mem_cnt:
@@ -198,9 +199,9 @@ def UpdateMageWindow ():
 				Button.EnableBorder (0, 0)
 	else:
 		label = Window.GetControl (0x10000040)
-		label.SetText (GemRB.GetString(61256) + " " + str(max_mem_cnt)) #spells can cast
+		# we give sorcerers all charges for all the spells, so some extra math is needed
+		label.SetText (GemRB.GetString(61256) + " " + str(mem_cnt/known_cnt) + "/" + str(max_mem_cnt)) #spells can cast
 
-	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
 	for i in range (24):
 		Button = Window.GetControl (27 + i)
 		if i < known_cnt:
