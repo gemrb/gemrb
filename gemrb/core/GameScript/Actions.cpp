@@ -1738,9 +1738,9 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 	if (ret) {
 		*poi = '*';
 	}
-        if (parameters->int0Parameter == SONG_BATTLE) {
-                core->GetGame()->CombatCounter = 150;
-        }
+	if (parameters->int0Parameter == SONG_BATTLE) {
+		core->GetGame()->CombatCounter = 150;
+	}
 }
 
 //starts the current area music (songtype is in int0Parameter)
@@ -4066,8 +4066,8 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
+	act->ApplyKit(true);
 	act->SetMCFlag(MC_FALLEN_PALADIN, BM_OR);
-	act->ApplyKit(act->GetBase(IE_KIT), true);
 }
 
 void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -4076,8 +4076,8 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
+	act->ApplyKit(true);
 	act->SetMCFlag(MC_FALLEN_RANGER, BM_OR);
-	act->ApplyKit(act->GetBase(IE_KIT), true);
 }
 
 void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
@@ -4087,7 +4087,7 @@ void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->SetMCFlag(MC_FALLEN_PALADIN, BM_NAND);
-	act->ApplyKit(act->GetBase(IE_KIT), false);
+	act->ApplyKit(false);
 }
 
 void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -4097,7 +4097,7 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->SetMCFlag(MC_FALLEN_RANGER, BM_NAND);
-	act->ApplyKit(act->GetBase(IE_KIT), false);
+	act->ApplyKit(false);
 }
 
 //transfering item from Sender to target, target must be an actor
@@ -6415,10 +6415,10 @@ void GameScript::AddKit(Scriptable* Sender, Action* parameters)
 	}
 	Actor *scr = (Actor *) Sender;
 	//remove previous kit stuff
-	scr->ApplyKit(scr->GetBase(IE_KIT), false);
+	scr->ApplyKit(true);
 	//this adds the current level abilities
 	scr->SetBase(IE_KIT, parameters->int0Parameter);
-	scr->ApplyKit(scr->GetBase(IE_KIT), true);
+	scr->ApplyKit(false);
 }
 
 //doesn't remove old kit
@@ -6429,7 +6429,7 @@ void GameScript::AddSuperKit(Scriptable* Sender, Action* parameters)
 	}
 	Actor *scr = (Actor *) Sender;
 	scr->SetBase(IE_KIT, parameters->int0Parameter);
-	scr->ApplyKit(scr->GetBase(IE_KIT), true);
+	scr->ApplyKit(false);
 }
 
 void GameScript::SetSelection(Scriptable* /*Sender*/, Action* parameters)

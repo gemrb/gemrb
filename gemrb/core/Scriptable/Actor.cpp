@@ -249,7 +249,7 @@ static int ReverseToHit=true;
 static int CheckAbilities=false;
 
 //internal flags for calculating to hit
-#define WEAPON_FIST		 0
+#define WEAPON_FIST        0
 #define WEAPON_MELEE       1
 #define WEAPON_RANGED      2
 #define WEAPON_STYLEMASK   15
@@ -597,7 +597,7 @@ void Actor::SetCircleSize()
 	SetCircle( anims->GetCircleSize(), *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
 
-void ApplyClab(Actor *actor, const char *clab, int level, bool remove)
+static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove)
 {
 	AutoTable table(clab);
 	if (table) {
@@ -646,96 +646,87 @@ void ApplyClab(Actor *actor, const char *clab, int level, bool remove)
 }
 
 #define BG2_KITMASK  0xffffc000
-#define KIT_BARBARIAN 0x4000
-#define KIT_BASECLASS 0x40000000
+#define KIT_BASECLASS 0x4000
 
-//applies a kit on the character (only bg2)
-bool Actor::ApplyKit(ieDword Value, bool remove)
+static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist")
 {
-	AutoTable table("kitlist");
-	if (!table) {
-		return false;
+	int kitindex = 0;
+
+	if ((kit&BG2_KITMASK) == KIT_BASECLASS) {
+		kitindex = kit&0xfff;
 	}
 
-	ieDword row;
-	//find row by unusability
-	row = table->GetRowCount();
-	while (row) {
-		row--;
-		ieDword Unusability = (ieDword) strtol(table->QueryField(row, 6),NULL,0);
-		if (Value == Unusability) {
-			goto found_row;
+	// carefully looking for kit by the usability flag
+	// since the barbarian kit id clashes with the no-kit value
+	if (kitindex == 0 && kit != KIT_BASECLASS) {
+		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref) );
+		if (tm) {
+			kitindex = tm->FindTableValue(6, kit);
+			if (kitindex < 0) {
+				kitindex = 0;
+			}
 		}
 	}
-	//if it wasn't found, try the bg2 kit format
-	if ((Value&BG2_KITMASK)==KIT_BARBARIAN) {
-		row = Value & 0xfff;
-	}
-	//cannot find kit
-	if (table->GetRowCount()<=row) {
-		return false;
-	}
-found_row:
-	//kit abilities
-	ieDword cls = (ieDword) atoi(table->QueryField(row, 7));
-	if (!cls || cls>=sizeof(levelslotsbg) ) {
-		return true;
-	}
-	const char *clab = table->QueryField(row, 4);
 
-	if (clab[0]=='*') {
-		return true;
-	}
-
-	ieDword max = GetClassLevel(levelslotsbg[cls]);
-
-	if (max) {
-		if (remove) {
-			ApplyClab(this, clab, max, true);
-		} else {
-			ApplyClab(this, clab, max, true);
-			ApplyClab(this, clab, max, false);
-		}
-	}
-	return true;
+	return (ieDword)kitindex;
 }
 
-void Actor::ApplyClassClab(bool remove)
+//applies a kit on the character (only bg2)
+bool Actor::ApplyKit(bool remove)
 {
+	ieDword kit = GetStat(IE_KIT);
+	ieDword kitclass = 0;
+	ieDword row = GetKitIndex(kit);
+	const char *clab = NULL;
+	ieDword max = 0;
+
+	if (row) {
+		//kit abilities
+		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable("kitlist"));
+		if (tm) {
+			kitclass = (ieDword) atoi(tm->QueryField(row, 7));
+			clab = tm->QueryField(row, 4);
+		}
+	}
+
 	//multi class
 	if (multiclass) {
 		ieDword msk = 1;
 		for(int i=1;(i<32) && (msk<=multiclass);i++) {
 			if (multiclass & msk) {
-				ApplyClassClab(i, remove);
+				max = GetClassLevel(levelslotsbg[i]);
+				if (i==kitclass) {
+					ApplyClab(clab, max, remove);
+				} else {
+					ApplyClab(classabilities[i], max, remove);
+				}
 			}
 			msk+=msk;
 		}
-		return;
+		return true;
 	}
 	//single class
-	ApplyClassClab((int) GetBase(IE_CLASS), remove);
+	ieDword cls = GetStat(IE_CLASS);
+	max = GetClassLevel(levelslotsbg[cls]);
+	if (kitclass==cls) {
+		ApplyClab(clab, max, remove);
+	}
+	else {
+		ApplyClab(classabilities[cls], max, remove);
+	}
+	return true;
 }
 
-void Actor::ApplyClassClab(int cls, bool remove)
+void Actor::ApplyClab(const char *clab, ieDword max, bool remove)
 {
-	if (classcount<0) {
-		return; //can this happen?
-	}
-
-	if (cls>classcount) {
-		cls=0;
-	}
-	const char *clab = classabilities[cls];
 	if (clab[0]!='*') {
-		ieDword max = GetClassLevel(levelslotsbg[cls]);
 		if (max) {
 			//singleclass
 			if (remove) {
-				ApplyClab(this, clab, max, true);
+				ApplyClab_internal(this, clab, max, true);
 			} else {
-				ApplyClab(this, clab, max, true);
-				ApplyClab(this, clab, max, false);
+				ApplyClab_internal(this, clab, max, true);
+				ApplyClab_internal(this, clab, max, false);
 			}
 		}
 	}
@@ -778,8 +769,7 @@ void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue)
 	actor->SetBase(IE_CLASSLEVELSUM,sum);
 	actor->SetupFist();
 	if (newValue!=oldValue) {
-		actor->ApplyKit(actor->GetBase(IE_KIT), false);
-		actor->ApplyClassClab(false);
+		actor->ApplyKit(false);
 	}
 	actor->GotLUFeedback = false;
 }
@@ -1724,7 +1714,7 @@ static void InitActorTables()
 			printf("DS: %d\n", dualswap[tmpindex]);
 		}
 		/*this could be enabled to ensure all levelslots are filled with at least 0's;
-		 *however, the access code should ensure this never happens
+		*however, the access code should ensure this never happens
 		for (i=0; i<classcount; i++) {
 			if (!levelslots[i]) {
 				levelslots[i] = (int *) calloc(ISCLASSES, sizeof(int *));
@@ -2164,11 +2154,13 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		spellbook.ClearBonus();
 	}
 
+	unsigned int i;
+
 	// some VVCs are controlled by stats (and so by PCFs), the rest have 'effect_owned' set
-	for (unsigned int i = 0; i < vvcOverlays.size(); i++) {
+	for (i = 0; i < vvcOverlays.size(); i++) {
 		if (vvcOverlays[i] && vvcOverlays[i]->effect_owned) vvcOverlays[i]->active = false;
 	}
-	for (unsigned int i = 0; i < vvcShields.size(); i++) {
+	for (i = 0; i < vvcShields.size(); i++) {
 		if (vvcShields[i] && vvcShields[i]->effect_owned) vvcShields[i]->active = false;
 	}
 
@@ -2178,7 +2170,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if (BaseStats[IE_CLASS] <= (ieDword)classcount)
 		RefreshPCStats();
 
-	for (unsigned int i=0;i<MAX_STATS;i++) {
+	for (i=0;i<MAX_STATS;i++) {
 		if (first || Modified[i]!=previous[i]) {
 			PostChangeFunctionType f = post_change_functions[i];
 			if (f) {
@@ -4075,7 +4067,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		THAC0Bonus += wspecial[stars][0];
 		DamageBonus += wspecial[stars][1];
 		speed += wspecial[stars][2];
-		 // add non-proficiency penalty, which is missing from the table
+		// add non-proficiency penalty, which is missing from the table
 		if (stars == 0) THAC0Bonus -= 4;
 	}
 
@@ -5890,29 +5882,6 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 	}
 
 	return 0;
-}
-
-static ieDword GetKitIndex (ieDword kit, const char *resref="kitlist")
-{
-	int kitindex = 0;
-
-	if ((kit&BG2_KITMASK) == KIT_BARBARIAN) {
-		kitindex = kit&0xfff;
-	}
-
-	// carefully looking for kit by the usability flag
-	// since the barbarian kit id clashes with the no-kit value
-	if (kitindex == 0 && kit != KIT_BARBARIAN) {
-		Holder<TableMgr> tm = gamedata->GetTable(gamedata->LoadTable(resref) );
-		if (tm) {
-			kitindex = tm->FindTableValue(6, kit);
-			if (kitindex < 0) {
-				kitindex = 0;
-			}
-		}
-	}
-
-	return (ieDword)kitindex;
 }
 
 int Actor::CheckUsability(Item *item) const

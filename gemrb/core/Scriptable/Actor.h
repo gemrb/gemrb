@@ -472,9 +472,9 @@ public:
 	/* sets some of the internal flags */
 	void SetRunFlags(ieDword flags);
 	/* applies the kit abilities, returns false if kit is not applicable */
-	bool ApplyKit(ieDword Value, bool remove);
+	bool ApplyKit(bool remove);
 	/* applies the class abilities*/
-	void ApplyClassClab(bool remove);
+	void ApplyClab(const char *clab, ieDword max, bool remove);
 	/* calls InitQuickSlot in PCStatStruct */
 	void SetupQuickSlot(unsigned int which, int slot, int headerindex);
 	/* returns true if the actor is PC/joinable*/
@@ -679,7 +679,7 @@ public:
 	/* returns true if this actor is untargetable */
 	bool InvalidSpellTarget();
 	/* returns true if the spell is useless to cast on target
-           or the spell's range is smaller than range */
+	or the spell's range is smaller than range */
 	bool InvalidSpellTarget(int spellnum, Actor *caster, int range);
 	/* returns true if the lightmap under the actor is dark */
 	bool PCInDark() const;

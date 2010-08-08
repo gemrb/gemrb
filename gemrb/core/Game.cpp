@@ -385,8 +385,10 @@ int Game::JoinParty(Actor* actor, int join)
 
 	if (join&JP_JOIN) {
 		//update kit abilities of actor
-		actor->ApplyKit(actor->GetBase(IE_KIT), false);
-		actor->ApplyClassClab(false);
+		actor->ApplyKit(false);
+		//update the quickslots
+		actor->ReinitQuickSlots();
+		//set the joining date
 		actor->PCStats->JoinDate = GameTime;
 		if (size) {
 			ieDword id = actor->GetID();
