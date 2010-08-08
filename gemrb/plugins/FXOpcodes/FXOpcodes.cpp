@@ -3282,31 +3282,53 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//get monster resref from 2da determined by fx->Resource or fx->Parameter2
+	//the only addition to the original engine is that fx->Resource can be
+	//used to specify a 2da (if parameter2 is >= 10)
 	ieResRef monster;
 	ieResRef hit;
 	ieResRef areahit;
+	ieResRef table;
 	int level = fx->Parameter1;
 
 	if (fx->Parameter2>=FX_MS) {
-		strnuprcpy(monster,fx->Resource,8);
-		strnuprcpy(hit,fx->Resource2,8);
-		strnuprcpy(areahit,fx->Resource3,8);
+		if (fx->Resource[0]) {
+			strnuprcpy(table, fx->Resource, 8);
+		} else {
+			strnuprcpy(table, "ANISUM03", 8);
+		}
 	} else {
-		core->GetResRefFrom2DA(monster_summoning_2da[fx->Parameter2], monster, hit, areahit);
+		strnuprcpy(table, monster_summoning_2da[fx->Parameter2], 8);
+	}
+	core->GetResRefFrom2DA(monster_summoning_2da[fx->Parameter2], monster, hit, areahit);
 
-		if (!hit[0]) {
-			strnuprcpy(hit,fx->Resource2,8);
-		}
-		if (!areahit[0]) {
-			strnuprcpy(areahit,fx->Resource3,8);
-		}
+	if (!hit[0]) {
+		strnuprcpy(hit,fx->Resource2,8);
+	}
+	if (!areahit[0]) {
+		strnuprcpy(areahit,fx->Resource3,8);
 	}
 
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
 
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, hit, Owner, target, p, fx->Parameter2/5, level, newfx);
+	//The hostile flag should cover these cases, all else is arbitrary
+	//0,1,2,3,4 - friendly to target
+	//5,6,7,8,9 - hostile to target
+	//10        - friendly to target
+
+	int eamod;
+	if (fx->Parameter2>=5 and fx->Parameter2<=9) {
+		eamod = EAM_ENEMY;
+	}
+	else {
+		eamod = EAM_ALLY;
+	}
+
+	//caster may be important here (Source), even if currently the EA modifiers
+	//don't use it
+	Scriptable *caster = GetCaster(Owner, fx);
+	core->SummonCreature(monster, hit, caster, target, p, eamod, level, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
