@@ -692,7 +692,7 @@ bool Actor::ApplyKit(bool remove)
 	//multi class
 	if (multiclass) {
 		ieDword msk = 1;
-		for(int i=1;(i<32) && (msk<=multiclass);i++) {
+		for(unsigned int i=1;(i<32) && (msk<=multiclass);i++) {
 			if (multiclass & msk) {
 				max = GetClassLevel(levelslotsbg[i]);
 				if (i==kitclass) {
