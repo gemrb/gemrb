@@ -2628,14 +2628,16 @@ bool Map::IsVisible(const Point &s, const Point &d)
 			// right to left
 			for (int startx = sX; startx >= dX; startx--) {
 				// sX - startx >= 0, so subtract (due to sign of diffy)
-				if (GetBlocked( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
+				//if (GetBlocked( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
+				if (GetBlocked( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_SIDEWALL)
 					return false;
 			}
 		} else {
 			// left to right
 			for (int startx = sX; startx <= dX; startx++) {
 				// sX - startx <= 0, so add (due to sign of diffy)
-				if (GetBlocked( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
+				//if (GetBlocked( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
+				if (GetBlocked( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_SIDEWALL)
 					return false;
 			}
 		}
@@ -2646,14 +2648,16 @@ bool Map::IsVisible(const Point &s, const Point &d)
 			// bottom to top
 			for (int starty = sY; starty >= dY; starty--) {
 				// sY - starty >= 0, so subtract (due to sign of diffx)
-				if (GetBlocked( sX - ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
+				//if (GetBlocked( sX - ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
+				if (GetBlocked( sX - ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_SIDEWALL)
 					return false;
 			}
 		} else {
 			// top to bottom
 			for (int starty = sY; starty <= dY; starty++) {
 				// sY - starty <= 0, so add (due to sign of diffx)
-				if (GetBlocked( sX + ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
+				//if (GetBlocked( sX + ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
+				if (GetBlocked( sX + ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_SIDEWALL)
 					return false;
 			}
 		}
