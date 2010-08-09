@@ -47,7 +47,10 @@ public:
                 short* memory, int size, int samplerate);
 
 private:
+	static void music_callback(void *udata, unsigned short *stream, int len);
+
 	int XPos, YPos;
+	Holder<SoundMgr> MusicReader;
 };
 
 #endif

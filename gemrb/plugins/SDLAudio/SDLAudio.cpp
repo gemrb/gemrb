@@ -54,6 +54,12 @@ bool SDLAudio::Init(void)
 	return true;
 }
 
+void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
+	SDLAudio *driver = (SDLAudio *)udata;
+	// TODO: conversion? mutexes? sanity checks? :)
+	driver->MusicReader->read_samples(( short* ) stream, len >> 1);
+}
+
 unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int flags)
 {
 	// TODO: some panning
@@ -122,8 +128,11 @@ unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int
 	return time_length;
 }
 
-int SDLAudio::CreateStream(Holder<SoundMgr>)
+int SDLAudio::CreateStream(Holder<SoundMgr> newMusic)
 {
+	printf("SDLAudio setting new music\n");
+	MusicReader = newMusic;
+
 	// TODO
 	return 0;
 }
@@ -131,11 +140,13 @@ int SDLAudio::CreateStream(Holder<SoundMgr>)
 bool SDLAudio::Stop()
 {
 	// TODO
+	Mix_HookMusic(NULL, NULL);
 	return true;
 }
 
 bool SDLAudio::Play()
 {
+	Mix_HookMusic((void (*)(void*, Uint8*, int))music_callback, this);
 	// TODO
 	return true;
 }
@@ -143,6 +154,7 @@ bool SDLAudio::Play()
 void SDLAudio::ResetMusics()
 {
 	// TODO
+	Mix_HookMusic(NULL, NULL);
 }
 
 bool SDLAudio::CanPlay()
