@@ -134,6 +134,9 @@ ELSE(SDL_FOUND)
  MESSAGE(FATAL_ERROR "unable to find SDL. please get it from www.libsdl.org")
 ENDIF(SDL_FOUND)
 
+MESSAGE(STATUS "Looking for SDL_mixer")
+INCLUDE(FindSDL_mixer)
+
 MESSAGE( STATUS "Looking for Zlib" )
 #SET(ZLIB_FIND_REQUIRED TRUE)
 INCLUDE(FindZLIB)
