@@ -358,13 +358,12 @@ def RemoveClassAbilities (pc, table, Level):
 
 				# apply spell (AP_) or gain spell (GA_)?
 				if ab[:2] == "AP":
-					# TODO: implement
 					GemRB.RemoveEffects (pc, ab[3:])
 				elif ab[:2] == "GA":
 					if SpellIndex >= 0:
 						# TODO: get the correct counts to avoid removing an innate ability
 						# given by more than one thing?
-						GemRB.UnmemorizeSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
+						# RemoveSpell will unmemorize them all too
 						GemRB.RemoveSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
 				else:
 					print "ERROR, unknown class ability (type): ", ab
