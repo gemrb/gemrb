@@ -6225,7 +6225,7 @@ static PyObject* GemRB_GetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 }
 
 PyDoc_STRVAR( GemRB_SetMemorizableSpellsCount__doc,
-"SetMemorizableSpellsCount(PartyID, Value, SpellType, Level, [Bonus])=>int\n\n"
+"SetMemorizableSpellsCount(PartyID, Value, SpellType, Level)=>int\n\n"
 "Sets number of memorizable spells of given type and level in PC's spellbook." );
 
 static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* args)
