@@ -339,7 +339,7 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 				else:
 					print "ERROR, unknown class ability (type): ", ab
 
-# remove all class abilities up to a give level
+# remove all class abilities up to the given level
 # for dual-classing mainly
 def RemoveClassAbilities (pc, table, Level):
 	TmpTable = GemRB.LoadTable (table)
