@@ -1152,6 +1152,8 @@ void Map::DrawMap(Region screen)
 void Map::DrawSearchMap(const Region &screen)
 {
 	Color inaccessible = { 128, 128, 128, 128 };
+	Color impassible = { 128, 64, 64, 128 }; // red-ish
+	Color sidewall = { 64, 64, 128, 128 }; // blue-ish
 	Video *vid=core->GetVideoDriver();
 	Region rgn=vid->GetViewport();
 	Region block;
@@ -1163,10 +1165,17 @@ void Map::DrawSearchMap(const Region &screen)
 
 	for(int x=0;x<w;x++) {
 		for(int y=0;y<h;y++) {
-			if (!(GetBlocked(x+rgn.x/16, y+rgn.y/12) & PATH_MAP_PASSABLE) ) {
+			unsigned char blockvalue = GetBlocked(x+rgn.x/16, y+rgn.y/12);
+			if (!(blockvalue & PATH_MAP_PASSABLE)) {
 				block.x=screen.x+x*16-(rgn.x % 16);
 				block.y=screen.y+y*12-(rgn.y % 12);
-				vid->DrawRect(block,inaccessible);
+				if (blockvalue == PATH_MAP_IMPASSABLE) { // 0
+					vid->DrawRect(block,impassible);
+				} else if (blockvalue & PATH_MAP_SIDEWALL) {
+					vid->DrawRect(block,sidewall);
+				} else {
+					vid->DrawRect(block,inaccessible);
+				}
 			}
 		}
 	}
