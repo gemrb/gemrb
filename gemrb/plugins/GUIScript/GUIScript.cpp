@@ -278,9 +278,13 @@ static int GetCreatureStat(Actor *actor, unsigned int StatID, int Mod)
 	return actor->GetBase( StatID );
 }
 
-static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue)
+static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue, bool pcf)
 {
-	actor->SetBase( StatID, StatValue );
+	if (pcf) {
+		actor->SetBase( StatID, StatValue );
+	} else {
+		actor->SetBaseNoPCF( StatID, StatValue );
+	}
 	actor->CreateDerivedStats();
 	return 1;
 }
@@ -4902,14 +4906,15 @@ static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerStat__doc,
-"SetPlayerStat(Slot, ID, Value)\n\n"
+"SetPlayerStat(Slot, ID, Value[, pcf])\n\n"
 "Changes a stat." );
 
 static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 {
 	int PlayerSlot, StatID, StatValue;
+	int pcf = 1;
 
-	if (!PyArg_ParseTuple( args, "iii", &PlayerSlot, &StatID, &StatValue )) {
+	if (!PyArg_ParseTuple( args, "iii|i", &PlayerSlot, &StatID, &StatValue, &pcf )) {
 		return AttributeError( GemRB_SetPlayerStat__doc );
 	}
 	Actor* MyActor = core->GetGame()->FindPC( PlayerSlot );
@@ -4917,7 +4922,7 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find actor!\n");
 	}
 	//Setting the creature's base stat
-	SetCreatureStat( MyActor, StatID, StatValue);
+	SetCreatureStat( MyActor, StatID, StatValue, pcf);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
