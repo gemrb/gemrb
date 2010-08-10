@@ -192,7 +192,7 @@ def DCMainDonePress ():
 	if GUICommon.IsDualSwap (pc):
 		GemRB.SetPlayerStat (pc, IE_LEVEL2, 1)
 	else:
-		GemRB.SetPlayerStat (pc, IE_LEVEL2, GemRB.GetPlayerStat (pc, IE_LEVEL))
+		GemRB.SetPlayerStat (pc, IE_LEVEL2, GemRB.GetPlayerStat (pc, IE_LEVEL), 0)
 		GemRB.SetPlayerStat (pc, IE_LEVEL, 1)
 	GemRB.SetPlayerStat (pc, IE_XP, 0)
 
