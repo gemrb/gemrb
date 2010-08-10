@@ -789,6 +789,9 @@ public: //Script Functions
 	static int Level(Scriptable* Sender, Trigger* parameters);
 	static int LevelGT(Scriptable* Sender, Trigger* parameters);
 	static int LevelLT(Scriptable* Sender, Trigger* parameters);
+	static int LevelInClass(Scriptable* Sender, Trigger* parameters);
+	static int LevelInClassGT(Scriptable* Sender, Trigger* parameters);
+	static int LevelInClassLT(Scriptable* Sender, Trigger* parameters);
 	static int LevelParty(Scriptable* Sender, Trigger* parameters);
 	static int LevelPartyGT(Scriptable* Sender, Trigger* parameters);
 	static int LevelPartyLT(Scriptable* Sender, Trigger* parameters);

@@ -2677,6 +2677,25 @@ int GameScript::ClassLevel(Scriptable* Sender, Trigger* parameters)
 	return actor->GetStat(IE_LEVEL) == (unsigned) parameters->int1Parameter;
 }
 
+// iwd2 and pst have different order of parameters:
+// ClassLevelGT(Protagonist,MAGE,89)
+// LevelInClass(Myself,10,CLERIC)
+int GameScript::LevelInClass(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+
+	if (!ID_ClassMask( actor, parameters->int1Parameter) )
+		return 0;
+	return actor->GetStat(IE_LEVEL) == (unsigned) parameters->int0Parameter;
+}
+
 int GameScript::LevelGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -2706,6 +2725,22 @@ int GameScript::ClassLevelGT(Scriptable* Sender, Trigger* parameters)
 	return actor->GetStat(IE_LEVEL) > (unsigned) parameters->int1Parameter;
 }
 
+int GameScript::LevelInClassGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+
+	if (!ID_ClassMask( actor, parameters->int1Parameter) )
+		return 0;
+	return actor->GetStat(IE_LEVEL) > (unsigned) parameters->int0Parameter;
+}
+
 int GameScript::LevelLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -2732,6 +2767,22 @@ int GameScript::ClassLevelLT(Scriptable* Sender, Trigger* parameters)
 	if (!ID_ClassMask( actor, parameters->int0Parameter) )
 		return 0;
 	return actor->GetStat(IE_LEVEL) < (unsigned) parameters->int1Parameter;
+}
+
+int GameScript::LevelInClassLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+
+	if (!ID_ClassMask( actor, parameters->int1Parameter) )
+		return 0;
+	return actor->GetStat(IE_LEVEL) < (unsigned) parameters->int0Parameter;
 }
 
 int GameScript::UnselectableVariable(Scriptable* Sender, Trigger* parameters)

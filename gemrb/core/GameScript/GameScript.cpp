@@ -230,9 +230,9 @@ static const TriggerLink triggernames[] = {
 	{"leaves", GameScript::Leaves, 0},
 	{"level", GameScript::Level, 0},
 	{"levelgt", GameScript::LevelGT, 0},
-	{"levelinclass", GameScript::ClassLevel, 0}, //iwd2
-	{"levelinclassgt", GameScript::ClassLevelGT, 0},
-	{"levelinclasslt", GameScript::ClassLevelLT, 0},
+	{"levelinclass", GameScript::LevelInClass, 0}, //iwd2
+	{"levelinclassgt", GameScript::LevelInClassGT, 0},
+	{"levelinclasslt", GameScript::LevelInClassLT, 0},
 	{"levellt", GameScript::LevelLT, 0},
 	{"levelparty", GameScript::LevelParty, 0},
 	{"levelpartygt", GameScript::LevelPartyGT, 0},
