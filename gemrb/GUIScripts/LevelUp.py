@@ -291,8 +291,8 @@ def OpenLevelUpWindow():
 		else: # single-classed with a kit
 			ABTable = CommonTables.KitList.GetValue (str(Kit), "ABILITIES")
 
-		# add the abilites if we aren't a mage and have a table to ref
-		if ABTable != "*" and ABTable[:6] != "CLABMA":
+		# add the abilites if we have a table to ref
+		if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
 			GUICommon.AddClassAbilities (pc, ABTable, Level[i], LevelDiff[i])
 
 	print "Actor CurrentLevels:",actor.Levels()
@@ -743,6 +743,6 @@ def ReactivateBaseClass ():
 		ABTable = CommonTables.KitList.GetValue (KitIndex, 4, 0)
 	print "ABTable:",ABTable
 
-	# add the abilites if we aren't a mage and have a table to ref
-	if ABTable != "*" and ABTable[:6] != "CLABMA":
+	# add the abilites if we have a table to ref
+	if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
 		GUICommon.AddClassAbilities (pc, ABTable, Level[1], Level[1]) # relearn class abilites

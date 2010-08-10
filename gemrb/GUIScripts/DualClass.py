@@ -158,7 +158,7 @@ def DCMainDonePress ():
 		ABTable = CommonTables.KitList.GetValue (str(KitIndex), "ABILITIES")
 	else:
 		ABTable = CommonTables.ClassSkills.GetValue (OldClassName, "ABILITIES")
-	if ABTable != "*" and ABTable[:6] != "CLABMA": # mage kits specify ability tables which don't exist
+	if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
 		GUICommon.RemoveClassAbilities (pc, ABTable, GemRB.GetPlayerStat (pc, IE_LEVEL))
 
 	# remove old class casting
@@ -169,7 +169,7 @@ def DCMainDonePress ():
 
 	# apply our class abilities
 	ABTable = CommonTables.ClassSkills.GetValue (ClassName, "ABILITIES")
-	if ABTable != "*" and ABTable[:6] != "CLABMA": # mage kits specify ability tables which don't exist
+	if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
 		GUICommon.AddClassAbilities (pc, ABTable)
 
 	# learn our new priest spells

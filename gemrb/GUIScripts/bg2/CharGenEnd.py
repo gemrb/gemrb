@@ -24,6 +24,7 @@ import LUCommon
 from ie_stats import *
 from ie_slots import *
 from ie_spells import *
+from ie_restype import RES_2DA
 
 def OnLoad():
 	# Lay on hands, turn undead and backstab multiplier get set by the core
@@ -68,14 +69,14 @@ def OnLoad():
 		for i in range (IsMulti[0]):
 			TmpClassName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue (5, IsMulti[i+1]) )
 			ABTable = CommonTables.ClassSkills.GetValue (TmpClassName, "ABILITIES")
-			if ABTable != "*" and ABTable[:6] != "CLABMA":
+			if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
 				GUICommon.AddClassAbilities (MyChar, ABTable, Levels[i], Levels[i])
 	else:
 		if KitIndex:
 			ABTable = CommonTables.KitList.GetValue (str(KitIndex), "ABILITIES")
 		else:
 			ABTable = CommonTables.ClassSkills.GetValue (ClassName, "ABILITIES")
-		if ABTable != "*" and ABTable[:6] != "CLABMA": # mage kits specify ability tables which don't exist
+		if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
 			GUICommon.AddClassAbilities (MyChar, ABTable, Levels[0], Levels[0])
 
 	# apply starting (alignment dictated) abilities
