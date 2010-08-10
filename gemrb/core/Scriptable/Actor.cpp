@@ -695,7 +695,8 @@ bool Actor::ApplyKit(bool remove)
 		for(unsigned int i=1;(i<32) && (msk<=multiclass);i++) {
 			if (multiclass & msk) {
 				max = GetClassLevel(levelslotsbg[i]);
-				if (i==kitclass) {
+				// don't apply/remove the old kit clab if the kit is disabled
+				if (i==kitclass && !IsDualClassed()) {
 					ApplyClab(clab, max, remove);
 				} else {
 					ApplyClab(classabilities[i], max, remove);
