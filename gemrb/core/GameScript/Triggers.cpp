@@ -2672,7 +2672,7 @@ int GameScript::ClassLevel(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 
-	if (!ID_ClassMask( actor, parameters->int0Parameter) )
+	if (!ID_Class( actor, parameters->int0Parameter) )
 		return 0;
 	return actor->GetStat(IE_LEVEL) == (unsigned) parameters->int1Parameter;
 }
@@ -2720,7 +2720,7 @@ int GameScript::ClassLevelGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if (!ID_ClassMask( actor, parameters->int0Parameter) )
+	if (!ID_Class( actor, parameters->int0Parameter) )
 		return 0;
 	return actor->GetStat(IE_LEVEL) > (unsigned) parameters->int1Parameter;
 }
@@ -2764,7 +2764,7 @@ int GameScript::ClassLevelLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if (!ID_ClassMask( actor, parameters->int0Parameter) )
+	if (!ID_Class( actor, parameters->int0Parameter) )
 		return 0;
 	return actor->GetStat(IE_LEVEL) < (unsigned) parameters->int1Parameter;
 }
