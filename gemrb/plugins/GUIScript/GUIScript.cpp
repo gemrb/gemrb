@@ -8897,7 +8897,7 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ApplyEffect__doc,
-"ApplyEffect(pc, effect, param1, param2[,resref,resref2, resref3]])\n\n"
+"ApplyEffect(pc, effect, param1, param2[, resref, resref2, resref3, source])\n\n"
 "Creates a basic effect and applies it on the player character. "
 "This function could be used to add stats that are stored in effect blocks. "
 "The resource fields are optional.");
