@@ -54,6 +54,7 @@ bool SDLAudio::Init(void)
 	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) < 0) {
 		return false;
 	}
+	Mix_ReserveChannels(1); // for speech
 	return true;
 }
 
@@ -91,6 +92,9 @@ unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int
 	(void)flags;
 
 	if (!ResRef) {
+		if (flags & GEM_SND_SPEECH) {
+			Mix_HaltChannel(0);
+		}
 		return 0;
 	}
 
@@ -137,7 +141,11 @@ unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int
 	}
 
 	// play
-	int channel = Mix_PlayChannel(-1, chunk, 0);
+	int channel = -1;
+	if (flags & GEM_SND_SPEECH) {
+		channel = 0;
+	}
+	channel = Mix_PlayChannel(channel, chunk, 0);
 	if (channel < 0) {
 		printf("error playing channel\n");
 		return 0;
@@ -186,8 +194,7 @@ bool SDLAudio::CanPlay()
 
 bool SDLAudio::IsSpeaking()
 {
-	// TODO
-	return false;
+	return Mix_Playing(0);
 }
 
 void SDLAudio::UpdateListenerPos(int x, int y)
