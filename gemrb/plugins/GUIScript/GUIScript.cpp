@@ -7791,7 +7791,7 @@ static PyObject* GemRB_Button_SetActionIcon(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_HasResource__doc,
-"HasResource(ResRef, ResType)\n\n"
+"HasResource(ResRef, ResType[, silent])\n\n"
 "Returns true if resource is accessible." );
 
 static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
