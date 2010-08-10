@@ -5706,11 +5706,15 @@ int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 		case 0: //once per second
 		case 1: //crash???
-			core->ApplyEffect(newfx, target, Owner);
+			if (!(core->GetGame()->GameTime%AI_UPDATE_TIME)) {
+				core->ApplyEffect(newfx, target, Owner);
+			}
 			break;
 		case 2://param1 times every second
-			for (i=0;i<fx->Parameter1;i++) {
-				core->ApplyEffect(newfx, target, Owner);
+			if (!(core->GetGame()->GameTime%AI_UPDATE_TIME)) {
+				for (i=0;i<fx->Parameter1;i++) {
+					core->ApplyEffect(newfx, target, Owner);
+				}
 			}
 			break;
 		case 3: //once every Param1 second
