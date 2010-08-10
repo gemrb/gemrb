@@ -606,7 +606,6 @@ private: //Internal variables
 public: //Script Functions
 	static int ID_Alignment(Actor *actor, int parameter);
 	static int ID_Allegiance(Actor *actor, int parameter);
-	static int ID_AVClass(Actor *actor, int parameter);
 	static int ID_Class(Actor *actor, int parameter);
 	static int ID_ClassMask(Actor *actor, int parameter);
 	static int ID_Faction(Actor *actor, int parameter);
