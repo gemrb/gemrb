@@ -29,6 +29,9 @@
 #include "SDL.h"
 #include "SDL_mixer.h"
 
+#include "Interface.h" // GetMusicMgr()
+#include "MusicMgr.h"
+
 SDLAudio::SDLAudio(void)
 {
 	XPos = 0;
@@ -57,7 +60,25 @@ bool SDLAudio::Init(void)
 void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 	SDLAudio *driver = (SDLAudio *)udata;
 	// TODO: conversion? mutexes? sanity checks? :)
-	driver->MusicReader->read_samples(( short* ) stream, len >> 1);
+	int num_samples = len / 2;
+	int cnt = driver->MusicReader->read_samples(( short* ) stream, num_samples);
+	if (cnt != num_samples) {
+		// TODO: this shouldn't be in the callback (see also the openal thread)
+		printMessage("SDLAudio", "Playing Next Music\n", WHITE );
+		core->GetMusicMgr()->PlayNext();
+
+		stream = stream + (cnt * 2);
+		len = len - (cnt * 2);
+
+		if (!driver->MusicReader) {
+			printMessage( "SDLAudio", "No Other Music to play\n", WHITE );
+			memset(stream, 0, len);
+			Mix_HookMusic(NULL, NULL);
+			return;
+		}
+
+		music_callback(udata, stream, len);
+	}
 }
 
 unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int flags)
