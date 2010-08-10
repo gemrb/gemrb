@@ -5689,6 +5689,13 @@ int fx_avatar_removal (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	BASE_SET(IE_AVATARREMOVAL, 1);
 	return FX_NOT_APPLIED;
 }
+
+/* note/TODO from Taimon:
+What happens at a lower level is that the engine recreates the entire stats on some changes to the creature. The application of an effect to the creature is one such change.
+Since the repeating effects are stored in a list inside those stats, they are being recreated every ai update, if there has been an effect application.
+The repeating effect itself internally uses a counter to store how often it has been called. And when this counter equals the period it fires of the effect. When the list is being recreated all those counters are lost.
+*/
+static EffectRef fx_apply_effect_repeat_ref = {"ApplyEffectRepeat", NULL, -1};
 // 0x110 ApplyEffectRepeat
 int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -5700,6 +5707,12 @@ int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx)
 	Effect *newfx = core->GetEffect(fx->Resource, fx->Power, p);
 	//core->GetEffect is a borrowed reference, don't delete it
 	if (!newfx) {
+		return FX_NOT_APPLIED;
+	}
+
+	// don't apply the effect if a similar one is already applied with a shorter duration
+	Effect *oldfx = target->fxqueue.HasEffect(fx_apply_effect_repeat_ref);
+	if (oldfx && oldfx->Duration < fx->Duration) {
 		return FX_NOT_APPLIED;
 	}
 
