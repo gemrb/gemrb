@@ -1082,11 +1082,18 @@ int GameScript::ID_Class(Actor *actor, int parameter)
 	return value > 0;
 }
 
+// IE_CLASS holds only one class, not a bitmask like with iwd2 kits. The ids values
+// are friendly to binary comparison, so we just need to build such a class value
 int GameScript::ID_ClassMask(Actor *actor, int parameter)
 {
+	// maybe we're lucky...
 	int value = actor->GetStat(IE_CLASS);
-	if (parameter==value) return 1;
-	//check on multiclass
+	if (parameter&(1<<(value-1))) return 1;
+
+	// otherwise iterate over all the classes
+	value = actor->GetClassMask();
+
+	if (parameter&value) return 1;
 	return 0;
 }
 

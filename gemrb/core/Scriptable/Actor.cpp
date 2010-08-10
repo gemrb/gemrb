@@ -137,6 +137,7 @@ static const int levelslotsbg[21]={ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERIC, ISTHI
 static const int levelslotsiwd2[11]={IE_LEVELFIGHTER,IE_LEVELMAGE,IE_LEVELTHIEF,
 	IE_LEVELBARBARIAN,IE_LEVELBARD,IE_LEVELCLERIC,IE_LEVELDRUID,IE_LEVELMONK,
 	IE_LEVELPALADIN,IE_LEVELRANGER,IE_LEVELSORCEROR};
+static const unsigned int classesiwd2[ISCLASSES]={5, 11, 9, 1, 2, 3, 4, 6, 7, 8, 10};
 
 //stat values are 0-255, so a byte is enough
 static ieByte featstats[MAX_FEATS]={0
@@ -6598,3 +6599,14 @@ bool Actor::PCInDark() const
 	return false;
 }
 
+int Actor::GetClassMask()
+{
+	int classmask = 0;
+	for (int i=0; i < ISCLASSES; i++) {
+		if (Modified[levelslotsiwd2[i]] > 0) {
+			classmask |= 1<<(classesiwd2[i]-1);
+		}
+	}
+
+	return classmask;
+}

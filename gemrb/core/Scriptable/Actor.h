@@ -683,5 +683,7 @@ public:
 	bool InvalidSpellTarget(int spellnum, Actor *caster, int range);
 	/* returns true if the lightmap under the actor is dark */
 	bool PCInDark() const;
+	/* computes the actor's classmask (iwd2) */
+	int GetClassMask();
 };
 #endif
