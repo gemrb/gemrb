@@ -540,9 +540,9 @@ struct TriggerLink {
 #define BD_NOEMPTY   1024 //don't display '... has nothing to say to you'
 
 #define AF_NONE 	 0
-#define AF_INSTANT       1
+#define AF_IMMEDIATE     1
 #define AF_CONTINUE      2
-#define AF_MASK 	 3   //none, instant or continue
+#define AF_MASK 	 3   //none, immediate or continue
 #define AF_BLOCKING      4
 #define AF_MERGESTRINGS  8
 //we could use this flag to restrict player scripts from using dangerous
@@ -553,6 +553,8 @@ struct TriggerLink {
 #define AF_INVALID       128
 #define AF_DIRECT        256 //this hack will transfer target from gamecontrol to object1 at compile time
 #define AF_ALIVE         512 //only alive actors can do this
+#define AF_INSTANT       1024
+
 struct ActionLink {
 	const char* Name;
 	ActionFunction Function;

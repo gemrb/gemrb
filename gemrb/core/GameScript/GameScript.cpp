@@ -464,7 +464,7 @@ static const ActionLink actionnames[] = {
 	{"changeteam", GameScript::SetTeam, 0}, //pst
 	{"changetilestate", GameScript::ChangeTileState, 0}, //bg2
 	{"chunkcreature", GameScript::Kill, 0}, //should be more graphical
-	{"clearactions", GameScript::ClearActions, AF_INSTANT},
+	{"clearactions", GameScript::ClearActions, 0},
 	{"clearallactions", GameScript::ClearAllActions, 0},
 	{"clearpartyeffects", GameScript::ClearPartyEffects, 0},
 	{"clearspriteeffects", GameScript::ClearSpriteEffects, 0},
@@ -474,7 +474,7 @@ static const ActionLink actionnames[] = {
 	{"clickrbuttonpoint", GameScript::ClickLButtonPoint, AF_BLOCKING},
 	{"closedoor", GameScript::CloseDoor,0},
 	{"containerenable", GameScript::ContainerEnable, 0},
-	{"continue", GameScript::Continue,AF_INSTANT | AF_CONTINUE},
+	{"continue", GameScript::Continue,AF_IMMEDIATE | AF_CONTINUE},
 	{"copygroundpilesto", GameScript::CopyGroundPilesTo, 0},
 	{"createcreature", GameScript::CreateCreature, 0}, //point is relative to Sender
 	{"createcreaturecopypoint", GameScript::CreateCreatureCopyPoint, 0}, //point is relative to Sender
@@ -497,7 +497,7 @@ static const ActionLink actionnames[] = {
 	{"createvisualeffect", GameScript::CreateVisualEffect, 0},
 	{"createvisualeffectobject", GameScript::CreateVisualEffectObject, 0},
 	{"createvisualeffectobjectSticky", GameScript::CreateVisualEffectObjectSticky, 0},
-	{"cutsceneid", GameScript::CutSceneID,AF_INSTANT},
+	{"cutsceneid", GameScript::CutSceneID,AF_IMMEDIATE},
 	{"damage", GameScript::Damage, 0},
 	{"daynight", GameScript::DayNight, 0},
 	{"deactivate", GameScript::Deactivate, 0},
@@ -2080,7 +2080,7 @@ int Response::Execute(Scriptable* Sender)
 	for (size_t i = 0; i < actions.size(); i++) {
 		Action* aC = actions[i];
 		switch (actionflags[aC->actionID] & AF_MASK) {
-			case AF_INSTANT:
+			case AF_IMMEDIATE:
 				GameScript::ExecuteAction( Sender, aC );
 				ret = 0;
 				break;
@@ -2185,10 +2185,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	}
 
 	//don't bother with special flow control actions
-	if (actionflags[actionID] & AF_INSTANT) {
+	if (actionflags[actionID] & AF_IMMEDIATE) {
 		//this action never entered the action queue, therefore shouldn't be freed
 		if (aC->GetRef()!=1) {
-			printf("Instant action got queued!\n");
+			printf("Immediate action got queued!\n");
 			PrintAction(actionID);
 			abort();
 		}
