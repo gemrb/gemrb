@@ -211,7 +211,9 @@ void Button::Draw(unsigned short x, unsigned short y)
 			video->BlitSprite( Picture, xOffs, yOffs, true );
 			Region r = Region( xOffs, yOffs + (int) (Picture->Height * Clipping), Picture->Width, (int) (Picture->Height*(1.0 - Clipping)) );
 			video->DrawRect( r, SourceRGB, true );
-			CloseUpColor();
+			// do NOT uncomment this, you can't change Changed or invalidate things from
+			// the middle of Window::DrawWindow() -- it needs moving to somewhere else
+			//CloseUpColor();
 		}
 		else {
 			Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
