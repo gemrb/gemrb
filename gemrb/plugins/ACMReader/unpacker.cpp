@@ -82,13 +82,24 @@ FillerProc Fillers[32] = {
 	& CValueUnpacker::return0, & CValueUnpacker::return0
 };
 
-void CValueUnpacker::prepare_bits(int bits)
+inline void CValueUnpacker::prepare_bits(int bits)
 {
 	while (bits > avail_bits) {
 		unsigned char one_byte;
+		if (buffer_bit_offset == UNPACKER_BUFFER_SIZE) {
+			unsigned long remains = stream->Remains();
+			if (remains > UNPACKER_BUFFER_SIZE)
+				remains = UNPACKER_BUFFER_SIZE;
+			buffer_bit_offset = UNPACKER_BUFFER_SIZE - remains;
+			if (buffer_bit_offset != UNPACKER_BUFFER_SIZE)
+				stream->Read( bits_buffer + buffer_bit_offset, remains);
+		}
 		//our stream read returns -1 instead of 0 on failure
 		//comparing with 1 will solve annoying interface changes
-		if (stream->Read( &one_byte, 1 )!=1) {
+		if (buffer_bit_offset < UNPACKER_BUFFER_SIZE) {
+			one_byte = bits_buffer[buffer_bit_offset];
+			buffer_bit_offset++;
+		} else {
 			one_byte = 0;
 		}
 		next_bits |= ( ( unsigned int ) one_byte << avail_bits );
