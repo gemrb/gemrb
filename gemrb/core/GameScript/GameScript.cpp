@@ -1540,6 +1540,31 @@ void InitializeIEScript()
 		//printFunction(objectsTable->GetStringIndex(j) );
 	}
 
+	int instantTableIndex = core->LoadSymbol("instant");
+	if (instantTableIndex < 0) {
+		printMessage("GameScript", "Couldn't find instant symbols!\n", LIGHT_RED);
+		abort();
+	}
+	Holder<SymbolMgr> instantTable = core->GetSymbol(instantTableIndex);
+	if (!instantTable) {
+		printMessage("GameScript", "Couldn't load instant symbols!\n", LIGHT_RED);
+		abort();
+	}
+	j = instantTable->GetSize();
+	while (j--) {
+		i = instantTable->GetValueIndex( j );
+		if (i >= MAX_ACTIONS) {
+			printMessage("GameScript"," ", RED);
+			printf("instant action %d (%s) is too high, ignoring\n", i, instantTable->GetStringIndex( j ) );
+			continue;
+		}
+		if (!actions[i]) {
+			printMessage("GameScript"," ", YELLOW);
+			printf("instant action %d (%s) doesn't exist, ignoring\n", i, instantTable->GetStringIndex( j ) );
+			continue;
+		}
+		actionflags[i] |= AF_INSTANT;
+	}
 }
 
 /********************** GameScript *******************************/
