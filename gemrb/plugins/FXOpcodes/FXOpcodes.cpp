@@ -6077,7 +6077,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_chaos_shield_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_chaos_shield_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_MOD( IE_CHAOSSHIELD );
+	STAT_ADD( IE_CHAOSSHIELD, fx->Parameter1 );
 	if (fx->Parameter2) {
 		target->AddPortraitIcon(PI_CSHIELD); //162
 	} else {
