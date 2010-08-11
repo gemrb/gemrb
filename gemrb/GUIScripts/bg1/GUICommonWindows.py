@@ -553,7 +553,7 @@ def UpdatePortraitWindow ():
 		if hp<1 or (state & STATE_DEAD):
 			Button.SetOverlay (ratio, 64,64,64,200, 64,64,64,200)
 		else:
-			Button.SetOverlay (ratio, 255,0,0,200, 128,0,0,200)
+			Button.SetOverlay (ratio, 140,0,0,205, 128,0,0,200)
 		Button.SetTooltip (GemRB.GetPlayerName (portid+1, 1) + "\n%d/%d" %(hp, hp_max))
 
 		#add effects on the portrait
