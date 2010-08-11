@@ -337,9 +337,21 @@ void Scriptable::AddAction(Action* aC)
 		printf( "[GameScript]: NULL action encountered for %s!\n",scriptName );
 		return;
 	}
+
 	InternalFlags|=IF_ACTIVE;
-	actionQueue.push_back( aC );
 	aC->IncRef();
+
+	// attempt to handle 'instant' actions, from instant.ids, which run immediately
+	// when added if the action queue is empty, even on actors which are Held/etc
+	if (!CurrentAction && !GetNextAction()) {
+		if (actionflags[aC->actionID] & AF_INSTANT) {
+			CurrentAction = aC;
+			GameScript::ExecuteAction( this, CurrentAction );
+			return;
+		}
+	}
+
+	actionQueue.push_back( aC );
 }
 
 void Scriptable::AddActionInFront(Action* aC)
