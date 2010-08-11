@@ -178,7 +178,8 @@ def SavePress():
 
 	#game hours (should be generated from game)
 	if Pos<len(Games):
-		Slotname = Games[Pos].GetGameDate()
+		Chapter = str(GemRB.GetGameVar ("CHAPTER") & 0x7fffffff)
+		Slotname = "Chapter " + Chapter + ": " + Games[Pos].GetGameDate()
 	else:
 		Slotname = ""
 	Label = ConfirmWindow.GetControl (0x10000004)
