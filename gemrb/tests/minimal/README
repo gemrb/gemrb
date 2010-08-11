@@ -1,0 +1,17 @@
+This is a simple test case to see if gemrb works. It contains the minimal
+dummy dataset required to run.
+
+If you installed gemrb system-wide use fhs.cfg:
+gemrb -c /usr/share/gemrb/minimal/fhs.cfg
+
+Unless gemrb is installed elsewhere, it should run and print a bunch of
+text and then automatically quit. You may briefly see a small window
+appear. The last thing you should see in the console of a succesful run is:
+[SDLVideo]: Creating Extra Buffer...[OK]
+[SDLVideo]: CreateDisplay...[OK]
+[GUIScript]: Loading Script Start...[OK]
+
+
+If it doesn't get that far and dies complaining about missing files, you
+need to adjust the config to point to the right paths.
+
