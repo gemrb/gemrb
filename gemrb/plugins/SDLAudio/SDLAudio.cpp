@@ -51,7 +51,7 @@ bool SDLAudio::Init(void)
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
 		return false;
 	}
-	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) < 0) {
+	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 8192) < 0) {
 		return false;
 	}
 	Mix_ReserveChannels(1); // for speech
