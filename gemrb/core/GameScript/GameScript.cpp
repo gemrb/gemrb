@@ -1359,10 +1359,12 @@ void InitializeIEScript()
 				printFunction(triggersTable,triggersTable->FindValue(triggersTable->GetValueIndex( j )));
 				//printFunction(triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ));
 			} else {
-				printMessage("GameScript"," ", WHITE);
-				printf("%s is a synonym of ", triggersTable->GetStringIndex( j ) );
-				printFunction(triggersTable,triggersTable->FindValue(triggersTable->GetValueIndex( j )));
-				//printFunction(triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j ) ) ) );
+				if (InDebug&ID_TRIGGERS) {
+					printMessage("GameScript"," ", WHITE);
+					printf("%s is a synonym of ", triggersTable->GetStringIndex( j ) );
+					printFunction(triggersTable,triggersTable->FindValue(triggersTable->GetValueIndex( j )));
+					//printFunction(triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j ) ) ) );
+				}
 			}
 			continue; //we already found an alternative
 		}
@@ -1388,9 +1390,11 @@ void InitializeIEScript()
 		if (f) {
 			for (i = 0; triggernames[i].Name; i++) {
 				if (f == triggernames[i].Function) {
-					printMessage("GameScript"," ", WHITE);
-					printf("%s is a synonym of %s\n", triggersTable->GetStringIndex( j ), triggernames[i].Name );
-					break;
+					if (InDebug&ID_TRIGGERS) {
+						printMessage("GameScript"," ", WHITE);
+						printf("%s is a synonym of %s\n", triggersTable->GetStringIndex( j ), triggernames[i].Name );
+						break;
+					}
 				}
 			}
 			continue;
@@ -1416,10 +1420,12 @@ void InitializeIEScript()
 				printFunction(actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
 //->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
 			} else {
-				printMessage("GameScript"," ", WHITE);
-				printf("%s is a synonym of ", actionsTable->GetStringIndex( j ) );
-				printFunction(actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex( j )));
+				if (InDebug&ID_ACTIONS) {
+					printMessage("GameScript"," ", WHITE);
+					printf("%s is a synonym of ", actionsTable->GetStringIndex( j ) );
+					printFunction(actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex( j )));
 //actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
+				}
 			}
 			continue; //we already found an alternative
 		}
@@ -1473,9 +1479,11 @@ void InitializeIEScript()
 		if (f) {
 			for (i = 0; actionnames[i].Name; i++) {
 				if (f == actionnames[i].Function) {
-					printMessage("GameScript"," ", WHITE);
-					printf("%s is a synonym of %s\n", actionsTable->GetStringIndex( j ), actionnames[i].Name );
-					break;
+					if (InDebug&ID_ACTIONS) {
+						printMessage("GameScript"," ", WHITE);
+						printf("%s is a synonym of %s\n", actionsTable->GetStringIndex( j ), actionnames[i].Name );
+						break;
+					}
 				}
 			}
 			continue;
