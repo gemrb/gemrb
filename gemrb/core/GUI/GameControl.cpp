@@ -2621,8 +2621,9 @@ void GameControl::DialogChoose(unsigned int choose)
 			EndDialog();
 		}
 
+		// *** the commented-out line here should no longer be required, with instant handling ***
 		// all dialog actions must be executed immediately
-		target->ProcessActions(true);
+		//target->ProcessActions(true);
 		// (do not clear actions - final actions can involve waiting/moving)
 
 		if (final_dialog) {
