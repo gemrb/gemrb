@@ -144,7 +144,7 @@ void PluginMgr::LoadPlugins(char* pluginpath)
 			continue;
 		}
 
-		printStatus( "OK", LIGHT_GREEN );
+		//printStatus( "OK", LIGHT_GREEN );
 		//using C bindings, so we don't need to jump through extra hoops
 		//with the symbol name
 		Version_t LibVersion = ( Version_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Version" );
@@ -152,7 +152,7 @@ void PluginMgr::LoadPlugins(char* pluginpath)
 		ID_t ID = ( ID_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_ID" );
 		Register_t Register = ( Register_t ) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Register" );
 
-		printMessage( "PluginMgr", "Checking Plugin Version...", WHITE );
+		//printMessage( "PluginMgr", "Checking Plugin Version...", WHITE );
 		if (LibVersion==NULL) {
 			printStatus( "ERROR", LIGHT_RED );
 			printf( "Invalid Plug-in, Skipping...\n" );
@@ -168,8 +168,9 @@ void PluginMgr::LoadPlugins(char* pluginpath)
 
 		PluginDesc desc = { hMod, ID(), Description(), Register };
 
-		printStatus( "OK", LIGHT_GREEN );
-		printMessage( "PluginMgr", "Loading Exports for ", WHITE );
+		//printStatus( "OK", LIGHT_GREEN );
+		//printMessage( "PluginMgr", "Loading Exports for ", WHITE );
+		printf( " " );
 		textcolor( LIGHT_WHITE );
 		printf( "%s", desc.Description );
 		textcolor( WHITE );
