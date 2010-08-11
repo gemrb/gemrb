@@ -34,6 +34,7 @@
 
 int main(int argc, char* argv[])
 {
+	Interface::SanityCheck(VERSION_GEMRB);
 	core = new Interface( argc, argv );
 	if (core->Init() == GEM_ERROR) {
 		delete( core );

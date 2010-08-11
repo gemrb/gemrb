@@ -5179,3 +5179,10 @@ void Interface::SetNextScript(const char *script)
 	strncpy( NextScript, script, sizeof(NextScript) );
 	QuitFlag |= QF_CHANGESCRIPT;
 }
+
+void Interface::SanityCheck(const char *ver) {
+	if (strcmp(ver, VERSION_GEMRB)) {
+		printf("version check failed: core version %s doesn't match caller's version %s\n", VERSION_GEMRB, ver);
+		abort();
+	}
+}

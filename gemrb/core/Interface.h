@@ -739,6 +739,8 @@ public:
 		EventFlag|=Flag;
 	}
 
+	static void SanityCheck(const char *ver);
+
 	/** Set Next Script */
 	void SetNextScript(const char *script);
 	/** Console is on Screen */
