@@ -168,8 +168,10 @@ def SavePress():
 	#slot name
 	if Pos<len(Games):
 		Slotname = Games[Pos].GetName()
+		save_strref = 15306
 	else:
 		Slotname = ""
+		save_strref = 15588
 	NameField = ConfirmWindow.GetControl (3)
 	NameField.SetText (Slotname)
 	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, EditChange)
@@ -199,7 +201,7 @@ def SavePress():
 
 	#save
 	SaveButton=ConfirmWindow.GetControl (7)
-	SaveButton.SetText (15588)
+	SaveButton.SetText (save_strref)
 	SaveButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConfirmedSaveGame)
 	SaveButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	#SaveButton.SetState (IE_GUI_BUTTON_DISABLED)
