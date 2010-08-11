@@ -864,5 +864,22 @@ def CanDualClass(actor):
 		return 1
 	return 0
 
+def SetupDamageInfo (pc, Button):
+	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
+	hp_max = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
+	state = GemRB.GetPlayerStat (pc, IE_STATE_ID)
+
+	if hp_max < 1:
+		ratio = 0.0
+	else:
+		ratio = (hp+0.0) / hp_max
+
+	if hp < 1 or (state & STATE_DEAD):
+		Button.SetOverlay (0, 64,64,64,200, 64,64,64,200)
+	else:
+		Button.SetOverlay (ratio, 140,0,0,205, 128,0,0,200)
+	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + "\n%d/%d" %(hp, hp_max))
+
+
 GameWindow = GUIClasses.GWindow(0)
 GameControl = GUIClasses.GControl(0,0)

@@ -505,20 +505,8 @@ def UpdatePortraitWindow ():
 				IE_GUI_BUTTON_DRAGGABLE, OP_SET)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetPicture (pic, "NOPORTSM")
-		hp = GemRB.GetPlayerStat (portid+1, IE_HITPOINTS)
-		hp_max = GemRB.GetPlayerStat (portid+1, IE_MAXHITPOINTS)
-		state = GemRB.GetPlayerStat (portid+1, IE_STATE_ID)
+		GUICommon.SetupDamageInfo (portid+1, Button)
 
-		if (hp_max<1):
-			ratio = 0.0
-		else:
-			ratio = (hp+0.0) / hp_max
-
-		if hp<1 or (state & STATE_DEAD):
-			Button.SetOverlay (ratio, 64,64,64,200, 64,64,64,200)
-		else:
-			Button.SetOverlay (ratio, 140,0,0,205, 128,0,0,200)
-		Button.SetTooltip (GemRB.GetPlayerName (portid+1, 1) + "\n%d/%d" %(hp, hp_max))
 		#add effects on the portrait
 		effects = GemRB.GetPlayerStates (portid+1)
 		states = ""

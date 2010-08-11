@@ -570,21 +570,7 @@ def UpdatePortraitWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetPicture (pic, "NOPORTSM")
 
-		hp = GemRB.GetPlayerStat (portid+1, IE_HITPOINTS)
-		hp_max = GemRB.GetPlayerStat (portid+1, IE_MAXHITPOINTS)
-		state = GemRB.GetPlayerStat (portid+1, IE_STATE_ID)
-
-		if (hp_max<1):
-			ratio = 0.0
-		else:
-			ratio = (hp+0.0) / hp_max
-
-		if hp<1 or (state & STATE_DEAD):
-			Button.SetOverlay (0, 64,64,64,200, 64,64,64,200)
-		else:
-			Button.SetOverlay (ratio, 140,0,0,205, 128,0,0,200)
-		ratio_str = "\n%d/%d" %(hp, hp_max)
-		Button.SetTooltip (GemRB.GetPlayerName (portid+1, 1) + ratio_str)
+		GUICommon.SetupDamageInfo (portid+1, Button)
 
 		#add effects on the portrait
 		#http://img.jeuxvideo.fr/00002663-photo-icewind-dale-heart-of-winter.jpg
