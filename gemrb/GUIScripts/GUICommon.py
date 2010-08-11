@@ -878,7 +878,10 @@ def SetupDamageInfo (pc, Button):
 		Button.SetOverlay (0, 64,64,64,200, 64,64,64,200)
 	else:
 		Button.SetOverlay (ratio, 140,0,0,205, 128,0,0,200)
-	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + "\n%d/%d" %(hp, hp_max))
+	ratio_str = "\n%d/%d" %(hp, hp_max)
+	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + ratio_str)
+
+	return ratio_str
 
 
 GameWindow = GUIClasses.GWindow(0)

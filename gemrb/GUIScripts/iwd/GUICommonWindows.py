@@ -570,7 +570,7 @@ def UpdatePortraitWindow ():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetPicture (pic, "NOPORTSM")
 
-		GUICommon.SetupDamageInfo (portid+1, Button)
+		ratio_str = GUICommon.SetupDamageInfo (portid+1, Button)
 
 		#add effects on the portrait
 		#http://img.jeuxvideo.fr/00002663-photo-icewind-dale-heart-of-winter.jpg
