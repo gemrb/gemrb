@@ -331,7 +331,7 @@ void Spellbook::RemoveSpell(const ieResRef ResRef)
 			std::vector< CREKnownSpell* >::iterator ks;
 
 			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ks++) {
-				if (strnicmp(ResRef, (*ks)->SpellResRef, sizeof(ResRef) ) ) {
+				if (strnicmp(ResRef, (*ks)->SpellResRef, sizeof(ieResRef) ) ) {
 					continue;
 				}
 				delete *ks;
