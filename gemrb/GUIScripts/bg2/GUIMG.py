@@ -199,8 +199,11 @@ def UpdateMageWindow ():
 				Button.EnableBorder (0, 0)
 	else:
 		label = Window.GetControl (0x10000040)
-		# we give sorcerers all charges for all the spells, so some extra math is needed
-		label.SetText (GemRB.GetString(61256) + " " + str(mem_cnt/known_cnt) + "/" + str(max_mem_cnt)) #spells can cast
+		if known_cnt:
+			# we give sorcerers all charges for all the spells, so some extra math is needed
+			label.SetText (GemRB.GetString(61256) + " " + str(mem_cnt/known_cnt) + "/" + str(max_mem_cnt))
+		else:
+			label.SetText ("")
 
 	for i in range (24):
 		Button = Window.GetControl (27 + i)
