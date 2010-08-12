@@ -3318,7 +3318,7 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	//10        - friendly to target
 
 	int eamod;
-	if (fx->Parameter2>=5 and fx->Parameter2<=9) {
+	if (fx->Parameter2>=5 && fx->Parameter2<=9) {
 		eamod = EAM_ENEMY;
 	}
 	else {
