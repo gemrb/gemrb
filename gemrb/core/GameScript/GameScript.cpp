@@ -2260,11 +2260,19 @@ Trigger* GenerateTrigger(char* String)
 	int len = strlench(String,'(')+1; //including (
 	int i = triggersTable->FindString(String, len);
 	if (i<0) {
+		printMessage("GameScript"," ",LIGHT_RED);
+		printf("Invalid scripting trigger: %s\n", String);
 		return NULL;
 	}
 	char *src = String+len;
 	char *str = triggersTable->GetStringIndex( i )+len;
-	return GenerateTriggerCore(src, str, i, negate);
+	Trigger *trigger = GenerateTriggerCore(src, str, i, negate);
+	if (!trigger) {
+		printMessage("GameScript"," ",LIGHT_RED);
+		printf("Malformed scripting trigger: %s\n", String);
+		return NULL;
+	}
+	return trigger;
 }
 
 Action* GenerateAction(char* String)
@@ -2283,7 +2291,13 @@ Action* GenerateAction(char* String)
 	}
 	char *src = String+len;
 	char *str = actionsTable->GetStringIndex( i )+len;
-	return GenerateActionCore( src, str, i);
+	Action *action = GenerateActionCore( src, str, i);
+	if (!action) {
+		printMessage("GameScript"," ",LIGHT_RED);
+		printf("Malformed scripting action: %s\n", String);
+		return NULL;
+	}
+	return action;
 }
 
 Action* GenerateActionDirect(char *String, Actor *object)

@@ -1306,7 +1306,7 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 		//Scriptable Name
 		src++;
 		int i;
-		for (i=0;i<(int) sizeof(object->objectName)-1 && *src!='"';i++)
+		for (i=0;i<(int) sizeof(object->objectName)-1 && *src && *src!='"';i++)
 		{
 			object->objectName[i] = *src;
 			src++;
@@ -1365,7 +1365,9 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 		switch (*str) {
 			default:
 				printf("Invalid type: %s\n",str);
-				str++;
+				//str++;
+				delete newAction;
+				return NULL;
 				break;
 
 			case 'p': //Point
@@ -1442,6 +1444,10 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 				}
 				action[i] = 0;
 				Action* act = GenerateAction( action);
+				if (!act) {
+					delete newAction;
+					return NULL;
+				}
 				act->objects[0] = newAction->objects[0];
 				newAction->objects[0] = NULL; //avoid freeing of object
 				delete newAction; //freeing action
@@ -1452,7 +1458,9 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 			case 'o': //Object
 				if (objectCount==3) {
 					printf("Invalid object count!\n");
-					abort();
+					//abort();
+					delete newAction;
+					return NULL;
 				}
 				ParseObject(str, src, newAction->objects[objectCount++]);
 				break;
@@ -1484,6 +1492,10 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 					i=0;
 				}
 				while (*src != '"') {
+					if (*src == 0) {
+						delete newAction;
+						return NULL;
+					}
 					//sizeof(context+name) = 40
 					if (i<40) {
 						*dst++ = (char) tolower(*src);
@@ -1497,7 +1509,9 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 					str++;
 					if (*str!='s') {
 						printf("Invalid mergestrings:%s\n",str);
-						abort();
+						//abort();
+						delete newAction;
+						return NULL;
 					}
 					SKIP_ARGUMENT();
 					if (!stringsCount) {
@@ -1513,6 +1527,10 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 					//reading the context string
 					i=0;
 					while (*src != '"') {
+						if (*src == 0) {
+							delete newAction;
+							return NULL;
+						}
 						if (i++<6) {
 							*dst++ = (char) tolower(*src);
 						}
@@ -1736,7 +1754,9 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 		switch (*str) {
 			default:
 				printf("Invalid type: %s\n",str);
-				str++;
+				//str++;
+				delete newTrigger;
+				return NULL;
 				break;
 
 			case 'p': //Point
@@ -1812,6 +1832,11 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					i=0;
 				}
 				while (*src != '"') {
+					if (*src == 0) {
+						delete newTrigger;
+						return NULL;
+					}
+
 					//sizeof(context+name) = 40
 					if (i<40) {
 						*dst++ = (char) tolower(*src);
@@ -1825,7 +1850,9 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					str++;
 					if (*str!='s') {
 						printf("Invalid mergestrings:%s\n",str);
-						abort();
+						//abort();
+						delete newTrigger;
+						return NULL;
 					}
 					SKIP_ARGUMENT();
 					if (!stringsCount) {
@@ -1841,6 +1868,11 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					//reading the context string
 					i=0;
 					while (*src != '"') {
+						if (*src == 0) {
+							delete newTrigger;
+							return NULL;
+						}
+
 						if (i++<6) {
 							*dst++ = (char) tolower(*src);
 						}
