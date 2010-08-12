@@ -34,6 +34,7 @@ SaveButton = 0
 TextAreaControl = 0
 Games = ()
 ScrollBar = 0
+str_chapter = (48007, 48006, 16205, 16206, 16207, 16208, 16209, 71020, 71021, 71022)
 
 def OpenSaveWindow ():
 	global SaveWindow, TextAreaControl, Games, ScrollBar
@@ -178,8 +179,8 @@ def SavePress():
 
 	#game hours (should be generated from game)
 	if Pos<len(Games):
-		Chapter = str(GemRB.GetGameVar ("CHAPTER") & 0x7fffffff)
-		Slotname = "Chapter " + Chapter + ": " + Games[Pos].GetGameDate()
+		Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
+		Slotname = GemRB.GetString(str_chapter[Chapter-1]) + " " + Games[Pos].GetGameDate()
 	else:
 		Slotname = ""
 	Label = ConfirmWindow.GetControl (0x10000004)
