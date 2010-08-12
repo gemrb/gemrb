@@ -282,6 +282,11 @@ int GetActionLength(const char* string)
 					}
 				}
 				break;
+			case '\r':
+			case '\n':
+				// force reset on newline if quotes are open
+				if (!quotes) return i;
+				break;
 			default:
 				break;
 		}
@@ -329,6 +334,16 @@ char** GetStrings(char* string, unsigned int& count)
 						}
 						ignore=false;
 					}
+				}
+				break;
+			case '\r':
+			case '\n':
+				// force reset on newline if quotes are open, or we had a comment
+				if (!quotes || ignore) {
+					level = 0;
+					quotes = true;
+					ignore = false;
+					count++;
 				}
 				break;
 			default:
