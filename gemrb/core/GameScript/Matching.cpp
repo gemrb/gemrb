@@ -141,6 +141,12 @@ inline static bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, i
 /* returns actors that match the [x.y.z] expression */
 static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_flags)
 {
+	// if you ActionOverride a global actor, they might not have a map :(
+	// TODO: don't allow this to happen?
+	if (!map) {
+		return NULL;
+	}
+
 	if (oC->objectName[0]) {
 		//We want the object by its name... (doors/triggers don't play here!)
 		Actor* aC = map->GetActor( oC->objectName, ga_flags );
@@ -320,9 +326,13 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 	}
 
 	if (oC->objectName[0]) {
-		aC = GetActorObject(Sender->GetCurrentArea()->GetTileMap(), oC->objectName );
-		if (aC) {
-			return aC;
+		// if you ActionOverride a global actor, they might not have a map :(
+		// TODO: don't allow this to happen?
+		if (Sender->GetCurrentArea()) {
+			aC = GetActorObject(Sender->GetCurrentArea()->GetTileMap(), oC->objectName );
+			if (aC) {
+				return aC;
+			}
 		}
 		Game *game = core->GetGame();
 
