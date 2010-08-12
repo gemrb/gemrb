@@ -317,6 +317,7 @@ void Spellbook::RemoveSpell(int spellid)
 				(*sm)->known_spells.erase(ks);
 				RemoveMemorization(*sm, ResRef);
 				ks--;
+				ClearSpellInfo();
 			}
 		}
 	}
@@ -338,6 +339,7 @@ void Spellbook::RemoveSpell(const ieResRef ResRef)
 				(*sm)->known_spells.erase(ks);
 				RemoveMemorization(*sm, ResRef);
 				ks--;
+				ClearSpellInfo();
 			}
 		}
 	}
