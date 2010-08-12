@@ -1635,11 +1635,15 @@ void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 	}
 }
 
-//DisplayStringHead, but wait for previous talk to succeed
+//DisplayStringHead, but wait until done
 void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 {
-	if (core->GetAudioDrv()->IsSpeaking()) {
-		//Sender->AddActionInFront( Sender->CurrentAction );
+	if (Sender->CurrentActionState) {
+		// TODO: should probably store the actual time and wait for that,
+		// rather than this hack
+		if (!core->GetAudioDrv()->IsSpeaking()) {
+			Sender->ReleaseCurrentAction();
+		}
 		return;
 	}
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1]);
@@ -1647,7 +1651,7 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 		target=Sender;
 	}
 	DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_WAIT|DS_SPEECH|DS_HEAD);
-	Sender->ReleaseCurrentAction();
+	Sender->CurrentActionState = 1;
 }
 
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
