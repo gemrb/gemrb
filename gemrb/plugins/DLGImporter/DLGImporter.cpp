@@ -298,6 +298,10 @@ int GetActionLength(const char* string)
 
 /* this function will break up faulty script strings that lack the CRLF
    between commands, common in PST dialog */
+/* misc test cases (just examples, there are more):
+     pst's FORGE.DLG (trigger split across two lines),
+     bg2's SAHIMP02.DLG (missing quotemark in string),
+     bg2's QUAYLE.DLG (missing closing bracket) */
 char** GetStrings(char* string, unsigned int& count)
 {
 	int col = 0;
