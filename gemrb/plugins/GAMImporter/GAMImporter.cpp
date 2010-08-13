@@ -833,10 +833,11 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game)
 		break;
 	}
 	stream->WriteDword( &game->RealTime ); //this isn't correct, this field is the realtime
-	stream->WriteDword( &SavedLocOffset);
-	for (i=0;i<7;i++) {
-		stream->Write( Signature, 8);
-	}
+	stream->WriteDword( &PPLocOffset);
+	stream->WriteDword( &PPLocCount);
+	char filling[52];
+	memset( filling, 0, sizeof(filling) );
+	stream->Write( &filling, 52); //unknown
 	return 0;
 }
 
@@ -1141,6 +1142,18 @@ int GAMImporter::PutGame(DataStream *stream, Game *game)
 	}
 	if (FamiliarsOffset) {
 		ret = PutFamiliars( stream, game);
+		if (ret) {
+			return ret;
+		}
+	}
+	if (SavedLocOffset) {
+		ret = PutSavedLocations( stream, game);
+		if (ret) {
+			return ret;
+		}
+	}
+	if (PPLocOffset) {
+		ret = PutPlaneLocations( stream, game);
 		if (ret) {
 			return ret;
 		}
