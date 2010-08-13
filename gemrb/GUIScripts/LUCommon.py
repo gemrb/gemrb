@@ -108,10 +108,8 @@ def SetupSavingThrows (pc, Level=None):
 		return
 
 	#see if we can add racial bonuses to saves
-	#default return is -1 NOT "*", so we convert always convert to str
-	#I'm leaving the "*" just in case
 	Race = CommonTables.Races.GetRowName (CommonTables.Races.FindValue (3, Race) )
-	RaceSaveTableName = str(CommonTables.Races.GetValue (Race, "SAVE") )
+	RaceSaveTableName = CommonTables.Races.GetValue (Race, "SAVE", 0)
 	RaceSaveTable = None
 	if RaceSaveTableName != "-1" and RaceSaveTableName != "*":
 		Con = GemRB.GetPlayerStat (pc, IE_CON, 1)-1
@@ -121,9 +119,15 @@ def SetupSavingThrows (pc, Level=None):
 
 	#preload our tables to limit multi-classed lookups
 	SaveTables = []
+	ClassBonus = 0
 	for i in range (NumClasses):
-		SaveName = CommonTables.Classes.GetValue (CommonTables.Classes.FindValue (5, Class[i]), 3, 0)
+		Row = CommonTables.Classes.FindValue (5, Class[i])
+		RowName = CommonTables.Classes.GetRowName (Row)
+		SaveName = CommonTables.Classes.GetValue (RowName, "SAVE", 0)
 		SaveTables.append (GemRB.LoadTable (SaveName) )
+		#use numeric value
+		ClassBonus += CommonTables.ClassSkills.GetValue (RowName, "SAVEBONUS", 1)
+
 	if not len (SaveTables):
 		return
 
@@ -146,6 +150,9 @@ def SetupSavingThrows (pc, Level=None):
 		#add racial bonuses if applicable (small pc's)
 		if RaceSaveTable:
 			CurrentSave -= RaceSaveTable.GetValue (row, Con)
+
+		#add class bonuses if applicable (paladin)
+		CurrentSave -= ClassBonus
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, CurrentSave)
 	return
 
