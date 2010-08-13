@@ -326,6 +326,7 @@ public:
 	Actor* GetActor(int i, bool any);
 	Actor* GetActorByDialog(const char* resref);
 	Actor* GetActorByResource(const char* resref);
+	Actor* GetActorByScriptName(const char* name);
 	bool HasActor(Actor *actor);
 	void RemoveActor(Actor* actor);
 	//returns actors in rect (onlyparty could be more sophisticated)

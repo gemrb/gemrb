@@ -1572,6 +1572,18 @@ Actor* Map::GetActorByResource(const char *resref)
 	return NULL;
 }
 
+Actor* Map::GetActorByScriptName(const char *name)
+{
+	size_t i = actors.size();
+	while (i--) {
+		Actor* actor = actors[i];
+		if (strnicmp( actor->GetScriptName(), name, 8 ) == 0) {
+			return actor;
+		}
+	}
+	return NULL;
+}
+
 int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 {
 	actorlist = ( Actor * * ) malloc( actors.size() * sizeof( Actor * ) );
