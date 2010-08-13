@@ -1816,8 +1816,11 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		return;
 	}
 
-	//this could be a non-PC
-	Actor *pc = game->selected[0];
+	Actor *pc = core->GetFirstSelectedPC(false);
+	if (!pc) {
+		//this could be a non-PC
+		pc = game->selected[0];
+	}
 	if (!actor) {
 		//add a check if you don't want some random monster handle doors and such
 		if (overDoor) {
