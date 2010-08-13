@@ -56,7 +56,7 @@ public:
 	/** Returns actor */
 	Actor *GetCreature(const char *ResRef, unsigned int PartySlot=0);
 	/** Returns a PC index, by loading a creature */
-	int LoadCreature(const char *ResRef, unsigned int PartySlot, bool character=false);
+	int LoadCreature(const char *ResRef, unsigned int PartySlot, bool character=false, int VersionOverride=-1);
 
 
 	// 2DA table functions.

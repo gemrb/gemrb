@@ -97,7 +97,7 @@ Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
 	return actor;
 }
 
-int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool character)
+int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool character, int VersionOverride)
 {
 	DataStream *stream;
 
@@ -120,6 +120,10 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 
 	if ( !actor ) {
 		return -1;
+	}
+
+	if (VersionOverride != -1) {
+		actor->version = VersionOverride;
 	}
 
 	//both fields are of length 9, make this sure!

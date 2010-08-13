@@ -31,7 +31,7 @@ def OnLoad():
 	GUICommonWindows.PortraitWindow = None
 
 	MyChar = GemRB.GetVar ("Slot")
-	GemRB.CreatePlayer ("charbase", MyChar | 0x8000 )
+	GemRB.CreatePlayer ("charbase", MyChar | 0x8000, 0, 11 ) # 11 = force bg2
 	CharGenCommon.DisplayOverview (1)
 
 	return

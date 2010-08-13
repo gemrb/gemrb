@@ -386,7 +386,7 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_LoadGame__doc,
-"LoadGame(Index)\n\n"
+"LoadGame(Index [,version] )\n\n"
 "Loads and enters the Game." );
 
 static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
@@ -4307,7 +4307,7 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreatePlayer__doc,
-"CreatePlayer(CREResRef, Slot [,Import] ) => PlayerSlot\n\n"
+"CreatePlayer(CREResRef, Slot [,Import, VersionOverride] ) => PlayerSlot\n\n"
 "Creates or removes a player character in a given party slot. If import is nonzero, then reads a CHR instead of a CRE." );
 
 static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
@@ -4315,8 +4315,9 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 	const char *CreResRef;
 	int PlayerSlot, Slot;
 	int Import=0;
+	int VersionOverride = -1;
 
-	if (!PyArg_ParseTuple( args, "si|i", &CreResRef, &PlayerSlot, &Import)) {
+	if (!PyArg_ParseTuple( args, "si|ii", &CreResRef, &PlayerSlot, &Import, &VersionOverride)) {
 		return AttributeError( GemRB_CreatePlayer__doc );
 	}
 	//PlayerSlot is zero based
@@ -4340,7 +4341,7 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 		}
 	}
 	if (CreResRef[0]) {
-		PlayerSlot = gamedata->LoadCreature( CreResRef, Slot, (bool) Import );
+		PlayerSlot = gamedata->LoadCreature( CreResRef, Slot, (bool) Import, VersionOverride );
 	} else {
 		//just destroyed the previous actor, not going to create one
 		PlayerSlot = 0;

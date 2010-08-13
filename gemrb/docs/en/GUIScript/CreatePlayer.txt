@@ -1,11 +1,12 @@
 
-Prototype: CreatePlayer(CREResRef, Slot [,Import] )
+Prototype: CreatePlayer(CREResRef, Slot [,Import, VersionOverride] )
 
 Description: Adds an actor (PC) to the current game. It works only after a LoadGame() was executed, and should be used before an EnterGame(). It is also used to import a .chr file as a PC. A new character will need additional SetPlayerStat() and FillPlayerInfo() calls to be a working character.
 
 Parameters: CREResRef - The name of the creature to be used as the actor, usually 'charbase'
             Slot      - The player character's position in the party
             Import    - Set it to 1 if you want to import a .chr instead of creating a new character
+            VersionOverride - Force version of new actor.
 
 Return value: the new player's index in the game structure
 

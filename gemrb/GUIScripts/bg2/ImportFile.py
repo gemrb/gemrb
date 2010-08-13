@@ -59,7 +59,7 @@ def SelectPress():
 def DonePress():
 	FileName = TextAreaControl.QueryText()
 	Slot = GemRB.GetVar("Slot")
-	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
+	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1, 11) # 11 = force bg2
 	if ImportWindow:
 		ImportWindow.Unload()
 	GemRB.SetToken("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1) )
