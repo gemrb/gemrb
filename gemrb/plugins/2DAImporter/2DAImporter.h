@@ -151,6 +151,19 @@ public:
 		}
 		return -1;
 	}
+
+	inline int FindTableValue(unsigned int col, const char* val, int start) const
+	{
+		ieDword row, max;
+
+		max = GetRowCount();
+		for (row = start; row < max; row++) {
+			const char* ret = QueryField( row, col );
+			if (stricmp(ret, val) == 0)
+				return (int) row;
+		}
+		return -1;
+	}
 };
 
 #endif
