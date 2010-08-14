@@ -527,9 +527,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	value = GemRB.GetPlayerStat (pc, IE_STR)
 	ex = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 	# 10332 to hit
-	stats.append ( (10332, GemRB.GetAbilityBonus (IE_STR,0,value,ex), '0') )
+	stats.append ( (10332, GemRB.GetAbilityBonus (IE_STR,0,value,ex), 'p') )
 	# 10336 damage
-	stats.append ( (10336, GemRB.GetAbilityBonus (IE_STR,1,value,ex), '0') )
+	stats.append ( (10336, GemRB.GetAbilityBonus (IE_STR,1,value,ex), 'p') )
 	# 10337 open doors (bend bars lift gates)
 	stats.append ( (10337, GemRB.GetAbilityBonus (IE_STR,2,value,ex), '0') )
 	# 10338 weight allowance
@@ -537,9 +537,9 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# 10339 AC
 	stats.append ( (10339, GA (IE_DEX,2), '0') )
 	# 10340 Missile adjustment
-	stats.append ( (10340, GA (IE_DEX,1), '0') )
+	stats.append ( (10340, GA (IE_DEX,1), 'p') )
 	# 10341 Reaction adjustment
-	stats.append ( (10341, GA (IE_DEX,0), '0') )
+	stats.append ( (10341, GA (IE_DEX,0), 'p') )
 	# 10342 CON HP Bonus/Level
 	stats.append ( (10342, GA (IE_CON,0), 'p') )
 	# 10343 Chance To Learn spell
