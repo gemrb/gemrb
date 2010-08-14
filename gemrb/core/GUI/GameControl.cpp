@@ -2652,6 +2652,20 @@ void GameControl::DialogChoose(unsigned int choose)
 				// then just search the current area for an actor with the dialog
 				tgt = target->GetCurrentArea()->GetActorByDialog(tr->Dialog);
 			}
+			if (!tgt) {
+				// try searching for banter dialogue: the original engine seems to
+				// happily let you randomly switch between normal and banter dialogs
+
+				// TODO: work out if this should go somewhere more central (such
+				// as GetActorByDialog), or if there's a less awful way to do this
+				// (we could cache the entries, for example)
+				// TODO: fix for ToB (see also the Interact action)
+				AutoTable pdtable("interdia");
+				if (pdtable) {
+					int row = pdtable->FindTableValue( pdtable->GetColumnIndex("FILE"), tr->Dialog );
+					tgt = target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
+				}
+			}
 			target = tgt;
 			if (!target) {
 				printMessage("Dialog","Can't redirect dialog\n",YELLOW);
