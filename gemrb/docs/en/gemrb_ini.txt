@@ -32,9 +32,8 @@ INI File Format
 gemrb.ini file is in Windows *.INI format. That means it's line
 oriented, consisting of a list of options, each on its own
 line. Options are grouped into sections, each section labeled with
-section name in [brackets]. [FIXME: case sensitive??]. Comments have
-to be on their own line, they start with semicolon (;) and last to the
-end of the line.
+section name in [brackets]. Comments have to be on their own line, they
+start with a semicolon (;) and last to the end of the line.
 
 Options are in this file described in the format optionname = <type>.
 For the moment all the options have to be in [resources] section.
@@ -65,12 +64,18 @@ CursorBAM = <resref>
 - - - - - - - - - - -
 Name of bitmap resource with cursor images (e.g. PST: CARET)
 
+ScrollCursorBAM = <resref>
+- - - - - - - - - - - - - -
+Name of bitmap resource with scroll cursor images (e.g. BG2: CURSARW)
 
 ButtonFont = <resref>
 - - - - - - - - - - - 
 Name of bitmap resource used for button font in dialog windows
 (e.g. BG1: STONESML)
 
+MovieFont = <resref>
+- - - - - - - - - - -
+Name of bitmap resource used for the movie subtitles
 
 TooltipFont = <resref>
 - - - - - - - - - - - -
@@ -132,7 +137,7 @@ BAM. (PST, ...)
 
 
 AllStringsTagged = <bool>
-- - - - - - - - - - -
+- - - - - - - - - - - - -
 If set to 1, .tlk tokens are always resolved regardless of the token
 flag in dialog.tlk. Normally only BG2 has token flags (0), all other
 games have this option set to 1.
@@ -248,12 +253,66 @@ Normally there is an area flag for this.
 DialogueScrolls = <bool>
 - - - - - - - - - - - - -
 If set to 1, dialogue window behaves as in PS:T - i.e. talk between 
-Nameless One and others is appended into the window as it comes. If set to 0 (default) each new pair of NPC's talk and Nameless One's replies is written from the start of the page, like in BG2.
+Nameless One and others is appended into the window as it comes. If set to
+0 (default) each new pair of NPC's talk and Nameless One's replies is
+written from the start of the page, like in BG2.
 
 MaximumAbility = 25|40
-- - - - - - - - - - - - -
-Determines the maximum value of character abilities. Setting it to absurd values might cause problems. Its value should be 40 for IWD2, 25 for all other games.
+- - - - - - - - - - - -
+Determines the maximum value of character abilities. Setting it to absurd
+values might cause problems. Its value should be 40 for IWD2, 25 for all
+other games.
 
 StrrefSaveGame = 0|1
-- - - - - - - - - - - - -
-Determines whether the GameScript action SaveGame uses the int0 paramater to lookup a strref, or to look in savegame.2da for the save game name.
+- - - - - - - - - - -
+Determines whether the GameScript action SaveGame uses the int0 paramater
+to lookup a strref, or to look in savegame.2da for the save game name.
+
+ReverseToHit = 0|1
+- - - - - - - - - -
+Determines whether higher armor class is better (iwd2) or worse (the rest).
+
+RedrawTile = 0|1
+- - - - - - - - -
+Force redraw of some overlay tiles??
+
+CheckAbilities = 0|1
+- - - - - - - - - - -
+Determines if character abilities should matter in item usability checks.
+
+SpellBookIconHack = 0|1
+- - - - - - - - - - - -
+Enables the spell book icon name hack needed for ToB.
+
+DeathOnZeroStat = 0|1
+- - - - - - - - - - -
+Determines whether characters should die if any of their primary stats
+reaches zero.
+
+BreakableWeapons = 0|1
+- - - - - - - - - - - -
+Determines if weapons can randomly break when used (1% chance in bg1).
+
+SelectiveMagicRes = 0|1
+- - - - - - - - - - - -
+Determines whether the magic resistance applies to all effects, even the
+beneficial ones.
+
+HasHideInShadows = 0|1
+- - - - - - - - - - - -
+Enable this if the characters also have the IE_HIDEINSHADOWS stat besides
+IE_STEALTH.
+
+ProperBackstab = 0|1
+- - - - - - - - - - -
+Determines how many checks the backstabbing code does before treating an
+attack as a backstab.
+
+HasSpecificDamageBonus = 0|1
+- - - - - - - - - - - - - - -
+Determines if the game supports specific damage bonus like for example +10%
+extra cold damage.
+
+StealIsAttack = 0|1
+- - - - - - - - - -
+Determines whether a detected stealing attempt causes the shopkeep to turn hostile.
