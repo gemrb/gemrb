@@ -619,12 +619,13 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 				else:
 					res.append ("[capital=0]" + GemRB.GetString (strref) + ' ' + str (val) )
 			elif type == 's': #both base and (modified) stat, but only if they differ
-				base = str (GB (val))
-				stat = str (GS (val))
+				base = GB (val)
+				stat = GS (val)
+				base_str = "[capital=0]" + GemRB.GetString (strref) + ': ' + str(stat)
 				if base == stat:
-					res.append ("[capital=0]" + GemRB.GetString (strref) + ': ' + base)
+					res.append (base_str)
 				else:
-					res.append ("[capital=0]" + GemRB.GetString (strref) + ': ' + base + " (" + stat + ")")
+					res.append (base_str + " (" + str(stat-base) + ")")
 			elif type == 'x': #x character before value
 				res.append ("[capital=0]"+GemRB.GetString (strref)+': x' + str (val) )
 			elif type == 'a': #value (portrait icon) + string
