@@ -4072,6 +4072,7 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	Actor *act = (Actor *) Sender;
 	act->ApplyKit(true);
 	act->SetMCFlag(MC_FALLEN_PALADIN, BM_OR);
+	if (act->InParty) displaymsg->DisplayConstantStringName(STR_PALADIN_FALL, 0xbcefbc, act);
 }
 
 void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -4082,6 +4083,7 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	Actor *act = (Actor *) Sender;
 	act->ApplyKit(true);
 	act->SetMCFlag(MC_FALLEN_RANGER, BM_OR);
+	if (act->InParty) displaymsg->DisplayConstantStringName(STR_RANGER_FALL, 0xbcefbc, act);
 }
 
 void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)

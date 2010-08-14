@@ -188,7 +188,9 @@
 #define STR_CASTER_LVL_INC 155 // caster level bonus (wild mages)
 #define STR_CASTER_LVL_DEC 156
 #define STR_EXPORTED       157 // characters exported (iwd)
+#define STR_PALADIN_FALL 158
+#define STR_RANGER_FALL 159
 
-#define STRREF_COUNT 158
+#define STRREF_COUNT 160
 
 #endif //! IE_STRINGS_H
