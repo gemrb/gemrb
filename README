@@ -1,7 +1,5 @@
-G E M R B
-*********
-
-
+Introduction
+------------
 GemRB (Game Engine Made with preRendered Background) is a "port"
 (actually a new implementation) of the original Infinity Engine (the one
 of Baldur's Gate, Icewind Dale, Planescape: Torment, ...) to
@@ -17,32 +15,26 @@ partition and mounted to your Linux/Unix filesystem, installed on
 windows and then copied to your filesystem, installed with WINE or 
 extracted manually from the CDs using the tool `unshield'.
 
-
 What little documentation exists is mostly in gemrb/docs/en/ and
 subdirectories, the gemrb.6 man page and this file.
 
+Supported platforms
+-------------------
 Supported (i.e. we got reports about successfully running GemRB) systems:
-
 Linux x86, x86-64, ppc
 FreeBSD x86
 MS Windows (98, XP or Vista)
-some Nokia N8x0 systems
 various Macintosh systems (even pre x86) also should work ...
+some smart phones (Symbian, Android)
+some consoles (OpenPandora, Dingoo)
+some exotic OSes (ReactOS, SyllableOS, Haiku)
 
-Requirements:
-
-SDL 1.2
-SDL_mixer (not required if you don't want sound)
-OpenAL 0.0.7 or above, (not required if you don't want sound)
-Python 2.2 or above, with shared libs (binaries are compiled with 2.5!)
-ZLib 1.2
-Png 1.2 (optional)
-
-If you compile from source, you will need the development packages!
+Requirements
+------------
+See the INSTALL file.
 
 Contacts
 --------
-
 Our homepage:
 http://gemrb.sourceforge.net
 
@@ -60,7 +52,6 @@ the time.
 
 Useful links
 ------------
-
 IESDP, documentation for the Infinity Engine file formats and more:
 http://iesdp.gibberlings3.net/
 
