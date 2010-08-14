@@ -513,13 +513,13 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# 11766 AC bonuses
 	stats.append (11766)
 	# 11770 AC vs. Crushing
-	stats.append ((11770, GS (IE_ACCRUSHINGMOD), ''))
+	stats.append ((11770, GS (IE_ACCRUSHINGMOD), 'p'))
 	# 11767 AC vs. Missile
-	stats.append ((11767, GS (IE_ACMISSILEMOD), ''))
+	stats.append ((11767, GS (IE_ACMISSILEMOD), 'p'))
 	# 11769 AC vs. Piercing
-	stats.append ((11769, GS (IE_ACPIERCINGMOD), ''))
+	stats.append ((11769, GS (IE_ACPIERCINGMOD), 'p'))
 	# 11768 AC vs. Slashing
-	stats.append ((11768, GS (IE_ACSLASHINGMOD), ''))
+	stats.append ((11768, GS (IE_ACSLASHINGMOD), 'p'))
 	stats.append (None)
 
 	# 10315 Ability bonuses
@@ -558,7 +558,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 			base = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level, 0)
 			if base:
 				count = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level)
-				stats.append ( (GemRB.GetString (10345), count-base, 'b') )
+				stats.append ( (GemRB.GetString (10345), count-base, 'r') )
 		stats.append (None)
 
 	# 32204 Resistances
@@ -618,6 +618,11 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 					res.append ("[capital=0]" + GemRB.GetString (strref) + ' +' + str (val) )
 				else:
 					res.append ("[capital=0]" + GemRB.GetString (strref) + ' ' + str (val) )
+			elif type == 'r': #a plus prefix if positive, strref is an already resolved string
+				if val > 0:
+					res.append ("[capital=0]" + strref + ' +' + str (val) )
+				else:
+					res.append ("[capital=0]" + strref + ' ' + str (val) )
 			elif type == 's': #both base and (modified) stat, but only if they differ
 				base = GB (val)
 				stat = GS (val)
