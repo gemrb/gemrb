@@ -11,7 +11,8 @@ Libraries:
   - Python 2.3 or better, compiled with shared libraries
   - SDL 1.2
   - OpenAL (optional, for sound)
-  - libpng
+  - SDL_mixer (optional, for fast lower-quality sound)
+  - libpng (optional, for the png importer plugin)
 
 Building GemRB on unix-like systems
 -----------------------------------

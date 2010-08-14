@@ -73,7 +73,7 @@ TooltipDelay=500
 #                                                   #
 #####################################################
 
-# Choices: openal (default), none
+# Choices: openal (default), sdlaudio (faster, but limited featureset), none
 #AudioDriver = openal
 
 # Volume of ambient sounds

@@ -32,6 +32,7 @@ various Macintosh systems (even pre x86) also should work ...
 Requirements:
 
 SDL 1.2
+SDL_mixer (not required if you don't want sound)
 OpenAL 0.0.7 or above, (not required if you don't want sound)
 Python 2.2 or above, with shared libs (binaries are compiled with 2.5!)
 ZLib 1.2
