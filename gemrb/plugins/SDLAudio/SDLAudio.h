@@ -22,6 +22,12 @@
 #define SDLAUDIO_H
 
 #include "Audio.h"
+#include <vector>
+
+struct BufferedData {
+	char *buf;
+	unsigned int size;
+};
 
 class SDLAudio : public Audio {
 public:
@@ -47,10 +53,23 @@ public:
                 short* memory, int size, int samplerate);
 
 private:
+	void FreeBuffers();
+
 	static void music_callback(void *udata, unsigned short *stream, int len);
+	static void buffer_callback(void *udata, char *stream, int len);
 
 	int XPos, YPos;
 	Holder<SoundMgr> MusicReader;
+
+	bool MusicPlaying;
+	unsigned int curr_buffer_offset;
+	std::vector<BufferedData> buffers;
+
+	int audio_rate;
+	unsigned short audio_format;
+	int audio_channels;
+
+	struct SDL_mutex* OurMutex;
 };
 
 #endif

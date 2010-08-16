@@ -37,12 +37,17 @@ SDLAudio::SDLAudio(void)
 	XPos = 0;
 	YPos = 0;
 	ambim = new AmbientMgr();
+	MusicPlaying = false;
+	OurMutex = NULL;
 }
 
 SDLAudio::~SDLAudio(void)
 {
 	// TODO
 	delete ambim;
+	Mix_HookMusic(NULL, NULL);
+	FreeBuffers();
+	SDL_DestroyMutex(OurMutex);
 }
 
 bool SDLAudio::Init(void)
@@ -51,15 +56,18 @@ bool SDLAudio::Init(void)
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
 		return false;
 	}
+	OurMutex = SDL_CreateMutex();
 	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 8192) < 0) {
 		return false;
 	}
+	Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
 	Mix_ReserveChannels(1); // for speech
 	return true;
 }
 
 void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 	SDLAudio *driver = (SDLAudio *)udata;
+	SDL_mutexP(driver->OurMutex);
 	// TODO: conversion? mutexes? sanity checks? :)
 	int num_samples = len / 2;
 	int cnt = driver->MusicReader->read_samples(( short* ) stream, num_samples);
@@ -80,6 +88,7 @@ void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 
 		music_callback(udata, stream, len);
 	}
+	SDL_mutexV(driver->OurMutex);
 }
 
 unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int flags)
@@ -114,12 +123,6 @@ unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int
 	int cnt1 = acm->read_samples( ( short* ) memory, cnt ) * 2;
 	//Sound Length in milliseconds
 	unsigned int time_length = ((cnt / riff_chans) * 1000) / samplerate;
-
-	// work out which rate we need
-	int audio_rate;
-	Uint16 audio_format;
-	int audio_channels;
-	Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
 
 	// convert our buffer, if necessary
 	SDL_AudioCVT cvt;
@@ -169,12 +172,14 @@ int SDLAudio::CreateStream(Holder<SoundMgr> newMusic)
 bool SDLAudio::Stop()
 {
 	// TODO
+	MusicPlaying = false;
 	Mix_HookMusic(NULL, NULL);
 	return true;
 }
 
 bool SDLAudio::Play()
 {
+	MusicPlaying = true;
 	Mix_HookMusic((void (*)(void*, Uint8*, int))music_callback, this);
 	// TODO
 	return true;
@@ -183,13 +188,13 @@ bool SDLAudio::Play()
 void SDLAudio::ResetMusics()
 {
 	// TODO
+	MusicPlaying = false;
 	Mix_HookMusic(NULL, NULL);
 }
 
 bool SDLAudio::CanPlay()
 {
-	// TODO
-	return false;
+	return true;
 }
 
 bool SDLAudio::IsSpeaking()
@@ -211,35 +216,135 @@ void SDLAudio::GetListenerPos(int& x, int& y)
 	y = YPos;
 }
 
-int SDLAudio::SetupNewStream(ieWord, ieWord, ieWord, ieWord, bool, bool)
+void SDLAudio::buffer_callback(void *udata, char *stream, int len) {
+	SDLAudio *driver = (SDLAudio *)udata;
+	SDL_mutexP(driver->OurMutex);
+	unsigned int remaining = len;
+	while (remaining && driver->buffers.size() > 0) {
+		unsigned int avail = driver->buffers[0].size - driver->curr_buffer_offset;
+		if (avail > remaining) {
+			// more data available in this buffer than we need
+			avail = remaining;
+			memcpy(stream, driver->buffers[0].buf + driver->curr_buffer_offset, avail);
+			driver->curr_buffer_offset += avail;
+		} else {
+			// exhausted this buffer, move to the next one
+			memcpy(stream, driver->buffers[0].buf + driver->curr_buffer_offset, avail);
+			driver->curr_buffer_offset = 0;
+			free(driver->buffers[0].buf);
+			// TODO: inefficient
+			driver->buffers.erase(driver->buffers.begin());
+		}
+		remaining -= avail;
+		stream = stream + avail;
+	}
+	if (remaining > 0) {
+		// underrun (out of buffers)
+		memset(stream, 0, remaining);
+	}
+	SDL_mutexV(driver->OurMutex);
+}
+
+int SDLAudio::SetupNewStream(ieWord x, ieWord y, ieWord z,
+			ieWord gain, bool point, bool Ambient)
 {
-	// TODO
-	return -1;
+	if (Ambient) {
+		// TODO: ambient sounds
+		return -1;
+	}
+
+	// TODO: maybe don't ignore these
+	(void)x;
+	(void)y;
+	(void)z;
+	(void)gain;
+	(void)point;
+
+	printf("SDLAudio allocating stream\n");
+
+	// TODO: buggy
+	MusicPlaying = false;
+	curr_buffer_offset = 0;
+	Mix_HookMusic((void (*)(void*, Uint8*, int))buffer_callback, this);
+	return 0;
 }
 
 int SDLAudio::QueueAmbient(int, const char*)
 {
-	// TODO
+	// TODO: ambient sounds
 	return -1;
 }
 
-bool SDLAudio::ReleaseStream(int, bool)
+bool SDLAudio::ReleaseStream(int stream, bool HardStop)
 {
-	// TODO
+	if (stream != 0) {
+		return false;
+	}
+
+	printf("SDLAudio releasing stream\n");
+
+	(void)HardStop;
+
+	assert(!MusicPlaying);
+
+	Mix_HookMusic(NULL, NULL);
+	FreeBuffers();
+
 	return true;
+}
+
+void SDLAudio::FreeBuffers()
+{
+	SDL_mutexP(OurMutex);
+	for (unsigned int i = 0; i < buffers.size(); i++) {
+		free(buffers[i].buf);
+	}
+	buffers.clear();
+	SDL_mutexV(OurMutex);
 }
 
 void SDLAudio::SetAmbientStreamVolume(int, int)
 {
-	// TODO
+	// TODO: ambient sounds
 }
 
-void SDLAudio::QueueBuffer(int, unsigned short, int, short*, int, int)
+void SDLAudio::QueueBuffer(int stream, unsigned short bits,
+			int channels, short* memory, int size, int samplerate)
 {
-	// TODO
+	if (stream != 0) {
+		return;
+	}
+
+	assert(!MusicPlaying);
+
+	BufferedData d;
+
+	// convert our buffer, if necessary
+	if (bits != 16 || channels != audio_channels || samplerate != audio_rate) {
+		SDL_AudioCVT cvt;
+		if (SDL_BuildAudioCVT(&cvt, (bits == 8 ? AUDIO_S8 : AUDIO_S16SYS), channels, samplerate,
+				audio_format, audio_channels, audio_rate) == 0) {
+			printMessage("SDLAudio", "Couldn't convert video stream!\n", RED );
+			printf("trying to convert %d bits, %d channels, %d rate\n", bits, channels, samplerate);
+			return;
+		}
+		cvt.buf = (Uint8*)malloc(size*cvt.len_mult);
+		memcpy(cvt.buf, memory, size);
+		cvt.len = size;
+		SDL_ConvertAudio(&cvt);
+
+		d.size = cvt.len*cvt.len_ratio;
+		d.buf = (char *)cvt.buf;
+	} else {
+		d.size = size;
+		d.buf = (char *)malloc(d.size);
+		memcpy(d.buf, memory, d.size);
+	}
+
+	SDL_mutexP(OurMutex);
+	buffers.push_back(d);
+	SDL_mutexV(OurMutex);
 }
-
-
 
 #include "plugindef.h"
 
