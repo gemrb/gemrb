@@ -194,7 +194,7 @@ CachePath=./Cache/
 #  enter the full path to the GemRB executable      #
 #####################################################
 
-GemRBPath=@DATA_DIR@
+#GemRBPath=@DATA_DIR@
 
 #####################################################
 #  GemRB GUI Scripts Path [String]                  #
@@ -205,7 +205,7 @@ GemRBPath=@DATA_DIR@
 #  the 'GUIScript' subdirectory.                    #
 #####################################################
 
-GUIScriptsPath=@DATA_DIR@
+#GUIScriptsPath=@DATA_DIR@
 
 #####################################################
 #  GemRB Plugins Path [String]                      #
@@ -219,7 +219,7 @@ GUIScriptsPath=@DATA_DIR@
 #  GemRB from source directory on Linux.            #
 #####################################################
 
-PluginsPath=@PLUGIN_DIR@
+#PluginsPath=@PLUGIN_DIR@
 
 #####################################################
 #  Game Data Path [String]                          #
@@ -252,7 +252,7 @@ PluginsPath=@PLUGIN_DIR@
 #  You probably do NOT want to specify this!        #
 #####################################################
 
-GemRBOverridePath=@DATA_DIR@
+#GemRBOverridePath=@DATA_DIR@
 
 #####################################################
 #  END                                              #
