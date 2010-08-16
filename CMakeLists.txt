@@ -123,7 +123,7 @@ INCLUDE(FindOpenAL)
 IF(OPENAL_FOUND)
  MESSAGE(STATUS "openal found")
 ELSE(OPENAL_FOUND)
- MESSAGE(ERROR "unable to find openal. please set OPENALDIR environment variable or get it from www.openal.org")
+ MESSAGE(ERROR "unable to find openal. Please set OPENALDIR environment variable or get it from www.openal.org")
 ENDIF(OPENAL_FOUND)
 
 MESSAGE(STATUS "Looking for SDL")
@@ -131,7 +131,7 @@ INCLUDE(FindSDL)
 IF(SDL_FOUND)
  MESSAGE(STATUS "SDL found")
 ELSE(SDL_FOUND)
- MESSAGE(FATAL_ERROR "unable to find SDL. please get it from www.libsdl.org")
+ MESSAGE(FATAL_ERROR "unable to find SDL. Please get it from www.libsdl.org")
 ENDIF(SDL_FOUND)
 
 MESSAGE(STATUS "Looking for SDL_mixer")
@@ -192,17 +192,17 @@ CHECK_FUNCTION_EXISTS("strndup" HAVE_STRNDUP)
 
 #Unneeded on windows
 IF(NOT WIN32)
-INCLUDE (CheckCXXSourceCompiles)
-CHECK_CXX_SOURCE_COMPILES("typedef void *(* voidvoid)(void);
+	INCLUDE (CheckCXXSourceCompiles)
+	CHECK_CXX_SOURCE_COMPILES("typedef void *(* voidvoid)(void);
 
-void *object = 0;
-voidvoid function;
-function = (voidvoid) object;
-" PERMITS_OBJECT_TO_FUNCTION_CAST)
+		void *object = 0;
+		voidvoid function;
+		function = (voidvoid) object;
+		" PERMITS_OBJECT_TO_FUNCTION_CAST)
 
-IF( NOT PERMITS_OBJECT_TO_FUNCTION_CAST )
- SET(HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1)
-ENDIF( NOT PERMITS_OBJECT_TO_FUNCTION_CAST )
+	IF( NOT PERMITS_OBJECT_TO_FUNCTION_CAST )
+		SET(HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1)
+	ENDIF( NOT PERMITS_OBJECT_TO_FUNCTION_CAST )
 ENDIF(NOT WIN32)
 
 IF(VORBIS_LIBRARY)
@@ -238,8 +238,8 @@ ENDMACRO(ADD_GEMRB_PLUGIN)
 
 #gemrb overrides macro
 MACRO(ADD_GEMRB_OVERRIDE game_name)
-FILE( GLOB FILES_TO_INSTALL *.2da *.bmp *.ini *.chu *.ids *.bcs *.vvc *.mos *.spl *.wav *.pro)
-INSTALL( FILES ${FILES_TO_INSTALL} DESTINATION ${DATA_DIR}/override/${game_name} )
+	FILE( GLOB FILES_TO_INSTALL *.2da *.bmp *.ini *.chu *.ids *.bcs *.vvc *.mos *.spl *.wav *.pro)
+	INSTALL( FILES ${FILES_TO_INSTALL} DESTINATION ${DATA_DIR}/override/${game_name} )
 ENDMACRO(ADD_GEMRB_OVERRIDE )
 
 ADD_SUBDIRECTORY( gemrb )
