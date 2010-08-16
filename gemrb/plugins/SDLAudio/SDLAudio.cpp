@@ -48,7 +48,11 @@ SDLAudio::~SDLAudio(void)
 	Mix_HookMusic(NULL, NULL);
 	FreeBuffers();
 	SDL_DestroyMutex(OurMutex);
+	Mix_ChannelFinished(NULL);
 }
+
+// no user data for Mix_ChannelFinished :(
+SDLAudio *g_sdlaudio = NULL;
 
 bool SDLAudio::Init(void)
 {
@@ -61,7 +65,15 @@ bool SDLAudio::Init(void)
 		return false;
 	}
 	Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
+
+	channel_data.resize(Mix_AllocateChannels(-1));
+	for (unsigned int i = 0; i < channel_data.size(); i++) {
+		channel_data[i] = NULL;
+	}
+
+	g_sdlaudio = this;
 	Mix_ReserveChannels(1); // for speech
+	Mix_ChannelFinished(channel_done_callback);
 	return true;
 }
 
@@ -89,6 +101,16 @@ void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 		music_callback(udata, stream, len);
 	}
 	SDL_mutexV(driver->OurMutex);
+}
+
+void SDLAudio::channel_done_callback(int channel) {
+	SDL_mutexP(g_sdlaudio->OurMutex);
+	assert(g_sdlaudio);
+	assert((unsigned int)channel < g_sdlaudio->channel_data.size());
+	assert(g_sdlaudio->channel_data[channel]);
+	free(g_sdlaudio->channel_data[channel]);
+	g_sdlaudio->channel_data[channel] = NULL;
+	SDL_mutexV(g_sdlaudio->OurMutex);
 }
 
 unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int flags)
@@ -148,14 +170,17 @@ unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int
 	if (flags & GEM_SND_SPEECH) {
 		channel = 0;
 	}
+	SDL_mutexP(OurMutex);
 	channel = Mix_PlayChannel(channel, chunk, 0);
 	if (channel < 0) {
+		SDL_mutexV(OurMutex);
 		printf("error playing channel\n");
 		return 0;
 	}
 
-	// TODO: keep track of the chunk, don't just leak!
-	// free(cvt.buf); // TODO: safe?
+	assert((unsigned int)channel < channel_data.size());
+	channel_data[channel] = cvt.buf;
+	SDL_mutexV(OurMutex);
 
 	return time_length;
 }

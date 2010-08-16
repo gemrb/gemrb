@@ -57,6 +57,9 @@ private:
 
 	static void music_callback(void *udata, unsigned short *stream, int len);
 	static void buffer_callback(void *udata, char *stream, int len);
+	static void channel_done_callback(int channel);
+
+	std::vector<void *> channel_data;
 
 	int XPos, YPos;
 	Holder<SoundMgr> MusicReader;
