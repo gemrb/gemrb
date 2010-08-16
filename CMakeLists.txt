@@ -3,6 +3,8 @@ if(COMMAND cmake_policy)
       cmake_policy(SET CMP0003 NEW)
       cmake_policy(SET CMP0005 NEW)
 endif(COMMAND cmake_policy)
+# allow empty else and endif constructs (available by default since 2.6.0)
+set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
