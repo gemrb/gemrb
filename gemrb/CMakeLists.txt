@@ -22,5 +22,12 @@ ELSE(WIN32)
  ENDIF(APPLE)
 ENDIF(WIN32)
 
+# preconfigure the sample config with the selected paths
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/GemRB.cfg.sample.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/GemRB.cfg.sample"
+  IMMEDIATE @ONLY
+)
+
 INSTALL( TARGETS gemrb DESTINATION ${BIN_DIR} )
-INSTALL( FILES GemRB.cfg.sample GemRB.cfg.noinstall.sample DESTINATION ${SYSCONF_DIR} )
+INSTALL( FILES "${CMAKE_CURRENT_BINARY_DIR}/GemRB.cfg.sample" GemRB.cfg.noinstall.sample DESTINATION ${SYSCONF_DIR} )
