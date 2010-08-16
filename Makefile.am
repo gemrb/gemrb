@@ -4,8 +4,7 @@ SPEC_FILES = \
         gemrb.spec \
         gemrb.spec.in
 
-EXTRA_DIST = admin/setup.sh \
-	CMakeLists.txt \
+EXTRA_DIST = CMakeLists.txt \
 	cmake_config.h.in \
 	cmake_uninstall.cmake.in \
 	$(SPEC_FILES)
