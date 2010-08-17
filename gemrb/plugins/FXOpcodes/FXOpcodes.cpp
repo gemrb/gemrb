@@ -4788,7 +4788,7 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->TimingMode!=FX_DURATION_INSTANT_PERMANENT) {
 		sca->SetDefaultDuration(fx->Duration-core->GetGame()->GameTime);
 	}
-	if (fx->Parameter2) {
+	if (fx->Parameter2 == 1) {
 		//play over target (sticky)
 		sca->effect_owned = true;
 		target->AddVVCell( sca );
@@ -4796,8 +4796,13 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//not sticky
-	sca->XPos=fx->PosX;
-	sca->YPos=fx->PosY;
+	if  (fx->Parameter2 == 2 || !target) {
+		sca->XPos = fx->PosX;
+		sca->YPos = fx->PosY;
+	} else {
+		sca->XPos = target->Pos.x;
+		sca->YPos = target->Pos.y;
+	}
 	sca->PlayOnce();
 	map->AddVVCell( sca );
 	return FX_NOT_APPLIED;
