@@ -4252,7 +4252,7 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 
 	Actor *scr = (Actor *) tar;
 	CREItem *item;
-	int slot = scr->inventory.RemoveItem(parameters->string1Parameter, 0, &item);
+	int slot = scr->inventory.RemoveItem(parameters->string1Parameter, IE_INV_ITEM_UNDROPPABLE, &item);
 	if (!item) {
 		item = new CREItem();
 	}
