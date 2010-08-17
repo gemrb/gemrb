@@ -1024,6 +1024,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	Scriptable *caster = GetCaster(Owner, fx);
+	if (!caster) caster = Owner; // IE stores the enemyally in the effect instead
 	bool enemyally = true;
 	if (caster->Type==ST_ACTOR) {
 		enemyally = ((Actor *) caster)->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
