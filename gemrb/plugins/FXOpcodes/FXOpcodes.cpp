@@ -635,6 +635,7 @@ static EffectRef effectnames[] = {
 	{ "PowerWordStun", fx_power_word_stun, -1 },
 	{ "PriestSpellSlotsModifier", fx_bonus_priest_spells, -1 },
 	{ "Proficiency", fx_proficiency, -1 },
+//	{ "Protection:Animation", fx_protection_from_animation, -1 },
 	{ "Protection:Animation", fx_generic_effect, -1 },
 	{ "Protection:Backstab", fx_no_backstab_modifier, -1 },
 	{ "Protection:Creature", fx_generic_effect, -1 },
@@ -2092,6 +2093,7 @@ int fx_alignment_change (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_dispel_effects (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	ieResRef Removed;
 	ieDword level;
 
 	switch (fx->Parameter2) {
@@ -2111,7 +2113,7 @@ int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		break;
 	}
 	//if signed would it be negative?
-	target->fxqueue.RemoveLevelEffects(level, RL_DISPELLABLE, 0);
+	target->fxqueue.RemoveLevelEffects(Removed, level, RL_DISPELLABLE, 0);
 	return FX_NOT_APPLIED;
 }
 
@@ -4757,6 +4759,7 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 // 0xd7 PlayVisualEffect
+static EffectRef fx_protection_from_animation_ref={"Protection:Animation",NULL,-1};
 int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_play_visual_effect (%2d): Resource: %s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
@@ -4778,6 +4781,13 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			return FX_APPLIED;
 		}
 	}
+
+	if (target->fxqueue.HasEffectWithResource(fx_protection_from_animation_ref,fx->Resource)) {
+		//effect supressed by opcode 0x128
+
+		return FX_APPLIED;
+	}
+
 
 	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, false);
 
@@ -4897,15 +4907,19 @@ int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xdc DispelSchool
 int fx_dispel_school (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
+  ieResRef Removed;
+
 	if (0) printf( "fx_dispel_school (%2d): Level: %d Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSCHOOL, fx->Parameter2);
+	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSCHOOL, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 //0xdd DispelSecondaryType
 int fx_dispel_secondary_type (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
+  ieResRef Removed;
+
 	if (0) printf( "fx_dispel_secondary_type (%2d): Level: %d Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSECTYPE, fx->Parameter2);
+	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSECTYPE, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
@@ -4918,10 +4932,10 @@ int fx_teleport_field (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
-	//this should be the target's position, i think
-	Point p = target->Pos;
-	p.x+=core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1));
-	p.y+=core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1));
+	//the origin is the effect's target point
+	Point p(fx->PosX+core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1)),
+	        fx->PosY+core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1)) );
+
 	target->SetPosition( p, true, 0);
 	return FX_NOT_APPLIED;
 }
@@ -4999,16 +5013,20 @@ int fx_bounce_secondary_type_dec (Scriptable* /*Owner*/, Actor* target, Effect* 
 //0xe5 DispelSchoolOne
 int fx_dispel_school_one (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
+	ieResRef Removed;
+
 	if (0) printf( "fx_dispel_school_one (%2d): Level: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSCHOOL|RL_REMOVEFIRST, fx->Parameter2);
+	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSCHOOL|RL_REMOVEFIRST, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
 //0xe6 DispelSecondaryTypeOne
 int fx_dispel_secondary_type_one (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
+	ieResRef Removed;
+
 	if (0) printf( "fx_dispel_secondary_type_one (%2d): Level: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	target->fxqueue.RemoveLevelEffects(fx->Parameter1,RL_MATCHSECTYPE|RL_REMOVEFIRST, fx->Parameter2);
+	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSECTYPE|RL_REMOVEFIRST, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
@@ -6023,6 +6041,8 @@ int fx_disable_chunk_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET( IE_DISABLECHUNKING, fx->Parameter1 );
 	return FX_APPLIED;
 }
+#if 0
+//This is done differently in the original engine, and THIS may not even work
 //0x128 Protection:Animation
 int fx_protection_from_animation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -6031,6 +6051,8 @@ int fx_protection_from_animation (Scriptable* /*Owner*/, Actor* target, Effect* 
 	target->RemoveVVCell(fx->Resource, false);
 	return FX_APPLIED;
 }
+#endif
+
 //0x129 Protection:Turn
 int fx_protection_from_turn (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {

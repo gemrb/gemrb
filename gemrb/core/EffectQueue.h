@@ -215,7 +215,7 @@ public:
 	void RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current) const;
 	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2) const;
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource) const;
-	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match) const;
+	void RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword flags, ieDword match) const;
 
 	/* returns true if the timing method supports simplified duration */
 	static bool HasDuration(Effect *fx);

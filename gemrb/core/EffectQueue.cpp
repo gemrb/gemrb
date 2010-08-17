@@ -462,7 +462,7 @@ bool EffectQueue::RemoveEffect(Effect* fx)
 	for (std::list< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
 		Effect* fx2 = *f;
 
-		if(  (fx==fx2) || !memcmp( fx, fx2, invariant_size)) {
+		if( (fx==fx2) || !memcmp( fx, fx2, invariant_size)) {
 			delete fx2;
 			effects.erase( f );
 			return true;
@@ -1127,7 +1127,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply) con
 	}
 	int res = FX_ABORT;
 	if( fn) {
-		if(  target && first_apply ) {
+		if( target && first_apply ) {
 			if( !target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
 				displaymsg->DisplayStringName( Opcodes[fx->Opcode].Strref, 0xf0f0f0,
 					target, IE_STR_SOUND);
@@ -1340,8 +1340,8 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime) const
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//FIXME: how this method handles delayed effects???
 		//it should remove them as well, i think
-		if(  DelayType( ((*f)->TimingMode) )!=PERMANENT ) {
-			if(  (*f)->Duration<=GameTime) {
+		if( DelayType( ((*f)->TimingMode) )!=PERMANENT ) {
+			if( (*f)->Duration<=GameTime) {
 				(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
 			}
 		}
@@ -1377,14 +1377,12 @@ void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword
 //remove certain levels of effects, possibly matching school/secondary type
 //this method removes whole spells (tied together by their source)
 //FIXME: probably this isn't perfect
-void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match) const
+void EffectQueue::RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword Flags, ieDword match) const
 {
-	ieResRef Removed;
-
 	Removed[0]=0;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		if(  (*f)->Power>level) {
+		if( (*f)->Power>level) {
 			continue;
 		}
 
@@ -1550,7 +1548,7 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 			ids=2;
 		}
 		ieDword param1 = actor->GetStat(ids_stats[ids-2]);
-		if(  (*f)->Parameter1) {
+		if( (*f)->Parameter1) {
 			MATCH_PARAM1();
 		}
 		int val = (int) (*f)->Parameter3;
