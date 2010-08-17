@@ -654,12 +654,12 @@ int GAMImporter::GetStoredFileSize(Game *game)
 
 	SavedLocOffset = headersize;
 	SavedLocCount = game->GetSavedLocationCount();
-	headersize +=SavedLocCount*20;
+	headersize +=SavedLocCount*12;
 
 	PPLocOffset = headersize;
 	PPLocCount = game->GetPlaneLocationCount();
 
-	return headersize + PPLocCount * 20;
+	return headersize + PPLocCount * 12;
 }
 
 int GAMImporter::PutJournals(DataStream *stream, Game *game)
