@@ -4274,7 +4274,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	//get target
 	Actor *target = area->GetActorByGlobalID(LastTarget);
 
-	if (target && (target->GetStat(IE_STATE_ID)&STATE_DEAD)) {
+	if (target && (target->GetStat(IE_STATE_ID)&(STATE_DEAD|STATE_INVISIBLE))) {
 		target = NULL;
 	}
 
