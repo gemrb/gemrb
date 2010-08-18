@@ -399,7 +399,7 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 		return AttributeError( GemRB_LoadGame__doc );
 	}
 	CObject<SaveGame> save(obj);
-	core->SetupLoadGame(save.get(), VersionOverride);
+	core->SetupLoadGame(save, VersionOverride);
 	Py_INCREF( Py_None );
 	return Py_None;
 }

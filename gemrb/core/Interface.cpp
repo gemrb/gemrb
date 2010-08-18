@@ -583,7 +583,8 @@ void Interface::HandleFlags()
 
 	if (QuitFlag&QF_LOADGAME) {
 		QuitFlag &= ~QF_LOADGAME;
-		LoadGame(LoadGameIndex, VersionOverride );
+		LoadGame(LoadGameIndex.get(), VersionOverride );
+		LoadGameIndex.release();
 	}
 
 	if (QuitFlag&QF_ENTERGAME) {
@@ -3707,7 +3708,7 @@ void Interface::QuitGame(int BackToMain)
 	GSUpdate(true);
 }
 
-void Interface::SetupLoadGame(SaveGame *sg, int ver_override)
+void Interface::SetupLoadGame(Holder<SaveGame> sg, int ver_override)
 {
 	LoadGameIndex = sg;
 	VersionOverride = ver_override;

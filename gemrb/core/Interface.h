@@ -331,7 +331,7 @@ public:
 	int SaveAsOriginal; //if true, saves files in compatible mode
 	int QuitFlag;
 	int EventFlag;
-	SaveGame *LoadGameIndex;
+	Holder<SaveGame> LoadGameIndex;
 	int VersionOverride;
 	unsigned int SlotTypes; //this is the same as the inventory size
 	ieResRef GlobalScript;
@@ -513,7 +513,7 @@ public:
 	/** if backtomain is not null then goes back to main screen */
 	void QuitGame(int backtomain);
 	/** sets up load game */
-	void SetupLoadGame(SaveGame *save, int ver_override);
+	void SetupLoadGame(Holder<SaveGame> save, int ver_override);
 	/** load saved game by index (-1 is default), ver_override is an optional parameter
 	    to override the saved game's version */
 	void LoadGame(SaveGame *save, int ver_override);
