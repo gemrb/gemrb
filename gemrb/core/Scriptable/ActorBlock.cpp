@@ -1818,7 +1818,11 @@ void Highlightable::TryDisarm(Actor *actor)
 void Door::TryPickLock(Actor *actor)
 {
 	if (LockDifficulty == 100) {
-		displaymsg->DisplayConstantStringName(STR_DOOR_NOPICK, 0xbcefbc, actor);
+		if (OpenStrRef != (ieDword)-1) {
+			displaymsg->DisplayStringName(OpenStrRef, 0xbcefbc, actor, IE_STR_SOUND|IE_STR_SPEECH);
+		} else {
+			displaymsg->DisplayConstantStringName(STR_DOOR_NOPICK, 0xbcefbc, actor);
+		}
 		return;
 	}
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
@@ -2280,7 +2284,11 @@ int Container::IsOpen() const
 void Container::TryPickLock(Actor *actor)
 {
 	if (LockDifficulty == 100) {
-		displaymsg->DisplayConstantStringName(STR_CONT_NOPICK, 0xbcefbc, actor);
+		if (OpenFail != (ieDword)-1) {
+			displaymsg->DisplayStringName(OpenFail, 0xbcefbc, actor, IE_STR_SOUND|IE_STR_SPEECH);
+		} else {
+			displaymsg->DisplayConstantStringName(STR_CONT_NOPICK, 0xbcefbc, actor);
+		}
 		return;
 	}
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
