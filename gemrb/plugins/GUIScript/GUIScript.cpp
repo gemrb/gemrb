@@ -9667,6 +9667,16 @@ bool GUIScript::Init(void)
 		return false;
 	}
 
+	// TODO: Put this file somewhere user editable
+	// TODO: Search multiple places for this file
+	char includeFile[_MAX_PATH];
+	PathJoin(includeFile, core->GUIScriptsPath, "GUIScripts/include.py", NULL);
+	FILE* includeFP = fopen(includeFile, "rb");
+	if ((includeFP == NULL) || (PyRun_SimpleFileEx(includeFP, includeFile, true) == -1)) {
+		printMessage( "GUIScript", " ", RED );
+		printf("console include file failed to load");
+	}
+
 	PyObject *pMainMod = PyImport_AddModule( "__main__" );
 	/* pMainMod is a borrowed reference */
 	pMainDic = PyModule_GetDict( pMainMod );
@@ -9795,16 +9805,6 @@ bool GUIScript::RunFunction(const char *ModuleName, const char* FunctionName, bo
 /** Exec a single String */
 void GUIScript::ExecString(const char* string)
 {
-	// TODO: Put this file somewhere user editable
-	// TODO: Search multiple places for this file
-	char includeFile[_MAX_PATH];
-	PathJoin(includeFile, core->GUIScriptsPath, "GUIScripts/include.py", NULL);
-	FILE* includeFP = fopen(includeFile, "rb");
-	if ((includeFP == NULL) || (PyRun_SimpleFileEx(includeFP, includeFile, true) == -1)) {
-		printMessage( "GUIScript", " ", RED );
-		printf("console include file failed to load");
-	}
-
 	if (PyRun_SimpleString((char*) string) == -1) {
 		if (PyErr_Occurred()) {
 			PyErr_Print();
