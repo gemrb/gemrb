@@ -82,13 +82,12 @@ public:
 			PyErr_Clear();
 		if (!PyCObject_Check(obj) || PyCObject_GetDesc(obj) != const_cast<TypeID*>(&T::ID)) {
 			printMessage("GUIScript","Bad CObject extracted.\n",LIGHT_RED);
+			Py_XDECREF(id);
 			return;
 		}
 		Holder<T>::ptr = static_cast<T*>(PyCObject_AsVoidPtr(obj));
 		Holder<T>::ptr->acquire();
-		if (id) {
-			Py_DECREF(id);
-		}
+		Py_XDECREF(id);
 	}
 	CObject(const Holder<T>& ptr)
 		: Holder<T>(ptr)
