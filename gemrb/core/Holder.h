@@ -26,7 +26,7 @@
 template <class T>
 class Held {
 public:
-	Held() : RefCount(1) {}
+	Held() : RefCount(0) {}
 	void acquire() { ++RefCount; }
 	void release() { if (!--RefCount) delete static_cast<T*>(this); }
 	size_t GetRefCount() { return RefCount; }
@@ -52,6 +52,8 @@ public:
 	Holder(T* ptr = NULL)
 		: ptr(ptr)
 	{
+		if (ptr)
+			ptr->acquire();
 	}
 	~Holder()
 	{
