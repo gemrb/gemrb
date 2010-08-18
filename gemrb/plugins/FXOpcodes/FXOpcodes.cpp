@@ -970,7 +970,11 @@ int fx_cure_berserk_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_berserk_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_berserk_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	//
+	// atleast how and bg2 allow this to only work on pcs
+	if (!core->HasFeature(GF_3ED_RULES) && !target->InParty) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_STATE_SET( STATE_BERSERK );
 	} else {
