@@ -3928,8 +3928,10 @@ void GameScript::DestroyGold(Scriptable* Sender, Action* parameters)
 		return;
 	Actor *act=(Actor *) Sender;
 	int max=(int) act->GetStat(IE_GOLD);
-	if (max>parameters->int0Parameter) {
-		max=parameters->int0Parameter;
+	if (parameters->int0Parameter != 0) {
+		if (max>parameters->int0Parameter) {
+			max=parameters->int0Parameter;
+		}
 	}
 	act->SetBase(IE_GOLD, act->GetBase(IE_GOLD)-max);
 }
