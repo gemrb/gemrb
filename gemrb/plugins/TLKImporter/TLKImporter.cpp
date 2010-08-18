@@ -65,7 +65,7 @@ TLKImporter::TLKImporter(void)
 		ieVariable key;
 
 		strnuprcpy(key, tm->GetRowName(i), sizeof(ieVariable)-1 );
-		gt_type *entry = (gt_type *) malloc(sizeof(gt_type) );
+		gt_type *entry = (gt_type *) new gt_type;
 		entry->type = atoi(tm->QueryField(i,0));
 		entry->male = atoi(tm->QueryField(i,1));
 		entry->female = atoi(tm->QueryField(i,2));
