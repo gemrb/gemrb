@@ -20,6 +20,7 @@ libgemrb_core_la_SOURCES = \
 	Core.cpp \
 	DataFileMgr.cpp \
 	Dialog.cpp \
+	DialogHandler.cpp \
 	DialogMgr.cpp \
 	DisplayMessage.cpp \
 	EffectMgr.cpp \

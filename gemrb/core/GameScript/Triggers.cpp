@@ -26,6 +26,7 @@
 #include "win32def.h"
 
 #include "Calendar.h"
+#include "DialogHandler.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Video.h"
@@ -235,7 +236,7 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	//for example the aaquatah dialog in irenicus dungeon depends on it
 	GameControl *gc = core->GetGameControl();
 	Actor *pc = (Actor *) scr;
-	if (pc->globalID == gc->targetID || pc->globalID==gc->speakerID) {
+	if (pc->globalID == gc->dialoghandler->targetID || pc->globalID==gc->dialoghandler->speakerID) {
 		return 0;
 	}
 
@@ -316,7 +317,7 @@ int GameScript::IsGabber(Scriptable* Sender, Trigger* parameters)
 	if (!scr || scr->Type!=ST_ACTOR) {
 		return 0;
 	}
-	if (((Actor *) scr)->globalID == core->GetGameControl()->speakerID)
+	if (((Actor *) scr)->globalID == core->GetGameControl()->dialoghandler->speakerID)
 		return 1;
 	return 0;
 }
@@ -3206,7 +3207,7 @@ int GameScript::NullDialog(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) tar;
 	GameControl *gc = core->GetGameControl();
-	if ( (actor->globalID != gc->targetID) && (actor->globalID != gc->speakerID) ) {
+	if ( (actor->globalID != gc->dialoghandler->targetID) && (actor->globalID != gc->dialoghandler->speakerID) ) {
 		return 1;
 	}
 	return 0;
@@ -3352,11 +3353,11 @@ int GameScript::InteractingWith(Scriptable* Sender, Trigger* parameters)
 	}
 	GameControl *gc = core->GetGameControl();
 	Actor *pc = (Actor *) Sender;
-	if (pc->globalID != gc->targetID && pc->globalID != gc->speakerID) {
+	if (pc->globalID != gc->dialoghandler->targetID && pc->globalID != gc->dialoghandler->speakerID) {
 		return 0;
 	}
 	pc = (Actor *) tar;
-	if (pc->globalID != gc->targetID && pc->globalID != gc->speakerID) {
+	if (pc->globalID != gc->dialoghandler->targetID && pc->globalID != gc->dialoghandler->speakerID) {
 		return 0;
 	}
 	return 1;

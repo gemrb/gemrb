@@ -25,6 +25,7 @@
 #include "Audio.h"
 #include "ControlAnimation.h"
 #include "DataFileMgr.h"
+#include "DialogHandler.h"
 #include "DisplayMessage.h"
 #include "EffectQueue.h"
 #include "Game.h"
@@ -4762,7 +4763,7 @@ static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* ar
 		if (!gc) {
 			return RuntimeError("Can't find GameControl!");
 		}
-		Actor *ac = gc->GetSpeaker();
+		Actor *ac = gc->dialoghandler->GetSpeaker();
 		int ret = 0;
 		if (ac) {
 			ret = ac->InParty;

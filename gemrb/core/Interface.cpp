@@ -36,6 +36,7 @@
 #include "Audio.h"
 #include "Calendar.h"
 #include "DataFileMgr.h"
+#include "DialogHandler.h"
 #include "DialogMgr.h"
 #include "DisplayMessage.h"
 #include "EffectMgr.h"
@@ -3083,9 +3084,9 @@ void Interface::HandleGUIBehaviour(void)
 			ieDword var = (ieDword) -3;
 			vars->Lookup("DialogChoose", var);
 			if ((int) var == -2) {
-				gc->EndDialog();
+				gc->dialoghandler->EndDialog();
 			} else if ( (int)var !=-3) {
-				gc->DialogChoose(var);
+				gc->dialoghandler->DialogChoose(var);
 				if (!(gc->GetDialogueFlags() & (DF_OPENCONTINUEWINDOW | DF_OPENENDWINDOW)))
 					guiscript->RunFunction( "GUIWORLD", "NextDialogState" );
 

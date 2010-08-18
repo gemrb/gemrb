@@ -25,6 +25,7 @@
 #include "defsounds.h"
 
 #include "Audio.h"
+#include "DialogHandler.h"
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
@@ -934,7 +935,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
 		if (Flags & BD_INTERRUPT) {
 			//break the current dialog if possible
-			gc->EndDialog(true);
+			gc->dialoghandler->EndDialog(true);
 		}
 		//check if we could manage to break it, not all dialogs are breakable!
 		if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
@@ -1046,7 +1047,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 
 		core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
-		ret = gc->InitDialog( scr, tar, Dialog);
+		ret = gc->dialoghandler->InitDialog( scr, tar, Dialog);
 	}
 	else {
 		ret = -1;

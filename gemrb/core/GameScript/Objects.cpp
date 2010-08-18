@@ -25,6 +25,7 @@
 
 #include "win32def.h"
 
+#include "DialogHandler.h"
 #include "Game.h"
 #include "GUI/GameControl.h"
 
@@ -104,7 +105,7 @@ Targets *GameScript::Protagonist(Scriptable* Sender, Targets *parameters, int ga
 	if (charnameisgabber) {
 		GameControl* gc = core->GetGameControl();
 		if (gc) {
-			parameters->AddTarget(gc->GetSpeaker(), 0, ga_flags);
+			parameters->AddTarget(gc->dialoghandler->GetSpeaker(), 0, ga_flags);
 		}
 		if (parameters->Count()) {
 			return parameters;
@@ -128,7 +129,7 @@ Targets *GameScript::Gabber(Scriptable* /*Sender*/, Targets *parameters, int ga_
 	parameters->Clear();
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		parameters->AddTarget(gc->GetSpeaker(), 0, ga_flags);
+		parameters->AddTarget(gc->dialoghandler->GetSpeaker(), 0, ga_flags);
 	}
 	return parameters;
 }

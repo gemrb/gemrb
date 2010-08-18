@@ -24,6 +24,7 @@
 
 #include "Audio.h"
 #include "Calendar.h"
+#include "DialogHandler.h"
 #include "Game.h"
 #include "Interface.h"
 #include "GUI/GameControl.h"
@@ -150,7 +151,7 @@ inline Actor *GetActorFromSlot(int slot)
 	if (slot==-1) {
 		GameControl *gc = core->GetGameControl();
 		if (gc) {
-			return gc->GetSpeaker();
+			return gc->dialoghandler->GetSpeaker();
 		}
 		return NULL;
 	}
@@ -168,7 +169,7 @@ char *TLKImporter::Gabber()
 {
 	Actor *act;
 
-	act=core->GetGameControl()->GetSpeaker();
+	act=core->GetGameControl()->dialoghandler->GetSpeaker();
 	if (act) {
 		return override->CS(act->LongName);
 	}

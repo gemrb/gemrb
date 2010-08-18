@@ -30,6 +30,7 @@
 #include "win32def.h"
 
 #include "Audio.h" //pst (react to death sounds)
+#include "DialogHandler.h" // checking for dialog
 #include "Game.h"
 #include "GameData.h"
 #include "DisplayMessage.h"
@@ -44,7 +45,7 @@
 #include "damages.h"
 #include "GameScript/GSUtils.h" //needed for DisplayStringCore
 #include "GameScript/GameScript.h"
-#include "GUI/GameControl.h" //checking for dialog
+#include "GUI/GameControl.h"
 #include "PolymorphCache.h" // stupid polymorph cache hack
 
 #include <cassert>
@@ -562,7 +563,7 @@ void Actor::SetCircleSize()
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
 		color = &yellow;
 		color_index = 5;
-	} else if (gc && gc->targetID == globalID && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
+	} else if (gc && gc->dialoghandler->targetID == globalID && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
 		color = &white;
 		color_index = 3; //?? made up
 	} else {
@@ -3353,7 +3354,7 @@ bool Actor::CheckOnDeath()
 	}
 	// don't destroy actors currently in a dialog
 	GameControl *gc = core->GetGameControl();
-	if (gc && (globalID == gc->targetID || globalID == gc->speakerID)) {
+	if (gc && (globalID == gc->dialoghandler->targetID || globalID == gc->dialoghandler->speakerID)) {
 		return false;
 	}
 
@@ -4940,7 +4941,7 @@ void Actor::Draw(const Region &screen)
 		drawcircle = false;
 	}
 	// the speaker should get a circle even in cutscenes
-	if (gc->targetID == globalID && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
+	if (gc->dialoghandler->targetID == globalID && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
 		drawcircle = true;
 	}
 	if (BaseStats[IE_STATE_ID]&STATE_DEAD || InternalFlags&IF_JUSTDIED) {

@@ -37,6 +37,7 @@
 
 class GameControl;
 class Window;
+class DialogHandler;
 
 //dialog flags
 #define DF_IN_DIALOG      1
@@ -180,15 +181,9 @@ private:
 
 private:
 	unsigned char LeftCount, BottomCount, RightCount, TopCount;
-	DialogState* ds;
-	Dialog* dlg;
 	Actor *user;     //the user of item or spell
 public:
-	ieWord speakerID;
-	ieWord targetID;
-	ieWord originalTargetID;
-	//no idea if this is viable
-	Scriptable *targetOB;
+	DialogHandler *dialoghandler;
 	//using spell or item
 	int spellOrItem; // -1 = item, otherwise the spell type
 	//the user of spell or item
@@ -196,8 +191,6 @@ public:
 	int spellSlot, spellIndex; //or inventorySlot/itemHeader
 	int spellCount; //multiple targeting
 public:
-	Actor *GetTarget();
-	Actor *GetSpeaker();
 	/** Selects one or all PC */
 	void SelectActor(int whom, int type = -1);
 	void SetLastActor(Actor *actor, Actor *prevActor);
@@ -232,9 +225,6 @@ public:
 	void MoveToPointFormation(Actor *actor, unsigned int pos, Point src, Point p);
 	/** calls MoveToPoint or RunToPoint */
 	void CreateMovement(Actor *actor, const Point &p);
-	int InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);
-	void EndDialog(bool try_to_break=false);
-	void DialogChoose(unsigned int choose);
 	/** Displays a string over an object */
 	void DisplayString(Scriptable* target);
 	/** Displays a string on screen */

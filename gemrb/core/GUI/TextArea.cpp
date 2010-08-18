@@ -25,6 +25,7 @@
 #include "win32def.h"
 
 #include "Audio.h"
+#include "DialogHandler.h"
 #include "GameData.h"
 #include "ImageMgr.h"
 #include "Interface.h"
@@ -516,10 +517,10 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		sscanf( lines[seltext], "[s=%d,", &idx);
 		if (idx==-1) {
 			//this kills this object, don't use any more data!
-			gc->EndDialog();
+			gc->dialoghandler->EndDialog();
 			return;
 		}
-		gc->DialogChoose( idx );
+		gc->dialoghandler->DialogChoose( idx );
 	}
 }
 
@@ -689,7 +690,7 @@ void TextArea::CalcRowCount()
 		Actor *actor = NULL;
 		GameControl *gc = core->GetGameControl();
 		if (gc) {
-			actor = gc->GetTarget();
+			actor = gc->dialoghandler->GetTarget();
 		}
 		if (actor) {
 			portrait = actor->GetPortrait(1);
@@ -803,10 +804,10 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned short /*Bu
 			if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
 				if (idx==-1) {
 					//this kills this object, don't use any more data!
-					gc->EndDialog();
+					gc->dialoghandler->EndDialog();
 					return;
 				}
-				gc->DialogChoose( idx );
+				gc->dialoghandler->DialogChoose( idx );
 				return;
 			}
 		}

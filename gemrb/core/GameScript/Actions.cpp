@@ -28,6 +28,7 @@
 #include "AmbientMgr.h"
 #include "Audio.h"
 #include "DataFileMgr.h"
+#include "DialogHandler.h"
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
@@ -4033,7 +4034,7 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 	}
 	GameControl* gc = core->GetGameControl();
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
-		gc->speakerID = ((Actor *) tar)->globalID;
+		gc->dialoghandler->speakerID = ((Actor *) tar)->globalID;
 	} else {
 		printMessage("GameScript","Can't set gabber!",YELLOW);
 	}
