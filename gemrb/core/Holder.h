@@ -22,13 +22,15 @@
 #define HOLDER_H
 
 #include <cstddef>
+#include <cassert>
 
 template <class T>
 class Held {
 public:
 	Held() : RefCount(0) {}
 	void acquire() { ++RefCount; }
-	void release() { if (!--RefCount) delete static_cast<T*>(this); }
+	void release() { assert(RefCount && "Broken Held usage.");
+		if (!--RefCount) delete static_cast<T*>(this); }
 	size_t GetRefCount() { return RefCount; }
 private:
 	size_t RefCount;
