@@ -3806,7 +3806,7 @@ static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 	}
 
 	CObject<SaveGame> game(Slot);
-	core->GetSaveGameIterator()->DeleteSaveGame( game.get() );
+	core->GetSaveGameIterator()->DeleteSaveGame( game );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
