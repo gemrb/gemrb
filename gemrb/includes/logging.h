@@ -54,11 +54,6 @@ extern GEM_EXPORT HANDLE hConsole;
 #define LIGHT_CYAN (CYAN | FOREGROUND_INTENSITY)
 #define LIGHT_WHITE (WHITE | FOREGROUND_INTENSITY)
 #define DEFAULT WHITE
-#define gotoxy(x,y) \
-	{ \
-	COORD coord = {x,y}; \
-	SetConsoleCursorPosition(hConsole, coord); \
-	}
 
 #else //WIN32
 # include <config.h>
@@ -83,7 +78,6 @@ extern GEM_EXPORT HANDLE hConsole;
 #define LIGHT_MAGENTA printf("\033[1m\033[35;40m");
 #define LIGHT_CYAN printf("\033[1m\033[36;40m");
 #define LIGHT_WHITE printf("\033[1m\033[37;40m");
-#define gotoxy(x,y) printf("\033[%d;%dH", y, x)
 #endif //WIN32
 
 #define printBracket(status, color) textcolor(WHITE); printf("["); textcolor(color); printf("%s", status); textcolor(WHITE); printf("]")
