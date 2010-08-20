@@ -1,2 +1,2 @@
-#this file is executed before every Console command
+# this file is executed at gemrb startup, for the Console
 from ie_stats import *
