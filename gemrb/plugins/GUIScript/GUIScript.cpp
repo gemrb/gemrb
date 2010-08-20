@@ -88,7 +88,6 @@ struct UsedItemType {
 	ieResRef itemname;
 	ieVariable username; //death variable
 	ieStrRef value;
-//	int flags;           //UIT flags
 };
 
 struct SpellDescType {
