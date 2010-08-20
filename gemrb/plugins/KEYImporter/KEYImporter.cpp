@@ -67,7 +67,7 @@ static bool PathExists(BIFEntry *entry, const char *path)
 	return false;
 }
 
-static bool PathExists(BIFEntry *entry, std::vector<std::string> pathlist)
+static bool PathExists(BIFEntry *entry, const std::vector<std::string> &pathlist)
 {
 	size_t i;
 	
