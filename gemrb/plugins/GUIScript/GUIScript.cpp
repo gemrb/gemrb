@@ -9814,20 +9814,9 @@ void GUIScript::ExecFile(const char* file)
 	if (!fs.Open(file, true))
 		return;
 
-<<<<<<< HEAD:gemrb/plugins/GUIScript/GUIScript.cpp
-	PathJoin(include, core->GUIScriptsPath, "GUIScripts/include.py", NULL);
-	
-	int len1 = 0;
-	int len2 = strlen(string)+1;
-	if (fs.Open( include, true )) {
-		len1 = fs.Remains();
-		if (len1<0) len1=0;
-	}
-=======
 	int len = fs.Remains();
 	if (len <= 0)
 		return;
->>>>>>> 7870ea752b68b6c59420e69ecc46119086e3bd32:gemrb/plugins/GUIScript/GUIScript.cpp
 
 	char* buffer = (char *) malloc(len+1);
 	if (!buffer)
