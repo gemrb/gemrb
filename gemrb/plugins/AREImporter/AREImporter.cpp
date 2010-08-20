@@ -609,7 +609,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			c->Scripts[0] = NULL;
 		}
 		strnlwrcpy(c->KeyResRef, KeyResRef, 8);
-		if (!OpenFail) OpenFail = -1; // rewrite 0 to -1
+		if (!OpenFail) OpenFail = (ieStrRef)-1; // rewrite 0 to -1
 		c->OpenFail = OpenFail;
 	}
 
@@ -808,7 +808,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 		door->DiscoveryDiff=DiscoveryDiff;
 		door->LockDifficulty=LockRemoval;
-		if (!OpenStrRef) OpenStrRef = -1; // rewrite 0 to -1
+		if (!OpenStrRef) OpenStrRef = (ieStrRef)-1; // rewrite 0 to -1
 		door->OpenStrRef=OpenStrRef;
 		strnspccpy(door->LinkedInfo, LinkedInfo, 32);
 		//these 2 fields are not sure
