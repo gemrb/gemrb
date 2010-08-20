@@ -221,6 +221,7 @@ def OpenStoreShoppingWindow ():
 
 		Button = Window.GetControl (i+13)
 		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
