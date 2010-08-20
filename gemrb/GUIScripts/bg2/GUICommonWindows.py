@@ -319,12 +319,6 @@ def UpdateActionsWindow ():
 			pc = i+1
 			break
 
-	if pc == 0:
-		#summoned/charmed creature.
-		#TODO: some creatures have real actions window!!
-		GroupControls()
-		return
-
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == 0:

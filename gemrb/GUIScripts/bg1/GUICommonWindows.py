@@ -259,6 +259,8 @@ def UpdateActionsWindow ():
 				pc = -1
 				break
 
+	Selected = GemRB.GetSelectedSize()
+
 	#setting up the disabled button overlay (using the second border slot)
 	for i in range (12):
 		Button = ActionsWindow.GetControl (i)
@@ -267,14 +269,13 @@ def UpdateActionsWindow ():
 		Button.SetFont ("NUMBER")
 		Button.SetText ("")
 
-	if pc == 0:
+	if Selected == 0:
 		EmptyControls ()
 		return
-	if pc == -1:
+	if Selected > 1:
 		GroupControls ()
 		return
 	#this is based on class
-
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == 0:

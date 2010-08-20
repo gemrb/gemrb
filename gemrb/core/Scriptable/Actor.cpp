@@ -1514,11 +1514,13 @@ static void InitActorTables()
 		extraslots = tm->GetRowCount();
 		OtherGUIButtons = (ActionButtonRow2 *) calloc( extraslots, sizeof (ActionButtonRow2) );
 
-		for (i=0; i<usecount; i++) {
-			OtherGUIButtons[i].clss = (ieByte) atoi( tm->QueryField(i,0) );
+		for (i=0; i<extraslots; i++) {
+			long tmp = 0;
+			valid_number( tm->QueryField(i,0), tmp );
+			OtherGUIButtons[i].clss = (ieByte) tmp;
 			memcpy(OtherGUIButtons[i].buttons, &DefaultButtons, sizeof(ActionButtonRow));
-			for (int j=0;j<MAX_QSLOTS;j++) {
-				OtherGUIButtons[i].buttons[j+3]=(ieByte) atoi( tm->QueryField(i,j+1) );
+			for (int j=0;j<GUIBT_COUNT;j++) {
+				OtherGUIButtons[i].buttons[j]=(ieByte) atoi( tm->QueryField(i,j+1) );
 			}
 		}
 	}
@@ -5300,8 +5302,8 @@ void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
 
 void Actor::SetActionButtonRow(ActionButtonRow &ar)
 {
-	for(int i=0;i<MAX_QSLOTS;i++) {
-		ieByte tmp = ar[i+3];
+	for(int i=0;i<GUIBT_COUNT;i++) {
+		ieByte tmp = ar[i];
 		if (QslotTranslation) {
 			tmp=gemrb2iwd[tmp];
 		}
@@ -5309,11 +5311,13 @@ void Actor::SetActionButtonRow(ActionButtonRow &ar)
 	}
 }
 
-//the first 3 buttons are untouched by this function
 void Actor::GetActionButtonRow(ActionButtonRow &ar)
 {
+	//at this point, we need the stats for the action button row
+	//only controlled creatures (and pcs) get it
+	CreateStats();
 	InitButtons(GetStat(IE_CLASS), false);
-	for(int i=0;i<GUIBT_COUNT-3;i++) {
+	for(int i=0;i<GUIBT_COUNT;i++) {
 		ieByte tmp=PCStats->QSlots[i];
 		if (QslotTranslation) {
 			if (tmp>=90) { //quick weapons
@@ -5326,9 +5330,8 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar)
 				tmp=iwd2gemrb[tmp];
 			}
 		}
-		ar[i+3]=tmp;
+		ar[i]=tmp;
 	}
-	memcpy(ar,DefaultButtons,3*sizeof(ieByte) );
 }
 
 void Actor::SetPortrait(const char* ResRef, int Which)

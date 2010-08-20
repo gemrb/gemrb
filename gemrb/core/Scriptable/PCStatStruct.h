@@ -68,6 +68,8 @@
 
 #define MAX_ACT_COUNT 34 //update this
 
+#define GUIBT_COUNT  12
+
 class GEM_EXPORT PCStatsStruct {
 public:
 	ieStrRef  BestKilledName;
@@ -90,7 +92,7 @@ public:
 	ieWord    QuickWeaponHeaders[MAX_QUICKWEAPONSLOT];
 	ieWord    QuickItemSlots[MAX_QUICKITEMSLOT];           //pst has 5, others use only 3
 	ieWord    QuickItemHeaders[MAX_QUICKITEMSLOT];
-	ieByte    QSlots[MAX_QSLOTS];          //iwd2 specific
+	ieByte    QSlots[GUIBT_COUNT];          //iwd2 specific
 	ieByte    QuickSpellClass[MAX_QSLOTS];
 	ieWord    PortraitIcons[MAX_PORTRAIT_ICONS];
 	ieWord    PreviousPortraitIcons[MAX_PORTRAIT_ICONS];

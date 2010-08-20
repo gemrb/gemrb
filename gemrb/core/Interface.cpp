@@ -2546,6 +2546,8 @@ ScriptEngine* Interface::GetGUIScriptEngine() const
 	return guiscript.get();
 }
 
+static EffectRef fx_summon_disable_ref={"AvatarRemovalModifier",NULL,-1};
+ 
 //NOTE: if there were more summoned creatures, it will return only the last
 Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod)
 {
@@ -2633,6 +2635,11 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 				//force vvc to play only once
 				vvc->PlayOnce();
 				map->AddVVCell( vvc );
+
+				//set up the summon disable effect
+				Effect *newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_INSTANT_LIMITED);
+				newfx->Duration = vvc->GetSequenceDuration(AI_UPDATE_TIME)*90/100;
+				ApplyEffect(newfx, ab, ab);
 			}
 		}
 

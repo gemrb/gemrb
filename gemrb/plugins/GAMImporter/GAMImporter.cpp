@@ -409,9 +409,13 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 		}
 		//QuickSlots are customisable in iwd2 and GemRB
 		//thus we adopt the iwd2 style actor info
+		//the first 3 slots are hardcoded anyway
+		pcInfo.QSlots[0] = ACT_TALK;
+		pcInfo.QSlots[1] = ACT_WEAPON1;
+		pcInfo.QSlots[2] = ACT_WEAPON2;
 		for (i=0;i<MAX_QSLOTS;i++) {
 			str->ReadDword( &tmpDword );
-			pcInfo.QSlots[i] = (ieByte) tmpDword;
+			pcInfo.QSlots[i+3] = (ieByte) tmpDword;
 		}
 	} else {
 		for (i = 0; i < 4; i++) {
@@ -967,7 +971,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 			}
 		}
 		for (i=0;i<MAX_QSLOTS;i++) {
-			tmpDword = ac->PCStats->QSlots[i];
+			tmpDword = ac->PCStats->QSlots[i+3];
 			stream->WriteDword( &tmpDword);
 		}
 	}

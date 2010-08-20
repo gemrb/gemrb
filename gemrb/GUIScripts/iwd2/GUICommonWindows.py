@@ -191,6 +191,8 @@ def UpdateActionsWindow ():
 	if GemRB.GetVar ("OtherWindow") != -1:
 		return
 
+	Selected = GemRB.GetSelectedSize()
+
 	for i in range (PARTY_SIZE):
 		if GemRB.GameIsPCSelected (i+1):
 			if pc == 0:
@@ -199,13 +201,12 @@ def UpdateActionsWindow ():
 				pc = -1
 				break
 
-	if pc == 0:
+	if Selected == 0:
 		EmptyControls ()
 		return
-	if pc == -1:
+	if Selected > 1:
 		GroupControls ()
 		return
-
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == 0:

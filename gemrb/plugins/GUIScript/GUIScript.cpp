@@ -8080,7 +8080,16 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	Actor* actor = game->FindPC( slot );
+	Actor* actor = NULL;
+	
+	if (slot) {
+		actor = game->FindPC( slot );
+	} else {
+		if (game->selected.size()==1) {
+			actor = game->selected[0];
+		}
+	}
+
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
@@ -9805,7 +9814,7 @@ void GUIScript::ExecString(const char* string)
 	
 	int len1 = 0;
 	int len2 = strlen(string)+1;
-        if (fs.Open( include, true )) {
+	if (fs.Open( include, true )) {
 		len1 = fs.Remains();
 		if (len1<0) len1=0;
 	}

@@ -1870,7 +1870,7 @@ ieDword Map::HasVVCCell(const ieResRef resource, const Point &p)
 			if ((*iter)->YPos!=p.y) continue;
 		}
 		if (strnicmp(resource, (*iter)->ResName, sizeof(ieResRef) )) continue;
-		ieDword tmp = (*iter)->GetSequenceDuration(15)-(*iter)->GetCurrentFrame();
+		ieDword tmp = (*iter)->GetSequenceDuration(AI_UPDATE_TIME)-(*iter)->GetCurrentFrame();
 		if (tmp>ret) {
 			ret = tmp;
 		}
