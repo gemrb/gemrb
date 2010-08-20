@@ -6294,6 +6294,7 @@ int fx_avatar_removal_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx
 	STAT_SET(IE_AVATARREMOVAL, fx->Parameter2);
 	return FX_APPLIED;
 }
+
 // 0x13c MagicalRest (also 0x124 iwd)
 int fx_magical_rest (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {

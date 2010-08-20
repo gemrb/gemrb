@@ -4235,6 +4235,9 @@ int Actor::GetDefense(int DamageType)
 	return defense + core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) );
 }
 
+
+static EffectRef fx_ac_vs_creature_type_ref={"ACVsCreatureType",NULL,-1};
+
 void Actor::PerformAttack(ieDword gameTime)
 {
 	// start a new round if we really don't have one yet
@@ -4396,10 +4399,11 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	//get target's defense against attack
 	int defense = target->GetDefense(damagetype);
+	defense -= target->fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,this);
 
 	bool success;
 	if(ReverseToHit) {
-		success = roll > tohit - defense;
+		success = roll + defense > tohit;
 	} else {
 		success = tohit + roll > defense;
 	}

@@ -1142,7 +1142,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply) con
 				//normal effect with duration
 				break;
 			case FX_NOT_APPLIED:
- 				//instant effect, pending removal
+				//instant effect, pending removal
 				//for example, a damage effect
 				fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 				break;
@@ -1543,12 +1543,12 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
-		ieDword ids = (*f)->Parameter2;
-		if( ids<2 || ids>9) {
-			ids=2;
-		}
-		ieDword param1 = actor->GetStat(ids_stats[ids-2]);
 		if( (*f)->Parameter1) {
+			ieDword ids = (*f)->Parameter2;
+			if( ids<2 || ids>8) {
+				ids=2;
+			}
+			ieDword param1 = actor->GetStat(ids_stats[ids-2]);
 			MATCH_PARAM1();
 		}
 		int val = (int) (*f)->Parameter3;
