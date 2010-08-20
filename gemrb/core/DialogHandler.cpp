@@ -19,13 +19,14 @@
 
 #include "DialogHandler.h"
 
-#include "DialogMgr.h"
-#include "GameData.h"
-#include "GUI/GameControl.h"
-#include "Video.h"
-#include "Game.h"
-#include "DisplayMessage.h"
 #include "strrefs.h"
+
+#include "DialogMgr.h"
+#include "DisplayMessage.h"
+#include "Game.h"
+#include "GameData.h"
+#include "Video.h"
+#include "GUI/GameControl.h"
 
 DialogHandler::DialogHandler(void)
 {

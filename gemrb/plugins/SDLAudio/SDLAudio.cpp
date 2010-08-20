@@ -21,16 +21,15 @@
 #include "SDLAudio.h"
 
 #include "win32def.h"
-#include "GameData.h"
 
 #include "AmbientMgr.h"
+#include "GameData.h"
+#include "Interface.h" // GetMusicMgr()
+#include "MusicMgr.h"
 #include "SoundMgr.h"
 
 #include "SDL.h"
 #include "SDL_mixer.h"
-
-#include "Interface.h" // GetMusicMgr()
-#include "MusicMgr.h"
 
 SDLAudio::SDLAudio(void)
 {

@@ -32,10 +32,11 @@
 #include "Audio.h" //pst (react to death sounds)
 #include "DialogHandler.h" // checking for dialog
 #include "Game.h"
-#include "GameData.h"
 #include "DisplayMessage.h"
+#include "GameData.h"
 #include "Interface.h"
 #include "Item.h"
+#include "PolymorphCache.h" // stupid polymorph cache hack
 #include "Projectile.h"
 #include "ProjectileServer.h"
 #include "ScriptEngine.h"
@@ -46,7 +47,6 @@
 #include "GameScript/GSUtils.h" //needed for DisplayStringCore
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
-#include "PolymorphCache.h" // stupid polymorph cache hack
 
 #include <cassert>
 

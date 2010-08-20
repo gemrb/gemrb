@@ -19,6 +19,7 @@
  */
 
 #include "GameScript/Matching.h"
+
 #include "GameScript/GSUtils.h"
 
 #include "Interface.h"

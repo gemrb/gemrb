@@ -22,6 +22,7 @@
 #define SDLAUDIO_H
 
 #include "Audio.h"
+
 #include <vector>
 
 struct BufferedData {

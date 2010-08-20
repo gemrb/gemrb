@@ -20,6 +20,8 @@
 
 #include "GUI/Button.h"
 
+#include "GUI/GameControl.h"
+
 #include "defsounds.h"
 #include "win32def.h"
 
@@ -28,7 +30,6 @@
 #include "Palette.h"
 #include "Variables.h"
 #include "Video.h"
-#include "GameControl.h"
 
 Button::Button()
 {

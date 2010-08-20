@@ -36,8 +36,8 @@
 #include "ProjectileServer.h"
 #include "TileMapMgr.h"
 #include "Video.h"
-#include "System/FileStream.h"
 #include "System/CachedFileStream.h"
+#include "System/FileStream.h"
 
 #define DEF_OPEN   0
 #define DEF_CLOSE  1

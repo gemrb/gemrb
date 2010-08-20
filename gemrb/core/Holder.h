@@ -21,8 +21,8 @@
 #ifndef HOLDER_H
 #define HOLDER_H
 
-#include <cstddef>
 #include <cassert>
+#include <cstddef>
 
 template <class T>
 class Held {
