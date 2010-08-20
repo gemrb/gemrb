@@ -43,6 +43,7 @@
 #include "Audio.h"
 #include "DataFileMgr.h"
 #include "MusicMgr.h"
+#include "SaveGame.h"
 #include "ScriptEngine.h"
 #include "StringMgr.h"
 #include "SymbolMgr.h"

@@ -23,68 +23,11 @@
 
 #include "exports.h"
 
-#include "Holder.h"
-#include "ResourceManager.h"
-#include "System/FileStream.h"
+#include "SaveGame.h"
 
 #include <vector>
 
-class ImageMgr;
-
 #define SAVEGAME_DIRECTORY_MATCHER "%d - %[A-Za-z0-9- _]"
-
-class GEM_EXPORT SaveGame : public Held<SaveGame> {
-public:
-	static const TypeID ID;
-public:
-	SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID);
-	~SaveGame();
-	int GetPortraitCount() const
-	{
-		return PortraitCount;
-	}
-	int GetSaveID() const
-	{
-		return SaveID;
-	}
-	const char* GetName() const
-	{
-		return Name;
-	}
-	const char* GetPrefix() const
-	{
-		return Prefix;
-	}
-	const char* GetPath() const
-	{
-		return Path;
-	}
-	const char* GetDate() const
-	{
-		return Date;
-	}
-	const char* GetGameDate() const;
-	const char* GetSlotName() const
-	{
-		return SlotName;
-	}
-
-	Sprite2D* GetPortrait(int index) const;
-	Sprite2D* GetPreview() const;
-	DataStream* GetGame() const;
-	DataStream* GetWmap() const;
-	DataStream* GetSave() const;
-private:
-	char Path[_MAX_PATH];
-	char Prefix[10];
-	char Name[_MAX_PATH];
-	char Date[_MAX_PATH];
-	mutable char GameDate[_MAX_PATH];
-	char SlotName[_MAX_PATH];
-	int PortraitCount;
-	int SaveID;
-	ResourceManager manager;
-};
 
 class GEM_EXPORT SaveGameIterator {
 private:
