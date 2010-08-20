@@ -9678,6 +9678,12 @@ bool GUIScript::Init(void)
 		return false;
 	}
 
+	// TODO: Put this file somewhere user editable
+	// TODO: Search multiple places for this file
+	char include[_MAX_PATH];
+	PathJoin(include, core->GUIScriptsPath, "GUIScripts/include.py", NULL);
+	ExecFile(include);
+
 	PyObject *pMainMod = PyImport_AddModule( "__main__" );
 	/* pMainMod is a borrowed reference */
 	pMainDic = PyModule_GetDict( pMainMod );
@@ -9803,13 +9809,13 @@ bool GUIScript::RunFunction(const char *ModuleName, const char* FunctionName, bo
 	return true;
 }
 
-/** Exec a single String */
-void GUIScript::ExecString(const char* string)
+void GUIScript::ExecFile(const char* file)
 {
-	char *buffer;
-	char include[_MAX_PATH];
 	FileStream fs;
+	if (!fs.Open(file, true))
+		return;
 
+<<<<<<< HEAD:gemrb/plugins/GUIScript/GUIScript.cpp
 	PathJoin(include, core->GUIScriptsPath, "GUIScripts/include.py", NULL);
 	
 	int len1 = 0;
@@ -9818,21 +9824,30 @@ void GUIScript::ExecString(const char* string)
 		len1 = fs.Remains();
 		if (len1<0) len1=0;
 	}
+=======
+	int len = fs.Remains();
+	if (len <= 0)
+		return;
+>>>>>>> 7870ea752b68b6c59420e69ecc46119086e3bd32:gemrb/plugins/GUIScript/GUIScript.cpp
 
-	buffer = (char *) malloc(len1+len2);
-	if (!buffer) {
+	char* buffer = (char *) malloc(len+1);
+	if (!buffer)
+		return;
+
+	if (fs.Read(buffer, len) == GEM_ERROR) {
+		free(buffer);
 		return;
 	}
+	buffer[len] = 0;
 
-	if (len1) {
-		len1 = fs.Read(buffer, len1);
-		if (len1==GEM_ERROR) len1=0;
-	}
-	memcpy(buffer+len1, string, len2);
-
-	int ret = PyRun_SimpleString( (char *) buffer );
+	ExecString(buffer);
 	free(buffer);
-	if (ret == -1) {
+}
+
+/** Exec a single String */
+void GUIScript::ExecString(const char* string)
+{
+	if (PyRun_SimpleString((char*) string) == -1) {
 		if (PyErr_Occurred()) {
 			PyErr_Print();
 		}
