@@ -5278,6 +5278,7 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 	if (core->CloseCurrentStore() ) {
 		return RuntimeError("Cannot save store!");
 	}
+	core->SetEventFlag(EF_PORTRAIT);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
