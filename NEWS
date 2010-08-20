@@ -1,13 +1,12 @@
-GemRB git (13bb69c85):
+GemRB V0.6.2 (2010-08-21):
   New features:
-    - 
+    - a basic SDL_mixer plugin for faster, but lower-quality audio
     - dualclassing for bg1 and iwd
     - new triggers, actions, infravision
-    - feet circle flickering on portrait hover
+    - feet circle flickering on portrait hover, coloration in dialog
     - wisdom xp bonus (pst)
 
   Improved features:
-    - 
     - actions, triggers, object matching
     - item loading and ability selection, inventory
     - projectiles, effects, subtitles, verbal constants
@@ -17,6 +16,7 @@ GemRB git (13bb69c85):
   Applied patches:
     backslash check patch from anthiste
     bg1 character generation patch from Maighstir
+    a crosscompiling fix from F.Fischer
 
 GemRB V0.6.1 (2010-06-16):
   New features:
