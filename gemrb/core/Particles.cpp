@@ -261,7 +261,7 @@ void Particles::AddParticles(int count)
 		switch (path) {
 		case SP_PATH_EXPL:
 			p.x = pos.w/2+core->Roll(1,pos.w/2,pos.w/4);
-			p.y = pos.h/2+last_insert&7;
+			p.y = pos.h/2+(last_insert&7);
 			break;
 		case SP_PATH_FALL:
 		default:
