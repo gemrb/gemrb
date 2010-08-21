@@ -1834,7 +1834,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		if (game->selected.size()==1) {
 			//the player is using an item or spell on the ground
 			if ((target_mode == TARGET_MODE_CAST) && spellCount) {
-				TryToCast(pc, p);
+				if (target_types & GA_POINT) {
+					TryToCast(pc, p);
+				}
 				return;
 			}
 
