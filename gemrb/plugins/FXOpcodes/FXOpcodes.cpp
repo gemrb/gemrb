@@ -1811,7 +1811,8 @@ int fx_sparkle (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	else {
 		idx=fx->Parameter1;
 	}
-	map->Sparkle( idx, fx->Parameter2, p, fx->Parameter3);
+
+	map->Sparkle( fx->Duration, idx, fx->Parameter2, p, fx->Parameter3);
 	return FX_NOT_APPLIED;
 }
 

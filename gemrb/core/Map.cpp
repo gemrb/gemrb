@@ -3175,9 +3175,9 @@ void Map::FadeSparkle(const Point &pos, bool forced)
 	}
 }
 
-void Map::Sparkle(ieDword color, ieDword type, const Point &pos, unsigned int FragAnimID)
+void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point &pos, unsigned int FragAnimID)
 {
-	int style, path, grow, size, width;
+	int style, path, grow, size, width, ttl;
 
 	//the high word is ignored in the original engine (compatibility hack)
 	switch(type&0xffff) {
@@ -3186,29 +3186,34 @@ void Map::Sparkle(ieDword color, ieDword type, const Point &pos, unsigned int Fr
 		grow = SP_SPAWN_FULL;
 		size = 100;
 		width = 40;
+		ttl = duration;
 		break;
 	case SPARKLE_PUFF:
 		path = SP_PATH_FOUNT; //sparks go up and down
-		grow = SP_SPAWN_FULL;
-		size = 100;
+		grow = SP_SPAWN_SOME;
+		size = 40;
 		width = 40;
+		ttl = core->GetGame()->GameTime+25;
 		break;
 	case SPARKLE_EXPLOSION: //this isn't in the original engine, but it is a nice effect to have
 		path = SP_PATH_EXPL;
-		grow = SP_SPAWN_FULL;
-		size = 10;
-		width = 140;
+		grow = SP_SPAWN_SOME;
+		size = 40;
+		width = 40;
+		ttl = core->GetGame()->GameTime+25;
 		break;
 	default:
 		path = SP_PATH_FLIT;
 		grow = SP_SPAWN_SOME;
 		size = 100;
 		width = 40;
+		ttl = duration;
 		break;
 	}
 	Particles *sparkles = new Particles(size);
 	sparkles->SetOwner(this);
-	sparkles->SetRegion(pos.x-width/2, pos.y-80, width, 80);
+	sparkles->SetRegion(pos.x-width/2, pos.y-30, width, 30);
+	sparkles->SetTimeToLive(ttl);
 
 	if (FragAnimID) {
 		style = SP_TYPE_BITMAP;
@@ -3220,10 +3225,7 @@ void Map::Sparkle(ieDword color, ieDword type, const Point &pos, unsigned int Fr
 	sparkles->SetType(style, path, grow);
 	sparkles->SetColor(color);
 	sparkles->SetPhase(P_GROW);
-	printf("sparkle: %d %d\n", color, type);
-	printf("Position: %d.%d\n", pos.x,pos.y);
 
-	//AddParticle(sparkles, pos);
 	spaIterator iter;
 	for(iter=particles.begin(); (iter!=particles.end()) && ((*iter)->GetHeight()<pos.y); iter++) ;
 	particles.insert(iter, sparkles);

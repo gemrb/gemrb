@@ -1055,7 +1055,7 @@ void Projectile::DrawExplosion(const Region &screen)
 		//Extension->ExplColor fake color for single shades (blue,green,red flames)
 		//Extension->FragAnimID the animation id for the character animation
 		//This color is not used in the original game
-		area->Sparkle(Extension->ExplColor, SPARKLE_EXPLOSION, Pos, Extension->FragAnimID);
+		area->Sparkle(0, Extension->ExplColor, SPARKLE_EXPLOSION, Pos, Extension->FragAnimID);
 	}
 
 	ProjectileServer *server = core->GetProjectileServer();
@@ -1398,7 +1398,7 @@ void Projectile::DrawTravel(const Region &screen)
 	}
 
 	if (SFlags&PSF_SPARKS) {
-		area->Sparkle(SparkColor,SPARKLE_PUFF,pos);
+		area->Sparkle(0,SparkColor,SPARKLE_EXPLOSION,pos);
 	}
 }
 

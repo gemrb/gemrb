@@ -22,6 +22,7 @@
 
 #include "Interface.h"
 #include "Video.h"
+#include "Game.h"
 
 Color sparkcolors[MAX_SPARK_COLOR][MAX_SPARK_PHASE];
 bool inited = false;
@@ -64,9 +65,8 @@ void InitSparks()
 	}
 	while (i--) {
 		for (int j=0;j<MAX_SPARK_PHASE;j++) {
-			//not filling the first entry
 			const char *value = tab->QueryField(i,j);
-			TranslateColor(value, sparkcolors[i+1][j]);
+			TranslateColor(value, sparkcolors[i][j]);
 		}
 	}
 }
@@ -91,6 +91,7 @@ Particles::Particles(int s)
 	type = SP_TYPE_POINT;
 	path = SP_PATH_FALL;
 	spawn_type = SP_SPAWN_NONE;
+	timetolive = 0;
 }
 
 Particles::~Particles()
@@ -139,14 +140,14 @@ bool Particles::AddNew(const Point &point)
 	switch(path)
 	{
 	case SP_PATH_EXPL:
-		st = (last_insert%15)<<16;
+		st = pos.h+last_insert%15;
 		break;
 	case SP_PATH_RAIN:
 	case SP_PATH_FLIT:
 		st = core->Roll(3,5,MAX_SPARK_PHASE)<<4;
 		break;
 	case SP_PATH_FOUNT:
-		st =(MAX_SPARK_PHASE + 2*pos.h)<<4;
+		st =(MAX_SPARK_PHASE + 2*pos.h);
 		break;
 	case SP_PATH_FALL:
 	default:
@@ -189,12 +190,22 @@ void Particles::Draw(const Region &screen)
 		if (points[i].state == -1) {
 			continue;
 		}
-		int state = points[i].state>>4;
+		int state;
+
+		switch(path) {
+		case SP_PATH_FLIT:
+		case SP_PATH_RAIN:
+			state = points[i].state>>4;
+		default:
+			state = points[i].state;
+			break;
+		}
+
 		if (state>=MAX_SPARK_PHASE) {
 			length = 6-abs(state-MAX_SPARK_PHASE-6);
 			state = 0;
 		} else {
-			state=MAX_SPARK_PHASE-state;
+			state=MAX_SPARK_PHASE-state-1;
 			length=0;
 		}
 		Color clr = sparkcolors[color][state];
@@ -229,7 +240,8 @@ void Particles::Draw(const Region &screen)
 			video->SetPixel (points[i].pos.x-region.x,
 				points[i].pos.y-region.y, clr, true);
 			break;
-		case SP_TYPE_LINE:         // this is more like a raindrop
+		// this is more like a raindrop
+		case SP_TYPE_LINE:
 			if (length) {
 				video->DrawLine (points[i].pos.x+region.x,
 					points[i].pos.y+region.y,
@@ -248,8 +260,8 @@ void Particles::AddParticles(int count)
 
 		switch (path) {
 		case SP_PATH_EXPL:
-			p.x = pos.w/2;
-			p.y = pos.h/2;
+			p.x = pos.w/2+core->Roll(1,pos.w/2,pos.w/4);
+			p.y = pos.h/2+last_insert&7;
 			break;
 		case SP_PATH_FALL:
 		default:
@@ -280,6 +292,13 @@ int Particles::Update()
 
 	if (phase==P_EMPTY) {
 		return drawn;
+	}
+
+	if (timetolive) {
+		if (timetolive<core->GetGame()->GameTime) {
+			spawn_type = SP_SPAWN_NONE;
+			phase = P_FADE;
+		}
 	}
 
 	switch(spawn_type) {
@@ -323,20 +342,23 @@ int Particles::Update()
 			points[i].pos.x%=pos.w;
 			points[i].pos.y+=(i&3)+1;
 			break;
+		case SP_PATH_EXPL:
+			points[i].pos.y+=1;
+			break;
 		case SP_PATH_FOUNT:
-			if (points[i].state<=MAX_SPARK_PHASE<<4) {
+			if (points[i].state<=MAX_SPARK_PHASE) {
 				break;
 			}
-			if (points[i].state>(MAX_SPARK_PHASE<<4)+pos.h) {
+			if (points[i].state<(MAX_SPARK_PHASE+pos.h)) {
 				if ( (points[i].state&7) == 7) {
 					points[i].pos.x+=(i&3)-1;
 				}
-				points[i].pos.y++;
+				points[i].pos.y+=2;
 			} else {
 				if ( (points[i].state&7) == 7) {
 					points[i].pos.x+=(i&3)-1;
 				}
-				points[i].pos.y--;
+				points[i].pos.y-=2;
 			}
 			break;
 		}

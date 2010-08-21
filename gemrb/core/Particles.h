@@ -105,6 +105,7 @@ public:
 		pos.w = w;
 		pos.h = h;
 	}
+	void SetTimeToLive(int ttl) { timetolive = ttl; }
 	void SetColor(ieByte c) { color=c; }
 	void SetOwner(Scriptable *o) { owner=o; }
 	/* returns true if it cannot add new elements */
@@ -116,6 +117,7 @@ public:
 	int GetHeight() const { return pos.y+pos.h; }
 private:
 	Element *points;
+	ieDword timetolive;
 	ieDword target;    //could be 0, in that case target is pos
 	ieWord size;       //spark number
 	ieWord last_insert;//last spark idx added

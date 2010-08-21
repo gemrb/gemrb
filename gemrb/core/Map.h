@@ -360,7 +360,7 @@ public:
 	//adds a sparkle puff of colour to a point in the area
 	//FragAnimID is an optional avatar animation ID (see avatars.2da) for
 	//fragment animation
-	void Sparkle(ieDword color, ieDword type, const Point &pos, unsigned int FragAnimID = 0);
+	void Sparkle(ieDword duration, ieDword color, ieDword type, const Point &pos, unsigned int FragAnimID = 0);
 	//removes or fades the sparkle puff at a point
 	void FadeSparkle(const Point &pos, bool forced);
 
