@@ -15,7 +15,8 @@ NEWS entry
 
 ******************* MODDING RING ********************
 For the modding news blurb, just skip the changelog digest and put a link
-to the main forum post.
+to the main forum post. Also add a general intro, since this is syndicated:
+[url=http://gemrb.sf.net]GemRB[/url] is a portable open-source implementation of Bioware's Infinity Engine. It was written to support pseudo-3D role playing games based on the Dungeons & Dragons ruleset (Baldur's Gate and Icewind Dale series, Planescape: Torment).
 
 ******************* SOURCEFORGE *********************
 For SF, just remove all of the BBCode.
