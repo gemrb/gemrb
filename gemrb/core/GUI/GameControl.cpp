@@ -2001,7 +2001,7 @@ void GameControl::PerformActionOn(Actor *actor)
 
 void GameControl::ResetTargetMode() {
 	target_mode = TARGET_MODE_NONE;
-	target_types = GA_SELECT|GA_NO_DEAD|GA_NO_HIDDEN;
+	target_types = GA_NO_DEAD|GA_NO_HIDDEN;
 }
 
 /** Special Key Press */
