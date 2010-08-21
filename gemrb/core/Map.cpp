@@ -1595,7 +1595,10 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 		if (onlyparty && actor->GetStat(IE_EA)>EA_CHARMED) {
 			continue;
 		}
-		if (!actor->ValidTarget(GA_SELECT|GA_NO_DEAD) )
+		// this is called by non-selection code..
+		if (onlyparty && !actor->ValidTarget(GA_SELECT))
+			continue;
+		if (!actor->ValidTarget(GA_NO_DEAD) )
 			continue;
 		if ((actor->Pos.x<rgn.x) || (actor->Pos.y<rgn.y))
 			continue;
