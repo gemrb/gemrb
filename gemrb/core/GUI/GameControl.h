@@ -208,6 +208,7 @@ public:
 	void TryToPick(Actor *source, Container *tgt);
 	void TryToDisarm(Actor *source, InfoPoint *tgt);
 	void PerformActionOn(Actor *actor);
+	void ResetTargetMode();
 
 	// returns the default cursor fitting the targeting mode 
 	int GetDefaultCursor() const;

@@ -125,8 +125,7 @@ GameControl::GameControl(void)
 	AIUpdateCounter = 1;
 	ieDword tmp=0;
 
-	target_mode = TARGET_MODE_NONE;
-	target_types = GA_SELECT|GA_NO_DEAD|GA_NO_HIDDEN;
+	ResetTargetMode();
 
 	core->GetDictionary()->Lookup("Center",tmp);
 	if (tmp) {
@@ -1497,7 +1496,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 	char Tmp[40];
 
 	if (!spellCount) {
-		target_mode = TARGET_MODE_NONE;
+		ResetTargetMode();
 		return; //not casting or using an own item
 	}
 	source->ClearPath();
@@ -1519,7 +1518,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 		si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
 		if (!si)
 		{
-			target_mode = TARGET_MODE_NONE;
+			ResetTargetMode();
 			return;
 		}
 		sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
@@ -1531,7 +1530,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 	}
 	source->AddAction( action );
 	if (!spellCount) {
-		target_mode = TARGET_MODE_NONE;
+		ResetTargetMode();
 	}
 }
 
@@ -1541,7 +1540,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 	char Tmp[40];
 
 	if (!spellCount) {
-		target_mode = TARGET_MODE_NONE;
+		ResetTargetMode();
 		return; //not casting or using an own item
 	}
 	source->ClearPath();
@@ -1562,7 +1561,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
 		if (!si)
 		{
-			target_mode = TARGET_MODE_NONE;
+			ResetTargetMode();
 			return;
 		}
 		sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
@@ -1574,7 +1573,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 	}
 	source->AddAction( action );
 	if (!spellCount) {
-		target_mode = TARGET_MODE_NONE;
+		ResetTargetMode();
 	}
 }
 
@@ -1608,13 +1607,13 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 
 	if (target_mode == TARGET_MODE_ATTACK) {
 		TryToBash(actor, container);
-		target_mode = TARGET_MODE_NONE;
+		ResetTargetMode();
 		return;
 	}
 
 	if ((target_mode == TARGET_MODE_PICK)) {
 		TryToPick(actor, container);
-		target_mode = TARGET_MODE_NONE;
+		ResetTargetMode();
 		return;
 	}
 
@@ -1643,13 +1642,13 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 
 	if (target_mode == TARGET_MODE_ATTACK) {
 		TryToBash(actor, door);
-		target_mode = TARGET_MODE_NONE ;
+		ResetTargetMode();
 		return;
 	}
 
 	if ( (target_mode == TARGET_MODE_PICK) || door->TrapDetected) {
 		TryToPick(actor, door);
-		target_mode = TARGET_MODE_NONE ;
+		ResetTargetMode();
 		return;
 	}
 
@@ -1673,7 +1672,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 	}
 	if ((target_mode == TARGET_MODE_PICK)) {
 		TryToDisarm(actor, trap);
-		target_mode = TARGET_MODE_NONE;
+		ResetTargetMode();
 		return true;
 	}
 
@@ -1921,11 +1920,17 @@ void GameControl::PerformActionOn(Actor *actor)
 		type = ACT_THIEVING;
 	}
 
+	if (type != ACT_NONE) {
+		if(!actor->ValidTarget(target_types)) {
+			return;
+		}
+	}
+
 	//we shouldn't zero this for two reasons in case of spell or item
 	//1. there could be multiple targets
 	//2. the target mode is important
 	if (!(target_mode == TARGET_MODE_CAST) || !spellCount) {
-		target_mode = TARGET_MODE_NONE;
+		ResetTargetMode();
 	}
 
 	switch (type) {
@@ -1993,6 +1998,12 @@ void GameControl::PerformActionOn(Actor *actor)
 			break;
 	}
 }
+
+void GameControl::ResetTargetMode() {
+	target_mode = TARGET_MODE_NONE;
+	target_types = GA_SELECT|GA_NO_DEAD|GA_NO_HIDDEN;
+}
+
 /** Special Key Press */
 void GameControl::OnSpecialKeyPress(unsigned char Key)
 {
