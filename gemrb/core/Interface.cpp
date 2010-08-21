@@ -2637,8 +2637,8 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 				map->AddVVCell( vvc );
 
 				//set up the summon disable effect
-				Effect *newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_INSTANT_LIMITED);
-				newfx->Duration = vvc->GetSequenceDuration(AI_UPDATE_TIME)*90/100;
+				Effect *newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_ABSOLUTE);
+				newfx->Duration = vvc->GetSequenceDuration(AI_UPDATE_TIME)*9/10 + core->GetGame()->GameTime;
 				ApplyEffect(newfx, ab, ab);
 			}
 		}
