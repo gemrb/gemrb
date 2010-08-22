@@ -1775,6 +1775,13 @@ void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 	map->PlayAreaSong(parameters->int0Parameter, restart, force);
 }
 
+void GameScript::StartCombatCounter(Scriptable* Sender, Action* /*parameters*/)
+{
+	Map *map = Sender->GetCurrentArea();
+	if (!map) return;
+	map->PlayAreaSong(3, 1, 1);
+}
+
 /*iwd2 can set an areasong slot*/
 void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 {
