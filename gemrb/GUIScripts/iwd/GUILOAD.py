@@ -127,7 +127,7 @@ def LoadGamePress ():
 	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
 	LoadScreen.StartLoadScreen()
 	GemRB.LoadGame(Games[Pos]) #loads and enters savegame
-	GemRB.EnterGame ()
+	GemRB.SetNextScript ("PartyFormation")
 	return
 
 def DeleteGameConfirm():

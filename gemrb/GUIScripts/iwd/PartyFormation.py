@@ -26,6 +26,7 @@ import GemRB
 from GUIDefines import *
 import GUICommon
 import GUICommonWindows
+import LoadScreen
 
 PartyFormationWindow = 0
 CreateCharWindow = 0
@@ -100,6 +101,9 @@ def OnLoad ():
 		else:
 			GemRB.SetVar ("SaveDir",1) #using mpsave
 			GemRB.SetVar ("PlayMode",0) #using first row
+
+	if LoadScreen.LoadScreen:
+		LoadScreen.LoadScreen.Unload()
 
 	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
 	return
