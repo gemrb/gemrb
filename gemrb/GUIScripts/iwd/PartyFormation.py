@@ -97,11 +97,9 @@ def OnLoad ():
 			GemRB.SetGlobal ("CHAPTER", "GLOBAL", 1)
 			GemRB.SetVar ("SaveDir",1) #using mpsave
 			GemRB.SetVar ("PlayMode",2) #using second row
-			GemRB.GameSetExpansion (1)
 		else:
 			GemRB.SetVar ("SaveDir",1) #using mpsave
 			GemRB.SetVar ("PlayMode",0) #using first row
-			GemRB.GameSetExpansion (0)
 
 	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
 	return

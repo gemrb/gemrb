@@ -106,7 +106,6 @@ def PregenPress():
 	if QuitWindow:
 		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0) #loadgame needs this hack
-	GemRB.GameSetExpansion(0)
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
 	GemRB.SetVar("PlayMode",-1)
@@ -119,7 +118,6 @@ def LoadSingle():
 	if QuitWindow:
 		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0)
-	GemRB.GameSetExpansion(0)
 	GemRB.SetNextScript("GUILOAD")
 	return
 
@@ -129,7 +127,6 @@ def MissionPack():
 	if QuitWindow:
 		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",3) #use mpsave for saved games
-	GemRB.GameSetExpansion(1)
 	GemRB.SetNextScript("GUILOAD")
 	return
 
@@ -139,7 +136,6 @@ def NewSingle():
 	if QuitWindow:
 		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0)
-	GemRB.GameSetExpansion(0)
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
 	GemRB.SetNextScript("CharGen") #temporarily
