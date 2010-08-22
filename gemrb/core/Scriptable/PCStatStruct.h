@@ -68,7 +68,7 @@
 
 #define MAX_ACT_COUNT 34 //update this
 
-#define GUIBT_COUNT  12
+#define GUIBT_COUNT (MAX_QSLOTS + 3)
 
 class GEM_EXPORT PCStatsStruct {
 public:

@@ -127,7 +127,7 @@ struct PCStruct {
 	ieWord   QuickItemHeader[MAX_QUICKITEMSLOT];
 	char Name[32];
 	ieDword  TalkCount;
-	ieByte QSlots[MAX_QSLOTS];
+	ieByte QSlots[GUIBT_COUNT];
 	ieByte QuickSpellClass[MAX_QSLOTS];
 };
 

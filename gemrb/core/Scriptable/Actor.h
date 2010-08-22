@@ -116,8 +116,6 @@ struct PolymorphCache;
 // Detect() mode: IDS matching ignores invisibility
 #define GA_DETECT 8192
 
-#define GUIBT_COUNT  12
-
 #define VCONST_COUNT 100
 
 //interact types
