@@ -455,7 +455,8 @@ def SetCharacterDescription():
 	if CharGenState > 1:
 		TextArea.Append (1048, -1)
 		TextArea.Append (": ")
-		Race = GemRB.GetPlayerStat (MyChar, IE_RACE)-1
+		Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
+		Race = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
 		TextArea.Append (CommonTables.Races.GetValue (Race, 2) )
 	if CharGenState > 3:
 		TextArea.Append (1049, -1)
@@ -924,7 +925,8 @@ def RaceDonePress():
 	ClassButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	CharGenState = 2
 
-	Race = GemRB.GetVar ("Race")
+	Race = GemRB.GetVar ("Race")-1
+	Race = CommonTables.Races.GetValue (Race, 3)
 	GemRB.SetPlayerStat (MyChar, IE_RACE, Race)
 	SetCharacterDescription()
 	CharGenWindow.SetVisible (WINDOW_VISIBLE)
@@ -946,7 +948,8 @@ def ClassPress():
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	ClassWindow = GemRB.LoadWindow (2)
 	ClassCount = CommonTables.Classes.GetRowCount ()
-	RaceName = CommonTables.Races.GetRowName (GemRB.GetPlayerStat (MyChar, IE_RACE) - 1)
+	RaceRow = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
+	RaceName = CommonTables.Races.GetRowName (RaceRow)
 	GemRB.SetVar ("Class", 0)
 	GemRB.SetVar ("Class Kit", 0)
 	GemRB.SetVar ("MAGESCHOOL", 0)
@@ -1023,7 +1026,8 @@ def ClassMultiPress():
 	ClassWindow.SetVisible (WINDOW_INVISIBLE)
 	ClassMultiWindow = GemRB.LoadWindow (10)
 	ClassCount = CommonTables.Classes.GetRowCount ()
-	RaceName = CommonTables.Races.GetRowName (GemRB.GetPlayerStat (MyChar, IE_RACE) - 1)
+	RaceRow = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
+	RaceName = CommonTables.Races.GetRowName (RaceRow)
 
 	print "Multi racename:", RaceName
 	for i in range (2, 10):
@@ -2322,11 +2326,11 @@ def AppearancePress():
 
 	HairColor = AppearanceTable.GetValue (PortraitIndex, 1)
 	GemRB.SetVar ("HairColor", HairColor)
-	SkinColor = AppearanceTable.GetValue (PortraitIndex, 2)
+	SkinColor = AppearanceTable.GetValue (PortraitIndex, 0)
 	GemRB.SetVar ("SkinColor", SkinColor)
-	MajorColor = AppearanceTable.GetValue (PortraitIndex, 3)
+	MajorColor = AppearanceTable.GetValue (PortraitIndex, 2)
 	GemRB.SetVar ("MajorColor", MajorColor)
-	MinorColor = AppearanceTable.GetValue (PortraitIndex, 4)
+	MinorColor = AppearanceTable.GetValue (PortraitIndex, 3)
 	GemRB.SetVar ("MinorColor", MinorColor)
 
 	AppearanceAvatarButton = AppearanceWindow.GetControl (1)
@@ -2379,9 +2383,13 @@ def DrawAvatar():
 
 	AvatarID = 0x6000
 	table = GemRB.LoadTable ("avprefr")
-	AvatarID = AvatarID+table.GetValue (GemRB.GetPlayerStat(MyChar, IE_RACE),0)
+	lookup = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat(MyChar, IE_RACE))
+	lookup = CommonTables.Races.GetRowName (lookup)
+	AvatarID = AvatarID+table.GetValue (lookup, "RACE")
 	table = GemRB.LoadTable ("avprefc")
-	AvatarID = AvatarID+table.GetValue (GemRB.GetPlayerStat(MyChar, IE_CLASS),0)
+	lookup = CommonTables.Classes.FindValue (5, GemRB.GetPlayerStat(MyChar, IE_CLASS))
+	lookup = CommonTables.Classes.GetRowName (lookup)
+	AvatarID = AvatarID+table.GetValue (lookup, "PREFIX")
 	table = GemRB.LoadTable ("avprefg")
 	AvatarID = AvatarID+table.GetValue (GemRB.GetPlayerStat(MyChar,IE_SEX),0)
 
