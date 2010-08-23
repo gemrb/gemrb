@@ -34,6 +34,7 @@
 #include "MapMgr.h"
 #include "MusicMgr.h"
 #include "Palette.h"
+#include "Particles.h"
 #include "PathFinder.h"
 #include "Projectile.h"
 #include "ScriptedAnimation.h"

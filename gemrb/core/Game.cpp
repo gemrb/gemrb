@@ -31,6 +31,7 @@
 #include "Interface.h"
 #include "MapMgr.h"
 #include "MusicMgr.h"
+#include "Particles.h"
 #include "ScriptEngine.h"
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"

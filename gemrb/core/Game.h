@@ -35,11 +35,12 @@ class Game;
 
 #include "Callback.h"
 #include "Map.h"
-#include "Particles.h"
 #include "Variables.h"
 #include "Scriptable/Actor.h"
 
 #include <vector>
+
+class Particles;
 
 //the size of the bestiary register
 #define BESTIARY_SIZE 260
