@@ -82,10 +82,6 @@ static int polystatcount = 0;
 
 //the original engine stores the colors in sprklclr.2da in a different order
 
-#define SPARK_COUNT 13
-
-static int spark_color_indices[SPARK_COUNT]={12,5,0,6,1,8,2,7,9,3,4,10,11};
-
 static ScriptedAnimation default_spell_hit;
 
 int fx_ac_vs_damage_type_modifier (Scriptable* Owner, Actor* target, Effect* fx);//00
@@ -1802,17 +1798,7 @@ int fx_sparkle (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	Point p(fx->PosX, fx->PosY);
 
-	//the IE programmers did something unexpected, again, a permutation!
-	unsigned int idx;
-
-	if (fx->Parameter1<SPARK_COUNT) {
-		idx = spark_color_indices[fx->Parameter1];
-	}
-	else {
-		idx=fx->Parameter1;
-	}
-
-	map->Sparkle( fx->Duration, idx, fx->Parameter2, p, fx->Parameter3);
+	map->Sparkle( fx->Duration, fx->Parameter1, fx->Parameter2, p, fx->Parameter3);
 	return FX_NOT_APPLIED;
 }
 

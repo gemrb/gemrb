@@ -27,6 +27,10 @@
 Color sparkcolors[MAX_SPARK_COLOR][MAX_SPARK_PHASE];
 bool inited = false;
 
+#define SPARK_COUNT 13
+
+static int spark_color_indices[SPARK_COUNT]={12,5,0,6,1,8,2,7,9,3,4,10,11};
+
 void TranslateColor(const char *value, Color &color)
 {
 	int r = 0;
@@ -65,7 +69,14 @@ void InitSparks()
 	}
 	while (i--) {
 		for (int j=0;j<MAX_SPARK_PHASE;j++) {
-			const char *value = tab->QueryField(i,j);
+			int idx;
+
+			if (i<SPARK_COUNT) {
+				idx = spark_color_indices[i];
+			} else {
+				idx = i;
+			}
+			const char *value = tab->QueryField(idx,j);
 			TranslateColor(value, sparkcolors[i][j]);
 		}
 	}
@@ -196,6 +207,7 @@ void Particles::Draw(const Region &screen)
 		case SP_PATH_FLIT:
 		case SP_PATH_RAIN:
 			state = points[i].state>>4;
+			break;
 		default:
 			state = points[i].state;
 			break;

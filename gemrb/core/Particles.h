@@ -66,19 +66,19 @@ struct Element {
 #define SP_SPAWN_FULL  1       //fill all at setup, then switch to none
 #define SP_SPAWN_SOME  2       //add some new elements regularly
 
-#define SPARK_COLOR_NONE 0
-#define SPARK_COLOR_BLUE 1
-#define SPARK_COLOR_GOLD 2
-#define SPARK_COLOR_PURPLE 3
-#define SPARK_COLOR_ICE 4
-#define SPARK_COLOR_STONE 5
-#define SPARK_COLOR_BLACK 6
-#define SPARK_COLOR_CHROM 7
-#define SPARK_COLOR_RED 8
-#define SPARK_COLOR_GREEN 9
-#define SPARK_COLOR_WHITE 10
-#define SPARK_COLOR_MAGENTA 11
-#define SPARK_COLOR_ORANGE 12
+#define SPARK_COLOR_BLUE 0
+#define SPARK_COLOR_GOLD 1
+#define SPARK_COLOR_PURPLE 2
+#define SPARK_COLOR_ICE 3
+#define SPARK_COLOR_STONE 4
+#define SPARK_COLOR_BLACK 5
+#define SPARK_COLOR_CHROM 6
+#define SPARK_COLOR_RED 7
+#define SPARK_COLOR_GREEN 8
+#define SPARK_COLOR_WHITE 9
+#define SPARK_COLOR_MAGENTA 10
+#define SPARK_COLOR_ORANGE 11
+#define SPARK_COLOR_CUSTOM 12
 
 #define MAX_SPARK_COLOR  13
 #define MAX_SPARK_PHASE  5
