@@ -2718,13 +2718,13 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			}
 		} else if (stricmp( core->GameType, "pst" ) == 0) {
 			if(0) printf("TODO: pst floating text\n");
-		} else if ((displaymsg->HasStringReference(STR_DAMAGE1) &&
-					! displaymsg->HasStringReference(STR_DAMAGE_IMMUNITY))
-					|| !hitter || hitter->Type != ST_ACTOR) {
+		} else if (!displaymsg->HasStringReference(STR_DAMAGE2) || !hitter || hitter->Type != ST_ACTOR) {
 			// bg1 and iwd
-			// or traps: "Damage Taken (damage)", but there's no token
-			char tmp[32];
-			snprintf(tmp, sizeof(tmp), "Damage Taken (%d)", damage);
+			// or any traps or self-infliction (also for bg1)
+			// construct an i18n friendly "Damage Taken (damage)", since there's no token
+			char tmp[64];
+			const char* msg = core->GetString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
+			snprintf(tmp, sizeof(tmp), "%s (%d)", msg, damage);
 			displaymsg->DisplayStringName(tmp, 0xffffff, this);
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
@@ -2732,7 +2732,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			// wipe the DAMAGER token, so we can color it
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", "" );
 			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
-			displaymsg->DisplayConstantStringName(STR_DAMAGE1, 0xffffff, hitter);
+			displaymsg->DisplayConstantStringName(STR_DAMAGE2, 0xffffff, hitter);
 		}
 	} else {
 		if (resisted == DR_IMMUNE) {
