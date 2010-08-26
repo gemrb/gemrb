@@ -28,8 +28,9 @@
 
 
 //this supposed to convince SDL to work on OS/X
+//WARNING: commenting this out will cause SDL 1.2.x to crash
 #ifdef __APPLE_CC__ // we need startup SDL here
-#include "SDL/SDL.h"
+#include <SDL.h>
 #endif
 
 int main(int argc, char* argv[])
