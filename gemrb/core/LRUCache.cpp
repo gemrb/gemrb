@@ -164,7 +164,7 @@ void testLRUCache()
 
 	bool r;
 	void* p;
-	const char* k2;
+	const char* k2 = 0;
 
 	r = c.Lookup("k050", p);
 	assert(!r);

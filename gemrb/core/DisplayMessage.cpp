@@ -153,7 +153,7 @@ void DisplayMessage::DisplayConstantStringValue(int stridx, unsigned int color, 
 void DisplayMessage::DisplayConstantStringNameString(int stridx, unsigned int color, int stridx2, const Scriptable *actor) const
 {
 	unsigned int actor_color;
-	const char *name;
+	const char *name = 0;
 
 	if (stridx<0) return;
 	actor_color = GetSpeakerColor(name, actor);
@@ -186,8 +186,8 @@ void DisplayMessage::DisplayConstantStringName(int stridx, unsigned int color, c
 void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *attacker, const Scriptable *target) const
 {
 	unsigned int attacker_color;
-	const char *name1;
-	const char *name2;
+	const char *name1 = 0;
+	const char *name2 = 0;
 
 	if (stridx<0) return;
 
@@ -216,7 +216,7 @@ void DisplayMessage::DisplayStringName(int stridx, unsigned int color, const Scr
 void DisplayMessage::DisplayStringName(const char *text, unsigned int color, const Scriptable *speaker) const
 {
 	unsigned int speaker_color;
-	const char *name;
+	const char *name = 0;
 
 	if (!text) return;
 	speaker_color = GetSpeakerColor(name, speaker);
