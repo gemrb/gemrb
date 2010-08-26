@@ -2718,7 +2718,9 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 			}
 		} else if (stricmp( core->GameType, "pst" ) == 0) {
 			if(0) printf("TODO: pst floating text\n");
-		} else if (displaymsg->HasStringReference(STR_DAMAGE1) || !hitter || hitter->Type != ST_ACTOR) {
+		} else if ((displaymsg->HasStringReference(STR_DAMAGE1) &&
+					! displaymsg->HasStringReference(STR_DAMAGE_IMMUNITY))
+					|| !hitter || hitter->Type != ST_ACTOR) {
 			// bg1 and iwd
 			// or traps: "Damage Taken (damage)", but there's no token
 			char tmp[32];
