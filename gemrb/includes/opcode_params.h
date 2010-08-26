@@ -52,8 +52,10 @@
 #define COND_HELPLESS 5
 #define COND_POISONED 6
 #define COND_ATTACKED 7
-#define COND_HIT 8
-#define COND_ALWAYS 9
+#define COND_NEAR4 8
+#define COND_NEAR10 9
+#define COND_EVERYROUND 10
+#define COND_TOOKDAMAGE 11
 
 //resources for the seven eyes effect
 #define EYE_MIND   0

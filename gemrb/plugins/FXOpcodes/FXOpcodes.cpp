@@ -5083,14 +5083,20 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	case COND_POISONED:
 		condition = actor->GetStat(IE_STATE_ID) & STATE_POISONED;
 		break;
-	case COND_ATTACKED:
+	case COND_ATTACKED: // once per round
 		condition = actor->LastHitter;
 		break;
-	case COND_HIT:
-		condition = actor->LastDamage;
+	case COND_NEAR4: // closer than 4'
+		condition = PersonalDistance(actor, target)<4;
 		break;
-	case COND_ALWAYS:
+	case COND_NEAR10: // closer than 10'
+		condition = PersonalDistance(actor, target)<10;
+		break;
+	case COND_EVERYROUND:
 		condition = 1;
+		break;
+	case COND_TOOKDAMAGE:
+		condition = actor->LastDamage;
 		break;
 	default:
 		condition = 0;
