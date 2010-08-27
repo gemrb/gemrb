@@ -33,6 +33,10 @@
 #include "Video.h"
 #include "GUI/GameControl.h"
 
+#if defined(__HAIKU__)
+#include <unistd.h>
+#endif
+
 #include <cassert>
 #include <set>
 #include <time.h>

@@ -25,6 +25,10 @@
  * Jens Granseuer <jensgr@gmx.net>
  */
 
+#if defined(__HAIKU__)
+#include <unistd.h>
+#endif
+
 #include "mve_player.h"
 #include "MVEPlayer.h"
 #include "gstmvedemux.h"

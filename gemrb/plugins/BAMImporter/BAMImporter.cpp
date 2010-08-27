@@ -18,6 +18,10 @@
  *
  */
 
+#if defined(__HAIKU__)
+#include <unistd.h>
+#endif
+
 #include "BAMImporter.h"
 
 #include "win32def.h"

@@ -27,6 +27,10 @@
  * Copyright (c) 2009 Konstantin Shishkov
 */
 
+#if defined(__HAIKU__)
+#include <unistd.h>
+#endif
+
 #include "BIKPlayer.h"
 
 #include "rational.h"

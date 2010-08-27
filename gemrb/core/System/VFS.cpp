@@ -27,6 +27,10 @@
 
 #include "Interface.h"
 
+#if defined(__HAIKU__)
+#include <unistd.h>
+#endif
+
 #include <cstdarg>
 #include <cstring>
 

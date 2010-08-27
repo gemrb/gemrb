@@ -73,6 +73,10 @@
 #include "System/FileStream.h"
 #include "System/VFS.h"
 
+#if defined(__HAIKU__)
+#include <unistd.h>
+#endif
+
 #include <cstdlib>
 #include <time.h>
 #include <vector>
