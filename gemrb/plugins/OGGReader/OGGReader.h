@@ -25,6 +25,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#ifdef __APPLE_CC__
+#define OV_EXCLUDE_STATIC_CALLBACKS
+#endif
 #include <vorbis/vorbisfile.h>
 
 class OGGReader : public SoundMgr {
