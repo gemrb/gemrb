@@ -40,9 +40,6 @@ bool ACMReader::Open(DataStream* stream)
 		return false;
 	}
 
-	//str->Read( &hdr, sizeof( ACM_Header ) );
-	//maybe this'll work on a PPC
-
 	str->ReadDword( &hdr.signature );
 	str->ReadDword( &hdr.samples );
 	str->ReadWord( &hdr.channels );

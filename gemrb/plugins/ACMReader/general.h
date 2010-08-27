@@ -24,7 +24,6 @@
 // Interplay ACM signature
 #define IP_ACM_SIG 0x01032897
 
-#pragma pack (push, 1)
 struct ACM_Header {
 	unsigned int signature;
 	unsigned int samples;
@@ -33,6 +32,5 @@ struct ACM_Header {
 	unsigned short levels : 4;
 	unsigned short subblocks : 12;
 };
-#pragma pack (pop)
 
 #endif
