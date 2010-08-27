@@ -176,9 +176,11 @@ ELSE()
 ENDIF()
 
 FIND_LIBRARY(VORBIS_LIBRARY vorbisfile)
-IF(VORBIS_LIBRARY)
+find_path(VORBIS_FILE vorbisfile.h PATH_SUFFIXES vorbis)
+IF(VORBIS_LIBRARY AND VORBIS_FILE)
 	MESSAGE(STATUS "Looking for Ogg Vorbis support: found")
 ELSE()
+	unset(VORBIS_LIBRARY) # disable the build for this plugin
 	MESSAGE(WARNING "Looking for Ogg Vorbis support: not found!")
 	MESSAGE(WARNING "While no original game data is in OGG format, some mod data is and will need conversion.")
 ENDIF()
