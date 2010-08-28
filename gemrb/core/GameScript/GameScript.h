@@ -750,6 +750,7 @@ public: //Script Functions
 	static int HPPercentLT(Scriptable* Sender, Trigger* parameters);
 	static int InActiveArea(Scriptable* Sender, Trigger* parameter);
 	static int InCutSceneMode(Scriptable *Sender, Trigger* parameter);
+	static int InLine(Scriptable* Sender, Trigger* parameter);
 	static int InMyArea(Scriptable* Sender, Trigger* parameter);
 	static int InMyGroup(Scriptable* Sender, Trigger* parameter);
 	static int InParty(Scriptable* Sender, Trigger* parameters);

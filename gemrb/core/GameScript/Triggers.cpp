@@ -31,6 +31,7 @@
 #include "GameData.h"
 #include "Video.h"
 #include "GUI/GameControl.h"
+#include "math.h" //needs for acos
 
 //-------------------------------------------------------------
 // Trigger Functions
@@ -1421,6 +1422,41 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 	}
 	int distance = SquaredMapDistance(Sender, scr);
 	return DiffCore(distance, (parameters->int0Parameter+1)*(parameters->int0Parameter+1), parameters->int1Parameter);
+}
+
+int GameScript::InLine(Scriptable* Sender, Trigger* parameters)
+{
+	Map *map = Sender->GetCurrentArea();
+	if (!map) {
+		return 0;
+	}
+
+	Scriptable* scr1 = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr1) {
+		return 0;
+	}
+
+	//looking for a scriptable by scriptname only
+	Scriptable* scr2 = map->GetActor( parameters->string0Parameter, 0 );
+	if (!scr2) {
+		scr2 = GetActorObject(map->GetTileMap(), parameters->string0Parameter);
+	}  
+	if (!scr2) {
+		return 0;
+	}
+
+	double fdm1 = SquaredDistance(Sender, scr1);
+	double fdm2 = SquaredDistance(Sender, scr2);
+	double fd12 = SquaredDistance(scr1, scr2);
+	double dm1 = sqrt(fdm1);
+	double dm2 = sqrt(fdm2);
+
+	if (fdm1>fdm2 || fd12>fdm2) {
+		return 0;
+	}
+	double angle = acos(( fdm2 + fdm1 - fd12 ) / (2*dm1*dm2));
+	if (angle*180.0*M_PI<30.0) return 1;
+	return 0;
 }
 
 //PST

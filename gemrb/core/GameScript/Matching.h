@@ -28,6 +28,7 @@ Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags);
 Targets* GetAllActors(Scriptable* Sender, int ga_flags);
 Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0);
 Scriptable* GetStoredActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0);
+Scriptable *GetActorObject(TileMap *TMap, const char *name);
 
 Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters, int ga_flags);
 Targets *XthNearestOf(Targets *parameters, int count, int ga_flags);

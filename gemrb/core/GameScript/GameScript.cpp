@@ -185,6 +185,7 @@ static const TriggerLink triggernames[] = {
 	{"hppercentlt", GameScript::HPPercentLT, 0},
 	{"inactivearea", GameScript::InActiveArea, 0},
 	{"incutscenemode", GameScript::InCutSceneMode, 0},
+	{"inline", GameScript::InLine, 0},
 	{"inmyarea", GameScript::InMyArea, 0},
 	{"inmygroup", GameScript::InMyGroup, 0},
 	{"inparty", GameScript::InParty, 0},

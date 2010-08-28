@@ -167,6 +167,7 @@ GEM_EXPORT unsigned int Distance(const Point pos, Scriptable *b);
 GEM_EXPORT unsigned int SquaredMapDistance(const Point pos, Scriptable *b);
 GEM_EXPORT unsigned int PersonalDistance(const Point pos, Scriptable *b);
 GEM_EXPORT unsigned int Distance(Scriptable *a, Scriptable *b);
+GEM_EXPORT unsigned int SquaredDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int PersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT int EARelation(Scriptable *a, Actor *b);
