@@ -822,6 +822,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'v': //marks some of the map visited (random vision distance)
 				area->ExploreMapChunk( p, rand()%30, 1 );
 				break;
+			case 'w': // consolidates found ground piles under the pointed pc
+				area->MoveVisibleGroundPiles(p);
+				break;
 			case 'x': // shows coordinates on the map
 				printf( "%s [%d.%d]\n", area->GetScriptName(), p.x, p.y );
 				break;

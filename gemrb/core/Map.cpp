@@ -3071,6 +3071,26 @@ void Map::CopyGroundPiles(Map *othermap, const Point &Pos)
 	}
 }
 
+void Map::MoveVisibleGroundPiles(const Point &Pos)
+{
+	int containercount = (int) TMap->GetContainerCount();
+	while (containercount--) {
+		Container * c = TMap->GetContainer( containercount);
+		if (c->Type==IE_CONTAINER_PILE && IsVisible(c->Pos, true)) {
+			//creating the container at the given position
+			Container *othercontainer;
+			othercontainer = GetPile(Pos);
+
+			//transfer the pile to the other container
+			unsigned int i=c->inventory.GetSlotCount();
+			while (i--) {
+				CREItem *item = c->RemoveItem(i, 0);
+				othercontainer->AddItem(item);
+			}
+		}
+	}
+}
+
 Container *Map::GetPile(Point position)
 {
 	Point tmp[4];

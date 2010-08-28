@@ -283,6 +283,8 @@ public:
 	int ConsolidateContainers();
 	/* transfers all piles (loose items) to another map */
 	void CopyGroundPiles(Map *othermap, const Point &Pos);
+	/* transfers all ever visible piles (loose items) to the specified position */
+	void MoveVisibleGroundPiles(const Point &Pos);
 	/* draws stationary vvc graphics */
 	//void DrawVideocells(Region screen);
 	void DrawHighlightables(Region screen);
