@@ -5221,9 +5221,13 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	{
 	case 1:
 		resref = "mislead";
+		//set the gender to illusionary, so ids matching will work
+		copy->SetBase(IE_SEX, 7);
+		copy->SetBase(IE_MAXHITPOINTS, copy->GetBase(IE_MAXHITPOINTS)/2);
 		break;
 	case 2:
 		resref = "projimg";
+		copy->SetBase(IE_SEX, 7);
 		break;
 	case 3:
 		resref = "simulacr";
