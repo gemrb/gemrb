@@ -4025,6 +4025,7 @@ void GameScript::UnloadArea(Scriptable* /*Sender*/, Action* parameters)
 	}
 }
 
+static EffectRef fx_death_ref={"Death", NULL, -1};
 void GameScript::Kill(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -4032,7 +4033,9 @@ void GameScript::Kill(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* target = ( Actor* ) tar;
-	target->SetBase(IE_HITPOINTS,(ieDword) -100);
+	Effect *fx = EffectQueue::CreateEffect(fx_death_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	target->fxqueue.AddEffect(fx, false);
+	delete fx;
 }
 
 void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
