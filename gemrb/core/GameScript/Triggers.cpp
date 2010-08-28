@@ -867,11 +867,25 @@ int GameScript::NumItemsPartyLT(Scriptable* /*Sender*/, Trigger* parameters)
 int GameScript::NumItems(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if ( !tar || tar->Type!=ST_ACTOR) {
+	if (!tar) {
 		return 0;
 	}
-	Actor *actor = (Actor *) tar;
-	int cnt = actor->inventory.CountItems(parameters->string0Parameter,1);
+
+	Inventory *inv = NULL;
+	switch (tar->Type) {
+		case ST_ACTOR:
+			inv = &(((Actor *) tar)->inventory);
+			break;
+		case ST_CONTAINER:
+			inv = &(((Container *) tar)->inventory);
+			break;
+		default:;
+	}
+	if (!inv) {
+		return 0;
+	}
+
+	int cnt = inv->CountItems(parameters->string0Parameter,1);
 	return cnt==parameters->int0Parameter;
 }
 
@@ -900,11 +914,25 @@ int GameScript::TotalItemCntExclude(Scriptable* Sender, Trigger* parameters)
 int GameScript::NumItemsGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if ( !tar || tar->Type!=ST_ACTOR) {
+	if (!tar) {
 		return 0;
 	}
-	Actor *actor = (Actor *) tar;
-	int cnt = actor->inventory.CountItems(parameters->string0Parameter,1);
+
+	Inventory *inv = NULL;
+	switch (tar->Type) {
+		case ST_ACTOR:
+			inv = &(((Actor *) tar)->inventory);
+			break;
+		case ST_CONTAINER:
+			inv = &(((Container *) tar)->inventory);
+			break;
+		default:;
+	}
+	if (!inv) {
+		return 0;
+	}
+
+	int cnt = inv->CountItems(parameters->string0Parameter,1);
 	return cnt>parameters->int0Parameter;
 }
 
@@ -933,11 +961,25 @@ int GameScript::TotalItemCntExcludeGT(Scriptable* Sender, Trigger* parameters)
 int GameScript::NumItemsLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if ( !tar || tar->Type!=ST_ACTOR) {
+	if (!tar) {
 		return 0;
 	}
-	Actor *actor = (Actor *) tar;
-	int cnt = actor->inventory.CountItems(parameters->string0Parameter,1);
+
+	Inventory *inv = NULL;
+	switch (tar->Type) {
+		case ST_ACTOR:
+			inv = &(((Actor *) tar)->inventory);
+			break;
+		case ST_CONTAINER:
+			inv = &(((Container *) tar)->inventory);
+			break;
+		default:;
+	}
+	if (!inv) {
+		return 0;
+	}
+
+	int cnt = inv->CountItems(parameters->string0Parameter,1);
 	return cnt<parameters->int0Parameter;
 }
 
