@@ -1207,7 +1207,6 @@ int fx_damage (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_death (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_death (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_SET(IE_MINHITPOINTS,0); //the die opcode seems to override minhp
 	ieDword damagetype = 0;
 	switch (fx->Parameter2) {
 	case 1:

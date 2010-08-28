@@ -3105,12 +3105,6 @@ void Actor::Die(Scriptable *killer)
 		return; //can die only once
 	}
 
-	int minhp = (signed) Modified[IE_MINHITPOINTS];
-	if (minhp > 0) { //can't die
-		SetBase(IE_HITPOINTS, minhp);
-		return;
-	}
-
 	//Can't simply set Selected to false, game has its own little list
 	Game *game = core->GetGame();
 	game->SelectActor(this, false, SELECT_NORMAL);
