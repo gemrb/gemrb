@@ -696,7 +696,7 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 
 		// caster - Casts spellname : target OR
 		// caster - spellname : target (repeating spells)
-		Scriptable *target;
+		Scriptable *target = NULL;
 		char tmp[100];
 		const char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
 		if (LastTarget) {
