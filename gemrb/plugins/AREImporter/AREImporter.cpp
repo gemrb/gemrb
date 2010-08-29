@@ -1852,12 +1852,14 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 
 	CreatureOffset = EmbeddedCreOffset;
 	for (i=0;i<ActorCount;i++) {
+		assert(stream->GetPos() == CreatureOffset);
 		Actor *ac = map->GetActor(i, false);
 
 		//reconstructing offsets again
-		am->GetStoredFileSize(ac);
+		CreatureOffset += am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
 	}
+	assert(stream->GetPos() == CreatureOffset);
 
 	return 0;
 }

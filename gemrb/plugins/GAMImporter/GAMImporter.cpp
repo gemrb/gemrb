@@ -1040,6 +1040,7 @@ int GAMImporter::PutPCs(DataStream *stream, Game *game)
 		CREOffset += am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
 	}
+	assert(stream->GetPos() == CREOffset);
 	return 0;
 }
 
@@ -1050,17 +1051,23 @@ int GAMImporter::PutNPCs(DataStream *stream, Game *game)
 	ieDword CREOffset = NPCOffset + NPCCount * PCSize;
 
 	for(i=0;i<NPCCount;i++) {
+		assert(stream->GetPos() == NPCOffset + i * PCSize);
 		Actor *ac = game->GetNPC(i);
 		ieDword CRESize = am->GetStoredFileSize(ac);
 		PutActor(stream, ac, CRESize, CREOffset, game->version);
 		CREOffset += CRESize;
 	}
+	assert(stream->GetPos() == NPCOffset + NPCCount * PCSize);
+
+	CREOffset = NPCOffset + NPCCount * PCSize; // just for the asserts..
 	for(i=0;i<NPCCount;i++) {
+		assert(stream->GetPos() == CREOffset);
 		Actor *ac = game->GetNPC(i);
 		//reconstructing offsets again
-		am->GetStoredFileSize(ac);
+		CREOffset += am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
 	}
+	assert(stream->GetPos() == CREOffset);
 	return 0;
 }
 
