@@ -643,6 +643,13 @@ void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 		}
 		GetCurrentArea()->AddProjectile(pro, origin, LastTargetPos);
 	}
+
+	// caster - Casts spellname
+	char tmp[100];
+	const char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
+	snprintf(tmp, sizeof(tmp), "%s %s", msg, core->GetString(spl->SpellName));
+	displaymsg->DisplayStringName(tmp, 0xffffff, this);
+
 	LastTarget = 0;
 	LastTargetPos.empty();
 }
@@ -684,8 +691,21 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 	ieDword spellnum=ResolveSpellNumber( SpellResRef );
 	if (spellnum!=0xffffffff) {
 		area->SeeSpellCast(this, spellnum);
+
+		// caster - Casts spellname : target OR
+		// caster - spellname : target (repeating spells)
+		Scriptable *target;
+		char tmp[100];
+		const char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
+		if (LastTarget) {
+			target = area->GetActorByGlobalID(LastTarget);
+			snprintf(tmp, sizeof(tmp), "%s %s : %s", msg, core->GetString(spl->SpellName), target->GetName(-1));
+		} else {
+			snprintf(tmp, sizeof(tmp), "%s : %s", core->GetString(spl->SpellName), GetName(-1));
+		}
+		displaymsg->DisplayStringName(tmp, 0xffffff, this);
+
 		if(LastTarget) {
-			Scriptable *target = area->GetActorByGlobalID(LastTarget);
 			if (target && (Type==ST_ACTOR) ) {
 				Actor *me = (Actor *) this;
 				target->LastSpellOnMe = spellnum;
