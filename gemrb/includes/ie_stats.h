@@ -43,6 +43,7 @@
 #define EA_NOTGOOD 		31
 #define EA_ANYTHING		126
 #define EA_NEUTRAL 		128
+#define EA_NOTNEUTRAL  	198
 #define EA_NOTEVIL 		199
 #define EA_EVILCUTOFF  		200
 #define EA_EVILBUTGREEN		201

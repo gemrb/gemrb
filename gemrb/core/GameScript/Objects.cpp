@@ -1016,6 +1016,9 @@ int GameScript::ID_Allegiance(Actor *actor, int parameter)
 			//notgood
 			return value >= EA_NOTGOOD;
 
+		case EA_NOTNEUTRAL:
+			return value >=EA_EVILCUTOFF || value <= EA_GOODCUTOFF;
+
 		case EA_NOTEVIL:
 			//notevil
 			return value <= EA_NOTEVIL;
