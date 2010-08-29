@@ -2895,6 +2895,8 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 		return -1;
 	}
 
+	CREOffset = stream->GetPos(); // for asserts
+
 	IsCharacter = chr;
 	if (chr) {
 		WriteChrHeader( stream, actor );
@@ -3001,19 +3003,24 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 			stream->WriteDword(&tmpDword);
 		}
 	} else {
+		assert(stream->GetPos() == CREOffset+KnownSpellsOffset);
 		ret = PutKnownSpells( stream, actor);
 		if (ret) {
 			return ret;
 		}
+		assert(stream->GetPos() == CREOffset+SpellMemorizationOffset);
 		ret = PutSpellPages( stream, actor);
 		if (ret) {
 			return ret;
 		}
+		assert(stream->GetPos() == CREOffset+MemorizedSpellsOffset);
 		ret = PutMemorizedSpells( stream, actor);
 		if (ret) {
 			return ret;
 		}
 	}
+
+	assert(stream->GetPos() == CREOffset+EffectsOffset);
 	ret = PutEffects(stream, actor);
 	if (ret) {
 		return ret;
@@ -3025,6 +3032,7 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 	}
 
 	//items and inventory slots
+	assert(stream->GetPos() == CREOffset+ItemsOffset);
 	ret = PutInventory( stream, actor, Inventory_Size);
 	if (ret) {
 		return ret;
