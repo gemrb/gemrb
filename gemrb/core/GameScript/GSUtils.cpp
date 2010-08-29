@@ -2220,6 +2220,9 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 	int *selects;
 	int i,j;
 
+	//FIXME: find out what the original really used the picks parameter for
+	if (picks == 1) picks = 5;
+
 	AutoTable tm("wish");
 	if (!tm) {
 		printStatus( "ERROR", LIGHT_RED );
