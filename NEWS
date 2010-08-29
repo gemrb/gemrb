@@ -1,3 +1,12 @@
+GemRB V0.6.2 git (2010-08-29)
+  New features:
+    - InLine trigger
+    - Importing a SoA game into ToB
+
+  Improved features:
+    - handling of minimum hp
+    - sparkles
+
 GemRB V0.6.2 (2010-08-21):
   New features:
     - a basic SDL_mixer plugin for faster, but lower-quality audio
