@@ -139,8 +139,6 @@ int GameScript::Class(Scriptable* Sender, Trigger* parameters)
 	return ID_Class( actor, parameters->int0Parameter);
 }
 
-//should not handle >200, but should check on multi-class
-//this is most likely ClassMask
 int GameScript::ClassEx(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
@@ -148,7 +146,7 @@ int GameScript::ClassEx(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = (Actor*)scr;
-	return ID_ClassMask( actor, parameters->int0Parameter);
+	return ID_AVClass( actor, parameters->int0Parameter);
 }
 
 int GameScript::Faction(Scriptable* Sender, Trigger* parameters)
