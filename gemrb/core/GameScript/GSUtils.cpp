@@ -2263,7 +2263,7 @@ retry:
 	for (i = 0; i < picks; i++) {
 		if (selects[i]<0)
 			continue;
-		int spnum = atoi( tm->QueryField( selects[i]-1, column-1 ) );
+		int spnum = atoi( tm->QueryField( selects[i], column-1 ) );
 		snprintf(varname,32,"wishpower%02d", spnum);
 		SetVariable(Sender, varname, "GLOBAL",1);
 	}
