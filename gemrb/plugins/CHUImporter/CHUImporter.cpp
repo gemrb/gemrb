@@ -160,7 +160,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				btn->SetFlags( Cycle&0xff00, BM_OR );
 				if (strnicmp( BAMFile, "guictrl\0", 8 ) == 0) {
 					if (UnpressedIndex == 0) {
-						printMessage("CHUImporter", "Special Button Control, Skipping Image Loading\n",GREEN );
+						//printMessage("CHUImporter", "Special Button Control, Skipping Image Loading\n",GREEN );
 						win->AddControl( btn );
 						break;
 					}
