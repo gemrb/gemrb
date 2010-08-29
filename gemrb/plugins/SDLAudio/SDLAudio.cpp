@@ -79,10 +79,17 @@ bool SDLAudio::Init(void)
 void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 	SDLAudio *driver = (SDLAudio *)udata;
 	SDL_mutexP(driver->OurMutex);
-	// TODO: conversion? mutexes? sanity checks? :)
-	int num_samples = len / 2;
-	int cnt = driver->MusicReader->read_samples(( short* ) stream, num_samples);
-	if (cnt != num_samples) {
+
+	do {
+
+		// TODO: conversion? mutexes? sanity checks? :)
+		int num_samples = len / 2;
+		int cnt = driver->MusicReader->read_samples(( short* ) stream, num_samples);
+
+		// Done?
+		if (cnt == num_samples)
+			break;
+
 		// TODO: this shouldn't be in the callback (see also the openal thread)
 		printMessage("SDLAudio", "Playing Next Music\n", WHITE );
 		core->GetMusicMgr()->PlayNext();
@@ -90,15 +97,15 @@ void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 		stream = stream + (cnt * 2);
 		len = len - (cnt * 2);
 
-		if (!driver->MusicReader) {
+		if (!driver->MusicPlaying) {
 			printMessage( "SDLAudio", "No Other Music to play\n", WHITE );
 			memset(stream, 0, len);
 			Mix_HookMusic(NULL, NULL);
-			return;
+			break;
 		}
 
-		music_callback(udata, stream, len);
-	}
+	} while(true);
+
 	SDL_mutexV(driver->OurMutex);
 }
 
