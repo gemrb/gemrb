@@ -138,12 +138,12 @@ Game::~Game(void)
 
 	i=savedpositions.size();
 	while(i--) {
-		delete savedpositions[i];
+		free (savedpositions[i]);
 	}
 
 	i=planepositions.size();
 	while(i--) {
-		delete planepositions[i];
+		free (planepositions[i]);
 	}
 }
 
