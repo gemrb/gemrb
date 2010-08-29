@@ -311,7 +311,7 @@ def UpdateActionsWindow ():
 	if Selected > 1:
 		GroupControls ()
 		return
-	#this is based on class
+
 	#we are sure there is only one actor selected
 	pc = 0
 	for i in range (PARTY_SIZE):
@@ -322,6 +322,7 @@ def UpdateActionsWindow ():
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == 0:
+		#this is based on class
 		ActionsWindow.SetupControls (globals(), pc)
 	elif level == 1:
 		ActionsWindow.SetupEquipmentIcons(globals(), pc, TopIndex)

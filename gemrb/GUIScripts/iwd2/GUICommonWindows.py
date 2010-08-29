@@ -43,6 +43,8 @@ OptionsWindow = None
 DraggedPortrait = None
 
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
+	"""Sets up all of the basic control windows."""
+
 	global OptionsWindow
 
 	OptionsWindow = Window
@@ -68,6 +70,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("SelectedWindow", 2)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIJRNL.OpenJournalWindow)
+
 	# Map
 	Button = Window.GetControl (7)
 	Button.SetTooltip (16310)
@@ -112,8 +115,20 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	return
 
 def AIPress ():
-	print "AIPress"
-	return
+        """Toggles the party AI."""
+
+        Button = PortraitWindow.GetControl (6)
+        AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
+
+        if AI:
+                GemRB.GameSetScreenFlags (GS_PARTYAI, OP_NAND)
+                Button.SetTooltip (15918)
+                GemRB.SetVar ("AI", 0)
+        else:
+                GemRB.GameSetScreenFlags (GS_PARTYAI, OP_OR)
+                Button.SetTooltip (15917)
+                GemRB.SetVar ("AI", GS_PARTYAI)
+        return
 
 def EmptyControls ():
 	global PortraitWindow
@@ -186,27 +201,25 @@ def UpdateActionsWindow ():
 	if PortraitWindow == None:
 		return
 
-	pc = 0
 	#do this only when there is no 'otherwindow'
 	if GemRB.GetVar ("OtherWindow") != -1:
 		return
 
 	Selected = GemRB.GetSelectedSize()
-
-	for i in range (PARTY_SIZE):
-		if GemRB.GameIsPCSelected (i+1):
-			if pc == 0:
-				pc = i+1
-			else:
-				pc = -1
-				break
-
 	if Selected == 0:
 		EmptyControls ()
 		return
 	if Selected > 1:
 		GroupControls ()
 		return
+
+	#we are sure there is only one actor selected
+	pc = 0
+	for i in range (PARTY_SIZE):
+		if GemRB.GameIsPCSelected (i+1):
+			pc = i+1
+			break
+
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == 0:
@@ -465,6 +478,7 @@ def OpenPortraitWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, PortraitButtonOnShiftPress)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, GUIINV.OnDropItemToPC)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT, OnDropPortraitToPC)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, PortraitButtonOnDrag)
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, PortraitButtonOnMouseEnter)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, PortraitButtonOnMouseLeave)
@@ -613,6 +627,9 @@ def PortraitButtonOnMouseEnter ():
 
 	i = GemRB.GetVar ("PressedPortrait")
 
+	if not i:
+		return
+
 	GemRB.GameControlSetLastActor( i )
 	if GemRB.IsDraggingItem()==2:
 		if DraggedPortrait != None:
@@ -625,7 +642,7 @@ def PortraitButtonOnMouseEnter ():
 		return
 
 	if GemRB.IsDraggingItem ():
-		Button = PortraitWindow.GetControl (i)
+		Button = PortraitWindow.GetControl (i-1)
 		Button.EnableBorder (FRAME_PC_TARGET, 1)
 	return
 
@@ -653,7 +670,7 @@ def PortraitButtonOnMouseLeave ():
 	if not i:
 		return
 
-	Button = PortraitWindow.GetControl (i)
+	Button = PortraitWindow.GetControl (i-1)
 	Button.EnableBorder (FRAME_PC_TARGET, 0)
 	GemRB.SetVar ("PressedPortrait", 0)
 	GemRB.SetTimedEvent (CheckDragging, 1)
