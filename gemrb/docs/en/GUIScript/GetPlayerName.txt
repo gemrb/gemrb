@@ -9,6 +9,7 @@ LongOrShort - which name to query
 -1 : default name
  0 : shortname
  1 : longname
+ 2 : scripting name
 
 Return value: string, it returns ??? if the PC doesn't exist.
 

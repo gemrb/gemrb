@@ -4376,7 +4376,7 @@ static PyObject* GemRB_GetPlayerStates(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GetPlayerName__doc,
 "GetPlayerName(PartyID[, LongOrShort]) => string\n\n"
-"Queries the player name." );
+"Queries the player character's [script]name." );
 
 static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 {
@@ -4394,6 +4394,10 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 	if (!MyActor) {
 		return RuntimeError( "Actor not found" );
 	}
+	if (Which == 2) {
+		return PyString_FromString( MyActor->GetScriptName() );
+	}
+
 	return PyString_FromString( MyActor->GetName(Which) );
 }
 
