@@ -1053,7 +1053,7 @@ static const IDSLink idsnames[] = {
 	{"align", GameScript::ID_Alignment},
 	{"alignmen", GameScript::ID_Alignment},
 	{"alignmnt", GameScript::ID_Alignment},
-	{"avclass", GameScript::ID_Class},
+	{"avclass", GameScript::ID_AVClass},
 	{"class", GameScript::ID_Class},
 	{"classmsk", GameScript::ID_ClassMask},
 	{"ea", GameScript::ID_Allegiance},

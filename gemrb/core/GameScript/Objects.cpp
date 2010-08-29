@@ -1098,6 +1098,13 @@ int GameScript::ID_ClassMask(Actor *actor, int parameter)
 	return 0;
 }
 
+int GameScript::ID_AVClass(Actor *actor, int parameter)
+{
+	//TODO: if parameter >=202, it is of *_ALL type
+	int value = actor->GetStat(IE_CLASS);
+	return parameter==value;
+}
+
 int GameScript::ID_Race(Actor *actor, int parameter)
 {
 	int value = actor->GetStat(IE_RACE);
