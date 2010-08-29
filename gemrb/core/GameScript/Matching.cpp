@@ -99,6 +99,7 @@ inline static bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, i
 	dist = SquaredMapDistance(Sender, target);
 
 	// TODO: what do we check for non-actors?
+	// non-actors have a visual range (15), we should do visual range and LOS
 
 	if (Sender->Type == ST_ACTOR) {
 		Actor *source = (Actor *)Sender;
@@ -115,6 +116,10 @@ inline static bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, i
 				// check for improved invisibility? probably not
 				//if ((state & STATE_INVIS2) != 0) return false;
 			}
+
+			// maybe this should be setting an invis flag?
+			// TODO: should SEEINVISIBLE ignore this? Detect()?
+			if (target->Modified[IE_AVATARREMOVAL]) return false;
 		}
 
 		// visual range check
