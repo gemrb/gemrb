@@ -31,6 +31,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Projectile.h" //needs for clearair
+#include "Spell.h" //needed for fx_cast_spell feedback
 #include "TileMap.h" //needs for knock!
 #include "damages.h"
 #include "GameScript/GSUtils.h" //needs for MoveBetweenAreasCore
@@ -3764,6 +3765,14 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter2) {
 		//apply spell on target
 		core->ApplySpell(fx->Resource, target, Owner, fx->Power);
+
+		// give feedback: Caster - spellname : target
+		char tmp[100];
+		Spell *spl = gamedata->GetSpell(fx->Resource);
+		if (spl) {
+			snprintf(tmp, sizeof(tmp), "%s : %s", core->GetString(spl->SpellName), target->GetName(-1));
+			displaymsg->DisplayStringName(tmp, 0xffffff, Owner);
+		}
 	} else {
 		//cast spell on target
 		Owner->CastSpell(fx->Resource, target, false);
