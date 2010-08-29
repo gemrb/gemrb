@@ -27,7 +27,8 @@ PC            = 2
 FAMILIAR      = 3
 ALLY          = 4
 CONTROLLED    = 5
-CHARMED       = 6
+#charmed is 7 inside the engine???
+CHARMED       = 7
 GOODBUTRED    = 28
 GOODBUTBLUE   = 29
 GOODCUTOFF    = 30
@@ -38,6 +39,7 @@ NOTEVIL       = 199
 EVILCUTOFF    = 200
 EVILBUTGREEN  = 201
 EVILBUTBLUE   = 202
+CHARMEDPC     = 254
 ENEMY         = 255
 
 # state bits (IE_STATE)
@@ -282,17 +284,28 @@ IE_TITLE1			= 172
 IE_TITLE2			= 173
 IE_DISABLEOVERLAY		= 174
 IE_DISABLEBACKSTAB		= 175
+#176-182 overwritten by us
 IE_XP_MAGE	 		= 176 # In PST this stores secondary level exp
 IE_XP_THIEF	 		= 177 # In PST this stores tertiary level exp
 IE_DIALOGRANGE                  = 178 # distance for dialogue
-IE_MOVEMENTRATE     = 179
-#180-198 unused
+IE_MOVEMENTRATE                 = 179
+IE_MORALE                       = 180
+IE_BOUNCE                       = 181
+IE_MIRRORIMAGES                 = 182
+#these are original
+IE_ENABLEOFFSCREENAI            = 183
+IE_EXISTANCEDELAY               = 184
+IE_ATTACKNUMBERDOUBLE           = 185
+IE_DISABLECHUNKING              = 186
+IE_NOTURNABLE                   = 187
+#188 was summondisable2 in original
 IE_STONESKINSGOLEM		= 199
 IE_LEVELDRAIN			= 200
 IE_AVATARREMOVAL                = 201
-
-IE_DISABLEDBUTTON		= 204
+#202 is unused
 # GemRB Specific Defines
+IE_IMMUNITY                     = 203
+IE_DISABLEDBUTTON		= 204
 IE_ANIMATION_ID			= 205
 IE_STATE_ID			= 206
 IE_EXTSTATE_ID                  = 207
@@ -325,7 +338,10 @@ IE_CLASS			= 232
 IE_GENERAL			= 233
 IE_EA				= 234
 IE_SPECIFIC			= 235
-#
+IE_SAVEDXPOS                    = 236
+IE_SAVEDYPOS                    = 237
+IE_SAVEDFACE                    = 238
+#239 user defined stat
 IE_LEVELBARBARIAN               = 240
 IE_LEVELBARD                    = 241
 IE_LEVELCLERIC                  = 242
@@ -334,9 +350,9 @@ IE_LEVELMONK                    = 244
 IE_LEVELPALADIN                 = 245
 IE_LEVELRANGER                  = 246
 IE_LEVELSORCEROR                = 247
-#place for more classes
-IE_SAVEDXPOS                    = 253
-IE_SAVEDYPOS                    = 254
-IE_SAVEDFACE                    = 255
+#248 IE_LEVELCLASS12
+#249 IE_LEVELCLASS13
+#the remaining six stats are spell states
+IE_SPLSTATE_ID1                 = 250
 
 # End of file ie_stats.py
