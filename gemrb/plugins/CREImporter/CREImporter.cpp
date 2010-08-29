@@ -1135,6 +1135,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		}
 		for (j = 0; j < MemorizedCount; j++) {
 			k = MemorizedIndex+j;
+			assert(k < MemorizedSpellsCount);
 			if (memorized_spells[k]) {
 				sm->memorized_spells.push_back( memorized_spells[k]);
 				memorized_spells[k] = NULL;
