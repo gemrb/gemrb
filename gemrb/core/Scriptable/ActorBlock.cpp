@@ -650,6 +650,8 @@ void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 	snprintf(tmp, sizeof(tmp), "%s %s", msg, core->GetString(spl->SpellName));
 	displaymsg->DisplayStringName(tmp, 0xffffff, this);
 
+	core->Autopause(AP_SPELLCAST);
+
 	LastTarget = 0;
 	LastTargetPos.empty();
 }
@@ -732,6 +734,8 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 			}
 		}
 	}
+
+	core->Autopause(AP_SPELLCAST);
 
 	gamedata->FreeSpell(spl, SpellResRef, false);
 	LastTarget = 0;
