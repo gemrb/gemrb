@@ -3245,10 +3245,9 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Actor *actor = (Actor *) Sender;
 	Game *game = core->GetGame();
 	strncpy(game->LoadMos, parameters->string1Parameter,8);
-	Point p = GetEntryPoint(actor->Area, parameters->string1Parameter);
+	Point p = GetEntryPoint(parameters->string0Parameter, parameters->string1Parameter);
 	if (p.isempty()) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -3275,10 +3274,9 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Actor *actor = (Actor *) Sender;
 	Game *game = core->GetGame();
 	strncpy(game->LoadMos, parameters->string1Parameter,8);
-	Point p = GetEntryPoint(actor->Area, parameters->string1Parameter);
+	Point p = GetEntryPoint(parameters->string0Parameter, parameters->string1Parameter);
 	if (p.isempty()) {
 		Sender->ReleaseCurrentAction();
 		return;
