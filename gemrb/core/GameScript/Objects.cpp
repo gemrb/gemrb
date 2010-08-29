@@ -1009,27 +1009,22 @@ int GameScript::ID_Allegiance(Actor *actor, int parameter)
 	int value = actor->GetStat( IE_EA );
 	switch (parameter) {
 		case EA_GOODCUTOFF:
-			//goodcutoff
 			return value <= EA_GOODCUTOFF;
 
 		case EA_NOTGOOD:
-			//notgood
 			return value >= EA_NOTGOOD;
 
 		case EA_NOTNEUTRAL:
 			return value >=EA_EVILCUTOFF || value <= EA_GOODCUTOFF;
 
 		case EA_NOTEVIL:
-			//notevil
 			return value <= EA_NOTEVIL;
 
 		case EA_EVILCUTOFF:
-			//evilcutoff
 			return value >= EA_EVILCUTOFF;
 
 		case 0:
-		case 126:
-			//anything
+		case EA_ANYTHING:
 			return true;
 
 	}
