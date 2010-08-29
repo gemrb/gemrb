@@ -2798,22 +2798,12 @@ static PyObject* GemRB_GameSetProtagonistMode(PyObject * /*self*/, PyObject* arg
 }
 
 PyDoc_STRVAR( GemRB_GameSetExpansion__doc,
-"GameSetExpansion(expmode)\n\n"
-"Sets the expansion mode, 0-no expansion, 1-expansion." );
+"GameSetExpansion()\n\n"
+"Sets the expansion mode." );
 
-static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* /*args*/)
 {
-	int Flags;
-
-	if (!PyArg_ParseTuple( args, "i", &Flags )) {
-		return AttributeError( GemRB_GameSetExpansion__doc );
-	}
-
-	Game *game = core->GetGame();
-	if (game) {
-		game->SetExpansion( Flags );
-	}
-
+	core->SetEventFlag(EF_MASTERSCRIPT);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -7649,7 +7639,7 @@ PyDoc_STRVAR( GemRB_LeaveParty__doc,
 
 static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 {
-	int PlayerSlot, initDialog;
+	int PlayerSlot, initDialog = 0;
 
 	if (!PyArg_ParseTuple( args, "i|i", &PlayerSlot, &initDialog )) {
 		return AttributeError( GemRB_LeaveParty__doc );
@@ -9295,7 +9285,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GamePause, METH_VARARGS),
 	METHOD(GameSelectPC, METH_VARARGS),
 	METHOD(GameSelectPCSingle, METH_VARARGS),
-	METHOD(GameSetExpansion, METH_VARARGS),
+	METHOD(GameSetExpansion, METH_NOARGS),
 	METHOD(GameSetFormation, METH_VARARGS),
 	METHOD(GameSetPartyGold, METH_VARARGS),
 	METHOD(GameSetPartySize, METH_VARARGS),

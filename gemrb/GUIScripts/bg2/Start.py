@@ -42,9 +42,10 @@ def OnLoad():
 	elif screen_width == 1024:
 		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
 
+	GemRB.SetMasterScript("BALDUR","WORLDMAP")
 	#if not detected tob, we go right to the main menu
 	if not GUICommon.HasTOB():
-		GemRB.SetMasterScript("BALDUR","WORLDMAP")
+		#GemRB.SetMasterScript("BALDUR","WORLDMAP")
 		GemRB.SetVar("oldgame",1)
 		GemRB.SetNextScript("Start2")
 		return
@@ -77,13 +78,13 @@ def OnLoad():
 def SoAPress():
 	if StartWindow:
 		StartWindow.Unload()
-	GemRB.SetMasterScript("BALDUR","WORLDMAP")
+	#GemRB.SetMasterScript("BALDUR","WORLDMAP")
 	GemRB.SetVar("oldgame",1)
 	GemRB.SetNextScript("Start2")
 	return
 
 def ToBPress():
-	GemRB.SetMasterScript("BALDUR25","WORLDM25")
+	#GemRB.SetMasterScript("BALDUR25","WORLDM25")
 	GemRB.SetVar("oldgame",0)
 	if StartWindow:
 		StartWindow.Unload()

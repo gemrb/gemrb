@@ -560,6 +560,7 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_MASTERSCRIPT) {
 		EventFlag&=~EF_MASTERSCRIPT;
+    game->SetExpansion();
 		guiscript->RunFunction( "MessageWindow", "UpdateMasterScript" );
 		return;
 	}
@@ -576,7 +577,10 @@ thus cannot be called from DrawWindows directly
 */
 void Interface::HandleFlags()
 {
-	EventFlag = EF_CONTROL; //clear events because the context changed
+  //clear events because the context changed, except the masterscript flag
+  //which was set before loading the game
+  EventFlag &= EF_MASTERSCRIPT;
+	EventFlag |= EF_CONTROL; 
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
 		// when reaching this, quitflag should be 1 or 2
@@ -1012,7 +1016,8 @@ void Interface::Main()
 		while (QuitFlag) {
 			HandleFlags();
 		}
-		if (EventFlag) {
+		//eventflags are processed only when there is a game
+		if (EventFlag && game) {
 			HandleEvents();
 		}
 		HandleGUIBehaviour();

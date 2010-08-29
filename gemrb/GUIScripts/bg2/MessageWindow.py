@@ -26,6 +26,9 @@ import GUICommon
 import GUICommonWindows
 import CommonWindow
 import GUIClasses
+import CommonTables
+from GUIDefines import *
+from CharGenEnd import GiveEquipment
 
 MessageWindow = 0
 PortraitWindow = 0
@@ -153,7 +156,66 @@ def UpdateControlStatus():
 
 	if hideflag:
 		GemRB.UnhideGUI()
+	return
+
+def RemoveYoshimo( idx):
+	GemRB.DisplayString(72046, 0xF5F596)
+	#WARNING:multiple strings are executed in reverse order
+	GemRB.ExecuteString('ApplySpellRES("destself",myself)', idx)
+	GemRB.ExecuteString('GivePartyAllEquipment()', idx)
+	return
+
+def RemoveImoen( idx):
+	GemRB.DisplayString(72047, 0xF5F596)
+	GemRB.ExecuteString('ApplySpellRES("destself",myself)', idx)
+	GemRB.ExecuteString('GivePartyAllEquipment()', idx)
+	return
+
+def FixEdwin( idx):
+	GemRB.ApplySpell(idx, "SPIN661")
+	return
+
+def FixAnomen( idx):
+	#lawful neutral
+	if (GemRB.GetPlayerStat(idx, IE_ALIGNMENT) == 0x12):
+		GemRB.ApplySpell(idx, "SPIN678")
+	return
+
+#do all the stuff not done yet
+def FixProtagonist( idx):
+	
+	Class = GemRB.GetPlayerStat (idx, IE_CLASS)
+	ClassIndex = CommonTables.Classes.FindValue (5, Class)
+	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
+	KitIndex = GUICommon.GetKitIndex (idx)
+	GiveEquipment(idx, ClassName, KitIndex)
+	return
 
 def UpdateMasterScript():
 	GemRB.SetMasterScript("BALDUR25","WORLDM25")
+	GemRB.SetGlobal("INTOB","GLOBAL",1)
+	GemRB.SetGlobal("HADELLESIMEDREAM1","GLOBAL", 1)
+	GemRB.SetGlobal("HADELLESIMEDREAM2","GLOBAL", 1)
+	GemRB.SetGlobal("HADIMOENDREAM1","GLOBAL", 1)
+	GemRB.SetGlobal("HADSLAYERDREAM","GLOBAL", 1)
+	GemRB.SetGlobal("HADJONDREAM1","GLOBAL", 1)
+	GemRB.SetGlobal("HADJONDREAM2","GLOBAL", 1)
+	idx = GemRB.GetPartySize()
+	
+	print "PartySize:", idx
+	while idx:
+		name = GemRB.GetPlayerName(idx, 2) #scripting name
+		print "Upgrading: ", name
+		if name == "yoshimo":
+			RemoveYoshimo(idx)
+		elif name == "imoen":
+			RemoveImoen(idx)
+		elif name == "edwin":
+			FixEdwin(idx)
+		elif name == "anomen":
+			FixAnomen(idx)
+		elif name == "none":
+			FixProtagonist(idx)
+			GemRB.GameSelectPC (idx, True, SELECT_REPLACE)
+		idx=idx-1
 	return

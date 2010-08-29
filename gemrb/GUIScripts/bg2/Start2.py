@@ -8,12 +8,12 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 #
 #this is essentially Start.py from the SoA game, except for a very small change
@@ -28,10 +28,11 @@ SinglePlayerButton = 0
 OptionsButton = 0
 MultiPlayerButton = 0
 MoviesButton = 0
+BackButton = 0
 
 def OnLoad():
 	global StartWindow, TutorialWindow, QuitWindow
-	global ExitButton, OptionsButton, MultiPlayerButton, MoviesButton, SinglePlayerButton
+	global ExitButton, OptionsButton, MultiPlayerButton, MoviesButton, SinglePlayerButton, BackButton
 	global SinglePlayerButton
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
@@ -118,16 +119,27 @@ def OnLoad():
 
 def SinglePlayerPress():
 
-	OptionsButton.SetText ("")
 	SinglePlayerButton.SetText (13728)
-	ExitButton.SetText (15416)
-	MultiPlayerButton.SetText (13729)
-	MoviesButton.SetText (33093)
-	MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadSingle)
 	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NewSingle)
-	MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Tutorial)
+	
+	MultiPlayerButton.SetText (13729)
+	MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadSingle)
+	
+	if GemRB.GetVar("oldgame")==1:
+		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Tutorial)
+		MoviesButton.SetText (33093)
+	else:
+		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ImportGame)
+		MoviesButton.SetText (71175)
+
+	ExitButton.SetText (15416)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackToMain)
+	
+	OptionsButton.SetText ("")
 	OptionsButton.SetState (IE_GUI_BUTTON_DISABLED)
+	
+	BackButton.SetText ("")
+	BackButton.SetState (IE_GUI_BUTTON_DISABLED)
 	return
 
 def MultiPlayerPress():
@@ -172,11 +184,11 @@ def LoadSingle():
 	if TutorialWindow:
 		TutorialWindow.Unload()
 	if GemRB.GetVar ("oldgame") == 0:
-		GemRB.GameSetExpansion(1)
+		#GemRB.GameSetExpansion(1)
 		GemRB.SetVar ("PlayMode", 2)
 		GemRB.SetVar ("SaveDir", 1)
 	else:
-		GemRB.GameSetExpansion(0)
+		#GemRB.GameSetExpansion(0)
 		GemRB.SetVar ("PlayMode", 0)
 		GemRB.SetVar ("SaveDir", 0)
 
@@ -191,11 +203,11 @@ def NewSingle():
 	if TutorialWindow:
 		TutorialWindow.Unload()
 	if GemRB.GetVar ("oldgame") == 0:
-		GemRB.GameSetExpansion(1)
+		#GemRB.GameSetExpansion(1)
 		GemRB.SetVar ("PlayMode", 2)
 		GemRB.SetVar ("SaveDir", 1)
 	else:
-		GemRB.GameSetExpansion(0)
+		#GemRB.GameSetExpansion(0)
 		GemRB.SetVar ("PlayMode", 0)
 		GemRB.SetVar ("SaveDir", 0)
 	GemRB.SetVar("Slot",1)
@@ -203,6 +215,23 @@ def NewSingle():
 	GemRB.SetNextScript ("CharGen")
 	return
 
+def ImportGame():
+	if StartWindow:
+		StartWindow.Unload()
+	if QuitWindow:
+		QuitWindow.Unload()
+	if TutorialWindow:
+		TutorialWindow.Unload()
+	#now this is tricky, we need to load old games, but set up the expansion
+	#GemRB.GameSetExpansion(0)
+	GemRB.SetVar ("PlayMode", 0)
+	GemRB.SetVar ("SaveDir", 0)
+	#i need another variable
+	GemRB.SetVar ("expansion", 1)
+	print "******************set expansion"
+	GemRB.SetNextScript ("GUILOAD")
+	return
+	
 def Tutorial():
 	StartWindow.SetVisible (WINDOW_INVISIBLE)
 	TutorialWindow.SetVisible (WINDOW_VISIBLE)
@@ -217,7 +246,6 @@ def PlayPress():
 		TutorialWindow.Unload()
 	GemRB.SetVar("PlayMode",1) #tutorial
 	GemRB.SetVar("SaveDir",0)
-	GemRB.GameSetExpansion(0)
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
 	GemRB.SetNextScript ("CharGen")
@@ -268,11 +296,13 @@ def BackToMain():
 	SinglePlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 	OptionsButton.SetState (IE_GUI_BUTTON_ENABLED)
 	MultiPlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
+	BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 	SinglePlayerButton.SetText (15413)
 	ExitButton.SetText (15417)
 	OptionsButton.SetText (13905)
 	MultiPlayerButton.SetText (15414)
 	MoviesButton.SetText (15415)
+	BackButton.SetText (15416)
 	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SinglePlayerPress)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OptionsPress)

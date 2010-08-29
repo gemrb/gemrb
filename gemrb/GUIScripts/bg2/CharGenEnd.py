@@ -21,8 +21,9 @@ import GemRB
 import GUICommon
 import CommonTables
 import LUCommon
-from ie_stats import *
+from GUIDefines import *
 from ie_slots import *
+from ie_stats import *
 from ie_spells import *
 from ie_restype import RES_2DA
 
@@ -110,6 +111,28 @@ def OnLoad():
 
 	# add the starting inventory for tob
 	if GUICommon.GameIsTOB():
+		GiveEquipment(MyChar, ClassName, KitIndex)
+
+	playmode = GemRB.GetVar ("PlayMode")
+	if playmode >=0:
+		if GemRB.GetVar("GUIEnhancements"):
+			GemRB.SaveCharacter ( MyChar, "gembak" )
+		#LETS PLAY!!
+		GemRB.EnterGame()
+		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
+	else:
+		#leaving multi player pregen
+		if CharGenWindow:
+			CharGenWindow.Unload ()
+		#when export is done, go to start
+		if GUICommon.HasTOB():
+			GemRB.SetToken ("NextScript","Start2")
+		else:
+			GemRB.SetToken ("NextScript","Start")
+		GemRB.SetNextScript ("ExportFile") #export
+	return
+
+def GiveEquipment(MyChar, ClassName, KitIndex):
 		# get the kit (or use class if no kit) to load the start table
 		if KitIndex == 0:
 			EquipmentColName = ClassName
@@ -188,22 +211,5 @@ def OnLoad():
 		# grant the slayer change ability to the protagonist
 		if MyChar == 1:
 			GemRB.LearnSpell (MyChar, "SPIN822", LS_MEMO)
-
-	playmode = GemRB.GetVar ("PlayMode")
-	if playmode >=0:
-		if GemRB.GetVar("GUIEnhancements"):
-			GemRB.SaveCharacter ( GemRB.GetVar ("Slot"), "gembak" )
-		#LETS PLAY!!
-		GemRB.EnterGame()
-		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
-	else:
-		#leaving multi player pregen
-		if CharGenWindow:
-			CharGenWindow.Unload ()
-		#when export is done, go to start
-		if GUICommon.HasTOB():
-			GemRB.SetToken ("NextScript","Start2")
-		else:
-			GemRB.SetToken ("NextScript","Start")
-		GemRB.SetNextScript ("ExportFile") #export
-	return
+		return
+		

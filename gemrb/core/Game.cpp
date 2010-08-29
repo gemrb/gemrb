@@ -298,8 +298,10 @@ void Game::ConsolidateParty()
 
 int Game::LeaveParty (Actor* actor)
 {
+  core->SetEventFlag(EF_PORTRAIT);
 	actor->CreateStats(); //create or update stats for leaving
 	actor->SetBase(IE_EXPLORE, 0);
+
 	SelectActor(actor, false, SELECT_NORMAL);
 	int slot = InParty( actor );
 	if (slot < 0) {
@@ -371,6 +373,7 @@ void Game::InitActorPos(Actor *actor)
 
 int Game::JoinParty(Actor* actor, int join)
 {
+  core->SetEventFlag(EF_PORTRAIT);
 	actor->CreateStats(); //create stats if they didn't exist yet
 	actor->InitButtons(actor->GetStat(IE_CLASS), false); //init actor's buttons
 	actor->SetBase(IE_EXPLORE, 1);
@@ -1305,7 +1308,7 @@ void Game::UpdateScripts()
 	// (we should probably find a less silly way to handle this,
 	// because nothing can ever stop area music now..)
 	if (!core->GetMusicMgr()->IsPlaying()) {
-		 ChangeSong(false,false);
+		ChangeSong(false,false);
 	}
 
 	//this is used only for the death delay so far
@@ -1711,9 +1714,20 @@ void Game::StartRainOrSnow(bool conditional, int w)
 	weather->SetPhase(P_FADE);
 }
 
-void Game::SetExpansion(int exp)
+void Game::SetExpansion()
 {
-	Expansion = exp;
+	if (Expansion) {
+		return;
+	}
+	Expansion = 1;
+
+	core->GetDictionary()->SetAt( "PlayMode", 2 );
+
+	int i = GetPartySize(false);
+	while(i--) {
+		Actor *actor = GetPC(i, false);
+		InitActorPos(actor);
+	}
 }
 
 void Game::DebugDump()

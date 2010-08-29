@@ -4119,7 +4119,8 @@ int fx_remove_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (actor) {
-		//play vvc effect over actor?
+		//leaveparty will be handled automagically
+		//plot critical items are not handled, shall we?
 		actor->DestroySelf();
 	}
 	return FX_NOT_APPLIED;

@@ -401,7 +401,7 @@ public:
 	/** updates current area music */
 	void ChangeSong(bool always = true, bool force = true);
 	/** sets expansion mode */
-	void SetExpansion(int exp);
+	void SetExpansion();
 	/** Dumps information about the object */
 	void DebugDump();
 	/** Finds an actor by global ID */

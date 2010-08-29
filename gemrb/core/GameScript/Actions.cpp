@@ -558,18 +558,6 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 //creates savegame?
 void GameScript::MoveToExpansion(Scriptable* Sender, Action* /*parameters*/)
 {
-	Game *game = core->GetGame();
-
-	game->SetExpansion(1);
-	core->GetDictionary()->SetAt( "PlayMode", 2 );
-	//TODO: set the new world map
-
-	int i = game->GetPartySize(false);
-	while(i--) {
-		Actor *actor = game->GetPC(i, false);
-		game->InitActorPos(actor);
-	}
-
 	core->SetEventFlag(EF_MASTERSCRIPT);
 	Sender->ReleaseCurrentAction();
 }
@@ -3175,7 +3163,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		}
 	}
 	core->GetGame()->JoinParty( act, JP_JOIN );
-	core->GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
+	//core->GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
 }
 
 void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
@@ -3185,7 +3173,7 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* act = ( Actor* ) Sender;
 	core->GetGame()->LeaveParty( act );
-	core->GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
+	//core->GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
 }
 
 //HideCreature hides only the visuals of a creature
