@@ -1034,53 +1034,64 @@ int GameScript::ID_Allegiance(Actor *actor, int parameter)
 	return parameter == value;
 }
 
+// *_ALL constants are different in iwd2 due to different classes (see note below)
+// bard, cleric, druid, fighter, mage, paladin, ranger, thief
+static const int all_bg_classes[] = { 206, 204, 208, 203, 202, 207, 209, 205 };
+static const int all_iwd2_classes[] = { 202, 203, 204, 205, 209, 206, 207, 208 };
+
 // Dual-classed characters will detect only as their new class until their
 // original class is re-activated, when they will detect as a multi-class
 // GetClassLevel takes care of this automatically!
-int GameScript::ID_Class(Actor *actor, int parameter)
-{
+inline bool idclass(Actor *actor, int parameter, bool iwd2) {
 	int value = 0;
 	if (parameter < 202 || parameter > 209) {
 		value = actor->GetStat(IE_CLASS);
 		return parameter==value;
 	}
+
+	const int *classes;
+	if (iwd2) {
+		classes = all_iwd2_classes;
+	} else {
+		classes = all_bg_classes;
+	}
+
 	// we got one of the *_ALL values
-	//TODO: unhardcode
-	switch (parameter) {
-		case 202:
-			// MAGE_ALL (also sorcerers)
-			value = actor->GetMageLevel() + actor->GetSorcererLevel();
-			break;
-		case 203:
-			// FIGHTER_ALL (also monks)
-			value = actor->GetFighterLevel() + actor->GetMonkLevel();
-			break;
-		case 204:
-			// CLERIC_ALL
-			value = actor->GetClericLevel();
-			break;
-		case 205:
-			// THIEF_ALL
-			value = actor->GetThiefLevel();
-			break;
-		case 206:
-			// BARD_ALL
-			value = actor->GetBardLevel();
-			break;
-		case 207:
-			// PALADIN_ALL
-			value = actor->GetPaladinLevel();
-			break;
-		case 208:
-			// DRUID_ALL
-			value = actor->GetDruidLevel();
-			break;
-		case 209:
-			// RANGER_ALL
-			value = actor->GetRangerLevel();
-			break;
+	if (parameter == classes[4]) {
+		// MAGE_ALL (also sorcerers)
+		value = actor->GetMageLevel() + actor->GetSorcererLevel();
+	} else if (parameter == classes[3]) {
+		// FIGHTER_ALL (also monks)
+		value = actor->GetFighterLevel() + actor->GetMonkLevel();
+	} else if (parameter == classes[1]) {
+		// CLERIC_ALL
+		value = actor->GetClericLevel();
+	} else if (parameter == classes[7]) {
+		// THIEF_ALL
+		value = actor->GetThiefLevel();
+	} else if (parameter == classes[0]) {
+		// BARD_ALL
+		value = actor->GetBardLevel();
+	} else if (parameter == classes[5]) {
+		// PALADIN_ALL
+		value = actor->GetPaladinLevel();
+	} else if (parameter == classes[2]) {
+		// DRUID_ALL
+		value = actor->GetDruidLevel();
+	} else if (parameter == classes[6]) {
+		// RANGER_ALL
+		value = actor->GetRangerLevel();
 	}
 	return value > 0;
+}
+
+int GameScript::ID_Class(Actor *actor, int parameter)
+{
+	if (core->HasFeature(GF_3ED_RULES)) {
+		//iwd2 has different values, see also the note for AVClass
+		return idclass(actor, parameter, 1);
+	}
+	return idclass(actor, parameter, 0);
 }
 
 // IE_CLASS holds only one class, not a bitmask like with iwd2 kits. The ids values
@@ -1098,11 +1109,12 @@ int GameScript::ID_ClassMask(Actor *actor, int parameter)
 	return 0;
 }
 
+// this is only present in iwd2
+// the function is identical to ID_Class, but uses the class20 IDS,
+// iwd2's class.ids is different than the rest, while class20 is identical (remnant)
 int GameScript::ID_AVClass(Actor *actor, int parameter)
 {
-	//TODO: if parameter >=202, it is of *_ALL type
-	int value = actor->GetStat(IE_CLASS);
-	return parameter==value;
+	return idclass(actor, parameter, 0);
 }
 
 int GameScript::ID_Race(Actor *actor, int parameter)
