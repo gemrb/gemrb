@@ -207,6 +207,7 @@ bool Spellbook::IsIWDSpellBook() const
 
 unsigned int Spellbook::GetSpellLevelCount(int type) const
 {
+	assert(type < NUM_BOOK_TYPES);
 	return (unsigned int) spells[type].size();
 }
 
