@@ -89,7 +89,7 @@ private:
 	void ReadScript(Actor *actor, int ScriptLevel);
 	void ReadDialog(Actor *actor);
 	CREKnownSpell* GetKnownSpell();
-	CRESpellMemorization* GetSpellMemorization();
+	CRESpellMemorization* GetSpellMemorization(Actor *act);
 	CREMemorizedSpell* GetMemorizedSpell();
 	CREItem* GetItem();
 	void SetupColor(ieDword&);

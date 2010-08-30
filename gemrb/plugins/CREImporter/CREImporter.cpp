@@ -633,16 +633,21 @@ void CREImporter::ReadScript(Actor *act, int ScriptLevel)
 	act->SetScript( aScript, ScriptLevel, act->InParty!=0);
 }
 
-CRESpellMemorization* CREImporter::GetSpellMemorization()
+CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 {
-	CRESpellMemorization* spl = new CRESpellMemorization();
+	ieWord Level, Type, Number, Number2;
 
-	str->ReadWord( &spl->Level );
-	str->ReadWord( &spl->Number );
-	str->ReadWord( &spl->Number2 );
-	str->ReadWord( &spl->Type );
+	str->ReadWord( &Level );
+	str->ReadWord( &Number );
+	str->ReadWord( &Number2 );
+	str->ReadWord( &Type );
 	str->ReadDword( &MemorizedIndex );
 	str->ReadDword( &MemorizedCount );
+
+	CRESpellMemorization* spl = act->spellbook.GetSpellMemorization(Level, Type);
+	assert(spl->Number == 0 && spl->Number2 == 0); // unused
+	spl->Number = Number;
+	spl->Number2 = Number;
 
 	return spl;
 }
@@ -1119,7 +1124,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 	str->Seek( SpellMemorizationOffset+CREOffset, GEM_STREAM_START );
 	for (i = 0; i < SpellMemorizationCount; i++) {
-		CRESpellMemorization* sm = GetSpellMemorization();
+		CRESpellMemorization* sm = GetSpellMemorization(act);
 
 		j=KnownSpellsCount;
 		while(j--) {
@@ -1143,7 +1148,6 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			}
 			printf("[CREImporter]: Duplicate memorized spell (%d) in creature!\n", k);
 		}
-		act->spellbook.AddSpellMemorization( sm );
 	}
 
 	i=KnownSpellsCount;
@@ -1460,9 +1464,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 	ieDword tmpDword;
 
 	int check = 0;
-	CRESpellMemorization *sm = new CRESpellMemorization;
-	sm->Level = level;
-	sm->Type = type;
+	CRESpellMemorization* sm = act->spellbook.GetSpellMemorization(level, type);
 	while(count--) {
 		str->ReadDword(&spellindex);
 		str->ReadDword(&totalcount);
@@ -1504,8 +1506,6 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 	sm->Number = (ieWord) tmpDword;
 	str->ReadDword(&tmpDword);
 	sm->Number2 = (ieWord) tmpDword;
-	
-	act->spellbook.AddSpellMemorization(sm);
 }
 
 void CREImporter::GetActorIWD2(Actor *act)
