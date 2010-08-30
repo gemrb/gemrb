@@ -2895,13 +2895,13 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 		return -1;
 	}
 
-	CREOffset = stream->GetPos(); // for asserts
-
 	IsCharacter = chr;
 	if (chr) {
 		WriteChrHeader( stream, actor );
 	}
 	assert(TotSCEFF==0 || TotSCEFF==1);
+
+	CREOffset = stream->GetPos(); // for asserts
 
 	ret = PutHeader( stream, actor);
 	if (ret) {

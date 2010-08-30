@@ -472,11 +472,9 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 	}
 
 	// only add this one if necessary
-	if (s->size() == level) {
-		s->push_back(sm);
-		return true;
-	}
-	return false;
+	assert (s->size() == level);
+	s->push_back(sm);
+	return true;
 }
 
 //apply the wisdom bonus on all spell levels for type
@@ -509,7 +507,7 @@ void Spellbook::ClearBonus()
 CRESpellMemorization *Spellbook::GetSpellMemorization(unsigned int type, unsigned int level)
 {
 	CRESpellMemorization *sm;
-	if (level>= GetSpellLevelCount(type) || !(sm = spells[type][level]) ) {
+	if (level >= GetSpellLevelCount(type)) {
 		sm = new CRESpellMemorization();
 		sm->Type = (ieWord) type;
 		sm->Level = (ieWord) level;
@@ -518,6 +516,9 @@ CRESpellMemorization *Spellbook::GetSpellMemorization(unsigned int type, unsigne
 			delete sm;
 			return NULL;
 		}
+		assert(sm == spells[type][level]);
+	} else {
+		sm = spells[type][level];
 	}
 	return sm;
 }
@@ -877,7 +878,7 @@ void Spellbook::dump()
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			CRESpellMemorization* sm = spells[i][j];
 			//if (!sm || !sm->Number) continue;
-			if (!sm) continue;
+			//if (!sm) continue;
 
 			//Never ever use field length qualifiers it is not portable, if you need to convert, convert to compatible values, anyway we don't need this!
 			//printf ( "type: %d: L: %d; N1: %d; N2: %d; T: %d; KC: %d; MC: %d\n", i,
