@@ -645,7 +645,7 @@ CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 	str->ReadDword( &MemorizedCount );
 
 	CRESpellMemorization* spl = act->spellbook.GetSpellMemorization(Level, Type);
-	assert(spl->Number == 0 && spl->Number2 == 0); // unused
+	assert(spl && spl->Number == 0 && spl->Number2 == 0); // unused
 	spl->Number = Number;
 	spl->Number2 = Number;
 
@@ -1465,6 +1465,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 
 	int check = 0;
 	CRESpellMemorization* sm = act->spellbook.GetSpellMemorization(level, type);
+	assert(sm && sm->Number == 0 && sm->Number2 == 0); // unused
 	while(count--) {
 		str->ReadDword(&spellindex);
 		str->ReadDword(&totalcount);

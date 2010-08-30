@@ -507,6 +507,9 @@ void Spellbook::ClearBonus()
 
 CRESpellMemorization *Spellbook::GetSpellMemorization(unsigned int type, unsigned int level)
 {
+	if (type >= (unsigned int)NUM_BOOK_TYPES)
+		return NULL;
+
 	CRESpellMemorization *sm;
 	if (level >= GetSpellLevelCount(type)) {
 		sm = new CRESpellMemorization();
