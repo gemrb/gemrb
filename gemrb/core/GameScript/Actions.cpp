@@ -3253,6 +3253,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	parameters->pointParameter=p;
+	strcpy(parameters->string1Parameter, "");
 	LeaveAreaLUA(Sender, parameters);
 	Sender->ReleaseCurrentAction();
 }
@@ -3282,6 +3283,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	parameters->pointParameter=p;
+	strcpy(parameters->string1Parameter, "");
 	LeaveAreaLUAPanic(Sender, parameters);
 	Sender->ReleaseCurrentAction();
 }
