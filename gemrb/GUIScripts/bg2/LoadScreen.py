@@ -22,6 +22,7 @@
 ###################################################
 
 import GemRB
+import GUICommon
 from GUIDefines import *
 
 LoadScreen = None
@@ -39,7 +40,10 @@ def StartLoadScreen ():
 	Middle.SetMOS (LoadPic)
 	Progress = 0
 	GemRB.SetVar ("Progress", Progress)
-	Table = GemRB.LoadTable ("loadhint")
+	if GUICommon.HasTOB():
+		Table = GemRB.LoadTable ("loadh25")
+	else:
+		Table = GemRB.LoadTable ("loadhint")
 	tmp = Table.GetRowCount ()
 	tmp = GemRB.Roll (1,tmp,0)
 	HintStr = Table.GetValue (tmp, 0)
