@@ -612,6 +612,11 @@ def IsDualClassed(actor, verbose):
 					DualInfo.append (ClassIndex)
 					break
 				Mask = 1 << i
+			if len(DualInfo) != 3:
+				print "WARNING: Invalid dualclass combination, treating as a single class!"
+				print DualedFrom, Class, Multi, KitIndex, DualInfo
+				return (0,-1,-1)
+
 			return DualInfo
 		else:
 			return (0,-1,-1)
