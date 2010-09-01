@@ -582,8 +582,7 @@ def IsDualClassed(actor, verbose):
 	if GameIsIWD2():
 		return (0,-1,-1)
 
-	Dual = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
-	Dual = Dual & ~(MC_EXPORTABLE|MC_PLOT_CRITICAL|MC_BEENINPARTY|MC_HIDDEN)
+	DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
 
 	if verbose:
 		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
@@ -592,9 +591,9 @@ def IsDualClassed(actor, verbose):
 		DualInfo = []
 		KitIndex = GetKitIndex (actor)
 
-		if (Dual & MC_WAS_ANY_CLASS) > 0: # first (previous) class of the dual class
+		if DualedFrom > 0: # first (previous) class of the dual class
 			MCColumn = CommonTables.Classes.GetColumnIndex ("MC_WAS_ID")
-			FirstClassIndex = CommonTables.Classes.FindValue (MCColumn, Dual & MC_WAS_ANY_CLASS)
+			FirstClassIndex = CommonTables.Classes.FindValue (MCColumn, DualedFrom)
 			if KitIndex:
 				DualInfo.append (1)
 				DualInfo.append (KitIndex)
@@ -617,7 +616,7 @@ def IsDualClassed(actor, verbose):
 		else:
 			return (0,-1,-1)
 	else:
-		if (Dual & MC_WAS_ANY_CLASS) > 0:
+		if DualedFrom > 0:
 			return (1,-1,-1)
 		else:
 			return (0,-1,-1)
