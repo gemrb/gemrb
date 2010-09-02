@@ -1906,7 +1906,7 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 
 	switch(type) {
 		case 0: case 1: case 2: case 3: //blood
-			i = (int) GetStat(IE_ANIMATION_ID)>>16;
+			i = anims->GetBloodColor();
 			if (!i) i = d_gradient[type];
 			if(hit) {
 				AddAnimation(d_main[type], i, 0, AA_PLAYONCE);

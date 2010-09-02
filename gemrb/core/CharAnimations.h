@@ -103,14 +103,18 @@
 #define IE_ANI_RANGED_THROW		2
 
 struct AvatarStruct {
+	/* entries from avatars.2da */
 	unsigned int AnimID;
 	ieResRef Prefixes[4];
 	unsigned int PaletteType;
 	unsigned char AnimationType;
 	unsigned char CircleSize;
 	char Size;
+
+	/* comes from bloodclr.2da */
+	char BloodColor;
 	
-	/* resdata entries */
+	/* resdata.ini entries */
 	unsigned int WalkScale; /* 1000 / walkscale */
 	unsigned int RunScale; /* 1000 / runscale */
 	int Bestiary;
@@ -169,6 +173,7 @@ public: //attribute functions
 	int NoPalette() const;
 	int GetAnimType() const;
 	char GetSize() const;
+	char GetBloodColor() const;
 
 	void PulseRGBModifiers();
 

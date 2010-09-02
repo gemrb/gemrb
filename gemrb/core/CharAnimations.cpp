@@ -118,6 +118,12 @@ char CharAnimations::GetSize() const
 	return AvatarTable[AvatarsRowNum].Size;
 }
 
+char CharAnimations::GetBloodColor() const
+{
+	if(AvatarsRowNum==~0u) return 0;
+	return AvatarTable[AvatarsRowNum].BloodColor;
+}
+
 int CharAnimations::GetActorPartCount() const
 {
 	if (AvatarsRowNum==~0u) return -1;
@@ -394,11 +400,6 @@ static int compare_avatars(const void *a, const void *b)
 {
 	unsigned int aa = ((AvatarStruct *)a)->AnimID;
 	unsigned int bb = ((AvatarStruct *)b)->AnimID;
-/*
-	if (aa>bb) return 1;
-	if (aa<bb) return -1;
-	return 0;
-*/
 	return (int) (aa-bb);
 }
 
@@ -451,6 +452,33 @@ void CharAnimations::InitAvatarsTable()
 		}
 	}
 	qsort(AvatarTable, AvatarsCount, sizeof(AvatarStruct), compare_avatars);
+
+	
+	AutoTable blood("bloodclr");
+	if (blood) {
+		int rows = blood->GetRowCount();
+		for(int i=0;i<rows;i++) {
+			long value = 0;
+			long rmin = 0;
+			long rmax = 0xffff;
+			
+			valid_number(blood->QueryField(i,0), value);
+			valid_number(blood->QueryField(i,1), rmin);
+			valid_number(blood->QueryField(i,2), rmax);
+			//printMessage("CharAnimations", "Setting up blood color: ", WHITE);
+			printf("%02x %04x-%04x ", (unsigned int) value, (unsigned int) rmin, (unsigned int) rmax);
+			if (value>255 || rmin>0xffff || rmax>0xffff || value<0 || rmin<0 || rmax<0) {
+				printStatus("Invalid value!", LIGHT_RED);
+				continue;
+			}
+			for(int j=0;j<AvatarsCount;j++) {
+				if (rmax>AvatarTable[j].AnimID) break;
+				if (rmin<AvatarTable[j].AnimID) continue;
+				AvatarTable[j].BloodColor = value;
+			}
+			printStatus("Done", GREEN);
+		}
+	}
 }
 
 CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
@@ -492,7 +520,6 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	GlobalColorMod.speed = 0;
 	GlobalColorMod.phase = 0;
 	lastModUpdate = 0;
-
 
 	AvatarsRowNum=AvatarsCount;
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
