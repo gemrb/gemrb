@@ -465,18 +465,17 @@ void CharAnimations::InitAvatarsTable()
 			valid_number(blood->QueryField(i,0), value);
 			valid_number(blood->QueryField(i,1), rmin);
 			valid_number(blood->QueryField(i,2), rmax);
-			//printMessage("CharAnimations", "Setting up blood color: ", WHITE);
-			printf("%02x %04x-%04x ", (unsigned int) value, (unsigned int) rmin, (unsigned int) rmax);
 			if (value>255 || rmin>0xffff || rmax>0xffff || value<0 || rmin<0 || rmax<0) {
+				printMessage("CharAnimations", "bloodclr entry:", LIGHT_RED);
+				printf("%02x %04x-%04x ", (unsigned int) value, (unsigned int) rmin, (unsigned int) rmax);
 				printStatus("Invalid value!", LIGHT_RED);
 				continue;
 			}
 			for(int j=0;j<AvatarsCount;j++) {
-				if (rmax>AvatarTable[j].AnimID) break;
-				if (rmin<AvatarTable[j].AnimID) continue;
+				if (rmax<AvatarTable[j].AnimID) break;
+				if (rmin>AvatarTable[j].AnimID) continue;
 				AvatarTable[j].BloodColor = value;
 			}
-			printStatus("Done", GREEN);
 		}
 	}
 }
