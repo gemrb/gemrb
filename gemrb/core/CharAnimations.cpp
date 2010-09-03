@@ -458,14 +458,14 @@ void CharAnimations::InitAvatarsTable()
 	if (blood) {
 		int rows = blood->GetRowCount();
 		for(int i=0;i<rows;i++) {
-			long value = 0;
-			long rmin = 0;
-			long rmax = 0xffff;
+			unsigned long value = 0;
+			unsigned long rmin = 0;
+			unsigned long rmax = 0xffff;
 			
-			valid_number(blood->QueryField(i,0), value);
-			valid_number(blood->QueryField(i,1), rmin);
-			valid_number(blood->QueryField(i,2), rmax);
-			if (value>255 || rmin>0xffff || rmax>0xffff || value<0 || rmin<0 || rmax<0) {
+			valid_number(blood->QueryField(i,0), (long &)value);
+			valid_number(blood->QueryField(i,1), (long &)rmin);
+			valid_number(blood->QueryField(i,2), (long &)rmax);
+			if (value>255 || rmin>0xffff || rmax>0xffff) {
 				printMessage("CharAnimations", "bloodclr entry:", LIGHT_RED);
 				printf("%02x %04x-%04x ", (unsigned int) value, (unsigned int) rmin, (unsigned int) rmax);
 				printStatus("Invalid value!", LIGHT_RED);
