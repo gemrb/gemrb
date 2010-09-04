@@ -2523,7 +2523,6 @@ int GameScript::NumCreatureVsParty(Scriptable* Sender, Trigger* parameters)
 	if (!parameters->objectParameter) {
 		parameters->objectParameter = new Object();
 	}
-	parameters->objectParameter->objectFields[0]=EA_EVILCUTOFF;
 	int value = GetObjectCount(Sender, parameters->objectParameter);
 	value -= core->GetGame()->GetPartySize(true);
 	return value == parameters->int0Parameter;
@@ -2534,7 +2533,6 @@ int GameScript::NumCreatureVsPartyGT(Scriptable* Sender, Trigger* parameters)
 	if (!parameters->objectParameter) {
 		parameters->objectParameter = new Object();
 	}
-	parameters->objectParameter->objectFields[0]=EA_EVILCUTOFF;
 	int value = GetObjectCount(Sender, parameters->objectParameter);
 	value -= core->GetGame()->GetPartySize(true);
 	return value > parameters->int0Parameter;
@@ -2545,7 +2543,6 @@ int GameScript::NumCreatureVsPartyLT(Scriptable* Sender, Trigger* parameters)
 	if (!parameters->objectParameter) {
 		parameters->objectParameter = new Object();
 	}
-	parameters->objectParameter->objectFields[0]=EA_EVILCUTOFF;
 	int value = GetObjectCount(Sender, parameters->objectParameter);
 	value -= core->GetGame()->GetPartySize(true);
 	return value < parameters->int0Parameter;

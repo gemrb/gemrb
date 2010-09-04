@@ -298,7 +298,7 @@ void Game::ConsolidateParty()
 
 int Game::LeaveParty (Actor* actor)
 {
-  core->SetEventFlag(EF_PORTRAIT);
+	core->SetEventFlag(EF_PORTRAIT);
 	actor->CreateStats(); //create or update stats for leaving
 	actor->SetBase(IE_EXPLORE, 0);
 
@@ -373,7 +373,7 @@ void Game::InitActorPos(Actor *actor)
 
 int Game::JoinParty(Actor* actor, int join)
 {
-  core->SetEventFlag(EF_PORTRAIT);
+	core->SetEventFlag(EF_PORTRAIT);
 	actor->CreateStats(); //create stats if they didn't exist yet
 	actor->InitButtons(actor->GetStat(IE_CLASS), false); //init actor's buttons
 	actor->SetBase(IE_EXPLORE, 1);
@@ -484,7 +484,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 {
 	std::vector< Actor*>::iterator m;
 
-	// actor was not specified, which means all PCs should be (de)selected
+	// actor was not specified, which means all selectables should be (de)selected
 	if (! actor) {
 		for ( m = selected.begin(); m != selected.end(); ++m) {
 			(*m)->Select( false );
@@ -493,12 +493,15 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 		selected.clear();
 
 		if (select) {
+			area->SelectActors();
+/*
 			for ( m = PCs.begin(); m != PCs.end(); ++m) {
 				if (! *m) {
 					continue;
 				}
 				SelectActor( *m, true, SELECT_QUIET );
 			}
+*/
 		}
 
 		if (! (flags & SELECT_QUIET)) {
@@ -524,11 +527,6 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 		} else if (actor->IsSelected()) {
 			// already selected
 			return true;
-
-			/*for ( m = selected.begin(); m != selected.end(); ++m) {
-				if ((*m) == actor) return true;
-			}
-			assert(false);*/
 		}
 
 		actor->Select( true );

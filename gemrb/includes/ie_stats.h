@@ -37,6 +37,7 @@
 #define EA_ALLY			4
 #define EA_CONTROLLED  		5
 #define EA_CHARMED 		6
+#define EA_CONTROLLABLE         15
 #define EA_GOODBUTRED  		28
 #define EA_GOODBUTBLUE 		29
 #define EA_GOODCUTOFF  		30

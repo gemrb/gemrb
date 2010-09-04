@@ -336,6 +336,8 @@ public:
 	int GetActorCount(bool any) const;
 	//fix actors position if required
 	void JumpActors(bool jump);
+	//selects all selectable actors in the area
+	void SelectActors();
 	//if items == true, remove noncritical items from ground piles too
 	void PurgeArea(bool items);
 

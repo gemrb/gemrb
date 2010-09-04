@@ -1490,6 +1490,17 @@ void Map::JumpActors(bool jump)
 	}
 }
 
+void Map::SelectActors()
+{
+	size_t i = actors.size();
+	while (i--) {
+		Actor* actor = actors[i];
+		if (actor->Modified[IE_EA]<EA_CONTROLLABLE) {
+			core->GetGame()->SelectActor(actor, true, SELECT_QUIET);
+		}
+	}
+}
+
 //before writing the area out, perform some cleanups
 void Map::PurgeArea(bool items)
 {
