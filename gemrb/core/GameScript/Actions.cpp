@@ -4764,6 +4764,7 @@ void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->SetBaseBit(IE_STATE_ID, STATE_BERSERK, true);
+	act->Panic(NULL, PANIC_BERSERK);
 }
 
 void GameScript::Panic(Scriptable* Sender, Action* /*parameters*/)
@@ -4772,7 +4773,7 @@ void GameScript::Panic(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->Panic();
+	act->Panic(NULL, PANIC_RANDOMWALK);
 }
 
 /* as of now: removes panic and berserk */

@@ -262,7 +262,7 @@ IDS
 0x104	AvatarRemoval
 0x105	Protection:Opcode2
 0x106	SummonPomab
-0x107	ControlUndead
+0x107	ControlCreature
 0x108	StaticCharge
 0x109	CloakOfFear
 0x10a	MovementRateModifier3
@@ -298,4 +298,3 @@ IDS
 0x128	ModifyGlobalVariable
 0x129	HideInShadowsModifier
 0x12a	UseMagicDeviceModifier
-425 ControlUndead2

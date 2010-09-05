@@ -729,7 +729,7 @@ int fx_chill_touch (Scriptable* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_chill_touch (%2d)\n", fx->Opcode);
 	target->Damage(fx->Parameter1, DAMAGE_COLD, Owner);
 	if (STAT_GET(IE_GENERAL)==GEN_UNDEAD) {
-		target->Panic();
+		target->Panic(Owner, PANIC_RUNAWAY);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -1841,8 +1841,8 @@ int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx)
 	switch (fx->Parameter2)
 	{
 	case 0: //command
-		target->Panic();
 		target->LastTurner = Owner->GetGlobalID();
+		target->Panic(Owner, PANIC_RUNAWAY);
 		break;
 	case 1://rebuke
 		if (target->SetSpellState(SS_REBUKED)) {
@@ -1852,12 +1852,12 @@ int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx)
 		target->LastTurner = Owner->GetGlobalID();
 		break;
 	case 2://destroy
-		target->Die(Owner);
 		target->LastTurner = Owner->GetGlobalID();
+		target->Die(Owner);
 		break;
 	case 3://panic
-		target->Panic();
 		target->LastTurner = Owner->GetGlobalID();
+		target->Panic(Owner, PANIC_RUNAWAY);
 		break;
 	default://depends on caster
 		if (fx->Parameter1) {

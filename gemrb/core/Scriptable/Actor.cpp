@@ -344,6 +344,8 @@ Actor::Actor()
 	attackProjectile = NULL;
 	lastInit = 0;
 	roundTime = 0;
+	modalTime = 0;
+	panicMode = PANIC_NONE;
 	lastattack = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
@@ -740,7 +742,8 @@ void Actor::ApplyClab(const char *clab, ieDword max, bool remove)
 void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	if ((actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK]) && (actor->Modified[IE_MORALEBREAK] != 0) ) {
-		actor->Panic();
+		//TODO: current attacker should be passed instead of NULL
+		actor->Panic(NULL, core->Roll(1,3,0) );
 	}
 	//for new colour
 	actor->SetCircleSize();
@@ -2504,15 +2507,50 @@ void Actor::SelectActor()
 	DisplayStringCore(this, VB_SELECT, DS_CONSOLE|DS_CONST );
 }
 
-void Actor::Panic()
+void Actor::Panic(Scriptable *attacker, int panicmode)
 {
 	if (GetStat(IE_STATE_ID)&STATE_PANIC) {
+		printf("Already paniced\n");
 		//already in panic
 		return;
 	}
 	if (InParty) core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 	SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 	DisplayStringCore(this, VB_PANIC, DS_CONSOLE|DS_CONST );
+
+	Action *action;
+	char Tmp[40];
+	//FIXME: GenerateActionDirect should work on any scriptable
+	//they just need global ID
+	if (panicmode == PANIC_RUNAWAY && !attacker || attacker->Type!=ST_ACTOR) {
+		panicmode = PANIC_RANDOMWALK;
+	}
+
+	switch(panicmode) {
+	case PANIC_RUNAWAY:
+		strncpy(Tmp,"RunAwayFromNoInterrupt([-1])", sizeof(Tmp) );
+		action = GenerateActionDirect(Tmp, (Actor *) attacker);
+		break;
+	case PANIC_RANDOMWALK:
+		strncpy(Tmp,"RandomWalk()", sizeof(Tmp) );
+		action = GenerateAction( Tmp );
+		break;
+	case PANIC_BERSERK:
+		if (Modified[IE_EA]<EA_GOODCUTOFF) {
+			strncpy(Tmp,"GroupAttack('[EVILCUTOFF]'", sizeof(Tmp) );
+		} else {
+			strncpy(Tmp,"GroupAttack('[GOODCUTOFF]'", sizeof(Tmp) );
+		}
+		action = GenerateAction( Tmp );
+		break;
+	default:
+		return;
+	}
+	if (action) {
+		AddActionInFront(action);
+	} else {
+		printMessage("Actor","Cannot generate panic action\n", RED);
+	}
 }
 
 void Actor::SetMCFlag(ieDword arg, int op)
@@ -3021,15 +3059,15 @@ int Actor::GetEncumbrance()
 	return inventory.GetWeight();
 }
 
+//bg2 and iwd1
+EffectRef control_creature_ref = { "ControlCreature", NULL, -1};
+//iwd2
 EffectRef control_undead_ref = { "ControlUndead2", NULL, -1};
 
 //receive turning
 void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 {
-	//this is safely hardcoded i guess
-	if (Modified[IE_GENERAL]!=GEN_UNDEAD) {
-		return;
-	}
+	bool evilcleric = false;
 
 	if (!turnlevel) {
 		return;
@@ -3040,24 +3078,55 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 		return;
 	}
 
+	if ((cleric->Type==ST_ACTOR) && GameScript::ID_Alignment((Actor *)cleric,AL_EVIL) ) {
+		evilcleric = true;
+	}
+
+	//a little adjustment of the level to get a slight randomness on who is turned
+	unsigned int level = GetXPLevel(true)-(GetGlobalID()&3);
+
+	//this is safely hardcoded i guess
+	if (Modified[IE_GENERAL]!=GEN_UNDEAD) {
+		level = GetPaladinLevel();
+		if (evilcleric && level) {
+			LastTurner = cleric->GetGlobalID();
+			if (turnlevel >= level+TURN_DEATH_LVL_MOD) {
+				if (gamedata->Exists("panic", IE_SPL_CLASS_ID)) {
+					core->ApplySpell("panic", this, cleric, 0);
+				} else {
+					printf("Panic from turning!\n");
+					Panic(cleric, PANIC_RUNAWAY);
+				}
+			}
+		}
+		return;
+	}
+
 	//determine alignment (if equals, then no turning)
 
 	LastTurner = cleric->GetGlobalID();
 
 	//determine panic or destruction/control
 	//we get the modified level
-	if (turnlevel - TURN_DEATH_LVL_MOD >= GetXPLevel(true)) {
-		if (cleric->Type == ST_ACTOR && ((Actor*)cleric)->MatchesAlignmentMask(AL_EVIL)) {
-			Effect *fx = fxqueue.CreateEffect(control_undead_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
-			fx->Duration = core->Time.round_sec;
-			fx->Target = FX_TARGET_PRESET;
-			core->ApplyEffect(fx, this, cleric);
-			delete fx;
-		} else {
-			Die(cleric);
+	if (turnlevel >= level+TURN_DEATH_LVL_MOD) {
+		if (evilcleric) {
+			Effect *fx = fxqueue.CreateEffect(control_creature_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
+			if (!fx) {
+				fx = fxqueue.CreateEffect(control_undead_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
+			}
+			if (fx) {
+				fx->Duration = core->Time.round_sec;
+				fx->Target = FX_TARGET_PRESET;
+				core->ApplyEffect(fx, this, cleric);
+				delete fx;
+				return;
+			}
+			//fallthrough for bg1
 		}
-	} else if (turnlevel - TURN_PANIC_LVL_MOD >= GetXPLevel(true)) {
-		Panic();
+		Die(cleric);
+	} else if (turnlevel >= level+TURN_PANIC_LVL_MOD) {
+		printf("Panic from turning!\n");
+		Panic(cleric, PANIC_RUNAWAY);
 	}
 }
 
@@ -3191,7 +3260,7 @@ void Actor::Die(Scriptable *killer)
 			} else if (Modified[IE_CLASS] == CLASS_FLAMINGFIST) {
 				repmod = core->GetReputationMod(3);
 			}
-			if (MatchesAlignmentMask(AL_EVIL)) {
+			if (GameScript::ID_Alignment(this,AL_EVIL) ) {
 				repmod += core->GetReputationMod(7);
 			}
 			if (repmod) {
@@ -4541,8 +4610,17 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 }
 
 void Actor::UpdateActorState(ieDword gameTime) {
+	if (ModalState == MS_NONE) {
+		return;
+	}
+	if (modalTime==gameTime) {
+		return;
+	}
+
 	//apply the modal effect on the beginning of each round
-	if (((gameTime-roundTime)%core->Time.round_size==0) && ModalState) {
+	if ((((gameTime-roundTime)%core->Time.round_size)==0)) {
+		//we can set this to 0
+		modalTime = gameTime;
 		if (!ModalSpell[0]) {
 			printMessage("Actor","Modal Spell Effect was not set!\n", YELLOW);
 			ModalSpell[0]='*';
@@ -6548,6 +6626,7 @@ bool Actor::TryToHide() {
 }
 
 // only works with masks; use direct comparison for specific alignment checks
+/* not needed, use GameScript::ID_Alignment
 bool Actor::MatchesAlignmentMask(ieDword mask)
 {
 	ieDword stat = Modified[IE_ALIGNMENT];
@@ -6572,6 +6651,7 @@ bool Actor::MatchesAlignmentMask(ieDword mask)
 	}
 
 }
+*/
 
 bool Actor::InvalidSpellTarget()
 {

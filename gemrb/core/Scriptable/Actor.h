@@ -77,6 +77,12 @@ struct PolymorphCache;
 #define GD_CHECK       1
 #define GD_FEEDBACK    2 //(also check)
 
+//Panic modes
+#define PANIC_NONE       0
+#define PANIC_BERSERK    1
+#define PANIC_RUNAWAY    2
+#define PANIC_RANDOMWALK 3
+
 /** flags for GetActor */
 //default action
 #define GA_DEFAULT  0
@@ -283,6 +289,8 @@ public:
 	vvcVector vvcShields;
 	ieDword *projectileImmunity; //classic bitfield
 	ieDword roundTime;           //these are timers for attack rounds
+	ieDword modalTime;           //last time the modal effect used
+	ieDword panicMode;           //runaway, berserk or randomwalk
 	ieDword lastInit;
 	bool no_more_steps;
 	int speed;
@@ -431,7 +439,7 @@ public:
 	/* call this on gui selects */
 	void SelectActor();
 	/* sets the actor in panic (turn/morale break) */
-	void Panic();
+	void Panic(Scriptable *attacker, int panicmode);
 	/* sets a multi class flag (actually this is a lot of else too) */
 	void SetMCFlag(ieDword bitmask, int op);
 	/* inlined dialogue start */
