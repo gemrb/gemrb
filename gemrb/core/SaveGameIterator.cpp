@@ -492,6 +492,10 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 	CreateSavePath(Path, index, slotname);
 
 	if (!DoSaveGame(Path)) {
+		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
+		if (core->GetGameControl()) {
+			core->GetGameControl()->SetDisplayText(STR_CANTSAVE, 30);
+		}
 		return -1;
 	}
 
@@ -542,6 +546,10 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 	CreateSavePath(Path, index, slotname);
 
 	if (!DoSaveGame(Path)) {
+		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
+		if (core->GetGameControl()) {
+			core->GetGameControl()->SetDisplayText(STR_CANTSAVE, 30);
+		}
 		return -1;
 	}
 

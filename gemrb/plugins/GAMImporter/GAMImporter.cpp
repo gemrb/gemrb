@@ -842,6 +842,11 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game)
 	char filling[52];
 	memset( filling, 0, sizeof(filling) );
 	stream->Write( &filling, 52); //unknown
+
+	//save failed, but it is not our fault, returning now before the asserts kill us
+	if (stream->GetPos()==0) {
+		return -1;
+	}
 	return 0;
 }
 
@@ -1014,6 +1019,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
 		stream->Write(filling, 194);
 	}
+
 	return 0;
 }
 
@@ -1030,9 +1036,10 @@ int GAMImporter::PutPCs(DataStream *stream, Game *game)
 		PutActor(stream, ac, CRESize, CREOffset, game->version);
 		CREOffset += CRESize;
 	}
-	assert(stream->GetPos() == PCOffset + PCCount * PCSize);
 
 	CREOffset = PCOffset + PCCount * PCSize; // just for the asserts..
+	assert(stream->GetPos() == CREOffset);
+
 	for(i=0;i<PCCount;i++) {
 		assert(stream->GetPos() == CREOffset);
 		Actor *ac = game->GetPC(i, false);
@@ -1057,9 +1064,9 @@ int GAMImporter::PutNPCs(DataStream *stream, Game *game)
 		PutActor(stream, ac, CRESize, CREOffset, game->version);
 		CREOffset += CRESize;
 	}
-	assert(stream->GetPos() == NPCOffset + NPCCount * PCSize);
-
 	CREOffset = NPCOffset + NPCCount * PCSize; // just for the asserts..
+	assert(stream->GetPos() == CREOffset);
+
 	for(i=0;i<NPCCount;i++) {
 		assert(stream->GetPos() == CREOffset);
 		Actor *ac = game->GetNPC(i);

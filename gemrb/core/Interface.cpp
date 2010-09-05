@@ -4884,13 +4884,14 @@ int Interface::WriteGame(const char *folder)
 		int ret = gm->PutGame (&str, game);
 		if (ret <0) {
 			printMessage("Core"," ", YELLOW);
-			printf("Game cannot be saved: %s\n", GameNameResRef);
+			printf("Game cannot be saved: %s\n", folder);
+			return -1;
 		}
 	} else {
 		printMessage("Core"," ", YELLOW);
-		printf("Internal error, game cannot be saved: %s\n", GameNameResRef);
+		printf("Internal error, game cannot be saved: %s\n", folder);
+		return -1;
 	}
-	//make sure the stream isn't connected to sm, or it will be double freed
 	return 0;
 }
 
@@ -4911,13 +4912,14 @@ int Interface::WriteWorldMap(const char *folder)
 		int ret = wmm->PutWorldMap (&str, worldmap);
 		if (ret <0) {
 			printMessage("Core"," ", YELLOW);
-			printf("Internal error, worldmap cannot be saved: %s\n", WorldMapName);
+			printf("Internal error, worldmap cannot be saved: %s\n", folder);
+			return -1;
 		}
 	} else {
 		printMessage("Core"," ", YELLOW);
-		printf("Internal error, worldmap cannot be saved: %s\n", WorldMapName);
+		printf("Internal error, worldmap cannot be saved: %s\n", folder);
+		return -1;
 	}
-	//make sure the stream isn't connected to sm, or it will be double freed
 	return 0;
 }
 
