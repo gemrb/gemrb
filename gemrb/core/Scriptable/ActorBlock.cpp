@@ -275,8 +275,11 @@ bool Scriptable::IsPC() const
 void Scriptable::ExecuteScript(int scriptCount)
 {
 	// area scripts still run for at least the current area, in bg1 (see ar2631, confirmed by testing)
-	if ((Type != ST_AREA) && (core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE)) {
-		return;
+	// but not in bg2 (kill Abazigal in ar6005)
+	if (core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE) {
+		if (! (core->HasFeature(GF_CUTSCENE_AREASCRIPTS) && Type == ST_AREA)) {
+			return;
+		}
 	}
 
 	if ((InternalFlags & IF_NOINT) && (CurrentAction || GetNextAction())) {

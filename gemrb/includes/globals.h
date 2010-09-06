@@ -133,8 +133,9 @@
 #define  GF_BIOGRAPHY_RES               48 //iwd branch
 #define  GF_NO_BIOGRAPHY                49 //pst
 #define  GF_STEAL_IS_ATTACK             50 //bg2 for sure
+#define  GF_CUTSCENE_AREASCRIPTS	51 //bg1, maybe more
 //update this
-#define GF_COUNT 51
+#define GF_COUNT 52
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

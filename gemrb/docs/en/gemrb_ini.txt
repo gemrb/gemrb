@@ -316,3 +316,7 @@ extra cold damage.
 StealIsAttack = 0|1
 - - - - - - - - - -
 Determines whether a detected stealing attempt causes the shopkeep to turn hostile.
+
+CutsceneAreascripts = 0|1
+- - - - - - - - - -
+Determines whether area scripts should run during cutscenes or not.
