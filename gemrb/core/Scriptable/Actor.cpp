@@ -6625,34 +6625,6 @@ bool Actor::TryToHide() {
 	return true;
 }
 
-// only works with masks; use direct comparison for specific alignment checks
-/* not needed, use GameScript::ID_Alignment
-bool Actor::MatchesAlignmentMask(ieDword mask)
-{
-	ieDword stat = Modified[IE_ALIGNMENT];
-
-	switch (mask) {
-		case AL_EVIL:
-			return stat == AL_LAWFUL_EVIL || stat == AL_NEUTRAL_EVIL || stat == AL_CHAOTIC_EVIL;
-		case AL_GE_NEUTRAL:
-			return stat == AL_NEUTRAL_GOOD || stat == AL_TRUE_NEUTRAL || stat == AL_NEUTRAL_EVIL;
-		case AL_GOOD:
-			return stat == AL_LAWFUL_GOOD || stat == AL_NEUTRAL_GOOD || stat == AL_CHAOTIC_GOOD;
-		case AL_CHAOTIC:
-			return stat == AL_CHAOTIC_GOOD || stat == AL_CHAOTIC_NEUTRAL || stat == AL_CHAOTIC_EVIL;
-		case AL_LC_NEUTRAL:
-			return stat == AL_NEUTRAL_GOOD || stat == AL_TRUE_NEUTRAL || stat == AL_NEUTRAL_EVIL;
-		case AL_LAWFUL:
-			return stat == AL_LAWFUL_GOOD || stat == AL_LAWFUL_NEUTRAL || stat == AL_LAWFUL_EVIL;
-		default:
-			printf("Bad mask parameter (%d) used with Actor::MatchesAlignmentMask!\n", mask);
-			assert(false);
-			return false;
-	}
-
-}
-*/
-
 bool Actor::InvalidSpellTarget()
 {
 	if (GetStat(IE_STATE_ID) & (STATE_DEAD)) return true;
