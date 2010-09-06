@@ -190,7 +190,8 @@
 #define STR_EXPORTED       157 // characters exported (iwd)
 #define STR_PALADIN_FALL 158
 #define STR_RANGER_FALL 159
+#define STR_RES_RESISTED 160
 
-#define STRREF_COUNT 160
+#define STRREF_COUNT 161
 
 #endif //! IE_STRINGS_H

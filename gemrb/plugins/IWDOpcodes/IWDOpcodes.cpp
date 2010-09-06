@@ -2007,7 +2007,8 @@ int fx_cutscene (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_resist_spell (Scriptable* Owner, Actor* target, Effect *fx)
 {
 	//check iwd ids targeting
-	if (check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
+	//changed this to the opposite (cure light wounds resisted by undead)
+	if (!check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -2018,22 +2019,39 @@ int fx_resist_spell (Scriptable* Owner, Actor* target, Effect *fx)
 	return FX_ABORT;
 }
 
-static EffectRef fx_resist_spell_ref={"ResistSpell2",NULL,-1};
+static EffectRef fx_resist_spell_ref={"Protection:Spell2",NULL,-1};
 
 //0x122 Protection:Spell3 ??? IWD ids targeting
 // this is a variant of resist spell, used in iwd2
 int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 {
 	//check iwd ids targeting
-	if (check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
+	//changed this to the opposite (cure light wounds resisted by undead)
+	if (!check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
 		return FX_NOT_APPLIED;
 	}
 
+	//convert effect to the normal resist spell effect (without text)
+	//in case it lingers
 	fx->Opcode=EffectQueue::ResolveEffect(fx_resist_spell_ref);
-	//display message too
 
 	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
 		return FX_APPLIED;
+	}
+	//display message too
+	int spellname = -1;
+
+	if(gamedata->Exists(fx->Resource, IE_ITM_CLASS_ID) ) {
+		spellname = gamedata->GetItem(fx->Resource)->ItemName;
+	} else if (gamedata->Exists(fx->Resource, IE_SPL_CLASS_ID) ) {
+		spellname = gamedata->GetSpell(fx->Resource, true)->SpellName;
+	}
+
+	if (spellname>=0) {
+		char *tmpstr = core->GetString(spellname, 0);
+		core->GetTokenDictionary()->SetAtCopy("RESOURCE", tmpstr);
+		core->FreeString(tmpstr);
+		displaymsg->DisplayConstantStringName(STR_RES_RESISTED, 0xf0f0f0, target);
 	}
 	//this has effect only on first apply, it will stop applying the spell
 	return FX_ABORT;
