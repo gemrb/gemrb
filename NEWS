@@ -1,11 +1,16 @@
-GemRB V0.6.2 git (2010-08-29)
+GemRB V0.6.2 git (758846c)
   New features:
+    -
+    - custom blood color (creature-dependant)
     - InLine trigger
     - Importing a SoA game into ToB
 
   Improved features:
-    - handling of minimum hp
+    -
     - sparkles
+    - panic
+    - actions, object matching
+    - handling of minimum hp
 
 GemRB V0.6.2 (2010-08-21):
   New features:
