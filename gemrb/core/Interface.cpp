@@ -2665,7 +2665,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 
 		//this check should happen after the fact
 		level -= ab->GetBase(IE_XP);
-		if(level<0) {
+		if(level<0 || ab->GetBase(IE_XP) == 0) {
 			break;
 		}
 
