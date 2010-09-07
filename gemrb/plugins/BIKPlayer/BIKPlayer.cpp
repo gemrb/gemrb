@@ -19,6 +19,9 @@
  */
 
 /*
+ * code derived from FFMPeg
+ * @author Michael Niedermayer <michaelni@gmx.at>
+ *
  * code derived from Bink Audio decoder
  * Copyright (c) 2007-2009 Peter Ross (pross@xvid.org)
  * Copyright (c) 2009 Daniel Verkamp (daniel@drv.nu)
@@ -609,6 +612,22 @@ const uint8_t ff_log2_tab[256]={
 		7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
 		7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
 };
+
+static inline av_const int av_log2(unsigned int v)
+{
+    int n = 0;
+    if (v & 0xffff0000) {
+        v >>= 16;
+        n += 16;
+    }
+    if (v & 0xff00) {
+        v >>= 8;
+        n += 8;
+    }
+    n += ff_log2_tab[v];
+
+    return n;
+}
 
 static inline int float_to_int16_one(const float *src){
 	float f = *src;
