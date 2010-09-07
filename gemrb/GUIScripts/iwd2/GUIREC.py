@@ -248,6 +248,9 @@ def DisplayGeneral (pc):
 	Race = CommonTables.Races.GetValue (tmp, 2)
 	tmp = CommonTables.Races.GetValue (tmp, 8)
 
+	Label = Window.GetControl (0x1000000f)
+	Label.SetText (Race)
+
 	if tmp == -1:
 		tmp = highest
 	else:
