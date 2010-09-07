@@ -411,20 +411,25 @@ def DisplaySkills (pc):
 
 	return
 
+def delimited_str(strref, delimiter, strref2):
+	if strref2:
+		return GemRB.GetString(strref) + delimiter + " " + GemRB.GetString(strref2) + "\n"
+	else:
+		return GemRB.GetString(strref) + delimiter + "\n"
+
+def delimited_txt(strref, delimiter, text):
+	return GemRB.GetString(strref) + delimiter + " " + str(text) + "\n"
+
 #character information
 def DisplayMisc (pc):
 	Window = RecordsWindow
 
 	TotalPartyExp = 0
-	ChapterPartyExp = 0
 	TotalCount = 0
-	ChapterCount = 0
 	for i in range (1, GemRB.GetPartySize() + 1):
 		stat = GemRB.GetPCStats(i)
 		TotalPartyExp = TotalPartyExp + stat['KillsTotalXP']
-		ChapterPartyExp = ChapterPartyExp + stat['KillsChapterXP']
 		TotalCount = TotalCount + stat['KillsTotalCount']
-		ChapterCount = ChapterCount + stat['KillsChapterCount']
 
 	stat = GemRB.GetPCStats (pc)
 
@@ -433,18 +438,17 @@ def DisplayMisc (pc):
 	RecordsTextArea.Append (40320)
 	RecordsTextArea.Append ("[/color]\n")
 
-	#favourite spell
-	RecordsTextArea.Append (stat['FavouriteSpell'])
-	RecordsTextArea.Append (stat['FavouriteWeapon'])
+	#favourite spell and weapon
+	RecordsTextArea.Append (delimited_str (11949, ":", stat['FavouriteSpell']))
+	RecordsTextArea.Append (delimited_str (11950, ":", stat['FavouriteWeapon']))
 
-	#
-	RecordsTextArea.Append ("[color=ffff00]")
+	# combat details
+	RecordsTextArea.Append ("\n[color=ffff00]")
 	RecordsTextArea.Append (40322)
 	RecordsTextArea.Append ("[/color]\n")
 
-	#most powerful vanquished
-	#we need getstring, so -1 will translate to empty string
-	RecordsTextArea.Append (GemRB.GetString (stat['BestKilledName']))
+	#most powerful vanquished, time spent, xp and kills
+	RecordsTextArea.Append (delimited_str (11947, ":", stat['BestKilledName']))
 
 	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
 	#   (script updates???). In each case, there are 60 seconds
@@ -461,42 +465,38 @@ def DisplayMisc (pc):
 	GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
 
-	#actually it is 16043 <DURATION>, but duration is translated to
-	#16041, hopefully this won't cause problem with international version
-	RecordsTextArea.Append (16041)
-
-	#total xp
-	if TotalPartyExp != 0:
-		PartyExp = int ((stat['KillsTotalXP'] * 100) / TotalPartyExp)
-		RecordsTextArea.Append (str (PartyExp) + '%')
+	# construct <GAMEDAYS> days ~and~ ~<HOUR> hours~
+	if days == 1:
+		time = GemRB.GetString (10698)
 	else:
-		RecordsTextArea.Append ("0%")
-
-	if ChapterPartyExp != 0:
-		PartyExp = int ((stat['KillsChapterXP'] * 100) / ChapterPartyExp)
-		RecordsTextArea.Append (str (PartyExp) + '%')
+		time = GemRB.GetString (10697)
+	time += " " + GemRB.GetString (10699) + " "
+	if hours == 1:
+		time += GemRB.GetString (10701)
 	else:
-		RecordsTextArea.Append ("0%")
+		time += GemRB.GetString (10700)
 
-	#total xp
-	if TotalCount != 0:
-		PartyExp = int ((stat['KillsTotalCount'] * 100) / TotalCount)
-		RecordsTextArea.Append (str (PartyExp) + '%')
+	RecordsTextArea.Append (delimited_txt (11948, ":", time))
+
+	# Experience Value of Kills
+	RecordsTextArea.Append (delimited_txt (11953, ":", stat['KillsTotalXP']))
+
+	# Number of Kills
+	RecordsTextArea.Append (delimited_txt (11954, ":", stat['KillsTotalCount']))
+
+	# Total Experience Value in Party
+	if TotalPartyExp:
+		val = stat['KillsTotalXP']*100/TotalPartyExp
 	else:
-		RecordsTextArea.Append ("0%")
+		val = 0
+	RecordsTextArea.Append (delimited_txt (11951, ":", str(val) + "%"))
 
-	if ChapterCount != 0:
-		PartyExp = int ((stat['KillsChapterCount'] * 100) / ChapterCount)
-		RecordsTextArea.Append (str (PartyExp) + '%')
+	# Percentage of Total Kills in Party
+	if TotalPartyExp:
+		val = stat['KillsTotalCount']*100/TotalCount
 	else:
-		RecordsTextArea.Append ("0%")
-
-	RecordsTextArea.Append (str (stat['KillsChapterXP']))
-	RecordsTextArea.Append (str (stat['KillsTotalXP']))
-
-	#count of kills in chapter/game
-	RecordsTextArea.Append (str (stat['KillsChapterCount']))
-	RecordsTextArea.Append (str (stat['KillsTotalCount']))
+		val = 0
+	RecordsTextArea.Append (delimited_txt (11954, ":", str(val) + "%"))
 
 	return
 
