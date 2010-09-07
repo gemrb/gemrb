@@ -376,8 +376,9 @@ def DisplaySkills (pc):
 	#skills
 	RecordsTextArea.Append ("[color=ffff00]")
 	RecordsTextArea.Append (11983)
-	RecordsTextArea.Append ("[/color]")
+	RecordsTextArea.Append ("[/color]\n")
 
+	skills = []
 	for i in range(rows):
 		stat = SkillTable.GetValue (i, 0, 2)
 		value = GemRB.GetPlayerStat (pc, stat)
@@ -385,9 +386,11 @@ def DisplaySkills (pc):
 
 		if value:
 			skill = SkillName.GetValue (i, 1)
-			RecordsTextArea.Append (skill, -1)
-			RecordsTextArea.Append (" "+str(value)+"("+str(base)+")")
+			skills.append (GemRB.GetString(skill) + ": " + str(value) + " (" + str(base) + ")\n")
 
+	skills.sort()
+	for i in skills:
+		RecordsTextArea.Append (i)
 
 	FeatTable = GemRB.LoadTable ("featreq")
 	FeatName = GemRB.LoadTable ("feats")
@@ -396,18 +399,24 @@ def DisplaySkills (pc):
 	featbits = [GemRB.GetPlayerStat (pc, IE_FEATS1), GemRB.GetPlayerStat (pc, IE_FEATS2), GemRB.GetPlayerStat (pc, IE_FEATS3)]
 	RecordsTextArea.Append ("\n\n[color=ffff00]")
 	RecordsTextArea.Append (36361)
-	RecordsTextArea.Append ("[/color]")
+	RecordsTextArea.Append ("[/color]\n")
 
+	feats = []
 	for i in range(rows):
 		featidx = i/32
 		pos = 1<<(i%32)
 		if featbits[featidx]&pos:
 			feat = FeatName.GetValue (i, 1)
-			RecordsTextArea.Append (feat, -1)
 			stat = FeatTable.GetValue (i, 9, 2)
 			if stat:
 				multi = GemRB.GetPlayerStat (pc, stat)
-				RecordsTextArea.Append (": "+str(multi) )
+				feats.append (GemRB.GetString(feat) + ": " + str(multi) + "\n")
+			else:
+				feats.append (GemRB.GetString(feat) + "\n")
+
+	feats.sort()
+	for i in feats:
+		RecordsTextArea.Append (i)
 
 	return
 
