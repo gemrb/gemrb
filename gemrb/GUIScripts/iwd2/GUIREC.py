@@ -364,8 +364,188 @@ def DisplayGeneral (pc):
 
 	return
 
+#FIXME: display only nonzero values except for casting failure
+#TODO: +/- prefix
+#TODO: check if there are any other entries
 def DisplayWeapons (pc):
 	Window = RecordsWindow
+
+	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
+	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
+	# maybe add an iwd2 mode to GemRB.GetAbilityBonus
+	GA = lambda s, pc=pc: int((GS(s)-10)/2)
+
+	###################
+	# Attack Roll Modifiers
+	RecordsTextArea.Append ("[color=ffff00]")
+	RecordsTextArea.Append (9457)
+	RecordsTextArea.Append ("[/color]\n")
+
+	combatdet = GemRB.GetCombatDetails(pc, 0)
+
+	# Main Hand
+	#TODO: display all the attack values (+15/+10/+5)
+	current = combatdet["ToHit"]
+	RecordsTextArea.Append (delimited_txt (734, ":", str (current), 0))
+	# Base
+	RecordsTextArea.Append ("  ", -1) # indentation
+	RecordsTextArea.Append (delimited_txt (31353, ":", str (GS(IE_TOHIT)), 0))
+	# Weapon
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (32560 , ":", str (0), 0))
+	# Proficiency
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (32561, ":", str (0), 0))
+	# Armor Penalty
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (39816 , ":", str (0), 0))
+	#TODO: check if there's also a @39822 = ~Shield Penalty~
+
+	# Abilities
+	#FIXME: this is different for ranged weapons (dex) or if weapon finese is chosen (dex or str)
+	strbon = GA(IE_STR)
+	if strbon:
+		RecordsTextArea.Append ("  ", -1)
+		RecordsTextArea.Append (delimited_txt (33547, ":", str (strbon), 0))
+	# Others
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (33548, ":", str (current - GS(IE_TOHIT) - strbon)))
+	RecordsTextArea.Append ("\n")
+
+	# Off Hand
+	if (GemRB.IsDualWielding(pc)):
+		RecordsTextArea.Append (delimited_txt (733, ":", str (GemRB.GetCombatDetails(pc, 1)["ToHit"]), 0))
+		RecordsTextArea.Append ("\n")
+		#TODO: probably all the same categories as above
+
+
+	###################
+	# Number of Attacks
+	RecordsTextArea.Append (delimited_txt (9458, ":", str (GS (IE_NUMBEROFATTACKS)/2)))
+	RecordsTextArea.Append ("\n")
+
+	###################
+	# Armor Class
+	RecordsTextArea.Append ("[color=ffff00]")
+	RecordsTextArea.Append (33553)
+	RecordsTextArea.Append ("[/color]\n")
+	RecordsTextArea.Append (delimited_txt (33553, ":", str (GS(IE_ARMORCLASS)), 0))
+
+	# Base
+	RecordsTextArea.Append ("  ", -1) # indentation
+	RecordsTextArea.Append (delimited_txt (31353, ":", str (10), 0))
+	# Armor
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (11997, ":", str (0), 0))
+	# Shield
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (6347, ":", str (0), 0))
+	# Deflection
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (33551, ":", str (0), 0))
+	# Generic
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (33552, ":", str (0), 0))
+	# Dexterity
+	if GA(IE_DEX):
+		RecordsTextArea.Append ("  ", -1)
+		RecordsTextArea.Append (delimited_txt (1151, ":", str (GA(IE_DEX)), 0))
+	# Monk Wisdom Bonus: <number> to AC
+	if GS(IE_LEVELMONK):
+		RecordsTextArea.Append ("  ", -1)
+		GemRB.SetToken ("number", str (GA(IE_WIS)))
+		RecordsTextArea.Append (39431, -1)
+	#TODO: Dodge?
+
+	RecordsTextArea.Append ("\n\n")
+
+	###################
+	# Armor Class Modifiers
+	stat = GS (IE_ACMISSILEMOD) + GS (IE_ACSLASHINGMOD) + GS (IE_ACPIERCINGMOD) + GS (IE_ACCRUSHINGMOD)
+	if stat:
+		RecordsTextArea.Append ("[color=ffff00]")
+		RecordsTextArea.Append (11766)
+		RecordsTextArea.Append ("[/color]")
+
+		# Missile
+		if GS (IE_ACMISSILEMOD):
+			RecordsTextArea.Append ("  ", -1) # indentation
+			RecordsTextArea.Append (delimited_txt (11767, ":", str (GS (IE_ACMISSILEMOD)), 0))
+		# Slashing
+		if GS (IE_ACSLASHINGMOD):
+			RecordsTextArea.Append ("  ", -1)
+			RecordsTextArea.Append (delimited_txt (11768, ":", str (GS (IE_ACSLASHINGMOD)), 0))
+		# Piercing
+		if GS (IE_ACPIERCINGMOD):
+			RecordsTextArea.Append ("  ", -1)
+			RecordsTextArea.Append (delimited_txt (11769, ":", str (GS (IE_ACPIERCINGMOD)), 0))
+		# Bludgeoning
+		if GS (IE_ACCRUSHINGMOD):
+			RecordsTextArea.Append ("  ", -1)
+			RecordsTextArea.Append (delimited_txt (11770, ":", str (GS (IE_ACCRUSHINGMOD))))
+
+		RecordsTextArea.Append ("\n")
+
+	###################
+	# Arcane spell failure
+	if GS(IE_LEVELBARD) + GS(IE_LEVELSORCEROR) + GS(IE_LEVELMAGE):
+		RecordsTextArea.Append ("[color=ffff00]")
+		RecordsTextArea.Append (41391)
+		RecordsTextArea.Append ("[/color]\n")
+
+		# Casting Failure
+		RecordsTextArea.Append (delimited_txt (41390 , ":", str (GS(IE_SPELLFAILUREMAGE)), 0))
+		# Armor Penalty
+		RecordsTextArea.Append ("  ", -1)
+		RecordsTextArea.Append (delimited_txt (39816 , ":", str (0), 0))
+		# Shield Penalty
+		RecordsTextArea.Append ("  ", -1)
+		RecordsTextArea.Append (delimited_txt (39822, ":", str (0), 0))
+		#TODO: check if there's also the bonus from armored arcana
+
+		RecordsTextArea.Append ("\n\n")
+
+	###################
+	# Weapon Statistics
+	RecordsTextArea.Append ("[color=ffff00]")
+	RecordsTextArea.Append (41119)
+	RecordsTextArea.Append ("[/color]\n")
+
+	slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )
+	if not slot_item:
+		print "ARGHH, no slot item, bailing out"
+		return
+	item = GemRB.GetItem (slot_item["ItemResRef"])
+	##FIXME: display Ranged (41123) + ammo for ranged weapons
+	RecordsTextArea.Append (delimited_str (734, " -", item["ItemNameIdentified"], 0))
+
+	# Damage
+	# TODO: display the unresolved damage string (2d6)
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (39518, ":", str (0), 0))
+	# Strength
+	# TODO: check if the weapon takes strength bonus at all
+	if GA(IE_STR):
+		RecordsTextArea.Append ("  ", -1)
+		RecordsTextArea.Append (delimited_txt (1145, ":", str (GA(IE_STR)), 0))
+	# Launcher
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (41408, ":", str (0), 0))
+	# Damage Potential
+	# TODO: display the unresolved total damage potential (2-12)
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (41120, ":", str (0), 0))
+	# Critical Hit (19-20 / x2)
+	# TODO: display the number of rolls and check if the critical range is already ok
+	crange = 20 - combatdet["CriticalBonus"]
+	if crange == 20:
+		crange = "20 / x" + str(1)
+	else:
+		crange = str(crange) + "-20 / x" + str(1)
+	RecordsTextArea.Append ("  ", -1)
+	RecordsTextArea.Append (delimited_txt (41122, ":", crange, 0))
+
+	#TODO: probably repeat for the off-hand
 
 	return
 
@@ -423,14 +603,22 @@ def DisplaySkills (pc):
 
 	return
 
-def delimited_str(strref, delimiter, strref2):
+def delimited_str(strref, delimiter, strref2, newline=1):
 	if strref2:
-		return GemRB.GetString(strref) + delimiter + " " + GemRB.GetString(strref2) + "\n"
+		val = GemRB.GetString(strref) + delimiter + " " + GemRB.GetString(strref2)
 	else:
-		return GemRB.GetString(strref) + delimiter + "\n"
+		val = GemRB.GetString(strref) + delimiter
+	if newline:
+		return val + "\n"
+	else:
+		return val
 
-def delimited_txt(strref, delimiter, text):
-	return GemRB.GetString(strref) + delimiter + " " + str(text) + "\n"
+def delimited_txt(strref, delimiter, text, newline=1):
+	val = GemRB.GetString(strref) + delimiter + " " + str(text)
+	if newline:
+		return val + "\n"
+	else:
+		return val
 
 #character information
 def DisplayMisc (pc):
