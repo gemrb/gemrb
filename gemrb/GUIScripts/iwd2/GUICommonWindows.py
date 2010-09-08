@@ -322,7 +322,6 @@ def ActionUseItemPressed ():
 	return
 
 def ActionCastPressed ():
-	print "CASRRE"
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 2)
 	UpdateActionsWindow ()

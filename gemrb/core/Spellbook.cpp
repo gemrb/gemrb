@@ -600,6 +600,31 @@ bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
 	return false;
 }
 
+bool Spellbook::UnmemorizeSpell(const ieResRef ResRef, bool deplete)
+{
+	for (int type = 0; type<NUM_BOOK_TYPES; type++) {
+		std::vector< CRESpellMemorization* >::iterator sm;
+		for (sm = spells[type].begin(); sm != spells[type].end(); sm++) {
+			std::vector< CREMemorizedSpell* >::iterator s;
+			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); s++) {
+				if (strnicmp(ResRef, (*s)->SpellResRef, sizeof(ieResRef) ) ) {
+					continue;
+				}
+				if (deplete) {
+					(*s)->Flags = 0;
+				} else {
+					delete *s;
+					(*sm)->memorized_spells.erase( s );
+				}
+				ClearSpellInfo();
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 //bitfield disabling type: 1 - mage, 2 - cleric etc
 //level: if set, then finds that level only
 CREMemorizedSpell* Spellbook::FindUnchargedSpell(int type, int level)

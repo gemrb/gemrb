@@ -5128,17 +5128,34 @@ void GameScript::AddSpecialAbility( Scriptable* Sender, Action* parameters)
 	core->SetEventFlag(EF_ACTION);
 }
 
+//actually this just depletes a spell, doesn't remove it from the book
+//GemRB extension: the first/second int parameter can also make it removed 
+//from the spell memorization schedule (also from the spellbook)
 void GameScript::RemoveSpell( Scriptable* Sender, Action* parameters)
 {
+	ieResRef spellres;
+	int type;
+
 	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	if (!ResolveSpellName( spellres, parameters) ) {
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
 	if (parameters->string0Parameter[0]) {
-		actor->spellbook.RemoveSpell(parameters->string0Parameter);
+		type = parameters->int1Parameter;
+	} else {
+		type = parameters->int0Parameter;
+	}
+	if (type==2) {
+	//remove spell from both book and memorization
+		actor->spellbook.RemoveSpell(spellres);
 		return;
 	}
-	actor->spellbook.RemoveSpell(parameters->int0Parameter);
+	//type == 1 remove spell only from memorization
+	//type == 0 original behaviour: deplete only
+	actor->spellbook.UnmemorizeSpell(spellres, type);
 }
 
 void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
