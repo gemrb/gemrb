@@ -4555,7 +4555,12 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 		// add strength bonus; backstab does not affect it
 		// TODO: should actually check WEAPON_USESTRENGTH, since a sling in bg2 has it
 		if (GetAttackStyle() != WEAPON_RANGED) {
-			damage += core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA) );
+			if (core->HasFeature(GF_3ED_RULES) && wi->itemflags&IE_INV_ITEM_TWOHANDED) {
+				// 150% bonus for twohandlers
+				damage += 150 * core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA)) / 100;
+			} else {
+				damage += core->GetStrengthBonus(1, GetStat(IE_STR), GetStat(IE_STREXTRA) );
+			}
 		}
 	}
 
