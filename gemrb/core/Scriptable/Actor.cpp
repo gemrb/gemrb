@@ -2504,7 +2504,7 @@ void Actor::ReactToDeath(const char * deadname)
 //call this only from gui selects
 void Actor::SelectActor()
 {
-	DisplayStringCore(this, VB_SELECT, DS_CONSOLE|DS_CONST );
+	DisplayStringCore(this, VB_SELECT+core->Roll(1,3,-1), DS_CONSOLE|DS_CONST );
 }
 
 void Actor::Panic(Scriptable *attacker, int panicmode)
@@ -5315,11 +5315,21 @@ void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index)
 		case VB_DIE:
 			index = 10;
 			break;
+		//TODO: one day we should implement verbal constant groups
 		case VB_SELECT:
-			index = 36+rand()%4;
+		case VB_SELECT+1:
+		case VB_SELECT+2:
+			index = 36;
 			break;
+		default:
+			printMessage("Actor","TODO:", YELLOW);
+			printf("Cannot determine 2DA rowcount for index: %d\n", index);
+			return;
 	}
-	strnlwrcpy(Sound, tab->QueryField (index, 0), 8);
+	printMessage("Actor"," ", WHITE);
+	printf("Getting sound 2da %.8s entry: %s\n", anims->ResRef, tab->GetRowName(index) );
+	int col = core->Roll(1,tab->GetColumnCount(index),-1);
+	strnlwrcpy(Sound, tab->QueryField (index, col), 8);
 }
 
 void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index)
@@ -5377,6 +5387,10 @@ void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
 	} else {
 		GetSoundFrom2DA(Sound, index);
 	}
+
+	//Empty resrefs
+	if (Sound[0]=='*') Sound[0]=0;
+	else if(!strncmp(Sound,"nosound",8) ) Sound[0]=0;
 }
 
 void Actor::SetActionButtonRow(ActionButtonRow &ar)
