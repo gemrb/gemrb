@@ -332,6 +332,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 				}
 			}
 	}
+	InternalFlags &= ~IF_ONCREATION;
 }
 
 void Scriptable::AddAction(Action* aC)
