@@ -1118,6 +1118,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply) con
 		break;
 	//this shouldn't happen
 	default:
+		printf("Unknown delay type: %d (from %d)\n", DelayType(fx->TimingMode&0xff), fx->TimingMode);
 		abort();
 	}
 
