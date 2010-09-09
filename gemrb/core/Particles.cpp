@@ -80,6 +80,7 @@ void InitSparks()
 			TranslateColor(value, sparkcolors[i][j]);
 		}
 	}
+	inited = true;
 }
 
 Particles::Particles(int s)
