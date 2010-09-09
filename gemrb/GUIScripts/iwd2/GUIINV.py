@@ -450,7 +450,7 @@ def OnDragItem ():
 	return
 
 def OnDropItemToPC ():
-	pc = GemRB.GetVar ("PressedPortrait") + 1
+	pc = GemRB.GetVar ("PressedPortrait")
 
 	GemRB.DropDraggedItem (pc, -3)
 	if GemRB.IsDraggingItem ():
