@@ -201,8 +201,8 @@ Interface::Interface(int iargc, char* iargv[])
 	strncpy( MovieFont, "STONESML", sizeof(MovieFont) );
 	strncpy( ScrollCursorBam, "CURSARW", sizeof(ScrollCursorBam) );
 	strncpy( GlobalScript, "BALDUR", sizeof(GlobalScript) );
-	strncpy( WorldMapName[0], "WORLDMAP", sizeof(WorldMapName) );
-	memset( WorldMapName[1], 0, sizeof(WorldMapName) );
+	strncpy( WorldMapName[0], "WORLDMAP", sizeof(ieResRef) );
+	memset( WorldMapName[1], 0, sizeof(ieResRef) );
 	strncpy( Palette16, "MPALETTE", sizeof(Palette16) );
 	strncpy( Palette32, "PAL32", sizeof(Palette32) );
 	strncpy( Palette256, "MPAL256", sizeof(Palette256) );
