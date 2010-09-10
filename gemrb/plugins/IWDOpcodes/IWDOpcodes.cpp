@@ -2328,9 +2328,9 @@ int fx_nausea (Scriptable* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_nausea (%2d)\n", fx->Opcode);
 	//FIXME: i'm not sure if this part is there
 	//create the sleep effect only once?
-	if (!fx->Parameter3) {
+	if (!fx->Parameter3 && Owner) {
 		Effect *newfx = EffectQueue::CreateEffect(fx_unconscious_state_ref,
-			fx->Parameter1, 1, fx->Duration);
+			fx->Parameter1, 1, fx->TimingMode);
 		newfx->Power = fx->Power;
 		core->ApplyEffect(newfx, target, Owner);
 
