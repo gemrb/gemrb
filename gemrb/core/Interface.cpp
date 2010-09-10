@@ -201,7 +201,8 @@ Interface::Interface(int iargc, char* iargv[])
 	strncpy( MovieFont, "STONESML", sizeof(MovieFont) );
 	strncpy( ScrollCursorBam, "CURSARW", sizeof(ScrollCursorBam) );
 	strncpy( GlobalScript, "BALDUR", sizeof(GlobalScript) );
-	strncpy( WorldMapName, "WORLDMAP", sizeof(WorldMapName) );
+	strncpy( WorldMapName[0], "WORLDMAP", sizeof(WorldMapName) );
+	memset( WorldMapName[1], 0, sizeof(WorldMapName) );
 	strncpy( Palette16, "MPALETTE", sizeof(Palette16) );
 	strncpy( Palette32, "PAL32", sizeof(Palette32) );
 	strncpy( Palette256, "MPAL256", sizeof(Palette256) );
@@ -560,7 +561,7 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_MASTERSCRIPT) {
 		EventFlag&=~EF_MASTERSCRIPT;
-    game->SetExpansion();
+		game->SetExpansion();
 		guiscript->RunFunction( "MessageWindow", "UpdateMasterScript" );
 		return;
 	}
@@ -577,9 +578,9 @@ thus cannot be called from DrawWindows directly
 */
 void Interface::HandleFlags()
 {
-  //clear events because the context changed, except the masterscript flag
-  //which was set before loading the game
-  EventFlag &= EF_MASTERSCRIPT;
+	//clear events because the context changed, except the masterscript flag
+	//which was set before loading the game
+	EventFlag &= EF_MASTERSCRIPT;
 	EventFlag |= EF_CONTROL; 
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
@@ -3750,8 +3751,8 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 
 	DataStream* gam_str = NULL;
 	DataStream* sav_str = NULL;
-	DataStream* wmp_str = NULL;
-
+	DataStream* wmp_str1 = NULL;
+	DataStream* wmp_str2 = NULL;
 
 	Game* new_game = NULL;
 	WorldMapArray* new_worldmap = NULL;
@@ -3764,18 +3765,22 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 		//Load the Default Game
 		gam_str = gamedata->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
 		sav_str = NULL;
-		wmp_str = gamedata->GetResource( WorldMapName, IE_WMP_CLASS_ID );
+		wmp_str1 = gamedata->GetResource( WorldMapName[0], IE_WMP_CLASS_ID );
+		if (WorldMapName[1][0]) {
+			wmp_str2 = gamedata->GetResource( WorldMapName[1], IE_WMP_CLASS_ID );
+		}
 	} else {
 		gam_str = sg->GetGame();
 		sav_str = sg->GetSave();
-		wmp_str = sg->GetWmap();
+		wmp_str1 = sg->GetWmap(0);
+		wmp_str2 = sg->GetWmap(1);
 	}
 
 	// These are here because of the goto
 	PluginHolder<SaveGameMgr> gam_mgr(IE_GAM_CLASS_ID);
 	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
 
-	if (!gam_str || !wmp_str)
+	if (!gam_str || !(wmp_str1 || wmp_str2) )
 		goto cleanup;
 
 	// Load GAM file
@@ -3795,12 +3800,13 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	if (!wmp_mgr)
 		goto cleanup;
 
-	if (!wmp_mgr->Open( wmp_str, true ))
+	if (!wmp_mgr->Open( wmp_str1, wmp_str2, true ))
 		goto cleanup;
 
 	new_worldmap = wmp_mgr->GetWorldMapArray( );
 
-	wmp_str = NULL;
+	wmp_str1 = NULL;
+	wmp_str2 = NULL;
 
 	LoadProgress(30);
 	// Unpack SAV (archive) file to Cache dir
@@ -3833,7 +3839,8 @@ cleanup:
 	delete new_worldmap;
 
 	delete gam_str;
-	delete wmp_str;
+	delete wmp_str1;
+	delete wmp_str2;
 	delete sav_str;
 }
 
@@ -3849,10 +3856,12 @@ void Interface::UpdateMasterScript()
 		return;
 
 	if (worldmap) {
-		DataStream *wmp_str = gamedata->GetResource( WorldMapName, IE_WMP_CLASS_ID );
+		DataStream *wmp_str1 = gamedata->GetResource( WorldMapName[0], IE_WMP_CLASS_ID );
+		DataStream *wmp_str2 = gamedata->GetResource( WorldMapName[1], IE_WMP_CLASS_ID );
 
-		if (!wmp_mgr->Open( wmp_str, true )) {
-			delete wmp_str;
+		if (!wmp_mgr->Open( wmp_str1, wmp_str2, true )) {
+			delete wmp_str1;
+			delete wmp_str2;
 		}
 
 		delete worldmap;
@@ -4903,20 +4912,34 @@ int Interface::WriteWorldMap(const char *folder)
 		return -1;
 	}
 
-	int size = wmm->GetStoredFileSize (worldmap);
-	if (size > 0) {
+	if (WorldMapName[1][0]) {
+		worldmap->SetSingle(false);
+	}
+
+	int size1 = wmm->GetStoredFileSize (worldmap, 0);
+	int size2 = 1; //just a dummy value
+
+	//if size is 0 for the first worldmap, then there is a problem
+	if (!worldmap->IsSingle() && (size1>0) ) {
+		size2=wmm->GetStoredFileSize (worldmap, 1);
+	}
+
+	int ret = 0;
+	if ((size1 < 0) || (size2<0) ) {
+		ret=-1;
+	} else {
 		//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
-		FileStream str;
+		FileStream str1;
+		FileStream str2;
 
-		str.Create( folder, WorldMapName, IE_WMP_CLASS_ID );
-		int ret = wmm->PutWorldMap (&str, worldmap);
-		if (ret <0) {
-			printMessage("Core"," ", YELLOW);
-			printf("Internal error, worldmap cannot be saved: %s\n", folder);
-			return -1;
+		str1.Create( folder, WorldMapName[0], IE_WMP_CLASS_ID );
+		if (!worldmap->IsSingle()) {
+			str2.Create( folder, WorldMapName[1], IE_WMP_CLASS_ID );
 		}
-	} else {
+		ret = wmm->PutWorldMap (&str1, &str2, worldmap);
+	}
+	if (ret <0) {
 		printMessage("Core"," ", YELLOW);
 		printf("Internal error, worldmap cannot be saved: %s\n", folder);
 		return -1;

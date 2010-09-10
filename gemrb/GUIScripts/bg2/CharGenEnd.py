@@ -109,9 +109,13 @@ def OnLoad():
 	SmallPortrait = GemRB.GetToken ("SmallPortrait")
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 
-	# add the starting inventory for tob
 	if GUICommon.GameIsTOB():
+		# add the starting inventory for tob
 		GiveEquipment(MyChar, ClassName, KitIndex)
+
+	if GUICommon.HasTOB() and GemRB.GetVar("oldgame"):
+		# add the new area for soa if we have it
+		GemRB.AddNewArea("xnewarea")
 
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:

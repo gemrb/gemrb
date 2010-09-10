@@ -140,9 +140,9 @@ DataStream* SaveGame::GetGame() const
 	return manager.GetResource(Prefix, IE_GAM_CLASS_ID, true);
 }
 
-DataStream* SaveGame::GetWmap() const
+DataStream* SaveGame::GetWmap(int idx) const
 {
-	return manager.GetResource(core->WorldMapName, IE_WMP_CLASS_ID, true);
+	return manager.GetResource(core->WorldMapName[idx], IE_WMP_CLASS_ID, true);
 }
 
 DataStream* SaveGame::GetSave() const
@@ -224,7 +224,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 		return false;
 
 	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
-	if (cnt != 2) { 
+	if (cnt != 2) {
 		//The matcher didn't match: either this is not a valid dir
 		//or the SAVEGAME_DIRECTORY_MATCHER needs updating.
 		printMessage( "SaveGameIterator", " ", LIGHT_RED );
@@ -245,12 +245,21 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 		return false;
 	}
 
-	PathJoinExt(ftmp, dtmp, core->WorldMapName, "wmp");
+	PathJoinExt(ftmp, dtmp, core->WorldMapName[0], "wmp");
 	if (access( ftmp, R_OK )) {
 		printMessage("SaveGameIterator"," ",YELLOW);
 		printf("Ignoring slot %s because of no appropriate worldmap!\n", dtmp);
 		return false;
 	}
+
+	/* we might need something here as well
+	PathJoinExt(ftmp, dtmp, core->WorldMapName[1], "wmp");
+	if (access( ftmp, R_OK )) {
+		printMessage("SaveGameIterator"," ",YELLOW);
+		printf("Ignoring slot %s because of no appropriate worldmap!\n", dtmp);
+		return false;
+	}
+	*/
 
 	return true;
 }
@@ -563,10 +572,10 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 
 void SaveGameIterator::DeleteSaveGame(Holder<SaveGame> game)
 {
-       if (!game) {
-               return;
-       }
+	if (!game) {
+		return;
+	}
 
-       core->DelTree( game->GetPath(), false ); //remove all files from folder
-       rmdir( game->GetPath() );
+	core->DelTree( game->GetPath(), false ); //remove all files from folder
+	rmdir( game->GetPath() );
 }

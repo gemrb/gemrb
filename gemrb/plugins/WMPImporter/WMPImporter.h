@@ -30,26 +30,29 @@
 
 class WMPImporter : public WorldMapMgr {
 private:
-	DataStream* str;
+	DataStream* str1;
+	DataStream* str2;
 	bool autoFree;
 
 	ieDword WorldMapsCount;
-	ieDword WorldMapsOffset;
+	ieDword WorldMapsCount1, WorldMapsCount2;
+	ieDword WorldMapsOffset1, WorldMapsOffset2;
 
 public:
 	WMPImporter(void);
 	~WMPImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream1, DataStream* stream2, bool autoFree = true);
 	WorldMapArray *GetWorldMapArray();
 
-	int GetStoredFileSize(WorldMapArray *wmap);
-	int PutWorldMap(DataStream* stream, WorldMapArray *wmap);
+	int GetStoredFileSize(WorldMapArray *wmap, unsigned int index);
+	int PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray *wmap);
 private:
-	void GetWorldMap(WorldMap *m, unsigned int index);
+	void GetWorldMap(DataStream *str, WorldMap *m, unsigned int index);
 
-	WMPAreaEntry* GetAreaEntry(WMPAreaEntry* ae);
-	WMPAreaLink* GetAreaLink(WMPAreaLink* al);
-	int PutMaps(DataStream *stream, WorldMapArray *wmap);
+	WMPAreaEntry* GetAreaEntry(DataStream *str, WMPAreaEntry* ae);
+	WMPAreaLink* GetAreaLink(DataStream *str, WMPAreaLink* al);
+	int PutMaps(DataStream *stream1, DataStream *stream2, WorldMapArray *wmap);
+	int PutMap(DataStream *stream, WorldMapArray *wmap, unsigned int index);
 	int PutLinks(DataStream *stream, WorldMap *wmap);
 	int PutAreas(DataStream *stream, WorldMap *wmap);
 };

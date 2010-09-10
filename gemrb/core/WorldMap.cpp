@@ -171,6 +171,35 @@ void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry *ae)
 	area_entries.push_back(ae);
 }
 
+void WorldMap::InsertAreaLink(unsigned int idx, unsigned int dir, WMPAreaLink *arealink)
+{
+	unsigned int pos;
+	WMPAreaEntry *ae;
+
+	WMPAreaLink *al = new WMPAreaLink();
+	memcpy(al, arealink, sizeof(WMPAreaLink) );
+	unsigned int max = area_links.size();
+	area_links.push_back(al);
+	for(pos = max; pos>idx; pos--) {
+		area_links[pos]=area_links[pos-1];
+	}
+	area_links[idx]=al;
+
+	max = area_entries.size();
+	for(pos = 0; pos<max; pos++) {
+		ae = area_entries[pos];
+		for (unsigned int k=0;k<4;k++) {
+			if ((pos==idx) && (k==dir)) {
+				ae->AreaLinksCount[k]++;
+				continue;
+			}
+			if(ae->AreaLinksIndex[k]>=idx) {
+				ae->AreaLinksIndex[k]++;
+			}
+		}
+	}
+}
+
 void WorldMap::SetAreaLink(unsigned int x, WMPAreaLink *arealink)
 {
 	WMPAreaLink *al =new WMPAreaLink();
@@ -486,11 +515,14 @@ WorldMapArray::WorldMapArray(unsigned int count)
 	CurrentMap = 0;
 	MapCount = count;
 	all_maps = (WorldMap **) calloc(count, sizeof(WorldMap *) );
+	single = true;
 }
 
 WorldMapArray::~WorldMapArray()
 {
-	for (unsigned int i = 0; i<MapCount; i++) {
+	unsigned int i;
+
+	for (i = 0; i<MapCount; i++) {
 		if (all_maps[i]) {
 			delete all_maps[i];
 		}

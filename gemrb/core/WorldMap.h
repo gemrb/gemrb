@@ -149,6 +149,7 @@ public:
 	WMPAreaLink *GetLink(unsigned int index) const { return area_links[index]; }
 	WMPAreaEntry *GetNewAreaEntry() const;
 	void SetAreaEntry(unsigned int index, WMPAreaEntry *areaentry);
+	void InsertAreaLink(unsigned int idx, unsigned int dir, WMPAreaLink *arealink);
 	void SetAreaLink(unsigned int index, WMPAreaLink *arealink);
 	void AddAreaEntry(WMPAreaEntry *ae);
 	void AddAreaLink(WMPAreaLink *al);
@@ -185,7 +186,10 @@ private:
 	WorldMap **all_maps;
 	unsigned int MapCount;
 	unsigned int CurrentMap;
+	bool single;
 public:
+	bool IsSingle() const { return single; }
+	void SetSingle(bool arg) { single = arg; }
 	unsigned int GetMapCount() const { return MapCount; }
 	unsigned int GetCurrentMapIndex() const { return CurrentMap; }
 	WorldMap *NewWorldMap(unsigned int index);

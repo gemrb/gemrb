@@ -82,8 +82,6 @@ static int StoreSpellsCount = -1;
 static int UsedItemsCount = -1;
 static int ItemSoundsCount = -1;
 
-//#define UIT_ALLOW_REPLACE    1 //item is replaceable with another item on this list
-
 struct UsedItemType {
 	ieResRef itemname;
 	ieVariable username; //death variable
@@ -1580,13 +1578,19 @@ PyDoc_STRVAR( GemRB_SetMasterScript__doc,
 PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 {
 	char* script;
-	char* worldmap;
+	char* worldmap1;
+	char* worldmap2 = NULL;
 
-	if (!PyArg_ParseTuple( args, "ss", &script, &worldmap )) {
+	if (!PyArg_ParseTuple( args, "ss|s", &script, &worldmap1, &worldmap2 )) {
 		return AttributeError( GemRB_SetMasterScript__doc );
 	}
 	strnlwrcpy( core->GlobalScript, script, 8 );
-	strnlwrcpy( core->WorldMapName, worldmap, 8 );
+	strnlwrcpy( core->WorldMapName[0], worldmap1, 8 );
+	if (!worldmap2) {
+		memset(core->WorldMapName[1], 0, 8);
+	} else {
+		strnlwrcpy( core->WorldMapName[1], worldmap2, 8 );
+	}
 	core->UpdateMasterScript();
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -2408,6 +2412,129 @@ static PyObject* GemRB_Window_DeleteControl(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Control is not found" );
 	}
 	win -> DelControl( CtrlIndex );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_AddNewArea__doc,
+"AddNewArea(_2daresref)\n\n"
+"Adds the extension areas to the game.");
+
+static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
+{
+	const char *resref;
+
+	if (!PyArg_ParseTuple( args, "s", &resref)) {
+		return AttributeError( GemRB_AddNewArea__doc );
+	}
+
+	AutoTable newarea(resref);
+	if (!newarea) {
+		return RuntimeError( "2da not found!");
+	}
+
+	WorldMap *wmap = core->GetWorldMap();
+	if (!wmap) {
+		return RuntimeError( "no worldmap loaded!");
+	}
+
+	const char *enc[5];
+	int k;
+	int links[4];
+	int indices[4];
+	int rows = newarea->GetRowCount();
+	for(int i=0;i<rows;i++) {
+		const char *area   = newarea->QueryField(i,0);
+		const char *script = newarea->QueryField(i,1);
+		int flags          = atoi(newarea->QueryField(i,2));
+		int icon           = atoi(newarea->QueryField(i,3));
+		int locx           = atoi(newarea->QueryField(i,4));
+		int locy           = atoi(newarea->QueryField(i,5));
+		int label          = atoi(newarea->QueryField(i,6));
+		int name           = atoi(newarea->QueryField(i,7));
+		const char *ltab   = newarea->QueryField(i,8);
+		links[WMP_NORTH]   = atoi(newarea->QueryField(i,9));
+		links[WMP_EAST]    = atoi(newarea->QueryField(i,10));
+		links[WMP_SOUTH]   = atoi(newarea->QueryField(i,11));
+		links[WMP_WEST]    = atoi(newarea->QueryField(i,12));
+		//this is the number of links in the 2da, we don't need it
+		int linksto        = atoi(newarea->QueryField(i,13));
+		
+		unsigned int local = 0;
+		int linkcnt = wmap->GetLinkCount();
+		for (k=0;k<4;k++) {
+			indices[k] = linkcnt;
+			linkcnt += links[k];
+			local += links[k];
+		}
+		unsigned int total = linksto+local;
+
+		AutoTable newlinks(ltab);
+		if (!newlinks || total != newlinks->GetRowCount() ) {
+			return RuntimeError( "invalid links 2da!");
+		}
+
+		WMPAreaEntry *entry = wmap->GetNewAreaEntry();
+		strnuprcpy(entry->AreaName, area, 8);
+		strnuprcpy(entry->AreaResRef, area, 8);
+		strnuprcpy(entry->AreaLongName, script, 32);
+		entry->SetAreaStatus(flags, BM_SET);
+		entry->IconSeq = icon;
+		entry->X = locx;
+		entry->Y = locy;
+		entry->LocCaptionName = label;
+		entry->LocTooltipName = name;
+		memset(entry->LoadScreenResRef, 0, 8);
+		memcpy(entry->AreaLinksIndex, indices, sizeof(entry->AreaLinksIndex) );
+		memcpy(entry->AreaLinksCount, links, sizeof(entry->AreaLinksCount) );
+		
+		int thisarea = wmap->GetEntryCount();
+		wmap->AddAreaEntry(entry);
+		wmap->AreaEntriesCount++;
+		for (unsigned int j=0;j<total;j++) {
+			WMPAreaLink *link = new WMPAreaLink();
+			const char *larea = newlinks->QueryField(j,0);
+			int lflags        = atoi(newlinks->QueryField(j,1));
+			const char *ename = newlinks->QueryField(j,2);
+			int distance      = atoi(newlinks->QueryField(j,3));
+			int encprob       = atoi(newlinks->QueryField(j,4));
+			for(k=0;k<5;k++) {
+				enc[k]    = newlinks->QueryField(i,5+k);
+			}
+			int linktodir     = atoi(newlinks->QueryField(j,10));
+
+			unsigned int areaindex;
+			WMPAreaEntry *oarea = wmap->GetArea(larea, areaindex);
+			if (!oarea) {
+				//blabla
+				return RuntimeError("cannot establish area link!");
+			}
+			strnuprcpy(link->DestEntryPoint, ename, 32);
+			link->DistanceScale = distance;
+			link->DirectionFlags = lflags;
+			link->EncounterChance = encprob;
+			for(k=0;k<5;k++) {
+				if (enc[k][0]=='*') {
+					memset(link->EncounterAreaResRef[k],0,8);
+				} else {
+					strnuprcpy(link->EncounterAreaResRef[k], enc[k], 8);
+				}
+			}
+
+			//first come the local links, then 'links to' this area
+			//local is total-linksto
+			if (j<local) {
+				link->AreaIndex = thisarea;
+				//linktodir may need translation
+				wmap->InsertAreaLink(areaindex, linktodir, link);
+			} else {
+				link->AreaIndex = areaindex;
+				wmap->AddAreaLink(link);
+			}
+
+		}
+	}
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3405,7 +3532,7 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 	//get soundset based string constant
 	snprintf(Sound, _MAX_PATH, "%s/%s%02d",
 		actor->PCStats->SoundFolder, actor->PCStats->SoundSet, str);
-	core->GetAudioDrv()->Play( Sound, 0, 0,  GEM_SND_RELATIVE|GEM_SND_SPEECH);
+	core->GetAudioDrv()->Play( Sound, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -5514,7 +5641,7 @@ PyDoc_STRVAR( GemRB_GetStore__doc,
 "GetStore() => dictionary\n\n"
 "Returns relevant data of the current store." );
 
-#define STORETYPE_COUNT  7
+#define STORETYPE_COUNT 7
 static int storebuttons[STORETYPE_COUNT][4]={
 //store
 {STA_BUYSELL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_CURE|STA_OPTIONAL},
@@ -5785,7 +5912,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 
 	case IE_STORE_SELECT|IE_STORE_SELL:
 	{
-		//this is  not removeitem, because the item is just marked
+		//this is not removeitem, because the item is just marked
 		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
 		if (!si) {
 			return RuntimeError( "Item not found!" );
@@ -9240,6 +9367,7 @@ static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
 
 static PyMethodDef GemRBMethods[] = {
 	METHOD(ActOnPC, METH_VARARGS),
+	METHOD(AddNewArea, METH_VARARGS),
 	METHOD(ApplyEffect, METH_VARARGS),
 	METHOD(ApplySpell, METH_VARARGS),
 	METHOD(CanUseItemType, METH_VARARGS),

@@ -287,8 +287,8 @@ private:
 	Game * game;
 	Calendar * calendar;
 	WorldMapArray* worldmap;
-	ieDword GameFeatures;   //the first 32 bits
-	ieDword GameFeatures2;  //the second 32 bits
+	ieDword GameFeatures; //the first 32 bits
+	ieDword GameFeatures2;//the second 32 bits
 	ieResRef ButtonFont;
 	ieResRef CursorBam;
 	ieResRef ScrollCursorBam;
@@ -336,7 +336,7 @@ public:
 	int VersionOverride;
 	unsigned int SlotTypes; //this is the same as the inventory size
 	ieResRef GlobalScript;
-	ieResRef WorldMapName;
+	ieResRef WorldMapName[2];
 	Variables * AreaAliasTable;
 	Variables * ItemExclTable;
 	Variables * ItemDialTable, *ItemDial2Table;
@@ -516,7 +516,7 @@ public:
 	/** sets up load game */
 	void SetupLoadGame(Holder<SaveGame> save, int ver_override);
 	/** load saved game by index (-1 is default), ver_override is an optional parameter
-	    to override the saved game's version */
+	to override the saved game's version */
 	void LoadGame(SaveGame *save, int ver_override);
 	/** fix changes in global script/worldmap*/
 	void UpdateMasterScript();
