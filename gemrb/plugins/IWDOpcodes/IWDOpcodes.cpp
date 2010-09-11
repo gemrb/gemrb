@@ -1968,6 +1968,7 @@ int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx)
 
 	Effect *newfx = EffectQueue::CreateEffect(fx_death_ref, 0,
 			8, FX_DURATION_INSTANT_PERMANENT);
+	newfx->Target=FX_TARGET_PRESET;
 	core->ApplyEffect(newfx, target, Owner);
 
 	delete newfx;
