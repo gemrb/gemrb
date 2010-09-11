@@ -1712,19 +1712,26 @@ void Game::StartRainOrSnow(bool conditional, int w)
 	weather->SetPhase(P_FADE);
 }
 
-void Game::SetExpansion()
+void Game::SetExpansion(ieDword value)
 {
-	if (Expansion) {
+	if (Expansion>=value) {
 		return;
 	}
-	Expansion = 1;
+	Expansion = value;
 
-	core->GetDictionary()->SetAt( "PlayMode", 2 );
+	switch(Expansion) {
+	default:
+		core->SetEventFlag(EF_EXPANSION);
+		break;
+	//TODO: move this hardcoded hack to the scripts
+	case 5:
+		core->GetDictionary()->SetAt( "PlayMode", 2 );
 
-	int i = GetPartySize(false);
-	while(i--) {
-		Actor *actor = GetPC(i, false);
-		InitActorPos(actor);
+		int i = GetPartySize(false);
+		while(i--) {
+			Actor *actor = GetPC(i, false);
+			InitActorPos(actor);
+		}
 	}
 }
 

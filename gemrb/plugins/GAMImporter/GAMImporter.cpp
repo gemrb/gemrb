@@ -146,7 +146,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	str->ReadDword( &GlobalOffset );
 	str->ReadDword( &GlobalCount );
 	str->ReadResRef( newGame->CurrentArea );
-	str->ReadDword( &newGame->Unknown48 );
+	str->ReadDword( &newGame->Unknown48 );//this is still unknown
 	str->ReadDword( &JournalCount );
 	str->ReadDword( &JournalOffset );
 	switch (version) {
@@ -156,7 +156,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			str->ReadResRef( newGame->CurrentArea ); // FIXME: see above
 			memcpy(newGame->AnotherArea, newGame->CurrentArea, sizeof(ieResRef) );
 			str->ReadDword( &newGame->ControlStatus );
-			str->ReadDword( &KillVarsCount ); //this is still unknown
+			str->ReadDword( &newGame->Expansion );
 			str->ReadDword( &FamiliarsOffset );
 			str->ReadDword( &SavedLocOffset );
 			str->ReadDword( &SavedLocCount );
@@ -806,7 +806,6 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game)
 	stream->WriteDword( &GlobalOffset );
 	stream->WriteDword( &GlobalCount );
 	stream->WriteResRef( game->CurrentArea );
-	//this is always 0xffffffff
 	stream->WriteDword( &game->Unknown48 );
 	stream->WriteDword( &JournalCount );
 	stream->WriteDword( &JournalOffset );
@@ -821,7 +820,7 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game)
 		stream->WriteDword( &game->Reputation );
 		stream->WriteResRef( game->CurrentArea );
 		stream->WriteDword( &game->ControlStatus );
-		stream->WriteDword( &tmpDword);
+		stream->WriteDword( &game->Expansion);
 		stream->WriteDword( &FamiliarsOffset);
 		stream->WriteDword( &SavedLocOffset);
 		stream->WriteDword( &SavedLocCount);

@@ -184,7 +184,7 @@ public:
 #define EF_IDENTIFY      64       //starts identify screen
 #define EF_SELECTION     128      //selection changed
 #define EF_OPENSTORE     256      //open store window
-#define EF_MASTERSCRIPT  512      //change masterscript request
+#define EF_EXPANSION     512      //upgrade game request
 #define EF_CLOSECONTAINER 1024    //close the container window
 
 //autopause
@@ -607,8 +607,6 @@ public:
 	void ApplySpellPoint(const ieResRef resname, Map *area, const Point &pos, Scriptable *caster, int level);
 	/** applies a single effect on the target */
 	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster);
-	//int ApplyEffect(const ieResRef resname, Actor *target, Scriptable *caster, int level, const Point &p);
-	//Actor *target, Scriptable *caster, 
 	Effect *GetEffect(const ieResRef resname, int level, const Point &p);
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map);

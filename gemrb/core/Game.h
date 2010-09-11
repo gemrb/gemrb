@@ -187,7 +187,6 @@ private:
 public:
 	std::vector< Actor*> selected;
 	int version;
-	int Expansion;
 	Variables* kaputz;
 	ieByte* beasts;
 	ieByte* mazedata; //only in PST
@@ -214,9 +213,10 @@ public:
 	ieDword PartyGold;
 	ieWord NpcInParty;
 	ieWord WeatherBits;
-	ieDword Unknown48;
+	ieDword Unknown48; //still unknown
 	ieDword Reputation;
-	ieDword ControlStatus;// used in bg2, iwd (where you can switch panes off)
+	ieDword ControlStatus; // used in bg2, iwd (where you can switch panes off)
+	ieDword Expansion; // mostly used by BG2. IWD games set it to 3 on newgame
 	ieResRef AnotherArea;
 	ieResRef CurrentArea;
 	ieResRef LoadMos;
@@ -401,7 +401,7 @@ public:
 	/** updates current area music */
 	void ChangeSong(bool always = true, bool force = true);
 	/** sets expansion mode */
-	void SetExpansion();
+	void SetExpansion(ieDword value);
 	/** Dumps information about the object */
 	void DebugDump();
 	/** Finds an actor by global ID */

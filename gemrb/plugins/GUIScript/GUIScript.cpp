@@ -1546,7 +1546,7 @@ static PyObject* GemRB_Control_SetTooltip(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Window_SetVisible__doc,
-"SetVisible(WindowIndex, Visible)\n\n"
+"SetVisible(WindowIndex, Visible)=>bool\n\n"
 "Sets the Visibility Flag of a Window." );
 
 static PyObject* GemRB_Window_SetVisible(PyObject * /*self*/, PyObject* args)
@@ -1568,6 +1568,32 @@ static PyObject* GemRB_Window_SetVisible(PyObject * /*self*/, PyObject* args)
 
 	Py_INCREF( Py_None );
 	return Py_None;
+}
+
+
+PyDoc_STRVAR( GemRB_GameUpgrade__doc,
+"GameUpgrade(int value)\n\n"
+"Sets the game version to a higher value." );
+
+PyObject* GemRB_GameUpgrade(PyObject * /*self*/, PyObject* args)
+{
+	int value;
+
+	if (!PyArg_ParseTuple( args, "i", &value )) {
+		return AttributeError( GemRB_GameUpgrade__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	if ((unsigned int) value>=game->Expansion) {
+		Py_INCREF( Py_False );
+		return Py_False;
+	}
+	Py_INCREF( Py_True );
+	return Py_True;
 }
 
 //useful only for ToB and HoW, sets masterscript/worldmap name
@@ -2924,15 +2950,42 @@ static PyObject* GemRB_GameSetProtagonistMode(PyObject * /*self*/, PyObject* arg
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_GameSetExpansion__doc,
-"GameSetExpansion()\n\n"
-"Sets the expansion mode." );
-
-static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* /*args*/)
+PyDoc_STRVAR( GemRB_GameGetExpansion__doc,
+"GameGetExpansion()=>int\n\n"
+"Gets the expansion mode." );
+static PyObject* GemRB_GameGetExpansion(PyObject * /*self*/, PyObject* /*args*/)
 {
-	core->SetEventFlag(EF_MASTERSCRIPT);
-	Py_INCREF( Py_None );
-	return Py_None;
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}  
+	return PyInt_FromLong( game->Expansion );
+}
+
+PyDoc_STRVAR( GemRB_GameSetExpansion__doc,
+"GameSetExpansion(value)=>bool\n\n"
+"Sets the expansion mode, returns false if it was already set." );
+
+static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* args)
+{
+	int value;
+
+	if (!PyArg_ParseTuple( args, "i", &value )) {
+		return AttributeError( GemRB_GameSetExpansion__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	if ((unsigned int) value<game->Expansion) {
+		Py_INCREF( Py_False );
+		return Py_False;
+	}
+	game->SetExpansion(value);
+	Py_INCREF( Py_True );
+	return Py_True;
 }
 
 PyDoc_STRVAR( GemRB_GameSetScreenFlags__doc,
@@ -9413,7 +9466,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GamePause, METH_VARARGS),
 	METHOD(GameSelectPC, METH_VARARGS),
 	METHOD(GameSelectPCSingle, METH_VARARGS),
-	METHOD(GameSetExpansion, METH_NOARGS),
+	METHOD(GameSetExpansion, METH_VARARGS),
+	METHOD(GameGetExpansion, METH_NOARGS),
 	METHOD(GameSetFormation, METH_VARARGS),
 	METHOD(GameSetPartyGold, METH_VARARGS),
 	METHOD(GameSetPartySize, METH_VARARGS),

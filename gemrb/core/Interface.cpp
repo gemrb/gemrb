@@ -492,7 +492,6 @@ void Interface::HandleEvents()
 		gc=NULL;
 	}
 
-
 	if (EventFlag&EF_SELECTION) {
 		EventFlag&=~EF_SELECTION;
 		guiscript->RunFunction( "GUICommonWindows", "SelectionChanged", false);
@@ -559,16 +558,15 @@ void Interface::HandleEvents()
 		return;
 	}
 
-	if (EventFlag&EF_MASTERSCRIPT) {
-		EventFlag&=~EF_MASTERSCRIPT;
-		game->SetExpansion();
-		guiscript->RunFunction( "MessageWindow", "UpdateMasterScript" );
-		return;
-	}
-
 	if (EventFlag&EF_CLOSECONTAINER) {
 		EventFlag&=~EF_CLOSECONTAINER;
 		guiscript->RunFunction( "GUIWORLD", "CloseContainerWindow" );
+		return;
+	}
+
+	if (EventFlag&EF_EXPANSION) {
+		EventFlag&=~EF_EXPANSION;
+		guiscript->RunFunction( "MessageWindow", "GameExpansion", false );
 		return;
 	}
 }
@@ -578,10 +576,8 @@ thus cannot be called from DrawWindows directly
 */
 void Interface::HandleFlags()
 {
-	//clear events because the context changed, except the masterscript flag
-	//which was set before loading the game
-	EventFlag &= EF_MASTERSCRIPT;
-	EventFlag |= EF_CONTROL; 
+	//clear events because the context changed
+	EventFlag = EF_CONTROL; 
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
 		// when reaching this, quitflag should be 1 or 2
@@ -594,11 +590,13 @@ void Interface::HandleFlags()
 		QuitFlag &= ~QF_LOADGAME;
 		LoadGame(LoadGameIndex.get(), VersionOverride );
 		LoadGameIndex.release();
+		//after loading a game, always check if the game needs to be upgraded
 	}
 
 	if (QuitFlag&QF_ENTERGAME) {
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
+			EventFlag|=EF_EXPANSION;
 			timer->Init();
 
 			//rearrange party slots
@@ -3773,7 +3771,13 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 		gam_str = sg->GetGame();
 		sav_str = sg->GetSave();
 		wmp_str1 = sg->GetWmap(0);
-		wmp_str2 = sg->GetWmap(1);
+		if (WorldMapName[1][0]) {
+			wmp_str2 = sg->GetWmap(1);
+			if (!wmp_str2) {
+				//upgrade an IWD game to HOW
+				wmp_str2 = gamedata->GetResource( WorldMapName[1], IE_WMP_CLASS_ID );
+			}
+		}
 	}
 
 	// These are here because of the goto

@@ -113,10 +113,6 @@ def OnLoad():
 		# add the starting inventory for tob
 		GiveEquipment(MyChar, ClassName, KitIndex)
 
-	if GUICommon.HasTOB() and GemRB.GetVar("oldgame"):
-		# add the new area for soa if we have it
-		GemRB.AddNewArea("xnewarea")
-
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
 		if GemRB.GetVar("GUIEnhancements"):

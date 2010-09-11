@@ -191,7 +191,26 @@ def FixProtagonist( idx):
 	GiveEquipment(idx, ClassName, KitIndex)
 	return
 
-def UpdateMasterScript():
+#upgrade savegame to next version
+def GameExpansion():
+
+	version = GemRB.GameGetExpansion()
+	if version<3:
+		GemRB.GameSetReputation(100)
+
+	if not GUICommon.HasTOB():
+		return
+
+	if GemRB.GetVar("oldgame"):
+		#upgrade SoA to ToB/SoA
+		if GemRB.GameSetExpansion(4):
+			GemRB.AddNewArea("xnewarea")
+		return
+
+	if not GemRB.GameSetExpansion(5):
+		return
+
+	#upgrade to ToB only
 	GemRB.SetMasterScript("BALDUR25","WORLDM25")
 	GemRB.SetGlobal("INTOB","GLOBAL",1)
 	GemRB.SetGlobal("HADELLESIMEDREAM1","GLOBAL", 1)
@@ -202,10 +221,8 @@ def UpdateMasterScript():
 	GemRB.SetGlobal("HADJONDREAM2","GLOBAL", 1)
 	idx = GemRB.GetPartySize()
 	
-	print "PartySize:", idx
 	while idx:
 		name = GemRB.GetPlayerName(idx, 2) #scripting name
-		print "Upgrading: ", name
 		if name == "yoshimo":
 			RemoveYoshimo(idx)
 		elif name == "imoen":

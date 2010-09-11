@@ -184,11 +184,9 @@ def LoadSingle():
 	if TutorialWindow:
 		TutorialWindow.Unload()
 	if GemRB.GetVar ("oldgame") == 0:
-		#GemRB.GameSetExpansion(1)
 		GemRB.SetVar ("PlayMode", 2)
 		GemRB.SetVar ("SaveDir", 1)
 	else:
-		#GemRB.GameSetExpansion(0)
 		GemRB.SetVar ("PlayMode", 0)
 		GemRB.SetVar ("SaveDir", 0)
 
@@ -203,11 +201,9 @@ def NewSingle():
 	if TutorialWindow:
 		TutorialWindow.Unload()
 	if GemRB.GetVar ("oldgame") == 0:
-		#GemRB.GameSetExpansion(1)
 		GemRB.SetVar ("PlayMode", 2)
 		GemRB.SetVar ("SaveDir", 1)
 	else:
-		#GemRB.GameSetExpansion(0)
 		GemRB.SetVar ("PlayMode", 0)
 		GemRB.SetVar ("SaveDir", 0)
 	GemRB.SetVar("Slot",1)
@@ -223,12 +219,8 @@ def ImportGame():
 	if TutorialWindow:
 		TutorialWindow.Unload()
 	#now this is tricky, we need to load old games, but set up the expansion
-	#GemRB.GameSetExpansion(0)
 	GemRB.SetVar ("PlayMode", 0)
 	GemRB.SetVar ("SaveDir", 0)
-	#i need another variable
-	GemRB.SetVar ("expansion", 1)
-	print "******************set expansion"
 	GemRB.SetNextScript ("GUILOAD")
 	return
 	
