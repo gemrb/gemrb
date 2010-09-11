@@ -45,12 +45,15 @@ def OnLoad ():
 		GemRB.PlayMovie ("BISLOGO", 1)
 		if GUICommon.HasHOW():
 			GemRB.PlayMovie ("WOTC", 1)
-			GemRB.SetMasterScript("BALDUR","WORLDMAP","EXPMAP")
 		else:
 			GemRB.PlayMovie ("TSRLOGO", 1)
-			GemRB.SetMasterScript("BALDUR","WORLDMAP")
 		GemRB.PlayMovie("INTRO", 1)
 		GemRB.SetVar ("SkipIntroVideos", 1)
+
+	if GUICommon.HasHOW():
+		GemRB.SetMasterScript("BALDUR","WORLDMAP","EXPMAP")
+	else:
+		GemRB.SetMasterScript("BALDUR","WORLDMAP")
 
 	# Find proper window border for higher resolutions
 	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
