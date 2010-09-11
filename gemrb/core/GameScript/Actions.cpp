@@ -554,11 +554,15 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 	}
 }
 
-//this is unfinished, maybe the original moves actors too?
-//creates savegame?
-void GameScript::MoveToExpansion(Scriptable* Sender, Action* /*parameters*/)
+//5 is the ToB value, but it might be useful to have multiple expansions
+void GameScript::MoveToExpansion(Scriptable* Sender, Action* parameters)
 {
-	core->SetEventFlag(EF_MASTERSCRIPT);
+	Game *game = core->GetGame();
+
+	if (!parameters->int0Parameter) {
+		parameters->int0Parameter = 5;
+	}
+	game->SetExpansion(parameters->int0Parameter);
 	Sender->ReleaseCurrentAction();
 }
 
