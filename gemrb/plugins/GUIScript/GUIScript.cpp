@@ -1570,32 +1570,6 @@ static PyObject* GemRB_Window_SetVisible(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-
-PyDoc_STRVAR( GemRB_GameUpgrade__doc,
-"GameUpgrade(int value)\n\n"
-"Sets the game version to a higher value." );
-
-PyObject* GemRB_GameUpgrade(PyObject * /*self*/, PyObject* args)
-{
-	int value;
-
-	if (!PyArg_ParseTuple( args, "i", &value )) {
-		return AttributeError( GemRB_GameUpgrade__doc );
-	}
-
-	Game *game = core->GetGame();
-	if (!game) {
-		return RuntimeError( "No game loaded!" );
-	}
-
-	if ((unsigned int) value>=game->Expansion) {
-		Py_INCREF( Py_False );
-		return Py_False;
-	}
-	Py_INCREF( Py_True );
-	return Py_True;
-}
-
 //useful only for ToB and HoW, sets masterscript/worldmap name
 PyDoc_STRVAR( GemRB_SetMasterScript__doc,
 "SetMasterScript(ScriptResRef, WMPResRef)\n\n"
