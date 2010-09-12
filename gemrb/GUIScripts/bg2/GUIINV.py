@@ -993,8 +993,6 @@ def DisplayItem (itemresref, type):
 
 	Text.SetText (text)
 	Label.SetText (label)
-
-	ItemInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OpenItemInfoWindow ():
