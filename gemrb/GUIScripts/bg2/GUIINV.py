@@ -593,8 +593,9 @@ def OpenItemAmountWindow ():
 		ItemAmountWindow = None
 
 		GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
-		UpdateSlot (pc, UsedSlot-1)
 		UsedSlot = None
+		#remove this after killing a modal will activate the topwindow
+		InventoryWindow.SetVisible (WINDOW_FRONT)
 		return
 
 	UsedSlot = GemRB.GetVar ("ItemButton")
