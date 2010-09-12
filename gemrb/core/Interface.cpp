@@ -2332,6 +2332,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"NoBiography",        //49GF_NO_BIOGRAPHY
 		"StealIsAttack",      //50GF_STEAL_IS_ATTACK
 		"CutsceneAreascripts",//51GF_CUTSCENE_AREASCRIPTS
+		"FlexibleWorldmap",   //52GF_FLEXIBLE_WMAP
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

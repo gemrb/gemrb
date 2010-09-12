@@ -47,9 +47,17 @@ WorldMapControl::WorldMapControl(const char *font, int direction)
 		strncpy(currentArea, m->AreaResRef, 8);
 	}
 
-	if (Value!=(ieDword) -1) {
-		worldmap->CalculateDistances(currentArea, Value);
+	//if there is no trivial area, look harder
+	if (!worldmap->GetArea(currentArea, (unsigned int &) entry) && 
+		core->HasFeature(GF_FLEXIBLE_WMAP) ) {
+		WMPAreaEntry *m = worldmap->FindNearestEntry(currentArea, (unsigned int &) entry);
+		if (m) {
+			strncpy(currentArea, m->AreaResRef, 8);
+		}
 	}
+
+	//this also updates visible locations
+	worldmap->CalculateDistances(currentArea, Value);
 	
 	// alpha bit is unfortunately ignored
 	if (font[0]) {

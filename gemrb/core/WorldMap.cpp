@@ -268,11 +268,40 @@ WMPAreaEntry* WorldMap::GetArea(const ieResRef AreaName, unsigned int &i) const
 	return NULL;
 }
 
+//Find Worldmap location by nearest area with a smaller number
+//Counting backwards, stop at 1000 boundaries.
+//It is not possible to simply round to 1000, because there are 
+//WMP entries like AR8001, and we need to find the best match
+WMPAreaEntry* WorldMap::FindNearestEntry(const ieResRef AreaName, unsigned int &i) const
+{
+	int value = 0;
+	ieResRef tmp;
+
+	sscanf(&AreaName[2],"%4d", &value);
+	do {
+		snprintf(tmp, 9, "%.2s%04d", AreaName, value);
+		WMPAreaEntry* ret = GetArea(tmp, i);
+		if (ret) {
+			return ret;
+		}
+		if (value%1000 == 0) break;
+		value--;
+	}
+	while(1); //value%1000 should protect us from infinite loops
+	i = -1;
+	return NULL;
+}
+
 //this is a pathfinding algorithm
 //you have to find the optimal path
-
 int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 {
+	//first, update reachable/visible areas by worlde.2da if exists
+	UpdateReachableAreas();
+	if (direction==-1) {
+		return 0;
+	}
+
 	if (direction<0 || direction>3) {
 		printMessage("WorldMap","", LIGHT_RED);
 		printf("CalculateDistances for invalid direction: %s\n", AreaName);
@@ -294,7 +323,6 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 
 	printMessage("WorldMap","", GREEN);
 	printf("CalculateDistances for Area: %s\n", AreaName);
-	UpdateReachableAreas();
 	UpdateAreaVisibility(AreaName, direction);
 
 	size_t memsize =sizeof(int) * area_entries.size();

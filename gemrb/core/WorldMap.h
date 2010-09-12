@@ -164,9 +164,11 @@ public:
 	WMPAreaLink *GetEncounterLink(const ieResRef B, bool &encounter) const;
 	/** Sets area status */
 	void SetAreaStatus(const ieResRef, int Bits, int Op);
-	/** internal function to get area pointer and index from area name.
+	/** Gets area pointer and index from area name.
 	 * also called from WorldMapArray to find the right map	*/
 	WMPAreaEntry* GetArea(const ieResRef AreaName, unsigned int &i) const;
+	/** Finds an area name closest to the given area */
+	WMPAreaEntry* FindNearestEntry(const ieResRef AreaName, unsigned int &i) const;
 private:
 	/** updates visibility of adjacent areas, called from CalculateDistances */
 	void UpdateAreaVisibility(const ieResRef AreaName, int direction);
