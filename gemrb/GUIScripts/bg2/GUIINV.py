@@ -413,7 +413,6 @@ def UpdateSlot (pc, slot):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenItemInfoWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenItemAmountWindow)
-		#Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenItemAmountWindow)
 	else:
 		if SlotType["ResRef"]=="*":
 			Button.SetBAM ("",0,0)
@@ -431,7 +430,7 @@ def UpdateSlot (pc, slot):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
-		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, None)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenItemAmountWindow)
 
 	if OverSlot == slot+1:
@@ -448,10 +447,6 @@ def UpdateSlot (pc, slot):
 		if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
 			Button.SetState (IE_GUI_BUTTON_THIRD)
 
-	#to avoid a bug where UpdateSlot activates InventoryWindow buttons
-	#bring the ItemAmountWindow back to front
-	if ItemAmountWindow:
-		ItemAmountWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OnDragItemGround ():
@@ -594,8 +589,8 @@ def OpenItemAmountWindow ():
 
 		GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 		UsedSlot = None
-		#remove this after killing a modal will activate the topwindow
-		InventoryWindow.SetVisible (WINDOW_FRONT)
+		OverSlot = None
+		UpdateInventoryWindow()
 		return
 
 	UsedSlot = GemRB.GetVar ("ItemButton")
@@ -994,9 +989,11 @@ def DisplayItem (itemresref, type):
 
 	Text.SetText (text)
 	Label.SetText (label)
+	ItemInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OpenItemInfoWindow ():
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
