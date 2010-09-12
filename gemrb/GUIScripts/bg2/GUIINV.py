@@ -25,6 +25,7 @@
 import GemRB
 import GUICommon
 import CommonTables
+import traceback
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -42,6 +43,7 @@ ErrorWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
 OverSlot = None
+UsedSlot = None
 
 def OpenInventoryWindowClick ():
 	tmp = GemRB.GetVar ("PressedPortrait")
@@ -255,6 +257,7 @@ def UpdateInventoryWindow ():
 	RefreshInventoryWindow ()
 	#populate inventory slot controls
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
+
 	for i in range (SlotCount):
 		UpdateSlot (pc, i)
 	return
@@ -410,7 +413,7 @@ def UpdateSlot (pc, slot):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenItemInfoWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenItemAmountWindow)
-		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenItemAmountWindow)
+		#Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenItemAmountWindow)
 	else:
 		if SlotType["ResRef"]=="*":
 			Button.SetBAM ("",0,0)
@@ -429,6 +432,7 @@ def UpdateSlot (pc, slot):
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenItemAmountWindow)
 
 	if OverSlot == slot+1:
 		if GemRB.CanUseItemType (SlotType["Type"], itemname):
@@ -444,6 +448,10 @@ def UpdateSlot (pc, slot):
 		if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
 			Button.SetState (IE_GUI_BUTTON_THIRD)
 
+	#to avoid a bug where UpdateSlot activates InventoryWindow buttons
+	#bring the ItemAmountWindow back to front
+	if ItemAmountWindow:
+		ItemAmountWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OnDragItemGround ():
@@ -483,6 +491,10 @@ def OnDragItem ():
 	"""Updates dragging."""
 
 	if GemRB.IsDraggingItem()==2:
+		return
+
+	#don't call when splitting items
+	if ItemAmountWindow != None:
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -549,19 +561,31 @@ def DragItemAmount ():
 	"""Drag a split item."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
-	slot_item = GemRB.GetSlotItem (pc, slot)
-	Text = ItemAmountWindow.GetControl (6)
-	Amount = Text.QueryText ()
-	item = GemRB.GetItem (slot_item["ItemResRef"])
-	GemRB.DragItem (pc, slot, item["ItemIcon"], int ("0"+Amount), 0)
+
+	#emergency dropping
+	if GemRB.IsDraggingItem()==1:
+		GemRB.DropDraggedItem (pc, UsedSlot)
+		UpdateSlot (pc, UsedSlot-1)
+
+	slot_item = GemRB.GetSlotItem (pc, UsedSlot)
+
+	#if dropping didn't help, don't die if slot_item isn't here
+	if slot_item:
+		Text = ItemAmountWindow.GetControl (6)
+		Amount = Text.QueryText ()
+		item = GemRB.GetItem (slot_item["ItemResRef"])
+		GemRB.DragItem (pc, UsedSlot, item["ItemIcon"], int ("0"+Amount), 0)
 	OpenItemAmountWindow ()
 	return
 
 def OpenItemAmountWindow ():
 	"""Open the split window."""
+	import GUICommonWindows
+	global UsedSlot
 
 	global ItemAmountWindow, StackAmount
+
+	pc = GemRB.GameGetSelectedPCSingle ()
 
 	if ItemAmountWindow != None:
 		if ItemAmountWindow:
@@ -569,34 +593,32 @@ def OpenItemAmountWindow ():
 		ItemAmountWindow = None
 
 		GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
+		UpdateSlot (pc, UsedSlot-1)
+		UsedSlot = None
 		return
 
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
-
+	UsedSlot = GemRB.GetVar ("ItemButton")
 	if GemRB.IsDraggingItem ()==1:
-		GemRB.DropDraggedItem (pc, slot)
+		GemRB.DropDraggedItem (pc, UsedSlot)
+		#redraw slot
+		UpdateSlot (pc, UsedSlot-1)
 		# disallow splitting while holding split items (double splitting)
 		if GemRB.IsDraggingItem () == 1:
-			UpdateSlot (pc, slot-1)
 			return
-	else:
-		return
 
-	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
-
-	slot_item = GemRB.GetSlotItem (pc, slot)
-	ResRef = slot_item['ItemResRef']
-	item = GemRB.GetItem (ResRef)
+	#UpdateSlot (pc, UsedSlot-1)
+	slot_item = GemRB.GetSlotItem (pc, UsedSlot)
 
 	if slot_item:
 		StackAmount = slot_item["Usages0"]
 	else:
 		StackAmount = 0
 	if StackAmount<=1:
-		UpdateSlot (pc, slot-1)
+		UpdateSlot (pc, UsedSlot-1)
 		return
 
+	ResRef = slot_item['ItemResRef']
+	item = GemRB.GetItem (ResRef)
 	ItemAmountWindow = Window = GemRB.LoadWindow (4)
 	# item icon
 	Icon = Window.GetControl (0)
@@ -628,7 +650,9 @@ def OpenItemAmountWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemAmountWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
+	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	slot_item = GemRB.GetSlotItem (pc, UsedSlot)
 	return
 
 def ReleaseFamiliar ():
