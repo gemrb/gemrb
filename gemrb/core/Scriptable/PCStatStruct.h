@@ -30,6 +30,7 @@
 #define MAX_PORTRAIT_ICONS 12
 #define MAX_FAVOURITES     4
 #define SOUNDFOLDERSIZE    32+1
+#define MAX_INTERACT       24
 
 //action buttons
 //the order of these buttons are based on opcode #144 
@@ -99,6 +100,8 @@ public:
 	ieByte    PortraitIconString[MAX_PORTRAIT_ICONS+2];
 	ieDword   LastLeft;   //trigger
 	ieDword   LastJoined; //trigger
+	ieDword   Interact[MAX_INTERACT];
+	ieWord    Happiness;
 private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);
 public:

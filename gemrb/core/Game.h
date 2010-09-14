@@ -120,7 +120,7 @@ struct PCStruct {
 	ieWord   ViewYPos;
 	ieWord   ModalState;
 	ieWord   Happiness;
-	unsigned char Unknown2c[96];
+	ieDword  Interact[MAX_INTERACT];
 	ieWord   QuickWeaponSlot[MAX_QUICKWEAPONSLOT];
 	ieWord   QuickWeaponHeader[MAX_QUICKWEAPONSLOT];
 	ieResRef QuickSpellResRef[MAX_QSLOTS];

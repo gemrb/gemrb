@@ -242,6 +242,8 @@ public:
 	//in game or area actor header
 	ieDword TalkCount;
 	ieDword RemovalTime;
+	//FIXME: this is definitely not the same in bg2, in bg2 there are joinable npcs
+	//which keep a matrix of counters
 	ieDword InteractCount; //this is accessible in iwd2, probably exists in other games too
 	ieDword appearance;
 	ieDword ModalState;

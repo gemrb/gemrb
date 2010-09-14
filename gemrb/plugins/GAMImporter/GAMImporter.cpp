@@ -349,7 +349,9 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	str->ReadWord( &pcInfo.ViewYPos );
 	str->ReadWord( &pcInfo.ModalState ); //see Modal.ids
 	str->ReadWord( &pcInfo.Happiness );
-	str->Read( &pcInfo.Unknown2c, 96 );
+	for (i=0;i<24;i++) {
+		str->ReadDword( &pcInfo.Interact[i] ); //interact counters
+	}
 
 	if (version==GAM_VER_GEMRB || version==GAM_VER_IWD2) {
 		ieResRef tmp;
@@ -512,6 +514,8 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	actor->TalkCount = pcInfo.TalkCount;
 	actor->ModalState = pcInfo.ModalState;
 	actor->SetModalSpell(pcInfo.ModalState, 0);
+	ps->Happiness = pcInfo.Happiness;
+	memcpy(ps->Interact, pcInfo.Interact, MAX_INTERACT *sizeof(ieDword) );
 
 	actor->SetPersistent( tmpWord );
 
@@ -887,10 +891,12 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	stream->WriteWord( &tmpWord);
 	tmpWord = (ieWord) ac->ModalState;
 	stream->WriteWord( &tmpWord);
-	tmpWord = 0; //happiness
+	tmpWord = ac->PCStats->Happiness;
 	stream->WriteWord( &tmpWord);
-	//a field of zeroes
-	stream->Write(filling, 96);
+	//interact counters
+	for (i=0;i<24;i++) {
+		stream->WriteDword( ac->PCStats->Interact+i);
+	}
 
 	//quickweapons
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
