@@ -1896,7 +1896,7 @@ int fx_suppress_hp (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_suppress_hp (%2d)\n", fx->Opcode);
 	if (target->SetSpellState( SS_NOHPINFO)) return FX_APPLIED;
-	EXTSTATE_SET(0x00001000);
+	EXTSTATE_SET(EXTSTATE_NO_HP);
 	return FX_APPLIED;
 }
 
@@ -1911,7 +1911,7 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		break;
 	case 1:
 		//in the original game this signified that a specific weapon is equipped
-		EXTSTATE_SET(0x00008000);
+		EXTSTATE_SET(EXTSTATE_FLOATTEXTS);
 		return FX_APPLIED;
 	case 2: //gemrb extension, displays verbalconstant
 		DisplayStringCore(target, fx->Parameter1, DS_CONST|DS_HEAD);

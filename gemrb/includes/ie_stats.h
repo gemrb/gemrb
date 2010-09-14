@@ -157,12 +157,15 @@
 #define EXTSTATE_EYE_SPIRIT  0x00000100
 #define EXTSTATE_EYE_FORT    0x00000200
 #define EXTSTATE_EYE_STONE   0x00000400
+#define EXTSTATE_NO_HP       0x00001000  //disable hp info in berserk mode
 #define EXTSTATE_NO_BACKSTAB 0x00004000
+#define EXTSTATE_FLOATTEXTS  0x00008000  //weapon chatting (IWD)
 #define EXTSTATE_DEAF        0x00020000
 #define EXTSTATE_NO_WAKEUP   0x80000000  //original HoW engine put this on top of eye_mind
 #define EXTSTATE_SEVEN_EYES  0x000007f0
 
 //Multiclass flags
+#define MC_SHOWLONGNAME         0x0001
 #define MC_REMOVE_CORPSE        0x0002
 #define MC_KEEP_CORPSE          0x0004
 #define MC_WAS_FIGHTER		0x0008
@@ -175,10 +178,10 @@
 #define MC_FALLEN_PALADIN	0x0200
 #define MC_FALLEN_RANGER	0x0400
 #define MC_EXPORTABLE           0x0800
-
+#define MC_HIDE_HP              0x1000 
 #define MC_PLOT_CRITICAL        0x2000  //if dies, it means game over
 #define MC_BEENINPARTY          0x8000
-#define MC_HIDDEN               0x10000
+#define MC_HIDDEN               0x10000 //iwd
 
 #define MC_NO_TALK              0x80000 //ignore dialoginterrupt
 

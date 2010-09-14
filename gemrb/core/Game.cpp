@@ -1436,7 +1436,6 @@ void Game::RestParty(int checks, int dream, int hp)
 	}
 	AdvanceTime(2400*AI_UPDATE_TIME);
 
-
 	int i = GetPartySize(true); // party size, only alive
 
 	while (i--) {
@@ -1453,7 +1452,6 @@ void Game::RestParty(int checks, int dream, int hp)
 
 	//movie and cutscene dreams
 	if (dream>=0) {
-
 		//cutscene dreams
 		if (gamedata->Exists("player1d",IE_BCS_CLASS_ID, true))
 			PlayerDream();
