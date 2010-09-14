@@ -974,6 +974,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			/* use interact.2da for short, inlined dialogue */
 			int type = CheckInteract(scriptingname, target->GetScriptName());
 			if(type) {
+				//TODO increase interact counter in scr
 				speaker->Interact(type);
 				target->Response(type);
 				Sender->ReleaseCurrentAction();

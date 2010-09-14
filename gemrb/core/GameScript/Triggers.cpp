@@ -1300,7 +1300,10 @@ int GameScript::NumTimesInteracted(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	return actor->InteractCount == (ieDword) parameters->int1Parameter ? 1 : 0;
+	ieDword npcid = parameters->int0Parameter;
+	if (npcid>=MAX_INTERACT) return 0;
+	if (!actor->PCStats) return 0;
+	return actor->PCStats->Interact[npcid] == (ieDword) parameters->int1Parameter ? 1 : 0;
 }
 
 int GameScript::NumTimesInteractedGT(Scriptable* Sender, Trigger* parameters)
@@ -1313,7 +1316,10 @@ int GameScript::NumTimesInteractedGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	return actor->InteractCount > (ieDword) parameters->int1Parameter ? 1 : 0;
+	ieDword npcid = parameters->int0Parameter;
+	if (npcid>=MAX_INTERACT) return 0;
+	if (!actor->PCStats) return 0;
+	return actor->PCStats->Interact[npcid] > (ieDword) parameters->int1Parameter ? 1 : 0;
 }
 
 int GameScript::NumTimesInteractedLT(Scriptable* Sender, Trigger* parameters)
@@ -1326,46 +1332,65 @@ int GameScript::NumTimesInteractedLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) scr;
-	return actor->InteractCount < (ieDword) parameters->int1Parameter ? 1 : 0;
+	ieDword npcid = parameters->int0Parameter;
+	if (npcid>=MAX_INTERACT) return 0;
+	if (!actor->PCStats) return 0;
+	return actor->PCStats->Interact[npcid] < (ieDword) parameters->int1Parameter ? 1 : 0;
 }
 
+//GemRB specific
+//interacting npc counts were restricted to 24
+//gemrb will increase a local variable in the interacting npc, with the scriptname of the
+//target npc
 int GameScript::NumTimesInteractedObject(Scriptable* Sender, Trigger* parameters)
 {
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
 	}
-	Actor* actor = ( Actor* ) scr;
-	return actor->InteractCount == (ieDword) parameters->int0Parameter ? 1 : 0;
+	Actor* tar = ( Actor* ) scr;
+	return CheckVariable(Sender, tar->GetScriptName(), "LOCALS") == (ieDword) parameters->int0Parameter ? 1 : 0;
 }
 
 int GameScript::NumTimesInteractedObjectGT(Scriptable* Sender, Trigger* parameters)
 {
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
 	}
-	Actor* actor = ( Actor* ) scr;
-	return actor->InteractCount > (ieDword) parameters->int0Parameter ? 1 : 0;
+	Actor* tar = ( Actor* ) scr;
+	return CheckVariable(Sender, tar->GetScriptName(), "LOCALS") > (ieDword) parameters->int0Parameter ? 1 : 0;
 }
 
 int GameScript::NumTimesInteractedObjectLT(Scriptable* Sender, Trigger* parameters)
 {
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
-		scr = Sender;
+		return 0;
 	}
 	if (scr->Type != ST_ACTOR) {
 		return 0;
 	}
-	Actor* actor = ( Actor* ) scr;
-	return actor->InteractCount < (ieDword) parameters->int0Parameter ? 1 : 0;
+	Actor* tar = ( Actor* ) scr;
+	return CheckVariable(Sender, tar->GetScriptName(), "LOCALS") < (ieDword) parameters->int0Parameter ? 1 : 0;
 }
 
 int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters)
