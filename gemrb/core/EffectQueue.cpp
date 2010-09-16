@@ -752,6 +752,9 @@ inline bool check_level(Actor *target, Effect *fx)
 	if( !target) {
 		return false;
 	}
+	if(fx->Target == FX_TARGET_SELF) {
+		return false;
+	}
 
 	ieDword level = (ieDword) target->GetXPLevel( true );
 	//return true if resisted
