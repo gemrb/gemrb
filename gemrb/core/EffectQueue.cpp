@@ -199,6 +199,7 @@ static EffectRef diced_effects[] = {
 static EffectRef diced_effects2[] = {
 	{"BurningBlood2",NULL,-1}, //how/iwd2
 	{"StaticCharge",NULL,-1}, //how/iwd2
+	{"SoulEater",NULL,-1}, //how/iwd2
 	{"LichTouch",NULL,-1}, //how
 {NULL,NULL,0} };
 
