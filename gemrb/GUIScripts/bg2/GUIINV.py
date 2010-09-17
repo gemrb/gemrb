@@ -1,4 +1,4 @@
-
+#-*-python-*-
 #GemRB - Infinity Engine Emulator
 #Copyright (C) 2003-2004 The GemRB Project
 #
@@ -17,7 +17,6 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
 ###################################################
@@ -25,7 +24,6 @@
 import GemRB
 import GUICommon
 import CommonTables
-import traceback
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -53,6 +51,7 @@ def OpenInventoryWindowClick ():
 
 def OpenInventoryWindow ():
 	"""Opens the inventory window."""
+
 	import GUICommonWindows
 
 	global InventoryWindow, OptionsWindow, PortraitWindow
@@ -430,7 +429,6 @@ def UpdateSlot (pc, slot):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
-		#Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenItemAmountWindow)
 
 	if OverSlot == slot+1:
@@ -575,9 +573,9 @@ def DragItemAmount ():
 
 def OpenItemAmountWindow ():
 	"""Open the split window."""
+
 	import GUICommonWindows
 	global UsedSlot
-
 	global ItemAmountWindow, StackAmount
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -602,7 +600,6 @@ def OpenItemAmountWindow ():
 		if GemRB.IsDraggingItem () == 1:
 			return
 
-	#UpdateSlot (pc, UsedSlot-1)
 	slot_item = GemRB.GetSlotItem (pc, UsedSlot)
 
 	if slot_item:
@@ -616,6 +613,7 @@ def OpenItemAmountWindow ():
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 	ItemAmountWindow = Window = GemRB.LoadWindow (4)
+
 	# item icon
 	Icon = Window.GetControl (0)
 	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -648,7 +646,6 @@ def OpenItemAmountWindow ():
 
 	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_NAND)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	slot_item = GemRB.GetSlotItem (pc, UsedSlot)
 	return
 
 def ReleaseFamiliar ():
