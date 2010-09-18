@@ -1,7 +1,7 @@
 
 Prototype: GemRB.IsDraggingItem()
 
-Description: Returns 1 if the player is dragging an item with the mouse (usually in the inventory screen).
+Description: Returns 1 if the player is dragging an item with the mouse (usually in the inventory screen). Returns 2 if the player is dragging a portrait (rearranging the party).
 
 Parameters: N/A
 
