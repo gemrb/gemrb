@@ -43,6 +43,8 @@ def OnDragItemGround ():
 		slot_item = GemRB.GetContainerItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 1) #container
+		if GUICommon.GameIsPST():
+			GemRB.PlaySound (item["DescIcon"])
 	else:
 		GemRB.DropDraggedItem (pc, -2) #dropping on ground
 
@@ -180,16 +182,28 @@ def MouseLeaveSlot ():
 
 def MouseEnterGround ():
 	Window = GUIINV.InventoryWindow
+
+	if GUICommon.GameIsPST():
+		offset = 47
+	else:
+		offset = 68
 	i = GemRB.GetVar ("GroundItemButton")
-	Button = Window.GetControl (i+68)
+	Button = Window.GetControl (i+offset)
+
 	if GemRB.IsDraggingItem ()==1:
 		Button.SetState (IE_GUI_BUTTON_SELECTED)
 	return
 
 def MouseLeaveGround ():
 	Window = GUIINV.InventoryWindow
+
+	if GUICommon.GameIsPST():
+		offset = 47
+	else:
+		offset = 68
 	i = GemRB.GetVar ("GroundItemButton")
-	Button = Window.GetControl (i+68)
+	Button = Window.GetControl (i+offset)
+
 	if GemRB.IsDraggingItem ()==1:
 		Button.SetState (IE_GUI_BUTTON_SECOND)
 	return
@@ -681,7 +695,8 @@ def DelayedReadItemWindow ():
 		ret = LSR_FAILED
 		strref = 10831
 	CloseItemInfoWindow ()
-	OpenErrorWindow (strref)
+	if not GUICommon.GameIsPST():
+		OpenErrorWindow (strref)
 	return
 
 def OpenItemWindow ():
@@ -751,8 +766,11 @@ def IdentifyUseScroll ():
 	return
 
 def CloseIdentifyItemWindow ():
+	global ItemIdentifyWindow
+
 	if ItemIdentifyWindow:
 		ItemIdentifyWindow.Unload ()
+		ItemIdentifyWindow = None
 	return
 
 def IdentifyItemWindow ():
@@ -762,24 +780,36 @@ def IdentifyItemWindow ():
 
 	ItemIdentifyWindow = Window = GemRB.LoadWindow (9)
 	Button = Window.GetControl (0)
-	Button.SetText (17105)
+	if GUICommon.GameIsPST():
+		Button.SetText (4259)
+	else:
+		Button.SetText (17105)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyUseSpell)
 	if not GemRB.HasSpecialSpell (pc, 1, 0):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (1)
-	Button.SetText (17106)
+	if GUICommon.GameIsPST():
+		Button.SetText (4260)
+	else:
+		Button.SetText (17106)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyUseScroll)
 	if not GemRB.HasSpecialItem (pc, 1, 0):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	Button = Window.GetControl (2)
-	Button.SetText (13727)
+	if GUICommon.GameIsPST():
+		Button.SetText (4196)
+	else:
+		Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseIdentifyItemWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	TextArea = Window.GetControl (3)
-	TextArea.SetText (19394)
+	if GUICommon.GameIsPST():
+		TextArea.SetText (4258)
+	else:
+		TextArea.SetText (19394)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
