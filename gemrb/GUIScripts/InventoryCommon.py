@@ -52,7 +52,7 @@ def OnDragItemGround ():
 def OnAutoEquip ():
 	"""Auto-equips equipment if possible."""
 
-	if not GemRB.IsDraggingItem ()!=1:
+	if GemRB.IsDraggingItem ()!=1:
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -85,6 +85,13 @@ def OnDragItem ():
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 	else:
 		SlotType = GemRB.GetSlotType (slot, pc)
+		#special monk check
+		if GemRB.GetPlayerStat (pc, IE_CLASS)==0x14:
+			#offhand slot mark
+			if SlotType["Effects"]==TYPE_OFFHAND:
+				SlotType["ResRef"]=""
+				GemRB.DisplayString (61355, 0xffffff)
+
 		if SlotType["ResRef"]!="":
 			GemRB.DropDraggedItem (pc, slot)
 
@@ -98,8 +105,14 @@ def OnDropItemToPC ():
 
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
-	if GemRB.IsDraggingItem ():
-		GemRB.DisplayString(17999,0xffffff)
+	if GemRB.IsDraggingItem ()==1:
+		if GUICommon.HasTOB ():
+			GemRB.DisplayString (61794, 0xfffffff)
+		elif GUICommon.GameIsPST ():
+			GemRB.DisplayString (19257, 0xfffffff)
+		else:
+			GemRB.DisplayString (17999, 0xfffffff)
+
 	GUIINV.UpdateInventoryWindow ()
 	return
 
@@ -233,20 +246,28 @@ def DisplayItem (itemresref, type):
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
 	#description icon
-	#Button = Window.GetControl (7)
-	#Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-	#Button.SetItemIcon (itemresref,2)
+	if GUICommon.GameIsBG2():
+		Button = Window.GetControl (7)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
+		Button.SetItemIcon (itemresref, 2)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#right button
 	Button = Window.GetControl(9)
 	drink = (type&1) and (item["Function"]&1)
 	read = (type&1) and (item["Function"]&2)
+	#sorcerors cannot learn spells
+	# FIXME: unhardcode
+	pc = GemRB.GameGetSelectedPCSingle ()
+	if GemRB.GetPlayerStat (pc, IE_CLASS) == 19:
+		read = 0
 	container = (type&1) and (item["Function"]&4)
 	dialog = (type&1) and (item["Dialog"]!="")
+	familiar = (type&1) and (item["Type"] == 38)
 	if drink:
 		Button.SetText (19392)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DrinkItemWindow)
-	elif read and not GUICommon.CannotLearnSlotSpell ():
+	elif read:
 		Button.SetText (17104)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReadItemWindow)
 	elif container:
@@ -262,16 +283,26 @@ def DisplayItem (itemresref, type):
 	elif dialog:
 		Button.SetText (item["DialogName"])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DialogItemWindow)
+	elif familiar:
+		Button.SetText (4373)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReleaseFamiliar)
 	else:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
 	Text = Window.GetControl (0x1000000b)
+	Label = Window.HasControl(0x1000000b)
+	if Label:
+		Label = Window.GetControl (0x1000000b)
 	if (type&2):
 		text = item["ItemName"]
+		label = 17108
 	else:
 		text = item["ItemNameIdentified"]
+		label = ""
 	Text.SetText (text)
+	if Label:
+		Label.SetText (label)
 
 	ItemInfoWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
@@ -462,10 +493,13 @@ def CancelColor():
 	return
 
 def ColorDonePress():
+	"""Saves the selected colors."""
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	if ColorPicker:
 		ColorPicker.Unload ()
+
 	ColorTable = GemRB.LoadTable ("clowncol")
 	PickedColor=ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
 	if ColorIndex==0:
@@ -498,6 +532,7 @@ def SkinPress():
 	return
 
 def MajorPress():
+	"""Selects the major color."""
 	global ColorIndex, PickedColor
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -507,6 +542,7 @@ def MajorPress():
 	return
 
 def MinorPress():
+	"""Selects the minor color."""
 	global ColorIndex, PickedColor
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -516,6 +552,8 @@ def MinorPress():
 	return
 
 def GetColor():
+	"""Opens the color selection window."""
+
 	global ColorPicker
 
 	ColorTable = GemRB.LoadTable ("clowncol")
@@ -548,8 +586,19 @@ def GetColor():
 	ColorPicker.SetVisible (WINDOW_VISIBLE)
 	return
 
+def ReleaseFamiliar ():
+	"""Simple Use Item"""
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	# the header is always the first, target is always self
+	GemRB.UseItem (pc, slot, 0, 5)
+	CloseItemInfoWindow ()
+	return
 
 def DrinkItemWindow ():
+	"""Drink the potion"""
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 	# the drink item header is always the first
@@ -581,18 +630,27 @@ def CloseErrorWindow ():
 	return
 
 def ReadItemWindow ():
+	global level, spell_ref
 	"""Tries to learn the mage scroll."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
-	ret = 0
+	ret = GUICommon.CannotLearnSlotSpell()
+
+	if ret:
+		strref = 72873
+		CloseItemInfoWindow ()
+		if GUICommon.HasTOB():
+			OpenErrorWindow (strref)
+		return
 
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
 	spell = GemRB.GetSpell (spell_ref)
 	if spell:
 		# can we learn more spells of this level?
-		spell_count = GemRB.GetKnownSpellsCount (pc, IE_SPELL_TYPE_WIZARD, spell['SpellLevel']-1)
+		level = spell['SpellLevel']-1
+		spell_count = GemRB.GetKnownSpellsCount (pc, IE_SPELL_TYPE_WIZARD, level)
 		if spell_count > GemRB.GetAbilityBonus (IE_INT, 2, GemRB.GetPlayerStat (pc, IE_INT)):
 			ret = LSR_FULL
 			if GUICommon.GameIsBG2():
@@ -600,12 +658,9 @@ def ReadItemWindow ():
 			else:
 				strref = -1
 		else:
-			if GemRB.LearnSpell (pc, spell_ref, LS_STATS|LS_ADDXP):
-				ret = LSR_FAILED
-				strref = 10831 # failure
-			else:
-				strref = 10830 # success
-			GemRB.RemoveItem (pc, slot)
+			GemRB.UseItem (pc, slot, 1, 5)
+			GemRB.SetTimedEvent(DelayedReadItemWindow, 1)
+			return
 	else:
 		print "WARNING: invalid spell header in item", slot_item['ItemResRef']
 		CloseItemInfoWindow ()
@@ -616,7 +671,22 @@ def ReadItemWindow ():
 
 	return ret
 
+def DelayedReadItemWindow ():
+	global level, spell_ref
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	if GUICommon.HasSpell (pc, IE_SPELL_TYPE_WIZARD, level, spell_ref):
+		strref = 10830
+	else:
+		ret = LSR_FAILED
+		strref = 10831
+	CloseItemInfoWindow ()
+	OpenErrorWindow (strref)
+	return
+
 def OpenItemWindow ():
+	"""Displays information about the item."""
+
 	#close inventory
 	GemRB.SetVar ("Inventory", 1)
 	if ItemInfoWindow:
@@ -631,6 +701,8 @@ def OpenItemWindow ():
 	return
 
 def DialogItemWindow ():
+	"""Converse with an item."""
+
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
 	GUIINV.OpenInventoryWindow ()
@@ -640,10 +712,15 @@ def DialogItemWindow ():
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 	dialog=item["Dialog"]
-	GemRB.ExecuteString ("StartDialog(\""+dialog+"\",Myself)", pc)
+	if GUICommon.GameIsBG2():
+		GemRB.ExecuteString ("StartDialogOverride(\""+dialog+"\",Myself,0,0,1)", pc)
+	else:
+		GemRB.ExecuteString ("StartDialog(\""+dialog+"\",Myself)", pc)
 	return
 
 def IdentifyUseSpell ():
+	"""Identifies the item with a memorized spell."""
+
 	global ItemIdentifyWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -658,6 +735,8 @@ def IdentifyUseSpell ():
 	return
 
 def IdentifyUseScroll ():
+	"""Identifies the item with a scroll or other item."""
+
 	global ItemIdentifyWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
