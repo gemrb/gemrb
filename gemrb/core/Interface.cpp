@@ -3949,6 +3949,7 @@ bool Interface::InitItemTypes()
 			slottypes[i].slotid = (ieDword) strtol(st->QueryField(row,1),NULL,0 );
 			strnlwrcpy( slottypes[i].slotresref, st->QueryField(row,2), 8 );
 			slottypes[i].slottip = (ieDword) strtol(st->QueryField(row,3),NULL,0 );
+			slottypes[i].slotflags = (ieDword) strtol(st->QueryField(row,5),NULL,0 );
 			//don't fill sloteffects for aliased slots (pst)
 			if (alias) {
 				continue;
@@ -4032,6 +4033,14 @@ ieDword Interface::QuerySlotEffects(unsigned int idx) const
 		return 0;
 	}
 	return slottypes[idx].sloteffects;
+}
+
+ieDword Interface::QuerySlotFlags(unsigned int idx) const
+{
+	if (idx>=SlotTypes) {
+		return 0;
+	}
+	return slottypes[idx].slotflags;
 }
 
 const char *Interface::QuerySlotResRef(unsigned int idx) const

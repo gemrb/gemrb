@@ -848,7 +848,6 @@ void GameScript::SaveLocation(Scriptable* Sender, Action* parameters)
 	if (!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	printf("SaveLocation: %s\n",parameters->string0Parameter);
 	SetVariable(Sender, parameters->string0Parameter, value);
 }
 
@@ -904,7 +903,6 @@ void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 	if (!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	printf("SaveLocation: %s\n",parameters->string0Parameter);
 	SetVariable(Sender, parameters->string0Parameter, value);
 }
 
@@ -4501,34 +4499,60 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	Actor *snd = (Actor *) Sender;
 	Actor *scr = (Actor *) tar;
 	//for PP one must go REALLY close
+	Map *map=Sender->GetCurrentArea();
+	if (!map) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 
 	if (PersonalDistance(Sender, tar)>10 ) {
 		MoveNearerTo(Sender, tar, 10);
 		return;
 	}
 
-	if (scr->LastTarget) {
+	if (scr->GetStat(IE_EA)>EA_EVILCUTOFF) {
 		displaymsg->DisplayConstantString(STR_PICKPOCKET_EVIL,0xffffff);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
-	int skill = snd->GetStat(IE_PICKPOCKET) - scr->GetStat(IE_PICKPOCKET);
-	skill+=core->Roll(1,100,1);
-	if (skill<100) {
-		//noticed
+	int skill = snd->GetStat(IE_PICKPOCKET);
+	int tgt = scr->GetStat(IE_PICKPOCKET);
+	//the original engine has no random here
+	if (tgt != 255) {
+		skill -= tgt;
+		//if you want original behaviour: remove this
+		skill += core->Roll(1,100, snd->GetStat(IE_LUCK) );
+	} else {
+		skill = 0;
+	}
+	//and change this 50 to 0.
+	if (skill<50) {
+		//noticed attempt
 		displaymsg->DisplayConstantString(STR_PICKPOCKET_FAIL,0xffffff);
 		if (core->HasFeature(GF_STEAL_IS_ATTACK) ) {
 			tar->LastAttacker = snd->GetID();
 		} else {
+			//pickpocket failed trigger
 			tar->LastOpenFailed = snd->GetID();
 		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
-	//find a candidate item for stealing (unstealable items are noticed)
-	int ret = MoveItemCore(tar, Sender, "", IE_INV_ITEM_UNSTEALABLE, IE_INV_ITEM_STOLEN);
+	int ret = MIC_NOITEM;
+	if ((RandomNumValue&3) || (scr->GetStat(IE_GOLD)<=0) ) {
+		int slot = scr->inventory.FindStealableItem();
+		if (slot) {
+			CREItem *item = scr->inventory.RemoveItem(slot);
+			ret = snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
+			if (ret!=ASI_SUCCESS) {
+				map->AddItemToLocation(snd->Pos, item);
+				ret = MIC_FULL;
+			}
+		}
+	}
+
 	if (ret==MIC_NOITEM) {
 		int money=0;
 		//go for money too
@@ -4546,7 +4570,6 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		if ( ASI_SUCCESS == snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY)) {
 			scr->SetBase(IE_GOLD,scr->GetBase(IE_GOLD)-money);
 		} else {
-			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
 			map->AddItemToLocation(Sender->Pos, item);
 			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
@@ -5774,7 +5797,6 @@ void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 
 void GameScript::EscapeAreaDestroy(Scriptable* Sender, Action* parameters)
 {
-printf("EscapeAreaDestroy\n");
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -5795,7 +5817,6 @@ printf("EscapeAreaDestroy\n");
 /*EscapeAreaObjectMove(S:Area*,I:X*,I:Y*,I:Face*)*/
 void GameScript::EscapeAreaObject(Scriptable* Sender, Action* parameters)
 {
-printf("EscapeAreaObject\n");
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -5825,7 +5846,6 @@ printf("EscapeAreaObject\n");
 //We don't have that feature yet, so this is the same as EscapeAreaObject
 void GameScript::EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters)
 {
-printf("EscapeAreaObjectNoSee\n");
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;

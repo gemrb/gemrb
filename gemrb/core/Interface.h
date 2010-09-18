@@ -103,6 +103,7 @@ struct SlotType {
 	ieDword slottip;
 	ieDword slotid;
 	ieDword sloteffects;
+	ieDword slotflags;
 	ieResRef slotresref;
 };
 
@@ -532,6 +533,7 @@ public:
 	ieDword QuerySlotType(unsigned int idx) const;
 	ieDword QuerySlottip(unsigned int idx) const;
 	ieDword QuerySlotID(unsigned int idx) const;
+	ieDword QuerySlotFlags(unsigned int idx) const;
 	ieDword QuerySlotEffects(unsigned int idx) const;
 	const char * QuerySlotResRef(unsigned int idx) const;
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */

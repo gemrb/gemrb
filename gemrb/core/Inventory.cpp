@@ -162,7 +162,6 @@ void Inventory::CalculateWeight()
 		if (!slot) {
 			continue;
 		}
-		//printf ("%2d: %8s : %d x %d\n", (int) i, slot->ItemResRef, slot->Weight, slot->Usages[0]);
 		if (slot->Weight == -1) {
 			Item *itm = gamedata->GetItem( slot->ItemResRef );
 			if (itm) {
@@ -1726,3 +1725,30 @@ void Inventory::ChargeAllItems(int hours)
 		gamedata->FreeItem( itm, item->ItemResRef, false );
 	}
 }
+
+#define ITM_STEALING (IE_INV_ITEM_UNSTEALABLE | IE_INV_ITEM_MOVABLE)
+unsigned int Inventory::FindStealableItem()
+{
+        unsigned int slot;
+        int inc;
+
+        slot = core->Roll(1, Slots.size(),-1);
+        inc = slot&1?1:-1;
+
+	printf("Start Slot: %d, increment: %d\n", slot, inc);
+	//as the unsigned value underflows, it will be greater than Slots.size()
+	for(;slot<Slots.size(); slot+=inc) {
+		CREItem *item = Slots[slot];
+		//can't steal empty slot
+		if (!item) continue;
+		//bit 1 is stealable slot
+		if (!(core->QuerySlotFlags(slot)&1) ) continue;
+		//can't steal equipped weapon
+		if ((unsigned int) (Equipped+SLOT_MELEE) == core->QuerySlot(slot)) continue;
+		//can't steal flagged items
+		if ((item->Flags & ITM_STEALING) != IE_INV_ITEM_MOVABLE) continue;
+		return slot;
+        }
+	return 0;
+}
+

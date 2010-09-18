@@ -1,58 +1,58 @@
 2DA V1.0
 *
-           BITS       SCRIPT     ICON       STRREF     EFFECTS    
-10         0          -1         *          0          2          
-7          1          5          IVPIEARL   31580      1          
-6          2          6          IVPICHST   32798      1          
-9          4          4          IVPITATT   32797      1          
-0          8          3          IVPIHNDR   32801      1          
-4          16         7          IVPIRING   4268       1          
-8          16         2          IVPIRING   4269       1          
-1          1          0          IVPIEARR   32857      1          
-2          4          1          IVPITATT   32797      1          
-3          64         8          IVPIWRST   32802      1          
-43         256        10         IVQIWEAP   4261       4          
-44         256        11         IVQIWEAP   4261       4          
-45         256        12         IVQIWEAP   4261       4          
-46         256        13         IVQIWEAP   4261       4          
-11         512        19         IVQIARRW   4262       5          
-12         512        20         IVQIARRW   4262       5          
-13         512        21         IVQIARRW   4262       5          
-14         512        22         IVQIARRW   4262       5          
-15         512        23         IVQIARRW   4262       5          
-16         0          -1         -          -          5          
-5          4          9          IVPITATT   32797      1          
-17         2048       14         IVQIITM    4274       0          
-18         2048       15         IVQIITM    4274       0          
-19         2048       16         IVQIITM    4274       0          
-20         2048       17         IVQIITM    4274       0          
-21         2048       18         IVQIITM    4274       0          
-22         -1         24         IVSLOT     4275       0          
-23         -1         25         IVSLOT     4275       0          
-24         -1         26         IVSLOT     4275       0          
-25         -1         27         IVSLOT     4275       0          
-26         -1         28         IVSLOT     4275       0          
-27         -1         29         IVSLOT     4275       0          
-28         -1         30         IVSLOT     4275       0          
-29         -1         31         IVSLOT     4275       0          
-30         -1         32         IVSLOT     4275       0          
-31         -1         33         IVSLOT     4275       0          
-32         -1         34         IVSLOT     4275       0          
-33         -1         35         IVSLOT     4275       0          
-34         -1         36         IVSLOT     4275       0          
-35         -1         37         IVSLOT     4275       0          
-36         -1         38         IVSLOT     4275       0          
-37         -1         39         IVSLOT     4275       0          
-38         -1         40         IVSLOT     4275       0          
-39         -1         41         IVSLOT     4275       0          
-40         -1         42         IVSLOT     4275       0          
-41         -1         43         IVSLOT     4275       0          
-42         0          -1         -          -          3          
-7          1          5          IVPILENS   32795      1          
-1          1          0          IVPIEYER   32787      1          
-43         256        10         IVPIBOW    32803      4          
-44         256        11         IVPIBOW    32803      4          
-45         256        12         IVPIBOW    32803      4          
-46         256        13         IVPIBOW    32803      4          
-43         256        10         IVPITETH   32799      4          
-44         256        11         IVPITETH   32799      4          
+           BITS       SCRIPT     ICON       STRREF     EFFECTS	FLAGS
+10         0          -1         *          0          2        0
+7          1          5          IVPIEARL   31580      1        0 
+6          2          6          IVPICHST   32798      1        0 
+9          4          4          IVPITATT   32797      1        0 
+0          8          3          IVPIHNDR   32801      1        0 
+4          16         7          IVPIRING   4268       1        1 
+8          16         2          IVPIRING   4269       1        1 
+1          1          0          IVPIEARR   32857      1        0 
+2          4          1          IVPITATT   32797      1        0 
+3          64         8          IVPIWRST   32802      1        0 
+43         256        10         IVQIWEAP   4261       4        1 
+44         256        11         IVQIWEAP   4261       4        1 
+45         256        12         IVQIWEAP   4261       4        1 
+46         256        13         IVQIWEAP   4261       4        1 
+11         512        19         IVQIARRW   4262       5        1 
+12         512        20         IVQIARRW   4262       5        1 
+13         512        21         IVQIARRW   4262       5        1 
+14         512        22         IVQIARRW   4262       5        1 
+15         512        23         IVQIARRW   4262       5        1 
+16         0          -1         -          -          5        0 
+5          4          9          IVPITATT   32797      1        0 
+17         2048       14         IVQIITM    4274       0        1 
+18         2048       15         IVQIITM    4274       0        1 
+19         2048       16         IVQIITM    4274       0        1 
+20         2048       17         IVQIITM    4274       0        1 
+21         2048       18         IVQIITM    4274       0        1 
+22         -1         24         IVSLOT     4275       0        1 
+23         -1         25         IVSLOT     4275       0        1 
+24         -1         26         IVSLOT     4275       0        1 
+25         -1         27         IVSLOT     4275       0        1 
+26         -1         28         IVSLOT     4275       0        1 
+27         -1         29         IVSLOT     4275       0        1 
+28         -1         30         IVSLOT     4275       0        1 
+29         -1         31         IVSLOT     4275       0        1 
+30         -1         32         IVSLOT     4275       0        1 
+31         -1         33         IVSLOT     4275       0        1 
+32         -1         34         IVSLOT     4275       0        1 
+33         -1         35         IVSLOT     4275       0        1 
+34         -1         36         IVSLOT     4275       0        1 
+35         -1         37         IVSLOT     4275       0        1 
+36         -1         38         IVSLOT     4275       0        1 
+37         -1         39         IVSLOT     4275       0        1 
+38         -1         40         IVSLOT     4275       0        1 
+39         -1         41         IVSLOT     4275       0        1 
+40         -1         42         IVSLOT     4275       0        1 
+41         -1         43         IVSLOT     4275       0        1 
+42         0          -1         -          -          3        0
+7          1          5          IVPILENS   32795      1        0 
+1          1          0          IVPIEYER   32787      1        0 
+43         256        10         IVPIBOW    32803      4        0 
+44         256        11         IVPIBOW    32803      4        0 
+45         256        12         IVPIBOW    32803      4        0 
+46         256        13         IVPIBOW    32803      4        0 
+43         256        10         IVPITETH   32799      4        0 
+44         256        11         IVPITETH   32799      4        0 
