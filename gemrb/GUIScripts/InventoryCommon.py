@@ -193,6 +193,11 @@ def DisplayItem (itemresref, type):
 	item = GemRB.GetItem (itemresref)
 	ItemInfoWindow = Window = GemRB.LoadWindow (5)
 
+	#fake label
+	if GUICommon.GameIsIWD():
+		Label = Window.GetControl (0x10000000)
+		Label.SetText ("")
+
 	#item icon
 	Button = Window.GetControl (2)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
@@ -245,7 +250,14 @@ def DisplayItem (itemresref, type):
 		Button.SetText (17104)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReadItemWindow)
 	elif container:
-		Button.SetText (14133)
+		if GUICommon.GameIsIWD2() or GUICommon.GameIsHOW():
+			Button.SetText (24891) # Open Container
+		elif GUICommon.GameIsBG2():
+			Button.SetText (44002) # open container
+		else:
+			# a fallback, since the originals have nothing appropriate
+			# FIXME: where do mods add the new string? This is untranslatable
+			Button.SetText ("Open container")
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemWindow)
 	elif dialog:
 		Button.SetText (item["DialogName"])
@@ -347,7 +359,10 @@ def OpenItemAmountWindow ():
 
 	# item amount
 	Text = Window.GetControl (6)
-	Text.SetSize (40, 40)
+	# FIXME: use a proper size
+	# FIXME: fix it for all the games
+	if GUICommon.GameIsIWD2():
+		Text.SetSize (40, 40)
 	Text.SetText (str (StackAmount//2))
 	Text.SetStatus (IE_GUI_EDIT_NUMBER|IE_GUI_CONTROL_FOCUSED)
 
@@ -507,9 +522,10 @@ def GetColor():
 	GUIINV.InventoryWindow.SetVisible (WINDOW_GRAYED) #darken it
 	ColorPicker=GemRB.LoadWindow (3)
 	GemRB.SetVar ("Selected",-1)
-	Button = ColorPicker.GetControl (35)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelColor)
-	Button.SetText(13727)
+	if GUICommon.GameIsIWD2():
+		Button = ColorPicker.GetControl (35)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelColor)
+		Button.SetText(13727)
 
 	for i in range (34):
 		Button = ColorPicker.GetControl (i)
@@ -579,7 +595,10 @@ def ReadItemWindow ():
 		spell_count = GemRB.GetKnownSpellsCount (pc, IE_SPELL_TYPE_WIZARD, spell['SpellLevel']-1)
 		if spell_count > GemRB.GetAbilityBonus (IE_INT, 2, GemRB.GetPlayerStat (pc, IE_INT)):
 			ret = LSR_FULL
-			strref = -1
+			if GUICommon.GameIsBG2():
+				strref = 32097
+			else:
+				strref = -1
 		else:
 			if GemRB.LearnSpell (pc, spell_ref, LS_STATS|LS_ADDXP):
 				ret = LSR_FAILED
