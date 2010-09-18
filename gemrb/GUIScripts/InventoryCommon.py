@@ -220,20 +220,30 @@ def DisplayItem (itemresref, type):
 	item = GemRB.GetItem (itemresref)
 	ItemInfoWindow = Window = GemRB.LoadWindow (5)
 
-	#fake label
-	if GUICommon.GameIsIWD():
-		Label = Window.GetControl (0x10000000)
-		Label.SetText ("")
+	# item name
+	Label = Window.GetControl (0x10000000)
+	if (type&2):
+		text = item["ItemName"]
+	else:
+		text = item["ItemNameIdentified"]
+	Label.SetText (text)
 
 	#item icon
 	Button = Window.GetControl (2)
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-	Button.SetItemIcon (itemresref,0)
+	if GUICommon.GameIsPST():
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		Button.SetItemIcon (itemresref)
+	else:
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+		Button.SetItemIcon (itemresref,0)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#middle button
 	Button = Window.GetControl (4)
-	Button.SetText (11973)
+	if GUICommon.GameIsPST():
+		Button.SetText (1403)
+	else:
+		Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseItemInfoWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -250,7 +260,10 @@ def DisplayItem (itemresref, type):
 	select = (type&1) and (item["Function"]&8)
 
 	if type&2:
-		Button.SetText (14133)
+		if GUICommon.GameIsPST():
+			Button.SetText (4256)
+		else:
+			Button.SetText (14133)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyItemWindow)
 	elif select:
 		Button.SetText (11960)
@@ -279,10 +292,16 @@ def DisplayItem (itemresref, type):
 	dialog = (type&1) and (item["Dialog"]!="")
 	familiar = (type&1) and (item["Type"] == 38)
 	if drink:
-		Button.SetText (19392)
+		if GUICommon.GameIsPST():
+			Button.SetText (4251) # the closest thing
+		else:
+			Button.SetText (19392)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DrinkItemWindow)
 	elif read:
-		Button.SetText (17104)
+		if GUICommon.GameIsPST():
+			Button.SetText (4252)
+		else:
+			Button.SetText (17104)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReadItemWindow)
 	elif container:
 		if GUICommon.GameIsIWD2() or GUICommon.GameIsHOW():
@@ -295,7 +314,10 @@ def DisplayItem (itemresref, type):
 			Button.SetText ("Open container")
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemWindow)
 	elif dialog:
-		Button.SetText (item["DialogName"])
+		if GUICommon.GameIsPST():
+			Button.SetText (4254)
+		else:
+			Button.SetText (item["DialogName"])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DialogItemWindow)
 	elif familiar:
 		Button.SetText (4373)
@@ -304,19 +326,27 @@ def DisplayItem (itemresref, type):
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
-	Text = Window.GetControl (0x1000000b)
 	Label = Window.HasControl(0x1000000b)
 	if Label:
 		Label = Window.GetControl (0x1000000b)
-	if (type&2):
-		text = item["ItemName"]
-		label = 17108
-	else:
-		text = item["ItemNameIdentified"]
-		label = ""
-	Text.SetText (text)
-	if Label:
-		Label.SetText (label)
+		if (type&2):
+			if GUICommon.GameIsPST():
+				text = 4279 # This item has not been identified
+			else:
+				text = 17108 # NOT IDENTIFIED
+		else:
+			text = ""
+		Label.SetText (text)
+
+	# in pst one can cycle through all the items from the description window
+	if Window.HasControl (14):
+		#left scroll
+		Button = Window.GetControl (13)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.LeftItemScroll)
+
+		#right scroll
+		Button = Window.GetControl (14)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.RightItemScroll)
 
 	ItemInfoWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
