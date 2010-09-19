@@ -166,6 +166,8 @@ public: //Events
 	void AutoSave();
 	void SetDisplayText(char *text, unsigned int time);
 	void SetDisplayText(ieStrRef text, unsigned int time);
+	/* centers viewport to the points specified */
+	void Center(unsigned short x, unsigned short y);
 private:
 	/** this function is called when the user presses 'q' (or equivalent) */
 	void QuickSave();

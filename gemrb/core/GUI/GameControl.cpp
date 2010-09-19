@@ -226,6 +226,16 @@ void GameControl::MoveToPointFormation(Actor *actor, unsigned int pos, Point src
 	CreateMovement(actor, p);
 }
 
+void GameControl::Center(unsigned short x, unsigned short y)
+{
+	Video *video = core->GetVideoDriver();
+	Region Viewport = video->GetViewport();
+	Viewport.x += x - Viewport.w / 2;
+	Viewport.y += y - Viewport.h / 2;
+	core->timer->SetMoveViewPort( Viewport.x, Viewport.y, 0, false );
+	video->MoveViewportTo( Viewport.x, Viewport.y );
+}
+
 // generate an action to do the actual movement
 // only PST supports RunToPoint
 void GameControl::CreateMovement(Actor *actor, const Point &p)
@@ -1732,7 +1742,6 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 	if (ScreenFlags&SF_DISABLEMOUSE)
 		return;
 
-	Region Viewport = core->GetVideoDriver()->GetViewport();
 	short px=x;
 	short py=y;
 	DoubleClick = false;
@@ -1746,10 +1755,6 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		break;
 	case GEM_MB_ACTION|GEM_MB_DOUBLECLICK:
 		DoubleClick = true;
-		Viewport.x += x - Viewport.w / 2;
-		Viewport.y += y - Viewport.h / 2;
-		core->timer->SetMoveViewPort( Viewport.x, Viewport.y, 0, false );
-		core->GetVideoDriver()->MoveViewportTo( Viewport.x, Viewport.y );
 	case GEM_MB_ACTION:
 		core->GetVideoDriver()->ConvertToGame( px, py );
 		MouseIsDown = true;
@@ -1761,6 +1766,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		SelectionRect.h = 0;
 	}
 }
+
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short /*Mod*/)
@@ -1854,6 +1860,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			pc->ClearPath();
 			pc->ClearActions();
 			CreateMovement(pc, p);
+			if (DoubleClick) Center(x,y);
 			//p is a searchmap travel region
 			if ( pc->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
 				sprintf( Tmp, "NIDSpecial2()" );
@@ -1888,6 +1895,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			actor->ClearActions();
 			MoveToPointFormation(actor, i, src, p);
 		}
+		if (DoubleClick) Center(x,y);
 
 		//p is a searchmap travel region
 		if ( party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
