@@ -123,6 +123,7 @@ GameControl::GameControl(void)
 	numScrollCursor = 0;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
+	EnableRunning = true;  //make this a game flag if you wish
 	ieDword tmp=0;
 
 	ResetTargetMode();
@@ -232,12 +233,14 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 	char Tmp[256];
 
 	Action *action = NULL;
-	if (DoubleClick) {
+	if (DoubleClick && EnableRunning) {
 		sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
  		action = GenerateAction( Tmp );
+		//if it didn't work don't insist
+		if (!action)
+			EnableRunning = false;
 	}
-	if (!action)
-	{
+	if (!action) {
 		sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
  		action = GenerateAction( Tmp );
 	}
@@ -1729,6 +1732,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 	if (ScreenFlags&SF_DISABLEMOUSE)
 		return;
 
+	Region Viewport = core->GetVideoDriver()->GetViewport();
 	short px=x;
 	short py=y;
 	DoubleClick = false;
@@ -1742,6 +1746,10 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		break;
 	case GEM_MB_ACTION|GEM_MB_DOUBLECLICK:
 		DoubleClick = true;
+		Viewport.x += x - Viewport.w / 2;
+		Viewport.y += y - Viewport.h / 2;
+		core->timer->SetMoveViewPort( Viewport.x, Viewport.y, 0, false );
+		core->GetVideoDriver()->MoveViewportTo( Viewport.x, Viewport.y );
 	case GEM_MB_ACTION:
 		core->GetVideoDriver()->ConvertToGame( px, py );
 		MouseIsDown = true;

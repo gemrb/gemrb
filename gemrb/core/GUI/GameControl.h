@@ -138,6 +138,7 @@ private:
 	int DialogueFlags;
 	char *DisplayText;
 	unsigned int DisplayTextTime;
+	bool EnableRunning;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
