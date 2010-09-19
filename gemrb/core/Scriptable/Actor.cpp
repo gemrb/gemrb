@@ -303,6 +303,7 @@ Actor::Actor()
 		BaseStats[i] = 0;
 		Modified[i] = 0;
 	}
+	PrevStats = NULL;
 
 	SmallPortrait[0] = 0;
 	LargePortrait[0] = 0;
@@ -547,6 +548,16 @@ ieDword Actor::GetStat(unsigned int StatIndex) const
 	if (StatIndex >= MAX_STATS) {
 		return 0xdadadada;
 	}
+	return Modified[StatIndex];
+}
+
+/** Always return a final stat value not partially calculated ones */
+ieDword Actor::GetSafeStat(unsigned int StatIndex) const
+{
+	if (StatIndex >= MAX_STATS) {
+		return 0xdadadada;
+	}
+	if (PrevStat) return PrevStat[StatIndex];
 	return Modified[StatIndex];
 }
 
@@ -2147,8 +2158,12 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	} else {
 		memcpy( previous, Modified, MAX_STATS * sizeof( ieDword ) );
 	}
+	PrevStats = &previous;
+
 	memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
-	if (PCStats) memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
+	if (PCStats) {
+		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
+	}
 
 	if (fx) {
 		fx->SetOwner(this);
@@ -2173,6 +2188,8 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 
 	fxqueue.ApplyAllEffects( this );
+	//move this further down if needed
+	PrevStats = null;
 
 	// IE_CLASS is >classcount for non-PCs/NPCs
 	if (BaseStats[IE_CLASS] <= (ieDword)classcount)

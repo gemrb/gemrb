@@ -203,6 +203,7 @@ public:
 	//CRE DATA FIELDS
 	ieDword BaseStats[MAX_STATS];
 	ieDword Modified[MAX_STATS];
+	ieDword *PrevStats;
 	ieByteSigned DeathCounters[4];   //PST specific (good, law, lady, murder)
 
 	ieResRef applyWhenHittingMelee;  //set melee effect
@@ -374,6 +375,8 @@ public:
 	bool ValidTarget(int ga_flags) const;
 	/** Returns a Stat value */
 	ieDword GetStat(unsigned int StatIndex) const;
+	/** Returns a safe Stat value, one, that is not partially computed */
+	ieDword GetSafeStat(unsigned int StatIndex) const;
 	/** Sets a Stat Value (unsaved) */
 	bool SetStat(unsigned int StatIndex, ieDword Value, int pcf);
 	/** Returns the difference */
