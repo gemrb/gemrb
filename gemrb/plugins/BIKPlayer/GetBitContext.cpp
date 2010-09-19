@@ -330,3 +330,4 @@ int VLC::init_vlc(int nb_bits, int nb_codes,
 	}
 	return 0;
 }
+
