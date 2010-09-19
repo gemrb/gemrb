@@ -557,7 +557,7 @@ ieDword Actor::GetSafeStat(unsigned int StatIndex) const
 	if (StatIndex >= MAX_STATS) {
 		return 0xdadadada;
 	}
-	if (PrevStat) return PrevStat[StatIndex];
+	if (PrevStats) return PrevStats[StatIndex];
 	return Modified[StatIndex];
 }
 
@@ -2158,7 +2158,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	} else {
 		memcpy( previous, Modified, MAX_STATS * sizeof( ieDword ) );
 	}
-	PrevStats = &previous;
+	PrevStats = &previous[0];
 
 	memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
 	if (PCStats) {
@@ -2189,7 +2189,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	fxqueue.ApplyAllEffects( this );
 	//move this further down if needed
-	PrevStats = null;
+	PrevStats = NULL;
 
 	// IE_CLASS is >classcount for non-PCs/NPCs
 	if (BaseStats[IE_CLASS] <= (ieDword)classcount)
