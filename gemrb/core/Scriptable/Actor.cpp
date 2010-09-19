@@ -2754,7 +2754,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
 				displaymsg->DisplayConstantStringName(STR_DAMAGE1, 0xffffff, this);
 			}
-		} else if (stricmp( core->GameType, "pst" ) == 0) {
+		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
 			if(0) printf("TODO: pst floating text\n");
 		} else if (!displaymsg->HasStringReference(STR_DAMAGE2) || !hitter || hitter->Type != ST_ACTOR) {
 			// bg1 and iwd
