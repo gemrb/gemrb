@@ -220,6 +220,11 @@ def DisplayItem (itemresref, type):
 	item = GemRB.GetItem (itemresref)
 	ItemInfoWindow = Window = GemRB.LoadWindow (5)
 
+	if GUICommon.GameIsPST():
+		strrefs = [ 1403, 4256, 4255, 4251, 4252, 4254, 4279 ]
+	else:
+		strrefs = [ 11973, 14133, 11960, 19392, 17104, item["DialogName"], 17108 ]
+
 	# item name
 	Label = Window.GetControl (0x10000000)
 	if (type&2):
@@ -240,10 +245,7 @@ def DisplayItem (itemresref, type):
 
 	#middle button
 	Button = Window.GetControl (4)
-	if GUICommon.GameIsPST():
-		Button.SetText (1403)
-	else:
-		Button.SetText (11973)
+	Button.SetText (strrefs[0])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseItemInfoWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -260,13 +262,10 @@ def DisplayItem (itemresref, type):
 	select = (type&1) and (item["Function"]&8)
 
 	if type&2:
-		if GUICommon.GameIsPST():
-			Button.SetText (4256)
-		else:
-			Button.SetText (14133)
+		Button.SetText (strrefs[1])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyItemWindow)
 	elif select:
-		Button.SetText (11960)
+		Button.SetText (strrefs[2])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesItemWindow)
 	else:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
@@ -295,16 +294,10 @@ def DisplayItem (itemresref, type):
 	dialog = (type&1) and (item["Dialog"]!="")
 	familiar = (type&1) and (item["Type"] == 38)
 	if drink:
-		if GUICommon.GameIsPST():
-			Button.SetText (4251) # the closest thing
-		else:
-			Button.SetText (19392)
+		Button.SetText (strrefs[3])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DrinkItemWindow)
 	elif read:
-		if GUICommon.GameIsPST():
-			Button.SetText (4252)
-		else:
-			Button.SetText (17104)
+		Button.SetText (strrefs[4])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReadItemWindow)
 	elif container:
 		if GUICommon.GameIsIWD2() or GUICommon.GameIsHOW():
@@ -317,10 +310,7 @@ def DisplayItem (itemresref, type):
 			Button.SetText ("Open container")
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemWindow)
 	elif dialog:
-		if GUICommon.GameIsPST():
-			Button.SetText (4254)
-		else:
-			Button.SetText (item["DialogName"])
+		Button.SetText (strrefs[5])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DialogItemWindow)
 	elif familiar:
 		Button.SetText (4373)
@@ -333,13 +323,10 @@ def DisplayItem (itemresref, type):
 	if Label:
 		Label = Window.GetControl (0x1000000b)
 		if (type&2):
-			if GUICommon.GameIsPST():
-				text = 4279 # This item has not been identified
-			else:
-				text = 17108 # NOT IDENTIFIED
+			# NOT IDENTIFIED
+			Label.SetText (strrefs[6])
 		else:
-			text = ""
-		Label.SetText (text)
+			Label.SetText ("")
 
 	# in pst one can cycle through all the items from the description window
 	if Window.HasControl (14):
