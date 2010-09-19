@@ -287,43 +287,17 @@ def RefreshInventoryWindow ():
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDragItemGround)
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
-		if Slot != None:
-			item = GemRB.GetItem (Slot['ItemResRef'])
-			identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
-			magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL
 
-			Button.SetItemIcon (Slot['ItemResRef'],0)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-			if not identified or item["ItemNameIdentified"] == -1:
-				Button.SetTooltip (item["ItemName"])
-				Button.EnableBorder (0, 1)
-				Button.EnableBorder (1, 0)
-			else:
-				Button.SetTooltip (item["ItemNameIdentified"])
-				Button.EnableBorder (0, 0)
-				if magical:
-					Button.EnableBorder (1, 1)
-				else:
-					Button.EnableBorder (1, 0)
-
-			if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc):
-				Button.EnableBorder (2, 0)
-			else:
-				Button.EnableBorder (2, 1)
-
+		if Slot == None:
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
+		else:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenGroundItemInfoWindow)
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None) #TODO: implement OpenGroundItemAmountWindow
 
-		else:
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetTooltip (12011)
-			Button.EnableBorder (0, 0)
-			Button.EnableBorder (1, 0)
-			Button.EnableBorder (2, 0)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
-			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
+		GUICommon.UpdateInventorySlot (pc, Button, Slot, "ground")
 
 	#making window visible/shaded depending on the pc's state
 	if GemRB.GetPlayerStat (pc, IE_HELD) == 0 and GemRB.GetPlayerStat (pc, IE_CASTERHOLD) == 0:
