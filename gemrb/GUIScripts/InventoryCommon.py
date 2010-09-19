@@ -273,10 +273,13 @@ def DisplayItem (itemresref, type):
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
 	#description icon
-	if GUICommon.GameIsBG2():
+	if GUICommon.GameIsBG2() or GUICommon.GameIsPST():
 		Button = Window.GetControl (7)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
-		Button.SetItemIcon (itemresref, 2)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		if GUICommon.GameIsPST():
+			Button.SetItemIcon (itemresref, 1) # no DescIcon
+		else:
+			Button.SetItemIcon (itemresref, 2)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#right button
@@ -353,8 +356,11 @@ def DisplayItem (itemresref, type):
 
 def OpenItemInfoWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
-	slot_item = GemRB.GetSlotItem (pc, slot)
+	if GUICommon.GameIsPST():
+		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
+	else:
+		slot = GemRB.GetVar ("ItemButton")
+		slot_item = GemRB.GetSlotItem (pc, slot)
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 
 	#auto identify when lore is high enough
@@ -752,8 +758,11 @@ def DialogItemWindow ():
 		ItemInfoWindow.Unload ()
 	GUIINV.OpenInventoryWindow ()
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
-	slot_item = GemRB.GetSlotItem (pc, slot)
+	if GUICommon.GameIsPST():
+		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
+	else:
+		slot = GemRB.GetVar ("ItemButton")
+		slot_item = GemRB.GetSlotItem (pc, slot)
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 	dialog=item["Dialog"]
