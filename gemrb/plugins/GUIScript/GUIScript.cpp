@@ -3039,10 +3039,9 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* a
 	}
 
 	//target mode is only the low bits (which is a number)
-	gc->target_mode = Mode&GA_ACTION;
+	gc->SetTargetMode(Mode&GA_ACTION);
 	//target type is all the bits
 	gc->target_types = (Mode&GA_ACTION)|Types;
-
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -3058,7 +3057,7 @@ static PyObject* GemRB_GameControlGetTargetMode(PyObject * /*self*/, PyObject* /
 		return RuntimeError("Can't find GameControl!");
 	}
 
-	return PyInt_FromLong(gc->target_mode);
+	return PyInt_FromLong(gc->GetTargetMode());
 }
 
 PyDoc_STRVAR( GemRB_Button_SetFlags__doc,
@@ -8384,7 +8383,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 					SetItemText(wi, ci, item->Usages[actor->PCStats->QuickWeaponHeaders[action-ACT_WEAPON1]], true);
 					if (usedslot == slot) {
 						btn->EnableBorder(0, true);
-						if (core->GetGameControl()->target_mode == TARGET_MODE_ATTACK) {
+						if (core->GetGameControl()->GetTargetMode() == TARGET_MODE_ATTACK) {
 							state = IE_GUI_BUTTON_SELECTED;
 						} else {
 							state = IE_GUI_BUTTON_THIRD;

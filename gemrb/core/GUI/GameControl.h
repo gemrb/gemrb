@@ -119,12 +119,12 @@ public:
 	Container* overContainer;
 	InfoPoint* overInfoPoint;
 
-	// currently selected targetting type, such as talk, attack, cast, ...
-	int target_mode;
 	// allow targetting allies, enemies and/or neutrals (bitmask)
 	int target_types;
-
 private:
+	// currently selected targetting type, such as talk, attack, cast, ...
+	// private to enforce proper cursor changes
+	int target_mode;
 	unsigned char lastCursor;
 	short moveX, moveY;
 	int numScrollCursor;
@@ -158,6 +158,8 @@ public: //Events
 	void OnSpecialKeyPress(unsigned char Key);
 	void DisplayTooltip();
 	void UpdateScrolling();
+	void SetTargetMode(int mode);
+	int GetTargetMode() { return target_mode; }
 	void SetScreenFlags(int value, int mode);
 	void SetDialogueFlags(int value, int mode);
 	int GetScreenFlags() { return ScreenFlags; }

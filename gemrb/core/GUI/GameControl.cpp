@@ -2020,8 +2020,19 @@ void GameControl::PerformActionOn(Actor *actor)
 	}
 }
 
+//sets target mode, and resets the cursor
+void GameControl::SetTargetMode(int mode) {
+	int x,y;
+
+	target_mode = mode;
+	//This hack is to refresh the mouse cursor
+	core->GetVideoDriver()->GetMousePos(x,y);
+	//calling into the videodriver to set the mouseposition won't work
+	core->GetEventMgr()->MouseMove(x,y);
+}
+
 void GameControl::ResetTargetMode() {
-	target_mode = TARGET_MODE_NONE;
+	SetTargetMode(TARGET_MODE_NONE);
 	target_types = GA_NO_DEAD|GA_NO_HIDDEN;
 }
 
@@ -2624,7 +2635,7 @@ void GameControl::SetupItemUse(int slot, int header, Actor *u, int targettype, i
 	spellSlot = slot;
 	spellIndex = header;
 	//item use also uses the casting icon, this might be changed in some custom game?
-	target_mode = TARGET_MODE_CAST;
+	SetTargetMode(TARGET_MODE_CAST);
 	target_types = targettype;
 	spellCount = cnt;
 }
@@ -2642,7 +2653,7 @@ void GameControl::SetupCasting(int type, int level, int idx, Actor *u, int targe
 	spellUser = u;
 	spellSlot = level;
 	spellIndex = idx;
-	target_mode = TARGET_MODE_CAST;
+	SetTargetMode(TARGET_MODE_CAST);
 	target_types = targettype;
 	spellCount = cnt;
 }

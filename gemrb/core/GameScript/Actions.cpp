@@ -6132,7 +6132,7 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	gc->target_mode = TARGET_MODE_ATTACK; //for bashing doors too
+	gc->SetTargetMode(TARGET_MODE_ATTACK); //for bashing doors too
 	OpenDoor(Sender, parameters);
 
 	Sender->ReleaseCurrentAction(); // this is blocking, OpenDoor is not
