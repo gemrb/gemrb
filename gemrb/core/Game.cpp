@@ -1743,6 +1743,7 @@ void Game::DebugDump()
 
 		printf("%s\n",map->GetScriptName());
 	}
+	printf("Current area: %s   Previous area: %s\n", CurrentArea, PreviousArea);
 	printf("Global script: %s\n", Scripts[0]->GetName());
 	printf("CombatCounter: %d\n", (int) CombatCounter);
 	printf("Attackers count: %d\n", (int) Attackers.size());

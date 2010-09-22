@@ -1,6 +1,6 @@
 2DA V1.0
 Auto-Save
-  SLOTNAME
-0 Auto-Save
-1 Quick-Save
-2 Quick-Save-Backup
+  SLOTNAME             QSAVE
+0 Auto-Save            0
+1 Quick-Save           1
+2 Quick-Save-Backup    1

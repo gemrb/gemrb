@@ -219,6 +219,7 @@ public:
 	ieDword Expansion; // mostly used by BG2. IWD games set it to 3 on newgame
 	ieResRef AnotherArea;
 	ieResRef CurrentArea;
+	ieResRef PreviousArea; //move here if the worldmap exit is illegal?
 	ieResRef LoadMos;
 	Actor *timestop_owner;
 	ieDword timestop_end;

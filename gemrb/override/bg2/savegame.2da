@@ -1,9 +1,9 @@
 2DA V1.0
 Auto-Save
-  SLOTNAME
-0 Auto-Save
-1 Quick-Save
-2 Final-Save
-3 Auto-Save-TOB
-4 Quick-Save-TOB
-5 Final-Save-TOB
+           SLOTNAME       QSAVE      
+0          Auto-Save      0          
+1          Quick-Save     1          
+2          Final-Save     0          
+3          Auto-Save-TOB  0          
+4          Quick-Save-TOB 1          
+5          Final-Save-TOB 0          

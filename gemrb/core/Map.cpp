@@ -425,10 +425,18 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 	//check worldmap entry, if that doesn't contain anything,
 	//make a random pick
 
+	Game* game = core->GetGame();
 	if (EveryOne==CT_WHOLE) {
+		//copy the area name if it exists on the worldmap
+		unsigned int index;
+
+		WMPAreaEntry* entry = core->GetWorldMap()->FindNearestEntry(area, index);
+		if (entry) {
+			memcpy (game->PreviousArea, entry->AreaName, 8);
+		}
+
 		core->GetGameControl()->AutoSave();
 	}
-	Game* game = core->GetGame();
 	Map* map = game->GetMap(area, false);
 	if (!map) {
 		printMessage("Map", " ", LIGHT_RED);

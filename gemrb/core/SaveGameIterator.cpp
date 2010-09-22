@@ -451,10 +451,43 @@ int CanSave()
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
 		return 2; //can't save while in dialog?
 	}
+
 	//TODO: can't save while in combat
-	//TODO: can't save while (party) actors are in helpless states
+	Game *game = core->GetGame();
+	if (!game) {
+		return -1;
+	}
+	if (game->CombatCounter) {
+		return 3;
+	}
+
+	Map *map = game->GetCurrentArea();
+	if (!map) {		
+		return -1;
+	}
+
+	if (map->AreaFlags&AF_SAVE) {
+		//cannot save in area
+		return 4;
+	}
+
+	int i = game->GetPartySize(true);
+	while(i--) {
+		Actor *actor = game->GetPC(i, true);
+		//TODO: can't save while (party) actors are in helpless states
+		if (actor->GetStat(IE_STATE_ID) & STATE_NOSAVE) {
+			//some actor is in nosave state
+			return 5;
+		}
+		if (actor->GetCurrentArea()!=map) {
+			//scattered
+			return 6;
+		}
+	}
+
 	//TODO: can't save while AOE spells are in effect
-	//TODO: can't save while IF_NOINT is set on an actor
+	//TODO: can't save while IF_NOINT is set on any actor
+
 	return 0;
 }
 
@@ -480,14 +513,20 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 {
 	AutoTable tab("savegame");
 	const char *slotname = NULL;
+	int qsave = 0;
+
 	if (tab) {
 		slotname = tab->QueryField(index);
+		qsave = atoi(tab->QueryField(index, 1));
 	}
 
 	if (mqs) {
-		assert(index==1);
+		assert(qsave);
 		PruneQuickSave(slotname);
 	}
+
+	if (int cansave = CanSave())
+		return cansave;
 
 	//if index is not an existing savegame, we create a unique slotname
 	for (size_t i = 0; i < save_slots.size(); ++i) {
@@ -499,25 +538,26 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 	}
 	char Path[_MAX_PATH];
 	CreateSavePath(Path, index, slotname);
+	GameControl *gc = core->GetGameControl();
 
 	if (!DoSaveGame(Path)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
-		if (core->GetGameControl()) {
-			core->GetGameControl()->SetDisplayText(STR_CANTSAVE, 30);
+		if (gc) {
+			gc->SetDisplayText(STR_CANTSAVE, 30);
 		}
 		return -1;
 	}
 
 	// Save succesful / Quick-save succesful
-	if (index == 1) {
+	if (qsave) {
 		displaymsg->DisplayConstantString(STR_QSAVESUCCEED, 0xbcefbc);
-		if (core->GetGameControl()) {
-			core->GetGameControl()->SetDisplayText(STR_QSAVESUCCEED, 30);
+		if (gc) {
+			gc->SetDisplayText(STR_QSAVESUCCEED, 30);
 		}
 	} else {
 		displaymsg->DisplayConstantString(STR_SAVESUCCEED, 0xbcefbc);
-		if (core->GetGameControl()) {
-			core->GetGameControl()->SetDisplayText(STR_SAVESUCCEED, 30);
+		if (gc) {
+			gc->SetDisplayText(STR_SAVESUCCEED, 30);
 		}
 	}
 	return 0;
@@ -532,7 +572,9 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 	if (int cansave = CanSave())
 		return cansave;
 
+	GameControl *gc = core->GetGameControl();
 	int index;
+
 	if (save) {
 		index = save->GetSaveID();
 
@@ -556,16 +598,16 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 
 	if (!DoSaveGame(Path)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
-		if (core->GetGameControl()) {
-			core->GetGameControl()->SetDisplayText(STR_CANTSAVE, 30);
+		if (gc) {
+			gc->SetDisplayText(STR_CANTSAVE, 30);
 		}
 		return -1;
 	}
 
 	// Save succesful
 	displaymsg->DisplayConstantString(STR_SAVESUCCEED, 0xbcefbc);
-	if (core->GetGameControl()) {
-		core->GetGameControl()->SetDisplayText(STR_SAVESUCCEED, 30);
+	if (gc) {
+		gc->SetDisplayText(STR_SAVESUCCEED, 30);
 	}
 	return 0;
 }
