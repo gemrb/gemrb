@@ -2625,6 +2625,8 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject * /*self*/, PyObject
 	if (encounter && eval) {
 		int i=rand()%5;
 
+		displaymsg->DisplayConstantString(STR_AMBUSH,0xbcefbc);
+
 		if(wal->EncounterChance>=100) {
 			wal->EncounterChance-=100;
 		}
