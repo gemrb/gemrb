@@ -5798,7 +5798,7 @@ void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 void GameScript::EscapeAreaNoSee(Scriptable* Sender, Action* parameters)
 {
 	if (InDebug&ID_ACTIONS) {
-		printf("EscapeArea/EscapeAreaMove\n");
+		printf("EscapeAreaNoSee\n");
 	}
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
