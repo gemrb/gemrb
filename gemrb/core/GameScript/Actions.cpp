@@ -5795,6 +5795,34 @@ void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 	//Sender->ReleaseCurrentAction();
 }
 
+void GameScript::EscapeAreaNoSee(Scriptable* Sender, Action* parameters)
+{
+	if (InDebug&ID_ACTIONS) {
+		printf("EscapeArea/EscapeAreaMove\n");
+	}
+	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Map *map = Sender->GetCurrentArea();
+	if (!map) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Point p = Sender->Pos;
+	map->TMap->AdjustNearestTravel(p);
+
+	if (parameters->string0Parameter[0]) {
+		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
+		EscapeAreaCore( Sender, p, parameters->string0Parameter, q, 0, parameters->int2Parameter );
+	} else {
+		EscapeAreaCore( Sender, p, parameters->string0Parameter, p, EA_DESTROY|EA_NOSEE, parameters->int0Parameter );
+	}
+	//EscapeAreaCore will do its ReleaseCurrentAction
+	//Sender->ReleaseCurrentAction();
+}
+
 void GameScript::EscapeAreaDestroy(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {

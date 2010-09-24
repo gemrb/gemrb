@@ -1074,6 +1074,7 @@ public:
 	static void Enemy(Scriptable* Sender, Action* parameters);
 	static void EscapeArea(Scriptable* Sender, Action* parameters);
 	static void EscapeAreaDestroy(Scriptable* Sender, Action* parameters);
+	static void EscapeAreaNoSee(Scriptable* Sender, Action* parameters);
 	static void EscapeAreaObject(Scriptable* Sender, Action* parameters);
 	static void EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters);
 	static void EquipItem(Scriptable *Sender, Action *parameters);

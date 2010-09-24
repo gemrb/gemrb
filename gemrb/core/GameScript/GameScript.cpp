@@ -552,6 +552,7 @@ static const ActionLink actionnames[] = {
 	{"erasejournalentry", GameScript::RemoveJournalEntry, 0},
 	{"escapearea", GameScript::EscapeArea, AF_BLOCKING},
 	{"escapeareadestroy", GameScript::EscapeAreaDestroy, AF_BLOCKING},
+	{"escapeareanosee", GameScript::EscapeAreaNoSee, AF_BLOCKING},
 	{"escapeareaobject", GameScript::EscapeAreaObject, AF_BLOCKING},
 	{"escapeareaobjectnosee", GameScript::EscapeAreaObjectNoSee, AF_BLOCKING},
 	{"exitpocketplane", GameScript::ExitPocketPlane, 0},
