@@ -118,6 +118,13 @@ def OpenStoreWindow ():
 	global store_funcs
 	global Inventory
 
+	print 1111111111111111111111111111
+	print 1111111111111111111111111111
+	print 1111111111111111111111111111
+	print 1111111111111111111111111111
+	print 1111111111111111111111111111
+	print 1111111111111111111111111111
+
 	#these are function pointers, not strings
 	#can't put this in global init, doh!
 	store_funcs = (OpenStoreShoppingWindow,
