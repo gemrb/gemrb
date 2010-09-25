@@ -142,7 +142,11 @@ def OpenStoreWindow ():
 	StoreWindow = Window = GemRB.LoadWindow (3)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
+	if GUICommon.GameIsIWD2():
+		#PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
+		pass
+	else:
+		PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 	ActionWindow = GemRB.LoadWindow (0)
 	#this window is static and grey, but good to stick the frame onto
 	ActionWindow.SetFrame ()
@@ -155,8 +159,9 @@ def OpenStoreWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseStoreWindow)
 
 	#Store type icon
-	Button = Window.GetControl (5)
-	Button.SetSprites (storebams[Store['StoreType']],0,0,0,0,0)
+	if not GUICommon.GameIsIWD2():
+		Button = Window.GetControl (5)
+		Button.SetSprites (storebams[Store['StoreType']],0,0,0,0,0)
 
 	#based on shop type, these buttons will change
 	store_type = Store['StoreType']
@@ -167,7 +172,7 @@ def OpenStoreWindow ():
 		Button.SetVarAssoc ("Action", i)
 		if Action>=0:
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-			if GUICommon.GameIsIWD1():
+			if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
 				Button.SetSprites ("GUISTBBC", Action, 1,2,0,0)
 			else:
 				Button.SetSprites ("GUISTBBC", Action, 0,1,2,0)
@@ -183,7 +188,8 @@ def OpenStoreWindow ():
 	ActionWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_VISIBLE)
 	store_funcs[store_buttons[0]] ()
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	if not GUICommon.GameIsIWD2():
+		PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def OpenStoreShoppingWindow ():
@@ -234,20 +240,20 @@ def OpenStoreShoppingWindow ():
 
 	for i in range (4):
 		Button = Window.GetControl (i+5)
-		if GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
-			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		else:
+		if GUICommon.GameIsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		else:
+			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
 		Button.AttachScrollBar (ScrollBarLeft)
 
 		Button = Window.GetControl (i+13)
-		if GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
-			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		else:
+		if GUICommon.GameIsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
+		else:
+			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
@@ -330,7 +336,7 @@ def OpenStoreIdentifyWindow ():
 	for i in range (4):
 		Button = Window.GetControl (i+8)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		if GUICommon.GameIsIWD1():
+		if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
 			Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		elif GUICommon.GameIsBG1():
@@ -368,18 +374,18 @@ def OpenStoreStealWindow ():
 
 	for i in range (4):
 		Button = Window.GetControl (i+4)
-		if GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
-			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		else:
+		if GUICommon.GameIsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		else:
+			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreStealWindow)
 		Button.AttachScrollBar (ScrollBarLeft)
 
 		Button = Window.GetControl (i+11)
-		if GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
-			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
-		else:
+		if GUICommon.GameIsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		else:
+			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 		Button.AttachScrollBar (ScrollBarRight)
 
@@ -876,7 +882,11 @@ def RedrawStoreIdentifyWindow ():
 		else:
 			Slot = None
 		Button = Window.GetControl (i+8)
-		Label = Window.GetControl (0x1000000c+i)
+		# TODO: recheck they really differ
+		if GUICommon.GameIsIWD2():
+			Label = Window.GetControl (0x1000000d+i)
+		else:
+			Label = Window.GetControl (0x1000000c+i)
 		Button.SetVarAssoc ("Index", TopIndex+i)
 		if Slot != None:
 			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[TopIndex+i], ITEM_PC)
