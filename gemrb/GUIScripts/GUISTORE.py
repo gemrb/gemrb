@@ -55,6 +55,10 @@ Buttons = [-1,-1,-1,-1]
 inventory_slots = ()
 total_price = 0
 total_income = 0
+if GUICommon.GameIsIWD2():
+	ItemButtonCount = 6
+else:
+	ItemButtonCount = 4
 
 # 0 - Store
 # 1 - Tavern
@@ -102,11 +106,13 @@ def CloseStoreWindow ():
 		StoreWindow.Unload ()
 	if ActionWindow:
 		ActionWindow.Unload ()
-	if PortraitWindow:
-		PortraitWindow.Unload ()
+	if not GUICommon.GameIsBG1():
+		if PortraitWindow:
+			PortraitWindow.Unload ()
 	StoreWindow = None
 	GemRB.LeaveStore ()
-	GUICommonWindows.PortraitWindow = OldPortraitWindow
+	if not GUICommon.GameIsBG1():
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
 	if Inventory:
 		GUIINV.OpenInventoryWindow ()
 	else:
@@ -145,7 +151,7 @@ def OpenStoreWindow ():
 	StoreWindow = Window = GemRB.LoadWindow (3)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	if GUICommon.GameIsIWD2():
+	if GUICommon.GameIsIWD2() or GUICommon.GameIsBG1():
 		#PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
 		pass
 	else:
@@ -192,7 +198,10 @@ def OpenStoreWindow ():
 	Window.SetVisible (WINDOW_VISIBLE)
 	store_funcs[store_buttons[0]] ()
 	if not GUICommon.GameIsIWD2():
-		PortraitWindow.SetVisible (WINDOW_VISIBLE)
+		if GUICommon.GameIsBG1():
+			GUICommonWindows.PortraitWindow.SetVisible (WINDOW_VISIBLE)
+		else:
+			PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def OpenStoreShoppingWindow ():
@@ -241,7 +250,7 @@ def OpenStoreShoppingWindow ():
 		Label = Window.GetControl (0x1000002c)
 		Label.SetText ("0")
 
-	for i in range (4):
+	for i in range (ItemButtonCount):
 		Button = Window.GetControl (i+5)
 		if GUICommon.GameIsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
@@ -336,7 +345,7 @@ def OpenStoreIdentifyWindow ():
 	Label.SetText ("0")
 
 	# 8-11 item slots, 0x1000000c-f labels
-	for i in range (4):
+	for i in range (ItemButtonCount):
 		Button = Window.GetControl (i+8)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
@@ -375,7 +384,7 @@ def OpenStoreStealWindow ():
 	ScrollBarRight = Window.GetControl (10)
 	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreStealWindow)
 
-	for i in range (4):
+	for i in range (ItemButtonCount):
 		Button = Window.GetControl (i+4)
 		if GUICommon.GameIsBG2():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
@@ -458,7 +467,7 @@ def OpenStoreHealWindow ():
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, UpdateStoreHealWindow)
 
 	#spell buttons
-	for i in range (4):
+	for i in range (ItemButtonCount):
 		Button = Window.GetControl (i+8)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateStoreHealWindow)
@@ -752,7 +761,7 @@ def RedrawStoreShoppingWindow ():
 	else:
 		RightButton.SetState (IE_GUI_BUTTON_DISABLED)
 
-	for i in range (4):
+	for i in range (ItemButtonCount):
 		if i+LeftTopIndex<LeftCount:
 			Slot = GemRB.GetStoreItem (i+LeftTopIndex)
 		else:
@@ -879,7 +888,7 @@ def RedrawStoreIdentifyWindow ():
 	TextArea = Window.GetControl (23)
 	TextArea.SetText ("")
 	Selected = 0
-	for i in range (4):
+	for i in range (ItemButtonCount):
 		if TopIndex+i<Count:
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[TopIndex+i])
 		else:
@@ -1074,7 +1083,7 @@ def RedrawStoreStealWindow ():
 	LeftCount = Store['StoreItemCount']
 	pc = GemRB.GameGetSelectedPCSingle ()
 	RightCount = len(inventory_slots)
-	for i in range (4):
+	for i in range (ItemButtonCount):
 		Slot = GemRB.GetStoreItem (i+LeftTopIndex)
 		Button = Window.GetControl (i+4)
 		Label = Window.GetControl (0x1000000f+i)
@@ -1214,7 +1223,7 @@ def UpdateStoreHealWindow ():
 	UpdateStoreCommon (Window, 0x10000000, 0, 0x10000001)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Index = GemRB.GetVar ("Index")
-	for i in range (4):
+	for i in range (ItemButtonCount):
 		Cure = GemRB.GetStoreCure (TopIndex+i)
 
 		Button = Window.GetControl (i+8)
