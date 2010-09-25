@@ -5410,8 +5410,6 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	//the core will be intelligent enough to not do excess work
 	core->SetCurrentStore( StoreResRef, NULL );
 
-	//the error flag is not optional, we should open a store now
-	//core->GetGUIScriptEngine()->RunFunction( "OpenStoreWindow", true);
 	core->SetEventFlag(EF_OPENSTORE);
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5426,6 +5424,7 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 	if (core->CloseCurrentStore() ) {
 		return RuntimeError("Cannot save store!");
 	}
+	core->ResetEventFlag(EF_OPENSTORE);
 	core->SetEventFlag(EF_PORTRAIT);
 	Py_INCREF( Py_None );
 	return Py_None;

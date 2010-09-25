@@ -80,9 +80,9 @@ def OnDragItem ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
-
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	
 	if not GemRB.IsDraggingItem ():
-		slot_item = GemRB.GetSlotItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 	else:
@@ -95,6 +95,22 @@ def OnDragItem ():
 				GemRB.DisplayString (61355, 0xffffff)
 
 		if SlotType["ResRef"]!="":
+			if slot_item:
+				item = GemRB.GetItem (slot_item["ItemResRef"])
+				#drag items into a bag
+				if item["Function"]&4:
+					#first swap them
+					GemRB.DropDraggedItem (pc, slot)
+					#enter the store
+					GemRB.EnterStore (slot_item["ItemResRef"])
+					#if it is possible to add, then do it
+					if GemRB.IsValidStoreItem (pc, slot, 0)&SHOP_SELL:
+						GemRB.ChangeStoreItem (pc, slot, SHOP_SELL)
+					else:
+						GemRB.DisplayString( 26285, 0xfffffff)
+					#leave (save) store
+					GemRB.LeaveStore()
+
 			GemRB.DropDraggedItem (pc, slot)
 
 	GUIINV.UpdateInventoryWindow ()

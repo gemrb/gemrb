@@ -739,6 +739,10 @@ public:
 	{
 		EventFlag|=Flag;
 	}
+	inline void ResetEventFlag(int Flag)
+	{
+		EventFlag&=~Flag;
+	}
 
 	static void SanityCheck(const char *ver);
 
