@@ -5067,10 +5067,10 @@ int Interface::GetConstitutionBonus(int column, int value) const
 int Interface::GetCharismaBonus(int column, int value) const
 {
 	// store price reduction
-	if (column<0 || column>0)
+	if (column<0 || column>(MaximumAbility-1))
 		return -9999;
 
-	return chrmod[column*(MaximumAbility+1)+value];
+	return chrmod[value];
 }
 
 int Interface::GetLoreBonus(int column, int value) const
