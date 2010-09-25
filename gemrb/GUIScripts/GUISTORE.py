@@ -138,7 +138,10 @@ def OpenStoreWindow ():
 		Inventory = None
 
 	GemRB.SetVar ("Action", 0)
-	GemRB.LoadWindowPack ("GUISTORE", 640, 480)
+	if GUICommon.GameIsIWD2():
+		GemRB.LoadWindowPack ("GUISTORE", 800, 600)
+	else:
+		GemRB.LoadWindowPack ("GUISTORE", 640, 480)
 	StoreWindow = Window = GemRB.LoadWindow (3)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
