@@ -194,6 +194,14 @@ def OpenStoreShoppingWindow ():
 
 	StoreShoppingWindow = Window = GemRB.LoadWindow (2)
 
+	# left scrollbar
+	ScrollBarLeft = Window.GetControl (11)
+	ScrollBarLeft.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreShoppingWindow)
+
+	# right scrollbar
+	ScrollBarRight = Window.GetControl (12)
+	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreShoppingWindow)
+
 	if Inventory:
 		# Title
 		Label = Window.GetControl (0xfffffff)
@@ -226,15 +234,16 @@ def OpenStoreShoppingWindow ():
 
 	for i in range (4):
 		Button = Window.GetControl (i+5)
-		if GUICommon.GameIsIWD1():
+		if GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
+		Button.AttachScrollBar (ScrollBarLeft)
 
 		Button = Window.GetControl (i+13)
-		if GUICommon.GameIsIWD1():
+		if GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
@@ -242,6 +251,7 @@ def OpenStoreShoppingWindow ():
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
+		Button.AttachScrollBar (ScrollBarRight)
 
 	# Buy
 	LeftButton = Button = Window.GetControl (2)
@@ -288,14 +298,6 @@ def OpenStoreShoppingWindow ():
 	Label = Window.CreateLabel (0x10000043, 15,325,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
 	Label = Window.CreateLabel (0x10000044, 15,365,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
 
-	# left scrollbar
-	ScrollBar = Window.GetControl (11)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreShoppingWindow)
-
-	# right scrollbar
-	ScrollBar = Window.GetControl (12)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreShoppingWindow)
-
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreShoppingWindow )
 	UpdateStoreShoppingWindow ()
 	Window.SetVisible (WINDOW_VISIBLE)
@@ -303,6 +305,7 @@ def OpenStoreShoppingWindow ():
 
 def OpenStoreIdentifyWindow ():
 	global StoreIdentifyWindow
+	global LeftButton
 
 	GemRB.SetVar ("Index", -1)
 	GemRB.SetVar ("TopIndex", 0)
@@ -310,8 +313,11 @@ def OpenStoreIdentifyWindow ():
 
 	StoreIdentifyWindow = Window = GemRB.LoadWindow (4)
 
+	ScrollBar = Window.GetControl (7)
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreIdentifyWindow)
+
 	# Identify
-	Button = Window.GetControl (5)
+	LeftButton = Button = Window.GetControl (5)
 	Button.SetText (14133)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyPressed)
 	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
@@ -327,13 +333,13 @@ def OpenStoreIdentifyWindow ():
 		if GUICommon.GameIsIWD1():
 			Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+		elif GUICommon.GameIsBG1():
+			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreIdentifyWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
-
-	ScrollBar = Window.GetControl (7)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreIdentifyWindow)
+		Button.AttachScrollBar (ScrollBar)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreIdentifyWindow )
 	UpdateStoreIdentifyWindow ()
@@ -346,24 +352,36 @@ def OpenStoreStealWindow ():
 
 	GemRB.SetVar ("RightIndex", 0)
 	GemRB.SetVar ("LeftIndex", 0)
+	GemRB.SetVar ("RightTopIndex", 0)
+	GemRB.SetVar ("LeftTopIndex", 0)
 	CloseWindows()
 
 	StoreStealWindow = Window = GemRB.LoadWindow (6)
 
+	# left scrollbar
+	ScrollBarLeft = Window.GetControl (9)
+	ScrollBarLeft.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreStealWindow)
+
+	# right scrollbar
+	ScrollBarRight = Window.GetControl (10)
+	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreStealWindow)
+
 	for i in range (4):
 		Button = Window.GetControl (i+4)
-		if GUICommon.GameIsIWD1():
+		if GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreStealWindow)
+		Button.AttachScrollBar (ScrollBarLeft)
 
 		Button = Window.GetControl (i+11)
-		if GUICommon.GameIsIWD1():
+		if GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
+		Button.AttachScrollBar (ScrollBarRight)
 
 	# Steal
 	LeftButton = Button = Window.GetControl (1)
@@ -376,14 +394,6 @@ def OpenStoreStealWindow ():
 	# encumbrance
 	Label = Window.CreateLabel (0x10000043, 15,325,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
 	Label = Window.CreateLabel (0x10000044, 15,365,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
-
-	# left scrollbar
-	ScrollBar = Window.GetControl (9)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreStealWindow)
-
-	# right scrollbar
-	ScrollBar = Window.GetControl (10)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreStealWindow)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreStealWindow )
 	UpdateStoreStealWindow ()
@@ -435,12 +445,16 @@ def OpenStoreHealWindow ():
 
 	StoreHealWindow = Window = GemRB.LoadWindow (5)
 
+	ScrollBar = Window.GetControl (7)
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, UpdateStoreHealWindow)
+
 	#spell buttons
 	for i in range (4):
 		Button = Window.GetControl (i+8)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateStoreHealWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoHealWindow)
+		#Button.AttachScrollBar (ScrollBar)
 
 	# price tag
 	Label = Window.GetControl (0x10000003)
@@ -452,8 +466,6 @@ def OpenStoreHealWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BuyHeal)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
-	ScrollBar = Window.GetControl (7)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, UpdateStoreHealWindow)
 	Count = Store['StoreCureCount']
 	if Count>4:
 		Count = Count-4
@@ -481,7 +493,7 @@ def OpenStoreRumourWindow ():
 	TextArea.SetText (14144)
 
 	#tavern quality image
-	if GUICommon.GameIsBG2():
+	if GUICommon.GameIsBG1() or GUICommon.GameIsBG2():
 		BAM = "TVRNQUL%d"% ((Store['StoreFlags']>>9)&3)
 		Button = Window.GetControl (12)
 		Button.SetSprites (BAM, 0, 0, 0, 0, 0)
@@ -525,6 +537,10 @@ def OpenStoreRentWindow ():
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateStoreRentWindow)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetVarAssoc ("RentIndex", i)
+		if GUICommon.GameIsBG1():
+			#these bioware guys screw up everything possible
+			#remove this line if you fixed guistore
+			Button.SetSprites ("GUISTROC",0, 1,2,0,3)
 		if ok<0:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
@@ -966,7 +982,7 @@ def InfoWindow (Slot, Item):
 	Label.SetText ("")
 
 	#description bam
-	if GUICommon.GameIsBG2():
+	if GUICommon.GameIsBG1() or GUICommon.GameIsBG2():
 		Button = Window.GetControl (7)
 		Button.SetItemIcon (Slot['ItemResRef'], 2)
 
