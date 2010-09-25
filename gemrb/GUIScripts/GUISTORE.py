@@ -71,7 +71,11 @@ total_income = 0
 # 5 - drink
 # 6 - rent
 
-storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORBAG","STORBAG")
+if GUICommon.GameIsIWD1():
+	# no bam for bags
+	storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORSTOR","STORSTOR")
+else:
+	storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORBAG","STORBAG")
 storetips = (14288,14292,14291,12138,15013,14289,14287)
 roomtypes = (17389,17517,17521,17519)
 store_funcs = None
@@ -118,13 +122,6 @@ def OpenStoreWindow ():
 	global store_funcs
 	global Inventory
 
-	print 1111111111111111111111111111
-	print 1111111111111111111111111111
-	print 1111111111111111111111111111
-	print 1111111111111111111111111111
-	print 1111111111111111111111111111
-	print 1111111111111111111111111111
-
 	#these are function pointers, not strings
 	#can't put this in global init, doh!
 	store_funcs = (OpenStoreShoppingWindow,
@@ -170,8 +167,10 @@ def OpenStoreWindow ():
 		Button.SetVarAssoc ("Action", i)
 		if Action>=0:
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-			#this is different from IWD???
-			Button.SetSprites ("GUISTBBC", Action, 0,1,2,0)
+			if GUICommon.GameIsIWD1():
+				Button.SetSprites ("GUISTBBC", Action, 1,2,0,0)
+			else:
+				Button.SetSprites ("GUISTBBC", Action, 0,1,2,0)
 			Button.SetTooltip (storetips[Action])
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, store_funcs[Action])
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -198,7 +197,12 @@ def OpenStoreShoppingWindow ():
 	if Inventory:
 		# Title
 		Label = Window.GetControl (0xfffffff)
-		Label.SetText (51881)
+		if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+			Label.SetText (26291)
+		elif GUICommon.GameIsBG2():
+			Label.SetText (51881)
+		else:
+			Label.SetText ("")
 		# buy price ...
 		Label = Window.GetControl (0x1000002b)
 		Label.SetText ("")
@@ -222,13 +226,19 @@ def OpenStoreShoppingWindow ():
 
 	for i in range (4):
 		Button = Window.GetControl (i+5)
-		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		if GUICommon.GameIsIWD1():
+			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+		else:
+			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
 
 		Button = Window.GetControl (i+13)
-		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
-		Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
+		if GUICommon.GameIsIWD1():
+			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+		else:
+			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
@@ -236,7 +246,14 @@ def OpenStoreShoppingWindow ():
 	# Buy
 	LeftButton = Button = Window.GetControl (2)
 	if Inventory:
-		Button.SetText (51882)
+		if GUICommon.GameIsIWD2():
+			Button.SetText (26287)
+		elif GUICommon.GameIsIWD1():
+			Button.SetText (26288)
+		elif GUICommon.GameIsBG2():
+			Button.SetText (51882)
+		else:
+			Button.SetText ("")
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ToBackpackPressed)
 	else:
 		Button.SetText (13703)
@@ -245,7 +262,12 @@ def OpenStoreShoppingWindow ():
 	# Sell
 	RightButton = Button = Window.GetControl (3)
 	if Inventory:
-		Button.SetText (51883)
+		if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+			Button.SetText (26288)
+		elif GUICommon.GameIsBG2():
+			Button.SetText (51883)
+		else:
+			Button.SetText ("")
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ToBagPressed)
 	else:
 		Button.SetText (13704)
@@ -253,9 +275,10 @@ def OpenStoreShoppingWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SellPressed)
 
 	# inactive button
-	Button = Window.GetControl (50)
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	if GUICommon.GameIsBG2():
+		Button = Window.GetControl (50)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
 	#backpack
 	Button = Window.GetControl (44)
@@ -301,7 +324,11 @@ def OpenStoreIdentifyWindow ():
 	for i in range (4):
 		Button = Window.GetControl (i+8)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		if GUICommon.GameIsIWD1():
+			Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
+			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+		else:
+			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreIdentifyWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
 
@@ -325,11 +352,17 @@ def OpenStoreStealWindow ():
 
 	for i in range (4):
 		Button = Window.GetControl (i+4)
-		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		if GUICommon.GameIsIWD1():
+			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+		else:
+			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreStealWindow)
 
 		Button = Window.GetControl (i+11)
-		Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
+		if GUICommon.GameIsIWD1():
+			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
+		else:
+			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 
 	# Steal
@@ -448,10 +481,11 @@ def OpenStoreRumourWindow ():
 	TextArea.SetText (14144)
 
 	#tavern quality image
-	BAM = "TVRNQUL%d"% ((Store['StoreFlags']>>9)&3)
-	Button = Window.GetControl (12)
-	Button.SetSprites (BAM, 0, 0, 0, 0, 0)
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	if GUICommon.GameIsBG2():
+		BAM = "TVRNQUL%d"% ((Store['StoreFlags']>>9)&3)
+		Button = Window.GetControl (12)
+		Button.SetSprites (BAM, 0, 0, 0, 0, 0)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	ScrollBar = Window.GetControl (5)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, UpdateStoreRumourWindow)
@@ -723,7 +757,12 @@ def RedrawStoreShoppingWindow ():
 				Button.EnableBorder (0, 0)
 
 			if Inventory:
-				Label.SetText (28337)
+				if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+					Label.SetText (24890)
+				elif GUICommon.GameIsBG2():
+					Label.SetText (28337)
+				else:
+					Label.SetText ("")
 			else:
 				Price = Item['Price'] * Store['SellMarkup'] / 100
 				if Price <= 0:
@@ -772,7 +811,12 @@ def RedrawStoreShoppingWindow ():
 				Button.EnableBorder (0, 0)
 
 			if Inventory:
-				Label.SetText (28337)
+				if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
+					Label.SetText (24890)
+				elif GUICommon.GameIsBG2():
+					Label.SetText (28337)
+				else:
+					Label.SetText ("")
 			else:
 				GemRB.SetToken ("ITEMCOST", str(Price) )
 				Label.SetText (10162)
@@ -922,8 +966,9 @@ def InfoWindow (Slot, Item):
 	Label.SetText ("")
 
 	#description bam
-	Button = Window.GetControl (7)
-	Button.SetItemIcon (Slot['ItemResRef'], 2)
+	if GUICommon.GameIsBG2():
+		Button = Window.GetControl (7)
+		Button.SetItemIcon (Slot['ItemResRef'], 2)
 
 	#slot bam
 	Button = Window.GetControl (2)
@@ -944,7 +989,8 @@ def InfoWindow (Slot, Item):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ErrorDone)
 
 	# hide the empty button
-	Window.DeleteControl (9)
+	if GUICommon.GameIsBG2():
+		Window.DeleteControl (9)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
