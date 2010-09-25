@@ -5818,6 +5818,12 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	if (Flags & IE_INV_ITEM_SELECTED) {
 		ret |= IE_STORE_SELECT;
 	}
+
+	//don't allow overstuffing bags
+	if (store->Capacity<=store->GetRealStockSize()) {
+		ret &= ~IE_STORE_SELL;
+	}
+
 	gamedata->FreeItem( item, ItemResRef, false );
 	return PyInt_FromLong(ret);
 }
