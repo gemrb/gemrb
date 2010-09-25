@@ -5021,30 +5021,42 @@ int Interface::GetStrengthBonus(int column, int value, int ex) const
 	return strmod[column*(MaximumAbility+1)+value]+strmodex[column*101+ex];
 }
 
-//only the first 3 columns are supported
+// we don't use the stuff maze yet
+// IE: bonus skill points are ignored and the plain int mod used!
 int Interface::GetIntelligenceBonus(int column, int value) const
 {
-	//learn spell, max spell level, max spell number on level
-	if (column<0 || column>2)
-		return -9999;
+	if (HasFeature(GF_3ED_RULES)) {
+		//learn spell, max spell level, max spell number on level, bonus skill points
+		if (column<0 || column>2) return -9999;
+	} else {
+		//learn spell, max spell level, max spell number on level, maze duration dice, maze duration dice size
+		if (column<0 || column>4) return -9999;
+	}
 
 	return intmod[column*(MaximumAbility+1)+value];
 }
 
 int Interface::GetDexterityBonus(int column, int value) const
 {
+	//no dexmod in iwd2 and only one type of modifier
+	if (HasFeature(GF_3ED_RULES)) {
+		return (value-10)/2;
+	}
+
 	//reaction, missile, ac
 	if (column<0 || column>2)
 		return -9999;
-
-	//no dexmod in iwd2???
-	if (HasFeature(GF_3ED_RULES)) return 0;
 
 	return dexmod[column*(MaximumAbility+1)+value];
 }
 
 int Interface::GetConstitutionBonus(int column, int value) const
 {
+	//no conmod in iwd2
+	if (HasFeature(GF_3ED_RULES)) {
+		return (value-10)/2;
+	}
+
 	//normal, warrior, minimum, regen hp, regen fatigue
 	if (column<0 || column>4)
 		return -9999;
@@ -5054,31 +5066,36 @@ int Interface::GetConstitutionBonus(int column, int value) const
 
 int Interface::GetCharismaBonus(int column, int value) const
 {
-	//?reaction
-	if (column<0 || column>0)
+	// store price reduction
+	if (column<0 || column>(MaximumAbility-1))
 		return -9999;
 
-	return chrmod[column*(MaximumAbility+1)+value];
+	return chrmod[value];
 }
 
 int Interface::GetLoreBonus(int column, int value) const
 {
+	//no lorebon in iwd2 - lore is a skill
+	if (HasFeature(GF_3ED_RULES)) return 0;
+
 	if (column<0 || column>0)
 		return -9999;
-
-	//no lorebon in iwd2???
-	if (HasFeature(GF_3ED_RULES)) return 0;
 
 	return lorebon[value];
 }
 
 int Interface::GetWisdomBonus(int column, int value) const
 {
+	//no wismod in iwd2
+	if (HasFeature(GF_3ED_RULES)) {
+		return (value-10)/2;
+	}
+
+	if (!HasFeature(GF_WISDOM_BONUS)) return 0;
+
 	// xp bonus
 	if (column<0 || column>0)
 		return -9999;
-
-	if (!HasFeature(GF_WISDOM_BONUS)) return 0;
 
 	return wisbon[value];
 }
