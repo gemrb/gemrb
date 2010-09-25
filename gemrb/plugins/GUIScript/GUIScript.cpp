@@ -9934,12 +9934,13 @@ bool GUIScript::RunFunction(const char *ModuleName, const char* FunctionName, bo
 
 	PyObject *module;
 	if (ModuleName) {
-		module = PyImport_Import(PyString_FromString(ModuleName));
+		module = PyImport_ImportModule(ModuleName);
 	} else {
 		module = pModule;
 		Py_XINCREF(module);
 	}
 	if (module == NULL) {
+		PyErr_Print();
 		return false;
 	}
 	PyObject *dict = PyModule_GetDict(module);
