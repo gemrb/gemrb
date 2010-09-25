@@ -107,7 +107,7 @@ def OnDragItem ():
 					if GemRB.IsValidStoreItem (pc, slot, 0)&SHOP_SELL:
 						GemRB.ChangeStoreItem (pc, slot, SHOP_SELL)
 					else:
-						GemRB.DisplayString( 26285, 0xfffffff)
+						GemRB.DisplayString( 9375, 0xfffffff)
 					#leave (save) store
 					GemRB.LeaveStore()
 
