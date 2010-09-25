@@ -102,11 +102,13 @@ def CloseStoreWindow ():
 		StoreWindow.Unload ()
 	if ActionWindow:
 		ActionWindow.Unload ()
-	if PortraitWindow:
-		PortraitWindow.Unload ()
+	if not GUICommon.GameIsBG1():
+		if PortraitWindow:
+			PortraitWindow.Unload ()
 	StoreWindow = None
 	GemRB.LeaveStore ()
-	GUICommonWindows.PortraitWindow = OldPortraitWindow
+	if not GUICommon.GameIsBG1():
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
 	if Inventory:
 		GUIINV.OpenInventoryWindow ()
 	else:
@@ -145,7 +147,7 @@ def OpenStoreWindow ():
 	StoreWindow = Window = GemRB.LoadWindow (3)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	if GUICommon.GameIsIWD2():
+	if GUICommon.GameIsIWD2() or GUICommon.GameIsBG1():
 		#PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
 		pass
 	else:
@@ -192,7 +194,10 @@ def OpenStoreWindow ():
 	Window.SetVisible (WINDOW_VISIBLE)
 	store_funcs[store_buttons[0]] ()
 	if not GUICommon.GameIsIWD2():
-		PortraitWindow.SetVisible (WINDOW_VISIBLE)
+		if GUICommon.GameIsBG1():
+			GUICommonWindows.PortraitWindow.SetVisible (WINDOW_VISIBLE)
+		else:
+			PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def OpenStoreShoppingWindow ():
