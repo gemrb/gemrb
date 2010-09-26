@@ -654,7 +654,7 @@ def BuyPressed ():
 		if Flags:
 			Slot = GemRB.GetStoreItem (i-1)
 			Item = GemRB.GetItem (Slot['ItemResRef'])
-			Price = Item['Price'] * Store['SellMarkup'] / 100
+			Price = GetRealPrice (pc, "sell", Item)
 			if Price <= 0:
 				Price = 1
 
@@ -722,7 +722,7 @@ def RedrawStoreShoppingWindow ():
 			if Inventory:
 				Price = 1
 			else:
-				Price = Item['Price'] * Store['SellMarkup'] / 100
+				Price = GetRealPrice (pc, "sell", Item)
 			if Price <= 0:
 				Price = 1
 			BuySum = BuySum + Price
@@ -737,7 +737,7 @@ def RedrawStoreShoppingWindow ():
 			if Inventory:
 				Price = 1
 			else:
-				Price = Item['Price'] * Store['BuyMarkup'] / 100
+				Price = GetRealPrice (pc, "buy", Item)
 			if Flags & SHOP_ID:
 				Price = 1
 			SellSum = SellSum + Price
@@ -1045,7 +1045,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 
 		if type == ITEM_STORE:
-			Price = Item['Price'] * Store['BuyMarkup'] / 100
+			Price = GetRealPrice (pc, "buy", Item)
 			Flags = GemRB.IsValidStoreItem (pc, i+LeftTopIndex, type)
 			if steal:
 				Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -1060,7 +1060,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 					Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 				if not Inventory:
-					Price = Item['Price'] * Store['SellMarkup'] / 100
+					Price = GetRealPrice (pc, "sell", Item)
 					if Price <= 0:
 						Price = 1
 		else:
@@ -1079,7 +1079,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 				if Inventory:
 					Price = 1
 				else:
-					Price = Item['Price'] * Store['BuyMarkup'] / 100
+					Price = GetRealPrice (pc, "buy", Item)
 
 				if (Price>0) and (Flags & SHOP_SELL):
 					if Flags & SHOP_SELECT:
@@ -1108,6 +1108,26 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		else:
 			GemRB.SetToken ("ITEMCOST", str(Price) )
 			Label.SetText (10162)
+
+def GetRealPrice (pc, mode, Item):
+	# get the base from the item
+	price = Item['Price']
+
+	# modifier from store properties (in percent)
+	if mode == "buy":
+		mod = Store['BuyMarkup']
+	else:
+		mod = Store['SellMarkup']
+
+	# charisma modifier (in percent)
+	mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (pc, IE_CHR) - 1, 0)
+
+	# TODO: reputation modifier (in percent, but multiplied)
+	mod = mod * 100 / 100
+
+	# TODO: depreciation
+
+	return price * mod / 100
 
 def UpdateStoreDonateWindow ():
 	Window = StoreDonateWindow
