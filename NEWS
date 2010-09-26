@@ -1,16 +1,20 @@
-GemRB V0.6.2 git (758846c)
+GemRB V0.6.2 git (6bb7668b7)
   New features:
     -
+    - IWD:HoW (worldmap) compatibility!
+    - proper store economics and dragging
     - custom blood color (creature-dependant)
-    - InLine trigger
+    - InLine trigger, EscapeAreaNoSee action
     - Importing a SoA game into ToB
 
   Improved features:
     -
+    - loading screens, ambushes
     - sparkles
     - panic
     - actions, object matching
     - handling of minimum hp
+    - bugfixes
 
 GemRB V0.6.2 (2010-08-21):
   New features:
