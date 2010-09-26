@@ -5829,6 +5829,42 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong(ret);
 }
 
+PyDoc_STRVAR( GemRB_FindStoreItem__doc,
+"FindStoreItem(resref)\n\n"
+"Returns the amount of the specified items in the open store."
+"0 is also returned for an infinite ammount.");
+
+static PyObject* GemRB_FindStoreItem(PyObject * /*self*/, PyObject* args)
+{
+	char *resref;
+
+	if (!PyArg_ParseTuple( args, "s", &resref)) {
+		return AttributeError( GemRB_FindStoreItem__doc );
+	}
+
+	Store *store = core->GetCurrentStore();
+	if (!store) {
+		return RuntimeError("No current store!");
+	}
+
+	int Slot = store->FindItem(resref, false);
+	if (Slot == -1) {
+		return PyInt_FromLong(0);
+	}
+	STOItem* si = store->GetItem( Slot );
+	if (!si) {
+		// shouldn't be possible, item vanished
+		return PyInt_FromLong(0);
+	}
+
+	if (si->InfiniteSupply == -1) {
+		// change this if it is ever needed for something else than depreciation calculation
+		return PyInt_FromLong(0);
+	} else {
+		return PyInt_FromLong(si->AmountInStock);
+	}
+}
+
 PyDoc_STRVAR( GemRB_SetPurchasedAmount__doc,
 "SetPurchasedAmount(idx, amount)\n\n"
 "Sets the amount of purchased items of a type.");
@@ -9444,6 +9480,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(ExecuteString, METH_VARARGS),
 	METHOD(ExploreArea, METH_VARARGS),
 	METHOD(FillPlayerInfo, METH_VARARGS),
+	METHOD(FindStoreItem, METH_VARARGS),
 	METHOD(GameControlGetTargetMode, METH_NOARGS),
 	METHOD(GameControlSetLastActor, METH_VARARGS),
 	METHOD(GameControlSetScreenFlags, METH_VARARGS),

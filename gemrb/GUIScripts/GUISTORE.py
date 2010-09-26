@@ -657,7 +657,7 @@ def BuyPressed ():
 		if Flags:
 			Slot = GemRB.GetStoreItem (i-1)
 			Item = GemRB.GetItem (Slot['ItemResRef'])
-			Price = GetRealPrice (pc, "sell", Item)
+			Price = GetRealPrice (pc, "sell", Item, Slot)
 			if Price <= 0:
 				Price = 1
 
@@ -725,7 +725,7 @@ def RedrawStoreShoppingWindow ():
 			if Inventory:
 				Price = 1
 			else:
-				Price = GetRealPrice (pc, "sell", Item)
+				Price = GetRealPrice (pc, "sell", Item, Slot)
 			if Price <= 0:
 				Price = 1
 			BuySum = BuySum + Price
@@ -740,7 +740,7 @@ def RedrawStoreShoppingWindow ():
 			if Inventory:
 				Price = 1
 			else:
-				Price = GetRealPrice (pc, "buy", Item)
+				Price = GetRealPrice (pc, "buy", Item, Slot)
 			if Flags & SHOP_ID:
 				Price = 1
 			SellSum = SellSum + Price
@@ -1048,7 +1048,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 
 		if type == ITEM_STORE:
-			Price = GetRealPrice (pc, "buy", Item)
+			Price = GetRealPrice (pc, "buy", Item, Slot)
 			Flags = GemRB.IsValidStoreItem (pc, i+LeftTopIndex, type)
 			if steal:
 				Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -1063,7 +1063,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 					Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 				if not Inventory:
-					Price = GetRealPrice (pc, "sell", Item)
+					Price = GetRealPrice (pc, "sell", Item, Slot)
 					if Price <= 0:
 						Price = 1
 		else:
@@ -1082,7 +1082,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 				if Inventory:
 					Price = 1
 				else:
-					Price = GetRealPrice (pc, "buy", Item)
+					Price = GetRealPrice (pc, "buy", Item, Slot)
 
 				if (Price>0) and (Flags & SHOP_SELL):
 					if Flags & SHOP_SELECT:
@@ -1112,7 +1112,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 			GemRB.SetToken ("ITEMCOST", str(Price) )
 			Label.SetText (10162)
 
-def GetRealPrice (pc, mode, Item):
+def GetRealPrice (pc, mode, Item, Slot):
 	# get the base from the item
 	price = Item['Price']
 
@@ -1122,13 +1122,28 @@ def GetRealPrice (pc, mode, Item):
 	else:
 		mod = Store['SellMarkup']
 
+	# depreciation works like this:
+	# - if you sell the item the first time, SellMarkup is used;
+	# - if you sell the item the second time, SellMarkup-DepreciationRate is used;
+	# - if you sell the item any more times, SellMarkup-2*DepreciationRate is used.
+	# If the storekeep has an infinite amount of the item, only SellMarkup is used.
+	# The amount of items sold at the same time doesn't matter! Selling three bows
+	# separately will produce less gold then selling them at the same time.
+	# We don't care who is the seller, so if the store already has 2 items, there'll be no gain
+	if mode == "buy":
+		count = GemRB.FindStoreItem (Slot["ItemResRef"])
+		if count:
+			oc = count
+			if count > 2:
+				count = 2
+			print 7777777777, Slot["ItemResRef"], oc, mod, "vs", mod-count*Store['Depreciation'], Store['Depreciation']
+			mod -= count * Store['Depreciation']
+
 	# charisma modifier (in percent)
 	mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (pc, IE_CHR) - 1, 0)
 
-	# reputation modifier (in percent, but multiplied)
+	# reputation modifier (in percent, but absolute)
 	mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
-
-	# TODO: depreciation
 
 	return price * mod / 100
 
