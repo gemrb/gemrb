@@ -1785,7 +1785,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	Point p(x,y);
 	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 	Game* game = core->GetGame();
+	if (!game) return;
 	Map* area = game->GetCurrentArea( );
+	if (!area) return;
 
 	if (DrawSelectionRect) {
 		Actor** ab;
