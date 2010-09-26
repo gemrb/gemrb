@@ -5981,6 +5981,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	case IE_STORE_SELECT|IE_STORE_SELL:
+	case IE_STORE_SELECT|IE_STORE_ID:
 	{
 		//this is not removeitem, because the item is just marked
 		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );

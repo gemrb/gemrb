@@ -337,6 +337,9 @@ def OpenStoreIdentifyWindow ():
 	ScrollBar = Window.GetControl (7)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawStoreIdentifyWindow)
 
+	TextArea = Window.GetControl (23)
+	TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
+
 	# Identify
 	LeftButton = Button = Window.GetControl (5)
 	Button.SetText (14133)
@@ -358,7 +361,7 @@ def OpenStoreIdentifyWindow ():
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		else:
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RedrawStoreIdentifyWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectID)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
 		Button.AttachScrollBar (ScrollBar)
 
@@ -619,6 +622,13 @@ def UpdateStoreShoppingWindow ():
 	RedrawStoreShoppingWindow ()
 	return
 
+def SelectID ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Index = GemRB.GetVar ("Index")
+	GemRB.ChangeStoreItem (pc, inventory_slots[Index], SHOP_ID|SHOP_SELECT)
+	RedrawStoreIdentifyWindow ()
+	return
+
 def SelectBuy ():
 	Window = StoreShoppingWindow
 
@@ -810,9 +820,12 @@ def RedrawStoreIdentifyWindow ():
 	Count = len(inventory_slots)
 	IDPrice = Store['IDPrice']
 
-	TextArea = Window.GetControl (23)
-	TextArea.SetText ("")
 	Selected = 0
+	for Slot in range (0, Count):
+		flags = GemRB.IsValidStoreItem (pc, inventory_slots[Slot], ITEM_PC)
+		if flags & SHOP_ID and flags & SHOP_SELECT:
+			Selected += 1
+
 	for i in range (ItemButtonCount):
 		if TopIndex+i<Count:
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[TopIndex+i])
@@ -832,11 +845,8 @@ def RedrawStoreIdentifyWindow ():
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 			if Flags & SHOP_ID:
-				if Index == TopIndex+i:
+				if Flags & SHOP_SELECT:
 					Button.SetState (IE_GUI_BUTTON_SELECTED)
-					Text = Item['ItemDesc']
-					TextArea.SetText (Text)
-					Selected = 1
 				else:
 					Button.SetState (IE_GUI_BUTTON_ENABLED)
 
@@ -844,9 +854,6 @@ def RedrawStoreIdentifyWindow ():
 				GemRB.SetToken ("ITEMCOST", str(IDPrice) )
 				Button.EnableBorder (0, 1)
 			else:
-				if Index == TopIndex+i:
-					Text = Item['ItemDescIdentified']
-					TextArea.SetText (Text)
 				Button.SetState (IE_GUI_BUTTON_DISABLED)
 				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
 				GemRB.SetToken ("ITEMCOST", str(0) )
@@ -863,28 +870,42 @@ def RedrawStoreIdentifyWindow ():
 	Label = Window.GetControl (0x10000003)
 	if Selected:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Label.SetText (str(IDPrice) )
+		Label.SetText (str(IDPrice * Selected) )
 	else:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Label.SetText (str(0) )
 	return
 
 def IdentifyPressed ():
-	IDPrice = Store['IDPrice']
-	if (GemRB.GameGetPartyGold ()<IDPrice):
-		return
-
-	Index = GemRB.GetVar ("Index")
-	if (Index<0):
-		return
-
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Count = len(inventory_slots)
-	if Index >= Count:
+
+	# get all the selected items
+	toID = []
+	for Slot in range (0, Count):
+		Flags = GemRB.IsValidStoreItem (pc, inventory_slots[Slot], ITEM_PC)
+		if Flags & SHOP_SELECT and Flags & SHOP_ID:
+			toID.append(Slot)
+
+	# enough gold?
+	EndGold = GemRB.GameGetPartyGold () - Store['IDPrice'] * len(toID)
+	if EndGold < 0:
 		return
 
-	GemRB.ChangeStoreItem (pc, inventory_slots[Index], SHOP_ID)
-	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()-IDPrice)
+	# identify
+	Window = StoreIdentifyWindow
+	TextArea = Window.GetControl (23)
+	for i in toID:
+		GemRB.ChangeStoreItem (pc, inventory_slots[i], SHOP_ID)
+		Slot = GemRB.GetSlotItem (pc, inventory_slots[i])
+		Item = GemRB.GetItem (Slot['ItemResRef'])
+		# FIXME: some items have the title, some don't - figure it out
+		TextArea.Append(Item['ItemNameIdentified'])
+		TextArea.Append("\n\n")
+		TextArea.Append(Item['ItemDescIdentified'])
+		TextArea.Append("\n\n\n")
+	GemRB.GameSetPartyGold (EndGold)
+
 	UpdateStoreIdentifyWindow ()
 	return
 
@@ -1136,7 +1157,6 @@ def GetRealPrice (pc, mode, Item, Slot):
 			oc = count
 			if count > 2:
 				count = 2
-			print 7777777777, Slot["ItemResRef"], oc, mod, "vs", mod-count*Store['Depreciation'], Store['Depreciation']
 			mod -= count * Store['Depreciation']
 
 	# charisma modifier (in percent)
