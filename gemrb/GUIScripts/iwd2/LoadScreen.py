@@ -26,9 +26,11 @@ import GUICommon
 from GUIDefines import *
 
 LoadScreen = None
+Picture = None
 hide = None
 
 def SetLoadScreen ():
+	#needed
 	Table = GemRB.LoadTable ("areaload")
 	Area = GemRB.GetGameString (STR_AREANAME)
 	LoadPic = Table.GetValue (Area, Table.GetColumnName(0) )
@@ -36,15 +38,27 @@ def SetLoadScreen ():
 	if LoadPic =="*":
 	        LoadPic = GemRB.GetGameString (STR_LOADMOS)
 
-	LoadScreen.SetPicture(LoadPic)
+	Picture.SetPicture(LoadPic)
 	hide = GemRB.HideGUI()
 	if hide:
 		GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	#
 
+	Table = GemRB.LoadTable ("loadhint")
+	tmp = Table.GetRowCount ()
+	tmp = GemRB.Roll (1,tmp,0)
+	HintStr = Table.GetValue (tmp, 0)
+	TextArea = LoadScreen.GetControl (2)
+	TextArea.SetText (HintStr)
+
+	Bar = LoadScreen.GetControl (0)
+	Bar.SetVarAssoc ("Progress", Progress)
+	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
+	LoadScreen.SetVisible (WINDOW_VISIBLE)
 	return
 
 def StartLoadScreen ():
-	global LoadScreen
+	global LoadScreen, Picture
 
 	GemRB.LoadWindowPack ("guils", 800, 600)
 	LoadScreen = GemRB.LoadWindow (0)
@@ -63,6 +77,8 @@ def StartLoadScreen ():
 	HintStr = Table.GetValue (tmp, 0)
 	TextArea = LoadScreen.GetControl (2)
 	TextArea.SetText (HintStr)
+
+	Picture = LoadScreen.GetControl (4)
 
 	Bar = LoadScreen.GetControl (0)
 	Bar.SetVarAssoc ("Progress", Progress)
