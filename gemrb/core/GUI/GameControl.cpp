@@ -364,12 +364,19 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 
+	Region screen( x + XPos, y + YPos, Width, Height );
+	Map *area = core->GetGame()->GetCurrentArea();
 	Video* video = core->GetVideoDriver();
+	if (!area) {
+		video->DrawRect( screen, blue, true );
+		return;
+	}
+
 	Region viewport = video->GetViewport();
 	if (moveX || moveY) {
 		viewport.x += moveX;
 		viewport.y += moveY;
-		Point mapsize = core->GetGame()->GetCurrentArea()->TMap->GetMapSize();
+		Point mapsize = area->TMap->GetMapSize();
 		if ( viewport.x < 0 )//if we are at top of the map
 			viewport.x = 0;
 		else if ( (viewport.x + viewport.w) >= mapsize.x) //if we are at the bottom
@@ -384,12 +391,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		core->timer->SetMoveViewPort( viewport.x, viewport.y, 0, false );
 		// move it directly ourselves, since we might be paused
 		video->MoveViewportTo( viewport.x, viewport.y );
-	}
-	Region screen( x + XPos, y + YPos, Width, Height );
-	Map* area = game->GetCurrentArea( );
-	if (!area) {
-		video->DrawRect( screen, blue, true );
-		return;
 	}
 	video->DrawRect( screen, black, true );
 

@@ -53,16 +53,18 @@ def StartTextScreen ():
 		ID = (GemRB.GetGameVar("CHAPTER") + 1) & 0x7fffffff
 		Chapter = ID + 1
 
-	if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
-		#fixme: this is also a guess; are there more, one per chapter?
+	#iwd2/bg2 has no separate music
+	if GUICommon.GameIsIWD1():
 		if LoadPic == "":
 			GemRB.LoadMusicPL ("chap0.mus")
 		else:
 			GemRB.LoadMusicPL ("chap1.mus")
 		TableName = "chapters"
+	elif GUICommon.GameIsIWD2():
+		GemRB.HardEndPL ()
+		TableName = "chapters"
 	elif GUICommon.GameIsBG1() and TableName[:6] == "chptxt":
 		GemRB.LoadMusicPL ("chapter.mus")
-	#else: TODO: what about bg2?
 
 	TextScreen = GemRB.LoadWindow (ID)
 	TextScreen.SetFrame ()
