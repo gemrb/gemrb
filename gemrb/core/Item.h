@@ -52,6 +52,10 @@ class Projectile;
 #define IE_ITEM_PULSATING    0x00001000
 #define IE_ITEM_UNSELLABLE   ( IE_ITEM_CRITICAL | IE_ITEM_STOLEN )
 
+//modder extensions
+#define IE_ITEM_NO_DISPEL    0x01000000 //disables destruction by dispelling
+#define IE_ITEM_TOGGLE_CRITS 0x02000000 //toggles critical hit avertion
+
 //Extended header recharge flags
 #define IE_ITEM_USESTRENGTH  1          //weapon
 #define IE_ITEM_BREAKABLE    2          //weapon
@@ -59,6 +63,9 @@ class Projectile;
 #define IE_ITEM_RECHARGE     0x800      //equipment
 #define IE_ITEM_IGNORESHIELD 0x10000    //weapon
 #define IE_ITEM_KEEN         0x20000    //weapon
+
+//modder extensions
+#define IE_ITEM_BACKSTAB     0x01000000 //can used for backstab (ranged weapon)
 
 //item use locations (weapons are not listed in equipment list)
 #define ITEM_LOC_WEAPON    1   //this is a weapon slot (uses thac0 etc)
