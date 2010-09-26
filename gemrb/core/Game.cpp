@@ -705,8 +705,7 @@ int Game::DelMap(unsigned int index, int forced)
 	return 0;
 }
 
-/* Loads an area, changepf == true if you want to setup the pathfinder too */
-//FIXME: changepf is removed now
+/* Loads an area */
 int Game::LoadMap(const char* ResRef)
 {
 	unsigned int i;
@@ -715,18 +714,24 @@ int Game::LoadMap(const char* ResRef)
 		return index;
 	}
 
+	core->GetGUIScriptEngine()->RunFunction("LoadScreen", "StartLoadScreen");
+	core->GetGUIScriptEngine()->RunFunction("LoadScreen", "SetLoadScreen");
 	DataStream* ds = gamedata->GetResource( ResRef, IE_ARE_CLASS_ID );
 	if (!ds) {
+		core->LoadProgress(100);
 		return -1;
 	}
 	PluginHolder<MapMgr> mM(IE_ARE_CLASS_ID);
 	if(!mM->Open( ds, true )) {
+		core->LoadProgress(100);
 		return -1;
 	}
 	Map* newMap = mM->GetMap(ResRef, IsDay());
 	if (!newMap) {
+		core->LoadProgress(100);
 		return -1;
 	}
+	core->LoadProgress(100);
 
 	for (i = 0; i < PCs.size(); i++) {
 		if (stricmp( PCs[i]->Area, ResRef ) == 0) {

@@ -25,6 +25,23 @@ import GemRB
 from GUIDefines import *
 
 LoadScreen = None
+hide = None
+
+def SetLoadScreen ():
+	hide = GemRB.HideGUI()
+	Table = GemRB.LoadTable ("areaload")
+	Area = GemRB.GetGameString (STR_AREANAME)
+	LoadPic = Table.GetValue (Area, Table.GetColumnName(0) )
+	print Area
+	print Table.GetColumnName(0)
+	print LoadPic
+	if not LoadPic or LoadPic =="":
+		LoadPic = GemRB.GetGameString (STR_LOADMOS)
+
+	if LoadPic=="":
+		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
+	LoadScreen.SetPicture(LoadPic)
+	return
 
 def StartLoadScreen ():
 	global LoadScreen
@@ -32,10 +49,8 @@ def StartLoadScreen ():
 	GemRB.LoadWindowPack ("guils", 640, 480)
 	LoadScreen = GemRB.LoadWindow (0)
 	LoadScreen.SetFrame ()
-	LoadPic = GemRB.GetGameString (STR_LOADMOS)
-	if LoadPic=="":
-		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
-	LoadScreen.SetPicture(LoadPic)
+
+	SetLoadScreen()
 	Bar = LoadScreen.GetControl (0)
 	Progress = 0
 	GemRB.SetVar ("Progress", Progress)
@@ -48,4 +63,7 @@ def EndLoadScreen ():
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK2")
 	LoadScreen.SetVisible (WINDOW_VISIBLE)
+	if hide:
+		GemRB.UnhideGUI()
+	LoadScreen.Unload()
 	return

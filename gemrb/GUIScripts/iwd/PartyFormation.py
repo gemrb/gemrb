@@ -35,6 +35,7 @@ ExitWindow = 0
 def OnLoad ():
 	global PartyFormationWindow
 
+	GUICommonWindows.PortraitWindow = None
 	GUICommonWindows.SelectionChangeHandler = None
 
 	GemRB.LoadWindowPack ("GUISP", 640, 480)

@@ -82,8 +82,8 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 		}
 		fclose( in_cache );
 		Current = compressed->Remains();
-		//starting at 40% going up to 90%
-		core->LoadProgress( 40+(All-Current)*50/All );
+		//starting at 20% going up to 70%
+		core->LoadProgress( 20+(All-Current)*50/All );
 	}
 	while(Current);
 	return GEM_OK;

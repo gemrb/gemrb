@@ -3756,9 +3756,9 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	Game* new_game = NULL;
 	WorldMapArray* new_worldmap = NULL;
 
-	LoadProgress(15);
+	LoadProgress(10);
 	if (!KeepCache) DelTree((const char *) CachePath, true);
-	LoadProgress(20);
+	LoadProgress(15);
 
 	if (sg == NULL) {
 		//Load the Default Game
@@ -3813,7 +3813,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	wmp_str1 = NULL;
 	wmp_str2 = NULL;
 
-	LoadProgress(30);
+	LoadProgress(20);
 	// Unpack SAV (archive) file to Cache dir
 	if (sav_str) {
 		PluginHolder<ArchiveImporter> ai(IE_BIF_CLASS_ID);
@@ -3835,7 +3835,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	worldmap = new_worldmap;
 
 	strings->OpenAux();
-	LoadProgress(100);
+	LoadProgress(70);
 	return;
 cleanup:
 	// Something went wrong, so try to clean after itself
@@ -4279,6 +4279,10 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 
 void Interface::LoadProgress(int percent)
 {
+	printf("LoadProgress: %d\n", percent);
+FILE *fp = fopen("debug","a");
+fprintf(fp,"LoadProgress: %d\n", percent);
+fclose(fp);
 	vars->SetAt("Progress", percent);
 	RedrawControls("Progress", percent);
 	RedrawAll();

@@ -405,6 +405,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	str->ReadWord( &map->RestHeader.NightChance );
 
 	printf( "Loading regions\n" );
+	core->LoadProgress(70);
 	//Loading InfoPoints
 	for (i = 0; i < InfoPointsCount; i++) {
 		str->Seek( InfoPointsOffset + ( i * 0xC4 ), GEM_STREAM_START );
@@ -870,6 +871,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		//the rest is not read, we seek for every record
 	}
 
+	core->LoadProgress(75);
 	printf( "Loading actors\n" );
 	//Loading Actors
 	str->Seek( ActorOffset, GEM_STREAM_START );
@@ -965,6 +967,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 	}
 
+	core->LoadProgress(90);
 	printf( "Loading animations\n" );
 	//Loading Animations
 	str->Seek( AnimOffset, GEM_STREAM_START );

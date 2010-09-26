@@ -26,10 +26,16 @@ import GUICommon
 from GUIDefines import *
 
 LoadScreen = None
+hide = None
+
+def SetLoadScreen ():
+	hide = GemRB.HideGUI()
+	return
 
 def StartLoadScreen ():
 	global LoadScreen
 
+	hide = GemRB.HideGUI()
 	GemRB.LoadWindowPack ("guils", 640, 480)
 	LoadScreen = GemRB.LoadWindow (0)
 	LoadScreen.SetFrame ()
@@ -52,3 +58,10 @@ def StartLoadScreen ():
 	Bar = LoadScreen.GetControl (0)
 	Bar.SetVarAssoc ("Progress", Progress)
 	LoadScreen.SetVisible (WINDOW_VISIBLE)
+
+def EndLoadScreen ():
+	if hide:
+		GemRB.UnhideGUI()
+	LoadScreen.Unload()
+        return
+

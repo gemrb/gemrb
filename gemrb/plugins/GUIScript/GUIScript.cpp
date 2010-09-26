@@ -348,7 +348,8 @@ static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 {
 	GameControl* gc = (GameControl *) GetControl( 0, 0, IE_GUI_GAMECONTROL);
 	if (!gc) {
-		return RuntimeError("No gamecontrol!");
+		return PyInt_FromLong( 0 );
+		//return RuntimeError("No gamecontrol!");
 	}
 	int ret = gc->HideGUI();
 
