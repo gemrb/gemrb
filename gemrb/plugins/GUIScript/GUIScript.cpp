@@ -5973,6 +5973,8 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		if (!si->Expired && (si->Flags& IE_INV_ITEM_RESELLABLE)) {
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
 			store->AddItem( si );
+			STOItem *s = store->GetItem(store->FindItem(si->ItemResRef, true));
+			s->AmountInStock++;
 		}
 		delete si;
 		res = ASI_SUCCESS;
