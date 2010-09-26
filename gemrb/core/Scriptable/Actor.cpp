@@ -4443,9 +4443,9 @@ void Actor::PerformAttack(ieDword gameTime)
 			UseItem(wi.slot, (ieDword)-2, target, UI_MISS);
 		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS)) {
 			//break sword
-			//TODO: this appears to be a random roll on-hit (perhaps critical failure
-			// too); we use 1% (1d20*1d5==1)
-			if ((header->RechargeFlags&IE_ITEM_BREAKABLE) && core->Roll(1,5,0) == 1) {
+			// a random roll on-hit (perhaps critical failure too)
+			//  in 0,5% (1d20*1d10==1) cases
+			if ((header->RechargeFlags&IE_ITEM_BREAKABLE) && core->Roll(1,10,0) == 1) {
 				inventory.BreakItemSlot(wi.slot);
 			}
 		}
