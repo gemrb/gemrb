@@ -2051,7 +2051,12 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 	}
 	Region Viewport = core->GetVideoDriver()->GetViewport();
 	Game *game = core->GetGame();
-	Point mapsize = game->GetCurrentArea()->TMap->GetMapSize();
+	Map *map = game->game->GetCurrentArea();
+	if (!map) {
+		return;
+	}
+
+	Point mapsize = map->TMap->GetMapSize();
 	int partysize = game->GetPartySize(false);
 	int pm;
 	char tmpstr[10];
