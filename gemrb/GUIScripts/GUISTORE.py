@@ -59,6 +59,7 @@ if GUICommon.GameIsIWD2():
 	ItemButtonCount = 6
 else:
 	ItemButtonCount = 4
+RepModTable = None
 
 # 0 - Store
 # 1 - Tavern
@@ -126,7 +127,7 @@ def OpenStoreWindow ():
 	global StoreWindow, ActionWindow, PortraitWindow
 	global OldPortraitWindow
 	global store_funcs
-	global Inventory
+	global Inventory, RepModTable
 
 	#these are function pointers, not strings
 	#can't put this in global init, doh!
@@ -134,6 +135,8 @@ def OpenStoreWindow ():
 	OpenStoreIdentifyWindow,OpenStoreStealWindow,
 	OpenStoreHealWindow, OpenStoreDonateWindow,
 	OpenStoreRumourWindow,OpenStoreRentWindow )
+
+	RepModTable = GemRB.LoadTable ("repmodst")
 
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the game control screen
@@ -1122,8 +1125,8 @@ def GetRealPrice (pc, mode, Item):
 	# charisma modifier (in percent)
 	mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (pc, IE_CHR) - 1, 0)
 
-	# TODO: reputation modifier (in percent, but multiplied)
-	mod = mod * 100 / 100
+	# reputation modifier (in percent, but multiplied)
+	mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
 
 	# TODO: depreciation
 
