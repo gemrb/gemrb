@@ -22,27 +22,25 @@
 ###################################################
 
 import GemRB
+import GUICommon
 from GUIDefines import *
 
 LoadScreen = None
 hide = None
 
 def SetLoadScreen ():
-	hide = GemRB.HideGUI()
 	Table = GemRB.LoadTable ("areaload")
 	Area = GemRB.GetGameString (STR_AREANAME)
 	LoadPic = Table.GetValue (Area, Table.GetColumnName(0) )
-	print "**********\n\n\n\n\n*********\n\n\n\n\n"
-	print Area
-	print Table.GetColumnName(0)
-	print "**********\n\n\n\n\n*********\n\n\n\n\n"
 
-	if not LoadPic or LoadPic =="":
-		LoadPic = GemRB.GetGameString (STR_LOADMOS)
+	if LoadPic =="*":
+	        LoadPic = GemRB.GetGameString (STR_LOADMOS)
 
-	if LoadPic=="":
-		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
 	LoadScreen.SetPicture(LoadPic)
+	hide = GemRB.HideGUI()
+	if hide:
+		GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+
 	return
 
 def StartLoadScreen ():
@@ -52,14 +50,12 @@ def StartLoadScreen ():
 	LoadScreen = GemRB.LoadWindow (0)
 	LoadScreen.SetFrame( )
 
-	SetLoadScreen()
-	Progress = 0
-	GemRB.SetVar ("Progress", Progress)
-
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	if LoadPic=="":
 		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
 	LoadScreen.SetPicture(LoadPic)
+	Progress = 0
+	GemRB.SetVar ("Progress", Progress)
 
 	Table = GemRB.LoadTable ("loadhint")
 	tmp = Table.GetRowCount ()
@@ -80,5 +76,6 @@ def EndLoadScreen ():
 	LoadScreen.SetVisible (WINDOW_VISIBLE)
 	if hide:
 		GemRB.UnhideGUI()
-	LoadScreen.Unload()
+	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
+
 	return
