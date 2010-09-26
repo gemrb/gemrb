@@ -952,7 +952,7 @@ def InfoWindow (Slot, Item):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ErrorDone)
 
 	# hide the empty button
-	if GUICommon.GameIsBG2():
+	if GUICommon.GameIsBG2() or GUICommon.GameIsIWD2():
 		Window.DeleteControl (9)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
