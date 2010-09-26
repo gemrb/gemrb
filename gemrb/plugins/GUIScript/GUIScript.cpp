@@ -5821,7 +5821,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	//don't allow overstuffing bags
-	if (store->Capacity<=store->GetRealStockSize()) {
+	if (store->Capacity && store->Capacity<=store->GetRealStockSize()) {
 		ret &= ~IE_STORE_SELL;
 	}
 
