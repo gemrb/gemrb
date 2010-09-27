@@ -22,7 +22,6 @@
 ###################################################
 
 import GemRB
-import GUICommon
 from GUIDefines import *
 
 LoadScreen = None
