@@ -61,6 +61,7 @@ else:
 	ItemButtonCount = 4
 RepModTable = None
 PreviousPC = 0
+BarteringPC = 0
 
 # 0 - Store
 # 1 - Tavern
@@ -128,7 +129,7 @@ def OpenStoreWindow ():
 	global StoreWindow, ActionWindow, PortraitWindow
 	global OldPortraitWindow
 	global store_funcs
-	global Inventory, RepModTable
+	global Inventory, RepModTable, BarteringPC
 
 	#these are function pointers, not strings
 	#can't put this in global init, doh!
@@ -165,6 +166,7 @@ def OpenStoreWindow ():
 	ActionWindow.SetFrame ()
 
 	Store = GemRB.GetStore ()
+	BarteringPC = GemRB.GameGetFirstSelectedPC ()
 
 	# Done
 	Button = Window.GetControl (0)
@@ -1182,7 +1184,7 @@ def GetRealPrice (pc, mode, Item, Slot):
 			mod -= count * Store['Depreciation']
 
 	# charisma modifier (in percent)
-	mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (pc, IE_CHR) - 1, 0)
+	mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (BarteringPC, IE_CHR) - 1, 0)
 
 	# reputation modifier (in percent, but absolute)
 	mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
