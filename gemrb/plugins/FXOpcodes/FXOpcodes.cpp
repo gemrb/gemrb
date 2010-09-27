@@ -461,7 +461,7 @@ static EffectRef effectnames[] = {
 	{ "CastingLevelModifier", fx_castinglevel_modifier, -1 },
 	{ "CastingSpeedModifier", fx_castingspeed_modifier, -1 },
 	{ "CastSpellOnCondition", fx_cast_spell_on_condition, -1 },
-	{ "ChangeBardSong", fx_generic_effect, -1 },
+	{ "ChangeBardSong", fx_change_bardsong, -1 },
 	{ "ChangeName", fx_change_name, -1 },
 	{ "ChantBadNonCumulative", fx_set_chantbad_state, -1 },
 	{ "ChantNonCumulative", fx_set_chant_state, -1 },
@@ -5415,7 +5415,14 @@ int fx_damageluck_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0xfb bardsong (generic effect)
+// 0xfb BardSong 
+
+int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_change_bardsong (%2d): %s\n", fx->Opcode, fx->Resource);
+	memcpy(target->BardSong, fx->Resource, 8);
+	return FX_APPLIED;
+}
 
 // 0xfc SetTrap
 int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)

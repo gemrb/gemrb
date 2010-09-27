@@ -2137,6 +2137,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		}
 	}
 	spellbook.ClearBonus();
+	/* these apply resrefs should be on a list as a trigger+resref */
 	memset(applyWhenHittingMelee,0,sizeof(ieResRef));
 	memset(applyWhenHittingRanged,0,sizeof(ieResRef));
 	memset(applyWhenNearLiving,0,sizeof(ieResRef));
@@ -2147,6 +2148,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	memset(applyWhenHelpless,0,sizeof(ieResRef));
 	memset(applyWhenAttacked,0,sizeof(ieResRef));
 	memset(applyWhenBeingHit,0,sizeof(ieResRef));
+	memset(BardSong,0,sizeof(ieResRef));
 	memset(projectileImmunity,0,ProjectileSize*sizeof(ieDword));
 
 	//initialize base stats
@@ -3952,6 +3954,12 @@ void Actor::SetModalSpell(ieDword state, const char *spell)
 		if (state >= core->ModalStates.size()) {
 			ModalSpell[0] = 0;
 		} else {
+			if (state==MS_BATTLESONG) {
+				if (BardSong[0]) {
+					strnlwrcpy(ModalSpell, BardSong, 8);
+					return;
+				}
+			}
 			strnlwrcpy(ModalSpell, core->ModalStates[state].spell, 8);
 		}
 	}

@@ -217,6 +217,7 @@ public:
 	ieResRef applyWhenAttacked;      //cast spell on condition
 	ieResRef applyWhenBeingHit;      //cast spell on condition
 	ieResRef ModalSpell;             //apply this spell once per round
+	ieResRef BardSong;               //custom bard song (updated by fx)
 
 	PCStatsStruct*  PCStats;
 	ieResRef SmallPortrait;
