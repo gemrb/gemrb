@@ -1873,9 +1873,9 @@ void Door::TryBashLock(Actor *actor)
 	int str = actor->GetStat(IE_STR);
 	int strEx = actor->GetStat(IE_STREXTRA);
 	unsigned int bonus = core->GetStrengthBonus(2, str, strEx); //BEND_BARS_LIFT_GATES
+	unsigned int roll = actor->LuckyRoll(1, 10, bonus, 0);
 
-	//bonus will never reach 100
-	if(bonus < LockDifficulty) {
+	if(roll < LockDifficulty || LockDifficulty == 100) {
 		displaymsg->DisplayConstantStringName(STR_DOORBASH_FAIL, 0xbcefbc, actor);
 		return;
 	}
@@ -2339,9 +2339,9 @@ void Container::TryBashLock(Actor *actor)
 	int str = actor->GetStat(IE_STR);
 	int strEx = actor->GetStat(IE_STREXTRA);
 	unsigned int bonus = core->GetStrengthBonus(2, str, strEx); //BEND_BARS_LIFT_GATES
+	unsigned int roll = actor->LuckyRoll(1, 10, bonus, 0);
 
-	//bonus will never reach 100
-	if(bonus < LockDifficulty) {
+	if(roll < LockDifficulty || LockDifficulty == 100) {
 		displaymsg->DisplayConstantStringName(STR_CONTBASH_FAIL, 0xbcefbc, actor);
 		return;
 	}
