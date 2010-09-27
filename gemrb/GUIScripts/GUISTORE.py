@@ -861,7 +861,7 @@ def RedrawStoreIdentifyWindow ():
 		else:
 			Label = Window.GetControl (0x1000000c+i)
 		Button.SetVarAssoc ("Index", TopIndex+i)
-		if Slot != None:
+		if Slot:
 			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[TopIndex+i], ITEM_PC)
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			Button.SetItemIcon (Slot['ItemResRef'], 0)
@@ -1266,7 +1266,7 @@ def UpdateStoreHealWindow ():
 		Button = Window.GetControl (i+8)
 		Label = Window.GetControl (0x1000000c+i)
 		Button.SetVarAssoc ("Index", TopIndex+i)
-		if Cure != None:
+		if Cure:
 			Spell = GemRB.GetSpell (Cure['CureResRef'])
 			Button.SetSpellIcon (Cure['CureResRef'], 1)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
@@ -1340,7 +1340,7 @@ def UpdateStoreRumourWindow ():
 		Drink = GemRB.GetStoreDrink (TopIndex+i)
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ("Index", i)
-		if Drink != None:
+		if Drink:
 			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Drink['DrinkName']))
 			GemRB.SetToken ("ITEMCOST", str(Drink['Price']) )
 			Button.SetText (10162)
