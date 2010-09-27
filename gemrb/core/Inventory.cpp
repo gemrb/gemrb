@@ -839,6 +839,8 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
+		// mark it as unequipped, so it doesn't cause problems in stores
+		item->Flags &= ~ IE_INV_ITEM_EQUIPPED;
 		map->AddItemToLocation(loc, item);
 		Changed = true;
 		dropped = true;
