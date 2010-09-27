@@ -60,6 +60,7 @@ if GUICommon.GameIsIWD2():
 else:
 	ItemButtonCount = 4
 RepModTable = None
+PreviousPC = 0
 
 # 0 - Store
 # 1 - Tavern
@@ -593,12 +594,34 @@ def UpdateStoreCommon (Window, title, name, gold):
 	Label.SetText (str(GemRB.GameGetPartyGold ()))
 	return
 
+def GetPC():
+	global PreviousPC
+
+	if PreviousPC:
+		pc = GemRB.GameGetSelectedPCSingle ()
+		if PreviousPC != pc:
+			PreviousPC = pc
+			# reset the store indices, to prevent overscrolling
+			GemRB.SetVar ("RightIndex", 0)
+			GemRB.SetVar ("LeftIndex", 0)
+			GemRB.SetVar ("RightTopIndex", 0)
+			GemRB.SetVar ("LeftTopIndex", 0)
+			GemRB.SetVar ("Index", 0)
+			GemRB.SetVar ("TopIndex", 0)
+	else:
+		PreviousPC = GemRB.GameGetSelectedPCSingle ()
+		pc = PreviousPC
+
+	return pc
+
 def UpdateStoreShoppingWindow ():
 	global Store, inventory_slots
 
 	Window = StoreShoppingWindow
 	#reget store in case of a change
 	Store = GemRB.GetStore ()
+	pc = GetPC()
+
 	LeftCount = Store['StoreItemCount'] - ItemButtonCount + 1
 	if LeftCount<0:
 		LeftCount=0
@@ -801,7 +824,7 @@ def UpdateStoreIdentifyWindow ():
 
 	Window = StoreIdentifyWindow
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GetPC()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	Count = len(inventory_slots)
 	ScrollBar = Window.GetControl (7)
@@ -990,7 +1013,7 @@ def UpdateStoreStealWindow ():
 	ScrollBar = Window.GetControl (9)
 	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount-ItemButtonCount+1)
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GetPC()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	RightCount = len(inventory_slots)
 	ScrollBar = Window.GetControl (10)
@@ -1077,7 +1100,6 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 				if Flags & SHOP_BUY:
 					if Flags & SHOP_SELECT:
 						Button.SetState (IE_GUI_BUTTON_SELECTED)
-						print "Selecting", i+LeftTopIndex, Slot['ItemResRef'], Item['Price'], Price
 					else:
 						Button.SetState (IE_GUI_BUTTON_ENABLED)
 				else:
