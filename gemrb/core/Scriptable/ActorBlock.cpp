@@ -1780,10 +1780,9 @@ void Door::TryDetectSecret(int skill)
 {
 	if (Type != ST_DOOR) return;
 	if (Visible()) return;
-	//FIXME: this part is just copied from the trap detection
-	if ((skill>=100) && (skill!=256) ) skill = 100;
-	if (skill/2+core->Roll(1,skill/2,0) > (signed)DiscoveryDiff) {
+	if (skill > (signed)DiscoveryDiff) {
 		Flags |= DOOR_FOUND;
+		core->PlaySound(DS_FOUNDSECRET);
 	}
 }
 

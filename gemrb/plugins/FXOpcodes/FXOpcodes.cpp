@@ -3816,17 +3816,34 @@ int fx_identify (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // (actually, in bg2 the effect targets area objects and the range is implemented
 // by the inareans projectile) - inanimate, area, no sprite
 // TODO: effects should target inanimates using different code
+// 0 - detect traps automatically
+// 1 - detect traps by skill
+// 2 - detect secret doors automatically
+// 3 - detect secret doors by luck
 int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_find_traps (%2d)\n", fx->Opcode );
 	//reveal trapped containers, doors, triggers that are in the visible range
 	ieDword range = target->GetStat(IE_VISUALRANGE)*10;
 	ieDword skill;
+	bool detecttraps = true;
 
-	if (fx->Parameter2 == 0)
-		skill = 256;                        //always works
-	else
-		skill = target->GetStat(IE_TRAPS);  //based on skill
+	switch(fx->Parameter2) {
+		case 1: 
+			skill = target->GetStat(IE_TRAPS);
+			break;  //find traps
+		case 3:
+			//detect secret doors
+			skill = target->LuckyRoll(1,100,0);
+			detecttraps = false;
+			break;
+		case 2:
+			detecttraps = false;
+		default:
+                       	//automatic find traps
+			skill = 256;
+			break;
+	}
 
 	TileMap *TMap = target->GetCurrentArea()->TMap;
 
@@ -3835,22 +3852,17 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		Door* door = TMap->GetDoor( Count++ );
 		if (!door)
 			break;
-/*
-		//not trapped
-		if (!door->Scripts[0]) {
-			continue;
-		}
-		//not detectable
-		if (!(door->Flags&DOOR_DETECTABLE)) {
-			continue;
-		}
-*/
 		if (Distance(door->Pos, target->Pos)<range) {
+			if (detecttraps) {
 			//when was door trap noticed
-			door->DetectTrap(skill);
+				door->DetectTrap(skill);
+			}
 			door->TryDetectSecret(skill);
-//			door->TrapDetected = 1;
 		}
+	}
+
+	if (!detecttraps) {
+		return FX_NOT_APPLIED;
 	}
 
 	Count = 0;
@@ -3878,6 +3890,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	return FX_NOT_APPLIED;
 }
+
 // 0x97 ReplaceCreature
 int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 {

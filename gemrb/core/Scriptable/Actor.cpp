@@ -4640,10 +4640,33 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 }
 
 void Actor::UpdateActorState(ieDword gameTime) {
-	if (ModalState == MS_NONE) {
+	if (modalTime==gameTime) {
 		return;
 	}
-	if (modalTime==gameTime) {
+
+	//IWD2 has no autodetect, you actually should 'search'
+	if (InParty && core->HasFeature(GF_AUTOSEARCH_HIDDEN) ) {
+		core->ApplySpell("detect", this, this, 0);
+	}
+
+	// this is a HACK, fuzzie can't work out where else to do this for now
+	// but we shouldn't be resetting rounds/attacks just because the actor
+	// wandered away, the action code should probably be responsible somehow
+	// see also line above (search for comment containing UpdateActorState)!
+	if (LastTarget && lastattack && lastattack < (gameTime - 1)) {
+		Actor *target = area->GetActorByGlobalID(LastTarget);
+		if (!target || target->GetStat(IE_STATE_ID)&STATE_DEAD) {
+			StopAttack();
+		} else {
+			printMessage("Attack","(Leaving attack)", GREEN);
+			core->GetGame()->OutAttack(GetID());
+		}
+
+		roundTime = 0;
+		lastattack = 0;
+	}
+
+	if (ModalState == MS_NONE) {
 		return;
 	}
 
@@ -4674,22 +4697,6 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		}
 	}
 
-	// this is a HACK, fuzzie can't work out where else to do this for now
-	// but we shouldn't be resetting rounds/attacks just because the actor
-	// wandered away, the action code should probably be responsible somehow
-	// see also line above (search for comment containing UpdateActorState)!
-	if (LastTarget && lastattack && lastattack < (gameTime - 1)) {
-		Actor *target = area->GetActorByGlobalID(LastTarget);
-		if (!target || target->GetStat(IE_STATE_ID)&STATE_DEAD) {
-			StopAttack();
-		} else {
-			printMessage("Attack","(Leaving attack)", GREEN);
-			core->GetGame()->OutAttack(GetID());
-		}
-
-		roundTime = 0;
-		lastattack = 0;
-	}
 }
 
 //idx could be: 0-6, 16-22, 32-38, 48-54
