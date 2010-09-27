@@ -1260,6 +1260,7 @@ def UpdateStoreHealWindow ():
 	UpdateStoreCommon (Window, 0x10000000, 0, 0x10000001)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Index = GemRB.GetVar ("Index")
+	pc = GemRB.GameGetSelectedPCSingle ()
 	for i in range (ItemButtonCount):
 		Cure = GemRB.GetStoreCure (TopIndex+i)
 
@@ -1271,16 +1272,29 @@ def UpdateStoreHealWindow ():
 			Button.SetSpellIcon (Cure['CureResRef'], 1)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+			dead = GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD
+			# toggle raise dead/resurrect based on state
+			# unfortunately the flags are not set properly in iwd
+			print "UpdateStoreHealWindow", dead, Cure['CureResRef'], Spell["SpellTargetType"]
+			if (dead and Spell["SpellTargetType"] != 3) or \
+			   (not dead and Spell["SpellTargetType"] == 3): # 3 - non-living
+				# locked and shaded
+				Button.SetState (IE_GUI_BUTTON_DISABLED)
+				Button.SetBorder (0, 0,0, 0,0, 200,0,0,100, 1,1)
+			else:
+				Button.SetState (IE_GUI_BUTTON_ENABLED)
+				Button.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
 
 			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Spell['SpellName']))
 			GemRB.SetToken ("ITEMCOST", str(Cure['Price']) )
 			Label.SetText (10162)
-
 		else:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+			Button.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
 			Label.SetText ("")
+
 		if TopIndex+i==Index:
 			TextArea = Window.GetControl (23)
 			TextArea.SetText (Cure['Description'])
