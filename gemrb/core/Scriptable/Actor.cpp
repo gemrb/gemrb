@@ -3798,11 +3798,11 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright)
 	ITMExtHeader *which;
 	if (GetAttackStyle() == WEAPON_RANGED) {
 		which = item->GetWeaponHeader(true);
-		wi.backstabbing = false;
+		wi.backstabbing = which->RechargeFlags & IE_ITEM_BACKSTAB;
 	} else {
 		which = item->GetWeaponHeader(false);
 		// any melee weapon usable by a single class thief is game (UAI does not affect this)
-		wi.backstabbing = !(item->UsabilityBitmask & 0x400000);
+		wi.backstabbing = !(item->UsabilityBitmask & 0x400000) || (which->RechargeFlags & IE_ITEM_BACKSTAB);
 	}
 
 	//make sure we use 'false' in this freeitem
