@@ -1754,7 +1754,9 @@ unsigned int Inventory::FindStealableItem()
 	return 0;
 }
 
-// extension to allow more or less than head gear to avert critical hits
+// extension to allow more or less than head gear to avert critical hits:
+// If an item with bit 25 set is equipped in a non-helmet slot, aversion is enabled
+// If an item with bit 25 set is equipped in a helmet slot, aversion is disabled
 bool Inventory::ProvidesCriticalAversion()
 {
 	for (size_t i = 0; i < Slots.size(); i++) {
@@ -1770,14 +1772,18 @@ bool Inventory::ProvidesCriticalAversion()
 
 		for (int h = 0; h < itm->ExtHeaderCount; h++) {
 			ITMExtHeader *header = itm->GetExtHeader(h);
-			if (header && (header->RechargeFlags & IE_ITEM_TOGGLE_CRITS)) {
-				return true;
+			if ((int)i == SLOT_HEAD) {
+				if (header && (header->RechargeFlags & IE_ITEM_TOGGLE_CRITS)) {
+					return false;
+				} else {
+					return true;
+				}
+			} else {
+				if (header && (header->RechargeFlags & IE_ITEM_TOGGLE_CRITS)) {
+					return true;
+				}
 			}
 		}
-	}
-	// remove this when items with the IE_ITEM_TOGGLE_CRITS set become available
-	if (HasItemInSlot("", SLOT_HEAD)) {
-		return true;
 	}
 	return false;
 }
