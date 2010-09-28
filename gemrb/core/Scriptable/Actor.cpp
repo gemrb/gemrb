@@ -4627,8 +4627,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 	if (critical) {
 		//a critical surely raises the morale?
 		NewBase(IE_MORALE, 1, MOD_ADDITIVE);
-		int head = inventory.GetHeadSlot();
-		if ((head!=-1) && target->inventory.HasItemInSlot("",(ieDword) head)) {
+		if (target->inventory.ProvidesCriticalAversion()) {
 			//critical hit is averted by helmet
 			displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, 0xffffff, target);
 		} else {

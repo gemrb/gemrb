@@ -317,6 +317,8 @@ public:
 	int WhyCantEquip(int slot, int twohanded) const;
 	/** returns a slot that has a stealable item */
 	unsigned int FindStealableItem();
+	/** checks if any equipped item provides critical hit aversion */
+	bool ProvidesCriticalAversion();
 	//setting important constants
 	static void Init(int mb);
 	static void SetHeadSlot(int arg);

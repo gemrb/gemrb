@@ -1754,3 +1754,30 @@ unsigned int Inventory::FindStealableItem()
 	return 0;
 }
 
+// extension to allow more or less than head gear to avert critical hits
+bool Inventory::ProvidesCriticalAversion()
+{
+	for (size_t i = 0; i < Slots.size(); i++) {
+		CREItem *item = Slots[i];
+		if (!item || ! (item->Flags & IE_INV_ITEM_EQUIPPED)) {
+			continue;
+		}
+
+		Item *itm = gamedata->GetItem(item->ItemResRef);
+		if (!itm) {
+			continue;
+		}
+
+		for (int h = 0; h < itm->ExtHeaderCount; h++) {
+			ITMExtHeader *header = itm->GetExtHeader(h);
+			if (header && (header->RechargeFlags & IE_ITEM_TOGGLE_CRITS)) {
+				return true;
+			}
+		}
+	}
+	// remove this when items with the IE_ITEM_TOGGLE_CRITS set become available
+	if (HasItemInSlot("", SLOT_HEAD)) {
+		return true;
+	}
+	return false;
+}
