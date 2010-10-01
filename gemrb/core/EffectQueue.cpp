@@ -1069,6 +1069,13 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply) con
 			fx->PosX = target->Pos.x;
 			fx->PosY = target->Pos.y;
 		}
+
+		//gemrb specific, stat based chance
+		if ((fx->Probability2 == 100) && Owner && (Owner->Type==ST_ACTOR) ) {
+			fx->Probability2 = 0;
+			fx->Probability1 = ((Actor *) Owner)->GetSafeStat(fx->Probability1);
+		}
+
 		//the effect didn't pass the probability check
 		if( !check_probability(fx) ) {
 			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
