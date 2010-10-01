@@ -511,6 +511,10 @@ public:
 	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/
 	WorldMap * GetWorldMap(const char *area = NULL);
 	void SetWindowFrame(int i, Sprite2D *Picture);
+	/** hides the game control window (if it exists), and reports success */
+	bool HideGCWindow();
+	/** unhides the game control window, if it exists */
+	void UnhideGCWindow();
 	GameControl *GetGameControl() const;
 	/** if backtomain is not null then goes back to main screen */
 	void QuitGame(int backtomain);

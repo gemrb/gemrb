@@ -3875,6 +3875,32 @@ void Interface::UpdateMasterScript()
 	}
 }
 
+bool Interface::HideGCWindow()
+{
+	Window *window = GetWindow( 0 );
+	// in the beginning, there's no window at all
+	if (! window)
+		return false;
+
+	Control* gc = window->GetControl(0);
+	if (gc->ControlType!=IE_GUI_GAMECONTROL) {
+		return false;
+	}
+	SetVisible(0, WINDOW_INVISIBLE);
+	return true;
+}
+
+void Interface::UnhideGCWindow()
+{
+	Window *window = GetWindow( 0 );
+	if (!window)
+		return;
+	Control* gc = window->GetControl(0);
+	if (gc->ControlType!=IE_GUI_GAMECONTROL)
+		return;
+	SetVisible(0, WINDOW_VISIBLE);
+}
+
 GameControl *Interface::GetGameControl() const
 {
 	Window *window = GetWindow( 0 );
@@ -4280,10 +4306,6 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 
 void Interface::LoadProgress(int percent)
 {
-	printf("LoadProgress: %d\n", percent);
-FILE *fp = fopen("debug","a");
-fprintf(fp,"LoadProgress: %d\n", percent);
-fclose(fp);
 	vars->SetAt("Progress", percent);
 	RedrawControls("Progress", percent);
 	RedrawAll();

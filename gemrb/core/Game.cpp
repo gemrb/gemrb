@@ -714,6 +714,7 @@ int Game::LoadMap(const char* ResRef)
 		return index;
 	}
 
+	bool hide = core->HideGCWindow();
 	core->GetGUIScriptEngine()->RunFunction("LoadScreen", "StartLoadScreen");
 	core->GetGUIScriptEngine()->RunFunction("LoadScreen", "SetLoadScreen");
 	DataStream* ds = gamedata->GetResource( ResRef, IE_ARE_CLASS_ID );
@@ -742,6 +743,9 @@ int Game::LoadMap(const char* ResRef)
 		if (stricmp( NPCs[i]->Area, ResRef ) == 0) {
 			newMap->AddActor( NPCs[i] );
 		}
+	}
+	if (hide) {
+		core->UnhideGCWindow();
 	}
 	return AddMap( newMap );
 }
