@@ -108,3 +108,9 @@ There should be a way of:
 (saving)
 Effects that are not saved: 2 -'while equipped'
 
+
+(probability, gemrb specific)
+If the low probability field was set to 100, then the high probability field contains the
+stat which determines the chance of the effect. For example:
+100/136 would determine the chance of the effect based on the caster's detect illusions skill.
+
