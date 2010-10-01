@@ -164,6 +164,18 @@ unsigned int PersonalDistance(Point p, Scriptable *b)
 	return (unsigned int) ret;
 }
 
+unsigned int SquaredPersonalDistance(Point p, Scriptable *b)
+{
+	long x = ( p.x - b->Pos.x );
+	long y = ( p.y - b->Pos.y );
+	int ret =  x*x + y*y;
+	if (b->Type==ST_ACTOR) {
+		ret-=((Actor *)b)->size*100;
+	}
+	if (ret<0) return (unsigned int) 0;
+	return (unsigned int) ret;
+}
+
 /** Calculates map distance between 2 scriptables */
 unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b)
 {
@@ -199,6 +211,21 @@ unsigned int PersonalDistance(Scriptable *a, Scriptable *b)
 	}
 	if (b->Type==ST_ACTOR) {
 		ret-=((Actor *)b)->size*10;
+	}
+	if (ret<0) return (unsigned int) 0;
+	return (unsigned int) ret;
+}
+
+unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b)
+{
+	long x = ( a->Pos.x - b->Pos.x );
+	long y = ( a->Pos.y - b->Pos.y );
+	int ret =  x*x + y*y;
+	if (a->Type==ST_ACTOR) {
+		ret-=((Actor *)a)->size*100;
+	}
+	if (b->Type==ST_ACTOR) {
+		ret-=((Actor *)b)->size*100;
 	}
 	if (ret<0) return (unsigned int) 0;
 	return (unsigned int) ret;
