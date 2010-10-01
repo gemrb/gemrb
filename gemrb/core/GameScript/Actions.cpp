@@ -6159,11 +6159,46 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Scriptable *target = GetActorFromObject(Sender, parameters->objects[1]);
+	TileMap *tmap = Sender->GetCurrentArea()->TMap;
+	Door *door = NULL;
+	Container *container = NULL;
+	Point pos;
+	if (target->Type == ST_DOOR) {
+		// FIXME: actually it chooses from two possible points
+		pos = target->Pos;
+		door = tmap->GetDoorByPosition(pos);
+	} else if(target->Type == ST_CONTAINER) {
+		pos = target->Pos;
+		container = tmap->GetContainerByPosition(pos);
+	} else {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	// TODO: "sets a field in the door/container to 1"
+
+	// FIXME: MAX_OPERATING_DISTANCE?
+	if (SquaredPersonalDistance(pos, Sender) > MAX_OPERATING_DISTANCE) {
+		MoveNearerTo(Sender, pos, MAX_OPERATING_DISTANCE, 0);
+		return;
+	}
 
 	gc->SetTargetMode(TARGET_MODE_ATTACK); //for bashing doors too
-	OpenDoor(Sender, parameters);
 
-	Sender->ReleaseCurrentAction(); // this is blocking, OpenDoor is not
+	// try to bash it
+	if (door) {
+		door->TryBashLock((Actor *) Sender);
+	} else if (container) {
+		container->TryBashLock((Actor *) Sender);
+	}
+
+	Sender->ReleaseCurrentAction();
 }
 
 //pst action
