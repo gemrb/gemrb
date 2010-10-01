@@ -1728,7 +1728,7 @@ void Inventory::ChargeAllItems(int hours)
 	}
 }
 
-#define ITM_STEALING (IE_INV_ITEM_UNSTEALABLE | IE_INV_ITEM_MOVABLE)
+#define ITM_STEALING (IE_INV_ITEM_UNSTEALABLE | IE_INV_ITEM_MOVABLE | IE_INV_ITEM_EQUIPPED)
 unsigned int Inventory::FindStealableItem()
 {
         unsigned int slot;
