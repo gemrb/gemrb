@@ -3,6 +3,6 @@
         	SPELL      ACTION       STR_ON     STR_OFF     STR_FAIL    AOESPELL
 NONE    	*          *            0          0           0           0
 BARDSONG	BARDSONG   BattleSong   50705      50706       -1          1
-DETECTTRAPS	FINDTRAP   FindTraps    50699      50700       -1          0
+DETECTTRAPS	FINDTRAP   FindTraps    50699      50700       -1          1
 STEALTH    	SNEAK      Hide         19944      4188        17120       0
 TURNUNDEAD	TURN       Turn         50702      50703       -1          1
