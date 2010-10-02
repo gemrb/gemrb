@@ -27,6 +27,7 @@
 #include "Map.h"
 #include "SymbolMgr.h"
 #include "Scriptable/Actor.h"
+#include "Spell.h"  //needs for the source flags bitfield
 
 #include <cstdio>
 
@@ -1092,6 +1093,13 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply) con
 		if( check_resistance(target, fx) ) {
 			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 			return FX_NOT_APPLIED;
+		}
+
+		//Same as in items and spells
+		if (fx->SourceFlags & SF_HOSTILE) {
+			if (target && (target != Owner) && Owner && (Owner->Type==ST_ACTOR) ) {
+				target->AttackedBy((Actor *) Owner);
+			}
 		}
 
 		if( NeedPrepare(fx->TimingMode) ) {

@@ -3976,15 +3976,20 @@ int Actor::GetAttackStyle()
 	return WEAPON_MELEE;
 }
 
+void Actor::AttackedBy( Actor *attacker)
+{
+	LastAttacker = attacker->GetID();
+	Game * game = core->GetGame();
+	game->InAttack(GetID() );
+	game->InAttack(LastAttacker);
+}
+
 void Actor::SetTarget( Scriptable *target)
 {
 	if (target->Type==ST_ACTOR) {
 		Actor *tar = (Actor *) target;
 		LastTarget = tar->GetID();
-		tar->LastAttacker = GetID();
-		//we tell the game object that this creature
-		//must be added to the list of combatants
-		core->GetGame()->InAttack(tar->LastAttacker);
+		tar->AttackedBy(this);
 	}
 	SetOrientation( GetOrient( target->Pos, Pos ), false );
 }

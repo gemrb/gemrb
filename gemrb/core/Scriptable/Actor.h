@@ -526,6 +526,8 @@ public:
 	void SetModalSpell(ieDword state, const char *spell);
 	/* returns current attack style */
 	int GetAttackStyle();
+	/* adds the combatants to the attackers list */
+	void AttackedBy(Actor *actor);
 	/* sets target for immediate attack */
 	void SetTarget( Scriptable *actor);
 	/* starts combat round*/
