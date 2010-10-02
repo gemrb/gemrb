@@ -298,6 +298,7 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 {
 	//first, update reachable/visible areas by worlde.2da if exists
 	UpdateReachableAreas();
+	UpdateAreaVisibility(AreaName, direction);
 	if (direction==-1) {
 		return 0;
 	}
@@ -323,7 +324,6 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 
 	printMessage("WorldMap","", GREEN);
 	printf("CalculateDistances for Area: %s\n", AreaName);
-	UpdateAreaVisibility(AreaName, direction);
 
 	size_t memsize =sizeof(int) * area_entries.size();
 	Distances = (int *) malloc( memsize );
@@ -484,9 +484,8 @@ int WorldMap::GetDistance(const ieResRef AreaName) const
 
 void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
 {
-	if (direction<0 || direction>3)
-		return;
 	unsigned int i;
+
 	WMPAreaEntry* ae=GetArea(AreaName,i);
 	if (!ae)
 		return;
@@ -494,6 +493,8 @@ void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
 	printf("Updated Area visibility: %s (visited, and visible)\n", AreaName);
 
 	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE, BM_OR);
+	if (direction<0 || direction>3)
+		return;
 	i=ae->AreaLinksCount[direction];
 	while (i--) {
 		WMPAreaLink* al = area_links[ae->AreaLinksIndex[direction]+i];

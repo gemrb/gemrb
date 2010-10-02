@@ -36,7 +36,6 @@
 #include "StringMgr.h"
 #include "TileMap.h"
 #include "Video.h"
-#include "WorldMap.h"
 #include "GUI/GameControl.h"
 
 #include <cstdio>
@@ -1086,19 +1085,6 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 				map1->RemoveActor( actor );
 			}
 			map2->AddActor( actor );
-
-			// update the worldmap if needed
-			if (actor->InParty) {
-				WorldMap *worldmap = core->GetWorldMap();
-				unsigned int areaindex;
-				WMPAreaEntry *entry = worldmap->GetArea(area, areaindex);
-				if (entry) {
-					// make sure the area is marked as revealed and visited
-					if (!(entry->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-						entry->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_VISITED, BM_OR);
-					}
-				}
-			}
 		}
 	}
 	actor->SetPosition(position, adjust);
