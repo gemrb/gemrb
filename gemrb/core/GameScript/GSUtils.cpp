@@ -981,6 +981,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	// post-swap (and non-actors always have IF_NOINT set) .. also added a check that it's
 	// actually busy doing something, for the same reason
 	if (target->GetInternalFlag()&IF_NOINT && (target->GetCurrentAction() || target->GetNextAction())) {
+		core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
 		displaymsg->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 		Sender->ReleaseCurrentAction();
 		return;
@@ -995,6 +996,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			if (!(Flags & BD_INTERRUPT)) {
 				// added CurrentAction as part of blocking action fixes
 				if (tar->GetCurrentAction() || tar->GetNextAction()) {
+					core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
 					displaymsg->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 					Sender->ReleaseCurrentAction();
 					return;

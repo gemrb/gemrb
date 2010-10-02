@@ -4079,6 +4079,7 @@ const char *Actor::GetDialog(int flags) const
 
 	if ( (InternalFlags & IF_NOINT) && CurrentAction) {
 		if (flags>1) {
+			core->GetTokenDictionary()->SetAtCopy("TARGET", ShortName);
 			displaymsg->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 		}
 		return NULL;
