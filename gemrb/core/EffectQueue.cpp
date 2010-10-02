@@ -1010,8 +1010,9 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	}
 
 	//don't resist self
+	bool selective_mr = core->HasFeature(GF_SELECTIVE_MAGIC_RES);
 	if (fx->Target==FX_TARGET_SELF) {
-		if (core->HasFeature(GF_SELECTIVE_MAGIC_RES) ) {
+		if (selective_mr) {
 			return false;
 		}
 	}
@@ -1019,8 +1020,11 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
 	if( fx->random_value < val) {
-		printf ("effect resisted: %s\n", (char*) Opcodes[fx->Opcode].Name);
-		return true;
+		// when using biased magic resistance non-hostile spells aren't resisted
+		if ((selective_mr && (fx->SourceFlags&SF_HOSTILE)) || !selective_mr) {
+			printf ("effect resisted: %s\n", (char*) Opcodes[fx->Opcode].Name);
+			return true;
+		}
 	}
 
 	//saving throws
