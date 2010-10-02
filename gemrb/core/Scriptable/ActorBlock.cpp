@@ -2001,7 +2001,7 @@ bool Highlightable::VisibleTrap(int see_all) const
 }
 
 //trap that will fire now
-bool Highlightable::TriggerTrap(int skill, ieDword ID)
+bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 {
 	if (!Trapped) {
 		return false;
@@ -2009,15 +2009,6 @@ bool Highlightable::TriggerTrap(int skill, ieDword ID)
 	//actually this could be script name[0]
 	if (!Scripts[0]) {
 		return false;
-	}
-	if (CanDetectTrap()) {
-		// this should probably be party members only
-		if ((skill>=100) && (skill!=256) ) skill = 100;
-		if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDiff) {
-			SetTrapDetected(1); //probably too late :)
-			//tumble???
-			return false;
-		}
 	}
 	LastTriggerObject = LastTrigger = LastEntered = ID;
 	ImmediateEvent();
