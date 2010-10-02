@@ -5743,7 +5743,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 		return false;
 	}
 
-	Projectile *pro = itm->GetProjectile(slot, header, flags&UI_MISS);
+	Projectile *pro = itm->GetProjectile(this, header, target, slot, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
 	gamedata->FreeItem(itm,tmpresref, false);
 	if (pro) {
@@ -5777,7 +5777,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 		return false;
 	}
 
-	Projectile *pro = itm->GetProjectile(slot, header, flags&UI_MISS);
+	Projectile *pro = itm->GetProjectile(this, header, target->Pos, slot, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
 	gamedata->FreeItem(itm,tmpresref, false);
 	if (pro) {

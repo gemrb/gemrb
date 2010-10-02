@@ -238,7 +238,7 @@ void Inventory::AddSlotEffects(ieDword index)
 	}
 
 	//get the equipping effects
-	EffectQueue *eqfx = itm->GetEffectBlock(-1, index, 0);
+	EffectQueue *eqfx = itm->GetEffectBlock(Owner, Owner->Pos, -1, index, 0);
 	gamedata->FreeItem( itm, slot->ItemResRef, false );
 
 	Owner->RefreshEffects(eqfx);

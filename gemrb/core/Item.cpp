@@ -54,7 +54,7 @@ Item::~Item(void)
 
 //-1 will return equipping feature block
 //otherwise returns the n'th feature block
-EffectQueue *Item::GetEffectBlock(int usage, ieDwordSigned invslot, ieDword pro) const
+EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, ieDwordSigned invslot, ieDword pro) const
 {
 	Effect *features;
 	int count;
@@ -74,8 +74,19 @@ EffectQueue *Item::GetEffectBlock(int usage, ieDwordSigned invslot, ieDword pro)
 	for (int i=0;i<count;i++) {
 		Effect *fx = features+i;
 		fx->InventorySlot = invslot;
-		fx->Projectile = pro;
-		fxqueue->AddEffect( fx );
+		fx->SourceFlags = Flags;
+		if (fx->Target != FX_TARGET_SELF) {
+			fx->Projectile = pro;
+			fxqueue->AddEffect( fx );
+		} else {
+			Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
+			fx->Projectile = 0;
+			fx->PosX=pos.x;
+			fx->PosY=pos.y;
+			if (target) {
+				core->ApplyEffect(fx, target, self);
+			}
+		}
 	}
 
 	//adding a pulse effect for weapons (PST)
@@ -182,7 +193,7 @@ int Item::UseCharge(ieWord *Charges, int header, bool expend) const
 }
 
 //returns a projectile loaded with the effect queue
-Projectile *Item::GetProjectile(ieDwordSigned invslot, int header, int miss) const
+Projectile *Item::GetProjectile(Scriptable *self, int header, const Point &target, ieDwordSigned invslot, int miss) const
 {
 	ITMExtHeader *eh = GetExtHeader(header);
 	if (!eh) {
@@ -192,11 +203,11 @@ Projectile *Item::GetProjectile(ieDwordSigned invslot, int header, int miss) con
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(idx);
 	int usage ;
 	if (header>= 0)
-		usage = header ;
+		usage = header;
 	else
-		usage = GetWeaponHeaderNumber(header==-2) ;
+		usage = GetWeaponHeaderNumber(header==-2);
 	if (!miss) {
-		EffectQueue *fx = GetEffectBlock(usage, invslot, idx);
+		EffectQueue *fx = GetEffectBlock(self, target, usage, invslot, idx);
 		pro->SetEffects(fx);
 	}
 	return pro;

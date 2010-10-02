@@ -116,21 +116,25 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		}
 		//fill these for completeness, inventoryslot is a good way
 		//to discern a spell from an item effect
-		features[i].InventorySlot = 0xffff;
-		if (features[i].Target != FX_TARGET_SELF) {
-			features[i].Projectile = pro;
-			fxqueue->AddEffect( features+i );
+		Effect *fx = features+i;
+
+		fx->InventorySlot = 0xffff;
+		//the hostile flag is used to determine if this was an attack
+		fx->SourceFlags = Flags;
+		if (fx->Target != FX_TARGET_SELF) {
+			fx->Projectile = pro;
+			fxqueue->AddEffect( fx );
 		} else {
 			Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
-			features[i].Projectile = 0;
-			features[i].PosX=pos.x;
-			features[i].PosY=pos.y;
+			fx->Projectile = 0;
+			fx->PosX=pos.x;
+			fx->PosY=pos.y;
 			//FIXME (r7193):
 			//This is bad, effects should be able to affect non living targets
 			//This is done by NULL target, the position should be enough
 			//to tell which non-actor object is affected
 			if (target) {
-				core->ApplyEffect(features+i, target, self);
+				core->ApplyEffect(fx, target, self);
 			}
 		}
 	}
