@@ -217,6 +217,7 @@ public:
 	ieResRef applyWhenAttacked;      //cast spell on condition
 	ieResRef applyWhenBeingHit;      //cast spell on condition
 	ieResRef ModalSpell;             //apply this spell once per round
+	ieResRef LingeringModalSpell;    //apply this spell once per round if the effects are lingering
 	ieResRef BardSong;               //custom bard song (updated by fx)
 
 	PCStatsStruct*  PCStats;
@@ -294,6 +295,7 @@ public:
 	ieDword *projectileImmunity; //classic bitfield
 	ieDword roundTime;           //these are timers for attack rounds
 	ieDword modalTime;           //last time the modal effect used
+	char modalSpellLingering;    //the count of rounds for which the modal spell will be reapplied after the state ends
 	ieDword panicMode;           //runaway, berserk or randomwalk
 	ieDword lastInit;
 	bool no_more_steps;

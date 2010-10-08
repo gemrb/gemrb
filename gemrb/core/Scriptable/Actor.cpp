@@ -24,6 +24,7 @@
 
 #include "Scriptable/Actor.h"
 
+#include "ie_feats.h"
 #include "overlays.h"
 #include "strrefs.h"
 #include "opcode_params.h"
@@ -346,6 +347,7 @@ Actor::Actor()
 	lastInit = 0;
 	roundTime = 0;
 	modalTime = 0;
+	modalSpellLingering = 0;
 	panicMode = PANIC_NONE;
 	lastattack = 0;
 
@@ -387,6 +389,7 @@ Actor::Actor()
 	ModalState = 0;
 	//set it to a neutral value
 	ModalSpell[0] = '*';
+	LingeringModalSpell[0] = '*';
 	//this one is saved, but not loaded?
 	localID = globalID = 0;
 	//this one is not saved
@@ -3926,6 +3929,11 @@ void Actor::SetModal(ieDword newstate, bool force)
 			return;
 	}
 
+	if (ModalState == MS_BATTLESONG && ModalState != newstate && HasFeat(FEAT_LINGERING_SONG)) {
+		strnlwrcpy(LingeringModalSpell, ModalSpell, 8);
+		modalSpellLingering = 2;
+	}
+
 	if (InParty) {
 		// display the turning-off message
 		if (ModalState != MS_NONE) {
@@ -4670,7 +4678,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		lastattack = 0;
 	}
 
-	if (ModalState == MS_NONE) {
+	if (ModalState == MS_NONE && !modalSpellLingering) {
 		return;
 	}
 
@@ -4678,6 +4686,20 @@ void Actor::UpdateActorState(ieDword gameTime) {
 	if ((((gameTime-roundTime)%core->Time.round_size)==0)) {
 		//we can set this to 0
 		modalTime = gameTime;
+
+		// handle lingering modal spells like bardsong in iwd2
+		if (modalSpellLingering && LingeringModalSpell[0]) {
+			modalSpellLingering--;
+			if (core->ModalStates[ModalState].aoe_spell) {
+				core->ApplySpellPoint(LingeringModalSpell, GetCurrentArea(), Pos, this, 0);
+			} else {
+				core->ApplySpell(LingeringModalSpell, this, this, 0);
+			}
+		}
+		if (ModalState == MS_NONE) {
+			return;
+		}
+
 		if (!ModalSpell[0]) {
 			printMessage("Actor","Modal Spell Effect was not set!\n", YELLOW);
 			ModalSpell[0]='*';
