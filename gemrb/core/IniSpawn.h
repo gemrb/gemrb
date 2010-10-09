@@ -157,6 +157,8 @@ private:
 	//gets the spec var operation code from a keyword
 	int GetDiffMode(const char *keyword);
 public:
+	/* called by action of the same name */
+	void SetNamelessDeath(const ieResRef area, Point &pos, ieDword state);
 	void InitSpawn(const ieResRef DefaultArea);
 	void RespawnNameless();
 	void InitialSpawn();

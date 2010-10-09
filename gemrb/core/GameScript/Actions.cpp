@@ -7095,3 +7095,14 @@ void GameScript::BanterBlockTime(Scriptable* /*Sender*/, Action* parameters)
 	core->GetGame()->BanterBlockTime = parameters->int0Parameter;
 }
 
+void GameScript::SetNamelessDeath(Scriptable* Sender, Action* parameters)
+{
+	ieResRef area;
+
+	snprintf(area,8,"AR%04d", parameters->int0Parameter);
+	IniSpawn *sp = Sender->GetCurrentArea()->INISpawn;
+	if (!sp) {
+		return;
+	}
+	sp->SetNamelessDeath(area, parameters->pointParameter, parameters->int1Parameter);
+}

@@ -448,6 +448,14 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 	delete[] critters;
 }
 
+/* set by action */
+void IniSpawn::SetNamelessDeath(const ieResRef area, Point &pos, ieDword state)
+{
+	strnuprcpy(NamelessSpawnArea, area, 8);
+	NamelessSpawnPoint = pos;
+	NamelessState = state;
+}
+
 void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 {
 	const char *s;

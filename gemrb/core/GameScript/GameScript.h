@@ -1310,6 +1310,7 @@ public:
 	static void SetMoraleAI(Scriptable* Sender, Action* parameters);
 	static void SetMusic(Scriptable* Sender, Action* parameters);
 	static void SetNamelessClass(Scriptable* Sender, Action* parameters);
+	static void SetNamelessDeath(Scriptable* Sender, Action* parameters);
 	static void SetNamelessDisguise(Scriptable* Sender, Action* parameters);
 	static void SetNoOneOnTrigger(Scriptable* Sender, Action* parameters);
 	static void SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters);
