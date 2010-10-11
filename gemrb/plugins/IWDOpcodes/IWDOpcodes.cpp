@@ -1961,7 +1961,7 @@ int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx)
 			break;
 		default:;
 	}
-	if (chance>core->Roll(1,100,0)) {
+	if (chance < core->Roll(1,100,0)) {
 		return FX_NOT_APPLIED;
 	}
 
