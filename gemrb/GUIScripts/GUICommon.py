@@ -109,8 +109,6 @@ def GetActorPaperDoll (actor):
 	doll = CommonTables.Pdolls.GetValue (row, which)
 	if doll == "*":
 		print "GetActorPaperDoll: Missing paper doll for animation", row, which
-	else:
-		print "GetActorPaperDoll", doll
 	return doll
 
 def SelectAllOnPress ():
