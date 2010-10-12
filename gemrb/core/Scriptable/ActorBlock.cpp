@@ -704,9 +704,11 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 		char tmp[100];
 		const char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
 		const char* spell = core->GetString(spl->SpellName);
+		if (LastTarget) {
+			target = area->GetActorByGlobalID(LastTarget);
+		}
 		if (stricmp(spell, "")) {
-			if (LastTarget) {
-				target = area->GetActorByGlobalID(LastTarget);
+			if (target) {
 				snprintf(tmp, sizeof(tmp), "%s %s : %s", msg, spell, target->GetName(-1));
 			} else {
 				snprintf(tmp, sizeof(tmp), "%s : %s", spell, GetName(-1));
