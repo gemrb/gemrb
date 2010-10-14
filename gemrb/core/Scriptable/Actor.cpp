@@ -110,6 +110,7 @@ struct ItemUseType {
 
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
+static bool pstflags = false;
 
 //item animation override array
 struct ItemAnimType {
@@ -1338,9 +1339,7 @@ static void InitActorTables()
 {
 	int i, j;
 
-	//if (core->HasFeature(GF_IWD_DEATHVARFORMAT)) {
-	//	memcpy(DeathVarFormat, IWDDeathVarFormat, sizeof(ieVariable));
-	//}
+	pstflags = core->HasFeature(GF_PST_STATE_FLAGS);
 
 	if (core->HasFeature(GF_CHALLENGERATING)) {
 		sharexp=SX_DIVIDE|SX_CR;
@@ -4225,6 +4224,11 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 
 	//second parameter is left or right hand flag
 	tohit = GetToHit(THAC0Bonus, Flags);
+
+	//pst increased critical hits
+	if (pstflags && (Modified[IE_STATE_ID]&STATE_CRIT_ENH)) {
+		CriticalBonus++;
+	}
 	return true;
 }
 
@@ -4641,13 +4645,19 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 		return;
 	}
 
+	//critical protection a la PST
+	if (pstflags && (Modified[IE_STATE_ID] & (ieDword) STATE_CRIT_PROT )) {
+		critical = 0;
+	}
+
 	if (critical) {
-		//a critical surely raises the morale?
-		NewBase(IE_MORALE, 1, MOD_ADDITIVE);
 		if (target->inventory.ProvidesCriticalAversion()) {
 			//critical hit is averted by helmet
 			displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, 0xffffff, target);
 		} else {
+			//a critical surely raises the morale?
+			//only if it is successful
+			NewBase(IE_MORALE, 1, MOD_ADDITIVE);
 			damage <<=1; //critical damage is always double?
 			core->timer->SetScreenShake(16,16,8);
 		}
