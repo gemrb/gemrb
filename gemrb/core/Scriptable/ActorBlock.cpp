@@ -616,27 +616,26 @@ void Scriptable::AddTrigger(ieDword *actorref)
 	tolist.push_back(actorref);
 }
 
-void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
+static EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
+
+void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt)
 {
-	if (Type == ST_ACTOR) {
-		((Actor *) this)->SetStance(IE_ANI_CONJURE);
-	}
-
-	if (SpellHeader == -1) {
-		LastTargetPos.empty();
-		return;
-	}
-
-	if (LastTargetPos.isempty()) {
-		SpellHeader = -1;
-		return;
-	}
-
 	Spell* spl = gamedata->GetSpell( SpellResRef );
-	//create projectile from known spellheader
-	Projectile *pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
-	SpellHeader = -1;
-	if (pro) {
+
+	//PST has a weird effect, called Enoll Eva's duplication
+	//it creates every projectile of the affected actor twice
+	int duplicate = 1;
+	if (core->HasFeature(GF_PST_STATE_FLAGS) && (Type == ST_ACTOR)) {
+		if ( ((Actor *)this)->GetStat(IE_STATE_ID)&STATE_EE_DUPL) {
+			duplicate = 2;
+		}
+	}
+
+	while(duplicate --) {
+		Projectile *pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+		if (!pro) {
+			return;
+		}
 		pro->SetCaster(GetGlobalID());
 		Point origin = Pos;
 		if (Type == ST_TRIGGER || Type == ST_PROXIMITY) {
@@ -645,55 +644,14 @@ void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 			// see also function below - maybe we should fix Pos instead
 			origin = ((InfoPoint *)this)->TrapLaunch;
 		}
-		GetCurrentArea()->AddProjectile(pro, origin, LastTargetPos);
-	}
 
-	// caster - Casts spellname
-	char tmp[100];
-	const char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
-	snprintf(tmp, sizeof(tmp), "%s %s", msg, core->GetString(spl->SpellName));
-	displaymsg->DisplayStringName(tmp, 0xffffff, this);
-
-	core->Autopause(AP_SPELLCAST);
-
-	LastTarget = 0;
-	LastTargetPos.empty();
-}
-
-static EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
-
-void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
-{
-	if (Type == ST_ACTOR) {
-		((Actor *) this)->SetStance(IE_ANI_CONJURE);
-	}
-
-	if (SpellHeader == -1) {
-		LastTarget = 0;
-		return;
-	}
-	if (!LastTarget) {
-		SpellHeader = -1;
-		return;
-	}
-	Spell* spl = gamedata->GetSpell( SpellResRef );
-	//create projectile from known spellheader
-	Projectile *pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
-	if (pro) {
-		pro->SetCaster(GetGlobalID());
-		Point origin = Pos;
-		if (Type == ST_TRIGGER || Type == ST_PROXIMITY) {
-			// try and make projectiles start from the right trap position
-			// see the traps in the duergar/assassin battle in bg2 dungeon
-			// see also function above - maybe we should fix Pos instead
-			origin = ((InfoPoint *)this)->TrapLaunch;
-		}
-		if (LastTarget) {
+		if (tgt) {
 			GetCurrentArea()->AddProjectile(pro, origin, LastTarget);
 		} else {
 			GetCurrentArea()->AddProjectile(pro, origin, LastTargetPos);
 		}
 	}
+
 	ieDword spellnum=ResolveSpellNumber( SpellResRef );
 	if (spellnum!=0xffffffff) {
 		area->SeeSpellCast(this, spellnum);
@@ -747,6 +705,48 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 	core->Autopause(AP_SPELLCAST);
 
 	gamedata->FreeSpell(spl, SpellResRef, false);
+
+}
+
+void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
+{
+	if (Type == ST_ACTOR) {
+		((Actor *) this)->SetStance(IE_ANI_CONJURE);
+	}
+
+	if (SpellHeader == -1) {
+		LastTargetPos.empty();
+		return;
+	}
+
+	if (LastTargetPos.isempty()) {
+		SpellHeader = -1;
+		return;
+	}
+
+	CreateProjectile(SpellResRef, 0);
+
+	SpellHeader = -1;
+	LastTarget = 0;
+	LastTargetPos.empty();
+}
+
+void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
+{
+	if (Type == ST_ACTOR) {
+		((Actor *) this)->SetStance(IE_ANI_CONJURE);
+	}
+
+	if (SpellHeader == -1) {
+		LastTarget = 0;
+		return;
+	}
+	if (!LastTarget) {
+		SpellHeader = -1;
+		return;
+	}
+	CreateProjectile(SpellResRef, LastTarget);
+	SpellHeader = -1;
 	LastTarget = 0;
 	LastTargetPos.empty();
 }

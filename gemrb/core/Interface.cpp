@@ -2334,6 +2334,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"CutsceneAreascripts",//51GF_CUTSCENE_AREASCRIPTS
 		"FlexibleWorldmap",   //52GF_FLEXIBLE_WMAP
 		"AutoSearchHidden",   //53GF_AUTOSEARCH_HIDDEN
+		"PSTStateFlags",      //54GF_PST_STATE_FLAGS
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

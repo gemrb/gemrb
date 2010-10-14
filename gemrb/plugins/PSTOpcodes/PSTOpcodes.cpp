@@ -345,11 +345,18 @@ int fx_flash_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0xc3 fx_tint_screen
+//FIXME: implement bit4 which would mean duration
 int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_tint_screen (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
-	core->timer->SetFadeFromColor(10);
-	core->timer->SetFadeToColor(10);
+	int fromTime = fx->DiceSides;
+	int toTime = fx->DiceSides;
+	switch(fx->Parameter2&6) {
+		case 0: toTime = 0; break;
+		case 2: fromTime = 0; break;
+	}
+	core->timer->SetFadeFromColor(fromTime);
+	core->timer->SetFadeToColor(toTime);
 	return FX_NOT_APPLIED;
 }
 

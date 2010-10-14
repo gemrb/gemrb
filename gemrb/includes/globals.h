@@ -136,8 +136,9 @@
 #define  GF_CUTSCENE_AREASCRIPTS	51 //bg1, maybe more
 #define  GF_FLEXIBLE_WMAP               52 //iwd
 #define  GF_AUTOSEARCH_HIDDEN           53 //all except iwd2
+#define  GF_PST_STATE_FLAGS             54 //pst complicates this
 //update this
-#define GF_COUNT 54
+#define GF_COUNT 55
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
