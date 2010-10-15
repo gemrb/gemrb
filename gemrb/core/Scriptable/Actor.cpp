@@ -111,6 +111,8 @@ struct ItemUseType {
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
 static bool pstflags = false;
+//used in many places, but different in engines
+static ieDword state_invisible = STATE_INVISIBLE;
 
 //item animation override array
 struct ItemAnimType {
@@ -1340,6 +1342,11 @@ static void InitActorTables()
 	int i, j;
 
 	pstflags = core->HasFeature(GF_PST_STATE_FLAGS);
+	if (pstflags) {
+		state_invisible=STATE_PST_INVIS;
+	} else {
+		state_invisible=STATE_INVISIBLE;
+	}
 
 	if (core->HasFeature(GF_CHALLENGERATING)) {
 		sharexp=SX_DIVIDE|SX_CR;
@@ -3657,7 +3664,9 @@ bool Actor::ValidTarget(int ga_flags) const
 
 	if (ga_flags&GA_NO_HIDDEN) {
 		if (Modified[IE_AVATARREMOVAL]) return false;
-		if (Modified[IE_EA]>EA_GOODCUTOFF && Modified[IE_STATE_ID]&STATE_INVISIBLE) return false;
+		if (Modified[IE_EA]>EA_GOODCUTOFF && Modified[IE_STATE_ID]&state_invisible) {
+			return false;
+		}
 	}
 
 	if (ga_flags&GA_NO_ALLY) {
@@ -4391,7 +4400,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	//get target
 	Actor *target = area->GetActorByGlobalID(LastTarget);
 
-	if (target && (target->GetStat(IE_STATE_ID)&(STATE_DEAD|STATE_INVISIBLE))) {
+	if (target && (target->GetStat(IE_STATE_ID)&(STATE_DEAD|state_invisible))) {
 		target = NULL;
 	}
 
@@ -4579,7 +4588,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 
 	if (wi) {
 		if (BaseStats[IE_BACKSTABDAMAGEMULTIPLIER] > 1) {
-			if (Modified[IE_STATE_ID] & (ieDword) (STATE_INVISIBLE) || Modified[IE_ALWAYSBACKSTAB]) {
+			if (Modified[IE_STATE_ID] & state_invisible || Modified[IE_ALWAYSBACKSTAB]) {
 				if ( !(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) ) {
 					if (target->Modified[IE_DISABLEBACKSTAB]) {
 						// The backstab seems to have failed
@@ -5060,7 +5069,7 @@ void Actor::Draw(const Region &screen)
 
 	//adjust invisibility for enemies
 	if (Modified[IE_EA]>EA_GOODCUTOFF) {
-		if (State&STATE_INVISIBLE) {
+		if (State&state_invisible) {
 			Trans = 255;
 			NoCircle = 1;
 		}
@@ -6576,11 +6585,7 @@ static EffectRef fx_remove_invisible_state_ref={"ForceVisible",NULL,-1};
 // removes the (normal) invisibility state
 void Actor::CureInvisibility()
 {
-	if (Modified[IE_STATE_ID] & (ieDword) (STATE_INVISIBLE)) {
-		//SetBaseBit(IE_STATE_ID, STATE_INVISIBLE, false);
-		//fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref, 0);
-
-		//this is much closer to what the original engine does here
+	if (Modified[IE_STATE_ID] & state_invisible) {
 		Effect *newfx;
 
 		newfx = EffectQueue::CreateEffect(fx_remove_invisible_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
@@ -6589,7 +6594,7 @@ void Actor::CureInvisibility()
 		delete newfx;
 
 		//not sure, but better than nothing
-		if (! (Modified[IE_STATE_ID]& STATE_INVISIBLE)) {
+		if (! (Modified[IE_STATE_ID]&state_invisible)) {
 			InternalFlags|=IF_BECAMEVISIBLE;
 		}
 	}

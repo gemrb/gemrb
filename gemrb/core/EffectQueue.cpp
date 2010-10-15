@@ -38,9 +38,9 @@ static struct {
 } Opcodes[MAX_EFFECTS];
 
 static int initialized = 0;
-
 static EffectRef *effectnames = NULL;
 static int effectnames_count = 0;
+static int pstflags = false;
 
 bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 {
@@ -223,6 +223,8 @@ bool Init_EffectQueue()
 	if( initialized) {
 		return true;
 	}
+	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
+
 	memset( Opcodes, 0, sizeof( Opcodes ) );
 	for(i=0;i<MAX_EFFECTS;i++) {
 		Opcodes[i].Strref=-1;
@@ -1006,6 +1008,10 @@ static bool check_resistance(Actor* actor, Effect* fx)
 
 	//not resistable (no saves either?)
 	if( fx->Resistance != FX_CAN_RESIST_CAN_DISPEL) {
+		return false;
+	}
+
+	if (pstflags && (actor->GetSafeStat(IE_STATE_ID) & (STATE_ANTIMAGIC) ) ) {
 		return false;
 	}
 
