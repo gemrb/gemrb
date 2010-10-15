@@ -80,6 +80,7 @@ static int *spell_abilities = NULL;
 static ieDword splabcount = 0;
 static int *polymorph_stats = NULL;
 static int polystatcount = 0;
+static bool pstflags = false;
 
 //the original engine stores the colors in sprklclr.2da in a different order
 
@@ -768,6 +769,7 @@ void RegisterCoreOpcodes()
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
 	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
+	pstflags=!!core->HasFeature(GF_PST_STATE_FLAGS);
 	default_spell_hit.SequenceFlags|=IE_VVC_BAM;
 }
 
@@ -1445,7 +1447,11 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	switch (fx->Parameter2) {
 	case 0:
-		STATE_SET( STATE_INVISIBLE );
+		if (pstflags) {
+			STATE_SET( STATE_PST_INVIS );
+		} else {
+			STATE_SET( STATE_INVISIBLE );
+		}
 		STAT_ADD(IE_TOHIT, 4);
 		break;
 	case 1:
@@ -1923,7 +1929,11 @@ int fx_cure_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_invisible_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (!STATE_GET(STATE_NONDET)) {
-		BASE_STATE_CURE( STATE_INVISIBLE | STATE_INVIS2 );
+		if (pstflags) {
+			BASE_STATE_CURE( STATE_PST_INVIS );
+		} else {
+			BASE_STATE_CURE( STATE_INVISIBLE | STATE_INVIS2 );
+		}
 		target->fxqueue.RemoveAllEffects(fx_set_invisible_state_ref);
 	}
 	return FX_NOT_APPLIED;
@@ -3557,7 +3567,11 @@ int fx_force_visible (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_force_visible (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	BASE_STATE_CURE(STATE_INVISIBLE);
+	if (pstflags) {
+		BASE_STATE_CURE(STATE_PST_INVIS);
+	} else {
+		BASE_STATE_CURE(STATE_INVISIBLE);
+	}
 	target->fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref,0);
 	target->fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref,2);
 	return FX_NOT_APPLIED;
@@ -4032,7 +4046,12 @@ int fx_mirror_image_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
-	STATE_SET( STATE_MIRROR );
+	if (pstflags) {
+		STATE_SET( STATE_PST_MIRROR );
+	}
+	else {
+		STATE_SET( STATE_MIRROR );
+	}
 	if (fx->Parameter2) {
 		target->SetSpellState(SS_REFLECTION);
 	} else {
