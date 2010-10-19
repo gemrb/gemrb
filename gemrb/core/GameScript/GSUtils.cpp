@@ -888,7 +888,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		ieDword range = MAX_OPERATING_DISTANCE;
+		//DialogueRange is set in IWD
+		ieDword range = MAX_OPERATING_DISTANCE + speaker->GetBase(IE_DIALOGRANGE);
 		//making sure speaker is the protagonist, player, actor
 		if ( target->InParty == 1) swap = true;
 		else if ( speaker->InParty !=1 && target->InParty) swap = true;
