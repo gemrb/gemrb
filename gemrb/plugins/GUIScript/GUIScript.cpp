@@ -9810,6 +9810,11 @@ bool GUIScript::Init(void)
 		printMessage( "GUIScript", string, RED );
 		return false;
 	}
+
+	// 2.6+ only, so we ignore failures
+	sprintf( string, "sys.dont_write_bytecode = True");
+	PyRun_SimpleString( string );
+
 	char path[_MAX_PATH];
 	char path2[_MAX_PATH];
 
