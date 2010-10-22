@@ -6384,7 +6384,7 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 	if (!map2) {
 		return RuntimeError( "Map not found!" );
 	}
-	int i = game->GetPartySize(true);
+	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor* actor = game->GetPC(i, false);
 		if (!actor->Selected) {
