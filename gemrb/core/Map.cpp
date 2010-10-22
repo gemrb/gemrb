@@ -3492,7 +3492,7 @@ void AreaAnimation::Draw(const Region &screen, Map *area)
 bool Map::ChangeMap(bool day_or_night)
 {
 	//no need of change if the area is not extended night
-	if (! (AreaType&AT_EXTENDED_NIGHT)) return false;
+	if (((AreaType&(AT_DAYNIGHT|AT_EXTENDED_NIGHT))!=(AT_DAYNIGHT|AT_EXTENDED_NIGHT))) return false;
 	//no need of change if the area already has the right tilemap
 	if ((DayNight == day_or_night) && GetTileMap()) return false;
 
@@ -3500,7 +3500,11 @@ bool Map::ChangeMap(bool day_or_night)
 	//no need to open and read the .are file again
 	//using the ARE class for this because ChangeMap is similar to LoadMap
 	//it loads the lightmap and the minimap too, besides swapping the tileset
-	mM->ChangeMap(this, day_or_night);
+	if (!mM->ChangeMap(this, day_or_night) && day_or_night) {
+		printMessage("Map", "Invalid night lightmap, falling back to day lightmap.\n", YELLOW);
+		mM->ChangeMap(this, 0);
+		DayNight = day_or_night;
+	}
 	return true;
 }
 
