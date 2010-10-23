@@ -4635,7 +4635,7 @@ int Interface::CloseCurrentStore()
 	return 0;
 }
 
-Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner)
+Store *Interface::SetCurrentStore(const ieResRef resname, ieDword owner)
 {
 	if ( CurrentStore ) {
 		if ( !strnicmp(CurrentStore->Name, resname, 8) ) {
@@ -4666,7 +4666,7 @@ Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner
 	}
 	strnlwrcpy(CurrentStore->Name, resname, 8);
 	if (owner) {
-		CurrentStore->SetOwner(owner);
+		CurrentStore->SetOwnerID(owner);
 	}
 	return CurrentStore;
 }

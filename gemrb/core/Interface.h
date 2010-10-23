@@ -572,7 +572,7 @@ public:
 	void SetCurrentContainer(Actor *actor, Container *arg, bool flag=false);
 	Store *GetCurrentStore();
 	int CloseCurrentStore();
-	Store *SetCurrentStore(const ieResRef resname, const ieVariable owner);
+	Store *SetCurrentStore(const ieResRef resname, ieDword owner);
 	void SetMouseScrollSpeed(int speed);
 	int GetMouseScrollSpeed();
 	// FIXME: due to Win32 we have to allocate/release all common

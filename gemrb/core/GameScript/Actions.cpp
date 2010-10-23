@@ -5144,7 +5144,7 @@ void GameScript::StartStore( Scriptable* Sender, Action* parameters)
 	if (core->GetCurrentStore() ) {
 		return;
 	}
-	core->SetCurrentStore( parameters->string0Parameter, Sender->GetScriptName());
+	core->SetCurrentStore( parameters->string0Parameter, Sender->GetGlobalID());
 	core->SetEventFlag(EF_OPENSTORE);
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->ReleaseCurrentAction();
@@ -5956,17 +5956,17 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 {
 	bool has_current = false;
 	ieResRef current;
-	ieVariable owner;
+	ieDword owner;
 
 	Store *store = core->GetCurrentStore();
 	if (!store) {
-		store = core->SetCurrentStore(parameters->string0Parameter,NULL);
+		store = core->SetCurrentStore(parameters->string0Parameter, 0);
 	} else {
 		if (strnicmp(store->Name, parameters->string0Parameter, 8) ) {
 			//not the current store, we need some dirty hack
 			has_current = true;
 			strnlwrcpy(current, store->Name, 8);
-			strnuprcpy(owner, store->GetOwner(), 32);
+			owner = store->GetOwnerID();
 		}
 	}
 	store->BuyMarkup = parameters->int0Parameter;

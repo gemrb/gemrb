@@ -150,7 +150,7 @@ public:
 
 	int version;
 	// the scripting name of the owner
-	ieVariable StoreOwner;
+	ieDword StoreOwnerID;
 
 public: //queries
 	int AcceptableItemType(ieDword type, ieDword invflags, bool pc) const;
@@ -167,7 +167,8 @@ public: //queries
 	/** Returns index of item */
 	unsigned int FindItem(const ieResRef item, bool usetrigger) const;
 	const char *GetOwner() const;
-	void SetOwner(const char* name);
+	ieDword GetOwnerID() const;
+	void SetOwnerID(ieDword owner);
 private:
 	/** Finds a mergeable item in the stock, if exact is set, it checks for usage counts too */
 	STOItem *FindItem(CREItem *item, bool exact);

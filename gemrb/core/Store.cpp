@@ -33,12 +33,12 @@
 
 Store::Store(void)
 {
-	HasTriggers=false;
-	purchased_categories=NULL;
-	drinks=NULL;
-	cures=NULL;
-	version=0;
-	StoreOwner[0]=0;
+	HasTriggers = false;
+	purchased_categories = NULL;
+	drinks = NULL;
+	cures = NULL;
+	version = 0;
+	StoreOwnerID = 0;
 }
 
 Store::~Store(void)
@@ -272,12 +272,12 @@ void Store::RemoveItem( unsigned int idx )
 	ItemsCount--;
 }
 
-const char *Store::GetOwner() const
+ieDword Store::GetOwnerID() const
 {
-	return StoreOwner;
+	return StoreOwnerID;
 }
 
-void Store::SetOwner(const char *name)
+void Store::SetOwnerID(ieDword owner)
 {
-	strnuprcpy(StoreOwner, name, 32);
+	StoreOwnerID = owner;
 }

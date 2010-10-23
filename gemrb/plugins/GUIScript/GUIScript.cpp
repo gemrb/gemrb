@@ -5711,6 +5711,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "StoreCureCount", PyInt_FromLong( store->CuresCount ));
 	PyDict_SetItemString(dict, "StoreItemCount", PyInt_FromLong( store->GetRealStockSize() ));
 	PyDict_SetItemString(dict, "StoreCapacity", PyInt_FromLong( store->Capacity ));
+	PyDict_SetItemString(dict, "StoreOwner", PyInt_FromLong( store->GetOwnerID() ));
 	PyObject* p = PyTuple_New( 4 );
 
 	int i;
@@ -8812,10 +8813,10 @@ PyDoc_STRVAR( GemRB_ApplySpell__doc,
 
 static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID;
+	int PartyID, casterID = 0;
 	const char *spell;
 
-	if (!PyArg_ParseTuple( args, "is", &PartyID, &spell )) {
+	if (!PyArg_ParseTuple( args, "is|i", &PartyID, &spell, &casterID )) {
 		return AttributeError( GemRB_ApplySpell__doc );
 	}
 
@@ -8827,7 +8828,11 @@ static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
-	core->ApplySpell(spell, actor, actor, 0);
+	Actor *caster = game->GetCurrentArea()->GetActorByGlobalID(casterID);
+	if (!caster) caster = game->GetActorByGlobalID(casterID);
+	if (!caster) caster = actor;
+
+	core->ApplySpell(spell, actor, caster, 0);
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -9249,7 +9254,8 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 	if (!map) {
 		return RuntimeError( "No area loaded!" );
 	}
-	Actor* owner = map->GetActor( store->GetOwner(), 0 );
+	Actor* owner = map->GetActorByGlobalID( store->GetOwnerID() );
+	if (!owner) owner = game->GetActorByGlobalID( store->GetOwnerID() );
 	if (!owner) {
 		printMessage("GUIScript", "No owner found!", YELLOW );
 		Py_INCREF( Py_None );
