@@ -314,6 +314,10 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	XP = GemRB.GetPlayerStat (pc, IE_XP)
 	LevelDrain = GS (IE_LEVELDRAIN)
 
+	if GS (IE_STATE_ID) & STATE_DEAD:
+		stats.append ( (11829,1,'c') ) # DEAD
+		stats.append (None)
+
 	if Multi[0] > 1: # we're multiclassed
 		print "\tMulticlassed"
 		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), GemRB.GetPlayerStat (pc, IE_LEVEL2), GemRB.GetPlayerStat (pc, IE_LEVEL3)]
