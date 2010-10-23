@@ -202,6 +202,23 @@ Actor* Game::FindNPC(const char *scriptingname)
 	return NULL;
 }
 
+Actor *Game::GetActorByGlobalID(unsigned int objectID)
+{
+  unsigned int slot;
+
+	for (slot=0; slot<PCs.size(); slot++) {
+		if (PCs[slot]->GetGlobalID()==objectID ) {
+			return PCs[slot];
+		}
+	}
+	for (slot=0; slot<NPCs.size(); slot++) {
+		if (NPCs[slot]->GetGlobalID()==objectID ) {
+			return NPCs[slot];
+		}
+	}
+	return NULL;
+}
+
 Actor* Game::GetPC(unsigned int slot, bool onlyalive)
 {
 	if (slot >= PCs.size()) {
@@ -1773,7 +1790,7 @@ void Game::DebugDump()
 		printf("Name: %s Order %d %s\n",actor->ShortName, actor->InParty, actor->Selected?"x":"-");
 	}
 }
-
+/*
 Actor *Game::GetActorByGlobalID(ieWord objectID)
 {
 	size_t mc = GetLoadedMapCount();
@@ -1784,4 +1801,4 @@ Actor *Game::GetActorByGlobalID(ieWord objectID)
 	}
 	return NULL;
 }
-
+*/

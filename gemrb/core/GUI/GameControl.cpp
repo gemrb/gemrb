@@ -796,7 +796,6 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				for (i = 0; i < game->selected.size(); i++) {
 					Actor* actor = game->selected[i];
 					MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, p, -1, true);
-					printf( "Teleported to %d, %d\n", p.x, p.y );
 				}
 				break;
 
@@ -873,7 +872,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor = area->GetActor( p, GA_DEFAULT);
 				}
 				if (lastActor) {
-					Effect *fx = EffectQueue::CreateEffect(heal_ref, lastActor->GetBase(IE_MAXHITPOINTS), 0x30001, FX_DURATION_INSTANT_PERMANENT);
+					Effect *fx = EffectQueue::CreateEffect(heal_ref, lastActor->GetStat(IE_MAXHITPOINTS), 0x30001, FX_DURATION_INSTANT_PERMANENT);
 					if (fx) {
 						core->ApplyEffect(fx, lastActor, lastActor);
 					}
@@ -926,7 +925,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 						//correctly (synchronisation)
 						lastActor->ClearActions();
 						lastActor->ClearPath();
-	
+
 						Effect *newfx;
 						newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
 						core->ApplyEffect(newfx, lastActor, lastActor);
@@ -1826,6 +1825,14 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	}
 
 	if (!game->selected.size()) {
+		//TODO: this is a hack, we need some restructuring here
+		//handling the special case when no one was selected, and
+		//the player clicks on a partymember
+		if (actor->GetStat(IE_EA)<EA_CHARMED) {
+			if (target_mode==TARGET_MODE_NONE) {
+				PerformActionOn(actor);
+			}
+		}
 		return;
 	}
 

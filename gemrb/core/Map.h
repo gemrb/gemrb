@@ -353,8 +353,8 @@ public:
 	//get the next saved projectile
 	Projectile* GetNextTrap(proIterator &iter);
 	//add a projectile to the area
+	void AddProjectile(Projectile* pro, const Point &source, ieWord actorID, bool fake);
 	void AddProjectile(Projectile* pro, const Point &source, const Point &dest);
-	void AddProjectile(Projectile* pro, const Point &source, ieWord actorID);
 
 	//returns the duration of a VVC cell set in the area (point may be set to empty)
 	ieDword HasVVCCell(const ieResRef resource, const Point &p);

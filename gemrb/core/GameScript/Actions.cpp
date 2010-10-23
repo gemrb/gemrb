@@ -1713,7 +1713,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 
 //pst and bg2 can play a song designated by index
 //actually pst has some extra params not currently implemented
-//switchplaylist implements fade by simply scheduling the next 
+//switchplaylist implements fade by simply scheduling the next
 //music after the currently running one
 //FIXME: This code is similar to PlayAreaSong, consider refactoring
 void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
@@ -2568,7 +2568,15 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 	}
 
 	//parse target
-	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
+	int seeflag;
+	unsigned int dist = GetSpellDistance(spellres, Sender);
+	if (dist == 0xffffffff) {
+		seeflag = 0;
+	} else {
+		seeflag = GA_NO_DEAD;
+	}
+
+	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2577,12 +2585,12 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 	if(Sender->Type==ST_ACTOR) {
 		Actor *act = (Actor *) Sender;
 
-		unsigned int dist = GetSpellDistance(spellres, act);
-
 		//move near to target
-		if (PersonalDistance(tar, Sender) > dist) {
-			MoveNearerTo(Sender,tar,dist);
-			return;
+		if (dist != 0xfffffff) {
+			if (PersonalDistance(tar, Sender) > dist) {
+				MoveNearerTo(Sender,tar,dist);
+				return;
+			}
 		}
 
 		//face target
@@ -2622,10 +2630,9 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 	}
 
 	if(Sender->Type==ST_ACTOR) {
+		unsigned int dist = GetSpellDistance(spellres, Sender);
+
 		Actor *act = (Actor *) Sender;
-
-		unsigned int dist = GetSpellDistance(spellres, act);
-
 		//move near to target
 		if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
 			MoveNearerTo(Sender,parameters->pointParameter,dist, 0);
@@ -4306,7 +4313,7 @@ void GameScript::FillSlot(Scriptable *Sender, Action* parameters)
 
 		//reequip original item
 		if(actor->inventory.AddSlotItem(tmp, slot)!=ASI_SUCCESS) {
-			delete tmp;    
+			delete tmp;
 		}
 	}
 }
@@ -5156,7 +5163,7 @@ void GameScript::AddSpecialAbility( Scriptable* Sender, Action* parameters)
 }
 
 //actually this just depletes a spell, doesn't remove it from the book
-//GemRB extension: the first/second int parameter can also make it removed 
+//GemRB extension: the first/second int parameter can also make it removed
 //from the spell memorization schedule (also from the spellbook)
 void GameScript::RemoveSpell( Scriptable* Sender, Action* parameters)
 {
@@ -6624,7 +6631,7 @@ void GameScript::Follow(Scriptable* Sender, Action* parameters)
 
 	char Tmp[256];
 
-	snprintf(Tmp, 256, "MoveToPointNoRecticle([%d.%d])", parameters->pointParameter.x, parameters->pointParameter.y);  	
+	snprintf(Tmp, 256, "MoveToPointNoRecticle([%d.%d])", parameters->pointParameter.x, parameters->pointParameter.y);
 	Action *newact = GenerateAction(Tmp);
 	Sender->AddAction(newact);
 }

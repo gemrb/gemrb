@@ -618,7 +618,7 @@ void Scriptable::AddTrigger(ieDword *actorref)
 
 static EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
 
-void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt)
+void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool fake)
 {
 	Spell* spl = gamedata->GetSpell( SpellResRef );
 
@@ -646,9 +646,9 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt)
 		}
 
 		if (tgt) {
-			GetCurrentArea()->AddProjectile(pro, origin, LastTarget);
+			area->AddProjectile(pro, origin, LastTarget, fake);
 		} else {
-			GetCurrentArea()->AddProjectile(pro, origin, LastTargetPos);
+			area->AddProjectile(pro, origin, LastTargetPos);
 		}
 	}
 
@@ -664,6 +664,9 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt)
 		const char* spell = core->GetString(spl->SpellName);
 		if (LastTarget) {
 			target = area->GetActorByGlobalID(LastTarget);
+			if (!target) {
+				target=core->GetGame()->GetActorByGlobalID(LastTarget);
+			}
 		}
 		if (stricmp(spell, "")) {
 			if (target) {
@@ -724,7 +727,7 @@ void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 		return;
 	}
 
-	CreateProjectile(SpellResRef, 0);
+	CreateProjectile(SpellResRef, 0, false);
 
 	SpellHeader = -1;
 	LastTarget = 0;
@@ -745,7 +748,8 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 		SpellHeader = -1;
 		return;
 	}
-	CreateProjectile(SpellResRef, LastTarget);
+	//if the projectile doesn't need to follow the target, then use the target position
+	CreateProjectile(SpellResRef, LastTarget, GetSpellDistance(SpellResRef, this)==0xffffffff);
 	SpellHeader = -1;
 	LastTarget = 0;
 	LastTargetPos.empty();

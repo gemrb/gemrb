@@ -314,21 +314,18 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 	if (!oC) {
 		return NULL;
 	}
+	Game *game = core->GetGame();
 	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, ga_flags);
 	if (tgts) {
 		//now this could return other than actor objects
 		aC = tgts->GetTarget(0,-1);
 		delete tgts;
-		/*if (!aC && (ga_flags&GA_GLOBAL) )
-		{
-			tgts = GetAllObjectsNearby(Sender, oC, ga_flags);
-			if (tgts) {
-				//now this could return other than actor objects
-				aC = tgts->GetTarget(0,-1);
-				delete tgts;
-			}
-		}*/
-		return aC;
+		if (aC || oC->objectFields[0]!=-1) {
+			return aC;
+		}
+
+		//global actors are always found by object ID!
+		return game->GetActorByGlobalID(oC->objectFields[1]);
 	}
 
 	if (oC->objectName[0]) {
@@ -340,7 +337,6 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 				return aC;
 			}
 		}
-		Game *game = core->GetGame();
 
 		//global actors are always found by scripting name!
 		aC = game->FindPC(oC->objectName);
@@ -351,18 +347,6 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 		if (aC) {
 			return aC;
 		}
-
-		/*if (ga_flags&GA_GLOBAL) {
-			size_t mc = game->GetLoadedMapCount();
-			while(mc--) {
-				Map *map = game->GetMap(mc);
-				if (map==Sender->GetCurrentArea()) continue;
-				aC = GetActorObject(map->GetTileMap(), oC->objectName);
-				if (aC) {
-					return aC;
-				}
-			}
-		}*/
 	}
 	return NULL;
 }

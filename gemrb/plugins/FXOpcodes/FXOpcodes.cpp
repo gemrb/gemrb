@@ -858,6 +858,23 @@ inline Scriptable *GetCaster(Scriptable *Owner, Effect *fx) {
 	return NULL;
 }
 
+//resurrect code used in many places
+void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
+{
+	Scriptable *caster = GetCaster(Owner, fx);
+	if (!caster) {
+		caster = Owner; // IE stores the enemyally in the effect instead
+	}
+	Map *area = caster->GetCurrentArea();
+
+	if (area && target->GetCurrentArea()!=area) {
+	   	MoveBetweenAreasCore(target, area->GetScriptName(), p, fx->Parameter2, true);
+	}
+	target->Resurrect();
+	
+}
+
+
 // handles the percentage damage spread over time by converting it to absolute damage
 inline void HandlePercentageDamage(Effect *fx, Actor *target) {
 	if (fx->Parameter2 == RPD_PERCENT && fx->FirstApply) {
@@ -1358,12 +1375,13 @@ int fx_set_hasted_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x11 CurrentHPModifier
-int fx_current_hp_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_current_hp_modifier (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_current_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	if (fx->Parameter2&0x10000) {
-		target->Resurrect();
+		Point p(fx->PosX, fx->PosY);
+		Resurrect(Owner, target, fx, p);
 	}
 	if (fx->Parameter2&0x20000) {
 		target->fxqueue.RemoveAllNonPermanentEffects();
@@ -1373,7 +1391,15 @@ int fx_current_hp_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	target->NewBase( IE_HITPOINTS, fx->Parameter1, fx->Parameter2&0xffff);
+	//current hp percent is relative to modified max hp
+	switch(fx->Parameter2&0xffff) {
+	case MOD_ADDITIVE:
+	case MOD_ABSOLUTE:
+		target->NewBase( IE_HITPOINTS, fx->Parameter1, fx->Parameter2&0xffff);
+		break;
+	case MOD_PERCENT:
+		target->NewBase( IE_HITPOINTS, target->GetSafeStat(IE_MAXHITPOINTS)*fx->Parameter1/100, MOD_ABSOLUTE);
+	}
 	//never stay permanent
 	return FX_NOT_APPLIED;
 }
@@ -1385,6 +1411,10 @@ int fx_current_hp_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_maximum_hp_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_maximum_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	if (STATE_GET( STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
 
 	bool base = fx->TimingMode==FX_DURATION_INSTANT_PERMANENT;
 
@@ -1669,11 +1699,11 @@ int fx_magic_damage_resistance_modifier (Scriptable* /*Owner*/, Actor* target, E
 }
 
 // 0x20 Cure:Death
-int fx_cure_dead_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_cure_dead_state (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_dead_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	//someone should clear the internal flags related to death
-	target->Resurrect();
+	Point p(fx->PosX, fx->PosY);
+	Resurrect(Owner, target, fx, p);
 	return FX_NOT_APPLIED;
 }
 
@@ -3854,7 +3884,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		case 2:
 			detecttraps = false;
 		default:
-                       	//automatic find traps
+			//automatic find traps
 			skill = 256;
 			break;
 	}
@@ -4939,7 +4969,7 @@ int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xdc DispelSchool
 int fx_dispel_school (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-  ieResRef Removed;
+	ieResRef Removed;
 
 	if (0) printf( "fx_dispel_school (%2d): Level: %d Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSCHOOL, fx->Parameter2);
@@ -4948,7 +4978,7 @@ int fx_dispel_school (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xdd DispelSecondaryType
 int fx_dispel_secondary_type (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-  ieResRef Removed;
+	ieResRef Removed;
 
 	if (0) printf( "fx_dispel_secondary_type (%2d): Level: %d Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSECTYPE, fx->Parameter2);
@@ -4966,7 +4996,7 @@ int fx_teleport_field (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	//the origin is the effect's target point
 	Point p(fx->PosX+core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1)),
-	        fx->PosY+core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1)) );
+		fx->PosY+core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1)) );
 
 	target->SetPosition( p, true, 0);
 	return FX_NOT_APPLIED;
@@ -5176,7 +5206,6 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_contingency (%2d): Level: %d, Count: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-printf("Check source:%s\n", fx->Source);
 	if (target->fxqueue.HasEffectWithSource(fx_contingency_ref, fx->Source)) {
 		displaymsg->DisplayConstantStringName(STR_CONTDUP, 0xf0f0f0, target);
 		return FX_NOT_APPLIED;
@@ -5565,7 +5594,6 @@ static EffectRef fx_spell_sequencer_active_ref={"Sequencer:Store",NULL,-1};
 int fx_create_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_spell_sequencer (%2d): Level: %d, Count: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-printf("Check source:%s\n", fx->Source);
 	if (target->fxqueue.HasEffectWithSource(fx_spell_sequencer_active_ref, fx->Source)) {
 		displaymsg->DisplayConstantStringName(STR_SEQDUP, 0xf0f0f0, target);
 		return FX_NOT_APPLIED;
@@ -6196,16 +6224,17 @@ int fx_always_backstab_modifier (Scriptable* /*Owner*/, Actor* target, Effect* f
 }
 
 // 0x130 MassRaiseDead
-int fx_mass_raise_dead (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_mass_raise_dead (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_mass_raise_dead (%2d)\n", fx->Opcode );
 
 	Game *game=core->GetGame();
 
 	int i=game->GetPartySize(false);
+	Point p(fx->PosX,fx->PosY);
 	while (i--) {
 		Actor *actor=game->GetPC(i,false);
-		actor->Resurrect();
+		Resurrect(Owner, actor, fx, p);
 	}
 	return FX_NOT_APPLIED;
 }

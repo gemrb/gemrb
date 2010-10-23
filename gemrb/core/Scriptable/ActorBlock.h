@@ -280,7 +280,7 @@ private:
 	/* used internally to handle start of spellcasting */
 	int SpellCast(const ieResRef SpellResRef, bool instant);
 	/* also part of the spellcasting process, creating the projectile */
-	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt);
+	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool fake);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {

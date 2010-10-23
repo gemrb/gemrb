@@ -567,7 +567,7 @@ int fx_ac_vs_damage_type_modifier_iwd2 (Scriptable* /*Owner*/, Actor* target, Ef
 		HandleBonus(target, IE_ARMORCLASS, fx->Parameter1, fx->TimingMode);
 		break;
 	case 1: //armor
-	 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 			if (BASE_GET( IE_ARMORCLASS) > fx->Parameter1) {
 				BASE_SET( IE_ARMORCLASS, fx->Parameter1 );
 			}
@@ -704,7 +704,8 @@ int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx)
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(0x1001+fx->Parameter2);
 	pro->SetCaster(Owner->GetGlobalID());
 	if (target) {
-		map->AddProjectile( pro, pos, target->GetGlobalID());
+		//i believe the spell hit projectiles don't follow anyone
+		map->AddProjectile( pro, pos, target->GetGlobalID(), true);
 	} else {
 		map->AddProjectile( pro, pos, pos);
 	}
@@ -1398,7 +1399,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 
 	int real = core->Roll(1,cnt,-1);
 	const char *resrefs[2]={tab->QueryField((unsigned int) 0,0), tab->QueryField((int) 0,1) };
-	
+
 	for (int i=0;i<cnt;i++) {
 		Point p(strtol(tab->QueryField(i+1,0),NULL,0), strtol(tab->QueryField(i+1,1), NULL, 0));
 		core->SummonCreature(resrefs[real!=i], fx->Resource2, Owner,
@@ -1518,7 +1519,7 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//how style (probably better would be to provide effcof.spl)
- 	Effect *newfx = EffectQueue::CreateEffect(fx_umberhulk_gaze_ref, 0,
+	Effect *newfx = EffectQueue::CreateEffect(fx_umberhulk_gaze_ref, 0,
 		8, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Power = fx->Power;
 
@@ -2623,7 +2624,7 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//bit 1 repeat or only once
 	if (fx->Parameter2&AE_REPEAT) {
-		 return FX_APPLIED;
+		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2816,7 +2817,7 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 	//create projectile from known spellheader
 	//cannot get the projectile from the spell
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
-	
+
 	if (pro) {
 		Point p(fx->PosX, fx->PosY);
 
@@ -2824,7 +2825,7 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 		Point origin(fx->PosX, fx->PosY);
 		pro->SetCaster(Owner->GetGlobalID());
 		if (target) {
-			map->AddProjectile( pro, origin, target->GetGlobalID());
+			map->AddProjectile( pro, origin, target->GetGlobalID(), false);
 		} else {
 			map->AddProjectile( pro, origin, origin);
 		}
@@ -2930,7 +2931,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	else if (check_iwd_targeting(Owner, target, 0, 84)) penalty = 2; //duergar
 	else penalty = 0;
 
- 	STAT_ADD(IE_SAVEFORTITUDE, penalty);
+	STAT_ADD(IE_SAVEFORTITUDE, penalty);
 	STAT_ADD(IE_SAVEREFLEX, penalty);
 	STAT_ADD(IE_SAVEWILL, penalty);
 	//for compatibility reasons
@@ -2945,7 +2946,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_damage_reduction (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_damage_reduction (%2d) Amount: %d\n", fx->Opcode, fx->Parameter2);
- 	STAT_SET(IE_RESISTSLASHING, fx->Parameter2*5);
+	STAT_SET(IE_RESISTSLASHING, fx->Parameter2*5);
 	STAT_SET(IE_RESISTCRUSHING, fx->Parameter2*5);
 	STAT_SET(IE_RESISTPIERCING, fx->Parameter2*5);
 	return FX_APPLIED;

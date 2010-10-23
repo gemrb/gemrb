@@ -383,6 +383,8 @@ Actor::Actor()
 	InteractCount = 0; //numtimesinteracted depends on this
 	appearance = 0xffffff; //might be important for created creatures
 	RemovalTime = ~0;
+	HomeLocation.x = 0;
+	HomeLocation.y = 0;
 	version = 0;
 	//these are used only in iwd2 so we have to default them
 	for(i=0;i<7;i++) {
@@ -862,18 +864,14 @@ void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 
 void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
-	if ((signed) actor->BaseStats[IE_HITPOINTS]>(signed) actor->Modified[IE_MAXHITPOINTS]) {
-		actor->BaseStats[IE_HITPOINTS]=actor->Modified[IE_MAXHITPOINTS];
+  int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
+	if ((signed) hp>maxhp) {
+		hp=maxhp;
 	}
 
-	int hptmp = (signed) actor->Modified[IE_MAXHITPOINTS];
-	if ((signed) hp>hptmp) {
-		hp=hptmp;
-	}
-
-	hptmp = (signed) actor->Modified[IE_MINHITPOINTS];
-	if (hptmp && (signed) hp<hptmp) {
-		hp=hptmp;
+	int minhp = (signed) actor->GetSafeStat(IE_MINHITPOINTS);
+	if (minhp && (signed) hp<minhp) {
+		hp=minhp;
 	}
 	if ((signed) hp<=0) {
 		actor->Die(NULL);
@@ -2319,9 +2317,9 @@ void Actor::RefreshPCStats() {
 
 	//we still apply the maximum bonus to dead characters, but don't apply
 	//to current HP, or we'd have dead characters showing as having hp
-	//Modified[IE_MAXHITPOINTS]+=bonus;
-	//if(BaseStats[IE_STATE_ID]&STATE_DEAD)
-	//	bonus = 0;
+	Modified[IE_MAXHITPOINTS]+=bonus;
+//	if(BaseStats[IE_STATE_ID]&STATE_DEAD)
+//		bonus = 0;
 //	BaseStats[IE_HITPOINTS]+=bonus;
 
 	// apply the intelligence and wisdom bonus to lore
@@ -3168,7 +3166,9 @@ void Actor::Resurrect()
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_MORALE, 10);
-	SetBase(IE_HITPOINTS, BaseStats[IE_MAXHITPOINTS]);
+	//resurrect spell sets the hitpoints to maximum in a separate effect
+	//raise dead leaves it at 1 hp
+	SetBase(IE_HITPOINTS, 1);
 	ClearActions();
 	ClearPath();
 	SetStance(IE_ANI_EMERGE);
@@ -4834,7 +4834,7 @@ void Actor::Heal(int days)
 	if (days) {
 		SetBase(IE_HITPOINTS, BaseStats[IE_HITPOINTS]+days*2);
 	} else {
-		SetBase(IE_HITPOINTS, BaseStats[IE_MAXHITPOINTS]);
+		SetBase(IE_HITPOINTS, Modified[IE_MAXHITPOINTS]);
 	}
 }
 
@@ -5165,7 +5165,7 @@ void Actor::Draw(const Region &screen)
 		//If you find a better place for it, I'll really be glad to put it there
 		//IN BG1 and BG2, this is at the ninth frame...
 		if(attackProjectile && (anims[0]->GetCurrentFrame() == 8/*anims[0]->GetFramesCount()/2*/)) {
-			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget);
+			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
 			attackProjectile = NULL;
 		}
 		if (nextFrame && lastFrame != nextFrame) {
@@ -5843,7 +5843,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 			delete AttackEffect;
 			attackProjectile = pro;
 		} else //launch it now as we are not attacking
-			GetCurrentArea()->AddProjectile(pro, Pos, tar->globalID);
+			GetCurrentArea()->AddProjectile(pro, Pos, tar->globalID, false);
 		return true;
 	}
 	return false;

@@ -286,6 +286,7 @@ public:
 	int LastDamageType;//lasthitter
 	ieDword LastTurner;
 	Point FollowOffset;//follow lastfollowed at this offset
+	Point HomeLocation;//spawnpoint, return here after rest
 
 	class Door *TargetDoor;
 

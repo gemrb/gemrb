@@ -128,8 +128,8 @@ GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context, bool *valid = NULL);
 Action* GenerateActionCore(const char *src, const char *str, int acIndex);
 Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
-unsigned int GetSpellDistance(ieResRef spellres, Actor *actor);
-unsigned int GetItemDistance(ieResRef itemres, int header);
+unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender);
+unsigned int GetItemDistance(const ieResRef itemres, int header);
 void SetupWishCore(Scriptable *Sender, int column, int picks);
 Gem_Polygon *GetPolygon2DA(ieDword index);
 

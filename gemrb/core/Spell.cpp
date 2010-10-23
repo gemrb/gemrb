@@ -159,34 +159,45 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, const Point &targ
 //get the casting distance of the spell
 //it depends on the casting level of the actor
 //if actor isn't given, then the first header is used
-unsigned int Spell::GetCastingDistance(Actor *actor) const
+unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 {
 	int level = 0;
-	if(actor) {
-		if(SpellType==IE_SPL_WIZARD) {
+	Actor *actor = NULL;
+	if (Sender && Sender->Type==ST_ACTOR) {
+		actor = (Actor *) Sender;
+	}
+
+	if (actor) {
+		if (SpellType==IE_SPL_WIZARD) {
 			level = actor->GetMageLevel();
 			if (!level) level = actor->GetSorcererLevel();
 			if (!level) level = actor->GetBardLevel();
 			if (!level) level = actor->GetStat(IE_LEVEL);
 			level+=actor->GetStat(IE_CASTINGLEVELBONUSMAGE);
 		}
-		else if(SpellType==IE_SPL_PRIEST) {
+		else if (SpellType==IE_SPL_PRIEST) {
 			level = actor->GetClericLevel();
 			if (!level) level = actor->GetDruidLevel();
 			if (!level) level = actor->GetPaladinLevel();
 			if (!level) level = actor->GetRangerLevel();
 			if (!level) level = actor->GetStat(IE_LEVEL);
-			level+=actor->GetStat(IE_CASTINGLEVELBONUSCLERIC);
+			level += actor->GetStat(IE_CASTINGLEVELBONUSCLERIC);
 		}
 	}
 
-	if(level<1) level=1;
+	if (level<1) {
+		level = 1;
+	}
 	int idx = GetHeaderIndexFromLevel(level);
 	SPLExtHeader *seh = GetExtHeader(idx);
 	if (!seh) {
 		printMessage("Spell", "Cannot retrieve spell header!!! ",RED);
 		printf("required header: %d, maximum: %d\n", idx, (int) ExtHeaderCount);
 		return 0;
+	}
+
+	if (seh->Target==TARGET_DEAD) {
+		return 0xffffffff;
 	}
 	return (unsigned int) seh->Range;
 }

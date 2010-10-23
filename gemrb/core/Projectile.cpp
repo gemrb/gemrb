@@ -252,7 +252,11 @@ void Projectile::CreateIteration()
 	Projectile *pro = server->GetProjectileByIndex(type-1);
 	pro->SetEffectsCopy(effects);
 	pro->SetCaster(Caster);
-	area->AddProjectile(pro, Pos, Target);
+	if (FakeTarget) {
+		area->AddProjectile(pro, Pos, FakeTarget, true);
+	} else {
+		area->AddProjectile(pro, Pos, Target, false);
+	}
 
 	// added by fuzzie, to make magic missiles instant, maybe wrong place
 	pro->Setup();
@@ -444,8 +448,19 @@ void Projectile::Payload()
 	} else {
 		//the target will be the original caster
 		//in case of single point area target (dimension door)
-		target = area->GetActorByGlobalID(Caster);
-		if (target) {
+		if (FakeTarget) {
+			target = area->GetActorByGlobalID(FakeTarget);
+			if (!target) {
+				target = core->GetGame()->GetActorByGlobalID(FakeTarget);
+			}
+		} else {
+			target = area->GetActorByGlobalID(Caster);
+			
+		}
+		Actor *source = area->GetActorByGlobalID(Caster);
+		if (source) {
+			effects->SetOwner(source);
+		} else {
 			effects->SetOwner(target);
 		}
 	}
@@ -694,10 +709,19 @@ void Projectile::SetTarget(const Point &p)
 	NextTarget(p);
 }
 
-void Projectile::SetTarget(ieDword tar)
+void Projectile::SetTarget(ieDword tar, bool fake)
 {
-	Target = tar;
-	Actor *target = area->GetActorByGlobalID(tar);
+	Actor *target = NULL;
+
+	if (fake) {
+		Target = 0;
+		FakeTarget = tar;
+		return;
+	} else {
+		Target = tar;
+		target = area->GetActorByGlobalID(tar);
+	}
+	 
 	if (!target) {
 		phase = P_EXPIRED;
 		return;
@@ -753,7 +777,7 @@ int Projectile::CalculateTargetFlag()
 	case PAF_ENEMY:
 		flags|=GA_NO_NEUTRAL|GA_NO_ALLY;
 		break;
-	case PAF_PARTY:        //this doesn't exist in IE
+	case PAF_PARTY: //this doesn't exist in IE
 		flags|=GA_NO_ENEMY;
 		break;
 	case PAF_TARGET:
@@ -899,7 +923,9 @@ void Projectile::SecondaryTarget()
 		Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
 		pro->SetEffectsCopy(effects);
 		pro->SetCaster(Caster);
-		area->AddProjectile(pro, Pos, Target);
+		//TODO:actually some of the splash projectiles are a good example of faketarget
+		//projectiles (that don't follow the target, but still hit)
+		area->AddProjectile(pro, Pos, Target, false);
 		poi++;
 		fail=false;
 
@@ -940,7 +966,7 @@ int Projectile::Update()
 	}
 	//recreate path if target has moved
 	if(Target) {
-		SetTarget(Target);
+		SetTarget(Target, false);
 	}
 
 	if (phase == P_TRAVEL) {
@@ -1034,7 +1060,7 @@ void Projectile::DrawExplosion(const Region &screen)
 	//Line targets are actors between source and destination point
 	if(ExtFlags&PEF_LINE) {
 		if (Target) {
-			SetTarget(Target);
+			SetTarget(Target, false);
 		}
 		LineTarget();
 	}
@@ -1108,7 +1134,7 @@ void Projectile::DrawExplosion(const Region &screen)
 			//more sprites if the whole area needs to be filled
 			if (apflags&APF_FILL) child_size*=2;
 			if (apflags&APF_SPREAD) child_size*=2;
-			if (apflags&APF_BOTH) child_size/=2;  //intentionally decreases
+			if (apflags&APF_BOTH) child_size/=2; //intentionally decreases
 			if (apflags&APF_MORE) child_size*=2;
 			children = (Projectile **) calloc(sizeof(Projectile *), child_size);
 		}
@@ -1325,9 +1351,9 @@ void Projectile::DrawTravel(const Region &screen)
 		//printf("id %d, travelled %f, angle %f\n", id, travelled, arc_angle);
 
 		// calculate the distance between the arc and the current pos
-		//  (this could use travelled and a larger constant multiplier,
-		//  to make the arc size fixed rather than relative to the total
-		//  distance to travel)
+		// (this could use travelled and a larger constant multiplier,
+		// to make the arc size fixed rather than relative to the total
+		// distance to travel)
 		double length_of_normal = travelled_distance * sin(arc_angle) * 0.3 * ((id / 2) + 1);
 		if (id % 2) length_of_normal = -length_of_normal;
 

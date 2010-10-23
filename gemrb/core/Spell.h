@@ -163,7 +163,7 @@ public:
 	void AddCastingGlow(EffectQueue *fxqueue, ieDword duration);
 	//returns a projectile created from an extended header
 	Projectile *GetProjectile(Scriptable *self, int headerindex, const Point &pos) const;
-	unsigned int GetCastingDistance(Actor *actor) const;
+	unsigned int GetCastingDistance(Scriptable *Sender) const;
 };
 
 #endif  // ! SPELL_H

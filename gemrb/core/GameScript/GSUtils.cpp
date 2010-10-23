@@ -212,11 +212,11 @@ void ResolveSpellName(ieResRef spellres, ieDword number)
 {
 	//resolve spell
 	unsigned int type = number/1000;
-	 int spellid = number%1000;
-	 if (type>4) {
-		 type=0;
-	 }
-	 sprintf(spellres, "%s%03d", spell_suffices[type], spellid);
+	int spellid = number%1000;
+	if (type>4) {
+		type=0;
+	}
+	sprintf(spellres, "%s%03d", spell_suffices[type], spellid);
 }
 
 ieDword ResolveSpellNumber(const ieResRef spellres)
@@ -395,7 +395,7 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 			actor->ResolveStringConstant( sb.Sound, (unsigned int) Strref);
 			if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
 				snprintf(Sound, _MAX_PATH, "%s/%s",
-					 actor->PCStats->SoundFolder, sb.Sound);
+					actor->PCStats->SoundFolder, sb.Sound);
 			} else {
 				memcpy(Sound, sb.Sound, sizeof(ieResRef) );
 			}
@@ -2182,8 +2182,9 @@ Point GetEntryPoint(const char *areaname, const char *entryname)
 	return p;
 }
 
-/* returns a spell's casting distance, it depends on the caster */
-unsigned int GetSpellDistance(ieResRef spellres, Actor *actor)
+/* returns a spell's casting distance, it depends on the caster (level), and targeting mode too
+   the used header is calculated from the caster level */
+unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
 {
 	unsigned int dist;
 
@@ -2193,13 +2194,20 @@ unsigned int GetSpellDistance(ieResRef spellres, Actor *actor)
 		printf("Spell couldn't be found:%.8s.\n", spellres);
 		return 0;
 	}
-	dist=spl->GetCastingDistance(actor);
+	dist = spl->GetCastingDistance(Sender);
+	//make possible special return values (like 0xffffffff means the spell doesn't need distance)
+	//this is used with special targeting mode (3)
+	if (dist>0xff000000) {
+		return dist;
+	}
+
 	gamedata->FreeSpell(spl, spellres, false);
 	return dist*15;
 }
 
-/* returns a spell's casting distance, it depends on the caster */
-unsigned int GetItemDistance(ieResRef itemres, int header)
+/* returns an item's casting distance, it depends on the used header, and targeting mode too
+   the used header is explictly given */
+unsigned int GetItemDistance(const ieResRef itemres, int header)
 {
 	unsigned int dist;
 
@@ -2210,6 +2218,12 @@ unsigned int GetItemDistance(ieResRef itemres, int header)
 		return 0;
 	}
 	dist=itm->GetCastingDistance(header);
+	//make possible special return values (like 0xffffffff means the item doesn't need distance)
+	//this is used with special targeting mode (3)
+	if (dist>0xff000000) {
+		return dist;
+	}
+
 	gamedata->FreeItem(itm, itemres, false);
 	return dist*15;
 }

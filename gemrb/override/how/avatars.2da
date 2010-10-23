@@ -338,7 +338,6 @@
 0xE860    MNO1      MNO1       MNO1       MNO1       9          2          1          *
 0xE870    MNO2      MNO2       MNO2       MNO2       9          2          1          *
 0xE880    MNO3      MNO3       MNO3       MNO3       9          2          1          *
-0xE880    MNO3      MNO3       MNO3       MNO3       9          2          1          *
 0xE890    MLI3      MLI3       MLI3       MLI3       9          2          1          *
 0xE8A0    MYU3      MYU3       MYU3       MYU3       9          2          1          *
 0xE8B0    MYUH      MYUH       MYUH       MYUH       9          2          1          *
@@ -347,9 +346,9 @@
 0xE8E0    MBU2      MBU2       MBU2       MBU2       9          2          1          *
 0xE8F0    MOR7      MOR7       MOR7       MOR7       9          2          1          *
 0xE900    MSAL      MSAL       MSAL       MSAL       16         2          1          *
-0xE900    MSH1      MSH1       MSH1       MSH1       16         2          1          *
+0xE908    MSH1      MSH1       MSH1       MSH1       16         2          1          *
 0xE910    MSA2      MSA2       MSA2       MSA2       16         2          1          *
-0xE910    MSH2      MSH2       MSH2       MSH2       16         2          1          *
+0xE918    MSH2      MSH2       MSH2       MSH2       16         2          1          *
 0xE920    MGHO      MGHO       MGHO       MGHO       9          2          1          *
 0xEA00    MSHR      MSHR       MSHR       MSHR       9          2          1          *
 0xEA10    MSH1      MSH1       MSH1       MSH1       16         2          1          *
@@ -380,9 +379,9 @@
 0xEC40    MDH1      MDH1       MDH1       MDH1       9          2          1          *
 0xEC50    MDH2      MDH2       MDH2       MDH2       9          2          1          *
 0xED00    MYU1      MYU1       MYU1       MYU1       9          2          1          *
-0xED00    MCOR      MCOR       MCOR       MCOR       9          3          1          *
+0xED09    MCOR      MCOR       MCOR       MCOR       9          3          1          *
 0xED10    MYU2      MYU2       MYU2       MYU2       9          2          1          *
-0xED10    MGLA      MGLA       MGLA       MGLA       9          2          1          *
+0xED19    MGLA      MGLA       MGLA       MGLA       9          2          1          *
 0xED20    MYU3      MYU3       MYU3       MYU3       9          2          1          *
 0xED20    MLEM      MLEM       MLEM       MLEM       9          2          1          *
 0xEE00    MWEB      MWEB       MWEB       MWEB       9          2          1          *

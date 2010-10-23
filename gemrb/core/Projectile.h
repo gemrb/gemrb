@@ -205,8 +205,9 @@ protected:
 	Point Pos;
 	Point Destination;
 	Point Origin;
-	ieDword Caster; //the globalID of the caster actor
-	ieDword Target; //the globalID of target actor
+	ieDword Caster;    //the globalID of the caster actor
+	ieDword Target;    //the globalID of target actor
+	ieDword FakeTarget; //a globalID for target that isn't followed
 	int phase;
 	//saved in area
 	ieResRef name;
@@ -227,7 +228,7 @@ protected:
 public:
 	void SetCaster(ieDword t);
 	ieDword GetCaster() const;
-	void SetTarget(ieDword t);
+	void SetTarget(ieDword t, bool fake);
 	void SetTarget(const Point &p);
 	bool PointInRadius(const Point &p) const;
 	void Cleanup();

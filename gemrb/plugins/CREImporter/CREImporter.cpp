@@ -830,11 +830,11 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 
 	act->inventory.CalculateWeight();
 	act->CreateDerivedStats();
-	if (CREVersion==IE_CRE_V1_2) {
+	//if (CREVersion==IE_CRE_V1_2) {
 		//do this after created derived stats
-		ieDword hp = act->BaseStats[IE_HITPOINTS] - GetHpAdjustment(act);
+		ieDword hp = act->BaseStats[IE_HITPOINTS] + GetHpAdjustment(act);
 		act->BaseStats[IE_HITPOINTS]=hp;
-	}
+	//}
 	//do this after created derived stats
 	act->SetupFist();
 	//initial setup
@@ -2176,9 +2176,9 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 	stream->WriteDword( &actor->BaseStats[IE_GOLD]);
 	stream->WriteDword( &actor->BaseStats[IE_STATE_ID]);
 	tmpWord = actor->BaseStats[IE_HITPOINTS];
-	if (CREVersion==IE_CRE_V1_2) {
-		tmpWord = (ieWord) (tmpWord + GetHpAdjustment(actor));
-	}
+	//decrease the hp back to the one without constitution bonus
+	//this is probably still not perfect
+	tmpWord = (ieWord) (tmpWord - GetHpAdjustment(actor));
 	stream->WriteWord( &tmpWord);
 	tmpWord = actor->BaseStats[IE_MAXHITPOINTS];
 	stream->WriteWord( &tmpWord);
