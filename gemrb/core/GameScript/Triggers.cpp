@@ -2759,6 +2759,7 @@ int GameScript::Level(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
+	// FIXME: what about multiclasses or dualclasses?
 	return actor->GetStat(IE_LEVEL) == (unsigned) parameters->int0Parameter;
 }
 
@@ -2776,6 +2777,7 @@ int GameScript::ClassLevel(Scriptable* Sender, Trigger* parameters)
 
 	if (!ID_Class( actor, parameters->int0Parameter) )
 		return 0;
+	// FIXME: compare the requested level
 	return actor->GetStat(IE_LEVEL) == (unsigned) parameters->int1Parameter;
 }
 
@@ -2795,6 +2797,7 @@ int GameScript::LevelInClass(Scriptable* Sender, Trigger* parameters)
 
 	if (!ID_ClassMask( actor, parameters->int1Parameter) )
 		return 0;
+	// FIXME: compare the requested level
 	return actor->GetStat(IE_LEVEL) == (unsigned) parameters->int0Parameter;
 }
 
