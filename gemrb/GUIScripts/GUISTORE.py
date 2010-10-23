@@ -500,6 +500,7 @@ def OpenStoreHealWindow ():
 		Count = 0
 	ScrollBar.SetVarAssoc ("TopIndex", Count+1)
 
+	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreHealWindow )
 	UpdateStoreHealWindow ()
 	Window.SetVisible (WINDOW_VISIBLE)
 	return
@@ -535,6 +536,7 @@ def OpenStoreRumourWindow ():
 		Count = 0
 	ScrollBar.SetVarAssoc ("TopIndex", Count+1)
 
+	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreRumourWindow )
 	UpdateStoreRumourWindow ()
 	Window.SetVisible (WINDOW_VISIBLE)
 	return
@@ -578,6 +580,7 @@ def OpenStoreRentWindow ():
 
 	GemRB.SetVar ("RentIndex", RentIndex)
 
+	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreRentWindow )
 	UpdateStoreRentWindow ()
 	Window.SetVisible (WINDOW_VISIBLE)
 	return
