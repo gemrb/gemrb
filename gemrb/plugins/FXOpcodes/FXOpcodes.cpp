@@ -5850,6 +5850,7 @@ int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx)
 // 0x111 RemoveProjectile
 int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
+	//the list is now cached by Interface, no need of freeing it
 	ieDword *projectilelist;
 
 	//instant effect
@@ -5877,8 +5878,10 @@ int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//The first element is the counter, so don't decrease the counter here
 	Point p(fx->PosX, fx->PosY);
 
-	while(projectilelist[0]) {
-		ieDword projectile = projectilelist[projectilelist[0]];
+	int i = projectilelist[0];
+
+	while(i) {
+		ieDword projectile = projectilelist[i];
 		proIterator piter;
 
 		size_t cnt = area->GetProjectileCount(piter);
@@ -5891,9 +5894,10 @@ int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (target) {
 			target->fxqueue.RemoveAllEffectsWithProjectile(projectile);
 		}
-		projectilelist[0]--;
+		i--;
 	}
-	free(projectilelist);
+	//this one was constructed by us
+	if (fx->Parameter2==2) free(projectilelist);
 	return FX_NOT_APPLIED;
 }
 
