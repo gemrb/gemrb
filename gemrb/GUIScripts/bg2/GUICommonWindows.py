@@ -635,6 +635,11 @@ def UpdatePortraitWindow ():
 		pic = GemRB.GetPlayerPortrait (portid+1, 1)
 		if Inventory and pc != portid+1:
 			pic = None
+		if pic and GemRB.GetPlayerStat(portid+1, IE_STATE_ID) & STATE_DEAD:
+			import GUISTORE
+			# dead pcs are hidden in all stores but temples
+			if GUISTORE.StoreWindow and not GUISTORE.StoreHealWindow:
+				pic = None
 
 		if not pic:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
