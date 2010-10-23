@@ -131,6 +131,7 @@ Interface::Interface(int iargc, char* iargv[])
 	AudioDriverName = "openal";
 	vars = NULL;
 	tokens = NULL;
+	lists = NULL;
 	RtRows = NULL;
 	sgiterator = NULL;
 	game = NULL;
@@ -246,6 +247,12 @@ Interface::Interface(int iargc, char* iargv[])
 		} \
 	} \
 	variable.clear(); \
+}
+
+//2da lists are ieDword lists allocated by malloc
+static void Release2daList(void *poi)
+{
+	free( (ieDword *) poi);
 }
 
 static void ReleaseItemList(void *poi)
@@ -412,6 +419,11 @@ Interface::~Interface(void)
 
 	delete vars;
 	delete tokens;
+	if (lists) {
+		lists->RemoveAll(Release2daList);
+		delete lists;
+	}
+
 	if (RtRows) {
 		RtRows->RemoveAll(ReleaseItemList);
 		delete RtRows;
@@ -1279,14 +1291,22 @@ int Interface::Init()
 	printMessage( "Core", "Initializing the Event Manager...", WHITE );
 	evntmgr = new EventMgr();
 
+	printMessage( "Core", "Initializing Lists Dictionary...", WHITE );
+	lists = new Variables();
+	if (!lists) {
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
+	}	
+	lists->SetType( GEM_VARIABLES_POINTER );
+
 	printMessage( "Core", "Initializing Variables Dictionary...", WHITE );
 	vars = new Variables();
 	if (!vars) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
-
 	vars->SetType( GEM_VARIABLES_INT );
+
 	vars->SetAt( "Volume Ambients", 100 );
 	vars->SetAt( "Volume Movie", 100 );
 	vars->SetAt( "Volume Music", 100 );
@@ -5210,7 +5230,7 @@ void Interface::GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieRe
 	}
 }
 
-ieDword *Interface::GetListFrom2DA(const ieResRef resref)
+ieDword *Interface::GetListFrom2DAInternal(const ieResRef resref)
 {
 	ieDword *ret;
 
@@ -5228,6 +5248,18 @@ ieDword *Interface::GetListFrom2DA(const ieResRef resref)
 	ret = (ieDword *) malloc(sizeof(ieDword));
 	ret[0]=0;
 	return ret;
+}
+
+ieDword* Interface::GetListFrom2DA(const ieResRef tablename)
+{
+	ieDword *list;
+	
+	if (!lists->Lookup(tablename, (void *&) list)) {
+		list = GetListFrom2DAInternal(tablename);
+		lists->SetAt(tablename, list);
+	}
+	
+	return list;
 }
 
 //returns a numeric value associated with a stat name (symbol) from stats.ids

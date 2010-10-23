@@ -279,6 +279,7 @@ private:
 	std::vector<int> topwin;
 	Variables * vars;
 	Variables * tokens;
+	Variables * lists;
 	Holder<MusicMgr> music;
 	std::vector<Symbol> symbols;
 	Holder<DataFileMgr> INIparty;
@@ -688,6 +689,8 @@ private:
 	GameControl* StartGameControl();
 	/** Executes everything (non graphical) in the main game loop */
 	void GameLoop(void);
+	/** the internal (without cache) part of GetListFrom2DA */
+	ieDword *GetListFrom2DAInternal(const ieResRef resref);
 public:
 	char GameDataPath[_MAX_PATH];
 	char GameOverridePath[_MAX_PATH];

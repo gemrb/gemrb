@@ -39,13 +39,12 @@ static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spi
 static bool enhanced_effects = false;
 //a scripting object for enemy (used for enemy in line of sight check)
 static Trigger *Enemy = NULL;
-//a list of projectiles Entropy Shield protects against
-static ieDword *EntropyProjectileList = NULL;
 
 #define PI_CONFUSION    3
 #define PI_PROTFROMEVIL 9
 #define PI_FREEACTION   19
 #define PI_BARKSKIN     20
+#define PI_BANE         35
 #define PI_PANIC        36
 #define PI_NAUSEA       43
 #define PI_HOPELESSNESS 44
@@ -353,6 +352,7 @@ struct IWDIDSEntry {
 
 static int spellrescnt = -1;
 static IWDIDSEntry *spellres = NULL;
+static Variables tables;
 
 static void Cleanup()
 {
@@ -361,10 +361,6 @@ static void Cleanup()
 	}
 	Enemy=NULL;
 
-	if (EntropyProjectileList) {
-		free (EntropyProjectileList);
-	}
-	EntropyProjectileList = NULL;
 	if (spellres) {
 		free (spellres);
 	}
@@ -567,7 +563,7 @@ int fx_ac_vs_damage_type_modifier_iwd2 (Scriptable* /*Owner*/, Actor* target, Ef
 		HandleBonus(target, IE_ARMORCLASS, fx->Parameter1, fx->TimingMode);
 		break;
 	case 1: //armor
-		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+	 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 			if (BASE_GET( IE_ARMORCLASS) > fx->Parameter1) {
 				BASE_SET( IE_ARMORCLASS, fx->Parameter1 );
 			}
@@ -1399,7 +1395,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 
 	int real = core->Roll(1,cnt,-1);
 	const char *resrefs[2]={tab->QueryField((unsigned int) 0,0), tab->QueryField((int) 0,1) };
-
+	
 	for (int i=0;i<cnt;i++) {
 		Point p(strtol(tab->QueryField(i+1,0),NULL,0), strtol(tab->QueryField(i+1,1), NULL, 0));
 		core->SummonCreature(resrefs[real!=i], fx->Resource2, Owner,
@@ -1519,7 +1515,7 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//how style (probably better would be to provide effcof.spl)
-	Effect *newfx = EffectQueue::CreateEffect(fx_umberhulk_gaze_ref, 0,
+ 	Effect *newfx = EffectQueue::CreateEffect(fx_umberhulk_gaze_ref, 0,
 		8, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Power = fx->Power;
 
@@ -1907,14 +1903,34 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_floattext (%2d): StrRef:%d Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	switch (fx->Parameter2)
 	{
+	case 1:
+		//in the original game this signified that a specific weapon is equipped
+		if (EXTSTATE_GET(EXTSTATE_FLOATTEXTS))
+			return FX_APPLIED;
+
+		EXTSTATE_SET(EXTSTATE_FLOATTEXTS);
+		if (!fx->Resource[0]) {
+			strnuprcpy(fx->Resource,"cynicism",sizeof(ieResRef));
+		}
+		if (fx->Parameter1) {
+			fx->Parameter1--;
+			return FX_APPLIED;
+		} else {
+			fx->Parameter1=core->Roll(1,500,500);
+		}
+	case 2:
+		if (EXTSTATE_GET(EXTSTATE_FLOATTEXTS)) {
+			ieDword *CynicismList = core->GetListFrom2DA(fx->Resource);
+			ieDword i = CynicismList[0];
+			if (i) {
+				DisplayStringCore(target, CynicismList[core->Roll(1,i,0)], DS_HEAD);
+			}
+		}    
+		return FX_APPLIED;
 	default:
 		DisplayStringCore(target, fx->Parameter1, DS_HEAD);
 		break;
-	case 1:
-		//in the original game this signified that a specific weapon is equipped
-		EXTSTATE_SET(EXTSTATE_FLOATTEXTS);
-		return FX_APPLIED;
-	case 2: //gemrb extension, displays verbalconstant
+	case 3: //gemrb extension, displays verbalconstant
 		DisplayStringCore(target, fx->Parameter1, DS_CONST|DS_HEAD);
 		break;
 	}
@@ -2624,7 +2640,7 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//bit 1 repeat or only once
 	if (fx->Parameter2&AE_REPEAT) {
-		return FX_APPLIED;
+		 return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2672,15 +2688,16 @@ int fx_entropy_shield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_entropy_shield (%2d)\n", fx->Opcode);
 	if (target->SetSpellState( SS_ENTROPY)) return FX_APPLIED;
+	if (!fx->Resource[0]) {
+		strnuprcpy(fx->Resource, "entropy", sizeof(ieResRef));
+	}
 	//immunity to certain projectiles
-	if (!EntropyProjectileList) {
-		EntropyProjectileList = core->GetListFrom2DA("entropy");
-		ieDword i = EntropyProjectileList[0];
-		//the index is handled differently because
-		//the list's first element is the element count
-		while(i) {
-			target->AddProjectileImmunity(EntropyProjectileList[i--]);
-		}
+	ieDword *EntropyProjectileList = core->GetListFrom2DA(fx->Resource);
+	ieDword i = EntropyProjectileList[0];
+	//the index is handled differently because
+	//the list's first element is the element count
+	while(i) {
+		target->AddProjectileImmunity(EntropyProjectileList[i--]);
 	}
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_ENTROPY);
@@ -2817,7 +2834,7 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 	//create projectile from known spellheader
 	//cannot get the projectile from the spell
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
-
+	
 	if (pro) {
 		Point p(fx->PosX, fx->PosY);
 
@@ -2931,7 +2948,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	else if (check_iwd_targeting(Owner, target, 0, 84)) penalty = 2; //duergar
 	else penalty = 0;
 
-	STAT_ADD(IE_SAVEFORTITUDE, penalty);
+ 	STAT_ADD(IE_SAVEFORTITUDE, penalty);
 	STAT_ADD(IE_SAVEREFLEX, penalty);
 	STAT_ADD(IE_SAVEWILL, penalty);
 	//for compatibility reasons
@@ -2946,7 +2963,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_damage_reduction (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_damage_reduction (%2d) Amount: %d\n", fx->Opcode, fx->Parameter2);
-	STAT_SET(IE_RESISTSLASHING, fx->Parameter2*5);
+ 	STAT_SET(IE_RESISTSLASHING, fx->Parameter2*5);
 	STAT_SET(IE_RESISTCRUSHING, fx->Parameter2*5);
 	STAT_SET(IE_RESISTPIERCING, fx->Parameter2*5);
 	return FX_APPLIED;
@@ -3210,10 +3227,14 @@ int fx_bane (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (target->SetSpellState( SS_BANE)) return FX_NOT_APPLIED;
 	//do this once
-	target->fxqueue.RemoveAllEffects(fx_bless_ref);
+	if (fx->FirstApply)
+		target->fxqueue.RemoveAllEffects(fx_bless_ref);
 	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_BANE);
 		target->SetColorMod(0xff, RGBModifier::ADD, 20, 0, 0, 0x80);
 	}
+	STAT_ADD( IE_TOHIT, -fx->Parameter1);
+	STAT_ADD( IE_MORALEBREAK, -fx->Parameter1);
 	return FX_APPLIED;
 }
 
@@ -3324,3 +3345,4 @@ GEMRB_PLUGIN(0x4F172B2, "Effect opcodes for the icewind branch of the games")
 PLUGIN_INITIALIZER(RegisterIWDOpcodes)
 PLUGIN_CLEANUP(Cleanup)
 END_PLUGIN()
+
