@@ -26,6 +26,7 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 from GUIDefines import *
+from ie_action import ACT_CAST
 
 TopIndex = 0
 SpellBookWindow = None
@@ -190,7 +191,12 @@ def UpdateSpellBookWindow ():
 			Button.EnableBorder (0, 0)
 
 	#if actor is uncontrollable, make this grayed
-	Window.SetVisible (WINDOW_VISIBLE)
+	CantCast = GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
+	if CantCast or GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD:
+		Window.SetVisible (WINDOW_GRAYED)
+	else:
+		Window.SetVisible (WINDOW_VISIBLE)
+
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	return

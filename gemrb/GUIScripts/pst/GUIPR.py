@@ -140,7 +140,9 @@ def UpdatePriestWindow ():
 			Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Icon.SetTooltip ('')
-	if (CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
+	CantCast = CommonTables.ClassSkills.GetValue (GemRB.GetPlayerStat (pc, IE_CLASS), 1) == "*"
+	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
+	if CantCast or GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD:
 		Window.SetVisible (WINDOW_GRAYED)
 	else:
 		Window.SetVisible (WINDOW_VISIBLE)

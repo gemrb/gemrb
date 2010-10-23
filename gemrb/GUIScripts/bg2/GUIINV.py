@@ -306,7 +306,11 @@ def RefreshInventoryWindow ():
 		GUICommon.UpdateInventorySlot (pc, Button, Slot, "ground")
 
 	#making window visible/shaded depending on the pc's state
-	Window.SetVisible (WINDOW_VISIBLE)
+	held = GemRB.GetPlayerStat (pc, IE_HELD) + GemRB.GetPlayerStat (pc, IE_CASTERHOLD)
+	if held or GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD:
+		Window.SetVisible (WINDOW_GRAYED)
+	else:
+		Window.SetVisible (WINDOW_VISIBLE)
 	return
 
 ###################################################
