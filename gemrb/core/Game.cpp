@@ -804,7 +804,7 @@ void Game::SwapPCs(unsigned int Index1, unsigned int Index2)
 	PCs[Index1]->InParty = PCs[Index2]->InParty;
 	PCs[Index2]->InParty = tmp;
 	//signal a change of the portrait window
-	core->SetEventFlag(EF_PORTRAIT);
+	core->SetEventFlag(EF_PORTRAIT | EF_SELECTION);
 }
 
 void Game::DeleteJournalEntry(ieStrRef strref)
