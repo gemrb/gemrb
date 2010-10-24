@@ -140,6 +140,15 @@ def RedrawContainerWindow ():
 		else:
 			GUICommon.UpdateInventorySlot (pc, Button, Slot, "inventory")
 
+	# shade the inventory icon if it is full
+	if Window.HasControl (54):
+		Button = Window.GetControl (54)
+		free_slots = GemRB.GetSlots (pc, 0x8000, -1)
+		if free_slots == ():
+			Button.SetState (IE_GUI_BUTTON_PRESSED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_LOCKED)
+
 def OpenContainerWindow ():
 	global ContainerWindow, Container
 
@@ -208,11 +217,10 @@ def OpenContainerWindow ():
 	ScrollBar = Window.GetControl (53)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawContainerWindow)
 
-	# encumbrance
+	# encumbrance and inventory icon
 	# iwd has a handy button
 	if Window.HasControl (54):
 		Button = Window.GetControl (54)
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		if GUICommon.GameIsPST():
 			Button.SetFont ("NUMBER")
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
