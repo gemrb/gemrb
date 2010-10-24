@@ -52,6 +52,11 @@ bool FileStream::Open(const char* fname, bool aF)
 		_fclose( str );
 		str = NULL;
 	}
+
+	if (!file_exists(fname)) {
+		return false;
+	}
+
 	autoFree = aF;
 	str = _fopen( fname, "rb" );
 	if (str == NULL) {
