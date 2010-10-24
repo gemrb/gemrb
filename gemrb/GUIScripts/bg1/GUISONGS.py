@@ -56,7 +56,7 @@ def PlayPress():
 	return
 
 def CreditsPress():
-	GemRB.PlayMovie("endcrdit", 1)
+	GemRB.PlayMovie("credits", 1)
 	return
 
 def DonePress():
