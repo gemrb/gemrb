@@ -50,6 +50,7 @@ bool FileStream::Open(const char* fname, bool aF)
 		core->FileStreamPtrCount--;
 #endif
 		_fclose( str );
+		str = NULL;
 	}
 	autoFree = aF;
 	str = _fopen( fname, "rb" );
