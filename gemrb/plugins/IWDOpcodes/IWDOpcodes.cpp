@@ -2102,7 +2102,7 @@ int fx_rod_of_smithing (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_rod_of_smithing (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
 	int damage = 0;
-	int five_percent = core->Roll(1,100,0)>5;
+	int five_percent = core->Roll(1,100,0)<5;
 
 	if (check_iwd_targeting(Owner, target, 0, 27)) { //golem
 			if(five_percent) {
