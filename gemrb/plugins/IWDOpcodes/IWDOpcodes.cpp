@@ -23,6 +23,7 @@
 #include "overlays.h"
 #include "win32def.h"
 
+#include "Audio.h"  //needs for a playsound call
 #include "DisplayMessage.h"
 #include "EffectQueue.h"
 #include "Game.h"
@@ -468,13 +469,15 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 			return DiffCore(AL_TRUE_NEUTRAL,STAT_GET(IE_ALIGNMENT)&AL_GE_MASK, spellres[type].relation);
 		}
 	case STI_TWO_ROWS:
-		if (check_iwd_targeting(Owner, target, value, idx)) return 0;
-		if (check_iwd_targeting(Owner, target, value, val)) return 0;
-		return 1;
-	case STI_NOT_TWO_ROWS:
+		//used in checks where any of two matches are ok (golem or undead etc)
 		if (check_iwd_targeting(Owner, target, value, idx)) return 1;
 		if (check_iwd_targeting(Owner, target, value, val)) return 1;
 		return 0;
+	case STI_NOT_TWO_ROWS:
+		//this should be the opposite as above
+		if (check_iwd_targeting(Owner, target, value, idx)) return 0;
+		if (check_iwd_targeting(Owner, target, value, val)) return 0;
+		return 1;
 	case STI_SOURCE_TARGET:
 		if (Owner==target) {
 			return 0;
@@ -997,7 +1000,7 @@ int fx_burning_blood (Scriptable* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_burning_blood (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 
 	//if the target is dead, this effect ceases to exist
-	if (STATE_GET(STATE_DEAD)) {
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -1019,7 +1022,7 @@ int fx_burning_blood2 (Scriptable* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_burning_blood2 (%2d): Count: %d Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	//if the target is dead, this effect ceases to exist
-	if (STATE_GET(STATE_DEAD)) {
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -1078,7 +1081,7 @@ int fx_summon_shadow_monster (Scriptable* Owner, Actor* target, Effect* fx)
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
-//f9 Recitation
+//0xf9 Recitation
 int fx_recitation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_recitation (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -1106,7 +1109,7 @@ int fx_recitation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_SAVEVSSPELL, value);
 	return FX_APPLIED;
 }
-//fa RecitationBad
+//0xfa RecitationBad
 int fx_recitation_bad (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_recitation (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -1121,8 +1124,8 @@ int fx_recitation_bad (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_SAVEVSSPELL, -2);
 	return FX_APPLIED;
 }
-//fb LichTouch (how)
-//fb State:Hold4 (iwd2)
+//0xfb LichTouch (how)
+//0xfb State:Hold4 (iwd2)
 static EffectRef fx_hold_creature_ref={"State:Hold",NULL,-1};
 
 int fx_lich_touch (Scriptable* Owner, Actor* target, Effect* fx)
@@ -1143,7 +1146,7 @@ int fx_lich_touch (Scriptable* Owner, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-//fc BlindingOrb (how)
+//0xfc BlindingOrb (how)
 static EffectRef fx_state_blind_ref={"State:Blind",NULL,-1};
 
 int fx_blinding_orb (Scriptable* Owner, Actor* target, Effect* fx)
@@ -1197,7 +1200,7 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	//creates damage opcode on everyone around. fx->Parameter2 - 0 fire, 1 - ice
 
 	//if the target is dead, this effect ceases to exist
-	if (STATE_GET(STATE_DEAD)) {
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -1221,6 +1224,8 @@ static EffectRef fx_immunity_resource_ref={"Protection:Spell",NULL,-1};
 int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_umberhulk_gaze (%2d): Duration: %d\n", fx->Opcode, fx->Parameter1);
+
+	//if the target is dead, this effect ceases to exist
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
@@ -1245,7 +1250,7 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
-		if (PersonalDistance(target, victim)>20) continue;
+		if (PersonalDistance(target, victim)>300) continue;
 
 		//check if target is golem/umber hulk/minotaur, the effect is not working
 		if (check_iwd_targeting(Owner, victim, 0, 17)) { //umber hulk
@@ -1279,6 +1284,8 @@ static EffectRef fx_fear_ref={"State:Panic",NULL,-1};
 int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_zombie_lord_aura (%2d): Duration: %d\n", fx->Opcode, fx->Parameter1);
+
+	//if the target is dead, this effect ceases to exist
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
@@ -1395,7 +1402,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 
 	int real = core->Roll(1,cnt,-1);
 	const char *resrefs[2]={tab->QueryField((unsigned int) 0,0), tab->QueryField((int) 0,1) };
-	
+
 	for (int i=0;i<cnt;i++) {
 		Point p(strtol(tab->QueryField(i+1,0),NULL,0), strtol(tab->QueryField(i+1,1), NULL, 0));
 		core->SummonCreature(resrefs[real!=i], fx->Resource2, Owner,
@@ -1459,7 +1466,7 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_static_charge (%2d): Count: %d \n", fx->Opcode, fx->Parameter1 );
 
 	//if the target is dead, this effect ceases to exist
-	if (STATE_GET(STATE_DEAD)) {
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -1495,7 +1502,7 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_cloak_of_fear (%2d): Count: %d \n", fx->Opcode, fx->Parameter1 );
 
 	//if the target is dead, this effect ceases to exist
-	if (STATE_GET(STATE_DEAD)) {
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -1718,7 +1725,8 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_shroud_of_flame (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 
-	if ( STATE_GET(STATE_DEAD) ) {
+	//if the target is dead, this effect ceases to exist
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -1744,7 +1752,8 @@ int fx_shroud_of_flame2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_shroud_of_flame2 (%2d)\n", fx->Opcode );
 
-	if ( STATE_GET(STATE_DEAD) ) {
+	//if the target is dead, this effect ceases to exist
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -1769,13 +1778,16 @@ int fx_animal_rage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_animal_rage (%2d): Mode: %d\n", fx->Opcode, fx->Parameter2 );
 
-	if ( STATE_GET(STATE_DEAD) ) {
-		return FX_NOT_APPLIED;
-	}
 	//param2==1 sets only the spell state
 	if (fx->Parameter2) {
 		target->SetSpellState( SS_ANIMALRAGE);
 		return FX_APPLIED;
+	}
+
+	//the state check is done after the parameter differentiation
+	//it might be a bug but i cannot decide (going with the original)
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
+		return FX_NOT_APPLIED;
 	}
 
 	//param2==0 doesn't set the spell state
@@ -1925,7 +1937,7 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			if (i) {
 				DisplayStringCore(target, CynicismList[core->Roll(1,i,0)], DS_HEAD);
 			}
-		}    
+		}
 		return FX_APPLIED;
 	default:
 		DisplayStringCore(target, fx->Parameter1, DS_HEAD);
@@ -1940,6 +1952,7 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0x11c MaceOfDisruption
 //death with chance based on race and level
 static EffectRef fx_death_ref={"Death",NULL,-1};
+static EffectRef fx_iwd_visual_spell_hit_ref={"IWDVisualSpellHit",NULL,-1};
 
 int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1982,10 +1995,16 @@ int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-
-	Effect *newfx = EffectQueue::CreateEffect(fx_death_ref, 0,
+	Effect *newfx = EffectQueue::CreateEffect(fx_iwd_visual_spell_hit_ref, 0,
 			8, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Target=FX_TARGET_PRESET;
+	newfx->Power=fx->Power;
+	core->ApplyEffect(newfx, target, Owner);
+
+	newfx = EffectQueue::CreateEffect(fx_death_ref, 0,
+			8, FX_DURATION_INSTANT_PERMANENT);
+	newfx->Target=FX_TARGET_PRESET;
+	newfx->Power=fx->Power;
 	core->ApplyEffect(newfx, target, Owner);
 
 	delete newfx;
@@ -2082,41 +2101,34 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 int fx_rod_of_smithing (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_rod_of_smithing (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
-	ieDword race = STAT_GET(IE_RACE);
-	//golem / outer planar gets hit
-	int damage;
+	int damage = 0;
+	int five_percent = core->Roll(1,100,0)>5;
 
-	switch (race) {
-		case 144: // golem
-			if (core->Roll(1,100,0)>5) {
-				damage = core->Roll(1,8,3);
-			} else {
+	if (check_iwd_targeting(Owner, target, 0, 27)) { //golem
+			if(five_percent) {
+				//instant death
 				damage = -1;
+			} else {
+				damage = core->Roll(1,8,3);
 			}
-			break;
-		case 156: //outsider
-			if (core->Roll(1,100,0)>5) {
-				return FX_NOT_APPLIED;
+	} else if (check_iwd_targeting(Owner, target, 0, 92)) { //outsider
+			if (five_percent) {
+				damage = core->Roll(8,3,0);
 			}
-			damage = core->Roll(8,3,0);
-			break;
-		default:;
-			return FX_NOT_APPLIED;
 	}
-
-	Effect *newfx;
-	if (damage<0) {
-		//create death effect (chunked death)
-		newfx = EffectQueue::CreateEffect(fx_death_ref, 0,
-			8, FX_DURATION_INSTANT_PERMANENT);
-	} else {
-		//create damage effect (blunt)
-		newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, (ieDword) damage,
-			0, FX_DURATION_INSTANT_PERMANENT);
+	if (damage) {
+		Effect *newfx;
+		if (damage<0) {
+			//create death effect (chunked death)
+			newfx = EffectQueue::CreateEffect(fx_death_ref, 0, 8, FX_DURATION_INSTANT_PERMANENT);
+		} else {
+			//create damage effect (blunt)
+			newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, (ieDword) damage,
+				0, FX_DURATION_INSTANT_PERMANENT);
+		}
+		core->ApplyEffect(newfx, target, Owner);
+		delete newfx;
 	}
-	core->ApplyEffect(newfx, target, Owner);
-
-	delete newfx;
 
 	return FX_NOT_APPLIED;
 }
@@ -2131,6 +2143,8 @@ int fx_beholder_dispel_magic (Scriptable* Owner, Actor* target, Effect* fx)
 	if (!fx->Resource[0]) {
 		strcpy(fx->Resource,"SPIN164");
 	}
+
+	//if the target is dead, this effect ceases to exist
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
@@ -2140,7 +2154,7 @@ int fx_beholder_dispel_magic (Scriptable* Owner, Actor* target, Effect* fx)
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
-		if (PersonalDistance(target, victim)<20) {
+		if (PersonalDistance(target, victim)<300) {
 			//this function deletes tmp
 			core->ApplySpell(fx->Resource, victim, Owner, fx->Power);
 		}
@@ -2157,16 +2171,22 @@ int fx_harpy_wail (Scriptable* Owner, Actor* target, Effect* fx)
 	if (!fx->Resource[0]) {
 		strcpy(fx->Resource,"SPIN166");
 	}
+	if (!fx->Resource2[0]) {
+		strcpy(fx->Resource2,"EFF_P111");
+	}
+
+	//if the target is dead, this effect ceases to exist
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
+	core->GetAudioDrv()->Play(fx->Resource2, target->Pos.x, target->Pos.y);
 
 	Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
-		if (PersonalDistance(target, victim)<20) {
+		if (PersonalDistance(target, victim)<300) {
 			//this function deletes tmp
 			core->ApplySpell(fx->Resource, victim, Owner, fx->Power);
 		}
@@ -2183,6 +2203,8 @@ int fx_jackalwere_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 	if (!fx->Resource[0]) {
 		strcpy(fx->Resource,"SPIN179");
 	}
+
+	//if the target is dead, this effect ceases to exist
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
@@ -2192,7 +2214,7 @@ int fx_jackalwere_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
-		if (PersonalDistance(target, victim)<20) {
+		if (PersonalDistance(target, victim)<300) {
 			//this function deletes tmp
 			core->ApplySpell(fx->Resource, victim, Owner, fx->Power);
 		}
@@ -2307,7 +2329,7 @@ int fx_protection_from_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	//after iwd2 style ids targeting, apply the spell named in the resource field
-	if (check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
+	if (!check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
 		return FX_NOT_APPLIED;
 	}
 	core->ApplySpell(fx->Resource, target, Owner, fx->Power);
@@ -2620,7 +2642,7 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_area_effect (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
 
-	//this effect ceases to affect dead targets
+	//this effect ceases to affect dead targets (probably on frozen and stoned too)
 	if (STATE_GET(STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
@@ -2834,7 +2856,7 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 	//create projectile from known spellheader
 	//cannot get the projectile from the spell
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
-	
+
 	if (pro) {
 		Point p(fx->PosX, fx->PosY);
 
@@ -3143,6 +3165,7 @@ int fx_call_lightning (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_call_lightning (%2d)\n", fx->Opcode);
 
+	//this effect ceases to affect dead targets (probably on frozen and stoned too)
 	if (STATE_GET(STATE_DEAD)) {
 		return FX_NOT_APPLIED;
 	}

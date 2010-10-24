@@ -868,7 +868,7 @@ void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
 	Map *area = caster->GetCurrentArea();
 
 	if (area && target->GetCurrentArea()!=area) {
-	   	MoveBetweenAreasCore(target, area->GetScriptName(), p, fx->Parameter2, true);
+		 	MoveBetweenAreasCore(target, area->GetScriptName(), p, fx->Parameter2, true);
 	}
 	target->Resurrect();
 	
@@ -968,20 +968,7 @@ int fx_cure_sleep_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0x03 Cure:Berserk
-// this effect clears the STATE_BERSERK (2) bit, but bg2 actually ignores the bit
-// it also removes effect 04
-static EffectRef fx_set_berserk_state_ref={"State:Berserk",NULL,-1};
-
-int fx_cure_berserk_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	if (0) printf( "fx_cure_berserk_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	BASE_STATE_CURE( STATE_BERSERK );
-	target->fxqueue.RemoveAllEffects(fx_set_berserk_state_ref);
-	return FX_NOT_APPLIED;
-}
-
-// 0x04 State:Berserk
+// 0x03 State:Berserk
 // this effect sets the STATE_BERSERK bit, but bg2 actually ignores the bit
 int fx_set_berserk_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -989,6 +976,10 @@ int fx_set_berserk_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// atleast how and bg2 allow this to only work on pcs
 	if (!core->HasFeature(GF_3ED_RULES) && !target->InParty) {
 		return FX_NOT_APPLIED;
+	}
+
+	if (fx->FirstApply) {
+		target->inventory.EquipBestWeapon(EQUIP_MELEE);
 	}
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
@@ -1022,6 +1013,19 @@ int fx_set_berserk_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		break;
 	}
 	return FX_PERMANENT;
+}
+
+// 0x04 Cure:Berserk
+// this effect clears the STATE_BERSERK (2) bit, but bg2 actually ignores the bit
+// it also removes effect 04
+static EffectRef fx_set_berserk_state_ref={"State:Berserk",NULL,-1};
+
+int fx_cure_berserk_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_cure_berserk_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	BASE_STATE_CURE( STATE_BERSERK );
+	target->fxqueue.RemoveAllEffects(fx_set_berserk_state_ref);
+	return FX_NOT_APPLIED;
 }
 
 // 0x05 State:Charmed
@@ -2493,7 +2497,9 @@ int fx_cure_feebleminded_state (Scriptable* /*Owner*/, Actor* target, Effect* fx
 int fx_set_diseased_state (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_diseased_state (%2d): Damage: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	//STATE_SET( STATE_DISEASED ); //no this we don't want
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
+		return FX_NOT_APPLIED;
+	}
 
 	//setting damage to 0 because not all types do damage
 	ieDword damage = 0;
