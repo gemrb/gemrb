@@ -1280,7 +1280,6 @@ def UpdateStoreHealWindow ():
 			dead = GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD
 			# toggle raise dead/resurrect based on state
 			# unfortunately the flags are not set properly in iwd
-			print "UpdateStoreHealWindow", dead, Cure['CureResRef'], Spell["SpellTargetType"]
 			if (dead and Spell["SpellTargetType"] != 3) or \
 			   (not dead and Spell["SpellTargetType"] == 3): # 3 - non-living
 				# locked and shaded

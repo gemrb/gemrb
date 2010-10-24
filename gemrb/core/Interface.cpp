@@ -3152,12 +3152,12 @@ void Interface::HandleGUIBehaviour(void)
 		if (CurrentContainer && UseContainer) {
 			if (!(flg & DF_IN_CONTAINER) ) {
 				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_OR);
-				guiscript->RunFunction( "GUIWORLD", "OpenContainerWindow" );
+				guiscript->RunFunction( "CommonWindow", "OpenContainerWindow" );
 			}
 		} else {
 			if (flg & DF_IN_CONTAINER) {
 				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_NAND);
-				guiscript->RunFunction( "GUIWORLD", "CloseContainerWindow" );
+				guiscript->RunFunction( "CommonWindow", "CloseContainerWindow" );
 			}
 		}
 		//end of gui hacks
