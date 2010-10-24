@@ -73,9 +73,15 @@ def PlayPress():
 	return
 
 def CreditsPress():
-	GemRB.PlayMovie ("CREDITS",1)
-	MovieWindow.Invalidate ()
+	if MovieWindow:
+		MovieWindow.Unload ()
+	GemRB.SetNextScript ("GUISONGS")
 	return
+
+#def CreditsPress():
+#	GemRB.PlayMovie ("CREDITS",1)
+#	MovieWindow.Invalidate ()
+#	return
 
 def DonePress():
 	if MovieWindow:
