@@ -5409,7 +5409,7 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	//stores are cached, bags could be opened while in shops
 	//so better just switch to the requested store silently
 	//the core will be intelligent enough to not do excess work
-	core->SetCurrentStore( StoreResRef, NULL );
+	core->SetCurrentStore( StoreResRef, 0 );
 
 	core->SetEventFlag(EF_OPENSTORE);
 	Py_INCREF( Py_None );
