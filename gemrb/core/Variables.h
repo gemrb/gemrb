@@ -117,6 +117,7 @@ protected:
 	void FreeAssoc(Variables::MyAssoc*);
 	Variables::MyAssoc* GetAssocAt(const char*, unsigned int&) const;
 	inline bool MyCopyKey(char*& dest, const char* key) const;
+	inline unsigned int MyCompareKey(const char* key, const char *str) const;
 	inline unsigned int MyHashKey(const char*) const;
 
 public:

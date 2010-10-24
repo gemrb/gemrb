@@ -47,10 +47,27 @@ inline bool Variables::MyCopyKey(char*& dest, const char* key) const
 	return true;
 }
 
+inline unsigned int Variables::MyCompareKey(const char* key, const char *str) const
+{
+	int i,j;
+
+	for (i = 0, j = 0; str[j] && key[i] && i < MAX_VARIABLE_LENGTH - 1 && j < MAX_VARIABLE_LENGTH - 1;) {
+		char c1 = tolower(key[i]);
+		if (c1 == ' ') { i++; continue; }
+		char c2 = tolower(str[j]);
+		if (c2 ==' ')  { j++; continue; }
+		if (c1!=c2) return 1;
+		i++;
+		j++;
+	}
+	if (str[j] || key[i]) return 1;
+	return 0;
+}
+
 inline unsigned int Variables::MyHashKey(const char* key) const
 {
 	unsigned int nHash = 0;
-	for (int i = 0; i < key[i] && i < MAX_VARIABLE_LENGTH; i++) {
+	for (int i = 0; key[i] && i < MAX_VARIABLE_LENGTH; i++) {
 		//the original engine ignores spaces in variable names
 		if (key[i] != ' ')
 			nHash = ( nHash << 5 ) + nHash + tolower( key[i] );
@@ -241,8 +258,14 @@ Variables::MyAssoc* Variables::GetAssocAt(const char* key, unsigned int& nHash) 
 	for (pAssoc = m_pHashTable[nHash];
 		pAssoc != NULL;
 		pAssoc = pAssoc->pNext) {
-		if (!strnicmp( pAssoc->key, key, MAX_VARIABLE_LENGTH )) {
-			return pAssoc;
+		if (m_lParseKey) {
+			if (!MyCompareKey( pAssoc->key, key) ) {
+				return pAssoc;
+			}
+		} else {
+			if (!strnicmp( pAssoc->key, key, MAX_VARIABLE_LENGTH )) {
+				return pAssoc;
+			}
 		}
 	}
 

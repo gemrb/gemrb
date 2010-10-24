@@ -1002,7 +1002,7 @@ void Interface::Main()
 	ieDword contrast = 5;
 	ieDword speed = 10;
 
-	vars->Lookup("FullScreen", FullScreen);
+	vars->Lookup("Full Screen", FullScreen);
 	video->CreateDisplay( Width, Height, Bpp, FullScreen);
 	video->SetDisplayTitle( GameName, GameType );
 	vars->Lookup("Brightness Correction", brightness);
@@ -1306,6 +1306,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	vars->SetType( GEM_VARIABLES_INT );
+	vars->ParseKey(true);
 
 	vars->SetAt( "Volume Ambients", 100 );
 	vars->SetAt( "Volume Movie", 100 );
