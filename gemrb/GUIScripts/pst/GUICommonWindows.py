@@ -459,8 +459,8 @@ def SelectionChanged ():
 		for i in range (0, PARTY_SIZE):
 			Button = PortraitWindow.GetControl (i)
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
-	import GUIWORLD
-	GUIWORLD.CloseContainerWindow()
+	import CommonWindow
+	CommonWindow.CloseContainerWindow()
 	return
 
 def PortraitButtonOnMouseEnter ():
