@@ -243,7 +243,7 @@ def OpenContainerWindow ():
 
 	# Done
 	Button = Window.GetControl (51)
-	if not GUICommon.GameIsIWD1() and not GUICommon.GameIsIWD2():
+	if not GUICommon.GameIsPST():
 		Button.SetText (11973)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeaveContainer)
