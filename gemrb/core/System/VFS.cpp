@@ -248,20 +248,32 @@ int _fclose(_FILE* stream)
 bool dir_exists(const char* path)
 {
 	struct stat buf;
-
 	buf.st_mode = 0;
-	stat( path, &buf );
-	return S_ISDIR( buf.st_mode ) != 0;
+
+	if (stat(path, &buf) < 0) {
+		return false;
+	}
+	if (!S_ISDIR(buf.st_mode)) {
+		return false;
+	}
+
+	return true;
 }
 
 /** Returns true if path is an existing directory */
 bool file_exists(const char* path)
 {
 	struct stat buf;
-
 	buf.st_mode = 0;
-	stat( path, &buf );
-	return S_ISREG( buf.st_mode ) != 0;
+
+	if (stat(path, &buf) < 0) {
+		return false;
+	}
+	if (!S_ISREG(buf.st_mode)) {
+		return false;
+	}
+
+	return true;
 }
 
 
