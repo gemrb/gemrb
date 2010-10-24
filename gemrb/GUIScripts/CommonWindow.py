@@ -204,11 +204,6 @@ def OpenContainerWindow ():
 		if GUICommon.GameIsPST():
 			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
-	# useless(?) iwd button
-	if Window.HasControl (51):
-		Button = Window.GetControl (51)
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-
 	# left scrollbar (container)
 	ScrollBar = Window.GetControl (52)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawContainerWindow)
