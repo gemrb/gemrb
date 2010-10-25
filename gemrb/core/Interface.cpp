@@ -1260,6 +1260,27 @@ int Interface::LoadSprites()
 			fnt->SetFirstChar( (ieByte) first_char );
 			fonts.push_back( fnt );
 		}
+
+		if (fonts.size() == 0) {
+			printMessage( "Core", "No default font loaded! ", WHITE );
+			printStatus( "ERROR", LIGHT_RED );
+			return GEM_ERROR;
+		}
+		if (GetFont( ButtonFont ) == NULL) {
+			printMessage( "Core", "ButtonFont not loaded: ", WHITE );
+			printf("%s ", ButtonFont);
+			printStatus( "WARNING", YELLOW );
+		}
+		if (GetFont( MovieFont ) == NULL) {
+			printMessage( "Core", "MovieFont not loaded: ", WHITE );
+			printf("%s ", MovieFont);
+			printStatus( "WARNING", YELLOW );
+		}
+		if (GetFont( TooltipFont ) == NULL) {
+			printMessage( "Core", "TooltipFont not loaded: ", WHITE );
+			printf("%s ", TooltipFont);
+			printStatus( "WARNING", YELLOW );
+		}
 	}
 	printMessage( "Core", "Fonts Loaded...", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
@@ -1525,7 +1546,6 @@ int Interface::Init()
 	int ret = LoadSprites();
 	if (ret) return ret;
 
-	Sprite2D *tmpsprite = GetCursorSprite();
 	printMessage( "Core", "Setting up the Console...", WHITE );
 	QuitFlag = QF_CHANGESCRIPT;
 	console = new Console();
@@ -1533,7 +1553,11 @@ int Interface::Init()
 	console->YPos = (ieWord) (Height - 25);
 	console->Width = (ieWord) Width;
 	console->Height = 25;
-	console->SetFont( fonts[0] );
+	if (fonts.size() > 0) {
+		console->SetFont( fonts[0] );
+	}
+
+	Sprite2D *tmpsprite = GetCursorSprite();
 	if (!tmpsprite) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
