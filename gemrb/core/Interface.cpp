@@ -2821,14 +2821,12 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 
 	Window* win = new Window( WindowID, (ieWord) XPos, (ieWord) YPos, (ieWord) Width, (ieWord) Height );
 	if (Background[0]) {
-		if (IsAvailable( IE_MOS_CLASS_ID )) {
-			ResourceHolder<ImageMgr> mos(Background);
-			if (mos != NULL) {
-				win->SetBackGround( mos->GetSprite2D(), true );
-			} else
-				printf( "[Core]: Cannot Load BackGround, skipping\n" );
-		} else
-			printf( "[Core]: No MOS Importer Available, skipping background\n" );
+		ResourceHolder<ImageMgr> mos(Background);
+		if (mos != NULL) {
+			win->SetBackGround( mos->GetSprite2D(), true );
+		} else {
+			printf( "[Core]: Cannot Load BackGround, skipping\n" );
+		}
 	}
 
 	strcpy( win->WindowPack, WindowPack );
