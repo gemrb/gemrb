@@ -3931,6 +3931,9 @@ GameControl *Interface::GetGameControl() const
 		return NULL;
 
 	Control* gc = window->GetControl(0);
+	if (gc == NULL) {
+		return NULL;
+	}
 	if (gc->ControlType!=IE_GUI_GAMECONTROL) {
 		return NULL;
 	}
