@@ -1124,21 +1124,18 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 			else:
 				Button.SetState (IE_GUI_BUTTON_DISABLED)
 
-			if steal:
-				Price = Slot['Price']
+			if Inventory:
+				Price = 1
 			else:
-				if Inventory:
-					Price = 1
-				else:
-					Price = GetRealPrice (pc, "buy", Item, Slot)
+				Price = GetRealPrice (pc, "buy", Item, Slot)
 
-				if (Price>0) and (Flags & SHOP_SELL):
-					if Flags & SHOP_SELECT:
-						Button.SetState (IE_GUI_BUTTON_SELECTED)
-					else:
-						Button.SetState (IE_GUI_BUTTON_ENABLED)
+			if (Price>0) and (Flags & SHOP_SELL):
+				if Flags & SHOP_SELECT:
+					Button.SetState (IE_GUI_BUTTON_SELECTED)
 				else:
-					Button.SetState (IE_GUI_BUTTON_DISABLED)
+					Button.SetState (IE_GUI_BUTTON_ENABLED)
+			else:
+				Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 		if Flags & SHOP_ID:
 			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
