@@ -3214,7 +3214,7 @@ static PyObject* GemRB_Button_SetPicture(PyObject * /*self*/, PyObject* args)
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
-		return NULL;
+		return RuntimeError("Cannot find the button!\n");
 	}
 
 	if (ResRef[0] == 0) {
@@ -3234,12 +3234,12 @@ static PyObject* GemRB_Button_SetPicture(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (!fact) {
-		return NULL;
+		return RuntimeError("Picture resource not found!\n");
 	}
 
 	Sprite2D* Picture = fact->GetSprite2D();
 	if (Picture == NULL) {
-		return NULL;
+		return RuntimeError("Failed to acquire the picture!\n");
 	}
 
 	btn->SetPicture( Picture );
