@@ -470,7 +470,7 @@ def LearnPriestSpells (pc, level, mask):
 	return
 
 # PST uses a button, IWD2 two types, the rest are the same with two labels
-def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
+def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = False):
 	"""Displays the encumbrance as a ratio of current to maximum."""
 
 	# Getting the character's strength
@@ -497,11 +497,11 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
 
 	ratio = (0.0 + encumbrance) / max_encumb
 	if ratio > 1.0:
-		Control.SetTextColor (255, 0, 0)
+		Control.SetTextColor (255, 0, 0, invert_colors)
 	elif ratio > 0.8:
-		Control.SetTextColor (255, 255, 0)
+		Control.SetTextColor (255, 255, 0, invert_colors)
 	else:
-		Control.SetTextColor (255, 255, 255)
+		Control.SetTextColor (255, 255, 255, invert_colors)
 
 	if Control2ID:
 		Control2.SetTextColor (255, 0, 0)

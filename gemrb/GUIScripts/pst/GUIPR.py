@@ -28,6 +28,7 @@ import CommonTables
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
+from ie_action import ACT_CAST
 
 PriestWindow = None
 PriestSpellInfoWindow = None

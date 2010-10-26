@@ -59,6 +59,9 @@ else:
 	leftdiv = 3
 	ground_size = 6
 
+if GUICommon.GameIsPST():
+	import GUICommonWindows
+
 def UpdateContainerWindow ():
 	global Container
 
@@ -66,7 +69,7 @@ def UpdateContainerWindow ():
 
 	pc = GemRB.GameGetFirstSelectedPC ()
 	if GUICommon.GameIsPST():
-		GUICommon.SetEncumbranceLabels (Window, 54, None, pc)
+		GUICommon.SetEncumbranceLabels (Window, 54, None, pc, True)
 	else:
 		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
 
@@ -243,7 +246,9 @@ def OpenContainerWindow ():
 
 	# Done
 	Button = Window.GetControl (51)
-	if not GUICommon.GameIsPST():
+	if GUICommon.GameIsPST():
+		Button.SetText (1403)
+	else:
 		Button.SetText (11973)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeaveContainer)
