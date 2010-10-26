@@ -280,7 +280,7 @@ def DisplayItem (itemresref, type):
 	if type&2:
 		Button.SetText (strrefs[1])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyItemWindow)
-	elif select:
+	elif select and not GUICommon.GameIsPST():
 		Button.SetText (strrefs[2])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesItemWindow)
 	else:
