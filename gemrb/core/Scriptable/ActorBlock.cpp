@@ -699,7 +699,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 					me->CureInvisibility();
 				}
 				// sanctuary ends with all hostile actions or when the caster targets someone else
-				if (target != this && spl->Flags & SF_HOSTILE) {
+				if (target != this || spl->Flags & SF_HOSTILE) {
 					me->CureSanctuary();
 				}
 			}
