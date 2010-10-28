@@ -698,7 +698,8 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 				} else {
 					me->CureInvisibility();
 				}
-				if (target!=this) { //FIXME: only dispel it for hostile spells
+				// sanctuary ends with all hostile actions or when the caster targets someone else
+				if (target != this && spl->Flags & SF_HOSTILE) {
 					me->CureSanctuary();
 				}
 			}
