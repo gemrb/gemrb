@@ -832,7 +832,9 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
 		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1);
-		spl->AddCastingGlow(fxqueue, duration);
+		if (!actor->Modified[IE_AVATARREMOVAL]) {
+			spl->AddCastingGlow(fxqueue, duration);
+		}
 		fxqueue->SetOwner(actor);
 		fxqueue->AddAllEffects(actor, actor->Pos);
 		delete fxqueue;
