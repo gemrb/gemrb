@@ -5932,11 +5932,16 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current store!");
 	}
 	switch (action) {
-	case IE_STORE_BUY: case IE_STORE_STEAL:
+	case IE_STORE_STEAL:
+	case IE_STORE_BUY:
 	{
 		STOItem* si = store->GetItem( Slot );
 		if (!si) {
 			return RuntimeError("Store item not found!");
+		}
+		//always stealing only one item
+		if (action == IE_STORE_STEAL) {
+			si->PurchasedAmount=1;
 		}
 		//the amount of items is stored in si->PurchasedAmount
 		//it will adjust AmountInStock/PurchasedAmount
