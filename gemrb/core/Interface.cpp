@@ -2623,7 +2623,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		}
 
 		if (Owner && Owner->Type==ST_ACTOR) {
-			ab->LastSummoner = ((Actor *) Owner)->GetID();
+			ab->LastSummoner = Owner->GetGlobalID();
 		}
 		//Always use Base stats for the recently summoned creature
 

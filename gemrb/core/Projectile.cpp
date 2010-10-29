@@ -412,7 +412,7 @@ Actor *Projectile::GetTarget()
 			return NULL;
 		}
 		if (res==-1) {
-			Target = original->GetID();
+			Target = original->GetGlobalID();
 			return NULL;
 		}
 		effects->SetOwner(original);

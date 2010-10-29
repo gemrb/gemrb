@@ -250,8 +250,6 @@ public:
 	ieDword InteractCount; //this is accessible in iwd2, probably exists in other games too
 	ieDword appearance;
 	ieDword ModalState;
-	ieWord globalID;
-	ieWord localID;
 	int PathTries; //the # of previous tries to pick up a new walkpath
 public:
 	#define LastTarget LastDisarmFailed
@@ -361,8 +359,8 @@ public:
 	void DebugDump();
 	/** fixes the feet circle */
 	void SetCircleSize();
-	/** places the actor on the map with a unique object ID */
-	void SetMap(Map *map, ieWord LID, ieWord GID);
+	/** places the actor on the map */
+	void SetMap(Map *map);
 	/** sets the actor's position, calculating with the nojump flag*/
 	void SetPosition(const Point &position, int jump, int radius=0);
 	/** you better use SetStat, this stuff is only for special cases*/
@@ -397,10 +395,6 @@ public:
 	/** Modifies the base stat value in different ways, returns difference */
 	int NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
 	void SetLeader(Actor *actor, int xoffset=0, int yoffset=0);
-	ieDword GetID()
-	{
-		return (localID<<16) | globalID;
-	}
 	/** Sets the Icon ResRef */
 	//Which - 0 both, 1 Large, 2 Small
 	void SetPortrait(const char* ResRef, int Which=0);

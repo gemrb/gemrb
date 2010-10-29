@@ -2505,8 +2505,8 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 		}
 
 		// should we be triggering the trap on close?
-		door->TriggerTrap(0, actor->GetID());
-		door->SetDoorOpen( !door->IsOpen(), true, actor->GetID() );
+		door->TriggerTrap(0, actor->GetGlobalID());
+		door->SetDoorOpen( !door->IsOpen(), true, actor->GetGlobalID() );
 	} else {
 		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE,0);
 		return;
@@ -4043,7 +4043,7 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 	}
 	GameControl* gc = core->GetGameControl();
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
-		gc->dialoghandler->speakerID = ((Actor *) tar)->globalID;
+		gc->dialoghandler->speakerID = tar->GetGlobalID();
 	} else {
 		printMessage("GameScript","Can't set gabber!",YELLOW);
 	}
@@ -4538,10 +4538,10 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		//noticed attempt
 		displaymsg->DisplayConstantString(STR_PICKPOCKET_FAIL,0xffffff);
 		if (core->HasFeature(GF_STEAL_IS_ATTACK) ) {
-			tar->LastAttacker = snd->GetID();
+			tar->LastAttacker = snd->GetGlobalID();
 		} else {
 			//pickpocket failed trigger
-			tar->LastOpenFailed = snd->GetID();
+			tar->LastOpenFailed = snd->GetGlobalID();
 		}
 		Sender->ReleaseCurrentAction();
 		return;
@@ -5307,7 +5307,7 @@ void GameScript::MarkObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->LastMarked = ((Actor *) tar)->GetID();
+	actor->LastMarked = tar->GetGlobalID();
 	//if this doesn't modify LastSeen, then remove this line
 	actor->LastSeen = actor->LastMarked;
 }
@@ -5372,7 +5372,7 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		}
 		//mark spell and target
 		me->LastMarkedSpell = splnum;
-		me->LastMarked = actor->GetID();
+		me->LastMarked = actor->GetGlobalID();
 		break;
 end_mso_loop:
 		pos++;
@@ -5519,7 +5519,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		}
 		Actor *actor = (Actor *)Sender;
 		actor->SetModal(MS_NONE);
-		container->TriggerTrap(0, actor->GetID());
+		container->TriggerTrap(0, actor->GetGlobalID());
 		core->SetCurrentContainer(actor, container, true);
 		Sender->ReleaseCurrentAction();
 		return;
@@ -6650,7 +6650,7 @@ void GameScript::FollowCreature(Scriptable* Sender, Action* parameters)
 	}
 	Actor *scr = (Actor *)Sender;
 	Actor *actor = (Actor *)tar;
-	scr->LastFollowed = actor->GetID();
+	scr->LastFollowed = actor->GetGlobalID();
 	scr->FollowOffset.empty();
 	if (!scr->InMove() || scr->Destination != actor->Pos) {
 		scr->WalkTo(actor->Pos, 0, 1);
@@ -6671,7 +6671,7 @@ void GameScript::RunFollow(Scriptable* Sender, Action* parameters)
 	}
 	Actor *scr = (Actor *)Sender;
 	Actor *actor = (Actor *)tar;
-	scr->LastFollowed = actor->GetID();
+	scr->LastFollowed = actor->GetGlobalID();
 	scr->FollowOffset.empty();
 	if (!scr->InMove() || scr->Destination != actor->Pos) {
 		scr->WalkTo(actor->Pos, IF_RUNNING, 1);
@@ -6706,8 +6706,8 @@ void GameScript::ProtectObject(Scriptable* Sender, Action* parameters)
 	}
 	Actor *scr = (Actor *)Sender;
 	Actor *actor = (Actor *)tar;
-	scr->LastFollowed = actor->GetID();
-	scr->LastProtected = actor->GetID();
+	scr->LastFollowed = actor->GetGlobalID();
+	scr->LastProtected = actor->GetGlobalID();
 	//not exactly range
 	scr->FollowOffset.x = parameters->int0Parameter;
 	scr->FollowOffset.y = parameters->int0Parameter;
@@ -6738,7 +6738,7 @@ void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 	}
 	Actor *scr = (Actor *)Sender;
 	Actor *actor = (Actor *)tar;
-	scr->LastFollowed = actor->GetID();
+	scr->LastFollowed = actor->GetGlobalID();
 	ieDword formation = parameters->int0Parameter;
 	ieDword pos = parameters->int1Parameter;
 	scr->FollowOffset = gc->GetFormationOffset(formation, pos);

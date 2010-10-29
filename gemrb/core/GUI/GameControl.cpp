@@ -83,7 +83,7 @@ static ieResRef TestSpell="SPWI207";
 //distance is the detection distance
 void GameControl::SetTracker(Actor *actor, ieDword dist)
 {
-	trackerID = actor->GetID();
+	trackerID = actor->GetGlobalID();
 	distance = dist;
 }
 
@@ -1251,7 +1251,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		}
 
 		if (lastActor) {
-			lastActorID = lastActor->globalID;
+			lastActorID = lastActor->GetGlobalID();
 			lastActor->SetOver( true );
 			ieDword type = lastActor->GetStat(IE_EA);
 			if (type >= EA_EVILCUTOFF || type == EA_GOODBUTRED) {
@@ -1605,7 +1605,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	source->ClearPath();
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial1()",sizeof(Tmp) );
-	dialoghandler->targetID = tgt->globalID; //this is a hack, but not so deadly
+	dialoghandler->targetID = tgt->GetGlobalID(); //this is a hack, but not so deadly
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
 }
 
@@ -1705,7 +1705,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			//reset trap and deactivated flags
 			if (trap->Scripts[0]) {
 				if (!(trap->Flags&TRAP_DEACTIVATED) ) {
-					trap->LastTriggerObject = trap->LastTrigger = actor->GetID();
+					trap->LastTriggerObject = trap->LastTrigger = actor->GetGlobalID();
 					trap->ImmediateEvent();
 					//directly feeding the event, even if there are actions in the queue
 					trap->Scripts[0]->Update();
@@ -2200,7 +2200,7 @@ void GameControl::SetLastActor(Actor *actor, Actor *prevActor)
 	if (!actor) {
 		lastActorID = 0;
 	} else {
-		lastActorID = actor->globalID;
+		lastActorID = actor->GetGlobalID();
 		actor->SetOver( true );
 	}
 }
@@ -2616,9 +2616,9 @@ Sprite2D* GameControl::GetPortraitPreview(int pcslot)
 	return img_scaled;
 }
 
-Actor *GameControl::GetActorByGlobalID(ieWord ID)
+Actor *GameControl::GetActorByGlobalID(ieDword globalID)
 {
-	if (!ID)
+	if (!globalID)
 		return NULL;
 	Game* game = core->GetGame();
 	if (!game)
@@ -2628,7 +2628,7 @@ Actor *GameControl::GetActorByGlobalID(ieWord ID)
 	if (!area)
 		return NULL;
 	return
-		area->GetActorByGlobalID(ID);
+		area->GetActorByGlobalID(globalID);
 }
 
 Actor *GameControl::GetLastActor()

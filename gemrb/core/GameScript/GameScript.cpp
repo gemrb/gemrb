@@ -2309,7 +2309,7 @@ Action* GenerateActionDirect(char *String, Actor *object)
 	Action* action = GenerateAction(String);
 	Object *tmp = action->objects[1];
 	if (tmp && tmp->objectFields[0]==-1) {
-		tmp->objectFields[1] = object->globalID;
+		tmp->objectFields[1] = object->GetGlobalID();
 	}
 	action->pointParameter.empty();
 	return action;

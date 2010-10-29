@@ -102,10 +102,8 @@ public:
 	static void MultipleQuickSaves(int arg);
 	void SetTracker(Actor *actor, ieDword dist);
 private:
-	//Actor* lastActor;
-	//using global ID which is safer
-	ieWord lastActorID;
-	ieWord trackerID;
+	ieDword lastActorID;
+	ieDword trackerID;
 	ieDword distance;  //tracking distance
 	std::vector< Actor*> highlighted;
 	bool DrawSelectionRect;
@@ -174,7 +172,7 @@ private:
 	/** this function is called when the user presses 'q' (or equivalent) */
 	void QuickSave();
 	/** this function safely retrieves an Actor by ID */
-	Actor *GetActorByGlobalID(ieWord ID);
+	Actor *GetActorByGlobalID(ieDword ID);
 	void CalculateSelection(const Point &p);
 	void ResizeDel(Window* win, int type);
 	void ResizeAdd(Window* win, int type);

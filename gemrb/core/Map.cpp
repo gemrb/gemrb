@@ -66,7 +66,6 @@ static Point **VisibilityMasks=NULL;
 static bool PathFinderInited = false;
 static Variables Spawns;
 static int LargeFog;
-static ieWord globalActorCounter;
 
 void ReleaseSpawnGroup(void *poi)
 {
@@ -303,12 +302,10 @@ Map::Map(void)
 		InitPathFinder();
 		InitSpawnGroups();
 		InitExplore();
-		globalActorCounter = 0;
 	}
 	ExploredBitmap = NULL;
 	VisibleBitmap = NULL;
 	version = 0;
-	localActorCounter = 0;
 	MasterArea = core->GetGame()->MasterArea(scriptName);
 }
 
@@ -543,7 +540,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		return;
 	}
 	if (ip->Scripts[0]) {
-		ip->LastTriggerObject = ip->LastTrigger = ip->LastEntered = actor->GetID();
+		ip->LastTriggerObject = ip->LastTrigger = ip->LastEntered = actor->GetGlobalID();
 		ip->ExecuteScript( 1 );
 		ip->ProcessActions(true);
 	}
@@ -1232,10 +1229,10 @@ void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
 			}
 		}
 		if (shoutID) {
-			listener->LastHeard = actor->GetID();
+			listener->LastHeard = actor->GetGlobalID();
 			listener->LastShout = shoutID;
 		} else {
-			listener->LastHelp = actor->GetID();
+			listener->LastHelp = actor->GetGlobalID();
 		}
 	}
 }
@@ -1287,9 +1284,7 @@ void Map::AddActor(Actor* actor)
 {
 	//setting the current area for the actor as this one
 	strnlwrcpy(actor->Area, scriptName, 8);
-	//if actor->globalID was already set, don't change it
-	actor->SetMap(this, ++localActorCounter,
-		actor->globalID?actor->globalID:++globalActorCounter);
+	actor->SetMap(this);
 	actors.push_back( actor );
 	//if a visible aggressive actor was put on the map, it is an autopause reason
 	//guess game is always loaded? if not, then we'll crash
@@ -1336,7 +1331,7 @@ void Map::DeleteActor(int i)
 		//this frees up the spot under the feet circle
 		ClearSearchMapFor( actor );
 		//remove the area reference from the actor
-		actor->SetMap(NULL,0,0);
+		actor->SetMap(NULL);
 		//don't destroy the object in case it is a persistent object
 		//otherwise there is a dead reference causing a crash on save
 		if (!game->InStore(actor) ) {
@@ -1353,12 +1348,11 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
 		return NULL;
 	}
 	//truncation is intentional
-	ieWord globalID = (ieWord) objectID;
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 
-		if (actor->globalID==globalID) {
+		if (actor->GetGlobalID()==objectID) {
 			return actor;
 		}
 	}
@@ -3516,7 +3510,7 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell)
 		return;
 	}
 
-	LastCasterSeen = ((Actor *) caster)->GetID();
+	LastCasterSeen = caster->GetGlobalID();
 	LastSpellSeen = spell;
 
 	size_t i = actors.size();

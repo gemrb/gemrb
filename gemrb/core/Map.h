@@ -234,7 +234,6 @@ public:
 	ieByte* VisibleBitmap;
 	int version;
 	ieResRef WEDResRef;
-	ieWord localActorCounter;
 	bool MasterArea;
 	//this is set by the importer (not stored in the file)
 	bool DayNight;

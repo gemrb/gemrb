@@ -9276,7 +9276,7 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 
 	//not sure if this is ok
 	//owner->LastAttacker = attacker->GetID();
-	owner->LastDisarmFailed = attacker->GetID();
+	owner->LastDisarmFailed = attacker->GetGlobalID();
 	Py_INCREF( Py_None );
 	return Py_None;
 }

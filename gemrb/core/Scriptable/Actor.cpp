@@ -397,8 +397,6 @@ Actor::Actor()
 	//set it to a neutral value
 	ModalSpell[0] = '*';
 	LingeringModalSpell[0] = '*';
-	//this one is saved, but not loaded?
-	localID = globalID = 0;
 	//this one is not saved
 	GotLUFeedback = false;
 	RollSaves();
@@ -586,7 +584,7 @@ void Actor::SetCircleSize()
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
 		color = &yellow;
 		color_index = 5;
-	} else if (gc && gc->dialoghandler->targetID == globalID && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
+	} else if (gc && gc->dialoghandler->targetID == GetGlobalID() && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
 		color = &white;
 		color_index = 3; //?? made up
 	} else {
@@ -2658,10 +2656,10 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	//add lastdamagetype up ? maybe
 	LastDamageType|=damagetype;
 	if(hitter && hitter->Type==ST_ACTOR) {
-		LastHitter=((Actor *) hitter)->GetID();
+		LastHitter=hitter->GetGlobalID();
 	} else {
 		//Maybe it should be something impossible like 0xffff, and use 'Someone'
-		LastHitter=GetID();
+		LastHitter=GetGlobalID();
 	}
 
 	switch(modtype)
@@ -2897,7 +2895,7 @@ void Actor::DebugDump()
 	}
 	printf( "\nArea:       %.8s   ", Area );
 	printf( "Dialog:     %.8s\n", Dialog );
-	printf( "Global ID:  %d   Local ID:  %d\n", globalID, localID);
+	printf( "Global ID:  %d\n", GetGlobalID());
 	printf( "Script name:%.32s\n", scriptName );
 	printf( "TalkCount:  %d   ", TalkCount );
 	printf( "PartySlot:  %d\n", InParty );
@@ -2943,7 +2941,7 @@ const char* Actor::GetActorNameByID(ieDword ID) const
 	return actor->GetScriptName();
 }
 
-void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
+void Actor::SetMap(Map *map)
 {
 	//Did we have an area?
 	bool effinit=!GetCurrentArea();
@@ -2951,15 +2949,10 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 	Scriptable::SetMap(map);
 	//unless we just lost it, in that case clear up some fields and leave
 	if (!map) {
-		//the local ID is surely illegal after the map is nulled
-		localID = 0;
 		//more bits may or may not be needed
 		InternalFlags &=~IF_CLEANUP;
 		return;
 	}
-
-	localID = LID;
-	globalID = GID;
 
 	//These functions are called once when the actor is first put in
 	//the area. It already has all the items (including fist) at this
@@ -3217,7 +3210,7 @@ void Actor::Die(Scriptable *killer)
 	//Can't simply set Selected to false, game has its own little list
 	Game *game = core->GetGame();
 	game->SelectActor(this, false, SELECT_NORMAL);
-	game->OutAttack(GetID());
+	game->OutAttack(GetGlobalID());
 
 	displaymsg->DisplayConstantStringName(STR_DEATH, 0xffffff, this);
 	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
@@ -3461,7 +3454,7 @@ bool Actor::CheckOnDeath()
 	}
 	// don't destroy actors currently in a dialog
 	GameControl *gc = core->GetGameControl();
-	if (gc && (globalID == gc->dialoghandler->targetID || globalID == gc->dialoghandler->speakerID)) {
+	if (gc && (GetGlobalID() == gc->dialoghandler->targetID || GetGlobalID() == gc->dialoghandler->speakerID)) {
 		return false;
 	}
 
@@ -4010,9 +4003,9 @@ int Actor::GetAttackStyle()
 
 void Actor::AttackedBy( Actor *attacker)
 {
-	LastAttacker = attacker->GetID();
+	LastAttacker = attacker->GetGlobalID();
 	Game * game = core->GetGame();
-	game->InAttack(GetID() );
+	game->InAttack(GetGlobalID() );
 	game->InAttack(LastAttacker);
 }
 
@@ -4020,7 +4013,7 @@ void Actor::SetTarget( Scriptable *target)
 {
 	if (target->Type==ST_ACTOR) {
 		Actor *tar = (Actor *) target;
-		LastTarget = tar->GetID();
+		LastTarget = tar->GetGlobalID();
 		tar->AttackedBy(this);
 	}
 	SetOrientation( GetOrient( target->Pos, Pos ), false );
@@ -4031,7 +4024,7 @@ void Actor::StopAttack()
 {
 	SetStance(IE_ANI_READY);
 	secondround = 0;
-	core->GetGame()->OutAttack(GetID());
+	core->GetGame()->OutAttack(GetGlobalID());
 	InternalFlags|=IF_TARGETGONE; //this is for the trigger!
 	if (InParty) {
 		core->Autopause(AP_NOTARGET);
@@ -4080,7 +4073,7 @@ void Actor::InitRound(ieDword gameTime)
 	//is guaranteed to be the start of a round, and we only want roundTime
 	//if we are attacking this round
 	if (InternalFlags&IF_STOPATTACK) {
-		core->GetGame()->OutAttack(GetID());
+		core->GetGame()->OutAttack(GetGlobalID());
 		roundTime = 0;
 		return;
 	}
@@ -4706,7 +4699,7 @@ void Actor::UpdateActorState(ieDword gameTime) {
 			StopAttack();
 		} else {
 			printMessage("Attack","(Leaving attack)", GREEN);
-			core->GetGame()->OutAttack(GetID());
+			core->GetGame()->OutAttack(GetGlobalID());
 		}
 
 		roundTime = 0;
@@ -4835,7 +4828,7 @@ void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 
 void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)
 {
-	LastFollowed = actor->GetID();
+	LastFollowed = actor->GetGlobalID();
 	FollowOffset.x = xoffset;
 	FollowOffset.y = yoffset;
 }
@@ -5119,7 +5112,7 @@ void Actor::Draw(const Region &screen)
 		drawcircle = false;
 	}
 	// the speaker should get a circle even in cutscenes
-	if (gc->dialoghandler->targetID == globalID && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
+	if (gc->dialoghandler->targetID == GetGlobalID() && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
 		drawcircle = true;
 	}
 	if (BaseStats[IE_STATE_ID]&STATE_DEAD || InternalFlags&IF_JUSTDIED) {
@@ -5809,7 +5802,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
 	gamedata->FreeItem(itm,tmpresref, false);
 	if (pro) {
-		pro->SetCaster(globalID);
+		pro->SetCaster(GetGlobalID());
 		GetCurrentArea()->AddProjectile(pro, Pos, target);
 		return true;
 	}
@@ -5844,7 +5837,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	gamedata->FreeItem(itm,tmpresref, false);
 	if (pro) {
 		//ieDword is unsigned!!
-		pro->SetCaster(globalID);
+		pro->SetCaster(GetGlobalID());
 		if(((int)header < 0) && !(flags&UI_MISS)) { //using a weapon
 			ITMExtHeader *which = itm->GetWeaponHeader(header == (ieDword)-2);
 			Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, (weapon_damagetype[which->DamageType])<<16, FX_DURATION_INSTANT_LIMITED);
@@ -5855,7 +5848,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 			delete AttackEffect;
 			attackProjectile = pro;
 		} else //launch it now as we are not attacking
-			GetCurrentArea()->AddProjectile(pro, Pos, tar->globalID, false);
+			GetCurrentArea()->AddProjectile(pro, Pos, tar->GetGlobalID(), false);
 		return true;
 	}
 	return false;

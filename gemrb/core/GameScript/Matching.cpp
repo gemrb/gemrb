@@ -301,7 +301,7 @@ Scriptable* GetStoredActorFromObject(Scriptable* Sender, Object* oC, int ga_flag
 	if (tar && tar->Type == ST_ACTOR) {
 		// .. but we only want objects created via objectFilters
 		if (oC->objectFilters[0]) {
-			Sender->CurrentActionTarget = ((Actor *)tar)->globalID;
+			Sender->CurrentActionTarget = tar->GetGlobalID();
 		}
 	}
 	return tar;
@@ -406,7 +406,7 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
 			Actor *actor = (Actor *) tt->actor;
-			if (actor->GetID() == actorID) {
+			if (actor->GetGlobalID() == actorID) {
 				ret = true;
 				break;
 			}

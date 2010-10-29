@@ -504,7 +504,7 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR) {
 			Actor* snd = ( Actor* ) Sender;
 			//additional checks for invisibility?
-			snd->LastSeen = ((Actor *) tar)->GetID();
+			snd->LastSeen = tar->GetGlobalID();
 		}
 		return 1;
 	}
@@ -1197,7 +1197,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	ieDword targetID = 0;
 	if (target->Type==ST_ACTOR) {
 		tar = (Actor *) target;
-		targetID = tar->GetID();
+		targetID = tar->GetGlobalID();
 	}
 	if (actor == tar) {
 		Sender->ReleaseCurrentAction();
