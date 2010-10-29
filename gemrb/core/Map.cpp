@@ -1342,12 +1342,53 @@ void Map::DeleteActor(int i)
 	actors.erase( actors.begin()+i );
 }
 
+Door *Map::GetDoorByGlobalID(ieDword objectID)
+{
+	if (!objectID) return NULL;
+
+	int doorCount = 0;
+	while (true) {
+		Door* door = TMap->GetDoor( doorCount++ );
+		if (!door)
+			return NULL;
+		if (door->GetGlobalID() == objectID)
+			return door;
+	}
+}
+
+Container *Map::GetContainerByGlobalID(ieDword objectID)
+{
+	if (!objectID) return NULL;
+
+	int containerCount = 0;
+	while (true) {
+		Container* container = TMap->GetContainer( containerCount++ );
+		if (!container)
+			return NULL;
+		if (container->GetGlobalID() == objectID)
+			return container;
+	}
+}
+
+InfoPoint *Map::GetInfoPointByGlobalID(ieDword objectID)
+{
+	if (!objectID) return NULL;
+
+	int ipCount = 0;
+	while (true) {
+		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
+		if (!ip)
+			return NULL;
+		if (ip->GetGlobalID() == objectID)
+			return ip;
+	}
+}
+
 Actor* Map::GetActorByGlobalID(ieDword objectID)
 {
 	if (!objectID) {
 		return NULL;
 	}
-	//truncation is intentional
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];

@@ -319,6 +319,9 @@ public:
 	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size);
 	unsigned char GetBlocked(unsigned int x, unsigned int y);
 	unsigned char GetBlocked(const Point &p);
+	Door *GetDoorByGlobalID(ieDword objectID);
+	Container *GetContainerByGlobalID(ieDword objectID);
+	InfoPoint *GetInfoPointByGlobalID(ieDword objectID);
 	Actor* GetActorByGlobalID(ieDword objectID);
 	Actor* GetActor(const Point &p, int flags);
 	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius);
