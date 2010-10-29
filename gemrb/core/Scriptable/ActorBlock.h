@@ -169,6 +169,7 @@ private:
 	// script_timers should probably be a std::map to
 	// conserve memory (usually at most 2 ids are used)
 	ieDword script_timers[MAX_TIMER];
+	ieDword globalID;
 protected: //let Actor access this
 	Map *area;
 	ieVariable scriptName;
@@ -179,7 +180,7 @@ protected: //let Actor access this
 	Action* CurrentAction;
 public:
 	int CurrentActionState;
-	ieWord CurrentActionTarget;
+	ieDword CurrentActionTarget;
 	bool CurrentActionInterruptable;
 	ieDword lastDelay;
 	ieDword lastRunTime;
@@ -270,7 +271,7 @@ public:
 	/* spellcasting finished */
 	void CastSpellPointEnd( const ieResRef SpellResRef);
 	void CastSpellEnd( const ieResRef SpellResRef);
-	ieWord GetGlobalID();
+	ieDword GetGlobalID() const { return globalID; }
 	/** timer functions (numeric ID, not saved) */
 	bool TimerActive(ieDword ID);
 	bool TimerExpired(ieDword ID);

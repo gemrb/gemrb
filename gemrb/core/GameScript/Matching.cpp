@@ -301,7 +301,7 @@ Scriptable* GetStoredActorFromObject(Scriptable* Sender, Object* oC, int ga_flag
 	if (tar && tar->Type == ST_ACTOR) {
 		// .. but we only want objects created via objectFilters
 		if (oC->objectFilters[0]) {
-			Sender->CurrentActionTarget = ((Actor *)tar)->globalID;
+			Sender->CurrentActionTarget = tar->GetGlobalID();
 		}
 	}
 	return tar;
@@ -325,7 +325,7 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 		}
 
 		//global actors are always found by object ID!
-		return game->GetActorByGlobalID(oC->objectFields[1]);
+		return game->GetGlobalActorByGlobalID(oC->objectFields[1]);
 	}
 
 	if (oC->objectName[0]) {
@@ -356,7 +356,7 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 	if (!Sender) {
 		return false;
 	}
-	Actor *ac = core->GetGame()->GetActorByGlobalID(actorID);
+	Actor *ac = Sender->GetCurrentArea()->GetActorByGlobalID(actorID);
 	if (!ac) {
 		return false;
 	}
@@ -406,7 +406,7 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
 			Actor *actor = (Actor *) tt->actor;
-			if (actor->GetID() == actorID) {
+			if (actor->GetGlobalID() == actorID) {
 				ret = true;
 				break;
 			}

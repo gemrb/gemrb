@@ -4506,7 +4506,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	fam->SetBase(IE_EA, EA_FAMILIAR);
-	fam->LastSummoner = ((Actor *) Owner)->GetID();
+	fam->LastSummoner = Owner->GetGlobalID();
 
 	Map *map = target->GetCurrentArea();
 	map->AddActor(fam);

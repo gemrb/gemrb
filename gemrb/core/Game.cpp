@@ -202,17 +202,17 @@ Actor* Game::FindNPC(const char *scriptingname)
 	return NULL;
 }
 
-Actor *Game::GetActorByGlobalID(unsigned int objectID)
+Actor *Game::GetGlobalActorByGlobalID(ieDword globalID)
 {
-  unsigned int slot;
+	unsigned int slot;
 
 	for (slot=0; slot<PCs.size(); slot++) {
-		if (PCs[slot]->GetGlobalID()==objectID ) {
+		if (PCs[slot]->GetGlobalID()==globalID ) {
 			return PCs[slot];
 		}
 	}
 	for (slot=0; slot<NPCs.size(); slot++) {
-		if (NPCs[slot]->GetGlobalID()==objectID ) {
+		if (NPCs[slot]->GetGlobalID()==globalID ) {
 			return NPCs[slot];
 		}
 	}
@@ -327,7 +327,7 @@ int Game::LeaveParty (Actor* actor)
 	std::vector< Actor*>::iterator m = PCs.begin() + slot;
 	PCs.erase( m );
 
-	ieDword id = actor->GetID();
+	ieDword id = actor->GetGlobalID();
 	for ( m = PCs.begin(); m != PCs.end(); ++m) {
 		(*m)->PCStats->LastLeft = id;
 		if ( (*m)->InParty>actor->InParty) {
@@ -412,7 +412,7 @@ int Game::JoinParty(Actor* actor, int join)
 		//set the joining date
 		actor->PCStats->JoinDate = GameTime;
 		if (size) {
-			ieDword id = actor->GetID();
+			ieDword id = actor->GetGlobalID();
 			for (size_t i=0;i<size; i++) {
 				Actor *a = GetPC(i, false);
 				a->PCStats->LastJoined = id;
@@ -1214,7 +1214,7 @@ bool Game::PCInCombat(Actor* actor) const
 	if (actor->LastTarget) {
 		return true;
 	}
-	if (AttackersOf(actor->GetID(), actor->GetCurrentArea())) {
+	if (AttackersOf(actor->GetGlobalID(), actor->GetCurrentArea())) {
 		return true;
 	}
 	return false;
@@ -1790,15 +1790,15 @@ void Game::DebugDump()
 		printf("Name: %s Order %d %s\n",actor->ShortName, actor->InParty, actor->Selected?"x":"-");
 	}
 }
-/*
-Actor *Game::GetActorByGlobalID(ieWord objectID)
+
+Actor *Game::GetActorByGlobalID(ieDword globalID)
 {
 	size_t mc = GetLoadedMapCount();
 	while(mc--) {
 		Map *map = GetMap(mc);
-		Actor *actor = map->GetActorByGlobalID(objectID);
+		Actor *actor = map->GetActorByGlobalID(globalID);
 		if (actor) return actor;
 	}
 	return NULL;
 }
-*/
+

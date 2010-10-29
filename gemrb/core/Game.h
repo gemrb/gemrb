@@ -239,7 +239,7 @@ public:
 	Actor* FindPC(unsigned int partyID);
 	Actor* FindNPC(unsigned int partyID);
 	/** Finds a global actor by global ID */
-	Actor* GetActorByGlobalID(unsigned int globalID);
+	Actor* GetGlobalActorByGlobalID(ieDword globalID);
 	/** Finds an actor in party, returns slot, if not there, returns -1*/
 	int InParty(Actor* pc) const;
 	/** Finds an actor in store, returns slot, if not there, returns -1*/
@@ -408,7 +408,7 @@ public:
 	/** Dumps information about the object */
 	void DebugDump();
 	/** Finds an actor by global ID */
-	//Actor *GetActorByGlobalID(ieWord objectID);
+	Actor *GetActorByGlobalID(ieDword objectID);
 	/** updates the infravision info */
 	void Infravision();
 private:

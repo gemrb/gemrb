@@ -31,14 +31,14 @@ public:
 	~DialogHandler();
 private:
 	/** this function safely retrieves an Actor by ID */
-	Actor *GetActorByGlobalID(ieWord ID);
+	Actor *GetActorByGlobalID(ieDword ID);
 private:
 	DialogState* ds;
 	Dialog* dlg;
 public:
-	ieWord speakerID;
-	ieWord targetID;
-	ieWord originalTargetID;
+	ieDword speakerID;
+	ieDword targetID;
+	ieDword originalTargetID;
 	//no idea if this is viable
 	Scriptable *targetOB;
 public:

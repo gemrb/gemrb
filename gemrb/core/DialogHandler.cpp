@@ -69,7 +69,7 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 	//linked to)
 
 	Actor *spe = (Actor *) spk;
-	speakerID = spe->globalID;
+	speakerID = spe->GetGlobalID();
 	Actor *oldTarget = GetActorByGlobalID(targetID);
 	if (tgt->Type!=ST_ACTOR) {
 		targetID=0xffff;
@@ -80,9 +80,9 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 		spk->LastTalkedTo=0;
 	} else {
 		Actor *tar = (Actor *) tgt;
-		speakerID = spe->globalID;
-		targetID = tar->globalID;
-		if (!originalTargetID) originalTargetID = tar->globalID;
+		speakerID = spe->GetGlobalID();
+		targetID = tar->GetGlobalID();
+		if (!originalTargetID) originalTargetID = tar->GetGlobalID();
 		spe->LastTalkedTo=targetID;
 		tar->LastTalkedTo=speakerID;
 		tar->SetCircleSize();
@@ -334,7 +334,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 				return;
 			}
 			Actor *oldTarget = GetActorByGlobalID(targetID);
-			targetID = tgt->globalID;
+			targetID = tgt->GetGlobalID();
 			tgt->SetCircleSize();
 			if (oldTarget) oldTarget->SetCircleSize();
 			// we have to make a backup, tr->Dialog is freed
@@ -430,7 +430,7 @@ end_of_choose:
 }
 
 // TODO: duplicate of the one in GameControl
-Actor *DialogHandler::GetActorByGlobalID(ieWord ID)
+Actor *DialogHandler::GetActorByGlobalID(ieDword ID)
 {
 	if (!ID)
 		return NULL;
@@ -441,8 +441,7 @@ Actor *DialogHandler::GetActorByGlobalID(ieWord ID)
 	Map* area = game->GetCurrentArea( );
 	if (!area)
 		return NULL;
-	return
-		area->GetActorByGlobalID(ID);
+	return area->GetActorByGlobalID(ID);
 }
 
 Actor *DialogHandler::GetTarget()

@@ -235,7 +235,7 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	//for example the aaquatah dialog in irenicus dungeon depends on it
 	GameControl *gc = core->GetGameControl();
 	Actor *pc = (Actor *) scr;
-	if (pc->globalID == gc->dialoghandler->targetID || pc->globalID==gc->dialoghandler->speakerID) {
+	if (pc->GetGlobalID() == gc->dialoghandler->targetID || pc->GetGlobalID()==gc->dialoghandler->speakerID) {
 		return 0;
 	}
 
@@ -289,7 +289,7 @@ int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
 int GameScript::InPartySlot(Scriptable* Sender, Trigger* parameters)
 {
 	Actor *actor = core->GetGame()->GetPC(parameters->int0Parameter, false);
-	return MatchActor(Sender, actor->GetID(), parameters->objectParameter);
+	return MatchActor(Sender, actor->GetGlobalID(), parameters->objectParameter);
 }
 
 int GameScript::Exists(Scriptable* Sender, Trigger* parameters)
@@ -316,7 +316,7 @@ int GameScript::IsGabber(Scriptable* Sender, Trigger* parameters)
 	if (!scr || scr->Type!=ST_ACTOR) {
 		return 0;
 	}
-	if (((Actor *) scr)->globalID == core->GetGameControl()->dialoghandler->speakerID)
+	if (scr->GetGlobalID() == core->GetGameControl()->dialoghandler->speakerID)
 		return 1;
 	return 0;
 }
@@ -2362,7 +2362,7 @@ int GameScript::SetLastMarkedObject(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	scr->LastMarked = actor->GetID();
+	scr->LastMarked = actor->GetGlobalID();
 	return 1;
 }
 
@@ -3309,9 +3309,8 @@ int GameScript::NullDialog(Scriptable* Sender, Trigger* parameters)
 	if (tar->Type != ST_ACTOR) {
 		return 0;
 	}
-	Actor *actor = (Actor *) tar;
 	GameControl *gc = core->GetGameControl();
-	if ( (actor->globalID != gc->dialoghandler->targetID) && (actor->globalID != gc->dialoghandler->speakerID) ) {
+	if ( (tar->GetGlobalID() != gc->dialoghandler->targetID) && (tar->GetGlobalID() != gc->dialoghandler->speakerID) ) {
 		return 1;
 	}
 	return 0;
@@ -3456,12 +3455,10 @@ int GameScript::InteractingWith(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	GameControl *gc = core->GetGameControl();
-	Actor *pc = (Actor *) Sender;
-	if (pc->globalID != gc->dialoghandler->targetID && pc->globalID != gc->dialoghandler->speakerID) {
+	if (Sender->GetGlobalID() != gc->dialoghandler->targetID && Sender->GetGlobalID() != gc->dialoghandler->speakerID) {
 		return 0;
 	}
-	pc = (Actor *) tar;
-	if (pc->globalID != gc->dialoghandler->targetID && pc->globalID != gc->dialoghandler->speakerID) {
+	if (tar->GetGlobalID() != gc->dialoghandler->targetID && tar->GetGlobalID() != gc->dialoghandler->speakerID) {
 		return 0;
 	}
 	return 1;
@@ -3543,7 +3540,7 @@ int GameScript::AttackedBy(Scriptable* Sender, Trigger* parameters)
 		while (tt) {
 			Actor *actor = (Actor *) tt->actor;
 			//if (actor->LastTarget == scr->GetID()) {
-			if (scr->LastAttacker == actor->GetID()) {
+			if (scr->LastAttacker == actor->GetGlobalID()) {
 				if (!AStyle || (AStyle==actor->GetAttackStyle()) ) {
 					scr->AddTrigger(&scr->LastAttacker);
 					ret = 1;

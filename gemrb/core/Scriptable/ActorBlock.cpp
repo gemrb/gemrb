@@ -42,6 +42,8 @@
 
 #define YESNO(x) ( (x)?"Yes":"No")
 
+static ieDword globalActorCounter = 0;
+
 /***********************
  *  Scriptable Class   *
  ***********************/
@@ -75,6 +77,8 @@ Scriptable::Scriptable(ScriptableType type)
 	lastRunTime = 0; //evaluating scripts
 	lastDelay = 0;
 	Dialog[0] = 0;
+
+	globalID = ++globalActorCounter;
 
 	interval = ( 1000 / AI_UPDATE_TIME );
 	WaitCounter = 0;
@@ -420,15 +424,6 @@ void Scriptable::ReleaseCurrentAction()
 	CurrentActionInterruptable = true;
 }
 
-ieWord Scriptable::GetGlobalID()
-{
-	if (Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
-		return actor->globalID;
-	}
-	return 0;
-}
-
 void Scriptable::ProcessActions(bool force)
 {
 	unsigned long thisTime = core->GetGame()->Ticks;
@@ -681,7 +676,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 			if (target && (Type==ST_ACTOR) ) {
 				Actor *me = (Actor *) this;
 				target->LastSpellOnMe = spellnum;
-				target->LastCasterOnMe = me->GetID();
+				target->LastCasterOnMe = me->GetGlobalID();
 				// don't cure invisibility if this is a self targetting invisibility spell
 				// like shadow door
 				//can't check GetEffectBlock, since it doesn't construct the queue for selftargetting spells
@@ -1836,11 +1831,11 @@ void Highlightable::TryDisarm(Actor *actor)
 {
 	if (!Trapped || !TrapDetected) return;
 
-	LastTriggerObject = LastTrigger = actor->GetID();
+	LastTriggerObject = LastTrigger = actor->GetGlobalID();
 	int skill = actor->GetStat(IE_TRAPS);
 
 	if (skill/2+core->Roll(1,skill/2,0)>TrapRemovalDiff) {
-		LastDisarmed = actor->GetID();
+		LastDisarmed = actor->GetGlobalID();
 		//trap removed
 		Trapped = 0;
 		displaymsg->DisplayConstantStringName(STR_DISARM_DONE, 0xd7d7be, actor);
@@ -1866,12 +1861,12 @@ void Door::TryPickLock(Actor *actor)
 	}
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
-		LastPickLockFailed = actor->GetID();
+		LastPickLockFailed = actor->GetGlobalID();
 		return;
 	}
 	SetDoorLocked( false, true);
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
-	LastUnlocked = actor->GetID();
+	LastUnlocked = actor->GetGlobalID();
 	ImmediateEvent();
 	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
 	Game *game = core->GetGame();
@@ -1894,7 +1889,7 @@ void Door::TryBashLock(Actor *actor)
 	displaymsg->DisplayConstantStringName(STR_DOORBASH_DONE, 0xd7d7be, actor);
 	SetDoorLocked(false, true);
 	//Is this really useful ?
-	LastUnlocked = actor->GetID();
+	LastUnlocked = actor->GetGlobalID();
 	ImmediateEvent();
 }
 
@@ -2093,7 +2088,7 @@ check:
 		//no need to avoid a travel trigger
 
 		//skill?
-		if (TriggerTrap(0, actor->GetID()) ) {
+		if (TriggerTrap(0, actor->GetGlobalID()) ) {
 			return true;
 		}
 	}
@@ -2323,12 +2318,12 @@ void Container::TryPickLock(Actor *actor)
 	}
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
-		LastPickLockFailed = actor->GetID();
+		LastPickLockFailed = actor->GetGlobalID();
 		return;
 	}
 	SetContainerLocked(false);
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
-	LastUnlocked = actor->GetID();
+	LastUnlocked = actor->GetGlobalID();
 	ImmediateEvent();
 	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
 	Game *game = core->GetGame();
@@ -2351,7 +2346,7 @@ void Container::TryBashLock(Actor *actor)
 	displaymsg->DisplayConstantStringName(STR_CONTBASH_DONE, 0xd7d7be, actor);
 	SetContainerLocked(false);
 	//Is this really useful ?
-	LastUnlocked = actor->GetID();
+	LastUnlocked = actor->GetGlobalID();
 	ImmediateEvent();
 }
 
