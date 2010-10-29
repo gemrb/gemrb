@@ -325,7 +325,7 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 		}
 
 		//global actors are always found by object ID!
-		return game->GetActorByGlobalID(oC->objectFields[1]);
+		return game->GetGlobalActorByGlobalID(oC->objectFields[1]);
 	}
 
 	if (oC->objectName[0]) {
@@ -356,7 +356,7 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 	if (!Sender) {
 		return false;
 	}
-	Actor *ac = core->GetGame()->GetActorByGlobalID(actorID);
+	Actor *ac = Sender->GetCurrentArea()->GetActorByGlobalID(actorID);
 	if (!ac) {
 		return false;
 	}
