@@ -1896,6 +1896,7 @@ void Door::TryBashLock(Actor *actor)
 void Door::DebugDump() const
 {
 	printf( "Debugdump of Door %s:\n", GetScriptName() );
+	printf( "Door Global ID:  %d\n", GetGlobalID());
 	printf( "Door Open: %s\n", YESNO(IsOpen()));
 	printf( "Door Locked: %s\n", YESNO(Flags&DOOR_LOCKED));
 	printf( "Door Trapped: %s\n", YESNO(Trapped));
@@ -2111,6 +2112,7 @@ void InfoPoint::DebugDump() const
 			printf( "Debugdump of Unsupported Region %s:\n", GetScriptName() );
 			break;
 	}
+	printf( "Region Global ID:  %d\n", GetGlobalID());
 	printf( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));
 	printf( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
 		TrapRemovalDiff );
@@ -2353,6 +2355,7 @@ void Container::TryBashLock(Actor *actor)
 void Container::DebugDump() const
 {
 	printf( "Debugdump of Container %s\n", GetScriptName() );
+	printf( "Container Global ID:  %d\n", GetGlobalID());
 	printf( "Type: %d,  LockDifficulty: %d\n", Type, LockDifficulty );
 	printf( "Flags: %d, Trapped: %s, Detected: %d\n", Flags, YESNO(Trapped), TrapDetected );
 	printf( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
