@@ -176,8 +176,8 @@ static unsigned int monkbon_rows = 0;
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 static ActionButtonRow2 *OtherGUIButtons = NULL;
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
-	ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
-	ACT_NONE, ACT_INNATE};
+	ACT_QSPELL1, ACT_QSPELL2, ACT_QSPELL3, ACT_CAST, ACT_USE, ACT_QSLOT1, ACT_QSLOT2,
+	ACT_QSLOT3, ACT_INNATE};
 static int QslotTranslation = false;
 static int DeathOnZeroStat = true;
 static ieDword TranslucentShadows = 0;
