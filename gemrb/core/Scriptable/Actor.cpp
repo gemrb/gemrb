@@ -246,6 +246,8 @@ static ieResRef hc_overlays[OVERLAY_COUNT]={"SANCTRY","SPENTACI","SPMAGGLO","SPS
 "GREASED","WEBENTD","MINORGLB","","","","","","","","","","","","","","",
 "","","","SPTURNI2","SPTURNI","","","","","",""};
 static ieDword hc_locations=0x2ba80030;
+static int hc_flags[OVERLAY_COUNT];
+#define HC_INVISIBLE 1
 
 static int *mxsplwis = NULL;
 static int spllevels;
@@ -975,12 +977,20 @@ static void handle_overlay(Actor *actor, ieDword idx)
 		return;
 	ieDword flag = hc_locations&(1<<idx);
 	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(hc_overlays[idx], false);
-	if (sca) {
-		if (flag) {
-			sca->ZPos=-1;
-		}
-		actor->AddVVCell(sca);
+	if (!sca) {
+		return;
 	}
+
+	// always draw it for party members; the rest must not be invisible to have it;
+	// this is just a guess, maybe there are extra conditions (MC_HIDDEN? IE_AVATARREMOVAL?)
+	if (hc_flags[idx] & HC_INVISIBLE && (!actor->InParty && actor->Modified[IE_STATE_ID] & STATE_INVISIBLE)) {
+		return;
+	}
+
+	if (flag) {
+		sca->ZPos=-1;
+	}
+	actor->AddVVCell(sca);
 }
 
 //de/activates the entangle overlay
@@ -1497,6 +1507,8 @@ static void InitActorTables()
 			if (atoi(tm->QueryField( i, 1))) {
 				hc_locations|=mask;
 			}
+			tmp = tm->QueryField( i, 2 );
+			hc_flags[i] = atoi(tmp);
 			mask<<=1;
 		}
 	}
