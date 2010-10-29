@@ -286,7 +286,7 @@ public:
 	Point FollowOffset;//follow lastfollowed at this offset
 	Point HomeLocation;//spawnpoint, return here after rest
 
-	class Door *TargetDoor;
+	ieDword TargetDoor;
 
 	EffectQueue fxqueue;
 	vvcVector vvcOverlays;

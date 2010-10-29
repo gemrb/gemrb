@@ -2473,20 +2473,11 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 	Actor *actor = (Actor *) Sender;
 	actor->SetModal(MS_NONE);
 
-	// TargetDoor is set when GameControl makes the action, so should be fine
-	// unless this action is quietly called by a script (and UseDoor in the
-	// original engine crashes, so this is surely no worse..), but we should
-	// maybe have a better solution
-	Scriptable* tar = actor->TargetDoor;
-	if (!tar) {
+	Door* door = actor->GetCurrentArea()->GetDoorByGlobalID(actor->TargetDoor);
+	if (!door) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (tar->Type != ST_DOOR) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	Door* door = ( Door* ) tar;
 	unsigned int distance;
 	Point *p = door->toOpen;
 	Point *otherp = door->toOpen+1;
@@ -2501,6 +2492,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 			else
 				core->PlaySound(DS_OPEN_FAIL);
 			Sender->ReleaseCurrentAction();
+			actor->TargetDoor = 0;
 			return; //don't open door
 		}
 
@@ -2513,6 +2505,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction();
+	actor->TargetDoor = 0;
 }
 
 void GameScript::ContainerEnable(Scriptable* Sender, Action* parameters)

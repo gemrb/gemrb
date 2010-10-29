@@ -347,7 +347,7 @@ Actor::Actor()
 	nextattack = 0;
 	InTrap = 0;
 	PathTries = 0;
-	TargetDoor = NULL;
+	TargetDoor = 0;
 	attackProjectile = NULL;
 	lastInit = 0;
 	roundTime = 0;

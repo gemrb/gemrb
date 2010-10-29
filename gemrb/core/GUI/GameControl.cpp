@@ -1670,8 +1670,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 
 	actor->ClearPath();
 	actor->ClearActions();
-	// it really isn't very nice to store a pointer in the actor like this
-	actor->TargetDoor = door;
+	actor->TargetDoor = door->GetGlobalID();
 	// internal gemrb toggle door action hack - should we use UseDoor instead?
 	sprintf( Tmp, "NIDSpecial9()" );
 	actor->AddAction( GenerateAction( Tmp) );
