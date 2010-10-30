@@ -600,6 +600,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			//cannot add directly to inventory (ground piles)
 			c->AddItem( core->ReadItem(str));
 		}
+		//update item flags (like movable flag)
+		c->CalculateWeight();
 
 		if (Type==IE_CONTAINER_PILE)
 			Script[0]=0;

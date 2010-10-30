@@ -148,7 +148,8 @@ void Inventory::AddItem(CREItem *item)
 	if (!item) return; //invalid items get no slot
 	Slots.push_back(item);
 	HackCharges(item);
-	//Changed=true; //probably not needed, chests got no encumbrance
+	//this will update the flags (needed for unmovable items in containers)
+	Changed=true;
 }
 
 void Inventory::CalculateWeight()
@@ -1388,7 +1389,7 @@ void Inventory::dump()
 			continue;
 		}
 
-		printf ( "%2u: %8.8s - (%d %d %d) %x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->StackAmount, itm->Weight );
+		printf ( "%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->StackAmount, itm->Weight );
 	}
 
 	printf( "Equipped: %d\n", Equipped );
