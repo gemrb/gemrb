@@ -2361,8 +2361,7 @@ int GameScript::SetLastMarkedObject(Scriptable* Sender, Trigger* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
-	Actor* actor = ( Actor* ) tar;
-	scr->LastMarked = actor->GetGlobalID();
+	scr->LastMarked = tar->GetGlobalID();
 	return 1;
 }
 

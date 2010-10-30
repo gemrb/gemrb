@@ -34,7 +34,6 @@ DialogHandler::DialogHandler(void)
 	targetID = 0;
 	originalTargetID = 0;
 	speakerID = 0;
-	targetOB = NULL;
 }
 
 DialogHandler::~DialogHandler(void)
@@ -68,22 +67,13 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
 
-	Actor *spe = (Actor *) spk;
-	speakerID = spe->GetGlobalID();
 	Actor *oldTarget = GetActorByGlobalID(targetID);
-	if (tgt->Type!=ST_ACTOR) {
-		targetID=0xffff;
-		//most likely this dangling object reference
-		//won't cause problems, because trigger points don't
-		//get destroyed during a dialog
-		targetOB=tgt;
-		spk->LastTalkedTo=0;
-	} else {
+	speakerID = spk->GetGlobalID();
+	targetID = tgt->GetGlobalID();
+	if (!originalTargetID) originalTargetID = tgt->GetGlobalID();
+	if (tgt->Type==ST_ACTOR) {
 		Actor *tar = (Actor *) tgt;
-		speakerID = spe->GetGlobalID();
-		targetID = tar->GetGlobalID();
-		if (!originalTargetID) originalTargetID = tar->GetGlobalID();
-		spe->LastTalkedTo=targetID;
+		spk->LastTalkedTo=targetID;
 		tar->LastTalkedTo=speakerID;
 		tar->SetCircleSize();
 	}
@@ -140,15 +130,15 @@ void DialogHandler::EndDialog(bool try_to_break)
 		tmp->LeaveDialog();
 	}
 	speakerID = 0;
-	if (targetID==0xffff) {
-		targetOB->LeaveDialog();
+	Scriptable *tmp2 = GetTarget();
+	if (tmp2 && tmp2->Type == ST_ACTOR) {
+		tmp = (Actor *)tmp2;
 	} else {
-		tmp=GetTarget();
-		if (tmp) {
-			tmp->LeaveDialog();
-		}
+		tmp = NULL;
 	}
-	targetOB = NULL;
+	if (tmp) {
+		tmp->LeaveDialog();
+	}
 	targetID = 0;
 	if (tmp) tmp->SetCircleSize();
 	originalTargetID = 0;
@@ -182,21 +172,16 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		EndDialog();
 		return;
 	}
-	Actor *tgt;
-	Scriptable *target;
 
-	if (targetID!=0xffff) {
-		tgt = GetTarget();
-		target = tgt;
-	} else {
-		//risky!!!
-		target = targetOB;
-		tgt=NULL;
-	}
+	Scriptable *target = GetTarget();
 	if (!target) {
 		printMessage("GameControl","Target gone???",LIGHT_RED);
 		EndDialog();
 		return;
+	}
+	Actor *tgt = NULL;
+	if (target->Type == ST_ACTOR) {
+		tgt = (Actor *)target;
 	}
 
 	Video *video = core->GetVideoDriver();
@@ -444,9 +429,29 @@ Actor *DialogHandler::GetActorByGlobalID(ieDword ID)
 	return area->GetActorByGlobalID(ID);
 }
 
-Actor *DialogHandler::GetTarget()
+Scriptable *DialogHandler::GetTarget()
 {
-	return GetActorByGlobalID(targetID);
+	// TODO: area GetScriptableByGlobalID?
+
+	if (!targetID) return NULL;
+
+	Game *game = core->GetGame();
+	if (!game) return NULL;
+
+	Map *area = game->GetCurrentArea();
+	if (!area) return NULL;
+
+	Actor *actor = area->GetActorByGlobalID(targetID);
+	if (actor) return actor;
+
+	Door *door = area->GetDoorByGlobalID(targetID);
+	if (door) return door;
+	Container *container = area->GetContainerByGlobalID(targetID);
+	if (container) return container;
+	InfoPoint *ip = area->GetInfoPointByGlobalID(targetID);
+	if (ip) return ip;
+
+	return NULL;
 }
 
 Actor *DialogHandler::GetSpeaker()

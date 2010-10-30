@@ -39,10 +39,8 @@ public:
 	ieDword speakerID;
 	ieDword targetID;
 	ieDword originalTargetID;
-	//no idea if this is viable
-	Scriptable *targetOB;
 public:
-	Actor *GetTarget();
+	Scriptable *GetTarget();
 	Actor *GetSpeaker();
 
 	int InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);

@@ -690,7 +690,10 @@ void TextArea::CalcRowCount()
 		Actor *actor = NULL;
 		GameControl *gc = core->GetGameControl();
 		if (gc) {
-			actor = gc->dialoghandler->GetTarget();
+			Scriptable *target = gc->dialoghandler->GetTarget();
+			if (target && target->Type == ST_ACTOR) {
+				actor = (Actor *)target;
+			}
 		}
 		if (actor) {
 			portrait = actor->GetPortrait(1);
