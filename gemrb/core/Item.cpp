@@ -74,8 +74,12 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 	for (int i=0;i<count;i++) {
 		Effect *fx = features+i;
 		fx->InventorySlot = invslot;
-		//this is not coming from the item header, but from the recharge flags
-		fx->SourceFlags = ext_headers[usage].RechargeFlags;
+		if (usage >= 0) {
+			//this is not coming from the item header, but from the recharge flags
+			fx->SourceFlags = ext_headers[usage].RechargeFlags;
+		} else {
+			fx->SourceFlags = 0;
+		}
 		if (fx->Target != FX_TARGET_SELF) {
 			fx->Projectile = pro;
 			fxqueue->AddEffect( fx );
