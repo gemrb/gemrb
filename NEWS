@@ -20,6 +20,7 @@ GemRB V0.6.2 git (776dcb2)
     - actions, object matching
     - handling of minimum hp
     - bugfixes
+    - personal items support (swap/equip/remove)
 
 GemRB V0.6.2 (2010-08-21):
   New features:
