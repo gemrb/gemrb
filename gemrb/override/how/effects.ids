@@ -163,7 +163,7 @@ IDS
 0xa1	Cure:Panic
 0xa2	Cure:Hold
 0xa3	FreeAction
-0xa4	SlowPoisonDamageRate
+0xa4	Cure:Intoxication
 0xa5	PauseTarget
 0xa6	MagicResistanceModifier
 0xa7	MissileHitModifier
