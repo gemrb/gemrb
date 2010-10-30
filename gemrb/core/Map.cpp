@@ -2046,6 +2046,7 @@ bool Map::CanFree()
 void Map::DebugDump(bool show_actors) const
 {
 	printf( "DebugDump of Area %s:\n", scriptName );
+	printf( "Area Global ID:  %d\n", GetGlobalID());
 	printf( "OutDoor: %s\n", YESNO(AreaType & AT_OUTDOOR ) );
 	printf( "Day/Night: %s\n", YESNO(AreaType & AT_DAYNIGHT ) );
 	printf( "Extended night: %s\n", YESNO(AreaType & AT_EXTENDED_NIGHT ) );
