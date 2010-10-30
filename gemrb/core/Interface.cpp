@@ -2526,8 +2526,8 @@ bool Interface::LoadGemRBINI()
 			abort();
 		}
 		SetFeature( ini->GetKeyAsInt( "resources", game_flags[i], 0 ), i );
-		printMessage("Option", "", GREEN);
-		printf("%s = %s\n", game_flags[i], HasFeature(i)?"yes":"no");
+		//printMessage("Option", "", GREEN);
+		//printf("%s = %s\n", game_flags[i], HasFeature(i)?"yes":"no");
 	}
 
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
