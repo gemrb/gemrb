@@ -1494,7 +1494,10 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 				else {
 					i=0;
 				}
-				while (*src != '"') {
+				//breaking on ',' in case of a monkey attack
+				//fixes bg1:melicamp.dlg, bg1:sharte.dlg
+				//if strings ever need a , inside, this is a FIXME
+				while (*src != '"' && *src !=',') {
 					if (*src == 0) {
 						delete newAction;
 						return NULL;
