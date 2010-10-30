@@ -1827,7 +1827,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		//TODO: this is a hack, we need some restructuring here
 		//handling the special case when no one was selected, and
 		//the player clicks on a partymember
-		if (actor->GetStat(IE_EA)<EA_CHARMED) {
+		if (actor && (actor->GetStat(IE_EA)<EA_CHARMED)) {
 			if (target_mode==TARGET_MODE_NONE) {
 				PerformActionOn(actor);
 			}

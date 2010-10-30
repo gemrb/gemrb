@@ -368,7 +368,7 @@ void Inventory::KillSlot(unsigned int index)
 	}
 
 	Slots[index] = NULL;
- 	int effect = core->QuerySlotEffects( index );
+	int effect = core->QuerySlotEffects( index );
 	if (!effect) {
 		return;
 	}
@@ -431,7 +431,7 @@ void Inventory::KillSlot(unsigned int index)
 			// reset Equipped if it is a ranged weapon slot
 			// but not magic weapon slot!
 
-			UpdateWeaponAnimation();      
+			UpdateWeaponAnimation();
 			break;
 		case SLOT_EFFECT_HEAD:
 			Owner->SetUsedHelmet("");
@@ -535,12 +535,16 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_item)
 {
 	size_t slot = Slots.size();
+	unsigned int mask = (flags^(IE_INV_ITEM_UNDROPPABLE|IE_INV_ITEM_EQUIPPED));
+	if (core->HasFeature(GF_NO_DROP_CAN_MOVE) ) {
+		mask &= ~IE_INV_ITEM_UNDROPPABLE;
+	}
 	while(slot--) {
 		CREItem *item = Slots[slot];
 		if (!item) {
 			continue;
 		}
-		unsigned int mask = (flags^(IE_INV_ITEM_UNDROPPABLE|IE_INV_ITEM_EQUIPPED));
+
 		if (flags && (mask&item->Flags)==flags) {
 			continue;
 		}
@@ -587,7 +591,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 			return ASI_FAILED;
 		}
 
-		//check for equipping weapons 
+		//check for equipping weapons
 		if (WhyCantEquip(slot,twohanded)) {
 			return ASI_FAILED;
 		}
@@ -601,7 +605,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 
 		CREItem *myslot = Slots[slot];
 		if (ItemsAreCompatible( myslot, item )) {
- 			//calculate with the max movable stock
+			//calculate with the max movable stock
 			int chunk = item->Usages[0];
 			int newamount = myslot->Usages[0]+chunk;
 			if (newamount>myslot->StackAmount) {
@@ -770,13 +774,17 @@ int Inventory::DepleteItem(ieDword flags)
 // TODO: once all callers have been checked, this can be reversed to make more sense
 int Inventory::FindItem(const char *resref, unsigned int flags) const
 {
+	unsigned int mask = (flags^IE_INV_ITEM_UNDROPPABLE);
+	if (core->HasFeature(GF_NO_DROP_CAN_MOVE) ) {
+		mask &= ~IE_INV_ITEM_UNDROPPABLE;
+	}
 	for (size_t i = 0; i < Slots.size(); i++) {
 		const CREItem *item = Slots[i];
 		if (!item) {
 			continue;
 		}
-		if ( (flags^IE_INV_ITEM_UNDROPPABLE) & item->Flags ) {
-				continue;
+		if ( mask & item->Flags ) {
+			continue;
 		}
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
@@ -942,7 +950,7 @@ bool Inventory::EquipItem(unsigned int slot)
 			UpdateWeaponAnimation();
 		}
 		break;
-	case SLOT_EFFECT_MISSILE:		
+	case SLOT_EFFECT_MISSILE:
 		//Get the ranged header of the projectile (so we theoretically allow shooting of daggers)
 		EquippedHeader = itm->GetWeaponHeaderNumber(true);
 		header = itm->GetExtHeader(EquippedHeader);
@@ -999,8 +1007,10 @@ bool Inventory::UnEquipItem(unsigned int slot, bool removecurse)
 			return false;
 		}
 	}
-	if (item->Flags & IE_INV_ITEM_UNDROPPABLE) {
-		return false;
+	if (!core->HasFeature(GF_NO_DROP_CAN_MOVE) || (item->Flags&IE_INV_ITEM_CURSED) ) {
+		if (item->Flags & IE_INV_ITEM_UNDROPPABLE ) {
+			return false;
+		}
 	}
 	item->Flags &= ~IE_INV_ITEM_EQUIPPED; //no idea if this is needed, won't hurt
 	return true;
@@ -1417,7 +1427,7 @@ void Inventory::EquipBestWeapon(int flags)
 		for(i=SLOT_RANGED;i<LAST_RANGED;i++) {
 			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
- 			//best ranged
+			//best ranged
 			int tmp = itm->GetDamagePotential(true, header);
 			if (tmp>damage) {
 				best_slot = i;
@@ -1516,7 +1526,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 				memcpy(array[pos].itemname, slot->ItemResRef, sizeof(ieResRef) );
 				array[pos].slot = idx;
 				array[pos].headerindex = ehc;
- 				int slen = ((char *) &(array[pos].itemname)) -((char *) &(array[pos].AttackType));
+				int slen = ((char *) &(array[pos].itemname)) -((char *) &(array[pos].AttackType));
 				memcpy(&(array[pos].AttackType), &(ext_header->AttackType), slen);
 				if (ext_header->Charges) {
 					//don't modify ehc, it is a counter
@@ -1574,7 +1584,7 @@ void Inventory::UpdateShieldAnimation(Item *it)
 void Inventory::UpdateWeaponAnimation()
 {
 	int slot = GetEquippedSlot();
- 	int effect = core->QuerySlotEffects( slot );
+	int effect = core->QuerySlotEffects( slot );
 	if (effect == SLOT_EFFECT_MISSILE) {
 		// ranged weapon
 		slot = FindRangedWeapon();
@@ -1620,8 +1630,7 @@ void Inventory::UpdateWeaponAnimation()
 	}
 
 	if (header)
-		memcpy(MeleeAnimation,header->MeleeAnimation,
-			 sizeof(MeleeAnimation) );
+		memcpy(MeleeAnimation,header->MeleeAnimation, sizeof(MeleeAnimation) );
 	if (itm)
 		gamedata->FreeItem( itm, Slot->ItemResRef, false );
 	Owner->SetUsedWeapon(AnimationType, MeleeAnimation, WeaponType);
@@ -1732,11 +1741,11 @@ void Inventory::ChargeAllItems(int hours)
 #define ITM_STEALING (IE_INV_ITEM_UNSTEALABLE | IE_INV_ITEM_MOVABLE | IE_INV_ITEM_EQUIPPED)
 unsigned int Inventory::FindStealableItem()
 {
-        unsigned int slot;
-        int inc;
+	unsigned int slot;
+	int inc;
 
-        slot = core->Roll(1, Slots.size(),-1);
-        inc = slot&1?1:-1;
+	slot = core->Roll(1, Slots.size(),-1);
+	inc = slot&1?1:-1;
 
 	printf("Start Slot: %d, increment: %d\n", slot, inc);
 	//as the unsigned value underflows, it will be greater than Slots.size()
@@ -1751,7 +1760,7 @@ unsigned int Inventory::FindStealableItem()
 		//can't steal flagged items
 		if ((item->Flags & ITM_STEALING) != IE_INV_ITEM_MOVABLE) continue;
 		return slot;
-        }
+	}
 	return 0;
 }
 

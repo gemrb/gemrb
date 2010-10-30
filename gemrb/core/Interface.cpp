@@ -223,8 +223,9 @@ Interface::Interface(int iargc, char* iargv[])
 	DraggedPortrait = 0;
 	DefSound = NULL;
 	DSCount = -1;
-	GameFeatures = 0;
-	GameFeatures2 = 0;
+	memset(GameFeatures, 0, sizeof( GameFeatures ));
+	//GameFeatures = 0;
+	//GameFeatures2 = 0;
 	memset( WindowFrames, 0, sizeof( WindowFrames ));
 	memset( GroundCircles, 0, sizeof( GroundCircles ));
 	memset(FogSprites, 0, sizeof( FogSprites ));
@@ -1969,6 +1970,12 @@ char* Interface::GetString(ieStrRef strref, ieDword options) const
 
 void Interface::SetFeature(int flag, int position)
 {
+	if (flag) {
+		GameFeatures[position>>5] |= 1<<(position&31);
+	} else {
+		GameFeatures[position>>5] &= ~(1<<(position&31) );
+	}
+/*
 	if (position>=32) {
 		position-=32;
 		if (flag) {
@@ -1983,14 +1990,21 @@ void Interface::SetFeature(int flag, int position)
 	} else {
 		GameFeatures &= ~( 1 << position );
 	}
+*/
 }
 
 ieDword Interface::HasFeature(int position) const
 {
+	return GameFeatures[position>>5] & (1<<(position&31));
+/*
+	if (position>=64) {
+		return GameFeatures3 & ( 1 << (position-64) );
+	}
 	if (position>=32) {
 		return GameFeatures2 & ( 1 << (position-32) );
 	}
 	return GameFeatures & ( 1 << position );
+*/
 }
 
 /** Search directories and load a config file */
@@ -2380,6 +2394,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"FlexibleWorldmap",   //52GF_FLEXIBLE_WMAP
 		"AutoSearchHidden",   //53GF_AUTOSEARCH_HIDDEN
 		"PSTStateFlags",      //54GF_PST_STATE_FLAGS
+		"NoDropCanMove",      //55GF_NO_DROP_CAN_MOVE
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -2511,8 +2526,8 @@ bool Interface::LoadGemRBINI()
 			abort();
 		}
 		SetFeature( ini->GetKeyAsInt( "resources", game_flags[i], 0 ), i );
-		//printMessage("Option", "", GREEN);
-		//printf("%s = %s\n", game_flags[i], HasFeature(i)?"yes":"no");
+		printMessage("Option", "", GREEN);
+		printf("%s = %s\n", game_flags[i], HasFeature(i)?"yes":"no");
 	}
 
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
@@ -4794,8 +4809,10 @@ Sprite2D *Interface::GetScrollCursorSprite(int frameNum, int spriteNum)
 int Interface::CanMoveItem(const CREItem *item) const
 {
 	//This is an inventory slot, switch to IE_ITEM_* if you use Item
-	if (item->Flags & IE_INV_ITEM_UNDROPPABLE)
-		return 0;
+	if (!HasFeature(GF_NO_DROP_CAN_MOVE) ) {
+		if (item->Flags & IE_INV_ITEM_UNDROPPABLE)
+			return 0;
+	}
 	//not gold, we allow only one single coin ResRef, this is good
 	//for all of the original games
 	if (strnicmp(item->ItemResRef, GoldResRef, 8 ) )

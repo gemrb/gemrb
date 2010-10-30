@@ -82,10 +82,16 @@ static int StoreSpellsCount = -1;
 static int UsedItemsCount = -1;
 static int ItemSoundsCount = -1;
 
+//Check removal/equip/swap of item based on item name and actor's scriptname
+#define CRI_REMOVE 0
+#define CRI_EQUIP  1
+#define CRI_SWAP   2
+
 struct UsedItemType {
 	ieResRef itemname;
 	ieVariable username; //death variable
 	ieStrRef value;
+	int flags;
 };
 
 struct SpellDescType {
@@ -94,8 +100,8 @@ struct SpellDescType {
 };
 
 typedef char EventNameType[17];
-#define IS_DROP   	0
-#define IS_GET    	1
+#define IS_DROP		0
+#define IS_GET  	1
 
 typedef ieResRef ResRefPairs[2];
 
@@ -5606,9 +5612,9 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
- 		Item *item = gamedata->GetItem(si->ItemResRef);
+		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
- 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
+			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 				memcpy(Sound,item->ReplacementItem,sizeof(ieResRef));
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
@@ -5638,9 +5644,9 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
- 		Item *item = gamedata->GetItem(si->ItemResRef);
+		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
- 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
+			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
 				memcpy(Sound,item->DescriptionIcon,sizeof(ieResRef));
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
@@ -6194,8 +6200,15 @@ static void ReadUsedItems()
 		for (i=0;i<UsedItemsCount;i++) {
 			strnlwrcpy(UsedItems[i].itemname, tab->GetRowName(i),8 );
 			strnlwrcpy(UsedItems[i].username, tab->QueryField(i,0),32 );
+			if (UsedItems[i].username[0]=='*') {
+				UsedItems[i].username[0] = 0;
+			}
 			//this is an strref
 			UsedItems[i].value = atoi(tab->QueryField(i,1) );
+			//1 - named actor cannot remove it
+			//2 - anyone else cannot equip it
+			//4 - can only swap it for something else
+			UsedItems[i].flags = atoi(tab->QueryField(i,2) );
 		}
 table_loaded:
 		gamedata->DelTable(table);
@@ -7113,7 +7126,7 @@ void DragItem(CREItem *si)
 	gamedata->FreeItem( item, si->ItemResRef, false );
 }
 
-int CheckRemoveItem(Actor *actor, CREItem *si)
+int CheckRemoveItem(Actor *actor, CREItem *si, int action)
 {
 	///check if item is undroppable because the actor likes it
 	if (UsedItemsCount==-1) {
@@ -7125,9 +7138,27 @@ int CheckRemoveItem(Actor *actor, CREItem *si)
 		if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, si->ItemResRef,8) ) {
 			continue;
 		}
-		if (UsedItems[i].username[0] && strnicmp(UsedItems[i].username, actor->GetScriptName(), 32) ) {
-			continue;
+		//true if names don't match
+		int nomatch = (UsedItems[i].username[0] && strnicmp(UsedItems[i].username, actor->GetScriptName(), 32) );
+
+		switch(action) {
+		case CRI_REMOVE:
+			if (UsedItems[i].flags&1) {
+				if (nomatch) continue;
+			} else continue;
+			break;
+		case CRI_EQUIP:
+			if (UsedItems[i].flags&2) {
+				if (!nomatch) continue;
+			} else continue;
+			break;
+		case CRI_SWAP:
+			if (UsedItems[i].flags&4) {
+				if (nomatch) continue;
+			} else continue;
+			break;
 		}
+
 		displaymsg->DisplayString(UsedItems[i].value,0xffffff, IE_STR_SOUND);
 		return 1;
 	}
@@ -7145,7 +7176,8 @@ CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 
 	//it is always possible to put these items into the inventory
 	if (!(core->QuerySlotType(Slot)&SLOT_INVENTORY)) {
-		if (CheckRemoveItem(actor, si)) {
+		bool isdragging = core->GetDraggedItem()!=NULL;
+		if (CheckRemoveItem(actor, si, isdragging?CRI_SWAP:CRI_REMOVE)) {
 			return NULL;
 		}
 	}
@@ -7212,7 +7244,6 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	} else {
 		si = TryToUnequip( actor, core->QuerySlot(Slot), Count );
 		actor->RefreshEffects(NULL);
-printf("Actor ac:%d\n", actor->Modified[IE_ARMORCLASS]);
 		actor->ReinitQuickSlots();
 		core->SetEventFlag(EF_SELECTION);
 	}
@@ -7291,9 +7322,9 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		}
 		CREItem *si = core->GetDraggedItem();
 		res = cc->AddItem(si);
- 		Item *item = gamedata->GetItem(si->ItemResRef);
+		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
- 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
+			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 				memcpy(Sound,item->ReplacementItem,sizeof(ieResRef));
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
@@ -7349,6 +7380,13 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		if (eh && eh->IDReq) {
 			displaymsg->DisplayConstantString(STR_ITEMID, 0xf0f0f0);
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
+			return PyInt_FromLong( 0 );
+		}
+	}
+
+	//it is always possible to put these items into the inventory
+	if (!(Slottype&SLOT_INVENTORY)) {
+		if (CheckRemoveItem(actor, slotitem, CRI_EQUIP)) {
 			return PyInt_FromLong( 0 );
 		}
 	}
@@ -8875,7 +8913,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	switch (slot) {
 		case -1:
 			//some equipment
- 			actor->inventory.GetEquipmentInfo(&itemdata, header, 1);
+			actor->inventory.GetEquipmentInfo(&itemdata, header, 1);
 			break;
 		case -2:
 			//quickslot

@@ -137,8 +137,10 @@
 #define  GF_FLEXIBLE_WMAP               52 //iwd
 #define  GF_AUTOSEARCH_HIDDEN           53 //all except iwd2
 #define  GF_PST_STATE_FLAGS             54 //pst complicates this
-//update this
-#define GF_COUNT 55
+#define  GF_NO_DROP_CAN_MOVE            55 //bg1
+
+//update this or bad things can happen
+#define GF_COUNT 56
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
