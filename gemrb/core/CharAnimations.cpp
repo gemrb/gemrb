@@ -2042,7 +2042,6 @@ void CharAnimations::GetLREquipmentRef(char* ResRef, unsigned char& Cycle,
 	Cycle = equip->Cycle;
 	//hackhackhack
 	sprintf( ResRef, "%4s%c%s", this->ResRef, equipRef[0], equip->Suffix );
-printf("LREquipment resref: %s\n", ResRef);
 }
 
 //Only for the ogre animation (MOGR)

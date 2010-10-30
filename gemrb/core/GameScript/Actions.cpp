@@ -5918,7 +5918,7 @@ void GameScript::PickUpItem(Scriptable* Sender, Action* parameters)
 	if (Slot<0) {
 		return;
 	}
-	int res = core->CanMoveItem(c->inventory.GetSlotItem(Slot)/*, false*/ );
+	int res = core->CanMoveItem(c->inventory.GetSlotItem(Slot) );
 	if (!res) { //cannot move
 		return;
 	}
