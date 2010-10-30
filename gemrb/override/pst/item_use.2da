@@ -1,27 +1,27 @@
 2DA V1.0
 *
-           USER       STRREF     
-AVEST      ANNAH      59142      
-JER_BR     ANNAH      61795      
-           ANNAH      61796      
-JER_FS     ANNAH      61797      
-           ANNAH      61798      
-ZERTH      DAKKON     59143      
-           GRACE      59144      
-BOD_PQ     GRACE      59145      
-BOD_GP     GRACE      59146      
-CHASTITY   GRACE      59147      
-VHAILOR    VHAILOR    59148      
-CIRCLEZ    DAKKON     59149      
-KARACH     DAKKON     59149      
-KARACH2    DAKKON     59149      
-GDIARY     GRACE      59150      
-GDIARY     GRACE      59151      
-GDIARY     GRACE      59152      
-NORDBOLT   NORDOM     59153      
-EYEBALL    NAMELESS   59154      
-EYEGLAS1   NAMELESS   59154      
-EYEGLAS2   NAMELESS   59154      
-EYEKAL     NAMELESS   59154      
-EYEKALEM   NAMELESS   59154      
-EYEVECNA   NAMELESS   59154      
+           USER       STRREF     FLAG
+AVEST      ANNAH      59142      7
+JER_BR     ANNAH      61795      7
+           ANNAH      61796      7
+JER_FS     ANNAH      61797      7
+           ANNAH      61798      7
+ZERTH      DAKKON     59143      7
+           GRACE      59144      7
+BOD_PQ     GRACE      59145      7
+BOD_GP     GRACE      59146      7
+CHASTITY   GRACE      59147      7
+VHAILOR    VHAILOR    59148      7
+CIRCLEZ    DAKKON     59149      2
+KARACH     DAKKON     59149      7
+KARACH2    DAKKON     59149      7
+GDIARY     GRACE      59150      1
+GDIARY     GRACE      59151      1
+GDIARY     GRACE      59152      1
+NORDBOLT   NORDOM     59153      7
+EYEBALL    NAMELESS   59154      7
+EYEGLAS1   NAMELESS   59154      7
+EYEGLAS2   NAMELESS   59154      7
+EYEKAL     NAMELESS   59154      7
+EYEKALEM   NAMELESS   59154      7
+EYEVECNA   NAMELESS   59154      7

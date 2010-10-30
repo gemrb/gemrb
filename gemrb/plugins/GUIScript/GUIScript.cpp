@@ -7142,19 +7142,22 @@ int CheckRemoveItem(Actor *actor, CREItem *si, int action)
 		int nomatch = (UsedItems[i].username[0] && strnicmp(UsedItems[i].username, actor->GetScriptName(), 32) );
 
 		switch(action) {
+		//the named actor cannot remove it
 		case CRI_REMOVE:
 			if (UsedItems[i].flags&1) {
 				if (nomatch) continue;
 			} else continue;
 			break;
+		//the named actor can equip it
 		case CRI_EQUIP:
 			if (UsedItems[i].flags&2) {
 				if (!nomatch) continue;
 			} else continue;
 			break;
+		//the named actor can swap it
 		case CRI_SWAP:
 			if (UsedItems[i].flags&4) {
-				if (nomatch) continue;
+				if (!nomatch) continue;
 			} else continue;
 			break;
 		}
