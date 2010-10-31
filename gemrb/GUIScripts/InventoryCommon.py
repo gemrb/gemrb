@@ -769,10 +769,7 @@ def DialogItemWindow ():
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 	dialog=item["Dialog"]
-	if GUICommon.GameIsBG2():
-		GemRB.ExecuteString ("StartDialogOverride(\""+dialog+"\",Myself,0,0,1)", pc)
-	else:
-		GemRB.ExecuteString ("StartDialog(\""+dialog+"\",Myself)", pc)
+	GemRB.ExecuteString ("StartDialogOverride(\""+dialog+"\",Myself,0,0,1)", pc)
 	return
 
 def IdentifyUseSpell ():
