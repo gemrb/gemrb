@@ -1245,7 +1245,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		}
 
 		if ((target_types & GA_NO_SELF) && lastActor ) {
-			if (lastActor == core->GetFirstSelectedPC(false)) {
+			if (lastActor == core->GetFirstSelectedActor()) {
 				lastActor=NULL;
 			}
 		}
@@ -2006,7 +2006,7 @@ void GameControl::PerformActionOn(Actor *actor)
 		case ACT_CAST: //cast on target or use item on target
 			if (game->selected.size()==1) {
 				Actor *source;
-				source = core->GetFirstSelectedPC(false);
+				source = core->GetFirstSelectedActor();
 				if(source) {
 					TryToCast(source, actor);
 				}
@@ -2020,7 +2020,7 @@ void GameControl::PerformActionOn(Actor *actor)
 		case ACT_THIEVING:
 			if (game->selected.size()==1) {
 				Actor *source;
-				source = core->GetFirstSelectedPC(false);
+				source = core->GetFirstSelectedActor();
 				if(source) {
 					TryToPick(source, actor);
 				}
