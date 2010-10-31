@@ -1344,10 +1344,10 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 }
 
 /* this function was lifted from GenerateAction, to make it clearer */
-Action* GenerateActionCore(const char *src, const char *str, int acIndex)
+Action* GenerateActionCore(const char *src, const char *str, unsigned short actionID)
 {
 	Action *newAction = new Action(true);
-	newAction->actionID = (unsigned short) actionsTable->GetValueIndex( acIndex );
+	newAction->actionID = actionID;
 	//this flag tells us to merge 2 consecutive strings together to get
 	//a variable (context+variablename)
 	int mergestrings = actionflags[newAction->actionID]&AF_MERGESTRINGS;

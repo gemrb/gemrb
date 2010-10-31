@@ -2295,7 +2295,7 @@ Action* GenerateAction(char* String)
 	}
 	char *src = String+len;
 	char *str = actionsTable->GetStringIndex( i )+len;
-	Action *action = GenerateActionCore( src, str, i);
+	Action *action = GenerateActionCore( src, str, actionsTable->GetValueIndex(i));
 	if (!action) {
 		printMessage("GameScript"," ",LIGHT_RED);
 		printf("Malformed scripting action: %s\n", String);
