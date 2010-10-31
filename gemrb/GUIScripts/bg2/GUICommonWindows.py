@@ -251,14 +251,14 @@ def SelectItemAbility():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	slot = GemRB.GetVar ("Slot")
 	ability = GemRB.GetVar ("Ability")
-	GemRB.SetupQuickSlot (pc, 0, slot, ability)
+	GemRB.SetupQuickSlot (pc, 0, slot, ability, 1)
 	GemRB.SetVar ("ActionLevel", 0)
 	return
 
 def SetupItemAbilities(pc, slot):
 	Window = ActionsWindow
 
-	slot_item = GemRB.GetSlotItem(pc, slot)
+	slot_item = GemRB.GetSlotItem(pc, slot, 1)
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 	Tips = item["Tooltips"]
 
@@ -402,7 +402,7 @@ def ActionRightPressed ():
 def ActionBardSongPressed ():
 	"""Toggles the battle song."""
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetModalState (pc, MS_BATTLESONG)
+	GemRB.SetModalState (pc, MS_BATTLESONG, 1)
 	GemRB.PlaySound ("act_01")
 	UpdateActionsWindow ()
 	return
@@ -410,14 +410,14 @@ def ActionBardSongPressed ():
 def ActionSearchPressed ():
 	"""Toggles detect traps."""
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetModalState (pc, MS_DETECTTRAPS)
+	GemRB.SetModalState (pc, MS_DETECTTRAPS, 1)
 	UpdateActionsWindow ()
 	return
 
 def ActionStealthPressed ():
 	"""Toggles stealth."""
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetModalState (pc, MS_STEALTH)
+	GemRB.SetModalState (pc, MS_STEALTH, 1)
 	GemRB.PlaySound ("act_07")
 	UpdateActionsWindow ()
 	return
@@ -425,7 +425,7 @@ def ActionStealthPressed ():
 def ActionTurnPressed ():
 	"""Toggles turn undead."""
 	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetModalState (pc, MS_TURNUNDEAD)
+	GemRB.SetModalState (pc, MS_TURNUNDEAD, 1)
 	GemRB.PlaySound ("act_06")
 	UpdateActionsWindow ()
 	return
@@ -812,6 +812,7 @@ def PortraitButtonOnMouseLeave ():
 	GemRB.SetTimedEvent (CheckDragging, 1)
 	return
 
+#FIXME: iterate over the whole selection
 def ActionStopPressed ():
 	for i in range (PARTY_SIZE):
 		if GemRB.GameIsPCSelected (i + 1):

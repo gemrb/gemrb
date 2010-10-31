@@ -6858,14 +6858,16 @@ static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSlotItem__doc,
-"GetSlotItem(PartyID, slot)=>dict\n\n"
-"Returns dict with specified slot item from PC's inventory or the dragged item if PartyID is 0." );
+"GetSlotItem(PartyID, slot[, global])=>dict\n\n"
+"Returns dict with specified slot item from PC's inventory or the dragged item if PartyID is 0.\n"
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID, Slot;
+	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "ii", &PartyID, &Slot)) {
+	if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &Slot, &global)) {
 		return AttributeError( GemRB_GetSlotItem__doc );
 	}
 	CREItem *si;
@@ -6878,7 +6880,12 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 		if (!game) {
 			return RuntimeError( "No game loaded!" );
 		}
-		Actor *actor = game->FindPC( PartyID );
+		Actor* actor;
+		if (global) {
+			actor = game->GetActorByGlobalID( PartyID );
+		} else {
+			actor = game->FindPC( PartyID );
+		}
 		if (!actor) {
 			return RuntimeError( "Actor not found" );
 		}
@@ -8663,17 +8670,19 @@ static PyObject* GemRB_SetDefaultActions(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetupQuickSlot__doc,
-"SetupQuickSlot(PartyID, quickslot, inventoryslot, headerindex)\n\n"
+"SetupQuickSlot(PartyID, quickslot, inventoryslot[, headerindex, global])\n\n"
 "Set up a quick slot or weapon slot of a PC to use a weapon ability.\n\n"
 "If the inventoryslot number is -1, only the header index will be changed. "
 "If the quick slot is 0, then the inventory slot will be used to find which "
-"headerindex should be set. The default value for headerindex is 0.");
+"headerindex should be set. The default value for headerindex is 0.\n"
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID, which, slot, headerindex = 0;
+	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "iii|i", &PartyID, &which, &slot, &headerindex )) {
+	if (!PyArg_ParseTuple( args, "iii|ii", &PartyID, &which, &slot, &headerindex, &global )) {
 		return AttributeError( GemRB_SetupQuickSlot__doc );
 	}
 
@@ -8681,7 +8690,12 @@ static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	Actor* actor = game->FindPC( PartyID );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( PartyID );
+	} else {
+		actor = game->FindPC( PartyID );
+	}
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
@@ -8808,24 +8822,31 @@ static PyObject* GemRB_GetEquippedAmmunition(PyObject * /*self*/, PyObject* args
 }
 
 PyDoc_STRVAR( GemRB_SetModalState__doc,
-"SetModalState(slot, state[,spell])\n\n"
+"SetModalState(slot, state[, global, spell])\n\n"
 "Sets the modal state of the actor.\n"
-"If 'spell' is not given, it will set a default spell resource associated with the state.");
+"If 'spell' is not given, it will set a default spell resource associated with the state.\n"
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 {
 	int slot;
 	int state;
+	int global = 0;
 	const char *spell=NULL;
 
-	if (!PyArg_ParseTuple( args, "ii|s", &slot, &state, &spell )) {
+	if (!PyArg_ParseTuple( args, "ii|is", &slot, &state, &global, &spell )) {
 		return AttributeError( GemRB_SetModalState__doc );
 	}
 	Game *game = core->GetGame();
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	Actor* actor = game->FindPC( slot );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( slot );
+	} else {
+		actor = game->FindPC( slot );
+	}
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
