@@ -2962,7 +2962,7 @@ static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "No game loaded!" );
 	}
 
-	if ((unsigned int) value<game->Expansion) {
+	if ((unsigned int) value<=game->Expansion) {
 		Py_INCREF( Py_False );
 		return Py_False;
 	}
