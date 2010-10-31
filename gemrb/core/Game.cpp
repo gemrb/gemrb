@@ -1799,6 +1799,6 @@ Actor *Game::GetActorByGlobalID(ieDword globalID)
 		Actor *actor = map->GetActorByGlobalID(globalID);
 		if (actor) return actor;
 	}
-	return NULL;
+	return GetGlobalActorByGlobalID(globalID);
 }
 
