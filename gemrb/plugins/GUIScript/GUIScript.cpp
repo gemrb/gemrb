@@ -6542,22 +6542,29 @@ static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GetMemorizedSpellsCount__doc,
-"GetMemorizedSpellsCount(PartyID, SpellType[, Level])=>int\n\n"
+"GetMemorizedSpellsCount(PartyID, SpellType[, Level, global])=>int\n\n"
 "Returns number of spells of given type and level in PartyID's memory. "
-"If level is omitted then it returns the number of distinct spells memorised." );
+"If level is omitted then it returns the number of distinct spells memorised.\n"
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID, SpellType, Level = -1;
+	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &SpellType, &Level )) {
+	if (!PyArg_ParseTuple( args, "ii|ii", &PartyID, &SpellType, &Level, &global )) {
 		return AttributeError( GemRB_GetMemorizedSpellsCount__doc );
 	}
 	Game *game = core->GetGame();
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	Actor* actor = game->FindPC( PartyID );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( PartyID );
+	} else {
+		actor = game->FindPC( PartyID );
+	}
 	if (!actor) {
 		return RuntimeError( "Actor not found!" );
 	}
@@ -8086,19 +8093,21 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Window_SetupEquipmentIcons__doc,
-"SetupEquipmentIcons(WindowIndex, dict slot[, Start, Offset])\n\n"
-"Automagically sets up the controls of the equipment list window for a PC indexed by slot.\n"
+"SetupEquipmentIcons(WindowIndex, dict, slot[, Start, Offset, global])\n\n"
+"Automagically sets up the controls of the equipment list window for a PC indexed by globalID.\n"
 "Start is the beginning of the visible part of the item list.\n"
-"Offset is the ID of the first usable button.");
+"Offset is the ID of the first usable button.\n"
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 {
 	int wi, slot;
 	int Start = 0;
 	int Offset = 0; //control offset (iwd2 has the action buttons starting at 6)
+	int global = 0;
 	PyObject *dict;
 
-	if (!PyArg_ParseTuple( args, "iOi|ii", &wi, &dict, &slot, &Start, &Offset )) {
+	if (!PyArg_ParseTuple( args, "iOi|iii", &wi, &dict, &slot, &Start, &Offset, &global )) {
 		return AttributeError( GemRB_Window_SetupEquipmentIcons__doc );
 	}
 
@@ -8106,7 +8115,12 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	Actor* actor = game->FindPC( slot );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( slot );
+	} else {
+		actor = game->FindPC( slot );
+	}
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
@@ -8193,19 +8207,21 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 }
 
 PyDoc_STRVAR( GemRB_Window_SetupSpellIcons__doc,
-"SetupSpellIcons(WindowIndex, slot, type[, Start, Offset])\n\n"
+"SetupSpellIcons(WindowIndex, dict, slot, type[, Start, Offset, global])\n\n"
 "Automagically sets up the controls of the spell or innate list window for a PC indexed by slot.\n"
 "Start is the beginning of the visible part of the spell list.\n"
-"Offset is the ID of the first usable button.");
+"Offset is the ID of the first usable button.\n"
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 {
 	int wi, slot, Type;
 	int Start = 0;
 	int Offset = 0;
+	int global = 0;
 	PyObject *dict;
 
-	if (!PyArg_ParseTuple( args, "iOii|ii", &wi, &dict, &slot, &Type, &Start, &Offset )) {
+	if (!PyArg_ParseTuple( args, "iOii|iii", &wi, &dict, &slot, &Type, &Start, &Offset, &global )) {
 		return AttributeError( GemRB_Window_SetupSpellIcons__doc );
 	}
 
@@ -8213,7 +8229,12 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	Actor* actor = game->FindPC( slot );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( slot );
+	} else {
+		actor = game->FindPC( slot );
+	}
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
@@ -8328,16 +8349,18 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 }
 
 PyDoc_STRVAR( GemRB_Window_SetupControls__doc,
-"SetupControls(WindowIndex, slot[, Start])\n\n"
-"Automagically sets up the controls of the action window for a PC indexed by slot." );
+"SetupControls(WindowIndex, dict, slot[, Start, global])\n\n"
+"Automagically sets up the controls of the action window for a PC indexed by slot.\n"
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 {
 	int wi, slot;
 	int Start = 0;
+	int global = 0;
 	PyObject *dict;
 
-	if (!PyArg_ParseTuple( args, "iOi|i", &wi, &dict, &slot, &Start )) {
+	if (!PyArg_ParseTuple( args, "iOi|ii", &wi, &dict, &slot, &Start, &global )) {
 		return AttributeError( GemRB_Window_SetupControls__doc );
 	}
 
@@ -8346,9 +8369,13 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "No game loaded!" );
 	}
 	Actor* actor = NULL;
-	
+
 	if (slot) {
-		actor = game->FindPC( slot );
+		if (global) {
+			actor = game->GetActorByGlobalID( slot );
+		} else {
+			actor = game->FindPC( slot );
+		}
 	} else {
 		if (game->selected.size()==1) {
 			actor = game->selected[0];
@@ -8666,17 +8693,19 @@ static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetEquippedQuickSlot__doc,
-"SetEquippedQuickSlot(PartyID, QWeaponSlot[, ability])->int\n\n"
+"SetEquippedQuickSlot(PartyID, QWeaponSlot[, ability, global])->int\n\n"
 "Sets the named weapon/item slot as equipped weapon slot, optionally sets the used ability."
-"Returns strref number of failure (0 success, -1 silent failure)." );
+"Returns strref number of failure (0 success, -1 silent failure).\n"
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
 	int slot;
 	int PartyID;
 	int ability = -1;
+	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &slot, &ability)) {
+	if (!PyArg_ParseTuple( args, "ii|ii", &PartyID, &slot, &ability, &global)) {
 		return AttributeError( GemRB_SetEquippedQuickSlot__doc );
 	}
 
@@ -8684,7 +8713,12 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	Actor* actor = game->FindPC( PartyID );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( PartyID );
+	} else {
+		actor = game->FindPC( PartyID );
+	}
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
@@ -8694,15 +8728,17 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetEquippedQuickSlot__doc,
-"GetEquippedQuickSlot(PartyID[, NoTrans]) => Slot\n\n"
-"Returns the inventory slot (translation) or quick weapon index (no translation) of the equipped weapon." );
+"GetEquippedQuickSlot(PartyID[, NoTrans, global]) => Slot\n\n"
+"Returns the inventory slot (translation) or quick weapon index (no translation) of the equipped weapon.\n"
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID;
 	int NoTrans = 0;
+	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "i|i", &PartyID, &NoTrans)) {
+	if (!PyArg_ParseTuple( args, "i|ii", &PartyID, &NoTrans, &global)) {
 		return AttributeError( GemRB_GetEquippedQuickSlot__doc );
 	}
 
@@ -8710,7 +8746,12 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	Actor* actor = game->FindPC( PartyID );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( PartyID );
+	} else {
+		actor = game->FindPC( PartyID );
+	}
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
@@ -8796,24 +8837,31 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SpellCast__doc,
-"SpellCast(actor, type, spell)\n\n"
+"SpellCast(slot, type, spell[, global])\n\n"
 "Makes the actor try to cast a spell. Type is the spell type like 3 for normal spells and 4 for innates.\n"
-"Spell is the index of the spell in the memorised spell list.");
+"Spell is the index of the spell in the memorised spell list.\n"
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 {
 	unsigned int slot;
 	unsigned int type;
 	unsigned int spell;
+	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "iii", &slot, &type, &spell )) {
+	if (!PyArg_ParseTuple( args, "iii|i", &slot, &type, &spell, &global )) {
 		return AttributeError( GemRB_SpellCast__doc );
 	}
 	Game *game = core->GetGame();
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	Actor* actor = game->FindPC( slot );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( slot );
+	} else {
+		actor = game->FindPC( slot );
+	}
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
@@ -8899,11 +8947,12 @@ static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_UseItem__doc,
-"UseItem(actor, slot, header[,forcetarget])\n\n"
+"UseItem(actor, slot, header[,forcetarget,global])\n\n"
 "Makes the actor try to use an item. "
 "If slot is -1, then header is the index of the item functionality in the use item list. "
 "If slot is -2, then header is the quickslot index. "
-"If slot is non-negative, then header is the header of the item in the 'slot'.");
+"If slot is non-negative, then header is the header of the item in the 'slot'.\n"
+"If global is set, the actor will be looked up by its global ID instead of party slot.");
 
 static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 {
@@ -8911,8 +8960,9 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	int slot;
 	int header;
 	int forcetarget=-1; //some crappy scrolls don't target self correctly!
+	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "iii|i", &PartyID, &slot, &header, &forcetarget )) {
+	if (!PyArg_ParseTuple( args, "iii|ii", &PartyID, &slot, &header, &forcetarget, &global )) {
 		return AttributeError( GemRB_UseItem__doc );
 	}
 
@@ -8920,7 +8970,12 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	Actor* actor = game->FindPC( PartyID );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( PartyID );
+	} else {
+		actor = game->FindPC( PartyID );
+	}
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
