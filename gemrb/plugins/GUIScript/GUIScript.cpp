@@ -4942,6 +4942,20 @@ static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*a
 	return PyInt_FromLong( 0 );
 }
 
+PyDoc_STRVAR( GemRB_GameGetFirstSelectedActor__doc,
+"GameGetFirstSelectedActor() => int\n\n"
+"Returns index of the first selected actor or 0 if none." );
+
+static PyObject* GemRB_GameGetFirstSelectedActor(PyObject * /*self*/, PyObject* /*args*/)
+{
+	Actor *actor = core->GetFirstSelectedActor();
+	if (actor) {
+		return PyInt_FromLong( actor->GetGlobalID() );
+	}
+
+	return PyInt_FromLong( 0 );
+}
+
 PyDoc_STRVAR( GemRB_GameControlSetLastActor__doc,
 "GameControlSetLastActor() => int\n\n"
 "Sets the last actor that was hovered over by the mouse." );
@@ -9541,6 +9555,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameControlSetTargetMode, METH_VARARGS),
 	METHOD(GameGetReputation, METH_NOARGS),
 	METHOD(GameSetReputation, METH_VARARGS),
+	METHOD(GameGetFirstSelectedActor, METH_NOARGS),
 	METHOD(GameGetFirstSelectedPC, METH_NOARGS),
 	METHOD(GameGetFormation, METH_VARARGS),
 	METHOD(GameGetPartyGold, METH_NOARGS),

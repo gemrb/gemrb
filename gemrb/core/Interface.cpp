@@ -4785,6 +4785,14 @@ Actor *Interface::GetFirstSelectedPC(bool forced)
 	return NULL;
 }
 
+Actor *Interface::GetFirstSelectedActor()
+{
+	if (game->selected.size()) {
+		return game->selected[0];
+	}
+	return NULL;
+}
+
 //this is used only for the console
 Sprite2D *Interface::GetCursorSprite()
 {

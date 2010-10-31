@@ -592,6 +592,7 @@ public:
 	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);
+	Actor *GetFirstSelectedActor();
 	/** returns a cursor sprite (not cached) */
 	Sprite2D *GetCursorSprite();
 	/** returns a scroll cursor sprite */
