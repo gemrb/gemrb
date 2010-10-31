@@ -4944,7 +4944,7 @@ static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*a
 
 PyDoc_STRVAR( GemRB_GameGetFirstSelectedActor__doc,
 "GameGetFirstSelectedActor() => int\n\n"
-"Returns index of the first selected actor or 0 if none." );
+"Returns the global ID of the first selected actor or 0 if none." );
 
 static PyObject* GemRB_GameGetFirstSelectedActor(PyObject * /*self*/, PyObject* /*args*/)
 {
