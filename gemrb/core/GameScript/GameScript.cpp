@@ -2288,21 +2288,23 @@ Action* GenerateAction(char* String)
 	}
 	int len = strlench(String,'(')+1; //including (
 	char *src = String+len;
-	int i = actionsTable->FindString(String, len);
+	int i = -1;
 	char *str;
 	unsigned short actionID;
-	if (i<0) {
-		if (overrideActionsTable) {
-			i = overrideActionsTable->FindString(String, len);
+	if (overrideActionsTable) {
+		i = overrideActionsTable->FindString(String, len);
+		if (i >= 0) {
+			str = overrideActionsTable->GetStringIndex( i )+len;
+			actionID = overrideActionsTable->GetValueIndex(i);
 		}
+	}
+	if (i<0) {
+		i = actionsTable->FindString(String, len);
 		if (i < 0) {
 			printMessage("GameScript"," ",LIGHT_RED);
 			printf("Invalid scripting action: %s\n", String);
 			return NULL;
 		}
-		str = overrideActionsTable->GetStringIndex( i )+len;
-		actionID = overrideActionsTable->GetValueIndex(i);
-	} else {
 		str = actionsTable->GetStringIndex( i )+len;
 		actionID = actionsTable->GetValueIndex(i);
 	}
