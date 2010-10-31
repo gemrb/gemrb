@@ -42,7 +42,8 @@
 
 #define YESNO(x) ( (x)?"Yes":"No")
 
-static ieDword globalActorCounter = 0;
+// we start this at a non-zero value to make debugging easier
+static ieDword globalActorCounter = 10000;
 
 /***********************
  *  Scriptable Class   *
