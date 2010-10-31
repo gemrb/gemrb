@@ -1295,7 +1295,7 @@ void InitializeIEScript()
 	triggersTable = core->GetSymbol( tT );
 	actionsTable = core->GetSymbol( aT );
 	objectsTable = core->GetSymbol( oT );
-	Holder<SymbolMgr> overrideActionsTable = core->GetSymbol( gaT );
+	overrideActionsTable = core->GetSymbol( gaT );
 	if (!triggersTable || !actionsTable || !objectsTable || !objNameTable) {
 		printMessage( "GameScript","A critical scripting file is damaged!\n",LIGHT_RED );
 		abort();
@@ -2287,15 +2287,26 @@ Action* GenerateAction(char* String)
 		printf("Compiling:%s\n",String);
 	}
 	int len = strlench(String,'(')+1; //including (
-	int i = actionsTable->FindString(String, len);
-	if (i<0) {
-		printMessage("GameScript"," ",LIGHT_RED);
-		printf("Invalid scripting action: %s\n", String);
-		return NULL;
-	}
 	char *src = String+len;
-	char *str = actionsTable->GetStringIndex( i )+len;
-	Action *action = GenerateActionCore( src, str, actionsTable->GetValueIndex(i));
+	int i = actionsTable->FindString(String, len);
+	char *str;
+	unsigned short actionID;
+	if (i<0) {
+		if (overrideActionsTable) {
+			i = overrideActionsTable->FindString(String, len);
+		}
+		if (i < 0) {
+			printMessage("GameScript"," ",LIGHT_RED);
+			printf("Invalid scripting action: %s\n", String);
+			return NULL;
+		}
+		str = overrideActionsTable->GetStringIndex( i )+len;
+		actionID = overrideActionsTable->GetValueIndex(i);
+	} else {
+		str = actionsTable->GetStringIndex( i )+len;
+		actionID = actionsTable->GetValueIndex(i);
+	}
+	Action *action = GenerateActionCore( src, str, actionID);
 	if (!action) {
 		printMessage("GameScript"," ",LIGHT_RED);
 		printf("Malformed scripting action: %s\n", String);
