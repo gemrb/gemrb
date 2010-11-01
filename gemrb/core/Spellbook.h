@@ -79,7 +79,7 @@ typedef enum ieIWD2SpellType {
 	IE_IWD2_SPELL_INNATE = 8,
 	IE_IWD2_SPELL_SONG = 9,
 	IE_IWD2_SPELL_SHAPE = 10
-} ieIWD2SPellType;
+} ieIWD2SpellType;
 
 #define NUM_IWD2_SPELLTYPES 11
 
