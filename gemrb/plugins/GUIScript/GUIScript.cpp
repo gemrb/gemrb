@@ -377,7 +377,7 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 	case 0: //game strings
 		Game *game = core->GetGame();
 		if (!game) {
-			return RuntimeError( "No game loaded!" );
+			return PyString_FromString("");
 		}
 		switch(Index&15) {
 		case 0:
