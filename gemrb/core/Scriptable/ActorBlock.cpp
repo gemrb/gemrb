@@ -2357,7 +2357,7 @@ void Container::DebugDump() const
 {
 	printf( "Debugdump of Container %s\n", GetScriptName() );
 	printf( "Container Global ID:  %d\n", GetGlobalID());
-	printf( "Type: %d,  LockDifficulty: %d\n", Type, LockDifficulty );
+	printf( "Type: %d, Locked: %s, LockDifficulty: %d\n", Type, YESNO(Flags&CONT_LOCKED), LockDifficulty );
 	printf( "Flags: %d, Trapped: %s, Detected: %d\n", Flags, YESNO(Trapped), TrapDetected );
 	printf( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
 		TrapRemovalDiff );
