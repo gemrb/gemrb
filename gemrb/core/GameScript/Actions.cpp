@@ -6183,8 +6183,7 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 
 	// TODO: "sets a field in the door/container to 1"
 
-	// FIXME: MAX_OPERATING_DISTANCE?
-	if (SquaredPersonalDistance(pos, Sender) > MAX_OPERATING_DISTANCE) {
+	if (SquaredPersonalDistance(pos, Sender) > MAX_OPERATING_DISTANCE*MAX_OPERATING_DISTANCE) {
 		MoveNearerTo(Sender, pos, MAX_OPERATING_DISTANCE, 0);
 		return;
 	}
