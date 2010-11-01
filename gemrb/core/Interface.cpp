@@ -2395,6 +2395,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"AutoSearchHidden",   //53GF_AUTOSEARCH_HIDDEN
 		"PSTStateFlags",      //54GF_PST_STATE_FLAGS
 		"NoDropCanMove",      //55GF_NO_DROP_CAN_MOVE
+		"JournalHasSections", //56GF_JOURNAL_HAS_SECTIONS
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

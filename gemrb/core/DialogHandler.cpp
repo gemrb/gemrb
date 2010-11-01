@@ -28,12 +28,22 @@
 #include "Video.h"
 #include "GUI/GameControl.h"
 
+//translate section values (journal, solved, unsolved, user)
+static int sectionMap[4]={4,1,2,0};
+static const int bg2Sections[4]={4,1,2,0};
+static const int noSections[4]={0,0,0,0};
+
 DialogHandler::DialogHandler(void)
 {
 	dlg = NULL;
 	targetID = 0;
 	originalTargetID = 0;
 	speakerID = 0;
+	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS) ) {
+		memcpy(sectionMap, bg2Sections, sizeof(sectionMap) );
+	} else {
+		memcpy(sectionMap, noSections, sizeof(sectionMap) );
+	}
 }
 
 DialogHandler::~DialogHandler(void)
@@ -154,8 +164,6 @@ void DialogHandler::EndDialog(bool try_to_break)
 	core->SetEventFlag(EF_PORTRAIT);
 }
 
-//translate section values (journal, solved, unsolved, user)
-static const int sectionMap[4]={4,1,2,0};
 
 void DialogHandler::DialogChoose(unsigned int choose)
 {
