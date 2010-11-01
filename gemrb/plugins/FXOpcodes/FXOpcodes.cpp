@@ -1416,7 +1416,7 @@ int fx_maximum_hp_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_maximum_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	if (STATE_GET( STATE_DEAD) ) {
+	if (STATE_GET( STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -1921,16 +1921,21 @@ int fx_set_stun_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_stun_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
+	//actually the original engine just skips this effect if the target is dead
 	if ( STATE_GET(STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
 
+	//this is an IWD extension
 	if (target->HasSpellState(SS_BLOODRAGE)) {
 		return FX_NOT_APPLIED;
 	}
 
 	if (fx->Parameter2==2) {
-		return power_word_stun_iwd2(target, fx);
+		//don't reroll the duration next time we get here
+		if (fx->FirstApply) {
+			return power_word_stun_iwd2(target, fx);
+		}
 	}
 	STATE_SET( STATE_STUNNED );
 	target->AddPortraitIcon(PI_STUN);
@@ -2263,6 +2268,7 @@ int fx_cure_infravision_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_blur_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_blur_state (%2d)\n", fx->Opcode );
+	//death stops this effect
 	if (STATE_GET( STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
@@ -4037,6 +4043,10 @@ int fx_set_minorglobe_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_shieldglobe_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_shieldglobe_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//the shield vanishes on dead
+	if (STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
 	STAT_SET_PCF( IE_SHIELDGLOBE, 1);
 	return FX_APPLIED;
 }
@@ -5911,6 +5921,10 @@ int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_teleport_to_target (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (STATE_GET(STATE_DEAD)) {
+		return FX_NOT_APPLIED;
+	}
+
 	Map *map = target->GetCurrentArea();
 	if (map) {
 		Actor *victim = map->GetActorByGlobalID(target->LastAttacker);
