@@ -206,7 +206,7 @@ public:
 	virtual ~Inventory();
 
 	/** duplicates the source inventory into the current one, marking items as undroppable */
-	void Copy(const Actor *source);
+	void CopyFrom(const Actor *source);
 	/** Removes an item from the inventory, destroys slot.
 	 * Use it for containers only */
 	CREItem *GetItem(unsigned int idx);

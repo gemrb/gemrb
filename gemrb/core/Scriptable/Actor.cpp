@@ -6415,7 +6415,7 @@ Actor *Actor::CopySelf(bool mislead) const
 		//these need to be called too to have a valid inventory
 		newActor->inventory.SetSlotCount(inventory.GetSlotCount());
 	} else {
-		newActor->inventory.Copy(this);
+		newActor->inventory.CopyFrom(this);
 		newActor->Equipped = Equipped;
 		newActor->EquippedHeader = EquippedHeader;
 		if (PCStats) {

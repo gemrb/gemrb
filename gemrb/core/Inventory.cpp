@@ -110,7 +110,7 @@ Inventory::~Inventory()
 
 // duplicates the source inventory into the current one
 // also changes the items to not drop, so simulacrum and similar don't become factories
-void Inventory::Copy(const Actor *source)
+void Inventory::CopyFrom(const Actor *source)
 {
 	if (!source) {
 		return;
