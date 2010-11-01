@@ -92,6 +92,40 @@ void Spellbook::FreeSpellPage(CRESpellMemorization *sm)
 	delete sm;
 }
 
+// FIXME: exclude slayer, all bhaal innates?
+void Spellbook::CopyFrom(const Actor *source)
+{
+	if (!source) {
+		return;
+	}
+
+	const Spellbook &wikipedia = source->spellbook;
+
+	for (int t = 0; t < NUM_BOOK_TYPES; t++) {
+		for (size_t i = 0; i < wikipedia.spells[t].size(); i++) {
+			CRESpellMemorization *wm = wikipedia.spells[t][i];
+			CRESpellMemorization *sm = new CRESpellMemorization();
+			spells[t].push_back(sm);
+			sm->Level = wm->Level;
+			sm->Number = wm->Number;
+			sm->Number2 = wm->Number2;
+			sm->Type = wm->Type;
+			for (unsigned int k = 0; k < wm->known_spells.size(); k++) {
+				CREKnownSpell *tmp_known = new CREKnownSpell();
+				sm->known_spells.push_back(tmp_known);
+				memcpy(tmp_known, wm->known_spells[k], sizeof(CREKnownSpell));
+			}
+			for (unsigned int k = 0; k < wm->memorized_spells.size(); k++) {
+				CREMemorizedSpell *tmp_mem = new CREMemorizedSpell();
+				sm->memorized_spells.push_back(tmp_mem);
+				memcpy(tmp_mem, wm->memorized_spells[k], sizeof(CREMemorizedSpell));
+			}
+		}
+	}
+
+	sorcerer = wikipedia.sorcerer;
+}
+
 //ITEM, SPPR, SPWI, SPIN, SPCL
 int sections[]={3,0,1,2,2};
 

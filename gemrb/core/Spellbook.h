@@ -158,6 +158,8 @@ public:
 	static void ReleaseMemory();
 
 	void FreeSpellPage(CRESpellMemorization* sm);
+	/** duplicates the source spellbook into the current one */
+	void CopyFrom(const Actor *source);
 	/** Check if the spell is memorised, optionally deplete it (casting) */
 	bool HaveSpell(const char *resref, ieDword flags);
 	bool HaveSpell(int spellid, ieDword flags);
