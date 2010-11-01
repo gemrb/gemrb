@@ -182,7 +182,8 @@ void Inventory::AddItem(CREItem *item)
 	Slots.push_back(item);
 	HackCharges(item);
 	//this will update the flags (needed for unmovable items in containers)
-	Changed=true;
+	//but those *can* be picked up (like the bg2 portal key), so we skip it
+	//Changed=true;
 }
 
 void Inventory::CalculateWeight()
