@@ -6397,8 +6397,9 @@ Actor *Actor::CopySelf(bool mislead) const
 	newActor->SetName(GetName(1),1);
 	newActor->version = version;
 	memcpy(newActor->BaseStats, BaseStats, sizeof(BaseStats) );
-	// illusions aren't worth any xp
+	// illusions aren't worth any xp and don't explore
 	newActor->BaseStats[IE_XPVALUE] = 0;
+	newActor->BaseStats[IE_EXPLORE] = 0;
 
 	//IF_INITIALIZED shouldn't be set here, yet
 	newActor->SetMCFlag(MC_EXPORTABLE, BM_NAND);
