@@ -3774,7 +3774,7 @@ int fx_disable_button (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STAT_BIT_OR( IE_DISABLEDBUTTON, 1<<fx->Parameter2 );
 	}
 
-	if (target->InParty && fx->FirstApply) {
+	if (target->IsSelected() && fx->FirstApply) {
 		core->SetEventFlag(EF_ACTION);
 	}
 	return FX_APPLIED;
@@ -3807,7 +3807,7 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (fx->Parameter2 == 0)
 			if (target->spellbook.GetKnownSpellsCount(IE_SPELL_TYPE_WIZARD, 0)) display_warning = true;
 	}
-	if (target->InParty && display_warning) {
+	if (target->IsSelected() && display_warning) {
 		displaymsg->DisplayConstantStringName(STR_DISABLEDMAGE, 0xff0000, target);
 		core->SetEventFlag(EF_ACTION);
 	}

@@ -3951,7 +3951,7 @@ void Actor::SetModal(ieDword newstate, bool force)
 		modalSpellLingering = 2;
 	}
 
-	if (InParty) {
+	if (IsSelected()) {
 		// display the turning-off message
 		if (ModalState != MS_NONE) {
 			displaymsg->DisplayStringName(core->ModalStates[ModalState].leaving_str, 0xffffff, this, IE_STR_SOUND|IE_STR_SPEECH);
@@ -5864,7 +5864,7 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 	}
 	if (!itm) return; //quick item slot contains invalid item resref
 
-	if (InParty) {
+	if (IsSelected()) {
 		core->SetEventFlag( EF_ACTION );
 	}
 

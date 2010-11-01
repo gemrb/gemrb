@@ -396,7 +396,7 @@ void Inventory::KillSlot(unsigned int index)
 	}
 
 	//the used up item vanishes from the quickslot bar
-	if (Owner->InParty) {
+	if (Owner->IsSelected()) {
 		core->SetEventFlag( EF_ACTION );
 	}
 
@@ -610,7 +610,7 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 	Slots[slot] = item;
 
 	//update the action bar next time
-	if (Owner->InParty) {
+	if (Owner->IsSelected()) {
 		core->SetEventFlag( EF_ACTION );
 	}
 }
