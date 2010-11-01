@@ -3822,7 +3822,12 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright)
 	} else {
 		which = item->GetWeaponHeader(false);
 		// any melee weapon usable by a single class thief is game (UAI does not affect this)
-		wi.backstabbing = !(item->UsabilityBitmask & 0x400000) || (which->RechargeFlags & IE_ITEM_BACKSTAB);
+		// but also check a bit in the recharge flags (modder extension)
+		if (which) {
+			wi.backstabbing = !(item->UsabilityBitmask & 0x400000) || (which->RechargeFlags & IE_ITEM_BACKSTAB);
+		} else {
+			wi.backstabbing = !(item->UsabilityBitmask & 0x400000);
+		}
 	}
 
 	//make sure we use 'false' in this freeitem
