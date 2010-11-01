@@ -377,7 +377,7 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 	case 0: //game strings
 		Game *game = core->GetGame();
 		if (!game) {
-			return PyString_FromString("");
+			return RuntimeError( "No game loaded!" );
 		}
 		switch(Index&15) {
 		case 0:
@@ -3843,7 +3843,11 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetGameVar__doc );
 	}
 
-	if (!core->GetGame()->locals->Lookup( Variable, value )) {
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	if (!game->locals->Lookup( Variable, value )) {
 		return PyInt_FromLong( ( unsigned long ) 0 );
 	}
 
@@ -4175,7 +4179,11 @@ PyDoc_STRVAR( GemRB_GetGameTime__doc,
 
 static PyObject* GemRB_GetGameTime(PyObject * /*self*/, PyObject* /*args*/)
 {
-	unsigned long GameTime = core->GetGame()->GameTime/AI_UPDATE_TIME;
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	unsigned long GameTime = game->GameTime/AI_UPDATE_TIME;
 	return PyInt_FromLong( GameTime );
 }
 
@@ -4185,7 +4193,11 @@ PyDoc_STRVAR( GemRB_GameGetReputation__doc,
 
 static PyObject* GemRB_GameGetReputation(PyObject * /*self*/, PyObject* /*args*/)
 {
-	int Reputation = (int) core->GetGame()->Reputation;
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	int Reputation = (int) game->Reputation;
 	return PyInt_FromLong( Reputation );
 }
 
@@ -4200,7 +4212,11 @@ static PyObject* GemRB_GameSetReputation(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "i", &Reputation )) {
 		return AttributeError( GemRB_GameSetReputation__doc );
 	}
-	core->GetGame()->SetReputation( (unsigned int) Reputation );
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	game->SetReputation( (unsigned int) Reputation );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -4285,13 +4301,17 @@ static PyObject* GemRB_GameGetFormation(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "|i", &Which )) {
 		return AttributeError( GemRB_GameGetFormation__doc );
 	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
 	if (Which<0) {
-		Formation = core->GetGame()->WhichFormation;
+		Formation = game->WhichFormation;
 	} else {
 		if (Which>4) {
 			return AttributeError( GemRB_GameGetFormation__doc );
 		}
-		Formation = core->GetGame()->Formations[Which];
+		Formation = game->Formations[Which];
 	}
 	return PyInt_FromLong( Formation );
 }
@@ -4307,13 +4327,17 @@ static PyObject* GemRB_GameSetFormation(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "i|i", &Formation, &Which )) {
 		return AttributeError( GemRB_GameSetFormation__doc );
 	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
 	if (Which<0) {
-		core->GetGame()->WhichFormation = Formation;
+		game->WhichFormation = Formation;
 	} else {
 		if (Which>4) {
 			return AttributeError( GemRB_GameSetFormation__doc );
 		}
-		core->GetGame()->Formations[Which] = Formation;
+		game->Formations[Which] = Formation;
 	}
 
 	Py_INCREF( Py_None );
@@ -4333,10 +4357,13 @@ static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 		return AttributeError( GemRB_GetJournalSize__doc );
 	}
 
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
 	int count = 0;
-	for (unsigned int i = 0; i < core->GetGame()->GetJournalCount(); i++) {
-		GAMJournalEntry* je = core->GetGame()->GetJournalEntry( i );
-		//printf ("JE: sec: %d; text: %d, time: %d, chapter: %d, un09: %d, un0b: %d\n", je->Section, je->Text, je->GameTime, je->Chapter, je->unknown09, je->unknown0B);
+	for (unsigned int i = 0; i < game->GetJournalCount(); i++) {
+		GAMJournalEntry* je = game->GetJournalEntry( i );
 		if ((section == -1 || section == je->Section) && (chapter==je->Chapter) )
 			count++;
 	}
@@ -4356,9 +4383,13 @@ static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 		return AttributeError( GemRB_GetJournalEntry__doc );
 	}
 
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
 	int count = 0;
-	for (unsigned int i = 0; i < core->GetGame()->GetJournalCount(); i++) {
-		GAMJournalEntry* je = core->GetGame()->GetJournalEntry( i );
+	for (unsigned int i = 0; i < game->GetJournalCount(); i++) {
+		GAMJournalEntry* je = game->GetJournalEntry( i );
 		if ((section == -1 || section == je->Section) && (chapter == je->Chapter)) {
 			if (index == count) {
 				PyObject* dict = PyDict_New();
@@ -4377,6 +4408,32 @@ static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetJournalEntry__doc,
+"SetJournalEntry(strref, chapter, [, section])\n\n"
+"Sets a journal journal entry w/ given chapter and section, if section was not given, then it will delete the entry." );
+
+static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
+{
+        int section=-1, chapter, strref;
+
+        if (!PyArg_ParseTuple( args, "ii|i", &strref, &chapter, &section )) {
+                return AttributeError( GemRB_SetJournalEntry__doc );
+        }
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	if (section!=-1) {
+		game->AddJournalEntry( chapter, section, strref);
+	} else {
+		game->DeleteJournalEntry( strref);
+	}
+
+        Py_INCREF( Py_None );
+        return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_GameIsBeastKnown__doc,
 "GameIsBeastKnown(index) => int\n\n"
 "Returns whether beast with given index is known to PCs (works only on PST)." );
@@ -4388,7 +4445,11 @@ static PyObject* GemRB_GameIsBeastKnown(PyObject * /*self*/, PyObject * args)
 		return AttributeError( GemRB_GameIsBeastKnown__doc );
 	}
 
-	return PyInt_FromLong( core->GetGame()->IsBeastKnown( index ));
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	return PyInt_FromLong( game->IsBeastKnown( index ));
 }
 
 PyDoc_STRVAR( GemRB_GetINIPartyCount__doc,
@@ -9570,7 +9631,11 @@ PyDoc_STRVAR( GemRB_GetSelectedSize__doc,
 
 static PyObject* GemRB_GetSelectedSize(PyObject* /*self*/, PyObject* /*args*/)
 {
-	return PyInt_FromLong(core->GetGame()->selected.size());
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	return PyInt_FromLong(game->selected.size());
 }
 
 PyDoc_STRVAR( GemRB_GetSelectedActors__doc,
@@ -9579,10 +9644,14 @@ PyDoc_STRVAR( GemRB_GetSelectedActors__doc,
 
 static PyObject* GemRB_GetSelectedActors(PyObject* /*self*/, PyObject* /*args*/)
 {
-	int count = core->GetGame()->selected.size();
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	int count = game->selected.size();
 	PyObject* actor_list = PyTuple_New(count);
 	for (int i = 0; i < count; i++) {
-		PyTuple_SetItem(actor_list, i, PyInt_FromLong( core->GetGame()->selected[i]->GetGlobalID() ) );
+		PyTuple_SetItem(actor_list, i, PyInt_FromLong( game->selected[i]->GetGlobalID() ) );
 	}
 	return actor_list;
 }
@@ -9762,6 +9831,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetGamma, METH_VARARGS),
 	METHOD(SetGlobal, METH_VARARGS),
 	METHOD(SetInfoTextColor, METH_VARARGS),
+	METHOD(SetJournalEntry, METH_VARARGS),
 	METHOD(SetMapnote, METH_VARARGS),
 	METHOD(SetMasterScript, METH_VARARGS),
 	METHOD(SetMemorizableSpellsCount, METH_VARARGS),
