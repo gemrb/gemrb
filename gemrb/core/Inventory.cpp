@@ -121,9 +121,9 @@ void Inventory::Copy(const Actor *source)
 	// allocate the items and mark them undroppable
 	CREItem *tmp, *item;
 	for (size_t i = 0; i < source->inventory.Slots.size(); i++) {
-		tmp = new CREItem();
 		item = source->inventory.Slots[i];
 		if (item) {
+			tmp = new CREItem();
 			memcpy(tmp, item, sizeof(CREItem));
 			tmp->Flags |= IE_INV_ITEM_UNDROPPABLE;
 			int ret = AddSlotItem(tmp, i);
