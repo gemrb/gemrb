@@ -6389,7 +6389,7 @@ bool Actor::IsDualClassed() const
 	return (Modified[IE_MC_FLAGS] & MC_WAS_ANY) > 0;
 }
 
-Actor *Actor::CopySelf() const
+Actor *Actor::CopySelf(bool mislead) const
 {
 	Actor *newActor = new Actor();
 
@@ -6406,13 +6406,18 @@ Actor *Actor::CopySelf() const
 	//the creature importer does this too
 	memcpy(newActor->Modified,newActor->BaseStats, sizeof(Modified) );
 
-	//copy the inventory
-	newActor->inventory.Copy(this);
-	newActor->Equipped = Equipped;
-	newActor->EquippedHeader = EquippedHeader;
-	if (PCStats) {
-		newActor->CreateStats();
-		memcpy(newActor->PCStats, PCStats, sizeof(PCStatsStruct));
+	//copy the inventory, but only if it is not the Mislead illusion
+	if (mislead) {
+		//these need to be called too to have a valid inventory
+		newActor->inventory.SetSlotCount(inventory.GetSlotCount());
+	} else {
+		newActor->inventory.Copy(this);
+		newActor->Equipped = Equipped;
+		newActor->EquippedHeader = EquippedHeader;
+		if (PCStats) {
+			newActor->CreateStats();
+			memcpy(newActor->PCStats, PCStats, sizeof(PCStatsStruct));
+		}
 	}
 	newActor->CreateDerivedStats();
 

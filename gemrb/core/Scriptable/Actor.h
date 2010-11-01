@@ -645,7 +645,7 @@ public:
 	/* Checks if the actor is dualclassed */
 	bool IsDualClassed() const;
 	/* Returns an exact copy of this actor */
-	Actor *CopySelf() const;
+	Actor *CopySelf(bool mislead) const;
 	/* Returns the actor's level of the given class */
 	ieDword GetFighterLevel() const { return GetClassLevel(ISFIGHTER); }
 	ieDword GetMageLevel() const { return GetClassLevel(ISMAGE); }

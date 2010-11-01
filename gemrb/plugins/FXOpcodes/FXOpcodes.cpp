@@ -5287,7 +5287,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET (IE_PUPPETMASTERTYPE, fx->Parameter1);
 
 	//copyself doesn't copy scripts, so the script clearing code is not needed
-	Actor *copy = target->CopySelf();
+	Actor *copy = target->CopySelf(fx->Parameter2 == 1);
 
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	if (newfx) {
@@ -5318,6 +5318,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		break;
 	case 3:
 		resref = "simulacr";
+		// TODO: add level drain
 		break;
 	default:
 		resref = fx->Resource;
