@@ -5,3 +5,4 @@ IDS
 397 UnmakeGlobal(O:Object*)
 396 SetToken2DA(S:ResRef*)
 395 StartDialogOverride(S:DialogFile*,O:Target*,I:Unused,I:Unused,I:ConverseAsItem)
+148 BashDoor(O:Object)

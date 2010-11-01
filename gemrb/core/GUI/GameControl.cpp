@@ -1622,7 +1622,10 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	}
 
 	if (target_mode == TARGET_MODE_ATTACK) {
-		TryToBash(actor, container);
+		actor->ClearPath();
+		actor->ClearActions();
+		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", container->GetScriptName());
+		actor->AddAction(GenerateAction(Tmp));
 		ResetTargetMode();
 		return;
 	}
@@ -1657,7 +1660,10 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	}
 
 	if (target_mode == TARGET_MODE_ATTACK) {
-		TryToBash(actor, door);
+		actor->ClearPath();
+		actor->ClearActions();
+		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", door->GetScriptName());
+		actor->AddAction(GenerateAction(Tmp));
 		ResetTargetMode();
 		return;
 	}
