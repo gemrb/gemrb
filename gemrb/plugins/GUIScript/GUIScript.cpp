@@ -8615,31 +8615,37 @@ jump_label:
 }
 
 PyDoc_STRVAR( GemRB_ClearActions__doc,
-"ClearActions(slot)\n\n"
-"Stops an action for a PC indexed by slot." );
+"ClearActions(slot[, global])\n\n"
+"Stops an action for a PC indexed by slot or if global is set, by global ID." );
 
 static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 {
 	int slot;
+	int global = 0;
 
-	if (!PyArg_ParseTuple( args, "i", &slot )) {
+	if (!PyArg_ParseTuple( args, "i|i", &slot, &global )) {
 		return AttributeError( GemRB_ClearActions__doc );
 	}
 	Game *game = core->GetGame();
 	if (!game) {
-		return RuntimeError( "No game loaded!" );
+		return RuntimeError( "No game loaded!\n" );
 	}
-	Actor* actor = game->FindPC( slot );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( slot );
+	} else {
+		actor = game->FindPC( slot );
+	}
 	if (!actor) {
-		return RuntimeError( "Actor not found" );
+		return RuntimeError( "Actor not found!\n" );
 	}
 	if (actor->GetInternalFlag()&IF_NOINT) {
-		printMessage( "GuiScript","Cannot break action", GREEN);
+		printMessage( "GuiScript","Cannot break action!\n", GREEN);
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
 	if (!(actor->GetNextStep()) && !actor->ModalState) {
-		printMessage( "GuiScript","No breakable action", GREEN);
+		printMessage( "GuiScript","No breakable action!\n", GREEN);
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
