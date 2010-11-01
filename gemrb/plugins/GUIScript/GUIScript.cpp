@@ -9572,6 +9572,20 @@ static PyObject* GemRB_GetSelectedSize(PyObject* /*self*/, PyObject* /*args*/)
 	return PyInt_FromLong(core->GetGame()->selected.size());
 }
 
+PyDoc_STRVAR( GemRB_GetSelectedActors__doc,
+"GetSelectedActors() => int\n\n"
+"Returns the global ids of selected actors in a tuple.");
+
+static PyObject* GemRB_GetSelectedActors(PyObject* /*self*/, PyObject* /*args*/)
+{
+	int count = core->GetGame()->selected.size();
+	PyObject* actor_list = PyTuple_New(count);
+	for (int i = 0; i < count; i++) {
+		PyTuple_SetItem(actor_list, i, PyInt_FromLong( core->GetGame()->selected[i]->GetGlobalID() ) );
+	}
+	return actor_list;
+}
+
 PyDoc_STRVAR( GemRB_GetSpellCastOn__doc,
 "GetSpellCastOn(pc) => resref\n\n"
 "Returns the last spell cast on a partymember.");
@@ -9691,6 +9705,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetPlayerString, METH_VARARGS),
 	METHOD(GetSaveGames, METH_VARARGS),
 	METHOD(GetSelectedSize, METH_NOARGS),
+	METHOD(GetSelectedActors, METH_NOARGS),
 	METHOD(GetString, METH_VARARGS),
 	METHOD(GetSpellCastOn, METH_VARARGS),
 	METHOD(GetToken, METH_VARARGS),

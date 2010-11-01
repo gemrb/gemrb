@@ -812,11 +812,9 @@ def PortraitButtonOnMouseLeave ():
 	GemRB.SetTimedEvent (CheckDragging, 1)
 	return
 
-#FIXME: iterate over the whole selection
 def ActionStopPressed ():
-	for i in range (PARTY_SIZE):
-		if GemRB.GameIsPCSelected (i + 1):
-			GemRB.ClearActions (i + 1)
+	for i in GemRB.GetSelectedActors():
+		GemRB.ClearActions (i, 1)
 	return
 
 def ActionTalkPressed ():
