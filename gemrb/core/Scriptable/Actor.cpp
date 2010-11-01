@@ -6406,8 +6406,14 @@ Actor *Actor::CopySelf() const
 	//the creature importer does this too
 	memcpy(newActor->Modified,newActor->BaseStats, sizeof(Modified) );
 
-	//these need to be called too to have a valid inventory
-	newActor->inventory.SetSlotCount(inventory.GetSlotCount());
+	//copy the inventory
+	newActor->inventory.Copy(this);
+	newActor->Equipped = Equipped;
+	newActor->EquippedHeader = EquippedHeader;
+	if (PCStats) {
+		newActor->CreateStats();
+		memcpy(newActor->PCStats, PCStats, sizeof(PCStatsStruct));
+	}
 	newActor->CreateDerivedStats();
 
 	//copy the running effects

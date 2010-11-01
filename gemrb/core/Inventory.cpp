@@ -108,6 +108,39 @@ Inventory::~Inventory()
 	}
 }
 
+// duplicates the source inventory into the current one
+// also changes the items to not drop, so simulacrum and similar don't become factories
+void Inventory::Copy(const Actor *source)
+{
+	if (!source) {
+		return;
+	}
+
+	SetSlotCount(source->inventory.GetSlotCount());
+
+	// allocate the items and mark them undroppable
+	CREItem *tmp, *item;
+	for (size_t i = 0; i < source->inventory.Slots.size(); i++) {
+		tmp = new CREItem();
+		item = source->inventory.Slots[i];
+		if (item) {
+			memcpy(tmp, item, sizeof(CREItem));
+			tmp->Flags |= IE_INV_ITEM_UNDROPPABLE;
+			int ret = AddSlotItem(tmp, i);
+			if (ret != ASI_SUCCESS) {
+				delete tmp;
+			}
+		}
+	}
+
+	// preserve the equipped status
+	Equipped = source->inventory.GetEquipped();
+	EquippedHeader = source->inventory.GetEquippedHeader();
+
+	Changed = true;
+	CalculateWeight();
+}
+
 CREItem *Inventory::GetItem(unsigned int slot)
 {
 	if (slot >= Slots.size() ) {
