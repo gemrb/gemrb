@@ -1410,8 +1410,7 @@ int fx_current_hp_modifier (Scriptable* Owner, Actor* target, Effect* fx)
 
 // 0x12 MaximumHPModifier
 // 0 and 3 differ in that 3 doesn't modify current hitpoints
-// 1,4 are the same
-// 2,5 are the same
+// 1,4 and 2,5 are analogous to them, but with different modifiers
 int fx_maximum_hp_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_maximum_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -1435,7 +1434,7 @@ int fx_maximum_hp_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			}
 		}
 		break;
-	case 3:
+	case 3: // no current hp bonus
 		// random value Parameter1 is set by level_check in EffectQueue
 		if (base) {
 			BASE_ADD( IE_MAXHITPOINTS, fx->Parameter1 );
@@ -1443,14 +1442,26 @@ int fx_maximum_hp_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			STAT_ADD( IE_MAXHITPOINTS, fx->Parameter1 );
 		}
 		break;
-	case 1:case 4:
+	case 1: // with current hp bonus, but unimplemented in the original
+	case 4:
 		if (base) {
 			BASE_SET( IE_MAXHITPOINTS, fx->Parameter1 );
 		} else {
 			STAT_SET( IE_MAXHITPOINTS, fx->Parameter1 );
 		}
 		break;
-	case 2:case 5:
+	case 2:
+		if (base) {
+			BASE_MUL(IE_MAXHITPOINTS, fx->Parameter1 );
+			BASE_MUL(IE_HITPOINTS, fx->Parameter1 );
+		} else {
+			target->NewStat( IE_MAXHITPOINTS, target->GetStat(IE_MAXHITPOINTS)*fx->Parameter1/100, MOD_ABSOLUTE);
+			if (fx->FirstApply) {
+				target->NewBase( IE_HITPOINTS, target->GetSafeStat(IE_HITPOINTS)*fx->Parameter1/100, MOD_ABSOLUTE);
+			}
+		}
+		break;
+	case 5: // no current hp bonus
 		if (base) {
 			BASE_MUL( IE_MAXHITPOINTS, fx->Parameter1 );
 		} else {
