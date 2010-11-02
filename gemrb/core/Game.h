@@ -300,7 +300,9 @@ public:
 	int AttackersOf(ieDword globalID, Map *area) const;
 
 	//journal entries
+	/** Deletes one or all journal entries if strref is -1 */
 	void DeleteJournalEntry(ieStrRef strref);
+	/** Delete entries of the same group */
 	void DeleteJournalGroup(int Group);
 	/** Adds a journal entry from dialog data.
 	 * Time and chapter are calculated on the fly
@@ -312,10 +314,12 @@ public:
 	GAMJournalEntry* FindJournalEntry(ieStrRef strref);
 	GAMJournalEntry* GetJournalEntry(unsigned int Index);
 
+	//saved locations
 	unsigned int GetSavedLocationCount() const;
 	void ClearSavedLocations();
 	GAMLocationEntry* GetSavedLocationEntry(unsigned int Index);
 
+	//plane locations
 	unsigned int GetPlaneLocationCount() const;
 	void ClearPlaneLocations();
 	GAMLocationEntry* GetPlaneLocationEntry(unsigned int Index);

@@ -8,5 +8,5 @@ Parameters: chapter - the chapter of the journal page
 
 Return value: numeric
 
-See also: GetJournalEntry
+See also: GetJournalEntry, SetJournalEntry
 

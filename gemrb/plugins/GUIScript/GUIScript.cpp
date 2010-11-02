@@ -4409,14 +4409,16 @@ static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 }
 
 PyDoc_STRVAR( GemRB_SetJournalEntry__doc,
-"SetJournalEntry(strref, chapter, [, section])\n\n"
-"Sets a journal journal entry w/ given chapter and section, if section was not given, then it will delete the entry." );
+"SetJournalEntry(strref[, section, chapter])\n\n"
+"Sets a journal journal entry w/ given chapter and section, if section was not given, then it will delete the entry.\n"
+"Chapter is optional, if it is omitted, then the current chapter will be used.\n"
+"If strref is -1, then it will delete the whole journal." );
 
 static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 {
-        int section=-1, chapter, strref;
+        int section=-1, chapter = -1, strref;
 
-        if (!PyArg_ParseTuple( args, "ii|i", &strref, &chapter, &section )) {
+        if (!PyArg_ParseTuple( args, "i|ii", &strref, &section, &chapter )) {
                 return AttributeError( GemRB_SetJournalEntry__doc );
         }
 
@@ -4424,10 +4426,22 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
-	if (section!=-1) {
-		game->AddJournalEntry( chapter, section, strref);
-	} else {
+
+	if (strref == -1) {
+		//delete the whole journal
+		section = -1;
+	}
+
+	if (section==-1) {
+		//delete one or all entries
 		game->DeleteJournalEntry( strref);
+	} else {
+		if (chapter == -1) {
+			ieDword tmp = -1;
+			game->locals->Lookup("CHAPTER", tmp);
+			chapter = (int) tmp;
+		}
+		game->AddJournalEntry( chapter, section, strref);
 	}
 
         Py_INCREF( Py_None );

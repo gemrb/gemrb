@@ -13,5 +13,5 @@ Return value: dictionary with the following fields:
 "Section"  - same as the input parameter
 "Chapter"  - same as the input parameter
 
-See also:
+See also: GetJournalSize, SetJournalEntry
 
