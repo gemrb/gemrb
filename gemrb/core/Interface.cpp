@@ -2229,9 +2229,7 @@ bool Interface::LoadConfig(const char* filename)
 	// Otherwise, it won't obey CaseSensitive set at the end
 	// of the config file.
 
-	if (!GameType[0]) {
-		strcpy( GameType, "gemrb" );
-	} else if (stricmp( GameType, "tob" ) == 0) {
+	if (stricmp( GameType, "tob" ) == 0) {
 		strncpy( GameType, "bg2", sizeof(GameType) );
 	}
 
@@ -2321,6 +2319,13 @@ bool Interface::LoadConfig(const char* filename)
 	chmod( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
 
 	printStatus( "OK", LIGHT_GREEN );
+
+	// Missing GameType is a common users' error
+	if (!GameType[0]) {
+		printMessage("Config","GameType was not set in your config file.\n", LIGHT_RED);
+		return false;
+	}
+
 	if ( StupidityDetector( CachePath )) {
 		printMessage("Core"," ",LIGHT_RED);
 		printf( "Cache path %s doesn't exist, not a folder or contains alien files!\n", CachePath );
