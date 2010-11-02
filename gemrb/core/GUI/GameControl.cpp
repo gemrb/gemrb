@@ -1668,7 +1668,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 		return;
 	}
 
-	if ( (target_mode == TARGET_MODE_PICK) || door->TrapDetected) {
+	if (target_mode == TARGET_MODE_PICK) {
 		TryToPick(actor, door);
 		ResetTargetMode();
 		return;
