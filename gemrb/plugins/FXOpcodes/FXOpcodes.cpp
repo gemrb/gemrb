@@ -4912,6 +4912,7 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 static EffectRef fx_leveldrain_ref={"LevelDrainModifier",NULL,-1};
 
+// FIXME: BG2 level drain uses parameter3 to decrease the MaxHp, and parameter4 to decrease level. (unset)
 int fx_leveldrain_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_leveldrain_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
@@ -4934,6 +4935,7 @@ int fx_leveldrain_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//current hitpoints don't have base/modified, only current
 		BASE_SUB(IE_HITPOINTS, x);
 	}
+	// TODO: lore, thieving
 	return FX_APPLIED;
 }
 
