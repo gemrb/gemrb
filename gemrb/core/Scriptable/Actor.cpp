@@ -2877,7 +2877,7 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix)
 
 	snprintf(Sound,8,"HIT_0%d%c%c",type, armor+'A', suffix?'1':0);
 
-	core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y,0 );
+	core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y );
 }
 
 //Just to quickly inspect debug maximum values

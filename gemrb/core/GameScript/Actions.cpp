@@ -1787,7 +1787,7 @@ void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
 	core->GetAudioDrv()->Play( parameters->string0Parameter, Sender->Pos.x,
-				Sender->Pos.y, parameters->int0Parameter );
+				Sender->Pos.y, parameters->int0Parameter ? GEM_SND_SPEECH : 0 );
 }
 
 void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
@@ -1799,7 +1799,7 @@ void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
-	core->GetAudioDrv()->Play( parameters->string0Parameter, 0, 0, 0);
+	core->GetAudioDrv()->Play( parameters->string0Parameter, 0, 0);
 }
 
 void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)

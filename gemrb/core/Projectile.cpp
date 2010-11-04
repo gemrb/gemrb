@@ -386,7 +386,7 @@ void Projectile::Setup()
 		SetBlend();
 	}
 	phase = P_TRAVEL;
-	core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, 0);
+	core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y);
 
 	//create more projectiles
 	if(ExtFlags&PEF_ITERATION) {
@@ -558,7 +558,7 @@ void Projectile::EndTravel()
 
 	//this sound is played for projectiles waiting for trigger
 	//it is probably also played when a travel projectile ends its mission
-	core->GetAudioDrv()->Play(SoundRes2, Pos.x, Pos.y, 0);
+	core->GetAudioDrv()->Play(SoundRes2, Pos.x, Pos.y);
 }
 
 void Projectile::AddTrail(ieResRef BAM, const ieByte *pal)
@@ -1099,7 +1099,7 @@ void Projectile::DrawExplosion(const Region &screen)
 	
 	//draw it only once, at the time of explosion
 	if (phase==P_EXPLODING1) {
-		core->GetAudioDrv()->Play(Extension->SoundRes, Pos.x, Pos.y, 0);
+		core->GetAudioDrv()->Play(Extension->SoundRes, Pos.x, Pos.y);
 		//play VVC in center
 		if (Extension->AFlags&PAF_VVC) {
 			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
@@ -1121,7 +1121,7 @@ void Projectile::DrawExplosion(const Region &screen)
 		
 		phase=P_EXPLODING2;
 	} else {
-		core->GetAudioDrv()->Play(Extension->AreaSound, Pos.x, Pos.y, 0);
+		core->GetAudioDrv()->Play(Extension->AreaSound, Pos.x, Pos.y);
 	}
 	
 	//the spreading animation is in the first column

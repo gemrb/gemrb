@@ -4288,7 +4288,7 @@ int fx_playsound (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_playsound (%s)", fx->Resource );
 	//this is probably inaccurate
 	if (target) {
-		core->GetAudioDrv()->Play(fx->Resource, target->Pos.x, target->Pos.y, 0);
+		core->GetAudioDrv()->Play(fx->Resource, target->Pos.x, target->Pos.y);
 	} else {
 		core->GetAudioDrv()->Play(fx->Resource);
 	}

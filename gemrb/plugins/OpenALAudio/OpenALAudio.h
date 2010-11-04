@@ -82,8 +82,8 @@ public:
     OpenALAudioDriver(void);
     ~OpenALAudioDriver(void);
     bool Init(void);
-    unsigned int Play(const char* ResRef, int XPos = 0, int YPos = 0,
-                      unsigned int flags = GEM_SND_RELATIVE);
+    unsigned int Play(const char* ResRef, int XPos, int YPos,
+                      unsigned int flags = 0);
     bool IsSpeaking();
     void UpdateVolume(unsigned int flags);
     bool CanPlay();
