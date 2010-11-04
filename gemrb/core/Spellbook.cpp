@@ -75,7 +75,7 @@ Spellbook::~Spellbook()
 			}
 		}
 	}
-	ClearSpellInfo(); 
+	ClearSpellInfo();
 	delete [] spells;
 }
 
@@ -103,6 +103,7 @@ void Spellbook::CopyFrom(const Actor *source)
 
 	for (int t = 0; t < NUM_BOOK_TYPES; t++) {
 		for (size_t i = 0; i < wikipedia.spells[t].size(); i++) {
+			unsigned int k;
 			CRESpellMemorization *wm = wikipedia.spells[t][i];
 			CRESpellMemorization *sm = new CRESpellMemorization();
 			spells[t].push_back(sm);
@@ -110,12 +111,12 @@ void Spellbook::CopyFrom(const Actor *source)
 			sm->Number = wm->Number;
 			sm->Number2 = wm->Number2;
 			sm->Type = wm->Type;
-			for (unsigned int k = 0; k < wm->known_spells.size(); k++) {
+			for (k = 0; k < wm->known_spells.size(); k++) {
 				CREKnownSpell *tmp_known = new CREKnownSpell();
 				sm->known_spells.push_back(tmp_known);
 				memcpy(tmp_known, wm->known_spells[k], sizeof(CREKnownSpell));
 			}
-			for (unsigned int k = 0; k < wm->memorized_spells.size(); k++) {
+			for (k = 0; k < wm->memorized_spells.size(); k++) {
 				CREMemorizedSpell *tmp_mem = new CREMemorizedSpell();
 				sm->memorized_spells.push_back(tmp_mem);
 				memcpy(tmp_mem, wm->memorized_spells[k], sizeof(CREMemorizedSpell));
@@ -699,11 +700,11 @@ void Spellbook::CreateSorcererMemory(int type)
 			delete sm->memorized_spells[cnt];
 		}
 		sm->memorized_spells.clear();
-		for (unsigned int k = 0;  k < sm->known_spells.size(); k++) {
+		for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
 			CREKnownSpell *ck = sm->known_spells[k];
 			cnt = sm->Number2;
 			while(cnt--) {
-			  MemorizeSpell(ck, true);
+				MemorizeSpell(ck, true);
 			}
 		}
 	}
