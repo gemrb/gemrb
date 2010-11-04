@@ -590,7 +590,7 @@ thus cannot be called from DrawWindows directly
 void Interface::HandleFlags()
 {
 	//clear events because the context changed
-	EventFlag = EF_CONTROL; 
+	EventFlag = EF_CONTROL;
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
 		// when reaching this, quitflag should be 1 or 2
@@ -1318,7 +1318,7 @@ int Interface::Init()
 	if (!lists) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
-	}	
+	}
 	lists->SetType( GEM_VARIABLES_POINTER );
 
 	printMessage( "Core", "Initializing Variables Dictionary...", WHITE );
@@ -2378,7 +2378,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"EnhancedEffects",    //31GF_ENHANCED_EFFECTS
 		"DeathOnZeroStat",    //32GF_DEATH_ON_ZERO_STAT
 		"SpawnIni",           //33GF_SPAWN_INI
-		"IWD2DeathVarFormat",  //34GF_IWD2_DEATHVARFORMAT
+		"IWD2DeathVarFormat", //34GF_IWD2_DEATHVARFORMAT
 		"HasResDataIni",      //35GF_RESDATA_INI
 		"OverrideCursorPos",  //36GF_OVERRIDE_CURSORPOS
 		"BreakableWeapons",   //37GF_BREAKABLE_WEAPONS
@@ -2401,6 +2401,8 @@ static const char *game_flags[GF_COUNT+1]={
 		"PSTStateFlags",      //54GF_PST_STATE_FLAGS
 		"NoDropCanMove",      //55GF_NO_DROP_CAN_MOVE
 		"JournalHasSections", //56GF_JOURNAL_HAS_SECTIONS
+		"CastingSounds",      //57GF_CASTING_SOUNDS
+		"EnhancedCastingSounds", //58GF_CASTING_SOUNDS2
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -2625,7 +2627,7 @@ ScriptEngine* Interface::GetGUIScriptEngine() const
 }
 
 static EffectRef fx_summon_disable_ref={"AvatarRemovalModifier",NULL,-1};
- 
+
 //NOTE: if there were more summoned creatures, it will return only the last
 Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod)
 {
@@ -5310,12 +5312,12 @@ ieDword *Interface::GetListFrom2DAInternal(const ieResRef resref)
 ieDword* Interface::GetListFrom2DA(const ieResRef tablename)
 {
 	ieDword *list;
-	
+
 	if (!lists->Lookup(tablename, (void *&) list)) {
 		list = GetListFrom2DAInternal(tablename);
 		lists->SetAt(tablename, list);
 	}
-	
+
 	return list;
 }
 

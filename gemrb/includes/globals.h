@@ -119,7 +119,7 @@
 #define  GF_IWD2_DEATHVARFORMAT  	34 //iwd branch (maybe pst)
 #define  GF_RESDATA_INI         	35 //pst
 #define  GF_OVERRIDE_CURSORPOS  	36 //pst, iwd2
-#define  GF_BREAKABLE_WEAPONS     	37 //bg1, not bg2 and iwd2, maybe others
+#define  GF_BREAKABLE_WEAPONS     	37 //only bg1
 #define  GF_3ED_RULES              	38 //iwd2
 #define  GF_LEVELSLOT_PER_CLASS    	39 //iwd2
 #define  GF_SELECTIVE_MAGIC_RES    	40 //bg2, iwd2, (how)
@@ -139,9 +139,11 @@
 #define  GF_PST_STATE_FLAGS             54 //pst complicates this
 #define  GF_NO_DROP_CAN_MOVE            55 //bg1
 #define  GF_JOURNAL_HAS_SECTIONS        56 //bg2
+#define  GF_CASTING_SOUNDS              57 //all except pst and bg1
+#define  GF_CASTING_SOUNDS2             58 //bg2
 
 //update this or bad things can happen
-#define GF_COUNT 57
+#define GF_COUNT 59
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

@@ -141,6 +141,8 @@ public:
 	ieDword TimePerLevel;
 	ieDword TimeConstant;
 	char unknown13[8];
+	//derived values
+	int CastingSound;
 
 public:
 	//returns the requested extended header
@@ -160,7 +162,7 @@ public:
 	//-1 will return the cfb
 	EffectQueue *GetEffectBlock(Scriptable *self, const Point &pos, int block_index, ieDword pro=0) const;
 	// add appropriate casting glow effect
-	void AddCastingGlow(EffectQueue *fxqueue, ieDword duration);
+	void AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender);
 	//returns a projectile created from an extended header
 	Projectile *GetProjectile(Scriptable *self, int headerindex, const Point &pos) const;
 	unsigned int GetCastingDistance(Scriptable *Sender) const;

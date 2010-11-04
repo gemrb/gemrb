@@ -24,6 +24,57 @@
 
 #include "EffectMgr.h"
 #include "Interface.h"
+#include "TableMgr.h" //needed for autotable
+
+int *cgsounds = NULL;
+int cgcount = -1;
+
+//cannot call this at the time of initialization because the tablemanager isn't alive yet
+void Initializer()
+{
+	if (cgsounds) {
+		free(cgsounds);
+		cgsounds = NULL;
+	}
+	cgcount = 0;
+	AutoTable tm("cgtable");
+	if (!tm) {
+		printStatus( "ERROR", LIGHT_RED );
+		printf( "Cannot find cgtable.2da.\n");
+		return;
+	}
+	cgcount = tm->GetRowCount();
+	cgsounds = (int *) calloc( cgcount, sizeof(int) );
+	for (int i = 0; i < cgcount; i++) {
+		cgsounds[i] = atoi(tm->QueryField( i, 1 ) );
+	}
+}
+
+void ReleaseMemorySPL()
+{
+	free(cgsounds);
+	cgsounds = NULL;
+	cgcount = -1;
+}
+
+int GetCGSound(ieDword CastingGraphics)
+{
+	if (cgcount<0) {
+		Initializer();
+	}
+
+	if (CastingGraphics>=(ieDword) cgcount) {
+		return -1;
+	}
+	int ret = -1;
+	if (core->HasFeature(GF_CASTING_SOUNDS) ) {
+		ret = cgsounds[CastingGraphics];
+		if (core->HasFeature(GF_CASTING_SOUNDS2) ) {
+			ret |= 0x100;
+		}
+	}
+	return ret;
+}
 
 SPLImporter::SPLImporter(void)
 {
@@ -74,6 +125,7 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	str->ReadWord( &s->ExclusionSchool );
 	str->ReadWord( &s->PriestType );
 	str->ReadWord( &s->CastingGraphics );
+	s->CastingSound = GetCGSound(s->CastingGraphics);
 	str->Read( &s->unknown1, 1 );
 	str->ReadWord( &s->PrimaryType );
 	str->Read( &s->SecondaryType, 1 );
@@ -186,4 +238,5 @@ void SPLImporter::GetFeature(Spell *s, Effect *fx)
 
 GEMRB_PLUGIN(0xA8D1014, "SPL File Importer")
 PLUGIN_CLASS(IE_SPL_CLASS_ID, SPLImporter)
+PLUGIN_CLEANUP(ReleaseMemorySPL)
 END_PLUGIN()

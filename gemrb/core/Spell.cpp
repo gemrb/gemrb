@@ -73,10 +73,44 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 //0 will always return first spell block
 //otherwise set to caster level
 static EffectRef fx_casting_glow_ref={"CastingGlow",NULL,-1};
+static EffectRef fx_playsound_ref={"PlaySound",NULL,-1};
 
-void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration)
+void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 {
-	Effect *fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
+	char g, t;
+	Effect *fx;
+	
+	int cgsound = CastingSound;
+	if (cgsound>=0) {
+		//bg2 style
+		if(cgsound&0x100) {    
+			switch(gender) {
+			default: g = 'm'; break;
+			case SEX_FEMALE: g = 'f'; break;
+			case SEX_OTHER: case SEX_NEITHER: g = 's'; break;
+			}
+		} else {
+			//how style
+			
+			switch(gender) {
+			default: g = 'm'; break;
+			case SEX_FEMALE: g = 'f'; break;
+			}         
+		}
+		if (SpellType==IE_SPL_PRIEST) {
+			t = 'p';
+		} else {
+			t = 'm';
+		}
+		fx = EffectQueue::CreateEffect(fx_playsound_ref, 0, 0, FX_DURATION_ABSOLUTE);
+		snprintf(fx->Resource, 9,"CHA_%c%c%02d", g, t, cgsound&0xff);
+		fx->InventorySlot = 0xffff;
+		fx->Projectile = 0;
+		fxqueue->AddEffect(fx);
+		delete fx;
+	}
+
+	fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
 	fx->Duration = core->GetGame()->GameTime + duration;
 	fx->InventorySlot = 0xffff;
 	fx->Projectile = 0;

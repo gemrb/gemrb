@@ -137,7 +137,7 @@ void Scriptable::SetScriptName(const char* text)
 /** Gets the DeathVariable */
 const char* Scriptable::GetScriptName(void) const
 {
-	 return scriptName;
+	return scriptName;
 }
 
 Map* Scriptable::GetCurrentArea() const
@@ -325,7 +325,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 		if (Script) {
 			alive |= Script->Update(&continuing, &done);
 		}
-		
+
 		/* scripts are not concurrent, see WAITPC override script for example */
 		if (done) break;
 	}
@@ -585,13 +585,13 @@ void Scriptable::ClearTriggers()
 		InternalFlags &= ~IF_JUSTDIED;
 	}
 	if (bittriggers & BT_ONCREATION) {
-		 InternalFlags &= ~IF_ONCREATION;
+		InternalFlags &= ~IF_ONCREATION;
 	}
 	if (bittriggers & BT_BECAMEVISIBLE) {
-		 InternalFlags &= ~IF_BECAMEVISIBLE;
+		InternalFlags &= ~IF_BECAMEVISIBLE;
 	}
 	if (bittriggers & BT_PARTYRESTED) {
-		 InternalFlags &= ~IF_PARTYRESTED;
+		InternalFlags &= ~IF_PARTYRESTED;
 	}
 	if (bittriggers & BT_WASINDIALOG) {
 		InternalFlags &= ~IF_WASINDIALOG;
@@ -817,20 +817,21 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 	// how does this work for non-actors exactly?
 	if (Type == ST_ACTOR) {
 		// The mental speed effect can shorten or lengthen the casting time.
-		casting_time -= (int)((Actor *) this)->GetStat(IE_MENTALSPEED);
+		casting_time -= (int)((Actor *) this)->Modified[IE_MENTALSPEED];
 		if (casting_time < 0) casting_time = 0;
 	}
 	// this is a guess which seems approximately right so far
 	int duration = (casting_time*core->Time.round_size) / 10;
-	if (instant)
+	if (instant) {
 		duration = 0;
+	}
 
 	//cfb
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
 		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1);
 		if (!actor->Modified[IE_AVATARREMOVAL]) {
-			spl->AddCastingGlow(fxqueue, duration);
+			spl->AddCastingGlow(fxqueue, duration, actor->Modified[IE_SEX]);
 		}
 		fxqueue->SetOwner(actor);
 		fxqueue->AddAllEffects(actor, actor->Pos);
@@ -1185,20 +1186,20 @@ void Movable::SetStance(unsigned int arg)
 	}
 
 	if (arg<MAX_ANIMS) {
-		 StanceID=(unsigned char) arg;
+		StanceID=(unsigned char) arg;
 
-		 if (StanceID == IE_ANI_ATTACK) {
-			 // Set stance to a random attack animation
+		if (StanceID == IE_ANI_ATTACK) {
+			// Set stance to a random attack animation
 
-			 int random = rand()%100;
-			 if (random < AttackMovements[0]) {
-				 StanceID = IE_ANI_ATTACK_BACKSLASH;
-			 } else if (random < AttackMovements[0] + AttackMovements[1]) {
-				 StanceID = IE_ANI_ATTACK_SLASH;
-			 } else {
-				 StanceID = IE_ANI_ATTACK_JAB;
-			 }
-		 }
+			int random = rand()%100;
+			if (random < AttackMovements[0]) {
+				StanceID = IE_ANI_ATTACK_BACKSLASH;
+			} else if (random < AttackMovements[0] + AttackMovements[1]) {
+				StanceID = IE_ANI_ATTACK_SLASH;
+			} else {
+				StanceID = IE_ANI_ATTACK_JAB;
+			}
+		}
 
 	} else {
 		StanceID=IE_ANI_AWAKE; //
@@ -1241,7 +1242,6 @@ void AdjustPositionTowards(Point &Pos, ieDword time_diff, unsigned int walk_spee
 	else
 		Pos.y -= ( unsigned short )
 			( ( ( Pos.y - ( ( desty * 12 ) + 6 ) ) * ( time_diff ) ) / walk_speed );
-	
 }
 
 // returns whether we made all pending steps (so, false if we must be called again this tick)
@@ -1778,7 +1778,7 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 
 bool Door::TryUnlock(Actor *actor) {
 	if (!(Flags&DOOR_LOCKED)) return true;
-	
+
 	// don't remove key in PS:T!
 	bool removekey = !core->HasFeature(GF_REVERSE_DOOR) && Flags&DOOR_KEY;
 	return Highlightable::TryUnlock(actor, removekey);
@@ -2372,6 +2372,6 @@ void Container::DebugDump() const
 
 bool Container::TryUnlock(Actor *actor) {
 	if (!(Flags&CONT_LOCKED)) return true;
-	
+
 	return Highlightable::TryUnlock(actor, false);
 }

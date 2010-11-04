@@ -1,20 +1,38 @@
 2DA V1.0
 *
-            RESREF     
-UNUSED0     *          
-UNUSED1     *          
-UNUSED2     *          
-UNUSED3     *          
-UNUSED4     *          
-UNUSED5     *          
-UNUSED6     *          
-UNUSED7     *          
-UNUSED8     *          
-NECROMANCY  CGNecrom   
-ALTERATION  CGAltera   
-ENCHANTMENT CGEnchan   
-ABJURATION  CGAbjura   
-ILLUSION    CGIllusi   
-CONJURATION CGConjur   
-INVOCATION  CGInvoca   
-DIVINATION  CGDivina   
+            RESREF     SOUND
+UNUSED0     *          *
+UNUSED1     *          *
+UNUSED2     *          *
+UNUSED3     *          *
+UNUSED4     *          *
+UNUSED5     *          *
+UNUSED6     *          *
+UNUSED7     *          *
+UNUSED8     *          *
+NECROMANCY  CGNecrom   07
+ALTERATION  CGAltera   08
+ENCHANTMENT CGEnchan   02
+ABJURATION  CGAbjura   05
+ILLUSION    CGIllusi   01
+CONJURATION CGConjur   03
+INVOCATION  CGInvoca   06
+DIVINATION  CGDivina   04
+SPARKBLUE   *46        05
+SPARKBLACK  *51        05
+SPARKBLUE2  *46        05
+SPARKGOLD   *47        05
+SPARKGREEN  *54        05
+SPARKCHROM  *52        05
+SPARKPURP   *48        05
+SPARKRED    *53        05
+SPARKWHITE  *49        05
+SPARKBLUE3  *46        05
+SPARKBLACK2 *51        05
+SPARKBLUE4  *46        05
+SPARKGOLD2  *47        05
+SPARKGREEN2 *54        05
+SPARKCHROM2 *52        05
+SPARKPURP2  *48        05
+SPARKRED2   *53        05
+SPARKWHITE2 *49        05
