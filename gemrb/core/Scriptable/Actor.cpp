@@ -2705,7 +2705,20 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 
 		// also apply reputation damage if we hurt (but not killed) an innocent
 		if (Modified[IE_CLASS] == CLASS_INNOCENT) {
-			core->GetGame()->SetReputation(core->GetGame()->Reputation + core->GetReputationMod(1));
+			Actor *act=NULL;
+			if (!hitter) {
+				hitter = area->GetActorByGlobalID(LastHitter);
+			}
+
+			if (hitter) {
+				if (hitter->Type==ST_ACTOR) {
+					act = (Actor *) hitter;
+				}
+			}
+
+			if (act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
+				core->GetGame()->SetReputation(core->GetGame()->Reputation + core->GetReputationMod(1));
+			}
 		}
 	}
 
@@ -3244,21 +3257,21 @@ void Actor::Die(Scriptable *killer)
 	InternalFlags|=IF_REALLYDIED|IF_JUSTDIED;
 	SetStance( IE_ANI_DIE );
 
+	Actor *act=NULL;
+	if (!killer) {
+		killer = area->GetActorByGlobalID(LastHitter);
+	}
+
+	if (killer) {
+		if (killer->Type==ST_ACTOR) {
+			act = (Actor *) killer;
+		}
+	}
+
 	if (InParty) {
 		game->PartyMemberDied(this);
 		core->Autopause(AP_DEAD);
 	} else {
-		Actor *act=NULL;
-		if (!killer) {
-			killer = area->GetActorByGlobalID(LastHitter);
-		}
-
-		if (killer) {
-			if (killer->Type==ST_ACTOR) {
-				act = (Actor *) killer;
-			}
-		}
-
 		if (act) {
 			if (act->InParty) {
 				//adjust kill statistics here
@@ -3284,7 +3297,7 @@ void Actor::Die(Scriptable *killer)
 		//give experience to party
 		game->ShareXP(Modified[IE_XPVALUE], sharexp );
 
-		if (!InParty) {
+		if (!InParty && act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
 			// adjust reputation if the corpse was:
 			// an innocent, a member of the Flaming Fist or something evil
 			int repmod = 0;
