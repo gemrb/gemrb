@@ -5870,10 +5870,7 @@ static EffectRef fx_pause_caster_modifier_ref={"PauseTarget",NULL,-1};
 int fx_unpause_caster (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_unpause_caster (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	Effect *eff = target->fxqueue.HasEffect(fx_pause_caster_modifier_ref);
-	if (eff) {
-		eff->Parameter1-=fx->Parameter2;
-	}
+	target->fxqueue.RemoveAllEffects(fx_pause_caster_modifier_ref);
 	return FX_NOT_APPLIED;
 }
 // 0x10f AvatarRemoval
