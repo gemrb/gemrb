@@ -289,7 +289,7 @@ public:
 	/** Returns slot of the map, if it was already loaded,
 	 * don't load it again, set changepf == true,
 	 * if you want to change the pathfinder too. */
-	int LoadMap(const char* ResRef);
+	int LoadMap(const char* ResRef, bool loadscreen);
 	int DelMap(unsigned int index, int forced = 0);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index);

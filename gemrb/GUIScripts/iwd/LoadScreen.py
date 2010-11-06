@@ -32,7 +32,8 @@ def SetLoadScreen ():
 	LoadPic = Table.GetValue (Area, Table.GetColumnName(0) )
         Middle = LoadScreen.GetControl (4)
         if LoadPic=="*":
-                LoadPic = "GTRSK00"+str(GemRB.Roll(1,9,0))
+		#HoW loadscreens are GTRSK001-GTRSK010
+                LoadPic = "GTRSK0"+str(GemRB.Roll(1,10,0)).zfill(2)
         Middle.SetMOS (LoadPic)
 	return
 

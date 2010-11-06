@@ -37,7 +37,6 @@ def StartLoadScreen ():
 	Middle = LoadScreen.GetControl (4)
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	if LoadPic=="":
-		#LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
 		LoadPic = "GTRSK00"+str(GemRB.Roll(1,5,0))
 	Middle.SetMOS (LoadPic)
 	Bar = LoadScreen.GetControl (0)

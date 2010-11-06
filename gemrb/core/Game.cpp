@@ -614,7 +614,7 @@ Map* Game::GetMap(unsigned int index) const
 
 Map *Game::GetMap(const char *areaname, bool change)
 {
-	int index = LoadMap(areaname);
+	int index = LoadMap(areaname, change);
 	if (index >= 0) {
 		if (change) {
 			MapIndex = index;
@@ -723,31 +723,38 @@ int Game::DelMap(unsigned int index, int forced)
 }
 
 /* Loads an area */
-int Game::LoadMap(const char* ResRef)
+int Game::LoadMap(const char* ResRef, bool loadscreen)
 {
 	unsigned int i;
+	Map *newMap;
+	PluginHolder<MapMgr> mM(IE_ARE_CLASS_ID);
+
+	//this shouldn't happen
+	if (!mM) {
+		return -1;
+	}
+
 	int index = FindMap(ResRef);
 	if (index>=0) {
 		return index;
 	}
 
-	bool hide = core->HideGCWindow();
-	core->GetGUIScriptEngine()->RunFunction("LoadScreen", "StartLoadScreen");
-	core->GetGUIScriptEngine()->RunFunction("LoadScreen", "SetLoadScreen");
+	bool hide = false;
+	if (loadscreen) {
+		hide = core->HideGCWindow();
+		core->GetGUIScriptEngine()->RunFunction("LoadScreen", "StartLoadScreen");
+		core->GetGUIScriptEngine()->RunFunction("LoadScreen", "SetLoadScreen");
+	}
 	DataStream* ds = gamedata->GetResource( ResRef, IE_ARE_CLASS_ID );
 	if (!ds) {
-		core->LoadProgress(100);
-		return -1;
+		goto failedload;
 	}
-	PluginHolder<MapMgr> mM(IE_ARE_CLASS_ID);
 	if(!mM->Open( ds, true )) {
-		core->LoadProgress(100);
-		return -1;
+		goto failedload;
 	}
-	Map* newMap = mM->GetMap(ResRef, IsDay());
+	newMap = mM->GetMap(ResRef, IsDay());
 	if (!newMap) {
-		core->LoadProgress(100);
-		return -1;
+		goto failedload;
 	}
 	core->LoadProgress(100);
 
@@ -765,6 +772,11 @@ int Game::LoadMap(const char* ResRef)
 		core->UnhideGCWindow();
 	}
 	return AddMap( newMap );
+failedload:
+	if (hide) 
+		core->UnhideGCWindow();
+	core->LoadProgress(100);
+	return -1;
 }
 
 int Game::AddNPC(Actor* npc)

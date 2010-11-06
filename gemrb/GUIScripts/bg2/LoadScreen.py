@@ -40,6 +40,7 @@ def StartLoadScreen ():
 	Middle = LoadScreen.GetControl (3)
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	if LoadPic == "":
+		#the addition of 1 is not an error, bg2 loadpic resrefs are GTRSK002-GTRSK006
 		LoadPic = "GTRSK00"+str(GemRB.Roll(1,5,1) )
 	Middle.SetMOS (LoadPic)
 	Progress = 0
