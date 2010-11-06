@@ -571,12 +571,6 @@ void Interface::HandleEvents()
 		return;
 	}
 
-	if (EventFlag&EF_CLOSECONTAINER) {
-		EventFlag&=~EF_CLOSECONTAINER;
-		guiscript->RunFunction( "GUIWORLD", "CloseContainerWindow" );
-		return;
-	}
-
 	if (EventFlag&EF_EXPANSION) {
 		EventFlag&=~EF_EXPANSION;
 		guiscript->RunFunction( "MessageWindow", "GameExpansion", false );

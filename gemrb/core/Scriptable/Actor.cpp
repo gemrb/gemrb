@@ -2681,9 +2681,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	int resisted = 0;
 	ModifyDamage (this, hitter, damage, resisted, damagetype, NULL, false);
 	if (damage) {
-		if (InParty) {
-			core->SetEventFlag(EF_CLOSECONTAINER);
-		}
 		GetHit();
 	}
 

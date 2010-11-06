@@ -186,7 +186,6 @@ public:
 #define EF_SELECTION     128      //selection changed
 #define EF_OPENSTORE     256      //open store window
 #define EF_EXPANSION     512      //upgrade game request
-#define EF_CLOSECONTAINER 1024    //close the container window
 
 //autopause
 #define AP_UNUSABLE      0
