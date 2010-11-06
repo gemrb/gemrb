@@ -124,6 +124,14 @@ char CharAnimations::GetBloodColor() const
 	return AvatarTable[AvatarsRowNum].BloodColor;
 }
 
+static ieResRef EmptySound={0};
+
+const ieResRef &CharAnimations::GetWalkSound() const
+{
+	if(AvatarsRowNum==~0u) return EmptySound;
+	return AvatarTable[AvatarsRowNum].WalkSound;
+}
+
 int CharAnimations::GetActorPartCount() const
 {
 	if (AvatarsRowNum==~0u) return -1;
@@ -475,6 +483,28 @@ void CharAnimations::InitAvatarsTable()
 				if (rmax<AvatarTable[j].AnimID) break;
 				if (rmin>AvatarTable[j].AnimID) continue;
 				AvatarTable[j].BloodColor = value;
+			}
+		}
+	}
+
+	AutoTable walk("walksnd");
+	if (walk) {
+		int rows = walk->GetRowCount();
+		for(int i=0;i<rows;i++) {
+			ieResRef value;
+			unsigned long rmin = 0;
+			unsigned long rmax = 0xffff;
+
+			strnuprcpy(value, walk->QueryField(i,0), 8);
+			valid_number(walk->QueryField(i,1), (long &)rmin);
+			valid_number(walk->QueryField(i,2), (long &)rmax);
+			if (value[0]=='*') {
+				value[0]=0;
+			}
+			for(int j=0;j<AvatarsCount;j++) {
+				if (rmax<AvatarTable[j].AnimID) break;
+				if (rmin>AvatarTable[j].AnimID) continue;
+				memcpy(AvatarTable[j].WalkSound, value, sizeof(ieResRef) );
 			}
 		}
 	}
@@ -1470,9 +1500,12 @@ void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,
 
 //Attack
 //h1, h2, w2
-static const char *SlashPrefix[]={"a1","a4","a7"};
-static const char *BackPrefix[]={"a2","a5","a8"};
-static const char *JabPrefix[]={"a3","a6","a9"};
+//static const char *SlashPrefix[]={"a1","a4","a7"};
+//static const char *BackPrefix[]={"a2","a5","a8"};
+//static const char *JabPrefix[]={"a3","a6","a9"};
+static const char *SlashPrefix[]={"a1","a2","a7"};
+static const char *BackPrefix[]={"a3","a4","a8"};
+static const char *JabPrefix[]={"a5","a6","a9"};
 static const char *RangedPrefix[]={"sa","sx","ss"};
 static const char *RangedPrefixOld[]={"sa","sx","a1"};
 

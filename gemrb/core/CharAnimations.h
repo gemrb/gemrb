@@ -105,19 +105,22 @@
 struct AvatarStruct {
 	/* entries from avatars.2da */
 	unsigned int AnimID;
-	ieResRef Prefixes[4];
 	unsigned int PaletteType;
+	ieResRef Prefixes[4];
 	unsigned char AnimationType;
 	unsigned char CircleSize;
 	char Size;
 
 	/* comes from bloodclr.2da */
-	char BloodColor;
+	char BloodColor;	
 	
 	/* resdata.ini entries */
 	unsigned int WalkScale; /* 1000 / walkscale */
 	unsigned int RunScale; /* 1000 / runscale */
 	int Bestiary;
+
+	/* comes from walksnd.2da */
+	ieResRef WalkSound;
 };
 
 struct EquipResRefData;
@@ -174,6 +177,7 @@ public: //attribute functions
 	int GetAnimType() const;
 	char GetSize() const;
 	char GetBloodColor() const;
+	const ieResRef &GetWalkSound() const;
 
 	void PulseRGBModifiers();
 
