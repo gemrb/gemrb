@@ -71,3 +71,4 @@ def EndLoadScreen ():
 	Skull = Window.GetControl (1)
 	Skull.SetMOS ("GSKULON")
 	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Unload ()
