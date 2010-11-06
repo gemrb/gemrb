@@ -9,7 +9,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -17,7 +17,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-# GUICommonWindows.py - functions to open common windows in lower part of the screen
+# GUICommonWindows.py - functions to open common
+# windows in lower part of the screen
+###################################################
 
 import GemRB
 from GUIDefines import *
@@ -29,6 +31,7 @@ import CommonTables
 import LUCommon
 import InventoryCommon
 
+# needed for all the Open*Window callbacks in the OptionsWindow
 import GUIJRNL
 import GUIMA
 import GUIMG
@@ -255,11 +258,14 @@ SelectionChangeHandler = None
 SelectionChangeMultiHandler = None
 
 def SetSelectionChangeHandler (handler):
+	"""Updates the selection handler."""
+
 	global SelectionChangeHandler
 
 	# Switching from walking to non-walking environment:
-	#   set the first selected PC in walking env as a selected
-	#   in nonwalking env
+	# set the first selected PC in walking env as a selected
+	# in nonwalking env
+	#if (not SelectionChangeHandler) and handler and (not GUICommon.NextWindowFn):
 	if (not SelectionChangeHandler) and handler:
 		sel = GemRB.GameGetFirstSelectedPC ()
 		if not sel:
@@ -308,10 +314,12 @@ def OpenPortraitWindow (needcontrols):
 		portrait_hp_numeric[i] = 0
 
 	UpdatePortraitWindow ()
-	SelectionChanged()
+	SelectionChanged ()
 	return Window
 
 def UpdatePortraitWindow ():
+	"""Updates all of the portraits."""
+
 	Window = PortraitWindow
 
 	for i in range (PARTY_SIZE):
@@ -391,7 +399,9 @@ def PortraitButtonOnDrag ():
 	return
 
 def PortraitButtonOnPress ():
-	i = GemRB.GetVar ('PressedPortrait')
+	"""Selects the portrait individually."""
+
+	i = GemRB.GetVar ("PressedPortrait")
 
 	if not i:
 		return
@@ -440,9 +450,8 @@ def PortraitButtonHPOnPress ():
 	return
 
 def StopAllOnPress ():
-	for i in range (PARTY_SIZE):
-		if GemRB.GameIsPCSelected(i + 1):
-			GemRB.ClearActions(i + 1)
+	for i in GemRB.GetSelectedActors():
+		GemRB.ClearActions (i, 1)
 	return
 
 # Run by Game class when selection was changed
@@ -456,7 +465,8 @@ def SelectionChanged ():
 			SelectionChangeMultiHandler ()
 	else:
 		sel = GemRB.GameGetSelectedPCSingle ()
-		for i in range (0, PARTY_SIZE):
+
+		for i in range (PARTY_SIZE):
 			Button = PortraitWindow.GetControl (i)
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
 	import CommonWindow
@@ -482,7 +492,7 @@ def PortraitButtonOnMouseEnter ():
 		Button.EnableBorder (FRAME_PC_TARGET, 1)
 
 def PortraitButtonOnMouseLeave ():
-	i = GemRB.GetVar ('PressedPortrait')
+	i = GemRB.GetVar ("PressedPortrait")
 	if not i:
 		return
 

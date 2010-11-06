@@ -30,6 +30,7 @@ import GUICommon
 import LUCommon
 import InventoryCommon
 
+# needed for all the Open*Window callbacks in the OptionsWindow
 import GUIJRNL
 import GUIMA
 import GUIMG
@@ -178,11 +179,13 @@ def EmptyControls ():
 	return
 
 def SelectFormationPreset ():
+	"""Choose the default formation."""
 	GemRB.GameSetFormation (GemRB.GetVar ("Value"), GemRB.GetVar ("Formation") )
 	GroupControls ()
 	return
 
 def SetupFormation ():
+	"""Opens the formation selection section."""
 	global ActionsWindow
 
 	Window = ActionsWindow
@@ -196,6 +199,8 @@ def SetupFormation ():
 	return
 
 def GroupControls ():
+	"""Sections that control group actions."""
+
 	global ActionsWindow
 
 	GemRB.SetVar ("ActionLevel", 0)
@@ -241,6 +246,36 @@ def OpenActionsWindowControls (Window):
 	UpdateActionsWindow ()
 	return
 
+def SelectItemAbility():
+	pc = GemRB.GameGetFirstSelectedActor ()
+	slot = GemRB.GetVar ("Slot")
+	ability = GemRB.GetVar ("Ability")
+	GemRB.SetupQuickSlot (pc, 0, slot, ability, 1)
+	GemRB.SetVar ("ActionLevel", 0)
+	return
+
+def SetupItemAbilities(pc, slot):
+	Window = ActionsWindow
+
+	slot_item = GemRB.GetSlotItem(pc, slot, 1)
+	item = GemRB.GetItem (slot_item["ItemResRef"])
+	Tips = item["Tooltips"]
+
+	for i in range (12):
+		Button = Window.GetControl (i)
+		Button.SetPicture ("")
+		if i<len(Tips):
+			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
+			Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
+			Button.SetItemIcon (slot_item['ItemResRef'], i+6)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItemAbility)
+			Button.SetVarAssoc ("Ability", i)
+	
+			Button.SetTooltip ("F%d - %s"%(i+1,GemRB.GetString(Tips[i])) )
+		else:
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	return
+
 def UpdateActionsWindow ():
 	global ActionsWindow
 	global level, TopIndex
@@ -250,15 +285,6 @@ def UpdateActionsWindow ():
 
 	if ActionsWindow == None:
 		return
-
-	pc = 0
-	for i in range (PARTY_SIZE):
-		if GemRB.GameIsPCSelected (i+1):
-			if pc == 0:
-				pc = i+1
-			else:
-				pc = -1
-				break
 
 	Selected = GemRB.GetSelectedSize()
 
@@ -276,31 +302,41 @@ def UpdateActionsWindow ():
 	if Selected > 1:
 		GroupControls ()
 		return
-	#this is based on class
+
+	#we are sure there is only one actor selected
+	pc = GemRB.GameGetFirstSelectedActor ()
+
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == 0:
-		ActionsWindow.SetupControls (globals(), pc)
+		#this is based on class
+		ActionsWindow.SetupControls (globals(), pc, 0, 1)
 	elif level == 1:
-		ActionsWindow.SetupEquipmentIcons(globals(), pc, TopIndex)
+		ActionsWindow.SetupEquipmentIcons(globals(), pc, TopIndex, 0, 1)
 	elif level == 2: #spells
 		GemRB.SetVar ("Type", 3)
-		ActionsWindow.SetupSpellIcons(globals(), pc, 3, TopIndex)
+		ActionsWindow.SetupSpellIcons(globals(), pc, 3, TopIndex, 0, 1)
 	elif level == 3: #innates
 		GemRB.SetVar ("Type", 4)
-		ActionsWindow.SetupSpellIcons(globals(), pc, 4, TopIndex)
+		ActionsWindow.SetupSpellIcons(globals(), pc, 4, TopIndex, 0, 1)
+	elif level == 4: #quick weapon/item ability selection
+		SetupItemAbilities(pc, GemRB.GetVar("Slot") )
 	return
 
 def ActionQWeaponPressed (which):
-	pc = GemRB.GameGetFirstSelectedPC ()
+	"""Selects the given quickslot weapon if possible."""
 
-	if GemRB.GetEquippedQuickSlot (pc,1)==which and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
-		GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
+	pc = GemRB.GameGetFirstSelectedActor ()
+	qs = GemRB.GetEquippedQuickSlot (pc, 1, 1)
+
+	#38 is the magic slot
+	if ((qs==which) or (qs==38)) and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
+		GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK, GA_NO_DEAD|GA_NO_SELF|GA_NO_HIDDEN)
 	else:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
-		GemRB.SetEquippedQuickSlot (pc, which)
+		GemRB.SetEquippedQuickSlot (pc, which, -1, 1)
 
-	ActionsWindow.SetupControls (globals(), pc)
+	ActionsWindow.SetupControls (globals(), pc, 0, 1)
 	UpdateActionsWindow ()
 	return
 
@@ -318,6 +354,10 @@ def ActionQWeapon4Pressed ():
 
 #no check needed because the button wouldn't be drawn if illegal
 def ActionLeftPressed ():
+	"""Scrolls the actions window left.
+
+	Used primarily for spell selection."""
+
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if TopIndex>10:
 		TopIndex -= 10
@@ -329,10 +369,16 @@ def ActionLeftPressed ():
 
 #no check needed because the button wouldn't be drawn if illegal
 def ActionRightPressed ():
-	pc = GemRB.GameGetFirstSelectedPC ()
+	"""Scrolls the action window right.
+
+	Used primarily for spell selection."""
+
+	pc = GemRB.GameGetFirstSelectedActor ()
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Type = GemRB.GetVar ("Type")
-	Max = GemRB.GetMemorizedSpellsCount(pc, Type)
+	#Type is a bitfield if there is no level given
+	#This is to make sure cleric/mages get all spells listed
+	Max = GemRB.GetMemorizedSpellsCount(pc, Type, -1, 1)
 	TopIndex += 10
 	if TopIndex > Max - 10:
 		if Max>10:
@@ -346,28 +392,31 @@ def ActionRightPressed ():
 
 def ActionBardSongPressed ():
 	"""Toggles the battle song."""
-	pc = GemRB.GameGetFirstSelectedPC ()
-	GemRB.SetModalState (pc, MS_BATTLESONG)
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.SetModalState (pc, MS_BATTLESONG, 1)
 	GemRB.PlaySound ("act_01")
 	UpdateActionsWindow ()
 	return
 
 def ActionSearchPressed ():
-	pc = GemRB.GameGetFirstSelectedPC ()
-	GemRB.SetModalState (pc, MS_DETECTTRAPS)
+	"""Toggles detect traps."""
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.SetModalState (pc, MS_DETECTTRAPS, 1)
 	UpdateActionsWindow ()
 	return
 
 def ActionStealthPressed ():
-	pc = GemRB.GameGetFirstSelectedPC ()
-	GemRB.SetModalState (pc, MS_STEALTH)
+	"""Toggles stealth."""
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.SetModalState (pc, MS_STEALTH, 1)
 	GemRB.PlaySound ("act_07")
 	UpdateActionsWindow ()
 	return
-	
+
 def ActionTurnPressed ():
-	pc = GemRB.GameGetFirstSelectedPC ()
-	GemRB.SetModalState (pc, MS_TURNUNDEAD)
+	"""Toggles turn undead."""
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.SetModalState (pc, MS_TURNUNDEAD, 1)
 	GemRB.PlaySound ("act_06")
 	UpdateActionsWindow ()
 	return
@@ -379,17 +428,19 @@ def ActionUseItemPressed ():
 	return
 
 def ActionCastPressed ():
+	"""Opens the spell choice scrollbar."""
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 2)
 	UpdateActionsWindow ()
 	return
 
 def ActionQItemPressed (action):
-	pc = GemRB.GameGetFirstSelectedPC ()
+	"""Uses the given quick item."""
+	pc = GemRB.GameGetFirstSelectedActor ()
 	#quick slot
-	GemRB.UseItem (pc, -2, action)
+	GemRB.UseItem (pc, -2, action, -1, 1)
 	return
-	
+
 def ActionQItem1Pressed ():
 	ActionQItemPressed (ACT_QSLOT1)
 	return
@@ -410,30 +461,68 @@ def ActionQItem5Pressed ():
 	ActionQItemPressed (ACT_QSLOT5)
 	return
 
+def ActionQItemRightPressed (action):
+	"""Selects the used ability of the quick item."""
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.SetVar ("Slot", action)
+	GemRB.SetVar ("ActionLevel", 4)
+	UpdateActionsWindow ()
+	return
+
+def ActionQItem1RightPressed ():
+	ActionQItemRightPressed (19)
+
+def ActionQItem2RightPressed ():
+	ActionQItemRightPressed (20)
+
+def ActionQItem3RightPressed ():
+	ActionQItemRightPressed (21)
+
+def ActionQItem4RightPressed ():
+	ActionQItemRightPressed (22)
+
+def ActionQItem5RightPressed ():
+	ActionQItemRightPressed (23)
+
+def ActionQWeapon1RightPressed ():
+	ActionQItemRightPressed (10)
+
+def ActionQWeapon2RightPressed ():
+	ActionQItemRightPressed (11)
+
+def ActionQWeapon3RightPressed ():
+	ActionQItemRightPressed (12)
+
+def ActionQWeapon4RightPressed ():
+	ActionQItemRightPressed (13)
+
 def ActionInnatePressed ():
+	"""Opens the innate spell scrollbar."""
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 3)
 	UpdateActionsWindow ()
 	return
 
 def SpellPressed ():
-	pc = GemRB.GameGetFirstSelectedPC ()
+	"""Prepares a spell to be cast."""
+
+	pc = GemRB.GameGetFirstSelectedActor ()
 
 	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	Spell = GemRB.GetVar ("Spell")
 	Type = GemRB.GetVar ("Type")
-	GemRB.SpellCast (pc, Type, Spell)
+	GemRB.SpellCast (pc, Type, Spell, 1)
 	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
 
 def EquipmentPressed ():
-	pc = GemRB.GameGetFirstSelectedPC ()
+	pc = GemRB.GameGetFirstSelectedActor ()
 
 	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	Item = GemRB.GetVar ("Equipment")
 	#equipment index
-	GemRB.UseItem (pc, -1, Item)
+	GemRB.UseItem (pc, -1, Item, -1, 1)
 	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
@@ -441,6 +530,8 @@ def EquipmentPressed ():
 SelectionChangeHandler = None
 
 def SetSelectionChangeHandler (handler):
+	"""Updates the selection handler."""
+
 	global SelectionChangeHandler
 
 	# Switching from walking to non-walking environment:
@@ -457,10 +548,12 @@ def SetSelectionChangeHandler (handler):
 
 	# redraw selection on change main selection | single selection
 	SelectionChanged ()
+	return
 
 def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
+	return
 
 def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
@@ -582,8 +675,10 @@ def PortraitButtonOnDrag ():
 	return
 
 def PortraitButtonOnPress ():
+	"""Selects the portrait individually."""
+
 	i = GemRB.GetVar ("PressedPortrait")
-	
+
 	if not i:
 		return
 
@@ -602,6 +697,8 @@ def PortraitButtonOnPress ():
 	return
 
 def PortraitButtonOnShiftPress ():
+	"""Handles selecting multiple portaits with shift."""
+
 	i = GemRB.GetVar ("PressedPortrait")
 
 	if not i:
@@ -617,9 +714,13 @@ def PortraitButtonOnShiftPress ():
 		RunSelectionChangeHandler ()
 	return
 
-# Run by Game class when selection was changed
 def SelectionChanged ():
+	"""Ran by the Game class when a PC selection is changed."""
+
 	global PortraitWindow
+
+	if not PortraitWindow:
+		return
 
 	GemRB.SetVar ("ActionLevel", 0)
 	if (not SelectionChangeHandler):
@@ -689,9 +790,8 @@ def PortraitButtonOnMouseLeave ():
 	return
 
 def ActionStopPressed ():
-	for i in range (PARTY_SIZE):
-		if GemRB.GameIsPCSelected (i + 1):
-			GemRB.ClearActions (i + 1)
+	for i in GemRB.GetSelectedActors():
+		GemRB.ClearActions (i, 1)
 	return
 
 def ActionTalkPressed ():
