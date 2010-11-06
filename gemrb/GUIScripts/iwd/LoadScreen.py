@@ -25,10 +25,8 @@ import GemRB
 from GUIDefines import *
 
 LoadScreen = None
-hide = None
 
 def SetLoadScreen ():
-	hide = GemRB.HideGUI()
 	Table = GemRB.LoadTable ("areaload")
 	Area = GemRB.GetGameString (STR_AREANAME)
 	LoadPic = Table.GetValue (Area, Table.GetColumnName(0) )
@@ -63,7 +61,5 @@ def EndLoadScreen ():
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK2")
 	LoadScreen.SetVisible (WINDOW_VISIBLE)
-	if hide:
-		GemRB.UnhideGUI()
 	LoadScreen.Unload()
 	return
