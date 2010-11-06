@@ -163,13 +163,10 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 			fx->Projectile = 0;
 			fx->PosX=pos.x;
 			fx->PosY=pos.y;
-			//FIXME (r7193):
-			//This is bad, effects should be able to affect non living targets
+			// effects should be able to affect non living targets
 			//This is done by NULL target, the position should be enough
 			//to tell which non-actor object is affected
-			if (target) {
-				core->ApplyEffect(fx, target, self);
-			}
+			core->ApplyEffect(fx, target, self);
 		}
 	}
 	return fxqueue;
