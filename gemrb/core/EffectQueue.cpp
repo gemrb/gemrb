@@ -791,6 +791,7 @@ static EffectRef fx_opcode_immunity_ref={"Protection:Opcode",NULL,-1}; //bg2
 static EffectRef fx_opcode_immunity2_ref={"Protection:Opcode2",NULL,-1};//iwd
 static EffectRef fx_spell_immunity_ref={"Protection:Spell",NULL,-1}; //bg2
 static EffectRef fx_spell_immunity2_ref={"Protection:Spell2",NULL,-1};//iwd
+static EffectRef fx_store_spell_sequencer_ref={"Sequencer:Store",NULL,-1}; //bg2, works against sequencers
 static EffectRef fx_school_immunity_ref={"Protection:School",NULL,-1};
 static EffectRef fx_secondary_type_immunity_ref={"Protection:SecondaryType",NULL,-1};
 
@@ -856,6 +857,10 @@ static int check_type(Actor* actor, Effect* fx)
 		}
 		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->Source) ) {
 			return 0;
+		}
+		if (actor->fxqueue.HasEffectWithResource(fx_store_spell_sequencer_ref, fx->Source) ) {
+		  //TODO: display strref 0x806C
+		  return 0;
 		}
 	}
 
