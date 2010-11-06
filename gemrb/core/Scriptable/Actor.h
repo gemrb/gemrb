@@ -431,6 +431,11 @@ public:
 		return which ? SmallPortrait : LargePortrait;
 	}
 
+	/** Gets the attack projectile */
+	Projectile* GetAttackProjectile()
+	{
+		return attackProjectile;
+	}
 	void SetName(const char* ptr, unsigned char type);
 	void SetName(int strref, unsigned char type);
 	/* returns carried weight atm, could calculate with strength*/
