@@ -66,6 +66,8 @@ static Point **VisibilityMasks=NULL;
 static bool PathFinderInited = false;
 static Variables Spawns;
 static int LargeFog;
+static TerrainSounds *terrainsounds;
+static int tsndcount = -1;
 
 void ReleaseSpawnGroup(void *poi)
 {
@@ -202,6 +204,17 @@ void InitPathFinder()
 		if (*poi != '*')
 			AdditionalCost = atoi( poi );
 	}
+	int rc = tm->GetRowCount()-2;
+	if (rc>0) {
+		terrainsounds = new TerrainSounds[rc];
+		tsndcount = rc;
+		while(rc--) {
+			strnuprcpy(terrainsounds[rc].Group,tm->GetRowName(rc+2), sizeof(ieResRef) );
+			for(int i = 0; i<16;i++) {
+				strnuprcpy(terrainsounds[rc].Sounds[i], tm->QueryField(rc+2, i), sizeof(ieResRef) );
+			}
+		}
+	}
 }
 
 void AddLOS(int destx, int desty, int slot)
@@ -283,6 +296,7 @@ Map::Map(void)
 	HeightMap = NULL;
 	SmallMap = NULL;
 	MapSet = NULL;
+	SrchMap = NULL;
 	Walls = NULL;
 	WallCount = 0;
 	queue[PR_SCRIPT] = NULL;
@@ -314,6 +328,7 @@ Map::~Map(void)
 	unsigned int i;
 
 	free( MapSet );
+	free( SrchMap );
 	delete TMap;
 	delete INISpawn;
 	aniIterator aniidx;
@@ -401,15 +416,17 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 	HeightMap = hm;
 	SmallMap = sm;
 	Width = (unsigned int) (TMap->XCellCount * 4);
-	Height = (unsigned int) (( TMap->YCellCount * 64 ) / 12);
+	Height = (unsigned int) (( TMap->YCellCount * 64 + 63) / 12);
 	//Filling Matrices
 	MapSet = (unsigned short *) malloc(sizeof(unsigned short) * Width * Height);
-	//converting searchmap to internal format
-	int y=SearchMap->GetHeight();
+	//Internal Searchmap
+	int y = SearchMap->GetHeight();
+	//smWidth = SearchMap->GetWidth();
+	SrchMap = (unsigned short *) malloc(sizeof(unsigned short) * Width * y);
 	while(y--) {
 		int x=SearchMap->GetWidth();
 		while(x--) {
-			SearchMap->SetAt(x,y,Passable[SearchMap->GetAt(x,y)&PATH_MAP_AREAMASK]);
+			SrchMap[y*Width+x] = Passable[SearchMap->GetAt(x,y)&PATH_MAP_AREAMASK];
 		}
 	}
 }
@@ -813,6 +830,16 @@ void Map::UpdateScripts()
 		//Execute Pending Actions
 		ip->ProcessActions(false);
 	}
+}
+
+void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
+	for(int i=0;i<tsndcount;i++) {
+		if (!memcmp(sound, terrainsounds[i].Group, sizeof(ieResRef) ) ) {
+			int type = SearchMap->GetAt( Pos.x/16, Pos.y/12 )&PATH_MAP_AREAMASK;
+			memcpy(sound, terrainsounds[i].Sounds[type], sizeof(ieResRef) );
+			return;
+		}
+	}  
 }
 
 bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
@@ -1687,9 +1714,9 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 	}
 }
 
-unsigned char Map::GetBlocked(unsigned int x, unsigned int y)
+unsigned int Map::GetBlocked(unsigned int x, unsigned int y)
 {
-	unsigned char ret = SearchMap->GetAt( x, y );
+	unsigned int ret = SrchMap[y*Width+x];
 	if (ret&(PATH_MAP_DOOR_TRANSPARENT|PATH_MAP_ACTOR)) {
 		ret&=~PATH_MAP_PASSABLE;
 	}
@@ -1725,7 +1752,7 @@ bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
 	return false;
 }
 
-unsigned char Map::GetBlocked(const Point &c)
+unsigned int Map::GetBlocked(const Point &c)
 {
 	return GetBlocked(c.x/16, c.y/12);
 }
@@ -3045,19 +3072,37 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value
 	for (unsigned int i=0; i<size; i++) {
 		for (unsigned int j=0; j<size; j++) {
 			if (i*i+j*j <= r) {
-				unsigned char tmp;
+				unsigned int ppxpi = ppx+i;
+				unsigned int ppypj = ppy+j;
+				unsigned int ppxmi = ppx-i;
+				unsigned int ppymj = ppy-j;
+				if ((ppxpi<Width) && (ppypj<Height)) {
+					unsigned int pos = ppypj*Width+ppxpi;
+					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
+					//tmp = SearchMap->GetAt(ppx+i,ppy+j)&PATH_MAP_NOTACTOR;
+					//SearchMap->SetAt(ppx+i,ppy+j,tmp|value);
+				}
 
-				tmp = SearchMap->GetAt(ppx+i,ppy+j)&PATH_MAP_NOTACTOR;
-				SearchMap->SetAt(ppx+i,ppy+j,tmp|value);
+				if ((ppxpi<Width) && (ppymj<Height)) {
+					unsigned int pos = (ppymj)*Width+ppxpi;
+					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
+					//tmp = SearchMap->GetAt(ppx+i,ppy-j)&PATH_MAP_NOTACTOR;
+					//SearchMap->SetAt(ppx+i,ppy-j,tmp|value);
+				}
 
-				tmp = SearchMap->GetAt(ppx+i,ppy-j)&PATH_MAP_NOTACTOR;
-				SearchMap->SetAt(ppx+i,ppy-j,tmp|value);
+				if ((ppxmi<Width) && (ppypj<Height)) {
+					unsigned int pos = (ppypj)*Width+ppxmi;
+					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
+					//tmp = SearchMap->GetAt(ppx-i,ppy+j)&PATH_MAP_NOTACTOR;
+					//SearchMap->SetAt(ppx-i,ppy+j,tmp|value);
+				}
 
-				tmp = SearchMap->GetAt(ppx-i,ppy+j)&PATH_MAP_NOTACTOR;
-				SearchMap->SetAt(ppx-i,ppy+j,tmp|value);
-
-				tmp = SearchMap->GetAt(ppx-i,ppy-j)&PATH_MAP_NOTACTOR;
-				SearchMap->SetAt(ppx-i,ppy-j,tmp|value);
+				if ((ppxmi<Width) && (ppymj<Height)) {
+					unsigned int pos = (ppymj)*Width+ppxmi;
+					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
+					//tmp = SearchMap->GetAt(ppx-i,ppy-j)&PATH_MAP_NOTACTOR;
+					//SearchMap->SetAt(ppx-i,ppy-j,tmp|value);
+				}
 			}
 		}
 	}

@@ -151,6 +151,12 @@ public:
 	unsigned int GetCreatureCount() { return Count; }
 };
 
+class TerrainSounds {
+public:
+  ieResRef Group;
+  ieResRef Sounds[16];
+};
+
 class SpawnGroup {
 public:
 	ieResRef *ResRefs;
@@ -244,6 +250,7 @@ private:
 	int trackFlag;
 	ieWord trackDiff;
 	unsigned short* MapSet;
+  unsigned short* SrchMap; //internal searchmap
 	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
 	std::list< AreaAnimation*> animations;
@@ -276,6 +283,7 @@ public:
 	/* sets all the auxiliary maps and the tileset */
 	void AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm);
 	void UpdateScripts();
+	void ResolveTerrainSound(ieResRef &sound, Point &pos);
 	bool DoStepForActor(Actor *actor, int speed, ieDword time);
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
@@ -317,8 +325,8 @@ public:
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
 	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size);
-	unsigned char GetBlocked(unsigned int x, unsigned int y);
-	unsigned char GetBlocked(const Point &p);
+	unsigned int GetBlocked(unsigned int x, unsigned int y);
+	unsigned int GetBlocked(const Point &p);
 	Door *GetDoorByGlobalID(ieDword objectID);
 	Container *GetContainerByGlobalID(ieDword objectID);
 	InfoPoint *GetInfoPointByGlobalID(ieDword objectID);

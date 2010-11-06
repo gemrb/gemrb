@@ -864,7 +864,7 @@ void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 
 void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
-  int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
+	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
 	if ((signed) hp>maxhp) {
 		hp=maxhp;
 	}
@@ -2845,6 +2845,25 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 	if (resdata) {
 		PlayHitSound(resdata, damagetype, false);
 	}
+}
+
+void Actor::PlayWalkSound()
+{
+	ieResRef Sound;
+
+	int cnt = anims->GetWalkSoundCount();
+	if (!cnt) return;
+
+	cnt=core->Roll(1,cnt,-1);
+	strnuprcpy(Sound, anims->GetWalkSound(), sizeof(ieResRef) );
+	area->ResolveTerrainSound(Sound, Pos);
+	if (cnt) {
+		int len = strlen(Sound);
+		if (len<8) {
+			Sound[len]=cnt+0x60;
+		}
+	}
+	core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y );
 }
 
 //Play PST specific hit sounds (HIT_0<dtype><armor>)
@@ -5357,6 +5376,13 @@ void Actor::Draw(const Region &screen)
 				anims[0]->endReached = false;
 				anims[0]->SetPos(0);
 			}
+		} else {
+			//FIXME: comment this out, if walksounds are just too broken
+			if (GetStance() == IE_ANI_WALK) {
+				if (!anims[0]->GetCurrentFrame()) {
+					PlayWalkSound();
+				}
+			}
 		}
 
 		ca->PulseRGBModifiers();
@@ -5395,6 +5421,7 @@ bool Actor::HandleActorStance()
 		SetStance( AttackStance );
 		return true;
 	}
+
 	return false;
 }
 
@@ -6803,3 +6830,4 @@ int Actor::GetClassMask()
 
 	return classmask;
 }
+

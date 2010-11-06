@@ -8,7 +8,7 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
@@ -121,6 +121,7 @@ struct AvatarStruct {
 
 	/* comes from walksnd.2da */
 	ieResRef WalkSound;
+	ieByte WalkSoundCount;
 };
 
 struct EquipResRefData;
@@ -132,7 +133,7 @@ private:
 	char WeaponRef[2];
 	char OffhandRef[2];
 public:
-	const ieDword *Colors;  //these are the custom color indices
+	const ieDword *Colors; //these are the custom color indices
 	RGBModifier ColorMods[32]; // color modification effects
 	unsigned long lastModUpdate;
 	RGBModifier GlobalColorMod; // global color modification effect
@@ -175,10 +176,10 @@ public: //attribute functions
 	int GetCircleSize() const;
 	int NoPalette() const;
 	int GetAnimType() const;
-	char GetSize() const;
-	char GetBloodColor() const;
+	int GetSize() const;
+	int GetBloodColor() const;
 	const ieResRef &GetWalkSound() const;
-
+	int GetWalkSoundCount() const;
 	void PulseRGBModifiers();
 
 private:

@@ -465,6 +465,8 @@ public:
 	int Damage(int damage, int damagetype, Scriptable *hitter, int modtype=MOD_ADDITIVE);
 	/* displays the damage taken and other details (depends on the game type) */
 	void DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Scriptable *hitter);
+	/* play a random footstep sound */
+	void PlayWalkSound();
 	/* play the proper hit sound (in pst) */
 	void PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix);
 	/* drops items from inventory to current spot */

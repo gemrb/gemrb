@@ -112,13 +112,13 @@ int CharAnimations::GetAnimType() const
 	return AvatarTable[AvatarsRowNum].AnimationType;
 }
 
-char CharAnimations::GetSize() const
+int CharAnimations::GetSize() const
 {
 	if (AvatarsRowNum==~0u) return 0;
 	return AvatarTable[AvatarsRowNum].Size;
 }
 
-char CharAnimations::GetBloodColor() const
+int CharAnimations::GetBloodColor() const
 {
 	if(AvatarsRowNum==~0u) return 0;
 	return AvatarTable[AvatarsRowNum].BloodColor;
@@ -130,6 +130,12 @@ const ieResRef &CharAnimations::GetWalkSound() const
 {
 	if(AvatarsRowNum==~0u) return EmptySound;
 	return AvatarTable[AvatarsRowNum].WalkSound;
+}
+
+int CharAnimations::GetWalkSoundCount() const
+{
+	if(AvatarsRowNum==~0u) return 0;
+	return AvatarTable[AvatarsRowNum].WalkSoundCount;
 }
 
 int CharAnimations::GetActorPartCount() const
@@ -440,7 +446,11 @@ void CharAnimations::InitAvatarsTable()
 		else {
 			AvatarTable[i].PaletteType=atoi(Avatars->QueryField(i,AV_USE_PALETTE) );
 		}
-		AvatarTable[i].Size=Avatars->QueryField(i,AV_SIZE)[0];
+		char size = Avatars->QueryField(i,AV_SIZE)[0];
+		if (size == '*') {
+			size = 0;
+		}
+		AvatarTable[i].Size = size;
 
 		AvatarTable[i].WalkScale = 0;
 		AvatarTable[i].RunScale = 0;
@@ -461,7 +471,7 @@ void CharAnimations::InitAvatarsTable()
 	}
 	qsort(AvatarTable, AvatarsCount, sizeof(AvatarStruct), compare_avatars);
 
-	
+
 	AutoTable blood("bloodclr");
 	if (blood) {
 		int rows = blood->GetRowCount();
@@ -469,7 +479,7 @@ void CharAnimations::InitAvatarsTable()
 			unsigned long value = 0;
 			unsigned long rmin = 0;
 			unsigned long rmax = 0xffff;
-			
+
 			valid_number(blood->QueryField(i,0), (long &)value);
 			valid_number(blood->QueryField(i,1), (long &)rmin);
 			valid_number(blood->QueryField(i,2), (long &)rmax);
@@ -494,17 +504,21 @@ void CharAnimations::InitAvatarsTable()
 			ieResRef value;
 			unsigned long rmin = 0;
 			unsigned long rmax = 0xffff;
+			unsigned int range = 0;
 
 			strnuprcpy(value, walk->QueryField(i,0), 8);
 			valid_number(walk->QueryField(i,1), (long &)rmin);
 			valid_number(walk->QueryField(i,2), (long &)rmax);
+			valid_number(walk->QueryField(i,3), (long &)range);
 			if (value[0]=='*') {
 				value[0]=0;
+				range = 0;
 			}
 			for(int j=0;j<AvatarsCount;j++) {
 				if (rmax<AvatarTable[j].AnimID) break;
 				if (rmin>AvatarTable[j].AnimID) continue;
 				memcpy(AvatarTable[j].WalkSound, value, sizeof(ieResRef) );
+				AvatarTable[j].WalkSoundCount = range;
 			}
 		}
 	}
@@ -856,7 +870,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			// Equipment animation parts
 
 			anims[part] = 0;
-			if (GetSize() == '*' || GetSize() == 0) continue;
+			if (GetSize() == 0) continue;
 
 			if (part == actorPartCount) {
 				if (WeaponRef[0] == 0) continue;
