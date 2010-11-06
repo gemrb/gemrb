@@ -106,6 +106,7 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 		snprintf(fx->Resource, 9,"CHA_%c%c%02d", g, t, cgsound&0xff);
 		fx->InventorySlot = 0xffff;
 		fx->Projectile = 0;
+		fx->Duration = core->GetGame()->GameTime + duration;
 		fxqueue->AddEffect(fx);
 		delete fx;
 	}
