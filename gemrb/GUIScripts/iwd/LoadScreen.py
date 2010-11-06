@@ -30,15 +30,10 @@ def SetLoadScreen ():
 	Table = GemRB.LoadTable ("areaload")
 	Area = GemRB.GetGameString (STR_AREANAME)
 	LoadPic = Table.GetValue (Area, Table.GetColumnName(0) )
-	print Area
-	print Table.GetColumnName(0)
-	print LoadPic
-	if not LoadPic or LoadPic =="":
-		LoadPic = GemRB.GetGameString (STR_LOADMOS)
-
-	if LoadPic=="":
-		LoadPic = "GUILS0"+str(GemRB.Roll(1,9,0))
-	LoadScreen.SetPicture(LoadPic)
+        Middle = LoadScreen.GetControl (4)
+        if LoadPic=="*":
+                LoadPic = "GTRSK00"+str(GemRB.Roll(1,9,0))
+        Middle.SetMOS (LoadPic)
 	return
 
 def StartLoadScreen ():
