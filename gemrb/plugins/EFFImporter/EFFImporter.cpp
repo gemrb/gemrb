@@ -131,7 +131,9 @@ Effect* EFFImporter::GetEffectV20(Effect *fx)
 	str->ReadWord( &fx->IsVariable ); //if this field was set to 1, this is a variable
 	str->ReadWord( &fx->IsSaveForHalfDamage ); //if this field was set to 1, save for half damage
 	str->ReadDword( &fx->PrimaryType );
-	str->Seek( 12, GEM_CURRENT_POS );
+	str->Seek( 4, GEM_CURRENT_POS );
+	str->ReadDword( &fx->MinAffectedLevel );
+	str->ReadDword( &fx->MaxAffectedLevel );
 	str->ReadDword( &fx->Resistance );
 	str->ReadDword( &fx->Parameter3 );
 	str->ReadDword( &fx->Parameter4 );
@@ -157,7 +159,8 @@ Effect* EFFImporter::GetEffectV20(Effect *fx)
 	} else {
 		str->Seek( 32, GEM_CURRENT_POS);
 	}
-	str->Seek( 8, GEM_CURRENT_POS );
+	str->ReadDword( &fx->CasterLevel );
+	str->Seek( 4, GEM_CURRENT_POS );
 	str->ReadDword( &fx->SecondaryType );
 	str->Seek( 60, GEM_CURRENT_POS );
 

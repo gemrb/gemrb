@@ -105,6 +105,8 @@ struct Effect {
 
 	// EFF V2.0 fields:
 	ieDword PrimaryType; //school
+	ieDword MinAffectedLevel;
+	ieDword MaxAffectedLevel;
 	ieDword Parameter3;
 	ieDword Parameter4;
 	ieDword PosX, PosY;
