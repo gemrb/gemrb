@@ -294,7 +294,7 @@ static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue, boo
 }
 
 /* create an item entry
-	 TODO: this code snippet exists in many copies, maybe consolidate */
+ TODO: this code snippet exists in many copies, maybe consolidate */
 static CREItem *CreateCreItem(const char *ItemResRef, int Charge0, int Charge1, int Charge2)
 {
 	CREItem *TmpItem = new CREItem();
@@ -3307,12 +3307,12 @@ static PyObject* GemRB_Button_SetMOS(PyObject * /*self*/, PyObject* args)
 
 	ResourceHolder<ImageMgr> im(ResRef);
 	if (im == NULL) {
-		return NULL;
+		return RuntimeError("Picture resource not found!\n");
 	}
 
 	Sprite2D* Picture = im->GetSprite2D();
 	if (Picture == NULL) {
-		return NULL;
+		return RuntimeError("Failed to acquire the picture!\n");
 	}
 
 	btn->SetPicture( Picture );
