@@ -167,6 +167,9 @@ def OpenInventoryWindow ():
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_FRONT)
 	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+
+	# force unpause the game
+	GemRB.GamePause(0, 0)
 	return
 
 #complete update
