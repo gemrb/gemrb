@@ -1892,9 +1892,10 @@ void GameScript::EvaluateAllBlocks()
 				Action *action = response->actions[0];
 				Scriptable *target = GetActorFromObject(MySelf, action->objects[1]);
 				if (target) {
-					target->ReleaseCurrentAction();
 					// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after?
 					rS->responses[0]->Execute(target);
+					// TODO: this will break blocking instants, if there are any
+					target->ReleaseCurrentAction();
 				} else if (InDebug&ID_CUTSCENE) {
 					printMessage("GameScript","Failed to find CutSceneID target!\n",YELLOW);
 					if (action->objects[1]) {
