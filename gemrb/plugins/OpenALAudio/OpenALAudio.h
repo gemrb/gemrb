@@ -58,7 +58,7 @@
 
 class OpenALSoundHandle : public SoundHandle {
 protected:
-	class AudioStream *parent;
+	struct AudioStream *parent;
 
 public:
 	OpenALSoundHandle(AudioStream *p) : parent(p) { }
