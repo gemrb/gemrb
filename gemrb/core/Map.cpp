@@ -637,11 +637,6 @@ void Map::UpdateScripts()
 	Actor *timestop_owner = game->timestop_owner;
 	bool timestop = game->timestop_end>game->GameTime;
 
-	// this is silly, the speed should be pre-calculated somewhere
-	//int *actor_speeds = (int *)calloc(Qcount[PR_SCRIPT], sizeof(int));
-
-	//bool *no_more_steps_for_actor = (bool *)calloc(Qcount[PR_SCRIPT], sizeof(bool));
-
 	while (q--) {
 		Actor* actor = queue[PR_SCRIPT][q];
 		//actor just moved away, don't run its script from this side
@@ -681,6 +676,13 @@ void Map::UpdateScripts()
 		 */
 		actor->ExecuteScript( MAX_SCRIPTS );
 
+	}
+
+	//clean up effects on dead actors too
+	q=Qcount[PR_DISPLAY];
+	while(q--) {
+		Actor* actor = queue[PR_DISPLAY][q];
+		actor->fxqueue.Cleanup();
 	}
 
 	q=Qcount[PR_SCRIPT];
