@@ -2924,10 +2924,9 @@ void Actor::DebugDump()
 	}
 	printf( "\nArea:       %.8s   ", Area );
 	printf( "Dialog:     %.8s\n", Dialog );
-	printf( "Global ID:  %d\n", GetGlobalID());
+	printf( "Global ID:  %d   PartySlot: %d\n", GetGlobalID(), InParty);
 	printf( "Script name:%.32s\n", scriptName );
 	printf( "TalkCount:  %d   ", TalkCount );
-	printf( "PartySlot:  %d\n", InParty );
 	printf( "Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );
 	printf( "Class:      %d   current class:%d\n", BaseStats[IE_CLASS], Modified[IE_CLASS] );
 	printf( "Race:       %d   current race:%d\n", BaseStats[IE_RACE], Modified[IE_RACE] );
@@ -2937,6 +2936,7 @@ void Actor::DebugDump()
 	printf( "Morale:     %d   current morale:%d\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
 	printf( "Moralebreak:%d   Morale recovery:%d\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
 	printf( "Visualrange:%d (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
+	printf( "Levels: %d/%d/%d (average %d)\n", Modified[IE_LEVEL], Modified[IE_LEVEL2], Modified[IE_LEVEL3], GetXPLevel(true) );
 	printf( "current HP:%d\n", BaseStats[IE_HITPOINTS] );
 	printf( "Mod[IE_ANIMATION_ID]: 0x%04X\n", Modified[IE_ANIMATION_ID] );
 	printf( "Colors:    ");
