@@ -286,6 +286,10 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			return;
 		}
 
+		// avoid problems when dhjollde.dlg tries starting a cutscene in the middle of a dialog
+		// (it seems harmless doing it in non-HoW too, since other versions would just break in such a situation)
+		core->SetCutSceneMode( false );
+
 		//displaying dialog for selected option
 		int si = tr->stateIndex;
 		//follow external linkage, if required
