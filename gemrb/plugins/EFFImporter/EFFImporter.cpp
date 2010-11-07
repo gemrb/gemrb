@@ -58,6 +58,18 @@ bool EFFImporter::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
+//level resistance is checked when DiceSides or DiceThrown
+//are greater than 0 (sometimes they used -1 for our amusement)
+//if level>than maximum affected or level<than minimum affected, then the
+//effect is resisted
+// copy the info into the EFFV2 fields (separate), so it is clearer
+inline static void fixAffectedLevels(Effect *fx) {
+	if (fx->DiceSides > 0 || fx->DiceThrown > 0) {
+		fx->MinAffectedLevel = fx->DiceThrown;
+		fx->MaxAffectedLevel = fx->DiceSides;
+	}
+}
+
 Effect* EFFImporter::GetEffect(Effect *fx)
 {
 	if (version == 1) {
@@ -101,6 +113,7 @@ Effect* EFFImporter::GetEffectV1(Effect *fx)
 	str->ReadDword( &fx->SavingThrowBonus );
 	str->ReadWord( &fx->IsVariable );
 	str->ReadWord( &fx->IsSaveForHalfDamage );
+	fixAffectedLevels( fx );
 
 	fx->PosX=0xffffffff;
 	fx->PosY=0xffffffff;
