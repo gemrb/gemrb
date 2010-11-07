@@ -179,11 +179,7 @@ void WorldMap::InsertAreaLink(unsigned int idx, unsigned int dir, WMPAreaLink *a
 	WMPAreaLink *al = new WMPAreaLink();
 	memcpy(al, arealink, sizeof(WMPAreaLink) );
 	unsigned int max = area_links.size();
-	area_links.push_back(al);
-	for(pos = max; pos>idx; pos--) {
-		area_links[pos]=area_links[pos-1];
-	}
-	area_links[idx]=al;
+	area_links.insert(area_links.begin()+idx,al);
 
 	max = area_entries.size();
 	for(pos = 0; pos<max; pos++) {
@@ -198,6 +194,8 @@ void WorldMap::InsertAreaLink(unsigned int idx, unsigned int dir, WMPAreaLink *a
 			}
 		}
 	}
+	//update the link count, just in case
+	AreaLinksCount++;
 }
 
 void WorldMap::SetAreaLink(unsigned int x, WMPAreaLink *arealink)

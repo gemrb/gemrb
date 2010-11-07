@@ -239,11 +239,12 @@ int WMPImporter::GetStoredFileSize(WorldMapArray *wmap, unsigned int index)
 		headersize += 184;
 		WorldMap *map = wmap->GetWorldMap(i);
 
-		ieDword AreaEntriesCount = map->GetEntryCount();
-		headersize += AreaEntriesCount * 240;
+		//Update the links and entries counts now, in case the worldmap has changed
+		map->AreaEntriesCount = map->GetEntryCount();
+		headersize += map->AreaEntriesCount * 240;
 
-		ieDword AreaLinksCount = map->GetLinkCount();
-		headersize += AreaLinksCount * 216;
+		map->AreaLinksCount = map->GetLinkCount();
+		headersize += map->AreaLinksCount * 216;
 
 		//put the first array into the first map
 		//the rest into the second map if not single
