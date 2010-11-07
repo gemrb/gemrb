@@ -6,7 +6,7 @@ gemrb -c /usr/share/gemrb/minimal/fhs.cfg
 
 Unless gemrb is installed elsewhere, it should run and print a bunch of
 text and then automatically quit. You may briefly see a small window
-appear. The last thing you should see in the console of a succesful run is:
+appear. The last thing you should see in the console of a successful run is:
 [SDLVideo]: Creating Extra Buffer...[OK]
 [SDLVideo]: CreateDisplay...[OK]
 [GUIScript]: Loading Script Start...[OK]
