@@ -1000,6 +1000,7 @@ void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 {
 	Scriptable * scr = GetActorFromObject( Sender, parameters->objects[1]);
 	if (!scr) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	core->timer->SetMoveViewPort( scr->Pos.x, scr->Pos.y, parameters->int0Parameter<<1, true );
@@ -1010,6 +1011,7 @@ void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 void GameScript::AddWayPoint(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
