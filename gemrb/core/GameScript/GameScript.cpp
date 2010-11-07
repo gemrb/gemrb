@@ -2305,7 +2305,7 @@ Action* GenerateAction(char* String)
 	return action;
 }
 
-Action* GenerateActionDirect(char *String, Actor *object)
+Action* GenerateActionDirect(char *String, Scriptable *object)
 {
 	Action* action = GenerateAction(String);
 	Object *tmp = action->objects[1];
