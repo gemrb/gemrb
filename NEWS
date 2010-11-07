@@ -1,10 +1,10 @@
-GemRB V0.6.2 git (776dcb2)
+GemRB V0.6.2 git (68718197)
   New features:
     -
-    - selective magic resistance (bg2-style)
+    - IWD:HoW is now completable!
+    - casting sounds and footsteps
     - autodetection of secret doors, detect illusions
-    - basic bardsong support
-    - IWD:HoW (worldmap) compatibility!
+    - basic bardsong support and selective magic resistance (bg2-style)
     - proper store economics, ergonomics and dragging
     - custom blood color (creature-dependant)
     - new actions, iwd effects and triggers
@@ -12,15 +12,16 @@ GemRB V0.6.2 git (776dcb2)
 
   Improved features:
     -
-    - actor selection and action bar
+    - actor selection and action bar (for summons and illusions too!)
     - door bashing and traps
     - loading screens, ambushes, worldmap
-    - sparkles
-    - panic
-    - actions, object matching
-    - handling of minimum hp
+    - sparkles, panic and other effects
+    - actions, dialogs, object matching
     - bugfixes
     - personal items support (swap/equip/remove)
+
+  Applied patches:
+	iwd regression fix from Eggert Jón Magnússon
 
 GemRB V0.6.2 (2010-08-21):
   New features:
