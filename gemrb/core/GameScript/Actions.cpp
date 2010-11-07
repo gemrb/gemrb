@@ -743,6 +743,11 @@ void GameScript::SetCursorState(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::StartCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
+	if (core->GetGameControl()->GetDialogueFlags()&DF_IN_DIALOG) {
+		// avoid problems when dhjollde.dlg calls this in the middle of a dialog
+		// TODO HACK: this isn't how it works in the original
+		return;
+	}
 	core->SetCutSceneMode( true );
 }
 
