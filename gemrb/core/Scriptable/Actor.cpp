@@ -2529,7 +2529,8 @@ void Actor::ReactToDeath(const char * deadname)
 			for(count=0;count<8 && resref[count]!=',';count++) {};
 			resref[count]=0;
 
-			ieDword len = core->GetAudioDrv()->Play( resref );
+			unsigned int len = 0;
+			core->GetAudioDrv()->Play( resref, &len );
 			ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 			if (counter != 0)
 				SetWait( counter );
@@ -2867,7 +2868,9 @@ void Actor::PlayWalkSound()
 			Sound[len]=cnt+0x60;
 		}
 	}
-	nextWalk = thisTime + core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y );
+	unsigned int len = 0;
+	core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y, 0, &len );
+	nextWalk = thisTime + len;
 }
 
 //Play PST specific hit sounds (HIT_0<dtype><armor>)

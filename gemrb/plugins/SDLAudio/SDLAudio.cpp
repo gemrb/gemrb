@@ -119,7 +119,7 @@ void SDLAudio::channel_done_callback(int channel) {
 	SDL_mutexV(g_sdlaudio->OurMutex);
 }
 
-unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int flags)
+Holder<SoundHandle> SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int flags, unsigned int *length)
 {
 	// TODO: some panning
 	(void)XPos;
@@ -132,14 +132,14 @@ unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int
 		if (flags & GEM_SND_SPEECH) {
 			Mix_HaltChannel(0);
 		}
-		return 0;
+		return Holder<SoundHandle>();
 	}
 
 	// TODO: move this loading code somewhere central
 	ResourceHolder<SoundMgr> acm(ResRef);
 	if (!acm) {
 		printf("failed acm load\n");
-		return 0;
+		return Holder<SoundHandle>();
 	}
 	int cnt = acm->get_length();
 	int riff_chans = acm->get_channels();
@@ -151,6 +151,10 @@ unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int
 	int cnt1 = acm->read_samples( ( short* ) memory, cnt ) * 2;
 	//Sound Length in milliseconds
 	unsigned int time_length = ((cnt / riff_chans) * 1000) / samplerate;
+
+	if (length) {
+		*length = time_length;
+	}
 
 	// convert our buffer, if necessary
 	SDL_AudioCVT cvt;
@@ -168,7 +172,7 @@ unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int
 	Mix_Chunk *chunk = Mix_QuickLoad_RAW(cvt.buf, cvt.len*cvt.len_ratio);
 	if (!chunk) {
 		printf("error loading chunk\n");
-		return 0;
+		return Holder<SoundHandle>();
 	}
 
 	// play
@@ -181,14 +185,15 @@ unsigned int SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsigned int
 	if (channel < 0) {
 		SDL_mutexV(OurMutex);
 		printf("error playing channel\n");
-		return 0;
+		return Holder<SoundHandle>();
 	}
 
 	assert((unsigned int)channel < channel_data.size());
 	channel_data[channel] = cvt.buf;
 	SDL_mutexV(OurMutex);
 
-	return time_length;
+	// TODO
+	return Holder<SoundHandle>();
 }
 
 int SDLAudio::CreateStream(Holder<SoundMgr> newMusic)

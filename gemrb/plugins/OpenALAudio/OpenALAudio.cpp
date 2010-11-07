@@ -45,6 +45,19 @@ void showALCError(const char* msg, const char* status, ALCdevice *device) {
 	printStatus(status, YELLOW);
 }
 
+bool OpenALSoundHandle::Playing() {
+	if (!parent) return false;
+
+	parent->ClearIfStopped();
+	return parent != 0;
+}
+
+void OpenALSoundHandle::Stop() {
+	if (parent) {
+		parent->ForceClear();
+	}
+}
+
 void AudioStream::ClearProcessedBuffers()
 {
 	ALint processed = 0;
@@ -84,6 +97,7 @@ void AudioStream::ClearIfStopped()
 		Source = 0;
 		Buffer = 0;
 		free = true;
+		if (handle) { handle->Invalidate(); handle.release(); }
 		ambient = false;
 		locked = false;
 		delete_buffers = false;
@@ -276,24 +290,28 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 	return Buffer;
 }
 
-unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, unsigned int flags)
+Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, unsigned int flags, unsigned int *length)
 {
 	ALuint Buffer;
 	unsigned int time_length;
 
 	if(ResRef == NULL) {
-        if((flags & GEM_SND_SPEECH) && alIsSource(speech.Source)) {
-            //So we want him to be quiet...
-            alSourceStop( speech.Source );
+		if((flags & GEM_SND_SPEECH) && alIsSource(speech.Source)) {
+			//So we want him to be quiet...
+			alSourceStop( speech.Source );
 			checkALError("Unable to stop speech", "WARNING");
 			speech.ClearProcessedBuffers();
 		}
-		return 0;
+		return Holder<SoundHandle>();
 	}
 
 	Buffer = loadSound( ResRef, time_length );
 	if (Buffer == 0) {
-		return 0;
+		return Holder<SoundHandle>();
+	}
+
+	if (length) {
+		*length = time_length;
 	}
 
 	ALuint Source;
@@ -310,38 +328,39 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 		//speech has a single channel, if a new speech started
 		//we stop the previous one
 		if(!speech.free && alIsSource(speech.Source)) {
-		    alSourceStop( speech.Source );
+			alSourceStop( speech.Source );
 			checkALError("Unable to stop speech", "WARNING");
 			speech.ClearProcessedBuffers();
 		}
-        if(!alIsSource(speech.Source)) {
-            alGenSources( 1, &speech.Source );
-            if (checkALError("Error creating source for speech", "ERROR")) {
-                return 0;
-            }
-        }
+		if(!alIsSource(speech.Source)) {
+			alGenSources( 1, &speech.Source );
+			if (checkALError("Error creating source for speech", "ERROR")) {
+				return Holder<SoundHandle>();
+			}
+		}
 
-        alSourcef( speech.Source, AL_PITCH, 1.0f );
-        alSourcefv( speech.Source, AL_VELOCITY, SourceVel );
-        alSourcei( speech.Source, AL_LOOPING, 0 );
-        alSourcef( speech.Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
-        checkALError("Unable to set speech parameters", "WARNING");
-        speech.free = false;
-        printf("speech.free: %d source:%d\n", speech.free,speech.Source);
+		alSourcef( speech.Source, AL_PITCH, 1.0f );
+		alSourcefv( speech.Source, AL_VELOCITY, SourceVel );
+		alSourcei( speech.Source, AL_LOOPING, 0 );
+		alSourcef( speech.Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
+		checkALError("Unable to set speech parameters", "WARNING");
+		speech.free = false;
+		printf("speech.free: %d source:%d\n", speech.free,speech.Source);
 
-        core->GetDictionary()->Lookup( "Volume Voices", volume );
-        alSourcef( speech.Source, AL_GAIN, 0.01f * volume );
-        alSourcei( speech.Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
-        alSourcefv( speech.Source, AL_POSITION, SourcePos );
-        assert(!speech.delete_buffers);
-        alSourcei( speech.Source, AL_BUFFER, Buffer );
-        checkALError("Unable to set speech parameters", "WARNING");
-        speech.Buffer = Buffer;
-        alSourcePlay( speech.Source );
-        if (checkALError("Unable to play speech", "ERROR")) {
-            return 0;
-        }
-        return time_length;
+		core->GetDictionary()->Lookup( "Volume Voices", volume );
+		alSourcef( speech.Source, AL_GAIN, 0.01f * volume );
+		alSourcei( speech.Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
+		alSourcefv( speech.Source, AL_POSITION, SourcePos );
+		assert(!speech.delete_buffers);
+		alSourcei( speech.Source, AL_BUFFER, Buffer );
+		checkALError("Unable to set speech parameters", "WARNING");
+		speech.Buffer = Buffer;
+		alSourcePlay( speech.Source );
+		if (checkALError("Unable to play speech", "ERROR")) {
+			return Holder<SoundHandle>();
+		}
+		speech.handle = new OpenALSoundHandle(&speech);
+		return speech.handle.get();
 	}
 
 	int stream = -1;
@@ -356,13 +375,13 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 	if (stream == -1) {
 		// Failed to assign new sound.
 		// The buffercache will handle deleting Buffer.
-		return 0;
+		return Holder<SoundHandle>();
 	}
 
 	// not speech
 	alGenSources( 1, &Source );
 	if (checkALError("Unable to create source", "ERROR")) {
-		return 0;
+		return Holder<SoundHandle>();
 	}
 
 	alSourcef( Source, AL_PITCH, 1.0f );
@@ -377,7 +396,7 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 	alSourcei( Source, AL_BUFFER, Buffer );
 
 	if (checkALError("Unable to set sound parameters", "ERROR")) {
-		return 0;
+		return Holder<SoundHandle>();
 	}
 
 	streams[stream].Buffer = Buffer;
@@ -386,10 +405,11 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 	alSourcePlay( Source );
 
 	if (checkALError("Unable to play sound", "ERROR")) {
-		return 0;
+		return Holder<SoundHandle>();
 	}
 
-	return time_length;
+	streams[stream].handle = new OpenALSoundHandle(&streams[stream]);
+	return streams[stream].handle.get();
 }
 
 bool OpenALAudioDriver::IsSpeaking()

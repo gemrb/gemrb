@@ -25,6 +25,7 @@
 #include "win32def.h"
 
 #include "Plugin.h"
+#include "Holder.h"
 
 #define GEM_SND_RELATIVE 1
 #define GEM_SND_SPEECH   IE_STR_SPEECH // 4
@@ -34,6 +35,13 @@
 class AmbientMgr;
 class SoundMgr;
 
+class GEM_EXPORT SoundHandle : public Held<SoundHandle> {
+public:
+	virtual bool Playing() = 0;
+	virtual void Stop() = 0;
+	virtual ~SoundHandle();
+};
+
 class GEM_EXPORT Audio : public Plugin {
 public:
 	static const TypeID ID;
@@ -41,8 +49,8 @@ public:
     Audio(void);
     virtual ~Audio();
     virtual bool Init(void) = 0;
-    virtual unsigned int Play(const char* ResRef, int XPos, int YPos, unsigned int flags = 0) = 0;
-    virtual unsigned int Play(const char* ResRef) { return Play(ResRef, 0, 0, GEM_SND_RELATIVE); }
+    virtual Holder<SoundHandle> Play(const char* ResRef, int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0) = 0;
+    virtual Holder<SoundHandle> Play(const char* ResRef, unsigned int *length = 0) { return Play(ResRef, 0, 0, GEM_SND_RELATIVE, length); }
     virtual bool IsSpeaking() = 0;
     virtual AmbientMgr* GetAmbientMgr() { return ambim; }
     virtual void UpdateVolume(unsigned int flags = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS) = 0;

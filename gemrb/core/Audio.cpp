@@ -29,3 +29,7 @@ Audio::Audio(void)
 Audio::~Audio(void)
 {
 }
+
+SoundHandle::~SoundHandle()
+{
+}

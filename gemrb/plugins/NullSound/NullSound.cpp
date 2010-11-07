@@ -42,9 +42,10 @@ bool NullSound::Init(void)
 	return true;
 }
 
-unsigned int NullSound::Play(const char*, int, int, unsigned int)
+Holder<SoundHandle> NullSound::Play(const char*, int, int, unsigned int, unsigned int *len)
 {
-	return 1000; //Returning 1 Second Length
+	if (len) *len = 1000; //Returning 1 Second Length
+	return Holder<SoundHandle>();
 }
 
 int NullSound::CreateStream(Holder<SoundMgr>)

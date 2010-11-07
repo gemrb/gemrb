@@ -56,6 +56,18 @@
 #define REFERENCE_DISTANCE 50
 #define ACM_BUFFERSIZE 8192
 
+class OpenALSoundHandle : public SoundHandle {
+protected:
+	class AudioStream *parent;
+
+public:
+	OpenALSoundHandle(AudioStream *p) : parent(p) { }
+	virtual ~OpenALSoundHandle() { }
+	virtual bool Playing();
+	virtual void Stop();
+	void Invalidate() { parent = 0; }
+};
+
 struct AudioStream {
     AudioStream() : Buffer(0), Source(0), Duration(0), free(true), ambient(false), locked(false), delete_buffers(false) { }
 
@@ -70,6 +82,8 @@ struct AudioStream {
     void ClearIfStopped();
     void ClearProcessedBuffers();
     void ForceClear();
+
+    Holder<OpenALSoundHandle> handle;
 };
 
 struct CacheEntry {
@@ -82,8 +96,8 @@ public:
     OpenALAudioDriver(void);
     ~OpenALAudioDriver(void);
     bool Init(void);
-    unsigned int Play(const char* ResRef, int XPos, int YPos,
-                      unsigned int flags = 0);
+    Holder<SoundHandle> Play(const char* ResRef, int XPos, int YPos,
+                      unsigned int flags = 0, unsigned int *length = 0);
     bool IsSpeaking();
     void UpdateVolume(unsigned int flags);
     bool CanPlay();
