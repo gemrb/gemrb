@@ -498,7 +498,7 @@ static const ActionLink actionnames[] = {
 	{"createvisualeffect", GameScript::CreateVisualEffect, 0},
 	{"createvisualeffectobject", GameScript::CreateVisualEffectObject, 0},
 	{"createvisualeffectobjectSticky", GameScript::CreateVisualEffectObjectSticky, 0},
-	{"cutsceneid", GameScript::CutSceneID,AF_IMMEDIATE},
+	{"cutsceneid", GameScript::CutSceneID,0},
 	{"damage", GameScript::Damage, 0},
 	{"daynight", GameScript::DayNight, 0},
 	{"deactivate", GameScript::Deactivate, 0},
@@ -1854,9 +1854,6 @@ bool GameScript::Update(bool *continuing, bool *done)
 	return true;
 }
 
-//FIXME: cutscene execution is even more simpler than this implementation
-//CutSceneID is a dummy object, a placeholder for the cutscene object
-//when evaluating all blocks (filling cutscene object action queues,
 //IE simply takes the first action's object for cutscene object
 //then adds these actions to its queue:
 // SetInterrupt(false), <actions>, SetInterrupt(true)
@@ -1870,24 +1867,41 @@ void GameScript::EvaluateAllBlocks()
 	if (!script) {
 		return;
 	}
-//according to research, cutscenes don't evaluate conditions, and always
-//run the first response, this is a serious cutback on possible
-//functionality, so i kept the gemrb specific code too.
+
 #ifdef GEMRB_CUTSCENES
-//this is the logical way of executing a cutscene
+	// this is the (unused) more logical way of executing a cutscene, which
+	// evaluates conditions and doesn't just use the first response
 	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		if (rB->Condition->Evaluate(MySelf)) {
+			// TODO: this no longer works since the cutscene changes
 			rB->Execute(MySelf);
 		}
 	}
 #else
-//this is the apparent IE behaviour
+	// this is the original IE behaviour:
+	// cutscenes don't evaluate conditions - they just choose the
+	// first response, take the object from the first action,
+	// and then add the actions to that object's queue.
 	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		ResponseSet * rS = rB->responseSet;
 		if (rS->responses.size()) {
-			rS->responses[0]->Execute(MySelf);
+			Response *response = rS->responses[0];
+			if (response->actions.size()) {
+				Action *action = response->actions[0];
+				Scriptable *target = GetActorFromObject(MySelf, action->objects[1]);
+				if (target) {
+					target->ReleaseCurrentAction();
+					// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after?
+					rS->responses[0]->Execute(target);
+				} else if (InDebug&ID_CUTSCENE) {
+					printMessage("GameScript","Failed to find CutSceneID target!\n",YELLOW);
+					if (action->objects[1]) {
+						action->objects[1]->Dump();
+					}
+				}
+			}
 		}
 	}
 #endif
@@ -2122,34 +2136,7 @@ int Response::Execute(Scriptable* Sender)
 				ret = 0;
 				break;
 			case AF_NONE:
-				if (Sender->GetInternalFlag()&IF_CUTSCENEID) {
-					Scriptable *cs = Sender->GetCutsceneID();
-					if (cs) {
-						// maybe this belongs somewhere else, but it certainly
-						// happens at the start of the cutscene (note that the
-						// queue is NOT cleared, so you can still have a pending
-						// action block your cutscene!)
-						cs->ReleaseCurrentAction();
-
-						cs->AddAction( aC );
-					} else {
-						//this can happen if a script refers to a wrong cutsceneid
-						if (InDebug&ID_CUTSCENE) {
-							printMessage("GameScript","Did not find cutscene object, action ignored!\n",YELLOW);
-						}
-					}
-				} else {
-					//this shouldn't happen, i think
-					if (Sender->GetCutsceneID()) {
-						printf("Stuck with cutscene ID!\n");
-						abort();
-					}
-					//ogres in dltc need this
-					Sender->AddAction( aC );
-					//this was a mistake, nothing
-					//requires it, so use the code above
-					//AddAction( Sender, aC );
-				}
+				Sender->AddAction( aC );
 				ret = 0;
 				break;
 			case AF_CONTINUE:

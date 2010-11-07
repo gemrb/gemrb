@@ -51,7 +51,6 @@ static ieDword globalActorCounter = 10000;
 Scriptable::Scriptable(ScriptableType type)
 {
 	Type = type;
-	CutSceneId = NULL;
 	for (int i = 0; i < MAX_SCRIPTS; i++) {
 		Scripts[i] = NULL;
 	}
@@ -445,9 +444,6 @@ void Scriptable::ProcessActions(bool force)
 		}
 		if (!CurrentAction) {
 			ClearActions();
-			if (CutSceneId) {
-				CutSceneId = NULL;
-			}
 			//removing the triggers at the end of the
 			//block
 			//ClearTriggers();
@@ -497,29 +493,9 @@ unsigned long Scriptable::GetWait() const
 	return WaitCounter;
 }
 
-Scriptable *Scriptable::GetCutsceneID() const
-{
-	return CutSceneId;
-}
-
 void Scriptable::LeaveDialog()
 {
 	InternalFlags |=IF_WASINDIALOG;
-}
-
-//this ends cutscene mode for this Sender
-void Scriptable::ClearCutsceneID()
-{
-	CutSceneId = NULL;
-	InternalFlags &= ~IF_CUTSCENEID;
-}
-
-//if the cutsceneID doesn't exist, we simply skip the action
-//because the cutscene script executer DOESN'T get hijacked
-void Scriptable::SetCutsceneID(Scriptable *csid)
-{
-	CutSceneId = csid;
-	InternalFlags |= IF_CUTSCENEID;
 }
 
 void Scriptable::Hide()

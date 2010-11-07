@@ -118,7 +118,6 @@ class SpriteCover;
 
 //scriptable flags
 #define IF_ACTIVE        0x10000
-#define IF_CUTSCENEID    0x20000
 #define IF_VISIBLE       0x40000
 #define IF_ONCREATION    0x80000
 #define IF_IDLE          0x100000
@@ -174,7 +173,6 @@ protected: //let Actor access this
 	Map *area;
 	ieVariable scriptName;
 	ieDword InternalFlags; //for triggers
-	Scriptable* CutSceneId;
 	ieResRef Dialog;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
@@ -224,9 +222,6 @@ public:
 	void SetWait(unsigned long time);
 	unsigned long GetWait() const;
 	void LeaveDialog();
-	Scriptable *GetCutsceneID() const;
-	void ClearCutsceneID();
-	void SetCutsceneID(Scriptable *csid);
 	void Interrupt();
 	void NoInterrupt();
 	void Hide();

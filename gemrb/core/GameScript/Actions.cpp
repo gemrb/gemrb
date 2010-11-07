@@ -756,18 +756,12 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 	GameScript* gs = new GameScript( parameters->string0Parameter, Sender );
 	gs->EvaluateAllBlocks();
 	delete( gs );
-	Sender->ClearCutsceneID();
 }
 
-void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
+void GameScript::CutSceneID(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	Sender->SetCutsceneID( GetActorFromObject( Sender, parameters->objects[1] ) );
-	if (InDebug&ID_CUTSCENE) {
-		if (!Sender->GetCutsceneID()) {
-			printMessage("GameScript","Failed to set CutSceneID!\n",YELLOW);
-			parameters->objects[1]->Dump();
-		}
-	}
+	// shouldn't get called
+	printMessage("GameScript","CutSceneID was called!\n",YELLOW);
 }
 
 void GameScript::Enemy(Scriptable* Sender, Action* /*parameters*/)

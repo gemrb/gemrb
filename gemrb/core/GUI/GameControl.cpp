@@ -2455,7 +2455,6 @@ void GameControl::DisplayString(const Point &p, const char *Text)
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = 0;
 	scr->Pos = p;
-	scr->ClearCutsceneID( );
 }
 
 //Create an overhead text over a scriptable target
@@ -2472,7 +2471,6 @@ void GameControl::DisplayString(Scriptable* target)
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = target->timeStartDisplaying;
 	scr->Pos = target->Pos;
-	scr->SetCutsceneID( target );
 }
 
 /** changes displayed map to the currently selected PC */

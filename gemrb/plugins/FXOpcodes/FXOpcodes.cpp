@@ -6273,11 +6273,6 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	GameScript* gs = new GameScript( resref, game );
 	gs->EvaluateAllBlocks();
 	delete( gs );
-	//for safety reasons, i get this pointer again
-	game = core->GetGame();
-	if (game) {
-		game->ClearCutsceneID();
-	}
 	return FX_NOT_APPLIED;
 }
 //0x12b ChaosShieldModifier
