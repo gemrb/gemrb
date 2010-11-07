@@ -117,11 +117,11 @@ ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 # Check for all the required and optional dependencies
 INCLUDE(FindPythonLibs)
-IF(PYTHON_LIBRARY)
-	MESSAGE(STATUS "Looking for Python libraries: found")
+IF(PYTHONLIBS_FOUND)
+	MESSAGE(STATUS "Looking for Python libraries and headers: found")
 ELSE()
-	MESSAGE(SEND_ERROR "Looking for Python libraries: not found!")
-	MESSAGE(FATAL_ERROR "Please get the development libraries from www.python.org")
+	MESSAGE(SEND_ERROR "Looking for Python libraries and headers: not found!")
+	MESSAGE(FATAL_ERROR "Please get them (www.python.org)")
 ENDIF()
 
 INCLUDE(FindSDL)
