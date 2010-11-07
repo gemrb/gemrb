@@ -313,6 +313,7 @@ private:
 	int attacksperround;
 	//time of our next attack
 	ieDword nextattack;
+	ieDword nextWalk;
 	ieDword lastattack;
 	ieDword InTrap;
 	char AttackStance;

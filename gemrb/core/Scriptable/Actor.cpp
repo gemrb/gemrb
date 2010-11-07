@@ -345,6 +345,8 @@ Actor::Actor()
 	secondround = 0;
 	attacksperround = 0;
 	nextattack = 0;
+	nextWalk = 0;
+	lastattack = 0;
 	InTrap = 0;
 	PathTries = 0;
 	TargetDoor = 0;
@@ -354,7 +356,6 @@ Actor::Actor()
 	modalTime = 0;
 	modalSpellLingering = 0;
 	panicMode = PANIC_NONE;
-	lastattack = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 	Equipped = 0;
@@ -2849,8 +2850,11 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 
 void Actor::PlayWalkSound()
 {
+	ieDword thisTime;
 	ieResRef Sound;
 
+	GetTime(thisTime);
+	if (thisTime<nextWalk) return;
 	int cnt = anims->GetWalkSoundCount();
 	if (!cnt) return;
 
@@ -2863,7 +2867,7 @@ void Actor::PlayWalkSound()
 			Sound[len]=cnt+0x60;
 		}
 	}
-	core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y );
+	nextWalk = thisTime + core->GetAudioDrv()->Play( Sound,Pos.x,Pos.y );
 }
 
 //Play PST specific hit sounds (HIT_0<dtype><armor>)
@@ -5377,10 +5381,12 @@ void Actor::Draw(const Region &screen)
 				anims[0]->SetPos(0);
 			}
 		} else {
+			if (!(gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
 			//FIXME: comment this out, if walksounds are just too broken
-			if (GetStance() == IE_ANI_WALK) {
-				if (!anims[0]->GetCurrentFrame()) {
-					PlayWalkSound();
+				if (GetStance() == IE_ANI_WALK) {
+					if (!anims[0]->GetCurrentFrame()) {
+						PlayWalkSound();
+					}
 				}
 			}
 		}
