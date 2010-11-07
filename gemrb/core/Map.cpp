@@ -1716,6 +1716,9 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 
 unsigned int Map::GetBlocked(unsigned int x, unsigned int y)
 {
+	if (y>Height || x>Width) {
+		return 0;
+	}
 	unsigned int ret = SrchMap[y*Width+x];
 	if (ret&(PATH_MAP_DOOR_TRANSPARENT|PATH_MAP_ACTOR)) {
 		ret&=~PATH_MAP_PASSABLE;
