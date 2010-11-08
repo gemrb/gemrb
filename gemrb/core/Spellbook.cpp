@@ -99,6 +99,18 @@ void Spellbook::CopyFrom(const Actor *source)
 		return;
 	}
 
+	// clear it first
+	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
+		for (unsigned int j = 0; j < spells[i].size(); j++) {
+			if (spells[i][j]) {
+				FreeSpellPage( spells[i][j] );
+				spells[i][j] = NULL;
+			}
+		}
+		spells[i].clear();
+	}
+	ClearSpellInfo();
+
 	const Spellbook &wikipedia = source->spellbook;
 
 	for (int t = 0; t < NUM_BOOK_TYPES; t++) {
