@@ -2269,13 +2269,7 @@ void Actor::RefreshPCStats() {
 
 	// warrior (fighter, barbarian, ranger, or paladin) or not
 	// GetClassLevel now takes into consideration inactive dual-classes
-	if (IsWarrior()) {
-		bonus = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
-	} else {
-
-		bonus = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);
-	}
-	bonus *= bonlevel;
+	bonus = GetHpAdjustment(bonlevel);
 	oldbonus *= oldlevel;
 	bonus = (oldbonus > bonus) ? oldbonus : bonus;
 
@@ -3690,6 +3684,44 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 		SetupQuickSlot(ACT_WEAPON1+which, inventory.GetFistSlot(), 0);
 }
 
+//if dual stuff needs to be handled on load too, improve this method with it
+int Actor::GetHpAdjustment(int multiplier)
+{
+	int val;
+
+	if (IsWarrior()) {
+		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,BaseStats[IE_CON]);
+	} else {
+		val = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,BaseStats[IE_CON]);
+	}
+	return val * multiplier;
+}
+
+void Actor::InitStatsOnLoad()
+{
+	//default is 9 in Tob (is this true? or just most anims are 9?)
+	SetBase(IE_MOVEMENTRATE,9);
+
+	ieWord animID = ( ieWord ) BaseStats[IE_ANIMATION_ID];
+	//this is required so the actor has animation already
+	SetAnimationID( animID );
+
+	// Setting up derived stats
+	if (BaseStats[IE_STATE_ID] & STATE_DEAD) {
+		SetStance( IE_ANI_TWITCH );
+		Deactivate();
+		InternalFlags|=IF_REALLYDIED;
+	} else {
+		SetStance( IE_ANI_AWAKE );
+	}
+	inventory.CalculateWeight();
+	CreateDerivedStats();
+	ieDword hp = BaseStats[IE_HITPOINTS] + GetHpAdjustment(GetXPLevel(false));
+	BaseStats[IE_HITPOINTS]=hp;
+	SetupFist();
+	//initial setup of modified stats
+	memcpy(Modified,BaseStats, sizeof(Modified));
+}
 
 void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
 {
@@ -3767,7 +3799,6 @@ void Actor::GetNextAnimation()
 	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum)->AnimID;
 	printf ("AnimID: %04X\n", NewAnimID);
 	SetBase( IE_ANIMATION_ID, NewAnimID);
-	//SetAnimationID ( NewAnimID );
 }
 
 void Actor::GetPrevAnimation()
@@ -3778,7 +3809,6 @@ void Actor::GetPrevAnimation()
 	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum)->AnimID;
 	printf ("AnimID: %04X\n", NewAnimID);
 	SetBase( IE_ANIMATION_ID, NewAnimID);
-	//SetAnimationID ( NewAnimID );
 }
 
 //slot is the projectile slot
@@ -4083,7 +4113,15 @@ int Actor::Immobile() const
 	if (GetStat(IE_STATE_ID) & STATE_STILL) {
 		return 1;
 	}
+
 	return 0;
+/*
+	//must be the last check or rearrange this condition
+	if (InternalFlags&IF_ACTIVE) {
+		return 0;
+	}
+	return 1;
+*/
 }
 
 //calculate how many attacks will be performed
@@ -5060,7 +5098,7 @@ void Actor::Draw(const Region &screen)
 	int explored = Modified[IE_DONOTJUMP]&DNJ_UNHINDERED;
 	//check the deactivation condition only if needed
 	//this fixes dead actors disappearing from fog of war (they should be permanently visible)
-	if ((!area->IsVisible( Pos, explored) || (InternalFlags&IF_REALLYDIED) ) &&	(InternalFlags&IF_ACTIVE) ) {
+	if ((!area->IsVisible( Pos, explored) || (InternalFlags&IF_REALLYDIED) ) && (InternalFlags&IF_ACTIVE) ) {
 		//turning actor inactive if there is no action next turn
 		if (ShouldHibernate()) {
 			InternalFlags|=IF_IDLE;
@@ -5107,10 +5145,6 @@ void Actor::Draw(const Region &screen)
 
 	if (State&STATE_DEAD) {
 		NoCircle = 1;
-	}
-
-	if (State&STATE_STILL) {
-		Frozen = 1;
 	}
 
 	//adjust invisibility for enemies
@@ -5196,18 +5230,18 @@ void Actor::Draw(const Region &screen)
 	if (anims) {
 		// update bounding box and such
 		int PartCount = ca->GetTotalPartCount();
-		Sprite2D* nextFrame = 0;
-		nextFrame = anims[0]->GetFrame(anims[0]->GetCurrentFrame());
+		//unselect actor if immobile or unavailable to player
+		if (Frozen || NoCircle) {
+			core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
+			//set the last frame if actor is died and deactivated
+			if (!(InternalFlags&(IF_ACTIVE|IF_IDLE)) && (StanceID==IE_ANI_TWITCH) ) {
+				anims[0]->SetPos(anims[0]->GetFrameCount()-1);
+			}
+		}
+		Sprite2D* nextFrame = anims[0]->GetFrame(anims[0]->GetCurrentFrame());
 
 		//make actor unselectable and unselected when it is not moving
-		//dead, petriefied, frozen, paralysed etc.
-		if (Frozen) {
-			// this 0x80 stuff was broken and is more broken now, disabled
-			//if (Selected!=0x80) {
-			//	Selected = 0x80;
-				core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
-			//}
-		}
+		//dead, petrified, frozen, paralysed etc.
 		//If you find a better place for it, I'll really be glad to put it there
 		//IN BG1 and BG2, this is at the ninth frame...
 		if(attackProjectile && (anims[0]->GetCurrentFrame() == 8/*anims[0]->GetFramesCount()/2*/)) {
@@ -5368,10 +5402,13 @@ void Actor::Draw(const Region &screen)
 		}
 
 		// advance animations one frame (in sync)
-		if (Frozen)
+		if (Frozen) {
+			//actually this is the last frame only if the animation is played backwards
 			anims[0]->LastFrame();
-		else
+		}
+		else {
 			anims[0]->NextFrame();
+		}
 
 		for (int part = 1; part < PartCount; ++part) {
 			if (anims[part])

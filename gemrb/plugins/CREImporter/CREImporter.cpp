@@ -810,35 +810,11 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	// Reading inventory, spellbook, etc
 	ReadInventory( act, Inventory_Size );
 
-	//default is 9 in Tob (is this true? or just most anims are 9?)
-	act->SetBase(IE_MOVEMENTRATE,9);
-
-	ieWord animID = ( ieWord ) act->BaseStats[IE_ANIMATION_ID];
-	//this is required so the actor has animation already
-	act->SetAnimationID( animID );
-
-	// Setting up derived stats
-	if (act->BaseStats[IE_STATE_ID] & STATE_DEAD) {
-		act->SetStance( IE_ANI_TWITCH );
-		act->Deactivate();
-	} else {
-		act->SetStance( IE_ANI_AWAKE );
-	}
 	if (IsCharacter) {
 		ReadChrHeader(act);
 	}
 
-	act->inventory.CalculateWeight();
-	act->CreateDerivedStats();
-	//if (CREVersion==IE_CRE_V1_2) {
-		//do this after created derived stats
-		ieDword hp = act->BaseStats[IE_HITPOINTS] + GetHpAdjustment(act);
-		act->BaseStats[IE_HITPOINTS]=hp;
-	//}
-	//do this after created derived stats
-	act->SetupFist();
-	//initial setup
-	memcpy(act->Modified,act->BaseStats, sizeof(act->Modified));
+	act->InitStatsOnLoad();
 
 	return act;
 }
@@ -2139,19 +2115,6 @@ int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int siz
 	return 0;
 }
 
-//this hack is needed for PST to adjust the current hp for compatibility
-int CREImporter::GetHpAdjustment(Actor *actor)
-{
-	int val;
-
-	if (actor->IsWarrior()) {
-		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,actor->BaseStats[IE_CON]);
-	} else {
-		val = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,actor->BaseStats[IE_CON]);
-	}
-	return val * actor->GetXPLevel( false );
-}
-
 int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 {
 	char Signature[8];
@@ -2178,7 +2141,7 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 	tmpWord = actor->BaseStats[IE_HITPOINTS];
 	//decrease the hp back to the one without constitution bonus
 	//this is probably still not perfect
-	tmpWord = (ieWord) (tmpWord - GetHpAdjustment(actor));
+	tmpWord = (ieWord) (tmpWord - actor->GetHpAdjustment(actor->GetXPLevel(false)));
 	stream->WriteWord( &tmpWord);
 	tmpWord = actor->BaseStats[IE_MAXHITPOINTS];
 	stream->WriteWord( &tmpWord);

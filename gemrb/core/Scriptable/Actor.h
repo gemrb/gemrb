@@ -550,6 +550,10 @@ public:
 	void ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical);
 	/* applies modal spell etc, if needed */
 	void UpdateActorState(ieDword gameTime);
+	/* returns the hp adjustment based on constitution */
+	int GetHpAdjustment(int multiplier);
+	/* does all the housekeeping after loading the actor from file */
+	void InitStatsOnLoad();
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
 	/* sets an RGB colour modification effect; location 0xff for global */
