@@ -5223,7 +5223,8 @@ void Actor::Draw(const Region &screen)
 	if (anims) {
 		// update bounding box and such
 		int PartCount = ca->GetTotalPartCount();
-		//unselect actor if immobile or unavailable to player
+		//make actor unselectable and unselected when it is not moving
+		//dead, petrified, frozen, paralysed or unavailable to player
 		if (Frozen || NoCircle) {
 			core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 			//set the last frame if actor is died and deactivated
@@ -5233,8 +5234,6 @@ void Actor::Draw(const Region &screen)
 		}
 		Sprite2D* nextFrame = anims[0]->GetFrame(anims[0]->GetCurrentFrame());
 
-		//make actor unselectable and unselected when it is not moving
-		//dead, petrified, frozen, paralysed etc.
 		//If you find a better place for it, I'll really be glad to put it there
 		//IN BG1 and BG2, this is at the ninth frame...
 		if(attackProjectile && (anims[0]->GetCurrentFrame() == 8/*anims[0]->GetFramesCount()/2*/)) {
