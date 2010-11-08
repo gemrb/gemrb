@@ -6503,12 +6503,13 @@ Actor *Actor::CopySelf(bool mislead) const
 			memcpy(newActor->PCStats, PCStats, sizeof(PCStatsStruct));
 		}
 	}
-	newActor->CreateDerivedStats();
 
 	//copy the spellbook, if any
 	if (!mislead) {
 		newActor->spellbook.CopyFrom(this);
 	}
+
+	newActor->CreateDerivedStats();
 
 	//copy the running effects
 	EffectQueue *newFXQueue = fxqueue.CopySelf();
