@@ -4115,13 +4115,6 @@ int Actor::Immobile() const
 	}
 
 	return 0;
-/*
-	//must be the last check or rearrange this condition
-	if (InternalFlags&IF_ACTIVE) {
-		return 0;
-	}
-	return 1;
-*/
 }
 
 //calculate how many attacks will be performed
