@@ -4287,7 +4287,6 @@ int fx_playsound (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_playsound (%s)", fx->Resource );
 	//this is probably inaccurate
-	// FIXME: only play it until fx->Duration
 	if (target) {
 		core->GetAudioDrv()->Play(fx->Resource, target->Pos.x, target->Pos.y);
 	} else {

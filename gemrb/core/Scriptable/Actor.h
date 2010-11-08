@@ -29,6 +29,7 @@
 #include "ie_types.h"
 
 #include "Animation.h"
+#include "Audio.h"
 #include "CharAnimations.h"
 #include "EffectQueue.h"
 #include "ScriptedAnimation.h"
@@ -292,6 +293,7 @@ public:
 	vvcVector vvcOverlays;
 	vvcVector vvcShields;
 	ieDword *projectileImmunity; //classic bitfield
+	Holder<SoundHandle> casting_sound;
 	ieDword roundTime;           //these are timers for attack rounds
 	ieDword modalTime;           //last time the modal effect used
 	char modalSpellLingering;    //the count of rounds for which the modal spell will be reapplied after the state ends

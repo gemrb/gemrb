@@ -806,10 +806,10 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
 		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1);
+		fxqueue->SetOwner(actor);
 		if (!actor->Modified[IE_AVATARREMOVAL]) {
 			spl->AddCastingGlow(fxqueue, duration, actor->Modified[IE_SEX]);
 		}
-		fxqueue->SetOwner(actor);
 		fxqueue->AddAllEffects(actor, actor->Pos);
 		delete fxqueue;
 	}
@@ -1158,6 +1158,14 @@ void Movable::SetStance(unsigned int arg)
 		if (GetInternalFlag()&IF_REALLYDIED) {
 			printMessage("Movable","Stance overridden by death\n", YELLOW);
 			return;
+		}
+	}
+
+	if (StanceID == IE_ANI_CONJURE && StanceID != arg && Type ==ST_ACTOR) {
+		Actor *caster = (Actor *) this;
+		if (caster->casting_sound) {
+			caster->casting_sound->Stop();
+			caster->casting_sound.release();
 		}
 	}
 

@@ -24,6 +24,7 @@
 
 #include "win32def.h"
 
+#include "Audio.h"
 #include "Game.h"
 #include "Interface.h"
 #include "Projectile.h"
@@ -73,15 +74,15 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 //0 will always return first spell block
 //otherwise set to caster level
 static EffectRef fx_casting_glow_ref={"CastingGlow",NULL,-1};
-static EffectRef fx_playsound_ref={"PlaySound",NULL,-1};
 
 void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 {
 	char g, t;
 	Effect *fx;
+	ieResRef Resource;
 	
 	int cgsound = CastingSound;
-	if (cgsound>=0) {
+	if (cgsound>=0 && duration > 1) {
 		//bg2 style
 		if(cgsound&0x100) {    
 			switch(gender) {
@@ -102,13 +103,10 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 		} else {
 			t = 'm';
 		}
-		fx = EffectQueue::CreateEffect(fx_playsound_ref, 0, 0, FX_DURATION_ABSOLUTE);
-		snprintf(fx->Resource, 9,"CHA_%c%c%02d", g, t, cgsound&0xff);
-		fx->InventorySlot = 0xffff;
-		fx->Projectile = 0;
-		fx->Duration = core->GetGame()->GameTime + duration;
-		fxqueue->AddEffect(fx);
-		delete fx;
+		snprintf(Resource, 9,"CHA_%c%c%02d", g, t, cgsound&0xff);
+		// only actors have fxqueue's and also the parent function checks for that
+		Actor *caster = (Actor *) fxqueue->GetOwner();
+		caster->casting_sound = core->GetAudioDrv()->Play(Resource, caster->Pos.x, caster->Pos.y);
 	}
 
 	fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
