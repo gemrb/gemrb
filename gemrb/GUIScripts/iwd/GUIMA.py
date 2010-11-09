@@ -264,6 +264,8 @@ def WorldMapWindowCommon (Travel):
 	WorldMapControl.SetAnimation ("WMDAG")
 	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, MoveToNewArea)
 	WorldMapControl.SetEvent (IE_GUI_MOUSE_ENTER_WORLDMAP, ChangeTooltip)
+	#center on current area
+	WorldMapControl.AdjustScrolling (0,0)
 
 	#north
 	Button = Window.GetControl (1)

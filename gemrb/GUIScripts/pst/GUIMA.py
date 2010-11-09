@@ -174,6 +174,8 @@ def WorldMapWindowCommon (Travel):
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_SELECTED, 0x20, 0x20, 0x00, 0xff)
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_NOTVISITED, 0x20, 0x20, 0x00, 0xa0)
 	WMap.SetAnimation ("WMPTY")
+	#center on current area
+	WMap.AdjustScrolling (0,0)
 	
 	# Done
 	Button = Window.GetControl (0)
