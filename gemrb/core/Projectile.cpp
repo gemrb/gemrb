@@ -490,11 +490,6 @@ void Projectile::ChangePhase()
 	if (Target) {
 		Actor *target = area->GetActorByGlobalID(Target);
 		if (!target) {
-			if (travel_handle) {
-				travel_handle->Stop();
-				travel_handle.release();
-			}
-
 			phase = P_EXPIRED;
 			return;
 		}
@@ -505,7 +500,6 @@ void Projectile::ChangePhase()
 			travel_handle->Stop();
 			travel_handle.release();
 		}
-
 		//there are no-effect projectiles, like missed arrows
 		//Payload can redirect the projectile in case of projectile reflection
 		Payload();
@@ -561,12 +555,6 @@ void Projectile::EndTravel()
 {
 	if(!Extension) {
 		phase = P_EXPIRED;
-
-		if (travel_handle) {
-			travel_handle->Stop();
-			travel_handle.release();
-		}
-
 		return;
 	}
 
@@ -1064,6 +1052,11 @@ void Projectile::DrawExplosion(const Region &screen)
 	if (!Extension) {
 		phase = P_EXPIRED;
 		return;
+	}
+
+	if (travel_handle) {
+		travel_handle->Stop();
+		travel_handle.release();
 	}
 
 	DrawChildren(screen);
