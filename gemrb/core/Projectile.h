@@ -35,6 +35,7 @@
 #include "Map.h"
 #include "Palette.h"
 #include "PathFinder.h"
+#include "Audio.h"
 
 //this is the height of the projectile when Spark Flag Fly = 1
 #define FLY_HEIGHT 50
@@ -225,6 +226,7 @@ protected:
 	Projectile **children;
 	int child_size;
 	int pathcounter;
+	Holder<SoundHandle> travel_handle;
 public:
 	void SetCaster(ieDword t);
 	ieDword GetCaster() const;

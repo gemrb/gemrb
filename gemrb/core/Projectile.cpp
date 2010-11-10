@@ -76,6 +76,11 @@ Projectile::~Projectile()
 	gamedata->FreePalette(palette, PaletteRes);
 	ClearPath();
 
+	if (travel_handle) {
+		travel_handle->Stop();
+		travel_handle.release();
+	}
+
 	if (phase != P_UNINITED) {
 		for (i = 0; i < MAX_ORIENT; ++i) {
 			if(travel[i])
@@ -386,7 +391,7 @@ void Projectile::Setup()
 		SetBlend();
 	}
 	phase = P_TRAVEL;
-	core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y);
+	travel_handle = core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
 
 	//create more projectiles
 	if(ExtFlags&PEF_ITERATION) {
@@ -485,12 +490,22 @@ void Projectile::ChangePhase()
 	if (Target) {
 		Actor *target = area->GetActorByGlobalID(Target);
 		if (!target) {
+			if (travel_handle) {
+				travel_handle->Stop();
+				travel_handle.release();
+			}
+
 			phase = P_EXPIRED;
 			return;
 		}
 	}
 	//reached target, and explodes now
 	if (!Extension) {
+		if (travel_handle) {
+			travel_handle->Stop();
+			travel_handle.release();
+		}
+
 		//there are no-effect projectiles, like missed arrows
 		//Payload can redirect the projectile in case of projectile reflection
 		Payload();
@@ -546,17 +561,29 @@ void Projectile::EndTravel()
 {
 	if(!Extension) {
 		phase = P_EXPIRED;
+
+		if (travel_handle) {
+			travel_handle->Stop();
+			travel_handle.release();
+		}
+
 		return;
 	}
 
 	//this flag says that the explosion should occur only when triggered
 	if (Extension->AFlags&PAF_TRIGGER) {
 		phase = P_TRIGGER;
+		return;
 	} else {
 		phase = P_EXPLODING1;
 	}
 
-	//this sound is played for projectiles waiting for trigger
+	if (travel_handle) {
+		travel_handle->Stop();
+		travel_handle.release();
+	}
+
+	//this sound is not played for projectiles waiting for trigger
 	//it is probably also played when a travel projectile ends its mission
 	core->GetAudioDrv()->Play(SoundRes2, Pos.x, Pos.y);
 }
