@@ -386,7 +386,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, int XPos, int YP
 
 	alSourcef( Source, AL_PITCH, 1.0f );
 	alSourcefv( Source, AL_VELOCITY, SourceVel );
-	alSourcei( Source, AL_LOOPING, 0 );
+	alSourcei( Source, AL_LOOPING, (flags & GEM_SND_LOOPING ? 1 : 0) );
 	alSourcef( Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
 	core->GetDictionary()->Lookup( "Volume SFX", volume );
 	alSourcef( Source, AL_GAIN, 0.01f * volume );
