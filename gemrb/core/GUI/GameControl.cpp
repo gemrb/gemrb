@@ -1922,7 +1922,9 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	if (!actor) return;
 
 	//we got an actor past this point
-	DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
+	if (target_mode == TARGET_MODE_NONE) {
+		DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
+	}
 
 	PerformActionOn(actor);
 }
