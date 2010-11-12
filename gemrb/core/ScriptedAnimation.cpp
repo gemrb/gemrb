@@ -518,18 +518,19 @@ bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 			printMessage("ScriptedAnimation", "Not fully initialised VVC!\n", LIGHT_RED);
 			return true;
 		}
-		justCreated = false;
 		if (Duration!=0xffffffff) {
 			Duration += core->GetGame()->GameTime;
 		}
 
-		if (!anims[P_ONSET*MAX_ORIENT+Orientation]) {
-			Phase = P_HOLD;
-		}
 retry:
 		if (sounds[Phase][0] != 0) {
 			core->GetAudioDrv()->Play( sounds[Phase] );
 		}
+
+		if (justCreated && !anims[P_ONSET*MAX_ORIENT+Orientation]) {
+			Phase = P_HOLD;
+		}
+		justCreated = false;
 	}
 
 	// if we're looping forever and we didn't get 'bumped' by an effect
