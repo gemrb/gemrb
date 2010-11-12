@@ -23,6 +23,7 @@
 #include "exports.h"
 
 #include "AnimationFactory.h"
+#include "Audio.h"
 #include "Map.h"
 #include "Palette.h"
 #include "SpriteCover.h"
@@ -88,6 +89,7 @@ public:
 	ScriptedAnimation *twin;
 	bool active;
 	bool effect_owned;
+	Holder<SoundHandle> sound_handle;
 public:
 	//draws the next frame of the videocell
 	bool Draw(const Region &screen, const Point &Pos, const Color &tint, Map *area, int dither, int orientation);

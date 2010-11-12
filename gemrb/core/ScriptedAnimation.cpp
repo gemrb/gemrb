@@ -391,6 +391,10 @@ ScriptedAnimation::~ScriptedAnimation(void)
 	if (twin) {
 		delete twin;
 	}
+	if (sound_handle) {
+		sound_handle->Stop();
+		sound_handle.release();
+	}
 }
 
 void ScriptedAnimation::SetPhase(int arg)
@@ -524,7 +528,7 @@ bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 
 retry:
 		if (sounds[Phase][0] != 0) {
-			core->GetAudioDrv()->Play( sounds[Phase] );
+			sound_handle = core->GetAudioDrv()->Play( sounds[Phase] );
 		}
 
 		if (justCreated && !anims[P_ONSET*MAX_ORIENT+Orientation]) {
