@@ -49,6 +49,8 @@ public:
 	virtual Effect* GetEffectV1(Effect *fx) = 0;
 	/** Fills fx with Effect v2.0 data loaded from the stream*/
 	virtual Effect* GetEffectV20(Effect *fx) = 0;
+	/** Fills the stream with Effect v2 data loaded from the effect*/
+	virtual void PutEffectV2(DataStream *stream, const Effect *fx) = 0;
 };
 
 #endif

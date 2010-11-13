@@ -2033,10 +2033,9 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 
 int AREImporter::PutEffects( DataStream *stream, EffectQueue *fxqueue)
 {
-	ieDword tmpDword1,tmpDword2;
-	char filling[60];
+	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
+	assert(eM != NULL);
 
-	memset(filling,0,sizeof(filling) );
 	std::list< Effect* >::const_iterator f=fxqueue->GetFirstEffect();
 	ieDword EffectsCount = fxqueue->GetSavedEffectsCount();
 	for(unsigned int i=0;i<EffectsCount;i++) {
@@ -2044,54 +2043,7 @@ int AREImporter::PutEffects( DataStream *stream, EffectQueue *fxqueue)
 
 		assert(fx!=NULL);
 
-		stream->Write( filling,8 ); //signature
-		stream->WriteDword( &fx->Opcode);
-		stream->WriteDword( &fx->Target);
-		stream->WriteDword( &fx->Power);
-		stream->WriteDword( &fx->Parameter1);
-		stream->WriteDword( &fx->Parameter2);
-		stream->WriteWord( &fx->TimingMode);
-		stream->WriteWord( &fx->unknown2);
-		stream->WriteDword( &fx->Duration);
-		stream->WriteWord( &fx->Probability1);
-		stream->WriteWord( &fx->Probability2);
-		stream->WriteResRef(fx->Resource);
-		stream->WriteDword( &fx->DiceThrown );
-		stream->WriteDword( &fx->DiceSides );
-		stream->WriteDword( &fx->SavingThrowType );
-		stream->WriteDword( &fx->SavingThrowBonus );
-		//isvariable
-		stream->Write( filling,4 );
-		stream->WriteDword( &fx->PrimaryType );
-		stream->Write( filling,12 );
-		stream->WriteDword( &fx->Resistance );
-		stream->WriteDword( &fx->Parameter3 );
-		stream->WriteDword( &fx->Parameter4 );
-		stream->Write( filling,8 );
-		if (fx->IsVariable) {
-			stream->Write(fx->Resource+8, 8);
-			//resource1-4 are used as a continuous memory
-			stream->Write(((ieByte *) fx->Resource)+16, 8);
-		} else {
-			stream->WriteResRef(fx->Resource2);
-			stream->WriteResRef(fx->Resource3);
-		}
-		tmpDword1 = (ieDword) fx->PosX;
-		tmpDword2 = (ieDword) fx->PosY;
-		stream->WriteDword( &tmpDword1 );
-		stream->WriteDword( &tmpDword2 );
-		//FIXME: these two points are actually different
-		stream->WriteDword( &tmpDword1 );
-		stream->WriteDword( &tmpDword2 );
-		stream->WriteDword( &fx->SourceType );
-		stream->WriteResRef( fx->Source );
-		stream->WriteDword( &fx->SourceFlags );
-		stream->WriteDword( &fx->Projectile );
-		tmpDword1 = (ieDword) fx->InventorySlot;
-		stream->WriteDword( &tmpDword1 );
-		stream->Write( filling,40 ); //12+32+8
-		stream->WriteDword( &fx->SecondaryType );
-		stream->Write( filling,60 );
+		eM->PutEffectV2(stream, fx);
 	}
 	return 0;
 }

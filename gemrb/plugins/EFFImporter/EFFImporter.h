@@ -40,6 +40,7 @@ public:
 	Effect* GetEffect(Effect *fx);
 	Effect* GetEffectV1(Effect *fx);
 	Effect* GetEffectV20(Effect *fx);
+	void PutEffectV2(DataStream *stream, const Effect *fx); // used in the area and cre importer
 };
 
 
