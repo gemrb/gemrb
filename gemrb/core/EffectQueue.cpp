@@ -674,7 +674,7 @@ int EffectQueue::AddAllEffects(Actor* target, const Point &destination) const
 {
 	int res = FX_NOT_APPLIED;
 	// pre-roll dice for fx needing them and stow them in the effect
-	ieDword random_value = core->Roll( 1, 100, 0 );
+	ieDword random_value = core->Roll( 1, 100, -1 );
 
 	if( target) {
 		target->RollSaves();
@@ -776,7 +776,7 @@ inline bool check_probability(Effect* fx)
 {
 	//watch for this, probability1 is the high number
 	//probability2 is the low number
-	//random value is 1-100
+	//random value is 0-99
 	if( fx->random_value<=fx->Probability2 || fx->random_value>fx->Probability1) {
 		return false;
 	}

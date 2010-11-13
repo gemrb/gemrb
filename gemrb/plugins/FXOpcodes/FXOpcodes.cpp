@@ -6103,7 +6103,7 @@ int fx_apply_effect_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (newfx) {
 			Effect *myfx = new Effect;
 			memcpy(myfx, newfx, sizeof(Effect));
-			myfx->random_value = core->Roll(1,100,0);
+			myfx->random_value = core->Roll(1,100,-1);
 			myfx->TimingMode=fx->TimingMode;
 			myfx->Duration=fx->Duration;
 			myfx->Target = FX_TARGET_PRESET;
