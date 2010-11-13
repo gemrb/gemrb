@@ -39,7 +39,9 @@ class SoundMgr;
 class GEM_EXPORT SoundHandle : public Held<SoundHandle> {
 public:
 	virtual bool Playing() = 0;
+	virtual void SetPos(int XPos, int YPos) = 0;
 	virtual void Stop() = 0;
+	virtual void StopLooping() = 0;
 	virtual ~SoundHandle();
 };
 

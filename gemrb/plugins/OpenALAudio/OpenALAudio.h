@@ -63,8 +63,10 @@ protected:
 public:
 	OpenALSoundHandle(AudioStream *p) : parent(p) { }
 	virtual ~OpenALSoundHandle() { }
+	virtual void SetPos(int XPos, int YPos);
 	virtual bool Playing();
 	virtual void Stop();
+	virtual void StopLooping();
 	void Invalidate() { parent = 0; }
 };
 

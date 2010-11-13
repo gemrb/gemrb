@@ -45,6 +45,16 @@ void showALCError(const char* msg, const char* status, ALCdevice *device) {
 	printStatus(status, YELLOW);
 }
 
+void OpenALSoundHandle::SetPos(int XPos, int YPos) {
+	if (!parent) return;
+
+	ALfloat SourcePos[] = {
+		(float) XPos, (float) YPos, 0.0f
+	};
+
+	alSourcefv(parent->Source, AL_POSITION, SourcePos);
+}
+
 bool OpenALSoundHandle::Playing() {
 	if (!parent) return false;
 
@@ -53,9 +63,15 @@ bool OpenALSoundHandle::Playing() {
 }
 
 void OpenALSoundHandle::Stop() {
-	if (parent) {
-		parent->ForceClear();
-	}
+	if (!parent) return;
+
+	parent->ForceClear();
+}
+
+void OpenALSoundHandle::StopLooping() {
+	if (!parent) return;
+
+	alSourcei(parent->Source, AL_LOOPING, 0);
 }
 
 void AudioStream::ClearProcessedBuffers()
