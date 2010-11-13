@@ -1922,7 +1922,7 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 		EXTSTATE_SET(EXTSTATE_FLOATTEXTS);
 		if (!fx->Resource[0]) {
-			strnuprcpy(fx->Resource,"cynicism",sizeof(ieResRef));
+			strnuprcpy(fx->Resource,"cynicism",sizeof(ieResRef)-1);
 		}
 		if (fx->Parameter1) {
 			fx->Parameter1--;
@@ -2711,7 +2711,7 @@ int fx_entropy_shield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_entropy_shield (%2d)\n", fx->Opcode);
 	if (target->SetSpellState( SS_ENTROPY)) return FX_APPLIED;
 	if (!fx->Resource[0]) {
-		strnuprcpy(fx->Resource, "entropy", sizeof(ieResRef));
+		strnuprcpy(fx->Resource, "entropy", sizeof(ieResRef)-1);
 	}
 	//immunity to certain projectiles
 	ieDword *EntropyProjectileList = core->GetListFrom2DA(fx->Resource);

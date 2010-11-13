@@ -209,9 +209,9 @@ void InitPathFinder()
 		terrainsounds = new TerrainSounds[rc];
 		tsndcount = rc;
 		while(rc--) {
-			strnuprcpy(terrainsounds[rc].Group,tm->GetRowName(rc+2), sizeof(ieResRef) );
+			strnuprcpy(terrainsounds[rc].Group,tm->GetRowName(rc+2), sizeof(ieResRef)-1 );
 			for(int i = 0; i<16;i++) {
-				strnuprcpy(terrainsounds[rc].Sounds[i], tm->QueryField(rc+2, i), sizeof(ieResRef) );
+				strnuprcpy(terrainsounds[rc].Sounds[i], tm->QueryField(rc+2, i), sizeof(ieResRef)-1 );
 			}
 		}
 	}
