@@ -660,6 +660,9 @@ void Projectile::DoStep(unsigned int walk_speed)
 
 	Pos.x=step->x;
 	Pos.y=step->y;
+	if (travel_handle) {
+		travel_handle->SetPos(Pos.x, Pos.y);
+	}
 	if (!step->Next) {
 		ClearPath();
 		NewOrientation = Orientation;
