@@ -59,6 +59,7 @@ class Container;
 class Control;
 class DataFileMgr;
 struct Effect;
+class EffectQueue;
 struct EffectRef;
 class EventMgr;
 class Factory;
@@ -615,6 +616,9 @@ public:
 	void ApplySpellPoint(const ieResRef resname, Map *area, const Point &pos, Scriptable *caster, int level);
 	/** applies a single effect on the target */
 	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster);
+	/** applies an effect queue on the target */
+	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster);
+	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p);
 	Effect *GetEffect(const ieResRef resname, int level, const Point &p);
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map);

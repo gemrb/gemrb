@@ -4842,20 +4842,7 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Scriptable *cas
 	level = spell->GetHeaderIndexFromLevel(level);
 	EffectQueue *fxqueue = spell->GetEffectBlock(caster, actor->Pos, level);
 
-	//check effect immunities
-	int res = fxqueue->CheckImmunity ( actor );
-	if (res) {
-		if (res == -1) {
-			//bounced back at a nonliving caster
-			if (caster->Type!=ST_ACTOR) {
-				delete fxqueue;
-				return;
-			}
-			actor = (Actor *) caster;
-		}
-		fxqueue->SetOwner( caster );
-		fxqueue->AddAllEffects(actor, actor->Pos);
-	}
+	ApplyEffectQueue(fxqueue, actor, caster, actor->Pos);
 	delete fxqueue;
 }
 
@@ -4884,26 +4871,35 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
 	//AddEffect now copies the fx data, please delete your effect reference
 	//if you created it. (Don't delete cached references)
 	fxqueue->AddEffect( effect );
+	int res = ApplyEffectQueue(fxqueue, actor, caster);
+	delete fxqueue;
+	return res;
+}
 
+int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster)
+{
+	Point p;
+	p.empty(); //the effect should have all its coordinates already set
+	return ApplyEffectQueue(fxqueue, actor, caster, p);
+}
+
+int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p)
+{
 	int res = fxqueue->CheckImmunity ( actor );
 	if (res) {
 		if (res == -1 ) {
 			//bounced back at a nonliving caster
 			if (caster->Type!=ST_ACTOR) {
-				delete fxqueue;
 				return 0;
 			}
 			actor = (Actor *) caster;
 		}
 		fxqueue->SetOwner( caster );
-		Point p;
 
-		p.empty(); //the effect should have all its coordinates already set
 		if (fxqueue->AddAllEffects( actor, p )==FX_NOT_APPLIED) {
 			res=0;
 		}
 	}
-	delete fxqueue;
 	return res;
 }
 
