@@ -1994,9 +1994,11 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value, int pcf)
 		}
 	}
 
-	unsigned int previous = Modified[StatIndex];
+	unsigned int previous = GetSafeStat(StatIndex);
 	if (Modified[StatIndex]!=Value) {
 		Modified[StatIndex] = Value;
+	}
+	if (previous!=Value) {
 		if (pcf) {
 			PostChangeFunctionType f = post_change_functions[StatIndex];
 			if (f) (*f)(this, previous, Value);
