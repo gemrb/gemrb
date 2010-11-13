@@ -4365,7 +4365,7 @@ int fx_apply_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (newfx) {
 			Effect *myfx = new Effect;
 			memcpy(myfx, newfx, sizeof(Effect));
-			myfx->random_value = core->Roll(1,100,0);
+			myfx->random_value = fx->random_value;
 			myfx->Target = FX_TARGET_PRESET;
 			myfx->TimingMode = fx->TimingMode;
 			myfx->Duration = fx->Duration;
