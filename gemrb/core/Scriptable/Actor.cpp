@@ -3692,9 +3692,9 @@ int Actor::GetHpAdjustment(int multiplier)
 	int val;
 
 	if (IsWarrior()) {
-		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,BaseStats[IE_CON]);
+		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
 	} else {
-		val = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,BaseStats[IE_CON]);
+		val = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);
 	}
 	return val * multiplier;
 }
@@ -3718,6 +3718,7 @@ void Actor::InitStatsOnLoad()
 	}
 	inventory.CalculateWeight();
 	CreateDerivedStats();
+	Modified[IE_CON]=BaseStats[IE_CON]; // used by GetHpAdjustment
 	ieDword hp = BaseStats[IE_HITPOINTS] + GetHpAdjustment(GetXPLevel(false));
 	BaseStats[IE_HITPOINTS]=hp;
 	SetupFist();
