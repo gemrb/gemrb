@@ -86,7 +86,7 @@ void InitScriptTables();
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode);
 bool ResolveSpellName(ieResRef spellres, Action *parameter);
 GEM_EXPORT void ResolveSpellName(ieResRef spellres, ieDword number);
-ieDword ResolveSpellNumber(const ieResRef spellres);
+GEM_EXPORT ieDword ResolveSpellNumber(const ieResRef spellres);
 bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot);
 void EscapeAreaCore(Scriptable *Sender, const Point &p, const char *area, const Point &enter, int flags, int wait);
 void GoNear(Scriptable *Sender, const Point &p);

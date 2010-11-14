@@ -256,7 +256,8 @@ public:
 	bool WeaponImmunity(int enchantment, ieDword weapontype) const;
 	// checks if spells of type "types" are disabled (usually by armor)
 	// returns a bitfield of disabled spelltypes
-	int DisabledSpellcasting(int types) const;
+	// it is no longer used
+	//int DisabledSpellcasting(int types) const;
 
 	// returns -1 if bounced, 0 if resisted, 1 if accepted spell
 	int CheckImmunity(Actor *target) const;

@@ -1635,6 +1635,7 @@ bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 	return WeaponImmunity(fx_weapon_immunity_ref.opcode, enchantment, weapontype);
 }
 
+/* no longer needed, use IE_CASTING stat
 static EffectRef fx_disable_spellcasting_ref={ "DisableCasting", NULL, -1 };
 int EffectQueue::DisabledSpellcasting(int types) const
 {
@@ -1685,6 +1686,7 @@ int EffectQueue::DisabledSpellcasting(int types) const
 	}
 	return spelltype_mask & types;
 }
+*/
 
 //useful for immunity vs spell, can't use item, etc.
 Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, const ieResRef resource) const

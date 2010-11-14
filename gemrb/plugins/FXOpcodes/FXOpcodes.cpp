@@ -38,6 +38,7 @@
 #include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
 #include "PolymorphCache.h" // fx_polymorph
+#include "Scriptable/PCStatStruct.h" //fx_polymorph (action definitions)
 
 //FIXME: find a way to handle portrait icons better
 #define PI_CONFUSED  3
@@ -868,10 +869,9 @@ void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
 	Map *area = caster->GetCurrentArea();
 
 	if (area && target->GetCurrentArea()!=area) {
-		 	MoveBetweenAreasCore(target, area->GetScriptName(), p, fx->Parameter2, true);
+		MoveBetweenAreasCore(target, area->GetScriptName(), p, fx->Parameter2, true);
 	}
 	target->Resurrect();
-	
 }
 
 
@@ -2802,7 +2802,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		nextHeal = fx->Parameter3;
 	}
 
-	//we can have multiple calls at the same gameTime, so we 
+	//we can have multiple calls at the same gameTime, so we
 	//just go to gameTime+1 to ensure one call
 	if (nextHeal>=gameTime) return FX_APPLIED;
 
@@ -3603,6 +3603,9 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//copy all polymorphed stats
 	if(!fx->Parameter2) {
 		STAT_SET( IE_POLYMORPHED, 1 );
+		//disable mage and cleric spells (see IE_CASTING doc above)
+		STAT_BIT_OR(IE_CASTING, 6);
+		STAT_BIT_OR(IE_DISABLEDBUTTON, (1<<ACT_CAST)|(1<<ACT_QSPELL1)|(1<<ACT_QSPELL2)|(1<<ACT_QSPELL3) );
 	}
 
 	for(int i=0;i<polystatcount;i++) {
@@ -3647,7 +3650,7 @@ int fx_set_chantbad_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_animation_stance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_animation_stance (%2d): Stance: %d\n", fx->Opcode, fx->Parameter2 );
-	
+
 	//this effect works only on living actors
 	if ( !STATE_GET(STATE_DEAD) ) {
 		target->SetStance(fx->Parameter2);
@@ -3792,8 +3795,18 @@ int fx_disable_button (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x91 DisableSpellCasting
-//bg2: 0 - mage, 1 - cleric, 2 - innate
-//iwd2: 0 - all, 1 - mage+cleric, 2 - mage, 3 - cleric , 4 - innate
+//bg2:  (-1 item), 0 - mage, 1 - cleric, 2 - innate, 3 - class
+//iwd2: (-1 item), 0 - all, 1 - mage+cleric, 2 - mage, 3 - cleric , 4 - innate,( 5 - class)
+
+/*internal representation of disabled spells in IE_CASTING (bitfield):
+1 - items (SPIT)
+2 - mage  (SPWI)
+4 - cleric (SPPR)
+8 - innate (SPIN)
+16 - class (SPCL)
+*/
+
+static ieDword dsc_bits_iwd2[7]={1, 14, 6, 2, 4, 8, 16};
 int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_disable_spellcasting (%2d): Button: %d\n", fx->Opcode, fx->Parameter2 );
@@ -3802,6 +3815,7 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 	bool display_warning = false;
+	ieDword tmp = fx->Parameter2+1;
 
 	//IWD2 Style spellbook
 	if (target->spellbook.IsIWDSpellBook()) {
@@ -3814,9 +3828,21 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_WIZARD, 0)) display_warning = true;
 				break;
 		}
+		if (tmp<7) {
+			STAT_BIT_OR_PCF(IE_CASTING, dsc_bits_iwd2[tmp] );
+		}
 	} else { // bg2
-		if (fx->Parameter2 == 0)
+		if (fx->Parameter2 == 0) {
 			if (target->spellbook.GetKnownSpellsCount(IE_SPELL_TYPE_WIZARD, 0)) display_warning = true;
+		}
+		//-1-> 0 -> 1 (item)
+		//0 -> 1 -> 2 (mage)
+		//1 -> 2 -> 4 (cleric)
+		//2 -> 3 -> 8 (innate)
+		//3 -> 4 -> 16 (class)
+		if (tmp<31) {
+			STAT_BIT_OR_PCF(IE_CASTING, 1<<tmp );
+		}
 	}
 	if (display_warning && target->GetStat(IE_EA) < EA_CONTROLLABLE) {
 		displaymsg->DisplayConstantStringName(STR_DISABLEDMAGE, 0xff0000, target);
@@ -3896,9 +3922,9 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	bool detecttraps = true;
 
 	switch(fx->Parameter2) {
-		case 1: 
+		case 1:
 			skill = target->GetStat(IE_TRAPS);
-			break;  //find traps
+			break; //find traps
 		case 3:
 			//detect secret doors
 			skill = target->LuckyRoll(1,100,0);
@@ -5309,13 +5335,13 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	ieResRef script;
-	
+
 	//intentionally 7, to leave room for the last letter
-	strnlwrcpy(script,target->GetScript(SCR_CLASS),7); 
+	strnlwrcpy(script,target->GetScript(SCR_CLASS),7);
 	//no need of buffer defense as long as you don't mess with the 7 above
-	strcat(script,"m"); 
+	strcat(script,"m");
 	//if the caster is inparty, the script is turned off by the AI disable flag
-	copy->SetScript(script, SCR_CLASS, target->InParty!=0); 
+	copy->SetScript(script, SCR_CLASS, target->InParty!=0);
 
 	switch(fx->Parameter2)
 	{
@@ -5572,7 +5598,7 @@ int fx_damageluck_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0xfb BardSong 
+// 0xfb BardSong
 
 int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {

@@ -8354,7 +8354,7 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 
 	// disable all spells if fx_disable_spellcasting was run with the same type
 	// but only if there are any spells of that type to disable
-	int disabled_spellcasting = actor->fxqueue.DisabledSpellcasting(7);
+	int disabled_spellcasting = actor->GetStat(IE_CASTING);
 
 	for (i=0;i<GUIBT_COUNT-(more?2:0);i++) {
 		SpellExtHeader *spell = SpellArray+i;
@@ -8367,7 +8367,8 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 		// disable spells that should be cast from the inventory
 		// Identify is misclassified and has Target 3 (Dead char)
 
-		if (CheckSpecialSpell(spell->spellname, actor) || (disabled_spellcasting&(1<<spell->type)) ) {
+		ieDword spelltype = ResolveSpellNumber(spell->spellname)/1000;
+		if (CheckSpecialSpell(spell->spellname, actor) || (disabled_spellcasting&(1<<spelltype)) ) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
 			btn->EnableBorder(1, IE_GUI_BUTTON_DISABLED);
 			PyObject *Function = PyDict_GetItemString(dict, "UpdateActionsWindow");
