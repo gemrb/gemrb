@@ -5413,7 +5413,7 @@ void Actor::Draw(const Region &screen)
 		}
 
 		// advance animations one frame (in sync)
-		if (Frozen) {
+		if (Immobile()) {
 			//actually this is the last frame only if the animation is played backwards
 			anims[0]->LastFrame();
 		}
