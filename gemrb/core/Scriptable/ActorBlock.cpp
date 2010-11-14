@@ -1882,6 +1882,7 @@ void Door::DebugDump() const
 {
 	printf( "Debugdump of Door %s:\n", GetScriptName() );
 	printf( "Door Global ID:  %d\n", GetGlobalID());
+	printf( "Position: %d.%d\n", Pos.x, Pos.y);
 	printf( "Door Open: %s\n", YESNO(IsOpen()));
 	printf( "Door Locked: %s\n", YESNO(Flags&DOOR_LOCKED));
 	printf( "Door Trapped: %s\n", YESNO(Trapped));
@@ -2098,6 +2099,7 @@ void InfoPoint::DebugDump() const
 			break;
 	}
 	printf( "Region Global ID:  %d\n", GetGlobalID());
+	printf( "Position: %d.%d\n", Pos.x, Pos.y);
 	printf( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));
 	printf( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
 		TrapRemovalDiff );
@@ -2341,6 +2343,7 @@ void Container::DebugDump() const
 {
 	printf( "Debugdump of Container %s\n", GetScriptName() );
 	printf( "Container Global ID:  %d\n", GetGlobalID());
+	printf( "Position: %d.%d\n", Pos.x, Pos.y);
 	printf( "Type: %d, Locked: %s, LockDifficulty: %d\n", Type, YESNO(Flags&CONT_LOCKED), LockDifficulty );
 	printf( "Flags: %d, Trapped: %s, Detected: %d\n", Flags, YESNO(Trapped), TrapDetected );
 	printf( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
