@@ -3643,7 +3643,7 @@ void Actor::ReinitQuickSlots()
 	for(i=0;i<2;i++) {
 		int which = ACT_WEAPON3+i;
 		// Assuming that ACT_WEAPON3 and 4 are always in the first two spots
-		if (PCStats->QSlots[i]!=which) {
+		if (PCStats->QSlots[i+3]!=which) {
 			SetupQuickSlot(which, 0xffff, 0xffff);
 		}
 	}
