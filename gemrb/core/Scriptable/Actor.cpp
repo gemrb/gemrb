@@ -5416,9 +5416,11 @@ void Actor::Draw(const Region &screen)
 				anims[0]->SetPos(0);
 			}
 		} else {
-			if (!(gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
-			//FIXME: comment this out, if walksounds are just too broken
+			//dialog, pause game
+			if (!(gc->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
+				//stance
 				if (GetStance() == IE_ANI_WALK) {
+					//frame reached 0
 					if (!anims[0]->GetCurrentFrame()) {
 						PlayWalkSound();
 					}
