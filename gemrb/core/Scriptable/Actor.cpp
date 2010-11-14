@@ -5085,6 +5085,32 @@ bool Actor::ShouldHibernate() {
 	return true;
 }
 
+bool Actor::ShouldDrawCircle()
+{
+	if (Modified[IE_NOCIRCLE]) {
+		return false;
+	}
+
+	if (Modified[IE_AVATARREMOVAL]) {
+		return false;
+	}
+
+	int State = Modified[IE_STATE_ID];
+
+	if (State&STATE_DEAD || InternalFlags&IF_JUSTDIED) {
+		return false;
+	}
+
+	//adjust invisibility for enemies
+	if (Modified[IE_EA]>EA_GOODCUTOFF) {
+		if (State&state_invisible) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 void Actor::Draw(const Region &screen)
 {
 	Map* area = GetCurrentArea();
@@ -5123,7 +5149,6 @@ void Actor::Draw(const Region &screen)
 
 	//explored or visibilitymap (bird animations are visible in fog)
 	//0 means opaque
-	int NoCircle = Modified[IE_NOCIRCLE];
 	int Trans = Modified[IE_TRANSLUCENT];
 
 	if (Trans>255) {
@@ -5133,21 +5158,14 @@ void Actor::Draw(const Region &screen)
 	//iwd has this flag saved in the creature
 	if (Modified[IE_AVATARREMOVAL]) {
 		Trans = 255;
-		NoCircle = 1;
 	}
 
-	int Frozen = Immobile();
 	int State = Modified[IE_STATE_ID];
-
-	if (State&STATE_DEAD) {
-		NoCircle = 1;
-	}
 
 	//adjust invisibility for enemies
 	if (Modified[IE_EA]>EA_GOODCUTOFF) {
 		if (State&state_invisible) {
 			Trans = 255;
-			NoCircle = 1;
 		}
 	}
 
@@ -5176,7 +5194,8 @@ void Actor::Draw(const Region &screen)
 	Video* video = core->GetVideoDriver();
 	Region vp = video->GetViewport();
 
-	bool drawcircle = (NoCircle == 0);
+	bool shoulddrawcircle = ShouldDrawCircle();
+	bool drawcircle = shoulddrawcircle;
 	GameControl *gc = core->GetGameControl();
 	if (gc->GetScreenFlags()&SF_CUTSCENE) {
 		// ground circles are not drawn in cutscenes
@@ -5185,9 +5204,6 @@ void Actor::Draw(const Region &screen)
 	// the speaker should get a circle even in cutscenes
 	if (gc->dialoghandler->targetID == GetGlobalID() && (gc->GetDialogueFlags()&DF_IN_DIALOG)) {
 		drawcircle = true;
-	}
-	if (BaseStats[IE_STATE_ID]&STATE_DEAD || InternalFlags&IF_JUSTDIED) {
-		drawcircle = false;
 	}
 	bool drawtarget = drawcircle;
 	// we always show circle/target on pause
@@ -5228,7 +5244,7 @@ void Actor::Draw(const Region &screen)
 		int PartCount = ca->GetTotalPartCount();
 		//make actor unselectable and unselected when it is not moving
 		//dead, petrified, frozen, paralysed or unavailable to player
-		if (Frozen || NoCircle) {
+		if (Immobile() || !shoulddrawcircle) {
 			core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 			//set the last frame if actor is died and deactivated
 			if (!(InternalFlags&(IF_ACTIVE|IF_IDLE)) && (StanceID==IE_ANI_TWITCH) ) {
