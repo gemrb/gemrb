@@ -67,9 +67,9 @@ class Palette;
 #define IE_GUI_BUTTON_ALIGN_BOTTOM 0x00000800
 #define IE_GUI_BUTTON_ANCHOR       0x00001000 //not implemented yet
 #define IE_GUI_BUTTON_LOWERCASE    0x00002000
+#define IE_GUI_BUTTON_MULTILINE    0x00004000 // don't set the single line flag
 //end of hardcoded part
-#define IE_GUI_BUTTON_DRAGGABLE    0x00004000
-#define IE_GUI_BUTTON_MULTILINE    0x00008000 // don't set the single line flag
+#define IE_GUI_BUTTON_DRAGGABLE    0x00008000
 #define IE_GUI_BUTTON_NO_TEXT      0x00010000   // don't draw button label
 #define IE_GUI_BUTTON_PLAYRANDOM   0x00020000
 #define IE_GUI_BUTTON_PLAYONCE     0x00040000
