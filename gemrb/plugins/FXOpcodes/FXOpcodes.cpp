@@ -3287,9 +3287,15 @@ int fx_knock (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_knock (%2d) [%d.%d]\n", fx->Opcode, fx->PosX, fx->PosY );
 	Map *map = Owner->GetCurrentArea();
+	if (!map) {
+		return FX_NOT_APPLIED;
+	}
 	Point p(fx->PosX, fx->PosY);
+
+printf("KNOCK Pos: %d.%d\n", fx->PosX, fx->PosY);
 	Door *door = map->TMap->GetDoorByPosition(p);
 	if (door) {
+printf("Got a door\n");
 		if (door->LockDifficulty<100) {
 			door->SetDoorLocked(false, true);
 		}
@@ -3297,6 +3303,7 @@ int fx_knock (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	}
 	Container *container = map->TMap->GetContainerByPosition(p);
 	if (container) {
+printf("Got a container\n");
 		if(container->LockDifficulty<100) {
 			container->SetContainerLocked(false);
 		}
@@ -3800,20 +3807,18 @@ int fx_disable_button (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 /*internal representation of disabled spells in IE_CASTING (bitfield):
 1 - items (SPIT)
-2 - mage  (SPWI)
-4 - cleric (SPPR)
+2 - cleric (SPPR)
+4 - mage  (SPWI)
 8 - innate (SPIN)
 16 - class (SPCL)
 */
 
 static ieDword dsc_bits_iwd2[7]={1, 14, 6, 2, 4, 8, 16};
+static ieDword dsc_bits_bg2[7]={1, 4, 2, 8, 16, 14, 6};
 int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_disable_spellcasting (%2d): Button: %d\n", fx->Opcode, fx->Parameter2 );
 
-	if (!fx->FirstApply) {
-		return FX_APPLIED;
-	}
 	bool display_warning = false;
 	ieDword tmp = fx->Parameter2+1;
 
@@ -3829,22 +3834,22 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				break;
 		}
 		if (tmp<7) {
-			STAT_BIT_OR_PCF(IE_CASTING, dsc_bits_iwd2[tmp] );
+			STAT_BIT_OR(IE_CASTING, dsc_bits_iwd2[tmp] );
 		}
 	} else { // bg2
 		if (fx->Parameter2 == 0) {
 			if (target->spellbook.GetKnownSpellsCount(IE_SPELL_TYPE_WIZARD, 0)) display_warning = true;
 		}
-		//-1-> 0 -> 1 (item)
-		//0 -> 1 -> 2 (mage)
-		//1 -> 2 -> 4 (cleric)
-		//2 -> 3 -> 8 (innate)
-		//3 -> 4 -> 16 (class)
+		//-1->  1 (item)
+		//0 ->  4 (mage)
+		//1 ->  2 (cleric)
+		//2 ->  8 (innate)
+		//3 ->  16 (class)
 		if (tmp<31) {
-			STAT_BIT_OR_PCF(IE_CASTING, 1<<tmp );
+			STAT_BIT_OR(IE_CASTING, dsc_bits_bg2[tmp] );
 		}
 	}
-	if (display_warning && target->GetStat(IE_EA) < EA_CONTROLLABLE) {
+	if (fx->FirstApply && display_warning && target->GetStat(IE_EA) < EA_CONTROLLABLE) {
 		displaymsg->DisplayConstantStringName(STR_DISABLEDMAGE, 0xff0000, target);
 		core->SetEventFlag(EF_ACTION);
 	}
