@@ -63,6 +63,7 @@ Button::Button()
 	memset(&DestRGB,0,sizeof(DestRGB));
 	memset( borders, 0, sizeof( borders ));
 	starttime = 0;
+	Anchor.null();
 }
 Button::~Button()
 {
@@ -717,4 +718,9 @@ void Button::SetHorizontalOverlay(double clip, const Color &src, const Color &de
 	}
 	Clipping = clip;
 	Changed = true;
+}
+
+void Button::SetAnchor(ieWord x, ieWord y)
+{
+	Anchor = Point(x,y);
 }

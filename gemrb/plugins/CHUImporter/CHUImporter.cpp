@@ -140,14 +140,22 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				btn->Height = Height;
 				btn->ControlType = ControlType;
 				ieResRef BAMFile;
-				ieWord Cycle, UnpressedIndex, PressedIndex,
-				SelectedIndex, DisabledIndex;
+				ieByte Cycle, Flags;
+				ieByte UnpressedIndex, x1;
+				ieByte PressedIndex, x2;
+				ieByte SelectedIndex, y1;
+				ieByte DisabledIndex, y2;
 				str->ReadResRef( BAMFile );
-				str->ReadWord( &Cycle );
-				str->ReadWord( &UnpressedIndex );
-				str->ReadWord( &PressedIndex );
-				str->ReadWord( &SelectedIndex );
-				str->ReadWord( &DisabledIndex );
+				str->Read( &Cycle, 1 );
+				str->Read( &Flags, 1 );
+				str->Read( &UnpressedIndex, 1 );
+				str->Read( &x1, 1 );
+				str->Read( &PressedIndex, 1 );
+				str->Read( &x2, 1 );
+				str->Read( &SelectedIndex, 1 );
+				str->Read( &y1, 1 );
+				str->Read( &DisabledIndex, 1 );
+				str->Read( &y2, 1 );
 				btn->Owner = win;
 				/** Justification comes from the .chu, other bits are set by script */
 				if (!Width) {
@@ -157,7 +165,11 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					btn->SetFlags(IE_GUI_BUTTON_CAPS, BM_OR);
 				}
 
-				btn->SetFlags( Cycle&0xff00, BM_OR );
+				btn->SetFlags( Flags, BM_OR );
+				if (Flags & IE_GUI_BUTTON_ANCHOR) {
+					btn->SetAnchor(x1 | (x2<<8), y1 | (y2<<8));
+				}
+
 				if (strnicmp( BAMFile, "guictrl\0", 8 ) == 0) {
 					if (UnpressedIndex == 0) {
 						//printMessage("CHUImporter", "Special Button Control, Skipping Image Loading\n",GREEN );
@@ -178,11 +190,11 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				/** Cycle is only a byte for buttons */
 				Sprite2D* tspr = bam->GetFrame( UnpressedIndex, (unsigned char) Cycle );
 				btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
-				tspr = bam->GetFrame( PressedIndex, (unsigned char) Cycle );
+				tspr = bam->GetFrame( PressedIndex, Cycle );
 				btn->SetImage( IE_GUI_BUTTON_PRESSED, tspr );
 				//ignorebuttonframes is a terrible hack
 				if (core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ) {
-					if (bam->GetCycleSize( (unsigned char) Cycle) == 4 )
+					if (bam->GetCycleSize(Cycle) == 4 )
 						SelectedIndex=2;
 				}
 				tspr = bam->GetFrame( SelectedIndex, (unsigned char) Cycle );

@@ -182,6 +182,7 @@ public: // Public Events
 	void SetTextColor(const Color &fore, const Color &back);
 	/** Sets percent (0-1.0) of width for clipping picture */
 	void SetPictureClipping(double clip)  { Clipping = clip; }
+	void SetAnchor(ieWord x, ieWord y);
 private: // Private attributes
 	char* Text;
 	bool hasText;
@@ -208,6 +209,7 @@ private: // Private attributes
 	/** HP Bar over portraits */
 	unsigned long starttime;
 	Color SourceRGB, DestRGB;
+	Point Anchor;
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];
 	bool IsPixelTransparent (unsigned short x, unsigned short y);
