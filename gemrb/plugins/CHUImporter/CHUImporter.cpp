@@ -140,14 +140,16 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				btn->Height = Height;
 				btn->ControlType = ControlType;
 				ieResRef BAMFile;
-				ieByte Cycle, Flags;
+				ieByte Cycle, tmp;
+				ieDword Flags;
 				ieByte UnpressedIndex, x1;
 				ieByte PressedIndex, x2;
 				ieByte SelectedIndex, y1;
 				ieByte DisabledIndex, y2;
 				str->ReadResRef( BAMFile );
 				str->Read( &Cycle, 1 );
-				str->Read( &Flags, 1 );
+				str->Read( &tmp, 1 );
+				Flags = tmp<<8;
 				str->Read( &UnpressedIndex, 1 );
 				str->Read( &x1, 1 );
 				str->Read( &PressedIndex, 1 );
