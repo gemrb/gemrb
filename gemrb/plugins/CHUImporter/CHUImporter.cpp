@@ -149,7 +149,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->ReadResRef( BAMFile );
 				str->Read( &Cycle, 1 );
 				str->Read( &tmp, 1 );
-				Flags = tmp<<8;
+				Flags = ((ieDword) tmp)<<8;
 				str->Read( &UnpressedIndex, 1 );
 				str->Read( &x1, 1 );
 				str->Read( &PressedIndex, 1 );
