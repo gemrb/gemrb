@@ -95,6 +95,7 @@ int *wmlevels[20];
 typedef ieResRef FistResType[MAX_LEVEL+1];
 
 static FistResType *fistres = NULL;
+static int *fistresclass = NULL;
 static ieResRef DefaultFist = {"FIST"};
 
 static int VCMap[VCONST_COUNT];
@@ -286,6 +287,8 @@ void ReleaseMemoryActor()
 	if (fistres) {
 		delete [] fistres;
 		fistres = NULL;
+		delete [] fistresclass;
+		fistresclass = NULL;
 	}
 
 	if (itemuse) {
@@ -6121,7 +6124,6 @@ void Actor::SetupFist()
 	assert (core->QuerySlotEffects(slot)==SLOT_EFFECT_FIST);
 	int row = GetBase(fiststat);
 	int col = GetXPLevel(false);
-	int classid = -1;
 
 	if (FistRows<0) {
 		FistRows=0;
@@ -6131,12 +6133,13 @@ void Actor::SetupFist()
 			strnlwrcpy( DefaultFist, fist->QueryField( (unsigned int) -1), 8);
 			FistRows = fist->GetRowCount();
 			fistres = new FistResType[FistRows];
+			fistresclass = new int[FistRows];
 			for (int i=0;i<FistRows;i++) {
 				int maxcol = fist->GetColumnCount(i)-1;
 				for (int cols = 0;cols<MAX_LEVEL;cols++) {
 					strnlwrcpy( fistres[i][cols], fist->QueryField( i, cols>maxcol?maxcol:cols ), 8);
 				}
-				classid = atoi(fist->GetRowName(i));
+				fistresclass[i] = atoi(fist->GetRowName(i));
 			}
 		}
 	}
@@ -6145,7 +6148,7 @@ void Actor::SetupFist()
 
 	const char *ItemResRef = DefaultFist;
 	for (int i = 0;i<FistRows;i++) {
-		if (classid == row) {
+		if (fistresclass[i] == row) {
 			ItemResRef = fistres[i][col];
 		}
 	}
