@@ -6121,6 +6121,7 @@ void Actor::SetupFist()
 	assert (core->QuerySlotEffects(slot)==SLOT_EFFECT_FIST);
 	int row = GetBase(fiststat);
 	int col = GetXPLevel(false);
+	int classid = -1;
 
 	if (FistRows<0) {
 		FistRows=0;
@@ -6135,7 +6136,7 @@ void Actor::SetupFist()
 				for (int cols = 0;cols<MAX_LEVEL;cols++) {
 					strnlwrcpy( fistres[i][cols], fist->QueryField( i, cols>maxcol?maxcol:cols ), 8);
 				}
-				*(int *) fistres[i] = atoi(fist->GetRowName( i));
+				classid = atoi(fist->GetRowName(i));
 			}
 		}
 	}
@@ -6144,7 +6145,7 @@ void Actor::SetupFist()
 
 	const char *ItemResRef = DefaultFist;
 	for (int i = 0;i<FistRows;i++) {
-		if (*(int *) fistres[i] == row) {
+		if (classid == row) {
 			ItemResRef = fistres[i][col];
 		}
 	}
