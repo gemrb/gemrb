@@ -349,6 +349,7 @@ private:
 	bool ShouldHibernate();
 	void ApplyClassClab(int cls, bool remove);
 	bool ShouldDrawCircle();
+	void SetupFistData();
 public:
 	Actor(void);
 	~Actor(void);

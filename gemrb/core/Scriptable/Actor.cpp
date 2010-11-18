@@ -6118,13 +6118,9 @@ void Actor::SetUsedHelmet(const char* AnimationType)
 	}
 }
 
-void Actor::SetupFist()
+// initializes the fist data the first time it is called
+void Actor::SetupFistData()
 {
-	int slot = core->QuerySlot( 0 );
-	assert (core->QuerySlotEffects(slot)==SLOT_EFFECT_FIST);
-	int row = GetBase(fiststat);
-	int col = GetXPLevel(false);
-
 	if (FistRows<0) {
 		FistRows=0;
 		AutoTable fist("fistweap");
@@ -6143,8 +6139,19 @@ void Actor::SetupFist()
 			}
 		}
 	}
+}
+
+void Actor::SetupFist()
+{
+	int slot = core->QuerySlot( 0 );
+	assert (core->QuerySlotEffects(slot)==SLOT_EFFECT_FIST);
+	int row = GetBase(fiststat);
+	int col = GetXPLevel(false);
+
 	if (col>MAX_LEVEL) col=MAX_LEVEL;
 	if (col<1) col=1;
+
+	SetupFistData();
 
 	const char *ItemResRef = DefaultFist;
 	for (int i = 0;i<FistRows;i++) {
