@@ -581,7 +581,9 @@ public:
 	/* Handling automatic stance changes */
 	bool HandleActorStance();
 
-	/* if necessary, advance animation and draw actor */
+	/* if necessary, advance animation */
+	void UpdateAnimations();
+	/* if necessary, draw actor */
 	void Draw(const Region &screen);
 
 	/* add mobile vvc (spell effects) to actor's list */

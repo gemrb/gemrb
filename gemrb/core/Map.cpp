@@ -1073,6 +1073,7 @@ void Map::DrawMap(Region screen)
 		switch(SelectObject(actor,q,a,sca,spark,pro)) {
 		case AOT_ACTOR:
 			actor->Draw( screen );
+			actor->UpdateAnimations();
 			actor = GetNextActor(q, index);
 			break;
 		case AOT_AREA:

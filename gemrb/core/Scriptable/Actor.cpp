@@ -5088,6 +5088,76 @@ bool Actor::ShouldHibernate() {
 	return true;
 }
 
+void Actor::UpdateAnimations()
+{
+	// TODO: move this
+	if (InTrap) {
+		area->ClearTrap(this, InTrap-1);
+	}
+
+	//make actor unselectable and unselected when it is not moving
+	//dead, petrified, frozen, paralysed or unavailable to player
+	if (Immobile() || !ShouldDrawCircle()) {
+		core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
+	}
+
+	CharAnimations* ca = GetAnims();
+	if (!ca) {
+		return;
+	}
+
+	ca->PulseRGBModifiers();
+
+	unsigned char StanceID = GetStance();
+	unsigned char Face = GetNextFace();
+	Animation** anims = ca->GetAnimation( StanceID, Face );
+	if (!anims) {
+		return;
+	}
+
+	//If you find a better place for it, I'll really be glad to put it there
+	//IN BG1 and BG2, this is at the ninth frame...
+	if(attackProjectile && (anims[0]->GetCurrentFrame() == 8/*anims[0]->GetFramesCount()/2*/)) {
+		GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
+		attackProjectile = NULL;
+	}
+
+	// advance first (main) animation by one frame (in sync)
+	if (Immobile()) {
+		// update animation, continue last-displayed frame
+		anims[0]->LastFrame();
+	} else {
+		// update animation, maybe advance a frame (if enough time has passed)
+		anims[0]->NextFrame();
+	}
+
+	// update all other animation parts, in sync with the first part
+	int PartCount = ca->GetTotalPartCount();
+	for (int part = 1; part < PartCount; ++part) {
+		if (anims[part])
+			anims[part]->GetSyncedNextFrame(anims[0]);
+	}
+
+	if (anims[0]->endReached) {
+		if (HandleActorStance()) {
+			// restart animation
+			anims[0]->endReached = false;
+			anims[0]->SetPos(0);
+		}
+	} else {
+		//dialog, pause game
+		if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
+			//stance
+			if (GetStance() == IE_ANI_WALK) {
+				//frame reached 0
+				if (!anims[0]->GetCurrentFrame()) {
+					PlayWalkSound();
+				}
+			}
+		}
+	}
+}
+
 bool Actor::ShouldDrawCircle()
 {
 	if (Modified[IE_NOCIRCLE]) {
@@ -5135,20 +5205,17 @@ void Actor::Draw(const Region &screen)
 		}
 	}
 
-	if (InTrap) {
-		area->ClearTrap(this, InTrap-1);
-	}
-
-	// if an actor isn't visible, should we still handle animations, draw
-	// video cells, etc? let us assume not, for now..
+	// if an actor isn't visible, should we still draw video cells?
+	// let us assume not, for now..
 	if (!(InternalFlags & IF_VISIBLE)) {
 		return;
 	}
 
 	//visual feedback
 	CharAnimations* ca = GetAnims();
-	if (!ca)
+	if (!ca) {
 		return;
+	}
 
 	//explored or visibilitymap (bird animations are visible in fog)
 	//0 means opaque
@@ -5243,25 +5310,17 @@ void Actor::Draw(const Region &screen)
 	unsigned char Face = GetNextFace();
 	Animation** anims = ca->GetAnimation( StanceID, Face );
 	if (anims) {
-		// update bounding box and such
-		int PartCount = ca->GetTotalPartCount();
-		//make actor unselectable and unselected when it is not moving
-		//dead, petrified, frozen, paralysed or unavailable to player
 		if (Immobile() || !shoulddrawcircle) {
-			core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 			//set the last frame if actor is died and deactivated
 			if (!(InternalFlags&(IF_ACTIVE|IF_IDLE)) && (StanceID==IE_ANI_TWITCH) ) {
 				anims[0]->SetPos(anims[0]->GetFrameCount()-1);
 			}
 		}
+
+		int PartCount = ca->GetTotalPartCount();
 		Sprite2D* nextFrame = anims[0]->GetFrame(anims[0]->GetCurrentFrame());
 
-		//If you find a better place for it, I'll really be glad to put it there
-		//IN BG1 and BG2, this is at the ninth frame...
-		if(attackProjectile && (anims[0]->GetCurrentFrame() == 8/*anims[0]->GetFramesCount()/2*/)) {
-			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
-			attackProjectile = NULL;
-		}
+		// update bounding box and such
 		if (nextFrame && lastFrame != nextFrame) {
 			Region newBBox;
 			if (PartCount == 1) {
@@ -5414,40 +5473,6 @@ void Actor::Draw(const Region &screen)
 				extraCovers[3+m] = NULL;
 			}
 		}
-
-		// advance animations one frame (in sync)
-		if (Immobile()) {
-			//actually this is the last frame only if the animation is played backwards
-			anims[0]->LastFrame();
-		}
-		else {
-			anims[0]->NextFrame();
-		}
-
-		for (int part = 1; part < PartCount; ++part) {
-			if (anims[part])
-				anims[part]->GetSyncedNextFrame(anims[0]);
-		}
-
-		if (anims[0]->endReached) {
-			if (HandleActorStance() ) {
-				anims[0]->endReached = false;
-				anims[0]->SetPos(0);
-			}
-		} else {
-			//dialog, pause game
-			if (!(gc->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
-				//stance
-				if (GetStance() == IE_ANI_WALK) {
-					//frame reached 0
-					if (!anims[0]->GetCurrentFrame()) {
-						PlayWalkSound();
-					}
-				}
-			}
-		}
-
-		ca->PulseRGBModifiers();
 	}
 
 	//draw videocells over the actor
