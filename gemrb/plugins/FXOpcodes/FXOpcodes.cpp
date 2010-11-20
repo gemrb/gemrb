@@ -4401,7 +4401,8 @@ int fx_apply_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			myfx->TimingMode = fx->TimingMode;
 			myfx->Duration = fx->Duration;
 			myfx->CasterID = fx->CasterID;
-			ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply);
+			ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !fx->Parameter3);
+			fx->Parameter3 = 1;
 			delete myfx;
 		}
 		//newfx is a borrowed reference don't delete it
@@ -6140,7 +6141,7 @@ int fx_apply_effect_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			myfx->Duration=fx->Duration;
 			myfx->Target = FX_TARGET_PRESET;
 			myfx->CasterID = fx->CasterID;
-			ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply);
+			ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, 0);
 			delete myfx;
 		}
 		//newfx is a borrowed reference don't delete it

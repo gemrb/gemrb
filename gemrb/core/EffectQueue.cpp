@@ -1067,7 +1067,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 // returns FX_ABORT if the whole spell this effect is in should be aborted
 // it will disable all future effects of same source (only on first apply)
 
-int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply) const
+int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieDword resistance) const
 {
 	//printf( "FX 0x%02x: %s(%d, %d)\n", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
 	if( fx->Opcode >= MAX_EFFECTS) {
@@ -1090,22 +1090,24 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply) con
 			fx->Probability1 = ((Actor *) Owner)->GetSafeStat(fx->Probability1);
 		}
 
-		//the effect didn't pass the probability check
-		if( !check_probability(fx) ) {
-			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-			return FX_NOT_APPLIED;
-		}
+		if (resistance) {
+			//the effect didn't pass the probability check
+			if( !check_probability(fx) ) {
+				fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+				return FX_NOT_APPLIED;
+			}
 
-		//the effect didn't pass the target level check
-		if( check_level(target, fx) ) {
-			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-			return FX_NOT_APPLIED;
-		}
+			//the effect didn't pass the target level check
+			if( check_level(target, fx) ) {
+				fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+				return FX_NOT_APPLIED;
+			}
 
-		//the effect didn't pass the resistance check
-		if( check_resistance(target, fx) ) {
-			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-			return FX_NOT_APPLIED;
+			//the effect didn't pass the resistance check
+			if( check_resistance(target, fx) ) {
+				fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+				return FX_NOT_APPLIED;
+			}
 		}
 
 		//Same as in items and spells

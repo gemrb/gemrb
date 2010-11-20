@@ -270,7 +270,7 @@ public:
 	static int ResolveEffect(EffectRef &effect_reference);
 	static bool match_ids(Actor *target, int table, ieDword value);
 	/** returns true if the process should abort applying a stack of effects */
-	int ApplyEffect(Actor* target, Effect* fx, ieDword first_apply) const;
+	int ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieDword resistance=1) const;
 private:
 	/** counts effects of specific opcode, parameters and resource */
 	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const char *ResRef) const;
