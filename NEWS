@@ -1,6 +1,5 @@
-GemRB V0.6.2 git (68718197)
+GemRB V0.6.2 git (872666ca)
   New features:
-    -
     - IWD:HoW is now completable!
     - casting sounds and footsteps
     - autodetection of secret doors, detect illusions
@@ -11,14 +10,13 @@ GemRB V0.6.2 git (68718197)
     - Importing a SoA game into ToB
 
   Improved features:
-    -
     - actor selection and action bar (for summons and illusions too!)
     - door bashing and traps
     - loading screens, ambushes, worldmap
     - sparkles, panic and other effects
     - actions, dialogs, object matching
-    - bugfixes
     - personal items support (swap/equip/remove)
+    - bugfixes
 
   Applied patches:
 	iwd regression fix from Eggert Jón Magnússon
