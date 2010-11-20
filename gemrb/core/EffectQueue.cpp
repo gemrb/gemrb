@@ -1637,6 +1637,29 @@ bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 	return WeaponImmunity(fx_weapon_immunity_ref.opcode, enchantment, weapontype);
 }
 
+void EffectQueue::AddWeaponEffects(EffectQueue *fxqueue, EffectRef &fx_ref) const
+{
+	ResolveEffectRef(fx_ref);
+	if( fx_ref.opcode<0) {
+		return;
+	}
+
+	ieDword opcode = fx_ref.opcode;
+	Point p(-1,-1);
+
+	std::list< Effect* >::const_iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+		//
+		Effect *fx = core->GetEffect( (*f)->Resource, (*f)->Power, p);
+		if (!fx) continue;
+		fx->Target = FX_TARGET_PRESET;
+		fxqueue->AddEffect(fx, true);
+		delete fx;
+	}
+}
+
 /* no longer needed, use IE_CASTING stat
 static EffectRef fx_disable_spellcasting_ref={ "DisableCasting", NULL, -1 };
 int EffectQueue::DisabledSpellcasting(int types) const

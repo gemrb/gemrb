@@ -341,8 +341,8 @@ int fx_drain_spells (Scriptable* Owner, Actor* target, Effect* fx);//f4
 int fx_checkforberserk_modifier (Scriptable* Owner, Actor* target, Effect* fx);//f5
 int fx_berserkstage1_modifier (Scriptable* Owner, Actor* target, Effect* fx);//f6
 int fx_berserkstage2_modifier (Scriptable* Owner, Actor* target, Effect* fx);//f7
-int fx_melee_effect (Scriptable* Owner, Actor* target, Effect* fx);//f8
-int fx_ranged_effect (Scriptable* Owner, Actor* target, Effect* fx);//f9
+//int fx_melee_effect (Scriptable* Owner, Actor* target, Effect* fx);//f8
+//int fx_ranged_effect (Scriptable* Owner, Actor* target, Effect* fx);//f9
 int fx_damageluck_modifier (Scriptable* Owner, Actor* target, Effect* fx);//fa
 int fx_change_bardsong (Scriptable* Owner, Actor* target, Effect* fx);//fb
 int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx);//fc (set trap)
@@ -681,13 +681,12 @@ static EffectRef effectnames[] = {
 	{ "Sequencer:Store", fx_store_spell_sequencer, -1 },
 	{ "SetAIScript", fx_set_ai_script, -1 },
 	{ "SetMapNote", fx_set_map_note, -1 },
-	{ "SetMeleeEffect", fx_melee_effect, -1 },
-	{ "SetRangedEffect", fx_ranged_effect, -1 },
+	{ "SetMeleeEffect", fx_generic_effect, -1 },
+	{ "SetRangedEffect", fx_generic_effect, -1 },
 	{ "SetTrap", fx_set_area_effect, -1 },
 	{ "SetTrapsModifier", fx_set_traps_modifier, -1 },
 	{ "SexModifier", fx_sex_modifier, -1 },
 	{ "SlashingResistanceModifier", fx_slashing_resistance_modifier, -1 },
-	{ "SlowPoisonDamageRate", fx_generic_effect, -1 }, //slow poison effect
 	{ "Sparkle", fx_sparkle, -1 },
 	{ "SpellDurationModifier", fx_spell_duration_modifier, -1 },
 	{ "Spell:Add", fx_add_innate, -1 },
@@ -5540,62 +5539,10 @@ int fx_berserkstage2_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0xf8 set melee effect
 // adds effect to melee attacks (for monks, asssasins, fighter hlas, ...)
 // it is cumulative
-int fx_melee_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx) {
-	if (1) printf( "fx_melee_effect (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
-
-	// are we just about to attack? Try later otherwise
-	if (!target->GetAttackProjectile()) {
-		return FX_APPLIED;
-	}
-
-	if ((target->GetAttackStyle()&3) == 2) { //WEAPON_RANGED
-		// wrong effect, try later
-		return FX_APPLIED;
-	}
-
-	Point p(fx->PosX, fx->PosY);
-	Effect *extrafx = core->GetEffect(fx->Resource, fx->Power, p);
-	//core->GetEffect is a borrowed reference, don't delete it
-	if (!extrafx) {
-		return FX_NOT_APPLIED;
-	}
-	extrafx->Target = FX_TARGET_PRESET;
-
-	// attach it to the attack projectile
-	target->GetAttackProjectile()->GetEffects()->AddEffect(extrafx, true);
-
-	return FX_APPLIED;
-}
 
 // 0xf9 set missile effect
 // adds effect to ranged attacks (archers, ...)
 // it is cumulative
-int fx_ranged_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx) {
-	if (1) printf( "fx_ranged_effect (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
-
-	// are we just about to attack? Try later otherwise
-	if (!target->GetAttackProjectile()) {
-		return FX_APPLIED;
-	}
-
-	if ((target->GetAttackStyle()&3) != 2) { // WEAPON_RANGED
-		// wrong effect, try later
-		return FX_APPLIED;
-	}
-
-	Point p(fx->PosX, fx->PosY);
-	Effect *extrafx = core->GetEffect(fx->Resource, fx->Power, p);
-	//core->GetEffect is a borrowed reference, don't delete it
-	if (!extrafx) {
-		return FX_NOT_APPLIED;
-	}
-	extrafx->Target = FX_TARGET_PRESET;
-
-	// attach it to the attack projectile
-	target->GetAttackProjectile()->GetEffects()->AddEffect(extrafx, true);
-
-	return FX_APPLIED;
-}
 
 // 0xfa DamageLuckModifier
 int fx_damageluck_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)

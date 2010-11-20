@@ -5939,6 +5939,8 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 }
 
 static EffectRef fx_damage_ref={"Damage",NULL,-1};
+static EffectRef fx_melee_ref={"SetMeleeEffect",NULL,-1};
+static EffectRef fx_ranged_ref={"SetRangedEffect",NULL,-1};
 
 bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword flags, int damage)
 {
@@ -5968,11 +5970,16 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 		//ieDword is unsigned!!
 		pro->SetCaster(GetGlobalID());
 		if(((int)header < 0) && !(flags&UI_MISS)) { //using a weapon
-			ITMExtHeader *which = itm->GetWeaponHeader(header == (ieDword)-2);
+			bool ranged = header == (ieDword)-2;
+			ITMExtHeader *which = itm->GetWeaponHeader(ranged);
 			Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, (weapon_damagetype[which->DamageType])<<16, FX_DURATION_INSTANT_LIMITED);
 			AttackEffect->Projectile = which->ProjectileAnimation;
 			AttackEffect->Target = FX_TARGET_PRESET;
 			pro->GetEffects()->AddEffect(AttackEffect, true);
+			if (ranged)
+				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_ranged_ref);
+			else
+				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_melee_ref);
 			//AddEffect created a copy, the original needs to be scrapped
 			delete AttackEffect;
 			attackProjectile = pro;
