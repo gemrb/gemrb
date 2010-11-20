@@ -1,4 +1,14 @@
-GemRB V0.6.2 git (872666ca)
+GemRB git (2bd6d0e):
+  New features:
+    - 
+
+  Improved features:
+    - 
+    - bugfixes
+
+  Applied patches:
+
+GemRB V0.6.3 git (2010-11-21)
   New features:
     - IWD:HoW is now completable!
     - casting sounds and footsteps
