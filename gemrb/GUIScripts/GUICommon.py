@@ -895,16 +895,17 @@ def SetupDamageInfo (pc, Button):
 	return ratio_str
 
 # redefine ceil, so we don't need to import the math module (which isn't available on all platforms)
+# returns int instead of float
 def ceil (value):
-	dec = (value * 10) % 10
-	if value > 0 and dec:
-		return float(int(value) + 1)
+	diff = value - int(value)
+	if value > 0 and diff > 0:
+		return int(value) + 1
 	else:
-		return float(int(value)) # just truncate
+		return int(value) # just truncate
 # unit test:
 #import math
 #for i in 1, 0, -1, 1.2, 0.2, -1.2, 1.8, 0.8, -1.8:
-#	if ceil (i) - math.ceil (i):
+#	if ceil (i) - int(math.ceil (i)):
 #		print i, ceil (i), math.ceil (i)
 
 GameWindow = GUIClasses.GWindow(0)
