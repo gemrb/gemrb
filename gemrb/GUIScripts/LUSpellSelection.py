@@ -186,9 +186,9 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True):
 				if len (Spells[i]) > ( 24 + ExtraSpellButtons() ):
 					HideUnhideScrollBar(0)
 					if chargen:
-						ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceil ( ( len (Spells[i])-24 ) / 6.0 ) + 1 )
+						ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-24 ) , 6 ) + 1 )
 					else: #there are five rows of 5 spells in level up of sorcs
-						ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceil ( ( len (Spells[i])-25 ) / 5.0 ) + 1 )
+						ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-25 ) , 5 ) + 1 )
 				else:
 					ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
 					HideUnhideScrollBar(1)
@@ -235,9 +235,9 @@ def SpellsDonePress ():
 				if len (Spells[i]) > ( 24 + ExtraSpellButtons() ):
 					HideUnhideScrollBar(0)
 					if chargen:
-						ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceil ( ( len (Spells[i])-24 ) / 6.0 ) + 1 )
+						ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-24 ) , 6 ) + 1 )
 					else:
-						ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceil ( ( len (Spells[i])-25 ) / 5.0 ) + 1 )
+						ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-25 ) , 5 ) + 1 )
 				else:
 					ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
 					HideUnhideScrollBar(1)
