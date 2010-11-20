@@ -18,7 +18,6 @@
 #
 
 import GemRB
-from math import ceil
 from GUIDefines import *
 from ie_stats import *
 import GUICommon
@@ -89,7 +88,7 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 			ScrollBar.SetSprites ("GUISCRCW", 0, 0,1,2,3,5,4)
 			ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, HLAShowAbilities)
 			#with enhanced GUI we have 5 rows of 5 abilities (the last one is 'the extra slot')
-			ScrollBar.SetVarAssoc ("HLATopIndex", int ( ceil ( ( len (HLAAbilities)-25 ) / 5.0 ) ) + 1 )
+			ScrollBar.SetVarAssoc ("HLATopIndex", int ( GUICommon.ceil ( ( len (HLAAbilities)-25 ) / 5.0 ) ) + 1 )
 			ScrollBar.SetDefaultScrollBar ()
 
 	# draw our HLAs and show the window
