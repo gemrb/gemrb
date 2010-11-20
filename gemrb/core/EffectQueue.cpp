@@ -1656,7 +1656,6 @@ void EffectQueue::AddWeaponEffects(EffectQueue *fxqueue, EffectRef &fx_ref) cons
 		if (!fx) continue;
 		fx->Target = FX_TARGET_PRESET;
 		fxqueue->AddEffect(fx, true);
-		delete fx;
 	}
 }
 
