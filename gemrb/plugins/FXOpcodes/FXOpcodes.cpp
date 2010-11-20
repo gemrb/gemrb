@@ -4400,6 +4400,7 @@ int fx_apply_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			myfx->Target = FX_TARGET_PRESET;
 			myfx->TimingMode = fx->TimingMode;
 			myfx->Duration = fx->Duration;
+			myfx->CasterID = fx->CasterID;
 			ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply);
 			delete myfx;
 		}
@@ -6134,10 +6135,11 @@ int fx_apply_effect_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (newfx) {
 			Effect *myfx = new Effect;
 			memcpy(myfx, newfx, sizeof(Effect));
-			myfx->random_value = core->Roll(1,100,-1);
+			myfx->random_value = fx->random_value;
 			myfx->TimingMode=fx->TimingMode;
 			myfx->Duration=fx->Duration;
 			myfx->Target = FX_TARGET_PRESET;
+			myfx->CasterID = fx->CasterID;
 			ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply);
 			delete myfx;
 		}
