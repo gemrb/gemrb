@@ -290,6 +290,7 @@ ADD_CUSTOM_TARGET( uninstall
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${GEMRB_VERSION})
 add_custom_target( dist
   COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD
+    | sed '/CMAKE_CXX_FLAGS/ s,-Werror,,'
     | gzip --best > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.gz
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
