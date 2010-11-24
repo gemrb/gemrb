@@ -2546,13 +2546,13 @@ Palette* Interface::CreatePalette(const Color &color, const Color &back)
 	pal->col[0].a = 0;
 	for (int i = 1; i < 256; i++) {
 		pal->col[i].r = back.r +
-			( unsigned char ) ( ( ( color.r - back.r ) * ( i ) ) / 255.0 );
+			( unsigned char ) ( ( ( color.r - back.r ) * ( i ) ) / 255 );
 		pal->col[i].g = back.g +
-			( unsigned char ) ( ( ( color.g - back.g ) * ( i ) ) / 255.0 );
+			( unsigned char ) ( ( ( color.g - back.g ) * ( i ) ) / 255 );
 		pal->col[i].b = back.b +
-			( unsigned char ) ( ( ( color.b - back.b ) * ( i ) ) / 255.0 );
+			( unsigned char ) ( ( ( color.b - back.b ) * ( i ) ) / 255 );
 		pal->col[i].a = back.a +
-			( unsigned char ) ( ( ( color.a - back.a ) * ( i ) ) / 255.0 );
+			( unsigned char ) ( ( ( color.a - back.a ) * ( i ) ) / 255 );
 	}
 	return pal;
 }
