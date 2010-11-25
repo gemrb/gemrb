@@ -4965,7 +4965,8 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 	{
 		FileStream str;
 
-		str.Create( Path, name, IE_CHR_CLASS_ID );
+		if (!str.Create( Path, name, IE_CHR_CLASS_ID ))
+			return -1;
 
 		int ret = gm->PutActor(&str, actor, true);
 		if (ret <0) {
