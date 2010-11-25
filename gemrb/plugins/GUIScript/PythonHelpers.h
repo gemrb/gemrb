@@ -28,18 +28,6 @@
 #include "Holder.h"
 #include "Interface.h"
 
-class StringCallback : public Callback {
-public:
-	StringCallback(const char*);
-	StringCallback(PyObject*);
-	~StringCallback();
-	bool call();
-	bool call(int);
-private:
-	PyObject *GetFunction();
-	PyObject* Name;
-};
-
 struct PythonCallback : public Callback {
 public:
 	PythonCallback(PyObject *Function);

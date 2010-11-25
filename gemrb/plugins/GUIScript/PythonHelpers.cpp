@@ -46,47 +46,6 @@ static bool CallPython(PyObject *Function, int arg)
 	return CallPython(Function, args);
 }
 
-StringCallback::StringCallback(const char *str)
-	: Name(PyString_FromString(const_cast<char*>(str)))
-{
-}
-
-StringCallback::StringCallback(PyObject *Name)
-	: Name(Name)
-{
-	Py_XINCREF(Name);
-}
-
-StringCallback::~StringCallback()
-{
-	Py_XDECREF(Name);
-}
-
-PyObject *StringCallback::GetFunction()
-{
-	if (!Name || !Py_IsInitialized()) {
-		return NULL;
-	}
-	/* Borrowed reference */
-	PyObject *Function = PyDict_GetItem(gs->pDict, Name);
-	if (!Function || !PyCallable_Check(Function)) {
-		printMessage("GUIScript", "Missing callback function:", LIGHT_RED);
-		printf("%s\n", PyString_AsString(Name));
-		return NULL;
-	}
-	return Function;
-}
-
-bool StringCallback::call()
-{
-	return CallPython(GetFunction());
-}
-
-bool StringCallback::call(int arg)
-{
-	return CallPython(GetFunction(), arg);
-}
-
 PythonCallback::PythonCallback(PyObject *Function)
 	: Function(Function)
 {
