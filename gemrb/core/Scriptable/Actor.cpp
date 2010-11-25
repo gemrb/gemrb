@@ -4513,9 +4513,13 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	//if this is the first call of the round, we need to update next attack
 	if (nextattack == 0) {
-		//FIXME: figure out exactly how initiative is calculated
-		int initiative = core->Roll(1, 5, GetXPLevel(true)/(-8));
-		int spdfactor = hittingheader->Speed + speed + initiative;
+		// initiative calculation (lucky 1d6-1 + item speed + speed stat + constant):
+		// speed contains the bonus from the physical speed stat and the proficiency level
+		int spdfactor = hittingheader->Speed + speed;
+		if (spdfactor<0) spdfactor = 0;
+		// FIXME: make LuckyRoll also be able to use luck as a malus
+		// -3: k/2 in the original, hardcoded to 6; -1 for the difference in rolls - the original rolled 0-5
+		spdfactor += core->Roll(1, 6, -Modified[IE_LUCK]) - 4;
 		if (spdfactor<0) spdfactor = 0;
 		if (spdfactor>10) spdfactor = 10;
 
@@ -4528,6 +4532,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
+	// FIXME: use proper weapon range
 	if((PersonalDistance(this, target) > wi.range*10) || (GetCurrentArea()!=target->GetCurrentArea() ) ) {
 		// this is a temporary double-check, remove when bugfixed
 		printMessage("Actor", "Attack action didn't bring us close enough!", LIGHT_RED);
