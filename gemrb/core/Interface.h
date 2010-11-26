@@ -33,6 +33,7 @@
 #include "exports.h"
 
 #include "Cache.h"
+#include "Callback.h"
 #include "GlobalTimer.h"
 #include "Holder.h"
 
@@ -328,6 +329,8 @@ private:
 	bool update_scripts;
 	/** Next Script Name */
 	char NextScript[64];
+	/** Function to call every main loop iteration */
+	EventHandler TickHook;
 public:
 	Holder<StringMgr> strings;
 	GlobalTimer * timer;
@@ -768,6 +771,8 @@ public:
 	Console * console;
 
 	Audio* GetAudioDrv(void) const;
+
+	void SetTickHook(EventHandler);
 
 #ifdef _DEBUG
 	int FileStreamPtrCount;

@@ -1044,6 +1044,7 @@ void Interface::Main()
 				( unsigned char * ) fpsstring, palette,
 				IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 		}
+		TickHook->call();
 	} while (video->SwapBuffers() == GEM_OK);
 	gamedata->FreePalette( palette );
 }
@@ -5359,6 +5360,11 @@ void Interface::StripLine(char * string, size_t size) {
 	if (size >= 3 && string[size-3] == '\r') {
 		string[size-3] = '\0'; // remove the carriage return too
 	}
+}
+
+void Interface::SetTickHook(EventHandler hook)
+{
+	TickHook = hook;
 }
 
 void Interface::SetNextScript(const char *script)

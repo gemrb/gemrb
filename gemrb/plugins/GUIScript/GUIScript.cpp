@@ -9696,6 +9696,36 @@ static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
 	return PyString_FromString(splname);
 }
 
+PyDoc_STRVAR( GemRB_SetTickHook__doc,
+"Set callback to be called every main loop iteration.\n\n"
+"This is useful for things like running a twisted reactor.");
+
+static PyObject* GemRB_SetTickHook(PyObject* /*self*/, PyObject* args)
+{
+	PyObject* function;
+
+	if (!PyArg_ParseTuple(args, "O", &function)) {
+		return AttributeError( GemRB_SetTickHook__doc );
+	}
+
+	EventHandler handler;
+	if (function == Py_None) {
+		handler = new Callback();
+	} else if (PyCallable_Check(function)) {
+		handler = new PythonCallback(function);
+	} else {
+		char buf[256];
+		// TODO: Print function name. (func.__name__)
+		snprintf(buf, sizeof(buf), "Can't set timed event handler!");
+		return RuntimeError(buf);
+	}
+
+	core->SetTickHook(handler);
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(ActOnPC, METH_VARARGS),
 	METHOD(AddNewArea, METH_VARARGS),
@@ -9860,6 +9890,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetPlayerSound, METH_VARARGS),
 	METHOD(SetPurchasedAmount, METH_VARARGS),
 	METHOD(SetRepeatClickFlags, METH_VARARGS),
+	METHOD(SetTickHook, METH_VARARGS),
 	METHOD(SetTimedEvent, METH_VARARGS),
 	METHOD(SetToken, METH_VARARGS),
 	METHOD(SetTooltipDelay, METH_VARARGS),
