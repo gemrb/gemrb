@@ -1436,6 +1436,7 @@ void GameControl::TryToDefend(Actor *source, Actor *tgt)
 
 	source->ClearPath();
 	source->ClearActions();
+	source->SetModal(MS_NONE);
 	strncpy(Tmp,"NIDSpecial4()",sizeof(Tmp) );
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
 }
@@ -1448,6 +1449,7 @@ void GameControl::TryToPick(Actor *source, Actor *tgt)
 
 	source->ClearPath();
 	source->ClearActions();
+	source->SetModal(MS_NONE);
 	strncpy(Tmp,"PickPockets([-1])", sizeof(Tmp) );
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
 }
@@ -1459,6 +1461,7 @@ void GameControl::TryToPick(Actor *source, Door *tgt)
 
 	source->ClearPath();
 	source->ClearActions();
+	source->SetModal(MS_NONE);
 	if (tgt->Trapped && tgt->TrapDetected) {
 		snprintf(Tmp, sizeof(Tmp), "RemoveTraps(\"%s\")", tgt->GetScriptName() );
 	} else {
@@ -1474,6 +1477,7 @@ void GameControl::TryToPick(Actor *source, Container *tgt)
 
 	source->ClearPath();
 	source->ClearActions();
+	source->SetModal(MS_NONE);
 	if (tgt->Trapped && tgt->TrapDetected) {
 		snprintf(Tmp, sizeof(Tmp), "RemoveTraps(\"%s\")", tgt->GetScriptName() );
 	} else {
@@ -1491,6 +1495,7 @@ void GameControl::TryToDisarm(Actor *source, InfoPoint *tgt)
 
 	source->ClearPath();
 	source->ClearActions();
+	source->SetModal(MS_NONE);
 	snprintf(Tmp, sizeof(Tmp), "RemoveTraps(\"%s\")", tgt->GetScriptName() );
 	source->AddAction( GenerateAction( Tmp ) );
 }
@@ -1502,6 +1507,7 @@ void GameControl::TryToBash(Actor *source, Scriptable *tgt)
 
 	source->ClearPath();
 	source->ClearActions();
+	source->SetModal(MS_NONE);
 	snprintf(Tmp, sizeof(Tmp), "Attack(\"%s\")", tgt->GetScriptName() );
 	source->AddAction( GenerateAction( Tmp ) );
 }
@@ -1604,6 +1610,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	//dialog initation
 	source->ClearPath();
 	source->ClearActions();
+	source->SetModal(MS_NONE);
 	strncpy(Tmp,"NIDSpecial1()",sizeof(Tmp) );
 	dialoghandler->targetID = tgt->GetGlobalID(); //this is a hack, but not so deadly
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
