@@ -1044,7 +1044,8 @@ void Interface::Main()
 				( unsigned char * ) fpsstring, palette,
 				IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 		}
-		TickHook->call();
+		if (TickHook)
+			TickHook->call();
 	} while (video->SwapBuffers() == GEM_OK);
 	gamedata->FreePalette( palette );
 }
