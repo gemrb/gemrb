@@ -51,8 +51,10 @@ def OnLoad():
 	else:
 		LastPortrait = GemRB.Roll (1, PortraitsTable.GetRowCount()-FemaleCount, 0)
 
-	TextAreaControl = AppearanceWindow.GetControl (7)
-	TextAreaControl.SetText ("") # why is this here?
+	#this control doesn't exist in the demo version (it is unused, so lets just skip it)
+	if AppearanceWindow.HasControl (7):
+		TextAreaControl = AppearanceWindow.GetControl (7)
+		TextAreaControl.SetText ("")
 
 	PortraitButton = AppearanceWindow.GetControl (1)
 	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
