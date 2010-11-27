@@ -1169,33 +1169,12 @@ static PyObject* GemRB_Symbol_GetValue(PyObject * /*self*/, PyObject* args)
 	return AttributeError( GemRB_Symbol_GetValue__doc );
 }
 
-PyDoc_STRVAR( GemRB_GetControl__doc,
-"GetControl(WindowIndex, ControlID) => ControlIndex\n\n"
-"Returns a control in a Window." );
-
-static PyObject* GemRB_GetControl(PyObject * /*self*/, PyObject* args)
-{
-	int WindowIndex, ControlID;
-
-	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlID )) {
-		return AttributeError( GemRB_GetControl__doc );
-	}
-
-
-	int ret = core->GetControl( WindowIndex, ControlID );
-	if (ret == -1) {
-		return RuntimeError( "Control is not found" );
-	}
-
-	return PyInt_FromLong( ret );
-}
-
 PyDoc_STRVAR( GemRB_Window_GetControl__doc,
 "GetControlObject(WindowID, ControlID) => GControl, or\n"
 "Window.GetControl(ControlID) => GControl\n\n"
 "Returns a control as an object." );
 
-static PyObject* GemRB_Window_GetControl(PyObject * self, PyObject* args)
+static PyObject* GemRB_Window_GetControl(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID;
 
@@ -1203,21 +1182,19 @@ static PyObject* GemRB_Window_GetControl(PyObject * self, PyObject* args)
 		return AttributeError( GemRB_Window_GetControl__doc );
 	}
 
-	PyObject* control = GemRB_GetControl( self, args );
-	if (!control || !PyObject_TypeCheck( control, &PyInt_Type ))
-		return control; // exception
+	int ctrlindex = core->GetControl(WindowIndex, ControlID);
+	if (ctrlindex == -1) {
+		return RuntimeError( "Control is not found" );
+	}
 
 	PyObject* ctrltuple = PyTuple_New(2);
 	PyTuple_SET_ITEM(ctrltuple, 0, PyInt_FromLong(WindowIndex));
-	PyTuple_SET_ITEM(ctrltuple, 1, control);
+	PyTuple_SET_ITEM(ctrltuple, 1, PyInt_FromLong(ctrlindex));
 
 	PyObject* ret = 0;
-	// TODO: get this from 'control' python variable
-	int ctrlindex = core->GetControl(WindowIndex, ControlID);
 	Control *ctrl = GetControl(WindowIndex, ctrlindex, -1);
 	if (!ctrl) {
-		// GetControl will already have raised an exception
-		return 0;
+		return RuntimeError( "Control is not found" );
 	}
 	const char* type = "Control";
 	switch(ctrl->ControlType) {
@@ -9787,7 +9764,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetCombatDetails, METH_VARARGS),
 	METHOD(GetContainer, METH_VARARGS),
 	METHOD(GetContainerItem, METH_VARARGS),
-	METHOD(GetControl, METH_VARARGS),
 	METHOD(GetCurrentArea, METH_NOARGS),
 	METHOD(GetEquippedAmmunition, METH_VARARGS),
 	METHOD(GetEquippedQuickSlot, METH_VARARGS),
