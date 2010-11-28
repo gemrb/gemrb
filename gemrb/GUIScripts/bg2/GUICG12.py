@@ -218,7 +218,7 @@ def CustomPress():
 
 	Button = Window.GetControl (0)
 	PortraitName = PortraitsTable.GetRowName (LastPortrait)+"M"
-	if GemRB.HasResource ("NOPORTMD", RES_BMP, 1):
+	if GemRB.HasResource (PortraitName, RES_BMP, 1) or GemRB.HasResource ("NOPORTMD", RES_BMP, 1):
 		Button.SetPicture (PortraitName, "NOPORTMD")
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
