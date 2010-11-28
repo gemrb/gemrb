@@ -22,6 +22,7 @@ from ie_stats import *
 from GUIDefines import *
 import GUICommon
 import CommonTables
+from ie_restype import RES_BMP
 
 CharGenWindow = 0
 TextAreaControl = 0
@@ -44,7 +45,8 @@ def DisplayOverview(step):
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	PortraitName = GemRB.GetToken ("LargePortrait")
 	if PortraitName != "":
-		PortraitButton.SetPicture (PortraitName, "NOPORTMD")
+		if GemRB.HasResource ("NOPORTMD", RES_BMP, 1):
+			PortraitButton.SetPicture (PortraitName, "NOPORTMD")
 	PortraitButton.SetState (IE_GUI_BUTTON_LOCKED)
 
 	GenderButton = CharGenWindow.GetControl (0)

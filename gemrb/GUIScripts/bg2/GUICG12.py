@@ -18,6 +18,7 @@
 #
 #character generation, appearance (GUICG12)
 import GemRB
+from ie_restype import RES_BMP
 
 AppearanceWindow = 0
 CustomWindow = 0
@@ -217,7 +218,8 @@ def CustomPress():
 
 	Button = Window.GetControl (0)
 	PortraitName = PortraitsTable.GetRowName (LastPortrait)+"M"
-	Button.SetPicture (PortraitName, "NOPORTMD")
+	if GemRB.HasResource ("NOPORTMD", RES_BMP, 1):
+		Button.SetPicture (PortraitName, "NOPORTMD")
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	Button = Window.GetControl (1)
