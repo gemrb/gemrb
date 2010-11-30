@@ -3319,11 +3319,11 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
+	actor->CurrentActionInterruptable = false;
 	if (Sender->CurrentActionState == 0) {
 		// TODO: what if parameter is 0? see orphan2
 		Sender->CurrentActionState = parameters->int0Parameter;
 		actor->SetStance( IE_ANI_DIE );
-		actor->CurrentActionInterruptable = false;
 	} else {
 		actor->CurrentActionState--;
 		if (Sender->CurrentActionState == 0) {
