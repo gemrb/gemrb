@@ -22,6 +22,7 @@ import GUICommon
 import CommonTables
 from ie_stats import *
 from GUIDefines import *
+from ie_restype import RES_2DA
 
 AbilityWindow = 0
 TextAreaControl = 0
@@ -62,7 +63,10 @@ def CalcLimits(Abidx):
 		Maximum = tmp
 
 	Race = Abracead.GetRowIndex(RaceName)
-	Add = Abracead.GetValue(Race, Abidx) + Abclsmod.GetValue(KitIndex, Abidx)
+	if Abclsmod:
+		Add = Abracead.GetValue(Race, Abidx) + Abclsmod.GetValue(KitIndex, Abidx)
+	else:
+		Add = Abracead.GetValue(Race, Abidx)
 	Maximum = Maximum + Add
 	Minimum = Minimum + Add
 	if Minimum<1:
@@ -112,7 +116,8 @@ def OnLoad():
 	global KitIndex, Minimum, Maximum, MyChar
 	
 	Abracead = GemRB.LoadTable("ABRACEAD")
-	Abclsmod = GemRB.LoadTable("ABCLSMOD")
+	if GemRB.HasResource ("ABCLSMOD", RES_2DA):
+		Abclsmod = GemRB.LoadTable ("ABCLSMOD")
 	Abclasrq = GemRB.LoadTable("ABCLASRQ")
 	Abracerq = GemRB.LoadTable("ABRACERQ")
 
