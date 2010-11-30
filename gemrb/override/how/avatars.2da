@@ -316,6 +316,7 @@
 0xE620    MSKB      MSKB       MSKB       MSKB       9          2          1          *
 0xE700    MNO1      MNO1       MNO1       MNO1       9          2          1          *
 0xE710    MNO2      MNO2       MNO2       MNO2       9          2          1          *
+0xE718    MTRO      MTRO       MTRO       MTRO       9          2          1          *
 0xE720    MNO3      MNO3       MNO3       MNO3       9          2          1          *
 0xE730    MTSN      MTSN       MTSN       MTSN       9          2          1          *
 0xE750    MUMB      MUMB       MUMB       MUMB       9          2          1          *
