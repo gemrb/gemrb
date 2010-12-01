@@ -22,8 +22,7 @@ from GUIDefines import *
 from ie_stats import *
 import CharGenCommon
 import GUICommon
-import CommonTables
-
+import BGCommon
 
 ColorTable = 0
 ColorWindow = 0
@@ -40,22 +39,6 @@ SkinColor = 0
 MinorColor = 0
 MajorColor = 0
 PDollButton = 0
-
-def RefreshPDoll():
-	MyChar = GemRB.GetVar ("Slot")
-	AnimID = 0x6000
-	table = GemRB.LoadTable("avprefr")
-	AnimID = AnimID+table.GetValue(GemRB.GetPlayerStat (MyChar, IE_RACE),0)
-	charclass = GemRB.GetPlayerStat (MyChar, IE_CLASS)
-	charclass = CommonTables.Classes.FindValue(5,charclass)
-	table = GemRB.LoadTable("avprefc")
-	AnimID = AnimID+table.GetValue(charclass+1,0)
-	table = GemRB.LoadTable("avprefg")
-	AnimID = AnimID+table.GetValue(GemRB.GetPlayerStat (MyChar, IE_SEX),0)
-	ResRef = CommonTables.Pdolls.GetValue(hex(AnimID), "LEVEL1")
-	PDollButton.SetPLT(ResRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
-
-	return
 
 def OnLoad():
 	global ColorWindow, DoneButton, PDollButton, ColorTable
@@ -115,7 +98,7 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
-	RefreshPDoll()
+	BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 	ColorWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
@@ -130,22 +113,22 @@ def DonePress():
 	if ColorIndex==0:
 		HairColor=PickedColor
 		HairButton.SetBAM("COLGRAD", 0, 0, HairColor)
-		RefreshPDoll()
+		BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 		return
 	if ColorIndex==1:
 		SkinColor=PickedColor
 		SkinButton.SetBAM("COLGRAD", 0, 0, SkinColor)
-		RefreshPDoll()
+		BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 		return
 	if ColorIndex==2:
 		MinorColor=PickedColor
 		MajorButton.SetBAM("COLGRAD", 0, 0, MinorColor)
-		RefreshPDoll()
+		BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 		return
 
 	MajorColor=PickedColor
 	MinorButton.SetBAM("COLGRAD", 0, 0, MajorColor)
-	RefreshPDoll()
+	BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 	return
 
 def GetColor():
