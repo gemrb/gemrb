@@ -5233,7 +5233,9 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Table is invalid." );
 	}
 	const char *poi = mtm->QueryField( 0 );
+	// the base animation id
 	int AnimID = strtoul( poi, NULL, 0 );
+	// tables for additive modifiers of the animation id (race, gender, class)
 	for (int i = 1; i < count; i++) {
 		poi = mtm->QueryField( i );
 		int table = gamedata->LoadTable( poi );
