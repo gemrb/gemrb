@@ -51,7 +51,7 @@ def RefreshPDoll():
 	charclass = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 	charclass = CommonTables.Classes.FindValue(5,charclass)
 	table = GemRB.LoadTable("avprefc")
-	AnimID = AnimID+table.GetValue(charclass,0)
+	AnimID = AnimID+table.GetValue(charclass+1,0)
 	table = GemRB.LoadTable("avprefg")
 	AnimID = AnimID+table.GetValue(GemRB.GetPlayerStat (MyChar, IE_SEX),0)
 	ResRef = CommonTables.Pdolls.GetValue(hex(AnimID), "LEVEL1")
