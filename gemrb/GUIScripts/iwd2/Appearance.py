@@ -21,7 +21,6 @@ import GemRB
 from GUIDefines import *
 import CommonTables
 
-global IE_ANIM_ID
 ColorTable = 0
 HairTable = 0
 SkinTable = 0
@@ -39,7 +38,6 @@ Color2 = 0
 Color3 = 0
 Color4 = 0
 PDollButton = 0
-IE_ANIM_ID = 206
 PDollResRef = 0
 
 def RefreshPDoll():

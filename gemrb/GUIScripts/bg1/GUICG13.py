@@ -25,7 +25,6 @@ import GUICommon
 import CommonTables
 
 
-global IE_ANIM_ID
 ColorTable = 0
 ColorWindow = 0
 ColorPicker = 0
@@ -41,7 +40,6 @@ SkinColor = 0
 MinorColor = 0
 MajorColor = 0
 PDollButton = 0
-IE_ANIM_ID = 206
 
 def RefreshPDoll():
 	MyChar = GemRB.GetVar ("Slot")

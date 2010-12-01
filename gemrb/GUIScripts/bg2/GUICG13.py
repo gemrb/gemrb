@@ -22,7 +22,6 @@ import CommonTables
 from GUIDefines import *
 from ie_stats import *
 
-global IE_ANIM_ID
 ColorTable = 0
 ColorWindow = 0
 ColorPicker = 0
@@ -39,7 +38,6 @@ MajorColor = 0
 MinorColor = 0
 PDollButton = 0
 MyChar = 0
-IE_ANIM_ID = 206
 
 def RefreshPDoll():
 	AnimID = 0x6000
