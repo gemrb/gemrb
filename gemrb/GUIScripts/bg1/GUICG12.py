@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 #
-#character generation, appearance (GUICG12)
+#character generation, portrait (GUICG12)
 import GemRB
 from GUIDefines import *
 from ie_stats import *
