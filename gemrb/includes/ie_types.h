@@ -32,8 +32,8 @@
 #include <config.h>
 #endif
 
-//we need this for Windows
-#ifdef WIN32
+//we need this for Windows and Android
+#if defined (WIN32) || defined (ANDROID)
 #define SIZEOF_INT 4
 #define SIZEOF_LONG_INT 4
 #endif
