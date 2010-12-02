@@ -1230,7 +1230,9 @@ def OpenColorPicker ():
 	for i in range (34):
 		MyColor = ColorTable.GetValue (ColorIndex, i)
 		if MyColor == "*":
-			break
+			Button = SubSubCustomizeWindow.GetControl(i+1)
+			Button.SetFlags(IE_GUI_BUTTON_PICTURE, OP_NAND)
+			continue
 		Button = SubSubCustomizeWindow.GetControl (i+1)
 		Button.SetBAM("COLGRAD", 2, 0, MyColor)
 		if PickedColor == MyColor:
