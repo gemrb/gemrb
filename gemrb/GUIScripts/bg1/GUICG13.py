@@ -140,13 +140,14 @@ def GetColor():
 		Button = ColorPicker.GetControl(i)
 		Button.SetState(IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-		#Button.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
 	Selected = -1
 	for i in range(34):
 		MyColor = ColorTable.GetValue(ColorIndex, i)
 		if MyColor == "*":
-			break
+			Button = ColorPicker.GetControl(i)
+			Button.SetFlags(IE_GUI_BUTTON_PICTURE, OP_NAND)
+			continue
 		Button = ColorPicker.GetControl(i)
 		Button.SetBAM("COLGRAD", 0, 0, MyColor)
 		if PickedColor == MyColor:
