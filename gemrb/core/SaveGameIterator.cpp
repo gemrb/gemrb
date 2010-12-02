@@ -105,7 +105,7 @@ SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const
 	PathJoinExt(nPath, Path, Prefix, "bmp");
 	memset(&my_stat,0,sizeof(my_stat));
 	stat( nPath, &my_stat );
-	strftime( Date, _MAX_PATH, "%c", localtime( &my_stat.st_mtime ) );
+	strftime( Date, _MAX_PATH, "%c", localtime( (time_t*)&my_stat.st_mtime ) );
 	manager.AddSource(Path, Name, PLUGIN_RESOURCE_DIRECTORY);
 	GameDate[0] = '\0';
 }

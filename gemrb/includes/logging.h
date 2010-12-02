@@ -28,6 +28,10 @@
 
 #include "exports.h"
 
+#ifdef ANDROID
+# include <android/log.h>
+#endif
+
 #ifdef WIN32
 # define ADV_TEXT
 # include <conio.h>
@@ -80,8 +84,14 @@ extern GEM_EXPORT HANDLE hConsole;
 #define LIGHT_WHITE printf("\033[1m\033[37;40m");
 #endif //WIN32
 
+#ifndef ANDROID
 #define printBracket(status, color) textcolor(WHITE); printf("["); textcolor(color); printf("%s", status); textcolor(WHITE); printf("]")
 #define printStatus(status, color) printBracket(status, color); printf("\n")
 #define printMessage(owner, message, color) printBracket(owner, LIGHT_WHITE); printf(": "); textcolor(color); printf("%s", message)
+#else
+#define printBracket(status, color)
+#define printStatus(status, color) __android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s]", status)
+#define printMessage(owner, message, color) __android_log_print(ANDROID_LOG_INFO, "GemRB", "%s: %s", owner, message)
+#endif
 
 #endif

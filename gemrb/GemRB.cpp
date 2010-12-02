@@ -33,6 +33,10 @@
 #include <SDL.h>
 #endif
 
+#ifdef ANDROID
+#include <SDL.h>
+#endif
+
 int main(int argc, char* argv[])
 {
 	Interface::SanityCheck(VERSION_GEMRB);
