@@ -70,6 +70,7 @@ def OpenInventoryWindow ():
 		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.SetVar ("MessageLabel", -1)
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		GUICommonWindows.UpdatePortraitWindow ()
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None

@@ -69,6 +69,7 @@ def OpenInventoryWindow ():
 		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		GUICommonWindows.UpdatePortraitWindow ()
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
