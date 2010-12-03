@@ -22,6 +22,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef ANDROID
+#include "swab.h"
+#endif
+
 #include "BAMImporter.h"
 
 #include "win32def.h"
