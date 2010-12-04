@@ -49,8 +49,6 @@
 #include "System/DataStream.h"
 #include "Region.h"
 #include "Sprite2D.h"
-#include "VideoMode.h"
-#include "VideoModes.h"
 
 #include <cstdio>
 #include <cstdlib>
