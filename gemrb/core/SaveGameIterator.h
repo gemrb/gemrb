@@ -41,9 +41,10 @@ public:
 	void DeleteSaveGame(Holder<SaveGame>);
 	int CreateSaveGame(Holder<SaveGame>, const char *slotname);
 	int CreateSaveGame(int index, bool mqs = false);
+	Holder<SaveGame> GetSaveGame(const char *slotname);
 private:
 	bool RescanSaveGames();
-	static Holder<SaveGame> GetSaveGame(const char *slotname);
+	static Holder<SaveGame> BuildSaveGame(const char *slotname);
 	void PruneQuickSave(const char *folder);
 };
 

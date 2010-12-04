@@ -292,7 +292,7 @@ bool SaveGameIterator::RescanSaveGames()
 	} while (++dir);
 
 	for (std::set<char*,iless>::iterator i = slots.begin(); i != slots.end(); i++) {
-		save_slots.push_back(GetSaveGame(*i));
+		save_slots.push_back(BuildSaveGame(*i));
 		free(*i);
 	}
 
@@ -306,7 +306,18 @@ const std::vector<Holder<SaveGame> >& SaveGameIterator::GetSaveGames()
 	return save_slots;
 }
 
-Holder<SaveGame> SaveGameIterator::GetSaveGame(const char *slotname)
+Holder<SaveGame> SaveGameIterator::GetSaveGame(const char *name)
+{
+	RescanSaveGames();
+
+	for (std::vector<Holder<SaveGame> >::iterator i = save_slots.begin(); i != save_slots.end(); i++) {
+		if (strcmp(name, (*i)->GetName()) == 0)
+			return *i;
+	}
+	return NULL;
+}
+
+Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 {
 	if (!slotname) {
 		return NULL;
