@@ -35,9 +35,9 @@ def StartLoadScreen ():
 	GemRB.LoadWindowPack ("guils")
 	LoadScreen = GemRB.LoadWindow (0)
 	Middle = LoadScreen.GetControl (4)
-	LoadPic = GemRB.GetGameString (STR_LOADMOS)
-	if LoadPic=="":
-		LoadPic = "GTRSK00"+str(GemRB.Roll(1,5,0))
+	#LoadPic = GemRB.GetGameString (STR_LOADMOS)
+	#if LoadPic=="":
+	LoadPic = "GTRSK00"+str(GemRB.Roll(1,5,0))
 	Middle.SetMOS (LoadPic)
 	Bar = LoadScreen.GetControl (0)
 	Progress = 0
