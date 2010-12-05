@@ -181,6 +181,7 @@ Interface::Interface(int iargc, char* iargv[])
 	DrawFPS = false;
 	KeepCache = false;
 	TooltipDelay = 100;
+	FullScreen = 0;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
 	SavePath[0] = 0;
@@ -992,7 +993,6 @@ static const Region bg( 0, 0, 100, 30 );
 /** this is the main loop */
 void Interface::Main()
 {
-	ieDword FullScreen = 0;
 	ieDword brightness = 10;
 	ieDword contrast = 5;
 	ieDword speed = 10;
@@ -2154,7 +2154,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
 		CONFIG_INT("EndianSwitch", DataStream::SetEndianSwitch);
 		CONFIG_INT("FogOfWar", FogOfWar = );
-		//CONFIG_INT("FullScreen", FullScreen = );
+		CONFIG_INT("FullScreen", FullScreen = );
 		CONFIG_INT("GUIEnhancements", GUIEnhancements = );
 		CONFIG_INT("GameOnCD", GameOnCD = );
 		CONFIG_INT("Height", Height = );
