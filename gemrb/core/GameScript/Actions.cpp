@@ -5761,7 +5761,8 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 		char FolderName[_MAX_PATH];
 		snprintf (FolderName, sizeof(FolderName), "%s - %s", basename, str);
 		core->FreeString( str );
-		core->GetSaveGameIterator()->CreateSaveGame(Holder< ::SaveGame>(), FolderName);
+
+		core->GetSaveGameIterator()->CreateSaveGame(core->GetSaveGameIterator()->GetSaveGame(FolderName), FolderName);
 	} else {
 		core->GetSaveGameIterator()->CreateSaveGame(parameters->int0Parameter);
 	}

@@ -79,8 +79,6 @@ public:
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen) = 0;
 	/** Sets window title of GemRB window */
 	virtual void SetDisplayTitle(char* title, char* icon) = 0;
-	virtual VideoModes GetVideoModes(bool fullscreen = false) = 0;
-	virtual bool TestVideoMode(VideoMode& vm) = 0;
 	/** Toggles GemRB between fullscreen and windowed mode.
 	  * 0 = windowed, 1 = fullscreen, -1 (default) = toggle */
 	virtual bool ToggleFullscreenMode(int set_reset=-1) = 0;

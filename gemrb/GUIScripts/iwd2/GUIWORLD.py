@@ -78,6 +78,25 @@ def OpenEndMessageWindow ():
 	if hideflag:
 		GemRB.UnhideGUI ()
 
+def OpenContinueMessageWindow ():
+	global ContinueWindow, OldActionsWindow
+
+	hideflag = GemRB.HideGUI ()
+
+	if not ContinueWindow:
+		GemRB.LoadWindowPack (GUICommon.GetWindowPack())
+		ContinueWindow = Window = GemRB.LoadWindow (9)
+		OldActionsWindow = GWindow( GemRB.GetVar ("PortraitWindow") )
+		GemRB.SetVar ("PortraitWindow", Window.ID)
+
+	#continue
+	Button = ContinueWindow.GetControl (0)
+	Button.SetText (9372)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
+
+	if hideflag:
+		GemRB.UnhideGUI ()
+
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
 

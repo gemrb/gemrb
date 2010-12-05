@@ -141,57 +141,6 @@ void SDLVideoDriver::SetDisplayTitle(char* title, char* icon)
 	SDL_WM_SetCaption( title, icon );
 }
 
-VideoModes SDLVideoDriver::GetVideoModes(bool fs)
-{
-	SDL_Rect** modes;
-	ieDword flags = SDL_SWSURFACE;
-	if (fs) {
-		flags |= SDL_FULLSCREEN;
-	}
-	VideoModes vm;
-	//32-bit Video Modes
-	SDL_PixelFormat pf;
-	pf.palette = NULL;
-	pf.BitsPerPixel = 32;
-	pf.BytesPerPixel = 4;
-	pf.Rmask = 0xff000000;
-	pf.Gmask = 0x00ff0000;
-	pf.Bmask = 0x0000ff00;
-	pf.Amask = 0x000000ff;
-	pf.Rshift = 24;
-	pf.Gshift = 16;
-	pf.Bshift = 8;
-	pf.Ashift = 0;
-	modes = SDL_ListModes( &pf, fs );
-	if (modes == ( SDL_Rect * * ) 0) {
-		return vm;
-	}
-	if (modes == ( SDL_Rect * * ) - 1) {
-		vm.AddVideoMode( 640, 480, 32, fs );
-		vm.AddVideoMode( 800, 600, 32, fs );
-		vm.AddVideoMode( 1024, 786, 32, fs );
-		vm.AddVideoMode( 1280, 1024, 32, fs );
-		vm.AddVideoMode( 1600, 1200, 32, fs );
-	} else {
-		for (int i = 0; modes[i]; i++) {
-			vm.AddVideoMode( modes[i]->w, modes[i]->h, 32, fs );
-		}
-	}
-	return vm;
-}
-
-bool SDLVideoDriver::TestVideoMode(VideoMode& vm)
-{
-	ieDword flags = SDL_SWSURFACE;
-	if (vm.GetFullScreen()) {
-		flags |= SDL_FULLSCREEN;
-	}
-	if (SDL_VideoModeOK( vm.GetWidth(), vm.GetHeight(), vm.GetBPP(), flags ) == vm.GetBPP()) {
-		return true;
-	}
-	return false;
-}
-
 bool SDLVideoDriver::ToggleFullscreenMode(int set_reset)
 {
 	if (set_reset==-1) {

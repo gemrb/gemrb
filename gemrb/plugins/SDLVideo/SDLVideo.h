@@ -55,8 +55,6 @@ public:
 	int Init(void);
 	int CreateDisplay(int width, int height, int bpp, bool fullscreen);
 	void SetDisplayTitle(char* title, char* icon);
-	VideoModes GetVideoModes(bool fullscreen = false);
-	bool TestVideoMode(VideoMode& vm);
 	bool ToggleFullscreenMode(int set_reset=-1);
 	int SwapBuffers(void);
 	int PollEvents();

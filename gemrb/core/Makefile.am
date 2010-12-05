@@ -109,8 +109,6 @@ libgemrb_core_la_SOURCES = \
 	TileSetMgr.cpp \
 	Variables.cpp \
 	Video.cpp \
-	VideoMode.cpp \
-	VideoModes.cpp \
 	WindowMgr.cpp \
 	WorldMap.cpp \
 	WorldMapMgr.cpp
