@@ -1923,7 +1923,7 @@ void Actor::AddAnimation(const ieResRef resource, int gradient, int height, int 
 	if (flags&AA_PLAYONCE) {
 		sca->PlayOnce();
 	}
-	if (flags&&AA_BLEND) {
+	if (flags&AA_BLEND) {
 		//pst anims need this?
 		sca->SetBlend();
 	}
