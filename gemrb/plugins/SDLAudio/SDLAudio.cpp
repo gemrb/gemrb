@@ -144,11 +144,10 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsig
 	int cnt = acm->get_length();
 	int riff_chans = acm->get_channels();
 	int samplerate = acm->get_samplerate();
-	//multiply always by 2 because it is in 16 bits
-	int rawsize = cnt * 2;
-	unsigned char * memory = (unsigned char*) malloc(rawsize);
+	// Use 16-bit word for memory allocation because read_samples takes a 16 bit alignment
+	short * memory = (short *) malloc(cnt);
 	//multiply always with 2 because it is in 16 bits
-	int cnt1 = acm->read_samples( ( short* ) memory, cnt ) * 2;
+	int cnt1 = acm->read_samples( memory, cnt ) * 2;
 	//Sound Length in milliseconds
 	unsigned int time_length = ((cnt / riff_chans) * 1000) / samplerate;
 
@@ -161,7 +160,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsig
 	SDL_BuildAudioCVT(&cvt, AUDIO_S16SYS, riff_chans, samplerate,
 			audio_format, audio_channels, audio_rate);
 	cvt.buf = (Uint8*)malloc(cnt1*cvt.len_mult);
-	memcpy(cvt.buf, memory, cnt1);
+	memcpy(cvt.buf, (char*)memory, cnt1);
 	cvt.len = cnt1;
 	SDL_ConvertAudio(&cvt);
 
