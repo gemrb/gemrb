@@ -553,7 +553,6 @@ void CREImporter::ReadChrHeader(Actor *act)
 	ieVariable name;
 	char Signature[8];
 	ieDword offset, size;
-	ieDword tmpDword;
 	ieWord tmpWord;
 	ieByte tmpByte;
 
@@ -562,8 +561,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 	str->Read (Signature, 8);
 	str->Read (name, 32);
 	name[32]=0;
-	tmpDword = *(ieDword *) name;
-	if (tmpDword != 0 && tmpDword !=1) {
+	if (name[0]) {
 		act->SetName( name, 0 ); //setting longname
 	}
 	str->ReadDword( &offset);
