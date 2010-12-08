@@ -2360,13 +2360,14 @@ void SDLVideoDriver::ClickMouse(unsigned int button)
 
 void SDLVideoDriver::MouseClickEvent(Uint8 type, Uint8 button)
 {
-	SDL_MouseButtonEvent *event = new SDL_MouseButtonEvent();
+	SDL_Event *event = new SDL_Event();
 	event->type = type;
-	event->button = button;
-	event->state = (type==SDL_MOUSEBUTTONDOWN)?SDL_PRESSED:SDL_RELEASED;
-	event->x = CursorPos.x;
-	event->y = CursorPos.y;
-	SDL_PushEvent((SDL_Event *) event);
+	event->button.type = type;
+	event->button.button = button;
+	event->button.state = (type==SDL_MOUSEBUTTONDOWN)?SDL_PRESSED:SDL_RELEASED;
+	event->button.x = CursorPos.x;
+	event->button.y = CursorPos.y;
+	SDL_PushEvent(event);
 }
 
 void SDLVideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
