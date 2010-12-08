@@ -121,9 +121,43 @@ int Control::RunEventHandler(EventHandler handler)
 }
 
 /** Key Press Event */
-void Control::OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/)
+void Control::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	//printf("OnKeyPress: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", (unsigned int) ControlID, Key, Key);
+#ifdef ANDROID // mapping volume control to volume control keys on device, these keys must be set up in AndroidAppSettings.cfg
+	switch(Key)	{
+		case 'o': // volume down
+		case 'p': // volume up
+			ieDword Ambients, Movie, Music, SFX, Voices;
+			core->GetDictionary()->Lookup( "Volume Ambients", Ambients );
+			core->GetDictionary()->Lookup( "Volume Movie", Movie );
+			core->GetDictionary()->Lookup( "Volume Music", Music );
+			core->GetDictionary()->Lookup( "Volume SFX", SFX );
+			core->GetDictionary()->Lookup( "Volume Voices", Voices );
+			if (Key=='o') {
+				if(Ambients>0) Ambients--;
+				if(Movie>0) Movie--;
+				if(Music>0) Music--;
+				if(SFX>0) SFX--;
+				if(Voices>0) Voices--;
+			} else {
+				if(Ambients<100) Ambients++;
+				if(Movie<100) Movie++;
+				if(Music<100) Music++;
+				if(SFX<100) SFX++;
+				if(Voices<100) Voices++;
+			}
+			core->GetDictionary()->SetAt( "Volume Ambients", Ambients );
+			core->GetDictionary()->SetAt( "Volume Movie", Movie );
+			core->GetDictionary()->SetAt( "Volume Music", Music );
+			core->GetDictionary()->SetAt( "Volume SFX", SFX );
+			core->GetDictionary()->SetAt( "Volume Voices", Voices );
+			core->GetAudioDrv()->UpdateVolume();
+			break;
+	}
+#else
+(void)Key; // unused, fool the compiler
+#endif
 }
 
 /** Key Release Event */

@@ -629,6 +629,15 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			SelectActor(pc, true);
 			SelectActor(pc+1, true);
 			break;
+#ifdef ANDROID
+		case 'o':
+		case 'p':
+			Control::OnKeyPress(Key, 0);
+			break;
+		case 'c': // show containers in ANDROID, GEM_ALT is not possible to use
+			DebugFlags |= DEBUG_SHOW_CONTAINERS;
+			return;
+#endif
 	default:
 		core->GetGame()->SetHotKey(toupper(Key));
 		break;
@@ -1004,6 +1013,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			QuickSave();
 			break;
 		case GEM_ALT: //alt key (shows containers)
+#ifdef ANDROID
+		case 'c': // show containers in ANDROID, GEM_ALT is not possible to use
+#endif
 			DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
 			break;
 		default:

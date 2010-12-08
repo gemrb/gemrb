@@ -269,8 +269,18 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 }
 
 /** Key Press Event */
-void MapControl::OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/)
+void MapControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
+#ifdef ANDROID
+	switch(Key) {
+		case 'o':
+		case 'p':
+			Control::OnKeyPress(Key, 0);
+			break;
+	}
+#else
+(void)Key; // unused, fool the compiler
+#endif
 }
 
 /** Key Release Event */
