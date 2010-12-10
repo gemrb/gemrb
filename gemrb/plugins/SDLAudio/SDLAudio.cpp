@@ -145,7 +145,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, int XPos, int YPos, unsig
 	int riff_chans = acm->get_channels();
 	int samplerate = acm->get_samplerate();
 	// Use 16-bit word for memory allocation because read_samples takes a 16 bit alignment
-	short * memory = (short *) malloc(cnt);
+	short * memory = (short *) malloc(cnt*2);
 	//multiply always with 2 because it is in 16 bits
 	int cnt1 = acm->read_samples( memory, cnt ) * 2;
 	//Sound Length in milliseconds
