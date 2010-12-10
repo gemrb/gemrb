@@ -4714,10 +4714,11 @@ PyDoc_STRVAR( GemRB_GetPlayerSound__doc,
 
 static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
 {
-	char Sound[33];
+	char Sound[42];
 	int PlayerSlot;
+	int flag = 0;
 
-	if (!PyArg_ParseTuple( args, "i", &PlayerSlot )) {
+	if (!PyArg_ParseTuple( args, "i|i", &PlayerSlot, &flag )) {
 		return AttributeError( GemRB_GetPlayerSound__doc );
 	}
 	Game *game = core->GetGame();
@@ -4728,7 +4729,7 @@ static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
 	if (!MyActor) {
 		return RuntimeError( "Actor not found!" );
 	}
-	MyActor->GetSoundFolder(Sound);
+	MyActor->GetSoundFolder(Sound, flag);
 	return PyString_FromString(Sound);
 }
 

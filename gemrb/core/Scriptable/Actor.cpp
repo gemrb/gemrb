@@ -5695,10 +5695,14 @@ void Actor::SetSoundFolder(const char *soundset)
 	}
 }
 
-void Actor::GetSoundFolder(char *soundset) const
+void Actor::GetSoundFolder(char *soundset, int full) const
 {
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
 		strnlwrcpy(soundset, PCStats->SoundFolder, 32);
+		if (full) {
+			strcat(soundset,"/");
+			strncat(soundset, PCStats->SoundSet, 8);
+		}
 	}
 	else {
 		strnlwrcpy(soundset, PCStats->SoundSet, 8);

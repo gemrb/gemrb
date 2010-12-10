@@ -1250,6 +1250,9 @@ def NextSound():
 	SoundIndex += 1
 	if SoundIndex >= len(SoundSequence):
 		SoundIndex = 0
+		if SoundIndex == tmp:
+			break
+
 	return
 
 def OpenColorWindow ():

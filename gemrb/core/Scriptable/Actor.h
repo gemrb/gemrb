@@ -404,7 +404,7 @@ public:
 	//Which - 0 both, 1 Large, 2 Small
 	void SetPortrait(const char* ResRef, int Which=0);
 	void SetSoundFolder(const char *soundset);
-	void GetSoundFolder(char *soundset) const;
+	void GetSoundFolder(char *soundset, int flag) const;
 	/** Gets the Character Long Name/Short Name */
 	char* GetName(int which) const
 	{
