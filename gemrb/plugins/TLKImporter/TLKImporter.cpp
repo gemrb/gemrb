@@ -525,8 +525,8 @@ empty:
 		}
 	}
 	if (flags & IE_STR_STRREFON) {
-		char* string2 = ( char* ) malloc( Length + 11 );
-		sprintf( string2, "%d: %s", strref, string );
+		char* string2 = ( char* ) malloc( Length + 13 );
+		sprintf( string2, "%u: %s", strref, string );
 		free( string );
 		return string2;
 	}
