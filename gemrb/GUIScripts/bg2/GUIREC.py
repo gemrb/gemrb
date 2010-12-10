@@ -1245,6 +1245,13 @@ def PlaySoundPressed():
 	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], 0, 0, 4)
 	return
 
+def NextSound():
+	global SoundIndex, SoundSequence
+	SoundIndex += 1
+	if SoundIndex >= len(SoundSequence):
+		SoundIndex = 0
+	return
+
 def OpenColorWindow ():
 	global SubCustomizeWindow
 	global PortraitWindow
