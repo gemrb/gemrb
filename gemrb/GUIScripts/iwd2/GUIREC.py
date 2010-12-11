@@ -1243,7 +1243,8 @@ def OpenSoundWindow ():
 	Gender = GemRB.GetPlayerStat (pc, IE_SEX, 1)
 
 	VoiceList.SetVarAssoc ("Selected", 0)
-	RowCount=VoiceList.GetCharSounds()
+	VoiceList.GetCharSounds()
+	VoiceList.SelectText (OldVoiceSet)
 
 	PlayButton = SubCustomizeWindow.GetControl (7)
 	PlayButton.SetText (17318)
