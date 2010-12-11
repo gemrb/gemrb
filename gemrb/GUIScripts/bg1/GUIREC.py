@@ -46,6 +46,7 @@ ColorTable = None
 ColorIndex = None
 ScriptTextArea = None
 SelectedTextArea = None
+OldVoiceSet = None
 
 # the available sounds
 SoundSequence = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', \
@@ -1069,16 +1070,19 @@ def OpenSoundWindow ():
 	global SubCustomizeWindow
 	global VoiceList
 	global Gender
+	global OldVoiceSet
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+	OldVoiceSet = GemRB.GetPlayerSound (pc)
 	SubCustomizeWindow = GemRB.LoadWindow (20)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
 	VoiceList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
-	pc = GemRB.GameGetSelectedPCSingle ()
 	Gender = GemRB.GetPlayerStat (pc, IE_SEX, 1)
 
 	VoiceList.SetVarAssoc ("Selected", 0)
-	RowCount=VoiceList.GetCharSounds()
+	VoiceList.GetCharSounds()
+	VoiceList.SelectText (OldVoiceSet)
 
 	PlayButton = SubCustomizeWindow.GetControl (7)
 	PlayButton.SetText (17318)
@@ -1096,9 +1100,15 @@ def OpenSoundWindow ():
 
 	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlaySoundPressed)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneSoundWindow)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSoundWindow)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def CloseSoundWindow ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.SetPlayerSound (pc, OldVoiceSet)
+	CloseSubCustomizeWindow ()
 	return
 
 def DoneSoundWindow ():

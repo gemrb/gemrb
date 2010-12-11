@@ -51,11 +51,12 @@ ColorTable = None
 ColorIndex = None
 ScriptTextArea = None
 SelectedTextArea = None
+OldVoiceSet = None
 
 # the available sounds
-SoundSequence = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', \
-				'm', 's', 't', 'u', 'v', '_', 'x', 'y', 'z', '0', '1', '2', \
-				'3', '4', '5', '6', '7', '8', '9']
+SoundSequence = [ '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', \
+		'13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', \
+		'25', '26', '27', '28', '29', '30', '31']
 SoundIndex = 0
 
 ###################################################
@@ -898,16 +899,19 @@ def OpenSoundWindow ():
 	global SubCustomizeWindow
 	global VoiceList
 	global Gender
+	global OldVoiceSet
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+	OldVoiceSet = GemRB.GetPlayerSound (pc)
 	SubCustomizeWindow = GemRB.LoadWindow (20)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
 	VoiceList.SetFlags (IE_GUI_TEXTAREA_SELECTABLE)
-	pc = GemRB.GameGetSelectedPCSingle ()
 	Gender = GemRB.GetPlayerStat (pc, IE_SEX, 1)
 
 	VoiceList.SetVarAssoc ("Selected", 0)
-	RowCount=VoiceList.GetCharSounds()
+	VoiceList.GetCharSounds()
+	VoiceList.SelectText (OldVoiceSet)
 
 	PlayButton = SubCustomizeWindow.GetControl (7)
 	PlayButton.SetText (17318)
@@ -925,9 +929,15 @@ def OpenSoundWindow ():
 
 	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlaySoundPressed)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneSoundWindow)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSoundWindow)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	return
+
+def CloseSoundWindow ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.SetPlayerSound (pc, OldVoiceSet)
+	CloseSubCustomizeWindow ()
 	return
 
 def DoneSoundWindow ():
@@ -938,17 +948,30 @@ def DoneSoundWindow ():
 	CloseSubCustomizeWindow ()
 	return
 
-#TODO: iwd has a different naming scheme
-#def PlaySoundPressed():
-	#global CharSoundWindow, SoundIndex, SoundSequence
+def PlaySoundPressed():
+	global CharSoundWindow, SoundIndex, SoundSequence
 
-	#CharSound = VoiceList.QueryText ()
-	#while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], RES_WAV)):
-		#SoundIndex += 1
-		#if SoundIndex >= len(SoundSequence):
-			#SoundIndex = 0
-	#GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], 0, 0, 4)
-	#return
+	CharSound = VoiceList.QueryText ()
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.SetPlayerSound (pc, CharSound)
+	VoiceSet = GemRB.GetPlayerSound (pc, 1)
+	tmp = SoundIndex
+	while (not GemRB.HasResource (VoiceSet + SoundSequence[SoundIndex], RES_WAV)):
+		NextSound()
+		if SoundIndex == tmp:
+			break
+	else:
+		NextSound()
+
+	GemRB.PlaySound (VoiceSet + SoundSequence[SoundIndex], 0, 0, 5)
+	return
+
+def NextSound():
+	global SoundIndex, SoundSequence
+	SoundIndex += 1
+	if SoundIndex >= len(SoundSequence):
+		SoundIndex = 0
+	return
 
 def OpenColorWindow ():
 	global SubCustomizeWindow
