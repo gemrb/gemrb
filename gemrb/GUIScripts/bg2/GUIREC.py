@@ -1240,9 +1240,14 @@ def PlaySoundPressed():
 	global CharSoundWindow, SoundIndex, SoundSequence
 
 	CharSound = VoiceList.QueryText ()
+	tmp = SoundIndex
 	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], RES_WAV)):
 		NextSound()
-	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], 0, 0, 4)
+		if SoundIndex == tmp:
+			break
+	else:
+		NextSound()
+	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], 0, 0, 5)
 	return
 
 def NextSound():
@@ -1250,9 +1255,6 @@ def NextSound():
 	SoundIndex += 1
 	if SoundIndex >= len(SoundSequence):
 		SoundIndex = 0
-		if SoundIndex == tmp:
-			break
-
 	return
 
 def OpenColorWindow ():
