@@ -68,6 +68,8 @@ public:
 	static void SetNoteString(const char *s);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
+	/** Set the TextArea value to the line number containing the string parameter */
+	void SelectText(const char *select);
 	/** Sets the Actual Text */
 	int SetText(const char* text, int pos = 0);
 	/** Clears the textarea */

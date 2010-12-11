@@ -1310,6 +1310,43 @@ static PyObject* GemRB_TextEdit_SetBufferLength(PyObject * /*self*/, PyObject* a
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_TextArea_SelectText__doc,
+"SelectText(WindowIndex, ControlIndex, String|Strref) => void\n\n"
+"Tries to set the Variable of the TextArea control to the linenumber of the referenced string.");
+
+static PyObject* GemRB_TextArea_SelectText(PyObject * /*self*/, PyObject* args)
+{
+	PyObject* wi, * ci, * str;
+	long WindowIndex, ControlIndex;
+	char* string;
+
+	if (!PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str )) {
+		return AttributeError( GemRB_TextArea_SelectText__doc );
+	}
+
+	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
+		!PyObject_TypeCheck( ci, &PyInt_Type ) ||
+		( !PyObject_TypeCheck( str, &PyString_Type ) &&
+		!PyObject_TypeCheck( str, &PyInt_Type ) )) {
+		return AttributeError( GemRB_TextArea_SelectText__doc );
+	}
+
+	WindowIndex = PyInt_AsLong( wi );
+	ControlIndex = PyInt_AsLong( ci );
+	if (PyObject_TypeCheck( str, &PyString_Type )) {
+		string = PyString_AsString( str );
+		if (string == NULL) {
+			return RuntimeError("Null string received");
+		}
+		TextArea* ta = (TextArea *) GetControl( WindowIndex, ControlIndex, IE_GUI_TEXTAREA );
+		if (!ta)
+			return NULL;
+		ta->SelectText( string );
+	}
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_Control_SetText__doc,
 "SetText(WindowIndex, ControlIndex, String|Strref) => int\n\n"
 "Sets the Text of a control in a Window." );
@@ -9950,6 +9987,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(TextArea_MoveText, METH_VARARGS),
 	METHOD(TextArea_Rewind, METH_VARARGS),
 	METHOD(TextArea_Scroll, METH_VARARGS),
+	METHOD(TextArea_SelectText, METH_VARARGS),
 	METHOD(TextArea_SetHistory, METH_VARARGS),
 	METHOD(TextEdit_ConvertEdit, METH_VARARGS),
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),

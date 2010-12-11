@@ -840,6 +840,27 @@ void TextArea::RedrawTextArea(const char* VariableName, unsigned int Sum)
 	Changed = true;
 }
 
+void TextArea::SelectText(const char *select)
+{
+	int i = lines.size();
+	while(i--) {
+		if (!stricmp(lines[i], select) ) {
+			CurLine = i;
+			if (sb) {
+				ScrollBar* bar = ( ScrollBar* ) sb;
+				bar->SetPos( i );
+			} else {
+				SetRow( i );
+			}
+			RedrawTextArea( VarName, i);
+			CalcRowCount();
+			Owner->Invalidate();
+			core->RedrawAll();
+			break;
+		}
+	}
+}
+
 const char* TextArea::QueryText()
 {
 	if ( Value<lines.size() ) {
