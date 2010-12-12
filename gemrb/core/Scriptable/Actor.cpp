@@ -549,7 +549,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 
 }
 
-CharAnimations* Actor::GetAnims()
+CharAnimations* Actor::GetAnims() const
 {
 	return anims;
 }
@@ -2018,7 +2018,7 @@ int Actor::GetMod(unsigned int StatIndex)
 	return (signed) Modified[StatIndex] - (signed) BaseStats[StatIndex];
 }
 /** Returns a Stat Base Value */
-ieDword Actor::GetBase(unsigned int StatIndex)
+ieDword Actor::GetBase(unsigned int StatIndex) const
 {
 	if (StatIndex >= MAX_STATS) {
 		return 0xffff;
@@ -2092,7 +2092,7 @@ bool Actor::SetBaseBit(unsigned int StatIndex, ieDword Value, bool setreset)
 	return true;
 }
 
-const unsigned char *Actor::GetStateString()
+const unsigned char *Actor::GetStateString() const
 {
 	if (!PCStats) {
 		return NULL;
@@ -3864,7 +3864,7 @@ int Actor::IsDualWielding() const
 
 //returns weapon header currently used (bow in case of bow+arrow)
 //if range is nonzero, then the returned header is valid
-ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright)
+ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 {
 	//only use the shield slot if we are dual wielding
 	leftorright = leftorright && IsDualWielding();
@@ -4069,7 +4069,7 @@ void Actor::SetModalSpell(ieDword state, const char *spell)
 
 //this is just a stub function for now, attackstyle could be melee/ranged
 //even spells got this attack style
-int Actor::GetAttackStyle()
+int Actor::GetAttackStyle() const
 {
 	WeaponInfo wi;
 	//Non NULL if the equipped slot is a projectile or a throwing weapon
@@ -4324,7 +4324,14 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	return true;
 }
 
-int Actor::GetToHit(int bonus, ieDword Flags)
+int Actor::MeleePenalty() const
+{
+  if (GetMonkLevel()) return 0;
+  if (inventory.GetEquippedSlot()!=IW_NO_EQUIPPED) return 4;
+  return 0;
+}
+
+int Actor::GetToHit(int bonus, ieDword Flags) const
 {
 	int tohit = bonus;
 
@@ -4356,18 +4363,20 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 	if (Flags&WEAPON_USESTRENGTH) {
 		tohit += core->GetStrengthBonus(0,GetStat(IE_STR), GetStat(IE_STREXTRA) );
 	}
+	Actor *target = area->GetActorByGlobalID(LastTarget);
 
 	// if the target is using a ranged weapon while we're meleeing, we get a +4 bonus
 	if ((Flags&WEAPON_STYLEMASK) != WEAPON_RANGED) {
-		Actor *target = area->GetActorByGlobalID(LastTarget);
 		if (target && target->GetAttackStyle() == WEAPON_RANGED) {
 			tohit += 4;
 		}
 	}
 
+  // melee vs. unarmed
+  tohit += target->MeleePenalty() - MeleePenalty();
+
 	// add +4 attack bonus vs racial enemies
 	if (GetRangerLevel()) {
-		Actor *target = area->GetActorByGlobalID(LastTarget);
 		if (target && IsRacialEnemy(target)) {
 			tohit += 4;
 		}
@@ -4384,7 +4393,7 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
 
-int Actor::GetDefense(int DamageType)
+int Actor::GetDefense(int DamageType) const
 {
 	//specific damage type bonus.
 	int defense = 0;
@@ -5517,7 +5526,7 @@ bool Actor::HandleActorStance()
 	return false;
 }
 
-void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index)
+void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
 {
 	if (!anims) return;
 
@@ -5552,7 +5561,7 @@ void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index)
 	strnlwrcpy(Sound, tab->QueryField (index, col), 8);
 }
 
-void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index)
+void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 {
 	const char *resource = "";
 	char section[12];
@@ -5587,7 +5596,7 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index)
 	Sound[count]=0;
 }
 
-void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
+void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index) const
 {
 	if (PCStats && PCStats->SoundSet[0]) {
 		//resolving soundset (bg1/bg2 style)
@@ -5709,15 +5718,15 @@ void Actor::GetSoundFolder(char *soundset, int full) const
 	}
 }
 
-bool Actor::HasVVCCell(const ieResRef resource)
+bool Actor::HasVVCCell(const ieResRef resource) const
 {
 	return GetVVCCell(resource) != NULL;
 }
 
-ScriptedAnimation *Actor::GetVVCCell(const ieResRef resource)
+ScriptedAnimation *Actor::GetVVCCell(const ieResRef resource) const
 {
 	int j = true;
-	vvcVector *vvcCells=&vvcShields;
+	const vvcVector *vvcCells=&vvcShields;
 retry:
 	size_t i=vvcCells->size();
 	while (i--) {
@@ -5761,9 +5770,9 @@ retry:
 //this is a faster version of hasvvccell, because it knows where to look
 //for the overlay, it also returns the vvc for further manipulation
 //use this for the seven eyes overlay
-ScriptedAnimation *Actor::FindOverlay(int index)
+ScriptedAnimation *Actor::FindOverlay(int index) const
 {
-	vvcVector *vvcCells;
+	const vvcVector *vvcCells;
 
 	if (index>31) return NULL;
 
@@ -5863,7 +5872,7 @@ void Actor::Rest(int hours)
 }
 
 //returns the actual slot from the quickslot
-int Actor::GetQuickSlot(int slot)
+int Actor::GetQuickSlot(int slot) const
 {
 	assert(slot<8);
 	if (inventory.HasItemInSlot("",inventory.GetMagicSlot())) {
@@ -6348,7 +6357,7 @@ bool Actor::SetSpellState(unsigned int spellstate)
 }
 
 //returns true if spell state is already set
-bool Actor::HasSpellState(unsigned int spellstate)
+bool Actor::HasSpellState(unsigned int spellstate) const
 {
 	if (spellstate>=192) return false;
 	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
@@ -6801,7 +6810,7 @@ void Actor::ResetState()
 
 // doesn't check the range, but only that the azimuth and the target
 // orientation match with a +/-2 allowed difference
-bool Actor::IsBehind(Actor* target)
+bool Actor::IsBehind(Actor* target) const
 {
 	unsigned char tar_orient = target->GetOrientation();
 	// computed, since we don't care where we face
@@ -6818,7 +6827,7 @@ bool Actor::IsBehind(Actor* target)
 }
 
 // checks all the actor's stats to see if the target is her racial enemy
-bool Actor::IsRacialEnemy(Actor* target)
+bool Actor::IsRacialEnemy(Actor* target) const
 {
 	if (Modified[IE_HATEDRACE] == target->Modified[IE_RACE]) {
 		return true;
@@ -6900,14 +6909,14 @@ bool Actor::TryToHide() {
 	return true;
 }
 
-bool Actor::InvalidSpellTarget()
+bool Actor::InvalidSpellTarget() const
 {
 	if (GetStat(IE_STATE_ID) & (STATE_DEAD)) return true;
 	if (HasSpellState(SS_SANCTUARY)) return true;
 	return false;
 }
 
-bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range)
+bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range) const
 {
 	ieResRef spellres;
 
@@ -6931,7 +6940,7 @@ bool Actor::PCInDark() const
 	return false;
 }
 
-int Actor::GetClassMask()
+int Actor::GetClassMask() const
 {
 	int classmask = 0;
 	for (int i=0; i < ISCLASSES; i++) {

@@ -49,7 +49,7 @@ struct PolymorphCache;
 
 #define MAX_STATS 256
 #define MAX_LEVEL 128
-#define MAX_FEATS 96   //3*sizeof(ieDword)
+#define MAX_FEATS 96 //3*sizeof(ieDword)
 
 //modal states
 #define MS_NONE        0
@@ -371,7 +371,7 @@ public:
 	/** you better use SetStat, this stuff is only for special cases*/
 	void SetAnimationID(unsigned int AnimID);
 	/** returns the animations */
-	CharAnimations* GetAnims();
+	CharAnimations* GetAnims() const;
 	/** Re/Inits the Modified vector */
 	void RefreshEffects(EffectQueue *eqfx);
 	/** gets saving throws */
@@ -389,7 +389,7 @@ public:
 	/** Returns the difference */
 	int GetMod(unsigned int StatIndex);
 	/** Returns a Stat Base Value */
-	ieDword GetBase(unsigned int StatIndex);
+	ieDword GetBase(unsigned int StatIndex) const;
 	/** Sets a Base Stat Value */
 	bool SetBase(unsigned int StatIndex, ieDword Value);
 	bool SetBaseNoPCF(unsigned int StatIndex, ieDword Value);
@@ -520,7 +520,7 @@ public:
 	ITMExtHeader *GetRangedWeapon(WeaponInfo &wi) const;
 	/* Returns current weapon range and extended header
 	 if range is nonzero, then which is valid */
-	ITMExtHeader* GetWeapon(WeaponInfo &wi, bool leftorright=false);
+	ITMExtHeader* GetWeapon(WeaponInfo &wi, bool leftorright=false) const;
 	/* Creates player statistics */
 	void CreateStats();
 	/* Heals actor by days */
@@ -534,17 +534,19 @@ public:
 	/* Sets the modal spell after checks */
 	void SetModalSpell(ieDword state, const char *spell);
 	/* returns current attack style */
-	int GetAttackStyle();
+	int GetAttackStyle() const;
 	/* adds the combatants to the attackers list */
 	void AttackedBy(Actor *actor);
 	/* sets target for immediate attack */
 	void SetTarget( Scriptable *actor);
 	/* starts combat round*/
 	void InitRound(ieDword gameTime);
+	/* returns melee penalty */
+	int MeleePenalty() const;
 	/* gets the to hit value */
-	int GetToHit(int bonus, ieDword Flags);
+	int GetToHit(int bonus, ieDword Flags) const;
 	/* gets the defense against an attack */
-	int GetDefense(int DamageType) ;
+	int GetDefense(int DamageType) const;
 	/* get the current hit bonus */
 	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
 		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus, int &style);
@@ -570,9 +572,9 @@ public:
 	/* overridden method, won't walk if dead */
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
-	void ResolveStringConstant(ieResRef sound, unsigned int index);
-	void GetSoundFromINI(ieResRef Sound, unsigned int index);
-	void GetSoundFrom2DA(ieResRef Sound, unsigned int index);
+	void ResolveStringConstant(ieResRef sound, unsigned int index) const;
+	void GetSoundFromINI(ieResRef Sound, unsigned int index) const;
+	void GetSoundFrom2DA(ieResRef Sound, unsigned int index) const;
 	/* sets the quick slots */
 	void SetActionButtonRow(ActionButtonRow &ar);
 	/* updates the quick slots */
@@ -591,12 +593,12 @@ public:
 	/* remove a vvc from the list, graceful means animated removal */
 	void RemoveVVCell(const ieResRef vvcname, bool graceful);
 	/* returns true if actor already has the overlay (slow) */
-	bool HasVVCCell(const ieResRef resource);
+	bool HasVVCCell(const ieResRef resource) const;
 	/* returns overlay if actor already has it (slow) */
-	ScriptedAnimation *GetVVCCell(const ieResRef resource);
+	ScriptedAnimation *GetVVCCell(const ieResRef resource) const;
 	/* returns the vvc pointer to a hardcoded overlay */
 	/* if it exists (faster than hasvvccell) */
-	ScriptedAnimation *FindOverlay(int index);
+	ScriptedAnimation *FindOverlay(int index) const;
 	/* draw videocells */
 	void DrawVideocells(const Region &screen, vvcVector &vvcCells, const Color &tint);
 
@@ -610,13 +612,13 @@ public:
 	/* rememorizes spells, cures fatigue, etc */
 	void Rest(int hours);
 	/* returns the portrait icons list */
-	const unsigned char *GetStateString();
+	const unsigned char *GetStateString() const;
 	/* adds a state icon to the list */
 	void AddPortraitIcon(ieByte icon);
 	/* disables a state icon in the list, doesn't remove it! */
 	void DisablePortraitIcon(ieByte icon);
 	/* returns which slot belongs to the quickweapon slot */
-	int GetQuickSlot(int slot);
+	int GetQuickSlot(int slot) const;
 	/* Sets equipped Quick slot, if header is -1, then use the current one */
 	int SetEquippedQuickSlot(int slot, int header);
 	/* Uses an item on the target or point */
@@ -625,7 +627,7 @@ public:
 	/* Deducts a charge from an item */
 	void ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent);
 	/* If it returns true, then default AC=10 and the lesser the better */
-	int IsReverseToHit();
+	static int IsReverseToHit();
 	/* initialize the action buttons based on class. If forced, it will override
 		previously customized or set buttons. */
 	void InitButtons(ieDword cls, bool forced);
@@ -649,7 +651,7 @@ public:
 	/* Checks and sets a spellstate if it wasn't set yet */
 	bool SetSpellState(unsigned int spellstate);
 	/* Checks a spellstate */
-	bool HasSpellState(unsigned int spellstate);
+	bool HasSpellState(unsigned int spellstate) const;
 	/* Checks a feat */
 	bool HasFeat(unsigned int featindex) const;
 	/* Reports projectile immunity, nonzero if immune */
@@ -686,7 +688,7 @@ public:
 	bool BlocksSearchMap() const;
 	bool CannotPassEntrance() const;
 	void UseExit(int flag);
-	int GetReaction();
+	//int GetReaction() const;
 	/* Similar to Roll, but takes luck into account */
 	int LuckyRoll(int dice, int size, int add, bool critical=1, bool only_damage=0, Actor* opponent=NULL) const;
 	/* removes normal invisibility (type 0) */
@@ -696,23 +698,23 @@ public:
 	/* resets the invisibility, sanctuary and modal states */
 	void ResetState();
 	/* checks whether the actor is behind the target */
-	bool IsBehind(Actor* target);
+	bool IsBehind(Actor* target) const;
 	/* checks whether the target is the actor's racial enemy */
-	bool IsRacialEnemy(Actor* target);
+	bool IsRacialEnemy(Actor* target) const;
 	/* checks whether the actor can stay in the current modal state */
 	bool ModalSpellSkillCheck();
 	/* does all the game logic checks to see if the actor can hide */
 	bool TryToHide();
 	/* checks if the alignment matches one of the masking constants */
-	bool MatchesAlignmentMask(ieDword mask);
+	//bool MatchesAlignmentMask(ieDword mask);
 	/* returns true if this actor is untargetable */
-	bool InvalidSpellTarget();
+	bool InvalidSpellTarget() const;
 	/* returns true if the spell is useless to cast on target
 	or the spell's range is smaller than range */
-	bool InvalidSpellTarget(int spellnum, Actor *caster, int range);
+	bool InvalidSpellTarget(int spellnum, Actor *caster, int range) const;
 	/* returns true if the lightmap under the actor is dark */
 	bool PCInDark() const;
 	/* computes the actor's classmask (iwd2) */
-	int GetClassMask();
+	int GetClassMask() const;
 };
 #endif
