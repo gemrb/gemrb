@@ -39,7 +39,7 @@ protected:
 	struct _GstMveDemuxStream *video_data;
 	unsigned short video_width;
 	unsigned short video_height;
-	char *video_back_buf;
+	unsigned short *video_back_buf;
 	bool truecolour;
 	bool video_rendered_frame;
 	unsigned int video_frameskip;

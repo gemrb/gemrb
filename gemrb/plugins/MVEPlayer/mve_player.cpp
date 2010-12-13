@@ -311,15 +311,15 @@ void MVEPlayer::segment_video_init(unsigned char version) {
 	if (video_back_buf) free(video_back_buf);
 
 	unsigned int size = width * height * (truecolour ? 2 : 1);
-	video_back_buf = (char *)malloc(size * 2);
+	video_back_buf = (guint16 *)malloc(size * 2);
 	memset(video_back_buf, 0, size * 2);
 
 	video_data = (GstMveDemuxStream *)malloc(sizeof(GstMveDemuxStream));
 	video_data->code_map = NULL;
 	video_data->width = width;
 	video_data->height = height;
-	video_data->back_buf1 = (guint8 *)video_back_buf;
-	video_data->back_buf2 = (guint8 *)video_back_buf + size;
+	video_data->back_buf1 = video_back_buf;
+	video_data->back_buf2 = video_back_buf + size/2;
 	video_data->max_block_offset = (height - 7) * width - 8;
 }
 
@@ -387,7 +387,7 @@ void MVEPlayer::segment_video_data(unsigned short size) {
 	char *data = buffer + 14;
 
 	if (flags & MVE_VIDEO_DELTA_FRAME) {
-		guint8 *temp = video_data->back_buf1;
+		guint16 *temp = video_data->back_buf1;
 		video_data->back_buf1 = video_data->back_buf2;
 		video_data->back_buf2 = temp;
 	}
@@ -404,7 +404,7 @@ void MVEPlayer::segment_video_play() {
 	} else {
 		unsigned int dest_x = (outputwidth - video_data->width) >> 1;
 		unsigned int dest_y = (outputheight - video_data->height) >> 1;
-		host->showFrame(video_data->back_buf1, video_data->width, video_data->height, 0, 0, video_data->width, video_data->height, dest_x, dest_y);
+		host->showFrame( (guint8 *) video_data->back_buf1, video_data->width, video_data->height, 0, 0, video_data->width, video_data->height, dest_x, dest_y);
 	}
 
 	video_rendered_frame = true;

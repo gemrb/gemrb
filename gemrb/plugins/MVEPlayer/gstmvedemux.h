@@ -121,8 +121,8 @@ struct _GstMveDemuxStream {
   /*guint8 bpp;*/   /* bytes per pixel */
   guint8 *code_map;
   /*gboolean code_map_avail;*/
-  guint8 *back_buf1;
-  guint8 *back_buf2;
+  guint16 *back_buf1;
+  guint16 *back_buf2;
   guint32 max_block_offset;
   /*GstBuffer *palette;
   GstBuffer *buffer;*/
