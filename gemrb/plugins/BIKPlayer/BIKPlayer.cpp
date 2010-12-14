@@ -1417,7 +1417,7 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 			prev = c_last.data[plane] + 8*by*stride;
 			for (bx = 0; bx < bw; bx++, dst += 8, prev += 8) {
 				blk = get_value(BINK_SRC_BLOCK_TYPES);
-				if ((by & 1) && blk == 1) {
+				if ((by & 1) && (blk == SCALED_BLOCK) ) {
 					bx++;
 					dst  += 8;
 					prev += 8;
