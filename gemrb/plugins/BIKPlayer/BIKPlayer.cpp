@@ -292,8 +292,6 @@ bool BIKPlayer::next_frame()
 		return false;
 	}
 	binkframe frame = frames[frameCount++];
-	//frame.size = fileRead( frame.pos, inbuff, frame.size);
-	//ieDword audframesize = *(ieDword *) inbuff;
 	str->Seek(frame.pos, GEM_STREAM_START);
 	ieDword audframesize;
 	str->ReadDword(&audframesize);
@@ -482,7 +480,7 @@ int BIKPlayer::sound_init(bool need_init)
 	return ret;
 }
 
-void BIKPlayer::ff_init_scantable(uint8_t *permutation, ScanTable *st, const uint8_t *src_scantable){
+void BIKPlayer::ff_init_scantable(ScanTable *st, const uint8_t *src_scantable){
 	int i,j;
 	int end;
 
@@ -490,7 +488,7 @@ void BIKPlayer::ff_init_scantable(uint8_t *permutation, ScanTable *st, const uin
 
 	for(i=0; i<64; i++){
 		j = src_scantable[i];
-		st->permutated[i] = permutation[j];
+		st->permutated[i] = j;
 	}
 
 	end=-1;
@@ -524,14 +522,7 @@ int BIKPlayer::video_init(int w, int h)
 		return 1;
 	}
 
-	//pixel format is PIX_FMT_YUV420P
-	//idct permutation is used in various optimisations,
-	//we go with the simplest (no permutation)
-	for(i=0;i<64;i++) {
-		c_idct_permutation[i]=i;
-	}
-
-	ff_init_scantable(c_idct_permutation, &c_scantable, bink_scan);
+	ff_init_scantable(&c_scantable, bink_scan);
 
 	bw = (header.width  + 7) >> 3;
 	bh = (header.height + 7) >> 3;
@@ -1277,6 +1268,25 @@ static void put_pixels_clamped(const DCTELEM *block, uint8_t *pixels, int line_s
 	}
 }
 
+static void add_pixels_nonclamped(const DCTELEM *block, uint8_t *pixels, int line_size)
+{
+        int i;
+
+        /* read the pixels */
+        for(i=0;i<8;i++) {
+                pixels[0] += block[0];
+                pixels[1] += block[1];
+                pixels[2] += block[2];
+                pixels[3] += block[3];
+                pixels[4] += block[4];
+                pixels[5] += block[5];
+                pixels[6] += block[6];
+                pixels[7] += block[7];
+                pixels += line_size;
+                block += 8;
+        }
+}
+
 static void add_pixels_clamped(const DCTELEM *block, uint8_t *pixels, int line_size)
 {
 	int i;
@@ -1575,7 +1585,7 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 					clear_block(block);
 					v = v_gb.get_bits(7);
 					read_residue(block, v);
-					add_pixels_clamped(block, dst, stride);
+					add_pixels_nonclamped(block, dst, stride);
 					break;
 				case INTRA_BLOCK:
 					clear_block(block);

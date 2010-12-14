@@ -200,7 +200,6 @@ private:
 	int outputwidth, outputheight;
 	unsigned int video_skippedframes;
 	//bink specific
-	uint8_t c_idct_permutation[64];
 	ScanTable c_scantable;
 	Bundle c_bundle[BINK_NB_SRC];  ///< bundles for decoding all data types
 	Tree c_col_high[16];         ///< trees for decoding high nibble in "colours" data type
@@ -228,7 +227,7 @@ private:
 	void queueBuffer(int stream, unsigned short bits,
 		int channels, short* memory, int size, int samplerate);
 	int sound_init(bool need_init);
-	void ff_init_scantable(uint8_t *permutation, ScanTable *st, const uint8_t *src_scantable);
+	void ff_init_scantable(ScanTable *st, const uint8_t *src_scantable);
 	int video_init(int w, int h);
 	void av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den);
 	int ReadHeader();
