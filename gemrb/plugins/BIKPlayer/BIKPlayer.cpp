@@ -1239,6 +1239,24 @@ static void get_pixels(DCTELEM *block, const uint8_t *pixels, int line_size)
 	}
 }
 
+static void put_pixels_nonclamped(const DCTELEM *block, uint8_t *pixels, int line_size)
+{
+        int i;
+        /* read the pixels */
+        for(i=0;i<8;i++) {
+                pixels[0] = block[0];
+                pixels[1] = block[1];
+                pixels[2] = block[2];
+                pixels[3] = block[3];
+                pixels[4] = block[4];
+                pixels[5] = block[5];
+                pixels[6] = block[6];
+                pixels[7] = block[7];
+                pixels += line_size;
+                block += 8;
+        }
+}
+
 static void put_pixels_clamped(const DCTELEM *block, uint8_t *pixels, int line_size)
 {
 	int i;
@@ -1367,7 +1385,7 @@ void bink_idct(DCTELEM *block)
 static void idct_put(uint8_t *dest, int line_size, DCTELEM *block)
 {
 	bink_idct(block);
-	put_pixels_clamped(block, dest, line_size);
+	put_pixels_nonclamped(block, dest, line_size);
 }
 static void idct_add(uint8_t *dest, int line_size, DCTELEM *block)
 {
