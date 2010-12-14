@@ -37,9 +37,6 @@ typedef short DCTELEM;
 typedef int DWTELEM;
 typedef short IDWTELEM;
 
-/* pixel operations */
-#define MAX_NEG_CROP 1024
-
 /**
  * Scantable.
  */

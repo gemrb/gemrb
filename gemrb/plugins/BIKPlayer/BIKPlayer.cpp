@@ -59,12 +59,8 @@ static const int ff_wma_critical_freqs[25] = {
 	24500,
 };
 
-static uint8_t ff_cropTbl[256 + 2 * MAX_NEG_CROP] = {0, };
-
 BIKPlayer::BIKPlayer(void)
 {
-	int i;
-
 	video = core->GetVideoDriver();
 	inbuff = NULL;
 	maxRow = 0;
@@ -73,12 +69,6 @@ BIKPlayer::BIKPlayer(void)
 	//force initialisation of static tables
 	memset(bink_trees, 0, sizeof(bink_trees));
 	memset(table, 0, sizeof(table));
-
-	for(i=0;i<256;i++) ff_cropTbl[i + MAX_NEG_CROP] = i;
-	for(i=0;i<MAX_NEG_CROP;i++) {
-		ff_cropTbl[i] = 0;
-		ff_cropTbl[i + MAX_NEG_CROP + 256] = 255;
-    	}
 }
 
 BIKPlayer::~BIKPlayer(void)
@@ -1248,26 +1238,6 @@ static void put_pixels_nonclamped(const DCTELEM *block, uint8_t *pixels, int lin
         }
 }
 
-static void put_pixels_clamped(const DCTELEM *block, uint8_t *pixels, int line_size)
-{
-	int i;
-	uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
-
-	/* read the pixels */
-	for(i=0;i<8;i++) {
-		pixels[0] = cm[block[0]];
-		pixels[1] = cm[block[1]];
-		pixels[2] = cm[block[2]];
-		pixels[3] = cm[block[3]];
-		pixels[4] = cm[block[4]];
-		pixels[5] = cm[block[5]];
-		pixels[6] = cm[block[6]];
-		pixels[7] = cm[block[7]];
-		pixels += line_size;
-		block += 8;
-	}
-}
-
 static void add_pixels_nonclamped(const DCTELEM *block, uint8_t *pixels, int line_size)
 {
         int i;
@@ -1287,30 +1257,10 @@ static void add_pixels_nonclamped(const DCTELEM *block, uint8_t *pixels, int lin
         }
 }
 
-static void add_pixels_clamped(const DCTELEM *block, uint8_t *pixels, int line_size)
-{
-	int i;
-	uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
-
-	/* read the pixels */
-	for(i=0;i<8;i++) {
-		pixels[0] = cm[pixels[0] + block[0]];
-		pixels[1] = cm[pixels[1] + block[1]];
-		pixels[2] = cm[pixels[2] + block[2]];
-		pixels[3] = cm[pixels[3] + block[3]];
-		pixels[4] = cm[pixels[4] + block[4]];
-		pixels[5] = cm[pixels[5] + block[5]];
-		pixels[6] = cm[pixels[6] + block[6]];
-		pixels[7] = cm[pixels[7] + block[7]];
-		pixels += line_size;
-		block += 8;
-	}
-}
-
 static inline void copy_block(DCTELEM block[64], const uint8_t *src, uint8_t *dst, int stride)
 {
 	get_pixels(block, src, stride);
-	put_pixels_clamped(block, dst, stride);
+	put_pixels_nonclamped(block, dst, stride);
 }
 
 #define clear_block(block) memset( (block), 0, sizeof(DCTELEM)*64);
@@ -1397,10 +1347,11 @@ static void idct_put(uint8_t *dest, int line_size, DCTELEM *block)
 	bink_idct(block);
 	put_pixels_nonclamped(block, dest, line_size);
 }
+
 static void idct_add(uint8_t *dest, int line_size, DCTELEM *block)
 {
 	bink_idct(block);
-	add_pixels_clamped(block, dest, line_size);
+	add_pixels_nonclamped(block, dest, line_size);
 }
 
 int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
