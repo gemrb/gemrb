@@ -175,22 +175,6 @@ int VLC::alloc_table(int size)
 	return index;
 }
 
-#define GET_DATA(v, table, i, wrap, size) \
-{\
-	const uint8_t *ptr = (const uint8_t *)table + i * wrap;\
-	switch(size) {\
-	case 1:\
-	    v = *(const uint8_t *)ptr;\
-	    break;\
-	case 2:\
-	    v = *(const uint16_t *)ptr;\
-	    break;\
-	default:\
-	    v = *(const uint32_t *)ptr;\
-	    break;\
-	}\
-}
-
 int VLC::build_table(int table_nb_bits, int nb_codes,
 	             const void *bits, int bits_wrap, int bits_size,
 	             const void *codes, int codes_wrap, int codes_size,

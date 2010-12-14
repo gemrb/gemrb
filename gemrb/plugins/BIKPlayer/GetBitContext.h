@@ -29,47 +29,79 @@
 class VLC
 {
 public:
-    int bits;
-    int16_t (*table)[2]; ///< code, bits
-    int table_size, table_allocated;
+	int bits;
+	int16_t (*table)[2]; ///< code, bits
+	int table_size, table_allocated;
 public:
-int init_vlc(int nb_bits, int nb_codes,
-             const void *bits, int bits_wrap, int bits_size,
-             const void *codes, int codes_wrap, int codes_size,
-             int flags);
+	int init_vlc(int nb_bits, int nb_codes,
+		const void *bits, int bits_wrap, int bits_size,
+		const void *codes, int codes_wrap, int codes_size,
+		int flags);
 private:
-  int alloc_table(int size);
-  int build_table(int table_nb_bits, int nb_codes,
-             const void *bits, int bits_wrap, int bits_size,
-             const void *codes, int codes_wrap, int codes_size,
-             uint32_t code_prefix, int n_prefix, int flags);
+	int alloc_table(int size);
+	int build_table(int table_nb_bits, int nb_codes,
+		const void *bits, int bits_wrap, int bits_size,
+		const void *codes, int codes_wrap, int codes_size,
+		uint32_t code_prefix, int n_prefix, int flags);
 
 };
 
+#if defined(__arm__)
+#define GET_DATA(v, table, i, wrap, size) \
+{\
+	const uint8_t *ptr = (const uint8_t *)table + i * wrap;\
+	v = 0;\
+	switch(size) {\
+	default:\
+		v |= *((const uint8_t *)ptr+3) << 24;\
+		v |= *((const uint8_t *)ptr+2) << 16;\
+	case 2:\
+		v |= *((const uint8_t *)ptr+1) << 8;\
+	case 1:\
+		v |= *(const uint8_t *)ptr;\
+	}\
+}
+#else
+#define GET_DATA(v, table, i, wrap, size) \
+{\
+	const uint8_t *ptr = (const uint8_t *)table + i * wrap;\
+	switch(size) {\
+	case 1:\
+		v = *(const uint8_t *)ptr;\
+		break;\
+	case 2:\
+		v = *(const uint16_t *)ptr;\
+		break;\
+	default:\
+		v = *(const uint32_t *)ptr;\
+		break;\
+	}\
+}
+#endif
 
 #define AV_RL32(x)                           \
-    ((((const uint8_t*)(x))[3] << 24) |         \
-     (((const uint8_t*)(x))[2] << 16) |         \
-     (((const uint8_t*)(x))[1] <<  8) |         \
-      ((const uint8_t*)(x))[0]) 
+	((((const uint8_t*)(x))[3] << 24) |  \
+	(((const uint8_t*)(x))[2] << 16) |   \
+	(((const uint8_t*)(x))[1] <<  8) |   \
+	((const uint8_t*)(x))[0]) 
 
 class GetBitContext
 {
 public:
-    const uint8_t *buffer, *buffer_end;
-    int index;
-    int size_in_bits;
+	const uint8_t *buffer, *buffer_end;
+	int index;
+	int size_in_bits;
 public:
-    void debug(const char *prefix);
-    float get_float();
-    void skip_bits(int x) { index+=x; }
-    int get_bits_count() { return index; }
-    void get_bits_align32();
-    unsigned int get_bits(int x);
-    unsigned int peek_bits(int x);
-    unsigned int get_bits_long(int n);
-    void init_get_bits(const uint8_t *b, int bit_size);
-    void read_tree(Tree *tree);
+	void debug(const char *prefix);
+	float get_float();
+	void skip_bits(int x) { index+=x; }
+	int get_bits_count() { return index; }
+	void get_bits_align32();
+	unsigned int get_bits(int x);
+	unsigned int peek_bits(int x);
+	unsigned int get_bits_long(int n);
+	void init_get_bits(const uint8_t *b, int bit_size);
+	void read_tree(Tree *tree);
 private:
-    void merge( uint8_t *dst, uint8_t *src, int size);
+	void merge( uint8_t *dst, uint8_t *src, int size);
 };

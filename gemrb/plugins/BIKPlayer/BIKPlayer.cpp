@@ -1156,7 +1156,8 @@ int BIKPlayer::read_colors(Bundle *b)
 int BIKPlayer::read_dcs(Bundle *b, int start_bits, int has_sign)
 {
 	int i, j, len, len2, bsize, v, v2;
-	int16_t *dst = (int16_t*)b->cur_dec;
+	SET_INT_TYPE *dst = (SET_INT_TYPE*)b->cur_dec;
+	//int16_t *dst = (int16_t*)b->cur_dec;
 
 	CHECK_READ_VAL(v_gb, b, len);
 	if (has_sign) {
@@ -1166,7 +1167,8 @@ int BIKPlayer::read_dcs(Bundle *b, int start_bits, int has_sign)
 	} else {
 		v = v_gb.get_bits(start_bits);
 	}
-	*dst++ = v;
+	SET_INT_VALUE(dst, v);
+	//*dst++ = v;
 	len--;
 	for (i = 0; i < len; i += 8) {
 		len2 = FFMIN(len - i, 8);
@@ -1178,14 +1180,16 @@ int BIKPlayer::read_dcs(Bundle *b, int start_bits, int has_sign)
 					v2 = -v2;
 				}
 				v += v2;
-				*dst++ = v;
+				SET_INT_VALUE(dst, v);
+				//*dst++ = v;
 				if (v < -32768 || v > 32767) {
 					return -1;
 				}
 			}
 		} else {
 			for (j = 0; j < len2; j++) {
-				*dst++ = v;
+				SET_INT_VALUE(dst, v);
+				//*dst++ = v;
 			}
 		}
 	}
@@ -1204,8 +1208,9 @@ inline int BIKPlayer::get_value(int bundle)
 	if (bundle == BINK_SRC_X_OFF || bundle == BINK_SRC_Y_OFF) {
 		return (int8_t)*c_bundle[bundle].cur_ptr++;
 	}
-	ret = *(int16_t*)c_bundle[bundle].cur_ptr;
-	c_bundle[bundle].cur_ptr += 2;
+	GET_INT_VALUE(ret, c_bundle[bundle].cur_ptr);
+	//ret = *(int16_t*)c_bundle[bundle].cur_ptr;
+	//c_bundle[bundle].cur_ptr += 2;
 	return ret;
 }
 

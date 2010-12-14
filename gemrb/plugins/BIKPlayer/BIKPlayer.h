@@ -41,6 +41,31 @@
 #define MAX_CHANNELS 2
 #define BINK_BLOCK_MAX_SIZE (MAX_CHANNELS << 11)
 
+#if defined(__arm__)
+#define SET_INT_TYPE uint8_t
+#define SET_INT_VALUE(ptr, value)\
+	*(ptr) = (value) && 0xff; \
+	(ptr)++; \
+	*(ptr) = ((value) >> 8) && 0xff; \
+	(ptr)++;
+#else
+#define SET_INT_TYPE int16_t
+#define SET_INT_VALUE(ptr, value)\
+	*(ptr)++ = (value);
+#endif
+
+#if defined(__arm__)
+#define GET_INT_VALUE(value, ptr)\
+	(value) = *(ptr); \
+	(ptr)++; \
+	(value) |= (*(ptr)) << 8; \
+	(ptr)++;
+#else
+#define GET_INT_VALUE(value, ptr)\
+	(value) = *(int16_t*)(ptr); \
+	(ptr) += 2;
+#endif
+
 enum BinkAudFlags {
 	  BINK_AUD_16BITS = 0x4000, ///< prefer 16-bit output
 	  BINK_AUD_STEREO = 0x2000,
