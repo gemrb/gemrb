@@ -311,18 +311,18 @@ The original games hardcoded this information in the engine.
 .SH FILES
 .PD 0
 .TP 20
-.B /usr/local/etc/gemrb.cfg
+.B @SYSCONF_DIR@/gemrb.cfg
 system-wide configuration file
 
 .TP
-.B /usr/local/share/gemrb/override/
+.B @DATA_DIR@/override/
 directory with 
 .IR gemrb -distributed
 data files. These used to be hardcoded in the original engine. The files
 are sorted into directories for specific games.
 
 .TP
-.B /usr/local/share/gemrb/GUIScripts/
+.B @DATA_DIR@/GUIScripts/
 directory with Python scripts providing GUI setup and interaction. The files
 are sorted into directories for specific games.
 
