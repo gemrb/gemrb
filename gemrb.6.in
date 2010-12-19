@@ -3,39 +3,44 @@
 
 .\"###################################################
 .SH NAME 
-.B gemrb
+GemRB
 \- emulator for Infinity Engine-based games
 
 .\"###################################################
 .SH SYNOPSIS
 .B gemrb
-[\-c config-file]
+[\-c
+.IR CONFIG-FILE ]
 .br
 .B torment
 .br
 
 .\"###################################################
 .SH DESCRIPTION
-.I gemrb
+.B GemRB
 is an emulator for Infinity Engine-based games, fine RPGs like Baldur's Gate,
-Icewind Dale or Planescape: Torment. 
+Icewind Dale and Planescape: Torment.
 
-.I gemrb
-is only an engine; to actually play anything you have to have 
-data from the original games installed where they can be found by 
-.IR gemrb .
+.B GemRB
+reimplements only the game engine. To actually play anything, you have to have
+the data from the original game(s), installed or unpackaged where GemRB can find it.
+See the
+.I GamePath
+and
+.I CDn
+settings in the engine configuration file below. A full install is recommended.
 
 .\"###################################################
 .SH OPTIONS
 .TP
-.B \-c
-.I FILE
-.br
-use other configuration file than default
+.BI \-c " FILE"
+Use the specified configuration file
+.IR FILE " instead"
+of the default
 .IR gemrb.cfg .  
 
 .B Note:
-You can also use program's name as a mean to select the configuration file.
+You can also use the program's name as a mean to select the configuration file.
 For example, if the program's name is 
 .I torment 
 instead of
@@ -47,15 +52,16 @@ and only if it's not found it searches for
 
 To use this feature, just create a symbolic link
 .I torment
-pointing to
+pointing to the
 .I gemrb
-binary and run
-.IR torment .
+binary and then run
+.IR torment
+instead.
 
 .\"###################################################
 .SH Configuration File
 .PD 0
-Configuration file consists of pairs
+A configuration file consists of pairs
 .IR PARAMETER=VALUE ,
 each on its own line. The case of PARAMETER is not significant, 
 GameType is the same as GAMETYPE. If the same PARAMETER is defined 
@@ -70,7 +76,7 @@ Empty lines and lines starting with `#' (hash sign) are ignored.
 Type of the game. The value is a name of subdirectory in override/ 
 and GUIScripts/ directories
 with game type-specific files and scripts. It is at present also used
-for various tweaks hardcoded in GemRB engine.
+for various tweaks hardcoded in the GemRB engine.
 
 .TP
 .BR GameName =STRING
@@ -104,9 +110,17 @@ Path to the data files for the game's particular CDs.
 .BR Width =INT
 Game window width (in pixels).
 
+.B WARNING:
+This is not arbitrary but depends on the game data. For custom resolutions
+the widescreen mod needs to be used.
+
 .TP
 .BR Height =INT
 Game window height (in pixels).
+
+.B WARNING:
+This is not arbitrary but depends on the game data. For custom resolutions
+the widescreen mod needs to be used.
 
 .TP
 .BR Bpp =INT
@@ -114,8 +128,7 @@ Color depth of the game window (in bits per pixel).
 
 .TP
 .BR Fullscreen =(0|1)
-Whether the game should run in fullscreen mode. (Note that fullcreen mode is
-currently buggy).
+Whether the game should run in fullscreen mode.
 
 .\".TP
 .\".BR ForceStereo =(0|1)
@@ -126,9 +139,11 @@ currently buggy).
 
 .TP
 .BR TooltipDelay =INT
-Delay (in ms) before tooltips are displayed when the mouse is not moving.
-Reasonable number for this option is e.g.
+Delay (in miliseconds) before tooltips are displayed when the mouse is not moving.
+A reasonable number for this option is e.g.
 .IR 500 .
+The default is
+.IR 100 .
 
 .TP
 .BR VolumeAmbients =INT
@@ -172,12 +187,9 @@ the current FPS (Frames per Second) value is drawn in the top left window corner
 
 .TP
 .BR FogOfWar =(0|1)
-This parameter is meant for developers. If set to
+If set to
 .IR 1 ,
-the unexplored parts of an area are blacked out. Since the unexplored bitmap is
-not updated by actors yet, it's set to
-.I 0 
-by default.
+the unexplored parts of an area are blacked out. It is enabled by default.
 
 .TP
 .BR EnableCheatKeys =(0|1)
@@ -247,10 +259,16 @@ or
 You can use this parameter more than once.
 
 .TP
+.BR AudioDriver =(openal|sdlaudio|none)
+Use the specified plugin as the audio driver. The default is openal, while
+.I none
+will disable all audio.
+
+.TP
 .BR SaveAsOriginal =(0|1)
 Set this parameter to
 .IR 1 ,
-if you want to keep the save game compatible with the original engine.
+if you want to keep the save game compatible with the original engine. It is enabled by default.
 
 .TP
 .BR CachePath =PATH
@@ -259,7 +277,7 @@ files.
 
 .TP
 .BR GemRBPath =PATH
-Path to the GemRB installation. (To be obsoleted).
+Path to the GemRB installation. (To be obsoleted; preset at build time).
 
 .TP
 .BR GUIScriptsPath =PATH
@@ -301,7 +319,7 @@ Original games use this directory to place last-minute patches.
 
 .TP
 .BR GemRBOverridePath =PATH
-Path where gemrb looks for its game override directory.
+Path where GemRB looks for its game override directory.
 It defaults to
 .IR GemRBPath .
 The original games hardcoded this information in the engine.
@@ -317,7 +335,7 @@ system-wide configuration file
 .TP
 .B @DATA_DIR@/override/
 directory with 
-.IR gemrb -distributed
+.BR GemRB -distributed
 data files. These used to be hardcoded in the original engine. The files
 are sorted into directories for specific games.
 
@@ -341,7 +359,7 @@ cache directory
 .\"###################################################
 .SH BUGS
 Many.
-.I gemrb
+.B GemRB
 is still in an early development stage and not nearly complete. 
 
 If you stumble over something which is supposed to work, either make a bug report
