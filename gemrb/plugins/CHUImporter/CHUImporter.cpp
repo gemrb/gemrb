@@ -185,7 +185,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				if (!bam ) {
 					printMessage( "CHUImporter","Cannot Load Button Images, skipping control\n",LIGHT_RED );
 					/* IceWind Dale 2 has fake BAM ResRefs for some Buttons,
-					   this will handle bad ResRefs */
+					this will handle bad ResRefs */
 					win->AddControl( btn );
 					break;
 				}
@@ -230,7 +230,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->ReadWord( &KnobYPos );
 				str->ReadWord( &CapXPos );
 				str->ReadWord( &CapYPos );
-				Progressbar* pbar = new Progressbar(KnobStepsCount, true ); 
+				Progressbar* pbar = new Progressbar(KnobStepsCount, true );
 				pbar->ControlID = ControlID;
 				pbar->XPos = XPos;
 				pbar->YPos = YPos;
@@ -249,7 +249,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					ResourceHolder<ImageMgr> mos(MOSFile2);
 					img2 = mos->GetSprite2D();
 				}
-				
+
 				pbar->SetImage( img, img2 );
 				if( KnobStepsCount ) {
 					/* getting the bam */
@@ -302,7 +302,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					sldr->SetImage( IE_GUI_SLIDER_GRABBEDKNOB, img );
 				}
 				else {
-					 sldr->SetState(IE_GUI_SLIDER_BACKGROUND);
+					sldr->SetState(IE_GUI_SLIDER_BACKGROUND);
 				}
 				win->AddControl( sldr );
 			}
@@ -314,30 +314,41 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				ieResRef BGMos;
 				ieResRef FontResRef, CursorResRef;
 				ieWord maxInput;
-	      ieWord CurCycle, CurFrame;
-	      ieWord PosX, PosY;
+				ieWord CurCycle, CurFrame;
+				ieWord PosX, PosY;
+				ieWord Pos2X, Pos2Y;
+				ieVariable Initial;
 
 				str->ReadResRef( BGMos );
+				//These are two more MOS resrefs, probably unused
 				str->Seek( 16, GEM_CURRENT_POS );
 				str->ReadResRef( CursorResRef );
-	      str->ReadWord( &CurCycle );
-	      str->ReadWord( &CurFrame );
-	      str->ReadWord( &PosX );
-	      str->ReadWord( &PosY );
-				str->Seek( 4, GEM_CURRENT_POS );
+				str->ReadWord( &CurCycle );
+				str->ReadWord( &CurFrame );
+				str->ReadWord( &PosX );
+				str->ReadWord( &PosY );
+				//FIXME: I still don't know what to do with this point
+				//Contrary to forum posts, it is definitely not a scrollbar ID
+				str->ReadWord( &Pos2X );
+				str->ReadWord( &Pos2Y );
 				str->ReadResRef( FontResRef );
-				str->Seek( 34, GEM_CURRENT_POS );
+				//this field is still unknown or unused
+				str->Seek( 2, GEM_CURRENT_POS );
+				//This is really a text field, but apparently the original engine
+				//always writes it over, and never uses it
+				str->Read( Initial, 32 );
+				Initial[32]=0;
 				str->ReadWord( &maxInput );
 				Font* fnt = core->GetFont( FontResRef );
-	      
+
 				AnimationFactory* bam = ( AnimationFactory* )
 					gamedata->GetFactoryResource( CursorResRef,
 							IE_BAM_CLASS_ID,
 							IE_NORMAL );
 				Sprite2D *cursor = NULL;
-	      if (bam) {
+				if (bam) {
 					cursor = bam->GetFrame( CurCycle, CurFrame );
-	      }
+				}
 
 				ResourceHolder<ImageMgr> mos(BGMos);
 				Sprite2D *img = NULL;
@@ -355,6 +366,8 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				te->SetFont( fnt );
 				te->SetCursor( cursor );
 				te->SetBackGround( img );
+				//The original engine always seems to ignore this textfield
+				//te->SetText (Initial );
 				win->AddControl( te );
 			}
 			break;
