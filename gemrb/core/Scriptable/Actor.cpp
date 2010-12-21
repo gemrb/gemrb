@@ -4326,9 +4326,9 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 
 int Actor::MeleePenalty() const
 {
-  if (GetMonkLevel()) return 0;
-  if (inventory.GetEquippedSlot()!=IW_NO_EQUIPPED) return 4;
-  return 0;
+	if (GetMonkLevel()) return 0;
+	if (inventory.GetEquippedSlot()!=IW_NO_EQUIPPED) return 4;
+	return 0;
 }
 
 int Actor::GetToHit(int bonus, ieDword Flags) const
@@ -4372,8 +4372,8 @@ int Actor::GetToHit(int bonus, ieDword Flags) const
 		}
 	}
 
-  // melee vs. unarmed
-  tohit += target->MeleePenalty() - MeleePenalty();
+	// melee vs. unarmed
+	tohit += target->MeleePenalty() - MeleePenalty();
 
 	// add +4 attack bonus vs racial enemies
 	if (GetRangerLevel()) {
@@ -4594,7 +4594,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	int resisted = 0;
 
 	if (hittingheader->DiceThrown<256) {
-		damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, 0, 1, 0);
+		damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, 0, LR_CRITICAL);
 		damage += DamageBonus;
 		printf("| Damage %dd%d%+d = %d ",hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, damage);
 	} else {
@@ -6712,22 +6712,27 @@ void Actor::UseExit(int flag) {
 // luck does not affect critical hit chances:
 // if critical is set, it will return 1/sides on a critical, otherwise it can never
 // return a critical miss when luck is positive and can return a false critical hit
-int Actor::LuckyRoll(int dice, int size, int add, bool critical, bool only_damage, Actor* opponent) const
+int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, Actor* opponent) const
 {
 	assert(this != opponent);
 
 	ieDword stat;
-	if (only_damage) {
+	if (flags&LR_DAMAGELUCK) {
 		stat = IE_DAMAGELUCK;
 	} else {
 		stat = IE_LUCK;
 	}
 
-	int luck = (signed) GetStat(stat);
+	int luck = (signed) GetSafeStat(stat);
+	if (flags&LR_NEGATIVE) {
+		luck = -luck;
+	}
 	if (opponent) luck -= (signed) opponent->GetStat(stat);
 	if (dice < 1 || size < 1) {
 		return add + luck;
 	}
+
+	ieDword critical = flags&LR_CRITICAL;
 
 	if (dice > 100) {
 		int bonus;

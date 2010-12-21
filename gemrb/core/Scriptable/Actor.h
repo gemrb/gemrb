@@ -51,6 +51,11 @@ struct PolymorphCache;
 #define MAX_LEVEL 128
 #define MAX_FEATS 96 //3*sizeof(ieDword)
 
+//lucky roll
+#define LR_CRITICAL    1
+#define LR_DAMAGELUCK  2
+#define LR_NEGATIVE    4
+
 //modal states
 #define MS_NONE        0
 #define MS_BATTLESONG  1
@@ -690,7 +695,7 @@ public:
 	void UseExit(int flag);
 	//int GetReaction() const;
 	/* Similar to Roll, but takes luck into account */
-	int LuckyRoll(int dice, int size, int add, bool critical=1, bool only_damage=0, Actor* opponent=NULL) const;
+	int LuckyRoll(int dice, int size, int add, ieDword flags=1, Actor* opponent=NULL) const;
 	/* removes normal invisibility (type 0) */
 	void CureInvisibility();
 	/* removes sanctuary */
