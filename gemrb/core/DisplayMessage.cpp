@@ -221,10 +221,13 @@ void DisplayMessage::DisplayStringName(const char *text, unsigned int color, con
 	if (!text) return;
 	speaker_color = GetSpeakerColor(name, speaker);
 
-	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
-		+ strlen( text ) + 18);
-	char* newstr = ( char* ) malloc( newlen );
-	snprintf( newstr, newlen, DisplayFormatName, speaker_color, name, color, text );
-	DisplayString( newstr );
-	free( newstr );
+	//FIXME: what happens if there is no name?
+	if (name) {
+		int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
+			+ strlen( text ) + 18);
+		char* newstr = ( char* ) malloc( newlen );
+		snprintf( newstr, newlen, DisplayFormatName, speaker_color, name, color, text );
+		DisplayString( newstr );
+		free( newstr );
+	}
 }
