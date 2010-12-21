@@ -94,7 +94,7 @@ void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 		printMessage("SDLAudio", "Playing Next Music\n", WHITE );
 		core->GetMusicMgr()->PlayNext();
 
-		stream = stream + (cnt * 2);
+		stream = stream + cnt;
 		len = len - (cnt * 2);
 
 		if (!driver->MusicPlaying) {
