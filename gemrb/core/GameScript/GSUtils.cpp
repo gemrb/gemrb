@@ -1182,19 +1182,6 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 	//bool leftorright = (bool) ((attacksperround-attackcount)&1);
 	bool leftorright = false;
-
-	//will return false on any errors (eg, unusable weapon)
-	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus, style)) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	if (header) wi.range *= 10;
-	else wi.range = 0;
-
-	if ( target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
-		wi.range += 10;
-	}
 	Actor *tar = NULL;
 	ieDword targetID = 0;
 	if (target->Type==ST_ACTOR) {
@@ -1204,6 +1191,20 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	if (actor == tar) {
 		Sender->ReleaseCurrentAction();
 		return;
+	}
+
+	//will return false on any errors (eg, unusable weapon)
+	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus, style, tar)) {
+		actor->SetStance(IE_ANI_READY);
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	if (header) wi.range *= 10;
+	else wi.range = 0;
+
+	if ( target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
+		wi.range += 10;
 	}
 	if (!(flags&AC_NO_SOUND) ) {
 		if (actor->LastTarget != targetID) {

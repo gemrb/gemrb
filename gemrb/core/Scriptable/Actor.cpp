@@ -4202,7 +4202,7 @@ void Actor::InitRound(ieDword gameTime)
 }
 
 bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
-		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus, int &style)
+		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const
 {
 	tohit = GetStat(IE_TOHIT);
 	speed = -GetStat(IE_PHYSICALSPEED);
@@ -4229,7 +4229,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		if (!rangedheader) {
 			//display out of ammo verbal constant if there is any???
 			//DisplayStringCore(this, VB_OUTOFAMMO, DS_CONSOLE|DS_CONST );
-			SetStance(IE_ANI_READY);
+			//SetStance(IE_ANI_READY);
 			//set some trigger?
 			return false;
 		}
@@ -4241,7 +4241,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		break;
 	default:
 		//item is unsuitable for fight
-		SetStance(IE_ANI_READY);
+		//SetStance(IE_ANI_READY);
 		return false;
 	}//melee or ranged
 	//this flag is set by the bow in case of projectile launcher.
@@ -4315,7 +4315,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	// TODO: Elves get a racial THAC0 bonus with all swords and bows in BG2 (but not daggers)
 
 	//second parameter is left or right hand flag
-	tohit = GetToHit(THAC0Bonus, Flags);
+	tohit = GetToHit(THAC0Bonus, Flags, target);
 
 	//pst increased critical hits
 	if (pstflags && (Modified[IE_STATE_ID]&STATE_CRIT_ENH)) {
@@ -4331,7 +4331,7 @@ int Actor::MeleePenalty() const
 	return 0;
 }
 
-int Actor::GetToHit(int bonus, ieDword Flags) const
+int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 {
 	int tohit = bonus;
 
@@ -4363,22 +4363,23 @@ int Actor::GetToHit(int bonus, ieDword Flags) const
 	if (Flags&WEAPON_USESTRENGTH) {
 		tohit += core->GetStrengthBonus(0,GetStat(IE_STR), GetStat(IE_STREXTRA) );
 	}
-	Actor *target = area->GetActorByGlobalID(LastTarget);
 
-	// if the target is using a ranged weapon while we're meleeing, we get a +4 bonus
-	if ((Flags&WEAPON_STYLEMASK) != WEAPON_RANGED) {
-		if (target && target->GetAttackStyle() == WEAPON_RANGED) {
-			tohit += 4;
+	if (target) {
+		// if the target is using a ranged weapon while we're meleeing, we get a +4 bonus
+		if ((Flags&WEAPON_STYLEMASK) != WEAPON_RANGED) {
+			if (target->GetAttackStyle() == WEAPON_RANGED) {
+				tohit += 4;
+			}
 		}
-	}
 
-	// melee vs. unarmed
-	tohit += target->MeleePenalty() - MeleePenalty();
+		// melee vs. unarmed
+		tohit += target->MeleePenalty() - MeleePenalty();
 
-	// add +4 attack bonus vs racial enemies
-	if (GetRangerLevel()) {
-		if (target && IsRacialEnemy(target)) {
-			tohit += 4;
+		// add +4 attack bonus vs racial enemies
+		if (GetRangerLevel()) {
+			if (IsRacialEnemy(target)) {
+				tohit += 4;
+			}
 		}
 	}
 
@@ -4516,7 +4517,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	int speed, style;
 
 	//will return false on any errors (eg, unusable weapon)
-	if (!GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus, style)) {
+	if (!GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus, style, target)) {
 		return;
 	}
 

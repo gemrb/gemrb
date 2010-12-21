@@ -9621,7 +9621,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	int speed, style=0;
 
 	PyObject* dict = PyDict_New();
-	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus, style)) {
+	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, Flags, DamageBonus, speed, CriticalBonus, style, NULL)) {
 		//TODO: handle error, so tohit will still be set correctly?
 	}
 	PyDict_SetItemString(dict, "ToHit", PyInt_FromLong (tohit));

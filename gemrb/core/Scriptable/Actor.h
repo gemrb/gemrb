@@ -549,12 +549,12 @@ public:
 	/* returns melee penalty */
 	int MeleePenalty() const;
 	/* gets the to hit value */
-	int GetToHit(int bonus, ieDword Flags) const;
+	int GetToHit(int bonus, ieDword Flags, Actor *target) const;
 	/* gets the defense against an attack */
 	int GetDefense(int DamageType) const;
 	/* get the current hit bonus */
 	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
-		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus, int &style);
+		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const;
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
 	/* ensures we can deal damage to a target */
