@@ -27,7 +27,7 @@ MAINTAINERCLEANFILES = \
 	admin/mkinstalldirs \
 	admin/py-compile
 
-dist_man6_MANS = gemrb.6
+dist_man6_MANS = gemrb.6.in
 
 install-data-hook:
 	rm -f $(DESTDIR)$(bindir)/plugins/libgemrb_core.so
