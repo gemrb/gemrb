@@ -421,8 +421,7 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 	MapSet = (unsigned short *) malloc(sizeof(unsigned short) * Width * Height);
 	//Internal Searchmap
 	int y = SearchMap->GetHeight();
-	//smWidth = SearchMap->GetWidth();
-	SrchMap = (unsigned short *) malloc(sizeof(unsigned short) * Width * y);
+	SrchMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
 	while(y--) {
 		int x=SearchMap->GetWidth();
 		while(x--) {
