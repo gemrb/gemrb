@@ -3287,8 +3287,10 @@ static PyObject* GemRB_Button_SetSprite2D(PyObject * /*self*/, PyObject* args)
 
 	CObject<Sprite2D> spr(obj);
 
+/*
 	if (spr)
 		spr->acquire();
+*/
 	btn->SetPicture( spr.get() );
 
 	Py_INCREF( Py_None );
