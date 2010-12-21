@@ -1719,7 +1719,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard)
 
 unsigned int Map::GetBlocked(unsigned int x, unsigned int y)
 {
-	if (y>Height || x>Width) {
+	if (y>=Height || x>=Width) {
 		return 0;
 	}
 	unsigned int ret = SrchMap[y*Width+x];
