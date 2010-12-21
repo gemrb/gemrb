@@ -2557,6 +2557,12 @@ int fx_set_diseased_state (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case RPD_SLOW: //slow
 		break;
+	case RPD_MOLD: //mold touch (how)
+		EXTSTATE_SET(EXTSTATE_MOLD);
+		damage = 1;
+		break;
+	case RPD_MOLD2:
+		break;
 	default:
 		damage = 1;
 		break;
@@ -3931,7 +3937,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break; //find traps
 		case 3:
 			//detect secret doors
-			skill = target->LuckyRoll(1,100,0);
+			skill = target->LuckyRoll(1, 100, 0, 0);
 			detecttraps = false;
 			break;
 		case 2:
@@ -4843,7 +4849,7 @@ int fx_power_word_stun (Scriptable* Owner, Actor* target, Effect* fx)
 //0xd3 State:Imprisonment (avatar removal plus portrait icon)
 int fx_imprisonment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_inprisonment (%2d)\n", fx->Opcode );
+	if (0) printf( "fx_imprisonment (%2d)\n", fx->Opcode );
 	target->SetMCFlag(MC_HIDDEN, BM_OR);
 	target->AddPortraitIcon(PI_PRISON);
 	return FX_APPLIED;
@@ -4865,6 +4871,13 @@ int fx_freedom (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_maze (%2d)\n", fx->Opcode );
+	if (!fx->Parameter2 && fx->FirstApply) {
+		//get the maze dice number (column 3)
+		int stat = target->GetSafeStat(IE_INT);
+		int size = core->GetIntelligenceBonus(3, stat);
+		int dice = core->GetIntelligenceBonus(4, stat);
+		fx->Duration = core->GetGame()->GameTime+target->LuckyRoll(dice, size, 0, 0)*100;
+	}
 	target->SetMCFlag(MC_HIDDEN, BM_OR);
 	target->AddPortraitIcon(PI_MAZE);
 	return FX_APPLIED;

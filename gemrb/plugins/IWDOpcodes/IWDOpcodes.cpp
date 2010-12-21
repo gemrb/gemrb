@@ -1204,6 +1204,13 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
+	//timing
+	ieDword time = core->GetGame()->GameTime;
+	if ((fx->Parameter4==time) || (time%6) ) {
+		return FX_APPLIED;
+	}
+	fx->Parameter4=time;
+
 	ieDword damage = DAMAGE_FIRE;
 
 	if (fx->Parameter2==1) {
@@ -1730,10 +1737,26 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	//timing
-	if (core->GetGame()->GameTime%6) {
+	//don't apply it twice in a round
+	if (EXTSTATE_GET(EXTSTATE_SHROUD)) {
 		return FX_APPLIED;
 	}
+	EXTSTATE_SET(EXTSTATE_SHROUD);
+	//directly modifying the color of the target
+	if (fx->Parameter2==1) {
+		target->SetColorMod(0xff, RGBModifier::ADD, -1, 0, 0, 0x96);
+	}
+	else {
+		target->SetColorMod(0xff, RGBModifier::ADD, -1, 0x96, 0, 0);
+	}
+
+	//timing
+	ieDword time = core->GetGame()->GameTime;
+	if ((fx->Parameter4==time) || (time%6) ) {
+		return FX_APPLIED;
+	}
+	fx->Parameter4=time;
+
 	//inflicts damage calculated by dice values+parameter1
 	//creates damage opcode on everyone around. fx->Parameter2 - 0 fire, 1 - ice
 	ieDword damage = DAMAGE_FIRE;
@@ -1742,13 +1765,16 @@ int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx)
 		damage = DAMAGE_COLD;
 	}
 
-	target->Damage(fx->Parameter1, DAMAGE_FIRE, Owner);
-	ApplyDamageNearby(Owner, target, fx, DAMAGE_FIRE);
+	target->Damage(fx->Parameter1, damage, Owner);
+	ApplyDamageNearby(Owner, target, fx, damage);
 	return FX_APPLIED;
 }
 
+static ieResRef resref_sof1={"effsof1"};
+static ieResRef resref_sof2={"effsof2"};
+
 //0x116 ShroudOfFlame (iwd2)
-int fx_shroud_of_flame2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_shroud_of_flame2 (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_shroud_of_flame2 (%2d)\n", fx->Opcode );
 
@@ -1758,18 +1784,32 @@ int fx_shroud_of_flame2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (target->SetSpellState( SS_FLAMESHROUD)) return FX_APPLIED;
+	EXTSTATE_SET(EXTSTATE_SHROUD); //just for compatibility
 
 	if(enhanced_effects) {
 		target->SetColorMod(0xff, RGBModifier::ADD, 1, 0xa0, 0, 0);
 	}
 
-	//timing
-	//if (core->GetGame()->GameTime%6) {
-	//	return FX_APPLIED;
-	//}
-
 	//apply resource on hitter
-	memcpy(target->applyWhenBeingHit,fx->Resource,sizeof(ieResRef));
+	//actually, this should be a list of triggers
+	if (fx->Resource[0]) {
+		memcpy(target->applyWhenBeingHit,fx->Resource,sizeof(ieResRef));
+	} else {
+		memcpy(target->applyWhenBeingHit,resref_sof1,sizeof(ieResRef));
+	}
+
+	//timing
+	ieDword time = core->GetGame()->GameTime;
+	if ((fx->Parameter4==time) || (time%6) ) {
+		return FX_APPLIED;
+	}
+	fx->Parameter4=time;
+
+	if (fx->Resource2[0]) {
+		core->ApplySpell(fx->Resource2, target, Owner, fx->Power);
+	} else {
+		core->ApplySpell(resref_sof2, target, Owner, fx->Power);
+	}
 	return FX_APPLIED;
 }
 

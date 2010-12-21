@@ -42,6 +42,13 @@
 #define RPD_WIS 8
 #define RPD_CHA 9
 #define RPD_SLOW 10
+//HoW specific disease types
+#define RPD_MOLD 11
+#define RPD_MOLD2 12 
+//iwd2 specific disease types
+#define RPD_CONTAGION 13
+#define RPD_PEST 14
+#define RPD_DOLOR 15
 
 //appply spell on condition
 #define COND_GOTHIT 0
