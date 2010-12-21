@@ -640,7 +640,7 @@ bool GenerateAbilityTables()
 	strmodex = (ieWordSigned *) malloc (101 * 4 * sizeof(ieWordSigned) );
 	if (!strmodex)
 		return false;
-	intmod = (ieWordSigned *) malloc (tablesize * 3 * sizeof(ieWordSigned) );
+	intmod = (ieWordSigned *) malloc (tablesize * 5 * sizeof(ieWordSigned) );
 	if (!intmod)
 		return false;
 	dexmod = (ieWordSigned *) malloc (tablesize * 3 * sizeof(ieWordSigned) );
@@ -698,7 +698,7 @@ bool Interface::ReadAbilityTables()
 	//3rd ed doesn't have strmodex, but has a maximum of 40
 	if (!ret && (MaximumAbility<=25) )
 		return ret;
-	ret = ReadAbilityTable("intmod", intmod, 3, MaximumAbility + 1);
+	ret = ReadAbilityTable("intmod", intmod, 5, MaximumAbility + 1);
 	if (!ret)
 		return ret;
 	ret = ReadAbilityTable("hpconbon", conmod, 5, MaximumAbility + 1);
@@ -5121,17 +5121,11 @@ int Interface::GetStrengthBonus(int column, int value, int ex) const
 	return strmod[column*(MaximumAbility+1)+value]+strmodex[column*101+ex];
 }
 
-// we don't use the stuff maze yet
-// IE: bonus skill points are ignored and the plain int mod used!
+//The maze columns are used only in the maze spell, no need to restrict them further
 int Interface::GetIntelligenceBonus(int column, int value) const
 {
-	if (HasFeature(GF_3ED_RULES)) {
-		//learn spell, max spell level, max spell number on level, bonus skill points
-		if (column<0 || column>2) return -9999;
-	} else {
-		//learn spell, max spell level, max spell number on level, maze duration dice, maze duration dice size
-		if (column<0 || column>4) return -9999;
-	}
+	//learn spell, max spell level, max spell number on level, maze duration dice, maze duration dice size
+	if (column<0 || column>4) return -9999;
 
 	return intmod[column*(MaximumAbility+1)+value];
 }
