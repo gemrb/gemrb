@@ -129,7 +129,7 @@ Store* STOImporter::GetStore(Store *s)
 
 	str->Seek( s->ItemsOffset, GEM_STREAM_START );
 	for (i = 0; i < s->ItemsCount; i++) {
-	STOItem *item = s->items[i];
+		STOItem *item = s->items[i];
 		GetItem(item);
 		//it is important to handle this field as signed
 		if (item->InfiniteSupply>0) {
@@ -160,14 +160,9 @@ void STOImporter::GetItem(STOItem *it)
 {
 	CREItem *itm = core->ReadItem(str);
 	memcpy(it, itm, sizeof(CREItem) );
-/*
-	str->ReadResRef( it->ItemResRef );
-	str->ReadWord( &it->PurchasedAmount );
-	for (int i=0;i<CHARGE_COUNTERS;i++) {
-		str->ReadWord( it->Usages+i );
-	}
-	str->ReadDword( &it->Flags );
-*/
+	//core allocates CREItem!!!
+	delete itm;
+
 	str->ReadDword( &it->AmountInStock );
 	//if there was no item on stock, how this could be 0
 	//we hack-fix this here so it won't cause trouble
