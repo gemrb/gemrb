@@ -4884,11 +4884,26 @@ int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xd6 CastFromList
-int fx_select_spell (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+//GemRB extension: if fx->Parameter1 is set, it is the bitfield of castable spells (could be priest spells)
+int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_select_spell (%2d) %d\n", fx->Opcode, fx->Parameter2 );
 	//if parameter2==0 -> cast spells from 2da (all spells listed in 2da)
 	//if parameter2==1 -> cast spells from book (all known spells, no need of memorize)
+	Spellbook *sb = &target->spellbook;  
+	if(fx->Parameter2) {
+		if (!fx->Parameter1) {
+			fx->Parameter1=1<<IE_SPELL_TYPE_WIZARD;
+		}
+		sb->SetCustomSpellInfo(NULL, fx->Source, fx->Parameter1);
+	} else {
+		ieResRef *data;
+
+		int count = core->ReadResRefTable(fx->Resource, data);
+		sb->SetCustomSpellInfo(data, fx->Source, count);
+		delete data;
+	}
+	core->GetDictionary()->SetAt("Type",-1);
 	return FX_NOT_APPLIED;
 }
 

@@ -163,6 +163,12 @@ def AIPress ():
 def EmptyControls ():
 	global ActionsWindow
 
+	Selected = GemRB.GetSelectedSize()
+	if Selected==1:
+		pc = GemRB.GameGetFirstSelectedActor ()
+		#init spell list
+		GemRB.SpellCast (pc, -1, 0, 1)
+		
 	GemRB.SetVar ("ActionLevel", 0)
 	Window = ActionsWindow
 	for i in range (12):
@@ -331,6 +337,9 @@ def UpdateActionsWindow ():
 		ActionsWindow.SetupSpellIcons(globals(), pc, 4, TopIndex, 0, 1)
 	elif level == 4: #quick weapon/item ability selection
 		SetupItemAbilities(pc, GemRB.GetVar("Slot") )
+	elif level == 5: #all known mage spells
+		GemRB.SetVar ("Type", -1)
+		ActionsWindow.SetupSpellIcons(globals(), pc, -1, TopIndex, 0, 1)
 	return
 
 def ActionQWeaponPressed (which):
@@ -388,7 +397,10 @@ def ActionRightPressed ():
 	Type = GemRB.GetVar ("Type")
 	#Type is a bitfield if there is no level given
 	#This is to make sure cleric/mages get all spells listed
-	Max = GemRB.GetMemorizedSpellsCount(pc, Type, -1, 1)
+	if Type&128:
+		Max = GemRB.GetKnownSpellsCount(pc, Type&127, -1, 1)
+	else:
+		Max = GemRB.GetMemorizedSpellsCount(pc, Type, -1, 1)
 	TopIndex += 10
 	if TopIndex > Max - 10:
 		if Max>10:
@@ -520,8 +532,15 @@ def SpellPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	Spell = GemRB.GetVar ("Spell")
 	Type = GemRB.GetVar ("Type")
+	if Type==-1:
+		GemRB.SetVar ("ActionLevel", 0)
+		GemRB.SetVar("Type", 0)
 	GemRB.SpellCast (pc, Type, Spell, 1)
-	GemRB.SetVar ("ActionLevel", 0)
+	if GemRB.GetVar ("Type")!=-1:
+		GemRB.SetVar ("ActionLevel", 0)
+		#init spell list
+		GemRB.SpellCast (pc, -1, 0, 1)
+	GemRB.SetVar ("TopIndex", 0)
 	UpdateActionsWindow ()
 	return
 

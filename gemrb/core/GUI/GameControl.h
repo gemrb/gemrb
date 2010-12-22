@@ -187,6 +187,8 @@ private:
 	Actor *user;     //the user of item or spell
 public:
 	DialogHandler *dialoghandler;
+	//the name of the spell to cast
+	ieResRef spellName;
 	//using spell or item
 	int spellOrItem; // -1 = item, otherwise the spell type
 	//the user of spell or item
@@ -245,7 +247,7 @@ public:
 	/** Sets up targeting with spells or items */
 	void SetupItemUse(int slot, int header, Actor *actor, int targettype, int cnt);
 	/** Page is the spell type + spell level info */
-	void SetupCasting(int type, int level, int slot, Actor *actor, int targettype, int cnt);
+	void SetupCasting(ieResRef spellname, int type, int level, int slot, Actor *actor, int targettype, int cnt);
 	bool SetEvent(int eventType, EventHandler handler);
 };
 

@@ -100,8 +100,8 @@ struct SpellDescType {
 };
 
 typedef char EventNameType[17];
-#define IS_DROP		0
-#define IS_GET  	1
+#define IS_DROP	0
+#define IS_GET 	1
 
 typedef ieResRef ResRefPairs[2];
 
@@ -2481,7 +2481,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		links[WMP_WEST]    = atoi(newarea->QueryField(i,12));
 		//this is the number of links in the 2da, we don't need it
 		int linksto        = atoi(newarea->QueryField(i,13));
-		
+
 		unsigned int local = 0;
 		int linkcnt = wmap->GetLinkCount();
 		for (k=0;k<4;k++) {
@@ -2509,7 +2509,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		memset(entry->LoadScreenResRef, 0, 8);
 		memcpy(entry->AreaLinksIndex, indices, sizeof(entry->AreaLinksIndex) );
 		memcpy(entry->AreaLinksCount, links, sizeof(entry->AreaLinksCount) );
-		
+
 		int thisarea = wmap->GetEntryCount();
 		wmap->AddAreaEntry(entry);
 		wmap->AreaEntriesCount++;
@@ -2955,7 +2955,7 @@ static PyObject* GemRB_GameGetExpansion(PyObject * /*self*/, PyObject* /*args*/)
 	Game *game = core->GetGame();
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
-	}  
+	}
 	return PyInt_FromLong( game->Expansion );
 }
 
@@ -3287,10 +3287,6 @@ static PyObject* GemRB_Button_SetSprite2D(PyObject * /*self*/, PyObject* args)
 
 	CObject<Sprite2D> spr(obj);
 
-/*
-	if (spr)
-		spr->acquire();
-*/
 	btn->SetPicture( spr.get() );
 
 	Py_INCREF( Py_None );
@@ -4432,11 +4428,11 @@ PyDoc_STRVAR( GemRB_SetJournalEntry__doc,
 
 static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 {
-        int section=-1, chapter = -1, strref;
+	int section=-1, chapter = -1, strref;
 
-        if (!PyArg_ParseTuple( args, "i|ii", &strref, &section, &chapter )) {
-                return AttributeError( GemRB_SetJournalEntry__doc );
-        }
+	if (!PyArg_ParseTuple( args, "i|ii", &strref, &section, &chapter )) {
+		return AttributeError( GemRB_SetJournalEntry__doc );
+	}
 
 	Game *game = core->GetGame();
 	if (!game) {
@@ -4460,8 +4456,8 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 		game->AddJournalEntry( chapter, section, strref);
 	}
 
-        Py_INCREF( Py_None );
-        return Py_None;
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_GameIsBeastKnown__doc,
@@ -8962,13 +8958,14 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_SpellCast__doc,
 "SpellCast(slot, type, spell[, global])\n\n"
 "Makes the actor try to cast a spell. Type is the spell type like 3 for normal spells and 4 for innates.\n"
+"If type is -1, then the castable spell list will be deleted and no spell will be cast.\n"
 "Spell is the index of the spell in the memorised spell list.\n"
-"If global is set, the actor will be looked up by its global ID instead of party slot.");
+"If global is set, the actor will be looked up by its global ID instead of party slot.\n");
 
 static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 {
 	unsigned int slot;
-	unsigned int type;
+	int type;
 	unsigned int spell;
 	int global = 0;
 
@@ -8987,6 +8984,13 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	}
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
+	}
+
+	//don't cast anything, just reinit the spell list
+	if (type==-1) {
+		actor->spellbook.ClearSpellInfo();
+		Py_INCREF( Py_None );
+		return Py_None;
 	}
 
 	SpellExtHeader spelldata; // = SpellArray[spell];
@@ -9009,23 +9013,23 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	switch (spelldata.Target) {
 		case TARGET_SELF:
 			// FIXME: GA_NO_DEAD and such are not actually used by SetupCasting
-			gc->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellname, spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
 			gc->TryToCast(actor, actor);
 			break;
 		case TARGET_NONE:
 			//reset the cursor
 			gc->ResetTargetMode();
-			//this is always instant casting
+			//this is always instant casting without spending the spell
 			core->ApplySpell(spelldata.spellname, actor, actor, 0);
 			break;
 		case TARGET_AREA:
-			gc->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_POINT, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellname, spelldata.type, spelldata.level, spelldata.slot, actor, GA_POINT, spelldata.TargetNumber);
 			break;
 		case TARGET_CREA:
-			gc->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellname, spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
 			break;
 		case TARGET_DEAD:
-			gc->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, 0, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellname, spelldata.type, spelldata.level, spelldata.slot, actor, 0, spelldata.TargetNumber);
 			break;
 		case TARGET_INV:
 			//bring up inventory in the end???

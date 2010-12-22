@@ -1538,24 +1538,32 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 
 	spellCount--;
 	if (spellOrItem>=0) {
-		sprintf(Tmp, "NIDSpecial8()");
+		if (spellIndex<0) {
+			sprintf(Tmp, "SpellPointNoDec()");
+		} else {
+			sprintf(Tmp, "SpellPoint()");
+		}
 	} else {
 		//using item on target
-		sprintf(Tmp, "NIDSpecial7()");
+		sprintf(Tmp, "UseItemPoint()");
 	}
 	Action* action = GenerateAction( Tmp );
 	action->pointParameter=tgt;
 	if (spellOrItem>=0)
 	{
-		CREMemorizedSpell *si;
-		//spell casting at target
-		si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
-		if (!si)
-		{
-			ResetTargetMode();
-			return;
+		if (spellIndex<0) {
+			sprintf(action->string0Parameter,"%.8s",spellName);
+		} else {
+			CREMemorizedSpell *si;
+			//spell casting at target
+			si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
+			if (!si)
+			{
+				ResetTargetMode();
+				return;
+			}
+			sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
 		}
-		sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
 	}
 	else
 	{
@@ -1582,7 +1590,11 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 
 	spellCount--;
 	if (spellOrItem>=0) {
-		sprintf(Tmp, "NIDSpecial6()");
+		if (spellIndex<0) {
+			sprintf(Tmp, "NIDSpecial7()");
+		} else {
+			sprintf(Tmp, "NIDSpecial6()");
+		}
 	} else {
 		//using item on target
 		sprintf(Tmp, "NIDSpecial5()");
@@ -1590,15 +1602,19 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 	Action* action = GenerateActionDirect( Tmp, tgt);
 	if (spellOrItem>=0)
 	{
-		CREMemorizedSpell *si;
-		//spell casting at target
-		si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
-		if (!si)
-		{
-			ResetTargetMode();
-			return;
+		if (spellIndex<0) {
+			sprintf(action->string0Parameter,"%.8s",spellName);
+		} else {
+			CREMemorizedSpell *si;
+			//spell casting at target
+			si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
+			if (!si)
+			{
+				ResetTargetMode();
+				return;
+			}
+			sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
 		}
-		sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
 	}
 	else
 	{
@@ -2668,6 +2684,7 @@ Actor *GameControl::GetLastActor()
 //cnt is the number of different targets (usually 1)
 void GameControl::SetupItemUse(int slot, int header, Actor *u, int targettype, int cnt)
 {
+	memset(spellName, 0, sizeof(ieResRef));
 	spellOrItem = -1;
 	spellUser = u;
 	spellSlot = slot;
@@ -2685,8 +2702,9 @@ void GameControl::SetupItemUse(int slot, int header, Actor *u, int targettype, i
 //u is the caster
 //target type is a bunch of GetActor flags that alter valid targets
 //cnt is the number of different targets (usually 1)
-void GameControl::SetupCasting(int type, int level, int idx, Actor *u, int targettype, int cnt)
+void GameControl::SetupCasting(ieResRef spellname, int type, int level, int idx, Actor *u, int targettype, int cnt)
 {
+	memcpy(spellName, spellname, sizeof(ieResRef));
 	spellOrItem = type;
 	spellUser = u;
 	spellSlot = level;
