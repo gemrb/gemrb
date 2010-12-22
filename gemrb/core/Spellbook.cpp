@@ -891,6 +891,75 @@ SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, 
 	return NULL;
 }
 
+void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const ieResRef spellname, unsigned int idx)
+{
+	Spell *spl = gamedata->GetSpell(spellname);
+	if (!spl)
+		return;
+	ieDword level = 0;
+	SpellExtHeader *seh = FindSpellInfo(sm_level, sm_type, spellname);
+	if (seh) {
+		seh->count++;
+		return;
+	}
+	seh = new SpellExtHeader;
+	spellinfo.push_back( seh );
+ 
+	memcpy(seh->spellname, spellname, sizeof(ieResRef) );
+	int ehc;
+	
+	for (ehc = 0; ehc < spl->ExtHeaderCount-1; ehc++) {
+		if (level<spl->ext_headers[ehc+1].RequiredLevel) {
+						break;
+		}
+	}
+	SPLExtHeader *ext_header = spl->ext_headers+ehc;
+	seh->headerindex = ehc;
+	seh->level = sm_level;
+	seh->type = sm_type;
+	seh->slot = idx;
+	seh->count = 1;
+	seh->SpellForm = ext_header->SpellForm;
+	memcpy(seh->MemorisedIcon, ext_header->MemorisedIcon,sizeof(ieResRef) );
+	seh->Target = ext_header->Target;
+	seh->TargetNumber = ext_header->TargetNumber;
+	seh->Range = ext_header->Range;
+	seh->Projectile = ext_header->ProjectileAnimation;
+	seh->CastingTime = (ieWord) ext_header->CastingTime;
+	seh->strref = spl->SpellName;
+	gamedata->FreeSpell(spl, spellname, false);
+}
+
+void Spellbook::SetCustomSpellInfo(ieResRef *data, ieResRef spell, int type)
+{
+	ClearSpellInfo();
+	if (data) {
+		for(int i = 0; i<type;i++) {
+			AddSpellInfo(0,0,data[i],-1);
+		}
+		return;
+	}
+
+	//if data is not set, use the known spells list to set up the spellinfo list
+	for(int i = 0; i<NUM_BOOK_TYPES; i++) {
+		if ((1<<i)&type) {
+			for(unsigned int j = 0; j<spells[i].size(); j++) {
+				CRESpellMemorization* sm = spells[i][j];
+
+				for(unsigned int k=0;k<sm->known_spells.size(); k++) {
+					CREKnownSpell* slot = sm->known_spells[k];
+					if (!slot)
+						continue;
+					//skip the spell itself
+					if (!memicmp(slot->SpellResRef, spell, sizeof(ieResRef)))
+						continue;
+					AddSpellInfo(sm->Level, sm->Type, slot->SpellResRef, -1);
+				}
+			}
+		}
+	}
+}
+
 // grouping the castable spells
 void Spellbook::GenerateSpellInfo()
 {
@@ -905,41 +974,7 @@ void Spellbook::GenerateSpellInfo()
 					continue;
 				if (!slot->Flags)
 					continue;
-				Spell *spl = gamedata->GetSpell(slot->SpellResRef);
-				if (!spl)
-					continue;
-				ieDword level = 0;
-				SpellExtHeader *seh = FindSpellInfo(sm->Level, sm->Type, slot->SpellResRef);
-				if (seh) {
-					seh->count++;
-					continue;
-				}
-				seh = new SpellExtHeader;
-				spellinfo.push_back( seh );
-
-				memcpy(seh->spellname, slot->SpellResRef, sizeof(ieResRef) );
-				int ehc;
-
-				for (ehc = 0; ehc < spl->ExtHeaderCount-1; ehc++) {
-					if (level<spl->ext_headers[ehc+1].RequiredLevel) {
-						break;
-					}
-				}
-				SPLExtHeader *ext_header = spl->ext_headers+ehc;
-				seh->headerindex = ehc;
-				seh->level = sm->Level;
-				seh->type = sm->Type;
-				seh->slot = k;
-				seh->count = 1;
-				seh->SpellForm = ext_header->SpellForm;
-				memcpy(seh->MemorisedIcon, ext_header->MemorisedIcon,sizeof(ieResRef) );
-				seh->Target = ext_header->Target;
-				seh->TargetNumber = ext_header->TargetNumber;
-				seh->Range = ext_header->Range;
-				seh->Projectile = ext_header->ProjectileAnimation;
-				seh->CastingTime = (ieWord) ext_header->CastingTime;
-				seh->strref = spl->SpellName;
-				gamedata->FreeSpell(spl, slot->SpellResRef, false);
+				AddSpellInfo(sm->Level, sm->Type, slot->SpellResRef, k);
 			}
 		}
 	}
@@ -953,12 +988,6 @@ void Spellbook::dump()
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			CRESpellMemorization* sm = spells[i][j];
-			//if (!sm || !sm->Number) continue;
-			//if (!sm) continue;
-
-			//Never ever use field length qualifiers it is not portable, if you need to convert, convert to compatible values, anyway we don't need this!
-			//printf ( "type: %d: L: %d; N1: %d; N2: %d; T: %d; KC: %d; MC: %d\n", i,
-			//	 sm->Level, sm->Number, sm->Number2, sm->Type, (int) sm->known_spells.size(), (int) sm->memorized_spells.size() );
 
 			if (sm->known_spells.size())
 				printf( " Known spells:\n" );
