@@ -951,7 +951,7 @@ void Spellbook::SetCustomSpellInfo(ieResRef *data, ieResRef spell, int type)
 					if (!slot)
 						continue;
 					//skip the spell itself
-					if (!memicmp(slot->SpellResRef, spell, sizeof(ieResRef)))
+					if (!strnicmp(slot->SpellResRef, spell, sizeof(ieResRef)))
 						continue;
 					AddSpellInfo(sm->Level, sm->Type, slot->SpellResRef, -1);
 				}
