@@ -896,12 +896,16 @@ void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const 
 	Spell *spl = gamedata->GetSpell(spellname);
 	if (!spl)
 		return;
+	if (spl->ExtHeaderCount<1)
+		return;
+
 	ieDword level = 0;
 	SpellExtHeader *seh = FindSpellInfo(sm_level, sm_type, spellname);
 	if (seh) {
 		seh->count++;
 		return;
 	}
+
 	seh = new SpellExtHeader;
 	spellinfo.push_back( seh );
  
@@ -910,9 +914,10 @@ void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const 
 	
 	for (ehc = 0; ehc < spl->ExtHeaderCount-1; ehc++) {
 		if (level<spl->ext_headers[ehc+1].RequiredLevel) {
-						break;
+			break;
 		}
 	}
+	
 	SPLExtHeader *ext_header = spl->ext_headers+ehc;
 	seh->headerindex = ehc;
 	seh->level = sm_level;
