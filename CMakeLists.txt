@@ -103,11 +103,23 @@ else (${LAYOUT} MATCHES "opt")
 	SET_PATH( MENU_DIR ${CMAKE_INSTALL_PREFIX}/share/applications )
 endif (${LAYOUT} MATCHES "home")
 
+# check if this is a release version
+execute_process(
+	COMMAND echo ${GEMRB_VERSION}
+	COMMAND grep -q git # cmake creates a pipe by itself
+	RESULT_VARIABLE RC
+	OUTPUT_QUIET
+)
+if(${RC} GREATER 0) # no match or error
+	set (GIT_VERSION 0)
+else()
+	set (GIT_VERSION 1)
+endif()
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-	if ( NOT DISABLE_WERROR )
+	if ((NOT DISABLE_WERROR) AND GIT_VERSION)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-	endif ( NOT DISABLE_WERROR )
+	endif ()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W -Wpointer-arith -Wcast-align")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-format-y2k -Wno-long-long -fno-strict-aliasing")
 	# only export symbols explicitly marked to be exported.
