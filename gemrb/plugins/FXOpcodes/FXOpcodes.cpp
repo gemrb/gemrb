@@ -4904,6 +4904,9 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		core->FreeResRefTable(data, count);
 	}
 	core->GetDictionary()->SetAt("Type",-1);
+	//this is required, because not all of these opcodes are firing right at casting
+	core->GetDictionary()->SetAt("ActionLevel", 2);
+	core->SetEventFlag(EF_ACTION);
 	return FX_NOT_APPLIED;
 }
 
