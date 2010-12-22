@@ -1,48 +1,48 @@
 cmake_minimum_required(VERSION 2.4.4)
 if(COMMAND cmake_policy)
-      cmake_policy(SET CMP0003 NEW)
-      cmake_policy(SET CMP0005 NEW)
+	cmake_policy(SET CMP0003 NEW)
+	cmake_policy(SET CMP0005 NEW)
 endif(COMMAND cmake_policy)
 # allow empty else and endif constructs (available by default since 2.6.0)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 # prevent in-source builds
 IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-  MESSAGE(FATAL_ERROR "
-    CMake generation for this project is not allowed within the source directory!
-    Remove the CMakeCache.txt file and try again from another folder, e.g.:
-      rm CMakeCache.txt
-      mkdir build
-      cd build
-      cmake .."
-  )
+	MESSAGE(FATAL_ERROR "
+		CMake generation for this project is not allowed within the source directory!
+		Remove the CMakeCache.txt file and try again from another folder, e.g.:
+		  rm CMakeCache.txt
+		  mkdir build
+		  cd build
+		  cmake .."
+	)
 ENDIF()
 
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
 # to Release prior to calling PROJECT()
 IF(DEFINED CMAKE_BUILD_TYPE)
-   SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
+	SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
 ELSE(DEFINED CMAKE_BUILD_TYPE)
-   SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
+	SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
 ENDIF(DEFINED CMAKE_BUILD_TYPE)
 
 PROJECT(gemrb)
 # try to extract the version from the source
 execute_process(
-  COMMAND sed -n "s/\#define VERSION_GEMRB .\\([^\"]*\\).$/\\1/p" ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/includes/globals.h
-  OUTPUT_VARIABLE GEMRB_VERSION
-  RESULT_VARIABLE RC
-  OUTPUT_STRIP_TRAILING_WHITESPACE
+	COMMAND sed -n "s/\#define VERSION_GEMRB .\\([^\"]*\\).$/\\1/p" ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/includes/globals.h
+	OUTPUT_VARIABLE GEMRB_VERSION
+	RESULT_VARIABLE RC
+	OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 if(${RC} GREATER 0) # lookup failed
-  set(GEMRB_VERSION "unknown")
+	set(GEMRB_VERSION "unknown")
 endif(${RC} GREATER 0)
 message("Detected version: ${GEMRB_VERSION}")
 
 IF(PREFIX)
-  SET(PREFIX CACHE PATH "Abbreviation for CMAKE_INSTALL_PREFIX.")
-  SET(CMAKE_INSTALL_PREFIX ${PREFIX})
+	SET(PREFIX CACHE PATH "Abbreviation for CMAKE_INSTALL_PREFIX.")
+	SET(CMAKE_INSTALL_PREFIX ${PREFIX})
 ENDIF(PREFIX)
 
 if (NOT LAYOUT)
@@ -253,8 +253,8 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 IF(APPLE)
- FIND_LIBRARY(SDL_MAIN_LIBRARY_PATH SDLmain)
- FIND_LIBRARY(COCOA_LIBRARY_PATH Cocoa)
+	FIND_LIBRARY(SDL_MAIN_LIBRARY_PATH SDLmain)
+	FIND_LIBRARY(COCOA_LIBRARY_PATH Cocoa)
 ENDIF(APPLE)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake_config.h.in
@@ -285,9 +285,9 @@ ENDMACRO(ADD_GEMRB_OVERRIDE )
 
 # also put the chosen paths in the man page (Ubuntu)
 CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/gemrb.6.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/gemrb.6"
-  IMMEDIATE @ONLY
+	"${CMAKE_CURRENT_SOURCE_DIR}/gemrb.6.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/gemrb.6"
+	IMMEDIATE @ONLY
 )
 
 ADD_SUBDIRECTORY( gemrb )
@@ -298,28 +298,28 @@ INSTALL( FILES gemrb.desktop DESTINATION ${MENU_DIR} )
 INSTALL( FILES README INSTALL COPYING NEWS AUTHORS DESTINATION ${DOC_DIR} )
 
 CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-  IMMEDIATE @ONLY
+	"${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+	IMMEDIATE @ONLY
 )
 
 # copy the variable, since the file uses @VERSION@
 set(VERSION ${GEMRB_VERSION})
 CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/gemrb.spec.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/gemrb.spec"
-  IMMEDIATE @ONLY
+	"${CMAKE_CURRENT_SOURCE_DIR}/gemrb.spec.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/gemrb.spec"
+	IMMEDIATE @ONLY
 )
 
 ADD_CUSTOM_TARGET( uninstall
-  "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" )
+	"${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" )
 
 # make dist for a gzipped tarball of current HEAD
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${GEMRB_VERSION})
 add_custom_target( dist
-  COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD
-    | gzip --best > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.gz
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+	COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD
+		| gzip --best > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.gz
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
 message(STATUS "")
