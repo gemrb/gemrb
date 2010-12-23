@@ -1233,7 +1233,7 @@ int fx_death (Scriptable* Owner, Actor* target, Effect* fx)
 	ieDword damagetype = 0;
 	switch (fx->Parameter2) {
 	case 1:
-		BASE_STATE_SET(STATE_D4); //not sure, should be charred
+		BASE_STATE_SET(STATE_FLAME); //not sure, should be charred
 		damagetype = DAMAGE_FIRE;
 		break;
 	case 2:
@@ -1269,6 +1269,9 @@ int fx_death (Scriptable* Owner, Actor* target, Effect* fx)
 	default:
 		damagetype = DAMAGE_ACID;
 	}
+	//these two bits are turned off on death
+	BASE_STATE_CURE(STATE_FROZEN|STATE_PETRIFIED);
+
 	target->Damage(0, damagetype, Owner);
 	//death has damage type too
 	target->Die(Owner);
@@ -1414,7 +1417,12 @@ int fx_maximum_hp_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_maximum_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	if (STATE_GET( STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
+	//state_exploding is different in PST, probably not needed anyway
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN|STATE_ACID|STATE_FLAME) ) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (BASE_GET(IE_HITPOINTS)<=0 ) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -1548,6 +1556,7 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_morale_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
+	//FIXME: in bg2 this is hacked to set param1=10, param2=1, we might need some flag for this
 	STAT_MOD( IE_MORALE );
 	return FX_APPLIED;
 }
@@ -1576,10 +1585,8 @@ int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_poisoned_state (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_poisoned_state (%2d): Damage: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	//apparently this bit isn't set, but then why is it here
-	//this requires a little research
 	STATE_SET( STATE_POISONED );
-	//also this effect is executed every update
+
 	ieDword damage;
 	int tmp = fx->Parameter1;
 
@@ -1716,8 +1723,11 @@ int fx_magic_damage_resistance_modifier (Scriptable* /*Owner*/, Actor* target, E
 int fx_cure_dead_state (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_dead_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	Point p(fx->PosX, fx->PosY);
-	Resurrect(Owner, target, fx, p);
+	//call this only if the target is dead, otherwise some variables can get wrong
+	if (STATE_GET(STATE_DEAD) ) {
+		Point p(fx->PosX, fx->PosY);
+		Resurrect(Owner, target, fx, p);
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -2891,6 +2901,7 @@ int fx_protection_spelllevel (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_change_name (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_change_name_modifier (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
+	//this also changes the base stat
 	target->SetName(fx->Parameter1, 0);
 	return FX_NOT_APPLIED;
 }
@@ -2899,8 +2910,9 @@ int fx_change_name (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_experience_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_experience_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	//i believe this has mode too
-	target->AddExperience (fx->Parameter1);
+	//FIXME: this has mode too
+	//target->AddExperience (fx->Parameter1);
+	STAT_MOD( IE_XP );
 	return FX_NOT_APPLIED;
 }
 
@@ -4888,7 +4900,7 @@ int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_select_spell (%2d) %d\n", fx->Opcode, fx->Parameter2 );
-	Spellbook *sb = &target->spellbook;  
+	Spellbook *sb = &target->spellbook;
 	if(fx->Parameter2) {
 		//all known spells, no need to memorize
 		if (!fx->Parameter1) {
