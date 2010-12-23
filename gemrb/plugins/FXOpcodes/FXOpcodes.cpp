@@ -3383,10 +3383,10 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	core->GetResRefFrom2DA(monster_summoning_2da[fx->Parameter2], monster, hit, areahit);
 
 	if (!hit[0]) {
-		strnuprcpy(hit,fx->Resource2,8);
+		strnuprcpy(hit, fx->Resource2, 8);
 	}
 	if (!areahit[0]) {
-		strnuprcpy(areahit,fx->Resource3,8);
+		strnuprcpy(areahit, fx->Resource3, 8);
 	}
 
 	//the monster should appear near the effect position
@@ -6440,20 +6440,42 @@ int fx_timeless_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x137 GenerateWish
-#define WISHCOUNT 25
-static int wishlevels[WISHCOUNT]={10,10,10,10,0,10,0,15,0,0,0,0,0,0,15,0,0,
-17,9,17,17,9,9,9,0};
-
+//GemRB extension: you can use different tables and not only wisdom stat
 int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	ieResRef spl;
 
 	if (0) printf( "fx_generate_wish (%2d): Mod: %d\n", fx->Opcode, fx->Parameter2 );
-	int tmp = core->Roll(1,WISHCOUNT,0);
-	sprintf(spl,"SPWISH%02d",tmp);
-	core->ApplySpell(spl, target, Owner, wishlevels[tmp-1]);
+	if (!fx->Parameter2) {
+		fx->Parameter2=IE_WIS;
+	}
+	int stat = target->GetSafeStat(fx->Parameter2);
+	if (!fx->Resource[0]) {
+		memcpy(fx->Resource,"wishcode",8);
+	}
+	AutoTable tm(fx->Resource);
+	if (!tm) {
+		return FX_NOT_APPLIED;
+	}
+
+	int max = tm->GetRowCount();
+	int tmp = core->Roll(1,max,0);
+	int i = tmp;
+	bool pass = true;
+	while(--i!=tmp && pass) {
+		if (i<0) {
+			pass=false;
+			i=max-1;
+		}
+		int min = atoi(tm->QueryField(i, 1));
+		int max = atoi(tm->QueryField(i, 2));
+		if (stat>=min && stat<=max) break;
+	}
+	strnuprcpy(spl, tm->QueryField(i,0), 8);
+	core->ApplySpell(spl, target, Owner, fx->Power);
 	return FX_NOT_APPLIED;
 }
+
 //0x138 //see fx_crash, this effect is not fully enabled in original bg2/tob
 int fx_immunity_sequester (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
