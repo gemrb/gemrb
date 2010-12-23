@@ -189,7 +189,7 @@ void GameScript::RealSetGlobalTimer(Scriptable* Sender, Action* parameters)
 	ieDword mytime=core->GetGame()->RealTime;
 
 	SetVariable( Sender, parameters->string0Parameter,
-		parameters->int0Parameter + mytime);
+		parameters->int0Parameter*AI_UPDATE_TIME + mytime);
 }
 
 void GameScript::ChangeAllegiance(Scriptable* Sender, Action* parameters)
