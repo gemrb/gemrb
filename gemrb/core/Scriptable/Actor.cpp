@@ -475,10 +475,12 @@ void Actor::SetName(int strref, unsigned char type)
 	if (type!=2) {
 		if (LongName) free(LongName);
 		LongName = core->GetString( strref, IE_STR_REMOVE_NEWLINE );
+		LongStrRef = strref;
 	}
 	if (type!=1) {
 		if (ShortName) free(ShortName);
 		ShortName = core->GetString( strref, IE_STR_REMOVE_NEWLINE );
+		ShortStrRef = strref;
 	}
 }
 
