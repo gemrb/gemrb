@@ -270,7 +270,7 @@ IDS
 0x10c	ExploreModifier
 0x10d	ScreenShake
 0x10e	Cure:CasterHold
-0x10f	AvatarRemoval
+0x10f	SummonDisable
 0x110	ApplyEffectRepeat
 0x111	RemoveProjectile
 0x112	TeleportToTarget

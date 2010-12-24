@@ -116,7 +116,7 @@ static int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx); //1
 static int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx); //101, duff in iwd2
 static int fx_resist_spell (Scriptable* Owner, Actor* target, Effect* fx); //102
 static int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx); //103
-//int fx_avatar_removal (Scriptable* Owner, Actor* target, Effect* fx); //104
+static int fx_avatar_removal (Scriptable* Owner, Actor* target, Effect* fx); //104
 //int fx_immunity_effect2 (Scriptable* Owner, Actor* target, Effect* fx); //105
 static int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx); //106
 static int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx); //107
@@ -255,6 +255,7 @@ static EffectRef effectnames[] = {
 	{ "UmberHulkGaze", fx_umberhulk_gaze, -1}, //100
 	{ "ZombieLordAura", fx_zombielord_aura, -1},//101, duff in iwd2
 	{ "SummonCreature2", fx_summon_creature2, -1}, //103
+	{ "AvatarRemoval", fx_avatar_removal, -1}, //104
 	{ "SummonPomab", fx_summon_pomab, -1}, //106
 	{ "ControlUndead", fx_control_undead, -1}, //107
 	{ "StaticCharge", fx_static_charge, -1}, //108
@@ -1373,7 +1374,13 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0x104 AvatarRemovalModifier (same as bg2)
+//0x104 AvatarRemoval
+int fx_avatar_removal (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	BASE_SET(IE_AVATARREMOVAL, 1);
+	return FX_NOT_APPLIED;
+}
+
 //0x105 immunity to effect (same as bg2?)
 //0x106 SummonPomab
 

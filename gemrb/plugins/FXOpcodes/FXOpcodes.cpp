@@ -5895,16 +5895,17 @@ int fx_unpause_caster (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->fxqueue.RemoveAllEffects(fx_pause_caster_modifier_ref);
 	return FX_NOT_APPLIED;
 }
-// 0x10f AvatarRemoval
-// 0x104 AvatarRemoval (iwd)
+
+// 0x10f SummonDisable (bg2)
 int fx_avatar_removal (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_avatar_removal (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	//FIXME: this is a permanent irreversible effect in IWD
-	//if it is different in bg2, then create another effect
-	//bg2 calls this SummonDisable
-	BASE_SET(IE_AVATARREMOVAL, 1);
-	return FX_NOT_APPLIED;
+	STAT_SET(IE_SUMMONDISABLE, 1);
+	STAT_SET(IE_CASTERHOLD, 1);
+	if (fx->Parameter2==1) {
+		STAT_SET(IE_AVATARREMOVAL, 1);
+	}
+	return FX_APPLIED;
 }
 
 /* note/TODO from Taimon:
