@@ -35,21 +35,6 @@ inline static Targets* ReturnActorAsTarget(Actor *aC)
 	return tgts;
 }
 
-/*Actor *FindActorNearby(const char *name, Map *except, int ga_flags)
-{
-	Game *game = core->GetGame();
-	size_t mc = game->GetLoadedMapCount();
-	while(mc--) {
-		Map *map = game->GetMap(mc);
-		if (map==except) continue;
-		Actor * aC = map->GetActor(name, ga_flags);
-		if (aC) {
-			return aC;
-		}
-	}
-	return NULL;
-}*/
-
 /* do IDS filtering: [PC], [ENEMY], etc */
 inline static bool DoObjectIDSCheck(Object *oC, Actor *ac, bool *filtered) {
 	for (int j = 0; j < ObjectIDSCount; j++) {
@@ -224,21 +209,6 @@ Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags)
 	tgts = DoObjectFiltering(Sender, tgts, oC, ga_flags);
 	return tgts;
 }
-
-/*Targets *GetAllObjectsNearby(Scriptable* Sender, Object* oC, int ga_flags)
-{
-	Game *game = core->GetGame();
-	size_t mc = game->GetLoadedMapCount();
-	while(mc--) {
-		Map *map = game->GetMap(mc);
-		if (map==Sender->GetCurrentArea()) continue;
-		Targets *tgts = GetAllObjects(map, Sender, oC, ga_flags);
-		if (tgts) {
-			return tgts;
-		}
-	}
-	return NULL;
-}*/
 
 Targets *GetAllActors(Scriptable *Sender, int ga_flags)
 {

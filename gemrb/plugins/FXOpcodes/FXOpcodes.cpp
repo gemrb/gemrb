@@ -35,6 +35,7 @@
 #include "TileMap.h" //needs for knock!
 #include "damages.h"
 #include "GameScript/GSUtils.h" //needs for MoveBetweenAreasCore
+#include "GameScript/Matching.h" //needs for GetAllObjects
 #include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
 #include "PolymorphCache.h" // fx_polymorph
@@ -5631,7 +5632,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (Owner->Type==ST_ACTOR) {
 		skill = ((Actor *)Owner)->GetStat(IE_SETTRAPS);
-		roll = core->Roll(1,100,0);
+		roll = target->LuckyRoll(1,100,0,LR_NEGATIVE);
 	} else {
 		roll=0;
 		skill=0;
@@ -5639,8 +5640,18 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (roll>skill) {
 		//failure
-		displaymsg->DisplayConstantStringName(STR_SNAREFAILED, 0xf0f0f0, target);
-		//TODO check luck and do some damage effect on target
+		displaymsg->DisplayConstantStringName(STR_SNAREFAILED, 0xf0f0f0, target);		
+		if (target->LuckyRoll(1,100,0)<25) {
+			ieResRef spl;
+			
+			strnuprcpy(spl, fx->Resource, 8);
+			if (strlen(spl)<8) {
+			  strcat(spl,"F");
+			} else {
+			  spl[7]='F';
+			}
+			core->ApplySpell(spl, target, Owner, fx->Power);
+		}
 		return FX_NOT_APPLIED;
 	}
 	//success
@@ -6028,13 +6039,20 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	Map *map = target->GetCurrentArea();
 	if (map) {
-		Actor *victim = map->GetActorByGlobalID(target->LastAttacker);
-		if (victim) {
+		Object oC;
+		oC.objectFields[0]=EA_ENEMY;
+		Targets *tgts = GetAllObjects(map, target, &oC, GA_NO_DEAD);
+		int rnd = core->Roll(1,tgts->Count(),-1);
+		Actor *victim = (Actor *) tgts->GetTarget(rnd, ST_ACTOR);
+		delete tgts;		
+		if (victim && PersonalDistance(victim, target)>20) {
 			target->SetPosition( victim->Pos, true, 0 );
+			target->SetColorMod(0xff, RGBModifier::ADD, 0x50, 0xff, 0xff, 0xff, 0);
 		}
 	}
 	return FX_NOT_APPLIED;
 }
+
 // 0x113 HideInShadowsModifier
 int fx_hide_in_shadows_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -6042,6 +6060,7 @@ int fx_hide_in_shadows_modifier (Scriptable* /*Owner*/, Actor* target, Effect* f
 	STAT_MOD( IE_HIDEINSHADOWS );
 	return FX_APPLIED;
 }
+
 // 0x114 DetectIllusionsModifier
 int fx_detect_illusion_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -6049,6 +6068,7 @@ int fx_detect_illusion_modifier (Scriptable* /*Owner*/, Actor* target, Effect* f
 	STAT_MOD( IE_DETECTILLUSIONS );
 	return FX_APPLIED;
 }
+
 // 0x115 SetTrapsModifier
 int fx_set_traps_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -6074,6 +6094,7 @@ int fx_renable_button (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->fxqueue.RemoveAllEffectsWithParam( fx_disable_button_ref, fx->Parameter2 );
 	return FX_NOT_APPLIED;
 }
+
 // 0x118 ForceSurgeModifier
 int fx_force_surge_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {

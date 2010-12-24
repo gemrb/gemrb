@@ -43,6 +43,7 @@ struct RGBModifier {
 		TINT,
 		BRIGHTEN
 	} type;
+	bool locked;
 };
 
 

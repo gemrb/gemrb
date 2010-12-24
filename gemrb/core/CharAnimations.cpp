@@ -2338,6 +2338,7 @@ void CharAnimations::PulseRGBModifiers()
 			GlobalColorMod.type = RGBModifier::NONE;
 			GlobalColorMod.phase = 0;
 			GlobalColorMod.speed = 0;
+			GlobalColorMod.locked = false;
 		}
 	}
 
@@ -2347,6 +2348,12 @@ void CharAnimations::PulseRGBModifiers()
 		{
 			ColorMods[i].phase += inc;
 			change[i>>3] = true;
+			if (ColorMods[i].phase > 2*ColorMods[i].speed) {
+				ColorMods[i].type = RGBModifier::NONE;
+				ColorMods[i].phase = 0;
+				ColorMods[i].speed = 0;
+				ColorMods[i].locked = false;
+			}
 		}
 	}
 

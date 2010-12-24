@@ -2153,12 +2153,16 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	//put all special cleanup calls here
 	CharAnimations* anims = GetAnims();
 	if (anims) {
-		anims->GlobalColorMod.type = RGBModifier::NONE;
-		anims->GlobalColorMod.speed = 0;
+		if (!anims->GlobalColorMod.locked) {
+			anims->GlobalColorMod.type = RGBModifier::NONE;
+			anims->GlobalColorMod.speed = 0;
+		}
 		unsigned int location;
 		for (location = 0; location < 32; ++location) {
-			anims->ColorMods[location].type = RGBModifier::NONE;
-			anims->ColorMods[location].speed = 0;
+			if (!anims->ColorMods[location].phase) {
+				anims->ColorMods[location].type = RGBModifier::NONE;
+				anims->ColorMods[location].speed = 0;
+			}
 		}
 	}
 	spellbook.ClearBonus();
@@ -4890,6 +4894,8 @@ void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 	if (!ca) return;
 
 	if (location == 0xff) {
+		if (phase && ca->GlobalColorMod.locked) return;
+		ca->GlobalColorMod.locked = !phase;
 		ca->GlobalColorMod.type = type;
 		ca->GlobalColorMod.speed = speed;
 		ca->GlobalColorMod.rgb.r = r;
@@ -4906,6 +4912,7 @@ void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 	}
 	//00xx0yyy-->000xxyyy
 	if (location&0xffffffc8) return; //invalid location
+	if (phase && ca->ColorMods[location].locked) return;
 	location = (location &7) | ((location>>1)&0x18);
 	ca->ColorMods[location].type = type;
 	ca->ColorMods[location].speed = speed;
