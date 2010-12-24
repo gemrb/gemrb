@@ -1,12 +1,18 @@
-GemRB git (2bd6d0e):
+GemRB git (bf8b5ac809ea):
   New features:
     - 
+    - subspell selection (spell immunity, nahal's reckless dweomer...)
+    - compatibility with the bg2 demo
 
   Improved features:
     - 
+    - bink player has less artifacts
+    - combat, effects, banters
     - bugfixes
 
   Applied patches:
+    a set of patches for Android support from Beholder
+    arm compilation fixes by ShadowJack
 
 GemRB V0.6.3 git (2010-11-21)
   New features:
