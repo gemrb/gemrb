@@ -287,8 +287,8 @@ def DisplayItem (itemresref, type):
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
-	#description icon
-	if GUICommon.GameIsBG2() or GUICommon.GameIsPST():
+	# description icon (not present in iwds)
+	if not GUICommon.GameIsIWD1() and not GUICommon.GameIsIWD2():
 		Button = Window.GetControl (7)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		if GUICommon.GameIsPST():
