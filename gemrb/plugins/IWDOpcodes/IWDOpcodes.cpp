@@ -1375,7 +1375,7 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //0x104 AvatarRemoval
-int fx_avatar_removal (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_avatar_removal (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
 	BASE_SET(IE_AVATARREMOVAL, 1);
 	return FX_NOT_APPLIED;
