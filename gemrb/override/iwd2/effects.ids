@@ -266,7 +266,7 @@ IDS
 0x108	StaticCharge
 0x109	CloakOfFear
 0x10a	MovementRateModifier3
-0x10b	RemoveConfusion
+0x10b	Cure:Confusion
 0x10c	EyeOfTheMind
 0x10d	EyeOfTheSword
 0x10e	EyeOfTheMage
