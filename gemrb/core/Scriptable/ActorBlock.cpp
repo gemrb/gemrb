@@ -989,7 +989,7 @@ void Selectable::SetCircle(int circlesize, const Color &color, Sprite2D* normal_
 int Selectable::WantDither()
 {
 	//if dithering is disabled globally, don't do it
-	if (core->FogOfWar&4) {
+	if (core->FogOfWar&FOG_DITHERSPRITES) {
 		return 0;
 	}
 	//if actor is dead, dither it if polygon wants
