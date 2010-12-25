@@ -41,7 +41,6 @@ static bool enhanced_effects = false;
 //a scripting object for enemy (used for enemy in line of sight check)
 static Trigger *Enemy = NULL;
 
-#define PI_CONFUSION    3
 #define PI_PROTFROMEVIL 9
 #define PI_FREEACTION   19
 #define PI_BARKSKIN     20
@@ -123,7 +122,7 @@ static int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx); //1
 static int fx_static_charge (Scriptable* Owner, Actor* target, Effect* fx); //108
 static int fx_cloak_of_fear (Scriptable* Owner, Actor* target, Effect* fx); //109
 //int fx_movement_modifier (Scriptable* Owner, Actor* target, Effect* fx); //10a
-static int fx_remove_confusion (Scriptable* Owner, Actor* target, Effect* fx);//10b
+//int fx_remove_confusion (Scriptable* Owner, Actor* target, Effect* fx);//10b
 static int fx_eye_of_the_mind (Scriptable* Owner, Actor* target, Effect* fx);//10c
 static int fx_eye_of_the_sword (Scriptable* Owner, Actor* target, Effect* fx);//10d
 static int fx_eye_of_the_mage (Scriptable* Owner, Actor* target, Effect* fx);//10e
@@ -260,7 +259,6 @@ static EffectRef effectnames[] = {
 	{ "ControlUndead", fx_control_undead, -1}, //107
 	{ "StaticCharge", fx_static_charge, -1}, //108
 	{ "CloakOfFear", fx_cloak_of_fear, -1}, //109 how/iwd2
-	{ "RemoveConfusion", fx_remove_confusion, -1},//10b
 	{ "EyeOfTheMind", fx_eye_of_the_mind, -1}, //10c
 	{ "EyeOfTheSword", fx_eye_of_the_sword, -1}, //10d
 	{ "EyeOfTheMage", fx_eye_of_the_mage, -1}, //10e
@@ -1226,7 +1224,6 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 //it is a specially hacked effect to ignore certain races
 //from the confusion effect
 static EffectRef fx_confusion_ref={"State:Confused",NULL,-1};
-static EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
 static EffectRef fx_immunity_resource_ref={"Protection:Spell",NULL,-1};
 
 int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
@@ -1556,16 +1553,8 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //0x10a MovementRateModifier3 (Like bg2)
-//0x10b RemoveConfusion
-int fx_remove_confusion (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	if (0) printf( "fx_remove_confusion (%2d)\n", fx->Opcode );
-	BASE_STATE_CURE(STATE_CONFUSED);
-	target->fxqueue.RemoveAllEffects(fx_confusion_ref);
-	target->fxqueue.RemoveAllEffects(fx_umberhulk_gaze_ref);
-	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref,PI_CONFUSION);
-	return FX_APPLIED;
-}
+//0x10b Cure:Confusion (Like bg2)
+
 //0x10c EyeOfTheMind
 int fx_eye_of_the_mind (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {

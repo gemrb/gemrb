@@ -42,6 +42,7 @@
 #include "Scriptable/PCStatStruct.h" //fx_polymorph (action definitions)
 
 //FIXME: find a way to handle portrait icons better
+#define PI_RIGID     2
 #define PI_CONFUSED  3
 #define PI_BERSERK   4
 #define PI_POISONED  6
@@ -3431,6 +3432,8 @@ int fx_set_confused_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	//NOTE: iwd2 is also unable to display the portrait icon
 	//for permanent confusion
+	//the portrait icon cannot be made common because rigid thinking uses a different icon
+	//in bg2/how
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_CONFUSED);
 	}
@@ -5522,6 +5525,15 @@ int fx_cure_confused_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_cure_confused_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	BASE_STATE_CURE( STATE_CONFUSED );
 	target->fxqueue.RemoveAllEffects(fx_confused_state_ref);
+	//FIXME:oddly enough, HoW removes the confused icon
+	//no one removes the rigid thinking icon
+	//there are also several mods floating around, which change these things inconsistently
+	//probably the best is to remove them all by default
+	//New mods can still disable the icon removal by setting param2
+	if (!fx->Parameter2) {
+		target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref,PI_CONFUSED );
+		target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref,PI_RIGID );
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -5646,9 +5658,9 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 			
 			strnuprcpy(spl, fx->Resource, 8);
 			if (strlen(spl)<8) {
-			  strcat(spl,"F");
+				strcat(spl,"F");
 			} else {
-			  spl[7]='F';
+				spl[7]='F';
 			}
 			core->ApplySpell(spl, target, Owner, fx->Power);
 		}
