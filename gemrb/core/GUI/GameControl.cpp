@@ -971,12 +971,12 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				printf("Show lightmap %s\n", DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
 				break;
 			case '7': //toggles fog of war
-				core->FogOfWar ^= 1;
-				printf("Show Fog-Of-War: %s\n", core->FogOfWar & 1 ? "ON" : "OFF");
+				core->FogOfWar ^= FOG_DRAWFOG;
+				printf("Show Fog-Of-War: %s\n", core->FogOfWar & FOG_DRAWFOG ? "ON" : "OFF");
 				break;
 			case '8': //show searchmap over area
-				core->FogOfWar ^= 2;
-				printf("Show searchmap %s\n", core->FogOfWar & 2 ? "ON" : "OFF");
+				core->FogOfWar ^= FOG_DRAWSEARCHMAP;
+				printf("Show searchmap %s\n", core->FogOfWar & FOG_DRAWSEARCHMAP ? "ON" : "OFF");
 				break;
 			default:
 				printf( "KeyRelease:%d - %d\n", Key, Mod );
