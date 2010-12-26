@@ -46,6 +46,8 @@ ColorTable = None
 ColorIndex = None
 ScriptTextArea = None
 SelectedTextArea = None
+PortraitWindow = None
+OldPortraitWindow = None
 OldVoiceSet = None
 
 # the available sounds
@@ -58,7 +60,7 @@ SoundIndex = 0
 def OpenRecordsWindow ():
 	import GUICommonWindows
 	global RecordsWindow, OptionsWindow
-	global OldOptionsWindow
+	global OldOptionsWindow, PortraitWindow, OldPortraitWindow
 
 	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
 		if InformationWindow: OpenInformationWindow ()
@@ -67,12 +69,17 @@ def OpenRecordsWindow ():
 			RecordsWindow.Unload ()
 		if OptionsWindow:
 			OptionsWindow.Unload ()
+		if PortraitWindow:
+			PortraitWindow.Unload ()
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		GUICommonWindows.UpdatePortraitWindow ()
+		OldPortraitWindow = None
 		GUICommonWindows.SetSelectionChangeHandler (None)
 		return
 
@@ -86,6 +93,8 @@ def OpenRecordsWindow ():
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 	OptionsWindow.SetFrame ()
 
 	# dual class
@@ -128,7 +137,7 @@ def OpenRecordsWindow ():
 
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_VISIBLE)
-	GUICommonWindows.PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 #original returns to game before continuing...
@@ -728,7 +737,7 @@ def CloseInformationWindow ():
 	InformationWindow = None
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	RecordsWindow.SetVisible (WINDOW_VISIBLE)
-	GUICommonWindows.PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def OpenBiographyWindow ():

@@ -86,6 +86,7 @@ def OpenInventoryWindow ():
 	GemRB.SetVar ("MessageLabel", Window.GetControl (0x1000003f).ID )
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
+	OptionsWindow.SetFrame ()
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenInventoryWindow)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow

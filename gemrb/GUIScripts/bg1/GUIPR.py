@@ -35,11 +35,13 @@ PriestSpellInfoWindow = None
 PriestSpellLevel = 0
 PriestSpellUnmemorizeWindow = None
 OldOptionsWindow = None
+PortraitWindow = None
+OldPortraitWindow = None
 
 
 def OpenPriestWindow ():
 	global PriestWindow, OptionsWindow
-	global OldOptionsWindow
+	global OldOptionsWindow, PortraitWindow, OldPortraitWindow
 
 
 	if GUICommon.CloseOtherWindow (OpenPriestWindow):
@@ -47,12 +49,16 @@ def OpenPriestWindow ():
 			PriestWindow.Unload ()
 		if OptionsWindow:
 			OptionsWindow.Unload ()
+		if PortraitWindow:
+			PortraitWindow.Unload ()
 		PriestWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		GemRB.UnhideGUI ()
 		OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
 		GUICommonWindows.SetSelectionChangeHandler(None)
 		return
 
@@ -65,6 +71,8 @@ def OpenPriestWindow ():
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenPriestWindow)
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 	OptionsWindow.SetFrame ()
 
 	Button = Window.GetControl (1)
@@ -102,7 +110,7 @@ def OpenPriestWindow ():
 
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
 	Window.SetVisible (WINDOW_FRONT)
-	GUICommonWindows.PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 
