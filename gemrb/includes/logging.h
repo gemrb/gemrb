@@ -60,7 +60,9 @@ extern GEM_EXPORT HANDLE hConsole;
 #define DEFAULT WHITE
 
 #else //WIN32
-# include <config.h>
+# ifndef ANDROID
+#  include <config.h>
+# endif
 # include <cstdio>
 # include <cstdlib>
 

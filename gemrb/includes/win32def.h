@@ -49,7 +49,9 @@
 # endif
 
 #else //WIN32
-# include <config.h>
+# ifndef ANDROID
+#  include <config.h>
+# endif
 # include <cstdio>
 # include <cstdlib>
 # include <cstring>

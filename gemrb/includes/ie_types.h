@@ -38,7 +38,7 @@
 #define SIZEOF_LONG_INT 4
 #endif
 
-//well msvc likes __int64, and me too
+//well msvc and Android likes __int64, and me too
 #ifndef WIN32
 #define __int64 long long
 #endif

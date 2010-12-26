@@ -38,6 +38,13 @@
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
 
+#ifdef ANDROID
+# define PACKAGE "GemRB"
+# define S_IEXEC  S_IXUSR
+# define S_IREAD  S_IRUSR
+# define S_IWRITE S_IWUSR
+#endif
+
 #ifndef GLOBALS_ONLY_DEFS
 
 #include "RGBAColor.h"
