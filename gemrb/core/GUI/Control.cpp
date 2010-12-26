@@ -128,24 +128,24 @@ void Control::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	switch(Key)	{
 		case 'o': // volume down
 		case 'p': // volume up
-			ieDword Ambients, Movie, Music, SFX, Voices;
-			core->GetDictionary()->Lookup( "Volume Ambients", Ambients );
-			core->GetDictionary()->Lookup( "Volume Movie", Movie );
-			core->GetDictionary()->Lookup( "Volume Music", Music );
-			core->GetDictionary()->Lookup( "Volume SFX", SFX );
-			core->GetDictionary()->Lookup( "Volume Voices", Voices );
+			int Ambients, Movie, Music, SFX, Voices;
+			core->GetDictionary()->Lookup( "Volume Ambients", (ieDword&)Ambients );
+			core->GetDictionary()->Lookup( "Volume Movie", (ieDword&)Movie );
+			core->GetDictionary()->Lookup( "Volume Music", (ieDword&)Music );
+			core->GetDictionary()->Lookup( "Volume SFX", (ieDword&)SFX );
+			core->GetDictionary()->Lookup( "Volume Voices", (ieDword&)Voices );
 			if (Key=='o') {
-				if(Ambients>0) Ambients--;
-				if(Movie>0) Movie--;
-				if(Music>0) Music--;
-				if(SFX>0) SFX--;
-				if(Voices>0) Voices--;
+				if(Ambients>0) Ambients-=10; if(Ambients<0) Ambients=0;
+				if(Movie>0) Movie-=10; if(Movie<0) Movie=0;
+				if(Music>0) Music-=10; if(Music<0) Music=0;
+				if(SFX>0) SFX-=10; if(SFX<0) SFX=0;
+				if(Voices>0) Voices-=10; if(Voices<0) Voices=0;
 			} else {
-				if(Ambients<100) Ambients++;
-				if(Movie<100) Movie++;
-				if(Music<100) Music++;
-				if(SFX<100) SFX++;
-				if(Voices<100) Voices++;
+				if(Ambients<100) Ambients+=10; if(Ambients>100) Ambients=100;
+				if(Movie<100) Movie+=10; if(Movie>100) Movie=100;
+				if(Music<100) Music+=10; if(Music>100) Music=100;
+				if(SFX<100) SFX+=10; if(SFX>100) SFX=100;
+				if(Voices<100) Voices+=10; if(Voices>100) Voices=100;
 			}
 			core->GetDictionary()->SetAt( "Volume Ambients", Ambients );
 			core->GetDictionary()->SetAt( "Volume Movie", Movie );
