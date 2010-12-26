@@ -1245,18 +1245,16 @@ def OpenColorPicker ():
 	GemRB.SetVar ("Selected",-1)
 	for i in range (1,35):
 		Button = SubSubCustomizeWindow.GetControl (i)
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
 
 	#Selected = -1
 	for i in range (34):
 		MyColor = ColorTable.GetValue (ColorIndex, i)
 		if MyColor == "*":
-			Button = SubSubCustomizeWindow.GetControl(i+1)
-			Button.SetFlags(IE_GUI_BUTTON_PICTURE, OP_NAND)
-			continue
+			break
 		Button = SubSubCustomizeWindow.GetControl (i+1)
-		Button.SetBAM("COLGRAD", 2, 0, MyColor)
+		Button.SetBAM("COLGRAD", 0, 0, MyColor)
 		if PickedColor == MyColor:
 			GemRB.SetVar ("Selected",i)
 			#Selected = i
