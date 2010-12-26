@@ -4533,9 +4533,8 @@ void Actor::PerformAttack(ieDword gameTime)
 		// speed contains the bonus from the physical speed stat and the proficiency level
 		int spdfactor = hittingheader->Speed + speed;
 		if (spdfactor<0) spdfactor = 0;
-		// FIXME: make LuckyRoll also be able to use luck as a malus
 		// -3: k/2 in the original, hardcoded to 6; -1 for the difference in rolls - the original rolled 0-5
-		spdfactor += core->Roll(1, 6, -Modified[IE_LUCK]) - 4;
+		spdfactor += LuckyRoll(1, 6, -4, LR_NEGATIVE);
 		if (spdfactor<0) spdfactor = 0;
 		if (spdfactor>10) spdfactor = 10;
 
