@@ -34,11 +34,27 @@
 #endif
 
 #ifdef ANDROID
-#include <SDL.h>
+#include <SDL/SDL.h>
+#include "audio.h"
+
+// pause audio playing if app goes in background
+static void appPutToBackground()
+{
+  core->GetAudioDrv()->Pause();
+}
+// resume audio playing if app return to foreground
+static void appPutToForeground()
+{
+  core->GetAudioDrv()->Resume();
+}
+
 #endif
 
 int main(int argc, char* argv[])
 {
+#ifdef ANDROID
+    SDL_ANDROID_SetApplicationPutToBackgroundCallback(&appPutToBackground, &appPutToForeground);
+#endif
 	Interface::SanityCheck(VERSION_GEMRB);
 	core = new Interface( argc, argv );
 	if (core->Init() == GEM_ERROR) {
