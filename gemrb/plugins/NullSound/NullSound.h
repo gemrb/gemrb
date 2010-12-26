@@ -32,6 +32,8 @@ public:
 	int CreateStream(Holder<SoundMgr>);
 	bool Play();
 	bool Stop();
+	bool Pause();
+	bool Resume();
 	bool CanPlay();
 	bool IsSpeaking();
 	void ResetMusics();

@@ -106,6 +106,8 @@ public:
     void ResetMusics();
     bool Play();
     bool Stop();
+	bool Pause();
+	bool Resume();
     int CreateStream(Holder<SoundMgr>);
     void UpdateListenerPos(int XPos, int YPos );
     void GetListenerPos( int &XPos, int &YPos );

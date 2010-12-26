@@ -506,6 +506,34 @@ bool OpenALAudioDriver::Stop()
 	return true;
 }
 
+bool OpenALAudioDriver::Pause()
+{
+	SDL_mutexP( musicMutex );
+	if (!alIsSource( MusicSource )) {
+		SDL_mutexV( musicMutex );
+		return false;
+	}
+	alSourcePause(MusicSource);
+	checkALError("Unable to pause music source", "WARNING");
+	MusicPlaying = false;
+	SDL_mutexV( musicMutex );
+	return true;
+}
+
+bool OpenALAudioDriver::Resume()
+{
+	SDL_mutexP( musicMutex );
+	if (!alIsSource( MusicSource )) {
+		SDL_mutexV( musicMutex );
+		return false;
+	}
+	alSourcePlay(MusicSource);
+	checkALError("Unable to resume music source", "WARNING");
+	MusicPlaying = true;
+	SDL_mutexV( musicMutex );
+	return true;
+}
+
 int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
 {
 	StackLock l(musicMutex, "musicMutex in CreateStream()");

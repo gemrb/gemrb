@@ -63,6 +63,16 @@ bool NullSound::Play()
 	return true;
 }
 
+bool NullSound::Pause()
+{
+	return true;
+}
+
+bool NullSound::Resume()
+{
+	return true;
+}
+
 void NullSound::ResetMusics()
 {
 }
