@@ -29,7 +29,7 @@ TextAreaControl = 0
 def OnLoad():
 	global ExportWindow, TextAreaControl
 
-	GemRB.LoadWindowPack ("GUICG")
+	GemRB.LoadWindowPack ("GUICG", 640, 480)
 	ExportWindow = GemRB.LoadWindow (21)
 
 	GUICommon.CloseOtherWindow(ExportWindow.Unload)

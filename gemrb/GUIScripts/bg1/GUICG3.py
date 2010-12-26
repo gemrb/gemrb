@@ -50,7 +50,7 @@ def OnLoad():
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 640, 480)
 	AlignmentTable = GemRB.LoadTable("aligns")
 	AlignmentWindow = GemRB.LoadWindow(3)
 

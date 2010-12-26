@@ -39,7 +39,7 @@ def OnLoad():
 		GemRB.PlayMovie ('INTRO',1)
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
-	GemRB.LoadWindowPack("START")
+	GemRB.LoadWindowPack("START", 640, 480)
 
 	#quit subwindow
 	QuitWindow = GemRB.LoadWindow(3)

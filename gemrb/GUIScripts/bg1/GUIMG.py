@@ -56,7 +56,7 @@ def OpenMageWindow ():
 		
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-	GemRB.LoadWindowPack ("GUIMG")
+	GemRB.LoadWindowPack ("GUIMG", 640, 480)
 	MageWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", MageWindow.ID)
 	OldOptionsWindow = GUICommonWindows.OptionsWindow

@@ -59,7 +59,7 @@ def OpenPriestWindow ():
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 	
-	GemRB.LoadWindowPack ("GUIPR")
+	GemRB.LoadWindowPack ("GUIPR", 640, 480)
 	PriestWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", PriestWindow.ID)
 	OldOptionsWindow = GUICommonWindows.OptionsWindow

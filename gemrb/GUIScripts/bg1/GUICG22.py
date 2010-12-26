@@ -41,7 +41,7 @@ def OnLoad():
 			KitWindow = None
 		return
 
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 640, 480)
 	RaceName = CommonTables.Races.GetRowName(GemRB.GetVar("Race")-1 )
 	Class = GemRB.GetVar("Class")-1
 	ClassName = CommonTables.Classes.GetRowName(Class)

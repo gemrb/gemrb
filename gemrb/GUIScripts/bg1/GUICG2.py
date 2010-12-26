@@ -45,7 +45,7 @@ def OnLoad():
 	GemRB.SetVar("Specialist",0)
 	GemRB.SetVar("Class Kit",0)
 	
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 640, 480)
 	ClassCount = CommonTables.Classes.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindow(2)
 	RaceRow = CommonTables.Races.FindValue(3,GemRB.GetPlayerStat (MyChar, IE_RACE))

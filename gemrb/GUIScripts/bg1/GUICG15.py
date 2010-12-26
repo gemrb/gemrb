@@ -67,7 +67,7 @@ def OnLoad():
 	ClassName = CommonTables.ClassSkills.GetRowName(Class)
 	TableName = CommonTables.ClassSkills.GetValue(ClassName, "HATERACE")
 	
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 640, 480)
 	RaceWindow = GemRB.LoadWindow(15)
 	RacialEnemyTable = GemRB.LoadTable(TableName)
 	RaceCount = RacialEnemyTable.GetRowCount()-LISTSIZE+1
