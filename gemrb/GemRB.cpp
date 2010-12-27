@@ -52,9 +52,6 @@ static void appPutToForeground()
 
 int main(int argc, char* argv[])
 {
-#ifdef ANDROID
-    SDL_ANDROID_SetApplicationPutToBackgroundCallback(&appPutToBackground, &appPutToForeground);
-#endif
 	Interface::SanityCheck(VERSION_GEMRB);
 	core = new Interface( argc, argv );
 	if (core->Init() == GEM_ERROR) {
@@ -64,6 +61,9 @@ int main(int argc, char* argv[])
 		getc(stdin);
 		return -1;
 	}
+#ifdef ANDROID
+    SDL_ANDROID_SetApplicationPutToBackgroundCallback(&appPutToBackground, &appPutToForeground);
+#endif
 	core->Main();
 	delete( core );
 	textcolor(DEFAULT);
