@@ -428,6 +428,8 @@ public:
 	const char* GetScript(int ScriptIndex) const;
 	/** Gets the Character's level for XP calculations */
 	ieDword GetXPLevel(int modified) const;
+	/** Guesses the base casting level */
+	ieDword GetBaseCasterLevel(int spelltype) const;
 	/** Returns the wild mage casting level modifier */
 	int GetWildMod(int level) const;
 	/** Returns any casting level modifier */

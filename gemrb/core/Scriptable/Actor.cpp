@@ -3087,6 +3087,33 @@ ieDword Actor::GetXPLevel(int modified) const
 	return ieDword(average);
 }
 
+// returns the guessed caster level by passed spell type
+// FIXME: add iwd2 support (should be more precise, as there are more class types)
+// FIXME: add more logic for cross-type kits (like avengers)?
+ieDword Actor::GetBaseCasterLevel(int spelltype) const
+{
+	int level = 0;
+
+	switch(spelltype)
+	{
+	case IE_SPL_PRIEST:
+		level = GetClericLevel();
+		if (!level) level = GetDruidLevel();
+		if (!level) level = GetPaladinLevel();
+		if (!level) level = GetRangerLevel();
+		break;
+	case IE_SPL_WIZARD:
+		level = GetMageLevel();
+		if (!level) level = GetSorcererLevel();
+		if (!level) level = GetBardLevel();
+		break;
+	}
+	// if nothing was found, use the average level
+	if (!level) level = GetXPLevel(true);
+
+	return level;
+}
+
 int Actor::GetWildMod(int level) const
 {
 	if(GetStat(IE_KIT)&0x8000) {

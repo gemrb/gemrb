@@ -837,8 +837,7 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 		}
 
 		//The ext. index is here to calculate the casting time
-		//FIXME: use the caster level, not the average
-		int level = actor->GetXPLevel(true);
+		int level = actor->GetBaseCasterLevel(spl->SpellType);
 		//Add casting level bonus/penalty - from stats and LVLMODWM.2da
 		level += actor->CastingLevelBonus(level, spl->SpellType);
 		SpellHeader = spl->GetHeaderIndexFromLevel(level);

@@ -206,21 +206,8 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 	}
 
 	if (actor) {
-		if (SpellType==IE_SPL_WIZARD) {
-			level = actor->GetMageLevel();
-			if (!level) level = actor->GetSorcererLevel();
-			if (!level) level = actor->GetBardLevel();
-			if (!level) level = actor->GetStat(IE_LEVEL);
-			level+=actor->GetStat(IE_CASTINGLEVELBONUSMAGE);
-		}
-		else if (SpellType==IE_SPL_PRIEST) {
-			level = actor->GetClericLevel();
-			if (!level) level = actor->GetDruidLevel();
-			if (!level) level = actor->GetPaladinLevel();
-			if (!level) level = actor->GetRangerLevel();
-			if (!level) level = actor->GetStat(IE_LEVEL);
-			level += actor->GetStat(IE_CASTINGLEVELBONUSCLERIC);
-		}
+		level = actor->GetBaseCasterLevel(SpellType);
+		level += actor->CastingLevelBonus(level, SpellType);
 	}
 
 	if (level<1) {
