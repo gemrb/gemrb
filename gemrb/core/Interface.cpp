@@ -236,6 +236,8 @@ Interface::Interface(int iargc, char* iargv[])
 	ItemDial2Table = NULL;
 	ItemTooltipTable = NULL;
 	update_scripts = false;
+	SpecialSpellsCount = -1;
+	SpecialSpells = NULL;
 
 	gamedata = new GameData();
 }
@@ -339,6 +341,10 @@ Interface::~Interface(void)
 		}
 		free(reputationmod);
 		reputationmod=NULL;
+	}
+
+	if (SpecialSpells) {
+		free(SpecialSpells);
 	}
 
 	PluginMgr::Get()->RunCleanup();
@@ -739,6 +745,54 @@ bool Interface::ReadGameTimeTable()
 	Time.rounds_per_turn = Time.turn_sec / Time.round_sec;
 
 	return true;
+}
+
+bool Interface::ReadSpecialSpells()
+{
+	int i;
+
+	AutoTable table("splspec");
+	if (!table) {
+		return false;
+	}
+	SpecialSpellsCount = table->GetRowCount();
+	SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
+	for (i=0;i<SpecialSpellsCount;i++) {
+		strnlwrcpy(SpecialSpells[i].resref, table->GetRowName(i),8 );
+		//if there are more flags, compose this value into a bitfield
+		SpecialSpells[i].value = atoi(table->QueryField(i,0) );
+	}
+	return true;
+}
+
+int Interface::GetSpecialSpell(ieResRef resref)
+{
+	for (int i=0;i<SpecialSpellsCount;i++) {
+		if (!strnicmp(resref, SpecialSpells[i].resref, sizeof(ieResRef))) {
+			return SpecialSpells[i].value;
+		}
+	}
+	return 0;
+}
+
+//disable spells based on some circumstances
+int Interface::CheckSpecialSpell(ieResRef resref, Actor *actor)
+{
+	int sp = GetSpecialSpell(resref);
+
+	//the identify spell is always disabled on the menu
+	if (sp&SP_IDENTIFY) {
+		return 1;
+	}
+
+	//if actor is silenced, and spell cannot be cast in silence, disable it
+	if (actor->GetStat(IE_STATE_ID) & STATE_SILENCED ) {
+		if (!(sp&SP_SILENCE)) {
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 bool Interface::ReadAuxItemTables()
@@ -1755,6 +1809,14 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
+
+	ret = ReadSpecialSpells();
+	printMessage( "Core", "Reading special spells table...", WHITE);
+	if (ret) {
+		printStatus( "OK", LIGHT_GREEN );
+	} else {
+		printStatus( "NOT FOUND", YELLOW );
+	}
 
 	ret = ReadAuxItemTables();
 	printMessage( "Core", "Reading item tables...", WHITE);

@@ -133,6 +133,13 @@ struct TimeStruct {
 	unsigned int rounds_per_turn;
 };
 
+struct SpellDescType {
+	ieResRef resref;
+	ieStrRef value;
+};
+#define SP_IDENTIFY  1      //any spell that cannot be cast from the menu
+#define SP_SILENCE   2      //any spell that can be cast in silence
+
 class ItemList {
 public:
 	ieResRef *ResRefs;
@@ -332,6 +339,8 @@ private:
 	char NextScript[64];
 	/** Function to call every main loop iteration */
 	EventHandler TickHook;
+	int SpecialSpellsCount;
+	SpellDescType *SpecialSpells;
 public:
 	Holder<StringMgr> strings;
 	GlobalTimer * timer;
@@ -668,6 +677,9 @@ public:
 	void StripLine(char * string, size_t size);
 	/** Returns the DeathVarFormat of the day */
 	static const char *GetDeathVarFormat();
+	int CheckSpecialSpell(ieResRef resref, Actor *actor);
+	int GetSpecialSpellsCount() { return SpecialSpellsCount; };
+	SpellDescType *GetSpecialSpells() { return SpecialSpells; };
 private:
 	int LoadSprites();
 	bool LoadConfig(void);
@@ -683,6 +695,8 @@ private:
 	bool ReadDamageTypeTable();
 	bool ReadReputationModTable();
 	bool ReadGameTimeTable();
+	bool ReadSpecialSpells();
+	int GetSpecialSpell(ieResRef resref);
 	bool ReadModalStates();
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);

@@ -77,7 +77,6 @@ GUIScript *gs = NULL;
 #define METHOD(name, args) {#name, GemRB_ ## name, args, GemRB_ ## name ## __doc}
 
 static int SpecialItemsCount = -1;
-static int SpecialSpellsCount = -1;
 static int StoreSpellsCount = -1;
 static int UsedItemsCount = -1;
 static int ItemSoundsCount = -1;
@@ -94,11 +93,6 @@ struct UsedItemType {
 	int flags;
 };
 
-struct SpellDescType {
-	ieResRef resref;
-	ieStrRef value;
-};
-
 typedef char EventNameType[17];
 #define IS_DROP	0
 #define IS_GET 	1
@@ -108,10 +102,6 @@ typedef ieResRef ResRefPairs[2];
 #define UNINIT_IEDWORD 0xcccccccc
 
 static SpellDescType *SpecialItems = NULL;
-static SpellDescType *SpecialSpells = NULL;
-
-#define SP_IDENTIFY  1      //any spell that cannot be cast from the menu
-#define SP_SILENCE   2      //any spell that can be cast in silence
 
 static SpellDescType *StoreSpells = NULL;
 static ItemExtHeader *ItemArray = NULL;
@@ -6236,60 +6226,6 @@ static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 	return dict;
 }
 
-static void ReadSpecialSpells()
-{
-	int i;
-
-	SpecialSpellsCount = 0;
-	int table = gamedata->LoadTable("splspec");
-	if (table>=0) {
-		Holder<TableMgr> tab = gamedata->GetTable(table);
-		if (!tab) goto table_loaded;
-		SpecialSpellsCount = tab->GetRowCount();
-		SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
-		for (i=0;i<SpecialSpellsCount;i++) {
-			strnlwrcpy(SpecialSpells[i].resref, tab->GetRowName(i),8 );
-			//if there are more flags, compose this value into a bitfield
-			SpecialSpells[i].value = atoi(tab->QueryField(i,0) );
-		}
-table_loaded:
-		gamedata->DelTable(table);
-	}
-}
-
-int GetSpecialSpell(ieResRef resref)
-{
-	if (SpecialSpellsCount==-1) {
-		ReadSpecialSpells();
-	}
-	for (int i=0;i<SpecialSpellsCount;i++) {
-		if (!strnicmp(resref, SpecialSpells[i].resref, sizeof(ieResRef))) {
-			return SpecialSpells[i].value;
-		}
-	}
-	return 0;
-}
-
-//disable spells based on some circumstances
-int CheckSpecialSpell(ieResRef resref, Actor *actor)
-{
-	int sp = GetSpecialSpell(resref);
-
-	//the identify spell is always disabled on the menu
-	if (sp&SP_IDENTIFY) {
-		return 1;
-	}
-
-	//if actor is silenced, and spell cannot be cast in silence, disable it
-	if (actor->GetStat(IE_STATE_ID) & STATE_SILENCED ) {
-		if (!(sp&SP_SILENCE)) {
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
 static void ReadUsedItems()
 {
 	int i;
@@ -8383,7 +8319,7 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 		// Identify is misclassified and has Target 3 (Dead char)
 
 		ieDword spelltype = ResolveSpellNumber(spell->spellname)/1000;
-		if (CheckSpecialSpell(spell->spellname, actor) || (disabled_spellcasting&(1<<spelltype)) ) {
+		if (core->CheckSpecialSpell(spell->spellname, actor) || (disabled_spellcasting&(1<<spelltype)) ) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
 			btn->EnableBorder(1, IE_GUI_BUTTON_DISABLED);
 			PyObject *Function = PyDict_GetItemString(dict, "UpdateActionsWindow");
@@ -9329,9 +9265,6 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iii", &PartyID, &itemtype, &useup)) {
 		return AttributeError( GemRB_HasSpecialSpell__doc );
 	}
-	if (SpecialSpellsCount==-1) {
-		ReadSpecialSpells();
-	}
 
 	Game *game = core->GetGame();
 	if (!game) {
@@ -9341,10 +9274,14 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
-	int i = SpecialSpellsCount;
+	int i = core->GetSpecialSpellsCount();
+	if (i == -1) {
+		return RuntimeError( "Game has no splspec.2da table!" );
+	}
+	SpellDescType *special_spells = core->GetSpecialSpells();
 	while(i--) {
-		if (itemtype&SpecialSpells[i].value) {
-			if (actor->spellbook.HaveSpell(SpecialSpells[i].resref,useup)) {
+		if (itemtype&special_spells[i].value) {
+			if (actor->spellbook.HaveSpell(special_spells[i].resref,useup)) {
 				if (useup) {
 					//actor->SpellCast(SpecialSpells[i].resref, actor);
 				}
@@ -10052,10 +9989,6 @@ GUIScript::~GUIScript(void)
 		free(StoreSpells);
 		StoreSpells=NULL;
 	}
-	if (SpecialSpells) {
-		free(SpecialSpells);
-		SpecialSpells=NULL;
-	}
 	if (SpecialItems) {
 		free(SpecialItems);
 		SpecialItems=NULL;
@@ -10070,7 +10003,6 @@ GUIScript::~GUIScript(void)
 	}
 
 	StoreSpellsCount = -1;
-	SpecialSpellsCount = -1;
 	SpecialItemsCount = -1;
 	UsedItemsCount = -1;
 	ItemSoundsCount = -1;
