@@ -777,9 +777,25 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 		return -1;
 	}
 
+	// check for area dead magic
+	// tob AR3004 is a dead magic area, but using a script with personal dead magic
+	if (area->GetInternalFlag()&AF_DEADMAGIC) {
+		// TODO: display fizzling animation
+		displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, 0xffffff, this);
+		return -1;
+	}
+
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
+		// check for personal dead magic
+		if (actor->Modified[IE_DEADMAGIC]) {
+			// TODO: display fizzling animation
+			displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, 0xffffff, this);
+			return -1;
+		}
+
 		//The ext. index is here to calculate the casting time
+		//FIXME: use the caster level, not the average
 		int level = actor->GetXPLevel(true);
 		//Add casting level bonus/penalty - from stats and LVLMODWM.2da
 		level += actor->CastingLevelBonus(level, spl->SpellType);
