@@ -140,6 +140,11 @@ struct SpellDescType {
 #define SP_IDENTIFY  1      //any spell that cannot be cast from the menu
 #define SP_SILENCE   2      //any spell that can be cast in silence
 
+struct SurgeSpell {
+	ieResRef spell;
+	ieStrRef message;
+};
+
 class ItemList {
 public:
 	ieResRef *ResRefs;
@@ -368,6 +373,7 @@ public:
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
 	std::vector<ModalStatesStruct> ModalStates;
 	TimeStruct Time;
+	std::vector<SurgeSpell> SurgeSpells;
 public:
 	Interface(int iargc, char *iargv[]);
 	~Interface(void);

@@ -346,6 +346,7 @@ Interface::~Interface(void)
 	if (SpecialSpells) {
 		free(SpecialSpells);
 	}
+	SurgeSpells.clear();
 
 	PluginMgr::Get()->RunCleanup();
 
@@ -750,10 +751,11 @@ bool Interface::ReadGameTimeTable()
 bool Interface::ReadSpecialSpells()
 {
 	int i;
+	bool result = true;
 
 	AutoTable table("splspec");
 	if (!table) {
-		return false;
+		result = false;
 	}
 	SpecialSpellsCount = table->GetRowCount();
 	SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
@@ -762,7 +764,21 @@ bool Interface::ReadSpecialSpells()
 		//if there are more flags, compose this value into a bitfield
 		SpecialSpells[i].value = atoi(table->QueryField(i,0) );
 	}
-	return true;
+
+	table.load("wildmag");
+	if (table) {
+		SurgeSpell ss;
+		for (i = 0; (unsigned)i < table->GetRowCount(); i++) {
+			strncpy(ss.spell, table->QueryField(i, 0), 8);
+			ss.message = strtol(table->QueryField(i, 1), NULL, 0);
+			// comment ignored
+			SurgeSpells.push_back(ss);
+		}
+	} else {
+		result = false;
+	}
+
+	return result;
 }
 
 int Interface::GetSpecialSpell(ieResRef resref)
