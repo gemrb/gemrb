@@ -678,6 +678,7 @@ public:
 	/** Returns the DeathVarFormat of the day */
 	static const char *GetDeathVarFormat();
 	int CheckSpecialSpell(ieResRef resref, Actor *actor);
+	int GetSpecialSpell(ieResRef resref);
 	int GetSpecialSpellsCount() { return SpecialSpellsCount; };
 	SpellDescType *GetSpecialSpells() { return SpecialSpells; };
 private:
@@ -696,7 +697,6 @@ private:
 	bool ReadReputationModTable();
 	bool ReadGameTimeTable();
 	bool ReadSpecialSpells();
-	int GetSpecialSpell(ieResRef resref);
 	bool ReadModalStates();
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);

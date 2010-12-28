@@ -792,9 +792,8 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 		// only a handful of spells don't have a verbal component -
 		// the original hardcoded vocalize and a few more
 		// we (also) ignore nonmagic spells
-		// TODO: also use spclspl.2da
 		if (actor->Modified[IE_STATE_ID] & STATE_SILENCED) {
-			if (!(spl->Flags&SF_HLA)) {
+			if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_HLA)) {
 				return -1;
 			}
 		}
