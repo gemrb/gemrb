@@ -787,6 +787,18 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
+
+		// check for silence
+		// only a handful of spells don't have a verbal component -
+		// the original hardcoded vocalize and a few more
+		// we (also) ignore nonmagic spells
+		// TODO: also use spclspl.2da
+		if (actor->Modified[IE_STATE_ID] & STATE_SILENCED) {
+			if (!(spl->Flags&SF_HLA)) {
+				return -1;
+			}
+		}
+
 		// check for personal dead magic
 		if (actor->Modified[IE_DEADMAGIC]) {
 			// TODO: display fizzling animation
