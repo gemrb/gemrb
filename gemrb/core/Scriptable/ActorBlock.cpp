@@ -794,6 +794,33 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 			return -1;
 		}
 
+		// check for miscast magic and similar
+		ieDword roll = actor->LuckyRoll(1, 100, 0, 0);
+		bool failed = false;
+		switch(spl->SpellType)
+		{
+		case IE_SPL_PRIEST:
+			if (actor->Modified[IE_SPELLFAILUREPRIEST] >= roll) {
+				failed = true;
+			}
+			break;
+		case IE_SPL_WIZARD:
+			if (actor->Modified[IE_SPELLFAILUREMAGE] >= roll) {
+				failed = true;
+			}
+			break;
+		case IE_SPL_INNATE:
+			if (actor->Modified[IE_SPELLFAILUREINNATE] >= roll) {
+				failed = true;
+			}
+			break;
+		}
+		if (failed) {
+			// TODO: display fizzling animation
+			displaymsg->DisplayConstantStringName(STR_MISCASTMAGIC, 0xffffff, this);
+			return -1;
+		}
+
 		//The ext. index is here to calculate the casting time
 		//FIXME: use the caster level, not the average
 		int level = actor->GetXPLevel(true);
