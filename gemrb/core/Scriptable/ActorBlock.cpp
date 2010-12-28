@@ -738,6 +738,7 @@ int Scriptable::CastSpellPoint( const ieResRef SpellResRef, const Point &target,
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
+			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
 			return -1;
 		}
 	}
@@ -755,6 +756,7 @@ int Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool 
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
+			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
 			return -1;
 		}
 	}
@@ -774,6 +776,7 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 	Spell* spl = gamedata->GetSpell( SpellResRef );
 	if (!spl) {
 		SpellHeader = -1;
+		printMessage("Scriptable", "Spell not found, aborting cast!\n", LIGHT_RED);
 		return -1;
 	}
 
@@ -794,6 +797,7 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 		// we (also) ignore nonmagic spells
 		if (actor->Modified[IE_STATE_ID] & STATE_SILENCED) {
 			if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_HLA)) {
+				printMessage("Scriptable", "Tried to cast while silenced!\n", YELLOW);
 				return -1;
 			}
 		}
