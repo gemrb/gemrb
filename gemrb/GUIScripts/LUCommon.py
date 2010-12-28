@@ -372,7 +372,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 
 			# we only do a roll if core diff or higher, or uncheck max
 			if rolls:
-				if GemRB.GetVar ("Difficulty Level") < 3:
+				if GemRB.GetVar ("Difficulty Level") >= 3 and not GemRB.GetVar ("Maximum HP"):
 					CurrentHP += int (GemRB.Roll (rolls, HPTable.GetValue (level, 0), bonus) / Divisor + 0.5)
 				else:
 					CurrentHP += int ((rolls * HPTable.GetValue (level, 0) + bonus) / Divisor + 0.5)
