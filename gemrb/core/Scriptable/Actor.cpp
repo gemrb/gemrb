@@ -404,6 +404,7 @@ Actor::Actor()
 	//this one is not saved
 	GotLUFeedback = false;
 	RollSaves();
+	WMLevelMod = 0;
 
 	polymorphCache = NULL;
 }
@@ -3114,17 +3115,28 @@ ieDword Actor::GetBaseCasterLevel(int spelltype) const
 	return level;
 }
 
-int Actor::GetWildMod(int level) const
+int Actor::GetWildMod(int level)
 {
 	if(GetStat(IE_KIT)&0x1e) {
-		if (level>=MAX_LEVEL) level=MAX_LEVEL;
-		if(level<1) level=1;
-		return wmlevels[core->Roll(1,20,-1)][level-1];
+		// avoid rerolling the mod, since we get called multiple times per each cast
+		if (!WMLevelMod) {
+			if (level>=MAX_LEVEL) level=MAX_LEVEL;
+			if(level<1) level=1;
+			WMLevelMod = wmlevels[core->Roll(1,20,-1)][level-1];
+
+			core->GetTokenDictionary()->SetAtCopy("LEVELDIF", WMLevelMod);
+			if (WMLevelMod > 0) {
+				displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, 0xffffff, this);
+			} else if (WMLevelMod < 0) {
+				displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, 0xffffff, this);
+			}
+		}
+		return WMLevelMod;
 	}
 	return 0;
 }
 
-int Actor::CastingLevelBonus(int level, int type) const
+int Actor::CastingLevelBonus(int level, int type)
 {
 	int bonus = 0;
 	switch(type)
@@ -3136,22 +3148,10 @@ int Actor::CastingLevelBonus(int level, int type) const
 		bonus = GetWildMod(level) + GetStat(IE_CASTINGLEVELBONUSMAGE);
 	}
 
-	if (!bonus) {
-		return 0;
-	}
-
-	core->GetTokenDictionary()->SetAtCopy("LEVELDIF", bonus);
-
-	if (bonus > 0) {
-		displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, 0xffffff, this);
-	} else {
-		displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, 0xffffff, this);
-	}
-
 	return bonus;
 }
 
-ieDword Actor::GetCasterLevel(int spelltype) const
+ieDword Actor::GetCasterLevel(int spelltype)
 {
 	int level = GetBaseCasterLevel(spelltype);
 	return level + CastingLevelBonus(level, spelltype);

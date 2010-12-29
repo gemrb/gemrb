@@ -283,6 +283,7 @@ public:
 	int WeaponType;
 	ieDword multiclass;
 	bool GotLUFeedback;
+	int WMLevelMod;
 
 	int LastCommand;   //lastcommander
 	int LastShout;     //lastheard
@@ -429,12 +430,12 @@ public:
 	/** Gets the Character's level for XP calculations */
 	ieDword GetXPLevel(int modified) const;
 	/** Guesses the (base) casting level */
-	ieDword GetCasterLevel(int spelltype) const;
+	ieDword GetCasterLevel(int spelltype);
 	ieDword GetBaseCasterLevel(int spelltype) const;
 	/** Returns the wild mage casting level modifier */
-	int GetWildMod(int level) const;
+	int GetWildMod(int level);
 	/** Returns any casting level modifier */
-	int CastingLevelBonus(int level, int type) const;
+	int CastingLevelBonus(int level, int type);
 
 	/** Gets the Dialog ResRef */
 	const char* GetDialog(int flags=GD_NORMAL) const;
