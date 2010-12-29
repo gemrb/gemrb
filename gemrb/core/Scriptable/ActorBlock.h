@@ -262,9 +262,11 @@ public:
 	void DrawOverheadText(const Region &screen);
 	/* check if casting is allowed at all */
 	int CanCast(const ieResRef SpellResRef);
+	/* check for and trigger a wild surge */
+	int CheckWildSurge(ieResRef &SpellResRef);
 	/* actor/scriptable casts spell */
-	int CastSpellPoint( const ieResRef SpellResRef, const Point &Target, bool deplete, bool instant = false );
-	int CastSpell( const ieResRef SpellResRef, Scriptable* Target, bool deplete, bool instant = false );
+	int CastSpellPoint( ieResRef &SpellResRef, const Point &Target, bool deplete, bool instant = false );
+	int CastSpell( ieResRef &SpellResRef, Scriptable* Target, bool deplete, bool instant = false );
 	/* spellcasting finished */
 	void CastSpellPointEnd( const ieResRef SpellResRef);
 	void CastSpellEnd( const ieResRef SpellResRef);

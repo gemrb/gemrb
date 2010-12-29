@@ -801,7 +801,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 //set target as point
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-int Scriptable::CastSpellPoint( const ieResRef SpellResRef, const Point &target, bool deplete, bool instant )
+int Scriptable::CastSpellPoint( ieResRef &SpellResRef, const Point &target, bool deplete, bool instant )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
@@ -816,6 +816,10 @@ int Scriptable::CastSpellPoint( const ieResRef SpellResRef, const Point &target,
 		return -1;
 	}
 
+	if(!CheckWildSurge(SpellResRef)) {
+		return -1;
+	}
+
 	LastTargetPos = target;
 	return SpellCast(SpellResRef, instant);
 }
@@ -823,7 +827,7 @@ int Scriptable::CastSpellPoint( const ieResRef SpellResRef, const Point &target,
 //set target as actor (if target isn't actor, use its position)
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-int Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool deplete, bool instant )
+int Scriptable::CastSpell( ieResRef &SpellResRef, Scriptable* target, bool deplete, bool instant )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
@@ -839,6 +843,10 @@ int Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool 
 	if (!target) target = this;
 
 	if(!CanCast(SpellResRef)) {
+		return -1;
+	}
+
+	if(!CheckWildSurge(SpellResRef)) {
 		return -1;
 	}
 
@@ -899,6 +907,53 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 
 	gamedata->FreeSpell(spl, SpellResRef, false);
 	return duration;
+}
+
+// Anyone with some wildness has 5% chance of getting a wild surge when casting,
+// but most innates are excluded, due to being nonmagic.
+// A d100 roll is made, some stat boni are added, then either:
+// 1. the spell is cast normally (score of 100 or more)
+// 2. one or more wild surges happen and something else is cast
+// 2.1. this can loop, since some surges cause rerolls
+int Scriptable::CheckWildSurge(ieResRef &SpellResRef)
+{
+	if (Type != ST_ACTOR || core->HasFeature(GF_3ED_RULES)) {
+		return 1;
+	}
+	Actor *caster = (Actor *) this;
+
+	int roll = core->Roll(1, 100, 0);
+	if ((roll <= 5 && caster->Modified[IE_SURGEMOD]) || caster->Modified[IE_FORCESURGE]) {
+		Spell *spl = gamedata->GetSpell( SpellResRef ); // this was checked before we got here
+		// ignore non-magic "spells"
+		if (!(spl->Flags&SF_HLA)) {
+			int check = roll + caster->GetCasterLevel(spl->SpellType) + caster->Modified[IE_SURGEMOD];
+			// hundred or more means a normal cast
+			if (check < 100) {
+				// lookup the spell in the "check" row of wildmag.2da
+				ieResRef surgeSpellRef;
+				strncpy(surgeSpellRef, core->SurgeSpells[check-1].spell, 8);
+				// display feedback: Wild Surge: bla bla
+				char text[200];
+				snprintf(text, 200, "%s %s", core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0), core->GetString(core->SurgeSpells[check-1].message, 0));
+				displaymsg->DisplayStringName(text, 0xffffff, this);
+
+				Spell *surgeSpell = gamedata->GetSpell(surgeSpellRef);
+				if (!surgeSpell) {
+					// TODO: handle the hardcoded cases - they'll also fail here
+					SpellHeader = -1;
+					printMessage("Scriptable", "New spell not found, aborting cast mid-surge!\n", LIGHT_RED);
+					return 0;
+				}
+
+				// finally change the spell
+				// FIXME: not enough, since CastSpell*End gets called separately, with the old ref
+				strncpy(SpellResRef, surgeSpellRef, 8);
+			}
+		}
+	}
+
+	return 1;
 }
 
 bool Scriptable::TimerActive(ieDword ID)
