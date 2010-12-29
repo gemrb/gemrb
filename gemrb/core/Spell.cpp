@@ -203,11 +203,7 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 	Actor *actor = NULL;
 	if (Sender && Sender->Type==ST_ACTOR) {
 		actor = (Actor *) Sender;
-	}
-
-	if (actor) {
-		level = actor->GetBaseCasterLevel(SpellType);
-		level += actor->CastingLevelBonus(level, SpellType);
+		level = actor->GetCasterLevel(SpellType);
 	}
 
 	if (level<1) {

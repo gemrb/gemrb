@@ -3151,6 +3151,12 @@ int Actor::CastingLevelBonus(int level, int type) const
 	return bonus;
 }
 
+ieDword Actor::GetCasterLevel(int spelltype) const
+{
+	int level = GetBaseCasterLevel(spelltype);
+	return level + CastingLevelBonus(level, spelltype);
+}
+
 /** maybe this would be more useful if we calculate with the strength too
 */
 int Actor::GetEncumbrance()
