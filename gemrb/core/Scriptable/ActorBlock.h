@@ -260,6 +260,8 @@ public:
 	void AddTrigger(ieDword *actorref);
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText(const Region &screen);
+	/* check if casting is allowed at all */
+	int CanCast(const ieResRef SpellResRef);
 	/* actor/scriptable casts spell */
 	int CastSpellPoint( const ieResRef SpellResRef, const Point &Target, bool deplete, bool instant = false );
 	int CastSpell( const ieResRef SpellResRef, Scriptable* Target, bool deplete, bool instant = false );

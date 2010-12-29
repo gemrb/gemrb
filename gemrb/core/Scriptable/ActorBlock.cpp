@@ -728,56 +728,13 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 	LastTargetPos.empty();
 }
 
-//set target as point
-//if spell needs to be depleted, do it
-//if spell is illegal stop casting
-int Scriptable::CastSpellPoint( const ieResRef SpellResRef, const Point &target, bool deplete, bool instant )
-{
-	LastTarget = 0;
-	LastTargetPos.empty();
-	if (Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
-		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
-			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
-			return -1;
-		}
-	}
-	LastTargetPos = target;
-	return SpellCast(SpellResRef, instant);
-}
-
-//set target as actor (if target isn't actor, use its position)
-//if spell needs to be depleted, do it
-//if spell is illegal stop casting
-int Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool deplete, bool instant )
-{
-	LastTarget = 0;
-	LastTargetPos.empty();
-	if (Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
-		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
-			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
-			return -1;
-		}
-	}
-
-	if (!target) target = this;
-
-	LastTargetPos = target->Pos;
-	if (target->Type==ST_ACTOR) {
-		LastTarget = target->GetGlobalID();
-	}
-	return SpellCast(SpellResRef, instant);
-}
-
-//start spellcasting (common part)
-int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
-{
-	Spell* spl = gamedata->GetSpell( SpellResRef );
+// check for input sanity and good casting conditions
+int Scriptable::CanCast(const ieResRef SpellResRef) {
+	Spell* spl = gamedata->GetSpell(SpellResRef);
 	if (!spl) {
 		SpellHeader = -1;
 		printMessage("Scriptable", "Spell not found, aborting cast!\n", LIGHT_RED);
-		return -1;
+		return 0;
 	}
 
 	// check for area dead magic
@@ -785,9 +742,10 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 	if (area->GetInternalFlag()&AF_DEADMAGIC) {
 		// TODO: display fizzling animation
 		displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, 0xffffff, this);
-		return -1;
+		return 0;
 	}
 
+	// various individual checks
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
 
@@ -798,7 +756,7 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 		if (actor->Modified[IE_STATE_ID] & STATE_SILENCED) {
 			if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_HLA)) {
 				printMessage("Scriptable", "Tried to cast while silenced!\n", YELLOW);
-				return -1;
+				return 0;
 			}
 		}
 
@@ -806,7 +764,7 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 		if (actor->Modified[IE_DEADMAGIC]) {
 			// TODO: display fizzling animation
 			displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, 0xffffff, this);
-			return -1;
+			return 0;
 		}
 
 		// check for miscast magic and similar
@@ -833,8 +791,70 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 		if (failed) {
 			// TODO: display fizzling animation
 			displaymsg->DisplayConstantStringName(STR_MISCASTMAGIC, 0xffffff, this);
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+//set target as point
+//if spell needs to be depleted, do it
+//if spell is illegal stop casting
+int Scriptable::CastSpellPoint( const ieResRef SpellResRef, const Point &target, bool deplete, bool instant )
+{
+	LastTarget = 0;
+	LastTargetPos.empty();
+	if (Type == ST_ACTOR) {
+		Actor *actor = (Actor *) this;
+		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
+			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
 			return -1;
 		}
+	}
+	if(!CanCast(SpellResRef)) {
+		return -1;
+	}
+
+	LastTargetPos = target;
+	return SpellCast(SpellResRef, instant);
+}
+
+//set target as actor (if target isn't actor, use its position)
+//if spell needs to be depleted, do it
+//if spell is illegal stop casting
+int Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool deplete, bool instant )
+{
+	LastTarget = 0;
+	LastTargetPos.empty();
+	if (Type == ST_ACTOR) {
+		Actor *actor = (Actor *) this;
+		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
+			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
+			return -1;
+		}
+	}
+
+	// FIXME: fishy
+	if (!target) target = this;
+
+	if(!CanCast(SpellResRef)) {
+		return -1;
+	}
+
+	LastTargetPos = target->Pos;
+	if (target->Type==ST_ACTOR) {
+		LastTarget = target->GetGlobalID();
+	}
+	return SpellCast(SpellResRef, instant);
+}
+
+//start spellcasting (common part)
+int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
+{
+	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	if (Type == ST_ACTOR) {
+		Actor *actor = (Actor *) this;
 
 		//The ext. index is here to calculate the casting time
 		int level = actor->GetBaseCasterLevel(spl->SpellType);
