@@ -183,6 +183,8 @@ void DisplayMessage::DisplayConstantStringName(int stridx, unsigned int color, c
 	DisplayStringName(text, color, speaker);
 }
 
+// String format is
+// <charname> - blah blah <someoneelse>
 void DisplayMessage::DisplayConstantStringAction(int stridx, unsigned int color, const Scriptable *attacker, const Scriptable *target) const
 {
 	unsigned int attacker_color;
