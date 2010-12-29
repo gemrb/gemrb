@@ -6108,7 +6108,7 @@ int fx_renable_button (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_force_surge_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_force_surge_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_MOD( IE_FORCESURGE );
+	STAT_MOD_VAR( IE_FORCESURGE, MOD_ABSOLUTE );
 	return FX_APPLIED;
 }
 
