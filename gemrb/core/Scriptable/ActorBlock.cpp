@@ -849,6 +849,8 @@ int Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool 
 	return SpellCast(SpellResRef, instant);
 }
 
+static EffectRef fx_force_surge_modifier_ref={"ForceSurgeModifier",NULL,-1};
+
 //start spellcasting (common part)
 int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 {
@@ -887,6 +889,12 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 		}
 		fxqueue->AddAllEffects(actor, actor->Pos);
 		delete fxqueue;
+		actor->WMLevelMod = 0;
+		if (actor->Modified[IE_FORCESURGE] == 1) {
+			// affects only the next spell cast, but since the timing is permanent,
+			// we have to remove it manually
+			actor->fxqueue.RemoveAllEffectsWithParam(fx_force_surge_modifier_ref, 1);
+		}
 	}
 
 	gamedata->FreeSpell(spl, SpellResRef, false);
