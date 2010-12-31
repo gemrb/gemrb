@@ -119,19 +119,19 @@
 #define STR_LOCKPICK_FAILED 86
 #define STR_STATIC_DISS     87
 #define STR_LIGHTNING_DISS  88
-#define STR_UNUSABLEITEM    89       //item has no usable ability
-#define STR_ITEMID          90       //item needs identify
+#define STR_UNUSABLEITEM    89      //item has no usable ability
+#define STR_ITEMID          90      //item needs identify
 #define STR_WRONGITEMTYPE   91
 #define STR_ITEMEXCL        92
-#define STR_PICKPOCKET_DONE 93       //done
-#define STR_PICKPOCKET_NONE 94       //no items to steal
-#define STR_PICKPOCKET_FAIL 95       //failed, noticed
-#define STR_PICKPOCKET_EVIL 96       //can't pick hostiles
-#define STR_PICKPOCKET_ARMOR 97      //armor restriction
-#define STR_USING_FEAT      98
-#define STR_STOPPED_FEAT    99
-#define STR_DISARM_DONE 100       //trap disarmed
-#define STR_DISARM_FAIL 101       //trap not disarmed
+#define STR_PICKPOCKET_DONE 93      //done
+#define STR_PICKPOCKET_NONE 94      //no items to steal
+#define STR_PICKPOCKET_FAIL 95      //failed, noticed
+#define STR_PICKPOCKET_EVIL 96      //can't pick hostiles
+#define STR_PICKPOCKET_ARMOR 97     //armor restriction
+#define STR_USING_FEAT     98
+#define STR_STOPPED_FEAT   99
+#define STR_DISARM_DONE   100       //trap disarmed
+#define STR_DISARM_FAIL   101       //trap not disarmed
 #define STR_DOORBASH_DONE 102
 #define STR_DOORBASH_FAIL 103
 #define STR_CONTBASH_DONE 104
@@ -158,43 +158,44 @@
 #define STR_PST_HOUR      125
 #define STR_PST_HOURS     126
 #define STR_DAMAGE_IMMUNITY 127
-#define STR_DAMAGE1 128
-#define STR_DAMAGE2 129
-#define STR_DAMAGE3 130
-#define STR_DMG_POISON 131
-#define STR_DMG_MAGIC 132
-#define STR_DMG_MISSILE 133
-#define STR_DMG_SLASHING 134
-#define STR_DMG_PIERCING 135
-#define STR_DMG_CRUSHING 136
-#define STR_DMG_FIRE 137
-#define STR_DMG_ELECTRIC 138
-#define STR_DMG_COLD 139
-#define STR_DMG_ACID 140
-#define STR_DMG_OTHER 141
-#define STR_GOTQUESTXP 142
-#define STR_LEVELUP 143
+#define STR_DAMAGE1       128
+#define STR_DAMAGE2       129
+#define STR_DAMAGE3       130
+#define STR_DMG_POISON    131
+#define STR_DMG_MAGIC     132
+#define STR_DMG_MISSILE   133
+#define STR_DMG_SLASHING  134
+#define STR_DMG_PIERCING  135
+#define STR_DMG_CRUSHING  136
+#define STR_DMG_FIRE      137
+#define STR_DMG_ELECTRIC  138
+#define STR_DMG_COLD      139
+#define STR_DMG_ACID      140
+#define STR_DMG_OTHER     141
+#define STR_GOTQUESTXP    142
+#define STR_LEVELUP       143
 #define STR_INVFULL_ITEMDROP 144
-#define STR_CONTDUP 145
-#define STR_CONTTRIG 146
-#define STR_CONTFAIL 147
-#define STR_SEQDUP 148
-#define STR_CRITICAL_HIT 149
+#define STR_CONTDUP       145
+#define STR_CONTTRIG      146
+#define STR_CONTFAIL      147
+#define STR_SEQDUP        148
+#define STR_CRITICAL_HIT  149
 #define STR_CRITICAL_MISS 150
-#define STR_DEATH 151
-#define STR_BACKSTAB 152
-#define STR_BACKSTAB_BAD 153
+#define STR_DEATH         151
+#define STR_BACKSTAB      152
+#define STR_BACKSTAB_BAD  153
 #define STR_BACKSTAB_FAIL 154
 #define STR_CASTER_LVL_INC 155 // caster level bonus (wild mages)
 #define STR_CASTER_LVL_DEC 156
-#define STR_EXPORTED       157 // characters exported (iwd)
-#define STR_PALADIN_FALL 158
-#define STR_RANGER_FALL 159
-#define STR_RES_RESISTED 160
+#define STR_EXPORTED      157 // characters exported (iwd)
+#define STR_PALADIN_FALL  158
+#define STR_RANGER_FALL   159
+#define STR_RES_RESISTED  160
 #define STR_DEADMAGIC_FAIL 161
-#define STR_MISCASTMAGIC 162
-#define STR_WILDSURGE 163
-
-#define STRREF_COUNT 164
+#define STR_MISCASTMAGIC  162
+#define STR_WILDSURGE     163
+#define STR_FAMBLOCK      164
+#define STR_FAMPROTAGONIST 165
+#define STRREF_COUNT 166
 
 #endif //! IE_STRINGS_H
