@@ -96,6 +96,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	}
 
 	interval = 1000/AI_UPDATE_TIME;
+	hasInfra = false;
+	familiarBlock = false;
 	//FIXME:i'm not sure in this...
 	NoInterrupt();
 }
@@ -1076,6 +1078,7 @@ bool Game::EveryoneNearPoint(Map *area, const Point &p, int flags) const
 			return false;
 		}
 		if (Distance(p,PCs[i])>MAX_TRAVELING_DISTANCE) {
+printf("Actor %s is not near!\n", PCs[i]->LongName);
 			return false;
 		}
 	}

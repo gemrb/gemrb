@@ -227,6 +227,7 @@ public:
 	int event_timer;
 	EventHandler event_handler; //like in Control
 	bool hasInfra;
+	bool familiarBlock;
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();

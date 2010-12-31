@@ -4553,8 +4553,24 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (!target->GetCurrentArea()) {
+		//this will delay casting until we get an area
 		return FX_APPLIED;
 	}
+
+	Game *game = core->GetGame();
+	//FIXME: the familiar block field is not saved in the game and not set when the 
+	//familiar is itemized, so a game reload will clear it (see how this is done in original)
+	if (game->familiarBlock) {
+		displaymsg->DisplayConstantStringName(STR_FAMBLOCK, 0xff0000, target);
+		return FX_NOT_APPLIED;
+	}
+
+	//The protagonist is ALWAYS in the first slot
+	if (game->GetPC(0, false)!=target) {
+		displaymsg->DisplayConstantStringName(STR_FAMPROTAGONIST, 0xff0000, target);
+		return FX_NOT_APPLIED;
+	}
+
 
 	if (fx->Parameter2!=FAMILIAR_RESOURCE) {
 		ieDword alignment;
@@ -4674,12 +4690,10 @@ int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_familiar_marker (%2d)\n", fx->Opcode );
 	if (! (STAT_GET(IE_STATE_ID)&STATE_NOSAVE)) {
-		//TODO: where to disable familiar?
-		//core->GetGame()->WeatherBits|=1;
+		core->GetGame()->familiarBlock=true;
 		return FX_APPLIED;
 	}
-	//TODO: enable familiar?
-	//core->GetGame()->WeatherBits&=~1;
+	core->GetGame()->familiarBlock=false;
 	return FX_NOT_APPLIED;
 }
 
