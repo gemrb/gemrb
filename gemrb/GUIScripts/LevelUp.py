@@ -602,7 +602,8 @@ def LevelUpDonePress():
 				GemRB.SetMemorizableSpellsCount (pc, NewDSpells[i], IE_SPELL_TYPE_PRIEST, i)
 
 			# learn all the spells we're given, but don't have, up to our given casting level
-			if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 1) > 0: # we can memorize spells of this level
+			# bonus spells don't count in determining if we can use this level
+			if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 0) > 0: # we can memorize spells of this level
 				for j in range(NumClasses): # loop through each class
 					IsDruid = CommonTables.ClassSkills.GetValue (Classes[j], 0, 0)
 					IsCleric = CommonTables.ClassSkills.GetValue (Classes[j], 1, 0)
