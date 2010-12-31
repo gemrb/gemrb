@@ -1734,7 +1734,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 
 	switch(trap->Type) {
 		case ST_TRAVEL:
-			actor->UseExit(true);
+			actor->UseExit(trap->GetGlobalID());
 			return false;
 		case ST_TRIGGER:
 			//the importer shouldn't load the script
@@ -1892,8 +1892,16 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 			return;
 		}
 		if (overInfoPoint) {
-			if (HandleActiveRegion(overInfoPoint, pc, p)) {
-				return;
+			if (overInfoPoint->Type==ST_TRAVEL) {
+				int i = game->selected.size();
+				ieDword exitID = overInfoPoint->GetGlobalID();
+				while(i--) {
+					game->selected[i]->UseExit(exitID);
+				}
+			} else {
+				if (HandleActiveRegion(overInfoPoint, pc, p)) {
+					return;
+				}
 			}
 		}
 

@@ -2178,10 +2178,7 @@ bool InfoPoint::TriggerTrap(int skill, ieDword ID)
 bool InfoPoint::Entered(Actor *actor)
 {
 	if (outline->PointIn( actor->Pos ) ) {
-		//don't trigger again for this actor
-		if (!(actor->GetInternalFlag()&IF_INTRAP)) {
-			goto check;
-		}
+		goto check;
 	}
 	// why is this here? actors which aren't *in* a trap get IF_INTRAP
 	// repeatedly unset, so this triggers again and again and again.
@@ -2207,6 +2204,10 @@ bool InfoPoint::Entered(Actor *actor)
 check:
 	if (Type==ST_TRAVEL) {
 		return true;
+	}
+
+	if (actor->GetInternalFlag()&IF_INTRAP) {
+		return false;
 	}
 
 	if (actor->InParty || (Flags&TRAP_NPC) ) {

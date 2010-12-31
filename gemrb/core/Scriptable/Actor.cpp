@@ -343,6 +343,7 @@ Actor::Actor()
 	LastDamage = 0;
 	LastDamageType = 0;
 	LastTurner = 0;
+	LastExit = 0;
 	HotKey = 0;
 	attackcount = 0;
 	secondround = 0;
@@ -6734,20 +6735,26 @@ bool Actor::BlocksSearchMap() const
 }
 
 //return true if the actor doesn't want to use an entrance
-bool Actor::CannotPassEntrance() const
+bool Actor::CannotPassEntrance(ieDword exitID) const
 {
+	if (LastExit!=exitID) {
+		return true;
+	}
+
 	if (InternalFlags&IF_USEEXIT) {
 		return false;
 	}
+
 	return true;
 }
 
-void Actor::UseExit(int flag) {
-	if (flag) {
+void Actor::UseExit(ieDword exitID) {
+	if (exitID) {
 		InternalFlags|=IF_USEEXIT;
 	} else {
 		InternalFlags&=~IF_USEEXIT;
 	}
+	LastExit = exitID;
 }
 
 // luck increases the minimum roll per dice, but only up to the number of dice sides;

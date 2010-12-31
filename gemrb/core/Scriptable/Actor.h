@@ -273,10 +273,11 @@ public:
 	ieDword LastCommander;
 	ieDword LastHelp;
 	ieDword LastSeen;
-	ieDword LastMarked;  // no idea if non-actors could mark objects
+	ieDword LastMarked;  //no idea if non-actors could mark objects
 	int LastMarkedSpell; //a spell number to cast
 	ieDword LastHeard;
 	ieDword HotKey;
+	ieDword LastExit;    //the global ID of the exit to be used
 	char ShieldRef[2];
 	char HelmetRef[2];
 	char WeaponRef[2];
@@ -695,8 +696,8 @@ public:
 	/* true if we are dual-wielding */
 	int IsDualWielding() const;
 	bool BlocksSearchMap() const;
-	bool CannotPassEntrance() const;
-	void UseExit(int flag);
+	bool CannotPassEntrance(ieDword exitID) const;
+	void UseExit(ieDword exitID);
 	//int GetReaction() const;
 	/* Similar to Roll, but takes luck into account */
 	int LuckyRoll(int dice, int size, int add, ieDword flags=1, Actor* opponent=NULL) const;

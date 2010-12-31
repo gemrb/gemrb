@@ -498,6 +498,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 		while (i--) {
 			Actor *pc = game->GetPC(i,false);
 			if (pc->GetCurrentArea()==this) {
+				pc->UseExit(0);
 				pc->ClearPath();
 				pc->ClearActions();
 				pc->AddAction( GenerateAction( command ) );
@@ -515,6 +516,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 				continue;
 			}
 			if (pc->GetCurrentArea()==this) {
+				pc->UseExit(0);
 				pc->ClearPath();
 				pc->ClearActions();
 				pc->AddAction( GenerateAction( command ) );
@@ -549,9 +551,9 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		break;
 	}
 
-	actor->UseExit(false);
 	if (ip->Destination[0] != 0) {
-		// 0 here is direction, can infopoints specify that or is an entrance always provided?
+		// the 0 here is default orientation, can infopoints specify that or
+		// is an entrance always provided?
 		MoveToNewArea(ip->Destination, ip->EntranceName, 0, EveryOne, actor);
 		return;
 	}
@@ -801,6 +803,7 @@ void Map::UpdateScripts()
 
 		if (wasActive) {
 			q=Qcount[PR_SCRIPT];
+			ieDword exitID = ip->GetGlobalID();
 			while (q--) {
 				Actor* actor = queue[PR_SCRIPT][q];
 				if (ip->Type == ST_PROXIMITY) {
@@ -812,7 +815,7 @@ void Map::UpdateScripts()
 					//ST_TRAVEL
 					//don't move if doing something else
 					// added CurrentAction as part of blocking action fixes
-					if (actor->CannotPassEntrance() ) {
+					if (actor->CannotPassEntrance(exitID) ) {
 						continue;
 					}
 					//this is needed, otherwise the travel
