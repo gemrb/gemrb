@@ -174,7 +174,7 @@ def guardSkills():
 	RowCount = SkillTable.GetRowCount()-2
 
 	MyChar = GemRB.GetVar ("Slot")
-	Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
+	Kit = GUICommon.GetKitIndex(MyChar)
 
 	if Kit != 0:
 		KitName = CommonTables.KitList.GetValue(Kit, 0) #rowname is just a number
