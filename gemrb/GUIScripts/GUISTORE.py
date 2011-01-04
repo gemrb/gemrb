@@ -756,10 +756,12 @@ def RedrawStoreShoppingWindow ():
 	idx = [ LeftTopIndex, RightTopIndex, LeftIndex, RightIndex ]
 	LeftCount = Store['StoreItemCount']
 	BuySum = 0
+	selected_count = 0
 	for i in range (LeftCount):
 		if GemRB.IsValidStoreItem (pc, i, ITEM_STORE) & SHOP_SELECT:
 			Slot = GemRB.GetStoreItem (i)
 			Item = GemRB.GetItem (Slot['ItemResRef'])
+			selected_count += 1
 			if Inventory:
 				Price = 1
 			else:
@@ -788,7 +790,8 @@ def RedrawStoreShoppingWindow ():
 		Label.SetText ("")
 	else:
 		Label.SetText (str(BuySum) )
-	if BuySum:
+	# also disable the button if the inventory is full
+	if BuySum and selected_count <= len(GemRB.GetSlots (pc, SLOT_INVENTORY, -1)):
 		LeftButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1074,7 +1077,14 @@ def RedrawStoreStealWindow ():
 		Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_PC, idx, 1)
 
-	if LeftIndex>=0:
+	selected_count = 0
+	for i in range (LeftCount):
+		Flags = GemRB.IsValidStoreItem (pc, i, ITEM_STORE)
+		if Flags & SHOP_SELECT:
+			selected_count += 1
+
+	# also disable the button if the inventory is full
+	if LeftIndex>=0 and selected_count <= len(GemRB.GetSlots (pc, SLOT_INVENTORY, -1)):
 		LeftButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
