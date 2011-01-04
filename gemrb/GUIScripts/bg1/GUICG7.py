@@ -26,7 +26,6 @@ import CommonTables
 import LUSpellSelection
 
 def OnLoad():
-	KitTable = GemRB.LoadTable("magesch")
 	Slot = GemRB.GetVar ("Slot")
 	Class = GemRB.GetPlayerStat (Slot, IE_CLASS)
 	TableName = CommonTables.ClassSkills.GetValue(Class, 2)
@@ -36,16 +35,8 @@ def OnLoad():
 		# sorcerer's need their known not max table
 		TableName = "SPLSRCKN"
 
-	# get our kit index
-	KitIndex = GUICommon.GetKitIndex (Slot)
-	if KitIndex:
-		KitValue = KitTable.GetValue(KitIndex - 21, 3)
-
-		# bards have kits too
-		if KitValue == -1:
-			KitValue = 0x4000 # we only need it for the spells, so this is ok
-	else:
-		KitValue = 0x4000
+	# get our kit
+	KitValue = GemRB.GetPlayerStat (Slot, IE_KIT)
 
 	# open up the spell selection window
 	# remember, it is pc, table, level, diff, kit, chargen
