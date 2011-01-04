@@ -176,13 +176,9 @@ def guardSkills():
 	MyChar = GemRB.GetVar ("Slot")
 	Kit = GUICommon.GetKitIndex(MyChar)
 
-	if Kit != 0:
+	if Kit != 0: # luckily the first row is a dummy
 		KitName = CommonTables.KitList.GetValue(Kit, 0) #rowname is just a number
-		PointsLeft = SkillTable.GetValue("FIRST_LEVEL",KitName)
-		if PointsLeft < 0:
-			Kit = 0
-		
-	if Kit == 0:
+	else:
 		ClassID = GemRB.GetPlayerStat (MyChar, IE_CLASS)
 		ClassIndex = CommonTables.Classes.FindValue(5,ClassID)
 		KitName = CommonTables.Classes.GetRowName(ClassIndex)
