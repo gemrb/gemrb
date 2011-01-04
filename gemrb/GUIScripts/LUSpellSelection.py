@@ -295,7 +295,6 @@ def ShowSpells ():
 		SpellButton.SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR)
 
 		# don't allow the selection of an un-learnable spell
-		#TODO: check if the SetBorder calls work in bg1
 		if Spells[SpellLevel][i+j][1] == 0:
 			SpellButton.SetState(IE_GUI_BUTTON_LOCKED)
 			# shade red
