@@ -91,7 +91,7 @@ def OnLoad():
 
 		#learn all our priest spells up to the level we can learn
 		for level in range (8):
-			if GemRB.GetMemorizableSpellsCount (MyChar, IE_SPELL_TYPE_PRIEST, level, 1) <= 0:
+			if GemRB.GetMemorizableSpellsCount (MyChar, IE_SPELL_TYPE_PRIEST, level, 0) <= 0:
 				GUICommon.LearnPriestSpells (MyChar, level, ClassFlag)
 				break
 	CharGenCommon.DisplayOverview (6)
