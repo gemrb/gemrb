@@ -151,22 +151,6 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 	}
 }
 
-/* this function is obsolete, use initquickslot with slot=-1
-void PCStatsStruct::SetSlotIndex(unsigned int which, ieWord headerindex)
-{
-	//this is not correct, not the slot, but a separate headerindex should be here
-	switch(which) {
-	case ACT_QSLOT1: QuickItemHeaders[0]=headerindex; return;
-	case ACT_QSLOT2: QuickItemHeaders[1]=headerindex; return;
-	case ACT_QSLOT3: QuickItemHeaders[2]=headerindex; return;
-	case ACT_QSLOT4: QuickItemHeaders[3]=headerindex; return;
-	case ACT_QSLOT5: QuickItemHeaders[4]=headerindex; return;
-	}
-	///it shouldn't reach this point
-	abort();
-}
-*/
-
 //returns both the inventory slot and the header index associated to a quickslot
 void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex)
 {
