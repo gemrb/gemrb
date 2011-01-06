@@ -648,8 +648,9 @@ def UpdatePortraitWindow ():
 			states = "\n" + states
 		states = "\n" + states
 
+		# character - 1 == bam cycle
 		# blank space
-		flag = chr(38)
+		flag = blank = chr(33)
 
 		# shopping icon
 		if pc==portid+1:
@@ -660,9 +661,9 @@ def UpdatePortraitWindow ():
 			flag = chr(37)
 
 		if LUCommon.CanLevelUp (portid+1):
-			states = flag+chr(238)+chr(39) + states
+			states = flag+blank+chr(255) + states
 		else:
-			states = flag+chr(238)+chr(238) + states
+			states = flag+blank+blank + states
 		Button.SetText(states)
 	return
 
