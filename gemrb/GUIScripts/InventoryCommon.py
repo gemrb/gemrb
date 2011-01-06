@@ -620,20 +620,18 @@ def GetColor():
 
 	for i in range (34):
 		Button = ColorPicker.GetControl (i)
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-
-	Selected = -1
-	for i in range (34):
 		MyColor = ColorTable.GetValue (ColorIndex, i)
 		if MyColor == "*":
-			break
-		Button = ColorPicker.GetControl (i)
-		Button.SetBAM ("COLGRAD", 2, 0, MyColor)
+			Button.SetState (IE_GUI_BUTTON_LOCKED)
+			continue
 		if PickedColor == MyColor:
 			GemRB.SetVar ("Selected",i)
-			Selected = i
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
+			Button.SetState (IE_GUI_BUTTON_LOCKED)
+			Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		else:
+			Button.SetBAM ("COLGRAD", 2, 0, MyColor)
+			Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc ("Selected",i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ColorDonePress)
 	ColorPicker.SetVisible (WINDOW_VISIBLE)
