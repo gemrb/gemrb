@@ -657,7 +657,7 @@ void Map::UpdateScripts()
 
 		//if the actor is immobile, don't run the scripts
 		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
-			if (actor->Immobile()) {
+			if (actor->Immobile() || actor->GetStat(IE_STATE_ID) & STATE_SLEEP) {
 				actor->no_more_steps = true;
 				continue;
 			}
