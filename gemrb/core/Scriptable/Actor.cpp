@@ -2696,10 +2696,16 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 		// common fists do normal damage, but cause sleeping for a round instead of death
 		if ((damagetype & DAMAGE_STUNNING) && Modified[IE_MINHITPOINTS] <= 0) {
 			NewBase(IE_HITPOINTS, 1, MOD_ABSOLUTE);
-			Effect *fx = EffectQueue::CreateEffect(fx_sleep_ref, 0, 0, FX_DURATION_INSTANT_LIMITED);
-			fx->Duration = core->Time.round_sec; // 1 round
-			core->ApplyEffect(fx, this, this);
-			delete fx;
+			// stack unconsciousness carefully to avoid replaying the stance changing
+			Effect *sleep = fxqueue.HasEffectWithParamPair(fx_sleep_ref, 0, 0);
+			if (sleep) {
+				sleep->Duration += core->Time.round_sec;
+			} else {
+				Effect *fx = EffectQueue::CreateEffect(fx_sleep_ref, 0, 0, FX_DURATION_INSTANT_LIMITED);
+				fx->Duration = core->Time.round_sec; // 1 round
+				core->ApplyEffect(fx, this, this);
+				delete fx;
+			}
 		} else {
 			if (damage) {
 				GetHit();
