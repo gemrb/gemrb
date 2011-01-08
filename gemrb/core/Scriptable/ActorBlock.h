@@ -209,6 +209,7 @@ public:
 	ieDword LastCasterSeen; //Last spellcaster seen
 	Point LastTargetPos;
 	int SpellHeader;
+	ieResRef SpellResRef;
 public:
 	/** Gets the Dialog ResRef */
 	const char* GetDialog(void) const
@@ -219,6 +220,7 @@ public:
 		strnuprcpy(Dialog, resref, 8);
 	}
 	void SetScript(const ieResRef aScript, int idx, bool ai=false);
+	void SetSpellResRef(ieResRef resref);
 	void SetWait(unsigned long time);
 	unsigned long GetWait() const;
 	void LeaveDialog();

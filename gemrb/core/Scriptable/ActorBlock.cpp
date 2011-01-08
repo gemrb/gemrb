@@ -96,6 +96,7 @@ Scriptable::Scriptable(ScriptableType type)
 	LastCasterSeen = 0;
 	LastSpellSeen = 0xffffffff;
 	SpellHeader = -1;
+	SpellResRef[0] = 0;
 	LastTargetPos.empty();
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
@@ -186,6 +187,10 @@ void Scriptable::SetScript(int index, GameScript* script)
 		delete Scripts[index];
 	}
 	Scripts[index] = script;
+}
+
+void Scriptable::SetSpellResRef(ieResRef resref) {
+	strnuprcpy(SpellResRef, resref, 8);
 }
 
 void Scriptable::DisplayHeadText(const char* text)
