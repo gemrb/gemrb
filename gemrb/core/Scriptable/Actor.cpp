@@ -2689,9 +2689,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 
 	int resisted = 0;
 	ModifyDamage (this, hitter, damage, resisted, damagetype, NULL, false);
-	if (damage) {
-		GetHit();
-	}
 
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
 
@@ -2704,9 +2701,15 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 			core->ApplyEffect(fx, this, this);
 			delete fx;
 		} else {
+			if (damage) {
+				GetHit();
+			}
 			NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
 		}
 	} else {
+		if (damage) {
+			GetHit();
+		}
 		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
 
 		// also apply reputation damage if we hurt (but not killed) an innocent
