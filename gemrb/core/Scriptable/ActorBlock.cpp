@@ -829,6 +829,10 @@ int Scriptable::CastSpellPoint( ieResRef &SpellRef, const Point &target, bool de
 	}
 	if(!CanCast(SpellRef)) {
 		SpellResRef[0] = 0;
+		if (Type == ST_ACTOR) {
+			Actor *actor = (Actor *) this;
+			actor->SetStance(IE_ANI_READY);
+		}
 		return -1;
 	}
 
@@ -864,6 +868,10 @@ int Scriptable::CastSpell( ieResRef &SpellRef, Scriptable* target, bool deplete,
 
 	if(!CanCast(SpellRef)) {
 		SpellResRef[0] = 0;
+		if (Type == ST_ACTOR) {
+			Actor *actor = (Actor *) this;
+			actor->SetStance(IE_ANI_READY);
+		}
 		return -1;
 	}
 
@@ -969,6 +977,7 @@ int Scriptable::CheckWildSurge()
 					SpellHeader = -1;
 					SpellResRef[0] = 0;
 					printMessage("Scriptable", "New spell not found, aborting cast mid-surge!\n", LIGHT_RED);
+					caster->SetStance(IE_ANI_READY);
 					return 0;
 				}
 
