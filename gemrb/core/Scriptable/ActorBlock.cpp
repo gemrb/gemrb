@@ -689,7 +689,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 
 }
 
-void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
+void Scriptable::CastSpellPointEnd()
 {
 	if (Type == ST_ACTOR) {
 		((Actor *) this)->SetStance(IE_ANI_CONJURE);
@@ -705,14 +705,19 @@ void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 		return;
 	}
 
+	if (!SpellResRef) {
+		return;
+	}
+
 	CreateProjectile(SpellResRef, 0, false);
 
 	SpellHeader = -1;
+	SpellResRef[0] = 0;
 	LastTarget = 0;
 	LastTargetPos.empty();
 }
 
-void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
+void Scriptable::CastSpellEnd()
 {
 	if (Type == ST_ACTOR) {
 		((Actor *) this)->SetStance(IE_ANI_CONJURE);
@@ -726,9 +731,14 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 		SpellHeader = -1;
 		return;
 	}
+	if (!SpellResRef) {
+		return;
+	}
+
 	//if the projectile doesn't need to follow the target, then use the target position
 	CreateProjectile(SpellResRef, LastTarget, GetSpellDistance(SpellResRef, this)==0xffffffff);
 	SpellHeader = -1;
+	SpellResRef[0] = 0;
 	LastTarget = 0;
 	LastTargetPos.empty();
 }
@@ -806,7 +816,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 //set target as point
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-int Scriptable::CastSpellPoint( ieResRef &SpellResRef, const Point &target, bool deplete, bool instant )
+int Scriptable::CastSpellPoint( ieResRef &SpellRef, const Point &target, bool deplete, bool instant )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
@@ -817,22 +827,27 @@ int Scriptable::CastSpellPoint( ieResRef &SpellResRef, const Point &target, bool
 			return -1;
 		}
 	}
-	if(!CanCast(SpellResRef)) {
+	if(!CanCast(SpellRef)) {
+		SpellResRef[0] = 0;
 		return -1;
 	}
 
-	if(!CheckWildSurge(SpellResRef)) {
+	if (!SpellResRef[0]) {
+		SetSpellResRef(SpellRef);
+	}
+
+	if(!CheckWildSurge()) {
 		return -1;
 	}
 
 	LastTargetPos = target;
-	return SpellCast(SpellResRef, instant);
+	return SpellCast(instant);
 }
 
 //set target as actor (if target isn't actor, use its position)
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-int Scriptable::CastSpell( ieResRef &SpellResRef, Scriptable* target, bool deplete, bool instant )
+int Scriptable::CastSpell( ieResRef &SpellRef, Scriptable* target, bool deplete, bool instant )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
@@ -847,11 +862,16 @@ int Scriptable::CastSpell( ieResRef &SpellResRef, Scriptable* target, bool deple
 	// FIXME: fishy
 	if (!target) target = this;
 
-	if(!CanCast(SpellResRef)) {
+	if(!CanCast(SpellRef)) {
+		SpellResRef[0] = 0;
 		return -1;
 	}
 
-	if(!CheckWildSurge(SpellResRef)) {
+	if (!SpellResRef[0]) {
+		SetSpellResRef(SpellRef);
+	}
+
+	if(!CheckWildSurge()) {
 		return -1;
 	}
 
@@ -859,13 +879,13 @@ int Scriptable::CastSpell( ieResRef &SpellResRef, Scriptable* target, bool deple
 	if (target->Type==ST_ACTOR) {
 		LastTarget = target->GetGlobalID();
 	}
-	return SpellCast(SpellResRef, instant);
+	return SpellCast(instant);
 }
 
 static EffectRef fx_force_surge_modifier_ref={"ForceSurgeModifier",NULL,-1};
 
 //start spellcasting (common part)
-int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
+int Scriptable::SpellCast(bool instant)
 {
 	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	if (Type == ST_ACTOR) {
@@ -920,7 +940,7 @@ int Scriptable::SpellCast(const ieResRef SpellResRef, bool instant)
 // 1. the spell is cast normally (score of 100 or more)
 // 2. one or more wild surges happen and something else is cast
 // 2.1. this can loop, since some surges cause rerolls
-int Scriptable::CheckWildSurge(ieResRef &SpellResRef)
+int Scriptable::CheckWildSurge()
 {
 	if (Type != ST_ACTOR || core->HasFeature(GF_3ED_RULES)) {
 		return 1;
@@ -947,12 +967,12 @@ int Scriptable::CheckWildSurge(ieResRef &SpellResRef)
 				if (!surgeSpell) {
 					// TODO: handle the hardcoded cases - they'll also fail here
 					SpellHeader = -1;
+					SpellResRef[0] = 0;
 					printMessage("Scriptable", "New spell not found, aborting cast mid-surge!\n", LIGHT_RED);
 					return 0;
 				}
 
 				// finally change the spell
-				// FIXME: not enough, since CastSpell*End gets called separately, with the old ref
 				strncpy(SpellResRef, surgeSpellRef, 8);
 			}
 		}

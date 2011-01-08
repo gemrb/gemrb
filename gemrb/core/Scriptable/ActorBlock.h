@@ -265,13 +265,13 @@ public:
 	/* check if casting is allowed at all */
 	int CanCast(const ieResRef SpellResRef);
 	/* check for and trigger a wild surge */
-	int CheckWildSurge(ieResRef &SpellResRef);
+	int CheckWildSurge();
 	/* actor/scriptable casts spell */
-	int CastSpellPoint( ieResRef &SpellResRef, const Point &Target, bool deplete, bool instant = false );
-	int CastSpell( ieResRef &SpellResRef, Scriptable* Target, bool deplete, bool instant = false );
+	int CastSpellPoint( ieResRef &SpellRef, const Point &Target, bool deplete, bool instant = false );
+	int CastSpell( ieResRef &SpellRef, Scriptable* Target, bool deplete, bool instant = false );
 	/* spellcasting finished */
-	void CastSpellPointEnd( const ieResRef SpellResRef);
-	void CastSpellEnd( const ieResRef SpellResRef);
+	void CastSpellPointEnd();
+	void CastSpellEnd();
 	ieDword GetGlobalID() const { return globalID; }
 	/** timer functions (numeric ID, not saved) */
 	bool TimerActive(ieDword ID);
@@ -280,7 +280,7 @@ public:
 	virtual char* GetName(int /*which*/) const { return NULL; }
 private:
 	/* used internally to handle start of spellcasting */
-	int SpellCast(const ieResRef SpellResRef, bool instant);
+	int SpellCast(bool instant);
 	/* also part of the spellcasting process, creating the projectile */
 	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool fake);
 };

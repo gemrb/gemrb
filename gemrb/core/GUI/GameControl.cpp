@@ -760,9 +760,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					if (target) {
 						src->CastSpell( TestSpell, target, false );
 						if (src->LastTarget) {
-							src->CastSpellEnd( TestSpell );
+							src->CastSpellEnd();
 						} else {
-							src->CastSpellPointEnd( TestSpell );
+							src->CastSpellPointEnd();
 						}
 					}
 				}

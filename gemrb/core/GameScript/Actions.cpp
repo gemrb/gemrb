@@ -2544,14 +2544,14 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 
 	//if target was set, fire spell
 	if (Sender->LastTarget) {
-		Sender->CastSpellEnd( spellres );
+		Sender->CastSpellEnd();
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	//the target was converted to a point
 	if(!Sender->LastTargetPos.isempty()) {
-		Sender->CastSpellPointEnd( spellres );
+		Sender->CastSpellPointEnd();
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2613,7 +2613,7 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 
 	//if target was set, fire spell
 	if (!Sender->LastTargetPos.isempty()) {
-		Sender->CastSpellPointEnd( spellres );
+		Sender->CastSpellPointEnd();
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2654,18 +2654,22 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 	if (!ResolveSpellName( spellres, parameters) ) {
 		Sender->ReleaseCurrentAction();
 		return;
+	} else {
+		if (!Sender->SpellResRef[0]) {
+			Sender->SetSpellResRef(spellres);
+		}
 	}
 
 	//if target was set, fire spell
 	if (Sender->LastTarget) {
-		Sender->CastSpellEnd( spellres );
+		Sender->CastSpellEnd();
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	//the target was converted to a point
 	if(!Sender->LastTargetPos.isempty()) {
-		Sender->CastSpellPointEnd( spellres );
+		Sender->CastSpellPointEnd();
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2707,11 +2711,15 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 	if (!ResolveSpellName( spellres, parameters) ) {
 		Sender->ReleaseCurrentAction();
 		return;
+	} else {
+		if (!Sender->SpellResRef[0]) {
+			Sender->SetSpellResRef(spellres);
+		}
 	}
 
 	//if target was set, fire spell
 	if (!Sender->LastTargetPos.isempty()) {
-		Sender->CastSpellPointEnd( spellres );
+		Sender->CastSpellPointEnd();
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2745,18 +2753,22 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	if (!ResolveSpellName( spellres, parameters) ) {
 		Sender->ReleaseCurrentAction();
 		return;
+	} else {
+		if (!Sender->SpellResRef[0]) {
+			Sender->SetSpellResRef(spellres);
+		}
 	}
 
 	//if target was set, fire spell
 	if (Sender->LastTarget) {
-		Sender->CastSpellEnd( spellres );
+		Sender->CastSpellEnd();
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	//the target was converted to a point
 	if(!Sender->LastTargetPos.isempty()) {
-		Sender->CastSpellPointEnd( spellres );
+		Sender->CastSpellPointEnd();
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2797,11 +2809,15 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 	if (!ResolveSpellName( spellres, parameters) ) {
 		Sender->ReleaseCurrentAction();
 		return;
+	} else {
+		if (!Sender->SpellResRef[0]) {
+			Sender->SetSpellResRef(spellres);
+		}
 	}
 
 	//if target was set, fire spell
 	if (!Sender->LastTargetPos.isempty()) {
-		Sender->CastSpellPointEnd( spellres );
+		Sender->CastSpellPointEnd();
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2835,6 +2851,10 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 	if (!ResolveSpellName( spellres, parameters) ) {
 		Sender->ReleaseCurrentAction();
 		return;
+	} else {
+		if (!Sender->SpellResRef[0]) {
+			Sender->SetSpellResRef(spellres);
+		}
 	}
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -2851,9 +2871,9 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 	}
 	Sender->CastSpell (spellres, tar, false, true);
 	if (tar->Type==ST_ACTOR) {
-		Sender->CastSpellEnd(spellres);
+		Sender->CastSpellEnd();
 	} else {
-		Sender->CastSpellPointEnd(spellres);
+		Sender->CastSpellPointEnd();
 	}
 	Sender->ReleaseCurrentAction();
 }
@@ -2869,6 +2889,10 @@ void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 	if (!ResolveSpellName( spellres, parameters) ) {
 		Sender->ReleaseCurrentAction();
 		return;
+	} else {
+		if (!Sender->SpellResRef[0]) {
+			Sender->SetSpellResRef(spellres);
+		}
 	}
 
 	//Sender->LastTargetPos=parameters->pointParameter;
@@ -2882,7 +2906,7 @@ void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 		actor->SetStance (IE_ANI_CONJURE);
 	}
 	Sender->CastSpellPoint (spellres, parameters->pointParameter, false, true);
-	Sender->CastSpellPointEnd(spellres);
+	Sender->CastSpellPointEnd();
 	Sender->ReleaseCurrentAction();
 }
 
@@ -2895,6 +2919,10 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 	if (!ResolveSpellName( spellres, parameters) ) {
 		Sender->ReleaseCurrentAction();
 		return;
+	} else {
+		if (!Sender->SpellResRef[0]) {
+			Sender->SetSpellResRef(spellres);
+		}
 	}
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -2912,9 +2940,9 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 	*/
 	Sender->CastSpell (spellres, tar, false, true);
 	if (tar->Type==ST_ACTOR) {
-		Sender->CastSpellEnd(spellres);
+		Sender->CastSpellEnd();
 	} else {
-		Sender->CastSpellPointEnd(spellres);
+		Sender->CastSpellPointEnd();
 	}
 	Sender->ReleaseCurrentAction();
 }
