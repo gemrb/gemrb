@@ -1020,6 +1020,9 @@ bool Inventory::EquipItem(unsigned int slot)
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
+		if (effect == SLOT_EFFECT_MISSILE) {
+			slot = FindRangedWeapon();
+		}
 		AddSlotEffects( slot );
 	}
 	return true;
