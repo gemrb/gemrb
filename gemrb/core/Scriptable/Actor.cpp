@@ -3134,7 +3134,7 @@ int Actor::GetWildMod(int level)
 			if(level<1) level=1;
 			WMLevelMod = wmlevels[core->Roll(1,20,-1)][level-1];
 
-			core->GetTokenDictionary()->SetAtCopy("LEVELDIF", WMLevelMod);
+			core->GetTokenDictionary()->SetAtCopy("LEVELDIF", abs(WMLevelMod));
 			if (WMLevelMod > 0) {
 				displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, 0xffffff, this);
 			} else if (WMLevelMod < 0) {
