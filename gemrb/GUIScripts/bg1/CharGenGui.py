@@ -60,7 +60,8 @@ def unsetClass():
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, 0)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, 0)
-	
+	GemRB.SetVar ("MAGESCHOOL", 0)
+
 def getClass(area):
 	MyChar = GemRB.GetVar ("Slot")
 	ClassTitle = GUICommon.GetActorClassTitle(MyChar)
