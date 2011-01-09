@@ -965,10 +965,6 @@ int Scriptable::CheckWildSurge()
 				// lookup the spell in the "check" row of wildmag.2da
 				ieResRef surgeSpellRef;
 				strncpy(surgeSpellRef, core->SurgeSpells[check-1].spell, 8);
-				// display feedback: Wild Surge: bla bla
-				char text[200];
-				snprintf(text, 200, "%s %s", core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0), core->GetString(core->SurgeSpells[check-1].message, 0));
-				displaymsg->DisplayStringName(text, 0xffffff, this);
 
 				Spell *surgeSpell = gamedata->GetSpell(surgeSpellRef);
 				if (!surgeSpell) {
@@ -982,6 +978,10 @@ int Scriptable::CheckWildSurge()
 
 				// finally change the spell
 				strncpy(SpellResRef, surgeSpellRef, 8);
+				// display feedback: Wild Surge: bla bla
+				char text[200];
+				snprintf(text, 200, "%s %s", core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0), core->GetString(core->SurgeSpells[check-1].message, 0));
+				displaymsg->DisplayStringName(text, 0xffffff, this);
 			}
 		}
 	}
