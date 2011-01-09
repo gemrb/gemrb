@@ -1019,7 +1019,6 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 		case '4': // change the target type to param1
 		case '5': // change the target to a random actor
 		case '6': // change saving throw (+param1)
-		case '8': // spell cast at (param1)x level
 		case '9': // set projectile speed to param1 %
 		default:
 			SpellHeader = -1;

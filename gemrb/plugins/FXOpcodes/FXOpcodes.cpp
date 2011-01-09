@@ -4519,15 +4519,24 @@ int fx_attackspeed_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xbf CastingLevelModifier
+// gemrb extension: if the resource key is set, apply param1 as a percentual modifier
 int fx_castinglevel_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_castinglevel_modifier (%2d) Value:%d Type:%d", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	switch (fx->Parameter2) {
 	case 0:
-		STAT_SET( IE_CASTINGLEVELBONUSMAGE, fx->Parameter1 );
+		if (fx->Resource[0]) {
+			STAT_MUL( IE_CASTINGLEVELBONUSMAGE, fx->Parameter1 );
+		} else {
+			STAT_SET( IE_CASTINGLEVELBONUSMAGE, fx->Parameter1 );
+		}
 		break;
 	case 1:
-		STAT_SET( IE_CASTINGLEVELBONUSCLERIC, fx->Parameter1 );
+		if (fx->Resource[0]) {
+			STAT_MUL( IE_CASTINGLEVELBONUSCLERIC, fx->Parameter1 );
+		} else {
+			STAT_SET( IE_CASTINGLEVELBONUSCLERIC, fx->Parameter1 );
+		}
 		break;
 	default:
 		return FX_NOT_APPLIED;

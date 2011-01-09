@@ -99,5 +99,5 @@
 96         0.2        0x22c3     cast_spell_twice
 97         6.4        0x227e     easier_save_(+4_save)
 98         SPWM198    0x2289     *
-99         8.2        0x2296     spell_cast_at_double_level
+99         +AT2XLVL   0x2296     spell_cast_at_double_level
 100        0.1        0x227D     no_change
