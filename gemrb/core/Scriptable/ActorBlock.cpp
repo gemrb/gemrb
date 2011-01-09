@@ -896,8 +896,9 @@ static EffectRef fx_force_surge_modifier_ref={"ForceSurgeModifier",NULL,-1};
 int Scriptable::SpellCast(bool instant)
 {
 	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	Actor *actor = NULL;
 	if (Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
+		actor = (Actor *) this;
 
 		//The ext. index is here to calculate the casting time
 		int level = actor->GetCasterLevel(spl->SpellType);
@@ -909,9 +910,9 @@ int Scriptable::SpellCast(bool instant)
 	SPLExtHeader *header = spl->GetExtHeader(SpellHeader);
 	int casting_time = (int)header->CastingTime;
 	// how does this work for non-actors exactly?
-	if (Type == ST_ACTOR) {
+	if (actor) {
 		// The mental speed effect can shorten or lengthen the casting time.
-		casting_time -= (int)((Actor *) this)->Modified[IE_MENTALSPEED];
+		casting_time -= (int)actor->Modified[IE_MENTALSPEED];
 		if (casting_time < 0) casting_time = 0;
 	}
 	// this is a guess which seems approximately right so far
@@ -919,10 +920,8 @@ int Scriptable::SpellCast(bool instant)
 	if (instant) {
 		duration = 0;
 	}
-
-	//cfb
-	if (Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
+	if (actor) {
+		//cfb
 		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1);
 		fxqueue->SetOwner(actor);
 		if (!actor->Modified[IE_AVATARREMOVAL]) {
