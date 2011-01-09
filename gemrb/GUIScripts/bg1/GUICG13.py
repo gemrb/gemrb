@@ -149,7 +149,7 @@ def GetColor():
 			Button.SetFlags(IE_GUI_BUTTON_PICTURE, OP_NAND)
 			continue
 		Button = ColorPicker.GetControl(i)
-		Button.SetBAM("COLGRAD", 0, 0, MyColor)
+		Button.SetBAM("COLGRAD", 2, 0, MyColor)
 		if PickedColor == MyColor:
 			GemRB.SetVar("Selected",i)
 			Selected = i

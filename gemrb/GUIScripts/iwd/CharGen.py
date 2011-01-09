@@ -2436,7 +2436,7 @@ def AppearanceColorChoice (CurrentColor):
 		Color = AppearanceColorTable.GetValue (ColorType, i)
 		if Color != "*":
 			ColorButton = AppearanceColorWindow.GetControl (i)
-			ColorButton.SetBAM ("COLGRAD", 0, 0, Color)
+			ColorButton.SetBAM ("COLGRAD", 2, 0, Color)
 			ColorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AppearanceColorSelected)
 			ColorButton.SetVarAssoc ("SelectedColor", Color)
 

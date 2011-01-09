@@ -1263,7 +1263,7 @@ def OpenColorPicker ():
 		if MyColor == "*":
 			break
 		Button = SubSubCustomizeWindow.GetControl (i+1)
-		Button.SetBAM("COLGRAD", 0, 0, MyColor)
+		Button.SetBAM("COLGRAD", 2, 0, MyColor)
 		if PickedColor == MyColor:
 			GemRB.SetVar ("Selected",i)
 			#Selected = i
