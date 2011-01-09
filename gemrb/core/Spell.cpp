@@ -155,6 +155,17 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		fx->InventorySlot = 0xffff;
 		//the hostile flag is used to determine if this was an attack
 		fx->SourceFlags = Flags;
+
+		// apply the stat-based spell duration modifier
+		if (self->Type == ST_ACTOR) {
+			Actor *caster = (Actor *) self;
+			if (caster->Modified[IE_SPELLDURATIONMODMAGE] && SpellType == IE_SPL_WIZARD) {
+				fx->Duration = (fx->Duration * caster->Modified[IE_SPELLDURATIONMODMAGE]) / 100;
+			} else if (caster->Modified[IE_SPELLDURATIONMODPRIEST] && SpellType == IE_SPL_PRIEST) {
+				fx->Duration = (fx->Duration * caster->Modified[IE_SPELLDURATIONMODPRIEST]) / 100;
+			}
+		}
+
 		if (fx->Target != FX_TARGET_SELF) {
 			fx->Projectile = pro;
 			fxqueue->AddEffect( fx );
