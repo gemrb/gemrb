@@ -317,3 +317,4 @@ IDS
 0x13b	AvatarRemovalModifier
 0x13c	MagicalRest
 0x13d	State:Haste2
+0x13e	ChangeWeather

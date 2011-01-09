@@ -413,6 +413,7 @@ int fx_golem_stoneskin_modifier (Scriptable* Owner, Actor* target, Effect* fx);/
 int fx_avatar_removal_modifier (Scriptable* Owner, Actor* target, Effect* fx);//13b
 int fx_magical_rest (Scriptable* Owner, Actor* target, Effect* fx);//13c
 //int fx_improved_haste_state (Scriptable* Owner, Actor* target, Effect* fx);//13d same as haste
+int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//13e   ChangeWeather
 
 int fx_unknown (Scriptable* Owner, Actor* target, Effect* fx);//???
 
@@ -467,6 +468,7 @@ static EffectRef effectnames[] = {
 	{ "CastSpellOnCondition", fx_cast_spell_on_condition, -1 },
 	{ "ChangeBardSong", fx_change_bardsong, -1 },
 	{ "ChangeName", fx_change_name, -1 },
+	{ "ChangeWeather", fx_change_weather, -1 },
 	{ "ChantBadNonCumulative", fx_set_chantbad_state, -1 },
 	{ "ChantNonCumulative", fx_set_chant_state, -1 },
 	{ "ChaosShieldModifier", fx_chaos_shield_modifier, -1 },
@@ -6567,6 +6569,22 @@ int fx_magical_rest (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x13d ImprovedHaste (See 0x10 Haste)
+
+// 0x13e ChangeWeather
+// sets the weather to param1, set it to:
+// 0 normal weather
+// 1 rain
+// 2 snow
+// 3 fog
+int fx_change_weather (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	printf( "fx_change_weather (%2d): P1: %d\n", fx->Opcode, fx->Parameter1 );
+
+	core->GetGame()->StartRainOrSnow(false, fx->Parameter1 & WB_MASK);
+
+	return FX_NOT_APPLIED;
+}
+
 // unknown
 int fx_unknown (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
