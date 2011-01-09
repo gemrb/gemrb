@@ -2325,10 +2325,15 @@ void Actor::RefreshPCStats() {
 		} else {
 			//wspattack appears to only effect warriors
 			int defaultattacks = 2 + 2*dualwielding;
-			if (tmplevel) {
-				SetBase(IE_NUMBEROFATTACKS, defaultattacks+wspattack[stars][tmplevel]);
+			if (stars) {
+				if (tmplevel) {
+					SetBase(IE_NUMBEROFATTACKS, defaultattacks+wspattack[stars][tmplevel]);
+				} else {
+					SetBase(IE_NUMBEROFATTACKS, defaultattacks);
+				}
 			} else {
-				SetBase(IE_NUMBEROFATTACKS, defaultattacks);
+				// unproficient user - force defaultattacks
+				SetStat(IE_NUMBEROFATTACKS, defaultattacks, 0);
 			}
 		}
 	}
