@@ -964,20 +964,21 @@ int Scriptable::CheckWildSurge()
 			if (check < 100) {
 				// lookup the spell in the "check" row of wildmag.2da
 				ieResRef surgeSpellRef;
+				memset(surgeSpellRef, 0, sizeof(surgeSpellRef));
 				strncpy(surgeSpellRef, core->SurgeSpells[check-1].spell, 8);
 
 				Spell *surgeSpell = gamedata->GetSpell(surgeSpellRef);
 				if (!surgeSpell) {
-					// TODO: handle the hardcoded cases - they'll also fail here
-					SpellHeader = -1;
-					SpellResRef[0] = 0;
-					printMessage("Scriptable", "New spell not found, aborting cast mid-surge!\n", LIGHT_RED);
-					caster->SetStance(IE_ANI_READY);
-					return 0;
+					// handle the hardcoded cases - they'll also fail here
+					if (!HandleHardcodedSurge(surgeSpellRef, spl, caster)) {
+						return 0;
+					}
+				} else {
+					// finally change the spell
+					// the hardcoded bunch does it on its own when needed
+					strncpy(SpellResRef, surgeSpellRef, 8);
 				}
 
-				// finally change the spell
-				strncpy(SpellResRef, surgeSpellRef, 8);
 				// display feedback: Wild Surge: bla bla
 				char text[200];
 				snprintf(text, 200, "%s %s", core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0), core->GetString(core->SurgeSpells[check-1].message, 0));
@@ -987,6 +988,47 @@ int Scriptable::CheckWildSurge()
 	}
 
 	return 1;
+}
+
+bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor *caster)
+{
+	// format: ID or ID.param1 or +SPELLREF
+	int types = caster->spellbook.GetTypes();
+	int lvl = spl->SpellLevel-1;
+	switch (surgeSpellRef[0]) {
+		case '7': // random spell of the same level (FIXME: make an effect out of this?)
+			// change this if we ever want the surges to respect the original type
+			for (int i=0; i<types; i++) {
+				unsigned int spellCount = caster->spellbook.GetKnownSpellsCount(i, lvl);
+				if (!spellCount) continue;
+				int id = core->Roll(1, spellCount, -1);
+				CREKnownSpell *ck = caster->spellbook.GetKnownSpell(i, lvl, id);
+				if (ck) {
+					strncpy(SpellResRef, ck->SpellResRef, 8);
+					break;
+				}
+			}
+			break;
+		case '+': // cast normally, but also cast SPELLREF first
+			core->ApplySpell(surgeSpellRef+1, caster, caster, caster->GetCasterLevel(spl->SpellType));
+			break;
+		case '0': // cast spell param1 times
+		case '1': // change projectile (id) to param1
+		case '2': // also target target type param1
+		case '3': // (wild surge) roll param1 more times
+		case '4': // change the target type to param1
+		case '5': // change the target to a random actor
+		case '6': // change saving throw (+param1)
+		case '8': // spell cast at (param1)x level
+		case '9': // set projectile speed to param1 %
+		default:
+			SpellHeader = -1;
+			SpellResRef[0] = 0;
+			printMessage("Scriptable", "New spell not found, aborting cast mid-surge!\n", LIGHT_RED);
+			caster->SetStance(IE_ANI_READY);
+			return false;
+	}
+	return true;
 }
 
 bool Scriptable::TimerActive(ieDword ID)

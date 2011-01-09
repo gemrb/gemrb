@@ -26,6 +26,7 @@
 #include "CharAnimations.h"
 #include "Inventory.h"
 #include "PathFinder.h"
+#include "Spell.h" // for HandleHardcodedSurge (repeat the spell lookup if this header is unwanted)
 #include "Sprite2D.h"
 #include "TileOverlay.h"
 #include "Variables.h"
@@ -283,6 +284,8 @@ private:
 	int SpellCast(bool instant);
 	/* also part of the spellcasting process, creating the projectile */
 	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool fake);
+	/* do some magic for the wierd/awesome wild surges */
+	bool HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor *caster);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {
