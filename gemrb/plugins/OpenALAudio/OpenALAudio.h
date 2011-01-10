@@ -49,6 +49,10 @@
 #include <alc.h>
 #endif
 
+#ifdef ANDROID
+#include <AL/android.h>
+#endif
+
 #define RETRY 5
 #define BUFFER_CACHE_SIZE 100
 #define MAX_STREAMS 30

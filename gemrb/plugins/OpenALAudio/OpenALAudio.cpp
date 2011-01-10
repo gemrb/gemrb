@@ -517,11 +517,18 @@ bool OpenALAudioDriver::Pause()
 	checkALError("Unable to pause music source", "WARNING");
 	MusicPlaying = false;
 	SDL_mutexV( musicMutex );
+	((AmbientMgrAL*) ambim)->deactivate();
+#ifdef ANDROID
+	al_android_pause_playback(); //call AudioTrack.pause() from JNI
+#endif
 	return true;
 }
 
 bool OpenALAudioDriver::Resume()
 {
+#ifdef ANDROID
+	al_android_resume_playback(); //call AudioTrack.play() from JNI
+#endif
 	SDL_mutexP( musicMutex );
 	if (!alIsSource( MusicSource )) {
 		SDL_mutexV( musicMutex );
@@ -531,6 +538,7 @@ bool OpenALAudioDriver::Resume()
 	checkALError("Unable to resume music source", "WARNING");
 	MusicPlaying = true;
 	SDL_mutexV( musicMutex );
+	((AmbientMgrAL*) ambim)->activate();
 	return true;
 }
 
