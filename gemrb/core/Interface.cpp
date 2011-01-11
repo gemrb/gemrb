@@ -756,13 +756,14 @@ bool Interface::ReadSpecialSpells()
 	AutoTable table("splspec");
 	if (!table) {
 		result = false;
-	}
-	SpecialSpellsCount = table->GetRowCount();
-	SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
-	for (i=0;i<SpecialSpellsCount;i++) {
-		strnlwrcpy(SpecialSpells[i].resref, table->GetRowName(i),8 );
-		//if there are more flags, compose this value into a bitfield
-		SpecialSpells[i].value = atoi(table->QueryField(i,0) );
+	} else {
+		SpecialSpellsCount = table->GetRowCount();
+		SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
+		for (i=0;i<SpecialSpellsCount;i++) {
+			strnlwrcpy(SpecialSpells[i].resref, table->GetRowName(i),8 );
+			//if there are more flags, compose this value into a bitfield
+			SpecialSpells[i].value = atoi(table->QueryField(i,0) );
+		}
 	}
 
 	table.load("wildmag");
