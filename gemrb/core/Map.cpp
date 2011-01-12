@@ -66,7 +66,7 @@ static Point **VisibilityMasks=NULL;
 static bool PathFinderInited = false;
 static Variables Spawns;
 static int LargeFog;
-static TerrainSounds *terrainsounds;
+static TerrainSounds *terrainsounds=NULL;
 static int tsndcount = -1;
 
 void ReleaseSpawnGroup(void *poi)
@@ -81,11 +81,14 @@ void Map::ReleaseMemory()
 			free(VisibilityMasks[i]);
 		}
 		free(VisibilityMasks);
-		VisibilityMasks=NULL;
+		VisibilityMasks = NULL;
 	}
-
 	Spawns.RemoveAll(ReleaseSpawnGroup);
 	PathFinderInited = false;
+	if (terrainsounds) {
+		delete [] terrainsounds;
+		terrainsounds = NULL;
+	}
 }
 
 inline static AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimation *a, ScriptedAnimation *sca, Particles *spark, Projectile *pro)
@@ -188,22 +191,26 @@ void InitSpawnGroups()
 void InitPathFinder()
 {
 	PathFinderInited = true;
+	tsndcount = 0;
 	AutoTable tm("pathfind");
-	if (tm) {
-		const char* poi;
 
-		for (int i = 0; i < 16; i++) {
-			poi = tm->QueryField( 0, i );
-			if (*poi != '*')
-				Passable[i] = atoi( poi );
-		}
-		poi = tm->QueryField( 1, 0 );
-		if (*poi != '*')
-			NormalCost = atoi( poi );
-		poi = tm->QueryField( 1, 1 );
-		if (*poi != '*')
-			AdditionalCost = atoi( poi );
+	if (!tm) {
+		return;
 	}
+
+	const char* poi;
+
+	for (int i = 0; i < 16; i++) {
+		poi = tm->QueryField( 0, i );
+		if (*poi != '*')
+			Passable[i] = atoi( poi );
+	}
+	poi = tm->QueryField( 1, 0 );
+	if (*poi != '*')
+		NormalCost = atoi( poi );
+	poi = tm->QueryField( 1, 1 );
+	if (*poi != '*')
+		AdditionalCost = atoi( poi );
 	int rc = tm->GetRowCount()-2;
 	if (rc>0) {
 		terrainsounds = new TerrainSounds[rc];
