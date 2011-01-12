@@ -754,9 +754,7 @@ bool Interface::ReadSpecialSpells()
 	bool result = true;
 
 	AutoTable table("splspec");
-	if (!table) {
-		result = false;
-	} else {
+	if (table) {
 		SpecialSpellsCount = table->GetRowCount();
 		SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
 		for (i=0;i<SpecialSpellsCount;i++) {
@@ -764,6 +762,8 @@ bool Interface::ReadSpecialSpells()
 			//if there are more flags, compose this value into a bitfield
 			SpecialSpells[i].value = atoi(table->QueryField(i,0) );
 		}
+	} else {
+		result = false;
 	}
 
 	table.load("wildmag");
