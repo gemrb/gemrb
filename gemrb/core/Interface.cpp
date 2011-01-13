@@ -815,7 +815,6 @@ int Interface::CheckSpecialSpell(ieResRef resref, Actor *actor)
 bool Interface::ReadAuxItemTables()
 {
 	int idx;
-	int table;
 	bool flag = true;
 
 	if (ItemExclTable) {
@@ -824,7 +823,6 @@ bool Interface::ReadAuxItemTables()
 		ItemExclTable = new Variables();
 		ItemExclTable->SetType(GEM_VARIABLES_INT);
 	}
-	table = gamedata->LoadTable( "itemexcl" );
 
 	AutoTable aa;
 
