@@ -367,6 +367,11 @@ void Game::InitActorPos(Actor *actor)
 	unsigned int ip = (unsigned int) (actor->InParty-1);
 	AutoTable start("start");
 	AutoTable strta("startpos");
+
+	if (!start || !strta) {
+		printMessage("Game","Game is missing character start data.\n",RED);
+		abort();
+	}
 	// 0 - single player, 1 - tutorial, 2 - expansion
 	ieDword playmode = 0;
 	core->GetDictionary()->Lookup( "PlayMode", playmode );
@@ -386,8 +391,11 @@ void Game::InitActorPos(Actor *actor)
 	actor->Pos.y = actor->Destination.y = (short) atoi( strta->QueryField( strta->GetRowIndex(ypos), ip ) );
 	actor->SetOrientation( atoi( strta->QueryField( strta->GetRowIndex(rot), ip) ), false );
 
-	strta.load("startare");
-	strnlwrcpy(actor->Area, strta->QueryField( strta->GetRowIndex(area), 0 ), 8 );
+	if (strta.load("startare")) {
+		strnlwrcpy(actor->Area, strta->QueryField( strta->GetRowIndex(area), 0 ), 8 );
+	} else {
+		strnlwrcpy(actor->Area, CurrentArea, 8 );
+	}
 }
 
 int Game::JoinParty(Actor* actor, int join)
