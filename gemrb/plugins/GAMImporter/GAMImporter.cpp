@@ -662,7 +662,11 @@ int GAMImporter::GetStoredFileSize(Game *game)
 
 	SavedLocOffset = headersize;
 	SavedLocCount = game->GetSavedLocationCount();
-	headersize +=SavedLocCount*12;
+	//there is an unknown dword at the end of iwd2 savegames
+	if (game->version==GAM_VER_IWD2) {
+		headersize += 4;
+	}
+	headersize += SavedLocCount*12;
 
 	PPLocOffset = headersize;
 	PPLocCount = game->GetPlaneLocationCount();
@@ -687,10 +691,19 @@ int GAMImporter::PutJournals(DataStream *stream, Game *game)
 	return 0;
 }
 
-//only in ToB
+//only in ToB (and iwd2)
 int GAMImporter::PutSavedLocations(DataStream *stream, Game *game)
 {
 	ieWord tmpWord;
+	ieDword filling = 0;
+
+	//iwd2 has a single 0 dword here (at the end of the file)
+	//it could be a hacked out saved location list (inherited from SoA)
+	//if the field is missing, original engine cannot load this saved game
+	if (game->version==GAM_VER_IWD2) {
+		stream->WriteDword(&filling);
+		return 0;
+	}
 
 	for (unsigned int i=0;i<SavedLocCount;i++) {
 			GAMLocationEntry *j = game->GetSavedLocationEntry(i);
