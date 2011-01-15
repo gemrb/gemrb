@@ -605,10 +605,14 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 	int duplicate = 1;
 	if (Type == ST_ACTOR) {
 		caster = (Actor *) this;
+		duplicate = caster->wildSurgeMods.num_castings;
+		if (!duplicate) {
+			duplicate = 1;
+		}
 	}
 	if (core->HasFeature(GF_PST_STATE_FLAGS) && (Type == ST_ACTOR)) {
 		if (caster->GetStat(IE_STATE_ID)&STATE_EE_DUPL) {
-			duplicate = 2;
+			duplicate *= 2;
 		}
 	}
 
