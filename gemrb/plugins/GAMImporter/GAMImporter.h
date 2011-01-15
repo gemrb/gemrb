@@ -59,7 +59,7 @@ public:
 	int PutGame(DataStream *stream, Game *game);
 private:
 	Actor* GetActor(Holder<ActorMgr> aM, bool is_in_party );
-	void GetPCStats(PCStatsStruct* ps);
+	void GetPCStats(PCStatsStruct* ps, bool extended);
 	GAMJournalEntry* GetJournalEntry();
 
 	int PutHeader(DataStream *stream, Game *game);

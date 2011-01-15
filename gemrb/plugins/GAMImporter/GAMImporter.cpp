@@ -353,7 +353,8 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 		str->ReadDword( &pcInfo.Interact[i] ); //interact counters
 	}
 
-	if (version==GAM_VER_GEMRB || version==GAM_VER_IWD2) {
+	bool extended = version==GAM_VER_GEMRB || version==GAM_VER_IWD2;
+	if (extended) {
 		ieResRef tmp;
 
 		for (i = 0; i < 4; i++) {
@@ -499,7 +500,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	//
 	actor->CreateStats();
 	PCStatsStruct *ps = actor->PCStats;
-	GetPCStats(ps);
+	GetPCStats(ps, extended);
 	memcpy(ps->QSlots, pcInfo.QSlots, sizeof(pcInfo.QSlots) );
 	memcpy(ps->QuickSpells, pcInfo.QuickSpellResRef, MAX_QSLOTS*sizeof(ieResRef) );
 	memcpy(ps->QuickSpellClass, pcInfo.QuickSpellClass, MAX_QSLOTS );
@@ -523,7 +524,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	return actor;
 }
 
-void GAMImporter::GetPCStats (PCStatsStruct *ps)
+void GAMImporter::GetPCStats (PCStatsStruct *ps, bool extended)
 {
 	int i;
 
@@ -552,6 +553,18 @@ void GAMImporter::GetPCStats (PCStatsStruct *ps)
 
 	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
 		str->Read( ps->SoundFolder, 32);
+	}
+	
+	//iwd2 has some PC only stats that the player can set (this can be done via a guiscript interface)
+	if (extended) {
+		//3 - expertise
+		//4 - power attack
+		//5 - arterial strike
+		//6 - hamstring
+		//7 - rapid shot
+		for (i=0;i<16;i++) {
+			str->ReadDword( &ps->ExtraSettings[i] );
+		}
 	}
 }
 
@@ -871,7 +884,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	int i;
 	ieDword tmpDword;
 	ieWord tmpWord;
-	char filling[194];
+	char filling[130];
 
 	memset(filling,0,sizeof(filling) );
 	if (ac->Selected) {
@@ -1035,7 +1048,12 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 		stream->Write(ac->PCStats->SoundFolder, 32);
 	}
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
-		stream->Write(filling, 194);
+		//I don't know how many fields are actually used in IWD2 saved game
+		//but we got at least 8 (and only 5 of those are actually used)
+		for(i=0;i<16;i++) {
+			stream->WriteDword( &ac->PCStats->ExtraSettings[i]);
+		}
+		stream->Write(filling, 130);
 	}
 
 	return 0;

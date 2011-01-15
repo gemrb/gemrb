@@ -88,6 +88,7 @@ public:
 	ieWord    FavouriteWeaponsCount[MAX_FAVOURITES];
 	ieResRef  SoundSet;
 	char      SoundFolder[SOUNDFOLDERSIZE];
+	ieDword   ExtraSettings[16];           //iwd2 - expertise, hamstring, arterial strike, etc
 	ieResRef  QuickSpells[MAX_QSLOTS];     //iwd2 uses 9, others use only 3
 	ieWord    QuickWeaponSlots[MAX_QUICKWEAPONSLOT]; //iwd2 uses 8, others use only 4
 	ieWord    QuickWeaponHeaders[MAX_QUICKWEAPONSLOT];
