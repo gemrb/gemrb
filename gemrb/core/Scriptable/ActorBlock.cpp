@@ -995,10 +995,12 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 	// format: ID or ID.param1 or +SPELLREF
 	int types = caster->spellbook.GetTypes();
 	int lvl = spl->SpellLevel-1;
+	int i;
+
 	switch (surgeSpellRef[0]) {
 		case '7': // random spell of the same level (FIXME: make an effect out of this?)
 			// change this if we ever want the surges to respect the original type
-			for (int i=0; i<types; i++) {
+			for (i=0; i<types; i++) {
 				unsigned int spellCount = caster->spellbook.GetKnownSpellsCount(i, lvl);
 				if (!spellCount) continue;
 				int id = core->Roll(1, spellCount, -1);
