@@ -857,8 +857,7 @@ static int check_type(Actor* actor, Effect* fx)
 			return 0;
 		}
 		if (actor->fxqueue.HasEffectWithResource(fx_store_spell_sequencer_ref, fx->Source) ) {
-		  //TODO: display strref 0x806C
-		  return 0;
+			return 0;
 		}
 	}
 
