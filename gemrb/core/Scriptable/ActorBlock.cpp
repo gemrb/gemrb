@@ -714,6 +714,14 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 				default: //0 - do nothing
 					break;
 			}
+
+			// apply the saving throw mod
+			if (caster->wildSurgeMods.saving_throw_mod) {
+				seh = &spl->ext_headers[SpellHeader];
+				for (i=0; i < seh->FeatureCount; i++) {
+					seh->features[i].SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
+				}
+			}
 		}
 
 		if (tgt) {
