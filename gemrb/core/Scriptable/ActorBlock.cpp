@@ -598,12 +598,16 @@ static EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
 void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool fake)
 {
 	Spell* spl = gamedata->GetSpell( SpellResRef );
+	Actor *caster = NULL;
 
 	//PST has a weird effect, called Enoll Eva's duplication
 	//it creates every projectile of the affected actor twice
 	int duplicate = 1;
+	if (Type == ST_ACTOR) {
+		caster = (Actor *) this;
+	}
 	if (core->HasFeature(GF_PST_STATE_FLAGS) && (Type == ST_ACTOR)) {
-		if ( ((Actor *)this)->GetStat(IE_STATE_ID)&STATE_EE_DUPL) {
+		if (caster->GetStat(IE_STATE_ID)&STATE_EE_DUPL) {
 			duplicate = 2;
 		}
 	}
@@ -656,9 +660,8 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 
 		if(LastTarget) {
 			if (target && (Type==ST_ACTOR) ) {
-				Actor *me = (Actor *) this;
 				target->LastSpellOnMe = spellnum;
-				target->LastCasterOnMe = me->GetGlobalID();
+				target->LastCasterOnMe = caster->GetGlobalID();
 				// don't cure invisibility if this is a self targetting invisibility spell
 				// like shadow door
 				//can't check GetEffectBlock, since it doesn't construct the queue for selftargetting spells
@@ -673,11 +676,11 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 				if (invis && spl->GetExtHeader(SpellHeader)->Target == TARGET_SELF) {
 					//pass
 				} else {
-					me->CureInvisibility();
+					caster->CureInvisibility();
 				}
 				// sanctuary ends with all hostile actions or when the caster targets someone else
 				if (target != this || spl->Flags & SF_HOSTILE) {
-					me->CureSanctuary();
+					caster->CureSanctuary();
 				}
 			}
 		}
