@@ -624,7 +624,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 		if (caster) {
 			tct = caster->wildSurgeMods.target_change_type;
 		}
-		if (!tct || tct == WSTC_ADDTYPE) {
+		if (!caster || !tct || tct == WSTC_ADDTYPE || !caster->wildSurgeMods.projectile_id) {
 			pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
 			if (!pro) {
 				return;
@@ -721,6 +721,22 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 				for (i=0; i < seh->FeatureCount; i++) {
 					seh->features[i].SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
 				}
+			}
+
+			// change the projectile
+			if (caster->wildSurgeMods.projectile_id) {
+				spl->ext_headers[SpellHeader].ProjectileAnimation = caster->wildSurgeMods.projectile_id;
+				// make it also work for self-targetting spells:
+				// change the payload or this was all in vain
+				seh = &spl->ext_headers[SpellHeader];
+				for (i=0; i < seh->FeatureCount; i++) {
+					if (seh->features[i].Target == FX_TARGET_SELF) {
+						seh->features[i].Target = FX_TARGET_PRESET;
+					}
+				}
+				// we need to refetch the projectile, so the new one is used
+				pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+				pro->SetCaster(GetGlobalID());
 			}
 		}
 
