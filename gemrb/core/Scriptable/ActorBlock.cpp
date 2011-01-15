@@ -653,10 +653,26 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 			int count, i;
 			Actor *newact = NULL;
 			SPLExtHeader *seh = NULL;
+			Effect *fx = NULL;
 			switch (caster->wildSurgeMods.target_change_type) {
 				case WSTC_SETTYPE:
 					break;
 				case WSTC_ADDTYPE:
+					// TODO: unhardcode to allow for mixing all the target types
+					// caster gets selftargetting fx when the projectile is fetched above
+					seh = &spl->ext_headers[SpellHeader];
+					for (i=0; i < seh->FeatureCount; i++) {
+						if (seh->features[i].Target == FX_TARGET_SELF) {
+							seh->features[i].Target = caster->wildSurgeMods.target_type;
+						} else {
+							// also apply to the caster
+							fx = seh->features+i;
+							core->ApplyEffect(fx, caster, caster);
+						}
+					}
+					// we need to refetch the projectile, so the effect queue is created
+					pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+					pro->SetCaster(GetGlobalID());
 					break;
 				case WSTC_RANDOMIZE:
 					count = area->GetActorCount(false);
