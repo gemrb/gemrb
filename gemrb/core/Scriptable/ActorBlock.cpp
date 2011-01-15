@@ -630,6 +630,16 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 			origin = ((InfoPoint *)this)->TrapLaunch;
 		}
 
+		if (caster) {
+			// check for the speed mod
+			if (caster->wildSurgeMods.projectile_speed_mod) {
+				pro->Speed = (pro->Speed * caster->wildSurgeMods.projectile_speed_mod) / 100;
+				if (!pro->Speed) {
+					pro->Speed = 1;
+				}
+			}
+		}
+
 		if (tgt) {
 			area->AddProjectile(pro, origin, LastTarget, fake);
 		} else {
