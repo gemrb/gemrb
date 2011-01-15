@@ -408,6 +408,7 @@ Actor::Actor()
 	WMLevelMod = 0;
 
 	polymorphCache = NULL;
+	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
 }
 
 Actor::~Actor(void)

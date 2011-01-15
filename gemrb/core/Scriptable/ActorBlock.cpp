@@ -694,8 +694,10 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 
 void Scriptable::CastSpellPointEnd()
 {
+	Actor *caster = NULL;
 	if (Type == ST_ACTOR) {
-		((Actor *) this)->SetStance(IE_ANI_CONJURE);
+		caster = ((Actor *) this);
+		caster->SetStance(IE_ANI_CONJURE);
 	}
 
 	if (SpellHeader == -1) {
@@ -718,12 +720,17 @@ void Scriptable::CastSpellPointEnd()
 	SpellResRef[0] = 0;
 	LastTarget = 0;
 	LastTargetPos.empty();
+	if (caster) {
+		memset(&(caster->wildSurgeMods), 0, sizeof(caster->wildSurgeMods));
+	}
 }
 
 void Scriptable::CastSpellEnd()
 {
+	Actor *caster = NULL;
 	if (Type == ST_ACTOR) {
-		((Actor *) this)->SetStance(IE_ANI_CONJURE);
+		caster = ((Actor *) this);
+		caster->SetStance(IE_ANI_CONJURE);
 	}
 
 	if (SpellHeader == -1) {
@@ -744,6 +751,9 @@ void Scriptable::CastSpellEnd()
 	SpellResRef[0] = 0;
 	LastTarget = 0;
 	LastTargetPos.empty();
+	if (caster) {
+		memset(&(caster->wildSurgeMods), 0, sizeof(caster->wildSurgeMods));
+	}
 }
 
 // check for input sanity and good casting conditions
@@ -1018,13 +1028,41 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			core->ApplySpell(surgeSpellRef+1, caster, caster, caster->GetCasterLevel(spl->SpellType));
 			break;
 		case '0': // cast spell param1 times
+			strtok(surgeSpellRef,".");
+			count = strtol(strtok(NULL,"."), NULL, 0);
+			caster->wildSurgeMods.num_castings = count;
+			break;
 		case '1': // change projectile (id) to param1
+			strtok(surgeSpellRef,".");
+			count = strtol(strtok(NULL,"."), NULL, 0);
+			caster->wildSurgeMods.projectile_id = count;
+			break;
 		case '2': // also target target type param1
-		case '3': // (wild surge) roll param1 more times
+			strtok(surgeSpellRef,".");
+			count = strtol(strtok(NULL,"."), NULL, 0);
+			caster->wildSurgeMods.target_type = count;
+			caster->wildSurgeMods.target_change_type = WSTC_ADDTYPE;
+			break;
 		case '4': // change the target type to param1
+			strtok(surgeSpellRef,".");
+			count = strtol(strtok(NULL,"."), NULL, 0);
+			caster->wildSurgeMods.target_type = count;
+			caster->wildSurgeMods.target_change_type = WSTC_SETTYPE;
+			break;
 		case '5': // change the target to a random actor
+			caster->wildSurgeMods.target_change_type = WSTC_RANDOMIZE;
+			break;
 		case '6': // change saving throw (+param1)
+			strtok(surgeSpellRef,".");
+			count = strtol(strtok(NULL,"."), NULL, 0);
+			caster->wildSurgeMods.saving_throw_mod = count;
+			break;
 		case '9': // set projectile speed to param1 %
+			strtok(surgeSpellRef,".");
+			count = strtol(strtok(NULL,"."), NULL, 0);
+			caster->wildSurgeMods.projectile_speed_mod = count;
+			break;
+		case '3': // (wild surge) roll param1 more times
 		default:
 			SpellHeader = -1;
 			SpellResRef[0] = 0;

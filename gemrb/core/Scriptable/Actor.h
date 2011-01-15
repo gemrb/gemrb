@@ -184,6 +184,20 @@ struct PolymorphCache;
 // used for distinguishing damage immunity from high damage resistance
 #define DR_IMMUNE 999999
 
+// wild surge target change type
+#define WSTC_SETTYPE   1 // change to this target type
+#define WSTC_ADDTYPE   2 // affect also this target type
+#define WSTC_RANDOMIZE 3 // choose a random target
+struct WildSurgeSpellMods {
+	unsigned int num_castings; // number of times to cast
+	unsigned int num_wildrolls; // number of times to roll
+	unsigned int projectile_id; // new projectile id
+	unsigned int target_change_type; // settype, addtype, randomize
+	unsigned int target_type; // type to use when target_change_type is not WSTC_RANDOMIZE
+	unsigned int projectile_speed_mod; // factor in percents
+	int saving_throw_mod;
+};
+
 typedef ieByte ActionButtonRow[GUIBT_COUNT];
 struct ActionButtonRow2 {
 	ActionButtonRow buttons;
@@ -310,6 +324,7 @@ public:
 	int speed;
 
 	PolymorphCache *polymorphCache; // fx_polymorph etc
+	WildSurgeSpellMods wildSurgeMods;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
