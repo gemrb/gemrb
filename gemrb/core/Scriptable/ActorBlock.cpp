@@ -617,11 +617,21 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 	}
 
 	while(duplicate --) {
-		Projectile *pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
-		if (!pro) {
-			return;
+		Projectile *pro;
+		// jump through hoops to skip applying selftargetting spells to the caster
+		//  if we'll be changing the target
+		int tct = 0;
+		if (caster) {
+			tct = caster->wildSurgeMods.target_change_type;
 		}
-		pro->SetCaster(GetGlobalID());
+		if (!tct || tct == WSTC_ADDTYPE) {
+			pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+			if (!pro) {
+				return;
+			}
+			pro->SetCaster(GetGlobalID());
+		}
+
 		Point origin = Pos;
 		if (Type == ST_TRIGGER || Type == ST_PROXIMITY) {
 			// try and make projectiles start from the right trap position
@@ -637,6 +647,48 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 				if (!pro->Speed) {
 					pro->Speed = 1;
 				}
+			}
+
+			// check for target (type) change
+			int count, i;
+			Actor *newact = NULL;
+			SPLExtHeader *seh = NULL;
+			switch (caster->wildSurgeMods.target_change_type) {
+				case WSTC_SETTYPE:
+					break;
+				case WSTC_ADDTYPE:
+					break;
+				case WSTC_RANDOMIZE:
+					count = area->GetActorCount(false);
+					newact = area->GetActor(core->Roll(1,count,-1), false);
+					if (count > 1 && newact == caster) {
+						while (newact == caster) {
+							newact = area->GetActor(core->Roll(1,count,-1), false);
+						}
+					}
+					if (tgt) {
+						LastTarget = newact->GetGlobalID();
+						LastTargetPos = newact->Pos;
+					} else {
+						// no better idea; I wonder if the original randomized point targets at all
+						LastTargetPos = newact->Pos;
+					}
+
+					// make it also work for self-targetting spells:
+					// change the payload or this was all in vain
+					seh = &spl->ext_headers[SpellHeader];
+					for (i=0; i < seh->FeatureCount; i++) {
+						if (seh->features[i].Target == FX_TARGET_SELF) {
+							seh->features[i].Target = FX_TARGET_PRESET;
+						}
+					}
+					// we need to fetch the projectile, so the effect queue is created
+					// (skipped above)
+					pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+					pro->SetCaster(GetGlobalID());
+					break;
+				default: //0 - do nothing
+					break;
 			}
 		}
 
