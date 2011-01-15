@@ -656,6 +656,14 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 			Effect *fx = NULL;
 			switch (caster->wildSurgeMods.target_change_type) {
 				case WSTC_SETTYPE:
+					seh = &spl->ext_headers[SpellHeader];
+					for (i=0; i < seh->FeatureCount; i++) {
+						seh->features[i].Target = caster->wildSurgeMods.target_type;
+					}
+					// we need to fetch the projectile, so the effect queue is created
+					// (skipped above)
+					pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+					pro->SetCaster(GetGlobalID());
 					break;
 				case WSTC_ADDTYPE:
 					// TODO: unhardcode to allow for mixing all the target types
