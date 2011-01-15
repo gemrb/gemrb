@@ -1,0 +1,25 @@
+Description: This table lists spells that are used when wild magic surges occur. The original engine had these hardcoded in the .exe.
+
+Columns -
+   SPELL   - A spell resref (to be cast instead) or one of the special codes below.
+   STRREF  - The string to be displayed when the surge occurs (eg. "Oops, is that a Pit Fiend?")
+   COMMENT - unused
+
+The syntax of the SPELL column is as follows:
+  - SPELLREF (use this spell instead)
+  - +SPELLREF (cast this spell first, then the chosen one)
+  - ID.parameter (use hardcoded feature number ID, passing a parameter)
+
+Possible values for ID are -
+   0 - cast spell //parameter// times
+   1 - change projectile to parameter
+   2 - also target (caster)
+   3 - roll on this wild surge table //parameter// times
+   4 - change target to parameter
+   5 - use a random target
+   6 - change the spell saving throws by //parameter//
+   7 - cast a random known spell
+   8 - set the projectile speed to //parameter// percent
+
+2 and 4 can take any effect target type as the parameter.
+
