@@ -1154,7 +1154,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			count = strtol(strtok(NULL,"."), NULL, 0);
 			caster->wildSurgeMods.saving_throw_mod = count;
 			break;
-		case '9': // set projectile speed to param1 %
+		case '8': // set projectile speed to param1 %
 			strtok(surgeSpellRef,".");
 			count = strtol(strtok(NULL,"."), NULL, 0);
 			caster->wildSurgeMods.projectile_speed_mod = count;
