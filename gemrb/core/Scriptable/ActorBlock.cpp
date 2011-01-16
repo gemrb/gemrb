@@ -1128,19 +1128,6 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 	Point targetpos(-1, -1);
 	ieResRef newspl;
 	switch (surgeSpellRef[0]) {
-		case '7': // random spell of the same level (FIXME: make an effect out of this?)
-			// change this if we ever want the surges to respect the original type
-			for (i=0; i<types; i++) {
-				unsigned int spellCount = caster->spellbook.GetKnownSpellsCount(i, lvl);
-				if (!spellCount) continue;
-				int id = core->Roll(1, spellCount, -1);
-				CREKnownSpell *ck = caster->spellbook.GetKnownSpell(i, lvl, id);
-				if (ck) {
-					strncpy(SpellResRef, ck->SpellResRef, 8);
-					break;
-				}
-			}
-			break;
 		case '+': // cast normally, but also cast SPELLREF first
 			core->ApplySpell(surgeSpellRef+1, caster, caster, caster->GetCasterLevel(spl->SpellType));
 			break;
@@ -1210,6 +1197,19 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			strtok(surgeSpellRef,".");
 			count = strtol(strtok(NULL,"."), NULL, 0);
 			caster->wildSurgeMods.saving_throw_mod = count;
+			break;
+		case '7': // random spell of the same level (FIXME: make an effect out of this?)
+			// change this if we ever want the surges to respect the original type
+			for (i=0; i<types; i++) {
+				unsigned int spellCount = caster->spellbook.GetKnownSpellsCount(i, lvl);
+				if (!spellCount) continue;
+				int id = core->Roll(1, spellCount, -1);
+				CREKnownSpell *ck = caster->spellbook.GetKnownSpell(i, lvl, id);
+				if (ck) {
+					strncpy(SpellResRef, ck->SpellResRef, 8);
+					break;
+				}
+			}
 			break;
 		case '8': // set projectile speed to param1 %
 			strtok(surgeSpellRef,".");
