@@ -4784,7 +4784,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 			// damage type without a resistance stat
 		} else {
 			damage += (signed)target->GetStat(IE_DAMAGEBONUS);
-			resisted = (int) (damage * (signed)target->GetStat(it->second.resist_stat)/100.0);
+			resisted = (int) (damage * (signed)target->GetSafeStat(it->second.resist_stat)/100.0);
 			// check for bonuses for specific damage types
 			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && hitter && hitter->Type == ST_ACTOR) {
 				int bonus = ((Actor *)hitter)->fxqueue.SpecificDamageBonus(it->second.iwd_mod_type);
@@ -4794,7 +4794,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 				}
 			}
 			damage -= resisted;
-			printf("Resisted %d of %d at %d%% resistance to %d\n", resisted, damage+resisted, target->GetStat(it->second.resist_stat), damagetype);
+			printf("Resisted %d of %d at %d%% resistance to %d\n", resisted, damage+resisted, target->GetSafeStat(it->second.resist_stat), damagetype);
 			if (damage <= 0) resisted = DR_IMMUNE;
 		}
 	}
