@@ -1,5 +1,7 @@
 Description: This table lists spells that are used when wild magic surges occur. The original engine had these hardcoded in the .exe.
 
+The row name corresponds to the required roll. The 100th row will be ignored, since a roll of 100 or more signifies a normal cast.
+
 Columns -
    SPELL   - A spell resref (to be cast instead) or one of the special codes below.
    STRREF  - The string to be displayed when the surge occurs (eg. "Oops, is that a Pit Fiend?")
