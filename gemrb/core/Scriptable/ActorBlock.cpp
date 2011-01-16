@@ -1089,6 +1089,11 @@ int Scriptable::CheckWildSurge()
 			int check = roll + caster->GetCasterLevel(spl->SpellType) + caster->Modified[IE_SURGEMOD];
 			// hundred or more means a normal cast
 			if (check < 100) {
+				// display feedback: Wild Surge: bla bla
+				char text[200];
+				snprintf(text, 200, "%s %s", core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0), core->GetString(core->SurgeSpells[check-1].message, 0));
+				displaymsg->DisplayStringName(text, 0xffffff, this);
+
 				// lookup the spell in the "check" row of wildmag.2da
 				ieResRef surgeSpellRef;
 				memset(surgeSpellRef, 0, sizeof(surgeSpellRef));
@@ -1105,11 +1110,6 @@ int Scriptable::CheckWildSurge()
 					// the hardcoded bunch does it on its own when needed
 					strncpy(SpellResRef, surgeSpellRef, 8);
 				}
-
-				// display feedback: Wild Surge: bla bla
-				char text[200];
-				snprintf(text, 200, "%s %s", core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0), core->GetString(core->SurgeSpells[check-1].message, 0));
-				displaymsg->DisplayStringName(text, 0xffffff, this);
 			}
 		}
 	}
