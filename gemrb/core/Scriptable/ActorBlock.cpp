@@ -617,7 +617,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 	}
 
 	while(duplicate --) {
-		Projectile *pro;
+		Projectile *pro = NULL;
 		// jump through hoops to skip applying selftargetting spells to the caster
 		//  if we'll be changing the target
 		int tct = 0;
