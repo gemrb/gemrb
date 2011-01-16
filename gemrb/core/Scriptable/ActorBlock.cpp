@@ -1123,7 +1123,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 	// format: ID or ID.param1 or +SPELLREF
 	int types = caster->spellbook.GetTypes();
 	int lvl = spl->SpellLevel-1;
-	int count, i, tmp, tmp2;
+	int count, i, tmp, tmp2, tmp3;
 	Scriptable *target = NULL;
 	Point targetpos(-1, -1);
 	ieResRef newspl;
@@ -1154,7 +1154,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			// force the surge roll to be < 100, so we cast a spell from the surge table
 			tmp = caster->Modified[IE_FORCESURGE];
 			tmp2 = caster->Modified[IE_SURGEMOD];
-			//FIXME: also save caster level
+			tmp3 = caster->WMLevelMod; // also save caster level; the original didn't reroll the bonus
 			caster->Modified[IE_FORCESURGE] = 7;
 			caster->Modified[IE_SURGEMOD] = - caster->GetCasterLevel(spl->SpellType); // nulify the bonus
 			if (LastTarget) {
@@ -1172,10 +1172,12 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 				if (target) {
 					caster->CastSpell(SpellResRef, target, false, true);
 					strncpy(newspl, SpellResRef, 8);
+					caster->WMLevelMod = tmp3;
 					caster->CastSpellEnd();
 				} else {
 					caster->CastSpellPoint(SpellResRef, targetpos, false, true);
 					strncpy(newspl, SpellResRef, 8);
+					caster->WMLevelMod = tmp3;
 					caster->CastSpellPointEnd();
 				}
 				// reset the ref, since CastSpell*End destroyed it
