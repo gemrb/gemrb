@@ -967,11 +967,11 @@ int Scriptable::CastSpellPoint( ieResRef &SpellRef, const Point &target, bool de
 		SetSpellResRef(SpellRef);
 	}
 
+	LastTargetPos = target;
+
 	if(!CheckWildSurge()) {
 		return -1;
 	}
-
-	LastTargetPos = target;
 	return SpellCast(instant);
 }
 
@@ -1006,14 +1006,15 @@ int Scriptable::CastSpell( ieResRef &SpellRef, Scriptable* target, bool deplete,
 		SetSpellResRef(SpellRef);
 	}
 
-	if(!CheckWildSurge()) {
-		return -1;
-	}
-
 	LastTargetPos = target->Pos;
 	if (target->Type==ST_ACTOR) {
 		LastTarget = target->GetGlobalID();
 	}
+
+	if(!CheckWildSurge()) {
+		return -1;
+	}
+
 	return SpellCast(instant);
 }
 
@@ -1122,7 +1123,10 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 	// format: ID or ID.param1 or +SPELLREF
 	int types = caster->spellbook.GetTypes();
 	int lvl = spl->SpellLevel-1;
-	int count, i;
+	int count, i, tmp, tmp2;
+	Scriptable *target = NULL;
+	Point targetpos(-1, -1);
+	ieResRef newspl;
 	switch (surgeSpellRef[0]) {
 		case '7': // random spell of the same level (FIXME: make an effect out of this?)
 			// change this if we ever want the surges to respect the original type
@@ -1156,6 +1160,43 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			caster->wildSurgeMods.target_type = count;
 			caster->wildSurgeMods.target_change_type = WSTC_ADDTYPE;
 			break;
+		case '3': // (wild surge) roll param1 more times
+			strtok(surgeSpellRef,".");
+			count = strtol(strtok(NULL,"."), NULL, 0);
+			// force surge and then cast
+			// force the surge roll to be < 100, so we cast a spell from the surge table
+			tmp = caster->Modified[IE_FORCESURGE];
+			tmp2 = caster->Modified[IE_SURGEMOD];
+			//FIXME: also save caster level
+			caster->Modified[IE_FORCESURGE] = 7;
+			caster->Modified[IE_SURGEMOD] = - caster->GetCasterLevel(spl->SpellType); // nulify the bonus
+			if (LastTarget) {
+				target = area->GetActorByGlobalID(LastTarget);
+				if (!target) {
+					target = core->GetGame()->GetActorByGlobalID(LastTarget);
+				}
+			}
+			if (!LastTargetPos.isempty()) {
+				targetpos = LastTargetPos;
+			} else if (target) {
+				targetpos = target->Pos;
+			}
+			for (i=0; i<count; i++) {
+				if (target) {
+					caster->CastSpell(SpellResRef, target, false, true);
+					strncpy(newspl, SpellResRef, 8);
+					caster->CastSpellEnd();
+				} else {
+					caster->CastSpellPoint(SpellResRef, targetpos, false, true);
+					strncpy(newspl, SpellResRef, 8);
+					caster->CastSpellPointEnd();
+				}
+				// reset the ref, since CastSpell*End destroyed it
+				strncpy(SpellResRef, newspl, 8);
+			}
+			caster->Modified[IE_FORCESURGE] = tmp;
+			caster->Modified[IE_SURGEMOD] = tmp2;
+			break;
 		case '4': // change the target type to param1
 			strtok(surgeSpellRef,".");
 			count = strtol(strtok(NULL,"."), NULL, 0);
@@ -1175,7 +1216,6 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			count = strtol(strtok(NULL,"."), NULL, 0);
 			caster->wildSurgeMods.projectile_speed_mod = count;
 			break;
-		case '3': // (wild surge) roll param1 more times
 		default:
 			SpellHeader = -1;
 			SpellResRef[0] = 0;
