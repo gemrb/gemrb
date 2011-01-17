@@ -358,4 +358,11 @@ IE_LEVELSORCEROR                = 247
 #the remaining six stats are spell states
 IE_SPLSTATE_ID1                 = 250
 
+#these stats exist only in PC's (but we access only PCs anyway)
+IE_EXPERTISE                    = 0x1003
+IE_POWERATTACK                  = 0x1004
+IE_ARTERIAL_STRIKE              = 0x1005
+IE_HAMSTRING                    = 0x1006
+IE_RAPID_SHOT                   = 0x1007
+
 # End of file ie_stats.py

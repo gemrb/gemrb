@@ -86,6 +86,9 @@ static int ItemSoundsCount = -1;
 #define CRI_EQUIP  1
 #define CRI_SWAP   2
 
+//bit used in SetCreatureStat to access some fields
+#define EXTRASETTINGS 0x1000
+
 struct UsedItemType {
 	ieResRef itemname;
 	ieVariable username; //death variable
@@ -266,6 +269,16 @@ static inline bool CheckStat(Actor * actor, ieDword stat, ieDword value, int op)
 
 static int GetCreatureStat(Actor *actor, unsigned int StatID, int Mod)
 {
+	//this is a hack, if more PCStats fields are needed, improve it
+	if (StatID&EXTRASETTINGS) {
+		PCStatsStruct *ps = actor->PCStats;
+		if (!ps) {
+			//the official invalid value in GetStat
+			return 0xdadadada;
+		}
+		StatID&=15;
+		return ps->ExtraSettings[StatID];
+	}
 	if (Mod) {
 		return actor->GetStat( StatID );
 	}
@@ -274,6 +287,17 @@ static int GetCreatureStat(Actor *actor, unsigned int StatID, int Mod)
 
 static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue, bool pcf)
 {
+	//this is a hack, if more PCStats fields are needed, improve it
+	if (StatID&EXTRASETTINGS) {
+		PCStatsStruct *ps = actor->PCStats;
+		if (!ps) {
+			return 0;
+		}
+		StatID&=15;
+		ps->ExtraSettings[StatID] = StatValue;
+		return 1;
+	}
+
 	if (pcf) {
 		actor->SetBase( StatID, StatValue );
 	} else {
