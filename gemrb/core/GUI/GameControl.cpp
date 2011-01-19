@@ -131,8 +131,7 @@ GameControl::GameControl(void)
 	core->GetDictionary()->Lookup("Center",tmp);
 	if (tmp) {
 		ScreenFlags=SF_ALWAYSCENTER|SF_CENTERONACTOR;
-	}
-	else {
+	} else {
 		ScreenFlags = SF_CENTERONACTOR;
 	}
 	LeftCount = 0;
@@ -1549,26 +1548,22 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 	}
 	Action* action = GenerateAction( Tmp );
 	action->pointParameter=tgt;
-	if (spellOrItem>=0)
-	{
+	if (spellOrItem>=0) {
 		if (spellIndex<0) {
 			sprintf(action->string0Parameter,"%.8s",spellName);
 		} else {
 			CREMemorizedSpell *si;
 			//spell casting at target
 			si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
-			if (!si)
-			{
+			if (!si) {
 				ResetTargetMode();
 				return;
 			}
 			sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
 		}
-	}
-	else
-	{
-		action->int0Parameter=spellSlot;
-		action->int1Parameter=spellIndex;
+	} else {
+		action->int0Parameter = spellSlot;
+		action->int1Parameter = spellIndex;
 	}
 	source->AddAction( action );
 	if (!spellCount) {
@@ -1600,26 +1595,22 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		sprintf(Tmp, "NIDSpecial5()");
 	}
 	Action* action = GenerateActionDirect( Tmp, tgt);
-	if (spellOrItem>=0)
-	{
+	if (spellOrItem>=0) {
 		if (spellIndex<0) {
 			sprintf(action->string0Parameter,"%.8s",spellName);
 		} else {
 			CREMemorizedSpell *si;
 			//spell casting at target
 			si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
-			if (!si)
-			{
+			if (!si) {
 				ResetTargetMode();
 				return;
 			}
 			sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
 		}
-	}
-	else
-	{
-		action->int0Parameter=spellSlot;
-		action->int1Parameter=spellIndex;
+	} else {
+		action->int0Parameter = spellSlot;
+		action->int1Parameter = spellIndex;
 	}
 	source->AddAction( action );
 	if (!spellCount) {
@@ -2184,8 +2175,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 	if (ScreenFlags & SF_LOCKSCROLL) {
 		moveX = 0;
 		moveY = 0;
-	}
-	else {
+	} else {
 		// override any existing viewport moves which may be in progress
 		core->timer->SetMoveViewPort( Viewport.x, Viewport.y, 0, false );
 		// move it directly ourselves, since we might be paused

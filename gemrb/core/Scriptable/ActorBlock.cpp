@@ -949,7 +949,7 @@ int Scriptable::CastSpellPoint( ieResRef &SpellRef, const Point &target, bool de
 	LastTargetPos.empty();
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
-		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
+		if (actor->HandleCastingStance(SpellRef,deplete) ) {
 			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
 			return -1;
 		}
@@ -984,7 +984,7 @@ int Scriptable::CastSpell( ieResRef &SpellRef, Scriptable* target, bool deplete,
 	LastTargetPos.empty();
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
-		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
+		if (actor->HandleCastingStance(SpellRef,deplete) ) {
 			printMessage("Scriptable", "Spell not known or memorized, aborting cast!\n", LIGHT_RED);
 			return -1;
 		}
