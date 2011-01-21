@@ -724,7 +724,7 @@ bool Actor::ApplyKit(bool remove)
 	//multi class
 	if (multiclass) {
 		ieDword msk = 1;
-		for(unsigned int i=1;(i<32) && (msk<=multiclass);i++) {
+		for(unsigned int i=1;(i<(unsigned int) classcount) && (msk<=multiclass);i++) {
 			if (multiclass & msk) {
 				max = GetClassLevel(levelslotsbg[i]);
 				// don't apply/remove the old kit clab if the kit is disabled
@@ -740,11 +740,13 @@ bool Actor::ApplyKit(bool remove)
 	}
 	//single class
 	ieDword cls = GetStat(IE_CLASS);
+	if (cls<(ieDword) classcount) {
+		return false;
+	}
 	max = GetClassLevel(levelslotsbg[cls]);
 	if (kitclass==cls) {
 		ApplyClab(clab, max, remove);
-	}
-	else {
+	} else {
 		ApplyClab(classabilities[cls], max, remove);
 	}
 	return true;
