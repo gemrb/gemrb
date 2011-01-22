@@ -2,18 +2,18 @@
 -1
                  STAT          ABILITY
 Alchemy          ALCHEMY       INT
-Animal_Empathy   ANIMALS       CHA
-Bluff            BLUFF         CHA
+Animal_Empathy   ANIMALS       CHR
+Bluff            BLUFF         CHR
 Concentration    CONCENTRATION CON
-Diplomacy        DIPLOMACY     CHA
+Diplomacy        DIPLOMACY     CHR
 Disable_Device   TRAPS         INT
 Hide             HIDEINSHADOWS DEX
-Intimidate       INTIMIDATE    CHA
+Intimidate       INTIMIDATE    CHR
 Knowledge_Arcana LORE          INT
 Move_Silently    STEALTH       DEX
 Open_Lock        LOCKPICKING   DEX
 Pick_Pocket      PICKPOCKET    DEX
 Search           SEARCH        INT
 Spellcraft       SPELLCRAFT    INT
-Use_Magic_Device MAGICDEVICE   CHA
+Use_Magic_Device MAGICDEVICE   CHR
 Wilderness_Lore  TRACKING      WIS
