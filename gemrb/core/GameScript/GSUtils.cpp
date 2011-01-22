@@ -64,8 +64,6 @@ int ExtraParametersCount = 0;
 int InDebug = 0;
 int happiness[3][20];
 int RandomNumValue;
-int *SkillStats=NULL;
-int SkillCount=-1;
 // reaction modifiers (by reputation and charisma)
 int rmodrep[20];
 int rmodchr[25];
@@ -73,20 +71,6 @@ Gem_Polygon **polygons;
 
 void InitScriptTables()
 {
-	//initializing the skill->stats conversion table
-	{
-	AutoTable tab("skillsta");
-	if (tab) {
-		int rowcount = tab->GetRowCount();
-		SkillCount = rowcount;
-		if (rowcount) {
-			SkillStats = (int *) malloc(rowcount * sizeof(int) );
-			while(rowcount--) {
-				SkillStats[rowcount]=strtol(tab->QueryField(rowcount,0), NULL, 0);
-			}
-		}
-	}
-	}
 	//initializing the happiness table
 	{
 	AutoTable tab("happy");

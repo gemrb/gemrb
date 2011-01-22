@@ -88,10 +88,13 @@ static int xpbonuslevels = -1;
 static int **levelslots = NULL;
 static int *dualswap = NULL;
 static int *maxhpconbon = NULL;
+static int *skillstats = NULL;
+static int *skillabils = NULL;
+static int skillcount = -1;
 static ieVariable CounterNames[4]={"GOOD","LAW","LADY","MURDER"};
 
 static int FistRows = -1;
-int *wmlevels[20];
+static int *wmlevels[20];
 typedef ieResRef FistResType[MAX_LEVEL+1];
 
 static FistResType *fistres = NULL;
@@ -1254,6 +1257,15 @@ void Actor::ReleaseMemory()
 			free(maxhpconbon);
 			maxhpconbon=NULL;
 		}
+		if (skillstats) {
+			free(skillstats);
+			skillstats=NULL;
+		}
+		if (skillabils) {
+			free(skillabils);
+			skillabils=NULL;
+		}
+
 		if (wspecial) {
 			for (i=0; i<=wspecial_max; i++) {
 				if (wspecial[i]) {
@@ -1906,6 +1918,21 @@ static void InitActorTables()
 			VCMap[row]=value;
 		}
 	}
+
+        //initializing the skill->stats conversion table (used in iwd2)
+        tm.load("skillsta");
+        if (tm) {
+                int rowcount = tm->GetRowCount();
+                skillcount = rowcount;
+                if (rowcount) {
+                        skillstats = (int *) malloc(rowcount * sizeof(int) );
+                        skillabils = (int *) malloc(rowcount * sizeof(int) );
+                        while(rowcount--) {
+                                skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
+                                skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
+                        }
+                }
+        }
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -6424,6 +6451,20 @@ bool Actor::HasSpellState(unsigned int spellstate) const
 	unsigned int bit = 1<<(spellstate&31);
 	if (Modified[pos]&bit) return true;
 	return false;
+}
+
+//this is a very specific rule that might need an external table later
+int Actor::GetAbilityBonus(unsigned int ability) const
+{
+	return GetStat(ability)/2-5;
+}
+
+int Actor::GetSkill(unsigned int skill) const
+{
+	if (skill>=(unsigned int) skillcount) return -1;
+	int ret = GetStat(skillstats[skill])+GetAbilityBonus(skillabils[skill]);
+	if (ret<0) ret = 0;
+	return ret;
 }
 
 //returns the numeric value of a feat, different from HasFeat

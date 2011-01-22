@@ -55,8 +55,6 @@ extern ieResRef *ObjectIDSTableNames;
 extern int ObjectFieldsCount;
 extern int ExtraParametersCount;
 extern int InDebug;
-extern int *SkillStats;
-extern int SkillCount;
 extern Gem_Polygon **polygons;
 
 #define MIC_INVALID -2

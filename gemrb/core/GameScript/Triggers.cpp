@@ -2258,9 +2258,6 @@ int GameScript::XPLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::CheckSkill(Scriptable* Sender, Trigger* parameters)
 {
-	if (parameters->int1Parameter>=SkillCount) {
-		return 0;
-	}
 	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!target) {
 		return 0;
@@ -2269,7 +2266,9 @@ int GameScript::CheckSkill(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) target;
-	if ((signed) actor->GetStat( SkillStats[parameters->int1Parameter] ) == parameters->int0Parameter) {
+	int sk = actor->GetSkill( parameters->int1Parameter );
+	if (sk<0) return 0;
+	if ( sk == parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -2284,7 +2283,7 @@ int GameScript::CheckStat(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) target;
-	if ((signed) actor->GetStat( parameters->int1Parameter ) == parameters->int0Parameter) {
+	if ( (signed) actor->GetStat( parameters->int1Parameter ) == parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -2292,15 +2291,14 @@ int GameScript::CheckStat(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::CheckSkillGT(Scriptable* Sender, Trigger* parameters)
 {
-	if (parameters->int1Parameter>=SkillCount) {
-		return 0;
-	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if ((signed) actor->GetStat( SkillStats[parameters->int1Parameter] ) > parameters->int0Parameter) {
+	int sk = actor->GetSkill( parameters->int1Parameter );
+	if (sk<0) return 0;
+	if ( sk > parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -2313,7 +2311,7 @@ int GameScript::CheckStatGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if ((signed) actor->GetStat( parameters->int1Parameter ) > parameters->int0Parameter) {
+	if ( (signed) actor->GetStat( parameters->int1Parameter ) > parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -2321,15 +2319,14 @@ int GameScript::CheckStatGT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::CheckSkillLT(Scriptable* Sender, Trigger* parameters)
 {
-	if (parameters->int1Parameter>=SkillCount) {
-		return 0;
-	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if ((signed) actor->GetStat( SkillStats[parameters->int1Parameter] ) < parameters->int0Parameter) {
+	int sk = actor->GetSkill( parameters->int1Parameter );
+	if (sk<0) return 0;
+	if ( sk < parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -2342,7 +2339,7 @@ int GameScript::CheckStatLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if ((signed) actor->GetStat( parameters->int1Parameter ) < parameters->int0Parameter) {
+	if ( (signed) actor->GetStat( parameters->int1Parameter ) < parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;

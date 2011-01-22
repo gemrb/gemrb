@@ -1251,10 +1251,6 @@ void Targets::Clear()
 /** releasing global memory */
 static void CleanupIEScript()
 {
-	if (SkillStats)
-		free(SkillStats);
-	SkillStats = NULL;
-	SkillCount = -1;
 	if (ObjectIDSTableNames)
 		free(ObjectIDSTableNames);
 	ObjectIDSTableNames = NULL;

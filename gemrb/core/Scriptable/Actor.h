@@ -656,8 +656,10 @@ public:
 	/* initialize the action buttons based on class. If forced, it will override
 		previously customized or set buttons. */
 	void InitButtons(ieDword cls, bool forced);
-	void SetFeat(unsigned int feat, int mode);
+	int GetAbilityBonus(unsigned int ability) const;
+	int GetSkill(unsigned int skill) const;
 	int GetFeat(unsigned int feat) const;
+	void SetFeat(unsigned int feat, int mode);
 	void SetUsedWeapon(const char *AnimationType, ieWord *MeleeAnimation,
 		int WeaponType=-1);
 	void SetUsedShield(const char *AnimationType, int WeaponType=-1);
