@@ -2476,6 +2476,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"JournalHasSections", //56GF_JOURNAL_HAS_SECTIONS
 		"CastingSounds",      //57GF_CASTING_SOUNDS
 		"EnhancedCastingSounds", //58GF_CASTING_SOUNDS2
+		"ForceAreaScript",    //59GF_FORCE_AREA_SCRIPT
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

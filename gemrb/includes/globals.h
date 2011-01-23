@@ -146,9 +146,9 @@
 #define  GF_JOURNAL_HAS_SECTIONS        56 //bg2
 #define  GF_CASTING_SOUNDS              57 //all except pst and bg1
 #define  GF_CASTING_SOUNDS2             58 //bg2
-
+#define  GF_FORCE_AREA_SCRIPT           59 //how and iwd2 (maybe iwd1)
 //update this or bad things can happen
-#define GF_COUNT 59
+#define GF_COUNT 60
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
