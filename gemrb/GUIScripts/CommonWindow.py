@@ -168,12 +168,13 @@ def OpenContainerWindow ():
 	else:
 		# FIXME: see note in CloseContainerWindow
 		if GUICommon.GameIsIWD2():
-			GUIWORLD.OldActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("PortraitWindow") )
+			GUIWORLD.OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
+			GemRB.SetVar ("MessageWindow", Window.ID)
 		else:
 			GUIWORLD.OldActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
-		GUIWORLD.OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
-		GemRB.SetVar ("MessageWindow", -1)
-	GemRB.SetVar ("ActionsWindow", Window.ID)
+			GUIWORLD.OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
+			GemRB.SetVar ("MessageWindow", -1)
+			GemRB.SetVar ("ActionsWindow", Window.ID)
 
 	Container = GemRB.GetContainer(0)
 
@@ -279,10 +280,10 @@ def CloseContainerWindow ():
 
 	# FIXME: iwd2 bug or just bad naming?
 	if GUICommon.GameIsIWD2():
-		GemRB.SetVar ("PortraitWindow", OldActionsWindow.ID)
+		GemRB.SetVar ("MessageWindow", GUIWORLD.OldMessageWindow.ID)
 	else:
 		GemRB.SetVar ("ActionsWindow", GUIWORLD.OldActionsWindow.ID)
-	GemRB.SetVar ("MessageWindow", GUIWORLD.OldMessageWindow.ID)
+		GemRB.SetVar ("MessageWindow", GUIWORLD.OldMessageWindow.ID)
 	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']
 	tmp = Table.GetValue (row, 2)
