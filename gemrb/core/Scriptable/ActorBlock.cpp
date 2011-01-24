@@ -1993,8 +1993,8 @@ Door::~Door(void)
 void Door::ImpedeBlocks(int count, Point *points, unsigned char value)
 {
 	for(int i = 0;i<count;i++) {
-		unsigned char tmp = area->SearchMap->GetAt( points[i].x, points[i].y ) & PATH_MAP_NOTDOOR;
-		area->SearchMap->SetAt( points[i].x, points[i].y, (tmp|value) );
+		unsigned char tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PATH_MAP_NOTDOOR;
+		area->SetInternalSearchMap(points[i].x, points[i].y, tmp|value);
 	}
 }
 
@@ -2118,7 +2118,7 @@ bool Door::BlockedOpen(int Open, int ForceOpen)
 		Actor** ab;
 		rgn.x = points[i].x*16;
 		rgn.y = points[i].y*12;
-		unsigned char tmp = area->SearchMap->GetAt( points[i].x, points[i].y ) & PATH_MAP_ACTOR;
+		unsigned char tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PATH_MAP_ACTOR;
 		if (tmp) {
 			int ac = area->GetActorInRect(ab, rgn, false);
 			while(ac--) {
