@@ -26,6 +26,7 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 from GUIDefines import *
+from ie_stats import *
 from ie_action import ACT_CAST
 
 TopIndex = 0
