@@ -45,6 +45,7 @@ OldPortraitWindow = None
 RentConfirmWindow = None
 LeftButton = None
 RightButton = None
+CureTable = None
 
 ITEM_PC    = 0
 ITEM_STORE = 1
@@ -110,6 +111,9 @@ def CloseStoreWindow ():
 		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
 		GemRB.UnhideGUI () #enabling the other windows
 		GUICommonWindows.SetSelectionChangeHandler( None )
+
+	CureTable.Unload()
+	CureTable = None
 	return
 
 def OpenStoreWindow ():
@@ -118,6 +122,9 @@ def OpenStoreWindow ():
 	global OldPortraitWindow
 	global store_funcs
 	global Inventory
+	global CureTable
+
+	CureTable = GemRB.LoadTable("speldesc") #additional info not supported by core
 
 	#these are function pointers, not strings
 	#can't put this in global init, doh!
@@ -1201,6 +1208,12 @@ def InfoHealWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
+def PlayCureSoundEffect (spell):
+	print spell
+	print CureTable.GetValue(spell, "SOUND_EFFECT")
+	GemRB.PlaySound (CureTable.GetValue(spell, "SOUND_EFFECT") )
+	return
+
 def BuyHeal ():
 	Index = GemRB.GetVar ("Index")
 	Cure = GemRB.GetStoreCure (Index)
@@ -1212,6 +1225,7 @@ def BuyHeal ():
 	GemRB.GameSetPartyGold (gold-Cure['Price'])
 	pc = GemRB.GameGetSelectedPCSingle ()
 	GemRB.ApplySpell (pc, Cure['CureResRef'])
+	PlayCureSoundEffect (Cure['CureResRef'])
 	UpdateStoreHealWindow ()
 	return
 
