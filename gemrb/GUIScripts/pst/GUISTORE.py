@@ -762,7 +762,6 @@ def RedrawStoreShoppingWindow ():
 
 			if (Price>0) and (Flags & SHOP_SELL):
 				if Flags & SHOP_SELECT:
-					print "SELECTING", GemRB.GetString(Item['ItemNameIdentified'])
 					Button.SetState (IE_GUI_BUTTON_SELECTED)
 				else:
 					Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -1209,8 +1208,6 @@ def InfoHealWindow ():
 	return
 
 def PlayCureSoundEffect (spell):
-	print spell
-	print CureTable.GetValue(spell, "SOUND_EFFECT")
 	GemRB.PlaySound (CureTable.GetValue(spell, "SOUND_EFFECT") )
 	return
 
