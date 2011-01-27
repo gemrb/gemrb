@@ -340,13 +340,14 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	// Small map for MapControl
-	ResourceHolder<ImageMgr> sm(TmpResRef);
 	// small map is *optional*!
+	ResourceHolder<ImageMgr> sm(TmpResRef);
 
 	if (Script[0]) {
-		map->Scripts[0] = new GameScript( Script, map );
-	} else {
-		map->Scripts[0] = NULL;
+		//for some reason the area's script is run from the last slot
+		//at least one area script depends on this, if you need something
+		//more customisable, add a game flag
+		map->Scripts[MAX_SCRIPTS-1] = new GameScript( Script, map );
 	}
 
 	if (day_or_night) {
