@@ -69,6 +69,10 @@ private:
 	int PutJournals(DataStream *stream, Game *game);
 	int PutVariables( DataStream *stream, Game *game);
 	int PutKillVars(DataStream *stream, Game *game);
+	void GetMazeHeader(void *memory);
+	void GetMazeEntry(void *memory);
+	void PutMazeHeader(DataStream *stream, void *memory);
+	void PutMazeEntry(DataStream *stream, void *memory);
 	int PutMaze(DataStream *stream, Game *game);
 	int PutFamiliars(DataStream *stream, Game *game);
 	int PutSavedLocations(DataStream *stream, Game *game);

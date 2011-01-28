@@ -157,6 +157,35 @@ struct GAMLocationEntry {
 	Point Pos;
 };
 
+//pst maze data structures (TODO: create a separate class?)
+struct maze_entry {
+	ieDword unknown00;
+	ieDword unknown04;
+	ieDword unknown08;
+	ieDword unknown0c;
+	ieDword unknown10;
+	ieWord unknown12;
+	ieDword unknown16;
+};
+
+struct maze_header {
+	ieDword maze_sizex, maze_sizey;
+	ieDword nordomx, nordomy;
+	ieDword unknown10, unknown14;
+	ieDword unknown18, unknown1c;
+	ieDword unknown20, unknown24;
+	ieDword difficulty;
+	ieDword unknown28;
+	ieDword unknown2c;
+	ieDword unknown30;
+};
+
+#define MAZE_ENTRY_SIZE sizeof(maze_entry)
+#define MAZE_HEADER_SIZE sizeof(maze_header)
+#define MAZE_ENTRY_COUNT 64
+#define MAZE_DATA_SIZE (MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE+MAZE_HEADER_SIZE)
+#define MAZE_DATA_SIZE_HARDCODED 1720
+
 #define MAX_CRLEVEL 32
 
 typedef int CRRow[MAX_CRLEVEL];
@@ -399,6 +428,8 @@ public:
 	void RestParty(int checks, int dream, int hp);
 	/** timestop effect initiated by actor */
 	void TimeStop(Actor *actor, ieDword end);
+	/** updates the infravision info */
+	void Infravision();
 	/** gets the colour which should be applied over the game area,
 	may return NULL */
 	const Color *GetGlobalTint() const;
@@ -414,8 +445,8 @@ public:
 	void DebugDump();
 	/** Finds an actor by global ID */
 	Actor *GetActorByGlobalID(ieDword objectID);
-	/** updates the infravision info */
-	void Infravision();
+	/** Allocates maze data */
+	ieByte *AllocateMazeData();
 private:
 	bool DetermineStartPosType(const TableMgr *strta);
 	ieResRef *GetDream(Map *area);
