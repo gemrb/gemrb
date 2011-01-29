@@ -558,10 +558,12 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		// make initial phase depend on location to make the pulse appear
 		// less even
 		ColorMods[i].phase = 5*i;
+		ColorMods[i].locked = false;
 	}
 	GlobalColorMod.type = RGBModifier::NONE;
 	GlobalColorMod.speed = 0;
 	GlobalColorMod.phase = 0;
+	GlobalColorMod.locked = false;
 	lastModUpdate = 0;
 
 	AvatarsRowNum=AvatarsCount;
