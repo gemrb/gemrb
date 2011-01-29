@@ -1827,6 +1827,9 @@ Actor *Game::GetActorByGlobalID(ieDword globalID)
 
 ieByte *Game::AllocateMazeData()
 {
+	if (mazedata) {
+		free(mazedata);
+	}
 	mazedata = (ieByte*)malloc(MAZE_DATA_SIZE);
 	return mazedata;
 }
