@@ -43,19 +43,19 @@ def GetPossible (pos):
 	if posx>0:
 		pos = Possible(posx-1, posy)
 		if pos>0:
-			possible[:0] = pos
+			possible[:0] = [pos]
 	if posy>0:
 		pos = Possible(posx, posy-1)
 		if pos>0:
-			possible[:0] = pos
+			possible[:0] = [pos]
 	if posx<7:
 		pos = Possible(posx+1, posy)
 		if pos>0:
-			possible[:0] = pos
+			possible[:0] = [pos]
 	if posy<7:
 		pos = Possible(posx, posy+1)
 		if pos>0:
-			possible[:0] = pos
+			possible[:0] = [pos]
 	return possible
 
 #loads a 2da and sets it up as maze
@@ -65,7 +65,7 @@ def LoadMazeFrom2da(tablename):
 		return
 	size = MazeTable.GetValue(-1,-1)
 	GemRB.SetupMaze(size, size)
-	entries = size*size
+	entries = zeros(MAZE_ENTRY_COUNT)
 	traps = 0
 	for i in entries:
 		Area = MazeTable.GetRowName(i)
@@ -73,7 +73,8 @@ def LoadMazeFrom2da(tablename):
 		TRAPTYPE = MazeTable.GetValue(Area,"TRAPTYPE")
 		WALLS = MazeTable.GetValue(Area,"WALLS")
 		FIELD_16 = MazeTable.GetValue(Area,"FIELD_16")
-		pos = int(Area[3:])
+		pos = int(Area[3:])-1
+		print Area,":", pos
 		GemRB.SetMazeEntry(pos, ME_0, FIELD_0)
 		GemRB.SetMazeEntry(pos, ME_TRAP, TRAPTYPE)
 		GemRB.SetMazeEntry(pos, ME_WALLS, WALLS)
@@ -81,7 +82,7 @@ def LoadMazeFrom2da(tablename):
 		if TRAPTYPE>=0:
 			traps = traps+1
 
-	GemRB.SetMazeData(MH_TRAPS, traps)
+	GemRB.SetMazeData(MH_TRAPCOUNT, traps)
 	GemRB.SetMazeData(MH_INITED, 1)
 	return
 
@@ -189,17 +190,18 @@ def CreateMaze ():
 		GemRB.SetMazeEntry(pos, ME_TRAP, GemRB.Roll(1, 3, -1) )
 
 	entries = zeros(max)
-	while rooms.len()>0:
+	while len(rooms)>0:
 		pos = rooms[0]
 		rooms[0:1] = []
 		posy = pos/dims
 		posx = pos-posy
 		possible = GetPossible(pos)
-		if possible.len()>0:
-			if possible.len()==1:
+		plen = len(possible)
+		if plen>0:
+			if plen==1:
 				newpos = possible[0]
 			else:
-				newpos = possible[GemRB.Roll(1, possible.len(), -1) ]
+				newpos = possible[GemRB.Roll(1, plen, -1) ]
 			if entries[newpos]==0:
 				AddRoom(newpos)
 
