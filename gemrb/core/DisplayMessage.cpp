@@ -113,15 +113,17 @@ unsigned int DisplayMessage::GetSpeakerColor(const char *&name, const Scriptable
 void DisplayMessage::DisplayConstantString(int stridx, unsigned int color, Scriptable *target) const
 {
 	if (stridx<0) return;
-	const char* text = core->GetString( strref_table[stridx], IE_STR_SOUND );
+	char* text = core->GetString( strref_table[stridx], IE_STR_SOUND );
 	DisplayString(text, color, target);
+	core->FreeString(text);
 }
 
 void DisplayMessage::DisplayString(int stridx, unsigned int color, ieDword flags) const
 {
 	if (stridx<0) return;
-	const char* text = core->GetString( stridx, flags);
+	char* text = core->GetString( stridx, flags);
 	DisplayString(text, color, NULL);
+	core->FreeString(text);
 }
 
 void DisplayMessage::DisplayString(const char *text, unsigned int color, Scriptable *target) const
@@ -179,8 +181,9 @@ void DisplayMessage::DisplayConstantStringName(int stridx, unsigned int color, c
 	if (stridx<0) return;
 	if(!speaker) return;
 
-	const char* text = core->GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
+	char* text = core->GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	DisplayStringName(text, color, speaker);
+	core->FreeString(text);
 }
 
 // String format is
@@ -211,8 +214,9 @@ void DisplayMessage::DisplayStringName(int stridx, unsigned int color, const Scr
 {
 	if (stridx<0) return;
 
-	const char* text = core->GetString( stridx, flags);
+	char* text = core->GetString( stridx, flags);
 	DisplayStringName(text, color, speaker);
+	core->FreeString( text );
 }
 
 void DisplayMessage::DisplayStringName(const char *text, unsigned int color, const Scriptable *speaker) const

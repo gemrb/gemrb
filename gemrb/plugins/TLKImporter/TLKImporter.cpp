@@ -249,44 +249,6 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 		Decoded = GetString( RaceStrRef(-1), 0);
 		goto exit_function;
 	}
-/*
-	if (!strcmp( Token, "SIRMAAM" )) {
-		Decoded = GetString( GenderStrRef(-1,27473,27475), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "GIRLBOY" )) {
-		Decoded = GetString( GenderStrRef(-1,27477,27476), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "BROTHERSISTER" )) {
-		Decoded = GetString( GenderStrRef(-1,27478,27479), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "LADYLORD" )) {
-		Decoded = GetString( GenderStrRef(-1,27481,27480), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "MALEFEMALE" )) {
-		Decoded = GetString( GenderStrRef(-1,27482,27483), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "HESHE" )) {
-		Decoded = GetString( GenderStrRef(-1,27484,27485), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "HISHER" )) {
-		Decoded = GetString( GenderStrRef(-1,27486,27487), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "HIMHER" )) {
-		Decoded = GetString( GenderStrRef(-1,27488,27487), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "MANWOMAN" )) {
-		Decoded = GetString( GenderStrRef(-1,27489,27490), 0);
-		goto exit_function;
-	}
-*/
 	if (!strncmp( Token, "PLAYER",6 )) {
 		Decoded = CharName(Token[6]-'1');
 		goto exit_function;
@@ -304,44 +266,6 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 		Decoded = GetString( RaceStrRef(0), 0);
 		goto exit_function;
 	}
-/*
-	if (!strcmp( Token, "PRO_SIRMAAM" )) {
-		Decoded = GetString( GenderStrRef(0,27473,27475), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "PRO_GIRLBOY" )) {
-		Decoded = GetString( GenderStrRef(0,27477,27476), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "PRO_BROTHERSISTER" )) {
-		Decoded = GetString( GenderStrRef(0,27478,27479), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "PRO_LADYLORD" )) {
-		Decoded = GetString( GenderStrRef(0,27481,27480), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "PRO_MALEFEMALE" )) {
-		Decoded = GetString( GenderStrRef(0,27482,27483), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "PRO_HESHE" )) {
-		Decoded = GetString( GenderStrRef(0,27484,27485), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "PRO_HISHER" )) {
-		Decoded = GetString( GenderStrRef(0,27486,27487), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "PRO_HIMHER" )) {
-		Decoded = GetString( GenderStrRef(0,27488,27487), 0);
-		goto exit_function;
-	}
-	if (!strcmp( Token, "PRO_MANWOMAN" )) {
-		Decoded = GetString( GenderStrRef(0,27489,27490), 0);
-		goto exit_function;
-	}
-*/
 	if (!strcmp( Token, "MAGESCHOOL" )) {
 		ieDword row = 0; //default value is 0 (generalist)
 		//this is subject to change, the row number in magesch.2da
