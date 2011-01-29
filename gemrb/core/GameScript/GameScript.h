@@ -1219,6 +1219,7 @@ public:
 	static void PlayDeadInterruptable(Scriptable* Sender, Action* parameters);
 	static void PlayerDialogue(Scriptable* Sender, Action* parameters);
 	static void PlaySequence(Scriptable* Sender, Action* parameters);
+	static void PlaySequenceGlobal(Scriptable* Sender, Action* parameters);
 	static void PlaySequenceTimed(Scriptable* Sender, Action* parameters);
 	static void PlaySound(Scriptable* Sender, Action* parameters);
 	static void PlaySoundNotRanged(Scriptable* Sender, Action* parameters);

@@ -2038,6 +2038,40 @@ void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
 	actor->SetStance( parameters->int0Parameter );
 }
 
+//same as PlaySequence, but the value comes from a variable
+//ToDo: create a PlaySequenceCore in GSUtils
+void GameScript::PlaySequenceGlobal(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar;
+	ieDword value;
+
+	value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
+
+	if (parameters->objects[1]) {
+		tar = GetActorFromObject( Sender, parameters->objects[1] );
+		if (!tar) {
+			//could be an animation
+			AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName);
+			if (anim) {
+				//set animation's cycle to value;
+				anim->sequence=value;
+				anim->frame=0;
+				//what else to be done???
+				anim->InitAnimation();
+			}
+			return;
+		}
+
+	} else {
+		tar = Sender;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) tar;
+	actor->SetStance( value );
+}
+
 void GameScript::SetDialogue(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {

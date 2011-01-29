@@ -717,6 +717,7 @@ static const ActionLink actionnames[] = {
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playerdialogue", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playsequence", GameScript::PlaySequence, 0},
+	{"playsequenceglobal", GameScript::PlaySequenceGlobal, 0}, //pst
 	{"playsequencetimed", GameScript::PlaySequenceTimed, 0},//pst
 	{"playsong", GameScript::StartSong, 0},
 	{"playsound", GameScript::PlaySound, 0},

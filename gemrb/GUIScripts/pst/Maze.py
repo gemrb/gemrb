@@ -32,8 +32,8 @@ entries = None
 def Possible(posx, posy):
 	pos = posy*MAZE_MAX_DIM+posx
 	if entries[pos]==2:
-		return false
-	return true
+		return False
+	return True
 
 def GetPossible (pos):
 	posy = pos/max
@@ -99,16 +99,16 @@ def MainRoomFits (pos2x, pos2y, pos):
 	south = pos2y*MAZE_MAX_DIM+pos2x
 
 	if south==pos:
-		return false
+		return False
 
 	north = (pos2y+1)*MAZE_MAX_DIM+pos2x
 	if north==pos:
-		return false
+		return False
 
 	GemRB.SetMazeEntry(south, ME_WALLS, WALL_NORTH)
 	entries[north]=2
 	AddRoom(south)
-	return true
+	return True
 
 def zeros (size):
 	return size*[0]
@@ -148,8 +148,8 @@ def CreateMaze ():
 
 	GemRB.SetupMaze(dims, dims)
 
-	nordomx = GemRB.Roll(1, dims-1, 0)
-	nordomy = GemRB.Roll(1, dims, 0)
+	nordomx = GemRB.Roll(1, dims-1, -1)
+	nordomy = GemRB.Roll(1, dims, -1)
 	pos = nordomy*MAZE_MAX_DIM+nordomx
 	entries[pos] = 2
 	GemRB.SetMazeEntry(pos, ME_WALLS, WALL_EAST)
@@ -158,11 +158,11 @@ def CreateMaze ():
 	if (mazedifficulty>1):
 		GemRB.SetMazeData(MH_POS1X, nordomx)
 		GemRB.SetMazeData(MH_POS1Y, nordomy)
-		pos2x = GemRB.Roll(1, dims, 0)
-		pos2y = GemRB.Roll(1, dims-1, 0)
+		pos2x = GemRB.Roll(1, dims, -1)
+		pos2y = GemRB.Roll(1, dims-1, -1)
 		while not MainRoomFits(pos2x, pos2y, pos):
-			pos2x = GemRB.Roll(1, dims, 0)
-			pos2y = GemRB.Roll(1, dims-1, 0)
+			pos2x = GemRB.Roll(1, dims, -1)
+			pos2y = GemRB.Roll(1, dims-1, -1)
 
 		GemRB.SetMazeData(MH_POS2X, -1)
 		GemRB.SetMazeData(MH_POS2Y, -1)
@@ -173,9 +173,9 @@ def CreateMaze ():
 		GemRB.SetMazeData(MH_POS2Y, -1)
 		
 
-	for i in traps:
-		posx = GemRB.Roll(1, dims, 0)
-		posy = GemRB.Roll(1, dims, 0)
+	for i in range(traps):
+		posx = GemRB.Roll(1, dims, -1)
+		posy = GemRB.Roll(1, dims, -1)
 		pos = posy*MAZE_MAX_DIM+posx;
 		while entries[pos]:
 			pos = pos + 1
@@ -186,7 +186,7 @@ def CreateMaze ():
 			else:
 				posy = pos/dims
 				posx = pos-posy
-		GemRB.SetMazeEntry(pos, ME_TRAP, GemRB.Roll(1, 3, 0) )
+		GemRB.SetMazeEntry(pos, ME_TRAP, GemRB.Roll(1, 3, -1) )
 
 	entries = zeros(max)
 	while rooms.len()>0:
@@ -199,7 +199,7 @@ def CreateMaze ():
 			if possible.len()==1:
 				newpos = possible[0]
 			else:
-				newpos = possible[GemRB.Roll(1, possible.len(), 0) ]
+				newpos = possible[GemRB.Roll(1, possible.len(), -1) ]
 			if entries[newpos]==0:
 				AddRoom(newpos)
 
