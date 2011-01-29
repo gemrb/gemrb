@@ -584,6 +584,12 @@ void Interface::HandleEvents()
 		guiscript->RunFunction( "MessageWindow", "GameExpansion", false );
 		return;
 	}
+
+	if (EventFlag&EF_CREATEMAZE) {
+		EventFlag&=~EF_CREATEMAZE;
+		guiscript->RunFunction( "Maze", "CreateMaze", false );
+		return;
+	}
 }
 
 /* handle main loop events that might destroy or create windows

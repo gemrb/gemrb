@@ -572,6 +572,7 @@ static const ActionLink actionnames[] = {
 	{"fillslot", GameScript::FillSlot, 0},
 	{"finalsave", GameScript::SaveGame, 0}, //synonym
 	{"findtraps", GameScript::FindTraps, 0},
+	{"fixengineroom", GameScript::FixEngineRoom, 0},
 	{"floatmessage", GameScript::DisplayStringHead, 0},
 	{"floatmessagefixed", GameScript::FloatMessageFixed, 0},
 	{"floatmessagefixedrnd", GameScript::FloatMessageFixedRnd, 0},
@@ -592,6 +593,7 @@ static const ActionLink actionnames[] = {
 	{"formation", GameScript::Formation, AF_BLOCKING},
 	{"fullheal", GameScript::FullHeal, 0},
 	{"fullhealex", GameScript::FullHeal, 0}, //pst, not sure what's different
+	{"generatemodronmaze", GameScript::GenerateMaze, 0},
 	{"generatepartymember", GameScript::GeneratePartyMember, 0},
 	{"getitem", GameScript::GetItem, 0},
 	{"getstat", GameScript::GetStat, 0}, //gemrb specific

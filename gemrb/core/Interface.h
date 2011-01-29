@@ -200,6 +200,7 @@ public:
 #define EF_SELECTION     128      //selection changed
 #define EF_OPENSTORE     256      //open store window
 #define EF_EXPANSION     512      //upgrade game request
+#define EF_CREATEMAZE    1024     //call the maze generator
 
 //autopause
 #define AP_UNUSABLE      0

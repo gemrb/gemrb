@@ -3189,7 +3189,6 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		}
 	}
 	core->GetGame()->JoinParty( act, JP_JOIN );
-	//core->GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
 }
 
 void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
@@ -3199,7 +3198,6 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* act = ( Actor* ) Sender;
 	core->GetGame()->LeaveParty( act );
-	//core->GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
 }
 
 //HideCreature hides only the visuals of a creature
@@ -5578,6 +5576,20 @@ void GameScript::SetMazeHarder(Scriptable* Sender, Action* /*parameters*/)
 	int value = CheckVariable( Sender, "MAZEDIFFICULTY","GLOBAL");
 	if (value<2) {
 		SetVariable(Sender, "MAZEDIFFICULTY", "GLOBAL", value+1);
+	}
+}
+
+void GameScript::GenerateMaze(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	core->SetEventFlag(EF_CREATEMAZE);
+}
+
+void GameScript::FixEngineRoom(Scriptable* Sender, Action* /*parameters*/)
+{
+	int value = CheckVariable( Sender, "EnginInMaze","GLOBAL");
+	if (value) {
+		SetVariable(Sender, "EnginInMaze", "GLOBAL", 0);
+		core->SetEventFlag(EF_CREATEMAZE);
 	}
 }
 

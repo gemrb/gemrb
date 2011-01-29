@@ -9710,6 +9710,204 @@ static PyObject* GemRB_SetTickHook(PyObject* /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetupMaze__doc,
+"SetupMaze(x,y)\n\n"
+"Initializes a maze of XxY size. "
+"The size shouldn't exceed the maximum possible maze size (64).");
+
+static PyObject* GemRB_SetupMaze(PyObject* /*self*/, PyObject* args)
+{
+	int xsize, ysize;
+
+	if (!PyArg_ParseTuple( args, "ii", &xsize, &ysize )) {
+		return AttributeError( GemRB_SetupMaze__doc );
+	}
+
+	if (xsize*ysize>MAZE_ENTRY_COUNT) {
+		return AttributeError( GemRB_SetupMaze__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	maze_header *h = (maze_header *) game->AllocateMazeData()+MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE;
+	memset(h, 0, MAZE_HEADER_SIZE);
+	h->maze_sizex = xsize;
+	h->maze_sizey = ysize;
+	int max = xsize*ysize;
+	for(int i=0;i<MAZE_ENTRY_COUNT;i++) {
+		maze_entry *m = (maze_entry *) game->mazedata+i*MAZE_ENTRY_SIZE;
+		memset(m, 0, MAZE_ENTRY_SIZE);
+		m->valid = i<max;
+		m->accessible = i<max;
+	}
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_SetMazeEntry__doc,
+"SetMazeEntry(entry, type, value)\n\n"
+"Sets a field in a maze entry. "
+"The entry index shouldn't exceed the maximum possible maze size (64). "
+"The type could be: ME_0, ME_WALLS, ME_TRAP or ME_16.");
+
+static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
+{
+	int entry;
+	int index;
+	int value;
+
+	if (!PyArg_ParseTuple( args, "iii", &entry, &index, &value )) {
+		return AttributeError( GemRB_SetMazeEntry__doc );
+	}
+
+	if (entry<0 || entry>63) {
+		return AttributeError( GemRB_SetMazeEntry__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	if (!game->mazedata) {
+		return RuntimeError( "No maze set up!" );
+	}
+
+	maze_header *h = (maze_header *) game->mazedata+MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE;
+	int dims = h->maze_sizex;
+	maze_entry *m = (maze_entry *) game->mazedata+entry*MAZE_ENTRY_SIZE;
+	maze_entry *m2;
+	switch(index) {
+		case ME_0: //unknown00
+			m->unknown00 = value;
+			break;
+		default:
+		case ME_VALID:
+		case ME_ACCESSIBLE:
+			return AttributeError( GemRB_SetMazeEntry__doc );
+			break;
+		case ME_TRAP: //trapped/traptype
+			if (value==-1) {
+				m->trapped = 0;
+				m->traptype = 0;
+			} else {
+				m->trapped = 1;
+				m->traptype = value;
+			}
+			break;
+		case ME_WALLS:
+			m->walls |= value;
+			if (value & WALL_EAST) {
+				if (entry%dims!=dims-1) {
+					m2 = (maze_entry *) game->mazedata+(entry+1)*MAZE_ENTRY_SIZE;
+					m2->walls|=WALL_WEST;
+				}
+			}
+
+			if (value & WALL_WEST) {
+				if (entry%dims) {
+					m2 = (maze_entry *) game->mazedata+(entry-1)*MAZE_ENTRY_SIZE;
+					m2->walls|=WALL_EAST;
+				}
+			}
+
+			if (value & WALL_NORTH) {
+				if (entry>=dims) {
+					m2 = (maze_entry *) game->mazedata+(entry-dims)*MAZE_ENTRY_SIZE;
+					m2->walls|=WALL_SOUTH;
+				}
+			}
+
+			if (value & WALL_SOUTH) {
+				if (entry+dims<MAZE_ENTRY_COUNT) {
+					m2 = (maze_entry *) game->mazedata+(entry+dims)*MAZE_ENTRY_SIZE;
+					m2->walls|=WALL_SOUTH;
+				}
+			}
+
+			break;
+		case ME_16:
+			m->unknown16 = value;
+			break;
+	}
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_SetMazeData__doc,
+"SetMazeData(type, value)\n\n"
+"Sets a field in the maze header. "
+"The type could be: ME_0, ME_WALLS, ME_TRAP or ME_16.");
+
+static PyObject* GemRB_SetMazeData(PyObject* /*self*/, PyObject* args)
+{
+	int entry;
+	int value;
+
+	if (!PyArg_ParseTuple( args, "ii", &entry, &value )) {
+		return AttributeError( GemRB_SetMazeData__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	if (!game->mazedata) {
+		return RuntimeError( "No maze set up!" );
+	}
+
+
+	maze_header *h = (maze_header *) game->mazedata+MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE;
+	switch(entry) {
+		case MH_POS1X:
+			h->pos1x = value;
+			break;
+		case MH_POS1Y:
+			h->pos1y = value;
+			break;
+		case MH_POS2X:
+			h->pos2x = value;
+			break;
+		case MH_POS2Y:
+			h->pos2y = value;
+			break;
+		case MH_POS3X:
+			h->pos3x = value;
+			break;
+		case MH_POS3Y:
+			h->pos3y = value;
+			break;
+		case MH_POS4X:
+			h->pos4x = value;
+			break;
+		case MH_POS4Y:
+			h->pos4y = value;
+			break;
+		case MH_TRAPCOUNT:
+			h->trapcount = value;
+			break;
+		case MH_INITED:
+			h->initialized = value;
+			break;
+		case MH_UNKNOWN2C:
+			h->unknown2c = value;
+			break;
+		case MH_UNKNOWN30:
+			h->unknown30 = value;
+			break;
+		default:
+			return AttributeError( GemRB_SetMazeData__doc );
+	}
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(ActOnPC, METH_VARARGS),
 	METHOD(AddNewArea, METH_VARARGS),
@@ -9862,6 +10060,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetJournalEntry, METH_VARARGS),
 	METHOD(SetMapnote, METH_VARARGS),
 	METHOD(SetMasterScript, METH_VARARGS),
+	METHOD(SetMazeEntry, METH_VARARGS),
+	METHOD(SetMazeData, METH_VARARGS),
 	METHOD(SetMemorizableSpellsCount, METH_VARARGS),
 	METHOD(SetModalState, METH_VARARGS),
 	METHOD(SetMouseScrollSpeed, METH_VARARGS),
@@ -9877,6 +10077,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetTimedEvent, METH_VARARGS),
 	METHOD(SetToken, METH_VARARGS),
 	METHOD(SetTooltipDelay, METH_VARARGS),
+	METHOD(SetupMaze, METH_VARARGS),
 	METHOD(SetupQuickSlot, METH_VARARGS),
 	METHOD(SetVar, METH_VARARGS),
 	METHOD(SoftEndPL, METH_NOARGS),

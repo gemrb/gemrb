@@ -160,24 +160,24 @@ struct GAMLocationEntry {
 //pst maze data structures (TODO: create a separate class?)
 struct maze_entry {
 	ieDword unknown00;
-	ieDword unknown04;
-	ieDword unknown08;
-	ieDword unknown0c;
-	ieDword unknown10;
-	ieWord unknown12;
+	ieDword accessible;
+	ieDword valid;
+	ieDword trapped;
+	ieDword traptype;
+	ieWord walls;
 	ieDword unknown16;
 };
 
 struct maze_header {
 	ieDword maze_sizex, maze_sizey;
-	ieDword nordomx, nordomy;
-	ieDword unknown10, unknown14;
-	ieDword unknown18, unknown1c;
-	ieDword unknown20, unknown24;
-	ieDword difficulty;
-	ieDword unknown28;
-	ieDword unknown2c;
-	ieDword unknown30;
+	ieDword pos1x, pos1y;  //nordom's position
+	ieDword pos2x, pos2y;  //main hall position
+	ieDword pos3x, pos3y;  //unknown
+	ieDword pos4x, pos4y;  //unknown
+	ieDword trapcount;     //based on map size
+	ieDword initialized;   //set to 1
+	ieDword unknown2c;     //unknown
+	ieDword unknown30;     //unknown
 };
 
 #define MAZE_ENTRY_SIZE sizeof(maze_entry)
@@ -185,6 +185,34 @@ struct maze_header {
 #define MAZE_ENTRY_COUNT 64
 #define MAZE_DATA_SIZE (MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE+MAZE_HEADER_SIZE)
 #define MAZE_DATA_SIZE_HARDCODED 1720
+
+//maze header indices
+#define MH_POS1X      0
+#define MH_POS1Y      1
+#define MH_POS2X      2
+#define MH_POS2Y      3
+#define MH_POS3X      4
+#define MH_POS3Y      5
+#define MH_POS4X      6
+#define MH_POS4Y      7
+#define MH_TRAPCOUNT  8
+#define MH_INITED     9
+#define MH_UNKNOWN2C  10
+#define MH_UNKNOWN30  11
+
+//maze entry indices
+#define ME_0          0
+#define ME_VALID      1
+#define ME_ACCESSIBLE 2
+#define ME_TRAP       3
+#define ME_WALLS      4
+#define ME_16         5
+
+//ME_WALL bitfields
+#define WALL_EAST     1
+#define WALL_WEST     2
+#define WALL_NORTH    4
+#define WALL_SOUTH    8
 
 #define MAX_CRLEVEL 32
 

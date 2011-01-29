@@ -1123,16 +1123,16 @@ void GAMImporter::GetMazeHeader(void *memory)
 	maze_header *m = (maze_header *) memory;
 	str->ReadDword( &m->maze_sizex );
 	str->ReadDword( &m->maze_sizey );
-	str->ReadDword( &m->nordomx );
-	str->ReadDword( &m->nordomy );
-	str->ReadDword( &m->unknown10 );
-	str->ReadDword( &m->unknown14 );
-	str->ReadDword( &m->unknown18 );
-	str->ReadDword( &m->unknown1c );
-	str->ReadDword( &m->unknown20 );
-	str->ReadDword( &m->unknown24 );
-	str->ReadDword( &m->difficulty );
-	str->ReadDword( &m->unknown28 );
+	str->ReadDword( &m->pos1x );
+	str->ReadDword( &m->pos1y );
+	str->ReadDword( &m->pos2x );
+	str->ReadDword( &m->pos2y );
+	str->ReadDword( &m->pos3x );
+	str->ReadDword( &m->pos3y );
+	str->ReadDword( &m->pos4x );
+	str->ReadDword( &m->pos4y );
+	str->ReadDword( &m->trapcount );
+	str->ReadDword( &m->initialized );
 	str->ReadDword( &m->unknown2c );
 	str->ReadDword( &m->unknown30 );
 }
@@ -1142,11 +1142,11 @@ void GAMImporter::GetMazeEntry(void *memory)
 	maze_entry *h = (maze_entry *) memory;
 
 	str->ReadDword( &h->unknown00 );
-	str->ReadDword( &h->unknown04 );
-	str->ReadDword( &h->unknown08 );
-	str->ReadDword( &h->unknown0c );
-	str->ReadDword( &h->unknown10 );
-	str->ReadWord( &h->unknown12 );
+	str->ReadDword( &h->valid );
+	str->ReadDword( &h->accessible );
+	str->ReadDword( &h->traptype );
+	str->ReadDword( &h->trapped );
+	str->ReadWord( &h->walls );
 	str->ReadDword( &h->unknown16 );
 }
 
@@ -1155,16 +1155,16 @@ void GAMImporter::PutMazeHeader(DataStream *stream, void *memory)
 	maze_header *m = (maze_header *) memory;
 	stream->WriteDword( &m->maze_sizex );
 	stream->WriteDword( &m->maze_sizey );
-	stream->WriteDword( &m->nordomx );
-	stream->WriteDword( &m->nordomy );
-	stream->WriteDword( &m->unknown10 );
-	stream->WriteDword( &m->unknown14 );
-	stream->WriteDword( &m->unknown18 );
-	stream->WriteDword( &m->unknown1c );
-	stream->WriteDword( &m->unknown20 );
-	stream->WriteDword( &m->unknown24 );
-	stream->WriteDword( &m->difficulty );
-	stream->WriteDword( &m->unknown28 );
+	stream->WriteDword( &m->pos1x );
+	stream->WriteDword( &m->pos1y );
+	stream->WriteDword( &m->pos2x );
+	stream->WriteDword( &m->pos2y );
+	stream->WriteDword( &m->pos3x );
+	stream->WriteDword( &m->pos3y );
+	stream->WriteDword( &m->pos4x );
+	stream->WriteDword( &m->pos4y );
+	stream->WriteDword( &m->trapcount );
+	stream->WriteDword( &m->initialized );
 	stream->WriteDword( &m->unknown2c );
 	stream->WriteDword( &m->unknown30 );
 }
@@ -1173,11 +1173,11 @@ void GAMImporter::PutMazeEntry(DataStream *stream, void *memory)
 {
 	maze_entry *h = (maze_entry *) memory;
 	stream->WriteDword( &h->unknown00 );
-	stream->WriteDword( &h->unknown04 );
-	stream->WriteDword( &h->unknown08 );
-	stream->WriteDword( &h->unknown0c );
-	stream->WriteDword( &h->unknown10 );
-	stream->WriteWord( &h->unknown12 );
+	stream->WriteDword( &h->valid );
+	stream->WriteDword( &h->accessible );
+	stream->WriteDword( &h->trapped );
+	stream->WriteDword( &h->traptype );
+	stream->WriteWord( &h->walls );
 	stream->WriteDword( &h->unknown16 );
 }
 

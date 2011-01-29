@@ -1095,6 +1095,7 @@ public:
 	static void FakeEffectExpiryCheck(Scriptable* Sender, Action* parameters);
 	static void FillSlot(Scriptable *Sender, Action* parameters);
 	static void FindTraps(Scriptable* Sender, Action* parameters);
+	static void FixEngineRoom(Scriptable *Sender, Action* parameters);
 	static void FloatMessageFixed(Scriptable* Sender, Action* parameters);
 	static void FloatMessageFixedRnd(Scriptable* Sender, Action* parameters);
 	static void FloatMessageRnd(Scriptable* Sender, Action* parameters);
@@ -1113,6 +1114,7 @@ public:
 	static void ForceUseContainer(Scriptable* Sender, Action* parameters);
 	static void Formation(Scriptable* Sender, Action* parameters);
 	static void FullHeal(Scriptable* Sender, Action* parameters);
+	static void GenerateMaze(Scriptable* Sender, Action* parameters);
 	static void GeneratePartyMember(Scriptable* Sender, Action* parameters);
 	static void GetItem(Scriptable* Sender, Action* parameters);
 	static void GetStat(Scriptable* Sender, Action* parameters);
