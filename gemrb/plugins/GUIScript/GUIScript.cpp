@@ -9713,7 +9713,7 @@ static PyObject* GemRB_SetTickHook(PyObject* /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_SetupMaze__doc,
 "SetupMaze(x,y)\n\n"
 "Initializes a maze of XxY size. "
-"The size shouldn't exceed the maximum possible maze size (64).");
+"The dimensions shouldn't exceed the maximum possible maze size (8x8).");
 
 static PyObject* GemRB_SetupMaze(PyObject* /*self*/, PyObject* args)
 {
@@ -9723,7 +9723,7 @@ static PyObject* GemRB_SetupMaze(PyObject* /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetupMaze__doc );
 	}
 
-	if (xsize*ysize>MAZE_ENTRY_COUNT) {
+	if ((unsigned) xsize>MAZE_MAX_DIM || (unsigned) ysize>MAZE_MAX_DIM) {
 		return AttributeError( GemRB_SetupMaze__doc );
 	}
 
@@ -9736,12 +9736,12 @@ static PyObject* GemRB_SetupMaze(PyObject* /*self*/, PyObject* args)
 	memset(h, 0, MAZE_HEADER_SIZE);
 	h->maze_sizex = xsize;
 	h->maze_sizey = ysize;
-	int max = xsize*ysize;
 	for(int i=0;i<MAZE_ENTRY_COUNT;i++) {
 		maze_entry *m = (maze_entry *) game->mazedata+i*MAZE_ENTRY_SIZE;
 		memset(m, 0, MAZE_ENTRY_SIZE);
-		m->valid = i<max;
-		m->accessible = i<max;
+		bool used = (i/MAZE_MAX_DIM<ysize) && (i%MAZE_MAX_DIM<xsize);
+		m->valid = used;
+		m->accessible = used;
 	}
 	Py_INCREF(Py_None);
 	return Py_None;

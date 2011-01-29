@@ -182,7 +182,8 @@ struct maze_header {
 
 #define MAZE_ENTRY_SIZE sizeof(maze_entry)
 #define MAZE_HEADER_SIZE sizeof(maze_header)
-#define MAZE_ENTRY_COUNT 64
+#define MAZE_MAX_DIM 8
+#define MAZE_ENTRY_COUNT (MAZE_MAX_DIM*MAZE_MAX_DIM)
 #define MAZE_DATA_SIZE (MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE+MAZE_HEADER_SIZE)
 #define MAZE_DATA_SIZE_HARDCODED 1720
 

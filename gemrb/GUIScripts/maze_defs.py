@@ -31,4 +31,4 @@ WALL_SOUTH = 8
 
 #maximum maze entry
 MAZE_ENTRY_COUNT = 64
-
+MAZE_MAX_DIM = 8

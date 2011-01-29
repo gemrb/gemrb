@@ -30,7 +30,7 @@ dims = 0
 entries = None
 
 def Possible(posx, posy):
-	pos = posy*dims+posx
+	pos = posy*MAZE_MAX_DIM+posx
 	if entries[pos]==2:
 		return false
 	return true
@@ -48,11 +48,11 @@ def GetPossible (pos):
 		pos = Possible(posx, posy-1)
 		if pos>0:
 			possible[:0] = pos
-	if posx<dims-1:
+	if posx<7:
 		pos = Possible(posx+1, posy)
 		if pos>0:
 			possible[:0] = pos
-	if posy<dims-1:
+	if posy<7:
 		pos = Possible(posx, posy+1)
 		if pos>0:
 			possible[:0] = pos
@@ -96,12 +96,12 @@ def AddRoom (pos):
 def MainRoomFits (pos2x, pos2y, pos):
 	global entries
 
-	south = pos2y*dims+pos2x
+	south = pos2y*MAZE_MAX_DIM+pos2x
 
 	if south==pos:
 		return false
 
-	north = (pos2y+1)*dims+pos2x
+	north = (pos2y+1)*MAZE_MAX_DIM+pos2x
 	if north==pos:
 		return false
 
@@ -150,10 +150,10 @@ def CreateMaze ():
 
 	nordomx = GemRB.Roll(1, dims-1, 0)
 	nordomy = GemRB.Roll(1, dims, 0)
-	pos = nordomy*dims+nordomx
+	pos = nordomy*MAZE_MAX_DIM+nordomx
 	entries[pos] = 2
 	GemRB.SetMazeEntry(pos, ME_WALLS, WALL_EAST)
-	pos = (nordomy+1)*dims+nordomx
+	pos = (nordomy+1)*MAZE_MAX_DIM+nordomx
 	AddRoom(pos)
 	if (mazedifficulty>1):
 		GemRB.SetMazeData(MH_POS1X, nordomx)
@@ -176,7 +176,7 @@ def CreateMaze ():
 	for i in traps:
 		posx = GemRB.Roll(1, dims, 0)
 		posy = GemRB.Roll(1, dims, 0)
-		pos = posy*dims+posx;
+		pos = posy*MAZE_MAX_DIM+posx;
 		while entries[pos]:
 			pos = pos + 1
 			if pos>=max:
