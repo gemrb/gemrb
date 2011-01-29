@@ -28,7 +28,6 @@ rooms = None
 max = 0
 dims = 0
 entries = None
-walls = None
 
 def Possible(posx, posy):
 	pos = posy*dims+posx
@@ -87,11 +86,16 @@ def LoadMazeFrom2da(tablename):
 	return
 
 def AddRoom (pos):
+	global rooms
+	global entries
+
 	rooms[:0]=[pos]
 	entries[pos] = 1
 	return
 
 def MainRoomFits (pos2x, pos2y, pos):
+	global entries
+
 	south = pos2y*dims+pos2x
 
 	if south==pos:
@@ -117,7 +121,7 @@ def CreateMaze ():
 	global max
 	global dims
 	global entries
-	global walls
+	global rooms
 
 	if GemRB.GetGameVar("EnginInMaze")>0:
 		LoadMazeFrom2da("easymaze")
@@ -140,7 +144,7 @@ def CreateMaze ():
 
 	max = dims*dims
 	entries = zeros(max)
-	walls = zeros(max)
+	rooms = zeros(max)
 
 	GemRB.SetupMaze(dims, dims)
 
@@ -152,21 +156,21 @@ def CreateMaze ():
 	pos = (nordomy+1)*dims+nordomx
 	AddRoom(pos)
 	if (mazedifficulty>1):
-		GemRB.SetMazeData(MAZE_POS1X, nordomx)
-		GemRB.SetMazeData(MAZE_POS1Y, nordomy)
+		GemRB.SetMazeData(MH_POS1X, nordomx)
+		GemRB.SetMazeData(MH_POS1Y, nordomy)
 		pos2x = GemRB.Roll(1, dims, 0)
 		pos2y = GemRB.Roll(1, dims-1, 0)
-		while not MainroomFits(pos2x, pos2y, pos):
+		while not MainRoomFits(pos2x, pos2y, pos):
 			pos2x = GemRB.Roll(1, dims, 0)
 			pos2y = GemRB.Roll(1, dims-1, 0)
 
-		GemRB.SetMazeData(MAZE_POS2X, -1)
-		GemRB.SetMazeData(MAZE_POS2Y, -1)
+		GemRB.SetMazeData(MH_POS2X, -1)
+		GemRB.SetMazeData(MH_POS2Y, -1)
 	else:
-		GemRB.SetMazeData(MAZE_POS1X, -1)
-		GemRB.SetMazeData(MAZE_POS1Y, -1)
-		GemRB.SetMazeData(MAZE_POS2X, -1)
-		GemRB.SetMazeData(MAZE_POS2Y, -1)
+		GemRB.SetMazeData(MH_POS1X, -1)
+		GemRB.SetMazeData(MH_POS1Y, -1)
+		GemRB.SetMazeData(MH_POS2X, -1)
+		GemRB.SetMazeData(MH_POS2Y, -1)
 		
 
 	for i in traps:
@@ -182,7 +186,7 @@ def CreateMaze ():
 			else:
 				posy = pos/dims
 				posx = pos-posy
-		GemRB.SetMazeEntry(pos, MAZE_TRAP, GemRB.Roll(1, 3, 0) )
+		GemRB.SetMazeEntry(pos, ME_TRAP, GemRB.Roll(1, 3, 0) )
 
 	entries = zeros(max)
 	while rooms.len()>0:
@@ -199,6 +203,6 @@ def CreateMaze ():
 			if entries[newpos]==0:
 				AddRoom(newpos)
 
-	GemRB.SetMazeData(MAZE_TRAPS, traps)
-	GemRB.SetMazeData(MAZE_INITED, 1)
+	GemRB.SetMazeData(MH_TRAPS, traps)
+	GemRB.SetMazeData(MH_INITED, 1)
 	return
