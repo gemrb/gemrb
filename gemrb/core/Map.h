@@ -469,8 +469,8 @@ public:
 	//returns true if tracking failed
 	bool DisplayTrackString(Actor *actor);
 	unsigned int GetLightLevel(const Point &Pos);
-	unsigned short GetInternalSearchMap(int x, int y)  { return SrchMap[x+y*Width]; };
-	void SetInternalSearchMap(int x, int y, int value)  { SrchMap[x+y*Width] = value; };
+	unsigned short GetInternalSearchMap(int x, int y);
+	void SetInternalSearchMap(int x, int y, int value);
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);

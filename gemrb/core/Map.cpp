@@ -3627,3 +3627,17 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell)
 		}
 	}
 }
+
+short unsigned int Map::GetInternalSearchMap(int x, int y) {
+	if ((unsigned)x >= Width || (unsigned)y >= Height) {
+		return 0;
+	}
+	return SrchMap[x+y*Width];
+}
+
+void Map::SetInternalSearchMap(int x, int y, int value) {
+	if ((unsigned)x >= Width || (unsigned)y >= Height) {
+		return;
+	}
+	SrchMap[x+y*Width] = value;
+}
