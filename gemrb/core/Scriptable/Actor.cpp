@@ -4024,7 +4024,18 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 
 	if (flags & LS_STATS) {
 		// chance to learn roll
-		if (LuckyRoll(1,100,0) > core->GetIntelligenceBonus(0, GetStat(IE_INT))) {
+		int roll = LuckyRoll(1, 100, 0);
+		// adjust the roll for specialist mages
+		// doesn't work in bg1, since its spells don't have PrimaryType set
+		if (GetKitIndex(BaseStats[IE_KIT])) {
+			if ((signed)BaseStats[IE_KIT] == 1<<(spell->PrimaryType+5)) { // +5 since the kit values start at 0x40
+				roll += 15;
+			} else {
+				roll -= 15;
+			}
+		}
+
+		if (roll > core->GetIntelligenceBonus(0, GetStat(IE_INT))) {
 			return LSR_FAILED;
 		}
 	}
