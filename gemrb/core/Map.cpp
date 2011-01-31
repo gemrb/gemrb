@@ -299,7 +299,6 @@ Map::Map(void)
 	area=this;
 	TMap = NULL;
 	LightMap = NULL;
-	SearchMap = NULL;
 	HeightMap = NULL;
 	SmallMap = NULL;
 	MapSet = NULL;
@@ -358,7 +357,6 @@ Map::~Map(void)
 		delete spawns[i];
 	}
 	delete LightMap;
-	delete SearchMap;
 	delete HeightMap;
 	core->GetVideoDriver()->FreeSprite( SmallMap );
 	for (i = 0; i < QUEUE_COUNT; i++) {
@@ -419,7 +417,6 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
 	TMap = tm;
 	LightMap = lm;
-	SearchMap = sr;
 	HeightMap = hm;
 	SmallMap = sm;
 	Width = (unsigned int) (TMap->XCellCount * 4);
@@ -427,12 +424,12 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 	//Filling Matrices
 	MapSet = (unsigned short *) malloc(sizeof(unsigned short) * Width * Height);
 	//Internal Searchmap
-	int y = SearchMap->GetHeight();
+	int y = sr->GetHeight();
 	SrchMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
 	while(y--) {
-		int x=SearchMap->GetWidth();
+		int x=sr->GetWidth();
 		while(x--) {
-			SrchMap[y*Width+x] = Passable[SearchMap->GetAt(x,y)&PATH_MAP_AREAMASK];
+			SrchMap[y*Width+x] = Passable[sr->GetAt(x,y)&PATH_MAP_AREAMASK];
 		}
 	}
 }
@@ -846,7 +843,7 @@ void Map::UpdateScripts()
 void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 	for(int i=0;i<tsndcount;i++) {
 		if (!memcmp(sound, terrainsounds[i].Group, sizeof(ieResRef) ) ) {
-			int type = SearchMap->GetAt( Pos.x/16, Pos.y/12 )&PATH_MAP_AREAMASK;
+			int type = GetInternalSearchMap( Pos.x/16, Pos.y/12 )&PATH_MAP_AREAMASK;
 			memcpy(sound, terrainsounds[i].Sounds[type], sizeof(ieResRef) );
 			return;
 		}
@@ -1147,7 +1144,7 @@ void Map::DrawMap(Region screen)
 		}
 	}
 
-	if ((core->FogOfWar&FOG_DRAWSEARCHMAP) && SearchMap) {
+	if ((core->FogOfWar&FOG_DRAWSEARCHMAP) && SrchMap) {
 		DrawSearchMap(screen);
 	} else {
 		if ((core->FogOfWar&FOG_DRAWFOG) && TMap) {
@@ -2058,7 +2055,6 @@ void Map::RemoveActor(Actor* actor)
 	size_t i=actors.size();
 	while (i--) {
 		if (actors[i] == actor) {
-			//BlockSearchMap(actor->Pos, actor->size, PATH_MAP_FREE);
 			ClearSearchMapFor(actor);
 			actors.erase( actors.begin()+i );
 			return;
@@ -3097,29 +3093,21 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value
 				if ((ppxpi<Width) && (ppypj<Height)) {
 					unsigned int pos = ppypj*Width+ppxpi;
 					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
-					//tmp = SearchMap->GetAt(ppx+i,ppy+j)&PATH_MAP_NOTACTOR;
-					//SearchMap->SetAt(ppx+i,ppy+j,tmp|value);
 				}
 
 				if ((ppxpi<Width) && (ppymj<Height)) {
 					unsigned int pos = (ppymj)*Width+ppxpi;
 					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
-					//tmp = SearchMap->GetAt(ppx+i,ppy-j)&PATH_MAP_NOTACTOR;
-					//SearchMap->SetAt(ppx+i,ppy-j,tmp|value);
 				}
 
 				if ((ppxmi<Width) && (ppypj<Height)) {
 					unsigned int pos = (ppypj)*Width+ppxmi;
 					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
-					//tmp = SearchMap->GetAt(ppx-i,ppy+j)&PATH_MAP_NOTACTOR;
-					//SearchMap->SetAt(ppx-i,ppy+j,tmp|value);
 				}
 
 				if ((ppxmi<Width) && (ppymj<Height)) {
 					unsigned int pos = (ppymj)*Width+ppxmi;
 					SrchMap[pos] = (SrchMap[pos]&PATH_MAP_NOTACTOR) | value;
-					//tmp = SearchMap->GetAt(ppx-i,ppy-j)&PATH_MAP_NOTACTOR;
-					//SearchMap->SetAt(ppx-i,ppy-j,tmp|value);
 				}
 			}
 		}

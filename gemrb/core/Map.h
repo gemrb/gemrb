@@ -229,7 +229,6 @@ class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
 	Image* LightMap;
-	Bitmap* SearchMap;
 	Bitmap* HeightMap;
 	Sprite2D* SmallMap;
 	IniSpawn *INISpawn;
