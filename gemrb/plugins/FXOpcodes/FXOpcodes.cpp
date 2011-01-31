@@ -3907,7 +3907,8 @@ int fx_learn_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//parameter1 is unused, gemrb lets you to make it not give XP
 	//probably we should also let this via a game flag if we want
 	//full compatibility with bg1
-	target->LearnSpell(fx->Resource, fx->Parameter2^LS_ADDXP);
+	//parameter2 is used in bg1 and pst to specify the spell type; bg2 and iwd2 figure it out from the resource
+	target->LearnSpell(fx->Resource, fx->Parameter1^LS_ADDXP);
 	return FX_NOT_APPLIED;
 }
 // 0x94 Spell:CastSpellPoint
