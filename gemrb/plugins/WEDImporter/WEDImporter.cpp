@@ -117,6 +117,10 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 	}
 	TileOverlay *over = new TileOverlay( overlays->Width, overlays->Height );
 	DataStream* tisfile = gamedata->GetResource(res, IE_TIS_CLASS_ID);
+	if (!tisfile) {
+		delete over;
+		return -1;
+	}
 	PluginHolder<TileSetMgr> tis(IE_TIS_CLASS_ID);
 	tis->Open( tisfile );
 	for (int y = 0; y < overlays->Height; y++) {
@@ -164,6 +168,7 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 TileMap* WEDImporter::GetTileMap(TileMap *tm)
 {
 	int usedoverlays;
+	bool freenew = false;
 
 	if (!overlays.size()) {
 		return NULL;
@@ -171,9 +176,16 @@ TileMap* WEDImporter::GetTileMap(TileMap *tm)
 
 	if (!tm) {
 		tm = new TileMap();
+		freenew = true;
 	}
 
 	usedoverlays = AddOverlay(tm, &overlays.at(0), false);
+	if (usedoverlays == -1) {
+		if (freenew) {
+			delete tm;
+		}
+		return NULL;
+	}
 	// rain_overlays[0] is never used
 	// XXX: should fix AddOverlay not to load an overlay twice if there's no rain version!!
 	//AddOverlay(tm, &overlays.at(0), true);
