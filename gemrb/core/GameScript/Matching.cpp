@@ -26,12 +26,12 @@
 #include "Game.h"
 #include "TileMap.h"
 
-/* return a Targets object with a single actor inside */
-inline static Targets* ReturnActorAsTarget(Actor *aC)
+/* return a Targets object with a single scriptable inside */
+inline static Targets* ReturnScriptableAsTarget(Scriptable *sc)
 {
-	if (!aC) return NULL;
+	if (!sc) return NULL;
 	Targets *tgts = new Targets();
-	tgts->AddTarget(aC, 0, 0);
+	tgts->AddTarget(sc, 0, 0);
 	return tgts;
 }
 
@@ -147,18 +147,34 @@ static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_
 		}*/
 
 		//return here because object name/IDS targeting are mutually exclusive
-		return ReturnActorAsTarget(aC);
+		return ReturnScriptableAsTarget(aC);
 	}
 
 	if (oC->objectFields[0]==-1) {
 		// this is an internal hack, allowing us to pass actor ids around as objects
 		Actor* aC = map->GetActorByGlobalID( (ieDword) oC->objectFields[1] );
-		/* TODO: this hack will throw away an invalid target */
-		/* Consider putting this in GetActorByGlobalID */
-		if (aC && !aC->ValidTarget(ga_flags)) {
-			aC = NULL;
+		if (aC) {
+			if (!aC->ValidTarget(ga_flags)) {
+				return NULL;
+			}
+			return ReturnScriptableAsTarget(aC);
 		}
-		return ReturnActorAsTarget(aC);
+		Door *door = map->GetDoorByGlobalID( (ieDword) oC->objectFields[1]);
+		if (door) {
+			return ReturnScriptableAsTarget(door);
+		}
+
+		Container* cont = map->GetContainerByGlobalID((ieDword) oC->objectFields[1]);
+		if (cont) {
+			return ReturnScriptableAsTarget(cont);
+		}
+
+		InfoPoint* trap = map->GetInfoPointByGlobalID((ieDword) oC->objectFields[1]);
+		if (trap) {
+			return ReturnScriptableAsTarget(trap);
+		}
+
+		return NULL;
 	}
 
 	Targets *tgts = NULL;

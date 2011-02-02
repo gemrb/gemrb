@@ -1474,11 +1474,11 @@ void GameControl::TryToPick(Actor *source, Door *tgt)
 	source->ClearActions();
 	source->SetModal(MS_NONE);
 	if (tgt->Trapped && tgt->TrapDetected) {
-		snprintf(Tmp, sizeof(Tmp), "RemoveTraps(\"%s\")", tgt->GetScriptName() );
+		strncpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp) );
 	} else {
-		snprintf(Tmp, sizeof(Tmp), "PickLock(\"%s\")", tgt->GetScriptName() );
+		strncpy(Tmp, "PickLock([-1])", sizeof(Tmp) );
 	}
-	source->AddAction( GenerateAction( Tmp ) );
+	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
 }
 
 //generate action code for source actor to try to pick a lock/disable trap on a container
@@ -1490,11 +1490,11 @@ void GameControl::TryToPick(Actor *source, Container *tgt)
 	source->ClearActions();
 	source->SetModal(MS_NONE);
 	if (tgt->Trapped && tgt->TrapDetected) {
-		snprintf(Tmp, sizeof(Tmp), "RemoveTraps(\"%s\")", tgt->GetScriptName() );
+		strncpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp) );
 	} else {
-		snprintf(Tmp, sizeof(Tmp), "PickLock(\"%s\")", tgt->GetScriptName() );
+		strncpy(Tmp, "PickLock([-1])", sizeof(Tmp) );
 	}
-	source->AddAction( GenerateAction( Tmp ) );
+	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
 }
 
 //generate action code for source actor to try to disable trap (only trap type active regions)
@@ -1507,8 +1507,8 @@ void GameControl::TryToDisarm(Actor *source, InfoPoint *tgt)
 	source->ClearPath();
 	source->ClearActions();
 	source->SetModal(MS_NONE);
-	snprintf(Tmp, sizeof(Tmp), "RemoveTraps(\"%s\")", tgt->GetScriptName() );
-	source->AddAction( GenerateAction( Tmp ) );
+	strncpy(Tmp, "RemoveTraps([-1])", sizeof(Tmp) );
+	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
 }
 
 //generate action code for source actor to try to force open lock on a door/container
