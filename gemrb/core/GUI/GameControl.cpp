@@ -1538,13 +1538,13 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 	spellCount--;
 	if (spellOrItem>=0) {
 		if (spellIndex<0) {
-			sprintf(Tmp, "SpellPointNoDec()");
+			strncpy(Tmp, "SpellPointNoDec(\"\",[0.0])", sizeof(Tmp) );
 		} else {
-			sprintf(Tmp, "SpellPoint()");
+			strncpy(Tmp, "SpellPoint(\"\",[0.0])", sizeof(Tmp) );
 		}
 	} else {
 		//using item on target
-		sprintf(Tmp, "UseItemPoint()");
+		strncpy(Tmp, "UseItemPoint(\"\",[0,0],0)", sizeof(Tmp) );
 	}
 	Action* action = GenerateAction( Tmp );
 	action->pointParameter=tgt;
