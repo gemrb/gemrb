@@ -1511,18 +1511,6 @@ void GameControl::TryToDisarm(Actor *source, InfoPoint *tgt)
 	source->AddAction( GenerateActionDirect( Tmp, tgt ) );
 }
 
-//generate action code for source actor to try to force open lock on a door/container
-void GameControl::TryToBash(Actor *source, Scriptable *tgt)
-{
-	char Tmp[40];
-
-	source->ClearPath();
-	source->ClearActions();
-	source->SetModal(MS_NONE);
-	snprintf(Tmp, sizeof(Tmp), "Attack(\"%s\")", tgt->GetScriptName() );
-	source->AddAction( GenerateAction( Tmp ) );
-}
-
 //generate action code for source actor to use item/cast spell on a point
 void GameControl::TryToCast(Actor *source, const Point &tgt)
 {

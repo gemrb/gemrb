@@ -203,7 +203,6 @@ public:
 	int HideGUI();
 	int UnhideGUI();
 	void TryToAttack(Actor *source, Actor *target);
-	void TryToBash(Actor *source, Scriptable *tgt);
 	void TryToCast(Actor *source, const Point &p);
 	void TryToCast(Actor *source, Actor *target);
 	void TryToDefend(Actor *source, Actor *target);
