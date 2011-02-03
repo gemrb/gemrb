@@ -119,6 +119,34 @@ def zeros (size):
 	return size*[0]
 
 def PrintMaze():
+	header = GemRB.GetMazeHeader()
+	if header==None or header["Inited"]==0:
+		print "There is maze or it is not initialized!"
+		return
+
+	MazeX = header["XSize"]
+	MazeY = header["YSize"]
+	MainX = header["Pos1X"]
+	MainY = header["Pos1Y"]
+	NordomX = header["Pos2X"]
+	NordomY = header["Pos2Y"]
+	for y in range (MazeY):
+		for x in range (MazeX):
+			pos = 8*y+x
+			entry = GemRB.GetMazeEntry(pos)
+			if entry["Special"]:
+				if x == NordomX and y == NordomY:
+					str = str + "N"
+				elif x == MainX and y == MainY:
+					str = str + "M"
+				else:
+					str = str + "!"
+			else:
+				if entry["Visited"]:
+					str = str + " "
+				else:
+					str = str + "?"
+		print str
 	return
 
 ###################################################

@@ -159,13 +159,13 @@ struct GAMLocationEntry {
 
 //pst maze data structures (TODO: create a separate class?)
 struct maze_entry {
-	ieDword unknown00;
+	ieDword visited;
 	ieDword accessible;
 	ieDword valid;
 	ieDword trapped;
 	ieDword traptype;
 	ieWord walls;
-	ieDword unknown16;
+	ieDword special;
 };
 
 struct maze_header {
@@ -202,12 +202,12 @@ struct maze_header {
 #define MH_UNKNOWN30  11
 
 //maze entry indices
-#define ME_0          0
+#define ME_VISITED    0
 #define ME_VALID      1
 #define ME_ACCESSIBLE 2
 #define ME_TRAP       3
 #define ME_WALLS      4
-#define ME_16         5
+#define ME_SPECIAL    5
 
 //ME_WALL bitfields
 #define WALL_EAST     1

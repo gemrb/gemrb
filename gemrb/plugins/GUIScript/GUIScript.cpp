@@ -9781,8 +9781,8 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 	maze_entry *m = (maze_entry *) (game->mazedata+entry*MAZE_ENTRY_SIZE);
 	maze_entry *m2;
 	switch(index) {
-		case ME_0: //unknown00
-			m->unknown00 = value;
+		case ME_VISITED: //unknown00
+			m->visited = value;
 			break;
 		default:
 		case ME_VALID:
@@ -9829,8 +9829,8 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 			}
 
 			break;
-		case ME_16:
-			m->unknown16 = value;
+		case ME_SPECIAL:
+			m->special = value;
 			break;
 	}
 
@@ -9860,7 +9860,6 @@ static PyObject* GemRB_SetMazeData(PyObject* /*self*/, PyObject* args)
 	if (!game->mazedata) {
 		return RuntimeError( "No maze set up!" );
 	}
-
 
 	maze_header *h = (maze_header *) (game->mazedata+MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE);
 	switch(entry) {
@@ -9906,6 +9905,79 @@ static PyObject* GemRB_SetMazeData(PyObject* /*self*/, PyObject* args)
 
 	Py_INCREF(Py_None);
 	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_GetMazeHeader__doc,
+"GetMazeHeader()=>dict\n\n"
+"Returns the Maze header of Planescape Torment savegames." );
+
+static PyObject* GemRB_GetMazeHeader(PyObject* /*self*/, PyObject* /*args*/)
+{
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	if (!game->mazedata) {
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
+	PyObject* dict = PyDict_New();
+	maze_header *h = (maze_header *) (game->mazedata+MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE);
+	PyDict_SetItemString(dict, "MazeX", PyInt_FromLong (h->maze_sizex));
+	PyDict_SetItemString(dict, "MazeY", PyInt_FromLong (h->maze_sizey));
+	PyDict_SetItemString(dict, "Pos1X", PyInt_FromLong (h->pos1x));
+	PyDict_SetItemString(dict, "Pos1Y", PyInt_FromLong (h->pos1y));
+	PyDict_SetItemString(dict, "Pos2X", PyInt_FromLong (h->pos2x));
+	PyDict_SetItemString(dict, "Pos2Y", PyInt_FromLong (h->pos2y));
+	PyDict_SetItemString(dict, "Pos3X", PyInt_FromLong (h->pos3x));
+	PyDict_SetItemString(dict, "Pos3Y", PyInt_FromLong (h->pos3y));
+	PyDict_SetItemString(dict, "Pos4X", PyInt_FromLong (h->pos4x));
+	PyDict_SetItemString(dict, "Pos4Y", PyInt_FromLong (h->pos4y));
+	PyDict_SetItemString(dict, "TrapCount", PyInt_FromLong (h->trapcount));
+	PyDict_SetItemString(dict, "Inited", PyInt_FromLong (h->initialized));
+	return dict;
+}
+
+PyDoc_STRVAR( GemRB_GetMazeEntry__doc,
+"GetMazeEntry(entry)=>dict\n\n"
+"Returns a Maze entry from Planescape Torment savegames. Entry must be 0-63." );
+
+static PyObject* GemRB_GetMazeEntry(PyObject* /*self*/, PyObject* args)
+{
+	int entry;
+
+	if (!PyArg_ParseTuple( args, "i", &entry )) {
+		return AttributeError( GemRB_GetMazeEntry__doc );
+	}
+
+	if (entry<0 || entry>=MAZE_ENTRY_COUNT) {
+		return AttributeError( GemRB_GetMazeEntry__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	if (!game->mazedata) {
+		return RuntimeError( "No maze set up!" );
+	}
+
+	PyObject* dict = PyDict_New();
+	maze_entry *m = (maze_entry *) (game->mazedata+entry*MAZE_ENTRY_SIZE);
+	PyDict_SetItemString(dict, "Visited", PyInt_FromLong (m->visited));
+	PyDict_SetItemString(dict, "Accessible", PyInt_FromLong (m->accessible));
+	PyDict_SetItemString(dict, "Valid", PyInt_FromLong (m->valid));
+	if (m->trapped) {
+		PyDict_SetItemString(dict, "Trapped", PyInt_FromLong (m->traptype));
+	} else {
+		PyDict_SetItemString(dict, "Trapped", PyInt_FromLong (-1));
+	}
+	PyDict_SetItemString(dict, "Walls", PyInt_FromLong (m->walls));
+	PyDict_SetItemString(dict, "Special", PyInt_FromLong (m->special));
+	return dict;
 }
 
 static PyMethodDef GemRBMethods[] = {
@@ -9986,6 +10058,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetJournalSize, METH_VARARGS),
 	METHOD(GetKnownSpell, METH_VARARGS),
 	METHOD(GetKnownSpellsCount, METH_VARARGS),
+	METHOD(GetMazeEntry, METH_VARARGS),
+	METHOD(GetMazeHeader, METH_NOARGS),
 	METHOD(GetMemorizableSpellsCount, METH_VARARGS),
 	METHOD(GetMemorizedSpell, METH_VARARGS),
 	METHOD(GetMemorizedSpellsCount, METH_VARARGS),
@@ -9999,13 +10073,12 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetPlayerScript, METH_VARARGS),
 	METHOD(GetPlayerSound, METH_VARARGS),
 	METHOD(GetPlayerString, METH_VARARGS),
+	METHOD(GetRumour, METH_VARARGS),
 	METHOD(GetSaveGames, METH_VARARGS),
 	METHOD(GetSelectedSize, METH_NOARGS),
 	METHOD(GetSelectedActors, METH_NOARGS),
 	METHOD(GetString, METH_VARARGS),
 	METHOD(GetSpellCastOn, METH_VARARGS),
-	METHOD(GetToken, METH_VARARGS),
-	METHOD(GetVar, METH_VARARGS),
 	METHOD(GetSlotType, METH_VARARGS),
 	METHOD(GetStore, METH_VARARGS),
 	METHOD(GetStoreDrink, METH_VARARGS),
@@ -10015,7 +10088,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetSlotItem, METH_VARARGS),
 	METHOD(GetSlots, METH_VARARGS),
 	METHOD(GetSystemVariable, METH_VARARGS),
-	METHOD(GetRumour, METH_VARARGS),
+	METHOD(GetToken, METH_VARARGS),
+	METHOD(GetVar, METH_VARARGS),
 	METHOD(HardEndPL, METH_NOARGS),
 	METHOD(HasResource, METH_VARARGS),
 	METHOD(HasSpecialItem, METH_VARARGS),
