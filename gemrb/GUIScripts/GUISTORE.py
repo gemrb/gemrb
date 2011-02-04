@@ -264,6 +264,8 @@ def OpenStoreShoppingWindow ():
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
+		Button.SetFont ("NUMBER")
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_TOP, OP_OR)
 		Button.AttachScrollBar (ScrollBarLeft)
 
 		Button = Window.GetControl (i+13)
@@ -275,6 +277,8 @@ def OpenStoreShoppingWindow ():
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
+		Button.SetFont ("NUMBER")
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_TOP, OP_OR)
 		Button.AttachScrollBar (ScrollBarRight)
 
 	# Buy
@@ -366,6 +370,8 @@ def OpenStoreIdentifyWindow ():
 			Button.SetBorder (0,0,0,0,0,0,0,128,160,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectID)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
+		Button.SetFont ("NUMBER")
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_TOP, OP_OR)
 		Button.AttachScrollBar (ScrollBar)
 
 	GUICommonWindows.SetSelectionChangeHandler( UpdateStoreIdentifyWindow )
@@ -408,6 +414,8 @@ def OpenStoreStealWindow ():
 		else:
 			Button.SetBorder (0,0,0,0,0,32,32,192,128,0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
+		Button.SetFont ("NUMBER")
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_TOP, OP_OR)
 		Button.AttachScrollBar (ScrollBarRight)
 
 	# Steal
@@ -873,6 +881,7 @@ def RedrawStoreIdentifyWindow ():
 			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[TopIndex+i], ITEM_PC)
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			Button.SetItemIcon (Slot['ItemResRef'], 0)
+			Button.SetText (str(Item['Count']) )
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 			if Flags & SHOP_ID:
@@ -1103,6 +1112,10 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 
 		Item = GemRB.GetItem (Slot['ItemResRef'])
 		Button.SetItemIcon (Slot['ItemResRef'], 0)
+		if Item['StackAmount']>1:
+			Button.SetText ( str(Slot['Usages0']) )
+		else:
+			Button.SetText ("")
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 
