@@ -163,18 +163,20 @@ def OpenContainerWindow ():
 	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	ContainerWindow = Window = GemRB.LoadWindow (8)
 
+
+	#stop gears from interfering
 	if GUICommon.GameIsPST():
+		GUIWORLD.OldPortraitWindow = GUIClasses.GWindow( GemRB.GetVar ("PortraitWindow") )
 		GUICommonWindows.DisableAnimatedWindows ()
+
+	if GUICommon.GameIsIWD2():
+		GUIWORLD.OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
+		GemRB.SetVar ("MessageWindow", Window.ID)
 	else:
-		# FIXME: see note in CloseContainerWindow
-		if GUICommon.GameIsIWD2():
-			GUIWORLD.OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
-			GemRB.SetVar ("MessageWindow", Window.ID)
-		else:
-			GUIWORLD.OldActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
-			GUIWORLD.OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
-			GemRB.SetVar ("MessageWindow", -1)
-			GemRB.SetVar ("ActionsWindow", Window.ID)
+		GUIWORLD.OldActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
+		GUIWORLD.OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
+		GemRB.SetVar ("MessageWindow", -1)
+		GemRB.SetVar ("ActionsWindow", Window.ID)
 
 	Container = GemRB.GetContainer(0)
 
@@ -274,9 +276,7 @@ def CloseContainerWindow ():
 
 	if GUICommon.GameIsPST():
 		GUICommonWindows.EnableAnimatedWindows ()
-		if hideflag:
-			GemRB.UnhideGUI ()
-		return
+		GemRB.SetVar ("PortraitWindow", GUIWORLD.OldPortraitWindow.ID)
 
 	# FIXME: iwd2 bug or just bad naming?
 	if GUICommon.GameIsIWD2():
@@ -284,6 +284,7 @@ def CloseContainerWindow ():
 	else:
 		GemRB.SetVar ("ActionsWindow", GUIWORLD.OldActionsWindow.ID)
 		GemRB.SetVar ("MessageWindow", GUIWORLD.OldMessageWindow.ID)
+
 	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']
 	tmp = Table.GetValue (row, 2)
