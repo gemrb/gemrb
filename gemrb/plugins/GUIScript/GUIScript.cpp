@@ -9751,7 +9751,7 @@ PyDoc_STRVAR( GemRB_SetMazeEntry__doc,
 "SetMazeEntry(entry, type, value)\n\n"
 "Sets a field in a maze entry. "
 "The entry index shouldn't exceed the maximum possible maze size (64). "
-"The type could be: ME_0, ME_WALLS, ME_TRAP or ME_16.");
+"The type could be: ME_ACCESSED, ME_WALLS, ME_TRAP or ME_SPECIAL.");
 
 static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 {
