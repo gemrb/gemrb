@@ -1105,6 +1105,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 		Label.SetText ("")
+		Button.SetText ("")
 	else:
 		LeftTopIndex = idx[0]
 		RightTopIndex = idx[1]
@@ -1179,10 +1180,16 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		else:
 			GemRB.SetToken ("ITEMCOST", str(Price) )
 			Label.SetText (10162)
+	return
 
 def GetRealPrice (pc, mode, Item, Slot):
 	# get the base from the item
 	price = Item['Price']
+
+	# FIXME: actually, the price for wands depends on their charge
+	# how ...
+	if Item['StackAmount']>1:
+		price = price * Slot['Usages0']
 
 	# modifier from store properties (in percent)
 	if mode == "buy":
