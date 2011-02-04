@@ -69,20 +69,19 @@ def LoadMazeFrom2da(tablename):
 		return
 	size = MazeTable.GetValue(-1,-1)
 	GemRB.SetupMaze(size, size)
-	entries = zeros(MAZE_ENTRY_COUNT)
 	traps = 0
-	for i in entries:
+	for i in range(MazeTable.GetRowCount()):
 		Area = MazeTable.GetRowName(i)
-		FIELD_0 = MazeTable.GetValue(Area,"FIELD_0")
+		ACCESSED = MazeTable.GetValue(Area,"ACCESSED")
 		TRAPTYPE = MazeTable.GetValue(Area,"TRAPTYPE")
 		WALLS = MazeTable.GetValue(Area,"WALLS")
-		FIELD_16 = MazeTable.GetValue(Area,"FIELD_16")
-		pos = int(Area[3:])-1
+		SPECIAL = MazeTable.GetValue(Area,"SPECIAL")
+		pos = int(Area[4:])-1
 		print Area,":", pos
-		GemRB.SetMazeEntry(pos, ME_0, FIELD_0)
+		GemRB.SetMazeEntry(pos, ME_ACCESSED, ACCESSED)
 		GemRB.SetMazeEntry(pos, ME_TRAP, TRAPTYPE)
 		GemRB.SetMazeEntry(pos, ME_WALLS, WALLS)
-		GemRB.SetMazeEntry(pos, ME_16, FIELD_16)
+		GemRB.SetMazeEntry(pos, ME_SPECIAL, SPECIAL)
 		if TRAPTYPE>=0:
 			traps = traps+1
 
@@ -158,7 +157,6 @@ def CreateMaze ():
 
 	if GemRB.GetGameVar("EnginInMaze")>0:
 		LoadMazeFrom2da("easymaze")
-		GemBR.UnloadTable("easymaze")
 		return
 
 	mazedifficulty = GemRB.GetGameVar("MazeDifficulty")

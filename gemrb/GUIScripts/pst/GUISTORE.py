@@ -112,7 +112,6 @@ def CloseStoreWindow ():
 		GemRB.UnhideGUI () #enabling the other windows
 		GUICommonWindows.SetSelectionChangeHandler( None )
 
-	CureTable.Unload()
 	CureTable = None
 	return
 
