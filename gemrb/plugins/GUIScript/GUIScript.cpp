@@ -9813,16 +9813,16 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 			}
 
 			if (value & WALL_NORTH) {
-				if (entry>=MAZE_MAX_DIM) {
-					m2 = (maze_entry *) (game->mazedata+(entry-MAZE_MAX_DIM)*MAZE_ENTRY_SIZE);
+				if (entry+MAZE_MAX_DIM<MAZE_ENTRY_COUNT) {
+					m2 = (maze_entry *) (game->mazedata+(entry+MAZE_MAX_DIM)*MAZE_ENTRY_SIZE);
 					m2->walls|=WALL_SOUTH;
 				}
 			}
 
 			if (value & WALL_SOUTH) {
-				if (entry+8<MAZE_ENTRY_COUNT) {
-					m2 = (maze_entry *) (game->mazedata+(entry+MAZE_MAX_DIM)*MAZE_ENTRY_SIZE);
-					m2->walls|=WALL_SOUTH;
+				if (entry>=MAZE_MAX_DIM) {
+					m2 = (maze_entry *) (game->mazedata+(entry-MAZE_MAX_DIM)*MAZE_ENTRY_SIZE);
+					m2->walls|=WALL_NORTH;
 				}
 			}
 
