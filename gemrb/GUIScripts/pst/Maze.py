@@ -77,7 +77,6 @@ def LoadMazeFrom2da(tablename):
 		WALLS = MazeTable.GetValue(Area,"WALLS")
 		SPECIAL = MazeTable.GetValue(Area,"SPECIAL")
 		pos = int(Area[4:])-1
-		print Area,":", pos
 		GemRB.SetMazeEntry(pos, ME_ACCESSED, ACCESSED)
 		GemRB.SetMazeEntry(pos, ME_TRAP, TRAPTYPE)
 		GemRB.SetMazeEntry(pos, ME_WALLS, WALLS)

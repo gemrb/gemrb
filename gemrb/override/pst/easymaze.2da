@@ -1,6 +1,6 @@
 2DA V1.0
 3
-          FIELD_0   TRAPTYPE  WALLS     FIELD_16
+          ACCESSED  TRAPTYPE  WALLS     SPECIAL
 AR1301    1         -1        5         0
 AR1309    1         -1        13        0
 AR1317    1         0         9         0
