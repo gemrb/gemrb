@@ -553,7 +553,7 @@ def UpdateSpellList ():
 	for i in range(11,20):
 		Button = Window.GetControl (i)
 		Button.SetFont ("NUMBER")
-		Button.SetFlags (IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM,OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM,OP_OR)
 		if j<cnt:
 			Button.SetSpellIcon (names[j], 1)
 			Button.SetText( str(SpellList[names[j]]) )
