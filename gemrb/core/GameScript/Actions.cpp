@@ -549,7 +549,7 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
-		MoveBetweenAreasCore( tar, parameters->string1Parameter,
+		MoveBetweenAreasCore( tar, parameters->string0Parameter,
 			parameters->pointParameter, -1, true);
 	}
 }
