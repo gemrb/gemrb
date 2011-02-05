@@ -5,13 +5,16 @@ Columns: BITS - connects the itemslots to item types (see itemtype.2da). If a bi
        ICON   - usually a bam ResRef of the background image of the slot in the inventory screen. (Your script may use it differently).
        STRREF - usually a tooltip StrRef, but your script may use it differently.
        EFFECT - whether the slot is an equipping slot (for equipping effects)
+       FLAGS  - fine tuning of slot mechanics:
+         - 0: normal
+         - 1: this slot cannot be stolen from (used for eg. the fists slot)
 
 Rows: each row represents a creature item slot, even unused or invisible slots must be represented.
 
 Example (BG2):
-           BITS       SCRIPT     ICON       STRREF
-0          1          13         STONHELM   11999
-1          2          11         STONARM    11997
-2          4          26         STONSHIL   12006
+           BITS       SCRIPT     ICON       STRREF     EFFECT   FLAGS
+10         0          0          *          0          2        0
+6          1          13         STONHELM   11999      7        0
+1          2          11         STONARM    11997      1        0
 ...
 
