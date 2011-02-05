@@ -49,41 +49,60 @@ extern GEM_EXPORT HANDLE hConsole;
 #	define textcolor(i) i
 #endif //WIN32
 
-#ifdef WIN32
-#	define BLACK 0
-#	define RED FOREGROUND_RED
-#	define GREEN FOREGROUND_GREEN
-#	define BROWN FOREGROUND_GREEN | FOREGROUND_RED
-#	define BLUE FOREGROUND_BLUE
-#	define MAGENTA FOREGROUND_RED | FOREGROUND_BLUE
-#	define CYAN FOREGROUND_BLUE | FOREGROUND_GREEN
-#	define WHITE FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED
-#	define LIGHT_RED (RED | FOREGROUND_INTENSITY)
-#	define LIGHT_GREEN (GREEN | FOREGROUND_INTENSITY)
-#	define YELLOW (GREEN | RED | FOREGROUND_INTENSITY)
-#	define LIGHT_BLUE (BLUE | FOREGROUND_INTENSITY)
-#	define LIGHT_MAGENTA (MAGENTA | FOREGROUND_INTENSITY)
-#	define LIGHT_CYAN (CYAN | FOREGROUND_INTENSITY)
-#	define LIGHT_WHITE (WHITE | FOREGROUND_INTENSITY)
-#	define DEFAULT WHITE
-#else //WIN32
-#	define DEFAULT printf("\033[0m");
-#	define BLACK printf("\033[0m\033[30;40m");
-#	define RED printf("\033[0m\033[31;40m");
-#	define GREEN printf("\033[0m\033[32;40m");
-#	define BROWN printf("\033[0m\033[33;40m");
-#	define BLUE printf("\033[0m\033[34;40m");
-#	define MAGENTA printf("\033[0m\033[35;40m");
-#	define CYAN printf("\033[0m\033[36;40m");
-#	define WHITE printf("\033[0m\033[37;40m");
-#	define LIGHT_RED printf("\033[1m\033[31;40m");
-#	define LIGHT_GREEN printf("\033[1m\033[32;40m");
-#	define YELLOW printf("\033[1m\033[33;40m");
-#	define LIGHT_BLUE printf("\033[1m\033[34;40m");
-#	define LIGHT_MAGENTA printf("\033[1m\033[35;40m");
-#	define LIGHT_CYAN printf("\033[1m\033[36;40m");
-#	define LIGHT_WHITE printf("\033[1m\033[37;40m");
-#endif //WIN32
+#ifdef NOCOLOR
+#	define DEFAULT printf("%s","");
+#	define BLACK printf("%s","");
+#	define RED printf("%s","");
+#	define GREEN printf("%s","");
+#	define BROWN printf("%s","");
+#	define BLUE printf("%s","");
+#	define MAGENTA printf("%s","");
+#	define CYAN printf("%s","");
+#	define WHITE printf("%s","");
+#	define LIGHT_RED printf("%s","");
+#	define LIGHT_GREEN printf("%s","");
+#	define YELLOW printf("%s","");
+#	define LIGHT_BLUE printf("%s","");
+#	define LIGHT_MAGENTA printf("%s","");
+#	define LIGHT_CYAN printf("%s","");
+#	define LIGHT_WHITE printf("%s","");
+#else
+#	ifdef WIN32
+#		define BLACK 0
+#		define RED FOREGROUND_RED
+#		define GREEN FOREGROUND_GREEN
+#		define BROWN FOREGROUND_GREEN | FOREGROUND_RED
+#		define BLUE FOREGROUND_BLUE
+#		define MAGENTA FOREGROUND_RED | FOREGROUND_BLUE
+#		define CYAN FOREGROUND_BLUE | FOREGROUND_GREEN
+#		define WHITE FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED
+#		define LIGHT_RED (RED | FOREGROUND_INTENSITY)
+#		define LIGHT_GREEN (GREEN | FOREGROUND_INTENSITY)
+#		define YELLOW (GREEN | RED | FOREGROUND_INTENSITY)
+#		define LIGHT_BLUE (BLUE | FOREGROUND_INTENSITY)
+#		define LIGHT_MAGENTA (MAGENTA | FOREGROUND_INTENSITY)
+#		define LIGHT_CYAN (CYAN | FOREGROUND_INTENSITY)
+#		define LIGHT_WHITE (WHITE | FOREGROUND_INTENSITY)
+#		define DEFAULT WHITE
+#	else //WIN32
+#		define DEFAULT printf("\033[0m");
+#		define BLACK printf("\033[0m\033[30;40m");
+#		define RED printf("\033[0m\033[31;40m");
+#		define GREEN printf("\033[0m\033[32;40m");
+#		define BROWN printf("\033[0m\033[33;40m");
+#		define BLUE printf("\033[0m\033[34;40m");
+#		define MAGENTA printf("\033[0m\033[35;40m");
+#		define CYAN printf("\033[0m\033[36;40m");
+#		define WHITE printf("\033[0m\033[37;40m");
+#		define LIGHT_RED printf("\033[1m\033[31;40m");
+#		define LIGHT_GREEN printf("\033[1m\033[32;40m");
+#		define YELLOW printf("\033[1m\033[33;40m");
+#		define LIGHT_BLUE printf("\033[1m\033[34;40m");
+#		define LIGHT_MAGENTA printf("\033[1m\033[35;40m");
+#		define LIGHT_CYAN printf("\033[1m\033[36;40m");
+#		define LIGHT_WHITE printf("\033[1m\033[37;40m");
+#	endif //WIN32
+#endif
 
 #ifndef ANDROID
 #	define printBracket(status, color) textcolor(WHITE); printf("["); textcolor(color); printf("%s", status); textcolor(WHITE); printf("]")

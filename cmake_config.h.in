@@ -12,3 +12,4 @@
 #define PLUGINDIR "${PLUGIN_DIR}"
 #define DATADIR "${DATA_DIR}"
 #define SYSCONFDIR "${SYSCONF_DIR}"
+#cmakedefine NOCOLOR ${NOCOLOR}
