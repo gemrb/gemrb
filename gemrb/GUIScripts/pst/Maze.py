@@ -9,7 +9,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -23,11 +23,16 @@
 
 import GemRB
 from maze_defs import *
+from GUIDefines import STR_AREANAME
 
 rooms = None
 max = 0
 dims = 0
 entries = None
+offx = (0,0,1,0,-1)
+offy = (0,-1,0,1,0)
+wallbits = (0, WALL_NORTH, WALL_EAST, WALL_SOUTH, WALL_WEST)
+entrances = ("", "Entry3", "Entry4","Entry1","Entry2")
 
 def Possible(posx, posy):
 	global entries
@@ -84,7 +89,12 @@ def LoadMazeFrom2da(tablename):
 		if TRAPTYPE>=0:
 			traps = traps+1
 
+	#adding foyer coordinates (middle of bottom)
+	GemRB.SetMazeData(MH_POS3X, size/2)
+	GemRB.SetMazeData(MH_POS3Y, size-1)
+	#adding trap
 	GemRB.SetMazeData(MH_TRAPCOUNT, traps)
+	#finish
 	GemRB.SetMazeData(MH_INITED, 1)
 	return
 
@@ -248,6 +258,130 @@ def CreateMaze ():
 					print "Something went wrong at pos: ", pos, " newpos: ", newpos
 				AddRoom(newpos)
 
+	#adding foyer coordinates
+	#TODO, how does the original prevent blocking by special rooms
+	GemRB.SetMazeData(MH_POS3X, GemRB.Roll(1,dims,-1) )
+	GemRB.SetMazeData(MH_POS3Y, dims-1)
+	#adding traps
 	GemRB.SetMazeData(MH_TRAPCOUNT, traps)
+	#finish
 	GemRB.SetMazeData(MH_INITED, 1)
+	return
+
+def FormatAreaName(pos):
+	if pos<9:
+		return "AR130"+str(pos+1)
+	return "AR13"+str(pos+1)
+
+def CustomizeMaze(AreaName):
+
+	header = GemRB.GetMazeHeader()
+	print "AreaName:", AreaName
+
+	mainX = header['Pos1X']
+	mainY = header['Pos1Y']
+	nordomX = header['Pos2X']
+	nordomY = header['Pos2Y']
+	foyerX = header['Pos3X']
+	foyerY = header['Pos3Y']
+	print header
+	#modron foyer
+	if AreaName == "fy":
+		#TODO modron foyer, only one entrance if EnginInMaze = 1
+		tmp = foyerX+foyerY*MAZE_MAX_DIM
+		entry = GemRB.GetMazeEntry(tmp)
+		GemRB.SetMapExit ("exit1", FormatAreaName(tmp), "Entry3" )
+
+		#disable engine room 
+		if GemRB.GetGameVar("EnginInMaze")==1:
+			GemRB.SetMapExit ("exit3" )
+		else:
+			GemRB.SetMapExit ("exit3", "AR13EN")
+		GemRB.SetMapExit ("exit4" )
+		return
+
+	if AreaName == "en":
+		#TODO engineering room
+		#what to do here?
+		return
+
+	if AreaName == "wz":
+		#TODO wizard's lair
+		tmp = mainX+mainY*MAZE_MAX_DIM
+		entry = GemRB.GetMazeEntry(tmp)
+		print "TMP=", tmp
+		print entry
+		return
+
+	if AreaName == "fd":
+		#TODO nordom
+		tmp = nordomX+nordomY*MAZE_MAX_DIM
+		entry = GemRB.GetMazeEntry(tmp)
+		print "TMP=", tmp
+		print entry
+		return
+
+	tmp = int(AreaName)-1
+	if tmp<0 or tmp>63:
+		return
+
+	entry = GemRB.GetMazeEntry(tmp)
+	#TODO: customize maze area based on entry (walls, traps)
+	print entry
+
+	if entry['Special']:
+		print "Inconsistence: somehow stumbled into a special area."
+		return
+
+	if not entry['Visited']:
+		#already customized
+		return
+
+	trapped = entry['Trapped']
+	if trapped>=0:
+		print "Enable trap", 'Trap'+chr(trapped+65) 
+		GemRB.EnableRegion('Trap'+chr(trapped+65) )
+
+	GemRB.SetMazeEntry(tmp, ME_ACCESSED, 0)
+	walls = entry['Walls']
+	y = tmp / MAZE_MAX_DIM
+	x = tmp - y*MAZE_MAX_DIM
+	for i in range(1,5):
+		if wallbits[i]&walls:
+			x2 = x+offx[i]
+			y2 = y+offy[i]
+			print "Current: ", x,":", y, " New: ", x2, ":", y2
+			set = 0
+			if x2 == nordomX and y2 == nordomY:
+				NewArea = "AR13FD"
+			elif x2 == mainX and y2 == mainY:
+				NewArea = "AR13WZ"
+			elif x2 == foyerX and y2 == foyerY+1:
+				NewArea = "AR13FY"
+			else:
+				if x2>=0 and x2<MAZE_MAX_DIM and y2>=0 and y2<MAZE_MAX_DIM:
+					NewArea = FormatAreaName (x2+y2*MAZE_MAX_DIM)
+				else:
+					#maximum dimensions
+					set = 1
+		else:
+			set = 1
+
+		if set:
+			#remove exit
+			print "Set Wall ", str(i)
+			GemRB.SetMapExit ("exit"+str(i) )
+		else:
+			print "Set Exit ", str(i), " to ", NewArea, " entrance:", entrances[i]
+			#set exit
+			GemRB.SetMapExit ("exit"+str(i), NewArea, entrances[i] )
+	return
+
+def CustomizeArea():
+	Area = GemRB.GetGameString (STR_AREANAME)
+	if Area[0:4] == "ar13":
+		CustomizeMaze(Area[4:])
+		return
+
+	#TODO insert non maze area customization here (set own area scripts for special areas)
 	return

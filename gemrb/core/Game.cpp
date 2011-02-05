@@ -635,6 +635,15 @@ Map *Game::GetMap(const char *areaname, bool change)
 			area->ChangeMap(IsDay());
 			ChangeSong(false, true);
 			Infravision();
+
+			//call area customization script for PST
+			//moved here because the current area is set here
+			ScriptEngine *sE = core->GetGUIScriptEngine();
+			if (core->HasFeature(GF_AREA_OVERRIDE) && sE) {
+				//area ResRef is accessible by GemRB.GetGameString (STR_AREANAME)
+				sE->RunFunction("Maze", "CustomizeArea");
+			}
+
 			return area;
 		}
 		return GetMap(index);
@@ -738,6 +747,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	unsigned int i;
 	Map *newMap;
 	PluginHolder<MapMgr> mM(IE_ARE_CLASS_ID);
+	ScriptEngine *sE = core->GetGUIScriptEngine();
 
 	//this shouldn't happen
 	if (!mM) {
@@ -750,10 +760,10 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	}
 
 	bool hide = false;
-	if (loadscreen) {
+	if (loadscreen && sE) {
 		hide = core->HideGCWindow();
-		core->GetGUIScriptEngine()->RunFunction("LoadScreen", "StartLoadScreen");
-		core->GetGUIScriptEngine()->RunFunction("LoadScreen", "SetLoadScreen");
+		sE->RunFunction("LoadScreen", "StartLoadScreen");
+		sE->RunFunction("LoadScreen", "SetLoadScreen");
 	}
 	DataStream* ds = gamedata->GetResource( ResRef, IE_ARE_CLASS_ID );
 	if (!ds) {
@@ -766,6 +776,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	if (!newMap) {
 		goto failedload;
 	}
+
 	core->LoadProgress(100);
 
 	for (i = 0; i < PCs.size(); i++) {

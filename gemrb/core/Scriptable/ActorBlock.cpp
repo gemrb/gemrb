@@ -2511,9 +2511,20 @@ void InfoPoint::DebugDump() const
 	}
 	printf( "Region Global ID:  %d\n", GetGlobalID());
 	printf( "Position: %d.%d\n", Pos.x, Pos.y);
-	printf( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));
-	printf( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
-		TrapRemovalDiff );
+	switch(Type) {
+	case ST_TRAVEL:
+		printf( "Destination Area: %s Entrance: %s\n", Destination, EntranceName);
+		break;
+	case ST_PROXIMITY:
+		printf( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));
+		printf( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
+			TrapRemovalDiff );
+		break;
+	case ST_TRIGGER:
+		printf ( "InfoString: %s\n", overHeadText );
+		break;
+	default:;
+	}
 	const char *name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();

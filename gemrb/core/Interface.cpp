@@ -2483,6 +2483,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"CastingSounds",      //57GF_CASTING_SOUNDS
 		"EnhancedCastingSounds", //58GF_CASTING_SOUNDS2
 		"ForceAreaScript",    //59GF_FORCE_AREA_SCRIPT
+		"AreaOverride",       //60GF_AREA_OVERRIDE
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
