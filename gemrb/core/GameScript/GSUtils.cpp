@@ -1609,7 +1609,10 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 	Actor *actor = (Actor *)Sender;
 
 	if (!actor->InMove() || actor->Destination != p) {
-		actor->WalkTo(p, 0, distance);
+		//chasing is unbreakable
+		//maybe consider setting a per action unbreakability
+		//instead of messing with the actor flag
+		actor->WalkTo(p, IF_NOINT, distance);
 	}
 
 	if (!actor->InMove()) {
@@ -1622,33 +1625,7 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 	}
 	return 0;
 }
-/*
-void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool flag, int distance)
-{
-	Point p;
-	GetPositionFromScriptable(target,p,flag);
-	GoNearAndRetry(Sender, p, distance);
-}
 
-void GoNearAndRetry(Scriptable *Sender, const Point &p, int distance)
-{
-	if (!Sender->GetCurrentAction() ) {
-		printMessage("GameScript","NULL action retried???\n",LIGHT_RED);
-		return;
-	}
-	Sender->AddActionInFront( Sender->GetCurrentAction() );
-	char Tmp[256];
-	sprintf( Tmp, "MoveToPoint([%hd.%hd])", p.x, p.y );
-	Action * action = GenerateAction( Tmp);
-	//experimental hack, this value means,
-	//MoveToPoint shall pop the next action too if movement fails
-	//and the actor is farther than distance
-	//this will prevent deadlocks
-	//(we have to add 1 because otherwise distance==0 fails, we subtract it in MoveToPoint)
-	action->int0Parameter = distance+1;
-	Sender->AddActionInFront( action );
-}
-*/
 void FreeSrc(SrcVector *poi, const ieResRef key)
 {
 	int res = SrcCache.DecRef((void *) poi, key, true);

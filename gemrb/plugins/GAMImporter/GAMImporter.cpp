@@ -1141,13 +1141,13 @@ void GAMImporter::GetMazeEntry(void *memory)
 {
 	maze_entry *h = (maze_entry *) memory;
 
-	str->ReadDword( &h->visited );
+	str->ReadDword( &h->override );
 	str->ReadDword( &h->valid );
 	str->ReadDword( &h->accessible );
-	str->ReadDword( &h->traptype );
 	str->ReadDword( &h->trapped );
+	str->ReadDword( &h->traptype );
 	str->ReadWord( &h->walls );
-	str->ReadDword( &h->special );
+	str->ReadDword( &h->visited );
 }
 
 void GAMImporter::PutMazeHeader(DataStream *stream, void *memory)
@@ -1172,18 +1172,18 @@ void GAMImporter::PutMazeHeader(DataStream *stream, void *memory)
 void GAMImporter::PutMazeEntry(DataStream *stream, void *memory)
 {
 	maze_entry *h = (maze_entry *) memory;
-	stream->WriteDword( &h->visited );
+	stream->WriteDword( &h->override );
 	stream->WriteDword( &h->valid );
 	stream->WriteDword( &h->accessible );
 	stream->WriteDword( &h->trapped );
 	stream->WriteDword( &h->traptype );
 	stream->WriteWord( &h->walls );
-	stream->WriteDword( &h->special );
+	stream->WriteDword( &h->visited );
 }
 
 int GAMImporter::PutMaze(DataStream *stream, Game *game)
 {
-	for(int i=0;i<64;i++) {
+	for(int i=0;i<MAZE_ENTRY_COUNT;i++) {
 		PutMazeEntry(stream, game->mazedata+i*MAZE_ENTRY_SIZE);
 	}
 	PutMazeHeader(stream, game->mazedata+MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE);

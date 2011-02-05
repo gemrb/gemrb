@@ -31,21 +31,25 @@ dims = 0
 entries = None
 offx = (0,0,1,0,-1)
 offy = (0,-1,0,1,0)
+#wallbits = (0, WALL_WEST, WALL_NORTH, WALL_EAST, WALL_SOUTH)
 wallbits = (0, WALL_NORTH, WALL_EAST, WALL_SOUTH, WALL_WEST)
-entrances = ("", "Entry3", "Entry4","Entry1","Entry2")
+entrances = ("", "Entry3", "Entry4", "Entry1", "Entry2")
+dirs = ("", "north", "east", "south","west")
+cposx=(686,886,497)
+cposy=(498,722,726)
 
 def Possible(posx, posy):
 	global entries
 
-	pos = posy*MAZE_MAX_DIM+posx
+	pos = posx*MAZE_MAX_DIM+posy
 
 	if entries[pos] == 2:
 		return -1
 	return pos
 
 def GetPossible (pos):
-	posy = pos/MAZE_MAX_DIM
-	posx = pos-posy*MAZE_MAX_DIM
+	posx = pos/MAZE_MAX_DIM
+	posy = pos-posx*MAZE_MAX_DIM
 	possible = []
 
 	if posx>0:
@@ -77,18 +81,23 @@ def LoadMazeFrom2da(tablename):
 	traps = 0
 	for i in range(MazeTable.GetRowCount()):
 		Area = MazeTable.GetRowName(i)
-		ACCESSED = MazeTable.GetValue(Area,"ACCESSED")
+		OVERRIDE = MazeTable.GetValue(Area,"OVERRIDE")
 		TRAPTYPE = MazeTable.GetValue(Area,"TRAPTYPE")
 		WALLS = MazeTable.GetValue(Area,"WALLS")
-		SPECIAL = MazeTable.GetValue(Area,"SPECIAL")
-		pos = int(Area[4:])-1
-		GemRB.SetMazeEntry(pos, ME_ACCESSED, ACCESSED)
+		VISITED = MazeTable.GetValue(Area,"VISITED")
+		pos = ConvertPos(int(Area[4:])-1)
+		GemRB.SetMazeEntry(pos, ME_OVERRIDE, OVERRIDE)
 		GemRB.SetMazeEntry(pos, ME_TRAP, TRAPTYPE)
 		GemRB.SetMazeEntry(pos, ME_WALLS, WALLS)
-		GemRB.SetMazeEntry(pos, ME_SPECIAL, SPECIAL)
+		GemRB.SetMazeEntry(pos, ME_VISITED, VISITED)
 		if TRAPTYPE>=0:
 			traps = traps+1
 
+	#disabling special rooms
+	GemRB.SetMazeData(MH_POS1X, -1)
+	GemRB.SetMazeData(MH_POS1Y, -1)
+	GemRB.SetMazeData(MH_POS2X, -1)
+	GemRB.SetMazeData(MH_POS2Y, -1)
 	#adding foyer coordinates (middle of bottom)
 	GemRB.SetMazeData(MH_POS3X, size/2)
 	GemRB.SetMazeData(MH_POS3Y, size-1)
@@ -109,12 +118,12 @@ def AddRoom (pos):
 def MainRoomFits (pos2x, pos2y, pos):
 	global entries
 
-	south = pos2y*MAZE_MAX_DIM+pos2x
+	south = pos2x*MAZE_MAX_DIM+pos2y
 
 	if south==pos:
 		return False
 
-	north = (pos2y+1)*MAZE_MAX_DIM+pos2x
+	north = (pos2x+1)*MAZE_MAX_DIM+pos2y
 	if north==pos:
 		return False
 
@@ -140,9 +149,9 @@ def PrintMaze():
 	NordomY = header["Pos2Y"]
 	for y in range (MazeY):
 		for x in range (MazeX):
-			pos = 8*y+x
+			pos = MAZE_MAX_DIM*x+y
 			entry = GemRB.GetMazeEntry(pos)
-			if entry["Special"]:
+			if entry["Override"]:
 				if x == NordomX and y == NordomY:
 					str = str + "N"
 				elif x == MainX and y == MainY:
@@ -156,6 +165,9 @@ def PrintMaze():
 					str = str + "?"
 		print str
 	return
+
+def ConvertPos (pos):
+	return ((pos&7)<<3)|(pos>>3)
 
 ###################################################
 def CreateMaze ():
@@ -182,22 +194,21 @@ def CreateMaze ():
 		dims = 8
 		traps = 18
 
-	max = dims*dims
 	entries = zeros(MAZE_ENTRY_COUNT)
 	rooms = []
 
 	GemRB.SetupMaze(dims, dims)
 	for x in range(dims, MAZE_MAX_DIM):
 		for y in range(dims, MAZE_MAX_DIM):
-			pos = y*MAZE_MAX_DIM+x;
+			pos = x*MAZE_MAX_DIM+y;
 			entries[pos] = 2
 
 	nordomx = GemRB.Roll(1, dims-1, -1)
 	nordomy = GemRB.Roll(1, dims, -1)
-	pos = nordomy*MAZE_MAX_DIM+nordomx
+	pos = nordomx*MAZE_MAX_DIM+nordomy
 	entries[pos] = 2
 	GemRB.SetMazeEntry(pos, ME_WALLS, WALL_EAST)
-	pos = nordomy*MAZE_MAX_DIM+nordomx+1
+	pos = nordomx*MAZE_MAX_DIM+nordomy+MAZE_MAX_DIM
 	AddRoom(pos)
 	if (mazedifficulty>1):
 		GemRB.SetMazeData(MH_POS1X, nordomx)
@@ -220,7 +231,7 @@ def CreateMaze ():
 	for i in range(traps):
 		posx = GemRB.Roll(1, dims, -1)
 		posy = GemRB.Roll(1, dims, -1)
-		pos = posy*MAZE_MAX_DIM+posx
+		pos = posx*MAZE_MAX_DIM+posy
 		while entries[pos]:
 			pos = pos + 1
 			if pos>=MAZE_ENTRY_COUNT:
@@ -228,16 +239,16 @@ def CreateMaze ():
 				posy = 0
 				pos = 0
 			else:
-				posy = pos/MAZE_MAX_DIM
-				posx = pos-posy*MAZE_MAX_DIM
+				posx = pos/MAZE_MAX_DIM
+				posy = pos-posx*MAZE_MAX_DIM
 		GemRB.SetMazeEntry(pos, ME_TRAP, GemRB.Roll(1, 3, -1) )
 
 	entries = oldentries
 	while len(rooms)>0:
 		pos = rooms[0]
 		rooms[0:1] = []
-		posy = pos/MAZE_MAX_DIM
-		posx = pos-posy*MAZE_MAX_DIM
+		posx = pos/MAZE_MAX_DIM
+		posy = pos-posx*MAZE_MAX_DIM
 		possible = GetPossible(pos)
 		plen = len(possible)
 		if plen>0:
@@ -259,7 +270,10 @@ def CreateMaze ():
 				AddRoom(newpos)
 
 	#adding foyer coordinates
-	#TODO, how does the original prevent blocking by special rooms
+	x = GemRB.Roll(1,dims,-1)
+	while x!=nordomx and dims-1!=nordomy:
+		x=GemRB.Roll(1,dims,-1)
+
 	GemRB.SetMazeData(MH_POS3X, GemRB.Roll(1,dims,-1) )
 	GemRB.SetMazeData(MH_POS3Y, dims-1)
 	#adding traps
@@ -276,7 +290,6 @@ def FormatAreaName(pos):
 def CustomizeMaze(AreaName):
 
 	header = GemRB.GetMazeHeader()
-	print "AreaName:", AreaName
 
 	mainX = header['Pos1X']
 	mainY = header['Pos1Y']
@@ -284,15 +297,15 @@ def CustomizeMaze(AreaName):
 	nordomY = header['Pos2Y']
 	foyerX = header['Pos3X']
 	foyerY = header['Pos3Y']
-	print header
 	#modron foyer
 	if AreaName == "fy":
 		#TODO modron foyer, only one entrance if EnginInMaze = 1
-		tmp = foyerX+foyerY*MAZE_MAX_DIM
+		tmp = foyerY+foyerX*MAZE_MAX_DIM
 		entry = GemRB.GetMazeEntry(tmp)
+		tmp = foyerX+foyerY*MAZE_MAX_DIM
 		GemRB.SetMapExit ("exit1", FormatAreaName(tmp), "Entry3" )
 
-		#disable engine room 
+		#disable engine room
 		if GemRB.GetGameVar("EnginInMaze")==1:
 			GemRB.SetMapExit ("exit3" )
 		else:
@@ -307,42 +320,51 @@ def CustomizeMaze(AreaName):
 
 	if AreaName == "wz":
 		#TODO wizard's lair
-		tmp = mainX+mainY*MAZE_MAX_DIM
+		tmp = mainY+mainX*MAZE_MAX_DIM
 		entry = GemRB.GetMazeEntry(tmp)
-		print "TMP=", tmp
-		print entry
+		tmp = mainX+mainY*MAZE_MAX_DIM
+		GemRB.SetMapExit ("exit3", FormatAreaName(tmp), "Entry1" )
 		return
 
 	if AreaName == "fd":
 		#TODO nordom
-		tmp = nordomX+nordomY*MAZE_MAX_DIM
+		tmp = nordomY+nordomX*MAZE_MAX_DIM
 		entry = GemRB.GetMazeEntry(tmp)
-		print "TMP=", tmp
-		print entry
+		tmp = nordomX+nordomY*MAZE_MAX_DIM
+		GemRB.SetMapExit ("exit2", FormatAreaName(tmp), "Entry4" )
 		return
 
 	tmp = int(AreaName)-1
 	if tmp<0 or tmp>63:
 		return
 
-	entry = GemRB.GetMazeEntry(tmp)
+	pos = ConvertPos(tmp)
+	entry = GemRB.GetMazeEntry(pos)
 	#TODO: customize maze area based on entry (walls, traps)
 	print entry
 
-	if entry['Special']:
-		print "Inconsistence: somehow stumbled into a special area."
-		return
-
-	if not entry['Visited']:
+	if entry['Visited']:
 		#already customized
 		return
 
+	difficulty = GemRB.GetGameVar("MazeDifficulty")
+	if difficulty == 0:
+		name = "CLOW"
+	elif difficulty == 1:
+		name = "CMOD"
+	else:
+		name = "CHIGH"
+
+	ccount = GemRB.Roll(1,3,0)
+
+	for i in range(ccount):
+		GemRB.CreateCreature(0, name, cposx[i], cposy[i])
+
 	trapped = entry['Trapped']
 	if trapped>=0:
-		print "Enable trap", 'Trap'+chr(trapped+65) 
-		GemRB.EnableRegion('Trap'+chr(trapped+65) )
+		GemRB.EnableRegion('Trap'+chr(trapped+65), 1 )
 
-	GemRB.SetMazeEntry(tmp, ME_ACCESSED, 0)
+	GemRB.SetMazeEntry(pos, ME_VISITED, 1)
 	walls = entry['Walls']
 	y = tmp / MAZE_MAX_DIM
 	x = tmp - y*MAZE_MAX_DIM
@@ -350,7 +372,6 @@ def CustomizeMaze(AreaName):
 		if wallbits[i]&walls:
 			x2 = x+offx[i]
 			y2 = y+offy[i]
-			print "Current: ", x,":", y, " New: ", x2, ":", y2
 			set = 0
 			if x2 == nordomX and y2 == nordomY:
 				NewArea = "AR13FD"
@@ -360,6 +381,7 @@ def CustomizeMaze(AreaName):
 				NewArea = "AR13FY"
 			else:
 				if x2>=0 and x2<MAZE_MAX_DIM and y2>=0 and y2<MAZE_MAX_DIM:
+					#reversed coordinates
 					NewArea = FormatAreaName (x2+y2*MAZE_MAX_DIM)
 				else:
 					#maximum dimensions
@@ -369,10 +391,8 @@ def CustomizeMaze(AreaName):
 
 		if set:
 			#remove exit
-			print "Set Wall ", str(i)
 			GemRB.SetMapExit ("exit"+str(i) )
 		else:
-			print "Set Exit ", str(i), " to ", NewArea, " entrance:", entrances[i]
 			#set exit
 			GemRB.SetMapExit ("exit"+str(i), NewArea, entrances[i] )
 	return

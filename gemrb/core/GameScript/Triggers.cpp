@@ -1512,8 +1512,8 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 		}
 		return 0;
 	}
-	// should this be PersonalDistance?
-	int distance = Distance(parameters->pointParameter, scr);
+	//personaldistance is needed for modron constructs in PST maze
+	int distance = PersonalDistance(parameters->pointParameter, scr);
 	if (distance <= ( parameters->int0Parameter * 10 )) {
 		return 1;
 	}

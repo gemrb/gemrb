@@ -7525,7 +7525,8 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_SetMapExit__doc,
 "SetMapExit(ExitName[, NewArea, NewEntrance])\n\n"
-"Adds or removes an exit.");
+"Modifies the target of an exit in the current area. If no destination is given, "
+"then the exit will be disabled.");
 
 static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 {
@@ -7546,7 +7547,7 @@ static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 
 	InfoPoint *ip = map->TMap->GetInfoPoint(ExitName);
 	if (!ip || ip->Type!=ST_TRAVEL) {
-		return RuntimeError( "No such exit" );
+		return RuntimeError( "No such exit!" );
 	}
 
 	if (!NewArea) {
@@ -7562,68 +7563,76 @@ static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 			strnuprcpy(ip->EntranceName, NewEntrance, sizeof(ieVariable)-1 );
 		}
 	}
-	
+
 	Py_INCREF( Py_None );
 	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_EnableRegion__doc,
 "EnableRegion(TrapName, flag)\n\n"
-"Enables or disables an infopoint in the current area");
+"Enables or disables an infopoint in the current area.");
 
 static PyObject* GemRB_EnableRegion(PyObject * /*self*/, PyObject* args)
 {
-        const char *Name;
-	int Flag;
+	const char *Name;
+	int Flag=1;
 
-        if (!PyArg_ParseTuple( args, "si", &Name, &Flag)) {
-                return AttributeError( GemRB_EnableRegion__doc );
-        }
+	if (!PyArg_ParseTuple( args, "s|i", &Name, &Flag)) {
+		return AttributeError( GemRB_EnableRegion__doc );
+	}
 
 	GET_GAME();
 
-        Map *map = game->GetCurrentArea();
-        if (!map) {
-                return RuntimeError( "No current area!" );
-        }
-
-        InfoPoint *ip = map->TMap->GetInfoPoint(Name);
-	if (Flag) {
-		ip->Flags&=~TRAP_DEACTIVATED;
-	} else {
-		ip->Flags|=TRAP_DEACTIVATED;
+	Map *map = game->GetCurrentArea();
+	if (!map) {
+		return RuntimeError( "No current area!" );
 	}
-	
+
+	InfoPoint *ip = map->TMap->GetInfoPoint(Name);
+	if (ip) {
+		if (Flag) {
+			ip->Flags&=~TRAP_DEACTIVATED;
+		} else {
+			ip->Flags|=TRAP_DEACTIVATED;
+		}
+	}
+
 	Py_INCREF( Py_None );
 	return Py_None;
 }
 
 
 PyDoc_STRVAR( GemRB_CreateCreature__doc,
-"CreateCreature(PartyID, CreResRef)\n\n"
-"Creates Creature in vicinity of a player character.");
+"CreateCreature(PartyID, CreResRef[, posX, posY])\n\n"
+"Creates Creature at a point. If the position parameters are unspecified "
+"then the creature will be put near the player character given by the first parameter.");
 
 static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID;
 	const char *CreResRef;
+	int PosX = -1, PosY = -1;
 
-	if (!PyArg_ParseTuple( args, "is", &PartyID, &CreResRef)) {
+	if (!PyArg_ParseTuple( args, "is|ii", &PartyID, &CreResRef, &PosX, &PosY)) {
 		return AttributeError( GemRB_CreateCreature__doc );
 	}
 
 	GET_GAME();
 
-	Actor* actor = game->FindPC( PartyID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
 	Map *map=game->GetCurrentArea();
 	if (!map) {
 		return RuntimeError( "No current area!" );
 	}
 
-	map->SpawnCreature(actor->Pos, CreResRef, 10);
+	if (PosX!=-1 && PosY!=-1) {
+		map->SpawnCreature(Point(PosX, PosY), CreResRef, 0);
+	} else {
+		Actor* actor = game->FindPC( PartyID );
+		if (!actor) {
+			return RuntimeError( "Actor not found!\n" );
+		}
+		map->SpawnCreature(actor->Pos, CreResRef, 10);
+	}
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -9653,8 +9662,8 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 	maze_entry *m = (maze_entry *) (game->mazedata+entry*MAZE_ENTRY_SIZE);
 	maze_entry *m2;
 	switch(index) {
-		case ME_VISITED:
-			m->visited = value;
+		case ME_OVERRIDE:
+			m->override = value;
 			break;
 		default:
 		case ME_VALID:
@@ -9672,37 +9681,37 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 			break;
 		case ME_WALLS:
 			m->walls |= value;
-			if (value & WALL_EAST) {
+			if (value & WALL_SOUTH) {
 				if (entry%MAZE_MAX_DIM!=MAZE_MAX_DIM-1) {
 					m2 = (maze_entry *) (game->mazedata+(entry+1)*MAZE_ENTRY_SIZE);
+					m2->walls|=WALL_NORTH;
+				}
+			}
+
+			if (value & WALL_NORTH) {
+				if (entry%MAZE_MAX_DIM) {
+					m2 = (maze_entry *) (game->mazedata+(entry-1)*MAZE_ENTRY_SIZE);
+					m2->walls|=WALL_SOUTH;
+				}
+			}
+
+			if (value & WALL_EAST) {
+				if (entry+MAZE_MAX_DIM<MAZE_ENTRY_COUNT) {
+					m2 = (maze_entry *) (game->mazedata+(entry+MAZE_MAX_DIM)*MAZE_ENTRY_SIZE);
 					m2->walls|=WALL_WEST;
 				}
 			}
 
 			if (value & WALL_WEST) {
-				if (entry%MAZE_MAX_DIM) {
-					m2 = (maze_entry *) (game->mazedata+(entry-1)*MAZE_ENTRY_SIZE);
+				if (entry>=MAZE_MAX_DIM) {
+					m2 = (maze_entry *) (game->mazedata+(entry-MAZE_MAX_DIM)*MAZE_ENTRY_SIZE);
 					m2->walls|=WALL_EAST;
 				}
 			}
 
-			if (value & WALL_NORTH) {
-				if (entry+MAZE_MAX_DIM<MAZE_ENTRY_COUNT) {
-					m2 = (maze_entry *) (game->mazedata+(entry+MAZE_MAX_DIM)*MAZE_ENTRY_SIZE);
-					m2->walls|=WALL_SOUTH;
-				}
-			}
-
-			if (value & WALL_SOUTH) {
-				if (entry>=MAZE_MAX_DIM) {
-					m2 = (maze_entry *) (game->mazedata+(entry-MAZE_MAX_DIM)*MAZE_ENTRY_SIZE);
-					m2->walls|=WALL_NORTH;
-				}
-			}
-
 			break;
-		case ME_SPECIAL:
-			m->special = value;
+		case ME_VISITED:
+			m->visited = value;
 			break;
 	}
 
@@ -9830,7 +9839,7 @@ static PyObject* GemRB_GetMazeEntry(PyObject* /*self*/, PyObject* args)
 
 	PyObject* dict = PyDict_New();
 	maze_entry *m = (maze_entry *) (game->mazedata+entry*MAZE_ENTRY_SIZE);
-	PyDict_SetItemString(dict, "Visited", PyInt_FromLong (m->visited));
+	PyDict_SetItemString(dict, "Override", PyInt_FromLong (m->override));
 	PyDict_SetItemString(dict, "Accessible", PyInt_FromLong (m->accessible));
 	PyDict_SetItemString(dict, "Valid", PyInt_FromLong (m->valid));
 	if (m->trapped) {
@@ -9839,7 +9848,7 @@ static PyObject* GemRB_GetMazeEntry(PyObject* /*self*/, PyObject* args)
 		PyDict_SetItemString(dict, "Trapped", PyInt_FromLong (-1));
 	}
 	PyDict_SetItemString(dict, "Walls", PyInt_FromLong (m->walls));
-	PyDict_SetItemString(dict, "Special", PyInt_FromLong (m->special));
+	PyDict_SetItemString(dict, "Visited", PyInt_FromLong (m->visited));
 	return dict;
 }
 
