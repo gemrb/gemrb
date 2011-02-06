@@ -144,6 +144,15 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	bool playonce;
 
 	if (0) printf( "fx_play_bam_blended (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	if (!Owner)
+		Owner = target;
+	if (!Owner)
+		return FX_NOT_APPLIED;
+	//delay effect
+	Map *area = Owner->GetCurrentArea();
+	if (!area)
+		return FX_APPLIED;
+
 	//play once set to true
 	//check tearring.itm (0xbb effect)
 	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(fx->Resource, true);
@@ -179,10 +188,15 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 			sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
 		}
 	}
+	//convert it to an area VVC
+	if (!target) {
+		fx->Parameter2|=2;
+	}
+
 	if (fx->Parameter2&2) {
 		sca->XPos+=fx->PosX;
 		sca->YPos+=fx->PosY;
-		Owner->GetCurrentArea()->AddVVCell(sca);
+		area->AddVVCell(sca);
 	} else {
 		ScriptedAnimation *twin = sca->DetachTwin();
 		if (twin) {
@@ -207,6 +221,15 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	bool doublehint;
 
 	if (0) printf( "fx_play_bam_not_blended (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	if (!Owner)
+		Owner = target;
+	if (!Owner)
+		return FX_NOT_APPLIED;
+
+	Map *area = Owner->GetCurrentArea();
+	if (!area)
+		return FX_APPLIED;
+
 	//play once set to true
 	//check tearring.itm (0xbb effect)
 	if ((fx->Parameter2&0x30000)==0x30000) {
@@ -268,7 +291,8 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 		sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
 	}
 	ScriptedAnimation *twin = sca->DetachTwin();
-	if (fx->Parameter2&4096) {
+
+	if (target && (fx->Parameter2&4096)) {
 		if (twin) {
 			target->AddVVCell(twin);
 		}
@@ -288,9 +312,9 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 		if (twin) {
 			twin->XPos+=fx->PosX-x;
 			twin->YPos+=fx->PosY+twin->ZPos-y;
-			Owner->GetCurrentArea()->AddVVCell(twin);
+			area->AddVVCell(twin);
 		}
-		Owner->GetCurrentArea()->AddVVCell(sca);
+		area->AddVVCell(sca);
 	}
 	return FX_NOT_APPLIED;
 }
