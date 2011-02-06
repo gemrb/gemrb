@@ -34,7 +34,7 @@ offy = (0,-1,0,1,0)
 #wallbits = (0, WALL_WEST, WALL_NORTH, WALL_EAST, WALL_SOUTH)
 wallbits = (0, WALL_NORTH, WALL_EAST, WALL_SOUTH, WALL_WEST)
 entrances = ("", "Entry3", "Entry4", "Entry1", "Entry2")
-dirs = ("", "north", "east", "south","west")
+doors = ("", "northdoor", "eastdoor", "southdoor", "westdoor")
 cposx=(686,886,497)
 cposy=(498,722,726)
 
@@ -392,9 +392,11 @@ def CustomizeMaze(AreaName):
 		if set:
 			#remove exit
 			GemRB.SetMapExit ("exit"+str(i) )
+			GemRB.SetMapDoor (doors[i], 0)
 		else:
 			#set exit
 			GemRB.SetMapExit ("exit"+str(i), NewArea, entrances[i] )
+			GemRB.SetMapDoor (doors[i], 1)
 	return
 
 def CustomizeArea():

@@ -2012,10 +2012,12 @@ void Door::UpdateDoor()
 	unsigned char oval, cval;
 	oval = PATH_MAP_IMPASSABLE;
 	if (Flags & DOOR_TRANSPARENT) {
-		cval = PATH_MAP_DOOR_TRANSPARENT;
+		cval = PATH_MAP_DOOR_IMPASSABLE;
 	}
 	else {
-		cval = PATH_MAP_DOOR_OPAQUE;
+		//both door flags are needed here, one for transparency the other
+		//is for passability
+		cval = PATH_MAP_DOOR_OPAQUE|PATH_MAP_DOOR_IMPASSABLE;
 	}
 	if (Flags &DOOR_OPEN) {
 		ImpedeBlocks(cibcount, closed_ib, 0);

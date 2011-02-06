@@ -7523,6 +7523,36 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetMapDoor__doc,
+"SetMapDoor(DoorName, State)\n\n"
+"Modifies a door's open state in the current area.");
+
+static PyObject* GemRB_SetMapDoor(PyObject * /*self*/, PyObject* args)
+{
+	const char *DoorName;
+	int State;
+
+	if (!PyArg_ParseTuple( args, "si", &DoorName, &State) ) {
+		return AttributeError( GemRB_SetMapDoor__doc);
+	}
+
+	GET_GAME();
+
+	Map *map = game->GetCurrentArea();
+	if (!map) {
+		return RuntimeError( "No current area!" );
+	}
+	
+	Door *door = map->TMap->GetDoor(DoorName);
+	if (!door) {
+		return RuntimeError( "No such door!" );
+	}
+
+	door->SetDoorOpen(State, 0, 0);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SetMapExit__doc,
 "SetMapExit(ExitName[, NewArea, NewEntrance])\n\n"
 "Modifies the target of an exit in the current area. If no destination is given, "
@@ -9998,6 +10028,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(Roll, METH_VARARGS),
 	METHOD(SaveCharacter, METH_VARARGS),
 	METHOD(SaveGame, METH_VARARGS),
+	METHOD(SetMapDoor, METH_VARARGS),
 	METHOD(SetMapExit, METH_VARARGS),
 	METHOD(SetDefaultActions, METH_VARARGS),
 	METHOD(SetEquippedQuickSlot, METH_VARARGS),
