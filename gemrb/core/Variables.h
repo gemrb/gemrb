@@ -95,7 +95,7 @@ public:
 	void SetAtCopy(const char* key, int newValue);
 	void SetAt(const char* key, char* newValue);
 	void SetAt(const char* key, void* newValue);
-	void SetAt(const char* key, ieDword newValue);
+	void SetAt(const char* key, ieDword newValue, bool nocreate=false);
 	void Remove(const char* key);
 	void RemoveAll(ReleaseFun fun);
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);

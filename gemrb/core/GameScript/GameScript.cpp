@@ -1281,6 +1281,9 @@ void InitializeIEScript()
 
 	PluginMgr::Get()->RegisterCleanup(CleanupIEScript);
 
+	NoCreate = core->HasFeature(GF_NO_NEW_VARIABLES);
+	HasKaputz = core->HasFeature(GF_HAS_KAPUTZ);
+
 	InitScriptTables();
 	int tT = core->LoadSymbol( "trigger" );
 	int aT = core->LoadSymbol( "action" );

@@ -57,6 +57,9 @@ int ObjectIDSCount = 7;
 int MaxObjectNesting = 5;
 bool HasAdditionalRect = false;
 bool HasTriggerPoint = false;
+//don't create new variables
+bool NoCreate = false;
+bool HasKaputz = false;
 //released by ReleaseMemory
 ieResRef *ObjectIDSTableNames;
 int ObjectFieldsCount = 7;
@@ -1611,7 +1614,7 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 	if (!actor->InMove() || actor->Destination != p) {
 		//chasing is unbreakable
 		//maybe consider setting a per action unbreakability
-		//instead of messing with the actor flag
+		//instead of messing with the actor
 		actor->WalkTo(p, IF_NOINT, distance);
 	}
 
@@ -1869,18 +1872,19 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 		printf( "Setting variable(\"%s%s\", %d)\n", Context,
 			VarName, value );
 	}
+
 	strncpy( newVarName, Context, 6 );
 	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
-		Sender->GetCurrentArea()->locals->SetAt( VarName, value );
+		Sender->GetCurrentArea()->locals->SetAt( VarName, value, NoCreate );
 		return;
 	}
 	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
-		Sender->locals->SetAt( VarName, value );
+		Sender->locals->SetAt( VarName, value, NoCreate );
 		return;
 	}
 	Game *game = core->GetGame();
-	if (!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
+	if (HasKaputz && !strnicmp(newVarName,"KAPUTZ",6) ) {
 		game->kaputz->SetAt( VarName, value );
 		return;
 	}
@@ -1888,7 +1892,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 	if (strnicmp(newVarName,"GLOBAL",6) ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
-			map->locals->SetAt( VarName, value);
+			map->locals->SetAt( VarName, value, NoCreate);
 		}
 		else if (InDebug&ID_VARIABLES) {
 			printMessage("GameScript"," ",YELLOW);
@@ -1896,7 +1900,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 		}
 	}
 	else {
-		game->locals->SetAt( VarName, ( ieDword ) value );
+		game->locals->SetAt( VarName, ( ieDword ) value, NoCreate );
 	}
 }
 
@@ -1917,22 +1921,22 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 	strncpy( newVarName, VarName, 6 );
 	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
-		Sender->GetCurrentArea()->locals->SetAt( poi, value );
+		Sender->GetCurrentArea()->locals->SetAt( poi, value, NoCreate );
 		return;
 	}
 	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
-		Sender->locals->SetAt( poi, value );
+		Sender->locals->SetAt( poi, value, NoCreate );
 		return;
 	}
 	Game *game = core->GetGame();
-	if (!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
-		game->kaputz->SetAt( poi, value );
+	if (HasKaputz && !strnicmp(newVarName,"KAPUTZ",6) ) {
+		game->kaputz->SetAt( poi, value, NoCreate );
 		return;
 	}
 	if (strnicmp(newVarName,"GLOBAL",6) ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
-			map->locals->SetAt( poi, value);
+			map->locals->SetAt( poi, value, NoCreate);
 		}
 		else if (InDebug&ID_VARIABLES) {
 			printMessage("GameScript"," ",YELLOW);
@@ -1940,7 +1944,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 		}
 	}
 	else {
-		game->locals->SetAt( poi, ( ieDword ) value );
+		game->locals->SetAt( poi, ( ieDword ) value, NoCreate );
 	}
 }
 
@@ -1973,7 +1977,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 		return value;
 	}
 	Game *game = core->GetGame();
-	if (!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
+	if (HasKaputz && !strnicmp(newVarName,"KAPUTZ",6) ) {
 		game->kaputz->Lookup( poi, value );
 		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s: %d\n",VarName, value);
@@ -2024,7 +2028,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 		return value;
 	}
 	Game *game = core->GetGame();
-	if (!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
+	if (HasKaputz && !strnicmp(newVarName,"KAPUTZ",6) ) {
 		game->kaputz->Lookup( VarName, value );
 		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s%s: %d\n",Context, VarName, value);
@@ -2150,7 +2154,7 @@ Point GetEntryPoint(const char *areaname, const char *entryname)
 }
 
 /* returns a spell's casting distance, it depends on the caster (level), and targeting mode too
-   the used header is calculated from the caster level */
+ the used header is calculated from the caster level */
 unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
 {
 	unsigned int dist;
@@ -2173,7 +2177,7 @@ unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
 }
 
 /* returns an item's casting distance, it depends on the used header, and targeting mode too
-   the used header is explictly given */
+ the used header is explictly given */
 unsigned int GetItemDistance(const ieResRef itemres, int header)
 {
 	unsigned int dist;

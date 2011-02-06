@@ -418,13 +418,19 @@ void Variables::SetAt(const char* key, void* value)
 }
 
 
-void Variables::SetAt(const char* key, ieDword value)
+void Variables::SetAt(const char* key, ieDword value, bool nocreate)
 {
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
 
 	assert( m_type == GEM_VARIABLES_INT );
 	if (( pAssoc = GetAssocAt( key, nHash ) ) == NULL) {
+		if (nocreate) {
+			printMessage("Variables", " ", YELLOW);
+			printf("Cannot create new variable: %s\n", key);
+			return;
+		}
+
 		if (m_pHashTable == NULL)
 			InitHashTable( m_nHashTableSize );
 

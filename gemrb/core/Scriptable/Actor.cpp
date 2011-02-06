@@ -1919,20 +1919,20 @@ static void InitActorTables()
 		}
 	}
 
-        //initializing the skill->stats conversion table (used in iwd2)
-        tm.load("skillsta");
-        if (tm) {
-                int rowcount = tm->GetRowCount();
-                skillcount = rowcount;
-                if (rowcount) {
-                        skillstats = (int *) malloc(rowcount * sizeof(int) );
-                        skillabils = (int *) malloc(rowcount * sizeof(int) );
-                        while(rowcount--) {
-                                skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
-                                skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
-                        }
-                }
-        }
+			  //initializing the skill->stats conversion table (used in iwd2)
+			  tm.load("skillsta");
+			  if (tm) {
+			          int rowcount = tm->GetRowCount();
+			          skillcount = rowcount;
+			          if (rowcount) {
+			                  skillstats = (int *) malloc(rowcount * sizeof(int) );
+			                  skillabils = (int *) malloc(rowcount * sizeof(int) );
+			                  while(rowcount--) {
+			                          skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
+			                          skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
+			                  }
+			          }
+			  }
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -3432,18 +3432,22 @@ void Actor::Die(Scriptable *killer)
 
 	// death variables are updated at the moment of death
 	if (KillVar[0]) {
+		//don't use the raw killVar here
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
-			game->kaputz->Lookup(KillVar, value);
-			game->kaputz->SetAt(KillVar, value+1);
+			if (AppearanceFlags&APP_DEATHTYPE) {
+				snprintf(varname, 32, "KILL_%s", KillVar);
+				game->kaputz->Lookup(varname, value);
+				game->kaputz->SetAt(varname, value+1, true);
+			}
 		} else {
 			// iwd/iwd2 path *sets* this var, so i changed it, not sure about pst above
-			game->locals->SetAt(KillVar, 1);
+			game->locals->SetAt(KillVar, 1, true);
 		}
 	}
 	if (IncKillVar[0]) {
 		value = 0;
 		game->locals->Lookup(IncKillVar, value);
-		game->locals->SetAt(IncKillVar, value + 1);
+		game->locals->SetAt(IncKillVar, value + 1, true);
 	}
 
 	if (scriptName[0]) {
@@ -3452,29 +3456,24 @@ void Actor::Die(Scriptable *killer)
 			if (AppearanceFlags&APP_DEATHVAR) {
 				snprintf(varname, 32, "%s_DEAD", scriptName);
 				game->kaputz->Lookup(varname, value);
-				game->kaputz->SetAt(varname, value+1);
-			}
-			if (AppearanceFlags&APP_DEATHTYPE) {
-				snprintf(varname, 32, "KILL_%s", KillVar);
-				game->kaputz->Lookup(varname, value);
-				game->kaputz->SetAt(varname, value+1);
+				game->kaputz->SetAt(varname, value+1, true);
 			}
 		} else {
 			snprintf(varname, 32, core->GetDeathVarFormat(), scriptName);
 			game->locals->Lookup(varname, value);
-			game->locals->SetAt(varname, value+1);
+			game->locals->SetAt(varname, value+1, true);
 		}
 
 		if (SetDeathVar) {
 			value = 0;
 			snprintf(varname, 32, "%s_DEAD", scriptName);
 			game->locals->Lookup(varname, value);
-			game->locals->SetAt(varname, 1);
+			game->locals->SetAt(varname, 1, true);
 			if (value) {
 				snprintf(varname, 32, "%s_KILL_CNT", scriptName);
 				value = 1;
 				game->locals->Lookup(varname, value);
-				game->locals->SetAt(varname, value + 1);
+				game->locals->SetAt(varname, value + 1, true);
 			}
 		}
 	}
@@ -3490,7 +3489,7 @@ void Actor::Die(Scriptable *killer)
 				// todo: should probably not set this for humans in iwd?
 				snprintf(varname, 32, "KILL_%s_CNT", raceName);
 				game->locals->Lookup(varname, value);
-				game->locals->SetAt(varname, value+1);
+				game->locals->SetAt(varname, value+1, true);
 			}
 		}
 	}
@@ -3501,7 +3500,7 @@ void Actor::Die(Scriptable *killer)
 		if (AppearanceFlags&j) {
 			ieDword value = 0;
 			game->locals->Lookup(CounterNames[i], value);
-			game->locals->SetAt(CounterNames[i], value+DeathCounters[i]);
+			game->locals->SetAt(CounterNames[i], value+DeathCounters[i], true);
 		}
 		j+=j;
 	}

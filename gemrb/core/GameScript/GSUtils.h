@@ -51,6 +51,8 @@ extern int ObjectIDSCount;
 extern int MaxObjectNesting;
 extern bool HasAdditionalRect;
 extern bool HasTriggerPoint;
+extern bool NoCreate;
+extern bool HasKaputz;
 extern ieResRef *ObjectIDSTableNames;
 extern int ObjectFieldsCount;
 extern int ExtraParametersCount;
