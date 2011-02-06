@@ -1141,7 +1141,7 @@ void Game::IncrementChapter()
 	ieDword chapter = (ieDword) -1;
 	locals->Lookup("CHAPTER",chapter);
 	//increment chapter only if it exists
-	locals->SetAt("CHAPTER", chapter+1, true);
+	locals->SetAt("CHAPTER", chapter+1, core->HasFeature(GF_NO_NEW_VARIABLES) );
 	//clear statistics
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		//all PCs must have this!

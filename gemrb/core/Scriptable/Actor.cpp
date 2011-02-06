@@ -115,6 +115,7 @@ struct ItemUseType {
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
 static bool pstflags = false;
+static bool nocreate = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
 
@@ -1371,6 +1372,7 @@ static void InitActorTables()
 	int i, j;
 
 	pstflags = core->HasFeature(GF_PST_STATE_FLAGS);
+	nocreate = core->HasFeature(GF_NO_NEW_VARIABLES);
 	if (pstflags) {
 		state_invisible=STATE_PST_INVIS;
 	} else {
@@ -3305,7 +3307,7 @@ void Actor::Resurrect()
 		ieDword value=0;
 
 		game->kaputz->Lookup(DeathVar, value);
-		if (value) {
+		if (value>0) {
 			game->kaputz->SetAt(DeathVar, value-1);
 		}
 	}
@@ -3437,17 +3439,17 @@ void Actor::Die(Scriptable *killer)
 			if (AppearanceFlags&APP_DEATHTYPE) {
 				snprintf(varname, 32, "KILL_%s", KillVar);
 				game->kaputz->Lookup(varname, value);
-				game->kaputz->SetAt(varname, value+1, true);
+				game->kaputz->SetAt(varname, value+1, nocreate);
 			}
 		} else {
 			// iwd/iwd2 path *sets* this var, so i changed it, not sure about pst above
-			game->locals->SetAt(KillVar, 1, true);
+			game->locals->SetAt(KillVar, 1, nocreate);
 		}
 	}
 	if (IncKillVar[0]) {
 		value = 0;
 		game->locals->Lookup(IncKillVar, value);
-		game->locals->SetAt(IncKillVar, value + 1, true);
+		game->locals->SetAt(IncKillVar, value + 1, nocreate);
 	}
 
 	if (scriptName[0]) {
@@ -3456,24 +3458,24 @@ void Actor::Die(Scriptable *killer)
 			if (AppearanceFlags&APP_DEATHVAR) {
 				snprintf(varname, 32, "%s_DEAD", scriptName);
 				game->kaputz->Lookup(varname, value);
-				game->kaputz->SetAt(varname, value+1, true);
+				game->kaputz->SetAt(varname, value+1, nocreate);
 			}
 		} else {
 			snprintf(varname, 32, core->GetDeathVarFormat(), scriptName);
 			game->locals->Lookup(varname, value);
-			game->locals->SetAt(varname, value+1, true);
+			game->locals->SetAt(varname, value+1, nocreate);
 		}
 
 		if (SetDeathVar) {
 			value = 0;
 			snprintf(varname, 32, "%s_DEAD", scriptName);
 			game->locals->Lookup(varname, value);
-			game->locals->SetAt(varname, 1, true);
+			game->locals->SetAt(varname, 1, nocreate);
 			if (value) {
 				snprintf(varname, 32, "%s_KILL_CNT", scriptName);
 				value = 1;
 				game->locals->Lookup(varname, value);
-				game->locals->SetAt(varname, value + 1, true);
+				game->locals->SetAt(varname, value + 1, nocreate);
 			}
 		}
 	}
@@ -3489,7 +3491,7 @@ void Actor::Die(Scriptable *killer)
 				// todo: should probably not set this for humans in iwd?
 				snprintf(varname, 32, "KILL_%s_CNT", raceName);
 				game->locals->Lookup(varname, value);
-				game->locals->SetAt(varname, value+1, true);
+				game->locals->SetAt(varname, value+1, nocreate);
 			}
 		}
 	}
@@ -3500,7 +3502,7 @@ void Actor::Die(Scriptable *killer)
 		if (AppearanceFlags&j) {
 			ieDword value = 0;
 			game->locals->Lookup(CounterNames[i], value);
-			game->locals->SetAt(CounterNames[i], value+DeathCounters[i], true);
+			game->locals->SetAt(CounterNames[i], value+DeathCounters[i], nocreate);
 		}
 		j+=j;
 	}
