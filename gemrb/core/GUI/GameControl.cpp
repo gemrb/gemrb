@@ -1486,6 +1486,9 @@ void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 		Video* video = core->GetVideoDriver();
 		video->SetDragCursor(NULL);
 	}
+#else
+(void)x;
+(void)y;
 #endif
 }
 
