@@ -32,10 +32,11 @@ def OnLoad():
 	global StartWindow, QuitWindow
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
+
 	if not skip_videos:
-		GemRB.PlayMovie ("BISLOGO")
-		GemRB.PlayMovie ("TSRLOGO")
-		GemRB.PlayMovie ("OPENING")
+		GemRB.PlayMovie ("BISLOGO", 1)
+		GemRB.PlayMovie ("TSRLOGO", 1)
+		GemRB.PlayMovie ("OPENING", 1)
 
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
