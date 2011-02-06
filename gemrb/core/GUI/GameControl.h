@@ -112,6 +112,9 @@ private:
 	Region SelectionRect;
 	short StartX, StartY;
 	//int action;
+#ifdef TOUCHSCREEN
+	bool touched; // true, if player touched screen (left button down and hold)
+#endif
 public:
 	Door* overDoor;
 	Container* overContainer;

@@ -44,6 +44,12 @@
 #define DEBUG_SHOW_DOORS	DEBUG_SHOW_CONTAINERS
 #define DEBUG_SHOW_LIGHTMAP     0x08
 
+#ifdef TOUCHSCREEN
+#	define SCROLL_BORDER 32
+#else
+#	define SCROLL_BORDER 5
+#endif
+
 static const Color cyan = {
 	0x00, 0xff, 0xff, 0xff
 };
@@ -66,6 +72,9 @@ static const Color black = {
 };
 static const Color blue = {
 	0x00, 0x00, 0xff, 0x80
+};
+static const Color gray = {
+	0x80, 0x80, 0x80, 0xff
 };
 
 //Animation* effect;
@@ -120,6 +129,9 @@ GameControl::GameControl(void)
 	lastCursor = IE_CURSOR_NORMAL;
 	moveX = moveY = 0;
 	scrolling = false;
+#ifdef TOUCHSCREEN
+	touched=false;
+#endif
 	numScrollCursor = 0;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
@@ -571,6 +583,25 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			}
 		}
 	}
+
+#ifdef TOUCHSCREEN
+	if (moveY < 0 && scrolling)
+		video->DrawLine(screen.x+4, screen.y+SCROLL_BORDER, screen.w+screen.x-4, screen.y+SCROLL_BORDER, red);
+	else
+		video->DrawLine(screen.x+4, screen.y+SCROLL_BORDER, screen.w+screen.x-4, screen.y+SCROLL_BORDER, gray);
+	if (moveY > 0 && scrolling)
+		video->DrawLine(screen.x+4, screen.h-SCROLL_BORDER, screen.w+screen.x-4, screen.h-SCROLL_BORDER, red);
+	else
+		video->DrawLine(screen.x+4, screen.h-SCROLL_BORDER, screen.w+screen.x-4, screen.h-SCROLL_BORDER, gray);
+	if (moveX < 0 && scrolling)
+		video->DrawLine(screen.x+SCROLL_BORDER, screen.y+4, screen.x+SCROLL_BORDER, screen.h+screen.y-4, red);
+	else
+		video->DrawLine(screen.x+SCROLL_BORDER, screen.y+4, screen.x+SCROLL_BORDER, screen.h+screen.y-4, gray);
+	if (moveX > 0 && scrolling)
+		video->DrawLine(screen.w+screen.x-SCROLL_BORDER, screen.y+4, screen.w+screen.x-SCROLL_BORDER, screen.h-4, red);
+	else
+		video->DrawLine(screen.w+screen.x-SCROLL_BORDER, screen.y+4, screen.w+screen.x-SCROLL_BORDER, screen.h-4, gray);
+#endif
 }
 
 /** inherited from Control, GameControl doesn't need it */
@@ -1196,6 +1227,62 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 	}
 
+#ifdef TOUCHSCREEN
+	int mousescrollspd = core->GetMouseScrollSpeed();
+	Region region;
+	Map* map;
+	Point mapsize;
+	Region viewport = core->GetVideoDriver()->GetViewport();
+	moveX = 0;
+	moveY = 0;
+	// Top scroll area
+	region=Region(XPos, YPos, Width, YPos+SCROLL_BORDER);
+	if (region.PointInside(x, y)) {
+		// Check for end of map area
+		if (viewport.y > 0)
+			moveY = -mousescrollspd;
+	}
+	// Bottom scroll area
+	region=Region(XPos, Height-SCROLL_BORDER, Width, Height);
+	if (region.PointInside(x, y)) {
+		// Check for end of map area
+		map = core->GetGame()->GetCurrentArea();
+		if (map != NULL) {
+			mapsize = map->TMap->GetMapSize();
+			if((viewport.y + viewport.h) < mapsize.y)
+				moveY = mousescrollspd;
+		}
+	}
+	// Left scroll area
+	region=Region(XPos, YPos, XPos+SCROLL_BORDER, Height);
+	if (region.PointInside(x, y)) {
+		// Check for end of map area
+		if(viewport.x > 0)
+			moveX = -mousescrollspd;
+	}
+	// Right scroll area
+	region=Region(Width-SCROLL_BORDER, YPos, Width, Height);
+	if (region.PointInside(x, y)) {
+		// Check for end of map area
+		map = core->GetGame()->GetCurrentArea();
+		if (map != NULL) {
+			mapsize = map->TMap->GetMapSize();
+			if((viewport.x + viewport.w) < mapsize.x)
+				moveX = mousescrollspd;
+		}
+	}
+	if ((moveX != 0 || moveY != 0) && touched) {
+		scrolling = true;
+		return;
+	} else {
+		moveX = 0;
+		moveY = 0;
+		scrolling = false;
+		Video* video = core->GetVideoDriver();
+		video->SetDragCursor(NULL);
+	}
+#endif
+
 	lastMouseX = x;
 	lastMouseY = y;
 	Point p( x,y );
@@ -1360,8 +1447,6 @@ end_function:
 	}
 }
 
-#define SCROLL_BORDER 5
-
 /** Global Mouse Move Event */
 void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 {
@@ -1373,6 +1458,7 @@ void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 		return;
 	}
 
+#ifndef TOUCHSCREEN
 	int mousescrollspd = core->GetMouseScrollSpeed();
 
 	if (x <= SCROLL_BORDER)
@@ -1400,6 +1486,7 @@ void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
 		Video* video = core->GetVideoDriver();
 		video->SetDragCursor(NULL);
 	}
+#endif
 }
 
 void GameControl::UpdateScrolling() {
@@ -1783,6 +1870,9 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 		StartY = py;
 		SelectionRect.w = 0;
 		SelectionRect.h = 0;
+#ifdef TOUCHSCREEN
+		touched=true;
+#endif
 	}
 }
 
@@ -1807,6 +1897,33 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	Map* area = game->GetCurrentArea( );
 	if (!area) return;
 
+#ifdef TOUCHSCREEN
+	touched=false;
+	if (scrolling) {
+		moveX = 0;
+		moveY = 0;
+		scrolling=false;
+		Video* video = core->GetVideoDriver();
+		video->SetDragCursor(NULL);
+		if (DrawSelectionRect) {
+			Actor** ab;
+			unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
+			if (count != 0) {
+				for (i = 0; i < highlighted.size(); i++)
+					highlighted[i]->SetOver( false );
+				highlighted.clear();
+				game->SelectActor( NULL, false, SELECT_NORMAL );
+				for (i = 0; i < count; i++) {
+					// FIXME: should call handler only once
+					game->SelectActor( ab[i], true, SELECT_NORMAL );
+				}
+			}
+			free( ab );
+			DrawSelectionRect = false;
+		}
+		return;
+	}
+#endif
 	if (DrawSelectionRect) {
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
