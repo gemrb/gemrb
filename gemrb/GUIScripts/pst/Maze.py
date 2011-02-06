@@ -362,7 +362,8 @@ def CustomizeMaze(AreaName):
 
 	trapped = entry['Trapped']
 	if trapped>=0:
-		GemRB.EnableRegion('Trap'+chr(trapped+65), 1 )
+		type = GemRB.Roll(1,4,0)
+		GemRB.SetMapRegion('Trap'+chr(trapped+65), '1300trp'+str(type) )
 
 	GemRB.SetMazeEntry(pos, ME_VISITED, 1)
 	walls = entry['Walls']

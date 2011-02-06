@@ -7598,17 +7598,17 @@ static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_EnableRegion__doc,
-"EnableRegion(TrapName, flag)\n\n"
+PyDoc_STRVAR( GemRB_SetMapRegion__doc,
+"SetMapRegion(TrapName[, trapscript])\n\n"
 "Enables or disables an infopoint in the current area.");
 
-static PyObject* GemRB_EnableRegion(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_SetMapRegion(PyObject * /*self*/, PyObject* args)
 {
 	const char *Name;
-	int Flag=1;
+	const char *TrapScript = NULL;
 
-	if (!PyArg_ParseTuple( args, "s|i", &Name, &Flag)) {
-		return AttributeError( GemRB_EnableRegion__doc );
+	if (!PyArg_ParseTuple( args, "s|s", &Name, &TrapScript)) {
+		return AttributeError( GemRB_SetMapRegion__doc );
 	}
 
 	GET_GAME();
@@ -7620,8 +7620,9 @@ static PyObject* GemRB_EnableRegion(PyObject * /*self*/, PyObject* args)
 
 	InfoPoint *ip = map->TMap->GetInfoPoint(Name);
 	if (ip) {
-		if (Flag) {
+		if (TrapScript && TrapScript[0]) {
 			ip->Flags&=~TRAP_DEACTIVATED;
+			ip->SetScript(TrapScript,0);
 		} else {
 			ip->Flags|=TRAP_DEACTIVATED;
 		}
@@ -9908,7 +9909,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(DrawWindows, METH_NOARGS),
 	METHOD(DropDraggedItem, METH_VARARGS),
 	METHOD(EnableCheatKeys, METH_VARARGS),
-	METHOD(EnableRegion, METH_VARARGS),
 	METHOD(EndCutSceneMode, METH_NOARGS),
 	METHOD(EnterGame, METH_NOARGS),
 	METHOD(EnterStore, METH_VARARGS),
@@ -10028,8 +10028,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(Roll, METH_VARARGS),
 	METHOD(SaveCharacter, METH_VARARGS),
 	METHOD(SaveGame, METH_VARARGS),
-	METHOD(SetMapDoor, METH_VARARGS),
-	METHOD(SetMapExit, METH_VARARGS),
 	METHOD(SetDefaultActions, METH_VARARGS),
 	METHOD(SetEquippedQuickSlot, METH_VARARGS),
 	METHOD(SetFullScreen, METH_VARARGS),
@@ -10037,7 +10035,10 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetGlobal, METH_VARARGS),
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(SetJournalEntry, METH_VARARGS),
+	METHOD(SetMapDoor, METH_VARARGS),
+	METHOD(SetMapExit, METH_VARARGS),
 	METHOD(SetMapnote, METH_VARARGS),
+	METHOD(SetMapRegion, METH_VARARGS),
 	METHOD(SetMasterScript, METH_VARARGS),
 	METHOD(SetMazeEntry, METH_VARARGS),
 	METHOD(SetMazeData, METH_VARARGS),
