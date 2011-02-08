@@ -172,8 +172,14 @@ inline PyObject* AttributeError(const char* doc_string)
 
 #define GET_GAME() \
 	Game *game = core->GetGame(); \
-	if (!game) {  \
+	if (!game) { \
 		return RuntimeError( "No game loaded!\n" ); \
+	}
+
+#define GET_MAP() \
+	Map *map = game->GetCurrentArea(); \
+	if (!map) { \
+		return RuntimeError( "No current area!" ); \
 	}
 
 #define GET_GAMECONTROL() \
@@ -2626,7 +2632,9 @@ static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 
-	game->GetCurrentArea()->MoveToNewArea(area, entrance, (unsigned int)direction, everyone, NULL);
+	GET_MAP();
+
+	map->MoveToNewArea(area, entrance, (unsigned int)direction, everyone, NULL);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -7486,6 +7494,43 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetMapAnimation__doc,
+"SetMapAnimation(X, Y, BAMresref[, flags, cycle, height])\n\n"
+"Creates an area animation.");
+
+static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
+{
+	int x,y;
+	const char *ResRef;
+	int Cycle = 0;
+	int Flags = 0x19;
+	int Height = 0x1e;
+	//the animation is cloned by AddAnimation, so we can keep the original on
+	//the stack
+	AreaAnimation anim;
+	memset(&anim,0,sizeof(anim));
+
+	if (!PyArg_ParseTuple( args, "iis|iii", &x, &y, &ResRef, &Flags, &Cycle, &Height)) {
+		return AttributeError( GemRB_CreateItem__doc );
+	}
+
+	GET_GAME();
+
+	GET_MAP();
+
+	anim.appearance=0xffffffff; //scheduled for every hour
+	anim.Pos.x=(short) x;
+	anim.Pos.y=(short) y;
+	strnlwrcpy(anim.Name, ResRef, 8);
+	strnlwrcpy(anim.BAM, ResRef, 8);
+	anim.Flags=Flags;
+	anim.sequence=Cycle;
+	anim.height=Height;
+	map->AddAnimation(&anim);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SetMapnote__doc,
 "SetMapnote(X, Y, color, Text)\n\n"
 "Adds or removes a mapnote.");
@@ -7501,10 +7546,8 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 
-	Map *map = game->GetCurrentArea();
-	if (!map) {
-		return RuntimeError( "No current area!" );
-	}
+	GET_MAP();
+
 	ieStrRef strref;
 	Point point;
 	point.x=x;
@@ -7538,10 +7581,7 @@ static PyObject* GemRB_SetMapDoor(PyObject * /*self*/, PyObject* args)
 
 	GET_GAME();
 
-	Map *map = game->GetCurrentArea();
-	if (!map) {
-		return RuntimeError( "No current area!" );
-	}
+	GET_MAP();
 	
 	Door *door = map->TMap->GetDoor(DoorName);
 	if (!door) {
@@ -7570,10 +7610,7 @@ static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 
 	GET_GAME();
 
-	Map *map = game->GetCurrentArea();
-	if (!map) {
-		return RuntimeError( "No current area!" );
-	}
+	GET_MAP();
 
 	InfoPoint *ip = map->TMap->GetInfoPoint(ExitName);
 	if (!ip || ip->Type!=ST_TRAVEL) {
@@ -7613,10 +7650,7 @@ static PyObject* GemRB_SetMapRegion(PyObject * /*self*/, PyObject* args)
 
 	GET_GAME();
 
-	Map *map = game->GetCurrentArea();
-	if (!map) {
-		return RuntimeError( "No current area!" );
-	}
+	GET_MAP();
 
 	InfoPoint *ip = map->TMap->GetInfoPoint(Name);
 	if (ip) {
@@ -7650,10 +7684,7 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 
 	GET_GAME();
 
-	Map *map=game->GetCurrentArea();
-	if (!map) {
-		return RuntimeError( "No current area!" );
-	}
+	GET_MAP();
 
 	if (PosX!=-1 && PosY!=-1) {
 		map->SpawnCreature(Point(PosX, PosY), CreResRef, 0);
@@ -7685,10 +7716,8 @@ static PyObject* GemRB_RevealArea(PyObject * /*self*/, PyObject* args)
 	Point p(x,y);
 	GET_GAME();
 
-	Map *map=game->GetCurrentArea();
-	if (!map) {
-		return RuntimeError( "No current area!" );
-	}
+	GET_MAP();
+
 	map->ExploreMapChunk( p, radius, Value );
 
 	Py_INCREF( Py_None );
@@ -7708,10 +7737,8 @@ static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 	}
 	GET_GAME();
 
-	Map *map=game->GetCurrentArea();
-	if (!map) {
-		return RuntimeError( "No current area!" );
-	}
+	GET_MAP();
+
 	map->Explore( Value );
 
 	Py_INCREF( Py_None );
@@ -8967,11 +8994,13 @@ static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
 
 	GET_GAME();
 
+	GET_MAP();
+
 	Actor* actor = game->FindPC( PartyID );
 	if (!actor) {
 		return RuntimeError( "Actor not found!\n" );
 	}
-	Actor *caster = game->GetCurrentArea()->GetActorByGlobalID(casterID);
+	Actor *caster = map->GetActorByGlobalID(casterID);
 	if (!caster) caster = game->GetActorByGlobalID(casterID);
 	if (!caster) caster = actor;
 
@@ -9388,10 +9417,8 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 	if (!store) {
 		return RuntimeError( "No store loaded!" );
 	}
-	Map *map = game->GetCurrentArea();
-	if (!map) {
-		return RuntimeError( "No area loaded!" );
-	}
+	GET_MAP();
+
 	Actor* owner = map->GetActorByGlobalID( store->GetOwnerID() );
 	if (!owner) owner = game->GetActorByGlobalID( store->GetOwnerID() );
 	if (!owner) {
@@ -10035,6 +10062,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetGlobal, METH_VARARGS),
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(SetJournalEntry, METH_VARARGS),
+	METHOD(SetMapAnimation, METH_VARARGS),
 	METHOD(SetMapDoor, METH_VARARGS),
 	METHOD(SetMapExit, METH_VARARGS),
 	METHOD(SetMapnote, METH_VARARGS),
