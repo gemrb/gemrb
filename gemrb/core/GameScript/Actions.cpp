@@ -3207,10 +3207,11 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	if (act->GetCurrentArea() != game->GetCurrentArea()) {
 		return;
 	}
-	
+
 	/* calling this, so it is simpler to change */
 	/* i'm not sure this is required here at all */
 	SetBeenInPartyFlags(Sender, parameters);
+	act->SetBase( IE_EA, EA_PC );
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
 		/* we must reset various existing scripts */
 		act->SetScript( "DEFAULT", AI_SCRIPT_LEVEL, true );
