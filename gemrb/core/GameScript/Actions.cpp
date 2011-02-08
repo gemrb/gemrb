@@ -3200,11 +3200,17 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
+	// make sure we're in the same area, otherwise Dynaheir joins when Minsc does
+	// but she's in another area and needs to be rescued first!
+	Actor* act = ( Actor* ) Sender;
+	Game *game = core->GetGame();
+	if (act->GetCurrentArea() != game->GetCurrentArea()) {
+		return;
+	}
+	
 	/* calling this, so it is simpler to change */
 	/* i'm not sure this is required here at all */
 	SetBeenInPartyFlags(Sender, parameters);
-	Actor* act = ( Actor* ) Sender;
-	act->SetBase( IE_EA, EA_PC );
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
 		/* we must reset various existing scripts */
 		act->SetScript( "DEFAULT", AI_SCRIPT_LEVEL, true );
@@ -3222,7 +3228,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 			act->SetDialog( resref );
 		}
 	}
-	core->GetGame()->JoinParty( act, JP_JOIN );
+	game->JoinParty( act, JP_JOIN );
 }
 
 void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
