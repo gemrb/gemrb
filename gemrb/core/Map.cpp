@@ -1225,8 +1225,14 @@ void Map::DrawSearchMap(const Region &screen)
 }
 
 //adding animation in order, based on its height parameter
-void Map::AddAnimation(AreaAnimation* anim)
+void Map::AddAnimation(AreaAnimation* panim)
 {
+	//copy external memory to core memory for msvc's sake
+	AreaAnimation *anim = new AreaAnimation();
+	memcpy(anim, panim, sizeof(AreaAnimation) );
+
+	anim->InitAnimation();
+
 	//this hack is to make sure animations flagged with background
 	//are always drawn first (-9999 seems sufficiently small)
 	if (anim->Flags&A_ANI_BACKGROUND) {
@@ -1234,14 +1240,9 @@ void Map::AddAnimation(AreaAnimation* anim)
 	}
 
 	aniIterator iter;
+	
 	for(iter=animations.begin(); (iter!=animations.end()) && ((*iter)->height<anim->height); iter++) ;
-	animations.insert(iter, anim);
-	/*
-	Animation *a = anim->animation[0];
-	anim->SetSpriteCover(BuildSpriteCover(anim->Pos.x, anim->Pos.y,-a->animArea.x,
-			-a->animArea.y, a->animArea.w, a->animArea.h,0
-		));
-	*/
+	animations.insert(iter, anim);	
 }
 
 //reapplying all of the effects on the actors of this map

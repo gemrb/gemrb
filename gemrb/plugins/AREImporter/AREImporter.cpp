@@ -1009,9 +1009,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			//set up the animation, it cannot be done here
 			//because a StaticSequence action can change
 			//it later
-			anim->InitAnimation();
-
 			map->AddAnimation( anim );
+			//the animation was safely transferred to internal memory
+			delete anim;
 		}
 	}
 
