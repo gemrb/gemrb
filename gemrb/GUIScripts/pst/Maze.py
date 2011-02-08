@@ -35,6 +35,9 @@ offy = (0,-1,0,1,0)
 wallbits = (0, WALL_NORTH, WALL_EAST, WALL_SOUTH, WALL_WEST)
 entrances = ("", "Entry3", "Entry4", "Entry1", "Entry2")
 doors = ("", "northdoor", "eastdoor", "southdoor", "westdoor")
+anims = ("", "a13xxdn", "a13xxde", "a13xxds", "a13xxdw")
+aposx=(0,1012,1005,505,380)
+aposy=(0,524,958,996,562)
 cposx=(686,886,497)
 cposy=(498,722,726)
 
@@ -308,9 +311,13 @@ def CustomizeMaze(AreaName):
 		#disable engine room
 		if GemRB.GetGameVar("EnginInMaze")==1:
 			GemRB.SetMapExit ("exit3" )
+			GemRB.SetMapDoor (doors[3], 0)
+			GemRB.SetMapAnimation(aposx[3], aposy[3], anims[3])
 		else:
 			GemRB.SetMapExit ("exit3", "AR13EN")
+			
 		GemRB.SetMapExit ("exit4" )
+		GemRB.SetMapAnimation(aposx[4], aposy[4], anims[4])
 		return
 
 	if AreaName == "en":
@@ -324,6 +331,7 @@ def CustomizeMaze(AreaName):
 		entry = GemRB.GetMazeEntry(tmp)
 		tmp = mainX+mainY*MAZE_MAX_DIM
 		GemRB.SetMapExit ("exit3", FormatAreaName(tmp), "Entry1" )
+		GemRB.SetMapDoor (doors[3], 1)
 		return
 
 	if AreaName == "fd":
@@ -332,6 +340,7 @@ def CustomizeMaze(AreaName):
 		entry = GemRB.GetMazeEntry(tmp)
 		tmp = nordomX+nordomY*MAZE_MAX_DIM
 		GemRB.SetMapExit ("exit2", FormatAreaName(tmp), "Entry4" )
+		GemRB.SetMapDoor (doors[2], 1)
 		return
 
 	tmp = int(AreaName)-1
@@ -394,10 +403,12 @@ def CustomizeMaze(AreaName):
 			#remove exit
 			GemRB.SetMapExit ("exit"+str(i) )
 			GemRB.SetMapDoor (doors[i], 0)
+			GemRB.SetMapAnimation(aposx[i], aposy[i], anims[i])
 		else:
 			#set exit
 			GemRB.SetMapExit ("exit"+str(i), NewArea, entrances[i] )
 			GemRB.SetMapDoor (doors[i], 1)
+			GemRB.SetMapAnimation(-1, -1, "")
 	return
 
 def CustomizeArea():
