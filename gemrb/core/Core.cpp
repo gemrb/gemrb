@@ -76,12 +76,12 @@ void strnuprcpy(char* dest, const char *source, int count)
 	*dest=0;
 }
 
-// this one also filters spaces
+// this one also filters spaces, used to copy variables 
 void strnspccpy(char* dest, const char *source, int count)
 {
 	memset(dest,0,count);
 	while(count--) {
-		char c = pl_lowercase[(ieByte) *source];
+		char c = pl_uppercase[(ieByte) *source];
 		if (c!=' ') {
 			*dest++=c;
 		}
