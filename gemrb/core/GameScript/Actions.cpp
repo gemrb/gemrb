@@ -5630,7 +5630,9 @@ void GameScript::FixEngineRoom(Scriptable* Sender, Action* /*parameters*/)
 	int value = CheckVariable( Sender, "EnginInMaze","GLOBAL");
 	if (value) {
 		SetVariable(Sender, "EnginInMaze", "GLOBAL", 0);
-		core->SetEventFlag(EF_CREATEMAZE);
+		//this works only because the engine room exit depends only on the EnginInMaze variable
+		ScriptEngine *sE = core->GetGUIScriptEngine();
+		sE->RunFunction("Maze", "CustomizeArea");
 	}
 }
 

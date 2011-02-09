@@ -104,6 +104,9 @@ def LoadMazeFrom2da(tablename):
 	#adding foyer coordinates (middle of bottom)
 	GemRB.SetMazeData(MH_POS3X, size/2)
 	GemRB.SetMazeData(MH_POS3Y, size-1)
+	#adding engine room coordinates (bottom right)
+	GemRB.SetMazeData(MH_POS4X, size-1)
+	GemRB.SetMazeData(MH_POS4Y, size-1)
 	#adding trap
 	GemRB.SetMazeData(MH_TRAPCOUNT, traps)
 	#finish
@@ -188,14 +191,14 @@ def CreateMaze ():
 	#make sure there are no more traps than rooms
 	#make sure dimensions don't exceed maximum possible
 	if mazedifficulty==0:
-		dims = 3
+		dims = 4
 		traps = 5
 	elif mazedifficulty==1:
-		dims = 5
+		dims = 6
 		traps = 12
 	else:
 		dims = 8
-		traps = 18
+		traps = 20
 
 	entries = zeros(MAZE_ENTRY_COUNT)
 	rooms = []
@@ -279,6 +282,10 @@ def CreateMaze ():
 
 	GemRB.SetMazeData(MH_POS3X, GemRB.Roll(1,dims,-1) )
 	GemRB.SetMazeData(MH_POS3Y, dims-1)
+	
+	#setting engine room coordinates to hidden (accessible from foyer)
+	GemRB.SetMazeData(MH_POS4X, -1)
+	GemRB.SetMazeData(MH_POS4Y, -1)
 	#adding traps
 	GemRB.SetMazeData(MH_TRAPCOUNT, traps)
 	#finish
@@ -300,11 +307,11 @@ def CustomizeMaze(AreaName):
 	nordomY = header['Pos2Y']
 	foyerX = header['Pos3X']
 	foyerY = header['Pos3Y']
+	engineX = header['Pos4X']
+	engineY = header['Pos4Y']
 	#modron foyer
 	if AreaName == "fy":
 		#TODO modron foyer, only one entrance if EnginInMaze = 1
-		tmp = foyerY+foyerX*MAZE_MAX_DIM
-		entry = GemRB.GetMazeEntry(tmp)
 		tmp = foyerX+foyerY*MAZE_MAX_DIM
 		GemRB.SetMapExit ("exit1", FormatAreaName(tmp), "Entry3" )
 
@@ -321,8 +328,11 @@ def CustomizeMaze(AreaName):
 		return
 
 	if AreaName == "en":
-		#TODO engineering room
-		#what to do here?
+		if GemRB.GetGameVar("EnginInMaze")==1:
+			tmp = engineX+(engineY-1)*MAZE_MAX_DIM
+			GemRB.SetMapExit ("exit1", FormatAreaName(tmp), "Entry3" )
+		else:
+			GemRB.SetMapExit ("exit1", "AR13FY" )
 		return
 
 	if AreaName == "wz":
@@ -350,7 +360,6 @@ def CustomizeMaze(AreaName):
 	pos = ConvertPos(tmp)
 	entry = GemRB.GetMazeEntry(pos)
 	#TODO: customize maze area based on entry (walls, traps)
-	print entry
 
 	if entry['Visited']:
 		#already customized
@@ -389,6 +398,8 @@ def CustomizeMaze(AreaName):
 				NewArea = "AR13WZ"
 			elif x2 == foyerX and y2 == foyerY+1:
 				NewArea = "AR13FY"
+			elif x2 == engineX and y2 == engineY:
+				NewArea = "AR13EN"
 			else:
 				if x2>=0 and x2<MAZE_MAX_DIM and y2>=0 and y2<MAZE_MAX_DIM:
 					#reversed coordinates
@@ -408,7 +419,7 @@ def CustomizeMaze(AreaName):
 			#set exit
 			GemRB.SetMapExit ("exit"+str(i), NewArea, entrances[i] )
 			GemRB.SetMapDoor (doors[i], 1)
-			GemRB.SetMapAnimation(-1, -1, "")
+			GemRB.SetMapAnimation(-1, -1, "", 0, 0)
 	return
 
 def CustomizeArea():
