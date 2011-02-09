@@ -4860,19 +4860,24 @@ void Interface::PlaySound(int index)
 
 Actor *Interface::GetFirstSelectedPC(bool forced)
 {
+	Actor *ret = NULL;
+	int slot = 0;
 	int partySize = game->GetPartySize( false );
 	if (!partySize) return NULL;
 	for (int i = 0; i < partySize; i++) {
 		Actor* actor = game->GetPC( i,false );
 		if (actor->IsSelected()) {
-			return actor;
+			if (actor->InParty<slot || !ret) {
+				ret = actor;
+				slot = actor->InParty;
+			}
 		}
 	}
 
-	if (forced) {
-		return game->GetPC(0,false);
+	if (forced && !ret) {
+		return game->FindPC((unsigned int) 0);
 	}
-	return NULL;
+	return ret;
 }
 
 Actor *Interface::GetFirstSelectedActor()
