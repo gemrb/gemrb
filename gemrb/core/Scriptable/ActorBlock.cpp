@@ -140,6 +140,12 @@ const char* Scriptable::GetScriptName(void) const
 	return scriptName;
 }
 
+void Scriptable::SetDialog(const char *resref) {
+		if (gamedata->Exists(resref, IE_DLG_CLASS_ID) ) {
+			strnuprcpy(Dialog, resref, 8);
+		}
+	}
+
 Map* Scriptable::GetCurrentArea() const
 {
 	//this could be NULL, always check it
@@ -2324,11 +2330,18 @@ InfoPoint::InfoPoint(void)
 	TrapRemovalDiff = 0;
 	TrapDetected = 0;
 	TrapLaunch.empty();
-	Dialog[0] = 0;
+	EnterWav[0] = 0;
 }
 
 InfoPoint::~InfoPoint(void)
 {
+}
+
+void InfoPoint::SetEnter(const char *resref)
+{
+	if (gamedata->Exists(resref, IE_WAV_CLASS_ID) ) {
+		strnuprcpy(EnterWav, resref, 8);
+	}
 }
 
 //checks if the actor may use this travel trigger
@@ -2413,7 +2426,7 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 		return false;
 	}
 	//actually this could be script name[0]
-	if (!Scripts[0]) {
+	if (!Scripts[0] && !EnterWav[0]) {
 		return false;
 	}
 	LastTriggerObject = LastTrigger = LastEntered = ID;

@@ -417,7 +417,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieWord PosX, PosY;
 		ieWord TalkX, TalkY;
 		ieVariable Name, Entrance;
-		ieResRef Script, DialogResRef, KeyResRef, Destination;
+		ieResRef Script, KeyResRef, Destination;
+		ieResRef DialogResRef, WavResRef; //adopted pst specific fields
 		ieStrRef DialogName;
 		str->Read( Name, 32 );
 		Name[32] = 0;
@@ -459,7 +460,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &PosX);
 		str->ReadWord( &PosY);
 		//maybe we have to store this
-		str->Seek( 44, GEM_CURRENT_POS );
+		str->Seek( 36, GEM_CURRENT_POS );
+		str->ReadResRef( WavResRef );
 		str->ReadWord( &TalkX);
 		str->ReadWord( &TalkY);
 		str->ReadDword( &DialogName );
@@ -507,6 +509,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ip->TalkPos.y=TalkY;
 		ip->DialogName=DialogName;
 		ip->SetDialog(DialogResRef);
+		ip->SetEnter(WavResRef);
 
 		if (Script[0]) {
 			ip->Scripts[0] = new GameScript( Script, ip );
@@ -1695,7 +1698,7 @@ int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 {
 	ieDword tmpDword = 0;
 	ieWord tmpWord;
-	char filling[56];
+	char filling[36];
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<InfoPointsCount;i++) {
@@ -1745,8 +1748,9 @@ int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) ip->UsePoint.y;
 		stream->WriteWord( &tmpWord);
-		stream->Write( filling, 44); //unknown
+		stream->Write( filling, 36); //unknown
 		//these are probably only in PST
+		stream->WriteResRef( ip->EnterWav);
 		tmpWord = (ieWord) ip->TalkPos.x;
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) ip->TalkPos.y;

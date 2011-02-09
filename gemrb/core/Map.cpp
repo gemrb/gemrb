@@ -782,17 +782,15 @@ void Map::UpdateScripts()
 		if (!ip)
 			break;
 		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
-		bool wasActive = (ip->Scripts[0] || ( ip->Type == ST_TRAVEL ));
 		// InfoPoints of all types don't run scripts if TRAP_DEACTIVATED is set
 		// (eg, TriggerActivation changes this, see lightning room from SoA)
- 		if (wasActive)
-			wasActive = !(ip->Flags&TRAP_DEACTIVATED);
+		int wasActive = (ip->Trapped && !(ip->Flags&TRAP_DEACTIVATED) ) || (ip->Type==ST_TRAVEL);
 
 		//If this InfoPoint is a Switch Trigger
 		if (ip->Type == ST_TRIGGER) {
 			//Check if this InfoPoint was activated
 			if (ip->LastTrigger) {
-				if (wasActive) {
+				if (wasActive && ip->Scripts[0]) {
 					//Run the InfoPoint script
 					ip->ExecuteScript( 1 );
 				}
@@ -815,6 +813,7 @@ void Map::UpdateScripts()
 					if(ip->Entered(actor)) {
 						//if trap triggered, then mark actor
 						actor->SetInTrap(ipCount);
+				    wasActive|=TRAP_USEPOINT;
 					}
 				} else {
 					//ST_TRAVEL
@@ -835,6 +834,10 @@ void Map::UpdateScripts()
 
 		if (wasActive) {
 			ip->ExecuteScript( 1 );
+			//Play the PST specific enter sound
+			if (wasActive&TRAP_USEPOINT) {
+				core->GetAudioDrv()->Play(ip->EnterWav, ip->TrapLaunch.x, ip->TrapLaunch.y);
+			}
 		}
 		//Execute Pending Actions
 		ip->ProcessActions(false);

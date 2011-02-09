@@ -65,18 +65,19 @@ class SpriteCover;
 //pst trap flags (portal)
 #define PORTAL_CURSOR 1
 #define PORTAL_TRAVEL 2
+
 //trigger flags
 #define TRAP_INVISIBLE  1
 #define TRAP_RESET      2
 #define TRAVEL_PARTY    4
 #define TRAP_DETECTABLE 8
 //#define TRAP_16	 16
-//#define TRAP_32	 32
+#define TRAP_LOWMEM	 32 //special treatment when low on memory ?
 #define TRAP_NPC	64
 //#define TRAP_128	128
 #define TRAP_DEACTIVATED  256
 #define TRAVEL_NONPC      512
-#define TRAP_USEPOINT       1024 //override usage point of travel regions
+#define TRAP_USEPOINT       1024 //override usage point of travel regions (used for sound in PST traps)
 #define INFO_DOOR	 2048 //info trigger blocked by door
 
 //door flags
@@ -187,6 +188,7 @@ public:
 	ScriptableType Type;
 	Point Pos;
 	ieStrRef DialogName;
+	ieResRef EnterWav; //play this wav file when stepping on the trap
 	GameScript* Scripts[MAX_SCRIPTS];
 	char* overHeadText;
 	Point overHeadTextPos;
@@ -217,9 +219,7 @@ public:
 	{
 		return Dialog;
 	}
-	void SetDialog(const char *resref) {
-		strnuprcpy(Dialog, resref, 8);
-	}
+	void SetDialog(const char *resref);
 	void SetScript(const ieResRef aScript, int idx, bool ai=false);
 	void SetSpellResRef(ieResRef resref);
 	void SetWait(unsigned long time);
@@ -554,6 +554,7 @@ public:
 	InfoPoint(void);
 	~InfoPoint(void);
 	//returns true if trap has been triggered, tumble skill???
+	void SetEnter(const char *resref);
 	bool TriggerTrap(int skill, ieDword ID);
 	//call this to check if an actor entered the trigger zone
 	bool Entered(Actor *actor);
@@ -573,6 +574,7 @@ public:
 	ieStrRef StrRef;
 	Point UsePoint;
 	Point TalkPos;
+
 };
 
 #endif
