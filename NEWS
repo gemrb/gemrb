@@ -4,6 +4,7 @@ GemRB git (901067dbb0a06b):
     - full wild, dead, miscast and vocal magic support
     - subspell selection (spell immunity, nahal's reckless dweomer...)
     - compatibility with the bg2 demo
+    - PST maze
 
   Improved features:
     - 
