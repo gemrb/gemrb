@@ -234,7 +234,7 @@ private:
 	void DecodeBlock(short *out);
 	int DecodeAudioFrame(void *data, int data_size);
 	inline int get_value(int bundle);
-	int read_dct_coeffs(DCTELEM block[64], const uint8_t *scan);
+	int read_dct_coeffs(DCTELEM block[64], const uint8_t *scan, bool is_intra);
 	int read_residue(DCTELEM block[64], int masks_count);
 	int read_runs(Bundle *b);
 	int read_motion_values(Bundle *b);

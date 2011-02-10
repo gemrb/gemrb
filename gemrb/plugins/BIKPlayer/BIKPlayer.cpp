@@ -767,11 +767,15 @@ int BIKPlayer::DecodeAudioFrame(void *data, int data_size)
  * @param scan  scan order table
  * @return 0 for success, negative value in other cases
  */
-int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan)
+int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan, bool is_intra)
 {
 	int mode_list[128];
 	int i, t, mask, bits, ccoef, mode;
 	int list_start = 64, list_end = 64, list_pos;
+	int coef_count = 0;
+	int coef_idx[64];
+	int quant_idx;
+	const uint32_t* quant;
 
 	mode_list[list_end++] = ( 4 << 2) | 0;
 	mode_list[list_end++] = (24 << 2) | 0;
@@ -812,6 +816,7 @@ int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan)
 							}
 						}
 						block[scan[ccoef]] = t;
+						coef_idx[coef_count++] = ccoef;
 					}
 				}
 				break;
@@ -831,10 +836,20 @@ int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan)
 						t = -t;
 				}
 				block[scan[ccoef]] = t;
+				coef_idx[coef_count++] = ccoef;
 				mode_list[list_pos++] = 0;
 				break;
 			}
 		}
+	}
+
+	quant_idx = v_gb.get_bits(4);
+	quant = is_intra ? bink_intra_quant[quant_idx]
+	                 : bink_inter_quant[quant_idx];
+	block[0] = (block[0] * quant[0]) >> 11;
+	for (i = 0; i < coef_count; i++) {
+		int idx = coef_idx[i];
+		block[scan[idx]] = (block[scan[idx]] * quant[idx]) >> 11;
 	}
 
 	return 0;
@@ -1361,7 +1376,6 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 	uint8_t *dst, *prev;
 	int v, c1, c2;
 	const uint8_t *scan;
-	const uint32_t *quant;
 	int xoff, yoff;
 #pragma pack(push,16)
 	DCTELEM block[64];
@@ -1457,11 +1471,7 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 					case INTRA_BLOCK:
 						clear_block(block);
 						block[0] = get_value(BINK_SRC_INTRA_DC);
-						read_dct_coeffs(block, c_scantable.permutated);
-						quant = bink_intra_quant[v_gb.get_bits(4)];
-						for (i = 0; i < 64; i++) {
-							block[i] = (block[i] * quant[i]) >> 11;
-						}
+						read_dct_coeffs(block, c_scantable.permutated,true);
 						bink_idct(block);
 						for (j = 0; j < 8; j++) {
 							for (i = 0; i < 8; i++) {
@@ -1541,11 +1551,7 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 				case INTRA_BLOCK:
 					clear_block(block);
 					block[0] = get_value(BINK_SRC_INTRA_DC);
-					read_dct_coeffs(block, c_scantable.permutated);
-					quant = bink_intra_quant[v_gb.get_bits(4)];
-					for (i = 0; i < 64; i++) {
-						block[i] = (block[i] * quant[i]) >> 11;
-					}
+					read_dct_coeffs(block, c_scantable.permutated,true);
 					idct_put(dst, stride, block);
 					break;
 				case FILL_BLOCK:
@@ -1560,11 +1566,7 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 					copy_block(block, prev + xoff + yoff*stride, dst, stride);
 					clear_block(block);
 					block[0] = get_value(BINK_SRC_INTER_DC);
-					read_dct_coeffs(block, c_scantable.permutated);
-					quant = bink_inter_quant[v_gb.get_bits(4)];
-					for (i = 0; i < 64; i++) {
-						block[i] = (block[i] * quant[i]) >> 11;
-					}
+					read_dct_coeffs(block, c_scantable.permutated,false);
 					idct_add(dst, stride, block);
 					break;
 				case PATTERN_BLOCK:
