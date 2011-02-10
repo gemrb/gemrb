@@ -1481,7 +1481,7 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 						for (i = 0; i < 8; i++) {
 							v = get_value(BINK_SRC_PATTERN);
 							for (j = 0; j < 8; j++, v >>= 1) {
-								PUT2x2(dst, stride, i, j, (v & 1) ? c2 : c1);
+								PUT2x2(dst, stride, j, i, (v & 1) ? c2 : c1);
 							}
 						}
 						break;
@@ -1573,7 +1573,7 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 					for (i = 0; i < 8; i++) {
 						v = get_value(BINK_SRC_PATTERN);
 						for (j = 0; j < 8; j++, v >>= 1) {
-							dst[i + j*stride] = (v & 1) ? c2 : c1;
+							dst[i*stride+j] = (v & 1) ? c2 : c1;
 						}
 					}
 					break;
