@@ -430,8 +430,8 @@ int BIKPlayer::sound_init(bool need_init)
 		sample_rate *= header.channels;
 		s_frame_len *= header.channels;
 		s_channels = 1;
-	if (header.channels == 2)
-		frame_len_bits++;
+		if (header.channels == 2)
+			frame_len_bits++;
 	}
 
 	s_overlap_len   = s_frame_len / 16;
@@ -460,10 +460,10 @@ int BIKPlayer::sound_init(bool need_init)
 	s_first = 1;
 
 	for (i = 0; i < s_channels; i++)
-	s_coeffs_ptr[i] = s_coeffs + i * s_frame_len;
+		s_coeffs_ptr[i] = s_coeffs + i * s_frame_len;
 
 	if (header.audioflag&BINK_AUD_USEDCT)
-		ret = ff_dct_init(&s_trans.dct, frame_len_bits, 0);
+		ret = ff_dct_init(&s_trans.dct, frame_len_bits, 1);
 	else
 		ret = ff_rdft_init(&s_trans.rdft, frame_len_bits, IRIDFT);
 
@@ -652,12 +652,12 @@ void BIKPlayer::DecodeBlock(short *out)
 	for (ch = 0; ch < s_channels; ch++) {
 		FFTSample *coeffs = s_coeffs_ptr[ch];
 		q = 0.0;
-		coeffs[0] = s_gb.get_float();
-		coeffs[1] = s_gb.get_float();
+		coeffs[0] = s_gb.get_float() * s_root;
+		coeffs[1] = s_gb.get_float() * s_root;
 
 		for (i = 0; i < s_num_bands; i++) {
 			int value = s_gb.get_bits(8);
-			quant[i] = (float) pow(10.0, FFMIN(value, 95) * 0.066399999);
+			quant[i] = (float) pow(10.0, FFMIN(value, 95) * 0.066399999) * s_root;
 		}
 
 		// find band (k)
@@ -701,13 +701,13 @@ void BIKPlayer::DecodeBlock(short *out)
 			}
 		}
 
-		if (header.audioflag&BINK_AUD_USEDCT)
+		if (header.audioflag&BINK_AUD_USEDCT) {
+			coeffs[0] /= 0.5;
 			ff_dct_calc (&s_trans.dct,  coeffs);
-		else
+			for (i = 0; i < s_frame_len; i++)
+				coeffs[i] *= s_frame_len / 2;
+		} else
 			ff_rdft_calc(&s_trans.rdft, coeffs);
-
-		for (i = 0; i < s_frame_len; i++)
-			coeffs[i] *= s_root;
 	}
 
 	ff_float_to_int16_interleave_c(out, (const float **)s_coeffs_ptr, s_frame_len, s_channels);
