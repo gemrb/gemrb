@@ -147,29 +147,49 @@ def PrintMaze():
 		print "There is maze or it is not initialized!"
 		return
 
-	MazeX = header["XSize"]
-	MazeY = header["YSize"]
+	MazeX = header["MazeX"]
+	MazeY = header["MazeY"]
 	MainX = header["Pos1X"]
 	MainY = header["Pos1Y"]
 	NordomX = header["Pos2X"]
 	NordomY = header["Pos2Y"]
+	FoyerX = header["Pos3X"]
+
+	print "Maze size is "+str(MazeX)+"X"+str(MazeY)
 	for y in range (MazeY):
+		line = ""
 		for x in range (MazeX):
 			pos = MAZE_MAX_DIM*x+y
 			entry = GemRB.GetMazeEntry(pos)
-			if entry["Override"]:
-				if x == NordomX and y == NordomY:
-					str = str + "N"
-				elif x == MainX and y == MainY:
-					str = str + "M"
-				else:
-					str = str + "!"
+			if entry["Walls"]&WALL_NORTH:
+				line = line + "+ "
 			else:
-				if entry["Visited"]:
-					str = str + " "
-				else:
-					str = str + "?"
-		print str
+				line = line + "+-"
+		print line+"+"
+		line = ""
+		for x in range (MazeX):
+			pos = MAZE_MAX_DIM*x+y
+			entry = GemRB.GetMazeEntry(pos)
+			if entry["Walls"]&WALL_WEST:
+				line = line + " "
+			else:
+				line = line + "|"
+			if x == NordomX and y == NordomY:
+				line = line + "N"
+			elif x == MainX and y == MainY:
+				line = line + "W"
+			elif entry["Trapped"]>=0:
+				line = line + chr(entry["Trapped"]+65)
+			else:
+				line = line + " "
+		print line+"|"
+	line = ""
+	for x in range (MazeX):
+		if FoyerX==x:
+			line = line + "+ "
+		else:
+			line = line + "+-"
+	print line+"+"
 	return
 
 def ConvertPos (pos):
