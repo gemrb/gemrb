@@ -649,7 +649,7 @@ def CloseQuitMsgWindow ():
 def OpenHotkeyOptionsWindow ():
 	return
 
-def CloseotkeyOptionsWindow ():
+def CloseHotkeyOptionsWindow ():
 	return
 
 ###################################################
