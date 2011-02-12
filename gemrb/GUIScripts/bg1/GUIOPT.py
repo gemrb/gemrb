@@ -44,7 +44,6 @@ OldOptionsWindow = None
 MoviesWindow = None
 KeysWindow = None
 HelpTextArea = None
-HelpTextArea2 = None
 
 LoadMsgWindow = None
 QuitMsgWindow = None
@@ -279,7 +278,7 @@ def CloseCharacterSoundsWindow ():
 
 def OpenCharacterSoundsWindow ():
 	"""Open character sounds window"""
-	global SubSubOptionsWindow, HelpTextArea2
+	global SubSubOptionsWindow, HelpTextArea
 
 	if SubSubOptionsWindow:
 		if SubSubOptionsWindow:
@@ -288,7 +287,7 @@ def OpenCharacterSoundsWindow ():
 
 	SubSubOptionsWindow = Window = GemRB.LoadWindow (12)
 
-	HelpTextArea2 = OptHelpText ('CharacterSounds', Window, 16, 18041)
+	HelpTextArea = OptHelpText ('CharacterSounds', Window, 16, 18041)
 
 	OptDone ('CharacterSounds', Window, 24)
 	OptCancel ('CharacterSounds', Window, 25)
@@ -306,19 +305,19 @@ def OpenCharacterSoundsWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 def DisplayHelpSubtitles ():
-	HelpTextArea2.SetText (18015)
+	HelpTextArea.SetText (18015)
 
 def DisplayHelpAttackSounds ():
-	HelpTextArea2.SetText (18013)
+	HelpTextArea.SetText (18013)
 
 def DisplayHelpFootsteps ():
-	HelpTextArea2.SetText (18014)
+	HelpTextArea.SetText (18014)
 
 def DisplayHelpCommandSounds ():
-	HelpTextArea2.SetText (18016)
+	HelpTextArea.SetText (18016)
 
 def DisplayHelpSelectionSounds ():
-	HelpTextArea2.SetText (11352)
+	HelpTextArea.SetText (11352)
 
 ###################################################
 
@@ -407,7 +406,7 @@ def CloseFeedbackOptionsWindow ():
 
 def OpenFeedbackOptionsWindow ():
 	"""Open feedback options window"""
-	global SubSubOptionsWindow, HelpTextArea2
+	global SubSubOptionsWindow, HelpTextArea
 
 	if SubSubOptionsWindow:
 		if SubSubOptionsWindow:
@@ -416,7 +415,7 @@ def OpenFeedbackOptionsWindow ():
 
 	SubSubOptionsWindow = Window = GemRB.LoadWindow (9)
 
-	HelpTextArea2 = OptHelpText ('FeedbackOptions', Window, 28, 18043)
+	HelpTextArea = OptHelpText ('FeedbackOptions', Window, 28, 18043)
 
 	OptDone ('FeedbackOptions', Window, 26)
 	OptCancel ('FeedbackOptions', Window, 27)
@@ -435,28 +434,28 @@ def OpenFeedbackOptionsWindow ():
 	return
 
 def DisplayHelpMarkerFeedback ():
-	HelpTextArea2.SetText (18024)
+	HelpTextArea.SetText (18024)
 
 def DisplayHelpLocatorFeedback ():
-	HelpTextArea2.SetText (18025)
+	HelpTextArea.SetText (18025)
 
 def DisplayHelpToHitRolls ():
-	HelpTextArea2.SetText (18026)
+	HelpTextArea.SetText (18026)
 
 def DisplayHelpCombatInfo ():
-	HelpTextArea2.SetText (18027)
+	HelpTextArea.SetText (18027)
 
 def DisplayHelpActions ():
-	HelpTextArea2.SetText (18028)
+	HelpTextArea.SetText (18028)
 
 def DisplayHelpStates ():
-	HelpTextArea2.SetText (18029)
+	HelpTextArea.SetText (18029)
 
 def DisplayHelpSelection ():
-	HelpTextArea2.SetText (18030)
+	HelpTextArea.SetText (18030)
 
 def DisplayHelpMiscellaneous ():
-	HelpTextArea2.SetText (18031)
+	HelpTextArea.SetText (18031)
 
 ###################################################
 
@@ -470,7 +469,7 @@ def CloseAutopauseOptionsWindow ():
 
 def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
-	global SubSubOptionsWindow, HelpTextArea2
+	global SubSubOptionsWindow, HelpTextArea
 
 	if SubSubOptionsWindow:
 		if SubSubOptionsWindow:
@@ -479,7 +478,7 @@ def OpenAutopauseOptionsWindow ():
 
 	SubSubOptionsWindow = Window = GemRB.LoadWindow (10)
 
-	HelpTextArea2 = OptHelpText ('AutopauseOptions', Window, 15, 18044)
+	HelpTextArea = OptHelpText ('AutopauseOptions', Window, 15, 18044)
 
 	OptDone ('AutopauseOptions', Window, 11)
 	OptCancel ('AutopauseOptions', Window, 14)
