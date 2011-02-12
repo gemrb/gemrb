@@ -173,6 +173,12 @@ public:
 	ieDword RGB;
 	ieWord ColorSpeed;
 	ieWord Shake;
+	ieWord IDSType;
+	ieWord IDSValue;
+	ieWord IDSType2;
+	ieWord IDSValue2;
+	ieResRef FailSpell;
+	ieResRef SuccSpell;
 	////// gap
 	ieDword TFlags;
 	ieResRef BAMRes1;
@@ -230,6 +236,7 @@ protected:
 public:
 	void SetCaster(ieDword t);
 	ieDword GetCaster() const;
+	bool FailedIDS(Actor *target) const;
 	void SetTarget(ieDword t, bool fake);
 	void SetTarget(const Point &p);
 	bool PointInRadius(const Point &p) const;

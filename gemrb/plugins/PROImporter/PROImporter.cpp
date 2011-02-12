@@ -80,7 +80,13 @@ Projectile* PROImporter::GetProjectile(Projectile *s)
 	str->ReadDword( &s->RGB );       //gemrb extension rgb pulse
 	str->ReadWord( &s->ColorSpeed ); //gemrb extension rgb speed
 	str->ReadWord( &s->Shake );      //gemrb extension screen shake
-	str->Seek(196, GEM_CURRENT_POS); //skipping unused (unknown) bytes
+	str->ReadWord( &s->IDSValue);    //gemrb extension IDS targeting
+	str->ReadWord( &s->IDSType);     //gemrb extension IDS targeting
+	str->ReadWord( &s->IDSValue2);   //gemrb extension IDS targeting
+	str->ReadWord( &s->IDSType2);    //gemrb extension IDS targeting
+	str->ReadResRef( s->FailSpell);  //gemrb extension fail effect
+	str->ReadResRef( s->SuccSpell);  //gemrb extension implicit effect
+	str->Seek(172, GEM_CURRENT_POS); //skipping unused (unknown) bytes
 	//we should stand at offset 0x100 now
 	str->ReadDword( &s->TFlags ); //other projectile flags
 	str->ReadResRef( s->BAMRes1 );

@@ -436,6 +436,15 @@ void Projectile::SetDelay(int delay)
 	ExtFlags|=PEF_FREEZE;
 }
 
+bool Projectile::FailedIDS(Actor *target) const
+{
+	bool fail = !EffectQueue::match_ids( target, IDSType, IDSValue);
+	if (fail && IDSType2) {
+		fail = !EffectQueue::match_ids( target, IDSType2, IDSValue2);
+	}
+	return fail;
+}
+
 void Projectile::Payload()
 {
 	Actor *target;
@@ -470,6 +479,19 @@ void Projectile::Payload()
 		}
 	}
 	if (target) {
+		//apply this spell on target when the projectile fails
+		if (FailedIDS(target)) {
+			if (FailSpell[0]) {
+				core->ApplySpell(FailSpell, target, effects->GetOwner(), 0);
+			}
+			return;
+		}
+
+		//apply this spell on the target when the projectile succeeds
+		if (SuccSpell[0]) {
+			core->ApplySpell(SuccSpell, target, effects->GetOwner(), 0);
+		}
+
 		if(ExtFlags&PEF_RGB) {
 			target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
 				RGB >> 8, RGB >> 16, RGB >> 24);
