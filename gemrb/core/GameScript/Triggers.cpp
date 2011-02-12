@@ -1129,8 +1129,8 @@ int GameScript::Acquired(Scriptable * Sender, Trigger* parameters)
 	return 0;
 }
 
-/** this trigger accepts a numeric parameter, this number could be: */
-/** 0 - normal, 1 - equipped, 2 - identified, 3 - equipped&identified */
+/** this trigger accepts a numeric parameter, this number is the same as inventory flags
+    like: 1 - identified, 2 - unstealable, 4 - stolen, 8 - undroppable, etc. */
 /** this is a GemRB extension */
 int GameScript::PartyHasItem(Scriptable * /*Sender*/, Trigger* parameters)
 {
