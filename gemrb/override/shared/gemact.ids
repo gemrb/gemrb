@@ -5,5 +5,6 @@ IDS
 397 UnmakeGlobal(O:Object*)
 396 SetToken2DA(S:ResRef*)
 395 StartDialogOverride(S:DialogFile*,O:Target*,I:Unused,I:Unused,I:ConverseAsItem)
+394 SetTrackString(I:StrRef, I:Flags, I:Difficulty)
 148 BashDoor(O:Object)
 93 LeaveAreaName(O:Target*)
