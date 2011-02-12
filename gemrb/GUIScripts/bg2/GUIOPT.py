@@ -17,14 +17,22 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-# GUIOPT.py - scripts to control options windows mostly from the GUIOPT winpack
-# Ingame options
+# GUIOPT.py - scripts to control options windows mostly from the GUIOPT winpack:
+# 0 - Main options window (peacock tail)
+# 1 - Video options window
+# 2 - msg win with 1 button
+# 3 - msg win with 2 buttons
+# 4 - msg win with 3 buttons
+# 5 - Audio options window
+# 6 - Gameplay options window
+# 8 - Feedback options window
+# 9 - Autopause options window
 
 ###################################################
 import GemRB
-from GUIDefines import *
 import GUICommon
 import GUISAVE
+from GUIDefines import *
 
 ###################################################
 GameOptionsWindow = None
@@ -65,6 +73,7 @@ def CloseOptionsWindow ():
 
 ###################################################
 def OpenOptionsWindow ():
+	"""Open main options window"""
 	import GUICommonWindows
 	global GameOptionsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
@@ -235,7 +244,7 @@ def OpenAudioOptionsWindow ():
 
 def DisplayHelpAmbientVolume ():
 	HelpTextArea.SetText (18008)
-	GemRB.UpdateAmbientsVolume()
+	GemRB.UpdateAmbientsVolume ()
 
 def DisplayHelpSoundFXVolume ():
 	HelpTextArea.SetText (18009)
@@ -245,7 +254,7 @@ def DisplayHelpVoiceVolume ():
 
 def DisplayHelpMusicVolume ():
 	HelpTextArea.SetText (18011)
-	GemRB.UpdateMusicVolume()
+	GemRB.UpdateMusicVolume ()
 
 def DisplayHelpMovieVolume ():
 	HelpTextArea.SetText (18012)
@@ -253,6 +262,59 @@ def DisplayHelpMovieVolume ():
 def DisplayHelpCreativeEAX ():
 	HelpTextArea.SetText (18022)
 
+###################################################
+
+def CloseCharacterSoundsWindow ():
+	global GameOptionsWindow
+
+	if GameOptionsWindow:
+		GameOptionsWindow.Unload ()
+	GameOptionsWindow = None
+	OpenGameplayOptionsWindow ()
+	return
+
+def OpenCharacterSoundsWindow ():
+	"""Open character sounds window"""
+	global GameOptionsWindow, HelpTextArea
+
+	if GameOptionsWindow:
+		if GameOptionsWindow:
+			GameOptionsWindow.Unload ()
+		GameOptionsWindow = None
+
+	GameOptionsWindow = Window = GemRB.LoadWindow (12)
+
+	HelpTextArea = OptHelpText ('CharacterSounds', Window, 16, 18041)
+
+	OptDone ('CharacterSounds', Window, 24)
+	OptCancel ('CharacterSounds', Window, 25)
+
+	OptCheckbox ('Subtitles', Window, 5, 20, 'Subtitles', 1)
+	OptCheckbox ('AttackSounds', Window, 6, 18, 'Attack Sounds', 1)
+	OptCheckbox ('Footsteps', Window, 7, 19, 'Footsteps', 1)
+	OptRadio ('CommandSounds', Window, 8, 21, 'Command Sounds Frequency', 1)
+	OptRadio ('CommandSounds', Window, 9, 21, 'Command Sounds Frequency', 2)
+	OptRadio ('CommandSounds', Window, 10, 21, 'Command Sounds Frequency', 3)
+	OptRadio ('SelectionSounds', Window, 58, 57, 'Selection Sounds Frequency', 1)
+	OptRadio ('SelectionSounds', Window, 59, 57, 'Selection Sounds Frequency', 2)
+	OptRadio ('SelectionSounds', Window, 60, 57, 'Selection Sounds Frequency', 3)
+
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+
+def DisplayHelpSubtitles ():
+	HelpTextArea.SetText (18015)
+
+def DisplayHelpAttackSounds ():
+	HelpTextArea.SetText (18013)
+
+def DisplayHelpFootsteps ():
+	HelpTextArea.SetText (18014)
+
+def DisplayHelpCommandSounds ():
+	HelpTextArea.SetText (18016)
+
+def DisplayHelpSelectionSounds ():
+	HelpTextArea.SetText (11352)
 
 ###################################################
 
@@ -287,11 +349,13 @@ def OpenGameplayOptionsWindow ():
 	OptCheckbox ('Gore', Window, 19, 27, 'Gore', 1)
 	OptCheckbox ('Infravision', Window, 42, 44, 'Infravision', 1)
 	OptCheckbox ('Weather', Window, 47, 46, 'Weather', 1)
-	OptCheckbox ('RestUntilHealed', Window, 50, 48, 'Heal Party on Rest', 1)
+	if GUICommon.GameIsBG2():
+		OptCheckbox ('RestUntilHealed', Window, 50, 48, 'Heal Party on Rest', 1)
 
 	OptButton ('FeedbackOptions', Window, 5, 17163)
 	OptButton ('AutopauseOptions', Window, 6, 17166)
-	OptButton ('HotkeyOptions', Window, 51, 816)
+	if GUICommon.GameIsBG2():
+		OptButton ('HotkeyOptions', Window, 51, 816)
 
 	GameOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -390,7 +454,6 @@ def DisplayHelpSelection ():
 def DisplayHelpMiscellaneous ():
 	HelpTextArea.SetText (18031)
 
-
 ###################################################
 
 def CloseAutopauseOptionsWindow ():
@@ -425,10 +488,12 @@ def OpenAutopauseOptionsWindow ():
 	OptCheckbox ('WeaponUnusable', Window, 5, 21, 'Auto Pause State', 16)
 	OptCheckbox ('TargetGone', Window, 13, 22, 'Auto Pause State', 32)
 	OptCheckbox ('EndOfRound', Window, 25, 24, 'Auto Pause State', 64)
-	OptCheckbox ('EnemySighted', Window, 26, 27, 'Auto Pause State', 128)
-	OptCheckbox ('SpellCast', Window, 34, 30, 'Auto Pause State', 256)
-	OptCheckbox ('TrapFound', Window, 31, 33, 'Auto Pause State', 512)
-	OptCheckbox ('CenterOnActor', Window, 31, 33, 'Auto Pause Center', 1)
+	if Window.HasControl(26, IE_GUI_BUTTON):
+		OptCheckbox ('EnemySighted', Window, 26, 27, 'Auto Pause State', 128)
+	if GUICommon.GameIsBG2():
+		OptCheckbox ('SpellCast', Window, 34, 30, 'Auto Pause State', 256)
+		OptCheckbox ('TrapFound', Window, 31, 33, 'Auto Pause State', 512)
+		OptCheckbox ('CenterOnActor', Window, 31, 33, 'Auto Pause Center', 1)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -465,60 +530,6 @@ def DisplayHelpTrapFound ():
 
 def DisplayHelpCenterOnActor ():
 	HelpTextArea.SetText (10571)
-
-###################################################
-
-def CloseCharacterSoundsWindow ():
-	global GameOptionsWindow
-
-	if GameOptionsWindow:
-		GameOptionsWindow.Unload ()
-	GameOptionsWindow = None
-	OpenGameplayOptionsWindow ()
-	return
-
-def OpenCharacterSoundsWindow ():
-	"""Open character sounds window"""
-	global GameOptionsWindow, HelpTextArea
-
-	if GameOptionsWindow:
-		if GameOptionsWindow:
-			GameOptionsWindow.Unload ()
-		GameOptionsWindow = None
-
-	GameOptionsWindow = Window = GemRB.LoadWindow (12)
-
-	HelpTextArea = OptHelpText ('CharacterSounds', Window, 16, 18041)
-
-	OptDone ('CharacterSounds', Window, 24)
-	OptCancel ('CharacterSounds', Window, 25)
-
-	OptCheckbox ('Subtitles', Window, 5, 20, 'Subtitles', 1)
-	OptCheckbox ('AttackSounds', Window, 6, 18, 'Attack Sounds', 1)
-	OptCheckbox ('Footsteps', Window, 7, 19, 'Footsteps', 1)
-	OptRadio ('CommandSounds', Window, 8, 21, 'Command Sounds Frequency', 1)
-	OptRadio ('CommandSounds', Window, 9, 21, 'Command Sounds Frequency', 2)
-	OptRadio ('CommandSounds', Window, 10, 21, 'Command Sounds Frequency', 3)
-	OptRadio ('SelectionSounds', Window, 58, 57, 'Selection Sounds Frequency', 1)
-	OptRadio ('SelectionSounds', Window, 59, 57, 'Selection Sounds Frequency', 2)
-	OptRadio ('SelectionSounds', Window, 60, 57, 'Selection Sounds Frequency', 3)
-
-	Window.ShowModal (MODAL_SHADOW_GRAY)
-
-def DisplayHelpSubtitles ():
-	HelpTextArea.SetText (18015)
-
-def DisplayHelpAttackSounds ():
-	HelpTextArea.SetText (18013)
-
-def DisplayHelpFootsteps ():
-	HelpTextArea.SetText (18014)
-
-def DisplayHelpCommandSounds ():
-	HelpTextArea.SetText (18016)
-
-def DisplayHelpSelectionSounds ():
-	HelpTextArea.SetText (11352)
 
 ###################################################
 
@@ -626,7 +637,7 @@ def OpenQuitMsgWindow ():
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseQuitMsgWindow)
 
-	# The game has not been saved ....
+	# Do you wish to save the game ....
 	Text = Window.GetControl (3)
 	Text.SetText (16456)
 
@@ -653,8 +664,6 @@ def CloseHotkeyOptionsWindow ():
 	return
 
 ###################################################
-###################################################
-
 # These functions help to setup controls found
 # in Video, Audio, Gameplay, Feedback and Autopause
 # options windows
@@ -698,11 +707,11 @@ def OptCheckbox (name, window, button_id, label_id, variable, value):
 
 	return button
 
-def OptButton (name, window, button_id, label_strref):
+def OptButton (name, window, button_id, button_strref):
 	"""Standard subwindow button for option windows"""
 	button = window.GetControl (button_id)
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, eval("Open%sWindow" %name))
-	button.SetText (label_strref)
+	button.SetText (button_strref)
 
 def OptDone (name, window, button_id):
 	"""Standard `Done' button for option windows"""

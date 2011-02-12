@@ -17,10 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-
-# GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
-
-# GUIOPT:
+# GUIOPT.py - scripts to control options windows mostly from the GUIOPT winpack:
 # 0 - Main options window (peacock tail)
 # 1 - Video options window
 # 2 - msg win with 1 button
@@ -31,14 +28,13 @@
 # 8 - Feedback options window
 # 9 - Autopause options window
 
-
 ###################################################
 import GemRB
 import GUICommon
 import GUICommonWindows
 import GUISAVE
 from GUIDefines import *
- 
+
 ###################################################
 OptionsWindow = None
 SubOptionsWindow = None
@@ -54,7 +50,7 @@ LoadMsgWindow = None
 QuitMsgWindow = None
 hideflag = None
 
-
+###################################################
 def CloseOptionsWindow ():
 	global GameOptionsWindow, OptionsWindow
 	global OldOptionsWindow
@@ -75,22 +71,19 @@ def CloseOptionsWindow ():
 	OldOptionsWindow = None
 	return
 
-def DummyWindow ():
-	return
-
 ###################################################
 def OpenOptionsWindow ():
 	"""Open main options window"""
 	global GameOptionsWindow, OptionsWindow
 	global OldOptionsWindow
 
-	if GUICommon.CloseOtherWindow(OpenOptionsWindow):
+	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
 		CloseOptionsWindow()
 		return
 
 	#hideflag = GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-	GUICommonWindows.SetSelectionChangeHandler (DummyWindow)
+	GUICommonWindows.SetSelectionChangeHandler (None)
 
 	GemRB.LoadWindowPack ("GUIOPT", 640, 480)
 	GameOptionsWindow = Window = GemRB.LoadWindow (2)
@@ -101,7 +94,17 @@ def OpenOptionsWindow ():
 		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenOptionsWindow)
 		OptionsWindow.SetFrame ()
 
-	# Load game
+	# Return to Game
+	Button = Window.GetControl (11)
+	Button.SetText (10308)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenOptionsWindow)
+
+	# Quit Game
+	Button = Window.GetControl (10)
+	Button.SetText (13731)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenQuitMsgWindow)
+
+	# Load Game
 	Button = Window.GetControl (5)
 	Button.SetText (13729)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLoadMsgWindow)
@@ -111,31 +114,20 @@ def OpenOptionsWindow ():
 	Button.SetText (13730)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSaveMsgWindow)
 
-	# Quit Game
-	Button = Window.GetControl (10)
-	Button.SetText (13731)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenQuitMsgWindow)
-
-	# Graphics
+	# Video Options
 	Button = Window.GetControl (7)
 	Button.SetText (17162)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenVideoOptionsWindow)
 
-	# Audio
+	# Audio Options
 	Button = Window.GetControl (8)
 	Button.SetText (17164)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenAudioOptionsWindow)
 
-	# Gameplay
+	# Gameplay Options
 	Button = Window.GetControl (9)
 	Button.SetText (17165)
-	#Button.SetText (10308)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenGameplayOptionsWindow)
-
-	# Return to game
-	Button = Window.GetControl (11)
-	Button.SetText (10308)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenOptionsWindow)
 
 	# game version, e.g. v1.1.0000
 	Label = Window.GetControl (0x1000000b)
@@ -146,8 +138,8 @@ def OpenOptionsWindow ():
 	GUICommonWindows.PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
-
 ###################################################
+
 def CloseVideoOptionsWindow ():
 	global SubOptionsWindow
 
@@ -178,6 +170,7 @@ def OpenVideoOptionsWindow ():
 	OptRadio ('BPP', Window, 5, 37, 'BitsPerPixel', 16)
 	OptRadio ('BPP', Window, 6, 37, 'BitsPerPixel', 24)
 	OptRadio ('BPP', Window, 7, 37, 'BitsPerPixel', 32)
+
 	OptCheckbox ('FullScreen', Window, 9, 38, 'Full Screen', 1)
 
 	OptCheckbox ('TransShadow', Window, 51, 50, 'Translucent Shadows', 1)
@@ -186,7 +179,7 @@ def OpenVideoOptionsWindow ():
 	OptCheckbox ('SoftStandBlt', Window, 42, 48, 'SoftBltFast' ,1)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-
+	return
 
 def DisplayHelpFullScreen ():
 	HelpTextArea.SetText (18000)
@@ -238,8 +231,6 @@ def OpenAudioOptionsWindow ():
 	SubOptionsWindow = Window = GemRB.LoadWindow (7)
 
 	HelpTextArea = OptHelpText ('AudioOptions', Window, 14, 18040)
-
-	Window.DeleteControl(16)
 
 	OptDone ('AudioOptions', Window, 24)
 	OptCancel ('AudioOptions', Window, 25)
@@ -312,7 +303,7 @@ def OpenCharacterSoundsWindow ():
 	OptRadio ('SelectionSounds', Window, 59, 57, 'Selection Sounds Frequency', 2)
 	OptRadio ('SelectionSounds', Window, 60, 57, 'Selection Sounds Frequency', 3)
 
-	Window.ShowModal (MODAL_SHADOW_GRAY) 
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 def DisplayHelpSubtitles ():
 	HelpTextArea2.SetText (18015)
@@ -333,12 +324,12 @@ def DisplayHelpSelectionSounds ():
 
 def CloseGameplayOptionsWindow ():
 	global SubOptionsWindow
- 
+
 	if SubOptionsWindow:
 		SubOptionsWindow.Unload()
 	SubOptionsWindow = None
 	return
-  
+
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
 	global SubOptionsWindow, HelpTextArea
@@ -363,13 +354,17 @@ def OpenGameplayOptionsWindow ():
 	OptCheckbox ('DitherAlways', Window, 14, 25, 'Always Dither', 1)
 	OptCheckbox ('Gore', Window, 19, 27, 'Gore', 1)
 	OptCheckbox ('Infravision', Window, 42, 44, 'Infravision', 1)
-	OptCheckbox ('Weather', Window, 47, 46, 'Weather', 1) 
+	OptCheckbox ('Weather', Window, 47, 46, 'Weather', 1)
+	if GUICommon.GameIsBG2():
+		OptCheckbox ('RestUntilHealed', Window, 50, 48, 'Heal Party on Rest', 1)
 
 	OptButton ('FeedbackOptions', Window, 5, 17163)
 	OptButton ('AutopauseOptions', Window, 6, 17166)
+	if GUICommon.GameIsBG2():
+		OptButton ('HotkeyOptions', Window, 51, 816)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-
+	return
 
 def DisplayHelpTooltipDelay ():
 	HelpTextArea.SetText (18017)
@@ -392,16 +387,16 @@ def DisplayHelpGore ():
 	HelpTextArea.SetText (18023)
 
 def DisplayHelpInfravision ():
-	HelpTextArea.SetText (11797) 
+	HelpTextArea.SetText (11797)
 
 def DisplayHelpWeather ():
 	HelpTextArea.SetText (20619)
- 
-def DisplayHelpRestUntilHealed ():
-	HelpTextArea.SetText (2242) 
 
+def DisplayHelpRestUntilHealed ():
+	HelpTextArea.SetText (2242)
 
 ###################################################
+
 def CloseFeedbackOptionsWindow ():
 	global SubSubOptionsWindow
 
@@ -427,22 +422,23 @@ def OpenFeedbackOptionsWindow ():
 	OptCancel ('FeedbackOptions', Window, 27)
 
 	OptSlider ('MarkerFeedback', Window, 8, 'GUI Feedback Level', 1)
-	OptSlider ('LocatorFeedback', Window, 9, 'Locator Feedback Level', 1) 
+	OptSlider ('LocatorFeedback', Window, 9, 'Locator Feedback Level', 1)
+
 	OptCheckbox ('ToHitRolls', Window, 10, 32, 'Rolls', 1)
 	OptCheckbox ('CombatInfo', Window, 11, 33, 'Combat Info', 1)
 	OptCheckbox ('Actions', Window, 12, 34, 'Actions', 1)
 	OptCheckbox ('States', Window, 13, 35, 'State Changes', 1)
 	OptCheckbox ('Selection', Window, 14, 36, 'Selection Text', 1)
-	OptCheckbox ('Miscellaneous', Window, 15, 37, 'Miscellaneous Text', 1) 
+	OptCheckbox ('Miscellaneous', Window, 15, 37, 'Miscellaneous Text', 1)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-
+	return
 
 def DisplayHelpMarkerFeedback ():
-	HelpTextArea.SetText (18024)
+	HelpTextArea2.SetText (18024)
 
 def DisplayHelpLocatorFeedback ():
-	HelpTextArea.SetText (18025)
+	HelpTextArea2.SetText (18025)
 
 def DisplayHelpToHitRolls ():
 	HelpTextArea2.SetText (18026)
@@ -497,9 +493,13 @@ def OpenAutopauseOptionsWindow ():
 	OptCheckbox ('EndOfRound', Window, 25, 24, 'Auto Pause State', 64)
 	if Window.HasControl(26, IE_GUI_BUTTON):
 		OptCheckbox ('EnemySighted', Window, 26, 27, 'Auto Pause State', 128)
+	if GUICommon.GameIsBG2():
+		OptCheckbox ('SpellCast', Window, 34, 30, 'Auto Pause State', 256)
+		OptCheckbox ('TrapFound', Window, 31, 33, 'Auto Pause State', 512)
+		OptCheckbox ('CenterOnActor', Window, 31, 33, 'Auto Pause Center', 1)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-
+	return
 
 def DisplayHelpCharacterHit ():
 	HelpTextArea.SetText (18032)
@@ -525,6 +525,14 @@ def DisplayHelpEndOfRound ():
 def DisplayHelpEnemySighted ():
 	HelpTextArea.SetText (23514)
 
+def DisplayHelpSpellCast ():
+	HelpTextArea.SetText (58171)
+
+def DisplayHelpTrapFound ():
+	HelpTextArea.SetText (31872)
+
+def DisplayHelpCenterOnActor ():
+	HelpTextArea.SetText (10571)
 
 ###################################################
 
@@ -559,6 +567,7 @@ def OpenLoadMsgWindow ():
 	Text.SetText (19531)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+	return
 
 def CloseLoadMsgWindow ():
 	global LoadMsgWindow
@@ -580,7 +589,8 @@ def LoadGamePress ():
 	GemRB.SetNextScript ("GUILOAD")
 	return
 
-def SaveGamePress():
+#save game AND quit
+def SaveGamePress ():
 	global QuitMsgWindow
 
 	if QuitMsgWindow:
@@ -592,7 +602,7 @@ def SaveGamePress():
 	GUISAVE.OpenSaveWindow ()
 	return
 
-def QuitGamePress():
+def QuitGamePress ():
 	global QuitMsgWindow
 
 	if QuitMsgWindow:
@@ -630,7 +640,7 @@ def OpenQuitMsgWindow ():
 
 	# Do you wish to save the game ....
 	Text = Window.GetControl (3)
-	Text.SetText (16456) # or ??? - cannot be saved atm
+	Text.SetText (16456)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -642,8 +652,13 @@ def CloseQuitMsgWindow ():
 		QuitMsgWindow.Unload ()
 	QuitMsgWindow = None
 	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+###################################################
+#TODO
+def OpenHotkeyOptionsWindow ():
 	return
 
+def CloseHotkeyOptionsWindow ():
+	return
 
 ###################################################
 # These functions help to setup controls found
@@ -653,18 +668,12 @@ def CloseQuitMsgWindow ():
 # These controls are usually made from an active
 # control (button, slider ...) and a label
 
+
 def OptSlider (name, window, slider_id, variable, value):
 	"""Standard slider for option windows"""
 	slider = window.GetControl (slider_id)
 	slider.SetVarAssoc (variable, value)
 	slider.SetEvent (IE_GUI_SLIDER_ON_CHANGE, eval("DisplayHelp" + name))
-
-	#label = window.GetControl (label_id)
-	#label.SetText (label_strref)
-	#label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	#label.SetState (IE_GUI_BUTTON_LOCKED)
-	#label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, eval("DisplayHelp" + name))
-
 	return slider
 
 def OptRadio (name, window, button_id, label_id, variable, value):
@@ -686,18 +695,20 @@ def OptCheckbox (name, window, button_id, label_id, variable, value):
 
 	button = window.GetControl (button_id)
 	button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	button.SetState (IE_GUI_BUTTON_SELECTED)
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, eval("DisplayHelp" + name))
 	button.SetVarAssoc (variable, value)
+
+	label = window.GetControl (label_id)
+	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	label.SetState (IE_GUI_BUTTON_LOCKED)
+
 	return button
 
 def OptButton (name, window, button_id, button_strref):
 	"""Standard subwindow button for option windows"""
 	button = window.GetControl (button_id)
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, eval("Open%sWindow" %name))
-
 	button.SetText (button_strref)
-
 
 def OptDone (name, window, button_id):
 	"""Standard `Done' button for option windows"""
@@ -718,7 +729,6 @@ def OptHelpText (name, window, text_id, text_strref):
 	text = window.GetControl (text_id)
 	text.SetText (text_strref)
 	return text
-
 
 ###################################################
 # End of file GUIOPT.py
