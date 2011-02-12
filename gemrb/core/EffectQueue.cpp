@@ -198,6 +198,7 @@ static EffectRef diced_effects[] = {
 
 //special effects without level check (but with damage dices not precalculated)
 static EffectRef diced_effects2[] = {
+	{"Charm",NULL,-1}, //all
 	{"BurningBlood2",NULL,-1}, //how/iwd2
 	{"StaticCharge",NULL,-1}, //how/iwd2
 	{"SoulEater",NULL,-1}, //how/iwd2
@@ -1078,6 +1079,8 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 
 	fx->FirstApply=first_apply;
 	if( first_apply) {
+		if (Owner)
+			fx->CasterID = Owner->GetGlobalID();
 		if( (fx->PosX==0xffffffff) && (fx->PosY==0xffffffff)) {
 			fx->PosX = target->Pos.x;
 			fx->PosY = target->Pos.y;

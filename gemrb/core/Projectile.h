@@ -90,6 +90,7 @@
 #define PEF_WANDERING  0x200000//random movement (no real path)
 #define PEF_CYCLE      0x400000//random cycle
 #define PEF_RGB        0x800000//rgb pulse on hit
+#define PEF_TOUCH      0x1000000//successful to hit roll needed
 
 //projectile area flags
 #define PAF_VISIBLE    1      //the travel projectile is visible until explosion

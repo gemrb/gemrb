@@ -1921,20 +1921,20 @@ static void InitActorTables()
 		}
 	}
 
-			  //initializing the skill->stats conversion table (used in iwd2)
-			  tm.load("skillsta");
-			  if (tm) {
-			          int rowcount = tm->GetRowCount();
-			          skillcount = rowcount;
-			          if (rowcount) {
-			                  skillstats = (int *) malloc(rowcount * sizeof(int) );
-			                  skillabils = (int *) malloc(rowcount * sizeof(int) );
-			                  while(rowcount--) {
-			                          skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
-			                          skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
-			                  }
-			          }
-			  }
+				//initializing the skill->stats conversion table (used in iwd2)
+				tm.load("skillsta");
+				if (tm) {
+				        int rowcount = tm->GetRowCount();
+				        skillcount = rowcount;
+				        if (rowcount) {
+				                skillstats = (int *) malloc(rowcount * sizeof(int) );
+				                skillabils = (int *) malloc(rowcount * sizeof(int) );
+				                while(rowcount--) {
+				                        skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
+				                        skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
+				                }
+				        }
+				}
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -4489,8 +4489,9 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
+static EffectRef fx_ac_vs_creature_type_ref={"ACVsCreatureType",NULL,-1};
 
-int Actor::GetDefense(int DamageType) const
+int Actor::GetDefense(int DamageType, Actor *attacker) const
 {
 	//specific damage type bonus.
 	int defense = 0;
@@ -4543,11 +4544,13 @@ int Actor::GetDefense(int DamageType) const
 		defense += GetStat(IE_ARMORCLASS);
 	}
 	//Dexterity bonus is stored negative in 2da files.
-	return defense + core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) );
+	defense += core->GetDexterityBonus(STAT_DEX_AC, GetStat(IE_DEX) );
+	if (attacker) {
+		defense -= fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,attacker);
+	}
+	return defense;
 }
 
-
-static EffectRef fx_ac_vs_creature_type_ref={"ACVsCreatureType",NULL,-1};
 
 void Actor::PerformAttack(ieDword gameTime)
 {
@@ -4713,8 +4716,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 
 	//get target's defense against attack
-	int defense = target->GetDefense(damagetype);
-	defense -= target->fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,this);
+	int defense = target->GetDefense(damagetype, this);
 
 	bool success;
 	if(ReverseToHit) {

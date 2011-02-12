@@ -436,12 +436,45 @@ void Projectile::SetDelay(int delay)
 	ExtFlags|=PEF_FREEZE;
 }
 
+//copied from Actor.cpp
+#define ATTACKROLL    20
+#define WEAPON_FIST        0
+
 bool Projectile::FailedIDS(Actor *target) const
 {
 	bool fail = !EffectQueue::match_ids( target, IDSType, IDSValue);
 	if (fail && IDSType2) {
 		fail = !EffectQueue::match_ids( target, IDSType2, IDSValue2);
 	}
+
+	if (!fail) {
+		if(ExtFlags&PEF_TOUCH) {
+			Actor *caster = core->GetGame()->GetActorByGlobalID(Caster);
+			//TODO move this to Actor
+			if (caster) {
+				int roll = caster->LuckyRoll(1, ATTACKROLL, 0);
+				if (roll==1) {
+					return true; //critical failure
+				}
+				
+				if (!(target->GetStat(IE_STATE_ID)&STATE_CRIT_PROT))  {
+					if (roll >= (ATTACKROLL - (int) caster->GetStat(IE_CRITICALHITBONUS))) {
+						return false; //critical success
+					}
+				}
+
+				int tohit = caster->GetToHit(0, WEAPON_FIST, target);
+				//damage type, should be generic?
+				int defense = target->GetDefense(0, caster);
+				if(target->IsReverseToHit()) {
+					fail = roll + defense < tohit;
+				} else {
+					fail = tohit + roll < defense;
+				}        
+			}
+		}
+	}
+
 	return fail;
 }
 

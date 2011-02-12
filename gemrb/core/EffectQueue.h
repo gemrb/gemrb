@@ -100,6 +100,9 @@ class Scriptable;
 // You will need to get GameTime somehow to use this macro
 #define	PrepareDuration(fx) fx->Duration = (fx->Duration*AI_UPDATE_TIME + GameTime)
 
+//return the caster object
+#define GetCasterObject()  (core->GetGame()->GetActorByGlobalID(fx->CasterID))
+
 // often used stat modifications, usually Parameter2 types 0, 1 and 2
 //these macros should work differently in permanent mode (modify base too)
 #define STAT_GET(stat) (target->Modified[ stat ])

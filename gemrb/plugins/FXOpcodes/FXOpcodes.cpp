@@ -852,22 +852,12 @@ inline Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
 	return ac;
 }
 
-inline Scriptable *GetCaster(Scriptable *Owner, Effect *fx) {
-	if (fx->FirstApply) {
-		fx->CasterID = Owner ? Owner->GetGlobalID() : 0;
-		return Owner;
-	} else {
-		return core->GetGame()->GetActorByGlobalID(fx->CasterID);
-	}
-	return NULL;
-}
-
 //resurrect code used in many places
 void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
 {
-	Scriptable *caster = GetCaster(Owner, fx);
+	Scriptable *caster = GetCasterObject();
 	if (!caster) {
-		caster = Owner; // IE stores the enemyally in the effect instead
+		caster = Owner;
 	}
 	Map *area = caster->GetCurrentArea();
 
@@ -1051,12 +1041,25 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	Scriptable *caster = GetCaster(Owner, fx);
-	if (!caster) caster = Owner; // IE stores the enemyally in the effect instead
-	bool enemyally = true;
-	if (caster->Type==ST_ACTOR) {
-		enemyally = ((Actor *) caster)->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
+	bool playercharmed;
+	bool casterenemy;
+	if (fx->FirstApply) {
+		Scriptable *caster = GetCasterObject();
+		if (!caster) caster = Owner;
+		if (caster->Type==ST_ACTOR) {
+			casterenemy = ((Actor *) caster)->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
+		} else {
+			casterenemy = target->GetStat(IE_EA)>EA_GOODCUTOFF;
+		}
+		fx->DiceThrown=casterenemy;
+
+		playercharmed = target->InParty;
+		fx->DiceSides = playercharmed;    
+	} else {
+		casterenemy = fx->DiceThrown;
+		playercharmed = fx->DiceSides;
 	}
+
 
 	switch (fx->Parameter2) {
 	case 0: //charmed (target neutral after charm)
@@ -1109,7 +1112,11 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	STATE_SET( STATE_CHARMED );
-	STAT_SET_PCF( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
+	if (playercharmed) {
+		STAT_SET_PCF( IE_EA, casterenemy?EA_CHARMEDPC:EA_CHARMED );
+	} else {
+		STAT_SET_PCF( IE_EA, casterenemy?EA_ENEMY:EA_CHARMED );
+	}
 	//don't stick if permanent
 	return FX_PERMANENT;
 }
@@ -1214,7 +1221,7 @@ int fx_cure_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x0c Damage
 // this is a very important effect
-int fx_damage (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_damage (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	//save for half damage type
@@ -1223,7 +1230,7 @@ int fx_damage (Scriptable* Owner, Actor* target, Effect* fx)
 	if (modtype==3) {
 		modtype&=~3;
 	}
-	Scriptable *caster = GetCaster(Owner, fx);
+	Scriptable *caster = GetCasterObject();
 
 	target->Damage(fx->Parameter1, damagetype, caster, modtype);
 	//this effect doesn't stick
@@ -1586,7 +1593,7 @@ int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x19 State:Poisoned
-int fx_set_poisoned_state (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_poisoned_state (%2d): Damage: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_SET( STATE_POISONED );
@@ -1625,7 +1632,7 @@ int fx_set_poisoned_state (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
-	Scriptable *caster = GetCaster(Owner, fx);
+	Scriptable *caster = GetCasterObject();
 
 	//percent
 	target->Damage(damage, DAMAGE_POISON, caster);
@@ -2524,7 +2531,7 @@ int fx_cure_feebleminded_state (Scriptable* /*Owner*/, Actor* target, Effect* fx
 }
 
 // 0x4e State:Diseased
-int fx_set_diseased_state (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_diseased_state (%2d): Damage: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
@@ -2582,7 +2589,7 @@ int fx_set_diseased_state (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	}
 	//percent
-	Scriptable *caster = GetCaster(Owner, fx);
+	Scriptable *caster = GetCasterObject();
 
 	if (damage) {
 		target->Damage(damage, DAMAGE_POISON, caster);
@@ -3409,7 +3416,7 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//caster may be important here (Source), even if currently the EA modifiers
 	//don't use it
-	Scriptable *caster = GetCaster(Owner, fx);
+	Scriptable *caster = GetCasterObject();
 	core->SummonCreature(monster, hit, caster, target, p, eamod, level, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;

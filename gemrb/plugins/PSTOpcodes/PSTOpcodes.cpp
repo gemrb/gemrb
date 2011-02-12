@@ -266,23 +266,27 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 			sca->AlterPalette(rgb);
 		}
 	}
-	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		playonce=true;
-	} else {
+	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
 		playonce=false;
+	} else {
+		playonce=true;
 	}
 	switch (fx->Parameter2&0x30000) {
 	case 0x20000://foreground
 		sca->ZPos+=9999;
+		sca->YPos+=9999;
 		break;
 	case 0x30000: //both
 		sca->ZPos+=9999;
+		sca->YPos+=9999;
 		if (sca->twin) {
 			sca->twin->ZPos-=9999;
+			sca->twin->YPos-=9999;
 		}
 		break;
 	default: //background
 		sca->ZPos-=9999;
+		sca->YPos-=9999;
 		break;
 	}
 	if (playonce) {
@@ -327,7 +331,7 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	Actor *owner = (Actor *) Owner;
+	Actor *owner = GetCasterObject();
 
 	if (owner==target) {
 		return FX_NOT_APPLIED;
@@ -352,7 +356,7 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 	}
 	int damage = donor->Damage(fx->Parameter1, fx->Parameter2, owner);
-	receiver->SetBase( IE_HITPOINTS, BASE_GET( IE_HITPOINTS ) + ( damage ) );
+	receiver->NewBase( IE_HITPOINTS, damage, MOD_ADDITIVE );
 	return FX_NOT_APPLIED;
 }
 

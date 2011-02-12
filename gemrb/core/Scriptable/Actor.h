@@ -571,7 +571,7 @@ public:
 	/* gets the to hit value */
 	int GetToHit(int bonus, ieDword Flags, Actor *target) const;
 	/* gets the defense against an attack */
-	int GetDefense(int DamageType) const;
+	int GetDefense(int DamageType, Actor *attacker) const;
 	/* get the current hit bonus */
 	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
 		ieDword &Flags, int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target) const;

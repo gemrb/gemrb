@@ -49,6 +49,7 @@
 #define EA_EVILCUTOFF  		200
 #define EA_EVILBUTGREEN		201
 #define EA_EVILBUTBLUE 		202
+#define EA_CHARMEDPC            254
 #define EA_ENEMY   		255
 
 //GENERAL values
