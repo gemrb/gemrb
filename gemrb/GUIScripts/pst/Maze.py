@@ -46,7 +46,7 @@ def Possible(posx, posy):
 
 	pos = posx*MAZE_MAX_DIM+posy
 
-	if entries[pos] == 2:
+	if entries[pos]:
 		return -1
 	return pos
 
@@ -57,19 +57,19 @@ def GetPossible (pos):
 
 	if posx>0:
 		newpos = Possible(posx-1, posy)
-		if newpos>0:
+		if newpos!=-1:
 			possible[:0] = [newpos]
 	if posy>0:
 		newpos = Possible(posx, posy-1)
-		if newpos>0:
+		if newpos!=-1:
 			possible[:0] = [newpos]
-	if posx<MAZE_MAX_DIM-1:
+	if posx<dims-1:
 		newpos = Possible(posx+1, posy)
-		if newpos>0:
+		if newpos!=-1:
 			possible[:0] = [newpos]
-	if posy<MAZE_MAX_DIM-1:
+	if posy<dims-1:
 		newpos = Possible(posx, posy+1)
-		if newpos>0:
+		if newpos!=-1:
 			possible[:0] = [newpos]
 
 	return possible
@@ -117,25 +117,28 @@ def AddRoom (pos):
 	global rooms
 	global entries
 
-	rooms[:0]=[pos]
+	rooms[len(rooms):]=[pos]
 	entries[pos] = 1
 	return
 
-def MainRoomFits (pos2x, pos2y, pos):
+def MainRoomFits (pos1x, pos1y, pos):
 	global entries
 
-	south = pos2x*MAZE_MAX_DIM+pos2y
+	room = pos1x*MAZE_MAX_DIM+pos1y
+	if room==pos:
+		return False
 
+	south = pos1x*MAZE_MAX_DIM+pos1y+1
 	if south==pos:
 		return False
 
-	north = (pos2x+1)*MAZE_MAX_DIM+pos2y
+	north = pos1x*MAZE_MAX_DIM+pos1y-1
 	if north==pos:
 		return False
 
-	GemRB.SetMazeEntry(south, ME_WALLS, WALL_NORTH)
-	entries[north]=2
-	AddRoom(south)
+	GemRB.SetMazeEntry(room, ME_WALLS, WALL_SOUTH)
+	entries[room] = 1
+	entries[north] = 1
 	return True
 
 def zeros (size):
@@ -226,27 +229,26 @@ def CreateMaze ():
 	GemRB.SetupMaze(dims, dims)
 	for x in range(dims, MAZE_MAX_DIM):
 		for y in range(dims, MAZE_MAX_DIM):
-			pos = x*MAZE_MAX_DIM+y;
-			entries[pos] = 2
+			pos = x*MAZE_MAX_DIM+y
+			entries[pos] = 1
 
 	nordomx = GemRB.Roll(1, dims-1, -1)
 	nordomy = GemRB.Roll(1, dims, -1)
 	pos = nordomx*MAZE_MAX_DIM+nordomy
-	entries[pos] = 2
+	entries[pos] = 1
 	GemRB.SetMazeEntry(pos, ME_WALLS, WALL_EAST)
 	pos = nordomx*MAZE_MAX_DIM+nordomy+MAZE_MAX_DIM
 	AddRoom(pos)
 	if (mazedifficulty>1):
-		GemRB.SetMazeData(MH_POS1X, nordomx)
-		GemRB.SetMazeData(MH_POS1Y, nordomy)
-		pos2x = GemRB.Roll(1, dims, -1)
-		pos2y = GemRB.Roll(1, dims-1, -1)
-		while not MainRoomFits(pos2x, pos2y, pos):
-			pos2x = GemRB.Roll(1, dims, -1)
-			pos2y = GemRB.Roll(1, dims-1, -1)
-
-		GemRB.SetMazeData(MH_POS2X, -1)
-		GemRB.SetMazeData(MH_POS2Y, -1)
+		GemRB.SetMazeData(MH_POS2X, nordomx)
+		GemRB.SetMazeData(MH_POS2Y, nordomy)
+		pos1x = GemRB.Roll(1, dims, -1)
+		pos1y = GemRB.Roll(1, dims-2, 0)
+		while not MainRoomFits(pos1x, pos1y, pos):
+			pos1x = GemRB.Roll(1, dims, -1)
+			pos1y = GemRB.Roll(1, dims-2, 0)
+		GemRB.SetMazeData(MH_POS1X, pos1x)
+		GemRB.SetMazeData(MH_POS1Y, pos1y)
 	else:
 		GemRB.SetMazeData(MH_POS1X, -1)
 		GemRB.SetMazeData(MH_POS1Y, -1)
@@ -271,8 +273,7 @@ def CreateMaze ():
 
 	entries = oldentries
 	while len(rooms)>0:
-		pos = rooms[0]
-		rooms[0:1] = []
+		pos = rooms.pop(0)
 		posx = pos/MAZE_MAX_DIM
 		posy = pos-posx*MAZE_MAX_DIM
 		possible = GetPossible(pos)
@@ -281,16 +282,18 @@ def CreateMaze ():
 			if plen==1:
 				newpos = possible[0]
 			else:
+				#adding item back if we got room to grow
+				AddRoom(pos)
 				newpos = possible[GemRB.Roll(1, plen, -1) ]
 			if entries[newpos]==0:
 				if newpos+1 == pos:
-					GemRB.SetMazeEntry(pos, ME_WALLS, WALL_EAST)
-				elif pos+1 == newpos:
-					GemRB.SetMazeEntry(pos, ME_WALLS, WALL_WEST)
-				elif pos+MAZE_MAX_DIM == newpos:
 					GemRB.SetMazeEntry(pos, ME_WALLS, WALL_NORTH)
-				elif newpos+MAZE_MAX_DIM == pos:
+				elif pos+1 == newpos:
 					GemRB.SetMazeEntry(pos, ME_WALLS, WALL_SOUTH)
+				elif pos+MAZE_MAX_DIM == newpos:
+					GemRB.SetMazeEntry(pos, ME_WALLS, WALL_EAST)
+				elif newpos+MAZE_MAX_DIM == pos:
+					GemRB.SetMazeEntry(pos, ME_WALLS, WALL_WEST)
 				else:
 					print "Something went wrong at pos: ", pos, " newpos: ", newpos
 				AddRoom(newpos)
@@ -302,7 +305,7 @@ def CreateMaze ():
 
 	GemRB.SetMazeData(MH_POS3X, GemRB.Roll(1,dims,-1) )
 	GemRB.SetMazeData(MH_POS3Y, dims-1)
-	
+
 	#setting engine room coordinates to hidden (accessible from foyer)
 	GemRB.SetMazeData(MH_POS4X, -1)
 	GemRB.SetMazeData(MH_POS4Y, -1)
@@ -342,7 +345,7 @@ def CustomizeMaze(AreaName):
 			GemRB.SetMapAnimation(aposx[3], aposy[3], anims[3])
 		else:
 			GemRB.SetMapExit ("exit3", "AR13EN")
-			
+
 		GemRB.SetMapExit ("exit4" )
 		GemRB.SetMapAnimation(aposx[4], aposy[4], anims[4])
 		return
