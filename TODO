@@ -35,7 +35,7 @@ Store:
 Animation:
 1. (PARTLY) fix char animation sequences
 2. stanceID is still fuzzy. Fix it. (FIXED?)
-3. (PARTLY) Implement projectile animations (area, cone, fragments, hardcoded features)
+3. (DONE-almost) Implement projectile animations (area, cone, fragments, hardcoded features)
 
 Actor:
 1. (PARTLY) Use the character sheet (Actor.cpp) itself to store attributes of the character 
@@ -55,8 +55,6 @@ Game GUI:
    it correctly too.
 4. (PARTLY) Fix unwanted screen shake (especially when on bottom of area)
 5. (DONE-almost) Level up code, this should be written mostly in GuiScript!!!
-6. (PARTLY) Contingency, spell trigger setup windows
-7. (PARTLY) Customize windows (part of character record window)
 
 General:
 1. The Cache and Variables classes could be rewritten to incorporate the release 
@@ -81,7 +79,6 @@ Sound:
    them in another thread (openal weirdness?)
 2. (PARTLY) sounds get sometimes distorted, might be connected to problem #1
 3. (PARTLY) Separate OpenAL interface from ACM loader and MVE player
-4. implement sound handles so looping, moving sound, stopping sound is possible
 5. fix sound settings (currently the volumes get reset on area change, for example)
 6. implement and use as much from EAX (echo, damping, etc) as possible
 
