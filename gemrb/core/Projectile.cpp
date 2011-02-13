@@ -443,8 +443,14 @@ void Projectile::SetDelay(int delay)
 bool Projectile::FailedIDS(Actor *target) const
 {
 	bool fail = !EffectQueue::match_ids( target, IDSType, IDSValue);
+	if (ExtFlags&PEF_NOTIDS) {
+		fail = !fail;
+	}
 	if (fail && IDSType2) {
 		fail = !EffectQueue::match_ids( target, IDSType2, IDSValue2);
+		if (ExtFlags&PEF_NOTIDS2) {
+		  fail = !fail;
+		}
 	}
 
 	if (!fail) {
@@ -995,6 +1001,8 @@ void Projectile::SecondaryTarget()
 		}
 		Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
 		pro->SetEffectsCopy(effects);
+		//copy the additional effects reference to the child projectile
+		memcpy(pro->SuccSpell, SuccSpell, sizeof(ieResRef) );
 		pro->SetCaster(Caster);
 		//TODO:actually some of the splash projectiles are a good example of faketarget
 		//projectiles (that don't follow the target, but still hit)

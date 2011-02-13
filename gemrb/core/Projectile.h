@@ -68,6 +68,7 @@
 //projectile extended travel flags (gemrb specific)
 #define PEF_BOUNCE     1       //bounce from walls (lightning bolt)
 #define PEF_CONTINUE   2       //continue as a travel projectile after trigger (lightning bolt)
+//TODO: This can probably be replaced by an area projectile trigger (like skull trap, glyph)
 #define PEF_FREEZE     4       //stay around (ice dagger)
 #define PEF_NO_TRAVEL  8       //all instant projectiles (draw upon holy might, finger of death)
 #define PEF_TRAIL      16      //trail bams facing value uses the same field as the travel projectile (otherwise it defaults to 9) (shout in iwd)
@@ -85,12 +86,15 @@
 #define PEF_BACKGROUND 0x10000 //draw under target,overrides flying (dimension door)
 #define PEF_POP        0x20000 //draw travel bam, then shadow, then travel bam backwards
 #define PEF_UNPOP      0x40000 //draw shadow, then travel bam (this is an internal flag)
-#define PEF_FADE       0x80000 //gradually fade on spot if used with PEF_FREEZE (ice dagger)
+//TODO: The next flag is probably not needed, it is done by a separate area hit animation
+#define PEF_FADE       0x80000 //gradually fade on spot if used with PEF_FREEZE (ice dagger) 
 #define PEF_TEXT       0x100000//display text during setup
 #define PEF_WANDERING  0x200000//random movement (no real path)
 #define PEF_CYCLE      0x400000//random cycle
 #define PEF_RGB        0x800000//rgb pulse on hit
 #define PEF_TOUCH      0x1000000//successful to hit roll needed
+#define PEF_NOTIDS     0x2000000//negate IDS check
+#define PEF_NOTIDS2    0x4000000//negate secondary IDS check
 
 //projectile area flags
 #define PAF_VISIBLE    1      //the travel projectile is visible until explosion
