@@ -1,0 +1,22 @@
+2DA V1.0
+6
+                    DEX		STR
+UNUSED              6		8
+MAGE                6		4
+FIGHTER             6		8
+CLERIC              4		6
+THIEF               8		6
+BARD                8		6
+PALADIN             6		8
+FIGHTER_MAGE        6		8
+FIGHTER_CLERIC      6		8
+FIGHTER_THIEF       8		8
+FIGHTER_MAGE_THIEF  8		8
+DRUID               4		6
+RANGER              6		8
+MAGE_THIEF          8		6
+CLERIC_MAGE         6		6
+CLERIC_THIEF        8		6
+FIGHTER_DRUID       6		8
+FIGHTER_MAGE_CLERIC 6		8
+CLERIC_RANGER       6		8

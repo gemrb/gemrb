@@ -1918,7 +1918,9 @@ int fx_strength_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_strength_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	////how strength: value is based on class
+	////pst power of one also depends on this!
 	if (fx->Parameter2==3) {
+		//TODO: strextra for stats>=18
 		fx->Parameter1 = core->Roll(1,SpellAbilityDieRoll(target,1),0);
 		fx->Parameter2 = 0;
 	}
