@@ -3696,11 +3696,31 @@ int fx_animation_stance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x8B DisplayString
 // gemrb extension: rgb colour for displaystring
+// gemrb extension: resource may be an strref list (src or 2da)
 static EffectRef fx_protection_from_display_string_ref={"Protection:String",NULL,-1};
 
 int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_display_string (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
+	if(fx->Resource[0]) {
+		//TODO: create a single list reader that handles src and 2da too
+		SrcVector *rndstr=LoadSrc(fx->Resource);
+		if (rndstr) {
+			fx->Parameter1 = rndstr->at(rand()%rndstr->size());
+			FreeSrc(rndstr, fx->Resource);
+			DisplayStringCore(target, fx->Parameter1, DS_HEAD);
+			*(ieDword *) &target->overColor=fx->Parameter2;
+			return FX_NOT_APPLIED;
+		}
+
+		//random text for other games
+		ieDword *rndstr2 = core->GetListFrom2DA(fx->Resource);
+		int cnt = rndstr2[0];
+		if (cnt) {
+			fx->Parameter1 = rndstr2[core->Roll(1,cnt,0)];
+		}    
+	}
+
 	if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
 		displaymsg->DisplayStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:0xffffff, target, IE_STR_SOUND|IE_STR_SPEECH);
 	}

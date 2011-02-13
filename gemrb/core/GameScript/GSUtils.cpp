@@ -1136,15 +1136,19 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 
 void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 {
-	strncpy(item->ItemResRef, resref, 8);
+	//copy the whole resref, including the terminating zero
+	strnuprcpy(item->ItemResRef, resref, 8);
 	core->ResolveRandomItem(item);
 	if (a==-1) {
-		Item *origitem = gamedata->GetItem(resref);
-		for(int i=0;i<3;i++) {
-			ITMExtHeader *e = origitem->GetExtHeader(i);
-			item->Usages[i]=e?e->Charges:0;
+		//use the default charge counts of the item
+		Item *origitem = gamedata->GetItem(item->ItemResRef);
+		if (origitem) {
+			for(int i=0;i<3;i++) {
+				ITMExtHeader *e = origitem->GetExtHeader(i);
+				item->Usages[i]=e?e->Charges:0;
+			}
+			gamedata->FreeItem(origitem, item->ItemResRef, false);
 		}
-		gamedata->FreeItem(origitem, resref, false);
 	} else {
 		item->Usages[0]=(ieWord) a;
 		item->Usages[1]=(ieWord) b;

@@ -112,8 +112,8 @@ void GoNearAndRetry(Scriptable *Sender, const Point &p, int distance);
 
 GEM_EXPORT int GetGroup(Actor *actor);
 
-void FreeSrc(SrcVector *poi, const ieResRef key);
-SrcVector *LoadSrc(const ieResRef resname);
+GEM_EXPORT void FreeSrc(SrcVector *poi, const ieResRef key);
+GEM_EXPORT SrcVector *LoadSrc(const ieResRef resname);
 Action *ParamCopy(Action *parameters);
 Action *ParamCopyNoOverride(Action *parameters);
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
