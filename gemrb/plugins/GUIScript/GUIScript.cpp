@@ -1872,12 +1872,16 @@ static PyObject* GemRB_Window_Unload(PyObject * /*self*/, PyObject* args)
 	if (arg == 0xffff) {
 		return AttributeError( "Feature unsupported! ");
 	}
-	int ret = core->DelWindow( arg );
-	if (ret == -1) {
-		return RuntimeError( "Can't unload window!" );
-	}
 
-	core->PlaySound(DS_WINDOW_CLOSE);
+	//Don't bug if the window wasn't loaded
+	if (core->GetWindow(arg) ) {
+		int ret = core->DelWindow( arg );
+		if (ret == -1) {
+			return RuntimeError( "Can't unload window!" );
+		}
+
+		core->PlaySound(DS_WINDOW_CLOSE);
+	}
 	Py_INCREF( Py_None );
 	return Py_None;
 }
