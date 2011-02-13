@@ -341,6 +341,12 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 	Actor *donor;
 	int a,b;
 
+	//handle variable level hp drain (for blood bridge)
+	if (fx->IsVariable) {
+		fx->Parameter2+=fx->CasterLevel;
+		fx->IsVariable=0;
+	}
+
 	switch(fx->Parameter2) {
 		case 3:
 		case 0: receiver = target; donor = owner; break;
