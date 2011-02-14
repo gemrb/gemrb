@@ -302,15 +302,19 @@ void Projectile::Setup()
 		}
 	}
 
-	if(Shake) {
-		core->timer->SetScreenShake( Shake, Shake, Shake);
-	}
-
+	//falling = vertical
+	//incoming = right side
+	//both = left side
 	if(ExtFlags&(PEF_FALLING|PEF_INCOMING) ) {
-		if (ExtFlags&PEF_FALLING) {
+		if (ExtFlags&PEF_INCOMING) {
+			if (ExtFlags&PEF_FALLING) {
+				Pos.x=Destination.x-200;
+			} else {
+				Pos.x=Destination.x+200;
+			}
+		}
+		else {
 			Pos.x=Destination.x;
-		} else {
-			Pos.x=Destination.x+200;
 		}
 		Pos.y=Destination.y-200;
 		NextTarget(Destination);
@@ -449,7 +453,7 @@ bool Projectile::FailedIDS(Actor *target) const
 	if (fail && IDSType2) {
 		fail = !EffectQueue::match_ids( target, IDSType2, IDSValue2);
 		if (ExtFlags&PEF_NOTIDS2) {
-		  fail = !fail;
+			fail = !fail;
 		}
 	}
 
@@ -487,6 +491,11 @@ bool Projectile::FailedIDS(Actor *target) const
 void Projectile::Payload()
 {
 	Actor *target;
+
+	if(Shake) {
+		core->timer->SetScreenShake( Shake, Shake, Shake);
+		Shake = 0;
+	}
 
 	if(!effects) {
 		return;
@@ -671,6 +680,15 @@ void Projectile::DoStep(unsigned int walk_speed)
 		ClearPath();
 		ChangePhase();
 		return;
+	}
+
+	//intro trailing, drawn only once at the beginning
+	if (pathcounter==0x7ffe) {
+		for(int i=0;i<3;i++) {
+			if(!TrailSpeed[i] && TrailBAM[i]) {
+				AddTrail(TrailBAM[i], 0);
+			}
+		}
 	}
 
 	//don't bug out on 0 smoke frequency like the original IE
@@ -1168,6 +1186,11 @@ void Projectile::DrawExplosion(const Region &screen)
 		//Extension->FragAnimID the animation id for the character animation
 		//This color is not used in the original game
 		area->Sparkle(0, Extension->ExplColor, SPARKLE_EXPLOSION, Pos, Extension->FragAnimID);
+	}
+
+	if(Shake) {
+		core->timer->SetScreenShake( Shake, Shake, Shake);
+		Shake = 0;
 	}
 
 	ProjectileServer *server = core->GetProjectileServer();
