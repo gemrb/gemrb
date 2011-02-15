@@ -27,6 +27,7 @@ import CommonTables
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
+from ie_action import *
 
 FloatMenuWindow = None
 
@@ -282,20 +283,23 @@ def UpdateFloatMenuSingleAction (i):
 
 def UpdateFloatMenuGroupAction (i):
 	Window = FloatMenuWindow
-	butts = [ ('AMGUARD', 31657, ''),
-		  ('AMTLK', 41653, ''),
-		  ('AMATTCK', 41654, ''),
-		  ('AMALLSTP', 41655, ''),
-		  ('AMGENS', '', '') ]
+	#butts = [ ('AMGUARD', 31657, ''),
+	#	  ('AMTLK', 41653, ''),
+	#	  ('AMATTCK', 41654, ''),
+	#	  ('AMALLSTP', 41655, ''),
+	#	  ('AMGENS', '', '') ]
+
+	butts = [ ACT_DEFEND, ACT_TALK, ACT_ATTACK, ACT_STOP, ACT_SEARCH ]
 	# Guard
 	# Initiate dialogue
 	# Attack
 	# Abort Current Action
 	Button = Window.GetControl (15 + i)
 
-	Button.SetSprites (butts[i][0], 0, 0, 1, 2, 3)
-	Button.SetTooltip (butts[i][1])
-	Button.SetText ('')
+	#Button.SetSprites (butts[i][0], 0, 0, 1, 2, 3)
+	#Button.SetTooltip (butts[i][1])
+	#Button.SetText ('')
+	Button.SetActionIcon (globals(), butts[i], i+1 )
 	return
 
 def RefreshSpellList(pc, innate):
@@ -332,9 +336,9 @@ def UpdateFloatMenuItem (pc, i, weapons):
 	Window = FloatMenuWindow
 	#no float menu index needed for weapons or quick items
 	if weapons:
-		slot_item = GemRB.GetSlotItem (pc, 9 + i)
+		slot_item = GemRB.GetSlotItem (pc, 10 + i)
 	else:
-		slot_item = GemRB.GetSlotItem (pc, 20 + i)
+		slot_item = GemRB.GetSlotItem (pc, 21 + i)
 	Button = Window.GetControl (15 + i)
 
 	#the selected state is in another bam, sucks, we have to do everything manually
@@ -344,7 +348,11 @@ def UpdateFloatMenuItem (pc, i, weapons):
 		Button.SetSprites ('AMGENS', 0, 0, 1, 0, 0)
 
 	# Weapons - the last action is 'Guard'
-
+	# TODO: use SetActionIcon whenever possible
+	if weapons and i==4:
+		Button.SetActionIcon (globals(), ACT_DEFEND)
+		return
+		
 	#if slot_item and slottype:
 	if slot_item:
 		item = GemRB.GetItem (slot_item['ItemResRef'])
@@ -355,7 +363,7 @@ def UpdateFloatMenuItem (pc, i, weapons):
 			Button.SetTooltip ('')
 			return
 
-		Button.SetItemIcon (slot_item['ItemResRef'])
+		Button.SetItemIcon (slot_item['ItemResRef'], 6)
 		if item['StackAmount'] > 1:
 			Button.SetText (str (slot_item['Usages0']))
 		else:

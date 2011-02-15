@@ -1,0 +1,35 @@
+2DA V1.0
+-1
+           1          2          3          4          TOOLTIP    RESREF
+Stealth    *          *          *          *          *          *
+Thieving   *          *          *          *          *          *
+Cast       *          *          *          *          *          *
+QSpell1    *          *          *          *          *          *
+QSpell2    *          *          *          *          *          *
+QSpell3    *          *          *          *          *          *
+Turn       *          *          *          *          *          *
+Talk       0          1          2          3          41653      AMTLK
+UseItem    *          *          *          *          *          *
+QItem1     *          *          *          *          *          *
+QItem4     *          *          *          *          *          *
+QItem2     *          *          *          *          *          *
+QItem3     *          *          *          *          *          *
+Innate     *          *          *          *          *          *
+Defend     0          1          2          3          31657      AMGUARD
+Attack     0          1          2          3          41654      AMATTCK
+QWeapon1   *          *          *          *          *          *
+QWeapon2   *          *          *          *          *          *
+QWeapon3   *          *          *          *          *          *
+QWeapon4   *          *          *          *          *          *
+BardSong   *          *          *          *          11798      *
+Stop       0          1          2          3          41655      AMALLSTP
+Search     0          1          2          3          -1         AMGENS
+23         *          *          *          *          *          *
+24         *          *          *          *          *          *
+25         *          *          *          *          *          *
+26         *          *          *          *          *          *
+27         *          *          *          *          *          *
+28         *          *          *          *          *          *
+29         *          *          *          *          *          *
+30         *          *          *          *          *          *
+QItem5     *          *          *          *          *          *

@@ -2071,7 +2071,7 @@ static PyObject* GemRB_Window_CreateTextEdit(PyObject * /*self*/, PyObject* args
 	if (spr)
 		edit->SetCursor( spr );
 	else
-		return RuntimeError( "BAM not found" );
+		return RuntimeError( "Cursor BAM not found" );
 
 	win->AddControl( edit );
 
@@ -2244,7 +2244,10 @@ static PyObject* GemRB_ScrollBar_SetSprites(PyObject * /*self*/, PyObject* args)
 		gamedata->GetFactoryResource( ResRef,
 				IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!af) {
-		return RuntimeError( "BAM not found" );
+		char tmpstr[24];
+
+		snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", ResRef);
+		return RuntimeError( tmpstr );
 	}
 	Sprite2D *tspr = af->GetFrame(upunpressed, (unsigned char)cycle);
 	sb->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED, tspr );
@@ -2297,7 +2300,10 @@ static PyObject* GemRB_Button_SetSprites(PyObject * /*self*/, PyObject* args)
 		gamedata->GetFactoryResource( ResRef,
 				IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!af) {
-		return RuntimeError( "BAM not found" );
+		char tmpstr[24];
+
+		snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", ResRef);
+		return RuntimeError( tmpstr );
 	}
 	Sprite2D *tspr = af->GetFrame(unpressed, (unsigned char)cycle);
 	btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
@@ -5273,8 +5279,10 @@ PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int
 		gamedata->GetFactoryResource( IconResRef,
 				IE_BAM_CLASS_ID, IE_NORMAL, 1 );
 	if (!af) {
-		printf("Searched for: %s\n", IconResRef);
-		return RuntimeError( "BAM not found" );
+		char tmpstr[24];
+
+		snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", IconResRef);
+		return RuntimeError( tmpstr );
 	}
 	//small difference between pst and others
 	if (af->GetCycleSize(0)!=4) { //non-pst
@@ -8083,7 +8091,10 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, PyObject *dict
 		gamedata->GetFactoryResource( GUIResRef[Index],
 				IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!bam) {
-		return RuntimeError( "BAM not found" );
+		char tmpstr[24];
+
+		snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", GUIResRef[Index]);
+		return RuntimeError( tmpstr );
 	}
 	packtype row;
 
@@ -8196,7 +8207,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 		gamedata->GetFactoryResource( "guibtbut",
 				IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!bam) {
-		return RuntimeError( "BAM not found" );
+		return RuntimeError("guibtbut BAM not found");
 	}
 
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
@@ -8319,7 +8330,7 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 		gamedata->GetFactoryResource( "guibtbut",
 				IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!bam) {
-		return RuntimeError( "BAM not found" );
+		return RuntimeError("guibtbut BAM not found");
 	}
 
 	// disable all spells if fx_disable_spellcasting was run with the same type
