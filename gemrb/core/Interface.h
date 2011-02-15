@@ -748,6 +748,7 @@ public:
 	std::vector<std::string> ModPath;
 	int Width, Height, Bpp, ForceStereo;
 	unsigned int TooltipDelay;
+	int IgnoreOriginalINI;
 	unsigned int FogOfWar;
 	bool CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
 	bool GUIEnhancements;

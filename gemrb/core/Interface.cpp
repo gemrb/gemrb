@@ -181,6 +181,7 @@ Interface::Interface(int iargc, char* iargv[])
 	DrawFPS = false;
 	KeepCache = false;
 	TooltipDelay = 100;
+	IgnoreOriginalINI = 0;
 	FullScreen = 0;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
@@ -1511,25 +1512,25 @@ int Interface::Init()
 	}
 
 	printMessage( "Core", "Reading Game Options...\n", WHITE );
-	if (!LoadGemRBINI())
-	{
+	if (!LoadGemRBINI()) {
 		printf( "Cannot Load INI\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
 
 	//loading baldur.ini
-	{
+	if (!IgnoreOriginalINI) {
 		char ini_path[_MAX_PATH];
 		PathJoin( ini_path, GamePath, INIConfig, NULL );
 		LoadINI( ini_path );
-		int i;
-		for (i = 0; i < 8; i++) {
-			if (INIConfig[i] == '.')
-				break;
-			GameNameResRef[i] = INIConfig[i];
-		}
-		GameNameResRef[i] = 0;
 	}
+
+	int i;
+	for (i = 0; i < 8; i++) {
+		if (INIConfig[i] == '.')
+			break;
+		GameNameResRef[i] = INIConfig[i];
+	}
+	GameNameResRef[i] = 0;
 
 	printMessage( "Core", "Creating Projectile Server...\n", WHITE );
 	projserv = new ProjectileServer();
@@ -2249,6 +2250,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_INT("SkipIntroVideos", SkipIntroVideos = );
 		CONFIG_INT("TooltipDelay", TooltipDelay = );
 		CONFIG_INT("Width", Width = );
+		CONFIG_INT("IgnoreOriginalINI", IgnoreOriginalINI = );
 #undef CONFIG_INT
 #define CONFIG_STRING(str, var) \
 		} else if (stricmp(name, str) == 0) { \
