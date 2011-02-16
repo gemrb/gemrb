@@ -95,6 +95,7 @@
 #define PEF_TOUCH      0x1000000//successful to hit roll needed
 #define PEF_NOTIDS     0x2000000//negate IDS check
 #define PEF_NOTIDS2    0x4000000//negate secondary IDS check
+#define PEF_BOTH       0x8000000//both IDS check must succeed
 
 //projectile area flags
 #define PAF_VISIBLE    1      //the travel projectile is visible until explosion

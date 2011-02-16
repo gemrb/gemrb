@@ -54,6 +54,13 @@ bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 	case 2: //EA
 		stat = IE_EA; break;
 	case 3: //GENERAL
+		//this is a hack to support dead only projectiles in PST
+		//if it interferes with something feel free to remove
+		if (value==GEN_DEAD) {
+			if (target->GetStat(IE_STATE_ID)&STATE_DEAD) {
+				return true;
+			}
+		}
 		stat = IE_GENERAL; break;
 	case 4: //RACE
 		stat = IE_RACE; break;

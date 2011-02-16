@@ -450,10 +450,21 @@ bool Projectile::FailedIDS(Actor *target) const
 	if (ExtFlags&PEF_NOTIDS) {
 		fail = !fail;
 	}
-	if (fail && IDSType2) {
-		fail = !EffectQueue::match_ids( target, IDSType2, IDSValue2);
-		if (ExtFlags&PEF_NOTIDS2) {
-			fail = !fail;
+	if (ExtFlags&PEF_BOTH) {
+		if (!fail) {
+			fail = !EffectQueue::match_ids( target, IDSType2, IDSValue2);
+			if (ExtFlags&PEF_NOTIDS2) {
+				fail = !fail;
+			}
+		}
+	}
+	else
+	{
+		if (fail && IDSType2) {
+			fail = !EffectQueue::match_ids( target, IDSType2, IDSValue2);
+			if (ExtFlags&PEF_NOTIDS2) {
+				fail = !fail;
+			}
 		}
 	}
 
@@ -983,6 +994,12 @@ void Projectile::SecondaryTarget()
 
 		//this flag is actually about ignoring the caster (who is at the center)
 		if ((SFlags & PSF_IGNORE_CENTER) && (Caster==Target)) {
+			poi++;
+			continue;
+		}
+
+		//IDS targeting for area projectiles
+		if (FailedIDS(*poi)) {
 			poi++;
 			continue;
 		}
