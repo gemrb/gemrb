@@ -52,7 +52,7 @@ def UseSpell ():
 
 def UseItem ():
 	pc = GemRB.GameGetFirstSelectedPC ()
-	GemRB.UseItem (pc, float_menu_selected+20, 0)
+	GemRB.UseItem (pc, float_menu_selected+21, 0)
 	return
 
 def UseWeapon ():
