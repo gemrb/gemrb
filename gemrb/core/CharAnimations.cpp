@@ -273,6 +273,28 @@ void CharAnimations::SetColors(const ieDword *arg)
 	SetupColors(PAL_HELMET);
 }
 
+void CharAnimations::CheckColorMod()
+{
+	if (!GlobalColorMod.locked) {
+		if (GlobalColorMod.type != RGBModifier::NONE) {
+			GlobalColorMod.type = RGBModifier::NONE;
+			GlobalColorMod.speed = 0;
+		  change[0]=change[1]=change[2]=change[3]=true;
+		}
+	}
+	unsigned int location;
+
+	for (location = 0; location < 32; ++location) {
+		if (!ColorMods[location].phase) {
+		  if (ColorMods[location].type != RGBModifier::NONE) {
+				ColorMods[location].type = RGBModifier::NONE;
+				ColorMods[location].speed = 0;
+		    change[location>>3]=true;
+		  }
+		}
+	}
+}
+
 void CharAnimations::SetupColors(PaletteType type)
 {
 	Palette* pal = palette[(int)type];
@@ -307,11 +329,16 @@ void CharAnimations::SetupColors(PaletteType type)
 		if (GlobalColorMod.type != RGBModifier::NONE) {
 			needmod = true;
 		}
+		//don't drop the palette, it disables rgb pulse effects
+		//also don't bail out, we need to free the modified palette later
+		//so this entire block is needless
+		/*
 		if ((colorcount == 0) && (needmod==false) ) {
-			gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef);
+		  gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef);
 			PaletteResRef[0]=0;
 			return;
 		}
+		*/
 		for (int i = 0; i < colorcount; i++) {
 			core->GetPalette( Colors[i]&255, size,
 				&palette[PAL_MAIN]->col[dest] );
@@ -529,6 +556,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	Colors = NULL;
 	int i,j;
 	for (i = 0; i < 4; ++i) {
+		change[i] = true;
 		modifiedPalette[i] = NULL;
 		palette[i] = NULL;
 	}
@@ -2328,7 +2356,7 @@ void CharAnimations::PulseRGBModifiers()
 	if (time - lastModUpdate > 400) lastModUpdate = time - 40;
 
 	int inc = (time - lastModUpdate)/40;
-	bool change[4] = { false, false, false, false };
+	
 	if (GlobalColorMod.type != RGBModifier::NONE &&
 		GlobalColorMod.speed > 0)
 	{
@@ -2359,10 +2387,22 @@ void CharAnimations::PulseRGBModifiers()
 		}
 	}
 
-	if (change[0]) SetupColors(PAL_MAIN);
-	if (change[1]) SetupColors(PAL_WEAPON);
-	if (change[2]) SetupColors(PAL_OFFHAND);
-	if (change[3]) SetupColors(PAL_HELMET);
+	if (change[0]) {
+		change[0]=0;
+		SetupColors(PAL_MAIN);
+	}
+	if (change[1]) {
+		change[1]=0;
+		SetupColors(PAL_WEAPON);
+	}
+	if (change[2]) {
+		change[2]=0;
+		SetupColors(PAL_OFFHAND);
+	}
+	if (change[3]) {
+		change[2]=0;
+		SetupColors(PAL_HELMET);
+	}
 
 	lastModUpdate += inc*40;
 }

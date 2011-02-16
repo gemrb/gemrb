@@ -138,6 +138,7 @@ public:
 	unsigned long lastModUpdate;
 	RGBModifier GlobalColorMod; // global color modification effect
 
+	bool change[4];
 	Palette* palette[4];
 	Palette* modifiedPalette[4];
 	unsigned int AvatarsRowNum;
@@ -157,8 +158,9 @@ public:
 	void SetHelmetRef(const char* ref);
 	void SetWeaponRef(const char* ref);
 	void SetOffhandRef(const char* ref);
-	void SetupColors(PaletteType type);
 	void SetColors(const ieDword *Colors);
+	void CheckColorMod();
+	void SetupColors(PaletteType type);
 	void LockPalette(const ieDword *Colors);
 
 	// returns an array of animations of size GetTotalPartCount()

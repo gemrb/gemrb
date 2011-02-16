@@ -1924,16 +1924,16 @@ static void InitActorTables()
 				//initializing the skill->stats conversion table (used in iwd2)
 				tm.load("skillsta");
 				if (tm) {
-				        int rowcount = tm->GetRowCount();
-				        skillcount = rowcount;
-				        if (rowcount) {
-				                skillstats = (int *) malloc(rowcount * sizeof(int) );
-				                skillabils = (int *) malloc(rowcount * sizeof(int) );
-				                while(rowcount--) {
-				                        skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
-				                        skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
-				                }
-				        }
+					      int rowcount = tm->GetRowCount();
+					      skillcount = rowcount;
+					      if (rowcount) {
+					              skillstats = (int *) malloc(rowcount * sizeof(int) );
+					              skillabils = (int *) malloc(rowcount * sizeof(int) );
+					              while(rowcount--) {
+					                      skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
+					                      skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
+					              }
+					      }
 				}
 }
 
@@ -2187,17 +2187,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	//put all special cleanup calls here
 	CharAnimations* anims = GetAnims();
 	if (anims) {
-		if (!anims->GlobalColorMod.locked) {
-			anims->GlobalColorMod.type = RGBModifier::NONE;
-			anims->GlobalColorMod.speed = 0;
-		}
-		unsigned int location;
-		for (location = 0; location < 32; ++location) {
-			if (!anims->ColorMods[location].phase) {
-				anims->ColorMods[location].type = RGBModifier::NONE;
-				anims->ColorMods[location].speed = 0;
-			}
-		}
+		anims->CheckColorMod();
 	}
 	spellbook.ClearBonus();
 	/* these apply resrefs should be on a list as a trigger+resref */
