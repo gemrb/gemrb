@@ -1,21 +1,22 @@
-GemRB git (901067dbb0a06b):
+GemRB git (e424e7686c3543e5):
   New features:
     - 
     - full wild, dead, miscast and vocal magic support
     - subspell selection (spell immunity, nahal's reckless dweomer...)
     - compatibility with the bg2 demo
-    - PST maze
+    - PST maze, projectiles
 
   Improved features:
     - 
     - travel regions
-    - bink player has less artifacts
-    - combat, effects, banters
+    - bink player has no/less artifacts, good sound quality
+    - combat, effects, actions, triggers, banters
     - bugfixes
 
   Applied patches:
     a set of patches for Android support from Beholder
     arm compilation fixes by ShadowJack
+    patch from Thomas Klausner fixing building with libpng 1.5
 
 GemRB V0.6.3 git (2010-11-21)
   New features:
