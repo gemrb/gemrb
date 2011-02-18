@@ -62,6 +62,7 @@ Projectile::Projectile()
 	memset(smokebam, 0, sizeof(smokebam));
 	light = NULL;
 	pathcounter = 0x7fff;
+	FakeTarget = 0;
 }
 
 Projectile::~Projectile()
