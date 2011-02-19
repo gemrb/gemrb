@@ -238,6 +238,7 @@ protected:
 	Projectile **children;
 	int child_size;
 	int pathcounter;
+	int bend;
 	Holder<SoundHandle> travel_handle;
 public:
 	void SetCaster(ieDword t);

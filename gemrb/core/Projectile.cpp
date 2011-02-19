@@ -63,6 +63,7 @@ Projectile::Projectile()
 	light = NULL;
 	pathcounter = 0x7fff;
 	FakeTarget = 0;
+	bend = 0;
 }
 
 Projectile::~Projectile()
@@ -258,6 +259,10 @@ void Projectile::CreateIteration()
 	Projectile *pro = server->GetProjectileByIndex(type-1);
 	pro->SetEffectsCopy(effects);
 	pro->SetCaster(Caster);
+	if (ExtFlags&PEF_CURVE) {
+		pro->bend=bend+1;
+	}
+
 	if (FakeTarget) {
 		area->AddProjectile(pro, Pos, FakeTarget, true);
 	} else {
@@ -1462,12 +1467,7 @@ void Projectile::DrawTravel(const Region &screen)
 	pos.x+=screen.x;
 	pos.y+=screen.y;
 
-	if(ExtFlags&PEF_CURVE && phase == P_TRAVEL && Origin != Destination && type >= 68 && type <= 77) {
-		// TODO: we want projectile# (starting at 0) because the lower-level
-		// casts should be near the centre, so this is hard-coding the
-		// magic missile id..
-		int id = type - 68;
-
+	if(bend && phase == P_TRAVEL && Origin != Destination) {
 		double total_distance = Distance(Origin, Destination);
 		double travelled_distance = Distance(Origin, Pos);
 
@@ -1478,14 +1478,12 @@ void Projectile::DrawTravel(const Region &screen)
 		// input to sin(): 0 to pi gives us an arc
 		double arc_angle = travelled * M_PI;
 
-		//printf("id %d, travelled %f, angle %f\n", id, travelled, arc_angle);
-
 		// calculate the distance between the arc and the current pos
 		// (this could use travelled and a larger constant multiplier,
 		// to make the arc size fixed rather than relative to the total
 		// distance to travel)
-		double length_of_normal = travelled_distance * sin(arc_angle) * 0.3 * ((id / 2) + 1);
-		if (id % 2) length_of_normal = -length_of_normal;
+		double length_of_normal = travelled_distance * sin(arc_angle) * 0.3 * ((bend / 2) + 1);
+		if (bend % 2) length_of_normal = -length_of_normal;
 
 		// adjust the to-be-rendered point by that distance
 		double x_vector = (Destination.x - Origin.x) / total_distance,

@@ -143,6 +143,8 @@ Sprite2D* Video::SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio )
 	return small;
 }
 
+//TODO light could be elliptical in the original engine
+//is it difficult?
 Sprite2D* Video::CreateLight(int radius, int intensity)
 {
 	if(!radius) return NULL;
