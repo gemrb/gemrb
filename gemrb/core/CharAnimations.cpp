@@ -2400,7 +2400,7 @@ void CharAnimations::PulseRGBModifiers()
 		SetupColors(PAL_OFFHAND);
 	}
 	if (change[3]) {
-		change[2]=0;
+		change[3]=0;
 		SetupColors(PAL_HELMET);
 	}
 
