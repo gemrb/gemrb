@@ -472,8 +472,10 @@ bool Projectile::FailedIDS(Actor *target) const
 	if (!fail) {
 		if(ExtFlags&PEF_TOUCH) {
 			Actor *caster = core->GetGame()->GetActorByGlobalID(Caster);
-			//TODO move this to Actor
 			if (caster) {
+				//TODO move this to Actor
+				//TODO some projectiles use melee attack (fist), others use projectile attack
+				//this apparently depends on the spell's spell form (normal vs. projectile)
 				int roll = caster->LuckyRoll(1, ATTACKROLL, 0);
 				if (roll==1) {
 					return true; //critical failure
@@ -485,6 +487,7 @@ bool Projectile::FailedIDS(Actor *target) const
 					}
 				}
 
+				//handle attack type here, weapon depends on it too?
 				int tohit = caster->GetToHit(0, WEAPON_FIST, target);
 				//damage type, should be generic?
 				int defense = target->GetDefense(0, caster);

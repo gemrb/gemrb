@@ -788,9 +788,11 @@ void GameScript::ChangeAIScript(Scriptable* Sender, Action* parameters)
 	if (parameters->int0Parameter>7) {
 		return;
 	}
+  /* some area scripts change it using script level 7
 	if (Sender->Type!=ST_ACTOR && parameters->int0Parameter) {
 		return;
 	}
+  */
 	Sender->SetScript( parameters->string0Parameter, parameters->int0Parameter, false );
 }
 
