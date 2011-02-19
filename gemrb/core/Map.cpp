@@ -2088,7 +2088,18 @@ bool Map::CanFree()
 
 void Map::DebugDump(bool show_actors) const
 {
+	size_t i;
+
 	printf( "DebugDump of Area %s:\n", scriptName );
+	printf ("Scripts:");
+
+	for (i = 0; i < MAX_SCRIPTS; i++) {
+		const char* poi = "<none>";
+		if (Scripts[i]) {
+			poi = Scripts[i]->GetName();
+		}
+		printf( " %.8s", poi );
+	}
 	printf( "Area Global ID:  %d\n", GetGlobalID());
 	printf( "OutDoor: %s\n", YESNO(AreaType & AT_OUTDOOR ) );
 	printf( "Day/Night: %s\n", YESNO(AreaType & AT_DAYNIGHT ) );
@@ -2099,7 +2110,7 @@ void Map::DebugDump(bool show_actors) const
 
 	if (show_actors) {
 		printf("\n");
-		size_t i = actors.size();
+		i = actors.size();
 		while (i--) {
 			if (!(actors[i]->GetInternalFlag()&(IF_JUSTDIED|IF_REALLYDIED))) {
 				printf("Actor: %s at %d.%d\n", actors[i]->GetName(1), actors[i]->Pos.x, actors[i]->Pos.y);
