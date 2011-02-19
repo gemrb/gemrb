@@ -64,6 +64,8 @@ Projectile::Projectile()
 	pathcounter = 0x7fff;
 	FakeTarget = 0;
 	bend = 0;
+	drawSpark = 0;
+	ZPos = 0;
 }
 
 Projectile::~Projectile()
@@ -399,6 +401,9 @@ void Projectile::Setup()
 	}
 	if (TFlags&PTF_BLEND) {
 		SetBlend();
+	}
+	if (SFlags&PSF_FLYING) {
+		ZPos = FLY_HEIGHT;
 	}
 	phase = P_TRAVEL;
 	travel_handle = core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
@@ -771,6 +776,11 @@ void Projectile::DoStep(unsigned int walk_speed)
 	if (!walk_speed) {
 		return;
 	}
+
+	if (SFlags&PSF_SPARKS) {
+		drawSpark = 1;
+	}
+
 	if (step->Next->x > step->x)
 		Pos.x += ( unsigned short )
 			( ( step->Next->x - Pos.x ) * ( time - timeStartStep ) / walk_speed );
@@ -783,6 +793,7 @@ void Projectile::DoStep(unsigned int walk_speed)
 	else
 		Pos.y -= ( unsigned short )
 			( ( Pos.y - step->Next->y ) * ( time - timeStartStep ) / walk_speed );
+
 }
 
 void Projectile::SetCaster(ieDword caster)
@@ -1211,7 +1222,10 @@ void Projectile::DrawExplosion(const Region &screen)
 		//Extension->ExplColor fake color for single shades (blue,green,red flames)
 		//Extension->FragAnimID the animation id for the character animation
 		//This color is not used in the original game
-		area->Sparkle(0, Extension->ExplColor, SPARKLE_EXPLOSION, Pos, Extension->FragAnimID);
+		Point pos = Pos;
+		pos.x+=screen.x;
+		pos.y+=screen.y;
+		area->Sparkle(0, Extension->ExplColor, SPARKLE_EXPLOSION, pos, Extension->FragAnimID, GetZPos());
 	}
 
 	if(Shake) {
@@ -1378,7 +1392,7 @@ void Projectile::DrawExplosion(const Region &screen)
 	}
 }
 
-int Projectile::GetTravelPos(int face)
+int Projectile::GetTravelPos(int face) const
 {
 	if (travel[face]) {
 		return travel[face]->GetCurrentFrame();
@@ -1386,7 +1400,7 @@ int Projectile::GetTravelPos(int face)
 	return 0;
 }
 
-int Projectile::GetShadowPos(int face)
+int Projectile::GetShadowPos(int face) const
 {
 	if (shadow[face]) {
 		return shadow[face]->GetCurrentFrame();
@@ -1531,9 +1545,7 @@ void Projectile::DrawTravel(const Region &screen)
 		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
 	}
 
-	if (SFlags&PSF_FLYING) {
-		pos.y-=FLY_HEIGHT;
-	}
+	pos.y-=GetZPos();
 
 	if (ExtFlags&PEF_PILLAR) {
 		//draw all frames simultaneously on top of each other
@@ -1551,9 +1563,16 @@ void Projectile::DrawTravel(const Region &screen)
 		}
 	}
 
-	if (SFlags&PSF_SPARKS) {
-		area->Sparkle(0,SparkColor,SPARKLE_EXPLOSION,pos);
+	if (drawSpark) {
+		area->Sparkle(0,SparkColor, SPARKLE_EXPLOSION, pos, 0, GetZPos() );
+		drawSpark = 0;
 	}
+
+}
+
+int Projectile::GetZPos() const
+{
+	return ZPos;
 }
 
 void Projectile::SetIdentifiers(const char *resref, ieWord id)

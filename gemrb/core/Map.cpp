@@ -3318,9 +3318,13 @@ void Map::FadeSparkle(const Point &pos, bool forced)
 	}
 }
 
-void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point &pos, unsigned int FragAnimID)
+void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point &pos, unsigned int FragAnimID, int Zpos)
 {
 	int style, path, grow, size, width, ttl;
+
+	if (!Zpos) {
+		Zpos = 30;
+	}
 
 	//the high word is ignored in the original engine (compatibility hack)
 	switch(type&0xffff) {
@@ -3336,14 +3340,14 @@ void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point &po
 		grow = SP_SPAWN_SOME;
 		size = 40;
 		width = 40;
-		ttl = core->GetGame()->GameTime+25;
+		ttl = core->GetGame()->GameTime+Zpos;
 		break;
 	case SPARKLE_EXPLOSION: //this isn't in the original engine, but it is a nice effect to have
 		path = SP_PATH_EXPL;
 		grow = SP_SPAWN_SOME;
 		size = 10;
 		width = 40;
-		ttl = core->GetGame()->GameTime+25;
+		ttl = core->GetGame()->GameTime+Zpos;
 		break;
 	default:
 		path = SP_PATH_FLIT;
@@ -3355,7 +3359,7 @@ void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point &po
 	}
 	Particles *sparkles = new Particles(size);
 	sparkles->SetOwner(this);
-	sparkles->SetRegion(pos.x-width/2, pos.y-30, width, 30);
+	sparkles->SetRegion(pos.x-width/2, pos.y-Zpos, width, Zpos);
 	sparkles->SetTimeToLive(ttl);
 
 	if (FragAnimID) {

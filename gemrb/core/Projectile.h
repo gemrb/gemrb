@@ -216,6 +216,7 @@ protected:
 	//similar to normal actors
 	Map *area;
 	Point Pos;
+	int ZPos;
 	Point Destination;
 	Point Origin;
 	ieDword Caster;    //the globalID of the caster actor
@@ -239,6 +240,7 @@ protected:
 	int child_size;
 	int pathcounter;
 	int bend;
+	int drawSpark;
 	Holder<SoundHandle> travel_handle;
 public:
 	void SetCaster(ieDword t);
@@ -353,9 +355,10 @@ private:
 	bool DrawChildren(const Region &screen);
 	void DrawExplosion(const Region &screen);
 	void DrawExploded(const Region &screen);
-	int GetTravelPos(int face);
-	int GetShadowPos(int face);
+	int GetTravelPos(int face) const;
+	int GetShadowPos(int face) const;
 	void SetPos(int face, int frame1, int frame2);
+	inline int GetZPos() const;
 
 	//logic to resolve target when single projectile hit destination
 	int CalculateTargetFlag();
