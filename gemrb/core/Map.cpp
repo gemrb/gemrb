@@ -3341,7 +3341,7 @@ void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point &po
 	case SPARKLE_EXPLOSION: //this isn't in the original engine, but it is a nice effect to have
 		path = SP_PATH_EXPL;
 		grow = SP_SPAWN_SOME;
-		size = 40;
+		size = 10;
 		width = 40;
 		ttl = core->GetGame()->GameTime+25;
 		break;
