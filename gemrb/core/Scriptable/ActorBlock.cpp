@@ -830,7 +830,7 @@ void Scriptable::CastSpellPointEnd()
 		return;
 	}
 
-	if (!SpellResRef) {
+	if (!SpellResRef[0]) {
 		return;
 	}
 
@@ -861,7 +861,7 @@ void Scriptable::CastSpellEnd()
 		SpellHeader = -1;
 		return;
 	}
-	if (!SpellResRef) {
+	if (!SpellResRef[0]) {
 		return;
 	}
 
