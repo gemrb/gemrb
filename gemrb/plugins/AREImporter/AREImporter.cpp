@@ -343,6 +343,12 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	// small map is *optional*!
 	ResourceHolder<ImageMgr> sm(TmpResRef);
 
+	//if the Script field is empty, the area name will be copied into it on first load
+	//this works only in the iwd branch of the games
+	if (!Script[0] && core->HasFeature(GF_FORCE_AREA_SCRIPT) ) {
+		memcpy(Script, ResRef, sizeof(ieResRef) );
+	}
+
 	if (Script[0]) {
 		//for some reason the area's script is run from the last slot
 		//at least one area script depends on this, if you need something
@@ -452,11 +458,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &LaunchY );
 		str->ReadResRef( KeyResRef );
 		str->ReadResRef( Script );
-		//if the Script field is empty, the area name will be copied into it on first load
-		//this works only in the iwd branch of the games
-		if (!Script[0] && core->HasFeature(GF_FORCE_AREA_SCRIPT) ) {
-			memcpy(Script, ResRef, sizeof(ieResRef) );
-		}
 		str->ReadWord( &PosX);
 		str->ReadWord( &PosY);
 		//maybe we have to store this
