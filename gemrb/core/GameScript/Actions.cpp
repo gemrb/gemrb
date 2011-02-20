@@ -785,26 +785,24 @@ void GameScript::Ally(Scriptable* Sender, Action* /*parameters*/)
 /** GemRB extension: you can replace baldur.bcs */
 void GameScript::ChangeAIScript(Scriptable* Sender, Action* parameters)
 {
-	if (parameters->int0Parameter>7) {
+	if (parameters->int0Parameter>=MAX_SCRIPTS) {
 		return;
 	}
-  /* some area scripts change it using script level 7
-	if (Sender->Type!=ST_ACTOR && parameters->int0Parameter) {
-		return;
-	}
-  */
+	//clearing the queue, and checking script level was intentionally removed
 	Sender->SetScript( parameters->string0Parameter, parameters->int0Parameter, false );
 }
 
 void GameScript::ForceAIScript(Scriptable* Sender, Action* parameters)
 {
+	if (parameters->int0Parameter>=MAX_SCRIPTS) {
+		return;
+	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
-	//changeaiscript clears the queue, i believe
-	//	actor->ClearActions();
+	//clearing the queue, and checking script level was intentionally removed
 	actor->SetScript( parameters->string0Parameter, parameters->int0Parameter, false );
 }
 
