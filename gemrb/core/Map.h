@@ -153,8 +153,8 @@ public:
 
 class TerrainSounds {
 public:
-  ieResRef Group;
-  ieResRef Sounds[16];
+	ieResRef Group;
+	ieResRef Sounds[16];
 };
 
 class SpawnGroup {
@@ -204,8 +204,9 @@ public:
 	void InitAnimation();
 	void SetPalette(ieResRef PaletteRef);
 	void BlendAnimation();
-	bool Schedule(ieDword gametime);
+	bool Schedule(ieDword gametime) const;
 	void Draw(const Region &screen, Map *area);
+	int GetHeight() const;
 private:
 	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle);
 };
@@ -249,7 +250,7 @@ private:
 	int trackFlag;
 	ieWord trackDiff;
 	unsigned short* MapSet;
-  unsigned short* SrchMap; //internal searchmap
+	unsigned short* SrchMap; //internal searchmap
 	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
 	std::list< AreaAnimation*> animations;

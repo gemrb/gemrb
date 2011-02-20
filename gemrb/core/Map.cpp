@@ -103,7 +103,8 @@ inline static AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimatio
 
 	int aah;
 	if (a) {
-		aah = a->Pos.y;//+a->height;
+		//aah = a->Pos.y;//+a->height;
+		aah = a->GetHeight();
 	} else {
 		aah = 0x7fffffff;
 	}
@@ -1236,15 +1237,11 @@ void Map::AddAnimation(AreaAnimation* panim)
 
 	anim->InitAnimation();
 
-	//this hack is to make sure animations flagged with background
-	//are always drawn first (-9999 seems sufficiently small)
-	if (anim->Flags&A_ANI_BACKGROUND) {
-		anim->height=-9999;
-	}
-
 	aniIterator iter;
 	
-	for(iter=animations.begin(); (iter!=animations.end()) && ((*iter)->height<anim->height); iter++) ;
+	int Height = anim->GetHeight();
+printf("Adding %s at height %d, Pos: %d.%d\n", anim->Name, Height, anim->Pos.x, anim->Pos.y);
+	for(iter=animations.begin(); (iter!=animations.end()) && ((*iter)->GetHeight()<Height); iter++) ;
 	animations.insert(iter, anim);	
 }
 
@@ -3548,7 +3545,7 @@ void AreaAnimation::BlendAnimation()
 	palette->CreateShadedAlphaChannel();
 }
 
-bool AreaAnimation::Schedule(ieDword gametime)
+bool AreaAnimation::Schedule(ieDword gametime) const
 {
 	if (!(Flags&A_ANI_ACTIVE) ) {
 		return false;
@@ -3560,6 +3557,15 @@ bool AreaAnimation::Schedule(ieDword gametime)
 		return true;
 	}
 	return false;
+}
+
+int AreaAnimation::GetHeight() const
+{
+	if (Flags&A_ANI_BACKGROUND) return -9999;
+	return Pos.y+height;
+	//FIXME: this is obviously a hack that is destined to crash, also useless, so
+	//See ar9101 in HoW and ar0602 in bg2 before committing anything
+	//return Pos.y+height-animation[0][0].GetFrame(0)->Height;
 }
 
 void AreaAnimation::Draw(const Region &screen, Map *area)
