@@ -372,9 +372,9 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_flash_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_flash_screen (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
-	core->GetVideoDriver()->SetFadeColor(((char *) &fx->Parameter1)[0],((char *) &fx->Parameter1)[1],((char *) &fx->Parameter1)[2]);
-	core->timer->SetFadeFromColor(1);
-	core->timer->SetFadeToColor(1);
+	core->GetVideoDriver()->SetFadeColor(((unsigned char *) &fx->Parameter1)[0],((unsigned char *) &fx->Parameter1)[1],((unsigned char *) &fx->Parameter1)[2]);
+	//this needs to be at least 2 for any effect
+	core->timer->SetFadeFromColor(2);
 	return FX_NOT_APPLIED;
 }
 
