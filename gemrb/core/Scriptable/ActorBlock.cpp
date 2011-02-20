@@ -611,6 +611,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 	int duplicate = 1;
 	if (Type == ST_ACTOR) {
 		caster = (Actor *) this;
+		//FIXME: 1 duplicate is no duplicate, right?
 		duplicate = caster->wildSurgeMods.num_castings;
 		if (!duplicate) {
 			duplicate = 1;
@@ -618,7 +619,9 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 	}
 	if (core->HasFeature(GF_PST_STATE_FLAGS) && (Type == ST_ACTOR)) {
 		if (caster->GetStat(IE_STATE_ID)&STATE_EE_DUPL) {
-			duplicate *= 2;
+			//seriously, wild surges and EE in the same game?
+			//anyway, it would be too many duplications
+			duplicate = 2;
 		}
 	}
 
@@ -1106,10 +1109,11 @@ int Scriptable::CheckWildSurge()
 				memset(surgeSpellRef, 0, sizeof(surgeSpellRef));
 				strncpy(surgeSpellRef, core->SurgeSpells[check-1].spell, 8);
 
-				Spell *surgeSpell = gamedata->GetSpell(surgeSpellRef);
-				if (!surgeSpell) {
+				if (gamedata->Exists(surgeSpellRef, IE_SPL_CLASS_ID)) {
 					// handle the hardcoded cases - they'll also fail here
 					if (!HandleHardcodedSurge(surgeSpellRef, spl, caster)) {
+						//free the spell handle because we need to return
+						gamedata->FreeSpell(spl, SpellResRef, false);
 						return 0;
 					}
 				} else {
@@ -1119,6 +1123,9 @@ int Scriptable::CheckWildSurge()
 				}
 			}
 		}
+
+		//free the spell handle
+		gamedata->FreeSpell(spl, SpellResRef, false);
 	}
 
 	return 1;
