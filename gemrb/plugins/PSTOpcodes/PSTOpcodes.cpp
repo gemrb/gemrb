@@ -178,12 +178,12 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	} else {
 		playonce=false;
 	}
-	if (fx->Parameter2&1) {
-		//four cycles, duration is in millisecond
-		sca->SetDefaultDuration(sca->GetSequenceDuration(4000));
-	} else {
-		if (playonce) {
+	if (playonce) {
 			sca->PlayOnce();
+	} else {
+	  if (fx->Parameter2&1) {
+		  //four cycles, duration is in millisecond
+		  sca->SetDefaultDuration(sca->GetSequenceDuration(AI_UPDATE_TIME));	  
 		} else {
 			sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
 		}
