@@ -601,7 +601,7 @@ void Scriptable::AddTrigger(ieDword *actorref)
 
 static EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
 
-void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool fake)
+void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake)
 {
 	Spell* spl = gamedata->GetSpell( SpellResRef );
 	Actor *caster = NULL;
@@ -638,7 +638,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 			if (!pro) {
 				return;
 			}
-			pro->SetCaster(GetGlobalID());
+			pro->SetCaster(GetGlobalID(), level);
 		}
 
 		Point origin = Pos;
@@ -672,7 +672,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 					// we need to fetch the projectile, so the effect queue is created
 					// (skipped above)
 					pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
-					pro->SetCaster(GetGlobalID());
+					pro->SetCaster(GetGlobalID(), level);
 					break;
 				case WSTC_ADDTYPE:
 					// TODO: unhardcode to allow for mixing all the target types
@@ -689,7 +689,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 					}
 					// we need to refetch the projectile, so the effect queue is created
 					pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
-					pro->SetCaster(GetGlobalID());
+					pro->SetCaster(GetGlobalID(), level);
 					break;
 				case WSTC_RANDOMIZE:
 					count = area->GetActorCount(false);
@@ -718,7 +718,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 					// we need to fetch the projectile, so the effect queue is created
 					// (skipped above)
 					pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
-					pro->SetCaster(GetGlobalID());
+					pro->SetCaster(GetGlobalID(), level);
 					break;
 				default: //0 - do nothing
 					break;
@@ -745,7 +745,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 				}
 				// we need to refetch the projectile, so the new one is used
 				pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
-				pro->SetCaster(GetGlobalID());
+				pro->SetCaster(GetGlobalID(), level);
 			}
 		}
 
@@ -815,12 +815,21 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool 
 
 }
 
-void Scriptable::CastSpellPointEnd()
+void Scriptable::CastSpellPointEnd(int level)
 {
 	Actor *caster = NULL;
 	if (Type == ST_ACTOR) {
 		caster = ((Actor *) this);
 		caster->SetStance(IE_ANI_CONJURE);
+		if (level == 0) {
+			Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+			Actor *actor = NULL;
+			if (Type == ST_ACTOR) {
+				actor = (Actor *) this;
+				level = actor->GetCasterLevel(spl->SpellType);
+			}
+			gamedata->FreeSpell(spl, SpellResRef, false);
+		}
 	}
 
 	if (SpellHeader == -1) {
@@ -837,7 +846,7 @@ void Scriptable::CastSpellPointEnd()
 		return;
 	}
 
-	CreateProjectile(SpellResRef, 0, false);
+	CreateProjectile(SpellResRef, 0, level, false);
 
 	SpellHeader = -1;
 	SpellResRef[0] = 0;
@@ -848,12 +857,21 @@ void Scriptable::CastSpellPointEnd()
 	}
 }
 
-void Scriptable::CastSpellEnd()
+void Scriptable::CastSpellEnd(int level)
 {
 	Actor *caster = NULL;
 	if (Type == ST_ACTOR) {
 		caster = ((Actor *) this);
 		caster->SetStance(IE_ANI_CONJURE);
+		if (level == 0) {
+			Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+			Actor *actor = NULL;
+			if (Type == ST_ACTOR) {
+				actor = (Actor *) this;
+				level = actor->GetCasterLevel(spl->SpellType);
+			}
+			gamedata->FreeSpell(spl, SpellResRef, false);
+		}
 	}
 
 	if (SpellHeader == -1) {
@@ -869,7 +887,7 @@ void Scriptable::CastSpellEnd()
 	}
 
 	//if the projectile doesn't need to follow the target, then use the target position
-	CreateProjectile(SpellResRef, LastTarget, GetSpellDistance(SpellResRef, this)==0xffffffff);
+	CreateProjectile(SpellResRef, LastTarget, level, GetSpellDistance(SpellResRef, this)==0xffffffff);
 	SpellHeader = -1;
 	SpellResRef[0] = 0;
 	LastTarget = 0;
@@ -1140,9 +1158,11 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 	Scriptable *target = NULL;
 	Point targetpos(-1, -1);
 	ieResRef newspl;
+
+	int level = caster->GetCasterLevel(spl->SpellType);
 	switch (surgeSpellRef[0]) {
 		case '+': // cast normally, but also cast SPELLREF first
-			core->ApplySpell(surgeSpellRef+1, caster, caster, caster->GetCasterLevel(spl->SpellType));
+			core->ApplySpell(surgeSpellRef+1, caster, caster, level);
 			break;
 		case '0': // cast spell param1 times
 			strtok(surgeSpellRef,".");
@@ -1186,12 +1206,12 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 					caster->CastSpell(SpellResRef, target, false, true);
 					strncpy(newspl, SpellResRef, 8);
 					caster->WMLevelMod = tmp3;
-					caster->CastSpellEnd();
+					caster->CastSpellEnd(level);
 				} else {
 					caster->CastSpellPoint(SpellResRef, targetpos, false, true);
 					strncpy(newspl, SpellResRef, 8);
 					caster->WMLevelMod = tmp3;
-					caster->CastSpellPointEnd();
+					caster->CastSpellPointEnd(level);
 				}
 				// reset the ref, since CastSpell*End destroyed it
 				strncpy(SpellResRef, newspl, 8);

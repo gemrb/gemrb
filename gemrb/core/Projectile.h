@@ -96,6 +96,7 @@
 #define PEF_NOTIDS     0x2000000//negate IDS check
 #define PEF_NOTIDS2    0x4000000//negate secondary IDS check
 #define PEF_BOTH       0x8000000//both IDS check must succeed
+#define PEF_DELAY      0x10000000//delay payload until travel projectile cycle ends
 
 //projectile area flags
 #define PAF_VISIBLE    1      //the travel projectile is visible until explosion
@@ -220,6 +221,7 @@ protected:
 	Point Destination;
 	Point Origin;
 	ieDword Caster;    //the globalID of the caster actor
+	int Level;         //the caster's level
 	ieDword Target;    //the globalID of target actor
 	ieDword FakeTarget; //a globalID for target that isn't followed
 	int phase;
@@ -243,7 +245,7 @@ protected:
 	int drawSpark;
 	Holder<SoundHandle> travel_handle;
 public:
-	void SetCaster(ieDword t);
+	void SetCaster(ieDword t, int level);
 	ieDword GetCaster() const;
 	bool FailedIDS(Actor *target) const;
 	void SetTarget(ieDword t, bool fake);

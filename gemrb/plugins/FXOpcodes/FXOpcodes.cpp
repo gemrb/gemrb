@@ -3911,7 +3911,7 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_cast_spell (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	if (fx->Parameter2) {
 		//apply spell on target
-		core->ApplySpell(fx->Resource, target, Owner, fx->Power);
+		core->ApplySpell(fx->Resource, target, Owner, fx->Parameter1);
 
 		// give feedback: Caster - spellname : target
 		char tmp[100];
@@ -3924,7 +3924,7 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 		//cast spell on target
 		Owner->CastSpell(fx->Resource, target, false);
 		//actually finish casting (if this is not good enough, use an action???)
-		Owner->CastSpellEnd();
+		Owner->CastSpellEnd(fx->Parameter1);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -3946,7 +3946,7 @@ int fx_cast_spell_point (Scriptable* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_cast_spell_point (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	Owner->CastSpellPoint(fx->Resource, target->Pos, false);
 	//actually finish casting (if this is not good enough, use an action???)
-	Owner->CastSpellPointEnd();
+	Owner->CastSpellPointEnd(fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 

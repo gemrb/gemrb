@@ -271,8 +271,8 @@ public:
 	int CastSpellPoint( ieResRef &SpellRef, const Point &Target, bool deplete, bool instant = false );
 	int CastSpell( ieResRef &SpellRef, Scriptable* Target, bool deplete, bool instant = false );
 	/* spellcasting finished */
-	void CastSpellPointEnd();
-	void CastSpellEnd();
+	void CastSpellPointEnd(int level);
+	void CastSpellEnd(int level);
 	ieDword GetGlobalID() const { return globalID; }
 	/** timer functions (numeric ID, not saved) */
 	bool TimerActive(ieDword ID);
@@ -283,7 +283,7 @@ private:
 	/* used internally to handle start of spellcasting */
 	int SpellCast(bool instant);
 	/* also part of the spellcasting process, creating the projectile */
-	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, bool fake);
+	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake);
 	/* do some magic for the wierd/awesome wild surges */
 	bool HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor *caster);
 };

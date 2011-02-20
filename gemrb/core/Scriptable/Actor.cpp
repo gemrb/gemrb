@@ -3234,7 +3234,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 			LastTurner = cleric->GetGlobalID();
 			if (turnlevel >= level+TURN_DEATH_LVL_MOD) {
 				if (gamedata->Exists("panic", IE_SPL_CLASS_ID)) {
-					core->ApplySpell("panic", this, cleric, 0);
+					core->ApplySpell("panic", this, cleric, level);
 				} else {
 					printf("Panic from turning!\n");
 					Panic(cleric, PANIC_RUNAWAY);
@@ -6040,7 +6040,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
 	gamedata->FreeItem(itm,tmpresref, false);
 	if (pro) {
-		pro->SetCaster(GetGlobalID());
+		pro->SetCaster(GetGlobalID(), 10);
 		GetCurrentArea()->AddProjectile(pro, Pos, target);
 		return true;
 	}
@@ -6077,7 +6077,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	gamedata->FreeItem(itm,tmpresref, false);
 	if (pro) {
 		//ieDword is unsigned!!
-		pro->SetCaster(GetGlobalID());
+		pro->SetCaster(GetGlobalID(), 10);
 		if(((int)header < 0) && !(flags&UI_MISS)) { //using a weapon
 			bool ranged = header == (ieDword)-2;
 			ITMExtHeader *which = itm->GetWeaponHeader(ranged);

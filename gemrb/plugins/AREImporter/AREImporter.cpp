@@ -1170,9 +1170,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieDword TrapEffOffset;
 		ieWord TrapSize, ProID;
 		ieWord X,Y;
-		ieDword Unknown1;
-		ieWord Unknown2;
-		ieByte Unknown3;
+		ieDword Ticks;
+		ieWord Unknown;
+		ieByte PartyID;
 		ieByte Owner;
 
 		str->Seek( TrapOffset + ( i * 0x1c ), GEM_STREAM_START );
@@ -1181,11 +1181,11 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadDword( &TrapEffOffset );
 		str->ReadWord( &TrapSize );
 		str->ReadWord( &ProID );
-		str->ReadDword( &Unknown1 );
+		str->ReadDword( &Ticks );
 		str->ReadWord( &X );
 		str->ReadWord( &Y );
-		str->ReadWord( &Unknown2 );
-		str->Read( &Unknown3,1 );
+		str->ReadWord( &Unknown );
+		str->Read( &PartyID,1 );
 		str->Read( &Owner,1 );
 		int TrapEffectCount = TrapSize/0x108;
 		if(TrapEffectCount*0x108!=TrapSize) {
@@ -1204,9 +1204,12 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		CachedFileStream *fs = new CachedFileStream( (CachedFileStream *) str, TrapEffOffset, TrapSize, true);
 
 		ReadEffects((DataStream *) fs,fxqueue, TrapEffectCount);
-		Actor * caster = core->GetGame()->FindPC(Owner);
+		Actor * caster = core->GetGame()->FindPC(PartyID);
 		pro->SetEffects(fxqueue);
-		if (caster) pro->SetCaster(caster->GetGlobalID());
+		if (caster) {
+			//FIXME: i don't know the level info
+			pro->SetCaster(caster->GetGlobalID(), 10);
+		}
 		Point pos(X,Y);
 		map->AddProjectile( pro, pos, pos);
 	}

@@ -700,7 +700,7 @@ int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	Point pos(fx->PosX,fx->PosY);
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(0x1001+fx->Parameter2);
-	pro->SetCaster(Owner->GetGlobalID());
+	pro->SetCaster(fx->CasterID, fx->CasterLevel);
 	if (target) {
 		//i believe the spell hit projectiles don't follow anyone
 		map->AddProjectile( pro, pos, target->GetGlobalID(), true);
@@ -2298,7 +2298,7 @@ int fx_alter_animation (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 		if (!strnicmp (an->Name, fx->Resource, 8) ) {
 			//play spell hit animation
 			Projectile *pro=core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
-			pro->SetCaster(Owner->GetGlobalID());
+			pro->SetCaster(fx->CasterID, fx->CasterLevel);
 			map->AddProjectile(pro, an->Pos, an->Pos);
 			//alter animation, we need only this for the original, but in the
 			//spirit of unhardcoding, i provided the standard modifier codeset
@@ -2898,7 +2898,7 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 
 		pro->SetEffects(spl->GetEffectBlock(Owner, p, 0, fx->Parameter2));
 		Point origin(fx->PosX, fx->PosY);
-		pro->SetCaster(Owner->GetGlobalID());
+		pro->SetCaster(fx->CasterID, fx->CasterLevel);
 		if (target) {
 			map->AddProjectile( pro, origin, target->GetGlobalID(), false);
 		} else {

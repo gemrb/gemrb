@@ -260,7 +260,7 @@ void Projectile::CreateIteration()
 	ProjectileServer *server = core->GetProjectileServer();
 	Projectile *pro = server->GetProjectileByIndex(type-1);
 	pro->SetEffectsCopy(effects);
-	pro->SetCaster(Caster);
+	pro->SetCaster(Caster, Level);
 	if (ExtFlags&PEF_CURVE) {
 		pro->bend=bend+1;
 	}
@@ -406,7 +406,11 @@ void Projectile::Setup()
 		ZPos = FLY_HEIGHT;
 	}
 	phase = P_TRAVEL;
-	travel_handle = core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
+	if (SoundRes3[0]) {
+		travel_handle = core->GetAudioDrv()->Play(SoundRes3, Pos.x, Pos.y, 0);
+	} else {
+		travel_handle = core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
+	}
 
 	//create more projectiles
 	if(ExtFlags&PEF_ITERATION) {
@@ -541,8 +545,7 @@ void Projectile::Payload()
 				target = core->GetGame()->GetActorByGlobalID(FakeTarget);
 			}
 		} else {
-			target = area->GetActorByGlobalID(Caster);
-			
+			target = area->GetActorByGlobalID(Caster);			
 		}
 		Actor *source = area->GetActorByGlobalID(Caster);
 		if (source) {
@@ -551,18 +554,19 @@ void Projectile::Payload()
 			effects->SetOwner(target);
 		}
 	}
+
 	if (target) {
 		//apply this spell on target when the projectile fails
 		if (FailedIDS(target)) {
 			if (FailSpell[0]) {
-				core->ApplySpell(FailSpell, target, effects->GetOwner(), 0);
+				core->ApplySpell(FailSpell, target, effects->GetOwner(), Level);
 			}
 			return;
 		}
 
 		//apply this spell on the target when the projectile succeeds
 		if (SuccSpell[0]) {
-			core->ApplySpell(SuccSpell, target, effects->GetOwner(), 0);
+			core->ApplySpell(SuccSpell, target, effects->GetOwner(), Level);
 		}
 
 		if(ExtFlags&PEF_RGB) {
@@ -591,19 +595,24 @@ void Projectile::ChangePhase()
 	}
 	//reached target, and explodes now
 	if (!Extension) {
-		if (travel_handle) {
-			travel_handle->Stop();
-			travel_handle.release();
-		}
 		//there are no-effect projectiles, like missed arrows
 		//Payload can redirect the projectile in case of projectile reflection
-		Payload();
+		if (!(ExtFlags&PEF_DELAY) || !extension_delay) {
+			if (travel_handle) {
+				travel_handle->Stop();
+				travel_handle.release();
+			}
+			Payload();
+		}
 		//freeze on target, this is recommended only for child projectiles
 		//as the projectile won't go away on its own
 		if(ExtFlags&PEF_FREEZE) {
 			if(extension_delay) {
 				if (extension_delay>0) {
 					extension_delay--;
+					if (travel_handle && !travel_handle->Playing()) {
+						travel_handle = core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
+					}
 				}
 				return;
 			}
@@ -796,9 +805,10 @@ void Projectile::DoStep(unsigned int walk_speed)
 
 }
 
-void Projectile::SetCaster(ieDword caster)
+void Projectile::SetCaster(ieDword caster, int level)
 {
 	Caster=caster;
+	Level=level;
 }
 
 ieDword Projectile::GetCaster() const
@@ -1054,14 +1064,20 @@ void Projectile::SecondaryTarget()
 				continue;
 			}
 		}
-		Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
-		pro->SetEffectsCopy(effects);
-		//copy the additional effects reference to the child projectile
-		memcpy(pro->SuccSpell, SuccSpell, sizeof(ieResRef) );
-		pro->SetCaster(Caster);
-		//TODO:actually some of the splash projectiles are a good example of faketarget
-		//projectiles (that don't follow the target, but still hit)
-		area->AddProjectile(pro, Pos, Target, false);
+		if (Extension->ExplProjIdx) {
+			Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
+			pro->SetEffectsCopy(effects);
+			//copy the additional effects reference to the child projectile
+			//but only when there is a spell to copy
+			if (SuccSpell[0])
+				memcpy(pro->SuccSpell, SuccSpell, sizeof(ieResRef) );
+			pro->SetCaster(Caster, Level);
+			//this is needed to apply the success spell on the center point
+			pro->SetTarget(Pos);
+			//TODO:actually some of the splash projectiles are a good example of faketarget
+			//projectiles (that don't follow the target, but still hit)
+			area->AddProjectile(pro, Pos, Target, false);
+		}
 		poi++;
 		fail=false;
 
@@ -1080,7 +1096,7 @@ void Projectile::SecondaryTarget()
 		if (actor) {
 			//name is the projectile's name
 			//for simplicity, we apply a spell of the same name
-			core->ApplySpell(name, actor, actor, 0);
+			core->ApplySpell(name, actor, actor, Level);
 		}
 	}
 }
@@ -1235,6 +1251,8 @@ void Projectile::DrawExplosion(const Region &screen)
 
 	ProjectileServer *server = core->GetProjectileServer();
 	//the center of the explosion could be another projectile played over the target
+	//warning: this projectile doesn't inherit any effects, so its payload function
+	//won't be doing anything (any effect of PAF_SECONDARY?)
 	if (Extension->FragProjIdx) {
 		Projectile *pro = server->GetProjectileByIndex(Extension->FragProjIdx);
 		if (pro) {
