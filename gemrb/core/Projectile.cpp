@@ -34,7 +34,8 @@
 #include <cstdlib>
 
 //to get gradient color
-#define PALSIZE 12
+//apparently pst doesn't have the small palette correctly
+#define PALSIZE 32
 
 static const ieByte SixteenToNine[MAX_ORIENT]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
 static const ieByte SixteenToFive[MAX_ORIENT]={0,1,2,3,4,3,2,1,0,1,2,3,4,3,2,1};
@@ -925,6 +926,11 @@ int Projectile::CalculateTargetFlag()
 		return flags;
 	}
 
+	//this is the only way to affect neutrals and enemies
+	if (Extension->APFlags&APF_INVERT_TARGET) {
+		flags^=(GA_NO_ALLY|GA_NO_ENEMY);
+	}
+
 	Actor *caster = area->GetActorByGlobalID(Caster);
 	if (caster && ((Actor *) caster)->GetStat(IE_EA)<EA_GOODCUTOFF) {
 		return flags;
@@ -1019,6 +1025,14 @@ void Projectile::SecondaryTarget()
 	Actor **actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	Actor **poi=actors;
 
+	if (Extension->DiceCount) {
+		//precalculate the maximum affected target count in case of PAF_AFFECT_ONE 
+		extension_targetcount = core->Roll(Extension->DiceCount, Extension->DiceSize, 0);
+	} else {
+		//this is the default case (for original engine)
+		extension_targetcount = 1;
+	}
+
 	while(*poi) {
 		ieDword Target = (*poi)->GetGlobalID();
 
@@ -1082,9 +1096,19 @@ void Projectile::SecondaryTarget()
 		fail=false;
 
 		//we already got one target affected in the AOE, this flag says
-		//that was enough
+		//that was enough (the GemRB extension can repeat this a random time (x d y)
 		if(Extension->AFlags&PAF_AFFECT_ONE) {
-			break;
+			if (extension_targetcount<=0) {
+				break;
+			}
+			//if target counting is per HD and this target is an actor, use the xp level field
+			//otherwise count it as one
+			if ((Extension->APFlags&APF_COUNT_HD) && ((*poi)->Type==ST_ACTOR) ) {
+				Actor *actor = (Actor *) *poi;
+				extension_targetcount-= actor->GetXPLevel(true);
+			} else {
+				extension_targetcount--;
+			}
 		}
 	}
 	free(actors);
@@ -1272,7 +1296,16 @@ void Projectile::DrawExplosion(const Region &screen)
 			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
 			if (vvc) {
 				if (apflags & APF_VVCPAL) {
-					vvc->SetPalette(Extension->ExplColor);
+					//if the palette is used as tint (as opposed to clown colorset) tint the vvc
+					if (apflags & APF_TINT) {
+						Color tmpColor[PALSIZE];
+
+						core->GetPalette( Extension->ExplColor, PALSIZE, tmpColor );
+						vvc->Tint = tmpColor[PALSIZE/2];
+						vvc->Transparency |= BLIT_TINTED;
+					} else {
+						vvc->SetPalette(Extension->ExplColor);
+					}
 				}
 				//if the trail oriented, then the center is oriented too
 				if (ExtFlags&PEF_TRAIL) {

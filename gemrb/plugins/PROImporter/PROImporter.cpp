@@ -156,8 +156,10 @@ void PROImporter::GetAreaExtension(ProjectileExtension *e)
 	str->ReadResRef( e->Secondary );
 	str->ReadResRef( e->AreaSound );
 	str->ReadDword( &e->APFlags );
+  str->ReadWord( &e->DiceCount );
+  str->ReadWord( &e->DiceSize );
 	//we skip the rest
-	str->Seek(188, GEM_CURRENT_POS);
+	str->Seek(184, GEM_CURRENT_POS);
 }
 
 #include "plugindef.h"

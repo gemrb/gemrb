@@ -117,7 +117,6 @@
 #define PAF_DELAY      0x4000 //
 #define PAF_AFFECT_ONE 0x8000 //
 
-
 //area projectile flags (in areapro.2da)
 //this functionality was hardcoded in the original engine, so the bit flags are
 //completely arbitrary (i assign them as need arises)
@@ -139,6 +138,13 @@
 #define APF_MORE      128
 //apply spell on caster if failed to find target
 #define APF_SPELLFAIL 256
+//multiple directions 
+#define APF_MULTIDIR  512
+//target HD counting
+#define APF_COUNT_HD  1024
+//target flag enemy ally switched
+#define APF_INVERT_TARGET 2048
+//
 
 struct ProjectileExtension
 {
@@ -160,6 +166,9 @@ struct ProjectileExtension
 	ieResRef Spread;    //areapro.2da first resref
 	ieResRef Secondary; //areapro.2da third resref
 	ieResRef AreaSound; //areapro.2da second sound resource
+	//used for target or HD counting
+	ieWord DiceCount;
+	ieWord DiceSize;
 };
 
 class GEM_EXPORT Projectile
@@ -231,6 +240,7 @@ protected:
 	//these come from the extension area
 	int extension_delay;
 	int extension_explosioncount;
+	int extension_targetcount;
 	Color tint;
 
 	//special (not using char animations)
