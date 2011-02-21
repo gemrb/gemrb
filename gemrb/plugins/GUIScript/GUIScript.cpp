@@ -9011,13 +9011,14 @@ static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
 
 	GET_GAME();
 
-	GET_MAP();
+	Map *map = game->GetCurrentArea();
 
 	Actor* actor = game->FindPC( PartyID );
 	if (!actor) {
 		return RuntimeError( "Actor not found!\n" );
 	}
-	Actor *caster = map->GetActorByGlobalID(casterID);
+	Actor *caster = NULL;
+	if (map) caster = map->GetActorByGlobalID(casterID);
 	if (!caster) caster = game->GetActorByGlobalID(casterID);
 	if (!caster) caster = actor;
 
