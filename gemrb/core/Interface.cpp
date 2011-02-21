@@ -1489,13 +1489,15 @@ int Interface::Init()
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_DIRECTORY);
 
 		//IWD2 movies are on the CD but not in the BIF
+		char *description = strdup("CD1/data");
 		for (i = 0; i < MAX_CD; i++) {
 			for (size_t j=0;j<CD[i].size();j++) {
-				char description[] = {'C', 'D', '1'+i, '/', 'd', 'a', 't', 'a', '\0'};
+				description[2]='1'+i;				
 				PathJoin( path, CD[i][j].c_str(), GameDataPath, NULL);
 				gamedata->AddSource(path, description, PLUGIN_RESOURCE_DIRECTORY);
 			}
 		}
+		free(description);
 
 		printStatus( "OK", LIGHT_GREEN );
 	}
@@ -2055,36 +2057,11 @@ void Interface::SetFeature(int flag, int position)
 	} else {
 		GameFeatures[position>>5] &= ~(1<<(position&31) );
 	}
-/*
-	if (position>=32) {
-		position-=32;
-		if (flag) {
-			GameFeatures2 |= 1 << position;
-		} else {
-			GameFeatures2 &= ~( 1 << position );
-		}
-		return;
-	}
-	if (flag) {
-		GameFeatures |= 1 << position;
-	} else {
-		GameFeatures &= ~( 1 << position );
-	}
-*/
 }
 
 ieDword Interface::HasFeature(int position) const
 {
 	return GameFeatures[position>>5] & (1<<(position&31));
-/*
-	if (position>=64) {
-		return GameFeatures3 & ( 1 << (position-64) );
-	}
-	if (position>=32) {
-		return GameFeatures2 & ( 1 << (position-32) );
-	}
-	return GameFeatures & ( 1 << position );
-*/
 }
 
 /** Search directories and load a config file */

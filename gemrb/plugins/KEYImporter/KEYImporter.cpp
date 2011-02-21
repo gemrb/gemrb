@@ -30,10 +30,12 @@
 
 KEYImporter::KEYImporter(void)
 {
+	description = NULL;
 }
 
 KEYImporter::~KEYImporter(void)
 {
+	free(description);
 	for (unsigned int i = 0; i < biffiles.size(); i++) {
 		free( biffiles[i].name );
 	}
@@ -123,7 +125,8 @@ static void FindBIF(BIFEntry *entry)
 
 bool KEYImporter::Open(const char *resfile, const char *desc)
 {
-	description = desc;
+	free(description);
+	description = strdup(desc);
 	if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
 		printf( "[ERROR]\nAn Archive Plug-in is not Available\n" );
 		return false;

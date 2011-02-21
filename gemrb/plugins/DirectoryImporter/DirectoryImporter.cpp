@@ -27,15 +27,18 @@
 
 DirectoryImporter::DirectoryImporter(void)
 {
+	description = NULL;
 }
 
 DirectoryImporter::~DirectoryImporter(void)
 {
+	free(description);
 }
 
 bool DirectoryImporter::Open(const char *dir, const char *desc)
 {
-	description = desc;
+	free(description);
+	description = strdup(desc);
 	strcpy(path, dir);
 	return true;
 }

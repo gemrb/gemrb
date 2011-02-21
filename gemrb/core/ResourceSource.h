@@ -41,7 +41,7 @@ public:
 	virtual DataStream* GetResource(const char* resname, const ResourceDesc &type) = 0;
 	const char *GetDescription() const { return description; }
 protected:
-	const char *description;
+	char *description;
 };
 
 #endif
