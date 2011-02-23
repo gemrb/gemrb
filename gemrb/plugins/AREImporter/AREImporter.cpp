@@ -1446,7 +1446,9 @@ int AREImporter::PutHeader(DataStream *stream, Map *map)
 	stream->WriteDword( &VariablesOffset );
 	stream->WriteDword( &VariablesCount );
 	stream->WriteDword( &tmpDword);
-	GameScript *s = map->Scripts[0];
+
+	//the saved area script is in the last script slot!
+	GameScript *s = map->Scripts[MAX_SCRIPTS-1];
 	if (s) {
 		stream->WriteResRef( s->GetName() );
 	} else {
