@@ -25,6 +25,8 @@
 #  Game Type [String] Use one of the following      #
 #  values:                                          #
 #                                                   #
+#  auto      Attempt to autodetect game type        #
+#                                                   #
 #  bg1       Baldur's Gate                          #
 #  bg2       Baldur's Gate 2 : SoA or ToB           #
 #  tob       Baldur's Gate 2 : ToB (obsolete)       #

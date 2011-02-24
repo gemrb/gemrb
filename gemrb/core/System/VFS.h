@@ -131,10 +131,10 @@ GEM_EXPORT void FixPath (char *path, bool needslash);
 
 GEM_EXPORT void ExtractFileFromPath(char *file, const char *full_path);
 
-class DirectoryIterator {
+class GEM_EXPORT DirectoryIterator {
 public:
 	/**
-	 * @param[in] path Path to direcrtory to search.
+	 * @param[in] path Path to directory to search.
 	 *
 	 * WARNING: the lifetime of path must be longer than the lifetime
 	 * of DirectoryIterator.

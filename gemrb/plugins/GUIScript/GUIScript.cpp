@@ -51,6 +51,7 @@
 #include "GUI/MapControl.h"
 #include "GUI/TextEdit.h"
 #include "GUI/WorldMapControl.h"
+#include "System/VFS.h"
 
 #include <cstdio>
 
@@ -9928,8 +9929,39 @@ static PyObject* GemRB_GetMazeEntry(PyObject* /*self*/, PyObject* args)
 	return dict;
 }
 
+char gametype_hint[100];
+int gametype_hint_weight;
+
+PyDoc_STRVAR( GemRB_AddGameTypeHint__doc,
+"AddGameTypeHint(type, weight, flags=0)\n\n"
+"Asserts that GameType should be TYPE, with confidence WEIGHT. "
+"Original games should use WEIGHT <= 100, greater values are reserved for new games. "
+"FLAGS are not used at the moment.");
+
+static PyObject* GemRB_AddGameTypeHint(PyObject* /*self*/, PyObject* args)
+{
+	char* type;
+	int weight;
+	int flags = 0;
+
+	if (!PyArg_ParseTuple( args, "si|i", &type, &weight, &flags )) {
+		return AttributeError( GemRB_AddGameTypeHint__doc );
+	}
+
+	if (weight > gametype_hint_weight) {
+		gametype_hint_weight = weight;
+		strncpy(gametype_hint, type, sizeof(gametype_hint)-1);
+		// I assume the '\0' in the end of gametype_hint
+	}
+
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(ActOnPC, METH_VARARGS),
+	METHOD(AddGameTypeHint, METH_VARARGS),
 	METHOD(AddNewArea, METH_VARARGS),
 	METHOD(ApplyEffect, METH_VARARGS),
 	METHOD(ApplySpell, METH_VARARGS),
@@ -10262,6 +10294,26 @@ GUIScript::~GUIScript(void)
 	GUIAction[0]=UNINIT_IEDWORD;
 }
 
+/**
+ * Quote path for use in python strings.
+ * On windows also convert backslashes to forward slashes.
+ */
+char* QuotePath(char* tgt, const char* src)
+{
+	char *p = tgt;
+	char c;
+
+	do {
+		c = *src++;
+#ifdef WIN32
+		if (c == '\\') c = '/';
+#endif
+		if (c == '"' || c == '\\') *p++ = '\\';
+	} while (0 != (*p++ = c));
+	return tgt;
+}
+
+
 PyDoc_STRVAR( GemRB__doc,
 "Module exposing GemRB data and engine internals\n\n"
 "This module exposes to python GUIScripts GemRB engine data and internals."
@@ -10304,8 +10356,34 @@ bool GUIScript::Init(void)
 
 	char path[_MAX_PATH];
 	char path2[_MAX_PATH];
+	char quoted[_MAX_PATH];
 
 	PathJoin(path, core->GUIScriptsPath, "GUIScripts", NULL);
+
+	// Add generic script path early, so GameType detection works
+	sprintf( string, "sys.path.append(\"%s\")", QuotePath( quoted, path ));
+	if (PyRun_SimpleString( string ) == -1) {
+		printMessage( "GUIScript", string, RED );
+		return false;
+	}
+
+	sprintf( string, "import GemRB\n");
+	if (PyRun_SimpleString( "import GemRB" ) == -1) {
+		printMessage( "GUIScript", string, RED );
+		return false;
+	}
+
+	// FIXME: better would be to add GemRB.GetGamePath() or some such
+	sprintf( string, "GemRB.GamePath = \"%s\"", QuotePath( quoted, core->GamePath ));
+	if (PyRun_SimpleString( string ) == -1) {
+		printMessage( "GUIScript", string, RED );
+		return false;
+	}
+
+	// Detect GameType if it was set to auto
+	if (stricmp( core->GameType, "auto" ) == 0) {
+		Autodetect();
+	}
 
 	// use the iwd guiscripts for how, but leave its override
 	if (stricmp( core->GameType, "how" ) == 0) {
@@ -10314,38 +10392,13 @@ bool GUIScript::Init(void)
 		PathJoin(path2, path, core->GameType, NULL);
 	}
 
-#ifdef WIN32
-	char *p;
-
-	for (p = path; *p != 0; p++)
-	{
-		if (*p == '\\')
-			*p = '/';
-	}
-
-	for (p = path2; *p != 0; p++)
-	{
-		if (*p == '\\')
-			*p = '/';
-	}
-#endif
-
-	sprintf( string, "sys.path.append(\"%s\")", path2 );
+	// GameType-specific import path must have a higher priority than
+	//   the generic one, so insert it before it
+	sprintf( string, "sys.path.insert(-1, \"%s\")", QuotePath( quoted, path2 ));
 	if (PyRun_SimpleString( string ) == -1) {
 		printMessage( "GUIScript", string, RED );
 		return false;
 	}
-	sprintf( string, "sys.path.append(\"%s\")", path );
-	if (PyRun_SimpleString( string ) == -1) {
-		printMessage( "GUIScript", string, RED );
-		return false;
-	}
-	sprintf( string, "import GemRB\n");
-	if (PyRun_SimpleString( "import GemRB" ) == -1) {
-		printMessage( "GUIScript", string, RED );
-		return false;
-	}
-
 	sprintf( string, "GemRB.GameType = \"%s\"", core->GameType);
 	if (PyRun_SimpleString( string ) == -1) {
 		printMessage( "GUIScript", string, RED );
@@ -10394,6 +10447,47 @@ bool GUIScript::Init(void)
 	/* pGUIClasses is a borrowed reference */
 
 	return true;
+}
+
+bool GUIScript::Autodetect(void)
+{
+	printMessage( "GUIScript", "Detecting GameType: ", WHITE);
+
+	char path[_MAX_PATH];
+	PathJoin( path, core->GUIScriptsPath, "GUIScripts", NULL );
+	DirectoryIterator iter( path );
+	if (!iter)
+		return false;
+
+	gametype_hint[0] = '\0';
+	gametype_hint_weight = 0;
+
+	do {
+		const char *dirent = iter.GetName();
+		char module[_MAX_PATH];
+
+		//printf("DE: %s\n", dirent);
+		if (iter.IsDirectory() && dirent[0] != '.') {
+			// NOTE: these methods subtly differ in sys.path content, need for __init__.py files ...
+			// Method1:
+			PathJoin(module, core->GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py", NULL);
+			ExecFile(module);
+			// Method2:
+			//strcpy( module, dirent );
+			//strcat( module, ".Autodetect");
+			//LoadScript(module);
+		}
+	} while (++iter);
+
+	if (gametype_hint[0]) {
+		printStatus(gametype_hint, GREEN);
+		strcpy(core->GameType, gametype_hint);
+		return true;
+	}
+	else {
+		printStatus("ERROR", LIGHT_RED);
+		return false;
+	}
 }
 
 bool GUIScript::LoadScript(const char* filename)

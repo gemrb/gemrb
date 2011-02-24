@@ -47,6 +47,8 @@ public:
 	~GUIScript(void);
 	/** Initialization Routine */
 	bool Init(void);
+	/** Autodetect GameType */
+	bool Autodetect(void);
 	/** Load Script */
 	bool LoadScript(const char* filename);
 	/** Run Function */
