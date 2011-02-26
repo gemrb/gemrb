@@ -520,7 +520,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 	switch (fx->Target) {
 	case FX_TARGET_ORIGINAL:
 		fx->SetPosition(self->Pos);
-		
+
 		flg = ApplyEffect( st, fx, 1 );
 		if( fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
 			if( st) {
@@ -744,6 +744,10 @@ inline bool check_level(Actor *target, Effect *fx)
 {
 	//skip non level based effects
 	if( IsDicedEffect((int) fx->Opcode)) {
+		//add the caster level to the dice count
+		if (fx->IsVariable) {
+			fx->DiceThrown+=fx->CasterLevel;
+		}
 		fx->Parameter1 = DICE_ROLL((signed)fx->Parameter1);
 		//this is a hack for PST style diced effects
 		if( core->HasFeature(GF_SAVE_FOR_HALF) ) {
@@ -778,7 +782,7 @@ inline bool check_level(Actor *target, Effect *fx)
 	return false;
 }
 
-//roll for the effect probability, there is a high and a low treshold, the d100 
+//roll for the effect probability, there is a high and a low treshold, the d100
 //roll should hit in the middle
 inline bool check_probability(Effect* fx)
 {
