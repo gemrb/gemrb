@@ -3831,9 +3831,14 @@ void Interface::SetCutSceneMode(bool active)
 	video->SetMouseEnabled(!active);
 }
 
+/** returns true if in dialogue or cutscene */
 bool Interface::InCutSceneMode() const
 {
-	return (GetGameControl()->GetScreenFlags()&SF_DISABLEMOUSE)!=0;
+	GameControl *gc = GetGameControl();
+	if (!gc || (gc->GetDialogueFlags()&DF_IN_DIALOG) || (gc->GetScreenFlags()&SF_DISABLEMOUSE) ) {
+  		return true;
+	}
+	return false;
 }
 
 void Interface::QuitGame(int BackToMain)
