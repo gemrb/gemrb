@@ -54,8 +54,20 @@ def StartLoadScreen ():
 	return
 
 def EndLoadScreen ():
-	Skull = LoadScreen.GetControl (3)
-	Skull.SetMOS ("GTRBPSK2")
-	LoadScreen.SetVisible (WINDOW_VISIBLE)
-	LoadScreen.Unload()
+	global LoadScreen
+
+	if LoadScreen:
+		Skull = LoadScreen.GetControl (3)
+		Skull.SetMOS ("GTRBPSK2")
+		LoadScreen.SetVisible (WINDOW_VISIBLE)
+		LoadScreen.Unload()
+	LoadScreen = None
+	return
+
+def CloseLoadScreen ():
+	global LoadScreen
+
+	if LoadScreen:
+		LoadScreen.Unload()
+	LoadScreen = None
 	return

@@ -103,9 +103,7 @@ def OnLoad ():
 			GemRB.SetVar ("SaveDir",1) #using mpsave
 			GemRB.SetVar ("PlayMode",0) #using first row
 
-	if LoadScreen.LoadScreen:
-		LoadScreen.LoadScreen.Unload()
-
+	LoadScreen.CloseLoadScreen()
 	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
