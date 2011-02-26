@@ -1725,7 +1725,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 		return;
 	}
 
-	core->SetEventFlag(EF_TARGETMODE);
+	core->SetEventFlag(EF_RESETTARGET);
 
 	if (target_mode == TARGET_MODE_ATTACK) {
 		actor->ClearPath();
@@ -1763,7 +1763,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 		return;
 	}
 
-	core->SetEventFlag(EF_TARGETMODE);
+	core->SetEventFlag(EF_RESETTARGET);
 
 	if (target_mode == TARGET_MODE_ATTACK) {
 		actor->ClearPath();
@@ -1998,7 +1998,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 				}
 			} else {
 				if (HandleActiveRegion(overInfoPoint, pc, p)) {
-					core->SetEventFlag(EF_TARGETMODE);
+					core->SetEventFlag(EF_RESETTARGET);
 					return;
 				}
 			}
