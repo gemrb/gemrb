@@ -140,17 +140,18 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 	EffectQueue *selfqueue = NULL;
 
 	for (int i=0;i<count;i++) {
-		if (Flags & SF_SIMPLIFIED_DURATION) {
+		Effect *fx = features+i;
+
+		if ((Flags & SF_SIMPLIFIED_DURATION) && (block_index>=0)) {
 			//hack the effect according to Level
 			//fxqueue->AddEffect will copy the effect,
 			//so we don't risk any overwriting
 			if (EffectQueue::HasDuration(features+i)) {
-				features[i].Duration = (TimePerLevel*block_index+TimeConstant)*core->Time.round_sec;
+				fx->Duration = (TimePerLevel*block_index+TimeConstant)*core->Time.round_sec;
 			}
 		}
 		//fill these for completeness, inventoryslot is a good way
 		//to discern a spell from an item effect
-		Effect *fx = features+i;
 
 		fx->InventorySlot = 0xffff;
 		//the hostile flag is used to determine if this was an attack
