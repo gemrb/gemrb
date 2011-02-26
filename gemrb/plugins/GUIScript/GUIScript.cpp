@@ -9107,7 +9107,8 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	//
 	switch (forcetarget) {
 		case TARGET_SELF:
-			actor->UseItem(itemdata.slot, itemdata.headerindex, actor, flags);
+			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_POINT, itemdata.TargetNumber);
+			gc->TryToCast(actor, actor);
 			break;
 		case TARGET_NONE:
 			gc->ResetTargetMode();
