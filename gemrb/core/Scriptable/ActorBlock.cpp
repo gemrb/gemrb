@@ -628,7 +628,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 	while(duplicate --) {
 		Projectile *pro = NULL;
 		// jump through hoops to skip applying selftargetting spells to the caster
-		//  if we'll be changing the target
+		// if we'll be changing the target
 		int tct = 0;
 		if (caster) {
 			tct = caster->wildSurgeMods.target_change_type;
@@ -1052,11 +1052,12 @@ int Scriptable::SpellCast(bool instant)
 {
 	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	Actor *actor = NULL;
+	int level = 0;
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
 
 		//The ext. index is here to calculate the casting time
-		int level = actor->GetCasterLevel(spl->SpellType);
+		level = actor->GetCasterLevel(spl->SpellType);
 		SpellHeader = spl->GetHeaderIndexFromLevel(level);
 	} else {
 		SpellHeader = 0;
@@ -1077,7 +1078,7 @@ int Scriptable::SpellCast(bool instant)
 	}
 	if (actor) {
 		//cfb
-		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1);
+		EffectQueue *fxqueue = spl->GetEffectBlock(this, this->Pos, -1, level);
 		fxqueue->SetOwner(actor);
 		if (!actor->Modified[IE_AVATARREMOVAL]) {
 			spl->AddCastingGlow(fxqueue, duration, actor->Modified[IE_SEX]);
@@ -1330,7 +1331,7 @@ static const unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
 
 void Selectable::DrawCircle(const Region &vp)
 {
-	/*  BG2 colours ground circles as follows:
+	/* BG2 colours ground circles as follows:
 	dark green for unselected party members
 	bright green for selected party members
 	flashing green/white for a party member the mouse is over
@@ -1390,7 +1391,7 @@ bool Selectable::IsOver(const Point &P) const
 	if (dy < -(csize-1)*12 || dy > (csize-1)*12) return false;
 
 	// then check ellipse
-	int r = 9*dx*dx + 16*dy*dy; // 48^2 * (  (dx/16)^2 + (dy/12)^2  )
+	int r = 9*dx*dx + 16*dy*dy; // 48^2 * ( (dx/16)^2 + (dy/12)^2 )
 
 	return (r <= 48*48*(csize-1)*(csize-1));
 }
@@ -2326,7 +2327,7 @@ void Door::TryBashLock(Actor *actor)
 void Door::DebugDump() const
 {
 	printf( "Debugdump of Door %s:\n", GetScriptName() );
-	printf( "Door Global ID:  %d\n", GetGlobalID());
+	printf( "Door Global ID: %d\n", GetGlobalID());
 	printf( "Position: %d.%d\n", Pos.x, Pos.y);
 	printf( "Door Open: %s\n", YESNO(IsOpen()));
 	printf( "Door Locked: %s\n", YESNO(Flags&DOOR_LOCKED));
@@ -2551,7 +2552,7 @@ void InfoPoint::DebugDump() const
 			printf( "Debugdump of Unsupported Region %s:\n", GetScriptName() );
 			break;
 	}
-	printf( "Region Global ID:  %d\n", GetGlobalID());
+	printf( "Region Global ID: %d\n", GetGlobalID());
 	printf( "Position: %d.%d\n", Pos.x, Pos.y);
 	switch(Type) {
 	case ST_TRAVEL:
@@ -2806,7 +2807,7 @@ void Container::TryBashLock(Actor *actor)
 void Container::DebugDump() const
 {
 	printf( "Debugdump of Container %s\n", GetScriptName() );
-	printf( "Container Global ID:  %d\n", GetGlobalID());
+	printf( "Container Global ID: %d\n", GetGlobalID());
 	printf( "Position: %d.%d\n", Pos.x, Pos.y);
 	printf( "Type: %d, Locked: %s, LockDifficulty: %d\n", Type, YESNO(Flags&CONT_LOCKED), LockDifficulty );
 	printf( "Flags: %d, Trapped: %s, Detected: %d\n", Flags, YESNO(Trapped), TrapDetected );

@@ -4916,8 +4916,8 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Scriptable *cas
 		return;
 	}
 
-	level = spell->GetHeaderIndexFromLevel(level);
-	EffectQueue *fxqueue = spell->GetEffectBlock(caster, actor->Pos, level);
+	int header = spell->GetHeaderIndexFromLevel(level);
+	EffectQueue *fxqueue = spell->GetEffectBlock(caster, actor->Pos, header, level);
 
 	ApplyEffectQueue(fxqueue, actor, caster, actor->Pos);
 	delete fxqueue;
@@ -4973,7 +4973,7 @@ int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *
 		}
 		fxqueue->SetOwner( caster );
 
-		if (fxqueue->AddAllEffects( actor, p )==FX_NOT_APPLIED) {
+		if (fxqueue->AddAllEffects( actor, p)==FX_NOT_APPLIED) {
 			res=0;
 		}
 	}

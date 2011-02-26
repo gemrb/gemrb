@@ -118,7 +118,7 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 	delete fx;
 }
 
-EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, ieDword pro) const
+EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro) const
 {
 	Effect *features;
 	int count;
@@ -156,6 +156,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		fx->InventorySlot = 0xffff;
 		//the hostile flag is used to determine if this was an attack
 		fx->SourceFlags = Flags;
+		fx->CasterLevel = level;
 
 		// apply the stat-based spell duration modifier
 		if (self->Type == ST_ACTOR) {

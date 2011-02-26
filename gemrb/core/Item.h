@@ -99,6 +99,8 @@ class Projectile;
 #define CHG_NOSOUND 2
 #define CHG_DAY     3
 
+//items caster level is hardcoded to 10
+#define ITEM_CASTERLEVEL   10
 /**
  * @class ITMExtHeader
  * Header for special effects and uses of an Item.
