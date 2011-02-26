@@ -2486,6 +2486,21 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_blind_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
+	//pst power word blind projectile support
+	if (fx->Parameter2==1) {
+		fx->Parameter2 = 0;
+		int stat = target->GetSafeStat(IE_HITPOINTS);
+		if (stat<25) {
+			stat = core->Roll(1,240,150);
+		} else if (stat<50) {
+			stat = core->Roll(1,120,70);
+		} else if (stat<100) {
+			stat = core->Roll(1,30,15);
+		} else stat = 0;
+		fx->Duration = core->GetGame()->GameTime+stat;
+
+	}
+
 	//don't do this effect twice (bug exists in BG2, but fixed in IWD2)
 	if (!STATE_GET(STATE_BLIND)) {
 		STATE_SET( STATE_BLIND );
