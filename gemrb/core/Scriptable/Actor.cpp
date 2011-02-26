@@ -6040,7 +6040,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT);
 	gamedata->FreeItem(itm,tmpresref, false);
 	if (pro) {
-		pro->SetCaster(GetGlobalID(), 10);
+		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
 		GetCurrentArea()->AddProjectile(pro, Pos, target);
 		return true;
 	}
@@ -6077,7 +6077,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	gamedata->FreeItem(itm,tmpresref, false);
 	if (pro) {
 		//ieDword is unsigned!!
-		pro->SetCaster(GetGlobalID(), 10);
+		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
 		if(((int)header < 0) && !(flags&UI_MISS)) { //using a weapon
 			bool ranged = header == (ieDword)-2;
 			ITMExtHeader *which = itm->GetWeaponHeader(ranged);
