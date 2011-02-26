@@ -135,7 +135,7 @@ GameControl::GameControl(void)
 	numScrollCursor = 0;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
-	EnableRunning = true;  //make this a game flag if you wish
+	EnableRunning = true; //make this a game flag if you wish
 	ieDword tmp=0;
 
 	ResetTargetMode();
@@ -1108,7 +1108,7 @@ void GameControl::DisplayTooltip() {
 							strindex = STR_INJURED2;
 						} else if (hp > maxhp/3) {
 							strindex = STR_INJURED3;
-						} else  {
+						} else {
 							strindex = STR_INJURED4;
 						}
 						strindex = displaymsg->GetStringReference(strindex);
@@ -1725,18 +1725,18 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 		return;
 	}
 
+	core->SetEventFlag(EF_TARGETMODE);
+
 	if (target_mode == TARGET_MODE_ATTACK) {
 		actor->ClearPath();
 		actor->ClearActions();
 		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", container->GetScriptName());
 		actor->AddAction(GenerateAction(Tmp));
-		ResetTargetMode();
 		return;
 	}
 
 	if ((target_mode == TARGET_MODE_PICK)) {
 		TryToPick(actor, container);
-		ResetTargetMode();
 		return;
 	}
 
@@ -1763,18 +1763,18 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 		return;
 	}
 
+	core->SetEventFlag(EF_TARGETMODE);
+
 	if (target_mode == TARGET_MODE_ATTACK) {
 		actor->ClearPath();
 		actor->ClearActions();
 		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", door->GetScriptName());
 		actor->AddAction(GenerateAction(Tmp));
-		ResetTargetMode();
 		return;
 	}
 
 	if (target_mode == TARGET_MODE_PICK) {
 		TryToPick(actor, door);
-		ResetTargetMode();
 		return;
 	}
 
@@ -1797,7 +1797,6 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 	}
 	if ((target_mode == TARGET_MODE_PICK)) {
 		TryToDisarm(actor, trap);
-		ResetTargetMode();
 		return true;
 	}
 
@@ -1999,6 +1998,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 				}
 			} else {
 				if (HandleActiveRegion(overInfoPoint, pc, p)) {
+					core->SetEventFlag(EF_TARGETMODE);
 					return;
 				}
 			}
@@ -2191,8 +2191,12 @@ void GameControl::SetTargetMode(int mode) {
 }
 
 void GameControl::ResetTargetMode() {
-	SetTargetMode(TARGET_MODE_NONE);
 	target_types = GA_NO_DEAD|GA_NO_HIDDEN;
+	SetTargetMode(TARGET_MODE_NONE);
+}
+
+void GameControl::UpdateTargetMode() {
+	SetTargetMode(target_mode);
 }
 
 /** Special Key Press */

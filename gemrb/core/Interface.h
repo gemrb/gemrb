@@ -201,6 +201,8 @@ public:
 #define EF_OPENSTORE     256      //open store window
 #define EF_EXPANSION     512      //upgrade game request
 #define EF_CREATEMAZE    1024     //call the maze generator
+#define EF_RESETTARGET   2048     //reset the mouse cursor
+#define EF_TARGETMODE    4096     //update the mouse cursor
 
 //autopause
 #define AP_UNUSABLE      0

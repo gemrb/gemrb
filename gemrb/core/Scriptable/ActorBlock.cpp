@@ -2204,6 +2204,7 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 	UpdateDoor();
 	area->ActivateWallgroups(open_wg_index, open_wg_count, Flags&DOOR_OPEN);
 	area->ActivateWallgroups(closed_wg_index, closed_wg_count, !(Flags&DOOR_OPEN));
+	core->SetEventFlag(EF_TARGETMODE);
 }
 
 bool Door::TryUnlock(Actor *actor) {

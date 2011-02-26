@@ -216,6 +216,7 @@ public:
 	void TryToDisarm(Actor *source, InfoPoint *tgt);
 	void PerformActionOn(Actor *actor);
 	void ResetTargetMode();
+	void UpdateTargetMode();
 
 	// returns the default cursor fitting the targeting mode 
 	int GetDefaultCursor() const;

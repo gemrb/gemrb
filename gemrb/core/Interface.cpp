@@ -592,6 +592,19 @@ void Interface::HandleEvents()
 		guiscript->RunFunction( "Maze", "CreateMaze", false );
 		return;
 	}
+
+	if ((EventFlag&EF_RESETTARGET) && gc) {
+		EventFlag&=~EF_RESETTARGET;
+		EventFlag|=EF_TARGETMODE;
+		gc->ResetTargetMode();
+		return;
+	}
+
+	if ((EventFlag&EF_TARGETMODE) && gc) {
+		EventFlag&=~EF_TARGETMODE;
+		gc->UpdateTargetMode();
+		return;
+	}
 }
 
 /* handle main loop events that might destroy or create windows
