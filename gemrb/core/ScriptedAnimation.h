@@ -82,6 +82,7 @@ public:
 	ieDword FaceTarget;
 	ieByte Orientation;
 	ieDword Duration;
+	ieDword Delay;
 	bool justCreated;
 	ieResRef ResName;
 	int Phase;
@@ -111,6 +112,8 @@ public:
 	SpriteCover* GetSpriteCover() const { return cover; }
 	int GetCurrentFrame();
 	ieDword GetSequenceDuration(ieDword multiplier);
+	/* sets up a delay in the beginning of the vvc */
+	void SetDelay(ieDword delay);
 	/* sets default duration if it wasn't set yet */
 	void SetDefaultDuration(unsigned int duration);
 	/* sets up the direction of the vvc */

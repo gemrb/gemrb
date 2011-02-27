@@ -86,6 +86,7 @@ void ScriptedAnimation::Init()
 	Phase = P_NOTINITED;
 	effect_owned = false;
 	active = true;
+	Delay = 0;
 }
 
 void ScriptedAnimation::Override(ScriptedAnimation *templ)
@@ -490,6 +491,14 @@ ieDword ScriptedAnimation::GetSequenceDuration(ieDword multiplier)
 	return 0;
 }
 
+void ScriptedAnimation::SetDelay(ieDword delay)
+{
+	Delay = delay;
+	if (twin) {
+		twin->Delay=delay;
+	}
+}
+
 void ScriptedAnimation::SetDefaultDuration(ieDword duration)
 {
 	if (Duration==0xffffffff) {
@@ -522,6 +531,11 @@ bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 			printMessage("ScriptedAnimation", "Not fully initialised VVC!\n", LIGHT_RED);
 			return true;
 		}
+		if (Delay) {
+		  Delay--;
+		  return false;
+		}
+
 		if (Duration!=0xffffffff) {
 			Duration += core->GetGame()->GameTime;
 		}
@@ -594,7 +608,13 @@ bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color
 	Sprite2D* frame;
 
 	if (HandlePhase(frame)) {
+		//expired
 		return true;
+	}
+
+	//delayed
+	if (justCreated) {
+		return false;
 	}
 
 	ieDword flag = BLIT_TRANSSHADOW;
