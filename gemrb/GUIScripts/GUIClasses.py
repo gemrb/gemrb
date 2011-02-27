@@ -56,7 +56,7 @@ class GWindow:
     'SetPos': _GemRB.Window_SetPos,
     'HasControl': _GemRB.Window_HasControl,
     'DeleteControl': _GemRB.Window_DeleteControl,
-    'Unload': _GemRB.Window_Unload,
+    #'Unload': _GemRB.Window_Unload,
     'SetupEquipmentIcons': _GemRB.Window_SetupEquipmentIcons,
     'SetupSpellIcons': _GemRB.Window_SetupSpellIcons,
     'SetupControls': _GemRB.Window_SetupControls,
