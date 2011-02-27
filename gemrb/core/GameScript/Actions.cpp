@@ -5569,6 +5569,13 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	if (core->InCutSceneMode()) {
+		//cannot use container in dialog or cutscene
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	Actor *actor = (Actor *)Sender;
 	Container *container = core->GetCurrentContainer();
 	if (!container) {
