@@ -560,22 +560,25 @@ void Projectile::Payload()
 		//apply this spell on target when the projectile fails
 		if (FailedIDS(target)) {
 			if (FailSpell[0]) {
-				core->ApplySpell(FailSpell, target, effects->GetOwner(), Level);
+				if (!Target) {
+				  core->ApplySpellPoint(FailSpell, area, Destination, effects->GetOwner(), Level);
+				} else {
+					core->ApplySpell(FailSpell, target, effects->GetOwner(), Level);
+				}
 			}
-			return;
-		}
+		} else {
+			//apply this spell on the target when the projectile succeeds
+			if (SuccSpell[0]) {
+				core->ApplySpell(SuccSpell, target, effects->GetOwner(), Level);
+			}
 
-		//apply this spell on the target when the projectile succeeds
-		if (SuccSpell[0]) {
-			core->ApplySpell(SuccSpell, target, effects->GetOwner(), Level);
-		}
+			if(ExtFlags&PEF_RGB) {
+				target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
+					RGB >> 8, RGB >> 16, RGB >> 24);
+			}
 
-		if(ExtFlags&PEF_RGB) {
-			target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
-				RGB >> 8, RGB >> 16, RGB >> 24);
+			effects->AddAllEffects(target, Destination);
 		}
-
-		effects->AddAllEffects(target, Destination);
 	}
 	delete effects;
 	effects = NULL;
@@ -1280,6 +1283,10 @@ void Projectile::DrawExplosion(const Region &screen)
 	if (Extension->FragProjIdx) {
 		Projectile *pro = server->GetProjectileByIndex(Extension->FragProjIdx);
 		if (pro) {
+			if (Extension->AFlags&PAF_SECONDARY) {
+				pro->SetEffectsCopy(effects);
+			}
+			pro->SetCaster(Caster, Level);
 			area->AddProjectile(pro, Pos, Pos);
 		}
 	}
