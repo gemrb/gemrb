@@ -64,6 +64,12 @@ class GWindow:
     'ShowModal': _GemRB.Window_ShowModal,
     'Invalidate': _GemRB.Window_Invalidate
   }
+  def __nonzero__(self):
+    return self.ID != -1
+  def Unload(self):
+    if self.ID != -1:
+      _GemRB.Window_Unload(self.ID)
+      self.ID = -1
   def GetControl(self, control):
     return _GemRB.Window_GetControl(self.ID, control)
   def CreateWorldMapControl(self, control, *args):
