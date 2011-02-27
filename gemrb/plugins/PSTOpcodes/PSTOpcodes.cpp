@@ -38,7 +38,8 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx);//c0
 int fx_flash_screen (Scriptable* Owner, Actor* target, Effect* fx);//c2
 int fx_tint_screen (Scriptable* Owner, Actor* target, Effect* fx);//c3
 int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx);//c4
-//unknown 0xc5-c8
+int fx_multiple_vvc (Scriptable* Owner, Actor* target, Effect* fx);//c5 //gemrb specific
+//unknown 0xc6-c8
 int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx);//c9
 //unknown 0xca
 int fx_bless (Scriptable* Owner, Actor* target, Effect* fx);//82 (this is a modified effect)
@@ -53,9 +54,8 @@ int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx);//d2
 int fx_jumble_curse (Scriptable* Owner, Actor* target, Effect* fx);//d3
 //int fx_unknown (Scriptable* Owner, Actor* target, Effect* fx);//d4
 
-// FIXME: Make this an ordered list, so we could use bsearch!
+//the engine sorts these, feel free to use any order
 static EffectRef effectnames[] = {
-	{ "RetreatFrom", fx_retreat_from, -1 },//6e
 	{ "Bless", fx_bless, -1},//82
 	{ "Curse", fx_curse, -1},//cb
 	{ "DetectEvil", fx_detect_evil, -1}, //d2
@@ -65,6 +65,7 @@ static EffectRef effectnames[] = {
 	{ "IronFist", fx_iron_fist, -1}, //d0
 	{ "JumbleCurse", fx_jumble_curse, -1}, //d3
 	{ "MoveView", fx_move_view, -1},//cd
+	{ "MultipleVVC", fx_multiple_vvc, -1}, //c5
 	{ "Overlay", fx_overlay, -1}, //c9
 	{ "PlayBAM1", fx_play_bam_blended, -1}, //bb
 	{ "PlayBAM2", fx_play_bam_not_blended, -1},//bc
@@ -72,6 +73,7 @@ static EffectRef effectnames[] = {
 	{ "PlayBAM4", fx_play_bam_not_blended, -1}, //be
 	{ "PlayBAM5", fx_play_bam_not_blended, -1}, //bf
 	{ "Prayer", fx_prayer, -1},//cc
+	{ "RetreatFrom", fx_retreat_from, -1 },//6e
 	{ "SetStatus", fx_set_status, -1}, //ba
 	{ "SpecialEffect", fx_special_effect, -1},//c4
 	{ "StopAllAction", fx_stop_all_action, -1}, //cf
@@ -181,9 +183,9 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	if (playonce) {
 			sca->PlayOnce();
 	} else {
-	  if (fx->Parameter2&1) {
-		  //four cycles, duration is in millisecond
-		  sca->SetDefaultDuration(sca->GetSequenceDuration(AI_UPDATE_TIME));	  
+		if (fx->Parameter2&1) {
+			//four cycles, duration is in millisecond
+			sca->SetDefaultDuration(sca->GetSequenceDuration(AI_UPDATE_TIME));		
 		} else {
 			sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
 		}
@@ -395,13 +397,70 @@ int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0xc4 fx_special_effect
-int fx_special_effect (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+//it is a mystery, why they needed to make this effect
+int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_special_effect (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	//param2 determines the effect's behaviour
+	//0 - adder's kiss projectile (0xcd)
+	//  adds play bam and damage opcodes to the projectile
+	//1 - ball lightning projectile (0xe0)
+	//  adds a play bam opcode to the projectile
+	//2 - raise dead projectile - the projectile itself has the effect (why is it so complicated)
 
+	//TODO: create the spells
+	switch(fx->Parameter2) {
+		case 0:
+			strnuprcpy(fx->Resource,"adder",8);
+			break;
+		case 1:
+			strnuprcpy(fx->Resource,"ball",8);
+			break;
+		case 2:
+			strnuprcpy(fx->Resource,"rdead",8);
+			break;
+	}
+	Owner->CastSpell(fx->Resource, target, false);
+	Owner->CastSpellEnd(fx->CasterLevel);
 	return FX_NOT_APPLIED;
 }
-//0xc5-c8 fx_unknown
+//0xc5 fx_multiple_vvc
+//this is a gemrb specific opcode to support the rune of torment projectile
+//it plays multiple vvc's with a given delay and duration
+int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_multiple_vvc (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+
+	Map *area = Owner->GetCurrentArea();
+	if (!area)
+		return FX_NOT_APPLIED;
+
+	AutoTable tab(fx->Resource);
+	if (!tab)
+		return FX_NOT_APPLIED;
+
+	int rows = tab->GetRowCount();
+	while(rows--) {
+		Point offset;
+		int delay, duration;
+
+		offset.x=atoi(tab->QueryField(rows,0));
+		offset.y=atoi(tab->QueryField(rows,1));
+		delay = atoi(tab->QueryField(rows,3));
+		duration = atoi(tab->QueryField(rows,4));
+	 	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(tab->QueryField(rows,2), true);
+		if (!sca) continue;
+		sca->SetBlend();
+		sca->SetDelay(AI_UPDATE_TIME*delay);
+		sca->SetDefaultDuration(AI_UPDATE_TIME*duration);
+		sca->XPos+=fx->PosX+offset.x;
+		sca->YPos+=fx->PosY+offset.y;
+		area->AddVVCell(sca);
+	}
+	return FX_NOT_APPLIED;
+}
+
+//0xc6-c8 fx_unknown
 //0xc9 fx_overlay
 int fx_overlay (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
