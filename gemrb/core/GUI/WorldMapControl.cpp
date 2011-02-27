@@ -315,10 +315,10 @@ void WorldMapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	if (Button != GEM_MB_ACTION) {
 		return;
 	}
+	MouseIsDown = false;
 	if (lastCursor==IE_CURSOR_NORMAL) {
 		RunEventHandler( WorldMapControlOnPress );
 	}
-	MouseIsDown = false;
 }
 
 /** Special Key Press */
