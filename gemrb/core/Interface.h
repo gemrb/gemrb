@@ -588,6 +588,7 @@ public:
 	int GetDraggedPortrait() const { return DraggedPortrait; }
 	void SetDraggedPortrait(int dp, int cursor=-1);
 	CREItem *ReadItem(DataStream *str);
+	CREItem *ReadItem(DataStream *str, CREItem *itm);
 	bool ResolveRandomItem(CREItem *itm);
 	ieStrRef GetRumour(const ieResRef resname);
 	Container *GetCurrentContainer();

@@ -3269,6 +3269,8 @@ void Interface::HandleGUIBehaviour(void)
 			} else if (flg & DF_OPENENDWINDOW) {
 				guiscript->RunFunction( "GUIWORLD", "OpenEndMessageWindow" );
 				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
+			} else {
+				guiscript->RunFunction( "GUICommonWindows", "EmptyControls" );
 			}
 		}
 
@@ -3836,7 +3838,7 @@ bool Interface::InCutSceneMode() const
 {
 	GameControl *gc = GetGameControl();
 	if (!gc || (gc->GetDialogueFlags()&DF_IN_DIALOG) || (gc->GetScreenFlags()&SF_DISABLEMOUSE) ) {
-  		return true;
+		return true;
 	}
 	return false;
 }
@@ -4584,7 +4586,13 @@ bool Interface::ReadRandomItems()
 CREItem *Interface::ReadItem(DataStream *str)
 {
 	CREItem *itm = new CREItem();
+	if (ReadItem(str, itm)) return itm;
+	delete itm;
+	return NULL;
+}
 
+CREItem *Interface::ReadItem(DataStream *str, CREItem *itm)
+{
 	str->ReadResRef( itm->ItemResRef );
 	str->ReadWord( &itm->Expired );
 	str->ReadWord( &itm->Usages[0] );
@@ -4594,7 +4602,6 @@ CREItem *Interface::ReadItem(DataStream *str)
 	if (ResolveRandomItem(itm) ) {
 		return itm;
 	}
-	delete itm;
 	return NULL;
 }
 

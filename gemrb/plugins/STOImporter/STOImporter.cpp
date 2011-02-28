@@ -158,10 +158,7 @@ Store* STOImporter::GetStore(Store *s)
 
 void STOImporter::GetItem(STOItem *it)
 {
-	CREItem *itm = core->ReadItem(str);
-	memcpy(it, itm, sizeof(CREItem) );
-	//core allocates CREItem!!!
-	delete itm;
+	core->ReadItem(str, (CREItem *) it);
 
 	str->ReadDword( &it->AmountInStock );
 	//if there was no item on stock, how this could be 0
