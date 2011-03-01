@@ -2625,7 +2625,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 {
 	//swap in the area of the actor
 	Game* game = core->GetGame();
-	if (forced || (stricmp( pc->Area, game->CurrentArea) != 0) ) {
+	if (forced || (pc && stricmp( pc->Area, game->CurrentArea) != 0) ) {
 		dialoghandler->EndDialog();
 		overInfoPoint = NULL;
 		overContainer = NULL;
