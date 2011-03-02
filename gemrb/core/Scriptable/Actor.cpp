@@ -5768,8 +5768,12 @@ void Actor::SetPortrait(const char* ResRef, int Which)
 	}
 	if(!Which) {
 		for (i = 0; i < 8 && ResRef[i]; i++) {};
-		SmallPortrait[i] = 'S';
-		LargePortrait[i] = 'M';
+		if (SmallPortrait[i-1] != 'S' && SmallPortrait[i-1] != 's') {
+			SmallPortrait[i] = 'S';
+		}
+		if (LargePortrait[i-1] != 'M' && LargePortrait[i-1] != 'm') {
+			LargePortrait[i] = 'M';
+		}
 	}
 }
 
