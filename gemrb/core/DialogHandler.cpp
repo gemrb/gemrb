@@ -264,6 +264,10 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			if (target->Type == ST_ACTOR) ((Movable *)target)->ClearPath(); // fuzzie added this
 			target->ClearActions();
 
+			// do not interrupt during dialog actions (needed for aerie.d polymorph block)
+			// the original achieved this by adding actions differently
+			target->NoInterrupt();
+
 			for (unsigned int i = 0; i < tr->actions.size(); i++) {
 				target->AddAction(tr->actions[i]);
 				//GameScript::ExecuteAction( target, action );
