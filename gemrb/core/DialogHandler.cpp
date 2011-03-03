@@ -89,8 +89,13 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 	}
 	if (oldTarget) oldTarget->SetCircleSize();
 
+	GameControl *gc = core->GetGameControl();
+
+	if (!gc)
+		return -1;
+
 	//check if we are already in dialog
-	if (core->GetGameControl()->GetDialogueFlags()&DF_IN_DIALOG) {
+	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
 		return 0;
 	}
 
@@ -100,11 +105,11 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 	}
 
 	//we need GUI for dialogs
-	core->GetGameControl()->UnhideGUI();
+	gc->UnhideGUI();
 
 	//no exploring while in dialogue
-	core->GetGameControl()->SetScreenFlags(SF_GUIENABLED|SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_OR);
-	core->GetGameControl()->SetDialogueFlags(DF_IN_DIALOG, BM_OR);
+	gc->SetScreenFlags(SF_GUIENABLED|SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_OR);
+	gc->SetDialogueFlags(DF_IN_DIALOG, BM_OR);
 
 	if (tgt->Type==ST_ACTOR) {
 		Actor *tar = (Actor *) tgt;
@@ -119,7 +124,7 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 	video->MoveViewportTo( tgt->Pos.x-vp.w/2, tgt->Pos.y-vp.h/2 );
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
 	if (!(dlg->Flags&7) ) {
-		core->GetGameControl()->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
 	}
 	//opening control size to maximum, enabling dialog window
 	core->GetGame()->SetControlStatus(CS_HIDEGUI, BM_NAND);
