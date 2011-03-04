@@ -4276,8 +4276,11 @@ int fx_cure_intoxication (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_pause_target (Scriptable* /*Owner*/, Actor * target, Effect* fx)
 {
 	if (0) printf( "fx_pause_target (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-
-	STAT_MOD( IE_CASTERHOLD );
+	if (target) {
+		STAT_MOD( IE_CASTERHOLD );
+	} else {
+		printf("fx_pause_target called with no target!\n");
+	}
 	return FX_PERMANENT;
 }
 
