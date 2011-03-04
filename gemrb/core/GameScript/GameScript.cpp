@@ -1254,6 +1254,10 @@ void Targets::Clear()
 /** releasing global memory */
 static void CleanupIEScript()
 {
+	triggersTable.release();
+	actionsTable.release();
+	objectsTable.release();
+	overrideActionsTable.release();
 	if (ObjectIDSTableNames)
 		free(ObjectIDSTableNames);
 	ObjectIDSTableNames = NULL;
