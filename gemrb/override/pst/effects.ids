@@ -197,6 +197,7 @@ IDS
 0xc3	TintScreen
 0xc4	SpecialEffect
 0xc5	MultipleVVC
+0xc6	ModifyGlobalVariable
 0xc9	Overlay
 0xcb	Curse
 0xcc	Prayer
@@ -207,4 +208,5 @@ IDS
 0xd1	HostileImage
 0xd2	DetectEvil
 0xd3	JumbleCurse
+0xd4	SpeakWithDead
 425	ControlUndead2
