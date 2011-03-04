@@ -52,7 +52,7 @@ int fx_iron_fist (Scriptable* Owner, Actor* target, Effect* fx);//d0
 int fx_hostile_image(Scriptable* Owner, Actor* target, Effect* fx);//d1
 int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx);//d2
 int fx_jumble_curse (Scriptable* Owner, Actor* target, Effect* fx);//d3
-//int fx_unknown (Scriptable* Owner, Actor* target, Effect* fx);//d4
+int fx_speak_with_dead (Scriptable* Owner, Actor* target, Effect* fx);//d4
 
 //the engine sorts these, feel free to use any order
 static EffectRef effectnames[] = {
@@ -75,6 +75,7 @@ static EffectRef effectnames[] = {
 	{ "Prayer", fx_prayer, -1},//cc
 	{ "RetreatFrom", fx_retreat_from, -1 },//6e
 	{ "SetStatus", fx_set_status, -1}, //ba
+	{ "SpeakWithDead", fx_speak_with_dead, -1}, //d4
 	{ "SpecialEffect", fx_special_effect, -1},//c4
 	{ "StopAllAction", fx_stop_all_action, -1}, //cf
 	{ "TintScreen", fx_tint_screen, -1}, //c3
@@ -680,6 +681,20 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET( IE_SPELLFAILUREPRIEST, 100);
 	STAT_SET( IE_SPELLFAILUREINNATE, 100);
 	return FX_APPLIED;
+}
+
+//0xd4 fx_speak_with_dead
+//This opcode is directly employed by the speak with dead projectile in the original engine
+//In GemRB it is used in a custom spell
+int fx_speak_with_dead (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf("fx_speak_with_dead (%2d)\n", fx->Opcode );
+	if (!STATE_GET( STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
+
+	//TODO: reverse engineer the original opcode
+	return FX_NOT_APPLIED;
 }
 
 #include "plugindef.h"
