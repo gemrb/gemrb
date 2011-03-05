@@ -1117,6 +1117,10 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 	EffectFunction fn = 0;
 	if( fx->Opcode<MAX_EFFECTS) {
 		fn = Opcodes[fx->Opcode].Function;
+		if (!(target || (Opcodes[fx->Opcode].Flags & EFFECT_NO_ACTOR))) {
+			printf("targetless opcode without EFFECT_NO_ACTOR: %d, skipping\n", fx->Opcode);
+			return FX_NOT_APPLIED;
+		}
 	}
 	int res = FX_ABORT;
 	if( fn) {

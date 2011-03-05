@@ -155,7 +155,8 @@ struct EffectDesc {
 enum EffectFlags {
 	EFFECT_NORMAL = 0,
 	EFFECT_DICED = 1,
-	EFFECT_NO_LEVEL_CHECK = 2
+	EFFECT_NO_LEVEL_CHECK = 2,
+	EFFECT_NO_ACTOR = 4
 };
 
 /** Initializes table of available spell Effects used by all the queues. */

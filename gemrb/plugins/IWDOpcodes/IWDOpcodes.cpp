@@ -236,15 +236,15 @@ static EffectDesc effectnames[] = {
 	{ "CrushingDamage", fx_crushing_damage, EFFECT_DICED, -1 }, //ed
 	{ "SaveBonus", fx_save_bonus, 0, -1 }, //ee
 	{ "SlowPoison", fx_slow_poison, 0, -1 }, //ef
-	{ "IWDMonsterSummoning", fx_iwd_monster_summoning, 0, -1 }, //f0
+	{ "IWDMonsterSummoning", fx_iwd_monster_summoning, EFFECT_NO_ACTOR, -1 }, //f0
 	{ "VampiricTouch", fx_vampiric_touch, EFFECT_DICED, -1 }, //f1
 	{ "AnimateDead", fx_animate_dead, 0, -1 }, //f3
 	{ "Prayer2", fx_prayer, 0, -1 }, //f4
 	{ "Curse2", fx_curse, 0, -1 }, //f5
-	{ "SummonMonster2", fx_summon_monster2, 0, -1 }, //f6
+	{ "SummonMonster2", fx_summon_monster2, EFFECT_NO_ACTOR, -1 }, //f6
 	{ "BurningBlood", fx_burning_blood, EFFECT_DICED, -1 }, //f7
 	{ "BurningBlood2", fx_burning_blood2, EFFECT_NO_LEVEL_CHECK, -1 }, //f7
-	{ "SummonShadowMonster", fx_summon_shadow_monster, 0, -1 }, //f8
+	{ "SummonShadowMonster", fx_summon_shadow_monster, EFFECT_NO_ACTOR, -1 }, //f8
 	{ "Recitation", fx_recitation, 0, -1 }, //f9
 	{ "RecitationBad", fx_recitation_bad, 0, -1 },//fa
 	{ "LichTouch", fx_lich_touch, EFFECT_NO_LEVEL_CHECK, -1 },//fb
@@ -279,7 +279,7 @@ static EffectDesc effectnames[] = {
 	{ "FloatText", fx_floattext, 0, -1 }, //11b
 	{ "MaceOfDisruption", fx_mace_of_disruption, 0, -1 }, //11c
 	{ "State:Set", fx_set_state, 0, -1 }, //120
-	{ "CutScene", fx_cutscene, 0, -1 }, //121
+	{ "CutScene", fx_cutscene, EFFECT_NO_ACTOR, -1 }, //121
 	{ "Protection:Spell2", fx_resist_spell, 0, -1 }, //ce
 	{ "Protection:Spell3", fx_resist_spell_and_message, 0, -1 }, //122
 	{ "RodOfSmithing", fx_rod_of_smithing, 0, -1 }, //123
@@ -288,7 +288,7 @@ static EffectDesc effectnames[] = {
 	{ "JackalWereGaze", fx_jackalwere_gaze, 0, -1 }, //127
 	{ "UseMagicDeviceModifier", fx_use_magic_device_modifier, 0, -1 }, //12a
 	//unhardcoded hacks for IWD
-	{ "AlterAnimation", fx_alter_animation, 0, -1 }, //399
+	{ "AlterAnimation", fx_alter_animation, EFFECT_NO_ACTOR, -1 }, //399
 	//iwd2 effects
 	{ "Hopelessness", fx_hopelessness, 0, -1 }, //400
 	{ "ProtectionFromEvil", fx_protection_from_evil, 0, -1 }, //401
@@ -300,8 +300,8 @@ static EffectDesc effectnames[] = {
 	{ "DeathWard", fx_death_ward, 0, -1 }, //407
 	{ "HolyPower", fx_holy_power, 0, -1 }, //408
 	{ "RighteousWrath", fx_righteous_wrath, 0, -1 }, //409
-	{ "SummonAlly", fx_summon_ally, 0, -1 }, //410
-	{ "SummonEnemy", fx_summon_enemy, 0, -1 }, //411
+	{ "SummonAlly", fx_summon_ally, EFFECT_NO_ACTOR, -1 }, //410
+	{ "SummonEnemy", fx_summon_enemy, EFFECT_NO_ACTOR, -1 }, //411
 	{ "Control2", fx_control, 0, -1 }, //412
 	{ "VisualEffectIWD2", fx_visual_effect_iwd2, 0, -1 }, //413
 	{ "ResilientSphere", fx_resilient_sphere, 0, -1 }, //414
@@ -829,13 +829,6 @@ int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_iwd_monster_summoning (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
 
-	if (!target) {
-		return FX_NOT_APPLIED;
-	}
-
-	if (!target->GetCurrentArea()) {
-		return FX_APPLIED;
-	}
 	//check the summoning limit?
 
 	ieResRef monster;
@@ -967,14 +960,6 @@ ieResRef summon_monster_2da[IWD_SM2]={"SLIZARD","STROLLS","SSHADOW","ISTALKE",
 int fx_summon_monster2 (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_summon_monster2 (%2d): ResRef:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
-	//check the summoning limit?
-	if (!target) {
-		return FX_NOT_APPLIED;
-	}
-
-	if (!target->GetCurrentArea()) {
-		return FX_APPLIED;
-	}
 
 	ieResRef monster;
 	ieResRef hit;
@@ -1055,14 +1040,6 @@ ieResRef summon_shadow_monster_2da[IWD_SM2]={"SMONSTE","DSMONST","SHADES" };
 int fx_summon_shadow_monster (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_summon_shadow_monster (%2d): ResRef:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
-	//check the summoning limit?
-	if (!target) {
-		return FX_NOT_APPLIED;
-	}
-
-	if (!target->GetCurrentArea()) {
-		return FX_APPLIED;
-	}
 
 	ieResRef monster;
 	ieResRef hit;
@@ -2493,13 +2470,6 @@ int fx_righteous_wrath (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //410 SummonAllyIWD2
 int fx_summon_ally (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	if (!target) {
-		return FX_NOT_APPLIED;
-	}
-
-	if (!target->GetCurrentArea()) {
-		return FX_APPLIED;
-	}
 	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_ALLY, 0, newfx);
@@ -2510,13 +2480,6 @@ int fx_summon_ally (Scriptable* Owner, Actor* target, Effect* fx)
 //411 SummonEnemyIWD2
 int fx_summon_enemy (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	if (!target) {
-		return FX_NOT_APPLIED;
-	}
-
-	if (!target->GetCurrentArea()) {
-		return FX_APPLIED;
-	}
 	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_ENEMY, 0, newfx);

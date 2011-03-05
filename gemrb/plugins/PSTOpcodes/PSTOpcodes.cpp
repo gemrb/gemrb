@@ -60,12 +60,12 @@ static EffectDesc effectnames[] = {
 	{ "Curse", fx_curse, 0, -1 },//cb
 	{ "DetectEvil", fx_detect_evil, 0, -1 }, //d2
 	{ "Embalm", fx_embalm, 0, -1 }, //0xce
-	{ "FlashScreen", fx_flash_screen, 0, -1 }, //c2
+	{ "FlashScreen", fx_flash_screen, EFFECT_NO_ACTOR, -1 }, //c2
 	{ "HostileImage", fx_hostile_image, 0, -1 },//d1
 	{ "IronFist", fx_iron_fist, 0, -1 }, //d0
 	{ "JumbleCurse", fx_jumble_curse, 0, -1 }, //d3
-	{ "MoveView", fx_move_view, 0, -1 },//cd
-	{ "MultipleVVC", fx_multiple_vvc, 0, -1 }, //c5
+	{ "MoveView", fx_move_view, EFFECT_NO_ACTOR, -1 },//cd
+	{ "MultipleVVC", fx_multiple_vvc, EFFECT_NO_ACTOR, -1 }, //c5
 	{ "Overlay", fx_overlay, 0, -1 }, //c9
 	{ "PlayBAM1", fx_play_bam_blended, 0, -1 }, //bb
 	{ "PlayBAM2", fx_play_bam_not_blended, 0, -1 },//bc
@@ -77,8 +77,8 @@ static EffectDesc effectnames[] = {
 	{ "SetStatus", fx_set_status, 0, -1 }, //ba
 	{ "SpeakWithDead", fx_speak_with_dead, 0, -1 }, //d4
 	{ "SpecialEffect", fx_special_effect, 0, -1 },//c4
-	{ "StopAllAction", fx_stop_all_action, 0, -1 }, //cf
-	{ "TintScreen", fx_tint_screen, 0, -1 }, //c3
+	{ "StopAllAction", fx_stop_all_action, EFFECT_NO_ACTOR, -1 }, //cf
+	{ "TintScreen", fx_tint_screen, EFFECT_NO_ACTOR, -1 }, //c3
 	{ "TransferHP", fx_transfer_hp, EFFECT_DICED, -1 }, //c0
 	{ NULL, NULL, 0, 0 },
 };

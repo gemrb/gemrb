@@ -419,7 +419,7 @@ int fx_unknown (Scriptable* Owner, Actor* target, Effect* fx);//???
 
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectDesc effectnames[] = {
-	{ "*Crash*", fx_crash, 0, -1 },
+	{ "*Crash*", fx_crash, EFFECT_NO_ACTOR, -1 },
 	{ "AcidResistanceModifier", fx_acid_resistance_modifier, 0, -1 },
 	{ "ACVsCreatureType", fx_generic_effect, 0, -1 }, //0xdb
 	{ "ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier, 0, -1 },
@@ -437,7 +437,7 @@ static EffectDesc effectnames[] = {
 	{ "ApplyEffectItem", fx_apply_effect_item, 0, -1 },
 	{ "ApplyEffectItemType", fx_apply_effect_item_type, 0, -1 },
 	{ "ApplyEffectRepeat", fx_apply_effect_repeat, 0, -1 },
-	{ "CutScene2", fx_cutscene2, 0, -1 },
+	{ "CutScene2", fx_cutscene2, EFFECT_NO_ACTOR, -1 },
 	{ "AttackSpeedModifier", fx_attackspeed_modifier, 0, -1 },
 	{ "AttacksPerRoundModifier", fx_attacks_per_round_modifier, 0, -1 },
 	{ "AuraCleansingModifier", fx_auracleansing_modifier, 0, -1 },
@@ -457,7 +457,7 @@ static EffectDesc effectnames[] = {
 	{ "Bounce:SpellLevelDec", fx_bounce_spelllevel_dec, 0, -1 },
 	{ "Bounce:Opcode", fx_bounce_opcode, 0, -1 },
 	{ "Bounce:Projectile", fx_bounce_projectile, 0, -1 },
-	{ "CantUseItem", fx_generic_effect, 0, -1 },
+	{ "CantUseItem", fx_generic_effect, EFFECT_NO_ACTOR, -1 },
 	{ "CantUseItemType", fx_generic_effect, 0, -1 },
 	{ "CanUseAnyItem", fx_can_use_any_item_modifier, 0, -1 },
 	{ "CastFromList", fx_select_spell, 0, -1 },
@@ -468,7 +468,7 @@ static EffectDesc effectnames[] = {
 	{ "CastSpellOnCondition", fx_cast_spell_on_condition, 0, -1 },
 	{ "ChangeBardSong", fx_change_bardsong, 0, -1 },
 	{ "ChangeName", fx_change_name, 0, -1 },
-	{ "ChangeWeather", fx_change_weather, 0, -1 },
+	{ "ChangeWeather", fx_change_weather, EFFECT_NO_ACTOR, -1 },
 	{ "ChantBadNonCumulative", fx_set_chantbad_state, 0, -1 },
 	{ "ChantNonCumulative", fx_set_chant_state, 0, -1 },
 	{ "ChaosShieldModifier", fx_chaos_shield_modifier, 0, -1 },
@@ -591,7 +591,7 @@ static EffectDesc effectnames[] = {
 	{ "MagicalRest", fx_magical_rest, 0, -1 },
 	{ "MagicDamageResistanceModifier", fx_magic_damage_resistance_modifier, 0, -1 },
 	{ "MagicResistanceModifier", fx_magic_resistance_modifier, 0, -1 },
-	{ "MassRaiseDead", fx_mass_raise_dead, 0, -1 },
+	{ "MassRaiseDead", fx_mass_raise_dead, EFFECT_NO_ACTOR, -1 },
 	{ "MaximumHPModifier", fx_maximum_hp_modifier, EFFECT_DICED, -1 },
 	{ "Maze", fx_maze, 0, -1 },
 	{ "MeleeDamageModifier", fx_melee_damage_modifier, 0, -1 },
@@ -603,9 +603,9 @@ static EffectDesc effectnames[] = {
 	{ "MissilesResistanceModifier", fx_missiles_resistance_modifier, 0, -1 },
 	{ "MirrorImage", fx_mirror_image, 0, -1 },
 	{ "MirrorImageModifier", fx_mirror_image_modifier, 0, -1 },
-	{ "ModifyGlobalVariable", fx_modify_global_variable, 0, -1 },
+	{ "ModifyGlobalVariable", fx_modify_global_variable, EFFECT_NO_ACTOR, -1 },
 	{ "ModifyLocalVariable", fx_modify_local_variable, 0, -1 },
-	{ "MonsterSummoning", fx_monster_summoning, 0, -1 },
+	{ "MonsterSummoning", fx_monster_summoning, EFFECT_NO_ACTOR, -1 },
 	{ "MoraleBreakModifier", fx_morale_break_modifier, 0, -1 },
 	{ "MoraleModifier", fx_morale_modifier, 0, -1 },
 	{ "MovementRateModifier", fx_movement_modifier, 0, -1 }, //fast (7e)
@@ -627,8 +627,8 @@ static EffectDesc effectnames[] = {
 	{ "PauseTarget", fx_pause_target, 0, -1 }, //also known as casterhold
 	{ "PickPocketsModifier", fx_pick_pockets_modifier, 0, -1 },
 	{ "PiercingResistanceModifier", fx_piercing_resistance_modifier, 0, -1 },
-	{ "PlayMovie", fx_play_movie, 0, -1 },
-	{ "PlaySound", fx_playsound, 0, -1 },
+	{ "PlayMovie", fx_play_movie, EFFECT_NO_ACTOR, -1 },
+	{ "PlaySound", fx_playsound, EFFECT_NO_ACTOR, -1 },
 	{ "PlayVisualEffect", fx_play_visual_effect, 0, -1 },
 	{ "PoisonResistanceModifier", fx_poison_resistance_modifier, 0, -1 },
 	{ "Polymorph", fx_polymorph, 0, -1 },
@@ -656,7 +656,7 @@ static EffectDesc effectnames[] = {
 	{ "Protection:String", fx_generic_effect, 0, -1 },
 	{ "Protection:Tracking", fx_protection_from_tracking, 0, -1 },
 	{ "Protection:Turn", fx_protection_from_turn, 0, -1 },
-	{ "Protection:Weapons", fx_immune_to_weapon, 0, -1 },
+	{ "Protection:Weapons", fx_immune_to_weapon, EFFECT_NO_ACTOR, -1 },
 	{ "PuppetMarker", fx_puppet_marker, 0, -1 },
 	{ "ProjectImage", fx_puppet_master, 0, -1 },
 	{ "Reveal:Area", fx_reveal_area, 0, -1 },
@@ -665,7 +665,7 @@ static EffectDesc effectnames[] = {
 	{ "Reveal:Tracks", fx_reveal_tracks, 0, -1 },
 	{ "RemoveCurse", fx_remove_curse, 0, -1 },
 	{ "RemoveImmunity", fx_remove_immunity, 0, -1 },
-	{ "RemoveMapNote", fx_remove_map_note, 0, -1 },
+	{ "RemoveMapNote", fx_remove_map_note, EFFECT_NO_ACTOR, -1 },
 	{ "RemoveProjectile", fx_remove_projectile, 0, -1 }, //removes effects from actor and area
 	{ "RenableButton", fx_renable_button, 0, -1 }, //removes disable button flag
 	{ "RemoveCreature", fx_remove_creature, 0, -1 },
@@ -678,13 +678,13 @@ static EffectDesc effectnames[] = {
 	{ "SaveVsPolyModifier", fx_save_vs_poly_modifier, 0, -1 },
 	{ "SaveVsSpellsModifier", fx_save_vs_spell_modifier, 0, -1 },
 	{ "SaveVsWandsModifier", fx_save_vs_wands_modifier, 0, -1 },
-	{ "ScreenShake", fx_screenshake, 0, -1 },
+	{ "ScreenShake", fx_screenshake, EFFECT_NO_ACTOR, -1 },
 	{ "ScriptingState", fx_scripting_state, 0, -1 },
 	{ "Sequencer:Activate", fx_activate_spell_sequencer, 0, -1 },
 	{ "Sequencer:Create", fx_create_spell_sequencer, 0, -1 },
 	{ "Sequencer:Store", fx_store_spell_sequencer, 0, -1 },
 	{ "SetAIScript", fx_set_ai_script, 0, -1 },
-	{ "SetMapNote", fx_set_map_note, 0, -1 },
+	{ "SetMapNote", fx_set_map_note, EFFECT_NO_ACTOR, -1 },
 	{ "SetMeleeEffect", fx_generic_effect, 0, -1 },
 	{ "SetRangedEffect", fx_generic_effect, 0, -1 },
 	{ "SetTrap", fx_set_area_effect, 0, -1 },
@@ -734,7 +734,7 @@ static EffectDesc effectnames[] = {
 	{ "StoneSkin2Modifier", fx_golem_stoneskin_modifier, 0, -1 },
 	{ "StrengthModifier", fx_strength_modifier, 0, -1 },
 	{ "StrengthBonusModifier", fx_strength_bonus_modifier, 0, -1 },
-	{ "SummonCreature", fx_summon_creature, 0, -1 },
+	{ "SummonCreature", fx_summon_creature, EFFECT_NO_ACTOR, -1 },
 	{ "RandomTeleport", fx_teleport_field, 0, -1 },
 	{ "TeleportToTarget", fx_teleport_to_target, 0, -1 },
 	{ "TimelessState", fx_timeless_modifier, 0, -1 },
@@ -745,8 +745,8 @@ static EffectDesc effectnames[] = {
 	{ "ToHitVsCreature", fx_generic_effect, 0, -1 },
 	{ "TrackingModifier", fx_tracking_modifier, 0, -1 },
 	{ "TransparencyModifier", fx_transparency_modifier, 0, -1 },
-	{ "Unknown", fx_unknown, 0, -1 },
-	{ "Unlock", fx_knock, 0, -1 }, //open doors/containers
+	{ "Unknown", fx_unknown, EFFECT_NO_ACTOR, -1 },
+	{ "Unlock", fx_knock, EFFECT_NO_ACTOR, -1 }, //open doors/containers
 	{ "UnsummonCreature", fx_unsummon_creature, 0, -1 },
 	{ "Variable:StoreLocalVariable", fx_local_variable, 0, -1 },
 	{ "VisualAnimationEffect", fx_visual_animation_effect, 0, -1 }, //unknown
@@ -2350,13 +2350,6 @@ static int eamods[]={EAM_ALLY,EAM_ALLY,EAM_DEFAULT,EAM_ALLY,EAM_DEFAULT,EAM_ENEM
 int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_summon_creature (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
-	if (!target) {
-		return FX_NOT_APPLIED;
-	}
-
-	if (!target->GetCurrentArea()) {
-		return FX_APPLIED;
-	}
 
 	//summon creature (resource), play vvc (resource2)
 	//creature's lastsummoner is Owner
@@ -4276,11 +4269,7 @@ int fx_cure_intoxication (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_pause_target (Scriptable* /*Owner*/, Actor * target, Effect* fx)
 {
 	if (0) printf( "fx_pause_target (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	if (target) {
-		STAT_MOD( IE_CASTERHOLD );
-	} else {
-		printf("fx_pause_target called with no target!\n");
-	}
+	STAT_MOD( IE_CASTERHOLD );
 	return FX_PERMANENT;
 }
 
