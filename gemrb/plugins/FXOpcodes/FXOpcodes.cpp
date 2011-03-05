@@ -366,7 +366,7 @@ int fx_protection_from_string (Scriptable* Owner, Actor* target, Effect* fx);//1
 int fx_explore_modifier (Scriptable* Owner, Actor* target, Effect* fx);//10c
 int fx_screenshake (Scriptable* Owner, Actor* target, Effect* fx);//10d
 int fx_unpause_caster (Scriptable* Owner, Actor* target, Effect* fx);//10e
-int fx_avatar_removal (Scriptable* Owner, Actor* target, Effect* fx);//10f
+int fx_summon_disable (Scriptable* Owner, Actor* target, Effect* fx);//10f
 int fx_apply_effect_repeat (Scriptable* Owner, Actor* target, Effect* fx);//110
 int fx_remove_projectile (Scriptable* Owner, Actor* target, Effect* fx);//111
 int fx_teleport_to_target (Scriptable* Owner, Actor* target, Effect* fx);//112
@@ -441,7 +441,7 @@ static EffectDesc effectnames[] = {
 	{ "AttackSpeedModifier", fx_attackspeed_modifier, 0, -1 },
 	{ "AttacksPerRoundModifier", fx_attacks_per_round_modifier, 0, -1 },
 	{ "AuraCleansingModifier", fx_auracleansing_modifier, 0, -1 },
-	{ "SummonDisable", fx_avatar_removal, 0, -1 }, //unknown
+	{ "SummonDisable", fx_summon_disable, 0, -1 }, //unknown
 	{ "AvatarRemovalModifier", fx_avatar_removal_modifier, 0, -1 },
 	{ "BackstabModifier", fx_backstab_modifier, 0, -1 },
 	{ "BerserkStage1Modifier", fx_berserkstage1_modifier, 0, -1 },
@@ -5979,9 +5979,9 @@ int fx_unpause_caster (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x10f SummonDisable (bg2)
-int fx_avatar_removal (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_summon_disable (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_avatar_removal (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_summon_disable (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET(IE_SUMMONDISABLE, 1);
 	STAT_SET(IE_CASTERHOLD, 1);
 	if (fx->Parameter2==1) {
