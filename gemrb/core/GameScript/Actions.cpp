@@ -4095,7 +4095,7 @@ void GameScript::UnloadArea(Scriptable* /*Sender*/, Action* parameters)
 	}
 }
 
-static EffectRef fx_death_ref={"Death", NULL, -1};
+static EffectRef fx_death_ref = { "Death", -1 };
 void GameScript::Kill(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -7013,7 +7013,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 //this action plays a vvc animation over target
 //we simply apply the appropriate opcode on the target (see iwdopcodes)
 //the list of vvcs is in iwdshtab.2da
-EffectRef fx_iwd_visual_spell_hit_ref={"IWDVisualSpellHit",NULL,-1};
+static EffectRef fx_iwd_visual_spell_hit_ref = { "IWDVisualSpellHit", -1 };
 
 void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 {

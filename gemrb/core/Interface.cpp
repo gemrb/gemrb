@@ -2705,7 +2705,7 @@ ScriptEngine* Interface::GetGUIScriptEngine() const
 	return guiscript.get();
 }
 
-static EffectRef fx_summon_disable_ref={"AvatarRemovalModifier",NULL,-1};
+static EffectRef fx_summon_disable_ref = { "AvatarRemovalModifier", -1 };
 
 //NOTE: if there were more summoned creatures, it will return only the last
 Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod)
@@ -5338,7 +5338,7 @@ int Interface::Autopause(ieDword flag)
 	return 0;
 }
 
-void Interface::RegisterOpcodes(int count, const EffectRef *opcodes)
+void Interface::RegisterOpcodes(int count, const EffectDesc *opcodes)
 {
 	EffectQueue_RegisterOpcodes(count, opcodes);
 }

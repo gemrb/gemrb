@@ -55,7 +55,7 @@ int fx_jumble_curse (Scriptable* Owner, Actor* target, Effect* fx);//d3
 int fx_speak_with_dead (Scriptable* Owner, Actor* target, Effect* fx);//d4
 
 //the engine sorts these, feel free to use any order
-static EffectRef effectnames[] = {
+static EffectDesc effectnames[] = {
 	{ "Bless", fx_bless, -1},//82
 	{ "Curse", fx_curse, -1},//cb
 	{ "DetectEvil", fx_detect_evil, -1}, //d2
@@ -473,7 +473,7 @@ int fx_overlay (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xca fx_unknown
 
 //0x82 fx_bless
-//static EffectRef fx_glow_ref ={"Color:PulseRGBGlobal",NULL,-1};
+//static EffectRef fx_glow_ref = { "Color:PulseRGBGlobal", -1 };
 //pst bless effect spawns a color glow automatically
 //but i would rather use the IWD2 method
 int fx_bless (Scriptable* /*Owner*/, Actor* target, Effect* fx)
@@ -519,8 +519,8 @@ int fx_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xcc fx_prayer
-static EffectRef fx_curse_ref={"Curse",NULL,-1};
-static EffectRef fx_bless_ref={"Bless",NULL,-1};
+static EffectRef fx_curse_ref = { "Curse", -1 };
+static EffectRef fx_bless_ref = { "Bless", -1 };
 
 int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -625,7 +625,7 @@ int fx_hostile_image (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0xd2 fx_detect_evil
-static EffectRef fx_single_color_pulse_ref={"Color:BriefRGB",NULL,-1};
+static EffectRef fx_single_color_pulse_ref = { "Color:BriefRGB", -1 };
 
 int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx)
 {

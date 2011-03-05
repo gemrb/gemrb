@@ -138,8 +138,14 @@ class Scriptable;
 typedef int (* EffectFunction)(Scriptable*, Actor*, Effect*);
 
 
-/** Links Effect name to a function implementing the effect */
+/** Cached Effect -> opcode mapping */
 struct EffectRef {
+	const char* Name;
+	int opcode;
+};
+
+/** Links Effect name to a function implementing the effect */
+struct EffectDesc {
 	const char* Name;
 	EffectFunction Function;
 	int opcode;
@@ -150,7 +156,7 @@ struct EffectRef {
 bool Init_EffectQueue();
 
 /** Registers opcodes implemented by an effect plugin */
-void EffectQueue_RegisterOpcodes(int count, const EffectRef *opcodes);
+void EffectQueue_RegisterOpcodes(int count, const EffectDesc *opcodes);
 
 /** release effect list when Interface is destroyed */
 void EffectQueue_ReleaseMemory();

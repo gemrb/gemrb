@@ -127,7 +127,7 @@ static bool QuitOnError = false;
 static int CHUWidth = 0;
 static int CHUHeight = 0;
 
-static EffectRef fx_learn_spell_ref={"Spell:Learn",NULL,-1};
+static EffectRef fx_learn_spell_ref = { "Spell:Learn", -1 };
 
 // Like PyString_FromString(), but for ResRef
 inline PyObject* PyString_FromResRef(char* ResRef)

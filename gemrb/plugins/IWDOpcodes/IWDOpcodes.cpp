@@ -222,7 +222,7 @@ static int fx_hamstring (Scriptable* Owner, Actor* target, Effect* fx); //456
 static int fx_rapid_shot (Scriptable* Owner, Actor* target, Effect* fx); //457
 
 //No need to make these ordered, they will be ordered by EffectQueue
-static EffectRef effectnames[] = {
+static EffectDesc effectnames[] = {
 	{ "ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, -1}, //0
 	{ "DamageBonusModifier", fx_damage_bonus_modifier, -1 }, //49
 	{ "DrawUponHolyMight", fx_draw_upon_holy_might, -1},//84 (iwd2)
@@ -505,7 +505,7 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 
 //iwd got a hardcoded 'fireshield' system
 //this effect applies damage on ALL nearby actors, except the center
-static EffectRef fx_damage_opcode_ref={"Damage",NULL,-1};
+static EffectRef fx_damage_opcode_ref = { "Damage", -1 };
 
 static void ApplyDamageNearby(Scriptable* Owner, Actor* target, Effect *fx, ieDword damagetype)
 {
@@ -779,8 +779,8 @@ int fx_save_bonus (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 //0xef SlowPoison
 //gemrb extension: can slow bleeding wounds (like bandage)
-static EffectRef fx_poison_ref={"Poison",NULL,-1};
-static EffectRef fx_wound_ref={"BleedingWounds",NULL,-1};
+static EffectRef fx_poison_ref = { "Poison", -1 };
+static EffectRef fx_wound_ref = { "BleedingWounds", -1 };
 
 int fx_slow_poison (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1125,7 +1125,7 @@ int fx_recitation_bad (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 //0xfb LichTouch (how)
 //0xfb State:Hold4 (iwd2)
-static EffectRef fx_hold_creature_ref={"State:Hold",NULL,-1};
+static EffectRef fx_hold_creature_ref = { "State:Hold", -1 };
 
 int fx_lich_touch (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1146,7 +1146,7 @@ int fx_lich_touch (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //0xfc BlindingOrb (how)
-static EffectRef fx_state_blind_ref={"State:Blind",NULL,-1};
+static EffectRef fx_state_blind_ref = { "State:Blind", -1 };
 
 int fx_blinding_orb (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1223,8 +1223,8 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 //0x100 UmberHulkGaze (causes confusion)
 //it is a specially hacked effect to ignore certain races
 //from the confusion effect
-static EffectRef fx_confusion_ref={"State:Confused",NULL,-1};
-static EffectRef fx_immunity_resource_ref={"Protection:Spell",NULL,-1};
+static EffectRef fx_confusion_ref = { "State:Confused", -1 };
+static EffectRef fx_immunity_resource_ref = { "Protection:Spell", -1 };
 
 int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1284,7 +1284,7 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //0x101 ZombieLordAura (causes Panic) unused in all games
-static EffectRef fx_fear_ref={"State:Panic",NULL,-1};
+static EffectRef fx_fear_ref = { "State:Panic", -1 };
 
 int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1506,7 +1506,7 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 //0x109 CloakOfFear (HoW/IWD2)
 //if the resource is not specified, it will work like in HoW
 
-static EffectRef fx_umberhulk_gaze_ref={"UmberHulkGaze",NULL,-1};
+static EffectRef fx_umberhulk_gaze_ref = { "UmberHulkGaze", -1 };
 
 int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1675,9 +1675,9 @@ int fx_remove_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-static EffectRef fx_str_ref={"StrengthModifier",NULL,-1};
-static EffectRef fx_con_ref={"ConstitutionModifier",NULL,-1};
-static EffectRef fx_dex_ref={"DexterityModifier",NULL,-1};
+static EffectRef fx_str_ref = { "StrengthModifier", -1 };
+static EffectRef fx_con_ref = { "ConstitutionModifier", -1 };
+static EffectRef fx_dex_ref = { "DexterityModifier", -1 };
 
 //0x115 SoulEater
 int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
@@ -1987,8 +1987,8 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 //0x11c MaceOfDisruption
 //death with chance based on race and level
-static EffectRef fx_death_ref={"Death",NULL,-1};
-static EffectRef fx_iwd_visual_spell_hit_ref={"IWDVisualSpellHit",NULL,-1};
+static EffectRef fx_death_ref = { "Death", -1 };
+static EffectRef fx_iwd_visual_spell_hit_ref = { "IWDVisualSpellHit", -1 };
 
 int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -2092,7 +2092,7 @@ int fx_resist_spell (Scriptable* Owner, Actor* target, Effect *fx)
 	return FX_ABORT;
 }
 
-static EffectRef fx_resist_spell_ref={"Protection:Spell2",NULL,-1};
+static EffectRef fx_resist_spell_ref = { "Protection:Spell2", -1 };
 
 //0x122 Protection:Spell3 ??? IWD ids targeting
 // this is a variant of resist spell, used in iwd2
@@ -2397,7 +2397,7 @@ static int fx_armor_of_faith (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //404 Nausea
-static EffectRef fx_unconscious_state_ref={"State:Helpless",NULL,-1};
+static EffectRef fx_unconscious_state_ref = { "State:Helpless", -1 };
 
 int fx_nausea (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -2526,7 +2526,7 @@ int fx_summon_enemy (Scriptable* Owner, Actor* target, Effect* fx)
 
 //412 Control2
 
-static EffectRef fx_protection_from_evil_ref={"ProtectionFromEvil",NULL,-1};
+static EffectRef fx_protection_from_evil_ref = { "ProtectionFromEvil", -1 };
 
 int fx_control (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -3110,10 +3110,10 @@ int fx_smite_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 //447 Restoration
 
-static EffectRef fx_disease_ref={"Disease",NULL,-1};
-static EffectRef fx_int_ref={"IntelligenceModifier",NULL,-1};
-static EffectRef fx_wis_ref={"WisdomModifier",NULL,-1};
-static EffectRef fx_cha_ref={"CharismaModifier",NULL,-1};
+static EffectRef fx_disease_ref = { "Disease", -1 };
+static EffectRef fx_int_ref = { "IntelligenceModifier", -1 };
+static EffectRef fx_wis_ref = { "WisdomModifier", -1 };
+static EffectRef fx_cha_ref = { "CharismaModifier", -1 };
 
 int fx_restoration (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3278,7 +3278,7 @@ int fx_lower_resistance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //452 Bane
-static EffectRef fx_bless_ref={"Bless",NULL,-1};
+static EffectRef fx_bless_ref = { "Bless", -1 };
 
 int fx_bane (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3298,7 +3298,7 @@ int fx_bane (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //453 PowerAttack
-static EffectRef fx_expertise_ref={"Expertise",NULL,-1};
+static EffectRef fx_expertise_ref = { "Expertise", -1 };
 
 int fx_power_attack (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3325,7 +3325,7 @@ int fx_power_attack (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //454 Expertise
-static EffectRef fx_powerattack_ref={"PowerAttack",NULL,-1};
+static EffectRef fx_powerattack_ref = { "PowerAttack", -1 };
 
 int fx_expertise (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3354,7 +3354,7 @@ int fx_expertise (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //455 ArterialStrike
-static EffectRef fx_hamstring_ref={"HamString",NULL,-1};
+static EffectRef fx_hamstring_ref = { "HamString", -1 };
 
 int fx_arterial_strike (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3372,7 +3372,7 @@ int fx_arterial_strike (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //456 HamString
-static EffectRef fx_arterialstrike_ref={"ArterialStrike",NULL,-1};
+static EffectRef fx_arterialstrike_ref = { "ArterialStrike", -1 };
 
 int fx_hamstring (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {

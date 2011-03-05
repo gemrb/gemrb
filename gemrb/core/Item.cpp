@@ -220,7 +220,7 @@ Projectile *Item::GetProjectile(Scriptable *self, int header, const Point &targe
 }
 
 //this is the implementation of the weapon glow effect in PST
-static EffectRef glow_ref ={"Color:PulseRGB",NULL,-1};
+static EffectRef glow_ref = { "Color:PulseRGB", -1 };
 //this type of colour uses PAL32, a PST specific palette
 #define PALSIZE 32
 static Color ActorColor[PALSIZE];

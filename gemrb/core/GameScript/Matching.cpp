@@ -77,7 +77,7 @@ inline static Targets *DoObjectFiltering(Scriptable *Sender, Targets *tgts, Obje
 	return tgts;
 }
 
-static EffectRef fx_protection_creature_ref = { "Protection:Creature", NULL, -1 };
+static EffectRef fx_protection_creature_ref = { "Protection:Creature", -1 };
 
 inline static bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, int &dist, bool ignoreinvis=false)
 {

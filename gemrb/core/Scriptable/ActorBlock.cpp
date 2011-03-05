@@ -599,7 +599,7 @@ void Scriptable::AddTrigger(ieDword *actorref)
 	tolist.push_back(actorref);
 }
 
-static EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
+static EffectRef fx_set_invisible_state_ref = { "State:Invisible", -1 };
 
 void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake)
 {
@@ -1045,7 +1045,7 @@ int Scriptable::CastSpell( ieResRef &SpellRef, Scriptable* target, bool deplete,
 	return SpellCast(instant);
 }
 
-static EffectRef fx_force_surge_modifier_ref={"ForceSurgeModifier",NULL,-1};
+static EffectRef fx_force_surge_modifier_ref = { "ForceSurgeModifier", -1 };
 
 //start spellcasting (common part)
 int Scriptable::SpellCast(bool instant)

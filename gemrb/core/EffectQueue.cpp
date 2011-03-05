@@ -172,7 +172,7 @@ int find_effect(const void *a, const void *b)
 	return stricmp((const char *) a,((const EffectRef *) b)->Name);
 }
 
-static EffectRef* FindEffect(const char* effectname)
+static EffectDesc* FindEffect(const char* effectname)
 {
 	if( !effectname || !effectnames) {
 		return NULL;
@@ -182,40 +182,40 @@ static EffectRef* FindEffect(const char* effectname)
 		printMessage( "EffectQueue", "", YELLOW);
 		printf("Couldn't assign effect: %s\n", effectname );
 	}
-	return (EffectRef *) tmp;
+	return (EffectDesc *) tmp;
 }
 
-static EffectRef fx_protection_from_display_string_ref={"Protection:String",NULL,-1};
+static EffectRef fx_protection_from_display_string_ref = { "Protection:String", -1 };
 
 //special effects without level check (but with damage dices precalculated)
 static EffectRef diced_effects[] = {
 	//core effects
-	{"Damage",NULL,-1},
-	{"CurrentHPModifier",NULL,-1},
-	{"MaximumHPModifier",NULL,-1},
+	{"Damage",-1},
+	{"CurrentHPModifier",-1},
+	{"MaximumHPModifier",-1},
 	//iwd effects
-	{"BurningBlood",NULL,-1}, //iwd
-	{"ColdDamage",NULL,-1},
-	{"CrushingDamage",NULL,-1},
-	{"VampiricTouch",NULL,-1},
-	{"VitriolicSphere",NULL,-1},
+	{"BurningBlood",-1}, //iwd
+	{"ColdDamage",-1},
+	{"CrushingDamage",-1},
+	{"VampiricTouch",-1},
+	{"VitriolicSphere",-1},
 	//pst effects
-	{"TransferHP",NULL,-1},
-{NULL,NULL,0} };
+	{"TransferHP",-1},
+	{NULL,0} };
 
 //special effects without level check (but with damage dices not precalculated)
 static EffectRef diced_effects2[] = {
-	{"Charm",NULL,-1}, //all
-	{"BurningBlood2",NULL,-1}, //how/iwd2
-	{"StaticCharge",NULL,-1}, //how/iwd2
-	{"SoulEater",NULL,-1}, //how/iwd2
-	{"LichTouch",NULL,-1}, //how
-{NULL,NULL,0} };
+	{"Charm",-1}, //all
+	{"BurningBlood2",-1}, //how/iwd2
+	{"StaticCharge",-1}, //how/iwd2
+	{"SoulEater",-1}, //how/iwd2
+	{"LichTouch",-1}, //how
+	{NULL,0} };
 
 inline static void ResolveEffectRef(EffectRef &effect_reference)
 {
 	if( effect_reference.opcode==-1) {
-		EffectRef* ref = FindEffect(effect_reference.Name);
+		EffectDesc* ref = FindEffect(effect_reference.Name);
 		if( ref && ref->opcode>=0) {
 			effect_reference.opcode = ref->opcode;
 			return;
@@ -266,7 +266,7 @@ bool Init_EffectQueue()
 			}
 		}
 
-		EffectRef* poi = FindEffect( effectname );
+		EffectDesc* poi = FindEffect( effectname );
 		if( poi != NULL) {
 			Opcodes[i].Function = poi->Function;
 			Opcodes[i].Name = poi->Name;
@@ -302,7 +302,7 @@ void EffectQueue_ReleaseMemory()
 	effectnames = NULL;
 }
 
-void EffectQueue_RegisterOpcodes(int count, const EffectRef* opcodes)
+void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 {
 	if( ! effectnames) {
 		effectnames = (EffectRef*) malloc( (count+1) * sizeof( EffectRef ) );
@@ -432,7 +432,7 @@ Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference
 	return CreateEffectCopy(oldfx, effect_reference.opcode, param1, param2);
 }
 
-static EffectRef fx_unsummon_creature_ref={"UnsummonCreature",NULL,-1};
+static EffectRef fx_unsummon_creature_ref = { "UnsummonCreature", -1 };
 
 Effect *EffectQueue::CreateUnsummonEffect(Effect *fx)
 {
@@ -796,36 +796,36 @@ inline bool check_probability(Effect* fx)
 }
 
 //immunity effects
-static EffectRef fx_level_immunity_ref={"Protection:Spelllevel",NULL,-1};
-static EffectRef fx_opcode_immunity_ref={"Protection:Opcode",NULL,-1}; //bg2
-static EffectRef fx_opcode_immunity2_ref={"Protection:Opcode2",NULL,-1};//iwd
-static EffectRef fx_spell_immunity_ref={"Protection:Spell",NULL,-1}; //bg2
-static EffectRef fx_spell_immunity2_ref={"Protection:Spell2",NULL,-1};//iwd
-static EffectRef fx_store_spell_sequencer_ref={"Sequencer:Store",NULL,-1}; //bg2, works against sequencers
-static EffectRef fx_school_immunity_ref={"Protection:School",NULL,-1};
-static EffectRef fx_secondary_type_immunity_ref={"Protection:SecondaryType",NULL,-1};
+static EffectRef fx_level_immunity_ref = { "Protection:Spelllevel", -1 };
+static EffectRef fx_opcode_immunity_ref = { "Protection:Opcode", -1 }; //bg2
+static EffectRef fx_opcode_immunity2_ref = { "Protection:Opcode2", -1 };//iwd
+static EffectRef fx_spell_immunity_ref = { "Protection:Spell", -1 }; //bg2
+static EffectRef fx_spell_immunity2_ref = { "Protection:Spell2", -1 };//iwd
+static EffectRef fx_store_spell_sequencer_ref = { "Sequencer:Store", -1 }; //bg2, works against sequencers
+static EffectRef fx_school_immunity_ref = { "Protection:School", -1 };
+static EffectRef fx_secondary_type_immunity_ref = { "Protection:SecondaryType", -1 };
 
 //decrementing immunity effects
-static EffectRef fx_level_immunity_dec_ref={"Protection:SpellLevelDec",NULL,-1};
-static EffectRef fx_spell_immunity_dec_ref={"Protection:SpellDec",NULL,-1};
-static EffectRef fx_school_immunity_dec_ref={"Protection:SchoolDec",NULL,-1};
-static EffectRef fx_secondary_type_immunity_dec_ref={"Protection:SecondaryTypeDec",NULL,-1};
+static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
+static EffectRef fx_spell_immunity_dec_ref = { "Protection:SpellDec", -1 };
+static EffectRef fx_school_immunity_dec_ref = { "Protection:SchoolDec", -1 };
+static EffectRef fx_secondary_type_immunity_dec_ref = { "Protection:SecondaryTypeDec", -1 };
 
 //bounce effects
-static EffectRef fx_level_bounce_ref={"Bounce:SpellLevel",NULL,-1};
-//static EffectRef fx_opcode_bounce_ref={"Bounce:Opcode",NULL,-1};
-static EffectRef fx_spell_bounce_ref={"Bounce:Spell",NULL,-1};
-static EffectRef fx_school_bounce_ref={"Bounce:School",NULL,-1};
-static EffectRef fx_secondary_type_bounce_ref={"Bounce:SecondaryType",NULL,-1};
+static EffectRef fx_level_bounce_ref = { "Bounce:SpellLevel", -1 };
+//static EffectRef fx_opcode_bounce_ref = { "Bounce:Opcode", -1 };
+static EffectRef fx_spell_bounce_ref = { "Bounce:Spell", -1 };
+static EffectRef fx_school_bounce_ref = { "Bounce:School", -1 };
+static EffectRef fx_secondary_type_bounce_ref = { "Bounce:SecondaryType", -1 };
 
 //decrementing bounce effects
-static EffectRef fx_level_bounce_dec_ref={"Bounce:SpellLevelDec",NULL,-1};
-static EffectRef fx_spell_bounce_dec_ref={"Bounce:SpellDec",NULL,-1};
-static EffectRef fx_school_bounce_dec_ref={"Bounce:SchoolDec",NULL,-1};
-static EffectRef fx_secondary_type_bounce_dec_ref={"Bounce:SecondaryTypeDec",NULL,-1};
+static EffectRef fx_level_bounce_dec_ref = { "Bounce:SpellLevelDec", -1 };
+static EffectRef fx_spell_bounce_dec_ref = { "Bounce:SpellDec", -1 };
+static EffectRef fx_school_bounce_dec_ref = { "Bounce:SchoolDec", -1 };
+static EffectRef fx_secondary_type_bounce_dec_ref = { "Bounce:SecondaryTypeDec", -1 };
 
 //spelltrap (multiple decrementing immunity)
-static EffectRef fx_spelltrap={"SpellTrap", NULL,-1};
+static EffectRef fx_spelltrap = { "SpellTrap", -1 };
 
 //this is for whole spell immunity/bounce
 inline static void DecreaseEffect(Effect *efx)
@@ -1547,7 +1547,7 @@ int EffectQueue::SpecificDamageBonus(ieDword opcode, ieDword param2) const
 	return bonus;
 }
 
-static EffectRef fx_damage_bonus_modifier_ref={"DamageBonusModifier",NULL,-1};
+static EffectRef fx_damage_bonus_modifier_ref = { "DamageBonusModifier", -1 };
 int EffectQueue::SpecificDamageBonus(ieDword damage_type) const
 {
 	ResolveEffectRef(fx_damage_bonus_modifier_ref);
@@ -1639,7 +1639,7 @@ bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapon
 	return false;
 }
 
-static EffectRef fx_weapon_immunity_ref={"Protection:Weapons",NULL,-1};
+static EffectRef fx_weapon_immunity_ref = { "Protection:Weapons", -1 };
 
 bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 {
@@ -1673,7 +1673,7 @@ void EffectQueue::AddWeaponEffects(EffectQueue *fxqueue, EffectRef &fx_ref) cons
 }
 
 /* no longer needed, use IE_CASTING stat
-static EffectRef fx_disable_spellcasting_ref={ "DisableCasting", NULL, -1 };
+static EffectRef fx_disable_spellcasting_ref = { "DisableCasting", -1 };
 int EffectQueue::DisabledSpellcasting(int types) const
 {
 	ResolveEffectRef(fx_disable_spellcasting_ref);
@@ -1814,7 +1814,7 @@ bool EffectQueue::HasDuration(Effect *fx)
 	return false;
 }
 
-static EffectRef fx_variable_ref={"Variable:StoreLocalVariable",NULL,-1};
+static EffectRef fx_variable_ref = { "Variable:StoreLocalVariable", -1 };
 
 //returns true if the effect must be saved
 //variables are saved differently

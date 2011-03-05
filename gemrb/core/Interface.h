@@ -61,7 +61,7 @@ class Control;
 class DataFileMgr;
 struct Effect;
 class EffectQueue;
-struct EffectRef;
+struct EffectDesc;
 class EventMgr;
 class Factory;
 class Font;
@@ -656,7 +656,7 @@ public:
 	/** receives an autopause reason, returns 1 if pause was triggered by this call, -1 if it was already triggered */
 	int Autopause(ieDword reason);
 	/** registers engine opcodes */
-	void RegisterOpcodes(int count, const EffectRef *opcodes);
+	void RegisterOpcodes(int count, const EffectDesc *opcodes);
 	/** reads a list of resrefs into an array, returns array size */
 	int ReadResRefTable(const ieResRef tablename, ieResRef *&data);
 	/** frees the data */

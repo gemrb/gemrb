@@ -2652,7 +2652,7 @@ void Actor::DialogInterrupt()
 	}
 }
 
-static EffectRef fx_cure_sleep_ref={"Cure:Sleep",NULL,-1};
+static EffectRef fx_cure_sleep_ref = { "Cure:Sleep", -1 };
 
 void Actor::GetHit()
 {
@@ -2679,7 +2679,7 @@ bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete)
 	return false;
 }
 
-static EffectRef fx_sleep_ref={"State:Helpless", NULL, -1};
+static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
 
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
@@ -3202,9 +3202,9 @@ int Actor::GetEncumbrance()
 }
 
 //bg2 and iwd1
-EffectRef control_creature_ref = { "ControlCreature", NULL, -1};
+static EffectRef control_creature_ref = { "ControlCreature", -1 };
 //iwd2
-EffectRef control_undead_ref = { "ControlUndead2", NULL, -1};
+static EffectRef control_undead_ref = { "ControlUndead2", -1 };
 
 //receive turning
 void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
@@ -3304,11 +3304,11 @@ void Actor::Resurrect()
 	//clear effects?
 }
 
-static EffectRef fx_cure_poisoned_state_ref={"Cure:Poison",NULL,-1};
-static EffectRef fx_cure_hold_state_ref={"Cure:Hold",NULL,-1};
-static EffectRef fx_cure_stun_state_ref={"Cure:Stun",NULL,-1};
-static EffectRef fx_remove_portrait_icon_ref={"Icon:Remove",NULL,-1};
-static EffectRef fx_unpause_caster_ref={"Cure:CasterHold",NULL,-1};
+static EffectRef fx_cure_poisoned_state_ref = { "Cure:Poison", -1 };
+static EffectRef fx_cure_hold_state_ref = { "Cure:Hold", -1 };
+static EffectRef fx_cure_stun_state_ref = { "Cure:Stun", -1 };
+static EffectRef fx_remove_portrait_icon_ref = { "Icon:Remove", -1 };
+static EffectRef fx_unpause_caster_ref = { "Cure:CasterHold", -1 };
 
 void Actor::Die(Scriptable *killer)
 {
@@ -4479,7 +4479,7 @@ int Actor::GetToHit(int bonus, ieDword Flags, Actor *target) const
 
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
-static EffectRef fx_ac_vs_creature_type_ref={"ACVsCreatureType",NULL,-1};
+static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
 
 int Actor::GetDefense(int DamageType, Actor *attacker) const
 {
@@ -4732,10 +4732,10 @@ void Actor::PerformAttack(ieDword gameTime)
 	ResetState();
 }
 
-static EffectRef fx_stoneskin_ref={"StoneSkinModifier",NULL,-1};
-static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
-static EffectRef fx_mirrorimage_ref={"MirrorImageModifier",NULL,-1};
-static EffectRef fx_aegis_ref={"Aegis",NULL,-1};
+static EffectRef fx_stoneskin_ref = { "StoneSkinModifier", -1 };
+static EffectRef fx_stoneskin2_ref = { "StoneSkin2Modifier", -1 };
+static EffectRef fx_mirrorimage_ref = { "MirrorImageModifier", -1 };
+static EffectRef fx_aegis_ref = { "Aegis", -1 };
 
 void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
 {
@@ -6051,9 +6051,9 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	return false;
 }
 
-static EffectRef fx_damage_ref={"Damage",NULL,-1};
-static EffectRef fx_melee_ref={"SetMeleeEffect",NULL,-1};
-static EffectRef fx_ranged_ref={"SetRangedEffect",NULL,-1};
+static EffectRef fx_damage_ref = { "Damage", -1 };
+static EffectRef fx_melee_ref = { "SetMeleeEffect", -1 };
+static EffectRef fx_ranged_ref = { "SetRangedEffect", -1 };
 
 bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword flags, int damage)
 {
@@ -6353,8 +6353,8 @@ int Actor::CheckUsability(Item *item) const
 	return 0;
 }
 
-static EffectRef fx_cant_use_item_ref={"CantUseItem",NULL,-1};
-static EffectRef fx_cant_use_item_type_ref={"CantUseItemType",NULL,-1};
+static EffectRef fx_cant_use_item_ref = { "CantUseItem", -1 };
+static EffectRef fx_cant_use_item_type_ref = { "CantUseItemType", -1 };
 
 //this one is the same, but returns strrefs based on effects
 ieStrRef Actor::Disabled(ieResRef name, ieDword type) const
@@ -6888,7 +6888,7 @@ int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, Actor* opponent
 	return result + add;
 }
 
-static EffectRef fx_remove_invisible_state_ref={"ForceVisible",NULL,-1};
+static EffectRef fx_remove_invisible_state_ref = { "ForceVisible", -1 };
 
 // removes the (normal) invisibility state
 void Actor::CureInvisibility()
@@ -6908,7 +6908,7 @@ void Actor::CureInvisibility()
 	}
 }
 
-static EffectRef fx_remove_sanctuary_ref={"Cure:Sanctuary",NULL,-1};
+static EffectRef fx_remove_sanctuary_ref = { "Cure:Sanctuary", -1 };
 
 // removes the sanctuary effect
 void Actor::CureSanctuary()
@@ -6976,7 +6976,7 @@ bool Actor::ModalSpellSkillCheck() {
 	}
 }
 
-static EffectRef fx_disable_button_ref={ "DisableButton", NULL, -1 };
+static EffectRef fx_disable_button_ref = { "DisableButton", -1 };
 
 inline void HideFailed(Actor* actor)
 {

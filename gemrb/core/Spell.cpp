@@ -73,7 +73,7 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 //-1 will return cfb
 //0 will always return first spell block
 //otherwise set to caster level
-static EffectRef fx_casting_glow_ref={"CastingGlow",NULL,-1};
+static EffectRef fx_casting_glow_ref = { "CastingGlow", -1 };
 
 void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 {

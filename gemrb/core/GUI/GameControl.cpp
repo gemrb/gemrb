@@ -705,8 +705,8 @@ void GameControl::SelectActor(int whom, int type)
 }
 
 //Effect for the ctrl-r cheatkey (resurrect)
-static EffectRef heal_ref={"CurrentHPModifier", NULL, -1};
-static EffectRef damage_ref={"Damage", NULL, -1};
+static EffectRef heal_ref = { "CurrentHPModifier", -1 };
+static EffectRef damage_ref = { "Damage", -1 };
 
 /** Key Release Event */
 void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
