@@ -87,6 +87,10 @@ void ScriptedAnimation::Init()
 	effect_owned = false;
 	active = true;
 	Delay = 0;
+	light = NULL;
+	LightX=0;
+	LightY=0;
+	LightZ=0;
 }
 
 void ScriptedAnimation::Override(ScriptedAnimation *templ)
@@ -257,7 +261,9 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 	stream->Seek( 16, GEM_CURRENT_POS );
 	stream->ReadDword( &tmp );  //this doesn't affect visibility
 	YPos = (signed) tmp;
-	stream->Seek( 12, GEM_CURRENT_POS );
+	stream->ReadDword( &LightX );
+	stream->ReadDword( &LightY );
+	stream->ReadDword( &LightZ );
 	stream->ReadDword( &Duration );
 	stream->Seek( 8, GEM_CURRENT_POS );
 	stream->ReadDword( &seq1 );
@@ -396,6 +402,9 @@ ScriptedAnimation::~ScriptedAnimation(void)
 		sound_handle->Stop();
 		sound_handle.release();
 	}
+	if(light) {
+		core->GetVideoDriver()->FreeSprite(light);
+	}
 }
 
 void ScriptedAnimation::SetPhase(int arg)
@@ -532,8 +541,12 @@ bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 			return true;
 		}
 		if (Delay) {
-		  Delay--;
-		  return false;
+			Delay--;
+			return false;
+		}
+
+		if (SequenceFlags&IE_VVC_LIGHTSPOT) {
+ 			light = core->GetVideoDriver()->CreateLight(LightX, LightZ);
 		}
 
 		if (Duration!=0xffffffff) {
@@ -634,7 +647,7 @@ bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color
 		flag |= BLIT_GREY;
 	}
 
-	if (Transparency & IE_VVC_RED_TINT) {
+	if (Transparency & IE_VVC_SEPIA) {
 		flag |= BLIT_RED;
 	}
 
@@ -662,6 +675,9 @@ bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color
 	}
 
 	video->BlitGameSprite( frame, cx + screen.x, cy + screen.y, flag, tint, cover, palette, &screen);
+	if (light) {
+		video->BlitGameSprite( light, cx + screen.x, cy + screen.y, 0, tint, NULL, NULL, &screen);
+	}
 	return false;
 }
 

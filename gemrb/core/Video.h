@@ -49,8 +49,8 @@ enum SpriteBlitFlags {
 	BLIT_NOSHADOW = 0x1000,
 	BLIT_TRANSSHADOW = 0x2000,
 	BLIT_TINTED = 0x00010000, // IE_VVC_TINT = 0x00030000
-	BLIT_GREY = IE_VVC_GREYSCALE, // 0x80000
-	BLIT_RED = IE_VVC_RED_TINT, // 0x02000000
+	BLIT_GREY = IE_VVC_GREYSCALE, // 0x80000; timestop palette
+	BLIT_RED = IE_VVC_SEPIA, // 0x02000000; dream scene palette
 	BLIT_DARK = IE_VVC_DARKEN, // 0x00100000; not implemented in SDLVideo yet
 	BLIT_GLOW = IE_VVC_GLOWING // 0x00200000; not implemented in SDLVideo yet
 	// Note: bits 29,30,31 are used by SDLVideo internally
