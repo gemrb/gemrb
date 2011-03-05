@@ -337,6 +337,7 @@ void Projectile::Setup()
 	//but also makes the caster immune to the effect
 	if (Extension) {
 		if (Extension->AFlags&PAF_CONE) {
+			NewOrientation = Orientation = GetOrient(Destination, Pos);
 			Destination=Pos;
 			ExtFlags|=PEF_NO_TRAVEL;
 		}
