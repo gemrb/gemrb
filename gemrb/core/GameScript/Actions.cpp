@@ -4204,7 +4204,7 @@ void GameScript::TakePartyItem(Scriptable* Sender, Action* parameters)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0,IE_INV_ITEM_UNSTEALABLE);
+		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,IE_INV_ITEM_UNDROPPABLE,IE_INV_ITEM_UNSTEALABLE);
 		if (res!=MIC_NOITEM) return;
 	}
 }
@@ -4216,7 +4216,7 @@ void GameScript::TakePartyItemNum(Scriptable* Sender, Action* parameters)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0, IE_INV_ITEM_UNSTEALABLE);
+		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,IE_INV_ITEM_UNDROPPABLE, IE_INV_ITEM_UNSTEALABLE);
 		if (res == MIC_GOTITEM) {
 			i++;
 			count--;
@@ -4232,7 +4232,7 @@ void GameScript::TakePartyItemRange(Scriptable* Sender, Action* parameters)
 	while (i--) {
 		Actor *ac = game->GetPC(i,false);
 		if (Distance(Sender, ac)<MAX_OPERATING_DISTANCE) {
-			while (MoveItemCore(ac, Sender, parameters->string0Parameter,0,IE_INV_ITEM_UNSTEALABLE)==MIC_GOTITEM) { }
+			while (MoveItemCore(ac, Sender, parameters->string0Parameter,IE_INV_ITEM_UNDROPPABLE,IE_INV_ITEM_UNSTEALABLE)==MIC_GOTITEM) { }
 		}
 	}
 }
@@ -4242,7 +4242,7 @@ void GameScript::TakePartyItemAll(Scriptable* Sender, Action* parameters)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		while (MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0, IE_INV_ITEM_UNSTEALABLE)==MIC_GOTITEM) { }
+		while (MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,IE_INV_ITEM_UNDROPPABLE, IE_INV_ITEM_UNSTEALABLE)==MIC_GOTITEM) { }
 	}
 }
 
