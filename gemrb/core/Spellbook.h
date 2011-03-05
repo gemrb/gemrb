@@ -47,6 +47,7 @@ class Spell;
 #define LS_LEARN   2   //give message when learned it
 #define LS_STATS   4   //check stats (alignment, etc)
 #define LS_MEMO    8   //memorize it instantly (add innate)
+#define LS_NOXP    16  //disable giving of xp (LS_ADDXP)
 
 //LearnSpell return values
 #define LSR_OK      0

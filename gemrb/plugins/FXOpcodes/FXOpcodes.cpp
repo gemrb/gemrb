@@ -3945,7 +3945,7 @@ int fx_learn_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//probably we should also let this via a game flag if we want
 	//full compatibility with bg1
 	//parameter2 is used in bg1 and pst to specify the spell type; bg2 and iwd2 figure it out from the resource
-	target->LearnSpell(fx->Resource, fx->Parameter1^LS_ADDXP);
+	target->LearnSpell(fx->Resource, fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 // 0x94 Spell:CastSpellPoint

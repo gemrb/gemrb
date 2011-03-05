@@ -4054,7 +4054,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 	if (tmp) {
 		displaymsg->DisplayConstantStringName(tmp, 0xbcefbc, this);
 	}
-	if (flags&LS_ADDXP) {
+	if (flags&LS_ADDXP && !(flags&LS_NOXP)) {
 		int xp = CalculateExperience(XP_LEARNSPELL, explev);
 		Game *game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);

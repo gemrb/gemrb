@@ -5,6 +5,7 @@ LS_ADDXP = 1   #give xp for learning it
 LS_LEARN = 2   #give message when learned it
 LS_STATS = 4   #check stats (alignment, etc)
 LS_MEMO  = 8   #memorize it instantly (add innate)
+LS_NOXP  = 16  #don't give xp; has precedence over LS_ADDXP
 
 # LearnSpell return values
 LSR_OK      = 0
