@@ -441,7 +441,7 @@ static EffectDesc effectnames[] = {
 	{ "AttackSpeedModifier", fx_attackspeed_modifier, 0, -1 },
 	{ "AttacksPerRoundModifier", fx_attacks_per_round_modifier, 0, -1 },
 	{ "AuraCleansingModifier", fx_auracleansing_modifier, 0, -1 },
-	{ "AvatarRemoval", fx_avatar_removal, 0, -1 }, //unknown
+	{ "SummonDisable", fx_avatar_removal, 0, -1 }, //unknown
 	{ "AvatarRemovalModifier", fx_avatar_removal_modifier, 0, -1 },
 	{ "BackstabModifier", fx_backstab_modifier, 0, -1 },
 	{ "BerserkStage1Modifier", fx_berserkstage1_modifier, 0, -1 },
