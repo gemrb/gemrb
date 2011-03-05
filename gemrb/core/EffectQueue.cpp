@@ -35,6 +35,7 @@ static struct {
 	const char* Name;
 	EffectFunction Function;
 	int Strref;
+	int Flags;
 } Opcodes[MAX_EFFECTS];
 
 static int initialized = 0;
@@ -187,31 +188,6 @@ static EffectDesc* FindEffect(const char* effectname)
 
 static EffectRef fx_protection_from_display_string_ref = { "Protection:String", -1 };
 
-//special effects without level check (but with damage dices precalculated)
-static EffectRef diced_effects[] = {
-	//core effects
-	{"Damage",-1},
-	{"CurrentHPModifier",-1},
-	{"MaximumHPModifier",-1},
-	//iwd effects
-	{"BurningBlood",-1}, //iwd
-	{"ColdDamage",-1},
-	{"CrushingDamage",-1},
-	{"VampiricTouch",-1},
-	{"VitriolicSphere",-1},
-	//pst effects
-	{"TransferHP",-1},
-	{NULL,0} };
-
-//special effects without level check (but with damage dices not precalculated)
-static EffectRef diced_effects2[] = {
-	{"Charm",-1}, //all
-	{"BurningBlood2",-1}, //how/iwd2
-	{"StaticCharge",-1}, //how/iwd2
-	{"SoulEater",-1}, //how/iwd2
-	{"LichTouch",-1}, //how
-	{NULL,0} };
-
 inline static void ResolveEffectRef(EffectRef &effect_reference)
 {
 	if( effect_reference.opcode==-1) {
@@ -270,6 +246,7 @@ bool Init_EffectQueue()
 		if( poi != NULL) {
 			Opcodes[i].Function = poi->Function;
 			Opcodes[i].Name = poi->Name;
+			Opcodes[i].Flags = poi->Flags;
 			//reverse linking opcode number
 			//using this unused field
 			if( (poi->opcode!=-1) && effectname[0]!='*') {
@@ -281,14 +258,6 @@ bool Init_EffectQueue()
 		//printf("-------- FN: %d, %s\n", i, effectname);
 	}
 	core->DelSymbol( eT );
-
-	//additional initialisations
-	for (i=0;diced_effects[i].Name;i++) {
-		ResolveEffectRef(diced_effects[i]);
-	}
-	for (i=0;diced_effects2[i].Name;i++) {
-		ResolveEffectRef(diced_effects2[i]);
-	}
 
 	return true;
 }
@@ -711,39 +680,13 @@ int EffectQueue::AddAllEffects(Actor* target, const Point &destination) const
 	return res;
 }
 
-//check if an effect has no level based resistance, but instead the dice sizes/count
-//adjusts Parameter1 (like a damage causing effect)
-inline static bool IsDicedEffect(int opcode)
-{
-	int i;
-
-	for(i=0;diced_effects[i].Name;i++) {
-		if( diced_effects[i].opcode==opcode) {
-			return true;
-		}
-	}
-	return false;
-}
-
-//there is no level based resistance, but Parameter1 cannot be precalculated
-//these effects use the Dice fields in a special way
-inline static bool IsDicedEffect2(int opcode)
-{
-	int i;
-
-	for(i=0;diced_effects2[i].Name;i++) {
-		if( diced_effects2[i].opcode==opcode) {
-			return true;
-		}
-	}
-	return false;
-}
-
 //resisted effect based on level
 inline bool check_level(Actor *target, Effect *fx)
 {
 	//skip non level based effects
-	if( IsDicedEffect((int) fx->Opcode)) {
+	//check if an effect has no level based resistance, but instead the dice sizes/count
+	//adjusts Parameter1 (like a damage causing effect)
+	if( Opcodes[fx->Opcode].Flags & EFFECT_DICED ) {
 		//add the caster level to the dice count
 		if (fx->IsVariable) {
 			fx->DiceThrown+=fx->CasterLevel;
@@ -761,7 +704,9 @@ inline bool check_level(Actor *target, Effect *fx)
 		}
 		return false;
 	}
-	if( IsDicedEffect2((int) fx->Opcode)) {
+	//there is no level based resistance, but Parameter1 cannot be precalculated
+	//these effects use the Dice fields in a special way
+	if( Opcodes[fx->Opcode].Flags & EFFECT_NO_LEVEL_CHECK ) {
 		return false;
 	}
 

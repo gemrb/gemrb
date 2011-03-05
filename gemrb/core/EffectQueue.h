@@ -148,7 +148,14 @@ struct EffectRef {
 struct EffectDesc {
 	const char* Name;
 	EffectFunction Function;
+	int Flags;
 	int opcode;
+};
+
+enum EffectFlags {
+	EFFECT_NORMAL = 0,
+	EFFECT_DICED = 1,
+	EFFECT_NO_LEVEL_CHECK = 2
 };
 
 /** Initializes table of available spell Effects used by all the queues. */

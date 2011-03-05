@@ -223,125 +223,125 @@ static int fx_rapid_shot (Scriptable* Owner, Actor* target, Effect* fx); //457
 
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectDesc effectnames[] = {
-	{ "ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, -1}, //0
-	{ "DamageBonusModifier", fx_damage_bonus_modifier, -1 }, //49
-	{ "DrawUponHolyMight", fx_draw_upon_holy_might, -1},//84 (iwd2)
-	{ "RetreatFrom", fx_turn_undead, -1 },//6e
-	{ "IronSkins", fx_ironskins, -1}, //da (iwd2)
-	{ "Color:FadeRGB", fx_fade_rgb, -1}, //e8
-	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, -1}, //e9
-	{ "ColdDamage", fx_cold_damage, -1}, //ea
-	{ "ChillTouch", fx_chill_touch, -1}, //ec (how)
-	{ "ChillTouchPanic", fx_chill_touch_panic, -1}, //ec (iwd2)
-	{ "CrushingDamage", fx_crushing_damage, -1}, //ed
-	{ "SaveBonus", fx_save_bonus, -1}, //ee
-	{ "SlowPoison", fx_slow_poison, -1}, //ef
-	{ "IWDMonsterSummoning", fx_iwd_monster_summoning, -1}, //f0
-	{ "VampiricTouch", fx_vampiric_touch, -1}, //f1
-	{ "AnimateDead", fx_animate_dead, -1}, //f3
-	{ "Prayer2", fx_prayer, -1}, //f4
-	{ "Curse2", fx_curse, -1}, //f5
-	{ "SummonMonster2", fx_summon_monster2, -1}, //f6
-	{ "BurningBlood", fx_burning_blood, -1}, //f7
-	{ "BurningBlood2", fx_burning_blood2, -1}, //f7
-	{ "SummonShadowMonster", fx_summon_shadow_monster, -1}, //f8
-	{ "Recitation", fx_recitation, -1}, //f9
-	{ "RecitationBad", fx_recitation_bad, -1},//fa
-	{ "LichTouch", fx_lich_touch, -1},//fb
-	{ "BlindingOrb", fx_blinding_orb, -1}, //fc
-	{ "RemoveEffects", fx_remove_effects, -1}, //fe
-	{ "SalamanderAura", fx_salamander_aura, -1}, //ff
-	{ "UmberHulkGaze", fx_umberhulk_gaze, -1}, //100
-	{ "ZombieLordAura", fx_zombielord_aura, -1},//101, duff in iwd2
-	{ "SummonCreature2", fx_summon_creature2, -1}, //103
-	{ "AvatarRemoval", fx_avatar_removal, -1}, //104
-	{ "SummonPomab", fx_summon_pomab, -1}, //106
-	{ "ControlUndead", fx_control_undead, -1}, //107
-	{ "StaticCharge", fx_static_charge, -1}, //108
-	{ "CloakOfFear", fx_cloak_of_fear, -1}, //109 how/iwd2
-	{ "EyeOfTheMind", fx_eye_of_the_mind, -1}, //10c
-	{ "EyeOfTheSword", fx_eye_of_the_sword, -1}, //10d
-	{ "EyeOfTheMage", fx_eye_of_the_mage, -1}, //10e
-	{ "EyeOfVenom", fx_eye_of_venom, -1}, //10f
-	{ "EyeOfTheSpirit", fx_eye_of_the_spirit, -1}, //110
-	{ "EyeOfFortitude", fx_eye_of_fortitude, -1}, //111
-	{ "EyeOfStone", fx_eye_of_stone, -1}, //112
-	{ "RemoveSevenEyes", fx_remove_seven_eyes, -1}, //113
-	{ "RemoveEffect", fx_remove_effect, -1}, //114
-	{ "SoulEater", fx_soul_eater, -1}, //115
-	{ "ShroudOfFlame", fx_shroud_of_flame, -1},//116
-	{ "ShroudOfFlame2", fx_shroud_of_flame2, -1},//116
-	{ "AnimalRage", fx_animal_rage, -1}, //117 - berserk?
-	{ "TurnUndead", fx_turn_undead, -1}, //118 how
-	{ "TurnUndead2", fx_turn_undead2, -1}, //118 iwd2
-	{ "VitriolicSphere", fx_vitriolic_sphere, -1}, //119
-	{ "SuppressHP", fx_suppress_hp, -1}, //11a -- some stat???
-	{ "FloatText", fx_floattext, -1}, //11b
-	{ "MaceOfDisruption", fx_mace_of_disruption, -1}, //11c
-	{ "State:Set", fx_set_state, -1}, //120
-	{ "CutScene", fx_cutscene, -1}, //121
-	{ "Protection:Spell2", fx_resist_spell, -1}, //ce
-	{ "Protection:Spell3", fx_resist_spell_and_message, -1}, //122
-	{ "RodOfSmithing", fx_rod_of_smithing, -1}, //123
-	{ "BeholderDispelMagic", fx_beholder_dispel_magic, -1},//125
-	{ "HarpyWail", fx_harpy_wail, -1}, //126
-	{ "JackalWereGaze", fx_jackalwere_gaze, -1}, //127
-	{ "UseMagicDeviceModifier", fx_use_magic_device_modifier, -1}, //12a
+	{ "ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, 0, -1 }, //0
+	{ "DamageBonusModifier", fx_damage_bonus_modifier, 0, -1 }, //49
+	{ "DrawUponHolyMight", fx_draw_upon_holy_might, 0, -1 },//84 (iwd2)
+	{ "RetreatFrom", fx_turn_undead, 0, -1 },//6e
+	{ "IronSkins", fx_ironskins, 0, -1 }, //da (iwd2)
+	{ "Color:FadeRGB", fx_fade_rgb, 0, -1 }, //e8
+	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, 0, -1 }, //e9
+	{ "ColdDamage", fx_cold_damage, EFFECT_DICED, -1 }, //ea
+	{ "ChillTouch", fx_chill_touch, 0, -1 }, //ec (how)
+	{ "ChillTouchPanic", fx_chill_touch_panic, 0, -1 }, //ec (iwd2)
+	{ "CrushingDamage", fx_crushing_damage, EFFECT_DICED, -1 }, //ed
+	{ "SaveBonus", fx_save_bonus, 0, -1 }, //ee
+	{ "SlowPoison", fx_slow_poison, 0, -1 }, //ef
+	{ "IWDMonsterSummoning", fx_iwd_monster_summoning, 0, -1 }, //f0
+	{ "VampiricTouch", fx_vampiric_touch, EFFECT_DICED, -1 }, //f1
+	{ "AnimateDead", fx_animate_dead, 0, -1 }, //f3
+	{ "Prayer2", fx_prayer, 0, -1 }, //f4
+	{ "Curse2", fx_curse, 0, -1 }, //f5
+	{ "SummonMonster2", fx_summon_monster2, 0, -1 }, //f6
+	{ "BurningBlood", fx_burning_blood, EFFECT_DICED, -1 }, //f7
+	{ "BurningBlood2", fx_burning_blood2, EFFECT_NO_LEVEL_CHECK, -1 }, //f7
+	{ "SummonShadowMonster", fx_summon_shadow_monster, 0, -1 }, //f8
+	{ "Recitation", fx_recitation, 0, -1 }, //f9
+	{ "RecitationBad", fx_recitation_bad, 0, -1 },//fa
+	{ "LichTouch", fx_lich_touch, EFFECT_NO_LEVEL_CHECK, -1 },//fb
+	{ "BlindingOrb", fx_blinding_orb, 0, -1 }, //fc
+	{ "RemoveEffects", fx_remove_effects, 0, -1 }, //fe
+	{ "SalamanderAura", fx_salamander_aura, 0, -1 }, //ff
+	{ "UmberHulkGaze", fx_umberhulk_gaze, 0, -1 }, //100
+	{ "ZombieLordAura", fx_zombielord_aura, 0, -1 },//101, duff in iwd2
+	{ "SummonCreature2", fx_summon_creature2, 0, -1 }, //103
+	{ "AvatarRemoval", fx_avatar_removal, 0, -1 }, //104
+	{ "SummonPomab", fx_summon_pomab, 0, -1 }, //106
+	{ "ControlUndead", fx_control_undead, 0, -1 }, //107
+	{ "StaticCharge", fx_static_charge, EFFECT_NO_LEVEL_CHECK, -1 }, //108
+	{ "CloakOfFear", fx_cloak_of_fear, 0, -1 }, //109 how/iwd2
+	{ "EyeOfTheMind", fx_eye_of_the_mind, 0, -1 }, //10c
+	{ "EyeOfTheSword", fx_eye_of_the_sword, 0, -1 }, //10d
+	{ "EyeOfTheMage", fx_eye_of_the_mage, 0, -1 }, //10e
+	{ "EyeOfVenom", fx_eye_of_venom, 0, -1 }, //10f
+	{ "EyeOfTheSpirit", fx_eye_of_the_spirit, 0, -1 }, //110
+	{ "EyeOfFortitude", fx_eye_of_fortitude, 0, -1 }, //111
+	{ "EyeOfStone", fx_eye_of_stone, 0, -1 }, //112
+	{ "RemoveSevenEyes", fx_remove_seven_eyes, 0, -1 }, //113
+	{ "RemoveEffect", fx_remove_effect, 0, -1 }, //114
+	{ "SoulEater", fx_soul_eater, EFFECT_NO_LEVEL_CHECK, -1 }, //115
+	{ "ShroudOfFlame", fx_shroud_of_flame, 0, -1 },//116
+	{ "ShroudOfFlame2", fx_shroud_of_flame2, 0, -1 },//116
+	{ "AnimalRage", fx_animal_rage, 0, -1 }, //117 - berserk?
+	{ "TurnUndead", fx_turn_undead, 0, -1 }, //118 how
+	{ "TurnUndead2", fx_turn_undead2, 0, -1 }, //118 iwd2
+	{ "VitriolicSphere", fx_vitriolic_sphere, EFFECT_DICED, -1 }, //119
+	{ "SuppressHP", fx_suppress_hp, 0, -1 }, //11a -- some stat???
+	{ "FloatText", fx_floattext, 0, -1 }, //11b
+	{ "MaceOfDisruption", fx_mace_of_disruption, 0, -1 }, //11c
+	{ "State:Set", fx_set_state, 0, -1 }, //120
+	{ "CutScene", fx_cutscene, 0, -1 }, //121
+	{ "Protection:Spell2", fx_resist_spell, 0, -1 }, //ce
+	{ "Protection:Spell3", fx_resist_spell_and_message, 0, -1 }, //122
+	{ "RodOfSmithing", fx_rod_of_smithing, 0, -1 }, //123
+	{ "BeholderDispelMagic", fx_beholder_dispel_magic, 0, -1 },//125
+	{ "HarpyWail", fx_harpy_wail, 0, -1 }, //126
+	{ "JackalWereGaze", fx_jackalwere_gaze, 0, -1 }, //127
+	{ "UseMagicDeviceModifier", fx_use_magic_device_modifier, 0, -1 }, //12a
 	//unhardcoded hacks for IWD
-	{ "AlterAnimation", fx_alter_animation, -1}, //399
+	{ "AlterAnimation", fx_alter_animation, 0, -1 }, //399
 	//iwd2 effects
-	{ "Hopelessness", fx_hopelessness, -1}, //400
-	{ "ProtectionFromEvil", fx_protection_from_evil, -1}, //401
-	{ "AddEffectsList", fx_add_effects_list, -1}, //402
-	{ "ArmorOfFaith", fx_armor_of_faith, -1}, //403
-	{ "Nausea", fx_nausea, -1}, //404
-	{ "Enfeeblement", fx_enfeeblement, -1}, //405
-	{ "FireShield", fx_fireshield, -1}, //406
-	{ "DeathWard", fx_death_ward, -1}, //407
-	{ "HolyPower", fx_holy_power, -1}, //408
-	{ "RighteousWrath", fx_righteous_wrath, -1}, //409
-	{ "SummonAlly", fx_summon_ally, -1}, //410
-	{ "SummonEnemy", fx_summon_enemy, -1}, //411
-	{ "Control2", fx_control, -1}, //412
-	{ "VisualEffectIWD2", fx_visual_effect_iwd2, -1}, //413
-	{ "ResilientSphere", fx_resilient_sphere, -1}, //414
-	{ "BarkSkin", fx_barkskin, -1}, //415
-	{ "BleedingWounds", fx_bleeding_wounds, -1},//416
-	{ "AreaEffect", fx_area_effect, -1}, //417
-	{ "FreeAction2", fx_free_action_iwd2, -1}, //418
-	{ "Unconsciousness", fx_unconsciousness, -1}, //419
-	{ "EntropyShield", fx_entropy_shield, -1}, //421
-	{ "StormShell", fx_storm_shell, -1}, //422
-	{ "ProtectionFromElements", fx_protection_from_elements, -1}, //423
-	{ "ControlUndead2", fx_control_undead, -1}, //425
-	{ "Aegis", fx_aegis, -1}, //426
-	{ "ExecutionerEyes", fx_executioner_eyes, -1}, //427
-	{ "ProjectileUseEffectList", fx_projectile_use_effect_list, -1}, //430
-	{ "EnergyDrain", fx_energy_drain, -1}, //431
-	{ "TortoiseShell", fx_tortoise_shell, -1}, //432
-	{ "Blink", fx_blink, -1},//433
-	{ "PersistentUseEffectList", fx_persistent_use_effect_list, -1}, //434
-	{ "DayBlindness", fx_day_blindness, -1}, //435
-	{ "DamageReduction", fx_damage_reduction, -1}, //436
-	{ "Disguise", fx_disguise, -1}, //437
-	{ "HeroicInspiration", fx_heroic_inspiration, -1},//438
-	//{ "PreventAISlowDown", fx_prevent_ai_slowdown, -1}, //439 same as bg2
-	{ "BarbarianRage", fx_barbarian_rage, -1}, //440
-	{ "MissileDamageReduction", fx_missile_damage_reduction, -1}, //443
-	{ "TensersTransformation", fx_tenser_transformation, -1}, //444
-	{ "SmiteEvil", fx_smite_evil, -1}, //446
-	{ "Restoration", fx_restoration, -1}, //447
-	{ "AlicornLance", fx_alicorn_lance, -1}, //448
-	{ "CallLightning", fx_call_lightning, -1}, //449
-	{ "GlobeInvulnerability", fx_globe_invulnerability, -1}, //450
-	{ "LowerResistance", fx_lower_resistance, -1}, //451
-	{ "Bane", fx_bane, -1}, //452
-	{ "PowerAttack", fx_power_attack, -1}, //453
-	{ "Expertise", fx_expertise, -1}, //454
-	{ "ArterialStrike", fx_arterial_strike, -1}, //455
-	{ "HamString", fx_hamstring, -1}, //456
-	{ "RapidShot", fx_rapid_shot, -1}, //457
-	{ NULL, NULL, 0 },
+	{ "Hopelessness", fx_hopelessness, 0, -1 }, //400
+	{ "ProtectionFromEvil", fx_protection_from_evil, 0, -1 }, //401
+	{ "AddEffectsList", fx_add_effects_list, 0, -1 }, //402
+	{ "ArmorOfFaith", fx_armor_of_faith, 0, -1 }, //403
+	{ "Nausea", fx_nausea, 0, -1 }, //404
+	{ "Enfeeblement", fx_enfeeblement, 0, -1 }, //405
+	{ "FireShield", fx_fireshield, 0, -1 }, //406
+	{ "DeathWard", fx_death_ward, 0, -1 }, //407
+	{ "HolyPower", fx_holy_power, 0, -1 }, //408
+	{ "RighteousWrath", fx_righteous_wrath, 0, -1 }, //409
+	{ "SummonAlly", fx_summon_ally, 0, -1 }, //410
+	{ "SummonEnemy", fx_summon_enemy, 0, -1 }, //411
+	{ "Control2", fx_control, 0, -1 }, //412
+	{ "VisualEffectIWD2", fx_visual_effect_iwd2, 0, -1 }, //413
+	{ "ResilientSphere", fx_resilient_sphere, 0, -1 }, //414
+	{ "BarkSkin", fx_barkskin, 0, -1 }, //415
+	{ "BleedingWounds", fx_bleeding_wounds, 0, -1 },//416
+	{ "AreaEffect", fx_area_effect, 0, -1 }, //417
+	{ "FreeAction2", fx_free_action_iwd2, 0, -1 }, //418
+	{ "Unconsciousness", fx_unconsciousness, 0, -1 }, //419
+	{ "EntropyShield", fx_entropy_shield, 0, -1 }, //421
+	{ "StormShell", fx_storm_shell, 0, -1 }, //422
+	{ "ProtectionFromElements", fx_protection_from_elements, 0, -1 }, //423
+	{ "ControlUndead2", fx_control_undead, 0, -1 }, //425
+	{ "Aegis", fx_aegis, 0, -1 }, //426
+	{ "ExecutionerEyes", fx_executioner_eyes, 0, -1 }, //427
+	{ "ProjectileUseEffectList", fx_projectile_use_effect_list, 0, -1 }, //430
+	{ "EnergyDrain", fx_energy_drain, 0, -1 }, //431
+	{ "TortoiseShell", fx_tortoise_shell, 0, -1 }, //432
+	{ "Blink", fx_blink, 0, -1 },//433
+	{ "PersistentUseEffectList", fx_persistent_use_effect_list, 0, -1 }, //434
+	{ "DayBlindness", fx_day_blindness, 0, -1 }, //435
+	{ "DamageReduction", fx_damage_reduction, 0, -1 }, //436
+	{ "Disguise", fx_disguise, 0, -1 }, //437
+	{ "HeroicInspiration", fx_heroic_inspiration, 0, -1 },//438
+	//{ "PreventAISlowDown", fx_prevent_ai_slowdown, 0, -1 }, //439 same as bg2
+	{ "BarbarianRage", fx_barbarian_rage, 0, -1 }, //440
+	{ "MissileDamageReduction", fx_missile_damage_reduction, 0, -1 }, //443
+	{ "TensersTransformation", fx_tenser_transformation, 0, -1 }, //444
+	{ "SmiteEvil", fx_smite_evil, 0, -1 }, //446
+	{ "Restoration", fx_restoration, 0, -1 }, //447
+	{ "AlicornLance", fx_alicorn_lance, 0, -1 }, //448
+	{ "CallLightning", fx_call_lightning, 0, -1 }, //449
+	{ "GlobeInvulnerability", fx_globe_invulnerability, 0, -1 }, //450
+	{ "LowerResistance", fx_lower_resistance, 0, -1 }, //451
+	{ "Bane", fx_bane, 0, -1 }, //452
+	{ "PowerAttack", fx_power_attack, 0, -1 }, //453
+	{ "Expertise", fx_expertise, 0, -1 }, //454
+	{ "ArterialStrike", fx_arterial_strike, 0, -1 }, //455
+	{ "HamString", fx_hamstring, 0, -1 }, //456
+	{ "RapidShot", fx_rapid_shot, 0, -1 }, //457
+	{ NULL, NULL, 0, 0 },
 };
 
 struct IWDIDSEntry {
