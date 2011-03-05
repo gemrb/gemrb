@@ -368,7 +368,7 @@ static void Cleanup()
 
 void RegisterIWDOpcodes()
 {
-	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
+	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
 	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
 	//create enemy trigger object for enemy in line of sight check
 	if (!Enemy) {

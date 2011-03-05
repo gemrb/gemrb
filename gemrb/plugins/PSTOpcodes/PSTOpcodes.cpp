@@ -85,7 +85,7 @@ static EffectDesc effectnames[] = {
 
 void RegisterTormentOpcodes()
 {
-	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
+	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
 }
 
 //retreat_from (works only in PST) - forces target to run away/walk away from Owner

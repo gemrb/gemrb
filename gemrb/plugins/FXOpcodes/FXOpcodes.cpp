@@ -771,7 +771,7 @@ static void Cleanup()
 
 void RegisterCoreOpcodes()
 {
-	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
+	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
 	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
 	pstflags=!!core->HasFeature(GF_PST_STATE_FLAGS);
 	default_spell_hit.SequenceFlags|=IE_VVC_BAM;

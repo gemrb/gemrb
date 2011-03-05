@@ -39,7 +39,7 @@ static struct {
 } Opcodes[MAX_EFFECTS];
 
 static int initialized = 0;
-static EffectRef *effectnames = NULL;
+static EffectDesc *effectnames = NULL;
 static int effectnames_count = 0;
 static int pstflags = false;
 
@@ -178,7 +178,7 @@ static EffectDesc* FindEffect(const char* effectname)
 	if( !effectname || !effectnames) {
 		return NULL;
 	}
-	void *tmp = bsearch(effectname, effectnames, effectnames_count, sizeof(EffectRef), find_effect);
+	void *tmp = bsearch(effectname, effectnames, effectnames_count, sizeof(EffectDesc), find_effect);
 	if( !tmp) {
 		printMessage( "EffectQueue", "", YELLOW);
 		printf("Couldn't assign effect: %s\n", effectname );
@@ -274,18 +274,18 @@ void EffectQueue_ReleaseMemory()
 void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 {
 	if( ! effectnames) {
-		effectnames = (EffectRef*) malloc( (count+1) * sizeof( EffectRef ) );
+		effectnames = (EffectDesc*) malloc( (count+1) * sizeof( EffectDesc ) );
 	} else {
-		effectnames = (EffectRef*) realloc( effectnames, (effectnames_count + count + 1) * sizeof( EffectRef ) );
+		effectnames = (EffectDesc*) realloc( effectnames, (effectnames_count + count + 1) * sizeof( EffectDesc ) );
 	}
 
-	memcpy( effectnames + effectnames_count, opcodes, count * sizeof( EffectRef ));
+	memcpy( effectnames + effectnames_count, opcodes, count * sizeof( EffectDesc ));
 	effectnames_count += count;
 	effectnames[effectnames_count].Name = NULL;
 	//if we merge two effect lists, then we need to sort their effect tables
 	//actually, we might always want to sort this list, so there is no
 	//need to do it manually (sorted table is needed if we use bsearch)
-	qsort(effectnames, effectnames_count, sizeof(EffectRef), compare_effects);
+	qsort(effectnames, effectnames_count, sizeof(EffectDesc), compare_effects);
 }
 
 EffectQueue::EffectQueue()
