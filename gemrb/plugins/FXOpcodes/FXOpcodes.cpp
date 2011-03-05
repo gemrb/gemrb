@@ -702,7 +702,7 @@ static EffectDesc effectnames[] = {
 	{ "State:Berserk", fx_set_berserk_state, 0, -1 },
 	{ "State:Blind", fx_set_blind_state, 0, -1 },
 	{ "State:Blur", fx_set_blur_state, 0, -1 },
-	{ "State:Charmed", fx_set_charmed_state, 0, -1 }, //0x05
+	{ "State:Charmed", fx_set_charmed_state, EFFECT_NO_LEVEL_CHECK, -1 }, //0x05
 	{ "State:Confused", fx_set_confused_state, 0, -1 },
 	{ "State:Deafness", fx_set_deaf_state, 0, -1 },
 	{ "State:DeafnessIWD2", fx_set_deaf_state_iwd2, 0, -1 }, //this is a modified version
