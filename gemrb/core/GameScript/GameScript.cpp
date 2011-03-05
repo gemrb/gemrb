@@ -204,6 +204,7 @@ static const TriggerLink triggernames[] = {
 	{"isactive", GameScript::IsActive, 0},
 	{"isanimationid", GameScript::AnimationID, 0},
 	{"iscreatureareaflag", GameScript::IsCreatureAreaFlag, 0},
+	{"iscreaturehiddeninshadows", GameScript::IsCreatureHiddenInShadows, 0},
 	{"isfacingobject", GameScript::IsFacingObject, 0},
 	{"isfacingsavedrotation", GameScript::IsFacingSavedRotation, 0},
 	{"isgabber", GameScript::IsGabber, 0},
