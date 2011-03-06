@@ -12,6 +12,7 @@ GemRB git (e424e7686c3543e5):
     - bink player has no/less artifacts, good sound quality
     - combat, effects, actions, triggers, banters
     - bugfixes
+    - VVC lightspot support
 
   Applied patches:
     a set of patches for Android support from Beholder
