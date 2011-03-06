@@ -999,7 +999,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadWord( &anim->sequence );
 			str->ReadWord( &anim->frame );
 			str->ReadDword( &anim->Flags );
-			str->ReadWord( (ieWord *) &anim->height );
+			str->ReadWordSigned( &anim->height );
 			str->ReadWord( &anim->transparency );
 			str->ReadWord( &anim->unknown3c ); //not completely understood, if not 0, sequence is started
 			str->Read( &anim->startchance,1 );
