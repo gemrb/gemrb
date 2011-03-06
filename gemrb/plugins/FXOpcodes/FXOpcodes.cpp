@@ -659,7 +659,7 @@ static EffectDesc effectnames[] = {
 	{ "Protection:Weapons", fx_immune_to_weapon, EFFECT_NO_ACTOR, -1 },
 	{ "PuppetMarker", fx_puppet_marker, 0, -1 },
 	{ "ProjectImage", fx_puppet_master, 0, -1 },
-	{ "Reveal:Area", fx_reveal_area, 0, -1 },
+	{ "Reveal:Area", fx_reveal_area, EFFECT_NO_ACTOR, -1 },
 	{ "Reveal:Creatures", fx_reveal_creatures, 0, -1 },
 	{ "Reveal:Magic", fx_reveal_magic, 0, -1 },
 	{ "Reveal:Tracks", fx_reveal_tracks, 0, -1 },
@@ -668,7 +668,7 @@ static EffectDesc effectnames[] = {
 	{ "RemoveMapNote", fx_remove_map_note, EFFECT_NO_ACTOR, -1 },
 	{ "RemoveProjectile", fx_remove_projectile, 0, -1 }, //removes effects from actor and area
 	{ "RenableButton", fx_renable_button, 0, -1 }, //removes disable button flag
-	{ "RemoveCreature", fx_remove_creature, 0, -1 },
+	{ "RemoveCreature", fx_remove_creature, EFFECT_NO_ACTOR, -1 },
 	{ "ReplaceCreature", fx_replace_creature, 0, -1 },
 	{ "ReputationModifier", fx_reputation_modifier, 0, -1 },
 	{ "RestoreSpells", fx_restore_spell_level, 0, -1 },
@@ -3120,7 +3120,14 @@ int fx_detect_alignment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_reveal_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_reveal_area (%2d): Value: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	Map *map = target->GetCurrentArea();
+	Map *map = NULL;
+	
+	if (target) {
+		map = target->GetCurrentArea();
+	}
+	else {
+		map = core->GetGame()->GetCurrentArea();
+	}
 	if (!map) {
 		return FX_APPLIED;
 	}
@@ -4297,7 +4304,15 @@ int fx_missile_to_hit_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx
 int fx_remove_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_remove_creature (%2d)\n", fx->Opcode);
-	Map *map = target->GetCurrentArea();
+
+	Map *map = NULL;
+	
+	if (target) {
+		map = target->GetCurrentArea();
+	}
+	else {
+		map = core->GetGame()->GetCurrentArea();
+	}
 	Actor *actor = target;
 
 	if (fx->Resource[0]) {
