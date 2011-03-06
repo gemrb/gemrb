@@ -213,7 +213,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	//apparently BG1/IWD2 relies on this, if chapter is unset, it is
 	//set to -1, hopefully it won't break anything
 	//PST has no chapter variable by default, and would crash on one
-	newGame->locals->SetAt("CHAPTER", (ieDword) -1, true);
+	newGame->locals->SetAt("CHAPTER", (ieDword) -1, core->HasFeature(GF_NO_NEW_VARIABLES));
 
 	// load initial values from var.var
 	newGame->locals->LoadInitialValues("GLOBAL");

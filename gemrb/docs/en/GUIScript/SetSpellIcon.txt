@@ -8,8 +8,8 @@ Description: Sets Spell icon image on a Button control. Type determines the icon
 Parameters:
 WindowIndex, ControlIndex  - the control's reference
 SPLResRef                  - the name of the spell (.spl resref)
-Type                       - (0 or 1)
-Tooltip                    - if 1 , set the tooltip "F<n> <spell_name>"
+Type                       - 0 (default, use parchment background) or 1 (use stone background)
+Tooltip                    - 0 (default); if 1, set the tooltip "F<n> <spell_name>"
 Function                   - number to be used in the tooltip above
 
 Return value: N/A
