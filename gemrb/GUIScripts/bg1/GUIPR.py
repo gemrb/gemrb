@@ -251,7 +251,7 @@ def OpenPriestSpellInfoWindow ():
 	Label.SetText (spell['SpellName'])
 
 	Button = Window.GetControl (2)
-	Button.SetSpellIcon (ResRef)
+	Button.SetSpellIcon (ResRef, 1)
 
 	Text = Window.GetControl (3)
 	Text.SetText (spell['SpellDesc'])
