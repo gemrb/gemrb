@@ -198,6 +198,7 @@ IDS
 0xc4	SpecialEffect
 0xc5	MultipleVVC
 0xc6	ModifyGlobalVariable
+0xc7	ChangeBackground
 0xc9	Overlay
 0xcb	Curse
 0xcc	Prayer
