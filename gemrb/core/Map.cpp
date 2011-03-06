@@ -33,6 +33,7 @@
 #include "Interface.h"
 #include "MapMgr.h"
 #include "MusicMgr.h"
+#include "ImageMgr.h"
 #include "Palette.h"
 #include "Particles.h"
 #include "PathFinder.h"
@@ -328,6 +329,8 @@ Map::Map(void)
 	VisibleBitmap = NULL;
 	version = 0;
 	MasterArea = core->GetGame()->MasterArea(scriptName);
+	Background = NULL;
+	BgDuration = 0;
 }
 
 Map::~Map(void)
@@ -817,7 +820,7 @@ void Map::UpdateScripts()
 					if(ip->Entered(actor)) {
 						//if trap triggered, then mark actor
 						actor->SetInTrap(ipCount);
-				    wasActive|=TRAP_USEPOINT;
+					  wasActive|=TRAP_USEPOINT;
 					}
 				} else {
 					//ST_TRAVEL
@@ -1048,20 +1051,33 @@ void Map::DrawMap(Region screen)
 		INISpawn->CheckSpawn();
 	}
 
-	int rain;
-	if (HasWeather()) {
-		//zero when the weather particles are all gone
-		rain = game->weather->GetPhase()-P_EMPTY;
-	} else {
-		rain = 0;
-	}
-	TMap->DrawOverlays( screen, rain );
-
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
+	int bgoverride = false;
 
-	//Draw Outlines
-	DrawHighlightables( screen );
+	if (Background) {
+		if (BgDuration<gametime) {
+		  video->FreeSprite(Background);
+		} else {
+		  video->BlitSprite(Background,0,0,true);
+		  bgoverride = true;
+		}
+	}
+
+	if (!bgoverride) {
+		int rain;
+		if (HasWeather()) {
+			//zero when the weather particles are all gone
+			rain = game->weather->GetPhase()-P_EMPTY;
+		} else {
+			rain = 0;
+		}
+
+		TMap->DrawOverlays( screen, rain );
+
+		//Draw Outlines
+		DrawHighlightables( screen );
+	}
 
 	Region vp = video->GetViewport();
 	//if it is only here, then the scripting will fail?
@@ -3657,4 +3673,16 @@ void Map::SetInternalSearchMap(int x, int y, int value) {
 		return;
 	}
 	SrchMap[x+y*Width] = value;
+}
+
+void Map::SetBackground(const ieResRef &bgResRef, ieDword duration) {
+	Video* video = core->GetVideoDriver();
+
+	ResourceHolder<ImageMgr> bmp(bgResRef);
+
+	if (Background) {
+		video->FreeSprite(Background);
+	}
+	Background = bmp->GetSprite2D();
+	BgDuration = duration;
 }

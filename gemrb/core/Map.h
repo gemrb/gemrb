@@ -245,6 +245,9 @@ public:
 	bool DayNight;
 	//movies for day/night (only in ToB)
 	ieResRef Dream[2];
+	Sprite2D *Background;
+	ieDword BgDuration;
+
 private:
 	ieStrRef trackString;
 	int trackFlag;
@@ -471,6 +474,7 @@ public:
 	unsigned int GetLightLevel(const Point &Pos);
 	unsigned short GetInternalSearchMap(int x, int y);
 	void SetInternalSearchMap(int x, int y, int value);
+	void SetBackground(const ieResRef &bgResref, ieDword duration);
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);

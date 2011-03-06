@@ -34,12 +34,14 @@ int fx_set_status (Scriptable* Owner, Actor* target, Effect* fx);//ba
 int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx);//bb
 int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx);//bc
 int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx);//c0
-//int fx_shake_screen (Scriptable* Owner, Actor* target, Effect* fx);//c1 already implemented
+//int fx_shake_screen (Scriptable* Owner, Actor* target, Effect* fx);//c1 already implemented in fxopcodes
 int fx_flash_screen (Scriptable* Owner, Actor* target, Effect* fx);//c2
 int fx_tint_screen (Scriptable* Owner, Actor* target, Effect* fx);//c3
 int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx);//c4
 int fx_multiple_vvc (Scriptable* Owner, Actor* target, Effect* fx);//c5 //gemrb specific
-//unknown 0xc6-c8
+//int fx_modify_global ((Scriptable* Owner, Actor* target, Effect* fx);//c6 already implemented in fxopcodes
+int fx_change_background (Scriptable* Owner, Actor* target, Effect* fx);//c7 //gemrb specific
+//unknown 0xc7-c8
 int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx);//c9
 //unknown 0xca
 int fx_bless (Scriptable* Owner, Actor* target, Effect* fx);//82 (this is a modified effect)
@@ -57,6 +59,7 @@ int fx_speak_with_dead (Scriptable* Owner, Actor* target, Effect* fx);//d4
 //the engine sorts these, feel free to use any order
 static EffectDesc effectnames[] = {
 	{ "Bless", fx_bless, 0, -1 },//82
+	{ "ChangeBackground", fx_change_background, EFFECT_NO_ACTOR, -1 }, //c6
 	{ "Curse", fx_curse, 0, -1 },//cb
 	{ "DetectEvil", fx_detect_evil, 0, -1 }, //d2
 	{ "Embalm", fx_embalm, 0, -1 }, //0xce
@@ -461,7 +464,19 @@ int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0xc6-c8 fx_unknown
+//0xc6 ChangeBackground
+//GemRB specific, to support BMP area background changes (desert hell projectile)
+int fx_change_background (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_multiple_vvc (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	Map *map = core->GetGame()->GetCurrentArea();
+	if (map) {
+		map->SetBackground(fx->Resource, fx->Duration);
+	}
+	return FX_NOT_APPLIED;
+}
+
+//0xc7-c8 fx_unknown
 //0xc9 fx_overlay
 int fx_overlay (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
