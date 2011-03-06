@@ -307,7 +307,7 @@ static EffectDesc effectnames[] = {
 	{ "ResilientSphere", fx_resilient_sphere, 0, -1 }, //414
 	{ "BarkSkin", fx_barkskin, 0, -1 }, //415
 	{ "BleedingWounds", fx_bleeding_wounds, 0, -1 },//416
-	{ "AreaEffect", fx_area_effect, 0, -1 }, //417
+	{ "AreaEffect", fx_area_effect, EFFECT_NO_ACTOR, -1 }, //417
 	{ "FreeAction2", fx_free_action_iwd2, 0, -1 }, //418
 	{ "Unconsciousness", fx_unconsciousness, 0, -1 }, //419
 	{ "EntropyShield", fx_entropy_shield, 0, -1 }, //421
@@ -2639,13 +2639,35 @@ seconds:
 
 int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_area_effect (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
+	if (0) printf( "fx_area_effect (%2d) Radius: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	//this effect ceases to affect dead targets (probably on frozen and stoned too)
-	if (STATE_GET(STATE_DEAD) ) {
-		return FX_NOT_APPLIED;
+	Game *game = core->GetGame();
+	Map *map = NULL;
+
+	if (target) {
+		if (STATE_GET(STATE_DEAD) ) {
+			return FX_NOT_APPLIED;
+		}
+		map = target->GetCurrentArea();
+	} else {
+		map = game->GetCurrentArea();
 	}
 
+	if (fx->FirstApply) {
+		if (!fx->Parameter3) {
+			fx->Parameter3=AI_UPDATE_TIME;
+		} else {
+			fx->Parameter3*=AI_UPDATE_TIME;
+		}
+		fx->Parameter4 = 0;
+	}
+
+	if (fx->Parameter4>=game->GameTime) {
+		return FX_APPLIED;
+	}
+
+	fx->Parameter4 = game->GameTime+fx->Parameter3;
 	Point pos(fx->PosX, fx->PosY);
 
 	Spell *spell = gamedata->GetSpell(fx->Resource);
@@ -2656,7 +2678,7 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	EffectQueue *fxqueue = spell->GetEffectBlock(Owner, pos, 0, fx->CasterLevel);
 	fxqueue->SetOwner(Owner);
 	//bit 2 original target is excluded or not excluded
-	fxqueue->AffectAllInRange(target->GetCurrentArea(), pos, 0, 0,fx->Parameter1, fx->Parameter2&AE_TARGETEXCL?target:NULL);
+	fxqueue->AffectAllInRange(map, pos, 0, 0,fx->Parameter1, fx->Parameter2&AE_TARGETEXCL?target:NULL);
 	delete fxqueue;
 
 	//bit 1 repeat or only once
