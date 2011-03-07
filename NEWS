@@ -1,19 +1,19 @@
-GemRB git (e424e7686c3543e5):
+GemRB git (ae7e8b60536573e043):
   New features:
     - 
     - full wild, dead, miscast and vocal magic support
     - subspell selection (spell immunity, nahal's reckless dweomer...)
     - compatibility with the bg2 demo
-    - PST maze, projectiles
+    - PST maze and (un)hardcoded projectiles
     - Autodetect GameType if it is set to 'auto' or commented out
+    - VVC lightspot support
 
   Improved features:
     - 
-    - travel regions
+    - travel regions, projectiles
     - bink player has no/less artifacts, good sound quality
     - combat, effects, actions, triggers, banters
     - bugfixes
-    - VVC lightspot support
 
   Applied patches:
     a set of patches for Android support from Beholder
