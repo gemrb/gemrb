@@ -5,6 +5,7 @@ GemRB git (e424e7686c3543e5):
     - subspell selection (spell immunity, nahal's reckless dweomer...)
     - compatibility with the bg2 demo
     - PST maze, projectiles
+    - Autodetect GameType if it is set to 'auto' or commented out
 
   Improved features:
     - 
