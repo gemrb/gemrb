@@ -33,7 +33,7 @@ private:
 	_FILE* str;
 public:
 	CachedFileStream(const char* stream, bool autoFree = true);
-	CachedFileStream(CachedFileStream* cfs, int startpos, int size,
+	CachedFileStream(DataStream* cfs, int startpos, int size,
 		bool autoFree = true);
 	~CachedFileStream(void);
 	int Read(void* dest, unsigned int length);

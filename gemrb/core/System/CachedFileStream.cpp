@@ -74,7 +74,7 @@ CachedFileStream::CachedFileStream(const char* stream, bool autoFree)
 	this->autoFree = autoFree;
 }
 
-CachedFileStream::CachedFileStream(CachedFileStream* cfs, int startpos,
+CachedFileStream::CachedFileStream(DataStream* cfs, int startpos,
 	int size, bool autoFree)
 {
 	this->size = size;
