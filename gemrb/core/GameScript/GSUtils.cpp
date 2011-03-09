@@ -703,6 +703,8 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 		map->AddActor( tar );
 		Point pos = src->Pos;
 		tar->SetOrientation(src->GetOrientation(), false );
+		// make sure to copy the HP, to avoid things like magically-healing trolls
+		tar->BaseStats[IE_HITPOINTS]=src->BaseStats[IE_HITPOINTS];
 		src->DestroySelf();
 		// can't SetPosition while the old actor is taking the spot
 		tar->SetPosition(pos, 1);
