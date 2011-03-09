@@ -939,8 +939,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			//actually, Flags&1 signs that the creature
 			//is not loaded yet, so !(Flags&1) means it is embedded
 			if (CreOffset != 0 && !(Flags&1) ) {
-				CachedFileStream *fs = new CachedFileStream( str, CreOffset, CreSize, true);
-				crefile = (DataStream *) fs;
+				crefile = new CachedFileStream( str, CreOffset, CreSize, true);
 			} else {
 				crefile = gamedata->GetResource( CreResRef, IE_CRE_CLASS_ID );
 			}
