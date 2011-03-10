@@ -1082,20 +1082,20 @@ void Projectile::SecondaryTarget()
 				continue;
 			}
 		}
-		if (Extension->ExplProjIdx) {
-			Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
-			pro->SetEffectsCopy(effects);
-			//copy the additional effects reference to the child projectile
-			//but only when there is a spell to copy
-			if (SuccSpell[0])
-				memcpy(pro->SuccSpell, SuccSpell, sizeof(ieResRef) );
-			pro->SetCaster(Caster, Level);
-			//this is needed to apply the success spell on the center point
-			pro->SetTarget(Pos);
-			//TODO:actually some of the splash projectiles are a good example of faketarget
-			//projectiles (that don't follow the target, but still hit)
-			area->AddProjectile(pro, Pos, Target, false);
-		}
+
+		Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
+		pro->SetEffectsCopy(effects);
+		//copy the additional effects reference to the child projectile
+		//but only when there is a spell to copy
+		if (SuccSpell[0])
+			memcpy(pro->SuccSpell, SuccSpell, sizeof(ieResRef) );
+		pro->SetCaster(Caster, Level);
+		//this is needed to apply the success spell on the center point
+		pro->SetTarget(Pos);
+		//TODO:actually some of the splash projectiles are a good example of faketarget
+		//projectiles (that don't follow the target, but still hit)
+		area->AddProjectile(pro, Pos, Target, false);
+
 		poi++;
 		fail=false;
 
