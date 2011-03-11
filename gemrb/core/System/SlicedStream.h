@@ -39,8 +39,6 @@ public:
 	int Read(void* dest, unsigned int length);
 	int Write(const void* src, unsigned int length);
 	int Seek(int pos, int startpos);
-	/** No descriptions */
-	int ReadLine(void* buf, unsigned int maxlen);
 };
 
 #endif

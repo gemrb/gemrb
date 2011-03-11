@@ -98,32 +98,3 @@ int SlicedStream::Seek(int newpos, int type)
 	}
 	return GEM_OK;
 }
-
-/** No descriptions */
-int SlicedStream::ReadLine(void* buf, unsigned int maxlen)
-{
-	// FIXME: eof?
-	if (!maxlen) {
-		return 0;
-	}
-	unsigned char * p = ( unsigned char * ) buf;
-	if (Pos >= size) {
-		p[0]=0;
-		return -1;
-	}
-	unsigned int i = 0;
-	while (i < ( maxlen - 1 )) {
-		char ch;
-		Read(&ch, 1);
-		if (Pos == size)
-			break;
-		if (( ( char ) ch ) == '\n')
-			break;
-		if (( ( char ) ch ) == '\t')
-			ch = ' ';
-		if (( ( char ) ch ) != '\r')
-			p[i++] = ch;
-	}
-	p[i] = 0;
-	return i;
-}

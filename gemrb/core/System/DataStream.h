@@ -68,7 +68,7 @@ public:
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();
 	void ReadDecrypted(void* buf, unsigned int size);
-	virtual int ReadLine(void* buf, unsigned int maxlen) = 0;
+	virtual int ReadLine(void* buf, unsigned int maxlen);
 	/** Endian Switch setup */
 	static void SetEndianSwitch(int par);
 	static bool IsEndianSwitch();
