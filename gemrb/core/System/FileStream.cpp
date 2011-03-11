@@ -241,3 +241,13 @@ int FileStream::ReadLine(void* buf, unsigned int maxlen)
 	p[i] = 0;
 	return i;
 }
+
+FileStream* FileStream::OpenFile(const char* filename)
+{
+	FileStream *fs = new FileStream();
+	if (fs->Open(filename))
+		return fs;
+
+	delete fs;
+	return NULL;
+}

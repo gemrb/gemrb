@@ -1582,11 +1582,10 @@ int Interface::Init()
 	printMessage( "Core", "Loading Dialog.tlk file...", WHITE );
 	char strpath[_MAX_PATH];
 	PathJoin( strpath, GamePath, dialogtlk, NULL );
-	FileStream* fs = new FileStream();
-	if (!fs->Open( strpath, true )) {
+	FileStream* fs = FileStream::OpenFile(strpath);
+	if (!fs) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find Dialog.tlk.\nTermination in Progress...\n" );
-		delete fs;
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
@@ -1729,10 +1728,9 @@ int Interface::Init()
 		printMessage( "Core", "Loading precreated teams setup...\n",
 			WHITE );
 		INIparty = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		FileStream* fs = new FileStream();
 		char tINIparty[_MAX_PATH];
 		PathJoin( tINIparty, GamePath, "Party.ini", NULL );
-		fs->Open( tINIparty, true );
+		FileStream* fs = FileStream::OpenFile( tINIparty );
 		if (!INIparty->Open( fs, true )) {
 			printStatus( "ERROR", LIGHT_RED );
 		} else {
@@ -1748,11 +1746,10 @@ int Interface::Init()
 		printMessage( "Core", "Loading beasts definition File...\n",
 			WHITE );
 		INIbeasts = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		FileStream* fs = new FileStream();
 		char tINIbeasts[_MAX_PATH];
 		PathJoin( tINIbeasts, GamePath, "beast.ini", NULL );
 		// FIXME: crashes if file does not open
-		fs->Open( tINIbeasts, true );
+		FileStream* fs = FileStream::OpenFile( tINIbeasts );
 		if (!INIbeasts->Open( fs, true )) {
 			printStatus( "ERROR", LIGHT_RED );
 		} else {
@@ -1762,11 +1759,10 @@ int Interface::Init()
 		printMessage( "Core", "Loading quests definition File...\n",
 			WHITE );
 		INIquests = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		FileStream* fs2 = new FileStream();
 		char tINIquests[_MAX_PATH];
 		PathJoin( tINIquests, GamePath, "quests.ini", NULL );
 		// FIXME: crashes if file does not open
-		fs2->Open( tINIquests, true );
+		FileStream* fs2 = FileStream::OpenFile( tINIquests );
 		if (!INIquests->Open( fs2, true )) {
 			printStatus( "ERROR", LIGHT_RED );
 		} else {

@@ -61,13 +61,7 @@ static FileStream *SearchIn(const char * Path,const char * ResRef, const char *T
 	if (!PathJoinExt(p, Path, f, Type))
 		return NULL;
 
-	FileStream * fs = new FileStream();
-	if(!fs) return NULL;
-	if(!fs->Open(p, true)) {
-		delete fs;
-		return NULL;
-	}
-	return fs;
+	return FileStream::OpenFile(p);
 }
 
 bool DirectoryImporter::HasResource(const char* resname, SClass_ID type)

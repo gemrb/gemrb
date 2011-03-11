@@ -55,6 +55,12 @@ public:
 	int Write(const void* src, unsigned int length);
 	int Seek(int pos, int startpos);
 	int ReadLine(void* buf, unsigned int maxlen);
+public:
+	/** Opens the specifed file.
+	 *
+	 *  Returns NULL, if the file can't be opened.
+	 */
+	static FileStream* OpenFile(const char* filename);
 };
 
 #endif  // ! FILESTREAM_H

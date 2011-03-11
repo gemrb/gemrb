@@ -77,10 +77,9 @@ void ReleaseMemory()
 void ReadAutonoteINI()
 {
 	INInote = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-	FileStream* fs = new FileStream();
 	char tINInote[_MAX_PATH];
 	PathJoin( tINInote, core->GamePath, "autonote.ini", NULL );
-	fs->Open( tINInote, true );
+	FileStream* fs = FileStream::OpenFile( tINInote );
 	INInote->Open( fs, true );
 }
 
