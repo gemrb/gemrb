@@ -49,3 +49,31 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 	}
 	return FileStream::OpenFile(path);
 }
+
+DataStream* CacheFile(const char* path)
+{
+	if (!core->GameOnCD)
+		return FileStream::OpenFile(path);
+
+	char filename[_MAX_PATH];
+	char cachedfile[_MAX_PATH];
+	ExtractFileFromPath(filename, path);
+	PathJoin(cachedfile, core->CachePath, filename, NULL);
+
+	if (!file_exists(cachedfile)) {    // File was not found in cache
+		FILE* src = _fopen(path, "rb");
+		FILE* dest = _fopen(cachedfile, "wb");
+		char buff[1024 * 1000];
+		do {
+			size_t len = _fread(buff, 1, 1024 * 1000, src);
+			size_t c = _fwrite(buff, 1, len, dest);
+			if (c != len) {
+				printf("CachedFileStream failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
+				abort();
+			}
+		} while (!_feof(src));
+		_fclose(src);
+		_fclose(dest);
+	}
+	return FileStream::OpenFile(cachedfile);
+}

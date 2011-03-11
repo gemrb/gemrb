@@ -141,7 +141,9 @@ int BIFImporter::OpenArchive(const char* filename)
 	fclose( in_cache );
 	//normal bif, not in cache
 	if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
-		stream = new CachedFileStream( filename );
+		stream = CacheFile( filename );
+		if (!stream)
+			return GEM_ERROR;
 		stream->Read( Signature, 8 );
 		strcpy( path, filename );
 		ReadBIF();
