@@ -129,16 +129,16 @@ int BIFImporter::OpenArchive(const char* filename)
 		delete( stream );
 		stream = NULL;
 	}
-	FILE* in_cache = fopen( filename, "rb" );
-	if( !in_cache) {
+	FileStream* file = FileStream::OpenFile(filename);
+	if( !file) {
 		return GEM_ERROR;
 	}
 	char Signature[8];
-	if (fread( &Signature, 1, 8, in_cache ) != 8) {
-		fclose ( in_cache );
+	if (file->Read(Signature, 8) == GEM_ERROR) {
+		delete file;
 		return GEM_ERROR;
 	}
-	fclose( in_cache );
+	delete file;
 	//normal bif, not in cache
 	if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
 		stream = CacheFile( filename );
@@ -180,10 +180,8 @@ int BIFImporter::OpenArchive(const char* filename)
 	if (strncmp( Signature, "BIFCV1.0", 8 ) == 0) {
 		//printf("'BIFCV1.0' Compressed File Found\n");
 		PathJoin( path, core->CachePath, compressed->filename, NULL );
-		in_cache = fopen( path, "rb" );
-		if (in_cache) {
+		if (file_exists(path)) {
 			//printf("Found in Cache\n");
-			fclose( in_cache );
 			delete( compressed );
 			stream = FileStream::OpenFile(path);
 			if (!stream)
@@ -203,8 +201,8 @@ int BIFImporter::OpenArchive(const char* filename)
 		compressed->ReadDword( &unCompBifSize );
 		printf( "\nDecompressing file: [..........]" );
 		fflush(stdout);
-		in_cache = fopen( path, "wb" );
-		if (!in_cache) {
+		FileStream out;
+		if (!out.Create(path)) {
 			printMessage("BIFImporter", " ", RED);
 			printf( "Cannot write %s.\n", path );	
 			return GEM_ERROR;
@@ -215,10 +213,10 @@ int BIFImporter::OpenArchive(const char* filename)
 			ieDword complen, declen;
 			compressed->ReadDword( &declen );
 			compressed->ReadDword( &complen );
-			if (comp->Decompress( in_cache, compressed, complen ) != GEM_OK) {
+			if (comp->Decompress( &out, compressed, complen ) != GEM_OK) {
 				return GEM_ERROR;
 			}
-			finalsize = ftell( in_cache );
+			finalsize = out.GetPos();
 			if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
 				laststep++;
 				printf( "\b\b\b\b\b\b\b\b\b\b\b" );
@@ -233,7 +231,6 @@ int BIFImporter::OpenArchive(const char* filename)
 			}
 		}
 		printf( "\n" );
-		fclose( in_cache );
 		delete( compressed );
 		stream = FileStream::OpenFile(path);
 		if (!stream)

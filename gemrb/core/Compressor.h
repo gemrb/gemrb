@@ -24,14 +24,12 @@
 #include "Plugin.h"
 #include "System/DataStream.h"
 
-#include <cstdio>
-
 class GEM_EXPORT Compressor : public Plugin {
 public:
 	Compressor(void);
 	virtual ~Compressor(void);
 	/** decompresses a datastream (memory or file) to a FILE * stream */
-	virtual int Decompress(FILE* dest, DataStream* source, unsigned int size_guess = 0) const = 0;
+	virtual int Decompress(DataStream* dest, DataStream* source, unsigned int size_guess = 0) const = 0;
 	/** compresses a datastream (memory or file) to another DataStream */
 	virtual int Compress(DataStream *dest, DataStream* source) const = 0;
 };

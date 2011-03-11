@@ -36,16 +36,15 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 	PathJoin(path, core->CachePath, fname, NULL);
 
 	if (!file_exists(path)) {
-		FILE* out = fopen(path, "wb");
-		if (!out) {
+		FileStream out;
+		if (!out.Create(path)) {
 			printMessage("FileCache", " ", RED);
 			printf( "Cannot write %s.\n", path );
 			return NULL;
 		}
 
 		PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
-		comp->Decompress(out, stream, length);
-		fclose(out);
+		comp->Decompress(&out, stream, length);
 	}
 	return FileStream::OpenFile(path);
 }

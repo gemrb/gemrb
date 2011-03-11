@@ -113,8 +113,17 @@ bool FileStream::Create(const char* fname, SClass_ID ClassID)
 	return Create(core->CachePath, fname, ClassID);
 }
 
-//Creating file outside of the cache
 bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID)
+{
+	char path[_MAX_PATH];
+	char filename[_MAX_PATH];
+	ExtractFileFromPath( filename, fname );
+	PathJoinExt(path, folder, filename, core->TypeExt(ClassID));
+	return Create(path);
+}
+
+//Creating file outside of the cache
+bool FileStream::Create(const char *path)
 {
 	if (str) {
 #ifdef _DEBUG
@@ -122,8 +131,8 @@ bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID
 #endif
 		_fclose( str );
 	}
-	ExtractFileFromPath( filename, fname );
-	PathJoinExt(originalfile, folder, filename, core->TypeExt(ClassID));
+	ExtractFileFromPath( filename, path );
+	strncpy(originalfile, path, _MAX_PATH);
 	str = _fopen( originalfile, "wb" );
 	if (str == NULL) {
 		return false;
