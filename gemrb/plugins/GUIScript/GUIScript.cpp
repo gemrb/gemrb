@@ -10607,7 +10607,7 @@ bool GUIScript::RunFunction(const char *ModuleName, const char* FunctionName, bo
 void GUIScript::ExecFile(const char* file)
 {
 	FileStream fs;
-	if (!fs.Open(file, true))
+	if (!fs.Open(file))
 		return;
 
 	int len = fs.Remains();

@@ -29,12 +29,11 @@ FileStream::FileStream(void)
 	opened = false;
 	created = false;
 	str = NULL;
-	autoFree = false;
 }
 
 FileStream::~FileStream(void)
 {
-	if (autoFree && str) {
+	if (str) {
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
 #endif
@@ -43,9 +42,9 @@ FileStream::~FileStream(void)
 	str = NULL;
 }
 
-bool FileStream::Open(const char* fname, bool aF)
+bool FileStream::Open(const char* fname)
 {
-	if (str && autoFree) {
+	if (str) {
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
 #endif
@@ -57,7 +56,6 @@ bool FileStream::Open(const char* fname, bool aF)
 		return false;
 	}
 
-	autoFree = aF;
 	str = _fopen( fname, "rb" );
 	if (str == NULL) {
 		return false;
@@ -77,15 +75,14 @@ bool FileStream::Open(const char* fname, bool aF)
 	return true;
 }
 
-bool FileStream::Modify(const char* fname, bool aF)
+bool FileStream::Modify(const char* fname)
 {
-	if (str && autoFree) {
+	if (str) {
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
 #endif
 		_fclose( str );
 	}
-	autoFree = aF;
 	str = _fopen( fname, "r+b" );
 	if (str == NULL) {
 		return false;
@@ -106,7 +103,6 @@ bool FileStream::Modify(const char* fname, bool aF)
 }
 
 //Creating file in the cache
-//Create is ALWAYS autofree
 bool FileStream::Create(const char* fname, SClass_ID ClassID)
 {
 	return Create(core->CachePath, fname, ClassID);
@@ -115,13 +111,12 @@ bool FileStream::Create(const char* fname, SClass_ID ClassID)
 //Creating file outside of the cache
 bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID)
 {
-	if (str && autoFree) {
+	if (str) {
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
 #endif
 		_fclose( str );
 	}
-	autoFree = true;
 	ExtractFileFromPath( filename, fname );
 	PathJoinExt(originalfile, folder, filename, core->TypeExt(ClassID));
 	str = _fopen( originalfile, "wb" );

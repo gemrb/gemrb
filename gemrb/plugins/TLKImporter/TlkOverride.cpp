@@ -307,7 +307,7 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 	PathJoin( nPath, core->CachePath, "default.toh", NULL );
 	FileStream* fs = new FileStream();
 retry:
-	if (fs->Modify( nPath, true )) {
+	if (fs->Modify(nPath)) {
 		return fs;
 	}
 	if (create) {
@@ -328,7 +328,7 @@ DataStream* CTlkOverride::GetAuxTlk(bool create)
 	PathJoin( nPath, core->CachePath, "default.tot", NULL );
 	FileStream* fs = new FileStream();
 retry:
-	if (fs->Modify( nPath, true )) {
+	if (fs->Modify(nPath)) {
 		return fs;
 	}
 	if (create) {

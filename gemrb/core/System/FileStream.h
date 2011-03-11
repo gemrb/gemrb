@@ -40,15 +40,14 @@
 
 class GEM_EXPORT FileStream : public DataStream {
 private:
-	bool autoFree;
 	_FILE* str;
 	bool opened, created;
 public:
 	FileStream(void);
 	~FileStream(void);
 
-	bool Open(const char* filename, bool autoFree = true);
-	bool Modify(const char* filename, bool autoFree = true);
+	bool Open(const char* filename);
+	bool Modify(const char* filename);
 	bool Create(const char* folder, const char* filename, SClass_ID ClassID);
 	bool Create(const char* filename, SClass_ID ClassID);
 	int Read(void* dest, unsigned int length);

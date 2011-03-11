@@ -5179,7 +5179,7 @@ int Interface::CompressSave(const char *folder)
 				char dtmp[_MAX_PATH];
 				dir.GetFullPath(dtmp);
 				FileStream fs;
-				fs.Open(dtmp, true);
+				fs.Open(dtmp);
 				ai->AddToSaveGame(&str, &fs);
 			}
 		} while (++dir);
