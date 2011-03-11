@@ -1923,124 +1923,124 @@ const char* Interface::TypeExt(SClass_ID type) const
 {
 	switch (type) {
 		case IE_2DA_CLASS_ID:
-			return ".2da";
+			return "2da";
 
 		case IE_ACM_CLASS_ID:
-			return ".acm";
+			return "acm";
 
 		case IE_ARE_CLASS_ID:
-			return ".are";
+			return "are";
 
 		case IE_BAM_CLASS_ID:
-			return ".bam";
+			return "bam";
 
 		case IE_BCS_CLASS_ID:
-			return ".bcs";
+			return "bcs";
 
 		case IE_BS_CLASS_ID:
-			return ".bs";
+			return "bs";
 
 		case IE_BIF_CLASS_ID:
-			return ".bif";
+			return "bif";
 
 		case IE_BIO_CLASS_ID:
 			if (HasFeature(GF_BIOGRAPHY_RES)) {
-				return ".res";
+				return "res";
 			}
-			return ".bio";
+			return "bio";
 
 		case IE_BMP_CLASS_ID:
-			return ".bmp";
+			return "bmp";
 
 		case IE_PNG_CLASS_ID:
-			return ".png";
+			return "png";
 
 		case IE_CHR_CLASS_ID:
-			return ".chr";
+			return "chr";
 
 		case IE_CHU_CLASS_ID:
-			return ".chu";
+			return "chu";
 
 		case IE_CRE_CLASS_ID:
-			return ".cre";
+			return "cre";
 
 		case IE_DLG_CLASS_ID:
-			return ".dlg";
+			return "dlg";
 
 		case IE_EFF_CLASS_ID:
-			return ".eff";
+			return "eff";
 
 		case IE_GAM_CLASS_ID:
-			return ".gam";
+			return "gam";
 
 		case IE_IDS_CLASS_ID:
-			return ".ids";
+			return "ids";
 
 		case IE_INI_CLASS_ID:
-			return ".ini";
+			return "ini";
 
 		case IE_ITM_CLASS_ID:
-			return ".itm";
+			return "itm";
 
 		case IE_MOS_CLASS_ID:
-			return ".mos";
+			return "mos";
 
 		case IE_MUS_CLASS_ID:
-			return ".mus";
+			return "mus";
 
 		case IE_MVE_CLASS_ID:
-			return ".mve";
+			return "mve";
 
 		case IE_OGG_CLASS_ID:
-			return ".ogg";
+			return "ogg";
 
 		case IE_PLT_CLASS_ID:
-			return ".plt";
+			return "plt";
 
 		case IE_PRO_CLASS_ID:
-			return ".pro";
+			return "pro";
 
 		case IE_SAV_CLASS_ID:
-			return ".sav";
+			return "sav";
 
 		case IE_SPL_CLASS_ID:
-			return ".spl";
+			return "spl";
 
 		case IE_SRC_CLASS_ID:
-			return ".src";
+			return "src";
 
 		case IE_STO_CLASS_ID:
-			return ".sto";
+			return "sto";
 
 		case IE_TIS_CLASS_ID:
-			return ".tis";
+			return "tis";
 
 		case IE_TLK_CLASS_ID:
-			return ".tlk";
+			return "tlk";
 
 		case IE_TOH_CLASS_ID:
-			return ".toh";
+			return "toh";
 
 		case IE_TOT_CLASS_ID:
-			return ".tot";
+			return "tot";
 
 		case IE_VAR_CLASS_ID:
-			return ".var";
+			return "var";
 
 		case IE_VVC_CLASS_ID:
-			return ".vvc";
+			return "vvc";
 
 		case IE_WAV_CLASS_ID:
-			return ".wav";
+			return "wav";
 
 		case IE_WED_CLASS_ID:
-			return ".wed";
+			return "wed";
 
 		case IE_WFX_CLASS_ID:
-			return ".wfx";
+			return "wfx";
 
 		case IE_WMP_CLASS_ID:
-			return ".wmp";
+			return "wmp";
 	}
 	return NULL;
 }
@@ -2129,16 +2129,14 @@ bool Interface::LoadConfig(void)
 		return true;
 	}
 
-	PathJoin( path, UserDir, name, NULL );
-	strcat( path, ".cfg" );
+	PathJoinExt( path, UserDir, name, "cfg" );
 
 	if (LoadConfig( path )) {
 		return true;
 	}
 
 #ifdef SYSCONFDIR
-	PathJoin( path, SYSCONFDIR, name, NULL );
-	strcat( path, ".cfg" );
+	PathJoinExt( path, SYSCONFDIR, name, "cfg" );
 
 	if (LoadConfig( path )) {
 		return true;
@@ -2150,16 +2148,14 @@ bool Interface::LoadConfig(void)
 		return false;
 	}
 
-	PathJoin( path, UserDir, PACKAGE, NULL );
-	strcat( path, ".cfg" );
+	PathJoinExt( path, UserDir, PACKAGE, "cfg" );
 
 	if (LoadConfig( path )) {
 		return true;
 	}
 
 #ifdef SYSCONFDIR
-	PathJoin( path, SYSCONFDIR, PACKAGE, NULL );
-	strcat( path, ".cfg" );
+	PathJoinExt( path, SYSCONFDIR, PACKAGE, "cfg" );
 
 	if (LoadConfig( path )) {
 		return true;
@@ -4399,7 +4395,7 @@ void Interface::RemoveFromCache(const ieResRef resref, SClass_ID ClassID)
 {
 	char filename[_MAX_PATH];
 
-	snprintf(filename, _MAX_PATH, "%s%.8s%s", CachePath, resref, TypeExt( ClassID ) );
+	PathJoinExt(filename, CachePath, resref, TypeExt(ClassID));
 	unlink ( filename);
 }
 

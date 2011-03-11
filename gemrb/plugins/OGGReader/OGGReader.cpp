@@ -124,5 +124,5 @@ int OGGReader::read_samples(short* buffer, int count)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x18C310C3, "OGG File Importer")
-PLUGIN_RESOURCE(OGGReader, ".ogg")
+PLUGIN_RESOURCE(OGGReader, "ogg")
 END_PLUGIN()

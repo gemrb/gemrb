@@ -123,10 +123,7 @@ bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID
 	}
 	autoFree = true;
 	ExtractFileFromPath( filename, fname );
-	strcpy( originalfile, folder );
-	strcat( originalfile, SPathDelimiter);
-	strcat( originalfile, filename );
-	strcat( originalfile, core->TypeExt( ClassID ) );
+	PathJoinExt(originalfile, folder, filename, core->TypeExt(ClassID));
 	str = _fopen( originalfile, "wb" );
 	if (str == NULL) {
 		return false;

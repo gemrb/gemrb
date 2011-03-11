@@ -112,6 +112,6 @@ int ACMReader::read_samples(short* buffer, int count)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x10373EE, "ACM File Importer")
-PLUGIN_IE_RESOURCE(ACMReader, ".acm", (ieWord)IE_ACM_CLASS_ID)
-PLUGIN_IE_RESOURCE(ACMReader, ".wav", (ieWord)IE_WAV_CLASS_ID)
+PLUGIN_IE_RESOURCE(ACMReader, "acm", (ieWord)IE_ACM_CLASS_ID)
+PLUGIN_IE_RESOURCE(ACMReader, "wav", (ieWord)IE_WAV_CLASS_ID)
 END_PLUGIN()
