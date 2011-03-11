@@ -32,6 +32,7 @@
 #include "SaveGameMgr.h"
 #include "Video.h"
 #include "GUI/GameControl.h"
+#include "System/FileStream.h"
 
 #if defined(__HAIKU__)
 #include <unistd.h>

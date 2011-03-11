@@ -54,6 +54,7 @@
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
+#include "System/FileStream.h"
 #include "System/VFS.h"
 
 #include <cstdio>
