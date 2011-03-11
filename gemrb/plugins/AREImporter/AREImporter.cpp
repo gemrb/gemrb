@@ -36,7 +36,7 @@
 #include "ProjectileServer.h"
 #include "TileMapMgr.h"
 #include "Video.h"
-#include "System/CachedFileStream.h"
+#include "System/SlicedStream.h"
 #include "System/FileStream.h"
 
 #define DEF_OPEN   0
@@ -938,7 +938,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			//actually, Flags&1 signs that the creature
 			//is not loaded yet, so !(Flags&1) means it is embedded
 			if (CreOffset != 0 && !(Flags&1) ) {
-				crefile = new CachedFileStream( str, CreOffset, CreSize, true);
+				crefile = new SlicedStream( str, CreOffset, CreSize );
 			} else {
 				crefile = gamedata->GetResource( CreResRef, IE_CRE_CLASS_ID );
 			}
@@ -1199,7 +1199,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 		//This could be wrong on msvc7 with its separate memory managers
 		EffectQueue *fxqueue = new EffectQueue();
-		CachedFileStream *fs = new CachedFileStream( (CachedFileStream *) str, TrapEffOffset, TrapSize, true);
+		DataStream *fs = new SlicedStream( str, TrapEffOffset, TrapSize);
 
 		ReadEffects((DataStream *) fs,fxqueue, TrapEffectCount);
 		Actor * caster = core->GetGame()->FindPC(PartyID);

@@ -1444,7 +1444,6 @@ int Interface::Init()
 	srand( ( unsigned int ) t );
 #ifdef _DEBUG
 	FileStreamPtrCount = 0;
-	CachedFileStreamPtrCount = 0;
 #endif
 	printMessage( "Core", "GemRB Core Initialization...\n", WHITE );
 	printStatus( "OK", LIGHT_GREEN );

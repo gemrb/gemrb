@@ -18,28 +18,29 @@
  *
  */
 
-#ifndef CACHEDFILESTREAM_H
-#define CACHEDFILESTREAM_H
+#ifndef SLICEDSTREAM_H
+#define SLICEDSTREAM_H
 
 #include "System/DataStream.h"
 
 #include "exports.h"
 
-class GEM_EXPORT CachedFileStream : public DataStream// : public FileStream
+class GEM_EXPORT SlicedStream : public DataStream
 {
 private:
 	bool autoFree;
 	unsigned long startpos;
-	_FILE* str;
+	DataStream* str;
 public:
-	CachedFileStream(const char* stream, bool autoFree = true);
-	CachedFileStream(DataStream* cfs, int startpos, int size,
-		bool autoFree = true);
-	~CachedFileStream(void);
+	SlicedStream(DataStream* cfs, int startpos, int size);
+	~SlicedStream();
+	SlicedStream* Clone();
+
 	int Read(void* dest, unsigned int length);
 	int Write(const void* src, unsigned int length);
 	int Seek(int pos, int startpos);
 	/** No descriptions */
 	int ReadLine(void* buf, unsigned int maxlen);
 };
+
 #endif

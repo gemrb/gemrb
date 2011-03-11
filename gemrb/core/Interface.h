@@ -802,7 +802,6 @@ public:
 
 #ifdef _DEBUG
 	int FileStreamPtrCount;
-	int CachedFileStreamPtrCount;
 #endif
 };
 

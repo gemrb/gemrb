@@ -27,7 +27,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "MapMgr.h"
-#include "System/MemoryStream.h"
+#include "System/SlicedStream.h"
 
 #include <cassert>
 
@@ -468,15 +468,11 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	tmpWord = is_in_party ? (pcInfo.PartyOrder + 1) : 0;
 
 	if (pcInfo.OffsetToCRE) {
-		str->Seek( pcInfo.OffsetToCRE, GEM_STREAM_START );
-		void* Buffer = malloc( pcInfo.CRESize );
-		str->Read( Buffer, pcInfo.CRESize );
-		MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize );
+		SlicedStream* ms = new SlicedStream( str, pcInfo.OffsetToCRE, pcInfo.CRESize );
 		if (ms) {
 			aM->Open( ms, true );
 			actor = aM->GetActor(tmpWord);
 		}
-		free (Buffer);
 
  		//torment has them as 0 or -1
 		if (pcInfo.Name[0]!=0 && pcInfo.Name[0]!=UNINITIALIZED_CHAR) {

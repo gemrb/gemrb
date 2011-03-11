@@ -25,7 +25,7 @@
 #include "Compressor.h"
 #include "FileCache.h"
 #include "Interface.h"
-#include "System/CachedFileStream.h"
+#include "System/SlicedStream.h"
 #include "System/FileStream.h"
 
 BIFImporter::BIFImporter(void)
@@ -255,7 +255,7 @@ DataStream* BIFImporter::GetStream(unsigned long Resource, unsigned long Type)
 		unsigned int srcResLoc = Resource & 0xFC000;
 		for (unsigned int i = 0; i < tentcount; i++) {
 			if (( tentries[i].resLocator & 0xFC000 ) == srcResLoc) {
-				return new CachedFileStream( stream, tentries[i].dataOffset,
+				return new SlicedStream( stream, tentries[i].dataOffset,
 							tentries[i].tileSize * tentries[i].tilesCount );
 			}
 		}
@@ -263,7 +263,7 @@ DataStream* BIFImporter::GetStream(unsigned long Resource, unsigned long Type)
 		ieDword srcResLoc = Resource & 0x3FFF;
 		for (ieDword i = 0; i < fentcount; i++) {
 			if (( fentries[i].resLocator & 0x3FFF ) == srcResLoc) {
-				return new CachedFileStream( stream, fentries[i].dataOffset,
+				return new SlicedStream( stream, fentries[i].dataOffset,
 							fentries[i].fileSize );
 			}
 		}
