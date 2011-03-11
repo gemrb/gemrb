@@ -60,19 +60,27 @@ DataStream* CacheFile(const char* path)
 	PathJoin(cachedfile, core->CachePath, filename, NULL);
 
 	if (!file_exists(cachedfile)) {    // File was not found in cache
-		FILE* src = _fopen(path, "rb");
-		FILE* dest = _fopen(cachedfile, "wb");
+		FileStream* src = FileStream::OpenFile(path);
+		FileStream* dest = FileStream::OpenFile(cachedfile);
+		if (!src || !dest) {
+			printf("CachdFile failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
+			abort();
+		}
+
+		size_t blockSize = 1024 * 1000;
 		char buff[1024 * 1000];
 		do {
-			size_t len = _fread(buff, 1, 1024 * 1000, src);
-			size_t c = _fwrite(buff, 1, len, dest);
+			if (blockSize > src->Remains())
+				blockSize = src->Remains();
+			size_t len = src->Read(buff, blockSize);
+			size_t c = dest->Write(buff, len);
 			if (c != len) {
-				printf("CachedFileStream failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
+				printf("CacheFile failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
 				abort();
 			}
-		} while (!_feof(src));
-		_fclose(src);
-		_fclose(dest);
+		} while (src->Remains());
+		delete src;
+		delete dest;
 	}
 	return FileStream::OpenFile(cachedfile);
 }
