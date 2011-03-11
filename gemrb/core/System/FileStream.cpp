@@ -31,6 +31,11 @@ FileStream::FileStream(void)
 	str = NULL;
 }
 
+FileStream* FileStream::Clone()
+{
+	return OpenFile(originalfile);
+}
+
 FileStream::~FileStream(void)
 {
 	if (str) {

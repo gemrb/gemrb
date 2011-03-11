@@ -45,6 +45,7 @@ private:
 public:
 	FileStream(void);
 	~FileStream(void);
+	FileStream* Clone();
 
 	bool Open(const char* filename);
 	bool Modify(const char* filename);

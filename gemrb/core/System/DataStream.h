@@ -72,6 +72,13 @@ public:
 	/** Endian Switch setup */
 	static void SetEndianSwitch(int par);
 	static bool IsEndianSwitch();
+	/** Create a copy of this stream.
+	 *
+	 *  Returns NULL on failure.
+	 **/
+	virtual DataStream* Clone();
+private:
+	DataStream(const DataStream&);
 };
 
 #endif  // ! DATASTREAM_H

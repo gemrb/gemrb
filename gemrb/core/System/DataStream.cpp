@@ -183,3 +183,8 @@ int DataStream::WriteResRef(const ieResRef src)
 {
 	return Write( src, 8);
 }
+
+DataStream* DataStream::Clone()
+{
+	return NULL;
+}
