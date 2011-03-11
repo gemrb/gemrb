@@ -23,6 +23,7 @@
 #include "win32def.h"
 
 #include "Compressor.h"
+#include "FileCache.h"
 #include "Interface.h"
 #include "System/CachedFileStream.h"
 #include "System/FileStream.h"
@@ -65,22 +66,10 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 		strlwr(fname);
 		compressed->ReadDword( &declen );
 		compressed->ReadDword( &complen );
-		PathJoin( path, core->CachePath, fname, NULL );
-		printf( "Decompressing %s\n",fname );
+		printf( "Decompressing %s\n", fname );
+		DataStream* cached = CacheCompressedStream(compressed, fname, complen);
 		free( fname );
-		if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB ))
-			return GEM_ERROR;
-		FILE *in_cache = fopen( path, "wb" );
-		if (!in_cache) {
-			printMessage("BIFImporter", " ", RED);
-			printf( "Cannot write %s.\n", path );	
-			return GEM_ERROR;
-		}
-		PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
-		if (comp->Decompress( in_cache, compressed, complen ) != GEM_OK) {
-			return GEM_ERROR;
-		}
-		fclose( in_cache );
+		delete cached;
 		Current = compressed->Remains();
 		//starting at 20% going up to 70%
 		core->LoadProgress( 20+(All-Current)*50/All );
@@ -172,41 +161,10 @@ int BIFImporter::OpenArchive(const char* filename)
 		strlwr(fname);
 		compressed->ReadDword( &declen );
 		compressed->ReadDword( &complen );
-		PathJoin( path, core->CachePath, fname, NULL );
-		free( fname );
-		in_cache = fopen( path, "rb" );
-		if (in_cache) {
-			//printf("Found in Cache\n");
-			fclose( in_cache );
-			delete( compressed );
-			stream = FileStream::OpenFile(path);
-			if (!stream)
-				return GEM_ERROR;
-			stream->Read( Signature, 8 );
-			if (strncmp( Signature, "BIFFV1  ", 8 ) == 0)
-				ReadBIF();
-			else
-				return GEM_ERROR;
-			return GEM_OK;
-		}
 		printf( "Decompressing\n" );
-		if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB )) {
-			printMessage("BIFImporter", "No Compression Manager Available.", RED);
-			return GEM_ERROR;
-		}
-		in_cache = fopen( path, "wb" );
-		if (!in_cache) {
-			printMessage("BIFImporter", " ", RED);
-			printf( "Cannot write %s.\n", path );
-			return GEM_ERROR;
-		}
-		PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
-		if (comp->Decompress( in_cache, compressed, complen ) != GEM_OK) {
-			return GEM_ERROR;
-		}
-		fclose( in_cache );
+		stream = CacheCompressedStream(compressed, fname, complen);
+		free( fname );
 		delete( compressed );
-		stream = FileStream::OpenFile(path);
 		if (!stream)
 			return GEM_ERROR;
 		stream->Read( Signature, 8 );

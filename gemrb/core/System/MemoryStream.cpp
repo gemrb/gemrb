@@ -24,20 +24,16 @@
 
 #include <cstring>
 
-MemoryStream::MemoryStream(void* buffer, int length, bool autoFree)
+MemoryStream::MemoryStream(void* buffer, int length)
 {
 	ptr = buffer;
 	size = length;
 	Pos = 0;
 	strcpy( filename, "" );
-	this->autoFree = autoFree;
 }
 
 MemoryStream::~MemoryStream(void)
 {
-	if (autoFree) {
-		free( ptr );
-	}
 }
 
 int MemoryStream::Read(void* dest, unsigned int length)

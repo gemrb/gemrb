@@ -471,9 +471,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 		str->Seek( pcInfo.OffsetToCRE, GEM_STREAM_START );
 		void* Buffer = malloc( pcInfo.CRESize );
 		str->Read( Buffer, pcInfo.CRESize );
-		//somehow autofree MemoryStream doesn't work on msvc 7.0
-		//separate heap for dll's?
-		MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize, false );
+		MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize );
 		if (ms) {
 			aM->Open( ms, true );
 			actor = aM->GetActor(tmpWord);

@@ -23,11 +23,9 @@
 #include "RGBAColor.h"
 #include "win32def.h"
 
-#include "Compressor.h"
+#include "FileCache.h"
 #include "Interface.h"
 #include "Video.h"
-#include "System/CachedFileStream.h"
-#include "System/FileStream.h"
 
 static ieDword red_mask = 0xff000000;
 static ieDword green_mask = 0x00ff0000;
@@ -52,36 +50,13 @@ bool MOSImporter::Open(DataStream* stream)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "MOSCV1  ", 8 ) == 0) {
-		char cpath[_MAX_PATH];
-		strcpy( cpath, core->CachePath );
-		strcat( cpath, stream->filename );
-		FILE* exist_in_cache = fopen( cpath, "rb" );
-		if (exist_in_cache) {
-			//File was previously cached, using local copy
-			delete( str );
-			fclose( exist_in_cache );
-			FileStream* s = new FileStream();
-			s->Open( cpath );
-			str = s;
-			str->Read( Signature, 8 );
-		} else {
-			//No file found in Cache, Decompressing and storing for further use
-			str->Seek( 4, GEM_CURRENT_POS );
-
-			if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB )) {
-				printf( "No Compression Manager Available.\nCannot Load Compressed Mos File.\n" );
-				return false;
-			}	
-			FILE* newfile = fopen( cpath, "wb" );
-			PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
-			comp->Decompress( newfile, str );
-			fclose( newfile );
-			delete( str );
-			FileStream* s = new FileStream();
-			s->Open( cpath );
-			str = s;
-			str->Read( Signature, 8 );
-		}
+		str->Seek( 4, GEM_CURRENT_POS );
+		DataStream* cached = CacheCompressedStream(stream, stream->filename);
+		delete str;
+		if (!cached)
+			return false;
+		str = cached;
+		str->Read( Signature, 8 );
 	}
 	if (strncmp( Signature, "MOS V1  ", 8 ) != 0) {
 		return false;

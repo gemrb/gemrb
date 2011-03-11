@@ -14,43 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- *
  */
 
-/**
- * @file MemoryStream.h
- * Declares MemoryStream class, stream reading/writing data from/to a buffer in memory.
- * @author The GemRB Project
- */
-
-
-#ifndef MEMORYSTREAM_H
-#define MEMORYSTREAM_H
+#ifndef FILECACHE_H
+#define FILECACHE_H
 
 #include "System/DataStream.h"
 
-#include "exports.h"
-#include "globals.h"
+GEM_EXPORT DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int  length = 0);
 
-/**
- * @class MemoryStream
- * Reads and writes data from/to a buffer in memory.
- */
-
-class GEM_EXPORT MemoryStream : public DataStream {
-private:
-	void* ptr;
-public:
-	MemoryStream(void* buffer, int length);
-	~MemoryStream(void);
-	int Read(void* dest, unsigned int length);
-	int Write(const void * /*src*/, unsigned int /*length*/)
-	{
-		return GEM_ERROR;
-	}
-	int Seek(int pos, int startpos);
-	int ReadLine(void* buf, unsigned int maxlen);
-};
-
-#endif  // ! MEMORYSTREAM_H
+#endif
