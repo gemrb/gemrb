@@ -29,7 +29,7 @@ bool checkALError(const char* msg, const char* status) {
 	int error = alGetError();
 	if (error != AL_NO_ERROR) {
 		printMessage("OpenAL", msg, WHITE );
-		printf (": %x ", error);
+		printf (": 0x%x ", error);
 		printStatus(status, YELLOW);
 		return true;
 	}
@@ -40,7 +40,7 @@ void showALCError(const char* msg, const char* status, ALCdevice *device) {
 	int error = alcGetError(device);
 	printMessage("OpenAL", msg, WHITE );
 	if (error != AL_NO_ERROR) {
-		printf (": %d ", error);
+		printf (": 0x%x ", error);
 	}
 	printStatus(status, YELLOW);
 }
