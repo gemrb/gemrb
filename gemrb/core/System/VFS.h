@@ -53,33 +53,10 @@
 
 #ifdef WIN32
 
-typedef struct _FILE {
-	HANDLE hFile;
-} _FILE;
-
-GEM_EXPORT _FILE* _fopen(const char* filename, const char* mode);
-GEM_EXPORT size_t _fread(void* ptr, size_t size, size_t n, _FILE* stream);
-GEM_EXPORT size_t _fwrite(const void* ptr, size_t size, size_t n,
-	_FILE* stream);
-GEM_EXPORT size_t _fseek(_FILE* stream, long offset, int whence);
-GEM_EXPORT int _fgetc(_FILE* stream);
-GEM_EXPORT long int _ftell(_FILE* stream);
-GEM_EXPORT int _feof(_FILE* stream);
-GEM_EXPORT int _fclose(_FILE* stream);
 #define mkdir(path, rights)  _mkdir(path)
 #define ResolveFilePath(p)
 
 #else  // ! WIN32
-
-#define _FILE FILE
-#define _fopen fopen
-#define _fread fread
-#define _fwrite fwrite
-#define _fseek fseek
-#define _fgetc fgetc
-#define _ftell ftell
-#define _feof feof
-#define _fclose fclose
 
 /** Handle ~ -> $HOME mapping and do initial case-sensitity check */
 GEM_EXPORT void ResolveFilePath(char* FilePath);

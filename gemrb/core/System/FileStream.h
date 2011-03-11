@@ -40,7 +40,8 @@
 
 class GEM_EXPORT FileStream : public DataStream {
 private:
-	_FILE* str;
+	struct File;
+	File* str;
 	bool opened, created;
 public:
 	FileStream(void);
@@ -55,13 +56,15 @@ public:
 	int Read(void* dest, unsigned int length);
 	int Write(const void* src, unsigned int length);
 	int Seek(int pos, int startpos);
-	int ReadLine(void* buf, unsigned int maxlen);
 public:
 	/** Opens the specifed file.
 	 *
 	 *  Returns NULL, if the file can't be opened.
 	 */
 	static FileStream* OpenFile(const char* filename);
+private:
+	void FindLength();
+	void Close();
 };
 
 #endif  // ! FILESTREAM_H
