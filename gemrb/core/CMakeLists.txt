@@ -27,7 +27,6 @@ FILE(GLOB gemrb_core_LIB_SRCS "*.cpp"
 	System/DataStream.cpp
 	System/FileStream.cpp
 	System/SlicedStream.cpp
-	System/MemoryStream.cpp
 	System/VFS.cpp
 	System/snprintf.cpp
 	)
