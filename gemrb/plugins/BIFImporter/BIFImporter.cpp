@@ -160,8 +160,9 @@ int BIFImporter::OpenArchive(const char* filename)
 	}
 	//not found as normal bif
 	//checking compression type
-	FileStream* compressed = new FileStream();
-	compressed->Open( filename, true );
+	FileStream* compressed = FileStream::OpenFile( filename );
+	if (!compressed)
+		return GEM_ERROR;
 	compressed->Read( Signature, 8 );
 	if (strncmp( Signature, "BIF V1.0", 8 ) == 0) {
 		ieDword fnlen, complen, declen;
@@ -178,7 +179,9 @@ int BIFImporter::OpenArchive(const char* filename)
 			//printf("Found in Cache\n");
 			fclose( in_cache );
 			delete( compressed );
-			stream = new CachedFileStream( path );
+			stream = FileStream::OpenFile(path);
+			if (!stream)
+				return GEM_ERROR;
 			stream->Read( Signature, 8 );
 			if (strncmp( Signature, "BIFFV1  ", 8 ) == 0)
 				ReadBIF();
@@ -203,7 +206,9 @@ int BIFImporter::OpenArchive(const char* filename)
 		}
 		fclose( in_cache );
 		delete( compressed );
-		stream = new CachedFileStream( path );
+		stream = FileStream::OpenFile(path);
+		if (!stream)
+			return GEM_ERROR;
 		stream->Read( Signature, 8 );
 		if (strncmp( Signature, "BIFFV1  ", 8 ) == 0)
 			ReadBIF();
@@ -220,7 +225,9 @@ int BIFImporter::OpenArchive(const char* filename)
 			//printf("Found in Cache\n");
 			fclose( in_cache );
 			delete( compressed );
-			stream = new CachedFileStream( path );
+			stream = FileStream::OpenFile(path);
+			if (!stream)
+				return GEM_ERROR;
 			stream->Read( Signature, 8 );
 			if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
 				ReadBIF();				
@@ -268,7 +275,9 @@ int BIFImporter::OpenArchive(const char* filename)
 		printf( "\n" );
 		fclose( in_cache );
 		delete( compressed );
-		stream = new CachedFileStream( path );
+		stream = FileStream::OpenFile(path);
+		if (!stream)
+			return GEM_ERROR;
 		stream->Read( Signature, 8 );
 		if (strncmp( Signature, "BIFFV1  ", 8 ) == 0)
 			ReadBIF();
