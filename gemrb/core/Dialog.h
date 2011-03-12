@@ -24,8 +24,6 @@
 #include "exports.h"
 #include "globals.h"
 
-#include "GameScript/GameScript.h"
-
 #include <vector>
 
 #define IE_DLG_TR_TEXT     0x01
@@ -36,6 +34,9 @@
 #define IE_DLG_UNSOLVED    0x40
 #define IE_DLG_SOLVED      0x100
 #define IE_DLG_QUEST_GROUP 0x4000 // this is a GemRB extension
+
+class Condition;
+class Action;
 
 struct DialogTransition {
 	ieDword Flags;

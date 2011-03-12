@@ -61,6 +61,7 @@
 #include "SpellMgr.h"
 #include "StoreMgr.h"
 #include "StringMgr.h"
+#include "SymbolMgr.h"
 #include "TileMap.h"
 #include "Video.h"
 #include "WorldMapMgr.h"
