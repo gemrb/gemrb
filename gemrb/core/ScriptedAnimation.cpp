@@ -515,7 +515,7 @@ void ScriptedAnimation::SetDelay(ieDword delay)
 
 void ScriptedAnimation::SetDefaultDuration(ieDword duration)
 {
-	if (!(SequenceFlags&IE_VVC_LOOP)) return;
+	if (!(SequenceFlags&(IE_VVC_LOOP|IE_VVC_FREEZE) )) return;
 	if (Duration==0xffffffff) {
 		Duration = duration;
 	}
