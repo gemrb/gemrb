@@ -40,6 +40,7 @@
 #define NINE 16           //nine faces (orientation)
 #define SEVENEYES 32      //special hack for seven eyes
 
+#define DEFAULT_FRAMERATE 15
 #define MAX_CYCLE_TYPE 16
 static const ieByte ctypes[MAX_CYCLE_TYPE]={
 	ILLEGAL, ONE, TWO, THREE, TWO|DOUBLE, ONE|FIVE, THREE|DOUBLE, ILLEGAL,
@@ -75,7 +76,7 @@ void ScriptedAnimation::Init()
 	Fade = 0;
 	SequenceFlags = 0;
 	XPos = YPos = ZPos = 0;
-	FrameRate = 15;
+	FrameRate = DEFAULT_FRAMERATE;
 	FaceTarget = 0;
 	Orientation = 0;
 	Dither = 0;
@@ -88,9 +89,10 @@ void ScriptedAnimation::Init()
 	active = true;
 	Delay = 0;
 	light = NULL;
-	LightX=0;
-	LightY=0;
-	LightZ=0;
+	LightX = 0;
+	LightY = 0;
+	LightZ = 0;
+	starttime = 0; 
 }
 
 void ScriptedAnimation::Override(ScriptedAnimation *templ)
@@ -257,6 +259,9 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 	ZPos = (signed) tmp;
 	stream->Seek( 4, GEM_CURRENT_POS );
 	stream->ReadDword( &FrameRate );
+
+	if (!FrameRate) FrameRate = DEFAULT_FRAMERATE;
+
 	stream->ReadDword( &FaceTarget );
 	stream->Seek( 16, GEM_CURRENT_POS );
 	stream->ReadDword( &tmp );  //this doesn't affect visibility
@@ -535,13 +540,25 @@ void ScriptedAnimation::SetOrientation(int orientation)
 
 bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 {
+	unsigned int inc = 0;
+
 	if (justCreated) {
 		if (Phase == P_NOTINITED) {
 			printMessage("ScriptedAnimation", "Not fully initialised VVC!\n", LIGHT_RED);
 			return true;
 		}
-		if (Delay) {
-			Delay--;
+		unsigned long time;
+		time = core->GetGame()->Ticks;
+		if (starttime == 0) {
+		  starttime = time;
+		}
+		if (( time - starttime ) >= ( unsigned long ) ( 1000 / FrameRate )) {
+			inc = (time-starttime)*FrameRate/1000;
+			starttime += inc*1000/FrameRate;
+		}
+
+		if (Delay>inc) {
+			Delay-=inc;
 			return false;
 		}
 
@@ -585,6 +602,10 @@ retry:
 			goto retry;
 		}
 	}
+	if (SequenceFlags&IE_VVC_FREEZE) {
+		return false;
+	}
+
 	//automatically slip from onset to hold to release
 	if (!frame || anims[Phase*MAX_ORIENT+Orientation]->endReached) {
 		if (Phase>=P_RELEASE) {
