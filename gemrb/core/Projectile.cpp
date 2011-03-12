@@ -528,7 +528,8 @@ void Projectile::Payload()
 		Shake = 0;
 	}
 
-	if(!effects) {
+	//allow area affecting projectile with a spell	
+	if(!(effects || (!Target && FailSpell[0]))) {
 		return;
 	}
 
@@ -550,10 +551,12 @@ void Projectile::Payload()
 			target = area->GetActorByGlobalID(Caster);			
 		}
 		Actor *source = area->GetActorByGlobalID(Caster);
-		if (source) {
-			effects->SetOwner(source);
-		} else {
-			effects->SetOwner(target);
+		if (effects) {
+			if (source) {
+				effects->SetOwner(source);
+			} else {
+				effects->SetOwner(target);
+			}
 		}
 	}
 
@@ -561,10 +564,11 @@ void Projectile::Payload()
 		//apply this spell on target when the projectile fails
 		if (FailedIDS(target)) {
 			if (FailSpell[0]) {
-				if (!Target) {
-				  core->ApplySpellPoint(FailSpell, area, Destination, effects->GetOwner(), Level);
-				} else {
+				if (Target) {
 					core->ApplySpell(FailSpell, target, effects->GetOwner(), Level);
+				} else {
+					//no Target, using the fake target as owner
+					core->ApplySpellPoint(FailSpell, area, Destination, target, Level);
 				}
 			}
 		} else {
@@ -581,6 +585,7 @@ void Projectile::Payload()
 			effects->AddAllEffects(target, Destination);
 		}
 	}
+
 	delete effects;
 	effects = NULL;
 }
@@ -602,12 +607,13 @@ void Projectile::ChangePhase()
 	if (!Extension) {
 		//there are no-effect projectiles, like missed arrows
 		//Payload can redirect the projectile in case of projectile reflection
-		if (!(ExtFlags&PEF_DELAY) || !extension_delay) {
+		if ((!(ExtFlags&PEF_DELAY) || !extension_delay) && (phase!=P_EXPLODED) ) {
 			if (travel_handle) {
 				travel_handle->Stop();
 				travel_handle.release();
 			}
 			Payload();
+			phase = P_EXPLODED;
 		}
 		//freeze on target, this is recommended only for child projectiles
 		//as the projectile won't go away on its own
