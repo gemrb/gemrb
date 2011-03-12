@@ -36,6 +36,7 @@
 #include "ProjectileServer.h"
 #include "TileMapMgr.h"
 #include "Video.h"
+#include "GameScript/GameScript.h"
 #include "System/CachedFileStream.h"
 #include "System/FileStream.h"
 
