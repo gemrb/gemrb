@@ -411,7 +411,7 @@ ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doub
 {
 	ScriptedAnimation *ret = NULL;
 
-	if (Exists( effect, IE_VVC_CLASS_ID ) ) {
+	if (Exists( effect, IE_VVC_CLASS_ID, true ) ) {
 		DataStream *ds = GetResource( effect, IE_VVC_CLASS_ID );
 		ret = new ScriptedAnimation(ds, true);
 	} else {
