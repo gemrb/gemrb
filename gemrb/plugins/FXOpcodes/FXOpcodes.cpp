@@ -5979,7 +5979,7 @@ int fx_explore_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_screenshake (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_screenshake (%2d): Strength: %d\n", fx->Opcode, fx->Parameter1 );
-	core->timer->SetScreenShake( fx->Parameter1, fx->Parameter1, 1);
+	core->timer->SetScreenShake( fx->Parameter1, fx->Parameter1, fx->Parameter1);
 	return FX_APPLIED;
 }
 
