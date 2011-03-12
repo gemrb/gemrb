@@ -468,7 +468,7 @@ int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 //GemRB specific, to support BMP area background changes (desert hell projectile)
 int fx_change_background (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if (0) printf( "fx_multiple_vvc (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	if (0) printf( "fx_change_background (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	Map *map = core->GetGame()->GetCurrentArea();
 	if (map) {
 		map->SetBackground(fx->Resource, fx->Duration);
