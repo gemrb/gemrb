@@ -2975,7 +2975,7 @@ void Actor::DebugDump()
 	printf( "\nArea:       %.8s   ", Area );
 	printf( "Dialog:     %.8s\n", Dialog );
 	printf( "Global ID:  %d   PartySlot: %d\n", GetGlobalID(), InParty);
-	printf( "Script name:%.32s\n", scriptName );
+	printf( "Script name:%.32s    Current action: %d\n", scriptName, CurrentAction ? CurrentAction->actionID : -1);
 	printf( "TalkCount:  %d   ", TalkCount );
 	printf( "Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );
 	printf( "Class:      %d   current class:%d\n", BaseStats[IE_CLASS], Modified[IE_CLASS] );
