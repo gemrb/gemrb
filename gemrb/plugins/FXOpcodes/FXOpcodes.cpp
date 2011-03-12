@@ -5022,6 +5022,7 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			vvc->active = true;
 			return FX_APPLIED;
 		}
+		if (! fx->FirstApply) return FX_NOT_APPLIED;
 	}
 
 	if (target->fxqueue.HasEffectWithResource(fx_protection_from_animation_ref,fx->Resource)) {
