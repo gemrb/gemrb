@@ -1464,19 +1464,6 @@ int Interface::Init()
 	SetInfoTextColor(defcolor);
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing GUI Script Engine...", WHITE );
-	guiscript = PluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
-	if (guiscript == NULL) {
-		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
-	}
-	if (!guiscript->Init()) {
-		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
-	}
-	printStatus( "OK", LIGHT_GREEN );
-	strcpy( NextScript, "Start" );
-
 	{
 		printMessage( "Core", "Initializing Search Path...", WHITE );
 		if (!IsAvailable( PLUGIN_RESOURCE_DIRECTORY )) {
@@ -1538,6 +1525,26 @@ int Interface::Init()
 			return GEM_ERROR;
 		}
 		printStatus( "OK", LIGHT_GREEN );
+	}
+
+	printMessage( "Core", "Initializing GUI Script Engine...", WHITE );
+	guiscript = PluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
+	if (guiscript == NULL) {
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
+	}
+	if (!guiscript->Init()) {
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
+	}
+	printStatus( "OK", LIGHT_GREEN );
+	strcpy( NextScript, "Start" );
+
+	{
+		// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
+		char path[_MAX_PATH];
+		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
+		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_DIRECTORY, RM_REPLACE_SAME_SOURCE);
 	}
 
 	printMessage( "Core", "Reading Game Options...\n", WHITE );
