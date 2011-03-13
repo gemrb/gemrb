@@ -1123,14 +1123,12 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	//WalkTo could release the current action, so we need this
-	ieDword tmp = (ieDword) parameters->int0Parameter;
 	//InMove can clear destination, so we need to save it
 	Point dest = actor->Destination;
 
 	// try the actual move, if we are not already moving there
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
-		actor->WalkTo( parameters->pointParameter, 0, tmp );
+		actor->WalkTo( parameters->pointParameter, 0 );
 		dest = actor->Destination;
 	}
 
@@ -1138,19 +1136,6 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
 		Sender->ReleaseCurrentAction();
-	}
-
-	if (tmp) {
-		if (!actor->InMove()) {
-			//can't reach target, movement failed
-			//we have to use tmp-1 because the distance required might be 0,
-			//so in GoNearAndRetry we add 1 to distance
-			if (Distance(dest,actor)>tmp-1) {
-				//to prevent deadlocks, we free the action
-				//which caused MoveToPoint in the first place
-				Sender->PopNextAction();
-			}
-		}
 	}
 }
 

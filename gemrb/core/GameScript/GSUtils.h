@@ -92,8 +92,6 @@ void EscapeAreaCore(Scriptable *Sender, const Point &p, const char *area, const 
 void GoNear(Scriptable *Sender, const Point &p);
 void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance);
 int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int no_release);
-void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool destination, int distance);
-void GoNearAndRetry(Scriptable *Sender, const Point &p, int distance);
 
 #define NO_OPERATION -1
 #define LESS_OR_EQUALS 0
