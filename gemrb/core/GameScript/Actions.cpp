@@ -2595,7 +2595,7 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 
 		//move near to target
 		if (dist != 0xfffffff) {
-			if (PersonalDistance(tar, Sender) > dist) {
+			if (PersonalDistance(tar, Sender) > dist || !Sender->GetCurrentArea()->IsVisible(Sender->Pos, tar->Pos)) {
 				MoveNearerTo(Sender,tar,dist);
 				return;
 			}
@@ -2642,7 +2642,7 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 
 		Actor *act = (Actor *) Sender;
 		//move near to target
-		if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
+		if (PersonalDistance(parameters->pointParameter, Sender) > dist || !Sender->GetCurrentArea()->IsVisible(Sender->Pos, parameters->pointParameter)) {
 			MoveNearerTo(Sender,parameters->pointParameter,dist, 0);
 			return;
 		}
