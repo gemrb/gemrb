@@ -86,12 +86,12 @@ def OnLoad():
 	StartWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", 1)
 	Label=StartWindow.GetControl (0x0fff0000)
 	Label.SetText (GEMRB_VERSION)
-	if not GUICommon.HasTOB():
-		BackButton.SetState (IE_GUI_BUTTON_DISABLED)
-		BackButton.SetText ("")
-	else:
+	if GUICommon.HasTOB():
 		BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 		BackButton.SetText (15416)
+	else:
+		BackButton.SetState (IE_GUI_BUTTON_DISABLED)
+		BackButton.SetText ("")
 	SinglePlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 	ExitButton.SetState (IE_GUI_BUTTON_ENABLED)
 	OptionsButton.SetState (IE_GUI_BUTTON_ENABLED)
