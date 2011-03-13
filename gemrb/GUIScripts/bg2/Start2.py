@@ -95,7 +95,10 @@ def OnLoad():
 	SinglePlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 	ExitButton.SetState (IE_GUI_BUTTON_ENABLED)
 	OptionsButton.SetState (IE_GUI_BUTTON_ENABLED)
-	if not GUICommon.GameIsBG2Demo():
+	if GUICommon.GameIsBG2Demo():
+		MultiPlayerButton.SetState (IE_GUI_BUTTON_DISABLED)
+		MoviesButton.SetState (IE_GUI_BUTTON_DISABLED)
+	else:
 		MultiPlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 		MultiPlayerButton.SetText (15414)
 		MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MultiPlayerPress)
@@ -128,6 +131,7 @@ def SinglePlayerPress():
 	
 	MultiPlayerButton.SetText (13729)
 	MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadSingle)
+	MultiPlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 
 	if not GUICommon.GameIsBG2Demo():
 		if GemRB.GetVar("oldgame")==1:
@@ -297,14 +301,24 @@ def BackToMain():
 	SinglePlayerButton.SetText (15413)
 	ExitButton.SetText (15417)
 	OptionsButton.SetText (13905)
-	MultiPlayerButton.SetText (15414)
-	MoviesButton.SetText (15415)
-	BackButton.SetText (15416)
+	if GUICommon.GameIsBG2Demo():
+		MoviesButton.SetText ("")
+		BackButton.SetText ("")
+		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		BackButton.SetState (IE_GUI_BUTTON_DISABLED)
+		MultiPlayerButton.SetText ("")
+		MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		MultiPlayerButton.SetState (IE_GUI_BUTTON_DISABLED)
+	else:
+		MultiPlayerButton.SetText (15414)
+		MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MultiPlayerPress)
+		MoviesButton.SetText (15415)
+		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MoviesPress)
+		BackButton.SetText (15416)
+
 	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SinglePlayerPress)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OptionsPress)
-	MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MultiPlayerPress)
-	MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MoviesPress)
 	QuitWindow.SetVisible (WINDOW_INVISIBLE)
 	StartWindow.SetVisible (WINDOW_VISIBLE)
 	return
