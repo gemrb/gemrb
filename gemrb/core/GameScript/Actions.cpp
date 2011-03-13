@@ -2594,7 +2594,7 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 		Actor *act = (Actor *) Sender;
 
 		//move near to target
-		if (dist != 0xfffffff) {
+		if (dist != 0xffffffff) {
 			if (PersonalDistance(tar, Sender) > dist || !Sender->GetCurrentArea()->IsVisible(Sender->Pos, tar->Pos)) {
 				MoveNearerTo(Sender,tar,dist);
 				return;
