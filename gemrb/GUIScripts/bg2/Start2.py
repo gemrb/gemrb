@@ -39,17 +39,18 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("START", 640, 480)
 #tutorial subwindow
-	TutorialWindow = GemRB.LoadWindow (5)
-	TextAreaControl = TutorialWindow.GetControl (1)
-	CancelButton = TutorialWindow.GetControl (11)
-	PlayButton = TutorialWindow.GetControl (10)
-	TextAreaControl.SetText (44200)
-	CancelButton.SetText (13727)
-	PlayButton.SetText (33093)
-	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelTut)
-	PlayButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	if not GUICommon.GameIsBG2Demo():
+		TutorialWindow = GemRB.LoadWindow (5)
+		TextAreaControl = TutorialWindow.GetControl (1)
+		CancelButton = TutorialWindow.GetControl (11)
+		PlayButton = TutorialWindow.GetControl (10)
+		TextAreaControl.SetText (44200)
+		CancelButton.SetText (13727)
+		PlayButton.SetText (33093)
+		PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
+		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelTut)
+		PlayButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+		CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 #quit subwindow
 	QuitWindow = GemRB.LoadWindow (3)
 	QuitTextArea = QuitWindow.GetControl (0)
@@ -94,22 +95,25 @@ def OnLoad():
 	SinglePlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 	ExitButton.SetState (IE_GUI_BUTTON_ENABLED)
 	OptionsButton.SetState (IE_GUI_BUTTON_ENABLED)
-	MultiPlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
-	MoviesButton.SetState (IE_GUI_BUTTON_ENABLED)
+	if not GUICommon.GameIsBG2Demo():
+		MultiPlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
+		MultiPlayerButton.SetText (15414)
+		MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MultiPlayerPress)
+
+		MoviesButton.SetState (IE_GUI_BUTTON_ENABLED)
+		MoviesButton.SetText (15415)
+		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MoviesPress)
 	SinglePlayerButton.SetText (15413)
 	ExitButton.SetText (15417)
 	OptionsButton.SetText (13905)
-	MultiPlayerButton.SetText (15414)
-	MoviesButton.SetText (15415)
 	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SinglePlayerPress)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OptionsPress)
-	MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MultiPlayerPress)
-	MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MoviesPress)
 	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Restart)
 	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	QuitWindow.SetVisible (WINDOW_INVISIBLE)
-	TutorialWindow.SetVisible (WINDOW_INVISIBLE)
+	if not GUICommon.GameIsBG2Demo():
+		TutorialWindow.SetVisible (WINDOW_INVISIBLE)
 	StartWindow.SetVisible (WINDOW_VISIBLE)
 	MusicTable = GemRB.LoadTable ("songlist")
 	# the table has useless rownames, so we can't search for BG2Theme
@@ -124,13 +128,14 @@ def SinglePlayerPress():
 	
 	MultiPlayerButton.SetText (13729)
 	MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadSingle)
-	
-	if GemRB.GetVar("oldgame")==1:
-		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Tutorial)
-		MoviesButton.SetText (33093)
-	else:
-		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ImportGame)
-		MoviesButton.SetText (71175)
+
+	if not GUICommon.GameIsBG2Demo():
+		if GemRB.GetVar("oldgame")==1:
+			MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Tutorial)
+			MoviesButton.SetText (33093)
+		else:
+			MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ImportGame)
+			MoviesButton.SetText (71175)
 
 	ExitButton.SetText (15416)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackToMain)
