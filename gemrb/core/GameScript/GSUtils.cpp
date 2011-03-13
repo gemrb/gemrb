@@ -2180,7 +2180,7 @@ unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
 	}
 
 	gamedata->FreeSpell(spl, spellres, false);
-	return dist*15;
+	return dist*5; //FIXME: this empirical constant shouldn't be needed!
 }
 
 /* returns an item's casting distance, it depends on the used header, and targeting mode too
