@@ -1193,6 +1193,12 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		return;
 	}
 
+	if (!CanSee(Sender, target, true, GA_NO_HIDDEN|GA_NO_DEAD)) {
+		actor->SetStance(IE_ANI_READY);
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	if (header) wi.range *= 10;
 	else wi.range = 0;
 
