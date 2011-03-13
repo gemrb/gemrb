@@ -31,7 +31,15 @@ files = (
     ("SONGLIST", "2DA", RES_2DA),
 )
 
+# using a dud resource type, since we rely on the manual GamePath searching
+# in AutodetectCommon
+demo_files = (
+    ("benevent", "TTF", 1),
+    ("feine22", "TTF", 1),
+)
 
+GemRB.BG2Demo = False
 if CheckFiles(files):
     GemRB.AddGameTypeHint ("bg2", 90)
-
+    if CheckFiles(demo_files):
+        GemRB.BG2Demo = True
