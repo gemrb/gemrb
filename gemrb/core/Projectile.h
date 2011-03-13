@@ -55,6 +55,7 @@
 #define PSF_SPARKS  1
 #define PSF_FLYING  2
 #define PSF_LOOPING 4       //looping sound
+#define PSF_LOOPING2 8       //looping second sound
 #define PSF_IGNORE_CENTER 16
 
 //projectile travel flags
@@ -182,7 +183,7 @@ public:
 	ieDword SFlags;
 	ieResRef SoundRes1;
 	ieResRef SoundRes2;
-	ieResRef SoundRes3;
+	ieResRef TravelVVC;
 	ieDword SparkColor;
 	ieDword ExtFlags;
 	ieDword StrRef;

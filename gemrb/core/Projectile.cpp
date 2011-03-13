@@ -82,8 +82,10 @@ Projectile::~Projectile()
 	ClearPath();
 
 	if (travel_handle) {
-		travel_handle->Stop();
-		travel_handle.release();
+    //allow an explosion sound to finish completely
+    travel_handle->StopLooping();
+		//travel_handle->Stop();
+		//travel_handle.release();
 	}
 
 	if (phase != P_UNINITED) {
@@ -408,11 +410,7 @@ void Projectile::Setup()
 		ZPos = FLY_HEIGHT;
 	}
 	phase = P_TRAVEL;
-	if (SoundRes3[0]) {
-		travel_handle = core->GetAudioDrv()->Play(SoundRes3, Pos.x, Pos.y, 0);
-	} else {
-		travel_handle = core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
-	}
+	travel_handle = core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
 
 	//create more projectiles
 	if(ExtFlags&PEF_ITERATION) {
@@ -636,8 +634,9 @@ void Projectile::ChangePhase()
 			}
 		}
 
-		phase = P_EXPIRED;
-		return;
+    //these will be called by EndTravel
+		//phase = P_EXPIRED;
+		//return;
 	}
 
 	EndTravel();
@@ -668,6 +667,13 @@ int Projectile::CalculateExplosionCount()
 
 void Projectile::EndTravel()
 {
+	if (travel_handle) {
+		travel_handle->Stop();
+		travel_handle.release();
+	}
+
+  travel_handle = core->GetAudioDrv()->Play(SoundRes2, Pos.x, Pos.y, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
+
 	if(!Extension) {
 		phase = P_EXPIRED;
 		return;
@@ -680,15 +686,6 @@ void Projectile::EndTravel()
 	} else {
 		phase = P_EXPLODING1;
 	}
-
-	if (travel_handle) {
-		travel_handle->Stop();
-		travel_handle.release();
-	}
-
-	//this sound is not played for projectiles waiting for trigger
-	//it is probably also played when a travel projectile ends its mission
-	core->GetAudioDrv()->Play(SoundRes2, Pos.x, Pos.y);
 }
 
 void Projectile::AddTrail(ieResRef BAM, const ieByte *pal)

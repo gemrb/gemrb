@@ -73,7 +73,7 @@ Projectile* PROImporter::GetProjectile(Projectile *s)
 	str->ReadDword( &s->SFlags ); //spark, ignore center, looping sound etc
 	str->ReadResRef( s->SoundRes1 );
 	str->ReadResRef( s->SoundRes2 );
-	str->ReadResRef( s->SoundRes3 );
+	str->ReadResRef( s->TravelVVC ); //no original game data uses this feature
 	str->ReadDword( &s->SparkColor );//enabled by PSF_SPARK
 	str->ReadDword( &s->ExtFlags ) ; //gemrb extension flags
 	str->ReadDword( &s->StrRef );    //gemrb extension strref
@@ -156,8 +156,8 @@ void PROImporter::GetAreaExtension(ProjectileExtension *e)
 	str->ReadResRef( e->Secondary );
 	str->ReadResRef( e->AreaSound );
 	str->ReadDword( &e->APFlags );
-  str->ReadWord( &e->DiceCount );
-  str->ReadWord( &e->DiceSize );
+	str->ReadWord( &e->DiceCount );
+	str->ReadWord( &e->DiceSize );
 	//we skip the rest
 	str->Seek(184, GEM_CURRENT_POS);
 }
