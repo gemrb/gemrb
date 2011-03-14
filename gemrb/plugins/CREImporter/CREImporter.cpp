@@ -1051,7 +1051,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	
 	//read the item entries based on the previously read indices
 	//an item entry may be read multiple times if the indices are repeating
-	for (i = 0;i<=Inventory_Size;) {
+	for (i = 0;i<Inventory_Size;) {
 		//the index was intentionally increased here, the fist slot isn't saved
 		ieWord index = indices[i++];
 		if (index != 0xffff) {
