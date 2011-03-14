@@ -4552,7 +4552,11 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	//only return if we don't have any attacks left this round
-	if (attackcount==0) return;
+	if (attackcount==0) {
+		// this is also part of the UpdateActorState hack below. sorry!
+		lastattack = gameTime;
+		return;
+	}
 
 	// this check shouldn't be necessary, but it causes a divide-by-zero below,
 	// so i would like it to be clear if it ever happens
