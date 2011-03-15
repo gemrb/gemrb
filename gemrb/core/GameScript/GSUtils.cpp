@@ -1585,9 +1585,9 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		((Actor *) Sender)->UseExit(true);
+		((Actor *) Sender)->UseExit(target->GetGlobalID());
 	} else {
-		((Actor *) Sender)->UseExit(false);
+		((Actor *) Sender)->UseExit(0);
 	}
 	// we deliberately don't try GetLikelyPosition here for now,
 	// maybe a future idea if we have a better implementation
