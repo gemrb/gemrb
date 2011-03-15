@@ -1616,13 +1616,14 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 		return 0;
 	}
 
+	//chasing is unbreakable
+	//TODO: is this true?
+	Sender->CurrentActionInterruptable = false;
+
 	Actor *actor = (Actor *)Sender;
 
 	if (!actor->InMove() || actor->Destination != p) {
-		//chasing is unbreakable
-		//maybe consider setting a per action unbreakability
-		//instead of messing with the actor
-		actor->WalkTo(p, IF_NOINT, distance);
+		actor->WalkTo(p, 0, distance);
 	}
 
 	if (!actor->InMove()) {
