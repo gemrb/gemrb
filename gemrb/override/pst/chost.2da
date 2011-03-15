@@ -1,0 +1,22 @@
+2DA V1.0
+-1
+           XPOS       YPOS       RESREF     DELAY      DURATION   
+Row0       0          -200       S091GATE   2          *          
+Row1       0          -200       S091DEVA   3          *          
+Row2       0          -200       S091DVAT   9          *          
+Row4       -30        -30        S091RAIL   11         *          
+Row5       -20        -20        S091RAIL   12         *          
+Row6       -10        -10        S091RAIL   13         *          
+Row3       0          0          S091SMHT   14         *          
+Row7       0          0          S091RAIL   14         *          
+Row8       10         10         S091RAIL   15         *          
+Row9       20         20         S091RAIL   15         *          
+Row10      30         30         S091RAIL   16         *          
+Row11      40         40         S091RAIL   16         *          
+Row12      0          -200       S091HTCH   18         *          
+Row13      0          0          S091PHNX   19         *          
+Row15      0          -200       S091ASUN   21         *          
+Row14      0          0          S091ARRS   22         *          
+Row16      0          0          S091APPR   23         *          
+Row17      0          0          S091GRLY   24         *          
+Row18      0          0          S091BLST   25         *          
