@@ -897,6 +897,9 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 	if (!resref[0]) {
 		if (Owner->Type==ST_ACTOR) {
 			Actor *act = (Actor *) Owner;
+			if (! act->BaseStats[IE_GOLD]) {
+				return dropped;
+			}
 			CREItem *gold = new CREItem();
 		
 			gold->Expired=0;
