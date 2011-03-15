@@ -270,13 +270,14 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			target->ClearActions();
 
 			// do not interrupt during dialog actions (needed for aerie.d polymorph block)
-			// the original achieved this by adding actions differently
-			target->NoInterrupt();
-
+			char buf[20];
+			strcpy(buf, "SetInterrupt(FALSE)");
+			target->AddAction( GenerateAction( buf ) );
 			for (unsigned int i = 0; i < tr->actions.size(); i++) {
 				target->AddAction(tr->actions[i]);
-				//GameScript::ExecuteAction( target, action );
 			}
+			strcpy(buf, "SetInterrupt(TRUE)");
+			target->AddAction( GenerateAction( buf ) );
 		}
 
 		int final_dialog = tr->Flags & IE_DLG_TR_FINAL;
