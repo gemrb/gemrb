@@ -900,6 +900,7 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 			CREItem *gold = new CREItem();
 		
 			gold->Expired=0;
+			gold->Flags=0;
 			gold->Usages[1]=0;
 			gold->Usages[2]=0;
 			memcpy(gold->ItemResRef, core->GoldResRef, sizeof(ieResRef) );
