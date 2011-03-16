@@ -888,7 +888,7 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 }
 
 void Map::ClearSearchMapFor( Movable *actor ) {
-	Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*16);
+	Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS, MAX_CIRCLE_SIZE*2*16);
 	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_FREE);
 
 	// Restore the searchmap areas of any nearby actors that could
