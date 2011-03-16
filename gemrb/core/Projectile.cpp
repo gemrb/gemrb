@@ -67,6 +67,7 @@ Projectile::Projectile()
 	bend = 0;
 	drawSpark = 0;
 	ZPos = 0;
+	extension_delay = 0;
 }
 
 Projectile::~Projectile()
@@ -1257,6 +1258,9 @@ void Projectile::DrawExplosion(const Region &screen)
 		LineTarget();
 	}
 
+	int apflags = Extension->APFlags;
+	int aoeflags = Extension->AFlags;
+
 	//no idea what is PAF_SECONDARY
 	//probably it is to alter some behaviour in the secondary
 	//projectile generation
@@ -1267,7 +1271,7 @@ void Projectile::DrawExplosion(const Region &screen)
 	SecondaryTarget();
 
 	//draw fragment graphics animation at the explosion center
-	if (Extension->AFlags&PAF_FRAGMENT) {
+	if (aoeflags&PAF_FRAGMENT) {
 		//there is a character animation in the center of the explosion
 		//which will go towards the edges (flames, etc)
 		//Extension->ExplColor fake color for single shades (blue,green,red flames)
@@ -1284,30 +1288,36 @@ void Projectile::DrawExplosion(const Region &screen)
 		Shake = 0;
 	}
 
-	ProjectileServer *server = core->GetProjectileServer();
 	//the center of the explosion could be another projectile played over the target
 	//warning: this projectile doesn't inherit any effects, so its payload function
 	//won't be doing anything (any effect of PAF_SECONDARY?)
+
 	if (Extension->FragProjIdx) {
-		Projectile *pro = server->GetProjectileByIndex(Extension->FragProjIdx);
-		if (pro) {
-			if (Extension->AFlags&PAF_SECONDARY) {
-				pro->SetEffectsCopy(effects);
+		if (apflags&APF_TILED) {
+			int i,j;
+			int radius = Extension->ExplosionRadius;
+
+			for (i=-radius;i<radius;i+=Extension->TileX) {
+				for(j=-radius;j<radius;j+=Extension->TileY) {
+					if (i*i+j*j<radius*radius) {
+						Point p(Pos.x+i, Pos.y+j);
+						SpawnFragment(p);
+					}
+				}
 			}
-			pro->SetCaster(Caster, Level);
-			area->AddProjectile(pro, Pos, Pos);
+		} else {
+			SpawnFragment(Pos);
 		}
 	}
 
 	//the center of the explosion is based on hardcoded explosion type (this is fireball.cpp in the original engine)
 	//these resources are listed in areapro.2da and served by ProjectileServer.cpp
-	int apflags = Extension->APFlags;
 	
 	//draw it only once, at the time of explosion
 	if (phase==P_EXPLODING1) {
 		core->GetAudioDrv()->Play(Extension->SoundRes, Pos.x, Pos.y);
 		//play VVC in center
-		if (Extension->AFlags&PAF_VVC) {
+		if (aoeflags&PAF_VVC) {
 			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
 			if (vvc) {
 				if (apflags & APF_VVCPAL) {
@@ -1355,7 +1365,7 @@ void Projectile::DrawExplosion(const Region &screen)
 		}
 		
 		//zero cone width means single line area of effect
-		if((Extension->AFlags&PAF_CONE) && !Extension->ConeWidth) {
+		if((aoeflags&PAF_CONE) && !Extension->ConeWidth) {
 			child_size = 1;
 		}
 
@@ -1389,7 +1399,7 @@ void Projectile::DrawExplosion(const Region &screen)
 			}
 			int max = 360;
 			int add = 0;
-			if (Extension->AFlags&PAF_CONE) {
+			if (aoeflags&PAF_CONE) {
 				max=Extension->ConeWidth;
 				add=(Orientation*45-max)/2;
 			}
