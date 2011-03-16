@@ -820,7 +820,7 @@ void Map::UpdateScripts()
 					if(ip->Entered(actor)) {
 						//if trap triggered, then mark actor
 						actor->SetInTrap(ipCount);
-					  wasActive|=TRAP_USEPOINT;
+						wasActive|=TRAP_USEPOINT;
 					}
 				} else {
 					//ST_TRAVEL
@@ -1057,10 +1057,10 @@ void Map::DrawMap(Region screen)
 
 	if (Background) {
 		if (BgDuration<gametime) {
-		  video->FreeSprite(Background);
+			video->FreeSprite(Background);
 		} else {
-		  video->BlitSprite(Background,0,0,true);
-		  bgoverride = true;
+			video->BlitSprite(Background,0,0,true);
+			bgoverride = true;
 		}
 	}
 
@@ -1503,6 +1503,7 @@ Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 	return NULL;
 }
 
+//maybe consider using a simple list
 Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius)
 {
 	ieDword count = 1;
@@ -1521,6 +1522,11 @@ Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius
 		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
+		if (!(flags&GA_NO_LOS)) {
+			if (!IsVisible(actor->Pos, p)) {
+				continue;
+			}
+		}
 		count++;
 	}
 
@@ -1538,6 +1544,12 @@ Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius
 		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
+		if (!(flags&GA_NO_LOS)) {
+			if (!IsVisible(actor->Pos, p)) {
+				continue;
+			}
+		}
+
 		ret[j++]=actor;
 	}
 

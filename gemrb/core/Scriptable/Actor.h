@@ -125,6 +125,9 @@ struct PolymorphCache;
 //added this comment for some clues if you really need it)
 //#define GA_GLOBAL     4096
 
+//line of sight is ignored (for GetAllActorsInRadius)
+#define GA_NO_LOS 4096
+
 // Detect() mode: IDS matching ignores invisibility
 #define GA_DETECT 8192
 
