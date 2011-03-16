@@ -45,18 +45,21 @@
 //projectile phases
 #define P_UNINITED  -1
 #define P_TRAVEL     0   //projectile moves to target
-#define P_TRIGGER    1   //projectile hovers over target, waits for trigger
-#define P_EXPLODING1 2   //projectile explosion spreads
-#define P_EXPLODING2 3   //projectile explosion repeats
-#define P_EXPLODED   4   //projectile spread over area
+#define P_TRAVEL2    1   //projectile hit target
+#define P_TRIGGER    2   //projectile hovers over target, waits for trigger
+#define P_EXPLODING1 3   //projectile explosion spreads
+#define P_EXPLODING2 4   //projectile explosion repeats
+#define P_EXPLODED   5   //projectile spread over area
 #define P_EXPIRED   99   //projectile scheduled for removal (existing parts are still drawn)
 
 //projectile spark flags
 #define PSF_SPARKS  1
 #define PSF_FLYING  2
-#define PSF_LOOPING 4       //looping sound
-#define PSF_LOOPING2 8       //looping second sound
+#define PSF_LOOPING 4         //looping sound
+#define PSF_LOOPING2 8        //looping second sound
 #define PSF_IGNORE_CENTER 16
+//gemrb specific internal flag
+#define PSF_SOUND2  0x80000000//already started sound2
 
 //projectile travel flags
 #define PTF_COLOUR  1       //fake colours
@@ -362,8 +365,16 @@ private:
 	void Payload();
 	//if there is an extension, convert to exploding or wait for trigger
 	void EndTravel();
+	//apply default spell
+	void ApplyDefault();
+	//stops the current sound
+	void StopSound();
+	//kickstarts the secondary sound
+	void UpdateSound();
+	//reached end of single travel missile, explode or expire now
 	void ChangePhase();
-	void AddTrail(ieResRef BAM, const ieByte *pal);
+	//drop a BAM or VVC on the trail path, return the length of the animation
+	int AddTrail(ieResRef BAM, const ieByte *pal);
 	void DoStep(unsigned int walk_speed);
 	void LineTarget();      //line projectiles (walls, scorchers)
 	void SecondaryTarget(); //area projectiles (circles, cones)

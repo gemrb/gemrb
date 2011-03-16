@@ -40,6 +40,8 @@
 static const ieByte SixteenToNine[MAX_ORIENT]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
 static const ieByte SixteenToFive[MAX_ORIENT]={0,1,2,3,4,3,2,1,0,1,2,3,4,3,2,1};
 
+static ProjectileServer *server = NULL;
+
 Projectile::Projectile()
 {
 	autofree = false;
@@ -68,6 +70,8 @@ Projectile::Projectile()
 	drawSpark = 0;
 	ZPos = 0;
 	extension_delay = 0;
+	if (!server)
+		server = core->GetProjectileServer();
 }
 
 Projectile::~Projectile()
@@ -83,10 +87,8 @@ Projectile::~Projectile()
 	ClearPath();
 
 	if (travel_handle) {
-    //allow an explosion sound to finish completely
-    travel_handle->StopLooping();
-		//travel_handle->Stop();
-		//travel_handle.release();
+		//allow an explosion sound to finish completely
+		travel_handle->StopLooping();
 	}
 
 	if (phase != P_UNINITED) {
@@ -261,7 +263,6 @@ void Projectile::SetBlend()
 //create another projectile with type-1 (iterate magic missiles and call lightning)
 void Projectile::CreateIteration()
 {
-	ProjectileServer *server = core->GetProjectileServer();
 	Projectile *pro = server->GetProjectileByIndex(type-1);
 	pro->SetEffectsCopy(effects);
 	pro->SetCaster(Caster, Level);
@@ -383,13 +384,16 @@ void Projectile::Setup()
 		if(ExtFlags&PEF_POP) {
 			//the explosion consists of a pop in/hold/pop out of the travel projectile (dimension door)
 			if(travel[0] && shadow[0]) {
-				SetDelay(travel[0]->GetFrameCount()*2+shadow[0]->GetFrameCount() );
+				extension_delay = travel[0]->GetFrameCount()*2+shadow[0]->GetFrameCount();
+				//SetDelay( travel[0]->GetFrameCount()*2+shadow[0]->GetFrameCount());
 				travel[0]->Flags|=A_ANI_PLAYONCE;
 				shadow[0]->Flags|=A_ANI_PLAYONCE;
 			}
 		} else {
 			if(travel[0]) {
-				SetDelay(travel[0]->GetFrameCount() );
+				extension_delay = travel[0]->GetFrameCount();
+				travel[0]->Flags|=A_ANI_PLAYONCE;
+				//SetDelay(travel[0]->GetFrameCount() );
 			}
 		}
 	}
@@ -589,6 +593,35 @@ void Projectile::Payload()
 	effects = NULL;
 }
 
+void Projectile::ApplyDefault()
+{
+	Actor *actor = area->GetActorByGlobalID(Caster);
+	if (actor) {
+		//name is the projectile's name
+		//for simplicity, we apply a spell of the same name
+		core->ApplySpell(name, actor, actor, Level);
+	}
+}
+
+void Projectile::StopSound()
+{
+	if (travel_handle) {
+		travel_handle->Stop();
+		travel_handle.release();
+ 	}
+}
+
+void Projectile::UpdateSound()
+{
+	if (!(SFlags&PSF_SOUND2)) {
+		StopSound();
+	}
+ 	if (!travel_handle || !travel_handle->Playing()) {
+		travel_handle = core->GetAudioDrv()->Play(SoundRes2, Pos.x, Pos.y, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
+		SFlags|=PSF_SOUND2;
+	}
+}
+
 //control the phase change when the projectile reached its target
 //possible actions: vanish, hover over point, explode
 //depends on the area extension
@@ -602,17 +635,26 @@ void Projectile::ChangePhase()
 			return;
 		}
 	}
+
+	if (phase == P_TRAVEL) {
+		if ((ExtFlags&PEF_DELAY) && extension_delay) {
+			 extension_delay--;
+			 UpdateSound();
+			 return;
+		}
+	}
+
 	//reached target, and explodes now
 	if (!Extension) {
 		//there are no-effect projectiles, like missed arrows
 		//Payload can redirect the projectile in case of projectile reflection
-		if ((!(ExtFlags&PEF_DELAY) || !extension_delay) && (phase!=P_EXPLODED) ) {
-			if (travel_handle) {
-				travel_handle->Stop();
-				travel_handle.release();
+		if (phase ==P_TRAVEL) {
+			if(ExtFlags&PEF_DEFSPELL) {
+				ApplyDefault();
 			}
+			StopSound();
 			Payload();
-			phase = P_EXPLODED;
+			phase = P_TRAVEL2;
 		}
 		//freeze on target, this is recommended only for child projectiles
 		//as the projectile won't go away on its own
@@ -620,13 +662,19 @@ void Projectile::ChangePhase()
 			if(extension_delay) {
 				if (extension_delay>0) {
 					extension_delay--;
-					if (travel_handle && !travel_handle->Playing()) {
-						travel_handle = core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
-					}
+					UpdateSound();
 				}
 				return;
 			}
 		}
+
+		if (phase == P_TRAVEL2) {
+			if (extension_delay) {
+				 extension_delay--;
+				 return;
+			}
+		}
+
 		if(ExtFlags&PEF_FADE) {
 			TFlags &= ~PTF_TINT; //turn off area tint
 			tint.a--;
@@ -634,10 +682,6 @@ void Projectile::ChangePhase()
 				return;
 			}
 		}
-
-    //these will be called by EndTravel
-		//phase = P_EXPIRED;
-		//return;
 	}
 
 	EndTravel();
@@ -668,13 +712,8 @@ int Projectile::CalculateExplosionCount()
 
 void Projectile::EndTravel()
 {
-	if (travel_handle) {
-		travel_handle->Stop();
-		travel_handle.release();
-	}
-
-  travel_handle = core->GetAudioDrv()->Play(SoundRes2, Pos.x, Pos.y, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
-
+	StopSound();
+	UpdateSound();
 	if(!Extension) {
 		phase = P_EXPIRED;
 		return;
@@ -689,13 +728,21 @@ void Projectile::EndTravel()
 	}
 }
 
-void Projectile::AddTrail(ieResRef BAM, const ieByte *pal)
+int Projectile::AddTrail(ieResRef BAM, const ieByte *pal)
 {
 	ScriptedAnimation *sca=gamedata->GetScriptedAnimation(BAM,0);
-	if (!sca) return;
+	if (!sca) return 0;
 	if(pal) {
-		for(int i=0;i<7;i++) {
-			sca->SetPalette(pal[i], 4+i*PALSIZE);
+		if (ExtFlags & PEF_TINT) {
+			Color tmpColor[PALSIZE];
+
+			core->GetPalette( pal[0], PALSIZE, tmpColor );
+			sca->Tint = tmpColor[PALSIZE/2];
+			sca->Transparency |= BLIT_TINTED;
+		} else {
+			for(int i=0;i<7;i++) {
+				sca->SetPalette(pal[i], 4+i*PALSIZE);
+			}
 		}
 	}
 	sca->SetOrientation(Orientation);
@@ -704,6 +751,7 @@ void Projectile::AddTrail(ieResRef BAM, const ieByte *pal)
 	sca->XPos += Pos.x;
 	sca->YPos += Pos.y;
 	area->AddVVCell(sca);
+	return sca->GetSequenceDuration(AI_UPDATE_TIME);
 }
 
 void Projectile::DoStep(unsigned int walk_speed)
@@ -712,6 +760,15 @@ void Projectile::DoStep(unsigned int walk_speed)
 		pathcounter--;
 	} else {
 		ClearPath();
+	}
+
+	//intro trailing, drawn only once at the beginning
+	if (pathcounter==0x7ffe) {
+		for(int i=0;i<3;i++) {
+			if(!TrailSpeed[i] && TrailBAM[i][0]) {
+				extension_delay = AddTrail(TrailBAM[i], (ExtFlags&PEF_TINT)?Gradients:NULL);
+			}
+		}
 	}
 
 	if (!path) {
@@ -725,15 +782,6 @@ void Projectile::DoStep(unsigned int walk_speed)
 		return;
 	}
 
-	//intro trailing, drawn only once at the beginning
-	if (pathcounter==0x7ffe) {
-		for(int i=0;i<3;i++) {
-			if(!TrailSpeed[i] && TrailBAM[i]) {
-				AddTrail(TrailBAM[i], 0);
-			}
-		}
-	}
-
 	//don't bug out on 0 smoke frequency like the original IE
 	if ((TFlags&PTF_SMOKE) && SmokeSpeed) {
 		if(!(pathcounter%SmokeSpeed)) {
@@ -743,7 +791,7 @@ void Projectile::DoStep(unsigned int walk_speed)
 
 	for(int i=0;i<3;i++) {
 		if(TrailSpeed[i] && !(pathcounter%TrailSpeed[i])) {
-			AddTrail(TrailBAM[i], 0);
+			AddTrail(TrailBAM[i], (ExtFlags&PEF_TINT)?Gradients:NULL);
 		}
 	}
 
@@ -1022,7 +1070,8 @@ void Projectile::LineTarget()
 void Projectile::SecondaryTarget()
 {
 	//fail will become true if the projectile utterly failed to find a target
-	bool fail= !!(Extension->APFlags&APF_SPELLFAIL);
+	//if the spell was already applied on explosion, ignore this
+	bool fail= !!(Extension->APFlags&APF_SPELLFAIL) && !(ExtFlags&PEF_DEFSPELL);
 	int mindeg = 0;
 	int maxdeg = 0;
 
@@ -1032,7 +1081,6 @@ void Projectile::SecondaryTarget()
 		maxdeg=mindeg+Extension->ConeWidth;
 	}
 
-	ProjectileServer *server = core->GetProjectileServer();
 	int radius = Extension->ExplosionRadius;
 	Actor **actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	Actor **poi=actors;
@@ -1128,12 +1176,7 @@ void Projectile::SecondaryTarget()
 	//In case of utter failure, apply a spell of the same name on the caster
 	//this feature is used by SCHARGE, PRTL_OP and PRTL_CL in the HoW pack
 	if(fail) {
-		Actor *actor = area->GetActorByGlobalID(Caster);
-		if (actor) {
-			//name is the projectile's name
-			//for simplicity, we apply a spell of the same name
-			core->ApplySpell(name, actor, actor, Level);
-		}
+		ApplyDefault();
 	}
 }
 
@@ -1157,7 +1200,7 @@ int Projectile::Update()
 		SetTarget(Target, false);
 	}
 
-	if (phase == P_TRAVEL) {
+	if (phase == P_TRAVEL || phase == P_TRAVEL2) {
 		DoStep(Speed);
 	}
 	return 1;
@@ -1172,14 +1215,19 @@ void Projectile::Draw(const Region &screen)
 			//This extension flag is to enable the travel projectile at
 			//trigger/explosion time
 			if (Extension->AFlags&PAF_VISIBLE) {
+			//if (!Extension || (Extension->AFlags&PAF_VISIBLE)) {
 				DrawTravel(screen);
 			}
+			/*
+			if (!Extension) {
+				return;
+			}*/
 			CheckTrigger(Extension->TriggerRadius);
 			if (phase == P_EXPLODING1 || phase == P_EXPLODING2) {
 				DrawExplosion(screen);
 			}
 			break;
-		case P_TRAVEL:
+		case P_TRAVEL: case P_TRAVEL2:
 			//There is no Extension for simple traveling projectiles!
 			DrawTravel(screen);
 			return;
@@ -1243,11 +1291,7 @@ void Projectile::DrawExplosion(const Region &screen)
 		return;
 	}
 
-	if (travel_handle) {
-		travel_handle->Stop();
-		travel_handle.release();
-	}
-
+	StopSound();
 	DrawChildren(screen);
 
 	int pause = core->IsFreezed();
