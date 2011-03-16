@@ -394,7 +394,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		drag_start.x = Owner->XPos + XPos + x;
 		drag_start.y = Owner->YPos + YPos + y;
 
- 		if (State == IE_GUI_BUTTON_LOCKED) {
+		if (State == IE_GUI_BUTTON_LOCKED) {
 			SetState( IE_GUI_BUTTON_LOCKED_PRESSED );
 			return;
 		}

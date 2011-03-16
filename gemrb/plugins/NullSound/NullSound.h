@@ -46,7 +46,7 @@ public:
 	bool ReleaseStream(int stream, bool hardstop);
 	void SetAmbientStreamVolume(int stream, int gain);
 	void QueueBuffer(int stream, unsigned short bits, int channels,
-                short* memory, int size, int samplerate);
+				short* memory, int size, int samplerate);
 
 private:
 	int XPos, YPos;

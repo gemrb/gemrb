@@ -480,7 +480,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 		}
 		free (Buffer);
 
- 		//torment has them as 0 or -1
+		//torment has them as 0 or -1
 		if (pcInfo.Name[0]!=0 && pcInfo.Name[0]!=UNINITIALIZED_CHAR) {
 			actor->SetName(pcInfo.Name,0); //setting both names
 		}

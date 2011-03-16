@@ -194,7 +194,7 @@ private:
 	long timer_last_sec;
 	long timer_last_usec;
 	unsigned int frame_wait;
- 	bool video_rendered_frame;
+	bool video_rendered_frame;
 	unsigned int video_frameskip;
 	bool done;
 	int outputwidth, outputheight;

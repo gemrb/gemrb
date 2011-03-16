@@ -331,7 +331,7 @@ int Particles::Update()
 			continue;
 		}
 		drawn=true;
- 		if (!points[i].state) {
+		if (!points[i].state) {
 			grow++;
 		}
 		points[i].state--;

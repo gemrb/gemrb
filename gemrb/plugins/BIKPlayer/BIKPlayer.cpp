@@ -596,18 +596,18 @@ const uint8_t ff_log2_tab[256]={
 
 static inline av_const int av_log2(unsigned int v)
 {
-    int n = 0;
-    if (v & 0xffff0000) {
-        v >>= 16;
-        n += 16;
-    }
-    if (v & 0xff00) {
-        v >>= 8;
-        n += 8;
-    }
-    n += ff_log2_tab[v];
+	int n = 0;
+	if (v & 0xffff0000) {
+		v >>= 16;
+		n += 16;
+	}
+	if (v & 0xff00) {
+		v >>= 8;
+		n += 8;
+	}
+	n += ff_log2_tab[v];
 
-    return n;
+	return n;
 }
 
 static inline int float_to_int16_one(const float *src){
@@ -1237,39 +1237,39 @@ static void get_pixels(DCTELEM *block, const uint8_t *pixels, int line_size)
 
 static void put_pixels_nonclamped(const DCTELEM *block, uint8_t *pixels, int line_size)
 {
-        int i;
-        /* read the pixels */
-        for(i=0;i<8;i++) {
-                pixels[0] = block[0];
-                pixels[1] = block[1];
-                pixels[2] = block[2];
-                pixels[3] = block[3];
-                pixels[4] = block[4];
-                pixels[5] = block[5];
-                pixels[6] = block[6];
-                pixels[7] = block[7];
-                pixels += line_size;
-                block += 8;
-        }
+	int i;
+	/* read the pixels */
+	for(i=0;i<8;i++) {
+		pixels[0] = block[0];
+		pixels[1] = block[1];
+		pixels[2] = block[2];
+		pixels[3] = block[3];
+		pixels[4] = block[4];
+		pixels[5] = block[5];
+		pixels[6] = block[6];
+		pixels[7] = block[7];
+		pixels += line_size;
+		block += 8;
+	}
 }
 
 static void add_pixels_nonclamped(const DCTELEM *block, uint8_t *pixels, int line_size)
 {
-        int i;
+	int i;
 
-        /* read the pixels */
-        for(i=0;i<8;i++) {
-                pixels[0] += block[0];
-                pixels[1] += block[1];
-                pixels[2] += block[2];
-                pixels[3] += block[3];
-                pixels[4] += block[4];
-                pixels[5] += block[5];
-                pixels[6] += block[6];
-                pixels[7] += block[7];
-                pixels += line_size;
-                block += 8;
-        }
+	/* read the pixels */
+	for(i=0;i<8;i++) {
+		pixels[0] += block[0];
+		pixels[1] += block[1];
+		pixels[2] += block[2];
+		pixels[3] += block[3];
+		pixels[4] += block[4];
+		pixels[5] += block[5];
+		pixels[6] += block[6];
+		pixels[7] += block[7];
+		pixels += line_size;
+		block += 8;
+	}
 }
 
 static inline void copy_block(DCTELEM block[64], const uint8_t *src, uint8_t *dst, int stride)
@@ -1283,78 +1283,78 @@ static inline void copy_block(DCTELEM block[64], const uint8_t *src, uint8_t *ds
 //This replaces the j_rev_dct module
 void bink_idct(DCTELEM *block)
 {
-    int i, t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, tA, tB, tC;
-    int tblock[64];
+	int i, t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, tA, tB, tC;
+	int tblock[64];
 
-    for (i = 0; i < 8; i++) {
-	t0 = block[i+ 0] + block[i+32];
-	t1 = block[i+ 0] - block[i+32];
-	t2 = block[i+16] + block[i+48];
-	t3 = block[i+16] - block[i+48];
-	t3 = ((t3 * 0xB50) >> 11) - t2;
+	for (i = 0; i < 8; i++) {
+		t0 = block[i+ 0] + block[i+32];
+		t1 = block[i+ 0] - block[i+32];
+		t2 = block[i+16] + block[i+48];
+		t3 = block[i+16] - block[i+48];
+		t3 = ((t3 * 0xB50) >> 11) - t2;
 
-	t4 = t0 - t2;
-	t5 = t0 + t2;
-	t6 = t1 + t3;
-	t7 = t1 - t3;
+		t4 = t0 - t2;
+		t5 = t0 + t2;
+		t6 = t1 + t3;
+		t7 = t1 - t3;
 
-	t0 = block[i+40] + block[i+24];
-	t1 = block[i+40] - block[i+24];
-	t2 = block[i+ 8] + block[i+56];
-	t3 = block[i+ 8] - block[i+56];
+		t0 = block[i+40] + block[i+24];
+		t1 = block[i+40] - block[i+24];
+		t2 = block[i+ 8] + block[i+56];
+		t3 = block[i+ 8] - block[i+56];
 
-	t8 = t2 + t0;
-	t9 = t3 + t1;
-	t9 = (0xEC8 * t9) >> 11;
-	tA = ((-0x14E8 * t1) >> 11) + t9 - t8;
-	tB = t2 - t0;
-	tB = ((0xB50 * tB) >> 11) - tA;
-	tC = ((0x8A9 * t3) >> 11) + tB - t9;
+		t8 = t2 + t0;
+		t9 = t3 + t1;
+		t9 = (0xEC8 * t9) >> 11;
+		tA = ((-0x14E8 * t1) >> 11) + t9 - t8;
+		tB = t2 - t0;
+		tB = ((0xB50 * tB) >> 11) - tA;
+		tC = ((0x8A9 * t3) >> 11) + tB - t9;
 
-	tblock[i+ 0] = t5 + t8;
-	tblock[i+56] = t5 - t8;
-	tblock[i+ 8] = t6 + tA;
-	tblock[i+48] = t6 - tA;
-	tblock[i+16] = t7 + tB;
-	tblock[i+40] = t7 - tB;
-	tblock[i+32] = t4 + tC;
-	tblock[i+24] = t4 - tC;
-    }
+		tblock[i+ 0] = t5 + t8;
+		tblock[i+56] = t5 - t8;
+		tblock[i+ 8] = t6 + tA;
+		tblock[i+48] = t6 - tA;
+		tblock[i+16] = t7 + tB;
+		tblock[i+40] = t7 - tB;
+		tblock[i+32] = t4 + tC;
+		tblock[i+24] = t4 - tC;
+	}
 
-    for (i = 0; i < 64; i += 8) {
-	t0 = tblock[i+0] + tblock[i+4];
-	t1 = tblock[i+0] - tblock[i+4];
-	t2 = tblock[i+2] + tblock[i+6];
-	t3 = tblock[i+2] - tblock[i+6];
-	t3 = ((t3 * 0xB50) >> 11) - t2;
+	for (i = 0; i < 64; i += 8) {
+		t0 = tblock[i+0] + tblock[i+4];
+		t1 = tblock[i+0] - tblock[i+4];
+		t2 = tblock[i+2] + tblock[i+6];
+		t3 = tblock[i+2] - tblock[i+6];
+		t3 = ((t3 * 0xB50) >> 11) - t2;
 
-	t4 = t0 - t2;
-	t5 = t0 + t2;
-	t6 = t1 + t3;
-	t7 = t1 - t3;
+		t4 = t0 - t2;
+		t5 = t0 + t2;
+		t6 = t1 + t3;
+		t7 = t1 - t3;
 
-	t0 = tblock[i+5] + tblock[i+3];
-	t1 = tblock[i+5] - tblock[i+3];
-	t2 = tblock[i+1] + tblock[i+7];
-	t3 = tblock[i+1] - tblock[i+7];
+		t0 = tblock[i+5] + tblock[i+3];
+		t1 = tblock[i+5] - tblock[i+3];
+		t2 = tblock[i+1] + tblock[i+7];
+		t3 = tblock[i+1] - tblock[i+7];
 
-	t8 = t2 + t0;
-	t9 = t3 + t1;
-	t9 = (0xEC8 * t9) >> 11;
-	tA = ((-0x14E8 * t1) >> 11) + t9 - t8;
-	tB = t2 - t0;
-	tB = ((0xB50 * tB) >> 11) - tA;
-	tC = ((0x8A9 * t3) >> 11) + tB - t9;
+		t8 = t2 + t0;
+		t9 = t3 + t1;
+		t9 = (0xEC8 * t9) >> 11;
+		tA = ((-0x14E8 * t1) >> 11) + t9 - t8;
+		tB = t2 - t0;
+		tB = ((0xB50 * tB) >> 11) - tA;
+		tC = ((0x8A9 * t3) >> 11) + tB - t9;
 
-	block[i+0] = (t5 + t8 + 0x7F) >> 8;
-	block[i+7] = (t5 - t8 + 0x7F) >> 8;
-	block[i+1] = (t6 + tA + 0x7F) >> 8;
-	block[i+6] = (t6 - tA + 0x7F) >> 8;
-	block[i+2] = (t7 + tB + 0x7F) >> 8;
-	block[i+5] = (t7 - tB + 0x7F) >> 8;
-	block[i+4] = (t4 + tC + 0x7F) >> 8;
-	block[i+3] = (t4 - tC + 0x7F) >> 8;
-    }
+		block[i+0] = (t5 + t8 + 0x7F) >> 8;
+		block[i+7] = (t5 - t8 + 0x7F) >> 8;
+		block[i+1] = (t6 + tA + 0x7F) >> 8;
+		block[i+6] = (t6 - tA + 0x7F) >> 8;
+		block[i+2] = (t7 + tB + 0x7F) >> 8;
+		block[i+5] = (t7 - tB + 0x7F) >> 8;
+		block[i+4] = (t4 + tC + 0x7F) >> 8;
+		block[i+3] = (t4 - tC + 0x7F) >> 8;
+	}
 }
 
 static void idct_put(uint8_t *dest, int line_size, DCTELEM *block)

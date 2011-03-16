@@ -256,14 +256,14 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 	Action *action = NULL;
 	if (DoubleClick && EnableRunning) {
 		sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
- 		action = GenerateAction( Tmp );
+		action = GenerateAction( Tmp );
 		//if it didn't work don't insist
 		if (!action)
 			EnableRunning = false;
 	}
 	if (!action) {
 		sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
- 		action = GenerateAction( Tmp );
+		action = GenerateAction( Tmp );
 	}
 
 	actor->AddAction( action );

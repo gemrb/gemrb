@@ -215,7 +215,7 @@ public:
 	void RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource) const;
 
 	/* removes any effects (delayed or not) which were using projectile */
- 	void RemoveAllEffectsWithProjectile(ieDword projectile) const;
+	void RemoveAllEffectsWithProjectile(ieDword projectile) const;
 
 	/* removes equipping effects with specified inventory slot code */
 	void RemoveEquippingEffects(ieDwordSigned slotcode) const;

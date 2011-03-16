@@ -226,10 +226,10 @@ inline int MAX(int a, int b)
 
 inline bool valid_number(const char* string, long& val)
 {
-        char* endpr;
+	char* endpr;
 
-        val = (long) strtoul( string, &endpr, 0 );
-        return ( const char * ) endpr != string;
+	val = (long) strtoul( string, &endpr, 0 );
+	return ( const char * ) endpr != string;
 }
 
 //we need 32+6 bytes at least, because we store 'context' in the variable

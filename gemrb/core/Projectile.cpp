@@ -608,7 +608,7 @@ void Projectile::StopSound()
 	if (travel_handle) {
 		travel_handle->Stop();
 		travel_handle.release();
- 	}
+	}
 }
 
 void Projectile::UpdateSound()
@@ -616,7 +616,7 @@ void Projectile::UpdateSound()
 	if (!(SFlags&PSF_SOUND2)) {
 		StopSound();
 	}
- 	if (!travel_handle || !travel_handle->Playing()) {
+	if (!travel_handle || !travel_handle->Playing()) {
 		travel_handle = core->GetAudioDrv()->Play(SoundRes2, Pos.x, Pos.y, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
 		SFlags|=PSF_SOUND2;
 	}
@@ -1273,7 +1273,7 @@ void Projectile::SpawnFragment(Point &dest)
 	if (pro) {
 		if (Extension->AFlags&PAF_SECONDARY) {
 				pro->SetEffectsCopy(effects);
- 		}
+		}
 		pro->SetCaster(Caster, Level);
 		if (pro->ExtFlags&PEF_RANDOM) {
 			dest.x+=core->Roll(1,Extension->TileX, -Extension->TileX/2);
@@ -1570,7 +1570,7 @@ void Projectile::SetupWall()
 
 void Projectile::DrawLine(const Region &screen, int face, ieDword flag)
 {
- 	Video *video = core->GetVideoDriver();
+	Video *video = core->GetVideoDriver();
 	PathNode *iter = path;
 	Sprite2D *frame = travel[face]->NextFrame();
 	while(iter) {

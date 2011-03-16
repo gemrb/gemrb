@@ -564,7 +564,7 @@ bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 		}
 
 		if (SequenceFlags&IE_VVC_LIGHTSPOT) {
- 			light = core->GetVideoDriver()->CreateLight(LightX, LightZ);
+			light = core->GetVideoDriver()->CreateLight(LightX, LightZ);
 		}
 
 		if (Duration!=0xffffffff) {

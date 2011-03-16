@@ -47,8 +47,8 @@ struct TRBlender_HalfTrans {
 	TRBlender_HalfTrans(const SDL_PixelFormat* format)
 	{
 		mask =   (0x7F >> format->Rloss) << format->Rshift
-               | (0x7F >> format->Gloss) << format->Gshift
-               | (0x7F >> format->Bloss) << format->Bshift;
+				| (0x7F >> format->Gloss) << format->Gshift
+				| (0x7F >> format->Bloss) << format->Bshift;
 	}
 
 	Uint32 operator()(Uint32 p, Uint32 v) const {
@@ -63,12 +63,12 @@ struct TRBlender_HalfTrans {
 //because it cannot select between the 16 and 32 bit variants
 template<typename PixelType, class Tinter, class Blender>
 static void BlitTile_internal(SDL_Surface* target,
-              int tx, int ty,
-              int rx, int ry,
-              int w, int h,
-              const Uint8* data, const SDL_Color* pal,
-              const Uint8* mask, Uint8 mask_key,
-              Tinter& tint, Blender& blend, PixelType /*dummy*/=0)
+			int tx, int ty,
+			int rx, int ry,
+			int w, int h,
+			const Uint8* data, const SDL_Color* pal,
+			const Uint8* mask, Uint8 mask_key,
+			Tinter& tint, Blender& blend, PixelType /*dummy*/=0)
 {
 	PixelType* buf_line = (PixelType*)(target->pixels) + (ty+ry)*(target->pitch / sizeof(PixelType));
 	const Uint8* data_line = data + ry*64;

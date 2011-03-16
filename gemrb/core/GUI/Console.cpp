@@ -172,7 +172,7 @@ void Console::OnSpecialKeyPress(unsigned char Key)
 //ctrl-up
 void Console::HistoryBack()
 {
- 	HistoryAdd(false);
+	HistoryAdd(false);
 	if (HistPos < HistMax-1 && Buffer[0]) {
 		HistPos++;
 	}
@@ -183,7 +183,7 @@ void Console::HistoryBack()
 //ctrl-down
 void Console::HistoryForward()
 {
- 	HistoryAdd(false);
+	HistoryAdd(false);
 	if (HistPos == 0) {
 		Buffer[0]=0;
 		CurPos=0;
