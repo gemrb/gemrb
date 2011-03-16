@@ -357,7 +357,10 @@ private:
 	void GetPaletteCopy(Animation *anim[], Palette *&pal);
 	void GetSmokeAnim();
 	void SetBlend();
+	//apply spells and effects on the target, only in single travel mode
+	//area effect projectiles call a separate single travel projectile for each affected target
 	void Payload();
+	//if there is an extension, convert to exploding or wait for trigger
 	void EndTravel();
 	void ChangePhase();
 	void AddTrail(ieResRef BAM, const ieByte *pal);
@@ -365,11 +368,13 @@ private:
 	void LineTarget();      //line projectiles (walls, scorchers)
 	void SecondaryTarget(); //area projectiles (circles, cones)
 	void CheckTrigger(unsigned int radius);
+	//calculate target and destination points for a firewall
 	void SetupWall();
 	void DrawLine(const Region &screen, int face, ieDword flag);
 	void DrawTravel(const Region &screen);
 	bool DrawChildren(const Region &screen);
 	void DrawExplosion(const Region &screen);
+	void SpawnFragment(Point &pos);
 	void DrawExploded(const Region &screen);
 	int GetTravelPos(int face) const;
 	int GetShadowPos(int face) const;

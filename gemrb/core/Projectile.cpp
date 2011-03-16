@@ -1219,6 +1219,22 @@ void Projectile::DrawExploded(const Region &screen)
 	phase = P_EXPIRED;
 }
 
+void Projectile::SpawnFragment(Point &dest)
+{
+	Projectile *pro = server->GetProjectileByIndex(Extension->FragProjIdx);
+	if (pro) {
+		if (Extension->AFlags&PAF_SECONDARY) {
+				pro->SetEffectsCopy(effects);
+ 		}
+		pro->SetCaster(Caster, Level);
+		if (pro->ExtFlags&PEF_RANDOM) {
+			dest.x+=core->Roll(1,Extension->TileX, -Extension->TileX/2);
+			dest.y+=core->Roll(1,Extension->TileY, -Extension->TileY/2);
+		}
+		area->AddProjectile(pro, dest, dest);
+	}
+}
+
 void Projectile::DrawExplosion(const Region &screen)
 {
 	//This seems to be a needless safeguard
