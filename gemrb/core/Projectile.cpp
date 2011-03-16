@@ -913,6 +913,10 @@ int Projectile::CalculateTargetFlag()
 	//if there are any, then change phase to exploding
 	int flags = GA_NO_DEAD;
 
+	if (Extension->AFlags&PAF_NO_WALL) {
+		flags|=GA_NO_LOS;
+	}
+
 	//projectiles don't affect dead/inanimate normally
 	if (Extension->AFlags&PAF_INANIMATE) {
 		flags&=~GA_NO_DEAD;
