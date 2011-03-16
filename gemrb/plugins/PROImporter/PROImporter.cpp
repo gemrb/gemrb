@@ -158,8 +158,18 @@ void PROImporter::GetAreaExtension(ProjectileExtension *e)
 	str->ReadDword( &e->APFlags );
 	str->ReadWord( &e->DiceCount );
 	str->ReadWord( &e->DiceSize );
+	str->ReadWord( &e->TileX );
+	str->ReadWord( &e->TileY );
+
+	if (!e->TileX) {
+		e->TileX=64;
+	}
+	if (!e->TileY) {
+		e->TileY=64;
+	}
+
 	//we skip the rest
-	str->Seek(184, GEM_CURRENT_POS);
+	str->Seek(180, GEM_CURRENT_POS);
 }
 
 #include "plugindef.h"

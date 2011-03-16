@@ -79,7 +79,7 @@
 #define PEF_HALFTRANS  256     //half-transparency (holy might)
 #define PEF_TINT       512     //use palette gradient as tint
 #define PEF_ITERATION  1024    //create another projectile of type-1 (magic missiles)
-#define PEF_TILED      2048    //tiled AOE (bg1 cone of cold/fire)
+#define PEF_DEFSPELL   2048    //always apply the default spell on the caster
 #define PEF_FALLING    4096    //projectile falls down vertically (cow)
 #define PEF_INCOMING   8192    //projectile falls in on trajectory (comet)
 #define PEF_LINE       16384   //solid line between source and target (agannazar's scorcher)
@@ -145,7 +145,8 @@
 #define APF_COUNT_HD  1024
 //target flag enemy ally switched
 #define APF_INVERT_TARGET 2048
-//
+//tiled AoE animation
+#define APF_TILED 4096
 
 struct ProjectileExtension
 {
@@ -170,6 +171,8 @@ struct ProjectileExtension
 	//used for target or HD counting
 	ieWord DiceCount;
 	ieWord DiceSize;
+	ieWord TileX;
+	ieWord TileY;
 };
 
 class GEM_EXPORT Projectile
