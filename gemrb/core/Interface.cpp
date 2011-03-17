@@ -3273,8 +3273,6 @@ void Interface::HandleGUIBehaviour(void)
 			} else if (flg & DF_OPENENDWINDOW) {
 				guiscript->RunFunction( "GUIWORLD", "OpenEndMessageWindow" );
 				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
-			} else {
-				guiscript->RunFunction( "GUICommonWindows", "EmptyControls" );
 			}
 		}
 
