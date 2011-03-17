@@ -25,6 +25,7 @@
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
+#include "ScriptEngine.h"
 #include "Video.h"
 #include "GUI/GameControl.h"
 
@@ -162,6 +163,8 @@ void DialogHandler::EndDialog(bool try_to_break)
 		delete dlg;
 		dlg = NULL;
 	}
+	// FIXME: it's not so nice having this here, but things call EndDialog directly :(
+	core->GetGUIScriptEngine()->RunFunction( "GUIWORLD", "DialogEnded" );
 	//restoring original size
 	core->GetGame()->SetControlStatus(CS_DIALOG, BM_NAND);
 	core->GetGameControl()->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_NAND);

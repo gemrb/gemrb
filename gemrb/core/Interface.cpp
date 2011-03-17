@@ -3255,8 +3255,12 @@ void Interface::HandleGUIBehaviour(void)
 			ieDword var = (ieDword) -3;
 			vars->Lookup("DialogChoose", var);
 			if ((int) var == -2) {
+				// TODO: this seems to never be called? (EndDialog is called from elsewhere instead)
 				gc->dialoghandler->EndDialog();
 			} else if ( (int)var !=-3) {
+				if ( (int) var == -1) {
+					guiscript->RunFunction( "GUIWORLD", "DialogStarted" );
+				}
 				gc->dialoghandler->DialogChoose(var);
 				if (!(gc->GetDialogueFlags() & (DF_OPENCONTINUEWINDOW | DF_OPENENDWINDOW)))
 					guiscript->RunFunction( "GUIWORLD", "NextDialogState" );
