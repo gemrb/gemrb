@@ -1112,7 +1112,9 @@ int Scriptable::CheckWildSurge()
 
 	int roll = core->Roll(1, 100, 0);
 	if ((roll <= 5 && caster->Modified[IE_SURGEMOD]) || caster->Modified[IE_FORCESURGE]) {
-		Spell *spl = gamedata->GetSpell( SpellResRef ); // this was checked before we got here
+		ieResRef OldSpellResRef;
+		memcpy(OldSpellResRef, SpellResRef, sizeof(OldSpellResRef));
+		Spell *spl = gamedata->GetSpell( OldSpellResRef ); // this was checked before we got here
 		// ignore non-magic "spells"
 		if (!(spl->Flags&SF_HLA)) {
 			int check = roll + caster->GetCasterLevel(spl->SpellType) + caster->Modified[IE_SURGEMOD];
@@ -1132,7 +1134,7 @@ int Scriptable::CheckWildSurge()
 					// handle the hardcoded cases - they'll also fail here
 					if (!HandleHardcodedSurge(surgeSpellRef, spl, caster)) {
 						//free the spell handle because we need to return
-						gamedata->FreeSpell(spl, SpellResRef, false);
+						gamedata->FreeSpell(spl, OldSpellResRef, false);
 						return 0;
 					}
 				} else {
@@ -1144,7 +1146,7 @@ int Scriptable::CheckWildSurge()
 		}
 
 		//free the spell handle
-		gamedata->FreeSpell(spl, SpellResRef, false);
+		gamedata->FreeSpell(spl, OldSpellResRef, false);
 	}
 
 	return 1;
