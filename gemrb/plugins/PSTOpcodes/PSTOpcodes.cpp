@@ -349,7 +349,7 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//handle variable level hp drain (for blood bridge)
 	if (fx->IsVariable) {
-		fx->Parameter2+=fx->CasterLevel;
+		fx->Parameter1+=fx->CasterLevel;
 		fx->IsVariable=0;
 	}
 
@@ -367,8 +367,14 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 		default:
 			return FX_NOT_APPLIED;
 	}
-	int damage = donor->Damage(fx->Parameter1, fx->Parameter2, owner);
-	receiver->NewBase( IE_HITPOINTS, damage, MOD_ADDITIVE );
+	int damage = receiver->GetStat(IE_MAXHITPOINTS)-receiver->GetStat(IE_HITPOINTS);
+	if (damage>(signed) fx->Parameter1) {
+		damage=(signed) fx->Parameter1;
+	}
+	if (damage) {
+		damage = donor->Damage(damage, fx->Parameter2, owner);
+		receiver->NewBase( IE_HITPOINTS, damage, MOD_ADDITIVE );
+	}
 	return FX_NOT_APPLIED;
 }
 
