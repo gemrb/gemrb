@@ -1128,7 +1128,7 @@ int Scriptable::CheckWildSurge()
 				memset(surgeSpellRef, 0, sizeof(surgeSpellRef));
 				strncpy(surgeSpellRef, core->SurgeSpells[check-1].spell, 8);
 
-				if (gamedata->Exists(surgeSpellRef, IE_SPL_CLASS_ID)) {
+				if (!gamedata->Exists(surgeSpellRef, IE_SPL_CLASS_ID)) {
 					// handle the hardcoded cases - they'll also fail here
 					if (!HandleHardcodedSurge(surgeSpellRef, spl, caster)) {
 						//free the spell handle because we need to return
