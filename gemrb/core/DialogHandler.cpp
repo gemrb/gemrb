@@ -106,10 +106,11 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 	}
 
 	//we need GUI for dialogs
-	gc->UnhideGUI();
+	//but the guiscript must be in control here
+	//gc->UnhideGUI();
 
 	//no exploring while in dialogue
-	gc->SetScreenFlags(SF_GUIENABLED|SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_OR);
+	gc->SetScreenFlags(/*SF_GUIENABLED|*/SF_DISABLEMOUSE|SF_LOCKSCROLL, BM_OR);
 	gc->SetDialogueFlags(DF_IN_DIALOG, BM_OR);
 
 	if (tgt->Type==ST_ACTOR) {
@@ -128,9 +129,10 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
 	}
 	//opening control size to maximum, enabling dialog window
-	core->GetGame()->SetControlStatus(CS_HIDEGUI, BM_NAND);
-	core->GetGame()->SetControlStatus(CS_DIALOG, BM_OR);
-	core->SetEventFlag(EF_PORTRAIT);
+	//but the guiscript must be in control here
+	//core->GetGame()->SetControlStatus(CS_HIDEGUI, BM_NAND);
+	//core->GetGame()->SetControlStatus(CS_DIALOG, BM_OR);
+	//core->SetEventFlag(EF_PORTRAIT);
 	return 0;
 }
 

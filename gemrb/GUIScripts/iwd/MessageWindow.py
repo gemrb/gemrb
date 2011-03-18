@@ -33,6 +33,7 @@ PortraitWindow = 0
 OptionsWindow = 0
 ExpandButton = 0
 ContractButton = 0
+TMessageTA = 0 # for dialog code
 
 def OnLoad():
 	global PortraitWindow, OptionsWindow
@@ -72,7 +73,7 @@ def OnLoad():
 	UpdateControlStatus ()
 
 def UpdateControlStatus ():
-	global MessageWindow, ExpandButton, ContractButton
+	global MessageWindow, ExpandButton, ContractButton, TMessageTA
 	
 	TMessageWindow = 0
 	TMessageTA = 0

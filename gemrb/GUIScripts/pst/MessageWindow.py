@@ -34,6 +34,7 @@ MessageWindow = 0
 ActionsWindow = 0
 PortraitWindow = 0
 OptionsWindow = 0
+MessageTA = 0
 
 def OnLoad():
 	global MessageWindow, ActionsWindow, PortraitWindow, OptionsWindow
@@ -87,7 +88,7 @@ def OnLoad():
 	UpdateControlStatus ()
 
 def UpdateControlStatus ():
-	global MessageWindow, PortraitWindow, ActionsWindow, OptionsWindow
+	global MessageWindow, PortraitWindow, ActionsWindow, OptionsWindow, MessageTA
 
 	Expand = GemRB.GetMessageWindowSize() & (GS_DIALOGMASK|GS_DIALOG)
 

@@ -142,6 +142,8 @@ def EmptyControls ():
 		Button = Window.GetControl (i+6)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.SetPicture ("")
+		Button.SetText ("")
+		Button.SetActionIcon (globals(), -1)
 	return
 
 def SelectFormationPreset ():

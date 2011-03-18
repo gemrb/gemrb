@@ -28,6 +28,7 @@ import GUICommon
 import GUICommonWindows
 import GUIClasses
 from ie_stats import *
+import MessageWindow
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -45,6 +46,19 @@ def DialogStarted ():
 
 	# try to force-close anything which is open
 	GUICommon.CloseOtherWindow(None)
+
+	# we need GUI for dialogs
+	GemRB.UnhideGUI()
+
+	# opening control size to maximum, enabling dialog window
+	GemRB.GameSetScreenFlags(GS_HIDEGUI, OP_NAND)
+	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
+
+	if GUICommonWindows.PortraitWindow:
+		GUICommonWindows.UpdatePortraitWindow ()
+
+	# we want this to happen before we start fiddling with the GUI
+	MessageWindow.UpdateControlStatus()
 
 	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	ContinueWindow = Window = GemRB.LoadWindow (9)
@@ -79,8 +93,13 @@ def CloseContinueWindow ():
 	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
 
 def NextDialogState ():
+	if not ContinueWindow:
+		return
+
 	ContinueWindow.SetVisible(WINDOW_INVISIBLE)
 	OldActionsWindow.SetVisible(WINDOW_VISIBLE)
+
+	MessageWindow.TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenEndMessageWindow ():
 	ContinueWindow.SetVisible(WINDOW_VISIBLE)
@@ -88,6 +107,8 @@ def OpenEndMessageWindow ():
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9371)	
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenContinueMessageWindow ():
 	ContinueWindow.SetVisible(WINDOW_VISIBLE)
@@ -96,6 +117,8 @@ def OpenContinueMessageWindow ():
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9372)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def UpdateReformWindow ():
 	Window = ReformPartyWindow
