@@ -1065,7 +1065,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			//the core allocates this item data
 			CREItem *item = core->ReadItem(str);
 			int Slot = core->QuerySlot(i);
-			if (item && Slot>0) {
+			if (item) {
 				act->inventory.SetSlotItem(item, Slot);
 			} else {
 				printMessage("CREImporter"," ",LIGHT_RED);
