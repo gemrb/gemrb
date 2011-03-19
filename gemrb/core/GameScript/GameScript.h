@@ -192,7 +192,7 @@ public:
 		canary = 0xdddddddd;
 		delete this;
 	}
-	bool ReadyToDie();
+	bool isNull();
 };
 
 class GEM_EXPORT Trigger {
