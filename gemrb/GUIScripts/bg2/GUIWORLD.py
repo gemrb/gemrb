@@ -29,6 +29,7 @@ import GUICommonWindows
 import GUIClasses
 from ie_stats import *
 import MessageWindow
+import CommonWindow
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -46,6 +47,7 @@ def DialogStarted ():
 
 	# try to force-close anything which is open
 	GUICommon.CloseOtherWindow(None)
+	CommonWindow.CloseContainerWindow()
 
 	# we need GUI for dialogs
 	GemRB.UnhideGUI()

@@ -39,6 +39,7 @@ def DialogStarted ():
 
 	# try to force-close anything which is open
 	GUICommon.CloseOtherWindow(None)
+	CommonWindow.CloseContainerWindow()
 
 	# we need GUI for dialogs
 	GemRB.UnhideGUI()
