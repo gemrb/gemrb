@@ -2550,7 +2550,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		entry->Y = locy;
 		entry->LocCaptionName = label;
 		entry->LocTooltipName = name;
-		memset(entry->LoadScreenResRef, 0, 8);
+		memset(entry->LoadScreenResRef, 0, sizeof(ieResRef));
 		memcpy(entry->AreaLinksIndex, indices, sizeof(entry->AreaLinksIndex) );
 		memcpy(entry->AreaLinksCount, links, sizeof(entry->AreaLinksCount) );
 
@@ -2581,7 +2581,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 			link->EncounterChance = encprob;
 			for(k=0;k<5;k++) {
 				if (enc[k][0]=='*') {
-					memset(link->EncounterAreaResRef[k],0,8);
+					memset(link->EncounterAreaResRef[k],0,sizeof(ieResRef));
 				} else {
 					strnuprcpy(link->EncounterAreaResRef[k], enc[k], 8);
 				}
