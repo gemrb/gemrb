@@ -981,7 +981,7 @@ int Scriptable::CastSpellPoint( ieResRef &SpellRef, const Point &target, bool de
 			return -1;
 		}
 	}
-	if(!CanCast(SpellRef)) {
+	if(deplete && !CanCast(SpellRef)) {
 		SpellResRef[0] = 0;
 		if (Type == ST_ACTOR) {
 			Actor *actor = (Actor *) this;
@@ -1020,7 +1020,7 @@ int Scriptable::CastSpell( ieResRef &SpellRef, Scriptable* target, bool deplete,
 	// FIXME: fishy
 	if (!target) target = this;
 
-	if(!CanCast(SpellRef)) {
+	if(deplete && !CanCast(SpellRef)) {
 		SpellResRef[0] = 0;
 		if (Type == ST_ACTOR) {
 			Actor *actor = (Actor *) this;
