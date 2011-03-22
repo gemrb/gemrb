@@ -3602,7 +3602,6 @@ int AreaAnimation::GetHeight() const
 
 void AreaAnimation::Draw(const Region &screen, Map *area)
 {
-	int ac=animcount;
 	Video* video = core->GetVideoDriver();
 
 	//always draw the animation tinted because tint is also used for
@@ -3617,7 +3616,8 @@ void AreaAnimation::Draw(const Region &screen, Map *area)
 			covers=(SpriteCover **) calloc( animcount, sizeof(SpriteCover *) );
 		}
 	}
-	ac=animcount;
+
+	int ac = animcount;
 	while (ac--) {
 		Animation *anim = animation[ac];
 		Sprite2D *frame = anim->NextFrame();

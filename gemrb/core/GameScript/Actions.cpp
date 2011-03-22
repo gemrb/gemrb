@@ -1738,6 +1738,7 @@ void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 	case 3: //force switch, but wait for previous music to end gracefully
 		force = false;
 		restart = true;
+		break;
 	default:
 		force = false;
 		restart = false;
