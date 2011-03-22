@@ -138,7 +138,7 @@ FileStream::FileStream(void)
 	str = new File();
 }
 
-FileStream* FileStream::Clone()
+DataStream* FileStream::Clone()
 {
 	return OpenFile(originalfile);
 }

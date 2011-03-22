@@ -40,7 +40,7 @@ SlicedStream::~SlicedStream()
 	delete str;
 }
 
-SlicedStream* SlicedStream::Clone()
+DataStream* SlicedStream::Clone()
 {
 	return new SlicedStream(str, startpos, size);
 }

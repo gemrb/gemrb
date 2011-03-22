@@ -34,7 +34,7 @@ private:
 public:
 	SlicedStream(DataStream* cfs, int startpos, int size);
 	~SlicedStream();
-	SlicedStream* Clone();
+	DataStream* Clone();
 
 	int Read(void* dest, unsigned int length);
 	int Write(const void* src, unsigned int length);
