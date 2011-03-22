@@ -17,7 +17,7 @@
  *
  */
 
-#include "Scriptable/ActorBlock.h"
+#include "Scriptable/Scriptable.h"
 
 #include "strrefs.h"
 #include "win32def.h"

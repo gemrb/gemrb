@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef ACTORBLOCK_H
-#define ACTORBLOCK_H
+#ifndef SCRIPTABLE_H
+#define SCRIPTABLE_H
 
 #include "exports.h"
 

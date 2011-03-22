@@ -212,8 +212,6 @@ GEM_EXPORT char* strlwr(char* string);
 	}
 #endif
 
-//struct ActorBlock;
-
 inline int MIN(int a, int b)
 {
 	return (a > b ? b : a);

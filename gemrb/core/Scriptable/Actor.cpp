@@ -20,7 +20,7 @@
 
 //This class represents the .cre (creature) files.
 //Any player or non-player character is a creature.
-//Actor is a scriptable object (Scriptable). See ActorBlock.cpp
+//Actor is a scriptable object (Scriptable). See Scriptable.cpp
 
 #include "Scriptable/Actor.h"
 

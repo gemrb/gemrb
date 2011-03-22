@@ -30,7 +30,7 @@ class Map;
 #include "Image.h"
 #include "IniSpawn.h"
 #include "SpriteCover.h"
-#include "Scriptable/ActorBlock.h"
+#include "Scriptable/Scriptable.h"
 
 #include <queue>
 

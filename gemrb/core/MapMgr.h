@@ -29,7 +29,7 @@
 
 #include "Map.h"
 #include "Plugin.h"
-#include "Scriptable/ActorBlock.h"
+#include "Scriptable/Scriptable.h"
 #include "System/DataStream.h"
 
 /**

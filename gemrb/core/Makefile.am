@@ -83,7 +83,7 @@ libgemrb_core_la_SOURCES = \
 	SaveGameMgr.cpp \
 	ScriptEngine.cpp \
 	Scriptable/Actor.cpp \
-	Scriptable/ActorBlock.cpp \
+	Scriptable/Scriptable.cpp \
 	Scriptable/PCStatStruct.cpp \
 	ScriptedAnimation.cpp \
 	SoundMgr.cpp \

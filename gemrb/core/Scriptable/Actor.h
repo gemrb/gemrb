@@ -21,7 +21,7 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
-#include "Scriptable/ActorBlock.h"
+#include "Scriptable/Scriptable.h"
 
 #include "Scriptable/PCStatStruct.h"
 
