@@ -689,8 +689,8 @@ public:
 	static const char *GetDeathVarFormat();
 	int CheckSpecialSpell(ieResRef resref, Actor *actor);
 	int GetSpecialSpell(ieResRef resref);
-	int GetSpecialSpellsCount() { return SpecialSpellsCount; };
-	SpellDescType *GetSpecialSpells() { return SpecialSpells; };
+	int GetSpecialSpellsCount() { return SpecialSpellsCount; }
+	SpellDescType *GetSpecialSpells() { return SpecialSpells; }
 private:
 	int LoadSprites();
 	bool LoadConfig(void);
