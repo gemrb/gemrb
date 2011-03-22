@@ -32,9 +32,15 @@ public:
 	File() : file() {}
 	void Close() { CloseHandle(file); }
 	size_t Length() {
-		__int64 size;
-		GetFileSizeEx(file, &size);
-		return size;
+		LARGE_INTEGER size;
+		DWORD high;
+		DWORD low = GetFileSize(file, &high);
+		if (low != 0xFFFFFFFF || GetLastError() == NO_ERROR) {
+			size.LowPart = low;
+			size.HighPart = high;
+			return size.QuadPart;
+		}
+		return 0;
 	}
 	bool OpenRO(const char *name) {
 		file = CreateFile(name,
