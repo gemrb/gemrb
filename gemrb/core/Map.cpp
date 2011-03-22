@@ -668,8 +668,9 @@ void Map::UpdateScripts()
 		actor->fxqueue.Cleanup();
 
 		//if the actor is immobile, don't run the scripts
+		//FIXME: this is not universaly true, only some states have this effect
 		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
-			if (actor->Immobile() || actor->GetStat(IE_STATE_ID) & STATE_SLEEP) {
+			if (/*actor->Immobile() ||*/ actor->GetStat(IE_STATE_ID) & STATE_SLEEP) {
 				actor->no_more_steps = true;
 				continue;
 			}
