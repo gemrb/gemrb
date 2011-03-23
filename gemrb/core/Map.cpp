@@ -232,8 +232,8 @@ void InitPathFinder()
 void AddLOS(int destx, int desty, int slot)
 {
 	for (int i=0;i<MaxVisibility;i++) {
-		int x=(destx*i+MaxVisibility/2)/MaxVisibility*16;
-		int y=(desty*i+MaxVisibility/2)/MaxVisibility*12;
+		int x = ((destx*i + MaxVisibility/2) / MaxVisibility) * 16;
+		int y = ((desty*i + MaxVisibility/2) / MaxVisibility) * 12;
 		if (LargeFog) {
 			x += 16;
 			y += 12;
@@ -3029,7 +3029,7 @@ void Map::SetMapVisibility(int setreset)
 	memset( VisibleBitmap, setreset, GetExploredMapSize() );
 }
 
-// x, y are in tile coordinates
+// x, y are not in tile coordinates
 void Map::ExploreTile(const Point &pos)
 {
 	int h = TMap->YCellCount * 2 + LargeFog;
