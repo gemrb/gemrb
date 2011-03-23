@@ -1240,33 +1240,13 @@ bool Game::PartyOverflow() const
 	return (PCs.size()>partysize);
 }
 
-bool Game::PCInCombat(Actor* actor) const
-{
-	if (!CombatCounter) {
-		return false;
-	}
-
-	if (actor->LastTarget) {
-		return true;
-	}
-	if (AttackersOf(actor->GetGlobalID(), actor->GetCurrentArea())) {
-		return true;
-	}
-	return false;
-}
-
 bool Game::AnyPCInCombat() const
 {
 	if (!CombatCounter) {
 		return false;
 	}
 
-	for (unsigned int i=0; i<PCs.size(); i++) {
-		if (PCInCombat (PCs[i])) {
-			return true;
-		}
-	}
-	return false;
+	return true;
 }
 
 //returns true if the protagonist (or the whole party died)
@@ -1309,30 +1289,10 @@ void Game::UpdateScripts()
 	ProcessActions(false);
 	size_t idx;
 
-	bool PartyAttack = false;
+	PartyAttack = false;
 
 	for (idx=0;idx<Maps.size();idx++) {
 		Maps[idx]->UpdateScripts();
-		size_t acnt=Attackers.size();
-		while(acnt--) {
-			Actor *actor = Maps[idx]->GetActorByGlobalID(Attackers[acnt]);
-			if (actor) {
-				if ( !Maps[idx]->GetActorByGlobalID(actor->LastTarget) ) {
-					//Actor's target left area
-					OutAttack(Attackers[acnt]);
-					continue;
-				} else {
-					//each attacker handles their own round initiation
-					actor->InitRound(GameTime);
-					if (actor->InParty) {
-						PartyAttack = true;
-					}
-				}
-			} else {
-				//Attacker is gone from area
-				OutAttack(Attackers[acnt]);
-			}
-		}
 	}
 
 	if (PartyAttack) {
@@ -1638,28 +1598,6 @@ bool Game::IsDay()
 	return true;
 }
 
-void Game::InAttack(ieDword globalID)
-{
-	std::vector< ieDword>::const_iterator idx;
-
-	for(idx=Attackers.begin(); idx!=Attackers.end();idx++) {
-		if (*idx==globalID) return;
-	}
-	Attackers.push_back(globalID);
-}
-
-void Game::OutAttack(ieDword globalID)
-{
-	std::vector< ieDword>::iterator idx;
-
-	for(idx=Attackers.begin(); idx!=Attackers.end();idx++) {
-		if (*idx==globalID) {
-			Attackers.erase(idx);
-			break;
-		}
-	}
-}
-
 void Game::ChangeSong(bool always, bool force)
 {
 	int Song;
@@ -1676,25 +1614,6 @@ void Game::ChangeSong(bool always, bool force)
 	//force just means, we schedule the song for later, if currently
 	//is playing
 	area->PlayAreaSong( Song, always, force );
-}
-
-int Game::AttackersOf(ieDword globalID, Map *area) const
-{
-	if (!area) {
-		return 0;
-	}
-	std::vector< ieDword>::const_iterator idx;
-
-	int cnt = 0;
-	for(idx=Attackers.begin(); idx!=Attackers.end();idx++) {
-		Actor * actor = area->GetActorByGlobalID(*idx);
-		if (actor) {
-			if (actor->LastTarget==globalID) {
-				cnt++;
-			}
-		}
-	}
-	return cnt;
 }
 
 /* this method redraws weather. If update is false,
@@ -1807,16 +1726,6 @@ void Game::DebugDump()
 	printf("Current area: %s   Previous area: %s\n", CurrentArea, PreviousArea);
 	printf("Global script: %s\n", Scripts[0]->GetName());
 	printf("CombatCounter: %d\n", (int) CombatCounter);
-	printf("Attackers count: %d\n", (int) Attackers.size());
-	for(idx=0;idx<Attackers.size(); idx++) {
-		Actor *actor = GetActorByGlobalID(Attackers[idx]);
-		if (!actor) {
-			printf("Name: ???\n");
-			continue;
-		}
-		Actor *whom = GetActorByGlobalID(actor->LastTarget);
-		printf("Name: %s Attacking : %s\n", actor->ShortName, whom?whom->ShortName:"???");
-	}
 
 	printf("Party size: %d\n", (int) PCs.size());
 	for(idx=0;idx<PCs.size();idx++) {

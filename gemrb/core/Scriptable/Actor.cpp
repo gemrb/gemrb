@@ -3321,7 +3321,6 @@ void Actor::Die(Scriptable *killer)
 	//Can't simply set Selected to false, game has its own little list
 	Game *game = core->GetGame();
 	game->SelectActor(this, false, SELECT_NORMAL);
-	game->OutAttack(GetGlobalID());
 
 	displaymsg->DisplayConstantStringName(STR_DEATH, 0xffffff, this);
 	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
@@ -4167,9 +4166,6 @@ int Actor::GetAttackStyle() const
 void Actor::AttackedBy( Actor *attacker)
 {
 	LastAttacker = attacker->GetGlobalID();
-	Game * game = core->GetGame();
-	game->InAttack(GetGlobalID() );
-	game->InAttack(LastAttacker);
 }
 
 void Actor::SetTarget( Scriptable *target)
@@ -4187,7 +4183,6 @@ void Actor::StopAttack()
 {
 	SetStance(IE_ANI_READY);
 	secondround = 0;
-	core->GetGame()->OutAttack(GetGlobalID());
 	InternalFlags|=IF_TARGETGONE; //this is for the trigger!
 	if (InParty) {
 		core->Autopause(AP_NOTARGET);
@@ -4218,46 +4213,11 @@ void Actor::InitRound(ieDword gameTime)
 	lastInit = gameTime;
 	secondround = !secondround;
 
-	//roundTime will equal 0 if we aren't attacking something
-	if (roundTime) {
-		//only perform calculations at the beginning of the round!
-		if (((gameTime-roundTime)%core->Time.round_size != 0) || \
-		(roundTime == lastInit)) {
-			return;
-		}
-	}
-
 	//reset variables used in PerformAttack
 	attackcount = 0;
 	attacksperround = 0;
 	nextattack = 0;
 	lastattack = 0;
-
-	//we set roundTime to zero on any of the following returns, because this
-	//is guaranteed to be the start of a round, and we only want roundTime
-	//if we are attacking this round
-	if (InternalFlags&IF_STOPATTACK) {
-		core->GetGame()->OutAttack(GetGlobalID());
-		roundTime = 0;
-		return;
-	}
-
-	if (!LastTarget) {
-		StopAttack();
-		roundTime = 0;
-		return;
-	}
-
-	//if held or disabled, etc, then cannot continue attacking
-	ieDword state = GetStat(IE_STATE_ID);
-	if (state&STATE_CANTMOVE) {
-		roundTime = 0;
-		return;
-	}
-	if (Immobile()) {
-		roundTime = 0;
-		return;
-	}
 
 	//add one for second round to get an extra attack only if we
 	//are x/2 attacks per round
@@ -4544,10 +4504,23 @@ int Actor::GetDefense(int DamageType, Actor *attacker) const
 
 void Actor::PerformAttack(ieDword gameTime)
 {
-	// start a new round if we really don't have one yet
-	if (!roundTime) {
-		printMessage("Actor", "Unregistered attack. We shouldn't be here?\n", RED);
-		secondround = 0;
+	if (InParty) {
+		// TODO: this is temporary hack
+		Game *game = core->GetGame();
+		game->PartyAttack = true;
+	}
+
+	// if held or disabled, etc, then cannot continue attacking
+	// TODO: should be in action
+	ieDword state = GetStat(IE_STATE_ID);
+	if (state&STATE_CANTMOVE || Immobile()) {
+		// this is also part of the UpdateActorState hack below. sorry!
+		lastattack = gameTime;
+		return;
+	}
+
+	if (!roundTime || (gameTime-roundTime > core->Time.round_size)) {
+		// TODO: do we need cleverness for secondround here?
 		InitRound(gameTime);
 	}
 
@@ -4883,10 +4856,8 @@ void Actor::UpdateActorState(ieDword gameTime) {
 			StopAttack();
 		} else {
 			printMessage("Attack","(Leaving attack)", GREEN);
-			core->GetGame()->OutAttack(GetGlobalID());
 		}
 
-		roundTime = 0;
 		lastattack = 0;
 	}
 

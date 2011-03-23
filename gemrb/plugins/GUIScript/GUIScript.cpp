@@ -8708,7 +8708,6 @@ static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	game->OutAttack(actor->GetGlobalID()); //stop attacking
 	actor->ClearPath();      //stop walking
 	actor->ClearActions();   //stop pending action involved walking
 	actor->SetModal(MS_NONE);//stop modal actions
