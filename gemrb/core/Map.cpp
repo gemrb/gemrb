@@ -45,6 +45,9 @@
 #include "strrefs.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 
 #include <cmath>
 #include <cassert>

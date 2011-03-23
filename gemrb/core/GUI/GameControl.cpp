@@ -36,6 +36,9 @@
 #include "Video.h"
 #include "damages.h"
 #include "GameScript/GSUtils.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 
 #include <cmath>
 

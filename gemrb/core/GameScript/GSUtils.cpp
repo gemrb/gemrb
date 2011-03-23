@@ -37,6 +37,9 @@
 #include "TileMap.h"
 #include "Video.h"
 #include "GUI/GameControl.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 
 #include <cstdio>
 

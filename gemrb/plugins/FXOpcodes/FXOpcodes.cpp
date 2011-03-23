@@ -30,6 +30,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "PolymorphCache.h" // fx_polymorph
 #include "Projectile.h" //needs for clearair
 #include "Spell.h" //needed for fx_cast_spell feedback
 #include "TileMap.h" //needs for knock!
@@ -38,7 +39,9 @@
 #include "GameScript/Matching.h" //needs for GetAllObjects
 #include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
-#include "PolymorphCache.h" // fx_polymorph
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 #include "Scriptable/PCStatStruct.h" //fx_polymorph (action definitions)
 
 //FIXME: find a way to handle portrait icons better

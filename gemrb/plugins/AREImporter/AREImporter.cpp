@@ -37,6 +37,9 @@
 #include "TileMapMgr.h"
 #include "Video.h"
 #include "GameScript/GameScript.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 #include "System/CachedFileStream.h"
 #include "System/FileStream.h"
 

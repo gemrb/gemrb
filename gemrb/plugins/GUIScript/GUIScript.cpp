@@ -51,6 +51,9 @@
 #include "GUI/MapControl.h"
 #include "GUI/TextEdit.h"
 #include "GUI/WorldMapControl.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 #include "System/VFS.h"
 
 #include <cstdio>

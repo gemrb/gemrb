@@ -41,6 +41,9 @@
 #include "Video.h"
 #include "WorldMap.h"
 #include "GUI/GameControl.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 
 //------------------------------------------------------------
 // Action Functions

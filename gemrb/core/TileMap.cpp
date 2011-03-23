@@ -23,6 +23,10 @@
 #include "Interface.h"
 #include "Video.h"
 
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
+
 TileMap::TileMap(void)
 {
 	XCellCount = 0;

@@ -26,7 +26,6 @@
 #include "CharAnimations.h"
 #include "Inventory.h"
 #include "PathFinder.h"
-#include "Spell.h" // for HandleHardcodedSurge (repeat the spell lookup if this header is unwanted)
 #include "Sprite2D.h"
 #include "TileOverlay.h"
 #include "Variables.h"
@@ -35,13 +34,16 @@
 
 class Action;
 class Actor;
+class Container;
 class Door;
 class GameScript;
 class Gem_Polygon;
 class Highlightable;
+class InfoPoint;
 class Movable;
 class Scriptable;
 class Selectable;
+class Spell;
 class SpriteCover;
 
 #define MAX_SCRIPTS		8
@@ -79,25 +81,6 @@ class SpriteCover;
 #define TRAVEL_NONPC      512
 #define TRAP_USEPOINT       1024 //override usage point of travel regions (used for sound in PST traps)
 #define INFO_DOOR	 2048 //info trigger blocked by door
-
-//door flags
-#define DOOR_OPEN        1
-#define DOOR_LOCKED      2
-#define DOOR_RESET       4   //reset trap
-#define DOOR_DETECTABLE  8   //trap detectable
-#define DOOR_16          16  //unknown
-#define DOOR_32          32  //unknown
-#define DOOR_LINKED      64   //info trigger linked to this door
-#define DOOR_SECRET      128  //door is secret
-#define DOOR_FOUND       256  //secret door found
-#define DOOR_TRANSPARENT 512  //obscures vision
-#define DOOR_KEY         1024 //key removed when used
-#define DOOR_SLIDE       2048 //impeded blocks ignored
-
-//container flags
-#define CONT_LOCKED      1
-#define CONT_RESET       8
-#define CONT_DISABLED    32
 
 //internal actor flags
 #define IF_GIVEXP     1     //give xp for this death
@@ -450,131 +433,6 @@ public:
 	ieDword opencount;
 	unsigned short* closedtiles;
 	ieDword closedcount;
-};
-
-class GEM_EXPORT Door : public Highlightable {
-public:
-	Door(TileOverlay* Overlay);
-	~Door(void);
-public:
-	ieVariable LinkedInfo;
-	ieResRef ID; //WED ID
-	TileOverlay* overlay;
-	unsigned short* tiles;
-	int tilecount;
-	ieDword Flags;
-	int closedIndex;
-	//trigger areas
-	Gem_Polygon* open;
-	Gem_Polygon* closed;
-	//impeded blocks
-	Point* open_ib; //impeded blocks stored in a Point array
-	int oibcount;
-	Point* closed_ib;
-	int cibcount;
-	//wallgroup covers
-	unsigned int open_wg_index;
-	unsigned int open_wg_count;
-	unsigned int closed_wg_index;
-	unsigned int closed_wg_count;
-	Point toOpen[2];
-	ieResRef OpenSound;
-	ieResRef CloseSound;
-	ieResRef LockSound;
-	ieResRef UnLockSound;
-	ieDword DiscoveryDiff;
-	ieDword LockDifficulty; //this is a dword?
-	ieStrRef OpenStrRef;
-	ieStrRef NameStrRef;
-	ieDword  Unknown54;     //unused in tob
-private:
-	void SetWallgroups(int count, int value);
-	void ImpedeBlocks(int count, Point *points, unsigned char value);
-	void UpdateDoor();
-	bool BlockedOpen(int Open, int ForceOpen);
-public:
-	void ToggleTiles(int State, int playsound = false);
-	void SetName(const char* Name); // sets door ID
-	void SetTiles(unsigned short* Tiles, int count);
-	void SetDoorLocked(int Locked, int playsound);
-	void SetDoorOpen(int Open, int playsound, ieDword ID);
-	void SetPolygon(bool Open, Gem_Polygon* poly);
-	int IsOpen() const;
-	void TryPickLock(Actor *actor);
-	void TryBashLock(Actor* actor) ;
-	bool TryUnlock(Actor *actor);
-	void TryDetectSecret(int skill);
-	bool Visible();
-	void DebugDump() const;
-	int TrapResets() const { return Flags & DOOR_RESET; }
-	void SetNewOverlay(TileOverlay *Overlay);
-};
-
-class GEM_EXPORT Container : public Highlightable {
-public:
-	Container(void);
-	~Container(void);
-	void SetContainerLocked(bool lock);
-	//turns the container to a pile
-	void DestroyContainer();
-	//removes an item from the container's inventory
-	CREItem *RemoveItem(unsigned int idx, unsigned int count);
-	//adds an item to the container's inventory
-	int AddItem(CREItem *item);
-	//draws the ground icons
-	void DrawPile(bool highlight, Region screen, Color tint);
-	//returns dithering option
-	int WantDither();
-	int IsOpen() const;
-	void TryPickLock(Actor *actor);
-	void TryBashLock(Actor* actor) ;
-	bool TryUnlock(Actor *actor);
-	void DebugDump() const;
-	int TrapResets() const { return Flags & CONT_RESET; }
-private:
-	//updates the ground icons for a pile
-	void RefreshGroundIcons();
-	void FreeGroundIcons();
-	void CreateGroundIconCover();
-public:
-	Point toOpen;
-	ieWord Type;
-	ieDword Flags;
-	ieWord LockDifficulty;
-	Inventory inventory;
-	ieStrRef OpenFail;
-	//these are not saved
-	Sprite2D *groundicons[3];
-	SpriteCover *groundiconcover;
-	//keyresref is stored in Highlightable
-};
-
-class GEM_EXPORT InfoPoint : public Highlightable {
-public:
-	InfoPoint(void);
-	~InfoPoint(void);
-	//returns true if trap has been triggered, tumble skill???
-	void SetEnter(const char *resref);
-	bool TriggerTrap(int skill, ieDword ID);
-	//call this to check if an actor entered the trigger zone
-	bool Entered(Actor *actor);
-	//checks if the actor may use this travel trigger
-	int CheckTravel(Actor *actor);
-	void DebugDump() const;
-	int TrapResets() const { return Flags & TRAP_RESET; }
-	bool CanDetectTrap() const;
-	bool PossibleToSeeTrap() const;
-	bool IsPortal() const;
-
-public:
-	ieResRef Destination;
-	ieVariable EntranceName;
-	ieDword Flags;
-	//overheadtext contains the string, but we have to save this
-	ieStrRef StrRef;
-	Point UsePoint;
-	Point TalkPos;
-
 };
 
 #endif

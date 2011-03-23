@@ -32,6 +32,9 @@
 #include "Video.h"
 #include "GUI/GameControl.h"
 #include "math.h" //needs for acos
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 
 //-------------------------------------------------------------
 // Trigger Functions

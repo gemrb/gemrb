@@ -473,11 +473,11 @@ Scriptable *DialogHandler::GetTarget()
 	if (actor) return actor;
 
 	Door *door = area->GetDoorByGlobalID(targetID);
-	if (door) return door;
+	if (door) return (Scriptable *)door;
 	Container *container = area->GetContainerByGlobalID(targetID);
-	if (container) return container;
+	if (container) return (Scriptable *)container;
 	InfoPoint *ip = area->GetInfoPointByGlobalID(targetID);
-	if (ip) return ip;
+	if (ip) return (Scriptable *)ip;
 
 	return NULL;
 }

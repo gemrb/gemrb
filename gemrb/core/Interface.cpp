@@ -72,6 +72,7 @@
 #include "GUI/Label.h"
 #include "GUI/MapControl.h"
 #include "GUI/WorldMapControl.h"
+#include "Scriptable/Container.h"
 #include "System/FileStream.h"
 #include "System/VFS.h"
 
