@@ -7005,9 +7005,20 @@ bool Actor::TryToHide() {
 		return false;
 	}
 
-	// check if the pc is in combat (seen / heard)
-	Game *game = core->GetGame();
-	if (game->PCInCombat(this)) {
+	// check if the actor is seen by enemy
+	Actor** visActors = GetCurrentArea()->GetAllActorsInRadius(Pos, GA_NO_DEAD, Modified[IE_VISUALRANGE]);
+	Actor** poi = visActors;
+	bool seen = false;
+	while (*poi && !seen) {
+		Actor *toCheck = *poi++;
+		if (Modified[IE_EA] >= EA_EVILCUTOFF)
+			seen = toCheck->Modified[IE_EA] < EA_EVILCUTOFF;
+		else
+			seen = toCheck->Modified[IE_EA] > EA_GOODCUTOFF;
+	}
+	free(visActors);
+
+	if (seen) {
 		HideFailed(this);
 		return false;
 	}
@@ -7019,6 +7030,7 @@ bool Actor::TryToHide() {
 		skill = GetStat(IE_STEALTH);
 	}
 
+	Game *game = core->GetGame();
 	// check how bright our spot is
 	ieDword lightness = game->GetCurrentArea()->GetLightLevel(Pos);
 	// seems to be the color overlay at midnight; lightness of a point with rgb (200, 100, 100)
