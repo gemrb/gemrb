@@ -2632,6 +2632,8 @@ bool Interface::LoadGemRBINI()
 Palette* Interface::CreatePalette(const Color &color, const Color &back)
 {
 	Palette* pal = new Palette();
+	pal->front = color;
+	pal->back = back;
 	pal->col[0].r = 0;
 	pal->col[0].g = 0xff;
 	pal->col[0].b = 0;

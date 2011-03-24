@@ -67,6 +67,8 @@ public:
 	Color col[256]; //< RGB or RGBA 8 bit palette
 	bool alpha; //< true if this is a RGBA palette
 	bool named; //< true if the palette comes from a bmp and cached
+	Color front; // Original colors used by core->CreatePalette()
+	Color back;
 
 	void IncRef() {
 		refcount++;
