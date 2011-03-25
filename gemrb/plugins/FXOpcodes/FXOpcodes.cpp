@@ -3940,10 +3940,15 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 			displaymsg->DisplayStringName(tmp, 0xffffff, Owner);
 		}
 	} else {
+		// save the current spell ref, so the rest of its effects can be applied afterwards
+		ieResRef OldSpellResRef;
+		memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
+		Owner->SetSpellResRef(fx->Resource);
 		//cast spell on target
 		Owner->CastSpell(fx->Resource, target, false);
 		//actually finish casting (if this is not good enough, use an action???)
 		Owner->CastSpellEnd(fx->Parameter1);
+		Owner->SetSpellResRef(OldSpellResRef);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -3963,9 +3968,14 @@ int fx_learn_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_cast_spell_point (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cast_spell_point (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
+	// save the current spell ref, so the rest of its effects can be applied afterwards
+	ieResRef OldSpellResRef;
+	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
+	Owner->SetSpellResRef(fx->Resource);
 	Owner->CastSpellPoint(fx->Resource, target->Pos, false);
 	//actually finish casting (if this is not good enough, use an action???)
 	Owner->CastSpellPointEnd(fx->Parameter1);
+	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }
 
@@ -5747,7 +5757,12 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	//success
 	displaymsg->DisplayConstantStringName(STR_SNARESUCCEED, 0xf0f0f0, target);
+	// save the current spell ref, so the rest of its effects can be applied afterwards
+	ieResRef OldSpellResRef;
+	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
+	Owner->SetSpellResRef(fx->Resource);
 	Owner->CastSpellPoint(fx->Resource, target->Pos, false);
+	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }
 
