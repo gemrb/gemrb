@@ -1849,13 +1849,10 @@ bool GameScript::Update(bool *continuing, bool *done)
 			}
 			continueExecution = ( rB->responseSet->Execute(MySelf) != 0);
 			if (continuing) *continuing = continueExecution;
-			//clear triggers after response executed
-			//MySelf->ClearTriggers();
 			if (!continueExecution) {
 				if (done) *done = true;
 				break;
 			}
-			//continueExecution = false;
 		}
 	}
 	return true;

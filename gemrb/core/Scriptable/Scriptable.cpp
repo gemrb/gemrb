@@ -298,12 +298,14 @@ void Scriptable::ExecuteScript(int scriptCount)
 		}
 	}
 
+	// Don't abort if there is a running non-interruptable action.
 	if ((InternalFlags & IF_NOINT) && (CurrentAction || GetNextAction())) {
 		return;
 	}
-
 	if (!CurrentActionInterruptable) {
-		if (!CurrentAction && !GetNextAction()) abort();
+		// sanity check
+		if (!CurrentAction && !GetNextAction())
+			abort();
 		return;
 	}
 
@@ -312,6 +314,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	if ((lastRunTime != 0) && (InternalFlags & IF_JUSTDIED)) {
 		return;
 	}
+	bool changed = false;
 
 	ieDword thisTime = core->GetGame()->Ticks;
 	if (( thisTime - lastRunTime ) < 1000) {
@@ -321,26 +324,22 @@ void Scriptable::ExecuteScript(int scriptCount)
 	lastDelay = lastRunTime;
 	lastRunTime = thisTime;
 
-	bool alive = false;
+	// if party AI is disabled, don't run non-override scripts
+	if (Type == ST_ACTOR && ((Actor *) this)->InParty && (core->GetGame()->ControlStatus & CS_PARTY_AI))
+		scriptCount = 1;
+	// TODO: hardcoded action hacks
 
 	bool continuing = false, done = false;
 	for (int i = 0;i<scriptCount;i++) {
-		//disable AI script level for actors in party when the player disabled them
-		if ((i == AI_SCRIPT_LEVEL) && Type == ST_ACTOR && ((Actor *) this)->InParty) {
-			if (core->GetGame()->ControlStatus&CS_PARTY_AI) {
-				continue;
-			}
-		}
-
 		GameScript *Script = Scripts[i];
 		if (Script) {
-			alive |= Script->Update(&continuing, &done);
+			changed |= Script->Update(&continuing, &done);
 		}
 
 		/* scripts are not concurrent, see WAITPC override script for example */
 		if (done) break;
 	}
-	if (alive && UnselectableTimer) {
+	if (changed && UnselectableTimer) {
 			UnselectableTimer--;
 			if (!UnselectableTimer) {
 				if (Type == ST_ACTOR) {
@@ -348,7 +347,9 @@ void Scriptable::ExecuteScript(int scriptCount)
 				}
 			}
 	}
-	InternalFlags &= ~IF_ONCREATION;
+
+	if (changed)
+		ClearTriggers();
 }
 
 void Scriptable::AddAction(Action* aC)
@@ -414,8 +415,6 @@ void Scriptable::ClearActions()
 	actionQueue.clear();
 	WaitCounter = 0;
 	LastTarget = 0;
-	//clear the triggers as fast as possible when queue ended?
-	ClearTriggers();
 
 	if (Type == ST_ACTOR) {
 		Interrupt();
@@ -456,16 +455,11 @@ void Scriptable::ProcessActions(bool force)
 		}
 		if (!CurrentAction) {
 			ClearActions();
-			//removing the triggers at the end of the
-			//block
-			//ClearTriggers();
 			break;
 		}
 		GameScript::ExecuteAction( this, CurrentAction );
 		//break execution in case of a Wait flag
 		if (WaitCounter) {
-			//clear triggers while waiting
-			//ClearTriggers();
 			break;
 		}
 		//break execution in case of blocking action
@@ -478,9 +472,6 @@ void Scriptable::ProcessActions(bool force)
 			break;
 		}
 	}
-	//most likely the best place to clear triggers is here
-	//queue is empty, or there is a looong action subject to break
-	ClearTriggers();
 	if (InternalFlags&IF_IDLE) {
 		Deactivate();
 	}
