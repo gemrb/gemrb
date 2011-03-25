@@ -605,6 +605,7 @@ static EffectRef fx_set_invisible_state_ref = { "State:Invisible", -1 };
 void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake)
 {
 	Spell* spl = gamedata->GetSpell( SpellResRef );
+	Spell* spltmp= NULL;
 	Actor *caster = NULL;
 
 	//PST has a weird effect, called Enoll Eva's duplication
@@ -624,6 +625,11 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 			//anyway, it would be too many duplications
 			duplicate = 2;
 		}
+	}
+
+	// when doing wild magic mods, use a copy of the spell to avoid mod propagation into the cache
+	if (caster && (caster->wildSurgeMods.target_change_type || caster->wildSurgeMods.saving_throw_mod || caster->wildSurgeMods.projectile_id)) {
+		spltmp = gamedata->GetUncachedSpell( SpellResRef );
 	}
 
 	while(duplicate --) {
@@ -666,19 +672,19 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 			Effect *fx = NULL;
 			switch (caster->wildSurgeMods.target_change_type) {
 				case WSTC_SETTYPE:
-					seh = &spl->ext_headers[SpellHeader];
+					seh = &spltmp->ext_headers[SpellHeader];
 					for (i=0; i < seh->FeatureCount; i++) {
 						seh->features[i].Target = caster->wildSurgeMods.target_type;
 					}
 					// we need to fetch the projectile, so the effect queue is created
 					// (skipped above)
-					pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+					pro = spltmp->GetProjectile(this, SpellHeader, LastTargetPos);
 					pro->SetCaster(GetGlobalID(), level);
 					break;
 				case WSTC_ADDTYPE:
 					// TODO: unhardcode to allow for mixing all the target types
 					// caster gets selftargetting fx when the projectile is fetched above
-					seh = &spl->ext_headers[SpellHeader];
+					seh = &spltmp->ext_headers[SpellHeader];
 					for (i=0; i < seh->FeatureCount; i++) {
 						if (seh->features[i].Target == FX_TARGET_SELF) {
 							seh->features[i].Target = caster->wildSurgeMods.target_type;
@@ -689,7 +695,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 						}
 					}
 					// we need to refetch the projectile, so the effect queue is created
-					pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+					pro = spltmp->GetProjectile(this, SpellHeader, LastTargetPos);
 					pro->SetCaster(GetGlobalID(), level);
 					break;
 				case WSTC_RANDOMIZE:
@@ -710,7 +716,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 
 					// make it also work for self-targetting spells:
 					// change the payload or this was all in vain
-					seh = &spl->ext_headers[SpellHeader];
+					seh = &spltmp->ext_headers[SpellHeader];
 					for (i=0; i < seh->FeatureCount; i++) {
 						if (seh->features[i].Target == FX_TARGET_SELF) {
 							seh->features[i].Target = FX_TARGET_PRESET;
@@ -718,7 +724,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					}
 					// we need to fetch the projectile, so the effect queue is created
 					// (skipped above)
-					pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+					pro = spltmp->GetProjectile(this, SpellHeader, LastTargetPos);
 					pro->SetCaster(GetGlobalID(), level);
 					break;
 				default: //0 - do nothing
@@ -727,7 +733,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 
 			// apply the saving throw mod
 			if (caster->wildSurgeMods.saving_throw_mod) {
-				seh = &spl->ext_headers[SpellHeader];
+				seh = &spltmp->ext_headers[SpellHeader];
 				for (i=0; i < seh->FeatureCount; i++) {
 					seh->features[i].SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
 				}
@@ -735,17 +741,17 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 
 			// change the projectile
 			if (caster->wildSurgeMods.projectile_id) {
-				spl->ext_headers[SpellHeader].ProjectileAnimation = caster->wildSurgeMods.projectile_id;
+				spltmp->ext_headers[SpellHeader].ProjectileAnimation = caster->wildSurgeMods.projectile_id;
 				// make it also work for self-targetting spells:
 				// change the payload or this was all in vain
-				seh = &spl->ext_headers[SpellHeader];
+				seh = &spltmp->ext_headers[SpellHeader];
 				for (i=0; i < seh->FeatureCount; i++) {
 					if (seh->features[i].Target == FX_TARGET_SELF) {
 						seh->features[i].Target = FX_TARGET_PRESET;
 					}
 				}
 				// we need to refetch the projectile, so the new one is used
-				pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+				pro = spltmp->GetProjectile(this, SpellHeader, LastTargetPos);
 				pro->SetCaster(GetGlobalID(), level);
 			}
 		}
@@ -813,6 +819,9 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 	core->Autopause(AP_SPELLCAST);
 
 	gamedata->FreeSpell(spl, SpellResRef, false);
+	if (spltmp) {
+		delete spltmp;
+	}
 
 }
 

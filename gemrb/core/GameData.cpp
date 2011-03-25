@@ -352,6 +352,27 @@ Spell* GameData::GetSpell(const ieResRef resname, bool silent)
 	return spell;
 }
 
+// this is a HACK and should be replaced with a proper copying mechanism to save on lookups
+Spell* GameData::GetUncachedSpell(const ieResRef resname, bool silent)
+{
+	DataStream* str = GetResource( resname, IE_SPL_CLASS_ID, silent );
+	PluginHolder<SpellMgr> sm(IE_SPL_CLASS_ID);
+	if (!sm) {
+		delete ( str );
+		return NULL;
+	}
+	if (!sm->Open( str, true )) {
+		return NULL;
+	}
+
+	Spell *spell = new Spell();
+	//this is required for storing the 'source'
+	strnlwrcpy(spell->Name, resname, 8);
+	sm->GetSpell( spell, silent );
+
+	return spell;
+}
+
 void GameData::FreeSpell(Spell *spl, const ieResRef name, bool free)
 {
 	int res;
