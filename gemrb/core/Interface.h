@@ -495,15 +495,7 @@ public:
 	/** returns true if in cutscene mode */
 	bool InCutSceneMode() const;
 	/** Updates the Game Script Engine State */
-	void GSUpdate(bool update_scripts)
-	{
-		if(update_scripts) {
-			timer->Update();
-		}
-		else {
-			timer->Freeze();
-		}
-	}
+	void GSUpdate(bool update_scripts);
 	/** Get the Party INI Interpreter */
 	DataFileMgr * GetPartyINI() const
 	{

@@ -3859,6 +3859,17 @@ bool Interface::InCutSceneMode() const
 	return false;
 }
 
+/** Updates the Game Script Engine State */
+void Interface::GSUpdate(bool update_scripts)
+{
+	if(update_scripts) {
+		timer->Update();
+	}
+	else {
+		timer->Freeze();
+	}
+}
+
 void Interface::QuitGame(int BackToMain)
 {
 	SetCutSceneMode(false);
