@@ -162,22 +162,34 @@ protected: //let Actor access this
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
 public:
+	// State relating to the currently-running action.
 	int CurrentActionState;
 	ieDword CurrentActionTarget;
 	bool CurrentActionInterruptable;
+
+	// Timing state for ExecuteScript.
 	ieDword lastDelay;
 	ieDword lastRunTime;
+
 	Variables* locals;
 	ScriptableType Type;
 	Point Pos;
+
 	ieStrRef DialogName;
-	ieResRef EnterWav; //play this wav file when stepping on the trap
+	//play this wav file when stepping on the trap
+	ieResRef EnterWav;
+
 	GameScript* Scripts[MAX_SCRIPTS];
+
+	// Variables for overhead text.
 	char* overHeadText;
 	Point overHeadTextPos;
 	unsigned char textDisplaying;
 	unsigned long timeStartDisplaying;
+
 	ieDword UnselectableTimer;
+
+	// Stored objects.
 	ieDword TriggerID; //for sendtrigger
 	ieDword LastTrigger;  // also LastClosed
 	ieDword LastTriggerObject; // hack until someone fixes triggers
@@ -193,6 +205,7 @@ public:
 	ieDword LastCasterOnMe; //Last spellcaster on this scriptable
 	ieDword LastSpellSeen;  //Last spell seen to be cast
 	ieDword LastCasterSeen; //Last spellcaster seen
+
 	Point LastTargetPos;
 	int SpellHeader;
 	ieResRef SpellResRef;
