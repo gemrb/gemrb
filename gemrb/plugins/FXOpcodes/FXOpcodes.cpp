@@ -5762,6 +5762,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
 	Owner->SetSpellResRef(fx->Resource);
 	Owner->CastSpellPoint(fx->Resource, target->Pos, false);
+	Owner->CastSpellPointEnd(0);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }
