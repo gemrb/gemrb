@@ -657,14 +657,6 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 		}
 
 		if (caster) {
-			// check for the speed mod
-			if (caster->wildSurgeMods.projectile_speed_mod) {
-				pro->Speed = (pro->Speed * caster->wildSurgeMods.projectile_speed_mod) / 100;
-				if (!pro->Speed) {
-					pro->Speed = 1;
-				}
-			}
-
 			// check for target (type) change
 			int count, i;
 			Actor *newact = NULL;
@@ -753,6 +745,14 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 				// we need to refetch the projectile, so the new one is used
 				pro = spltmp->GetProjectile(this, SpellHeader, LastTargetPos);
 				pro->SetCaster(GetGlobalID(), level);
+			}
+
+			// check for the speed mod
+			if (caster->wildSurgeMods.projectile_speed_mod) {
+				pro->Speed = (pro->Speed * caster->wildSurgeMods.projectile_speed_mod) / 100;
+				if (!pro->Speed) {
+					pro->Speed = 1;
+				}
 			}
 		}
 
