@@ -260,6 +260,7 @@ def WorldMapWindowCommon (Travel):
 
 	Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "toolfont")
 	WorldMapControl = Window.GetControl (4)
+	WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, 0xa4, 0x6a, 0x4c, 0x00)
 	WorldMapControl.SetAnimation ("WMDAG")
 	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, MoveToNewArea)
 	WorldMapControl.SetEvent (IE_GUI_MOUSE_ENTER_WORLDMAP, ChangeTooltip)

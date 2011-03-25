@@ -170,6 +170,7 @@ def WorldMapWindowCommon (Travel):
 
 	Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "FONTDLG")
 	WMap = Window.GetControl (4)
+	WMap.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, 0x84, 0x4a, 0x2c, 0x00)
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_NORMAL, 0x20, 0x20, 0x00, 0xff)
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_SELECTED, 0x20, 0x20, 0x00, 0xff)
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_NOTVISITED, 0x20, 0x20, 0x00, 0xa0)
