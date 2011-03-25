@@ -1580,7 +1580,7 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 
 	myarea = Sender->GetCurrentArea();
 	hisarea = target->GetCurrentArea();
-	if (hisarea!=myarea) {
+	if (hisarea && hisarea!=myarea) {
 		target = myarea->GetTileMap()->GetTravelTo(hisarea->GetScriptName());
 
 		if (!target) {
