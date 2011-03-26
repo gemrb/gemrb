@@ -141,7 +141,7 @@ private:
 	ALenum GetFormatEnum(int channels, int bits);
 	static int MusicManager(void* args);
 	bool stayAlive;
-	unsigned char* music_memory;
+	short* music_memory;
 	SDL_Thread* musicThread;
 };
 

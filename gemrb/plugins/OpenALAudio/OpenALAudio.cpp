@@ -134,7 +134,7 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 {
 	alutContext = NULL;
 	MusicPlaying = false;
-	music_memory = (unsigned char*) malloc(ACM_BUFFERSIZE);
+	music_memory = (short*) malloc(ACM_BUFFERSIZE);
 	MusicSource = 0;
 	memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
 	musicMutex = SDL_CreateMutex();
@@ -278,9 +278,9 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 	int samplerate = acm->get_samplerate();
 	//multiply always by 2 because it is in 16 bits
 	int rawsize = cnt * 2;
-	unsigned char * memory = (unsigned char*) malloc(rawsize);
+	short* memory = (short*) malloc(rawsize);
 	//multiply always with 2 because it is in 16 bits
-	int cnt1 = acm->read_samples( ( short* ) memory, cnt ) * 2;
+	int cnt1 = acm->read_samples( memory, cnt ) * 2;
 	//Sound Length in milliseconds
 	time_length = ((cnt / riff_chans) * 1000) / samplerate;
 	//it is always reading the stuff into 16 bits
@@ -801,7 +801,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					 {
 						printMessage("OPENAL", "Music in INITIAL State. AutoStarting\n", WHITE );
 						for (int i = 0; i < MUSICBUFFERS; i++) {
-							driver->MusicReader->read_samples( ( short* ) driver->music_memory, ACM_BUFFERSIZE >> 1 );
+							driver->MusicReader->read_samples( driver->music_memory, ACM_BUFFERSIZE >> 1 );
 							alBufferData( driver->MusicBuffer[i], AL_FORMAT_STEREO16,
 								driver->music_memory, ACM_BUFFERSIZE,
 								driver->MusicReader->get_samplerate() );
@@ -841,7 +841,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					}
 					if (bFinished == AL_FALSE) {
 						int size = ACM_BUFFERSIZE;
-						int cnt = driver->MusicReader->read_samples( ( short* ) driver->music_memory, ACM_BUFFERSIZE >> 1 );
+						int cnt = driver->MusicReader->read_samples( driver->music_memory, ACM_BUFFERSIZE >> 1 );
 						size -= ( cnt * 2 );
 						if (size != 0)
 							bFinished = AL_TRUE;
@@ -850,7 +850,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 							core->GetMusicMgr()->PlayNext();
 							if (driver->MusicPlaying) {
 								printMessage( "OpenAL", "Queuing New Music\n", WHITE );
-								driver->MusicReader->read_samples( ( short* ) ( driver->music_memory + ( cnt*2 ) ), size >> 1 );
+								driver->MusicReader->read_samples( ( driver->music_memory + cnt ), size >> 1 );
 								bFinished = AL_FALSE;
 							} else {
 								printMessage( "OpenAL", "No Other Music to play\n", WHITE );
