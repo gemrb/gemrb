@@ -854,7 +854,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 								bFinished = AL_FALSE;
 							} else {
 								printMessage( "OpenAL", "No Other Music to play\n", WHITE );
-								memset( driver->music_memory + ( cnt * 2 ), 0, size );
+								memset( driver->music_memory + cnt, 0, size );
 								driver->MusicPlaying = false;
 								break;
 							}
