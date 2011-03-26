@@ -2209,7 +2209,6 @@ bool Interface::LoadConfig(const char* filename)
 	int lineno = 0;
 	while (!feof( config )) {
 		if (! fgets( line, sizeof(line), config )) { // also if len == size(line)
-			return false;
 			break;
 		}
 		lineno++;
