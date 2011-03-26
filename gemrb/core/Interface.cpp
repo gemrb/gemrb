@@ -2180,26 +2180,26 @@ bool Interface::LoadConfig(void)
 
 bool Interface::LoadConfig(const char* filename)
 {
-	FILE* config;
 	size_t i;
 
 	printMessage("Config","Trying to open ", WHITE);
 	textcolor(LIGHT_WHITE);
 	printf("%s ", filename);
-	config = fopen( filename, "rb" );
+	FileStream* config = FileStream::OpenFile(filename);
 	if (config == NULL) {
 		printStatus("NOT FOUND", YELLOW);
 		return false;
 	}
 
-	char line[1024];
-	char *name, *nameend, *value, *valueend;
 	//once GemRB own format is working well, this might be set to 0
 	SaveAsOriginal = 1;
 
 	int lineno = 0;
-	while (!feof( config )) {
-		if (! fgets( line, sizeof(line), config )) { // also if len == size(line)
+	while (config->Remains()) {
+		char line[1024];
+		char *name, *nameend, *value, *valueend;
+
+		if (config->ReadLine(line, _MAX_PATH) == -1) {
 			break;
 		}
 		lineno++;
@@ -2312,7 +2312,7 @@ bool Interface::LoadConfig(const char* filename)
 			}
 		}
 	}
-	fclose( config );
+	delete config;
 
 	// WARNING: Don't move ResolveFilePath into the loop
 	// Otherwise, it won't obey CaseSensitive set at the end
@@ -3790,45 +3790,36 @@ int Interface::GetCharacters(TextArea* ta)
 
 bool Interface::LoadINI(const char* filename)
 {
-	FILE* config;
-	config = fopen( filename, "rb" );
+	FileStream* config = FileStream::OpenFile(filename);
 	if (config == NULL) {
 		return false;
 	}
 	char name[65], value[_MAX_PATH + 3];
-	while (!feof( config )) {
-		name[0] = 0;
-		value[0] = 0;
-		char rem;
+	while (config->Remains()) {
+		char line[_MAX_PATH];
 
-		if (fread( &rem, 1, 1, config ) != 1)
+		if (config->ReadLine(line, _MAX_PATH) == -1)
 			break;
 
-		if (( rem == '#' ) ||
-			( rem == '[' ) ||
-			( rem == '\r' ) ||
-			( rem == '\n' ) ||
-			( rem == ';' )) {
-			if (rem == '\r') {
-				fgetc( config );
-				continue;
-			} else if (rem == '\n')
-				continue;
-
-			//it should always return zero
-			if (fscanf( config, "%*[^\r\n]%*[\r\n]" )!=0)
-				break;
+		if ((line[0] == '#') ||
+			( line[0] == '[' ) ||
+			( line[0] == '\r' ) ||
+			( line[0] == '\n' ) ||
+			( line[0] == ';' )) {
 			continue;
 		}
-		fseek( config, -1, SEEK_CUR );
+
+		name[0] = 0;
+		value[0] = 0;
+
 		//the * element is not counted
-		if (fscanf( config, "%[^=]=%[^\r\n]%*[\r\n]", name, value )!=2)
+		if (sscanf( line, "%[^=]=%[^\r\n]", name, value )!=2)
 			continue;
 		if (( value[0] >= '0' ) && ( value[0] <= '9' )) {
 			vars->SetAt( name, atoi( value ) );
 		}
 	}
-	fclose( config );
+	delete config;
 	return true;
 }
 
