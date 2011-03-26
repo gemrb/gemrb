@@ -104,11 +104,11 @@ class GameScript;
 #define MAX_NESTING		5
 
 #define GSASSERT(f,c) \
- if(!(f))  \
- {  \
- printf("Assertion failed: %s [0x%08lX] Line %d",#f, c, __LINE__); \
-	abort(); \
- }
+	if(!(f))  \
+	{  \
+		printf("Assertion failed: %s [0x%08lX] Line %d",#f, c, __LINE__); \
+		abort(); \
+	}
 
 typedef std::vector<ieDword> SrcVector;
 

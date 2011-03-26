@@ -1738,16 +1738,16 @@ void SDLVideoDriver::GetPixel(short x, short y, Color& c)
 
 void SDLVideoDriver::GetPixel(void *vptr, unsigned short x, unsigned short y, Color &c)
 {
-        SDL_Surface *surf = (SDL_Surface*)(vptr);
+	SDL_Surface *surf = (SDL_Surface*)(vptr);
 
-        SDL_LockSurface( surf );
-        unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
-                ( ( y * surf->w + x) * surf->format->BytesPerPixel );
-        long val = 0;
-        ReadPixel(val, pixels, surf->format->BytesPerPixel);
-        SDL_UnlockSurface( surf );
+	SDL_LockSurface( surf );
+	unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
+		( ( y * surf->w + x) * surf->format->BytesPerPixel );
+	long val = 0;
+	ReadPixel(val, pixels, surf->format->BytesPerPixel);
+	SDL_UnlockSurface( surf );
 
-        SDL_GetRGBA( val, surf->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
+	SDL_GetRGBA( val, surf->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
 }
 
 long SDLVideoDriver::GetPixel(void *vptr, unsigned short x, unsigned short y)

@@ -107,7 +107,7 @@ def OnDragItem ():
 					if GemRB.IsValidStoreItem (pc, slot, 0)&SHOP_SELL:
 						GemRB.ChangeStoreItem (pc, slot, SHOP_SELL)
 					else:
-						GemRB.DisplayString( 9375, 0xfffffff)
+						GemRB.DisplayString( 9375, 0xffffff)
 					#leave (save) store
 					GemRB.LeaveStore()
 
@@ -125,11 +125,11 @@ def OnDropItemToPC ():
 	GemRB.DropDraggedItem (pc, -3)
 	if GemRB.IsDraggingItem ()==1:
 		if GUICommon.HasTOB ():
-			GemRB.DisplayString (61794, 0xfffffff)
+			GemRB.DisplayString (61794, 0xffffff)
 		elif GUICommon.GameIsPST ():
-			GemRB.DisplayString (19257, 0xfffffff)
+			GemRB.DisplayString (19257, 0xffffff)
 		else:
-			GemRB.DisplayString (17999, 0xfffffff)
+			GemRB.DisplayString (17999, 0xffffff)
 
 	GUIINV.UpdateInventoryWindow ()
 	return

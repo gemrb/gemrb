@@ -32,6 +32,8 @@
 #include "ResourceSource.h"
 #endif
 
+#define RM_REPLACE_SAME_SOURCE 1
+
 class DataStream;
 class Resource;
 class ResourceSource;
@@ -49,7 +51,7 @@ public:
 	 * @param[in] description Description of the source.
 	 * @param[in] type Plugin type used for source.
 	 **/
-	bool AddSource(const char *path, const char *description, PluginID type);
+	bool AddSource(const char *path, const char *description, PluginID type, int flags=0);
 
 	/** returns true if resource exists */
 	bool Exists(const char *ResRef, SClass_ID type, bool silent=false) const;

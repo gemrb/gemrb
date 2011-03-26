@@ -36,8 +36,12 @@
 #include "ProjectileServer.h"
 #include "TileMapMgr.h"
 #include "Video.h"
-#include "System/SlicedStream.h"
+#include "GameScript/GameScript.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 #include "System/FileStream.h"
+#include "System/SlicedStream.h"
 
 #define DEF_OPEN   0
 #define DEF_CLOSE  1

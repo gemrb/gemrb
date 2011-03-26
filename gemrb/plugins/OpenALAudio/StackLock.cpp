@@ -25,31 +25,31 @@
 // adapted from ScummVM's mutex.cpp
 
 StackLock::StackLock(SDL_mutex* mutex, const char *mutexName)
-        : _mutex(mutex), _mutexName(mutexName) {
-        lock();
+	: _mutex(mutex), _mutexName(mutexName) {
+	lock();
 }
 
 StackLock::~StackLock() {
-        unlock();
+	unlock();
 }
 
 void StackLock::lock() {
 #if 0
-        if (_mutexName != NULL) {
-                fprintf(stderr, "Locking mutex %s\n", _mutexName);
+	if (_mutexName != NULL) {
+		fprintf(stderr, "Locking mutex %s\n", _mutexName);
 	}
 #endif
 
-        SDL_mutexP(_mutex);
+	SDL_mutexP(_mutex);
 }
 
 void StackLock::unlock() {
 #if 0
-        if (_mutexName != NULL) {
-                fprintf(stderr, "Unlocking mutex %s\n", _mutexName);
+	if (_mutexName != NULL) {
+		fprintf(stderr, "Unlocking mutex %s\n", _mutexName);
 	}
 #endif
 
-        SDL_mutexV(_mutex);
+	SDL_mutexV(_mutex);
 }
 

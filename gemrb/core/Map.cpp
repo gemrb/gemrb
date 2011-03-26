@@ -45,6 +45,9 @@
 #include "strrefs.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 
 #include <cmath>
 #include <cassert>
@@ -229,8 +232,8 @@ void InitPathFinder()
 void AddLOS(int destx, int desty, int slot)
 {
 	for (int i=0;i<MaxVisibility;i++) {
-		int x=(destx*i+MaxVisibility/2)/MaxVisibility*16;
-		int y=(desty*i+MaxVisibility/2)/MaxVisibility*12;
+		int x = ((destx*i + MaxVisibility/2) / MaxVisibility) * 16;
+		int y = ((desty*i + MaxVisibility/2) / MaxVisibility) * 12;
 		if (LargeFog) {
 			x += 16;
 			y += 12;
@@ -668,8 +671,9 @@ void Map::UpdateScripts()
 		actor->fxqueue.Cleanup();
 
 		//if the actor is immobile, don't run the scripts
+		//FIXME: this is not universaly true, only some states have this effect
 		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
-			if (actor->Immobile() || actor->GetStat(IE_STATE_ID) & STATE_SLEEP) {
+			if (/*actor->Immobile() ||*/ actor->GetStat(IE_STATE_ID) & STATE_SLEEP) {
 				actor->no_more_steps = true;
 				continue;
 			}
@@ -820,7 +824,7 @@ void Map::UpdateScripts()
 					if(ip->Entered(actor)) {
 						//if trap triggered, then mark actor
 						actor->SetInTrap(ipCount);
-					  wasActive|=TRAP_USEPOINT;
+						wasActive|=TRAP_USEPOINT;
 					}
 				} else {
 					//ST_TRAVEL
@@ -888,7 +892,7 @@ bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
 }
 
 void Map::ClearSearchMapFor( Movable *actor ) {
-	Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*16);
+	Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS, MAX_CIRCLE_SIZE*2*16);
 	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_FREE);
 
 	// Restore the searchmap areas of any nearby actors that could
@@ -1057,10 +1061,10 @@ void Map::DrawMap(Region screen)
 
 	if (Background) {
 		if (BgDuration<gametime) {
-		  video->FreeSprite(Background);
+			video->FreeSprite(Background);
 		} else {
-		  video->BlitSprite(Background,0,0,true);
-		  bgoverride = true;
+			video->BlitSprite(Background,0,0,true);
+			bgoverride = true;
 		}
 	}
 
@@ -1503,6 +1507,7 @@ Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius)
 	return NULL;
 }
 
+//maybe consider using a simple list
 Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius)
 {
 	ieDword count = 1;
@@ -1521,6 +1526,11 @@ Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius
 		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
+		if (!(flags&GA_NO_LOS)) {
+			if (!IsVisible(actor->Pos, p)) {
+				continue;
+			}
+		}
 		count++;
 	}
 
@@ -1538,6 +1548,12 @@ Actor **Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius
 		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
+		if (!(flags&GA_NO_LOS)) {
+			if (!IsVisible(actor->Pos, p)) {
+				continue;
+			}
+		}
+
 		ret[j++]=actor;
 	}
 
@@ -3013,7 +3029,7 @@ void Map::SetMapVisibility(int setreset)
 	memset( VisibleBitmap, setreset, GetExploredMapSize() );
 }
 
-// x, y are in tile coordinates
+// x, y are not in tile coordinates
 void Map::ExploreTile(const Point &pos)
 {
 	int h = TMap->YCellCount * 2 + LargeFog;
@@ -3589,7 +3605,6 @@ int AreaAnimation::GetHeight() const
 
 void AreaAnimation::Draw(const Region &screen, Map *area)
 {
-	int ac=animcount;
 	Video* video = core->GetVideoDriver();
 
 	//always draw the animation tinted because tint is also used for
@@ -3604,7 +3619,8 @@ void AreaAnimation::Draw(const Region &screen, Map *area)
 			covers=(SpriteCover **) calloc( animcount, sizeof(SpriteCover *) );
 		}
 	}
-	ac=animcount;
+
+	int ac = animcount;
 	while (ac--) {
 		Animation *anim = animation[ac];
 		Sprite2D *frame = anim->NextFrame();

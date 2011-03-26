@@ -881,7 +881,10 @@ def RedrawStoreIdentifyWindow ():
 			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[TopIndex+i], ITEM_PC)
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			Button.SetItemIcon (Slot['ItemResRef'], 0)
-			Button.SetText (str(Item['Count']) )
+			if Item['StackAmount'] > 1:
+				Button.SetText (str(Slot['Usages0']))
+			else:
+				Button.SetText ("")
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 			if Flags & SHOP_ID:

@@ -25,10 +25,14 @@
 
 #include "Polygon.h"
 #include "TileOverlay.h"
-#include "GameScript/GameScript.h"
 
 //special container types
 #define IE_CONTAINER_PILE   4
+
+class Container;
+class Door;
+class InfoPoint;
+class TileObject;
 
 class GEM_EXPORT TileMap {
 private:

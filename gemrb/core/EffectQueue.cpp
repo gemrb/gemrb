@@ -588,9 +588,9 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 	case FX_TARGET_PARTY:
 all_party:
 		game = core->GetGame();
-		i = game->GetPartySize(true);
+		i = game->GetPartySize(false);
 		while(i--) {
-			Actor* actor = game->GetPC( i, true );
+			Actor* actor = game->GetPC( i, false );
 			fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, fx, 1 );

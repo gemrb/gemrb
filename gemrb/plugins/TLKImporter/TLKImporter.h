@@ -60,7 +60,7 @@ private:
 		 if dest is not NULL it also returns the decoded value */
 	int BuiltinToken(char* Token, char* dest);
 	int RaceStrRef(int slot);
- 	int GenderStrRef(int slot, int malestrref, int femalestrref);
+	int GenderStrRef(int slot, int malestrref, int femalestrref);
 	char *Gabber();
 	char *CharName(int slot);
 };

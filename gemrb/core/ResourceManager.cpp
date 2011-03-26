@@ -35,13 +35,23 @@ ResourceManager::~ResourceManager()
 {
 }
 
-bool ResourceManager::AddSource(const char *path, const char *description, PluginID type)
+bool ResourceManager::AddSource(const char *path, const char *description, PluginID type, int flags)
 {
 	PluginHolder<ResourceSource> source(type);
 	if (!source->Open(path, description)) {
 		return false;
 	}
-	searchPath.push_back(source);
+
+	if (flags & RM_REPLACE_SAME_SOURCE) {
+		for (size_t i = 0; i < searchPath.size(); i++) {
+			if (!stricmp(description, searchPath[i]->GetDescription())) {
+				searchPath[i] = source;
+				break;
+			}
+		}
+	} else {
+		searchPath.push_back(source);
+	}
 	return true;
 }
 

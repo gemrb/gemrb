@@ -172,8 +172,8 @@ void MVEPlay::freeAudioStream(int stream)
 }
 
 void MVEPlay::queueBuffer(int stream, unsigned short bits,
-                int channels, short* memory,
-                int size, int samplerate)
+			int channels, short* memory,
+			int size, int samplerate)
 {
 	if (stream > -1)
 		core->GetAudioDrv()->QueueBuffer(stream, bits, channels, memory, size, samplerate) ;

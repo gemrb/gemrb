@@ -25,6 +25,9 @@
 #include "Interface.h"
 #include "Game.h"
 #include "TileMap.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 
 /* return a Targets object with a single scriptable inside */
 inline static Targets* ReturnScriptableAsTarget(Scriptable *sc)

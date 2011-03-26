@@ -22,7 +22,10 @@ FILE(GLOB gemrb_core_LIB_SRCS "*.cpp"
 	GUI/Window.cpp
 	GUI/WorldMapControl.cpp
 	Scriptable/Actor.cpp
-	Scriptable/ActorBlock.cpp
+	Scriptable/Container.cpp
+	Scriptable/Door.cpp
+	Scriptable/InfoPoint.cpp
+	Scriptable/Scriptable.cpp
 	Scriptable/PCStatStruct.cpp
 	System/DataStream.cpp
 	System/FileStream.cpp

@@ -40,9 +40,10 @@ class WorldMapControl;
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 /** Which label color is set with SetColor() */
-#define IE_GUI_WMAP_COLOR_NORMAL      0
-#define IE_GUI_WMAP_COLOR_SELECTED    1
-#define IE_GUI_WMAP_COLOR_NOTVISITED  2
+#define IE_GUI_WMAP_COLOR_BACKGROUND  0
+#define IE_GUI_WMAP_COLOR_NORMAL      1
+#define IE_GUI_WMAP_COLOR_SELECTED    2
+#define IE_GUI_WMAP_COLOR_NOTVISITED  3
 
 
 /**

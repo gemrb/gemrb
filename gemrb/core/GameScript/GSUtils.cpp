@@ -37,6 +37,9 @@
 #include "TileMap.h"
 #include "Video.h"
 #include "GUI/GameControl.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 
 #include <cstdio>
 
@@ -703,6 +706,8 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 		map->AddActor( tar );
 		Point pos = src->Pos;
 		tar->SetOrientation(src->GetOrientation(), false );
+		// make sure to copy the HP, to avoid things like magically-healing trolls
+		tar->BaseStats[IE_HITPOINTS]=src->BaseStats[IE_HITPOINTS];
 		src->DestroySelf();
 		// can't SetPosition while the old actor is taking the spot
 		tar->SetPosition(pos, 1);
@@ -1214,7 +1219,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		actor->SetTarget( target );
 	}
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
-		(PersonalDistance(Sender, target) > wi.range) ) {
+		(PersonalDistance(Sender, target) > wi.range) ||
+		(!Sender->GetCurrentArea()->IsVisible(Sender->Pos, target->Pos))) {
 		MoveNearerTo(Sender, target, wi.range);
 		return;
 	} else if (target->Type == ST_DOOR) {
@@ -1582,9 +1588,9 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		((Actor *) Sender)->UseExit(true);
+		((Actor *) Sender)->UseExit(target->GetGlobalID());
 	} else {
-		((Actor *) Sender)->UseExit(false);
+		((Actor *) Sender)->UseExit(0);
 	}
 	// we deliberately don't try GetLikelyPosition here for now,
 	// maybe a future idea if we have a better implementation
@@ -1613,13 +1619,14 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 		return 0;
 	}
 
+	//chasing is unbreakable
+	//TODO: is this true?
+	Sender->CurrentActionInterruptable = false;
+
 	Actor *actor = (Actor *)Sender;
 
 	if (!actor->InMove() || actor->Destination != p) {
-		//chasing is unbreakable
-		//maybe consider setting a per action unbreakability
-		//instead of messing with the actor
-		actor->WalkTo(p, IF_NOINT, distance);
+		actor->WalkTo(p, 0, distance);
 	}
 
 	if (!actor->InMove()) {
@@ -2177,7 +2184,7 @@ unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
 	}
 
 	gamedata->FreeSpell(spl, spellres, false);
-	return dist*15;
+	return dist*5; //FIXME: this empirical constant shouldn't be needed!
 }
 
 /* returns an item's casting distance, it depends on the used header, and targeting mode too

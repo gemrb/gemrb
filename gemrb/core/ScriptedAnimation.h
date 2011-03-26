@@ -57,7 +57,10 @@
 #define IE_VVC_MID_BRIGHTEN 	0x00000080
 #define IE_VVC_HIGH_BRIGHTEN	0x00000100
 
-#define IE_VVC_UNUSED           0xe0000000U
+
+//#define IE_VVC_UNUSED           0xe0000000U
+//gemrb specific sequence flags
+#define IE_VVC_FREEZE     0x80000000
 
 //phases
 #define P_NOTINITED -1
@@ -104,6 +107,7 @@ public:
 	bool active;
 	bool effect_owned;
 	Holder<SoundHandle> sound_handle;
+	unsigned long starttime;
 public:
 	//draws the next frame of the videocell
 	bool Draw(const Region &screen, const Point &Pos, const Color &tint, Map *area, int dither, int orientation);

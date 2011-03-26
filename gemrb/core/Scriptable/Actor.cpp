@@ -20,7 +20,7 @@
 
 //This class represents the .cre (creature) files.
 //Any player or non-player character is a creature.
-//Actor is a scriptable object (Scriptable). See ActorBlock.cpp
+//Actor is a scriptable object (Scriptable). See Scriptable.cpp
 
 #include "Scriptable/Actor.h"
 
@@ -2975,7 +2975,7 @@ void Actor::DebugDump()
 	printf( "\nArea:       %.8s   ", Area );
 	printf( "Dialog:     %.8s\n", Dialog );
 	printf( "Global ID:  %d   PartySlot: %d\n", GetGlobalID(), InParty);
-	printf( "Script name:%.32s\n", scriptName );
+	printf( "Script name:%.32s    Current action: %d\n", scriptName, CurrentAction ? CurrentAction->actionID : -1);
 	printf( "TalkCount:  %d   ", TalkCount );
 	printf( "Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );
 	printf( "Class:      %d   current class:%d\n", BaseStats[IE_CLASS], Modified[IE_CLASS] );
@@ -4552,7 +4552,11 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	//only return if we don't have any attacks left this round
-	if (attackcount==0) return;
+	if (attackcount==0) {
+		// this is also part of the UpdateActorState hack below. sorry!
+		lastattack = gameTime;
+		return;
+	}
 
 	// this check shouldn't be necessary, but it causes a divide-by-zero below,
 	// so i would like it to be clear if it ever happens

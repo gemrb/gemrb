@@ -23,6 +23,7 @@
 #include "win32def.h"
 
 #include "Interface.h"
+#include "GameScript/GameScript.h"
 #include "System/FileStream.h"
 
 DLGImporter::DLGImporter(void)

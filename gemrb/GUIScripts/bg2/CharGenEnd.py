@@ -109,6 +109,10 @@ def OnLoad():
 	SmallPortrait = GemRB.GetToken ("SmallPortrait")
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 
+	if GUICommon.GameIsTOB():
+		# add the starting inventory for tob
+		GiveEquipment(MyChar, ClassName, KitIndex)
+
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
 		if GemRB.GetVar("GUIEnhancements"):

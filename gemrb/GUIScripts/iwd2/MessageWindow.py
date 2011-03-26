@@ -25,6 +25,8 @@ from GUIDefines import *
 
 MessageWindow = 0
 PortraitWindow = 0
+TMessageTA = 0 # for dialog code
+
 def OnLoad():
 	global MessageWindow, PortraitWindow
 
@@ -54,7 +56,7 @@ def OnLoad():
 	return
 
 def UpdateControlStatus():
-	global MessageWindow
+	global MessageWindow,TMessageTA
 
 	TMessageWindow = 0
 	TMessageTA = 0

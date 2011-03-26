@@ -51,6 +51,9 @@
 #include "GUI/MapControl.h"
 #include "GUI/TextEdit.h"
 #include "GUI/WorldMapControl.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 #include "System/VFS.h"
 
 #include <cstdio>
@@ -2550,7 +2553,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		entry->Y = locy;
 		entry->LocCaptionName = label;
 		entry->LocTooltipName = name;
-		memset(entry->LoadScreenResRef, 0, 8);
+		memset(entry->LoadScreenResRef, 0, sizeof(ieResRef));
 		memcpy(entry->AreaLinksIndex, indices, sizeof(entry->AreaLinksIndex) );
 		memcpy(entry->AreaLinksCount, links, sizeof(entry->AreaLinksCount) );
 
@@ -2581,7 +2584,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 			link->EncounterChance = encprob;
 			for(k=0;k<5;k++) {
 				if (enc[k][0]=='*') {
-					memset(link->EncounterAreaResRef[k],0,8);
+					memset(link->EncounterAreaResRef[k],0,sizeof(ieResRef));
 				} else {
 					strnuprcpy(link->EncounterAreaResRef[k], enc[k], 8);
 				}
@@ -2761,7 +2764,7 @@ static PyObject* GemRB_Window_CreateWorldMapControl(PyObject * /*self*/, PyObjec
 PyDoc_STRVAR( GemRB_WorldMap_SetTextColor__doc,
 "SetWorldMapTextColor(WindowIndex, ControlIndex, which, red, green, blue)\n\n"
 "Sets the label colors of a WorldMap Control. WHICH selects color affected"
-"and is one of IE_GUI_WMAP_COLOR_(NORMAL|SELECTED|NOTVISITED)." );
+"and is one of IE_GUI_WMAP_COLOR_(BACKGROUND|NORMAL|SELECTED|NOTVISITED)." );
 
 static PyObject* GemRB_WorldMap_SetTextColor(PyObject * /*self*/, PyObject* args)
 {

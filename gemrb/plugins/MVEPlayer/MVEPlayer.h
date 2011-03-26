@@ -44,8 +44,8 @@ private:
 	int setAudioStream();
 	void freeAudioStream(int stream);
 	void queueBuffer(int stream, unsigned short bits,
-                int channels, short* memory,
-                int size, int samplerate);
+				int channels, short* memory,
+				int size, int samplerate);
 public:
 	MVEPlay(void);
 	~MVEPlay(void);

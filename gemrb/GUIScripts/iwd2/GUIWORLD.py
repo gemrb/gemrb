@@ -27,6 +27,9 @@ import GemRB
 from GUIDefines import *
 import GUICommon
 from GUIClasses import GWindow
+import GUICommonWindows
+import MessageWindow
+import CommonWindow
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -36,66 +39,64 @@ ReformPartyWindow = None
 OldActionsWindow = None
 OldMessageWindow = None
 
-def CloseContinueWindow ():
-	if ContinueWindow:
-		# don't close the actual window now to avoid flickering: we might still want it open
-		GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
-
-def NextDialogState ():
+def DialogStarted ():
 	global ContinueWindow, OldActionsWindow
 
-	if ContinueWindow == None:
+	# try to force-close anything which is open
+	GUICommon.CloseOtherWindow(None)
+	CommonWindow.CloseContainerWindow()
+
+	# we need GUI for dialogs
+	GemRB.UnhideGUI()
+
+	# opening control size to maximum, enabling dialog window
+	GemRB.GameSetScreenFlags(GS_HIDEGUI, OP_NAND)
+	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
+
+	MessageWindow.UpdateControlStatus()
+
+	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
+	ContinueWindow = Window = GemRB.LoadWindow (9)
+
+def DialogEnded ():
+	global ContinueWindow, OldActionsWindow
+
+	# TODO: why is this being called at game start?!
+	if not ContinueWindow:
 		return
 
-	hideflag = GemRB.HideGUI ()
-
-	if ContinueWindow:
-		ContinueWindow.Unload ()
-	GemRB.SetVar ("PortraitWindow", OldActionsWindow.ID)
+	ContinueWindow.Unload ()
 	ContinueWindow = None
 	OldActionsWindow = None
-	if hideflag:
-		GemRB.UnhideGUI ()
 
+def CloseContinueWindow ():
+	# don't close the actual window now to avoid flickering: we might still want it open
+	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
+
+def NextDialogState ():
+	if not ContinueWindow:
+		return
+
+	ContinueWindow.SetVisible(WINDOW_INVISIBLE)
+
+	MessageWindow.TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenEndMessageWindow ():
-	global ContinueWindow, OldActionsWindow
-
-	hideflag = GemRB.HideGUI ()
-
-	if not ContinueWindow:
-		GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-		ContinueWindow = Window = GemRB.LoadWindow (9)
-		OldActionsWindow = GWindow( GemRB.GetVar ("PortraitWindow") )
-		GemRB.SetVar ("PortraitWindow", Window.ID)
-
-	#end dialog
+	ContinueWindow.SetVisible(WINDOW_VISIBLE)
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9371)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-
-	if hideflag:
-		GemRB.UnhideGUI ()
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenContinueMessageWindow ():
-	global ContinueWindow, OldActionsWindow
-
-	hideflag = GemRB.HideGUI ()
-
-	if not ContinueWindow:
-		GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-		ContinueWindow = Window = GemRB.LoadWindow (9)
-		OldActionsWindow = GWindow( GemRB.GetVar ("PortraitWindow") )
-		GemRB.SetVar ("PortraitWindow", Window.ID)
-
+	ContinueWindow.SetVisible(WINDOW_VISIBLE)
 	#continue
 	Button = ContinueWindow.GetControl (0)
 	Button.SetText (9372)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-
-	if hideflag:
-		GemRB.UnhideGUI ()
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenReformPartyWindow ():
 	global ReformPartyWindow

@@ -61,15 +61,18 @@
 #include "SpellMgr.h"
 #include "StoreMgr.h"
 #include "StringMgr.h"
+#include "SymbolMgr.h"
 #include "TileMap.h"
 #include "Video.h"
 #include "WorldMapMgr.h"
+#include "GameScript/GameScript.h"
 #include "GUI/Button.h"
 #include "GUI/Console.h"
 #include "GUI/GameControl.h"
 #include "GUI/Label.h"
 #include "GUI/MapControl.h"
 #include "GUI/WorldMapControl.h"
+#include "Scriptable/Container.h"
 #include "System/FileStream.h"
 #include "System/VFS.h"
 
@@ -1424,6 +1427,8 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 
 	if (!LoadConfig()) {
+		printMessage( "Core", "Could not load config file ", YELLOW);
+		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
 	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
@@ -1475,6 +1480,9 @@ int Interface::Init()
 
 		PathJoin( path, CachePath, NULL);
 		gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY);
+
+		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
+		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_DIRECTORY);
 
 		size_t i;
 		for (i = 0; i < ModPath.size(); ++i)
@@ -1536,11 +1544,12 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 	strcpy( NextScript, "Start" );
 
-
-	char path[_MAX_PATH];
-	PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
-	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_DIRECTORY);
-
+	{
+		// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
+		char path[_MAX_PATH];
+		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
+		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_DIRECTORY, RM_REPLACE_SAME_SOURCE);
+	}
 
 	printMessage( "Core", "Reading Game Options...\n", WHITE );
 	if (!LoadGemRBINI()) {
@@ -2179,38 +2188,51 @@ bool Interface::LoadConfig(const char* filename)
 	printf("%s ", filename);
 	config = fopen( filename, "rb" );
 	if (config == NULL) {
-		printStatus("NOT FOUND", LIGHT_RED);
+		printStatus("NOT FOUND", YELLOW);
 		return false;
 	}
-	char name[65], value[_MAX_PATH + 3];
 
+	char line[1024];
+	char *name, *nameend, *value, *valueend;
 	//once GemRB own format is working well, this might be set to 0
 	SaveAsOriginal = 1;
 
+	int lineno = 0;
 	while (!feof( config )) {
-		char rem;
-
-		if (fread( &rem, 1, 1, config ) != 1)
+		if (! fgets( line, sizeof(line), config )) { // also if len == size(line)
 			break;
+		}
+		lineno++;
 
-		if (rem == '#') {
-			//it should always return 0
-			if (fscanf( config, "%*[^\r\n]%*[\r\n]" )!=0)
-				break;
+		// skip leading blanks from name
+		name = line;
+		name += strspn( line, " \t\r\n" );
+
+		// ignore empty or comment lines
+		if (*name == '\0' || *name == '#') {
 			continue;
 		}
-		fseek( config, -1, SEEK_CUR );
-		memset(value,'\0',_MAX_PATH + 3);
-		//the * element is not counted
-		if (fscanf( config, "%64[^= ] = %[^\r\n]%*[\r\n]", name, value )!=2)
+
+		value = strchr( name, '=' );
+		if (!value || value == name) {
+			printf( "Invalid line %d\n", lineno );
 			continue;
-		for (i=_MAX_PATH + 2; i > 0; i--) {
-			if (value[i] == '\0') continue;
-			if (value[i] == ' ') {
-				value[i] = '\0';
-			} else {
-				break;
-			}
+		}
+
+		// trim trailing blanks from name
+		nameend = value;
+		while (nameend > name && strchr( "= \t", *nameend )) {
+			*nameend-- = '\0';
+		}
+
+		value++;
+		// skip leading blanks
+		value += strspn( value, " \t");
+
+		// trim trailing blanks from value
+		valueend = value + strlen( value ) - 1;
+		while (valueend >= value && strchr( " \t\r\n", *valueend )) {
+			*valueend-- = '\0';
 		}
 
 		if (false) {
@@ -2616,6 +2638,8 @@ bool Interface::LoadGemRBINI()
 Palette* Interface::CreatePalette(const Color &color, const Color &back)
 {
 	Palette* pal = new Palette();
+	pal->front = color;
+	pal->back = back;
 	pal->col[0].r = 0;
 	pal->col[0].g = 0xff;
 	pal->col[0].b = 0;
@@ -3242,8 +3266,12 @@ void Interface::HandleGUIBehaviour(void)
 			ieDword var = (ieDword) -3;
 			vars->Lookup("DialogChoose", var);
 			if ((int) var == -2) {
+				// TODO: this seems to never be called? (EndDialog is called from elsewhere instead)
 				gc->dialoghandler->EndDialog();
 			} else if ( (int)var !=-3) {
+				if ( (int) var == -1) {
+					guiscript->RunFunction( "GUIWORLD", "DialogStarted" );
+				}
 				gc->dialoghandler->DialogChoose(var);
 				if (!(gc->GetDialogueFlags() & (DF_OPENCONTINUEWINDOW | DF_OPENENDWINDOW)))
 					guiscript->RunFunction( "GUIWORLD", "NextDialogState" );
@@ -3260,8 +3288,6 @@ void Interface::HandleGUIBehaviour(void)
 			} else if (flg & DF_OPENENDWINDOW) {
 				guiscript->RunFunction( "GUIWORLD", "OpenEndMessageWindow" );
 				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
-			} else {
-				guiscript->RunFunction( "GUICommonWindows", "EmptyControls" );
 			}
 		}
 
@@ -3810,7 +3836,12 @@ bool Interface::LoadINI(const char* filename)
 void Interface::SetCutSceneMode(bool active)
 {
 	GameControl *gc = GetGameControl();
+
 	if (gc) {
+		// don't mess with controls/etc if we're already in a cutscene
+		if (active == (gc->GetScreenFlags()&SF_CUTSCENE))
+			return;
+
 		gc->SetCutSceneMode( active );
 	}
 	if (game) {

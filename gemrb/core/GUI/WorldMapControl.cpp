@@ -67,6 +67,8 @@ WorldMapControl::WorldMapControl(const char *font, int direction)
 	}
 
 	// initialize label colors
+	// NOTE: it would be better to initialize these colors from
+	//   some 2da file
 	Color normal = { 0xf0, 0xf0, 0xf0, 0xff };
 	Color selected = { 0xf0, 0x80, 0x80, 0xff };
 	Color notvisited = { 0x80, 0x80, 0xf0, 0xff };
@@ -377,19 +379,35 @@ bool WorldMapControl::SetEvent(int eventType, EventHandler handler)
 
 void WorldMapControl::SetColor(int which, Color color)
 {
-	Color black = { 0x00, 0x00, 0x00, 0x00 };
+	Palette* pal;
+	// FIXME: clearly it can cause palettes to be re-created several times,
+	//   because setting background color creates all palettes anew.
 	switch (which) {
-	case IE_GUI_WMAP_COLOR_NORMAL:
+	case IE_GUI_WMAP_COLOR_BACKGROUND:
+		pal = core->CreatePalette( pal_normal->front, color );
 		gamedata->FreePalette( pal_normal );
-		pal_normal = core->CreatePalette( color, black );
+		pal_normal = pal;
+		pal = core->CreatePalette( pal_selected->front, color );
+		gamedata->FreePalette( pal_selected );
+		pal_selected = pal;
+		pal = core->CreatePalette( pal_notvisited->front, color );
+		gamedata->FreePalette( pal_notvisited );
+		pal_notvisited = pal;
+		break;
+	case IE_GUI_WMAP_COLOR_NORMAL:
+		pal = core->CreatePalette( color, pal_normal->back );
+		gamedata->FreePalette( pal_normal );
+		pal_normal = pal;
 		break;
 	case IE_GUI_WMAP_COLOR_SELECTED:
+		pal = core->CreatePalette( color, pal_selected->back );
 		gamedata->FreePalette( pal_selected );
-		pal_selected = core->CreatePalette( color, black );
+		pal_selected = pal;
 		break;
 	case IE_GUI_WMAP_COLOR_NOTVISITED:
+		pal = core->CreatePalette( color, pal_notvisited->back );
 		gamedata->FreePalette( pal_notvisited );
-		pal_notvisited = core->CreatePalette( color, black );
+		pal_notvisited = pal;
 		break;
 	default:
 		break;

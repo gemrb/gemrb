@@ -97,7 +97,7 @@ unsigned int DisplayMessage::GetSpeakerColor(const char *&name, const Scriptable
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-			name = core->GetString( ((InfoPoint *) speaker)->DialogName );
+			name = core->GetString( speaker->DialogName );
 			speaker_color = 0xc0c0c0;
 			break;
 		default:

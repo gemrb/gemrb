@@ -1,9 +1,9 @@
 2DA V1.0
 *
-           XPOS       YPOS       RESREF     DELAY      DURATION   
-0          0          0          S914RUNE   0          50         
-1          -196       28         S914BGBL   21         29         
-2          -16        62         S914BGBL   26         24         
-3          24         -68        S914BGBL   31         19         
-4          201        40         S914BGBL   36         14         
-5          0          0          S914HGBL   45         5          
+           XPOS       YPOS       RESREF     DELAY     DURATION
+0          0          0          S914RUNE   0         8
+1          -196       28         S914BGBL   4         4
+2          -16        62         S914BGBL   5         3
+3          24         -68        S914BGBL   6         2
+4          201        40         S914BGBL   7         1
+5          0          0          S914HGBL   8         2

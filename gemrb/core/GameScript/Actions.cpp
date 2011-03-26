@@ -41,6 +41,9 @@
 #include "Video.h"
 #include "WorldMap.h"
 #include "GUI/GameControl.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 
 //------------------------------------------------------------
 // Action Functions
@@ -1123,14 +1126,12 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	//WalkTo could release the current action, so we need this
-	ieDword tmp = (ieDword) parameters->int0Parameter;
 	//InMove can clear destination, so we need to save it
 	Point dest = actor->Destination;
 
 	// try the actual move, if we are not already moving there
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
-		actor->WalkTo( parameters->pointParameter, 0, tmp );
+		actor->WalkTo( parameters->pointParameter, 0 );
 		dest = actor->Destination;
 	}
 
@@ -1138,19 +1139,6 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
 		Sender->ReleaseCurrentAction();
-	}
-
-	if (tmp) {
-		if (!actor->InMove()) {
-			//can't reach target, movement failed
-			//we have to use tmp-1 because the distance required might be 0,
-			//so in GoNearAndRetry we add 1 to distance
-			if (Distance(dest,actor)>tmp-1) {
-				//to prevent deadlocks, we free the action
-				//which caused MoveToPoint in the first place
-				Sender->PopNextAction();
-			}
-		}
 	}
 }
 
@@ -1753,6 +1741,7 @@ void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 	case 3: //force switch, but wait for previous music to end gracefully
 		force = false;
 		restart = true;
+		break;
 	default:
 		force = false;
 		restart = false;
@@ -2609,8 +2598,8 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 		Actor *act = (Actor *) Sender;
 
 		//move near to target
-		if (dist != 0xfffffff) {
-			if (PersonalDistance(tar, Sender) > dist) {
+		if (dist != 0xffffffff) {
+			if (PersonalDistance(tar, Sender) > dist || !Sender->GetCurrentArea()->IsVisible(Sender->Pos, tar->Pos)) {
 				MoveNearerTo(Sender,tar,dist);
 				return;
 			}
@@ -2657,7 +2646,7 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 
 		Actor *act = (Actor *) Sender;
 		//move near to target
-		if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
+		if (PersonalDistance(parameters->pointParameter, Sender) > dist || !Sender->GetCurrentArea()->IsVisible(Sender->Pos, parameters->pointParameter)) {
 			MoveNearerTo(Sender,parameters->pointParameter,dist, 0);
 			return;
 		}

@@ -1510,7 +1510,7 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//how style (probably better would be to provide effcof.spl)
- 	Effect *newfx = EffectQueue::CreateEffect(fx_umberhulk_gaze_ref, 0,
+	Effect *newfx = EffectQueue::CreateEffect(fx_umberhulk_gaze_ref, 0,
 		8, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Power = fx->Power;
 
@@ -2991,7 +2991,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	else if (check_iwd_targeting(Owner, target, 0, 84)) penalty = 2; //duergar
 	else penalty = 0;
 
- 	STAT_ADD(IE_SAVEFORTITUDE, penalty);
+	STAT_ADD(IE_SAVEFORTITUDE, penalty);
 	STAT_ADD(IE_SAVEREFLEX, penalty);
 	STAT_ADD(IE_SAVEWILL, penalty);
 	//for compatibility reasons
@@ -3006,7 +3006,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_damage_reduction (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_damage_reduction (%2d) Amount: %d\n", fx->Opcode, fx->Parameter2);
- 	STAT_SET(IE_RESISTSLASHING, fx->Parameter2*5);
+	STAT_SET(IE_RESISTSLASHING, fx->Parameter2*5);
 	STAT_SET(IE_RESISTCRUSHING, fx->Parameter2*5);
 	STAT_SET(IE_RESISTPIERCING, fx->Parameter2*5);
 	return FX_APPLIED;

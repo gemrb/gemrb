@@ -29,32 +29,58 @@ import GUICommon
 import GUICommonWindows
 import CommonWindow
 from GUIDefines import *
+import MessageWindow
 
 FormationWindow = None
 ReformPartyWindow = None
 
+def DialogStarted ():
+	global ContinueWindow, OldActionsWindow
+
+	# try to force-close anything which is open
+	GUICommon.CloseOtherWindow(None)
+	CommonWindow.CloseContainerWindow()
+
+	# we need GUI for dialogs
+	GemRB.UnhideGUI()
+
+	# opening control size to maximum, enabling dialog window
+	GemRB.GameSetScreenFlags(GS_HIDEGUI, OP_NAND)
+	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
+
+	MessageWindow.UpdateControlStatus()
+
+def DialogEnded ():
+	pass
+
 def CloseContinueWindow ():
+	# don't close the actual window now to avoid flickering: we might still want it open
 	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
-	Window = GUIClasses.GWindow(GemRB.GetVar ("MessageWindow"))
-	Button = Window.GetControl (0)
+
+def NextDialogState ():
+	if not MessageWindow.MessageWindow:
+		return
+
+	Button = MessageWindow.MessageWindow.GetControl (0)
 	Button.SetText(28082)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
 
-def NextDialogState ():
-	pass
+	MessageWindow.MessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenEndMessageWindow ():
-	Window = GUIClasses.GWindow(GemRB.GetVar ("MessageWindow"))
-	Button = Window.GetControl (0)
+	Button = MessageWindow.MessageWindow.GetControl (0)
 	Button.SetText (34602)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenContinueMessageWindow ():
-	Window = GUIClasses.GWindow(GemRB.GetVar ("MessageWindow"))
-	Button = Window.GetControl (0)
+	#continue
+	Button = MessageWindow.MessageWindow.GetControl (0)
 	Button.SetText (34603)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenReformPartyWindow ():
 	global ReformPartyWindow

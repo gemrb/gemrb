@@ -1029,58 +1029,52 @@ void CREImporter::GetActorPST(Actor *act)
 
 void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 {
-	CREItem** items;
+	ieWord *indices = (ieWord *) calloc(Inventory_Size, sizeof(ieWord));
+	//CREItem** items;
 	unsigned int i,j,k;
 
-	str->Seek( ItemsOffset+CREOffset, GEM_STREAM_START );
-	items = (CREItem **) calloc (ItemsCount, sizeof(CREItem *) );
-
-	for (i = 0; i < ItemsCount; i++) {
-		items[i] = core->ReadItem(str); //could be NULL item
-	}
 	act->inventory.SetSlotCount(Inventory_Size+1);
-
 	str->Seek( ItemSlotsOffset+CREOffset, GEM_STREAM_START );
 
-	for (i = 1; i <= Inventory_Size; i++) {
-		int Slot = core->QuerySlot( i );
-		ieWord index;
-		str->ReadWord( &index );
-
-		if (index != 0xFFFF) {
-			if (index>=ItemsCount) {
-				printMessage("CREImporter"," ",LIGHT_RED);
-				printf("Invalid item index (%d) in creature!\n", index);
-				continue;
-			}
-			CREItem *item = items[index];
-			if (item && gamedata->Exists(item->ItemResRef, IE_ITM_CLASS_ID)) {
-				act->inventory.SetSlotItem( item, Slot );
-				items[index] = NULL;
-				continue;
-			}
-			printMessage("CREImporter"," ",LIGHT_RED);
-			printf("Duplicate or (no-drop) item (%d) in creature!\n", index);
-		}
+	//first read the indices
+	for (i = 0;i<Inventory_Size; i++) {
+		str->ReadWord(indices+i);
 	}
-
-	i = ItemsCount;
-	while(i--) {
-		if ( items[i]) {
-			printMessage("CREImporter"," ",LIGHT_RED);
-			printf("Dangling item in creature: %s!\n", items[i]->ItemResRef);
-			delete items[i];
-		}
-	}
-	free (items);
-
-	//this dword contains the equipping info (which slot is selected)
+	//this word contains the equipping info (which slot is selected)
 	// 0,1,2,3 - weapon slots
 	// 1000 - fist
 	// -24,-23,-22,-21 - quiver
 	//the equipping effects are delayed until the actor gets an area
 	str->ReadWordSigned( &act->Equipped );
+	//the equipped slot's selected ability is stored here
 	str->ReadWord( &act->EquippedHeader );
+	
+	//read the item entries based on the previously read indices
+	//an item entry may be read multiple times if the indices are repeating
+	for (i = 0;i<Inventory_Size;) {
+		//the index was intentionally increased here, the fist slot isn't saved
+		ieWord index = indices[i++];
+		if (index != 0xffff) {
+			if (index>=ItemsCount) {
+				printMessage("CREImporter"," ",LIGHT_RED);
+				printf("Invalid item index (%d) in creature!\n", index);
+				continue;
+			}
+			//20 is the size of CREItem on disc (8+2+3x2+4)
+			str->Seek( ItemsOffset+index*20 + CREOffset, GEM_STREAM_START );
+			//the core allocates this item data
+			CREItem *item = core->ReadItem(str);
+			int Slot = core->QuerySlot(i);
+			if (item) {
+				act->inventory.SetSlotItem(item, Slot);
+			} else {
+				printMessage("CREImporter"," ",LIGHT_RED);
+				printf("Invalid item index (%d) in creature!\n", index);
+			}
+		}
+	}
+
+	free (indices);
 
 	// Reading spellbook
 	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );

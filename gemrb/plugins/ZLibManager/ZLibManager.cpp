@@ -35,8 +35,8 @@ ZLibManager::~ZLibManager(void)
 }
 
 
-#define INPUTSIZE  4096
-#define OUTPUTSIZE 4096
+#define INPUTSIZE  8192
+#define OUTPUTSIZE 8192
 
 // ZLib Decompression Routine
 int ZLibManager::Decompress(DataStream* dest, DataStream* source, unsigned int size_guess) const

@@ -130,7 +130,7 @@ public:
 	ieDword PurchasedCategoriesOffset;
 	ieDword PurchasedCategoriesCount;
 	ieDword ItemsOffset;
- 	//don't use this value directly, use GetRealStockSize
+	//don't use this value directly, use GetRealStockSize
 	ieDword ItemsCount;
 	ieDword Lore;
 	ieDword IDPrice;

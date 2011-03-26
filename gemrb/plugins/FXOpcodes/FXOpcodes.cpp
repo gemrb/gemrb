@@ -30,6 +30,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "PolymorphCache.h" // fx_polymorph
 #include "Projectile.h" //needs for clearair
 #include "Spell.h" //needed for fx_cast_spell feedback
 #include "TileMap.h" //needs for knock!
@@ -38,7 +39,9 @@
 #include "GameScript/Matching.h" //needs for GetAllObjects
 #include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
-#include "PolymorphCache.h" // fx_polymorph
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 #include "Scriptable/PCStatStruct.h" //fx_polymorph (action definitions)
 
 //FIXME: find a way to handle portrait icons better
@@ -3771,6 +3774,7 @@ int fx_casting_glow (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		sca->YPos+=fx->PosY+ypos_by_direction[target->GetOrientation()];
 		sca->ZPos+=heightmod;
 		sca->SetBlend();
+		sca->PlayOnce();
 		if (fx->Duration) {
 			sca->SetDefaultDuration(fx->Duration-core->GetGame()->GameTime);
 		} else {
@@ -5022,6 +5026,7 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			vvc->active = true;
 			return FX_APPLIED;
 		}
+		if (! fx->FirstApply) return FX_NOT_APPLIED;
 	}
 
 	if (target->fxqueue.HasEffectWithResource(fx_protection_from_animation_ref,fx->Resource)) {
@@ -5979,7 +5984,7 @@ int fx_explore_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_screenshake (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_screenshake (%2d): Strength: %d\n", fx->Opcode, fx->Parameter1 );
-	core->timer->SetScreenShake( fx->Parameter1, fx->Parameter1, 1);
+	core->timer->SetScreenShake( fx->Parameter1, fx->Parameter1, fx->Parameter1);
 	return FX_APPLIED;
 }
 

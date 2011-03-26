@@ -36,6 +36,9 @@
 #include "Video.h"
 #include "damages.h"
 #include "GameScript/GSUtils.h"
+#include "Scriptable/Container.h"
+#include "Scriptable/Door.h"
+#include "Scriptable/InfoPoint.h"
 
 #include <cmath>
 
@@ -256,14 +259,14 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 	Action *action = NULL;
 	if (DoubleClick && EnableRunning) {
 		sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
- 		action = GenerateAction( Tmp );
+		action = GenerateAction( Tmp );
 		//if it didn't work don't insist
 		if (!action)
 			EnableRunning = false;
 	}
 	if (!action) {
 		sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
- 		action = GenerateAction( Tmp );
+		action = GenerateAction( Tmp );
 	}
 
 	actor->AddAction( action );
@@ -496,7 +499,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		Actor *actor = area->GetActorByGlobalID(trackerID);
 
 		if (actor) {
-			Actor **monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, distance);
+			Actor **monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS, distance);
 
 			int i = 0;
 			while(monsters[i]) {
