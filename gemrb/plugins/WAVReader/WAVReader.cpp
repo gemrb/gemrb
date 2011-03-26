@@ -128,8 +128,8 @@ bool WavPCMReader::Open(DataStream* stream)
 	str->ReadDword(&r_hdr.length);
 	//don't swap this
 	str->Read( &wave, 4 );
-	if (r_hdr.fourcc != *( unsigned int * ) RIFF_4cc ||
-		wave != *( unsigned int * ) WAVE_4cc) {
+	if (memcmp(&r_hdr.fourcc, RIFF_4cc, 4) != 0 ||
+		memcmp(&wave, WAVE_4cc, 4) != 0) {
 		return false;
 	}
 
@@ -137,7 +137,7 @@ bool WavPCMReader::Open(DataStream* stream)
 	//don't swap this
 	str->Read(&fmt_hdr.fourcc,4);
 	str->ReadDword(&fmt_hdr.length);
-	if (fmt_hdr.fourcc != *( unsigned int * ) fmt_4cc ||
+	if (memcmp(&fmt_hdr.fourcc, fmt_4cc, 4) != 0 ||
 		fmt_hdr.length > sizeof( cWAVEFORMATEX )) {
 		return false;
 	}
@@ -166,13 +166,13 @@ bool WavPCMReader::Open(DataStream* stream)
 	str->Read(&data_hdr.fourcc,4);
 	str->ReadDword(&data_hdr.length);
 
-	if (data_hdr.fourcc == *( unsigned int * ) fact_4cc) {
+	if (memcmp(&data_hdr.fourcc, fact_4cc, 4) == 0) {
 		str->Seek( data_hdr.length, GEM_CURRENT_POS );
 		//str->Read( &data_hdr, sizeof( data_hdr ) );
 		str->ReadDword(&data_hdr.fourcc);
 		str->ReadDword(&data_hdr.length);
 	}
-	if (data_hdr.fourcc != *( unsigned int * ) data_4cc) {
+	if (memcmp(&data_hdr.fourcc, data_4cc, 4) != 0) {
 		return false;
 	}
 
