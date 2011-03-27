@@ -795,7 +795,7 @@ void Map::UpdateScripts()
 		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
 		// InfoPoints of all types don't run scripts if TRAP_DEACTIVATED is set
 		// (eg, TriggerActivation changes this, see lightning room from SoA)
-		int wasActive = (ip->Trapped && !(ip->Flags&TRAP_DEACTIVATED) ) || (ip->Type==ST_TRAVEL);
+		int wasActive = (!(ip->Flags&TRAP_DEACTIVATED) ) || (ip->Type==ST_TRAVEL);
 
 		//If this InfoPoint is a Switch Trigger
 		if (ip->Type == ST_TRIGGER) {
