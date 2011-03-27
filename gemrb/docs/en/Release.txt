@@ -61,16 +61,15 @@ create them if there are structural or build related changes. New config
 options should also be mentioned here if they're not part of the changelog.
 
 * Put the tarballs/binaries into Releases on SF
-  - create a new directory in the appropriate section by rightclicking
-  - mark it for upload
-  - upload the release notes
-  - upload the file
-  - mark the release notes as release notes (popup on leftclick)
-  - mark the file to have the release notes and default platforms (popup on leftclick)
+  - go to the Files section
+  - click on the sources subdir
+  - add a new similarly-named folder
+  - use "add file" to upload the sources and release notes
+  - change the file properties to set the default platforms (under "view details")
 
 * Test the downloads from sourceforge.net
 
-* Announce on homepage, SF, #GemRB in channel and title, Happypenguin and
+* Announce on homepage, SF, #GemRB in channel and title, Happypenguin, LGDB and
   Gibberlings3:
     - our forum
     - modding news (Avenger, Theacefes, Grim Squeaker, DavidW and cmorgan have access)
