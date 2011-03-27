@@ -495,7 +495,7 @@ public:
 	/** returns true if in cutscene mode */
 	bool InCutSceneMode() const;
 	/** Updates the Game Script Engine State */
-	void GSUpdate(bool update_scripts);
+	bool GSUpdate(bool update_scripts);
 	/** Get the Party INI Interpreter */
 	DataFileMgr * GetPartyINI() const
 	{

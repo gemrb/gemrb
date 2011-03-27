@@ -3242,7 +3242,7 @@ void Interface::GameLoop(void)
 		update_scripts = !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS);
 	}
 
-	GSUpdate(update_scripts);
+	update_scripts = GSUpdate(update_scripts);
 
 	//i'm not sure if this should be here
 
@@ -3875,13 +3875,14 @@ bool Interface::InCutSceneMode() const
 }
 
 /** Updates the Game Script Engine State */
-void Interface::GSUpdate(bool update_scripts)
+bool Interface::GSUpdate(bool update_scripts)
 {
 	if(update_scripts) {
-		timer->Update();
+		return timer->Update();
 	}
 	else {
 		timer->Freeze();
+		return false;
 	}
 }
 

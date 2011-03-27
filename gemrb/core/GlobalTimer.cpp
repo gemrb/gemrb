@@ -141,7 +141,7 @@ void GlobalTimer::DoStep(int count)
 	video->MoveViewportTo(x,y);
 }
 
-void GlobalTimer::Update()
+bool GlobalTimer::Update()
 {
 	Map *map;
 	Game *game;
@@ -159,12 +159,12 @@ void GlobalTimer::Update()
 
 	if (!startTime) {
 		startTime = thisTime;
-		return;
+		return false;
 	}
 
 	advance = thisTime - startTime;
 	if ( advance < interval) {
-		return;
+		return false;
 	}
 	ieDword count = advance/interval;
 	DoStep(count);
@@ -196,6 +196,7 @@ void GlobalTimer::Update()
 	}
 end:
 	startTime = thisTime;
+	return true;
 }
 
 

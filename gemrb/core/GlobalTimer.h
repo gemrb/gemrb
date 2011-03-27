@@ -60,7 +60,7 @@ public:
 public:
 	void Init();
 	void Freeze();
-	void Update();
+	bool Update();
 	bool ViewportIsMoving();
 	void DoStep(int count);
 	void SetMoveViewPort(ieDword x, ieDword y, int spd, bool center);
