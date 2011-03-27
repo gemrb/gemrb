@@ -3965,14 +3965,15 @@ int fx_learn_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 // 0x94 Spell:CastSpellPoint
-int fx_cast_spell_point (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_cast_spell_point (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_cast_spell_point (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
 	Owner->SetSpellResRef(fx->Resource);
-	Owner->CastSpellPoint(fx->Resource, target->Pos, false);
+	Point p(fx->PosX, fx->PosY);
+	Owner->CastSpellPoint(fx->Resource, p, false);
 	//actually finish casting (if this is not good enough, use an action???)
 	Owner->CastSpellPointEnd(fx->Parameter1);
 	Owner->SetSpellResRef(OldSpellResRef);
