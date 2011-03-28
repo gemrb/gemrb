@@ -224,6 +224,11 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 	vp.w = ViewWidth;
 	vp.h = ViewHeight;
 
+	if ((vp.x + vp.w) >= MAP_TO_SCREENX( Width ))
+		vp.w = MAP_TO_SCREENX( Width ) - vp.x;
+	if ((vp.y + vp.h) >= MAP_TO_SCREENY( Height ))
+		vp.h = MAP_TO_SCREENY( Height ) - vp.y;
+
 	video->DrawRect( vp, colors[green], false, false );
 
 	// Draw PCs' ellipses
