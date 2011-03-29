@@ -156,7 +156,7 @@ def ConfirmedSaveGame():
 		GemRB.SaveGame(None, Slotname)
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
-	SaveWindow.SetVisible (WINDOW_VISIBLE)
+	OpenSaveWindow() # close window
 	return
 
 def SavePress():
