@@ -34,10 +34,15 @@ SaveButton = 0
 TextAreaControl = 0
 Games = ()
 ScrollBar = 0
+# this lookup table is used only by bg2
 str_chapter = (48007, 48006, 16205, 16206, 16207, 16208, 16209, 71020, 71021, 71022)
+num_rows = 4
+ctrl_offset = (26, 30, 40, 0x10000008, 0x10000010)
+sav_version = 0
 
 def OpenSaveWindow ():
 	global SaveWindow, TextAreaControl, Games, ScrollBar
+	global num_rows, ctrl_offset, sav_version
 
 	if GUICommon.CloseOtherWindow (OpenSaveWindow):
 		CloseSaveWindow ()
@@ -46,23 +51,32 @@ def OpenSaveWindow ():
 	GemRB.HideGUI ()
 	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
 
-	GemRB.LoadWindowPack ("GUISAVE", 640, 480)
+	if GUICommon.GameIsIWD2():
+		GemRB.LoadWindowPack ("GUISAVE", 800, 600)
+		num_rows = 5
+		ctrl_offset = (55, 60, 25, 0x10000005, 0x1000000a)
+		sav_version = 22
+	else:
+		GemRB.LoadWindowPack ("GUISAVE", 640, 480)
 	Window = SaveWindow = GemRB.LoadWindow (0)
 	Window.SetFrame ()
-	CancelButton=Window.GetControl (34)
+	if GUICommon.GameIsIWD2():
+		CancelButton=Window.GetControl (22)
+	else:
+		CancelButton=Window.GetControl (34)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSaveWindow)
 	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 	GemRB.SetVar ("LoadIdx",0)
 
-	for i in range(4):
-		Button = Window.GetControl (26+i)
+	for i in range(num_rows):
+		Button = Window.GetControl (ctrl_offset[0]+i)
 		Button.SetText (15588)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SavePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetVarAssoc ("LoadIdx",i)
 
-		Button = Window.GetControl (30+i)
+		Button = Window.GetControl (ctrl_offset[1]+i)
 		Button.SetText (13957)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -75,14 +89,17 @@ def OpenSaveWindow ():
 
 		#PC portraits
 		for j in range(PARTY_SIZE):
-			Button = Window.GetControl (40+i*PARTY_SIZE+j)
+			Button = Window.GetControl (ctrl_offset[2]+i*PARTY_SIZE+j)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
-	ScrollBar=Window.GetControl (25)
+	if GUICommon.GameIsIWD2():
+		ScrollBar=Window.GetControl (23)
+	else:
+		ScrollBar=Window.GetControl (25)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
 	Games=GemRB.GetSaveGames ()
-	TopIndex = max (0, len(Games) - 4 + 1) #one more for the 'new game'
+	TopIndex = max (0, len(Games) - num_rows + 1) #one more for the 'new game'
 	GemRB.SetVar ("TopIndex",TopIndex)
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex+1)
 	ScrollBar.SetDefaultScrollBar ()
@@ -95,11 +112,11 @@ def ScrollBarPress():
 
 	#draw load game portraits
 	Pos = GemRB.GetVar ("TopIndex")
-	for i in range(4):
+	for i in range(num_rows):
 		ActPos = Pos + i
 
-		Button1 = Window.GetControl (26+i)
-		Button2 = Window.GetControl (30+i)
+		Button1 = Window.GetControl (ctrl_offset[0]+i)
+		Button2 = Window.GetControl (ctrl_offset[1]+i)
 		if ActPos<=len(Games):
 			Button1.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
@@ -115,14 +132,14 @@ def ScrollBarPress():
 			Slotname = ""
 			Button2.SetState (IE_GUI_BUTTON_DISABLED)
 
-		Label = Window.GetControl (0x10000008+i)
+		Label = Window.GetControl (ctrl_offset[3]+i)
 		Label.SetText (Slotname)
 
 		if ActPos<len(Games):
 			Slotname = Games[ActPos].GetGameDate()
 		else:
 			Slotname = ""
-		Label = Window.GetControl (0x10000010+i)
+		Label = Window.GetControl (ctrl_offset[4]+i)
 		Label.SetText (Slotname)
 
 		Button=Window.GetControl (1+i)
@@ -131,7 +148,7 @@ def ScrollBarPress():
 		else:
 			Button.SetPicture("")
 		for j in range(PARTY_SIZE):
-			Button=Window.GetControl (40+i*PARTY_SIZE+j)
+			Button=Window.GetControl (ctrl_offset[2]+i*PARTY_SIZE+j)
 			if ActPos<len(Games):
 				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
 			else:
@@ -152,9 +169,9 @@ def ConfirmedSaveGame():
 	Slotname = Label.QueryText ()
 	LoadScreen.StartLoadScreen()
 	if Pos < len(Games):
-		GemRB.SaveGame(Games[Pos], Slotname)
+		GemRB.SaveGame(Games[Pos], Slotname, sav_version)
 	else:
-		GemRB.SaveGame(None, Slotname)
+		GemRB.SaveGame(None, Slotname, sav_version)
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
 	OpenSaveWindow() # close window
@@ -190,19 +207,20 @@ def SavePress():
 	Label.SetText (Slotname)
 
 	#areapreview
-	Button=ConfirmWindow.GetControl (0)
-	if Pos<len(Games):
-		Button.SetSprite2D(Games[Pos].GetPreview())
-	else:
-		Button.SetPicture("")
-
-	#portraits
-	for j in range(PARTY_SIZE):
-		Button=ConfirmWindow.GetControl (40+j)
+	if not GUICommon.GameIsIWD2():
+		Button=ConfirmWindow.GetControl (0)
 		if Pos<len(Games):
-			Button.SetSprite2D(Games[Pos].GetPortrait(j))
+			Button.SetSprite2D(Games[Pos].GetPreview())
 		else:
 			Button.SetPicture("")
+
+	#portraits
+		for j in range(PARTY_SIZE):
+			Button=ConfirmWindow.GetControl (40+j)
+			if Pos<len(Games):
+				Button.SetSprite2D(Games[Pos].GetPortrait(j))
+			else:
+				Button.SetPicture("")
 
 	#save
 	SaveButton=ConfirmWindow.GetControl (7)
