@@ -9,7 +9,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -168,7 +168,7 @@ def SavePress():
 
 	#slot name
 	if Pos<len(Games):
-		Slotname = Games[Pos].GetName();
+		Slotname = Games[Pos].GetName()
 		save_strref = 15306
 	else:
 		Slotname = ""

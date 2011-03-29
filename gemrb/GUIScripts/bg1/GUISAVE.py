@@ -150,7 +150,7 @@ def ConfirmedSaveGame():
 	Label = ConfirmWindow.GetControl (3)
 	Slotname = Label.QueryText ()
 	LoadScreen.StartLoadScreen()
-	if Pos<len(Games):
+	if Pos < len(Games):
 		GemRB.SaveGame(Games[Pos], Slotname)
 	else:
 		GemRB.SaveGame(None, Slotname)
