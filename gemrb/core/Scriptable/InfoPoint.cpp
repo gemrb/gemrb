@@ -52,7 +52,6 @@ InfoPoint::InfoPoint(void)
 	TrapRemovalDiff = 0;
 	TrapDetected = 0;
 	TrapLaunch.empty();
-	EnterWav[0] = 0;
 }
 
 InfoPoint::~InfoPoint(void)
@@ -88,23 +87,6 @@ int InfoPoint::CheckTravel(Actor *actor)
 	return CT_ACTIVE;
 }
 
-//detect this trap, using a skill, skill could be set to 256 for 'sure'
-//skill is the all around modified trap detection skill
-//a trapdetectiondifficulty of 100 means impossible detection short of a spell
-void Highlightable::DetectTrap(int skill)
-{
-	if (!CanDetectTrap()) return;
-	if (!Scripts[0]) return;
-	if ((skill>=100) && (skill!=256) ) skill = 100;
-	if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDiff) {
-		SetTrapDetected(1); //probably could be set to the player #?
-	}
-}
-
-bool Highlightable::PossibleToSeeTrap() const
-{
-	return CanDetectTrap();
-}
 
 bool InfoPoint::PossibleToSeeTrap() const
 {
@@ -139,24 +121,6 @@ bool Highlightable::VisibleTrap(int see_all) const
 	if (see_all) return true;
 	if (TrapDetected ) return true;
 	return false;
-}
-
-//trap that will fire now
-bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
-{
-	if (!Trapped) {
-		return false;
-	}
-	//actually this could be script name[0]
-	if (!Scripts[0] && !EnterWav[0]) {
-		return false;
-	}
-	LastTriggerObject = LastTrigger = LastEntered = ID;
-	ImmediateEvent();
-	if (!TrapResets()) {
-		Trapped = false;
-	}
-	return true;
 }
 
 //trap that will fire now

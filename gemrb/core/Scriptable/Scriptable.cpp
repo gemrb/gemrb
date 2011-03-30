@@ -1452,6 +1452,7 @@ Highlightable::Highlightable(ScriptableType type)
 	Highlight = false;
 	Cursor = IE_CURSOR_NORMAL;
 	KeyResRef[0] = 0;
+	EnterWav[0] = 0;
 }
 
 Highlightable::~Highlightable(void)
@@ -1480,6 +1481,24 @@ void Highlightable::DrawOutline() const
 void Highlightable::SetCursor(unsigned char CursorIndex)
 {
 	Cursor = CursorIndex;
+}
+
+//trap that will fire now
+bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
+{
+	if (!Trapped) {
+		return false;
+	}
+	//actually this could be script name[0]
+	if (!Scripts[0] && !EnterWav[0]) {
+		return false;
+	}
+	LastTriggerObject = LastTrigger = LastEntered = ID;
+	ImmediateEvent();
+	if (!TrapResets()) {
+		Trapped = false;
+	}
+	return true;
 }
 
 bool Highlightable::TryUnlock(Actor *actor, bool removekey) {
@@ -1521,6 +1540,23 @@ bool Highlightable::TryUnlock(Actor *actor, bool removekey) {
 	return true;
 }
 
+//detect this trap, using a skill, skill could be set to 256 for 'sure'
+//skill is the all around modified trap detection skill
+//a trapdetectiondifficulty of 100 means impossible detection short of a spell
+void Highlightable::DetectTrap(int skill)
+{
+	if (!CanDetectTrap()) return;
+	if (!Scripts[0]) return;
+	if ((skill>=100) && (skill!=256) ) skill = 100;
+	if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDiff) {
+		SetTrapDetected(1); //probably could be set to the player #?
+	}
+}
+
+bool Highlightable::PossibleToSeeTrap() const
+{
+	return CanDetectTrap();
+}
 
 /*****************
  * Movable Class *

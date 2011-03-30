@@ -176,8 +176,6 @@ public:
 	Point Pos;
 
 	ieStrRef DialogName;
-	//play this wav file when stepping on the trap
-	ieResRef EnterWav;
 
 	GameScript* Scripts[MAX_SCRIPTS];
 
@@ -334,6 +332,8 @@ public:
 	ieWord Trapped;
 	ieWord TrapDetected;
 	ieResRef KeyResRef;
+	//play this wav file when stepping on the trap (on PST)
+	ieResRef EnterWav;
 public:
 	bool IsOver(const Point &Pos) const;
 	void DrawOutline() const;

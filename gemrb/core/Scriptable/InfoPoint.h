@@ -62,7 +62,6 @@ public:
 	ieStrRef StrRef;
 	Point UsePoint;
 	Point TalkPos;
-
 };
 
 #endif
