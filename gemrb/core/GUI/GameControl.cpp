@@ -2720,15 +2720,8 @@ Sprite2D* GameControl::GetPreview()
 	if (!x)
 		y = 0;
 
-	int hf = HideGUI ();
-	signed char v = Owner->Visible;
-	Owner->Visible = WINDOW_VISIBLE;
 	Draw (0, 0);
-	Owner->Visible = v;
 	Sprite2D *screenshot = video->GetScreenshot( Region(x, y, w, h) );
-	if (hf) {
-		UnhideGUI ();
-	}
 	core->DrawWindows();
 
 	Sprite2D* preview = video->SpriteScaleDown ( screenshot, 5 );

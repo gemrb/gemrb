@@ -158,6 +158,7 @@ def ScrollBarPress():
 def AbortedSaveGame():
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
+		ConfirmWindow = None
 	SaveWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
@@ -167,14 +168,18 @@ def ConfirmedSaveGame():
 	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
 	Label = ConfirmWindow.GetControl (3)
 	Slotname = Label.QueryText ()
-	LoadScreen.StartLoadScreen()
+	#FIXME: make this work
+	#LoadScreen.StartLoadScreen()
+	if ConfirmWindow:
+		ConfirmWindow.Unload ()
+		ConfirmWindow = None
+	OpenSaveWindow() # close window
+	GemRB.HideGUI ()
 	if Pos < len(Games):
 		GemRB.SaveGame(Games[Pos], Slotname, sav_version)
 	else:
 		GemRB.SaveGame(None, Slotname, sav_version)
-	if ConfirmWindow:
-		ConfirmWindow.Unload ()
-	OpenSaveWindow() # close window
+	GemRB.UnhideGUI ()
 	return
 
 def SavePress():
@@ -262,12 +267,14 @@ def DeleteGameConfirm():
 	ScrollBarPress()
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
+		ConfirmWindow = None
 	SaveWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def DeleteGameCancel():
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
+		ConfirmWindow = None
 	SaveWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
@@ -290,8 +297,11 @@ def DeleteGamePress():
 	return
 
 def CloseSaveWindow ():
+	global SaveWindow
+
 	if SaveWindow:
 		SaveWindow.Unload ()
+		SaveWindow = None
 	if GemRB.GetVar ("QuitAfterSave"):
 		GemRB.QuitGame ()
 		GemRB.SetNextScript ("Start")
