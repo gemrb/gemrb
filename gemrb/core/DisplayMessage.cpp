@@ -33,11 +33,11 @@ static int strref_table[STRREF_COUNT];
 
 #define PALSIZE 8
 static Color ActorColor[PALSIZE];
-static const char* DisplayFormatName = "[color=%lX]%s - [/color][p][color=%lX]%s[/color][/p]";
-static const char* DisplayFormatAction = "[color=%lX]%s - [/color][p][color=%lX]%s %s[/color][/p]";
-static const char* DisplayFormat = "[/color][p][color=%lX]%s[/color][/p]";
-static const char* DisplayFormatValue = "[/color][p][color=%lX]%s: %d[/color][/p]";
-static const char* DisplayFormatNameString = "[color=%lX]%s - [/color][p][color=%lX]%s: %s[/color][/p]";
+static const char* DisplayFormatName = "[color=%06X]%s - [/color][p][color=%06X]%s[/color][/p]";
+static const char* DisplayFormatAction = "[color=%06X]%s - [/color][p][color=%06X]%s %s[/color][/p]";
+static const char* DisplayFormat = "[/color][p][color=%06X]%s[/color][/p]";
+static const char* DisplayFormatValue = "[/color][p][color=%06X]%s: %d[/color][/p]";
+static const char* DisplayFormatNameString = "[color=%06X]%s - [/color][p][color=%06X]%s: %s[/color][/p]";
 
 DisplayMessage::DisplayMessage(void) {
 	ReadStrrefs();
@@ -161,7 +161,7 @@ void DisplayMessage::DisplayConstantStringNameString(int stridx, unsigned int co
 	actor_color = GetSpeakerColor(name, actor);
 	char* text = core->GetString( strref_table[stridx], IE_STR_SOUND );
 	char* text2 = core->GetString( strref_table[stridx2], IE_STR_SOUND );
-	int newlen = (int)(strlen( DisplayFormat ) + strlen(name) + strlen( text ) + strlen(text2) + 18);
+	int newlen = (int)(strlen( DisplayFormat ) + strlen(name) + strlen( text ) + strlen(text2) + 20);
 	char* newstr = ( char* ) malloc( newlen );
 	if (strlen(text2)) {
 		snprintf( newstr, newlen, DisplayFormatNameString, actor_color, name, color, text, text2 );
