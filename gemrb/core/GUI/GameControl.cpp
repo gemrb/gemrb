@@ -1042,6 +1042,12 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		case 'r':
 			core->GetGUIScriptEngine()->RunFunction("GUIREC","OpenRecordsWindow");
 			break;
+		case 'p':
+			core->GetGUIScriptEngine()->RunFunction("GUIPR","OpenPriestWindow");
+			break;
+		case 'w':
+			core->GetGUIScriptEngine()->RunFunction("GUIMG","OpenMageWindow");
+			break;
 		case 'q': //quicksave
 			QuickSave();
 			break;
