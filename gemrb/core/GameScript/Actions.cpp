@@ -2975,9 +2975,9 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 		level = parameters->int1Parameter;
 	}
 	if (tar->Type==ST_ACTOR) {
-		Sender->CastSpellEnd(parameters->int1Parameter);
+		Sender->CastSpellEnd(level);
 	} else {
-		Sender->CastSpellPointEnd(parameters->int1Parameter);
+		Sender->CastSpellPointEnd(level);
 	}
 	Sender->ReleaseCurrentAction();
 }
