@@ -1527,6 +1527,18 @@ void Game::TimeStop(Actor* owner, ieDword end)
 	timestop_end=end;
 }
 
+// check if the passed actor is a victim of timestop
+bool Game::TimeStoppedFor(const Actor* target)
+{
+	if (!timestop_owner) {
+		return false;
+	}
+	if (target == timestop_owner || target->GetStat(IE_DISABLETIMESTOP)) {
+		return false;
+	}
+	return true;
+}
+
 //recalculate the party's infravision state
 void Game::Infravision()
 {

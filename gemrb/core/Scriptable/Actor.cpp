@@ -4200,6 +4200,10 @@ int Actor::Immobile() const
 	if (GetStat(IE_STATE_ID) & STATE_STILL) {
 		return 1;
 	}
+	Game *game = core->GetGame();
+	if (game && game->TimeStoppedFor(this)) {
+		return 1;
+	}
 
 	return 0;
 }

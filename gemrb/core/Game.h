@@ -449,6 +449,8 @@ public:
 	void RestParty(int checks, int dream, int hp);
 	/** timestop effect initiated by actor */
 	void TimeStop(Actor *actor, ieDword end);
+	/** check if the passed actor is a victim of timestop */
+	bool TimeStoppedFor(const Actor* target=NULL);
 	/** updates the infravision info */
 	void Infravision();
 	/** gets the colour which should be applied over the game area,
