@@ -1524,7 +1524,7 @@ void Game::RestParty(int checks, int dream, int hp)
 void Game::TimeStop(Actor* owner, ieDword end)
 {
 	timestop_owner=owner;
-	timestop_end=GameTime+end;
+	timestop_end=end;
 }
 
 //recalculate the party's infravision state
