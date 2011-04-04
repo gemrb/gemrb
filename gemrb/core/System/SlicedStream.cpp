@@ -32,7 +32,7 @@ SlicedStream::SlicedStream(DataStream* str, int startpos, int size)
 	this->size = size;
 	this->startpos = startpos;
 	strncpy(originalfile, str->originalfile, _MAX_PATH);
-	strncpy(filename, str->filename, _MAX_PATH);
+	strncpy(filename, str->filename, sizeof(filename));
 }
 
 SlicedStream::~SlicedStream()
