@@ -660,7 +660,7 @@ void Map::UpdateScripts()
 			actor->no_more_steps = true;
 			continue;
 		}
-		if (timestop && actor!=timestop_owner && actor->Modified[IE_DISABLETIMESTOP] ) {
+		if (timestop && actor!=timestop_owner && actor->Modified[IE_DISABLETIMESTOP] == 0) {
 			actor->no_more_steps = true;
 			continue;
 		}
