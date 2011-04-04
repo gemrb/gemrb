@@ -54,6 +54,7 @@
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
+#include "System/FileStream.h"
 #include "System/VFS.h"
 
 #include <cstdio>
@@ -10609,7 +10610,7 @@ bool GUIScript::RunFunction(const char *ModuleName, const char* FunctionName, bo
 void GUIScript::ExecFile(const char* file)
 {
 	FileStream fs;
-	if (!fs.Open(file, true))
+	if (!fs.Open(file))
 		return;
 
 	int len = fs.Remains();

@@ -1613,5 +1613,5 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x316E2EDE, "BIK Video Player")
-PLUGIN_RESOURCE(BIKPlayer, ".mve")
+PLUGIN_RESOURCE(BIKPlayer, "mve")
 END_PLUGIN()

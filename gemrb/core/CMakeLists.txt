@@ -27,10 +27,9 @@ FILE(GLOB gemrb_core_LIB_SRCS "*.cpp"
 	Scriptable/InfoPoint.cpp
 	Scriptable/Scriptable.cpp
 	Scriptable/PCStatStruct.cpp
-	System/CachedFileStream.cpp
 	System/DataStream.cpp
 	System/FileStream.cpp
-	System/MemoryStream.cpp
+	System/SlicedStream.cpp
 	System/VFS.cpp
 	System/snprintf.cpp
 	)

@@ -39,7 +39,7 @@ ZLibManager::~ZLibManager(void)
 #define OUTPUTSIZE 8192
 
 // ZLib Decompression Routine
-int ZLibManager::Decompress(FILE* dest, DataStream* source, unsigned int size_guess) const
+int ZLibManager::Decompress(DataStream* dest, DataStream* source, unsigned int size_guess) const
 {
 	unsigned char bufferin[INPUTSIZE], bufferout[OUTPUTSIZE];
 	z_stream stream;
@@ -84,8 +84,7 @@ int ZLibManager::Decompress(FILE* dest, DataStream* source, unsigned int size_gu
 		if (( result != Z_OK ) && ( result != Z_STREAM_END )) {
 			return GEM_ERROR;
 		}
-		if (fwrite( bufferout, 1, OUTPUTSIZE - stream.avail_out, dest ) <
-			OUTPUTSIZE - stream.avail_out) {
+		if (dest->Write(bufferout, OUTPUTSIZE - stream.avail_out) == GEM_ERROR) {
 			return GEM_ERROR;
 		}
 		if (result == Z_STREAM_END) {

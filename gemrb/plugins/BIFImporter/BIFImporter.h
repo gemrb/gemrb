@@ -25,7 +25,7 @@
 
 #include "globals.h"
 
-#include "System/CachedFileStream.h"
+#include "System/DataStream.h"
 
 struct FileEntry {
 	ieDword resLocator;
@@ -50,7 +50,7 @@ private:
 	FileEntry* fentries;
 	TileEntry* tentries;
 	ieDword fentcount, tentcount;
-	CachedFileStream* stream;
+	DataStream* stream;
 public:
 	BIFImporter(void);
 	~BIFImporter(void);

@@ -68,10 +68,17 @@ public:
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();
 	void ReadDecrypted(void* buf, unsigned int size);
-	virtual int ReadLine(void* buf, unsigned int maxlen) = 0;
+	int ReadLine(void* buf, unsigned int maxlen);
 	/** Endian Switch setup */
 	static void SetEndianSwitch(int par);
 	static bool IsEndianSwitch();
+	/** Create a copy of this stream.
+	 *
+	 *  Returns NULL on failure.
+	 **/
+	virtual DataStream* Clone();
+private:
+	DataStream(const DataStream&);
 };
 
 #endif  // ! DATASTREAM_H

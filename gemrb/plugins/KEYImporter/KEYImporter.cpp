@@ -135,8 +135,8 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	// NOTE: Interface::Init has already resolved resfile.
 	printMessage( "KEYImporter", "Opening ", WHITE );
 	printf( "%s...", resfile );
-	FileStream* f = new FileStream();
-	if (!f->Open( resfile )) {
+	FileStream* f = FileStream::OpenFile(resfile);
+	if (!f) {
 		// Check for backslashes (false escape characters)
 		// this check probably belongs elsewhere (e.g. ResolveFilePath)
 		if (strstr( resfile, "\\ " )) {
@@ -145,7 +145,6 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 		printStatus( "ERROR", LIGHT_RED );
 		printMessage( "KEYImporter", "Cannot open Chitin.key\n", LIGHT_RED );
 		textcolor( WHITE );
-		delete( f );
 		return false;
 	}
 	printStatus( "OK", LIGHT_GREEN );
@@ -264,6 +263,7 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 		DataStream* ret = ai->GetStream( ResLocator, type );
 		if (ret) {
 			strnlwrcpy( ret->filename, resname, 8 );
+			strcat( ret->filename, "." );
 			strcat( ret->filename, core->TypeExt( type ) );
 			return ret;
 		}

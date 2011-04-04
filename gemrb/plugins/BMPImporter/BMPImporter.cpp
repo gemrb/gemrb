@@ -291,5 +291,5 @@ Bitmap* BMPImporter::GetBitmap()
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xD768B1, "BMP File Reader")
-PLUGIN_IE_RESOURCE(BMPImporter, ".bmp", (ieWord)IE_BMP_CLASS_ID)
+PLUGIN_IE_RESOURCE(BMPImporter, "bmp", (ieWord)IE_BMP_CLASS_ID)
 END_PLUGIN()

@@ -47,29 +47,21 @@ static bool FindIn(const char *Path, const char *ResRef, const char *Type)
 {
 	char p[_MAX_PATH], f[_MAX_PATH] = {0};
 	strcpy(f, ResRef);
-	strcat(f, Type);
 	strlwr(f);
 
-	return PathJoin(p, Path, f, NULL);
+	return PathJoinExt(p, Path, f, Type);
 }
 
 static FileStream *SearchIn(const char * Path,const char * ResRef, const char *Type)
 {
 	char p[_MAX_PATH], f[_MAX_PATH] = {0};
 	strcpy(f, ResRef);
-	strcat(f, Type);
 	strlwr(f);
 
-	if (!PathJoin(p, Path, f, NULL))
+	if (!PathJoinExt(p, Path, f, Type))
 		return NULL;
 
-	FileStream * fs = new FileStream();
-	if(!fs) return NULL;
-	if(!fs->Open(p, true)) {
-		delete fs;
-		return NULL;
-	}
-	return fs;
+	return FileStream::OpenFile(p);
 }
 
 bool DirectoryImporter::HasResource(const char* resname, SClass_ID type)

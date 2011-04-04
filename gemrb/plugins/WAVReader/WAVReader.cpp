@@ -189,5 +189,5 @@ bool WavPCMReader::Open(DataStream* stream)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x11BB1288, "WAV File Importer")
-PLUGIN_IE_RESOURCE(WavPCMReader, ".wav", (ieWord)IE_WAV_CLASS_ID)
+PLUGIN_IE_RESOURCE(WavPCMReader, "wav", (ieWord)IE_WAV_CLASS_ID)
 END_PLUGIN()

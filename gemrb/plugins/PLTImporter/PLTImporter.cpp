@@ -106,5 +106,5 @@ Sprite2D* PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x8D0C64F, "PLT File Importer")
-PLUGIN_IE_RESOURCE(PLTImporter, ".plt", (ieWord)IE_PLT_CLASS_ID)
+PLUGIN_IE_RESOURCE(PLTImporter, "plt", (ieWord)IE_PLT_CLASS_ID)
 END_PLUGIN()

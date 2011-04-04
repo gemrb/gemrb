@@ -14,32 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- *
  */
 
-#ifndef CACHEDFILESTREAM_H
-#define CACHEDFILESTREAM_H
+#ifndef FILECACHE_H
+#define FILECACHE_H
 
 #include "System/DataStream.h"
 
-#include "exports.h"
+GEM_EXPORT DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int  length = 0);
+GEM_EXPORT DataStream* CacheFile(const char* path);
 
-class GEM_EXPORT CachedFileStream : public DataStream// : public FileStream
-{
-private:
-	bool autoFree;
-	unsigned long startpos;
-	_FILE* str;
-public:
-	CachedFileStream(const char* stream, bool autoFree = true);
-	CachedFileStream(CachedFileStream* cfs, int startpos, int size,
-		bool autoFree = true);
-	~CachedFileStream(void);
-	int Read(void* dest, unsigned int length);
-	int Write(const void* src, unsigned int length);
-	int Seek(int pos, int startpos);
-	/** No descriptions */
-	int ReadLine(void* buf, unsigned int maxlen);
-};
 #endif

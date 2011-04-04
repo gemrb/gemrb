@@ -25,7 +25,7 @@
 
 #include "Holder.h"
 #include "ResourceManager.h"
-#include "System/FileStream.h"
+#include "System/VFS.h"
 
 class ImageMgr;
 

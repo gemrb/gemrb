@@ -30,7 +30,7 @@
 
 #include "win32def.h"
 
-#include "Compressor.h"
+#include "FileCache.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
@@ -77,45 +77,14 @@ bool BAMImporter::Open(DataStream* stream, bool autoFree)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "BAMCV1  ", 8 ) == 0) {
-		//Check if Decompressed file has already been Cached
-		char cpath[_MAX_PATH];
-		strcpy( cpath, core->CachePath );
-		strcat( cpath, stream->filename );
-		FILE* exist_in_cache = fopen( cpath, "rb" );
-		if (exist_in_cache) {
-			//File was previously cached, using local copy
-			if (autoFree) {
-				delete( str );
-			}
-			fclose( exist_in_cache );
-			FileStream* s = new FileStream();
-			s->Open( cpath );
-			str = s;
-			str->Read( Signature, 8 );
-		} else {
-			//No file found in Cache, Decompressing and storing for further use
-			str->Seek( 4, GEM_CURRENT_POS );
-
-			if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB )) {
-				printf( "No Compression Manager Available.\nCannot Load Compressed Bam File.\n" );
-				return false;
-			}
-			FILE* newfile = fopen( cpath, "wb" );
-			if (!newfile) {
-				printMessage("BAMImporter", " ", RED);
-				printf( "Cannot write %s.\n", cpath );
-				return false;
-			}
-			PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
-			comp->Decompress( newfile, str );
-			fclose( newfile );
-			if (autoFree)
-				delete( str );
-			FileStream* s = new FileStream();
-			s->Open( cpath );
-			str = s;
-			str->Read( Signature, 8 );
-		}
+		str->Seek( 4, GEM_CURRENT_POS );
+		DataStream* cached = CacheCompressedStream(stream, stream->filename);
+		if (autoFree)
+			delete str;
+		if (!cached)
+			return false;
+		str = cached;
+		str->Read( Signature, 8 );
 	}
 	if (strncmp( Signature, "BAM V1  ", 8 ) != 0) {
 		return false;

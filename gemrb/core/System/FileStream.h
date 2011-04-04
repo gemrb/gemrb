@@ -40,24 +40,31 @@
 
 class GEM_EXPORT FileStream : public DataStream {
 private:
-	bool autoFree;
-	unsigned long startpos;
-	_FILE* str;
+	struct File;
+	File* str;
 	bool opened, created;
 public:
 	FileStream(void);
 	~FileStream(void);
+	DataStream* Clone();
 
-	bool Open(const char* filename, bool autoFree = true);
-	bool Open(_FILE* stream, int startpos, int size, bool autoFree = false);
-	bool Modify(const char* filename, bool autoFree = true);
+	bool Open(const char* filename);
+	bool Modify(const char* filename);
 	bool Create(const char* folder, const char* filename, SClass_ID ClassID);
 	bool Create(const char* filename, SClass_ID ClassID);
+	bool Create(const char* filename);
 	int Read(void* dest, unsigned int length);
 	int Write(const void* src, unsigned int length);
 	int Seek(int pos, int startpos);
-	unsigned long GetStartPos() const;
-	int ReadLine(void* buf, unsigned int maxlen);
+public:
+	/** Opens the specifed file.
+	 *
+	 *  Returns NULL, if the file can't be opened.
+	 */
+	static FileStream* OpenFile(const char* filename);
+private:
+	void FindLength();
+	void Close();
 };
 
 #endif  // ! FILESTREAM_H
