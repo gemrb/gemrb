@@ -224,6 +224,7 @@ int Container::IsOpen() const
 
 void Container::TryPickLock(Actor *actor)
 {
+	core->PlaySound(DS_PICKLOCK);
 	if (LockDifficulty == 100) {
 		if (OpenFail != (ieDword)-1) {
 			displaymsg->DisplayStringName(OpenFail, 0xbcefbc, actor, IE_STR_SOUND|IE_STR_SPEECH);

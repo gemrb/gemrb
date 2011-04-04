@@ -345,6 +345,7 @@ void Highlightable::TryDisarm(Actor *actor)
 
 void Door::TryPickLock(Actor *actor)
 {
+	core->PlaySound(DS_PICKLOCK);
 	if (LockDifficulty == 100) {
 		if (OpenStrRef != (ieDword)-1) {
 			displaymsg->DisplayStringName(OpenStrRef, 0xbcefbc, actor, IE_STR_SOUND|IE_STR_SPEECH);
