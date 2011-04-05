@@ -7,14 +7,15 @@ endif(COMMAND cmake_policy)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 # prevent in-source builds
-IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+IF(NOT ${INSOURCEBUILD} AND ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 	MESSAGE(FATAL_ERROR "
 		CMake generation for this project is not allowed within the source directory!
-		Remove the CMakeCache.txt file and try again from another folder, e.g.:
-		  rm CMakeCache.txt
+		Remove the CMake cache files and try again from another folder, e.g.:
+		  rm -r CMakeCache.txt CMakeFiles/
 		  mkdir build
 		  cd build
-		  cmake .."
+		  cmake ..
+		If you really want an in-source build, pass -DINSOURCEBUILD=1"
 	)
 ENDIF()
 
