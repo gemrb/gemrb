@@ -44,7 +44,10 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 		}
 
 		PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
-		comp->Decompress(&out, stream, length);
+		if (comp->Decompress(&out, stream, length) != GEM_OK)
+			return NULL;
+	} else {
+		stream->Seek(length, GEM_CURRENT_POS);
 	}
 	return FileStream::OpenFile(path);
 }

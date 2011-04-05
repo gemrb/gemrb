@@ -61,6 +61,10 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 	do {
 		ieDword fnlen, complen, declen;
 		compressed->ReadDword( &fnlen );
+		if (!fnlen) {
+			printMessage("BIFImporter", "Corrupt Save Detected\n", RED);
+			return GEM_ERROR;
+		}
 		char* fname = ( char* ) malloc( fnlen );
 		compressed->Read( fname, fnlen );
 		strlwr(fname);
@@ -69,6 +73,8 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 		printf( "Decompressing %s\n", fname );
 		DataStream* cached = CacheCompressedStream(compressed, fname, complen);
 		free( fname );
+		if (!cached)
+			return GEM_ERROR;
 		delete cached;
 		Current = compressed->Remains();
 		//starting at 20% going up to 70%
