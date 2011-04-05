@@ -71,7 +71,7 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 		compressed->ReadDword( &declen );
 		compressed->ReadDword( &complen );
 		printf( "Decompressing %s\n", fname );
-		DataStream* cached = CacheCompressedStream(compressed, fname, complen);
+		DataStream* cached = CacheCompressedStream(compressed, fname, complen, true);
 		free( fname );
 		if (!cached)
 			return GEM_ERROR;

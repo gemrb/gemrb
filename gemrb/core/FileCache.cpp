@@ -23,7 +23,7 @@
 #include "System/FileStream.h"
 #include "System/VFS.h"
 
-DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int  length)
+DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int length, bool overwrite)
 {
 	if (!core->IsAvailable(PLUGIN_COMPRESSION_ZLIB)) {
 		printf( "No Compression Manager Available.\nCannot Load Compressed File.\n" );
@@ -35,7 +35,7 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 	char path[_MAX_PATH];
 	PathJoin(path, core->CachePath, fname, NULL);
 
-	if (!file_exists(path)) {
+	if (overwrite || !file_exists(path)) {
 		FileStream out;
 		if (!out.Create(path)) {
 			printMessage("FileCache", " ", RED);
