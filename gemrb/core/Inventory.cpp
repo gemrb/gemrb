@@ -641,14 +641,13 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 		if (ItemsAreCompatible( myslot, item )) {
 			//calculate with the max movable stock
 			int chunk = item->Usages[0];
-			int newamount = myslot->Usages[0]+chunk;
-			if (newamount>myslot->StackAmount) {
-				newamount=myslot->StackAmount;
-				chunk = item->Usages[0]-newamount;
+			if (myslot->Usages[0] + chunk > myslot->StackAmount) {
+				chunk = myslot->StackAmount - myslot->Usages[0];
 			}
 			if (!chunk) {
 				return -1;
 			}
+			assert(chunk > 0);
 			myslot->Flags |= IE_INV_ITEM_ACQUIRED;
 			myslot->Usages[0] = (ieWord) (myslot->Usages[0] + chunk);
 			item->Usages[0] = (ieWord) (item->Usages[0] - chunk);

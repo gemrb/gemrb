@@ -7384,17 +7384,8 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		//release it only when fully placed
 		if (res==ASI_SUCCESS) {
 			core->ReleaseDraggedItem ();
-		} else {
-			// res == ASI_PARTIAL
-			// swap the items, so the existing one ends up being filled;
-			// the items are the same, so we just need to adjust the usage count
-			int usages = slotitem->Usages[0];
-			CREItem *itm = actor->inventory.GetSlotItem(Slot);
-			if (itm) {
-				slotitem->Usages[0] = itm->Usages[0];
-				itm->Usages[0] = usages;
-			}
 		}
+		// res == ASI_PARTIAL
 		//EquipItem (in AddSlotItem) already called RefreshEffects
 		actor->ReinitQuickSlots();
 	//couldn't place item there, try swapping (only if slot is explicit)
