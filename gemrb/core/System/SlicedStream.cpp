@@ -53,10 +53,13 @@ int SlicedStream::Read(void* dest, unsigned int length)
 		return GEM_ERROR;
 	}
 
-	str->Seek(startpos + Pos, GEM_STREAM_START);
+	str->Seek(startpos + Pos + (Encrypted ? 2 : 0), GEM_STREAM_START);
 	unsigned int c = (unsigned int) str->Read(dest, length);
 	if (c != length) {
 		return GEM_ERROR;
+	}
+	if (Encrypted) {
+		ReadDecrypted( dest, c );
 	}
 	Pos += c;
 	return c;
