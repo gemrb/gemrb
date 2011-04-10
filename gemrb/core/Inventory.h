@@ -170,9 +170,9 @@ public:
 	ieWord Usages[CHARGE_COUNTERS];
 	ieDword Flags;
 	// 2 cached values from associated item. LEAVE IT SIGNED!
-	/** Weight of items in the stack */
+	/** Weight of each item in the stack */
 	int Weight;
-	/** Amount of items in this stack */
+	/** Maximum amount of items in this stack */
 	int StackAmount;
 
 	CREItem()
