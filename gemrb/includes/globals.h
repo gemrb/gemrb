@@ -173,7 +173,7 @@ extern unsigned char pl_lowercase[256];
 
 GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l);
 GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
-GEM_EXPORT void strnspccpy(char* d, const char *s, int l);
+GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
 #ifndef HAVE_STRNLEN
 GEM_EXPORT int strnlen(const char* string, int maxlen);
 #endif

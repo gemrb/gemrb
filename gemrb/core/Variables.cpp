@@ -500,7 +500,8 @@ void Variables::LoadInitialValues(const char* name)
 		// is it the type we want? if not, skip
 		if (strnicmp(buffer, name, 6)) continue;
 		// copy variable (types got 2 extra spaces, and the name is padded too)
-		strnspccpy(varname,buffer+8,32);
+		// (true = uppercase, needed for original engine save compat, see 315b8f2e)
+		strnspccpy(varname,buffer+8,32, true);
 		SetAt(varname, value);
 	}  
 }
