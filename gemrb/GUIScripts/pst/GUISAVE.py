@@ -168,8 +168,11 @@ def DeleteGameConfirm():
 	return
 
 def DeleteGameCancel():
+	global ConfirmWindow
+
 	if ConfirmWindow:
 		ConfirmWindow.Unload()
+		ConfirmWindow = None
 	SaveWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
