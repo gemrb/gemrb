@@ -299,11 +299,11 @@ def ConfirmedSaveGame ():
 	# We have to close floating window first
 	OpenSaveDetailWindow ()
 	LoadScreen.StartLoadScreen (LoadScreen.LS_TYPE_SAVING)
+	CloseSaveWindow ()
 	if Pos < len(Games):
 		GemRB.SaveGame (Games[Pos], Slotname)
 	else:
 		GemRB.SaveGame (None, Slotname)
-	CloseSaveWindow ()
 
 
 # Exit either back to game or to the Start window
