@@ -2701,7 +2701,7 @@ Sprite2D* GameControl::GetScreenshot(bool show_gui)
 //copies a downscaled screenshot into a sprite for save game preview
 Sprite2D* GameControl::GetPreview()
 {
-	// We get preview by first taking a screenshot of size 640x405,
+	// We get preview by first taking a screenshot of quintuple size of the preview control size (a few pixels bigger only in pst),
 	// centered in the display. This is to get a decent picture for
 	// higher screen resolutions.
 	// FIXME: how do orig games solve that?
@@ -2714,13 +2714,13 @@ Sprite2D* GameControl::GetPreview()
 	if (x < 0) {
 		x = 0;
 	} else {
-		w = 640;
+		w = 515;
 	}
 
 	if (y < 0) {
 		y = 0;
 	} else {
-		h = 405;
+		h = 385;
 	}
 
 	if (!x)

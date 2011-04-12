@@ -1555,8 +1555,8 @@ void SDLVideoDriver::SetDragCursor(Sprite2D* drag)
 
 Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 {
-	int Width = r.w ? r.w : disp->w;
-	int Height = r.h ? r.h : disp->h;
+	unsigned int Width = r.w ? r.w : disp->w;
+	unsigned int Height = r.h ? r.h : disp->h;
 	SDL_Rect src = {r.x, r.y, r.w, r.h};
 
 
@@ -1564,7 +1564,8 @@ Sprite2D* SDLVideoDriver::GetScreenshot( Region r )
 				0xFF0000, 0x00FF00, 0x0000FF, 0x000000 );
 	SDL_BlitSurface( backBuf, (r.w && r.h) ? &src : NULL, surf, NULL);
 	void* pixels = malloc( Width * Height * 3 );
-	memcpy( pixels, surf->pixels, Width * Height * 3 );
+	for (unsigned int y = 0; y < Height; y++)
+		memcpy( (char*)pixels+(Width * y * 3), (char*)surf->pixels+(surf->pitch * y), Width * 3 );
 	//freeing up temporary surface as we copied its pixels
 	Sprite2D* screenshot = CreateSprite( Width, Height, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000, pixels, false, 0 );
 	SDL_FreeSurface(surf);
