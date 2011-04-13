@@ -199,14 +199,14 @@ int DataStream::ReadLine(void* buf, unsigned int maxlen)
 	while (i < ( maxlen - 1 )) {
 		char ch;
 		Read(&ch, 1);
-		if (Pos == size)
-			break;
 		if (( ( char ) ch ) == '\n')
 			break;
 		if (( ( char ) ch ) == '\t')
 			ch = ' ';
 		if (( ( char ) ch ) != '\r')
 			p[i++] = ch;
+		if (Pos == size)
+			break;
 	}
 	p[i] = 0;
 	return i;
