@@ -120,9 +120,6 @@ def LoadGamePress():
 	LoadScreen.StartLoadScreen()
 	#loads savegame
 	GemRB.LoadGame(Games[Pos])
-	#performs conversion to ToB
-	if (GemRB.GetVar("oldgame")==0) and GemRB.GetVar("expansion")==1:
-		GemRB.GameSetExpansion()
 
 	#enters game
 	GemRB.EnterGame() #it will close windows, including the loadscreen
