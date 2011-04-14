@@ -106,8 +106,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 		ResourceHolder<ImageMgr> mos(MosFile);
 		if (mos != NULL) {
 			win->SetBackGround( mos->GetSprite2D(), true );
-		} else
-			printMessage( "CHUImporter","Cannot Load BackGround, skipping\n",YELLOW );
+		}
 	}
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		printMessage( "CHUImporter","No BAM Importer Available, skipping controls\n",LIGHT_RED );

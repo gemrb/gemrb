@@ -2941,8 +2941,6 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 		ResourceHolder<ImageMgr> mos(Background);
 		if (mos != NULL) {
 			win->SetBackGround( mos->GetSprite2D(), true );
-		} else {
-			printf( "[Core]: Cannot Load BackGround, skipping\n" );
 		}
 	}
 
