@@ -638,7 +638,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 		}
 
 		CREItem *myslot = Slots[slot];
-		if (ItemsAreCompatible( myslot, item )) {
+		if (myslot->StackAmount > 1 && ItemsAreCompatible(myslot, item)) {
 			//calculate with the max movable stock
 			int chunk = item->Usages[0];
 			if (myslot->Usages[0] + chunk > myslot->StackAmount) {
