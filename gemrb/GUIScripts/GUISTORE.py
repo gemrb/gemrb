@@ -119,6 +119,7 @@ def CloseStoreWindow ():
 	if Inventory:
 		GUIINV.OpenInventoryWindow ()
 	else:
+		GemRB.GamePause (0, 1)
 		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) #enabling the game control screen
 		GemRB.UnhideGUI () #enabling the other windows
 		GUICommonWindows.SetSelectionChangeHandler( None )
@@ -147,6 +148,8 @@ def OpenStoreWindow ():
 		Inventory = 1
 	else:
 		Inventory = None
+		# pause the game, so we don't get interrupted
+		GemRB.GamePause (1, 1)
 
 	GemRB.SetVar ("Action", 0)
 	if GUICommon.GameIsIWD2():
