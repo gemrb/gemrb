@@ -645,7 +645,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 				chunk = myslot->StackAmount - myslot->Usages[0];
 			}
 			if (!chunk) {
-				return -1;
+				return ASI_FAILED;
 			}
 			assert(chunk > 0);
 			myslot->Flags |= IE_INV_ITEM_ACQUIRED;
