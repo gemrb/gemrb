@@ -137,8 +137,8 @@ Targets *GameScript::Gabber(Scriptable* /*Sender*/, Targets *parameters, int ga_
 Targets *GameScript::LastTrigger(Scriptable *Sender, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();
-	if (Sender->LastTriggerObject) {
-		Actor *target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastTriggerObject);
+	if (Sender->LastTrigger) {
+		Actor *target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastTrigger);
 		parameters->AddTarget(target, 0, ga_flags);
 	}
 	return parameters;
@@ -252,7 +252,7 @@ Targets *GameScript::ProtectorOf(Scriptable *Sender, Targets *parameters, int ga
 		}
 	}
 	parameters->Clear();
-	if (actor) {
+	/*if (actor) {
 		ieWord tmp = actor->LastProtected;
 		Map *cm = Sender->GetCurrentArea();
 		int i = cm->GetActorCount(true);
@@ -261,6 +261,12 @@ Targets *GameScript::ProtectorOf(Scriptable *Sender, Targets *parameters, int ga
 			if (target && (target->LastProtected ==tmp) ) {
 				parameters->AddTarget(target, 0, ga_flags);
 			}
+		}
+	}*/
+	if (actor) {
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastProtector);
+		if (target) {
+			parameters->AddTarget(target, 0, ga_flags);
 		}
 	}
 	return parameters;
@@ -276,7 +282,7 @@ Targets *GameScript::ProtectedBy(Scriptable *Sender, Targets *parameters, int ga
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastProtected);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastProtectee);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -325,7 +331,7 @@ Targets *GameScript::LastAttackerOf(Scriptable *Sender, Targets *parameters, int
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHitter);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastAttacker);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -379,7 +385,7 @@ Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters, int
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTalkedTo);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTalker);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}

@@ -420,8 +420,6 @@ public:
 	/** returns true if no one moves */
 	bool EveryoneStopped() const;
 	bool EveryoneNearPoint(Map *map, const Point &p, int flags) const;
-	/** returns true if a PC just died */
-	int PartyMemberDied() const;
 	/** a party member just died now */
 	void PartyMemberDied(Actor *);
 	/** Increments chapter variable and refreshes kill stats */

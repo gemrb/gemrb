@@ -85,8 +85,9 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 	if (!originalTargetID) originalTargetID = tgt->GetGlobalID();
 	if (tgt->Type==ST_ACTOR) {
 		Actor *tar = (Actor *) tgt;
-		spk->LastTalkedTo=targetID;
-		tar->LastTalkedTo=speakerID;
+		// TODO: verify
+		spk->LastTalker=targetID;
+		tar->LastTalker=speakerID;
 		tar->SetCircleSize();
 	}
 	if (oldTarget) oldTarget->SetCircleSize();
