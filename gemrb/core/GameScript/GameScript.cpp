@@ -1825,7 +1825,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 					if (MySelf->GetInternalFlag()&IF_NOINT) {
 						// we presumably don't want any further execution?
 						if (done) *done = true;
-						return true;
+						return false;
 					}
 
 					if (lastAction==a) {
@@ -1834,7 +1834,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 						// interactions with Continue() (lastAction here is always
 						// the first block encountered), needs more testing
 						//if (done) *done = true;
-						return true;
+						return false;
 					}
 
 					//movetoobjectfollow would break if this isn't called
@@ -1852,11 +1852,11 @@ bool GameScript::Update(bool *continuing, bool *done)
 			if (continuing) *continuing = continueExecution;
 			if (!continueExecution) {
 				if (done) *done = true;
-				break;
+				return true;
 			}
 		}
 	}
-	return true;
+	return continueExecution;
 }
 
 //IE simply takes the first action's object for cutscene object
