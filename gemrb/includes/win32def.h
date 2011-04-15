@@ -63,6 +63,7 @@
 #ifndef HAVE_SNPRINTF
 # ifdef WIN32
 #  define snprintf _snprintf
+#  define vsnprintf _vsnprintf
 #  define HAVE_SNPRINTF 1
 # else
 #  include "System/snprintf.h"
@@ -84,5 +85,5 @@
 #define M_PI_2  1.57079632679489661923 // pi/2
 #endif
 
-#include "logging.h"
+#include "System/Logging.h"
 #endif  //! WIN32DEF_H

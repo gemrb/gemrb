@@ -27,10 +27,10 @@
 #define LOGGING_H
 
 #include "exports.h"
+#include "win32def.h"
 
 #ifdef ANDROID
 #	include <android/log.h>
-#	include "android_log_printf.h"
 #endif
 
 #ifdef WIN32
@@ -110,10 +110,12 @@ extern GEM_EXPORT HANDLE hConsole;
 #	define printStatus(status, color) printBracket(status, color); printf("\n")
 #	define printMessage(owner, message, color) printBracket(owner, LIGHT_WHITE); printf(": "); textcolor(color); printf("%s", message)
 #else
-#	define printf android_log_printf
+#	define printf print
 #	define printBracket(status, color)
 #	define printStatus(status, color) __android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s]", status)
 #	define printMessage(owner, message, color) __android_log_print(ANDROID_LOG_INFO, "GemRB", "%s: %s", owner, message)
 #endif
+
+GEM_EXPORT void print(const char* message, ...);
 
 #endif

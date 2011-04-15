@@ -102,6 +102,7 @@ libgemrb_core_la_SOURCES = \
 	SymbolMgr.cpp \
 	System/DataStream.cpp \
 	System/FileStream.cpp \
+	System/Logging.cpp \
 	System/SlicedStream.cpp \
 	System/VFS.cpp \
 	TableMgr.cpp \

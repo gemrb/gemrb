@@ -16,9 +16,39 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef IE_ANDROID_LOG_PRINTF_H
-#define IE_ANDROID_LOG_PRINTF_H
+#include "System/Logging.h"
 
-int android_log_printf(const char * fmt, ...);
+#include <cstdio>
+#include <cstdarg>
 
+#ifdef ANDROID
+#include <android/log.h>
 #endif
+
+void print(const char *message, ...)
+{
+	va_list ap;
+
+	va_start(ap, message);
+	int size = vsnprintf(NULL, 0, message, ap);
+	va_end(ap);
+
+	if (size < 0)
+		return;
+
+	char *buff = new char[size+1];
+	va_start(ap, message);
+	vsprintf(buff, message, ap);
+	va_end(ap);
+
+#if (!defined(WIN32) || defined(__MINGW32__)) && !defined(ANDROID)
+	// NOTE: We could do this without the allocation, but this path gets tested more.
+	printf("%s", buff);
+#elif defined(ANDROID)
+	__android_log_print(ANDROID_LOG_INFO, "print:", "%s", message);
+#else
+	cprintf("%s", message);
+#endif
+	free(buff);
+	va_end(ap);
+}
