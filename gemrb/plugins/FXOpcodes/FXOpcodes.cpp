@@ -5332,7 +5332,9 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	//check condition
 	switch(fx->Parameter2) {
 	case COND_GOTHIT: //on hit
-		condition = target->LastDamage;
+		// FIXME: test this
+		//condition = target->LastDamage;
+		condition = actor->MatchTrigger(trigger_hitby);
 		break;
 	case COND_NEAR: //
 		condition = PersonalDistance(actor, target)<30;
@@ -5353,6 +5355,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		condition = actor->GetStat(IE_STATE_ID) & STATE_POISONED;
 		break;
 	case COND_ATTACKED: // once per round
+		// FIXME: what's this meant to do?
 		condition = actor->LastHitter;
 		break;
 	case COND_NEAR4: // closer than 4'
@@ -5365,7 +5368,9 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		condition = 1;
 		break;
 	case COND_TOOKDAMAGE:
-		condition = actor->LastDamage;
+		// FIXME: test this
+		//condition = actor->LastDamage;
+		condition = actor->MatchTrigger(trigger_tookdamage);
 		break;
 	default:
 		condition = 0;

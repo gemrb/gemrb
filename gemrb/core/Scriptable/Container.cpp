@@ -235,12 +235,12 @@ void Container::TryPickLock(Actor *actor)
 	}
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
-		LastPickLockFailed = actor->GetGlobalID();
+		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
 		return;
 	}
 	SetContainerLocked(false);
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
-	LastUnlocked = actor->GetGlobalID();
+	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	ImmediateEvent();
 	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
 	Game *game = core->GetGame();
@@ -263,7 +263,7 @@ void Container::TryBashLock(Actor *actor)
 	displaymsg->DisplayConstantStringName(STR_CONTBASH_DONE, 0xd7d7be, actor);
 	SetContainerLocked(false);
 	//Is this really useful ?
-	LastUnlocked = actor->GetGlobalID();
+	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	ImmediateEvent();
 }
 

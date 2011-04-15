@@ -333,22 +333,10 @@ Actor::Actor()
 	LongStrRef = (ieStrRef) -1;
 	ShortStrRef = (ieStrRef) -1;
 
-	LastProtected = 0;
-	LastFollowed = 0;
-	LastCommander = 0;
-	LastHelp = 0;
-	LastSeen = 0;
-	LastMarked = 0;
-	LastMarkedSpell = 0;
-	LastHeard = 0;
 	PCStats = NULL;
-	LastCommand = 0; //used by order
-	LastShout = 0; //used by heard
-	LastDamage = 0;
+	//LastDamage = 0;
 	LastDamageType = 0;
-	LastTurner = 0;
 	LastExit = 0;
-	HotKey = 0;
 	attackcount = 0;
 	secondround = 0;
 	attacksperround = 0;
@@ -2690,7 +2678,9 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	}
 
 	//add lastdamagetype up ? maybe
+	//FIXME: what does original do?
 	LastDamageType|=damagetype;
+	AddTrigger(TriggerEntry(trigger_hitby, hitter->GetGlobalID()));
 	if(hitter && hitter->Type==ST_ACTOR) {
 		LastHitter=hitter->GetGlobalID();
 	} else {
@@ -2749,6 +2739,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 		if (Modified[IE_CLASS] == CLASS_INNOCENT) {
 			Actor *act=NULL;
 			if (!hitter) {
+				// TODO: check this
 				hitter = area->GetActorByGlobalID(LastHitter);
 			}
 
@@ -2764,7 +2755,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 		}
 	}
 
-	LastDamage=damage;
+	//LastDamage=damage;
 	InternalFlags|=IF_ACTIVE;
 	int chp = (signed) BaseStats[IE_HITPOINTS];
 	int damagelevel = 0;
@@ -3002,7 +2993,7 @@ void Actor::DebugDump()
 	}
 	printf( "\nWaitCounter: %d\n", (int) GetWait());
 	printf( "LastTarget: %d %s\n", LastTarget, GetActorNameByID(LastTarget));
-	printf( "LastTalked: %d %s\n", LastTalkedTo, GetActorNameByID(LastTalkedTo));
+	printf( "LastTalked: %d %s\n", LastTalker, GetActorNameByID(LastTalker));
 	inventory.dump();
 	spellbook.dump();
 	fxqueue.dump();
@@ -3231,7 +3222,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 	if (Modified[IE_GENERAL]!=GEN_UNDEAD) {
 		level = GetPaladinLevel();
 		if (evilcleric && level) {
-			LastTurner = cleric->GetGlobalID();
+			AddTrigger(TriggerEntry(trigger_turnedby, cleric->GetGlobalID()));
 			if (turnlevel >= level+TURN_DEATH_LVL_MOD) {
 				if (gamedata->Exists("panic", IE_SPL_CLASS_ID)) {
 					core->ApplySpell("panic", this, cleric, level);
@@ -3246,7 +3237,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 
 	//determine alignment (if equals, then no turning)
 
-	LastTurner = cleric->GetGlobalID();
+	AddTrigger(TriggerEntry(trigger_turnedby, cleric->GetGlobalID()));
 
 	//determine panic or destruction/control
 	//we get the modified level
@@ -3356,6 +3347,7 @@ void Actor::Die(Scriptable *killer)
 
 	Actor *act=NULL;
 	if (!killer) {
+		// TODO: is this right?
 		killer = area->GetActorByGlobalID(LastHitter);
 	}
 
@@ -3549,10 +3541,9 @@ bool Actor::CheckOnDeath()
 	if (InternalFlags&IF_CLEANUP) {
 		return true;
 	}
-	if (InternalFlags&IF_JUSTDIED) {
-		if (lastRunTime == 0 || CurrentAction || GetNextAction()) {
-			return false; //actor is currently dying, let him die first
-		}
+	// FIXME
+	if (InternalFlags&IF_JUSTDIED || CurrentAction || GetNextAction()) {
+		return false; //actor is currently dying, let him die first
 	}
 	if (!(InternalFlags&IF_REALLYDIED) ) {
 		return false;
@@ -4165,6 +4156,7 @@ int Actor::GetAttackStyle() const
 
 void Actor::AttackedBy( Actor *attacker)
 {
+	AddTrigger(TriggerEntry(trigger_attackedby, attacker->GetGlobalID()));
 	LastAttacker = attacker->GetGlobalID();
 }
 
@@ -4183,7 +4175,7 @@ void Actor::StopAttack()
 {
 	SetStance(IE_ANI_READY);
 	secondround = 0;
-	InternalFlags|=IF_TARGETGONE; //this is for the trigger!
+	//InternalFlags|=IF_TARGETGONE; //this is for the trigger!
 	if (InParty) {
 		core->Autopause(AP_NOTARGET);
 	}
@@ -5159,7 +5151,7 @@ bool Actor::ShouldHibernate() {
 		return false;
 	if (LastTarget) //currently attacking someone
 		return false;
-	if (!lastRunTime) // haven't had a chance to run a script
+	if (InternalFlags&IF_JUSTDIED) // didn't have a chance to run a script
 		return false;
 	if (CurrentAction)
 		return false;
@@ -6882,7 +6874,7 @@ void Actor::CureInvisibility()
 
 		//not sure, but better than nothing
 		if (! (Modified[IE_STATE_ID]&state_invisible)) {
-			InternalFlags|=IF_BECAMEVISIBLE;
+			AddTrigger(TriggerEntry(trigger_becamevisible));
 		}
 	}
 }

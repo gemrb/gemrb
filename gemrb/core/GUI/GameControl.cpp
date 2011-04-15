@@ -271,7 +271,8 @@ void GameControl::CreateMovement(Actor *actor, const Point &p)
 
 	actor->AddAction( action );
 	// force action so that we get target recticles immediately
-	actor->ProcessActions(true);
+	// FIXME
+	actor->ProcessActions();
 }
 
 GameControl::~GameControl(void)
@@ -1811,6 +1812,8 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 
 	switch(trap->Type) {
 		case ST_TRAVEL:
+			trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
+			trap->LastTrigger = actor->GetGlobalID(); // FIXME
 			actor->UseExit(trap->GetGlobalID());
 			return false;
 		case ST_TRIGGER:
@@ -1822,11 +1825,14 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			//reset trap and deactivated flags
 			if (trap->Scripts[0]) {
 				if (!(trap->Flags&TRAP_DEACTIVATED) ) {
-					trap->LastTriggerObject = trap->LastTrigger = actor->GetGlobalID();
+					trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
+					trap->LastTrigger = actor->GetGlobalID(); // FIXME
 					trap->ImmediateEvent();
 					//directly feeding the event, even if there are actions in the queue
-					trap->Scripts[0]->Update();
-					trap->ProcessActions(true);
+					//trap->Scripts[0]->Update();
+					// FIXME
+					trap->ExecuteScript(1);
+					trap->ProcessActions();
 					//if reset trap flag not set, deactivate it
 					//hmm, better not, info triggers don't deactivate themselves on click
 					//if (!(trap->Flags&TRAP_RESET)) {

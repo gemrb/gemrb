@@ -35,6 +35,7 @@
 #include "TileMap.h"
 #include "Video.h"
 #include "GameScript/GSUtils.h"
+#include "GameScript/Matching.h" // MatchActor
 #include "GUI/GameControl.h"
 #include "Scriptable/InfoPoint.h"
 
@@ -60,49 +61,59 @@ Scriptable::Scriptable(ScriptableType type)
 	textDisplaying = 0;
 	timeStartDisplaying = 0;
 	scriptName[0] = 0;
-	TriggerID = 0; //used by SendTrigger
-	LastTriggerObject = LastTrigger = 0;
-	LastEntered = 0;
-	LastDisarmed = 0;
-	LastDisarmFailed = 0;
-	LastUnlocked = 0;
-	LastOpenFailed = 0;
-	LastPickLockFailed = 0;
+
+	LastAttacker = 0;
+	LastCommander = 0;
+	LastProtector = 0;
+	LastProtectee = 0;
+	LastTargetedBy = 0;
+	LastHitter = 0;
+	LastHelp = 0;
+	LastTrigger = 0;
+	LastSeen = 0;
+	LastTalker = 0;
+	LastHeard = 0;
+	LastSummoner = 0;
+	LastFollowed = 0;
+	LastMarked = 0;
+	LastMarkedSpell = 0;
+
 	DialogName = 0;
 	CurrentAction = NULL;
 	CurrentActionState = 0;
 	CurrentActionTarget = 0;
 	CurrentActionInterruptable = true;
+	CurrentActionTicks = 0;
 	UnselectableTimer = 0;
-	startTime = 0;   //executing scripts
-	lastRunTime = 0; //evaluating scripts
-	lastDelay = 0;
+	Ticks = 0;
+	AdjustedTicks = 0;
+	ScriptTicks = 0;
+	IdleTicks = 0;
+	TriggerCountdown = 0;
 	Dialog[0] = 0;
 
 	globalID = ++globalActorCounter;
 
-	interval = ( 1000 / AI_UPDATE_TIME );
 	WaitCounter = 0;
 	if (Type == ST_ACTOR) {
-		InternalFlags = IF_VISIBLE | IF_ONCREATION | IF_USEDSAVE;
+		InternalFlags = IF_VISIBLE | IF_USEDSAVE;
 	} else {
-		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_ONCREATION | IF_NOINT;
+		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_NOINT;
 	}
 	area = 0;
 	Pos.x = 0;
 	Pos.y = 0;
 
-	LastCasterOnMe = 0;
 	LastSpellOnMe = 0xffffffff;
-	LastCasterSeen = 0;
-	LastSpellSeen = 0xffffffff;
 	SpellHeader = -1;
 	SpellResRef[0] = 0;
+	LastTarget = 0;
 	LastTargetPos.empty();
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
 	locals->ParseKey( 1 );
 	InitTriggers();
+	AddTrigger(TriggerEntry(trigger_oncreation));
 
 	memset( script_timers,0, sizeof(script_timers));
 }
@@ -270,12 +281,13 @@ void Scriptable::DrawOverheadText(const Region &screen)
 
 void Scriptable::DelayedEvent()
 {
-	lastRunTime = core->GetGame()->Ticks;
+	// FIXME: do we need this?
+	// lastRunTime = core->GetGame()->Ticks;
 }
 
 void Scriptable::ImmediateEvent()
 {
-	lastRunTime = 0;
+	InternalFlags |= IF_FORCEUPDATE;
 }
 
 bool Scriptable::IsPC() const
@@ -286,6 +298,62 @@ bool Scriptable::IsPC() const
 		}
 	}
 	return false;
+}
+
+void Scriptable::Update()
+{
+	Ticks++;
+	AdjustedTicks++;
+
+	TickScripting();
+
+	ProcessActions();
+}
+
+void Scriptable::TickScripting()
+{
+	// Stagger script updates.
+	if (Ticks % 16 != globalID % 16)
+		return;
+
+	ieDword actorState = 0;
+	if (Type == ST_ACTOR)
+		actorState = ((Actor *)this)->Modified[IE_STATE_ID];
+
+	// Dead actors only get one chance to run a new script.
+	if ((actorState & STATE_DEAD) && !(InternalFlags & IF_JUSTDIED))
+		return;
+
+	ScriptTicks++;
+
+	// If no action is running, we've had triggers set recently or we haven't checked recently, do a script update.
+	bool needsUpdate = (!CurrentAction) || (TriggerCountdown > 0) || (IdleTicks > 15);
+
+	// Also do a script update if one was forced..
+	if (InternalFlags & IF_FORCEUPDATE) {
+		needsUpdate = true;
+		InternalFlags &= ~IF_FORCEUPDATE;
+	}
+	// TODO: force for all on-screen actors
+
+	// Charmed actors don't get frequent updates.
+	if ((actorState & STATE_CHARMED) && (IdleTicks < 5))
+		needsUpdate = false;
+
+	if (!needsUpdate) {
+		IdleTicks++;
+		return;
+	}
+
+	if (triggers.size())
+		TriggerCountdown = 5;
+	IdleTicks = 0;
+	InternalFlags &= ~IF_JUSTDIED;
+	if (TriggerCountdown > 0)
+		TriggerCountdown--;
+	// TODO: set TriggerCountdown once we have real triggers
+
+	ExecuteScript(MAX_SCRIPTS);
 }
 
 void Scriptable::ExecuteScript(int scriptCount)
@@ -309,20 +377,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 		return;
 	}
 
-	// only allow death scripts to run once, hopefully?
-	// this is probably terrible logic which needs moving elsewhere
-	if ((lastRunTime != 0) && (InternalFlags & IF_JUSTDIED)) {
-		return;
-	}
 	bool changed = false;
-
-	ieDword thisTime = core->GetGame()->Ticks;
-	if (( thisTime - lastRunTime ) < 1000) {
-		return;
-	}
-
-	lastDelay = lastRunTime;
-	lastRunTime = thisTime;
 
 	// if party AI is disabled, don't run non-override scripts
 	if (Type == ST_ACTOR && ((Actor *) this)->InParty && (core->GetGame()->ControlStatus & CS_PARTY_AI))
@@ -339,6 +394,8 @@ void Scriptable::ExecuteScript(int scriptCount)
 		/* scripts are not concurrent, see WAITPC override script for example */
 		if (done) break;
 	}
+
+	// FIXME: completely wrong place for this!
 	if (changed && UnselectableTimer) {
 			UnselectableTimer--;
 			if (!UnselectableTimer) {
@@ -433,16 +490,11 @@ void Scriptable::ReleaseCurrentAction()
 	CurrentActionState = 0;
 	CurrentActionTarget = 0;
 	CurrentActionInterruptable = true;
+	CurrentActionTicks = 0;
 }
 
-void Scriptable::ProcessActions(bool force)
+void Scriptable::ProcessActions()
 {
-	unsigned long thisTime = core->GetGame()->Ticks;
-
-	if (!force && (( thisTime - startTime ) < interval)) {
-		return;
-	}
-	startTime = thisTime;
 	if (WaitCounter) {
 		WaitCounter--;
 		if (WaitCounter) return;
@@ -452,6 +504,8 @@ void Scriptable::ProcessActions(bool force)
 		CurrentActionInterruptable = true;
 		if (!CurrentAction) {
 			CurrentAction = PopNextAction();
+		} else {
+			CurrentActionTicks++;
 		}
 		if (!CurrentAction) {
 			ClearActions();
@@ -472,9 +526,10 @@ void Scriptable::ProcessActions(bool force)
 			break;
 		}
 	}
-	if (InternalFlags&IF_IDLE) {
+	// FIXME
+	/*if (InternalFlags&IF_IDLE) {
 		Deactivate();
-	}
+	}*/
 }
 
 bool Scriptable::InMove() const
@@ -498,7 +553,7 @@ unsigned long Scriptable::GetWait() const
 
 void Scriptable::LeaveDialog()
 {
-	InternalFlags |=IF_WASINDIALOG;
+	AddTrigger(TriggerEntry(trigger_wasindialog));
 }
 
 void Scriptable::Hide()
@@ -538,7 +593,8 @@ void Scriptable::Activate()
 
 void Scriptable::PartyRested()
 {
-	InternalFlags |=IF_PARTYRESTED;
+	//InternalFlags |=IF_PARTYRESTED;
+	AddTrigger(TriggerEntry(trigger_partyrested));
 }
 
 ieDword Scriptable::GetInternalFlag()
@@ -548,13 +604,14 @@ ieDword Scriptable::GetInternalFlag()
 
 void Scriptable::InitTriggers()
 {
-	tolist.clear();
-	bittriggers = 0;
+	//tolist.clear();
+	//bittriggers = 0;
+	triggers.clear();
 }
 
 void Scriptable::ClearTriggers()
 {
-	for (TriggerObjects::iterator m = tolist.begin(); m != tolist.end (); m++) {
+	/*for (TriggerObjects::iterator m = tolist.begin(); m != tolist.end (); m++) {
 		*(*m) = 0;
 	}
 	if (!bittriggers) {
@@ -577,18 +634,47 @@ void Scriptable::ClearTriggers()
 	}
 	if (bittriggers & BT_PARTYRESTED) {
 		InternalFlags &= ~IF_PARTYRESTED;
-	}
+	}*/
 	InitTriggers();
 }
 
-void Scriptable::SetBitTrigger(ieDword bittrigger)
+/*void Scriptable::SetBitTrigger(ieDword bittrigger)
 {
 	bittriggers |= bittrigger;
+}*/
+
+void Scriptable::AddTrigger(TriggerEntry trigger)
+{
+	triggers.push_back(trigger);
+	ImmediateEvent();
 }
 
-void Scriptable::AddTrigger(ieDword *actorref)
-{
-	tolist.push_back(actorref);
+bool Scriptable::MatchTrigger(unsigned short id, ieDword param) {
+	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
+		TriggerEntry &trigger = *m;
+		if (trigger.triggerID != id)
+			continue;
+		if (param && trigger.param1 != param)
+			continue;
+		return true;
+	}
+
+	return false;
+}
+
+bool Scriptable::MatchTriggerWithObject(unsigned short id, class Object *obj, ieDword param) {
+	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
+		TriggerEntry &trigger = *m;
+		if (trigger.triggerID != id)
+			continue;
+		if (param && trigger.param2 != param)
+			continue;
+		if (!MatchActor(this, trigger.param1, obj))
+			continue;
+		return true;
+	}
+
+	return false;
 }
 
 static EffectRef fx_set_invisible_state_ref = { "State:Invisible", -1 };
@@ -775,8 +861,8 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 
 		if(LastTarget) {
 			if (target && (Type==ST_ACTOR) ) {
+				target->AddTrigger(TriggerEntry(trigger_spellcastonme, caster->GetGlobalID(), spellnum));
 				target->LastSpellOnMe = spellnum;
-				target->LastCasterOnMe = caster->GetGlobalID();
 				// don't cure invisibility if this is a self targetting invisibility spell
 				// like shadow door
 				//can't check GetEffectBlock, since it doesn't construct the queue for selftargetting spells
@@ -1493,7 +1579,9 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 	if (!Scripts[0] && !EnterWav[0]) {
 		return false;
 	}
-	LastTriggerObject = LastTrigger = LastEntered = ID;
+	AddTrigger(TriggerEntry(trigger_entered, ID));
+	// TODO: correct?
+	//LastTriggerObject = LastTrigger = LastEntered = ID;
 	ImmediateEvent();
 	if (!TrapResets()) {
 		Trapped = false;

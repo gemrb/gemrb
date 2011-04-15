@@ -252,14 +252,14 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 		area->JumpActors(true);
 	}
 	if (Open) {
-		LastEntered = ID; //used as lastOpener
+		AddTrigger(TriggerEntry(trigger_opened, ID));
 
 		// in PS:T, opening a door does not unlock it
 		if (!core->HasFeature(GF_REVERSE_DOOR)) {
 			SetDoorLocked(false,playsound);
 		}
 	} else {
-		LastTriggerObject = LastTrigger = ID; //used as lastCloser
+		AddTrigger(TriggerEntry(trigger_closed, ID));
 	}
 	ToggleTiles(Open, playsound);
 	//synchronising other data with the door state
@@ -325,11 +325,10 @@ void Highlightable::TryDisarm(Actor *actor)
 {
 	if (!Trapped || !TrapDetected) return;
 
-	LastTriggerObject = LastTrigger = actor->GetGlobalID();
 	int skill = actor->GetStat(IE_TRAPS);
 
 	if (skill/2+core->Roll(1,skill/2,0)>TrapRemovalDiff) {
-		LastDisarmed = actor->GetGlobalID();
+		AddTrigger(TriggerEntry(trigger_disarmed, actor->GetGlobalID()));
 		//trap removed
 		Trapped = 0;
 		displaymsg->DisplayConstantStringName(STR_DISARM_DONE, 0xd7d7be, actor);
@@ -338,7 +337,7 @@ void Highlightable::TryDisarm(Actor *actor)
 		game->ShareXP(xp, SX_DIVIDE);
 	} else {
 		displaymsg->DisplayConstantStringName(STR_DISARM_FAIL, 0xd7d7be, actor);
-		TriggerTrap(skill, LastTrigger);
+		TriggerTrap(skill, actor->GetGlobalID());
 	}
 	ImmediateEvent();
 }
@@ -356,12 +355,12 @@ void Door::TryPickLock(Actor *actor)
 	}
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
-		LastPickLockFailed = actor->GetGlobalID();
+		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
 		return;
 	}
 	SetDoorLocked( false, true);
 	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
-	LastUnlocked = actor->GetGlobalID();
+	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	ImmediateEvent();
 	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
 	Game *game = core->GetGame();
@@ -384,7 +383,7 @@ void Door::TryBashLock(Actor *actor)
 	displaymsg->DisplayConstantStringName(STR_DOORBASH_DONE, 0xd7d7be, actor);
 	SetDoorLocked(false, true);
 	//Is this really useful ?
-	LastUnlocked = actor->GetGlobalID();
+	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	ImmediateEvent();
 }
 

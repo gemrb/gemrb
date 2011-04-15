@@ -475,7 +475,7 @@ void Game::SetHotKey(unsigned long Key)
 		Actor *actor = *m;
 
 		if (actor->IsSelected()) {
-			actor->HotKey = (ieDword) Key;
+			actor->AddTrigger(TriggerEntry(trigger_hotkey, (ieDword) Key));
 		}
 	}
 }
@@ -1124,17 +1124,6 @@ void Game::PartyMemberDied(Actor *actor)
 	}
 }
 
-//reports if someone died
-int Game::PartyMemberDied() const
-{
-	for (unsigned int i=0; i<PCs.size(); i++) {
-		if (PCs[i]->GetInternalFlag()&IF_JUSTDIED) {
-			return i;
-		}
-	}
-	return -1;
-}
-
 void Game::IncrementChapter()
 {
 	//chapter first set to 0 (prologue)
@@ -1286,7 +1275,7 @@ bool Game::EveryoneDead() const
 void Game::UpdateScripts()
 {
 	ExecuteScript( 1 );
-	ProcessActions(false);
+	ProcessActions();
 	size_t idx;
 
 	PartyAttack = false;

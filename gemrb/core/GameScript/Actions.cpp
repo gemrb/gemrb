@@ -4600,10 +4600,11 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		//noticed attempt
 		displaymsg->DisplayConstantString(STR_PICKPOCKET_FAIL,0xffffff);
 		if (core->HasFeature(GF_STEAL_IS_ATTACK) ) {
-			tar->LastAttacker = snd->GetGlobalID();
+			tar->AddTrigger(TriggerEntry(trigger_attackedby, snd->GetGlobalID()));
+			tar->LastAttacker = snd->GetGlobalID(); // FIXME
 		} else {
 			//pickpocket failed trigger
-			tar->LastOpenFailed = snd->GetGlobalID();
+			tar->AddTrigger(TriggerEntry(trigger_pickpocketfailed, snd->GetGlobalID()));
 		}
 		Sender->ReleaseCurrentAction();
 		return;
@@ -4911,7 +4912,7 @@ void GameScript::SendTrigger(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	tar->TriggerID=parameters->int0Parameter;
+	tar->AddTrigger(TriggerEntry(trigger_trigger, parameters->int0Parameter));
 }
 
 void GameScript::Shout( Scriptable* Sender, Action* parameters)
@@ -4957,8 +4958,7 @@ void GameScript::GiveOrder(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (tar) {
-		tar->LastOrderer = Sender->GetGlobalID();
-		tar->LastOrder = parameters->int0Parameter;
+		tar->AddTrigger(TriggerEntry(trigger_receivedorder, Sender->GetGlobalID(), parameters->int0Parameter));
 	}
 }
 
@@ -6227,9 +6227,10 @@ void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 		printf("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
 		return;
 	}
-	ip->LastEntered = 0;
+	// FIXME: what does this do? clear triggers?
+	/*ip->LastEntered = 0;
 	ip->LastTrigger = 0;
-	ip->LastTriggerObject = 0;
+	ip->LastTriggerObject = 0;*/
 }
 
 void GameScript::UseDoor(Scriptable* Sender, Action* parameters)
@@ -6794,7 +6795,8 @@ void GameScript::ProtectObject(Scriptable* Sender, Action* parameters)
 	Actor *scr = (Actor *)Sender;
 	Actor *actor = (Actor *)tar;
 	scr->LastFollowed = actor->GetGlobalID();
-	scr->LastProtected = actor->GetGlobalID();
+	scr->LastProtectee = actor->GetGlobalID();
+	actor->LastProtector = scr->GetGlobalID();
 	//not exactly range
 	scr->FollowOffset.x = parameters->int0Parameter;
 	scr->FollowOffset.y = parameters->int0Parameter;

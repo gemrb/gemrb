@@ -1863,22 +1863,22 @@ int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx)
 	switch (fx->Parameter2)
 	{
 	case 0: //command
-		target->LastTurner = Owner->GetGlobalID();
+		target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
 		target->Panic(Owner, PANIC_RUNAWAY);
 		break;
 	case 1://rebuke
+		target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
 		if (target->SetSpellState(SS_REBUKED)) {
 			//display string rebuked
 		}
 		STAT_SUB(IE_ARMORCLASS,4);
-		target->LastTurner = Owner->GetGlobalID();
 		break;
 	case 2://destroy
-		target->LastTurner = Owner->GetGlobalID();
+		target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
 		target->Die(Owner);
 		break;
 	case 3://panic
-		target->LastTurner = Owner->GetGlobalID();
+		target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
 		target->Panic(Owner, PANIC_RUNAWAY);
 		break;
 	default://depends on caster

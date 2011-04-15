@@ -811,20 +811,12 @@ int GameScript::GlobalTimerStarted(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::WasInDialog(Scriptable* Sender, Trigger* /*parameters*/)
 {
-	if (Sender->GetInternalFlag()&IF_WASINDIALOG) {
-		Sender->SetBitTrigger(BT_WASINDIALOG);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTrigger(trigger_wasindialog);
 }
 
 int GameScript::OnCreation(Scriptable* Sender, Trigger* /*parameters*/)
 {
-	if (Sender->GetInternalFlag()&IF_ONCREATION) {
-		Sender->SetBitTrigger(BT_ONCREATION);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTrigger(trigger_oncreation);
 }
 
 int GameScript::NumItemsParty(Scriptable* /*Sender*/, Trigger* parameters)
@@ -1549,16 +1541,12 @@ int GameScript::Or(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::TriggerTrigger(Scriptable* Sender, Trigger* parameters)
 {
-	if(Sender->TriggerID==(ieDword) parameters->int0Parameter) {
-		Sender->AddTrigger (&Sender->TriggerID);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTrigger(trigger_trigger, parameters->int0Parameter);
 }
 
 int GameScript::WalkedToTrigger(Scriptable* Sender, Trigger* parameters)
 {
-	Actor *target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastTrigger);
+	/*Actor *target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastTrigger);
 	if (!target) {
 		return 0;
 	}
@@ -1575,293 +1563,72 @@ int GameScript::WalkedToTrigger(Scriptable* Sender, Trigger* parameters)
 		Sender->AddTrigger (&Sender->LastTrigger);
 		return 1;
 	}
-	return 0;
+	return 0;*/
+	return Sender->MatchTriggerWithObject(trigger_walkedtotrigger, parameters->objectParameter);
 }
 
 int GameScript::Clicked(Scriptable* Sender, Trigger* parameters)
 {
-	//now objects suicide themselves if they are empty objects
-	//so checking an empty object is easier
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastTrigger) {
-			Sender->AddTrigger (&Sender->LastTrigger);
-			return 1;
-		}
-		return 0;
-	}
-	if (MatchActor(Sender, Sender->LastTrigger, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastTrigger);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_clicked, parameters->objectParameter);
 }
 
 int GameScript::Disarmed(Scriptable* Sender, Trigger* parameters)
 {
-	switch(Sender->Type) {
-		case ST_DOOR: case ST_CONTAINER: case ST_PROXIMITY:
-			break;
-		default:
-			return 0;
-	}
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastDisarmed) {
-			Sender->AddTrigger (&Sender->LastDisarmed);
-			return 1;
-		}
-		return 0;
-	}
-	if (MatchActor(Sender, Sender->LastDisarmed, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastDisarmed);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_disarmed, parameters->objectParameter);
 }
 
 //stealing from a store failed, owner triggered
 int GameScript::StealFailed(Scriptable* Sender, Trigger* parameters)
 {
-	switch(Sender->Type) {
-		case ST_ACTOR:
-			break;
-		default:
-			return 0;
-	}
-	// maybe check if Sender is a shopkeeper???
-
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastDisarmFailed) {
-			Sender->AddTrigger (&Sender->LastDisarmFailed);
-			return 1;
-		}
-		return 0;
-	}
-	if (MatchActor(Sender, Sender->LastDisarmFailed, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastDisarmFailed);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_disarmfailed, parameters->objectParameter);
 }
 
 int GameScript::PickpocketFailed(Scriptable* Sender, Trigger* parameters)
 {
-	switch(Sender->Type) {
-		case ST_ACTOR:
-			break;
-		default:
-			return 0;
-	}
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastOpenFailed) {
-			Sender->AddTrigger (&Sender->LastOpenFailed);
-			return 1;
-		}
-		return 0;
-	}
-	if (MatchActor(Sender, Sender->LastOpenFailed, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastOpenFailed);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_pickpocketfailed, parameters->objectParameter);
 }
 
 int GameScript::PickLockFailed(Scriptable* Sender, Trigger* parameters)
 {
-	switch(Sender->Type) {
-		case ST_DOOR: case ST_CONTAINER:
-			break;
-		default:
-			return 0;
-	}
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastPickLockFailed) {
-			Sender->AddTrigger (&Sender->LastPickLockFailed);
-			return 1;
-		}
-		return 0;
-	}
-	if (MatchActor(Sender, Sender->LastPickLockFailed, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastPickLockFailed);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_picklockfailed, parameters->objectParameter);
 }
 
 int GameScript::OpenFailed(Scriptable* Sender, Trigger* parameters)
 {
-	switch(Sender->Type) {
-		case ST_DOOR: case ST_CONTAINER:
-			break;
-		default:
-			return 0;
-	}
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastOpenFailed) {
-			Sender->AddTrigger (&Sender->LastOpenFailed);
-			return 1;
-		}
-		return 0;
-	}
-	if (MatchActor(Sender, Sender->LastOpenFailed, parameters->objectParameter
-)) {
-		Sender->AddTrigger (&Sender->LastOpenFailed);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_failedtoopen, parameters->objectParameter);
 }
 
 int GameScript::DisarmFailed(Scriptable* Sender, Trigger* parameters)
 {
-	switch(Sender->Type) {
-		case ST_DOOR: case ST_CONTAINER: case ST_PROXIMITY:
-			break;
-		default:
-			return 0;
-	}
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastDisarmFailed) {
-			Sender->AddTrigger (&Sender->LastDisarmFailed);
-			return 1;
-		}
-		return 0;
-	}
-	if (MatchActor(Sender, Sender->LastDisarmFailed, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastDisarmFailed);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_disarmfailed, parameters->objectParameter);
 }
 
 //opened for doors/containers (using lastEntered)
 int GameScript::Opened(Scriptable* Sender, Trigger* parameters)
 {
-	Door *door;
-
-	switch (Sender->Type) {
-		case ST_DOOR:
-			door = (Door *) Sender;
-			if (!door->IsOpen()) {
-				return 0;
-			}
-			break;
-		case ST_CONTAINER:
-			break;
-		default:
-			return 0;
-	}
-
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastEntered) {
-			Sender->AddTrigger (&Sender->LastEntered);
-			return 1;
-		}
-		return 0;
-	}
-	if (MatchActor(Sender, Sender->LastEntered, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastEntered);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_opened, parameters->objectParameter);
 }
 
 //closed for doors (using lastTrigger)
 int GameScript::Closed(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type != ST_DOOR) {
-		return 0;
-	}
-	Door *door = (Door *) Sender;
-	if (door->IsOpen()) {
-		return 0;
-	}
-
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastTrigger) {
-			Sender->AddTrigger (&Sender->LastTrigger);
-			return 1;
-		}
-		return 0;
-	}
-	if (MatchActor(Sender, Sender->LastTrigger, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastTrigger);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_closed, parameters->objectParameter);
 }
 
 //unlocked for doors/containers (using lastUnlocked)
 int GameScript::Unlocked(Scriptable* Sender, Trigger* parameters)
 {
-	Door *door;
-
-	switch (Sender->Type) {
-		case ST_DOOR:
-			door = (Door *) Sender;
-			if ((door->Flags&DOOR_LOCKED) ) {
-				return 0;
-			}
-			break;
-		case ST_CONTAINER:
-			break;
-		default:
-			return 0;
-	}
-
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastUnlocked) {
-			Sender->AddTrigger (&Sender->LastUnlocked);
-			return 1;
-		}
-		return 0;
-	}
-	if (MatchActor(Sender, Sender->LastUnlocked, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastUnlocked);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_unlocked, parameters->objectParameter);
 }
 
 int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type != ST_PROXIMITY) {
-		return 0;
-	}
-	InfoPoint *ip = (InfoPoint *) Sender;
-	if (!ip->Trapped) {
-		return 0;
-	}
-
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastEntered) {
-			Sender->AddTrigger (&Sender->LastEntered);
-			return 1;
-		}
-		return 0;
-	}
-	if (MatchActor(Sender, Sender->LastEntered, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastEntered);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_entered, parameters->objectParameter);
 }
 
 int GameScript::HarmlessEntered(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type != ST_PROXIMITY) {
-		return 0;
-	}
-	if (parameters->objectParameter == NULL) {
-		if (Sender->LastEntered) {
-			Sender->AddTrigger (&Sender->LastEntered);
-			return 1;
-		}
-		return 0;
-	}
-	if (MatchActor(Sender, Sender->LastEntered, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastEntered);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_harmlessentered, parameters->objectParameter);
 }
 
 int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
@@ -1944,68 +1711,27 @@ int GameScript::CreatureHidden(Scriptable* Sender, Trigger* /*parameters*/)
 }
 int GameScript::BecameVisible(Scriptable* Sender, Trigger* /*parameters*/)
 {
-	if (Sender->Type!=ST_ACTOR) {
-		return 0;
-	}
-	Actor *act=(Actor *) Sender;
-	if (act->GetInternalFlag()&IF_BECAMEVISIBLE) {
-		//set trigger to erase
-		act->SetBitTrigger(BT_BECAMEVISIBLE);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTrigger(trigger_becamevisible);
 }
 
 int GameScript::Die(Scriptable* Sender, Trigger* /*parameters*/)
 {
-	if (Sender->Type!=ST_ACTOR) {
-		return 0;
-	}
-	Actor *act=(Actor *) Sender;
-	if (act->GetInternalFlag()&IF_JUSTDIED) {
-		//set trigger to erase
-		act->SetBitTrigger(BT_DIE);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTrigger(trigger_die);
 }
 
 int GameScript::Died(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar || tar->Type!=ST_ACTOR) {
-		return 0;
-	}
-	Actor *act=(Actor *) tar;
-	if (act->GetInternalFlag()&IF_JUSTDIED) {
-		//set trigger to erase
-		act->SetBitTrigger(BT_DIE);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_died, parameters->objectParameter);
 }
 
-int GameScript::PartyMemberDied(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+int GameScript::PartyMemberDied(Scriptable* Sender, Trigger* parameters)
 {
-	Game *game = core->GetGame();
-	int i = game->PartyMemberDied();
-	if (i==-1) {
-		return 0;
-	}
-	//set trigger to erase
-	game->GetPC(i,false)->SetBitTrigger(BT_DIE);
-	return 1;
+	return Sender->MatchTriggerWithObject(trigger_partymemberdied, parameters->objectParameter);
 }
 
-int GameScript::NamelessBitTheDust(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+int GameScript::NamelessBitTheDust(Scriptable* Sender, Trigger* /*parameters*/)
 {
-	Actor* actor = core->GetGame()->GetPC(0, false);
-	if (actor->GetInternalFlag()&IF_JUSTDIED) {
-		//set trigger to clear
-		actor->SetBitTrigger(BT_DIE);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTrigger(trigger_namelessbitthedust);
 }
 
 int GameScript::Race(Scriptable* Sender, Trigger* parameters)
@@ -2450,6 +2176,7 @@ int GameScript::See(Scriptable* Sender, Trigger* parameters)
 	if (Sender->Type==ST_ACTOR && see) {
 		Actor *act = (Actor *) Sender;
 		//save lastseen as lastmarked
+		//FIXME: what is this doing?
 		act->LastMarked = act->LastSeen;
 		//Sender->AddTrigger (&act->LastSeen);
 	}
@@ -3397,18 +3124,7 @@ int GameScript::TimeLT(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor *scr = (Actor *) Sender;
-				// FIXME: this is never going to work on 64 bit archs ...
-	int ret = (unsigned long) scr->HotKey == (unsigned long) parameters->int0Parameter;
-	//probably we need to implement a trigger mechanism, clear
-	//the hotkey only when the triggerblock was evaluated as true
-	if (ret) {
-		Sender->AddTrigger (&scr->HotKey);
-	}
-	return ret;
+	return Sender->MatchTrigger(trigger_hotkey, parameters->int0Parameter);
 }
 
 int GameScript::CombatCounter(Scriptable* /*Sender*/, Trigger* parameters)
@@ -3428,20 +3144,7 @@ int GameScript::CombatCounterLT(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::TrapTriggered(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type != ST_TRIGGER) {
-		return 0;
-	}
-/* matchactor would do this, hmm
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-*/
-	if (MatchActor(Sender, Sender->LastTrigger, parameters->objectParameter)) {
-		Sender->AddTrigger (&Sender->LastTrigger);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_traptriggered, parameters->objectParameter);
 }
 
 int GameScript::InteractingWith(Scriptable* Sender, Trigger* parameters)
@@ -3473,7 +3176,7 @@ int GameScript::LastPersonTalkedTo(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *scr = (Actor *) Sender;
-	if (MatchActor(Sender, scr->LastTalkedTo, parameters->objectParameter)) {
+	if (MatchActor(Sender, scr->LastTalker, parameters->objectParameter)) {
 		return 1;
 	}
 	return 0;
@@ -3525,7 +3228,8 @@ int GameScript::IsFacingObject(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::AttackedBy(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
+	return Sender->MatchTriggerWithObject(trigger_attackedby, parameters->objectParameter, parameters->int0Parameter);
+	/*if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
 	Actor *scr = (Actor *) Sender;
@@ -3550,12 +3254,13 @@ int GameScript::AttackedBy(Scriptable* Sender, Trigger* parameters)
 		}
 	}
 	delete tgts;
-	return ret;
+	return ret;*/
 }
 
 int GameScript::TookDamage(Scriptable* Sender, Trigger* /*parameters*/)
 {
-	if (Sender->Type!=ST_ACTOR) {
+	return Sender->MatchTrigger(trigger_tookdamage);
+	/*if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
@@ -3564,43 +3269,17 @@ int GameScript::TookDamage(Scriptable* Sender, Trigger* /*parameters*/)
 		Sender->AddTrigger(&actor->LastHitter);
 		return 1;
 	}
-	return 0;
+	return 0;*/
 }
 
 int GameScript::HitBy(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	if (parameters->int0Parameter) {
-		if (!(parameters->int0Parameter&actor->LastDamageType) ) {
-			return 0;
-		}
-	}
-	if (MatchActor(Sender, actor->LastHitter, parameters->objectParameter)) {
-		Sender->AddTrigger(&actor->LastHitter);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_attackedby, parameters->objectParameter, parameters->int0Parameter);
 }
 
 int GameScript::Heard(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	if (parameters->int0Parameter) {
-		if (parameters->int0Parameter!=actor->LastShout) {
-			return 0;
-		}
-	}
-	if (MatchActor(Sender, actor->LastHeard, parameters->objectParameter)) {
-		Sender->AddTrigger(&actor->LastHeard);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_heard, parameters->objectParameter, parameters->int0Parameter);
 }
 
 int GameScript::LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters)
@@ -3645,7 +3324,8 @@ int GameScript::HelpEX(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	if (actor->GetStat(stat)==help->GetStat(stat) ) {
-		Sender->AddTrigger(&actor->LastHelp);
+		// FIXME
+		//Sender->AddTrigger(&actor->LastHelp);
 		return 1;
 	}
 	return 0;
@@ -3653,30 +3333,18 @@ int GameScript::HelpEX(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::Help_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	if (MatchActor(Sender, actor->LastHelp, parameters->objectParameter)) {
-		Sender->AddTrigger(&actor->LastHelp);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_help, parameters->objectParameter);
 }
 
 int GameScript::ReceivedOrder(Scriptable* Sender, Trigger* parameters)
 {
-	if (MatchActor(Sender, Sender->LastOrderer, parameters->objectParameter) &&
-		parameters->int0Parameter==Sender->LastOrder) {
-		Sender->AddTrigger(&Sender->LastOrderer);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_receivedorder, parameters->objectParameter, parameters->int0Parameter);
 }
 
 int GameScript::Joins(Scriptable* Sender, Trigger* parameters)
 {
-	if(Sender->Type!=ST_ACTOR) {
+	return Sender->MatchTriggerWithObject(trigger_joins, parameters->objectParameter);
+	/*if(Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
 	Actor * actor = ( Actor* ) Sender;
@@ -3688,12 +3356,13 @@ int GameScript::Joins(Scriptable* Sender, Trigger* parameters)
 		Sender->AddTrigger(&actor->PCStats->LastJoined);
 		return 1;
 	}
-	return 0;
+	return 0;*/
 }
 
 int GameScript::Leaves(Scriptable* Sender, Trigger* parameters)
 {
-	if(Sender->Type!=ST_ACTOR) {
+	return Sender->MatchTriggerWithObject(trigger_leaves, parameters->objectParameter);
+	/*if(Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
 	Actor * actor = ( Actor* ) Sender;
@@ -3705,7 +3374,7 @@ int GameScript::Leaves(Scriptable* Sender, Trigger* parameters)
 		Sender->AddTrigger(&actor->PCStats->LastLeft);
 		return 1;
 	}
-	return 0;
+	return 0;*/
 }
 
 int GameScript::FallenPaladin(Scriptable* Sender, Trigger* /*parameters*/)
@@ -4115,13 +3784,8 @@ int GameScript::Delay( Scriptable* Sender, Trigger* parameters)
 	if (delay<=1) {
 		return 1;
 	}
-	ieDword time1=Sender->lastDelay/1000/delay;
-	ieDword time2=Sender->lastRunTime/1000/delay;
 
-	if (time1!=time2) {
-		return 1;
-	}
-	return 0;
+	return (Sender->ScriptTicks % delay) <= Sender->IdleTicks;
 }
 
 int GameScript::TimeOfDay(Scriptable* /*Sender*/, Trigger* parameters)
@@ -4164,11 +3828,7 @@ int GameScript::RandomStatCheck(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::PartyRested(Scriptable* Sender, Trigger* /*parameters*/)
 {
-	if (Sender->GetInternalFlag()&IF_PARTYRESTED) {
-		Sender->SetBitTrigger(BT_PARTYRESTED);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTrigger(trigger_partyrested);
 }
 
 int GameScript::IsWeaponRanged(Scriptable* Sender, Trigger* parameters)
@@ -4344,7 +4004,8 @@ int GameScript::SystemVariable_Trigger(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::SpellCast(Scriptable* Sender, Trigger* parameters)
 {
-	if(parameters->int0Parameter) {
+	return Sender->MatchTriggerWithObject(trigger_spellcast, parameters->objectParameter, parameters->int0Parameter);
+	/*if(parameters->int0Parameter) {
 		unsigned int param = 2000+parameters->int0Parameter%1000;
 		if (param!=Sender->LastSpellSeen) {
 			return 0;
@@ -4354,12 +4015,13 @@ int GameScript::SpellCast(Scriptable* Sender, Trigger* parameters)
 		Sender->AddTrigger(&Sender->LastCasterSeen);
 		return 1;
 	}
-	return 0;
+	return 0;*/
 }
 
 int GameScript::SpellCastPriest(Scriptable* Sender, Trigger* parameters)
 {
-	if(parameters->int0Parameter) {
+	return Sender->MatchTriggerWithObject(trigger_spellcastpriest, parameters->objectParameter, parameters->int0Parameter);
+	/*if(parameters->int0Parameter) {
 		unsigned int param = 1000+parameters->int0Parameter%1000;
 		if (param!=Sender->LastSpellSeen) {
 			return 0;
@@ -4369,12 +4031,13 @@ int GameScript::SpellCastPriest(Scriptable* Sender, Trigger* parameters)
 		Sender->AddTrigger(&Sender->LastCasterSeen);
 		return 1;
 	}
-	return 0;
+	return 0;*/
 }
 
 int GameScript::SpellCastInnate(Scriptable* Sender, Trigger* parameters)
 {
-	if(parameters->int0Parameter) {
+	return Sender->MatchTriggerWithObject(trigger_spellcastinnate, parameters->objectParameter, parameters->int0Parameter);
+	/*if(parameters->int0Parameter) {
 		unsigned int param = 3000+parameters->int0Parameter%1000;
 		if (param!=Sender->LastSpellSeen) {
 			return 0;
@@ -4384,12 +4047,13 @@ int GameScript::SpellCastInnate(Scriptable* Sender, Trigger* parameters)
 		Sender->AddTrigger(&Sender->LastCasterSeen);
 		return 1;
 	}
-	return 0;
+	return 0;*/
 }
 
 int GameScript::SpellCastOnMe(Scriptable* Sender, Trigger* parameters)
 {
-	if(parameters->int0Parameter) {
+	return Sender->MatchTriggerWithObject(trigger_spellcastonme, parameters->objectParameter, parameters->int0Parameter);
+	/*if(parameters->int0Parameter) {
 		if ((ieDword) parameters->int0Parameter!=Sender->LastSpellOnMe) {
 			return 0;
 		}
@@ -4398,7 +4062,7 @@ int GameScript::SpellCastOnMe(Scriptable* Sender, Trigger* parameters)
 		Sender->AddTrigger(&Sender->LastCasterOnMe);
 		return 1;
 	}
-	return 0;
+	return 0;*/
 }
 
 int GameScript::CalendarDay(Scriptable* /*Sender*/, Trigger* parameters)
@@ -4429,15 +4093,7 @@ int GameScript::CalendarDayLT(Scriptable* /*Sender*/, Trigger* parameters)
 }
 
 //NT Returns true only if the active CRE was turned by the specified priest or paladin.
-int GameScript::TurnedBy(Scriptable* Sender, Trigger* /*parameters*/)
+int GameScript::TurnedBy(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	if (MatchActor(Sender, actor->LastTurner, NULL)) {
-		Sender->AddTrigger(&actor->LastTurner);
-		return 1;
-	}
-	return 0;
+	return Sender->MatchTriggerWithObject(trigger_turnedby, parameters->objectParameter);
 }

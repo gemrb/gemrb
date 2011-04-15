@@ -1807,7 +1807,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 	//lastRunTime = thisTime;
 
 	if(!(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
-		return true;
+		return false;
 	}
 
 	bool continueExecution = false;

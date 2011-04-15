@@ -516,7 +516,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 				pc->ClearPath();
 				pc->ClearActions();
 				pc->AddAction( GenerateAction( command ) );
-				pc->ProcessActions(true);
+				pc->ProcessActions();
 			}
 		}
 		return;
@@ -534,7 +534,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 				pc->ClearPath();
 				pc->ClearActions();
 				pc->AddAction( GenerateAction( command ) );
-				pc->ProcessActions(true);
+				pc->ProcessActions();
 			}
 		}
 		return;
@@ -543,7 +543,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 	actor->ClearPath();
 	actor->ClearActions();
 	actor->AddAction( GenerateAction( command ) );
-	actor->ProcessActions(true);
+	actor->ProcessActions();
 }
 
 void Map::UseExit(Actor *actor, InfoPoint *ip)
@@ -572,9 +572,12 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		return;
 	}
 	if (ip->Scripts[0]) {
-		ip->LastTriggerObject = ip->LastTrigger = ip->LastEntered = actor->GetGlobalID();
+		// FIXME:  is this good?
+		//ip->LastTriggerObject = ip->LastTrigger = ip->LastEntered = actor->GetGlobalID();
+		ip->AddTrigger(TriggerEntry(trigger_entered, actor->GetGlobalID()));
+		// FIXME
 		ip->ExecuteScript( 1 );
-		ip->ProcessActions(true);
+		ip->ProcessActions();
 	}
 }
 
@@ -638,7 +641,7 @@ void Map::UpdateScripts()
 	
 	//Execute Pending Actions
 	//if it is only here, then the drawing will fail
-	ProcessActions(false);
+	ProcessActions();
 
 	// If scripts frozen, return.
 	// This fixes starting a new IWD game. The above ProcessActions pauses the
@@ -694,7 +697,7 @@ void Map::UpdateScripts()
 		 * point, etc), but i did it this way for now because it seems least painful
 		 * and we should probably be staggering the script executions anyway
 		 */
-		actor->ExecuteScript( MAX_SCRIPTS );
+		actor->Update();
 
 	}
 
@@ -709,8 +712,6 @@ void Map::UpdateScripts()
 	while (q--) {
 		Actor* actor = queue[PR_SCRIPT][q];
 		if (actor->no_more_steps) continue;
-
-		actor->ProcessActions(false);
 
 		actor->UpdateActorState(game->GameTime);
 
@@ -770,10 +771,7 @@ void Map::UpdateScripts()
 		Door* door = TMap->GetDoor( doorCount++ );
 		if (!door)
 			break;
-		if (door->Scripts[0])
-			door->ExecuteScript( 1 );
-		//Execute Pending Actions
-		door->ProcessActions(false);
+		door->Update();
 	}
 
 	//Check if we need to start some container scripts
@@ -782,10 +780,7 @@ void Map::UpdateScripts()
 		Container* container = TMap->GetContainer( containerCount++ );
 		if (!container)
 			break;
-		if (container->Scripts[0])
-			container->ExecuteScript( 1 );
-		//Execute Pending Actions
-		container->ProcessActions(false);
+		container->Update();
 	}
 
 	//Check if we need to start some trap scripts
@@ -802,15 +797,7 @@ void Map::UpdateScripts()
 
 		//If this InfoPoint is a Switch Trigger
 		if (ip->Type == ST_TRIGGER) {
-			//Check if this InfoPoint was activated
-			if (ip->LastTrigger) {
-				if (wasActive && ip->Scripts[0]) {
-					//Run the InfoPoint script
-					ip->ExecuteScript( 1 );
-				}
-			}
-			//Execute Pending Actions
-			ip->ProcessActions(false);
+			ip->Update();
 			continue;
 		}
 
@@ -847,14 +834,12 @@ void Map::UpdateScripts()
 		}
 
 		if (wasActive) {
-			ip->ExecuteScript( 1 );
 			//Play the PST specific enter sound
 			if (wasActive&TRAP_USEPOINT) {
 				core->GetAudioDrv()->Play(ip->EnterWav, ip->TrapLaunch.x, ip->TrapLaunch.y);
 			}
+			ip->Update();
 		}
-		//Execute Pending Actions
-		ip->ProcessActions(false);
 	}
 }
 
@@ -1293,9 +1278,10 @@ void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
 			}
 		}
 		if (shoutID) {
+			listener->AddTrigger(TriggerEntry(trigger_heard, actor->GetGlobalID(), shoutID));
 			listener->LastHeard = actor->GetGlobalID();
-			listener->LastShout = shoutID;
 		} else {
+			listener->AddTrigger(TriggerEntry(trigger_help, actor->GetGlobalID()));
 			listener->LastHelp = actor->GetGlobalID();
 		}
 	}
@@ -3667,15 +3653,20 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell)
 		return;
 	}
 
-	LastCasterSeen = caster->GetGlobalID();
-	LastSpellSeen = spell;
+	// FIXME: this seems clearly wrong, but matches old gemrb behaviour
+	unsigned short triggerType = trigger_spellcast;
+	if (spell >= 3000)
+		triggerType = trigger_spellcastinnate;
+	else if (spell < 2000)
+		triggerType = trigger_spellcastpriest;
+
+	caster->AddTrigger(TriggerEntry(triggerType, caster->GetGlobalID(), spell));
 
 	size_t i = actors.size();
 	while (i--) {
 		Actor* witness = actors[i];
 		if (CanSee(witness, caster, true, 0)) {
-			witness->LastSpellSeen=LastSpellSeen;
-			witness->LastCasterSeen=LastCasterSeen;
+			caster->AddTrigger(TriggerEntry(triggerType, caster->GetGlobalID(), spell));
 		}
 	}
 }

@@ -3231,12 +3231,12 @@ void Interface::GameLoop(void)
 		update_scripts = !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS);
 	}
 
-	update_scripts = GSUpdate(update_scripts);
+	bool do_update = GSUpdate(update_scripts);
 
 	//i'm not sure if this should be here
 
 	//in multi player (if we ever get to it), only the server must call this
-	if (update_scripts) {
+	if (do_update) {
 		if ( game->selected.size() > 0 ) {
 			gc->ChangeMap(GetFirstSelectedPC(true), false);
 		}
