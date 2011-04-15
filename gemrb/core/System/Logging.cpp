@@ -104,3 +104,42 @@ void textcolor(log_color c)
 #endif
 #endif
 }
+
+#ifndef ANDROID
+void printBracket(const char* status, log_color color)
+{
+	textcolor(WHITE);
+	print("[");
+	textcolor(color);
+	print("%s", status);
+	textcolor(WHITE);
+	print("]");
+}
+
+void printStatus(const char* status, log_color color)
+{
+	printBracket(status, color);
+	print("\n");
+}
+
+void printMessage(const char* owner, const char* message, log_color color)
+{
+	printBracket(owner, LIGHT_WHITE);
+	print(": ");
+	textcolor(color);
+	print("%s", message);
+}
+#else /* !ANDROID */
+void printBracket(const char* status, log_color color)
+{
+}
+
+void printStatus(const char* status, log_color color)
+{
+	__android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s]", status)
+}
+
+void printMessage(const char* owner, const char* message, log_color color)
+	__android_log_print(ANDROID_LOG_INFO, "GemRB", "%s: %s", owner, message)
+}
+#endif

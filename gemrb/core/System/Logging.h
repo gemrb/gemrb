@@ -64,18 +64,12 @@ enum log_color {
 	LIGHT_WHITE
 };
 
-#ifndef ANDROID
-#	define printBracket(status, color) textcolor(WHITE); print("["); textcolor(color); print("%s", status); textcolor(WHITE); print("]")
-#	define printStatus(status, color) printBracket(status, color); print("\n")
-#	define printMessage(owner, message, color) printBracket(owner, LIGHT_WHITE); print(": "); textcolor(color); print("%s", message)
-#else
-#	define printBracket(status, color)
-#	define printStatus(status, color) __android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s]", status)
-#	define printMessage(owner, message, color) __android_log_print(ANDROID_LOG_INFO, "GemRB", "%s: %s", owner, message)
-#endif
 
 GEM_EXPORT void print(const char* message, ...);
 GEM_EXPORT void textcolor(log_color);
+GEM_EXPORT void printBracket(const char *status, log_color color);
+GEM_EXPORT void printStatus(const char* status, log_color color);
+GEM_EXPORT void printMessage(const char* owner, const char* message, log_color color);
 
 #if (__GNUC__ > 4)
 // poison printf
