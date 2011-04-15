@@ -34,6 +34,15 @@ void print(const char *message, ...)
 {
 	va_list ap;
 
+#if (!defined(WIN32) || defined(__MINGW32__))
+	va_start(ap, message);
+# ifdef ANDROID
+	__android_log_vprint(ANDROID_LOG_INFO, "printf:", message, ap);
+# else
+	vprintf(message, ap);
+# endif
+	va_end(ap);
+#else
 	va_start(ap, message);
 	int size = vsnprintf(NULL, 0, message, ap);
 	va_end(ap);
@@ -46,16 +55,11 @@ void print(const char *message, ...)
 	vsprintf(buff, message, ap);
 	va_end(ap);
 
-#if (!defined(WIN32) || defined(__MINGW32__)) && !defined(ANDROID)
-	// NOTE: We could do this without the allocation, but this path gets tested more.
-	printf("%s", buff);
-#elif defined(ANDROID)
-	__android_log_print(ANDROID_LOG_INFO, "print:", "%s", message);
-#else
 	cprintf("%s", message);
-#endif
+
 	free(buff);
 	va_end(ap);
+#endif
 }
 
 #ifdef WIN32
