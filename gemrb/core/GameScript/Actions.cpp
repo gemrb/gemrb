@@ -457,7 +457,7 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
-		printf("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
+		print("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
 		return;
 	}
 	InfoPoint *trigger = (InfoPoint *) ip;
@@ -578,7 +578,7 @@ void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 		if (act) {
 			if (game->GetPlaneLocationCount() <= (unsigned int)i) {
 				// what are we meant to do here?
-				printf("argh, couldn't restore party member %d!", i + 1);
+				print("argh, couldn't restore party member %d!", i + 1);
 				continue;
 			}
 			GAMLocationEntry *gle = game->GetPlaneLocationEntry(i);
@@ -1308,7 +1308,7 @@ void GameScript::RestorePartyLocation(Scriptable* /*Sender*/, Action* /*paramete
 		if (act) {
 			if (game->GetSavedLocationCount() <= (unsigned int)i) {
 				// what are we meant to do here?
-				printf("argh, couldn't restore party member %d!", i + 1);
+				print("argh, couldn't restore party member %d!", i + 1);
 				continue;
 			}
 			GAMLocationEntry *gle = game->GetSavedLocationEntry(i);
@@ -1523,7 +1523,7 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!target) {
 		target=Sender;
-		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
+		print("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
 	}
 
 	DisplayStringCore(target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD|DS_SPEECH );
@@ -1556,7 +1556,7 @@ void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!target) {
 		target=Sender;
-		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
+		print("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
 	}
 
 	DisplayStringCore(target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD);
@@ -1567,7 +1567,7 @@ void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!target) {
 		target=Sender;
-		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
+		print("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
 	}
 
 	SrcVector *rndstr=LoadSrc(parameters->string0Parameter);
@@ -1584,7 +1584,7 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!target) {
 		target=Sender;
-		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
+		print("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
 	}
 
 	SrcVector *rndstr=LoadSrc(parameters->string0Parameter);
@@ -1770,20 +1770,20 @@ void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 //optional integer parameter (isSpeech)
 void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
-	printf( "PlaySound(%s)\n", parameters->string0Parameter );
+	print( "PlaySound(%s)\n", parameters->string0Parameter );
 	core->GetAudioDrv()->Play( parameters->string0Parameter, Sender->Pos.x,
 				Sender->Pos.y, parameters->int0Parameter ? GEM_SND_SPEECH : 0 );
 }
 
 void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 {
-	printf( "PlaySound(%s)\n", parameters->string0Parameter );
+	print( "PlaySound(%s)\n", parameters->string0Parameter );
 	core->GetAudioDrv()->Play( parameters->string0Parameter, parameters->pointParameter.x, parameters->pointParameter.y );
 }
 
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
-	printf( "PlaySound(%s)\n", parameters->string0Parameter );
+	print( "PlaySound(%s)\n", parameters->string0Parameter );
 	core->GetAudioDrv()->Play( parameters->string0Parameter, 0, 0);
 }
 
@@ -1903,7 +1903,7 @@ void GameScript::AmbientActivate(Scriptable* Sender, Action* parameters)
 		anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName );
 	}
 	if (!anim) {
-		printf( "Script error: No Animation Named \"%s\" or \"%s\"\n",
+		print( "Script error: No Animation Named \"%s\" or \"%s\"\n",
 			parameters->string0Parameter,parameters->objects[1]->objectName );
 		return;
 	}
@@ -1934,7 +1934,7 @@ void GameScript::StaticStart(Scriptable* Sender, Action* parameters)
 {
 	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
 	if (!anim) {
-		printf( "Script error: No Animation Named \"%s\"\n",
+		print( "Script error: No Animation Named \"%s\"\n",
 			parameters->objects[1]->objectName );
 		return;
 	}
@@ -1945,7 +1945,7 @@ void GameScript::StaticStop(Scriptable* Sender, Action* parameters)
 {
 	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
 	if (!anim) {
-		printf( "Script error: No Animation Named \"%s\"\n",
+		print( "Script error: No Animation Named \"%s\"\n",
 			parameters->objects[1]->objectName );
 		return;
 	}
@@ -1956,7 +1956,7 @@ void GameScript::StaticPalette(Scriptable* Sender, Action* parameters)
 {
 	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
 	if (!anim) {
-		printf( "Script error: No Animation Named \"%s\"\n",
+		print( "Script error: No Animation Named \"%s\"\n",
 			parameters->objects[1]->objectName );
 		return;
 	}
@@ -2146,7 +2146,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 	}
 	//travel direction passed to guiscript
 	int direction = Sender->GetCurrentArea()->WhichEdge(actor->Pos);
-	printf("Travel direction returned: %d\n", direction);
+	print("Travel direction returned: %d\n", direction);
 	if (direction==-1) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -4886,7 +4886,7 @@ void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 {
 	WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
-		printf("Can't find worldmap!\n");
+		print("Can't find worldmap!\n");
 		abort();
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
@@ -4898,7 +4898,7 @@ void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 {
 	WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
-		printf("Can't find worldmap!\n");
+		print("Can't find worldmap!\n");
 		abort();
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
@@ -5865,7 +5865,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 {
 	if (InDebug&ID_ACTIONS) {
-		printf("EscapeArea/EscapeAreaMove\n");
+		print("EscapeArea/EscapeAreaMove\n");
 	}
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
@@ -5893,7 +5893,7 @@ void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 void GameScript::EscapeAreaNoSee(Scriptable* Sender, Action* parameters)
 {
 	if (InDebug&ID_ACTIONS) {
-		printf("EscapeAreaNoSee\n");
+		print("EscapeAreaNoSee\n");
 	}
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
@@ -6224,7 +6224,7 @@ void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
-		printf("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
+		print("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
 		return;
 	}
 	ip->LastEntered = 0;
@@ -7148,7 +7148,7 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 	AutoTable tm(parameters->string0Parameter);
 	if (!tm) {
 		printStatus( "ERROR", LIGHT_RED );
-		printf( "Cannot find %s.2da.\n", parameters->string0Parameter);
+		print( "Cannot find %s.2da.\n", parameters->string0Parameter);
 		return;
 	}
 

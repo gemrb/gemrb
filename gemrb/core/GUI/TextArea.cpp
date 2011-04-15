@@ -479,7 +479,7 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			Owner->Invalidate();
 			Changed = true;
 			int len = GetRowLength(CurLine);
-			//printf("len: %d Before: %s\n",len, lines[CurLine]);
+			//print("len: %d Before: %s\n",len, lines[CurLine]);
 			lines[CurLine] = (char *) realloc( lines[CurLine], len + 2 );
 			for (int i = len; i > CurPos; i--) {
 				lines[CurLine][i] = lines[CurLine][i - 1];
@@ -487,7 +487,7 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 			lines[CurLine][CurPos] = Key;
 			lines[CurLine][len + 1] = 0;
 			CurPos++;
-			//printf("pos: %d After: %s\n",CurPos, lines[CurLine]);
+			//print("pos: %d After: %s\n",CurPos, lines[CurLine]);
 			CalcRowCount();
 			RunEventHandler( TextAreaOnChange );
 		}
@@ -577,7 +577,7 @@ void TextArea::OnSpecialKeyPress(unsigned char Key)
 			break;
 		case GEM_DELETE:
 			len = GetRowLength(CurLine);
-			//printf("len: %d Before: %s\n",len, lines[CurLine]);
+			//print("len: %d Before: %s\n",len, lines[CurLine]);
 			if (CurPos>=len) {
 				//TODO: merge next line
 				break;
@@ -586,12 +586,12 @@ void TextArea::OnSpecialKeyPress(unsigned char Key)
 			for (i = CurPos; i < len; i++) {
 				lines[CurLine][i] = lines[CurLine][i + 1];
 			}
-			//printf("pos: %d After: %s\n",CurPos, lines[CurLine]);
+			//print("pos: %d After: %s\n",CurPos, lines[CurLine]);
 			break;
 		case GEM_BACKSP:
 			len = GetRowLength(CurLine);
 			if (CurPos != 0) {
-				//printf("len: %d Before: %s\n",len, lines[CurLine]);
+				//print("len: %d Before: %s\n",len, lines[CurLine]);
 				if (len<1) {
 					break;
 				}
@@ -601,15 +601,15 @@ void TextArea::OnSpecialKeyPress(unsigned char Key)
 				}
 				lines[CurLine][len - 1] = 0;
 				CurPos--;
-				//printf("pos: %d After: %s\n",CurPos, lines[CurLine]);
+				//print("pos: %d After: %s\n",CurPos, lines[CurLine]);
 			} else {
 				if (CurLine) {
 					//TODO: merge lines
 					int oldline = CurLine;
 					CurLine--;
 					int old = GetRowLength(CurLine);
-					//printf("len: %d Before: %s\n",old, lines[CurLine]);
-					//printf("len: %d Before: %s\n",len, lines[oldline]);
+					//print("len: %d Before: %s\n",old, lines[CurLine]);
+					//print("len: %d Before: %s\n",len, lines[oldline]);
 					lines[CurLine] = (char *) realloc (lines[CurLine], len+old);
 					memcpy(lines[CurLine]+old, lines[oldline],len);
 					free(lines[oldline]);
@@ -617,13 +617,13 @@ void TextArea::OnSpecialKeyPress(unsigned char Key)
 					lines.erase(lines.begin()+oldline);
 					lrows.erase(lrows.begin()+oldline);
 					CurPos = old;
-					//printf("pos: %d len: %d After: %s\n",CurPos, GetRowLength(CurLine), lines[CurLine]);
+					//print("pos: %d len: %d After: %s\n",CurPos, GetRowLength(CurLine), lines[CurLine]);
 				}
 			}
 			break;
 		 case GEM_RETURN:
 			//add an empty line after CurLine
-			//printf("pos: %d Before: %s\n",CurPos, lines[CurLine]);
+			//print("pos: %d Before: %s\n",CurPos, lines[CurLine]);
 			lrows.insert(lrows.begin()+CurLine, 0);
 			len = GetRowLength(CurLine);
 			//copy the text after the cursor into the new line
@@ -637,8 +637,8 @@ void TextArea::OnSpecialKeyPress(unsigned char Key)
 			//move cursor to next line beginning
 			CurLine++;
 			CurPos=0;
-			//printf("len: %d After: %s\n",GetRowLength(CurLine-1), lines[CurLine-1]);
-			//printf("len: %d After: %s\n",GetRowLength(CurLine), lines[CurLine]);
+			//print("len: %d After: %s\n",GetRowLength(CurLine-1), lines[CurLine-1]);
+			//print("len: %d After: %s\n",GetRowLength(CurLine), lines[CurLine]);
 			break;
 	}
 	CalcRowCount();
@@ -780,7 +780,7 @@ void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
 			if (seltext != (int) i)
 				core->RedrawAll();
 			seltext = ( int ) i;
-			//printf("CtrlId = 0x%08lx, seltext = %d, rows = %d, row = %d, r = %d\n", ControlID, i, rows, row, r);
+			//print("CtrlId = 0x%08lx, seltext = %d, rows = %d, row = %d, r = %d\n", ControlID, i, rows, row, r);
 			return;
 		}
 	}
@@ -788,7 +788,7 @@ void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
 		core->RedrawAll();
 	}
 	seltext = -1;
-	//printf("CtrlId = 0x%08lx, seltext = %d, rows %d, row %d, r = %d\n", ControlID, seltext, rows, row, r);
+	//print("CtrlId = 0x%08lx, seltext = %d, rows %d, row %d, r = %d\n", ControlID, seltext, rows, row, r);
 }
 
 /** Mouse Button Up */

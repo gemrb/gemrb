@@ -43,7 +43,7 @@ Bitmap* ImageMgr::GetBitmap()
 	Bitmap *data = new Bitmap(width, height);
 
 	printMessage("ImageMgr", "Don't know how to handle 24bit bitmap from ", WHITE);
-	printf( "%s...", str->filename );
+	print( "%s...", str->filename );
 	printStatus( "ERROR", LIGHT_RED );
 
 	Sprite2D *spr = GetSprite2D();
@@ -81,7 +81,7 @@ Image* ImageMgr::GetImage()
 void ImageMgr::GetPalette(int /*colors*/, Color* /*pal*/)
 {
 	printMessage("ImageMgr", "Can't get non-existant palette from ", WHITE);
-	printf("%s... ", str->filename);
+	print("%s... ", str->filename);
 	printStatus("ERROR", LIGHT_RED);
 }
 

@@ -123,7 +123,7 @@ int Control::RunEventHandler(EventHandler handler)
 /** Key Press Event */
 void Control::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
-	//printf("OnKeyPress: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", (unsigned int) ControlID, Key, Key);
+	//print("OnKeyPress: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", (unsigned int) ControlID, Key, Key);
 #ifdef ANDROID // mapping volume control to volume control keys on device, these keys must be set up in AndroidAppSettings.cfg
 	switch(Key)	{
 		case 'o': // volume down
@@ -163,25 +163,25 @@ void Control::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 /** Key Release Event */
 void Control::OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/)
 {
-	//printf( "OnKeyRelease: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", (unsigned int) ControlID, Key, Key );
+	//print( "OnKeyRelease: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", (unsigned int) ControlID, Key, Key );
 }
 
 /** Mouse Enter Event */
 void Control::OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/)
 {
-//	printf("OnMouseEnter: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
+//	print("OnMouseEnter: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
 }
 
 /** Mouse Leave Event */
 void Control::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 {
-//	printf("OnMouseLeave: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
+//	print("OnMouseLeave: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
 }
 
 /** Mouse Over Event */
 void Control::OnMouseOver(unsigned short /*x*/, unsigned short /*y*/)
 {
-	//printf("OnMouseOver: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
+	//print("OnMouseOver: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
 }
 
 /** Mouse Button Down */
@@ -200,7 +200,7 @@ void Control::OnMouseDown(unsigned short x, unsigned short y,
 void Control::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	unsigned short /*Button*/, unsigned short /*Mod*/)
 {
-	//printf("OnMouseUp: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", (unsigned int) ControlID, x, y, Button, Mod);
+	//print("OnMouseUp: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", (unsigned int) ControlID, x, y, Button, Mod);
 }
 
 /** Special Key Press */

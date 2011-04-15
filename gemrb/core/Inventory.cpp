@@ -56,7 +56,7 @@ static int MagicBit = 0;
 static void InvalidSlot(int slot)
 {
 	printMessage("Inventory"," ",LIGHT_RED);
-	printf("Invalid slot: %d!\n",slot);
+	print("Invalid slot: %d!\n",slot);
 	abort();
 }
 
@@ -238,7 +238,7 @@ void Inventory::CalculateWeight()
 			}
 			else {
 				printMessage( "Inventory", " ", LIGHT_RED);
-				printf("Invalid item: %s!\n", slot->ItemResRef);
+				print("Invalid item: %s!\n", slot->ItemResRef);
 				slot->Weight = 0;
 			}
 		} else {
@@ -303,7 +303,7 @@ void Inventory::SetInventoryType(int arg)
 void Inventory::SetSlotCount(unsigned int size)
 {
 	if (Slots.size()) {
-		printf("Inventory size changed???\n");
+		print("Inventory size changed???\n");
 		//we don't allow reassignment,
 		//if you want this, delete the previous Slots here
 		abort();
@@ -969,7 +969,7 @@ bool Inventory::EquipItem(unsigned int slot)
 	int effect = core->QuerySlotEffects( slot );
 	Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) {
-		printf("Invalid item Equipped: %s Slot: %d\n", item->ItemResRef, slot);
+		print("Invalid item Equipped: %s Slot: %d\n", item->ItemResRef, slot);
 		return false;
 	}
 	switch (effect) {
@@ -1447,7 +1447,7 @@ void Inventory::BreakItemSlot(ieDword slot)
 
 void Inventory::dump()
 {
-	printf( "INVENTORY:\n" );
+	print( "INVENTORY:\n" );
 	for (unsigned int i = 0; i < Slots.size(); i++) {
 		CREItem* itm = Slots[i];
 
@@ -1455,13 +1455,13 @@ void Inventory::dump()
 			continue;
 		}
 
-		printf ( "%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->StackAmount, itm->Weight );
+		print ( "%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->StackAmount, itm->Weight );
 	}
 
-	printf( "Equipped: %d\n", Equipped );
+	print( "Equipped: %d\n", Equipped );
 	Changed = true;
 	CalculateWeight();
-	printf( "Total weight: %d\n", Weight );
+	print( "Total weight: %d\n", Weight );
 }
 
 void Inventory::EquipBestWeapon(int flags)
@@ -1803,7 +1803,7 @@ unsigned int Inventory::FindStealableItem()
 	slot = core->Roll(1, Slots.size(),-1);
 	inc = slot&1?1:-1;
 
-	printf("Start Slot: %d, increment: %d\n", slot, inc);
+	print("Start Slot: %d, increment: %d\n", slot, inc);
 	//as the unsigned value underflows, it will be greater than Slots.size()
 	for(;slot<Slots.size(); slot+=inc) {
 		CREItem *item = Slots[slot];

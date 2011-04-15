@@ -70,7 +70,7 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 		strlwr(fname);
 		compressed->ReadDword( &declen );
 		compressed->ReadDword( &complen );
-		printf( "Decompressing %s\n", fname );
+		print( "Decompressing %s\n", fname );
 		DataStream* cached = CacheCompressedStream(compressed, fname, complen, true);
 		free( fname );
 		if (!cached)
@@ -169,7 +169,7 @@ int BIFImporter::OpenArchive(const char* filename)
 		strlwr(fname);
 		compressed->ReadDword( &declen );
 		compressed->ReadDword( &complen );
-		printf( "Decompressing\n" );
+		print( "Decompressing\n" );
 		stream = CacheCompressedStream(compressed, fname, complen);
 		free( fname );
 		delete( compressed );
@@ -184,10 +184,10 @@ int BIFImporter::OpenArchive(const char* filename)
 	}
 
 	if (strncmp( Signature, "BIFCV1.0", 8 ) == 0) {
-		//printf("'BIFCV1.0' Compressed File Found\n");
+		//print("'BIFCV1.0' Compressed File Found\n");
 		PathJoin( path, core->CachePath, compressed->filename, NULL );
 		if (file_exists(path)) {
-			//printf("Found in Cache\n");
+			//print("Found in Cache\n");
 			delete( compressed );
 			stream = FileStream::OpenFile(path);
 			if (!stream)
@@ -199,18 +199,18 @@ int BIFImporter::OpenArchive(const char* filename)
 				return GEM_ERROR;
 			return GEM_OK;
 		}
-		printf( "Decompressing\n" );
+		print( "Decompressing\n" );
 		if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB ))
 			return GEM_ERROR;
 		PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 		ieDword unCompBifSize;
 		compressed->ReadDword( &unCompBifSize );
-		printf( "\nDecompressing file: [..........]" );
+		print( "\nDecompressing file: [..........]" );
 		fflush(stdout);
 		FileStream out;
 		if (!out.Create(path)) {
 			printMessage("BIFImporter", " ", RED);
-			printf( "Cannot write %s.\n", path );	
+			print( "Cannot write %s.\n", path );
 			return GEM_ERROR;
 		}
 		ieDword finalsize = 0;
@@ -225,18 +225,18 @@ int BIFImporter::OpenArchive(const char* filename)
 			finalsize = out.GetPos();
 			if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
 				laststep++;
-				printf( "\b\b\b\b\b\b\b\b\b\b\b" );
+				print( "\b\b\b\b\b\b\b\b\b\b\b" );
 				int l;
 
 				for (l = 0; l < laststep; l++)
-					printf( "|" );
+					print( "|" );
 				for (; l < 10; l++)//l starts from laststep
-					printf( "." );
-				printf( "]" );
+					print( "." );
+				print( "]" );
 				fflush(stdout);
 			}
 		}
-		printf( "\n" );
+		print( "\n" );
 		delete( compressed );
 		stream = FileStream::OpenFile(path);
 		if (!stream)

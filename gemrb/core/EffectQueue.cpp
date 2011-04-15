@@ -181,7 +181,7 @@ static EffectDesc* FindEffect(const char* effectname)
 	void *tmp = bsearch(effectname, effectnames, effectnames_count, sizeof(EffectDesc), find_effect);
 	if( !tmp) {
 		printMessage( "EffectQueue", "", YELLOW);
-		printf("Couldn't assign effect: %s\n", effectname );
+		print("Couldn't assign effect: %s\n", effectname );
 	}
 	return (EffectDesc *) tmp;
 }
@@ -250,12 +250,12 @@ bool Init_EffectQueue()
 			//reverse linking opcode number
 			//using this unused field
 			if( (poi->opcode!=-1) && effectname[0]!='*') {
-				printf("Clashing Opcodes FN: %d vs. %d, %s\n", i, poi->opcode, effectname);
+				print("Clashing Opcodes FN: %d vs. %d, %s\n", i, poi->opcode, effectname);
 				abort();
 			}
 			poi->opcode = i;
 		}
-		//printf("-------- FN: %d, %s\n", i, effectname);
+		//print("-------- FN: %d, %s\n", i, effectname);
 	}
 	core->DelSymbol( eT );
 
@@ -634,7 +634,7 @@ all_party:
 
 	case FX_TARGET_UNKNOWN:
 	default:
-		printf( "Unknown FX target type: %d\n", fx->Target);
+		print( "Unknown FX target type: %d\n", fx->Target);
 		flg = FX_ABORT;
 		break;
 	}
@@ -950,11 +950,11 @@ static bool check_resistance(Actor* actor, Effect* fx)
 
 	//opcode immunity
 	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
-		printf ("immune to effect: %s\n", (char*) Opcodes[fx->Opcode].Name);
+		print ("immune to effect: %s\n", (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
 	if( actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
-		printf ("immune2 to effect: %s\n", (char*) Opcodes[fx->Opcode].Name);
+		print ("immune2 to effect: %s\n", (char*) Opcodes[fx->Opcode].Name);
 		return true;
 	}
 
@@ -987,7 +987,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	if( fx->random_value < val) {
 		// when using biased magic resistance non-hostile spells aren't resisted
 		if ((selective_mr && (fx->SourceFlags&SF_HOSTILE)) || !selective_mr) {
-			printf ("effect resisted: %s\n", (char*) Opcodes[fx->Opcode].Name);
+			print ("effect resisted: %s\n", (char*) Opcodes[fx->Opcode].Name);
 			return true;
 		}
 	}
@@ -1006,7 +1006,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 		if( fx->IsSaveForHalfDamage) {
 			fx->Parameter1/=2;
 		} else {
-			printf ("%s saved against effect: %s\n", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
+			print ("%s saved against effect: %s\n", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
 			return true;
 		}
 	}
@@ -1025,7 +1025,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 
 int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieDword resistance) const
 {
-	//printf( "FX 0x%02x: %s(%d, %d)\n", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
+	//print( "FX 0x%02x: %s(%d, %d)\n", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
 	if( fx->Opcode >= MAX_EFFECTS) {
 		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 		return FX_NOT_APPLIED;
@@ -1110,7 +1110,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		break;
 	//this shouldn't happen
 	default:
-		printf("Unknown delay type: %d (from %d)\n", DelayType(fx->TimingMode&0xff), fx->TimingMode);
+		print("Unknown delay type: %d (from %d)\n", DelayType(fx->TimingMode&0xff), fx->TimingMode);
 		abort();
 	}
 
@@ -1118,7 +1118,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 	if( fx->Opcode<MAX_EFFECTS) {
 		fn = Opcodes[fx->Opcode].Function;
 		if (!(target || (Opcodes[fx->Opcode].Flags & EFFECT_NO_ACTOR))) {
-			printf("targetless opcode without EFFECT_NO_ACTOR: %d, skipping\n", fx->Opcode);
+			print("targetless opcode without EFFECT_NO_ACTOR: %d, skipping\n", fx->Opcode);
 			return FX_NOT_APPLIED;
 		}
 	}
@@ -1727,7 +1727,7 @@ bool EffectQueue::HasAnyDispellableEffect() const
 
 void EffectQueue::dump() const
 {
-	printf( "EFFECT QUEUE:\n" );
+	print( "EFFECT QUEUE:\n" );
 	int i = 0;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
@@ -1737,7 +1737,7 @@ void EffectQueue::dump() const
 			if( fx->Opcode < MAX_EFFECTS)
 				Name = (char*) Opcodes[fx->Opcode].Name;
 
-			printf( " %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Name, fx->Parameter1, fx->Parameter2, fx->Source );
+			print( " %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Name, fx->Parameter1, fx->Parameter2, fx->Source );
 		}
 	}
 }

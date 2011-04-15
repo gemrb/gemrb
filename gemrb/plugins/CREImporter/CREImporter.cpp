@@ -395,7 +395,7 @@ bool CREImporter::Open(DataStream* stream, bool aF)
 	}
 
 	printMessage( "CREImporter"," ",LIGHT_RED);
-	printf("Not a CRE File or File Version not supported: %8.8s\n", Signature );
+	print("Not a CRE File or File Version not supported: %8.8s\n", Signature );
 	return false;
 }
 
@@ -795,7 +795,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 		default:
 			Inventory_Size=0;
 			printMessage("CREImporter","Unknown creature signature: ", RED);
-			printf("%d\n", CREVersion);
+			print("%d\n", CREVersion);
 			abort();
 	}
 
@@ -1057,7 +1057,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		if (index != 0xffff) {
 			if (index>=ItemsCount) {
 				printMessage("CREImporter"," ",LIGHT_RED);
-				printf("Invalid item index (%d) in creature!\n", index);
+				print("Invalid item index (%d) in creature!\n", index);
 				continue;
 			}
 			//20 is the size of CREItem on disc (8+2+3x2+4)
@@ -1069,7 +1069,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				act->inventory.SetSlotItem(item, Slot);
 			} else {
 				printMessage("CREImporter"," ",LIGHT_RED);
-				printf("Invalid item index (%d) in creature!\n", index);
+				print("Invalid item index (%d) in creature!\n", index);
 			}
 		}
 	}
@@ -1114,7 +1114,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				memorized_spells[k] = NULL;
 				continue;
 			}
-			printf("[CREImporter]: Duplicate memorized spell (%d) in creature!\n", k);
+			print("[CREImporter]: Duplicate memorized spell (%d) in creature!\n", k);
 		}
 	}
 
@@ -1122,7 +1122,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	while(i--) {
 		if (known_spells[i]) {
 			printMessage("CREImporter"," ", YELLOW);
-			printf("Dangling spell in creature: %s!\n", known_spells[i]->SpellResRef);
+			print("Dangling spell in creature: %s!\n", known_spells[i]->SpellResRef);
 			delete known_spells[i];
 		}
 	}
@@ -1132,7 +1132,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	while(i--) {
 		if (memorized_spells[i]) {
 			printMessage("CREImporter"," ", YELLOW);
-			printf("Dangling spell in creature: %s!\n", memorized_spells[i]->SpellResRef);
+			print("Dangling spell in creature: %s!\n", memorized_spells[i]->SpellResRef);
 			delete memorized_spells[i];
 		}
 	}
@@ -1468,7 +1468,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 			}
 		} else {
 			printMessage("CREImporter","Unresolved spell index: ", LIGHT_RED);
-			printf("%d level:%d, type: %d\n", spellindex, level+1, type);
+			print("%d level:%d, type: %d\n", spellindex, level+1, type);
 		}
 	}
 	str->ReadDword(&tmpDword);

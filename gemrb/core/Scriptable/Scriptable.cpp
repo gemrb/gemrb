@@ -355,7 +355,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 void Scriptable::AddAction(Action* aC)
 {
 	if (!aC) {
-		printf( "[GameScript]: NULL action encountered for %s!\n",scriptName );
+		print( "[GameScript]: NULL action encountered for %s!\n",scriptName );
 		return;
 	}
 
@@ -378,7 +378,7 @@ void Scriptable::AddAction(Action* aC)
 void Scriptable::AddActionInFront(Action* aC)
 {
 	if (!aC) {
-		printf( "[GameScript]: NULL action encountered for %s!\n",scriptName );
+		print( "[GameScript]: NULL action encountered for %s!\n",scriptName );
 		return;
 	}
 	InternalFlags|=IF_ACTIVE;
@@ -1284,7 +1284,7 @@ void Scriptable::StartTimer(ieDword ID, ieDword expiration)
 {
 	if (ID>=MAX_TIMER) {
 		printMessage("Scriptable", " ", RED);
-		printf("Timer id %d exceeded MAX_TIMER %d\n", ID, MAX_TIMER);
+		print("Timer id %d exceeded MAX_TIMER %d\n", ID, MAX_TIMER);
 		return;
 	}
 	script_timers[ID]= core->GetGame()->GameTime + expiration*AI_UPDATE_TIME;
@@ -1661,7 +1661,7 @@ void Movable::SetStance(unsigned int arg)
 
 	} else {
 		StanceID=IE_ANI_AWAKE; //
-		printf("Tried to set invalid stance id (%u)\n", arg);
+		print("Tried to set invalid stance id (%u)\n", arg);
 	}
 }
 
@@ -1720,7 +1720,7 @@ bool Movable::DoStep(unsigned int walk_speed, ieDword time)
 		step = path;
 		timeStartStep = time;
 	} else if (step->Next && (( time - timeStartStep ) >= walk_speed)) {
-		//printf("[New Step] : Orientation = %d\n", step->orient);
+		//print("[New Step] : Orientation = %d\n", step->orient);
 		step = step->Next;
 		timeStartStep = timeStartStep + walk_speed;
 	}

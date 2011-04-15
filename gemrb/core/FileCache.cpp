@@ -26,7 +26,7 @@
 DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int length, bool overwrite)
 {
 	if (!core->IsAvailable(PLUGIN_COMPRESSION_ZLIB)) {
-		printf( "No Compression Manager Available.\nCannot Load Compressed File.\n" );
+		print( "No Compression Manager Available.\nCannot Load Compressed File.\n" );
 		return NULL;
 	}
 
@@ -39,7 +39,7 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 		FileStream out;
 		if (!out.Create(path)) {
 			printMessage("FileCache", " ", RED);
-			printf( "Cannot write %s.\n", path );
+			print( "Cannot write %s.\n", path );
 			return NULL;
 		}
 
@@ -66,7 +66,7 @@ DataStream* CacheFile(const char* path)
 		FileStream* src = FileStream::OpenFile(path);
 		FileStream* dest = FileStream::OpenFile(cachedfile);
 		if (!src || !dest) {
-			printf("CachdFile failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
+			print("CachdFile failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
 			abort();
 		}
 
@@ -78,7 +78,7 @@ DataStream* CacheFile(const char* path)
 			size_t len = src->Read(buff, blockSize);
 			size_t c = dest->Write(buff, len);
 			if (c != len) {
-				printf("CacheFile failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
+				print("CacheFile failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
 				abort();
 			}
 		} while (src->Remains());

@@ -102,7 +102,7 @@ static void FindBIF(BIFEntry *entry)
 
 		if (!entry->cd) {
 			printStatus( "ERROR", LIGHT_RED );
-			printf( "Cannot find %s... Resource unavailable.\n",
+			print( "Cannot find %s... Resource unavailable.\n",
 					entry->name );
 			entry->found = false;
 			return;
@@ -119,7 +119,7 @@ static void FindBIF(BIFEntry *entry)
 	}
 
 	printMessage( "KEYImporter", " ", WHITE );
-	printf( "Cannot find %s...", entry->name );
+	print( "Cannot find %s...", entry->name );
 	printStatus( "ERROR", LIGHT_RED );
 }
 
@@ -128,19 +128,19 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	free(description);
 	description = strdup(desc);
 	if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
-		printf( "[ERROR]\nAn Archive Plug-in is not Available\n" );
+		print( "[ERROR]\nAn Archive Plug-in is not Available\n" );
 		return false;
 	}
 	unsigned int i;
 	// NOTE: Interface::Init has already resolved resfile.
 	printMessage( "KEYImporter", "Opening ", WHITE );
-	printf( "%s...", resfile );
+	print( "%s...", resfile );
 	FileStream* f = FileStream::OpenFile(resfile);
 	if (!f) {
 		// Check for backslashes (false escape characters)
 		// this check probably belongs elsewhere (e.g. ResolveFilePath)
 		if (strstr( resfile, "\\ " )) {
-			printf("%s", "\nEscaped space(s) detected in path!. Do not escape spaces in your GamePath! " );
+			print("%s", "\nEscaped space(s) detected in path!. Do not escape spaces in your GamePath! " );
 		}
 		printStatus( "ERROR", LIGHT_RED );
 		printMessage( "KEYImporter", "Cannot open Chitin.key\n", LIGHT_RED );
@@ -167,10 +167,10 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	f->ReadDword( &BifOffset );
 	f->ReadDword( &ResOffset );
 	printMessage( "KEYImporter", " ", WHITE );
-	printf( "BIF Files Count: %d (Starting at %d Bytes)\n", BifCount,
+	print( "BIF Files Count: %d (Starting at %d Bytes)\n", BifCount,
 		BifOffset );
 	printMessage( "KEYImporter", " ", WHITE );
-	printf( "RES Count: %d (Starting at %d Bytes)\n", ResCount, ResOffset );
+	print( "RES Count: %d (Starting at %d Bytes)\n", ResCount, ResOffset );
 	f->Seek( BifOffset, GEM_STREAM_START );
 	ieDword BifLen, ASCIIZOffset;
 	ieWord ASCIIZLen;
@@ -250,14 +250,14 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 		if (core->GameOnCD && (biffiles[bifnum].cd != 0))
 			FindBIFOnCD(&biffiles[bifnum]);
 		if (!biffiles[bifnum].found) {
-			printf( "Cannot find %s... Resource unavailable.\n",
+			print( "Cannot find %s... Resource unavailable.\n",
 					biffiles[bifnum].name );
 			return NULL;
 		}
 
 		PluginHolder<ArchiveImporter> ai(IE_BIF_CLASS_ID);
 		if (ai->OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
-			printf("Cannot open archive %s\n", biffiles[bifnum].path );
+			print("Cannot open archive %s\n", biffiles[bifnum].path );
 			return NULL;
 		}
 		DataStream* ret = ai->GetStream( ResLocator, type );

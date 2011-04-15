@@ -237,7 +237,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 
 	stream->Read( Signature, 8);
 	if (strncmp( Signature, "VVC V1.0", 8 ) != 0) {
-		printf( "Not a valid VVC File\n" );
+		print( "Not a valid VVC File\n" );
 		if (autoFree)
 			delete( stream );
 		return;

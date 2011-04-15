@@ -427,7 +427,7 @@ void Variables::SetAt(const char* key, ieDword value, bool nocreate)
 	if (( pAssoc = GetAssocAt( key, nHash ) ) == NULL) {
 		if (nocreate) {
 			printMessage("Variables", " ", YELLOW);
-			printf("Cannot create new variable: %s\n", key);
+			print("Cannot create new variable: %s\n", key);
 			return;
 		}
 

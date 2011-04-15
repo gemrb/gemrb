@@ -22,8 +22,6 @@
 
 #include "win32def.h" // logging
 
-#include <cstdio>
-
 #include "Interface.h"
 
 
@@ -56,7 +54,7 @@ int main(int argc, char* argv[])
 	core = new Interface( argc, argv );
 	if (core->Init() == GEM_ERROR) {
 		delete( core );
-		printf("Press enter to continue...");
+		print("Press enter to continue...");
 		textcolor(DEFAULT);
 		getc(stdin);
 		return -1;

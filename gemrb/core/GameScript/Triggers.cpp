@@ -2698,8 +2698,8 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 	if (!tar) {
 		if (InDebug&ID_TRIGGERS) {
 			printMessage("GameScript"," ",LIGHT_RED);
-			printf("Couldn't find door/container:%s\n", parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
-			printf("Sender: %s\n", Sender->GetScriptName() );
+			print("Couldn't find door/container:%s\n", parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
+			print("Sender: %s\n", Sender->GetScriptName() );
 		}
 		return 0;
 	}
@@ -2717,7 +2717,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 		default:; //to remove a warning
 	}
 	printMessage("GameScript"," ",LIGHT_RED);
-	printf("Not a door/container:%s\n", tar->GetScriptName());
+	print("Not a door/container:%s\n", tar->GetScriptName());
 	return 0;
 }
 
@@ -2726,8 +2726,8 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar) {
 		printMessage("GameScript"," ",LIGHT_RED);
-		printf("Couldn't find door/container:%s\n", parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
-		printf("Sender: %s\n", Sender->GetScriptName() );
+		print("Couldn't find door/container:%s\n", parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
+		print("Sender: %s\n", Sender->GetScriptName() );
 		return 0;
 	}
 	switch(tar->Type) {
@@ -2744,7 +2744,7 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 		default:; //to remove a warning
 	}
 	printMessage("GameScript"," ",LIGHT_RED);
-	printf("Not a door/container:%s\n", tar->GetScriptName());
+	print("Not a door/container:%s\n", tar->GetScriptName());
 	return 0;
 }
 

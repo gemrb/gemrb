@@ -104,7 +104,7 @@ int MVEPlay::doPlay()
 	player.video_init(w, h);
 
 	if (!player.start_playback()) {
-		printf("Failed to decode movie!\n");
+		print("Failed to decode movie!\n");
 		return 1;
 	}
 

@@ -341,10 +341,10 @@ void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 			ScrollY += 64;
 			break;
 		case GEM_ALT:
-			printf( "ALT pressed\n" );
+			print( "ALT pressed\n" );
 			break;
 		case GEM_TAB:
-			printf( "TAB pressed\n" );
+			print( "TAB pressed\n" );
 			break;
 	}
 

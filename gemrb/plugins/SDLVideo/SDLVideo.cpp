@@ -73,12 +73,12 @@ SDLVideoDriver::~SDLVideoDriver(void)
 
 int SDLVideoDriver::Init(void)
 {
-	//printf("[SDLVideoDriver]: Init...");
+	//print("[SDLVideoDriver]: Init...");
 	if (SDL_InitSubSystem( SDL_INIT_VIDEO ) == -1) {
-		//printf("[ERROR]\n");
+		//print("[ERROR]\n");
 		return GEM_ERROR;
 	}
-	//printf("[OK]\n");
+	//print("[OK]\n");
 	SDL_EnableUNICODE( 1 );
 	SDL_EnableKeyRepeat( 500, 50 );
 	SDL_ShowCursor( SDL_DISABLE );
@@ -1309,7 +1309,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		// tinted
 		// covered
 
-//		printf("Unoptimized blit: %04X\n", flags);
+//		print("Unoptimized blit: %04X\n", flags);
 
 #define SPECIALPIXEL   int ia=0; if ((remflags & BLIT_HALFTRANS) || (p == 1 && (remflags & BLIT_TRANSSHADOW))) ia = 1; if (p == 1 && (remflags & BLIT_NOSHADOW)) { } else
 
@@ -1439,7 +1439,7 @@ void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
 		// transshadow  (impossible with 32bpp)
 		// palettealpha (always set)
 
-//		printf("Unoptimized blit: %04X\n", flags);
+//		print("Unoptimized blit: %04X\n", flags);
 
 #define SPECIALPIXEL   int ia=0; if ((remflags & BLIT_HALFTRANS)) ia = 1; if (p == 1 && (remflags & BLIT_NOSHADOW)) { } else
 
@@ -1697,7 +1697,7 @@ inline void WritePixel(const long val, unsigned char *pixels, int BytesPerPixel)
 
 void SDLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped)
 {
-	//printf("x: %d; y: %d; XC: %d; YC: %d, VX: %d, VY: %d, VW: %d, VH: %d\n", x, y, xCorr, yCorr, Viewport.x, Viewport.y, Viewport.w, Viewport.h);
+	//print("x: %d; y: %d; XC: %d; YC: %d, VX: %d, VY: %d, VW: %d, VH: %d\n", x, y, xCorr, yCorr, Viewport.x, Viewport.y, Viewport.w, Viewport.h);
 	if (clipped) {
 		x += xCorr;
 		y += yCorr;

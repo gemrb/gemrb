@@ -80,7 +80,7 @@ bool INIImporter::Open(DataStream* stream, bool autoFree)
 			continue;
 		if (lastTag->AddLine( strbuf )) {
 			printMessage("INIImporter","", LIGHT_RED);
-			printf("Bad Line in file: %s, Section: [%s], Entry: '%s'\n", stream->filename, lastTag->GetTagName(), strbuf);
+			print("Bad Line in file: %s, Section: [%s], Entry: '%s'\n", stream->filename, lastTag->GetTagName(), strbuf);
 		}
 
 	} while (true);

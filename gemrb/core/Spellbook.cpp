@@ -989,27 +989,27 @@ void Spellbook::dump()
 {
 	unsigned int k;
 
-	printf( "SPELLBOOK:\n" );
+	print( "SPELLBOOK:\n" );
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			CRESpellMemorization* sm = spells[i][j];
 
 			if (sm->known_spells.size())
-				printf( " Known spells:\n" );
+				print( " Known spells:\n" );
 			for (k = 0; k < sm->known_spells.size(); k++) {
 				CREKnownSpell* spl = sm->known_spells[k];
 				if (!spl) continue;
 
-				printf ( " %2d: %8s L: %d T: %d\n", k, spl->SpellResRef, spl->Level, spl->Type );
+				print ( " %2d: %8s L: %d T: %d\n", k, spl->SpellResRef, spl->Level, spl->Type );
 			}
 
 			if (sm->memorized_spells.size())
-				printf( " Memorized spells:\n" );
+				print( " Memorized spells:\n" );
 			for (k = 0; k < sm->memorized_spells.size (); k++) {
 				CREMemorizedSpell* spl = sm->memorized_spells[k];
 				if (!spl) continue;
 
-				printf ( " %2u: %8s %x\n", k, spl->SpellResRef, spl->Flags );
+				print ( " %2u: %8s %x\n", k, spl->SpellResRef, spl->Flags );
 			}
 		}
 	}

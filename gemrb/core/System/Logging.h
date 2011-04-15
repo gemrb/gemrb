@@ -38,9 +38,6 @@
 #	include <conio.h>
 extern GEM_EXPORT HANDLE hConsole;
 #	define textcolor(i) SetConsoleTextAttribute(hConsole, i)
-#	ifndef __MINGW32__
-#		define printf cprintf //broken in mingw !!
-#	endif
 #else //WIN32
 #	ifndef ANDROID
 #		include <config.h>
@@ -51,22 +48,22 @@ extern GEM_EXPORT HANDLE hConsole;
 #endif //WIN32
 
 #ifdef NOCOLOR
-#	define DEFAULT printf("%s","");
-#	define BLACK printf("%s","");
-#	define RED printf("%s","");
-#	define GREEN printf("%s","");
-#	define BROWN printf("%s","");
-#	define BLUE printf("%s","");
-#	define MAGENTA printf("%s","");
-#	define CYAN printf("%s","");
-#	define WHITE printf("%s","");
-#	define LIGHT_RED printf("%s","");
-#	define LIGHT_GREEN printf("%s","");
-#	define YELLOW printf("%s","");
-#	define LIGHT_BLUE printf("%s","");
-#	define LIGHT_MAGENTA printf("%s","");
-#	define LIGHT_CYAN printf("%s","");
-#	define LIGHT_WHITE printf("%s","");
+#	define DEFAULT print("%s","");
+#	define BLACK print("%s","");
+#	define RED print("%s","");
+#	define GREEN print("%s","");
+#	define BROWN print("%s","");
+#	define BLUE print("%s","");
+#	define MAGENTA print("%s","");
+#	define CYAN print("%s","");
+#	define WHITE print("%s","");
+#	define LIGHT_RED print("%s","");
+#	define LIGHT_GREEN print("%s","");
+#	define YELLOW print("%s","");
+#	define LIGHT_BLUE print("%s","");
+#	define LIGHT_MAGENTA print("%s","");
+#	define LIGHT_CYAN print("%s","");
+#	define LIGHT_WHITE print("%s","");
 #else
 #	ifdef WIN32
 #		define BLACK 0
@@ -86,31 +83,30 @@ extern GEM_EXPORT HANDLE hConsole;
 #		define LIGHT_WHITE (WHITE | FOREGROUND_INTENSITY)
 #		define DEFAULT WHITE
 #	else //WIN32
-#		define DEFAULT printf("\033[0m");
-#		define BLACK printf("\033[0m\033[30;40m");
-#		define RED printf("\033[0m\033[31;40m");
-#		define GREEN printf("\033[0m\033[32;40m");
-#		define BROWN printf("\033[0m\033[33;40m");
-#		define BLUE printf("\033[0m\033[34;40m");
-#		define MAGENTA printf("\033[0m\033[35;40m");
-#		define CYAN printf("\033[0m\033[36;40m");
-#		define WHITE printf("\033[0m\033[37;40m");
-#		define LIGHT_RED printf("\033[1m\033[31;40m");
-#		define LIGHT_GREEN printf("\033[1m\033[32;40m");
-#		define YELLOW printf("\033[1m\033[33;40m");
-#		define LIGHT_BLUE printf("\033[1m\033[34;40m");
-#		define LIGHT_MAGENTA printf("\033[1m\033[35;40m");
-#		define LIGHT_CYAN printf("\033[1m\033[36;40m");
-#		define LIGHT_WHITE printf("\033[1m\033[37;40m");
+#		define DEFAULT print("\033[0m");
+#		define BLACK print("\033[0m\033[30;40m");
+#		define RED print("\033[0m\033[31;40m");
+#		define GREEN print("\033[0m\033[32;40m");
+#		define BROWN print("\033[0m\033[33;40m");
+#		define BLUE print("\033[0m\033[34;40m");
+#		define MAGENTA print("\033[0m\033[35;40m");
+#		define CYAN print("\033[0m\033[36;40m");
+#		define WHITE print("\033[0m\033[37;40m");
+#		define LIGHT_RED print("\033[1m\033[31;40m");
+#		define LIGHT_GREEN print("\033[1m\033[32;40m");
+#		define YELLOW print("\033[1m\033[33;40m");
+#		define LIGHT_BLUE print("\033[1m\033[34;40m");
+#		define LIGHT_MAGENTA print("\033[1m\033[35;40m");
+#		define LIGHT_CYAN print("\033[1m\033[36;40m");
+#		define LIGHT_WHITE print("\033[1m\033[37;40m");
 #	endif //WIN32
 #endif
 
 #ifndef ANDROID
-#	define printBracket(status, color) textcolor(WHITE); printf("["); textcolor(color); printf("%s", status); textcolor(WHITE); printf("]")
-#	define printStatus(status, color) printBracket(status, color); printf("\n")
-#	define printMessage(owner, message, color) printBracket(owner, LIGHT_WHITE); printf(": "); textcolor(color); printf("%s", message)
+#	define printBracket(status, color) textcolor(WHITE); print("["); textcolor(color); print("%s", status); textcolor(WHITE); print("]")
+#	define printStatus(status, color) printBracket(status, color); print("\n")
+#	define printMessage(owner, message, color) printBracket(owner, LIGHT_WHITE); print(": "); textcolor(color); print("%s", message)
 #else
-#	define printf print
 #	define printBracket(status, color)
 #	define printStatus(status, color) __android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s]", status)
 #	define printMessage(owner, message, color) __android_log_print(ANDROID_LOG_INFO, "GemRB", "%s: %s", owner, message)

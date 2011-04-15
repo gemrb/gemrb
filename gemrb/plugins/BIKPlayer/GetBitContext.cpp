@@ -158,7 +158,7 @@ void GetBitContext::merge( uint8_t *dst, uint8_t *src, int size)
 
 void GetBitContext::debug(const char *prefix)
 {
-	printf("%s: %d\n", prefix, index);
+	print("%s: %d\n", prefix, index);
 }
 
 //VLC specific code from bitstream.c

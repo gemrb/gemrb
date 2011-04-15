@@ -40,7 +40,7 @@ void Initializer()
 	AutoTable tm("cgtable");
 	if (!tm) {
 		printStatus( "ERROR", LIGHT_RED );
-		printf( "Cannot find cgtable.2da.\n");
+		print( "Cannot find cgtable.2da.\n");
 		return;
 	}
 	cgcount = tm->GetRowCount();
@@ -106,7 +106,7 @@ bool SPLImporter::Open(DataStream* stream, bool autoFree)
 	} else if (strncmp( Signature, "SPL V2.0", 8 ) == 0) {
 		version = 20;
 	} else {
-		printf( "[SPLImporter]: This file is not a valid SPL File\n" );
+		print( "[SPLImporter]: This file is not a valid SPL File\n" );
 		return false;
 	}
 

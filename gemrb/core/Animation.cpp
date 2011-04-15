@@ -71,7 +71,7 @@ void Animation::SetPos(unsigned int index)
 void Animation::AddFrame(Sprite2D* frame, unsigned int index)
 {
 	if (index>=indicesCount) {
-		printf("You tried to write past a buffer in animation, BAD!\n");
+		print("You tried to write past a buffer in animation, BAD!\n");
 		abort();
 	}
 	core->GetVideoDriver()->FreeSprite(frames[index]);
@@ -107,7 +107,7 @@ unsigned int Animation::GetCurrentFrame() const
 Sprite2D* Animation::LastFrame(void)
 {
 	if (!Flags&A_ANI_ACTIVE) {
-		printf("Frame fetched while animation is inactive!\n");
+		print("Frame fetched while animation is inactive!\n");
 		return NULL;
 	}
 	if (gameAnimation) {
@@ -126,7 +126,7 @@ Sprite2D* Animation::LastFrame(void)
 Sprite2D* Animation::NextFrame(void)
 {
 	if (!Flags&A_ANI_ACTIVE) {
-		printf("Frame fetched while animation is inactive!\n");
+		print("Frame fetched while animation is inactive!\n");
 		return NULL;
 	}
 	if (starttime == 0) {
@@ -180,7 +180,7 @@ Sprite2D* Animation::NextFrame(void)
 Sprite2D* Animation::GetSyncedNextFrame(Animation* master)
 {
 	if (!Flags&A_ANI_ACTIVE) {
-		printf("Frame fetched while animation is inactive!\n");
+		print("Frame fetched while animation is inactive!\n");
 		return NULL;
 	}
 	Sprite2D* ret;

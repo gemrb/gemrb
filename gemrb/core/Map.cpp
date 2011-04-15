@@ -467,7 +467,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 	Map* map = game->GetMap(area, false);
 	if (!map) {
 		printMessage("Map", " ", LIGHT_RED);
-		printf("Invalid map: %s\n",area);
+		print("Invalid map: %s\n",area);
 		command[0]=0;
 		return;
 	}
@@ -495,7 +495,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 		} else {
 			// crashes in original engine
 			printMessage("Map", " ", YELLOW);
-			printf( "WARNING!!! EntryPoint '%s' does not exist and direction %d is invalid\n", entrance, direction );
+			print( "WARNING!!! EntryPoint '%s' does not exist and direction %d is invalid\n", entrance, direction );
 			X = map->TMap->XCellCount * 64;
 			Y = map->TMap->YCellCount * 64;
 		}
@@ -734,7 +734,7 @@ void Map::UpdateScripts()
 				} else if (avatar->WalkScale) {
 					speed = avatar->WalkScale;
 				} else {
-					//printf("no walkscale for anim %d!\n", actor->BaseStats[IE_ANIMATION_ID]);
+					//print("no walkscale for anim %d!\n", actor->BaseStats[IE_ANIMATION_ID]);
 				}
 			}
 		}
@@ -1266,7 +1266,7 @@ void Map::AddAnimation(AreaAnimation* panim)
 	aniIterator iter;
 	
 	int Height = anim->GetHeight();
-printf("Adding %s at height %d, Pos: %d.%d\n", anim->Name, Height, anim->Pos.x, anim->Pos.y);
+print("Adding %s at height %d, Pos: %d.%d\n", anim->Name, Height, anim->Pos.x, anim->Pos.y);
 	for(iter=animations.begin(); (iter!=animations.end()) && ((*iter)->GetHeight()<Height); iter++) ;
 	animations.insert(iter, anim);	
 }
@@ -2125,30 +2125,30 @@ void Map::DebugDump(bool show_actors) const
 {
 	size_t i;
 
-	printf( "DebugDump of Area %s:\n", scriptName );
-	printf ("Scripts:");
+	print( "DebugDump of Area %s:\n", scriptName );
+	print ("Scripts:");
 
 	for (i = 0; i < MAX_SCRIPTS; i++) {
 		const char* poi = "<none>";
 		if (Scripts[i]) {
 			poi = Scripts[i]->GetName();
 		}
-		printf( " %.8s", poi );
+		print( " %.8s", poi );
 	}
-	printf( "Area Global ID:  %d\n", GetGlobalID());
-	printf( "OutDoor: %s\n", YESNO(AreaType & AT_OUTDOOR ) );
-	printf( "Day/Night: %s\n", YESNO(AreaType & AT_DAYNIGHT ) );
-	printf( "Extended night: %s\n", YESNO(AreaType & AT_EXTENDED_NIGHT ) );
-	printf( "Weather: %s\n", YESNO(AreaType & AT_WEATHER ) );
-	printf( "Area Type: %d\n", AreaType & (AT_CITY|AT_FOREST|AT_DUNGEON) );
-	printf( "Can rest: %s\n", YESNO(AreaType & AT_CAN_REST) );
+	print( "Area Global ID:  %d\n", GetGlobalID());
+	print( "OutDoor: %s\n", YESNO(AreaType & AT_OUTDOOR ) );
+	print( "Day/Night: %s\n", YESNO(AreaType & AT_DAYNIGHT ) );
+	print( "Extended night: %s\n", YESNO(AreaType & AT_EXTENDED_NIGHT ) );
+	print( "Weather: %s\n", YESNO(AreaType & AT_WEATHER ) );
+	print( "Area Type: %d\n", AreaType & (AT_CITY|AT_FOREST|AT_DUNGEON) );
+	print( "Can rest: %s\n", YESNO(AreaType & AT_CAN_REST) );
 
 	if (show_actors) {
-		printf("\n");
+		print("\n");
 		i = actors.size();
 		while (i--) {
 			if (!(actors[i]->GetInternalFlag()&(IF_JUSTDIED|IF_REALLYDIED))) {
-				printf("Actor: %s at %d.%d\n", actors[i]->GetName(1), actors[i]->Pos.x, actors[i]->Pos.y);
+				print("Actor: %s at %d.%d\n", actors[i]->GetName(1), actors[i]->Pos.x, actors[i]->Pos.y);
 			}
 		}
 	}
@@ -2329,7 +2329,7 @@ PathNode* Map::RunAway(const Point &s, const Point &d, unsigned int size, unsign
 
 		unsigned int Cost = MapSet[y * Width + x] + NormalCost;
 		if (Cost > PathLen) {
-			//printf("Path not found!\n");
+			//print("Path not found!\n");
 			break;
 		}
 		SetupNode( x - 1, y - 1, size, Cost );
@@ -2672,12 +2672,12 @@ PathNode* Map::FindPath(const Point &s, const Point &d, unsigned int size, int M
 
 		if (pos == pos2) {
 			//We've found _a_ path
-			//printf("GOAL!!!\n");
+			//print("GOAL!!!\n");
 			break;
 		}
 		unsigned int Cost = MapSet[y * Width + x] + NormalCost;
 		if (Cost > 65500) {
-			//printf("Path not found!\n");
+			//print("Path not found!\n");
 			break;
 		}
 		SetupNode( x - 1, y - 1, size, Cost );
@@ -2832,7 +2832,7 @@ int Map::WhichEdge(const Point &s)
 	unsigned int sY=s.y/12;
 	if (!(GetBlocked( sX, sY )&PATH_MAP_TRAVEL)) {
 		printMessage("Map"," ",YELLOW);
-		printf("This isn't a travel region [%d.%d]?\n",sX, sY);
+		print("This isn't a travel region [%d.%d]?\n",sX, sY);
 		return -1;
 	}
 	sX*=Height;
@@ -3501,7 +3501,7 @@ Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
 	if (!anim)
 		anim = af->GetCycle( 0 );
 	if (!anim) {
-		printf("Cannot load animation: %s\n", BAM);
+		print("Cannot load animation: %s\n", BAM);
 		return NULL;
 	}
 	//this will make the animation stop when the game is stopped
@@ -3523,7 +3523,7 @@ void AreaAnimation::InitAnimation()
 	AnimationFactory* af = ( AnimationFactory* )
 		gamedata->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
 	if (!af) {
-		printf("Cannot load animation: %s\n", BAM);
+		print("Cannot load animation: %s\n", BAM);
 		return;
 	}
 

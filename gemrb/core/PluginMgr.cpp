@@ -66,7 +66,7 @@ inline voidvoid my_dlsym(void *handle, const char *symbol)
 #else
 #define FREE_PLUGIN( handle )  dlclose( handle )
 #define GET_PLUGIN_SYMBOL( handle, name )  my_dlsym( handle, name )
-#define PRINT_DLERROR printf( "%s\n", dlerror() )
+#define PRINT_DLERROR print( "%s\n", dlerror() )
 #endif
 
 PluginMgr *PluginMgr::Get()
@@ -82,7 +82,7 @@ PluginMgr::PluginMgr()
 void PluginMgr::LoadPlugins(char* pluginpath)
 {
 	printMessage( "PluginMgr", "Loading Plugins from ", WHITE );
-	printf( "%s\n", pluginpath );
+	print( "%s\n", pluginpath );
 	
 	char path[_MAX_PATH];
 	strcpy( path, pluginpath );
@@ -100,11 +100,11 @@ void PluginMgr::LoadPlugins(char* pluginpath)
 
 		PathJoin( path, pluginpath, file, NULL );		
 		printBracket( "PluginMgr", LIGHT_WHITE );
-		printf( ": Loading: " );
+		print( ": Loading: " );
 		textcolor( LIGHT_WHITE );
-		printf( "%s", path );
+		print( "%s", path );
 		textcolor( WHITE );
-		printf( "..." );
+		print( "..." );
 
 		
 		ieDword flags = 0;
@@ -139,7 +139,7 @@ void PluginMgr::LoadPlugins(char* pluginpath)
 #endif
 		if (hMod == NULL) {
 			printBracket( "ERROR", LIGHT_RED );
-			printf( "\nCannot Load Module, Skipping...\n" );
+			print( "\nCannot Load Module, Skipping...\n" );
 			PRINT_DLERROR;
 			continue;
 		}
@@ -155,13 +155,13 @@ void PluginMgr::LoadPlugins(char* pluginpath)
 		//printMessage( "PluginMgr", "Checking Plugin Version...", WHITE );
 		if (LibVersion==NULL) {
 			printStatus( "ERROR", LIGHT_RED );
-			printf( "Invalid Plug-in, Skipping...\n" );
+			print( "Invalid Plug-in, Skipping...\n" );
 			FREE_PLUGIN( hMod );
 			continue;
 		}
 		if (strcmp(LibVersion(), VERSION_GEMRB) ) {
 			printStatus( "ERROR", LIGHT_RED );
-			printf( "Plug-in Version not valid, Skipping...\n" );
+			print( "Plug-in Version not valid, Skipping...\n" );
 			FREE_PLUGIN( hMod );
 			continue;
 		}
@@ -170,11 +170,11 @@ void PluginMgr::LoadPlugins(char* pluginpath)
 
 		//printStatus( "OK", LIGHT_GREEN );
 		//printMessage( "PluginMgr", "Loading Exports for ", WHITE );
-		printf( " " );
+		print( " " );
 		textcolor( LIGHT_WHITE );
-		printf( "%s", desc.Description );
+		print( "%s", desc.Description );
 		textcolor( WHITE );
-		printf( "..." );
+		print( "..." );
 		printStatus( "OK", LIGHT_GREEN );
 		if (libs.find(desc.ID) != libs.end()) {
 			printMessage( "PluginMgr", "Plug-in Already Loaded! ", WHITE );

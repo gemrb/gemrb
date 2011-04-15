@@ -58,7 +58,7 @@ bool PLTImporter::Open(DataStream* stream)
 
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "PLT V1  ", 8 ) != 0) {
-		printf( "[PLTImporter]: Not a valid PLT File.\n" );
+		print( "[PLTImporter]: Not a valid PLT File.\n" );
 		return false;
 	}
 

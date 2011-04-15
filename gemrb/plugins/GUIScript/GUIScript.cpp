@@ -622,7 +622,7 @@ static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
 	if ( (width && (width>core->Width)) ||
 			(height && (height>core->Height)) ) {
 		printMessage("GUIScript","Screen is too small!\n",LIGHT_RED);
-		printf("This window requires %d x %d resolution.\n",width,height);
+		print("This window requires %d x %d resolution.\n",width,height);
 		return RuntimeError("Please change your settings.");
 	}
 	Py_INCREF( Py_None );
@@ -3396,7 +3396,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 			IE_BAM_CLASS_ID, IE_NORMAL );
 		if (!af) {
 			printMessage("GUISCript","PLT/BAM not found for ref: ",YELLOW);
-			printf("%s\n", ResRef);
+			print("%s\n", ResRef);
 			textcolor(WHITE);
 			if (type == 0)
 				return NULL;
@@ -3408,13 +3408,13 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 
 		Picture = af->GetPaperdollImage(col[0]==0xFFFFFFFF?0:col, Picture2,(unsigned int)type);
 		if (Picture == NULL) {
-			printf ("Picture == NULL\n");
+			print ("Picture == NULL\n");
 			return NULL;
 		}
 	} else {
 		Picture = im->GetSprite2D(type, col);
 		if (Picture == NULL) {
-			printf ("Picture == NULL\n");
+			print ("Picture == NULL\n");
 			return NULL;
 		}
 	}
@@ -3816,7 +3816,7 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 	}
 	long value =(long) CheckVariable(Sender, Variable, Context);
 	printMessage("GUISCript"," ",YELLOW);
-	printf("%s %s=%ld\n",Context, Variable, value);
+	print("%s %s=%ld\n",Context, Variable, value);
 	textcolor(WHITE);
 	return PyInt_FromLong( value );
 }
@@ -5268,7 +5268,7 @@ PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int
 	if (spell == NULL) {
 		btn->SetPicture( NULL );
 		printMessage( "GUIScript", " ", LIGHT_RED);
-		printf("Spell not found :%.8s", SpellResRef );
+		print("Spell not found :%.8s", SpellResRef );
 		//no incref here!
 		return Py_None;
 	}
@@ -5862,7 +5862,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	Item *item = gamedata->GetItem( ItemResRef );
 	if (!item) {
 		printMessage("GUIScript", " ", LIGHT_RED);
-		printf("Invalid resource reference: %s\n", ItemResRef);
+		print("Invalid resource reference: %s\n", ItemResRef);
 		return PyInt_FromLong(0);
 	}
 
@@ -6337,9 +6337,9 @@ static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	if (GameScript::EvaluateString( game->GetCurrentArea( ), String )) {
-		printf( "%s returned True\n", String );
+		print( "%s returned True\n", String );
 	} else {
-		printf( "%s returned False\n", String );
+		print( "%s returned False\n", String );
 	}
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -8460,7 +8460,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 	for (int i=0;i<GUIBT_COUNT;i++) {
 		int ci = core->GetControl(wi, i+Start);
 		if (ci<0) {
-			printf("Couldn't find button #%d on Window #%d\n", i+Start, wi);
+			print("Couldn't find button #%d on Window #%d\n", i+Start, wi);
 			return RuntimeError ("No such control!\n");
 		}
 		int action = myrow[i];
@@ -8944,15 +8944,15 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	SpellExtHeader spelldata; // = SpellArray[spell];
 	actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
 
-	printf("Cast spell: %s\n", spelldata.spellname);
-	printf("Slot: %d\n", spelldata.slot);
-	printf("Type: %d\n", spelldata.type);
+	print("Cast spell: %s\n", spelldata.spellname);
+	print("Slot: %d\n", spelldata.slot);
+	print("Type: %d\n", spelldata.type);
 	//cannot make this const, because it will be freed
 	char *tmp = core->GetString(spelldata.strref);
-	printf("Spellname: %s\n", tmp);
+	print("Spellname: %s\n", tmp);
 	core->FreeString(tmp);
-	printf("Target: %d\n", spelldata.Target);
-	printf("Range: %d\n", spelldata.Range);
+	print("Target: %d\n", spelldata.Target);
+	print("Range: %d\n", spelldata.Range);
 	if(! (1<<spelldata.type) & type) {
 		return RuntimeError( "Wrong type of spell!");
 	}
@@ -8984,7 +8984,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 			//bring up inventory in the end???
 			//break;
 		default:
-			printf("Unhandled target type: %d\n", spelldata.Target);
+			print("Unhandled target type: %d\n", spelldata.Target);
 			break;
 	}
 	Py_INCREF( Py_None );
@@ -9092,12 +9092,12 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	/// remove this after projectile is done
-	printf("Use item: %s\n", itemdata.itemname);
-	printf("Extended header: %d\n", itemdata.headerindex);
-	printf("Attacktype: %d\n",itemdata.AttackType);
-	printf("Range: %d\n",itemdata.Range);
-	printf("Target: %d\n",forcetarget);
-	printf("Projectile: %d\n", itemdata.ProjectileAnimation);
+	print("Use item: %s\n", itemdata.itemname);
+	print("Extended header: %d\n", itemdata.headerindex);
+	print("Attacktype: %d\n",itemdata.AttackType);
+	print("Range: %d\n",itemdata.Range);
+	print("Target: %d\n",forcetarget);
+	print("Projectile: %d\n", itemdata.ProjectileAnimation);
 	//
 	switch (forcetarget) {
 		case TARGET_SELF:
@@ -10409,19 +10409,19 @@ bool GUIScript::Init(void)
 
 	if (PyRun_SimpleString( "from GUIDefines import *" ) == -1) {
 		printMessage( "GUIScript", " ", RED );
-		printf("Check if %s/GUIDefines.py exists! ", path);
+		print("Check if %s/GUIDefines.py exists! ", path);
 		return false;
 	}
 
 	if (PyRun_SimpleString( "from GUIClasses import *" ) == -1) {
 		printMessage( "GUIScript", " ", RED );
-		printf("Check if %s/GUIClasses.py exists! ", path);
+		print("Check if %s/GUIClasses.py exists! ", path);
 		return false;
 	}
 
 	if (PyRun_SimpleString( "from GemRB import *" ) == -1) {
 		printMessage( "GUIScript", " ", RED );
-		printf("builtin GemRB module failed to load!!! ");
+		print("builtin GemRB module failed to load!!! ");
 		return false;
 	}
 
@@ -10461,7 +10461,7 @@ bool GUIScript::Autodetect(void)
 		const char *dirent = iter.GetName();
 		char module[_MAX_PATH];
 
-		//printf("DE: %s\n", dirent);
+		//print("DE: %s\n", dirent);
 		if (iter.IsDirectory() && dirent[0] != '.') {
 			// NOTE: these methods subtly differ in sys.path content, need for __init__.py files ...
 			// Method1:
@@ -10491,7 +10491,7 @@ bool GUIScript::LoadScript(const char* filename)
 		return false;
 	}
 	printMessage( "GUIScript", "Loading Script ", WHITE );
-	printf( "%s...", filename );
+	print( "%s...", filename );
 
 	char path[_MAX_PATH];
 	strcpy( path, filename );
@@ -10537,7 +10537,7 @@ PyObject *GUIScript::CallbackFunction(const char* fname, PyObject* pArgs)
 	/* pFunc: Borrowed reference */
 	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
 		printMessage("GUIScript", " ", LIGHT_RED);
-		printf("%s is not callable!\n", fname);
+		print("%s is not callable!\n", fname);
 		return NULL;
 	}
 	PyObject *pValue = PyObject_CallObject( pFunc, pArgs );
@@ -10573,7 +10573,7 @@ bool GUIScript::RunFunction(const char *ModuleName, const char* FunctionName, bo
 	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
 		if (error) {
 			printMessage( "GUIScript", "Missing function:", LIGHT_RED );
-			printf("%s\n", FunctionName);
+			print("%s\n", FunctionName);
 		}
 		Py_DECREF(module);
 		return false;

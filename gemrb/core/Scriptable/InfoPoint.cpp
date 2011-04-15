@@ -198,31 +198,31 @@ void InfoPoint::DebugDump() const
 {
 	switch (Type) {
 		case ST_TRIGGER:
-			printf( "Debugdump of InfoPoint Region %s:\n", GetScriptName() );
+			print( "Debugdump of InfoPoint Region %s:\n", GetScriptName() );
 			break;
 		case ST_PROXIMITY:
-			printf( "Debugdump of Trap Region %s:\n", GetScriptName() );
+			print( "Debugdump of Trap Region %s:\n", GetScriptName() );
 			break;
 		case ST_TRAVEL:
-			printf( "Debugdump of Travel Region %s:\n", GetScriptName() );
+			print( "Debugdump of Travel Region %s:\n", GetScriptName() );
 			break;
 		default:
-			printf( "Debugdump of Unsupported Region %s:\n", GetScriptName() );
+			print( "Debugdump of Unsupported Region %s:\n", GetScriptName() );
 			break;
 	}
-	printf( "Region Global ID: %d\n", GetGlobalID());
-	printf( "Position: %d.%d\n", Pos.x, Pos.y);
+	print( "Region Global ID: %d\n", GetGlobalID());
+	print( "Position: %d.%d\n", Pos.x, Pos.y);
 	switch(Type) {
 	case ST_TRAVEL:
-		printf( "Destination Area: %s Entrance: %s\n", Destination, EntranceName);
+		print( "Destination Area: %s Entrance: %s\n", Destination, EntranceName);
 		break;
 	case ST_PROXIMITY:
-		printf( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));
-		printf( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
+		print( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));
+		print( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
 			TrapRemovalDiff );
 		break;
 	case ST_TRIGGER:
-		printf ( "InfoString: %s\n", overHeadText );
+		print ( "InfoString: %s\n", overHeadText );
 		break;
 	default:;
 	}
@@ -230,7 +230,7 @@ void InfoPoint::DebugDump() const
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	printf( "Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef, Dialog );
-	printf( "Active: %s\n", YESNO(InternalFlags&IF_ACTIVE));
+	print( "Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef, Dialog );
+	print( "Active: %s\n", YESNO(InternalFlags&IF_ACTIVE));
 }
 

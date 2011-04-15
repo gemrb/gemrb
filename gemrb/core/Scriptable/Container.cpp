@@ -269,18 +269,18 @@ void Container::TryBashLock(Actor *actor)
 
 void Container::DebugDump() const
 {
-	printf( "Debugdump of Container %s\n", GetScriptName() );
-	printf( "Container Global ID: %d\n", GetGlobalID());
-	printf( "Position: %d.%d\n", Pos.x, Pos.y);
-	printf( "Type: %d, Locked: %s, LockDifficulty: %d\n", Type, YESNO(Flags&CONT_LOCKED), LockDifficulty );
-	printf( "Flags: %d, Trapped: %s, Detected: %d\n", Flags, YESNO(Trapped), TrapDetected );
-	printf( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
+	print( "Debugdump of Container %s\n", GetScriptName() );
+	print( "Container Global ID: %d\n", GetGlobalID());
+	print( "Position: %d.%d\n", Pos.x, Pos.y);
+	print( "Type: %d, Locked: %s, LockDifficulty: %d\n", Type, YESNO(Flags&CONT_LOCKED), LockDifficulty );
+	print( "Flags: %d, Trapped: %s, Detected: %d\n", Flags, YESNO(Trapped), TrapDetected );
+	print( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
 		TrapRemovalDiff );
 	const char *name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	printf( "Script: %s, Key: %s\n", name, KeyResRef );
+	print( "Script: %s, Key: %s\n", name, KeyResRef );
 	// FIXME: const_cast
 	const_cast<Inventory&>(inventory).dump();
 }

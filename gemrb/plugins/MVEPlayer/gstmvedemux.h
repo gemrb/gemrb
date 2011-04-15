@@ -26,8 +26,8 @@
 #include "globals.h"
 
 #define G_UNLIKELY(x) (x)
-#define GST_WARNING printf
-#define GST_ERROR printf
+#define GST_WARNING print
+#define GST_ERROR print
 
 /* Define GET function for unaligned memory */
 #define _GST_GET(__data, __idx, __size, __shift) \

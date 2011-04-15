@@ -390,21 +390,21 @@ void Door::TryBashLock(Actor *actor)
 
 void Door::DebugDump() const
 {
-	printf( "Debugdump of Door %s:\n", GetScriptName() );
-	printf( "Door Global ID: %d\n", GetGlobalID());
-	printf( "Position: %d.%d\n", Pos.x, Pos.y);
-	printf( "Door Open: %s\n", YESNO(IsOpen()));
-	printf( "Door Locked: %s\n", YESNO(Flags&DOOR_LOCKED));
-	printf( "Door Trapped: %s\n", YESNO(Trapped));
+	print( "Debugdump of Door %s:\n", GetScriptName() );
+	print( "Door Global ID: %d\n", GetGlobalID());
+	print( "Position: %d.%d\n", Pos.x, Pos.y);
+	print( "Door Open: %s\n", YESNO(IsOpen()));
+	print( "Door Locked: %s\n", YESNO(Flags&DOOR_LOCKED));
+	print( "Door Trapped: %s\n", YESNO(Trapped));
 	if (Trapped) {
-		printf( "Trap Permanent: %s Detectable: %s\n", YESNO(Flags&DOOR_RESET), YESNO(Flags&DOOR_DETECTABLE) );
+		print( "Trap Permanent: %s Detectable: %s\n", YESNO(Flags&DOOR_RESET), YESNO(Flags&DOOR_DETECTABLE) );
 	}
-	printf( "Secret door: %s (Found: %s)\n", YESNO(Flags&DOOR_SECRET),YESNO(Flags&DOOR_FOUND));
+	print( "Secret door: %s (Found: %s)\n", YESNO(Flags&DOOR_SECRET),YESNO(Flags&DOOR_FOUND));
 	const char *Key = GetKey();
 	const char *name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	printf( "Script: %s, Key (%s) removed: %s, Dialog: %s\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog );
+	print( "Script: %s, Key (%s) removed: %s, Dialog: %s\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog );
 }
 

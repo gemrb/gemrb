@@ -213,7 +213,7 @@ void* BAMImporter::GetFramePixels(unsigned short findex)
 				// into override/ dir?
 				if (i + ( *p ) + 1 > pixelcount) {
 					memset( &Buffer[i], CompressedColorIndex, pixelcount - i );
-					printf ("Broken frame %d\n", findex);
+					print ("Broken frame %d\n", findex);
 				} else {
 					memset( &Buffer[i], CompressedColorIndex, ( *p ) + 1 );
 				}

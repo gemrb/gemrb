@@ -512,7 +512,7 @@ void CharAnimations::InitAvatarsTable()
 			valid_number(blood->QueryField(i,2), (long &)rmax);
 			if (value>255 || rmin>0xffff || rmax>0xffff) {
 				printMessage("CharAnimations", "bloodclr entry:", LIGHT_RED);
-				printf("%02x %04x-%04x ", (unsigned int) value, (unsigned int) rmin, (unsigned int) rmax);
+				print("%02x %04x-%04x ", (unsigned int) value, (unsigned int) rmin, (unsigned int) rmax);
 				printStatus("Invalid value!", LIGHT_RED);
 				continue;
 			}
@@ -610,7 +610,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	}
 	ResRef[0]=0;
 	printMessage("CharAnimations", " ", LIGHT_RED);
-	printf("Invalid or nonexistent avatar entry:%04X\n", AnimID);
+	print("Invalid or nonexistent avatar entry:%04X\n", AnimID);
 }
 
 //we have to drop them when armourlevel changes
@@ -782,7 +782,7 @@ WSW 003      |      013 ESE
 Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Orient)
 {
 	if (StanceID>=MAX_ANIMS) {
-		printf("Illegal stance ID\n");
+		print("Illegal stance ID\n");
 		abort();
 	}
 
@@ -864,7 +864,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			autoSwitchOnEnd = true;
 			break;
 		default:
-			printf ("Invalid Stance: %d\n", StanceID);
+			print ("Invalid Stance: %d\n", StanceID);
 			break;
 	}
 	Animation** anims = Anims[StanceID][Orient];
@@ -1380,7 +1380,7 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			strcat( ResRef, "g11" );
 			break;
 		default:
-			printf("VHR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			print("VHR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}
@@ -1459,7 +1459,7 @@ void CharAnimations::AddVHR3Suffix(char* ResRef, unsigned char StanceID,
 			strcat( ResRef, "g11" );
 			break;
 		default:
-			printf("VHR3 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			print("VHR3 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}
@@ -1521,7 +1521,7 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		default:
-			printf("Four frames Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			print("Four frames Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 
@@ -1663,7 +1663,7 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		default:
-			printf("VHR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			print("VHR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}
@@ -1737,7 +1737,7 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		default:
-			printf("Six Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			print("Six Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 
@@ -1787,7 +1787,7 @@ void CharAnimations::AddLR2Suffix(char* ResRef, unsigned char StanceID,
 			Cycle = 32 + Orient;
 			break;
 		default:
-			printf("LR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			print("LR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}
@@ -1910,7 +1910,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			Cycle = Orient;
 			break;
 		default:
-			printf("MHR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			print("MHR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}
@@ -2024,7 +2024,7 @@ void CharAnimations::AddLRSuffix2( char* ResRef, unsigned char StanceID,
 			Cycle = 40 + Orient / 2;
 			break;
 		default:
-			printf("LRSuffix2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			print("LRSuffix2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}
@@ -2101,7 +2101,7 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 			Cycle = 40 + Orient / 2;
 			break;
 		default:
-			printf("LR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			print("LR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}
@@ -2175,7 +2175,7 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 			Cycle = 24 + Orient / 2;
 			break;
 		default:
-			printf("LR3 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			print("LR3 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}
@@ -2250,7 +2250,7 @@ void CharAnimations::AddMMR2Suffix(char* ResRef, unsigned char StanceID,
 			Cycle = ( Orient / 2 );
 			break;
 		default:
-			printf("MMR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			print("MMR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}
@@ -2337,7 +2337,7 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 			Cycle = ( Orient / 2 );
 			break;
 		default:
-			printf("MMR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			print("MMR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}

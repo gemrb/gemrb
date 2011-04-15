@@ -252,7 +252,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	}
 	tm = tmm->GetTileMap(tm);
 	if (!tm) {
-		printf( "[AREImporter]: No Tile Map Available.\n" );
+		print( "[AREImporter]: No Tile Map Available.\n" );
 		return false;
 	}
 
@@ -272,7 +272,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 
 	ResourceHolder<ImageMgr> lm(TmpResRef);
 	if (!lm) {
-		printf( "[AREImporter]: No lightmap available.\n" );
+		print( "[AREImporter]: No lightmap available.\n" );
 		return false;
 	}
 
@@ -291,7 +291,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	Map* map = new Map();
 	if(!map) {
-		printf("Can't allocate map (out of memory).\n");
+		print("Can't allocate map (out of memory).\n");
 		abort();
 	}
 	if (core->SaveAsOriginal) {
@@ -320,7 +320,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
-		printf( "[AREImporter]: No Tile Map Manager Available.\n" );
+		print( "[AREImporter]: No Tile Map Manager Available.\n" );
 		return NULL;
 	}
 	ieResRef TmpResRef;
@@ -338,7 +338,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	//there was no tilemap set yet, so lets just send a NULL
 	TileMap* tm = tmm->GetTileMap(NULL);
 	if (!tm) {
-		printf( "[AREImporter]: No Tile Map Available.\n" );
+		print( "[AREImporter]: No Tile Map Available.\n" );
 		return NULL;
 	}
 
@@ -367,7 +367,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	ResourceHolder<ImageMgr> lm(TmpResRef);
 	if (!lm) {
-		printf( "[AREImporter]: No lightmap available.\n" );
+		print( "[AREImporter]: No lightmap available.\n" );
 		return NULL;
 	}
 
@@ -375,7 +375,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	ResourceHolder<ImageMgr> sr(TmpResRef);
 	if (!sr) {
-		printf( "[AREImporter]: No searchmap available.\n" );
+		print( "[AREImporter]: No searchmap available.\n" );
 		return NULL;
 	}
 
@@ -383,7 +383,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	ResourceHolder<ImageMgr> hm(TmpResRef);
 	if (!hm) {
-		printf( "[AREImporter]: No heightmap available.\n" );
+		print( "[AREImporter]: No heightmap available.\n" );
 		return NULL;
 	}
 
@@ -414,7 +414,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	str->ReadWord( &map->RestHeader.DayChance );
 	str->ReadWord( &map->RestHeader.NightChance );
 
-	printf( "Loading regions\n" );
+	print( "Loading regions\n" );
 	core->LoadProgress(70);
 	//Loading InfoPoints
 	for (i = 0; i < InfoPointsCount; i++) {
@@ -522,7 +522,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 	}
 
-	printf( "Loading containers\n" );
+	print( "Loading containers\n" );
 	//Loading Containers
 	for (i = 0; i < ContainersCount; i++) {
 		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
@@ -629,7 +629,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		c->OpenFail = OpenFail;
 	}
 
-	printf( "Loading doors\n" );
+	print( "Loading doors\n" );
 	//Loading Doors
 	for (i = 0; i < DoorsCount; i++) {
 		str->Seek( DoorsOffset + ( i * 0xc8 ), GEM_STREAM_START );
@@ -832,7 +832,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		door->SetDialog(Dialog);
 	}
 
-	printf( "Loading spawnpoints\n" );
+	print( "Loading spawnpoints\n" );
 	//Loading SpawnPoints
 	for (i = 0; i < SpawnCount; i++) {
 		str->Seek( SpawnOffset + (i*0xc8), GEM_STREAM_START );
@@ -887,11 +887,11 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	core->LoadProgress(75);
-	printf( "Loading actors\n" );
+	print( "Loading actors\n" );
 	//Loading Actors
 	str->Seek( ActorOffset, GEM_STREAM_START );
 	if (!core->IsAvailable( IE_CRE_CLASS_ID )) {
-		printf( "[AREImporter]: No Actor Manager Available, skipping actors\n" );
+		print( "[AREImporter]: No Actor Manager Available, skipping actors\n" );
 	} else {
 		PluginHolder<ActorMgr> actmgr(IE_CRE_CLASS_ID);
 		for (i = 0; i < ActorCount; i++) {
@@ -947,7 +947,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				crefile = gamedata->GetResource( CreResRef, IE_CRE_CLASS_ID );
 			}
 			if(!actmgr->Open( crefile, true )) {
-				printf("Couldn't read actor: %s!\n", CreResRef);
+				print("Couldn't read actor: %s!\n", CreResRef);
 				continue;
 			}
 			ab = actmgr->GetActor(0);
@@ -982,11 +982,11 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	core->LoadProgress(90);
-	printf( "Loading animations\n" );
+	print( "Loading animations\n" );
 	//Loading Animations
 	str->Seek( AnimOffset, GEM_STREAM_START );
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
-		printf( "[AREImporter]: No Animation Manager Available, skipping animations\n" );
+		print( "[AREImporter]: No Animation Manager Available, skipping animations\n" );
 	} else {
 		for (i = 0; i < AnimCount; i++) {
 			AreaAnimation* anim = new AreaAnimation();
@@ -1021,7 +1021,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 	}
 
-	printf( "Loading entrances\n" );
+	print( "Loading entrances\n" );
 	//Loading Entrances
 	str->Seek( EntrancesOffset, GEM_STREAM_START );
 	for (i = 0; i < EntrancesCount; i++) {
@@ -1036,7 +1036,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		map->AddEntrance( Name, XPos, YPos, Face );
 	}
 
-	printf( "Loading variables\n" );
+	print( "Loading variables\n" );
 	map->locals->LoadInitialValues(ResRef);
 	//Loading Variables
 	str->Seek( VariablesOffset, GEM_STREAM_START );
@@ -1051,7 +1051,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		map->locals->SetAt( Name, Value );
 	}
 
-	printf( "Loading ambients\n" );
+	print( "Loading ambients\n" );
 	str->Seek( AmbiOffset, GEM_STREAM_START );
 	for (i = 0; i < AmbiCount; i++) {
 		int j;
@@ -1091,7 +1091,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		map->AddAmbient(ambi);
 	}
 
-	printf( "Loading automap notes\n" );
+	print( "Loading automap notes\n" );
 	str->Seek( NoteOffset, GEM_STREAM_START );
 
 	//this feature exists in all blackisle games but not in bioware games
@@ -1166,7 +1166,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	//this is a ToB feature (saves the unexploded projectiles)
-	printf( "Loading traps\n" );
+	print( "Loading traps\n" );
 	for (i = 0; i < TrapCount; i++) {
 		ieResRef TrapResRef;
 		ieDword TrapEffOffset;
@@ -1192,7 +1192,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		int TrapEffectCount = TrapSize/0x108;
 		if(TrapEffectCount*0x108!=TrapSize) {
 			printMessage("AREImporter", " ", LIGHT_RED);
-			printf("TrapEffectSize in game: %d != %d. Clearing it\n", TrapSize, TrapEffectCount*0x108);
+			print("TrapEffectSize in game: %d != %d. Clearing it\n", TrapSize, TrapEffectCount*0x108);
 				continue;
 		}
 		//The projectile is always created, the worst that can happen
@@ -1216,7 +1216,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		map->AddProjectile( pro, pos, pos);
 	}
 
-	printf( "Loading tiles\n" );
+	print( "Loading tiles\n" );
 	//Loading Tiled objects (if any)
 	str->Seek( TileOffset, GEM_STREAM_START );
 	for (i = 0; i < TileCount; i++) {
@@ -1239,7 +1239,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		map->TMap->AddTile( ID, Name, Flags, NULL,0, NULL, 0 );
 	}
 
-	printf( "Loading explored bitmap\n" );
+	print( "Loading explored bitmap\n" );
 	i = map->GetExploredMapSize();
 	if (ExploredBitmapSize==i) {
 		map->ExploredBitmap = (ieByte *) malloc(i);
@@ -1249,14 +1249,14 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	else {
 		if( ExploredBitmapSize ) {
 			printMessage("AREImporter", " ", LIGHT_RED);
-			printf("ExploredBitmapSize in game: %d != %d. Clearing it\n", ExploredBitmapSize, i);
+			print("ExploredBitmapSize in game: %d != %d. Clearing it\n", ExploredBitmapSize, i);
 		}
 		ExploredBitmapSize = i;
 		map->ExploredBitmap = (ieByte *) calloc(i, 1);
 	}
 	map->VisibleBitmap = (ieByte *) calloc(i, 1);
 
-	printf( "Loading wallgroups\n");
+	print( "Loading wallgroups\n");
 	map->SetWallGroups( tmm->GetPolygonsCount(),tmm->GetWallGroups() );
 	//setting up doors
 	for (i=0;i<DoorsCount;i++) {

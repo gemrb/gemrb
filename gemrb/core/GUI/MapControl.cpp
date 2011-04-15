@@ -294,7 +294,7 @@ void MapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	switch (Key) {
 		case '\t':
 			//not GEM_TAB
-			printf( "TAB released\n" );
+			print( "TAB released\n" );
 			return;
 		case 'f':
 			if (Mod & GEM_MOD_CTRL)
@@ -504,10 +504,10 @@ void MapControl::OnSpecialKeyPress(unsigned char Key)
 			ScrollY += 64;
 			break;
 		case GEM_ALT:
-			printf( "ALT pressed\n" );
+			print( "ALT pressed\n" );
 			break;
 		case GEM_TAB:
-			printf( "TAB pressed\n" );
+			print( "TAB pressed\n" );
 			break;
 		default:
 			break;

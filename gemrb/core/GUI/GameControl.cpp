@@ -881,7 +881,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				area->MoveVisibleGroundPiles(p);
 				break;
 			case 'x': // shows coordinates on the map
-				printf( "%s [%d.%d]\n", area->GetScriptName(), p.x, p.y );
+				print( "%s [%d.%d]\n", area->GetScriptName(), p.x, p.y );
 				break;
 			case 'g'://shows loaded areas and other game information
 				game->DebugDump();
@@ -997,22 +997,22 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case '4': //show all traps and infopoints
 				DebugFlags ^= DEBUG_SHOW_INFOPOINTS;
-				printf("Show traps and infopoints %s\n", DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
+				print("Show traps and infopoints %s\n", DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
 				break;
 			case '6': //show the lightmap
 				DebugFlags ^= DEBUG_SHOW_LIGHTMAP;
-				printf("Show lightmap %s\n", DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
+				print("Show lightmap %s\n", DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
 				break;
 			case '7': //toggles fog of war
 				core->FogOfWar ^= FOG_DRAWFOG;
-				printf("Show Fog-Of-War: %s\n", core->FogOfWar & FOG_DRAWFOG ? "ON" : "OFF");
+				print("Show Fog-Of-War: %s\n", core->FogOfWar & FOG_DRAWFOG ? "ON" : "OFF");
 				break;
 			case '8': //show searchmap over area
 				core->FogOfWar ^= FOG_DRAWSEARCHMAP;
-				printf("Show searchmap %s\n", core->FogOfWar & FOG_DRAWSEARCHMAP ? "ON" : "OFF");
+				print("Show searchmap %s\n", core->FogOfWar & FOG_DRAWSEARCHMAP ? "ON" : "OFF");
 				break;
 			default:
-				printf( "KeyRelease:%d - %d\n", Key, Mod );
+				print( "KeyRelease:%d - %d\n", Key, Mod );
 				break;
 		}
 		return; //return from cheatkeys
@@ -2394,7 +2394,7 @@ void GameControl::HandleWindowHide(const char *WindowName, const char *WindowPos
 				return;
 			}
 			printMessage("GameControl", "Invalid Window Index: ", LIGHT_RED);
-			printf("%s:%u\n",WindowName, index);
+			print("%s:%u\n",WindowName, index);
 		}
 	}
 }
@@ -2447,7 +2447,7 @@ void GameControl::HandleWindowReveal(const char *WindowName, const char *WindowP
 				return;
 			}
 			printMessage("GameControl", "Invalid Window Index ", LIGHT_RED);
-			printf("%s:%u\n",WindowName, index);
+			print("%s:%u\n",WindowName, index);
 		}
 	}
 }

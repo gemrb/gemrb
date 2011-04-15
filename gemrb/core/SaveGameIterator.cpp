@@ -229,7 +229,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 		//The matcher didn't match: either this is not a valid dir
 		//or the SAVEGAME_DIRECTORY_MATCHER needs updating.
 		printMessage( "SaveGameIterator", " ", LIGHT_RED );
-		printf( "Invalid savegame directory '%s' in %s.\n", slotname, Path );
+		print( "Invalid savegame directory '%s' in %s.\n", slotname, Path );
 		return false;
 	}
 
@@ -242,14 +242,14 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 
 	if (access( ftmp, R_OK )) {
 		printMessage("SaveGameIterator"," ",YELLOW);
-		printf("Ignoring slot %s because of no appropriate preview!\n", dtmp);
+		print("Ignoring slot %s because of no appropriate preview!\n", dtmp);
 		return false;
 	}
 
 	PathJoinExt(ftmp, dtmp, core->WorldMapName[0], "wmp");
 	if (access( ftmp, R_OK )) {
 		printMessage("SaveGameIterator"," ",YELLOW);
-		printf("Ignoring slot %s because of no appropriate worldmap!\n", dtmp);
+		print("Ignoring slot %s because of no appropriate worldmap!\n", dtmp);
 		return false;
 	}
 
@@ -257,7 +257,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	PathJoinExt(ftmp, dtmp, core->WorldMapName[1], "wmp");
 	if (access( ftmp, R_OK )) {
 		printMessage("SaveGameIterator"," ",YELLOW);
-		printf("Ignoring slot %s because of no appropriate worldmap!\n", dtmp);
+		print("Ignoring slot %s because of no appropriate worldmap!\n", dtmp);
 		return false;
 	}
 	*/
@@ -335,7 +335,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
 	//maximum pathlength == 240, without 8+3 filenames
 	if ( (cnt != 2) || (strlen(Path)>240) ) {
-		printf( "Invalid savegame directory '%s' in %s.\n", slotname, Path );
+		print( "Invalid savegame directory '%s' in %s.\n", slotname, Path );
 		return NULL;
 	}
 

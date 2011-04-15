@@ -1021,7 +1021,7 @@ int Game::GetXPFromCR(int cr)
 		if (cr>=MAX_CRLEVEL) {
 			cr=MAX_CRLEVEL-1;
 		}
-		printf("Challenge Rating: %d, party level: %d ", cr, level);
+		print("Challenge Rating: %d, party level: %d ", cr, level);
 		return crtable[level][cr];
 	}
 	printMessage("Game","Cannot find moncrate.2da!\n", LIGHT_RED);
@@ -1097,7 +1097,7 @@ bool Game::EveryoneNearPoint(Map *area, const Point &p, int flags) const
 			return false;
 		}
 		if (Distance(p,PCs[i])>MAX_TRAVELING_DISTANCE) {
-printf("Actor %s is not near!\n", PCs[i]->LongName);
+print("Actor %s is not near!\n", PCs[i]->LongName);
 			return false;
 		}
 	}
@@ -1729,21 +1729,21 @@ void Game::DebugDump()
 {
 	size_t idx;
 
-	printf("Currently loaded areas:\n");
+	print("Currently loaded areas:\n");
 	for(idx=0;idx<Maps.size();idx++) {
 		Map *map = Maps[idx];
 
-		printf("%s\n",map->GetScriptName());
+		print("%s\n",map->GetScriptName());
 	}
-	printf("Current area: %s   Previous area: %s\n", CurrentArea, PreviousArea);
-	printf("Global script: %s\n", Scripts[0]->GetName());
-	printf("CombatCounter: %d\n", (int) CombatCounter);
+	print("Current area: %s   Previous area: %s\n", CurrentArea, PreviousArea);
+	print("Global script: %s\n", Scripts[0]->GetName());
+	print("CombatCounter: %d\n", (int) CombatCounter);
 
-	printf("Party size: %d\n", (int) PCs.size());
+	print("Party size: %d\n", (int) PCs.size());
 	for(idx=0;idx<PCs.size();idx++) {
 		Actor *actor = PCs[idx];
 
-		printf("Name: %s Order %d %s\n",actor->ShortName, actor->InParty, actor->Selected?"x":"-");
+		print("Name: %s Order %d %s\n",actor->ShortName, actor->InParty, actor->Selected?"x":"-");
 	}
 }
 

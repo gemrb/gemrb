@@ -106,7 +106,7 @@ class GameScript;
 #define GSASSERT(f,c) \
 	if(!(f))  \
 	{  \
-		printf("Assertion failed: %s [0x%08lX] Line %d",#f, c, __LINE__); \
+		print("Assertion failed: %s [0x%08lX] Line %d",#f, c, __LINE__); \
 		abort(); \
 	}
 
@@ -171,19 +171,19 @@ public:
 
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		if(objectName[0]) {
-			printf("Object: %s\n",objectName);
+			print("Object: %s\n",objectName);
 			return;
 		}
-		printf("IDS Targeting: ");
+		print("IDS Targeting: ");
 		for(i=0;i<MAX_OBJECT_FIELDS;i++) {
-			printf("%d ",objectFields[i]);
+			print("%d ",objectFields[i]);
 		}
-		printf("\n");
-		printf("Filters: ");
+		print("\n");
+		print("Filters: ");
 		for(i=0;i<MAX_NESTING;i++) {
-			printf("%d ",objectFilters[i]);
+			print("%d ",objectFilters[i]);
 		}
-		printf("\n");
+		print("\n");
 	}
 
 	void Release()
@@ -232,17 +232,17 @@ public:
 	void Dump()
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		printf ("Trigger: %d\n", triggerID);
-		printf ("Int parameters: %d %d %d\n", int0Parameter, int1Parameter, int2Parameter);
-		printf ("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
-		printf ("String0: %s\n", string0Parameter);
-		printf ("String1: %s\n", string1Parameter);
+		print ("Trigger: %d\n", triggerID);
+		print ("Int parameters: %d %d %d\n", int0Parameter, int1Parameter, int2Parameter);
+		print ("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
+		print ("String0: %s\n", string0Parameter);
+		print ("String1: %s\n", string1Parameter);
 		if (objectParameter) {
 			objectParameter->Dump();
 		} else {
-			printf("No object\n");
+			print("No object\n");
 		}
-		printf("\n");
+		print("\n");
 	}
 
 	void Release()
@@ -334,25 +334,25 @@ public:
 		int i;
 
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		printf("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
-		printf("String0: %s, String1: %s\n", string0Parameter?string0Parameter:"<NULL>", string1Parameter?string1Parameter:"<NULL>");
+		print("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
+		print("String0: %s, String1: %s\n", string0Parameter?string0Parameter:"<NULL>", string1Parameter?string1Parameter:"<NULL>");
 		for (i=0;i<3;i++) {
 			if (objects[i]) {
-				printf( "%d. ",i+1);
+				print( "%d. ",i+1);
 				objects[i]->Dump();
 			} else {
-				printf( "%d. Object - NULL\n",i+1);
+				print( "%d. Object - NULL\n",i+1);
 			}
 		}
 
-		printf("RefCount: %d\n", RefCount);
+		print("RefCount: %d\n", RefCount);
 	}
 
 	void Release()
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		if (!RefCount) {
-			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
+			print( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__ );
 			abort();
 		}
@@ -367,7 +367,7 @@ public:
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
 		if (RefCount >= 65536) {
-			printf( "Refcount increased to: %d in action %d\n", RefCount,
+			print( "Refcount increased to: %d in action %d\n", RefCount,
 				actionID );
 			abort();
 		}
@@ -386,7 +386,7 @@ public:
 		for (size_t c = 0; c < actions.size(); c++) {
 			if (actions[c]) {
 				if (actions[c]->GetRef()>2) {
-					printf("Residue action %d with refcount %d\n", actions[c]->actionID, actions[c]->GetRef());
+					print("Residue action %d with refcount %d\n", actions[c]->actionID, actions[c]->GetRef());
 				}
 				actions[c]->Release();
 				actions[c] = NULL;
