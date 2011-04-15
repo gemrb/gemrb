@@ -114,4 +114,9 @@ extern GEM_EXPORT HANDLE hConsole;
 
 GEM_EXPORT void print(const char* message, ...);
 
+#if (__GNUC__ > 4)
+// poison printf
+extern "C" int printf(const char* message, ...) __attribute__ ((deprecated))
+#endif
+
 #endif
