@@ -25,6 +25,11 @@
 #include <android/log.h>
 #endif
 
+#ifdef WIN32
+# define ADV_TEXT
+# include <conio.h>
+#endif
+
 void print(const char *message, ...)
 {
 	va_list ap;
