@@ -52,3 +52,55 @@ void print(const char *message, ...)
 	free(buff);
 	va_end(ap);
 }
+
+#ifdef WIN32
+static int colors[] = {
+	0,
+	FOREGROUND_RED,
+	FOREGROUND_GREEN,
+	FOREGROUND_GREEN | FOREGROUND_RED,
+	FOREGROUND_BLUE,
+	FOREGROUND_RED | FOREGROUND_BLUE,
+	FOREGROUND_BLUE | FOREGROUND_GREEN,
+	FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED,
+	(RED | FOREGROUND_INTENSITY),
+	(GREEN | FOREGROUND_INTENSITY),
+	(GREEN | RED | FOREGROUND_INTENSITY),
+	(BLUE | FOREGROUND_INTENSITY),
+	(MAGENTA | FOREGROUND_INTENSITY),
+	(CYAN | FOREGROUND_INTENSITY),
+	(WHITE | FOREGROUND_INTENSITY),
+	WHITE
+};
+#else
+static const char* colors[] = {
+	"\033[0m",
+	"\033[0m\033[30;40m",
+	"\033[0m\033[31;40m",
+	"\033[0m\033[32;40m",
+	"\033[0m\033[33;40m",
+	"\033[0m\033[34;40m",
+	"\033[0m\033[35;40m",
+	"\033[0m\033[36;40m",
+	"\033[0m\033[37;40m",
+	"\033[1m\033[31;40m",
+	"\033[1m\033[32;40m",
+	"\033[1m\033[33;40m",
+	"\033[1m\033[34;40m",
+	"\033[1m\033[35;40m",
+	"\033[1m\033[36;40m",
+	"\033[1m\033[37;40m"
+};
+#endif
+
+
+void textcolor(log_color c)
+{
+#ifndef NOCOLOR
+#ifdef WIN32
+	SetConsoleTextAttribute(hConsole, colors[c]);
+#else
+	printf("%s", colors[c]);
+#endif
+#endif
+}
