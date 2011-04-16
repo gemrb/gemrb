@@ -62,7 +62,11 @@ enum log_color {
 };
 
 
-GEM_EXPORT void print(const char* message, ...);
+GEM_EXPORT void print(const char* message, ...)
+#if defined(__GNUC__)
+    __attribute__ ((format(printf, 1, 2)))
+#endif
+	;
 GEM_EXPORT void textcolor(log_color);
 GEM_EXPORT void printBracket(const char *status, log_color color);
 GEM_EXPORT void printStatus(const char* status, log_color color);
