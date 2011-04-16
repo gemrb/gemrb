@@ -135,12 +135,16 @@ void printStatus(const char* status, log_color color)
 	print("\n");
 }
 
-void printMessage(const char* owner, const char* message, log_color color)
+void printMessage(const char* owner, const char* message, log_color color, ...)
 {
 	printBracket(owner, LIGHT_WHITE);
 	print(": ");
 	textcolor(color);
-	print("%s", message);
+	va_list ap;
+
+	va_start(ap, color);
+	vprint(message, ap);
+	va_end(ap);
 }
 #else /* !ANDROID */
 void printBracket(const char* status, log_color color)
