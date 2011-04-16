@@ -30,36 +30,40 @@
 # include <conio.h>
 #endif
 
-void print(const char *message, ...)
+void vprint(const char *message, va_list ap)
 {
-	va_list ap;
-
 #if (!defined(WIN32) || defined(__MINGW32__))
-	va_start(ap, message);
 # ifdef ANDROID
 	__android_log_vprint(ANDROID_LOG_INFO, "printf:", message, ap);
 # else
 	vprintf(message, ap);
 # endif
-	va_end(ap);
 #else
-	va_start(ap, message);
-	int size = vsnprintf(NULL, 0, message, ap);
-	va_end(ap);
+	va_list copy;
+	// MSVC6 lacks va_copy
+	memcpy(&copy, &ap, sizeof(va_list))
+	int size = vsnprintf(NULL, 0, message, copy);
+	va_end(copy);
 
 	if (size < 0)
 		return;
 
 	char *buff = new char[size+1];
-	va_start(ap, message);
 	vsprintf(buff, message, ap);
-	va_end(ap);
 
 	cprintf("%s", message);
 
 	free(buff);
-	va_end(ap);
 #endif
+}
+
+void print(const char *message, ...)
+{
+	va_list ap;
+
+	va_start(ap, message);
+	vprint(message, ap);
+	va_end(ap);
 }
 
 #ifdef WIN32
