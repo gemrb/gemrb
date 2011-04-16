@@ -68,9 +68,9 @@ GEM_EXPORT void printBracket(const char *status, log_color color);
 GEM_EXPORT void printStatus(const char* status, log_color color);
 GEM_EXPORT void printMessage(const char* owner, const char* message, log_color color);
 
-#if (__GNUC__ > 4)
+#if (__GNUC__ >= 4)
 // poison printf
-extern "C" int printf(const char* message, ...) __attribute__ ((deprecated))
+extern "C" int printf(const char* message, ...) __attribute__ ((deprecated("GemRB doesn't use printf; use print instead.")));
 #endif
 
 #endif

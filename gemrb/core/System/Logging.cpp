@@ -109,7 +109,7 @@ void textcolor(log_color c)
 #ifdef WIN32
 	SetConsoleTextAttribute(hConsole, colors[c]);
 #else
-	printf("%s", colors[c]);
+	print("%s", colors[c]);
 #endif
 #endif
 }
