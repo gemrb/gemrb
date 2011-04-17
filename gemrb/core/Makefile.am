@@ -105,6 +105,7 @@ libgemrb_core_la_SOURCES = \
 	System/Logging.cpp \
 	System/MemoryStream.cpp \
 	System/SlicedStream.cpp \
+	System/String.cpp \
 	System/VFS.cpp \
 	TableMgr.cpp \
 	Tile.cpp \
