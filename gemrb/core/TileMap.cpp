@@ -513,8 +513,8 @@ int TileMap::CleanupContainer(Container *container)
 			return 1;
 		}
 	}
-	printMessage("TileMap", " ", LIGHT_RED);
-	print("Invalid container cleanup: %s\n", container->GetScriptName());
+	printMessage("TileMap", "Invalid container cleanup: %s\n", LIGHT_RED,
+		container->GetScriptName());
 	return 1;
 }
 

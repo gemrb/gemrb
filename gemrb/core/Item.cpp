@@ -240,8 +240,8 @@ unsigned int Item::GetCastingDistance(int idx) const
 {
 	ITMExtHeader *seh = GetExtHeader(idx);
 	if (!seh) {
-		printMessage("Item", "Cannot retrieve item header!!! ",RED);
-		print("required header: %d, maximum: %d\n", idx, (int) ExtHeaderCount);
+		printMessage("Item", "Cannot retrieve item header!!! required header: %d, maximum: %d\n", RED,
+			idx, (int) ExtHeaderCount);
 		return 0;
 	}
 	return (unsigned int) seh->Range;

@@ -63,8 +63,8 @@ bool WMPImporter::Open(DataStream* stream1, DataStream* stream2, bool autoFree)
 	if (str1) {
 		str1->Read( Signature, 8 );
 		if (strncmp( Signature, "WMAPV1.0", 8 ) != 0) {
-			printMessage( "WMPImporter","This file is not a valid WMP File\n", LIGHT_RED);
-			print( "-->%s<--\n", stream1->filename);
+			printMessage("WMPImporter", "This file is not a valid WMP File\n-->%s<--\n", LIGHT_RED,
+				stream1->filename);
 			return false;
 		}
 		str1->ReadDword( &WorldMapsCount1 );
@@ -77,8 +77,8 @@ bool WMPImporter::Open(DataStream* stream1, DataStream* stream2, bool autoFree)
 	if (str2) {
 		str2->Read( Signature, 8 );
 		if (strncmp( Signature, "WMAPV1.0", 8 ) != 0) {
-			printMessage( "WMPImporter","This file is not a valid WMP File\n", LIGHT_RED);
-			print( "-->%s<--\n", stream2->filename);
+			printMessage("WMPImporter", "This file is not a valid WMP File\n-->%s<--\n", LIGHT_RED,
+				stream2->filename);
 			return false;
 		}
 		str2->ReadDword( &WorldMapsCount2 );

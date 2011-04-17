@@ -74,8 +74,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 	}
 	char path[_MAX_PATH];
 	PathJoin(path, core->GamePath, musicsubfolder, name, NULL);
-	printMessage("MUSImporter", "", WHITE);
-	print( "Loading %s...", path );
+	printMessage("MUSImporter", "Loading %s...", WHITE, path);
 	if (!str->Open(path)) {
 		printStatus("NOT FOUND", LIGHT_RED );
 		return false;

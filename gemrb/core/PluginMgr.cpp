@@ -81,8 +81,7 @@ PluginMgr::PluginMgr()
 
 void PluginMgr::LoadPlugins(char* pluginpath)
 {
-	printMessage( "PluginMgr", "Loading Plugins from ", WHITE );
-	print( "%s\n", pluginpath );
+	printMessage("PluginMgr", "Loading Plugins from %s\n", WHITE, pluginpath);
 	
 	char path[_MAX_PATH];
 	strcpy( path, pluginpath );

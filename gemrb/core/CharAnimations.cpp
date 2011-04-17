@@ -511,8 +511,8 @@ void CharAnimations::InitAvatarsTable()
 			valid_number(blood->QueryField(i,1), (long &)rmin);
 			valid_number(blood->QueryField(i,2), (long &)rmax);
 			if (value>255 || rmin>0xffff || rmax>0xffff) {
-				printMessage("CharAnimations", "bloodclr entry:", LIGHT_RED);
-				print("%02x %04x-%04x ", (unsigned int) value, (unsigned int) rmin, (unsigned int) rmax);
+				printMessage("CharAnimations", "bloodclr entry: %02x %04x-%04x ", LIGHT_RED,
+						(unsigned int) value, (unsigned int) rmin, (unsigned int) rmax);
 				printStatus("Invalid value!", LIGHT_RED);
 				continue;
 			}
@@ -609,8 +609,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		}
 	}
 	ResRef[0]=0;
-	printMessage("CharAnimations", " ", LIGHT_RED);
-	print("Invalid or nonexistent avatar entry:%04X\n", AnimID);
+	printMessage("CharAnimations", "Invalid or nonexistent avatar entry:%04X\n", LIGHT_RED, AnimID);
 }
 
 //we have to drop them when armourlevel changes
@@ -931,10 +930,8 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 
 		if (!af) {
 			if (part < actorPartCount) {
-				char warnbuf[200];
-				snprintf(warnbuf, 200,
-					 "Couldn't create animationfactory: %s (%04x)\n", NewResRef, GetAnimationID());
-				printMessage("CharAnimations",warnbuf,LIGHT_RED);
+				printMessage("CharAnimations", "Couldn't create animationfactory: %s (%04x)\n",
+					LIGHT_RED, NewResRef, GetAnimationID());;
 				for (int i = 0; i < part; ++i)
 					delete anims[i];
 				delete[] anims;
@@ -951,11 +948,8 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 
 		if (!a) {
 			if (part < actorPartCount) {
-				char warnbuf[200];
-				snprintf(warnbuf, 200,
-						 "Couldn't load animation: %s, cycle %d\n",
+				printMessage("CharAnimations", "Couldn't load animation: %s, cycle %d\n", LIGHT_RED,
 						 NewResRef, Cycle);
-				printMessage("CharAnimations",warnbuf,LIGHT_RED);
 				for (int i = 0; i < part; ++i)
 					delete anims[i];
 				delete[] anims;
@@ -1115,7 +1109,6 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 					 char* NewResRef, unsigned char& Cycle,
 					 int Part, EquipResRefData*& EquipData)
 {
-	char tmp[256];
 	EquipData = 0;
 	Orient &= 15;
 	switch (GetAnimType()) {
@@ -1203,8 +1196,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			strnlwrcpy(NewResRef, AvatarTable[AvatarsRowNum].Prefixes[Part], 8);
 			break;
 		default:
-			sprintf (tmp,"Unknown animation type in avatars.2da row: %d\n", AvatarsRowNum);
-			printMessage ("CharAnimations",tmp, LIGHT_RED);
+			printMessage ("CharAnimations", "Unknown animation type in avatars.2da row: %d\n", LIGHT_RED, AvatarsRowNum);
 			abort();
 	}
 }

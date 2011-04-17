@@ -326,8 +326,7 @@ void SanityCheck(ieWord a,ieWord &b,const char *message)
 		return;
 	}
 	if (b==0xffff) {
-		printMessage("GAMImporter"," ",LIGHT_RED);
-		print("Invalid Slot Enabler caught: %s!\n", message);
+		printMessage("GAMImporter", "Invalid Slot Enabler caught: %s!\n", LIGHT_RED, message);
 		b=0;
 	}
 }

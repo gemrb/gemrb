@@ -79,8 +79,8 @@ bool INIImporter::Open(DataStream* stream, bool autoFree)
 		if (lastTag == NULL)
 			continue;
 		if (lastTag->AddLine( strbuf )) {
-			printMessage("INIImporter","", LIGHT_RED);
-			print("Bad Line in file: %s, Section: [%s], Entry: '%s'\n", stream->filename, lastTag->GetTagName(), strbuf);
+			printMessage("INIImporter", "Bad Line in file: %s, Section: [%s], Entry: '%s'\n", LIGHT_RED,
+				stream->filename, lastTag->GetTagName(), strbuf);
 		}
 
 	} while (true);

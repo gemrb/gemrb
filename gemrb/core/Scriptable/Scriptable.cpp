@@ -1369,8 +1369,8 @@ bool Scriptable::TimerExpired(ieDword ID)
 void Scriptable::StartTimer(ieDword ID, ieDword expiration)
 {
 	if (ID>=MAX_TIMER) {
-		printMessage("Scriptable", " ", RED);
-		print("Timer id %d exceeded MAX_TIMER %d\n", ID, MAX_TIMER);
+		printMessage("Scriptable", "Timer id %d exceeded MAX_TIMER %d\n", RED,
+			ID, MAX_TIMER);
 		return;
 	}
 	script_timers[ID]= core->GetGame()->GameTime + expiration*AI_UPDATE_TIME;

@@ -196,8 +196,8 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, const Point &targ
 {
 	SPLExtHeader *seh = GetExtHeader(header);
 	if (!seh) {
-		printMessage("Spell", "Cannot retrieve spell header!!! ",RED);
-		print("required header: %d, maximum: %d\n", header, (int) ExtHeaderCount);
+		printMessage("Spell", "Cannot retrieve spell header!!! required header: %d, maximum: %d\n", RED,
+			header, (int) ExtHeaderCount);
 		return NULL;
 	}
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
@@ -225,8 +225,8 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 	int idx = GetHeaderIndexFromLevel(level);
 	SPLExtHeader *seh = GetExtHeader(idx);
 	if (!seh) {
-		printMessage("Spell", "Cannot retrieve spell header!!! ",RED);
-		print("required header: %d, maximum: %d\n", idx, (int) ExtHeaderCount);
+		printMessage("Spell", "Cannot retrieve spell header!!! required header: %d, maximum: %d\n", RED,
+			idx, (int) ExtHeaderCount);
 		return 0;
 	}
 

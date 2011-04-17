@@ -599,8 +599,8 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 
 	if (!ab) {
-		printMessage("GameScript","Failed to create creature! ",LIGHT_RED);
-		print("(missing creature file %s?)\n", parameters->string0Parameter);
+		printMessage("GameScript", "Failed to create creature! (missing creature file %s?)\n", LIGHT_RED,
+			parameters->string0Parameter);
 		// maybe this should abort()?
 		return;
 	}
@@ -737,8 +737,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 		// last parameter is 'face', which should be passed from relevant action parameter..
 		sprintf( Tmp, "MoveBetweenAreas(\"%s\",[%hd.%hd],%d)", area, enter.x, enter.y, 0 );
 	}
-	printMessage("GSUtils"," ", WHITE);
-	print("Executing %s in EscapeAreaCore\n", Tmp);
+	printMessage("GSUtils", "Executing %s in EscapeAreaCore\n", WHITE, Tmp);
 	//drop this action, but add another (destroyself or movebetweenareas)
 	//between the arrival and the final escape, there should be a wait time
 	//that wait time could be handled here
@@ -835,15 +834,15 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		scr = Sender;
 	}
 	if (!scr) {
-		printMessage("GameScript"," ",LIGHT_RED);
-		print("Speaker for dialog couldn't be found (Sender: %s, Type: %d) Flags:%d.\n", Sender->GetScriptName(), Sender->Type, Flags);
+		printMessage("GameScript", "Speaker for dialog couldn't be found (Sender: %s, Type: %d) Flags:%d.\n", LIGHT_RED,
+			Sender->GetScriptName(), Sender->Type, Flags);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	if (!tar || tar->Type!=ST_ACTOR) {
-		printMessage("GameScript"," ",LIGHT_RED);
-		print("Target for dialog couldn't be found (Sender: %s, Type: %d).\n", Sender->GetScriptName(), Sender->Type);
+		printMessage("GameScript", "Target for dialog couldn't be found (Sender: %s, Type: %d).\n", LIGHT_RED,
+			Sender->GetScriptName(), Sender->Type);
 		if (Sender->Type == ST_ACTOR) {
 			((Actor *) Sender)->DebugDump();
 		}
@@ -862,8 +861,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	speaker = NULL;
 	target = (Actor *) tar;
 	if ((Flags & BD_CHECKDIST) && !CanSee(scr, target, false, seeflag) ) {
-		printMessage("GameScript"," ",LIGHT_RED);
-		print("CanSee returned false! Speaker (%s, type %d) and target are:\n", scr->GetScriptName(), scr->Type);
+		printMessage("GameScript", "CanSee returned false! Speaker (%s, type %d) and target are:\n", LIGHT_RED,
+			scr->GetScriptName(), scr->Type);
 		if (scr->Type == ST_ACTOR) {
 			((Actor *) scr)->DebugDump();
 		}
@@ -1066,8 +1065,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust)
 {
-	printMessage("GameScript", " ", WHITE);
-	print("MoveBetweenAreas: %s to %s [%d.%d] face: %d\n", actor->GetName(0), area,position.x,position.y, face);
+	printMessage("GameScript", "MoveBetweenAreas: %s to %s [%d.%d] face: %d\n", WHITE,
+		actor->GetName(0), area,position.x,position.y, face);
 	Map* map2;
 	Game* game = core->GetGame();
 	if (area[0]) { //do we need to switch area?
@@ -1264,8 +1263,8 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	if (!valHook) {
 		//FIXME:missing ids file!!!
 		if (InDebug&ID_TRIGGERS) {
-			printMessage("GameScript"," ",LIGHT_RED);
-			print("Missing IDS file %s for symbol %s!\n",idsname, symbol);
+			printMessage("GameScript", "Missing IDS file %s for symbol %s!\n", LIGHT_RED,
+				idsname, symbol);
 		}
 		return -1;
 	}
@@ -1644,8 +1643,7 @@ void FreeSrc(SrcVector *poi, const ieResRef key)
 {
 	int res = SrcCache.DecRef((void *) poi, key, true);
 	if (res<0) {
-		printMessage( "GameScript", "Corrupted Src cache encountered (reference count went below zero), ", LIGHT_RED );
-		print( "Src name is: %.8s\n", key);
+		printMessage("GameScript", "Corrupted Src cache encountered (reference count went below zero), Src name is: %.8s\n", LIGHT_RED, key);
 		abort();
 	}
 	if (!res) {
@@ -1906,8 +1904,8 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 			map->locals->SetAt( VarName, value, NoCreate);
 		}
 		else if (InDebug&ID_VARIABLES) {
-			printMessage("GameScript"," ",YELLOW);
-			print("Invalid variable %s %s in setvariable\n",Context, VarName);
+			printMessage("GameScript", "Invalid variable %s %s in setvariable\n", YELLOW,
+				Context, VarName);
 		}
 	}
 	else {
@@ -1950,8 +1948,8 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 			map->locals->SetAt( poi, value, NoCreate);
 		}
 		else if (InDebug&ID_VARIABLES) {
-			printMessage("GameScript"," ",YELLOW);
-			print("Invalid variable %s in setvariable\n",VarName);
+			printMessage("GameScript", "Invalid variable %s in setvariable\n", YELLOW,
+				VarName);
 		}
 	}
 	else {
@@ -2004,8 +2002,8 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 				*valid=false;
 			}
 			if (InDebug&ID_VARIABLES) {
-				printMessage("GameScript"," ",YELLOW);
-				print("Invalid variable %s in checkvariable\n",VarName);
+				printMessage("GameScript", "Invalid variable %s in checkvariable\n", YELLOW,
+					VarName);
 			}
 		}
 	} else {
@@ -2055,8 +2053,8 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 				*valid=false;
 			}
 			if (InDebug&ID_VARIABLES) {
-				printMessage("GameScript"," ",YELLOW);
-				print("Invalid variable %s %s in checkvariable\n",Context, VarName);
+				printMessage("GameScript", "Invalid variable %s %s in checkvariable\n", YELLOW,
+					Context, VarName);
 			}
 		}
 	} else {
@@ -2172,8 +2170,7 @@ unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
 
 	Spell* spl = gamedata->GetSpell( spellres );
 	if (!spl) {
-		printMessage("GameScript"," ",LIGHT_RED);
-		print("Spell couldn't be found:%.8s.\n", spellres);
+		printMessage("GameScript", "Spell couldn't be found:%.8s.\n", LIGHT_RED, spellres);
 		return 0;
 	}
 	dist = spl->GetCastingDistance(Sender);
@@ -2195,8 +2192,7 @@ unsigned int GetItemDistance(const ieResRef itemres, int header)
 
 	Item* itm = gamedata->GetItem( itemres );
 	if (!itm) {
-		printMessage("GameScript"," ",LIGHT_RED);
-		print("Item couldn't be found:%.8s.\n", itemres);
+		printMessage("GameScript", "Item couldn't be found:%.8s.\n", LIGHT_RED, itemres);
 		return 0;
 	}
 	dist=itm->GetCastingDistance(header);

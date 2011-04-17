@@ -466,8 +466,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 	}
 	Map* map = game->GetMap(area, false);
 	if (!map) {
-		printMessage("Map", " ", LIGHT_RED);
-		print("Invalid map: %s\n",area);
+		printMessage("Map", "Invalid map: %s\n", LIGHT_RED, area);
 		command[0]=0;
 		return;
 	}
@@ -494,8 +493,8 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 			Y = map->TMap->YCellCount * 32;
 		} else {
 			// crashes in original engine
-			printMessage("Map", " ", YELLOW);
-			print( "WARNING!!! EntryPoint '%s' does not exist and direction %d is invalid\n", entrance, direction );
+			printMessage("Map", "WARNING!!! EntryPoint '%s' does not exist and direction %d is invalid\n", YELLOW,
+				entrance, direction);
 			X = map->TMap->XCellCount * 64;
 			Y = map->TMap->YCellCount * 64;
 		}
@@ -2817,8 +2816,8 @@ int Map::WhichEdge(const Point &s)
 	unsigned int sX=s.x/16;
 	unsigned int sY=s.y/12;
 	if (!(GetBlocked( sX, sY )&PATH_MAP_TRAVEL)) {
-		printMessage("Map"," ",YELLOW);
-		print("This isn't a travel region [%d.%d]?\n",sX, sY);
+		printMessage("Map", "This isn't a travel region [%d.%d]?\n", YELLOW,
+			sX, sY);
 		return -1;
 	}
 	sX*=Height;

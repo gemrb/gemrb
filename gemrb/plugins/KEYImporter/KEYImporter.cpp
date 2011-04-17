@@ -118,8 +118,7 @@ static void FindBIF(BIFEntry *entry)
 		}
 	}
 
-	printMessage( "KEYImporter", " ", WHITE );
-	print( "Cannot find %s...", entry->name );
+	printMessage("KEYImporter", "Cannot find %s...", WHITE, entry->name);
 	printStatus( "ERROR", LIGHT_RED );
 }
 
@@ -133,8 +132,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	}
 	unsigned int i;
 	// NOTE: Interface::Init has already resolved resfile.
-	printMessage( "KEYImporter", "Opening ", WHITE );
-	print( "%s...", resfile );
+	printMessage("KEYImporter", "Opening %s...", WHITE, resfile);
 	FileStream* f = FileStream::OpenFile(resfile);
 	if (!f) {
 		// Check for backslashes (false escape characters)
@@ -153,8 +151,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	f->Read( Signature, 8 );
 	if (strncmp( Signature, "KEY V1  ", 8 ) != 0) {
 		printStatus( "ERROR", LIGHT_RED );
-		printMessage( "KEYImporter", "File has an Invalid Signature.\n",
-			LIGHT_RED );
+		printMessage( "KEYImporter", "File has an Invalid Signature.\n", LIGHT_RED );
 		textcolor( WHITE );
 		delete( f );
 		return false;
@@ -169,8 +166,8 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	printMessage( "KEYImporter", " ", WHITE );
 	print( "BIF Files Count: %d (Starting at %d Bytes)\n", BifCount,
 		BifOffset );
-	printMessage( "KEYImporter", " ", WHITE );
-	print( "RES Count: %d (Starting at %d Bytes)\n", ResCount, ResOffset );
+	printMessage("KEYImporter", "RES Count: %d (Starting at %d Bytes)\n", WHITE,
+		ResCount, ResOffset);
 	f->Seek( BifOffset, GEM_STREAM_START );
 	ieDword BifLen, ASCIIZOffset;
 	ieWord ASCIIZLen;

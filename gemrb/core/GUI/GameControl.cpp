@@ -2399,8 +2399,8 @@ void GameControl::HandleWindowHide(const char *WindowName, const char *WindowPos
 				}
 				return;
 			}
-			printMessage("GameControl", "Invalid Window Index: ", LIGHT_RED);
-			print("%s:%u\n",WindowName, index);
+			printMessage("GameControl", "Invalid Window Index: %s:%u\n", LIGHT_RED,
+				WindowName, index);
 		}
 	}
 }
@@ -2452,8 +2452,8 @@ void GameControl::HandleWindowReveal(const char *WindowName, const char *WindowP
 				}
 				return;
 			}
-			printMessage("GameControl", "Invalid Window Index ", LIGHT_RED);
-			print("%s:%u\n",WindowName, index);
+			printMessage("GameControl", "Invalid Window Index %s:%u\n", LIGHT_RED,
+				WindowName, index);
 		}
 	}
 }

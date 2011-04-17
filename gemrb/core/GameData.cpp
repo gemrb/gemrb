@@ -269,8 +269,7 @@ void GameData::FreePalette(Palette *&pal, const ieResRef name)
 	}
 	res=PaletteCache.DecRef((void *) pal, name, true);
 	if (res<0) {
-		printMessage( "Core", "Corrupted Palette cache encountered (reference count went below zero), ", LIGHT_RED );
-		print( "Palette name is: %.8s\n", name);
+		printMessage("Core", "Corrupted Palette cache encountered (reference count went below zero), Palette name is: %.8s\n", LIGHT_RED, name);
 		abort();
 	}
 	if (!res) {
@@ -314,8 +313,7 @@ void GameData::FreeItem(Item const *itm, const ieResRef name, bool free)
 
 	res=ItemCache.DecRef((void *) itm, name, free);
 	if (res<0) {
-		printMessage( "Core", "Corrupted Item cache encountered (reference count went below zero), ", LIGHT_RED );
-		print( "Item name is: %.8s\n", name);
+		printMessage("Core", "Corrupted Item cache encountered (reference count went below zero), Item name is: %.8s\n", LIGHT_RED, name);
 		abort();
 	}
 	if (res) return;
@@ -356,8 +354,8 @@ void GameData::FreeSpell(Spell *spl, const ieResRef name, bool free)
 
 	res=SpellCache.DecRef((void *) spl, name, free);
 	if (res<0) {
-		printMessage( "Core", "Corrupted Spell cache encountered (reference count went below zero), ", LIGHT_RED );
-		print( "Spell name is: %.8s or %.8s\n", name, spl->Name);
+		printMessage("Core", "Corrupted Spell cache encountered (reference count went below zero), Spell name is: %.8s or %.8s\n", LIGHT_RED,
+			name, spl->Name);
 		abort();
 	}
 	if (res) return;
@@ -395,8 +393,7 @@ void GameData::FreeEffect(Effect *eff, const ieResRef name, bool free)
 
 	res=EffectCache.DecRef((void *) eff, name, free);
 	if (res<0) {
-		printMessage( "Core", "Corrupted Effect cache encountered (reference count went below zero), ", LIGHT_RED );
-		print( "Effect name is: %.8s\n", name);
+		printMessage("Core", "Corrupted Effect cache encountered (reference count went below zero), Effect name is: %.8s\n", LIGHT_RED, name);
 		abort();
 	}
 	if (res) return;
@@ -481,8 +478,8 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	}
 	default:
 		print( "\n" );
-		printMessage( "KEYImporter", " ", WHITE );
-		print( "%s files are not supported.\n", core->TypeExt( type ) );
+		printMessage("KEYImporter", "%s files are not supported.\n", WHITE,
+			core->TypeExt(type));
 		return NULL;
 	}
 }

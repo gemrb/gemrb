@@ -28,7 +28,7 @@
 bool checkALError(const char* msg, const char* status) {
 	int error = alGetError();
 	if (error != AL_NO_ERROR) {
-		printMessage("OpenAL", msg, WHITE );
+		printMessage("OpenAL", "%s", WHITE, msg);
 		print (": 0x%x ", error);
 		printStatus(status, YELLOW);
 		return true;
@@ -38,7 +38,7 @@ bool checkALError(const char* msg, const char* status) {
 
 void showALCError(const char* msg, const char* status, ALCdevice *device) {
 	int error = alcGetError(device);
-	printMessage("OpenAL", msg, WHITE );
+	printMessage("OpenAL", "%s", WHITE, msg );
 	if (error != AL_NO_ERROR) {
 		print (": 0x%x ", error);
 	}
@@ -171,11 +171,8 @@ bool OpenALAudioDriver::Init(void)
 	int sources = CountAvailableSources(MAX_STREAMS+1);
 	num_streams = sources - 1;
 
-	char buf[255];
-	sprintf(buf, "Allocated %d streams.%s", num_streams,
-		    (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : "" ) );
-
-	printMessage( "OpenAL", buf, WHITE );
+	printMessage( "OpenAL", "Allocated %d streams.%s", WHITE,
+		num_streams, (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : "" ));
 
 	stayAlive = true;
 	musicThread = SDL_CreateThread( MusicManager, this );

@@ -302,15 +302,13 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 	}
 
 	if (direction<0 || direction>3) {
-		printMessage("WorldMap","", LIGHT_RED);
-		print("CalculateDistances for invalid direction: %s\n", AreaName);
+		printMessage("WorldMap", "CalculateDistances for invalid direction: %s\n", LIGHT_RED, AreaName);
 		return -1;
 	}
 
 	unsigned int i;
 	if (!GetArea(AreaName, i)) {
-		printMessage("WorldMap","", LIGHT_RED);
-		print("CalculateDistances for invalid Area: %s\n", AreaName);
+		printMessage("WorldMap", "CalculateDistances for invalid Area: %s\n", LIGHT_RED, AreaName);
 		return -1;
 	}
 	if (Distances) {
@@ -320,8 +318,7 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 		free(GotHereFrom);
 	}
 
-	printMessage("WorldMap","", GREEN);
-	print("CalculateDistances for Area: %s\n", AreaName);
+	printMessage("WorldMap", "CalculateDistances for Area: %s\n", GREEN, AreaName);
 
 	size_t memsize =sizeof(int) * area_entries.size();
 	Distances = (int *) malloc( memsize );
@@ -345,8 +342,8 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 			int j=ae->AreaLinksIndex[d];
 			int k=j+ae->AreaLinksCount[d];
 			if ((size_t) k>area_links.size()) {
-				printMessage("WorldMap","The worldmap file is corrupted... and it would crash right now!\n",RED);
-				print("Entry #: %d Direction: %d\n",i,d);
+				printMessage("WorldMap", "The worldmap file is corrupted... and it would crash right now!\nEntry #: %d Direction: %d\n", RED,
+					i, d);
 				break;
 			}
 			for(;j<k;j++) {
@@ -433,8 +430,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 	unsigned int i;
 	WMPAreaEntry *ae=GetArea( AreaName, i ); //target area
 	if (!ae) {
-		printMessage("WorldMap","",LIGHT_RED);
-		print("No such area: %s\n", AreaName);
+		printMessage("WorldMap", "No such area: %s\n", LIGHT_RED, AreaName);
 		return NULL;
 	}
 	std::list<WMPAreaLink*> walkpath;

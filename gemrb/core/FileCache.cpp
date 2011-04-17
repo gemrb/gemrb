@@ -38,8 +38,7 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 	if (overwrite || !file_exists(path)) {
 		FileStream out;
 		if (!out.Create(path)) {
-			printMessage("FileCache", " ", RED);
-			print( "Cannot write %s.\n", path );
+			printMessage("FileCache", "Cannot write %s.\n", RED, path);
 			return NULL;
 		}
 

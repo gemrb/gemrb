@@ -3863,7 +3863,7 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 void GameScript::Debug(Scriptable* /*Sender*/, Action* parameters)
 {
 	InDebug=parameters->int0Parameter;
-	printMessage("GameScript",parameters->string0Parameter,YELLOW);
+	printMessage("GameScript","%s",YELLOW,parameters->string0Parameter);
 }
 
 void GameScript::IncrementProficiency(Scriptable* Sender, Action* parameters)

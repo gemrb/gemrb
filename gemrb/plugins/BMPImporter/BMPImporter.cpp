@@ -93,8 +93,7 @@ bool BMPImporter::Open(DataStream* stream)
 	//str->ReadDword(&ColorsUsed );
 	//str->ReadDword(&ColorsImportant );
 	if (Compression != 0) {
-		printMessage( "BMPImporter"," ", LIGHT_RED);
-		print( "Compressed %d-bits Image, not supported.\n", BitCount );
+		printMessage("BMPImporter", "Compressed %d-bits Image, not supported.\n", LIGHT_RED, BitCount);
 		return false;
 	}
 	//COLORTABLE
@@ -136,8 +135,7 @@ bool BMPImporter::Open(DataStream* stream)
 			PaddedRowLength = ( Width >> 1 );
 			break;
 		default:
-			printMessage( "BMPImporter"," ", LIGHT_RED);
-			print( "BitCount %d is not supported.\n", BitCount );
+			printMessage("BMPImporter", "BitCount %d is not supported.\n", LIGHT_RED, BitCount);
 			return false;
 	}
 	//if(BitCount!=4)
@@ -274,8 +272,7 @@ Bitmap* BMPImporter::GetBitmap()
 		}
 		break;
 	case 24:
-		printMessage("BMPImporter", "Don't know how to handle 24bit bitmap from ", WHITE);
-		print( "%s...", str->filename );
+		printMessage("BMPImporter", "Don't know how to handle 24bit bitmap from %s...", WHITE, str->filename);
 		printStatus( "ERROR", LIGHT_RED );
 		for (y = 0; y < Height; y++) {
 			for (unsigned int x = 0; x < Width; x++) {

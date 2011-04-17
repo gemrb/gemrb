@@ -209,8 +209,7 @@ int BIFImporter::OpenArchive(const char* filename)
 		fflush(stdout);
 		FileStream out;
 		if (!out.Create(path)) {
-			printMessage("BIFImporter", " ", RED);
-			print( "Cannot write %s.\n", path );
+			printMessage("BIFImporter", "Cannot write %s.\n", RED, path);
 			return GEM_ERROR;
 		}
 		ieDword finalsize = 0;

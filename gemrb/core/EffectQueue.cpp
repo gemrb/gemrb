@@ -180,8 +180,7 @@ static EffectDesc* FindEffect(const char* effectname)
 	}
 	void *tmp = bsearch(effectname, effectnames, effectnames_count, sizeof(EffectDesc), find_effect);
 	if( !tmp) {
-		printMessage( "EffectQueue", "", YELLOW);
-		print("Couldn't assign effect: %s\n", effectname );
+		printMessage("EffectQueue", "Couldn't assign effect: %s\n", YELLOW, effectname);
 	}
 	return (EffectDesc *) tmp;
 }

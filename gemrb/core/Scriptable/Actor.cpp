@@ -498,8 +498,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
 		if ((AnimID&0xf000)==0xe000) {
 			if (BaseStats[IE_COLORCOUNT]) {
-				printMessage("Actor"," ",YELLOW);
-				print("Animation ID %x is supposed to be real colored (no recoloring), patched creature\n", AnimID);
+				printMessage("Actor", "Animation ID %x is supposed to be real colored (no recoloring), patched creature\n", YELLOW, AnimID);
 			}
 			BaseStats[IE_COLORCOUNT]=0;
 		}
@@ -508,8 +507,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	if(anims->ResRef[0] == 0) {
 		delete anims;
 		anims = NULL;
-		printMessage("Actor", " ",LIGHT_RED);
-		print("Missing animation for %s\n",LongName);
+		printMessage("Actor", "Missing animation for %s\n", LIGHT_RED, LongName);
 		return;
 	}
 	anims->SetOffhandRef(ShieldRef);
@@ -540,8 +538,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	if (anim && anim[0]) {
 		SetBase(IE_MOVEMENTRATE, anim[0]->GetFrameCount()) ;
 	} else {
-		printMessage("Actor", "Unable to determine movement rate for animation ", YELLOW);
-		print("%04x!\n", AnimID);
+		printMessage("Actor", "Unable to determine movement rate for animation %04x!\n", YELLOW, AnimID);
 	}
 
 }
@@ -2811,8 +2808,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 	}
 
 	if (damage > 0 && resisted != DR_IMMUNE) {
-		printMessage("Actor", " ", GREEN);
-		print("%d damage taken.\n", damage);
+		printMessage("Actor", "%d damage taken.\n", GREEN, damage);
 
 		if (detailed) {
 			// 3 choices depending on resistance and boni
@@ -2856,8 +2852,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 		}
 	} else {
 		if (resisted == DR_IMMUNE) {
-			printMessage("Actor", " ", GREEN);
-			print("is immune to damage type: %s.\n", type_name);
+			printMessage("Actor", "is immune to damage type: %s.\n", GREEN, type_name);
 			if (hitter && hitter->Type == ST_ACTOR) {
 				if (detailed) {
 					//<DAMAGEE> was immune to my <TYPE> damage
@@ -4234,8 +4229,8 @@ void Actor::InitRound(ieDword gameTime)
 	roundTime = gameTime;
 
 	//print a little message :)
-	printMessage("InitRound", " ", WHITE);
-	print("Name: %s | Attacks: %d | Start: %d\n", ShortName, attacksperround, gameTime);
+	printMessage("InitRound", "Name: %s | Attacks: %d | Start: %d\n", WHITE,
+		ShortName, attacksperround, gameTime);
 
 	// this might not be the right place, but let's give it a go
 	if (attacksperround && InParty) {
@@ -5613,12 +5608,11 @@ void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
 			index = 36;
 			break;
 		default:
-			printMessage("Actor","TODO:", YELLOW);
-			print("Cannot determine 2DA rowcount for index: %d\n", index);
+			printMessage("Actor", "TODO:Cannot determine 2DA rowcount for index: %d\n", YELLOW, index);
 			return;
 	}
-	printMessage("Actor"," ", WHITE);
-	print("Getting sound 2da %.8s entry: %s\n", anims->ResRef, tab->GetRowName(index) );
+	printMessage("Actor", "Getting sound 2da %.8s entry: %s\n", WHITE,
+		anims->ResRef, tab->GetRowName(index) );
 	int col = core->Roll(1,tab->GetColumnCount(index),-1);
 	strnlwrcpy(Sound, tab->QueryField (index, col), 8);
 }

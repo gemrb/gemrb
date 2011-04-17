@@ -228,8 +228,8 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	if (cnt != 2) {
 		//The matcher didn't match: either this is not a valid dir
 		//or the SAVEGAME_DIRECTORY_MATCHER needs updating.
-		printMessage( "SaveGameIterator", " ", LIGHT_RED );
-		print( "Invalid savegame directory '%s' in %s.\n", slotname, Path );
+		printMessage("SaveGameIterator", "Invalid savegame directory '%s' in %s.\n", LIGHT_RED,
+			slotname, Path);
 		return false;
 	}
 
@@ -241,23 +241,20 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	PathJoinExt(ftmp, dtmp, core->GameNameResRef, "bmp");
 
 	if (access( ftmp, R_OK )) {
-		printMessage("SaveGameIterator"," ",YELLOW);
-		print("Ignoring slot %s because of no appropriate preview!\n", dtmp);
+		printMessage("SaveGameIterator", "Ignoring slot %s because of no appropriate preview!\n", YELLOW, dtmp);
 		return false;
 	}
 
 	PathJoinExt(ftmp, dtmp, core->WorldMapName[0], "wmp");
 	if (access( ftmp, R_OK )) {
-		printMessage("SaveGameIterator"," ",YELLOW);
-		print("Ignoring slot %s because of no appropriate worldmap!\n", dtmp);
+		printMessage("SaveGameIterator", "Ignoring slot %s because of no appropriate worldmap!\n", YELLOW, dtmp);
 		return false;
 	}
 
 	/* we might need something here as well
 	PathJoinExt(ftmp, dtmp, core->WorldMapName[1], "wmp");
 	if (access( ftmp, R_OK )) {
-		printMessage("SaveGameIterator"," ",YELLOW);
-		print("Ignoring slot %s because of no appropriate worldmap!\n", dtmp);
+		printMessage("SaveGameIterator", "Ignoring slot %s because of no appropriate worldmap!\n", YELLOW, dtmp);
 		return false;
 	}
 	*/

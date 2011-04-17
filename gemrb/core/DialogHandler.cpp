@@ -68,8 +68,7 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 	dlg = dm->GetDialog();
 
 	if (!dlg) {
-		printMessage("GameControl", " ", LIGHT_RED);
-		print( "Cannot start dialog: %s\n", dlgref );
+		printMessage("GameControl", "Cannot start dialog: %s\n", LIGHT_RED, dlgref);
 		return -1;
 	}
 

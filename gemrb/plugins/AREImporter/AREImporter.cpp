@@ -1191,8 +1191,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->Read( &Owner,1 );
 		int TrapEffectCount = TrapSize/0x108;
 		if(TrapEffectCount*0x108!=TrapSize) {
-			printMessage("AREImporter", " ", LIGHT_RED);
-			print("TrapEffectSize in game: %d != %d. Clearing it\n", TrapSize, TrapEffectCount*0x108);
+			printMessage("AREImporter", "TrapEffectSize in game: %d != %d. Clearing it\n", LIGHT_RED,
+				TrapSize, TrapEffectCount*0x108);
 				continue;
 		}
 		//The projectile is always created, the worst that can happen
@@ -1248,8 +1248,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 	else {
 		if( ExploredBitmapSize ) {
-			printMessage("AREImporter", " ", LIGHT_RED);
-			print("ExploredBitmapSize in game: %d != %d. Clearing it\n", ExploredBitmapSize, i);
+			printMessage("AREImporter", "ExploredBitmapSize in game: %d != %d. Clearing it\n", LIGHT_RED,
+				ExploredBitmapSize, i);
 		}
 		ExploredBitmapSize = i;
 		map->ExploredBitmap = (ieByte *) calloc(i, 1);

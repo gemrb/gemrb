@@ -47,8 +47,7 @@ inline static bool DoObjectIDSCheck(Object *oC, Actor *ac, bool *filtered) {
 		*filtered = true;
 		IDSFunction func = idtargets[j];
 		if (!func) {
-			printMessage("GameScript"," ", YELLOW);
-			print("Unimplemented IDS targeting opcode: %d\n", j);
+			printMessage("GameScript", "Unimplemented IDS targeting opcode: %d\n", YELLOW, j);
 			continue;
 		}
 		if (!func( ac, oC->objectFields[j] ) ) {
@@ -66,8 +65,8 @@ inline static Targets *DoObjectFiltering(Scriptable *Sender, Targets *tgts, Obje
 
 		ObjectFunction func = objects[filterid];
 		if (!func) {
-			printMessage("GameScript"," ", YELLOW);
-			print("Unknown object filter: %d %s\n", filterid, objectsTable->GetValue(filterid));
+			printMessage("GameScript", "Unknown object filter: %d %s\n", YELLOW,
+				filterid, objectsTable->GetValue(filterid));
 			continue;
 		}
 

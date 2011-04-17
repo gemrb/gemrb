@@ -1357,18 +1357,18 @@ int Interface::LoadSprites()
 			return GEM_ERROR;
 		}
 		if (GetFont( ButtonFont ) == NULL) {
-			printMessage( "Core", "ButtonFont not loaded: ", WHITE );
-			print("%s ", ButtonFont);
+			printMessage("Core", "ButtonFont not loaded: %s ", WHITE,
+				ButtonFont);
 			printStatus( "WARNING", YELLOW );
 		}
 		if (GetFont( MovieFont ) == NULL) {
-			printMessage( "Core", "MovieFont not loaded: ", WHITE );
-			print("%s ", MovieFont);
+			printMessage("Core", "MovieFont not loaded: %s ", WHITE,
+				MovieFont);
 			printStatus( "WARNING", YELLOW );
 		}
 		if (GetFont( TooltipFont ) == NULL) {
-			printMessage( "Core", "TooltipFont not loaded: ", WHITE );
-			print("%s ", TooltipFont);
+			printMessage("Core", "TooltipFont not loaded: %s ", WHITE,
+				TooltipFont);
 			printStatus( "WARNING", YELLOW );
 		}
 	}
@@ -1733,8 +1733,7 @@ int Interface::Init()
 	}
 
 	if (HasFeature( GF_HAS_PARTY_INI )) {
-		printMessage( "Core", "Loading precreated teams setup...\n",
-			WHITE );
+		printMessage( "Core", "Loading precreated teams setup...\n", WHITE );
 		INIparty = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIparty[_MAX_PATH];
 		PathJoin( tINIparty, GamePath, "Party.ini", NULL );
@@ -1751,8 +1750,7 @@ int Interface::Init()
 	}
 
 	if (HasFeature( GF_HAS_BEASTS_INI )) {
-		printMessage( "Core", "Loading beasts definition File...\n",
-			WHITE );
+		printMessage( "Core", "Loading beasts definition File...\n", WHITE );
 		INIbeasts = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIbeasts[_MAX_PATH];
 		PathJoin( tINIbeasts, GamePath, "beast.ini", NULL );
@@ -1764,8 +1762,7 @@ int Interface::Init()
 			printStatus( "OK", LIGHT_GREEN );
 		}
 
-		printMessage( "Core", "Loading quests definition File...\n",
-			WHITE );
+		printMessage( "Core", "Loading quests definition File...\n", WHITE );
 		INIquests = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIquests[_MAX_PATH];
 		PathJoin( tINIquests, GamePath, "quests.ini", NULL );
@@ -2416,8 +2413,7 @@ bool Interface::LoadConfig(const char* filename)
 	}
 
 	if ( StupidityDetector( CachePath )) {
-		printMessage("Core"," ",LIGHT_RED);
-		print( "Cache path %s doesn't exist, not a folder or contains alien files!\n", CachePath );
+		printMessage("Core", "Cache path %s doesn't exist, not a folder or contains alien files!\n", LIGHT_RED, CachePath );
 		return false;
 	}
 	if (!KeepCache) DelTree((const char *) CachePath, false);
@@ -2507,8 +2503,8 @@ bool Interface::LoadGemRBINI()
 		return false;
 	}
 
-	printMessage( "Core", "Loading game type-specific GemRB setup...\n", WHITE );
-	print( "%s",inifile->originalfile);
+	printMessage("Core", "Loading game type-specific GemRB setup...\n%s", WHITE,
+		inifile->originalfile);
 
 	if (!IsAvailable( IE_INI_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -2862,13 +2858,11 @@ bool Interface::LoadWindowPack(const char* name)
 {
 	DataStream* stream = gamedata->GetResource( name, IE_CHU_CLASS_ID );
 	if (stream == NULL) {
-		printMessage( "Interface", "Error: Cannot find ", LIGHT_RED );
-		print( "%s.chu\n", name );
+		printMessage("Interface", "Error: Cannot find %s.chu\n", LIGHT_RED, name );
 		return false;
 	}
 	if (!GetWindowMgr()->Open( stream, true )) {
-		printMessage( "Interface", "Error: Cannot Load ", LIGHT_RED );
-		print( "%s.chu\n", name );
+		printMessage("Interface", "Error: Cannot Load %s.chu\n", LIGHT_RED, name );
 		return false;
 	}
 
@@ -4676,8 +4670,8 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		}
 		itm->Usages[0]=(ieWord) Roll(j,k,0);
 	}
-	printMessage("Interface"," ",LIGHT_RED);
-	print("Loop detected while generating random item:%s\n",itm->ItemResRef);
+	printMessage("Interface", "Loop detected while generating random item:%s\n", LIGHT_RED,
+		itm->ItemResRef);
 	return false;
 }
 
@@ -4783,13 +4777,13 @@ int Interface::CloseCurrentStore()
 		str.Create( CurrentStore->Name, IE_STO_CLASS_ID );
 		int ret = sm->PutStore (&str, CurrentStore);
 		if (ret <0) {
-			printMessage("Core"," ", YELLOW);
-			print("Store removed: %s\n", CurrentStore->Name);
+			printMessage("Core", "Store removed: %s\n", YELLOW,
+				CurrentStore->Name);
 			RemoveFromCache(CurrentStore->Name, IE_STO_CLASS_ID);
 		}
 	} else {
-		printMessage("Core"," ", YELLOW);
-		print("Store removed: %s\n", CurrentStore->Name);
+		printMessage("Core", "Store removed: %s\n", YELLOW,
+			CurrentStore->Name);
 		RemoveFromCache(CurrentStore->Name, IE_STO_CLASS_ID);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
@@ -4849,8 +4843,7 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 	Dialog *dlg = dm->GetDialog();
 
 	if (!dlg) {
-		printMessage("Interface"," ", LIGHT_RED);
-		print( "Cannot load dialog: %s\n", dlgref );
+		printMessage("Interface", "Cannot load dialog: %s\n", LIGHT_RED, dlgref);
 		return (ieStrRef) -1;
 	}
 	Scriptable *pc=game->GetPC( game->GetSelectedPCSingle(), false );
@@ -5060,13 +5053,13 @@ int Interface::SwapoutArea(Map *map)
 		str.Create( map->GetScriptName(), IE_ARE_CLASS_ID );
 		int ret = mm->PutArea (&str, map);
 		if (ret <0) {
-			printMessage("Core"," ", YELLOW);
-			print("Area removed: %s\n", map->GetScriptName());
+			printMessage("Core", "Area removed: %s\n", YELLOW,
+				map->GetScriptName());
 			RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
 		}
 	} else {
-		printMessage("Core"," ", YELLOW);
-		print("Area removed: %s\n", map->GetScriptName());
+		printMessage("Core", "Area removed: %s\n", YELLOW,
+			map->GetScriptName());
 		RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
@@ -5095,8 +5088,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 
 		int ret = gm->PutActor(&str, actor, true);
 		if (ret <0) {
-			printMessage("Core"," ", YELLOW);
-			print("Character cannot be saved: %s\n", name);
+			printMessage("Core", "Character cannot be saved: %s\n", YELLOW, name);
 			return -1;
 		}
 	}
@@ -5130,13 +5122,11 @@ int Interface::WriteGame(const char *folder)
 		str.Create( folder, GameNameResRef, IE_GAM_CLASS_ID );
 		int ret = gm->PutGame (&str, game);
 		if (ret <0) {
-			printMessage("Core"," ", YELLOW);
-			print("Game cannot be saved: %s\n", folder);
+			printMessage("Core", "Game cannot be saved: %s\n", YELLOW, folder);
 			return -1;
 		}
 	} else {
-		printMessage("Core"," ", YELLOW);
-		print("Internal error, game cannot be saved: %s\n", folder);
+		printMessage("Core", "Internal error, game cannot be saved: %s\n", YELLOW, folder);
 		return -1;
 	}
 	return 0;
@@ -5177,8 +5167,7 @@ int Interface::WriteWorldMap(const char *folder)
 		ret = wmm->PutWorldMap (&str1, &str2, worldmap);
 	}
 	if (ret <0) {
-		printMessage("Core"," ", YELLOW);
-		print("Internal error, worldmap cannot be saved: %s\n", folder);
+		printMessage("Core", "Internal error, worldmap cannot be saved: %s\n", YELLOW, folder);
 		return -1;
 	}
 	return 0;
@@ -5444,8 +5433,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	Holder<SymbolMgr> sym = GetSymbol( symbol );
 	ieDword stat = (ieDword) sym->GetValue( stat_name );
 	if (stat==(ieDword) ~0) {
-		printMessage("Core"," ",YELLOW);
-		print("Cannot translate symbol: %s\n", stat_name);
+		printMessage("Core", "Cannot translate symbol: %s\n", YELLOW, stat_name);
 	}
 	return stat;
 }

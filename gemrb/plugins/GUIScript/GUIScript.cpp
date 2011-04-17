@@ -621,8 +621,8 @@ static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
 
 	if ( (width && (width>core->Width)) ||
 			(height && (height>core->Height)) ) {
-		printMessage("GUIScript","Screen is too small!\n",LIGHT_RED);
-		print("This window requires %d x %d resolution.\n",width,height);
+		printMessage("GUIScript", "Screen is too small!\nThis window requires %d x %d resolution.\n", LIGHT_RED,
+			width, height);
 		return RuntimeError("Please change your settings.");
 	}
 	Py_INCREF( Py_None );
@@ -3395,8 +3395,8 @@ static PyObject* GemRB_Button_SetPLT(PyObject * /*self*/, PyObject* args)
 			gamedata->GetFactoryResource( ResRef,
 			IE_BAM_CLASS_ID, IE_NORMAL );
 		if (!af) {
-			printMessage("GUISCript","PLT/BAM not found for ref: ",YELLOW);
-			print("%s\n", ResRef);
+			printMessage("GUISCript", "PLT/BAM not found for ref: %s\n", YELLOW,
+				ResRef);
 			textcolor(WHITE);
 			if (type == 0)
 				return NULL;
@@ -3815,8 +3815,8 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	long value =(long) CheckVariable(Sender, Variable, Context);
-	printMessage("GUISCript"," ",YELLOW);
-	print("%s %s=%ld\n",Context, Variable, value);
+	printMessage("GUISCript", "%s %s=%ld\n", YELLOW,
+		Context, Variable, value);
 	textcolor(WHITE);
 	return PyInt_FromLong( value );
 }
@@ -5267,8 +5267,8 @@ PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int
 	Spell* spell = gamedata->GetSpell( SpellResRef, 1 );
 	if (spell == NULL) {
 		btn->SetPicture( NULL );
-		printMessage( "GUIScript", " ", LIGHT_RED);
-		print("Spell not found :%.8s", SpellResRef );
+		printMessage("GUIScript", "Spell not found :%.8s", LIGHT_RED,
+			SpellResRef);
 		//no incref here!
 		return Py_None;
 	}
@@ -5861,8 +5861,8 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 	Item *item = gamedata->GetItem( ItemResRef );
 	if (!item) {
-		printMessage("GUIScript", " ", LIGHT_RED);
-		print("Invalid resource reference: %s\n", ItemResRef);
+		printMessage("GUIScript", "Invalid resource reference: %s\n", LIGHT_RED,
+			ItemResRef);
 		return PyInt_FromLong(0);
 	}
 
@@ -10342,7 +10342,7 @@ bool GUIScript::Init(void)
 
 	sprintf( string, "import sys" );
 	if (PyRun_SimpleString( string ) == -1) {
-		printMessage( "GUIScript", string, RED );
+		printMessage( "GUIScript", "%s", RED, string );
 		return false;
 	}
 
@@ -10359,20 +10359,20 @@ bool GUIScript::Init(void)
 	// Add generic script path early, so GameType detection works
 	sprintf( string, "sys.path.append(\"%s\")", QuotePath( quoted, path ));
 	if (PyRun_SimpleString( string ) == -1) {
-		printMessage( "GUIScript", string, RED );
+		printMessage( "GUIScript", "%s", RED, string );
 		return false;
 	}
 
 	sprintf( string, "import GemRB\n");
 	if (PyRun_SimpleString( "import GemRB" ) == -1) {
-		printMessage( "GUIScript", string, RED );
+		printMessage( "GUIScript", "%s", RED, string );
 		return false;
 	}
 
 	// FIXME: better would be to add GemRB.GetGamePath() or some such
 	sprintf( string, "GemRB.GamePath = \"%s\"", QuotePath( quoted, core->GamePath ));
 	if (PyRun_SimpleString( string ) == -1) {
-		printMessage( "GUIScript", string, RED );
+		printMessage( "GUIScript", "%s", RED, string );
 		return false;
 	}
 
@@ -10392,12 +10392,12 @@ bool GUIScript::Init(void)
 	//   the generic one, so insert it before it
 	sprintf( string, "sys.path.insert(-1, \"%s\")", QuotePath( quoted, path2 ));
 	if (PyRun_SimpleString( string ) == -1) {
-		printMessage( "GUIScript", string, RED );
+		printMessage( "GUIScript", "%s", RED, string );
 		return false;
 	}
 	sprintf( string, "GemRB.GameType = \"%s\"", core->GameType);
 	if (PyRun_SimpleString( string ) == -1) {
-		printMessage( "GUIScript", string, RED );
+		printMessage( "GUIScript", "%s", RED, string );
 		return false;
 	}
 
@@ -10409,14 +10409,12 @@ bool GUIScript::Init(void)
 #endif
 
 	if (PyRun_SimpleString( "from GUIDefines import *" ) == -1) {
-		printMessage( "GUIScript", " ", RED );
-		print("Check if %s/GUIDefines.py exists! ", path);
+		printMessage("GUIScript", "Check if %s/GUIDefines.py exists! ", RED, path);
 		return false;
 	}
 
 	if (PyRun_SimpleString( "from GUIClasses import *" ) == -1) {
-		printMessage( "GUIScript", " ", RED );
-		print("Check if %s/GUIClasses.py exists! ", path);
+		printMessage("GUIScript", "Check if %s/GUIClasses.py exists! ", RED, path);
 		return false;
 	}
 
@@ -10491,8 +10489,7 @@ bool GUIScript::LoadScript(const char* filename)
 	if (!Py_IsInitialized()) {
 		return false;
 	}
-	printMessage( "GUIScript", "Loading Script ", WHITE );
-	print( "%s...", filename );
+	printMessage("GUIScript", "Loading Script %s...", WHITE, filename);
 
 	char path[_MAX_PATH];
 	strcpy( path, filename );
@@ -10537,8 +10534,7 @@ PyObject *GUIScript::CallbackFunction(const char* fname, PyObject* pArgs)
 	PyObject *pFunc = PyDict_GetItemString( pDict, (char *) fname );
 	/* pFunc: Borrowed reference */
 	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
-		printMessage("GUIScript", " ", LIGHT_RED);
-		print("%s is not callable!\n", fname);
+		printMessage("GUIScript", "%s is not callable!\n", LIGHT_RED, fname);
 		return NULL;
 	}
 	PyObject *pValue = PyObject_CallObject( pFunc, pArgs );
@@ -10573,8 +10569,7 @@ bool GUIScript::RunFunction(const char *ModuleName, const char* FunctionName, bo
 	/* pFunc: Borrowed reference */
 	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
 		if (error) {
-			printMessage( "GUIScript", "Missing function:", LIGHT_RED );
-			print("%s\n", FunctionName);
+			printMessage("GUIScript", "Missing function:%s\n", LIGHT_RED, FunctionName);
 		}
 		Py_DECREF(module);
 		return false;

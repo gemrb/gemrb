@@ -55,8 +55,7 @@ static int MagicBit = 0;
 
 static void InvalidSlot(int slot)
 {
-	printMessage("Inventory"," ",LIGHT_RED);
-	print("Invalid slot: %d!\n",slot);
+	printMessage("Inventory", "Invalid slot: %d!\n", LIGHT_RED, slot);
 	abort();
 }
 
@@ -237,8 +236,8 @@ void Inventory::CalculateWeight()
 				gamedata->FreeItem( itm, slot->ItemResRef, false );
 			}
 			else {
-				printMessage( "Inventory", " ", LIGHT_RED);
-				print("Invalid item: %s!\n", slot->ItemResRef);
+				printMessage("Inventory", "Invalid item: %s!\n", LIGHT_RED,
+					slot->ItemResRef);
 				slot->Weight = 0;
 			}
 		} else {

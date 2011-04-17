@@ -205,8 +205,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		critter.CreFile=new ieResRef[critter.creaturecount];
 		GetElements(s, critter.CreFile, critter.creaturecount);
 	} else {
-		printMessage( "IniSpawn"," ", LIGHT_RED);
-		print("Invalid spawn entry: %s\n", crittername);
+		printMessage("IniSpawn", "Invalid spawn entry: %s\n", LIGHT_RED, crittername);
 	}
 
 	s = inifile->GetKeyAsString(crittername,"point_select",NULL);
