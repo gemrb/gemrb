@@ -2677,8 +2677,8 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	//add lastdamagetype up ? maybe
 	//FIXME: what does original do?
 	LastDamageType|=damagetype;
-	AddTrigger(TriggerEntry(trigger_hitby, hitter->GetGlobalID()));
 	if(hitter && hitter->Type==ST_ACTOR) {
+		AddTrigger(TriggerEntry(trigger_hitby, hitter->GetGlobalID()));
 		LastHitter=hitter->GetGlobalID();
 	} else {
 		//Maybe it should be something impossible like 0xffff, and use 'Someone'
