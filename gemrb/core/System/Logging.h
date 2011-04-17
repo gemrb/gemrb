@@ -76,9 +76,11 @@ GEM_EXPORT void printMessage(const char* owner, const char* message, log_color c
 #endif
 	;
 
-#if (__GNUC__ >= 4)
 // poison printf
+#if (__GNUC__ >= 4 && (__GNUC_MINOR__ >= 5 || __GNUC__ > 4))
 extern "C" int printf(const char* message, ...) __attribute__ ((deprecated("GemRB doesn't use printf; use print instead.")));
+#elif __GNUC__ >= 4
+extern "C" int printf(const char* message, ...) __attribute__ ((deprecated));
 #endif
 
 #endif
