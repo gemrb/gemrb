@@ -41,7 +41,7 @@ void vprint(const char *message, va_list ap)
 #else
 	va_list copy;
 	// MSVC6 lacks va_copy
-	memcpy(&copy, &ap, sizeof(va_list))
+	memcpy(&copy, &ap, sizeof(va_list));
 	int size = vsnprintf(NULL, 0, message, copy);
 	va_end(copy);
 
