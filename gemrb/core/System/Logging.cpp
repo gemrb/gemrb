@@ -66,6 +66,7 @@ void print(const char *message, ...)
 	va_end(ap);
 }
 
+#ifndef NOCOLOR
 #ifdef WIN32
 static int colors[] = {
 	0,
@@ -105,11 +106,14 @@ static const char* colors[] = {
 	"\033[1m\033[37;40m"
 };
 #endif
+#endif
 
 
 void textcolor(log_color c)
 {
-#ifndef NOCOLOR
+#ifdef NOCOLOR
+	if (c) while (0) ;
+#else
 #ifdef WIN32
 	SetConsoleTextAttribute(hConsole, colors[c]);
 #else
