@@ -4269,7 +4269,10 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 	}
 
 	CREItem *item = new CREItem();
-	CreateItemCore(item, parameters->string0Parameter, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
+	if (!CreateItemCore(item, parameters->string0Parameter, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter)) {
+		delete item;
+		return;
+	}
 	if (tar->Type==ST_CONTAINER) {
 		myinv->AddItem(item);
 	} else {
@@ -4300,7 +4303,10 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 	}
 	int value = CheckVariable( Sender, parameters->string0Parameter );
 	CREItem *item = new CREItem();
-	CreateItemCore(item, parameters->string1Parameter, value, 0, 0);
+	if (!CreateItemCore(item, parameters->string1Parameter, value, 0, 0)) {
+		delete item;
+		return;
+	}
 	if (Sender->Type==ST_CONTAINER) {
 		myinv->AddItem(item);
 	} else {
@@ -4328,7 +4334,10 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 	if (!item) {
 		item = new CREItem();
 	}
-	CreateItemCore(item, parameters->string0Parameter, -1, 0, 0);
+	if (!CreateItemCore(item, parameters->string0Parameter, -1, 0, 0)) {
+		delete item;
+		return;
+	}
 	if (ASI_SUCCESS != scr->inventory.AddSlotItem(item,slot)) {
 		Map *map = scr->GetCurrentArea();
 		map->AddItemToLocation(Sender->Pos, item);
@@ -4636,7 +4645,9 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 			return;
 		}
 		CREItem *item = new CREItem();
-		CreateItemCore(item, core->GoldResRef, money, 0, 0);
+		if (!CreateItemCore(item, core->GoldResRef, money, 0, 0)) {
+			abort();
+		}
 		if ( ASI_SUCCESS == snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY)) {
 			scr->SetBase(IE_GOLD,scr->GetBase(IE_GOLD)-money);
 		} else {
