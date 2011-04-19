@@ -2832,18 +2832,15 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	int damage;
 	int tmp = fx->Parameter1;
 	ieDword gameTime = core->GetGame()->GameTime;
-	ieDword nextHeal;
 
-	if (!fx->Parameter3) {
-		//hack to ensure our first call gets through
-		nextHeal = gameTime-1;
+	if (fx->FirstApply) {
+		//ensure our first call gets through
 	} else {
-		nextHeal = fx->Parameter3;
+		//we can have multiple calls at the same gameTime, so we
+		//just go to gameTime+1 to ensure one call
+		ieDword nextHeal = fx->Parameter3;
+		if (nextHeal>=gameTime) return FX_APPLIED;
 	}
-
-	//we can have multiple calls at the same gameTime, so we
-	//just go to gameTime+1 to ensure one call
-	if (nextHeal>=gameTime) return FX_APPLIED;
 
 	HandlePercentageDamage(fx, target);
 
@@ -2855,16 +2852,16 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		tmp *= core->Time.round_sec;
 		//fall
 	case RPD_SECONDS:	//restore param3 hp every param1 seconds
-		fx->Parameter3 = nextHeal + tmp*AI_UPDATE_TIME;
+		fx->Parameter3 = gameTime + tmp*AI_UPDATE_TIME;
 		damage = 1;
 		break;
 	case RPD_PERCENT: // handled in HandlePercentageDamage
 	case RPD_POINTS:	//restore param1 hp every second? that's crazy!
 		damage = fx->Parameter1;
-		fx->Parameter3 = nextHeal + AI_UPDATE_TIME;
+		fx->Parameter3 = gameTime + AI_UPDATE_TIME;
 		break;
 	default:
-		fx->Parameter3 = nextHeal + AI_UPDATE_TIME;
+		fx->Parameter3 = gameTime + AI_UPDATE_TIME;
 		damage = 1;
 		break;
 	}
