@@ -2232,7 +2232,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	PrevStats = NULL;
 
 	// IE_CLASS is >classcount for non-PCs/NPCs
-	if (BaseStats[IE_CLASS] <= (ieDword)classcount)
+	if (BaseStats[IE_CLASS] > 0 && BaseStats[IE_CLASS] <= (ieDword)classcount)
 		RefreshPCStats();
 
 	for (i=0;i<MAX_STATS;i++) {
