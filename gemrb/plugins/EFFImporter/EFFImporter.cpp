@@ -197,23 +197,25 @@ void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 	stream->WriteDword( &fx->Duration);
 	stream->WriteWord( &fx->Probability1);
 	stream->WriteWord( &fx->Probability2);
-	stream->WriteResRef(fx->Resource);
+	if (fx->IsVariable) {
+		stream->Write( filling,8 );
+	} else {
+		stream->WriteResRef(fx->Resource);
+	}
 	stream->WriteDword( &fx->DiceThrown );
 	stream->WriteDword( &fx->DiceSides );
 	stream->WriteDword( &fx->SavingThrowType );
 	stream->WriteDword( &fx->SavingThrowBonus );
-	//isvariable
-	stream->Write( filling,4 );
+	stream->WriteWord( &fx->IsVariable );
+	stream->Write( filling,2 ); // SaveForHalfDamage
 	stream->WriteDword( &fx->PrimaryType );
-	stream->Write( filling,12 );
+	stream->Write( filling,12 ); // MinAffectedLevel, MaxAffectedLevel, Resistance
 	stream->WriteDword( &fx->Resistance );
 	stream->WriteDword( &fx->Parameter3 );
 	stream->WriteDword( &fx->Parameter4 );
 	stream->Write( filling,8 );
 	if (fx->IsVariable) {
-		stream->Write(fx->Resource+8, 8);
-		//resource1-4 are used as a continuous memory
-		stream->Write(((ieByte *) fx->Resource)+16, 8);
+		stream->Write( filling,16 );
 	} else {
 		stream->WriteResRef(fx->Resource2);
 		stream->WriteResRef(fx->Resource3);
@@ -231,7 +233,14 @@ void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 	stream->WriteDword( &fx->Projectile );
 	tmpDword1 = (ieDword) fx->InventorySlot;
 	stream->WriteDword( &tmpDword1 );
-	stream->Write( filling,40 ); //12+32+8
+	if (fx->IsVariable) {
+		//resource1-4 are used as a continuous memory
+		stream->Write(fx->Resource, 32);
+	} else {
+		stream->Write( filling,32 );
+	}
+	stream->WriteDword( &fx->CasterLevel);
+	stream->Write( filling,4);
 	stream->WriteDword( &fx->SecondaryType );
 	stream->Write( filling,60 );
 }

@@ -1765,12 +1765,13 @@ bool EffectQueue::HasDuration(Effect *fx)
 static EffectRef fx_variable_ref = { "Variable:StoreLocalVariable", -1 };
 
 //returns true if the effect must be saved
-//variables are saved differently
 bool EffectQueue::Persistent(Effect* fx)
 {
-	//we save this as variable
+	// local variable effects self-destruct if they were processed already
+	// but if they weren't processed, e.g. in a global actor, we must save them
+	// TODO: do we really need to special-case this? leaving it for now - fuzzie
 	if( fx->Opcode==(ieDword) ResolveEffect(fx_variable_ref)) {
-		return false;
+		return true;
 	}
 
 	switch (fx->TimingMode) {
