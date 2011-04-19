@@ -1048,19 +1048,15 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		ret = -1;
 	}
 
+	Sender->ReleaseCurrentAction();
+
 	if (ret<0) {
-		Sender->ReleaseCurrentAction();
 		if (Flags & BD_NOEMPTY) {
 			return;
 		}
 		displaymsg->DisplayConstantStringName(STR_NOTHINGTOSAY,0xff0000,tar);
 		return;
 	}
-
-	//this is a bit fishy
-	Sender->SetWait(1);
-	Sender->ReleaseCurrentAction();
-
 }
 
 void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust)
