@@ -196,6 +196,7 @@ void Container::RefreshGroundIcons()
 	while (i--) {
 		CREItem *slot = inventory.GetSlotItem(i); //borrowed reference
 		Item *itm = gamedata->GetItem( slot->ItemResRef ); //cached reference
+		if (!itm) continue;
 		//well, this is required in PST, needs more work if some other
 		//game is broken by not using -1,0
 		groundicons[i] = gamedata->GetBAMSprite( itm->GroundIcon, 0, 0 );

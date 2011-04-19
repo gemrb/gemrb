@@ -4645,6 +4645,10 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		} else {
 			i=Roll(1,itemlist->Count,-1);
 		}
+		if (! gamedata->GetItem(itemlist->ResRefs[i])) {
+			printMessage("Interface", "Nonexistent random item (bad table entry) detected: %s\n", LIGHT_RED, itemlist->ResRefs[i]);
+			continue;
+		}
 		strnlwrcpy( NewItem, itemlist->ResRefs[i], 8);
 		char *p=(char *) strchr(NewItem,'*');
 		if (p) {
