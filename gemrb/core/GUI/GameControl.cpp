@@ -1814,7 +1814,8 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 		case ST_TRAVEL:
 			trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
 			trap->LastTrigger = actor->GetGlobalID(); // FIXME
-			actor->UseExit(trap->GetGlobalID());
+			// exit usage is handled by caller for now
+			// actor->UseExit(trap->GetGlobalID());
 			return false;
 		case ST_TRIGGER:
 			//the importer shouldn't load the script
@@ -2011,11 +2012,10 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 				while(i--) {
 					game->selected[i]->UseExit(exitID);
 				}
-			} else {
-				if (HandleActiveRegion(overInfoPoint, pc, p)) {
-					core->SetEventFlag(EF_RESETTARGET);
-					return;
-				}
+			}
+			if (HandleActiveRegion(overInfoPoint, pc, p)) {
+				core->SetEventFlag(EF_RESETTARGET);
+				return;
 			}
 		}
 
