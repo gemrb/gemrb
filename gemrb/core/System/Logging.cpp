@@ -141,6 +141,21 @@ void printMessage(const char* owner, const char* message, log_color color, ...)
 	vprint(message, ap);
 	va_end(ap);
 }
+
+void error(const char* owner, const char* message, ...)
+{
+	// FIXME: Merge with printMessage?
+	printBracket(owner, LIGHT_WHITE);
+	print(": ");
+	textcolor(LIGHT_RED);
+	va_list ap;
+
+	va_start(ap, message);
+	vprint(message, ap);
+	va_end(ap);
+
+	exit(1);
+}
 #else /* !ANDROID */
 void printBracket(const char* status, log_color color)
 {
@@ -159,4 +174,14 @@ void printMessage(const char* owner, const char* message, log_color color, ...)
 	__android_log_vprint(ANDROID_LOG_INFO, "GemRB", message, ap);
 	va_end(ap);
 }
+
+void error(const char* owner, const char* message, ...)
+{
+	// FIXME: We drop owner and file/line on the floor.
+	va_list ap;
+	va_start(ap, message);
+	__android_log_vprint(ANDROID_LOG_INFO, "GemRB", message, ap);
+	va_end(ap);
+	exit(1);
+};
 #endif
