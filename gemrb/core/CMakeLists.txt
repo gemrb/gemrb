@@ -32,7 +32,6 @@ FILE(GLOB gemrb_core_LIB_SRCS "*.cpp"
 	System/Logging.cpp
 	System/SlicedStream.cpp
 	System/VFS.cpp
-	System/snprintf.cpp
 	)
 
 if (STATIC_LINK)

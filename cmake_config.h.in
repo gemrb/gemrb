@@ -2,9 +2,6 @@
 
 #cmakedefine SIZEOF_INT ${SIZEOF_INT}
 #cmakedefine SIZEOF_LONG_INT ${SIZEOF_LONG_INT}
-#ifndef HAVE_SNPRINTF
-#cmakedefine HAVE_SNPRINTF 1
-#endif
 #ifndef HAVE_STRNDUP
 #cmakedefine HAVE_STRNDUP 1
 #endif
