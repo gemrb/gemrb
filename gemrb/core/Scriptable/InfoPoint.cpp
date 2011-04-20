@@ -232,6 +232,7 @@ void InfoPoint::DebugDump() const
 		name = Scripts[0]->GetName();
 	}
 	print( "Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef, Dialog );
+	print( "Deactivated: %s\n", YESNO(Flags&TRAP_DEACTIVATED));
 	print( "Active: %s\n", YESNO(InternalFlags&IF_ACTIVE));
 }
 
