@@ -39,21 +39,12 @@ void vprint(const char *message, va_list ap)
 	vprintf(message, ap);
 # endif
 #else
-	va_list copy;
-	// MSVC6 lacks va_copy
-	memcpy(&copy, &ap, sizeof(va_list));
-	int size = vsnprintf(NULL, 0, message, copy);
-	va_end(copy);
-
-	if (size < 0)
-		return;
-
-	char *buff = new char[size+1];
-	vsprintf(buff, message, ap);
-
-	cprintf("%s", message);
-
-	free(buff);
+	// Don't try to be smart.
+	// Assume this is long enough. If not, message will be truncated.
+	// MSVC6 has old vsnprintf that doesn't give length
+	char buff[_MAX_PATH];
+	vsnprintf(buff, _MAX_PATH, message, ap);
+	cprintf("%s", buff);
 #endif
 }
 
