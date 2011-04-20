@@ -168,8 +168,7 @@ void Scriptable::SetMap(Map *map)
 {
 	if (map && (map->GetCurrentArea()!=map)) {
 		//a map always points to itself (if it is a real map)
-		printMessage("Scriptable","Invalid map set!\n",LIGHT_RED);
-		abort();
+		error("Scriptable", "Invalid map set!\n");
 	}
 	area = map;
 }
@@ -180,8 +179,7 @@ void Scriptable::SetMap(Map *map)
 void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 {
 	if (idx >= MAX_SCRIPTS) {
-		printMessage("Scriptable","Invalid script index!\n",LIGHT_RED);
-		abort();
+		error("Scriptable", "Invalid script index!\n");
 	}
 	if (Scripts[idx]) {
 		delete Scripts[idx];

@@ -369,8 +369,7 @@ void Game::InitActorPos(Actor *actor)
 	AutoTable strta("startpos");
 
 	if (!start || !strta) {
-		printMessage("Game","Game is missing character start data.\n",RED);
-		abort();
+		error("Game", "Game is missing character start data.\n");
 	}
 	// 0 - single player, 1 - tutorial, 2 - expansion
 	ieDword playmode = 0;

@@ -177,7 +177,7 @@ void printMessage(const char* owner, const char* message, log_color color, ...)
 
 void error(const char* owner, const char* message, ...)
 {
-	// FIXME: We drop owner and file/line on the floor.
+	// FIXME: We drop owner on the floor.
 	va_list ap;
 	va_start(ap, message);
 	__android_log_vprint(ANDROID_LOG_INFO, "GemRB", message, ap);

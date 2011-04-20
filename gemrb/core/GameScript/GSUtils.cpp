@@ -1641,8 +1641,7 @@ void FreeSrc(SrcVector *poi, const ieResRef key)
 {
 	int res = SrcCache.DecRef((void *) poi, key, true);
 	if (res<0) {
-		printMessage("GameScript", "Corrupted Src cache encountered (reference count went below zero), Src name is: %.8s\n", LIGHT_RED, key);
-		abort();
+		error("GameScript", "Corrupted Src cache encountered (reference count went below zero), Src name is: %.8s\n", key);
 	}
 	if (!res) {
 		delete poi;

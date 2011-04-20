@@ -2617,8 +2617,7 @@ bool Interface::LoadGemRBINI()
 
 	for (i=0;i<GF_COUNT;i++) {
 		if (!game_flags[i]) {
-			print("Fix the game flags!\n");
-			abort();
+			error("Core", "Fix the game flags!\n");
 		}
 		SetFeature( ini->GetKeyAsInt( "resources", game_flags[i], 0 ), i );
 		//printMessage("Option", "", GREEN);
@@ -5484,7 +5483,6 @@ void Interface::SetNextScript(const char *script)
 
 void Interface::SanityCheck(const char *ver) {
 	if (strcmp(ver, VERSION_GEMRB)) {
-		print("version check failed: core version %s doesn't match caller's version %s\n", VERSION_GEMRB, ver);
-		abort();
+		error("Core", "version check failed: core version %s doesn't match caller's version %s\n", VERSION_GEMRB, ver);
 	}
 }

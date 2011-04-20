@@ -238,8 +238,7 @@ void ProjectileServer::AddSymbols(Holder<SymbolMgr> projlist) {
 		}
 		if (value >= (unsigned int)projectilecount) {
 			// this should never happen!
-			printMessage("ProjectileServer","Too high projectilenumber while adding projectiles\n", RED);
-			abort();
+			error("ProjectileServer", "Too high projectilenumber while adding projectiles\n");
 		}
 		strnuprcpy(projectiles[value].resname, projlist->GetStringIndex(rows), 8);
 	}

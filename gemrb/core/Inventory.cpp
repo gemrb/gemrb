@@ -55,8 +55,7 @@ static int MagicBit = 0;
 
 static void InvalidSlot(int slot)
 {
-	printMessage("Inventory", "Invalid slot: %d!\n", LIGHT_RED, slot);
-	abort();
+	error("Inventory", "Invalid slot: %d!\n", slot);
 }
 
 //This inline function returns both an item pointer and the slot data.

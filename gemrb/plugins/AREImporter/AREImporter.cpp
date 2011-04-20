@@ -291,8 +291,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	Map* map = new Map();
 	if(!map) {
-		print("Can't allocate map (out of memory).\n");
-		abort();
+		error("AREImporter", "Can't allocate map (out of memory).\n");
 	}
 	if (core->SaveAsOriginal) {
 		map->version = bigheader;
