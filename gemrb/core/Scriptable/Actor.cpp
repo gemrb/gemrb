@@ -3335,10 +3335,11 @@ void Actor::Die(Scriptable *killer)
 	if (area)
 		area->ClearSearchMapFor(this);
 
-	//JUSTDIED will be removed when the Die() trigger executed
+	//JUSTDIED will be removed after the first script check
 	//otherwise it is the same as REALLYDIED
 	InternalFlags|=IF_REALLYDIED|IF_JUSTDIED;
 	SetStance( IE_ANI_DIE );
+	AddTrigger(TriggerEntry(trigger_die));
 
 	Actor *act=NULL;
 	if (!killer) {
