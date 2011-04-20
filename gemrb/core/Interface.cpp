@@ -4636,6 +4636,10 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 
 		void* lookup;
 		if ( !RtRows->Lookup( itm->ItemResRef, lookup ) ) {
+			if (!gamedata->Exists(itm->ItemResRef, IE_ITM_CLASS_ID)) {
+				printMessage("Interface", "Nonexistent random item (bad table entry) detected: %s\n", LIGHT_RED, itm->ItemResRef);
+				return false;
+			}
 			return true;
 		}
 		ItemList *itemlist = (ItemList*)lookup;
@@ -4644,10 +4648,6 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 			i=Roll(2,(itemlist->Count+1)/2,-2);
 		} else {
 			i=Roll(1,itemlist->Count,-1);
-		}
-		if (! gamedata->GetItem(itemlist->ResRefs[i])) {
-			printMessage("Interface", "Nonexistent random item (bad table entry) detected: %s\n", LIGHT_RED, itemlist->ResRefs[i]);
-			continue;
 		}
 		strnlwrcpy( NewItem, itemlist->ResRefs[i], 8);
 		char *p=(char *) strchr(NewItem,'*');

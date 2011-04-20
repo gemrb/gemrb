@@ -348,14 +348,14 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);
-			if (target->GetInternalFlag()&IF_NOINT) {
+			/*if (target->GetInternalFlag()&IF_NOINT) {
 				// this whole check moved out of InitDialog by fuzzie, see comments
 				// for the IF_NOINT check in BeginDialog
 				displaymsg->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 				ta->SetMinRow( false );
 				EndDialog();
 				return;
-			}
+			}*/
 			int ret = InitDialog( speaker, target, tmpresref);
 			if (ret<0) {
 				// error was displayed by InitDialog

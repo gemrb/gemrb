@@ -1048,19 +1048,15 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		ret = -1;
 	}
 
+	Sender->ReleaseCurrentAction();
+
 	if (ret<0) {
-		Sender->ReleaseCurrentAction();
 		if (Flags & BD_NOEMPTY) {
 			return;
 		}
 		displaymsg->DisplayConstantStringName(STR_NOTHINGTOSAY,0xff0000,tar);
 		return;
 	}
-
-	//this is a bit fishy
-	Sender->SetWait(1);
-	Sender->ReleaseCurrentAction();
-
 }
 
 void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust)
@@ -1138,11 +1134,12 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 	Sender->ReleaseCurrentAction();
 }
 
-void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
+bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 {
 	//copy the whole resref, including the terminating zero
 	strnuprcpy(item->ItemResRef, resref, 8);
-	core->ResolveRandomItem(item);
+	if (!core->ResolveRandomItem(item))
+		return false;
 	if (a==-1) {
 		//use the default charge counts of the item
 		Item *origitem = gamedata->GetItem(item->ItemResRef);
@@ -1159,6 +1156,7 @@ void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 		item->Usages[2]=(ieWord) c;
 	}
 	item->Flags=0;
+	return true;
 }
 
 //It is possible to attack CONTAINERS/DOORS as well!!!

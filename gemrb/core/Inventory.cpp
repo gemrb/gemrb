@@ -1396,7 +1396,7 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	TmpItem->Usages[1]=(ieWord) Charge1;
 	TmpItem->Usages[2]=(ieWord) Charge2;
 	TmpItem->Flags=0;
-	if (core->ResolveRandomItem(TmpItem) && gamedata->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
+	if (core->ResolveRandomItem(TmpItem)) {
 		AddSlotItem( TmpItem, SlotID );
 	} else {
 		delete TmpItem;
@@ -1414,7 +1414,7 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 		TmpItem->Usages[1]=(ieWord) Charge1;
 		TmpItem->Usages[2]=(ieWord) Charge2;
 		TmpItem->Flags=0;
-		if (core->ResolveRandomItem(TmpItem) && gamedata->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
+		if (core->ResolveRandomItem(TmpItem)) {
 			SetSlotItem( TmpItem, SlotID );
 		} else {
 			delete TmpItem;
