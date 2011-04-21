@@ -33,6 +33,7 @@
 #include "Effect.h"
 #include "Region.h"
 
+#include <cstdlib>
 #include <list>
 
 class Actor;
