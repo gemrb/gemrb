@@ -51,7 +51,6 @@
 #include "MusicMgr.h"
 #include "Palette.h"
 #include "PluginMgr.h"
-#include "PluginMgr.h"
 #include "ProjectileServer.h"
 #include "SaveGameIterator.h"
 #include "SaveGameMgr.h"
