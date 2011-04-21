@@ -65,7 +65,7 @@ public:
 	virtual int FindTableValue(unsigned int column, const char* value, int start = 0) const = 0;
 
 	/** Opens a Table File */
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream) = 0;
 };
 
 /**

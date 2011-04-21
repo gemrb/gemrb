@@ -338,7 +338,6 @@ static void InitSpellbook()
 CREImporter::CREImporter(void)
 {
 	str = NULL;
-	autoFree = false;
 	TotSCEFF = 0xff;
 	CREVersion = 0xff;
 	InitSpellbook();
@@ -346,21 +345,16 @@ CREImporter::CREImporter(void)
 
 CREImporter::~CREImporter(void)
 {
-	if (str && autoFree) {
-		delete( str );
-	}
+	delete str;
 }
 
-bool CREImporter::Open(DataStream* stream, bool aF)
+bool CREImporter::Open(DataStream* stream)
 {
-	if (str && this->autoFree) {
-		delete( str );
-	}
-	str = stream;
-	autoFree = aF;
 	if (stream == NULL) {
 		return false;
 	}
+	delete str;
+	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	IsCharacter = false;

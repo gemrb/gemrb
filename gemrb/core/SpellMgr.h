@@ -40,7 +40,7 @@ class GEM_EXPORT SpellMgr : public Plugin {
 public:
 	SpellMgr(void);
 	virtual ~SpellMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream) = 0;
 	virtual Spell* GetSpell(Spell *spl, bool silent=false) = 0;
 };
 

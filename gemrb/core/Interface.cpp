@@ -1321,7 +1321,7 @@ int Interface::LoadSprites()
 			int needpalette = atoi( tab->QueryField( i, 1 ) );
 			int first_char = atoi( tab->QueryField( i, 2 ) );
 			str = gamedata->GetResource( ResRef, IE_BAM_CLASS_ID );
-			if (!bamint->Open( str, true )) {
+			if (!bamint->Open(str)) {
 				continue;
 			}
 			Font* fnt = bamint->GetFont();
@@ -1596,7 +1596,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
-	strings->Open( fs, true );
+	strings->Open(fs);
 
 	{
 		printMessage( "Core", "Loading Palettes...\n", WHITE );
@@ -1724,7 +1724,7 @@ int Interface::Init()
 		printMessage( "Core", "Loading resource data File...", WHITE );
 		INIresdata = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		DataStream* ds = gamedata->GetResource("resdata", IE_INI_CLASS_ID);
-		if (!INIresdata->Open( ds, true )) {
+		if (!INIresdata->Open(ds)) {
 			printStatus( "ERROR", LIGHT_RED );
 		} else {
 			printStatus( "OK", LIGHT_GREEN );
@@ -1737,7 +1737,7 @@ int Interface::Init()
 		char tINIparty[_MAX_PATH];
 		PathJoin( tINIparty, GamePath, "Party.ini", NULL );
 		FileStream* fs = FileStream::OpenFile( tINIparty );
-		if (!INIparty->Open( fs, true )) {
+		if (!INIparty->Open(fs)) {
 			printStatus( "ERROR", LIGHT_RED );
 		} else {
 			printStatus( "OK", LIGHT_GREEN );
@@ -1755,7 +1755,7 @@ int Interface::Init()
 		PathJoin( tINIbeasts, GamePath, "beast.ini", NULL );
 		// FIXME: crashes if file does not open
 		FileStream* fs = FileStream::OpenFile( tINIbeasts );
-		if (!INIbeasts->Open( fs, true )) {
+		if (!INIbeasts->Open(fs)) {
 			printStatus( "ERROR", LIGHT_RED );
 		} else {
 			printStatus( "OK", LIGHT_GREEN );
@@ -1767,7 +1767,7 @@ int Interface::Init()
 		PathJoin( tINIquests, GamePath, "quests.ini", NULL );
 		// FIXME: crashes if file does not open
 		FileStream* fs2 = FileStream::OpenFile( tINIquests );
-		if (!INIquests->Open( fs2, true )) {
+		if (!INIquests->Open(fs2)) {
 			printStatus( "ERROR", LIGHT_RED );
 		} else {
 			printStatus( "OK", LIGHT_GREEN );
@@ -2511,7 +2511,7 @@ bool Interface::LoadGemRBINI()
 		return false;
 	}
 	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
-	ini->Open( inifile, true ); //autofree
+	ini->Open(inifile);
 
 	printStatus( "OK", LIGHT_GREEN );
 
@@ -2860,7 +2860,7 @@ bool Interface::LoadWindowPack(const char* name)
 		printMessage("Interface", "Error: Cannot find %s.chu\n", LIGHT_RED, name );
 		return false;
 	}
-	if (!GetWindowMgr()->Open( stream, true )) {
+	if (!GetWindowMgr()->Open(stream)) {
 		printMessage("Interface", "Error: Cannot Load %s.chu\n", LIGHT_RED, name );
 		return false;
 	}
@@ -3530,7 +3530,7 @@ int Interface::LoadSymbol(const char* ResRef)
 		delete str;
 		return -1;
 	}
-	if (!sm->Open( str, true )) {
+	if (!sm->Open(str)) {
 		return -1;
 	}
 	Symbol s;
@@ -3962,7 +3962,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	if (!gam_mgr)
 		goto cleanup;
 
-	if (!gam_mgr->Open( gam_str, true ))
+	if (!gam_mgr->Open(gam_str))
 		goto cleanup;
 
 	new_game = gam_mgr->LoadGame(new Game(), ver_override);
@@ -3975,7 +3975,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	if (!wmp_mgr)
 		goto cleanup;
 
-	if (!wmp_mgr->Open( wmp_str1, wmp_str2, true ))
+	if (!wmp_mgr->Open(wmp_str1, wmp_str2))
 		goto cleanup;
 
 	new_worldmap = wmp_mgr->GetWorldMapArray( );
@@ -4034,7 +4034,7 @@ void Interface::UpdateMasterScript()
 		DataStream *wmp_str1 = gamedata->GetResource( WorldMapName[0], IE_WMP_CLASS_ID );
 		DataStream *wmp_str2 = gamedata->GetResource( WorldMapName[1], IE_WMP_CLASS_ID );
 
-		if (!wmp_mgr->Open( wmp_str1, wmp_str2, true )) {
+		if (!wmp_mgr->Open(wmp_str1, wmp_str2)) {
 			delete wmp_str1;
 			delete wmp_str2;
 		}
@@ -4812,7 +4812,7 @@ Store *Interface::SetCurrentStore(const ieResRef resname, ieDword owner)
 		delete ( str );
 		return NULL;
 	}
-	if (!sm->Open( str, true )) {
+	if (!sm->Open(str)) {
 		return NULL;
 	}
 
@@ -4842,7 +4842,7 @@ int Interface::GetMouseScrollSpeed() {
 ieStrRef Interface::GetRumour(const ieResRef dlgref)
 {
 	PluginHolder<DialogMgr> dm(IE_DLG_CLASS_ID);
-	dm->Open( gamedata->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
+	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
 	Dialog *dlg = dm->GetDialog();
 
 	if (!dlg) {

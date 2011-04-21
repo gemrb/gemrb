@@ -29,26 +29,20 @@
 TISImporter::TISImporter(void)
 {
 	str = NULL;
-	autoFree = false;
 }
 
 TISImporter::~TISImporter(void)
 {
-	if (str && autoFree) {
-		delete( str );
-	}
+	delete str;
 }
 
-bool TISImporter::Open(DataStream* stream, bool autoFree)
+bool TISImporter::Open(DataStream* stream)
 {
 	if (stream == NULL) {
 		return false;
 	}
-	if (str && this->autoFree) {
-		delete( str );
-	}
+	delete str;
 	str = stream;
-	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	headerShift = 0;

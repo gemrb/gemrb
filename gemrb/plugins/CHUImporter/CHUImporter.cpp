@@ -38,27 +38,21 @@
 CHUImporter::CHUImporter()
 {
 	str = NULL;
-	autoFree = false;
 }
 
 CHUImporter::~CHUImporter()
 {
-	if (autoFree) {
-		delete str;
-	}
+	delete str;
 }
 
 /** This function loads all available windows from the 'stream' parameter. */
-bool CHUImporter::Open(DataStream* stream, bool autoFree)
+bool CHUImporter::Open(DataStream* stream)
 {
 	if (stream == NULL) {
 		return false;
 	}
-	if (this->autoFree) {
-		delete str;
-	}
+	delete str;
 	str = stream;
-	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "CHUIV1  ", 8 ) != 0) {

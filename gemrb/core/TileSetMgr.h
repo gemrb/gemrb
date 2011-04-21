@@ -29,7 +29,7 @@ class GEM_EXPORT TileSetMgr : public Plugin {
 public:
 	TileSetMgr(void);
 	virtual ~TileSetMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream) = 0;
 	virtual Tile* GetTile(unsigned short* indexes, int count,
 		unsigned short* secondary = NULL) = 0;
 };

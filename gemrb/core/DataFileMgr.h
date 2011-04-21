@@ -40,7 +40,7 @@ class GEM_EXPORT DataFileMgr : public Plugin {
 public:
 	DataFileMgr(void);
 	virtual ~DataFileMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = false) = 0;
+	virtual bool Open(DataStream* stream) = 0;
 	virtual int GetTagsCount() const = 0;
 	virtual const char* GetTagNameByIndex(int index) const = 0;
 	virtual int GetKeysCount(const char* Tag) const = 0;

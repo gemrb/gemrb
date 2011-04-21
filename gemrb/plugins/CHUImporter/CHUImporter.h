@@ -42,7 +42,7 @@ public:
 	/** Returns the i-th window in the Previously Loaded Stream */
 	Window* GetWindow(unsigned int i);
 	/** This function loads all available windows from the 'stream' parameter. */
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 };
 
 #endif

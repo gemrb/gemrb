@@ -31,13 +31,12 @@
 class SPLImporter : public SpellMgr {
 private:
 	DataStream* str;
-	bool autoFree;
 	int version;
 
 public:
 	SPLImporter(void);
 	~SPLImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	Spell* GetSpell(Spell *spl, bool silent=false);
 private:
 	void GetExtHeader(Spell *s, SPLExtHeader* eh);

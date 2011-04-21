@@ -32,7 +32,6 @@ typedef std::vector< char*> RowEntry;
 class p2DAImporter : public TableMgr {
 private:
 	DataStream* str;
-	bool autoFree;
 	std::vector< char*> colNames;
 	std::vector< char*> rowNames;
 	std::vector< char*> ptrs;
@@ -41,7 +40,7 @@ private:
 public:
 	p2DAImporter(void);
 	~p2DAImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	/** Returns the actual number of Rows in the Table */
 	inline ieDword GetRowCount() const
 	{

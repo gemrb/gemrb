@@ -53,7 +53,6 @@ struct VarOffset {
 class DLGImporter : public DialogMgr {
 private:
 	DataStream* str;
-	bool autoFree;
 	ieDword StatesCount;
 	ieDword StatesOffset;
 	ieDword TransitionsCount;
@@ -70,7 +69,7 @@ private:
 public:
 	DLGImporter(void);
 	~DLGImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	Dialog* GetDialog() const;
 private:
 	DialogState* GetDialogState(Dialog *d, unsigned int index) const;

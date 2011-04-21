@@ -38,17 +38,14 @@
 GAMImporter::GAMImporter(void)
 {
 	str = NULL;
-	autoFree = false;
 }
 
 GAMImporter::~GAMImporter(void)
 {
-	if (str && autoFree) {
-		delete( str );
-	}
+	delete str;
 }
 
-bool GAMImporter::Open(DataStream* stream, bool autoFree)
+bool GAMImporter::Open(DataStream* stream)
 {
 	if (stream == NULL) {
 		return false;
@@ -57,7 +54,6 @@ bool GAMImporter::Open(DataStream* stream, bool autoFree)
 		return false;
 	}
 	str = stream;
-	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "GAMEV0.0", 8 ) == 0) {
@@ -469,7 +465,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	if (pcInfo.OffsetToCRE) {
 		SlicedStream* ms = new SlicedStream( str, pcInfo.OffsetToCRE, pcInfo.CRESize );
 		if (ms) {
-			aM->Open( ms, true );
+			aM->Open(ms);
 			actor = aM->GetActor(tmpWord);
 		}
 
@@ -484,7 +480,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 		//another plugin cannot free memory stream from this plugin
 		//so auto free is a no-no
 		if (ds) {
-			aM->Open( ds, true );
+			aM->Open(ds);
 			actor = aM->GetActor(pcInfo.PartyOrder);
 		}
 	}

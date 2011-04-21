@@ -27,28 +27,22 @@
 INIImporter::INIImporter(void)
 {
 	str = NULL;
-	autoFree = false;
 }
 
 INIImporter::~INIImporter(void)
 {
-	if (str && autoFree) {
-		delete( str );
-	}
+	delete str;
 	for (unsigned int i = 0; i < tags.size(); i++)
 		delete( tags[i] );
 }
 
-bool INIImporter::Open(DataStream* stream, bool autoFree)
+bool INIImporter::Open(DataStream* stream)
 {
 	if (stream == NULL) {
 		return false;
 	}
-	if (str && this->autoFree) {
-		delete( str );
-	}
+	delete str;
 	str = stream;
-	this->autoFree = autoFree;
 	int cnt = 0;
 	char* strbuf = ( char* ) malloc( 4097 );
 	INITag* lastTag = NULL;

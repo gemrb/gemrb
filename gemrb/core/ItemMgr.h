@@ -41,7 +41,7 @@ class GEM_EXPORT ItemMgr : public Plugin {
 public:
 	ItemMgr(void);
 	virtual ~ItemMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream) = 0;
 	virtual Item* GetItem(Item *s) = 0;
 };
 

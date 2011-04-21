@@ -84,7 +84,7 @@ void ReadAutonoteINI()
 	char tINInote[_MAX_PATH];
 	PathJoin( tINInote, core->GamePath, "autonote.ini", NULL );
 	FileStream* fs = FileStream::OpenFile( tINInote );
-	INInote->Open( fs, true );
+	INInote->Open(fs);
 }
 
 int GetTrackString(const ieResRef areaName)
@@ -122,7 +122,6 @@ int GetTrackString(const ieResRef areaName)
 
 AREImporter::AREImporter(void)
 {
-	autoFree = false;
 	str = NULL;
 	if (Sounds[0][0] == UNINITIALIZED_BYTE) {
 		memset( Sounds, 0, sizeof( Sounds ) );
@@ -140,22 +139,17 @@ AREImporter::AREImporter(void)
 
 AREImporter::~AREImporter(void)
 {
-	if (autoFree) {
-		delete str;
-	}
+	delete str;
 	Sounds[0][0]=UNINITIALIZED_BYTE;
 }
 
-bool AREImporter::Open(DataStream* stream, bool autoFree)
+bool AREImporter::Open(DataStream* stream)
 {
 	if (stream == NULL) {
 		return false;
 	}
-	if (this->autoFree) {
-		delete str;
-	}
+	delete str;
 	str = stream;
-	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
 
@@ -946,7 +940,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			} else {
 				crefile = gamedata->GetResource( CreResRef, IE_CRE_CLASS_ID );
 			}
-			if(!actmgr->Open( crefile, true )) {
+			if(!actmgr->Open(crefile)) {
 				print("Couldn't read actor: %s!\n", CreResRef);
 				continue;
 			}
@@ -1271,7 +1265,7 @@ void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword Effe
 	unsigned int i;
 
 	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
-	eM->Open( ds, true );
+	eM->Open(ds);
 
 	for (i = 0; i < EffectsCount; i++) {
 		Effect fx;

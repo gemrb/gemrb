@@ -39,7 +39,6 @@ class Palette;
 class BAMImporter : public AnimationMgr {
 private:
 	DataStream* str;
-	bool autoFree;
 	FrameEntry* frames;
 	CycleEntry* cycles;
 	ieWord FramesCount;
@@ -57,7 +56,7 @@ private:
 public:
 	BAMImporter(void);
 	~BAMImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	int GetCycleSize(unsigned char Cycle);
 	AnimationFactory* GetAnimationFactory(const char* ResRef,
 		unsigned char mode = IE_NORMAL);

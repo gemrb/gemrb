@@ -33,7 +33,6 @@
 class CREImporter : public ActorMgr {
 private:
 	DataStream* str;
-	bool autoFree;
 	unsigned char CREVersion;
 	ieDword KnownSpellsOffset;
 	ieDword KnownSpellsCount;
@@ -61,7 +60,7 @@ private:
 public:
 	CREImporter(void);
 	~CREImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	Actor* GetActor(unsigned char is_in_party);
 
 	//returns saved size, updates internal offsets before save

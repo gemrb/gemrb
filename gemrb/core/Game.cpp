@@ -769,7 +769,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	if (!ds) {
 		goto failedload;
 	}
-	if(!mM->Open( ds, true )) {
+	if(!mM->Open(ds)) {
 		goto failedload;
 	}
 	newMap = mM->GetMap(ResRef, IsDay());

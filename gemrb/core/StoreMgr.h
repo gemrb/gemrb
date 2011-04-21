@@ -41,7 +41,7 @@ class GEM_EXPORT StoreMgr : public Plugin {
 public:
 	StoreMgr(void);
 	virtual ~StoreMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream) = 0;
 	virtual Store* GetStore(Store *s) = 0;
 
 	virtual int GetStoredFileSize(Store *s) = 0;

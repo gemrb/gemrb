@@ -30,26 +30,20 @@
 STOImporter::STOImporter(void)
 {
 	str = NULL;
-	autoFree = false;
 }
 
 STOImporter::~STOImporter(void)
 {
-	if (str && autoFree) {
-		delete( str );
-	}
+	delete str;
 }
 
-bool STOImporter::Open(DataStream* stream, bool autoFree)
+bool STOImporter::Open(DataStream* stream)
 {
 	if (stream == NULL) {
 		return false;
 	}
-	if (str && this->autoFree) {
-		delete( str );
-	}
+	delete str;
 	str = stream;
-	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "STORV1.0", 8 ) == 0) {

@@ -26,13 +26,12 @@
 class TISImporter : public TileSetMgr {
 private:
 	DataStream* str;
-	bool autoFree;
 	ieDword headerShift;
 	ieDword TilesCount, TilesSectionLen, TileSize;
 public:
 	TISImporter(void);
 	~TISImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	Tile* GetTile(unsigned short* indexes, int count,
 		unsigned short* secondary = NULL);
 	Sprite2D* GetTile(int index);

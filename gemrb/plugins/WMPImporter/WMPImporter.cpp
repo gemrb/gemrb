@@ -30,34 +30,24 @@ WMPImporter::WMPImporter(void)
 {
 	str1 = NULL;
 	str2 = NULL;
-	autoFree = false;
 }
 
 WMPImporter::~WMPImporter(void)
 {
-	if (str1 && autoFree) {
-		delete( str1 );
-	}
-	if (str2 && autoFree) {
-		delete( str2 );
-	}
+	delete str1;
+	delete str2;
 }
 
-bool WMPImporter::Open(DataStream* stream1, DataStream* stream2, bool autoFree)
+bool WMPImporter::Open(DataStream* stream1, DataStream* stream2)
 {
 	if ((stream1 == NULL) && (stream2 == NULL) ) {
 		return false;
 	}
-	if (str1 && this->autoFree) {
-		delete( str1 );
-	}
-	if (str2 && this->autoFree) {
-		delete( str2 );
-	}
+	delete str1;
+	delete str2;
 	str1 = stream1;
 	str2 = stream2;
 
-	this->autoFree = autoFree;
 	char Signature[8];
 
 	if (str1) {

@@ -40,7 +40,7 @@ class GEM_EXPORT WorldMapMgr : public Plugin {
 public:
 	WorldMapMgr(void);
 	virtual ~WorldMapMgr(void);
-	virtual bool Open(DataStream* stream1, DataStream* stream2, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream1, DataStream* stream2) = 0;
 	virtual WorldMapArray* GetWorldMapArray() = 0;
 
 	virtual int GetStoredFileSize(WorldMapArray *wmap, unsigned int index) = 0;

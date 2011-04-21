@@ -31,13 +31,12 @@
 class PROImporter : public ProjectileMgr {
 private:
 	DataStream* str;
-	bool autoFree;
 	int version;
 
 public:
 	PROImporter(void);
 	~PROImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	Projectile* GetProjectile(Projectile *s);
 private:
 	void GetAreaExtension(ProjectileExtension *s);

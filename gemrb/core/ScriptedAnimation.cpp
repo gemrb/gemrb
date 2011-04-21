@@ -226,7 +226,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 }
 
 /* Creating animation from VVC */
-ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
+ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 {
 	Init();
 	if (!stream) {
@@ -238,8 +238,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 	stream->Read( Signature, 8);
 	if (strncmp( Signature, "VVC V1.0", 8 ) != 0) {
 		print( "Not a valid VVC File\n" );
-		if (autoFree)
-			delete( stream );
+		delete stream;
 		return;
 	}
 	ieResRef Anim1ResRef;
@@ -383,9 +382,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 
 	SetPhase(P_ONSET);
 
-	if (autoFree) {
-		delete( stream );
-	}
+	delete stream;
 }
 
 ScriptedAnimation::~ScriptedAnimation(void)

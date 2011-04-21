@@ -31,13 +31,12 @@
 class STOImporter : public StoreMgr {
 private:
 	DataStream* str;
-	bool autoFree;
 	int version;
 
 public:
 	STOImporter(void);
 	~STOImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	Store* GetStore(Store *store);
 
 	//returns saved size, updates internal offsets before save

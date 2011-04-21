@@ -41,7 +41,7 @@ class GEM_EXPORT MapMgr : public Plugin {
 public:
 	MapMgr(void);
 	virtual ~MapMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream) = 0;
 	virtual bool ChangeMap(Map *map, bool day_or_night) = 0;
 	virtual Map* GetMap(const char* ResRef, bool day_or_night) = 0;
 

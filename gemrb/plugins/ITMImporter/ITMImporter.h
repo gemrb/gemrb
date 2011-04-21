@@ -34,13 +34,12 @@
 class ITMImporter : public ItemMgr {
 private:
 	DataStream* str;
-	bool autoFree;
 	int version;
 
 public:
 	ITMImporter(void);
 	~ITMImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	Item* GetItem(Item *s);
 private:
 	void GetExtHeader(Item *s, ITMExtHeader* eh);

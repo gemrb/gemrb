@@ -36,7 +36,6 @@ class WEDImporter : public TileMapMgr {
 private:
 	std::vector< Overlay> overlays;
 	DataStream* str;
-	bool autoFree;
 	ieDword OverlaysCount, DoorsCount, OverlaysOffset, SecHeaderOffset,
 		DoorsOffset, DoorTilesOffset;
 	ieDword WallPolygonsCount, PolygonsOffset, VerticesOffset,
@@ -52,7 +51,7 @@ private:
 public:
 	WEDImporter(void);
 	~WEDImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	//if tilemap already exists, don't create it
 	TileMap* GetTileMap(TileMap *tm);
 	ieWord* GetDoorIndices(char* ResRef, int* count, bool& BaseClosed);

@@ -32,7 +32,6 @@ class WMPImporter : public WorldMapMgr {
 private:
 	DataStream* str1;
 	DataStream* str2;
-	bool autoFree;
 
 	ieDword WorldMapsCount;
 	ieDword WorldMapsCount1, WorldMapsCount2;
@@ -41,7 +40,7 @@ private:
 public:
 	WMPImporter(void);
 	~WMPImporter(void);
-	bool Open(DataStream* stream1, DataStream* stream2, bool autoFree = true);
+	bool Open(DataStream* stream1, DataStream* stream2);
 	WorldMapArray *GetWorldMapArray();
 
 	int GetStoredFileSize(WorldMapArray *wmap, unsigned int index);

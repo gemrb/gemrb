@@ -29,7 +29,6 @@ class AnimationFactory;
 class AREImporter : public MapMgr {
 private:
 	DataStream* str;
-	bool autoFree;
 	int bigheader;
 	ieResRef WEDResRef;
 	ieDword LastSave;
@@ -57,7 +56,7 @@ private:
 public:
 	AREImporter(void);
 	~AREImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	bool ChangeMap(Map *map, bool day_or_night);
 	Map* GetMap(const char* ResRef, bool day_or_night);
 	int GetStoredFileSize(Map *map);

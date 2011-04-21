@@ -29,7 +29,7 @@ class GEM_EXPORT ProjectileMgr : public Plugin {
 public:
 	ProjectileMgr(void);
 	virtual ~ProjectileMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream) = 0;
 	virtual Projectile* GetProjectile( Projectile *) = 0;
 };
 

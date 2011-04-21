@@ -36,7 +36,6 @@
 class GAMImporter : public SaveGameMgr {
 private:
 	DataStream* str;
-	bool autoFree;
 	int version;
 	unsigned int PCSize;
 	ieDword PCOffset, PCCount;
@@ -51,7 +50,7 @@ private:
 public:
 	GAMImporter(void);
 	~GAMImporter(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream);
 	Game* LoadGame(Game *newGame, int ver_override = 0);
 
 	int GetStoredFileSize(Game *game);

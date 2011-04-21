@@ -28,27 +28,21 @@
 ITMImporter::ITMImporter(void)
 {
 	str = NULL;
-	autoFree = false;
 }
 
 ITMImporter::~ITMImporter(void)
 {
-	if (autoFree) {
-		delete str;
-	}
+	delete str;
 	str = NULL;
 }
 
-bool ITMImporter::Open(DataStream* stream, bool autoFree)
+bool ITMImporter::Open(DataStream* stream)
 {
 	if (stream == NULL) {
 		return false;
 	}
-	if (this->autoFree) {
-		delete str;
-	}
+	delete str;
 	str = stream;
-	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "ITM V1  ", 8 ) == 0) {

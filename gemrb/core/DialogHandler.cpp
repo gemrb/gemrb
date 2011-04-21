@@ -64,7 +64,7 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 	}
 
 	PluginHolder<DialogMgr> dm(IE_DLG_CLASS_ID);
-	dm->Open( gamedata->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
+	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
 	dlg = dm->GetDialog();
 
 	if (!dlg) {

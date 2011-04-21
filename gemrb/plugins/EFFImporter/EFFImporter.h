@@ -36,6 +36,8 @@ private:
 public:
 	EFFImporter(void);
 	~EFFImporter(void);
+	// We need this autoFree, since Effects are included inline
+	// in other file types, without a size header.
 	bool Open(DataStream* stream, bool autoFree = true);
 	Effect* GetEffect(Effect *fx);
 	Effect* GetEffectV1(Effect *fx);

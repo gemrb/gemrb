@@ -79,26 +79,20 @@ int GetCGSound(ieDword CastingGraphics)
 SPLImporter::SPLImporter(void)
 {
 	str = NULL;
-	autoFree = false;
 }
 
 SPLImporter::~SPLImporter(void)
 {
-	if (str && autoFree) {
-		delete( str );
-	}
+	delete str;
 }
 
-bool SPLImporter::Open(DataStream* stream, bool autoFree)
+bool SPLImporter::Open(DataStream* stream)
 {
 	if (stream == NULL) {
 		return false;
 	}
-	if (str && this->autoFree) {
-		delete( str );
-	}
+	delete str;
 	str = stream;
-	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "SPL V1  ", 8 ) == 0) {

@@ -121,7 +121,7 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		delete ( str );
 		return CreateDefaultProjectile(idx);
 	}
-	if (!sm->Open( str, true )) {
+	if (!sm->Open(str)) {
 		return CreateDefaultProjectile(idx);
 	}
 	Projectile *pro = new Projectile();

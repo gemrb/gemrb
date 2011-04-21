@@ -43,7 +43,7 @@ class GEM_EXPORT SymbolMgr : public Plugin {
 public:
 	SymbolMgr(void);
 	virtual ~SymbolMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream) = 0;
 	virtual int GetValue(const char* text) const = 0;
 	virtual char* GetValue(int val) const = 0;
 	virtual char* GetStringIndex(unsigned int Index) const = 0;

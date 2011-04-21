@@ -29,7 +29,7 @@ class GEM_EXPORT TileMapMgr : public Plugin {
 public:
 	TileMapMgr(void);
 	virtual ~TileMapMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream) = 0;
 	virtual TileMap* GetTileMap(TileMap *tm) = 0;
 	virtual ieWord* GetDoorIndices(char* ResRef, int* count,
 		bool& BaseClosed) = 0;

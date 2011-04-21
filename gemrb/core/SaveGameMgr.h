@@ -28,7 +28,7 @@ class GEM_EXPORT SaveGameMgr : public Plugin {
 public:
 	SaveGameMgr(void);
 	virtual ~SaveGameMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream) = 0;
 	virtual Game* LoadGame(Game *newGame, int ver_override = 0) = 0;
 
 	virtual int GetStoredFileSize(Game *game) = 0;

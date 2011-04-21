@@ -40,7 +40,6 @@
 BAMImporter::BAMImporter(void)
 {
 	str = NULL;
-	autoFree = false;
 	frames = NULL;
 	cycles = NULL;
 	palette = NULL;
@@ -50,37 +49,31 @@ BAMImporter::BAMImporter(void)
 
 BAMImporter::~BAMImporter(void)
 {
-	if (str && autoFree) {
-		delete( str );
-	}
+	delete str;
 	delete[] frames;
 	delete[] cycles;
 	gamedata->FreePalette(palette);
 }
 
-bool BAMImporter::Open(DataStream* stream, bool autoFree)
+bool BAMImporter::Open(DataStream* stream)
 {
 	unsigned int i;
 
 	if (stream == NULL) {
 		return false;
 	}
-	if (str && this->autoFree) {
-		delete( str );
-	}
+	delete str;
 	delete[] frames;
 	delete[] cycles;
 	gamedata->FreePalette(palette);
 
 	str = stream;
-	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "BAMCV1  ", 8 ) == 0) {
 		str->Seek( 4, GEM_CURRENT_POS );
 		DataStream* cached = CacheCompressedStream(stream, stream->filename);
-		if (autoFree)
-			delete str;
+		delete str;
 		if (!cached)
 			return false;
 		str = cached;

@@ -90,7 +90,7 @@ Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
 		return 0;
 
 	PluginHolder<ActorMgr> actormgr(IE_CRE_CLASS_ID);
-	if (!actormgr->Open( ds, true )) {
+	if (!actormgr->Open(ds)) {
 		return 0;
 	}
 	Actor* actor = actormgr->GetActor(PartySlot);
@@ -108,7 +108,7 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 		PathJoin( nPath, core->GamePath, "characters", fName, NULL );
 		stream = FileStream::OpenFile(nPath);
 		PluginHolder<ActorMgr> actormgr(IE_CRE_CLASS_ID);
-		if (!actormgr->Open( stream, true )) {
+		if (!actormgr->Open(stream)) {
 			return -1;
 		}
 		actor = actormgr->GetActor(PartySlot);
@@ -159,7 +159,7 @@ int GameData::LoadTable(const ieResRef ResRef)
 		delete str;
 		return -1;
 	}
-	if (!tm->Open( str, true )) {
+	if (!tm->Open(str)) {
 		return -1;
 	}
 	Table t;
@@ -290,7 +290,7 @@ Item* GameData::GetItem(const ieResRef resname)
 		delete ( str );
 		return NULL;
 	}
-	if (!sm->Open( str, true )) {
+	if (!sm->Open(str)) {
 		return NULL;
 	}
 
@@ -332,7 +332,7 @@ Spell* GameData::GetSpell(const ieResRef resname, bool silent)
 		delete ( str );
 		return NULL;
 	}
-	if (!sm->Open( str, true )) {
+	if (!sm->Open(str)) {
 		return NULL;
 	}
 
@@ -374,7 +374,7 @@ Effect* GameData::GetEffect(const ieResRef resname)
 		delete ( str );
 		return NULL;
 	}
-	if (!em->Open( str, true )) {
+	if (!em->Open(str)) {
 		return NULL;
 	}
 
@@ -408,7 +408,7 @@ ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doub
 
 	if (Exists( effect, IE_VVC_CLASS_ID, true ) ) {
 		DataStream *ds = GetResource( effect, IE_VVC_CLASS_ID );
-		ret = new ScriptedAnimation(ds, true);
+		ret = new ScriptedAnimation(ds);
 	} else {
 		AnimationFactory *af = (AnimationFactory *)
 			GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
@@ -458,7 +458,7 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 			PluginHolder<AnimationMgr> ani(IE_BAM_CLASS_ID);
 			if (!ani)
 				return NULL;
-			if (!ani->Open( ret, true ))
+			if (!ani->Open(ret))
 				return NULL;
 			AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
 			factory->AddFactoryObject( af );

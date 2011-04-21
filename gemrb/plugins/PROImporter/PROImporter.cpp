@@ -28,27 +28,21 @@
 PROImporter::PROImporter(void)
 {
 	str = NULL;
-	autoFree = false;
 }
 
 PROImporter::~PROImporter(void)
 {
-	if (autoFree) {
-		delete str;
-	}
+	delete str;
 	str = NULL;
 }
 
-bool PROImporter::Open(DataStream* stream, bool autoFree)
+bool PROImporter::Open(DataStream* stream)
 {
 	if (stream == NULL) {
 		return false;
 	}
-	if (this->autoFree) {
-		delete str;
-	}
+	delete str;
 	str = stream;
-	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "PRO V1.0", 8 ) == 0) {

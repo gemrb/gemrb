@@ -29,27 +29,21 @@
 DLGImporter::DLGImporter(void)
 {
 	str = NULL;
-	autoFree = false;
 	Version = 0;
 }
 
 DLGImporter::~DLGImporter(void)
 {
-	if (str && autoFree) {
-		delete( str );
-	}
+	delete str;
 }
 
-bool DLGImporter::Open(DataStream* stream, bool autoFree)
+bool DLGImporter::Open(DataStream* stream)
 {
 	if (stream == NULL) {
 		return false;
 	}
-	if (str && this->autoFree) {
-		delete( str );
-	}
+	delete str;
 	str = stream;
-	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strnicmp( Signature, "DLG V1.0", 8 ) != 0) {
