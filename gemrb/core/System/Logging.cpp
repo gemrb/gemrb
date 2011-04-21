@@ -151,7 +151,12 @@ void printStatus(const char* status, log_color color)
 	__android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s]", status)
 }
 
-void printMessage(const char* owner, const char* message, log_color color)
-	__android_log_print(ANDROID_LOG_INFO, "GemRB", "%s: %s", owner, message)
+void printMessage(const char* owner, const char* message, log_color color, ...)
+{
+	// FIXME: We drop owner on the floor.
+	va_list ap;
+	va_start(ap, message);
+	__android_log_vprint(ANDROID_LOG_INFO, "GemRB", message, ap);
+	va_end(ap);
 }
 #endif
