@@ -601,7 +601,6 @@ public:
 	void FreeITMExt(ITMExtHeader *p, Effect *e);
 	void FreeSPLExt(SPLExtHeader *p, Effect *e);
 	WorldMapArray *NewWorldMapArray(int count);
-	void DoTheStoreHack(Store *s);
 	/** plays stock gui sound referenced by index */
 	void PlaySound(int idx);
 	/** returns the first selected PC, if forced is set, then it returns

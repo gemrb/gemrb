@@ -4860,24 +4860,6 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 	return ret;
 }
 
-void Interface::DoTheStoreHack(Store *s)
-{
-	size_t size = s->PurchasedCategoriesCount * sizeof( ieDword );
-	s->purchased_categories=(ieDword *) malloc(size);
-
-	size = s->CuresCount * sizeof( STOCure );
-	s->cures=(STOCure *) malloc(size);
-
-	size = s->DrinksCount * sizeof( STODrink );
-	s->drinks=(STODrink *) malloc(size);
-
-	for(size=0;size<s->ItemsCount;size++) {
-		STOItem *si = new STOItem();
-		memset(si, 0, sizeof(STOItem) );
-		s->items.push_back( si );
-	}
-}
-
 //plays stock sound listed in defsound.2da
 void Interface::PlaySound(int index)
 {

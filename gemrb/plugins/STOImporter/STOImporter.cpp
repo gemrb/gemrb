@@ -119,10 +119,20 @@ Store* STOImporter::GetStore(Store *s)
 		memset( s->unknown3, 0, 80 );
 	}
 
-	//Allocation must be done in the same place as destruction.
-	//Yeah, this is intentionally so ugly, someone who doesn't like this
-	//may fix it.
-	core->DoTheStoreHack(s);
+	size_t size = s->PurchasedCategoriesCount * sizeof( ieDword );
+	s->purchased_categories=(ieDword *) malloc(size);
+
+	size = s->CuresCount * sizeof( STOCure );
+	s->cures=(STOCure *) malloc(size);
+
+	size = s->DrinksCount * sizeof( STODrink );
+	s->drinks=(STODrink *) malloc(size);
+
+	for(size=0;size<s->ItemsCount;size++) {
+		STOItem *si = new STOItem();
+		memset(si, 0, sizeof(STOItem) );
+		s->items.push_back( si );
+	}
 
 	str->Seek( s->PurchasedCategoriesOffset, GEM_STREAM_START );
 	GetPurchasedCategories( s );
