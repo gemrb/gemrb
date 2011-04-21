@@ -458,7 +458,8 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 			PluginHolder<AnimationMgr> ani(IE_BAM_CLASS_ID);
 			if (!ani)
 				return NULL;
-			ani->Open( ret, true );
+			if (!ani->Open( ret, true ))
+				return NULL;
 			AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
 			factory->AddFactoryObject( af );
 			return af;
