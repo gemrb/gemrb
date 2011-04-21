@@ -30,8 +30,6 @@ struct Pair {
 
 class IDSImporter : public SymbolMgr {
 private:
-	DataStream* str;
-
 	std::vector< Pair> pairs;
 	std::vector< char*> ptrs;
 

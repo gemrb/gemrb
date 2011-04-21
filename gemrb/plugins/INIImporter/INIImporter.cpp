@@ -26,23 +26,19 @@
 
 INIImporter::INIImporter(void)
 {
-	str = NULL;
 }
 
 INIImporter::~INIImporter(void)
 {
-	delete str;
 	for (unsigned int i = 0; i < tags.size(); i++)
 		delete( tags[i] );
 }
 
-bool INIImporter::Open(DataStream* stream)
+bool INIImporter::Open(DataStream* str)
 {
-	if (stream == NULL) {
+	if (str == NULL) {
 		return false;
 	}
-	delete str;
-	str = stream;
 	int cnt = 0;
 	char* strbuf = ( char* ) malloc( 4097 );
 	INITag* lastTag = NULL;
@@ -74,11 +70,12 @@ bool INIImporter::Open(DataStream* stream)
 			continue;
 		if (lastTag->AddLine( strbuf )) {
 			printMessage("INIImporter", "Bad Line in file: %s, Section: [%s], Entry: '%s'\n", LIGHT_RED,
-				stream->filename, lastTag->GetTagName(), strbuf);
+				str->filename, lastTag->GetTagName(), strbuf);
 		}
 
 	} while (true);
 	free( strbuf );
+	delete str;
 	return true;
 }
 

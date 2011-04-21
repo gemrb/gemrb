@@ -29,27 +29,20 @@
 
 IDSImporter::IDSImporter(void)
 {
-	str = NULL;
 }
 
 IDSImporter::~IDSImporter(void)
 {
-	delete str;
-
 	for (unsigned int i = 0; i < ptrs.size(); i++) {
 		free( ptrs[i] );
 	}
 }
 
-bool IDSImporter::Open(DataStream* stream)
+bool IDSImporter::Open(DataStream* str)
 {
-	if (stream == NULL) {
+	if (str == NULL) {
 		return false;
 	}
-	if (str) {
-		return false;
-	}
-	str = stream;
 
 	str->CheckEncrypted();
 	char tmp[11];
@@ -85,6 +78,7 @@ bool IDSImporter::Open(DataStream* stream)
 		}
 	}
 
+	delete str;
 	return true;
 }
 

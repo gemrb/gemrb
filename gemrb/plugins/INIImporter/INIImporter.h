@@ -180,7 +180,6 @@ public:
 
 class INIImporter : public DataFileMgr {
 private:
-	DataStream* str;
 	std::vector< INITag*> tags;
 
 public:

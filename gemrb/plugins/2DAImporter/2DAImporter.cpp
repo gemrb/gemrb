@@ -30,24 +30,20 @@
 
 p2DAImporter::p2DAImporter(void)
 {
-	str = NULL;
 }
 
 p2DAImporter::~p2DAImporter(void)
 {
-	delete str;
 	for (unsigned int i = 0; i < ptrs.size(); i++) {
 		free( ptrs[i] );
 	}
 }
 
-bool p2DAImporter::Open(DataStream* stream)
+bool p2DAImporter::Open(DataStream* str)
 {
-	if (stream == NULL) {
+	if (str == NULL) {
 		return false;
 	}
-	delete str;
-	str = stream;
 	char Signature[SIGNLENGTH];
 	str->CheckEncrypted();
 
@@ -104,6 +100,7 @@ bool p2DAImporter::Open(DataStream* stream)
 			row++;
 		}
 	}
+	delete str;
 	return true;
 }
 

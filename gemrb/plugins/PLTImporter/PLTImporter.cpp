@@ -49,9 +49,11 @@ PLTImporter::~PLTImporter(void)
 	}
 }
 
-bool PLTImporter::Open(DataStream* stream)
+bool PLTImporter::Open(DataStream* str)
 {
-	str = stream;
+	if (!str) {
+		return false;
+	}
 
 	char Signature[8];
 	unsigned short unknown[4];
@@ -68,7 +70,7 @@ bool PLTImporter::Open(DataStream* stream)
 
 	pixels = malloc( Width * Height * 2 );
 	str->Read( pixels, Width * Height * 2 );
-
+	delete str;
 	return true;
 }
 
