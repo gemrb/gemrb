@@ -3782,9 +3782,11 @@ void Actor::InitStatsOnLoad()
 	}
 	inventory.CalculateWeight();
 	CreateDerivedStats();
-	Modified[IE_CON]=BaseStats[IE_CON]; // used by GetHpAdjustment
-	ieDword hp = BaseStats[IE_HITPOINTS] + GetHpAdjustment(GetXPLevel(false));
-	BaseStats[IE_HITPOINTS]=hp;
+	if (BaseStats[IE_CLASS] > 0 && BaseStats[IE_CLASS] <= (ieDword)classcount) {
+		Modified[IE_CON]=BaseStats[IE_CON]; // used by GetHpAdjustment
+		ieDword hp = BaseStats[IE_HITPOINTS] + GetHpAdjustment(GetXPLevel(false));
+		BaseStats[IE_HITPOINTS]=hp;
+	}
 	SetupFist();
 	//initial setup of modified stats
 	memcpy(Modified,BaseStats, sizeof(Modified));
