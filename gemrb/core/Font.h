@@ -99,7 +99,7 @@ public:
 	void SetPalette(Palette* pal);
 	/** Returns width of the string rendered in this font in pixels */
 	int CalcStringWidth(const char* string, bool NoColor = false) const;
-	void SetupString(char* string, unsigned int width, bool NoColor = false) const;
+	void SetupString(char* string, unsigned int width, bool NoColor = false, Font *initials = NULL, bool enablecap = false) const;
 	/** Sets ASCII code of the first character in the font.
 	 * (it allows remapping numeric fonts from \000 to '0') */
 	void SetFirstChar(unsigned char first);

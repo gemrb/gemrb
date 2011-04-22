@@ -146,7 +146,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	size_t len = strlen( ( char* ) string );
 	char* tmp = ( char* ) malloc( len + 1 );
 	memcpy( tmp, ( char * ) string, len + 1 );
-	SetupString( tmp, rgn.w, NoColor );
+	SetupString( tmp, rgn.w, NoColor, initials, enablecap );
 	int ystep = 0;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
 		for (size_t i = 0; i < len; i++) {
@@ -320,7 +320,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		len--;
 	}
 
-	SetupString( tmp, rgn.w, NoColor );
+	SetupString( tmp, rgn.w, NoColor, initials, capital );
 	int ystep = 0;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
 		
@@ -473,20 +473,27 @@ int Font::CalcStringWidth(const char* string, bool NoColor) const
 	return ( int ) ret;
 }
 
-void Font::SetupString(char* string, unsigned int width, bool NoColor) const
+void Font::SetupString(char* string, unsigned int width, bool NoColor, Font *initials, bool enablecap) const
 {
 	size_t len = strlen( string );
 	unsigned int psx = PARAGRAPH_START_X;
 	int lastpos = 0;
 	unsigned int x = psx, wx = 0;
 	bool endword = false;
+	int initials_rows = 0;
+	int initials_x = 0;
 	for (size_t pos = 0; pos < len; pos++) {
 		if (x + wx > width) {
+			// we wrapped, force a new line somewhere
 			if (!endword && ( x == psx ))
 				lastpos = ( int ) pos;
 			else
 				string[lastpos] = 0;
 			x = psx;
+			if (initials_rows > 0) {
+				initials_rows--;
+				x += initials_x;
+			}
 		}
 		if (string[pos] == 0) {
 			continue;
@@ -495,9 +502,14 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor) const
 		if (string[pos] == '\r')
 			string[pos] = ' ';
 		if (string[pos] == '\n') {
+			// force a new line here
 			string[pos] = 0;
 			x = psx;
 			wx = 0;
+			if (initials_rows > 0) {
+				initials_rows--;
+				x += initials_x;
+			}
 			lastpos = ( int ) pos;
 			endword = true;
 			continue;
@@ -515,6 +527,14 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor) const
 				}
 				tag[k] = string[pos++];
 			}
+			if (strnicmp( tag, "capital=",8)==0) {
+				int capital = 0;
+				sscanf( tag, "capital=%d", &capital);
+				if (capital) {
+					enablecap=true;
+				}
+				continue;
+			}
 			if (stricmp( "p", tag ) == 0) {
 				psx = x;
 				continue;
@@ -531,6 +551,14 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor) const
 		}
 
 		wx += size[( unsigned char ) string[pos] - 1].w;
+		if (initials && enablecap) {
+			wx += initials->size[(unsigned char) string[pos] - 1].w;
+			enablecap=false;
+			initials_x = wx;
+			//how many more lines to be indented (one was already indented)
+			initials_rows = (initials->maxHeight-1)/maxHeight;
+			continue;
+		}
 		if (( string[pos] == ' ' ) || ( string[pos] == '-' )) {
 			x += wx;
 			wx = 0;
