@@ -5756,7 +5756,7 @@ void Actor::SetSoundFolder(const char *soundset)
 		char filepath[_MAX_PATH];
 
 		strnlwrcpy(PCStats->SoundFolder, soundset, 32);
-		PathJoin(filepath,core->GamePath,"sounds",PCStats->SoundFolder,0);
+		PathJoin(filepath, core->GamePath, "sounds", PCStats->SoundFolder, NULL);
 		char file[_MAX_PATH];
 		if (FileGlob(file, filepath, "?????01")) {
 			file[5] = '\0';

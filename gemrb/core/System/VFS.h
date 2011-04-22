@@ -101,7 +101,7 @@ GEM_EXPORT bool file_exists(const char* path);
  * char filepath[_MAX_PATH];
  * PathJoin( filepath, core->GUIScriptsPath, core->GameType, 'GUIDefines.py', NULL );
  */
-GEM_EXPORT bool PathJoin (char* target, const char* base, ...);
+GEM_EXPORT bool PathJoin (char* target, const char* base, ...) SENTINEL;
 GEM_EXPORT bool PathJoinExt (char* target, const char* dir, const char* file, const char* ext = NULL);
 GEM_EXPORT void FixPath (char *path, bool needslash);
 
