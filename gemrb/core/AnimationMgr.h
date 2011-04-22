@@ -25,8 +25,9 @@
 
 #include "Animation.h"
 #include "AnimationFactory.h"
-#include "Font.h"
 #include "Plugin.h"
+
+class Font;
 
 class GEM_EXPORT AnimationMgr : public Plugin {
 public:
