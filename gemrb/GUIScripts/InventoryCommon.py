@@ -263,7 +263,7 @@ def DisplayItem (itemresref, type):
 	Button = Window.GetControl (4)
 	Button.SetText (strrefs[0])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseItemInfoWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL|IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	#textarea
 	Text = Window.GetControl (5)
