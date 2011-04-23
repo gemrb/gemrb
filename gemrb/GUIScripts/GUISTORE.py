@@ -1225,12 +1225,12 @@ def GetRealPrice (pc, mode, Item, Slot):
 			if count > 2:
 				count = 2
 			mod -= count * Store['Depreciation']
+	else:
+		# charisma modifier (in percent)
+		mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (BarteringPC, IE_CHR) - 1, 0)
 
-	# charisma modifier (in percent)
-	mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (BarteringPC, IE_CHR) - 1, 0)
-
-	# reputation modifier (in percent, but absolute)
-	mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
+		# reputation modifier (in percent, but absolute)
+		mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
 
 	return price * mod / 100
 
