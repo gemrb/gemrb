@@ -196,11 +196,11 @@ PluginMgr::~PluginMgr(void)
 {
 //don't free the shared libraries in debug mode, so valgrind can resolve the stack trace
 #ifndef _DEBUG
-	for (unsigned int i = 0; i < libs.size(); i++) {
+	for (std::map<PluginID, PluginDesc>::iterator i = libs.begin(); i != libs.end(); i++) {
 #ifdef WIN32
-		FreeLibrary(libs[i].handle);
+		FreeLibrary(i->second.handle);
 #else
-	//	dlclose(libs[i].handle);
+		// dlclose(i->second.handle);
 #endif
 	}
 #endif
