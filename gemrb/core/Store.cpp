@@ -197,12 +197,13 @@ STOItem *Store::FindItem(CREItem *item, bool exact)
 		if (strnicmp(item->ItemResRef, temp->ItemResRef, 8) ) {
 			continue;
 		}
-		if(exact) {
+		if (exact) {
+			// Infinite supply means we don't have to worry about keeping track of amounts.
 			if (temp->InfiniteSupply==-1) {
 				return temp;
 			}
-			//check if we could simply merge the item into the stock or need a new entry
-			if ((temp->StackAmount>=99) || memcmp(temp->Usages, item->Usages, sizeof(item->Usages))) {
+			// Check if we have a non-stackable item with a different number of charges.
+			if (item->StackAmount < 2 && memcmp(temp->Usages, item->Usages, sizeof(item->Usages))) {
 				continue;
 			}
 		}
@@ -245,7 +246,21 @@ void Store::AddItem(CREItem *item)
 
 	if (temp) {
 		if (temp->InfiniteSupply!=-1) {
-			temp->StackAmount++;
+			if (item->StackAmount > 1) {
+				// Stacked, so increase usages.
+				ieDword newAmount = 1;
+				if (item->Usages[0] != temp->Usages[0] && item->Usages[0] > 0) {
+					// Stack sizes differ!
+					// For now, we do what bg2 does and just round up.
+					newAmount = item->Usages[0] / temp->Usages[0];
+					if (item->Usages[0] % temp->Usages[0])
+						newAmount++;
+				}
+				temp->AmountInStock += newAmount;
+			} else {
+				// Not stacked, so just increase the amount.
+				temp->AmountInStock++;
+			}
 		}
 		return;
 	}
@@ -255,6 +270,11 @@ void Store::AddItem(CREItem *item)
 	//a real class from struct, make sure the fields are cleared
 	memset( temp, 0, sizeof (STOItem ) );
 	memcpy( temp, item, sizeof( CREItem ) );
+	if (temp->Usages[0] > 1) {
+		// For now, we do what bg2 does and add new items in stacks of 1.
+		temp->AmountInStock = item->Usages[0];
+		temp->Usages[0] = 1;
+	}
 	items.push_back (temp );
 	ItemsCount++;
 }
