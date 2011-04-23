@@ -1168,12 +1168,12 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 				Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 		if Flags & SHOP_ID:
-			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
+			Name = GemRB.GetString (Item['ItemName'])
 			Button.EnableBorder (0, 1)
 			if not steal and type == ITEM_PC:
 				Price = 1
 		else:
-			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
+			Name = GemRB.GetString (Item['ItemNameIdentified'])
 			Button.EnableBorder (0, 0)
 
 		if Inventory:
@@ -1185,7 +1185,14 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 				Label.SetText ("")
 		else:
 			GemRB.SetToken ("ITEMCOST", str(Price) )
-			Label.SetText (10162)
+			GemRB.SetToken ("ITEMNAME", Name)
+			LabelText = GemRB.GetString(10162)
+			if type == ITEM_STORE:
+				if steal:
+					LabelText = Name
+				elif Slot["Amount"] != -1:
+					LabelText = LabelText + " (" + str(Slot["Amount"]) + ")"
+			Label.SetText (LabelText)
 	return
 
 def GetRealPrice (pc, mode, Item, Slot):
