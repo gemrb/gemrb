@@ -170,9 +170,12 @@ void STOImporter::GetItem(STOItem *it)
 	if (!it->AmountInStock) {
 		it->AmountInStock = 1;
 	}
-	//another hack-fix
+	// make sure the inventory knows that it needs to update flags+weight
+	it->Weight = -1;
 	Item *item = gamedata->GetItem( it->ItemResRef );
 	if (item) {
+		it->StackAmount = item->StackAmount;
+		//another hack-fix
 		if (!item->LoreToID) {
 			it->Flags |= IE_INV_ITEM_IDENTIFIED;
 		}
