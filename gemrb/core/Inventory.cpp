@@ -743,6 +743,7 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 		}
 		item->PurchasedAmount--;
 	}
+	CalculateWeight();
 	return ret;
 }
 
