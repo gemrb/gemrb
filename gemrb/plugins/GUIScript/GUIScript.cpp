@@ -8221,6 +8221,10 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject * /*self*/, PyObject*
 
 		if (item->UseIcon[0]) {
 			Picture = gamedata->GetBAMSprite(item->UseIcon, 1, 0);
+			// try cycle 0 if cycle 1 doesn't exist
+			// (needed for e.g. sppr707b which is used by Daystar's Sunray)
+			if (!Picture)
+				Picture = gamedata->GetBAMSprite(item->UseIcon, 0, 0);
 		}
 
 		if (!Picture) {
