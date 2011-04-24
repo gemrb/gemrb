@@ -828,7 +828,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 		}
 
 		if (tgt) {
-			area->AddProjectile(pro, origin, LastTarget, fake);
+			area->AddProjectile(pro, origin, tgt, fake);
 		} else {
 			area->AddProjectile(pro, origin, LastTargetPos);
 		}
@@ -844,10 +844,10 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 		char tmp[100];
 		const char* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
 		const char* spell = core->GetString(spl->SpellName);
-		if (LastTarget) {
-			target = area->GetActorByGlobalID(LastTarget);
+		if (tgt) {
+			target = area->GetActorByGlobalID(tgt);
 			if (!target) {
-				target=core->GetGame()->GetActorByGlobalID(LastTarget);
+				target=core->GetGame()->GetActorByGlobalID(tgt);
 			}
 		}
 		if (stricmp(spell, "")) {
@@ -859,7 +859,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 			displaymsg->DisplayStringName(tmp, 0xffffff, this);
 		}
 
-		if(LastTarget) {
+		if (tgt) {
 			if (target && (Type==ST_ACTOR) ) {
 				target->AddTrigger(TriggerEntry(trigger_spellcastonme, caster->GetGlobalID(), spellnum));
 				target->LastSpellOnMe = spellnum;
