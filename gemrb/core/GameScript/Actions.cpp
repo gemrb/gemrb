@@ -2565,16 +2565,16 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//if target was set, fire spell
-	if (Sender->LastTarget) {
-		Sender->CastSpellEnd(0);
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	//the target was converted to a point
-	if(!Sender->LastTargetPos.isempty()) {
-		Sender->CastSpellPointEnd(0);
+	if (Sender->CurrentActionTicks) {
+		if (Sender->LastTarget) {
+			//if target was set, fire spell
+			Sender->CastSpellEnd(0);
+		} else if(!Sender->LastTargetPos.isempty()) {
+			//the target was converted to a point
+			Sender->CastSpellPointEnd(0);
+		} else {
+			printMessage("GameScript", "Spell lost target somewhere!", LIGHT_RED);
+		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2634,9 +2634,13 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//if target was set, fire spell
-	if (!Sender->LastTargetPos.isempty()) {
-		Sender->CastSpellPointEnd(0);
+	if (Sender->CurrentActionTicks) {
+		if(!Sender->LastTargetPos.isempty()) {
+			//if target was set, fire spell
+			Sender->CastSpellPointEnd(0);
+		} else {
+			printMessage("GameScript", "SpellPoint lost target somewhere!", LIGHT_RED);
+		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2683,16 +2687,16 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	//if target was set, fire spell
-	if (Sender->LastTarget) {
-		Sender->CastSpellEnd(0);
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	//the target was converted to a point
-	if(!Sender->LastTargetPos.isempty()) {
-		Sender->CastSpellPointEnd(0);
+	if (Sender->CurrentActionTicks) {
+		if (Sender->LastTarget) {
+			//if target was set, fire spell
+			Sender->CastSpellEnd(0);
+		} else if(!Sender->LastTargetPos.isempty()) {
+			//the target was converted to a point
+			Sender->CastSpellPointEnd(0);
+		} else {
+			printMessage("GameScript", "SpellNoDec lost target somewhere!", LIGHT_RED);
+		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2740,9 +2744,13 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	//if target was set, fire spell
-	if (!Sender->LastTargetPos.isempty()) {
-		Sender->CastSpellPointEnd(0);
+	if (Sender->CurrentActionTicks) {
+		if(!Sender->LastTargetPos.isempty()) {
+			//if target was set, fire spell
+			Sender->CastSpellPointEnd(0);
+		} else {
+			printMessage("GameScript", "SpellPointNoDec lost target somewhere!", LIGHT_RED);
+		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2782,16 +2790,16 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	//if target was set, fire spell
-	if (Sender->LastTarget) {
-		Sender->CastSpellEnd(0);
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	//the target was converted to a point
-	if(!Sender->LastTargetPos.isempty()) {
-		Sender->CastSpellPointEnd(0);
+	if (Sender->CurrentActionTicks) {
+		if (Sender->LastTarget) {
+			//if target was set, fire spell
+			Sender->CastSpellEnd(0);
+		} else if(!Sender->LastTargetPos.isempty()) {
+			//the target was converted to a point
+			Sender->CastSpellPointEnd(0);
+		} else {
+			printMessage("GameScript", "ForceSpell lost target somewhere!", LIGHT_RED);
+		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2838,9 +2846,13 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	//if target was set, fire spell
-	if (!Sender->LastTargetPos.isempty()) {
-		Sender->CastSpellPointEnd(0);
+	if (Sender->CurrentActionTicks) {
+		if(!Sender->LastTargetPos.isempty()) {
+			//if target was set, fire spell
+			Sender->CastSpellPointEnd(0);
+		} else {
+			printMessage("GameScript", "ForceSpellPoint lost target somewhere!", LIGHT_RED);
+		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
