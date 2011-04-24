@@ -1274,8 +1274,7 @@ bool Game::EveryoneDead() const
 
 void Game::UpdateScripts()
 {
-	ExecuteScript( 1 );
-	ProcessActions();
+	Update();
 	size_t idx;
 
 	PartyAttack = false;

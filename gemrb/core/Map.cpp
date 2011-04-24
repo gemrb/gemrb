@@ -635,7 +635,8 @@ void Map::UpdateScripts()
 	if (has_pcs) {
 		//Run all the Map Scripts (as in the original)
 		//The default area script is in the last slot anyway
-		ExecuteScript( MAX_SCRIPTS );
+		//ExecuteScript( MAX_SCRIPTS );
+		Update();
 	}
 	
 	//Execute Pending Actions
