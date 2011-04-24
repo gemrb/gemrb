@@ -991,26 +991,33 @@ def InfoWindow (Slot, Item):
 
 	MessageWindow = Window = GemRB.LoadWindow (12)
 
+	# TODO: check non-bg2 games to see which label is which
+	if GUICommon.GameIsBG2():
+		NameLabel = Window.GetControl (0x10000000)
+		FakeLabel = Window.GetControl (0x10000007)
+	else:
+		NameLabel = Window.GetControl (0x10000007)
+		FakeLabel = Window.GetControl (0x10000000)
+
 	#fake label
-	Label = Window.GetControl (0x10000000)
-	Label.SetText ("")
+	FakeLabel.SetText ("")
 
 	#description bam
 	if GUICommon.GameIsBG1() or GUICommon.GameIsBG2():
 		Button = Window.GetControl (7)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetItemIcon (Slot['ItemResRef'], 2)
 
 	#slot bam
 	Button = Window.GetControl (2)
 	Button.SetItemIcon (Slot['ItemResRef'], 0)
 
-	Label = Window.GetControl (0x10000007)
 	TextArea = Window.GetControl (5)
 	if Identify:
-		Label.SetText (Item['ItemNameIdentified'])
+		NameLabel.SetText (Item['ItemNameIdentified'])
 		TextArea.SetText (Item['ItemDescIdentified'])
 	else:
-		Label.SetText (Item['ItemName'])
+		NameLabel.SetText (Item['ItemName'])
 		TextArea.SetText (Item['ItemDesc'])
 
 	#Done
