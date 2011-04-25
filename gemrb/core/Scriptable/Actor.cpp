@@ -3836,7 +3836,7 @@ bool Actor::ValidTarget(int ga_flags) const
 		break;
 	}
 	if (ga_flags&GA_NO_DEAD) {
-		if (InternalFlags&IF_JUSTDIED) return false;
+		if (InternalFlags&IF_REALLYDIED) return false;
 		if (Modified[IE_STATE_ID] & STATE_DEAD) return false;
 	}
 	if (ga_flags&GA_SELECT) {
