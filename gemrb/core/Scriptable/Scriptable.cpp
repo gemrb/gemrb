@@ -869,13 +869,15 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 				bool invis = false;
 				unsigned int opcode = EffectQueue::ResolveEffect(fx_set_invisible_state_ref);
 				SPLExtHeader *seh = spl->GetExtHeader(SpellHeader);
-				for (unsigned int i=0; i < seh->FeatureCount; i++) {
-					if (seh->features[i].Opcode == opcode) {
-						invis = true;
-						break;
+				if (seh) {
+					for (unsigned int i=0; i < seh->FeatureCount; i++) {
+						if (seh->features[i].Opcode == opcode) {
+							invis = true;
+							break;
+						}
 					}
 				}
-				if (invis && seh->Target == TARGET_SELF) {
+				if (invis && seh && seh->Target == TARGET_SELF) {
 					//pass
 				} else {
 					caster->CureInvisibility();
