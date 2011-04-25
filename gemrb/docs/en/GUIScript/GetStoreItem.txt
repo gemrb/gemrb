@@ -15,6 +15,7 @@ Return value: dictionary
 "Usages1"     - The secondary charges of the item.
 "Usages2"     - The tertiary charges of the item.
 "Flags"       - Item flags.
+"Purchased"   - The count of purchased items of this type.
 
 See also: EnterStore, GetStoreDrink, GetStoreCure, GetStore, GetSlotItem
 
