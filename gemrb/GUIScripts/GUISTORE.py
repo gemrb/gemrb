@@ -1186,20 +1186,20 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		GemRB.SetToken ("ITEMNAME", Name)
 		if Inventory:
 			if GUICommon.GameIsIWD1() or GUICommon.GameIsIWD2():
-				Label.SetText (24890)
+				LabelText = GemRB.GetString (24890)
 			elif GUICommon.GameIsBG2():
-				Label.SetText (28337)
+				LabelText = GemRB.GetString (28337)
 			else:
-				Label.SetText ("")
+				LabelText = ""
 		else:
 			GemRB.SetToken ("ITEMCOST", str(Price) )
 			LabelText = GemRB.GetString(10162)
-			if type == ITEM_STORE:
-				if steal:
-					LabelText = Name
-				elif Slot["Amount"] != -1:
-					LabelText = LabelText + " (" + str(Slot["Amount"]) + ")"
-			Label.SetText (LabelText)
+		if type == ITEM_STORE:
+			if steal:
+				LabelText = Name
+			elif Slot["Amount"] != -1:
+				LabelText = LabelText + " (" + str(Slot["Amount"]) + ")"
+		Label.SetText (LabelText)
 	return
 
 def GetRealPrice (pc, mode, Item, Slot):
