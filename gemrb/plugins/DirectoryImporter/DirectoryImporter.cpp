@@ -37,6 +37,9 @@ DirectoryImporter::~DirectoryImporter(void)
 
 bool DirectoryImporter::Open(const char *dir, const char *desc)
 {
+	if (!dir_exists(dir))
+		return false;
+
 	free(description);
 	description = strdup(desc);
 	strcpy(path, dir);
