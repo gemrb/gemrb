@@ -50,6 +50,13 @@ GameName=Baldur's Gate 2
 #####################################################
 #  Video Parameters                                 #
 #####################################################
+#NOTE: SCREEN width and height can NOT be ARBITRARY without installing the
+# widescreen mod: http://www.gibberlings3.net/widescreen/
+#Resolutions supported by the original games (gemrb) are:
+# * 640x480 (except in iwd2)
+# * 800x600 (bg2, iwd:how, iwd2)
+# * 1024x768 (bg2, iwd:how, iwd2)
+# * 1280x1024 (bg2, iwd:how, iwd2)
 
 #Screen width
 Width=640
