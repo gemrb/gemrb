@@ -1,10 +1,12 @@
-GemRB git (b10cdc3):
+GemRB git (28e81ee93ae479):
   New features:
     - 
+    - yet more unhardcoded PST projectiles
 
   Improved features:
     - 
-    - bugfixes
+    - effects, triggers, actions, dialogs
+    - bugfixes and internal cleanups
 
   Applied patches:
 
