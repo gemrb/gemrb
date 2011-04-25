@@ -1,10 +1,12 @@
-GemRB git (28e81ee93ae479):
+GemRB git (b81de475e00):
   New features:
     - 
     - yet more unhardcoded PST projectiles
 
   Improved features:
     - 
+    - squirrels and other small game don't die instantly
+    - stores and stacking
     - effects, triggers, actions, dialogs
     - bugfixes and internal cleanups
 
