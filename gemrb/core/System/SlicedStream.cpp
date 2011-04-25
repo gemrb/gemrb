@@ -20,6 +20,8 @@
 
 #include "System/SlicedStream.h"
 
+#include "System/MemoryStream.h"
+
 #include "win32def.h"
 #include "errors.h"
 
@@ -102,4 +104,23 @@ int SlicedStream::Seek(int newpos, int type)
 		return GEM_ERROR;
 	}
 	return GEM_OK;
+}
+
+DataStream* SliceStream(DataStream* str, unsigned long startpos, unsigned long size, bool preservepos)
+{
+	if (size <= 16384) {
+		// small (or empty) substream, just read it into a buffer instead of expensive file I/O
+		unsigned long oldpos;
+		if (preservepos)
+			oldpos = str->GetPos();
+		str->Seek(startpos, GEM_STREAM_START);
+		char *data = (char*)malloc(size);
+		str->Read(data, size);
+		if (preservepos)
+			str->Seek(oldpos, GEM_STREAM_START);
+
+		DataStream *mem = new MemoryStream(str->originalfile, data, size);
+		return mem;
+	} else
+		return new SlicedStream(str, startpos, size);
 }

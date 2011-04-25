@@ -41,4 +41,6 @@ public:
 	int Seek(int pos, int startpos);
 };
 
+GEM_EXPORT DataStream* SliceStream(DataStream* str, unsigned long startpos, unsigned long size, bool preservepos = false);
+
 #endif

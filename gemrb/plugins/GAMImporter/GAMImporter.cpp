@@ -463,7 +463,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	tmpWord = is_in_party ? (pcInfo.PartyOrder + 1) : 0;
 
 	if (pcInfo.OffsetToCRE) {
-		SlicedStream* ms = new SlicedStream( str, pcInfo.OffsetToCRE, pcInfo.CRESize );
+		DataStream* ms = SliceStream( str, pcInfo.OffsetToCRE, pcInfo.CRESize );
 		if (ms) {
 			aM->Open(ms);
 			actor = aM->GetActor(tmpWord);
