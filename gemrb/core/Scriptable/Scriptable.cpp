@@ -868,13 +868,14 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 				//can't check GetEffectBlock, since it doesn't construct the queue for selftargetting spells
 				bool invis = false;
 				unsigned int opcode = EffectQueue::ResolveEffect(fx_set_invisible_state_ref);
-				for (unsigned int i=0; i < spl->ext_headers[SpellHeader].FeatureCount; i++) {
-					if (spl->GetExtHeader(SpellHeader)->features[i].Opcode == opcode) {
+				SPLExtHeader *seh = spl->GetExtHeader(SpellHeader);
+				for (unsigned int i=0; i < seh->FeatureCount; i++) {
+					if (seh->features[i].Opcode == opcode) {
 						invis = true;
 						break;
 					}
 				}
-				if (invis && spl->GetExtHeader(SpellHeader)->Target == TARGET_SELF) {
+				if (invis && seh->Target == TARGET_SELF) {
 					//pass
 				} else {
 					caster->CureInvisibility();
