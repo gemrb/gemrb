@@ -884,7 +884,7 @@ def RedrawStoreIdentifyWindow ():
 			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[TopIndex+i], ITEM_PC)
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			Button.SetItemIcon (Slot['ItemResRef'], 0)
-			if Item['StackAmount'] > 1:
+			if Item['MaxStackAmount'] > 1:
 				Button.SetText (str(Slot['Usages0']))
 			else:
 				Button.SetText ("")
@@ -1126,7 +1126,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 
 		Item = GemRB.GetItem (Slot['ItemResRef'])
 		Button.SetItemIcon (Slot['ItemResRef'], 0)
-		if Item['StackAmount']>1:
+		if Item['MaxStackAmount']>1:
 			Button.SetText ( str(Slot['Usages0']) )
 		else:
 			Button.SetText ("")
@@ -1208,7 +1208,7 @@ def GetRealPrice (pc, mode, Item, Slot):
 
 	# FIXME: actually, the price for wands depends on their charge
 	# how ...
-	if Item['StackAmount']>1:
+	if Item['MaxStackAmount']>1:
 		price = price * Slot['Usages0']
 
 	# modifier from store properties (in percent)

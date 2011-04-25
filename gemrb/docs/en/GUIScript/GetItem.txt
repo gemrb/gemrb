@@ -12,7 +12,7 @@ The fields of the dictionary are the following:
 "ItemDesc"           - strref of unidentified description.
 "ItemDescIdentified" - strref of identified description.
 "ItemIcon"           - the item's icon (.bam resref)
-"StackAmount"        - maximum stackable amount
+"MaxStackAmount"     - maximum stackable amount
 "Dialog"             - item dialog (.dlg resref)
 "DialogName"         - the item dialog name
 "Function"           - returns special function

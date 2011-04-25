@@ -97,7 +97,7 @@ Item* ITMImporter::GetItem(Item *s)
 	str->Read( &s->MinCharisma, 1 );
 	str->Read( &s->unknown3, 1 );
 	str->ReadDword( &s->Price );
-	str->ReadWord( &s->StackAmount );
+	str->ReadWord( &s->MaxStackAmount );
 	str->ReadResRef( s->ItemIcon );
 	str->ReadWord( &s->LoreToID );
 	str->ReadResRef( s->GroundIcon );

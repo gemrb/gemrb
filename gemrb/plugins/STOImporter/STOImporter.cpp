@@ -174,7 +174,7 @@ void STOImporter::GetItem(STOItem *it)
 	it->Weight = -1;
 	Item *item = gamedata->GetItem( it->ItemResRef );
 	if (item) {
-		it->StackAmount = item->StackAmount;
+		it->MaxStackAmount = item->MaxStackAmount;
 		//another hack-fix
 		if (!item->LoreToID) {
 			it->Flags |= IE_INV_ITEM_IDENTIFIED;

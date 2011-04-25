@@ -291,7 +291,7 @@ def UpdateSlot (pc, i):
 		identified = slot_item['Flags'] & IE_INV_ITEM_IDENTIFIED
 
 		Button.SetItemIcon (slot_item['ItemResRef'])
-		if item['StackAmount'] > 1:
+		if item['MaxStackAmount'] > 1:
 			Button.SetText (str (slot_item['Usages0']))
 		else:
 			Button.SetText ('')

@@ -364,7 +364,7 @@ def UpdateFloatMenuItem (pc, i, weapons):
 			return
 
 		Button.SetItemIcon (slot_item['ItemResRef'], 6)
-		if item['StackAmount'] > 1:
+		if item['MaxStackAmount'] > 1:
 			Button.SetText (str (slot_item['Usages0']))
 		else:
 			Button.SetText ('')

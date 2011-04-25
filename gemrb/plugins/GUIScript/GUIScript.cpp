@@ -6142,7 +6142,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	//calculate depreciation too
 	//store->DepreciationRate, mount
 
-	if (item->StackAmount>1) {
+	if (item->MaxStackAmount>1) {
 		price *= si->Usages[0];
 	}
 	//is this correct?
@@ -7023,7 +7023,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "ItemIcon", PyString_FromResRef (item->ItemIcon));
 	PyDict_SetItemString(dict, "DescIcon", PyString_FromResRef (item->DescriptionIcon));
 	PyDict_SetItemString(dict, "BrokenItem", PyString_FromResRef (item->ReplacementItem));
-	PyDict_SetItemString(dict, "StackAmount", PyInt_FromLong (item->StackAmount));
+	PyDict_SetItemString(dict, "MaxStackAmount", PyInt_FromLong (item->MaxStackAmount));
 	PyDict_SetItemString(dict, "Dialog", PyString_FromResRef (item->Dialog));
 	PyDict_SetItemString(dict, "DialogName", PyInt_FromLong ((signed)item->DialogName));
 	PyDict_SetItemString(dict, "Price", PyInt_FromLong (item->Price));

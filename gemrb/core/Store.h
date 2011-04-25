@@ -69,7 +69,7 @@ struct STOItem {
 	ieDword Flags;
 	// 2 cached values from associated item. LEAVE IT SIGNED!
 	int Weight;
-	int StackAmount;
+	int MaxStackAmount;
 	ieDword AmountInStock;
 	ieDwordSigned InfiniteSupply;
 	// V1.1

@@ -525,7 +525,7 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
 		#Button.SetSprites ('IVSLOT', 0,  0, 0, 0, 0)
 		Button.SetItemIcon (Slot['ItemResRef'],0)
 
-		if Item['StackAmount'] > 1:
+		if Item['MaxStackAmount'] > 1:
 			Button.SetText (str (Slot['Usages0']))
 		else:
 			Button.SetText ('')

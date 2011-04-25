@@ -173,12 +173,12 @@ public:
 	/** Weight of each item in the stack */
 	int Weight;
 	/** Maximum amount of items in this stack */
-	int StackAmount;
+	int MaxStackAmount;
 
 	CREItem()
 	{
 		Weight=-1; //invalid weight
-		StackAmount=0;
+		MaxStackAmount=0;
 	}
 };
 

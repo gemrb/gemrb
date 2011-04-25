@@ -180,7 +180,7 @@ public:
 	ieByte unknown3;
 	ieDword KitUsability;
 	ieDword Price;
-	ieWord StackAmount;
+	ieWord MaxStackAmount;
 	ieResRef ItemIcon;
 	ieWord LoreToID;
 	ieResRef GroundIcon;

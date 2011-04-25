@@ -227,12 +227,12 @@ void Inventory::CalculateWeight()
 				}
 
 				//if item is stacked mark it as so
-				if (itm->StackAmount) {
+				if (itm->MaxStackAmount) {
 					slot->Flags |= IE_INV_ITEM_STACKED;
 				}
 
 				slot->Weight = itm->Weight;
-				slot->StackAmount = itm->StackAmount;
+				slot->MaxStackAmount = itm->MaxStackAmount;
 				gamedata->FreeItem( itm, slot->ItemResRef, false );
 			}
 			else {
@@ -244,7 +244,7 @@ void Inventory::CalculateWeight()
 			slot->Flags &= ~IE_INV_ITEM_ACQUIRED;
 		}
 		if (slot->Weight > 0) {
-			Weight += slot->Weight * ((slot->Usages[0] && slot->StackAmount > 1) ? slot->Usages[0] : 1);
+			Weight += slot->Weight * ((slot->Usages[0] && slot->MaxStackAmount > 1) ? slot->Usages[0] : 1);
 		}
 	}
 	Changed = false;
@@ -637,11 +637,11 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 		}
 
 		CREItem *myslot = Slots[slot];
-		if (myslot->StackAmount > 1 && ItemsAreCompatible(myslot, item)) {
+		if (myslot->MaxStackAmount > 1 && ItemsAreCompatible(myslot, item)) {
 			//calculate with the max movable stock
 			int chunk = item->Usages[0];
-			if (myslot->Usages[0] + chunk > myslot->StackAmount) {
-				chunk = myslot->StackAmount - myslot->Usages[0];
+			if (myslot->Usages[0] + chunk > myslot->MaxStackAmount) {
+				chunk = myslot->MaxStackAmount - myslot->Usages[0];
 			}
 			if (!chunk) {
 				return ASI_FAILED;
@@ -1380,7 +1380,7 @@ int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *re
 		}
 		// check if the item fits in this slot, we use the cached
 		// stackamount value
-		if (item->Usages[0]<item->StackAmount) {
+		if (item->Usages[0]<item->MaxStackAmount) {
 			return (int) i;
 		}
 	}
@@ -1455,7 +1455,7 @@ void Inventory::dump()
 			continue;
 		}
 
-		print ( "%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->StackAmount, itm->Weight );
+		print ( "%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight );
 	}
 
 	print( "Equipped: %d\n", Equipped );
