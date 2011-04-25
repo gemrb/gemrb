@@ -172,8 +172,8 @@ int SDLVideoDriver::SwapBuffers(void)
 	int ret = GEM_OK;
 	unsigned long time;
 	GetTime( time );
-	if (( time - lastTime ) < 17) {
-		SDL_Delay( 17 - (time - lastTime) );
+	if (( time - lastTime ) < 33) {
+		SDL_Delay( 33 - (time - lastTime) );
 		GetTime( time );
 	}
 	lastTime = time;
