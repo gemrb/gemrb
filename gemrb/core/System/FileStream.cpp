@@ -170,7 +170,6 @@ void FileStream::Close()
 void FileStream::FindLength()
 {
 	size = str->Length();
-	str->SeekStart(0);
 	Pos = 0;
 }
 
