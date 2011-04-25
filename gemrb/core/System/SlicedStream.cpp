@@ -33,6 +33,7 @@ SlicedStream::SlicedStream(DataStream* str, int startpos, int size)
 	this->startpos = startpos;
 	strncpy(originalfile, str->originalfile, _MAX_PATH);
 	strncpy(filename, str->filename, sizeof(filename));
+	this->str->Seek(this->startpos, GEM_STREAM_START);
 }
 
 SlicedStream::~SlicedStream()
@@ -53,7 +54,7 @@ int SlicedStream::Read(void* dest, unsigned int length)
 		return GEM_ERROR;
 	}
 
-	str->Seek(startpos + Pos + (Encrypted ? 2 : 0), GEM_STREAM_START);
+	//str->Seek(startpos + Pos + (Encrypted ? 2 : 0), GEM_STREAM_START);
 	unsigned int c = (unsigned int) str->Read(dest, length);
 	if (c != length) {
 		return GEM_ERROR;
@@ -67,7 +68,7 @@ int SlicedStream::Read(void* dest, unsigned int length)
 
 int SlicedStream::Write(const void* src, unsigned int length)
 {
-	str->Seek(startpos + Pos, GEM_STREAM_START);
+	//str->Seek(startpos + Pos, GEM_STREAM_START);
 	unsigned int c = (unsigned int) Write(src, length);
 	if (c != length) {
 		return GEM_ERROR;
@@ -94,6 +95,7 @@ int SlicedStream::Seek(int newpos, int type)
 		default:
 			return GEM_ERROR;
 	}
+	str->Seek(startpos + Pos /*+ (Encrypted ? 2 : 0)*/, GEM_STREAM_START);
 	//we went past the buffer
 	if (Pos>size) {
 		print("[Streams]: Invalid seek position: %ld (limit: %ld)\n",Pos, size);
