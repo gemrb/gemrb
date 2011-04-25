@@ -2565,7 +2565,7 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	if (Sender->CurrentActionTicks) {
+	if (Sender->CurrentActionState) {
 		if (Sender->LastTarget) {
 			//if target was set, fire spell
 			Sender->CastSpellEnd(0);
@@ -2613,6 +2613,7 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 		//stop doing anything else
 		act->SetModal(MS_NONE);
 	}
+	Sender->CurrentActionState = 1;
 	int duration = Sender->CastSpell( spellres, tar, true );
 	if (duration != -1) Sender->SetWait(duration);
 
@@ -2634,7 +2635,7 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	if (Sender->CurrentActionTicks) {
+	if (Sender->CurrentActionState) {
 		if(!Sender->LastTargetPos.isempty()) {
 			//if target was set, fire spell
 			Sender->CastSpellPointEnd(0);
@@ -2661,6 +2662,7 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 		act->SetModal(MS_NONE);
 	}
 
+	Sender->CurrentActionState = 1;
 	int duration = Sender->CastSpellPoint( spellres, parameters->pointParameter, true );
 	if (duration != -1) Sender->SetWait(duration);
 
@@ -2687,7 +2689,7 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	if (Sender->CurrentActionTicks) {
+	if (Sender->CurrentActionState) {
 		if (Sender->LastTarget) {
 			//if target was set, fire spell
 			Sender->CastSpellEnd(0);
@@ -2718,6 +2720,7 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 		//stop doing anything else
 		act->SetModal(MS_NONE);
 	}
+	Sender->CurrentActionState = 1;
 	int duration = Sender->CastSpell( spellres, tar, false );
 	if (duration != -1) Sender->SetWait(duration);
 
@@ -2744,7 +2747,7 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	if (Sender->CurrentActionTicks) {
+	if (Sender->CurrentActionState) {
 		if(!Sender->LastTargetPos.isempty()) {
 			//if target was set, fire spell
 			Sender->CastSpellPointEnd(0);
@@ -2764,6 +2767,7 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 		act->SetModal(MS_NONE);
 	}
 
+	Sender->CurrentActionState = 1;
 	int duration = Sender->CastSpellPoint( spellres, parameters->pointParameter, false );
 	if (duration != -1) Sender->SetWait(duration);
 
@@ -2790,7 +2794,7 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	if (Sender->CurrentActionTicks) {
+	if (Sender->CurrentActionState) {
 		if (Sender->LastTarget) {
 			//if target was set, fire spell
 			Sender->CastSpellEnd(0);
@@ -2821,6 +2825,7 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 		//stop doing anything else
 		act->SetModal(MS_NONE);
 	}
+	Sender->CurrentActionState = 1;
 	int duration = Sender->CastSpell (spellres, tar, false);
 	if (duration != -1) Sender->SetWait(duration);
 
@@ -2846,7 +2851,7 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	if (Sender->CurrentActionTicks) {
+	if (Sender->CurrentActionState) {
 		if(!Sender->LastTargetPos.isempty()) {
 			//if target was set, fire spell
 			Sender->CastSpellPointEnd(0);
@@ -2866,6 +2871,7 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 		act->SetModal(MS_NONE);
 	}
 
+	Sender->CurrentActionState = 1;
 	int duration = Sender->CastSpellPoint (spellres, parameters->pointParameter, false);
 	if (duration != -1) Sender->SetWait(duration);
 
