@@ -270,7 +270,8 @@ void Store::AddItem(CREItem *item)
 	//a real class from struct, make sure the fields are cleared
 	memset( temp, 0, sizeof (STOItem ) );
 	memcpy( temp, item, sizeof( CREItem ) );
-	if (temp->Usages[0] > 1) {
+	temp->AmountInStock = 1;
+	if (temp->StackAmount > 1 && temp->Usages[0] > 1) {
 		// For now, we do what bg2 does and add new items in stacks of 1.
 		temp->AmountInStock = item->Usages[0];
 		temp->Usages[0] = 1;
