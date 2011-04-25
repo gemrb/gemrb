@@ -322,6 +322,16 @@ add_custom_target( dist
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
+# pretty-print options macro
+# as of 2.8 cmake does not support anything like EVAL
+MACRO(PRINT_OPTION option name)
+if (${option})
+	message(STATUS "  ${name}: ${option}")
+else()
+	message(STATUS "  ${name}: disabled")
+endif()
+ENDMACRO(PRINT_OPTION)
+
 message(STATUS "")
 message(STATUS "These are the configured paths:")
 message(STATUS "  PREFIX: ${CMAKE_INSTALL_PREFIX}")
@@ -338,13 +348,9 @@ message(STATUS "  MENU_DIR: ${MENU_DIR}")
 message(STATUS "")
 message(STATUS "Options:")
 message(STATUS "  LAYOUT: ${LAYOUT}")
-message(STATUS "  NOCOLOR: ${NOCOLOR}")
-message(STATUS "  TOUCHSCREEN: ${TOUCHSCREEN}")
-if (STATIC_LINK)
-	message(STATUS "  STATIC_LINK: ${STATIC_LINK}")
-else()
-	message(STATUS "  STATIC_LINK: disabled")
-endif()
+PRINT_OPTION("${NOCOLOR}" "NOCOLOR")
+PRINT_OPTION("${TOUCHSCREEN}" "TOUCHSCREEN")
+PRINT_OPTION("${STATIC_LINK}" "STATIC_LINK")
 message(STATUS "")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "")
