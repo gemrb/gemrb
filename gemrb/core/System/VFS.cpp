@@ -62,7 +62,7 @@ struct dirent {
 // buffer which readdir returns
 static dirent de;
 
-DIR* opendir(const char* filename)
+static DIR* opendir(const char* filename)
 {
 	DIR* dirp = ( DIR* ) malloc( sizeof( DIR ) );
 	dirp->is_first = 1;
@@ -73,7 +73,7 @@ DIR* opendir(const char* filename)
 	return dirp;
 }
 
-dirent* readdir(DIR* dirp)
+static dirent* readdir(DIR* dirp)
 {
 	struct _finddata_t c_file;
 
@@ -93,7 +93,7 @@ dirent* readdir(DIR* dirp)
 	return &de;
 }
 
-void closedir(DIR* dirp)
+static void closedir(DIR* dirp)
 {
 	_findclose( dirp->hFile );
 	free( dirp );
@@ -139,7 +139,7 @@ bool file_exists(const char* path)
  * Appends 'name' to path 'target' and returns 'target'.
  * It takes care of inserting PathDelimiter ('/' or '\\') if needed
  */
-char* PathAppend (char* target, const char* name)
+static char* PathAppend (char* target, const char* name)
 {
 	size_t len = strlen(target);
 
@@ -153,7 +153,7 @@ char* PathAppend (char* target, const char* name)
 }
 
 
-bool FindInDir(const char* Dir, char *Filename)
+static bool FindInDir(const char* Dir, char *Filename)
 {
 	// First test if there's a Filename with exactly same name
 	// and if yes, return it and do not search in the Dir
@@ -260,7 +260,7 @@ void FixPath (char *path, bool needslash)
 	path[i] = 0;
 }
 
-int strmatch(const char *string, const char *mask)
+static int strmatch(const char *string, const char *mask)
 {
 	while(*mask) {
 		if (*mask!='?') {
@@ -394,3 +394,4 @@ void DirectoryIterator::Rewind()
 	else
 		Entry = readdir(static_cast<DIR*>(Directory));
 }
+
