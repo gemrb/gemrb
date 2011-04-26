@@ -362,10 +362,8 @@ DirectoryIterator::~DirectoryIterator()
 bool DirectoryIterator::IsDirectory()
 {
 	char dtmp[_MAX_PATH];
-	struct stat fst;
 	GetFullPath(dtmp);
-	stat( dtmp, &fst );
-	return S_ISDIR( fst.st_mode );
+	return dir_exists(dtmp);
 }
 
 char* DirectoryIterator::GetName()
