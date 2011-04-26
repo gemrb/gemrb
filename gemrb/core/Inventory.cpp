@@ -349,7 +349,7 @@ int Inventory::CountItems(const char *resref, bool stacks) const
 			continue;
 		}
 		if (resref && resref[0]) {
-			if (!strnicmp(resref, item->ItemResRef, 8) )
+			if (strnicmp(resref, item->ItemResRef, 8) )
 				continue;
 		}
 		if (stacks && (item->Flags&IE_INV_ITEM_STACKED) ) {
