@@ -95,7 +95,7 @@ int BIFImporter::CreateArchive(DataStream *compressed)
 		return GEM_ERROR;
 	}
 	char Signature[8];
-	
+
 	memcpy(Signature,"SAV V1.0",8);
 	compressed->Write(Signature, 8);
 
@@ -194,7 +194,7 @@ int BIFImporter::OpenArchive(const char* filename)
 				return GEM_ERROR;
 			stream->Read( Signature, 8 );
 			if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
-				ReadBIF();				
+				ReadBIF();
 			} else
 				return GEM_ERROR;
 			return GEM_OK;
@@ -317,3 +317,4 @@ void BIFImporter::ReadBIF(void)
 GEMRB_PLUGIN(0xC7F133C, "BIF File Importer")
 PLUGIN_CLASS(IE_BIF_CLASS_ID, BIFImporter)
 END_PLUGIN()
+
