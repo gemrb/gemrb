@@ -126,9 +126,9 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 	# only export symbols explicitly marked to be exported.
 	INCLUDE(CheckCXXCompilerFlag)
 	CHECK_CXX_COMPILER_FLAG("-fvisibility=hidden" VISIBILITY_HIDDEN)
-	IF (VISIBILITY_HIDDEN)
+	IF (VISIBILITY_HIDDEN AND NOT WIN32)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-	ENDIF (VISIBILITY_HIDDEN)
+	ENDIF ()
 	if (WIN32)
 		# GCC 4.5.0+ has shared libstdc++ without dllimport
 		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--enable-auto-import")
