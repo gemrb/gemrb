@@ -188,15 +188,15 @@ static bool FindInDir(const char* Dir, char *Filename)
 
 bool PathJoin (char *target, const char *base, ...)
 {
-	va_list ap;
-	va_start(ap, base);
-
 	if (base == NULL) {
 		target[0] = '\0';
 		return false;
 	}
 
 	strcpy(target, base);
+
+	va_list ap;
+	va_start(ap, base);
 
 	while (char *source = va_arg(ap, char*)) {
 		char *slash;
@@ -219,8 +219,10 @@ bool PathJoin (char *target, const char *base, ...)
 			source = slash + 1;
 		} while (slash);
 	}
+
 	va_end( ap );
 	return true;
+
 finish:
 	while (char *source = va_arg(ap, char*)) {
 		PathAppend(target, source);
