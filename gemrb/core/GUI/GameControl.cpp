@@ -1812,7 +1812,6 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 	switch(trap->Type) {
 		case ST_TRAVEL:
 			trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
-			trap->LastTrigger = actor->GetGlobalID(); // FIXME
 			// exit usage is handled by caller for now
 			// actor->UseExit(trap->GetGlobalID());
 			return false;
@@ -1826,18 +1825,11 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			if (trap->Scripts[0]) {
 				if (!(trap->Flags&TRAP_DEACTIVATED) ) {
 					trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
-					trap->LastTrigger = actor->GetGlobalID(); // FIXME
-					trap->ImmediateEvent();
 					//directly feeding the event, even if there are actions in the queue
 					//trap->Scripts[0]->Update();
 					// FIXME
 					trap->ExecuteScript(1);
 					trap->ProcessActions();
-					//if reset trap flag not set, deactivate it
-					//hmm, better not, info triggers don't deactivate themselves on click
-					//if (!(trap->Flags&TRAP_RESET)) {
-					//	trap->Flags|=TRAP_DEACTIVATED;
-					//}
 				}
 			} else {
 				if (trap->overHeadText) {

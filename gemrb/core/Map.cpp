@@ -571,8 +571,6 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		return;
 	}
 	if (ip->Scripts[0]) {
-		// FIXME:  is this good?
-		//ip->LastTriggerObject = ip->LastTrigger = ip->LastEntered = actor->GetGlobalID();
 		ip->AddTrigger(TriggerEntry(trigger_entered, actor->GetGlobalID()));
 		// FIXME
 		ip->ExecuteScript( 1 );

@@ -1585,9 +1585,6 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 		return false;
 	}
 	AddTrigger(TriggerEntry(trigger_entered, ID));
-	// TODO: correct?
-	//LastTriggerObject = LastTrigger = LastEntered = ID;
-	ImmediateEvent();
 	if (!TrapResets()) {
 		Trapped = false;
 	}
