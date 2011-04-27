@@ -239,24 +239,9 @@ bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot)
 
 bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 {
-	bool had_nostore=false;
-	bool has_current=false;
-	ieResRef current;
-	ieDword owner = 0;
 	CREItem item;
 
-	Store *store = core->GetCurrentStore();
-	if (!store) {
-		had_nostore = true;
-		store = core->SetCurrentStore(storename, 0);
-	} else {
-		if (strnicmp(store->Name, storename, 8) ) {
-			//not the current store, we need some dirty hack
-			has_current = true;
-			strnlwrcpy(current, store->Name, 8);
-			owner = store->GetOwnerID();
-		}
-	}
+	Store* store = gamedata->GetStore(storename);
 	if (!store) {
 		printMessage("GameScript","Store cannot be opened!\n", LIGHT_RED);
 		return false;
@@ -267,12 +252,7 @@ bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 	if (store->FindItem(itemname, false) != (unsigned int)-1) {
 		ret=true;
 	}
-	if (has_current) {
-		//setting back old store (this will save our current store)
-		core->SetCurrentStore(current, owner);
-	} else if (had_nostore) {
-		core->CloseCurrentStore();
-	}
+	// Don't call gamedata->SaveStore, we don't change it, and it remains cached.
 	return ret;
 }
 
