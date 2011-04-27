@@ -1481,29 +1481,29 @@ int Interface::Init()
 		gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY);
 
 		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
-		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_DIRECTORY);
+		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		size_t i;
 		for (i = 0; i < ModPath.size(); ++i)
-			gamedata->AddSource(ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_DIRECTORY);
+			gamedata->AddSource(ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		PathJoin( path, GemRBOverridePath, "override", "shared", NULL);
-		gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_DIRECTORY);
+		gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		PathJoin( path, GamePath, GameOverridePath, NULL);
-		gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_DIRECTORY);
+		gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		PathJoin( path, GamePath, GameSoundsPath, NULL);
-		gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
+		gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		PathJoin( path, GamePath, GameScriptsPath, NULL);
-		gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_DIRECTORY);
+		gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		PathJoin( path, GamePath, GamePortraitsPath, NULL);
-		gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_DIRECTORY);
+		gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		PathJoin( path, GamePath, GameDataPath, NULL);
-		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_DIRECTORY);
+		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		//IWD2 movies are on the CD but not in the BIF
 		char *description = strdup("CD1/data");
@@ -1511,7 +1511,7 @@ int Interface::Init()
 			for (size_t j=0;j<CD[i].size();j++) {
 				description[2]='1'+i;				
 				PathJoin( path, CD[i][j].c_str(), GameDataPath, NULL);
-				gamedata->AddSource(path, description, PLUGIN_RESOURCE_DIRECTORY);
+				gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
 			}
 		}
 		free(description);
@@ -1547,7 +1547,7 @@ int Interface::Init()
 		// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
 		char path[_MAX_PATH];
 		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
-		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_DIRECTORY, RM_REPLACE_SAME_SOURCE);
+		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 	}
 
 	printMessage( "Core", "Reading Game Options...\n", WHITE );

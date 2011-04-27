@@ -87,8 +87,92 @@ DataStream* DirectoryImporter::GetResource(const char* resname, const ResourceDe
 	return SearchIn( path, resname, type.GetExt() );
 }
 
+CachedDirectoryImporter::CachedDirectoryImporter() {
+}
+
+CachedDirectoryImporter::~CachedDirectoryImporter() {
+}
+
+bool CachedDirectoryImporter::Open(const char *dir, const char *desc) {
+	if (!DirectoryImporter::Open(dir, desc))
+		return false;
+
+	Refresh();
+
+	return true;
+}
+
+void CachedDirectoryImporter::Refresh() {
+	cache.clear();
+
+	DirectoryIterator it(path);
+	if (!it)
+		return;
+
+	char buf[_MAX_PATH];
+	do {
+		if (it.IsDirectory())
+			continue;
+		const char *name = it.GetName();
+		if (!core->CaseSensitive) {
+			cache[name] = name;
+			continue;
+		}
+		strnlwrcpy(buf, name, _MAX_PATH, false);
+		if (cache.find(buf) != cache.end()) {
+			printMessage("CachedDirectoryImporter", "Duplicate '%s' files in '%s' directory", LIGHT_RED, buf, path);
+		}
+		cache[buf] = name;
+	} while (++it);
+}
+
+static const char *ConstructFilename(const char* resname, const char* ext) {
+	static char buf[_MAX_PATH];
+	if (core->CaseSensitive) {
+		strnlwrcpy(buf, resname, _MAX_PATH-4, false);
+	} else {
+		strcpy(buf, resname);
+	}
+	strcat(buf, ".");
+	strcat(buf, ext);
+	return buf;
+}
+
+bool CachedDirectoryImporter::HasResource(const char* resname, SClass_ID type) {
+	const char* filename = ConstructFilename(resname, core->TypeExt(type));
+	return (cache.find(filename) != cache.end());
+}
+
+bool CachedDirectoryImporter::HasResource(const char* resname, const ResourceDesc &type) {
+	const char* filename = ConstructFilename(resname, type.GetExt());
+	return (cache.find(filename) != cache.end());
+}
+
+DataStream* CachedDirectoryImporter::GetResource(const char* resname, SClass_ID type) {
+	const char* filename = ConstructFilename(resname, core->TypeExt(type));
+	std::map<std::string, std::string>::const_iterator it = cache.find(filename);
+	if (it == cache.end())
+		return NULL;
+	char buf[_MAX_PATH];
+	strcpy(buf, path);
+	PathAppend(buf, it->second.c_str());
+	return FileStream::OpenFile(buf);
+}
+
+DataStream* CachedDirectoryImporter::GetResource(const char* resname, const ResourceDesc &type) {
+	const char* filename = ConstructFilename(resname, type.GetExt());
+	std::map<std::string, std::string>::const_iterator it = cache.find(filename);
+	if (it == cache.end())
+		return NULL;
+	char buf[_MAX_PATH];
+	strcpy(buf, path);
+	PathAppend(buf, it->second.c_str());
+	return FileStream::OpenFile(buf);
+}
+
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xAB4534, "Directory Importer")
 PLUGIN_CLASS(PLUGIN_RESOURCE_DIRECTORY, DirectoryImporter)
+PLUGIN_CLASS(PLUGIN_RESOURCE_CACHEDDIRECTORY, CachedDirectoryImporter)
 END_PLUGIN()
