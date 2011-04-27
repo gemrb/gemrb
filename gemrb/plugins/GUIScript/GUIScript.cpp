@@ -5486,9 +5486,7 @@ PyDoc_STRVAR( GemRB_LeaveStore__doc,
 
 static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 {
-	if (core->CloseCurrentStore() ) {
-		return RuntimeError("Cannot save store!");
-	}
+	core->CloseCurrentStore();
 	core->ResetEventFlag(EF_OPENSTORE);
 	core->SetEventFlag(EF_PORTRAIT);
 	Py_INCREF( Py_None );

@@ -403,6 +403,8 @@ static bool DoSaveGame(const char *Path)
 		}
 	}
 
+	gamedata->SaveAllStores();
+
 	//compress files in cache named: .STO and .ARE
 	//no .CRE would be saved in cache
 	if (core->CompressSave(Path)) {

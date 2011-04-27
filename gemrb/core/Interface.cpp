@@ -357,7 +357,6 @@ Interface::~Interface(void)
 	ReleaseMemoryActor();
 	EffectQueue_ReleaseMemory();
 	CharAnimations::ReleaseMemory();
-	delete CurrentStore;
 
 	FreeResRefTable(DefSound, DSCount);
 
@@ -3911,6 +3910,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 
 	// Yes, it uses goto. Other ways seemed too awkward for me.
 
+	gamedata->SaveAllStores();
 	strings->CloseAux();
 	tokens->RemoveAll(NULL); //clearing the token dictionary
 
@@ -4761,43 +4761,15 @@ Store *Interface::GetCurrentStore()
 	return CurrentStore;
 }
 
-int Interface::CloseCurrentStore()
+void Interface::CloseCurrentStore()
 {
-	if ( !CurrentStore ) {
-		return -1;
-	}
-	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
-	if (sm == NULL) {
-		return -1;
-	}
-	int size = sm->GetStoredFileSize (CurrentStore);
-	if (size > 0) {
-		//created streams are always autofree (close file on destruct)
-		//this one will be destructed when we return from here
-		FileStream str;
-
-		str.Create( CurrentStore->Name, IE_STO_CLASS_ID );
-		int ret = sm->PutStore (&str, CurrentStore);
-		if (ret <0) {
-			printMessage("Core", "Store removed: %s\n", YELLOW,
-				CurrentStore->Name);
-			RemoveFromCache(CurrentStore->Name, IE_STO_CLASS_ID);
-		}
-	} else {
-		printMessage("Core", "Store removed: %s\n", YELLOW,
-			CurrentStore->Name);
-		RemoveFromCache(CurrentStore->Name, IE_STO_CLASS_ID);
-	}
-	//make sure the stream isn't connected to sm, or it will be double freed
-	delete CurrentStore;
-	CurrentStore = NULL;
-	return 0;
+	gamedata->SaveStore(CurrentStore);
 }
 
 Store *Interface::SetCurrentStore(const ieResRef resname, ieDword owner)
 {
-	if ( CurrentStore ) {
-		if ( !strnicmp(CurrentStore->Name, resname, 8) ) {
+	if (CurrentStore) {
+		if (!strnicmp(CurrentStore->Name, resname, 8)) {
 			return CurrentStore;
 		}
 
@@ -4805,25 +4777,10 @@ Store *Interface::SetCurrentStore(const ieResRef resname, ieDword owner)
 		CloseCurrentStore();
 	}
 
-	DataStream* str = gamedata->GetResource( resname, IE_STO_CLASS_ID );
-	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
-	if (sm == NULL) {
-		delete ( str );
-		return NULL;
-	}
-	if (!sm->Open(str)) {
-		return NULL;
-	}
-
-	// FIXME - should use some already allocated in core
-	// not really, only one store is open at a time, then it is
-	// unloaded, we don't really have to cache it, it will be saved in
-	// Cache anyway!
-	CurrentStore = sm->GetStore( new Store() );
+	CurrentStore = gamedata->GetStore(resname);
 	if (CurrentStore == NULL) {
 		return NULL;
 	}
-	strnlwrcpy(CurrentStore->Name, resname, 8);
 	if (owner) {
 		CurrentStore->SetOwnerID(owner);
 	}

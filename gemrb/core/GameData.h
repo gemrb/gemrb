@@ -24,10 +24,14 @@
 #include "SClassID.h"
 #include "exports.h"
 #include "ie_types.h"
+#include "iless.h"
 
 #include "Cache.h"
 #include "Holder.h"
 #include "ResourceManager.h"
+
+#include <map>
+#include <vector>
 
 class Actor;
 struct Effect;
@@ -38,6 +42,7 @@ class ScriptedAnimation;
 class Spell;
 class Sprite2D;
 class TableMgr;
+class Store;
 
 struct Table {
 	Holder<TableMgr> tm;
@@ -90,6 +95,12 @@ public:
 	/** returns factory resource, currently works only with animations */
 	void* GetFactoryResource(const char* resname, SClass_ID type,
 		unsigned char mode = IE_NORMAL, bool silent=false);
+
+	Store* GetStore(const ieResRef ResRef);
+	/// Saves a store to the cache and frees it.
+	void SaveStore(Store*& store);
+	/// Saves all stores in the cache
+	void SaveAllStores();
 private:
 	Cache ItemCache;
 	Cache SpellCache;
@@ -97,6 +108,8 @@ private:
 	Cache PaletteCache;
 	Factory* factory;
 	std::vector<Table> tables;
+	typedef std::map<const char*, Store*, iless> StoreMap;
+	StoreMap stores;
 };
 
 extern GEM_EXPORT GameData * gamedata;
