@@ -139,7 +139,7 @@ bool file_exists(const char* path)
  * Appends 'name' to path 'target' and returns 'target'.
  * It takes care of inserting PathDelimiter ('/' or '\\') if needed
  */
-static char* PathAppend (char* target, const char* name)
+char* PathAppend (char* target, const char* name)
 {
 	size_t len = strlen(target);
 

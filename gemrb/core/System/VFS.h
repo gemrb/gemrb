@@ -108,6 +108,8 @@ GEM_EXPORT void FixPath (char *path, bool needslash);
 
 GEM_EXPORT void ExtractFileFromPath(char *file, const char *full_path);
 
+GEM_EXPORT char* PathAppend (char* target, const char* name);
+
 class GEM_EXPORT DirectoryIterator {
 public:
 	/**
