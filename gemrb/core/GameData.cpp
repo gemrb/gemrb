@@ -524,19 +524,14 @@ void GameData::SaveStore(Store*& store)
 	if (sm == NULL) {
 		error("GameData", "Can't save store to cache.");
 	}
-	int size = sm->GetStoredFileSize(store);
-	if (size > 0) {
-		FileStream str;
 
-		str.Create(store->Name, IE_STO_CLASS_ID);
-		int ret = sm->PutStore(&str, store);
-		if (ret < 0) {
-			printMessage("Core", "Store removed: %s\n", YELLOW, store->Name);
-			core->RemoveFromCache(store->Name, IE_STO_CLASS_ID);
-		}
-	} else {
-		printMessage("Core", "Store removed: %s\n", YELLOW, store->Name);
-		core->RemoveFromCache(store->Name, IE_STO_CLASS_ID);
+	FileStream str;
+
+	if (!str.Create(store->Name, IE_STO_CLASS_ID)) {
+		error("GameData", "Can't create file while saving store.");
+	}
+	if (!sm->PutStore(&str, store)) {
+		error("GameData", "Error saving store.");
 	}
 
 	stores.erase(it);
