@@ -1352,31 +1352,32 @@ void InitializeIEScript()
 	while (j--) {
 		i = triggersTable->GetValueIndex( j );
 		const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ));
-		//maybe we should watch for this bit?
-		//bool triggerflag = i & 0x4000;
+
+		bool was_condition = (i & 0x4000);
 		i &= 0x3fff;
 		if (i >= MAX_TRIGGERS) {
 			printMessage("GameScript", "trigger %d (%s) is too high, ignoring\n", RED,
 				i, triggersTable->GetStringIndex( j ) );
 			continue;
 		}
+
 		if (triggers[i]) {
 			if (poi && triggers[i]!=poi->Function) {
 				printMessage("GameScript", "%s is in collision with ", YELLOW,
 					triggersTable->GetStringIndex( j ) );
 				printFunction(triggersTable,triggersTable->FindValue(triggersTable->GetValueIndex( j )));
-				//printFunction(triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ));
 			} else {
 				if (InDebug&ID_TRIGGERS) {
 					printMessage("GameScript", "%s is a synonym of ", WHITE,
 						triggersTable->GetStringIndex( j ) );
 					printFunction(triggersTable,triggersTable->FindValue(triggersTable->GetValueIndex( j )));
-					//printFunction(triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j ) ) ) );
 				}
 			}
 			continue; //we already found an alternative
 		}
+
 		if (poi == NULL) {
+			// missing trigger which might be resolved later
 			triggers[i] = NULL;
 			triggerflags[i] = 0;
 			missing_triggers.push_back(j);
@@ -1384,6 +1385,8 @@ void InitializeIEScript()
 		}
 		triggers[i] = poi->Function;
 		triggerflags[i] = poi->Flags;
+		if (was_condition)
+			triggerflags[i] |= TF_CONDITION;
 	}
 
 	for (l = missing_triggers.begin(); l!=missing_triggers.end();l++) {
@@ -1407,9 +1410,9 @@ void InitializeIEScript()
 			}
 			continue;
 		}
+
 		printMessage("GameScript","Couldn't assign function to trigger: ", YELLOW);
 		printFunction(triggersTable,j);
-//->GetStringIndex(j) );
 	}
 
 	j = actionsTable->GetSize();
