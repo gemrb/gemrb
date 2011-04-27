@@ -171,7 +171,7 @@ class Actor;
 extern unsigned char pl_uppercase[256];
 extern unsigned char pl_lowercase[256];
 
-GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l);
+GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l, bool pad = true);
 GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
 GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
 #ifndef HAVE_STRNLEN

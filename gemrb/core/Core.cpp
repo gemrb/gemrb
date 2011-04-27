@@ -52,11 +52,13 @@ ieByte pl_uppercase[256];
 ieByte pl_lowercase[256];
 
 // these 3 functions will copy a string to a zero terminated string with a maximum length
-void strnlwrcpy(char *dest, const char *source, int count)
+void strnlwrcpy(char *dest, const char *source, int count, bool pad)
 {
 	while(count--) {
 		*dest++ = pl_lowercase[(ieByte) *source];
 		if(!*source++) {
+			if (!pad)
+				return;
 			while(count--) *dest++=0;
 			break;
 		}
