@@ -503,6 +503,7 @@ typedef int (* IDSFunction)(Actor *, int parameter);
 
 #define TF_NONE 	0
 #define TF_CONDITION    1 //this isn't a trigger, just a condition (0x4000)
+#define TF_SAVED        2 //trigger is in svtriobj.ids
 #define TF_MERGESTRINGS 8 //same value as actions' mergestring
 
 struct TriggerLink {

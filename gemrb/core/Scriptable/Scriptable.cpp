@@ -645,6 +645,10 @@ void Scriptable::AddTrigger(TriggerEntry trigger)
 {
 	triggers.push_back(trigger);
 	ImmediateEvent();
+
+	assert(trigger.triggerID < MAX_TRIGGERS);
+	if (triggerflags[trigger.triggerID] & TF_SAVED)
+		LastTrigger = trigger.param1;
 }
 
 bool Scriptable::MatchTrigger(unsigned short id, ieDword param) {

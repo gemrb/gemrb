@@ -1582,6 +1582,33 @@ void InitializeIEScript()
 		}
 		actionflags[i] |= AF_INSTANT;
 	}
+
+	int savedTriggersIndex = core->LoadSymbol("svtriobj");
+	if (savedTriggersIndex < 0) {
+		// leaving this as not strictly necessary, for now
+		printMessage("GameScript", "Couldn't find saved trigger symbols!\n", YELLOW);
+	} else {
+		Holder<SymbolMgr> savedTriggersTable = core->GetSymbol(savedTriggersIndex);
+		if (!savedTriggersTable) {
+			error("GameScript", "Couldn't laod saved trigger symbols!\n");
+		}
+		j = savedTriggersTable->GetSize();
+		while (j--) {
+			i = savedTriggersTable->GetValueIndex( j );
+			i &= 0x3fff;
+			if (i >= MAX_ACTIONS) {
+				printMessage("GameScript", "saved trigger %d (%s) is too high, ignoring\n", RED,
+					i, savedTriggersTable->GetStringIndex( j ) );
+				continue;
+			}
+			if (!triggers[i]) {
+				printMessage("GameScript", "saved trigger %d (%s) doesn't exist, ignoring\n", YELLOW,
+					i, savedTriggersTable->GetStringIndex( j ) );
+				continue;
+			}
+			triggerflags[i] |= TF_SAVED;
+		}
+	}
 }
 
 /********************** GameScript *******************************/
