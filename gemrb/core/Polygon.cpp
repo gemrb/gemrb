@@ -219,15 +219,13 @@ struct ScanlineInt {
 
 };
 
-
 void Gem_Polygon::ComputeTrapezoids()
 {
 	if (count < 3) return;
 	//the loader never should load such a large polygon, 
 	//because the polygon count is supposed to be a 16 bit value
 	if (count > 65535) {
-		printMessage("Polygon", "Invalid Polygon!\n", LIGHT_RED);
-		abort();
+		error("Polygon", "Invalid Polygon!\n");
 	}
 
 	trapezoids.clear();

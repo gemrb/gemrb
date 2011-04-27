@@ -255,8 +255,7 @@ void GameData::FreePalette(Palette *&pal, const ieResRef name)
 	}
 	if (!name || !name[0]) {
 		if(pal->named) {
-			print("Palette is supposed to be named, but got no name!\n");
-			abort();
+			error("GameData", "Palette is supposed to be named, but got no name!\n");
 		} else {
 			pal->Release();
 			pal=NULL;
@@ -264,13 +263,11 @@ void GameData::FreePalette(Palette *&pal, const ieResRef name)
 		return;
 	}
 	if (!pal->named) {
-		print("Unnamed palette, it should be %s!\n", name);
-		abort();
+		error("GameData", "Unnamed palette, it should be %s!\n", name);
 	}
 	res=PaletteCache.DecRef((void *) pal, name, true);
 	if (res<0) {
-		printMessage("Core", "Corrupted Palette cache encountered (reference count went below zero), Palette name is: %.8s\n", LIGHT_RED, name);
-		abort();
+		error("Core", "Corrupted Palette cache encountered (reference count went below zero), Palette name is: %.8s\n", name);
 	}
 	if (!res) {
 		pal->Release();
@@ -313,8 +310,7 @@ void GameData::FreeItem(Item const *itm, const ieResRef name, bool free)
 
 	res=ItemCache.DecRef((void *) itm, name, free);
 	if (res<0) {
-		printMessage("Core", "Corrupted Item cache encountered (reference count went below zero), Item name is: %.8s\n", LIGHT_RED, name);
-		abort();
+		error("Core", "Corrupted Item cache encountered (reference count went below zero), Item name is: %.8s\n", name);
 	}
 	if (res) return;
 	if (free) delete itm;
@@ -393,8 +389,7 @@ void GameData::FreeEffect(Effect *eff, const ieResRef name, bool free)
 
 	res=EffectCache.DecRef((void *) eff, name, free);
 	if (res<0) {
-		printMessage("Core", "Corrupted Effect cache encountered (reference count went below zero), Effect name is: %.8s\n", LIGHT_RED, name);
-		abort();
+		error("Core", "Corrupted Effect cache encountered (reference count went below zero), Effect name is: %.8s\n", name);
 	}
 	if (res) return;
 	if (free) delete eff;

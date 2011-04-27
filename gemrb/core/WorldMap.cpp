@@ -440,8 +440,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 		walkpath.push_back(area_links[GotHereFrom[i]]);
 		i = WhoseLinkAmI(GotHereFrom[i]);
 		if (i==(ieDword) -1) {
-			print("Something has been screwed up here (incorrect path)!\n");
-			abort();
+			error("WorldMap", "Something has been screwed up here (incorrect path)!\n");
 		}
 	}
 

@@ -65,8 +65,7 @@ DataStream* CacheFile(const char* path)
 		FileStream* src = FileStream::OpenFile(path);
 		FileStream* dest = FileStream::OpenFile(cachedfile);
 		if (!src || !dest) {
-			print("CachdFile failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
-			abort();
+			error("Cache", "CachedFile failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
 		}
 
 		size_t blockSize = 1024 * 1000;
@@ -77,8 +76,7 @@ DataStream* CacheFile(const char* path)
 			size_t len = src->Read(buff, blockSize);
 			size_t c = dest->Write(buff, len);
 			if (c != len) {
-				print("CacheFile failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
-				abort();
+				error("Cache", "CacheFile failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
 			}
 		} while (src->Remains());
 		delete src;

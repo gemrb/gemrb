@@ -249,8 +249,7 @@ bool Init_EffectQueue()
 			//reverse linking opcode number
 			//using this unused field
 			if( (poi->opcode!=-1) && effectname[0]!='*') {
-				print("Clashing Opcodes FN: %d vs. %d, %s\n", i, poi->opcode, effectname);
-				abort();
+				error("EffectQueue", "Clashing Opcodes FN: %d vs. %d, %s\n", i, poi->opcode, effectname);
 			}
 			poi->opcode = i;
 		}
@@ -1128,8 +1127,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		break;
 	//this shouldn't happen
 	default:
-		print("Unknown delay type: %d (from %d)\n", DelayType(fx->TimingMode&0xff), fx->TimingMode);
-		abort();
+		error("EffectQueue", "Unknown delay type: %d (from %d)\n", DelayType(fx->TimingMode&0xff), fx->TimingMode);
 	}
 
 	EffectFunction fn = 0;

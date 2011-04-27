@@ -1296,16 +1296,14 @@ void InitializeIEScript()
 	int gaT = core->LoadSymbol( "gemact" );
 	AutoTable objNameTable("script");
 	if (tT < 0 || aT < 0 || oT < 0 || !objNameTable) {
-		printMessage( "GameScript","A critical scripting file is missing!\n",LIGHT_RED );
-		abort();
+		error("GameScript", "A critical scripting file is missing!\n");
 	}
 	triggersTable = core->GetSymbol( tT );
 	actionsTable = core->GetSymbol( aT );
 	objectsTable = core->GetSymbol( oT );
 	overrideActionsTable = core->GetSymbol( gaT );
 	if (!triggersTable || !actionsTable || !objectsTable || !objNameTable) {
-		printMessage( "GameScript","A critical scripting file is damaged!\n",LIGHT_RED );
-		abort();
+		error("GameScript", "A critical scripting file is damaged!\n");
 	}
 
 	int i;
@@ -1314,8 +1312,7 @@ void InitializeIEScript()
 
 	ObjectIDSCount = atoi( objNameTable->QueryField() );
 	if (ObjectIDSCount<0 || ObjectIDSCount>MAX_OBJECT_FIELDS) {
-		printMessage("GameScript","The IDS Count shouldn't be more than 10!\n",LIGHT_RED);
-		abort();
+		error("GameScript", "The IDS Count shouldn't be more than 10!\n");
 	}
 
 	ObjectIDSTableNames = (ieResRef *) malloc( sizeof(ieResRef) * ObjectIDSCount );
@@ -1333,8 +1330,7 @@ void InitializeIEScript()
 	}
 	MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 	if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
-		printMessage("GameScript","The Object Nesting Count shouldn't be more than 5!\n", LIGHT_RED);
-		abort();
+		error("GameScript", "The Object Nesting Count shouldn't be more than 5!\n");
 	}
 	HasAdditionalRect = ( atoi( objNameTable->QueryField( 2 ) ) != 0 );
 	ExtraParametersCount = atoi( objNameTable->QueryField( 3 ) );
@@ -1561,13 +1557,11 @@ void InitializeIEScript()
 
 	int instantTableIndex = core->LoadSymbol("instant");
 	if (instantTableIndex < 0) {
-		printMessage("GameScript", "Couldn't find instant symbols!\n", LIGHT_RED);
-		abort();
+		error("GameScript", "Couldn't find instant symbols!\n");
 	}
 	Holder<SymbolMgr> instantTable = core->GetSymbol(instantTableIndex);
 	if (!instantTable) {
-		printMessage("GameScript", "Couldn't load instant symbols!\n", LIGHT_RED);
-		abort();
+		error("GameScript", "Couldn't load instant symbols!\n");
 	}
 	j = instantTable->GetSize();
 	while (j--) {
@@ -1610,8 +1604,7 @@ GameScript::~GameScript(void)
 		int res = BcsCache.DecRef(script, Name, true);
 
 		if (res<0) {
-			printMessage("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: %.8s\n", LIGHT_RED, Name);
-			abort();
+			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: %.8s\n", Name);
 		}
 		if (!res) {
 			//print("Freeing script %s because its refcount has reached 0.\n", Name);

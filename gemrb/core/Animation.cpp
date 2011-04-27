@@ -71,8 +71,7 @@ void Animation::SetPos(unsigned int index)
 void Animation::AddFrame(Sprite2D* frame, unsigned int index)
 {
 	if (index>=indicesCount) {
-		print("You tried to write past a buffer in animation, BAD!\n");
-		abort();
+		error("Animation", "You tried to write past a buffer in animation, BAD!\n");
 	}
 	core->GetVideoDriver()->FreeSprite(frames[index]);
 	frames[index]=frame;

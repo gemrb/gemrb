@@ -283,8 +283,7 @@ void Store::AddItem(CREItem *item)
 void Store::RemoveItem( unsigned int idx )
 {
 	if (items.size()!=ItemsCount) {
-		printMessage("Store","Inconsistent store", LIGHT_RED);
-		abort();
+		error("Store", "Inconsistent store");
 	}
 	if (ItemsCount<=idx) {
 		return;
