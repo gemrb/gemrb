@@ -1734,6 +1734,11 @@ int GameScript::NamelessBitTheDust(Scriptable* Sender, Trigger* /*parameters*/)
 	return Sender->MatchTrigger(trigger_namelessbitthedust);
 }
 
+int GameScript::Killed(Scriptable* Sender, Trigger* parameters)
+{
+	return Sender->MatchTriggerWithObject(trigger_killed, parameters->objectParameter);
+}
+
 int GameScript::Race(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );

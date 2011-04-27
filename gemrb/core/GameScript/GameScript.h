@@ -786,6 +786,7 @@ public: //Script Functions
 	static int ItemIsIdentified(Scriptable* Sender, Trigger* parameters);
 	static int Joins(Scriptable* Sender, Trigger* parameters);
 	static int Kit(Scriptable* Sender, Trigger* parameters);
+	static int Killed(Scriptable* Sender, Trigger* parameters);
 	static int KnowSpell(Scriptable* Sender, Trigger* parameters);
 	static int LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int LastPersonTalkedTo(Scriptable* Sender, Trigger* parameters);
