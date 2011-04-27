@@ -87,13 +87,16 @@ DataStream* DirectoryImporter::GetResource(const char* resname, const ResourceDe
 	return SearchIn( path, resname, type.GetExt() );
 }
 
-CachedDirectoryImporter::CachedDirectoryImporter() {
+CachedDirectoryImporter::CachedDirectoryImporter()
+{
 }
 
-CachedDirectoryImporter::~CachedDirectoryImporter() {
+CachedDirectoryImporter::~CachedDirectoryImporter()
+{
 }
 
-bool CachedDirectoryImporter::Open(const char *dir, const char *desc) {
+bool CachedDirectoryImporter::Open(const char *dir, const char *desc)
+{
 	if (!DirectoryImporter::Open(dir, desc))
 		return false;
 
@@ -102,7 +105,8 @@ bool CachedDirectoryImporter::Open(const char *dir, const char *desc) {
 	return true;
 }
 
-void CachedDirectoryImporter::Refresh() {
+void CachedDirectoryImporter::Refresh()
+{
 	cache.clear();
 
 	DirectoryIterator it(path);
@@ -114,10 +118,6 @@ void CachedDirectoryImporter::Refresh() {
 		if (it.IsDirectory())
 			continue;
 		const char *name = it.GetName();
-		if (!core->CaseSensitive) {
-			cache[name] = name;
-			continue;
-		}
 		strnlwrcpy(buf, name, _MAX_PATH, false);
 		if (cache.find(buf) != cache.end()) {
 			printMessage("CachedDirectoryImporter", "Duplicate '%s' files in '%s' directory", LIGHT_RED, buf, path);
@@ -126,29 +126,29 @@ void CachedDirectoryImporter::Refresh() {
 	} while (++it);
 }
 
-static const char *ConstructFilename(const char* resname, const char* ext) {
+static const char *ConstructFilename(const char* resname, const char* ext)
+{
 	static char buf[_MAX_PATH];
-	if (core->CaseSensitive) {
-		strnlwrcpy(buf, resname, _MAX_PATH-4, false);
-	} else {
-		strcpy(buf, resname);
-	}
+	strnlwrcpy(buf, resname, _MAX_PATH-4, false);
 	strcat(buf, ".");
 	strcat(buf, ext);
 	return buf;
 }
 
-bool CachedDirectoryImporter::HasResource(const char* resname, SClass_ID type) {
+bool CachedDirectoryImporter::HasResource(const char* resname, SClass_ID type)
+{
 	const char* filename = ConstructFilename(resname, core->TypeExt(type));
 	return (cache.find(filename) != cache.end());
 }
 
-bool CachedDirectoryImporter::HasResource(const char* resname, const ResourceDesc &type) {
+bool CachedDirectoryImporter::HasResource(const char* resname, const ResourceDesc &type)
+{
 	const char* filename = ConstructFilename(resname, type.GetExt());
 	return (cache.find(filename) != cache.end());
 }
 
-DataStream* CachedDirectoryImporter::GetResource(const char* resname, SClass_ID type) {
+DataStream* CachedDirectoryImporter::GetResource(const char* resname, SClass_ID type)
+{
 	const char* filename = ConstructFilename(resname, core->TypeExt(type));
 	std::map<std::string, std::string>::const_iterator it = cache.find(filename);
 	if (it == cache.end())
@@ -159,7 +159,8 @@ DataStream* CachedDirectoryImporter::GetResource(const char* resname, SClass_ID 
 	return FileStream::OpenFile(buf);
 }
 
-DataStream* CachedDirectoryImporter::GetResource(const char* resname, const ResourceDesc &type) {
+DataStream* CachedDirectoryImporter::GetResource(const char* resname, const ResourceDesc &type)
+{
 	const char* filename = ConstructFilename(resname, type.GetExt());
 	std::map<std::string, std::string>::const_iterator it = cache.find(filename);
 	if (it == cache.end())
