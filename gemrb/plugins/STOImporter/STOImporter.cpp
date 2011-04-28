@@ -228,7 +228,7 @@ void STOImporter::GetPurchasedCategories(Store* s)
 }
 
 //call this before any write, it updates offsets!
-int STOImporter::GetStoredFileSize(Store *s)
+void STOImporter::CalculateStoredFileSize(Store *s)
 {
 	int headersize, itemsize;
 
@@ -264,19 +264,16 @@ int STOImporter::GetStoredFileSize(Store *s)
 	//items
 	s->ItemsOffset = headersize;
 	headersize += s->ItemsCount * itemsize;
-
-	return headersize;
 }
 
-int STOImporter::PutPurchasedCategories(DataStream *stream, Store* s)
+void STOImporter::PutPurchasedCategories(DataStream *stream, Store* s)
 {
 	for (unsigned int i = 0; i < s->PurchasedCategoriesCount; i++) {
 		stream->WriteDword( s->purchased_categories+i );
 	}
-	return 0;
 }
 
-int STOImporter::PutHeader(DataStream *stream, Store *s)
+void STOImporter::PutHeader(DataStream *stream, Store *s)
 {
 	char Signature[8];
 	ieDword tmpDword;
@@ -328,10 +325,9 @@ int STOImporter::PutHeader(DataStream *stream, Store *s)
 		stream->WriteDword( &tmpDword);
 		stream->Write( s->unknown3, 80); //writing out original fillers
 	}
-	return 0;
 }
 
-int STOImporter::PutItems(DataStream *stream, Store *store)
+void STOImporter::PutItems(DataStream *stream, Store *store)
 {
 	for (unsigned int ic=0;ic<store->ItemsCount;ic++) {
 		STOItem *it = store->items[ic];
@@ -351,20 +347,18 @@ int STOImporter::PutItems(DataStream *stream, Store *store)
 			stream->WriteDword( (ieDword *) &it->InfiniteSupply );
 		}
 	}
-	return 0;
 }
 
-int STOImporter::PutCures(DataStream *stream, Store *s)
+void STOImporter::PutCures(DataStream *stream, Store *s)
 {
 	for (unsigned int i=0;i<s->CuresCount;i++) {
 		STOCure *c = s->cures+i;
 		stream->WriteResRef( c->CureResRef);
 		stream->WriteDword( &c->Price);
 	}
-	return 0;
 }
 
-int STOImporter::PutDrinks(DataStream *stream, Store *s)
+void STOImporter::PutDrinks(DataStream *stream, Store *s)
 {
 	for (unsigned int i=0;i<s->DrinksCount;i++) {
 		STODrink *d = s->drinks+i;
@@ -373,41 +367,23 @@ int STOImporter::PutDrinks(DataStream *stream, Store *s)
 		stream->WriteDword( &d->Price);
 		stream->WriteDword( &d->Strength);
 	}
-	return 0;
 }
 
 //saves the store into a datastream, be it memory or file
-int STOImporter::PutStore(DataStream *stream, Store *store)
+bool STOImporter::PutStore(DataStream *stream, Store *store)
 {
-	int ret;
-
 	if (!stream || !store) {
-		return -1;
+		return false;
 	}
 
-	ret = PutHeader( stream, store);
-	if (ret) {
-		return ret;
-	}
+	CalculateStoredFileSize(store);
+	PutHeader(stream, store);
+	PutDrinks(stream, store);
+	PutCures(stream, store);
+	PutPurchasedCategories(stream, store);
+	PutItems(stream, store);
 
-	ret = PutDrinks( stream, store);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutCures( stream, store);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutPurchasedCategories (stream, store);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutItems( stream, store);
-
-	return ret;
+	return true;
 }
 
 #include "plugindef.h"

@@ -44,8 +44,7 @@ public:
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Store* GetStore(Store *s) = 0;
 
-	virtual int GetStoredFileSize(Store *s) = 0;
-	virtual int PutStore(DataStream* stream, Store *s) = 0;
+	virtual bool PutStore(DataStream* stream, Store *s) = 0;
 };
 
 #endif

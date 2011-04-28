@@ -40,9 +40,9 @@ public:
 	Store* GetStore(Store *store);
 
 	//returns saved size, updates internal offsets before save
-	int GetStoredFileSize(Store *st);
+	void CalculateStoredFileSize(Store *st);
 	//saves file
-	int PutStore(DataStream *stream, Store *store);
+	bool PutStore(DataStream *stream, Store *store);
 
 private:
 	void GetItem(STOItem *item);
@@ -50,11 +50,11 @@ private:
 	void GetCure(STOCure *cure);
 	void GetPurchasedCategories(Store* s);
 
-	int PutItems(DataStream *stream, Store* s);
-	int PutDrinks(DataStream *stream, Store* s);
-	int PutCures(DataStream *stream, Store* s);
-	int PutPurchasedCategories(DataStream *stream, Store* s);
-	int PutHeader(DataStream *stream, Store *store);
+	void PutItems(DataStream *stream, Store* s);
+	void PutDrinks(DataStream *stream, Store* s);
+	void PutCures(DataStream *stream, Store* s);
+	void PutPurchasedCategories(DataStream *stream, Store* s);
+	void PutHeader(DataStream *stream, Store *store);
 };
 
 

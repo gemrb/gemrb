@@ -20,6 +20,8 @@
 
 #include "GameData.h"
 
+#include "globals.h"
+
 #include "ActorMgr.h"
 #include "AnimationMgr.h"
 #include "Cache.h"
@@ -35,6 +37,7 @@
 #include "ResourceDesc.h"
 #include "Spell.h"
 #include "SpellMgr.h"
+#include "StoreMgr.h"
 #include "Scriptable/Actor.h"
 #include "System/FileStream.h"
 
@@ -478,4 +481,70 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 			core->TypeExt(type));
 		return NULL;
 	}
+}
+
+Store* GameData::GetStore(const ieResRef ResRef)
+{
+	StoreMap::iterator it = stores.find(ResRef);
+	if (it != stores.end()) {
+		return it->second;
+	}
+
+	DataStream* str = gamedata->GetResource(ResRef, IE_STO_CLASS_ID);
+	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
+	if (sm == NULL) {
+		delete ( str );
+		return NULL;
+	}
+	if (!sm->Open(str)) {
+		return NULL;
+	}
+
+	Store* store = sm->GetStore(new Store());
+	if (store == NULL) {
+		return NULL;
+	}
+	strnlwrcpy(store->Name, ResRef, 8);
+	// The key needs to last as long as the store,
+	// so use the one we just copied.
+	stores[store->Name] = store;
+	return store;
+}
+
+void GameData::SaveStore(Store*& store)
+{
+	if (!store)
+		return;
+	StoreMap::iterator it = stores.find(store->Name);
+	if (it == stores.end()) {
+		error("GameData", "Saving a store that wasn't cached.");
+	}
+
+	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
+	if (sm == NULL) {
+		error("GameData", "Can't save store to cache.");
+	}
+
+	FileStream str;
+
+	if (!str.Create(store->Name, IE_STO_CLASS_ID)) {
+		error("GameData", "Can't create file while saving store.");
+	}
+	if (!sm->PutStore(&str, store)) {
+		error("GameData", "Error saving store.");
+	}
+
+	stores.erase(it);
+	delete store;
+	store = NULL;
+}
+
+void GameData::SaveAllStores()
+{
+	for (StoreMap::iterator it = stores.begin(); it != stores.end(); /*nothing*/) {
+		// SaveStore removes the store from the cache,
+		// so increment the iterator before calling.
+		SaveStore((it++)->second);
+	}
+	stores.clear();
 }
