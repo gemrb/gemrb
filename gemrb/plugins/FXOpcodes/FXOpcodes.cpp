@@ -2552,10 +2552,16 @@ int fx_cure_feebleminded_state (Scriptable* /*Owner*/, Actor* target, Effect* fx
 }
 
 // 0x4e State:Diseased
+static EffectRef fx_diseased_state_ref = { "State:Diseased", -1 };
 int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_set_diseased_state (%2d): Damage: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
+		return FX_NOT_APPLIED;
+	}
+
+	int count = target->fxqueue.CountEffects(fx_diseased_state_ref, fx->Parameter1, fx->Parameter2, fx->Resource);
+	if (count > 1) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -2620,8 +2626,6 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 
 // 0x4f Cure:Disease
-static EffectRef fx_diseased_state_ref = { "State:Diseased", -1 };
-
 int fx_cure_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_cure_diseased_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
