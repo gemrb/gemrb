@@ -1599,6 +1599,12 @@ int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_set_poisoned_state (%2d): Damage: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	
+	int count = target->fxqueue.CountEffects(fx_poisoned_state_ref, fx->Parameter1, fx->Parameter2, fx->Resource);
+	if (count > 1) {
+		return FX_NOT_APPLIED;
+	}
+
 	STATE_SET( STATE_POISONED );
 
 	ieDword damage;
