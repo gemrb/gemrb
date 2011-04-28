@@ -41,7 +41,7 @@
 #include <vector>
 
 #ifdef WIN32
-typedef HINSTANCE LibHandle;
+typedef HMODULE LibHandle;
 #else
 typedef void *LibHandle;
 #endif
