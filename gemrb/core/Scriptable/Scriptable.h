@@ -37,7 +37,7 @@ class Highlightable;
 class InfoPoint;
 class Map;
 class Movable;
-class PathNode;
+struct PathNode;
 class Scriptable;
 class Selectable;
 class Spell;
