@@ -1168,7 +1168,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 			case FX_PERMANENT:
 				//don't stick around if it was executed permanently
 				//for example, a permanent strength modifier effect
-				if( (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) ) {
+				if( fx->TimingMode == FX_DURATION_INSTANT_PERMANENT ) {
 					fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 				}
 				break;

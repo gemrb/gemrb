@@ -1744,7 +1744,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 		return;
 	}
 
-	if ((target_mode == TARGET_MODE_PICK)) {
+	if (target_mode == TARGET_MODE_PICK) {
 		TryToPick(actor, container);
 		return;
 	}
@@ -1804,7 +1804,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 		//don't bother with this region further
 		return true;
 	}
-	if ((target_mode == TARGET_MODE_PICK)) {
+	if (target_mode == TARGET_MODE_PICK) {
 		TryToDisarm(actor, trap);
 		return true;
 	}
