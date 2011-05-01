@@ -14,8 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- *
  */
 
 /**
@@ -24,12 +22,8 @@
  * @author The GemRB Project
  */
 
-
 #ifndef SYMBOLMGR_H
 #define SYMBOLMGR_H
-
-/** GetValue returns this if text is not found in arrays */
-#define SYMBOL_VALUE_NOT_LOCATED -65535
 
 #include "Plugin.h"
 #include "System/DataStream.h"
@@ -44,6 +38,7 @@ public:
 	SymbolMgr(void);
 	virtual ~SymbolMgr(void);
 	virtual bool Open(DataStream* stream) = 0;
+	/// Returns -1 if string isn't found.
 	virtual int GetValue(const char* text) const = 0;
 	virtual char* GetValue(int val) const = 0;
 	virtual char* GetStringIndex(unsigned int Index) const = 0;
