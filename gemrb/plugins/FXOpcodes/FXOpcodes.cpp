@@ -3916,7 +3916,7 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//1 ->  2 (cleric)
 		//2 ->  8 (innate)
 		//3 ->  16 (class)
-		if (tmp<31) {
+		if (tmp<7) {
 			STAT_BIT_OR(IE_CASTING, dsc_bits_bg2[tmp] );
 		}
 	}
