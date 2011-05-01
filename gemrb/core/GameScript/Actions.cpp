@@ -678,7 +678,7 @@ void GameScript::CreateCreatureObjectDoor(Scriptable* Sender, Action* parameters
 {
 	//we hack this to death
 	strcpy(parameters->string1Parameter, "SPDIMNDR");
-	CreateCreatureCore( Sender, parameters, CC_OFFSET | CC_CHECK_IMPASSABLE|CC_CHECK_OVERLAP | CC_PLAY_ANIM );
+	CreateCreatureCore( Sender, parameters, CC_OBJECT | CC_CHECK_IMPASSABLE|CC_CHECK_OVERLAP | CC_PLAY_ANIM );
 }
 
 //don't use offset from Sender
