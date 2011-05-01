@@ -481,7 +481,7 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Bu
 			return;
 		case MAP_VIEW_NOTES:
 			//left click allows setting only when in MAP_SET_NOTE mode
-			if ((Button == GEM_MB_ACTION) ) {
+			if (Button == GEM_MB_ACTION) {
 				ViewHandle(x,y);
 			}
 			ClickHandle(Button);
