@@ -8278,6 +8278,9 @@ PyDoc_STRVAR( GemRB_Window_SetupSpellIcons__doc,
 "Offset is the ID of the first usable button.\n"
 "If global is set, the actor will be looked up by its global ID instead of party slot.");
 
+//order is: mage, cleric, innate, class, song, (defaults to 1, item)
+static int sections[]={2,4,8,16,16};
+
 static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 {
 	int wi, slot, Type;
@@ -8337,6 +8340,7 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 	// but only if there are any spells of that type to disable
 	int disabled_spellcasting = actor->GetStat(IE_CASTING);
 
+//print("disable bits: %d\n", disabled_spellcasting);
 	for (i=0;i<GUIBT_COUNT-(more?2:0);i++) {
 		SpellExtHeader *spell = SpellArray+i;
 
@@ -8348,7 +8352,10 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 		// disable spells that should be cast from the inventory
 		// Identify is misclassified and has Target 3 (Dead char)
 
-		if (core->CheckSpecialSpell(spell->spellname, actor) || (disabled_spellcasting&(1<<spell->type)) ) {
+		int type = spell->type>4?1:sections[spell->type];
+
+//print("%s %d %d %s\n", spell->spellname, spell->type, type, (disabled_spellcasting&type) ? "disabled":"enabled" );
+		if (core->CheckSpecialSpell(spell->spellname, actor) || (disabled_spellcasting&type) ) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
 			btn->EnableBorder(1, IE_GUI_BUTTON_DISABLED);
 			PyObject *Function = PyDict_GetItemString(dict, "UpdateActionsWindow");
