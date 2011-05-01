@@ -53,9 +53,10 @@
 #include "win32def.h"
 
 #include "AnimStructures.h"
-#include "System/DataStream.h"
 #include "Region.h"
 #include "Sprite2D.h"
+#include "System/DataStream.h"
+#include "System/String.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -166,17 +167,6 @@
 class Scriptable;
 class Actor;
 
-/* this function will work with pl/cz special characters */
-
-extern unsigned char pl_uppercase[256];
-extern unsigned char pl_lowercase[256];
-
-GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l, bool pad = true);
-GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
-GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
-#ifndef HAVE_STRNLEN
-GEM_EXPORT int strnlen(const char* string, int maxlen);
-#endif
 GEM_EXPORT unsigned char GetOrient(const Point &s, const Point &d);
 GEM_EXPORT unsigned int Distance(const Point pos, const Point pos2);
 GEM_EXPORT unsigned int Distance(const Point pos, Scriptable *b);
@@ -190,15 +180,6 @@ GEM_EXPORT unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT int EARelation(Scriptable *a, Actor *b);
 GEM_EXPORT bool dir_exists(const char* path);
-GEM_EXPORT int strlench(const char* string, char ch);
-#ifndef HAVE_STRNDUP
-GEM_EXPORT char* strndup(const char* s, size_t l);
-#endif
-
-#ifndef WIN32
-GEM_EXPORT char* strupr(char* string);
-GEM_EXPORT char* strlwr(char* string);
-#endif
 
 #ifdef WIN32
 #define GetTime(store) store = GetTickCount()

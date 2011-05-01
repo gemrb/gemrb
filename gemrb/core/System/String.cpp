@@ -16,7 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "globals.h"
+#include "System/String.h"
+
 #include "exports.h"
 
 #include <ctype.h>
@@ -28,14 +29,14 @@
 #endif
 #endif
 
-ieByte pl_uppercase[256];
-ieByte pl_lowercase[256];
+unsigned char pl_uppercase[256];
+unsigned char pl_lowercase[256];
 
 // these 3 functions will copy a string to a zero terminated string with a maximum length
 void strnlwrcpy(char *dest, const char *source, int count, bool pad)
 {
 	while(count--) {
-		*dest++ = pl_lowercase[(ieByte) *source];
+		*dest++ = pl_lowercase[(unsigned char) *source];
 		if(!*source++) {
 			if (!pad)
 				return;
@@ -49,7 +50,7 @@ void strnlwrcpy(char *dest, const char *source, int count, bool pad)
 void strnuprcpy(char* dest, const char *source, int count)
 {
 	while(count--) {
-		*dest++ = pl_uppercase[(ieByte) *source];
+		*dest++ = pl_uppercase[(unsigned char) *source];
 		if(!*source++) {
 			while(count--) *dest++=0;
 			break;
@@ -65,9 +66,9 @@ void strnspccpy(char* dest, const char *source, int count, bool upper)
 	while(count--) {
 		char c;
 		if (upper)
-			c = pl_uppercase[(ieByte) *source];
+			c = pl_uppercase[(unsigned char) *source];
 		else
-			c = pl_lowercase[(ieByte) *source];
+			c = pl_lowercase[(unsigned char) *source];
 		if (c!=' ') {
 			*dest++=c;
 		}

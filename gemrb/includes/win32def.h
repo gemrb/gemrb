@@ -30,6 +30,8 @@
 
 #include "exports.h"
 
+#include "System/String.h"
+
 #ifdef WIN32
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
@@ -50,10 +52,7 @@
 # endif
 # include <cstdio>
 # include <cstdlib>
-# include <cstring>
 
-# define stricmp strcasecmp
-# define strnicmp strncasecmp
 #endif //WIN32
 
 #if defined(WIN32) && !defined(__MINGW32__)
