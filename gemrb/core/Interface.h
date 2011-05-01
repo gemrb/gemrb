@@ -49,6 +49,7 @@
 #include "StringMgr.h"
 #include "SymbolMgr.h"
 #include "Video.h"
+#include "WindowMgr.h"
 #endif
 
 class Actor;

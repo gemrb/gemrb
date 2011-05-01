@@ -33,6 +33,10 @@
 #include <map>
 #include <vector>
 
+#ifdef _MSC_VER // No SFINAE
+#include "TableMgr.h"
+#endif
+
 class Actor;
 struct Effect;
 class Factory;
