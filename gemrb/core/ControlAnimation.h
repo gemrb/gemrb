@@ -23,12 +23,12 @@
 
 #include "RGBAColor.h"
 #include "exports.h"
-
-#include "AnimationFactory.h"
-#include "Sprite2D.h"
-#include "GUI/Control.h"
+#include "globals.h"
 
 #include <vector>
+
+class AnimationFactory;
+class Control;
 
 class GEM_EXPORT ControlAnimation {
 private:

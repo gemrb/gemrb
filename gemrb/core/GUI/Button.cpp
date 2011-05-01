@@ -22,6 +22,7 @@
 
 #include "GUI/GameControl.h"
 #include "GUI/EventMgr.h"
+#include "GUI/ScrollBar.h"
 #include "GUI/Window.h"
 
 #include "defsounds.h"

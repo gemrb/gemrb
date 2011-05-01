@@ -28,8 +28,9 @@
 #define WINDOWMGR_H
 
 #include "Plugin.h"
-#include "GUI/Window.h"
-#include "System/DataStream.h"
+
+class DataStream;
+class Window;
 
 /**
  * @class WindowMgr

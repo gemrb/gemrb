@@ -26,6 +26,7 @@
 
 #include "Interface.h"
 #include "Video.h"
+#include "GUI/Window.h"
 
 EventMgr::EventMgr(void)
 {

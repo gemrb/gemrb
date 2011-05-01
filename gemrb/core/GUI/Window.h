@@ -29,14 +29,12 @@
 #define WINDOW_H
 
 #include "GUI/Control.h"
-#include "GUI/ScrollBar.h"
-#include "GUI/TextArea.h"
 
 #include "exports.h"
 
-#include "Sprite2D.h"
-
 #include <vector>
+
+class Sprite2D;
 
 // Window Flags
 #define WF_CHANGED  1     //window changed

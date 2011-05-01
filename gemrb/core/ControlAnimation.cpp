@@ -22,6 +22,7 @@
 
 #include "win32def.h"
 
+#include "AnimationFactory.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
 #include "Interface.h"
