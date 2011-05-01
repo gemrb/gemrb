@@ -53,7 +53,6 @@
 
 #ifdef WIN32
 
-#define mkdir(path, rights)  _mkdir(path)
 #define ResolveFilePath(p)
 
 #else  // ! WIN32
@@ -109,6 +108,8 @@ GEM_EXPORT void FixPath (char *path, bool needslash);
 GEM_EXPORT void ExtractFileFromPath(char *file, const char *full_path);
 
 GEM_EXPORT char* PathAppend (char* target, const char* name);
+
+GEM_EXPORT bool MakeDirectory(const char* path) WARN_UNUSED;
 
 class GEM_EXPORT DirectoryIterator {
 public:

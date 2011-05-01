@@ -276,8 +276,10 @@ bool SaveGameIterator::RescanSaveGames()
 	DirectoryIterator dir(Path);
 	// create the save game directory at first access
 	if (!dir) {
-		mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
-		chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
+		if (!MakeDirectory(Path)) {
+			printMessage("SaveGameIterator", "Unable to create save game directory '%s'", RED, Path);
+			return false;
+		}
 		dir.Rewind();
 	}
 	if (!dir) { //If we cannot open the Directory
@@ -505,13 +507,16 @@ int CanSave()
 	return 0;
 }
 
-static void CreateSavePath(char *Path, int index, const char *slotname)
+static bool CreateSavePath(char *Path, int index, const char *slotname) WARN_UNUSED;
+static bool CreateSavePath(char *Path, int index, const char *slotname)
 {
 	PathJoin( Path, core->SavePath, SaveDir(), NULL );
 
 	//if the path exists in different case, don't make it again
-	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
-	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
+	if (!MakeDirectory(Path)) {
+		printMessage("SaveGameIterator", "Unable to create save game directory '%s'", RED, Path);
+		return false;
+	}
 	//keep the first part we already determined existing
 
 	char dir[_MAX_PATH];
@@ -519,8 +524,11 @@ static void CreateSavePath(char *Path, int index, const char *slotname)
 	PathJoin(Path, Path, dir, NULL);
 	//this is required in case the old slot wasn't recognised but still there
 	core->DelTree(Path, false);
-	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
-	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
+	if (!MakeDirectory(Path)) {
+		printMessage("SaveGameIterator", "Unable to create save game directory '%s'", RED, Path);
+		return false;
+	}
+	return true;
 }
 
 int SaveGameIterator::CreateSaveGame(int index, bool mqs)
@@ -551,8 +559,15 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 		}
 	}
 	char Path[_MAX_PATH];
-	CreateSavePath(Path, index, slotname);
 	GameControl *gc = core->GetGameControl();
+
+	if (!CreateSavePath(Path, index, slotname)) {
+		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
+		if (gc) {
+			gc->SetDisplayText(STR_CANTSAVE, 30);
+		}
+		return -1;
+	}
 
 	if (!DoSaveGame(Path)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
@@ -608,7 +623,13 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 	}
 
 	char Path[_MAX_PATH];
-	CreateSavePath(Path, index, slotname);
+	if (!CreateSavePath(Path, index, slotname)) {
+		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
+		if (gc) {
+			gc->SetDisplayText(STR_CANTSAVE, 30);
+		}
+		return -1;
+	}
 
 	if (!DoSaveGame(Path)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);

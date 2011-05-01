@@ -2397,13 +2397,13 @@ bool Interface::LoadConfig(const char* filename)
 	}
 
 	//FixPath( SavePath, false );
-	//mkdir( SavePath, S_IREAD|S_IWRITE|S_IEXEC );
-	//chmod( SavePath, S_IREAD|S_IWRITE|S_IEXEC );
+	//MakeDirectory(SavePath);
 	FixPath( SavePath, true );
 
 	FixPath( CachePath, false );
-	mkdir( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
-	chmod( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
+	if (!MakeDirectory(CachePath)) {
+		error("Core", "Unable to create cache directory '%s'", CachePath);
+	}
 
 	printStatus( "OK", LIGHT_GREEN );
 

@@ -33,6 +33,7 @@
 
 #include <cstdarg>
 #include <cstring>
+#include <cerrno>
 
 #ifndef WIN32
 #include <dirent.h>
@@ -347,6 +348,24 @@ void ExtractFileFromPath(char *file, const char *full_path)
 		strcpy(file, p+1);
 	else
 		strcpy(file, full_path);
+}
+
+bool MakeDirectory(const char* path)
+{
+#ifdef WIN32
+#define mkdir(path, mode) _mkdir(path)
+#endif
+	if (mkdir(path, S_IREAD|S_IWRITE|S_IEXEC) < 0) {
+		if (errno != EEXIST) {
+			return false;
+		}
+	}
+	// Ignore errors from chmod
+	chmod(path, S_IREAD|S_IWRITE|S_IEXEC);
+	return true;
+#ifdef WIN32
+#undef mkdir
+#endif
 }
 
 DirectoryIterator::DirectoryIterator(const char *path)
