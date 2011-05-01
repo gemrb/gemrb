@@ -20,17 +20,46 @@
 
 
 struct TRTinter_NoTint {
-	Uint8 r(Uint8 v) const { return v; }
-	Uint8 g(Uint8 v) const { return v; }
-	Uint8 b(Uint8 v) const { return v; }
+	void operator()(Uint8&, Uint8&, Uint8&) const { }
 };
 
 struct TRTinter_Tint {
 	TRTinter_Tint(const Color& t) : tint(t) { }
 
-	Uint8 r(Uint8 v) const { return (tint.r * v) >> 8; }
-	Uint8 g(Uint8 v) const { return (tint.g * v) >> 8; }
-	Uint8 b(Uint8 v) const { return (tint.b * v) >> 8; }
+	void operator()(Uint8& vr, Uint8& vg, Uint8& vb) const {
+		vr = (tint.r * vr) >> 8;
+		vg = (tint.g * vg) >> 8;
+		vb = (tint.b * vb) >> 8;
+	}
+
+	Color tint;
+};
+
+struct TRTinter_Grey {
+	TRTinter_Grey(const Color& t) : tint(t) { }
+
+	void operator()(Uint8& vr, Uint8& vg, Uint8& vb) const {
+		vr = (tint.r * vr) >> 10;
+		vg = (tint.g * vg) >> 10;
+		vb = (tint.b * vb) >> 10;
+		Uint8 a = vr + vg + vb;
+		vr = vg = vb = a;
+	}
+
+	Color tint;
+};
+struct TRTinter_Sepia {
+	TRTinter_Sepia(const Color& t) : tint(t) { }
+
+	void operator()(Uint8& vr, Uint8& vg, Uint8& vb) const {
+		vr = (tint.r * vr) >> 10;
+		vg = (tint.g * vg) >> 10;
+		vb = (tint.b * vb) >> 10;
+		Uint8 a = vr + vg + vb;
+		vr = a + 21; // can't overflow, since a is at most 189
+		vg = a;
+		vb = a < 32 ? 0 : a - 32;
+	}
 
 	Color tint;
 };
@@ -77,9 +106,10 @@ static void BlitTile_internal(SDL_Surface* target,
 
 	for (unsigned int i = 0; i < 256; ++i)
 	{
-		Uint8 r = tint.r(pal[i].r);
-		Uint8 g = tint.g(pal[i].g);
-		Uint8 b = tint.b(pal[i].b);
+		Uint8 r = pal[i].r;
+		Uint8 g = pal[i].g;
+		Uint8 b = pal[i].b;
+		tint(r, g, b);
 		opal[i] = (r >> target->format->Rloss) << target->format->Rshift
 		                   | (g >> target->format->Gloss) << target->format->Gshift
 		                   | (b >> target->format->Bloss) << target->format->Bshift;

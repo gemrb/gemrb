@@ -816,7 +816,7 @@ void SDLVideoDriver::BlitSpriteRegion(const Sprite2D* spr, const Region& size, i
 	}
 }
 
-void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, bool trans)
+void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags)
 {
 	if (spr->BAM) {
 		printMessage( "SDLVideo", "Tile blit not supported for this sprite\n", LIGHT_RED );
@@ -866,7 +866,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	}
 
 	bool tint = false;
-	Color tintcol = {0,0,0,0};
+	Color tintcol = {255,255,255,0};
 
 	if (core->GetGame()) {
 		const Color* totint = core->GetGame()->GetGlobalTint();
@@ -882,27 +882,58 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 		else \
 			BlitTile_internal<Uint16>(backBuf, x, y, rx, ry, w, h, data, pal, mask_data, ck, T, B); \
 
+	if (flags & TILE_GREY) {
 
-	if (trans) {
-		TRBlender_HalfTrans B(backBuf->format);
+		if (flags & TILE_HALFTRANS) {
+			TRBlender_HalfTrans B(backBuf->format);
 
-		if (tint) {
-			TRTinter_Tint T(tintcol);
+			TRTinter_Grey T(tintcol);
 			DO_BLIT
 		} else {
-			TRTinter_NoTint T;
+			TRBlender_Opaque B(backBuf->format);
+
+			TRTinter_Grey T(tintcol);
 			DO_BLIT
 		}
+
+	} else if (flags & TILE_SEPIA) {
+
+		if (flags & TILE_HALFTRANS) {
+			TRBlender_HalfTrans B(backBuf->format);
+
+			TRTinter_Sepia T(tintcol);
+			DO_BLIT
+		} else {
+			TRBlender_Opaque B(backBuf->format);
+
+			TRTinter_Sepia T(tintcol);
+			DO_BLIT
+		}
+
 	} else {
-		TRBlender_Opaque B(backBuf->format);
 
-		if (tint) {
-			TRTinter_Tint T(tintcol);
-			DO_BLIT
+		if (flags & TILE_HALFTRANS) {
+			TRBlender_HalfTrans B(backBuf->format);
+
+			if (tint) {
+				TRTinter_Tint T(tintcol);
+				DO_BLIT
+			} else {
+				TRTinter_NoTint T;
+				DO_BLIT
+			}
 		} else {
-			TRTinter_NoTint T;
-			DO_BLIT
+			TRBlender_Opaque B(backBuf->format);
+
+			if (tint) {
+				TRTinter_Tint T(tintcol);
+				DO_BLIT
+			} else {
+				TRTinter_NoTint T;
+				DO_BLIT
+			}
 		}
+
 	}
 
 #undef DO_BLIT

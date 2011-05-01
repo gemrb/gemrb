@@ -96,7 +96,7 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 				anim = tile->anim[0];
 			}
 			vid->BlitTile( anim->NextFrame(), 0, viewport.x + ( x * 64 ),
-				viewport.y + ( y * 64 ), &viewport, false );
+				viewport.y + ( y * 64 ), &viewport, 0 );
 			if (!tile->om || tile->tileIndex) {
 				continue;
 			}
@@ -113,7 +113,7 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 						                   tile->anim[0]->NextFrame(),
 							               viewport.x + ( x * 64 ),
 							               viewport.y + ( y * 64 ),
-							               &viewport, false );
+							               &viewport, 0 );
 						} else {
 							Sprite2D* mask = 0;
 							if (tile->anim[1])
@@ -122,7 +122,7 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 						                   mask,
 							               viewport.x + ( x * 64 ),
 							               viewport.y + ( y * 64 ),
-							               &viewport, true );
+							               &viewport, TILE_HALFTRANS );
 						}
 					}
 				}

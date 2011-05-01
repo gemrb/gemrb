@@ -82,7 +82,7 @@ public:
 	bool SupportsBAMSprites() { return true; }
 	void FreeSprite(Sprite2D* &spr);
 	Sprite2D* DuplicateSprite(const Sprite2D* spr);
-	void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, bool trans);
+	void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y, const Region* clip, unsigned int flags);
 	void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
 		const Region* clip = NULL);
 	void BlitSpriteRegion(const Sprite2D* spr, const Region& size, int x, int y,
