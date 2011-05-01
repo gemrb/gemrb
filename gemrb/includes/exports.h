@@ -45,4 +45,12 @@
 #define GEM_EXPORT_DLL extern "C"
 #endif
 
+#ifdef __GNUC__
+#define WARN_UNUSED __attribute__ ((warn_unused_result))
+#define SENTINEL __attribute__ ((sentinel))
+#else
+#define WARN_UNUSED
+#define SENTINEL
+#endif
+
 #endif
