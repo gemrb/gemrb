@@ -3821,7 +3821,7 @@ void Interface::SetCutSceneMode(bool active)
 
 	if (gc) {
 		// don't mess with controls/etc if we're already in a cutscene
-		if (active == (gc->GetScreenFlags()&SF_CUTSCENE))
+		if (active == (bool)(gc->GetScreenFlags()&SF_CUTSCENE))
 			return;
 
 		gc->SetCutSceneMode( active );
