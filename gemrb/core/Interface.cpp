@@ -2420,12 +2420,6 @@ bool Interface::LoadConfig(const char* filename)
 	return true;
 }
 
-static void upperlower(int upper, int lower)
-{
-	pl_uppercase[lower]=(ieByte) upper;
-	pl_lowercase[upper]=(ieByte) lower;
-}
-
 static const char *game_flags[GF_COUNT+1]={
 		"HasKaputz",          //0 GF_HAS_KAPUTZ
 		"AllStringsTagged",   //1 GF_ALL_STRINGS_TAGGED
@@ -2605,7 +2599,10 @@ bool Interface::LoadGemRBINI()
 		if (s) {
 			const char *s2 = strchr(s,',');
 			if (s2) {
-				upperlower(atoi(s), atoi(s2+1) );
+				unsigned char upper = atoi(s);
+				unsigned char lower = atoi(s2+1);
+				pl_uppercase[lower] = upper;
+				pl_lowercase[upper] = lower;
 			}
 		}
 	}
