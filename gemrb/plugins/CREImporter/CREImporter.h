@@ -25,7 +25,7 @@
 #include "Spellbook.h"
 
 class CREItem;
-class Effect;
+struct Effect;
 
 #define IE_CRE_GEMRB            0
 #define IE_CRE_V1_0		10  //bg1
