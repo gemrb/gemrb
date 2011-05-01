@@ -57,6 +57,7 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 	}
 	int All = compressed->Remains();
 	int Current;
+	int percent, last_percent = 20;
 	if (!All) return GEM_ERROR;
 	do {
 		ieDword fnlen, complen, declen;
@@ -78,7 +79,11 @@ int BIFImporter::DecompressSaveGame(DataStream *compressed)
 		delete cached;
 		Current = compressed->Remains();
 		//starting at 20% going up to 70%
-		core->LoadProgress( 20+(All-Current)*50/All );
+		percent = (20 + (All - Current) * 50 / All);
+		if (percent - last_percent > 5) {
+			core->LoadProgress(percent);
+			last_percent = percent;
+		}
 	}
 	while(Current);
 	return GEM_OK;
