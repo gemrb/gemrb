@@ -27,25 +27,6 @@ Point::Point(void)
 	//memset(this, 0, sizeof(*this));
 }
 
-Point::~Point(void)
-{
-}
-
-Point::Point(const Point& pnt)
-{
-	x=pnt.x;
-	y=pnt.y;
-	//memcpy(this, &pnt, sizeof(*this));
-}
-
-Point& Point::operator=(const Point& pnt)
-{
-	x = pnt.x;
-	y = pnt.y;
-	//memcpy(this, &pnt, sizeof(*this));
-	return *this;
-}
-
 bool Point::operator==(const Point& pnt)
 {
 	if (( x == pnt.x ) && ( y == pnt.y )) {
@@ -111,27 +92,6 @@ bool Point::PointInside(const Point &p) const
 Region::Region(void)
 {
 	x = y = w = h = 0;
-}
-
-Region::~Region(void)
-{
-}
-
-Region::Region(const Region& rgn)
-{
-	x = rgn.x;
-	y = rgn.y;
-	w = rgn.w;
-	h = rgn.h;
-}
-
-Region& Region::operator=(const Region& rgn)
-{
-	x = rgn.x;
-	y = rgn.y;
-	w = rgn.w;
-	h = rgn.h;
-	return *this;
 }
 
 bool Region::operator==(const Region& rgn)

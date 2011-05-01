@@ -39,11 +39,8 @@
 class GEM_EXPORT Point {
 public:
 	Point(void);
-	Point(const Point& pnt);
 	Point(short x, short y);
-	~Point(void);
 
-	Point& operator=(const Point& pnt);
 	bool operator==(const Point &pnt);
 	bool operator!=(const Point &pnt);
 
@@ -76,14 +73,11 @@ public:
 class GEM_EXPORT Region {
 public:
 	Region(void);
-	~Region(void);
 	int x;
 	int y;
 	int w;
 	int h;
-	Region(const Region& rgn);
 	Region(const Point& p, int w, int h);
-	Region& operator=(const Region& rgn);
 	bool operator==(const Region& rgn);
 	bool operator!=(const Region& rgn);
 	Region(int x, int y, int w, int h);
