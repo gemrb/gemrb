@@ -8348,8 +8348,7 @@ static PyObject* GemRB_Window_SetupSpellIcons(PyObject * /*self*/, PyObject* arg
 		// disable spells that should be cast from the inventory
 		// Identify is misclassified and has Target 3 (Dead char)
 
-		ieDword spelltype = ResolveSpellNumber(spell->spellname)/1000;
-		if (core->CheckSpecialSpell(spell->spellname, actor) || (disabled_spellcasting&(1<<spelltype)) ) {
+		if (core->CheckSpecialSpell(spell->spellname, actor) || (disabled_spellcasting&(1<<spell->type)) ) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
 			btn->EnableBorder(1, IE_GUI_BUTTON_DISABLED);
 			PyObject *Function = PyDict_GetItemString(dict, "UpdateActionsWindow");
