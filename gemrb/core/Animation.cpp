@@ -112,7 +112,7 @@ Sprite2D* Animation::LastFrame(void)
 	if (gameAnimation) {
 		starttime = core->GetGame()->Ticks;
 	} else {
-		GetTime( starttime );
+		starttime = GetTickCount();
 	}
 	Sprite2D* ret;
 	if (playReversed)
@@ -132,7 +132,7 @@ Sprite2D* Animation::NextFrame(void)
 		if (gameAnimation) {
 			starttime = core->GetGame()->Ticks;
 		} else {
-			GetTime( starttime );
+			starttime = GetTickCount();
 		}
 	}
 	Sprite2D* ret;
@@ -148,7 +148,7 @@ Sprite2D* Animation::NextFrame(void)
 	if (gameAnimation) {
 		time = core->GetGame()->Ticks;
 	} else {
-		GetTime(time);
+		time = GetTickCount();
 	}
 
 	//it could be that we skip more than one frame in case of slow rendering

@@ -1439,7 +1439,7 @@ void Selectable::DrawCircle(const Region &vp)
 		//doing a time dependent flashing of colors
 		//if it is too fast, increase the 6 to 7
 		unsigned long step;
-		GetTime( step );
+		step = GetTickCount();
 		step = tp_steps [(step >> 6) & 7];
 		mix.a = overColor.a;
 		mix.r = (overColor.r*step+selectedColor.r*(8-step))/8;
@@ -2028,7 +2028,7 @@ void Movable::DrawTargetPoint(const Region &vp)
 	// generates "step" from sequence 3 2 1 0 1 2 3 4
 	// updated each 1/15 sec
 	unsigned long step;
-	GetTime( step );
+	step = GetTickCount();
 	step = tp_steps [(step >> 6) & 7];
 
 	step = step + 1;

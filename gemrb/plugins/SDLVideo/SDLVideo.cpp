@@ -47,7 +47,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	xCorr = 0;
 	yCorr = 0;
 	lastTime = 0;
-	GetTime( lastMouseTime );
+	lastMouseTime = GetTickCount();
 	backBuf=NULL;
 	extra=NULL;
 	subtitlestrref = 0;
@@ -171,10 +171,10 @@ int SDLVideoDriver::SwapBuffers(void)
 {
 	int ret = GEM_OK;
 	unsigned long time;
-	GetTime( time );
+	time = GetTickCount();
 	if (( time - lastTime ) < 33) {
 		SDL_Delay( 33 - (time - lastTime) );
-		GetTime( time );
+		time = GetTickCount();
 	}
 	lastTime = time;
 
@@ -214,7 +214,7 @@ int SDLVideoDriver::SwapBuffers(void)
 	unsigned int delay = core->TooltipDelay;
 	// The multiplication by 10 is there since the last, disabling slider position is the eleventh
 	if (!ConsolePopped && (delay<TOOLTIP_DELAY_FACTOR*10) ) {
-		GetTime( time );
+		time = GetTickCount();
 		/** Display tooltip if mouse is idle */
 		if (( time - lastMouseTime ) > delay) {
 			if (Evnt)
@@ -2334,7 +2334,7 @@ void SDLVideoDriver::GetMousePos(int &x, int &y)
 
 void SDLVideoDriver::MouseMovement(int x, int y)
 {
-	GetTime( lastMouseTime );
+	lastMouseTime = GetTickCount();
 	if (DisableMouse&MOUSE_DISABLED)
 		return;
 	CursorPos.x = x; // - mouseAdjustX[CursorIndex];

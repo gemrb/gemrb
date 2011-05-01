@@ -2883,7 +2883,7 @@ void Actor::PlayWalkSound()
 	ieDword thisTime;
 	ieResRef Sound;
 
-	GetTime(thisTime);
+	thisTime = GetTickCount();
 	if (thisTime<nextWalk) return;
 	int cnt = anims->GetWalkSoundCount();
 	if (!cnt) return;

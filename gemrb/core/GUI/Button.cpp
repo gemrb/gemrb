@@ -125,7 +125,7 @@ void Button::CloseUpColor()
 	unsigned long newtime;
 
 	Changed = true;
-	GetTime( newtime );
+	newtime = GetTickCount();
 	if (newtime<starttime) {
 		return;
 	}
@@ -713,7 +713,7 @@ void Button::SetHorizontalOverlay(double clip, const Color &src, const Color &de
 		Flags |= IE_GUI_BUTTON_HORIZONTAL;
 		SourceRGB=src;
 		DestRGB=dest;
-		GetTime( starttime );
+		starttime = GetTickCount();
 		starttime += 40;
 	}
 	Clipping = clip;

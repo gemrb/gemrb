@@ -59,7 +59,7 @@ void GlobalTimer::Freeze()
 	unsigned long thisTime;
 	unsigned long advance;
 
-	GetTime( thisTime );
+	thisTime = GetTickCount();
 	advance = thisTime - startTime;
 	if ( advance < interval) {
 		return;
@@ -155,7 +155,7 @@ bool GlobalTimer::Update()
 
 	UpdateAnimations();
 
-	GetTime( thisTime );
+	thisTime = GetTickCount();
 
 	if (!startTime) {
 		startTime = thisTime;
@@ -265,7 +265,7 @@ void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, unsigned long time)
 	AnimationRef* anim;
 	unsigned long thisTime;
 
-	GetTime( thisTime );
+	thisTime = GetTickCount();
 	time += thisTime;
 
 	// if there are no free animation reference objects,
@@ -309,7 +309,7 @@ void GlobalTimer::RemoveAnimation(ControlAnimation* ctlanim)
 void GlobalTimer::UpdateAnimations()
 {
 	unsigned long thisTime;
-	GetTime( thisTime );
+	thisTime = GetTickCount();
 	while (animations.begin() + first_animation != animations.end()) {
 		AnimationRef* anim = animations[first_animation];
 		if (anim->ctlanim == NULL) {

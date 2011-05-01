@@ -176,16 +176,14 @@ GEM_EXPORT unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT int EARelation(Scriptable *a, Actor *b);
 
-#ifdef WIN32
-#define GetTime(store) store = GetTickCount()
-#else
+#ifndef WIN32
 #include <sys/time.h>
-#define GetTime(store) \
-	{ \
-		struct timeval tv; \
-		gettimeofday(&tv, NULL); \
-		store = (tv.tv_usec/1000) + (tv.tv_sec*1000); \
-	}
+inline unsigned long GetTickCount()
+{
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (tv.tv_usec/1000) + (tv.tv_sec*1000);
+}
 #endif
 
 inline int MIN(int a, int b)

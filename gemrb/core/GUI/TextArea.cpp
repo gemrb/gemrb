@@ -126,7 +126,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	{
 		unsigned long thisTime;
 
-		GetTime( thisTime);
+		thisTime = GetTickCount();
 		if (thisTime>starttime) {
 			starttime = thisTime+ticks;
 			smooth--;
@@ -939,7 +939,7 @@ void TextArea::SetupScroll(unsigned long tck)
 	}
 	i = (unsigned int) lines.size();
 	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
-	GetTime( starttime );
+	starttime = GetTickCount();
 	if (RunEventHandler( TextAreaOutOfText )) {
 		//event handler destructed this object?
 		return;

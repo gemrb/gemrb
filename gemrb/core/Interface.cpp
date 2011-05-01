@@ -1104,7 +1104,7 @@ void Interface::Main()
 	Font* fps = GetFont( ( unsigned int ) 0 );
 	char fpsstring[40]={"???.??? fps"};
 	unsigned long frame = 0, time, timebase;
-	GetTime(timebase);
+	timebase = GetTickCount();
 	double frames = 0.0;
 	Palette* palette = CreatePalette( white, black );
 	do {
@@ -1123,7 +1123,7 @@ void Interface::Main()
 		DrawWindows();
 		if (DrawFPS) {
 			frame++;
-			GetTime( time );
+			time = GetTickCount();
 			if (time - timebase > 1000) {
 				frames = ( frame * 1000.0 / ( time - timebase ) );
 				timebase = time;
