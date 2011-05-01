@@ -64,6 +64,7 @@
 #include "SymbolMgr.h"
 #include "TileMap.h"
 #include "Video.h"
+#include "WindowMgr.h"
 #include "WorldMapMgr.h"
 #include "GameScript/GameScript.h"
 #include "GUI/Button.h"

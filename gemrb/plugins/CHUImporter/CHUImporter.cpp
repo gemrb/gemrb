@@ -34,6 +34,7 @@
 #include "GUI/Slider.h"
 #include "GUI/TextArea.h"
 #include "GUI/TextEdit.h"
+#include "GUI/Window.h"
 
 CHUImporter::CHUImporter()
 {

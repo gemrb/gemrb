@@ -25,8 +25,10 @@
 #include "GlobalTimer.h"
 #include "Interface.h"
 #include "Map.h"
+#include "Sprite2D.h"
 #include "Video.h"
 #include "GUI/EventMgr.h"
+#include "GUI/Window.h"
 #include "Scriptable/Actor.h"
 
 #define MAP_NO_NOTES   0
