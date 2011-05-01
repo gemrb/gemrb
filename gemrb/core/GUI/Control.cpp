@@ -20,6 +20,7 @@
 
 #include "GUI/Control.h"
 
+#include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
 #include "win32def.h"

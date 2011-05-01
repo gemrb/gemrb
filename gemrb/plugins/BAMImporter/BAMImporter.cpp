@@ -31,9 +31,11 @@
 #include "win32def.h"
 
 #include "FileCache.h"
+#include "Font.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
+#include "Sprite2D.h"
 #include "Video.h"
 #include "System/FileStream.h"
 

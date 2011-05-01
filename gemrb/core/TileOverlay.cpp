@@ -20,6 +20,7 @@
 
 #include "TileOverlay.h"
 
+#include "GlobalTimer.h"
 #include "Interface.h"
 #include "Video.h"
 

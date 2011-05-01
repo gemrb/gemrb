@@ -25,6 +25,7 @@
 
 #include "win32def.h"
 
+#include "CharAnimations.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"

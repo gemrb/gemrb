@@ -24,6 +24,7 @@
 
 #include "Game.h"
 #include "Interface.h"
+#include "TableMgr.h"
 #include "Video.h"
 
 #include <list>

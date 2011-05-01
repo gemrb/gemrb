@@ -25,6 +25,8 @@
 #include "Interface.h"
 #include "Variables.h"
 #include "Video.h"
+#include "GUI/EventMgr.h"
+#include "GUI/Window.h"
 
 ScrollBar::ScrollBar(void)
 {

@@ -25,6 +25,7 @@
 #include "Game.h"
 #include "Interface.h"
 #include "Map.h"
+#include "Sprite2D.h"
 #include "Video.h"
 
 Animation::Animation(int count)

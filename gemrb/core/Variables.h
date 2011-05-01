@@ -27,6 +27,8 @@
 #include "globals.h"
 #include "win32def.h"
 
+#include <cassert>
+
 #ifndef ReleaseFun
 typedef void (*ReleaseFun)(void *);
 #endif

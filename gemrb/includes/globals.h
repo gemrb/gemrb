@@ -52,9 +52,7 @@
 #include "errors.h"
 #include "win32def.h"
 
-#include "AnimStructures.h"
 #include "Region.h"
-#include "Sprite2D.h"
 #include "System/DataStream.h"
 #include "System/String.h"
 

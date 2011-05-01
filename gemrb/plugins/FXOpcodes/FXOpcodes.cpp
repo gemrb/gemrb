@@ -29,9 +29,11 @@
 #include "EffectQueue.h"
 #include "Game.h"
 #include "GameData.h"
+#include "GlobalTimer.h"
 #include "Interface.h"
 #include "PolymorphCache.h" // fx_polymorph
 #include "Projectile.h" //needs for clearair
+#include "ScriptedAnimation.h"
 #include "Spell.h" //needed for fx_cast_spell feedback
 #include "TileMap.h" //needs for knock!
 #include "damages.h"

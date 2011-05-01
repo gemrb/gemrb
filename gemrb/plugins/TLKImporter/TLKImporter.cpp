@@ -27,7 +27,9 @@
 #include "DialogHandler.h"
 #include "Game.h"
 #include "Interface.h"
+#include "TableMgr.h"
 #include "GUI/GameControl.h"
+#include "Scriptable/Actor.h"
 
 //set this to -1 if charname is gabber (iwd2)
 static int charname=0;

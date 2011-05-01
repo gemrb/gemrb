@@ -36,6 +36,7 @@
 #include "Video.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
+#include "GUI/Window.h"
 
 #include <cassert>
 #include <cmath>

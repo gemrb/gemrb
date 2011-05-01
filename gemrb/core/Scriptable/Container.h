@@ -21,6 +21,7 @@
 #ifndef CONTAINER_H
 #define CONTAINER_H
 
+#include "Inventory.h"
 #include "Scriptable.h"
 
 //container flags

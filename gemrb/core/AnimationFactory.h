@@ -25,6 +25,7 @@
 #include "globals.h"
 
 #include "Animation.h"
+#include "AnimStructures.h"
 #include "FactoryObject.h"
 
 class GEM_EXPORT AnimationFactory : public FactoryObject {

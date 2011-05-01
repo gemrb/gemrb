@@ -28,6 +28,7 @@
 #include "SymbolMgr.h"
 #include "Scriptable/Actor.h"
 #include "Spell.h"  //needs for the source flags bitfield
+#include "TableMgr.h"
 
 #include <cstdio>
 

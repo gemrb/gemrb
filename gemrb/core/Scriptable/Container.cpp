@@ -31,6 +31,7 @@
 #include "Map.h"
 #include "Projectile.h"
 #include "Spell.h"
+#include "Sprite2D.h"
 #include "SpriteCover.h"
 #include "TileMap.h"
 #include "Video.h"

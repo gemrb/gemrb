@@ -22,9 +22,12 @@
 #include "win32def.h"
 
 #include "Game.h"
+#include "GlobalTimer.h"
 #include "Interface.h"
 #include "Map.h"
 #include "Video.h"
+#include "GUI/EventMgr.h"
+#include "Scriptable/Actor.h"
 
 #define MAP_NO_NOTES   0
 #define MAP_VIEW_NOTES 1

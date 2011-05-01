@@ -29,15 +29,16 @@
 
 #include "globals.h"
 
-#include "Animation.h"
 #include "Plugin.h"
-#include "Polygon.h"
 #include "ScriptedAnimation.h"
-#include "GUI/EventMgr.h"
 
 class AnimationFactory;
+class EventMgr;
+class Font;
+class Gem_Polygon;
 class Palette;
 class SpriteCover;
+class Wall_Polygon;
 
 // Note: not all these flags make sense together. Specifically:
 // NOSHADOW overrides TRANSSHADOW

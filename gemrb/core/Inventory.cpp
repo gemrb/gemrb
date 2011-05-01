@@ -26,11 +26,13 @@
 #include "win32def.h"
 #include "strrefs.h"
 
+#include "CharAnimations.h"
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Item.h"
+#include "Map.h"
 #include "ScriptEngine.h"
 #include "Scriptable/Actor.h"
 

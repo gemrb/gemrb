@@ -23,11 +23,6 @@
 
 #include "exports.h"
 
-#include "CharAnimations.h"
-#include "Inventory.h"
-#include "PathFinder.h"
-#include "Sprite2D.h"
-#include "TileOverlay.h"
 #include "Variables.h"
 
 #include <list>
@@ -40,10 +35,13 @@ class GameScript;
 class Gem_Polygon;
 class Highlightable;
 class InfoPoint;
+class Map;
 class Movable;
+class PathNode;
 class Scriptable;
 class Selectable;
 class Spell;
+class Sprite2D;
 class SpriteCover;
 
 #define MAX_SCRIPTS		8

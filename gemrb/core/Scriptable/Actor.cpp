@@ -31,10 +31,14 @@
 #include "win32def.h"
 
 #include "Audio.h" //pst (react to death sounds)
+#include "Bitmap.h"
+#include "DataFileMgr.h"
 #include "DialogHandler.h" // checking for dialog
 #include "Game.h"
+#include "GlobalTimer.h"
 #include "DisplayMessage.h"
 #include "GameData.h"
+#include "Image.h"
 #include "Interface.h"
 #include "Item.h"
 #include "PolymorphCache.h" // stupid polymorph cache hack
@@ -42,6 +46,7 @@
 #include "ProjectileServer.h"
 #include "ScriptEngine.h"
 #include "Spell.h"
+#include "Sprite2D.h"
 #include "TableMgr.h"
 #include "Video.h"
 #include "damages.h"

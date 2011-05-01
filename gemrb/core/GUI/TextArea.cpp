@@ -32,6 +32,8 @@
 #include "Palette.h"
 #include "Variables.h"
 #include "Video.h"
+#include "GUI/EventMgr.h"
+#include "GUI/Window.h"
 #include "Scriptable/Actor.h"
 
 #include <cstdio>

@@ -22,6 +22,8 @@
 
 #include "win32def.h"
 
+#include "AnimationFactory.h"
+#include "DataFileMgr.h"
 #include "Game.h"
 #include "GameData.h"
 #include "ImageMgr.h"

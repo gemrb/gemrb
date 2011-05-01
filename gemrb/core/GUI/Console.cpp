@@ -27,6 +27,7 @@
 #include "Palette.h"
 #include "ScriptEngine.h"
 #include "Video.h"
+#include "GUI/EventMgr.h"
 
 Console::Console(void)
 {

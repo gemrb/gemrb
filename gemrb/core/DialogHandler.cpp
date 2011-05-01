@@ -25,10 +25,13 @@
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
+#include "GlobalTimer.h"
 #include "ScriptEngine.h"
+#include "TableMgr.h"
 #include "Video.h"
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
+#include "GUI/TextArea.h"
 
 //translate section values (journal, solved, unsolved, user)
 static int sectionMap[4]={4,1,2,0};

@@ -21,6 +21,8 @@
 #include "GUI/Button.h"
 
 #include "GUI/GameControl.h"
+#include "GUI/EventMgr.h"
+#include "GUI/Window.h"
 
 #include "defsounds.h"
 #include "win32def.h"

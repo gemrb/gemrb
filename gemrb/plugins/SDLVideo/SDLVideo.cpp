@@ -28,8 +28,11 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
+#include "Polygon.h"
 #include "SpriteCover.h"
 #include "GUI/Console.h"
+#include "GUI/EventMgr.h"
+#include "GUI/Window.h"
 
 #include <cmath>
 #include <cassert>

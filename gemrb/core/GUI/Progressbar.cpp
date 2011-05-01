@@ -24,6 +24,7 @@
 
 #include "Interface.h"
 #include "Video.h"
+#include "GUI/Window.h"
 
 #include <cstring>
 

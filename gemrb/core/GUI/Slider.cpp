@@ -25,6 +25,7 @@
 #include "Interface.h"
 #include "Variables.h"
 #include "Video.h"
+#include "GUI/Window.h"
 
 #include <cmath>
 

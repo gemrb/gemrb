@@ -28,6 +28,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
+#include "Sprite2D.h"
 #include "Video.h"
 
 #include <cassert>

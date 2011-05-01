@@ -26,10 +26,6 @@ class Map;
 #include "exports.h"
 #include "globals.h"
 
-#include "Bitmap.h"
-#include "Image.h"
-#include "IniSpawn.h"
-#include "SpriteCover.h"
 #include "Scriptable/Scriptable.h"
 
 #include <queue>
@@ -38,11 +34,17 @@ class Actor;
 class Ambient;
 class Animation;
 class AnimationFactory;
+class Bitmap;
+class CREItem;
 class GameControl;
+class Image;
+class IniSpawn;
+class Palette;
 class Particles;
 struct PathNode;
 class Projectile;
 class ScriptedAnimation;
+class SpriteCover;
 class TileMap;
 class Wall_Polygon;
 

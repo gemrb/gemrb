@@ -24,7 +24,10 @@
 #include "EffectQueue.h"
 #include "Game.h"
 #include "GameData.h"
+#include "GlobalTimer.h"
 #include "Interface.h"
+#include "Map.h"
+#include "TableMgr.h"
 #include "TileMap.h"
 #include "Video.h" //for tints
 #include "Scriptable/Actor.h"

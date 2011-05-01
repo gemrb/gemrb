@@ -23,8 +23,10 @@
 
 #include "MapMgr.h"
 
+#include "Map.h" // proIterator
 class Animation;
 class AnimationFactory;
+class EffectQueue;
 
 class AREImporter : public MapMgr {
 private:

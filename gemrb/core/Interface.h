@@ -34,11 +34,11 @@
 
 #include "Cache.h"
 #include "Callback.h"
-#include "GlobalTimer.h"
 #include "Holder.h"
 
 #include <map>
 #include <string>
+#include <vector>
 
 #ifdef _MSC_VER // No SFINAE
 #include "Audio.h"
@@ -67,6 +67,7 @@ class Factory;
 class Font;
 class Game;
 class GameControl;
+class GlobalTimer;
 class ITMExtHeader;
 class Image;
 class Item;
@@ -82,6 +83,7 @@ class SaveGameIterator;
 class ScriptEngine;
 class ScriptedAnimation;
 class Spell;
+class Sprite2D;
 class Store;
 class StringMgr;
 class SymbolMgr;

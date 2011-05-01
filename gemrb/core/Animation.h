@@ -26,9 +26,10 @@
 #include "globals.h"
 
 #include "Region.h"
-#include "Sprite2D.h"
 
 #include <vector>
+
+class Sprite2D;
 
 class GEM_EXPORT Animation {
 private:

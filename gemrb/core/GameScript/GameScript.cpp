@@ -29,6 +29,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"
+#include "TableMgr.h"
 
 //debug flags
 // 1 - cache

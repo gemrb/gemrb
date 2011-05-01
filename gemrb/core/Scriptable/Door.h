@@ -23,6 +23,8 @@
 
 #include "Scriptable.h"
 
+class TileOverlay;
+
 //door flags
 #define DOOR_OPEN        1
 #define DOOR_LOCKED      2

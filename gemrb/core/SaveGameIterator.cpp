@@ -30,8 +30,11 @@
 #include "ImageWriter.h"
 #include "Interface.h"
 #include "SaveGameMgr.h"
+#include "Sprite2D.h"
+#include "TableMgr.h"
 #include "Video.h"
 #include "GUI/GameControl.h"
+#include "Scriptable/Actor.h"
 #include "System/FileStream.h"
 
 #if defined(__HAIKU__)

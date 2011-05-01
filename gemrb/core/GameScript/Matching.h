@@ -24,6 +24,8 @@
 
 #include "exports.h"
 
+class TileMap;
+
 GEM_EXPORT Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags);
 Targets* GetAllActors(Scriptable* Sender, int ga_flags);
 Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0);

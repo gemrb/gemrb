@@ -28,6 +28,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Item.h"
+#include "Font.h"
 #include "Map.h"
 #include "Projectile.h"
 #include "Spell.h"
@@ -37,6 +38,7 @@
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
 #include "GUI/GameControl.h"
+#include "GUI/Window.h"
 #include "Scriptable/InfoPoint.h"
 
 #include <cassert>

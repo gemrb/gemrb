@@ -28,15 +28,16 @@
 #include "exports.h"
 #include "ie_types.h"
 
-#include "Animation.h"
 #include "Audio.h"
-#include "CharAnimations.h"
 #include "EffectQueue.h"
-#include "ScriptedAnimation.h"
+#include "Palette.h"
 
 #include <cstring>
 #include <vector>
 
+class Animation;
+class CharAnimations;
+class DataFileMgr;
 class Map;
 class ScriptedAnimation;
 struct PolymorphCache;

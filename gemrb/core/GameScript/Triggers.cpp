@@ -29,6 +29,7 @@
 #include "DialogHandler.h"
 #include "Game.h"
 #include "GameData.h"
+#include "Polygon.h"
 #include "Video.h"
 #include "GUI/GameControl.h"
 #include "math.h" //needs for acos

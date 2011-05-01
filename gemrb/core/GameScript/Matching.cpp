@@ -24,6 +24,7 @@
 
 #include "Interface.h"
 #include "Game.h"
+#include "Map.h"
 #include "TileMap.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"

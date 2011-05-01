@@ -20,6 +20,7 @@
 
 #include "Cache.h"
 
+#include <cassert>
 #include <ctype.h>
 
 // private inlines

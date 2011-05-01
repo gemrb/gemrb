@@ -32,6 +32,7 @@
 #include "ie_types.h"
 
 #include "CharAnimations.h" //contains MAX_ORIENT
+#include "EffectQueue.h"
 #include "Map.h"
 #include "Palette.h"
 #include "PathFinder.h"

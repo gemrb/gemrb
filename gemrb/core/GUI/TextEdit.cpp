@@ -25,6 +25,8 @@
 #include "Interface.h"
 #include "Palette.h"
 #include "Video.h"
+#include "GUI/EventMgr.h"
+#include "GUI/Window.h"
 
 TextEdit::TextEdit(unsigned short maxLength, unsigned short px, unsigned short py)
 {

@@ -22,12 +22,15 @@
 
 #include "exports.h"
 
-#include "AnimationFactory.h"
 #include "Audio.h"
-#include "Map.h"
 #include "Palette.h"
 #include "SpriteCover.h"
-#include "System/DataStream.h"
+
+class Animation;
+class AnimationFactory;
+class DataStream;
+class Map;
+class Sprite2D;
 
 //scripted animation flags 
 #define S_ANI_PLAYONCE        8        //(same as area animation)

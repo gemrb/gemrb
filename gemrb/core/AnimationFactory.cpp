@@ -23,6 +23,7 @@
 #include "win32def.h"
 
 #include "Interface.h"
+#include "Sprite2D.h"
 #include "Video.h"
 
 AnimationFactory::AnimationFactory(const char* ResRef)

@@ -23,6 +23,7 @@
 #include "win32def.h"
 
 #include "GameData.h"
+#include "GlobalTimer.h"
 #include "Interface.h"
 #include "Palette.h"    /* needed only for paperdoll palettes */
 #include "Video.h"      /* needed only for paperdoll palettes */

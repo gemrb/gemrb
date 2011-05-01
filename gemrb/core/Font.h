@@ -33,6 +33,7 @@
 #include <vector>
 
 class Palette;
+class Sprite2D;
 
 struct StringList {
 	Sprite2D*** strings;

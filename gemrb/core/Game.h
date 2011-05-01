@@ -34,13 +34,16 @@ class Game;
 #include "ie_types.h"
 
 #include "Callback.h"
-#include "Map.h"
+#include "Scriptable/Scriptable.h"
+#include "Scriptable/PCStatStruct.h"
 #include "Variables.h"
-#include "Scriptable/Actor.h"
 
 #include <vector>
 
+class Actor;
+class Map;
 class Particles;
+class TableMgr;
 
 //the size of the bestiary register
 #define BESTIARY_SIZE 260

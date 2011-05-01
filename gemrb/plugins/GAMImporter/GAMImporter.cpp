@@ -27,6 +27,8 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "MapMgr.h"
+#include "TableMgr.h"
+#include "Scriptable/Actor.h"
 #include "System/SlicedStream.h"
 
 #include <cassert>

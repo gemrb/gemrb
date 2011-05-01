@@ -28,8 +28,11 @@
 #define DISPLAYMESSAGE_H
 
 #include "exports.h"
+#include "ie_types.h"
 
-#include "ActorMgr.h"
+#include <cstdlib>
+
+class Scriptable;
 
 class GEM_EXPORT DisplayMessage
 {

@@ -26,6 +26,7 @@
 #include "TableMgr.h"
 #include "GUI/Label.h"
 #include "GUI/TextArea.h"
+#include "Scriptable/Actor.h"
 
 GEM_EXPORT DisplayMessage * displaymsg;
 
