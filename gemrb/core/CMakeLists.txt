@@ -49,6 +49,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	PalettedImageMgr.cpp
 	Particles.cpp
 	Plugin.cpp
+	PluginLoader.cpp
 	PluginMgr.cpp
 	Polygon.cpp
 	Projectile.cpp

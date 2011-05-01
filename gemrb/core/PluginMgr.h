@@ -40,12 +40,6 @@
 #include <map>
 #include <vector>
 
-#ifdef WIN32
-typedef HMODULE LibHandle;
-#else
-typedef void *LibHandle;
-#endif
-
 class Plugin;
 class Resource;
 class TypeID;
@@ -64,19 +58,11 @@ public:
 public:
 	/** Return global instance of PluginMgr */
 	static PluginMgr* Get();
-	void LoadPlugins(char* pluginpath);
 private:
 	PluginMgr();
 public: // HACK: MSVC6 is buggy.
-	~PluginMgr(void);
+	~PluginMgr();
 private:
-	struct PluginDesc {
-		LibHandle handle;
-		PluginID ID;
-		const char *Description;
-		bool (*Register)(PluginMgr*);
-	};
-	std::map< PluginID, PluginDesc> libs;
 	std::map< SClass_ID, PluginFunc> plugins;
 	std::map< const TypeID*, std::vector<ResourceDesc> > resources;
 	/** Array of initializer functions */
@@ -86,12 +72,10 @@ private:
 	typedef std::map<const char*, PluginFunc, iless> driver_map;
 	std::map<const TypeID*, driver_map> drivers;
 public:
-	/** Return names of all *.so or *.dll files in the given directory */
-	bool FindFiles( char* path, std::list< char* > &files);
+	size_t GetPluginCount() const { return plugins.size(); }
 	bool IsAvailable(SClass_ID plugintype) const;
 	Plugin* GetPlugin(SClass_ID plugintype) const;
 
-	size_t GetPluginCount() const { return plugins.size(); }
 
 	/**
 	 * Register class plugin.

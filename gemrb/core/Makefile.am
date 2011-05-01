@@ -70,6 +70,7 @@ libgemrb_core_la_SOURCES = \
 	PalettedImageMgr.cpp \
 	Particles.cpp \
 	Plugin.cpp \
+	PluginLoader.cpp \
 	PluginMgr.cpp \
 	Polygon.cpp \
 	Projectile.cpp \

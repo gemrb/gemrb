@@ -51,6 +51,7 @@
 #include "MoviePlayer.h"
 #include "MusicMgr.h"
 #include "Palette.h"
+#include "PluginLoader.h"
 #include "PluginMgr.h"
 #include "ProjectileServer.h"
 #include "SaveGameIterator.h"
@@ -1435,7 +1436,7 @@ int Interface::Init()
 	}
 	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
 	PluginMgr *plugin = PluginMgr::Get();
-	plugin->LoadPlugins(PluginsPath);
+	LoadPlugins(PluginsPath);
 	if (plugin && plugin->GetPluginCount()) {
 		printMessage( "Core", "Plugin Loading Complete...", WHITE );
 		printStatus( "OK", LIGHT_GREEN );
