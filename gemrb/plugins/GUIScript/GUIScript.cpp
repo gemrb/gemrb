@@ -9208,7 +9208,7 @@ static PyObject* GemRB_SetFullScreen(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "i", &fullscreen )) {
 		return AttributeError( GemRB_SetFullScreen__doc );
 	}
-	core->GetVideoDriver()->ToggleFullscreenMode(fullscreen);
+	core->GetVideoDriver()->SetFullscreenMode(fullscreen);
 	Py_INCREF( Py_None );
 	return Py_None;
 }

@@ -80,9 +80,9 @@ public:
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen) = 0;
 	/** Sets window title of GemRB window */
 	virtual void SetDisplayTitle(char* title, char* icon) = 0;
-	/** Toggles GemRB between fullscreen and windowed mode.
-	  * 0 = windowed, 1 = fullscreen, -1 (default) = toggle */
-	virtual bool ToggleFullscreenMode(int set_reset=-1) = 0;
+	/** Toggles GemRB between fullscreen and windowed mode. */
+	bool ToggleFullscreenMode();
+	virtual bool SetFullscreenMode(bool set) = 0;
 	/** Swaps displayed and back buffers */
 	virtual int SwapBuffers(void) = 0;
 	/** Grabs and releases mouse cursor within GemRB window */

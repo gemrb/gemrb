@@ -144,13 +144,10 @@ void SDLVideoDriver::SetDisplayTitle(char* title, char* icon)
 	SDL_WM_SetCaption( title, icon );
 }
 
-bool SDLVideoDriver::ToggleFullscreenMode(int set_reset)
+bool SDLVideoDriver::SetFullscreenMode(bool set)
 {
-	if (set_reset==-1) {
-		 set_reset=!fullscreen;
-	}
-	if (fullscreen != set_reset) {
-		fullscreen=set_reset;
+	if (fullscreen != set) {
+		fullscreen=set;
 		SDL_WM_ToggleFullScreen( disp );
 		//readjust mouse to original position
 		MoveMouse(CursorPos.x, CursorPos.y);
@@ -269,7 +266,7 @@ int SDLVideoDriver::PollEvents() {
 					break;
 				case SDLK_f:
 					if (modstate & GEM_MOD_CTRL) {
-						ToggleFullscreenMode(-1);
+						ToggleFullscreenMode();
 					}
 					break;
 				default:
@@ -2498,7 +2495,7 @@ int SDLVideoDriver::PollMovieEvents()
 					case SDLK_q:
 						return 1;
 					case SDLK_f:
-						ToggleFullscreenMode(-1);
+						ToggleFullscreenMode();
 						break;
 					default:
 						break;

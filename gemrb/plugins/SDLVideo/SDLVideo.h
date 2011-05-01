@@ -55,7 +55,7 @@ public:
 	int Init(void);
 	int CreateDisplay(int width, int height, int bpp, bool fullscreen);
 	void SetDisplayTitle(char* title, char* icon);
-	bool ToggleFullscreenMode(int set_reset=-1);
+	bool SetFullscreenMode(bool set);
 	int SwapBuffers(void);
 	int PollEvents();
 	bool ToggleGrabInput();

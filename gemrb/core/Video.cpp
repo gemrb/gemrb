@@ -46,6 +46,11 @@ Video::~Video(void)
 {
 }
 
+bool Video::ToggleFullscreenMode()
+{
+	return SetFullscreenMode(!fullscreen);
+}
+
 /** Set Event Manager */
 void Video::SetEventMgr(EventMgr* evnt)
 {
