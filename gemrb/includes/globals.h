@@ -175,7 +175,6 @@ GEM_EXPORT unsigned int PersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int SquaredPersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int SquaredMapDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT int EARelation(Scriptable *a, Actor *b);
-GEM_EXPORT bool dir_exists(const char* path);
 
 #ifdef WIN32
 #define GetTime(store) store = GetTickCount()
