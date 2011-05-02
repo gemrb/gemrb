@@ -1,0 +1,67 @@
+{
+   Suppress_Python1
+   Memcheck:Addr4
+   fun:PyObject_Free
+}
+
+{
+   Suppress_Python2
+   Memcheck:Addr8
+   fun:PyObject_Realloc
+}
+
+{
+   Suppress_Python3
+   Memcheck:Cond
+   fun:PyObject_Free
+}
+
+{
+   Suppress_Python4
+   Memcheck:Cond
+   fun:PyObject_Realloc
+}
+
+{
+   Suppress_Python5
+   Memcheck:Value8
+   fun:PyObject_Free
+}
+
+{
+   Suppress_Python6
+   Memcheck:Value8
+   fun:PyObject_Realloc
+}
+
+{
+   Suppress_Python7
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+}
+
+
+{
+   Suppress_SDL1
+   Memcheck:Addr8
+   fun:SDL_LoadFunction
+}
+
+{
+   Suppress_SDL2
+   Memcheck:Value4
+   fun:SDL_LoadFunction
+}
+
+{
+   Suppress_SDL3
+   Memcheck:Cond
+   obj:/lib/ld-2.7.so
+}
+
+{
+   Suppress_libc
+   Memcheck:Addr8
+   obj:/lib/ld-2.7.so
+}
+
