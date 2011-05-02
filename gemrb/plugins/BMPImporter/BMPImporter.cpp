@@ -285,6 +285,33 @@ Bitmap* BMPImporter::GetBitmap()
 	return data;
 }
 
+Image* BMPImporter::GetImage()
+{
+	Bitmap *data = new Image(Width,Height);
+
+	unsigned char *p = ( unsigned char * ) pixels;
+	switch (BitCount) {
+	case 8:
+		unsigned int y;
+		for (y = 0; y < Height; y++) {
+			for (unsigned int x = 0; x < Width; x++) {
+				data->SetAt(x,y,Palette[p[y*Width + x]%NumColors]);
+			}
+		}
+		break;
+	case 24:
+		for (y = 0; y < Height; y++) {
+			for (unsigned int x = 0; x < Width; x++) {
+				unsigned idx = 3*(y*Width + x);
+				data->SetAt(x,y,Color(p[idx+2],p[idx+1],p[idx+0],0xFF));
+			}
+		}
+		break;
+	}
+
+	return data;
+}
+
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xD768B1, "BMP File Reader")
