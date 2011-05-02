@@ -287,7 +287,7 @@ Bitmap* BMPImporter::GetBitmap()
 
 Image* BMPImporter::GetImage()
 {
-	Bitmap *data = new Image(Width,Height);
+	Image *data = new Image(Width,Height);
 
 	unsigned char *p = ( unsigned char * ) pixels;
 	switch (BitCount) {
@@ -295,7 +295,7 @@ Image* BMPImporter::GetImage()
 		unsigned int y;
 		for (y = 0; y < Height; y++) {
 			for (unsigned int x = 0; x < Width; x++) {
-				data->SetAt(x,y,Palette[p[y*Width + x]%NumColors]);
+				data->SetPixel(x,y,Palette[p[y*Width + x]%NumColors]);
 			}
 		}
 		break;
@@ -303,7 +303,8 @@ Image* BMPImporter::GetImage()
 		for (y = 0; y < Height; y++) {
 			for (unsigned int x = 0; x < Width; x++) {
 				unsigned idx = 3*(y*Width + x);
-				data->SetAt(x,y,Color(p[idx+2],p[idx+1],p[idx+0],0xFF));
+				Color c = {p[idx+2], p[idx+1], p[idx+0], 0xFF};
+				data->SetPixel(x,y,c);
 			}
 		}
 		break;
