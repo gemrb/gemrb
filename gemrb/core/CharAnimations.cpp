@@ -1368,6 +1368,10 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_WALK:
 			strcat( ResRef, "g11" );
 			break;
+
+		case IE_ANI_HIDE:
+			strcat( ResRef, "g22" );
+			break;
 		default:
 			error("CharAnimation", "VHR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			break;
@@ -2000,6 +2004,7 @@ void CharAnimations::AddLRSuffix2( char* ResRef, unsigned char StanceID,
 			Cycle = 32 + Orient / 2;
 			break;
 		case IE_ANI_SLEEP:
+		case IE_ANI_HIDE:
 		case IE_ANI_TWITCH:
 			strcat( ResRef, "g1" );
 			strcpy( EquipData->Suffix, "g1" );
