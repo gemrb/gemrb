@@ -1604,7 +1604,7 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	
 	int count = target->fxqueue.CountEffects(fx_poisoned_state_ref, fx->Parameter1, fx->Parameter2, fx->Resource);
 	if (count > 1) {
-		return FX_NOT_APPLIED;
+		return FX_APPLIED;
 	}
 
 	STATE_SET( STATE_POISONED );
@@ -2562,7 +2562,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	int count = target->fxqueue.CountEffects(fx_diseased_state_ref, fx->Parameter1, fx->Parameter2, fx->Resource);
 	if (count > 1) {
-		return FX_NOT_APPLIED;
+		return FX_APPLIED;
 	}
 
 	//setting damage to 0 because not all types do damage
