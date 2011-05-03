@@ -823,13 +823,25 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned short /*Bu
 	RunEventHandler( TextAreaOnChange );
 }
 
-/** Copies the current TextArea content to another TextArea control */
-void TextArea::CopyTo(TextArea* ta)
+void TextArea::SetText(const std::vector<char*>& text)
 {
-	ta->Clear();
-	for (size_t i = 0; i < lines.size(); i++) {
-		ta->SetText( lines[i], -1 );
+	Clear();
+	for (size_t i = 0; i < text.size(); i++) {
+		int newlen = strlen(text[i]);
+		char* str = (char *) malloc(newlen + 1);
+		memcpy(str, text[i], newlen + 1);
+		lines.push_back(str);
+		lrows.push_back(0);
+		CurPos = newlen;
 	}
+	CurLine = lines.size() - 1;
+	UpdateControls();
+}
+
+/** Copies the current TextArea content to another TextArea control */
+void TextArea::CopyTo(TextArea *ta)
+{
+	ta->SetText(lines);
 }
 
 void TextArea::RedrawTextArea(const char* VariableName, unsigned int Sum)
