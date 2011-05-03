@@ -189,14 +189,22 @@ enum {
 	trigger_walkedtotrigger = 0xd6 // bg2
 };
 
+// flags for TriggerEntry
+enum {
+	// has the effect queue (if any) been processed since this trigger
+	// was added? (for fx_cast_spell_on_condition)
+	TEF_PROCESSED_EFFECTS = 1
+};
+
 struct TriggerEntry {
-	TriggerEntry(unsigned short id) : triggerID(id), param1(0), param2(0) { }
-	TriggerEntry(unsigned short id, ieDword p1) : triggerID(id), param1(p1), param2(0) { }
-	TriggerEntry(unsigned short id, ieDword p1, ieDword p2) : triggerID(id), param1(p1), param2(p2) { }
+	TriggerEntry(unsigned short id) : triggerID(id), param1(0), param2(0), flags(0) { }
+	TriggerEntry(unsigned short id, ieDword p1) : triggerID(id), param1(p1), param2(0), flags(0) { }
+	TriggerEntry(unsigned short id, ieDword p1, ieDword p2) : triggerID(id), param1(p1), param2(p2), flags(0) { }
 
 	unsigned short triggerID;
 	ieDword param1;
 	ieDword param2;
+	unsigned int flags;
 };
 
 //typedef std::list<ieDword *> TriggerObjects;
@@ -209,14 +217,13 @@ public:
 	Scriptable(ScriptableType type);
 	virtual ~Scriptable(void);
 private:
-	std::list<TriggerEntry> triggers;
-
 	unsigned long WaitCounter;
 	// script_timers should probably be a std::map to
 	// conserve memory (usually at most 2 ids are used)
 	ieDword script_timers[MAX_TIMER];
 	ieDword globalID;
 protected: //let Actor access this
+	std::list<TriggerEntry> triggers;
 	Map *area;
 	ieVariable scriptName;
 	ieDword InternalFlags; //for triggers
@@ -333,6 +340,7 @@ public:
 	void AddTrigger(TriggerEntry trigger);
 	bool MatchTrigger(unsigned short id, ieDword param = 0);
 	bool MatchTriggerWithObject(unsigned short id, class Object *obj, ieDword param = 0);
+	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0);
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText(const Region &screen);
 	/* check if casting is allowed at all */

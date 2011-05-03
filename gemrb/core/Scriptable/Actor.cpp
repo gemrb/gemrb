@@ -2237,6 +2237,10 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	//move this further down if needed
 	PrevStats = NULL;
 
+	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
+		m->flags |= TEF_PROCESSED_EFFECTS;
+	}
+
 	// IE_CLASS is >classcount for non-PCs/NPCs
 	if (BaseStats[IE_CLASS] > 0 && BaseStats[IE_CLASS] <= (ieDword)classcount)
 		RefreshPCStats();

@@ -681,6 +681,19 @@ bool Scriptable::MatchTriggerWithObject(unsigned short id, class Object *obj, ie
 	return false;
 }
 
+const TriggerEntry *Scriptable::GetMatchingTrigger(unsigned short id, unsigned int notflags) {
+	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
+		TriggerEntry &trigger = *m;
+		if (trigger.triggerID != id)
+			continue;
+		if (notflags & trigger.flags)
+			continue;
+		return &*m;
+	}
+
+	return NULL;
+}
+
 static EffectRef fx_set_invisible_state_ref = { "State:Invisible", -1 };
 
 void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake)

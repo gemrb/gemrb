@@ -67,6 +67,7 @@
 #define PI_BOUNCE   65
 #define PI_BOUNCE2  67
 
+#define PI_CONTINGENCY 75
 #define PI_BLOODRAGE 76 //iwd2
 #define PI_MAZE     78
 #define PI_PRISON   79
@@ -5311,89 +5312,151 @@ int fx_timestop (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_cast_spell_on_condition (%2d): Target: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	/*
+	 * This is used for Fire Shield, etc, to cast spells when certain
+	 * triggers are true. It is also used for contingencies, which set
+	 * Parameter3 and expect some special processing.
+	 * In the original engine, this constructs a 'contingency list' in the
+	 * target's stats, which is checked in two cases: every 100 ticks
+	 * (for 0x4xxx-type triggers) and every time a trigger is added (for
+	 * other triggers).
+	 * Instead, we handle the first type directly here in the effect
+	 * itself, and the normal type by marking triggers with the flag
+	 * TEF_PROCESSED_EFFECTS after every effect run, so we can tell that
+	 * only triggers without the flag should be checked.
+	 * Conveniently, since contingency versions self-destruct and
+	 * non-contingency versions are only allowed to run once per
+	 * frame, we need only check a single trigger per effect run.
+	 */
 
 	if (fx->FirstApply && fx->Parameter3) {
+		// TODO: display strings
+
 		target->spellbook.HaveSpell( fx->Resource, HS_DEPLETE );
 		target->spellbook.HaveSpell( fx->Resource2, HS_DEPLETE );
 		target->spellbook.HaveSpell( fx->Resource3, HS_DEPLETE );
 		target->spellbook.HaveSpell( fx->Resource4, HS_DEPLETE );
 	}
 
-	//get subject of check
+	if (fx->Parameter3) {
+		target->AddPortraitIcon(PI_CONTINGENCY);
+	}
+
+	// TODO: resist source spell, if any
+
+	// get the actor to cast spells at
 	Actor *actor = NULL;
 	Map *map = target->GetCurrentArea();
-	switch(fx->Parameter1) {
-		//self
-	case 0: actor = target; break;
-		//last attacker
-	case 1: actor = map->GetActorByGlobalID(target->LastHitter); break;
-		//nearest enemy
-		//fix this!
-	//case 2: actor = map->GetActorByGlobalID(target->LastSeen); break;
-	case 2: actor = GetNearestEnemyOf(map, target, 0); break;
-		//nearest creature
-	case 3: actor = map->GetActorByGlobalID(target->LastSeen); break;
+	switch (fx->Parameter1) {
+	case 0:
+		// Myself
+		actor = target;
+		break;
+	case 1:
+		// LastHitter
+		actor = map->GetActorByGlobalID(target->LastHitter);
+		break;
+	case 2:
+		// NearestEnemyOf
+		actor = GetNearestEnemyOf(map, target, 0);
+		break;
+	case 3:
+		// Nearest?
+		actor = map->GetActorByGlobalID(target->LastSeen);
+		break;
 	}
+
 	if (!actor) {
 		return FX_APPLIED;
 	}
-	int condition;
-	//check condition
-	switch(fx->Parameter2) {
-	case COND_GOTHIT: //on hit
-		// FIXME: test this
-		//condition = target->LastDamage;
-		condition = actor->MatchTrigger(trigger_hitby);
+
+	bool condition;
+	bool per_round = true; // 4xxx trigger?
+	const TriggerEntry *entry = NULL;
+
+	// check the condition
+	switch (fx->Parameter2) {
+	case COND_GOTHIT:
+		// HitBy([ANYONE])
+		// TODO: should we ignore this for self-hits in non-contingency mode?
+		entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
+		per_round = false;
 		break;
-	case COND_NEAR: //
-		condition = PersonalDistance(actor, target)<30;
+	case COND_NEAR:
+		// See(NearestEnemyOf())
+		// FIXME
+		condition = PersonalDistance(actor, target) < 30;
 		break;
 	case COND_HP_HALF:
-		condition = actor->GetBase(IE_HITPOINTS)<actor->GetStat(IE_MAXHITPOINTS)/2;
+		// HPPercentLT(Myself, 50)
+		condition = target->GetBase(IE_HITPOINTS) < (target->GetStat(IE_MAXHITPOINTS) / 2);
 		break;
 	case COND_HP_QUART:
-		condition = actor->GetBase(IE_HITPOINTS)<actor->GetStat(IE_MAXHITPOINTS)/4;
+		// HPPercentLT(Myself, 25)
+		condition = target->GetBase(IE_HITPOINTS) < (target->GetStat(IE_MAXHITPOINTS) / 4);
 		break;
 	case COND_HP_LOW:
-		condition = actor->GetBase(IE_HITPOINTS)<actor->GetStat(IE_MAXHITPOINTS)/10;
+		// HPPercentLT(Myself, 10)
+		condition = target->GetBase(IE_HITPOINTS) < (target->GetStat(IE_MAXHITPOINTS) / 10);
 		break;
 	case COND_HELPLESS:
-		condition = actor->GetStat(IE_STATE_ID) & STATE_CANTMOVE;
+		// StateCheck(Myself, STATE_HELPLESS)
+		condition = (bool)(target->GetStat(IE_STATE_ID) & STATE_CANTMOVE);
 		break;
 	case COND_POISONED:
-		condition = actor->GetStat(IE_STATE_ID) & STATE_POISONED;
+		// StateCheck(Myself, STATE_POISONED)
+		condition = (bool)(target->GetStat(IE_STATE_ID) & STATE_POISONED);
 		break;
-	case COND_ATTACKED: // once per round
-		// FIXME: what's this meant to do?
-		condition = actor->LastHitter;
+	case COND_ATTACKED:
+		// AttackedBy([ANYONE])
+		entry = target->GetMatchingTrigger(trigger_attackedby, TEF_PROCESSED_EFFECTS);
+		per_round = false;
 		break;
-	case COND_NEAR4: // closer than 4'
-		condition = PersonalDistance(actor, target)<4;
+	case COND_NEAR4:
+		// PersonalSpaceDistance([ANYONE], 4)
+		// FIXME
+		condition = PersonalDistance(actor, target) < 4;
 		break;
-	case COND_NEAR10: // closer than 10'
-		condition = PersonalDistance(actor, target)<10;
+	case COND_NEAR10:
+		// PersonalSpaceDistance([ANYONE], 10)
+		// FIXME
+		condition = PersonalDistance(target, actor) < 10;
 		break;
 	case COND_EVERYROUND:
-		condition = 1;
+		condition = true;
 		break;
 	case COND_TOOKDAMAGE:
-		// FIXME: test this
-		//condition = actor->LastDamage;
-		condition = actor->MatchTrigger(trigger_tookdamage);
+		// TookDamage()
+		entry = target->GetMatchingTrigger(trigger_tookdamage, TEF_PROCESSED_EFFECTS);
+		per_round = false;
 		break;
 	default:
-		condition = 0;
+		condition = false;
+	}
+
+	if (per_round) {
+		// This is a 4xxx trigger which is only checked every round.
+		if (Owner->AdjustedTicks % core->Time.round_size)
+			condition = false;
+	} else {
+		// This is a normal trigger which gets a single opportunity every frame.
+		condition = (entry != NULL);
 	}
 
 	if (condition) {
+		// The trigger was evaluated as true, cast the spells now.
+		// TODO: fail remaining spells if an earlier one fails?
 		core->ApplySpell(fx->Resource, actor, Owner, fx->Power);
 		core->ApplySpell(fx->Resource2, actor, Owner, fx->Power);
 		core->ApplySpell(fx->Resource3, actor, Owner, fx->Power);
 		core->ApplySpell(fx->Resource4, actor, Owner, fx->Power);
+
 		if (fx->Parameter3) {
+			// Contingencies only run once, remove ourselves.
 			return FX_NOT_APPLIED;
 		}
 	}
+
 	return FX_APPLIED;
 }
 
