@@ -653,7 +653,7 @@ void Map::UpdateScripts()
 	int q=Qcount[PR_SCRIPT];
 
 	Game *game = core->GetGame();
-	bool timestop = game->timestop_end>game->GameTime;
+	bool timestop = game->IsTimestopActive();
 	if (!timestop) {
 		game->timestop_owner = NULL;
 	}

@@ -5119,7 +5119,7 @@ void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& 
 	if (!ca->lockPalette) flags |= BLIT_TINTED;
 	Game* game = core->GetGame();
 	// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
-	if (game->timestop_end > game->GameTime && this != game->timestop_owner && Modified[IE_DISABLETIMESTOP] == 0) {
+	if (game->IsTimestopActive() && this != game->timestop_owner && Modified[IE_DISABLETIMESTOP] == 0) {
 		flags |= BLIT_GREY;
 	}
 

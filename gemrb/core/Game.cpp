@@ -1752,3 +1752,7 @@ ieByte *Game::AllocateMazeData()
 	return mazedata;
 }
 
+bool Game::IsTimestopActive()
+{
+	return timestop_end > GameTime;
+}

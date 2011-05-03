@@ -20,7 +20,7 @@
 
 #include "TileOverlay.h"
 
-#include "Game.h"
+#include "Game.h" // needed only for TILE_GREY below
 #include "GlobalTimer.h"
 #include "Interface.h"
 #include "Video.h"
@@ -87,7 +87,7 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 	int dx = ( vp.x + vp.w + 63 ) / 64;
 	int dy = ( vp.y + vp.h + 63 ) / 64;
 	int flags = 0;
-	if (core->GetGame()->timestop_end > core->GetGame()->GameTime) {
+	if (core->GetGame()->IsTimestopActive()) {
 		flags = TILE_GREY;
 	}
 

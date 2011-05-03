@@ -471,6 +471,8 @@ public:
 	Actor *GetActorByGlobalID(ieDword objectID);
 	/** Allocates maze data */
 	ieByte *AllocateMazeData();
+	/** Checks if any timestop effects are active */
+	bool IsTimestopActive();
 private:
 	bool DetermineStartPosType(const TableMgr *strta);
 	ieResRef *GetDream(Map *area);
