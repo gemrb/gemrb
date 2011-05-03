@@ -71,7 +71,7 @@ public:
 	/** Set the TextArea value to the line number containing the string parameter */
 	void SelectText(const char *select);
 	/** Sets the Actual Text */
-	void SetText(const char* text, int pos = 0);
+	void SetText(const char* text);
 	/** Sets text */
 	void SetText(const std::vector<char*>& text);
 	/** Clears the textarea */

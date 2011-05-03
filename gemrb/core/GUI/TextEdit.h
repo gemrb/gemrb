@@ -63,7 +63,7 @@ public:
 	/** Set BackGround */
 	void SetBackGround(Sprite2D* back);
 	/** Sets the Text of the current control */
-	void SetText(const char* string, int pos = 0);
+	void SetText(const char* string);
 	/** Sets the Text of the current control */
 	const char* QueryText();
 	/** Sets the buffer length */

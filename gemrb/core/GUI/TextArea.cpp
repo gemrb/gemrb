@@ -299,31 +299,23 @@ int TextArea::SetScrollBar(Control* ptr)
 }
 
 /** Sets the Actual Text */
-void TextArea::SetText(const char* text, int pos)
+void TextArea::SetText(const char* text)
 {
-	if (pos==0) {
-		if (!text[0]) {
-			lines.clear();
-			lrows.clear();
-		}
+	if (!text[0]) {
+		lines.clear();
+		lrows.clear();
+	}
 
-		if (lines.size() == 0) {
-			pos = -1;
-		}
-	}
-	if (pos >= ( int ) lines.size()) {
-		return;
-	}
 	int newlen = ( int ) strlen( text );
 
-	if (pos == -1) {
+	if (lines.size() == 0) {
 		char* str = (char *) malloc( newlen + 1 );
 		memcpy( str, text, newlen + 1 );
 		lines.push_back( str );
 		lrows.push_back( 0 );
 	} else {
-		lines[pos] = (char *) realloc( lines[pos], newlen + 1 );
-		memcpy( lines[pos], text, newlen + 1 );
+		lines[0] = (char *) realloc( lines[0], newlen + 1 );
+		memcpy( lines[0], text, newlen + 1 );
 	}
 	CurPos = newlen;
 	CurLine = lines.size()-1;

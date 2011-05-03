@@ -186,7 +186,7 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 }
 
 /** Sets the Text of the current control */
-void TextEdit::SetText(const char* string, int /*pos*/)
+void TextEdit::SetText(const char* string)
 {
 	strncpy( ( char * ) Buffer, string, max );
 	Buffer[max]=0;

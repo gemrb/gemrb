@@ -94,7 +94,7 @@ void Console::SetBackGround(Sprite2D* back)
 	Back = back;
 }
 /** Sets the Text of the current control */
-void Console::SetText(const char* string, int /*pos*/)
+void Console::SetText(const char* string)
 {
 	strncpy( ( char * ) Buffer, string, max );
 }

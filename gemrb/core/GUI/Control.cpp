@@ -97,7 +97,7 @@ void Control::ResetEventHandler(EventHandler handler)
 	handler = NULL;
 }
 
-void Control::SetText(const char* /*string*/, int /*pos*/)
+void Control::SetText(const char* /*string*/)
 {
 }
 

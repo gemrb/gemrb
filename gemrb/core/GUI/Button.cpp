@@ -575,7 +575,7 @@ void Button::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 
 
 /** Sets the Text of the current control */
-void Button::SetText(const char* string, int /*pos*/)
+void Button::SetText(const char* string)
 {
 	free(Text);
 	Text = NULL;
