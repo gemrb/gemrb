@@ -73,7 +73,7 @@ void Label::Draw(unsigned short x, unsigned short y)
 
 }
 /** This function sets the actual Label Text */
-int Label::SetText(const char* string, int /*pos*/)
+void Label::SetText(const char* string, int /*pos*/)
 {
 	if (Buffer )
 		free( Buffer );
@@ -97,7 +97,6 @@ int Label::SetText(const char* string, int /*pos*/)
 	if (Owner) {
 		Owner->Invalidate();
 	}
-	return 0;
 }
 /** Sets the Foreground Font Color */
 void Label::SetColor(Color col, Color bac)

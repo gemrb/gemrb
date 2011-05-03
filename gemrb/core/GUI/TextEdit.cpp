@@ -186,7 +186,7 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 }
 
 /** Sets the Text of the current control */
-int TextEdit::SetText(const char* string, int /*pos*/)
+void TextEdit::SetText(const char* string, int /*pos*/)
 {
 	strncpy( ( char * ) Buffer, string, max );
 	Buffer[max]=0;
@@ -194,7 +194,6 @@ int TextEdit::SetText(const char* string, int /*pos*/)
 	if (Owner) {
 		Owner->Invalidate();
 	}
-	return 0;
 }
 
 void TextEdit::SetBufferLength(ieWord buflen)

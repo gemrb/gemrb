@@ -1398,7 +1398,6 @@ static PyObject* GemRB_Control_SetText(PyObject * /*self*/, PyObject* args)
 	PyObject* wi, * ci, * str;
 	long WindowIndex, ControlIndex, StrRef;
 	char* string;
-	int ret;
 
 	if (!PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str )) {
 		return AttributeError( GemRB_Control_SetText__doc );
@@ -1423,21 +1422,15 @@ static PyObject* GemRB_Control_SetText(PyObject * /*self*/, PyObject* args)
 		if (string == NULL) {
 			return RuntimeError("Null string received");
 		}
-		ret = ctrl->SetText(string);
-		if (ret == -1) {
-			return RuntimeError("Cannot set text");
-		}
+		ctrl->SetText(string);
 	} else {
 		StrRef = PyInt_AsLong( str );
 		if (StrRef == -1) {
-			ret = ctrl->SetText(GEMRB_STRING);
+			ctrl->SetText(GEMRB_STRING);
 		} else {
 			char *tmpstr = core->GetString( StrRef );
-			ret = ctrl->SetText(tmpstr);
+			ctrl->SetText(tmpstr);
 			core->FreeString( tmpstr );
-		}
-		if (ret == -1) {
-			return RuntimeError("Cannot set text");
 		}
 	}
 	Py_INCREF(Py_None);

@@ -299,7 +299,7 @@ int TextArea::SetScrollBar(Control* ptr)
 }
 
 /** Sets the Actual Text */
-int TextArea::SetText(const char* text, int pos)
+void TextArea::SetText(const char* text, int pos)
 {
 	if (pos==0) {
 		if (!text[0]) {
@@ -312,7 +312,7 @@ int TextArea::SetText(const char* text, int pos)
 		}
 	}
 	if (pos >= ( int ) lines.size()) {
-		return -1;
+		return;
 	}
 	int newlen = ( int ) strlen( text );
 
@@ -328,7 +328,6 @@ int TextArea::SetText(const char* text, int pos)
 	CurPos = newlen;
 	CurLine = lines.size()-1;
 	UpdateControls();
-	return 0;
 }
 
 void TextArea::SetMinRow(bool enable)

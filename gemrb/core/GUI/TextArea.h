@@ -71,7 +71,7 @@ public:
 	/** Set the TextArea value to the line number containing the string parameter */
 	void SelectText(const char *select);
 	/** Sets the Actual Text */
-	int SetText(const char* text, int pos = 0);
+	void SetText(const char* text, int pos = 0);
 	/** Clears the textarea */
 	void Clear();
 	/** Discards scrolled out lines from the textarea */
