@@ -265,12 +265,6 @@ void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 	}
 }
 
-/** Sets the Text of the current control */
-int ScrollBar::SetText(const char* /*string*/, int /*pos*/)
-{
-	return 0;
-}
-
 /** Sets the Maximum Value of the ScrollBar */
 void ScrollBar::SetMax(unsigned short Max)
 {

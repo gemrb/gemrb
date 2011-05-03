@@ -67,7 +67,7 @@ public:
 	/** Draws the Control on the Output Display */
 	virtual void Draw(unsigned short x, unsigned short y) = 0;
 	/** Sets the Text of the current control */
-	virtual int SetText(const char* string, int pos = 0) = 0;
+	virtual int SetText(const char* string, int pos = 0);
 	/** Sets the Tooltip text of the current control */
 	int SetTooltip(const char* string);
 	/** Displays the tooltip text, Worldmap handles this differently */

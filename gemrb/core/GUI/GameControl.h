@@ -96,8 +96,6 @@ public:
 public:
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
-	/** Sets the Text of the current control */
-	int SetText(const char* string, int pos = 0);
 	/** Sets multiple quicksaves flag*/
 	static void MultipleQuickSaves(int arg);
 	void SetTracker(Actor *actor, ieDword dist);
