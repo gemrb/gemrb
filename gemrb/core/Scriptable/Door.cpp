@@ -105,23 +105,23 @@ void Door::UpdateDoor()
 	Pos.x = outline->BBox.x + outline->BBox.w/2;
 	Pos.y = outline->BBox.y + outline->BBox.h/2;
 
-	unsigned char oval, cval;
-	oval = PATH_MAP_IMPASSABLE;
+	unsigned char pmdflags;
+
 	if (Flags & DOOR_TRANSPARENT) {
-		cval = PATH_MAP_DOOR_IMPASSABLE;
+		pmdflags = PATH_MAP_DOOR_IMPASSABLE;
 	}
 	else {
 		//both door flags are needed here, one for transparency the other
 		//is for passability
-		cval = PATH_MAP_DOOR_OPAQUE|PATH_MAP_DOOR_IMPASSABLE;
+		pmdflags = PATH_MAP_DOOR_OPAQUE|PATH_MAP_DOOR_IMPASSABLE;
 	}
 	if (Flags &DOOR_OPEN) {
 		ImpedeBlocks(cibcount, closed_ib, 0);
-		ImpedeBlocks(oibcount, open_ib, cval);
+		ImpedeBlocks(oibcount, open_ib, pmdflags);
 	}
 	else {
 		ImpedeBlocks(oibcount, open_ib, 0);
-		ImpedeBlocks(cibcount, closed_ib, cval);
+		ImpedeBlocks(cibcount, closed_ib, pmdflags);
 	}
 
 	InfoPoint *ip = area->TMap->GetInfoPoint(LinkedInfo);
