@@ -1550,7 +1550,6 @@ void Game::Infravision()
 //returns the colour which should be applied onto the whole game area viewport
 //this is based on timestop, dream area, weather, daytime
 
-static const Color TimeStopTint={0xe0,0xe0,0xe0,0x20}; //greyscale
 static const Color DreamTint={0xf0,0xe0,0xd0,0x10};    //light brown scale
 static const Color NightTint={0x80,0x80,0xe0,0x40};    //dark, bluish
 static const Color DuskTint={0xe0,0x80,0x80,0x40};     //dark, reddish
@@ -1559,9 +1558,6 @@ static const Color DarkTint={0x80,0x80,0xe0,0x10};     //slightly dark bluish
 
 const Color *Game::GetGlobalTint() const
 {
-	if (timestop_end>GameTime) {
-		return &TimeStopTint;
-	}
 	Map *map = GetCurrentArea();
 	if (!map) return NULL;
 	if (map->AreaFlags&AF_DREAM) {
