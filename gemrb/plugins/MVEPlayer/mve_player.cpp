@@ -297,8 +297,10 @@ void MVEPlayer::segment_create_timer() {
 void MVEPlayer::segment_video_init(unsigned char version) {
 	unsigned short width = GST_READ_UINT16_LE(buffer) << 3;
 	unsigned short height = GST_READ_UINT16_LE(buffer + 2) << 3;
+/* count is unused
 	unsigned short count = 1;
 	if (version > 0) count = GST_READ_UINT16_LE(buffer + 4);
+*/
 	unsigned short temp = 0;
 	if (version > 1) temp = GST_READ_UINT16_LE(buffer + 6);
 	truecolour = !!temp;
@@ -339,7 +341,9 @@ void MVEPlayer::segment_video_palette() {
 	host->setPalette((unsigned char *)palette - (3 * palette_start), palette_start, palette_count);
 }
 
+//appears to be unused
 void MVEPlayer::segment_video_compressedpalette() {
+#if 0
 	char *data = buffer;
 
 	unsigned int i, j;
@@ -360,6 +364,7 @@ void MVEPlayer::segment_video_compressedpalette() {
 			}
 		}
 	}
+#endif
 }
 
 void MVEPlayer::segment_video_codemap(unsigned short size) {
