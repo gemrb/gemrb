@@ -3409,18 +3409,18 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
+
 	actor->CurrentActionInterruptable = false;
-	if (Sender->CurrentActionState == 0) {
-		// TODO: what if parameter is 0? see orphan2
+	if (!Sender->CurrentActionTicks && parameters->int0Parameter) {
+		// set countdown on first run
 		Sender->CurrentActionState = parameters->int0Parameter;
 		actor->SetStance( IE_ANI_DIE );
-	} else {
-		actor->CurrentActionState--;
-		if (Sender->CurrentActionState == 0) {
-			actor->SetStance( IE_ANI_GET_UP );
-			Sender->ReleaseCurrentAction();
-		}
 	}
+	if (Sender->CurrentActionState <= 0) {
+		actor->SetStance( IE_ANI_GET_UP );
+		Sender->ReleaseCurrentAction();
+	}
+	actor->CurrentActionState--;
 }
 
 void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
@@ -3430,17 +3430,17 @@ void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	if (Sender->CurrentActionState == 0) {
-		// TODO: what if parameter is 0? see orphan2
+
+	if (!Sender->CurrentActionTicks && parameters->int0Parameter) {
+		// set countdown on first run
 		Sender->CurrentActionState = parameters->int0Parameter;
 		actor->SetStance( IE_ANI_DIE );
-	} else {
-		actor->CurrentActionState--;
-		if (Sender->CurrentActionState == 0) {
-			actor->SetStance( IE_ANI_GET_UP );
-			Sender->ReleaseCurrentAction();
-		}
 	}
+	if (Sender->CurrentActionState <= 0) {
+		actor->SetStance( IE_ANI_GET_UP );
+		Sender->ReleaseCurrentAction();
+	}
+	actor->CurrentActionState--;
 }
 
 /* this may not be correct, just a placeholder you can fix */
