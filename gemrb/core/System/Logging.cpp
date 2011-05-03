@@ -163,7 +163,7 @@ void printBracket(const char* status, log_color color)
 
 void printStatus(const char* status, log_color color)
 {
-	__android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s]", status)
+	__android_log_print(ANDROID_LOG_INFO, "GemRB", "[%s]", status);
 }
 
 void printMessage(const char* owner, const char* message, log_color color, ...)

@@ -30,6 +30,10 @@
 #include "ScriptEngine.h"
 #include "Video.h"
 
+#ifdef ANDROID
+#include "Variables.h"
+#endif
+
 #include <cstdio>
 #include <cstring>
 
