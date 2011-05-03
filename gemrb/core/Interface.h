@@ -756,7 +756,7 @@ public:
 	/** returns true if the game is paused */
 	bool IsFreezed();
 	/** Draws the Visible windows in the Windows Array */
-	void DrawWindows(void);
+	void DrawWindows(bool allow_delete = false);
 	/** Sends a termination signal to the Video Driver */
 	bool Quit(void);
 	/** CheatKey support */

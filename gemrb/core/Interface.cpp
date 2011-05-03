@@ -1125,7 +1125,7 @@ void Interface::Main()
 		HandleGUIBehaviour();
 
 		GameLoop();
-		DrawWindows();
+		DrawWindows(true);
 		if (DrawFPS) {
 			frame++;
 			time = GetTickCount();
@@ -3298,7 +3298,7 @@ void Interface::HandleGUIBehaviour(void)
 	}
 }
 
-void Interface::DrawWindows(void)
+void Interface::DrawWindows(bool allow_delete)
 {
 	//here comes the REAL drawing of windows
 	if (ModalWindow) {
@@ -3316,10 +3316,12 @@ void Interface::DrawWindows(void)
 		Window* win = windows[t];
 		if (win != NULL) {
 			if (win->Visible == WINDOW_INVALID) {
-				topwin.erase(topwin.begin()+i);
-				evntmgr->DelWindow( win );
-				delete win;
-				windows[t]=NULL;
+				if (allow_delete) {
+					topwin.erase(topwin.begin()+i);
+					evntmgr->DelWindow( win );
+					delete win;
+					windows[t]=NULL;
+				}
 			} else if (win->Visible) {
 				win->DrawWindow();
 			}
