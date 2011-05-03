@@ -435,8 +435,6 @@ public:
 	int GetControl(unsigned short WindowIndex, unsigned long ControlID) const;
 	/** Adjust the scrolling of the control (if applicable) */
 	int AdjustScrolling(unsigned short WindowIndex, unsigned short ControlIndex, short x, short y);
-	/** Set the Text of a Control */
-	int SetText(unsigned short WindowIndex, unsigned short ControlIndex, const char * string);
 	/** Set the Tooltip text of a Control */
 	int SetTooltip(unsigned short WindowIndex, unsigned short ControlIndex, const char * string);
 	/** sets tooltip to be displayed */

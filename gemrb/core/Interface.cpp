@@ -3037,23 +3037,6 @@ int Interface::AdjustScrolling(unsigned short WindowIndex,
 	return 0;
 }
 
-/** Set the Text of a Control */
-int Interface::SetText(unsigned short WindowIndex,
-		unsigned short ControlIndex, const char* string)
-{
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
-	if (win == NULL) {
-		return -1;
-	}
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return -1;
-	}
-	return ctrl->SetText( string );
-}
 /** Set the Tooltip text of a Control */
 int Interface::SetTooltip(unsigned short WindowIndex,
 		unsigned short ControlIndex, const char* string)
