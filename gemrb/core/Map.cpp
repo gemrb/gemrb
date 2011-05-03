@@ -1071,7 +1071,6 @@ void Map::DrawMap(Region screen)
 		DrawHighlightables( screen );
 	}
 
-	Region vp = video->GetViewport();
 	//if it is only here, then the scripting will fail?
 	GenerateQueues();
 	SortQueues();

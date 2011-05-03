@@ -1980,14 +1980,14 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	}
 	Response* rE = new Response();
 	rE->weight = 0;
-	int count = stream->ReadLine( line, 1024 );
+	stream->ReadLine( line, 1024 );
 	char *poi;
 	rE->weight = (unsigned char)strtoul(line,&poi,10);
 	if (strncmp(poi,"AC",2)==0)
 	while (true) {
 		//not autofreed, because it is referenced by the Script
 		Action* aC = new Action(false);
-		count = stream->ReadLine( line, 1024 );
+		stream->ReadLine( line, 1024 );
 		aC->actionID = (unsigned short)strtoul(line, NULL,10);
 		for (int i = 0; i < 3; i++) {
 			stream->ReadLine( line, 1024 );
