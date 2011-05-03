@@ -438,7 +438,7 @@ static EffectDesc effectnames[] = {
 	{ "AlwaysBackstab", fx_always_backstab_modifier, 0, -1 },
 	{ "AnimationIDModifier", fx_animation_id_modifier, 0, -1 },
 	{ "AnimationStateChange", fx_animation_stance, 0, -1 },
-	{ "ApplyEffect", fx_apply_effect, 0, -1 },
+	{ "ApplyEffect", fx_apply_effect, EFFECT_NO_ACTOR, -1 },
 	{ "ApplyEffectCurse", fx_apply_effect_curse, 0, -1 },
 	{ "ApplyEffectItem", fx_apply_effect_item, 0, -1 },
 	{ "ApplyEffectItemType", fx_apply_effect_item_type, 0, -1 },
@@ -4473,37 +4473,44 @@ int fx_hold_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xb0 see: fx_movement_modifier
 
 //0xb1 ApplyEffect
-int fx_apply_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_apply_effect (%2d) %s", fx->Opcode, fx->Resource );
 
 	//this effect executes a file effect in place of this effect
 	//the file effect inherits the target and the timingmode, but gets
 	//a new chance to roll percents
-	int ret = FX_NOT_APPLIED;
-	if (!target) {
-		return ret;
+	if (target && !EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
+		return FX_NOT_APPLIED;
 	}
-	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
-		Point p(fx->PosX, fx->PosY);
 
-		//apply effect, if the effect is a goner, then kill
-		//this effect too
-		Effect *newfx = core->GetEffect(fx->Resource, fx->Power, p);
-		if (newfx) {
-			Effect *myfx = new Effect;
-			memcpy(myfx, newfx, sizeof(Effect));
-			myfx->random_value = core->Roll(1,100,-1);
-			myfx->Target = FX_TARGET_PRESET;
-			myfx->TimingMode = fx->TimingMode;
-			myfx->Duration = fx->Duration;
-			myfx->CasterID = fx->CasterID;
-			ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !fx->Parameter3);
-			fx->Parameter3 = 1;
-			delete myfx;
-		}
-		//newfx is a borrowed reference don't delete it
+	Point p(fx->PosX, fx->PosY);
+
+	//apply effect, if the effect is a goner, then kill
+	//this effect too
+	Effect *newfx = core->GetEffect(fx->Resource, fx->Power, p);
+	if (!newfx)
+		return FX_NOT_APPLIED;
+
+	Effect *myfx = new Effect;
+	memcpy(myfx, newfx, sizeof(Effect));
+	myfx->random_value = core->Roll(1,100,-1);
+	myfx->Target = FX_TARGET_PRESET;
+	myfx->TimingMode = fx->TimingMode;
+	myfx->Duration = fx->Duration;
+	myfx->CasterID = fx->CasterID;
+
+	int ret;
+	if (target) {
+		ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !fx->Parameter3);
+	} else {
+		EffectQueue fxqueue;
+		fxqueue.SetOwner(Owner);
+		ret = fxqueue.ApplyEffect(NULL, myfx, fx->FirstApply, !fx->Parameter3);
 	}
+
+	fx->Parameter3 = 1;
+	delete myfx;
 	return ret;
 }
 
