@@ -302,8 +302,7 @@ int TextArea::SetScrollBar(Control* ptr)
 void TextArea::SetText(const char* text)
 {
 	if (!text[0]) {
-		lines.clear();
-		lrows.clear();
+		Clear();
 	}
 
 	int newlen = ( int ) strlen( text );
