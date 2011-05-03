@@ -1014,7 +1014,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 	}
 
-	int ret;
+	bool ret;
 
 	if (Dialog[0]) {
 		//increasing NumTimesTalkedTo or NumTimesInteracted
@@ -1028,12 +1028,12 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		ret = gc->dialoghandler->InitDialog( scr, tar, Dialog);
 	}
 	else {
-		ret = -1;
+		ret = false;
 	}
 
 	Sender->ReleaseCurrentAction();
 
-	if (ret<0) {
+	if (!ret) {
 		if (Flags & BD_NOEMPTY) {
 			return;
 		}
