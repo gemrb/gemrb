@@ -628,7 +628,7 @@ void Map::UpdateScripts()
 	}
 
 	// fuzzie added this check because some area scripts (eg, AR1600 when
-	// escaping Brynnlaw) were executing after they were meant to be done, 
+	// escaping Brynnlaw) were executing after they were meant to be done,
 	// and this seems the nicest way of handling that for now - it's quite
 	// possibly wrong (so if you have problems, revert this and find
 	// another way)
@@ -638,7 +638,7 @@ void Map::UpdateScripts()
 		//ExecuteScript( MAX_SCRIPTS );
 		Update();
 	}
-	
+
 	//Execute Pending Actions
 	//if it is only here, then the drawing will fail
 	ProcessActions();
@@ -850,7 +850,7 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
 			memcpy(sound, terrainsounds[i].Sounds[type], sizeof(ieResRef) );
 			return;
 		}
-	}  
+	}
 }
 
 bool Map::DoStepForActor(Actor *actor, int speed, ieDword time) {
@@ -1057,7 +1057,15 @@ void Map::DrawMap(Region screen)
 	}
 
 	if (!bgoverride) {
-		int rain;
+		int rain, flags;
+
+		if (game->IsTimestopActive()) {
+                	flags = TILE_GREY;
+	        }
+		else if (AreaFlags&AF_DREAM) {
+			flags = TILE_SEPIA;
+		} else flags = 0;
+
 		if (HasWeather()) {
 			//zero when the weather particles are all gone
 			rain = game->weather->GetPhase()-P_EMPTY;
@@ -1065,7 +1073,7 @@ void Map::DrawMap(Region screen)
 			rain = 0;
 		}
 
-		TMap->DrawOverlays( screen, rain );
+		TMap->DrawOverlays( screen, rain, flags );
 
 		//Draw Outlines
 		DrawHighlightables( screen );
@@ -1248,11 +1256,10 @@ void Map::AddAnimation(AreaAnimation* panim)
 	anim->InitAnimation();
 
 	aniIterator iter;
-	
+
 	int Height = anim->GetHeight();
-print("Adding %s at height %d, Pos: %d.%d\n", anim->Name, Height, anim->Pos.x, anim->Pos.y);
 	for(iter=animations.begin(); (iter!=animations.end()) && ((*iter)->GetHeight()<Height); iter++) ;
-	animations.insert(iter, anim);	
+	animations.insert(iter, anim);
 }
 
 //reapplying all of the effects on the actors of this map

@@ -20,7 +20,7 @@
 
 #include "TileOverlay.h"
 
-#include "Game.h" // needed only for TILE_GREY below
+//#include "Game.h" // needed only for TILE_GREY below
 #include "GlobalTimer.h"
 #include "Interface.h"
 #include "Video.h"
@@ -74,7 +74,7 @@ void TileOverlay::BumpViewport(const Region &viewport, Region &vp)
 	}
 }
 
-void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
+void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays, int flags)
 {
 	Video* vid = core->GetVideoDriver();
 	Region vp = vid->GetViewport();
@@ -86,10 +86,6 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 	int sy = vp.y / 64;
 	int dx = ( vp.x + vp.w + 63 ) / 64;
 	int dy = ( vp.y + vp.h + 63 ) / 64;
-	int flags = 0;
-	if (core->GetGame()->IsTimestopActive()) {
-		flags = TILE_GREY;
-	}
 
 	for (int y = sy; y < dy && y < h; y++) {
 		for (int x = sx; x < dx && x < w; x++) {
