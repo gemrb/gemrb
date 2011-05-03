@@ -1398,7 +1398,6 @@ static PyObject* GemRB_Control_SetText(PyObject * /*self*/, PyObject* args)
 	PyObject* wi, * ci, * str;
 	long WindowIndex, ControlIndex, StrRef;
 	char* string;
-	int ret;
 
 	if (!PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str )) {
 		return AttributeError( GemRB_Control_SetText__doc );
@@ -1413,29 +1412,29 @@ static PyObject* GemRB_Control_SetText(PyObject * /*self*/, PyObject* args)
 
 	WindowIndex = PyInt_AsLong( wi );
 	ControlIndex = PyInt_AsLong( ci );
+	Control *ctrl = GetControl(WindowIndex, ControlIndex, -1);
+	if (!ctrl) {
+		return RuntimeError("Invalid Control");
+	}
+
 	if (PyObject_TypeCheck( str, &PyString_Type )) {
 		string = PyString_AsString( str );
 		if (string == NULL) {
 			return RuntimeError("Null string received");
 		}
-		ret = core->SetText( (ieWord) WindowIndex, (ieWord) ControlIndex, string );
-		if (ret == -1) {
-			return RuntimeError("Cannot set text");
-		}
+		ctrl->SetText(string);
 	} else {
 		StrRef = PyInt_AsLong( str );
 		if (StrRef == -1) {
-			ret = core->SetText( (ieWord) WindowIndex, (ieWord) ControlIndex, GEMRB_STRING );
+			ctrl->SetText(GEMRB_STRING);
 		} else {
 			char *tmpstr = core->GetString( StrRef );
-			ret = core->SetText( (ieWord) WindowIndex, (ieWord) ControlIndex, tmpstr );
+			ctrl->SetText(tmpstr);
 			core->FreeString( tmpstr );
 		}
-		if (ret == -1) {
-			return RuntimeError("Cannot set text");
-		}
 	}
-	return PyInt_FromLong( ret );
+	Py_INCREF(Py_None);
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_TextArea_Append__doc,

@@ -299,36 +299,26 @@ int TextArea::SetScrollBar(Control* ptr)
 }
 
 /** Sets the Actual Text */
-int TextArea::SetText(const char* text, int pos)
+void TextArea::SetText(const char* text)
 {
-	if (pos==0) {
-		if (!text[0]) {
-			lines.clear();
-			lrows.clear();
-		}
+	if (!text[0]) {
+		Clear();
+	}
 
-		if (lines.size() == 0) {
-			pos = -1;
-		}
-	}
-	if (pos >= ( int ) lines.size()) {
-		return -1;
-	}
 	int newlen = ( int ) strlen( text );
 
-	if (pos == -1) {
+	if (lines.size() == 0) {
 		char* str = (char *) malloc( newlen + 1 );
 		memcpy( str, text, newlen + 1 );
 		lines.push_back( str );
 		lrows.push_back( 0 );
 	} else {
-		lines[pos] = (char *) realloc( lines[pos], newlen + 1 );
-		memcpy( lines[pos], text, newlen + 1 );
+		lines[0] = (char *) realloc( lines[0], newlen + 1 );
+		memcpy( lines[0], text, newlen + 1 );
 	}
 	CurPos = newlen;
 	CurLine = lines.size()-1;
 	UpdateControls();
-	return 0;
 }
 
 void TextArea::SetMinRow(bool enable)
@@ -824,13 +814,25 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned short /*Bu
 	RunEventHandler( TextAreaOnChange );
 }
 
-/** Copies the current TextArea content to another TextArea control */
-void TextArea::CopyTo(TextArea* ta)
+void TextArea::SetText(const std::vector<char*>& text)
 {
-	ta->Clear();
-	for (size_t i = 0; i < lines.size(); i++) {
-		ta->SetText( lines[i], -1 );
+	Clear();
+	for (size_t i = 0; i < text.size(); i++) {
+		int newlen = strlen(text[i]);
+		char* str = (char *) malloc(newlen + 1);
+		memcpy(str, text[i], newlen + 1);
+		lines.push_back(str);
+		lrows.push_back(0);
+		CurPos = newlen;
 	}
+	CurLine = lines.size() - 1;
+	UpdateControls();
+}
+
+/** Copies the current TextArea content to another TextArea control */
+void TextArea::CopyTo(TextArea *ta)
+{
+	ta->SetText(lines);
 }
 
 void TextArea::RedrawTextArea(const char* VariableName, unsigned int Sum)

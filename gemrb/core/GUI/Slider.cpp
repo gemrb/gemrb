@@ -274,12 +274,6 @@ void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
 	}
 }
 
-/** Sets the Text of the current control */
-int Slider::SetText(const char* /*string*/, int /*pos*/)
-{
-	return 0;
-}
-
 /** Sets the slider change event */
 bool Slider::SetEvent(int eventType, EventHandler handler)
 {

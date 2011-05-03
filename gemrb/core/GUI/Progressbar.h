@@ -60,8 +60,6 @@ public:
 	void SetBarCap(Sprite2D *img3);
 	/** Sets the mos coordinates for the progressbar filler mos/cap */
 	void SetSliderPos(int x, int y, int x2, int y2);
-	/** Dummy function */
-	int SetText(const char * string, int pos = 0);
 	/** Redraws a progressbar which is associated with VariableName */
 	void RedrawProgressbar(const char *VariableName, int Sum);
 	/** Set handler for specified event */

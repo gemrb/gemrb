@@ -59,7 +59,7 @@ DialogHandler::~DialogHandler(void)
 }
 
 //Try to start dialogue between two actors (one of them could be inanimate)
-int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref)
+bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref)
 {
 	if (dlg) {
 		delete dlg;
@@ -72,7 +72,7 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 
 	if (!dlg) {
 		printMessage("GameControl", "Cannot start dialog: %s\n", LIGHT_RED, dlgref);
-		return -1;
+		return false;
 	}
 
 	strnlwrcpy(dlg->ResRef, dlgref, 8); //this isn't handled by GetDialog???
@@ -97,16 +97,16 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 	GameControl *gc = core->GetGameControl();
 
 	if (!gc)
-		return -1;
+		return false;
 
 	//check if we are already in dialog
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
-		return 0;
+		return true;
 	}
 
 	int si = dlg->FindFirstState( tgt );
 	if (si < 0) {
-		return -1;
+		return false;
 	}
 
 	//we need GUI for dialogs
@@ -137,7 +137,7 @@ int DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgr
 	//core->GetGame()->SetControlStatus(CS_HIDEGUI, BM_NAND);
 	//core->GetGame()->SetControlStatus(CS_DIALOG, BM_OR);
 	//core->SetEventFlag(EF_PORTRAIT);
-	return 0;
+	return true;
 }
 
 /*try to break will only try to break it, false means unconditional stop*/
@@ -359,8 +359,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 				EndDialog();
 				return;
 			}*/
-			int ret = InitDialog( speaker, target, tmpresref);
-			if (ret<0) {
+			if (!InitDialog( speaker, target, tmpresref)) {
 				// error was displayed by InitDialog
 				ta->SetMinRow( false );
 				EndDialog();

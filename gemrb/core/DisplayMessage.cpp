@@ -62,7 +62,7 @@ void DisplayMessage::DisplayString(const char* Text, Scriptable *target) const
 {
 	Label *l = core->GetMessageLabel();
 	if (l) {
-		l->SetText(Text, 0);
+		l->SetText(Text);
 	}
 	TextArea *ta = core->GetMessageTextArea();
 	if (ta) {

@@ -615,12 +615,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 #endif
 }
 
-/** inherited from Control, GameControl doesn't need it */
-int GameControl::SetText(const char* /*string*/, int /*pos*/)
-{
-	return 0;
-}
-
 /** Key Press Event */
 void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {

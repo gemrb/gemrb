@@ -43,7 +43,7 @@ public:
 	Scriptable *GetTarget();
 	Actor *GetSpeaker();
 
-	int InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);
+	bool InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);
 };

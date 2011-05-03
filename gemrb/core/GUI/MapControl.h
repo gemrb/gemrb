@@ -79,8 +79,6 @@ public:
 	void DrawFog(unsigned short XWin, unsigned short YWin);
 	/** Compute parameters after changes in control's or screen geometry */
 	void Realize();
-	/** Sets the Text of the current control */
-	int SetText(const char* /*string*/, int /*pos*/) { return 0; }
 
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
