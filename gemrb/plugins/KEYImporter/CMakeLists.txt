@@ -1,1 +1,1 @@
-ADD_GEMRB_PLUGIN (KEYImporter KEYImporter.cpp Dictionary.cpp)
+ADD_GEMRB_PLUGIN (KEYImporter KEYImporter.cpp)
