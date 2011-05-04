@@ -63,7 +63,7 @@ bool EFFImporter::Open(DataStream* stream, bool autoFree)
 //if level>than maximum affected or level<than minimum affected, then the
 //effect is resisted
 // copy the info into the EFFV2 fields (separate), so it is clearer
-inline static void fixAffectedLevels(Effect *fx) {
+static inline void fixAffectedLevels(Effect *fx) {
 	if (fx->DiceSides > 0 || fx->DiceThrown > 0) {
 		fx->MinAffectedLevel = fx->DiceThrown;
 		fx->MaxAffectedLevel = fx->DiceSides;

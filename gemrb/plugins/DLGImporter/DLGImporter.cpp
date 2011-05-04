@@ -160,7 +160,7 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 
 static char** GetStrings(char* string, unsigned int& count);
 
-Condition* GetCondition(char* string)
+static Condition* GetCondition(char* string)
 {
 	unsigned int count;
 	char **lines = GetStrings( string, count );
@@ -252,7 +252,7 @@ std::vector<Action*> DLGImporter::GetAction(unsigned int index) const
 	return actions;
 }
 
-int GetActionLength(const char* string)
+static int GetActionLength(const char* string)
 {
 	int i;
 	int level = 0;
@@ -297,7 +297,7 @@ int GetActionLength(const char* string)
      pst's FORGE.DLG (trigger split across two lines),
      bg2's SAHIMP02.DLG (missing quotemark in string),
      bg2's QUAYLE.DLG (missing closing bracket) */
-char** GetStrings(char* string, unsigned int& count)
+static char** GetStrings(char* string, unsigned int& count)
 {
 	int col = 0;
 	int level = 0;

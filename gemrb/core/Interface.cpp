@@ -273,7 +273,7 @@ static void ReleaseItemList(void *poi)
 	delete ((ItemList *) poi);
 }
 
-void FreeAbilityTables()
+static void FreeAbilityTables()
 {
 	if (strmod) {
 		free(strmod);
@@ -662,7 +662,7 @@ void Interface::HandleFlags()
 	}
 }
 
-bool GenerateAbilityTables()
+static bool GenerateAbilityTables()
 {
 	FreeAbilityTables();
 

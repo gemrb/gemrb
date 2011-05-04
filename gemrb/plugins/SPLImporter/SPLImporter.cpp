@@ -30,7 +30,7 @@ int *cgsounds = NULL;
 int cgcount = -1;
 
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
-void Initializer()
+static void Initializer()
 {
 	if (cgsounds) {
 		free(cgsounds);
@@ -50,14 +50,14 @@ void Initializer()
 	}
 }
 
-void ReleaseMemorySPL()
+static void ReleaseMemorySPL()
 {
 	free(cgsounds);
 	cgsounds = NULL;
 	cgcount = -1;
 }
 
-int GetCGSound(ieDword CastingGraphics)
+static int GetCGSound(ieDword CastingGraphics)
 {
 	if (cgcount<0) {
 		Initializer();

@@ -151,7 +151,7 @@ Game::~Game(void)
 	}
 }
 
-bool IsAlive(Actor *pc)
+static bool IsAlive(Actor *pc)
 {
 	if (pc->GetStat(IE_STATE_ID)&STATE_DEAD) {
 		return false;

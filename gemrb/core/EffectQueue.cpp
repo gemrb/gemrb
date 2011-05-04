@@ -98,7 +98,7 @@ bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 
 static const bool fx_instant[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,true};
 
-inline bool IsInstant(ieByte timingmode)
+static inline bool IsInstant(ieByte timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return false;
 	return fx_instant[timingmode];
@@ -106,7 +106,7 @@ inline bool IsInstant(ieByte timingmode)
 
 static const bool fx_equipped[MAX_TIMING_MODE]={false,false,true,false,false,true,false,false,true,false,false};
 
-inline bool IsEquipped(ieByte timingmode)
+static inline bool IsEquipped(ieByte timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return false;
 	return fx_equipped[timingmode];
@@ -115,7 +115,7 @@ inline bool IsEquipped(ieByte timingmode)
 //                                               0    1     2     3    4    5    6     7       8   9     10
 static const bool fx_relative[MAX_TIMING_MODE]={true,false,false,true,true,true,false,false,false,false,false};
 
-inline bool NeedPrepare(ieWord timingmode)
+static inline bool NeedPrepare(ieWord timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return false;
 	return fx_relative[timingmode];
@@ -129,7 +129,7 @@ inline bool NeedPrepare(ieWord timingmode)
 static const int fx_prepared[MAX_TIMING_MODE]={DURATION,PERMANENT,PERMANENT,DELAYED, //0-3
 DELAYED,DELAYED,DELAYED,DELAYED,PERMANENT,PERMANENT,PERMANENT};		//4-7
 
-inline int DelayType(ieByte timingmode)
+static inline int DelayType(ieByte timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return INVALID;
 	return fx_prepared[timingmode];
@@ -138,7 +138,7 @@ inline int DelayType(ieByte timingmode)
 //which effects are removable
 static const bool fx_removable[MAX_TIMING_MODE]={true,true,false,true,true,false,true,true,false,false,true};
 
-inline int IsRemovable(ieByte timingmode)
+static inline int IsRemovable(ieByte timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return INVALID;
 	return fx_removable[timingmode];
@@ -158,18 +158,18 @@ FX_DURATION_AFTER_EXPIRES,FX_DURATION_PERMANENT_UNSAVED, //4,5
 FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED,//6,8
 FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED};//9,10
 
-inline ieByte TriggeredEffect(ieByte timingmode)
+static inline ieByte TriggeredEffect(ieByte timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return false;
 	return fx_triggered[timingmode];
 }
 
-int compare_effects(const void *a, const void *b)
+static int compare_effects(const void *a, const void *b)
 {
 	return stricmp(((EffectRef *) a)->Name,((EffectRef *) b)->Name);
 }
 
-int find_effect(const void *a, const void *b)
+static int find_effect(const void *a, const void *b)
 {
 	return stricmp((const char *) a,((const EffectRef *) b)->Name);
 }
@@ -188,7 +188,7 @@ static EffectDesc* FindEffect(const char* effectname)
 
 static EffectRef fx_protection_from_display_string_ref = { "Protection:String", -1 };
 
-inline static void ResolveEffectRef(EffectRef &effect_reference)
+static inline void ResolveEffectRef(EffectRef &effect_reference)
 {
 	if( effect_reference.opcode==-1) {
 		EffectDesc* ref = FindEffect(effect_reference.Name);
@@ -699,7 +699,7 @@ int EffectQueue::AddAllEffects(Actor* target, const Point &destination) const
 }
 
 //resisted effect based on level
-inline bool check_level(Actor *target, Effect *fx)
+static inline bool check_level(Actor *target, Effect *fx)
 {
 	//skip non level based effects
 	//check if an effect has no level based resistance, but instead the dice sizes/count
@@ -747,7 +747,7 @@ inline bool check_level(Actor *target, Effect *fx)
 
 //roll for the effect probability, there is a high and a low treshold, the d100
 //roll should hit in the middle
-inline bool check_probability(Effect* fx)
+static inline bool check_probability(Effect* fx)
 {
 	//watch for this, probability1 is the high number
 	//probability2 is the low number
@@ -791,7 +791,7 @@ static EffectRef fx_secondary_type_bounce_dec_ref = { "Bounce:SecondaryTypeDec",
 static EffectRef fx_spelltrap = { "SpellTrap", -1 };
 
 //this is for whole spell immunity/bounce
-inline static void DecreaseEffect(Effect *efx)
+static inline void DecreaseEffect(Effect *efx)
 {
 	efx->Parameter1--;
 	if( (int) efx->Parameter1<1) {
@@ -1196,7 +1196,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 #define MATCH_PROJECTILE() if((*f)->Projectile!=projectile) { continue; }
 
 static const bool fx_live[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,false};
-inline bool IsLive(ieByte timingmode)
+static inline bool IsLive(ieByte timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return false;
 	return fx_live[timingmode];

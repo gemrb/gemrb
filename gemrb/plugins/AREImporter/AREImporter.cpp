@@ -71,7 +71,7 @@ Holder<DataFileMgr> INInote;
 ResRefToStrRef *tracks = NULL;
 int trackcount = 0;
 
-void ReleaseMemory()
+static void ReleaseMemory()
 {
 	INInote.release();
 
@@ -79,7 +79,7 @@ void ReleaseMemory()
 	tracks = NULL;
 }
 
-void ReadAutonoteINI()
+static void ReadAutonoteINI()
 {
 	INInote = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	char tINInote[_MAX_PATH];
@@ -88,7 +88,7 @@ void ReadAutonoteINI()
 	INInote->Open(fs);
 }
 
-int GetTrackString(const ieResRef areaName)
+static int GetTrackString(const ieResRef areaName)
 {
 	int i;
 	bool trackflag = displaymsg->HasStringReference(STR_TRACKING);

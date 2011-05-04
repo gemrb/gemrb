@@ -59,7 +59,7 @@ IniSpawn::~IniSpawn()
 	}
 }
 
-Holder<DataFileMgr> GetIniFile(const ieResRef DefaultArea)
+static Holder<DataFileMgr> GetIniFile(const ieResRef DefaultArea)
 {
 	//the lack of spawn ini files is not a serious problem, happens all the time
 	if (!gamedata->Exists( DefaultArea, IE_INI_CLASS_ID)) {
@@ -83,7 +83,7 @@ Holder<DataFileMgr> GetIniFile(const ieResRef DefaultArea)
 
 /*** initializations ***/
 
-inline int CountElements(const char *s, char separator)
+static inline int CountElements(const char *s, char separator)
 {
 	int ret = 1;
 	while(*s) {
@@ -93,7 +93,7 @@ inline int CountElements(const char *s, char separator)
 	return ret;
 }
 
-inline void GetElements(const char *s, ieResRef *storage, int count)
+static inline void GetElements(const char *s, ieResRef *storage, int count)
 {
 	while(count--) {
 		ieResRef *field = storage+count;
@@ -111,7 +111,7 @@ inline void GetElements(const char *s, ieResRef *storage, int count)
 	}
 }
 
-inline void GetElements(const char *s, ieVariable *storage, int count)
+static inline void GetElements(const char *s, ieVariable *storage, int count)
 {
 	while(count--) {
 		ieVariable *field = storage+count;

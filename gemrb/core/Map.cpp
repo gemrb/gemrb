@@ -75,7 +75,7 @@ static int LargeFog;
 static TerrainSounds *terrainsounds=NULL;
 static int tsndcount = -1;
 
-void ReleaseSpawnGroup(void *poi)
+static void ReleaseSpawnGroup(void *poi)
 {
 	delete (SpawnGroup *) poi;
 }
@@ -97,7 +97,7 @@ void Map::ReleaseMemory()
 	}
 }
 
-inline static AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimation *a, ScriptedAnimation *sca, Particles *spark, Projectile *pro)
+static inline AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimation *a, ScriptedAnimation *sca, Particles *spark, Projectile *pro)
 {
 	int actorh;
 	if (actor) {
@@ -150,7 +150,7 @@ inline static AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimatio
 
 //returns true if creature must be embedded in the area
 //npcs in saved game shouldn't be embedded either
-inline static bool MustSave(Actor *actor)
+static inline bool MustSave(Actor *actor)
 {
 	if (actor->Persistent()) {
 		return false;
@@ -161,7 +161,7 @@ inline static bool MustSave(Actor *actor)
 }
 
 //Preload spawn group entries (creature resrefs that reference groups of creatures)
-void InitSpawnGroups()
+static void InitSpawnGroups()
 {
 	ieResRef GroupName;
 	int i;
@@ -195,7 +195,7 @@ void InitSpawnGroups()
 }
 
 //Preload the searchmap configuration
-void InitPathFinder()
+static void InitPathFinder()
 {
 	PathFinderInited = true;
 	tsndcount = 0;
@@ -231,7 +231,7 @@ void InitPathFinder()
 	}
 }
 
-void AddLOS(int destx, int desty, int slot)
+static void AddLOS(int destx, int desty, int slot)
 {
 	for (int i=0;i<MaxVisibility;i++) {
 		int x = ((destx*i + MaxVisibility/2) / MaxVisibility) * 16;
@@ -245,7 +245,7 @@ void AddLOS(int destx, int desty, int slot)
 	}
 }
 
-void InitExplore()
+static void InitExplore()
 {
 	LargeFog = !core->HasFeature(GF_SMALL_FOG);
 

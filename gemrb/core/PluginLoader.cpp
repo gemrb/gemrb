@@ -63,7 +63,7 @@ typedef bool (* Register_t)(PluginMgr*);
 #ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
 #include <assert.h>
 typedef void *(* voidvoid)(void);
-inline voidvoid my_dlsym(void *handle, const char *symbol)
+static inline voidvoid my_dlsym(void *handle, const char *symbol)
 {
 	void *value = dlsym(handle,symbol);
 	voidvoid ret;

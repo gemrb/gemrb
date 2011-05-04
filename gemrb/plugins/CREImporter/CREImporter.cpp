@@ -171,7 +171,7 @@ int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
 }
 
 //input: index, level, type, kit
-const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType type, int kit)
+static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType type, int kit)
 {
 	const ieResRef *ret;
 
@@ -232,7 +232,7 @@ const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType type, in
 	return NULL;
 }
 
-void ReleaseMemoryCRE()
+static void ReleaseMemoryCRE()
 {
 	if (randcolors) {
 		delete [] randcolors;

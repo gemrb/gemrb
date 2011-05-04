@@ -317,7 +317,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	return newGame;
 }
 
-void SanityCheck(ieWord a,ieWord &b,const char *message)
+static void SanityCheck(ieWord a,ieWord &b,const char *message)
 {
 	if (a==0xffff) {
 		b=0xffff;

@@ -453,7 +453,7 @@ static bool DoSaveGame(const char *Path)
 	return true;
 }
 
-int CanSave()
+static int CanSave()
 {
 	//some of these restrictions might not be needed
 	Store * store = core->GetCurrentStore();

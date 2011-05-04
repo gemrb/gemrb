@@ -74,7 +74,7 @@ TLKImporter::TLKImporter(void)
 	}
 }
 
-void ReleaseGtEntry(void *poi)
+static void ReleaseGtEntry(void *poi)
 {
 	delete (gt_type *) poi;
 }
@@ -141,7 +141,7 @@ inline char* mystrncpy(char* dest, const char* source, int maxlength,
 		0	 - PROTAGONIST
 		1-9 - PLAYERx
 */
-inline Actor *GetActorFromSlot(int slot)
+static inline Actor *GetActorFromSlot(int slot)
 {
 	if (slot==-1) {
 		GameControl *gc = core->GetGameControl();

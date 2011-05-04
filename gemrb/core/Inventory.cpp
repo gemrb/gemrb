@@ -154,7 +154,7 @@ CREItem *Inventory::GetItem(unsigned int slot)
 
 //This hack sets the charge counters for non-rechargeable items,
 //if their charge is zero
-inline void HackCharges(CREItem *item)
+static inline void HackCharges(CREItem *item)
 {
 	Item *itm = gamedata->GetItem( item->ItemResRef );
 	if (itm) {
