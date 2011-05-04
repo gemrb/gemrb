@@ -113,16 +113,28 @@ void CachedDirectoryImporter::Refresh()
 	if (!it)
 		return;
 
+	unsigned int count = 0;
+	do {
+		if (it.IsDirectory())
+			continue;
+		count++;
+	} while (++it);
+
+	// limit to 4k buckets
+	// less than 1% of the bg2+fixpack override are of bucket length >4
+	cache.init(count > 4 * 1024 ? 4 * 1024 : count, count);
+
+	it.Rewind();
+
 	char buf[_MAX_PATH];
 	do {
 		if (it.IsDirectory())
 			continue;
 		const char *name = it.GetName();
 		strnlwrcpy(buf, name, _MAX_PATH, false);
-		if (cache.find(buf) != cache.end()) {
+		if (cache.set(buf, name)) {
 			printMessage("CachedDirectoryImporter", "Duplicate '%s' files in '%s' directory", LIGHT_RED, buf, path);
 		}
-		cache[buf] = name;
 	} while (++it);
 }
 
@@ -138,36 +150,36 @@ static const char *ConstructFilename(const char* resname, const char* ext)
 bool CachedDirectoryImporter::HasResource(const char* resname, SClass_ID type)
 {
 	const char* filename = ConstructFilename(resname, core->TypeExt(type));
-	return (cache.find(filename) != cache.end());
+	return cache.has(filename);
 }
 
 bool CachedDirectoryImporter::HasResource(const char* resname, const ResourceDesc &type)
 {
 	const char* filename = ConstructFilename(resname, type.GetExt());
-	return (cache.find(filename) != cache.end());
+	return cache.has(filename);
 }
 
 DataStream* CachedDirectoryImporter::GetResource(const char* resname, SClass_ID type)
 {
 	const char* filename = ConstructFilename(resname, core->TypeExt(type));
-	std::map<std::string, std::string>::const_iterator it = cache.find(filename);
-	if (it == cache.end())
+	const std::string *s = cache.get(filename);
+	if (!s)
 		return NULL;
 	char buf[_MAX_PATH];
 	strcpy(buf, path);
-	PathAppend(buf, it->second.c_str());
+	PathAppend(buf, s->c_str());
 	return FileStream::OpenFile(buf);
 }
 
 DataStream* CachedDirectoryImporter::GetResource(const char* resname, const ResourceDesc &type)
 {
 	const char* filename = ConstructFilename(resname, type.GetExt());
-	std::map<std::string, std::string>::const_iterator it = cache.find(filename);
-	if (it == cache.end())
+	const std::string *s = cache.get(filename);
+	if (!s)
 		return NULL;
 	char buf[_MAX_PATH];
 	strcpy(buf, path);
-	PathAppend(buf, it->second.c_str());
+	PathAppend(buf, s->c_str());
 	return FileStream::OpenFile(buf);
 }
 

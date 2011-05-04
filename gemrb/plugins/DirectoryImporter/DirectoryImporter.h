@@ -20,10 +20,7 @@
 #define KEYIMP_H
 
 #include "ResourceSource.h"
-
-#include <cstring>
-#include <map>
-#include <vector>
+#include "StringMap.h"
 
 class Resource;
 class ResourceDesc;
@@ -46,7 +43,7 @@ public:
 
 class CachedDirectoryImporter : public DirectoryImporter {
 protected:
-	std::map<std::string, std::string> cache;
+	StringMap cache;
 
 public:
 	CachedDirectoryImporter();
