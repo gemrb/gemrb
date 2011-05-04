@@ -1098,7 +1098,7 @@ bool Game::EveryoneNearPoint(Map *area, const Point &p, int flags) const
 			return false;
 		}
 		if (Distance(p,PCs[i])>MAX_TRAVELING_DISTANCE) {
-print("Actor %s is not near!\n", PCs[i]->LongName);
+			print("Actor %s is not near!\n", PCs[i]->LongName);
 			return false;
 		}
 	}
@@ -1614,7 +1614,7 @@ void Game::ChangeSong(bool always, bool force)
 }
 
 /* this method redraws weather. If update is false,
-then the weather particles won't change (game paused)
+   then the weather particles won't change (game paused)
 */
 void Game::DrawWeather(const Region &screen, bool update)
 {
