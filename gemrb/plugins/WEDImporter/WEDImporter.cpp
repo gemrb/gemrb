@@ -32,6 +32,7 @@
 
 #include "GameData.h"
 #include "Interface.h"
+#include "PluginMgr.h"
 #include "TileSetMgr.h"
 
 struct wed_polygon {

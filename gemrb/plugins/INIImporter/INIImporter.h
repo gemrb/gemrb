@@ -26,6 +26,7 @@
 #include "globals.h"
 
 #include <cstring>
+#include <vector>
 
 struct INIPair {
 	char* Name, * Value;

@@ -24,6 +24,7 @@
 
 #include "EffectMgr.h"
 #include "Interface.h"
+#include "PluginMgr.h"
 #include "TableMgr.h" //needed for autotable
 
 int *cgsounds = NULL;

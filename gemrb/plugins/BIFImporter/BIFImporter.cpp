@@ -25,6 +25,7 @@
 #include "Compressor.h"
 #include "FileCache.h"
 #include "Interface.h"
+#include "PluginMgr.h"
 #include "System/SlicedStream.h"
 #include "System/FileStream.h"
 

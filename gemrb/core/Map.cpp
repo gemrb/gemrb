@@ -38,6 +38,7 @@
 #include "Palette.h"
 #include "Particles.h"
 #include "PathFinder.h"
+#include "PluginMgr.h"
 #include "Projectile.h"
 #include "ScriptedAnimation.h"
 #include "TileMap.h"

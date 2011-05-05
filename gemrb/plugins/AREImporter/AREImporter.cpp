@@ -33,6 +33,7 @@
 #include "ImageMgr.h"
 #include "Interface.h"
 #include "Palette.h"
+#include "PluginMgr.h"
 #include "ProjectileServer.h"
 #include "TileMapMgr.h"
 #include "Video.h"

@@ -23,6 +23,8 @@
 
 #include "SymbolMgr.h"
 
+#include <vector>
+
 struct Pair {
 	int val;
 	char* str;

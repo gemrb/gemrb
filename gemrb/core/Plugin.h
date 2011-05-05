@@ -31,7 +31,6 @@
 #include "exports.h"
 
 #include "Holder.h"
-#include "PluginMgr.h"
 #include "TypeID.h"
 
 #include <cstddef>
@@ -45,21 +44,6 @@ class GEM_EXPORT Plugin : public Held<Plugin> {
 public:
 	Plugin(void);
 	virtual ~Plugin(void);
-};
-
-template <class T>
-class PluginHolder : public Holder<T> {
-public:
-	PluginHolder()
-	{
-	}
-	PluginHolder(PluginID id)
-		: Holder<T>(static_cast<T*>(PluginMgr::Get()->GetPlugin(id)))
-	{
-	}
-	~PluginHolder()
-	{
-	}
 };
 
 #endif

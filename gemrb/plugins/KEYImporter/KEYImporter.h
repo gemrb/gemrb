@@ -21,8 +21,10 @@
 #ifndef KEYIMP_H
 #define KEYIMP_H
 
-#include "ArchiveImporter.h"
 #include "ResourceSource.h"
+
+#include "ArchiveImporter.h"
+#include "PluginMgr.h"
 
 #include "Dictionary.h"
 

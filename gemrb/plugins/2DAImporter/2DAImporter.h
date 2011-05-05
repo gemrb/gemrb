@@ -26,6 +26,7 @@
 #include "globals.h"
 
 #include <cstring>
+#include <vector>
 
 typedef std::vector< char*> RowEntry;
 

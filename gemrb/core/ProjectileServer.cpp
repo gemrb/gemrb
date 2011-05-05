@@ -22,6 +22,7 @@
 
 #include "GameData.h"
 #include "Interface.h"
+#include "PluginMgr.h"
 #include "ProjectileMgr.h"
 #include "SymbolMgr.h"
 

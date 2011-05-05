@@ -23,7 +23,6 @@
 
 #include "exports.h"
 
-#include "PluginMgr.h"
 #include "Projectile.h"
 
 class SymbolMgr;

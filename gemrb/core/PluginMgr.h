@@ -32,6 +32,7 @@
 #include "globals.h"
 #include "iless.h"
 #include "win32def.h"
+#include "Holder.h"
 
 #include "ResourceDesc.h"
 
@@ -132,6 +133,21 @@ public:
 	 * Tries to get driver associated to name, or falls back to a random one.
 	 */
 	Plugin* GetDriver(const TypeID* type, const char* name);
+};
+
+template <class T>
+class PluginHolder : public Holder<T> {
+public:
+	PluginHolder()
+	{
+	}
+	PluginHolder(PluginID id)
+		: Holder<T>(static_cast<T*>(PluginMgr::Get()->GetPlugin(id)))
+	{
+	}
+	~PluginHolder()
+	{
+	}
 };
 
 #endif

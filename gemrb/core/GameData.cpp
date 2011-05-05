@@ -35,6 +35,7 @@
 #include "Interface.h"
 #include "Item.h"
 #include "ItemMgr.h"
+#include "PluginMgr.h"
 #include "ResourceDesc.h"
 #include "ScriptedAnimation.h"
 #include "Spell.h"

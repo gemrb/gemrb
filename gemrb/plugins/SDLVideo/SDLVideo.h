@@ -25,6 +25,7 @@
 
 #include "win32def.h"
 
+#include <vector>
 #include <SDL.h>
 
 class SDLVideoDriver : public Video {

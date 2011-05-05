@@ -30,6 +30,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Map.h"
+#include "PluginMgr.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
 #include "Scriptable/Actor.h"

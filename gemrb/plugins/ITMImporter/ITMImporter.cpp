@@ -24,6 +24,7 @@
 
 #include "EffectMgr.h"
 #include "Interface.h"
+#include "PluginMgr.h"
 
 ITMImporter::ITMImporter(void)
 {

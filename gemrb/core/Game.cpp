@@ -33,6 +33,7 @@
 #include "MapMgr.h"
 #include "MusicMgr.h"
 #include "Particles.h"
+#include "PluginMgr.h"
 #include "ScriptEngine.h"
 #include "TableMgr.h"
 #include "GameScript/GameScript.h"

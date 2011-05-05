@@ -20,6 +20,7 @@
 
 #include "Compressor.h"
 #include "Interface.h"
+#include "PluginMgr.h"
 #include "System/FileStream.h"
 #include "System/VFS.h"
 
