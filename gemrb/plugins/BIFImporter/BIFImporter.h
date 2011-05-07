@@ -60,6 +60,7 @@ public:
 	int CreateArchive(DataStream *compressed);
 	DataStream* GetStream(unsigned long Resource, unsigned long Type);
 private:
+	static bool DecompressBIF(DataStream* compressed, const char* path);
 	void ReadBIF(void);
 };
 

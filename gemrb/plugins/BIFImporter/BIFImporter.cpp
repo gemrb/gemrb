@@ -135,6 +135,48 @@ int BIFImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 	return GEM_OK;
 }
 
+bool BIFImporter::DecompressBIF(DataStream* compressed, const char* path)
+{
+	print( "Decompressing\n" );
+	if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB ))
+		return false;
+	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
+	ieDword unCompBifSize;
+	compressed->ReadDword( &unCompBifSize );
+	print( "\nDecompressing file: [..........]" );
+	fflush(stdout);
+	FileStream out;
+	if (!out.Create(path)) {
+		printMessage("BIFImporter", "Cannot write %s.\n", RED, path);
+		return false;
+	}
+	ieDword finalsize = 0;
+	int laststep = 0;
+	while (finalsize < unCompBifSize) {
+		ieDword complen, declen;
+		compressed->ReadDword( &declen );
+		compressed->ReadDword( &complen );
+		if (comp->Decompress( &out, compressed, complen ) != GEM_OK) {
+			return false;
+		}
+		finalsize = out.GetPos();
+		if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
+			laststep++;
+			print( "\b\b\b\b\b\b\b\b\b\b\b" );
+			int l;
+
+			for (l = 0; l < laststep; l++)
+				print( "|" );
+			for (; l < 10; l++)//l starts from laststep
+				print( "." );
+			print( "]" );
+			fflush(stdout);
+		}
+	}
+	print( "\n" );
+	return true;
+}
+
 int BIFImporter::OpenArchive(const char* filename)
 {
 	if (stream) {
@@ -205,43 +247,10 @@ int BIFImporter::OpenArchive(const char* filename)
 				return GEM_ERROR;
 			return GEM_OK;
 		}
-		print( "Decompressing\n" );
-		if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB ))
-			return GEM_ERROR;
-		PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
-		ieDword unCompBifSize;
-		compressed->ReadDword( &unCompBifSize );
-		print( "\nDecompressing file: [..........]" );
-		fflush(stdout);
-		FileStream out;
-		if (!out.Create(path)) {
-			printMessage("BIFImporter", "Cannot write %s.\n", RED, path);
+		if (!DecompressBIF(compressed, path)) {
+			delete( compressed );
 			return GEM_ERROR;
 		}
-		ieDword finalsize = 0;
-		int laststep = 0;
-		while (finalsize < unCompBifSize) {
-			ieDword complen, declen;
-			compressed->ReadDword( &declen );
-			compressed->ReadDword( &complen );
-			if (comp->Decompress( &out, compressed, complen ) != GEM_OK) {
-				return GEM_ERROR;
-			}
-			finalsize = out.GetPos();
-			if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
-				laststep++;
-				print( "\b\b\b\b\b\b\b\b\b\b\b" );
-				int l;
-
-				for (l = 0; l < laststep; l++)
-					print( "|" );
-				for (; l < 10; l++)//l starts from laststep
-					print( "." );
-				print( "]" );
-				fflush(stdout);
-			}
-		}
-		print( "\n" );
 		delete( compressed );
 		stream = FileStream::OpenFile(path);
 		if (!stream)
