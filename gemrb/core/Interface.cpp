@@ -4751,6 +4751,7 @@ Store *Interface::GetCurrentStore()
 void Interface::CloseCurrentStore()
 {
 	gamedata->SaveStore(CurrentStore);
+	CurrentStore = NULL;
 }
 
 Store *Interface::SetCurrentStore(const ieResRef resname, ieDword owner)

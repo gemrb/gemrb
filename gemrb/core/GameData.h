@@ -102,7 +102,7 @@ public:
 
 	Store* GetStore(const ieResRef ResRef);
 	/// Saves a store to the cache and frees it.
-	void SaveStore(Store*& store);
+	void SaveStore(Store* store);
 	/// Saves all stores in the cache
 	void SaveAllStores();
 private:

@@ -514,7 +514,7 @@ Store* GameData::GetStore(const ieResRef ResRef)
 	return store;
 }
 
-void GameData::SaveStore(Store*& store)
+void GameData::SaveStore(Store* store)
 {
 	if (!store)
 		return;
@@ -539,7 +539,6 @@ void GameData::SaveStore(Store*& store)
 
 	stores.erase(it);
 	delete store;
-	store = NULL;
 }
 
 void GameData::SaveAllStores()
