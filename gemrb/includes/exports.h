@@ -21,6 +21,14 @@
 #ifndef EXPORTS_H
 #define EXPORTS_H
 
+/**
+ * @file exports.h
+ * This file contains global compiler configuration.
+ *
+ * It should not contain any declarations or includes,
+ * only compiler dependent macros and pragmas.
+ */
+
 #ifdef WIN32
 #	ifdef GEM_BUILD_DLL
 #		define GEM_EXPORT __declspec(dllexport)
@@ -51,6 +59,16 @@
 #else
 #define WARN_UNUSED
 #define SENTINEL
+#endif
+
+#if _MSC_VER >= 1000
+// 4251 disables the annoying warning about missing dll interface in templates
+# pragma warning( disable: 4251 521 )
+# pragma warning( disable: 4275 )
+//disables annoying warning caused by STL:Map in msvc 6.0
+# if _MSC_VER < 7000
+#   pragma warning(disable:4786)
+# endif
 #endif
 
 #endif

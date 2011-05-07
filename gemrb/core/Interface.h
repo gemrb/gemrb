@@ -26,9 +26,6 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-//skip messy warnings in MSVC6
-#include "win32def.h"
-
 #include "SClassID.h"
 #include "exports.h"
 

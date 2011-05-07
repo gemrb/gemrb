@@ -36,16 +36,6 @@
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 
-# if _MSC_VER >= 1000
-// 4251 disables the annoying warning about missing dll interface in templates
-#  pragma warning( disable: 4251 521 )
-#  pragma warning( disable: 4275 )
-//disables annoying warning caused by STL:Map in msvc 6.0
-#  if _MSC_VER < 7000
-#    pragma warning(disable:4786)
-#  endif
-# endif
-
 #else //WIN32
 # ifndef ANDROID
 #  include <config.h>
