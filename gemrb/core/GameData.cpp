@@ -543,10 +543,7 @@ void GameData::SaveStore(Store* store)
 
 void GameData::SaveAllStores()
 {
-	for (StoreMap::iterator it = stores.begin(); it != stores.end(); /*nothing*/) {
-		// SaveStore removes the store from the cache,
-		// so increment the iterator before calling.
-		SaveStore((it++)->second);
+	while (!stores.empty()) {
+		SaveStore(stores.begin()->second);
 	}
-	stores.clear();
 }
