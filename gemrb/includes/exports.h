@@ -74,4 +74,10 @@
 #	endif
 #endif
 
+/// Make sure we don't like to static libraries
+/// This causes hard to debug errors due to multiple heaps.
+#if defined(_MSC_VER) && !defined(_DLL)
+#	error GemRB must be dynamically linked with runtime libraries on win32.
+#endif
+
 #endif
