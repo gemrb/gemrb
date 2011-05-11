@@ -49,11 +49,11 @@ BIFImporter::~BIFImporter(void)
 	}
 }
 
-bool BIFImporter::DecompressBIF(DataStream* compressed, const char* path)
+DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path)
 {
 	print( "Decompressing\n" );
 	if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB ))
-		return false;
+		return NULL;
 	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 	ieDword unCompBifSize;
 	compressed->ReadDword( &unCompBifSize );
@@ -62,7 +62,7 @@ bool BIFImporter::DecompressBIF(DataStream* compressed, const char* path)
 	FileStream out;
 	if (!out.Create(path)) {
 		printMessage("BIFImporter", "Cannot write %s.\n", RED, path);
-		return false;
+		return NULL;
 	}
 	ieDword finalsize = 0;
 	int laststep = 0;
@@ -71,7 +71,7 @@ bool BIFImporter::DecompressBIF(DataStream* compressed, const char* path)
 		compressed->ReadDword( &declen );
 		compressed->ReadDword( &complen );
 		if (comp->Decompress( &out, compressed, complen ) != GEM_OK) {
-			return false;
+			return NULL;
 		}
 		finalsize = out.GetPos();
 		if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
@@ -88,91 +88,70 @@ bool BIFImporter::DecompressBIF(DataStream* compressed, const char* path)
 		}
 	}
 	print( "\n" );
-	return true;
+	return FileStream::OpenFile(path);
 }
 
-int BIFImporter::OpenArchive(const char* filename)
+DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const char* /*path*/)
+{
+	ieDword fnlen, complen, declen;
+	compressed->ReadDword( &fnlen );
+	compressed->Seek(fnlen, GEM_CURRENT_POS);
+	compressed->ReadDword(&declen);
+	compressed->ReadDword(&complen);
+	print( "Decompressing\n" );
+	return CacheCompressedStream(compressed, compressed->filename, complen);
+}
+
+int BIFImporter::OpenArchive(const char* path)
 {
 	if (stream) {
 		delete( stream );
 		stream = NULL;
 	}
-	FileStream* file = FileStream::OpenFile(filename);
-	if( !file) {
-		return GEM_ERROR;
-	}
+
+	char filename[_MAX_PATH];
+	ExtractFileFromPath(filename, path);
+
+	char cachePath[_MAX_PATH];
+	PathJoin(cachePath, core->CachePath, filename, NULL);
+	stream = FileStream::OpenFile(cachePath);
+
 	char Signature[8];
-	if (file->Read(Signature, 8) == GEM_ERROR) {
-		delete file;
-		return GEM_ERROR;
-	}
-	//normal bif, not in cache
-	if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
-		stream = CacheStream(file);
-		if (!stream)
+	if (!stream) {
+		FileStream* file = FileStream::OpenFile(path);
+		if (!file) {
 			return GEM_ERROR;
-		stream->Read( Signature, 8 );
-		strcpy( path, filename );
-		ReadBIF();
-		return GEM_OK;
-	}
-	//not found as normal bif
-	//checking compression type
-	if (strncmp( Signature, "BIF V1.0", 8 ) == 0) {
-		ieDword fnlen, complen, declen;
-		file->ReadDword( &fnlen );
-		char* fname = ( char* ) malloc( fnlen );
-		file->Read( fname, fnlen );
-		strlwr(fname);
-		file->ReadDword( &declen );
-		file->ReadDword( &complen );
-		print( "Decompressing\n" );
-		stream = CacheCompressedStream(file, fname, complen);
-		free( fname );
-		delete( file );
-		if (!stream)
+		}
+		if (file->Read(Signature, 8) == GEM_ERROR) {
+			delete file;
 			return GEM_ERROR;
-		stream->Read( Signature, 8 );
-		if (strncmp( Signature, "BIFFV1  ", 8 ) == 0)
-			ReadBIF();
-		else
+		}
+
+		if (strncmp(Signature, "BIF V1.0", 8) == 0) {
+			stream = DecompressBIF(file, cachePath);
+			delete file;
+		} else if (strncmp(Signature, "BIFCV1.0", 8) == 0) {
+			stream = DecompressBIFC(file, cachePath);
+			delete file;
+		} else if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
+			stream = CacheStream(file);
+		} else {
+			delete file;
 			return GEM_ERROR;
-		return GEM_OK;
+		}
 	}
 
-	if (strncmp( Signature, "BIFCV1.0", 8 ) == 0) {
-		//print("'BIFCV1.0' Compressed File Found\n");
-		PathJoin( path, core->CachePath, file->filename, NULL );
-		if (file_exists(path)) {
-			//print("Found in Cache\n");
-			delete( file );
-			stream = FileStream::OpenFile(path);
-			if (!stream)
-				return GEM_ERROR;
-			stream->Read( Signature, 8 );
-			if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
-				ReadBIF();
-			} else
-				return GEM_ERROR;
-			return GEM_OK;
-		}
-		if (!DecompressBIF(file, path)) {
-			delete( file );
-			return GEM_ERROR;
-		}
-		delete( file );
-		stream = FileStream::OpenFile(path);
-		if (!stream)
-			return GEM_ERROR;
-		stream->Read( Signature, 8 );
-		if (strncmp( Signature, "BIFFV1  ", 8 ) == 0)
-			ReadBIF();
-		else
-			return GEM_ERROR;
-		return GEM_OK;
+	if (!stream)
+		return GEM_ERROR;
+
+	stream->Read( Signature, 8 );
+
+	if (strncmp( Signature, "BIFFV1  ", 8 ) != 0) {
+		return GEM_ERROR;
 	}
-	delete (file);
-	return GEM_ERROR;
+
+	ReadBIF();
+	return GEM_OK;
 }
 
 DataStream* BIFImporter::GetStream(unsigned long Resource, unsigned long Type)
