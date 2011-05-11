@@ -90,30 +90,10 @@ static void FindBIF(BIFEntry *entry)
 		return;
 	}
 
-	if (core->GameOnCD) {
-		int mask = 1<<2;
-		for(int cd = 1; cd<=MAX_CD; cd++) {
-			if ((entry->BIFLocator & mask) != 0) {
-				entry->cd = cd;
-				break;
-			}
-			mask += mask;
-		}
-
-		if (!entry->cd) {
-			printStatus( "ERROR", LIGHT_RED );
-			print( "Cannot find %s... Resource unavailable.\n",
-					entry->name );
-			entry->found = false;
-			return;
-		}
-		entry->found = PathExists(entry, core->CD[entry->cd-1]);
-		return;
-	}
-
 	for (int i = 0; i < MAX_CD; i++) {
 		if (PathExists(entry, core->CD[i]) ) {
 			entry->found = true;
+			entry->cd = i;
 			return;
 		}
 	}
@@ -223,18 +203,6 @@ bool KEYImporter::HasResource(const char* resname, const ResourceDesc &type)
 	return HasResource(resname, type.GetKeyType());
 }
 
-static void FindBIFOnCD(BIFEntry *entry)
-{
-	if (file_exists(entry->path)) {
-		entry->found = true;
-		return;
-	}
-
-	core->WaitForDisc(entry->cd, entry->name);
-
-	entry->found = PathExists(entry, core->CD[entry->cd-1]);
-}
-
 DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 {
 	unsigned int ResLocator;
@@ -244,8 +212,6 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 	if (resources.Lookup( resname, type, ResLocator )) {
 		unsigned int bifnum = ( ResLocator & 0xFFF00000 ) >> 20;
 
-		if (core->GameOnCD && (biffiles[bifnum].cd != 0))
-			FindBIFOnCD(&biffiles[bifnum]);
 		if (!biffiles[bifnum].found) {
 			print( "Cannot find %s... Resource unavailable.\n",
 					biffiles[bifnum].name );
