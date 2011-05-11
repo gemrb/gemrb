@@ -276,6 +276,7 @@ gemrb/plugins/NullSound/Makefile
 gemrb/plugins/OpenALAudio/Makefile 
 gemrb/plugins/PLTImporter/Makefile 
 gemrb/plugins/PROImporter/Makefile 
+gemrb/plugins/SAVImporter/Makefile
 gemrb/plugins/SDLVideo/Makefile 
 gemrb/plugins/SPLImporter/Makefile 
 gemrb/plugins/STOImporter/Makefile 
