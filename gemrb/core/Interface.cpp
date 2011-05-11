@@ -3972,7 +3972,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	LoadProgress(20);
 	// Unpack SAV (archive) file to Cache dir
 	if (sav_str) {
-		PluginHolder<ArchiveImporter> ai(IE_BIF_CLASS_ID);
+		PluginHolder<ArchiveImporter> ai(IE_SAV_CLASS_ID);
 		if (ai) {
 			if (ai->DecompressSaveGame(sav_str) != GEM_OK) {
 				goto cleanup;
@@ -5111,8 +5111,7 @@ int Interface::CompressSave(const char *folder)
 	if (!dir) {
 		return -1;
 	}
-	//BIF and SAV are the same
-	PluginHolder<ArchiveImporter> ai(IE_BIF_CLASS_ID);
+	PluginHolder<ArchiveImporter> ai(IE_SAV_CLASS_ID);
 	ai->CreateArchive( &str);
 
 	//.tot and .toh should be saved last, because they are updated when an .are is saved

@@ -30,6 +30,7 @@ SUBDIRS = \
 	PNGImporter \
 	PROImporter \
 	PSTOpcodes \
+	SAVImporter \
 	SDLVideo \
 	SPLImporter \
 	STOImporter \

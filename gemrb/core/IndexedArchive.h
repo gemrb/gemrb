@@ -18,47 +18,19 @@
  *
  */
 
-#ifndef BIFIMPORTER_H
-#define BIFIMPORTER_H
-
-#include "IndexedArchive.h"
+#ifndef INDEXEDARCHIVE_H
+#define INDEXEDARCHIVE_H
 
 #include "globals.h"
 
-#include "System/DataStream.h"
+#include "Plugin.h"
 
-struct FileEntry {
-	ieDword resLocator;
-	ieDword dataOffset;
-	ieDword fileSize;
-	ieWord  type;
-	ieWord  u1; //Unknown Field
-};
-
-struct TileEntry {
-	ieDword resLocator;
-	ieDword dataOffset;
-	ieDword tilesCount;
-	ieDword tileSize; //named tilesize so it isn't confused
-	ieWord  type;
-	ieWord  u1; //Unknown Field
-};
-
-class BIFImporter : public IndexedArchive {
-private:
-	char path[_MAX_PATH];
-	FileEntry* fentries;
-	TileEntry* tentries;
-	ieDword fentcount, tentcount;
-	DataStream* stream;
+class GEM_EXPORT IndexedArchive : public Plugin {
 public:
-	BIFImporter(void);
-	~BIFImporter(void);
-	int OpenArchive(const char* filename);
-	DataStream* GetStream(unsigned long Resource, unsigned long Type);
-private:
-	static bool DecompressBIF(DataStream* compressed, const char* path);
-	void ReadBIF(void);
+	IndexedArchive(void);
+	virtual ~IndexedArchive(void);
+	virtual int OpenArchive(const char* filename) = 0;
+	virtual DataStream* GetStream(unsigned long Resource, unsigned long Type) = 0;
 };
 
 #endif

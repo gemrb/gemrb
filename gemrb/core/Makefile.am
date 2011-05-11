@@ -56,6 +56,7 @@ libgemrb_core_la_SOURCES = \
 	ImageFactory.cpp \
 	ImageMgr.cpp \
 	ImageWriter.cpp \
+	IndexedArchive.cpp \
 	IniSpawn.cpp \
 	Interface.cpp \
 	Inventory.cpp \

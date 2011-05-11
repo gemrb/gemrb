@@ -23,7 +23,7 @@
 #include "win32def.h"
 #include "globals.h"
 
-#include "ArchiveImporter.h"
+#include "IndexedArchive.h"
 #include "Interface.h"
 #include "ResourceDesc.h"
 #include "System/FileStream.h"
@@ -254,7 +254,7 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 
 		// simple one-BIF cache to avoid opening the same BIF repeatedly
 		if (lastSeenCache.bifnum != bifnum) {
-			PluginHolder<ArchiveImporter> ai(IE_BIF_CLASS_ID);
+			PluginHolder<IndexedArchive> ai(IE_BIF_CLASS_ID);
 			if (ai->OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
 				print("Cannot open archive %s\n", biffiles[bifnum].path );
 				return NULL;

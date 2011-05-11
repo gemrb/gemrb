@@ -35,6 +35,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	ImageFactory.cpp
 	ImageMgr.cpp
 	ImageWriter.cpp
+	IndexedArchive.cpp
 	IniSpawn.cpp
 	Interface.cpp
 	Inventory.cpp

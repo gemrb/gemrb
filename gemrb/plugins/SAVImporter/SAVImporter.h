@@ -18,47 +18,22 @@
  *
  */
 
-#ifndef BIFIMPORTER_H
-#define BIFIMPORTER_H
+#ifndef SAVIMPORTER_H
+#define SAVIMPORTER_H
 
-#include "IndexedArchive.h"
+#include "ArchiveImporter.h"
 
 #include "globals.h"
 
 #include "System/DataStream.h"
 
-struct FileEntry {
-	ieDword resLocator;
-	ieDword dataOffset;
-	ieDword fileSize;
-	ieWord  type;
-	ieWord  u1; //Unknown Field
-};
-
-struct TileEntry {
-	ieDword resLocator;
-	ieDword dataOffset;
-	ieDword tilesCount;
-	ieDword tileSize; //named tilesize so it isn't confused
-	ieWord  type;
-	ieWord  u1; //Unknown Field
-};
-
-class BIFImporter : public IndexedArchive {
-private:
-	char path[_MAX_PATH];
-	FileEntry* fentries;
-	TileEntry* tentries;
-	ieDword fentcount, tentcount;
-	DataStream* stream;
+class SAVImporter : public ArchiveImporter {
 public:
-	BIFImporter(void);
-	~BIFImporter(void);
-	int OpenArchive(const char* filename);
-	DataStream* GetStream(unsigned long Resource, unsigned long Type);
-private:
-	static bool DecompressBIF(DataStream* compressed, const char* path);
-	void ReadBIF(void);
+	SAVImporter(void);
+	~SAVImporter(void);
+	int DecompressSaveGame(DataStream *compressed);
+	int AddToSaveGame(DataStream *str, DataStream *uncompressed);
+	int CreateArchive(DataStream *compressed);
 };
 
 #endif

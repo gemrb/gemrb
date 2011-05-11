@@ -49,92 +49,6 @@ BIFImporter::~BIFImporter(void)
 	}
 }
 
-int BIFImporter::DecompressSaveGame(DataStream *compressed)
-{
-	char Signature[8];
-	compressed->Read( Signature, 8 );
-	if (strncmp( Signature, "SAV V1.0", 8 ) ) {
-		return GEM_ERROR;
-	}
-	int All = compressed->Remains();
-	int Current;
-	int percent, last_percent = 20;
-	if (!All) return GEM_ERROR;
-	do {
-		ieDword fnlen, complen, declen;
-		compressed->ReadDword( &fnlen );
-		if (!fnlen) {
-			printMessage("BIFImporter", "Corrupt Save Detected\n", RED);
-			return GEM_ERROR;
-		}
-		char* fname = ( char* ) malloc( fnlen );
-		compressed->Read( fname, fnlen );
-		strlwr(fname);
-		compressed->ReadDword( &declen );
-		compressed->ReadDword( &complen );
-		print( "Decompressing %s\n", fname );
-		DataStream* cached = CacheCompressedStream(compressed, fname, complen, true);
-		free( fname );
-		if (!cached)
-			return GEM_ERROR;
-		delete cached;
-		Current = compressed->Remains();
-		//starting at 20% going up to 70%
-		percent = (20 + (All - Current) * 50 / All);
-		if (percent - last_percent > 5) {
-			core->LoadProgress(percent);
-			last_percent = percent;
-		}
-	}
-	while(Current);
-	return GEM_OK;
-}
-
-//this one can create .sav files only
-int BIFImporter::CreateArchive(DataStream *compressed)
-{
-	if (stream) {
-		delete( stream );
-		stream = NULL;
-	}
-	if (!compressed) {
-		return GEM_ERROR;
-	}
-	char Signature[8];
-
-	memcpy(Signature,"SAV V1.0",8);
-	compressed->Write(Signature, 8);
-
-	return GEM_OK;
-}
-
-int BIFImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
-{
-	ieDword fnlen, declen, complen;
-
-	fnlen = strlen(uncompressed->filename)+1;
-	declen = uncompressed->Size();
-	str->WriteDword( &fnlen);
-	str->Write( uncompressed->filename, fnlen);
-	str->WriteDword( &declen);
-	//baaah, we dump output right in the stream, we get the compressed length
-	//only after the compressed data was written
-	complen = 0xcdcdcdcd; //placeholder
-	unsigned long Pos = str->GetPos(); //storing the stream position
-	str->WriteDword( &complen);
-
-	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
-	comp->Compress( str, uncompressed );
-
-	//writing compressed length (calculated)
-	unsigned long Pos2 = str->GetPos();
-	complen = Pos2-Pos-sizeof(ieDword); //calculating the compressed stream size
-	str->Seek(Pos, GEM_STREAM_START); //going back to the placeholder
-	str->WriteDword( &complen);       //updating size
-	str->Seek(Pos2, GEM_STREAM_START);//resuming work
-	return GEM_OK;
-}
-
 bool BIFImporter::DecompressBIF(DataStream* compressed, const char* path)
 {
 	print( "Decompressing\n" );
@@ -332,4 +246,3 @@ void BIFImporter::ReadBIF(void)
 GEMRB_PLUGIN(0xC7F133C, "BIF File Importer")
 PLUGIN_CLASS(IE_BIF_CLASS_ID, BIFImporter)
 END_PLUGIN()
-

@@ -23,7 +23,7 @@
 
 #include "ResourceSource.h"
 
-#include "ArchiveImporter.h"
+#include "IndexedArchive.h"
 #include "PluginMgr.h"
 
 #include "Dictionary.h"
@@ -52,7 +52,7 @@ struct KEYCache {
 	KEYCache() { bifnum = 0xffffffff; }
 
 	unsigned int bifnum;
-	PluginHolder<ArchiveImporter> plugin;
+	PluginHolder<IndexedArchive> plugin;
 };
 
 class KEYImporter : public ResourceSource {
