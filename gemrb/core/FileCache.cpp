@@ -54,7 +54,7 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 
 DataStream* CacheFile(const char* path)
 {
-	if (!core->GameOnCD)
+	if (!core->SlowBIFs)
 		return FileStream::OpenFile(path);
 
 	char filename[_MAX_PATH];

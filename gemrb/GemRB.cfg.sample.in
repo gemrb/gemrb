@@ -111,7 +111,7 @@ TooltipDelay=500
 
 #CaseSensitive=1
 
-#GameOnCD=0
+#SlowBIFs=0
 
 #####################################################
 #  GUI Parameters                                   #

@@ -742,7 +742,7 @@ public:
 	unsigned int TooltipDelay;
 	int IgnoreOriginalINI;
 	unsigned int FogOfWar;
-	bool CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
+	bool CaseSensitive, SlowBIFs, SkipIntroVideos, DrawFPS;
 	bool GUIEnhancements;
 	bool KeepCache;
 	Variables *plugin_flags;

@@ -184,7 +184,7 @@ Interface::Interface(int iargc, char* iargv[])
 #else
 	CaseSensitive = false;
 #endif
-	GameOnCD = false;
+	SlowBIFs = false;
 	SkipIntroVideos = false;
 	DrawFPS = false;
 	KeepCache = false;
@@ -2248,7 +2248,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_INT("FogOfWar", FogOfWar = );
 		CONFIG_INT("FullScreen", FullScreen = );
 		CONFIG_INT("GUIEnhancements", GUIEnhancements = );
-		CONFIG_INT("GameOnCD", GameOnCD = );
+		CONFIG_INT("SlowBIFs", SlowBIFs = );
 		CONFIG_INT("Height", Height = );
 		CONFIG_INT("KeepCache", KeepCache = );
 		CONFIG_INT("MultipleQuickSaves", GameControl::MultipleQuickSaves);
