@@ -81,8 +81,8 @@ public:
 
 		incAccesses();
 
-		for (Entry *e = getBucketByHash(_hash.hash(key)); e; e = e->next)
-			if (_hash.equals(e->key, key))
+		for (Entry *e = getBucketByHash(HashKey<std::string>::hash(key)); e; e = e->next)
+			if (HashKey<std::string>::equals(e->key, key))
 				return &e->value;
 
 		return NULL;

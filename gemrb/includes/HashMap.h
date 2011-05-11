@@ -38,33 +38,33 @@ struct HashKey {
 };
 
 #define HASHMAP_DEFINE_TRIVIAL_HASHKEY(T)			\
-template<>							\
-struct HashKey<T> {						\
-	static inline unsigned int hash(const T &key)		\
+	template<>						\
+	inline unsigned int HashKey<T>::hash(const T &key)	\
 	{							\
 		return static_cast<unsigned int>(key);		\
 	}							\
-	static inline bool equals(const T &a, const T &b)	\
+	template<>						\
+	inline bool HashKey<T>::equals(const T &a, const T &b)	\
 	{							\
 		return a == b;					\
 	}							\
-	static inline void copy(T &a, const T &b)		\
+	template<>						\
+	inline void HashKey<T>::copy(T &a, const T &b)		\
 	{							\
 		a = b;						\
-	}							\
-}
+	}
 
 // MSVC6 is convinced that this the same as char[1] from StringMap.h
 //HASHMAP_DEFINE_TRIVIAL_HASHKEY(char);
 //HASHMAP_DEFINE_TRIVIAL_HASHKEY(signed char);
 //HASHMAP_DEFINE_TRIVIAL_HASHKEY(unsigned char);
 
-HASHMAP_DEFINE_TRIVIAL_HASHKEY(short);
-HASHMAP_DEFINE_TRIVIAL_HASHKEY(unsigned short);
-HASHMAP_DEFINE_TRIVIAL_HASHKEY(int);
-HASHMAP_DEFINE_TRIVIAL_HASHKEY(unsigned int);
-HASHMAP_DEFINE_TRIVIAL_HASHKEY(long);
-HASHMAP_DEFINE_TRIVIAL_HASHKEY(unsigned long);
+HASHMAP_DEFINE_TRIVIAL_HASHKEY(short)
+HASHMAP_DEFINE_TRIVIAL_HASHKEY(unsigned short)
+HASHMAP_DEFINE_TRIVIAL_HASHKEY(int)
+HASHMAP_DEFINE_TRIVIAL_HASHKEY(unsigned int)
+HASHMAP_DEFINE_TRIVIAL_HASHKEY(long)
+HASHMAP_DEFINE_TRIVIAL_HASHKEY(unsigned long)
 
 #undef HASHMAP_DEFINE_TRIVIAL_HASHKEY
 
@@ -75,7 +75,6 @@ public:
 	~HashMap();
 
 	void init(unsigned int tableSize, unsigned int blockSize);
-	void setDescription(const char *description);
 
 	// sets a value and returns true if an existing entry has been replaced
 	bool set(const Key &key, const Value &value);
@@ -92,10 +91,7 @@ protected:
 		Entry *next;
 	};
 
-	HashKey _hash;
-
 	inline bool isInitialized() const;
-	Value *take(const Key &key);
 
 	inline Entry *popAvailable();
 	inline void pushAvailable(Entry *e);
@@ -117,6 +113,8 @@ private:
 	Entry **_buckets;
 	Entry *_available;
 
+	void allocBlock();
+
 #ifdef HASHMAP_DEBUG
 	struct Debug {
 		unsigned int allocs;
@@ -124,12 +122,9 @@ private:
 	};
 
 	mutable Debug _debug;
-	void dumpStats();
+public:
+	void dumpStats(const char* description);
 #endif
-
-	char *_description;
-
-	void allocBlock();
 };
 
 template<typename Key, typename Value, typename HashKey>
@@ -138,8 +133,7 @@ HashMap<Key, Value, HashKey>::HashMap() :
 		_blockSize(0),
 		_blocks(),
 		_buckets(NULL),
-		_available(NULL),
-		_description(NULL)
+		_available(NULL)
 {
 #ifdef HASHMAP_DEBUG
 	memset(&_debug, 0, sizeof(_debug));
@@ -150,7 +144,6 @@ template<typename Key, typename Value, typename HashKey>
 HashMap<Key, Value, HashKey>::~HashMap()
 {
 	clear();
-	free(_description);
 }
 
 template<typename Key, typename Value, typename HashKey>
@@ -173,8 +166,6 @@ void HashMap<Key, Value, HashKey>::init(unsigned int tableSize, unsigned int blo
 		_blockSize = 4;
 
 	_buckets = new Entry *[_tableSize];
-	if (!_buckets)
-		error("HashMap", "%s: Out of memory\n", _description);
 
 	memset(_buckets, 0, sizeof(Entry *) * _tableSize);
 
@@ -184,17 +175,10 @@ void HashMap<Key, Value, HashKey>::init(unsigned int tableSize, unsigned int blo
 }
 
 template<typename Key, typename Value, typename HashKey>
-void HashMap<Key, Value, HashKey>::setDescription(const char *description)
-{
-	free(_description);
-	_description = strdup(description);
-}
-
-template<typename Key, typename Value, typename HashKey>
 bool HashMap<Key, Value, HashKey>::set(const Key &key, const Value &value)
 {
 	if (!isInitialized())
-		error("HashMap", "%s: Not initialized\n", _description);
+		error("HashMap", "Not initialized\n");
 
 	unsigned int p = getMapPosByKey(key);
 	Entry *e;
@@ -202,7 +186,7 @@ bool HashMap<Key, Value, HashKey>::set(const Key &key, const Value &value)
 	// set as root if empty
 	if (!_buckets[p]) {
 		e = popAvailable();
-		_hash.copy(e->key, key);
+		HashKey::copy(e->key, key);
 		e->value = value;
 
 		_buckets[p] = e;
@@ -213,7 +197,7 @@ bool HashMap<Key, Value, HashKey>::set(const Key &key, const Value &value)
 	e = _buckets[p];
 
 	// check root
-	if (_hash.equals(e->key, key)) {
+	if (HashKey::equals(e->key, key)) {
 		e->value = value;
 		return true;
 	}
@@ -230,7 +214,7 @@ bool HashMap<Key, Value, HashKey>::set(const Key &key, const Value &value)
 
 	// append new
 	hit = popAvailable();
-	_hash.copy(hit->key, key);
+	HashKey::copy(hit->key, key);
 	hit->value = value;
 	e->next = hit;
 
@@ -246,7 +230,7 @@ const Value *HashMap<Key, Value, HashKey>::get(const Key &key) const
 	incAccesses();
 
 	for (Entry *e = getBucketByKey(key); e; e = e->next)
-		if (_hash.equals(e->key, key))
+		if (HashKey::equals(e->key, key))
 			return &e->value;
 
 	return NULL;
@@ -261,7 +245,34 @@ bool HashMap<Key, Value, HashKey>::has(const Key &key) const
 template<typename Key, typename Value, typename HashKey>
 inline bool HashMap<Key, Value, HashKey>::remove(const Key &key)
 {
-	return take(key) != NULL;
+	if (!isInitialized())
+		return false;
+
+	unsigned int p = getMapPosByKey(key);
+	Entry *e = _buckets[p];
+
+	if (!e)
+		return false;
+
+	// check root
+	if (HashKey::equals(e->key, key)) {
+		_buckets[p] = e->next;
+		pushAvailable(e);
+
+		return true;
+	}
+
+	// walk the list
+	e = findPredecessor(key, e);
+	Entry *hit = e->next;
+
+	if (!hit)
+		return false;
+
+	e->next = hit->next;
+	pushAvailable(hit);
+
+	return true;
 }
 
 template<typename Key, typename Value, typename HashKey>
@@ -289,39 +300,6 @@ template<typename Key, typename Value, typename HashKey>
 bool inline HashMap<Key, Value, HashKey>::isInitialized() const
 {
 	return _buckets != NULL;
-}
-
-template<typename Key, typename Value, typename HashKey>
-Value *HashMap<Key, Value, HashKey>::take(const Key &key)
-{
-	if (!isInitialized())
-		return NULL;
-
-	unsigned int p = getMapPosByKey(key);
-	Entry *e = _buckets[p];
-
-	if (!e)
-		return NULL;
-
-	// check root
-	if (_hash.equals(e->key, key)) {
-		_buckets[p] = e->next;
-		pushAvailable(e);
-
-		return &e->value;
-	}
-
-	// walk the list
-	e = findPredecessor(key, e);
-	Entry *hit = e->next;
-
-	if (!hit)
-		return NULL;
-
-	e->next = hit->next;
-	pushAvailable(hit);
-
-	return &hit->value;
 }
 
 template<typename Key, typename Value, typename HashKey>
@@ -353,7 +331,7 @@ inline unsigned int HashMap<Key, Value, HashKey>::getMapPosByHash(unsigned int h
 template<typename Key, typename Value, typename HashKey>
 inline unsigned int HashMap<Key, Value, HashKey>::getMapPosByKey(const Key &key) const
 {
-	return getMapPosByHash(_hash.hash(key));
+	return getMapPosByHash(HashKey::hash(key));
 }
 
 template<typename Key, typename Value, typename HashKey>
@@ -372,7 +350,7 @@ template<typename Key, typename Value, typename HashKey>
 inline typename HashMap<Key, Value, HashKey>::Entry *HashMap<Key, Value, HashKey>::findPredecessor(const Key &key, Entry *e) const
 {
 	for (; e->next; e = e->next)
-		if (_hash.equals(e->next->key, key))
+		if (HashKey::equals(e->next->key, key))
 			break;
 
 	return e;
@@ -390,8 +368,6 @@ template<typename Key, typename Value, typename HashKey>
 void HashMap<Key, Value, HashKey>::allocBlock()
 {
 	Entry *block = new Entry[_blockSize];
-	if (!block)
-		error("HashMap", "%s: Out of memory\n", _description);
 
 	_blocks.push_back(block);
 
@@ -405,7 +381,7 @@ void HashMap<Key, Value, HashKey>::allocBlock()
 
 #ifdef HASHMAP_DEBUG
 template<typename Key, typename Value, typename HashKey>
-void HashMap<Key, Value, HashKey>::dumpStats()
+void HashMap<Key, Value, HashKey>::dumpStats(const char* description)
 {
 	if (!isInitialized())
 		return;
@@ -467,7 +443,7 @@ void HashMap<Key, Value, HashKey>::dumpStats()
 			">8 buckets\t%u\n"
 			"largest bucket\t%u\n"
 			"memsize\t\t%ukb\n",
-			DEFAULT, _description,
+			DEFAULT, description,
 			_tableSize, _debug.allocs, _debug.accesses,
 			entries, collisions, empty, eq1, eq2, gt2,
 			gt4, gt8, largest, bytes / 1024);
