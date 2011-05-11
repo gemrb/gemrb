@@ -52,21 +52,19 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 	return FileStream::OpenFile(path);
 }
 
-DataStream* CacheFile(const char* path)
+DataStream* CacheStream(DataStream* src)
 {
+	src->Seek(0, GEM_STREAM_START);
 	if (!core->SlowBIFs)
-		return FileStream::OpenFile(path);
+		return src;
 
-	char filename[_MAX_PATH];
 	char cachedfile[_MAX_PATH];
-	ExtractFileFromPath(filename, path);
-	PathJoin(cachedfile, core->CachePath, filename, NULL);
+	PathJoin(cachedfile, core->CachePath, src->filename, NULL);
 
 	if (!file_exists(cachedfile)) {    // File was not found in cache
-		FileStream* src = FileStream::OpenFile(path);
-		FileStream* dest = FileStream::OpenFile(cachedfile);
-		if (!src || !dest) {
-			error("Cache", "CachedFile failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
+		FileStream dest;
+		if (!dest.Create(cachedfile)) {
+			error("Cache", "CachedFile failed to write to cached file '%s' (from '%s')\n", cachedfile, src->originalfile);
 		}
 
 		size_t blockSize = 1024 * 1000;
@@ -75,13 +73,14 @@ DataStream* CacheFile(const char* path)
 			if (blockSize > src->Remains())
 				blockSize = src->Remains();
 			size_t len = src->Read(buff, blockSize);
-			size_t c = dest->Write(buff, len);
+			size_t c = dest.Write(buff, len);
 			if (c != len) {
-				error("Cache", "CacheFile failed to write to cached file '%s' (from '%s')\n", cachedfile, path);
+				error("Cache", "CacheFile failed to write to cached file '%s' (from '%s')\n", cachedfile, src->originalfile);
 			}
 		} while (src->Remains());
-		delete src;
-		delete dest;
 	}
+
+	delete src;
+
 	return FileStream::OpenFile(cachedfile);
 }

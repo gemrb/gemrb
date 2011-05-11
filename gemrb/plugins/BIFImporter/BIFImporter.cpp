@@ -106,10 +106,9 @@ int BIFImporter::OpenArchive(const char* filename)
 		delete file;
 		return GEM_ERROR;
 	}
-	delete file;
 	//normal bif, not in cache
 	if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
-		stream = CacheFile( filename );
+		stream = CacheStream(file);
 		if (!stream)
 			return GEM_ERROR;
 		stream->Read( Signature, 8 );
@@ -119,22 +118,18 @@ int BIFImporter::OpenArchive(const char* filename)
 	}
 	//not found as normal bif
 	//checking compression type
-	FileStream* compressed = FileStream::OpenFile( filename );
-	if (!compressed)
-		return GEM_ERROR;
-	compressed->Read( Signature, 8 );
 	if (strncmp( Signature, "BIF V1.0", 8 ) == 0) {
 		ieDword fnlen, complen, declen;
-		compressed->ReadDword( &fnlen );
+		file->ReadDword( &fnlen );
 		char* fname = ( char* ) malloc( fnlen );
-		compressed->Read( fname, fnlen );
+		file->Read( fname, fnlen );
 		strlwr(fname);
-		compressed->ReadDword( &declen );
-		compressed->ReadDword( &complen );
+		file->ReadDword( &declen );
+		file->ReadDword( &complen );
 		print( "Decompressing\n" );
-		stream = CacheCompressedStream(compressed, fname, complen);
+		stream = CacheCompressedStream(file, fname, complen);
 		free( fname );
-		delete( compressed );
+		delete( file );
 		if (!stream)
 			return GEM_ERROR;
 		stream->Read( Signature, 8 );
@@ -147,10 +142,10 @@ int BIFImporter::OpenArchive(const char* filename)
 
 	if (strncmp( Signature, "BIFCV1.0", 8 ) == 0) {
 		//print("'BIFCV1.0' Compressed File Found\n");
-		PathJoin( path, core->CachePath, compressed->filename, NULL );
+		PathJoin( path, core->CachePath, file->filename, NULL );
 		if (file_exists(path)) {
 			//print("Found in Cache\n");
-			delete( compressed );
+			delete( file );
 			stream = FileStream::OpenFile(path);
 			if (!stream)
 				return GEM_ERROR;
@@ -161,11 +156,11 @@ int BIFImporter::OpenArchive(const char* filename)
 				return GEM_ERROR;
 			return GEM_OK;
 		}
-		if (!DecompressBIF(compressed, path)) {
-			delete( compressed );
+		if (!DecompressBIF(file, path)) {
+			delete( file );
 			return GEM_ERROR;
 		}
-		delete( compressed );
+		delete( file );
 		stream = FileStream::OpenFile(path);
 		if (!stream)
 			return GEM_ERROR;
@@ -176,7 +171,7 @@ int BIFImporter::OpenArchive(const char* filename)
 			return GEM_ERROR;
 		return GEM_OK;
 	}
-	delete (compressed);
+	delete (file);
 	return GEM_ERROR;
 }
 
