@@ -68,7 +68,7 @@ HASHMAP_DEFINE_TRIVIAL_HASHKEY(unsigned long)
 
 #undef HASHMAP_DEFINE_TRIVIAL_HASHKEY
 
-template<typename Key, typename Value, typename HashKey = HashKey<Key> >
+template<typename Key, typename Value, typename Hash = HashKey<Key> >
 class HashMap {
 public:
 	HashMap();
@@ -174,8 +174,8 @@ void HashMap<Key, Value, HashKey>::init(unsigned int tableSize, unsigned int blo
 #endif
 }
 
-template<typename Key, typename Value, typename HashKey>
-bool HashMap<Key, Value, HashKey>::set(const Key &key, const Value &value)
+template<typename Key, typename Value, typename Hash>
+bool HashMap<Key, Value, Hash>::set(const Key &key, const Value &value)
 {
 	if (!isInitialized())
 		error("HashMap", "Not initialized\n");
@@ -186,7 +186,7 @@ bool HashMap<Key, Value, HashKey>::set(const Key &key, const Value &value)
 	// set as root if empty
 	if (!_buckets[p]) {
 		e = popAvailable();
-		HashKey::copy(e->key, key);
+		Hash::copy(e->key, key);
 		e->value = value;
 
 		_buckets[p] = e;
@@ -197,7 +197,7 @@ bool HashMap<Key, Value, HashKey>::set(const Key &key, const Value &value)
 	e = _buckets[p];
 
 	// check root
-	if (HashKey::equals(e->key, key)) {
+	if (Hash::equals(e->key, key)) {
 		e->value = value;
 		return true;
 	}
@@ -214,15 +214,15 @@ bool HashMap<Key, Value, HashKey>::set(const Key &key, const Value &value)
 
 	// append new
 	hit = popAvailable();
-	HashKey::copy(hit->key, key);
+	Hash::copy(hit->key, key);
 	hit->value = value;
 	e->next = hit;
 
 	return false;
 }
 
-template<typename Key, typename Value, typename HashKey>
-const Value *HashMap<Key, Value, HashKey>::get(const Key &key) const
+template<typename Key, typename Value, typename Hash>
+const Value *HashMap<Key, Value, Hash>::get(const Key &key) const
 {
 	if (!isInitialized())
 		return NULL;
@@ -230,20 +230,20 @@ const Value *HashMap<Key, Value, HashKey>::get(const Key &key) const
 	incAccesses();
 
 	for (Entry *e = getBucketByKey(key); e; e = e->next)
-		if (HashKey::equals(e->key, key))
+		if (Hash::equals(e->key, key))
 			return &e->value;
 
 	return NULL;
 }
 
-template<typename Key, typename Value, typename HashKey>
-bool HashMap<Key, Value, HashKey>::has(const Key &key) const
+template<typename Key, typename Value, typename Hash>
+bool HashMap<Key, Value, Hash>::has(const Key &key) const
 {
 	return get(key) != NULL;
 }
 
-template<typename Key, typename Value, typename HashKey>
-inline bool HashMap<Key, Value, HashKey>::remove(const Key &key)
+template<typename Key, typename Value, typename Hash>
+inline bool HashMap<Key, Value, Hash>::remove(const Key &key)
 {
 	if (!isInitialized())
 		return false;
@@ -255,7 +255,7 @@ inline bool HashMap<Key, Value, HashKey>::remove(const Key &key)
 		return false;
 
 	// check root
-	if (HashKey::equals(e->key, key)) {
+	if (Hash::equals(e->key, key)) {
 		_buckets[p] = e->next;
 		pushAvailable(e);
 
@@ -275,8 +275,8 @@ inline bool HashMap<Key, Value, HashKey>::remove(const Key &key)
 	return true;
 }
 
-template<typename Key, typename Value, typename HashKey>
-void HashMap<Key, Value, HashKey>::clear()
+template<typename Key, typename Value, typename Hash>
+void HashMap<Key, Value, Hash>::clear()
 {
 	if (!isInitialized())
 		return;
@@ -296,14 +296,14 @@ void HashMap<Key, Value, HashKey>::clear()
 	}
 }
 
-template<typename Key, typename Value, typename HashKey>
-bool inline HashMap<Key, Value, HashKey>::isInitialized() const
+template<typename Key, typename Value, typename Hash>
+bool inline HashMap<Key, Value, Hash>::isInitialized() const
 {
 	return _buckets != NULL;
 }
 
-template<typename Key, typename Value, typename HashKey>
-inline typename HashMap<Key, Value, HashKey>::Entry *HashMap<Key, Value, HashKey>::popAvailable()
+template<typename Key, typename Value, typename Hash>
+inline typename HashMap<Key, Value, Hash>::Entry *HashMap<Key, Value, Hash>::popAvailable()
 {
 	if (!_available)
 		allocBlock();
@@ -316,56 +316,56 @@ inline typename HashMap<Key, Value, HashKey>::Entry *HashMap<Key, Value, HashKey
 	return e;
 }
 
-template<typename Key, typename Value, typename HashKey>
-inline void HashMap<Key, Value, HashKey>::pushAvailable(Entry *e) {
+template<typename Key, typename Value, typename Hash>
+inline void HashMap<Key, Value, Hash>::pushAvailable(Entry *e) {
 	e->next = _available;
 	_available = e;
 }
 
-template<typename Key, typename Value, typename HashKey>
-inline unsigned int HashMap<Key, Value, HashKey>::getMapPosByHash(unsigned int hash) const
+template<typename Key, typename Value, typename Hash>
+inline unsigned int HashMap<Key, Value, Hash>::getMapPosByHash(unsigned int hash) const
 {
 	return hash % _tableSize;
 }
 
-template<typename Key, typename Value, typename HashKey>
-inline unsigned int HashMap<Key, Value, HashKey>::getMapPosByKey(const Key &key) const
+template<typename Key, typename Value, typename Hash>
+inline unsigned int HashMap<Key, Value, Hash>::getMapPosByKey(const Key &key) const
 {
-	return getMapPosByHash(HashKey::hash(key));
+	return getMapPosByHash(Hash::hash(key));
 }
 
-template<typename Key, typename Value, typename HashKey>
-inline typename HashMap<Key, Value, HashKey>::Entry *HashMap<Key, Value, HashKey>::getBucketByHash(unsigned int hash) const
+template<typename Key, typename Value, typename Hash>
+inline typename HashMap<Key, Value, Hash>::Entry *HashMap<Key, Value, Hash>::getBucketByHash(unsigned int hash) const
 {
 	return _buckets[getMapPosByHash(hash)];
 }
 
-template<typename Key, typename Value, typename HashKey>
-inline typename HashMap<Key, Value, HashKey>::Entry *HashMap<Key, Value, HashKey>::getBucketByKey(const Key &key) const
+template<typename Key, typename Value, typename Hash>
+inline typename HashMap<Key, Value, Hash>::Entry *HashMap<Key, Value, Hash>::getBucketByKey(const Key &key) const
 {
 	return _buckets[getMapPosByKey(key)];
 }
 
-template<typename Key, typename Value, typename HashKey>
-inline typename HashMap<Key, Value, HashKey>::Entry *HashMap<Key, Value, HashKey>::findPredecessor(const Key &key, Entry *e) const
+template<typename Key, typename Value, typename Hash>
+inline typename HashMap<Key, Value, Hash>::Entry *HashMap<Key, Value, Hash>::findPredecessor(const Key &key, Entry *e) const
 {
 	for (; e->next; e = e->next)
-		if (HashKey::equals(e->next->key, key))
+		if (Hash::equals(e->next->key, key))
 			break;
 
 	return e;
 }
 
-template<typename Key, typename Value, typename HashKey>
-inline void HashMap<Key, Value, HashKey>::incAccesses() const
+template<typename Key, typename Value, typename Hash>
+inline void HashMap<Key, Value, Hash>::incAccesses() const
 {
 #ifdef HASHMAP_DEBUG
 	_debug.accesses++;
 #endif
 }
 
-template<typename Key, typename Value, typename HashKey>
-void HashMap<Key, Value, HashKey>::allocBlock()
+template<typename Key, typename Value, typename Hash>
+void HashMap<Key, Value, Hash>::allocBlock()
 {
 	Entry *block = new Entry[_blockSize];
 
@@ -380,8 +380,8 @@ void HashMap<Key, Value, HashKey>::allocBlock()
 }
 
 #ifdef HASHMAP_DEBUG
-template<typename Key, typename Value, typename HashKey>
-void HashMap<Key, Value, HashKey>::dumpStats(const char* description)
+template<typename Key, typename Value, typename Hash>
+void HashMap<Key, Value, Hash>::dumpStats(const char* description)
 {
 	if (!isInitialized())
 		return;
