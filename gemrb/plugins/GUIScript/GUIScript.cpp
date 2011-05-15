@@ -5219,9 +5219,12 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	}
 	int mastertable = gamedata->LoadTable( "avprefix" );
 	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
+	if (!mtm) {
+		return RuntimeError("Couldn't load avprefix table.");
+	}
 	int count = mtm->GetRowCount();
 	if (count< 1 || count>8) {
-		return RuntimeError("Table is invalid." );
+		return RuntimeError("avprefix table contains no entries." );
 	}
 	const char *poi = mtm->QueryField( 0 );
 	// the base animation id
@@ -5231,6 +5234,9 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		poi = mtm->QueryField( i );
 		int table = gamedata->LoadTable( poi );
 		Holder<TableMgr> tm = gamedata->GetTable( table );
+		if (!tm) {
+			return RuntimeError("Couldn't load an avprefix table.");
+		}
 		int StatID = atoi( tm->QueryField() );
 		StatID = MyActor->GetBase( StatID );
 		poi = tm->QueryField( StatID );
