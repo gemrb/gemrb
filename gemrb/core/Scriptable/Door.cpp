@@ -394,7 +394,7 @@ void Door::DebugDump() const
 	print( "Position: %d.%d\n", Pos.x, Pos.y);
 	print( "Door Open: %s\n", YESNO(IsOpen()));
 	print( "Door Locked: %s\n", YESNO(Flags&DOOR_LOCKED));
-	print( "Door Trapped: %s\n", YESNO(Trapped));
+	print( "Door Trapped: %s	Difficulty: %d\n", YESNO(Trapped), TrapRemovalDiff);
 	if (Trapped) {
 		print( "Trap Permanent: %s Detectable: %s\n", YESNO(Flags&DOOR_RESET), YESNO(Flags&DOOR_DETECTABLE) );
 	}
