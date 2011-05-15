@@ -255,7 +255,7 @@ void Projectile::GetPaletteCopy(Animation *anim[], Palette *&pal)
 	}
 }
 
-void Projectile::SetBlend()
+void Projectile::SetBlend(int brighten)
 {
 	GetPaletteCopy(travel, palette);
 	if (!palette)
@@ -263,6 +263,9 @@ void Projectile::SetBlend()
 	if (!palette->alpha) {
 		palette->CreateShadedAlphaChannel();
 	}
+  if (brighten) {
+    palette->Brighten();
+  }
 }
 
 //create another projectile with type-1 (iterate magic missiles and call lightning)
@@ -414,7 +417,7 @@ void Projectile::Setup()
 		light = core->GetVideoDriver()->CreateLight(LightX, LightZ);
 	}
 	if (TFlags&PTF_BLEND) {
-		SetBlend();
+		SetBlend(TFlags&PTF_BRIGHTEN);
 	}
 	if (SFlags&PSF_FLYING) {
 		ZPos = FLY_HEIGHT;

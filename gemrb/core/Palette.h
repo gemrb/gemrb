@@ -85,6 +85,7 @@ public:
 	}
 
 	void CreateShadedAlphaChannel();
+  void Brighten();
 
 	void SetupPaperdollColours(const ieDword* Colors, unsigned int type);
 	void SetupRGBModification(const Palette* src, const RGBModifier* mods,

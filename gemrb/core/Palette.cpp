@@ -47,6 +47,16 @@ void Palette::CreateShadedAlphaChannel()
 	alpha = true;
 }
 
+void Palette::Brighten()
+{
+  for (int i = 0; i<256;i++) {
+    col[i].r = (col[i].r+256)/2;
+    col[i].g = (col[i].g+256)/2;
+    col[i].b = (col[i].b+256)/2;
+    col[i].a = (col[i].a+256)/2;
+  }
+}
+
 Palette* Palette::Copy()
 {
 	Palette* pal = new Palette(col, alpha);

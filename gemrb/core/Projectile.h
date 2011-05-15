@@ -68,7 +68,8 @@
 #define PTF_TINT    8       //tint projectile
 #define PTF_SHADOW  32      //has shadow bam
 #define PTF_LIGHT   64      //has light shadow
-#define PTF_BLEND   128     //blend colours
+#define PTF_BLEND   128     //blend colours (use alpha)
+#define PTF_BRIGHTEN 256    //brighten alpha
 
 //projectile extended travel flags (gemrb specific)
 #define PEF_BOUNCE     1       //bounce from walls (lightning bolt)
@@ -360,7 +361,7 @@ private:
 	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq);
 	void GetPaletteCopy(Animation *anim[], Palette *&pal);
 	void GetSmokeAnim();
-	void SetBlend();
+	void SetBlend(int brighten);
 	//apply spells and effects on the target, only in single travel mode
 	//area effect projectiles call a separate single travel projectile for each affected target
 	void Payload();
