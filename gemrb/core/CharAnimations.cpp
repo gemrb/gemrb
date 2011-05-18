@@ -1721,6 +1721,7 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_TWITCH:
+		case IE_ANI_SLEEP:
 			strcat( ResRef, "g2" );
 			Cycle = 64 + Orient;
 			break;
