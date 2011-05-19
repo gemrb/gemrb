@@ -4884,6 +4884,13 @@ void Actor::UpdateActorState(ieDword gameTime) {
 			return;
 		}
 
+		// some states and timestop disable modal actions
+		// interestingly the original doesn't include STATE_DISABLED, STATE_FROZEN/STATE_PETRIFIED
+		ieDword state = Modified[IE_STATE_ID];
+		if (Immobile() || (state & (STATE_CONFUSED | STATE_DEAD | STATE_HELPLESS | STATE_PANIC | STATE_BERSERK | STATE_SLEEP))) {
+			return;
+		}
+
 		//we can set this to 0
 		modalTime = gameTime;
 
