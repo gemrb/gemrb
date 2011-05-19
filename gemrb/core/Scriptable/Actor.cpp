@@ -4871,9 +4871,6 @@ void Actor::UpdateActorState(ieDword gameTime) {
 
 	//apply the modal effect on the beginning of each round
 	if ((((gameTime-roundTime)%core->Time.round_size)==0)) {
-		//we can set this to 0
-		modalTime = gameTime;
-
 		// handle lingering modal spells like bardsong in iwd2
 		if (modalSpellLingering && LingeringModalSpell[0]) {
 			modalSpellLingering--;
@@ -4886,6 +4883,9 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		if (ModalState == MS_NONE) {
 			return;
 		}
+
+		//we can set this to 0
+		modalTime = gameTime;
 
 		if (!ModalSpell[0]) {
 			printMessage("Actor","Modal Spell Effect was not set!\n", YELLOW);
