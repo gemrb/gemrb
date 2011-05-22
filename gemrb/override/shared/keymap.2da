@@ -1,0 +1,50 @@
+2DA V1.0
+*
+                      MODULE           FUNCTION                          GROUP
+Inventory             GUIINV           OpenInventoryWindow               0
+Character_Record      GUIREC           OpenRecordsWindow                 0
+Return_To_Game        GUICommonWindows ReturnToGame                      0
+Journal               GUIJRNL          OpenJournalWindow                 0
+Map                   GUIMA            OpenMapWindow                     0 
+Wizard_Spells         GUIMG            OpenMageWindow                    0
+Priest_Spells         GUIPR            OpenPriestWindow                  0
+Options               GUIOPT           OpenOptionsWindow                 0
+Character_Arbitration GUIMP            * 
+Guard_/_Protect       GUICommonWindows ActionDefendPressed               0
+Turn_Undead           GUICommonWindows ActionTurnPressed                 0
+Battle_Song           GUICommonWindows ActionBardSongPressed             0
+Cast_Spell            GUICommonWindows ActionCastPressed                 0
+Use_Item              GUICommonWindows ActionUseItemPressed              0
+Dialog                GUICommonWindows ActionTalkPressed                 0
+Thieving              GUICommonWindows ActionThievingPressed             0
+Stealth               GUICommonWindows ActionStealthPressed              0
+Trap_Detection        GUICommonWindows ActionSearchPressed               0
+Group_Stop            GUICommonWindows ActionStopPressed                 0
+Group_Attack          GUICommonWindows ActionAttackPressed               0
+Special_Abilities     GUICommonWindows ActionInnatePressed               0
+Equip_Melee_Weapon    GUICommonWindows ActionMeleePressed                0
+Equip_Range_Weapon    GUICommonWindows ActionRangePressed                0
+Quick_Load            GUILOAD          QuickLoadPressed                  0
+Quick_Save            GUISAVE          QuickSavePressed                  0
+Rest                  GUICommon        RestPress                         0
+Hide_Interface        GUICommonWindows HideInterface                     0
+Right_Interface       GUICommonWindows MinimizePortraits                 0
+Left_Interface        MessageWindow    Options                           0
+Toggle_AI             MessageWindow    TogglePartyAI                     0
+Hard_Pause            GUICommonWindows HardPausePressed                  0
+Location              GUICommonWindows LocationPressed                   0
+Chat_Window           GUIMP            *
+Spell_Slot_1          GUICommonWindows *
+Spell_Slot_2          GUICommonWindows *
+Spell_Slot_3          GUICommonWindows *
+Weapon_Slot_1         GUICommonWindows ActionQWeapon1Pressed             0
+Weapon_Slot_2         GUICommonWindows ActionQWeapon2Pressed             0
+Weapon_Slot_3         GUICommonWindows ActionQWeapon3Pressed             0
+Weapon_Slot_4         GUICommonWindows ActionQWeapon4Pressed             0
+Item_Slot_1           GUICommonWindows ActionQItem1Pressed               0
+Item_Slot_2           GUICommonWindows ActionQItem2Pressed               0
+Item_Slot_3           GUICommonWindows ActionQItem3Pressed               0
+Item_Slot_4           GUICommonWindows ActionQItem4Pressed               0
+Item_Slot_5           GUICommonWindows ActionQItem5Pressed               0
+Default               GUICommonWindows ResolveKey                        0
+
