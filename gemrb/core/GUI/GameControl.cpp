@@ -32,6 +32,7 @@
 #include "ImageMgr.h"
 #include "Interface.h"
 #include "Item.h"
+#include "KeyMap.h"
 #include "PathFinder.h"
 #include "SaveGameIterator.h"
 #include "ScriptEngine.h"
@@ -1032,6 +1033,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				displaymsg->DisplayConstantString(STR_UNPAUSED,0xff0000);
 			}
 			break;
+/*
 		case 'm':
 			core->GetGUIScriptEngine()->RunFunction("GUIMA","OpenMapWindow");
 			break;
@@ -1050,6 +1052,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		case 'w':
 			core->GetGUIScriptEngine()->RunFunction("GUIMG","OpenMageWindow");
 			break;
+*/
 		case 'q': //quicksave
 			QuickSave();
 			break;
@@ -1060,6 +1063,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
 			break;
 		default:
+			core->GetKeyMap()->ResolveKey(Key,0);
 			break;
 	}
 }

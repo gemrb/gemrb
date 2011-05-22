@@ -69,6 +69,7 @@ class GlobalTimer;
 class ITMExtHeader;
 class Image;
 class Item;
+class KeyMap;
 class Label;
 class Map;
 class MusicMgr;
@@ -349,6 +350,7 @@ private:
 	EventHandler TickHook;
 	int SpecialSpellsCount;
 	SpellDescType *SpecialSpells;
+	KeyMap *keymap;
 public:
 	Holder<StringMgr> strings;
 	GlobalTimer * timer;
@@ -520,6 +522,12 @@ public:
 	Calendar * GetCalendar() const
 	{
 		return calendar;
+	}
+
+	/** Gets the KeyMap class */
+	KeyMap * GetKeyMap() const
+	{
+		return keymap;
 	}
 
 	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/

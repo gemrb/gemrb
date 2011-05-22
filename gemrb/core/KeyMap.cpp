@@ -1,0 +1,139 @@
+/* GemRB - Infinity Engine Emulator
+ * Copyright (C) 2009 The GemRB Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ *
+ */
+
+#include "KeyMap.h"
+#include "win32def.h"
+#include "Interface.h"
+#include "TableMgr.h"
+#include "ScriptEngine.h"
+#include "System/FileStream.h"
+
+#define KEYLENGTH 64
+
+Function::Function(const char *m, const char *f, int g)
+{
+	strncpy(module, m, sizeof(module));
+	strncpy(function, f, sizeof(function));
+	group = g;
+}
+
+KeyMap::KeyMap()
+{
+	keymap.SetType(GEM_VARIABLES_POINTER);
+}
+
+bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
+{
+	AutoTable kmtable(tablefile);
+
+	if (!kmtable) {
+		return false;
+	}
+
+        char tINIkeymap[_MAX_PATH];
+        PathJoin( tINIkeymap, core->GamePath, inifile, NULL );
+        FileStream* config = FileStream::OpenFile( tINIkeymap );
+
+	if (config == NULL) {
+		printMessage("KeyMap","There is no keymap.ini file...\n",YELLOW);
+		return false;
+	}
+	char name[KEYLENGTH+1], value[_MAX_PATH + 3];
+	while (config->Remains()) {
+		char line[_MAX_PATH];
+
+		if (config->ReadLine(line, _MAX_PATH) == -1)
+			break;
+
+		if ((line[0] == '#') ||
+			( line[0] == '[' ) ||
+			( line[0] == '\r' ) ||
+			( line[0] == '\n' ) ||
+			( line[0] == ';' )) {
+			continue;
+		}
+
+		name[0] = 0;
+		value[0] = 0;
+
+		//the * element is not counted
+		if (sscanf( line, "%[^=]=%[^\r\n]", name, value )!=2)
+			continue;
+
+		strnlwrcpy(name,name,KEYLENGTH);
+		for(int c=0;c<KEYLENGTH;c++) if (name[c]==' ') name[c]='_';
+
+		int l = strlen(value);
+		Function *fun;
+		void *tmp;
+
+		if (l<0 || l>1 || keymap.Lookup(value, tmp) ) {
+			print("Ignoring key %s\n", value);
+			continue;
+		}
+
+		const char *module;
+		const char *function;
+		const char *group;
+
+		if (kmtable->GetRowIndex(name)>=0 ) {
+			module = kmtable->QueryField(name, "MODULE");
+			function = kmtable->QueryField(name, "FUNCTION");
+			group = kmtable->QueryField(name, "GROUP");
+		} else {
+			module = kmtable->QueryField("Default","MODULE");
+			function = kmtable->QueryField("Default","FUNCTION");
+			group = kmtable->QueryField("Default","GROUP");
+		}
+		fun = new Function(module, function, atoi(group));
+		keymap.SetAt(value, fun);
+		print("Adding key %s with function %s::%s\n", value, module, function);
+	}
+	delete config;
+	return true;
+}
+
+//group can be:
+//main gamecontrol
+void KeyMap::ResolveKey(int key, int group)
+{
+	Function *fun;
+	void *tmp;
+	char keystr[2];
+
+	keystr[0]=(char) key;
+	keystr[1]=0;
+
+	print("Looking up key: %c (%s) \n", key, keystr);
+
+	if (!keymap.Lookup(keystr, tmp) ) {
+		return;
+	}
+	fun = (Function *) tmp;
+	
+	if (fun->group!=group) {
+		return;
+	}
+
+	printMessage("KeyMap", " ", WHITE);
+	print("RunFunction(%s::%s)\n",fun->module, fun->function);
+	core->GetGUIScriptEngine()->RunFunction(fun->module, fun->function);
+}
+

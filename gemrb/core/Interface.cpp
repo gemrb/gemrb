@@ -47,6 +47,7 @@
 #include "GlobalTimer.h"
 #include "ImageMgr.h"
 #include "ItemMgr.h"
+#include "KeyMap.h"
 #include "MapMgr.h"
 #include "MoviePlayer.h"
 #include "MusicMgr.h"
@@ -143,6 +144,7 @@ Interface::Interface(int iargc, char* iargv[])
 	sgiterator = NULL;
 	game = NULL;
 	calendar = NULL;
+	keymap = NULL;
 	worldmap = NULL;
 	CurrentStore = NULL;
 	CurrentContainer = NULL;
@@ -339,6 +341,7 @@ Interface::~Interface(void)
 	delete game;
 	delete calendar;
 	delete worldmap;
+	delete keymap;
 
 	FreeAbilityTables();
 
@@ -1779,6 +1782,7 @@ int Interface::Init()
 	}
 	game = NULL;
 	calendar = NULL;
+        keymap = NULL;
 
 	timer = new GlobalTimer();
 	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
@@ -1893,6 +1897,15 @@ int Interface::Init()
 	InitializeIEScript();
 	printStatus( "OK", LIGHT_GREEN );
 
+	printMessage( "Core", "Initializing keymap tables...", WHITE);
+	keymap = new KeyMap();
+	ret = keymap->InitializeKeyMap("keymap.ini", "keymap");
+	if (!ret) {
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
+	} else {
+		printStatus( "OK", LIGHT_GREEN );
+	}
 	printMessage( "Core", "Core Initialization Complete!\n", WHITE );
 
 	return GEM_OK;

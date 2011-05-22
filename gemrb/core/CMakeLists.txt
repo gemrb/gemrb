@@ -41,6 +41,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Inventory.cpp
 	Item.cpp
 	ItemMgr.cpp
+	KeyMap.cpp
 	LRUCache.cpp
 	Map.cpp
 	MapMgr.cpp
