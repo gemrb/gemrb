@@ -2651,7 +2651,9 @@ static EffectRef fx_cure_sleep_ref = { "Cure:Sleep", -1 };
 
 void Actor::GetHit()
 {
-	SetStance( IE_ANI_DAMAGE );
+	if (!Immobile()) {
+		SetStance( IE_ANI_DAMAGE );
+	}
 	DisplayStringCore(this, VB_DAMAGE, DS_CONSOLE|DS_CONST );
 	if (Modified[IE_STATE_ID]&STATE_SLEEP) {
 		if (Modified[IE_EXTSTATE_ID]&EXTSTATE_NO_WAKEUP) {
