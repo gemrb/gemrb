@@ -1130,13 +1130,10 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	//InMove can clear destination, so we need to save it
-	Point dest = actor->Destination;
 
 	// try the actual move, if we are not already moving there
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
 		actor->WalkTo( parameters->pointParameter, 0 );
-		dest = actor->Destination;
 	}
 
 	// give up if we can't move there (no path was found)
