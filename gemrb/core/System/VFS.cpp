@@ -148,6 +148,12 @@ char* PathAppend (char* target, const char* name)
 		target[len++] = PathDelimiter;
 		target[len] = 0;
 	}
+	// strip possible leading backslash, since it is not ignored on all platforms
+	// totl has '\data\zcMHar.bif' in the key file, and also the CaseSensitive
+	// code breaks with that extra slash, so simple fix: remove it
+	if (name[0] == '\\') {
+		name = name+1;
+	}
 	strncat( target+len, name, _MAX_PATH - len - 1 );
 
 	return target;
