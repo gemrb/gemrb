@@ -669,6 +669,7 @@ void Map::UpdateScripts()
 		}
 		if (timestop && actor!=timestop_owner && actor->Modified[IE_DISABLETIMESTOP] == 0) {
 			actor->no_more_steps = true;
+			actor->ClearPath(); //HACK: prevents jumping when timestop ends
 			continue;
 		}
 
@@ -686,6 +687,9 @@ void Map::UpdateScripts()
 			}
 		}
 		actor->no_more_steps = false;
+		if (actor->Immobile()) {
+			actor->ClearPath(); //HACK: prevents jumping when effect ends
+		}
 
 		/*
 		 * we run scripts all at once because one of the actions in ProcessActions
