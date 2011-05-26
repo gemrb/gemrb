@@ -1912,20 +1912,20 @@ static void InitActorTables()
 		}
 	}
 
-				//initializing the skill->stats conversion table (used in iwd2)
-				tm.load("skillsta");
-				if (tm) {
-					      int rowcount = tm->GetRowCount();
-					      skillcount = rowcount;
-					      if (rowcount) {
-					              skillstats = (int *) malloc(rowcount * sizeof(int) );
-					              skillabils = (int *) malloc(rowcount * sizeof(int) );
-					              while(rowcount--) {
-					                      skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
-					                      skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
-					              }
-					      }
-				}
+	//initializing the skill->stats conversion table (used in iwd2)
+	tm.load("skillsta");
+	if (tm) {
+		int rowcount = tm->GetRowCount();
+		skillcount = rowcount;
+		if (rowcount) {
+			skillstats = (int *) malloc(rowcount * sizeof(int) );
+			skillabils = (int *) malloc(rowcount * sizeof(int) );
+			while(rowcount--) {
+				skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
+				skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
+			}
+		}
+	}
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
