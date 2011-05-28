@@ -2718,6 +2718,12 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 
 	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
 
+	// instant chunky death if the actor is petrified or frozen
+	if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && !Modified[IE_DISABLECHUNKING]) {
+		damage = 123456; // arbitrarily high for death; won't be displayed
+		LastDamageType |= DAMAGE_CHUNKING;
+	}
+
 	if (BaseStats[IE_HITPOINTS] <= (ieDword) damage) {
 		// common fists do normal damage, but cause sleeping for a round instead of death
 		if ((damagetype & DAMAGE_STUNNING) && Modified[IE_MINHITPOINTS] <= 0) {
@@ -2767,7 +2773,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	//LastDamage=damage;
 	InternalFlags|=IF_ACTIVE;
 	int chp = (signed) BaseStats[IE_HITPOINTS];
-	int damagelevel = 0;
+	int damagelevel = 0; //FIXME: this level is never used
 	if (damage<10) {
 		damagelevel = 1;
 	} else {
