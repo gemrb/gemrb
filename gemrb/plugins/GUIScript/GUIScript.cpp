@@ -3552,7 +3552,8 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 	if (ctl->animation) {
 		//if this control says the resource is the same
 		//we wanted to set, we don't reset it
-		if(ctl->animation->SameResource(ResRef, Cycle)) {
+		//but we must reinitialize it, if it was play once
+		if(ctl->animation->SameResource(ResRef, Cycle) && !(ctl->Flags&IE_GUI_BUTTON_PLAYONCE)) {
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
