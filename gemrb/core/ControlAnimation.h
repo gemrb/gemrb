@@ -38,6 +38,7 @@ private:
 	unsigned int frame;
 	unsigned int anim_phase;
 	bool has_palette;
+	bool is_blended;
 	ieDword colors[8];
 public:
 	ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycle = 0);
@@ -46,6 +47,7 @@ public:
 	//report if the current resource is the same as descripted by the params
 	bool SameResource(const ieResRef ResRef, int Cycle);
 	void SetPaletteGradients(ieDword *col);
+	void SetBlend(bool b);
 };
 
 #endif

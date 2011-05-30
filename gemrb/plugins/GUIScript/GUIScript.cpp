@@ -3530,7 +3530,7 @@ static PyObject* GemRB_Control_SetAnimationPalette(PyObject * /*self*/, PyObject
 }
 
 PyDoc_STRVAR( GemRB_Control_SetAnimation__doc,
-"SetAnimation(WindowIndex, ControlIndex, BAMResRef[, Cycle])\n\n"
+"SetAnimation(WindowIndex, ControlIndex, BAMResRef[, Cycle, Blend])\n\n"
 "Sets the animation of a Control (usually a Button) from a BAM file. Optionally an animation cycle could be set too.");
 
 static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
@@ -3538,8 +3538,9 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 	int wi, ci;
 	char *ResRef;
 	int Cycle = 0;
+	int Blend = 0;
 
-	if (!PyArg_ParseTuple( args, "iis|i", &wi, &ci, &ResRef, &Cycle )) {
+	if (!PyArg_ParseTuple( args, "iis|ii", &wi, &ci, &ResRef, &Cycle, &Blend )) {
 		return AttributeError( GemRB_Control_SetAnimation__doc );
 	}
 
@@ -3569,6 +3570,9 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 
 	ControlAnimation* anim = new ControlAnimation( ctl, ResRef, Cycle );
 
+	if (Blend) {
+		anim->SetBlend(true);
+	}
 	anim->UpdateAnimation();
 
 	Py_INCREF( Py_None );
