@@ -311,6 +311,9 @@ def OnMageMemorizeSpell ():
 		GemRB.PlaySound ("GAM_24")
 		Button = MageWindow.GetControl(index + 27)
 		Button.SetAnimation ("FLASH")
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+		Button = MageWindow.GetControl(mem_cnt + 2)
+		Button.SetAnimation ("FLASH")
 	return
 
 def CloseMageSpellUnmemorizeWindow ():
