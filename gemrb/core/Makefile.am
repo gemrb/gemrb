@@ -62,6 +62,7 @@ libgemrb_core_la_SOURCES = \
 	Inventory.cpp \
 	Item.cpp \
 	ItemMgr.cpp \
+	KeyMap.cpp \
 	LRUCache.cpp \
 	Map.cpp \
 	MapMgr.cpp \
