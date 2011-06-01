@@ -98,12 +98,13 @@ def OpenSpellBookWindow ():
 		Button = Window.GetControl (6 + i)
 		Button.SetBorder (0,0,0,0,0,0,0,0,160,0,1)
 		#Button.SetBAM ("SPELFRAM",0,0,0)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
 	for i in range (8):
 		Button = Window.GetControl (30 + i)
+		Button.SetFlags (IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetVarAssoc ("SpellIndex", i)
 
@@ -145,7 +146,7 @@ def UpdateSpellBookWindow ():
 			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 			Button.SetSpellIcon (ms['SpellResRef'])
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 			if ms['Flags']:
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSpellBookSpellUnmemorizeWindow)
 			else:
@@ -159,7 +160,7 @@ def UpdateSpellBookWindow ():
 		else:
 			if i < max_mem_cnt:
 				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-				Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+				Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 			else:
 				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 				Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
@@ -279,10 +280,16 @@ def OnSpellBookMemorizeSpell ():
 	level = SpellBookSpellLevel
 	type = IE_SPELL_TYPE_PRIEST
 
-	index = GemRB.GetVar ("SpellButton") - 100 + TopIndex
+	index = GemRB.GetVar ("SpellButton") - 100
 
-	if GemRB.MemorizeSpell (pc, type, level, index):
+	if GemRB.MemorizeSpell (pc, type, level, index + TopIndex):
 		UpdateSpellBookWindow ()
+		GemRB.PlaySound ("GAM_24")
+		Button = PriestWindow.GetControl(index + 30)
+		Button.SetAnimation ("FLASH")
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+		Button = PriestWindow.GetControl(mem_cnt + 5)
+		Button.SetAnimation ("FLASH")
 	return
 
 def OpenSpellBookSpellRemoveWindow ():
@@ -371,6 +378,9 @@ def OnSpellBookUnmemorizeSpell ():
 
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
 		UpdateSpellBookWindow ()
+		GemRB.PlaySound ("GAM_44")
+		Button = PriestWindow.GetControl(index + 6)
+		Button.SetAnimation ("FLASH")
 	return
 
 
