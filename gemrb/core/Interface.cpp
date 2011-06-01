@@ -1902,7 +1902,6 @@ int Interface::Init()
 	ret = keymap->InitializeKeyMap("keymap.ini", "keymap");
 	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
-		return GEM_ERROR;
 	} else {
 		printStatus( "OK", LIGHT_GREEN );
 	}
