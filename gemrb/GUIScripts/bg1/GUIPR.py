@@ -96,13 +96,13 @@ def OpenPriestWindow ():
 		Button = Window.GetControl (3 + i)
 		Button.SetBorder (0,0,0,0,0,0,0,0,64,0,1)
 		Button.SetSprites ("SPELFRAM",0,0,0,0,0)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
 	for i in range (20):
 		Button = Window.GetControl (27 + i)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdatePriestWindow)
@@ -122,9 +122,9 @@ def UpdatePriestWindow ():
 
 	Window = PriestWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Type = IE_SPELL_TYPE_PRIEST
+	type = IE_SPELL_TYPE_PRIEST
 	level = PriestSpellLevel
-	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, Type, level)
+	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
 
 	Label = Window.GetControl (0x10000032)
 	GemRB.SetToken ('LEVEL', str (level + 1))
@@ -134,14 +134,14 @@ def UpdatePriestWindow ():
 	Label = Window.GetControl (0x10000035)
 	Label.SetText (Name)
 
-	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, Type, level)
+	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
 	for i in range (12):
 		Button = Window.GetControl (3 + i)
 		if i < mem_cnt:
-			ms = GemRB.GetMemorizedSpell (pc, Type, level, i)
+			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 			Button.SetSpellIcon (ms['SpellResRef'])
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 			if ms['Flags']:
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPriestSpellUnmemorizeWindow)
 			else:
@@ -154,7 +154,7 @@ def UpdatePriestWindow ():
 			Button.EnableBorder (0, ms['Flags'] == 0)
 		else:
 			if i < max_mem_cnt:
-				Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
+				Button.SetFlags (IE_GUI_BUTTON_NORMAL | IE_GUI_BUTTON_PLAYONCE, OP_SET)
 			else:
 				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
@@ -163,11 +163,11 @@ def UpdatePriestWindow ():
 			Button.EnableBorder (0, 0)
 
 
-	known_cnt = GemRB.GetKnownSpellsCount (pc, Type, level)
+	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
 	for i in range (20):
 		Button = Window.GetControl (27 + i)
 		if i < known_cnt:
-			ks = GemRB.GetKnownSpell (pc, Type, level, i)
+			ks = GemRB.GetKnownSpell (pc, type, level, i)
 			Button.SetSpellIcon (ks['SpellResRef'])
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestMemorizeSpell)
@@ -203,6 +203,7 @@ def PriestPrevLevelPress ():
 	if PriestSpellLevel > 0:
 		PriestSpellLevel = PriestSpellLevel - 1
 		UpdatePriestWindow ()
+		
 	return
 
 def PriestNextLevelPress ():
@@ -262,12 +263,18 @@ def OpenPriestSpellInfoWindow ():
 def OnPriestMemorizeSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
-	Type = IE_SPELL_TYPE_PRIEST
+	type = IE_SPELL_TYPE_PRIEST
 
 	index = GemRB.GetVar ("SpellButton") - 100
 
-	if GemRB.MemorizeSpell (pc, Type, level, index):
+	if GemRB.MemorizeSpell (pc, type, level, index):
 		UpdatePriestWindow ()
+		GemRB.PlaySound ("GAM_24")
+		Button = PriestWindow.GetControl(index + 27)
+		Button.SetAnimation ("FLASH",0,1)
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+		Button = PriestWindow.GetControl(mem_cnt + 2)
+		Button.SetAnimation ("FLASH",0,1)
 	return
 
 def OpenPriestSpellRemoveWindow ():
@@ -332,12 +339,15 @@ def OnPriestUnmemorizeSpell ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
-	Type = IE_SPELL_TYPE_PRIEST
+	type = IE_SPELL_TYPE_PRIEST
 
 	index = GemRB.GetVar ("SpellButton")
 
-	if GemRB.UnmemorizeSpell (pc, Type, level, index):
+	if GemRB.UnmemorizeSpell (pc, type, level, index):
 		UpdatePriestWindow ()
+		GemRB.PlaySound ("GAM_44")
+		Button = PriestWindow.GetControl(index + 3)
+		Button.SetAnimation ("FLASH",0,1)
 	return
 
 def OnPriestRemoveSpell ():
@@ -346,12 +356,12 @@ def OnPriestRemoveSpell ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
-	Type = IE_SPELL_TYPE_PRIEST
+	type = IE_SPELL_TYPE_PRIEST
 
 	index = GemRB.GetVar ("SpellButton")-100
 
 	#remove spell from memory
-	GemRB.RemoveSpell (pc, Type, level, index)
+	GemRB.RemoveSpell (pc, type, level, index)
 	UpdatePriestWindow ()
 	return
 
