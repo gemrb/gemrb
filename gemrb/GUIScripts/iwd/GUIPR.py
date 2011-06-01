@@ -88,13 +88,13 @@ def OpenPriestWindow ():
 		Button = Window.GetControl (3 + i)
 		Button.SetBorder (0,0,0,0,0,0,0,0,64,0,1)
 		Button.SetSprites ("SPELFRAM",0,0,0,0,0)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
 	for i in range (GUICommon.GetIWDSpellButtonCount()):
 		Button = Window.GetControl (27 + i)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	GUICommonWindows.SetSelectionChangeHandler (UpdatePriestWindow)
@@ -132,7 +132,7 @@ def UpdatePriestWindow ():
 			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 			Button.SetSpellIcon (ms['SpellResRef'], 0)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
 			if ms['Flags']:
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPriestSpellUnmemorizeWindow)
 			else:
@@ -145,7 +145,7 @@ def UpdatePriestWindow ():
 			Button.EnableBorder (0, ms['Flags'] == 0)
 		else:
 			if i < max_mem_cnt:
-				Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
+				Button.SetFlags (IE_GUI_BUTTON_NORMAL | IE_GUI_BUTTON_PLAYONCE, OP_SET)
 			else:
 				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
@@ -258,6 +258,12 @@ def OnPriestMemorizeSpell ():
 
 	if GemRB.MemorizeSpell (pc, type, level, index):
 		UpdatePriestWindow ()
+		GemRB.PlaySound ("GAM_24")
+		Button = PriestWindow.GetControl(index + 27)
+		Button.SetAnimation ("FLASH",0,1)
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+		Button = PriestWindow.GetControl(mem_cnt + 2)
+		Button.SetAnimation ("FLASH",0,1)
 	return
 
 def OpenPriestSpellRemoveWindow ():
@@ -328,6 +334,9 @@ def OnPriestUnmemorizeSpell ():
 
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
 		UpdatePriestWindow ()
+		GemRB.PlaySound ("GAM_44")
+		Button = PriestWindow.GetControl(index + 3)
+		Button.SetAnimation ("FLASH",0,1)
 	return
 
 def OnPriestRemoveSpell ():
