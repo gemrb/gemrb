@@ -78,6 +78,13 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 			continue;
 
 		strnlwrcpy(name,name,KEYLENGTH);
+		//remove trailing spaces (bg1 ini file contains them)
+                char *nameend = name + strlen( name ) - 1;
+                while (nameend >= name && strchr( " \t\r\n", *nameend )) {
+                        *nameend-- = '\0';
+                }
+
+		//change internal spaces to underscore
 		for(int c=0;c<KEYLENGTH;c++) if (name[c]==' ') name[c]='_';
 
 		int l = strlen(value);
