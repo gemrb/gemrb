@@ -51,7 +51,7 @@ bool DataStream::IsEndianSwitch()
 /** Returns true if the stream is encrypted */
 bool DataStream::CheckEncrypted()
 {
-	ieWord two;
+	ieWord two = 0x0000; // if size < 2, two won't be initialized
 	Seek( 0, GEM_STREAM_START );
 	Read( &two, 2 );
 	if (two == 0xFFFF) {
