@@ -342,7 +342,7 @@ private:
 	int FindRangedProjectile(unsigned int type) const;
 	// called by KillSlot
 	void RemoveSlotEffects( /*CREItem* slot*/ ieDword slot );
-	void KillSlot(ieDword index);
+	void KillSlot(unsigned int index);
 	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot) const;
 	void UpdateWeaponAnimation();
 	void UpdateShieldAnimation(Item *it);
