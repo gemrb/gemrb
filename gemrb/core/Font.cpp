@@ -455,19 +455,9 @@ int Font::CalcStringWidth(const char* string, bool NoColor) const
 	size_t ret = 0, len = strlen( string );
 	for (size_t i = 0; i < len; i++) {
 		if (( ( unsigned char ) string[i] ) == '[' && !NoColor) {
-			i++;
-			if (i>=len)
-				break;
-			char tag[256];
-			int k = 0;
-			for (k = 0; k < 256; k++) {
-				if (string[i] == ']') {
-					tag[k] = 0;
-					break;
-				}
-				tag[k] = string[i++];
+			while(i<len && ((unsigned char) string[i]) != ']') {
+				i++;
 			}
-			continue;
 		}
 		ret += size[( unsigned char ) string[i] - 1].w;
 	}
