@@ -138,7 +138,7 @@ private:
 	/** Sets spell from memorized as 'already-cast' */
 	bool DepleteSpell(CREMemorizedSpell* spl);
 	/** Depletes a sorcerer type spellpage by one */
-	void DepleteLevel(CRESpellMemorization* sm);
+	void DepleteLevel(CRESpellMemorization* sm, const ieResRef except);
 	/** Adds a single spell to the spell info list */
 	void AddSpellInfo(unsigned int level, unsigned int type, const ieResRef name, unsigned int idx);
 	/** regenerates the spellinfo list */
@@ -195,8 +195,9 @@ public:
 	/** adds a spell to the book, returns experience if learned */
 	int LearnSpell(Spell *spell, int memo);
 	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index) const;
-	unsigned int GetMemorizedSpellsCount(int type) const;
-	unsigned int GetMemorizedSpellsCount(int type, unsigned int level) const;
+	unsigned int GetMemorizedSpellsCount(int type, bool real) const;
+	unsigned int GetMemorizedSpellsCount(int type, unsigned int level, bool real) const;
+	unsigned int GetMemorizedSpellsCount(const ieResRef name, int type, bool real) const;
 	CREMemorizedSpell* GetMemorizedSpell(int type, unsigned int level, unsigned int index) const;
 
 	int GetMemorizableSpellsCount(int type, unsigned int level, bool bonus) const;

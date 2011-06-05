@@ -107,7 +107,7 @@ struct UsedItemType {
 
 typedef char EventNameType[17];
 #define IS_DROP	0
-#define IS_GET 	1
+#define IS_GET	1
 
 typedef ieResRef ResRefPairs[2];
 
@@ -6528,7 +6528,7 @@ static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GetMemorizedSpellsCount__doc,
-"GetMemorizedSpellsCount(PartyID, SpellType[, Level, global])=>int\n\n"
+"GetMemorizedSpellsCount(PartyID, SpellType, Level, castable[, global])=>int\n\n"
 "Returns number of spells of given type and level in PartyID's memory. "
 "If level is omitted then it returns the number of distinct spells memorised.\n"
 "If global is set, the actor will be looked up by its global ID instead of party slot.");
@@ -6537,8 +6537,9 @@ static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* ar
 {
 	int PartyID, SpellType, Level = -1;
 	int global = 0;
+	bool castable;
 
-	if (!PyArg_ParseTuple( args, "ii|ii", &PartyID, &SpellType, &Level, &global )) {
+	if (!PyArg_ParseTuple( args, "iiii|i", &PartyID, &SpellType, &Level, &castable, &global )) {
 		return AttributeError( GemRB_GetMemorizedSpellsCount__doc );
 	}
 	GET_GAME();
@@ -6554,9 +6555,13 @@ static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* ar
 	}
 
 	if (Level<0) {
-		return PyInt_FromLong( actor->spellbook.GetSpellInfoSize( SpellType ) );
+		if (castable) {
+			return PyInt_FromLong( actor->spellbook.GetSpellInfoSize( SpellType ) );
+		} else {
+			return PyInt_FromLong( actor->spellbook.GetMemorizedSpellsCount( SpellType, false ) );
+		}
 	} else {
-		return PyInt_FromLong( actor->spellbook.GetMemorizedSpellsCount( SpellType, Level ) );
+		return PyInt_FromLong( actor->spellbook.GetMemorizedSpellsCount( SpellType, Level, castable ) );
 	}
 }
 
@@ -7606,7 +7611,7 @@ static PyObject* GemRB_SetMapDoor(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	GET_MAP();
-	
+
 	Door *door = map->TMap->GetDoor(DoorName);
 	if (!door) {
 		return RuntimeError( "No such door!" );
@@ -8511,7 +8516,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			} else {
 				type = IE_SPELL_TYPE_INNATE;
 			}
-			if (!actor->spellbook.GetMemorizedSpellsCount(type)) {
+			if (!actor->spellbook.GetMemorizedSpellsCount(type, true)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
@@ -8634,6 +8639,11 @@ static PyObject* GemRB_Window_SetupControls(PyObject * /*self*/, PyObject* args)
 			ieResRef *poi = &actor->PCStats->QuickSpells[action-ACT_QSPELL1];
 			if ((*poi)[0]) {
 				SetSpellIcon(wi, ci, *poi, 1, 1, i+1);
+				int mem = actor->spellbook.GetMemorizedSpellsCount(*poi, -1, true);
+				if (!mem) {
+					state = IE_GUI_BUTTON_DISABLED;
+				}
+				SetItemText(wi, ci, mem, true);
 			}
 		}
 			break;
@@ -10689,3 +10699,4 @@ PyObject* GUIScript::ConstructObject(const char* type, PyObject* pArgs)
 GEMRB_PLUGIN(0x1B01BE6B, "GUI Script Engine (Python)")
 PLUGIN_CLASS(IE_GUI_SCRIPT_CLASS_ID, GUIScript)
 END_PLUGIN()
+

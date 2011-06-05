@@ -137,7 +137,7 @@ def UpdateMageWindow ():
 	Label = Window.GetControl (0x10000035)
 	Label.SetText (Name)
 
-	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 	for i in range (12):
 		Button = Window.GetControl (3 + i)
 		if i < mem_cnt:
@@ -266,7 +266,7 @@ def OnMageMemorizeSpell ():
 		GemRB.PlaySound ("GAM_24")
 		Button = MageWindow.GetControl(index + 27)
 		Button.SetAnimation ("FLASH",0,1)
-		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 		Button = MageWindow.GetControl(mem_cnt + 2)
 		Button.SetAnimation ("FLASH",0,1)
 	return

@@ -139,7 +139,7 @@ def UpdateSpellBookWindow ():
 	Button = Window.GetControl (1)
 	Button.SetPicture (GemRB.GetPlayerPortrait (pc,0))
 
-	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 	for i in range (24):
 		Button = Window.GetControl (6 + i)
 		if i < mem_cnt:
@@ -287,7 +287,7 @@ def OnSpellBookMemorizeSpell ():
 		GemRB.PlaySound ("GAM_24")
 		Button = PriestWindow.GetControl(index + 30)
 		Button.SetAnimation ("FLASH")
-		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 		Button = PriestWindow.GetControl(mem_cnt + 5)
 		Button.SetAnimation ("FLASH")
 	return

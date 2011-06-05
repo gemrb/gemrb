@@ -169,7 +169,8 @@ def UpdateMageWindow ():
 	Label.SetText (Name)
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
-	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
+	true_mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, True)
 	if not BookType:
 		for i in range (12):
 			Button = Window.GetControl (3 + i)
@@ -201,7 +202,7 @@ def UpdateMageWindow ():
 		label = Window.GetControl (0x10000040)
 		if known_cnt:
 			# we give sorcerers all charges for all the spells, so some extra math is needed
-			label.SetText (GemRB.GetString(61256) + " " + str(mem_cnt/known_cnt) + "/" + str(max_mem_cnt))
+			label.SetText (GemRB.GetString(61256) + " " + str(true_mem_cnt/known_cnt) + "/" + str(max_mem_cnt))
 		else:
 			label.SetText ("")
 
@@ -311,7 +312,7 @@ def OnMageMemorizeSpell ():
 		GemRB.PlaySound ("GAM_24")
 		Button = MageWindow.GetControl(index + 27)
 		Button.SetAnimation ("FLASH")
-		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 		Button = MageWindow.GetControl(mem_cnt + 2)
 		Button.SetAnimation ("FLASH")
 	return
@@ -709,7 +710,7 @@ def BuildSpellList (pc, type, level):
 
 	SpellList = {}
 	dummy = [Spell1,Spell2,Spell3]
-	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 
 	for i in range(mem_cnt):
 		ms = GemRB.GetMemorizedSpell (pc, type, level, i)

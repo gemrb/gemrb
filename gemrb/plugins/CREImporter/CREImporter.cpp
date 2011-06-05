@@ -2682,7 +2682,7 @@ int CREImporter::PutSpellPages( DataStream *stream, Actor *actor)
 			tmpWord = i;
 			stream->WriteWord( &tmpWord);
 			stream->WriteDword( &SpellIndex);
-			tmpDword = actor->spellbook.GetMemorizedSpellsCount(i,j);
+			tmpDword = actor->spellbook.GetMemorizedSpellsCount(i,j, false);
 			stream->WriteDword( &tmpDword);
 			SpellIndex += tmpDword;
 		}
@@ -2696,7 +2696,7 @@ int CREImporter::PutMemorizedSpells(DataStream *stream, Actor *actor)
 	for (int i=0;i<type;i++) {
 		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
 		for (unsigned int j=0;j<level;j++) {
-			unsigned int count = actor->spellbook.GetMemorizedSpellsCount(i,j);
+			unsigned int count = actor->spellbook.GetMemorizedSpellsCount(i,j, false);
 			for (unsigned int k=0;k<count;k++) {
 				CREMemorizedSpell *cm = actor->spellbook.GetMemorizedSpell(i,j,k);
 
