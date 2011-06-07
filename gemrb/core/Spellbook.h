@@ -242,6 +242,10 @@ public:
 
 	/** lists spells of a type */
 	bool GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count);
+
+	/** find the first spell matching resref */
+	bool FindSpellInfo(SpellExtHeader *array, ieResRef spellname);
+
 	/** Dumps spellbook to stdout for debugging */
 	void dump();
 };

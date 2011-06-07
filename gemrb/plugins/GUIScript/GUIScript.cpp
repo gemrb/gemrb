@@ -8976,7 +8976,20 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	}
 
 	SpellExtHeader spelldata; // = SpellArray[spell];
-	actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
+
+	if (type==-2) {
+		//resolve quick spell slot
+		if (!actor->PCStats) {
+			//no quick slots for this actor, is this an error?
+			//return RuntimeError( "Actor has no quickslots!\n" );
+			Py_INCREF( Py_None );
+			return Py_None;
+		}
+		//quick spell type is available in actor->PCStats->QuickSpellClasses, if needed
+		actor->spellbook.FindSpellInfo(&spelldata, actor->PCStats->QuickSpells[spell]);
+	} else {
+		actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
+	}
 
 	print("Cast spell: %s\n", spelldata.spellname);
 	print("Slot: %d\n", spelldata.slot);
