@@ -343,6 +343,22 @@ def ActionQWeapon3Pressed ():
 def ActionQWeapon4Pressed ():
 	ActionQWeaponPressed(3)
 
+def ActionQSpellPressed (which):
+	pc = GemRB.GameGetFirstSelectedActor ()
+
+	GemRB.SpellCast (pc, -2, which, 1)
+	UpdateActionsWindow ()
+	return
+
+def ActionQSpell1Pressed ():
+	ActionQSpellPressed(0)
+
+def ActionQSpell2Pressed ():
+	ActionQSpellPressed(1)
+
+def ActionQSpell3Pressed ():
+	ActionQSpellPressed(2)
+
 #no check needed because the button wouldn't be drawn if illegal
 def ActionLeftPressed ():
 	"""Scrolls the actions window left.
