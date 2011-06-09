@@ -2446,8 +2446,7 @@ void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 16, 2 * bufw,
 					0x7C00, 0x03E0, 0x001F, 0 );
 	} else {
-		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 8, bufw, 0x7C00,
-					0x03E0, 0x001F, 0 );
+		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 8, bufw, 0, 0, 0, 0 );
 
 		for (i = 0; i < 256; i++) {
 			sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
