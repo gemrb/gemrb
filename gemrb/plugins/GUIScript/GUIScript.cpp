@@ -6502,14 +6502,19 @@ PyDoc_STRVAR( GemRB_GetKnownSpell__doc,
 
 static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID, SpellType, Level, Index;
+	int PartyID, SpellType, Level, Index, global = 0;
 
-	if (!PyArg_ParseTuple( args, "iiii", &PartyID, &SpellType, &Level, &Index )) {
+	if (!PyArg_ParseTuple( args, "iiii|i", &PartyID, &SpellType, &Level, &Index, &global )) {
 		return AttributeError( GemRB_GetKnownSpell__doc );
 	}
 	GET_GAME();
 
-	Actor* actor = game->FindPC( PartyID );
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( PartyID );
+	} else {
+		actor = game->FindPC( PartyID );
+	}
 	if (!actor) {
 		return RuntimeError( "Actor not found!\n" );
 	}
@@ -8760,6 +8765,53 @@ static PyObject* GemRB_SetDefaultActions(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+
+PyDoc_STRVAR( GemRB_SetupQuickSpell__doc,
+"SetupQuickSpell(PartyID, spellslot, spellindex, type[, global])=>int\n\n"
+"Set up a quick spell slot of a PC.\n\n"
+"If global is set, the actor will be looked up by its global ID instead of party slot."
+"It also returns the target type of the selected spell.");
+
+static PyObject* GemRB_SetupQuickSpell(PyObject * /*self*/, PyObject* args)
+{
+	SpellExtHeader spelldata;
+	int PartyID, which, slot, type;
+	int global = 0;
+
+	if (!PyArg_ParseTuple( args, "iiii|i", &PartyID, &slot, &which, &type, &global )) {
+		return AttributeError( GemRB_SetupQuickSpell__doc );
+	}
+
+	GET_GAME();
+
+	Actor* actor;
+	if (global) {
+		actor = game->GetActorByGlobalID( PartyID );
+	} else {
+		actor = game->FindPC( PartyID );
+	}
+	if (!actor) {
+		return RuntimeError( "Actor not found!\n" );
+	}
+
+	if (!actor->PCStats) {
+		//no quick slots for this actor, is this an error?
+		//return RuntimeError( "Actor has no quickslots!\n" );
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
+	actor->spellbook.GetSpellInfo(&spelldata, type, which, 1);
+	if (!spelldata.spellname[0]) {
+		return RuntimeError( "Invalid parameter!\n" );
+	}
+
+	memcpy(actor->PCStats->QuickSpells[slot], spelldata.spellname, sizeof(ieResRef) );
+	actor->PCStats->QuickSpellClass[slot] = type;
+
+	return PyInt_FromLong( spelldata.Target );
+}
+
 PyDoc_STRVAR( GemRB_SetupQuickSlot__doc,
 "SetupQuickSlot(PartyID, quickslot, inventoryslot[, headerindex, global])\n\n"
 "Set up a quick slot or weapon slot of a PC to use a weapon ability.\n\n"
@@ -10180,6 +10232,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetTooltipDelay, METH_VARARGS),
 	METHOD(SetupMaze, METH_VARARGS),
 	METHOD(SetupQuickSlot, METH_VARARGS),
+	METHOD(SetupQuickSpell, METH_VARARGS),
 	METHOD(SetVar, METH_VARARGS),
 	METHOD(SoftEndPL, METH_NOARGS),
 	METHOD(SpellCast, METH_VARARGS),
@@ -10436,7 +10489,7 @@ bool GUIScript::Init(void)
 	}
 
 	// GameType-specific import path must have a higher priority than
-	//   the generic one, so insert it before it
+	// the generic one, so insert it before it
 	sprintf( string, "sys.path.insert(-1, \"%s\")", QuotePath( quoted, path2 ));
 	if (PyRun_SimpleString( string ) == -1) {
 		printMessage( "GUIScript", "%s", RED, string );
