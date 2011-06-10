@@ -47,6 +47,7 @@ ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycl
 	control = ctl;
 	control->animation = this;
 	has_palette = false;
+	is_blended = false;
 }
 
 //freeing the bitmaps only once, but using an intelligent algorithm
