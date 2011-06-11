@@ -2907,7 +2907,7 @@ void Actor::PlayWalkSound()
 	if (!cnt) return;
 
 	cnt=core->Roll(1,cnt,-1);
-	strnuprcpy(Sound, anims->GetWalkSound(), sizeof(ieResRef) );
+	strnuprcpy(Sound, anims->GetWalkSound(), sizeof(ieResRef)-1 );
 	area->ResolveTerrainSound(Sound, Pos);
 	if (cnt) {
 		int len = strlen(Sound);
