@@ -83,7 +83,7 @@ private:
 public:
 	ieResRef AreaName;
 	ieResRef AreaResRef;
-	char AreaLongName[32];
+	ieVariable AreaLongName;
 	ieDword IconSeq;
 	ieDword X;
 	ieDword Y;
@@ -101,7 +101,7 @@ public:
 
 struct WMPAreaLink {
 	ieDword AreaIndex;
-	char DestEntryPoint[32];
+	ieVariable DestEntryPoint;
 	ieDword DistanceScale;
 	ieDword DirectionFlags; //where will the player appear on dest. area
 	ieResRef EncounterAreaResRef[5];

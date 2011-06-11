@@ -167,6 +167,7 @@ WMPAreaEntry* WMPImporter::GetAreaEntry(DataStream *str, WMPAreaEntry* ae)
 	str->ReadResRef( ae->AreaName );
 	str->ReadResRef( ae->AreaResRef );
 	str->Read( ae->AreaLongName, 32 );
+	ae->AreaLongName[32]=0;
 	ieDword tmpDword;
 	str->ReadDword( &tmpDword );
 	str->ReadDword( &ae->IconSeq );
@@ -191,6 +192,7 @@ WMPAreaLink* WMPImporter::GetAreaLink(DataStream *str, WMPAreaLink* al)
 {
 	str->ReadDword( &al->AreaIndex );
 	str->Read( al->DestEntryPoint, 32 );
+	al->DestEntryPoint[32]=0;
 	str->ReadDword( &al->DistanceScale );
 	str->ReadDword( &al->DirectionFlags );
 	for (unsigned k = 0; k < 5; k++) {
