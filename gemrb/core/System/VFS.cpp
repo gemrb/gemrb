@@ -199,8 +199,9 @@ bool PathJoin (char *target, const char *base, ...)
 		target[0] = '\0';
 		return false;
 	}
-
-	strcpy(target, base);
+	if (base != target) {
+		strcpy(target, base);
+	}
 
 	va_list ap;
 	va_start(ap, base);
