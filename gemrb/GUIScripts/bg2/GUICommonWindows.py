@@ -168,7 +168,7 @@ def EmptyControls ():
 		pc = GemRB.GameGetFirstSelectedActor ()
 		#init spell list
 		GemRB.SpellCast (pc, -1, 0, 1)
-		
+
 	GemRB.SetVar ("ActionLevel", 0)
 	Window = ActionsWindow
 	for i in range (12):
@@ -279,7 +279,7 @@ def SetupItemAbilities(pc, slot):
 			Button.SetItemIcon (slot_item['ItemResRef'], i+6)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItemAbility)
 			Button.SetVarAssoc ("Ability", i)
-	
+
 			Button.SetTooltip ("F%d - %s"%(i+1,GemRB.GetString(Tips[i])) )
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -375,7 +375,7 @@ def ActionQWeapon4Pressed ():
 
 def ActionQSpellPressed (which):
 	pc = GemRB.GameGetFirstSelectedActor ()
-	
+
 	GemRB.SpellCast (pc, -2, which, 1)
 	UpdateActionsWindow ()
 	return
