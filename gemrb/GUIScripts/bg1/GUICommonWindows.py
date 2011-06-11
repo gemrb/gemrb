@@ -370,6 +370,22 @@ def ActionQSpell2Pressed ():
 def ActionQSpell3Pressed ():
 	ActionQSpellPressed(2)
 
+def ActionQSpellRightPressed (which):
+	GemRB.SetVar ("QSpell", which)
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 2)
+	UpdateActionsWindow ()
+	return
+
+def ActionQSpell1RightPressed ():
+	ActionQSpellRightPressed(0)
+
+def ActionQSpell2RightPressed ():
+	ActionQSpellRightPressed(1)
+
+def ActionQSpell3RightPressed ():
+	ActionQSpellRightPressed(2)
+
 #no check needed because the button wouldn't be drawn if illegal
 def ActionLeftPressed ():
 	"""Scrolls the actions window left.
@@ -447,6 +463,7 @@ def ActionUseItemPressed ():
 
 def ActionCastPressed ():
 	"""Opens the spell choice scrollbar."""
+	GemRB.SetVar ("QSpell", -1)
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 2)
 	UpdateActionsWindow ()
@@ -529,8 +546,25 @@ def SpellPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	Spell = GemRB.GetVar ("Spell")
 	Type = GemRB.GetVar ("Type")
+	slot = GemRB.GetVar ("QSpell")
+	if slot>=0:
+		#setup quickspell slot
+		#if spell has no target, return
+		#otherwise continue with casting
+		Target = GemRB.SetupQuickSpell (pc, slot, Spell, Type, 1)
+		if Target == 5:
+			Type = -1
+			GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
+
+	if Type==-1:
+		GemRB.SetVar ("ActionLevel", 0)
+		GemRB.SetVar("Type", 0)
 	GemRB.SpellCast (pc, Type, Spell, 1)
-	GemRB.SetVar ("ActionLevel", 0)
+	if GemRB.GetVar ("Type")!=-1:
+		GemRB.SetVar ("ActionLevel", 0)
+		#init spell list
+		GemRB.SpellCast (pc, -1, 0, 1)
+	GemRB.SetVar ("TopIndex", 0)
 	UpdateActionsWindow ()
 	return
 
