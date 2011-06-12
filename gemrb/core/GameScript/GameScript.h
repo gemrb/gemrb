@@ -146,7 +146,7 @@ class GEM_EXPORT Object {
 public:
 	Object()
 	{
-		objectName[0] = 0;
+		memset( objectName, 0, 65 );
 
 		memset( objectFields, 0, MAX_OBJECT_FIELDS * sizeof( int ) );
 		memset( objectFilters, 0, MAX_NESTING * sizeof( int ) );
@@ -292,8 +292,8 @@ public:
 		objects[0] = NULL;
 		objects[1] = NULL;
 		objects[2] = NULL;
-		string0Parameter[0] = 0;
-		string1Parameter[0] = 0;
+		memset(string0Parameter, 0, 65);
+		memset(string1Parameter, 0, 65);
 		int0Parameter = 0;
 		pointParameter.null();
 		int1Parameter = 0;
