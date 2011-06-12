@@ -199,12 +199,14 @@ class GEM_EXPORT Trigger {
 public:
 	Trigger()
 	{
+		triggerID = 0;
 		flags = 0;
 		objectParameter = NULL;
-		string0Parameter[0] = 0;
-		string1Parameter[0] = 0;
+		memset(string0Parameter, 0, 65);
+		memset(string1Parameter, 0, 65);
 		int0Parameter = 0;
 		int1Parameter = 0;
+		int2Parameter = 0;
 		pointParameter.null();
 		canary = (unsigned long) 0xdeadbeef;
 	}
