@@ -1,11 +1,11 @@
-GemRB git (363718d77d05fc5a):
+GemRB git r1ee726db77c3 (2011-06-11):
   New features:
-    - 
+    - quickspell support
+    - keymap.ini handling
     - it should be possible to complete ToB too now
     - yet more unhardcoded PST projectiles
 
   Improved features:
-    - 
     - performance
     - squirrels and other small game don't die instantly
     - stores and stacking
