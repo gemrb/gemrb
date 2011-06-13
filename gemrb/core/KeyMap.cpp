@@ -83,11 +83,10 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 		name[0] = 0;
 		value[0] = 0;
 
-		//the * element is not counted
-		//TODO:merge the two format strings
-		if (sscanf( line, "%[^=]=%*[ ]%[^\r\n]", name, value )!=2)
-			if (sscanf( line, "%[^=]=%[^\r\n]", name, value )!=2)
-				continue;
+		//ignore possible space after the =, sadly we cannot do the same with
+		//spaces before it
+		if (sscanf( line, "%[^=]= %[^\r\n]", name, value )!=2)
+			continue;
 
 		strnlwrcpy(name,name,KEYLENGTH);
 		//remove trailing spaces (bg1 ini file contains them)
