@@ -1041,6 +1041,7 @@ public:
 	static void DayNight(Scriptable *Sender, Action* parameters);
 	static void Deactivate(Scriptable* Sender, Action* parameters);
 	static void Debug(Scriptable* Sender, Action* parameters);
+	static void DemoEnd(Scriptable* Sender, Action* parameters);
 	static void DestroyAllDestructableEquipment(Scriptable* Sender,
 		Action* parameters);
 	static void DestroyAllEquipment(Scriptable* Sender, Action* parameters);

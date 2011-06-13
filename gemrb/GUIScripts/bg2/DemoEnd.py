@@ -23,12 +23,41 @@
 
 import GemRB
 
+Picture = None
+Table = None
+Window = None
+
 def OnLoad ():
-	GemRB.HideGUI ()
-	GemRB.QuitGame ()
-	which = GemRB.GetVar ("QuitGame3")
-	if which==-1:
-		GemRB.SetNextScript("DemoEnd")
+	global Table, Picture, Window
+	
+	GemRB.LoadWindowPack("demoend", 640, 480)
+	Window = GemRB.LoadWindow(0)
+	Window.SetFrame()
+	Picture = 0
+	Table = GemRB.LoadTable ("splashsc")
+	resref = Table.GetValue (Picture,0)
+	print "Picture name:", resref
+	Button = Window.GetControl (0)
+	Button.SetFlags (IE_GUI_BUTTON_DEFAULT|IE_GUI_BUTTON_CANCEL|IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
+	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
+	Button.SetPicture (resref)
+	Window.SetVisible (WINDOW_VISIBLE)
+	return
+	
+def NextPress ():
+	global Picture
+	
+	Picture = Picture + 1
+	if Table.GetRowCount()<=Picture:
+		DemoEnd()
 	else:
-		GemRB.SetNextScript("Start")
+		resref = Table.GetValue (Picture,0)
+		print "Picture name:", resref
+		Button = Window.GetControl (0)
+		Button.SetPicture (resref)
+	return
+	
+def DemoEnd ():
+	GemRB.SetNextScript ("Start")
 	return

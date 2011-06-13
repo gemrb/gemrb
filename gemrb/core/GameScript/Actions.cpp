@@ -4794,6 +4794,16 @@ void GameScript::QuitGame(Scriptable* Sender, Action* parameters)
 	core->SetNextScript("QuitGame");
 }
 
+//BG2 demo end, shows some pictures then goes to main screen
+void GameScript::DemoEnd(Scriptable* Sender, Action* parameters)
+{
+	ClearAllActions(Sender, parameters);
+	core->GetDictionary()->SetAt("QuitGame1", (ieDword)0);
+	core->GetDictionary()->SetAt("QuitGame2", (ieDword)0);
+	core->GetDictionary()->SetAt("QuitGame3", (ieDword)-1);
+	core->SetNextScript("QuitGame");
+}
+
 void GameScript::StopMoving(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {

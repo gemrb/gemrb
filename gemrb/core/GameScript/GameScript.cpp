@@ -508,7 +508,7 @@ static const ActionLink actionnames[] = {
 	{"debug", GameScript::Debug, 0},
 	{"debugoutput", GameScript::Debug, 0},
 	{"deletejournalentry", GameScript::RemoveJournalEntry, 0},
-	{"demoend", GameScript::QuitGame, 0}, //same for now
+	{"demoend", GameScript::DemoEnd, 0}, //same for now
 	{"destroyalldestructableequipment", GameScript::DestroyAllDestructableEquipment, 0},
 	{"destroyallequipment", GameScript::DestroyAllEquipment, 0},
 	{"destroygold", GameScript::DestroyGold, 0},
