@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-# QuitGame.py - display EndGame sequence
+# DemoEnd.py - display DemoEnd pictures
 
 ###################################################
 
@@ -36,7 +36,6 @@ def OnLoad ():
 	Picture = 0
 	Table = GemRB.LoadTable ("splashsc")
 	resref = Table.GetValue (Picture,0)
-	print "Picture name:", resref
 	Button = Window.GetControl (0)
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT|IE_GUI_BUTTON_CANCEL|IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
@@ -53,7 +52,6 @@ def NextPress ():
 		DemoEnd()
 	else:
 		resref = Table.GetValue (Picture,0)
-		print "Picture name:", resref
 		Button = Window.GetControl (0)
 		Button.SetPicture (resref)
 	return
