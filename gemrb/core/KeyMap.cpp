@@ -39,6 +39,16 @@ KeyMap::KeyMap()
 	keymap.SetType(GEM_VARIABLES_POINTER);
 }
 
+void ReleaseFunction(void *fun)
+{
+	delete (Function *) fun;
+}
+
+KeyMap::~KeyMap()
+{
+	keymap.RemoveAll(ReleaseFunction);
+}
+
 bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 {
 	AutoTable kmtable(tablefile);
@@ -74,8 +84,10 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 		value[0] = 0;
 
 		//the * element is not counted
-		if (sscanf( line, "%[^=]=%[^\r\n]", name, value )!=2)
-			continue;
+		//TODO:merge the two format strings
+		if (sscanf( line, "%[^=]=%*[ ]%[^\r\n]", name, value )!=2)
+			if (sscanf( line, "%[^=]=%[^\r\n]", name, value )!=2)
+				continue;
 
 		strnlwrcpy(name,name,KEYLENGTH);
 		//remove trailing spaces (bg1 ini file contains them)

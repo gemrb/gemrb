@@ -31,6 +31,7 @@ private:
 	Variables keymap;
 public:
 	KeyMap();
+	~KeyMap();
 	bool InitializeKeyMap(const char *inifile, const char *keyfile);
 	void ResolveKey(int key, int group);
 };
