@@ -173,9 +173,9 @@ static Condition* GetCondition(char* string)
 		} else {
 			condition->triggers.push_back(trigger);
 		}
-		free(lines[i]);
+		free( lines[i] );
 	}
-	free(lines);
+	free( lines );
 	return condition;
 }
 
@@ -200,7 +200,7 @@ Condition* DLGImporter::GetStateTrigger(unsigned int index) const
 	str->Read( string, Length );
 	string[Length] = 0;
 	Condition *condition = GetCondition(string);
-	free(string);
+	free( string );
 	return condition;
 }
 
@@ -247,8 +247,10 @@ std::vector<Action*> DLGImporter::GetAction(unsigned int index) const
 			action->IncRef();
 			actions.push_back(action);
 		}
-		free(lines[i]);
+		free( lines[i] );
 	}
+	free( lines );
+	free( string );
 	return actions;
 }
 
