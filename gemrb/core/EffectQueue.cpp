@@ -1002,7 +1002,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 
 	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
-	if( fx->random_value < val) {
+	if( fx->random_value < (signed)val) {
 		// when using biased magic resistance non-hostile spells aren't resisted
 		if ((selective_mr && (fx->SourceFlags&SF_HOSTILE)) || !selective_mr) {
 			print ("effect resisted: %s\n", (char*) Opcodes[fx->Opcode].Name);
