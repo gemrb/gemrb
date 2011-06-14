@@ -308,11 +308,15 @@ int SDLVideoDriver::PollEvents() {
 				case SDLK_RIGHT:
 					key = GEM_RIGHT;
 					break;
+				case SDLK_DELETE:
+#ifndef TARGET_OS_IPHONE
+					//iOS currently doesnt have a backspace so we use delete.
+					//This change should be future proof in the event they change delete
+					key = GEM_DELETE;
+					break;
+#endif
 				case SDLK_BACKSPACE:
 					key = GEM_BACKSP;
-					break;
-				case SDLK_DELETE:
-					key = GEM_DELETE;
 					break;
 				case SDLK_RETURN:
 				case SDLK_KP_ENTER:
