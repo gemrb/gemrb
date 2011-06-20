@@ -39,6 +39,7 @@ bool ResourceManager::AddSource(const char *path, const char *description, Plugi
 {
 	PluginHolder<ResourceSource> source(type);
 	if (!source->Open(path, description)) {
+		printMessage("ResourceManager","Invalid path given: %s (%s)\n", YELLOW, path, description);
 		return false;
 	}
 
