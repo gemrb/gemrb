@@ -2432,7 +2432,6 @@ bool Interface::LoadConfig(const char* filename)
 		return false;
 	}
 	if (!KeepCache) DelTree((const char *) CachePath, false);
-	FixPath( CachePath, true );
 
 	return true;
 }

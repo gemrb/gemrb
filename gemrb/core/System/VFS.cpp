@@ -391,6 +391,8 @@ bool DirectoryIterator::IsDirectory()
 {
 	char dtmp[_MAX_PATH];
 	GetFullPath(dtmp);
+	//this is needed on windows!!!
+	FixPath(dtmp, false);
 	return dir_exists(dtmp);
 }
 
