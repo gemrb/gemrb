@@ -613,6 +613,9 @@ void Map::UpdateScripts()
 		}
 	}
 
+	GenerateQueues();
+	SortQueues();
+
 	// if masterarea, then we allow 'any' actors
 	// if not masterarea, we allow only players
 	// if (!GetActorCount(MasterArea) ) {
@@ -846,6 +849,9 @@ void Map::UpdateScripts()
 			ip->Update();
 		}
 	}
+
+	GenerateQueues();
+	SortQueues();
 }
 
 void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) {
@@ -1084,9 +1090,6 @@ void Map::DrawMap(Region screen)
 		DrawHighlightables( screen );
 	}
 
-	//if it is only here, then the scripting will fail?
-	GenerateQueues();
-	SortQueues();
 	//drawing queues 1 and 0
 	//starting with lower priority
 	//so displayed, but inactive actors (dead) will be drawn over
