@@ -549,7 +549,8 @@ def GetActorClassTitle (actor):
 					ClassTitle = CommonTables.KitList.GetValue (KitIndex, 2)
 				else:
 					ClassTitle = CommonTables.Classes.GetValue (ClassIndex, 2)
-				ClassTitle = GemRB.GetString (ClassTitle)
+				if ClassTitle != "*":
+					ClassTitle = GemRB.GetString (ClassTitle)
 	else:
 		ClassTitle = GemRB.GetString (ClassTitle)
 
@@ -664,6 +665,9 @@ def IsDualSwap (actor):
 	else:
 		BaseClass = GetKitIndex (actor)
 		BaseClass = CommonTables.KitList.GetValue (BaseClass, 7)
+		if BaseClass == "*":
+			# mod boilerplate
+			return 0
 		BaseClass = CommonTables.Classes.FindValue (5, BaseClass)
 		BaseClass = CommonTables.Classes.GetRowName (BaseClass)
 

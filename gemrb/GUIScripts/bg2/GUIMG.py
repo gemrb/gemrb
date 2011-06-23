@@ -184,11 +184,14 @@ def UpdateMageWindow ():
 				else:
 					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageUnmemorizeSpell)
 				Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenMageSpellInfoWindow)
-				spell = GemRB.GetSpell (ms['SpellResRef'])
-				Button.SetTooltip (spell['SpellName'])
 				MageMemorizedSpellList.append (ms['SpellResRef'])
 				Button.SetVarAssoc ("SpellButton", i)
 				Button.EnableBorder (0, ms['Flags'] == 0)
+				spell = GemRB.GetSpell (ms['SpellResRef'])
+				if not spell:
+					print "Missing memorised spell!", ms['SpellResRef']
+					continue
+				Button.SetTooltip (spell['SpellName'])
 			else:
 				if i < max_mem_cnt:
 					Button.SetFlags (IE_GUI_BUTTON_NORMAL | IE_GUI_BUTTON_PLAYONCE, OP_SET)
@@ -213,10 +216,13 @@ def UpdateMageWindow ():
 			Button.SetSpellIcon (ks['SpellResRef'], 0)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageMemorizeSpell)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenMageSpellInfoWindow)
-			spell = GemRB.GetSpell (ks['SpellResRef'])
-			Button.SetTooltip (spell['SpellName'])
 			MageKnownSpellList.append (ks['SpellResRef'])
 			Button.SetVarAssoc ("SpellButton", 100 + i)
+			spell = GemRB.GetSpell (ks['SpellResRef'])
+			if not spell:
+				print "Missing known spell!", ms['SpellResRef']
+				continue
+			Button.SetTooltip (spell['SpellName'])
 
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
