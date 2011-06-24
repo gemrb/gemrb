@@ -4796,7 +4796,7 @@ int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_bounce_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_projectile (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	STAT_BIT_OR( IE_BOUNCE, BNC_PROJECTILE );
+	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_PROJECTILE );
 	return FX_APPLIED;
 }
 
@@ -4804,7 +4804,7 @@ int fx_bounce_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_bounce_opcode (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_opcode (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	STAT_BIT_OR( IE_BOUNCE, BNC_OPCODE );
+	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_OPCODE );
 	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
@@ -4813,7 +4813,7 @@ int fx_bounce_opcode (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_bounce_spelllevel (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_spellevel (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	STAT_BIT_OR( IE_BOUNCE, BNC_LEVEL );
+	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_LEVEL );
 	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
@@ -4822,7 +4822,7 @@ int fx_bounce_spelllevel (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_bounce_spelllevel_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_spellevel_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	STAT_BIT_OR( IE_BOUNCE, BNC_LEVEL_DEC );
+	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_LEVEL_DEC );
 	target->AddPortraitIcon(PI_BOUNCE);
 	return FX_APPLIED;
 }
@@ -4840,7 +4840,7 @@ int fx_protection_spelllevel_dec (Scriptable* /*Owner*/, Actor* target, Effect* 
 int fx_bounce_school (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_school (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	STAT_BIT_OR( IE_BOUNCE, BNC_SCHOOL );
+	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_SCHOOL );
 	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
@@ -4849,7 +4849,7 @@ int fx_bounce_school (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_bounce_secondary_type (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_secondary_type (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	STAT_BIT_OR( IE_BOUNCE, BNC_SECTYPE );
+	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_SECTYPE );
 	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
@@ -4898,7 +4898,7 @@ int fx_resist_spell_dec (Scriptable* /*Owner*/, Actor* target, Effect *fx)
 int fx_bounce_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_spell (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	STAT_BIT_OR( IE_BOUNCE, BNC_RESOURCE );
+	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_RESOURCE );
 	return FX_APPLIED;
 }
 
@@ -4906,7 +4906,7 @@ int fx_bounce_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_bounce_spell_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_spell (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	STAT_BIT_OR( IE_BOUNCE, BNC_RESOURCE_DEC );
+	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_RESOURCE_DEC );
 	return FX_APPLIED;
 }
 
@@ -5273,7 +5273,7 @@ int fx_protection_secondary_type_dec (Scriptable* /*Owner*/, Actor* target, Effe
 int fx_bounce_school_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_school_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	STAT_BIT_OR( IE_BOUNCE, BNC_SCHOOL_DEC );
+	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_SCHOOL_DEC );
 	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
@@ -5282,7 +5282,7 @@ int fx_bounce_school_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_bounce_secondary_type_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_bounce_secondary_type_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	STAT_BIT_OR( IE_BOUNCE, BNC_SECTYPE_DEC );
+	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_SECTYPE_DEC );
 	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
