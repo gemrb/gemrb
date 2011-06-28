@@ -1,5 +1,5 @@
 
-Prototype: GemRB.ApplySpell(PartyID, resref)
+Prototype: GemRB.ApplySpell(PartyID, resref[, casterID])
 
 Description: Applies a spell on the actor marked by PartyID.
 This function can be used to add abilities that are stored as spells (eg. innates)
@@ -7,6 +7,7 @@ This function can be used to add abilities that are stored as spells (eg. innate
 Parameters:
 PartyID           - the player character's index in the party
 resref            - spell resource reference
+casterID          - global id of the desired caster
 
 Return value: N/A
 
