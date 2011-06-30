@@ -59,7 +59,7 @@ binary and then run
 instead.
 
 .\"###################################################
-.SH Configuration File
+.SH CONFIGURATION
 .PD 0
 A configuration file consists of pairs
 .IR PARAMETER=VALUE ,
@@ -69,7 +69,7 @@ more than once, only the last occurence is used.
 
 Empty lines and lines starting with `#' (hash sign) are ignored.
 
-.B Parameters:
+.SH General Parameters:
 
 .TP
 .BR GameType =(bg1|bg2|iwd|iwd2|how|pst)
@@ -82,22 +82,6 @@ for various tweaks hardcoded in the GemRB engine.
 .BR GameName =STRING
 Arbitrary name of the game. It will be displayed in the window's title bar.
 
-.TP
-.BR GamePath =PATH
-Path to the directory where the original game is installed. If you can't
-install the game under MS Windows or with WINE, you can try to unpack the data files
-with the
-.I unshield
-program found at 
-.IR http://synce.sourceforge.net .
-
-.TP
-.BR CD1 =PATH
-.TP
-.BR CD2 =PATH
-.TP
-.BR CDn =...
-Path to the data files for the game's particular CDs.
 
 .\".TP
 .\".BR INIConfig =FILE
@@ -105,6 +89,8 @@ Path to the data files for the game's particular CDs.
 .\".IR GamePath .
 .\"E.g. for Baldur's Gate game it is baldur.ini.
 
+.\"###################################################
+.SH Video Parameters:
 
 .TP
 .BR Width =INT
@@ -146,6 +132,29 @@ The default is
 .IR 100 .
 
 .TP
+.BR SkipIntroVideos =(0|1)
+This parameter is meant for developers. If set to
+.IR 1 ,
+the intro and logo videos are skipped to save developer's nerves. The default is
+.IR 0 .
+
+.TP
+.BR FogOfWar =(0|1)
+If set to
+.IR 1 ,
+the unexplored parts of an area are blacked out. It is enabled by default.
+
+
+.\"###################################################
+.SH Audio Parameters:
+
+.TP
+.BR AudioDriver =(openal|sdlaudio|none)
+Use the specified plugin as the audio driver. The default is openal, while
+.I none
+will disable all audio.
+
+.TP
 .BR VolumeAmbients =INT
 Volume of ambient sounds in percents. The default is
 .IR 100 .
@@ -170,58 +179,8 @@ Volume of sound effects in percents. The default is
 Volume of PC or NPC voices in percents. The default is
 .IR 100 .
 
-
-.TP
-.BR SkipIntroVideos =(0|1)
-This parameter is meant for developers. If set to
-.IR 1 ,
-the intro and logo videos are skipped to save developer's nerves. The default is
-.IR 0 .
-
-.TP
-.BR DrawFPS =(0|1)
-This parameter is meant for developers. If set to
-.IR 1 ,
-the current FPS (Frames per Second) value is drawn in the top left window corner. The default is
-.IR 0 .
-
-.TP
-.BR FogOfWar =(0|1)
-If set to
-.IR 1 ,
-the unexplored parts of an area are blacked out. It is enabled by default.
-
-.TP
-.BR EnableCheatKeys =(0|1)
-This parameter is meant for developers. If set to
-.IR 1 ,
-certain keys allow you to inspect the internal state of objects, do forbidden things, etc.
-The keys are listed in the
-.I CheatKeys.txt
-file. Do NOT use this option unless you want to make your hands dirty :-). The default is
-.IR 0 .
-
-.TP
-.BR ScriptDebugMode =(n)
-This parameter is meant for developers. It is a combination of bit values
-
-.IR 1
-- count references,
-
-.IR 2
-- display cutscene warnings,
-
-.IR 4
-- display variable warnings,
-
-.IR 8
-- display action warnings,
-
-.IR 16
-- display trigger warnings.
-
-The default is
-.IR 0 .
+.\"###################################################
+.SH Path parameters:
 
 .TP
 .BR CaseSensitive =(0|1)
@@ -239,36 +198,26 @@ Set this parameter to
 on Unix-like systems.
 
 .TP
-.BR DelayPlugin =FILENAME
-Named plugin will be loaded after other (nondelayed) plugins were loaded.
-.IR FILENAME 
-is a name without path, but with extension, for example
-.IR libNullSound.so 
-or
-.IR libNullSound.dll .
-You can use this parameter more than once.
+.BR GamePath =PATH
+Path to the directory where the original game is installed. If you can't
+install the game under MS Windows or with WINE, you can try to unpack the data files
+with the
+.I unshield
+program found at 
+.IR http://synce.sourceforge.net .
 
 .TP
-.BR SkipPlugin =FILENAME
-Named plugin will not be loaded.
-.IR FILENAME 
-is a name without path, but with extension, for example
-.IR libNullSound.so 
-or
-.IR libNullSound.dll .
-You can use this parameter more than once.
+.BR CD1 =PATH
+.TP
+.BR CD2 =PATH
+.TP
+.BR CDn =...
+Path to the data files for the game's particular CDs.
 
 .TP
-.BR AudioDriver =(openal|sdlaudio|none)
-Use the specified plugin as the audio driver. The default is openal, while
-.I none
-will disable all audio.
-
-.TP
-.BR SaveAsOriginal =(0|1)
-Set this parameter to
-.IR 1 ,
-if you want to keep the save game compatible with the original engine. It is enabled by default.
+.BR GameOnCD =(0|1)
+defaults to
+.IR 0 .
 
 .TP
 .BR CachePath =PATH
@@ -298,17 +247,10 @@ defaults to
 .IR GamePath .
 
 .TP
-.BR GameOnCD =(0|1)
-defaults to
-.IR 0 .
-
-
-.TP
 .BR GameDataPath =PATH
 Path to the original game's installed data files, relative to GamePath.
 Usually it's 
 .IR data .
-
 
 .TP
 .BR GameOverridePath =PATH
@@ -323,6 +265,74 @@ Path where GemRB looks for its game override directory.
 It defaults to
 .IR GemRBPath .
 The original games hardcoded this information in the engine.
+
+.\"###################################################
+.SH Development parameters:
+
+.TP
+.BR EnableCheatKeys =(0|1)
+This parameter is meant for developers. If set to
+.IR 1 ,
+certain keys allow you to inspect the internal state of objects, do forbidden things, etc.
+The keys are listed in the
+.I CheatKeys.txt
+file. Do NOT use this option unless you want to make your hands dirty :-). The default is
+.IR 0 .
+
+.TP
+.BR DrawFPS =(0|1)
+This parameter is meant for developers. If set to
+.IR 1 ,
+the current FPS (Frames per Second) value is drawn in the top left window corner. The default is
+.IR 0 .
+
+.TP
+.BR ScriptDebugMode =(n)
+This parameter is meant for developers. It is a combination of bit values
+
+.IR 1
+- count references,
+
+.IR 2
+- display cutscene warnings,
+
+.IR 4
+- display variable warnings,
+
+.IR 8
+- display action warnings,
+
+.IR 16
+- display trigger warnings.
+
+The default is
+.IR 0 .
+
+.TP
+.BR DelayPlugin =FILENAME
+Named plugin will be loaded after other (nondelayed) plugins were loaded.
+.IR FILENAME 
+is a name without path, but with extension, for example
+.IR libNullSound.so 
+or
+.IR libNullSound.dll .
+You can use this parameter more than once.
+
+.TP
+.BR SkipPlugin =FILENAME
+Named plugin will not be loaded.
+.IR FILENAME 
+is a name without path, but with extension, for example
+.IR libNullSound.so 
+or
+.IR libNullSound.dll .
+You can use this parameter more than once.
+
+.TP
+.BR SaveAsOriginal =(0|1)
+Set this parameter to
+.IR 1 ,
+if you want to keep the save game compatible with the original engine. It is enabled by default.
 
 
 .\"###################################################
