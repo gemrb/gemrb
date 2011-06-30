@@ -38,8 +38,8 @@ public:
 
 class Function {
 public:
-	char module[16];
-	char function[32];
+	ieVariable module;
+	ieVariable function;
 	int group;
 
 	Function(const char *m, const char *f, int g);
