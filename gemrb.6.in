@@ -59,7 +59,7 @@ binary and then run
 instead.
 
 .\"###################################################
-.SH Configuration File
+.SH CONFIGURATION
 .PD 0
 A configuration file consists of pairs
 .IR PARAMETER=VALUE ,
@@ -69,7 +69,13 @@ more than once, only the last occurence is used.
 
 Empty lines and lines starting with `#' (hash sign) are ignored.
 
-.B Parameters:
+At least the
+.I GameType
+and 
+.I GamePath
+parameters need to be changed. That is often enough, so do not fiddle with the other paths too much.
+
+.SH General Parameters:
 
 .TP
 .BR GameType =(bg1|bg2|iwd|iwd2|how|pst)
@@ -83,28 +89,20 @@ for various tweaks hardcoded in the GemRB engine.
 Arbitrary name of the game. It will be displayed in the window's title bar.
 
 .TP
-.BR GamePath =PATH
-Path to the directory where the original game is installed. If you can't
-install the game under MS Windows or with WINE, you can try to unpack the data files
-with the
-.I unshield
-program found at 
-.IR http://synce.sourceforge.net .
+.BR GUIEnhancements =(0|1)
+Set this to 1 to enable a few GUI enhancements, mostly in BG2. Disabled by default.
 
 .TP
-.BR CD1 =PATH
-.TP
-.BR CD2 =PATH
-.TP
-.BR CDn =...
-Path to the data files for the game's particular CDs.
+.BR EndianSwitch =(0|1)
+Set this to 1 if you are running GemRB on a big-endian machine. Disabled by default.
 
-.\".TP
-.\".BR INIConfig =FILE
-.\"Name of the game's INI file, relative to 
-.\".IR GamePath .
-.\"E.g. for Baldur's Gate game it is baldur.ini.
+.TP
+.BR MultipleQuickSaves =(0|1)
+EXPERIMENTAL. Set this to 1 if you want GemRB to keep multiple quicksaves around. Disabled by default.
 
+
+.\"###################################################
+.SH Video Parameters:
 
 .TP
 .BR Width =INT
@@ -130,13 +128,6 @@ Color depth of the game window (in bits per pixel).
 .BR Fullscreen =(0|1)
 Whether the game should run in fullscreen mode.
 
-.\".TP
-.\".BR ForceStereo =(0|1)
-.\"Some older games such as BG1 and PST need this parameter to be 
-.\".IR 1 .
-.\"For other game types set it to
-.\".IR 0 .
-
 .TP
 .BR TooltipDelay =INT
 Delay (in miliseconds) before tooltips are displayed when the mouse is not moving.
@@ -144,6 +135,29 @@ A reasonable number for this option is e.g.
 .IR 500 .
 The default is
 .IR 100 .
+
+.TP
+.BR SkipIntroVideos =(0|1)
+If set to
+.IR 1 ,
+the intro and logo videos are skipped to save developer's nerves. The default is
+.IR 0 .
+
+.TP
+.BR FogOfWar =(0|1)
+If set to
+.IR 1 ,
+the unexplored parts of an area are blacked out. It is enabled by default.
+
+
+.\"###################################################
+.SH Audio Parameters:
+
+.TP
+.BR AudioDriver =(openal|sdlaudio|none)
+Use the specified plugin as the audio driver. The default is openal, while
+.I none
+will disable all audio.
 
 .TP
 .BR VolumeAmbients =INT
@@ -170,26 +184,134 @@ Volume of sound effects in percents. The default is
 Volume of PC or NPC voices in percents. The default is
 .IR 100 .
 
+.\"###################################################
+.SH Path parameters:
 
 .TP
-.BR SkipIntroVideos =(0|1)
-This parameter is meant for developers. If set to
+.BR CaseSensitive =(0|1)
+When 
+this parameter is set to 
 .IR 1 ,
-the intro and logo videos are skipped to save developer's nerves. The default is
+the engine will try to find files regardless of their names' case at the cost
+of a slight speed penalty. This is especially important when using
+game files on CD-ROMs, where the files can't be renamed. Like 
+many Windows programs, the original games use inconsistent mix
+of lower/upper case letters for naming and referencing their files. 
+
+Set this parameter to 
+.I 1
+on Unix-like systems.
+
+.TP
+.BR GamePath =PATH
+Path to the directory where the original game is installed. If you can't
+install the game under MS Windows or with WINE, you can try to unpack the data files
+with the
+.I unshield
+program found at 
+.IR http://synce.sourceforge.net .
+
+.TP
+.BR CD1 =PATH
+.TP
+.BR CD2 =PATH
+.TP
+.BR CDn =...
+Path to the data files for the game's particular CDs or any other data sources.
+
+.TP
+.BR GameOnCD =(0|1)
+defaults to
 .IR 0 .
 
 .TP
-.BR DrawFPS =(0|1)
-This parameter is meant for developers. If set to
-.IR 1 ,
-the current FPS (Frames per Second) value is drawn in the top left window corner. The default is
-.IR 0 .
+.BR CachePath =PATH
+User-writable directory where the engine caches uncompressed and temporary
+files. Defaults to a subdirectory of the current directory.
 
 .TP
-.BR FogOfWar =(0|1)
-If set to
-.IR 1 ,
-the unexplored parts of an area are blacked out. It is enabled by default.
+.BR GemRBPath =PATH
+Path to the GemRB installation. (To be obsoleted; preset at build time).
+
+.TP
+.BR GUIScriptsPath =PATH
+Path to the directory with scripts controlling the game's GUI. (To be obsoleted; preset at build time).
+
+.TP
+.BR GemRBOverridePath =PATH
+Path where GemRB looks for its game override directory.
+It defaults to
+.IR GemRBPath .
+The original games hardcoded this information in the engine. (To be obsoleted; preset at build time).
+
+.TP
+.I The following variables do not need to be altered, unless you are doing something really special!
+
+.TP
+.BR SavePath =PATH
+Path to the directory with save games. Note that this directory has to
+contain 
+.I save/
+and/or eventually
+.I mpsave/
+subdirectories and that only these subdirectories contain the actual
+saved games.
+
+.I SavePath
+defaults to
+.IR GamePath .
+
+.TP
+.BR GameDataPath =PATH
+Path to the original game's installed data files, relative to GamePath.
+Usually it's 
+.IR data .
+
+.TP
+.BR GameOverridePath =PATH
+Path to the original game's override dir, relative to GamePath.
+Usually it's 
+.IR override .
+Original games use this directory to place last-minute patches.
+
+.TP
+.BR GameCharactersPath =PATH
+Path to the original game's installed data files, relative to GamePath.
+Usually it's 
+.IR characters .
+
+.TP
+.BR GamePortraitsPath =PATH
+Path to the original game's installed data files, relative to GamePath.
+Usually it's 
+.IR portraits .
+
+.TP
+.BR GameScriptsPath =PATH
+Path to the original game's installed data files, relative to GamePath.
+Usually it's 
+.IR scripts .
+
+.TP
+.BR GameSoundsPath =PATH
+Path to the original game's installed data files, relative to GamePath.
+Usually it's 
+.IR sounds .
+
+.\"###################################################
+.SH Input Parameters:
+
+.TP
+.BR DoubleClickDelay =INT
+Milisecond treshold for detecting a double click. The default is 250.
+
+.TP
+.BR RepeatKeyDelay =INT
+Milisecond treshold for detecting a repeated key press. The default is 250.
+
+
+.\"###################################################
+.SH Development parameters:
 
 .TP
 .BR EnableCheatKeys =(0|1)
@@ -199,6 +321,13 @@ certain keys allow you to inspect the internal state of objects, do forbidden th
 The keys are listed in the
 .I CheatKeys.txt
 file. Do NOT use this option unless you want to make your hands dirty :-). The default is
+.IR 0 .
+
+.TP
+.BR DrawFPS =(0|1)
+This parameter is meant for developers. If set to
+.IR 1 ,
+the current FPS (Frames per Second) value is drawn in the top left window corner. The default is
 .IR 0 .
 
 .TP
@@ -224,21 +353,6 @@ The default is
 .IR 0 .
 
 .TP
-.BR CaseSensitive =(0|1)
-When 
-this parameter is set to 
-.IR 1 ,
-the engine will try to find files regardless of their names' case at the cost
-of a slight speed penalty. This is especially important when using
-game files on CD-ROMs, where the files can't be renamed. Like 
-many Windows programs, the original games use inconsistent mix
-of lower/upper case letters for naming and referencing their files. 
-
-Set this parameter to 
-.I 1
-on Unix-like systems.
-
-.TP
 .BR DelayPlugin =FILENAME
 Named plugin will be loaded after other (nondelayed) plugins were loaded.
 .IR FILENAME 
@@ -259,70 +373,23 @@ or
 You can use this parameter more than once.
 
 .TP
-.BR AudioDriver =(openal|sdlaudio|none)
-Use the specified plugin as the audio driver. The default is openal, while
-.I none
-will disable all audio.
-
-.TP
 .BR SaveAsOriginal =(0|1)
 Set this parameter to
 .IR 1 ,
 if you want to keep the save game compatible with the original engine. It is enabled by default.
 
 .TP
-.BR CachePath =PATH
-User-writable directory where the engine caches uncompressed and temporary
-files.
+.BR KeepCache =(0|1)
+Set this parameter to
+.IR 1 ,
+if you want to keep the cache after exiting GemRB. It is disabled by default.
 
 .TP
-.BR GemRBPath =PATH
-Path to the GemRB installation. (To be obsoleted; preset at build time).
-
-.TP
-.BR GUIScriptsPath =PATH
-Path to the directory with scripts controlling the game's GUI. 
-
-.TP
-.BR SavePath =PATH
-Path to the directory with save games. Note that this directory has to
-contain 
-.I save/
-and/or eventually
-.I mpsave/
-subdirectories and that only these subdirectories contain the actual
-saved games.
-
-.I SavePath
-defaults to
-.IR GamePath .
-
-.TP
-.BR GameOnCD =(0|1)
-defaults to
-.IR 0 .
-
-
-.TP
-.BR GameDataPath =PATH
-Path to the original game's installed data files, relative to GamePath.
-Usually it's 
-.IR data .
-
-
-.TP
-.BR GameOverridePath =PATH
-Path to the original game's override dir, relative to GamePath.
-Usually it's 
-.IR override .
-Original games use this directory to place last-minute patches.
-
-.TP
-.BR GemRBOverridePath =PATH
-Path where GemRB looks for its game override directory.
-It defaults to
-.IR GemRBPath .
-The original games hardcoded this information in the engine.
+.BR IgnoreOriginalINI =(0|1)
+Set this parameter to
+.IR 1 ,
+if you want to ignore the settings from the original configuration files - baldur.ini
+/ icewind.ini / torment.ini. It is disabled by default.
 
 
 .\"###################################################
@@ -363,17 +430,17 @@ Many.
 is still in an early development stage and not nearly complete. 
 
 If you stumble over something which is supposed to work, either make a bug report
-at http://sourceforge.net/projects/gemrb or come to IRC channel 
+at http://sourceforge.net/projects/gemrb or come to the official IRC channel 
 .I #GemRB
 at FreeNode.
 
 .\"###################################################
 .SH AUTHOR
-The GemRB Project development team at http://gemrb.sourceforge.net
+The GemRB Project development team at http://gemrb.org
 
 .\"###################################################
 .SH COPYING
-Copyright (C) 2003-2008 The GemRB Project
+Copyright (C) 2003-2011 The GemRB Project
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
