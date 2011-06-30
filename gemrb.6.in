@@ -82,13 +82,6 @@ for various tweaks hardcoded in the GemRB engine.
 .BR GameName =STRING
 Arbitrary name of the game. It will be displayed in the window's title bar.
 
-
-.\".TP
-.\".BR INIConfig =FILE
-.\"Name of the game's INI file, relative to 
-.\".IR GamePath .
-.\"E.g. for Baldur's Gate game it is baldur.ini.
-
 .\"###################################################
 .SH Video Parameters:
 
@@ -115,13 +108,6 @@ Color depth of the game window (in bits per pixel).
 .TP
 .BR Fullscreen =(0|1)
 Whether the game should run in fullscreen mode.
-
-.\".TP
-.\".BR ForceStereo =(0|1)
-.\"Some older games such as BG1 and PST need this parameter to be 
-.\".IR 1 .
-.\"For other game types set it to
-.\".IR 0 .
 
 .TP
 .BR TooltipDelay =INT
