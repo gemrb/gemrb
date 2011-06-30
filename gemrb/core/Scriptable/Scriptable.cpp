@@ -305,6 +305,15 @@ void Scriptable::Update()
 	Ticks++;
 	AdjustedTicks++;
 
+	if (UnselectableTimer) {
+		UnselectableTimer--;
+		if (!UnselectableTimer) {
+			if (Type == ST_ACTOR) {
+				((Actor *) this)->SetCircleSize();
+			}
+		}
+	}
+
 	TickScripting();
 
 	ProcessActions();
@@ -393,16 +402,6 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 		/* scripts are not concurrent, see WAITPC override script for example */
 		if (done) break;
-	}
-
-	// FIXME: completely wrong place for this!
-	if (changed && UnselectableTimer) {
-			UnselectableTimer--;
-			if (!UnselectableTimer) {
-				if (Type == ST_ACTOR) {
-					((Actor *) this)->SetCircleSize();
-				}
-			}
 	}
 
 	if (changed)

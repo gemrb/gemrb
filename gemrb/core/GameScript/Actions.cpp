@@ -3864,7 +3864,7 @@ void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 
 void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 {
-	Sender->UnselectableTimer=parameters->int0Parameter;
+	Sender->UnselectableTimer=parameters->int0Parameter * AI_UPDATE_TIME;
 
 	//update color
 	if (Sender->Type != ST_ACTOR) {
