@@ -82,6 +82,19 @@ for various tweaks hardcoded in the GemRB engine.
 .BR GameName =STRING
 Arbitrary name of the game. It will be displayed in the window's title bar.
 
+.TP
+.BR GUIEnhancements =(0|1)
+Set this to 1 to enable a few GUI enhancements, mostly in BG2. Disabled by default.
+
+.TP
+.BR EndianSwitch =(0|1)
+Set this to 1 if you are running GemRB on a big-endian machine. Disabled by default.
+
+.TP
+.BR MultipleQuickSaves =(0|1)
+EXPERIMENTAL. Set this to 1 if you want GemRB to keep multiple quicksaves around. Disabled by default.
+
+
 .\"###################################################
 .SH Video Parameters:
 
@@ -219,6 +232,13 @@ Path to the GemRB installation. (To be obsoleted; preset at build time).
 Path to the directory with scripts controlling the game's GUI. 
 
 .TP
+.BR GemRBOverridePath =PATH
+Path where GemRB looks for its game override directory.
+It defaults to
+.IR GemRBPath .
+The original games hardcoded this information in the engine.
+
+.TP
 .BR SavePath =PATH
 Path to the directory with save games. Note that this directory has to
 contain 
@@ -246,11 +266,40 @@ Usually it's
 Original games use this directory to place last-minute patches.
 
 .TP
-.BR GemRBOverridePath =PATH
-Path where GemRB looks for its game override directory.
-It defaults to
-.IR GemRBPath .
-The original games hardcoded this information in the engine.
+.BR GameCharactersPath =PATH
+Path to the original game's installed data files, relative to GamePath.
+Usually it's 
+.IR characters .
+
+.TP
+.BR GamePortraitsPath =PATH
+Path to the original game's installed data files, relative to GamePath.
+Usually it's 
+.IR portraits .
+
+.TP
+.BR GameScriptsPath =PATH
+Path to the original game's installed data files, relative to GamePath.
+Usually it's 
+.IR scripts .
+
+.TP
+.BR GameSoundsPath =PATH
+Path to the original game's installed data files, relative to GamePath.
+Usually it's 
+.IR sounds .
+
+.\"###################################################
+.SH Input Parameters:
+
+.TP
+.BR DoubleClickDelay =INT
+Milisecond treshold for detecting a double click. The default is 250.
+
+.TP
+.BR RepeatKeyDelay =INT
+Milisecond treshold for detecting a repeated key press. The default is 250.
+
 
 .\"###################################################
 .SH Development parameters:
@@ -319,6 +368,19 @@ You can use this parameter more than once.
 Set this parameter to
 .IR 1 ,
 if you want to keep the save game compatible with the original engine. It is enabled by default.
+
+.TP
+.BR KeepCache =(0|1)
+Set this parameter to
+.IR 1 ,
+if you want to keep the cache after exiting GemRB. It is disabled by default.
+
+.TP
+.BR IgnoreOriginalINI =(0|1)
+Set this parameter to
+.IR 1 ,
+if you want to ignore the settings from the original configuration files - baldur.ini
+/ icewind.ini / torment.ini. It is disabled by default.
 
 
 .\"###################################################
