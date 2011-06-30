@@ -87,6 +87,12 @@ void GameData::ClearCaches()
 	SpellCache.RemoveAll(ReleaseSpell);
 	EffectCache.RemoveAll(ReleaseEffect);
 	PaletteCache.RemoveAll(ReleasePalette);
+
+	while (!stores.empty()) {
+		Store *store = stores.begin()->second;
+		stores.erase(stores.begin());
+		delete store;
+	}
 }
 
 Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
