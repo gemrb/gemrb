@@ -1392,7 +1392,7 @@ def BuyHeal ():
 
 	GemRB.GameSetPartyGold (gold-Cure['Price'])
 	pc = GemRB.GameGetSelectedPCSingle ()
-	GemRB.ApplySpell (pc, Cure['CureResRef'], Store['StoreOwner'])
+	GemRB.ApplySpell (pc, Cure['CureResRef'], pc)
 	UpdateStoreHealWindow ()
 	return
 
