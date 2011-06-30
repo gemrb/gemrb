@@ -445,8 +445,25 @@ def ActionRightPressed ():
 	UpdateActionsWindow ()
 	return
 
+def ActionMeleePressed ():
+	""" switches to the most damaging melee weapon"""
+	#get the party Index
+	pc = GemRB.GameGetFirstSelectedPC ()
+	GemRB.ExecuteString("EquipMostDamagingMelee()", pc)
+	return
+
+def ActionRangePressed ():
+	""" switches to the most damaging ranged weapon"""
+	#get the party Index
+	pc = GemRB.GameGetFirstSelectedPC ()
+	GemRB.ExecuteString("EquipRanged()", pc)
+	return
+
 def ActionBardSongPressed ():
 	"""Toggles the battle song."""
+
+	##FIXME: check if the actor can actually switch to this state
+	#get the global ID
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_BATTLESONG, 1)
 	GemRB.PlaySound ("act_01")
@@ -455,6 +472,9 @@ def ActionBardSongPressed ():
 
 def ActionSearchPressed ():
 	"""Toggles detect traps."""
+
+	##FIXME: check if the actor can actually switch to this state
+	#get the global ID
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_DETECTTRAPS, 1)
 	UpdateActionsWindow ()
