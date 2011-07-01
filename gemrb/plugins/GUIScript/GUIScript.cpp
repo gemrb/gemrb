@@ -3945,14 +3945,15 @@ PyDoc_STRVAR( GemRB_SaveGame__doc,
 static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 {
 	PyObject *obj;
+	int slot = -1;
 	int Version = -1;
 	const char *folder;
 
 	if (!PyArg_ParseTuple( args, "Os|i", &obj, &folder, &Version )) {
-		return AttributeError( GemRB_SaveGame__doc );
+		if (!PyArg_ParseTuple( args, "i|i", &slot, &Version)) {
+			return AttributeError( GemRB_SaveGame__doc );
+		}
 	}
-
-	CObject<SaveGame> save(obj);
 
 	GET_GAME();
 
@@ -3964,7 +3965,13 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 	if (Version>0) {
 		game->version = Version;
 	}
-	return PyInt_FromLong(sgi->CreateSaveGame(save, folder) );
+	if (slot == -1) {
+		CObject<SaveGame> save(obj);
+
+		return PyInt_FromLong(sgi->CreateSaveGame(save, folder) );
+	} else {
+		return PyInt_FromLong(sgi->CreateSaveGame(slot, core->MultipleQuickSaves) );
+	}
 }
 
 PyDoc_STRVAR( GemRB_GetSaveGames__doc,

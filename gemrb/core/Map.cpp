@@ -40,6 +40,7 @@
 #include "PathFinder.h"
 #include "PluginMgr.h"
 #include "Projectile.h"
+#include "SaveGameIterator.h"
 #include "ScriptedAnimation.h"
 #include "TileMap.h"
 #include "Video.h"
@@ -465,7 +466,11 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 			memcpy (game->PreviousArea, entry->AreaName, 8);
 		}
 
+		//perform autosave
+		core->GetSaveGameIterator()->CreateSaveGame(0, false);
+/*
 		core->GetGameControl()->AutoSave();
+*/
 	}
 	Map* map = game->GetMap(area, false);
 	if (!map) {

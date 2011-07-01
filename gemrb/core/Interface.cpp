@@ -2263,7 +2263,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_INT("GameOnCD", GameOnCD = );
 		CONFIG_INT("Height", Height = );
 		CONFIG_INT("KeepCache", KeepCache = );
-		CONFIG_INT("MultipleQuickSaves", GameControl::MultipleQuickSaves);
+		CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
 		CONFIG_INT("RepeatKeyDelay", evntmgr->SetRKDelay);
 		CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
 		CONFIG_INT("ScriptDebugMode", SetScriptDebugMode);

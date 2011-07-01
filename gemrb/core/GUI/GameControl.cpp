@@ -94,7 +94,7 @@ static const Color gray = {
 typedef Point formation_type[FORMATIONSIZE];
 ieDword formationcount;
 static formation_type *formations=NULL;
-static bool mqs = false;
+//static bool mqs = false;
 static ieResRef TestSpell="SPWI207";
 
 //If one of the actors has tracking on, the gamecontrol needs to display
@@ -111,11 +111,12 @@ void GameControl::SetTracker(Actor *actor, ieDword dist)
 //multiple quick saves are kept, their age is determined by the slot
 //number. There is an algorithm which keeps about log2(n) slots alive.
 //The algorithm is implemented in SaveGameIterator
+/*
 void GameControl::MultipleQuickSaves(int arg)
 {
 	mqs=arg==1;
 }
-
+*/
 GameControl::GameControl(void)
 {
 	if (!formations) {
@@ -295,19 +296,6 @@ GameControl::~GameControl(void)
 	if (DisplayText) {
 		core->FreeString(DisplayText);
 	}
-}
-
-//Autosave was triggered by the GUI
-void GameControl::AutoSave()
-{
-	core->GetSaveGameIterator()->CreateSaveGame(0, false);
-}
-
-//QuickSave was triggered by the GUI
-//mqs is the 'multiple quick saves' flag
-void GameControl::QuickSave()
-{
-	core->GetSaveGameIterator()->CreateSaveGame(1, mqs == 1);
 }
 
 // ArrowSprite cycles
@@ -1021,6 +1009,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		return; //return from cheatkeys
 	}
 	switch (Key) {
+//FIXME: move these to guiscript
 		case 'h': //hard pause
 			if (DialogueFlags & DF_FREEZE_SCRIPTS) break;
 			//fallthrough
@@ -1032,29 +1021,6 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		 	} else {
 				displaymsg->DisplayConstantString(STR_UNPAUSED,0xff0000);
 			}
-			break;
-/*
-		case 'm':
-			core->GetGUIScriptEngine()->RunFunction("GUIMA","OpenMapWindow");
-			break;
-		case 'j':
-			core->GetGUIScriptEngine()->RunFunction("GUIJRNL","OpenJournalWindow");
-			break;
-		case 'i':
-			core->GetGUIScriptEngine()->RunFunction("GUIINV","OpenInventoryWindow");
-			break;
-		case 'r':
-			core->GetGUIScriptEngine()->RunFunction("GUIREC","OpenRecordsWindow");
-			break;
-		case 'p':
-			core->GetGUIScriptEngine()->RunFunction("GUIPR","OpenPriestWindow");
-			break;
-		case 'w':
-			core->GetGUIScriptEngine()->RunFunction("GUIMG","OpenMageWindow");
-			break;
-*/
-		case 'q': //quicksave
-			QuickSave();
 			break;
 		case GEM_ALT: //alt key (shows containers)
 #ifdef ANDROID

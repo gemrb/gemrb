@@ -125,8 +125,8 @@ def LoadGamePress():
 	GemRB.EnterGame() #it will close windows, including the loadscreen
 	return
 
-def QuickLoadPressed():
-	global Games
+def GetQuickLoadSlot():
+	global Games, QuickLoadSlot
 
 	Games=GemRB.GetSaveGames()
 	QuickLoadSlot = None
@@ -136,7 +136,12 @@ def QuickLoadPressed():
 		if Slotname == 1:
 		        QuickLoadSlot = Game
 		        break
+	return
 
+def QuickLoadPressed():
+	global QuickLoadSlot
+
+	GetQuickLoadSlot()
 	if QuickLoadSlot!=None:
 		LoadScreen.StartLoadScreen()
 		GemRB.LoadGame(QuickLoadSlot)

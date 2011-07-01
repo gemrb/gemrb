@@ -155,6 +155,15 @@ def ScrollBarPress():
 				Button.SetPicture("")
 	return
 
+def QuickSavePressed():
+	Slot = 1
+
+	if GUICommon.GameIsTOB():
+		Slot = 4
+
+	GemRB.SaveGame(Slot)
+	return
+
 def AbortedSaveGame():
 	global ConfirmWindow
 

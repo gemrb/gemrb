@@ -97,7 +97,7 @@ public:
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
 	/** Sets multiple quicksaves flag*/
-	static void MultipleQuickSaves(int arg);
+	//static void MultipleQuickSaves(int arg);
 	void SetTracker(Actor *actor, ieDword dist);
 private:
 	ieDword lastActorID;
@@ -163,15 +163,11 @@ public: //Events
 	void SetDialogueFlags(int value, int mode);
 	int GetScreenFlags() { return ScreenFlags; }
 	int GetDialogueFlags() { return DialogueFlags; }
-	/** this function is called from the area when autosave is needed */
-	void AutoSave();
 	void SetDisplayText(char *text, unsigned int time);
 	void SetDisplayText(ieStrRef text, unsigned int time);
 	/* centers viewport to the points specified */
 	void Center(unsigned short x, unsigned short y);
 private:
-	/** this function is called when the user presses 'q' (or equivalent) */
-	void QuickSave();
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetActorByGlobalID(ieDword ID);
 	void CalculateSelection(const Point &p);

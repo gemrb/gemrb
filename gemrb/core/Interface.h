@@ -753,6 +753,7 @@ public:
 	bool CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
 	bool GUIEnhancements;
 	bool KeepCache;
+	bool MultipleQuickSaves;
 	Variables *plugin_flags;
 	/** The Main program loop */
 	void Main(void);
