@@ -779,7 +779,9 @@ int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
-	if (valid && value1) {
+	// not checking if value1 is 0, so bg2's
+	// mind flayer lair's (ar2400) ogre timer check works (never set for first use)
+	if (valid) {
 		if ( value1 < core->GetGame()->GameTime ) return 1;
 	}
 	return 0;
