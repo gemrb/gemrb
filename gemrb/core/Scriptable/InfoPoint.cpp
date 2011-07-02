@@ -139,12 +139,6 @@ bool InfoPoint::TriggerTrap(int skill, ieDword ID)
 		AddTrigger(TriggerEntry(trigger_entered, ID));
 		return true;
 	} else if (Highlightable::TriggerTrap(skill, ID)) {
-		if (!Trapped) {
-			Flags|=TRAP_DEACTIVATED;
-		}
-		// ok, so this is a pain. Entered() trigger checks Trapped,
-		// so it needs to be kept set. how to do this right?
-		Trapped = true;
 		return true;
 	}
 	return false;
