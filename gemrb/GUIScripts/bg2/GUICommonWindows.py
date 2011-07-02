@@ -577,6 +577,7 @@ def ActionQWeapon4RightPressed ():
 
 def ActionInnatePressed ():
 	"""Opens the innate spell scrollbar."""
+	GemRB.SetVar ("QSpell", -1)
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 3)
 	UpdateActionsWindow ()
