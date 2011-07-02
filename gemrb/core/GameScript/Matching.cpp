@@ -211,7 +211,8 @@ static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_
 Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags)
 {
 	if (!oC) {
-		return NULL;
+		//return all objects
+		return GetAllActors(Sender, ga_flags);
 	}
 	Targets* tgts = EvaluateObject(map, Sender, oC, ga_flags);
 	//if we couldn't find an endpoint by name or object qualifiers
