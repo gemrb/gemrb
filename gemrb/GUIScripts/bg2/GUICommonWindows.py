@@ -267,6 +267,9 @@ def SetupItemAbilities(pc, slot):
 	Window = ActionsWindow
 
 	slot_item = GemRB.GetSlotItem(pc, slot, 1)
+	if not slot_item:
+		# empty quickslot
+		return
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 	Tips = item["Tooltips"]
 
