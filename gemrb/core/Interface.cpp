@@ -2798,8 +2798,10 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		Map *map;
 		if (target) {
 			map = target->GetCurrentArea();
-		} else {
+		} else if (Owner) {
 			map = Owner->GetCurrentArea();
+		} else {
+			map = game->GetCurrentArea();
 		}
 		map->AddActor(ab);
 		ab->SetPosition(position, true, 0);
