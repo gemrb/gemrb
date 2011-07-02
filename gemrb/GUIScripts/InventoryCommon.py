@@ -689,9 +689,10 @@ def ReadItemWindow ():
 	ret = GUICommon.CannotLearnSlotSpell()
 
 	if ret:
+		# couldn't find any strrefs for the other undhandled values (stat, level)
 		strref = 72873
 		CloseItemInfoWindow ()
-		if GUICommon.HasTOB():
+		if GUICommon.HasTOB() and ret == LSR_KNOWN:
 			OpenErrorWindow (strref)
 		return
 
