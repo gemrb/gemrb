@@ -1,4 +1,4 @@
-GemRB git r1ee726db77c3 (2011-06-11):
+GemRB git e5beb1c388463 (2011-07-03):
   New features:
     - quickspell support
     - keymap.ini handling
@@ -13,6 +13,7 @@ GemRB git r1ee726db77c3 (2011-06-11):
     - bugfixes and internal cleanups
 
   Applied patches:
+    ios support patches from Brad Allred
 
 GemRB V0.6.4 (2011-03-27):
   New features:
