@@ -1005,11 +1005,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
 	if( (signed) fx->random_value < (signed) val) {
-		// when using biased magic resistance non-hostile spells aren't resisted
-		// do not resist these secondary schools in bg2, SF_HOSTILE is not enough
-		int type = fx->SecondaryType;
-		type = ((type > 0 && type <=3) || type == 7 || type == 8 || type == 0xd);
-		if ((selective_mr && ((fx->SourceFlags&SF_HOSTILE) || !type)) || !selective_mr) {
+		if ((selective_mr && (fx->Resistance&FX_CAN_RESIST)) || !selective_mr) {
 			displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, 0xffffff, actor);
 			print ("effect resisted: %s\n", (char*) Opcodes[fx->Opcode].Name);
 			return true;
