@@ -90,9 +90,6 @@ def MaximizeOptions():
 def MaximizePortraits():
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_NAND)
 
-def TogglePartyAI():
-	GemRB.GameSetScreenFlags(GS_PARTYAI, OP_XOR)
-
 def UpdateControlStatus():
 	global MessageWindow, ExpandButton, ContractButton, TMessageTA
 	

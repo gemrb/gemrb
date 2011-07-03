@@ -133,6 +133,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 
 	if PortraitWindow:
 		UpdatePortraitWindow ()
+	return
 
 def MarkMenuButton (WindowIndex):
 	Pressed = WindowIndex.GetControl( GemRB.GetVar ("SelectedWindow") )
@@ -143,6 +144,25 @@ def MarkMenuButton (WindowIndex):
 
 	if Pressed: # don't draw the selection when returning to the game
 		Pressed.SetState (IE_GUI_BUTTON_SELECTED)
+	return
+
+def OptionsPress ():
+	"""Toggles the options pane """
+	PP = GemRB.GetMessageWindowSize () & GS_OPTIONPANE
+	if PP:
+		GemRB.GameSetScreenFlags (GS_OPTIONPANE, OP_NAND)
+	else:
+		GemRB.GameSetScreenFlags (GS_OPTIONPANE, OP_OR)
+	return
+
+def PortraitPress ():
+	"""Toggles the portraits pane """
+	PP = GemRB.GetMessageWindowSize () & GS_PORTRAITPANE
+	if PP:
+		GemRB.GameSetScreenFlags (GS_PORTRAITPANE, OP_NAND)
+	else:
+		GemRB.GameSetScreenFlags (GS_PORTRAITPANE, OP_OR)
+	return
 
 def AIPress ():
 	"""Toggles the party AI."""
@@ -152,12 +172,15 @@ def AIPress ():
 
 	if AI:
 		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_NAND)
-		Button.SetTooltip (15918)
 		GemRB.SetVar ("AI", 0)
+		Button.SetTooltip (15918)
 	else:
 		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_OR)
-		Button.SetTooltip (15917)
 		GemRB.SetVar ("AI", GS_PARTYAI)
+		Button.SetTooltip (15917)
+
+	#force redrawing, in case a hotkey triggered this function
+	Button.SetVarAssoc ("AI", GS_PARTYAI)
 	return
 
 def EmptyControls ():
@@ -670,7 +693,7 @@ def OpenPortraitWindow (needcontrols):
 		GemRB.SetVar ("AI", GSFlags)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
 		Button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-		Button.SetVarAssoc ("AI", 1)
+		Button.SetVarAssoc ("AI", GS_PARTYAI)
 		if GSFlags:
 			Button.SetTooltip (15917)
 		else:
