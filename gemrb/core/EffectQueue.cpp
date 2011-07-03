@@ -20,6 +20,8 @@
 
 #include "EffectQueue.h"
 
+#include "strrefs.h"
+
 #include "DisplayMessage.h"
 #include "Effect.h"
 #include "Game.h"
@@ -1005,6 +1007,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	if( (signed) fx->random_value < (signed) val) {
 		// when using biased magic resistance non-hostile spells aren't resisted
 		if ((selective_mr && (fx->SourceFlags&SF_HOSTILE)) || !selective_mr) {
+			displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, 0xffffff, actor);
 			print ("effect resisted: %s\n", (char*) Opcodes[fx->Opcode].Name);
 			return true;
 		}
