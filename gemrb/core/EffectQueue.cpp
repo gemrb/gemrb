@@ -986,7 +986,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 */
 
 	//not resistable (no saves either?)
-	if( fx->Resistance != FX_CAN_RESIST_CAN_DISPEL) {
+	if(!fx->Resistance || fx->Resistance == FX_NO_RESIST_CAN_DISPEL) {
 		return false;
 	}
 
