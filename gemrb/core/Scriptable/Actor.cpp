@@ -1080,11 +1080,11 @@ void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 //de/activates the spell bounce background
 void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 {
-	if (newValue&1) {
+	if (newValue) {
 		handle_overlay(actor, OV_BOUNCE);
 		return;
 	}
-	if (oldValue&1) {
+	if (oldValue) {
 		//it seems we have to remove it abruptly
 		actor->RemoveVVCell(hc_overlays[OV_BOUNCE], false);
 	}
