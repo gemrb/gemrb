@@ -502,6 +502,7 @@ void Scriptable::ProcessActions()
 	while (true) {
 		CurrentActionInterruptable = true;
 		if (!CurrentAction) {
+			assert(CurrentActionTicks == 0 && CurrentActionState == 0);
 			CurrentAction = PopNextAction();
 		} else {
 			CurrentActionTicks++;
