@@ -936,6 +936,7 @@ void GameScript::WaitRandom(Scriptable* Sender, Action* parameters)
 
 	if (!Sender->CurrentActionState) {
 		Sender->ReleaseCurrentAction();
+		return;
 	}
 
 	assert(Sender->CurrentActionState >= 0);
@@ -951,6 +952,7 @@ void GameScript::Wait(Scriptable* Sender, Action* parameters)
 
 	if (!Sender->CurrentActionState) {
 		Sender->ReleaseCurrentAction();
+		return;
 	}
 
 	assert(Sender->CurrentActionState >= 0);
@@ -3416,6 +3418,7 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 	if (Sender->CurrentActionState <= 0) {
 		actor->SetStance( IE_ANI_GET_UP );
 		Sender->ReleaseCurrentAction();
+		return;
 	}
 	actor->CurrentActionState--;
 }
@@ -3436,6 +3439,7 @@ void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
 	if (Sender->CurrentActionState <= 0) {
 		actor->SetStance( IE_ANI_GET_UP );
 		Sender->ReleaseCurrentAction();
+		return;
 	}
 	actor->CurrentActionState--;
 }
