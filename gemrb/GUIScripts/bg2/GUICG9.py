@@ -54,8 +54,8 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
+	RedrawSkills()
 	SkillWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
