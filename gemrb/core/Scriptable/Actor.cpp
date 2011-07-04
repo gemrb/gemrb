@@ -2770,6 +2770,10 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 		}
 	}
 
+	if (damage > 0) {
+		AddTrigger(TriggerEntry(trigger_tookdamage, LastHitter));
+	}
+
 	//LastDamage=damage;
 	InternalFlags|=IF_ACTIVE;
 	int chp = (signed) BaseStats[IE_HITPOINTS];
