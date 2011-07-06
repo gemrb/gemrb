@@ -136,6 +136,8 @@ GameControl::GameControl(void)
 		touchScrollAreasEnabled = true;
 		touched = false;
 		scrollAreasWidth = 32;
+	} else {
+		scrollAreasWidth = 5;
 	}
 
 	core->GetDictionary()->Lookup("Center",tmp);
