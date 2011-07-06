@@ -81,7 +81,7 @@ public:
 	void Realize();
 
 	/** Key Press Event */
-	void OnKeyPress(unsigned char Key, unsigned short Mod);
+	//void OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Mouse Leave Event */

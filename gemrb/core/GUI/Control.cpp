@@ -130,43 +130,9 @@ int Control::RunEventHandler(EventHandler handler)
 }
 
 /** Key Press Event */
-void Control::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
+void Control::OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/)
 {
 	//print("OnKeyPress: CtrlID = 0x%08X, Key = %c (0x%02hX)\n", (unsigned int) ControlID, Key, Key);
-#ifdef ANDROID // mapping volume control to volume control keys on device, these keys must be set up in AndroidAppSettings.cfg
-	switch(Key)	{
-		case 'o': // volume down
-		case 'p': // volume up
-			int Ambients, Movie, Music, SFX, Voices;
-			core->GetDictionary()->Lookup( "Volume Ambients", (ieDword&)Ambients );
-			core->GetDictionary()->Lookup( "Volume Movie", (ieDword&)Movie );
-			core->GetDictionary()->Lookup( "Volume Music", (ieDword&)Music );
-			core->GetDictionary()->Lookup( "Volume SFX", (ieDword&)SFX );
-			core->GetDictionary()->Lookup( "Volume Voices", (ieDword&)Voices );
-			if (Key=='o') {
-				if(Ambients>0) Ambients-=10; if(Ambients<0) Ambients=0;
-				if(Movie>0) Movie-=10; if(Movie<0) Movie=0;
-				if(Music>0) Music-=10; if(Music<0) Music=0;
-				if(SFX>0) SFX-=10; if(SFX<0) SFX=0;
-				if(Voices>0) Voices-=10; if(Voices<0) Voices=0;
-			} else {
-				if(Ambients<100) Ambients+=10; if(Ambients>100) Ambients=100;
-				if(Movie<100) Movie+=10; if(Movie>100) Movie=100;
-				if(Music<100) Music+=10; if(Music>100) Music=100;
-				if(SFX<100) SFX+=10; if(SFX>100) SFX=100;
-				if(Voices<100) Voices+=10; if(Voices>100) Voices=100;
-			}
-			core->GetDictionary()->SetAt( "Volume Ambients", Ambients );
-			core->GetDictionary()->SetAt( "Volume Movie", Movie );
-			core->GetDictionary()->SetAt( "Volume Music", Music );
-			core->GetDictionary()->SetAt( "Volume SFX", SFX );
-			core->GetDictionary()->SetAt( "Volume Voices", Voices );
-			core->GetAudioDrv()->UpdateVolume();
-			break;
-	}
-#else
-(void)Key; // unused, fool the compiler
-#endif
 }
 
 /** Key Release Event */
@@ -178,13 +144,13 @@ void Control::OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/)
 /** Mouse Enter Event */
 void Control::OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/)
 {
-//	print("OnMouseEnter: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
+	//print("OnMouseEnter: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
 }
 
 /** Mouse Leave Event */
 void Control::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 {
-//	print("OnMouseLeave: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
+	//print("OnMouseLeave: CtrlID = 0x%08X, x = %hd, y = %hd\n", (unsigned int) ControlID, x, y);
 }
 
 /** Mouse Over Event */

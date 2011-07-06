@@ -109,10 +109,11 @@ private:
 	bool DoubleClick;
 	Region SelectionRect;
 	short StartX, StartY;
-	//int action;
-#ifdef TOUCHSCREEN
+	// following variables used for touch scroll areas
+	bool touchScrollAreasEnabled; // true, if scroll areas enabled
 	bool touched; // true, if player touched screen (left button down and hold)
-#endif
+	unsigned int scrollAreasWidth; // scroll areas width
+
 public:
 	Door* overDoor;
 	Container* overContainer;

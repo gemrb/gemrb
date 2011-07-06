@@ -751,6 +751,7 @@ public:
 	int IgnoreOriginalINI;
 	unsigned int FogOfWar;
 	bool CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
+	bool TouchScrollAreas;
 	bool GUIEnhancements;
 	bool KeepCache;
 	bool MultipleQuickSaves;

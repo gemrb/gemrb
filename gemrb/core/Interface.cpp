@@ -189,6 +189,7 @@ Interface::Interface(int iargc, char* iargv[])
 	GameOnCD = false;
 	SkipIntroVideos = false;
 	DrawFPS = false;
+	TouchScrollAreas = false;
 	KeepCache = false;
 	TooltipDelay = 100;
 	IgnoreOriginalINI = 0;
@@ -1694,6 +1695,7 @@ int Interface::Init()
 	//no need of strdup, variables do copy the key!
 	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
 	vars->SetAt( "GUIEnhancements", (unsigned long)GUIEnhancements );
+	vars->SetAt( "TouchScrollAreas", (unsigned long)TouchScrollAreas );
 
 	printMessage( "Core", "Initializing Token Dictionary...", WHITE );
 	tokens = new Variables();
@@ -2260,6 +2262,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_INT("FogOfWar", FogOfWar = );
 		CONFIG_INT("FullScreen", FullScreen = );
 		CONFIG_INT("GUIEnhancements", GUIEnhancements = );
+		CONFIG_INT("TouchScrollAreas", TouchScrollAreas = );
 		CONFIG_INT("GameOnCD", GameOnCD = );
 		CONFIG_INT("Height", Height = );
 		CONFIG_INT("KeepCache", KeepCache = );
