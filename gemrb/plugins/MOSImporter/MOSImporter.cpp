@@ -27,16 +27,16 @@
 #include "Interface.h"
 #include "Video.h"
 
-static ieDword red_mask = 0xff000000;
-static ieDword green_mask = 0x00ff0000;
-static ieDword blue_mask = 0x0000ff00;
+static ieDword red_mask = 0x00ff0000;
+static ieDword green_mask = 0x0000ff00;
+static ieDword blue_mask = 0x000000ff;
 
 MOSImporter::MOSImporter(void)
 {
 	if (DataStream::IsEndianSwitch()) {
-		red_mask = 0x000000ff;
-		green_mask = 0x0000ff00;
-		blue_mask = 0x00ff0000;
+		red_mask = 0x0000ff00;
+		green_mask = 0x00ff0000;
+		blue_mask = 0xff000000;
 	}
 }
 
@@ -102,13 +102,13 @@ Sprite2D* MOSImporter::GetSprite2D()
 				( 4 * x * 64 );
 			for (int h = 0; h < bh; h++) {
 				for (int w = 0; w < bw; w++) {
-					*startpixel = RevCol[*bp].a;
-					startpixel++;
 					*startpixel = RevCol[*bp].b;
 					startpixel++;
 					*startpixel = RevCol[*bp].g;
 					startpixel++;
 					*startpixel = RevCol[*bp].r;
+					startpixel++;
+					*startpixel = RevCol[*bp].a;
 					startpixel++;
 					bp++;
 				}

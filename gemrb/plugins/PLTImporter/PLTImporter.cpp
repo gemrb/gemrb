@@ -28,17 +28,17 @@
 
 static int pperm[8]={3,6,0,5,4,1,2,7};
 
-static ieDword red_mask = 0xff000000;
-static ieDword green_mask = 0x00ff0000;
-static ieDword blue_mask = 0x0000ff00;
+static ieDword red_mask = 0x00ff0000;
+static ieDword green_mask = 0x0000ff00;
+static ieDword blue_mask = 0x000000ff;
 
 PLTImporter::PLTImporter(void)
 {
 	pixels = NULL;
 	if (DataStream::IsEndianSwitch()) {
-		red_mask = 0x000000ff;
-		green_mask = 0x0000ff00;
-		blue_mask = 0x00ff0000;
+		red_mask = 0x0000ff00;
+		green_mask = 0x00ff0000;
+		blue_mask = 0xff000000;
 	}
 }
 
@@ -88,13 +88,13 @@ Sprite2D* PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 		for (unsigned int x = 0; x < Width; x++) {
 			unsigned char intensity = *src++;
 			unsigned char palindex = *src++;
+			*dest++ = Palettes[palindex][intensity].b;
+			*dest++ = Palettes[palindex][intensity].g;
+			*dest++ = Palettes[palindex][intensity].r;
 			if (intensity == 0xff)
 				*dest++ = 0x00;
 			else
 				*dest++ = 0xff;
-			*dest++ = Palettes[palindex][intensity].b;
-			*dest++ = Palettes[palindex][intensity].g;
-			*dest++ = Palettes[palindex][intensity].r;
 		}
 	}
 	Sprite2D* spr = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
