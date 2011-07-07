@@ -20,11 +20,11 @@
 
 #include "exports.h"
 
+#include <stdlib.h>
 #include <ctype.h>
 #ifdef WIN32
 #include "win32def.h"
 #ifdef _DEBUG
-#include <stdlib.h>
 #include <crtdbg.h>
 #endif
 #endif
