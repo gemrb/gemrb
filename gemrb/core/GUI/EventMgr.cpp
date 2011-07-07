@@ -382,6 +382,7 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 				}
 				break;
 			case IE_GUI_GAMECONTROL:
+			case IE_GUI_WORLDMAP:
 				//gamecontrols will receive all special keys
 				break;
 			case IE_GUI_EDIT:
