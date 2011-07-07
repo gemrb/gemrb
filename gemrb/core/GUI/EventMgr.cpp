@@ -278,17 +278,17 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 			break;
 	}
 
-	if ((Button == GEM_MB_SCRLUP || Button == GEM_MB_SCRLDOWN) && last_win_mousefocused) {
-		ctrl = last_win_mousefocused->GetScrollControl();
-		if (ctrl) {
-			ctrl->OnMouseDown( x - last_win_mousefocused->XPos - ctrl->XPos, y - last_win_mousefocused->YPos - ctrl->YPos, Button, Mod );
-		}
+	if (Button == GEM_MB_SCRLUP || Button == GEM_MB_SCRLDOWN) {
+		int mousescrollspd = core->GetMouseScrollSpeed();
+		if(Button == GEM_MB_SCRLDOWN) mousescrollspd *= -1;
+		MouseWheelScroll(0, mousescrollspd);
 	}
 
 	if (last_win_mousefocused) {
 		last_win_mousefocused->SetMouseFocused(NULL);
 	}
 }
+
 /** BroadCast Mouse Up Event */
 void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
@@ -299,6 +299,20 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button
 	if (last_ctrl_mousefocused == NULL) return;
 	last_ctrl_mousefocused->OnMouseUp( x - last_win_mousefocused->XPos - last_ctrl_mousefocused->XPos,
 		y - last_win_mousefocused->YPos - last_ctrl_mousefocused->YPos, Button, Mod );
+}
+
+/** BroadCast Mouse ScrollWheel Event */
+void EventMgr::MouseWheelScroll( short x, short y)//these are signed!
+{
+	//should this mouse focus? I dont think so...
+	if (last_win_mousefocused) {
+		//last_win_mousefocused->SetMouseFocused(NULL);
+		Control *ctrl;
+		ctrl = last_win_mousefocused->GetFocus();
+		if (ctrl) {
+			ctrl->OnMouseWheelScroll( x, y);
+		}
+	}
 }
 
 /** BroadCast Mouse Idle Event */
@@ -382,6 +396,7 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 				}
 				break;
 			case IE_GUI_GAMECONTROL:
+			case IE_GUI_WORLDMAP:
 				//gamecontrols will receive all special keys
 				break;
 			case IE_GUI_EDIT:
