@@ -59,6 +59,7 @@ class GameScript;
 #define VB_DAMAGE    18
 #define VB_DIE       19
 #define VB_SELECT    26
+#define VB_COMMAND   32
 #define VB_INSULT    44
 #define VB_COMPLIMENT 47
 #define VB_SPECIAL   50
@@ -68,6 +69,7 @@ class GameScript;
 #define VB_RESP_INS  58
 #define VB_HOSTILE   59
 #define VB_DIALOG    60
+#define VB_SELECT_RARE 63
 #define VB_CRITHIT   65
 #define VB_CRITMISS  66
 #define VB_TIMMUNE   67
