@@ -1,0 +1,8 @@
+2DA V1.0
+-1
+           AREAFLAG   VC         SWITCH     
+FOREST     0x10       21         0          
+DUNGEON    0x20       23         0          
+CITY       8          22         0          
+DAY        2          24         1          
+
