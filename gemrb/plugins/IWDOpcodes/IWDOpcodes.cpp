@@ -136,7 +136,6 @@ static int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx);//115
 static int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx);//116
 static int fx_shroud_of_flame2 (Scriptable* Owner, Actor* target, Effect* fx);//116
 static int fx_animal_rage (Scriptable* Owner, Actor* target, Effect* fx);//117
-static int fx_turn_undead (Scriptable* Owner, Actor* target, Effect* fx);//118
 static int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx);//118
 static int fx_vitriolic_sphere (Scriptable* Owner, Actor* target, Effect* fx);//119
 static int fx_suppress_hp (Scriptable* Owner, Actor* target, Effect* fx);//11a
@@ -226,7 +225,6 @@ static EffectDesc effectnames[] = {
 	{ "ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, 0, -1 }, //0
 	{ "DamageBonusModifier", fx_damage_bonus_modifier, 0, -1 }, //49
 	{ "DrawUponHolyMight", fx_draw_upon_holy_might, 0, -1 },//84 (iwd2)
-	{ "RetreatFrom", fx_turn_undead, 0, -1 },//6e
 	{ "IronSkins", fx_ironskins, 0, -1 }, //da (iwd2)
 	{ "Color:FadeRGB", fx_fade_rgb, 0, -1 }, //e8
 	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, 0, -1 }, //e9
@@ -272,7 +270,6 @@ static EffectDesc effectnames[] = {
 	{ "ShroudOfFlame", fx_shroud_of_flame, 0, -1 },//116
 	{ "ShroudOfFlame2", fx_shroud_of_flame2, 0, -1 },//116
 	{ "AnimalRage", fx_animal_rage, 0, -1 }, //117 - berserk?
-	{ "TurnUndead", fx_turn_undead, 0, -1 }, //118 how
 	{ "TurnUndead2", fx_turn_undead2, 0, -1 }, //118 iwd2
 	{ "VitriolicSphere", fx_vitriolic_sphere, EFFECT_DICED, -1 }, //119
 	{ "SuppressHP", fx_suppress_hp, 0, -1 }, //11a -- some stat???
@@ -1837,21 +1834,6 @@ int fx_animal_rage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//this is highly unsure
 			//fx->Parameter1=1;
 		}
-	}
-	return FX_APPLIED;
-}
-
-//0x118 TurnUndead how
-int fx_turn_undead (Scriptable* Owner, Actor* target, Effect* fx)
-{
-	if (0) print( "fx_turn_undead (%2d): Level %d\n", fx->Opcode, fx->Parameter1 );
-	if (fx->Parameter1) {
-		target->Turn(Owner, fx->Parameter1);
-	} else {
-		if (Owner->Type!=ST_ACTOR) {
-			return FX_NOT_APPLIED;
-		}
-		target->Turn(Owner, ((Actor *) Owner)->GetStat(IE_TURNUNDEADLEVEL));
 	}
 	return FX_APPLIED;
 }

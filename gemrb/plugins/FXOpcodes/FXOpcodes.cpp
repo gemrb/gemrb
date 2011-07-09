@@ -208,7 +208,7 @@ int fx_morale_break_modifier (Scriptable* Owner, Actor* target, Effect* fx);//6a
 int fx_portrait_change (Scriptable* Owner, Actor* target, Effect* fx);//6b
 int fx_reputation_modifier (Scriptable* Owner, Actor* target, Effect* fx);//6c
 int fx_hold_creature_no_icon (Scriptable* Owner, Actor* target, Effect* fx);//6d
-//int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx);//6e reused
+int fx_turn_undead (Scriptable* Owner, Actor* target, Effect* fx);//6e reused
 int fx_create_magic_item (Scriptable* Owner, Actor* target, Effect* fx);//6f
 int fx_remove_item (Scriptable* Owner, Actor* target, Effect* fx);//70
 int fx_equip_item (Scriptable* Owner, Actor* target, Effect* fx);//71
@@ -678,6 +678,7 @@ static EffectDesc effectnames[] = {
 	{ "ReplaceCreature", fx_replace_creature, 0, -1 },
 	{ "ReputationModifier", fx_reputation_modifier, 0, -1 },
 	{ "RestoreSpells", fx_restore_spell_level, 0, -1 },
+	{ "RetreatFrom2", fx_turn_undead, 0, -1 },
 	{ "RightHitModifier", fx_right_to_hit_modifier, 0, -1 },
 	{ "SaveVsBreathModifier", fx_save_vs_breath_modifier, 0, -1 },
 	{ "SaveVsDeathModifier", fx_save_vs_death_modifier, 0, -1 },
@@ -751,6 +752,7 @@ static EffectDesc effectnames[] = {
 	{ "ToHitVsCreature", fx_generic_effect, 0, -1 },
 	{ "TrackingModifier", fx_tracking_modifier, 0, -1 },
 	{ "TransparencyModifier", fx_transparency_modifier, 0, -1 },
+	{ "TurnUndead", fx_turn_undead, 0, -1 },
 	{ "Unknown", fx_unknown, EFFECT_NO_ACTOR, -1 },
 	{ "Unlock", fx_knock, EFFECT_NO_ACTOR, -1 }, //open doors/containers
 	{ "UnsummonCreature", fx_unsummon_creature, 0, -1 },
@@ -3007,7 +3009,21 @@ int fx_reputation_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x6d --> see later
 
-// 0x6e works only in PST, reused for turning undead
+//0x6e works only in PST, reused for turning undead in bg
+//0x118 TurnUndead how
+int fx_turn_undead (Scriptable* Owner, Actor* target, Effect* fx)
+{
+	if (0) print( "fx_turn_undead (%2d): Level %d\n", fx->Opcode, fx->Parameter1 );
+	if (fx->Parameter1) {
+		target->Turn(Owner, fx->Parameter1);
+	} else {
+		if (Owner->Type!=ST_ACTOR) {
+			return FX_NOT_APPLIED;
+		}
+		target->Turn(Owner, ((Actor *) Owner)->GetStat(IE_TURNUNDEADLEVEL));
+	}
+	return FX_APPLIED;
+}
 
 // 0x6f Item:CreateMagic
 
