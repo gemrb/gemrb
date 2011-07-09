@@ -2690,12 +2690,18 @@ void Actor::CommandActor() const
 //Generates an idle action (party banter, area comment, bored)
 void Actor::IdleActions(bool nonidle)
 {
+	//only party [N]PCs talk
+	if (!InParty) return;
+	//if they got an area
 	Map *map = GetCurrentArea();
 	if (!map) return;
+	//and not in panic
 	if (panicMode!=PANIC_NONE) return;
 
 	Game *game = core->GetGame();
+	//there is no combat
 	if (game->CombatCounter) return;
+	//and they are on the current area
 	if (map!=game->GetCurrentArea()) return;
 
 	ieDword time = game->GameTime;
