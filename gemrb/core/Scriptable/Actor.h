@@ -300,6 +300,8 @@ public:
 	ieDword modalTime;           //last time the modal effect used
 	char modalSpellLingering;    //the count of rounds for which the modal spell will be reapplied after the state ends
 	ieDword panicMode;           //runaway, berserk or randomwalk
+	ieDword nextComment;         //do something random (area comment, interaction)
+	ieDword nextBored;           //do something when bored
 	ieDword lastInit;
 	bool no_more_steps;
 	int speed;
@@ -456,7 +458,13 @@ public:
 	/* receives undead turning message */
 	void Turn(Scriptable *cleric, ieDword turnlevel);
 	/* call this on gui selects */
-	void SelectActor();
+	void SelectActor() const;
+	/* call this when adding actions via gui */
+	void CommandActor() const;
+	/** handle panic and other involuntary actions that mess with scripting */
+	bool OverrideActions();
+	/** handle idle actions, that shouldn't mess with scripting */
+	void IdleActions(bool nonidle);
 	/* sets the actor in panic (turn/morale break) */
 	void Panic(Scriptable *attacker, int panicmode);
 	/* sets a multi class flag (actually this is a lot of else too) */
@@ -466,9 +474,9 @@ public:
 	/* returns a remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int index) const;
 	/* displaying a random verbal constant */
-	void VerbalConstant(int start, int count);
+	void VerbalConstant(int start, int count) const;
 	/* inlined dialogue response */
-	void Response(int type);
+	void Response(int type) const;
 	/* called when someone died in the party */
 	void ReactToDeath(const char *deadname);
 	/* called when someone talks to Actor */
@@ -581,6 +589,10 @@ public:
 	void ResolveStringConstant(ieResRef sound, unsigned int index) const;
 	void GetSoundFromINI(ieResRef Sound, unsigned int index) const;
 	void GetSoundFrom2DA(ieResRef Sound, unsigned int index) const;
+	/* generate area specific oneliner */
+	void GetAreaComment(int areaflag) const;
+	/* generate party banter, return true if successful */
+	bool GetPartyComment();
 	/* sets the quick slots */
 	void SetActionButtonRow(ActionButtonRow &ar);
 	/* updates the quick slots */

@@ -120,7 +120,7 @@ Point GetEntryPoint(const char *areaname, const char *entryname);
 GEM_EXPORT int CanSee(Scriptable* Sender, Scriptable* target, bool range, int nodead);
 GEM_EXPORT int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos);
 GEM_EXPORT int DiffCore(ieDword a, ieDword b, int diffmode);
-GEM_EXPORT void DisplayStringCore(Scriptable* Sender, int Strref, int flags);
+GEM_EXPORT void DisplayStringCore(Scriptable* const Sender, int Strref, int flags);
 GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);
 GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust);
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid = NULL);

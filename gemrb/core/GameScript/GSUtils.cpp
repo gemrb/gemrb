@@ -340,7 +340,7 @@ bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags)
 	return false;
 }
 
-void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
+void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 {
 	StringBlock sb;
 	char Sound[_MAX_PATH];
@@ -947,6 +947,12 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			Dialog = ( const char * ) PlayerDialogRes;
 			break;
 		case BD_INTERACT: //using the source for the dialog
+			Game *game = core->GetGame();
+			if (game->BanterBlockFlag || game->BanterBlockTime) {
+				printMessage("GameScript","Banterblock disabled interaction.\n",GREEN);
+				Sender->ReleaseCurrentAction();
+				return;
+			}
 			const char* scriptingname = scr->GetScriptName();
 
 			/* use interact.2da for short, inlined dialogue */

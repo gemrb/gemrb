@@ -96,6 +96,8 @@ static int *maxhpconbon = NULL;
 static int *skillstats = NULL;
 static int *skillabils = NULL;
 static int skillcount = -1;
+static int **afcomments = NULL;
+static int afcount = -1;
 static ieVariable CounterNames[4]={"GOOD","LAW","LADY","MURDER"};
 
 static int FistRows = -1;
@@ -106,7 +108,13 @@ static FistResType *fistres = NULL;
 static int *fistresclass = NULL;
 static ieResRef DefaultFist = {"FIST"};
 
+//verbal constant specific data
 static int VCMap[VCONST_COUNT];
+static ieDword sel_snd_freq = 0;
+static ieDword cmd_snd_freq = 0;
+static ieDword bored_time = 3000;
+//the chance to issue one of the rare select verbal constants
+#define RARE_SELECT_CHANCE 1
 
 //item usability array
 struct ItemUseType {
@@ -357,6 +365,8 @@ Actor::Actor()
 	modalTime = 0;
 	modalSpellLingering = 0;
 	panicMode = PANIC_NONE;
+	nextComment = 0;
+	nextBored = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 	Equipped = 0;
@@ -1258,6 +1268,16 @@ void Actor::ReleaseMemory()
 			skillabils=NULL;
 		}
 
+	if (afcomments) {
+		for(i=0;i<afcount;i++) {
+			if(afcomments[i]) {
+				free(afcomments[i]);
+			}
+		}
+		free(afcomments);
+		afcomments=NULL;
+	}
+
 		if (wspecial) {
 			for (i=0; i<=wspecial_max; i++) {
 				if (wspecial[i]) {
@@ -1362,6 +1382,9 @@ static void InitActorTables()
 {
 	int i, j;
 
+	core->GetDictionary()->Lookup("Selection Sounds Frequency", sel_snd_freq);
+	core->GetDictionary()->Lookup("Command Sounds Frequency", cmd_snd_freq);
+	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
 	pstflags = core->HasFeature(GF_PST_STATE_FLAGS);
 	nocreate = core->HasFeature(GF_NO_NEW_VARIABLES);
 	if (pstflags) {
@@ -1923,6 +1946,22 @@ static void InitActorTables()
 			while(rowcount--) {
 				skillstats[rowcount]=core->TranslateStat(tm->QueryField(rowcount,0));
 				skillabils[rowcount]=core->TranslateStat(tm->QueryField(rowcount,1));
+			}
+		}
+	}
+
+	//initializing area flag comments
+	tm.load("comment");
+	if (tm) {
+		int rowcount = tm->GetRowCount();
+		afcount = rowcount;
+		if (rowcount) {
+			afcomments = (int **) calloc(rowcount, sizeof(int *) );
+			while(rowcount--) {
+				afcomments[rowcount]=(int *) malloc(3*sizeof(int) );
+				for(i=0;i<3;i++) {
+					afcomments[rowcount][i] = strtol(tm->QueryField(rowcount,i), NULL, 0);
+				}
 			}
 		}
 	}
@@ -2492,7 +2531,7 @@ ieStrRef Actor::GetVerbalConstant(int index) const
 	return StrRefs[idx];
 }
 
-void Actor::VerbalConstant(int start, int count)
+void Actor::VerbalConstant(int start, int count) const
 {
 	ieStrRef vc;
 
@@ -2502,11 +2541,11 @@ void Actor::VerbalConstant(int start, int count)
 		count--;
 	}
 	if(count>=0) {
-		DisplayStringCore(this, start+count, DS_CONSOLE|DS_CONST );
+		DisplayStringCore((Scriptable *const) this, start+count, DS_CONSOLE|DS_CONST );
 	}
 }
 
-void Actor::Response(int type)
+void Actor::Response(int type) const
 {
 	int start;
 	int count;
@@ -2524,7 +2563,7 @@ void Actor::Response(int type)
 		count--;
 	}
 	if(count>=0) {
-		DisplayStringCore(this, start+count, DS_CONSOLE|DS_CONST );
+		DisplayStringCore((Scriptable *const) this, start+count, DS_CONSOLE|DS_CONST );
 	}
 }
 
@@ -2568,10 +2607,134 @@ void Actor::ReactToDeath(const char * deadname)
 	}
 }
 
-//call this only from gui selects
-void Actor::SelectActor()
+//issue area specific comments
+void Actor::GetAreaComment(int areaflag) const
 {
-	DisplayStringCore(this, VB_SELECT+core->Roll(1,3,-1), DS_CONSOLE|DS_CONST );
+	for(int i=0;i<afcount;i++) {
+		if (afcomments[i][0]&areaflag) {
+			int vc = afcomments[i][1];
+			if (afcomments[i][2]) {
+				if (!core->GetGame()->IsDay()) {
+					vc++;
+				}
+			}
+			VerbalConstant(vc, 1);
+			return;
+		}
+	}
+}
+
+bool Actor::GetPartyComment()
+{
+	Game *game = core->GetGame();
+
+	//don't even bother
+	if (game->NpcInParty<2) return false;
+	ieDword size = game->GetPartySize(true);
+	//don't even bother, again
+	if (size<2) return false;
+
+	if(core->Roll(1,2,-1)) {
+		return false;
+	}
+
+	for(unsigned int i=core->Roll(1,size,0);i<2*size;i++) {
+		Actor *target = game->GetPC(i%size, true);
+		if (target==this) continue;
+		if (target->BaseStats[IE_MC_FLAGS]&MC_EXPORTABLE) continue; //not NPC
+		if (target->GetCurrentArea()!=GetCurrentArea()) continue;
+		char Tmp[40];
+		strncpy(Tmp,"Interact([-1])", sizeof(Tmp) );
+		Action *action = GenerateActionDirect(Tmp, target);
+		if (action) {
+			AddActionInFront(action);
+		} else {
+			printMessage("Actor","Cannot generate banter action\n", RED);
+		}
+		return true;
+	}
+	return false;
+}
+
+//call this only from gui selects
+void Actor::SelectActor() const
+{
+	switch (sel_snd_freq) {
+		case 0:
+			return;
+		case 1:
+			if (core->Roll(1,100,0)>25) return;
+		default:;
+	}
+
+	//drop the rare selection comment 1% of the time
+	if (core->Roll(1,100,0) <= RARE_SELECT_CHANCE) {
+		VerbalConstant(VB_SELECT_RARE,2);
+	} else {
+		VerbalConstant(VB_SELECT,6);
+	}
+}
+
+void Actor::CommandActor() const
+{
+	switch (cmd_snd_freq) {
+		case 0:
+			return;
+		case 1:
+			if (core->Roll(1,100,0)>25) return;
+		default:;
+	}
+	VerbalConstant(VB_COMMAND,7);
+}
+
+//Generates an idle action (party banter, area comment, bored)
+void Actor::IdleActions(bool nonidle)
+{
+	Map *map = GetCurrentArea();
+	if (!map) return;
+	if (panicMode!=PANIC_NONE) return;
+
+	Game *game = core->GetGame();
+	if (game->CombatCounter) return;
+	if (map!=game->GetCurrentArea()) return;
+
+	ieDword time = game->GameTime;
+
+	//don't mess with cutscenes, dialogue, or when scripts disabled us
+	if (core->InCutSceneMode() || game->BanterBlockFlag || (game->BanterBlockTime>time) ) {
+		return;
+	}
+
+	//drop an area comment, party oneliner or initiate party banter (with Interact)
+	//party comments have a priority, but they happen half of the time, at most
+	if (nextComment<time) {
+		if (nextComment) {
+			if (!GetPartyComment()) {
+				GetAreaComment(map->AreaType);
+			}
+		}
+		nextComment = time+core->Roll(5,1000,bored_time/2);
+		return;
+	}
+
+	//drop the bored one liner is there was no action for some time
+	if(nonidle || !nextBored) {
+		//if not in party or bored timeout is disabled, don't bother to set the new time
+		if (InParty && bored_time) {
+			nextBored=time+core->Roll(1,30,bored_time);
+		}
+	} else {
+		if (nextBored<time) {
+			nextBored = time+core->Roll(1,30,bored_time/10);
+			VerbalConstant(VB_BORED, 1);
+		}
+	}
+}
+
+bool Actor::OverrideActions()
+{
+	//TODO:: implement forced actions that mess with scripting (panic, confusion, etc)
+	return false;
 }
 
 void Actor::Panic(Scriptable *attacker, int panicmode)
@@ -5638,6 +5801,7 @@ void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
 			index = 10;
 			break;
 		//TODO: one day we should implement verbal constant groups
+		case VB_DIALOG:
 		case VB_SELECT:
 		case VB_SELECT+1:
 		case VB_SELECT+2:
@@ -6965,13 +7129,24 @@ bool Actor::IsRacialEnemy(Actor* target) const
 
 bool Actor::ModalSpellSkillCheck() {
 	switch(ModalState) {
-		case MS_BATTLESONG:
-		case MS_DETECTTRAPS:
-		case MS_TURNUNDEAD:
+	case MS_BATTLESONG:
+		if (isclass[ISBARD]&(1<<Modified[IE_CLASS])) {
 			return true;
-		case MS_STEALTH:
+		}
+		/* do we need this */
+		if (Modified[IE_STATE_ID]& STATE_SILENCED) {
+			return true;
+		}
+		return false;
+	case MS_DETECTTRAPS:
+		if (Modified[IE_TRAPS]<=0) return false;
+		return true;
+	case MS_TURNUNDEAD:
+		if (Modified[IE_TURNUNDEADLEVEL]<=0) return false;
+			return true;
+	case MS_STEALTH:
 			return TryToHide();
-		case MS_NONE:
+	case MS_NONE:
 		default:
 			return false;
 	}

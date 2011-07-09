@@ -392,6 +392,10 @@ void Scriptable::ExecuteScript(int scriptCount)
 	if (Type == ST_ACTOR && ((Actor *) this)->InParty && (core->GetGame()->ControlStatus & CS_PARTY_AI))
 		scriptCount = 1;
 	// TODO: hardcoded action hacks
+	if (Type == ST_ACTOR) {
+		//TODO: add stuff here that overrides actions (like Panic, etc)
+		changed |= ((Actor *) this)->OverrideActions();
+	}
 
 	bool continuing = false, done = false;
 	for (int i = 0;i<scriptCount;i++) {
@@ -406,6 +410,11 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 	if (changed)
 		ClearTriggers();
+
+	if (Type == ST_ACTOR) {
+		//TODO: add stuff here about idle actions
+		((Actor *) this)->IdleActions(CurrentAction!=NULL);
+	}
 }
 
 void Scriptable::AddAction(Action* aC)
