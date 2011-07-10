@@ -138,6 +138,8 @@ struct PolymorphCache;
 #define I_INSULT     1
 #define I_COMPLIMENT 2
 #define I_SPECIAL    3
+#define I_INSULT_RESP 4
+#define I_COMPL_RESP 5
 
 // 3 for blur, 8 for mirror images
 #define EXTRA_ACTORCOVERS 11
@@ -591,6 +593,8 @@ public:
 	void GetSoundFrom2DA(ieResRef Sound, unsigned int index) const;
 	/* generate area specific oneliner */
 	void GetAreaComment(int areaflag) const;
+	/* handle oneliner interaction */
+	bool HandleInteract(Actor *target);
 	/* generate party banter, return true if successful */
 	bool GetPartyComment();
 	/* sets the quick slots */

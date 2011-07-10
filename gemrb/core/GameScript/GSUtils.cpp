@@ -781,25 +781,6 @@ void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 	}
 }
 
-int CheckInteract(const char *talker, const char *target)
-{
-	AutoTable interact("interact");
-	if(!interact)
-		return 0;
-	const char *value = interact->QueryField(talker, target);
-	if(!value)
-		return 0;
-	switch(value[0]) {
-		case 's':
-			return I_SPECIAL;
-		case 'c':
-			return I_COMPLIMENT;
-		case 'i':
-			return I_INSULT;
-	}
-	return 0;
-}
-
 static ieResRef PlayerDialogRes = "PLAYERx\0";
 
 void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
@@ -955,20 +936,16 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			}
 			const char* scriptingname = scr->GetScriptName();
 
-			/* use interact.2da for short, inlined dialogue */
-			int type = CheckInteract(scriptingname, target->GetScriptName());
-			if(type) {
-				//TODO increase interact counter in scr
-				speaker->Interact(type);
-				target->Response(type);
-				Sender->ReleaseCurrentAction();
-				return;
-			}
 			/* banter dialogue */
 			pdtable.load("interdia");
-			//Dialog is a borrowed reference, we cannot free pdtable while it is being used
+			//Dialog is a borrowed reference, and pdtable will be freed automagically
 			if (pdtable) {
-				Dialog = pdtable->QueryField( scriptingname, "FILE" );
+				//5 is the magic number for the ToB expansion
+				if (game->Expansion==5) {
+					Dialog = pdtable->QueryField( scriptingname, "25FILE" );
+				} else {
+					Dialog = pdtable->QueryField( scriptingname, "FILE" );
+				}
 			}
 			break;
 	}

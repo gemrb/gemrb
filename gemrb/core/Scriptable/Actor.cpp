@@ -127,7 +127,7 @@ struct ItemUseType {
 
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
-static bool pstflags = false;
+static ieDword pstflags = false;
 static bool nocreate = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
@@ -1385,8 +1385,8 @@ static void InitActorTables()
 	core->GetDictionary()->Lookup("Selection Sounds Frequency", sel_snd_freq);
 	core->GetDictionary()->Lookup("Command Sounds Frequency", cmd_snd_freq);
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
-	pstflags = core->HasFeature(GF_PST_STATE_FLAGS);
-	nocreate = core->HasFeature(GF_NO_NEW_VARIABLES);
+	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
+	nocreate = !!core->HasFeature(GF_NO_NEW_VARIABLES);
 	if (pstflags) {
 		state_invisible=STATE_PST_INVIS;
 	} else {
@@ -2511,6 +2511,8 @@ void Actor::Interact(int type)
 		case I_INSULT: start=VB_INSULT; count=3; break;
 		case I_COMPLIMENT: start=VB_COMPLIMENT; count=3; break;
 		case I_SPECIAL: start=VB_SPECIAL; count=3; break;
+		case I_INSULT_RESP: start=VB_RESP_INS; count = 3; break;
+		case I_COMPL_RESP: start=VB_RESP_COMP; count = 3; break;
 		default:
 			return;
 	}
@@ -2541,29 +2543,8 @@ void Actor::VerbalConstant(int start, int count) const
 		count--;
 	}
 	if(count>=0) {
-		DisplayStringCore((Scriptable *const) this, start+count, DS_CONSOLE|DS_CONST );
-	}
-}
-
-void Actor::Response(int type) const
-{
-	int start;
-	int count;
-	ieStrRef vc;
-
-	switch(type) {
-		case I_INSULT: start=VB_RESP_INS; count=3; break;
-		case I_COMPLIMENT: start=VB_RESP_COMP; count=3; break;
-		default:
-			return;
-	}
-
-	count=rand()%count;
-	while(count && ((vc = GetVerbalConstant(start+count))!=(ieStrRef) -1)) {
-		count--;
-	}
-	if(count>=0) {
-		DisplayStringCore((Scriptable *const) this, start+count, DS_CONSOLE|DS_CONST );
+		//DisplayStringCore((Scriptable *const) this, start+count, DS_CONSOLE|DS_CONST );
+		DisplayStringCore((Scriptable *const) this, vc, DS_CONSOLE );
 	}
 }
 
@@ -2624,6 +2605,47 @@ void Actor::GetAreaComment(int areaflag) const
 	}
 }
 
+static int CheckInteract(const char *talker, const char *target)
+{
+	AutoTable interact("interact");
+	if(!interact)
+		return 0;
+	const char *value = interact->QueryField(talker, target);
+	if(!value)
+		return 0;
+	switch(value[0]) {
+		case 's':
+			return I_SPECIAL;
+		case 'c':
+			return I_COMPLIMENT;
+		case 'i':
+			return I_INSULT;
+		case 'I':
+			return I_INSULT_RESP;
+		case 'C':
+			return I_COMPL_RESP;
+	}
+	return 0;
+}
+
+bool Actor::HandleInteract(Actor *target)
+{
+	int type = CheckInteract(scriptName, target->GetScriptName());
+	if (!type) return false;
+
+	Interact(type);
+	switch(type)
+	{
+	case I_COMPLIMENT:
+		target->Interact(I_COMPL_RESP);
+		break;
+	case I_INSULT:
+		target->Interact(I_INSULT_RESP);
+		break;
+	}
+	return true;
+}
+
 bool Actor::GetPartyComment()
 {
 	Game *game = core->GetGame();
@@ -2643,6 +2665,13 @@ bool Actor::GetPartyComment()
 		if (target==this) continue;
 		if (target->BaseStats[IE_MC_FLAGS]&MC_EXPORTABLE) continue; //not NPC
 		if (target->GetCurrentArea()!=GetCurrentArea()) continue;
+
+		//simplified interact
+		if (HandleInteract(target)) {
+			return true;
+		}
+
+		//V2 interact
 		char Tmp[40];
 		strncpy(Tmp,"Interact([-1])", sizeof(Tmp) );
 		Action *action = GenerateActionDirect(Tmp, target);
@@ -4438,7 +4467,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 {
 	tohit = GetStat(IE_TOHIT);
 	speed = -GetStat(IE_PHYSICALSPEED);
-	bool dualwielding = IsDualWielding();
+	ieDword dualwielding = IsDualWielding();
 	header = GetWeapon(wi, leftorright && dualwielding);
 	if (!header) {
 		return false;
