@@ -83,13 +83,13 @@
 static ieResRef *casting_glows = NULL;
 static int cgcount = -1;
 static ieResRef *spell_hits = NULL;
-static bool enhanced_effects = false;
+static ieDword enhanced_effects = 0;
 static int shcount = -1;
 static int *spell_abilities = NULL;
 static ieDword splabcount = 0;
 static int *polymorph_stats = NULL;
 static int polystatcount = 0;
-static bool pstflags = false;
+static ieDword pstflags = false;
 
 //the original engine stores the colors in sprklclr.2da in a different order
 
@@ -780,8 +780,8 @@ static void Cleanup()
 void RegisterCoreOpcodes()
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
-	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
-	pstflags=!!core->HasFeature(GF_PST_STATE_FLAGS);
+	enhanced_effects=core->HasFeature(GF_ENHANCED_EFFECTS);
+	pstflags=core->HasFeature(GF_PST_STATE_FLAGS);
 	default_spell_hit.SequenceFlags|=IE_VVC_BAM;
 }
 
@@ -4154,8 +4154,7 @@ int fx_set_sanctuary_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET_PCF( IE_SANCTUARY, fx->Parameter2);
 	//a rare event, but this effect gives more in bg2 than in iwd2
 	//so we use this flag
-	if (!enhanced_effects)
-	{
+	if (!enhanced_effects) {
 		target->SetLockedPalette(fullwhite);
 	}
 	return FX_APPLIED;
