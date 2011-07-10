@@ -819,6 +819,10 @@ void GameScript::SetPlayerSound(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
+	if (((ieDword) parameters->int0Parameter)>100) {
+		printMessage("GameScript","Invalid index %d in SetPlayerSound.\n", YELLOW, parameters->int0Parameter);
+		return;
+	}
 	Actor* actor = ( Actor* ) tar;
 	actor->StrRefs[parameters->int0Parameter]=parameters->int1Parameter;
 }
@@ -3247,7 +3251,11 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		ieResRef resref;
 		//set dialog only if we got a row
 		if (pdtable->GetRowIndex( scriptname ) != -1) {
-			strnlwrcpy(resref, pdtable->QueryField( scriptname, "JOIN_DIALOG_FILE"),8);
+			if (game->Expansion==5) {
+				strnlwrcpy(resref, pdtable->QueryField( scriptname, "25JOIN_DIALOG_FILE"), sizeof(ieResRef)-1);
+			} else {
+				strnlwrcpy(resref, pdtable->QueryField( scriptname, "JOIN_DIALOG_FILE"), sizeof(ieResRef)-1);
+			}
 			act->SetDialog( resref );
 		}
 	}
@@ -3781,13 +3789,22 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 	}
 	AutoTable pdtable("pdialog");
 	Actor* act = ( Actor* ) Sender;
-	const char* scriptingname = act->GetScriptName();
-	act->SetDialog( pdtable->QueryField( scriptingname, "POST_DIALOG_FILE" ) );
+	const char* scriptname = act->GetScriptName();
+	if (pdtable->GetRowIndex( scriptname ) != -1) {
+		ieResRef resref;
+
+		if (core->GetGame()->Expansion==5) {
+			strnlwrcpy(resref, pdtable->QueryField( scriptname, "25POST_DIALOG_FILE" ), sizeof(ieResRef)-1 );
+		} else {
+			strnlwrcpy(resref, pdtable->QueryField( scriptname, "POST_DIALOG_FILE" ), sizeof(ieResRef)-1 );
+		}
+		act->SetDialog(resref);
+	}
 }
 
 void GameScript::TextScreen(Scriptable* Sender, Action* parameters)
 {
-	strnlwrcpy(core->GetGame()->LoadMos, parameters->string0Parameter,8);
+	strnlwrcpy(core->GetGame()->LoadMos, parameters->string0Parameter, sizeof(ieResRef)-1);
 	core->GetGUIScriptEngine()->RunFunction( "TextScreen", "StartTextScreen" );
 	core->GetVideoDriver()->SetMouseEnabled(true);
 	Sender->SetWait(1);
@@ -6092,10 +6109,10 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 	if (!store) {
 		store = core->SetCurrentStore(parameters->string0Parameter, 0);
 	} else {
-		if (strnicmp(store->Name, parameters->string0Parameter, 8) ) {
+		if (strnicmp(store->Name, parameters->string0Parameter, sizeof(ieResRef)-1) ) {
 			//not the current store, we need some dirty hack
 			has_current = true;
-			strnlwrcpy(current, store->Name, 8);
+			strnlwrcpy(current, store->Name, sizeof(ieResRef)-1);
 			owner = store->GetOwnerID();
 		}
 	}
