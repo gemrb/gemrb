@@ -3982,12 +3982,14 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 // 0x93 Spell:Learn
 int fx_learn_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) print( "fx_learn_spell (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
+	if (0) print( "fx_learn_spell (%2d): Resource:%s Flags: %d Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter1, fx->Parameter2 );
 	//parameter1 is unused, gemrb lets you to make it not give XP
 	//probably we should also let this via a game flag if we want
 	//full compatibility with bg1
 	//parameter2 is used in bg1 and pst to specify the spell type; bg2 and iwd2 figure it out from the resource
-	target->LearnSpell(fx->Resource, fx->Parameter1);
+
+	int x= target->LearnSpell(fx->Resource, fx->Parameter1);
+	print("Learnspell returned: %d\n", x);
 	return FX_NOT_APPLIED;
 }
 // 0x94 Spell:CastSpellPoint
@@ -4389,7 +4391,7 @@ int fx_damage_animation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_add_innate (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_add_innate (%2d): Resource: %s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
-	target->LearnSpell(fx->Resource, fx->Parameter2^LS_MEMO);
+	target->LearnSpell(fx->Resource, fx->Parameter2);
 	//this is an instant, so it shouldn't stick
 	return FX_NOT_APPLIED;
 }

@@ -4221,6 +4221,11 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		return LSR_INVALID; //not existent spell
 	}
 
+	//innates are always memorized when gained
+	if (spell->SpellType==IE_SPL_INNATE) {
+		flags|=LS_MEMO;
+	}
+
 	if (flags & LS_STATS) {
 		// chance to learn roll
 		int roll = LuckyRoll(1, 100, 0);
