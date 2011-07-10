@@ -1,0 +1,9 @@
+2DA V1.0
+*
+	ORIGINAL	NEW          COMMENT
+RESP1	59		58      no second hostile response
+RESP2     60        58      no third hostile response
+DLG1      61        59      hostile dialog shifts
+DLG2      62        60      default dialog shifts
+
+

@@ -48,7 +48,7 @@ class GameScript;
 #define DS_SPEECH  64
 #define DS_AREA    128
 
-//verbal constant (bg2), we need a lookup table for other games
+//verbal constant (bg2), we have a lookup table (vcremap) for other games
 #define VB_PANIC     1
 #define VB_HAPPY     2
 #define VB_UNHAPPY   3
@@ -67,8 +67,8 @@ class GameScript;
 #define VB_REACT_S   54
 #define VB_RESP_COMP 55
 #define VB_RESP_INS  58
-#define VB_HOSTILE   59
-#define VB_DIALOG    60
+#define VB_HOSTILE   61
+#define VB_DIALOG    62
 #define VB_SELECT_RARE 63
 #define VB_CRITHIT   65
 #define VB_CRITMISS  66
