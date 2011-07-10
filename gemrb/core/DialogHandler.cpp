@@ -331,10 +331,16 @@ void DialogHandler::DialogChoose(unsigned int choose)
 				// TODO: work out if this should go somewhere more central (such
 				// as GetActorByDialog), or if there's a less awful way to do this
 				// (we could cache the entries, for example)
-				// TODO: fix for ToB (see also the Interact action)
 				AutoTable pdtable("interdia");
 				if (pdtable) {
-					int row = pdtable->FindTableValue( pdtable->GetColumnIndex("FILE"), tr->Dialog );
+					int col;
+
+					if (core->GetGame()->Expansion==5) {
+						col = pdtable->GetColumnIndex("25FILE");
+					} else {
+						col = pdtable->GetColumnIndex("FILE");
+					}
+					int row = pdtable->FindTableValue( col, tr->Dialog );
 					tgt = target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
 				}
 			}
