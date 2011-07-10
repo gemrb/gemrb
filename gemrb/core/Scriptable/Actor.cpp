@@ -2507,14 +2507,22 @@ void Actor::Interact(int type)
 	int start;
 	int count;
 
-	switch(type) {
-		case I_INSULT: start=VB_INSULT; count=3; break;
-		case I_COMPLIMENT: start=VB_COMPLIMENT; count=3; break;
-		case I_SPECIAL: start=VB_SPECIAL; count=3; break;
-		case I_INSULT_RESP: start=VB_RESP_INS; count = 3; break;
-		case I_COMPL_RESP: start=VB_RESP_COMP; count = 3; break;
+	switch(type&0xff) {
+		case I_INSULT: start=VB_INSULT; break;
+		case I_COMPLIMENT: start=VB_COMPLIMENT; break;
+		case I_SPECIAL: start=VB_SPECIAL; break;
+		case I_INSULT_RESP: start=VB_RESP_INS; break;
+		case I_COMPL_RESP: start=VB_RESP_COMP; break;
 		default:
 			return;
+	}
+	if (type&0xff00) {
+		//PST style fixed slots
+		start+=((type&0xff00)>>8)-1;
+		count = 1;
+	} else {
+		//BG1 style random slots
+		count = 3;
 	}
 	VerbalConstant(start, count);
 }
@@ -2613,25 +2621,46 @@ static int CheckInteract(const char *talker, const char *target)
 	const char *value = interact->QueryField(talker, target);
 	if(!value)
 		return 0;
-	switch(value[0]) {
-		case 's':
-			return I_SPECIAL;
-		case 'c':
-			return I_COMPLIMENT;
-		case 'i':
-			return I_INSULT;
-		case 'I':
-			return I_INSULT_RESP;
-		case 'C':
-			return I_COMPL_RESP;
+
+	int tmp = 0;
+	int x = 0;
+	int ln = strlen(value);
+
+	if (ln>1) {
+		//we round the length up, so the last * will be also chosen
+		x = core->Roll(1,(ln+1)/2,-1)*2;
+		//convert '1', '2' and '3' to 0x100,0x200,0x300 respectively, all the rest becomes 0
+		//it is no problem if we hit the zero terminator in case of an odd length
+		tmp = value[x+1]-'0';
+		if ((ieDword) tmp>3) tmp=0;
+		tmp <<= 8;
 	}
-	return 0;
+
+	switch(value[x]) {
+		case '*':
+			return I_DIALOG;
+		case 's':
+			return tmp+I_SPECIAL;
+		case 'c':
+			return tmp+I_COMPLIMENT;
+		case 'i':
+			return tmp+I_INSULT;
+		case 'I':
+			return tmp+I_INSULT_RESP;
+		case 'C':
+			return tmp+I_COMPL_RESP;
+	}
+	return I_NONE;
 }
 
-bool Actor::HandleInteract(Actor *target)
+int Actor::HandleInteract(Actor *target)
 {
 	int type = CheckInteract(scriptName, target->GetScriptName());
-	if (!type) return false;
+
+	//no interaction at all
+	if (type==I_NONE) return -1;
+	//banter dialog interaction
+	if (type==I_DIALOG) return 0;
 
 	Interact(type);
 	switch(type)
@@ -2643,7 +2672,7 @@ bool Actor::HandleInteract(Actor *target)
 		target->Interact(I_INSULT_RESP);
 		break;
 	}
-	return true;
+	return 1;
 }
 
 bool Actor::GetPartyComment()
@@ -2667,20 +2696,22 @@ bool Actor::GetPartyComment()
 		if (target->GetCurrentArea()!=GetCurrentArea()) continue;
 
 		//simplified interact
-		if (HandleInteract(target)) {
+		switch(HandleInteract(target)) {
+			case -1: return false;
+			case 1: return true;
+			default:
+			//V2 interact
+			char Tmp[40];
+			LastTalker = target->GetGlobalID();
+			strncpy(Tmp,"Interact([-1])", sizeof(Tmp) );
+			Action *action = GenerateActionDirect(Tmp, target);
+			if (action) {
+				AddActionInFront(action);
+			} else {
+				printMessage("Actor","Cannot generate banter action\n", RED);
+			}
 			return true;
 		}
-
-		//V2 interact
-		char Tmp[40];
-		strncpy(Tmp,"Interact([-1])", sizeof(Tmp) );
-		Action *action = GenerateActionDirect(Tmp, target);
-		if (action) {
-			AddActionInFront(action);
-		} else {
-			printMessage("Actor","Cannot generate banter action\n", RED);
-		}
-		return true;
 	}
 	return false;
 }

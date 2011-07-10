@@ -1,0 +1,12 @@
+2DA V1.0
+-1
+           AREAFLAG   VC         SWITCH     
+RAVEL      0x10       21         0          
+BAATOR     0x20       23         0          
+CLERKS     4          22         0          
+HIVE       1          24         1          
+FORTRESS   0x80       70         0
+CARCERI    0x200      71         0
+CURST      0x100      72         0
+LIMBO      0x40       73         0
+LOWER      2          74         0
