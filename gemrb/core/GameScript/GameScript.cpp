@@ -2330,6 +2330,7 @@ Action* GenerateAction(char* String)
 Action* GenerateActionDirect(char *String, Scriptable *object)
 {
 	Action* action = GenerateAction(String);
+	if (!action) return NULL;
 	Object *tmp = action->objects[1];
 	if (tmp && tmp->objectFields[0]==-1) {
 		tmp->objectFields[1] = object->GetGlobalID();
