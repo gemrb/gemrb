@@ -197,7 +197,15 @@ void Control::OnSpecialKeyPress(unsigned char Key)
 		}
 	}
 }
+void Control::SetFocus(bool focus)
+{
+	hasFocus = focus;
+}
 
+bool Control::isFocused()
+{
+	return hasFocus;
+}
 /** Sets the Display Flags */
 int Control::SetFlags(int arg_flags, int opcode)
 {

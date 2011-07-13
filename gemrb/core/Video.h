@@ -96,7 +96,10 @@ public:
 	virtual bool ToggleGrabInput() = 0;
 	virtual short GetWidth() = 0;
 	virtual short GetHeight() = 0;
-
+	/** Displays or hides a virtual (software) keyboard*/
+	virtual void ShowSoftKeyboard() = 0;
+	virtual void HideSoftKeyboard() = 0;
+	
 	virtual void InitSpriteCover(SpriteCover* sc, int flags) = 0;
 	virtual void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly) = 0;
 	virtual void DestroySpriteCover(SpriteCover* sc) = 0;

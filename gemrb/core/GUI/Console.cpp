@@ -215,6 +215,14 @@ void Console::HistoryAdd(bool force)
 	}
 }
 
+void Console::SetFocus(bool focus)
+{
+	Control::SetFocus(focus);
+	if (hasFocus) {
+		core->GetVideoDriver()->ShowSoftKeyboard();
+	}
+}
+
 bool Console::SetEvent(int /*eventType*/, EventHandler /*handler*/)
 {
 	return false;

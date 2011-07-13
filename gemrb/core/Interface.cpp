@@ -2274,6 +2274,7 @@ bool Interface::LoadConfig(const char* filename)
 		CONFIG_INT("TooltipDelay", TooltipDelay = );
 		CONFIG_INT("Width", Width = );
 		CONFIG_INT("IgnoreOriginalINI", IgnoreOriginalINI = );
+		CONFIG_INT("UseSoftKeyboard", UseSoftKeyboard = );
 #undef CONFIG_INT
 #define CONFIG_STRING(str, var) \
 		} else if (stricmp(name, str) == 0) { \

@@ -63,6 +63,9 @@ public:
 	short GetWidth() { return ( disp ? disp->w : 0 ); }
 	short GetHeight() { return ( disp ? disp->h : 0 ); }
 
+	void ShowSoftKeyboard();
+	void HideSoftKeyboard();
+	
 	void InitSpriteCover(SpriteCover* sc, int flags);
 	void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly);
 	void DestroySpriteCover(SpriteCover* sc);

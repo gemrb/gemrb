@@ -83,6 +83,7 @@ public: //Events
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
+	void SetFocus(bool focus);
 	bool SetEvent(int eventType, EventHandler handler);
 private:
 	void HistoryBack();

@@ -61,6 +61,9 @@ class Window;
  */
 
 class GEM_EXPORT Control {
+protected:
+	/** Focused Control */
+	bool hasFocus;
 public:
 	Control();
 	virtual ~Control();
@@ -97,8 +100,6 @@ public: // Public attributes
 	/** Text to display as a tooltip when the mouse cursor hovers
 	 * for some time over the control */
 	char* Tooltip;
-	/** Focused Control */
-	bool hasFocus;
 	/** If true, control is redrawn during next call to gc->DrawWindows.
 	 * Then it's set back to false. */
 	bool Changed;
@@ -115,6 +116,8 @@ public: //Events
 	Window *GetOwner() const { return Owner; }
 	/** Set the Flags */
 	int SetFlags(int arg_flags, int opcode);
+	virtual void SetFocus(bool focus);
+	bool isFocused();
 	/** Set handler for specified event. Override in child classes */
 	virtual bool SetEvent(int eventType, EventHandler handler) = 0;
 	/** Run specified handler, it may return error code */

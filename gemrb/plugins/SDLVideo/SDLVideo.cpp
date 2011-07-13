@@ -38,6 +38,13 @@
 #include <cassert>
 #include <cstdio>
 
+#ifdef TARGET_OS_IPHONE
+#include "SDL_uikitkeyboard.h"
+#endif
+#ifdef ANDROID
+#include "SDL_screenkeyboard.h"
+#endif
+
 SDLVideoDriver::SDLVideoDriver(void)
 {
 	CursorIndex = 0;
@@ -435,6 +442,37 @@ bool SDLVideoDriver::ToggleGrabInput()
 		SDL_WM_GrabInput( SDL_GRAB_OFF );
 		MoveMouse(CursorPos.x, CursorPos.y);
 		return false;
+	}
+}
+
+/*
+This method is intended for devices with no physical keyboard or with an optional soft keyboard (iOS/Android)
+*/
+void SDLVideoDriver::HideSoftKeyboard()
+{
+
+	if(core->UseSoftKeyboard){
+#ifdef TARGET_OS_IPHONE
+		SDL_iPhoneKeyboardHide(SDL_GetFocusWindow());
+#endif
+#ifdef ANDROID
+		SDL_ANDROID_SetScreenKeyboardShown(0);
+#endif
+	}
+}
+
+/*
+This method is intended for devices with no physical keyboard or with an optional soft keyboard (iOS/Android)
+*/
+void SDLVideoDriver::ShowSoftKeyboard()
+{
+	if(core->UseSoftKeyboard){
+#ifdef TARGET_OS_IPHONE
+		SDL_iPhoneKeyboardShow(SDL_GetFocusWindow());
+#endif
+#ifdef ANDROID
+		SDL_ANDROID_SetScreenKeyboardShown(1);
+#endif
 	}
 }
 

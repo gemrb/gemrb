@@ -28,10 +28,6 @@
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
-#if TARGET_OS_IPHONE
-#	include "SDL_uikitkeyboard.h"
-#endif
-
 TextEdit::TextEdit(unsigned short maxLength, unsigned short px, unsigned short py)
 {
 	max = maxLength;
@@ -77,9 +73,6 @@ void TextEdit::Draw(unsigned short x, unsigned short y)
 
 	//The aligning of textedit fields is done by absolute positioning (FontPosX, FontPosY)
 	if (hasFocus) {
-#if TARGET_OS_IPHONE
-		SDL_iPhoneKeyboardShow(SDL_GetWindowFromID(1));
-#endif
 		font->Print( Region( x + XPos + FontPosX, y + YPos + FontPosY, Width, Height ), Buffer,
 				palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_TOP,
 				true, NULL, Cursor, CurPos );
@@ -190,6 +183,14 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 
 	}
 	RunEventHandler( EditOnChange );
+}
+
+void TextEdit::SetFocus(bool focus)
+{
+	Control::SetFocus(focus);
+	if (hasFocus) {
+		core->GetVideoDriver()->ShowSoftKeyboard();
+	}
 }
 
 /** Sets the Text of the current control */

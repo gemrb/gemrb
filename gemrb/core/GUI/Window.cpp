@@ -204,12 +204,12 @@ Control* Window::GetMouseFocus() const
 void Window::SetFocused(Control* ctrl)
 {
 	if (lastFocus != NULL) {
-		lastFocus->hasFocus = false;
+		lastFocus->SetFocus(false);
 		lastFocus->Changed = true;
 	}
 	lastFocus = ctrl;
 	if (ctrl != NULL) {
-		lastFocus->hasFocus = true;
+		lastFocus->SetFocus(true);
 		lastFocus->Changed = true;
 	}
 }
