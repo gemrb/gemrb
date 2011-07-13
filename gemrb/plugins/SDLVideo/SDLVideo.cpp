@@ -416,7 +416,7 @@ int SDLVideoDriver::PollEvents() {
 		}
 	}
 
-	if (Evnt && !DisableMouse && lastevent && time>lastmousetime && SDL_GetMouseState(&x,&y)==SDL_BUTTON(1)) {
+	if (Evnt && !DisableMouse && lastevent && time>lastmousetime && SDL_GetMouseState(&x,&y)==SDL_BUTTON(SDL_BUTTON_LEFT)) {
 		lastmousetime=time+Evnt->GetRKDelay();
 		if (!ConsolePopped)
 			Evnt->MouseUp( x, y, 1 << ( 0 ), GetModState(SDL_GetModState()) );
