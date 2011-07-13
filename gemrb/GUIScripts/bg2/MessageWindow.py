@@ -52,17 +52,20 @@ def OnLoad():
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
 
-	Button=OptionsWindow.GetControl(10)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MinimizeOptions)
-	Button=PortraitWindow.GetControl(8)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.MinimizePortraits)
+	# 1280 and higher don't have this control
+	if OptionsWindow.HasControl (10):
+		Button = OptionsWindow.GetControl (10)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizeOptions)
+		Button = PortraitWindow.GetControl (8)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.MinimizePortraits)
 
 	ActionsWindow = GemRB.LoadWindow(3)
 	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
-	Button=ActionsWindow.GetControl(60)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizeOptions)
-	Button=ActionsWindow.GetControl(61)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizePortraits)
+	if ActionsWindow.HasControl (60):
+		Button=ActionsWindow.GetControl(60)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizeOptions)
+		Button=ActionsWindow.GetControl(61)
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, MaximizePortraits)
 
 	GemRB.SetVar("PortraitWindow", PortraitWindow.ID)
 	GemRB.SetVar("ActionsWindow", ActionsWindow.ID)

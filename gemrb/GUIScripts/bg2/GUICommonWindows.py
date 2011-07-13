@@ -127,9 +127,10 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		rb = 9
 
 	# Rest
-	Button = Window.GetControl (rb)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
-	Button.SetTooltip (11942)
+	if Window.HasControl (rb):
+		Button = Window.GetControl (rb)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
+		Button.SetTooltip (11942)
 
 	if PortraitWindow:
 		UpdatePortraitWindow ()
@@ -262,6 +263,10 @@ def OpenActionsWindowControls (Window):
 	global ActionsWindow
 
 	ActionsWindow = Window
+	# 1280 and higher don't have this control
+	if not Window.HasControl (62):
+		UpdateActionsWindow ()
+		return
 	# Gears (time) when options pane is down
 	Button = Window.GetControl (62)
 	Label = Button.CreateLabelOnButton (0x1000003e, "NORMAL", 0)
@@ -681,8 +686,10 @@ def OpenPortraitWindow (needcontrols):
 	PortraitWindow = Window = GemRB.LoadWindow (1)
 
 	if needcontrols:
-		Button=Window.GetControl (8)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizePortraits)
+		# 1280 and higher don't have this control
+		if Window.HasControl (8):
+			Button=Window.GetControl (8)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizePortraits)
 
 		# AI
 		Button = Window.GetControl (6)
