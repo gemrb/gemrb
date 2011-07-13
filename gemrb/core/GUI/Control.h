@@ -135,6 +135,8 @@ public: //Events
 	/** Mouse Button Up */
 	virtual void OnMouseUp(unsigned short x, unsigned short y,
 		unsigned short Button, unsigned short Mod);
+	/** Mouse wheel scroll */
+	virtual void OnMouseWheelScroll( short x, short y);
 	/** Special Key Press */
 	virtual void OnSpecialKeyPress(unsigned char Key);
 	virtual bool IsPixelTransparent(unsigned short /*x*/, unsigned short /*y*/) {

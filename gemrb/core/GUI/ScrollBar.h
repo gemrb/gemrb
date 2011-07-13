@@ -94,6 +94,8 @@ public: // Public Events
 		unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
+	/** Mouse Wheel Scroll Event */
+	void OnMouseWheelScroll(short x, short y);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, EventHandler handler);
 	/** OnChange Scripted Event Function Name */

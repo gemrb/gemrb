@@ -105,6 +105,8 @@ public:
 	/** BroadCast Mouse Move Event */
 	void MouseUp(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
+	/** BroadCast Mouse Scroll Event */
+	void MouseWheelScroll( short x, short y);
 	/** BroadCast Mouse Idle Event */
 	void MouseIdle(unsigned long time);
 	/** BroadCast Key Press Event */

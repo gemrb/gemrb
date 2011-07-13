@@ -154,6 +154,7 @@ public: //Events
 	/** Mouse Button Up */
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
+	void OnMouseWheelScroll(short x, short y);
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
 	void DisplayTooltip();

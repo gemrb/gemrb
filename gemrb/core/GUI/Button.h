@@ -160,7 +160,9 @@ public: // Public Events
 		unsigned short Mod);
 	/** Mouse Button Up */
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);	
+				   unsigned short Mod);  
+	/** Mouse wheel scroll */
+	void OnMouseWheelScroll(short x, short y);
 	/** A special key has been pressed */
 	void OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */

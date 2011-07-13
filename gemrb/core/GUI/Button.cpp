@@ -413,13 +413,11 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 	case GEM_MB_SCRLUP:
 		if (scrlbr) {
 			scrlbr->ScrollUp();
-			core->RedrawAll();
 		}
 		break; 
 	case GEM_MB_SCRLDOWN:
 		if (scrlbr) {
 			scrlbr->ScrollDown();
-			core->RedrawAll();
 		}
 		break;
 	}
@@ -504,6 +502,21 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	} else {
 		if (Button == GEM_MB_MENU && ButtonOnRightPress)
 			RunEventHandler( ButtonOnRightPress );
+	}
+}
+
+void Button::OnMouseWheelScroll(short x, short y)
+{
+	ScrollBar* scrlbr = (ScrollBar*) sb;
+	if (!scrlbr) {
+		Control *ctrl = Owner->GetScrollControl();
+		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {
+			scrlbr = (ScrollBar *) ctrl;
+		}
+	}
+	
+	if (scrlbr) {
+		scrlbr->OnMouseWheelScroll(x, y);
 	}
 }
 

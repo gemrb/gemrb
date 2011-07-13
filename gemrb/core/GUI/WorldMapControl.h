@@ -103,6 +103,8 @@ private:
 	/** Mouse Button Up */
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
+	/** Mouse Wheel Event */
+	void OnMouseWheelScroll(short x, short y);
 	/** Key Release Event */
 	void OnKeyRelease(unsigned char Key, unsigned short Mod);
 	/** Special Key Press */

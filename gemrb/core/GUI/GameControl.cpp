@@ -2034,6 +2034,37 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 	PerformActionOn(actor);
 }
 
+void GameControl::OnMouseWheelScroll(short x, short y)
+{
+	Region Viewport = core->GetVideoDriver()->GetViewport();
+	Game* game = core->GetGame();
+	Map *map = game->GetCurrentArea();
+	if (!map) return;
+	
+	Point mapsize = map->TMap->GetMapSize();
+	
+	if (Viewport.x + x <= 0) {
+		Viewport.x = 0;
+	}else if (Viewport.x + Viewport.w + x < mapsize.x) {
+		Viewport.x += x;
+	}
+	
+	if (Viewport.y + y <= 0) {
+		Viewport.y = 0;
+	}else if (Viewport.y + Viewport.h + y < mapsize.y) {
+		Viewport.y += y;
+	}
+	if (ScreenFlags & SF_LOCKSCROLL) {
+		moveX = 0;
+		moveY = 0;
+	} else {
+		// override any existing viewport moves which may be in progress
+		core->timer->SetMoveViewPort( Viewport.x, Viewport.y, 0, false );
+		// move it directly ourselves, since we might be paused
+		core->GetVideoDriver()->MoveViewportTo( Viewport.x, Viewport.y );
+	}	
+}
+
 void GameControl::PerformActionOn(Actor *actor)
 {
 	Game* game = core->GetGame();
@@ -2174,45 +2205,24 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 		}
 		return; //don't accept keys in dialog
 	}
-	Region Viewport = core->GetVideoDriver()->GetViewport();
 	Game *game = core->GetGame();
 	if (!game) return;
-	Map *map = game->GetCurrentArea();
-	if (!map) return;
-
-	Point mapsize = map->TMap->GetMapSize();
 	int partysize = game->GetPartySize(false);
+	
 	int pm;
 	char tmpstr[10];
-
 	switch (Key) {
 		case GEM_LEFT:
-			if (Viewport.x > 63)
-				Viewport.x -= 64;
-			else
-				Viewport.x = 0;
+			OnMouseWheelScroll(-64, 0);
 			break;
 		case GEM_UP:
-			if (Viewport.y > 63)
-				Viewport.y -= 64;
-			else
-				Viewport.y = 0;
+			OnMouseWheelScroll(0, -64);
 			break;
 		case GEM_DOWN:
-			if (Viewport.y + Viewport.h + 64 < mapsize.y)
-				Viewport.y += 64;
-			else {
-				Viewport.y = mapsize.y - Viewport.h;
-				if (Viewport.y<0) Viewport.y=0;
-			}
+			OnMouseWheelScroll(0, 64);
 			break;
 		case GEM_RIGHT:
-			if (Viewport.x + Viewport.w + 64 < mapsize.x)
-				Viewport.x += 64;
-			else {
-				Viewport.x = mapsize.x - Viewport.w;
-				if (Viewport.x<0) Viewport.x=0;
-			}
+			OnMouseWheelScroll(64, 0);
 			break;
 		case GEM_ALT:
 			DebugFlags |= DEBUG_SHOW_CONTAINERS;
@@ -2246,15 +2256,6 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			return;
 		default:
 			return;
-	}
-	if (ScreenFlags & SF_LOCKSCROLL) {
-		moveX = 0;
-		moveY = 0;
-	} else {
-		// override any existing viewport moves which may be in progress
-		core->timer->SetMoveViewPort( Viewport.x, Viewport.y, 0, false );
-		// move it directly ourselves, since we might be paused
-		core->GetVideoDriver()->MoveViewportTo( Viewport.x, Viewport.y );
 	}
 }
 

@@ -326,31 +326,13 @@ void WorldMapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	}
 }
 
-/** Special Key Press */
-void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
+/** Mouse wheel scroll */
+void WorldMapControl::OnMouseWheelScroll(short x, short y)
 {
+	ScrollX += x;
+	ScrollY += y;
+	
 	WorldMap* worldmap = core->GetWorldMap();
-	switch (Key) {
-		case GEM_LEFT:
-			ScrollX -= 64;
-			break;
-		case GEM_UP:
-			ScrollY -= 64;
-			break;
-		case GEM_RIGHT:
-			ScrollX += 64;
-			break;
-		case GEM_DOWN:
-			ScrollY += 64;
-			break;
-		case GEM_ALT:
-			print( "ALT pressed\n" );
-			break;
-		case GEM_TAB:
-			print( "TAB pressed\n" );
-			break;
-	}
-
 	Sprite2D *MapMOS = worldmap->GetMapMOS();
 	if (ScrollX > MapMOS->Width - Width)
 		ScrollX = MapMOS->Width - Width;
@@ -360,6 +342,31 @@ void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 		ScrollX = 0;
 	if (ScrollY < 0)
 		ScrollY = 0;
+}
+
+/** Special Key Press */
+void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
+{
+	switch (Key) {
+		case GEM_LEFT:
+			OnMouseWheelScroll(-64, 0);
+			break;
+		case GEM_UP:
+			OnMouseWheelScroll(0, -64);
+			break;
+		case GEM_RIGHT:
+			OnMouseWheelScroll(64, 0);
+			break;
+		case GEM_DOWN:
+			OnMouseWheelScroll(0, 64);
+			break;
+		case GEM_ALT:
+			print( "ALT pressed\n" );
+			break;
+		case GEM_TAB:
+			print( "TAB pressed\n" );
+			break;
+	}
 }
 
 bool WorldMapControl::SetEvent(int eventType, EventHandler handler)

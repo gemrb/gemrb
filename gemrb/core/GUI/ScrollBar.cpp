@@ -231,6 +231,16 @@ void ScrollBar::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	State = 0;
 }
 
+/** Mousewheel scroll */
+void ScrollBar::OnMouseWheelScroll(short /*x*/, short y){
+	if ( State == 0 ){//dont allow mousewheel to do anything if the slider is being interacted with already.
+		unsigned short fauxY = SliderYPos;
+		if ((short)fauxY + y <= 0) fauxY = 0;
+		else fauxY += y;
+		SetPosForY(fauxY);
+	}
+}
+
 /** Mouse Over Event */
 void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {

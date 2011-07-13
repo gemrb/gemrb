@@ -178,6 +178,15 @@ void Control::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	//print("OnMouseUp: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", (unsigned int) ControlID, x, y, Button, Mod);
 }
 
+/** Mouse scroll wheel */
+void Control::OnMouseWheelScroll( short x, short y)
+{
+	Control *ctrl = Owner->GetScrollControl();
+	if (ctrl && (ctrl!=this)) {
+		ctrl->OnMouseWheelScroll( x, y );
+	}	
+}
+
 /** Special Key Press */
 void Control::OnSpecialKeyPress(unsigned char Key)
 {
