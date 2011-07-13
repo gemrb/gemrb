@@ -252,5 +252,15 @@ PluginsPath=./gemrb/plugins/
 #GemRBOverridePath=/usr/share/games/gemrb
 
 #####################################################
+#  Input Parameters                                 #
+#####################################################
+
+#whether or not to use software keyboard on devices that support one
+#UseSoftKeyboard=1
+
+#Adds a gutter around the screen for scrolling
+#TouchScrollAreas=1
+
+#####################################################
 #  END                                              #
 #####################################################
