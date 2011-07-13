@@ -100,6 +100,11 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 	ieDword flags = SDL_SWSURFACE;
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
+#if SDL_VERSION_ATLEAST(1,3,0)
+		//This is needed to remove the status bar on Android/iOS. 
+		//since we are in fullscreen this has no effect outside Android/iOS
+		flags |= SDL_WINDOW_BORDERLESS;
+#endif
 	}
 	printMessage( "SDLVideo", "SDL_SetVideoMode...", WHITE );
 	disp = SDL_SetVideoMode( w, h, bpp, flags );
