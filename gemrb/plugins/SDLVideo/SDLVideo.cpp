@@ -315,8 +315,8 @@ int SDLVideoDriver::PollEvents() {
 					break;
 				case SDLK_DELETE:
 #ifndef TARGET_OS_IPHONE
-					//iOS currently doesnt have a backspace so we use delete.
-					//This change should be future proof in the event they change delete
+					//iOS currently doesnt have a backspace so we use delete. 
+					//This change should be future proof in the event apple changes the delete key to a backspace.
 					key = GEM_DELETE;
 					break;
 #endif
@@ -883,10 +883,10 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, 
 	Uint32 ck = 0;
 	if (mask) {
 		mask_data = (Uint8*) (( SDL_Surface * ) mask->vptr)->pixels;
-#if SDL_MAJOR_VERSION <= 1 && SDL_MINOR_VERSION < 3
-		ck = (( SDL_Surface * ) mask->vptr)->format->colorkey;
-#else
+#if SDL_VERSION_ATLEAST(1,3,0)
 		SDL_GetColorKey(( SDL_Surface * ) mask->vptr, &ck);
+#else
+		ck = (( SDL_Surface * ) mask->vptr)->format->colorkey;
 #endif
 	}
 
