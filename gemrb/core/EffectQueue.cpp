@@ -488,6 +488,12 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 	Actor *st = (self && (self->Type==ST_ACTOR)) ?(Actor *) self:NULL;
 	Effect* new_fx;
 
+	if (self) {
+		fx->CasterID = self->GetGlobalID();
+	} else {
+		if (Owner) fx->CasterID = Owner->GetGlobalID();
+	}
+
 	switch (fx->Target) {
 	case FX_TARGET_ORIGINAL:
 		fx->SetPosition(self->Pos);
@@ -1055,8 +1061,6 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 
 	fx->FirstApply=first_apply;
 	if( first_apply) {
-		if (Owner)
-			fx->CasterID = Owner->GetGlobalID();
 		if( (fx->PosX==0xffffffff) && (fx->PosY==0xffffffff)) {
 			fx->PosX = target->Pos.x;
 			fx->PosY = target->Pos.y;
