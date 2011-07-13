@@ -63,7 +63,8 @@ public:
 	ScrollBar(void);
 	~ScrollBar(void);
 	/**sets position, updates associated stuff */
-	void SetPos(int NewPos);
+	void SetPos(ieDword NewPos);
+	void SetPosForY(unsigned short y);
 	void ScrollUp();
 	void ScrollDown();
 	/**redraws scrollbar if associated with VarName */
@@ -73,7 +74,8 @@ public:
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */
 	Sprite2D* Frames[SB_RES_COUNT];
-	/** Cursor Position */
+	unsigned short SliderYPos;
+	/** Item Index */
 	unsigned short Pos;
 	/** Scroll Bar Status */
 	unsigned short State;
