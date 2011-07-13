@@ -39,7 +39,7 @@ also pass -DDISABLE_WERROR=1, so warnings won't impede you. This option is
 also suggested if you're making a source package.
 
 You can also pass -DTOUCHSCREEN=1 on devices that have one. GemRB will disable
-mouse scrolling and use wider visible trigger-area scrolling on borders.
+mouse scrolling.
 
 Please let us know if you encounter any problems while building.
 
