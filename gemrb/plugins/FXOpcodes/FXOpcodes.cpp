@@ -1293,7 +1293,8 @@ int fx_death (Scriptable* Owner, Actor* target, Effect* fx)
 
 	target->Damage(0, damagetype, Owner);
 	//death has damage type too
-	target->Die(Owner);
+	Scriptable *killer = core->GetGame()->GetGlobalActorByGlobalID(fx->CasterID);
+	target->Die(killer);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }
