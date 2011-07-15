@@ -5471,6 +5471,18 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	if (condition) {
 		// The trigger was evaluated as true, cast the spells now.
 		// TODO: fail remaining spells if an earlier one fails?
+		// Actually, atleast fire shields also have a range check
+		if (fx->Parameter2 == COND_GOTHIT) {
+			Spell* spl = gamedata->GetSpell(fx->Source);
+			if (!spl) {
+				print("fx_cast_spell_on_condition: Spell couldn't be found:%.8s.\n", fx->Source);
+				return FX_NOT_APPLIED;
+			}
+			unsigned int dist = spl->GetCastingDistance(target);
+			if (PersonalDistance(target, actor) > dist) {
+				return FX_APPLIED;
+			}
+		}
 		core->ApplySpell(fx->Resource, actor, Owner, fx->Power);
 		core->ApplySpell(fx->Resource2, actor, Owner, fx->Power);
 		core->ApplySpell(fx->Resource3, actor, Owner, fx->Power);
