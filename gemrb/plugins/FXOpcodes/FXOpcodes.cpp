@@ -5471,22 +5471,30 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	if (condition) {
 		// The trigger was evaluated as true, cast the spells now.
 		// TODO: fail remaining spells if an earlier one fails?
-		// Actually, atleast fire shields also have a range check
-		if (fx->Parameter2 == COND_GOTHIT) {
-			Spell* spl = gamedata->GetSpell(fx->Source);
-			if (!spl) {
-				print("fx_cast_spell_on_condition: Spell couldn't be found:%.8s.\n", fx->Source);
-				return FX_NOT_APPLIED;
+		unsigned int i, dist;
+		ieResRef refs[4];
+		strncpy(refs[0], fx->Resource, sizeof(ieResRef));
+		strncpy(refs[1], fx->Resource2, sizeof(ieResRef));
+		strncpy(refs[2], fx->Resource3, sizeof(ieResRef));
+		strncpy(refs[3], fx->Resource4, sizeof(ieResRef));
+		for (i=0; i < 4; i++) {
+			if (!refs[i][0]) {
+				continue;
 			}
-			unsigned int dist = spl->GetCastingDistance(target);
-			if (PersonalDistance(target, actor) > dist) {
-				return FX_APPLIED;
+			// Actually, atleast fire shields also have a range check
+			if (fx->Parameter2 == COND_GOTHIT) {
+				dist = GetSpellDistance(refs[i], target);
+				if (!dist) {
+					//TODO: display 36937
+					continue;
+				}
+				if (PersonalDistance(target, actor) > dist) {
+					continue;
+				}
 			}
+			//TODO: display 36936?
+			core->ApplySpell(refs[i], actor, Owner, fx->Power);
 		}
-		core->ApplySpell(fx->Resource, actor, Owner, fx->Power);
-		core->ApplySpell(fx->Resource2, actor, Owner, fx->Power);
-		core->ApplySpell(fx->Resource3, actor, Owner, fx->Power);
-		core->ApplySpell(fx->Resource4, actor, Owner, fx->Power);
 
 		if (fx->Parameter3) {
 			// Contingencies only run once, remove ourselves.
