@@ -459,32 +459,39 @@ static int CanSave()
 	//some of these restrictions might not be needed
 	Store * store = core->GetCurrentStore();
 	if (store) {
+		displaymsg->DisplayConstantString(STR_CANTSAVESTORE, 0xbcefbc);
 		return 1; //can't save while store is open
 	}
 	GameControl *gc = core->GetGameControl();
 	if (!gc) {
+		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
 		return -1; //no gamecontrol!!!
 	}
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
-		return 2; //can't save while in dialog?
+		displaymsg->DisplayConstantString(STR_CANTSAVEDIALOG, 0xbcefbc);
+		return 2; //can't save while in dialog
 	}
 
 	//TODO: can't save while in combat
 	Game *game = core->GetGame();
 	if (!game) {
+		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
 		return -1;
 	}
 	if (game->CombatCounter) {
+		displaymsg->DisplayConstantString(STR_CANTSAVECOMBAT, 0xbcefbc);
 		return 3;
 	}
 
 	Map *map = game->GetCurrentArea();
 	if (!map) {		
+		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
 		return -1;
 	}
 
 	if (map->AreaFlags&AF_SAVE) {
 		//cannot save in area
+		displaymsg->DisplayConstantString(STR_CANTSAVEMONS, 0xbcefbc);
 		return 4;
 	}
 
@@ -494,16 +501,20 @@ static int CanSave()
 		//TODO: can't save while (party) actors are in helpless states
 		if (actor->GetStat(IE_STATE_ID) & STATE_NOSAVE) {
 			//some actor is in nosave state
+			displaymsg->DisplayConstantString(STR_CANTSAVENOCTRL, 0xbcefbc);
 			return 5;
 		}
 		if (actor->GetCurrentArea()!=map) {
 			//scattered
+			displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
 			return 6;
 		}
 	}
 
-	//TODO: can't save while AOE spells are in effect
-	//TODO: can't save while IF_NOINT is set on any actor
+	//TODO: can't save while AOE spells are in effect -> CANTSAVE
+	//TODO: can't save while IF_NOINT is set on any actor -> CANTSAVEDIALOG2 (dialog about to start)
+	//TODO: can't save  during a rest, chapter information or movie -> CANTSAVEMOVIE
+	//TODO: can't save while enemies are visible? AnyPCSeesEnemy -> CANTSAVEMONS
 
 	return 0;
 }
