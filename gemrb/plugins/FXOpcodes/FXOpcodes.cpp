@@ -5489,10 +5489,11 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 					continue;
 				}
 				if (PersonalDistance(target, actor) > dist) {
+					//display 'One of the spells has failed.'
+					displaymsg->DisplayConstantStringName(STR_CONTFAIL, 0xff0000, target);
 					continue;
 				}
 			}
-			//TODO: display 36936?
 			core->ApplySpell(refs[i], actor, Owner, fx->Power);
 		}
 
