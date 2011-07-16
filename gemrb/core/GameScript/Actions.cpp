@@ -1254,6 +1254,17 @@ void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* paramet
 	}
 }
 
+void GameScript::TriggerWalkTo(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1], 0 );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	MoveToObjectCore(Sender, parameters, 0, false);
+	tar->AddTrigger(TriggerEntry(trigger_walkedtotrigger, Sender->GetGlobalID()));
+}
+
 void GameScript::MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters)
 {
 	MoveToObjectCore(Sender, parameters, IF_NOINT, false);

@@ -1406,6 +1406,7 @@ public:
 	static void TransformPartyItem(Scriptable* Sender, Action* parameters);
 	static void TransformPartyItemAll(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
+	static void TriggerWalkTo(Scriptable* Sender, Action* parameters);
 	static void Turn(Scriptable* Sender, Action* parameters);
 	static void TurnAMT(Scriptable* Sender, Action* parameters);
 	static void UndoExplore(Scriptable *Sender, Action *parameters);

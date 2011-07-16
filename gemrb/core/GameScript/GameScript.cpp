@@ -924,7 +924,7 @@ static const ActionLink actionnames[] = {
 	{"transformpartyitem", GameScript::TransformPartyItem, 0},
 	{"transformpartyitemall", GameScript::TransformPartyItemAll, 0},
 	{"triggeractivation", GameScript::TriggerActivation, 0},
-	{"triggerwalkto", GameScript::MoveToObject,AF_BLOCKING|AF_ALIVE}, //something like this
+	{"triggerwalkto", GameScript::TriggerWalkTo,AF_BLOCKING|AF_ALIVE}, //something like this
 	{"turn", GameScript::Turn, 0},
 	{"turnamt", GameScript::TurnAMT, AF_BLOCKING}, //relative Face()
 	{"undoexplore", GameScript::UndoExplore, 0},
