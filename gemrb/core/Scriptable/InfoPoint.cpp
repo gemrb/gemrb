@@ -136,7 +136,7 @@ bool InfoPoint::TriggerTrap(int skill, ieDword ID)
 	if (!Trapped) {
 		// we have to set Entered somewhere, here seems best..
 		// FIXME: likely not best :)
-		AddTrigger(TriggerEntry(trigger_entered, ID));
+		AddTrigger(TriggerEntry(trigger_harmlessentered, ID));
 		return true;
 	} else if (Highlightable::TriggerTrap(skill, ID)) {
 		return true;
