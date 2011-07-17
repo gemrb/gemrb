@@ -252,7 +252,9 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 		area->JumpActors(true);
 	}
 	if (Open) {
-		AddTrigger(TriggerEntry(trigger_opened, ID));
+		if (Trapped) {
+			AddTrigger(TriggerEntry(trigger_opened, ID));
+		}
 
 		// in PS:T, opening a door does not unlock it
 		if (!core->HasFeature(GF_REVERSE_DOOR)) {
