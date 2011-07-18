@@ -1797,9 +1797,10 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 				}
 			}
 			if (trap->Flags&TRAP_USEPOINT) {
-				//overriding the target point
-				p = trap->UsePoint;
-				return false;
+				char Tmp[256];
+				sprintf(Tmp, "TriggerWalkTo(\"%s\")", trap->GetScriptName());
+				actor->AddAction(GenerateAction(Tmp));
+				return true;
 			}
 			return true;
 		default:;

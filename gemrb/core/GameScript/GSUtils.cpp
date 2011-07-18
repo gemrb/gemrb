@@ -1085,6 +1085,10 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
+	Point dest = target->Pos;
+	if (target->Type == ST_TRIGGER && ((InfoPoint *)target)->Flags&TRAP_USEPOINT) {
+		dest = ((InfoPoint *)target)->UsePoint;
+	}
 	if (untilsee && CanSee(actor, target, true, 0) ) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1094,8 +1098,8 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 			return;
 		}
 	}
-	if (!actor->InMove() || actor->Destination != target->Pos) {
-		actor->WalkTo( target->Pos, flags, 0 );
+	if (!actor->InMove() || actor->Destination != dest) {
+		actor->WalkTo( dest, flags, 0 );
 	}
 	//hopefully this hack will prevent lockups
 	if (!actor->InMove()) {
