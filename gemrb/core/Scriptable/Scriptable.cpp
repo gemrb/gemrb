@@ -508,9 +508,14 @@ void Scriptable::ProcessActions()
 		if (WaitCounter) return;
 	}
 
+	int lastAction = -1;
+
 	while (true) {
 		CurrentActionInterruptable = true;
 		if (!CurrentAction) {
+			if (! (CurrentActionTicks == 0 && CurrentActionState == 0)) {
+				print("Last action: %d\n", lastAction);
+			}
 			assert(CurrentActionTicks == 0 && CurrentActionState == 0);
 			CurrentAction = PopNextAction();
 		} else {
@@ -518,8 +523,10 @@ void Scriptable::ProcessActions()
 		}
 		if (!CurrentAction) {
 			ClearActions();
+			lastAction = -1;
 			break;
 		}
+		lastAction = CurrentAction->actionID;
 		GameScript::ExecuteAction( this, CurrentAction );
 		//break execution in case of a Wait flag
 		if (WaitCounter) {
