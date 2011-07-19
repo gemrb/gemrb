@@ -675,6 +675,8 @@ public:
 	ieDword *GetListFrom2DA(const ieResRef resref);
 	/** translates a stat symbol to numeric value */
 	ieDword TranslateStat(const char *stat_name);
+	/** resolves a stat bonus based on multiple stats */
+	ieDword ResolveStatBonus(Actor *actor, const char *tablename);
 	/** Opens CD prompt window and waits for the specified disc */
 	void WaitForDisc(int disc_number, const char* path);
 	/** Returns the music playlist corresponding to the provided type */

@@ -4037,15 +4037,19 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	switch(fx->Parameter2) {
 		case 1:
+			//find traps
 			skill = target->GetStat(IE_TRAPS);
-			break; //find traps
+			break;
 		case 3:
 			//detect secret doors
-			skill = target->LuckyRoll(1, 100, 0, 0);
+			//FIXME: is 1d100 the real base value?
+			skill = target->LuckyRoll(1, 100, 0, 0)+core->ResolveStatBonus(target, "dstable");
 			detecttraps = false;
 			break;
 		case 2:
+			//automatic secret door detection
 			detecttraps = false;
+			//fall through is intentional here
 		default:
 			//automatic find traps
 			skill = 256;

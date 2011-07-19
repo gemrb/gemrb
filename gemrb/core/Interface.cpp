@@ -5383,6 +5383,38 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	return stat;
 }
 
+// Calculates an arbitrary stat bonus, based on tables.
+// the master table contains the table names (as row names) and the used stat
+// the subtables contain stat value/bonus pairs.
+ieDword Interface::ResolveStatBonus(Actor *actor, const char *tablename)
+{
+        int mastertable = gamedata->LoadTable( tablename );
+        Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
+        if (!mtm) {
+		printMessage("Core", "Cannot resolve stat bonus.\n", RED);
+                return -1;
+        }
+        int count = mtm->GetRowCount();
+        if (count< 1) {
+		return 0;
+        }
+        ieDword ret = 0;
+        // tables for additive modifiers of bonus type
+        for (int i = 0; i < count; i++) {
+		tablename = mtm->GetRowName(i);
+		int stat = TranslateStat(mtm->QueryField(i,0) );
+		ieDword value = actor->GetSafeStat(stat);
+		int table = gamedata->LoadTable( tablename );
+		Holder<TableMgr> tm = gamedata->GetTable( table );
+
+		int row = tm->FindTableValue(0, value, 0);
+		if (row>=0) {
+			ret += strtol(tm->QueryField(row, 1), NULL, 0);
+		}
+	}
+	return ret;
+}
+
 void Interface::WaitForDisc(int disc_number, const char* path)
 {
 	GetDictionary()->SetAt( "WaitForDisc", (ieDword) disc_number );
