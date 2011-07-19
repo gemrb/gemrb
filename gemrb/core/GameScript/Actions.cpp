@@ -5076,9 +5076,7 @@ void GameScript::AttackOneRound( Scriptable* Sender, Action* parameters)
 
 	AttackCore(Sender, tar, 0);
 
-	if (Sender->CurrentActionState == 1) {
-		//this is the LastDisarmFailed field, but this is an actor
-		//Sender->LastTarget = 0;
+	if (Sender->CurrentActionState <= 1) {
 		Sender->ReleaseCurrentAction();
 	} else {
 		Sender->CurrentActionState--;
@@ -5246,7 +5244,11 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 
 	AttackCore(Sender, tar, 0);
 
-	Sender->CurrentActionState--;
+	if (Sender->CurrentActionState) {
+		Sender->CurrentActionState--;
+	} else {
+		Sender->ReleaseCurrentAction();
+	}
 }
 
 void GameScript::Explore( Scriptable* Sender, Action* /*parameters*/)
