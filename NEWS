@@ -4,6 +4,8 @@ GemRB git e5beb1c388463 (2011-07-03):
     - keymap.ini handling
     - it should be possible to complete ToB too now
     - yet more unhardcoded PST projectiles
+    - area comments, party npc interactions
+    - TriggerWalkTo action
 
   Improved features:
     - performance
@@ -11,6 +13,8 @@ GemRB git e5beb1c388463 (2011-07-03):
     - stores and stacking
     - effects, triggers, actions, dialogs
     - bugfixes and internal cleanups
+    - secret door detection
+    - turn undead fixed
 
   Applied patches:
     ios support patches from Brad Allred
