@@ -25,6 +25,50 @@
 #include "EffectMgr.h"
 #include "Interface.h"
 #include "PluginMgr.h"
+#include "TableMgr.h" //needed for autotable
+
+int *profs = NULL;
+int profcount = -1;
+
+//cannot call this at the time of initialization because the tablemanager isn't alive yet
+static void Initializer()
+{
+	if (profs) {
+		free(profs);
+		profs = NULL;
+	}
+	profcount = 0;
+	AutoTable tm("proftype");
+	if (!tm) {
+		printStatus( "ERROR", LIGHT_RED );
+		print( "Cannot find proftype.2da.\n");
+		return;
+	}
+	profcount = tm->GetRowCount();
+	profs = (int *) calloc( profcount, sizeof(int) );
+	for (int i = 0; i < profcount; i++) {
+		profs[i] = atoi(tm->QueryField( i, 1 ) );
+	}
+}
+
+static void ReleaseMemoryITM()
+{
+	free(profs);
+	profs = NULL;
+	profcount = -1;
+}
+
+static int GetProficiency(ieDword ItemType)
+{
+	if (profcount<0) {
+		Initializer();
+	}
+
+	if (ItemType>=(ieDword) profcount) {
+		return 0;
+	}
+	return profs[ItemType];
+}
 
 ITMImporter::ITMImporter(void)
 {
@@ -95,6 +139,12 @@ Item* ITMImporter::GetItem(Item *s)
 	s->KitUsability=(k1<<24) | (k2<<16) | (k3<<8) | k4; //bg2/iwd2 specific
 	str->Read( &s->MinConstitution, 1 );
 	str->Read( &s->WeaProf, 1 ); //bg2 specific
+
+	//hack for non bg2 weapon proficiencies
+	if (!s->WeaProf) {
+		s->WeaProf = GetProficiency(s->ItemType);
+	}
+
 	str->Read( &s->MinCharisma, 1 );
 	str->Read( &s->unknown3, 1 );
 	str->ReadDword( &s->Price );
@@ -247,4 +297,5 @@ void ITMImporter::GetFeature(Effect *fx)
 
 GEMRB_PLUGIN(0xD913A54, "ITM File Importer")
 PLUGIN_CLASS(IE_ITM_CLASS_ID, ITMImporter)
+PLUGIN_CLEANUP(ReleaseMemoryITM)
 END_PLUGIN()
