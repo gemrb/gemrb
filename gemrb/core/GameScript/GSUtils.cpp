@@ -490,7 +490,7 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 //transfering item from Sender to target
 //if target has no inventory, the item will be destructed
 //if target can't get it, it will be dropped at its feet
-int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag)
+int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag, int count)
 {
 	Inventory *myinv;
 	Map *map;
@@ -514,7 +514,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 			return MIC_INVALID;
 	}
 	CREItem *item;
-	myinv->RemoveItem(resref, flags, &item);
+	myinv->RemoveItem(resref, flags, &item, count);
 	if (!item) {
 		// nothing was removed
 		return MIC_NOITEM;

@@ -237,7 +237,7 @@ public:
 	 * If count !=0 it splits the item and returns only requested amount */
 	CREItem* RemoveItem(unsigned int slot, unsigned int count = 0);
 	/** returns slot of removed item, you can delete the removed item */
-	int RemoveItem(const char* resref, unsigned int flags, CREItem **res_item);
+	int RemoveItem(const char* resref, unsigned int flags, CREItem **res_item, int count = 0);
 
 	/** adds CREItem to the inventory. If slot == -1, finds
 	** first eligible slot, eventually splitting the item to

@@ -4256,12 +4256,16 @@ void GameScript::TakePartyItemNum(Scriptable* Sender, Action* parameters)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,IE_INV_ITEM_UNDROPPABLE, IE_INV_ITEM_UNSTEALABLE);
+		Actor *pc = game->GetPC(i, false);
+		int personal_count = pc->inventory.CountItems(parameters->string0Parameter, true);
+		if (!personal_count) continue;
+		int res=MoveItemCore(pc, Sender, parameters->string0Parameter,IE_INV_ITEM_UNDROPPABLE, IE_INV_ITEM_UNSTEALABLE, count);
 		if (res == MIC_GOTITEM) {
 			i++;
-			count--;
+			// decrease only by the removed amount, since multiple slots may have been involved
+			count -= (personal_count - pc->inventory.CountItems(parameters->string0Parameter, true));
 		}
-		if (!count) return;
+		if (count < 1) return;
 	}
 }
 
