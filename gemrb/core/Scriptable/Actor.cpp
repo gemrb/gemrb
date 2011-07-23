@@ -2918,13 +2918,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	//add lastdamagetype up ? maybe
 	//FIXME: what does original do?
 	LastDamageType|=damagetype;
-	if(hitter && hitter->Type==ST_ACTOR) {
-		AddTrigger(TriggerEntry(trigger_hitby, hitter->GetGlobalID()));
-		LastHitter=hitter->GetGlobalID();
-	} else {
-		//Maybe it should be something impossible like 0xffff, and use 'Someone'
-		LastHitter=GetGlobalID();
-	}
 
 	switch(modtype)
 	{
@@ -6324,6 +6317,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 			Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, (weapon_damagetype[which->DamageType])<<16, FX_DURATION_INSTANT_LIMITED);
 			AttackEffect->Projectile = which->ProjectileAnimation;
 			AttackEffect->Target = FX_TARGET_PRESET;
+			AttackEffect->Parameter3 = 1;
 			pro->GetEffects()->AddEffect(AttackEffect, true);
 			if (ranged)
 				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_ranged_ref);
