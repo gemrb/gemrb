@@ -353,6 +353,8 @@ private:
 	ieDword GetClassLevel (const ieDword id) const;
 	/* Returns true if the dual class is backwards */
 	bool IsDualSwap() const;
+	/* returns the weapon proficiency stat of the actor */
+	int GetProficiency(int proftype) const;
 	/** Re/Inits the Modified vector for PCs/NPCs */
 	void RefreshPCStats();
 	bool ShouldHibernate();

@@ -2309,6 +2309,27 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 }
 
+int Actor::GetProficiency(int proftype) const
+{
+	switch(proftype) {
+	case -2: //hand to hand old style
+		return 1;
+	case -1: //no proficiency
+		return 0;
+	default:
+		//bg1 style proficiencies
+		if(proftype>=0 && proftype<=IE_EXTRAPROFICIENCY20-IE_PROFICIENCYBASTARDSWORD) {
+			return GetStat(IE_PROFICIENCYBASTARDSWORD+proftype);
+		}
+
+		//bg2 style proficiencies
+		if (proftype>=IE_PROFICIENCYBASTARDSWORD && proftype<=IE_EXTRAPROFICIENCY20) {
+			return GetStat(proftype);
+		}
+		return 0;
+	}
+}
+
 // refresh stats on creatures (PC or NPC) with a valid class (not animals etc)
 // internal use only, and this is maybe a stupid name :)
 void Actor::RefreshPCStats() {
@@ -2359,8 +2380,8 @@ void Actor::RefreshPCStats() {
 	ITMExtHeader *header = GetWeapon(wi, false);
 	ieDword stars;
 	int dualwielding = IsDualWielding();
-	if (header && (wi.prof <= MAX_STATS)) {
-		stars = GetStat(wi.prof)&PROFS_MASK;
+	stars = GetProficiency(wi.prof)&PROFS_MASK;
+	if (header) {
 		if (stars >= (unsigned)wspattack_rows) {
 			stars = wspattack_rows-1;
 		}
@@ -4549,20 +4570,17 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	if (leftorright) Flags|=WEAPON_LEFTHAND;
 
 	//add in proficiency bonuses
-	ieDword stars;
-	if (wi.prof && (wi.prof <= MAX_STATS)) {
-		stars = GetStat(wi.prof)&PROFS_MASK;
-
-		//hit/damage/speed bonuses from wspecial
-		if ((signed)stars > wspecial_max) {
-			stars = wspecial_max;
-		}
-		THAC0Bonus += wspecial[stars][0];
-		DamageBonus += wspecial[stars][1];
-		speed += wspecial[stars][2];
-		// add non-proficiency penalty, which is missing from the table
-		// FIXME: this is class-dependant: warrior's 2, mages 5, rest 3
-		if (stars == 0) THAC0Bonus -= 4;
+	ieDword stars = GetProficiency(wi.prof)&PROFS_MASK;
+	//hit/damage/speed bonuses from wspecial
+	if ((signed)stars > wspecial_max) {
+		stars = wspecial_max;
+	}
+	THAC0Bonus += wspecial[stars][0];
+	DamageBonus += wspecial[stars][1];
+	speed += wspecial[stars][2];
+	// add non-proficiency penalty, which is missing from the table
+	if (stars == 0) {
+		THAC0Bonus -= 4;
 	}
 
 	if (IsDualWielding() && wsdualwield) {
