@@ -2918,13 +2918,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	//add lastdamagetype up ? maybe
 	//FIXME: what does original do?
 	LastDamageType|=damagetype;
-	if(hitter && hitter->Type==ST_ACTOR) {
-		AddTrigger(TriggerEntry(trigger_hitby, hitter->GetGlobalID()));
-		LastHitter=hitter->GetGlobalID();
-	} else {
-		//Maybe it should be something impossible like 0xffff, and use 'Someone'
-		LastHitter=GetGlobalID();
-	}
 
 	switch(modtype)
 	{
@@ -3000,7 +2993,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	}
 
 	if (damage > 0) {
-		AddTrigger(TriggerEntry(trigger_tookdamage, LastHitter));
+		AddTrigger(TriggerEntry(trigger_tookdamage, LastHitter)); // FIXME: lastdamager? LastHitter is not set for spell damage
 	}
 
 	//LastDamage=damage;
@@ -4568,6 +4561,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		DamageBonus += wspecial[stars][1];
 		speed += wspecial[stars][2];
 		// add non-proficiency penalty, which is missing from the table
+		// FIXME: this is class-dependant: warrior's 2, mages 5, rest 3
 		if (stars == 0) THAC0Bonus -= 4;
 	}
 
@@ -6324,6 +6318,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 			Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, (weapon_damagetype[which->DamageType])<<16, FX_DURATION_INSTANT_LIMITED);
 			AttackEffect->Projectile = which->ProjectileAnimation;
 			AttackEffect->Target = FX_TARGET_PRESET;
+			AttackEffect->Parameter3 = 1;
 			pro->GetEffects()->AddEffect(AttackEffect, true);
 			if (ranged)
 				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_ranged_ref);

@@ -1240,6 +1240,18 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	Scriptable *caster = GetCasterObject();
 
+	// gemrb extension
+	if (fx->Parameter3) {
+		if(caster && caster->Type==ST_ACTOR) {
+			target->AddTrigger(TriggerEntry(trigger_hitby, caster->GetGlobalID()));
+			target->LastHitter=caster->GetGlobalID();
+		} else {
+			//Maybe it should be something impossible like 0xffff, and use 'Someone'
+			printMessage("Actor", "LastHitter (type %d) falling back to target: %s.\n", RED, caster ? caster->Type : -1, target->GetName(1));
+			target->LastHitter=target->GetGlobalID();
+		}
+	}
+
 	target->Damage(fx->Parameter1, damagetype, caster, modtype);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
