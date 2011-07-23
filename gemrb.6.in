@@ -405,7 +405,7 @@ if you want to ignore the settings from the original configuration files - baldu
 .\"###################################################
 .SH FILES
 .PD 0
-.TP 20
+.TP
 .B @SYSCONF_DIR@/gemrb.cfg
 system-wide configuration file
 
