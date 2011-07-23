@@ -1607,6 +1607,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 	} else {
 		action->int0Parameter = spellSlot;
 		action->int1Parameter = spellIndex;
+		action->int2Parameter = UI_SILENT;
 	}
 	source->AddAction( action );
 	if (!spellCount) {
@@ -1654,6 +1655,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 	} else {
 		action->int0Parameter = spellSlot;
 		action->int1Parameter = spellIndex;
+		action->int2Parameter = UI_SILENT;
 	}
 	source->AddAction( action );
 	if (!spellCount) {
