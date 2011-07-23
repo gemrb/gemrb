@@ -2993,7 +2993,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype)
 	}
 
 	if (damage > 0) {
-		AddTrigger(TriggerEntry(trigger_tookdamage, LastHitter));
+		AddTrigger(TriggerEntry(trigger_tookdamage, LastHitter)); // FIXME: lastdamager? LastHitter is not set for spell damage
 	}
 
 	//LastDamage=damage;
@@ -4561,6 +4561,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		DamageBonus += wspecial[stars][1];
 		speed += wspecial[stars][2];
 		// add non-proficiency penalty, which is missing from the table
+		// FIXME: this is class-dependant: warrior's 2, mages 5, rest 3
 		if (stars == 0) THAC0Bonus -= 4;
 	}
 
