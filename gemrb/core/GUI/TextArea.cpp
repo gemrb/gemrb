@@ -180,8 +180,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			if (strnicmp( "[s=", lines[i], 3 ) == 0) {
 				int tlen;
 				unsigned long acolor, bcolor;
-				char* rest;
-				strtoul( lines[i] + 3, &rest, 0 );
+				char* rest = strchr( lines[i] + 3, ',' );
 				if (*rest != ',')
 					goto notmatched;
 				acolor = strtoul( rest + 1, &rest, 16 );
