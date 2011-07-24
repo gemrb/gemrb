@@ -110,6 +110,8 @@ def OpenJournalWindow ():
 	Button = JournalWindow.GetControl (3)
 	Button.SetText (20636)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenJournalWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 	#JournalWindow.SetVisible (WINDOW_VISIBLE)
 	GemRB.UnhideGUI()
@@ -149,6 +151,8 @@ def OpenQuestsWindow ():
 	Button = Window.GetControl (5)
 	Button.SetText (46677)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenQuestsWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 	# Done
 	Button = Window.GetControl (0)
@@ -318,6 +322,8 @@ def OpenBeastsWindow ():
 	Button = BeastsWindow.GetControl (7)
 	Button.SetText (46677)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBeastsWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 	# Done
 	Button = BeastsWindow.GetControl (4)
@@ -417,6 +423,8 @@ def OpenLogWindow ():
 	Button = Window.GetControl (1)
 	Button.SetText (46677)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLogWindow)
+	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 	# Done
 	Button = Window.GetControl (0)
