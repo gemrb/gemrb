@@ -6161,7 +6161,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	//calculate depreciation too
 	//store->DepreciationRate, mount
 
-	if (item->MaxStackAmount>1) {
+	if (item->MaxStackAmount) {
 		price *= si->Usages[0];
 	}
 	//is this correct?

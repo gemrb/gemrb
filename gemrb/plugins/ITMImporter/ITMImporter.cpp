@@ -149,6 +149,12 @@ Item* ITMImporter::GetItem(Item *s)
 	str->Read( &s->unknown3, 1 );
 	str->ReadDword( &s->Price );
 	str->ReadWord( &s->MaxStackAmount );
+
+	//hack for non stacked items, so MaxStackAmount could be used as a boolean
+	if (s->MaxStackAmount==1) {
+		s->MaxStackAmount = 0;
+	}
+
 	str->ReadResRef( s->ItemIcon );
 	str->ReadWord( &s->LoreToID );
 	str->ReadResRef( s->GroundIcon );

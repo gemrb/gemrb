@@ -203,7 +203,7 @@ STOItem *Store::FindItem(CREItem *item, bool exact)
 				return temp;
 			}
 			// Check if we have a non-stackable item with a different number of charges.
-			if (item->MaxStackAmount < 2 && memcmp(temp->Usages, item->Usages, sizeof(item->Usages))) {
+			if (!item->MaxStackAmount && memcmp(temp->Usages, item->Usages, sizeof(item->Usages))) {
 				continue;
 			}
 		}
@@ -246,7 +246,7 @@ void Store::AddItem(CREItem *item)
 
 	if (temp) {
 		if (temp->InfiniteSupply!=-1) {
-			if (item->MaxStackAmount > 1) {
+			if (item->MaxStackAmount) {
 				// Stacked, so increase usages.
 				ieDword newAmount = 1;
 				if (item->Usages[0] != temp->Usages[0] && item->Usages[0] > 0) {
@@ -271,7 +271,7 @@ void Store::AddItem(CREItem *item)
 	memset( temp, 0, sizeof (STOItem ) );
 	memcpy( temp, item, sizeof( CREItem ) );
 	temp->AmountInStock = 1;
-	if (temp->MaxStackAmount > 1 && temp->Usages[0] > 1) {
+	if (temp->MaxStackAmount && temp->Usages[0] > 1) {
 		// For now, we do what bg2 does and add new items in stacks of 1.
 		temp->AmountInStock = item->Usages[0];
 		temp->Usages[0] = 1;

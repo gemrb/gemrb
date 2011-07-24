@@ -176,7 +176,7 @@ int Item::UseCharge(ieWord *Charges, int header, bool expend) const
 	int type = ieh->ChargeDepletion;
 
 	int ccount = 0;
-	if ((header>=CHARGE_COUNTERS) || (header<0/*weapon header*/)) {
+	if ((header>=CHARGE_COUNTERS) || (header<0) || MaxStackAmount) {
 		header = 0;
 	}
 	ccount=Charges[header];

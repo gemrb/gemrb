@@ -245,7 +245,7 @@ void Inventory::CalculateWeight()
 			slot->Flags &= ~IE_INV_ITEM_ACQUIRED;
 		}
 		if (slot->Weight > 0) {
-			Weight += slot->Weight * ((slot->Usages[0] && slot->MaxStackAmount > 1) ? slot->Usages[0] : 1);
+			Weight += slot->Weight * ((slot->Usages[0] && slot->MaxStackAmount) ? slot->Usages[0] : 1);
 		}
 	}
 	Changed = false;
@@ -638,7 +638,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 		}
 
 		CREItem *myslot = Slots[slot];
-		if (myslot->MaxStackAmount > 1 && ItemsAreCompatible(myslot, item)) {
+		if (myslot->MaxStackAmount && ItemsAreCompatible(myslot, item)) {
 			//calculate with the max movable stock
 			int chunk = item->Usages[0];
 			if (myslot->Usages[0] + chunk > myslot->MaxStackAmount) {
