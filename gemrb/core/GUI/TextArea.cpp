@@ -179,9 +179,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		for (size_t i = 0; i < linesize; i++) {
 			if (strnicmp( "[s=", lines[i], 3 ) == 0) {
 				int tlen;
-				unsigned long idx, acolor, bcolor;
+				unsigned long acolor, bcolor;
 				char* rest;
-				idx = strtoul( lines[i] + 3, &rest, 0 );
+				strtoul( lines[i] + 3, &rest, 0 );
 				if (*rest != ',')
 					goto notmatched;
 				acolor = strtoul( rest + 1, &rest, 16 );

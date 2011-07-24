@@ -301,6 +301,7 @@ void Font::Print(Region cliprgn, Region rgn, const unsigned char* string,
 		capital=1;
 		enablecap=true;
 	}
+	(void)enablecap; //HACK: shut up unused-but-set warnings, until the var is reused
 
 	unsigned int psx = PARAGRAPH_START_X;
 	Palette* pal = hicolor;
