@@ -388,6 +388,7 @@ Actor::Actor()
 			ProjectileSize=32;
 		}
 	}
+	multiclass = 0;
 	projectileImmunity = (ieDword *) calloc(ProjectileSize,sizeof(ieDword));
 	AppearanceFlags = 0;
 	SetDeathVar = IncKillCount = UnknownField = 0;
@@ -6926,9 +6927,6 @@ Actor *Actor::CopySelf(bool mislead) const
 
 	//the creature importer does this too
 	memcpy(newActor->Modified,newActor->BaseStats, sizeof(Modified) );
-
-	// temporary hack, so we don't get into a loop with CreateDerivedStats
-	newActor->multiclass = 0;
 
 	//copy the inventory, but only if it is not the Mislead illusion
 	if (mislead) {
