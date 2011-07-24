@@ -1,23 +1,22 @@
-GemRB git e5beb1c388463 (2011-07-03):
+GemRB V0.6.5 (2011-07-24):
   New features:
     - quickspell support
     - keymap.ini handling
-    - it should be possible to complete ToB too now
     - yet more unhardcoded PST projectiles
     - area comments, party npc interactions
-    - TriggerWalkTo action
+    - ios port and enhanced touchscreen support
 
   Improved features:
     - performance
     - squirrels and other small game don't die instantly
     - stores and stacking
     - effects, triggers, actions, dialogs
+    - secret door detection, turning undead
     - bugfixes and internal cleanups
-    - secret door detection
-    - turn undead fixed
 
   Applied patches:
     ios support patches from Brad Allred
+    android and touchscreen patches from Beholder
 
 GemRB V0.6.4 (2011-03-27):
   New features:
