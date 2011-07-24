@@ -882,12 +882,10 @@ bool Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
 			je->Section = (ieByte) Section;
 			je->Group = (ieByte) Group;
 			ieDword chapter = 0;
-			locals->Lookup("CHAPTER", chapter);
-			if (core->HasFeature(GF_NO_NEW_VARIABLES)) {
-				je->Chapter = 0;
-			} else {
-				je->Chapter = (ieByte) chapter;
+			if (!core->HasFeature(GF_NO_NEW_VARIABLES)) {
+				locals->Lookup("CHAPTER", chapter);
 			}
+			je->Chapter = (ieByte) chapter;
 			je->GameTime = GameTime;
 			return true;
 		}
@@ -895,12 +893,10 @@ bool Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
 	je = new GAMJournalEntry;
 	je->GameTime = GameTime;
 	ieDword chapter = 0;
-	locals->Lookup("CHAPTER", chapter);
-	if (core->HasFeature(GF_NO_NEW_VARIABLES)) {
-		je->Chapter = 0;
-	} else {
-		je->Chapter = (ieByte) chapter;
+	if (!core->HasFeature(GF_NO_NEW_VARIABLES)) {
+		locals->Lookup("CHAPTER", chapter);
 	}
+	je->Chapter = (ieByte) chapter;
 	je->unknown09 = 0;
 	je->Section = (ieByte) Section;
 	je->Group = (ieByte) Group;
