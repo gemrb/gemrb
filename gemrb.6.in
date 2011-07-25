@@ -303,11 +303,11 @@ Usually it's
 
 .TP
 .BR DoubleClickDelay =INT
-Milisecond treshold for detecting a double click. The default is 250.
+Milisecond threshold for detecting a double click. The default is 250.
 
 .TP
 .BR RepeatKeyDelay =INT
-Milisecond treshold for detecting a repeated key press. The default is 250.
+Milisecond threshold for detecting a repeated key press. The default is 250.
 
 .TP
 .BR TouchScrollAreas =(0|1)
