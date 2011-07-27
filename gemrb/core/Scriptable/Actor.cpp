@@ -88,6 +88,7 @@ static char **classabilities = NULL;
 static int *turnlevels = NULL;
 static int *booktypes = NULL;
 static int *xpbonus = NULL;
+static int *defaultprof = NULL;
 static int xpbonustypes = -1;
 static int xpbonuslevels = -1;
 static int **levelslots = NULL;
@@ -123,6 +124,11 @@ struct ItemUseType {
 	ieByte mcol;	//which column should be matched against the stat
 	ieByte vcol;	//which column has the bit value for it
 	ieByte which;	//which item dword should be used (1 = kit)
+};
+
+static const char *skillcolumns[12]={"DRUIDSPELL", "CLERICSPELL", "MAGESPELL", NULL, 
+		                         "BARDSKILL", "THIEFSKILL", "LAYHANDS", "TURNLEVEL",
+		                         "BOOKTYPE", "HATERACE", "ABILITIES", "NO_PROF",
 };
 
 static ItemUseType *itemuse = NULL;
@@ -1227,6 +1233,12 @@ void Actor::ReleaseMemory()
 			free(classabilities);
 			classabilities=NULL;
 		}
+
+		if (defaultprof) {
+			free(defaultprof);
+			defaultprof=NULL;
+		}
+
 		if (turnlevels) {
 			free(turnlevels);
 			turnlevels=NULL;
@@ -1269,15 +1281,15 @@ void Actor::ReleaseMemory()
 			skillabils=NULL;
 		}
 
-	if (afcomments) {
-		for(i=0;i<afcount;i++) {
-			if(afcomments[i]) {
-				free(afcomments[i]);
+		if (afcomments) {
+			for(i=0;i<afcount;i++) {
+				if(afcomments[i]) {
+					free(afcomments[i]);
+				}
 			}
+			free(afcomments);
+			afcomments=NULL;
 		}
-		free(afcomments);
-		afcomments=NULL;
-	}
 
 		if (wspecial) {
 			for (i=0; i<=wspecial_max; i++) {
@@ -1357,12 +1369,18 @@ void Actor::ReleaseMemory()
 	classcount = -1;
 }
 
-#define COL_HATERACE      0   //ranger type racial enemy
+#define COL_DRUID_SPELL   0   //ranger type racial enemy
 #define COL_CLERIC_SPELL  1   //cleric spells
 #define COL_MAGE_SPELL    2   //mage spells
 #define COL_STARTXP       3   //starting xp
 #define COL_BARD_SKILL    4   //bard skills
 #define COL_THIEF_SKILL   5   //thief skills
+#define COL_LAYHANDS      6   //paladin ability
+#define COL_TURNLEVEL     7   //paladin/cleric
+#define COL_BOOKTYPE      8   //sorceror
+#define COL_HATERACE      9   //ranger special
+#define COL_ABILITIES     10  //clab
+#define COL_NO_PROF       11  //default proficiency penalty
 
 #define COL_MAIN       0
 #define COL_SPARKS     1
@@ -1434,26 +1452,26 @@ static void InitActorTables()
 		turnlevels = (int *) calloc(classcount, sizeof(int));
 		booktypes = (int *) calloc(classcount, sizeof(int));
 		classabilities = (char **) calloc(classcount, sizeof(char*));
+		defaultprof = (int *) calloc(classcount, sizeof(int));
 
 		ieDword bitmask = 1;
 
 		for(i = 0; i<classcount; i++) {
 			const char *field;
-			int turnlevel = atoi(tm->QueryField( i, 7));
-			turnlevels[i]=turnlevel;
+			const char *rowname = tm->GetRowName(i);
 
-			field = tm->QueryField( i, 0 );
+			field = tm->QueryField( rowname, skillcolumns[COL_DRUID_SPELL] );
 			if (field[0]!='*') {
 				isclass[ISDRUID] |= bitmask;
 				druidspelltables[i]=strdup(field);
 			}
-			field = tm->QueryField( i, 1 );
+			field = tm->QueryField( rowname, skillcolumns[COL_CLERIC_SPELL] );
 			if (field[0]!='*') {
 				isclass[ISCLERIC] |= bitmask;
 				clericspelltables[i]=strdup(field);
 			}
 
-			field = tm->QueryField( i, 2 );
+			field = tm->QueryField( rowname, skillcolumns[COL_MAGE_SPELL] );
 			if (field[0]!='*') {
 				isclass[ISMAGE] |= bitmask;
 				wizardspelltables[i]=strdup(field);
@@ -1461,24 +1479,25 @@ static void InitActorTables()
 
 			// field 3 holds the starting xp
 
-			field = tm->QueryField( i, 4 );
+			field = tm->QueryField( rowname, skillcolumns[COL_BARD_SKILL] );
 			if (field[0]!='*') {
 				isclass[ISBARD] |= bitmask;
 			}
 
-			field = tm->QueryField( i, 5 );
+			field = tm->QueryField( rowname, skillcolumns[COL_THIEF_SKILL] );
 			if (field[0]!='*') {
 				isclass[ISTHIEF] |= bitmask;
 			}
 
-			field = tm->QueryField( i, 6 );
+			field = tm->QueryField( rowname, skillcolumns[COL_LAYHANDS] );
 			if (field[0]!='*') {
 				isclass[ISPALADIN] |= bitmask;
 			}
 
-			// field 7 holds the turn undead level
+			field = tm->QueryField( rowname, skillcolumns[COL_TURNLEVEL] );
+			turnlevels[i]=atoi(field);      
 
-			field = tm->QueryField( i, 8 );
+			field = tm->QueryField( rowname, skillcolumns[COL_BOOKTYPE] );
 			booktypes[i]=atoi(field);
 			//if booktype == 3 then it is a 'divine sorceror' class
 			//we shouldn't hardcode iwd2 classes this heavily
@@ -1486,16 +1505,20 @@ static void InitActorTables()
 				isclass[ISSORCERER] |= bitmask;
 			}
 
-			field = tm->QueryField( i, 9 );
+			field = tm->QueryField( rowname, skillcolumns[COL_HATERACE] );
 			if (field[0]!='*') {
 				isclass[ISRANGER] |= bitmask;
 			}
 
-			field = tm->QueryField( i, 10 );
+			field = tm->QueryField( rowname, skillcolumns[COL_ABILITIES] );
 			if (!strnicmp(field, "CLABMO", 6)) {
 				isclass[ISMONK] |= bitmask;
 			}
 			classabilities[i]=strdup(field);
+
+			field = tm->QueryField( rowname, skillcolumns[COL_NO_PROF] );
+			defaultprof[i]=atoi(field);
+
 			bitmask <<=1;
 		}
 	} else {
@@ -4581,7 +4604,13 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	speed += wspecial[stars][2];
 	// add non-proficiency penalty, which is missing from the table
 	if (stars == 0) {
-		THAC0Bonus -= 4;
+		ieDword clss = BaseStats[IE_CLASS];
+		if (clss <= (ieDword) classcount) {
+			THAC0Bonus -= defaultprof[clss];
+		} else {
+			//it is not clear what is the penalty for non player classes 
+			THAC0Bonus -= 4;
+		}
 	}
 
 	if (IsDualWielding() && wsdualwield) {
@@ -6417,7 +6446,7 @@ void Actor::InitButtons(ieDword cls, bool forced)
 	}
 
 	ActionButtonRow myrow;
-	if ((int) cls >= classcount) {
+	if (cls >= (ieDword) classcount) {
 		memcpy(&myrow, &DefaultButtons, sizeof(ActionButtonRow));
 		for (int i=0;i<extraslots;i++) {
 			if (cls==OtherGUIButtons[i].clss) {
