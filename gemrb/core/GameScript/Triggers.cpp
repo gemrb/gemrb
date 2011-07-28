@@ -325,16 +325,20 @@ int GameScript::IsGabber(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+//returns true if the trap or infopoint is active
 int GameScript::IsActive(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!scr) {
+	if (!scr || (scr->Type!=ST_PROXIMITY && scr->Type!=ST_TRIGGER && scr->Type!=ST_TRAVEL) ) {
 		return 0;
 	}
-	if (scr->GetInternalFlag()&IF_ACTIVE) {
-		return 1;
+
+	InfoPoint *ip = (InfoPoint *) scr;
+
+	if (ip->Flags&(TRAP_DEACTIVATED|INFO_DOOR) ) {
+		return 0;
 	}
-	return 0;
+	return 1;
 }
 
 int GameScript::InTrap(Scriptable* Sender, Trigger* parameters)
