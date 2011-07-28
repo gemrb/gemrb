@@ -644,10 +644,10 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 			if (myslot->Usages[0] + chunk > myslot->MaxStackAmount) {
 				chunk = myslot->MaxStackAmount - myslot->Usages[0];
 			}
-			if (!chunk) {
+			if (chunk<=0) {
 				return ASI_FAILED;
 			}
-			assert(chunk > 0);
+			
 			myslot->Flags |= IE_INV_ITEM_ACQUIRED;
 			myslot->Usages[0] = (ieWord) (myslot->Usages[0] + chunk);
 			item->Usages[0] = (ieWord) (item->Usages[0] - chunk);
