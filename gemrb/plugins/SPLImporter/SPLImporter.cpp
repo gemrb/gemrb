@@ -195,7 +195,8 @@ void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 	ieByte tmpByte;
 
 	str->Read( &eh->SpellForm, 1 );
-	str->Read( &eh->unknown1, 1 );
+	//this byte is used in PST
+	str->Read( &eh->Hostile, 1 );
 	str->Read( &eh->Location, 1 );
 	str->Read( &eh->unknown2, 1 );
 	str->ReadResRef( eh->MemorisedIcon );

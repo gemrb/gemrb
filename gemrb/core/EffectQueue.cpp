@@ -1552,6 +1552,38 @@ void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword am
 	DecreaseParam1OfEffect(effect_reference.opcode, amount);
 }
 
+//this is only used for Cloak of Warding Overlay in PST
+int EffectQueue::DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword param2) const
+{
+	std::list< Effect* >::const_iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+		MATCH_PARAM2();
+		ieDword value = (*f)->Parameter3;
+		if( value>amount) {
+			value -= amount;
+			amount = 0;
+		} else {
+			amount -= value;
+			value = 0;
+		}
+		(*f)->Parameter3=value;
+		if (value) {
+			return 0;
+		}
+	}
+	return amount;
+}
+
+int EffectQueue::DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amount, ieDword param2) const
+{
+	ResolveEffectRef(effect_reference);
+	if( effect_reference.opcode<0) {
+		return 0;
+	}
+	return DecreaseParam3OfEffect(effect_reference.opcode, amount, param2);
+}
 
 //this function does IDS targeting for effects (extra damage/thac0 against creature)
 static const int ids_stats[7]={IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT};

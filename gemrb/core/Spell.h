@@ -71,7 +71,7 @@ public:
 	~SPLExtHeader();
 
 	ieByte SpellForm;
-	ieByte unknown1;
+	ieByte Hostile;
 	ieByte Location;
 	ieByte unknown2;
 	ieResRef MemorisedIcon;
@@ -167,7 +167,7 @@ public:
 	// add appropriate casting glow effect
 	void AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender);
 	//returns a projectile created from an extended header
-	Projectile *GetProjectile(Scriptable *self, int headerindex, const Point &pos) const;
+	Projectile *GetProjectile(Scriptable *self, int headerindex, int level, const Point &pos) const;
 	unsigned int GetCastingDistance(Scriptable *Sender) const;
 };
 
