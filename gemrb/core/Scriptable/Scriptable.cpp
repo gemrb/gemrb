@@ -745,7 +745,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 			tct = caster->wildSurgeMods.target_change_type;
 		}
 		if (!caster || !tct || tct == WSTC_ADDTYPE || !caster->wildSurgeMods.projectile_id) {
-			pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+			pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
 			if (!pro) {
 				return;
 			}
@@ -774,7 +774,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					}
 					// we need to fetch the projectile, so the effect queue is created
 					// (skipped above)
-					pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+					pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
 					pro->SetCaster(GetGlobalID(), level);
 					break;
 				case WSTC_ADDTYPE:
@@ -791,7 +791,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 						}
 					}
 					// we need to refetch the projectile, so the effect queue is created
-					pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+					pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
 					pro->SetCaster(GetGlobalID(), level);
 					break;
 				case WSTC_RANDOMIZE:
@@ -820,7 +820,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					}
 					// we need to fetch the projectile, so the effect queue is created
 					// (skipped above)
-					pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+					pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
 					pro->SetCaster(GetGlobalID(), level);
 					break;
 				default: //0 - do nothing
@@ -847,7 +847,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					}
 				}
 				// we need to refetch the projectile, so the new one is used
-				pro = spl->GetProjectile(this, SpellHeader, LastTargetPos);
+				pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
 				pro->SetCaster(GetGlobalID(), level);
 			}
 
