@@ -1108,9 +1108,14 @@ void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 }
 
 //no separate values (changes are permanent)
-void pcf_fatigue(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+void pcf_fatigue(Actor *actor, ieDword oldValue, ieDword newValue)
 {
+	// get the old fatigue luck modifier
+	int luckMod = core->ResolveStatBonus(actor, "fatigue", 1, oldValue);
 	actor->BaseStats[IE_FATIGUE]=newValue;
+	// compensate for the change and modify luck
+	luckMod = core->ResolveStatBonus(actor, "fatigue") - luckMod;
+	actor->SetBase(IE_LUCK, actor->BaseStats[IE_LUCK] + luckMod);
 }
 
 //no separate values (changes are permanent)

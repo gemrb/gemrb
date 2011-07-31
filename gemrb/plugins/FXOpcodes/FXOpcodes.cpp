@@ -2813,7 +2813,6 @@ int fx_fatigue_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) print( "fx_fatigue_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	STAT_MOD( IE_FATIGUE );
-	// TODO: fatigue has a negative effect on luck -> add fatigmod.2da support
 	return FX_APPLIED;
 }
 
