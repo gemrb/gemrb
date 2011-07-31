@@ -2453,6 +2453,11 @@ void Actor::RefreshPCStats() {
 
 	// apply the intelligence and wisdom bonus to lore
 	Modified[IE_LORE] += core->GetLoreBonus(0, Modified[IE_INT]) + core->GetLoreBonus(0, Modified[IE_WIS]);
+
+	// add fatigue every 4 hours
+	if (!(core->GetGame()->GameTime % 1200)) {
+		NewBase(IE_FATIGUE, 1, MOD_ADDITIVE);
+	}
 }
 
 void Actor::RollSaves()
