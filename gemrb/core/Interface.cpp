@@ -5386,7 +5386,8 @@ ieDword Interface::TranslateStat(const char *stat_name)
 // Calculates an arbitrary stat bonus, based on tables.
 // the master table contains the table names (as row names) and the used stat
 // the subtables contain stat value/bonus pairs.
-ieDword Interface::ResolveStatBonus(Actor *actor, const char *tablename)
+// Optionally an override stat value can be specified (needed for use in pcfs).
+int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword flags, int value)
 {
         int mastertable = gamedata->LoadTable( tablename );
         Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
@@ -5398,18 +5399,31 @@ ieDword Interface::ResolveStatBonus(Actor *actor, const char *tablename)
         if (count< 1) {
 		return 0;
         }
-        ieDword ret = 0;
+        int ret = 0;
         // tables for additive modifiers of bonus type
         for (int i = 0; i < count; i++) {
 		tablename = mtm->GetRowName(i);
+		int checkcol = strtol(mtm->QueryField(i,1), NULL, 0);
+		unsigned int readcol = strtol(mtm->QueryField(i,2), NULL, 0);
 		int stat = TranslateStat(mtm->QueryField(i,0) );
-		ieDword value = actor->GetSafeStat(stat);
+		if (!(flags&1)) {
+			value = actor->GetSafeStat(stat);
+		}
 		int table = gamedata->LoadTable( tablename );
 		Holder<TableMgr> tm = gamedata->GetTable( table );
 
-		int row = tm->FindTableValue(0, value, 0);
+		int row;
+		if (checkcol == -1) {
+			// use the row names
+			char tmp[4];
+			snprintf(tmp, sizeof(tmp), "%d", value);
+			row = tm->GetRowIndex(tmp);
+		} else {
+			// use the checkcol column (default of 0)
+			row = tm->FindTableValue(checkcol, value, 0);
+		}
 		if (row>=0) {
-			ret += strtol(tm->QueryField(row, 1), NULL, 0);
+			ret += strtol(tm->QueryField(row, readcol), NULL, 0);
 		}
 	}
 	return ret;
