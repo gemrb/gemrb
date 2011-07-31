@@ -1072,13 +1072,13 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 	case 0: //charmed (target neutral after charm)
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+			displaymsg->DisplayConstantStringName(STR_CHARMED, DMC_LIGHTESTGREY, target);
 		}
 	case 1000:
 		break;
 	case 1: //charmed (target hostile after charm)
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+			displaymsg->DisplayConstantStringName(STR_CHARMED, DMC_LIGHTESTGREY, target);
 		}
 	case 1001:
 		if (!target->InParty) {
@@ -1087,13 +1087,13 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 2: //dire charmed (target neutral after charm)
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
+			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, DMC_LIGHTESTGREY, target);
 		}
 	case 1002:
 		break;
 	case 3: //dire charmed (target hostile after charm)
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
+			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, DMC_LIGHTESTGREY, target);
 		}
 	case 1003:
 		if (!target->InParty) {
@@ -1102,7 +1102,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 4: //controlled by cleric
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+			displaymsg->DisplayConstantStringName(STR_CONTROLLED, DMC_LIGHTESTGREY, target);
 		}
 	case 1004:
 		if (!target->InParty) {
@@ -1111,7 +1111,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 5: //thrall (typo comes from original engine doc)
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+			displaymsg->DisplayConstantStringName(STR_CHARMED, DMC_LIGHTESTGREY, target);
 		}
 	case 1005:
 		STAT_SET(IE_EA, EA_ENEMY );
@@ -3778,7 +3778,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-		displaymsg->DisplayStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:0xffffff, target, IE_STR_SOUND|IE_STR_SPEECH);
+		displaymsg->DisplayStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:DMC_WHITE, target, IE_STR_SOUND|IE_STR_SPEECH);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -3956,7 +3956,7 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 	if (fx->FirstApply && display_warning && target->GetStat(IE_EA) < EA_CONTROLLABLE) {
-		displaymsg->DisplayConstantStringName(STR_DISABLEDMAGE, 0xff0000, target);
+		displaymsg->DisplayConstantStringName(STR_DISABLEDMAGE, DMC_RED, target);
 		core->SetEventFlag(EF_ACTION);
 	}
 	return FX_APPLIED;
@@ -3975,7 +3975,7 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 		Spell *spl = gamedata->GetSpell(fx->Resource);
 		if (spl) {
 			snprintf(tmp, sizeof(tmp), "%s : %s", core->GetString(spl->SpellName), target->GetName(-1));
-			displaymsg->DisplayStringName(tmp, 0xffffff, Owner);
+			displaymsg->DisplayStringName(tmp, DMC_WHITE, Owner);
 		}
 	} else {
 		// save the current spell ref, so the rest of its effects can be applied afterwards
@@ -4689,13 +4689,13 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 	//FIXME: the familiar block field is not saved in the game and not set when the 
 	//familiar is itemized, so a game reload will clear it (see how this is done in original)
 	if (game->familiarBlock) {
-		displaymsg->DisplayConstantStringName(STR_FAMBLOCK, 0xff0000, target);
+		displaymsg->DisplayConstantStringName(STR_FAMBLOCK, DMC_RED, target);
 		return FX_NOT_APPLIED;
 	}
 
 	//The protagonist is ALWAYS in the first slot
 	if (game->GetPC(0, false)!=target) {
-		displaymsg->DisplayConstantStringName(STR_FAMPROTAGONIST, 0xff0000, target);
+		displaymsg->DisplayConstantStringName(STR_FAMPROTAGONIST, DMC_RED, target);
 		return FX_NOT_APPLIED;
 	}
 
@@ -5505,7 +5505,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 				}
 				if (PersonalDistance(target, actor) > dist) {
 					//display 'One of the spells has failed.'
-					displaymsg->DisplayConstantStringName(STR_CONTFAIL, 0xff0000, target);
+					displaymsg->DisplayConstantStringName(STR_CONTFAIL, DMC_RED, target);
 					continue;
 				}
 			}
@@ -5543,7 +5543,7 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) print( "fx_create_contingency (%2d): Level: %d, Count: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	if (target->fxqueue.HasEffectWithSource(fx_contingency_ref, fx->Source)) {
-		displaymsg->DisplayConstantStringName(STR_CONTDUP, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_CONTDUP, DMC_LIGHTESTGREY, target);
 		return FX_NOT_APPLIED;
 	}
 
@@ -5860,13 +5860,13 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	//check if trap count is over an amount (only saved traps count)
 	//actually, only projectiles in trigger phase should count here
 	if (map->GetTrapCount(iter)>6) {
-		displaymsg->DisplayConstantStringName(STR_NOMORETRAP, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_NOMORETRAP, DMC_LIGHTESTGREY, target);
 		return FX_NOT_APPLIED;
 	}
 
 	//check if we are under attack
 	if (GetNearestEnemyOf(map, target, ORIGIN_SEES_ENEMY|ENEMY_SEES_ORIGIN)) {
-		displaymsg->DisplayConstantStringName(STR_MAYNOTSETTRAP, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_MAYNOTSETTRAP, DMC_LIGHTESTGREY, target);
 		return FX_NOT_APPLIED;
 	}
 
@@ -5880,7 +5880,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (roll>skill) {
 		//failure
-		displaymsg->DisplayConstantStringName(STR_SNAREFAILED, 0xf0f0f0, target);		
+		displaymsg->DisplayConstantStringName(STR_SNAREFAILED, DMC_LIGHTESTGREY, target);
 		if (target->LuckyRoll(1,100,0)<25) {
 			ieResRef spl;
 			
@@ -5895,7 +5895,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	//success
-	displaymsg->DisplayConstantStringName(STR_SNARESUCCEED, 0xf0f0f0, target);
+	displaymsg->DisplayConstantStringName(STR_SNARESUCCEED, DMC_LIGHTESTGREY, target);
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
@@ -5971,7 +5971,7 @@ int fx_create_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_create_spell_sequencer (%2d): Level: %d, Count: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (target->fxqueue.HasEffectWithSource(fx_spell_sequencer_active_ref, fx->Source)) {
-		displaymsg->DisplayConstantStringName(STR_SEQDUP, 0xf0f0f0, target);
+		displaymsg->DisplayConstantStringName(STR_SEQDUP, DMC_LIGHTESTGREY, target);
 		return FX_NOT_APPLIED;
 	}
 	//just a call to activate the spell sequencer creation gui

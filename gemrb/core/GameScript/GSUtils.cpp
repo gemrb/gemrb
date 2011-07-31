@@ -394,7 +394,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			if(flags&DS_NONAME) {
 				displaymsg->DisplayString( sb.text );
 			} else {
-				displaymsg->DisplayStringName( Strref, 0xf0f0f0, Sender, 0);
+				displaymsg->DisplayStringName( Strref, DMC_LIGHTESTGREY, Sender, 0);
 			}
 		}
 		if (sb.text[0] && strcmp(sb.text," ") && (flags & (DS_HEAD | DS_AREA))) {
@@ -536,16 +536,16 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	}
 	if (!myinv) {
 		delete item;
-		if (lostitem) displaymsg->DisplayConstantString(STR_LOSTITEM, 0xbcefbc);
+		if (lostitem) displaymsg->DisplayConstantString(STR_LOSTITEM, DMC_BG2XPGREEN);
 		return MIC_GOTITEM; // actually it was lost, not gained
 	}
 	if ( myinv->AddSlotItem(item, SLOT_ONLYINVENTORY) !=ASI_SUCCESS) {
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
-		if (gotitem) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
+		if (gotitem) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 		return MIC_FULL;
 	}
-	if (gotitem) displaymsg->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
+	if (gotitem) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
 	return MIC_GOTITEM;
 }
 
@@ -966,7 +966,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	// actually busy doing something, for the same reason
 	if (target->GetInternalFlag()&IF_NOINT && (target->GetCurrentAction() || target->GetNextAction())) {
 		core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
-		displaymsg->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+		displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -981,7 +981,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 				// added CurrentAction as part of blocking action fixes
 				if (tar->GetCurrentAction() || tar->GetNextAction()) {
 					core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
-					displaymsg->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+					displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
 					Sender->ReleaseCurrentAction();
 					return;
 				}
@@ -1023,7 +1023,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		if (Flags & BD_NOEMPTY) {
 			return;
 		}
-		displaymsg->DisplayConstantStringName(STR_NOTHINGTOSAY,0xff0000,tar);
+		displaymsg->DisplayConstantStringName(STR_NOTHINGTOSAY, DMC_RED, tar);
 		return;
 	}
 }
@@ -1194,7 +1194,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 				//DisplayStringCore(Sender, VB_ATTACK, DS_CONSOLE|DS_CONST );
 			}
 			//display attack message
-			displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK,0xf0f0f0, Sender, target);
+			displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK, DMC_LIGHTESTGREY, Sender, target);
 		}
 	}
 	//action performed

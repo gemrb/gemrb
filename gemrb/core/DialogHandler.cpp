@@ -250,7 +250,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 				Section |= 2;
 			}
 			if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
-				displaymsg->DisplayConstantString(STR_JOURNALCHANGE,0xffff00);
+				displaymsg->DisplayConstantString(STR_JOURNALCHANGE, DMC_BG2XPGREEN);
 				char *string = core->GetString( tr->journalStrRef );
 				//cutting off the strings at the first crlf
 				char *poi = strchr(string,'\n');
@@ -264,7 +264,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 
 		if (tr->textStrRef != 0xffffffff) {
 			//allow_zero is for PST (deionarra's text)
-			displaymsg->DisplayStringName( (int) (tr->textStrRef), 0x8080FF, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
+			displaymsg->DisplayStringName( (int) (tr->textStrRef), DMC_DIALOGPARTY, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
 			if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
 				ta->AppendText( "", -1 );
 			}
@@ -361,7 +361,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 			/*if (target->GetInternalFlag()&IF_NOINT) {
 				// this whole check moved out of InitDialog by fuzzie, see comments
 				// for the IF_NOINT check in BeginDialog
-				displaymsg->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+				displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
 				ta->SetMinRow( false );
 				EndDialog();
 				return;
@@ -382,7 +382,7 @@ void DialogHandler::DialogChoose(unsigned int choose)
 		}
 	}
 	//displaying npc text
-	displaymsg->DisplayStringName( ds->StrRef, 0x70FF70, target, IE_STR_SOUND|IE_STR_SPEECH);
+	displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
 	//adding a gap between options and npc text
 	ta->AppendText("",-1);
 	int i;

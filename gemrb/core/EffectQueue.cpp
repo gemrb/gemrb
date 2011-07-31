@@ -1012,7 +1012,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
 	if( (signed) fx->random_value < (signed) val) {
 		if ((selective_mr && (fx->Resistance&FX_CAN_RESIST)) || !selective_mr) {
-			displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, 0xffffff, actor);
+			displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, DMC_WHITE, actor);
 			print ("effect resisted: %s\n", (char*) Opcodes[fx->Opcode].Name);
 			return true;
 		}
@@ -1149,7 +1149,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 	if( fn) {
 		if( target && fx->FirstApply ) {
 			if( !target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-				displaymsg->DisplayStringName( Opcodes[fx->Opcode].Strref, 0xf0f0f0,
+				displaymsg->DisplayStringName( Opcodes[fx->Opcode].Strref, DMC_LIGHTESTGREY,
 					target, IE_STR_SOUND);
 			}
 		}

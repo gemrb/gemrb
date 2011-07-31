@@ -1004,10 +1004,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		case ' ': //soft pause
 			DialogueFlags ^= DF_FREEZE_SCRIPTS;
 			if (DialogueFlags&DF_FREEZE_SCRIPTS) {
-				displaymsg->DisplayConstantString(STR_PAUSED,0xff0000);
+				displaymsg->DisplayConstantString(STR_PAUSED, DMC_RED);
 				SetDisplayText(STR_PAUSED, 0); // time 0 = removed instantly on unpause
 			} else {
-				displaymsg->DisplayConstantString(STR_UNPAUSED,0xff0000);
+				displaymsg->DisplayConstantString(STR_UNPAUSED, DMC_RED);
 			}
 			break;
 		case GEM_ALT: //alt key (shows containers)

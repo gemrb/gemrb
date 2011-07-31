@@ -2522,7 +2522,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 		if (!door->TryUnlock(actor)) {
-			displaymsg->DisplayConstantString(STR_DOORLOCKED,0xd7d7be,door);
+			displaymsg->DisplayConstantString(STR_DOORLOCKED, DMC_LIGHTGREY, door);
 			//playsound unsuccessful opening of door
 			if(door->IsOpen())
 				core->PlaySound(DS_CLOSE_FAIL);
@@ -3123,9 +3123,9 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 	int xp = parameters->int0Parameter;
 	if (displaymsg->HasStringReference(STR_GOTQUESTXP)) {
 		core->GetTokenDictionary()->SetAtCopy("EXPERIENCEAMOUNT", xp);
-		displaymsg->DisplayConstantStringName(STR_GOTQUESTXP, 0xbcefbc, actor);
+		displaymsg->DisplayConstantStringName(STR_GOTQUESTXP, DMC_BG2XPGREEN, actor);
 	} else {
-		displaymsg->DisplayConstantStringValue(STR_GOTXP, 0xbcefbc, (ieDword)xp);
+		displaymsg->DisplayConstantStringValue(STR_GOTXP, DMC_BG2XPGREEN, (ieDword)xp);
 	}
 	actor->AddExperience(xp);
 }
@@ -3141,7 +3141,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 	}
 
 	if (parameters->int0Parameter>0) {
-		displaymsg->DisplayString(parameters->int0Parameter, 0x40f0f000,IE_STR_SOUND);
+		displaymsg->DisplayString(parameters->int0Parameter, DMC_BG2XPGREEN, IE_STR_SOUND);
 	}
 	if (!xptable) {
 		printMessage("GameScript","Can't perform ADDXP2DA",LIGHT_RED);
@@ -4195,7 +4195,7 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	Actor *act = (Actor *) Sender;
 	act->ApplyKit(true);
 	act->SetMCFlag(MC_FALLEN_PALADIN, BM_OR);
-	if (act->InParty) displaymsg->DisplayConstantStringName(STR_PALADIN_FALL, 0xbcefbc, act);
+	if (act->InParty) displaymsg->DisplayConstantStringName(STR_PALADIN_FALL, DMC_BG2XPGREEN, act);
 }
 
 void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -4206,7 +4206,7 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	Actor *act = (Actor *) Sender;
 	act->ApplyKit(true);
 	act->SetMCFlag(MC_FALLEN_RANGER, BM_OR);
-	if (act->InParty) displaymsg->DisplayConstantStringName(STR_RANGER_FALL, 0xbcefbc, act);
+	if (act->InParty) displaymsg->DisplayConstantStringName(STR_RANGER_FALL, DMC_BG2XPGREEN, act);
 }
 
 void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
@@ -4335,9 +4335,9 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 			Map *map=tar->GetCurrentArea();
 			// drop it at my feet
 			map->AddItemToLocation(tar->Pos, item);
-			if (((Actor *)tar)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
+			if (((Actor *)tar)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 		} else {
-			if (((Actor *)tar)->InParty) displaymsg->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
+			if (((Actor *)tar)->InParty) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
 		}
 	}
 }
@@ -4369,9 +4369,9 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
 			map->AddItemToLocation(Sender->Pos, item);
-			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
+			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 		} else {
-			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_GOTITEM, 0xbcefbc);
+			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
 		}
 	}
 }
@@ -4644,7 +4644,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 
 	if (scr->GetStat(IE_EA)>EA_EVILCUTOFF) {
-		displaymsg->DisplayConstantString(STR_PICKPOCKET_EVIL,0xffffff);
+		displaymsg->DisplayConstantString(STR_PICKPOCKET_EVIL, DMC_WHITE);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -4662,7 +4662,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	//and change this 50 to 0.
 	if (skill<50) {
 		//noticed attempt
-		displaymsg->DisplayConstantString(STR_PICKPOCKET_FAIL,0xffffff);
+		displaymsg->DisplayConstantString(STR_PICKPOCKET_FAIL, DMC_WHITE);
 		if (core->HasFeature(GF_STEAL_IS_ATTACK) ) {
 			tar->AddTrigger(TriggerEntry(trigger_attackedby, snd->GetGlobalID()));
 			tar->LastAttacker = snd->GetGlobalID(); // FIXME
@@ -4695,7 +4695,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		}
 		if (!money) {
 			//no stuff to steal
-			displaymsg->DisplayConstantString(STR_PICKPOCKET_NONE,0xffffff);
+			displaymsg->DisplayConstantString(STR_PICKPOCKET_NONE, DMC_WHITE);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -4708,13 +4708,13 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		} else {
 			// drop it at my feet
 			map->AddItemToLocation(Sender->Pos, item);
-			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, 0xbcefbc);
+			if (((Actor *)Sender)->InParty) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
 	}
 
-	displaymsg->DisplayConstantString(STR_PICKPOCKET_DONE,0xffffff);
+	displaymsg->DisplayConstantString(STR_PICKPOCKET_DONE, DMC_WHITE);
 	DisplayStringCore(snd, VB_PP_SUCC, DS_CONSOLE|DS_CONST );
 	Sender->ReleaseCurrentAction();
 }
@@ -4967,7 +4967,7 @@ void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
 	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BM_OR);
-	displaymsg->DisplayConstantString(STR_WORLDMAPCHANGE, 0xc8ffc8);
+	displaymsg->DisplayConstantString(STR_WORLDMAPCHANGE, DMC_BG2XPGREEN);
 }
 
 void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
@@ -5660,7 +5660,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		if (!container->TryUnlock(actor)) {
 			//playsound can't open container
 			//display string, etc
-			displaymsg->DisplayConstantString(STR_CONTLOCKED,0xd7d7be,container);
+			displaymsg->DisplayConstantString(STR_CONTLOCKED, DMC_LIGHTGREY, container);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -5915,7 +5915,7 @@ void GameScript::ExportParty(Scriptable* /*Sender*/, Action* parameters)
 		snprintf(FileName,_MAX_PATH,"%s%d",parameters->string0Parameter,i+1);
 		core->WriteCharacter(FileName, actor);
 	}
-	displaymsg->DisplayConstantString(STR_EXPORTED, 0xbcefbc);
+	displaymsg->DisplayConstantString(STR_EXPORTED, DMC_BG2XPGREEN);
 }
 
 void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
@@ -6282,7 +6282,7 @@ void GameScript::PauseGame(Scriptable* Sender, Action* /*parameters*/)
 	GameControl *gc = core->GetGameControl();
 	if (gc) {
 		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
-		displaymsg->DisplayConstantString(STR_SCRIPTPAUSED,0xff0000);
+		displaymsg->DisplayConstantString(STR_SCRIPTPAUSED, DMC_RED);
 	}
 	// releasing this action allows actions to continue executing,
 	// so we force a wait

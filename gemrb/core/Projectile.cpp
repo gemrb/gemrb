@@ -319,7 +319,7 @@ void Projectile::Setup()
 	if(ExtFlags&PEF_TEXT) {
 		Actor *act = area->GetActorByGlobalID(Caster);
 		if(act) {
-			displaymsg->DisplayStringName(StrRef,0xd7d7be,act,0);
+			displaymsg->DisplayStringName(StrRef, DMC_LIGHTGREY, act,0);
 		}
 	}
 

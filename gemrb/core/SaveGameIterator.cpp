@@ -459,39 +459,39 @@ static int CanSave()
 	//some of these restrictions might not be needed
 	Store * store = core->GetCurrentStore();
 	if (store) {
-		displaymsg->DisplayConstantString(STR_CANTSAVESTORE, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_CANTSAVESTORE, DMC_BG2XPGREEN);
 		return 1; //can't save while store is open
 	}
 	GameControl *gc = core->GetGameControl();
 	if (!gc) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return -1; //no gamecontrol!!!
 	}
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
-		displaymsg->DisplayConstantString(STR_CANTSAVEDIALOG, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_CANTSAVEDIALOG, DMC_BG2XPGREEN);
 		return 2; //can't save while in dialog
 	}
 
 	//TODO: can't save while in combat
 	Game *game = core->GetGame();
 	if (!game) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return -1;
 	}
 	if (game->CombatCounter) {
-		displaymsg->DisplayConstantString(STR_CANTSAVECOMBAT, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_CANTSAVECOMBAT, DMC_BG2XPGREEN);
 		return 3;
 	}
 
 	Map *map = game->GetCurrentArea();
 	if (!map) {		
-		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return -1;
 	}
 
 	if (map->AreaFlags&AF_SAVE) {
 		//cannot save in area
-		displaymsg->DisplayConstantString(STR_CANTSAVEMONS, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_CANTSAVEMONS, DMC_BG2XPGREEN);
 		return 4;
 	}
 
@@ -501,12 +501,12 @@ static int CanSave()
 		//TODO: can't save while (party) actors are in helpless states
 		if (actor->GetStat(IE_STATE_ID) & STATE_NOSAVE) {
 			//some actor is in nosave state
-			displaymsg->DisplayConstantString(STR_CANTSAVENOCTRL, 0xbcefbc);
+			displaymsg->DisplayConstantString(STR_CANTSAVENOCTRL, DMC_BG2XPGREEN);
 			return 5;
 		}
 		if (actor->GetCurrentArea()!=map) {
 			//scattered
-			displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
+			displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 			return 6;
 		}
 	}
@@ -574,7 +574,7 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 	GameControl *gc = core->GetGameControl();
 
 	if (!CreateSavePath(Path, index, slotname)) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		if (gc) {
 			gc->SetDisplayText(STR_CANTSAVE, 30);
 		}
@@ -582,7 +582,7 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 	}
 
 	if (!DoSaveGame(Path)) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		if (gc) {
 			gc->SetDisplayText(STR_CANTSAVE, 30);
 		}
@@ -591,12 +591,12 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 
 	// Save succesful / Quick-save succesful
 	if (qsave) {
-		displaymsg->DisplayConstantString(STR_QSAVESUCCEED, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_QSAVESUCCEED, DMC_BG2XPGREEN);
 		if (gc) {
 			gc->SetDisplayText(STR_QSAVESUCCEED, 30);
 		}
 	} else {
-		displaymsg->DisplayConstantString(STR_SAVESUCCEED, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_SAVESUCCEED, DMC_BG2XPGREEN);
 		if (gc) {
 			gc->SetDisplayText(STR_SAVESUCCEED, 30);
 		}
@@ -636,7 +636,7 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 
 	char Path[_MAX_PATH];
 	if (!CreateSavePath(Path, index, slotname)) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		if (gc) {
 			gc->SetDisplayText(STR_CANTSAVE, 30);
 		}
@@ -644,7 +644,7 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 	}
 
 	if (!DoSaveGame(Path)) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, 0xbcefbc);
+		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		if (gc) {
 			gc->SetDisplayText(STR_CANTSAVE, 30);
 		}
@@ -652,7 +652,7 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 	}
 
 	// Save succesful
-	displaymsg->DisplayConstantString(STR_SAVESUCCEED, 0xbcefbc);
+	displaymsg->DisplayConstantString(STR_SAVESUCCEED, DMC_BG2XPGREEN);
 	if (gc) {
 		gc->SetDisplayText(STR_SAVESUCCEED, 30);
 	}

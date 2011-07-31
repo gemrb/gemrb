@@ -895,7 +895,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 			} else {
 				snprintf(tmp, sizeof(tmp), "%s : %s", spell, GetName(-1));
 			}
-			displaymsg->DisplayStringName(tmp, 0xffffff, this);
+			displaymsg->DisplayStringName(tmp, DMC_WHITE, this);
 		}
 /*
 		if (tgt) {
@@ -1029,7 +1029,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 	// tob AR3004 is a dead magic area, but using a script with personal dead magic
 	if (area->GetInternalFlag()&AF_DEADMAGIC) {
 		// TODO: display fizzling animation
-		displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, 0xffffff, this);
+		displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, DMC_WHITE, this);
 		return 0;
 	}
 
@@ -1051,7 +1051,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 		// check for personal dead magic
 		if (actor->Modified[IE_DEADMAGIC]) {
 			// TODO: display fizzling animation
-			displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, 0xffffff, this);
+			displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, DMC_WHITE, this);
 			return 0;
 		}
 
@@ -1078,7 +1078,7 @@ int Scriptable::CanCast(const ieResRef SpellResRef) {
 		}
 		if (failed) {
 			// TODO: display fizzling animation
-			displaymsg->DisplayConstantStringName(STR_MISCASTMAGIC, 0xffffff, this);
+			displaymsg->DisplayConstantStringName(STR_MISCASTMAGIC, DMC_WHITE, this);
 			return 0;
 		}
 	}
@@ -1242,7 +1242,7 @@ int Scriptable::CheckWildSurge()
 				// display feedback: Wild Surge: bla bla
 				char text[200];
 				snprintf(text, 200, "%s %s", core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0), core->GetString(core->SurgeSpells[check-1].message, 0));
-				displaymsg->DisplayStringName(text, 0xffffff, this);
+				displaymsg->DisplayStringName(text, DMC_WHITE, this);
 
 				// lookup the spell in the "check" row of wildmag.2da
 				ieResRef surgeSpellRef;

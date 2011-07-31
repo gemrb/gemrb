@@ -229,19 +229,19 @@ void Container::TryPickLock(Actor *actor)
 	core->PlaySound(DS_PICKLOCK);
 	if (LockDifficulty == 100) {
 		if (OpenFail != (ieDword)-1) {
-			displaymsg->DisplayStringName(OpenFail, 0xbcefbc, actor, IE_STR_SOUND|IE_STR_SPEECH);
+			displaymsg->DisplayStringName(OpenFail, DMC_BG2XPGREEN, actor, IE_STR_SOUND|IE_STR_SPEECH);
 		} else {
-			displaymsg->DisplayConstantStringName(STR_CONT_NOPICK, 0xbcefbc, actor);
+			displaymsg->DisplayConstantStringName(STR_CONT_NOPICK, DMC_BG2XPGREEN, actor);
 		}
 		return;
 	}
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
-		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, 0xbcefbc, actor);
+		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, DMC_BG2XPGREEN, actor);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
 		return;
 	}
 	SetContainerLocked(false);
-	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xd7d7be, actor);
+	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, DMC_LIGHTGREY, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	ImmediateEvent();
 	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
@@ -258,11 +258,11 @@ void Container::TryBashLock(Actor *actor)
 	unsigned int roll = actor->LuckyRoll(1, 10, bonus, 0);
 
 	if(roll < LockDifficulty || LockDifficulty == 100) {
-		displaymsg->DisplayConstantStringName(STR_CONTBASH_FAIL, 0xbcefbc, actor);
+		displaymsg->DisplayConstantStringName(STR_CONTBASH_FAIL, DMC_BG2XPGREEN, actor);
 		return;
 	}
 
-	displaymsg->DisplayConstantStringName(STR_CONTBASH_DONE, 0xd7d7be, actor);
+	displaymsg->DisplayConstantStringName(STR_CONTBASH_DONE, DMC_LIGHTGREY, actor);
 	SetContainerLocked(false);
 	//Is this really useful ?
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
