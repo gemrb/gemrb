@@ -1112,7 +1112,7 @@ void pcf_fatigue(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	// get the old fatigue luck modifier
 	int luckMod = core->ResolveStatBonus(actor, "fatigue", 1, oldValue);
-	actor->BaseStats[IE_FATIGUE]=newValue;
+	actor->BaseStats[IE_FATIGUE] = newValue + core->GetConstitutionBonus(STAT_CON_FATIGUE, actor->Modified[IE_CON]);
 	// compensate for the change and modify luck
 	luckMod = core->ResolveStatBonus(actor, "fatigue") - luckMod;
 	actor->SetBase(IE_LUCK, actor->BaseStats[IE_LUCK] + luckMod);
