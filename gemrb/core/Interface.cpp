@@ -4272,14 +4272,14 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 		}
 		if (slottype&SLOT_SHIELD) {
 			//cannot equip twohanded in offhand
-			if (feedback) displaymsg->DisplayConstantString(STR_NOT_IN_OFFHAND, DMC_LIGHTESTGREY);
+			if (feedback) displaymsg->DisplayConstantString(STR_NOT_IN_OFFHAND, DMC_WHITE);
 			return 0;
 		}
 	}
 
 	if ( (unsigned int) item->ItemType>=(unsigned int) ItemTypes) {
 		//invalid itemtype
-		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, DMC_LIGHTESTGREY);
+		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, DMC_WHITE);
 		return 0;
 	}
 
@@ -4288,13 +4288,13 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 		//constant strings
 		int idx = actor->Unusable(item);
 		if (idx) {
-			if (feedback) displaymsg->DisplayConstantString(idx, DMC_LIGHTESTGREY);
+			if (feedback) displaymsg->DisplayConstantString(idx, DMC_WHITE);
 			return 0;
 		}
 		//custom strings
 		ieStrRef str = actor->Disabled(item->Name, item->ItemType);
 		if (str && !equipped) {
-			if (feedback) displaymsg->DisplayString(str, DMC_LIGHTESTGREY, 0);
+			if (feedback) displaymsg->DisplayString(str, DMC_WHITE, 0);
 			return 0;
 		}
 	}
@@ -4303,7 +4303,7 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 	int ret = (slotmatrix[item->ItemType]&slottype);
 
 	if (!ret) {
-		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, DMC_LIGHTESTGREY);
+		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, DMC_WHITE);
 		return 0;
 	}
 
@@ -4330,7 +4330,7 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 			}
 
 			if (!flg) {
-				displaymsg->DisplayConstantString(STR_UNUSABLEITEM, DMC_LIGHTESTGREY);
+				displaymsg->DisplayConstantString(STR_UNUSABLEITEM, DMC_WHITE);
 				return 0;
 			}
 		}

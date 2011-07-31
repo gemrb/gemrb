@@ -394,7 +394,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			if(flags&DS_NONAME) {
 				displaymsg->DisplayString( sb.text );
 			} else {
-				displaymsg->DisplayStringName( Strref, DMC_LIGHTESTGREY, Sender, 0);
+				displaymsg->DisplayStringName( Strref, DMC_WHITE, Sender, 0);
 			}
 		}
 		if (sb.text[0] && strcmp(sb.text," ") && (flags & (DS_HEAD | DS_AREA))) {
@@ -1194,7 +1194,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 				//DisplayStringCore(Sender, VB_ATTACK, DS_CONSOLE|DS_CONST );
 			}
 			//display attack message
-			displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK, DMC_LIGHTESTGREY, Sender, target);
+			displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK, DMC_WHITE, Sender, target);
 		}
 	}
 	//action performed

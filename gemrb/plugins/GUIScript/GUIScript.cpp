@@ -7371,7 +7371,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	// can't equip item because of similar already equipped
 	if (Effect) {
 		if (item->ItemExcl & actor->inventory.GetEquipExclusion(Slot)) {
-			displaymsg->DisplayConstantString(STR_ITEMEXCL, DMC_LIGHTESTGREY);
+			displaymsg->DisplayConstantString(STR_ITEMEXCL, DMC_WHITE);
 			//freeing the item before returning
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
 			return PyInt_FromLong( 0 );
@@ -7382,7 +7382,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if ( (Slottype == SLOT_ITEM) && !(slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
 		ITMExtHeader *eh = item->GetExtHeader(0);
 		if (eh && eh->IDReq) {
-			displaymsg->DisplayConstantString(STR_ITEMID, DMC_LIGHTESTGREY);
+			displaymsg->DisplayConstantString(STR_ITEMID, DMC_WHITE);
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
 			return PyInt_FromLong( 0 );
 		}
