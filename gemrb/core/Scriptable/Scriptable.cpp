@@ -723,7 +723,9 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 	if (Type == ST_ACTOR) {
 		caster = (Actor *) this;
 		caster->CureInvisibility();
-		caster->CureSanctuary();
+		if (spl->Flags&SF_HOSTILE) {
+			caster->CureSanctuary();
+		}
 
 		//FIXME: 1 duplicate is no duplicate, right?
 		duplicate = caster->wildSurgeMods.num_castings;
