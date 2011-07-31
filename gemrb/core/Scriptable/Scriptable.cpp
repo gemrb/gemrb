@@ -710,7 +710,7 @@ const TriggerEntry *Scriptable::GetMatchingTrigger(unsigned short id, unsigned i
 	return NULL;
 }
 
-static EffectRef fx_set_invisible_state_ref = { "State:Invisible", -1 };
+//static EffectRef fx_set_invisible_state_ref = { "State:Invisible", -1 };
 
 void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake)
 {
@@ -722,12 +722,16 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 	int duplicate = 1;
 	if (Type == ST_ACTOR) {
 		caster = (Actor *) this;
+		caster->CureInvisibility();
+		caster->CureSanctuary();
+
 		//FIXME: 1 duplicate is no duplicate, right?
 		duplicate = caster->wildSurgeMods.num_castings;
 		if (!duplicate) {
 			duplicate = 1;
 		}
 	}
+
 	if (core->HasFeature(GF_PST_STATE_FLAGS) && (Type == ST_ACTOR)) {
 		if (caster->GetStat(IE_STATE_ID)&STATE_EE_DUPL) {
 			//seriously, wild surges and EE in the same game?
@@ -891,7 +895,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 			}
 			displaymsg->DisplayStringName(tmp, 0xffffff, this);
 		}
-
+/*
 		if (tgt) {
 			if (target && (Type==ST_ACTOR) ) {
 				target->AddTrigger(TriggerEntry(trigger_spellcastonme, caster->GetGlobalID(), spellnum));
@@ -921,12 +925,11 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 				}
 			}
 		}
+*/
 	}
-
 	core->Autopause(AP_SPELLCAST);
 
 	gamedata->FreeSpell(spl, SpellResRef, false);
-
 }
 
 void Scriptable::CastSpellPointEnd(int level)
