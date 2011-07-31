@@ -2458,6 +2458,12 @@ void Actor::RefreshPCStats() {
 	if (!(core->GetGame()->GameTime % 1200)) {
 		NewBase(IE_FATIGUE, 1, MOD_ADDITIVE);
 	}
+
+	// regenerate actors with high enough constitution
+	int rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
+	if (rate && !(core->GetGame()->GameTime % (rate*AI_UPDATE_TIME))) {
+		NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
+	}
 }
 
 void Actor::RollSaves()
