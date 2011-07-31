@@ -140,6 +140,8 @@ public:
 	void SetOrientation(int orientation);
 	/* transforms vvc to blended */
 	void SetBlend();
+	/* sets the effect owned flag */
+	void SetEffectOwned(bool flag);
 	/* sets fade effect at end of animation (pst feature) */
 	void SetFade(ieByte initial, int speed);
 	/* alters palette with rgb factor */

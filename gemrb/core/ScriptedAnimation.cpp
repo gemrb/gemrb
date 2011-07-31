@@ -181,6 +181,8 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 		if (type&DOUBLE) {
 			c<<=1;
 			if (gettwin) c++;
+			//this is needed for PST twin animations that contain 2 or 3 phases
+			p*=MAX_ORIENT;
 		} else if (type&FIVE) {
 			c=SixteenToFive[c];
 			if ((i&15)>=5) mirror = true;
@@ -552,7 +554,7 @@ bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 		unsigned long time;
 		time = core->GetGame()->Ticks;
 		if (starttime == 0) {
-		  starttime = time;
+			starttime = time;
 		}
 		if (( time - starttime ) >= ( unsigned long ) ( 1000 / FrameRate )) {
 			inc = (time-starttime)*FrameRate/1000;
@@ -713,6 +715,14 @@ void ScriptedAnimation::PreparePalette()
 		if (!palette->alpha) {
 			palette->CreateShadedAlphaChannel();
 		}
+	}
+}
+
+void ScriptedAnimation::SetEffectOwned(bool flag)
+{
+	effect_owned=flag;
+	if (twin) {
+		twin->effect_owned=flag;
 	}
 }
 
