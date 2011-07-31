@@ -1116,6 +1116,11 @@ void pcf_fatigue(Actor *actor, ieDword oldValue, ieDword newValue)
 	// compensate for the change and modify luck
 	luckMod = core->ResolveStatBonus(actor, "fatigue") - luckMod;
 	actor->SetBase(IE_LUCK, actor->BaseStats[IE_LUCK] + luckMod);
+
+	// reuse the luck mod to determine when the actor is tired
+	if (luckMod) {
+		DisplayStringCore(actor, VB_TIRED, DS_CONSOLE|DS_CONST);
+	}
 }
 
 //no separate values (changes are permanent)
@@ -2457,6 +2462,11 @@ void Actor::RefreshPCStats() {
 	// add fatigue every 4 hours
 	if (!(core->GetGame()->GameTime % 18000)) {
 		NewBase(IE_FATIGUE, 1, MOD_ADDITIVE);
+	}
+	if (core->ResolveStatBonus(this, "fatigue")) {
+		AddPortraitIcon(39); //PI_FATIGUE from FXOpcodes.cpp
+	} else {
+		DisablePortraitIcon(39); //PI_FATIGUE from FXOpcodes.cpp
 	}
 
 	// regenerate actors with high enough constitution
