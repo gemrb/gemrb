@@ -465,16 +465,20 @@ public:
 	Spawn *GetSpawnRadius(const Point &point, unsigned int radius);
 	unsigned int GetSpawnCount() { return (unsigned int) spawns.size(); }
 	void TriggerSpawn(Spawn *spawn);
+
 	//move some or all players to a new area
 	void MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor);
 	bool HasWeather();
 	int GetWeather();
 	void ClearTrap(Actor *actor, ieDword InTrap);
+
+	//tracking stuff
 	void SetTrackString(ieStrRef strref, int flg, int difficulty);
 	//returns true if tracking failed
 	bool DisplayTrackString(Actor *actor);
-	unsigned int GetLightLevel(const Point &Pos);
-	unsigned short GetInternalSearchMap(int x, int y);
+
+	unsigned int GetLightLevel(const Point &Pos) const;
+	unsigned short GetInternalSearchMap(int x, int y) const;
 	void SetInternalSearchMap(int x, int y, int value);
 	void SetBackground(const ieResRef &bgResref, ieDword duration);
 private:

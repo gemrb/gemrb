@@ -3461,7 +3461,7 @@ bool Map::DisplayTrackString(Actor *target)
 
 // returns a lightness level in the range of [0-100]
 // since the lightmap is much smaller than the area, we need to interpolate
-unsigned int Map::GetLightLevel(const Point &Pos)
+unsigned int Map::GetLightLevel(const Point &Pos) const
 {
 	Color c = LightMap->GetPixel(Pos.x/16, Pos.y/12);
 	// at night/dusk/dawn the lightmap color is adjusted by the color overlay. (Only get's darker.)
@@ -3690,21 +3690,24 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell)
 	}
 }
 
-short unsigned int Map::GetInternalSearchMap(int x, int y) {
+short unsigned int Map::GetInternalSearchMap(int x, int y) const
+{
 	if ((unsigned)x >= Width || (unsigned)y >= Height) {
 		return 0;
 	}
 	return SrchMap[x+y*Width];
 }
 
-void Map::SetInternalSearchMap(int x, int y, int value) {
+void Map::SetInternalSearchMap(int x, int y, int value)
+{
 	if ((unsigned)x >= Width || (unsigned)y >= Height) {
 		return;
 	}
 	SrchMap[x+y*Width] = value;
 }
 
-void Map::SetBackground(const ieResRef &bgResRef, ieDword duration) {
+void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
+{
 	Video* video = core->GetVideoDriver();
 
 	ResourceHolder<ImageMgr> bmp(bgResRef);
