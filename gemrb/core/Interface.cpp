@@ -5389,19 +5389,19 @@ ieDword Interface::TranslateStat(const char *stat_name)
 // Optionally an override stat value can be specified (needed for use in pcfs).
 int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword flags, int value)
 {
-        int mastertable = gamedata->LoadTable( tablename );
-        Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
-        if (!mtm) {
+	int mastertable = gamedata->LoadTable( tablename );
+	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
+	if (!mtm) {
 		printMessage("Core", "Cannot resolve stat bonus.\n", RED);
-                return -1;
-        }
-        int count = mtm->GetRowCount();
-        if (count< 1) {
+		return -1;
+	}
+	int count = mtm->GetRowCount();
+	if (count< 1) {
 		return 0;
-        }
-        int ret = 0;
-        // tables for additive modifiers of bonus type
-        for (int i = 0; i < count; i++) {
+	}
+	int ret = 0;
+	// tables for additive modifiers of bonus type
+	for (int i = 0; i < count; i++) {
 		tablename = mtm->GetRowName(i);
 		int checkcol = strtol(mtm->QueryField(i,1), NULL, 0);
 		unsigned int readcol = strtol(mtm->QueryField(i,2), NULL, 0);
