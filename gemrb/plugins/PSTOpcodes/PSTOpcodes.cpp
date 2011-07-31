@@ -777,6 +777,10 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		}
 		break;
 	case 4:
+		//this is not the original position, but the immunity stat was already used for things like this
+		//as an added benefit, HasImmunityEffects also works with the pst spell
+		STAT_BIT_OR( IE_IMMUNITY, IMM_GUARDIAN);
+		break;
 	case 5:
 		break;
 	case 6:

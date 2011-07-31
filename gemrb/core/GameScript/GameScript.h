@@ -777,6 +777,7 @@ public: //Script Functions
 	static int IsExtendedNight(Scriptable* Sender, Trigger* parameters);
 	static int IsFacingObject(Scriptable* Sender, Trigger* parameters);
 	static int IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters);
+	static int IsInGuardianMantle(Scriptable* Sender, Trigger* parameters);
 	static int IsLocked(Scriptable* Sender, Trigger* parameters);
 	static int IsMarkedSpell(Scriptable* Sender, Trigger* parameters);
 	static int IsOverMe(Scriptable* Sender, Trigger* parameters);

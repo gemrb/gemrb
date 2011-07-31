@@ -3956,6 +3956,21 @@ int GameScript::Unusable(Scriptable* Sender, Trigger* parameters)
 	return ret;
 }
 
+//returns true if the immunity flag is set
+//(attacker has to make a successful spell save to hit the target)
+int GameScript::IsInGuardianMantle(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if (actor->GetStat(IE_IMMUNITY)&IMM_GUARDIAN) {
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::HasBounceEffects(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable *tar = GetActorFromObject( Sender, parameters->objectParameter );
