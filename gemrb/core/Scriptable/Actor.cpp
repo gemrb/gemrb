@@ -1112,7 +1112,7 @@ void pcf_fatigue(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	// get the old fatigue luck modifier
 	int luckMod = core->ResolveStatBonus(actor, "fatigue", 1, oldValue);
-	actor->BaseStats[IE_FATIGUE] = newValue + core->GetConstitutionBonus(STAT_CON_FATIGUE, actor->Modified[IE_CON]);
+	actor->BaseStats[IE_FATIGUE] = newValue;
 	// compensate for the change and modify luck
 	luckMod = core->ResolveStatBonus(actor, "fatigue") - luckMod;
 	actor->SetBase(IE_LUCK, actor->BaseStats[IE_LUCK] + luckMod);
@@ -6253,7 +6253,7 @@ void Actor::Rest(int hours)
 			}
 		}
 	} else {
-		SetBase (IE_FATIGUE, 0);
+		SetBase (IE_FATIGUE, - core->GetConstitutionBonus(STAT_CON_FATIGUE, Modified[IE_CON]));
 		SetBase (IE_INTOXICATION, 0);
 		inventory.ChargeAllItems (0);
 		spellbook.ChargeAllSpells ();
