@@ -1538,9 +1538,17 @@ void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
 		ieDword value = (*f)->Parameter1;
-		if( value>amount) value-=amount;
-		else value = 0;
+		if( value>amount) {
+			value -= amount;
+			amount = 0;
+		} else {
+			amount -= value;
+			value = 0;
+		}
 		(*f)->Parameter1=value;
+		if (value) {
+			return;
+		}
 	}
 }
 
