@@ -37,7 +37,7 @@
 #define DMC_LIGHTGREY 0xd7d7be
 #define DMC_BG2XPGREEN 0xbcefbc
 #define DMC_GOLD 0xc0c000
-#define DMC_DIALOG 0x70FF70
+#define DMC_DIALOG DMC_WHITE
 #define DMC_DIALOGPARTY 0x8080FF
 
 class Scriptable;
