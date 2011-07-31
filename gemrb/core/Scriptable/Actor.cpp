@@ -126,9 +126,9 @@ struct ItemUseType {
 	ieByte which;	//which item dword should be used (1 = kit)
 };
 
-static const char *skillcolumns[12]={"DRUIDSPELL", "CLERICSPELL", "MAGESPELL", NULL, 
-		                         "BARDSKILL", "THIEFSKILL", "LAYHANDS", "TURNLEVEL",
-		                         "BOOKTYPE", "HATERACE", "ABILITIES", "NO_PROF",
+static const char *skillcolumns[12]={
+	"DRUIDSPELL", "CLERICSPELL", "MAGESPELL", NULL, "BARDSKILL", "THIEFSKILL",
+	"LAYHANDS", "TURNLEVEL", "BOOKTYPE", "HATERACE", "ABILITIES", "NO_PROF",
 };
 
 static ItemUseType *itemuse = NULL;
@@ -5032,10 +5032,10 @@ static EffectRef fx_stoneskin_ref = { "StoneSkinModifier", -1 };
 static EffectRef fx_stoneskin2_ref = { "StoneSkin2Modifier", -1 };
 static EffectRef fx_mirrorimage_ref = { "MirrorImageModifier", -1 };
 static EffectRef fx_aegis_ref = { "Aegis", -1 };
+static EffectRef fx_cloak_ref = { "Overlay", -1 };
 
 void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &resisted, int damagetype, WeaponInfo *wi, bool critical)
 {
-
 	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
 	if (mirrorimages) {
 		if (LuckyRoll(1,mirrorimages+1,0) != 1) {
@@ -5051,8 +5051,17 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 	if (!(damagetype & ~(DAMAGE_PIERCING|DAMAGE_SLASHING|DAMAGE_MISSILE|DAMAGE_MAGIC))) {
 		int stoneskins = target->Modified[IE_STONESKINS];
 		if (stoneskins) {
+			//pst style damage soaking from cloak of warding
+			int tmp = target->fxqueue.DecreaseParam3OfEffect(fx_cloak_ref, damage, 0);
+			if (tmp>damage) {
+				damage = 0;
+				return;
+			}
+			damage -= tmp;
+
 			target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin_ref, 1);
 			target->fxqueue.DecreaseParam1OfEffect(fx_aegis_ref, 1);
+
 			target->Modified[IE_STONESKINS]--;
 			damage = 0;
 			return;
@@ -5425,6 +5434,9 @@ void Actor::DrawVideocells(const Region &screen, vvcVector &vvcCells, const Colo
 			delete vvc;
 			vvcCells.erase(vvcCells.begin()+i);
 			continue;
+		}
+		if (!vvc->active) {
+			vvc->SetPhase(P_RELEASE);
 		}
 	}
 }
@@ -6122,11 +6134,8 @@ bool Actor::HasVVCCell(const ieResRef resource) const
 	return GetVVCCell(resource) != NULL;
 }
 
-ScriptedAnimation *Actor::GetVVCCell(const ieResRef resource) const
+ScriptedAnimation *Actor::GetVVCCell(const vvcVector *vvcCells, const ieResRef resource) const
 {
-	int j = true;
-	const vvcVector *vvcCells=&vvcShields;
-retry:
 	size_t i=vvcCells->size();
 	while (i--) {
 		ScriptedAnimation *vvc = (*vvcCells)[i];
@@ -6137,9 +6146,14 @@ retry:
 			return vvc;
 		}
 	}
-	vvcCells=&vvcOverlays;
-	if (j) { j = false; goto retry; }
 	return NULL;
+}
+
+ScriptedAnimation *Actor::GetVVCCell(const ieResRef resource) const
+{
+	ScriptedAnimation *vvc = GetVVCCell(&vvcShields, resource);
+	if (vvc) return vvc;
+	return GetVVCCell(&vvcOverlays, resource);
 }
 
 void Actor::RemoveVVCell(const ieResRef resource, bool graceful)

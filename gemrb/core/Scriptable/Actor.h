@@ -620,6 +620,8 @@ public:
 	void RemoveVVCell(const ieResRef vvcname, bool graceful);
 	/* returns true if actor already has the overlay (slow) */
 	bool HasVVCCell(const ieResRef resource) const;
+	/* returns overlay (or underlay) if actor already has it, faster */
+	ScriptedAnimation *GetVVCCell(const vvcVector *vvcCells, const ieResRef resource) const;
 	/* returns overlay if actor already has it (slow) */
 	ScriptedAnimation *GetVVCCell(const ieResRef resource) const;
 	/* returns the vvc pointer to a hardcoded overlay */
