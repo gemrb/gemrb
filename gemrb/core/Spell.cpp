@@ -120,6 +120,7 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
 
 EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro) const
 {
+	bool pst_hostile = false;
 	Effect *features;
 	int count;
 
@@ -131,6 +132,9 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		} else {
 			features = ext_headers[block_index].features;
 			count = ext_headers[block_index].FeatureCount;
+			if (!(ext_headers[block_index].Hostile&4)) {
+				pst_hostile = true;
+			}
 		}
 	} else {
 		features = casting_features;
@@ -156,6 +160,10 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		fx->InventorySlot = 0xffff;
 		//the hostile flag is used to determine if this was an attack
 		fx->SourceFlags = Flags;
+		//pst spells contain a friendly flag in the spell header
+		if (pst_hostile) {
+			fx->SourceFlags|=SF_HOSTILE;
+		}
 		fx->CasterLevel = level;
 
 		// apply the stat-based spell duration modifier
@@ -192,7 +200,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 	return fxqueue;
 }
 
-Projectile *Spell::GetProjectile(Scriptable *self, int header, const Point &target) const
+Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const Point &target) const
 {
 	SPLExtHeader *seh = GetExtHeader(header);
 	if (!seh) {
@@ -202,7 +210,7 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, const Point &targ
 	}
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 	if (seh->FeatureCount) {
-		pro->SetEffects(GetEffectBlock(self, target, header, seh->ProjectileAnimation));
+		pro->SetEffects(GetEffectBlock(self, target, header, level, seh->ProjectileAnimation));
 	}
 	return pro;
 }

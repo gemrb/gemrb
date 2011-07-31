@@ -4917,7 +4917,7 @@ void Interface::ApplySpellPoint(const ieResRef resname, Map* area, const Point &
 		return;
 	}
 	int header = spell->GetHeaderIndexFromLevel(level);
-	Projectile *pro = spell->GetProjectile(caster, header, pos);
+	Projectile *pro = spell->GetProjectile(caster, header, level, pos);
 	pro->SetCaster(caster->GetGlobalID(), level);
 	area->AddProjectile(pro, caster->Pos, pos);
 }
