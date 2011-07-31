@@ -1059,8 +1059,8 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 
 	ieDword GameTime = core->GetGame()->GameTime;
 
-	fx->FirstApply=first_apply;
-	if( first_apply) {
+	if (first_apply) {
+		fx->FirstApply = 1;
 		if( (fx->PosX==0xffffffff) && (fx->PosY==0xffffffff)) {
 			fx->PosX = target->Pos.x;
 			fx->PosY = target->Pos.y;
@@ -1147,7 +1147,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 	}
 	int res = FX_ABORT;
 	if( fn) {
-		if( target && first_apply ) {
+		if( target && fx->FirstApply ) {
 			if( !target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
 				displaymsg->DisplayStringName( Opcodes[fx->Opcode].Strref, 0xf0f0f0,
 					target, IE_STR_SOUND);
@@ -1155,6 +1155,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		}
 
 		res=fn( Owner, target, fx );
+		fx->FirstApply = 0;
 
 		//if there is no owner, we assume it is the target
 		switch( res ) {
