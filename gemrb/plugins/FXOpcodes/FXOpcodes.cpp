@@ -5109,7 +5109,7 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	if (fx->Parameter2 == 1) {
 		//play over target (sticky)
-		sca->effect_owned = true;
+		sca->SetEffectOwned(true);
 		target->AddVVCell( sca );
 		return FX_APPLIED;
 	}
