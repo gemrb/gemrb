@@ -2455,7 +2455,7 @@ void Actor::RefreshPCStats() {
 	Modified[IE_LORE] += core->GetLoreBonus(0, Modified[IE_INT]) + core->GetLoreBonus(0, Modified[IE_WIS]);
 
 	// add fatigue every 4 hours
-	if (!(core->GetGame()->GameTime % 1200)) {
+	if (!(core->GetGame()->GameTime % 18000)) {
 		NewBase(IE_FATIGUE, 1, MOD_ADDITIVE);
 	}
 
