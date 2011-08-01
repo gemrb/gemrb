@@ -318,7 +318,7 @@ def RefreshSpellList(pc, innate):
 	spell_list = []
 	#level==0 is level #1
 	for level in range (9):
-		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, True)
 		for j in range (mem_cnt):
 			ms = GemRB.GetMemorizedSpell (pc, type, level, j)
 

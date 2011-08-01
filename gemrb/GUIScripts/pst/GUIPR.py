@@ -92,7 +92,7 @@ def UpdatePriestWindow ():
 	Label.SetText (19672)
 
 
-	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 	for i in range (12):
 		Icon = Window.GetControl (2 + i)
 		Icon.SetBorder (0,  0, 0, 0, 0,  0, 0, 0, 160,  0, 1)
