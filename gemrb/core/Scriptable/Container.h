@@ -27,7 +27,7 @@
 //container flags
 #define CONT_LOCKED      1
 #define CONT_RESET       8
-#define CONT_DISABLED    32
+#define CONT_DISABLED    (32|128)   //bg2 and pst uses different bits, luckily they are not overlapping
 
 class GEM_EXPORT Container : public Highlightable {
 public:
