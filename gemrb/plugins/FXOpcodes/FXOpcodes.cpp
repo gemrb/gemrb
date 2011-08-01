@@ -4164,7 +4164,11 @@ int fx_set_sanctuary_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	//iwd and bg are a bit different, but we solve the whole stuff in a single opcode
 	if (0) print( "fx_set_sanctuary_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	if (target->HasSpellState(SS_SANCTUARY)) return FX_NOT_APPLIED;
+
+	// don't set the state twice
+	// SetSpellState will also check if it is already set first
+	if (target->SetSpellState(SS_SANCTUARY)) return FX_NOT_APPLIED;
+
 	if (!fx->Parameter2) {
 		fx->Parameter2=1;
 	}
