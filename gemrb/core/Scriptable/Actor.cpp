@@ -5014,6 +5014,10 @@ void Actor::PerformAttack(ieDword gameTime)
 	} else {
 		success = tohit + roll > defense;
 	}
+	// autohit immobile enemies (true for atleast stun, sleep, timestop)
+	if (target->Immobile() || (target->GetStat(IE_STATE_ID) & STATE_SLEEP)) {
+		success = true;
+	}
 
 	if (!success) {
 		//hit failed
