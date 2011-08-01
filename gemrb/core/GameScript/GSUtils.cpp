@@ -2247,6 +2247,24 @@ retry:
 	free(selects);
 }
 
+void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag)
+{
+	AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->string0Parameter);
+	if (!anim) {
+		anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName );
+	}
+	if (!anim) {
+		print( "Script error: No Animation Named \"%s\" or \"%s\"\n",
+			parameters->string0Parameter,parameters->objects[1]->objectName );
+		return;
+	}
+	if (flag) {
+		anim->Flags |= A_ANI_ACTIVE;
+	} else {
+		anim->Flags &= ~A_ANI_ACTIVE;
+	}
+}
+
 #define MAX_ISLAND_POLYGONS  10
 
 //read a polygon 2da

@@ -1914,22 +1914,10 @@ void GameScript::SoundActivate(Scriptable* /*Sender*/, Action* parameters)
 }
 
 // according to IESDP this action is about animations
+//PST's SetCorpseEnabled also handles containers, but no one uses it
 void GameScript::AmbientActivate(Scriptable* Sender, Action* parameters)
 {
-	AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->string0Parameter);
-	if (!anim) {
-		anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName );
-	}
-	if (!anim) {
-		print( "Script error: No Animation Named \"%s\" or \"%s\"\n",
-			parameters->string0Parameter,parameters->objects[1]->objectName );
-		return;
-	}
-	if (parameters->int0Parameter) {
-		anim->Flags |= A_ANI_ACTIVE;
-	} else {
-		anim->Flags &= ~A_ANI_ACTIVE;
-	}
+	AmbientActivateCore(Sender, parameters, parameters->int0Parameter);
 }
 
 void GameScript::ChangeTileState(Scriptable* Sender, Action* parameters)
@@ -3018,16 +3006,55 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 	Sender->ReleaseCurrentAction();
 }
 
+void GameScript::Activate(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		//it could still be an area animation, PST allows deactivating them via Activate
+		AmbientActivateCore(Sender, parameters, 1);
+		return;
+	}
+	if (tar->Type == ST_ACTOR) {
+		tar->Unhide();
+		return;
+	}
+
+	//PST allows activating of containers
+	if (tar->Type == ST_CONTAINER) {
+		((Container *) tar)->Flags&=~CONT_DISABLED;
+		return;
+	}
+
+	//and regions
+	if (tar->Type == ST_PROXIMITY || tar->Type == ST_TRAVEL || tar->Type==ST_TRIGGER) {
+		((InfoPoint *) tar)->Flags&=~TRAP_DEACTIVATED;
+		return;
+	}
+}
+
 void GameScript::Deactivate(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
+		//it could still be an area animation, PST allows deactivating them via Deactivate
+		AmbientActivateCore(Sender, parameters, 0);
 		return;
 	}
-	if (tar->Type != ST_ACTOR) {
+	if (tar->Type == ST_ACTOR) {
+		tar->Hide();
 		return;
 	}
-	tar->Hide();
+	//PST allows deactivating of containers
+	if (tar->Type == ST_CONTAINER) {
+		((Container *) tar)->Flags|=CONT_DISABLED;
+		return;
+	}
+
+	//and regions
+	if (tar->Type == ST_PROXIMITY || tar->Type == ST_TRAVEL || tar->Type==ST_TRIGGER) {
+		((InfoPoint *) tar)->Flags|=TRAP_DEACTIVATED;
+		return;
+	}
 }
 
 void GameScript::MakeGlobal(Scriptable* Sender, Action* /*parameters*/)
@@ -3308,17 +3335,6 @@ void GameScript::ForceHide(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	actor->BaseStats[IE_AVATARREMOVAL]=1;
-}
-
-void GameScript::Activate(Scriptable* Sender, Action* parameters)
-{
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar || tar->Type != ST_ACTOR) {
-		return;
-	}
-	// Deactivate hides, so this should unhide..
-	//tar->Activate();
-	tar->Unhide();
 }
 
 void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)

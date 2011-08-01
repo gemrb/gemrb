@@ -453,6 +453,10 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 
 	Container *c;
 	for (idx = 0; (c = area->TMap->GetContainer( idx )); idx++) {
+		if (c->Flags & CONT_DISABLED) {
+			continue;
+		}
+
 		c->Highlight = false;
 		if (overContainer == c && target_mode) {
 			if (c->VisibleTrap(0) || (c->Flags & CONT_LOCKED)) {
@@ -1159,6 +1163,10 @@ int GameControl::GetCursorOverDoor(Door *overDoor) const
 //returns the appropriate cursor over a container (or pile)
 int GameControl::GetCursorOverContainer(Container *overContainer) const
 {
+	if (overContainer->Flags & CONT_DISABLED) {
+		return lastCursor;
+	}
+
 	if (target_mode == TARGET_MODE_PICK) {
 		if (overContainer->VisibleTrap(0)) {
 			return IE_CURSOR_TRAP;
@@ -1693,6 +1701,11 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 void GameControl::HandleContainer(Container *container, Actor *actor)
 {
 	char Tmp[256];
+
+	//container is disabled, it should not react
+	if (container->Flags & CONT_DISABLED) {
+		return;
+	}
 
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the container back from the coordinates
