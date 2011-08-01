@@ -316,8 +316,6 @@ public:
 	void DisplayHeadText(const char* text);
 	void FixHeadTextPos();
 	void SetScriptName(const char* text);
-	//call this to deny script running in the next AI cycle
-	void DelayedEvent();
 	//call this to enable script running as soon as possible
 	void ImmediateEvent();
 	bool IsPC() const;

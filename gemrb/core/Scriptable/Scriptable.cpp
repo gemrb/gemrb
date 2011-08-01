@@ -279,12 +279,6 @@ void Scriptable::DrawOverheadText(const Region &screen)
 	gamedata->FreePalette(palette);
 }
 
-void Scriptable::DelayedEvent()
-{
-	// FIXME: do we need this?
-	// lastRunTime = core->GetGame()->Ticks;
-}
-
 void Scriptable::ImmediateEvent()
 {
 	InternalFlags |= IF_FORCEUPDATE;
