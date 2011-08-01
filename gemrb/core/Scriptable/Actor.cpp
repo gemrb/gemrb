@@ -1505,7 +1505,7 @@ static void InitActorTables()
 			}
 
 			field = tm->QueryField( rowname, skillcolumns[COL_TURNLEVEL] );
-			turnlevels[i]=atoi(field);      
+			turnlevels[i]=atoi(field);
 
 			field = tm->QueryField( rowname, skillcolumns[COL_BOOKTYPE] );
 			booktypes[i]=atoi(field);
@@ -3726,10 +3726,14 @@ void Actor::Die(Scriptable *killer)
 
 	// death variables are updated at the moment of death
 	if (KillVar[0]) {
-		//don't use the raw killVar here
+		//don't use the raw killVar here (except when the flags explicitly ask for it)
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 			if (AppearanceFlags&APP_DEATHTYPE) {
-				snprintf(varname, 32, "KILL_%s", KillVar);
+				if (AppearanceFlags&APP_LEAVEKILL) {
+					snprintf(varname, 32, "%s", KillVar);
+				} else {
+					snprintf(varname, 32, "KILL_%s", KillVar);
+				}
 				game->kaputz->Lookup(varname, value);
 				game->kaputz->SetAt(varname, value+1, nocreate);
 			}
@@ -3792,7 +3796,7 @@ void Actor::Die(Scriptable *killer)
 	j=APP_GOOD;
 	for(i=0;i<4;i++) {
 		if (AppearanceFlags&j) {
-			ieDword value = 0;
+			value = 0;
 			game->locals->Lookup(CounterNames[i], value);
 			game->locals->SetAt(CounterNames[i], value+DeathCounters[i], nocreate);
 		}
@@ -3813,7 +3817,7 @@ void Actor::Die(Scriptable *killer)
 
 		Map *area = GetCurrentArea();
 		if (area) {
-			ieDword value = 0;
+			value = 0;
 			area->locals->Lookup(varname, value);
 			// i am guessing that we shouldn't decrease below 0
 			if (value > 0) {
@@ -4634,7 +4638,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 		if (clss <= (ieDword) classcount) {
 			THAC0Bonus -= defaultprof[clss];
 		} else {
-			//it is not clear what is the penalty for non player classes 
+			//it is not clear what is the penalty for non player classes
 			THAC0Bonus -= 4;
 		}
 	}
