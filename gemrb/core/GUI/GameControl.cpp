@@ -41,6 +41,7 @@
 #include "TileMap.h"
 #include "Video.h"
 #include "damages.h"
+#include "opcode_params.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
@@ -1626,6 +1627,14 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 	}
 	source->ClearPath();
 	source->ClearActions();
+
+	// cannot target spells on invisible or sanctuaried creatures
+	// invisible actors are invisible, so this is usually impossible by itself, but improved invisibility changes that
+	if ((tgt->GetStat(IE_STATE_ID)&STATE_INVISIBLE) || tgt->HasSpellState(SS_SANCTUARY)) {
+		displaymsg->DisplayConstantStringName(STR_NOSEE_NOCAST, DMC_RED, source);
+		ResetTargetMode();
+		return;
+	}
 
 	spellCount--;
 	if (spellOrItem>=0) {
