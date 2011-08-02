@@ -1625,10 +1625,6 @@ def SkillsSelect():
 
 	CharGenWindow.SetVisible (WINDOW_INVISIBLE)
 	SkillsWindow = GemRB.LoadWindow (6)
-	RaceName = CommonTables.Races.GetRowName (GemRB.GetPlayerStat (MyChar, IE_RACE) - 1)
-	Dexterity = str(GetPlayerStat (MyChar, IE_DEX) )
-	SkillRaceTable = GemRB.LoadTable ("SKILLRAC")
-	SkillDexterityTable = GemRB.LoadTable ("SKILLDEX")
 
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), \
 		GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
