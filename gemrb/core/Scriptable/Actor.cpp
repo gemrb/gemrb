@@ -276,8 +276,9 @@ static int hc_flags[OVERLAY_COUNT];
 static int *mxsplwis = NULL;
 static int spllevels;
 
-// thieving skill dexterity boni vector
+// thieving skill dexterity and race boni vectors
 std::vector<std::vector<int> > skilldex;
+std::vector<std::vector<int> > skillrac;
 
 //for every game except IWD2 we need to reverse TOHIT
 static int ReverseToHit=true;
@@ -1372,6 +1373,7 @@ void Actor::ReleaseMemory()
 			wmlevels[i]=NULL;
 		}
 		skilldex.clear();
+		skillrac.clear();
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -2016,6 +2018,35 @@ static void InitActorTables()
 					skilldex[i].push_back (atoi(tm->GetRowName(i)));
 				} else {
 					skilldex[i].push_back (atoi(tm->QueryField(i, j)));
+				}
+			}
+		}
+	}
+
+	// race modifier for thieving skills
+	tm.load("skillrac");
+	int value = 0;
+	int racetable = core->LoadSymbol("race");
+	Holder<SymbolMgr> race;
+	if (racetable != -1) {
+		race = core->GetSymbol(racetable);
+	}
+	if (tm) {
+		int cols = tm->GetColumnCount();
+		int rows = tm->GetRowCount();
+		for (i = 0; i < rows; i++) {
+			skillrac.push_back (std::vector<int>());
+			for(j = -1; j < cols; j++) {
+				if (j == -1) {
+					// figure out the value from the race name
+					if (racetable == -1) {
+						value = 0;
+					} else {
+						value = race->GetValue(tm->GetRowName(i));
+					}
+					skillrac[i].push_back (value);
+				} else {
+					skillrac[i].push_back (atoi(tm->QueryField(i, j)));
 				}
 			}
 		}
@@ -7466,13 +7497,24 @@ int Actor::GetSkillBonus(unsigned int col) const
 {
 	if (skilldex.empty()) return 0;
 
-	// dexterity
-	int lookup = Modified[IE_DEX];
+	// race
+	int lookup = Modified[IE_RACE];
+	int bonus = 0;
 	std::vector<std::vector<int> >::iterator it;
-	for (it = skilldex.begin(); it != skilldex.end(); it++) {
+	for (it = skillrac.begin(); it != skillrac.end(); it++) {
 		if ((*it)[0] == lookup) {
-			return (*it)[col];
+			bonus = (*it)[col];
+			break;
 		}
 	}
-	return 0;
+
+	// dexterity
+	lookup = Modified[IE_DEX];
+	for (it = skilldex.begin(); it != skilldex.end(); it++) {
+		if ((*it)[0] == lookup) {
+			bonus += (*it)[col];
+			break;
+		}
+	}
+	return bonus;
 }
