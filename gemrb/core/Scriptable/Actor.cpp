@@ -93,7 +93,7 @@ static int xpbonustypes = -1;
 static int xpbonuslevels = -1;
 static int **levelslots = NULL;
 static int *dualswap = NULL;
-static int *maxhpconbon = NULL;
+static int *maxLevelForHpRoll = NULL;
 static int *skillstats = NULL;
 static int *skillabils = NULL;
 static int skillcount = -1;
@@ -1282,9 +1282,9 @@ void Actor::ReleaseMemory()
 			free(dualswap);
 			dualswap=NULL;
 		}
-		if (maxhpconbon) {
-			free(maxhpconbon);
-			maxhpconbon=NULL;
+		if (maxLevelForHpRoll) {
+			free(maxLevelForHpRoll);
+			maxLevelForHpRoll=NULL;
 		}
 		if (skillstats) {
 			free(skillstats);
@@ -1693,12 +1693,8 @@ static void InitActorTables()
 		}
 	}
 
-	//default all hp con bonuses to 9; this should be updated below
 	//TODO: check iwd2
-	maxhpconbon = (int *) calloc(classcount, sizeof(int));
-	for (i = 0; i < classcount; i++) {
-		maxhpconbon[i] = 9;
-	}
+	maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
 	tm.load("classes");
 	if (tm && !core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
 		AutoTable hptm;
@@ -1739,7 +1735,7 @@ static void InitActorTables()
 				if (classis>=0) {
 					print("Classis: %d ", classis);
 					levelslots[tmpindex][classis] = IE_LEVEL;
-					//get the max hp con bonus
+					//get the last level when we can roll for HP
 					hptm.load(tm->QueryField(i, 6));
 					if (hptm) {
 						int tmphp = 0;
@@ -1747,7 +1743,7 @@ static void InitActorTables()
 						while (atoi(hptm->QueryField(tmphp, rollscolumn)))
 							tmphp++;
 						print("TmpHP: %d ", tmphp);
-						if (tmphp) maxhpconbon[tmpindex] = tmphp;
+						if (tmphp) maxLevelForHpRoll[tmpindex] = tmphp;
 					}
 				}
 				continue;
@@ -1799,8 +1795,8 @@ static void InitActorTables()
 								while (atoi(hptm->QueryField(tmphp, rollscolumn)))
 									tmphp++;
 								//make sure we at least set the first class
-								if ((tmphp>maxhpconbon[tmpindex])||foundwarrior||numfound==0)
-									maxhpconbon[tmpindex]=tmphp;
+								if ((tmphp>maxLevelForHpRoll[tmpindex])||foundwarrior||numfound==0)
+									maxLevelForHpRoll[tmpindex]=tmphp;
 							}
 						}
 					}
@@ -1825,7 +1821,7 @@ static void InitActorTables()
 				free(classnames);
 				classnames = NULL;
 			}
-			print("HPCON: %d ", maxhpconbon[tmpindex]);
+			print("HPROLLMAXLVL: %d ", maxLevelForHpRoll[tmpindex]);
 			print("DS: %d\n", dualswap[tmpindex]);
 		}
 		/*this could be enabled to ensure all levelslots are filled with at least 0's;
@@ -2427,15 +2423,15 @@ void Actor::RefreshPCStats() {
 	ieDword bonindex = BaseStats[IE_CLASS]-1;
 
 	//we must limit the levels to the max allowable
-	if (bonlevel>maxhpconbon[bonindex])
-		bonlevel = maxhpconbon[bonindex];
+	if (bonlevel>maxLevelForHpRoll[bonindex])
+		bonlevel = maxLevelForHpRoll[bonindex];
 
 	if (IsDualInactive()) {
 		//we apply the inactive hp bonus if it's better than the new hp bonus, so that we
 		//never lose hp, only gain, on leveling
 		oldlevel = IsDualSwap() ? BaseStats[IE_LEVEL] : BaseStats[IE_LEVEL2];
 		bonlevel = IsDualSwap() ? BaseStats[IE_LEVEL2] : BaseStats[IE_LEVEL];
-		oldlevel = (oldlevel > maxhpconbon[bonindex]) ? maxhpconbon[bonindex] : oldlevel;
+		oldlevel = (oldlevel > maxLevelForHpRoll[bonindex]) ? maxLevelForHpRoll[bonindex] : oldlevel;
 		if (Modified[IE_MC_FLAGS] & (MC_WAS_FIGHTER|MC_WAS_RANGER)) {
 			oldbonus = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR, Modified[IE_CON]);
 		} else {
