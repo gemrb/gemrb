@@ -276,6 +276,9 @@ static int hc_flags[OVERLAY_COUNT];
 static int *mxsplwis = NULL;
 static int spllevels;
 
+// thieving skill dexterity boni vector
+std::vector<std::vector<int> > skilldex;
+
 //for every game except IWD2 we need to reverse TOHIT
 static int ReverseToHit=true;
 static int CheckAbilities=false;
@@ -1368,6 +1371,7 @@ void Actor::ReleaseMemory()
 			free(wmlevels[i]);
 			wmlevels[i]=NULL;
 		}
+		skilldex.clear();
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1999,6 +2003,23 @@ static void InitActorTables()
 			}
 		}
 	}
+
+	// dexterity modifier for thieving skills
+	tm.load("skilldex");
+	if (tm) {
+		int skilldexNCols = tm->GetColumnCount();
+		int skilldexNRows = tm->GetRowCount();
+		for (i = 0; i < skilldexNRows; i++) {
+			skilldex.push_back (std::vector<int>());
+			for(j = -1; j < skilldexNCols; j++) {
+				if (j == -1) {
+					skilldex[i].push_back (atoi(tm->GetRowName(i)));
+				} else {
+					skilldex[i].push_back (atoi(tm->QueryField(i, j)));
+				}
+			}
+		}
+	}
 }
 
 void Actor::SetLockedPalette(const ieDword *gradients)
@@ -2474,6 +2495,17 @@ void Actor::RefreshPCStats() {
 	if (rate && !(core->GetGame()->GameTime % (rate*AI_UPDATE_TIME))) {
 		NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 	}
+
+	// adjust thieving skills with dex and race
+	// table header is in this order:
+	// PICK_POCKETS  OPEN_LOCKS  FIND_TRAPS  MOVE_SILENTLY  HIDE_IN_SHADOWS  DETECT_ILLUSION  SET_TRAPS
+	Modified[IE_PICKPOCKET] += GetSkillBonus(1);
+	Modified[IE_LOCKPICKING] += GetSkillBonus(2);
+	Modified[IE_TRAPS] += GetSkillBonus(3);
+	Modified[IE_STEALTH] += GetSkillBonus(4);
+	Modified[IE_HIDEINSHADOWS] += GetSkillBonus(5);
+	Modified[IE_DETECTILLUSIONS] += GetSkillBonus(6);
+	Modified[IE_SETTRAPS] += GetSkillBonus(7);
 }
 
 void Actor::RollSaves()
@@ -7429,3 +7461,18 @@ int Actor::GetClassMask() const
 	return classmask;
 }
 
+// returns the combined dexterity and racial bonus to specified thieving skill
+int Actor::GetSkillBonus(unsigned int col) const
+{
+	if (skilldex.empty()) return 0;
+
+	// dexterity
+	int lookup = Modified[IE_DEX];
+	std::vector<std::vector<int> >::iterator it;
+	for (it = skilldex.begin(); it != skilldex.end(); it++) {
+		if ((*it)[0] == lookup) {
+			return (*it)[col];
+		}
+	}
+	return 0;
+}

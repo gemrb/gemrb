@@ -746,5 +746,7 @@ public:
 	bool PCInDark() const;
 	/* computes the actor's classmask (iwd2) */
 	int GetClassMask() const;
+	/* computes the thieving skill bonus from race and dexterity */
+	int GetSkillBonus(unsigned int col) const;
 };
 #endif
