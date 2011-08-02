@@ -143,8 +143,6 @@ def OnLoad():
 
 	CostTable = GemRB.LoadTable("skilcost")
 
-	SkillRacTable = GemRB.LoadTable("SKILLRAC")
-
 	for i in range(RowCount):
 		GemRB.SetVar("Skill "+str(i),0) # Racial/Class bonuses don't factor in char-gen or leveling
 						# so can be safely ignored
