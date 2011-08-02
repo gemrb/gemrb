@@ -420,14 +420,14 @@ def ProfsLeftPress():
 		return
 	if GUICommon.GameIsIWD1() or GUICommon.GameIsBG1():
 		ProfMaxTable = GemRB.LoadTable ("profsmax")
-		MaxProf = ProfMaxTable.GetValue(ClassNameSave, "OTHER_LEVELS")
+		if ProfsType == LUPROFS_TYPE_CHARGEN:
+			MaxProf = ProfMaxTable.GetValue(ClassNameSave, "FIRST_LEVEL")
+		else:
+			MaxProf = ProfMaxTable.GetValue(ClassNameSave, "OTHER_LEVELS")
 	else:
 		MaxProf = ProfsTable.GetValue(Pos+ProfsTableOffset, ProfsColumn)
 	if MaxProf>5:
 		MaxProf = 5
-	# FIXME: use profsmax.2da (in all games? could be problematic for weapon styles)
-	#if (MaxProf>2) and GUICommon.GameIsBG1():
-	#	MaxProf = 2
 
 	ActPoint = GemRB.GetVar("Prof "+str(Pos) )
 	if ActPoint >= MaxProf:
