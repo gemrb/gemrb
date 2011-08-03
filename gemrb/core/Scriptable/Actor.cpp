@@ -2415,7 +2415,17 @@ int Actor::GetProficiency(int proftype) const
 // refresh stats on creatures (PC or NPC) with a valid class (not animals etc)
 // internal use only, and this is maybe a stupid name :)
 void Actor::RefreshPCStats() {
-	//calculate hp bonus
+	// calculate the hp bonus for each level
+	//	single-classed characters:
+	//		apply full constitution bonus for levels up (and including) to maxLevelForHpRoll
+	//	dual-classed characters:
+	//		while inactive, there is no consititution bonus and hp gain AT ALL
+	//		afterwards, the same applies as for single-classed characters again
+	//			consititution bonus is NOT taken from the max of classes
+	//	multi-classed characters:
+	//		apply the highest constitution bonus for levels up (and including) to maxLevelForHpRoll (already the max of the classes)
+	//		BUT divide it by the number of classes (ideally the last one to levelup should get all the fractions)
+	//	for levels after maxLevelForHpRoll there is NO constitution bonus anymore
 	int bonus;
 	int bonlevel = GetXPLevel(true);
 	int oldlevel, oldbonus;
