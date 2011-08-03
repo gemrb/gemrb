@@ -370,9 +370,12 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 			rolls = HPTable.GetValue (level, 1)
 			bonus = HPTable.GetValue (level, 2)
 
-			# we only do a roll if core diff or higher, or uncheck max
+			# we only do a roll on core difficulty or higher
+			# and if maximum HP rolls (bg2 and later) are disabled
+			# and/or if it is bg1 chargen (I guess too many testers got annoyed)
 			if rolls:
-				if GemRB.GetVar ("Difficulty Level") >= 3 and not GemRB.GetVar ("Maximum HP"):
+				if GemRB.GetVar ("Difficulty Level") >= 3 and not GemRB.GetVar ("Maximum HP") \
+				and not (GUICommon.GameIsBG1() and LowLevel == 0):
 					CurrentHP += int (GemRB.Roll (rolls, HPTable.GetValue (level, 0), bonus) / Divisor + 0.5)
 				else:
 					CurrentHP += int ((rolls * HPTable.GetValue (level, 0) + bonus) / Divisor + 0.5)
