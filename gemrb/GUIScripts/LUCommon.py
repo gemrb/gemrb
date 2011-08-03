@@ -386,14 +386,18 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 						roll = GemRB.Roll (rolls, sides, bonus)
 						if roll-bonus < MinRoll:
 							roll = MinRoll + bonus
-						CurrentHP += int (roll / Divisor + 0.5)
+						AddedHP = int (roll / Divisor + 0.5)
 					else:
-						CurrentHP += int (GemRB.Roll (rolls, sides, bonus) / Divisor + 0.5)
+						AddedHP = int (GemRB.Roll (rolls, sides, bonus) / Divisor + 0.5)
 				else:
-					CurrentHP += int ((rolls * sides + bonus) / Divisor + 0.5)
+					AddedHP = int ((rolls * sides + bonus) / Divisor + 0.5)
 			else:
-				CurrentHP += int (bonus / Divisor + 0.5)
-			CurrentHP = int (CurrentHP)
+				AddedHP = int (bonus / Divisor + 0.5)
+			# ensure atleast 1hp is given
+			# this is safe for inactive dualclass levels too (handled above)
+			if AddedHP == 0:
+				AddedHP = 1
+			CurrentHP += AddedHP
 
 	#update our hp values
 	GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, CurrentHP+OldHP)
