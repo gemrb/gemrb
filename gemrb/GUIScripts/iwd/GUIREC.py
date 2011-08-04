@@ -528,7 +528,13 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	# 10341 Reaction adjustment
 	stats.append ( (10341, GA (IE_DEX,0), '0') )
 	# 10342 CON HP Bonus/Level
-	stats.append ( (10342, GA (IE_CON,0), 'p') )
+	# dual-classed chars get no bonus while the primary class is inactive
+	# and the new class' bonus afterwards
+	# single- and multi-classed chars are straightforward - the highest class bonus counts
+	if GUICommon.IsWarrior (pc):
+		stats.append ( (10342, GA (IE_CON, 1), 'p') )
+	else:
+		stats.append ( (10342, GA (IE_CON, 0), 'p') )
 	# 10343 Chance To Learn spell
 	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, 0, 0)>0:
 		stats.append ( (10343, GA (IE_INT,0), '%' ) )
