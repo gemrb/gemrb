@@ -2467,6 +2467,13 @@ void Actor::RefreshPCStats() {
 		bonus=1-Modified[IE_MAXHITPOINTS];
 	}
 
+	//we still apply the maximum bonus to dead characters, but don't apply
+	//to current HP, or we'd have dead characters showing as having hp
+	Modified[IE_MAXHITPOINTS]+=bonus;
+	//	if(BaseStats[IE_STATE_ID]&STATE_DEAD)
+	//		bonus = 0;
+	//	BaseStats[IE_HITPOINTS]+=bonus;
+
 	//get the wspattack bonuses for proficiencies
 	WeaponInfo wi;
 	ITMExtHeader *header = GetWeapon(wi, false);
@@ -2506,13 +2513,6 @@ void Actor::RefreshPCStats() {
 			}
 		}
 	}
-
-	//we still apply the maximum bonus to dead characters, but don't apply
-	//to current HP, or we'd have dead characters showing as having hp
-	Modified[IE_MAXHITPOINTS]+=bonus;
-//	if(BaseStats[IE_STATE_ID]&STATE_DEAD)
-//		bonus = 0;
-//	BaseStats[IE_HITPOINTS]+=bonus;
 
 	// apply the intelligence and wisdom bonus to lore
 	Modified[IE_LORE] += core->GetLoreBonus(0, Modified[IE_INT]) + core->GetLoreBonus(0, Modified[IE_WIS]);
