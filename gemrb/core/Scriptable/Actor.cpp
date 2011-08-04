@@ -1804,10 +1804,10 @@ static void InitActorTables()
 					//save the MC_WAS_ID of the first class in the dual-class
 					if (numfound==0 && tmpbits==2) {
 						if (strcmp(classnames[0], currentname) == 0) {
-							dualswap[tmpindex] = strtol(tm->QueryField(classname, "MC_WAS_ID"), NULL, 0);
+							dualswap[tmpindex] = strtol(tm->QueryField(currentname, "MC_WAS_ID"), NULL, 0);
 						}
 					} else if (numfound==1 && tmpbits==2 && !dualswap[tmpindex]) {
-						dualswap[tmpindex] = strtol(tm->QueryField(classname, "MC_WAS_ID"), NULL, 0);
+						dualswap[tmpindex] = strtol(tm->QueryField(currentname, "MC_WAS_ID"), NULL, 0);
 					}
 					numfound++;
 				}
