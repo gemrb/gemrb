@@ -81,7 +81,7 @@ public:
 	AutoTable(const AutoTable &);
 	AutoTable& operator=(const AutoTable&);
 
-	bool load(const char* ResRef);
+	bool load(const char* ResRef, bool silent=false);
 	void release();
 	bool ok() const { return table; }
 	operator bool() const { return table; }

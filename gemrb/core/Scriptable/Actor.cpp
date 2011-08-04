@@ -1736,7 +1736,7 @@ static void InitActorTables()
 					print("Classis: %d ", classis);
 					levelslots[tmpindex][classis] = IE_LEVEL;
 					//get the last level when we can roll for HP
-					hptm.load(tm->QueryField(i, 6));
+					hptm.load(tm->QueryField(i, 6), true);
 					if (hptm) {
 						int tmphp = 0;
 						int rollscolumn = hptm->GetColumnIndex("ROLLS");
@@ -1788,7 +1788,7 @@ static void InitActorTables()
 						if (!foundwarrior) {
 							foundwarrior = (classis==ISFIGHTER||classis==ISRANGER||classis==ISPALADIN||
 								classis==ISBARBARIAN);
-							hptm.load(tm->QueryField(currentname, "HP"));
+							hptm.load(tm->QueryField(currentname, "HP"), true);
 							if (hptm) {
 								int tmphp = 0;
 								int rollscolumn = hptm->GetColumnIndex("ROLLS");

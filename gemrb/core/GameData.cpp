@@ -154,7 +154,7 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 }
 
 /** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-int GameData::LoadTable(const ieResRef ResRef)
+int GameData::LoadTable(const ieResRef ResRef, bool silent)
 {
 	int ind = GetTableIndex( ResRef );
 	if (ind != -1) {
@@ -162,7 +162,7 @@ int GameData::LoadTable(const ieResRef ResRef)
 		return ind;
 	}
 	//print("(%s) Table not found... Loading from file\n", ResRef);
-	DataStream* str = GetResource( ResRef, IE_2DA_CLASS_ID );
+	DataStream* str = GetResource( ResRef, IE_2DA_CLASS_ID, silent );
 	if (!str) {
 		return -1;
 	}

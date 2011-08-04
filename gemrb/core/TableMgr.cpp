@@ -56,11 +56,11 @@ AutoTable& AutoTable::operator=(const AutoTable& other)
 	return *this;
 }
 
-bool AutoTable::load(const char* ResRef)
+bool AutoTable::load(const char* ResRef, bool silent)
 {
 	release();
 
-	int ref = gamedata->LoadTable(ResRef);
+	int ref = gamedata->LoadTable(ResRef, silent);
 	if (ref == -1)
 		return false;
 
