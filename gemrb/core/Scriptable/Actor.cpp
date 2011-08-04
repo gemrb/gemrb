@@ -1742,7 +1742,7 @@ static void InitActorTables()
 						int rollscolumn = hptm->GetColumnIndex("ROLLS");
 						while (atoi(hptm->QueryField(tmphp, rollscolumn)))
 							tmphp++;
-						print("TmpHP: %d ", tmphp);
+						print("HPROLLMAXLVL: %d\n", tmphp);
 						if (tmphp) maxLevelForHpRoll[tmpindex] = tmphp;
 					}
 				}
