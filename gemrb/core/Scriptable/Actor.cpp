@@ -5124,7 +5124,7 @@ void Actor::ModifyDamage(Actor *target, Scriptable *hitter, int &damage, int &re
 	}
 
 	//guardian mantle for PST
-	if ((hitter->Type==ST_ACTOR) && (target->Modified[IE_IMMUNITY]&IMM_GUARDIAN) ) {
+	if (hitter && (hitter->Type==ST_ACTOR) && (target->Modified[IE_IMMUNITY]&IMM_GUARDIAN) ) {
 		Actor *attacker = (Actor *) hitter;
 		//if the hitter doesn't make the spell save, the mantle works and the damage is 0
 		if (!attacker->GetSavingThrow(0,-4) ) {
