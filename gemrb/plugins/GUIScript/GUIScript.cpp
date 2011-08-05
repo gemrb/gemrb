@@ -3950,6 +3950,7 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 	const char *folder;
 
 	if (!PyArg_ParseTuple( args, "Os|i", &obj, &folder, &Version )) {
+		PyErr_Clear();
 		if (!PyArg_ParseTuple( args, "i|i", &slot, &Version)) {
 			return AttributeError( GemRB_SaveGame__doc );
 		}
