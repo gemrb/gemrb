@@ -2427,6 +2427,8 @@ void Actor::RefreshPCStats() {
 	//		BUT divide it by the number of classes (ideally the last one to levelup should get all the fractions)
 	//	for levels after maxLevelForHpRoll there is NO constitution bonus anymore
 	int bonus;
+	// this is wrong for dual-classed (so we override it later)
+	// and sometimes marginally wrong for multi-classed (but we usually round the average up)
 	int bonlevel = GetXPLevel(true);
 	int oldlevel, oldbonus;
 	oldlevel = oldbonus = 0;
@@ -2436,24 +2438,42 @@ void Actor::RefreshPCStats() {
 	if (bonlevel>maxLevelForHpRoll[bonindex])
 		bonlevel = maxLevelForHpRoll[bonindex];
 
-	if (IsDualInactive()) {
-		//we apply the inactive hp bonus if it's better than the new hp bonus, so that we
-		//never lose hp, only gain, on leveling
+	if (IsDualClassed()) {
+		// just the old consititution bonus
 		oldlevel = IsDualSwap() ? BaseStats[IE_LEVEL] : BaseStats[IE_LEVEL2];
 		bonlevel = IsDualSwap() ? BaseStats[IE_LEVEL2] : BaseStats[IE_LEVEL];
 		oldlevel = (oldlevel > maxLevelForHpRoll[bonindex]) ? maxLevelForHpRoll[bonindex] : oldlevel;
+		// give the bonus only for the levels where there were actually rolls
+		// if we wanted to be really strict, the old bonindex and max roll level would need to be looked up
+		if (oldlevel == maxLevelForHpRoll[bonindex]) {
+			bonlevel = 0;
+		} else {
+			bonlevel -= oldlevel; // the actual number of "rolling" levels for the new bonus
+			if (bonlevel+oldlevel > maxLevelForHpRoll[bonindex]) {
+				bonlevel = maxLevelForHpRoll[bonindex] - oldlevel;
+			}
+		}
+		if (bonlevel < 0) bonlevel = 0;
 		if (Modified[IE_MC_FLAGS] & (MC_WAS_FIGHTER|MC_WAS_RANGER)) {
 			oldbonus = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR, Modified[IE_CON]);
 		} else {
 			oldbonus = core->GetConstitutionBonus(STAT_CON_HP_NORMAL, Modified[IE_CON]);
 		}
-	}
+		bonus = oldbonus * oldlevel;
 
-	// warrior (fighter, barbarian, ranger, or paladin) or not
-	// GetClassLevel now takes into consideration inactive dual-classes
-	bonus = GetHpAdjustment(bonlevel);
-	oldbonus *= oldlevel;
-	bonus = (oldbonus > bonus) ? oldbonus : bonus;
+		// but if the class is already reactivated ...
+		if (!IsDualInactive()) {
+			// add in the bonus for the levels of the new class
+			// since there are no warrior to warrior dual-classes, just invert the previous check to get the right conmod
+			if (Modified[IE_MC_FLAGS] & (MC_WAS_FIGHTER|MC_WAS_RANGER)) {
+				bonus += bonlevel * core->GetConstitutionBonus(STAT_CON_HP_NORMAL, Modified[IE_CON]);
+			} else {
+				bonus += GetHpAdjustment(bonlevel);
+			}
+		}
+	} else {
+		bonus = GetHpAdjustment(bonlevel);
+	}
 
 	//morale recovery every xth AI cycle
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
@@ -4143,6 +4163,7 @@ int Actor::GetHpAdjustment(int multiplier)
 {
 	int val;
 
+	// GetClassLevel/IsWarrior takes into consideration inactive dual-classes, so those would fail here
 	if (IsWarrior()) {
 		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
 	} else {
