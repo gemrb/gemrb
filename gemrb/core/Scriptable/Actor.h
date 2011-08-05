@@ -357,6 +357,7 @@ private:
 	int GetProficiency(int proftype) const;
 	/** Re/Inits the Modified vector for PCs/NPCs */
 	void RefreshPCStats();
+	void RefreshHP();
 	bool ShouldHibernate();
 	void ApplyClassClab(int cls, bool remove);
 	bool ShouldDrawCircle();

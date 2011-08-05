@@ -2412,9 +2412,8 @@ int Actor::GetProficiency(int proftype) const
 	}
 }
 
-// refresh stats on creatures (PC or NPC) with a valid class (not animals etc)
-// internal use only, and this is maybe a stupid name :)
-void Actor::RefreshPCStats() {
+// recalculates the constitution bonus to hp and adds it to the stat
+void Actor::RefreshHP() {
 	// calculate the hp bonus for each level
 	//	single-classed characters:
 	//		apply full constitution bonus for levels up (and including) to maxLevelForHpRoll
@@ -2475,14 +2474,6 @@ void Actor::RefreshPCStats() {
 		bonus = GetHpAdjustment(bonlevel);
 	}
 
-	//morale recovery every xth AI cycle
-	int mrec = GetStat(IE_MORALERECOVERYTIME);
-	if (mrec) {
-		if (!(core->GetGame()->GameTime%mrec)) {
-			NewBase(IE_MORALE,1,MOD_ADDITIVE);
-		}
-	}
-
 	if (bonus<0 && (Modified[IE_MAXHITPOINTS]+bonus)<=0) {
 		bonus=1-Modified[IE_MAXHITPOINTS];
 	}
@@ -2493,6 +2484,20 @@ void Actor::RefreshPCStats() {
 	//	if(BaseStats[IE_STATE_ID]&STATE_DEAD)
 	//		bonus = 0;
 	//	BaseStats[IE_HITPOINTS]+=bonus;
+}
+
+// refresh stats on creatures (PC or NPC) with a valid class (not animals etc)
+// internal use only, and this is maybe a stupid name :)
+void Actor::RefreshPCStats() {
+	RefreshHP();
+
+	//morale recovery every xth AI cycle
+	int mrec = GetStat(IE_MORALERECOVERYTIME);
+	if (mrec) {
+		if (!(core->GetGame()->GameTime%mrec)) {
+			NewBase(IE_MORALE,1,MOD_ADDITIVE);
+		}
+	}
 
 	//get the wspattack bonuses for proficiencies
 	WeaponInfo wi;
