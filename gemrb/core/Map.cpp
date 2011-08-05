@@ -346,6 +346,18 @@ Map::~Map(void)
 
 	free( MapSet );
 	free( SrchMap );
+
+	//close the current container if it was owned by this map, this avoids a crash
+
+	Container *c = core->GetCurrentContainer();
+
+	if (c && c->GetCurrentArea()==this) {
+
+		core->CloseCurrentContainer();
+
+	}
+
+
 	delete TMap;
 	delete INISpawn;
 	aniIterator aniidx;
@@ -1076,8 +1088,8 @@ void Map::DrawMap(Region screen)
 		int rain, flags;
 
 		if (game->IsTimestopActive()) {
-                	flags = TILE_GREY;
-	        }
+			flags = TILE_GREY;
+		}
 		else if (AreaFlags&AF_DREAM) {
 			flags = TILE_SEPIA;
 		} else flags = 0;
