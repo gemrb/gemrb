@@ -4713,6 +4713,20 @@ Effect *Interface::GetFeatures(int count)
 	return new Effect[count];
 }
 
+/*
+void Interface::FreeITMExt(ITMExtHeader *p, Effect *e)
+{
+	delete [] p;
+	delete [] e;
+}
+
+void Interface::FreeSPLExt(SPLExtHeader *p, Effect *e)
+{
+	delete [] p;
+	delete [] e;
+}
+*/
+
 WorldMapArray *Interface::NewWorldMapArray(int count)
 {
 	return new WorldMapArray(count);
