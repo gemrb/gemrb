@@ -263,9 +263,9 @@ void Projectile::SetBlend(int brighten)
 	if (!palette->alpha) {
 		palette->CreateShadedAlphaChannel();
 	}
-  if (brighten) {
-    palette->Brighten();
-  }
+	if (brighten) {
+		palette->Brighten();
+	}
 }
 
 //create another projectile with type-1 (iterate magic missiles and call lightning)
@@ -443,6 +443,10 @@ Actor *Projectile::GetTarget()
 			effects->SetOwner(target);
 			return target;
 		}
+		if (!effects) {
+			return target;
+		}
+
 		int res = effects->CheckImmunity ( target );
 		//resisted
 		if (!res) {
@@ -532,7 +536,7 @@ bool Projectile::FailedIDS(Actor *target) const
 
 void Projectile::Payload()
 {
-	Actor *target;
+	Actor *target, *Owner;
 
 	if(Shake) {
 		core->timer->SetScreenShake( Shake, Shake, Shake);
@@ -540,7 +544,7 @@ void Projectile::Payload()
 	}
 
 	//allow area affecting projectile with a spell	
-	if(!(effects || (!Target && FailSpell[0]))) {
+	if(!(effects || SuccSpell[0] || (!Target && FailSpell[0]))) {
 		return;
 	}
 
@@ -561,14 +565,12 @@ void Projectile::Payload()
 		} else {
 			target = area->GetActorByGlobalID(Caster);			
 		}
-		Actor *source = area->GetActorByGlobalID(Caster);
-		if (effects) {
-			if (source) {
-				effects->SetOwner(source);
-			} else {
-				effects->SetOwner(target);
-			}
-		}
+	}
+	Actor *source = area->GetActorByGlobalID(Caster);
+	if (source) {
+		Owner = source;
+	} else {
+		Owner = target;
 	}
 
 	if (target) {
@@ -576,7 +578,7 @@ void Projectile::Payload()
 		if (FailedIDS(target)) {
 			if (FailSpell[0]) {
 				if (Target) {
-					core->ApplySpell(FailSpell, target, effects->GetOwner(), Level);
+					core->ApplySpell(FailSpell, target, Owner, Level);
 				} else {
 					//no Target, using the fake target as owner
 					core->ApplySpellPoint(FailSpell, area, Destination, target, Level);
@@ -585,7 +587,7 @@ void Projectile::Payload()
 		} else {
 			//apply this spell on the target when the projectile succeeds
 			if (SuccSpell[0]) {
-				core->ApplySpell(SuccSpell, target, effects->GetOwner(), Level);
+				core->ApplySpell(SuccSpell, target, Owner, Level);
 			}
 
 			if(ExtFlags&PEF_RGB) {
@@ -593,7 +595,10 @@ void Projectile::Payload()
 					RGB >> 8, RGB >> 16, RGB >> 24);
 			}
 
-			effects->AddAllEffects(target, Destination);
+			if (effects) {
+				effects->SetOwner(Owner);
+				effects->AddAllEffects(target, Destination);
+			}
 		}
 	}
 

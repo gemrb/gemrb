@@ -182,10 +182,10 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 		rgb.type=RGBModifier::TINT;
 		sca->AlterPalette(rgb);
 	}
-	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		playonce=true;
-	} else {
+	if ((fx->TimingMode==FX_DURATION_INSTANT_LIMITED) && (fx->Parameter2&1) ) {
 		playonce=false;
+	} else {
+		playonce=true;
 	}
 	if (playonce) {
 			sca->PlayOnce();
@@ -513,9 +513,14 @@ int DamageLastHitter(Effect *fx, Actor *target, int param1, int param2)
 		if (actor && PersonalDistance(target, actor)<30 ) {
 			const TriggerEntry *entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
 			if (entry) {
-				Effect *newfx = EffectQueue::CreateEffectCopy( fx, fx_damage_opcode_ref, param1, param2);
+				Effect *newfx = EffectQueue::CreateEffect( fx_damage_opcode_ref, param1, param2, FX_DURATION_INSTANT_PERMANENT);
+			  newfx->Target = FX_TARGET_PRESET;
+			  newfx->Power = fx->Power;
+			  memcpy(newfx->Source, fx->Source, sizeof(newfx->Source) );
 				core->ApplyEffect(newfx, actor, target);
-				fx->Parameter3--;
+			  if (fx->Parameter3!=0xffffffff) {
+					fx->Parameter3--;
+			  }
 			}
 		}
 	}
@@ -533,7 +538,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	int terminate = FX_APPLIED;
-	bool playonce = true;
+	bool playonce = false;
 	int Duration = 0;
 	Effect *newfx;
 
@@ -544,7 +549,6 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		case 0: //cloak of warding
 			Duration = 5 * fx->CasterLevel;
 			fx->Parameter3 = core->Roll(3,4,fx->CasterLevel);
-			playonce = false;
 			break;
 		case 1: //shield
 			Duration = 25 * fx->CasterLevel;
@@ -571,13 +575,13 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_wands_ref, 1, 0);
 			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
-			//terminate = FX_NOT_APPLIED;
 			break;
 		case 2: //black barbed shield
 			Duration = core->Roll(10,3,0);
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 2, 0);
 			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
+			fx->Parameter3=0xffffffff;
 			break;
 		case 3: //pain mirror
 			fx->Parameter3 = 1;
@@ -593,7 +597,6 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			break;
 		case 6: //duplication
 			core->GetAudioDrv()->Play("magic02", target->Pos.x, target->Pos.y);
-			playonce = false;
 			break;
 		case 7: //armor
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_colorchange_ref, 0x825A2800, -1);      
@@ -675,10 +678,11 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			//terminate = FX_NOT_APPLIED;
 			break;
 		case 13: //conflagration
-			fx->Duration = 50;
+			Duration = 50;
+			playonce = true;
 			break;
 		case 14: //infernal shield
-			fx->Duration = 5 * fx->CasterLevel;
+			Duration = 5 * fx->CasterLevel;
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_resistfire_ref, 150, 1);
 			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
@@ -712,7 +716,6 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_wands_ref, 1, 0);
 			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
-			//terminate = FX_NOT_APPLIED;
 			break;
 		case 16: //balance in all things
 			fx->Parameter3 = fx->CasterLevel/4;
@@ -723,6 +726,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			break;
 		}
 		if (Duration) {
+			fx->Duration = Duration;
 			fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 			PrepareDuration(fx);
 		}
@@ -767,7 +771,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 2: //black barbed shield (damage opponents)
 		if (target->LastHitter) {
-			terminate = DamageLastHitter(fx, target, 6, 2);
+			terminate = DamageLastHitter(fx, target, core->Roll(2, 6, 0),0x100000 );
 		}
 		break;
 	case 3: case 16: //pain mirror or balance in all things
