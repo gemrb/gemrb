@@ -882,28 +882,28 @@ def CanDualClass(actor):
 		return 1
 	return 0
 
-# FIXME; maybe rather add another column to classes.2da
 def IsWarrior (actor):
-	real_men = [ "FIGHTER", "PALADIN", "BARBARIAN", "RANGER", "FIGHTER_THIEF", "FIGHTER_DRUID", "FIGHTER_MAGE", "FIGHTER_MAGE_THIEF", "FIGHTER_MAGE_CLERIC" ]
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	ClassIndex = CommonTables.Classes.FindValue (5, Class)
 	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
+	IsWarrior = CommonTables.ClassSkills.GetValue (ClassName, "NO_PROF")
+
+	# warriors get only a -2 penalty for wielding weapons they are not proficient with
+	IsWarrior = (IsWarrior == -2)
 
 	Dual = IsDualClassed (actor, 0)
 	if Dual[0] > 0:
 		DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
 		MCColumn = CommonTables.Classes.GetColumnIndex ("MC_WAS_ID")
 		FirstClassIndex = CommonTables.Classes.FindValue (MCColumn, DualedFrom)
-		FirstClass = CommonTables.Classes.GetValue (FirstClassIndex, 5)
+		FirstClassName = CommonTables.Classes.GetRowName (FirstClassIndex)
+		OldIsWarrior = CommonTables.ClassSkills.GetValue (FirstClassName, "NO_PROF")
 		# there are no warrior to warrior dualclasses, so if the previous class was one, the current one certainly isn't
-		if FirstClass in real_men:
+		if OldIsWarrior == -2:
 			return 0
-		else:
-			return 1
-	else:
-		if ClassName in real_men:
-			return 1
-	return 0
+		# but there are also non-warrior to non-warrior dualclasses, so just use the new class check
+
+	return IsWarrior
 
 def SetupDamageInfo (pc, Button):
 	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
