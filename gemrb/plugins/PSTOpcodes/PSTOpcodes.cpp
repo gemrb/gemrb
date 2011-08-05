@@ -188,11 +188,11 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 		playonce=true;
 	}
 	if (playonce) {
-			sca->PlayOnce();
+		sca->PlayOnce();
 	} else {
 		if (fx->Parameter2&1) {
 			//four cycles, duration is in millisecond
-			sca->SetDefaultDuration(sca->GetSequenceDuration(AI_UPDATE_TIME));		
+			sca->SetDefaultDuration(sca->GetSequenceDuration(AI_UPDATE_TIME));
 		} else {
 			sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
 		}
@@ -461,7 +461,7 @@ int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 		offset.y=atoi(tab->QueryField(rows,1));
 		delay = atoi(tab->QueryField(rows,3));
 		duration = atoi(tab->QueryField(rows,4));
-	 	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(tab->QueryField(rows,2), true);
+		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(tab->QueryField(rows,2), true);
 		if (!sca) continue;
 		sca->SetBlend();
 		sca->SetDelay(AI_UPDATE_TIME*delay);
@@ -514,13 +514,13 @@ int DamageLastHitter(Effect *fx, Actor *target, int param1, int param2)
 			const TriggerEntry *entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
 			if (entry) {
 				Effect *newfx = EffectQueue::CreateEffect( fx_damage_opcode_ref, param1, param2, FX_DURATION_INSTANT_PERMANENT);
-			  newfx->Target = FX_TARGET_PRESET;
-			  newfx->Power = fx->Power;
-			  memcpy(newfx->Source, fx->Source, sizeof(newfx->Source) );
+				newfx->Target = FX_TARGET_PRESET;
+				newfx->Power = fx->Power;
+				memcpy(newfx->Source, fx->Source, sizeof(newfx->Source) );
 				core->ApplyEffect(newfx, actor, target);
-			  if (fx->Parameter3!=0xffffffff) {
+				if (fx->Parameter3!=0xffffffff) {
 					fx->Parameter3--;
-			  }
+				}
 			}
 		}
 	}
@@ -539,6 +539,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	int terminate = FX_APPLIED;
 	bool playonce = false;
+	ieDword tint = 0;
 	int Duration = 0;
 	Effect *newfx;
 
@@ -599,7 +600,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			core->GetAudioDrv()->Play("magic02", target->Pos.x, target->Pos.y);
 			break;
 		case 7: //armor
-			newfx = EffectQueue::CreateEffectCopy(fx, fx_colorchange_ref, 0x825A2800, -1);      
+			newfx = EffectQueue::CreateEffectCopy(fx, fx_colorchange_ref, 0x825A2800, -1);
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 6, 16);
@@ -682,6 +683,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			playonce = true;
 			break;
 		case 14: //infernal shield
+			tint = 0x5EC2FE;
 			Duration = 5 * fx->CasterLevel;
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_resistfire_ref, 150, 1);
 			newfx->Duration = Duration;
@@ -692,6 +694,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			core->ApplyEffect(newfx, target, Owner);
 			break;
 		case 15: //submerge the will
+			tint = 0x538D90;
 			Duration = 12 * fx->CasterLevel;
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 2, 16);
 			newfx->Duration = Duration;
@@ -718,6 +721,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			core->ApplyEffect(newfx, target, Owner);
 			break;
 		case 16: //balance in all things
+			tint = 0x615AB4;
 			fx->Parameter3 = fx->CasterLevel/4;
 
 			Duration = 5 * fx->CasterLevel;
@@ -733,6 +737,19 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		if (!target->HasVVCCell(fx->Resource)) {
 			ScriptedAnimation *sca = gamedata->GetScriptedAnimation(fx->Resource, true);
 			if (sca) {
+				if (tint) {
+					RGBModifier rgb;
+
+					rgb.speed=-1;
+					rgb.phase=0;
+					rgb.rgb.r=tint;
+					rgb.rgb.g=tint >> 8;
+					rgb.rgb.b=tint >> 16;
+					rgb.rgb.a=tint >> 24;
+					rgb.type=RGBModifier::TINT;
+
+					sca->AlterPalette(rgb);
+				}
 				sca->SetBlend();
 				if (playonce) {
 					sca->PlayOnce();
@@ -762,7 +779,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	switch(fx->Parameter2) {
-	case 0: //cloak of warding  
+	case 0: //cloak of warding
 		if (fx->Parameter3<=0) {
 			return FX_NOT_APPLIED;
 		}
