@@ -51,7 +51,6 @@
 #include "GUI/Window.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
-#include "Scriptable/FloatText.h"
 #include "Scriptable/InfoPoint.h"
 
 #include <cmath>
@@ -347,13 +346,6 @@ Map::~Map(void)
 
 	free( MapSet );
 	free( SrchMap );
-
-	//close the current container if it was owned by this map, this avoids a crash
-	Container *c = core->GetCurrentContainer();
-	if (c && c->GetCurrentArea()==this) {
-		core->CloseCurrentContainer();
-	}
-
 	delete TMap;
 	delete INISpawn;
 	aniIterator aniidx;
@@ -1230,12 +1222,6 @@ void Map::DrawMap(Region screen)
 		//(maybe we should be using the queue?)
 		Actor* actor = actors[i];
 		actor->DrawOverheadText(screen);
-	}
-
-	i = texts.size();
-	while(i--) {
-		FloatText* ft = texts[i];
-		ft->DrawOverheadText(screen);
 	}
 
 	oldgametime=gametime;
@@ -3732,50 +3718,3 @@ void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
 	Background = bmp->GetSprite2D();
 	BgDuration = duration;
 }
-
-void Map::AddFloatText(Actor *actor, char *text)
-{
-	size_t i = texts.size();
-	Region nr;
-	bool display = true;
-
-	nr.h = 20;
-	nr.w = 100;
-	nr.x = actor->Pos.x;
-	nr.y = actor->Pos.y;
-
-	while(i--) {
-		//cleanup
-		if (!texts[i]->Height) {
-			delete texts[i];
-
-			texts.erase(texts.begin()+i);
-			continue;
-		}
-
-		//existing stack
-		if (texts[i]->owner==actor->GetGlobalID() ) {
-			texts[i]->AddText(text);
-			return;
-		}
-
-		Region r;
-
-		r.h = texts[i]->Height*20;
-		r.w = 100;
-		r.x = texts[i]->Pos.x;
-		r.x = texts[i]->Pos.y;
-		if (nr.InsideRegion(r)) {
-			//collision, what to do
-			display = false;
-		}
-	}
-
-	//new stack fits on screen
-	if (display) {
-		FloatText *newtext = new FloatText;
-		newtext->DisplayHeadText(text, actor);
-		texts.insert(texts.end(),newtext);
-	}
-}
-
