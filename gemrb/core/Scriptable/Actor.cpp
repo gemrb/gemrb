@@ -3826,10 +3826,10 @@ void Actor::Die(Scriptable *killer)
 		//don't use the raw killVar here (except when the flags explicitly ask for it)
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 			if (AppearanceFlags&APP_DEATHTYPE) {
-				if (AppearanceFlags&APP_LEAVEKILL) {
-					snprintf(varname, 32, "%s", KillVar);
-				} else {
+				if (AppearanceFlags&APP_ADDKILL) {
 					snprintf(varname, 32, "KILL_%s", KillVar);
+				} else {
+					snprintf(varname, 32, "%s", KillVar);
 				}
 				game->kaputz->Lookup(varname, value);
 				game->kaputz->SetAt(varname, value+1, nocreate);

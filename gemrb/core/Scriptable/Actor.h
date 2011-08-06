@@ -172,7 +172,7 @@ struct PolymorphCache;
 #define APP_HALFTRANS    2           //half transparent
 #define APP_DEATHVAR     16          //set death variable
 #define APP_DEATHTYPE    32          //count creature type deaths
-#define APP_LEAVEKILL    64          //don't include KILL_ in the name
+#define APP_ADDKILL      64          //prepend KILL_ to the creature type
 #define APP_FACTION      128         //count killed faction
 #define APP_TEAM         0x100       //count killed team
 #define APP_INVULNERABLE 0x200       //invulnerable
