@@ -265,14 +265,12 @@ def OpenContainerWindow ():
 def CloseContainerWindow ():
 	global ContainerWindow
 
-	if ContainerWindow == None:
+	if not ContainerWindow:
 		return
 
 	hideflag = GemRB.HideGUI ()
 
-	if ContainerWindow:
-		ContainerWindow.Unload ()
-	ContainerWindow = None
+	ContainerWindow.Unload ()
 
 	if GUICommon.GameIsPST():
 		GUICommonWindows.EnableAnimatedWindows ()

@@ -348,15 +348,10 @@ Map::~Map(void)
 	free( SrchMap );
 
 	//close the current container if it was owned by this map, this avoids a crash
-
 	Container *c = core->GetCurrentContainer();
-
 	if (c && c->GetCurrentArea()==this) {
-
 		core->CloseCurrentContainer();
-
 	}
-
 
 	delete TMap;
 	delete INISpawn;
