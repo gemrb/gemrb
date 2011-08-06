@@ -3259,7 +3259,15 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 			unsigned int i=c->inventory.GetSlotCount();
 			while (i--) {
 				CREItem *item = c->RemoveItem(i, 0);
-				othercontainer->AddItem(item);
+				int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0);
+				if (slot != -1) {
+					if (othercontainer->inventory.MergeItems(slot, item) != ASI_SUCCESS) {
+						// the merge either failed (add whole) or went over the limit (add remainder)
+						othercontainer->AddItem(item);
+					}
+				} else {
+					othercontainer->AddItem(item);
+				}
 			}
 		}
 	}
