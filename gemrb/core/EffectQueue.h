@@ -270,8 +270,6 @@ public:
 	int DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amount, ieDword param2) const;
 	int SpecificDamageBonus(ieDword damage_type) const;
 	bool HasAnyDispellableEffect() const;
-	//transforming timing modes
-	static void TransformToDelay(ieByte &TimingMode);
 	//getting summarised effects
 	int BonusAgainstCreature(EffectRef &effect_reference, Actor *actor) const;
 	//getting weapon immunity flag

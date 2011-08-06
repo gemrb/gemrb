@@ -153,13 +153,6 @@ FX_DURATION_AFTER_EXPIRES,FX_DURATION_PERMANENT_UNSAVED, //4,5
 FX_DURATION_INSTANT_LIMITED,FX_DURATION_JUST_EXPIRED,FX_DURATION_PERMANENT_UNSAVED,//6,8
 FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES,FX_DURATION_JUST_EXPIRED};//9,10
 
-//change the timing method for effect that should trigger after this effect expired
-static const ieDword fx_to_delayed[]={FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED,
-FX_DURATION_PERMANENT_UNSAVED,FX_DURATION_DELAY_LIMITED_PENDING,
-FX_DURATION_AFTER_EXPIRES,FX_DURATION_PERMANENT_UNSAVED, //4,5
-FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED,//6,8
-FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED};//9,10
-
 static inline ieByte TriggeredEffect(ieByte timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return false;
@@ -1931,15 +1924,6 @@ ieDword EffectQueue::GetSavedEffectsCount() const
 			cnt++;
 	}
 	return cnt;
-}
-
-void EffectQueue::TransformToDelay(ieByte &TimingMode)
-{
-	if( TimingMode<MAX_TIMING_MODE) {;
-		TimingMode = fx_to_delayed[TimingMode];
-	} else {
-		TimingMode = FX_DURATION_JUST_EXPIRED;
-	}
 }
 
 int EffectQueue::ResolveEffect(EffectRef &effect_reference)
