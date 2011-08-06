@@ -401,5 +401,6 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 
 	#update our hp values
 	GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, CurrentHP+OldHP)
-	GemRB.SetPlayerStat (pc, IE_HITPOINTS, GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1)+CurrentHP)
+	# HACK: account also for the new constitution bonus for the current hitpoints
+	GemRB.SetPlayerStat (pc, IE_HITPOINTS, GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1)+CurrentHP+5)
 	return
