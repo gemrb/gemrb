@@ -637,29 +637,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 			return ASI_SUCCESS;
 		}
 
-		CREItem *myslot = Slots[slot];
-		if (myslot->MaxStackAmount && ItemsAreCompatible(myslot, item)) {
-			//calculate with the max movable stock
-			int chunk = item->Usages[0];
-			if (myslot->Usages[0] + chunk > myslot->MaxStackAmount) {
-				chunk = myslot->MaxStackAmount - myslot->Usages[0];
-			}
-			if (chunk<=0) {
-				return ASI_FAILED;
-			}
-			
-			myslot->Flags |= IE_INV_ITEM_ACQUIRED;
-			myslot->Usages[0] = (ieWord) (myslot->Usages[0] + chunk);
-			item->Usages[0] = (ieWord) (item->Usages[0] - chunk);
-			Changed = true;
-			EquipItem(slot);
-			if (item->Usages[0] == 0) {
-				delete item;
-				return ASI_SUCCESS;
-			}
-			return ASI_PARTIAL;
-		}
-		return ASI_FAILED;
+		return MergeItems(slot, item);
 	}
 
 	bool which;
@@ -1853,4 +1831,31 @@ bool Inventory::ProvidesCriticalAversion()
 		}
 	}
 	return false;
+}
+
+int Inventory::MergeItems(int slot, CREItem *item)
+{
+	CREItem *slotitem = Slots[slot];
+	if (slotitem->MaxStackAmount && ItemsAreCompatible(slotitem, item)) {
+		//calculate with the max movable stock
+		int chunk = item->Usages[0];
+		if (slotitem->Usages[0] + chunk > slotitem->MaxStackAmount) {
+			chunk = slotitem->MaxStackAmount - slotitem->Usages[0];
+		}
+		if (chunk<=0) {
+			return ASI_FAILED;
+		}
+
+		slotitem->Flags |= IE_INV_ITEM_ACQUIRED;
+		slotitem->Usages[0] = (ieWord) (slotitem->Usages[0] + chunk);
+		item->Usages[0] = (ieWord) (item->Usages[0] - chunk);
+		Changed = true;
+		EquipItem(slot);
+		if (item->Usages[0] == 0) {
+			delete item;
+			return ASI_SUCCESS;
+		}
+		return ASI_PARTIAL;
+	}
+	return ASI_FAILED;
 }

@@ -321,6 +321,8 @@ public:
 	unsigned int FindStealableItem();
 	/** checks if any equipped item provides critical hit aversion */
 	bool ProvidesCriticalAversion();
+	/** tries to merge the passed item with the on in the passed slot */
+	int MergeItems(int slot, CREItem *item);
 	//setting important constants
 	static void Init(int mb);
 	static void SetHeadSlot(int arg);
