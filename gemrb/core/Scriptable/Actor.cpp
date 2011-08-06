@@ -362,6 +362,7 @@ Actor::Actor()
 	LastExit = 0;
 	attackcount = 0;
 	secondround = 0;
+	//AttackStance =  IE_ANI_ATTACK;
 	attacksperround = 0;
 	nextattack = 0;
 	nextWalk = 0;
@@ -3455,8 +3456,10 @@ void Actor::SetMap(Map *map)
 		//find a quiver for the bow, etc
 		if (Equipped!=IW_NO_EQUIPPED) {
 			inventory.EquipItem( Equipped+inventory.GetWeaponSlot());
-			SetEquippedQuickSlot( inventory.GetEquipped(), EquippedHeader );
+		} else {
+			inventory.EquipItem(inventory.GetFistSlot());
 		}
+		SetEquippedQuickSlot( inventory.GetEquipped(), EquippedHeader );
 	}
 }
 
@@ -6429,7 +6432,11 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 				break;
 			}
 		}
+		//if it is the fist slot and not currently used, then set it up
 		if (i==MAX_QUICKWEAPONSLOT) {
+			Equipped = IW_NO_EQUIPPED;
+			EquippedHeader = 0;
+			inventory.SetEquippedSlot(Equipped, EquippedHeader);
 			return 0;
 		}
 	}
