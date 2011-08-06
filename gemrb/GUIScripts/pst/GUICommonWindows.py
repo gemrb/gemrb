@@ -50,7 +50,9 @@ MenuWindow = None
 MainWindow = None
 global PortraitWindow
 PortraitWindow = None
+global ActionsWindow
 ActionsWindow = None
+global OptionsWindow
 OptionsWindow = None
 DraggedPortrait = None
 DiscWindow = None
@@ -68,61 +70,11 @@ DiscWindow = None
 # 9 REST
 # 10 TXTE
 
-def OpenCommonWindows ():
-	global TimeWindow, PortWindow, MenuWindow, MainWindow
-
-	TimeWindow = GemRB.LoadWindow (0)
-	PortWindow = GemRB.LoadWindow (1)
-	MenuWindow = GemRB.LoadWindow (2)
-	MainWindow = GemRB.LoadWindow (3)
-
-	Window = MenuWindow
-
-	# Can't Reach ???
-	Button = Window.GetControl (0)
-	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: CntReachPress
-
-	# AI
-	Button = Window.GetControl (4)
-	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
-
-	# Message popup
-	Button = Window.GetControl (10)
-	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, TxtePress)
-
-
-	SetupMenuWindowControls (Window)
-
-
-	TimeWindow.SetVisible (WINDOW_VISIBLE)
-	PortWindow.SetVisible (WINDOW_VISIBLE)
-	MenuWindow.SetVisible (WINDOW_VISIBLE)
-	MainWindow.SetVisible (WINDOW_VISIBLE)
-	
-def CloseCommonWindows ():
-	global MainWindow
-
-	if MainWindow == None:
-		return
-	#if TimeWindow == None:
-	#	return
-	
-	if MainWindow:
-		MainWindow.Unload ()
-	if TimeWindow:
-		TimeWindow.Unload ()
-	if PortWindow:
-		PortWindow.Unload ()
-	if MenuWindow:
-		MenuWindow.Unload ()
-
-	MainWindow = None
-
 def SetupMenuWindowControls (Window):
+	global OptionsWindow
+
 	# Inventory
+	OptionsWindow = Window
 	Button = Window.GetControl (1)
 	Button.SetTooltip (41601)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
@@ -161,7 +113,6 @@ def SetupMenuWindowControls (Window):
 	Button.SetTooltip (41628)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.RestPress)
 
-
 	# AI
 	Button = Window.GetControl (4)
 	Button.SetTooltip (41631) # or 41646 Activate ...
@@ -188,6 +139,9 @@ def TxtePress ():
 	print "TxtePress"
 
 def SetupActionsWindowControls (Window):
+	global ActionsWindow
+
+	ActionsWindow = Window
 	# time button
 	Button = Window.GetControl (0)
 	Button.SetAnimation ("WMTIME")
@@ -211,7 +165,7 @@ def SetupActionsWindowControls (Window):
 	# Formations
 	Button = Window.GetControl (4)
 	Button.SetTooltip (44945)
-	
+
 
 
 # which=INVENTORY|STATS|FMENU
@@ -223,14 +177,14 @@ def GetActorPortrait (actor, which):
 	row = "0x%02X" %anim_id
 
 	return CommonTables.Pdolls.GetValue (row, which)
-	
+
 
 def UpdateAnimation ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	disguise = GemRB.GetGameVar ("APPEARANCE")
 	if disguise == 2: #dustman
-		animid = "DR"				
+		animid = "DR"
 	elif disguise == 1: #zombie
 		animid = "ZO"
 	else:
@@ -332,7 +286,7 @@ def UpdatePortraitWindow ():
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			ButtonHP.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			continue
-		
+
 		#sel = GemRB.GameGetSelectedPCSingle () == i + 1
 		Button.SetBAM (pic, 0, 0, -1)
 
@@ -360,7 +314,7 @@ def UpdatePortraitWindow ():
 		else:
 			Button.SetFlags(IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_DRAGGABLE|IE_GUI_BUTTON_MULTILINE, OP_SET)
 		Button.SetAnimation (pic, cycle)
-		
+
 
 		ButtonHP.SetFlags(IE_GUI_BUTTON_PICTURE, OP_SET)
 
@@ -381,7 +335,7 @@ def UpdatePortraitWindow ():
 			op = OP_NAND
 		else:
 			op = OP_OR
-			
+
 		ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
 
 
@@ -436,7 +390,7 @@ def PortraitButtonOnShiftPress ():
 
 def PortraitButtonHPOnPress ():
 	Window = PortraitWindow
-	
+
 	i = GemRB.GetVar ('PressedPortraitHP')
 
 	portrait_hp_numeric[i-1] = not portrait_hp_numeric[i-1]
@@ -446,7 +400,7 @@ def PortraitButtonHPOnPress ():
 		op = OP_NAND
 	else:
 		op = OP_OR
-			
+
 	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
 	return
 
@@ -590,7 +544,7 @@ def OpenWaitForDiscWindow ():
 	DisableAnimatedWindows ()
 
 	# 31483 - Please place PS:T disc number
-	# 31568 - Please  place the PS:T DVD 
+	# 31568 - Please place the PS:T DVD
 	# 31569 - in drive
 	# 31570 - Wrong disc in drive
 	# 31571 - There is no disc in drive

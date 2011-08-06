@@ -64,7 +64,7 @@ def OpenInventoryWindow ():
 	AvSlotsTable = GemRB.LoadTable ('avslots')
 
 	if GUICommon.CloseOtherWindow (OpenInventoryWindow):
-		GemRB.HideGUI ()
+		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
 		if InventoryWindow:
 			InventoryWindow.Unload ()
 		InventoryWindow = None
@@ -141,8 +141,10 @@ def OpenInventoryWindow ():
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()
 
-	GemRB.UnhideGUI()
-
+	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
+	GUICommonWindows.PortraitWindow.SetVisible(WINDOW_VISIBLE)
+	GUICommonWindows.OptionsWindow.SetVisible(WINDOW_VISIBLE)
+	return
 
 def UpdateInventoryWindow ():
 	global ItemHash
@@ -270,6 +272,9 @@ def UpdateSlot (pc, i):
 		slot = slot_list[i]+1
 		SlotType = GemRB.GetSlotType (slot)
 		slot_item = GemRB.GetSlotItem (pc, slot)
+		#PST displays the default weapon in the first slot if nothing else was equipped
+		if slot_item == None and SlotType["ID"] == 10 and GemRB.GetEquippedQuickSlot(pc)==10:
+			slot_item = GemRB.GetSlotItem (pc, 0)
 
 	ControlID = SlotType["ID"]
 	if ControlID<0:
@@ -330,7 +335,11 @@ def UpdateSlot (pc, i):
 
 		Button.EnableBorder (0, 0)
 		Button.EnableBorder (1, 0)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+
+		if SlotType["Effects"]==4:
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DefaultWeapon)
+		else:
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 
@@ -347,6 +356,12 @@ def UpdateSlot (pc, i):
 
 		if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot or GemRB.GetEquippedAmmunition (pc)==slot):
 			Button.SetState (IE_GUI_BUTTON_THIRD)
+	return
+
+def DefaultWeapon ():
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.SetEquippedQuickSlot (pc, 1000, -1, 1)
+	UpdateInventoryWindow ()
 	return
 
 def OnAutoEquip ():
