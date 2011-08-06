@@ -1555,6 +1555,7 @@ void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword am
 }
 
 //this is only used for Cloak of Warding Overlay in PST
+//returns the damage amount NOT soaked
 int EffectQueue::DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword param2) const
 {
 	std::list< Effect* >::const_iterator f;
@@ -1578,11 +1579,13 @@ int EffectQueue::DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword 
 	return amount;
 }
 
+//this is only used for Cloak of Warding Overlay in PST
+//returns the damage amount NOT soaked
 int EffectQueue::DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amount, ieDword param2) const
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
-		return 0;
+		return amount;
 	}
 	return DecreaseParam3OfEffect(effect_reference.opcode, amount, param2);
 }
