@@ -505,7 +505,7 @@ static EffectRef fx_dispel_ref = { "DispelEffects", -1 };
 static EffectRef fx_miscast_ref = { "MiscastMagicModifier", -1 };
 static EffectRef fx_set_state_ref = { "SetStatus", -1 };
 
-int DamageLastHitter(Effect *fx, Actor *target, int param1, int param2)
+static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int param2)
 {
 	if (fx->Parameter3) {
 		Map *map = target->GetCurrentArea();
@@ -531,6 +531,14 @@ int DamageLastHitter(Effect *fx, Actor *target, int param1, int param2)
 	return FX_APPLIED;
 }
 
+static inline void ConvertTiming(Effect *fx, int Duration)
+{
+	fx->Duration = Duration;
+	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+	ieDword GameTime = core->GetGame()->GameTime;
+	PrepareDuration(fx);
+}
+
 int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_overlay (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
@@ -540,58 +548,52 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 	int terminate = FX_APPLIED;
 	bool playonce = false;
 	ieDword tint = 0;
-	int Duration = 0;
 	Effect *newfx;
 
 	//special effects based on fx_param2
 	if (fx->FirstApply) {
-		ieDword GameTime = core->GetGame()->GameTime;
 		switch(fx->Parameter2) {
 		case 0: //cloak of warding
-			Duration = 5 * fx->CasterLevel;
+			ConvertTiming (fx, 5 * fx->CasterLevel);
 			fx->Parameter3 = core->Roll(3,4,fx->CasterLevel);
 			break;
 		case 1: //shield
-			Duration = 25 * fx->CasterLevel;
+			ConvertTiming(fx, 25 * fx->CasterLevel);
+
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 3, 16);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_breath_ref, 1, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_death_ref, 1, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_poly_ref, 1, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_spell_ref, 1, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_wands_ref, 1, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 			break;
 		case 2: //black barbed shield
-			Duration = core->Roll(10,3,0);
+			ConvertTiming (fx, core->Roll(10,3,0));
+
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 2, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 			fx->Parameter3=0xffffffff;
 			break;
 		case 3: //pain mirror
 			fx->Parameter3 = 1;
-			Duration = 5 * fx->CasterLevel;
+			ConvertTiming (fx, 5 * fx->CasterLevel);
+
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_colorpulse_ref, 0xFAFF7000, 0x30000C);
 			core->ApplyEffect(newfx, target, Owner);
 			break;
 		case 4: //guardian mantle
-			Duration = 50 + 5 * fx->CasterLevel;
+			ConvertTiming (fx, 50 + 5 * fx->CasterLevel);
 			break;
 		case 5: //shroud of shadows
 
@@ -634,10 +636,9 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		default:
 			break;
 		case 11: //flame walk
-			Duration = 10 * fx->CasterLevel;
+			ConvertTiming (fx, 10 * fx->CasterLevel);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_single_color_pulse_ref, 0xFF00, 0x400040);
-			//wtf is this
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_colorchange_ref, 0x64FA00, 0x50005);
@@ -652,88 +653,74 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			core->ApplyEffect(newfx, target, Owner);
 			break;
 		case 12: //protection from evil
-			Duration = 10 * fx->CasterLevel;
+			ConvertTiming (fx, 10 * fx->CasterLevel);
+
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 2, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_breath_ref, 2, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_death_ref, 2, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_poly_ref, 2, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_spell_ref, 2, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_wands_ref, 2, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 			//terminate = FX_NOT_APPLIED;
 			break;
 		case 13: //conflagration
-			Duration = 50;
+			ConvertTiming (fx, 50);
 			playonce = true;
 			break;
 		case 14: //infernal shield
 			tint = 0x5EC2FE;
-			Duration = 5 * fx->CasterLevel;
+			ConvertTiming (fx, 5 * fx->CasterLevel);
+
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_resistfire_ref, 150, 1);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_resistmfire_ref, 150, 1);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 			break;
 		case 15: //submerge the will
 			tint = 0x538D90;
-			Duration = 12 * fx->CasterLevel;
+			ConvertTiming (fx, 12 * fx->CasterLevel);
+
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 2, 16);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_breath_ref, 1, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_death_ref, 1, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_poly_ref, 1, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_spell_ref, 1, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_wands_ref, 1, 0);
-			newfx->Duration = Duration;
 			core->ApplyEffect(newfx, target, Owner);
 			break;
 		case 16: //balance in all things
 			tint = 0x615AB4;
 			fx->Parameter3 = fx->CasterLevel/4;
+			ConvertTiming (fx, 5 * fx->CasterLevel);
 
-			Duration = 5 * fx->CasterLevel;
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_colorpulse_ref, 0x615AB400, 0x30000C);
 			core->ApplyEffect(newfx, target, Owner);
+			playonce = true;
 			break;
 		}
-		if (Duration) {
-			fx->Duration = Duration;
-			fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
-			PrepareDuration(fx);
-		}
+
 		if (!target->HasVVCCell(fx->Resource)) {
 			ScriptedAnimation *sca = gamedata->GetScriptedAnimation(fx->Resource, true);
 			if (sca) {
