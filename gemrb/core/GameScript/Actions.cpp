@@ -771,12 +771,16 @@ void GameScript::CutSceneID(Scriptable* /*Sender*/, Action* /*parameters*/)
 	printMessage("GameScript","CutSceneID was called!\n",YELLOW);
 }
 
+static EffectRef fx_charm_ref = { "State:Charmed", -1 };
+
 void GameScript::Enemy(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
+
+	actor->fxqueue.RemoveAllEffects(fx_charm_ref);
 	actor->SetBase( IE_EA, EA_ENEMY );
 }
 
@@ -786,6 +790,8 @@ void GameScript::Ally(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
+
+	actor->fxqueue.RemoveAllEffects(fx_charm_ref);
 	actor->SetBase( IE_EA, EA_ALLY );
 }
 
@@ -2991,7 +2997,7 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Sender->LastTargetPos=parameters->pointParameter;
-	
+
 	Sender->CastSpell (spellres, tar, false, true);
 	if (parameters->string0Parameter[0]) {
 		level = parameters->int0Parameter;

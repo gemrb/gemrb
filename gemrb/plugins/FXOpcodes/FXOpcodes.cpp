@@ -1052,6 +1052,9 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 	bool playercharmed;
 	bool casterenemy;
 	if (fx->FirstApply) {
+		//when charmed, the target forgets its current action
+		target->ClearActions();
+
 		Scriptable *caster = GetCasterObject();
 		if (!caster) caster = Owner;
 		if (caster->Type==ST_ACTOR) {
@@ -1062,7 +1065,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		fx->DiceThrown=casterenemy;
 
 		playercharmed = target->InParty;
-		fx->DiceSides = playercharmed;    
+		fx->DiceSides = playercharmed;
 	} else {
 		casterenemy = fx->DiceThrown;
 		playercharmed = fx->DiceSides;
@@ -1617,7 +1620,7 @@ int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_set_poisoned_state (%2d): Damage: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	
+
 	int count = target->fxqueue.CountEffects(fx_poisoned_state_ref, fx->Parameter1, fx->Parameter2, fx->Resource);
 	if (count > 1) {
 		return FX_APPLIED;
@@ -3162,7 +3165,7 @@ int fx_reveal_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) print( "fx_reveal_area (%2d): Value: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	Map *map = NULL;
-	
+
 	if (target) {
 		map = target->GetCurrentArea();
 	}
@@ -3774,7 +3777,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		int cnt = rndstr2[0];
 		if (cnt) {
 			fx->Parameter1 = rndstr2[core->Roll(1,cnt,0)];
-		}    
+		}
 	}
 
 	if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
@@ -4368,7 +4371,7 @@ int fx_remove_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (0) print( "fx_remove_creature (%2d)\n", fx->Opcode);
 
 	Map *map = NULL;
-	
+
 	if (target) {
 		map = target->GetCurrentArea();
 	}
@@ -4690,7 +4693,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	Game *game = core->GetGame();
-	//FIXME: the familiar block field is not saved in the game and not set when the 
+	//FIXME: the familiar block field is not saved in the game and not set when the
 	//familiar is itemized, so a game reload will clear it (see how this is done in original)
 	if (game->familiarBlock) {
 		displaymsg->DisplayConstantStringName(STR_FAMBLOCK, DMC_RED, target);
@@ -5887,7 +5890,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		displaymsg->DisplayConstantStringName(STR_SNAREFAILED, DMC_WHITE, target);
 		if (target->LuckyRoll(1,100,0)<25) {
 			ieResRef spl;
-			
+
 			strnuprcpy(spl, fx->Resource, 8);
 			if (strlen(spl)<8) {
 				strcat(spl,"F");
@@ -6294,7 +6297,7 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		Targets *tgts = GetAllObjects(map, target, &oC, GA_NO_DEAD);
 		int rnd = core->Roll(1,tgts->Count(),-1);
 		Actor *victim = (Actor *) tgts->GetTarget(rnd, ST_ACTOR);
-		delete tgts;		
+		delete tgts;
 		if (victim && PersonalDistance(victim, target)>20) {
 			target->SetPosition( victim->Pos, true, 0 );
 			target->SetColorMod(0xff, RGBModifier::ADD, 0x50, 0xff, 0xff, 0xff, 0);
